@@ -1,0 +1,25 @@
+Revision history for Perl extension SWISH.
+
+0.01  Tue Sep 12 12:04:53 2000
+	- original version; created by h2xs 1.20 with options
+		-X -n SWISH
+
+0.05  Mon Jan 15, 2001
+        - Prepared for SWISH-E 2.2.  Namely, made the results
+          callback method ($hit->property) use the (at this time)
+          standard names for the fields, and provide access to all
+          data (swish internal data such as rank, title, file name, and
+          properties) through method calls on the $hit object.
+
+0.06  Mon Feb 05, 2001
+        - More works toward use with SWISH-E 2.2.
+          New method $result->get_header that replaces the
+          $result->indexheaders method.  The headers are now
+          stored as a hash with a key INDEX that points to
+          a hash of headers by index file name.
+
+0.08 Sat Nov  1 22:56:38 UTC 2003
+
+        - Depreciated this module -- see README
+
+

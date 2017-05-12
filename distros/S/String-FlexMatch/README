@@ -1,0 +1,152 @@
+NAME
+    String::FlexMatch - Flexible ways to match a string
+
+VERSION
+    version 1.100820
+
+SYNOPSIS
+      use String::FlexMatch;
+
+      my $s = String::FlexMatch->new(string => 'foobar');
+      if ($s eq 'foobar') {
+        # ...
+      }
+
+      $s = String::FlexMatch->new(regex => 'Error .* at line \d+');
+      if ($s eq 'Error "foo" at line 58') {
+        # ...
+      }
+
+      $s = String::FlexMatch->new(code => 'sub { length $_[0] < 10 }');
+      # or:
+      # my $s = String::FlexMatch->new(code => sub { length $_[0] < 10 });
+
+      if ($s ne 'somelongstring') {
+        # ...
+      }
+
+DESCRIPTION
+    Normally when trying to see whether two strings are equal, you use the
+    "eq" operator. If you want to find out whether one string matches
+    another more flexibly, you'd use a regular expression. And sometimes you
+    have to call a subroutine with a string argument that will tell you
+    whether that argument is interesting, i.e. matches in a broader sense.
+
+    When running data-driven tests, you sometimes don't know beforehand
+    which form of matching ("eq", regex or code) you need. Take the
+    following example:
+
+      use Test::More;
+      use String::FlexMatch;
+      use YAML;
+
+      sub frobnicate { $_[0] + $_[1] }
+
+      my $tests = Load do { local $/; <DATA> };
+      plan tests => scalar @$tests;
+
+      for my $test (@$tests) {
+        my $baz = frobnicate($test->{testarg}{foo}, $test->{testarg}{bar});
+        is($baz, $test->{expect}{baz});
+      }
+
+      __DATA__
+      -
+        testarg:
+          foo: 2
+          bar: 3
+        expect:
+          baz: 5
+      -
+        testarg:
+          foo: 21
+          bar: 34
+        expect:
+          baz: !perl/String::FlexMatch
+            regex: '\d+'
+
+    A setup like this was the reason for writing this class. If you find any
+    other uses for it, please let me know so this manpage can be expanded
+    with a few cookbook-style examples.
+
+METHODS
+  new
+        my $obj = String::FlexMatch->new;
+        my $obj = String::FlexMatch->new(%args);
+
+    Creates and returns a new object. The constructor will accept as
+    arguments a list of pairs, from component name to initial value. For
+    each pair, the named component is initialized by calling the method of
+    the same name with the given value. If called with a single hash
+    reference, it is dereferenced and its key/value pairs are set as
+    described before.
+
+  as_string
+    FIXME
+
+  choice_attr
+    FIXME
+
+  code
+    FIXME
+
+  finish_dump
+    FIXME
+
+  force_code
+    FIXME
+
+  force_regex
+    FIXME
+
+  init
+    FIXME
+
+  is_eq
+    FIXME
+
+  is_ne
+    FIXME
+
+  prepare_dump
+    FIXME
+
+  regex
+    FIXME
+
+  string
+    FIXME
+
+  yaml_dump
+    FIXME
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=String-FlexMatch>.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <http://search.cpan.org/dist/String-FlexMatch/>.
+
+    The development version lives at
+    <http://github.com/hanekomu/String-FlexMatch/>. Instead of sending
+    patches, please fork this project using the standard git and github
+    infrastructure.
+
+AUTHOR
+      Marcel Gruenauer <marcel@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2004 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

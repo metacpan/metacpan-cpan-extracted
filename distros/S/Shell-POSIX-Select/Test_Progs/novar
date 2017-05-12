@@ -1,0 +1,5 @@
+#! /usr/bin/perl -w
+
+use Shell::POSIX::Select;
+
+select (1,2) { print "$_\n"; }

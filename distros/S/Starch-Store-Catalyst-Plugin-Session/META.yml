@@ -1,0 +1,32 @@
+---
+abstract: 'Starch storage backend using Catalyst::Plugin::Session stores.'
+author:
+  - 'Aran Deltac <bluefeet@gmail.com>'
+build_requires:
+  Catalyst::Plugin::Session::Store::File: '0.18'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test2::Bundle::Extended: '0.000051'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Starch-Store-Catalyst-Plugin-Session
+requires:
+  Catalyst::Plugin::Session: '0.4'
+  Log::Any: '1.03'
+  Moo: '2'
+  Starch: '0.05'
+  Type::Tiny: '1.000005'
+  namespace::clean: '0.24'
+  strictures: '2'
+resources:
+  bugtracker: https://github.com/bluefeet/Starch-Store-Calatlyst-Plugin-Session/issues
+  homepage: https://github.com/bluefeet/Starch-Store-Calatlyst-Plugin-Session
+  repository: https://github.com/bluefeet/Starch-Store-Calatlyst-Plugin-Session.git
+version: '0.03'

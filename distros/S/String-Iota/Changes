@@ -1,0 +1,6 @@
+Revision history for Perl extension String::Iota.
+
+0.01  Sun Jun  7 18:09:01 2009
+	- original version; created by h2xs 1.23 with options
+		-X -n String::Iota
+

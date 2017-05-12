@@ -1,0 +1,62 @@
+Revision history for Sub-Prototype-Util
+
+0.11    2013-08-24 20:25 UTC
+        This is a maintenance release. The code contains no functional change.
+        Satisfied users of version 0.10 can skip this update.
+        + Doc : POD headings are now properly linkable.
+        + Tst : Author tests are no longer bundled with this distribution.
+                They are only made available to authors in the git repository.
+        + Upd : Package metadata overhaul.
+
+0.10    2011-08-25 11:05 UTC
+        + Chg : recall() now uses "goto" to call the wrapper code (except for
+                perl 5.8.0).
+        + Chg : The internals sustained a large cleanup. This will hopefully
+                make it easier to understand and maintain.
+        + Fix : The functions of this module no longer clobber $@.
+        + Fix : Fix test failures on perl 5.8.0, and on perl 5.13.7 and above.
+        + Fix : Work around Kwalitee test misfailures.
+
+0.09    2009-06-04 22:45 UTC
+        + Chg : recall() was reimplemented in terms of wrap().
+        + Chg : "compile => 1" is now the default for wrap.
+        + Fix : Croak messages are now relative to the caller.
+        + Fix : flatten() croaks when not enough arguments were given to match
+                the prototype.
+        + Upd : Resources in META.yml.
+        + Upd : META.yml spec updated to 1.4.
+
+0.08    2008-05-02 15:25 UTC
+        + Fix : "{ $func => undef }" (resp. "=> ''") should enforce no prototype
+                (resp. enforce an empty prototype).
+
+0.07    2008-04-21 09:00 UTC
+        + Add : Forward eval() errors when compiling in wrap().
+        + Add : Talk about wrap() in the synopsis and samples/try.pl.
+        + Fix : t/12-wrap.t failures with 5.6.x.
+
+0.06    2008-04-20 16:20 UTC
+        + Add : The wrap() function.
+
+0.05    2008-04-15 09:45 UTC
+        + Add : You can now specify which prototype to use with recall(). This
+                is needed to be able to recall into CORE::{grep,map}.
+
+0.04    2008-04-09 13:25 UTC
+        + Fix : recall() should pass by reference as much as possible, or we
+                won't be able to apply it to functions that modify their
+                arguments (e.g. open()).
+        + Fix : our really doesn't exist in 5.005.
+
+0.03    2008-04-06 22:20 UTC
+        + Fix : our doesn't exist in 5.005 (sigh).
+        + Fix : '_' prototype should use the current argument when it's
+                available and only resort to $_ when it's not.
+
+0.02    2008-04-06 16:40 UTC
+        + Fix : Missing LICENSE in Makefile.PL.
+        + Fix : Typos in POD.
+
+0.01    2008-04-06 14:00 UTC
+        First version, released on an unsuspecting world.
+

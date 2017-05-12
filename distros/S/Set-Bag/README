@@ -1,0 +1,20 @@
+This module implements a bag (aka multiset) Perl class.
+
+For more information please see the pod documentation contained within
+the Bag.pm.  It should be easily viewable with any program capable of
+viewing plain text. After you have installed this package with
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+you should be able to read the documentation also with
+
+	perldoc Set::Bag
+
+--
+
+David Oswald <davido@cpan.org> (Maintainer)
+Jarkko Hietaniemi <jhi@iki.fi> (Original author)
+

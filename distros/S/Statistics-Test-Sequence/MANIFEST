@@ -1,0 +1,12 @@
+Changes
+examples/comparison.pl
+lib/Statistics/Test/Sequence.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00pod.t
+t/00podcover.t
+t/11faculty.t
+t/12expfreq.t
+t/20tests.t
+META.yml                                 Module meta-data (added by MakeMaker)

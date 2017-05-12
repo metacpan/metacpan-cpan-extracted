@@ -1,0 +1,51 @@
+=encoding utf8
+
+
+This is Perl module B<Sub::Mux>.
+
+=begin html
+
+<a href="http://travis-ci.org/bayashi/Sub-Mux"><img src="https://secure.travis-ci.org/bayashi/Sub-Mux.png"/></a> <a href="https://coveralls.io/r/bayashi/Sub-Mux"><img src="https://coveralls.io/repos/bayashi/Sub-Mux/badge.png?branch=master"/></a>
+
+=end html
+
+
+=head1 INSTALLATION
+
+Sub::Mux installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Sub::Mux
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+
+=head1 DOCUMENTATION
+
+Sub::Mux documentation is available as in POD. So you can do:
+
+    % perldoc Sub::Mux
+
+
+=head1 REPOSITORY
+
+Sub::Mux is hosted on github
+L<http://github.com/bayashi/Sub-Mux>
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>

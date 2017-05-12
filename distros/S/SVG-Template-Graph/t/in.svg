@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<svg width="730" enable-background="new 0 0 730 447" viewBox="0 0 730 447" xmlns:a="http://ns.adobe.com/AdobeSVGViewerExtensions/3.0/" xml:space="preserve" height="447" overflow="visible"><!--  (c) 2004 Petra Kukofka, Ronan Oger  -->
+	<g fill="#FFFFFF" stroke="#411DA4" id="backgrounds">
+		<rect width="729" y="0.5" fill="none" x="0.5" stroke-width="1.5" id="background_all" height="446" />
+		<rect width="584" y="87.5" fill="none" x="89.5" troke-width="1.5" id="background_chart" height="246" />
+	</g>
+	<g fill="#411DA4" transform="translate(345,20)" font-family="Arial-Bold" id="group.graph.title" font-size="17">
+		<text text-orientation="down" text-anchor="middle">
+			<tspan x="0">Hello svg graphing world</tspan>
+			<tspan dy="1.2ex" x="0">I am a rock</tspan>
+			<tspan dy="1.2ex" x="0">and I am an entry of value 1</tspan>
+			<tspan dy="1.2ex" x="0">Hello svg graphing world</tspan>
+		</text>
+	</g>
+	<g fill="#411DA4" font-family="Arial-Bold" id="group.graph.axes" font-size="12">
+		<text transform="matrix(0 -1 1 0 34.5 288.5)" id="chart_axis_y_1">% Annual Performance
+		</text>
+		<text transform="matrix(0 -1 1 0 717.5 275.5)" id="chart_axes_y_2">Indexed Performance
+		</text>
+		<text transform="matrix(1 0 0 1 343.5 372.5)" id="chart_axes_x_1" font-size="11">Calender Year
+		</text>
+	</g>
+	<g id="legend">
+		<rect width="562.8325" stroke="#999999" x="100.3335" height="18" y="395.333" fill="none" stroke-width="0.5" id="legend_border" />
+		<text transform="matrix(1 0 0 1 271.5 407.5)" font-family="Arial-Bold" font-size="11" fill="#411DA4">xxxxxxx Diversified
+		</text>
+		<g id="legend_rect_blue">
+			<rect width="24.002" stroke="#333333" x="242.125" height="7.125" y="400.75" fill="#411DA4" stroke-width="0.5" />
+		</g>
+		<text transform="matrix(1 0 0 1 140.5 407.5)" font-family="Arial-Bold" font-size="11" fill="#411DA4">xxxxxxx Fund
+		</text>
+		<g id="legend_rect_yellow">
+			<rect stroke="#333333" x="111.125" y="400.75" fill="#FBFCC5" stroke-width="0.5" />
+		</g>
+		<text transform="matrix(1 0 0 1 436.5 407.5)" font-family="Arial-Bold" font-size="11" fill="#411DA4">zzzzzzz Fund
+		</text>
+		<line y1="403.75" x2="430.75" stroke="#411DA4" x1="406.25" fill="none" stroke-width="1.7" id="legend_stroke_blue" y2="403.75" />
+		<text transform="matrix(1 0 0 1 553.5 407.5)" font-family="Arial-Bold" font-size="11" fill="#411DA4">zzzzzzz Diversified
+		</text>
+		<g id="legend_stroke_orange">
+			<line y1="403.75" x2="547.75" stroke="#FFC978" x1="523.25" fill="#FFC978" stroke-width="1.5" y2="403.75" />
+		</g>
+	</g>
+	<g id="data_y-axis_left">
+		<line y1="333.3965" x2="89.125" stroke="#411DA4" x1="84.125" fill="none" id="stroke_-10" y2="333.3965" />
+		<text transform="matrix(1 0 0 1 36.8335 337.5)" font-family="Arial" font-size="11" fill="#411DA4">-10.00 %
+		</text>
+		<line y1="305.4375" x2="89.125" stroke="#411DA4" x1="84.125" fill="none" id="stroke_-5" y2="305.4375" />
+		<text transform="matrix(1 0 0 1 42.8335 309.5)" font-family="Arial" font-size="11" fill="#411DA4">-5.00 %
+		</text>
+		<line y1="278.4375" x2="89.125" stroke="#411DA4" x1="84.125" fill="none" id="stroke_0" y2="278.4375" />
+		<text transform="matrix(1 0 0 1 40.5 282.5)" font-family="Arial" font-size="11" fill="#411DA4">  0.00 %
+		</text>
+		<line y1="251.1875" x2="89.125" stroke="#411DA4" x1="84.125" fill="none" id="stroke_5" y2="251.1875" />
+		<text transform="matrix(1 0 0 1 40.5 255.5)" font-family="Arial" font-size="11" fill="#411DA4">  5.00 %
+		</text>
+		<line y1="223.9375" x2="89.125" stroke="#411DA4" x1="84.125" fill="none" id="stroke_10" y2="223.9375" />
+		<text transform="matrix(1 0 0 1 40.5 227.5)" font-family="Arial" font-size="11" fill="#411DA4">10.00 %
+		</text>
+		<line y1="196.1875" x2="89.125" stroke="#411DA4" x1="84.125" fill="none" id="stroke_15" y2="196.1875" />
+		<text transform="matrix(1 0 0 1 40.5 200.5)" font-family="Arial" font-size="11" fill="#411DA4">15.00 %
+		</text>
+		<line y1="169.1875" x2="89.125" stroke="#411DA4" x1="84.125" fill="none" id="stroke_20" y2="169.1875" />
+		<text transform="matrix(1 0 0 1 40.5 173.5)" font-family="Arial" font-size="11" fill="#411DA4">20.00 %
+		</text>
+		<line y1="142.1875" x2="89.125" stroke="#411DA4" x1="84.125" fill="none" id="stroke_25" y2="142.1875" />
+		<text transform="matrix(1 0 0 1 40.5 146.5)" font-family="Arial" font-size="11" fill="#411DA4">25.00 %
+		</text>
+		<line y1="114.8335" x2="89.125" stroke="#411DA4" x1="84.125" fill="none" id="stroke_30" y2="114.8335" />
+		<text transform="matrix(1 0 0 1 40.5 118.5)" font-family="Arial" font-size="11" fill="#411DA4">30.00 %
+		</text>
+		<line y1="87.5" x2="89.125" stroke="#411DA4" x1="84.125" fill="none" id="stroke_35" y2="87.5" />
+		<text transform="matrix(1 0 0 1 40.5 91.5)" font-family="Arial" font-size="11" fill="#411DA4">35.00 %
+		</text>
+	</g>
+	<g id="data_y-axis_right">
+		<line y1="333.5" x2="678.125" stroke="#411DA4" x1="673.125" fill="none" id="stroke_85" y2="333.5" />
+		<text transform="matrix(1 0 0 1 682.5 337.5)" font-family="Arial" font-size="11" fill="#411DA4">85
+		</text>
+		<line y1="315.5" x2="678.125" stroke="#411DA4" x1="673.125" fill="none" id="stroke_90" y2="315.5" />
+		<text transform="matrix(1 0 0 1 682.5 319.5)" font-family="Arial" font-size="11" fill="#411DA4">90
+		</text>
+		<line y1="298.5" x2="678.125" stroke="#411DA4" x1="673.125" fill="none" id="stroke_95" y2="298.5" />
+		<text transform="matrix(1 0 0 1 682.5 302.5)" font-family="Arial" font-size="11" fill="#411DA4">95
+		</text>
+		<line y1="280.5" x2="678.125" stroke="#411DA4" x1="673.125" fill="none" id="stroke_100" y2="280.5" />
+		<text transform="matrix(1 0 0 1 682.5 284.5)" font-family="Arial" font-size="11" fill="#411DA4">100
+		</text>
+		<line y1="263.5" x2="678.125" stroke="#411DA4" x1="673.125" fill="none" id="stroke_105" y2="263.5" />
+		<text transform="matrix(1 0 0 1 682.5 266.5)" font-family="Arial" font-size="11" fill="#411DA4">105
+		</text>
+		<line y1="245.5" x2="678.125" stroke="#411DA4" x1="673.125" fill="none" id="stroke_110" y2="245.5" />
+		<text transform="matrix(1 0 0 1 682.5 249.5)" font-family="Arial" font-size="11" fill="#411DA4">110
+		</text>
+		<line y1="227.5" x2="678.125" stroke="#411DA4" x1="673.125" fill="none" id="stroke_115" y2="227.5" />
+		<text transform="matrix(1 0 0 1 682.5 231.5)" font-family="Arial" font-size="11" fill="#411DA4">115
+		</text>
+		<line y1="210.5" x2="678.125" stroke="#411DA4" x1="673.125" fill="none" id="stroke_120" y2="210.5" />
+		<text transform="matrix(1 0 0 1 682.5 214.5)" font-family="Arial" font-size="11" fill="#411DA4">120
+		</text>
+		<line y1="193.5" x2="678.125" stroke="#411DA4" x1="673.125" fill="none" id="stroke_125" y2="193.5" />
+		<text transform="matrix(1 0 0 1 682.5 196.5)" font-family="Arial" font-size="11" fill="#411DA4">125
+		</text>
+		<line y1="175.5" x2="678.125" stroke="#411DA4" x1="673.125" fill="none" id="stroke_130" y2="175.5" />
+		<text transform="matrix(1 0 0 1 682.5 179.5)" font-family="Arial" font-size="11" fill="#411DA4">130
+		</text>
+		<line y1="157.5" x2="678.125" stroke="#411DA4" x1="673.125" fill="none" id="stroke_135" y2="157.5" />
+		<text transform="matrix(1 0 0 1 682.5 161.5)" font-family="Arial" font-size="11" fill="#411DA4">135
+		</text>
+		<line y1="140.5" x2="678.125" stroke="#411DA4" x1="673.125" fill="none" id="stroke_140" y2="140.5" />
+		<text transform="matrix(1 0 0 1 682.5 143.5)" font-family="Arial" font-size="11" fill="#411DA4">140
+		</text>
+		<line y1="122.5" x2="678.125" stroke="#411DA4" x1="673.125" fill="none" id="stroke_145" y2="122.5" />
+		<text transform="matrix(1 0 0 1 682.5 126.5)" font-family="Arial" font-size="11" fill="#411DA4">145
+		</text>
+		<line y1="104.5" x2="678.125" stroke="#411DA4" x1="673.125" fill="none" id="stroke_150" y2="104.5" />
+		<text transform="matrix(1 0 0 1 682.5 108.5)" font-family="Arial" font-size="11" fill="#411DA4">150
+		</text>
+		<line y1="87.5" x2="678.125" stroke="#411DA4" x1="673.125" fill="none" id="stroke_155" y2="87.5" />
+		<text transform="matrix(1 0 0 1 682.5 91.5)" font-family="Arial" font-size="11" fill="#411DA4">155
+		</text>
+	</g>
+	<g font-family="Arial" font-size="11" fill="#411DA4" id="data_x-axis">
+		<text transform="matrix(1 0 0 1 563.833 353.5)" id="2004">2004
+		</text>
+		<text transform="matrix(1 0 0 1 368.833 353.5)" id="2003">2003
+		</text>
+		<text transform="matrix(1 0 0 1 172.833 353.5)" id="2002">2002
+		</text>
+	</g>
+	<g stroke="#999999" fill="none" id="inner_x-axis">
+		<line y1="278.5" x2="673.125" x1="89.917" y2="278.5" />
+	</g>
+	<g id="bars">
+		<g id="bar_2004_blue">
+			<rect width="55.835" stroke="#333333" x="577.207" height="9.3408" y="278.8086" fill="#411DA4" stroke-width="0.5" />
+			<rect width="55.835" stroke="#333333" x="577.207" height="9.3408" y="278.8086" fill="none" stroke-width="0.5" />
+		</g>
+		<g id="bar_2004_yellow">
+			<rect width="55.835" x="521.207" height="1.5078" y="276.8086" fill="#FBFCC5" />
+			<rect width="55.835" stroke="#333333" x="521.207" height="1.5078" y="276.8086" fill="none" stroke-width="0.5" />
+		</g>
+		<g id="bar_2003_blue">
+			<rect width="55.835" x="381.125" height="121.0469" y="157.2891" fill="#411DA4" />
+			<rect width="55.835" stroke="#333333" x="381.125" height="121.0469" y="157.2891" fill="none" stroke-width="0.5" />
+		</g>
+		<g id="bar_2003_yellow">
+			<rect width="55.835" x="325.125" height="157.2969" y="121.0391" fill="#FBFCC5" />
+			<rect width="55.835" stroke="#333333" x="325.125" height="157.2969" y="121.0391" fill="none" stroke-width="0.5" />
+		</g>
+		<g id="bar_2002_blue">
+			<rect width="55.835" x="187.125" height="46.3789" y="231.957" fill="#411DA4" />
+			<rect width="55.835" stroke="#333333" x="187.125" height="46.3789" y="231.957" fill="none" stroke-width="0.5" />
+		</g>
+		<g id="bar_2002_yellow">
+			<rect width="55.835" x="131.125" height="53.0469" y="225.2891" fill="#FBFCC5" />
+			<rect width="55.835" stroke="#333333" x="131.125" height="53.0469" y="225.2891" fill="none" stroke-width="0.5" />
+		</g>
+	</g>
+	<g id="chart_curves">
+		<polyline stroke="#FFC978" points="89.75,279.75 95.5005,280.0283 99,279 103,280 106.5,281.5 110,283.75 114.25,283.75 118.25,280.5 121.75,279 125.5,280.5 128.25,281.25 133.25,277.75 140.25,271.5 142.25,267.75 147.75,267.75 158.5,258.75 168.25,259 207.25,245.25 212.25,247.5 217.25,247.5 222,244 227.75,243.25 238.5,241 247.25,234 253.75,233.75 257,231 267,235.25 269.75,235.25 280.75,223.5 285.5,221.5 299,213.75 300.25,209.5 305.25,207.75 311.5,197 316,202 317.75,202.25 324.5,193 329.25,193 340.75,180.25 352.5,191.75 355,192.25 360,199.5 367.75,199.5 373,196.75 380,202.75 380,206.5 384.25,210 386.25,210 393.5,202 403.5,197.75 409.75,197.75 420.75,188.25 428,187.75 433.5,183.5 441.5,183.5 446,179.75 448.5,180 455,183 460.5,183 463.75,179.5 466.5,179.5 468,181.25 472,181.25 477.5,176.5 483.5,176.5 485.25,177.75 488.5,177.75 495,168.25 500.75,168.5 506,164.75 514.5,165 525.5,152.5 528.75,152.5 529.75,155 538.25,155.25 542,162.5 552.25,162.5 556,158.75 567.75,158.75 574.75,149 584.5,148.75 586.25,147 595.75,147 602.25,152.5 605.25,153 611.75,160.75 618,163 621.25,172 624.75,174.25 629.5,189.5 632,189.75 636.25,181.5 640.75,181.5 643.75,178.75 646.25,179 647.25,180.75 649.75,180.75 653.25,175 655.75,175.25 660,178 661.25,178 666.75,172.5 669.25,172.25 671.25,174.5 674,173.75 " fill="none" id="orange" stroke-width="1.5" />
+		<polyline stroke="#411DA4" points="89.75,280.5 95,280.75 96,279.5 100,279 108,283.75 110.75,283.5 119.75,277 123.25,276.75 125.75,279 128.75,279.5 139,271.75 141.25,265.5 146.25,265.5 158.75,255.75 165,255.75 171.5,250.75 187,247 191.25,246.75 204.75,240.25 209.25,240.25 212,242.25 222.5,235 236.75,230.5 245.25,221 251.25,221 256.75,215.5 265.5,220 270.25,220 279,211.75 288.25,205.25 299.75,200.5 299.75,196.75 305.5,193.25 311.75,182 317.75,189.25 324.5,180.25 329,179.25 341.75,165 351.75,178 354.25,178 360.5,185.75 373.25,179.75 379.5,184.75 383.75,191.25 392.75,185.25 405.75,178.75 411.5,179 418.25,170.75 422.25,168 427,167.25 434.75,161.5 441.25,161.75 446.25,156.25 449.5,156 453.75,158.5 459.25,159 464.5,153 467,152.75 469.25,154.75 471,154.75 478.25,149 488.5,148.75 495.75,138.5 501.5,138.5 507.25,133.25 515.25,133.25 525.25,118.25 538,118.5 541,125.25 550.5,125 557,120.5 569,120 574.5,111.5 578.25,111.25 579.5,112.5 582.75,113 588,109 595,109 600.75,113.5 605,113.5 610.5,120.25 619.25,126 619.5,131.75 623.75,135 629,146.75 632.25,147 636.75,139 646,138.75 647.25,139.75 650.25,140.5 653.25,135.75 657.5,136.25 659.5,138 662,137.75 666.75,132 673.5,131.75 " fill="none" id="blue" stroke-width="1.7" />
+	</g><!-- 
+	Generated using the Perl SVG Module V.2.28
+	by Ronan Oger
+	Info: http://www.roasp.com/
+ -->
+</svg>

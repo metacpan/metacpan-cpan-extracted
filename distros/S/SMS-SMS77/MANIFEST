@@ -1,0 +1,14 @@
+bin/sms77send
+Build.PL
+debian/changelog
+debian/compat
+debian/control
+debian/copyright
+debian/rules
+lib/SMS/SMS77.pm
+lib/SMS/SMS77/Message.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+META.json

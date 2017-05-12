@@ -1,0 +1,21 @@
+Changes for Set::Integer::Gapfillers
+
+0.01 Sat Apr  1 08:11:58 2006
+    - original version; created by ExtUtils::ModuleMaker 0.44
+0.02 Sun Apr  2 21:39:50 EDT 2006
+    - replaced original algorithm (BrowserUK's)
+0.03 Mon Apr  3 22:27:49 EDT 2006
+    - documentation changes only, in response to comments from BrowserUK
+0.04 Sat Apr  8 10:19:17 EDT 2006
+    - implemented new interface, algorithm; now you supply/receive lower 
+      and upper bounds to ranges -- not the entire range
+0.05 Sat Apr  8 13:50:03 EDT 2006
+    - implemented, documented and tested 3 output methods:  segments_needed(),
+      gapfillers(), and all_segments().
+0.06 Mon Apr 10 2006
+    - mostly improvements in documentation
+0.07 Tue Apr 11 19:29:06 EDT 2006
+    - module renamed to Set-Integer-Gapfillers; first CPAN upload.
+0.08 Sun May 17 15:51:35 EDT 2009
+    - improve test coverage and do subsequent refactoring; thanks to Isaac
+      Miller for impetus to do so

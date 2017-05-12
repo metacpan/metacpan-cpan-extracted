@@ -1,0 +1,6 @@
+# INSTALL
+# =======
+
+perl Makefile.PL
+make install
+make realclean

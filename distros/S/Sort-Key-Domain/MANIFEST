@@ -1,0 +1,11 @@
+Changes
+Domain.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/Sort-Key-Domain.t
+lib/Sort/Key/Domain.pm
+examples/domains_bm.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

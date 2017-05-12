@@ -1,0 +1,49 @@
+This module will be on the server:
+SNMP Trap Support (sending and/or receiving)
+-----------------
+Net::Snmp
+--supports v1 and v2
+--can be made non-blocking via new...-nonblocking
+--default is to block
+
+These modules would be run on each client based on a config file
+of sorts.
+
+User Logins
+-----------
+something to read a variant of /var/log/lastlogin, wtmp,etc
+we can do this because the files are usually a fixed binary format
+
+Drive Space Monitoring
+----------------------
+File::df
+
+--requires: statfs()
+--statfs() can be prevented by blocking (on bsdi at least) 
+--works with, solaris, sunos, hp/ux, osf/1, linux
+
+
+Running process monitor
+-----------------------
+Proc::Processtable
+--requires: File::Find, Storable
+--works with: Linux, Solaris, aix, hp/ux, fbsd, irix, osf, bsdi, nbsd
+---Watchdog::Process says 
+# This class is unreliable on Linux as 
+# Proc::ProcessTable::Process::cmndline() sometimes returns undef. 
+--hrm...does this mean Proc::Processtable is broke?
+
+Load monitoring
+---------------
+Unix:Processors, gives info of whether a processor is online
+ how many processors, speed of each processor
+
+Sys::CpuLoad
+--works with: any os that has /proc/loadavg or system call 
+   equivalent of /usr/bin/uptime
+
+Log File Monitoring
+-------------------
+File::Tail
+--I'm sure this one blocks...duh...but it can be changed
+--but this is very useful for monitoring purposes (see swatch for an example)

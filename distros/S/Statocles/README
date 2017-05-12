@@ -1,0 +1,65 @@
+Statocles
+
+Statocles is an application for building static web pages from a set of
+plain YAML and Markdown files. It is designed to make it as simple as
+possible to develop rich web content using basic text-based tools.
+
+  FEATURES
+
+*   A simple format based on Markdown
+    <http://daringfireball.net/projects/markdown/> for editing site
+    content.
+
+*   A command-line application for building, deploying, and editing the
+    site.
+
+*   A simple daemon to display a test site before it goes live.
+
+*   A blogging application with
+
+    *   RSS and Atom syndication feeds.
+
+    *   Tags to organize blog posts. Tags have their own custom feeds.
+
+    *   Crosspost links to direct users to a syndicated blog.
+
+    *   Post-dated blog posts to appear automatically when the date is
+        passed.
+
+*   Customizable themes using the Mojolicious template language.
+
+*   A clean default theme using the Skeleton CSS library
+    <http://getskeleton.com>.
+
+*   SEO-friendly features such as sitemaps (sitemap.xml)
+    <http://www.sitemaps.org>.
+
+*   Automatic checking for broken links.
+
+*   Syntax highlighting for code and configuration blocks.
+
+*   Hooks to add your own plugins and your own custom applications.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Doug Bell.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

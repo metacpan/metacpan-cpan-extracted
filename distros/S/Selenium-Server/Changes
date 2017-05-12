@@ -1,0 +1,7 @@
+Revision history for Perl extension Selenium::Server
+
+0.02
+        - support auto_start constructor args
+
+0.01
+        - original version

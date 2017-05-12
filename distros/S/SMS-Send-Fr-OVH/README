@@ -1,0 +1,64 @@
+SMS-Send-Fr-OVH version 0.01
+============================================
+
+SMS::Send::Fr::OVH is a driver for SMS::Send library (http://search.cpan.org/~adamk/SMS-Send-1.06/lib/SMS/Send.pm).
+It is intended to work with the OVH SMS API for sending text message.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+SYNOPSIS
+
+  use SMS::Send::Fr::OVH;
+
+  # Create a sender
+  my $sender = SMS::Send->new('Fr::OVH',
+      _account => 'sms-ab1234-1',
+      _login => 'sms_user_name',
+      _password => 'pass',
+      _from => 'ovh_sender_name'
+      _transform_number => [
+           { match_re => '^+33', replace_re => '0033' },
+      ]
+  );
+
+  # Send a message
+  my $sent = $sender->send_sms(
+      text => 'This is a test message',
+      to   => '003361*****20'
+  );
+
+  # Did the send succeed.
+  if ( $sent ) {
+      print "Message sent ok\n";
+  } else {
+      print "Failed to send message\n";
+  }
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+  - base
+  - carp
+  - LWP::Simple
+  - SMS::Send::Driver
+  - JSON
+  - strict
+  - warnings
+
+AUTHOR
+  Alex Arnaud <gg.alexarnaud@gmail.com>
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2016 by Alex Arnaud
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.20.02 or,
+at your option, any later version of Perl 5 you may have available.

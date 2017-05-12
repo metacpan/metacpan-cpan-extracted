@@ -1,0 +1,130 @@
+SNMP-Persist - The SNMP pass_persist threaded backend 
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Anna Wiejak
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+
+INTRODUCTION 
+
+The SNMP-Persist module is a backend for pass_persist feature of net-snmp.
+
+It simplifies the process of sharing user-specified data via SNMP and
+development of persistent net-snmp applications controlling a chosen
+MIB subtree.
+
+It is particularly useful if data gathering process takes too long.
+The responder is a separate thread, which is not influenced by updates
+of MIB subtree data.
+The answer to a snmp request is fast and doesn't rely on potentially
+slow source of data.
+
+
+
+QUICK START
+
+1) Decide on what values and data will be stored in snmp subtree
+
+   Example: 
+	There are 5 applications running on the box, each outputing a new line to its own log file every 60 seconds.
+	The aim is to:
+	* get the recent number of threads, database connections and total memory every 300 seconds
+	* serve the listed values via snmp in an organized way
+	
+2) Organize the data into sets of data pairs (OID data type + value).
+
+   Example:
+ 	Each application gets its own number. The following data pairs are set:
+	* aplication number (INTEGER),
+	* application name (STRING),
+	* number of threads (INTEGER), 
+	* database connections (INTEGER
+	* total memory (Counter32)
+	Additionally each data set gets its own sequence number.
+
+3) Write perl script which does the following:
+	* gets the required data
+	* according to the data structure described in 2) creates a hash of arrays, where:
+		* a hash key is: <data set sequence number> . "." . <application number>
+		* hash value is: an array of corresponding data pairs (data type, value)
+
+4) Add calls to SNMP::Persist functions as specified in the manual and loop the data mining function (see: EXAMPLE)
+
+5) Attach to snmpd.conf config file
+
+pass_persist .1.3.6.1.4.1.2021.248 <user script location>
+
+
+EXAMPLE
+
+        use SNMP::Persist qw(&define_oid &start_persister &define_subtree);
+        use strict;
+        use warnings;
+
+
+        #define base oid to host the subtree
+        define_oid(".1.3.6.1.4.1.2021.248");
+
+        #start the thread serving answers
+        start_persister();
+
+        #set first application number
+
+        #loop forever to update the values
+        while(1) {
+
+          my %subtree;
+          my $gameName;
+          my $index=1;                                          #set first application number
+
+          foreach $gameName ("game1", "game2") {                     #for each application
+            $subtree{"1." . $index}=["INTEGER",$index];              #set game index data pair
+            $subtree{"2." . $index}=["STRING",$gameName];            #set game name data pair
+            $subtree{"3." . $index}=["Counter32", 344.2 ];           #set total memory data pair
+            $index++;                                                #next application
+          }
+
+          #new values have arrived - notify the subtree controller
+          define_subtree(\%subtree);
+
+          #don't update for next 5 minutes
+          sleep(300);
+        }
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc SNMP::Persist
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/SNMP-Persist
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=SNMP-Persist
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/SNMP-Persist
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/SNMP-Persist
+
+
+

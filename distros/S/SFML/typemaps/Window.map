@@ -1,0 +1,15 @@
+TYPEMAP
+Context*		O_OBJECT
+ContextSettings*	O_OBJECT
+VideoMode*		O_OBJECT
+Window*			O_OBJECT
+Event*			O_OBJECT
+SizeEvent*		O_OBJECT
+KeyEvent*		O_OBJECT
+TextEvent*		O_OBJECT
+MouseMoveEvent*		O_OBJECT
+MouseButtonEvent*	O_OBJECT
+MouseWheelEvent*	O_OBJECT
+JoystickMoveEvent*	O_OBJECT
+JoystickButtonEvent*	O_OBJECT
+JoystickConnectEvent*	O_OBJECT

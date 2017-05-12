@@ -1,0 +1,35 @@
+language: perl
+perl:
+    - "5.24.0"
+    - "5.22.2"
+    - "5.20.3"
+    - "5.18.4"
+    - "5.16.3"
+    - "5.14.4"
+    - "5.12.5"
+    - "5.10.1"
+
+before_install:
+    - git clone git://github.com/haarg/perl-travis-helper
+    - source perl-travis-helper/init
+    - build-perl
+    - perl -V
+    - build-dist
+    - cd $BUILD_DIR
+
+install:
+    - export RELEASE_TESTING=1 AUTOMATED_TESTING=1 AUTHOR_TESTING=1 HARNESS_OPTIONS=j1:c HARNESS_TIMER=1
+    - cpanm --quiet --notest Devel::Cover::Report::Coveralls
+    - cpanm --quiet --notest --installdeps .
+
+script:
+    - PERL5OPT=-MDevel::Cover=-ignore,"t/",+ignore,"prove",+ignore,"bin/nytprof",+ignore,"flame",-coverage,statement,branch,condition,path,subroutine prove -lrs t
+    - cover
+
+after_success:
+    - cover -report coveralls
+
+sudo: false
+
+notifications:
+    email: false

@@ -1,0 +1,36 @@
+# chat_client.stem
+#
+[
+	class	=>	'Stem::Console',
+],
+[
+	class	=>	'Stem::Hub',
+	name	=>	'client',
+	args	=>	[],
+],
+[
+	class	=>	'Stem::Portal',
+	args	=>	[],
+],
+[
+	class	=>	'Stem::SockMsg',
+	name	=>	'A',
+	args	=>	[
+		port		=> 6666,
+		server		=> 1,
+		cell_attr	=> [
+			'data_addr'	=> ':sw:a'
+		],
+	],
+],
+[
+	class	=>	'Stem::SockMsg',
+	name	=>	'B',
+	args	=>	[
+		port		=> 6667,
+		server		=> 1,
+		cell_attr	=> [
+			'data_addr'	=> ':sw:b'
+		],
+	],
+],

@@ -1,0 +1,46 @@
+Statistics-KernelEstimation version 0.02
+========================================
+
+This modules calculates Kernel Density Estimates and related quantities
+for a collection of random points.
+
+A Kernel Density Estimate (KDE) is similar to a histogram, but improves
+on two known problems of histograms: it is smooth (whereas a histogram
+is ragged) and does not suffer from ambiguity in regards to the placement
+of bins.
+
+In a KDE, a smooth, strongly peaked function is placed at the location
+of each point in the collection, and the contributions from all points
+is summed. The resulting function is a smooth approximation to the
+probability density from which the set of points was drawn. The smoothness
+of the resulting curve can be controlled through a bandwidth parameter.
+
+This module calculates KDEs as well as Cumulative Density Functions (CDF).
+Three different kernels are available (Gaussian, Box, Epanechnikov). The
+module also offers limited support for bandwidth optimization.
+
+Finally, the module can generate "classical" histograms and distribution
+functions.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+No dependencies on external modules.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Philipp K. Janert
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

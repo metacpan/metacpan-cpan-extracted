@@ -1,0 +1,13 @@
+      SAP::WAS::SOAP
+===========================
+
+
+This module set is designed for doing HTTP based SOAP encoded RFC calls to and SAP R/3 system via the SAP Web Application Server ( the WAS ) .
+
+Look at the examples directory.  These are setup to run from the examples directory and do not require you to install the package.
+It is setup for my test environment which uses the SAP WAS system ( Web Application Server ) - version 6.10.
+You need to ensure that login to the /sap/bc/soap/rfc service has been configured correctly using SAP transaction SICF, first, or this will not work ( under the version 6.10 WAS that I used the only thing I had to change was the settings for the auto login user ) - this corresponds directly to the URL that is supplied to the SAP::WAS::SOAP constructor.
+
+For help - I can be contacted at piers@ompa.net
+
+Cheers.

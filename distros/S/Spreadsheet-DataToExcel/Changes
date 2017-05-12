@@ -1,0 +1,17 @@
+Revision history for Spreadsheet-DataToExcel
+
+0.0104  2013-10-30
+        - Minor changes to comply with specs and Kwalitee game
+        - Got rid of the "Use of qw(...) as parentheses is deprecated"
+          warning
+
+0.0103  2011-01-01
+        - Fixed the docs to indicate that the "file" can also take
+          a filehandle
+
+0.0102  2009-11-07
+        - Fixed warnings that showed up for empty cells.
+
+0.0101  2009-07-29
+        - First version, released on an unsuspecting world.
+

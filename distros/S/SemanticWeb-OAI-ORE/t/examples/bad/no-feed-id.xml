@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <!-- id tag missing - not ORE valid -->
+  <category scheme="http://www.openarchives.org/ore/terms/" 
+  term="http://www.openarchives.org/ore/terms/ResourceMap" label="Resource Map" />
+
+ <entry>
+   <id>tag:arxiv.org,2007:astro-ph/0601007v2:pdf</id>
+ </entry>
+ 
+ <entry>
+   <id>tag:arxiv.org,2007:astro-ph/0601007v2:ps</id>
+ </entry>
+ 
+ <entry>
+   <id>tag:arxiv.org,2007:astro-ph/0601007v2:e-print</id>
+ </entry>
+
+</feed>

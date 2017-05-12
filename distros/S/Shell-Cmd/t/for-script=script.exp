@@ -1,0 +1,47 @@
+SC_FAILED=0;
+SC_EXIT=0;
+main () {
+   SC_ORIG_DIRE=`pwd`;
+   SC_DIRE=`pwd`;
+
+   for i in 1 2 ;do
+
+      #
+      # Command 3
+      #
+      SC_CURR_EXIT=0;
+      SC_CURR_SUCC=0;
+      echo "#SC CMD 3.1";
+      echo "#SC CMD 3.1" >&2;
+      if [ $SC_CURR_SUCC -eq 0 ]; then
+         echo $i ;
+         CMD_EXIT=$?;
+         if [ $CMD_EXIT -eq 0 ]; then
+            SC_CURR_SUCC=1;
+            SC_CURR_EXIT=0;
+         elif [ $SC_CURR_EXIT -eq 0 ]; then
+            SC_CURR_EXIT=$CMD_EXIT;
+         fi
+         if [ $CMD_EXIT -ne 0 ]; then
+            echo "#SC EXIT 3.1 $CMD_EXIT";
+            echo "#SC EXIT 3.1 $CMD_EXIT" >&2;
+         fi
+      fi
+      echo "";
+      echo "" >&2;
+
+      if [ $SC_EXIT -eq 0  -a  $SC_CURR_EXIT -ne 0 ]; then
+         SC_EXIT=$SC_CURR_EXIT;
+         SC_FAILED=3;
+      fi
+      if [ $SC_EXIT -ne 0 ]; then
+         return
+      fi
+
+   done
+   cd "$SC_ORIG_DIRE";
+}
+
+main
+exit $SC_EXIT;
+

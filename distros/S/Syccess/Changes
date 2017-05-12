@@ -1,0 +1,217 @@
+==================================================
+Changes from 1743-07-02 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.104 at 2017-04-15 19:34:22 +0000
+------------------------------------------
+
+  Change: e31be293e0604ce613d0b2ddf2c402234d5aeb96
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2017-04-15 21:33:53 +0000
+
+    Tuned default label generation, moved repository to private GitHub 
+
+------------------------------------------
+version 0.103 at 2014-12-31 22:45:12 +0000
+------------------------------------------
+
+  Change: fdf0e258ada0e33c30306a8ef7a04b3acd7aaff9
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-12-31 23:45:12 +0000
+
+    Fixed dzil config, new travis yml 
+
+------------------------------------------
+version 0.102 at 2014-06-27 21:38:25 +0000
+------------------------------------------
+
+  Change: 584683bbe6798d88bfb3e226de0eec254a07119f
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-06-27 23:38:25 +0000
+
+    Optimization 
+
+  Change: a74a673a18b029fc0030a17b21ff936ea2d8017c
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-06-11 21:37:14 +0000
+
+    Fixed typos 
+
+------------------------------------------
+version 0.101 at 2014-06-05 23:33:31 +0000
+------------------------------------------
+
+  Change: 915a700637ad1396d4300a647cba30956662ab7d
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-06-06 01:33:31 +0000
+
+    Nope.. 
+
+  Change: 486a3c02e8d527036e58694cfce5d768391e3c45
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-06-06 01:20:50 +0000
+
+    5.20 on travis already? 
+
+  Change: 95d1fed89b4302af133041d96137727e174f4751
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-06-06 01:19:46 +0000
+
+    Yeah sure, NOW i see the typo in the doc 
+
+------------------------------------------
+version 0.100 at 2014-06-05 23:18:17 +0000
+------------------------------------------
+
+  Change: 94500e26d66d220b32934d9394a559df30d490c8
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-06-06 01:18:17 +0000
+
+    Ok the validators also need some documentation..... 
+
+  Change: c5081161131bdb6df8e1acd79fb5dad1845f8215
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-06-06 00:46:47 +0000
+
+    Small corrections 
+
+------------------------------------------
+version 0.008 at 2014-06-05 22:22:18 +0000
+------------------------------------------
+
+  Change: f920fb07b5f6806e0e7ead31539653d7c9cf94d2
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-06-06 00:22:18 +0000
+
+    More documentation! Now 50% off! 
+
+------------------------------------------
+version 0.007 at 2014-06-04 15:34:33 +0000
+------------------------------------------
+
+  Change: 6fdb9cc2b3f90754f873a6e7d017971e14b9c76f
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-06-04 17:34:33 +0000
+
+    MORE DOCUMENTATION!!!! AAAAHHHH 
+
+------------------------------------------
+version 0.006 at 2014-06-04 02:59:24 +0000
+------------------------------------------
+
+  Change: 3494523b93f4266e42f0aa8013f8c4fbe0068097
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-06-04 04:59:24 +0000
+
+    Documentation! Documentation! Documentation! 
+
+------------------------------------------
+version 0.005 at 2014-06-04 01:26:06 +0000
+------------------------------------------
+
+  Change: db1fd6cfa61f67f14c4bf6a5bb869269746beb2a
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-06-04 03:26:06 +0000
+
+    Added call functionality, added MooX::Traits supports on all classes
+    beside validators 
+
+------------------------------------------
+version 0.004 at 2014-05-26 19:06:16 +0000
+------------------------------------------
+
+  Change: dc04f5be2a8d339b241373dd1e513c3654805817
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-26 21:06:16 +0000
+
+    Added Code ref validator 
+
+------------------------------------------
+version 0.003 at 2014-05-24 18:50:07 +0000
+------------------------------------------
+
+  Change: db300e10a7468b94d934380837481ff68d00bcc5
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-24 20:50:07 +0000
+
+    Added functionality to errors function to be limited by field 
+
+  Change: b0e2cfb8701bbe5e8051e5d6a1fd26d3554d8e02
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-24 13:15:37 +0000
+
+    Added missing requirement 
+
+  Change: 3dfb52b87a6b041f4e4de8709802a8a448706e4b
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-23 11:06:33 +0000
+
+    Adding error count 
+
+  Change: 09e31d7cab71239c568a68d42a933694ccc25e88
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-22 19:28:08 +0000
+
+    Updated load test 
+
+------------------------------------------
+version 0.002 at 2014-05-22 17:06:59 +0000
+------------------------------------------
+
+  Change: 32ab873775e1e37515f03d53964aa22a7232cf6f
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-22 19:06:59 +0000
+
+    Added SyccessX::Validator namespace as fallback 
+
+  Change: 35fbb2266ebd010fb96f385e16ad1bc668366519
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-22 17:27:35 +0000
+
+    Implemented In validator 
+
+  Change: ca9001d96c762effbd31a2fa8b196b1de19207a4
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-22 17:18:45 +0000
+
+    Added Regex validator 
+
+------------------------------------------
+version 0.001 at 2014-05-21 21:59:28 +0000
+------------------------------------------
+
+  Change: 8311234f6cff4c50018202a1e43f22a35f1afa7a
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-21 23:59:28 +0000
+
+    Added travis config 
+
+  Change: 5cbd700a9080e84e7aff2190d1a6f29bee86a9b2
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-21 23:58:46 +0000
+
+    Added label concept, more tests, is number check 
+
+  Change: d0c9a80701d15829bb759dcc525f275af1b11cbd
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-21 18:31:33 +0000
+
+    SYNOPSIS SYNOPSIS SYNOPSIS SYNOPSIS SYNOPSIS SYNOPSIS SYNOPSIS
+    SYNOPSIS SYNOPSIS 
+
+  Change: 17f2b20ff8349f3450fba27b17c17dabc9748605
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-21 18:08:33 +0000
+
+    First release, required field implementation working 
+
+  Change: 19adf8260e2373181129cb692d4bd03ec1de3b14
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-13 17:17:54 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

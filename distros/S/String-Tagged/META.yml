@@ -1,0 +1,22 @@
+---
+abstract: 'string buffers with value tags on extents'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  Test::Identity: '0'
+  Test::More: '0.88'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: String-Tagged
+provides:
+  String::Tagged:
+    file: lib/String/Tagged.pm
+    version: '0.14'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.14'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

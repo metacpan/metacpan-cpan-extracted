@@ -1,0 +1,100 @@
+SANtricity::SMcli version 0.02
+==============================
+
+A simple perl interface to Engenio's SANtricity CLI to enable the monitoring
+and management of SAN devices. The following methods are currently provided:
+
+    arrayStatus()
+          Checks the overall status of the array. Returns 0 if the
+          array is OK, otherwise an array reference to the output from
+          the SMcli command.
+
+
+    checkVol("VOLNAME")
+          Checks the status of volume VOLNAME. Returns a hash reference
+          containing all the volume information (which varies by volume
+          type).
+
+
+    getConfig( ARGS )
+          Get storage array config. If no args are specified this is run
+          with the SMcli allConfig option. To specify the data to get set
+          any of the following hash keys to 1:
+               globalSettings, volumeConfigAndSettings, hostTopology, lunMappings
+
+          Returns a File::Temp object of the file containing the config data
+
+
+    getEvents( ARGS )
+          Get information from the array event log. Optional arguments are:
+               eventType => all | critical (defaults to all)
+               count     => n              (# of events to get, omit to
+                                            get all)
+
+          Returns a File::Temp object of the file containing the event log
+          data.
+
+
+    monitorPerformance( ARGS )
+          Get array performance statistics. Optional arguments are:
+               interval   => n (seconds between data capture, defaults to 5)
+               iterations => n (# of iterations, defaults to 5)
+
+          Returns a File::Temp object of the file containing the performance
+          data.
+
+
+    recreateSnap("SNAPNAME")
+          Recreates a previously stopped snapshot. Argument is snapshot
+          name, returns 0 if successful, otherwise 1.
+
+
+    resumeRVM("PRIMARY-NAME")
+          Resumes a previously suspended RVM remote mirror. This command
+          must be run on the primary array. Argument is name of RVM
+          primary, returns 0 if successful, otherwise 1.
+
+
+    showController( ARGS )
+          Gets information on array controllers. Optional args are:
+               controller     => a | b (Controller to report on) OR
+               allControllers => 1     (All controllers - default)
+               summary        => 1     (Summary mode - off by default)
+
+          Returns an array reference containing the command output.
+
+
+    stopSnap("SNAPNAME")
+          Stops a snapshot. Argument is snapshot name, returns 0 if
+          successful, otherwise 1.
+
+
+    suspendRVM("PRIMARY-NAME")
+          Suspends an RVM remote mirror. This command must be run on the
+          primary array. Argument is name of RVM primary, returns 0 if
+          successful, otherwise 1.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires only modules that are included with the standard
+perl distribution.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Rich Bishop
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.
+
+

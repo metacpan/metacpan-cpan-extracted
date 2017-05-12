@@ -1,0 +1,15 @@
+README for Set::Object
+~~~~~~~~~~~~~~~~~~~~~~
+Set::Object provides efficient sets,
+unordered collections of Perl objects without duplicates
+for scalars and references.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   su root -c "make install"
+

@@ -1,0 +1,74 @@
+Revision history for Sort::External
+
+0.18    2008-09-03
+        * Tamp down memory consumption.
+        * Increase default mem_threshold to 8 MiB.
+        * Improve testing reliability under Windows.
+
+0.171   2008-08-22
+        * Fix support for Perl 5.6.2.
+        * Specify Perl 5.6.2 as a minimum version.
+
+0.17    2008-08-17
+        * Prepended hyphens removed from parameter names (but
+          -old_style_params still work).
+        * Fixed endless loop bug (RT #37623) which affected certain inputs
+          when a sortsub was provided.
+        * Now uses only one temp file.
+        * Reimplemented using C-struct-based rather than Perl-hash-based
+          objects.
+        * Clone dependency eliminated.
+
+0.16    2005-12-09
+        * Restored -line_separator as dummy arg, for backwards compatibility
+          with Search::Kinosearch 0.21.
+
+0.15    2005-11-29
+        * Now preserves taint and utf8 flags.
+        * Explicitly forbid refs rather than fail with an IO error.
+        * -mem_threshold now the default flush trigger mechanism.
+        * -line_separator removed.
+
+0.14    2005-11-01
+        * Fixed a memory leak.
+
+0.13    2005-10-31
+        * Fixed compilation problems for pre-c99 compilers.
+
+0.12    2005-10-21
+        * Fixed intermittent bug in gatekeeper algo which produced bad sorts.
+
+0.11    2005-09-17
+        * 5-40% speed improvement, depending on config.
+        * Now an XS module (it already had XS dependencies).
+        * Devel::Size dependency eliminated.
+        * -mem_threshold now uses cruder but quicker algo for tracking memory.
+        * Now uses custom IO setup based on length => string pairings.
+        * Bugs associated with old IO based on linesep and split now gone.
+        * -line_separator deprecated, custom -line_separator removed.
+        * Fixed failing test.
+
+0.10    2005-07-28
+        * Implemented -mem_threshold.
+        * Implemented -flags parameter for finish().
+
+0.05    2005-07-17
+        * Fixed bug with empty -sortfile when no tempfiles were needed.
+        * Fixed bug sorting empty strings with -line_separator specified.
+
+0.04    2005-06-29
+        * Fixed 2 bugs regarding random line separator.
+
+0.03    2005-06-09
+        * Fixed 1-in-10 crashing bug.
+        * Added 'random' -line_separator functionality.
+
+0.02    2005-06-07
+        * Fixed bug where fetch returned 0 rather than undef.
+        * Fixed crashing bug when finish called before feed.
+        * Change to only use disk cache if necessary.
+
+0.01    2005-05-29
+        * Moved from Sort::MonsterSort to Sort::External at the suggestion of
+          the PAUSE admins.
+

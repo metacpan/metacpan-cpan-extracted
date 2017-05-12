@@ -1,0 +1,38 @@
+---
+abstract: 'report on and update an SQLite database.'
+author:
+  - 'Kathryn Andersen'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.28'
+  Test::More: '0'
+  perl: v5.8.5
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SQLite-Work
+requires:
+  CGI: '0'
+  DBD::SQLite: '0'
+  DBI: '0'
+  Data::Dumper: '0'
+  File::Temp: '0'
+  Getopt::ArgvFile: '0'
+  Getopt::Long: '2.34'
+  POSIX: '0'
+  Pod::Usage: '0'
+  Text::NeatTemplate: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/rubykat/SQLite-Work
+  repository: https://github.com/rubykat/SQLite-Work.git
+version: '0.1601'

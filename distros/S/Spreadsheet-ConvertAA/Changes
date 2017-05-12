@@ -1,0 +1,14 @@
+Revision history for Perl extension Spreadsheet::ConvertAA.
+
+0.01  Mon Jan  5 19:12:26 2004
+	- original version; created by h2xs 1.21 with options
+		-X -n Spreadsheet::ConvertAA
+
+0.02  Sat Jan  24 16:00:00 2004
+	CHANGED: '@' is also accepted
+
+0.03  Fri Jun  18 01:42:00 2004
+	FIXED: wrong handling of lower case characters thanks to Steven Dwyer
+
+0.04  Thu Jun  30 01:00:00 2005
+	CHANGED: Implementation, taken from Spreadsheet::Read

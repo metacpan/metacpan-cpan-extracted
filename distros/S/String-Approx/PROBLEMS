@@ -1,0 +1,6 @@
+3.08: 
+
+	* t/aslice.t: for some strange reason the tests 5 and 6 fail in
+	  SunOS 4.1.4, I got two separate cpan-testers reports on this.
+	  If the test is run manually, it succeeds.  Go figure.
+

@@ -1,0 +1,24 @@
+---
+abstract: 'a module for save Excelfile as Textfile'
+author:
+  - 'Gernot Havranek <havi@cpan.org>'
+build_requires:
+  Test::More: 0
+  Win32::OLE: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Spreadsheet-Excel2Text
+provides:
+  Spreadsheet::Excel2Text:
+    file: lib/Spreadsheet/Excel2Text.pm
+    version: 0.04
+requires:
+  perl: v5.10.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.04

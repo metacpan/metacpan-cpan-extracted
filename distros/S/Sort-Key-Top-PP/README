@@ -1,0 +1,97 @@
+NAME
+    Sort::Key::Top::PP - pure Perl implementation of parts of Sort::Key::Top
+
+SYNOPSIS
+            use Sort::Key::Top::PP 'top';
+            my @top5 = top 5 => @biglist;
+
+DESCRIPTION
+    Sort::Key::Top::PP is set of functions for finding the top "n" items in an
+    array by some criteria. It's not as fast as Sort::Key::Top, but it is
+    generally quite a bit faster than sorting the entire array and taking the
+    first "n" items.
+
+    This module implements pure Perl equivalents of the following functions as
+    descibed in Sort::Key::Top.
+
+    *   `top`
+
+    *   `topsort`
+
+    *   `keytop`
+
+    *   `keytopsort`
+
+    *   `ntop`
+
+    *   `ntopsort`
+
+    *   `nkeytop`
+
+    *   `nkeytopsort`
+
+    *   `rtop`
+
+    *   `rtopsort`
+
+    *   `rkeytop`
+
+    *   `rkeytopsort`
+
+    *   `rntop`
+
+    *   `rntopsort`
+
+    *   `rnkeytop`
+
+    *   `rnkeytopsort`
+
+    *   `head`
+
+    *   `nhead`
+
+    *   `keyhead`
+
+    *   `nkeyhead`
+
+    *   `tail`
+
+    *   `ntail`
+
+    *   `keytail`
+
+    *   `nkeytail`
+
+    By default *all functions are exported*. If you don't like that, then
+    please specify an explicit list of functions to import, a la:
+
+       use Sort::Key::Top::PP qw( top );
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Sort-Key-Top-PP>.
+
+SEE ALSO
+    Sort::Key::Top,
+    <http://blogs.perl.org/users/stas/2012/12/tmtowtdi-plus-benchmarking.html#
+    comments>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+    Key parts of the top n selection algorithm (and much egging on) by
+    Stanislaw Pusep (cpan:SYP).
+
+    API inspired by Sort::Key::Top by Salvador Fandiño García (cpan:SALVA).
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012, 2014 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

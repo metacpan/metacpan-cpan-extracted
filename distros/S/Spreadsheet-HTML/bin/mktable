@@ -1,0 +1,192 @@
+#!/usr/bin/env perl 
+use strict;
+use warnings FATAL => 'all';
+use Spreadsheet::HTML;
+
+use Safe;
+use Pod::Usage;
+use Getopt::Long;
+
+eval "use HTML::Display";
+our $NO_DISPLAY = $@;
+
+my $generator = Spreadsheet::HTML->new;
+my $method    = shift if $generator->can( $ARGV[0] || '' );
+$method ||= 'generate';
+
+GetOptions (
+    'param=s'   => \my %params,
+    'display'   => \my $display,
+    'help:s'    => \my $help,
+    'man'       => \my $man,
+    'version'   => \my $version,
+);
+print _lookup_help( $help ) and exit if $help;
+pod2usage( -verbose => 0 ) if defined $help;
+pod2usage( -verbose => 2 ) if $man;
+
+if ($version) {
+    print "$_\n" for 
+        "      Spreadsheet::HTML path: " . $INC{'Spreadsheet/HTML.pm'},
+        "   Spreadsheet::HTML version: $Spreadsheet::HTML::VERSION",
+        "       HTML::AutoTag version: $HTML::AutoTag::VERSION",
+        "Tie::Hash::Attribute version: $Tie::Hash::Attribute::VERSION",
+    ;
+    exit;
+}
+
+my @skip  = qw( fill file art map sep );
+my @undef = qw( encodes empty );
+
+my %args;
+my $safe = Safe->new;
+for my $key (keys %params) {
+    next if grep { $key eq $_ } @skip;
+    $args{$key} = $safe->reval( $params{$key} );
+}
+
+for (@skip)  { $args{$_} = $params{$_} if exists $params{$_}  }
+for (@undef) { $args{$_} = undef if exists $params{$_} and $params{$_} eq 'undef' }
+
+if ($display) {
+    if ($NO_DISPLAY) {
+        warn "please install HTML::Display\n";
+    } else {
+        HTML::Display::display( $generator->$method( %args ) );
+        exit;
+    }
+}
+
+print $generator->$method( %args ), $/;
+
+sub _lookup_help {
+    my $value = shift;
+    my $preset_param;
+
+    my $unfound = "can't find docs for '$value' :(\n";
+
+    my %chunks;
+    my @chunks = _chunk( $INC{'Spreadsheet/HTML.pm'} );
+    if ($value =~ /:/) {
+        ($value,$preset_param) = split /:/, $value;
+        %chunks = map {( $_ => [ _chunk( $INC{$_} ) ] )} grep m{^Spreadsheet/HTML/Preset}, sort keys %INC;
+    }
+
+    my ($found) = grep / \* C<$value/, @chunks;
+    return $unfound unless $found;
+
+    if ($preset_param) {
+        my ($target) = split /\n/, $found;
+        $target =~ s/\s*\*\s*//;
+        my $file;
+        for my $key (keys %chunks) {
+            ($found) = grep /\Q$target\E/, @{ $chunks{$key} };
+            if ($found) {
+                $file = $key;
+                last;
+            }
+        }
+        ($found) = grep / \* C<$preset_param/, @{ $chunks{$file || ''} || [] };
+        return $unfound unless $found;
+    }
+
+    $found =~ s/\w<([^>]+)>/$1/g;
+    $found =~ s{\s+=\w+.*}{}ms;
+    return "\n$found\n\n";
+}
+
+sub _chunk {
+    my $file = shift;
+    open my $fh, '<', $file or die "cannot read $file: $!\n";
+    my @chunk = do{ local $/ = "\n=item"; <$fh> };
+    close $fh;
+    return @chunk;
+}
+
+__END__
+=head1 NAME
+
+mktable - generate an HTML table.
+
+=head1 SYNOPSIS
+
+mktable method [options]
+
+ Options:
+   --param      parameters, multiple allowed
+   --display    display results via HTML::Display
+   --help       list usage for methods and parameters
+   --man        print man page
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--param>
+
+The params. Use the B<--help> option to display
+documentation about a particular parameter (or method).
+
+  --param file=/path/to/file.csv
+  --param indent='"    "'
+  --param table='{class=>"foo"}'
+
+=item B<--display>
+
+Display results to your browser via L<HTML::Display>.
+
+=item B<--help>
+
+Will attempt to look up option value as a method
+or parameter, display it and exit. If value is a
+colon separated 'tuple' then the first element is
+assumeted to be a preset method and the second is
+its specific parameter.
+
+  --help file
+  --help select:values
+
+=item B<--man>
+
+Prints the manual page and exits.
+
+=item B<--version>
+
+Prints the versions of the core modules used.
+
+=back
+
+=head1 EXAMPLES
+
+  mktable portrait --param file=data.xls > out.html
+
+  # portrait is default generation method
+  mktable --param file=data.xls --param preserve=1 > out.html
+
+  # wrap references with quotes:
+  mktable --param -r1='{class=>"foo"}'
+
+  # wrap pure whitespace with quotes:
+  mktable --param indent='"    "'
+
+  # display output to browser with HTML::Display
+  mktable landscape --param data=[[a..d],[1..4],[5..8]] --display
+
+  mktable conway --param data=[1..300] --param wrap=20 --param matrix=1 --display
+
+  mktable sudoku --display
+
+  # banner requires you to install and configure Text::FIGlet
+  mktable banner --param text="'hello world'" --param scroll=1 --param bx=1 --display
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Spreadsheet::HTML>
+
+The engine behind this script.
+
+=back
+
+=cut

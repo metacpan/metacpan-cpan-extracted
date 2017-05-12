@@ -1,0 +1,12 @@
+0.6 2006-04-03
+
+ - change documentation to use correct CGI style response (rather than HTTP).
+ - change exception that is raised for repeated header to warning to take account of current apache module version, which repeats HTTPS header when present.
+
+0.4 2005-10-12
+
+ - added Test::Pod and Test::Pod::Coverage tests.
+ - blocking is now a named parameter to new (old calling style is deprecated and will produce a warning, will be removed in next version). Blocking is still false by default.
+ - sysread is now used when blocking is not set.
+
+0.2 - Initial release

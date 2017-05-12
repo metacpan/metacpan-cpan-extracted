@@ -1,0 +1,46 @@
+ 1.00 1999.06.16 - Initial release
+
+ 1.01 1999.06.17 - Documentation fixes and fix to 'close' method in
+                   Search::InvertedIndex::DB::DB_File_SplitHash
+
+ 1.02 1999.06.18 - Major bugfix to locking system.
+                   Performance tweaking. Roughly 3x improvement.
+
+ 1.03 1999.06.30 - Documentation fixes.
+
+ 1.04 1999.07.01 - Documentation fixes and caching system bugfixes.
+                   (never publically released)
+
+ 1.05 1999.10.20 - Altered ranking computation on search results
+
+ 1.06 1999.10.20 - Removed 'use attrs' usage to improve portability
+
+ 1.08 2000.01.25 - Bug fix to multi database code and documentation updates
+
+ 1.09 2000.03.23 - Bug fix to 'Search::InvertedIndex::DB:DB_File_SplitHash' submodule
+                   to manage case where 'open' is not performed before 'close' is called.
+
+ 1.10 2000.07.05 - Delayed loading of serializer and added option to select
+                   which serializer (Storable or Data::Dumper) to use at instance 'new' time.
+                   This should allow module to be loaded by mod_perl via the 'PerlModule'
+                   conf directive and enable use on platforms that do not support
+                   'Storable' (such as Macintosh).
+
+ 1.11 2000.11.29 - Added 'Search::InvertedIndex::DB::Mysql' (authored by
+                   Michael Cramer <cramer@webkist.com>) database driver
+                   to package.
+
+1.12 2002.04.09 - Squashed bug in removal of an index from a group when the index doesn't
+                  exist in that group that caused index counts for the group to be decremented
+                  in error.
+
+1.13 2003.09.28 - Iterim release. Fixed false error return from 'first_key_in_group' for a group
+                  that has not yet had any keys set.  Tightened calling
+                  parm parses. Tweaked performance of preload updating code.
+                  Added taint fix for stringifier identifier.
+                  This release was driven by the taint issue and the clear bug as crisis items.
+                  Hopefully a 1.14 release will be in the not too distant future.
+
+1.14 2003.11.14 - Patch to the MySQL database driver to accomodate changes in DBD::mysql.
+                  Addition of a test for MySQL functionality, Patch and test thanks to
+                  Kate L Pugh <kake@earth.li>.

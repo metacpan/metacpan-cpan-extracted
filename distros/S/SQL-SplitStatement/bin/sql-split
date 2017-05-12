@@ -1,0 +1,346 @@
+#!/usr/bin/env perl
+
+###########################################################################
+# Copyright 2011 Emanuele Zeppieri                                        #
+#                                                                         #
+# This program is free software; you can redistribute it and/or modify it #
+# under the terms of either: the GNU General Public License as published  #
+# by the Free Software Foundation, or the Artistic License.               #
+#                                                                         #
+# See http://dev.perl.org/licenses/ for more information.                 #
+###########################################################################
+
+use strict;
+use warnings;
+
+use SQL::SplitStatement;
+
+our $VERSION = $SQL::SplitStatement::VERSION;
+
+use Getopt::Long;
+Getopt::Long::Configure qw(
+    auto_help auto_version bundling require_order gnu_compat
+);
+use Pod::Usage;
+
+### Options ###
+
+my $man;
+my $help;
+
+my $keep_terminators;
+my $keep_comments;
+my $keep_empty_statements;
+my $keep_extra_spaces;
+my $slash_terminates;
+
+# Global variables (UPPERCASED)
+my $OUTPUT_STATEMENT_SEP = "\n--\n";
+my $OUTPUT_FILE_SEP      = "\n-- >>>*<<< --\n";
+
+my $ON_ERROR = 0;
+
+GetOptions(
+    'help|h|?' => \$help,
+    'man'      => \$man,
+    
+    'terminators|T!'            => \$keep_terminators,
+    'extra-spaces|spaces|S!'    => \$keep_extra_spaces,
+    'comments|C!'               => \$keep_comments,
+    'empty-statements|empty|E!' => \$keep_empty_statements,
+    'slash-terminates|slash!'   => \$slash_terminates,
+    
+    'output-statement-separator|oss|s=s' => \$OUTPUT_STATEMENT_SEP,
+    'output-file-separator|ofs|f=s'      => \$OUTPUT_FILE_SEP,
+    
+    'on-error|error|e=s' => \$ON_ERROR
+) or pod2usage(2);
+
+pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
+pod2usage(2) if $help;
+
+die qq[Illegal on_error value: "$ON_ERROR"]
+    if $ON_ERROR !~ /^(stop|continue|no-output|0|1|2)$/i;
+
+### Main code ###
+
+*error = $ON_ERROR =~ /^(continue|1)$/i
+    ? sub { warn shift } : sub { die shift };
+
+*process_file = $ON_ERROR =~ /^(no-output|2)$/i
+    ? \&split_and_gather_statements : \&split_and_print_statements;
+
+my $SPLITTER = SQL::SplitStatement->new(
+    keep_terminators      => $keep_terminators,
+    keep_extra_spaces     => $keep_extra_spaces,
+    keep_comments         => $keep_comments,
+    keep_empty_statements => $keep_empty_statements,
+    slash_terminates      => $slash_terminates
+);
+
+my $OUTPUT = '';
+
+{
+    local $/, $| = 1;
+    
+    if ( @ARGV ) {
+        while ( my $filename = shift @ARGV ) {
+            if ( $filename eq '-' ) {
+                process_file( \*STDIN )
+            } elsif ( open my $fh, '<', $filename ) {
+                process_file( $fh, scalar @ARGV )
+            } else {
+                error( qq[Can't open file "$filename": $!] )
+            }
+        }
+    } else {
+        split_and_print_statements( \*STDIN )
+    }
+    
+    print $OUTPUT if $OUTPUT;
+    print "\n"
+}
+
+### Main code End ###
+
+sub split_and_print_statements {
+    my ($fh, $not_last_file) = @_;
+    print join $OUTPUT_STATEMENT_SEP, $SPLITTER->split( <$fh> );
+    print $OUTPUT_FILE_SEP if $not_last_file
+}
+
+sub split_and_gather_statements {
+    my ($fh, $not_last_file) = @_;
+    $OUTPUT .= join $OUTPUT_STATEMENT_SEP, $SPLITTER->split( <$fh> );
+    $OUTPUT .= $OUTPUT_FILE_SEP if $not_last_file
+}
+
+__END__
+
+=head1 NAME
+
+sql-split - SQL splitting command line utility
+
+=head1 VERSION
+
+version 1.00020
+
+=head1 SYNOPSIS
+
+    sql-split [ OPTIONS ] [ FILE(S) ]
+    sql-split --man
+
+=head1 DESCRIPTION
+
+This program tries to split any SQL code (even containing non-standard and/or
+procedural extensions, at least the ones from the most popular DBMSs) into the
+atomic statements it is composed of.
+
+The given FILES are read and split one by one, and the resulting statements are
+printed to the standard output, separated by a customizable string (see below).
+Each given file must contain only full SQL statements, that is, no single atomic
+statement can span multiple files.
+
+If no file is given, or if one of the file names is a C<-> (dash), the SQL code
+is read from STDIN, so that this program can be used as a I<filter> or even
+interactively.
+
+Consider however that this is by no means a validating parser, so that errors in
+SQL code will not be detected (and can even lead to incorrect splitting).
+
+=head1 OPTIONS
+
+=head2 -T, --terminators
+
+It causes the trailing terminator tokens to be kept in the returned atomic
+statements (by default they are discarded instead).
+
+The strings currently recognized as terminators (depending on the context) are:
+
+=over 4
+
+=item * C<;> (the I<semicolon> character);
+
+=item * any string defined by the MySQL C<DELIMITER> command;
+
+=item * an C<;> followed by an C</> (I<forward-slash> character) on its own
+line;
+
+=item * an C<;> followed by an C<.> (I<dot> character) on its own line,
+followed by an C</> on its own line;
+
+=item * an C</> on its own line regardless of the preceding characters
+(only if the C<slash_terminates> option, explained below, is set).
+
+=back
+
+The multi-line terminators above are always treated as a single token, that is
+they are discarded (or returned) as a whole (regardless of the
+C<--no-slash-terminates> option value).
+
+=head2 -S, --spaces, --extra-spaces
+
+It causes the space characters around the statements, if any, to be kept in the
+returned atomic statements (by default they are trimmed instead).
+
+=head2 -C, --comments
+
+It causes the comments, if any, to be kept in the returned atomic statements
+(by default any comment is discarded instead).
+
+Both SQL and multi-line C-style comments are recognized.
+
+=head2 -E, --empty, --empty-statements
+
+It causes the empty statements to be returned (by default, they are discarded
+instead).
+
+A statement is considered empty when it contains no characters other than the
+terminator and space characters. A statement composed solely of comments is not
+recognized as empty and it is therefore returned, if the C<--comments> option is
+used. Note instead that an empty statement is recognized as such regardless of
+the use of the C<--terminators> and C<--extra-spaces> options.
+
+=head2 --no-slash, --no-slash-terminates
+
+By default a C</> (I<forward-slash>) on its own line, even without a preceding
+semicolon, is admitted as a candidate terminator.
+
+When this option is used instead, a forward-slash on its own line is treated as
+a statement terminator only if preceded by a semicolon or by a dot and a
+semicolon.
+
+If you are dealing with Oracle's SQL, you should not use this option, since a
+slash (alone, without a preceding semicolon) is often used as a terminator, as
+it is permitted by SQL*Plus (on non-I<block> statements).
+
+With SQL dialects other than Oracle, there is the (theoretical) possibility that
+a slash on its own line could pass the additional checks and be considered a
+terminator (while it shouldn't). This chance should be really tiny (it has never
+been observed in real world code indeed). Though negligible, this option will
+anyway rule out that risk.
+
+=head2 -s, --oss, --output-statement-separator I<string>
+
+The string which will be printed between every pair of returned atomic
+statements. By default, it is a S<C<-->> (I<double dash>) on its own line.
+
+To use special characters (such as newlines) when passing such string, please
+consult your shell docs (for example, in Bash the above mentioned default
+separator could be defined as S<C<$'\n--\n'>>).
+
+Note that the last returned statement (for each processed file) will not be
+followed by such separator.
+
+=head2 -f, --ofs, --output-file-separator I<string>
+
+The string which will be printed between the groups of statements coming from
+different files. By default it is the C<<<< -- >>>*<<< -- >>>> string on its own
+line.
+
+Similarly to the statement separator, the file separator will not be printed
+after the last file.
+
+=head2 -e, --error, --on-error I<value>
+
+It controls the program behavior in case one of the given files is not
+accessible.
+
+It can take the following values:
+
+=over 4
+
+=item *
+
+C<stop> or C<0>, which causes the program to die at the first file which
+can not be opened, but it prints all the statements split that far (this is the
+default);
+
+=item *
+
+C<continue> or C<1>, which causes the program, when it encounters a file
+error, to just emit a warning (on STDERR) and continue with the next file;
+
+=item *
+
+C<no-output> or C<2>, which, just like C<stop>, causes the program to
+die at the first file error, but in this case it does not print any statement,
+not even those coming from the previous (already read) files; in other words,
+the statements are printed out only if (and after) all of the given files have
+been successfully read.
+
+=back
+
+The above listed string values are case-insensitive.
+
+=head2 -h, -?, --help
+
+It prints a brief help message and exits.
+
+=head2 --man
+
+It shows the full man page.
+
+=head2 --version
+
+It prints the program version and exits.
+
+=head1 SUPPORTED DBMSs
+
+sql-split aims to cover the widest possible range of DBMSs, SQL dialects and
+extensions (even proprietary), in a (nearly) fully transparent way for the user.
+
+Currently it has been tested mainly on SQLite, PostgreSQL, MySQL and Oracle.
+
+=head2 Procedural Extensions
+
+Procedural code is by far the most complex to handle.
+
+Currently any block of code which start with C<FUNCTION>, C<PROCEDURE>,
+C<DECLARE>, C<CREATE> or C<CALL> is correctly recognized, as well as
+I<anonymous> C<BEGIN ... END> blocks, I<dollar quoted> blocks and blocks
+delimited by a C<DELIMITER>-defined I<custom terminator>, therefore a wide range
+of procedural extensions should be handled correctly. However, only PL/SQL,
+PL/PgSQL and MySQL code has been tested so far.
+
+=head1 LIMITATIONS
+
+None currently known (other than the lack of tests on SQL dialects different
+from the ones described above).
+
+=head2 Non-limitations
+
+To be split correctly, the given input must, in general, be syntactically valid
+SQL. For example, an unbalanced C<BEGIN> or a misspelled keyword could, under
+certain circumstances, confuse the parser and make it trip over the next
+statement terminator, thus returning non-split statements. This should not
+be a problem though, as the original (invalid) SQL code would have been unusable
+anyway (remember that this is NOT a validating parser!)
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<SQL::SplitStatement> (perldoc SQL::SplitStatement)
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright 2011 I<Emanuele Zeppieri> E<lt>emazep@cpan.orgE<gt>.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+See L<http://www.perl.com/perl/misc/Artistic.html>
+
+=head1 NO WARRANTY
+
+This program comes with NO WARRANTIES of any kind. It not only may cause loss of
+data and hardware damaging, but it may also cause several bad diseases to nearby
+people, including, but not limited to, diarrhoea, gonorrhea and dysmenorrhea.
+Don't say you haven't been warned.
+
+=cut

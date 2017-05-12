@@ -1,0 +1,88 @@
+Revision history for Spreadsheet-Reader-ExcelXML
+
+Uses the change tracking convention
++ New feature.
+- Removed/deprecated feature.
+! Bug fix.
+* Place holder
+
+NOTE: This software is designated as beta quality until this notice is removed.  The goal
+is to be method matched to Spreadsheet::ParseExcel prior to the v1.0 release.
+
+v0.16.8   2017-04-20 05:32:31-07:00 America/Los_Angeles
+
+	+ Added perl 5.24 testing to TravisCI
+
+v0.16.6   2017-04-20 05:19:27-07:00 America/Los_Angeles
+
+	+ Added one additional test to help diagnose perl 5.16 fails on TravisCI
+
+v0.16.4   2017-04-19 16:47:12-07:00 America/Los_Angeles
+
+	! Added requirement for Spreadsheet::Reader::Format v0.6.4 due to a sub dependancy of it's own
+
+v0.16.2   2017-02-13 09:45:12-08:00 America/Los_Angeles
+
+    ! Fix an unacknowledged dependancy on a newer format module version
+
+v0.16.0   2017-02-10 14:45:46-08:00 America/Los_Angeles
+
+	+ Added support for Excel cell XML value types ('t' attribute)
+        'b' => forced into 1 or 0 with an exists style test
+        'd' => will show as a 'Date' cell type
+        'inlineStr' => handled just like a formula 'str'  (set to the 'Text' type)
+        'n' => this seems redundant because generally Excel just doesn't store 't' for numbers but it behaves the same way
+    ! Upgraded debug support to use Log::Shiras::Unhide
+
+v0.14.0   2016-07-06 19:24:49-07:00 America/Los_Angeles
+
+	+ Added an attribute 'xml_doctype' to store any '!DOCTYPE' values
+	! Fixed miscategorized headers in the xml parser
+		closes #7 in github. added test 007-bad_shared_strings.t
+	! Updated a link in the main POD
+
+v0.12.2   2016-06-10 06:05:23-07:00 America/Los_Angeles
+
+	! Attempt to fix a couple of CPAN Testers fails
+		http://www.cpantesters.org/cpan/report/03c61060-2cf2-11e6-8f3d-886e3422d01a
+		http://www.cpantesters.org/cpan/report/2e4c1c6c-2cf2-11e6-816f-dbd7a8618baf
+	! Fixed PositionStyles POD title
+
+v0.10.4   2016-06-07 06:33:16-07:00 America/Los_Angeles
+
+	! Added 006-synopsis_use.t in order to validate the synopsis for all CPAN testers implementations
+		closes #6 in github with a test to catch the potential fail
+	! Fixed Worksheet, Chartsheet, WorksheetToRow, NamedSharedStrings, NamedStyles,
+		PositionSharedStrings, and PositionStyles POD titles
+
+v0.10.0   2016-05-15 05:21:48-07:00 America/Los_Angeles
+
+	! Fix POD encoding requirements for kwalitee fail
+
+v0.8.0    2016-05-15 04:58:48-07:00 America/Los_Angeles
+
+	! Fix common versioning of modules
+
+v0.6.0    2016-05-14 23:21:47-07:00 America/Los_Angeles
+
+	! Updated the requirement for Spreadsheet::Reader::Format to v0.6.0 to avoid cascading
+			CPAN testers fails
+
+v0.4.0    2016-05-11 12:44:12-07:00 America/Los_Angeles
+
+	! changed test 06-named_worksheet.t to use cmp_deeply to avoid preceision variances between perls
+		closes #1 in github
+	! Added an acknowledgement for Slaven Rezić - thanks for the prompt bug submission
+	! Updated level requirements for Spreadsheet::Reader::Format
+		closes #2 in github
+	! Excluded empty strings from the attribute build when they are not between quotes
+
+v0.2.0    2016-05-10 15:10:05-07:00 America/Los_Angeles
+
+	+ Initial production level release
+	! fixed several travis-ci fails mostly due to os differences and imported classes
+	+ Finished the main Spreadsheet::Reader::ExcelXML pod (documentation)
+
+v0.1_1    2016-05-05 05:42:17-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+	+ Initial release to move Spreadsheet::XLSX::Reader::LibXML off of XML::LibXML support

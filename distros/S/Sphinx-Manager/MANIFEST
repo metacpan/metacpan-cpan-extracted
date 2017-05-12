@@ -1,0 +1,15 @@
+.cvsignore
+Changes
+lib/Sphinx/Manager.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00-load.t
+t/bin/indexer
+t/bin/searchd
+t/boilerplate.t
+t/manager.t
+t/pod-coverage.t
+t/pod.t
+META.json                                Module JSON meta-data (added by MakeMaker)

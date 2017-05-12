@@ -1,0 +1,56 @@
+{
+   "abstract" : "parse SMS Server Tools files",
+   "author" : [
+      "Thomas Lenz <tholen@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "SMS-Server-Tools",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Class::Accessor" : "0.31",
+            "Log::Log4perl" : "1",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor" : "0.31",
+            "Log::Log4perl" : "1",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "SMS::Server::Tools" : {
+         "file" : "lib/SMS/Server/Tools.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=SMS-Server-Tools"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/tholen/sms-server-tools-perl"
+      }
+   },
+   "version" : "0.02"
+}

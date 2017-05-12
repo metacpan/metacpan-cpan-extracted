@@ -1,0 +1,19 @@
+# Rejected if we don't have any streets on the request
+template: update-contact.tt
+
+vars:
+  contact_id: blah1
+  phone: ''
+  no_addr: 1
+
+input_assertions:
+  class: SRS::EPP::Command::Update::Contact
+
+
+output_assertions:
+  count: 
+    - [ '//epp:resData', 0, "No res data returned"]
+  match:
+    - [ '//epp:reason', 'Voice phone number cannot be blank', 'knows what happened' ]
+  attr_is:
+    - [ '//epp:result', 'code', 2306, 'EPP: Correct response code' ]

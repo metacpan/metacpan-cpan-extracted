@@ -1,0 +1,445 @@
+package Silki::Manual::Admin;
+
+# ABSTRACT: Admin manual for Silki
+
+
+
+=pod
+
+=head1 NAME
+
+Silki::Manual::Admin - Admin manual for Silki
+
+=head1 VERSION
+
+version 0.29
+
+=head1 INSTALLATION
+
+Silki requires a Postgres database in order to function, and it also has a
+config file. This means that installation is a little different from a
+standard Perl distribution.
+
+The basic steps are the same, but the F<Build.PL> script takes several
+additional arguments:
+
+=over 4
+
+=item * --db-name
+
+Defaults to "Silki".
+
+=item * --db-username
+
+=item * --db-password
+
+=item * --db-host
+
+=item * --db-port
+
+=item * --db-ssl
+
+None of these are necessary, if the user that runs C<./Build install> has
+permission create a Postgres database using the default connection settings.
+
+=item * --etc-dir
+
+When you first install Silki, it will create a new config file for you in the
+specified directory. This defaults to F</etc/silki>, but you can override it.
+
+If you have already installed Silki, you can specify this and Silki will use
+this config file to figure out where to install share files, how to connect to
+the database, etc.
+
+=item * --share-dir
+
+By default, the share files are installed in the Perl module tree. If you
+prefer a different location, you can specify an alternate location.
+
+=item * --cache-dir
+
+At runtime, Silki needs a directory for generate cache files. This defaults to
+F</var/cache/silki>.
+
+=item * --hostname
+
+The default hostname for the web application. Set this to the (first) hostname
+through which you will access Silki. Silki can be installed once for multiple
+hostnames, but to do this, you need to access the web UI. To access the web
+UI, Silki needs to know what hostname it is listening on.
+
+By default, Silki will simply use the system hostname as returned by
+L<Sys::Hostname>.
+
+=back
+
+So the installation process looks like this:
+
+   perl Build.PL [--etc-dir = /usr/local/etc/silki --db-username foo --db-password bar ...]
+   ./Build test
+   [sudo ] ./Build install
+
+=head2 Cache Dir
+
+Currently, the installer does not make the cache directory, or ensure that it
+has the right permissions. The cache directory must be writeable by the user
+that Silki will run as, which is likely to be something like "www-data".
+
+=head1 CONFIGURATION
+
+Silki uses an INI-style configuration file. You may also need to configure a
+web server to serve the Silki application. While Catalyst does make it
+possible to run the application in standalone mode, this is not recommended
+for production use.
+
+When you first install Silki, it will generate a configuration file based on
+the parameters you pass to F<Build.PL>, and that will work for most
+users.
+
+The configuration file has the following settings.
+
+=head2 [Silki] Section
+
+This section contains some application wide settings.
+
+=over 4
+
+=item * max_upload_size
+
+This determines the maximum size of an attachment in the wiki. This defaults
+to approximately 10MB, which will work for most cases. If you plan to store
+huge files (video, disk images), you will need to increase this.
+
+Silki stores files in the database, so you may not want to use it to store
+huge files.
+
+=item * path_prefix
+
+This allows you to add an arbitrary prefix to all URIs that Silki
+generates. This is useful if you want to install Silki under some specific
+path on your server, like "http://example.com/wikis".
+
+=item * static
+
+When running in production mode, Silki expects that all static files (images,
+javascript, CSS, etc) will be served by a front-end web server. However, if
+you explicitly set this to a true value, Silki will serve all static content.
+
+=item * secret
+
+This is used as salt when generating digests for things like user
+authentication cookie MACs. It is also used for generating some URIs. If you
+change it, existing cookies and URIs will become invalid.
+
+There's no good reason to change this unless you believe that server security
+has been compromised.
+
+=item * is_production
+
+This will be set to true when the configuration file is first generated. Don't
+make this false unless you know what you're doing.
+
+=item * mod_rewrite_hack
+
+The Apache mod_rewrite module unescapes the URI before passing it to the
+backend. This ends up breaking paths to page titles with any escaped
+characters in them. Set this to a true value and Silki will account for this
+problem.
+
+=back
+
+=head2 [database] Section
+
+This section contains settings for connecting to the database.
+
+=over 4
+
+=item * name
+
+The name of the database containing the Silki schema. This defaults to
+"Silki". Don't change this unless you've already renamed your database.
+
+=item * username
+
+=item * password
+
+The username and password used when connecting to the Postgres server.
+
+=item * host
+
+=item * port
+
+The host and port for the Postgres server.
+
+=back
+
+By default, Silki attempts to connect to Postgres running on localhost with
+the default port. It assumes that the user it is running as can connect
+without a password.
+
+=head2 [dirs] section
+
+This section contains paths to some directories used by Silki
+
+=over 4
+
+=item * share
+
+The directory which contains "share" files, such as mason components and
+images. By default, Silki uses L<File::ShareDir> to find this.
+
+=item * cache
+
+Silki needs to write some cache files to disk. Files in this directory can be
+removed manually if you like, and they will be regenerated as needed. This
+defaults to F</var/cache/silki>.
+
+Obviously, Silki will need to have read and write access to this directory at
+runtime.
+
+=back
+
+=head2 [antispam] section
+
+This section contains configuration for Silki's optional antispam feature.
+
+=over 4
+
+=item * server
+
+The antispam API server. This defaults to api.antispam.typepad.com.
+
+=item * key
+
+The antispam API server key. If this is not set, Silki will not be able to
+check links for spamminess.
+
+=back
+
+=head1 FINDING THE CONFIG FILE
+
+By default, Silki looks for its config file at F</etc/silki/silki.conf>.
+
+If you're running Silki as a user with a home directory (and not as root), it
+also looks in F<~/.silki/etc/silki.conf>, which is handy for development and
+testing.
+
+If you want to put the config file somewhere else, you can set the
+C<SILKI_CONFIG> environment variable.
+
+=head1 GETTING STARTED
+
+When you first install Silki, it will create a single admin user and a wiki
+for you.
+
+The user account is "admin@E<lt>domainE<gt>". The default password is
+"changeme".
+
+Once you log in, you can change the account's email, name, and password. You
+can also switch to using an OpenID login if you prefer.
+
+Wikis cannot be renamed, but you can delete the wiki Silki created for you,
+called "My Wiki".
+
+=head1 WIKI PERMISSIONS AND USER ROLES
+
+Silki supports several levels of privacy for a wiki. It does this using a
+wiki-wide permission system. Each wiki has a privacy setting, which determines
+what different types of users can do.
+
+The available settings are:
+
+=over 4
+
+=item * Public
+
+Anyone can read I<and> edit the wiki, without logging in. Only logged-in wiki
+members can upload attachments.
+
+=item * Public, log-in to edit
+
+Anyone can read the wiki, but users must create an account and log in to
+edit. This ensures that all edits are associated with a given user, as opposed
+to the generic "Guest User". Only logged-in wiki members can upload
+attachments.
+
+=item * Public can read, members can edit
+
+Anyone can read the wiki, but only logged-in wiki members can edit it.
+
+=item * Private
+
+You must be a logged-in wiki member to edit the wiki.
+
+=back
+
+Regardless of the privacy setting, only a wiki admin can delete pages and
+attachments or invite new members to the wiki.
+
+Of course, a site admin has access to all wikis.
+
+=head2 Wiki Membership
+
+A wiki admin can invite new users to the wiki. If the user already has an
+account in the Silki installation, they are immediately added.
+
+If they don't have an account, they receive an invitation email and are asked
+to confirm their account's information (name, email, etc.). Once they do this,
+they are full members of that wiki.
+
+=head2 Guests Versus Logged-in Users
+
+When someone visits the wiki without logging in, they are using a generic
+"Guest User" account. This account is created by the system at installation
+time. No one can log in as this user, and there is only one guest account for
+the entire system.
+
+If the system has any public wikis, then guest users will see a "register"
+link. This allows them to create a new account without an explicit
+invitation. They are still not members of any wikis, but once they log in they
+will no longer be considered a guest.
+
+=head1 USER MANAGEMENT
+
+As mentioned previously, there are several ways to create new user accounts.
+It is not really safe to delete a user, so a site admin can explicitly disable
+an existing user. When a user is disabled, they cannot log in, but their
+activity history is still preserved, and their profile is still visible to
+other users.
+
+The site admin cannot disable any accounts which were created by the system
+(the "Guest User" and "System User" accounts), nor can the site admin disable
+their own account.
+
+A site can admin also grant site admin access to existing users. Since a site
+admin can access any wiki, they can also grant wiki admin status to other
+users.
+
+=head1 DOMAINS
+
+By default, Silki assumes that it is being accessed under the system's
+hostname. Of course, this may not be true.
+
+This is important because Silki generates URIs with the hostname when it
+issues a redirect, and when it sends invitation and registration confirmation
+emails.
+
+A site admin can edit the exisiting domain.
+
+Domains can have separate web and email hostnames. The email hostname is not
+currently used, but will be used in the future for emailing content into the
+wiki.
+
+Silki will throw an error if you attempt to access it from a domain it does
+not know about. If the default domain chosen when the system was installed is
+not being used, you can edit the domain manually using the C<psql> command
+line tool. In the future, the default domain will be made configurable during
+the installation process.
+
+=head2 Multiple Domains
+
+If you set up Silki for some sort of wiki hosting system, you may want to
+operate with multiple domains. When you create a wiki, you will assign it to a
+specific domain.
+
+Of course, you will also need to configure the web server side to work with
+multiple domains.
+
+=head1 WEB SERVER CONFIGURATION
+
+With Catalyst, you have a number of options when deciding how to integrate
+Silki with your web server, including FastCGI, mod_perl, PSGI, and more.
+
+While you can, in theory, run Silki as a vanilla CGI, this is not recommended,
+as it will be quite slow.
+
+Silki uses the X-Sendfile header when users download attachments. This means
+you will need to configure your web server to support this.
+
+=head2 Apache 2 and Starman
+
+Since there are so many options, we'll cover just one in depth, running Silki
+with Apache 2 serving static content, and L<Starman> as the app server.
+
+In order to support the X-Sendfile header, you will need the
+L<mod_xsendfile|http://tn123.ath.cx/mod_xsendfile/> Apache module installed.
+
+You should configure Apache to serve the css, images, and javascript files
+statically. In production, Silki prepends the css and javascript URIs with the
+Silki version number. This helps ensure that these files are reloaded when a
+new version of Silki is installed. Assuming you installed the share files in
+F</usr/local/share/silki>, this would look like:
+
+  AliasMatch ^/[^/]+/css(.+) /usr/local/share/silki/css$1
+  AliasMatch ^/[^/]+/js(.+)  /usr/local/share/silki/js$1
+  AliasMatch ^/images(.+)    /usr/local/share/silki/images$1
+
+All other URIs should simply be passed to the Starman server. For testing, you
+can start the server from the command line:
+
+  sudo -u www-data \
+      starman --listen 127.0.0.1:13000 \
+              --workers 5 \
+              --preload-app \
+              /usr/local/bin/silki.psgi
+
+You can adjust the value of C<--listen>, but it is recommended that you only
+listen on the localhost interface. There's no reason to expose the app server
+to the world at large. You can also adjust C<--workers> as needed.
+
+You also need to enable support for the X-Sendfile header in your Apache
+config file:
+
+  XSendFile on
+  XSendFileAllowAbove on
+
+Finally, you can use mod_rewrite to pass all non-static URIs to the Starman
+server:
+
+  RewriteEngine On
+  RewriteRule !^/images    - [C]
+  RewriteRule !^/[^/]+/css - [C]
+  RewriteRule !^/[^/]+/js  - [C]
+  RewriteRule (.*)         http://localhost:13000$1 [P,L]
+
+The whole thing, wrapped in a virtual host, looks like this:
+
+  <VirtualHost *:80>
+      ServerName  silki.test
+
+      DocumentRoot /usr/local/share/silki
+
+      ErrorLog /var/log/apache2/error.log
+      CustomLog /var/log/apache2/access.log combined
+
+      AliasMatch ^/[^/]+/css(.+) /usr/local/share/silki/css$1
+      AliasMatch ^/[^/]+/js(.+)  /usr/local/share/silki/js$1
+      AliasMatch ^/images(.+)    /usr/local/share/silki/images$1
+
+      XSendFile on
+      XSendFileAllowAbove on
+
+      RewriteEngine On
+      RewriteRule !^/images    - [C]
+      RewriteRule !^/[^/]+/css - [C]
+      RewriteRule !^/[^/]+/js  - [C]
+      RewriteRule (.*)         http://localhost:13000$1 [P,L]
+  </VirtualHost>
+
+=head1 AUTHOR
+
+Dave Rolsky <autarch@urth.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2011 by Dave Rolsky.
+
+This is free software, licensed under:
+
+  The GNU Affero General Public License, Version 3, November 2007
+
+=cut
+
+
+__END__
+

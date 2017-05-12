@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Search/Fulltext/Tokenizer/MeCab.pm
+minil.toml
+share/dic/op.csv
+share/dic/op.dic
+t/00_compile.t
+t/01-usage.t
+t/02-various-searches.t
+META.yml
+MANIFEST

@@ -1,0 +1,162 @@
+{
+   "resources" : {
+      "repository" : "http://github.com/jjl/Spark-Form"
+   },
+   "generated_by" : "Dist::Zilla::Plugin::MetaJSON version 1.092450",
+   "meta-spec" : {
+      "version" : 1.4,
+      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html"
+   },
+   "version" : "0.2102",
+   "name" : "Spark-Form",
+   "author" : [
+      "James Laver L<http://jameslaver.com>"
+   ],
+   "license" : "perl",
+   "provides" : {
+      "SparkX::Form::BasicValidators" : {
+         "version" : "0.2102",
+         "file" : "lib/SparkX/Form/BasicValidators.pm"
+      },
+      "SparkX::Form::Field::File" : {
+         "version" : "0.2102",
+         "file" : "lib/SparkX/Form/Field/File.pm"
+      },
+      "SparkX::Form::Field::Checkbox" : {
+         "version" : "0.2102",
+         "file" : "lib/SparkX/Form/Field/Checkbox.pm"
+      },
+      "SparkX::Form::Field::Validator::Regex" : {
+         "version" : "0.2102",
+         "file" : "lib/SparkX/Form/Field/Validator/Regex.pm"
+      },
+      "SparkX::Form::Field::Password" : {
+         "version" : "0.2102",
+         "file" : "lib/SparkX/Form/Field/Password.pm"
+      },
+      "Spark::Form" : {
+         "version" : "0.2102",
+         "file" : "lib/Spark/Form.pm"
+      },
+      "SparkX::Form::Printer::List" : {
+         "version" : "0.2102",
+         "file" : "lib/SparkX/Form/Printer/List.pm"
+      },
+      "SparkX::Form::Field::Text" : {
+         "version" : "0.2102",
+         "file" : "lib/SparkX/Form/Field/Text.pm"
+      },
+      "SparkX::Form::Field::Button" : {
+         "version" : "0.2102",
+         "file" : "lib/SparkX/Form/Field/Button.pm"
+      },
+      "SparkX::Form::Field::Validator::MaxLength" : {
+         "version" : "0.2102",
+         "file" : "lib/SparkX/Form/Field/Validator/MaxLength.pm"
+      },
+      "Spark::Form::Printer" : {
+         "version" : "0.2102",
+         "file" : "lib/Spark/Form/Printer.pm"
+      },
+      "SparkX::Form::Field::Reset" : {
+         "version" : "0.2102",
+         "file" : "lib/SparkX/Form/Field/Reset.pm"
+      },
+      "Spark::Form::FAQ" : {
+         "version" : "0.2102",
+         "file" : "lib/Spark/Form/FAQ.pm"
+      },
+      "SparkX::Form::Field::Select" : {
+         "version" : "0.2102",
+         "file" : "lib/SparkX/Form/Field/Select.pm"
+      },
+      "Spark::Form::Field::Role::Printable::XHTML" : {
+         "version" : "0.2102",
+         "file" : "lib/Spark/Form/Field/Role/Printable/XHTML.pm"
+      },
+      "SparkX::Form::Field::Textarea" : {
+         "version" : "0.2102",
+         "file" : "lib/SparkX/Form/Field/Textarea.pm"
+      },
+      "Spark::Form::Source" : {
+         "version" : "0.2102",
+         "file" : "lib/Spark/Form/Source.pm"
+      },
+      "Spark::Form::Printer::HTML" : {
+         "version" : "0.2102",
+         "file" : "lib/Spark/Form/Printer/HTML.pm"
+      },
+      "Spark::Form::Field::Role::Printable" : {
+         "version" : "0.2102",
+         "file" : "lib/Spark/Form/Field/Role/Printable.pm"
+      },
+      "SparkX::Form::Field::Validator::MinLength" : {
+         "version" : "0.2102",
+         "file" : "lib/SparkX/Form/Field/Validator/MinLength.pm"
+      },
+      "Spark::Form::Printer::XHTML" : {
+         "version" : "0.2102",
+         "file" : "lib/Spark/Form/Printer/XHTML.pm"
+      },
+      "SparkX::Form::BasicPrinters" : {
+         "version" : "0.2102",
+         "file" : "lib/SparkX/Form/BasicPrinters.pm"
+      },
+      "SparkX::Form::Field::Submit" : {
+         "version" : "0.2102",
+         "file" : "lib/SparkX/Form/Field/Submit.pm"
+      },
+      "Spark::Form::Field::Role::Printable::HTML" : {
+         "version" : "0.2102",
+         "file" : "lib/Spark/Form/Field/Role/Printable/HTML.pm"
+      },
+      "SparkX::Form::Field::Radio" : {
+         "version" : "0.2102",
+         "file" : "lib/SparkX/Form/Field/Radio.pm"
+      },
+      "SparkX::Form::Field::Validator::NotEmpty" : {
+         "version" : "0.2102",
+         "file" : "lib/SparkX/Form/Field/Validator/NotEmpty.pm"
+      },
+      "SparkX::Form::BasicFields" : {
+         "version" : "0.2102",
+         "file" : "lib/SparkX/Form/BasicFields.pm"
+      },
+      "SparkX::Form::Field::Image" : {
+         "version" : "0.2102",
+         "file" : "lib/SparkX/Form/Field/Image.pm"
+      },
+      "Spark::Form::Field::Role::Validateable" : {
+         "version" : "0.2102",
+         "file" : "lib/Spark/Form/Field/Role/Validateable.pm"
+      },
+      "SparkX::Form::Field::Hidden" : {
+         "version" : "0.2102",
+         "file" : "lib/SparkX/Form/Field/Hidden.pm"
+      },
+      "SparkX::Form::Field::Validator::Confirm" : {
+         "version" : "0.2102",
+         "file" : "lib/SparkX/Form/Field/Validator/Confirm.pm"
+      },
+      "Spark::Form::Field" : {
+         "version" : "0.2102",
+         "file" : "lib/Spark/Form/Field.pm"
+      },
+      "SparkX::Form::Field::MultiSelect" : {
+         "version" : "0.2102",
+         "file" : "lib/SparkX/Form/Field/MultiSelect.pm"
+      }
+   },
+   "requires" : {
+      "Module::Pluggable" : "0",
+      "MooseX::LazyRequire" : "0.04",
+      "Test::More" : "0",
+      "List::Util" : "0",
+      "Data::Couplet" : "0.02004312",
+      "MooseX::AttributeHelpers" : "0.21",
+      "List::MoreUtils" : "0",
+      "Moose" : "0.89",
+      "HTML::Tiny" : "0"
+   },
+   "abstract" : "A simple yet powerful forms validation system that promotes reuse."
+}

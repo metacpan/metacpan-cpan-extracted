@@ -1,0 +1,6 @@
+Revision history for Perl extension Sys::Headers.
+
+0.01  Tue Aug 20 16:01:59 2002
+	- original version; created by h2xs 1.21 with options
+		-b 5.5.3 -AXn Sys::Headers
+

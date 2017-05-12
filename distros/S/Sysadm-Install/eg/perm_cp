@@ -1,0 +1,16 @@
+#!/usr/bin/perl
+###########################################
+# perm_cp
+# Mike Schilli, 2005 (m@perlmeister.com)
+# Copy file permissions/owner from one file
+# to another
+###########################################
+use warnings;
+use strict;
+
+use Sysadm::Install qw(:all);
+use Log::Log4perl qw(:easy);
+Log::Log4perl->easy_init($DEBUG);
+
+Sysadm::Install::dry_run(1);
+perm_cp(@ARGV);

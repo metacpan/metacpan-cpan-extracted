@@ -1,0 +1,16 @@
+Changes
+lib/Set/Integer/Gapfillers.pm
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/01_load.t
+t/02_regular.t
+t/03_closed.t
+t/04_bound_in_gap.t
+t/05_closed_bound_in_gap.t
+t/06_same_interior.t
+t/07_needed.t
+t/08_expand.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,259 @@
+=head1 NAME
+
+Strehler::Manual::ExtraEntityConfiguration - Configurable flags on extra entities
+
+=head1 DESCRIPTION
+
+The behaviour of Strehler when it manages an extra entity can be highly customized just using standard Strehler flags. These flags will be listed here and explained.
+
+=head1 CONFIGURE A FLAG
+
+There're two ways to assign a custom value to a flag related to an extra entity.
+
+=head2 ENTITY CLASS FLAG METHOD OVERRIDE
+
+In the new entity class you can override methods that belong to L<Strehler::Element::Role::Configured> to make them return flag value you want.
+For example:
+
+    sub updatable { return 0; }
+
+will make your entity elements impossible to be modified, turning off the "Edit" button.
+
+=head2 STREHLER CONFIGURATION
+
+Standard implementation of configuration methods just try to read the flag from the config.yml or return a default value. So you can use Dancer2 configuration to change values.
+
+    Strehler:
+        my_entity:
+            auto: 1
+            class: My::Entity
+            deletable: 0
+
+My_entity will not have delete button on its entries.
+
+B<REMEMBER>: Overriding configuration methods has always priority on config.yml configuration.
+
+=head1 CONFIGURATION FLAGS
+
+=over 4
+
+=item visible
+
+default:
+
+Put this flag to 0 to make an entity disappear from the top bar. 
+
+B<Warning>: Category menu cannot be hidden
+
+=item auto
+
+default: 1
+
+Tell Strehler to use standard implementation for all the backend navigations. With auto = 0, paths like /admin/entity/list have to be implemented.
+
+=item exposed
+
+default: 1
+
+Data about the entity is automatically exposed through Strehler's APIs.
+
+=item plural
+
+default: a label deriver from item_type using L<Lingua::EN::Inflect>
+
+Label that will be used to build API paths.
+
+=item label
+
+default: ???
+
+The label that will appear in the menu and in the entity pages.
+
+=item class
+
+B<Mandatory in config.yml>
+
+Indicates the class that will manage the entity (a L<Strehler::Element subclass>).
+
+=item form
+
+default: undef
+
+Say the file with the form configuration for the CRUD of the entity.
+If no form is defined create/update functions will fail.
+
+=item multilang_form
+
+default: undef
+
+As for form flag, defines the file with multilang fields configuration. TO be used only if you have multilang fields.
+
+=item creatable
+
+default: 1
+
+Say if Strehler user can create an entry for the entity.
+
+=item updatable
+
+default: 1
+
+Say if Strehler user can modify an entry for the entity.
+
+=item deletable
+
+default: 1
+
+Say if Strehler user can delete an entry for the entity.
+
+=item categorized
+
+default: 0
+
+Say if entity can be categorized using Strehler categories.
+To be categorized, the entity must have a column CATEGORY (INTEGER) in its database table.
+
+To add category selector to your form use L<Strehler::FormFu::Element::Category>. Just add:
+
+    - type: "+Strehler::FormFu::Element::Category"
+
+to your form.
+For tags use L<Strehler::FormFu::Element::Tags>.
+
+    - type: "+Strehler::FormFu::Element::Tags"
+
+=item ordered
+
+default: 0
+
+Say if entity uses Strehler ordering feature.
+To use it, the entity must ave a column DISPLAY_ORDER (INTEGER) in its database table.
+
+To add order field (with Next! button) to your form use L<Strehler::FormFu::Element::DisplayOrder>
+
+    - type: "+Strehler::FormFu::Element::DisplayOrder"
+
+=item dated
+
+default: 0
+
+Say if entity uses Strehler publish date feature.
+To use it, the entity must ave a column PUBLISH_DATE (DATE) in its database table.
+
+To add order field (with Next! button) to your form use L<Strehler::FormFu::Element::PublishDate>
+
+    - type: "+Strehler::FormFu::Element::PublishDate"
+
+
+=item publishable
+
+default: 0
+
+Say if entity uses Strehler publish feature 
+To use it, the entity must ave a column PUBLISHED (TINYINT) in its database table.
+
+=item auto_publish
+
+default: 0
+
+A publishable content appear already online at creation. Can be put offline.
+
+=item custom_list_template
+
+default: undef
+
+This method can be overriden to return path to a custom template that represent the line of an element in the list view. Writing it, consider that the element will be passed to it as the object el.
+
+=item add_main_column_span
+
+default: 8
+
+Indicate the width of the editing area in add forms. 
+
+As for bootstrap grid, value can go from 1 to 12.
+
+=item custom_snippet_add_position
+
+default: left
+
+Indicate where the blank column go. In the blank column the custom snippet will appear, if defined.
+
+=item entity_js
+
+default: undef
+
+A path (local to the site) for a custom js that will be loaded in the add page for the entity.
+
+=item allowed_role
+
+default: ""
+
+If role is equal to admin only admin user will see the entity.
+
+=back
+
+=head1 OVERRIDABLE METHODS
+
+These methods can only be overriden inside a subclass of Element to obtain a customization.
+
+=over 4
+
+=item save_form
+
+return id
+
+This method is called as class method from add/edit functions to save form data in the database. 
+
+It takes as input:
+
+B<id>: id of the submitted element, if edited (undef when creating a new one)
+
+B<form>: the form object as arrived from posting data
+
+B<uploads>: content of request->uploads() as defined by Dancer2
+
+You can override this method to control how data are saved on the database.
+
+The method return element id if saving data was a success, undef otherwise.  
+
+=item form_modifications
+
+return a form object
+
+This method takes in the form object allowing you to write here customization you can't realize on yaml file.
+
+=item data_fields
+
+return undef
+
+This method can be overriden to give back different fields from the database columns in get_basic_data function.
+
+In a custom element make it returns an array of strings.
+
+WARNING: behaviour unpredictable if any string is not a database column or a custom function.
+
+=item multilang_data_fields
+
+return undef
+
+This method can be overriden to give back different fields from the database columns in get_ext_data function (it controls multilang fields).
+
+In a custom element make it return an array of strings.
+
+WARNING: behaviour unpredictable if any string is not a database column of the multilang table or a custom function.
+
+=item custom_add_snippet
+
+return undef
+
+This method can be overriden to return an HTML snippet that will be displayed on the side of the edit form of the element.
+
+
+=back
+
+=head1 SEE ALSO
+
+L<Strehler::Manual::ExtraEntityTutorial> explains how to create a new entity and how configuration flags can be used.
+
+=cut
+

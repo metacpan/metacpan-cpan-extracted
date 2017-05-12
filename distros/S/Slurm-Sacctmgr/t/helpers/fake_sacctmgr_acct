@@ -1,0 +1,262 @@
+#!/bin/sh
+#
+#Fake sacctmgr show acct results for testing
+#
+#Updated to handle preTRES (Slurm v 14.x.y) and postTRES (Slurm 15.x.y) data
+#USe env var FAKE_SLURM_VERSION to set this
+#Also accepts --version and format= arguments
+
+#Order of fields is now controllable via format option
+#Below is the default if no format given
+FORMAT_FIELDS="account description organization"
+
+verbose_flag=
+
+print_version()
+{	version=$1
+	cat - <<EOF
+slurm $version
+EOF
+	exit 0
+}
+
+print_header()
+{
+	tmptext=
+	for fld in $FORMAT_FIELDS
+	do
+		case $fld in
+		    account)
+			tmptext="${tmptext}Account"
+			;;
+		    description)
+			tmptext="${tmptext}Descr"
+			;;
+		    organization)
+			tmptext="${tmptext}Org"
+			;;
+		    coordinators)
+			tmptext="${tmptext}Coord Accounts"
+			;;
+		    *)
+			echo >&2 "Unrecognized field name $fld in format string, aborting"
+			exit 1;
+			;;
+		esac
+		tmptext="${tmptext}|"
+	done
+	echo $tmptext
+}
+
+
+print_acct()
+{	
+	#Clear values
+	tmp_account=
+	tmp_description=
+	tmp_organization=
+	tmp_coordinators=
+
+	#Set values
+	while [ $# -gt 0 ]
+	do
+		key=$1
+		val=$1
+		shift
+		key=`echo $key | sed -e 's/=.*$//'`
+		val=`echo $val | sed -e 's/^[^=]*=//'`
+		#echo >&2 "$key = $val"
+
+		case $key in
+		    account)
+			tmp_account=$val
+			;;
+		    description)
+			tmp_description=$val
+			;;
+		    organization)
+			tmp_organization=$val
+			;;
+		    coordinators)
+			tmp_coordinators=$val
+			;;
+		#----	ERROR
+		    *)
+			echo >&2 "Unrecognized parm $key, aborting"
+			exit 1
+			;;
+		esac
+	done
+		    
+	#Print values
+	tmptext=
+	for fld in $FORMAT_FIELDS
+	do
+		case $fld in
+		#----	common fields
+		    account)
+			tmptext="${tmptext}${tmp_account}"
+			;;
+		    description)
+			tmptext="${tmptext}${tmp_description}"
+			;;
+		    organization)
+			tmptext="${tmptext}${tmp_organization}"
+			;;
+		    coordinators)
+			tmptext="${tmptext}${tmp_coordinators}"
+			;;
+		#----	ERROR
+		    *)
+			echo >&2 "Unrecognized field name $fld in format string, aborting"
+			exit 1;
+			;;
+		esac
+		tmptext="${tmptext}|"
+	done
+	echo $tmptext
+
+
+}
+
+print_specified_acct()
+{	acct=$1
+
+	case $acct in
+	   aaa)
+		print_acct account='aaa' description='test account 1' organization='aa'
+		;;
+	   aab)
+		print_acct account='aab' description='test account 1b' organization='aa'
+		;;
+	   bbb)
+		print_acct account='bbb' description='test account 2' organization='bb'
+		;;
+	   ccc)
+		print_acct account='ccc' description='test account 3' organization='cc'
+		;;
+	   *)
+		x=x
+		#echo >&2 "Unknown acct $usr"
+		;;
+	esac
+}
+
+print_accts()
+{	#We always have --noheader
+	#print_header
+	while [ $# -gt 0 ]
+	do
+		acct=$1
+		shift
+		print_specified_acct $acct
+	done
+}
+
+print_all_accts()
+{	#Must do alphabetically
+	print_accts 'aaa' 'aab' 'bbb' 'ccc' 
+}
+
+
+print_org_aa_accts()
+{	#Print all accts with org aa
+	print_accts 'aaa' 'aab'
+}
+
+print_org_bb_accts()
+{	#Print all accts with org bb
+	print_accts 'bbb'
+}
+
+print_org_cc_accts()
+{	#Print all accts with org cc
+	print_accts 'ccc'
+}
+
+print_desc_1b_accts()
+{	#Print all accts with org aa and desc 'test account 1b'
+	print_accts 'aab'
+}
+
+print_org_aa_1b_accts()
+{	#Print all accts with org aa and desc 'test account 1b'
+	print_accts 'aab'
+}
+
+print_no_accts()
+{	print_accts 'no-such-acct'
+}
+
+#Parse options
+org_flag=
+name_flag=
+desc_flag=
+
+while [ $# -gt 0 ]
+do
+	arg=$1
+	shift
+
+	case $arg in
+	    --version)
+		#Print version and exit
+		if [ "x$FAKE_SLURM_VERSION" = "x" ]; then
+			print_version 14
+		else
+			print_version $FAKE_SLURM_VERSION
+		fi
+		exit 0
+		;;
+	    format=*)
+		#Set our format string
+		tmp=`echo $arg | sed -e 's/^format=//' -e "s/'//g" -e 's/"//g' -e 's/,/ /g'`
+		FORMAT_FIELDS=$tmp
+		;;
+	    name=* )
+		tmp=`echo $arg | sed -e 's/^name=//' -e "s/'//g" -e 's/"//g' `
+		name_flag=$tmp
+		;;
+	    account=* )
+		tmp=`echo $arg | sed -e 's/^account=//' -e "s/'//g" -e 's/"//g' `
+		name_flag=$tmp
+		;;
+	    organization=* )
+		tmp=`echo $arg | sed -e 's/^organization=//' -e "s/'//g" -e 's/"//g' `
+		org_flag=$tmp
+		;;
+	     description=* )
+		tmp=`echo $arg | sed -e 's/^description=//' -e "s/'//g" -e 's/"//g' `
+		desc_flag="$tmp"
+		;;
+	esac
+done
+
+if [ "x${org_flag}" != "x" ]; then
+	#org requested, possibly with desc
+	if [ "x${desc_flag}" = "x" ]; then
+		if [ "x${org_flag}" = "xaa" ]; then
+			#Org aa only
+			print_org_aa_accts
+		elif [ "x${org_flag}" = "xbb" ]; then
+			print_org_bb_accts
+		elif [ "x${org_flag}" = "xcc" ]; then
+			print_org_cc_accts
+		fi
+	elif [ "x${desc_flag}" = "xtest account 1b" ]; then
+		if [ "x${org_flag}" = "xaa" ]; then
+			print_org_aa_1b_accts
+		else
+			print_no_accts
+		fi
+	fi
+elif [ "x${desc_flag}" = "xtest account 1b" ]; then
+	print_desc_1b_accts
+elif [ "x${name_flag}" != "x" ]; then
+	#name specified.  Do not handle multiple flags here
+	print_specified_acct $name_flag
+else
+	#No flags, print all accounts
+	print_all_accts
+fi
+

@@ -1,0 +1,111 @@
+#!Spp
+
+(context spp-to-ruby)
+
+(def to-ast(file)
+  (my $file-txt (read-file file))
+  (opt ($file-txt ~~ Spp)))
+
+(def to-ruby(file)
+  (my ast (to-ast file))
+  (my ruby-code (atom-to-str ast))
+  (say ruby-code))
+
+(def atom-to-str(atom)
+  (my ($name value) atom)
+  (case $name
+    (when :nil    :nil)
+    (when :true   :true)
+    (when :false  :false)
+    (when :int    value)
+    (when :sym    value)
+    (when :exprs  (exprs-to-str value))
+    (when :list   (list-to-str value))
+    (when :hash   (hash-to-str value))
+    (when :array  (array-to-str value))
+    (when :str    (str-to-str value))
+    (when :string (string-to-str value))
+    (when :def    (def-to-str value))
+    (else (error "unknown atom name: {$name}"))))
+
+(def def-to-str(exprs)
+  (say exprs))
+
+(def exprs-to-str(exprs)
+  (my strs (atoms-to-str exprs))
+  (return (join strs '\n')))
+
+(def atoms-to-str(atoms)
+  (my strs [])
+  (for atom in atoms
+    (strs << (atom-to-str atom)))
+  (return strs))
+
+(def hash-to-str(hash)
+  (my strs [])
+  (for pair in hash
+    (strs << (pair-to-str pair)))
+  (my hash-str (join strs ','))
+  (return "\{{hash-str}\}"))
+
+(def pair-to-str(pair)
+  (my strs (atoms-to-str pair))
+  (return (join strs ' => ')))
+
+(def array-to-str(array)
+  (my strs (atoms-to-str array))
+  (my array-str (join strs ','))
+  (return "[{array-str}]"))
+
+(def str-to-str(str)
+  (my strs [])
+  (for char in (split str)
+    (strs << (char-to-str char)))
+  (my str-str (join strs))
+  (return "'{str-str}'"))
+
+(def string-to-str(string)
+  (my strs [])
+  (for node in string
+    (my ($name value) node)
+    (if ($name == :str)
+      (strs << value)
+      else
+      (strs << (atom-to-str node))))
+  (return [:str (join strs)]))
+
+(def _list-to-str(array)
+  (my strs (atoms-to-str array))
+  (my array-str (join strs ' '))
+  (return "({array-str})"))
+
+(def list-to-str(list)
+  (my first-atom (first list))
+  (my (atom-type atom-name) first-atom)
+  (if (atom-type == :sym)
+    (my value (last list))
+    (my args (rest list))
+    (case atom-name
+      (when :if    (if-to-str args))
+      (when :for   (for-to-str args))
+      (when :while (while-to-str args))
+      (when :case  (case-to-str value))
+      (when :def   (def-to-str  value))
+      (else (error "Not implement {atom-name} to ruby")))))
+
+(def char-to-str(char)
+  (case char
+    (when '\n' '\\n')
+    (when '\r' '\\r')
+    (when '\t' '\\t')
+    (when '\'' '\\\'')
+    (when '\{' '\\\{')
+    (when '\"' '\\\"')
+    (when '\\' '\\\\')
+    (else (return char))))
+
+(to-ruby (ARGV 0))
+
+(end spp-to-ruby)
+
+# vim: ft=newlisp

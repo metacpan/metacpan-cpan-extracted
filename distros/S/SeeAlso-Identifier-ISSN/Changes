@@ -1,0 +1,10 @@
+Revision history for Perl module SeeAlso::Identifier::ISSN
+
+0.5703 Mon Jul 18 09:47:20 CEST 2011
+    - loose required version of M:B
+    - isa() usage by the book
+    - pod fixes
+
+0.57 Sat May 14 16:42:26 2011
+    - original version; created by ExtUtils::ModuleMaker 0.51
+

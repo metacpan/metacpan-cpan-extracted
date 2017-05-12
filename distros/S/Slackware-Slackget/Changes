@@ -1,0 +1,106 @@
+Revision history for Slackware::Slackget
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+	
+0.02	Many updates and addings
+
+0.03	The followings classes are now in there neare final form :
+	- slackget10::Package
+	- slackget10::PackageList
+	- slackget10::SpecialFiles::PACKAGES
+	- slackget10::SpecialFiles::CHECKSUMS
+	- slackget10::SpecialFiles::FILELIST
+	- slackget10::SpecialFileContainer
+	- slackget10::SpecialFileContainerList
+	
+	The slackget10::Base have well advance, and a new namespace have been added : slackget10::Network::* which will manage all network connections. Classes from this namespace will be has simple has the other to use (I hope...)
+	New classesare (I can ommit somes..) :
+	- All slackget10::Network::* classes
+	- slackget10::List
+	- slackget10::Server
+	- slackget10::ServerList
+	- slackget10::Config (I think it's a new one but I'm not sure :))
+
+0.04	I have recycled the Log class from old slack-get sources, and improved existing classes. The network is now fully supported.
+
+0.05	Wed May 11 01:05:26 CEST 2005
+	This new version correct some bugs, fully support the network, and I am now sure that a large part of the module works fine. 
+	You can test a large part of functionnality by using the slack-getd perl script in the t/ directory.
+	In this version there is a lot of debug print, if you want to test the slack-getd daemon you have to custom the config.xml file.
+	The servers.xml can be used as it.
+0.06	Mon May 16 14:55:17 CEST 2005
+	Add the followings modules :
+	- slackget10::Network::Auth
+	- slackget10::Status
+	- slackget10::PkgTools
+
+0.07 Tue Aug 30 20:44:36 CEST 2005
+	This is an intermediate development version which correct some bugs.
+	- correct all docs to pass the "pod-coverage" test. I still not provide a test suite but I correct existing code to pass default test.
+	- Modifying slackget10.pm. A new instance of this class is now usefull. She instanciate the followings class : slackget10::Config, slackget10::Base, slackget10::PkgTools, slackget10::Network::Auth. Moreover it provide accessors for this class (please read the doc)
+	- slackget10.pm also provide the base architecture for the new plug-in system. Provide the load_plugins() method. TODO: implements the call_plugin() method.
+	- Made some modifications in slack-getd
+	- Add some functions and method (in slackget10::Base among other)
+	- Last but not least I have update all install script (MANIFEST, Build.PL, etc.) and they now are complete :-)
+
+0.10 Tue Oct 23 21:40:35 CEST 2007
+	- Loads of changes and bugfixes
+	- Removed the followings class from the module :
+		* slackget10::Server
+		* slackget10::ServerList
+		* slackget10::Log* (the new architecture from the 1.0.0-alpha2 use POE::Component::Logger)
+	- Removed the followings unused classes :
+		* slackget10::Networking
+		* slackget10::Network::Daemon
+	- fixes the test suite
+
+0.11 Sun Nov 11 20:30:12 CEST 2007
+	- Made the slackget10::Network::Connection::* drivers loading completly dynamic.
+	- Removed the followings class from the module :
+		* slackget10::Log
+		* slackget10::Log::LogRotate
+	- Change loads of things in slackget10::Network::Connection (please look at the documentation)
+
+0.12 Tue Nov 27 23:00:51 CEST 2007
+	- Update documentation
+	- Add slackget10::Network::Message class
+	- Add slackget10::Network::Backend::* namespace and the XML.pm backend
+	- remove slackget10::Network::Response.pm
+
+0.13 <date>
+	- New namespace and module name : Slackware::Slackget
+
+0.14 Tue Dec 04 16:00:51 CEST 2007
+	- try to fix the unexplicated crash in config tests
+	- fix a bug in the driver's loading code in Slackware::Slackget::Network::Connection
+
+0.15_99 Sat Jan 02 15:00:00 CEST 2008
+	- modify Slackware::Slackget::File->filename() behavior to allow it to set the filename
+	- fix is_heavy_word() method in Slackware::Slackget::Package, wich now return the correct result
+	- update Slackware::Slackget::Date to make it fill the month-name from the month-number
+	- update Slackware::Slackget::Date by overloading '<=>' and 'cmp'
+	- changed all classes of the Slackware::Slackget module to be compliant with the slack-get naming convention (SGNCC : Slack-Get Naming Convention Compliant) (http://www.infinityperl.org/post/2008/02/02/SGNCC-Slack-Get-Naming-Convention-Compliant-:-the-new-slack-gets-naming-convention-document)
+	- add more tests to the test suite for the followings classes :
+		* Slackware::Slackget::File (SGNCC & backward compatible)
+		* Slackware::Slackget::Media (SGNCC & backward compatible)
+		* Slackware::Slackget::Date (SGNCC & backward compatible)
+		* Slackware::Slackget::Package (SGNCC & backward compatible)
+
+0.16  
+	- code cleanup for the Slackware::Slackget::List class
+	- fix some "uninitialized value" problem in the Slackware::Slackget::File class
+	- the bug with `file` -b option on Solaris should be fixed.
+	- add more tests to the test suite for the followings classes :
+		* Slackware::Slackget::List (SGNCC & backward compatible)
+
+0.17
+	- Fix some modules internal calls to be compliant with the new API (Base.pm,MD5.pm, etc.)
+	- Add the Slackware::Slackget::List tests to the MANIFEST to include it in the archive...
+	- Implements the Slackware::Slackget::GPG->import_key() method
+	- Add the followings methods to Slackware::Slackget::GPG : list_keys(), list_sigs(), key_info(), sig_info().
+	- Removed all the _send_info() part in Slackware::Slackget::PkgTools.
+	- Change Slackware::Slackget::Package::to_string() behavior to generate a Slackware's PACKAGES.TXT compatible string.
+	- Add method to simply add dependencies when generating a package.
+	- Fix the Slackware::Slackget::Package : now generate all dependencies data structure while parsing PACKAGES.TXT files.
+	- Modify the to_string() method from Slackware::Slackget::List to allow a subclass to write its own to_string() method.

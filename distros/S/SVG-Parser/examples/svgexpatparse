@@ -1,0 +1,17 @@
+#!/usr/bin/perl -w
+use strict;
+use SVG::Parser::Expat;
+
+die "Usage: $0 <file>\n" unless @ARGV;
+
+my $xml;
+{
+    local $/=undef;
+    $xml=<>;
+}
+
+my $parser=new SVG::Parser::Expat(-debug=>1,'--indent'=>'  ');
+
+my $svg=$parser->parse($xml);
+
+print $svg->xmlify();

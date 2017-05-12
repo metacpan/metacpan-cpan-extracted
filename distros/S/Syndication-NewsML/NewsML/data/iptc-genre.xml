@@ -1,0 +1,176 @@
+<?xml version="1.0"?>
+<!DOCTYPE TopicSet PUBLIC "urn:newsml:iptc.org:20001006:NewsMLv1.0.dtd:1" "NewsMLv1.0.dtd">
+<TopicSet Duid="iptc.genre" FormalName="Genre">
+	<Comment xml:lang="en">The nature or characteristics of a NewsComponent, not specifically its content.</Comment>
+	<Topic Duid="gen1">
+		<TopicType Scheme="IptcTopicType" FormalName="Genre"/>
+		<FormalName Scheme="IptcGenre">Current</FormalName>
+		<Description xml:lang="en">The object content is about events taking place at the time of the report.</Description>
+	</Topic>
+	<Topic Duid="gen2">
+		<TopicType Scheme="IptcTopicType" FormalName="Genre"/>
+		<FormalName Scheme="IptcGenre">Analysis</FormalName>
+		<Description xml:lang="en">The object contains data and conclusions drawn by a journalist who has researched the story in depth.</Description>
+	</Topic>
+	<Topic Duid="gen3">
+		<TopicType Scheme="IptcTopicType" FormalName="Genre"/>
+		<FormalName Scheme="IptcGenre">Archive material</FormalName>
+		<Description xml:lang="en">The object contains material distributed previously that has been selected from the originator's archives.</Description>
+	</Topic>
+	<Topic Duid="gen4">
+		<TopicType Scheme="IptcTopicType" FormalName="Genre"/>
+		<FormalName Scheme="IptcGenre">Background</FormalName>
+		<Description xml:lang="en">The object provides some scene setting and explanation for the event being reported.</Description>
+	</Topic>
+	<Topic Duid="gen5">
+		<TopicType Scheme="IptcTopicType" FormalName="Genre"/>
+		<FormalName Scheme="IptcGenre">Feature</FormalName>
+		<Description xml:lang="en">The object content is about a particular event or individual that may not be significant to the current breaking news.</Description>
+	</Topic>
+	<Topic Duid="gen6">
+		<TopicType Scheme="IptcTopicType" FormalName="Genre"/>
+		<FormalName Scheme="IptcGenre">Forecast</FormalName>
+		<Description xml:lang="en">The object contains opinion as to the outcome of a future event.</Description>
+	</Topic>
+	<Topic Duid="gen7">
+		<TopicType Scheme="IptcTopicType" FormalName="Genre"/>
+		<FormalName Scheme="IptcGenre">History</FormalName>
+		<Description xml:lang="en">The object content is based on previous rather than current events.</Description>
+	</Topic>
+	<Topic Duid="gen8">
+		<TopicType Scheme="IptcTopicType" FormalName="Genre"/>
+		<FormalName Scheme="IptcGenre">Obituary</FormalName>
+		<Description xml:lang="en">The object contains a narrative about an individual's life and achievements for publication after his or her death.</Description>
+	</Topic>
+	<Topic Duid="gen9">
+		<TopicType Scheme="IptcTopicType" FormalName="Genre"/>
+		<FormalName Scheme="IptcGenre">Opinion</FormalName>
+		<Description xml:lang="en">The object contains an editorial comment that reflects the views of the author.</Description>
+	</Topic>
+	<Topic Duid="gen10">
+		<TopicType Scheme="IptcTopicType" FormalName="Genre"/>
+		<FormalName Scheme="IptcGenre">Polls &amp; Surveys</FormalName>
+		<Description xml:lang="en">The object contains numeric or other information produced as a result of questionnaires or interviews.</Description>
+	</Topic>
+	<Topic Duid="gen11">
+		<TopicType Scheme="IptcTopicType" FormalName="Genre"/>
+		<FormalName Scheme="IptcGenre">Profile</FormalName>
+		<Description xml:lang="en">The object contains a description of the life or activity of a news subject (often a living individual).</Description>
+	</Topic>
+	<Topic Duid="gen12">
+		<TopicType Scheme="IptcTopicType" FormalName="Genre"/>
+		<FormalName Scheme="IptcGenre">Results Listings &amp; Statistics</FormalName>
+		<Description xml:lang="en">The object contains alphanumeric data suitable for presentation in tabular form.</Description>
+	</Topic>
+	<Topic Duid="gen13">
+		<TopicType Scheme="IptcTopicType" FormalName="Genre"/>
+		<FormalName Scheme="IptcGenre">Summary</FormalName>
+		<Description xml:lang="en">The object contains a a single item synopsis of a number of news stories (generally unrelated).</Description>
+	</Topic>
+	<Topic Duid="gen14">
+		<TopicType Scheme="IptcTopicType" FormalName="Genre"/>
+		<FormalName Scheme="IptcGenre">Transcript &amp; Verbatim</FormalName>
+		<Description xml:lang="en">The object contains a word for word report of a discussion or briefing without significant journalistic intervention.</Description>
+	</Topic>
+	<Topic Duid="gen15">
+		<TopicType Scheme="IptcTopicType" FormalName="Genre"/>
+		<FormalName Scheme="IptcGenre">Interview</FormalName>
+		<Description xml:lang="en">The object contains a report of a dialogue with a news source that gives it significant voice (includes Q &amp; A).</Description>
+	</Topic>
+	<Topic Duid="gen16">
+		<TopicType Scheme="IptcTopicType" FormalName="Genre"/>
+		<FormalName Scheme="IptcGenre">From the Scene</FormalName>
+		<Description xml:lang="en">The object contains a report from the scene of an event.</Description>
+	</Topic>
+	<Topic Duid="gen17">
+		<TopicType Scheme="IptcTopicType" FormalName="Genre"/>
+		<FormalName Scheme="IptcGenre">Retrospective</FormalName>
+		<Description xml:lang="en">The object contains material that looks back on a specific (generally long) period of time such as a season, quarter, year or decade.</Description>
+	</Topic>
+	<Topic Duid="gen18">
+		<TopicType Scheme="IptcTopicType" FormalName="Genre"/>
+		<FormalName Scheme="IptcGenre">Update</FormalName>
+		<Description xml:lang="en">The object contains an intraday snapshot (as for electronic services) of a single news subject.</Description>
+	</Topic>
+	<Topic Duid="gen19">
+		<TopicType Scheme="IptcTopicType" FormalName="Genre"/>
+		<FormalName Scheme="IptcGenre">Wrapup</FormalName>
+		<Description xml:lang="en">The object contains a recap of a running story (such as the end of the day).</Description>
+	</Topic>
+	<Topic Duid="gen20">
+		<TopicType Scheme="IptcTopicType" FormalName="Genre"/>
+		<FormalName Scheme="IptcGenre">Press Release</FormalName>
+		<Description xml:lang="en">The object contains promotional material or information provided to a news organisation.</Description>
+	</Topic>
+	<Topic Duid="gen21">
+		<TopicType Scheme="IptcTopicType" FormalName="Genre"/>
+		<FormalName Scheme="IptcGenre">Synopsis</FormalName>
+		<Description xml:lang="en">The object contains a condensed version of a single news item.</Description>
+	</Topic>
+	<Topic Duid="gen22">
+		<TopicType Scheme="IptcTopicType" FormalName="Genre"/>
+		<FormalName Scheme="IptcGenre">Quote</FormalName>
+		<Description xml:lang="en">The object contains a one or two sentence verbatim in direct quote.</Description>
+	</Topic>
+	<Topic Duid="gen23">
+		<TopicType Scheme="IptcTopicType" FormalName="Genre"/>
+		<FormalName Scheme="IptcGenre">Press-Digest</FormalName>
+		<Description xml:lang="en">The object contains an editorial comment by another medium completely or in parts without significant journalistic changes.</Description>
+	</Topic>
+	<Topic Duid="gen24">
+		<TopicType Scheme="IptcTopicType" FormalName="Genre"/>
+		<FormalName Scheme="IptcGenre">Review</FormalName>
+		<Description xml:lang="en">The object contains a critique of a creative activity or service (for example a book, a film or a restaurant).</Description>
+	</Topic>
+	<Topic Duid="gen25">
+		<TopicType Scheme="IptcTopicType" FormalName="Genre"/>
+		<FormalName Scheme="IptcGenre">Curtain Raiser</FormalName>
+		<Description xml:lang="en">The object contains information about the staging and outcome of an immediately upcoming event.</Description>
+	</Topic>
+	<Topic Duid="gen26">
+		<TopicType Scheme="IptcTopicType" FormalName="Genre"/>
+		<FormalName Scheme="IptcGenre">Actuality</FormalName>
+		<Description xml:lang="en">The object contains the recording of the event.</Description>
+	</Topic>
+	<Topic Duid="gen27">
+		<TopicType Scheme="IptcTopicType" FormalName="Genre"/>
+		<FormalName Scheme="IptcGenre">Question &amp; Answer Session</FormalName>
+		<Description xml:lang="en">The object contains the interviewer and subject questions and answers.</Description>
+	</Topic>
+	<Topic Duid="gen28">
+		<TopicType Scheme="IptcTopicType" FormalName="Genre"/>
+		<FormalName Scheme="IptcGenre">Music</FormalName>
+		<Description xml:lang="en">The object contains music alone.</Description>
+	</Topic>
+	<Topic Duid="gen29">
+		<TopicType Scheme="IptcTopicType" FormalName="Genre"/>
+		<FormalName Scheme="IptcGenre">Response to a Question</FormalName>
+		<Description xml:lang="en">The object contains a reply to a question.</Description>
+	</Topic>
+	<Topic Duid="gen30">
+		<TopicType Scheme="IptcTopicType" FormalName="Genre"/>
+		<FormalName Scheme="IptcGenre">Raw Sound</FormalName>
+		<Description xml:lang="en">The object contains unedited sounds.</Description>
+	</Topic>
+	<Topic Duid="gen31">
+		<TopicType Scheme="IptcTopicType" FormalName="Genre"/>
+		<FormalName Scheme="IptcGenre">Scener</FormalName>
+		<Description xml:lang="en">The object contains a description of the event circumstances.</Description>
+	</Topic>
+	<Topic Duid="gen32">
+		<TopicType Scheme="IptcTopicType" FormalName="Genre"/>
+		<FormalName Scheme="IptcGenre">Text only</FormalName>
+		<Description xml:lang="en">The object contains a transcription of text.</Description>
+	</Topic>
+	<Topic Duid="gen33">
+		<TopicType Scheme="IptcTopicType" FormalName="Genre"/>
+		<FormalName Scheme="IptcGenre">Voicer</FormalName>
+		<Description xml:lang="en">The object containts only voice.</Description>
+	</Topic>
+	<Topic Duid="gen34">
+		<TopicType Scheme="IptcTopicType" FormalName="Genre"/>
+		<FormalName Scheme="IptcGenre">Wrap</FormalName>
+		<Description xml:lang="en">The object contains a complete summary of the event.</Description>
+	</Topic>
+</TopicSet>
+

@@ -1,0 +1,164 @@
+=head1 Title
+
+Shoebox Utilities
+
+=head1 Introduction
+
+These notes are cursory and in time I hope they will develop into a full manual.
+
+Toolbox has taken over from the development of Shoebox. It supports Unicode and other new features. Since much of the basic file format is the same between Shoebox and Toolbox, with Toolbox being a superset of Shoebox, the Shoebox utilities will work quite happily with Toolbox files. Therefore, wherever Shoebox is mentioned in this documentation, the reader should also read Toolbox, unless Toolbox is explicitly mentioned in contrast to Shoebox.
+
+=head1 Programs
+
+Each of the programs is a command line program and a summary help page is available by simply typing the command with no options and pressing return. This will list all the options available and some notes on their use.
+
+=head2 SH2XML
+
+The purpose of C<sh2xml> is to convert a Shoebox database into XML. While Shoebox has the ability to export to XML files, the purpose of a separate offline utility is to provide XML that is: consistent to a DTD, in Unicode and with supporting information.
+
+The basic C<sh2xml> command is:
+
+    sh2xml -s settings_dir infile outfile
+
+The C<-s> option specifies the directory containing the C<.prj> file. I.e it is the directory containing all the C<.typ> and C<.lng> files referenced by this database.
+
+Given this information C<sh2xml> creates an XML file based on the hierarchy given in the database type. If fields are missing, C<sh2xml> inserts them to ensure that conformance to the DTD is ensured.
+
+C<sh2xml> has a number of other command line options that allow for specifying whether formatting information should be output, etc. One particularly useful option is C<-x> which is used to specify an XSL stylesheet filename to be inserted into the XML file. Then when the file is rendered, it will be processed by the given stylesheet for rendering purposes.
+
+=head3 Unicode Conversion
+
+Unless all the data in the database is already in Unicode, it is necessary for it to be converted into Unicode ready for creation of the XML file. Information regarding the encoding of particular data is specified in the Language Properties associated with a field. In Toolbox, for example, it is possible to specify that a particular language is stored in Unicode. C<sh2xml> will use this information to know that no data conversion is necessary on this data.
+
+For other encodings, it is necessary to tell C<sh2xml> how to convert the data to Unicode. If no other information is available, C<sh2xml> will assume that the data is stored in the system codepage (or whatever codepage is specified by the C<-c> option). But that is often not the case. There are other ways of converting data, particularly, Windows codepages and TECkit.
+
+Later in this document is a section on Encoding Conversion that describes C<encrem> and an encoding registry. C<sh2xml> interacts with this registry to do data conversion. C<encrem> works on the basis of encodings having names and then giving details of how to convert from such encodings to Unicode. C<sh2xml> therefore needs a name for a particular encoding and then can use the encoding conversion registry to work out how to do the data conversion. So, for each language that needs data conversion, we need to give an encoding name. This is done by storing information in the language properties itself. In the language properties for a particular language there is a tab labelled "Options". This tab has a comment field. We store the encoding name in the comment field by typing:
+
+    \codepage encoding_name
+
+on a line by itself in the comment field. The encoding_name may be the name of an encoding in the encoding registry or it may be a number corresponding to a Windows codepage. Notice that when the language properties are saved and reopened, the C<\codepage> entry will be preceded by a space, this is normal and not a problem. Line initial spaces are ignored by C<sh2xml>.
+
+=head3 Interlinear Text
+
+C<sh2xml> processes interlinear text into its constituents. Thus an interlinear block consisting of text, morpheme breaks, gloss and part of speech will be broken into individual words with their morpheme breaks each with a gloss and part of speech, rather than four lines of text. This allows for easier processing of interlinear text in XML. C<sh2xml> works out the interlinear structure itself from the database type information in the settings directory.
+
+=over 4
+
+There may be problems with processing interlinear text that is stored in Unicode. This is an urgent TODO.
+
+=back
+
+=head2 SH2SH
+
+C<sh2sh> is very similar to C<sh2xml> except that rather than outputting XML, it outputs a unicode Shoebox database file. Thus it converts all fields too or from Unicode according to the encoding information in the language properties.
+
+Since the resulting encodings are different, while the field markers are the same, the languages associated with each field will be different and so, in effect, the database type is different. Therefore, C<sh2sh> removes the database type heading from the file and the output file has to be imported into Toolbox using a different database type, when ready.
+
+=head2 shintr
+
+C<shintr> does the same interlinear analysis that C<sh2xml> does, but it does no data conversion and is aimed towards producing an intermediate shoebox file ready for conversion to RTF. The aim of the combination of C<shintr> and C<sh_rtf> is to be able to produce nicely typeset interlinear text for use in Word. It does this by using equation fields. This makes each interlinear block into, effectively, a single character. Moving blocks around (for discourse charting) or having a long phrase wrap at the end of the line are some of the advantages of this approach.
+
+C<shintr> uses styles to control layout. Within the interlinear block the style associated with each line is a text style. By setting the font formatting for a text style to invisible, the appropriate line in the block will disappear.
+
+Setting up to use C<shintr> involves ensuring that two magic fields are available in the interlinear text database type.
+
+=over 4
+
+=item _RTFONLY_
+
+This marker name (usually associated with the C<\_RTF> marker) is used to pass RTF code from C<shintr> through C<sh_rtf> without it being processed.
+
+=item \_INT
+
+This marker (usually given the name C<Interlinear block>) is the style used for the whole interlinear block paragraph. The actual lines in the block are given character styles.
+
+=back
+
+in addition, all the markers in the interlinear block need to be marked as character styles otherwise C<sh_rtf> will convert them into paragraphs rather than as running text.
+
+Since C<shintr> needs to know about database type information the command line is of the form:
+
+    shintr -s settings_dir infile outfile
+    
+=head2 sh_rtf
+
+This program emulates the Shoebox RTF export process but with some enhancements:
+
+=over 4
+
+=item *
+
+It supports Non-Roman scripts better through passing character set information through to RTF.
+
+=item *
+
+It supports the C<_RTF ONLY_>) marker name to pass RTF data through unchanged
+
+=item *
+
+It has the ability to generate two column text for annotations via command line options.
+
+=back
+
+The primary purpose of this program is for use with C<shintr> but it can be used for simple conversion from Shoebox files to RTF. But this is probably best done by the Shoebox program itself, unless you are having character set problems.
+
+=head2 shdiff3
+
+Line based merging is the process of taking two files and a common ancestor and creating a third file from the three which incorporates both sets of changes the two files have made to the common ancestor. This is a powerful concept when two different people have edited the same file. Such a tool can create a file which is a combination of the edits that the two people have made. If there is a possible clash this is identified and a human has to edit the file to resolve the clash.
+
+The problem with line based merging is that it doesn't take into account the record structure of a Shoebox file. It is possible to really make a mess of a Shoebox database using a line based merge. Instead a merge needs to take into account the record and field structure of a database. In addition it needs to account for there being multiple records with the same record field. C<shdiff3> is such a program. Give it a common ancestor file and two database and it will produce a new database incorporating both sets of changes. If there is a clash this is marked in the database using a clash marker (C<\__cm>).
+
+If the files are not Shoebox file, then the normal diff3 program is called. This allows this program to be used within svn for intelligent merging.
+
+=head2 shdiffn
+
+This version of merging allows any number of files with a common ancestor to be used and all the changes to be incorporated in one go.
+
+=head1 Encoding Conversion
+
+Various of the utilities allow the conversion of data to or from Unicode. The 
+basic principle of data conversion is that the byte encoding is given a name and 
+this is used to look up a mechanism for converting too or from Unicode.
+
+There are a number of different ways of converting data: system codepages, 
+internal Perl encodings, TECkit, etc. What would be nice is if there were one 
+place to look that would tell how to convert from a given encoding to Unicode.
+
+For this system, we use a thing called the I<Encoding Registry> which is an XML 
+file containing information about encodings and how they are converted; fonts 
+and how they relate to encodings and how the various mappings are implemented. 
+For the most part, you as a user don't need to know anything about the specifics 
+of the XML format, but you will need to interact with the encoding registry 
+using tools.
+
+One important tool is C<encrem> the encoding registry manager. It is a command 
+line tool that allows you to enter multiple commands into one session (or to 
+even pipe those commands from a text file to do automatic installation, etc.).
+
+C<encrem> looks in the registry for the encoding registry and if it can't find 
+it will use one you specify on the command line:
+
+    encrem -r possibly_new.xml
+    
+It then tells you which file it is actually using (whether it found it in the 
+system registry or is using the one you specify). If you are sure you have an 
+existing encoding registry, you don't need to use the C<-r> option to C<encrem>. 
+The next step is to possibly add an empty template to the registry ready for 
+adding new encodings and mappings and then to register that file with the system 
+registry:
+
+    encrem -r possibly_new.xml
+    encrem: create
+    encrem: register
+    encrem: exit
+    
+Notice the different command lines. You can get help at any time by typing a 
+command name followed by C<help> or simply C<help> to get a short list of 
+commands.
+
+Now that we are sure we have an encoding registry file, we can start adding 
+information to it:
+
+    encrem
+    encrem: add-encoding 
+

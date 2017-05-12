@@ -1,0 +1,8 @@
+#!/bin/sh
+#
+#Just echo back the cmdline to stderr
+
+echo "Slurm test: echo_cmdline_to_stderr"
+echo >&2 "$@"
+
+

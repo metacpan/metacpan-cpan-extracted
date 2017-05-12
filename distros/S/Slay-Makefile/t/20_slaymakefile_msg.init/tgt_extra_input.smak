@@ -1,0 +1,3 @@
+# Test the target "Extraneous input" warning
+
+{ 'target' }abc}:

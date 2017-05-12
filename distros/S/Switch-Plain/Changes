@@ -1,0 +1,23 @@
+Revision history for Switch-Plain
+
+0.0501  2017-04-16
+        - don't rely on '.' in @INC
+
+0.05    2016-06-10
+        - simplify internals
+        - compatibility with 5.25.*
+
+0.04    2016-01-15
+        - evaluate the scrutinee in scalar context, not list
+
+0.03    2014-12-22
+        - internal restructuring
+        - compatibility with 5.21.*
+
+0.02    2013-09-23
+        - documentation fixes
+        - minor code cleanup
+
+0.01    2012-10-18
+        First version, released on an unsuspecting world.
+

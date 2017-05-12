@@ -1,0 +1,9 @@
+a
+ab
+ac
+abc      ! comment
+!
+:TYPE    type1
+:TYPE    type2
+:OPTION  a1
+:OPTION  a2 = vala2

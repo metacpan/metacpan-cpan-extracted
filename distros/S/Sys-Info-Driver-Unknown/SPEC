@@ -1,0 +1,18 @@
+{
+    module_name    => 'Sys::Info::Driver::Unknown',
+    requires       => {
+        'Sys::Info::Base' => '0.78',
+        ( $] < 5.006 ? ( 'warnings::compat' => 0 ) : ()),
+    },
+    build_requires => {
+        'Test::Sys::Info' => '0.20',
+    },
+    recommends     => {
+        'Unix::Processors' => 0,
+    },
+    meta_merge     => {
+        resources => {
+            repository => 'http://bitbucket.org/burak/cpan-sys-info-driver-unknown/',
+        },
+    },
+}

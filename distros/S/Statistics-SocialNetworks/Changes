@@ -1,0 +1,6 @@
+Revision history for Perl extension Statistics::SocialNetworks.
+
+0.01  Sat May 16 13:58:20 2009
+	- original version; created by h2xs 1.23 with options
+		-AXc -n Statistics::SocialNetworks
+

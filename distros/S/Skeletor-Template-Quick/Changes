@@ -1,0 +1,7 @@
+Revision history for Skeletor::Template::Quick
+
+0.02 2015-11-09
+    (ms) Fixed chmod of eg/*
+
+0.01 2015-11-08
+    (ms) Where it all began.

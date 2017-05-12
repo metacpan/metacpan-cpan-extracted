@@ -1,0 +1,8 @@
+Changes for Perl extention SQLite-Archive
+
+0.02 Fri 23 Nov 2007
+	- Removing use of Object::Tiny
+	- Upgrading to Module::Install 0.68
+
+0.01 Mon 10 Sep 2007
+	- Creating initial version

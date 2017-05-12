@@ -1,0 +1,11 @@
+Revision history for Perl extension Script::State
+
+0.03	Wed Nov  2 00:21:38 2011
+	- Made not affected by Data::Dumper global variables
+
+0.02    Tue Dec  7 19:51:54 JST 2010
+        - Updated pod
+        - Fixed tests
+
+0.01    Tue Nov 16 12:24:05 2010
+        - original version

@@ -1,0 +1,61 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+our $VERSION = "0.02";
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+use Getopt::Long;
+use Pod::Usage;
+use SVG::Convert;
+
+my ($help);
+
+GetOptions(
+    'help|h' => \$help
+);
+pod2usage(1) if $help;
+
+my ($src_file, $out_file) = @ARGV;
+
+unless (@ARGV > 1) {
+    pod2usage(1);
+}
+
+my $svgconv = SVG::Convert->new;
+
+unless ($out_file) {
+    print $svgconv->convert(format => "xaml", src_file => $src_file, output => "string");
+}
+else {
+    $svgconv->convert(format => "xaml", src_file => $src_file, output => "file", output_file => $out_file);
+}
+
+__END__
+
+=head1 NAME
+
+svg2xaml - Convert to xaml from svg.
+
+=head1 SYNOPSIS
+
+svg2xaml [options] inputfile [outputfile]
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--help|-h>
+
+Print help message and exit.
+
+=back
+
+=head1 DESCRIPTION
+
+B<This program> will read svg file and write xml file formated XAML.
+
+=cut

@@ -1,0 +1,73 @@
+Revision history for Perl extension Statistics::ANOVA.
+
+0.13    2017/02/10
+    - add dependency on Readonly.pm in build script
+
+0.12    2017/02/08
+    - remove dependency on Statistics::ANOVA::EffectSize in build script
+
+0.11 2017/02/04
+    - ss_b value defined for parametric independent ordinal ANOVA; was only keyed as ss_l
+    - confidence(): ensure retrieve all vars in dataset by not sending %args to _get data method
+    - migrated effect-size routines to Statistics::ANOVA::EffectSize
+    - eta- and omega-square dump labels now subscripted with _p (e.g., eta^2_p) to indicate they are the "partial" estimates.
+    - table method now prints eta- and/or omega_sq values if these have been calculated.
+    - headings in table title changed, e.g., SumSq not 'Sum Sq'.
+
+0.10 2015/02/16
+    - main anova() method now returns a hash of its results (f-value, p-value, etc.) if called in list context; otherwise (as usual) the class object itself.
+    - eta- and omega-squared methods now actually perform the anova, and so accept the same named args as anova() 
+    - Jonkheere-Terpstra, Friedman and Page methods are now sub-modules, depending on Statistics::Data::Rank.
+    - Statistics::Lite now relied on for basic descriptive stats.
+    - removed cluster() method as "feature-creep"; it was never properly documented - a module for cluster-by-ANOVA is being written
+    - an index array of invalid values is no longer cached upon load() or add(); invalid values are determined on each get of data for any test.
+
+0.09 2015/02/05
+    - Statistics::Data used as base.
+    - corrected confidence interval measure so that it is based on sqrt(count) not sqrt(count - 1).	
+    - denied support for handling (loading, adding) data with ( data => (1, 2, 3) ) type of args.\; must be referenced if they are keyed.
+    - most variables of sums now use sum0() from List::AllUtils to calculate sum of anonymous array.
+
+0.08 2011/04/19
+	-new: confidence intervals computed using pooled estimate of variability over groups (as in calculating MS-within for the ANOVA).
+	-correction: paired comparison t-tests following-up the RM ANOVA (called by $aov->compare(independent => 0, parametric => 1)) were not working - thanks to Patrick H. Degnan, Yale, for bringing this up. 
+
+0.07 2010/10/03 ** Important: Several changes that make this version incompatible with v0.062:
+	-new: generic anova() and compare() methods
+	-new: independent groups non-parametric method (Kruskal-Wallis), handling ties
+	-new: independent "levels" test, of linearity, by parametric and non-parametric (Jonckheere-Terpstra) methods
+	-new: dependent "levels" test, of linearity, by non-parametric method (Page test)
+	-new: post hoc cluster method, parametric (Scott-Knott) and non-parametric (Worsley)
+	-new: nonparametric multiple comparison procedure for nominal independent groups (Dwass procedure)
+	-new: options/method for setting alpha and correcting p-value in the means-comparisons procedures. So alpha is .05 by default, but can be set to something else, and instead of the alpha being adjusted according to the number of means compared, the p-values themselves can be adjusted.
+	-change: extended correction for ties in Friedman's test per Hollander-Wolfe eq. 7.8
+	-change: multiple comparisons now return a hash of relevant values, rather than simply dump to STDOUT; see method compare()
+	-change: load() and add() methods now also accept arefs of "name, data" pairs, or a single aref, with the "data" being arefs or not
+	-change: unload() method can now be sent one or more names for clobbering particular samples, rather than bombing the lot
+	-change: a comma was missing between t_value and p_value in dump of independent comparisons
+	-change: no more of these dashes in the dumps: 2-p, 1-p; just 2p and 1p instead
+	-change: precisioning handles undefined values
+	-change: alphanum order of the pairs in paired comparisons
+	-change: clean-up of refs in pod
+    -change: the hash keys that were suffixed with "_t" and "_e" (for "treatment" and "error") are now suffixed with "_b" (for "between") and "_w_ (for "within").
+	-misc: plenty new tests in "t" folder
+
+0.06x 2008/07/11 - 2009/03/13
+	-further work on appropriate handling of missing values and NaNs.
+	-generalised grand_total calculation within anova_indep which was appropriate only if there were equal number of observations per group: thanks to Cathal Seoghie for feedback that led to identifying this limitation
+    -handling "missing values": added checking and purging of elements that are undefined or NaN before loading; this also reduces the later checks and possible croaks
+    -added sub "table" for returning/printing a table of dfs, sums-squares, etc.; pretty formatting still needed ...
+
+0.02-0.05 2008/06/26: 
+    -added sub "add_data" for non-deleting loads; all calls to load unload
+    -all carps now croak
+    -nonparam flag for ensuring Friedman test appropriately "dump"-ed
+    -cleaned-up ranking operation in Friedman test to handle ties - thanks to Gene Boggs' Statistics-RankCorrelation
+    -added F-equivalent output option for Friedman test - thanks to "R" docs
+    -cleaned-up POD and dist, with example file
+    -removed bung sub fmax for now
+
+0.01  2006/06/27 02:19:29
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -n Statistics::ANOVA
+    - uploaded via PAUSE June 2008

@@ -1,0 +1,33 @@
+; vim: syntax=dosini
+name    = Search-GIN-Extract-ClassMap
+author  = Kent Fredric <kentnl@cpan.org>
+license = Perl_5
+copyright_holder = Kent Fredric <kentfredric@gmail.com>
+
+[@Author::KENTNL]
+bumpversions  = 1
+normal_form   = numify
+mantissa      = 6
+srcreadme     = mkdn
+toolkit       = eumm
+toolkit_hardness = soft
+
+;twitter_extra_hash_tags = #
+
+;version_major  = 0
+;version_minor  = 1
+;version_rel_year = 2009
+;version_rel_month = 8
+;version_rel_day = 26
+;version_rel_hour = 00
+;version_rel_time_zone = Pacific/Auckland
+
+[Prereqs]
+;Moose = 0.90
+;MooseX::Types::Moose = 0.19
+;MooseX::Types = 0.19
+;namespace::autoclean = 0.08
+;Search::GIN = 0.03
+;Test::More = 0.92
+;aliased = 0.30
+

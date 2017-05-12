@@ -1,0 +1,40 @@
+Sys/Headers version 0.01
+========================
+
+DESCRIPTION
+
+This is alpha code.
+
+This is alpha code.
+
+This is alpha code.
+
+This module will use L<h2ph> to convert your systems header files
+into Perl header files.  It should be stated that h2ph isn't very
+good at this, it has some bugs.  However, if you can handle a few
+warnings every now and again, and you need access to information
+contained in the header files, use this module.
+
+First you need to build a repository of Perl header files.  This
+requires having write access to the place where Sys::Headers is
+installed.  This limitation will most likley change.
+
+Once you've done that, you can use these headers at compile time
+by listing the ones you want in similar fashion to C<#include> from
+C.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2002 Casey West. All rights reserved.
+This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+

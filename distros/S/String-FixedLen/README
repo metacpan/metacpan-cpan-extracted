@@ -1,0 +1,62 @@
+The file is the README for String::FixedLen version 0.02
+
+INSTALLATION
+
+perl Makefile.PL
+make
+make test
+make install
+
+TESTING
+
+This module requires the following module for thorough testing:
+
+    Test::More
+
+The following test modules are optional:
+
+    Test::Pod
+    Test::Pod::Coverage
+
+It can also make use of Devel::Cover if available.
+
+UNINSTALLATION
+
+This is a pure-Perl module. The following one-liner should print
+out the canonical path of the file:
+
+  perl -MString::FixedLen -le 'print $INC{"String::FixedLen.pm"}'
+
+Just delete this file. There is also the question of the man page.
+Finding that is left as an exercise to the reader.
+
+USAGE
+
+use String::FixedLen;
+
+tie my $str, 'String::FixedLen', 4;
+
+$str = 'a';
+$str .= 'cheater;        # "ache"
+$str = "hello, world\n"; # "hell"
+$str = 9999 + 12;        # "1001"
+
+STATUS
+
+This module is unlikely to be enhanced, but I'm interested in
+hearing about any ideas in ways it could be improved, and I'll
+(try to) fix any bugs I hear about.
+
+AUTHOR
+
+David Landgren
+
+COPYRIGHT
+
+This module is copyright (C) David Landgren 2007.
+All rights reserved.
+
+LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

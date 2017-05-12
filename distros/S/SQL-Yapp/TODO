@@ -1,0 +1,314 @@
+TODO:
+   - check determinism
+
+   - missing syntax:
+     UNION
+     WITH .. SELECT
+     CREATE INDEX
+     DROP INDEX
+     TRUNCATE (MySQL and PostgreSQL)
+    Probably later:
+     LOCK
+     SELECT ... *INTO*
+     SET TRANSACTION
+     more stuff
+
+   - Have a table of allowed tables to enable more compile-time checks.
+     (Any interpolated table will be accepted and checked by the DB
+     system instead -- we only want compile-time checks here.)
+
+   - Maybe have a table of columns per table to check at compile time.
+     This is more tricky if done with context, i.e., per table, because
+     we'd have to fully understand scoping.  A complete list of columns
+     is a start, though, particularly for DBs that have been constructed
+     to work with NATURAL JOIN, which typically have very unique column
+     names in their tables.
+
+   - Maybe have ExprAs and TableAs objects.
+
+   - Maybe have WhenThen objects (two classes: one for expr, one for
+     suffix operation, for the two types of operations:
+     CASE WHEN and CASE x WHEN (the latter allows both).
+
+   - MAYBBE:
+     Allow keywords and constructs to be marked as optional (if the read
+     dialect allows them).  Probably we need to list all possible optional
+     stuff, because this may also depend on the DB version.  Things
+     immediately coming to mind:
+         ?IF NOT EXISTS         MySQL only
+         ?IF EXISTS             MySQL only
+         ?ONLY                  PostgreSQL only
+
+   - for peep-hole optimisions on the generated code, str_append_... should
+     not directly construct a string, but return a recursive structure of
+     the term.  Each node should be something like:
+
+         { kind => '...', args => [...], ... }
+
+     E.g. the number 5:
+         { kind => 'num', args => [ 5 ] }
+
+     Arbitrary perl interpolation in list or scalar context:
+
+         { kind => 'list',   args => [ 'do{perlcode}' ] }
+         { kind => 'scalar', args => [ 'do{perlcode}' ] }
+
+     More information could be stored, of course:
+
+         { kind => 'join', args => [ ... ], sep => ',', prefix => 'CONCAT ' }
+     or:
+         { kind => 'map', args => [ ... ], body => '($_)' }
+     etc.
+
+     On this structure, we could run an optimiser that removes maps,
+     combines joins, etc.
+
+   - Support translation of IF NOT EXISTS etc. via information_scheme
+     tables.  This is tricky with all the different data bases around.
+
+   - Add support for scalar references, which should become bind
+     variables:
+
+         my $uid= ...;
+         my $q= sql{ SELECT foo FROM bar WHERE uid = \$uid and name = ? };
+
+     "$q" should stringify as:
+
+         SELECT `foo` FROM `bar` WHERE `uid` = ? and `name` = ?
+
+     There shall be a function $q->bind($name) which produces a list of
+     values, parameterised by all the ? found, automatically filling in
+     all the \$ references automatically.  So:
+
+           $uid=99;
+           my @a= $q->bind(4);
+
+     Should lead to @a=(99,4);
+
+     Implementing this is a bit tricky, but would be great.  We could
+     then prepare statements with references, and very simply execute
+     them later:
+
+           my $pq= $dbh->prepare($q);
+           ...
+           $pq->execute($q->bind(5));
+
+     LATER: If dbh is set, we could even provide prepare, execute, etc.
+     functions ourselves to eliminate the need for the ->bind()
+     invocation and for two variables to keep track of:
+
+           my $pq= $q->prepare();
+           $pq->execute(5);
+
+
+   - LATER: named bind variables:
+
+      my $q= sql{ ... WHERE time_insert BETWEEN ?{time_min} AND ?{time_max} }
+      my $pq= $q->prepare();
+      ...
+      $pq->execute(time_min => $time_min, time_max => $time_max);
+
+     Of course, the named bind variable could be used more than
+     once:
+
+        my $q= sql{ ...
+            WHERE
+                (time_insert BETWEEN ?{time_min} AND ?{time_max})
+            OR  (time_close  BETWEEN ?{time_min} AND ?{time_max})
+        };
+
+        my $pq= $q->prepare();
+        ...
+        $pq->execute(time_min => $time_min, time_max => $time_max);
+
+     Problem: mixing of normal and named variables. Solution: normal
+     ones first, so we get prototypes like:
+
+        ($$$)        ; three normal bind variables
+        ($$$%)       ; three normal plus some named bind variables
+        (%)          ; only named bind variables
+        etc.
+
+   - optimise:
+     min1, min1default, and max1_if_scalar can usually be elimited by
+     looking at the list:
+
+        - min1 and min1default can be dropped if the list is
+          guaranteed to be non-empty
+
+        - max1_if_scalar can be dropped if the list guaranteed to have
+          at most 1 element.
+
+     It is quite easy to count, actually, since only non-scalar
+     'interpol' nodes are dangerous.
+
+   - optimise:
+
+        str_append_str ( str_append_comma str_append_str )*
+
+     -> one str_append_str with the concatenated string.
+
+   - Optimise:
+        (map{ SQL::Yapp::column1($_) } SQL::Yapp::ASTERISK)
+     is equal to:
+        SQL::Yapp::ASTERISK
+     and inside a join(), it can even be optimised to:
+        '*'
+
+     Same for QUESTION and all the other special values.
+
+     Same for literal numbers if inside a join():
+        (map{ SQL::Yapp::column1($_) } 5)
+     in a join is equal to:
+        5
+
+   - encapsulate different syntax (read and write) in different packages
+     so that this code has no knowledge about MySQL, PostgreSQL, Oracle,
+     etc., but lets the packages handle it.
+
+   -  Klarstellen, warum `...`-Syntax benutzt wird.  Evtl. auch [...] erlauben
+      mit der entsprechenden Dialekt-Einstellung.
+
+    - In void context, prepare, execute and possibly fetch all rows and store
+      them somewhere.  Maybe don't fetch, but provide access to the handle
+      somehow.  Maybe have a special callback hook for running
+      commands in void mode.
+LATER:
+   - ARRAY[...]
+
+   - C<//> will be normalised to C<COALESCE>?
+
+   - Normalisation:
+
+           COALESCE()               MySQL, PostgreSQL
+       vs. NVL()                    Oracle             <-- unfold
+
+           SELECT ... <nothing>     MySQL, PostgreSQL
+       vs. SELECT ... FROM dual     Oracle
+
+           CASE WHEN ... END        Std
+       vs. DECODE()                 Oracle
+
+    With read_dialect containing 'perl',
+    allow: &&, ||, ^^, ! as boolean operators.  This requires
+    substitution based in read_dialect in set_expr_functor.
+
+   - Handle INSERT...SET without set2value if $write_dialect == 'mysql'.
+
+   - Handle LIMIT without large number if $write_dialect == 'postgresql'.
+
+DONE:
+   - Statements:
+     SELECT
+     INSERT
+     UPDATE
+     DELETE
+   - Expressions
+     Missing:
+     - special Expr syntax:
+           CASE ... (WHEN ... THEN ...)* [ ELSE ... ] END)
+
+   - functions with special syntax, e.g. CAST(...)
+         CAST      ( <expr> AS <type> )
+         TREAT     ( <expr> AS <type> )
+         POSITION  ( <expr> IN <expr> [ USING <char length units> ] )
+         SUBSTRING ( <expr> FROM <expr> [ FOR <expr> ] [ USING <char length units> ] )
+         { CHAR_LENGTH | CHARACTER_LENGTH } ( <expr> [ USING <char length units> ] )
+         CONVERT   ( <expr> USING <transcoding name> )
+         OVERLAY   ( <expr> PLACING <expr> FROM <expr> [ FOR <expr> ] [ USING <char length units> ] )
+         EXTRACT   ( <expr> FROM <expr> )
+         UNNEST    ( <expr> ) [ WITH ORDINALITY ]
+         TRANSLATE ( <expr> USING <transliteration name> )
+   - XOR
+
+   - Interpolation:
+     Allow (arrays of) array references after INSERT ... VALUES:
+
+       my $a= ['a', 'b'];
+
+       INSERT INTO t VALUES $a
+
+       my @a= (['a','b'],[1,2]);
+
+       INSERT INTO t VALUES @a
+
+     For this, maybe allow reference syntax:
+
+       my @a= ('a', 'b');
+
+       INSERT INTO t VALUES \@a
+
+     Here, it is not needed, however, because you can write:
+
+       INSERT INTO t VALUES (@a)
+
+     This even works now.
+
+   - subqueries: ANY, SOME, ALL
+
+   - implement context: sql{...} as expression will expand as an SQL::Yapp::Expr
+
+   - Allow Stmt interpolation in subqueries:
+
+         my $stmt= sql{ SELECT ... };
+
+         ... WHERE a = ANY (Stmt $stmt) ...
+
+     This requires us to check for a SELECT Stmt, not only a Stmt, which
+     could be wrong.  Maybe we leave that problem to the SQL server?
+     In that case, it would be easy, just add another function
+     parse_select_stmt() that's like parse_stmt() but only accepts SELECT
+     and interpol.
+
+   - CANCELLED:
+     Think about interpolating ORDER BY / GROUP BY stuff.  It will
+     happen in applications where the user can set the order.
+     At least we need to interpolate the direction DESC/ASC.
+     Better yet: a sequence of Order:
+
+         my $dir=   $desc ? sqlDir{DESC} : sqlDir{ASC};
+         my @order= sqlOrder{ a Dir $dir, b ASC }
+         my $q=     sql{ SELECT * FROM B ORDER BY @order };
+
+     It would be interesting whether it's possible to implement
+     double-negation:
+
+         my $q=     sql{ SELECT * FROM B ORDER BY @order DESC };
+
+         --> ... a ASC, b DESC
+
+     SOLUTION:
+     Store direction in bool variable and then use:
+
+         $order= sqlOrder{ $order DESC }
+             if $direction eq 'DESC';
+
+     This works already.
+
+   - query types:
+     SELECT
+
+   - think about handling table and column names.
+
+     - The goal is to modify table names on the fly, e.g. to prefix
+       each table name with a user-defined string.  This means we
+       need to finely distinguish different types of names.
+
+     - How to handle unqualified and qualified column specifications
+       in interpolations?  I.e.:
+
+           SELECT foo.$col_name1 FROM ...
+       vs.
+           SELECT $col_name2 FROM ...
+
+       $col_name2 may contain a table name, while $col_name1 may not.
+       Maybe we must require that $col_name1 is a simple Perl string,
+       so that we can invoke:
+
+           quote_identifier('foo', $col_name1)
+
+       while $col_name2 may be either a Perl string, or a Column
+       object which is already in proper syntax.  In any case, for
+       qualified column names, we *must* invoke quote_identifier
+       with both arguments.
+

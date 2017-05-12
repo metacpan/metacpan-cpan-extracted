@@ -1,0 +1,19 @@
+0.312  2017-02-14
+  * Now works with variables that have magic such as results of
+    substr, tied variables, etc. (thanks James Raspass)
+
+0.311  2015-10-24
+  * Don't ship MYMETA files anymore (thanks Adel Qalieh
+    and Alexandr Ciornii)
+
+0.310  2014-09-23
+  * Fix segfault when passed in undef (thanks Ichinose Shogo)
+  * Documentation updates
+  * Add github repo and license meta info
+
+0.300  2012-10-09
+  * Change version number format
+  * Skip unreliable stats test for now
+
+0.20   2012-07-12
+  * Initial release

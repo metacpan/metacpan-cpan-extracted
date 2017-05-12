@@ -1,0 +1,134 @@
+NAME
+    Syntax::Feature::Qwa - qwa(), qwh() and qwk() quote-like operators to
+    create arrayrefs and hashrefs
+
+SYNOPSIS
+     use syntax qw/qwa/;
+     use Data::Dumper;
+ 
+     print Dumper qwa(foo bar baz quux);
+ 
+     # [
+     #   'foo',
+     #   'bar',
+     #   'baz',
+     #   'quux',
+     # ]
+
+     print Dumper qwh(foo bar baz quux);
+ 
+     # {
+     #   'foo' => 'bar',
+     #   'baz' => 'quux',
+     # }
+
+     print Dumper qwk(foo bar baz quux);
+ 
+     # {
+     #   'foo'  => 1,
+     #   'bar'  => 2,
+     #   'baz'  => 3,
+     #   'quux' => 4,
+     # }
+
+DESCRIPTION
+    Perl's word list operator (`qw()`) is really nice. It allows you to build
+    simple lists without needing much punctuation. But it's quite common to
+    see it wrapped by additional punctuation in the form of:
+
+      my $array = [qw(foo bar baz)];
+
+    It would be quite nice to have a version of the word list operator which
+    returned an arrayref instead of a list. That's where this module comes in.
+    It provides a "word list arrayref" operator:
+
+      my $array = qwa(foo bar baz);
+
+    It also provides companion "word list hashref" and "word list hashref
+    keys" operators.
+
+  Use with syntax.pm
+    This module is intended to be used with the syntax module. This allows you
+    to switch on multiple syntax extensions in one line:
+
+     use syntax 'ql', 'qwa', 'io';
+
+  Use without syntax.pm
+    It is also possible to use this module without syntax.pm:
+
+     use Syntax::Feature::Qwa;
+
+EQUIVALENTS
+    If you want to rewrite code using this module to remove its dependency on
+    it, or if you just want to better understand how it works, here are some
+    equivalents between this module's operators, and how they'd be expressed
+    without this module.
+
+  qwa()
+     my $arrayref = qwa(Foo Bar Baz);
+ 
+     my $arrayref = [ qw(Foo Bar Bar) ];
+
+  qwh()
+     my $hashref  = qwh(Foo Bar Baz);
+ 
+     my $hashref  = +{ qw(Foo Bar Bar) };
+
+  qwk()
+     my $hashref  = qwk(Foo Bar Baz);
+ 
+     my $hashref  = +{ do { my $i = 0; map { $_, ++$i } qw(Foo Bar Bar) } };
+
+EXAMPLES
+  Hashref keys as lookup tables
+     # Create a lookup table
+     my $days = qwk(Mon Tue Wed Thu Fri Sat Sun);
+ 
+     # The task is to sort these into their weekly order
+     my @list = qw(Fri Tue Wed);
+ 
+     # Easy!
+     my @sorted_list = sort { $days->{$a} <=> $days->{$b} } @list;
+
+  Hashref keys for smart matching
+     my $admins = qwk(alice bob carol);
+     my $login  = get_current_user();
+ 
+     if ($login ~~ $admins)
+     {
+       ...
+     }
+
+  Arrayrefs for smart matching
+    The example above also works using arrayrefs. For smaller lists, arrayrefs
+    might be faster; for larger lists hashrefs probably will be.
+
+     my $admins = qwa(alice bob carol);
+     my $login  = get_current_user();
+ 
+     if ($login ~~ $admins)
+     {
+       ...
+     }
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Syntax-Feature-Qwa>.
+
+SEE ALSO
+    syntax, Syntax::Feature::Ql, PerlX::QuoteOperator.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

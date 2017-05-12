@@ -1,0 +1,2 @@
+set display-mode spaced
+desc commands

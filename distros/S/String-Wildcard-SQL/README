@@ -1,0 +1,26 @@
+SYNOPSIS
+
+        use String::Wildcard::SQL qw(contains_wildcard);
+    
+        say 1 if contains_wildcard(""));      # -> 0
+        say 1 if contains_wildcard("ab%"));   # -> 1
+        say 1 if contains_wildcard("ab\\%")); # -> 0
+
+DESCRIPTION
+
+FUNCTIONS
+
+ contains_wildcard($str[, $variant]) => bool
+
+    Return true if $str contains wildcard pattern. Wildcard patterns
+    include % (meaning zero or more characters) and _ (exactly one
+    character).
+
+SEE ALSO
+
+    Regexp::Wildcards to convert a string with wildcard pattern to
+    equivalent regexp pattern. Can handle Unix wildcards as well as SQL and
+    DOS/Win32.
+
+    Other String::Wildcard::* modules.
+

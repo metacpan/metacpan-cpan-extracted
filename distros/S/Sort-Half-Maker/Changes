@@ -1,0 +1,22 @@
+Revision history for Perl extension Sort::Half::Maker.
+
+0.04 Tue Jan  5 2016
+          - distribution refresh
+
+0.03 Tue Feb 28 2007
+          - t/02-basic.t "fixed" for 5.6: SKIP test
+            which needs stable sort (which 5.6 doesn't have)
+          - fixed bug that made lists with duplicates like
+            qw(a b a) sort like qw(b a) instead of qw(a b)
+
+0.02 Fri Feb 23 2007
+          - BEWARE! incompatible change: overhaul in argument names
+            for &make_halfsort -
+                make_halfsort(pre => \@s, post => \@e, any => \&s)
+                    becomes
+                make_halfsort(start => \@s, end => \@e, fallback => \&s)
+          - added LICENSE to Makefile.PL
+          - fixed MANIFEST for CPANTS sake
+
+0.01 Wed Feb 21 2007
+          - absolute beginning

@@ -1,0 +1,87 @@
+=head1 NAME
+
+Sys::Syscall - access system calls that Perl doesn't normally provide access to
+
+=head1 SYNOPSIS
+
+  use Sys::Syscall;
+
+=head1 DESCRIPTION
+
+Use epoll, sendfile, from Perl.  Mostly Linux-only support now, but
+more syscalls/OSes planned for future.
+
+=head1 Exports
+
+Nothing by default.
+
+May export: sendfile epoll_ctl epoll_create epoll_wait EPOLLIN EPOLLOUT EPOLLERR EPOLLHUP EPOLL_CTL_ADD  EPOLL_CTL_DEL EPOLL_CTL_MOD
+
+Export tags:  :epoll and :sendfile
+
+=head1 Functions
+
+=head2 epoll support
+
+=over 4
+
+=item $ok = epoll_defined()
+
+Returns true if epoll might be available.  (caller must still test with epoll_create)
+
+=item $epfd = epoll_create([ $start_size ])
+
+Create a new epoll filedescriptor.  Returns -1 if epoll isn't available.
+
+=item $rv = epoll_ctl($epfd, $op, $fd, $events)
+
+See manpage for epoll_ctl
+
+=item $count = epoll_wait($epfd, $max_events, $timeout, $arrayref)
+
+See manpage for epoll_wait.  $arrayref is an arrayref to be modified
+with the items returned.  The values put into $arrayref are arrayrefs
+of [$fd, $state].
+
+=back
+
+=head2 sendfile support
+
+=over 4
+
+=item $ok = sendfile_defined()
+
+Returns true if sendfile should work on this operating system.
+
+=item $sent = sendfile($sock_fd, $file_fd, $max_send)
+
+Sends up to $max_send bytes from $file_fd to $sock_fd.  Returns bytes
+actually sent, or -1 on error.
+
+=back
+
+=head1 COPYRIGHT
+
+This module is Copyright (c) 2005 Six Apart, Ltd.
+
+All rights reserved.
+
+You may distribute under the terms of either the GNU General Public
+License or the Artistic License, as specified in the Perl README file.
+If you need more liberal licensing terms, please contact the
+maintainer.
+
+=head1 Contributing
+
+Want to contribute?  See:
+
+  L<http://contributing.appspot.com/sys-syscall>
+
+=head1 WARRANTY
+
+This is free software. IT COMES WITHOUT WARRANTY OF ANY KIND.
+
+=head1 AUTHORS
+
+Brad Fitzpatrick <brad@danga.com>
+

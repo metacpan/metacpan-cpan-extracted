@@ -1,0 +1,18 @@
+include common.smakh
+
+{
+    $FILE = "30_act_shell";
+    $FOO = "The lazy cow";
+}
+
+default:   depend1 depend2 depend3
+	{ @OUTPUT = `cat $FILE.trace`;
+        trace(@_) }
+
+depend%:  my_prereq% your_prereq%
+        echo "Building $TARGET with deps ($DEP0, $DEP1) and match ($1)" >> $FILE.trace
+        echo "   $""* is $*" >> $FILE.trace
+        echo "   $""FOO is [${FOO}]" >> $FILE.trace
+
+extra:
+        echo No such variable $NOSUCHVAR or ${NOSUCHVAR}

@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                SQL-Tokenizer
+version:             0.24
+abstract:            A simple SQL tokenizer.
+license:             ~
+author:              
+    - Igor Sutton Lopes <igor.sutton@gmail.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

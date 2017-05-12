@@ -1,0 +1,45 @@
+Revision history for SysV-SharedMem
+
+0.010     2014-05-15 12:03:34 Europe/Amsterdam
+          Add missing interpeter pointer on threaded perls
+
+0.009     2013-12-30 13:14:35 Europe/Amsterdam
+          *Backwards incompatible change*: new id option is a shm_id, not a proj_id. This also affects the order of precedence.
+          Allow detection of size of shared memory segment
+          Add shared_detach and shared_identifier
+          Fix detaching on unthreaded perls
+          Fix readonly flag on attaching
+
+0.008     2013-02-06 04:58:16 Europe/Amsterdam
+          Handle COW/THINKFIRST properly
+          Modernize magic storage
+
+0.007     2012-10-10 20:27:19 Europe/Amsterdam
+          Check for thinkfirst sv's properly
+          Removed superfluous tests
+
+0.006     2011-09-10 10:28:36 Europe/Amsterdam
+          Fixed creation mode and permissions
+          Converted to Dist::Zilla
+
+0.005   2011-01-12
+        Fall back on strerror if necessary
+
+0.004   2010-12-01
+        Give clearer errors on incorrect files and sizes
+        Fixed Build-time dependencies
+        Added Test::NoWarnings to test files
+
+0.003   2010-11-29
+        Added missing die_sys function
+        Added unit tests for various error conditions
+        Don't allow zero sized shared memory
+
+0.002   2010-11-21
+        Added key option
+        Included extra headers for OpenBSD compatibility
+        Made get_sys_error more robust on Linux
+
+0.001   2010-10-24
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,9 @@
+name = "SemVer-V2-Strict"
+badges = ["travis", "appveyor", "codecov"]
+module_maker="ModuleBuildTiny"
+license = "mit"
+authors = ["Pine Mizune <pinemz@gmail.com>"]
+authority = "cpan:PINE"
+
+[Metadata]
+x_static_install = 1

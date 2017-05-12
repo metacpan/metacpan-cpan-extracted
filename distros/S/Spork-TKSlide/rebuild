@@ -1,0 +1,16 @@
+#!/usr/bin/env perl
+
+use lib 'lib';
+use Spork;
+
+die "Must be run from the Spork directory\n"
+  unless -f "rebuild";
+my $spork_dir = shift
+  or die "No spork directory specified\n";
+die "Invalid spork directory '$spork_dir'\n"
+  unless -d $spork_dir;
+$spork_dir =~ s/\/+//;
+
+my $hub = Spork->new->load_hub;
+$hub->load_class('template')->compress_files($spork_dir);
+$hub->load_class('slides')->compress_files($spork_dir);

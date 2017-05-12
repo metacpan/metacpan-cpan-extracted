@@ -1,0 +1,57 @@
+#<NZSRSRequest VerMajor='5' VerMinor='0'>
+#   <Whois DomainName="cheese.co.nz" FullResult="0"/>
+#</NZSRSRequest>
+#
+#<?xml version="1.0"?>
+#<!DOCTYPE NZSRSResponse SYSTEM "protocol.dtd">
+#<NZSRSResponse VerMajor="5" VerMinor="0">
+#  <Response Action="Whois" FeId="8" FeSeq="4640992" OrigRegistrarId="1" RecipientRegistrarId="1"><FeTimeStamp Day="26" Hour="11" Minute="41" Month="5" Second="21" TimeZoneOffset="+12:00" Year="2010"/><Domain DomainName="cheese.co.nz" Status="Active"/></Response>
+#</NZSRSResponse>
+
+template: create-domain.tt
+
+vars:
+  domain: wicked-yeah2.co.te
+  ns:
+    - ns1.hidns.com
+    - ns2.hidns.com
+    - ns3.hidns.com
+  owner: id123
+  admin: shazzam1234
+  tech: alcatraz367
+  period: 1
+
+input_assertions:
+  class: SRS::EPP::Command::Create::Domain
+  count:
+    - [ '//domain:name', 1, 'Initial EPP: Creating one domain' ]
+    - [ '//domain:hostName', 3, 'Initial EPP: Three nameservers' ]
+    - [ '//domain:registrant', 1, 'Initial EPP: One registrant' ]
+    - [ '//domain:contact[@type="admin"]', 1, 'Initial EPP: One admin contact' ]
+    - [ '//domain:contact[@type="tech"]', 1, 'Initial EPP: One tech contact' ]
+
+SRS:
+  - assertions:
+      count:
+        - [ '//RegistrantContact', 1, 'SRS: Check for only one RegistrantContact' ]
+        - [ '//AdminContact', 1, 'SRS: Check for only one AdminContact' ]
+        - [ '//TechnicalContact', 1, 'SRS: Check for only one TechnicalContact' ]
+        - [ '//NameServers/Server', 3, 'SRS: Check for three nameservers' ]
+      match:
+      match_all:
+      attr_is:
+        - [ '//DomainCreate', 'DomainName', 'wicked-yeah2.co.te', 'SRS: Check the domain name to be registered' ]
+        - [ '//DomainCreate', 'Term', '1', 'SRS: Check the term is one' ]
+        - [ '//RegistrantContact', 'HandleId', 'id123', 'SRS: RegistrantContact handle' ]
+        - [ '//AdminContact', 'HandleId', 'shazzam1234', 'SRS: AdminContact handle' ]
+        - [ '//TechnicalContact', 'HandleId', 'alcatraz367', 'SRS: TechnicalContact handle' ]
+
+output_assertions:
+  count:
+    - [ '//domain:creData', 1, 'SRS: Check for one creData' ]
+  match:
+    - [ '//domain:name', 'wicked-yeah2.co.te', 'SRS: Check domain name' ]
+    - [ '//domain:crDate', '/\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d:\d\d/', 'SRS: Check crDate' ]
+    - [ '//domain:exDate', '/\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d:\d\d/', 'SRS: Check exDate' ]
+  attr_is:
+    - [ '//epp:result', 'code', '1000', 'SRS: Check result code' ]

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NZSRSResponse VerMajor="5" VerMinor="6">
+  <Response Action="GetMessages" FeId="4" FeSeq="3600212" MoreRowsAvailable="1" OrigRegistrarId="922" RecipientRegistrarId="922" Rows="1" TransId="sep.4d3371a1.6207.002">
+    <FeTimeStamp Day="17" Hour="11" Minute="30" Month="1" Second="58" TimeZoneOffset="+13:00" Year="2011" />
+    <Message Remaining="6">
+      <Response Action="DomainUpdate" FeId="4" FeSeq="3583688" OrigRegistrarId="922" RecipientRegistrarId="922" Rows="2" TransId="sep.4d2fceb8.2d28.002 (Auto-generated)">
+        <FeTimeStamp Day="14" Hour="17" Minute="19" Month="1" Second="06" TimeZoneOffset="+13:00" Year="2011" />
+        <Domain DomainName="amazon-payment-uk.net.nz" UDAI="mW5Nq7sP">
+          <AuditDetails ActionId="sep.4d2fceb8.2d28.002 (Auto-generated)" RegistrarId="922" />
+        </Domain>
+        <Domain DomainName="gatzevent.org.nz" UDAI="qPAaBuf7">
+          <AuditDetails ActionId="sep.4d2fceb8.2d28.002 (Auto-generated)" RegistrarId="922" />
+        </Domain>
+      </Response>
+    </Message>
+  </Response>
+</NZSRSResponse>

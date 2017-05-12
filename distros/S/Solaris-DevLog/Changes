@@ -1,0 +1,16 @@
+Revision history for Perl extension Solaris::DevLog.
+
+0.01  Fri Jan 18 18:48:27 2002
+	- original version; created by h2xs 1.21 with options
+		-A -n Solaris::DevLog
+
+0.9   Mon Jan 21 14:59:45 2002
+	- moved constructor into Perl
+	- added select method
+        - returning control block as hash
+	- no longer returning datalen
+	- updated pod
+	- moved most of test.pl to example.pl
+
+1.0   Mon Feb 11 13:29:53 2002
+	- packaged for CPAN release

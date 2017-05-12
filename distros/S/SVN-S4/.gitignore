@@ -1,0 +1,13 @@
+README
+README_FIRST_SITE
+blib
+Makefile
+pm_to_blib
+test_dir
+*.c
+*.bs
+*.old
+*.bak
+MYMETA.*
+.git
+.svn

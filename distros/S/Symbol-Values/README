@@ -1,0 +1,71 @@
+Symbol-Values version 1.07
+==========================================================================
+ $Id: README,v 1.8 2005/08/27 17:24:03 kay Exp $
+===========================================================================
+
+DESCRIPTION
+    This module provides consistent accessing interface to values of symbol.
+    
+    Below is the background why I wore this module.
+    
+    I've been feeling that glob notation of perl is little bit funny.
+    
+    First problem is that it lacks consistency in the way of 
+    fetching/storing values of a symbol.
+    
+    See examples below.
+    
+      $code_ref = *name{CODE};    # Getting code object.
+                                  # This is obvious.
+      
+      *name{CODE} = $code_ref;    # Setting code object.
+                                  # THIS CODE DOES NOT WORK!!
+      
+      
+      *name = $code_ref;          # This code works...
+                                  # Isn't it funny?
+    
+    Second problem is readability of the code.
+    
+    I think that inconsistency of the glob notation is making
+    readability of the code little bit difficult.
+    
+    Therefore I wrote this module to provide alternative way of accessing
+    to the values of a symbol.
+    
+    By using this module, above examples can be wrote as below.
+    
+      use Symbol::Values;
+      my $sym = Symbol::Values->new('name');
+      
+      $code_ref = $sym->code;    # Getting code object.
+      
+      $sym->code = $code_ref;    # Setting code object.
+    
+    I hope this module makes your code more readable.
+    
+REQUIREMENTS
+
+    Perl, version 5.6 or more.
+    This module provides lvalue function, so Perl > 5.6 is required.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+    No non-standard module is required.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Keitaro Miyazaki
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.

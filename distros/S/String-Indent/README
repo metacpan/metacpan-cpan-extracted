@@ -1,0 +1,29 @@
+FUNCTIONS
+
+ indent($indent, $str, \%opts) => STR
+
+    Indent every line in $str with $indent. Example:
+
+     indent('  ', "one\ntwo\nthree") # "  one\n  two\n  three"
+
+    %opts is optional. Known options:
+
+      * indent_blank_lines => bool (default: 1)
+
+      If set to false, does not indent blank lines (i.e., lines containing
+      only zero or more whitespaces).
+
+      * first_line_indent => str
+
+      If set, then the first line will be set to this instead of the normal
+      indent.
+
+      * subsequent_lines_indent => str
+
+      If set, then all lines but the first line will be set to this instead
+      of the normal indent.
+
+SEE ALSO
+
+    Indent::String, String::Nudge
+

@@ -1,0 +1,19 @@
+Revision history for Perl extension SharePoint::SOAPHandler.
+
+
+0.0013  Thu Jul 7 10:55:00 2012
+	- 2nd update documentation changes, REAME and .pm version update, POD update
+	- added more tests for write_from_memory and copy_local_files to see if
+	- it conforms to new documentation of the methods in parent class, and it does.
+	-i.e. default overwrite existing file, does not act on dir
+	-no code changes
+
+0.0012  Wed May 24 10:00:00 2012
+	- first update; in Makefile.PL, added requirement for Term::ReadKey, which is only used for testing
+		-updated this file, README (version and Term::ReadKey), and the .pm file version number
+		-changed test harness to include number of tests and use SKIP block
+
+0.0011  Tue Aug 23 10:31:32 2011
+	- original version; created by h2xs 1.23 with options
+		-XAOa -b 5.8.0 --skip-exporter --skip-autoloader -v0.0011 -nSharePoint::SOAPHandler
+

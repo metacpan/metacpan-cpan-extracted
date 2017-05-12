@@ -1,0 +1,16 @@
+# Dump of OAI-ORE Resource Map model as N3
+<A-1> <http://purl.org/dc/terms/creator> <Y>.
+<A-1> <http://www.openarchives.org/ore/terms/aggregates> <AR-1>.
+<A-1> <http://www.openarchives.org/ore/terms/aggregates> <AR-2>.
+<A-1> <http://www.openarchives.org/ore/terms/aggregates> <AR-3>.
+<A-1> <http://www.openarchives.org/ore/terms/similarTo> <DOI-1>.
+<A-1> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchives.org/ore/terms/Aggregation>.
+<AR-1> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchives.org/ore/terms/AggregatedResource>.
+<AR-2> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchives.org/ore/terms/AggregatedResource>.
+<AR-3> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchives.org/ore/terms/AggregatedResource>.
+<ReM-1> <http://purl.org/dc/elements/1.1/rights> "You have some rights".
+<ReM-1> <http://purl.org/dc/terms/created> "2007-10-15T00:00:00Z".
+<ReM-1> <http://purl.org/dc/terms/creator> <X>.
+<ReM-1> <http://purl.org/dc/terms/modified> "2007-10-15T00:00:00Z".
+<ReM-1> <http://www.openarchives.org/ore/terms/describes> <A-1>.
+<ReM-1> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchives.org/ore/terms/ResourceMap>.

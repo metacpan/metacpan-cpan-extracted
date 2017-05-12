@@ -1,0 +1,17 @@
+CONTRIBUTING
+COPYRIGHT
+CREDITS
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+SIGNATURE
+dist.ini
+doap.ttl
+examples/eg1.pl
+lib/String/Interpolate/Delayed.pm
+t/01basic.t

@@ -1,0 +1,5 @@
+Product Code,Product Name,List Price Type,List Price,List Price Currency,List Price Unit,Amount per List Price Unit,Purchase Price Type,Purchase Price,Purchase Price Currency,Purchase Price Unit,Amount per Purchase Price Unit,Batch Level Tracking,Tax Category,Status
+WIDGET1,"Super Cool 
+Widget!",Exclusive,20.54,EUR,EACH,1,Inclusive,10.54,AUD,BOX10,10,No,GST,Active
+Amazing-PIPE!,"There is nothing this Pipe
+ cannot do!",Exclusive,100000,JPY,cm,10,Inclusive,2.23,USD,M,1000,No,EXEMPT,Active

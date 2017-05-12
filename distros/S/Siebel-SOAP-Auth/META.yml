@@ -1,0 +1,43 @@
+---
+abstract: 'Moo based class to implement transparent Siebel Session Management for XML::Compile::WSDL11 '
+author:
+  - 'Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>'
+build_requires:
+  Digest::MD5: '0'
+  File::Spec: '0'
+  Moose: '2.1405'
+  Test::Exception: '0.40'
+  Test::Moose: '2.1405'
+  Test::More: '0'
+  XML::Compile::SOAP11: '3.12'
+  XML::Compile::Transport::SOAPHTTP: '3.12'
+  XML::Compile::WSDL11: '3.04'
+  perl: '5.008009'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.008009'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Siebel-SOAP-Auth
+provides:
+  Siebel::SOAP::Auth:
+    file: lib/Siebel/SOAP/Auth.pm
+    version: '0.004'
+requires:
+  Encode: '0'
+  Log::Report: '1.05'
+  Moo: '2.000001'
+  Types::Standard: '1.000005'
+  XML::Compile::SOAP11: '3.12'
+  XML::LibXML: '2.0115'
+  namespace::clean: '0.25'
+  perl: '5.008009'
+resources:
+  bugtracker: https://github.com/glasswalk3r/siebel-soap-auth/issues
+  homepage: https://github.com/glasswalk3r/siebel-soap-auth
+  repository: https://github.com/glasswalk3r/siebel-soap-auth.git
+version: '0.004'

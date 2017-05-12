@@ -1,0 +1,14 @@
+MANIFEST
+Makefile.PL
+README
+SHA256.pm
+SHA256.pod
+_sha256.c
+sha384_512.c
+sha.h
+sha512.h
+sha256.pod
+sha256.xs
+typemap
+types.h
+t/test.t

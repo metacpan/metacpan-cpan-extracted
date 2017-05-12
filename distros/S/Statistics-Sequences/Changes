@@ -1,0 +1,62 @@
+Revision history for Perl module Statistics::Sequences
+
+0.15 2017.04.10
+  - _precisioned changed to not precision if value is integer
+  - added giving values to stats_hash and dump as an array-ref; simpler, & the elements returned (in dump's print) are in the order, left to right, as given. But ...
+  - retained giving values as a hash - permits also giving arguments per element - e.g., values => { z_value => 1, p_value => { exact => 1 } }, in a later version
+  - added, while keeping the hash (as above), 'psisq' within dump's ordering list - so it precedes p_value when called from Vnomes - a temporary hack
+  - removed default look-up of observed() and p_value() methods in stats_hash; might not exist and croak; was not documented
+  - misc other edits of stats_hash() and dump()
+  - added Diagnostics section in POD
+
+0.14 2016-03-09
+  - revert from 0.13 to avoid recursive dependency issue
+
+0.13 2016-03-01
+ - installation now requires Statistics::Sequences::Joins, ::Runs, ::Pot, ::Turns, and ::Vnomes.
+
+0.12 2013-08-12
+ - remove hash-bang to perl, and specify using latest version of Statistics::Data (0.08) in build script, to help solve dist issues for some platforms
+ - tighter scoping of $method and $str within dump() method (which should be renamed) 
+
+0.11 2013-06-27
+ - rewrite of dump() method to cope with stats that have list output (as for Statistics::Sequences::Vnomes/observed).
+ - eval{} of methods called for stats_hash() or dump().
+
+0.10 2013-05
+ - All methods for data-handling (load, read, add, unload) expanded and inherited from Statistics::Data
+ - Overhauled interface to the statistics and tests - using methods to get descriptives, etc. - see the PODs
+ - Have to name the "stat" you want for any of these methods, as well as for the "test"
+ - Sub-modules parcelled out to exist in the world by themselves
+ - Statistics::Zed object is no longer cached.
+ - NOT compatible with prior versions. All sub-modules (tests of Runs, Turns, Pot, etc.) rewritten to be compatible.
+
+0.052 2010-09-30
+ - Check that all options sent to <test> are valid ones
+ - Improve croak message for valid Vnomes test
+ - Values for the arguments 'tails' and 'ccorr' must be specified as arguments on each call - they are not cached
+
+0.051 2010-09-13
+ - Statistics::Zed object cached during <new> so can be used repeatedly and shared between sub-modules
+ - Vnomes: computes z-value from psisquare's p-value and uses this in dumps (as do the other sub-modules)
+
+0.050 2010-09-12
+ - added sub-module Turns - test of turning-points as local peaks and troughs 
+ - added binate method in main package
+ - Vnomes: changed rounding to flooring for the NIST-prescribed limit of length
+
+0.04x 2010-09 
+ - added sub-module Vnomes - Good's serial test
+ - clean-up dump sub: if text => 0 or undef, you get printed what's returned by the sub string 
+ - cleaned-up generic <load> sub and associated private subs
+ - deprecated calling a test just by its name, rather than hash-keying it as "what".
+
+0.031 2009 March: some rationalisation of precision_s and precision_p operations
+
+0.03 2009 March: spring-cleaning; but see Statistics::Zed 0.02 for relevant changes
+
+0.02 2008/06/29: upload via PAUSE. 
+
+0.01  Sun Jul 23 22:31:41 2006
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter -use-new-tests -n Statistics::Sequences

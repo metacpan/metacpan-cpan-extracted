@@ -1,0 +1,35 @@
+# Update domain, add an admin and tech contact contact
+template: update-domain.tt
+
+vars:
+  domain: updatable.co.te
+  admin_old: 10d
+  admin: registrant-001
+  tech_old: 10d
+  tech: registrant-001
+
+input_assertions:
+
+SRS:
+  - assertions:
+      count:
+      match:
+        - [ '//DomainNameFilter', 'updatable.co.te', 'Check for the domain name' ]
+      match_all:
+      attr_is:
+        - [ '//FieldList', 'AdminContact', '1', 'Admin contact requested in DDQ field list' ]
+        - [ '//FieldList', 'TechnicalContact', '1', 'Technical contact requested in DDQ field list' ]
+  - assertions:
+      count:
+      match:
+        - [ '//DomainNameFilter', 'updatable.co.te', 'Check for the domain name' ]
+      match_all:
+      attr_is:
+        - [ '//AdminContact', 'HandleId', 'registrant-001', 'Check for the admin contact' ]
+        - [ '//TechnicalContact', 'HandleId', 'registrant-001', 'Check for the tech contact' ]
+
+output_assertions:
+  count:
+    - [ '//epp:result', 1, 'SRS: Check for one result' ]
+  attr_is:
+    - [ '//epp:result', 'code', 1000, 'SRS: Check for correct result code' ]

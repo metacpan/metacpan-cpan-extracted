@@ -1,0 +1,32 @@
+Revision history for Perl extension ShipIt::Step::ChangeAllVersions
+
+1.002 2015-01-18 16:58:18+0900
+    - Preserve file mode, esp. executable flags (#2)
+
+1.001 2013-03-18 20:33:17
+    - Do not process symlinks (tokuhirom)
+
+1.000 2012-10-20 21:06:22
+    - No feature changes. Just upgraded Module::Install.
+
+0.007 2011-12-01 10:31:58
+    - Ignore symbolic links
+
+0.006 Wed Mar 31 10:59:45 2010
+    - Allow the 'v' prefix in VERSION sections
+
+0.005 Mon Mar 22 14:18:33 2010
+    - Ignore the return value of read(), reported by miyagawa san
+
+0.004 Sun Mar 14 13:07:27 2010
+    - Update scrpt files in script/ and bin/ (tokuhirom)
+    - Use File::Find instead of the MANIFEST file
+
+0.003 Wed Mar 10 16:40:12 2010
+    - Respect --dry-run mode
+
+0.002 Tue Oct 13 18:36:15 2009
+    - Add "requires 'parent'" to Makefile.PL
+
+0.001 Fri Oct  9 09:44:18 2009
+	- original version; created by Module::Setup

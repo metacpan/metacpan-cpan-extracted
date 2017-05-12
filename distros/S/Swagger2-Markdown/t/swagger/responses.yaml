@@ -1,0 +1,54 @@
+---
+x-api-blueprint:
+  resource_section: name_uri
+  action_section: name_method
+swagger: "2.0"
+info:
+  version: "1.0"
+  title: Responses API
+  description: |
+    In this API example we will discuss what information a response can bear and how to define multiple responses. Technically a response is represented by a payload that is sent back in response to a request.
+
+    ## API Blueprint
+    + [Previous: Grouping Resources](04.%20Grouping%20Resources.md)
+    + [This: Raw API Blueprint](https://raw.github.com/apiaryio/api-blueprint/master/examples/05.%20Responses.md)
+    + [Next: Requests](06.%20Requests.md)
+
+paths:
+  /message:
+    x-api-blueprint:
+      group: Messages
+      summary: My Message
+      description: |
+        Group of all messages-related resources.
+    get:
+      summary: Retrieve a Message
+      description: |
+        This action has **two** responses defined: One returing a plain text and the other a JSON representation of our resource. Both has the same HTTP status code. Also both responses bear additional information in the form of a custom HTTP header. Note that both responses have set the `Content-Type` HTTP header just by specifying `(text/plain)` or `(application/json)` in their respective signatures.
+      produces:
+        - text/plain
+      responses:
+        200:
+          description: The response message
+          headers:
+            X-My-Message-Header:
+              description: some header
+              type: integer
+          schema:
+            format: string
+            example: "Hello World!"
+    put:
+      summary: Update a Message
+      consumes:
+        - text/plain
+      parameters:
+        - in: body
+          name: message
+          schema:
+            format: string
+            example: "All your base are belong to us."
+      responses:
+        204:
+          description: The response message
+
+# vim: ts=2:sw=2:et

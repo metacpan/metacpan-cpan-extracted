@@ -1,0 +1,959 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<!DOCTYPE hrc PUBLIC "-//Cail Lomecb//DTD Colorer HRC take5//EN"
+  "http://colorer.sf.net/2003/hrc.dtd">
+<hrc version="take5" xmlns="http://colorer.sf.net/2003/hrc"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://colorer.sf.net/2003/hrc http://colorer.sf.net/2003/hrc.xsd">
+
+  <type name="css">
+
+    <annotation>
+     <documentation>
+      Cascading Style Sheets, Level 1 and 2
+     </documentation>
+     <contributors><![CDATA[
+      darkman <darkman@magnet.ru>
+      Albert Micheev <2:5049/80>
+      Timur Safin <timur@lanit.ru>
+      Eugene Efremov <4mirror@mail.ru>
+     ]]></contributors>
+     <appinfo>
+      <prototype name="css" group="inet" description="css">
+        <location link="css/css.hrc"/>
+        <filename>/\.(css)$/i</filename>
+      </prototype>
+      <require> <!-- no module required -->
+       <type name="xmlschema"/>
+      </require>
+     </appinfo>
+    </annotation>
+
+    <import type="def"/>
+
+    <region name="Comment" parent="def:Comment"/>
+    <region name="ForeignComment" parent="def:Comment"/>
+
+    <region name="baseColors" parent="def:Var" />
+    <region name="extColors" parent="def:VarStrong" />
+    <region name="w3cColors" parent="baseColors" />
+
+    <region name="Number" parent="def:Number"/>
+    <region name="UnitSuffix" parent="def:NumberSuffix"/>
+    <region name="Symbol" parent="def:Symbol"/>
+
+    <region name="Directive" parent="def:Directive" description='Directives, started with @ char'/>
+    <region name="MediaType" parent="def:DirectiveContent" description='Media type region'/>
+
+    <region name="TagName" parent="default" />
+    <region name="PseudoElement" parent="def:Keyword" />
+    <region name="PseudoElementUnknown" parent="default" />
+
+    <region name="PropertyName" parent="def:KeywordStrong" />
+    <region name="PropertyFunc" parent="def:FunctionKeyword" />
+    <region name="PropertyValue" parent="def:Parameter" />
+    <region name="ImportantValue" parent="def:Keyword" />
+
+    <region name="RuleOutline" parent="def:Outlined"/>
+    <region name="DirectiveOutline" parent="def:Outlined"/>
+    <region name="MediaOutline" parent="DirectiveOutline"/>
+
+    <region name="UnicodeChar" parent="def:Character"/>
+    <region name="UnicodeCharContent" parent="def:CharacterContent"/>
+
+    <entity name='worddiv-class' value="[\s\,\}\{\x22\x27\:\;\(\)]"/>
+    <entity name='worddiv' value="(?{}$|%worddiv-class;)"/>
+
+    <scheme name="Colors">
+      <inherit scheme="NumericColors"/>
+      <inherit scheme="rgbFunc"/>
+      <inherit scheme="w3cColors"/>
+      <inherit scheme="SystemColors"/>
+      <inherit scheme="CustomColors"/>
+    </scheme>
+    <scheme name="w3cColors">
+      <keywords region="w3cColors" ignorecase="yes" worddiv='%worddiv-class;'>
+        <word name='aqua'/>
+        <word name='black'/>
+        <word name='blue'/>
+        <word name='fuchsia'/>
+        <word name='gray'/>
+        <word name='green'/>
+        <word name='lime'/>
+        <word name='maroon'/>
+        <word name='navy'/>
+        <word name='olive'/>
+        <word name='purple'/>
+        <word name='red'/>
+        <word name='silver'/>
+        <word name='teal'/>
+        <word name='white'/>
+        <word name='yellow'/>
+      </keywords>
+    </scheme>
+
+    <scheme name="CustomColors">
+     <annotation><documentation><![CDATA[
+         Possible matched any colors...
+      ]]></documentation></annotation>
+    </scheme>
+
+    <scheme name="SystemColors">
+      <keywords region="extColors" ignorecase="yes" worddiv='%worddiv-class;'>
+        <word name="ActiveBorder"/>
+        <word name="ActiveCaption"/>
+        <word name="AppWorkspace"/>
+        <word name="Background"/>
+        <word name="ButtonFace"/>
+        <word name="ButtonHighlight"/>
+        <word name="ButtonShadow"/>
+        <word name="ButtonText"/>
+        <word name="CaptionText"/>
+        <word name="GrayText"/>
+        <word name="Highlight"/>
+        <word name="HighlightText"/>
+        <word name="InactiveBorder"/>
+        <word name="InactiveCaption"/>
+        <word name="InactiveCaptionText"/>
+        <word name="InfoBackground"/>
+        <word name="InfoText"/>
+        <word name="Menu"/>
+        <word name="MenuText"/>
+        <word name="Scrollbar"/>
+        <word name="ThreeDDarkShadow"/>
+        <word name="ThreeDFace"/>
+        <word name="ThreeDHighlight"/>
+        <word name="ThreeDLightShadow"/>
+        <word name="ThreeDShadow"/>
+        <word name="Window"/>
+        <word name="WindowFrame"/>
+        <word name="WindowText"/>
+      </keywords>
+    </scheme>
+
+
+    <scheme name="PropertyNames">
+      <keywords region="PropertyName" ignorecase="yes" worddiv='%worddiv-class;'>
+        <word name="ACCELERATOR"/>
+        <word name="azimuth"/>
+        <word name="background-attachment"/>
+        <word name="background-color"/>
+        <word name="background-image"/>
+        <word name="background-position-x"/>
+        <word name="background-position-y"/>
+        <word name="background-position"/>
+        <word name="background-repeat"/>
+        <word name="background"/>
+        <word name="border-collapse"/>
+        <word name="border-color"/>
+        <word name="border-spacing"/>
+        <word name="border-style"/>
+        <word name="border-top-color"/>
+        <word name="border-right-color"/>
+        <word name="border-bottom-color"/>
+        <word name="border-left-color"/>
+        <word name="border-top-style"/>
+        <word name="border-right-style"/>
+        <word name="border-bottom-style"/>
+        <word name="border-left-style"/>
+        <word name="border-top-width"/>
+        <word name="border-right-width"/>
+        <word name="border-bottom-width"/>
+        <word name="border-left-width"/>
+        <word name="border-top"/>
+        <word name="border-right"/>
+        <word name="border-bottom"/>
+        <word name="border-left"/>
+        <word name="border-width"/>
+        <word name="border"/>
+        <word name="bottom"/>
+        <word name="caption-side"/>
+        <word name="clear"/>
+        <word name="clip"/>
+        <word name="color"/>
+        <word name="content"/>
+        <word name="counter-increment"/>
+        <word name="counter-reset"/>
+        <word name="cue-after"/>
+        <word name="cue-before"/>
+        <word name="cue"/>
+        <word name="cursor"/>
+        <word name="direction"/>
+        <word name="display"/>
+        <word name="elevation"/>
+        <word name="empty-cells"/>
+        <word name="float"/>
+        <word name="font-family"/>
+        <word name="font-size"/>
+        <word name="font-size-adjust"/>
+        <word name="font-stretch"/>
+        <word name="font-style"/>
+        <word name="font-variant"/>
+        <word name="font-weight"/>
+        <word name="font"/>
+        <word name="height"/>
+        <word name="ime-mode"/>
+        <word name="layout-grid"/>
+        <word name="left"/>
+        <word name="letter-spacing"/>
+        <word name="line-height"/>
+        <word name="list-style-image"/>
+        <word name="list-style-position"/>
+        <word name="list-style-type"/>
+        <word name="list-style"/>
+        <word name="margin-top"/>
+        <word name="margin-right"/>
+        <word name="margin-bottom"/>
+        <word name="margin-left"/>
+        <word name="margin"/>
+        <word name="marker-offset"/>
+        <word name="marks"/>
+        <word name="max-height"/>
+        <word name="max-width"/>
+        <word name="min-height"/>
+        <word name="min-width"/>
+        <word name="orphans"/>
+        <word name="outline-color"/>
+        <word name="outline-style"/>
+        <word name="outline-width"/>
+        <word name="outline"/>
+        <word name="overflow-x"/>
+        <word name="overflow-y"/>
+        <word name="overflow"/>
+        <word name="padding-top"/>
+        <word name="padding-right"/>
+        <word name="padding-bottom"/>
+        <word name="padding-left"/>
+        <word name="padding"/>
+        <word name="page-break-after"/>
+        <word name="page-break-before"/>
+        <word name="page-break-inside"/>
+        <word name="page"/>
+        <word name="pause-after"/>
+        <word name="pause-before"/>
+        <word name="pause"/>
+        <word name="pitch-range"/>
+        <word name="pitch"/>
+        <word name="play-during"/>
+        <word name="position"/>
+        <word name="quotes"/>
+        <word name="richness"/>
+        <word name="right"/>
+        <word name="ruby-align"/>
+        <word name="size"/>
+        <word name="speak-header"/>
+        <word name="speak-numeral"/>
+        <word name="speak-punctuation"/>
+        <word name="speak"/>
+        <word name="speech-rate"/>
+        <word name="stress"/>
+        <word name="table-layout"/>
+        <word name="text-align-last"/>
+        <word name="text-align"/>
+        <word name="text-decoration"/>
+        <word name="text-indent"/>
+        <word name="text-shadow"/>
+        <word name="text-transform"/>
+        <word name="top"/>
+        <word name="unicode-bidi"/>
+        <word name="vertical-align"/>
+        <word name="visibility"/>
+        <word name="voice-family"/>
+        <word name="volume"/>
+        <word name="white-space"/>
+        <word name="widows"/>
+        <word name="width"/>
+        <word name="word-spacing"/>
+        <word name="z-index"/>
+        <word name="src"/>
+      </keywords>
+    </scheme>
+
+    <scheme name="TagNames">
+      <annotation><documentation><![CDATA[
+         Possible matched tags
+      ]]></documentation></annotation>
+     </scheme>
+    <scheme name="AttrNames">
+      <annotation><documentation><![CDATA[
+         Possible matched attributes (used in [...])
+      ]]></documentation></annotation>
+     </scheme>
+
+    <scheme name="Comment">
+      <block start="/\/\*/" end="/\*\//" scheme="Comment" region="Comment"
+             region00="PairStart" region10="PairEnd"/>
+      <!-- for <style>...</style> in html -->
+      <regexp match="/~\s* &lt;!-- /x" region="ForeignComment"/>
+      <regexp match="/^\s* &lt;!-- /x" region="ForeignComment"/>
+      <regexp match="/(\/\/)? \s* --&gt; /x" region="ForeignComment"/>
+    </scheme>
+
+    <scheme name="NumericBaseValue">
+      <regexp match="/([+\-])?[\d\.]+\b/x"
+             region0="Number" region1="def:Symbol"/>
+    </scheme>
+    <scheme name="NumericLst">
+     <inherit scheme="NumericBaseValue"/>
+     <regexp match="/\s*\,\s*/" region="Symbol"/>
+     <regexp match="/~\s*\,\s*/" region="def:Error"/>
+     <regexp match="/\s*\,\s*$/" region="def:Error"/>
+    </scheme>
+
+    <scheme name="NumericColors">
+     <regexp match="/(?{def:NumberPrefix}\#)([\da-fA-F]{6}|[\da-fA-F]{3})/" region="def:NumberHex"/>
+    </scheme>
+    <scheme name="NumericColorsLst">
+     <inherit scheme="NumericLst">
+      <virtual scheme="NumericBaseValue" subst-scheme="NumericColors"/>
+     </inherit>
+    </scheme>
+
+    <scheme name="NumericTime">
+      <regexp match="/([+\-])?[\d\.]+ (m?s)?\M\b/x"
+             region0="Number" region1="def:Symbol" region2="UnitSuffix"/>
+
+    </scheme>
+    <scheme name="NumericTimeLst">
+     <inherit scheme="NumericLst">
+      <virtual scheme="NumericBaseValue" subst-scheme="NumericTime"/>
+     </inherit>
+    </scheme>
+
+    <scheme name="NumericFreq">
+      <regexp match="/([+\-])?[\d\.]+ (k?Hz)?\M\b/x"
+             region0="Number" region1="def:Symbol" region2="UnitSuffix"/>
+
+    </scheme>
+    <scheme name="NumericFreqLst">
+     <inherit scheme="NumericLst">
+      <virtual scheme="NumericBaseValue" subst-scheme="NumericFreq"/>
+     </inherit>
+    </scheme>
+
+    <scheme name="NumericArc">
+      <regexp match="/([+\-])?[\d\.]+ (deg|g?rad)?\M\b/x"
+             region0="Number" region1="def:Symbol" region2="UnitSuffix"/>
+
+    </scheme>
+    <scheme name="NumericArcLst">
+     <inherit scheme="NumericLst">
+      <virtual scheme="NumericBaseValue" subst-scheme="NumericArc"/>
+     </inherit>
+    </scheme>
+    <scheme name="NumericLength">
+      <regexp match="/([+\-])?[\d\.]+ (\%|em|ex|pc|pt|px|in|mm|cm)?\M%worddiv;/x"
+             region0="Number" region1="def:Symbol" region2="UnitSuffix"/>
+    </scheme>
+    <scheme name="NumericLengthLst">
+     <inherit scheme="NumericLst">
+      <virtual scheme="NumericBaseValue" subst-scheme="NumericLength"/>
+     </inherit>
+    </scheme>
+
+    <scheme name="NumericValue">
+      <regexp match="/ \c (0x)  [\da-fA-F]+ \b /ix" region="Number"/>
+
+      <!--inherit scheme="NumericColor"/-->
+      <inherit scheme="NumericLength"/>
+      <inherit scheme="NumericArc"/>
+      <inherit scheme="NumericFreq"/>
+      <inherit scheme="NumericTime"/>
+
+      <keywords region="Symbol">
+        <symb name=","/>
+        <!--  <symb name="("/>
+        <symb name=")"/>
+        <symb name="%"/>-->
+      </keywords>
+    </scheme>
+
+    <scheme name="StringValue-content">
+     <regexp match="/\\[&quot;&apos;]/" region="def:StringContent"/>
+     <regexp match="/\\[\dA-Fa-f]{1,8}/" region="UnicodeCharContent"/>
+     <regexp match="/\\$/" region="def:StringContent"/>
+     <regexp match="/[^\\&quot;&apos;]$/" region="def:Error"/>
+    </scheme>
+
+    <scheme name="StringValue">
+      <inherit scheme='StringValueQuot'/>
+      <inherit scheme='StringValueApos'/>
+    </scheme>
+    <scheme name="StringValueQuot">
+      <regexp match="/((&quot;))(\\\\|\\[&quot;&apos;]|\\$|.)*?((&quot;))/"
+       region="def:String"
+       region1="def:StringEdge" region4="def:StringEdge"
+       region2="def:PairStart" region5="def:PairEnd"
+      />
+    </scheme>
+    <scheme name="StringValueApos">
+      <regexp match="/((&apos;))(\\\\|\\[&quot;&apos;]|\\$|.)*?((&apos;))/"
+       region="def:String"
+       region1="def:StringEdge" region4="def:StringEdge"
+       region2="def:PairStart" region5="def:PairEnd"
+      />
+    </scheme>
+
+    <entity name="comma" value="(?{def:Symbol}\s*\,\s*)"/>
+    <entity name="per-val" value="(?{def:Number}100|\d{1,2})(?{UnitSuffix}%)"/>
+    <entity name="dec-val" value="(?{def:Number}[12]?\d{1,2})"/>
+    <scheme name="rgbFunc">
+     <regexp match="/(?{PropertyFunc}rgb)\s*(?{def:PairStart}\()\s*
+      (%per-val;%comma;%per-val;%comma;%per-val;
+      |%dec-val;%comma;%dec-val;%comma;%dec-val;)
+      \s*(?{def:PairEnd}\))/xi" region="def:Symbol"
+     />
+    </scheme>
+    <scheme name="urlFunc">
+      <block start="/\b(url)(\s)*((\(\s*)([&quot;&apos;]?))/" end="/(\y5)(\s*\))/"
+       scheme="xmlschema:anyURI-content" region="String"
+       region01="PropertyFunc" region03="def:PairStart" region04="Symbol" region05="String"
+       region10="def:PairEnd" region11="String" region12="Symbol"
+      />
+    </scheme>
+    <scheme name="shareFunc-content">
+     <inherit scheme="NumericLengthLst"/>
+     <regexp match="/auto/" region="PropertyValue"/>
+    </scheme>
+    <scheme name="shareFunc">
+      <block start="/\b(rect)(\s)*((\())/" end="/(\))/" scheme="shareFunc-content"
+       region01="PropertyFunc" region03="def:PairStart" region04="Symbol"
+       region10="def:PairEnd"  region11="Symbol"
+      />
+     <regexp match="/auto/" region="PropertyValue"/>
+    </scheme>
+
+
+    <scheme name="PropertyFunc">
+      <inherit scheme="rgbFunc"/>
+      <inherit scheme="urlFunc"/>
+      <inherit scheme="shareFunc"/>
+
+      <block start="/\b(rect|attr)(\s)*((\())/" end="/(\))/" scheme="NumericLengthLst"
+       region01="PropertyFunc" region03="def:PairStart" region04="Symbol"
+       region10="def:PairEnd"  region11="Symbol"
+      />
+
+    </scheme>
+
+    <scheme name="Property">
+      <inherit scheme="Comment"/>
+      <inherit scheme='StringValue'/>
+      <inherit scheme='NumericValue'/>
+      <inherit scheme='PropertyFunc'/>
+      <inherit scheme='Colors'/>
+      <keywords ignorecase="yes" region="ImportantValue" worddiv='%worddiv-class;'>
+         <word name="!important"/>
+      </keywords>
+      <inherit scheme='PropertyValue'/>
+    </scheme>
+
+    <scheme name="PropertyValue">
+      <keywords region="PropertyValue" ignorecase="yes" worddiv='%worddiv-class;'>
+        <word name="left-side"/>
+        <word name="far-left"/>
+        <word name="left"/>
+        <word name="center-left"/>
+        <word name="center-right"/>
+        <word name="center"/>
+        <word name="far-right"/>
+        <word name="right-side"/>
+        <word name="right"/>
+        <word name="behind"/>
+        <word name="leftwards"/>
+        <word name="rightwards"/>
+        <word name="inherit"/>
+        <word name="scroll"/>
+        <word name="fixed"/>
+        <word name="transparent"/>
+        <word name="none"/>
+        <word name="repeat-x"/>
+        <word name="repeat-y"/>
+        <word name="repeat"/>
+        <word name="no-repeat"/>
+        <word name="collapse"/>
+        <word name="separate"/>
+        <word name="auto"/>
+        <word name="top"/>
+        <word name="bottom"/>
+        <word name="both"/>
+        <word name="open-quote"/>
+        <word name="close-quote"/>
+        <word name="no-open-quote"/>
+        <word name="no-close-quote"/>
+        <word name="crosshair"/>
+        <word name="default"/>
+        <word name="pointer"/>
+        <word name="move"/>
+        <word name="e-resize"/>
+        <word name="ne-resize"/>
+        <word name="nw-resize"/>
+        <word name="n-resize"/>
+        <word name="se-resize"/>
+        <word name="sw-resize"/>
+        <word name="s-resize"/>
+        <word name="text"/>
+        <word name="wait"/>
+        <word name="help"/>
+        <word name="ltr"/>
+        <word name="rtl"/>
+        <word name="inline"/>
+        <word name="block"/>
+        <word name="list-item"/>
+        <word name="run-in"/>
+        <word name="compact"/>
+        <word name="marker"/>
+        <word name="table"/>
+        <word name="inline-table"/>
+        <word name="table-row-group"/>
+        <word name="table-header-group"/>
+        <word name="table-footer-group"/>
+        <word name="table-row"/>
+        <word name="table-column-group"/>
+        <word name="table-column"/>
+        <word name="table-cell"/>
+        <word name="table-caption"/>
+        <word name="below"/>
+        <word name="level"/>
+        <word name="above"/>
+        <word name="higher"/>
+        <word name="lower"/>
+        <word name="show"/>
+        <word name="hide"/>
+        <word name="caption"/>
+        <word name="icon"/>
+        <word name="menu"/>
+        <word name="message-box"/>
+        <word name="small-caption"/>
+        <word name="status-bar"/>
+        <word name="normal"/>
+        <word name="wider"/>
+        <word name="narrower"/>
+        <word name="ultra-condensed"/>
+        <word name="extra-condensed"/>
+        <word name="condensed"/>
+        <word name="semi-condensed"/>
+        <word name="semi-expanded"/>
+        <word name="expanded"/>
+        <word name="extra-expanded"/>
+        <word name="ultra-expanded"/>
+        <word name="italic"/>
+        <word name="oblique"/>
+        <word name="small-caps"/>
+        <word name="bold"/>
+        <word name="bolder"/>
+        <word name="lighter"/>
+        <!-- word name="100"/>
+        <word name="200"/>
+        <word name="300"/>
+        <word name="400"/>
+        <word name="500"/>
+        <word name="600"/>
+        <word name="700"/>
+        <word name="800"/>
+        <word name="900"/-->
+        <word name="inside"/>
+        <word name="outside"/>
+        <word name="disc"/>
+        <word name="circle"/>
+        <word name="square"/>
+        <word name="decimal"/>
+        <word name="decimal-leading-zero"/>
+        <word name="lower-roman"/>
+        <word name="upper-roman"/>
+        <word name="lower-greek"/>
+        <word name="lower-alpha"/>
+        <word name="lower-latin"/>
+        <word name="upper-alpha"/>
+        <word name="upper-latin"/>
+        <word name="hebrew"/>
+        <word name="armenian"/>
+        <word name="georgian"/>
+        <word name="cjk-ideographic"/>
+        <word name="hiragana"/>
+        <word name="katakana"/>
+        <word name="hiragana-iroha"/>
+        <word name="katakana-iroha"/>
+        <word name="crop"/>
+        <word name="cross"/>
+        <word name="invert"/>
+        <word name="visible"/>
+        <word name="hidden"/>
+        <word name="always"/>
+        <word name="avoid"/>
+        <word name="x-low"/>
+        <word name="low"/>
+        <word name="medium"/>
+        <word name="high"/>
+        <word name="x-high"/>
+        <word name="mix?"/>
+        <word name="repeat?"/>
+        <word name="static"/>
+        <word name="relative"/>
+        <word name="absolute"/>
+        <word name="portrait"/>
+        <word name="landscape"/>
+        <word name="spell-out"/>
+        <word name="once"/>
+        <word name="digits"/>
+        <word name="continuous"/>
+        <word name="code"/>
+        <word name="x-slow"/>
+        <word name="slow"/>
+        <word name="fast"/>
+        <word name="x-fast"/>
+        <word name="faster"/>
+        <word name="slower"/>
+        <word name="justify"/>
+        <word name="underline"/>
+        <word name="overline"/>
+        <word name="line-through"/>
+        <word name="blink"/>
+        <word name="capitalize"/>
+        <word name="uppercase"/>
+        <word name="lowercase"/>
+        <word name="embed"/>
+        <word name="bidi-override"/>
+        <word name="baseline"/>
+        <word name="sub"/>
+        <word name="super"/>
+        <word name="text-top"/>
+        <word name="middle"/>
+        <word name="text-bottom"/>
+        <word name="silent"/>
+        <word name="x-soft"/>
+        <word name="soft"/>
+        <word name="loud"/>
+        <word name="x-loud"/>
+        <word name="pre"/>
+        <word name="nowrap"/>
+        <word name="serif"/>
+        <word name="sans-serif"/>
+        <word name="cursive"/>
+        <word name="fantasy"/>
+        <word name="monospace"/>
+        <word name="empty"/>
+        <word name="string"/>
+        <word name="strict"/>
+        <word name="loose"/>
+        <word name="char"/>
+        <word name="true"/>
+        <word name="false"/>
+        <word name="dotted"/>
+        <word name="dashed"/>
+        <word name="solid"/>
+        <word name="double"/>
+        <word name="groove"/>
+        <word name="ridge"/>
+        <word name="inset"/>
+        <word name="outset"/>
+        <word name="larger"/>
+        <word name="smaller"/>
+        <word name="xx-small"/>
+        <word name="x-small"/>
+        <word name="small"/>
+        <word name="large"/>
+        <word name="x-large"/>
+        <word name="xx-large"/>
+        <word name="all"/>
+        <word name="newspaper"/>
+        <word name="distribute"/>
+        <word name="distribute-all-lines"/>
+        <word name="distribute-center-last"/>
+        <word name="inter-word"/>
+        <word name="inter-ideograph"/>
+        <word name="inter-cluster"/>
+        <word name="kashida"/>
+        <word name="ideograph-alpha"/>
+        <word name="ideograph-numeric"/>
+        <word name="ideograph-parenthesis"/>
+        <word name="ideograph-space"/>
+        <word name="keep-all"/>
+        <word name="break-all"/>
+        <word name="break-word"/>
+        <word name="lr-tb"/>
+        <word name="tb-rl"/>
+        <word name="thin"/>
+        <word name="thick"/>
+        <word name="inline-block"/>
+        <word name="w-resize"/>
+        <word name="hand"/>
+        <word name="distribute-letter"/>
+        <word name="distribute-space"/>
+        <word name="whitespace"/>
+        <word name="male"/><!-- for voice-family -->
+        <word name="female"/>
+        <word name="child"/>
+
+        <word name="ignore"/>
+      </keywords>
+    </scheme>
+
+    <scheme name="PropertyWrapper">
+       <block start="/~/" end="/:/" scheme="PropertyNames" region10="Symbol"/>
+       <inherit scheme="Property"/>
+    </scheme>
+
+    <scheme name="RuleContent">
+       <inherit scheme="Comment"/>
+       <!-- property value after colon -->
+       <block start="/\M([\w\d\-]+)?\s*(:)/" end="/\M[\;\}\x22\x27]/"
+              scheme="PropertyWrapper" region02="Symbol"
+       />
+
+      <!-- EE: add ";" -->
+      <keywords region="def:SymbolStrong">
+       <symb name=";"/>
+      </keywords>
+
+    </scheme>
+
+    <scheme name="QuotRuleContent">
+     <inherit  scheme="RuleContent">
+      <!--virtual scheme="RuleContent" subst-scheme="QuotRuleContent"/-->
+      <virtual scheme="StringValue" subst-scheme="StringValueQuot"/>
+     </inherit>
+    </scheme>
+    <scheme name="AposRuleContent">
+     <inherit  scheme="RuleContent">
+      <!--virtual scheme="RuleContent" subst-scheme="AposRuleContent"/-->
+      <virtual scheme="StringValue" subst-scheme="StringValueApos"/>
+     </inherit>
+    </scheme>
+
+    <scheme name="Predicate">
+      <keywords region="Symbol">
+         <symb name="="/>
+         <symb name="~="/>
+      </keywords>
+      <inherit scheme='StringValue'/>
+      <inherit scheme='AttrNames'/>
+    </scheme>
+
+    <scheme name="PseudoElement">
+      <keywords region="PseudoElement">
+        <word name="link"/>
+        <word name="active"/>
+        <word name="visited"/>
+        <word name="hover"/>
+        <word name="first-letter"/>
+        <word name="first-line"/>
+        <word name="first"/>
+        <word name="left"/>
+        <word name="right"/>
+
+        <word name="after"/>
+        <word name="before"/>
+
+        <word name="lang"/>
+        <word name="focus"/>
+      </keywords>
+    </scheme>
+
+    <scheme name="RuleDirective">
+      <regexp match="/\M\@(\w+)/" region1="DirectiveOutline"/>
+      <block start="/(?{SymbolStrong}\@)(?{Directive}font-face)\s+
+        (?{PairStart}(?{SymbolStrong}\{))/ixs"
+       end="/(?{PairEnd}(?{SymbolStrong}\}))/" scheme="FFRuleContent"
+      />
+      <regexp match="/(\@)(page|font-face)/" region0="Directive" region1="SymbolStrong"/>
+    </scheme>
+
+    <scheme name="RulesList">
+      <inherit scheme="Comment"/>
+
+      <regexp match="/^\M(?{RuleOutline}[\w\.\:\#][\|\*\s\,\.\:\[\]\#\.\w\-\*\=\x22\x27]+)/"/>
+
+      <inherit scheme="TagNames"/>
+      <!-- !!EE: symbols in tags -->
+      <regexp match="/((?{Symbol}[\#\.\*])|\w)+/" region="TagName"/>
+
+      <block start="/(:)\M[\.\w\-]+/" end="/~[\.\w\-]+\m/"
+       scheme="PseudoElement" region="PseudoElementUnknown" region01="SymbolStrong"
+      />
+      <inherit scheme="RuleDirective"/>
+
+      <block start="/(\{)/" end="/(\})/" scheme="RuleContent"
+             region00="SymbolStrong" region01="def:PairStart"
+             region10="SymbolStrong" region11="def:PairEnd"/>
+      <block start="/(\[)/" end="/(\])/" scheme="Predicate"
+             region00="Symbol" region01="def:PairStart"
+             region10="Symbol" region11="def:PairEnd"/>
+
+      <keywords region="def:Error">
+         <symb name="@"/>
+         <symb name="{"/>
+         <symb name="}"/>
+         <symb name=";"/>
+         <symb name="["/>
+         <symb name="]"/>
+      </keywords>
+      <keywords region="Symbol">
+         <symb name="+"/>
+         <symb name=":"/>
+         <symb name="."/>
+         <symb name=","/>
+         <symb name="#"/>
+         <symb name=">"/>
+      </keywords>
+    </scheme>
+
+
+    <scheme name="pure-css">
+      <regexp match="/\M\@media \s+ (?{MediaOutline}.*?) \{/ix"/>
+      <block start="/(?{SymbolStrong}\@)(?{Directive}media) \s+
+        (?{MediaOutline}(?{MediaType}.*?))
+        (?{PairStart}(?{SymbolStrong}\{))/ixs"
+       end="/(?{PairEnd}(?{SymbolStrong}\}))/" scheme="RulesList"
+      />
+      <block start="/(\@)(import|charset|namespace)/i" end="/(\;)/" scheme="Property"
+       region01="SymbolStrong" region02="Directive" region11="SymbolStrong"
+      />
+      <inherit scheme="RulesList"/>
+    </scheme>
+
+
+
+    <!--
+     -
+     - extended
+     -
+    -->
+
+
+    <annotation>
+     <documentation>
+      Example css customising:
+      font-face directive support.
+     </documentation>
+    </annotation>
+
+    <scheme name="FFPropertyFunc">
+     <annotation>
+      <documentation>
+      This scheme add new functions
+      </documentation>
+     </annotation>
+     <block start="/\b(format|local)(\s)*((\())/" end="/(\))/" scheme="StringValue"
+      region01="PropertyFunc" region03="def:PairStart" region04="Symbol"
+      region10="def:PairEnd"  region11="Symbol"
+     />
+     <inherit scheme="PropertyFunc"/>
+    </scheme>
+
+    <scheme name="FFPropertyNames">
+     <annotation>
+      <documentation>
+       This scheme add (or overload if need) new functions
+      </documentation>
+     </annotation>
+     <keywords region="PropertyName" ignorecase="yes" worddiv='%worddiv-class;'>
+      <word name="unicode-range"/>
+     </keywords>
+     <inherit scheme="PropertyNames"/>
+    </scheme>
+
+    <scheme name="UnicodeRange-content">
+     <regexp match="/[\dA-Fa-f]{1,8}/" region="UnicodeChar"/>
+     <keywords region="def:Symbol">
+      <symb name="?" region="UnicodeCharContent"/>
+      <symb name="-"/>
+     </keywords>
+     <regexp match="/.*/" priority="low" region="def:Error"/>
+    </scheme>
+    <scheme name="UnicodeRange">
+     <block start="/U\+\M[\d\?A-Fa-f]/" end="/\M%worddiv;/"
+      scheme="UnicodeRange-content" region00="def:Keyword"
+     />
+    </scheme>
+
+    <scheme name="FFProperty">
+     <inherit scheme="Property">
+      <virtual scheme="PropertyFunc" subst-scheme="FFPropertyFunc"/>
+     </inherit>
+     <inherit scheme="UnicodeRange"/>
+    </scheme>
+
+    <scheme name="FFRuleContent">
+     <annotation>
+      <documentation>
+       Base scheme. Overload all.
+      </documentation>
+     </annotation>
+     <inherit scheme="RuleContent">
+      <virtual scheme="Property" subst-scheme="FFProperty"/>
+      <virtual scheme="PropertyNames" subst-scheme="FFPropertyNames"/>
+      <virtual scheme="PropertyFunc" subst-scheme="FFPropertyFunc"/>
+      <!-- other overload... -->
+     </inherit>
+    </scheme>
+
+
+    <!--
+      -
+      - main
+      -
+      -->
+
+    <scheme name="check-pure-css">
+     <inherit scheme="unless-html-css"/>
+    </scheme>
+    <scheme name="html-css" if="html-css">
+     <inherit scheme="html-css:css"/>
+    </scheme>
+    <scheme name="unless-html-css" unless="html-css">
+     <inherit scheme="unless-svg-css"/>
+    </scheme>
+    <scheme name="svg-css" if="svg-css">
+     <inherit scheme="svg-css:css"/>
+    </scheme>
+    <scheme name="unless-svg-css" unless="svg-css">
+     <inherit scheme="pure-css"/>
+    </scheme>
+
+    <scheme name="css">
+     <inherit scheme="html-css"/>
+     <inherit scheme="svg-css"/>
+     <inherit scheme="check-pure-css"/>
+    </scheme>
+
+  </type>
+</hrc>
+<!-- ***** BEGIN LICENSE BLOCK *****
+   - Version: MPL 1.1/GPL 2.0/LGPL 2.1
+   -
+   - The contents of this file are subject to the Mozilla Public License Version
+   - 1.1 (the "License"); you may not use this file except in compliance with
+   - the License. You may obtain a copy of the License at
+   - http://www.mozilla.org/MPL/
+   -
+   - Software distributed under the License is distributed on an "AS IS" basis,
+   - WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+   - for the specific language governing rights and limitations under the
+   - License.
+   -
+   - The Original Code is the Colorer Library.
+   -
+   - The Initial Developer of the Original Code is
+   - Cail Lomecb <cail@nm.ru>.
+   - Portions created by the Initial Developer are Copyright (C) 1999-2003
+   - the Initial Developer. All Rights Reserved.
+   -
+   - Contributor(s):
+   - Albert Micheev <2:5049/80>
+   - darkman <darkman@magnet.ru>
+   - Eugene Efremov <4mirror@mail.ru>
+   - Timur Safin <timur@lanit.ru>
+   -
+   - Alternatively, the contents of this file may be used under the terms of
+   - either the GNU General Public License Version 2 or later (the "GPL"), or
+   - the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
+   - in which case the provisions of the GPL or the LGPL are applicable instead
+   - of those above. If you wish to allow use of your version of this file only
+   - under the terms of either the GPL or the LGPL, and not to allow others to
+   - use your version of this file under the terms of the MPL, indicate your
+   - decision by deleting the provisions above and replace them with the notice
+   - and other provisions required by the LGPL or the GPL. If you do not delete
+   - the provisions above, a recipient may use your version of this file under
+   - the terms of any one of the MPL, the GPL or the LGPL.
+   -
+   - ***** END LICENSE BLOCK ***** -->

@@ -1,0 +1,18 @@
+
+TODO for SMS::AQL
+
+ - new method to send message to multiple recipients at once
+
+ - option to enable/disable concatenation (messages > 160 chars) and set
+   maximum length (would be useful just in case some script error in the
+   calling script made it try to send an excessively long message
+
+ - improve documentation
+ 
+ - testing with non-UK destination numbers... obviously I don't have a
+   non-UK phone to test with, does anybody outside of the UK want to
+   help out by performing tests?  Free credits will be allocated for 
+   testing.
+
+
+$Id$

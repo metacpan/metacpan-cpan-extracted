@@ -1,0 +1,80 @@
+
+                   -=* SOAP-Lite-ActiveWorks *=-
+
+
+Highlights
+==========
+
+    *  Use your ActiveWorks broker as a SOAP server.
+    *  HTTP SOAP server and ActiveWorks SOAP servers forward requests
+       to each other.
+    *  Publish ActiveWorks events from Linux!  (ala SOAP of course)
+
+
+Overview
+========
+
+SOAP::Transport::ACTIVEWORKS module provides a transport layer for sending and
+receiving SOAP requests to and from an ActiveWorks broker.  Example adapter and
+client scripts are provided.
+
+The goal of the package is to allow access to ActiveWorks events as readily as
+you would access an ordinary class via an HTTP server and the SOAP protocol.
+
+
+Setup & Demo Scripts
+====================
+You must first have the SOAP-Lite and Aw packages installed.  The package has
+been tested in an environment where two web servers and three brokers were
+running. The servers and brokers must be granted access to the applicable
+ports on the applicable systems. 
+
+
+Prepare Your AW Broker
+----------------------
+Using the AW 'Event Type Editor' (evtype_editor on Solaris) import the event
+definitions from "server/broker-config/soap.data".  This creates the "SOAP"
+client group, event scope, SOAP::Request and SOAP::Reply events.  For
+demonstration events AdapterDevKit::calcRequest and AdapterDevKit::calcReply
+are also added.
+
+Be sure to save the changes on the broker.
+
+
+Prepare Apache
+--------------
+Configure Apache for mod_perl to use Apache::AwSOAP as an alternative SOAP
+request handler.  Which usually means adding a block like the following to
+your conf/http.conf file:
+
+
+<Location /aw-soap>
+  SetHandler    perl-script
+  PerlHandler   Apache::AwSOAP
+</Location>
+
+
+And restart Apache :-)
+
+
+Prepare Your Modules
+--------------------
+Before running 'perl Makefile.PL' edit lib/SOAP/Transport/ACTIVEWORKS.pm and
+update the AW_DEFAULT_* strings for the appropriate broker, host port number
+for your site (editing the default client group is probably a bad idea).
+
+After installing the ACTIVEWORKS module with "make install" add the modules
+in server/SafeModules to where you keep deployed modules for your SOAP servers.
+
+
+Start Your Servers!
+-------------------
+You restarted Apache already right?  Now edit the adapter scripts to talk to
+the brokers at your site:
+
+  server/soap-lite-adapter.pl   (the AW SOAP server)
+  server/calc-adapter.pl        (for demo only)
+  time_adapter.pl               (from the Aw:: pacakge)
+
+and start them.  Edit the client scripts accordingly and have at it.  Each
+script contains POD documentation.

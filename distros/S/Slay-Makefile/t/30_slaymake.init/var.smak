@@ -1,0 +1,5 @@
+all:
+        echo $VAR1$var2 to you
+        {
+            "$VAR1$var2 to you$var3\n";
+        }

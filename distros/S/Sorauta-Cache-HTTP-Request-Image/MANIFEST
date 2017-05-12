@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Sorauta-Cache-HTTP-Request-Image.t
+lib/Sorauta/Cache/HTTP/Request/Image.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

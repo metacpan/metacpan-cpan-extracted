@@ -1,0 +1,50 @@
+---
+abstract: 'Simple L<Plack::Request>-based web framework'
+author:
+  - 'Aleksandr Aleshin <silencer2k@gmail.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+  File::ShareDir::Install: 0.06
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.044, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Spike
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Carp: 0
+  Date::Parse: 0
+  File::ShareDir: 0
+  FindBin: 0
+  HTTP::Status: 0
+  List::MoreUtils: 0
+  List::Util: 1.45
+  POSIX: 0
+  Plack: 1.0030
+  Plack::MIME: 0
+  Plack::Request: 0
+  Plack::Response: 0
+  Scalar::Util: 0
+  Time::HiRes: 0
+  base: 0
+  feature: 0
+  perl: v5.10.1
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/Silencer2K/perl-spike-2.0/issues
+  homepage: https://github.com/Silencer2K/perl-spike-2.0
+  repository: https://github.com/Silencer2K/perl-spike-2.0.git
+version: 2.0004
+x_authority: cpan:SILENCER

@@ -1,0 +1,13 @@
+Revision history for Perl extension ShipIt::Step::CommitMessageWrap
+
+0.04    2007-12-31T23:59:59+09:00
+        - added requires ShipIt in Makefile.PL
+
+0.03    2007-12-31T17:30:00+09:00
+        - tag_version method hook point is mistaken
+
+0.02    2007-12-31T17:21:00+09:00
+        - fixed UUV warnings
+
+0.01    2007-12-31T17:01:04+09:00
+        - original version

@@ -1,0 +1,7 @@
+<check>
+  <contact:check xmlns:contact="urn:ietf:params:xml:ns:contact-1.0">
+[% FOR contact_id = contact_ids -%]
+    <contact:id>[% contact_id %]</contact:id>
+[% END -%]
+  </contact:check>
+</check>

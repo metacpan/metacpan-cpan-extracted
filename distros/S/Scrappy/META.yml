@@ -1,0 +1,37 @@
+---
+abstract: 'The All Powerful Web Spidering, Scraping, Creeping Crawling Framework'
+author:
+  - 'Al Newkirk <awncorp@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  File::ShareDir::Install: 0.03
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200006, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Scrappy
+requires:
+  Array::Unique: 0
+  Cwd: 0
+  Data::Dumper: 0
+  DateTime: 0
+  DateTime::Format::SQLite: 0
+  File::Find::Rule: 0
+  File::ShareDir: 0
+  File::Slurp: 0
+  File::Util: 0
+  HTML::TreeBuilder: 0
+  Moose: 0
+  Parallel::ForkManager: 0
+  String::TT: 0
+  Template: 0
+  Test::More: 0
+  Try::Tiny: 0
+  URI: 0
+  WWW::Mechanize: 0
+  Web::Scraper: 0
+  YAML::Syck: 0
+version: 0.94112090

@@ -1,0 +1,43 @@
+{
+   "abstract" : "SeeAlso handling of International Standard Serial Numbers",
+   "author" : [
+      "Thomas Berger C<< <THB@cpan.org> >>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "SeeAlso-Identifier-ISSN",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.35"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Business::ISSN" : 0,
+            "SeeAlso::Identifier" : "0.46",
+            "perl" : "v5.8.2"
+         }
+      }
+   },
+   "provides" : {
+      "SeeAlso::Identifier::ISSN" : {
+         "file" : "lib/SeeAlso/Identifier/ISSN.pm",
+         "version" : "0.5704"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.5704"
+}

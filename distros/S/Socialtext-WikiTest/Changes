@@ -1,0 +1,48 @@
+0.07 - Mon Dec  6 17:13:38 PST 2010
+ - added select_and_wait()
+ - moved the start_time variable into the base class
+ - moved the handle_command up into the base class
+ - escape backticks for option names, to allow crazy options
+ - Fix a bug to allow UTF8 characters in regexps - Thanks Takatoshi Kitano
+ - Add the 'include' command to the base fixture
+ - move non-selenium functions into the fixture base class
+ - add a 'set_default' method that is like ||=
+ - Allow handle_command to pass through more than 2 args.
+ - fix a test
+
+0.06 - Thu Jun 21 15:47:13 PDT 2007
+ - Fix a bug that prevented testing whether a value was "0"
+ - Handle multi-byte characters better - Thanks Takatoshi Kitano
+
+0.05 - Mon Apr  9 11:00:01 PDT 2007
+ - move Socialtext specific code out of this module
+ - move the fixture test utility code into a package 
+ - s/Mock::Rester/Socialtext::Resting::Mock/
+
+0.04 - March 21, 2007
+ - Added a failing test if a testplan dies
+ - updated Socialtext ids based on UI changes
+ - Made Socialtext watchlist code more robust
+ - Change the selenium browser with $ENV{selenium_browser}
+ - Added print_page for debugging
+ - Modified socialtext st_login to redirect to the workspace
+
+0.03 - Mon Mar 12 21:20:05 PDT 2007
+ - Null now prints out commands
+ - Add util/run-wiki-tests example script
+ - test plans that die shouldn't stop all testing
+ - fixed st-admin when called with no verify option
+
+0.02 - Fri Dec 29 15:09:10 PST 2006
+ - added a bunch more Socialtext fixture commands
+ - use click_and_wait more
+ - option description for click_and_wait
+ - enhanced qr// support for most fields
+ - Added mock rester support for local testing from file
+ - Add variable support to selenium commands
+ - Added st-admin fixture command
+ - Added st-force-confirmation command
+
+0.01 - Wed Dec 20 11:43:02 PST 2006
+ - first release
+ - extra awesome

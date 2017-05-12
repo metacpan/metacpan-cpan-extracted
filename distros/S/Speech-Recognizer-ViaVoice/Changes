@@ -1,0 +1,13 @@
+Revision history for Perl extension Speech::Recognizer::ViaVoice.
+
+0.02  Fri Jul  6 10:58:08 CDT 2001
+	- added link to ViaVoice in the perldoc comments and a filter
+		to change it into a link in README.html
+	- bin/pronunciations.pl now created from bin/pronunciations.pl.in.  The
+		dynamically created file reflects proper values for ViaVoice root
+		dir and default locale.
+
+0.01  Tue Jun 26 21:44:35 2001
+	- original version; created by h2xs 1.21 with options
+		-x -O -A speechr.h
+

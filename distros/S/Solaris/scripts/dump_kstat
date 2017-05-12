@@ -1,0 +1,75 @@
+#!/usr/local/bin/perl -w
+
+use strict;
+use Solaris::Kstat;
+
+my $ks = Solaris::Kstat->new();
+foreach my $m (sort(keys(%$ks)))
+   {
+   foreach my $i (sort(keys(%{$ks->{$m}})))
+      {
+      foreach my $n (sort(keys(%{$ks->{$m}->{$i}})))
+         {
+         foreach my $k (sort(keys(%{$ks->{$m}->{$i}->{$n}})))
+            {
+            print("$m.$i.$n $k = $ks->{$m}->{$i}->{$n}->{$k}\n");
+            }
+         print("\n");
+         }
+      }
+   }
+__END__
+
+=head1 NAME
+
+dump_kstat - Dump the kstat structure
+
+=head1 SYNOPSIS
+
+dump_kstats
+
+=head1 DESCRIPTION
+
+This simple script dumps the entire kstat structure to stdout - useful for
+figuring out what statistics are available.
+
+=head1 EXAMPLES
+
+ $ dump_kstat
+ audio.0.audioc0 class = controller
+ audio.0.audioc0 crtime = 3533.04802622
+ audio.0.audioc0 hard = 444966
+ audio.0.audioc0 multiple service = 0
+ audio.0.audioc0 snaptime = 1993147.67168284
+ audio.0.audioc0 soft = 0
+ audio.0.audioc0 spurious = 0
+ audio.0.audioc0 watchdog = 0
+
+ cpu_info.0.cpu_info0 class = misc
+ cpu_info.0.cpu_info0 clock_MHz = 296
+ cpu_info.0.cpu_info0 cpu_type = sparc
+ cpu_info.0.cpu_info0 crtime = 48.927526937
+ cpu_info.0.cpu_info0 fpu_type = sparc
+ cpu_info.0.cpu_info0 snaptime = 1993147.67383159
+ cpu_info.0.cpu_info0 state = on-line
+ cpu_info.0.cpu_info0 state_begin = 906386861
+
+ :
+ :
+ :
+
+ $ 
+
+=head1 AUTHOR
+
+Alan Burlison, <Alan.Burlison@uk.sun.com>
+
+=head1 SEE ALSO
+
+L<kstat(3K)>
+
+"Sun Performance And Tuning - Java And The Internet" 2nd ed. by Adrian Cockroft
+and Richard Pettit - ISBN 0-13-095249-4.  This book explains many of the
+statistics displayed by this utility.
+
+=cut

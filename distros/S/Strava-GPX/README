@@ -1,0 +1,25 @@
+NAME
+    Strava-GPX - Get a gpx file from a strava ride
+
+SYNOPSIS
+      use Strava::GPX;
+      my $strava = Strava::GPX->new( $url );
+      my $gpx = $strava->to_gpx; # gpx file content
+
+DESCRIPTION
+    Grab a Strava page, find a course, output a gpx file so you can go ride
+    it.
+
+SEE ALSO
+    Strava::Utilities
+
+AUTHOR
+    Fred Moyer, <fred@redhotpenguin.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2012 by Fred Moyer
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.16.0 or, at
+    your option, any later version of Perl 5 you may have available.
+

@@ -1,0 +1,35 @@
+Revision history for Perl extension SWISHE::API::Remote.
+
+0.10  Thu Jul 07 14:06:00 2006
+	- die() if unknown options are passed to SWISH::API::Remote::new()
+	- added new HEADERS, CHARS and META search options as per pek
+	  (Peter Karman) suggestions
+	- added SWISH::API::Remote's 'timeout' field for LWP, documented 
+	- added to documentation, updated example to specify index and options
+	- added 'query', 'stopwords' and 'headers' fields to 
+	  SWISH::API::Results as per pek's additions and documented 
+	- updated example in pod of Remote.pm to specify index and options
+	- added pek's swished_example.cgi to new example/ subdir
+	- moved swishedsearch example to new subdir example/
+	- don't install swishedsearch in perl's bin/ directory (via Makefile.PL)
+	- SWISH::API::Result::Properties are returned sorted
+	- updated copyrights to show 2004-2006, not 2004
+	- corrected, added to and improved documentation and TODO file
+	- there is no version 0.08 or 0.09 
+0.07  Mon Aug 09 18:26:34 2004
+	- modified SWISH::API::Remote's APIs a wee smidgen
+	- made seperate modules in Remote/ :
+	    Results.pm, Result.pm, and FunctionGenerator.pm
+	- documented a lot more
+	- renamed clienttest.pl to swishedsearch
+	- better output from swishedsearch
+0.06  Mon Aug 09 15:26:45 2004
+	- added hash options to SWISH::API::Remote's 
+	    new() and Execute() methods
+	- fixed error usage in SWISH::API::Remote and clienttest.pl
+0.04  Wed Jul 28 15:37:16 2004
+	- first release on joshr.com/src/SWISH-API-Remote
+0.01  Wed May 19 09:36:19 2004
+	- original version; created by h2xs 1.23 with options
+		-AX -n SWISHE::API::Remote
+

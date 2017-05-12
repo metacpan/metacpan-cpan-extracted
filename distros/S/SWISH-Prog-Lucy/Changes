@@ -1,0 +1,105 @@
+Revision history for SWISH-Prog-Lucy
+
+0.25 01 Aug 2015
+ - fix POD synopsis for Searcher in main SWISH::Prog::Lucy to match Searcher SYNOPSIS
+   (h/t https://rt.cpan.org/Ticket/Display.html?id=106189)
+
+0.24 15 Sept 2014
+ - fixes for Lucy 0.4.0
+
+0.23 22 July 2014
+ - improve support for multi-value fields
+
+0.22 21 July 2014
+ - fix regression introduced in 0.21 where case-sensitive fulltext fields
+    with stemming on were not stemmed.
+
+0.21 18 July 2014
+ - add 'id' attribute to Searcher, Results, Result
+ - add fields support for PropertyNamesCompareCase, PropertyNamesIgnoreCase,
+   and better delineation of what it means to define a field as a PropertyName 
+   but not a MetaName (store but do not tokenize)
+
+0.20 02 March 2014
+ - check for undef query returned by Search::Query::Parser
+
+0.19 13 Dec 2013
+ - fix tests for change in SWISH::Prog 0.75
+
+0.18 4 Oct 2013
+ - packaging clean up 
+ - bump dependency on LucyX::Search::WildcardQuery 
+
+0.17 12 Feb 2013
+ - fix bug in dynamically-added PropertyNames where sortable flag was not
+   turned on.
+
+0.16 12 Feb 2013
+ - support UndefinedMetaTags 'autoall' for adding PropertyNames as well as 
+   MetaNames dynamically. Requires SWISH::3 1.000006.
+
+0.15 10 Feb 2013
+ - refactored internal initialization of query parser, adding qp_config
+   option to constructor. This should solve the issue when
+   UndefinedMetaTags is set to 'auto' in the Indexer, and additional fields
+   are added to an existing index.
+
+0.14 04 Feb 2013
+ - include built-in swish* properties as search-able fields.
+
+0.13 30 Jan 2013
+ - add Searcher->nfs_mode so that manager logic is optional. Feature has
+   been in there since 0.08 but not needed unless we are running under NFS.
+
+0.12 29 Nov 2012
+ - support stale searcher detection when multiple indexes are being
+   searched.
+
+0.11 3 Sept 2012
+ - refer to header meta file internally using official API method
+ - added Indexer->abort method
+
+0.10 23 Aug 2012
+ - croak_on_error => 1 in Search::Query::Parser means invalid queries now
+   generate an exception in Searcher.
+ - Result->score will always return a positive integer (score || 1)
+
+0.09 28 July 2012
+ - add property_map to respect PropertyNameAlias params in get_property()
+ - fix MANIFEST to include missing Module::Install files
+
+0.08 19 July 2012
+ - bump dependencies
+ - switch to Module::Install
+ - include bin/lucyx-dump-terms example script
+ - add dependency on Sys::Hostname, to support indexes on NFS shares.
+
+0.07 13 Oct 2011
+ - expose qp() attribute as part of public API.
+ - add get_propnames() method to Searcher.
+
+0.06 11 Oct 2011
+ - fix tests, bump dependency on SWISH::Prog 0.53
+
+0.05 26 Sept 2011
+ - add stemming support for Stemmer configuration and back compat with
+   Swish-e v 2.x FuzzyIndexingMode.
+
+0.04 10 Sept 2011
+ - add highlightable_fields feature to expose the highlightable attribute
+   of Lucy FullTextField objects.
+ - add find_relevant_fields feature to locate the fields that matched the
+   query. Depends upon highlightable_fields being set to true.
+
+0.03 28 June 2011
+ - no functional changes, just bumped version because SWISH::Prog 0.51 had
+   not been released prior to 0.02 and all the failing test reports are
+   misleading.
+
+0.02 23 June 2011
+ - Fix bad s/ks/lucy/ strings from initial port.
+ - bump SWISH::Prog dependency
+
+0.01 21 June 2011
+ - Initial release, based on SWISH::Prog::KSx.
+

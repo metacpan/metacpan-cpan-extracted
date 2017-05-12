@@ -1,0 +1,13 @@
+Revision history for Perl extension Statistics::Associations
+
+0.00003  2008/11/19
+        - fix a bug in case that is called without make_matrix()
+        - fix a typo in docs ( 'contingenvy -> 'contingency' )
+        - add some error cases 
+        - add test codes
+
+0.00002  2008/11/18 
+        - fix a typo in docs ( 'Normal Scale' -> 'Nominal Scale' ) 
+
+0.00001  2008/11/18 
+        - original version

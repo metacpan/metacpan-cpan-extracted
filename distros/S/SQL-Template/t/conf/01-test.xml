@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<st:sql>
+	
+	<st:do name="drop_table_person" >
+		DROP TABLE IF EXISTS PERSON
+	</st:do>
+
+	<st:do name="drop_table_country" >
+		DROP TABLE IF EXISTS COUNTRY
+	</st:do>
+	
+	<st:do name="create_table_country" >
+		CREATE TABLE COUNTRY(
+			COUNTRY_ID	CHAR(2) PRIMARY KEY,
+			NAME 		VARCHAR2(30)
+		)
+	</st:do>
+
+	
+	<st:do name="create_table_person" >
+		CREATE TABLE PERSON(
+			ID 			INTEGER PRIMARY KEY,
+			NAME 		VARCHAR2(30),
+			SURNAME		VARCHAR2(30),
+			BORNDATE	DATETIME,
+			COUNTRY_ID	CHAR(2),
+			GENDER		VARCHAR2(1)
+		)
+	</st:do>
+
+	<st:do name="insert_country" >
+		INSERT INTO COUNTRY(COUNTRY_ID, NAME)
+		VALUES( ${COUNTRY_ID}, ${NAME} )
+	</st:do>
+
+	<st:do name="insert_person" >
+		INSERT INTO PERSON(ID, NAME, SURNAME, BORNDATE, COUNTRY_ID, GENDER)
+		VALUES( ${ID}, ${NAME}, ${SURNAME}, ${BORNDATE}, ${COUNTRY_ID}, ${GENDER})
+	</st:do>
+
+	<st:select name="query_for_person" >
+		SELECT * FROM PERSON 
+		<st:if test="${ID}" prepend="WHERE">
+			ID=${ID}
+		</st:if>
+	</st:select>	
+	
+	<st:select name="count_people" >
+		SELECT COUNT(*) FROM PERSON 
+		<st:if test="${ID}" prepend="WHERE">
+			ID=${ID}
+		</st:if>
+	</st:select>
+	
+</st:sql>

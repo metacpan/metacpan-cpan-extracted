@@ -1,0 +1,25 @@
+#!/usr/local/bin/perl -s
+#
+# sasindex - Make an index for a set of SAS files
+#
+# just a demo
+
+$usage = q{sasindex [options] sasfile [.. sasfile]
+	 };
+
+#	If you cannot install SAS::Parser in the standard lib/perl
+#  directory, uncomment next line and change to your personal 
+#  lib/perl directory
+#  unshift @INC "$ENV{HOME}/lib/perl";
+
+ use SAS::Index;
+
+ $filelist = new SAS::Index;
+ 
+ $filelist->makeindex(@ARGV);
+ 
+ foreach $f (@{$filelist->{files}}) {
+ 	my $index = ${$filelist->{entries}{$f}};
+ 	print "Indexed $f:\n$index\n";
+ }
+ exit; 

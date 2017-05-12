@@ -1,0 +1,32 @@
+---
+abstract: 'Adds MD5 information when filtering an image for SWISHE.'
+author:
+  - 'Logan Bell, C<< <loganbell at gmail.com> >>'
+  - 'Logan Bell <loganbell@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.14'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: SWISH-Filters-ImageToMD5Xml
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Digest::MD5: 0
+  MIME::Base64: 0
+  SWISH::Filter: 0
+  Search::Tools::XML: 0.06
+  XML::Simple: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/logie17/SWISH-Filters-ImageMD5ToXml
+version: '0.04'

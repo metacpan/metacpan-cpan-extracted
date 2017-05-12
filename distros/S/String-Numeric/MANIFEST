@@ -1,0 +1,22 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/String/Numeric.pm
+lib/String/Numeric/PP.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/000_load.t
+t/005_import.t
+t/010_usage.t
+t/020_basic.t
+t/060_overload.t
+t/070_tiescalar.t
+t/lib/myconfig.pm

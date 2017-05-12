@@ -1,0 +1,38 @@
+Statistics-useR version 0.01
+================
+
+INSTALLATION
+
+Before installing, make sure following environment variables exist.
+export R_HOME="/usr/lib/R"
+export R_SHARE_DIR="/usr/share/R/share"
+export R_DOC_DIR="/usr/share/R/doc"
+export LD_LIBRARY_PATH=${R_HOME}/lib
+(R installation may be different with above path)
+
+By default, R_HOME should have "lib" and "include" directories which are necessary for compiling this module. If not, please find where "libR.so" and header files such as "R.h", "Rinternals.h" are located, then link the files as followes. 
+------------------------------------------
+ln -s libR.so-dir ${R_HOME}/lib 
+ln -s header-files-dir ${R_HOME}/include
+------------------------------------------
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires the installation of R(version > 2.7) and Perl version > 5.10.
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2011 by LIB@SAIC-Frederick
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.

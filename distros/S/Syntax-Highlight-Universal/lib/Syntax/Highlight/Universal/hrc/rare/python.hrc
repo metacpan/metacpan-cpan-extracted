@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<!DOCTYPE hrc PUBLIC "-//Cail Lomecb//DTD Colorer HRC take5//EN"
+  "http://colorer.sf.net/2003/hrc.dtd">
+<hrc version="take5" xmlns="http://colorer.sf.net/2003/hrc"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://colorer.sf.net/2003/hrc http://colorer.sf.net/2003/hrc.xsd">
+<!--
+    Python Defs
+With help of:
+    Grzegorz Makarewicz <mak@mikroplan.com.pl>
+-->
+   <type name="python">
+
+      <import type="def"/>
+
+      <region name="pyString" parent="String"/>
+      <region name="pyComment" parent="Comment"/>
+      <region name="pySymb" parent="Symbol"/>
+      <region name="pyWord" parent="Keyword"/>
+      <region name="pyBuiltins" parent="Label"/>
+      <region name="pyOctNumb" parent="NumberOct"/>
+      <region name="pyException" parent="Label"/>
+
+
+      <scheme name="python">
+         <regexp match="/(\#.*$)/" region0="pyComment"/>
+         <block start="/[uUrR]?\&#34;\&#34;\&#34;/" end="/\&#34;\&#34;\&#34;/" scheme="Comment" region="pyComment" region00="PairStart" region10="PairEnd"/>
+         <block start="/[uUrR]?'''/" end="/'''/" scheme="Comment" region="pyComment" region00="PairStart" region10="PairEnd"/>
+<!-- Strings -->
+         <regexp match="/([uUrR]?(?{PairStart}&#34;)(\\.|[^\\&#34;])*?(?{PairEnd}&#34;))/" region="pyString"/>
+         <regexp match="/([uUrR]?(?{PairStart}')(\\.|[^\\'])*?(?{PairEnd}'))/" region="pyString"/>
+<!-- Numbers -->
+         <inherit scheme="FloatNumber"/>
+         <inherit scheme="CHexNumber"/>
+         <inherit scheme="DecNumber"/>
+         <regexp match="/\b(0[0-7]*[Ll]?)\b/" region0="pyOctNumb"/>
+         <regexp match="/(?{PairStart}`).*(?{PairEnd}`)/" region0="pyBuiltins"/>
+         <regexp match="/^\M \s* def \s+ ([\w_]+) \s* \( .* \) \s* :/x" region1="Function"/>
+         <regexp match="/^\M \s* class \s+ ([\w_]+) \s* (\( .* \))? \s* :/x" region1="Function"/>
+         <inherit scheme="PairedBrackets">
+            <virtual scheme="PairedBrackets" subst-scheme="python"/>
+         </inherit>
+         <keywords region="pySymb">
+            <symb name=";"/>
+            <symb name="="/>
+            <symb name="+"/>
+            <symb name="-"/>
+            <symb name="/"/>
+            <symb name="*"/>
+            <symb name="&amp;"/>
+            <symb name="|"/>
+            <symb name="^"/>
+            <symb name="("/>
+            <symb name=")"/>
+            <symb name="["/>
+            <symb name="]"/>
+            <symb name=","/>
+            <symb name="."/>
+            <symb name=":"/>
+            <symb name="!"/>
+            <symb name="~"/>
+            <symb name="&lt;"/>
+            <symb name="&gt;"/>
+            <symb name="%"/>
+            <symb name="{"/>
+            <symb name="}"/>
+            <symb name="?"/>
+         </keywords>
+         <keywords region="pyWord">
+            <word name="and"/>
+            <word name="assert"/>
+            <word name="break"/>
+            <word name="continue"/>
+            <word name="del"/>
+            <word name="elif"/>
+            <word name="else"/>
+            <word name="except"/>
+            <word name="exec"/>
+            <word name="finally"/>
+            <word name="for"/>
+            <word name="from"/>
+            <word name="global"/>
+            <word name="if"/>
+            <word name="return"/>
+            <word name="try"/>
+            <word name="import"/>
+            <word name="in"/>
+            <word name="is"/>
+            <word name="not"/>
+            <word name="or"/>
+            <word name="pass"/>
+            <word name="print"/>
+            <word name="raise"/>
+            <word name="while"/>
+            <word name="def"/>
+            <word name="class"/>
+            <word name="yield"/>
+         </keywords>
+         <keywords region="pyException">
+            <word name="ArithmeticError"/>
+            <word name="AssertionError"/>
+            <word name="AttributeError"/>
+            <word name="EOFError"/>
+            <word name="EnvironmentError"/>
+            <word name="Exception"/>
+            <word name="FloatingPointError"/>
+            <word name="IOError"/>
+            <word name="ImportError"/>
+            <word name="IndexError"/>
+            <word name="KeyError"/>
+            <word name="KeyboardInterrupt"/>
+            <word name="LookupError"/>
+            <word name="MemoryError"/>
+            <word name="NameError"/>
+            <word name="NotImplementeError"/>
+            <word name="OSError"/>
+            <word name="OverflowError"/>
+            <word name="RuntimeError"/>
+            <word name="StandarError"/>
+            <word name="StopIteration"/>
+            <word name="SyntaxError"/>
+            <word name="SystemError"/>
+            <word name="SystemExit"/>
+            <word name="TypeError"/>
+            <word name="ValueError"/>
+            <word name="ZeroDivisionError"/>
+         </keywords>
+         <keywords region="pyBuiltins">
+            <word name="Ellipsis"/>
+            <word name="False"/>
+            <word name="None"/>
+            <word name="True"/>
+            <word name="lambda"/>
+            <word name="__debug__"/>
+            <word name="__doc__"/>
+            <word name="__import__"/>
+            <word name="__name__"/>
+            <word name="__class__"/>
+            <word name="__future__"/>
+            <word name="__init__"/>
+            <word name="__del__"/>
+            <word name="__call__"/>
+            <word name="__iter__"/>
+            <word name="__getattr__"/>
+            <word name="__setattr__"/>
+            <word name="__delattr__"/>
+            <word name="__getitem__"/>
+            <word name="__setitem__"/>
+            <word name="__delitem__"/>
+            <word name="__getslice__"/>
+            <word name="__setslice__"/>
+            <word name="__delslice__"/>
+            <word name="__get__"/>
+            <word name="__set__"/>
+            <word name="__delete__"/>
+            <word name="__str__"/>
+            <word name="__repr__"/>
+            <word name="__cmp__"/>
+            <word name="__rcmp__"/>
+            <word name="__nonzero__"/>
+            <word name="__len__"/>
+            <word name="__lt__"/>
+            <word name="__le__"/>
+            <word name="__gt__"/>
+            <word name="__ge__"/>
+            <word name="__eq__"/>
+            <word name="__ne__"/>
+            <word name="__add__"/>
+            <word name="__sub__"/>
+            <word name="__mul__"/>
+            <word name="__mod__"/>
+            <word name="__div__"/>
+            <word name="__floordiv__"/>
+            <word name="__truediv__"/>
+            <word name="__divmod__"/>
+            <word name="__pow__"/>
+            <word name="__lshift__"/>
+            <word name="__rshift__"/>
+            <word name="__and__"/>
+            <word name="__or__"/>
+            <word name="__xor__"/>
+            <word name="__radd__"/>
+            <word name="__rsub__"/>
+            <word name="__rmul__"/>
+            <word name="__rdiv__"/>
+            <word name="__rmod__"/>
+            <word name="__rdivmod__"/>
+            <word name="__rpow__"/>
+            <word name="__rlshift__"/>
+            <word name="__rrshift__"/>
+            <word name="__rand__"/>
+            <word name="__ror__"/>
+            <word name="__rxor__"/>
+            <word name="__iadd__"/>
+            <word name="__isub__"/>
+            <word name="__imul__"/>
+            <word name="__idiv__"/>
+            <word name="__imod__"/>
+            <word name="__ipow__"/>
+            <word name="__ilshift__"/>
+            <word name="__irshift__"/>
+            <word name="__iand__"/>
+            <word name="__ior__"/>
+            <word name="__ixor__"/>
+            <word name="__neg__"/>
+            <word name="__pos__"/>
+            <word name="__abs__"/>
+            <word name="__invert__"/>
+            <word name="__int__"/>
+            <word name="__long__"/>
+            <word name="__float__"/>
+            <word name="__complex__"/>
+            <word name="__oct__"/>
+            <word name="__hex__"/>
+            <word name="__coerce__"/>
+            <word name="__contains__"/>
+            <word name="__hash__"/>
+            <word name="__slots__"/>
+            <word name="__iter__"/>
+            <word name="__next__"/>
+            <word name="abs"/>
+            <word name="apply"/>
+            <word name="buffer"/>
+            <word name="callable"/>
+            <word name="chr"/>
+            <word name="classmethod"/>
+            <word name="cmp"/>
+            <word name="coerce"/>
+            <word name="compile"/>
+            <word name="complex"/>
+            <word name="delattr"/>
+            <word name="dir"/>
+            <word name="divmod"/>
+            <word name="eval"/>
+            <word name="execfile"/>
+            <word name="exit"/>
+            <word name="filter"/>
+            <word name="float"/>
+            <word name="getattr"/>
+            <word name="getattribute"/>
+            <word name="globals"/>
+            <word name="hasattr"/>
+            <word name="hash"/>
+            <word name="hex"/>
+            <word name="id"/>
+            <word name="input"/>
+            <word name="int"/>
+            <word name="intern"/>
+            <word name="isinstance"/>
+            <word name="issubclass"/>
+            <word name="iter"/>
+            <word name="len"/>
+            <word name="list"/>
+            <word name="locals"/>
+            <word name="long"/>
+            <word name="map"/>
+            <word name="max"/>
+            <word name="min"/>
+            <word name="oct"/>
+            <word name="open"/>
+            <word name="ord"/>
+            <word name="pow"/>
+            <word name="property"/>
+            <word name="quit"/>
+            <word name="range"/>
+            <word name="raw_input"/>
+            <word name="reduce"/>
+            <word name="reload"/>
+            <word name="repr"/>
+            <word name="round"/>
+            <word name="setattr"/>
+            <word name="slice"/>
+            <word name="str"/>
+            <word name="string"/>
+            <word name="super"/>
+            <word name="tuple"/>
+            <word name="type"/>
+            <word name="vars"/>
+            <word name="xrange"/>
+            <word name="file"/>
+            <word name="dict"/>
+            <word name="classmethod"/>
+            <word name="staticmethod"/>
+         </keywords>
+      </scheme>
+
+   </type>
+</hrc>
+<!-- ***** BEGIN LICENSE BLOCK *****
+   - Version: MPL 1.1/GPL 2.0/LGPL 2.1
+   -
+   - The contents of this file are subject to the Mozilla Public License Version
+   - 1.1 (the "License"); you may not use this file except in compliance with
+   - the License. You may obtain a copy of the License at
+   - http://www.mozilla.org/MPL/
+   -
+   - Software distributed under the License is distributed on an "AS IS" basis,
+   - WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+   - for the specific language governing rights and limitations under the
+   - License.
+   -
+   - The Original Code is the Colorer Library.
+   -
+   - The Initial Developer of the Original Code is
+   - Cail Lomecb <cail@nm.ru>.
+   - Portions created by the Initial Developer are Copyright (C) 1999-2003
+   - the Initial Developer. All Rights Reserved.
+   -
+   - Contributor(s):
+   -
+   - Alternatively, the contents of this file may be used under the terms of
+   - either the GNU General Public License Version 2 or later (the "GPL"), or
+   - the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
+   - in which case the provisions of the GPL or the LGPL are applicable instead
+   - of those above. If you wish to allow use of your version of this file only
+   - under the terms of either the GPL or the LGPL, and not to allow others to
+   - use your version of this file under the terms of the MPL, indicate your
+   - decision by deleting the provisions above and replace them with the notice
+   - and other provisions required by the LGPL or the GPL. If you do not delete
+   - the provisions above, a recipient may use your version of this file under
+   - the terms of any one of the MPL, the GPL or the LGPL.
+   -
+   - ***** END LICENSE BLOCK ***** -->

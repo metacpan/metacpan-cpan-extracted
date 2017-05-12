@@ -1,0 +1,225 @@
+
+SNMP::Monitor - A module for watching interface status, logging
+                interface utilization and arbitrary other SNMP
+                queries
+====================================================================
+
+
+1.) What is it?
+
+Are you managing a network? Then you definitely want to be notified
+about status changes of your WAN lines. You are interested in displaying
+the utilization of both LAN and WAN. You'd like to have accounting
+statistics of your Internet connection. Or you want to have a comfortable
+possibility of watching other SNMP variables.
+
+If HP OpenView or a similar program does this for you, stop reading
+here: You have something far better. If not, read on ...
+
+The SNMP::Monitor package and its frontend 'snmpmon' allow you
+to
+
+    - add or delete routers from or to a set of managed routers
+    - start a permanently running monitor that is watching your
+      interfaces and can do logging into a database
+    - display a graphical view of the interface utilization
+      via the WWW
+    - show interface statistics
+    - includes an access control system that restricts these
+      information to given users based on interface and/or
+      host
+
+The main differences between SNMP::Monitor and packages like MRTG are:
+
+    - SNMP::Monitor is a general purpose framework; you can easily
+      add arbitrary SNMP variables and related triggers
+    - A database engine is used for logging; thus SNMP::Monitor
+      can easily give any kind of accounting report that you like.
+
+If you'd like to see a running example, visit
+
+    http://www.zvw.de/snmpmon_public
+
+2.) Prerequisites
+
+Lots of. :-) First of all, some external binaries are required:
+
+    - GNUplot 3.6beta or later is used for creating GIF images;
+      if you don't have GNUplot, you can still use the SNMP
+      monitor, but no graphical view is available. See
+
+	ftp://cmpc1.phys.soton.ac.uk/pub/
+
+      or
+
+	http://science.nas.nasa.gov/~woo/gnuplot/beta
+
+    - The ppmtogif program, available as part of the netpbm
+      package or as part of the libgr distribution. Sorry,
+      I have no information for obtaining one of these
+      packages available right now, except that libgr is part
+      of my Red Hat Linux distribution. :-)
+
+    - The SNMP client libraries from the UCD snmp distribution,
+      see
+
+	  ftp://ftp.ece.ucdavis.edu:/pub/snmp
+
+      Note, that you don't need a running server, the libraries
+      and header files are completely sufficient.
+
+      Perhaps the CMU package or Juergen Schoenwaelder's version
+      will do, I did not try. In this case you might need an
+      older version of the SNMP module too, see below.
+
+    - MySQL or another database engine with a DBI (Database
+      independent interface for Perl 5) driver
+
+    - Some other Perl modules:
+
+	  Data-Dumper, version 2.081 or later
+          SNMP, version 1.8a1 or later
+          MailTools, version 1.11 or later
+          IO-stringy, version 1.203 or later
+	  HTML::EP, version 0.1005 or later
+          Msql-Mysql-modules, 1.1832 or later (or perhaps your
+              database engines driver)
+
+      Missing Perl modules are available from
+
+	   ftp://ftp.funet.fi/pub/languages/perl/CPAN/modules/by-module
+
+      See Installation below for how to install a Perl module
+
+
+3.) Installation
+
+First you install the Perl modules. For example the Data::Dumper
+module is installed as follows:
+
+    gzip -cd Data-Dumper-2.081.tar.gz | tar xf -
+    cd Data-Dumper-2.081
+    perl Makefile.PL
+    make
+    make test
+    su -c "make install"
+
+Installing the SNMP::Monitor package is just as simple. You will
+be prompted a lot of questions that should hopefully be self
+explaining. I hope the defaults are fine.
+
+For installing the HTML pages, see the docs of the HTML::EP module
+by doing a
+
+    perldoc HTML::EP
+
+this should tell you how to configure your WWW server for feeding
+files with the extension .ep into the HTML::EP system. To verify
+the installation, create a file like
+
+    <ep-perl>
+    print "content-type: text/plain\n\n";
+    print "It worked! Your EP system is up and running.\n";
+    </ep-perl>
+
+and point your browser to the appropriate location (note: Don't use
+a location like file://..., but http://...!).  You should neither see the
+C<ep-perl> nor the C<print> instructions.
+
+After this is done, select a password protected directory and put
+the files from the "html" directory into it. That's all.
+
+You might start the "snmpmon" utility when the system comes up.
+See "Starting the monitor" and "Stopping the monitor" below for
+instructions what to perform when booting or shutting down.
+
+Finally you should manually edit the configuration file. This is
+by default located in
+
+    /etc/snmpmon/configuration
+
+but you might have choosen another location while installing the
+module. Note that what you are editing is Perl source! You are
+bound to the restrictions and you have all the power of Perl in
+this file. However, when done editing, do yourself a favour and
+check, whether you have created correct Perl code again by doing
+a
+
+    perl -e 'require "/etc/snmpmon/configuration"; print "ok\n"'
+
+For a detailed description of the configuration file, see
+
+    perldoc SNMP::Monitor::Install
+
+
+4.) Adding routers
+
+While installing the SNMP::Monitor package, a file like
+"/etc/snmpmon/configuration" should have been created for you.
+Typically it includes one router. Of course you are by no means
+restricted to a single router: You can add more routers at any
+time by doing a
+
+    snmpmon --add <routername>
+
+
+5.) Removing routers
+
+When playing with the configuration file, you might need to remove
+a router. This can be done with
+
+    snmpmon --remove <routername>
+
+
+6.) Starting the monitor
+
+Once you have initialized the system, try a
+
+    snmpmon --start
+
+or
+
+    snmpmon start
+
+If something goes wrong, you should receive an email that tells
+you an error message.
+
+
+7.) Shutting down the monitor
+
+When the system is shutting down, you can do a
+
+    snmpmon --stop
+
+or
+
+    snmpmon stop
+
+Note, that no accounting information is created in that time!
+
+
+8.) Author and Copyright
+
+This program is
+
+        Copyright (C) 1998    Jochen Wiedmann
+                              Am Eisteich 9
+                              72555 Metzingen
+                              Germany
+
+                              Phone: +49 7123 14887
+                              Email: joe@ispsoft.de
+
+All rights reserved.
+
+You may distribute this module under the terms of either the GNU
+General Public License or the Artistic License, as specified in
+the Perl README file.
+
+
+9. See also
+
+the SNMP::Monitor(3) manpage, the snmpmon(1) manpage, the
+SNMP(3) manpage
+
+

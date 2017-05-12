@@ -1,0 +1,39 @@
+Revision history for Setup
+
+1.0.5   2015-09-09 (PERLANCAR)
+
+	- No spec changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+1.0.4   2012-09-04 (SHARYANTO)
+
+        - Specify how function should log dry-run message and message before
+          performing action in 'fix_state' phase.
+
+
+1.0.3   2012-08-21 (SHARYANTO)
+
+        - Follow Rinci 1.1.24. Simplify description (idempotency is implied by
+          transaction protocol). Remove requirement of using
+          Perinci::Sub::Gen::Undoable since it is now deprecated.
+
+
+1.0.2   2012-08-14 (SHARYANTO)
+
+        - No functional changes. Follow Rinci 1.1.23. Simplify description.
+
+
+1.0.1   2012-05-31 (SHARYANTO)
+
+        - Simplify description, as most functionality is now already described
+          in more detail by Rinci 1.1.17+ and Riap 1.1.13+'s transaction/undo
+          protocol.
+
+
+1.0.0   2012-03-28 (SHARYANTO)
+
+        - First release, split from Setup-File.

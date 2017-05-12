@@ -1,0 +1,5 @@
+#!/bin/sh
+
+(cd Libdevinfo-Impl; swig -perl5 -exportall Impl.i)
+perl Makefile.PL
+make

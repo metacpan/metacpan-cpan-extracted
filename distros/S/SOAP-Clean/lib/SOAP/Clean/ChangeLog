@@ -1,0 +1,685 @@
+2003-04-18  Paul Stodghill  <stodghil@quimby-xp>
+
+	* Internal.pm:
+	SOAP::Clean::Internal::Actor::counts: new method
+	SOAP::Clean::Internal::Actor::_comm:
+	 - restructed verbose and statistics code
+	 - compute statistics.
+
+	* XML.pm:
+	Export xml_document_element.
+
+2003-04-15  Paul Stodghill  <stodghil@quimby-xp>
+
+	* XML.pm:
+	Generate real error message if SOAP::Clean::XMLLibxml does not load
+	correctly.
+
+2003-02-18  Paul Stodghill  <stodghil@quimby-xp>
+
+	* XML.pm:
+	Better error messages when an open fails.
+
+2003-01-15  Paul Stodghill  <stodghil@quimby-xp>
+
+	* CGI.pm, Client.pm, Internal.pm, Misc.pm, Processes.pm, Security.pm, Server.pm, WSDL.pm, XML.pm, XMLLibxml.pm, XMLTwig.pm:
+	Added copyright notice.
+
+	* CGI.pm, Client.pm, Internal.pm, Misc.pm, Processes.pm, Security.pm, Server.pm, WSDL.pm, XML.pm, XMLLibxml.pm, XMLTwig.pm:
+	Moved to new location that is consistent with CPAN-style distribution.
+
+2003-01-14  Paul Stodghill  <stodghil@quimby-xp>
+
+	* CGI.pm:
+	*** empty log message ***
+
+	* CGI.pm:
+	handle_post: only set the argument value if it isn't "".
+
+	* Internal.pm:
+	arg_decode_to_string: Bug fix. The test was wrong.
+
+	* Internal.pm:
+	arg_decode_to_string: if the argument has an xml element child, then
+	    guess that it should be unparsed and returned as a string.
+	    Otherwise, try to return the text subelements.
+
+2003-01-13  Paul Stodghill  <stodghil@quimby-xp>
+
+	* CGI.pm:
+	global: die -> assert
+
+	cgi_die_handler -> soap_die_handler and html_die_handler
+	{soap,html}_die_handler set after access method is determined.
+	verbose command line argument is now additive (e.g., -v -v -v)
+	removed ?descr and ?urn "methods".
+
+	handle_post: reimplemented.
+	handle_get: reimplemented.
+	handle_descr: deleted
+	handle_urn: deleted
+
+	* Server.pm:
+	Initialization
+	- Servers start with a default urn, name and full name
+	global:
+	- arg_decode_xxx: renamed arg_decode_to_{string,xml}.
+	_write_to_string: delete. subsumed by Internal::arg_decode_to_string.
+
+	* Internal.pm:
+	global:
+	- die -> assert
+	arg_encode_xml: if arg is string, parse it.
+	arg_decode_xxx: deleted
+	arg_decode_to_xml,arg_decode_to_string:
+	- new functions, subsume arg_decode_xxx
+
+	* Client.pm: global:
+	- simplify_type -> xsd_type_to_sc
+	- arg_decode_xxx -> arg_decode_to_{string,xml}
+
+	* Misc.pm:
+	escape_HTML: new function.
+
+	* XML.pm:
+	global: die -> assert
+	xml_is_element: don't barf on XML values.
+	xml_fix_name: allow empty environments.
+
+2003-01-10  Paul Stodghill  <stodghil@quimby-xp>
+
+	* Server.pm:
+	If a default value is missing, the parameter is only optional.
+
+2003-01-09  Paul Stodghill  <stodghil@quimby-xp>
+
+	* WSDL.pm:
+	Allow documentation elements within operation elements.
+
+	* Internal.pm:
+	Treat floats as strings in order not to lose digits.
+
+2003-01-08  Paul Stodghill  <stodghil@quimby-xp>
+
+	* Server.pm:
+	Print a meaningful error message when a parameter, which appears in
+	out_order(), is an input parameter.
+
+	* Server.pm:
+	Print a meaningful error message when a parameter, which appears in
+	in_order(), is an output parameter.
+
+2003-01-03  Paul Stodghill  <stodghil@quimby-xp>
+
+	* CGI.pm, Misc.pm:
+	Use HTTP_HOST instead of SERVER_NAME:SERVER_PORT
+
+	* Server.pm, Client.pm:
+	Handle optional arguments.
+
+	* WSDL.pm:
+	Backtrace returns a string.
+	maxoccurs -> max_occurs
+
+	* Misc.pm:
+	Backtrace returns a string.
+
+	* Client.pm:
+	_comm returns the response object.
+	Check that _comm responses are successful.
+	Check that _comm responses are XML.
+
+	* Internal.pm:
+	_comm: just return the response object.
+
+2003-01-02  Paul Stodghill  <stodghil@quimby-xp>
+
+	* Client.pm:
+	Include the response string in the error message if the SOAP request
+	fails.
+
+	* Server.pm:
+	Improve log handling. Print it on success.
+
+2002-12-31  Paul Stodghill  <stodghil@quimby-xp>
+
+	* CGI.pm:
+	handle_wsdl: bunch of code moved to Server::Base::_wsdl_generate
+	_wsdl_generate_types: to Server.pm
+	_wsdl_generate_messages: to Server.pm
+	_wsdl_generate_porttype_operation: to Server.pm
+	_wsdl_generate_binding_operation: to Server.pm
+	_wsdl_parameter_type: to Server.pm
+
+	* Server.pm:
+	_wsdl_generate: new function. bunch of code from CGI::handle_wsdl
+	_wsdl_generate_types: from CGI.pm
+	_wsdl_generate_messages: from CGI.pm
+	_wsdl_generate_porttype_operation: from CGI.pm
+	_wsdl_generate_binding_operation: from CGI.pm
+	_wsdl_parameter_type: from CGI.pm
+
+	* Server.pm:
+	Bug fix for processing $$param{optional}.
+
+	Sanity checking for $$param{optional} and $$param{default}
+
+	* Server.pm:
+	Use $$param{optional} and $$param{default} correctly.
+
+	* Server.pm:
+	_read_descr and _parse_descr are methods again.
+
+	initialize: moved from CGI.pm
+	descr_file: moved from CGI.pm
+	descr: moved from CGI.pm
+	params: moved from CGI.pm
+	command: moved from CGI.pm
+	urn: moved from CGI.pm
+	name: moved from CGI.pm
+	full_name: moved from CGI.pm
+	in_order: moved from CGI.pm
+	out_order: moved from CGI.pm
+	_dispatch_method: moved from CGI.pm
+	_Call: moved from CGI.pm
+	_Spawn: moved from CGI.pm
+	_do_Spawn: moved from CGI.pm
+	_Running: moved from CGI.pm
+	_do_Running: moved from CGI.pm
+	_Results: moved from CGI.pm
+	_do_Results: moved from CGI.pm
+	job_info_to_string: moved from CGI.pm
+	job_info_from_string: moved from CGI.pm
+	_ensure_interface: moved from CGI.pm
+	_write_to_file: moved from CGI.pm
+	_read_from_file: moved from CGI.pm
+	_write_to_string: moved from CGI.pm
+
+	* CGI.pm:
+	Now inherits from SOAP::Clean::Server::Base.
+
+	initialize: moved to Server.pm
+	descr_file: moved to Server.pm
+	descr: moved to Server.pm
+	params: moved to Server.pm
+	command: moved to Server.pm
+	urn: moved to Server.pm
+	name: moved to Server.pm
+	full_name: moved to Server.pm
+	in_order: moved to Server.pm
+	out_order: moved to Server.pm
+	_dispatch_method: moved to Server.pm
+	_Call: moved to Server.pm
+	_Spawn: moved to Server.pm
+	_do_Spawn: moved to Server.pm
+	_Running: moved to Server.pm
+	_do_Running: moved to Server.pm
+	_Results: moved to Server.pm
+	_do_Results: moved to Server.pm
+	job_info_to_string: moved to Server.pm
+	job_info_from_string: moved to Server.pm
+	_ensure_interface: moved to Server.pm
+	_write_to_file: moved to Server.pm
+	_read_from_file: moved to Server.pm
+	_write_to_string: moved to Server.pm
+
+	* Security.pm:
+	verify_envelope, decrypt_body: Moved from CGI.pm.
+
+	* CGI.pm:
+	$$param{init} -> $$param{default}
+	_ensure_interface: sanity check parameters
+	read_descr, parse_descr: moved to Server.pm
+
+	* Server.pm:
+	Original version.
+
+2002-12-30  Paul Stodghill  <stodghil@quimby-xp>
+
+	* CGI.pm:
+	_ensure_interface: Check to see that both params() and commands() were
+	both used, or neither was used.
+
+	* CGI.pm:
+	_do_Spawn, _do_Results:
+	  The last commit message lies. $self->{params} is still an array ref.
+
+	params: new method that takes a list of parameter "declarations" and
+	initializes $self->{params}.
+
+	* CGI.pm:
+	command: new method for adding command line information to server
+	  object. Alternative to descr() approach. Can be a string or a function
+	  reference. If a string, variable references, ${var}, in the string are
+	  replaced with the appropriate parameter value to generate the final
+	  command line. If a function reference, called with a hash table that
+	  maps parameter names to their replacement values.
+
+	_do_Spawn, _do_Results:
+	  $self->{params} is now a readonly hash table.
+	  the job info contains %replacements instead of $self->{params}.
+
+	_do_Spawn:
+	  Use the value $self->{command} to generate the command line, either
+	  via function call or substitution.
+
+	parse_descr:
+	  Parameters are now a hashtable, not an array.
+
+	* Misc.pm:
+	assert: return the value that is asserted, so we can say "assert($x)+$y".
+
+	* CGI.pm:
+	Updated for the new object-oriented interface to SOAP::Clean::Processes.
+
+	* Processes.pm:
+	Converted to an object-oriented interface. All of the existing functions
+	are methods of SOAP::Clean::Processes::Basic, which inherits from an
+	abstract base class SOAP::Clean::Processes::Base. This allows us to add
+	alternate process manipulation routines.
+
+2002-12-27  Paul Stodghill  <stodghil@quimby-xp>
+
+	* Client.pm:
+	Delete the usage_msg routines.
+
+	* Client.pm:
+	usage -> usage_msg (depricated)
+	usage() now returns a usage data structure
+
+	* CGI.pm:
+	Use CGI routines to contruct headers of responses.
+
+	* Misc.pm:
+	my_cgifile_handler::request
+	- strip \r's
+	- fix parsing of headers
+	- if Status: appears, use it to set the code and message of the response.
+
+2002-12-26  Paul Stodghill  <stodghil@quimby-xp>
+
+	* CGI.pm, Client.pm, Internal.pm:
+	$self argument to arg_decode* and arg_encode* is gone.
+
+	* CGI.pm:
+	"_die" methods are gone. Use plain old "die" instead.
+	Calls to die inside of CGI scripts are caught by cgi_die_handler, which
+	generates a message in the appropriate format.
+
+	* Client.pm, Internal.pm, Processes.pm, Security.pm:
+	"_die" methods are gone. Use plain old "die" instead.
+
+2002-12-24  Paul Stodghill  <stodghil@quimby-xp>
+
+	* CGI.pm, Client.pm, Internal.pm, WSDL.pm:
+	The XML*.pm files were rewriten. These files were updated to account for
+	new function names and new functionality.
+
+	* XML.pm, XMLLibxml.pm, XMLTwig.pm:
+	Major rewrite.
+
+	The XML::LibXML and XML::Twig data structures exist only for a very
+	short while in four I/O functions in XML???.pm. The internal
+	representation used by the rest of the system is completely Perl-based.
+	Alot of function names have changes and alot of functionality has
+	changed.
+
+2002-12-23  Paul Stodghill  <stodghil@quimby-xp>
+
+	* XMLLibxml.pm:
+	xml_get_text:
+	xml_to_fh:
+	xml_to_string:
+	xml_copy: new routines added for the XML??? interface.
+
+	* XML.pm:
+	Switch back to using XML::LibXML
+
+2002-12-22  Paul Stodghill  <stodghil@quimby-xp>
+
+	* CGI.pm:
+	fixed syntax error, removed debugging printf
+
+	* CGI.pm:
+	Added code to allow runtime environment to be set from the command line.
+
+	* CGI.pm:
+	handle_wsdl: ensure that the parameters listed in in_order and out_order
+	    really are parameters.
+
+	* CGI.pm, Client.pm, Internal.pm, Misc.pm, Security.pm, WSDL.pm:
+	No longer assumes the use of XML::LibXML. All XML manipulation is done
+	through SOAP::Clean::XML??? interface.
+
+	* XML.pm:
+	LibXML implementation moved to XMLLibxml.
+
+	This file now just includes one of the XML???.pm implementation files.
+
+	* XMLLibxml.pm, XMLTwig.pm:
+	Original version.
+
+2002-12-16  Paul Stodghill  <stodghil@quimby-xp>
+
+	* Internal.pm:
+	Don't add xmlns="" to xml arguments.
+
+	* CGI.pm:
+	Hoist the server namespace declaration.
+
+	* XML.pm:
+	Don't add enclosing namespaces when extracting an XML node.
+	FIXME!
+
+	* Client.pm:
+	ns1 -> server
+
+	* CGI.pm:
+	Don't use default namespaces. Let's see what breaks.
+
+	* Client.pm:
+	Pass the method_name to _comm, for debugging messages.
+
+	* XML.pm:
+	If the unknown_url is not defined, then how can they be equal?
+
+	* CGI.pm:
+	Don't leave '?wsdl' on the URL that is specified in the WSDL
+
+2002-12-11  Paul Stodghill  <stodghil@quimby-xp>
+
+	* Client.pm:
+	request_document: Use POST, not GET.
+
+2002-12-10  Paul Stodghill  <stodghil@quimby-xp>
+
+	* Misc.pm:
+	my_cgifile_handler::request:
+		Headers "Foo-Bar:" -> HTTP_FOO_BAR
+
+	* Client.pm:
+	Pretty much completely rewritten to handle WSDL.
+
+	* Internal.pm:
+	arg_encode: Function for encoding arguments.
+
+	soaphttp:
+	wsdl_http:
+	wsdl_mime: new globals used in WSDL.pm
+
+	dsig_keys:
+	enc_dec_params: Moved from Client.pm and CGI.pm
+
+	descr_file
+	descr
+	urn
+	name
+	full_name: Moved to CGI.pm
+
+	_comm: Now takes a hash of extra headers.
+
+	read_descr
+	parse_descr: Moved to CGI.pm
+
+	* CGI.pm: dsig_keys:
+	enc_dec_params: Internal.pm
+
+	descr_file:
+	descr:
+	urn:
+	name:
+	full_name: Moved from Internal.pm
+
+	in_order:
+	out_order: New functions to establish the argument and result order.
+
+	handle_wsdl: use in_order and out_order information
+	handle_get: ensure interface
+		Generate \n's
+
+	read_descr:
+	parse_descr: moved from Internal.pm
+
+	* WSDL.pm:
+	Original version.
+
+2002-12-03  Paul Stodghill  <stodghil@quimby-xp>
+
+	* CGI.pm:
+	_Running: arg_decode_string - don't check that it is actually a string.
+	_Results: same.
+
+2002-12-02  Paul Stodghill  <stodghil@quimby-xp>
+
+	* CGI.pm:
+	If the client uses Content-type: text/xml, then the server should use it
+	too.
+
+	* Client.pm:
+	.NET requires that xmlns="server:urn" to be set on responses, so we do
+	it from the client too. Argh.
+
+	* CGI.pm:
+	.NET requires that xmlns="server:urn" to be set on responses. Argh.
+
+	* Internal.pm:
+	arg_encode_xml: Add an xmlns="" attribute, just in case.
+	arg_decode_xml: Extract and close the child.
+
+	* XML.pm:
+	xml_extract_and_close_child: new function
+	xml_fix_name: special case: "xmlns" -> "xmlns:"
+	namespace: should be xmlns:
+
+2002-11-27  Paul Stodghill  <stodghil@quimby-xp>
+
+	* CGI.pm:
+	handle_wsdl: XxxReply -> XxxResult
+
+2002-11-19  Paul Stodghill  <stodghil@quimby-xp>
+
+	* CGI.pm:
+	handle_post: bogus argument to write_to_string. fix later.
+	_write_to_file: set DONT_CHECK argument to arg_decode_xml and
+	arg_decode_raw.
+
+	* Processes.pm:
+	process_spawn: hopefully we get better output from this.
+
+	* Client.pm:
+	result: new method. Set the server to return a single result, not a list
+	of results.
+
+	* CGI.pm:
+	_write_to_string: take a default type as an argument. pass it to
+			  arg_decode
+	_do_Spawn: pass target type to _write_to_string.
+
+	* XML.pm:
+	xml_to_file - put \n at end of xml
+	xml_fix_name - don't return undef for the urn.
+
+2002-11-18  Paul Stodghill  <stodghil@quimby-xp>
+
+	* Client.pm:
+	All occurrences of method _comm:
+	- new argument $tag used for diagnostic messages
+
+	* Internal.pm:
+	_comm: new argument $tag used for diagnostic messages
+
+	* XML.pm:
+	xml_to_file: new routine
+
+2002-11-17  Paul Stodghill  <stodghil@quimby-xp>
+
+	* Processes.pm:
+	process_spawn:
+	- Take the status from the spawned command directly.
+	- close all file handles before doing exec!
+
+	* Client.pm:
+	call: print a nicer error message when waiting.
+
+	* Client.pm:
+	poll_freq: new method
+	args_order, results_order: reindented
+	call: if poll_freq is set, call asynchronously
+
+	* CGI.pm:
+	Set verbose level by environment variable VERBOSE_SERVER
+
+	* Processes.pm:
+	process_spawn: reindent
+
+	* Processes.pm:
+	process_spawn: extra single quote.
+
+	* CGI.pm:
+	Missing comma.
+
+	* Internal.pm:
+	arg_encode_float: bug fix.
+
+	* Client.pm:
+	Don't retrieve the WSDL, 'cause we don't use it yet.
+
+	* CGI.pm:
+	process_run and process_spawn take an additional argument which is the
+	name of a file into which stdout and stderr will be written.
+
+	$job_info objects are modified accordingly.
+
+	* Processes.pm:
+	process_run and process_spawn take an additional argument which is the
+	name of a file into which stdout and stderr will be written.
+
+2002-11-15  Paul Stodghill  <stodghil@quimby-xp>
+
+	* CGI.pm:
+	Global - check that urn and name are set.
+	Implement ...?urn for obtaining the urn.
+
+	* Client.pm:
+	urn is obtained from the server.
+
+	* XML.pm:
+	xml_from_url: new routine.
+
+	* Client.pm:
+	Client::new - split to Actor::new and Client::initialize
+	Client::initialize - new method
+
+	read_descr, parse_descr: are now methods of Actor;
+
+	* CGI.pm:
+	CGI::new - split to Actor::new and CGI::initialize
+	CGI::initialize - new method
+
+	read_descr, parse_descr: are now methods of Actor;
+
+	* Internal.pm:
+	Actor::new - initialization moved to Actor::initialize
+	Actor::initialize - new method
+	read_descr, parse_descr: are now methods of Actor;
+
+	* Client.pm: new:
+	_ensure_interface:
+	- setting all of the xxx_params values is done in _ensure_interface.
+
+	_deconstruct_results_list:
+	- use the param information to determine a default_type for decoding.
+
+	* CGI.pm: go:
+	- Allow any case for "wsdl" and "descr" in the query string
+
+	arg_decode_base64 -> arg_decode_raw
+	arg_encode_base64 -> arg_encode_raw
+
+	_write_to_string: missing "}"
+
+	* Internal.pm:
+	arg_decode_base64 -> arg_decode_raw
+	arg_encode_base64 -> arg_encode_raw
+
+	arg_decode:
+	- take a default_type as an argument
+	- require either a default_type or an xsd:type attribute in the element
+	  being decoded.
+
+	arg_decode_xxx:
+	- new argument, $dont_check. if set, don't type check the element, just
+	  decode it.
+
+	* Processes.pm:
+	process_run: new routine for synchronous execution.
+
+2002-11-14  Paul Stodghill  <stodghil@quimby-xp>
+
+	* Client.pm:
+	_deconstruct_results_list: use new function arg_decode
+
+	* CGI.pm:
+	_write_to_string: new function arg_decode
+	_handle_wsdl: only generate one portType, binding
+
+	_wsdl_generate_porttype: deleted
+	_wsdl_generate_binding: deleted
+	_wsdl_generate_port: deleted
+
+	_wsdl_generate_porttype_operation: new function
+	_wsdl_generate_binding_operation: new function
+
+	* Internal.pm:
+	arg_encode_float: new function
+	arg_decode_float: new function
+	is_type: bug fix
+	arg_decode: new function
+
+	* XML.pm:
+	xml_get_attr: take a default value, not a not-strict flag
+	xml_get_child: always be strict
+	element: children that are "0" are ignored.
+
+2002-11-13  Paul Stodghill  <stodghil@quimby-xp>
+
+	* CGI.pm:
+	Further changes to get the WSDL right.
+
+	* Internal.pm:
+	is_type: use the new routine, xml_same_names.
+
+	* Misc.pm:
+	backtrace to stderr.
+
+	* Security.pm:
+	Delete the exported names. They were all wrong.
+
+	* XML.pm:
+	xml_fix_name: more cleanups. get attributes without prefixes right.
+	    Visit parents if we have to in order to find the default namespace.
+	xml_same_urns: new routine
+	xml_same_names: new routine
+
+	xml_get_attr: exploit the changes listed above
+	xml_get_child: exploit the changes listed above
+
+2002-11-12  Paul Stodghill  <stodghil@quimby-xp>
+
+	* CGI.pm:
+	_wsdl_generate_porttype: "portType", not "porttype".
+
+	* CGI.pm:
+	handle_wsdl : remove some debugging print statements.
+
+	* XML.pm:
+	xml_dump : misc cleanup.
+	xml_fix_name : add code to handle empty prefixes. still needs work.
+	xml_get_name : handle Document nodes
+	xml_get_child : check that the parameters are defined
+	namespace : rewritten for no good reason
+	element : special case namespace nodes to use setNamespace methods
+
+	* CGI.pm, Client.pm, Internal.pm, Misc.pm, Processes.pm, Security.pm, XML.pm:
+	"Original version". Code taken from old ../Clean.pm
+

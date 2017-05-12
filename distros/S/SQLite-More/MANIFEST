@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/SQLite-More.t
+lib/SQLite/More.pm
+META.yml                                 Module meta-data (added by MakeMaker)

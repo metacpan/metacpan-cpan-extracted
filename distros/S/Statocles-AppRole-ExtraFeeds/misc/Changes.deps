@@ -1,0 +1,16 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+0.001003
+ [Changed / test requires]
+ - Statocles::Test 0 → 0.075
+ - Test::More 0.89 → 0
+
+0.001002 2016-02-26T06:52:21Z
+
+0.001001 2016-02-25T00:34:57Z
+ [Added / configure requires]
+ - CPAN::Meta::Requirements 2.120620
+ - Module::Metadata
+
+ [Changed / test requires]
+ - Beam::Wire 0 → 1.016

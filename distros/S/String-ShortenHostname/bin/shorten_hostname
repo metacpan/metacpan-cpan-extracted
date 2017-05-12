@@ -1,0 +1,109 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+# ABSTRACT: tries to shorten hostnames while keeping them meaningful
+# PODNAME: shorten_hostname
+our $VERSION = '0.006'; # VERSION
+
+
+use String::ShortenHostname::App;
+
+my $app = String::ShortenHostname::App->new_with_options();
+eval { $app->run; };
+if($@) {
+	exit(1);
+}
+
+exit(0);
+
+
+__END__
+=pod
+
+=head1 NAME
+
+shorten_hostname - tries to shorten hostnames while keeping them meaningful
+
+=head1 VERSION
+
+version 0.006
+
+=head1 SYNOPSIS
+
+  shorten_hostname [-?dEefl] [long options...] [hostname] [more hostnames...]
+        -? --usage --help               Prints this usage information.
+        -l --length                     the desired length of the hostname
+                                        string
+        -d --keep_digits_per_domain     number of digits per domain
+        -e --domain_edge                edge string for truncation of domain
+        -m --cut_middle                 dont truncate, cut in the middle of
+                                        domain
+        -f --force                      force string length (truncate)
+        -E --force_edge                 edge string for forced truncation of
+
+Hostnames can be specified as additional arguments or on STDIN.
+
+=head1 DESCRIPTION
+
+shorten_hostname will try to shorten the hostname string to the length specified.
+It will cut each domain part to a given length from right to left till the string is
+short enough or the end of the domain has been reached.
+
+=head1 EXAMPLE
+
+  $ shorten_hostname -l 20 saftpresse.bofh-noc.de
+  saftpresse.bof~c.de
+
+  $ shorten_hostname -l 20 --no-force < t/test_data
+  falcon.lon~n.lon~n.cc.tld
+  r2d2.lon~n.sho~n.cc.tld
+  c3po.sub.sho~n.cc.tld
+  r4p17.sub.sho~n.bla~b.de
+
+=head1 OPTIONS
+
+=over
+
+=item -l, --length <int> (required)
+
+The desired maximum length of the hostname string.
+
+=item -d, --keep_digits_per_domain <int> (default: 5)
+
+Cut each domain part at this length.
+
+=item -e, --domain_edge <str> (default: ~)
+
+If defined this string will be used to replace the end of each domain truncated to
+indicate that it was truncated.
+
+=item -m, --cut_middle, --no-cut_middle (default: On)
+
+If enabled the cut will be done one character before the last.
+
+=item -f, --force, --no-force (default: On)
+
+If specified the module will force the length by cutting the result string.
+
+=item -E, --force_edge <str> (default: ~>)
+
+If defined this string will be used to replace the end of the string to
+indicate that it was truncated.
+
+=back
+
+=head1 AUTHOR
+
+Markus Benning <me@w3r3wolf.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Markus Benning.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

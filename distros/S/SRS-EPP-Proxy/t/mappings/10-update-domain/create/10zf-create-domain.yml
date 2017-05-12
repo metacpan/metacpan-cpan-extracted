@@ -1,0 +1,22 @@
+description: set up domain to use a handle
+registrar: 1
+
+
+request: |-
+ <NZSRSRequest VerMajor="4" VerMinor="4" RegistrarId="100">
+  <DomainCreate Delegate="1" DomainName="10zf.co.te" Term="1" ActionId="[% actionid %] 1">
+    <RegistrantContact HandleId="10d"/>
+    <AdminContact HandleId="10d"/>
+    <TechnicalContact HandleId="10d"/>
+    <NameServers>
+      <Server FQDN="ns1.blah.com"/>
+      <Server FQDN="ns2.10ze.co.te" IP4Addr="200.200.200.200"/>
+      <Server FQDN="ns3.10ze.co.te" IP6Addr="1080:0:0:0:8:800:200C:417A" />
+      <Server FQDN="ns4.10ze.co.te" IP4Addr="200.200.200.201" IP6Addr="1080:0:0:0:8:800:200C:417B" />
+    </NameServers>
+  </DomainCreate>
+ </NZSRSRequest>
+
+
+assertions:
+ - xpath_matches: [ '//Error', '0', 'No errors' ]

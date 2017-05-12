@@ -1,0 +1,19 @@
+to install the module...
+
+try 
+
+yum install perl-Storable-CouchDB
+
+or
+
+rpmbuild -ta Storable-CouchDB-0.0X.tar.gz
+rpm -Uhv /path/perl-Storable-CouchDB-0.0X-X.dist.noarch.rpm
+
+or lastly
+
+perl Makefile.PL
+make
+make test
+make install
+
+If you are on a windows box you should use 'nmake' rather than 'make'.

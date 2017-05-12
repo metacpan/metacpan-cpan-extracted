@@ -1,0 +1,50 @@
+Shell version 0.73
+==================
+
+NAME
+
+    Shell - run shell commands transparently within perl
+
+SYNOPSIS
+
+       use Shell qw(cat ps cp);
+       $passwd = cat('</etc/passwd');
+       @pslines = ps('-ww'),
+       cp("/etc/passwd", "/tmp/passwd");
+
+       # object oriented 
+       my $sh = Shell->new;
+       print $sh->ls('-l');
+
+DESCRIPTION
+
+This package is a show case, illustrating how to provide a 
+simple interface for obtaining the standard output of
+arbitrary commands. It shouldn't be used for production programs. 
+
+This was originally written by Larry Wall back in 1994.
+Later contributions came from Jenda@Krynicky.cz, Dave Cottle,
+Casey West and Wolfgang Laun.
+
+Extracted from core distribution for publishing on the CPAN 
+by Adriano Ferreira <ferreira@cpan.org>.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+  Test::More
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Perl 5 Porters
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

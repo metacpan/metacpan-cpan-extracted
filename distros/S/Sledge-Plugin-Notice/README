@@ -1,0 +1,27 @@
+NAME
+       Sledge::Plugin::Notice - show one-time message
+
+SYNOPSIS
+         # in your Sledge::Pages
+         use Sledge::Plugin::Notice;
+         sub post_dispatch_foo {
+             my $self = shift;
+             # do something..
+             $self->notice('Item was successfully created.');
+             $self->redirect('bar');
+         }
+         # in your template
+         [% IF notice %]<h2>[% notice %]</h2>[% END %]
+
+DESCRIPTION
+       Sledge::Plugin::Notice is a plugin for Sledge to show one-
+       time message.
+
+SEE ALSO
+       Bundle::Sledge
+
+AUTHOR
+       Jiro Nishiguchi <jiro@cpan.org>
+
+       This library is free software; you can redistribute it
+       and/or modify it under the same terms as Perl itself.

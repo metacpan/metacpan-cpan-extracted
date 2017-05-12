@@ -1,0 +1,33 @@
+#!/usr/bin/ruby
+
+func binary_search(a,i) {
+
+    var l = 0;
+    var h = a.end;
+
+    while (h >= l) {
+        var mid = (h+l / 2 -> int);
+        a[mid] > i && (h = mid-1; next);
+        a[mid] < i && (l = mid+1; next);
+        return mid;
+    }
+
+    return -1;
+}
+
+
+##
+# Testing
+##
+
+var min = 1;
+var max = 99;
+
+var a = @(min..max)
+
+for i in [@|(min .. min+5), @|(max-5 .. max)] {
+    say i
+    assert_eq(binary_search(a, i), i-1)
+}
+
+say "Test passed!"

@@ -1,0 +1,34 @@
+Revision history for Socket-Netlink
+
+0.05    2016/11/17 22:20:10
+        [CHANGES]
+         * Try also Sub::Util::set_subname()
+
+        [BUGFIXES]
+         * Fix tests for big endian (RT#71112) (thanks ppisar@redhat.com)
+         * Fix nlmsgerr length check (RT#118688) (thanks ppisar@redhat.com)
+
+0.04    CHANGES:
+         * Optionally compile against some genetlink.h constants only found
+           post-2.6.18 so as not to fail to build on older systems
+         * Only upbless Netlink::Generic messages if they're not already a
+           more specific subclass
+         * Reuseable support for nlmsg_type dependent subclassing of message
+           objects
+         * Support different message classes for user->kernel commands vs.
+           kernel->user notifications
+         * Don't hard-depend on Sub::Uplevel
+
+0.03    CHANGES:
+         * Added accessors for finer access of individual netlink attribute
+           values in messages
+
+0.02    CHANGES:
+         * Improved NLMSG_ERROR handling semantics
+         * Don't cache NETLINK_GENERIC familyname => id mapping
+
+        BUGFIXES:
+         * Declare ExtUtils::CChecker as a configure_requires
+
+0.01    First version, released on an unsuspecting world.
+

@@ -1,0 +1,23 @@
+Revision history for Statistics-Reproducibility
+
+0.09    2014-03-15/18:00
+        Independence from Math::Geometry::Multidimensional
+
+0.08    2014-03-12/22:02
+        FIxed variance bug
+
+0.07    2014-03-12/21:47
+        Fixed minimum required observations
+
+0.06	20140305/09:35 GMT
+	Minor Fixes
+
+0.05    20140221/11:38
+        Removed line that overwrites data in run() !!!
+
+0.04    20140108/07:25
+        Updated to reflect change of name of Statistics::TheilSenEstimator
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

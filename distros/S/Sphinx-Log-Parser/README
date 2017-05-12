@@ -1,0 +1,76 @@
+NAME
+    Sphinx::Log::Parser - parse Sphinx searchd log
+
+VERSION
+    version 0.03
+
+SYNOPSIS
+        use Sphinx::Log::Parser;
+        
+    my $parser = Sphinx::Log::Parser->new( '/var/log/searchd/query.log' );
+        while (my $sl = $parser->next) {
+            print $sl->{total_matches}, $sl->{query_date}, "\n"; # more
+        }
+
+DESCRIPTION
+    Sphinx::Log::Parser parse sphinx searchd query.log based on
+    <http://sphinxsearch.com/docs/current.html#query-log-format>
+
+  Constructing a Parser
+    new requires as first argument a source from where to get the searchd
+    query log lines. It can be:
+
+    *   a filename for the searchd query log to be parsed. check query_log
+        in conf file
+
+    *   an IO::Handle object.
+
+    *   a File::Tail object as first argument, in which case the *read*
+        method will be called to get lines to process.
+
+    *   The log string, you need use IO::Scalar
+
+            use IO::Scalar;
+            # 0.9.9
+            my $logstr = '[Fri Oct  1 03:18:46.342 2010] 0.014 sec [ext/2/rel 55 (0,700)] [topic;topicdelta;] [ios=0 kb=0.0 ioms=0.0] @title lucky';
+            my $io = new IO::Scalar \$logstr;
+            my $parser = Sphinx::Log::Parser->new( $io );
+
+  Parsing the file
+    The file is parse one line at a time by calling the next method, which
+    returns a hash-reference containing the following keys:
+
+       {
+         'performances_counters' => 'ios=0 kb=0.0 ioms=0.0',
+         'total_matches' => '55',
+         'match_mode' => 'ext',
+         'query' => '@title lucky',
+         'query_date' => 'Fri Oct  1 03:18:46.342 2010',
+         'query_comment' => undef,
+         'filter_count' => '2',
+         'multiquery_factor' => undef,
+         'index_name' => 'topic;topicdelta;',
+         'limit' => '700',
+         'groupby_attr' => undef,
+         'query_time' => '0.014',
+         'sort_mode' => 'rel',
+         'offset' => '0'
+       },
+
+    The log format is
+
+        [query-date] query-time multiquery-factor [match-mode/filters-count/sort-mode total-matches (offset,limit) @groupby-attr]  [index-name] [performances-counters] [query-comment] query
+        
+    # optionals: multiquery-factor, @groupby-attr, performances-counters, query-comment
+
+AUTHORS
+    *   Fayland Lam <fayland@gmail.com>
+
+    *   Paolo Lunazzi
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Fayland Lam, Paolo Lunazzi.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

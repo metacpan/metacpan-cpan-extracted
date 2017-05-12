@@ -1,0 +1,110 @@
+NAME
+    System2 - like system(), but with access to STDOUT and STDERR.
+
+SYNOPSIS
+      use System2;
+
+      $System2::debug++;
+
+      my ($out, $err) = system2(@args);
+
+      my ($exit_value, $signal_num, $dumped_core) = &System2::exit_status($?);
+      
+      print "EXIT: exit_value $exit_value signal_num ".
+            "$signal_num dumped_core $dumped_core\n";
+      
+      print "OUT:\n$out";
+      print "ERR:\n$err"
+
+DESCRIPTION
+    The module presents an interface for executing a command, and gathering
+    the output from STDOUT and STDERR.
+
+    Benefits of this interface:
+
+    - the Bourne shell is never implicily invoked: saves a stray exec(), and
+      bypasses those nasty shell quoting problems.
+
+    - cheaper to run than open3().
+
+    - augmented processing of arguments, to allow for overriding arg[0] (eg.
+      initiating a login shell).
+
+    STDOUT and STDERR are returned in scalars. $? is set.
+
+    If $debug is set, on-the fly diagnostics will be reported about how much
+    data is being read.
+
+    Provides for convienence, a routine exit_status() to break out the exit
+    value into separate scalars, straight from perlvar(1):
+
+    - the exit value of the subprocess
+
+    - which signal, if any, the process died from
+
+    - reports whether there was a core dump.
+
+    There are two interfaces available: a regular list, or named parameters:
+
+    These are equivilent:
+
+      my @args = ( '/bin/sh', '-x', '-c', 'echo $0' );
+
+      my @args = ( path => '/bin/sh', args => [ '-c', 'echo $0' ] );
+
+    To override arg[0], pass in a arrayref for the first argument, or use
+    the arg0 named parameter. Contrast the prior argument lists with these
+    below:
+
+      my @args = ( ['/bin/sh', '-sh'], '-c', 'echo $0' );
+
+      my @args = ( path => '/bin/sh', args => ['-c', 'echo $0'],
+                   arg0 => '-sh' );
+
+CAVEATS
+    Obviously, the returned scalars can be quite large, depending on the
+    nature of the program being run. In the future, I intend to introduce
+    options to allow for reading from temporary file handles, but for now,
+    be aware of the potential resource usage.
+
+    Although I've been using this module for literally years now personally,
+    consider it lightly tested, until I get feedback from the public at
+    large. (Treat this as a hint to tell me that you're using it. :)
+
+    Have at it.
+
+AUTHOR
+    Brian Reichert <reichert@numachi.com>
+
+SEE ALSO
+    perlfunc(1), perlvar(1).
+
+LICENSE:
+
+   Copyright (c) 2001-2003, Brian Reichert <reichert@numachi.com>
+   All rights reserved.
+   
+   Redistribution and use in source and binary forms, with or without
+   modification, are permitted provided that the following conditions are
+   met:
+     * Redistributions of source code must retain the above copyright
+       notice, this list of conditions and the following disclaimer.
+     * Redistributions in binary form must reproduce the above copyright
+       notice, this list of conditions and the following disclaimer in
+       the documentation and/or other materials provided with the
+       distribution.
+     * Neither the name of the Numachi nor the names of its
+       contributors may be used to endorse or promote products derived
+       from this software without specific prior written permission.
+       
+   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+   A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR
+   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+   EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+   PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+   PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+   LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+   NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.

@@ -1,0 +1,131 @@
+--- #YAML:1.0
+##
+## This is an example SoggyOnion configuration, which is
+## formatted as YAML. Use it like:
+##
+##    $ soggyonion /path/to/this/config.yaml
+##
+
+################################################################
+# OPTIONS
+#
+# These are general options to control the general functionality
+# of soggyonion.
+
+options:
+
+  # where to look for template files
+  templatedir: '/home/bass/soggyonion/dist/defaults/templates'
+
+  # where to put processed (output) files
+  outputdir: '/home/bass/soggyonion/htdocs/'
+
+  # where to store our cache files
+  cachedir: '/tmp/soggycache'
+
+################################################################
+# LAYOUT OF OUTPUT
+#
+# These parameters define what pages to create and what items
+# to include in them. Items in layout are hashes with the
+# following keys:
+#
+#     title - title of the processed page
+#     name  - filename of template in templatedir
+#     items - array of plugins or sources
+#
+layout:
+
+  - title: Perl and O'Reilly
+    name: perl.html
+    items:
+      - rss: http://search.cpan.org/recent.rdf
+        id: cpan
+      - rss: http://use.perl.org/search.pl?op=journals&content_type=rss
+        id: journals
+      - rss: http://www.perlmonks.org/headlines.rdf
+        icon: http://perlmonks.org/images/perlmonkssm.gif
+        id: perlmonks
+      - rss: http://use.perl.org/useperl.rss
+        id: useperl
+      - rss: http://www.perl.com/pace/perlnews.rdf
+        icon: http://perl.com/images/75-logo.jpg
+        id: perldotcom
+        limit: 10
+      - rss: http://www.theperlreview.com/rss/tpr-all.rdf
+        id: perlreview
+        limit: 15
+
+  - title: Open-Source and More
+    name: opensource.html
+    items:
+      - rss: http://www.freshmeat.net/backend/fm-releases.rdf
+        id: freshmeat
+      - rss: http://www.osnews.com/files/recent.rdf
+        icon: http://img.osnews.com/images/osn.gif
+        id: osnews
+      - rss: http://linuxtoday.com/backend/biglt.rss
+        id: linuxtoday
+        html: no
+      - rss: http://www.debianplanet.com/module.php?mod=node&op=feed
+        icon: http://www.debian.org/logos/openlogo-50.png
+        id: debianplanet
+        descriptions: no
+      - rss: http://www.oreillynet.com/meerkat/?_fl=rss10&t=ALL&c=916
+        id: oreilly
+        limit: 10
+      - rss: http://slashdot.org/index.rss
+        id: slashdot
+
+  - title: Weather
+    name: weather.html
+    items:
+      - plugin: SoggyOnion::Plugin::GeoWeather
+        id: weatherdotcom
+        zip: '02115'
+        #city: Boston
+        #state: MA
+
+  - title: PhotoBlogs
+    name: pb.html
+    items:
+      - images: http://www.chromasia.com/iblog/
+        id: chromasia
+      - images: http://www.hchamp.com/
+        id: hchamp
+      - images: http://www.joecunningham.com/
+        id: joecunningham
+      - images: http://www.ferociouscheese.com/
+        id: ferociouscheese
+#      - images: http://sensitivelight.com/blog/
+#        id: sensitivelight
+#        limit: 3
+
+  - title: Miscellaneous
+    name: misc.html
+    items:
+      - rss: http://del.icio.us/popular/rss
+        id: delicious
+        descriptions: no
+      - rss: http://boingboing.net/rss.xml
+        icon: http://boingboing.net/dimages/bbhead.gif
+        id: boingboing
+        html: no
+        maxlen: 150
+        limit: 15
+      - rss: http://realbeer.com/rdf/realbeernews.rdf
+        id: realbeer
+
+#  - title: Other Blogs
+#    name: blogs.html
+#    items:
+
+  - title: TEMP
+    name: temp.html
+    items:
+      - images: http://www.google.com/
+        id: goog
+      - images: http://www.slashdot.org/
+        id: slash
+
+

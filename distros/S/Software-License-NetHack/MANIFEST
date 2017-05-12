@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Software/License/NetHack.pm
+t/00-compile.t
+xt/release/eol.t
+xt/release/no-tabs.t
+xt/release/pod-coverage.t
+xt/release/pod-syntax.t

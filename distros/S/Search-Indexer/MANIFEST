@@ -1,0 +1,34 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/base.t
+t/stress.t
+t/data/book1
+t/data/book10
+t/data/book11
+t/data/book12
+t/data/book13
+t/data/book14
+t/data/book15
+t/data/book16
+t/data/book17
+t/data/book18
+t/data/book19
+t/data/book2
+t/data/book20
+t/data/book21
+t/data/book22
+t/data/book23
+t/data/book24
+t/data/book3
+t/data/book4
+t/data/book5
+t/data/book6
+t/data/book7
+t/data/book8
+t/data/book9
+t/data/preface
+lib/Search/Indexer.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

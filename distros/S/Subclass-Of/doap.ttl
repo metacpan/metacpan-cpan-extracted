@@ -1,0 +1,166 @@
+@prefix cpan-uri: <http://purl.org/NET/cpan-uri/terms#> .
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Subclass-Of/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "Module::Runtime"^^doap-deps:CpanId ], [ doap-deps:on "List::MoreUtils"^^doap-deps:CpanId ], [ doap-deps:on "Sub::Name"^^doap-deps:CpanId ], [ doap-deps:on "namespace::clean"^^doap-deps:CpanId ], [ doap-deps:on "Exporter::Tiny"^^doap-deps:CpanId ];
+	doap-deps:runtime-suggestion [ doap-deps:on "Moo 1.002000"^^doap-deps:CpanId ], [ doap-deps:on "Moose 2.0000"^^doap-deps:CpanId ], [ doap-deps:on "Mouse 1.00"^^doap-deps:CpanId ];
+	doap-deps:test-recommendation [ doap-deps:on "Moo 1.002000"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::Warn"^^doap-deps:CpanId ], [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [ doap-deps:on "Test::Fatal"^^doap-deps:CpanId ], [
+		doap-deps:on "Test::Requires 0.06"^^doap-deps:CpanId;
+	];
+	doap-deps:test-suggestion [ doap-deps:on "Moose 2.0000"^^doap-deps:CpanId ], [ doap-deps:on "Mouse 1.00"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Subclass-Of>;
+	doap:created         "2013-05-29"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/Subclass-Of>;
+	doap:homepage        <https://metacpan.org/release/Subclass-Of>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "Subclass-Of";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Subclass-Of/v_0-000_01>, <http://purl.org/NET/cpan-uri/dist/Subclass-Of/v_0-000_02>, <http://purl.org/NET/cpan-uri/dist/Subclass-Of/v_0-000_03>, <http://purl.org/NET/cpan-uri/dist/Subclass-Of/v_0-000_04>, <http://purl.org/NET/cpan-uri/dist/Subclass-Of/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Subclass-Of/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Subclass-Of/v_0-003>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-subclass-of>;
+	];
+	doap:shortdesc       "import a magic subclass".
+
+<http://purl.org/NET/cpan-uri/dist/Subclass-Of/v_0-000_01>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	rdfs:label           "Developer preview";
+	dc:identifier        "Subclass-Of-0.000_01"^^xsd:string;
+	dc:issued            "2013-05-29"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Subclass-Of-0.000_01.tar.gz>;
+	doap:revision        "0.000_01"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Subclass-Of/v_0-000_02>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "Subclass-Of-0.000_02"^^xsd:string;
+	dc:issued            "2013-05-31"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Exportable 'subclass_of' function.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Public 'install' method.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Support subclassing of Mouse classes.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "A shed-load of test cases.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Much documentation.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Lexically scope aliases.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Subclass-Of-0.000_02.tar.gz>;
+	doap:revision        "0.000_02"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Subclass-Of/v_0-000_03>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "Subclass-Of-0.000_03"^^xsd:string;
+	dc:issued            "2013-05-31"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Mandatory 'redefine' warnings for constant subs in Perl prior to 5.16 caused test failures; stop allowing Perl to inline our 'constants', therefore avoid these warnings.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Subclass-Of-0.000_03.tar.gz>;
+	doap:revision        "0.000_03"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Subclass-Of/v_0-000_04>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "Subclass-Of-0.000_04"^^xsd:string;
+	dc:issued            "2013-06-04"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "vstring warning in Perl 5.10.0 caused test failures.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Set %INC for generated classes.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Added example script.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Subclass-Of-0.000_04.tar.gz>;
+	doap:revision        "0.000_04"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Subclass-Of/v_0-001>
+	a                    doap:Version;
+	dc:identifier        "Subclass-Of-0.001"^^xsd:string;
+	dc:issued            "2013-06-05"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Minor clarifications.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Added SEE ALSO section.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Subclass-Of-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Subclass-Of/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "Subclass-Of-0.002"^^xsd:string;
+	dc:issued            "2013-06-14"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Support '-has' option to add attributes to a child class.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Subclass-Of-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Subclass-Of/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "Subclass-Of-0.003"^^xsd:string;
+	dc:issued            "2013-06-14"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Use Exporter::Tiny instead of Exporter::TypeTiny.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Use Dist::Inkt.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Subclass-Of-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

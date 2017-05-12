@@ -1,0 +1,398 @@
+SVN-fs-dump-format-version: 2
+
+UUID: 2785358f-ed1c-0410-8d81-93a2a39f1216
+
+Revision-number: 0
+Prop-content-length: 56
+Content-length: 56
+
+K 8
+svn:date
+V 27
+2006-09-08T09:09:02.348832Z
+PROPS-END
+
+Revision-number: 1
+Prop-content-length: 125
+Content-length: 125
+
+K 7
+svn:log
+V 26
+Standard repository layout
+K 10
+svn:author
+V 4
+book
+K 8
+svn:date
+V 27
+2006-09-08T11:48:32.736884Z
+PROPS-END
+
+Node-path: branches
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: tags
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: trunk
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Revision-number: 2
+Prop-content-length: 116
+Content-length: 116
+
+K 7
+svn:log
+V 17
+Add an empty file
+K 10
+svn:author
+V 4
+book
+K 8
+svn:date
+V 27
+2006-09-08T11:49:03.913665Z
+PROPS-END
+
+Node-path: trunk/empty.txt
+Node-kind: file
+Node-action: add
+Prop-content-length: 40
+Text-content-length: 0
+Text-content-md5: d41d8cd98f00b204e9800998ecf8427e
+Content-length: 40
+
+K 13
+svn:eol-style
+V 6
+native
+PROPS-END
+
+
+Revision-number: 3
+Prop-content-length: 120
+Content-length: 120
+
+K 7
+svn:log
+V 21
+some dummy latin text
+K 10
+svn:author
+V 4
+book
+K 8
+svn:date
+V 27
+2006-09-08T12:35:49.304317Z
+PROPS-END
+
+Node-path: trunk/loremipsum.txt
+Node-kind: file
+Node-action: add
+Prop-content-length: 40
+Text-content-length: 1090
+Text-content-md5: 60262fd14bd1b59416820cc37e4ee982
+Content-length: 1130
+
+K 13
+svn:eol-style
+V 6
+native
+PROPS-END
+quo fugiat quos quam voluptate nostrum perferendis eum animi fugit unde
+nam accusantium laboriosam quaerat asperiores assumenda praesentium
+iure eaque dicta explicabo autem vero voluptates sed itaque repellat
+dignissimos quia laudantium temporibus consequuntur beatae dolore eligendi
+doloremque quas recusandae proident sapiente mollit aliqua veniam culpa
+cillum voluptatem tempore exercitationem ullamco nobis nihil corrupti
+anim dolores soluta reiciendis
+
+necessitatibus sequi officia do dolorum a nisi consectetur quisquam illum
+amet delectus minim porro provident error dolorem repudiandae pariatur
+occaecat rem aspernatur
+
+tempora excepturi ab similique repellendus voluptatum neque totam aliquip
+adipisicing cum vitae eveniet minus placeat nemo quibusdam laborum velit
+saepe aute fuga reprehenderit eius ratione magnam aperiam sit mollitia
+lorem facilis debitis distinctio non facere natus maiores alias iste
+aliquid rerum ullam sunt possimus minima qui nostrud nesciunt at et
+deleniti tempor hic corporis suscipit commodo odio quis quae harum
+molestiae exercitation inventore cumque
+
+
+Revision-number: 4
+Prop-content-length: 134
+Content-length: 134
+
+K 7
+svn:log
+V 35
+renamed loremipsum.txt to latin.txt
+K 10
+svn:author
+V 4
+book
+K 8
+svn:date
+V 27
+2006-09-08T14:02:27.413127Z
+PROPS-END
+
+Node-path: trunk/latin.txt
+Node-kind: file
+Node-action: add
+Node-copyfrom-rev: 3
+Node-copyfrom-path: trunk/loremipsum.txt
+
+
+Node-path: trunk/loremipsum.txt
+Node-action: delete
+
+
+Revision-number: 5
+Prop-content-length: 121
+Content-length: 121
+
+K 7
+svn:log
+V 22
+add a file without EOL
+K 10
+svn:author
+V 4
+book
+K 8
+svn:date
+V 27
+2006-09-08T14:42:37.600634Z
+PROPS-END
+
+Node-path: trunk/no-eol.txt
+Node-kind: file
+Node-action: add
+Prop-content-length: 40
+Text-content-length: 25
+Text-content-md5: bf9d9536e2997b9bf13ac679e041f9ab
+Content-length: 65
+
+K 13
+svn:eol-style
+V 6
+native
+PROPS-END
+swish bloop krunch z_zwap
+
+Revision-number: 6
+Prop-content-length: 136
+Content-length: 136
+
+K 7
+svn:log
+V 37
+a log message ending
+with a newline
+
+
+K 10
+svn:author
+V 4
+book
+K 8
+svn:date
+V 27
+2006-09-08T15:35:27.869414Z
+PROPS-END
+
+Node-path: trunk/zlonk
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Revision-number: 7
+Prop-content-length: 191
+Content-length: 191
+
+K 7
+svn:log
+V 92
+A copy from the working dir to a URL:
+
+    svn cp . svn://localhost/test123/tags/cp-WC-URL
+
+
+K 10
+svn:author
+V 4
+book
+K 8
+svn:date
+V 27
+2006-09-08T16:59:51.034755Z
+PROPS-END
+
+Node-path: tags/cp-WC-URL
+Node-kind: dir
+Node-action: add
+Node-copyfrom-rev: 1
+Node-copyfrom-path: trunk
+
+
+Node-path: tags/cp-WC-URL/empty.txt
+Node-kind: file
+Node-action: add
+Node-copyfrom-rev: 2
+Node-copyfrom-path: trunk/empty.txt
+
+
+Node-path: tags/cp-WC-URL/latin.txt
+Node-kind: file
+Node-action: add
+Node-copyfrom-rev: 4
+Node-copyfrom-path: trunk/latin.txt
+
+
+Node-path: tags/cp-WC-URL/no-eol.txt
+Node-kind: file
+Node-action: add
+Node-copyfrom-rev: 5
+Node-copyfrom-path: trunk/no-eol.txt
+
+
+Node-path: tags/cp-WC-URL/zlonk
+Node-kind: dir
+Node-action: add
+Node-copyfrom-rev: 6
+Node-copyfrom-path: trunk/zlonk
+
+
+Revision-number: 8
+Prop-content-length: 109
+Content-length: 109
+
+K 7
+svn:log
+V 10
+a new file
+K 10
+svn:author
+V 4
+book
+K 8
+svn:date
+V 27
+2006-09-08T17:01:06.786524Z
+PROPS-END
+
+Node-path: trunk/whap.txt
+Node-kind: file
+Node-action: add
+Prop-content-length: 40
+Text-content-length: 58
+Text-content-md5: 25c219035d2ecbdae652ca145e9e780d
+Content-length: 98
+
+K 13
+svn:eol-style
+V 6
+native
+PROPS-END
+WINK_WINK_WINKITY_WINK_BLINK
+FERRIP
+PAK_POW
+SPLAPPLE_PLAP
+
+
+Revision-number: 9
+Prop-content-length: 112
+Content-length: 112
+
+K 7
+svn:log
+V 13
+rename a file
+K 10
+svn:author
+V 4
+book
+K 8
+svn:date
+V 27
+2006-09-08T17:06:34.131741Z
+PROPS-END
+
+Node-path: trunk/crunchle.txt
+Node-kind: file
+Node-action: add
+Node-copyfrom-rev: 8
+Node-copyfrom-path: trunk/whap.txt
+
+
+Node-path: trunk/whap.txt
+Node-action: delete
+
+
+Revision-number: 10
+Prop-content-length: 141
+Content-length: 141
+
+K 7
+svn:log
+V 42
+replace a file by another of the same name
+K 10
+svn:author
+V 4
+book
+K 8
+svn:date
+V 27
+2006-09-09T07:32:54.158084Z
+PROPS-END
+
+Node-path: trunk/crunchle.txt
+Node-kind: file
+Node-action: replace
+Prop-content-length: 40
+Text-content-length: 40
+Text-content-md5: e50c6d0bd09735b520e49893ee70864d
+Content-length: 80
+
+K 13
+svn:eol-style
+V 6
+native
+PROPS-END
+aiieee
+zok
+clash
+bang_eth
+plop
+ker_plop
+
+

@@ -1,0 +1,15 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+eval {
+    require Pod::Strip;
+    my $p = Pod::Strip->new;
+    $p->output_fh(*STDOUT);
+    $p->parse_file(*STDIN);
+  }
+  or print <STDIN>;
+
+exit;
+__END__
+

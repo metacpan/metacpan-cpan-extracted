@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--This needs a lot of work still.-->
+
+<!DOCTYPE language SYSTEM "language.dtd">
+<language
+  name="Shebangml" section="Markup"
+  version="1.00" kateversion="2.3"
+  extensions="*.hbml" mimetypes="text/x-hbml">
+  <highlighting>
+    <contexts>
+      <context attribute="Normal Text" lineEndContext="#pop" name="Normal Text" >
+        <Detect2Chars attribute="Comment" context="Multiline Comment"
+          char="#" char1="{" firstNonSpace="true"/>
+        <DetectChar attribute="Comment" context="Comment" char="#" firstNonSpace="true"/>
+<!--        <keyword attribute="Keyword" context="#stay" String="somename" />-->
+        <RegExpr String="div\[" insensitive="true" context="Tag with Atts" lookAhead="true"/>
+      </context>
+
+      <context name="Tag with Atts">
+        <RegExpr String="div" insensitive="true" context="Tag Name"/>
+      </context>
+
+      <context attribute="Tag" name="Tag Name">
+        <AnyChar String="[{" context="#pop"/>
+      </context>
+
+      <context attribute="Attribute List" name="Attribute List">
+        <DetectChar attribute="String" context="string" char="&quot;" />
+      </context>
+
+      <context attribute="Comment" lineEndContext="#pop" name="Comment">
+      </context>
+
+      <context attribute="Comment" lineEndContext="#stay" name="Multiline Comment">
+        <Detect2Chars attribute="Comment" context="#pop"
+          char="#" char1="}" firstNonSpace="true" endRegion="Comment"/>
+      </context>
+
+      <!-- Some Template Junk -->
+      <context attribute="String" lineEndContext="#stay" name="string" >
+        <DetectChar attribute="String" context="#pop" char="&quot;" />
+      </context>
+
+    </contexts>
+    <itemDatas>
+      <itemData name="Normal Text" defStyleNum="dsNormal"/>
+      <itemData name="Tag" defStyleNum="dsString"/>
+      <itemData name="Comment"  defStyleNum="dsComment"/>
+      <itemData name="String" defStyleNum="dsString" />
+    </itemDatas>
+  </highlighting>
+
+  <general>
+    <comments>
+      <comment name="multiLine" start="#{&#10;" end="&#10;#}" region="Comment"/>
+      <comment name="singleLine" start="#"/>
+    </comments>
+    <keywords casesensitive="1" />
+  </general>
+</language>

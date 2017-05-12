@@ -1,0 +1,25 @@
+---
+name: SWF-NeedsRecompile
+version: 1.06
+author:
+  - 'Chris Dolan <cdolan@cpan.org>'
+abstract: Tests if any SWF or FLA file dependencies have changed
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  File::HomeDir: 0.50
+  File::Slurp: 9999.09
+  List::MoreUtils: 0
+  Regexp::Common: 2.12
+  perl: 5.008
+build_requires:
+  Test::More: 0
+provides:
+  SWF::NeedsRecompile:
+    file: lib/SWF/NeedsRecompile.pm
+    version: 1.06
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,271 @@
+#!/usr/bin/perl -w
+################################################################################
+#
+#  Copyright 2010 Zuse Institute Berlin
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation or under the same terms as perl itself.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+#  Please send comments to kallies@zib.de
+#
+################################################################################
+#
+# Demo lstopo via perl using the Sys::Hwloc module
+#
+################################################################################
+# $Id: perl-lstopo,v 1.10 2011/01/11 10:49:39 bzbkalli Exp $
+################################################################################
+
+use strict;
+
+use lib qw(
+	   blib/lib
+	   blib/arch
+	  );
+
+use Getopt::Long;
+use Pod::Usage;
+use Sys::Hwloc 0.05;
+
+BEGIN {
+  die "This script needs HWLOC_API_VERSION >= 0x00010000\n" unless
+    HWLOC_API_VERSION() >= 0x00010000;
+}
+
+# --
+# Program options
+# --
+
+my %options = (
+               -merge      => undef,       # ignore all but keep structure
+	       -whole      => undef,       # topology of whole system
+	       -cpuset     => undef,       # show cpusets
+	       -onlycpuset => undef,       # show cpusets, only
+	       -synthetic  => undef,       # load fake topology
+	       -xml        => undef,       # xml output
+	       -short      => undef,       # short output
+	      );
+
+GetOptions(
+	   "merge!"       => \$options{-merge},
+	   "whole!"       => \$options{-whole},
+	   "cpuset!"      => \$options{-cpuset},
+	   "cpuset-only!" => \$options{-onlycpuset},
+	   "synthetic=s"  => \$options{-synthetic},
+	   "xml!"         => \$options{-xml},
+	   "short!"       => \$options{-short},
+	   "help|?"       => sub { usage() },
+	  ) or usage();
+
+# -------------------------------------------------------------------------------
+# Init topology, set flags, load
+# -------------------------------------------------------------------------------
+
+my $t = Sys::Hwloc::Topology->init;
+die "Failed to init topology context!\n" unless $t;
+
+if($options{-whole}) {
+  die "Failed to set topology flags!\n" if $t->set_flags(HWLOC_TOPOLOGY_FLAG_WHOLE_SYSTEM);
+}
+
+if($options{-synthetic}) {
+  die "Failed to fake topology!\n" if $t->set_synthetic($options{-synthetic});
+}
+
+if($options{-merge}) {
+  die "Failed to merge topology!\n" if $t->ignore_all_keep_structure;
+}
+
+die "Failed to load topology!\n" if $t->load;
+
+# -------------------------------------------------------------------------------
+# Output
+# -------------------------------------------------------------------------------
+
+if($options{-xml}) {
+  if(HWLOC_HAS_XML) {
+    $t->export_xml('-');
+  } else {
+    die "Your hwloc lib was build without XML support!\n";
+  }
+} else {
+  if($options{-short}) {
+    topostr($t->root);
+    print "\n";
+  } else {
+    lstopo($t->root);
+  }
+}
+
+# -------------------------------------------------------------------------------
+# Done
+# -------------------------------------------------------------------------------
+
+$t->destroy;
+
+# -------------------------------------------------------------------------------
+# Recursively print info of objects
+# -------------------------------------------------------------------------------
+
+sub lstopo {
+  my $obj = shift;
+  return unless $obj;
+
+  if($options{-onlycpuset}) {
+
+    printf "%*s%s\n", 2 * $obj->depth, '', $obj->sprintf_cpuset;
+
+  } else {
+
+    my $s = $obj->sprintf_type;
+
+  CASE:{
+
+      $obj->type == HWLOC_OBJ_MACHINE && do {
+	$s .= sprintf(" (%s)", fmtMem($obj->memory->{total_memory}));
+ 	last CASE;
+      };
+
+      $s .= sprintf(" #%d", $obj->logical_index);
+
+      $obj->type == HWLOC_OBJ_NODE && do {
+	$s .= sprintf(" (%s)", fmtMem($obj->memory->{total_memory}));
+ 	last CASE;
+      };
+
+      $obj->type == HWLOC_OBJ_CACHE && do {
+	$s .= sprintf(" (%s)", fmtMem($obj->attr->{cache}->{size}));
+	last CASE;
+      };
+
+      $obj->type == HWLOC_OBJ_PU && do {
+	$s .= sprintf(" (phys=%d)", $obj->os_index);
+	last CASE;
+      };
+
+    }
+
+    if($options{-cpuset}) {
+
+      $s .= sprintf(" cpuset=%s", $obj->sprintf_cpuset);
+      printf "%*s%s\n", 2 * $obj->depth, '', $s;
+
+    } else {
+
+      my $parent = $obj->parent;
+      if($parent && $parent->arity == 1) {
+	printf " + %s", $s;
+      } else {
+	printf "%*s%s", 2 * $obj->depth, '', $s;
+      }
+
+      if($obj->arity != 1) {
+	print "\n";
+      }
+
+    }
+
+  }
+
+  foreach($obj->children) {
+    lstopo($_);
+  }
+}
+
+# -------------------------------------------------------------------------------
+# Build and print short topology description
+# -------------------------------------------------------------------------------
+
+sub topostr {
+  my $obj = shift;
+
+  if($obj) {
+    if($obj->type == HWLOC_OBJ_PU) {
+      printf "%d", $obj->os_index;
+    } else {
+      print "(" if $obj->arity > 1;
+      foreach my $child ($obj->children) {
+	topostr($child);
+	print "," if $child->sibling_rank < $obj->arity - 1;
+      }
+      print ")" if $obj->arity > 1;
+    }
+  }
+
+}
+
+# -------------------------------------------------------------------------------
+# Format memory
+# -------------------------------------------------------------------------------
+
+sub fmtMem {
+  my $val = shift;
+  return '?' unless defined $val;
+  my $unit = 'B';
+  if($val > 1024) {
+    $unit = 'kB';
+    $val /= 1024;
+  }
+  if($val > 1024) {
+    $unit = 'MB';
+    $val /= 1024;
+  }
+  if($val > 1024) {
+    $unit = 'GB';
+    $val /= 1024;
+  }
+  if($val > 1024) {
+    $unit = 'TB';
+    $val /= 1024;
+  }
+  return sprintf("%.f%s", $val, $unit);
+}
+
+# -------------------------------------------------------------------------------
+# Usage message
+# -------------------------------------------------------------------------------
+
+sub usage {
+  pod2usage(
+            -verbose   => 0,
+            -exitval   => 0,
+            -noperldoc => 1,
+           );
+}
+
+__END__
+
+=head1 NAME
+
+perl-lstopo - demo lstopo using perl Sys::Hwloc module
+
+=head1 SYNOPSIS
+
+perl-lstopo {--help|-?}
+
+perl-lstopo  [-synthetic <fake>] [-merge] [-whole] [-cpuset | -cpuset-only | -xml | -short]
+
+=head1 AUTHOR
+
+Bernd Kallies, E<lt>kallies@zib.deE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011 Zuse Institute Berlin
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation.
+
+=cut
+

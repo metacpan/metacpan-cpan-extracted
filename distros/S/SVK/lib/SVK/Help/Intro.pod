@@ -1,0 +1,169 @@
+# BEGIN BPS TAGGED BLOCK {{{
+# COPYRIGHT:
+# 
+# This software is Copyright (c) 2003-2008 Best Practical Solutions, LLC
+#                                          <clkao@bestpractical.com>
+# 
+# (Except where explicitly superseded by other copyright notices)
+# 
+# 
+# LICENSE:
+# 
+# 
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of either:
+# 
+#   a) Version 2 of the GNU General Public License.  You should have
+#      received a copy of the GNU General Public License along with this
+#      program.  If not, write to the Free Software Foundation, Inc., 51
+#      Franklin Street, Fifth Floor, Boston, MA 02110-1301 or visit
+#      their web page on the internet at
+#      http://www.gnu.org/copyleft/gpl.html.
+# 
+#   b) Version 1 of Perl's "Artistic License".  You should have received
+#      a copy of the Artistic License with this package, in the file
+#      named "ARTISTIC".  The license is also available at
+#      http://opensource.org/licenses/artistic-license.php.
+# 
+# This work is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+# 
+# CONTRIBUTION SUBMISSION POLICY:
+# 
+# (The following paragraph is not intended to limit the rights granted
+# to you to modify and distribute this software under the terms of the
+# GNU General Public License and is only of importance to you if you
+# choose to contribute your changes and enhancements to the community
+# by submitting them to Best Practical Solutions, LLC.)
+# 
+# By intentionally submitting any modifications, corrections or
+# derivatives to this work, or any other work intended for use with SVK,
+# to Best Practical Solutions, LLC, you confirm that you are the
+# copyright holder for those contributions and you grant Best Practical
+# Solutions, LLC a nonexclusive, worldwide, irrevocable, royalty-free,
+# perpetual, license to use, copy, create derivative works based on
+# those contributions, and sublicense and distribute those contributions
+# and any derivatives thereof.
+# 
+# END BPS TAGGED BLOCK }}}
+=head1 NAME
+
+SVK::Help::Intro - Introduction to svk
+
+=head1 DESCRIPTION
+
+svk is an open source distributed version control system which is
+designed to interoperate with Subversion.  Like other version control
+systems, it keeps track of each change you make to a project and allows
+you to maintain multiple parallel tracks of development.  svk also has
+a number of powerful features which are rarely found in other version
+control systems.
+
+svk has been designed from the ground up to support development
+models that are simple and intuitive for software developers.  It has
+advanced smart branching and merging semantics that make it easy to
+maintain multiple parallel lines of development and painless to merge
+changes across branches. svk's built in patch manager makes it easy
+for non-committers to share changes among themselves and with project
+maintainers
+
+svk provides powerful support for I<distributed development>.  Every svk
+client is capable of fully mirroring remote Subversion repositories so
+that you have full access to a project's history at any time, even when
+they are off the network or on the wrong side of a firewall.  You can
+branch a remote project at any point in that project's history, whether
+or not you have write access to that project's repository.  Later, you
+can integrate changes from the project's master server (usually with a
+single command) or push your branch up to another Subversion repository.
+
+
+=head1 GETTING STARTED
+
+svk has a rich command line interface that can be somewhat daunting
+at first. the following few commands are all you'll need for day to
+day operation. 
+
+=over
+
+
+=item svk mirror
+
+First, you'll need to I<mirror> a remote repository. This sets up a local
+copy of that repository for you to branch from, merge to and otherwise 
+poke at. The local path is sometimes called a "depot path."
+  
+    svk mirror svn://svn.example.com/project_x //mirror/project_x
+
+=item svk sync
+
+When you've set up a new mirror or want to get some work done without
+a network connection, I<sync> your local repository with upstream
+repositories.
+
+    svk sync //mirror/project_x
+
+=item svk checkout
+
+When you want to get some work done, you can I<checkout> a working copy
+to make changes.
+
+    cd ~/svk-checkouts
+    svk co //mirror/project_x
+
+If you want to work offline, you can create a local branch
+
+    cd ~/svk-checkouts/project_x
+    svk branch --offline
+
+=item svk add, svk delete and svk move
+
+As you work on the files in your working copy, feel free to I<add>
+new files, I<delete> existing files and I<move> files around.
+
+    cd ~/svk-checkouts/project_x
+
+    svk add Changelog 
+    svk move badly_named_file.c well_named_file.c
+    svk delete .README.swp
+
+=item svk commit
+
+When you're done, just I<commit> your changes to your local repository,
+whether or not you have network.  If you I<commit> to a mirrored path,
+rather than a local branch, you'll need to be able to access the path's
+upstream subversion server, but the commit will be sent to the server
+instantly.
+
+    svk commit 
+
+=item svk pull
+
+Life doesn't stop when you make a local branch.  From time to time,
+I<pull> down changes from the upstream repository.
+
+    cd ~/svk-checkouts/project_x
+    svk pull 
+
+=item svk push
+
+
+When you're ready to share your changes with the world, I<push> them to
+the upstream repository.
+
+    cd ~/svk-checkouts/project_x
+    svk push 
+
+=back
+
+To see a full list of svk's commands, type C<svk help commands>.
+For help with a specific command, just type C<svk help I<command>>.
+
+The svk wiki (L<http://svk.bestpractical.com>) is a great place to find the
+latest svk tips, tricks and updates.  If you run into trouble using svk,
+the wiki's the right place to start looking for help.
+
+=cut
+
+1;

@@ -1,0 +1,67 @@
+######################################################################
+    Sys::Ramdisk 0.02
+######################################################################
+
+NAME
+    Sys::Ramdisk - Create and nuke RAM disks on various systems
+
+SYNOPSIS
+        use Sys::Ramdisk;
+
+        my $ramdisk = Sys::Ramdisk->new(
+           size => "100m",
+           dir  => "/tmp/ramdisk",
+        );
+
+        $ramdisk->mount();
+
+        # Use ramdisk on /tmp/ramdisk ...
+
+        $ramdisk->unmount();
+
+DESCRIPTION
+    Most Unix systems provide RAM disks, although every OS/filesystem flavor
+    seems to have its own interface to it. Sys::Ramdisk provides a
+    system-agnostic interface to it, by abstracting the nitty gritty of the
+    particular implementation.
+
+METHODS
+    "new()"
+        Constructor, optional arguments are
+
+        "size"
+            The size of the RAM disk, defaults to 100m.
+
+        "dir"
+            The directory the RAM disk is going to be mounted under,
+            defaults to a temporary directory, created on demand and
+            returned by the dir() method later
+
+        "cleanup"
+            Set this to true if you want the object destructor unmount the
+            yroot when the object goes out of scope. Defaults to true.
+
+    "mount()"
+        Mount the RAM disk.
+
+    "unmount()"
+        Unmount the RAM disk.
+
+    "dir()"
+        Set or get the name of the directory the RAM disk will be mounted
+        under. Note that some operating systems mount the RAM disk under a
+        different directory nevertheless (e.g. OSX), make sure to check
+        $ramdisk->dir() after running mount() to figure out where it
+        actually landed.
+
+SUPPORTED OPERATING SYSTEMS
+    Currently, only Linux and OSX are supported.
+
+LEGALESE
+    Copyright 2010 by Mike Schilli, all rights reserved. This program is
+    free software, you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+AUTHOR
+    2010, Mike Schilli <cpan@perlmeister.com>
+

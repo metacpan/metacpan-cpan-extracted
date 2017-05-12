@@ -1,0 +1,159 @@
+package Statistics::NiceR::Backend::EmbeddedR;
+# ABSTRACT: manages the embedded R interpreter
+$Statistics::NiceR::Backend::EmbeddedR::VERSION = '0.03';
+use strict;
+use warnings;
+
+use Statistics::NiceR::Inline::Rinline; # this is need to set the R_HOME env variable
+use Inline with => qw(Statistics::NiceR::Inline::Rinline);
+use Statistics::NiceR::Backend::EmbeddedR::Inline C => 'DATA';
+
+our $loaded = -1;
+
+
+sub import {
+	Inline->init;
+	unless($Statistics::NiceR::Backend::EmbeddedR::loaded == $$) {
+		$Statistics::NiceR::Backend::EmbeddedR::loaded = $$;
+		_start_R();
+	}
+}
+
+END {
+	_stop_R();
+}
+
+1;
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Statistics::NiceR::Backend::EmbeddedR - manages the embedded R interpreter
+
+=head1 VERSION
+
+version 0.03
+
+=head1 AUTHOR
+
+Zakariyya Mughal <zmughal@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Zakariyya Mughal.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
+__DATA__
+__C__
+
+void _start_R() {
+	char *localArgs[] = {"R", "--no-save","--silent"};
+	Rf_initEmbeddedR(3, localArgs);
+}
+
+void _stop_R() {
+	Rf_endEmbeddedR(0);
+}
+
+/* undefine eval from Rinternals.h */
+#undef eval
+SEXP eval( SV* self, SV* eval_sv ) {
+	SEXP tmp, eval_expr_v, ret;
+	ParseStatus status;
+	char* eval_str;
+	int i;
+	int error_occurred;
+
+	eval_str = SvPV_nolen(eval_sv);
+
+	PROTECT(tmp = mkString(eval_str));
+	PROTECT(eval_expr_v = R_ParseVector(tmp, -1, &status, R_NilValue));
+	if (status != PARSE_OK) {
+		UNPROTECT(2); /* tmp, eval_expr_v */
+		/* TODO throw exception */
+		/*error("invalid call %s", eval_str);*/
+		return R_NilValue;
+	}
+	/* Loop is needed here as EXPSEXP will be of length > 1 */
+	for(i = 0; i < length(eval_expr_v); i++) {
+		ret = R_tryEval(VECTOR_ELT(eval_expr_v, i), R_GlobalEnv, &error_occurred);
+		if( error_occurred ) {
+			UNPROTECT(2); /* tmp, eval_expr_v */
+			/* TODO throw exception */
+			return R_NilValue;
+		}
+	}
+	UNPROTECT(2); /* tmp, eval_expr_v */
+	PROTECT(ret);
+
+	return ret;
+}
+
+SEXP R_get_function(SV* self, char* fname) {
+	return Rf_install(fname);
+}
+
+
+SEXP R_call_function(SV* self, SEXP function, SV* args_ref) {
+	SEXP e; /* expression */
+	SEXP next; /* pairlist iterator */
+	AV* args; /* the array in args_ref */
+	AV* arg_av; /* SV container for SEXP */
+	SV* arg_sv; /* SV container for SEXP */
+	IV arg_intptr; /* integer pointer to SEXP */
+	SEXP arg; /* current argument */
+	SEXP ret; /* return value */
+	int error_occurred; /* error checking boolean */
+
+	int num_args; /* number of arguments */
+	int arg_idx; /* argument list iterator */
+
+	/* TODO check svtype for args == AV */
+	args = (AV*) SvRV( args_ref );
+	num_args = av_len( args ) + 1;
+
+	/* (num_args + 1) slots: function name + args */
+	PROTECT(e = allocVector(LANGSXP, num_args + 1));
+
+	SETCAR(e, function); /* function at the beginning of the list */
+	if( num_args > 0 ) {
+		next = CDR(e); /* begin argument list */
+
+		for( arg_idx = 0; arg_idx < num_args; arg_idx++ ) {
+			arg_av = (AV*)SvRV( *( av_fetch( args, arg_idx, 0 ) ) );
+			/* TODO make sure we can handle keys: currently we only look at the first item (index 0) */
+			arg_sv = *(av_fetch( arg_av, 0, 0 ));
+			arg_intptr = SvIV( (SV*) SvRV(arg_sv) ); /* get integer pointer out of SV */
+			arg = INT2PTR(SEXP, arg_intptr ); /* cast the integer to a pointer */
+
+			/* key is for using calls with arg names */
+			//val = hv_iternextsv(hv, &key, &len);
+			/* TODO  deal with keys */
+
+			SETCAR(next, arg);
+
+			/* TODO deal with keys */
+			/*if(key && key[0]) {
+				SET_TAG(next, Rf_install(key));
+			}*/
+
+			next = CDR(next);
+		}
+	}
+	/*[>DEBUG<]Rf_PrintValue(e);*/
+
+	ret = R_tryEval(e, R_GlobalEnv, &error_occurred );
+	UNPROTECT(1); /* e */
+	if( error_occurred ) {
+		/* TODO error checking */
+		return R_NilValue;
+	}
+	PROTECT(ret);
+}

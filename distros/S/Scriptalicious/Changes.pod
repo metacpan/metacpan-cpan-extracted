@@ -1,0 +1,210 @@
+
+=head1 WHATS NEW IN SCRIPTALICIOUS
+
+=head2 VERSION 1.17
+
+=over
+
+=item Fix deadlock with C<out =E<gt> sub { ... }>
+
+Between Perl versions 5.17.5 and 5.17.6, a change was introduced which
+exposed a common pipe deadlock bug in this module, if you used closures
+which handle filehandles. [closes: RT#85999]
+
+=back
+
+=head2 VERSION 1.16
+
+=over
+
+=item Clear PERL5OPT before invoking $^X in tests
+
+To hopefully resolve some false failures
+
+=item Fix code for case when Time::HiRes is not available
+
+I never got a report about this, but it clearly didn't work!  Guess
+no-one's using a Perl before 5.7.3 or without that module any more.
+
+=item put the magic AUTOLOAD back
+
+Scriptalicious will do most of its core stuff without compiling most
+of itself, and there is an AUTOLOAD hook which puts them into place.
+I decided to re-enable it.
+
+=item remove (soft) dependency on Pod::Constants
+
+Scriptalicious scripts are less delicious without a working --help,
+and many systems did not bother with this soft dependency, so it is
+of benefit to just implement what that code did instead.
+
+=item new $CONFIG variable
+
+Used for telling where config was read from (or specifying where it is
+to be read from)
+
+=item deal with negative values in sci_unit and time_unit
+
+These functions didn't deal with negative input; fix that.
+
+=back
+
+=head2 VERSION 1.15
+
+=over
+
+=item Add missing copyright notices and license.
+
+Gah, sorry about this.  Note that it is a retrospective license, so
+you don't need to 'upgrade' to this version to copy the software.
+
+=back
+
+=head2 VERSION 1.14
+
+=over
+
+=item 5.6.x compat: fix missed instance of unquoted filehandle in test suite
+
+=back
+
+=head2 VERSION 1.13
+
+=over
+
+=item 5.6.x compat: don't use readline FH; use <FH> instead
+
+=item Don't die if getconf is called without YAML installed; warn instead
+
+=item Make YAML config test conditional on YAML being installed
+
+=item Fix incorrectly written e-mail address in Makefile.PL
+
+=item Remove TODO file; these features have been added!
+
+=back
+
+=head2 VERSION 1.12
+
+=over
+
+=item Add getopt_lenient()
+
+=item Add time_unit() function
+
+=item Use time_unit instead of sci_unit in show_elapsed/show_delta
+
+=item Fix test that was still testing for µ
+
+=back
+
+=head2 VERSION 1.11
+
+=over
+
+=item Drop C<Module::Build> dependency
+
+Go back to C<ExtUtils::MakeMaker>.
+
+=item Fix various problems with prompt_*
+
+=item Add C<hush_exec> and C<unhush_exec> functions
+
+=item Make C<getopt()> optional for getting verbosity right
+
+=item Functions don't clobber $_ (Gerard Goosen)
+
+=back
+
+=head2 VERSION 1.10
+
+Add prompt_file from an earlier branch.
+
+Fix F<Build.PL> so a compatibility Makefile.PL is generated.
+
+=head2 VERSION 1.09
+
+Another "brown paper bag release".  Fixed a bug in tsay that would
+cause it not to work if there was a true value in $1 already.  Bring
+on Perl 6 and lexical $/.
+
+=head2 VERSION 1.08
+
+Added new functions 'anydump' and the awesome 'tsay'
+
+=head2 VERSION 1.07
+
+Brown paper bag release - the prompting had some debug statements
+left behind.
+
+=head2 VERSION 1.06
+
+Documentation modifications only; it was quite rightly pointed out
+that the documentation didn't really say what the script is useful
+for.
+
+
+=head2 VERSION 1.05
+
+=over
+
+=item B<Prompting>
+
+Prompt the user for arbitrary things via prompt_for(-int => "foo"),
+with readline support.
+
+=item B<Filehandle Plugging and Playing>
+
+All functions that run things (ie C<run()>, C<run_err()>, C<capture()>
+and C<capture_err()> can now have arbitrary filehandle connections to
+closures (via a sub-process), named files or filehandles.
+
+=back
+
+=head2 VERSION 1.04
+
+Bug fix for scripts that fork (see F<t/04-fork.t>)
+
+=head2 VERSION 1.03
+
+=over
+
+=item B<YAML config file support>
+
+Do your C<getopt()> and C<YAML::Load()> in one pass!  See C<getconf()>
+in the man page.
+
+You can even include the default YAML configuration file in your POD
+via Pod::Constants!  Soon to be documented and tested by the test
+suite :).  But the daring can go put some YAML in a section called
+"C<DEFAULT CONFIGURATION FILE>"
+
+=item B<Quick and dirty timer functions>
+
+New timer utility functions C<start_timer()>, C<show_delta()>,
+C<show_elapsed()>
+
+=item bugfix
+
+C<barf()> now does not make your script exit if inside C<eval {}>; it
+checks C<$^S> and re-throws the error instead.
+
+=back
+
+=head2 Historic releases
+
+ Version 1.02 - Thu, 15 Apr 2004 12:24:16 +1200
+
+  * Made barf actually barf :-}
+  * Fixed bug with capture and -v - error "Warning: unable to close
+    filehandle CHILD properly."
+  * output from capture_err matches documentation
+
+ Version 1.01 - Tue, 13 Apr 2004 10:26:27 +1200
+
+  * Fixed version number input - now accepts $main::VERSION as per
+    widespread convention
+  * Added SEE ALSO section based on feedback from module-
+    authors@perl.org
+
+=cut

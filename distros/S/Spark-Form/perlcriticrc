@@ -1,0 +1,19 @@
+severity = 1
+
+exclude = RequireTidyCode RequirePodSections ProhibitPostfixControls RequireRcsKeywords RequireExplicitPackage ProhibitUnlessBlocks ProhibitBuiltinHomonyms RequireCleanNamespace RequireUseStrict RequireUseWarnings Variables::ProhibitPunctuationVars RegularExpressions::RequireDotMatchAnything RegularExpressions::RequireExtendedFormatting RegularExpressions::RequireLineBoundaryMatching RequirePodAtEnd
+
+include = Moose::ProhibitMultipleWiths Moose::ProhibitNewMethod Moose::RequireMakeImmutable CodeLayout::ProhibitTrailingWhitespace
+
+color = 1
+verbose = 9
+
+[BuiltinFunctions::ProhibitStringyEval]
+allow_includes = 1
+
+[CodeLayout::ProhibitTrailingWhitespace]
+
+[Documentation::PodSpelling]
+stop_words = CPAN Str TODO rw HashRef ArrayRef HTML XHTML Bool API CGI basename plugins MyApp plugin Laver Django YAML Jifty validators Superclass superclass accessors pre checkbox textarea Printability RegexRef Undef
+
+[NamingConventions::ProhibitAmbiguousNames]
+forbid = abstract bases close contract last left no record right second

@@ -1,0 +1,233 @@
+1.6611: Wed Dec 17 2014
+   - SREZIC@cpan.org suggested LC_ALL=C for all tests
+   - using Number::Format vars instead of LC_ALL to fix tests
+   - yeah, that's not going to work... using setlocale()
+
+1.6608: Fri Jan 10 2014
+   - bug in LSF
+
+1.6607: Mon Jan 23 2012
+   - forgot to update the copyright to 2012
+
+1.6605: Sat Jan 21 2012
+   - change env var DEBUG to DEBUG_STATS_B (cpan698301@mstier.de)
+
+1.6603: Mon Jan 24 2011
+   - fail to load Test::More gracefully, but don't require it
+     even for build.
+
+1.6602: Thu Sep 30 2010
+   - changes to make this work again in 5.6.x
+     (hint provided by Jerome Provensal)
+
+1.6601: Sat Sep 12 2009
+   - The debian build devs set TEST_AUTHOR, then created a bug
+     report concerning the results.  First things first, make it
+     so setting TEST_AUTHOR doesn't work unless you set a
+     specific code -- are you the author? No?  Then don't
+     complain about the suggestions from Perl-Critic
+   - fixed the various things the latest Perl-Critic complains
+     about -- nothing really, and a bug in the critic.
+
+1.6600: Sun Jun 28 2009
+   - new test: create each object in its empty state, make sure
+     its really empty.
+   - added an importer interface for the %ENV vars
+   - removing the ENV vars (except for pre-compile init)
+   - finished updating the pods for all the 1.66 changes
+
+1.6600: Sat Jun 27 2009
+   - worked on computed vectors a little.  decided it should be
+     possible to insert into them, instead inserting into the
+     input_vector.
+   - finished a lot more 1.66 docs
+   - since two vectors remain separate objects under
+     $v1->set_vector($v2), they shouldn't be linked together from
+     that -- set_vector now copies instead of linking.
+     computed() vectors can serve that role instead.
+   - made sure all the object accessors return the object
+   - made set_vector() take nonscalars like all the export
+     constructors
+   - made the export constructors use the new set_vector() via
+     new()
+   - made all the objects true in bool context
+
+1.6600: Wed Jun 24 2009
+   - _OVBed: median, StdDev, Variance
+   - fixed bugs resulting from the above
+   - made quite a lot of the methods of Vectors private
+   - trying to make the pods more consistent and informative
+   - renamed size() as query_size() to be really consistent --
+     but put in an undocumented alias named size() ... maybe
+     deprecate later.
+   - renamed ginsert() append(), but left ginsert() operational,
+     with no real chance of deprecation later
+
+1.6600: Tue Jun 23 2009
+   - installed a lotta DRY on the two vector classes, will
+     continue this tonight and on lunch break most likely.
+   - worked on the docs, they need a good deal of work
+   - _OVBed Mean
+   - noticed a half-way implemented set_vector fill-disabler, why
+     isn't it finished?
+     - added a query_filled to check to see if a vector is full
+     - made sure the _OVB and _TVB base classes know about the
+       half implemented fill disabler
+     - use query_filled in various places, to make it automagic
+       like everything else
+     - I gave up on the second argument to set_size... it needs
+       to be kinda system wide to work right.  Another $ENV{VAR}.
+       *sigh*
+   - _OVBed Mode
+
+1.6600: Mon Jun 22 2009
+   - started added best practices stuff to the dist
+
+1.6500: Fri May 29 2009
+   - I get asked, "does S::B handle missing values?" quite a lot.
+   - YES IT DOES! (now)
+
+1.6007: Sat May  2 2009
+   - fixed copyright information on request
+   - fixed various docbugs
+   - finished a thought about outliers
+
+1.6005: Thu Mar 26 12:22:23 EDT 2009
+   - META.yml stuff
+
+1.6004: Sun Mar  1 07:15:37 EST 2009
+   - doc bug found by Raj Chandran
+
+1.6003: Sun Feb  8 17:21:39 EST 2009
+   - perl 5.8.0 can't deal with this program, requiring 5.8.1:
+
+     my $o = bless {v1=>1, v2=>2}, "class";
+     print "K:$_; V:$o->{$_}\n" for keys %$o;
+     print "K:$_; V:$o->{$_}\n" for qw(v1 v2 v3);
+
+1.6002: Mon Jan 19 07:16:55 EST 2009
+   - I'm skipping the t/60_ tests without recent versions of
+     Math::BigFloat.  No idea what causes the problems, but since
+     the module isn't required, it doesn't even tell me the
+     version of the module.
+   - Perl's locale support is embarrassingly buggy.  Under
+     certain conditions, Number::Format will die because perl's
+     POSIX getlocale stuff returns some (but not all) of certain
+     locales.  This stuff is reproducible on almost any
+     machine, so I didn't bother to report it.  WRW installed a
+     fix in NF 1.61(a) that sets the thousands_sep to "" when
+     it's the same as the decimal_point.  Fixed (sorta).
+
+1.6001: Thu Nov  6 07:06:24 EST 2008
+   - noted the population vs sample issue (again)
+
+1.6: Sun Oct 19 07:24:19 EDT 2008
+   - rather than fixing more of the tests using
+     abs(blah-blarg)<tolerance, I've moved to overload '==' to do
+     it for me iff $ENV{TOLER} is set to a tolerance.
+   - I rather trivially allow Math::BigFloat inserts, but this
+     isn't documented or tested well.
+
+1.531: Thu Oct 16 16:26:12 EDT 2008
+   - A really minor bugfix thanks to Michiel van Loon
+   - I'm also requiring the latest version of Number::Format to
+     see if that mysterious separator problem disappears for
+     the rare tester that has a problem with it.
+
+1.53: Fri Aug 22 17:34:02 EDT 2008
+   - did some cleanup on the recalc code
+   - still showing a bug in the new t/08_filter tests... 
+   - yeah, bad bug in the median code, wow
+
+1.50: Fri Aug 22 06:56:17 EDT 2008
+   - adding a computed vector class that will act just like a
+     vector, but will be recomputable.
+   - computed vectors and a test have been added...
+   - added a filtered-outlier test
+   - documented the new computed vectors
+
+1.00: Thu Aug  7 07:24:36 EDT 2008
+   - finished up the docs, they still need to be proofread
+
+1.00: Fri Aug 1 - Wed Aug 6 2008
+   - bringing this distro up to date, apparently people actually
+     use it.
+   - tons of doc fixes
+   - adding an overloader class to deal with "" and 0+
+   - pre-reqed in Number::Format for ""
+   - forget returning undef cardinality, vector sizes are 0 when
+     they don't have a size set.
+   - added vector tags and the ability to add "computers" linked
+     to other vectors
+   - renamed CoVariance to Covariance
+   - I modernized and updated the crap out of the vector class
+   - I tested most of that new stuff also
+   - I added the "computer" storage devices to the Vector class
+   - I started the new smarter linking
+   - fixed an unimportant memory leak with Scalar::Util::weaken()
+   - re-wrote the docs from scratch
+
+0.42:  Wed Jan 25 17:22:11 EST 2006
+   - jettero patched in Orien's things
+
+0.41.3:  Thu Mar 25 12:48:56 EST 2004
+   - jettero took out the stoopid mod::sig, everyone hated
+     it anyway
+
+0.41.1 and 0.41.2: Tue Mar 23 07:59:46 EST 2004
+   - Copyright clarifications.  ... GPL with a twist.
+
+0.41:  Fri Jan 30 08:54:37 EST 2004
+   - jettero found an amazingly STUPID typo in the Basic.pm
+     Statisics anyone?
+
+0.4:  Thu Jan 29 11:20:51 EST 2004
+   - jettero added the UNBIAS flag for those that wish to
+     use (N-1) in their variance. Perhaps I should switch
+     the default. We will see.
+
+0.39:  Fri Dec 12 07:18:18 EST 2003
+   - jettero changed the NAME field to match CPAN
+
+0.38:  Tue Dec  9 08:35:59 EST 2003
+   - jettero discovered many bugs in the insert/ginsert of
+     the new new()s
+
+0.37:  Mon Dec  8 20:58:08 EST 2003
+   - jettero cleaned up the new() functions so they don't
+     require arguments for no reason
+
+0.36:  Sat Dec  6 11:32:17 EST 2003
+   - jettero added (linear) LeastSquareFit
+
+0.35:  Tue Dec  2 17:04:58 EST 2003
+   - jettero was working on the documentation in Basic.pm
+     when he realized the need for ginsert and set_vector
+     around the world... finished implementing those.
+
+0.34:  Tue Dec  2 14:45:11 EST 2003
+   - jettero tought the ::Covariance module to take ::Mean
+     objects as optional arguments to keep the ::Correlation
+     object from uselessly recalculating the mean as
+     mentioned in the entry below in 0.33.
+
+0.33:  Tue Dec  2 14:00:48 EST 2003
+   - jettero did an amazing amount of work on the objected
+     oriented structrues, the tests in t/ and added the
+     queuing functions to the packages. He also added the
+     Vector object to handle some things. Note that the
+     author is aware that the Mean get's uselessly
+     recalculated for some the high level objects...
+     Solution forthcomming...
+
+0.25:  Mon Dec  1 12:13:44 EST 2003
+   - jettero installed a correlation module and upped the
+     version a great deal.
+
+0.02:  Mon Dec  1 00:28:50 EST 2003
+   - jettero made some base packages, namely: StdDev,
+     Variance, Covariance, and Mean.
+
+0.01:  Sun Nov 30 11:55:03 EST 2003
+   - jettero made a skeleton package
+

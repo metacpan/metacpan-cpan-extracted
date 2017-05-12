@@ -1,0 +1,58 @@
+SVN-Dumpfile
+============
+
+SVN::Dumpfile represence a Subversion (http://subversion.tigris.org/) dumpfile.
+This module can modify, add or delete headers, properties and
+the content of the file records, called nodes.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+TESTS
+
+To run basic tests on an own Subversion dumpfile do:
+
+  SVNTESTDF=/path/to/dumpfile make test
+or
+  SVNTESTDF=/path/to/dumpfile perl t/99dftest.t
+
+To run basic tests on an own Subversion repository do:
+
+  SVNTESTREP=/path/to/repository/ make test
+or
+  SVNTESTREP=/path/to/repotitory t/99dftest.t
+
+Feel free to send error messages to email address below.
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Carp
+    Date::Parse
+    Digest::MD5
+    IO::File
+
+Optional:
+    Data::UUID (otherwise UUID will be just a random number)
+
+An installation of Subversion is needed to export and import the 
+dumpfiles.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006-2008 by Martin Scharrer <martin@scharrer-online.de>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

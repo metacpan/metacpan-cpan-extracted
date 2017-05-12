@@ -1,0 +1,90 @@
+Revision history for Perl extension Sys::Info::Driver::Windows.
+
+0.78 Sat Apr 16 15:51:46 2011
+    => Just increased the version number.
+
+0.77 Thu Aug  5 00:09:07 2010
+    => Bundle Capture::Tiny, as it's used too early to be a PREREQ.
+
+0.76 Sun Jul 18 02:24:09 2010
+    => Bump version for new stable release.
+
+0.75_02 Fri Jul 16 01:55:08 2010
+    => Set CPU flags.
+
+0.75_01 Mon Jul 12 03:12:33 2010
+    => Disable bundled intrinsics for MinGW 4x.
+    => Capture::Tiny is now a prereq.
+    => Win32API::Net also added to prereqs for Strawberry.
+
+0.74_03 Tue May  4 01:02:13 2010
+    => Fix a bootstrapping issue.
+
+0.74_02 Sun May  2 02:57:18 2010
+    => Move data structures into a separate conf.
+    => Config::General is now a dependency.
+
+0.74_01 Wed Mar 24 18:56:52 2010
+    => Improve CPU probe.
+    => Bundle intrin.h & friends from ReactOS for MinGW.
+
+0.73 Sun Jan 10 06:13:24 2010
+    => Support new uname().
+    => Perl::Critic refactoring.
+    => Fix code crashing.
+    => Added a workaround for CPU bitness detection for 32bit Windows + 64bit CPU.
+       However, it's currently an ugly hack. Any patches are welcome.
+    => Fix for RT#53523.
+    => Windows 7 support.
+
+0.72 Fri May  8 07:21:32 2009
+    => Improve os->tz().
+
+0.72 Sun May  3 03:29:00 2009
+    => Builder update.
+
+0.70 Mon Apr  6 03:54:23 2009
+    => Bump version for new stable release.
+
+0.69_11 Sat Apr  4 06:04:21 2009
+    => Implement os->bitness cpu->bitness.
+
+0.69_10 Fri Apr  3 22:21:51 2009
+    => Update test suite.
+
+0.69_06 Sat Mar 14 06:13:22 2009
+    => Update test suite.
+
+0.69_05 Sat Mar 14 01:41:10 2009
+    => Fix build suite.
+
+0.69_04 Sun Mar  8 03:42:32 2009
+    => Remove cache stuff.
+    => bitness()
+    => Now using Test::Sys::Info.
+    => Improve load_module().
+
+0.69_03 Fri Mar  6 05:52:57 2009
+    => Experimental support to detect the bitness of CPU & OS.
+
+0.69_02 Thu Mar  5 04:07:56 2009
+    => Add Sys::Info::Driver::Unknown to PREREQ
+
+0.69_01 Thu Mar  5 03:18:38 2009
+    => Separation from Sys::Info.
+    => Integrated Sys::Info::Driver::Windows::XS into Sys::Info::Driver::Windows.
+
+Revision history for Perl extension Sys::Info::Driver::Windows::XS
+(before integration into Sys::Info::Driver::Windows)
+
+0.21 Tue Jul  8 21:00:59 2008
+    => Increase distro kwalitee.
+
+0.20 Sun Jun 15 22:37:33 2008
+    => Implemented an interface to GetSystemInfo().
+
+0.11 Sun Jun  8 22:10:54 2008
+    => Forgot README & Changes to include in distro.
+
+0.10 Tue May 27 22:22:40 2008
+    => First public release.

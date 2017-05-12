@@ -1,0 +1,29 @@
+---
+abstract: 'Async Solr search driver'
+author:
+  - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SolarBeam
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::Page: '0'
+  Mojo::JSON::MaybeXS: '0'
+  Mojolicious: '0'
+resources:
+  bugtracker: https://github.com/Reisegiganten/solarbeam/issues
+  homepage: https://github.com/Reisegiganten/solarbeam
+  repository: https://github.com/Reisegiganten/solarbeam.git
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

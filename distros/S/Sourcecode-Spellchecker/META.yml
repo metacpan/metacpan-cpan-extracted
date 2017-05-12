@@ -1,0 +1,32 @@
+---
+name: Sourcecode-Spellchecker
+version: 0.03
+author:
+  - Zachary Blair <zblair@cpan.org>
+abstract: 'Detects common misspellings in source code and suggests corrections.'
+license: perl
+distribution_type: module
+generated_by: 'Zachary Blair'
+resources:
+  license: http://dev.perl.org/licenses/
+configure_requires:
+  ExtUtils::MakeMaker: 0
+build_requires:
+  ExtUtils::MakeMaker: 0
+  Test::More: 0
+requires:
+  perl: 5.006
+no_index:
+  directory:
+    - t
+provides:
+  Sourcecode::Spellchecker:
+    file: lib/Sourcecode/Spellchecker.pm
+    version: 0.03
+keywords:
+  - Spell
+  - Sourcecode
+  - Dictionary
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

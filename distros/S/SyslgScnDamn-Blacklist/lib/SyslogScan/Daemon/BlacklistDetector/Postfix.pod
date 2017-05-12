@@ -1,0 +1,82 @@
+
+=head1 NAME
+
+ SyslogScan::Daemon::BlacklistDetector::Postfix - recognize the postfix mailer's bounce lines
+
+=head1 SYNOPSIS
+
+ bld_plugin SyslogScan::Daemon::BlacklistDetector::Postfix
+	debug		1
+	rx_ourIP	216\.240\.47\.\d+
+	logpath		/var/log/mail.log
+
+=head1 DESCRIPTION
+
+SyslogScan::Daemon::BlacklistDetector::Postfix
+knows where to find the postfix MTAs log files and how
+to parse them for bounce information.
+
+SyslogScan::Daemon::BlacklistDetector::Postfix is a plugin for
+L<SyslogScan::Daemon::BlacklistDetector>.  
+The SYNOPSIS shows the configuration
+lines you might use in C</etc/syslogscand.conf> to turn on
+the postfix parsing.
+
+=head1 CONFIGURATION PARAMETERS
+
+SyslogScan::Daemon::BlacklistDetector::Postfix defines the following configuration
+parameters which may be given in indented lines that follow
+C<plugin SyslogScan::Daemon::BlacklistDetector::Postfix> or with the
+confuration prefix (C<blden_>) anywhere in the configuration file after the 
+C<plugin SyslogScan::Daemon::BlacklistDetector::Postfix> line.
+
+=over 15
+
+=item debug
+
+(default 0) Turn on debugging.
+
+=item rx_ourIP
+
+(no default, optional) A regular expression to match the part of the log line that
+would represent the sending IP address. 
+
+=item logpath
+
+(default C</var/log/mail.log>)
+
+=back
+
+=head1 parse_logs() INFO
+
+In addition to the required return elements, parse_logs() also returns:
+
+=over 15
+
+=item prefix
+
+If postfix is logging itself as C<postfix-somthing> instead of C<postfix>, then
+C<prefix> will be the C<something>.
+
+=item rx
+
+The regular expression that matched.
+
+=item mobj
+
+The SyslogScan::Daemon::BlacklistDetector::Postfix object.
+
+=back
+
+=head1 SEE ALSO
+
+The context for the blacklist detector:
+L<SyslogScan::Daemon::BlacklistDetector>
+
+=head1 LICENSE
+
+Copyright (C) 2006, David Muir Sharnoff <muir@idiom.com>
+
+This module may be used and copied on the same terms as Perl
+itself.
+

@@ -1,0 +1,186 @@
+NAME
+    SNMP::Simple - shortcuts for when using SNMP
+
+SYNOPSIS
+        use SNMP::Simple;
+
+        $name     = $s->get('sysName');       # same as sysName.0
+        $location = $s->get('sysLocation');
+
+        @array    = $s->get_list('hrPrinterStatus');
+        $arrayref = $s->get_list('hrPrinterStatus');
+
+        @list_of_lists = $s->get_table(
+            qw(
+                prtConsoleOnTime
+                prtConsoleColor
+                prtConsoleDescription
+                )
+        );
+
+        @list_of_hashes = $s->get_named_table(
+            name   => 'prtInputDescription',
+            media  => 'prtInputMediaName',
+            status => 'prtInputStatus',
+            level  => 'prtInputCurrentLevel',
+            max    => 'prtInputMaxCapacity',
+        );
+
+DESCRIPTION
+    This module provides shortcuts when performing repetitive
+    information-retrieval tasks with SNMP.
+
+    Instead of this:
+
+        use SNMP;
+        $vars = new SNMP::VarList( ['prtConsoleOnTime'], ['prtConsoleColor'],
+            ['prtConsoleDescription'], );
+        my ( $light_status, $light_color, $light_desc ) = $s->getnext($vars);
+        die $s->{ErrorStr} if $s->{ErrorStr};
+        while ( !$s->{ErrorStr} and $$vars[0]->tag eq "prtConsoleOnTime" ) {
+            push @{ $data{lights} },
+                {
+                status => ( $light_status ? 0 : 1 ),
+                color       => SNMP::mapEnum( $$vars[1]->tag, $light_color ),
+                description => $light_desc,
+                };
+            ( $light_status, $light_color, $light_desc ) = $s->getnext($vars);
+        }
+
+    ...you can do this:
+
+        use SNMP::Simple;
+        $data{lights} = $s->get_named_table(
+            status => 'prtConsoleOnTime',
+            color  => 'prtConsoleColor',
+            name   => 'prtConsoleDescription',
+        );
+
+  SNMP Beginners, read me first!
+    Please, please, please do not use this module as a starting point for
+    working with SNMP and Perl. Look elsewhere for starting resources:
+
+    * The SNMP module
+    * The Net-SNMP web site (<http://www.net-snmp.org/>) and tutorial
+    (<http://www.net-snmp.org/tutorial-5/>)
+    * Appendix E of Perl for System Administration
+    (<http://www.amazon.com/exec/obidos/tg/detail/-/1565926099>) by David N.
+    Blank-Edelman
+
+  SNMP Advanced and Intermediate users, read me first!
+    I'll admit this is a complete slaughtering of SNMP, but my goals were
+    precise. If you think SNMP::Simple could be refined in any way, feel
+    free to send me suggestions/fixes/patches.
+
+METHODS
+  new( @args )
+    Creates a new SNMP::Simple object. Arguments given are passed directly
+    to "SNMP::Session->new". See "SNMP::Session" in SNMP for details.
+
+    Example:
+
+        use SNMP::Simple
+    
+        my $s = SNMP::Simple->new(
+            DestHost  => 'host.example.com',
+            Community => 'public',
+            Version   => 1,
+        ) or die "couldn't create session";
+    
+        ...
+
+  get( $oid )
+    Gets the named variable and returns its value. If no value is returned,
+    "get()" will try to retrieve a list named $name and return its first
+    vlaue. Thus, for convenience,
+
+        $s->get('sysDescr')
+
+    ..should be the same as:
+
+        $s->get('sysDescr.0')
+
+    Numbered OIDs are fine, too, with or without a leading dot:
+
+        $s->get('1.3.6.1.2.1.1.1.0')
+
+    "SNMP::mapEnum()" is automatically used on the result.
+
+  get_list( $oid )
+    Returns leaves of the given OID.
+
+    If called in array context, returns an array. If called in scalar
+    context, returns an array reference.
+
+  get_table( @oids )
+    Given a list of OIDs, this will return a list of lists of all of the
+    values of the table.
+
+    For example, to get a list of all known network interfaces on a machine
+    and their status:
+
+        $s->get_table('ifDescr', 'ifOperStatus')
+
+    Would return something like the following:
+
+        [ 'lo',   'up'   ], 
+        [ 'eth0', 'down' ], 
+        [ 'eth1', 'up'   ],
+        [ 'sit0', 'down' ]
+
+    If called in array context, returns an array (of arrays). If called in
+    scalar context, returns an array reference.
+
+  get_named_table( %oids_by_alias )
+    Like "get_table", but lets you rename ugly OID names on the fly. To get
+    a list of all known network interfaces on a machine and their status:
+
+        $s->get_table( name => 'ifDescr', status => 'ifOperStatus' )
+
+    Would return something like the following:
+
+            {   
+                status => 'up',
+                name   => 'lo'
+            },
+            {
+                status => 'down',
+                name   => 'eth0'
+            },
+            {
+                status => 'up',
+                name   => 'eth1'
+            },
+            {
+                status => 'down',
+                name   => 'sit0'
+            }
+
+    If called in array context, returns an array (of hashes). If called in
+    scalar context, returns an array reference.
+
+EXAMPLES
+    A sample script examples/printerstats.pl is included with this
+    distribution.
+
+SEE ALSO
+    SNMP
+
+AUTHOR
+    Ian Langworth, "<ian@cpan.org>"
+
+BUGS
+    * There are no real tests.
+    * I haven't tested this with v3.
+
+    Please report any bugs or feature requests to
+    "bug-snmp-simple@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org>. I will be notified, and then you'll automatically
+    be notified of progress on your bug as I make changes.
+
+COPYRIGHT & LICENSE
+    Copyright 2005 Ian Langworth, All Rights Reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

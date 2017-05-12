@@ -1,0 +1,86 @@
+NAME
+       Speech::Swift::Simple - Simplified extension for Speech::Swift, a Perl extension for
+       the Cepstral Text-to-Speech Engine (Swift)
+
+SYNOPSIS
+       #!/usr/bin/perl
+
+       use Speech::Swift::Simple;
+
+       my $s = new Speech::Swift::Simple(channels => 1, encoding =>
+       Speech::Swift::AUDIO_ENCODING_PCM16);
+
+       $s->set_voice("Allison");
+
+       my $wave = $s->generate("My name is allison");
+
+       $wave->write("test.wav");
+
+DESCRIPTION
+       new(...)
+           "encoding"
+               OPTIONAL: specify the encoding method to use for the output audio- see
+               Speech::Swift defaults to Speech::Swift::AUDIO_ENCODING_PCM16
+
+           "channels"
+               OPTIONAL: specify the number of channels to use, either 1 or 2; defaults to
+               1.
+
+           "deadair"
+               OPTIONAL: include deadair in audio output, either 1 or 0; defaults to 0;
+
+       set_voice($voice_name)
+           Set the Cepstral voice to use for this Text-to-Speech generation.
+
+           $voice_name is the name of the voice to use.
+
+               $s->set_voice("Allison");
+
+       get_voices()
+           Returns a hash reference list of the currently available voices on the system.
+
+               $voices = $s->get_voices();
+
+       generate($text)
+           Generates audio for the given text, and returns a new
+           Speech::Swift::Simple::Wave object with the audio.
+
+           $text is the text to synthesize.
+
+           See the Speech::Swift::Simple::Wave man page for more details.
+
+               $wave = $s->generate("My name is allison");
+
+DEPENDENCIES
+       Speech::Swift PERL Module
+
+SEE ALSO
+       Cepstral - http://cepstral.com/
+
+AUTHOR
+       Mike Pultz <mike@mikepultz.com>
+
+LICENCE AND COPYRIGHT
+       Copyright (c) 2011, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+
+       This module is free software; you can redistribute it and/or modify it under the
+       same terms as Perl itself. See perlartistic.
+
+DISCLAIMER OF WARRANTY
+       BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY FOR THE
+       SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN OTHERWISE STATED IN
+       WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE THE SOFTWARE "AS IS"
+       WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT
+       LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+       PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+       YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY
+       SERVICING, REPAIR, OR CORRECTION.
+
+       IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING WILL ANY
+       COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR REDISTRIBUTE THE SOFTWARE
+       AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY
+       GENERAL, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR
+       INABILITY TO USE THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA
+       BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
+       OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH HOLDER OR OTHER
+       PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.

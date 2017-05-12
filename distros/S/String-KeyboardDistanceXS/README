@@ -1,0 +1,61 @@
+Name               DSLIP Description                                  Info
+------------------ ----- -------------------------------------------  --------
+String::KeyboardDistanceXS Rdpfp Approximate String Comparison                KRBURTON
+
+
+Approximate string comparison.
+
+
+NAME
+    String::KeyboardDistanceXS - String Comparison Algorithm
+
+SYNOPSIS
+      use String::KeyboardDistanceXS qw( :all );
+      my $s1 = 'Apple';
+      my $s2 = 'Wople';
+
+      # compute a match probability
+      my $pr = qwertyKeyboardDistanceMatch($s1,$s2);
+
+      # find the keyboard distance between two strings
+      my $dst = qwertyKeyboardDistance('IBM','HAL');
+
+DESCRIPTION
+    This is an XS implementation of the main qwerty functions for computing
+    the distance and match probabilities from the String::KeyboardDistance
+    module. Please see the documentation for String::KeyboardDistance for
+    more about these functions.
+
+    Since these functions are implemented as XS, in C, they are
+    significantly faster than the Perl based functions in
+    String::KeyboardDistance. That is the primary reason for this module,
+    performance.
+
+  TODO
+
+    This module only implements 2 of the functions from the Perl based
+    module. We should match the API from the other module as well as
+    possible. Some of the features will not be possible with this module,
+    namely making the keyboard maps easily accessable to Perl code.
+
+  EXPORT
+
+    None by default. Functions are exported with the :all tag.
+
+      qwertyKeyboardDistance
+      qwertyKeyboardDistanceMatch
+
+AUTHOR
+     Kyle R. Burton
+     krburton@hmsonline.com
+     kburton@hmsonline.com
+     HMS
+     625 Ridge Pike
+     Building E
+     Suite 400
+     Conshohocken, PA 19428
+
+SEE ALSO
+    perl(1). String::Approx. Text::DoubleMetaphone. String::Similarity.
+    String::KeyboardDistance.
+

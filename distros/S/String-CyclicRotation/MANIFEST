@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/String-CyclicRotation.t
+lib/String/CyclicRotation.pm
+META.yml                                 Module meta-data (added by MakeMaker)

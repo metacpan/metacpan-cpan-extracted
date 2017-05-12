@@ -1,0 +1,10 @@
+<h2><a href="[% src %]">[% title %]</a></h2>
+<p>
+[% FOREACH link = links %]
+    <a href="[% src %]">
+    <img src="[% GET link FILTER uri %]" alt="(scraped image)" border="0"/>
+    </a>
+    <br/>
+[% END %]
+</p>
+

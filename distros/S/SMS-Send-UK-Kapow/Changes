@@ -1,0 +1,31 @@
+Revision history for SMS-Send-UK-Kapow
+
+0.06    2 February 2009
+        The send_sms method, if using http/s to interact with Kapow, now waits up to 10
+          seconds per message while attempting to confirm that the message was actually
+          delivered to the user. This is in accordance with the SMS::Send specification. 
+          You can override this behaviour by supplying a false value to the new '_wait'
+          parameter to either new() or send_sms(). Whether or not you use _wait, you can
+          'manually' check the delivery status of any message sent using http/s by 
+          calling the delivery_status method.
+        Added missing dependency on SMS::Send::Driver.
+
+0.05    29 January 2009 
+        Default HTTP method changed from get to post.
+        Changes to number processing to avoid duplication of work already done by Send::SMS.
+
+0.04    29 January 2009 (not released)
+        Renamed send_status method to delivery_status, with an alias for compatibility.
+        The _from_id and _route params can now be set per message as well as per object.
+        Don't translate '07' to '447' anymore before sending, as it's not required by Kapow.
+        Added META.yml file.
+
+0.03    28 January 2009 (not released)
+        Both MIME::Lite and LWP::UserAgent are now required.
+
+0.02    25 January 2009
+        Doc fix and require MIME::Lite for email.
+
+0.01    23 January 2009
+        First version.
+

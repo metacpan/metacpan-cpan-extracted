@@ -1,0 +1,27 @@
+2015-08-24  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Regenerate distro with a modern MakeMaker
+	  (using perl 5.18.2)
+
+	* Use the recommended copyright and license wording.
+	
+	* Bump the copyright years.
+
+	* Add the copyright and license also to the README.
+	
+	* Release as version 0.04. 
+
+Sat Sep  7 19:09:25 2002  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Added _set_update_callback() internal interface
+	  for derived ("protected") classes that want to
+	  cache some computed data but invalidate it when
+	  the population data changes.
+
+	* Release as version 0.03. 
+
+Thu Apr 25 01:42:48 2002  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Just doc tweaks, no functionality changes.
+
+	* Release as version 0.02.

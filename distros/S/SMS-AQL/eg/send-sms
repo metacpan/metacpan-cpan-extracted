@@ -1,0 +1,79 @@
+#!/usr/bin/perl
+
+# $Id$
+# A simple script to be called by other scripts, taking either two parameters - a
+# mobile number (or comma-separated list of numbers) and a message, or just a
+# message, in which case the default_destination in the config file is used.
+#
+# Reads www.aql.com account details from a YANL
+# file ~/.aql_login, which should contain username, password and sender number
+# (if a sender number is not included, the machine's hostname will be used).
+# (Yes, a sender can be a mobile number, or any text).
+
+use strict;
+use SMS::AQL;
+use Sys::Hostname;
+use YAML;
+
+my $conf_file = $ENV{HOME} . '/.aql_login';
+my $conf = YAML::LoadFile($conf_file)
+    or die "Failed to read $conf_file";
+
+
+my ($destinations, $message);
+
+if (@ARGV == 2) {
+    $destinations = shift @ARGV;
+    $message = join ' ', @ARGV;
+} elsif (@ARGV == 1) {
+    $destinations = $conf->{default_destination};
+    if (!$destinations) {
+        die "Called with only one parameter, and no default_destination "
+           ."specified in $conf_file";
+    }
+    $message = shift @ARGV;
+} else {
+    show_usage();
+}
+
+
+my $sms = SMS::AQL->new({
+    username => $conf->{username},
+    password => $conf->{password},
+    options => {
+        sender => $conf->{sender} || Sys::Hostname::hostname(),
+    },
+});
+
+if (!$sms) {
+    die "Failed to get SMS::AQL object";
+}
+
+my $failures;
+
+for my $destination (split /,/, $destinations) {
+    my ($ok, $why) = $sms->send_sms($destination, $message);
+    if (!$ok) {
+        warn "Failed to send to $destination - $why";
+        $failures++;
+    }
+}
+
+if ($failures) {
+    exit -1;
+} else {
+    exit 0;
+}
+
+
+
+sub show_usage {
+print <<USAGE;
+
+Usage: $0 destination message
+
+E.g. $0 +44788123456 "Here is a nice message"
+USAGE
+exit;
+}
+

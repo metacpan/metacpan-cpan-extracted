@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Sub-Delete
+version:      1.00002
+version_from: lib/Sub/Delete.pm
+installdirs:  site
+requires:
+    constant:                      0
+    Exporter:                      5.57
+    strict:                        0
+    warnings:                      0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

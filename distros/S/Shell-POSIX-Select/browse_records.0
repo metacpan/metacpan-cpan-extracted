@@ -1,0 +1,28 @@
+#########################################################
+# Sample Program for Perl Module "Shell::POSIX::Select" #
+#  tim@TeachMePerl.com  (888) DOC-PERL  (888) DOC-UNIX  #
+#  Copyright 2002-2003, Tim Maher. All Rights Reserved  #
+#########################################################
+use Shell::POSIX::Select ( style => 'Korn' );
+ 
+if (@ARGV != 2  and  @ARGV != 3) {
+    # Could also use Getopt:* module for option parsing
+    die "Usage: $0 fieldnum filename [delimiter]" ;
+}
+
+( $field, $file, $delim) = @ARGV ;
+if ( ! defined $delim ) {
+    $delim='[\040\t]+' # SP/TAB sequences
+}
+
+$field-- ;  # 2->1, 1->0, etc., for 0-based indexing
+
+foreach ( `cat "$file"` ) {
+    # field is the key in the hash, value is entire record
+    $f2r{ (split /$delim/, $_)[ $field ] } = $_ ;
+}
+
+# Show specified fields in menu, and display associated records
+select $record ( sort keys %f2r ) {
+    print "$f2r{$record}" ;
+}

@@ -1,0 +1,68 @@
+[% USE Siesta( 'action', cgi.param('action') ) %]
+[% list = Siesta.list( cgi.param('list') ) %]
+[% INCLUDE _header.tt2 title="Siesta - List options for " _ list.name %]
+
+[% IF list.is_member( session.user ) %]You're a member of this list.[% END %]
+[% IF list.owner == session.user %]You're the owner of this list.[% END %]
+
+[% IF Siesta.errors.size; PROCESS _errors_list.tt2; END %]
+
+<h1>Plugins</h1>
+<form method="post">
+<input type="hidden" name="action" value="set_pref">
+<input type="hidden" name="list" value="[% list.id %]">
+[% FOR queue = list.queues %]
+<h2>Queue: [% queue %]</h2>
+	<table border=1>
+	[% FOR plugin = list.plugins(queue) %][%# plugin = plugin.promote %]
+		<tr><td colspan="2"><h2>[% plugin.name %][% IF plugin.personal %] (personal)[% END %]</h2></td>
+		[% IF session.user == list.owner %]
+		<td>[% IF plugin.rank > 1 %]<a href="?list=[% list.name %];action=move_plugin;id=[% plugin.id %];to=[% plugin.rank - 1 %];submit=1">up</a>[% ELSE %]&nbsp;[% END %]</td>
+		<td>[% IF plugin.rank < loop.size %]<a href="?list=[% list.name %];action=move_plugin;id=[% plugin.id %];to=[% plugin.rank + 1 %];submit=1">down</a>[% ELSE %]&nbsp;[% END %]</td>
+		<td><a href="?list=[% list.name %];action=delete_plugin;id=[% plugin.id %];submit=1">delete</a></td>
+		[% END %]
+		</tr>
+		[% IF plugin.options.keys.size %]
+		<tr><td>name</td><td>description</td><td>default</td><td>list</td>[% IF session.user && plugin.personal %]<td>you</td>[% END %]</tr>
+		[% END %]
+		[% FOR option = plugin.options.keys %]
+			<tr><td>[% option %]</td>
+			<td>[% plugin.options.$option.description %]</td>
+			<td>[% plugin.options.$option.default %]</td>
+			<td>[% IF session.user == list.owner %]<input type="text" name="list_[% option %]" value="[% END %][% x = plugin.user( undef ); plugin.pref(option) %][% IF session.user == list.owner %]">[% END %]</td>
+			[% IF session.user && plugin.personal %]
+			<td><input type="text" name="personal_[% option %]" value="[% x = plugin.member( session.user ); plugin.pref(option) %]"></td>
+			[% END %]
+			</tr>
+		[% END %]
+	[% END %]
+	</table>
+[% END %]
+<input type="submit" name="submit" value="Set Prefs">
+</form>
+
+[% IF list.owner == session.user %]
+<h2>Add Plugin</h2>
+<table>
+	<form method="POST">
+	<input type="hidden" name="list" value="[% list.name %]">
+	<input type="hidden" name="action" value="add_plugin">
+	<tr>
+	    <td>Queue: <select name="queue">[% FOR queue = list.queues %]<option>[% queue %][% END %]</select></td>
+	    <td>Plugin: <select name="type">[% FOR type = Siesta.available_plugins %]<option>[% type %][% END %]</select></td>
+	    <td>Personal <input type="checkbox" name="personal"></td>
+	    <td><input type="submit" name="submit" value="Add plugin"></td>
+   	</tr>
+	</form>
+</table>
+
+<h2>Subscribers</h2>
+<table>
+	<td><th>address</th><th>active</th></tr>
+[% FOR user = list.members %]
+	<tr><td>[% user.email %]</td><td>[% user.active %]</td></tr>
+[% END %]
+</table>
+[% END %]
+
+[% INCLUDE _footer.tt2 %]

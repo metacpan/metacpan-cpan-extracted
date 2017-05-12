@@ -1,0 +1,13 @@
+template: errors/invalid-xsi.tt
+
+vars:
+  domain: foo.co.te
+
+output_assertions:
+  count:
+    - [ '//epp:resData', 0, 'EPP: No resData in the response' ]
+  match:
+    - [ '//epp:result', '/Namespace prefix xsi .* not defined/', 'knows what happened' ]
+    - [ '//epp:msg', "/xmlns error/", "Message makes sense" ]
+  attr_is:
+    - [ '//epp:result', 'code', 2001, 'EPP: XML invalid' ]

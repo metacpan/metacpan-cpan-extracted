@@ -1,0 +1,21 @@
+NAME
+    PrintExcelSheet - a module for print Excelsheets
+
+SYNOPSIS
+            use warnings;
+            use strict;
+            use PrintExcelsheet qw( PrintIt );
+
+            PrintIt("C:\\Test.xls", 'all'); # print all sheets
+            PrintIt("C:\\Test.xls", 2..5);  # print sheet 2 to 5
+            PrintIt("C:\\Test.xls", 6);     # print sheet 6
+
+ABSTRACT
+    Test
+
+DESCRIPTION
+    ...
+
+AUTHOR AND LICENSE
+    copyright 2009 (c) Gernot Havranek
+

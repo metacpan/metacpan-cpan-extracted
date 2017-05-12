@@ -1,0 +1,29 @@
+Revision history for perl module Selenium::UserAgent
+
+0.10 2016-08-19
+ - Assert minimum required version for List::Util
+
+0.09 2016-06-05
+ - Stop using Test::ParallelSubtest
+
+0.08 2016-03-15
+ - Add nexus9 as an option for emulation
+
+0.07 2016-03-09
+ - Use Chrome's mobileEmulation option to set device-width
+
+0.06 2015-07-13
+ - Add new device candidates with specific types
+ - Deprecate almost all of the old device candidates
+ - Tests: Add workaround for Firefox not getting smaller than 335px
+
+0.05 2014-05-05
+ - Stop excluding passing certificate error switch
+
+0.04 2014-11-23
+ - Rename module to Selenium::UserAgent. This is of course a breaking
+   change.
+
+0.01 2014-07-18
+ - Initial commit. The module applies user agents and browser sizes to
+   Chrome and Firefox through a remote webdriver.

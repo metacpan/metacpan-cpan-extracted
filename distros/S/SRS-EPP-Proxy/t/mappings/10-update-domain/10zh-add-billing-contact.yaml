@@ -1,0 +1,12 @@
+# Add a billing contact, which is not supported
+template: update-domain.tt
+
+vars:
+  domain: 10zh.co.te
+  billing: registrant-001
+
+output_assertions:
+  attr_is:
+    - [ '//epp:result', 'code', 2102, 'SRS: Check for correct result code' ]
+
+

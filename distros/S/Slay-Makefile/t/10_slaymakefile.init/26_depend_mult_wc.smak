@@ -1,0 +1,9 @@
+include common.smakh
+
+default:   { map(("my_$_", "your_$_"), map "depend$_", 1..3) }
+	{ trace(@_) }
+
+%depend%:  { my ($maker, $target, $matches) = @_;
+             "$matches->[0]prereq$matches->[1]" }
+        # Comment }
+	{ trace(@_) }

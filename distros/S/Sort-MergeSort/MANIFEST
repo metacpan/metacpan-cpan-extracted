@@ -1,0 +1,9 @@
+Makefile.PL
+Changes
+MANIFEST			This list of files
+t/mergesort.t
+lib/Sort/MergeSort.pm
+lib/Sort/MergeSort/Iterator.pm
+t/iterator.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

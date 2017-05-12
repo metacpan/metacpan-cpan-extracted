@@ -1,0 +1,19 @@
+Spork-Shlomify
+
+This is an improved Spork derivative.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Shlomi Fish
+
+This program is released under the following license: MIT X11

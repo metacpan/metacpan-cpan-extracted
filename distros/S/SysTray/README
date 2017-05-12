@@ -1,0 +1,29 @@
+Sys::Tray
+=========
+
+All doc and versions are in the POD in the main .pm - not here.
+
+INSTALLATION
+
+This is a cross-platform ".xs" module.  If you have a compiler
+and GUI libraries installed, you can build it yourself as
+normal.  If you do not have a compiler - you can fetch a
+prebuilt .PPM or similar version from someplace like Activestate.
+
+DEPENDENCIES
+
+See the POD for an accurate up-to-date list.  In general,
+at least the following is required:-
+
+  * A C/C++ compiler
+  * for Linux:-	  KDE 3.2/Qt 3.3 development packages installed
+  * for Windows:- Windows PSDK (if you're not using Visual Studio/C++)
+  * for Mac:-	  Cocoa framework
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by Chris Drake.  Contact details on www.vradd.com
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Sorauta-SVN-AutoCommit.t
+lib/Sorauta/SVN/AutoCommit.pm
+lib/SVN/Agent/Dummy.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

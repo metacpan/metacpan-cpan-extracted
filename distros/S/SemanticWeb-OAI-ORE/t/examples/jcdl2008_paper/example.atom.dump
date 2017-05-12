@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+ <id>http://arxiv.org/rem/0801.2244v1#aggregation</id>
+ <title>ORE Aggregation http://arxiv.org/rem/0801.2244v1#aggregation</title>
+ <link rel="self" type="application/atom+xml" href="http://arxiv.org/rem/0801.2244v1" />
+ <category label="Resource map" term="http://www.openarchives.org/ore/terms/ResourceMap" scheme="http://www.openarchives.org/ore/terms/" />
+ <link rel="describes" href="http://arxiv.org/rem/0801.2244v1#aggregation" />
+ <author>
+  <uri>http://arxiv.org/</uri>
+  <name>Authority http://arxiv.org/</name>
+ </author>
+ <updated>2008-01-15T10:01:19Z</updated>
+ <dcterms:created>2008-01-15T10:01:19Z</dcterms:created>
+ <rights>http://creativecommons.org/licenses/publicdomain/</rights>
+ <rdf:type>http://www.openarchives.org/ore/terms/Aggregation</rdf:type>
+ <ore:analogousTo>info:doi/10.1103/PhysRevD.72.095016</ore:analogousTo>
+ <rdf:type>http://purl.org/eprint/type/JournalArticle</rdf:type>
+ <ore:isAggregatedBy>http://arxiv.org/rem/0801.2244#aggregation</ore:isAggregatedBy>
+ <ore:alsoInResourceMap>http://arxiv.org/rem/0801.2244</ore:alsoInResourceMap>
+ <entry>
+  <id>urn:uuid:DCB09660-CD33-3BBB-90BD-51234F2663FB</id>
+  <link rel="alternate" href="http://arxiv.org/abs/0801.2244v1" />
+  <title>Aggregated Resouce http://arxiv.org/abs/0801.2244v1</title>
+  <content>Aggregated Resouce http://arxiv.org/abs/0801.2244v1</content>
+  <updated>2008-01-15T10:01:19Z</updated>
+  <rdf:type>http://www.openarchives.org/ore/terms/AggregatedResource</rdf:type>
+  <rdf:type>info:eu-repo/semantics/humanStartPage</rdf:type>
+ </entry>
+ <entry>
+  <id>urn:uuid:8F98C689-4E82-30D3-83E2-80356EF043EE</id>
+  <link rel="alternate" href="http://arxiv.org/pdf/0801.2244v1" />
+  <title>Aggregated Resouce http://arxiv.org/pdf/0801.2244v1</title>
+  <content>Aggregated Resouce http://arxiv.org/pdf/0801.2244v1</content>
+  <updated>2008-01-15T10:01:19Z</updated>
+  <rdf:type>http://www.openarchives.org/ore/terms/AggregatedResource</rdf:type>
+  <rdf:type>http://purl.org/dc/dcmitype/Text</rdf:type>
+ </entry>
+</feed>
+

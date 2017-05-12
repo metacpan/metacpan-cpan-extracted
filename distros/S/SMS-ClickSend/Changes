@@ -1,0 +1,7 @@
+Revision history for SMS-ClickSend
+
+0.02  2014-11-12 21:22:50 CST
+        - return useful json data when the returning Content-Type is json
+
+0.01  2014-11-12 20:48:02 CST
+        - Initial release

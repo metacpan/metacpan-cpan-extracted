@@ -1,0 +1,33 @@
+---
+name: Sort-Bucket
+version: 0.02
+author:
+  - 'Nick Cleaton <nick@cleaton.net>'
+abstract: a fast XS bucket sort
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/ncleaton/sort-bucket.git
+build_requires:
+  Devel::Refcount: 0
+  Digest::MD5: 0
+  ExtUtils::CBuilder: 0
+  List::Util: 0
+  Test::Exception: 0
+  Test::Group: 0
+  Test::Group::Foreach: 0
+  Test::More: 0.88
+  Time::HiRes: 0
+requires:
+  Exporter: 0
+  XSLoader: 0
+configure_requires:
+  Module::Build: 0.35
+provides:
+  Sort::Bucket:
+    file: lib/Sort/Bucket.pm
+    version: 0.02
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

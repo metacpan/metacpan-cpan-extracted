@@ -1,0 +1,7 @@
+NestedGroups.pm
+NestedGroups/Member.pm
+Changes
+MANIFEST
+Makefile.PL
+README
+t/basic.t

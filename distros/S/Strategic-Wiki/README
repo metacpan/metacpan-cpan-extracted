@@ -1,0 +1,41 @@
+NAME
+    Strategic::Wiki - Turn Any Directory into a Lightweight Wiki
+
+SYNOPSIS
+        > strategic-wiki init
+        > edit .strategic-wiki/config.yaml
+        > strategic-wiki make
+        > strategic-wiki up
+
+DESCRIPTION
+    Strategic Wiki (SW) lets you turn any directory on your computer into a
+    wiki. Every file in the directory is a wiki page. All SW files are put
+    into a ".strategic-wiki/" subdirectory. SW uses git for wiki history. If
+    your directory is already a git repo, SW can use its GIT_DIR, or it can
+    set up its own. SW is a Perl Plack program, so you can run it in any web
+    environment. The 'up' command will start a local web server that you can
+    use immediately (even offline).
+
+    Strategic::Wiki installs a command line utility called "stategic- wiki".
+    This command can be used to create and update the wiki. It can also act
+    as a git hook command.
+
+DOCUMENTATION
+    See Strategic::Wiki::Manual for more information.
+
+NAMESPACE
+    Strategic::Wiki is a Perl project created and maintained by Strategic
+    Data, a company in Melbourne Australia that uses Perl and contributes to
+    the Perl and Open Source communities.
+
+AUTHOR
+    Ingy döt Net <ingy@cpan.org>
+
+COPYRIGHT
+    Copyright (c) 2010. Ingy döt Net.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://www.perl.com/perl/misc/Artistic.html
+

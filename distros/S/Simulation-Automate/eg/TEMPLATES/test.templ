@@ -1,0 +1,17 @@
+use lib '../..';
+use Simulation::Automate;
+use Cwd;
+my $installdir=cwd();
+$installdir=~s/\/test-synsim//;
+
+my $msg= "
+SynSim Installation Test
+
+Simulation::Automate version $Simulation::Automate::VERSION
+
+Installed locally in $installdir
+";
+open(OUT,">$ARGV[0]");
+print OUT $msg;
+close OUT;
+print $msg;

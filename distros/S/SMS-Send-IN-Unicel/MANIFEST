@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+LICENSE
+README
+t/liveaccttest.t
+t/compile.t
+t/checkloginpass.t
+t/checkmsgdest.t
+t/pod.t
+t/pod-coverage.t
+lib/SMS/Send/IN/Unicel.pm

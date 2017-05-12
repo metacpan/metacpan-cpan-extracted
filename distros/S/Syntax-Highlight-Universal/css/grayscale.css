@@ -1,0 +1,204 @@
+/* Generated with hrd2css.pl from grayscale.hrd */
+
+.def_HorzCross {
+	color: #000000;
+	background-color: #BBBBBB;
+}
+
+.def_VertCross {
+	color: #000000;
+	background-color: #BBBBBB;
+}
+
+.def_Number {
+	color: #2e2e2e;
+}
+
+.def_NumberDec {
+	color: #2e2e2e;
+}
+
+.def_NumberHex {
+	color: #2a2a2a;
+}
+
+.def_NumberBin {
+	color: #1e1e1e;
+}
+
+.def_NumberOct {
+	color: #2e2e2e;
+}
+
+.def_NumberFloat {
+	color: #2a2a2a;
+}
+
+.def_NumberSuffix {
+	color: #222222;
+}
+
+.def_String {
+	color: #4c4c4c;
+}
+
+.def_StringContent {
+	color: #7d7d7d;
+}
+
+.def_StringEdge {
+	color: #2a2a2a;
+}
+
+.def_CharacterContent {
+	color: #444444;
+}
+
+.def_Comment {
+	color: #696969;
+}
+
+.def_CommentContent {
+	color: #868686;
+}
+
+.def_CommentDoc {
+	color: #afafaf;
+}
+
+.def_Symbol {
+	color: #555555;
+}
+
+.def_SymbolStrong {
+	color: #555555;
+}
+
+.def_Prefix {
+	color: #939393;
+}
+
+.def_Operator {
+	color: #939393;
+}
+
+.def_Keyword {
+	color: #575757;
+	font-weight: bold;
+}
+
+.def_KeywordStrong {
+	color: #8e8e8e;
+	font-weight: bold;
+}
+
+.def_Register {
+	color: #2a2a2a;
+}
+
+.def_Constant {
+	color: #404040;
+}
+
+.def_VarStrong {
+	color: #3e3e3e;
+}
+
+.def_Identifier {
+	color: #656565;
+}
+
+.def_Directive {
+	color: #2f2f2f;
+}
+
+.def_Param {
+	color: #262626;
+}
+
+.def_Tag {
+	color: #2a2a2a;
+}
+
+.def_OpenTag {
+	color: #545454;
+}
+
+.def_CloseTag {
+	color: #545454;
+}
+
+.def_Label {
+	color: #adadad;
+}
+
+.def_LabelStrong {
+	color: #000000;
+	background-color: #707070;
+}
+
+.def_Insertion {
+	color: #000000;
+	background-color: #e0e0e0;
+}
+
+.def_InsertionStart {
+	color: #2a2a2a;
+	background-color: #e0e0e0;
+}
+
+.def_InsertionEnd {
+	color: #2a2a2a;
+	background-color: #e0e0e0;
+}
+
+.def_Error {
+	color: #ffffff;
+	background-color: #494949;
+	font-weight: bold;
+}
+
+.def_ErrorText {
+	color: #9e9e9e;
+}
+
+.def_TODO {
+	color: #ffffff;
+	background-color: #555555;
+	font-weight: bold;
+}
+
+.def_Debug {
+	color: #b8b8b8;
+	background-color: #515151;
+	font-weight: bold;
+}
+
+.def_Path {
+	color: #333333;
+}
+
+.def_URL {
+	color: #444444;
+}
+
+.def_EMail {
+	color: #676767;
+}
+
+.def_Date {
+	color: #646464;
+}
+
+.def_Time {
+	color: #797979;
+}
+
+.def_PairStart {
+	color: #333333;
+}
+
+.def_PairEnd {
+	color: #333333;
+}
+

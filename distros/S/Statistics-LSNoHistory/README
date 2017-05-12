@@ -1,0 +1,27 @@
+Statistics::LSNoHistory version 0.01
+===================================
+
+This is the README file for Perl module Statistics::LSNoHistory.  Run
+
+	perldoc ./LSNoHistory.pm 
+
+for information about its functionality.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 John Pliam <pliam@cpan.org>
+
+See file COPYING for complete information.

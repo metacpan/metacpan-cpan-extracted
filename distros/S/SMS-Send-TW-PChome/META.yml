@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         SMS-Send-TW-PChome
+version:      0.03
+version_from: lib/SMS/Send/TW/PChome.pm
+installdirs:  site
+requires:
+    Crypt::SSLeay:                 0.51
+    SMS::Send:                     0
+    Text::Iconv:                   1.7
+    WWW::Mechanize:                1.18
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

@@ -1,0 +1,54 @@
+description: set up handles
+registrar: 1
+
+request: |-
+ <NZSRSRequest VerMajor="4" VerMinor="4" RegistrarId="100">
+    <HandleCreate Email="Loopdigga@handlethis-orz.co.te" ActionId="[% actionid %] 1" HandleId="id123" Name="FooBar">
+       <PostalAddress
+                Address1="1400 E 8 Mile Rd"
+                Address2="Highland Park"
+                City="Detroit"
+                Province="Michigan"
+                CountryCode="US"
+                PostalCode="48203"
+                />   
+        <Phone
+            AreaCode="4"
+            CountryCode="64"
+            LocalNumber="Registrant phone s1c1"
+            />
+    </HandleCreate> 
+    <HandleCreate Email="Loopdigga@handlethis-orz.co.te" ActionId="[% actionid %] 2" HandleId="shazzam1234" Name="FooBar">
+       <PostalAddress
+                Address1="1400 E 8 Mile Rd"
+                Address2="Highland Park"
+                City="Detroit"
+                Province="Michigan"
+                CountryCode="US"
+                PostalCode="48203"
+                />   
+        <Phone
+            AreaCode="4"
+            CountryCode="64"
+            LocalNumber="Registrant phone s1c1"
+            />
+    </HandleCreate> 
+    <HandleCreate Email="Loopdigga@handlethis-orz.co.te" ActionId="[% actionid %] 3" HandleId="alcatraz367" Name="FooBar">
+       <PostalAddress
+                Address1="1400 E 8 Mile Rd"
+                Address2="Highland Park"
+                City="Detroit"
+                Province="Michigan"
+                CountryCode="US"
+                PostalCode="48203"
+                />   
+        <Phone
+            AreaCode="4"
+            CountryCode="64"
+            LocalNumber="Registrant phone s1c1"
+            />
+    </HandleCreate>         
+ </NZSRSRequest>
+
+assertions:
+ - xpath_matches: [ '//Error', '0', 'No errors' ]

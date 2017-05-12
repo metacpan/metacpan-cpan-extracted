@@ -1,0 +1,18 @@
+Revision history for SQLib
+
+0.05    04-02-2013
+        It looks like that I forgot to change the MANIFEST file (no tests were included until now).
+        Some small fixes.
+
+0.04    25-03-2013
+        More tests.
+
+0.03    20-03-2013
+        Bugfixes and more tests were added.
+
+0.02    20-03-2013
+        Some the POD notation fixes.
+
+0.01    20-03-2013
+        First version.
+

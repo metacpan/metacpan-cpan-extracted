@@ -1,0 +1,25 @@
+-*- Outline -*- $Format: "* Version $ProjectRelease$"$
+* Version 1.002
+
+* FAM <-> Perl Interface
+This is a pretty standard XSUB, for Irix only. See SGI::FAM(3) for more.
+
+* Installation
+
+perl Makefile.PL; make all test install
+
+Also try out `perl -Mblib monitor DIRECTORY' on some interesting directory.
+
+* Scripts
+
+** monitor
+
+monitor - monitor filesystem activity with FAM
+
+** magicrcs
+
+magicrcs - automatically monitor directories & files and keep them under RCS
+
+* Summaries
+
+SGI::FAM		Interface to SGI FAM (file-monitor) API.		adcO

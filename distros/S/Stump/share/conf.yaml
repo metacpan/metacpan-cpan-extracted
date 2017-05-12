@@ -1,0 +1,7 @@
+# This is the Stump configuration file
+
+# Automatically run 'stump make' before 'stump speech' when appropriate.
+auto_make: 1
+
+# The command that 'stump speech' runs.
+start_command: ooimpress -nologo -show stump.odp

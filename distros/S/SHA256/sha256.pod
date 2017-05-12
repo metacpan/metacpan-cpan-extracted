@@ -1,0 +1,56 @@
+
+=head1 NAME
+
+SHA256 - a module that implements the NIST SHA-256 hash
+
+=head1 SYNOPSIS
+
+ use SHA256;
+
+ $context = new SHA256;
+ $context->reset();
+ $context->add(LIST);
+ $context->addfile(HANDLE);
+
+ $digest = $context->digest();
+ $string = $context->hexdigest();
+
+ $digest = $context->hash($string);
+ $string = $context->hexhash($string);
+
+=head1 DESCRIPTION
+
+The B<sha256> module allows you to use the NIST sha256 hash algorithm.
+
+A new sha256 context object is created with the B<new> operation.
+Multiple simultaneous digest context can be maintained if desired.
+The context is updated with the B<add> operation which adds the
+strings contained in the I<LIST> parameter.
+
+The final message digest value is returned by the B<digest> operation
+as a 32-byte binary string. This operation delivers the result of
+operations since the last B<new> or B<reset> operation. Once the
+operation has been performed, the context must be B<reset> before
+being used to calculate another digest value.
+
+Several convenience functions are also provided. The B<addfile>
+operation takes an open file-handle and reads it until end-of file in
+8192-byte blocks adding the contents to the context. The B<hexdigest>
+operation calls B<digest> and returns the result as a printable string
+of hexadecimal digits in eight-digit groups. The B<hash> operation
+performs the complete series of steps: B<reset>, B<add>, B<digest> on
+the supplied scalar value, and returns the result as a 32-byte binary
+string. The B<hexhash> operation does the same thing, but returns the
+result in the format of the B<hexdigest> operation.
+
+=head1 AUTHOR
+
+SHA-256 C code and Perl interface by Rafael R. Sevilla, based on
+reference code provided by NIST.
+
+For more information on SHA256 see:
+
+http://csrc.nist.gov/cryptval/shs.html
+
+=cut
+

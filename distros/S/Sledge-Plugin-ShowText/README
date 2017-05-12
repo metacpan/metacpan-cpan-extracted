@@ -1,0 +1,39 @@
+NAME
+    Sledge::Plugin::ShowText - plugin to show text from data
+
+SYNOPSIS
+      package Your::Pages;
+      use Sledge::Plugin::ShowText;
+      use Your::Data;
+
+      sub dispatch_foo {
+          my $self  = shift;
+          my $id    = $self->r->param('id');
+          my $text = Your::Data->retrieve($id)->text;
+          return $self->show_text($text);
+      }
+
+      sub dispatch_bar {
+          my $self  = shift;
+
+          if (.....) {
+              return $self->show_text('ok');
+          }
+          else {
+              return $self->show_text('ng');
+          }
+      }
+
+DESCRIPTION
+    Sledge::Plugin::ShowText is show text Plugin for Sledge. You can easy to
+    generate plain text.
+
+AUTHOR
+    KIMURA, takefumi <takefumi@mobilefactory.jp>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    Slege::Plugin::ShowImage
+

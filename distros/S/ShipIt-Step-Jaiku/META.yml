@@ -1,0 +1,25 @@
+--- 
+abstract: ~
+author: 
+  - "{% ELSE %}"
+build_requires: 
+  Test::Compile: 0
+  Test::More: 0
+  UNIVERSAL::require: 0
+distribution_type: module
+generated_by: Module::Install version 0.68
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: ShipIt-Step-Jaiku
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Net::Jaiku: 0
+  ShipIt: 0
+  YAML: 0
+  perl: 5.6.0
+version: 0.01

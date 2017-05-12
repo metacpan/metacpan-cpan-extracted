@@ -1,0 +1,14 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use File::Spec;
+use IO::File;
+
+my (undef, undef, $thisbin) = File::Spec->splitpath( $0 );
+my $filename = File::Spec->catfile($ENV{FAKE_DATA}, "${thisbin}.out");
+
+die qq{Test data $filename not found} unless -e $filename;
+
+my $fh = IO::File->new( $filename, 'r');
+print STDOUT do { local $/; <$fh>};
+close $fh;

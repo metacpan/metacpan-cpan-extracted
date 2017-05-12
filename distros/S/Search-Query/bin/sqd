@@ -1,0 +1,151 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Getopt::Std;
+use Search::Query;
+use Pod::Usage;
+use Data::Dump qw( dump );
+
+my %Opt;
+getopts( "sd:hDf:b:", \%Opt );
+$Opt{d} ||= 'Native';
+$Opt{b} = '+' unless defined $Opt{b};
+pod2usage(1) if $Opt{h};
+pod2usage(1) if !@ARGV;
+
+my @args;
+if ( $Opt{f} ) {
+    push @args, default_field => $Opt{f};
+    push @args, fields        => [ $Opt{f} ];
+}
+push @args, default_boolop => $Opt{b};
+my $query_class = Search::Query->get_query_class( $Opt{d} );
+if ( $query_class eq 'Search::Query::Dialect::SQL' ) {
+    push @args, fields => [ $Opt{f} || 'NOSUCHFIELD' ];
+}
+if ( $Opt{s} ) {
+    push @args, sloppy => 1;
+}
+my $parser = Search::Query->parser(
+    query_class => $query_class,
+    null_term   => 'NULL',
+    @args
+);
+
+my $str = join ' ', @ARGV;
+my $query = $parser->parse($str) or die "bad query: " . $parser->error;
+printf( "%s\n => %s\n", $str, $query );
+if ( $Opt{D} ) {
+    dump $query;
+}
+if ( lc( $Opt{d} ) eq 'lucy' ) {
+    printf( "%s\n => %s\n", $str, $query->as_lucy_query->to_string );
+    if ( $Opt{D} ) {
+        dump $query->as_lucy_query->dump();
+    }
+}
+
+exit(0);
+
+__END__
+
+=pod
+
+=head1 NAME
+
+sqd - Search::Query::Dialect parser
+
+=head1 SYNOPSIS
+
+ sqd [-d dialect] [-f fieldname] [-D] [-h] [-b "+||-"] query
+ 
+ Examples:
+  % sqd foo or bar
+  % sqd -d sql foo or bar
+  % sqd -d swish foo or bar
+  % sqd -d native foo or bar
+
+=head1 DESCRIPTION
+
+B<sqd> is a simple program for testing the output of Search::Query::Parser
+in various dialects.
+
+B<sqd> is short for Search Query Dialect.
+
+=head1 OPTIONS
+
+=over
+
+=item -d I<dialect>
+
+Indicate the I<dialect> to re-serialize your query with.
+
+=item -f I<fieldname>
+
+Indicate the default field name. For SQL, default is NOSUCHFIELD.
+
+=item -D
+
+Prints the $query object to stderr with Data::Dump.
+
+=item -b I<op>
+
+Set the default_boolop value. Default is B<+>. Set to the empty
+string "" for an OR search.
+
+=item -h
+
+Print the usage statement.
+
+=back
+
+=head1 AUTHOR
+
+Peter Karman, C<< <karman at cpan.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-search-query at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Search-Query>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Search::Query
+
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Search-Query>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Search-Query>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Search-Query>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Search-Query/>
+
+=back
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2010 Peter Karman.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut

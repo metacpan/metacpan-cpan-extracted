@@ -1,0 +1,19 @@
+Revision history for Perl module Storable::CouchDB
+
+0.04 2011-02-02
+  - Updated tests to skip if there is no local CouchDB
+  - Updated documentation
+0.03 2011-01-29
+  - Updated documentation for CPAN
+  - Updated argument terminology from "id" to "doc"
+  - Added binary tests
+  - Added documentation on Storage Details
+0.02 2011-01-29
+  - Added support for arrays, scalars and undef
+  - Changed store method from data=>key to key=>data ## Not backwards compatable ##
+  - Added many test
+  - Updated documentation
+  - Added example script
+0.01 2011-01-28
+  - Support for hashes
+  - Original version; created by ExtUtils::ModuleMaker 0.51

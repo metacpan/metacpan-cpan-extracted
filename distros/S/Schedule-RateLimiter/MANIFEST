@@ -1,0 +1,9 @@
+Changes
+RateLimiter.pm
+Makefile.PL
+MANIFEST
+README
+t/1_constructor.t
+t/2_single_iterations.t
+t/3_zero_seconds.t
+t/4_multiple_iterations.t

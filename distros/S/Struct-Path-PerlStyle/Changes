@@ -1,0 +1,90 @@
+Revision history for Struct-Path-PerlStyle
+
+0.63    2017-03-31
+        don't quote numbers used as hash keys in ps_serialize()
+        refactoring, small tests improvements
+        tests fixed for dev perl (5.25.9)
+
+0.62    2017-03-01
+        regexp match filter (=~) added
+        croak if unclosed brackets used in path
+
+0.61    2017-02-21
+        steps count corruption fixed in '<<' if closure used more than once
+        'eq' filter fixed (doesn't croaks now) for undefs
+
+0.60    2017-01-22
+        no backwards compatibility for filters (operators): should be in
+            parentheis now (filters still is highly experimental future)
+        filters now may have arguments
+        'eq', 'defined' and 'not' filters added
+
+0.44    2017-01-12
+        double quotes used in ps_serialize()
+        escape control characters in ps_serialize() (\t,\n,\b and so on)
+        pod corrected
+
+0.43    2017-01-03
+        quote non ASCII keys in ps_serialize()
+        escape/unescape quoting characters
+        tests improved
+
+0.42    2016-12-18
+        Quote key in ps_serialize() unless key is simple word (match /^\w+$/)
+
+0.41    2016-12-06
+        '<' (step back) operator is deprecated ('<<' must be used instead)
+        tests improved
+
+0.40    2016-11-19
+        regexp match for hash keys specification supported
+
+0.33    2016-10-20
+        docs corrected
+
+0.32    2016-10-16
+        bare numbers as hash keys now works correctly
+        get rid of list context for ps_serialize()'s out (ambigous)
+        tests refactored
+
+0.31    2016-09-13
+        ps_serialize() now returns list of serialized steps in list context
+
+0.30    2016-09-12
+        Operators support added to ps_parse()
+
+0.24    2016-09-09
+        passed path corruption fixed (for multiword keys)
+
+0.23    2016-07-17
+        perl 5.10 and below compatibility fixed for ps_serialize()
+        more strict hash definition check for ps_serialize()
+        tests improved
+
+0.22    2016-07-15
+        Keys with spaces/tabs now quoted in ps_serialize()
+        Croak if floating-point array index definition passed to ps_parse()
+
+0.21    2016-07-07
+        Refactoring
+        Tests coverage improved
+
+0.20    2016-06-28
+        Path structure changed according Struct::Path's v0.20
+
+0.05    2016-06-03
+        ranges supported in ps_serialize()
+
+0.04    2016-05-31
+        ps_serialize() implemented
+
+0.03    2016-05-30
+        unstarted/unfinished ranges correctly handled in ps_parse()
+
+0.02    2016-05-27
+        multiple bugfixes, cosmetic changes
+
+0.01    2016-05-19
+        ps_parse() implemented
+        working draft
+

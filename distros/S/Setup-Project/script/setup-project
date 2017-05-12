@@ -1,0 +1,52 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Getopt::Compact::WithCmd;
+
+# Taken from Plack::Util
+sub load_class {
+    my $class = shift;
+    my $file = $class;
+    $file =~ s!::!/!g;
+    require "$file.pm"; ## no critic
+    return $class;
+}
+
+my $go = Getopt::Compact::WithCmd->new(
+    global_struct => {
+        'flavor' => {
+            alias    => 'f',
+            type     => 'Str',
+            desc     => 'flavor package',
+            opts => {
+                required => 1,
+            },
+        },
+        'distdir' => {
+            alias    => 'd',
+            type     => 'Str',
+            desc     => 'dist dir',
+            opts => {
+                default => '.'
+            },
+        },
+    },
+);
+
+my $opts   = $go->opts;
+my $flavor = $opts->{flavor};
+my $argv   = \@ARGV;
+
+my $obj = load_class($flavor)->new(
+    distdir => $opts->{distdir},
+);
+eval {
+    $obj->parse($argv);
+};
+if ($@) {
+    printf ("usage: setup_project -f %s -d /tmp/ %s \n", $flavor, $obj->argv);
+    exit;
+}
+$obj->maker->safely_run(sub {
+    $obj->run;
+});

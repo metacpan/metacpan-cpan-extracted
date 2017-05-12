@@ -1,0 +1,11 @@
+Revision history for Perl module SMS::Send::NANP::TextPower
+
+0.03 2015-12-02
+  - Moved SMS::Send::TextPower to SMS::Send::NANP::TextPower to be compliant with the SMS::Send Local/International phone number business rules.
+
+0.02 2015-11-24
+  - Update to move common methods to SMS::Send::Driver::WebService
+  - Added tests for North American Numbering Plan (NANP) format
+
+0.01 2015-10-20
+  - original version; created by ExtUtils::ModuleMaker 0.51

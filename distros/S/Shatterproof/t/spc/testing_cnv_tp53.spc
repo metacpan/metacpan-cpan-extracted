@@ -1,0 +1,2 @@
+#chr	start	end	number	quality
+17	7580000	7580050	15	.

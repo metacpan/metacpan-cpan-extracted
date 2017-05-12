@@ -1,0 +1,17 @@
+Revision history for Speech::Google::TTS
+
+0.74	28/12/2013
+	System independent default tempdir.
+
+0.73	26/12/2013
+	Some minor fixes for *BSD compatibility
+
+0.72	20/12/2013
+	Module Build system added.
+
+0.71	19/12/2013
+	OO configuration interface added.	
+
+0.70    12/12/2013
+        First version for CPAN modules
+

@@ -1,0 +1,169 @@
+Revision history for Perl extension Spellunker
+
+v0.4.0 2013-11-03T09:54:46Z
+
+    - Added clear_stopwords method.
+      (moznion)
+
+v0.3.1 2013-09-10T20:02:10Z
+
+    - Fixed too much recursive calls.
+      (Reported from gfx++)
+
+v0.3.0 2013-06-10T07:54:23Z
+
+    - Allow git sha1 hash
+      (tokuhirom)
+    - more stopwords
+      (tokuhirom)
+
+v0.2.9 2013-06-08T04:48:12Z
+
+    - more stopwords
+      (tokuhirom)
+
+v0.2.8 2013-05-26T23:28:34Z
+
+    - Show correct test line number if all_pod_files_spelling_ok fails.
+      (tobyink)
+    - Documentation fixes.
+      (tobyink)
+    - Test "bin" and "script" directories if "blib" does not exist.
+      (tobyink)
+
+v0.2.7 2013-05-19T23:26:17Z
+
+    - Added more stopwords.
+
+v0.2.6 2013-05-09T01:27:01Z
+
+    - Added more stopwords.
+
+v0.2.5 2013-05-07T03:19:25Z
+
+    - Added more stopwords.
+
+v0.2.4 2013-04-27T14:15:11Z
+
+    - Added more stopwords.
+      (tokuhirom)
+    - Support &amp;.
+      (tokuhirom)
+
+v0.2.3 2013-04-24T10:11:05Z
+
+    - Ignore multi byte characters
+      (tokuhirom)
+
+v0.2.2 2013-04-24T06:06:11Z
+
+    - add load_dictionary() to Test::Spellunker and Spellunker::Pod
+      (Fuji, Goro)
+    - more stopwords
+
+v0.2.1 2013-04-24T01:30:17Z
+
+    - allow load_dictionary($fh) to read words from *DATA
+      (Fuji, Goro)
+    - slurp dictionaries for performance
+      (Fuji, Goro)
+
+v0.1.0 2013-04-24T00:02:44Z
+
+    - More stopwords.
+    - Ignore HTTPS URLs.
+      (Kentaro Kuribayashi)
+
+v0.0.17 2013-04-23T01:12:48Z
+
+    - Ignore Perl function call
+    - more stopwords
+
+v0.0.16 2013-04-22T23:01:58Z
+
+    - Added some stopwords
+    - Modified some rules.
+
+v0.0.15 2013-04-22T14:14:20Z
+
+    - Better symbol handling
+
+v0.0.14 2013-04-22T09:15:16Z
+
+    - Lots of ignoring rules enhancements
+
+v0.0.13 2013-04-19T09:28:56Z
+
+    - Allow capitalized word
+    - Allow \0 \1
+    - Allow non alphabetical word
+    - Allow "*-ish"
+    - Allow perl5 class names.
+    - Add more stopword
+
+v0.0.12 2013-04-19T00:31:09Z
+
+    - Ignore string looks like command line options
+    - Fixed line number handling in POD parsing
+    - And more stopwords.
+
+v0.0.11 2013-04-18T03:14:00Z
+
+    - Support "You'd"
+      (Suggested by gfx++)
+    - Depend *on* Pod::Simple 3.26
+
+v0.0.10 2013-04-18T02:58:08Z
+
+    - Do not include user dictionary in testing Spellunker itself.
+
+v0.0.9 2013-04-18T02:45:33Z
+
+    - Ignore Text::MicroTemplate code
+    - Ignore Perl method call
+    - Ignore xism flag!
+    - Added 'iterator' to stopwords
+    - Support "re-*"
+    - no Spellunker::WordList::Perl. use plain text dictionary
+    - Load user dictionary with :utf8.
+    - Fixed UUV #2
+      (Reported by gfx)
+    - Better support for "n't" and "'ll"
+      (Suggested by gfx++)
+    - And more.
+
+v0.0.8 2013-04-17T09:57:27Z
+
+    - Allow "can't"
+
+v0.0.7 2013-04-17T07:53:04Z
+
+    - Ignore \%hashref, \@val
+
+v0.0.6 2013-04-17T05:55:03Z
+
+    - Better handling for "You'll" and "doesn't" or something.
+    - Ignore "_know_" style.
+
+v0.0.5 2013-04-17T01:54:02Z
+
+    - suppress uuv on win32
+
+v0.0.4 2013-04-16T14:25:25Z
+
+    - ignore "isn't"
+    - more stopwords
+    - Fixed user dictionary loader.
+
+v0.0.3 2013-04-16T12:17:07Z
+
+    - Fixed Test::Spellunker bug.
+
+v0.0.2 2013-04-16T09:49:12Z
+
+    - FIxed dependencies
+
+v0.0.1 2013-04-16T09:06:17Z
+
+    - original version
+

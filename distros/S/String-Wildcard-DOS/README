@@ -1,0 +1,57 @@
+NAME
+    String::Wildcard::DOS - DOS wildcard string routines
+
+VERSION
+    This document describes version 0.01 of String::Wildcard::DOS (from Perl
+    distribution String-Wildcard-DOS), released on 2014-07-26.
+
+SYNOPSIS
+        use String::Wildcard::DOS qw(contains_wildcard);
+
+        say 1 if contains_wildcard(""));      # -> 0
+        say 1 if contains_wildcard("ab*"));   # -> 1
+        say 1 if contains_wildcard("ab\\*")); # -> 1
+
+DESCRIPTION
+FUNCTIONS
+  contains_wildcard($str) => bool
+    Return true if $str contains DOS wildcard pattern. Wildcard patterns
+    include "*" (meaning zero or more characters), "?" (exactly one
+    character). There is no backslash escaping mechanism.
+
+TODO
+    See String::Wildcard::Bash's TODO for the types of other functions which
+    I plan to add to this module.
+
+SEE ALSO
+    Regexp::Wildcards to convert a string with wildcard pattern to
+    equivalent regexp pattern. Can handle Unix wildcards as well as SQL and
+    DOS/Win32. As of this writing (v1.05), it does not handle character
+    class ("[...]") and interprets brace expansion differently than bash.
+
+    Other "String::Wildcard::*" modules.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/String-Wildcard-DOS>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/sharyanto/perl-String-Wildcard-DOS>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=String-Wildcard-DOS>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Steven Haryanto.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

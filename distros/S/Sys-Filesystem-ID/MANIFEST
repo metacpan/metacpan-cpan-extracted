@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+Makefile.PL
+bin/fsid
+bin/fsidgen
+lib/Sys/Filesystem/ID.pm
+t/00.t
+META.yml                                 Module meta-data (added by MakeMaker)

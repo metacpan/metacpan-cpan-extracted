@@ -1,0 +1,3 @@
+# Sample cron tab used for custom_sleep.pl
+34 2 * * Mon "make_stats"
+43 8 * * Wed "Make Peace"

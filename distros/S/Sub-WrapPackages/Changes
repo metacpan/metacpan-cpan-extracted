@@ -1,0 +1,14 @@
+2010-03-06   2.0   Slightly incompatible re-write
+
+2010-01-09   1.31  Bugfix for 'use constant' in perl 5.10, thanks to
+                     Lee Johnson
+
+2009-08-11   1.3   deferred wrapping of modules that aren't yet loaded;
+                   wildcards for modules
+                 
+2006-08-02   1.2   changed how we detect what functions/methods a package
+                   defines
+
+2006-07-26   1.1   added ability to wrap inherited subs
+
+2003-11-15   initial release

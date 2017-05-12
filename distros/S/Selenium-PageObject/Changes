@@ -1,0 +1,45 @@
+Revision history for Perl module Selenium::PageObject
+
+0.012 2014-12-05 TEODESIAN
+    - Convert to DZIL
+    - Fix various spelling/grammar issues with POD
+    - Remove unused vars
+    - Fixed issue where setting selects would fail due to referencing list rather than iterator
+    - Corrected SYNOPSIS and added DESCRIPTION
+
+0.011 2014-12-03 TEODESIAN
+    - The distname was getting set as Selenium::PageObject (eg in META.yml),
+      where it should have been Selenium-PageObject.
+    - Reformatted this file (Changes) as per CPAN::Changes::Spec
+    - Added links to two SEE ALSO entries that didn't have them.
+
+0.010 2014-11-28 TEODESIAN
+    - Add test deps for said POD testing
+
+0.009 2014-11-28 TEODESIAN
+    - Fix some incorrect POD discovered with pod testing
+
+0.008 2014-11-27 TEODESIAN
+    - Fix undeclared dep on Data::Random in Selenium::Element
+
+0.007 2014-08-17 TEODESIAN
+    - More Kwalitee
+
+0.006 2014-08-14 TEODESIAN
+    - RT#98018 - NAME in pod
+
+0.005 2014-08-14 TEODESIAN
+    - RT#98017 - link2gitrepos
+
+0.004 2014-08-14 TEODESIAN
+    - use strict/warnings, fixed an issue in the WWW::Selenium bootup code
+
+0.003 2014-08-14 TEODESIAN
+    - Corrected POD errors, added tab() method
+
+0.002 2014-08-08 TEODESIAN
+    - Added POD
+
+0.001 2014-08-07 TEODESIAN
+    - First release to CPAN
+

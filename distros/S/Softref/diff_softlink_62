@@ -1,0 +1,367 @@
+--- ./mg.h~	Tue Nov 25 09:52:56 1997
++++ ./mg.h	Tue Mar 17 18:34:36 1998
+@@ -29,8 +29,10 @@ struct magic {
+ #define MGf_TAINTEDDIR 1
+ #define MGf_REFCOUNTED 2
+ #define MGf_GSKIP      4
++#define MGf_PRE_CHANGE 8
+ 
+ #define MGf_MINMATCH   1
++#define MGf_NOT_RO     1		/* The SV was not READONLY. */
+ 
+ #define MgTAINTEDDIR(mg)	(mg->mg_flags & MGf_TAINTEDDIR)
+ #define MgTAINTEDDIR_on(mg)	(mg->mg_flags |= MGf_TAINTEDDIR)
+--- ./global.sym.orig	Mon Mar 16 06:42:34 1998
++++ ./global.sym	Tue Mar 17 20:36:40 1998
+@@ -382,6 +382,7 @@ magic_clearsig
+ magic_existspack
+ magic_freedefelem
+ magic_freeregexp
++magic_freesoftlink
+ magic_get
+ magic_getarylen
+ magic_getdefelem
+@@ -391,6 +392,7 @@ magic_getpos
+ magic_getsig
+ magic_gettaint
+ magic_getuvar
++magic_killsoftlinks
+ magic_len
+ magic_mutexfree
+ magic_nextpack
+@@ -411,6 +413,7 @@ magic_setnkeys
+ magic_setpack
+ magic_setpos
+ magic_setsig
++magic_setsoftlink
+ magic_setsubstr
+ magic_settaint
+ magic_setuvar
+@@ -1015,6 +1018,7 @@ sv_reftype
+ sv_replace
+ sv_report_used
+ sv_reset
++sv_rvsoft
+ sv_setiv
+ sv_setiv_mg
+ sv_setnv
+--- ./mg.c.orig	Mon Mar 16 06:41:48 1998
++++ ./mg.c	Tue Mar 17 19:02:48 1998
+@@ -1333,6 +1333,74 @@ vivify_defelem(SV *sv)
+     mg->mg_flags &= ~MGf_REFCOUNTED;
+ }
+ 
++static int
++magic_change_softlink(sv,mg,kill)
++SV* sv;
++MAGIC* mg;
++I32 kill;
++{
++    SV *target = mg->mg_obj;
++    MAGIC *tmg = mg_find(target, '<');
++    AV *av = (AV*)tmg->mg_obj;
++    SV **svp = AvARRAY(av);
++    I32 i = AvFILL(av);
++
++    while (i >= 0) {
++	if (svp[i] != sv) {
++	    i--;
++	    continue;
++	}
++	svp[i] = svp[AvFILLp(av)--];
++#if 0					/* A cycle may be longer... */
++	if (AvFILL(av) == -1 && target != sv) /* It is dangerous to unmagic */
++	    sv_unmagic(target, '<');
++#endif
++	mg->mg_obj = NULL;		/* Avoid a loop in next unmagic: */
++	mg->mg_flags &= ~MGf_REFCOUNTED;
++	if (!kill)
++	    sv_unmagic(sv, '>');
++	return 0;
++    }
++    croak("panic: backlink softref_dec");
++    return 0;
++}
++
++int
++magic_freesoftlink(sv,mg)
++SV* sv;
++MAGIC* mg;
++{
++    SvROK_off(sv);			/* The refcount is long ago decr'd. */
++    if (mg->mg_flags & MGf_NOT_RO)
++	SvREADONLY_off(sv);
++    if (mg->mg_obj)			/* Are not called in a loop */
++	return magic_change_softlink(sv,mg,1);
++}
++
++int
++magic_setsoftlink(sv,mg)
++SV* sv;
++MAGIC* mg;
++{
++    return magic_change_softlink(sv,mg,0);
++}
++
++int
++magic_killsoftlinks(sv,mg)
++SV* sv;
++MAGIC* mg;
++{
++    AV *av = (AV*)mg->mg_obj;
++    SV **svp = AvARRAY(av);
++    I32 i = AvFILL(av);
++
++    while (i >= 0) {
++	sv_unmagic(svp[i], '>');	/* Calls mg_free */
++	i--;
++    }
++    return 0;
++}
++
+ int
+ magic_setmglob(SV *sv, MAGIC *mg)
+ {
+--- ./perl.h.orig	Mon Mar 16 06:31:22 1998
++++ ./perl.h	Tue Mar 17 18:31:48 1998
+@@ -1834,6 +1834,11 @@ EXT MGVTBL vtbl_amagicelem =   {0,     m
+                                         0,      0,      magic_setamagic};
+ #endif /* OVERLOAD */
+ 
++EXT MGVTBL vtbl_softlink =   {0,     magic_setsoftlink,
++                                        0,      0,      magic_freesoftlink};
++EXT MGVTBL vtbl_softtarget =   {0,     0,
++                                        0,      0,      magic_killsoftlinks};
++
+ #else /* !DOINIT */
+ 
+ EXT MGVTBL vtbl_sv;
+@@ -1857,6 +1862,8 @@ EXT MGVTBL vtbl_pos;
+ EXT MGVTBL vtbl_bm;
+ EXT MGVTBL vtbl_fm;
+ EXT MGVTBL vtbl_uvar;
++EXT MGVTBL vtbl_softlink;
++EXT MGVTBL vtbl_softtarget;
+ 
+ #ifdef USE_THREADS
+ EXT MGVTBL vtbl_mutex;
+--- ./proto.h.orig	Mon Mar 16 06:45:24 1998
++++ ./proto.h	Tue Mar 17 18:32:24 1998
+@@ -212,6 +212,7 @@ int	magic_clearsig	_((SV* sv, MAGIC* mg)
+ int	magic_existspack _((SV* sv, MAGIC* mg));
+ int	magic_freedefelem _((SV* sv, MAGIC* mg));
+ int	magic_freeregexp _((SV* sv, MAGIC* mg));
++int	magic_freesoftlink _((SV* sv, MAGIC* mg));
+ int	magic_get	_((SV* sv, MAGIC* mg));
+ int	magic_getarylen	_((SV* sv, MAGIC* mg));
+ int	magic_getdefelem _((SV* sv, MAGIC* mg));
+@@ -221,6 +222,7 @@ int	magic_getpos	_((SV* sv, MAGIC* mg));
+ int	magic_getsig	_((SV* sv, MAGIC* mg));
+ int	magic_gettaint	_((SV* sv, MAGIC* mg));
+ int	magic_getuvar	_((SV* sv, MAGIC* mg));
++int	magic_killsoftlinks _((SV* sv, MAGIC* mg));
+ U32	magic_len	_((SV* sv, MAGIC* mg));
+ #ifdef USE_THREADS
+ int	magic_mutexfree	_((SV* sv, MAGIC* mg));
+@@ -246,6 +248,7 @@ int	magic_setnkeys	_((SV* sv, MAGIC* mg)
+ int	magic_setpack	_((SV* sv, MAGIC* mg));
+ int	magic_setpos	_((SV* sv, MAGIC* mg));
+ int	magic_setsig	_((SV* sv, MAGIC* mg));
++int	magic_setsoftlink _((SV* sv, MAGIC* mg));
+ int	magic_setsubstr	_((SV* sv, MAGIC* mg));
+ int	magic_settaint	_((SV* sv, MAGIC* mg));
+ int	magic_setuvar	_((SV* sv, MAGIC* mg));
+@@ -537,6 +540,7 @@ char*	sv_reftype _((SV* sv, int ob));
+ void	sv_replace _((SV* sv, SV* nsv));
+ void	sv_report_used _((void));
+ void	sv_reset _((char* s, HV* stash));
++SV*	sv_rvsoft _((SV* rv));
+ void	sv_setpvf _((SV* sv, const char* pat, ...));
+ void	sv_setpvf_mg _((SV* sv, const char* pat, ...));
+ void	sv_setiv _((SV* sv, IV num));
+--- ./sv.c.orig	Mon Mar 16 07:04:44 1998
++++ ./sv.c	Tue Mar 17 21:24:30 1998
+@@ -60,6 +60,8 @@ static void sv_unglob _((SV* sv));
+ static void sv_check_thinkfirst _((SV *sv));
+ 
+ #define SV_CHECK_THINKFIRST(sv) if (SvTHINKFIRST(sv)) sv_check_thinkfirst(sv)
++#define SV_WEAKLY_READONLY(sv) (SvREADONLY(sv) && sv_cannot_modify(sv))
++#define SV_STRONGLY_READONLY(sv) (SvREADONLY(sv) && sv_cannot_modify_weak(sv))
+ 
+ #ifndef PURIFY
+ static void *my_safemalloc(MEM_SIZE size);
+@@ -624,6 +626,46 @@ my_safemalloc(MEM_SIZE size)
+ #define new_XPVIO() (void*)my_safemalloc(sizeof(XPVIO))
+ #define del_XPVIO(p) my_safefree((char*)p)
+ 
++static int
++sv_cannot_modify(register SV *sv)
++{					/* Assume it it READONLY */
++    if (SvRMAGICAL(sv)) {
++	/* Check whether READONLY is set only for PRE_CHANGE magic. */
++	MAGIC *mg = SvMAGIC(sv);
++
++	while (mg) {
++	    MAGIC *next = mg->mg_moremagic;
++
++	    if (mg->mg_flags & MGf_PRE_CHANGE)
++		sv_unmagic(sv, mg->mg_type); /* Trigger _free method. */
++	    mg = next;
++	}
++	return SvREADONLY(sv);		/* Now the real state is restored */
++    } else
++	return 1;
++}
++
++static int
++sv_cannot_modify_weak(register SV *sv)
++{					/* Assume it it READONLY */
++    if (SvRMAGICAL(sv)) {
++	/* Check whether READONLY is set only for PRE_CHANGE magic. */
++	MAGIC *mg = SvMAGIC(sv);
++	int cannot = 1;
++
++	while (mg) {
++	    MAGIC *next = mg->mg_moremagic;
++
++	    if (mg->mg_flags & (MGf_PRE_CHANGE|MGf_NOT_RO) 
++		== (MGf_PRE_CHANGE|MGf_NOT_RO))
++		cannot = 0;
++	    mg = next;
++	}
++	return cannot;			/* Now the real state is restored */
++    } else
++	return 1;
++}
++
+ bool
+ sv_upgrade(register SV *sv, U32 mt)
+ {
+@@ -2302,7 +2344,7 @@ sv_usepvn_mg(register SV *sv, register c
+ static void
+ sv_check_thinkfirst(register SV *sv)
+ {
+-    if (SvREADONLY(sv)) {
++    if (SV_WEAKLY_READONLY(sv)) {
+ 	dTHR;
+ 	if (curcop != &compiling)
+ 	    croak(no_modify);
+@@ -2432,7 +2474,7 @@ sv_magic(register SV *sv, SV *obj, int h
+ {
+     MAGIC* mg;
+     
+-    if (SvREADONLY(sv)) {
++    if (SV_STRONGLY_READONLY(sv)) {
+ 	dTHR;
+ 	if (curcop != &compiling && !strchr("gBf", how))
+ 	    croak(no_modify);
+@@ -2564,6 +2606,18 @@ sv_magic(register SV *sv, SV *obj, int h
+     case '.':
+ 	mg->mg_virtual = &vtbl_pos;
+ 	break;
++    case '>':
++	SvRMAGICAL_on(sv);
++	if (!SvREADONLY(sv)) {
++	    mg->mg_flags |= (MGf_NOT_RO | MGf_PRE_CHANGE);
++	    SvREADONLY_on(sv);
++	} else
++	    mg->mg_flags |= MGf_PRE_CHANGE;
++	mg->mg_virtual = &vtbl_softlink;
++	break;
++    case '<':
++	mg->mg_virtual = &vtbl_softtarget;
++	break;
+     case '~':	/* Reserved for use by extensions not perl internals.	*/
+ 	/* Useful for attaching extension internal data to perl vars.	*/
+ 	/* Note that multiple extensions may clash if magical scalars	*/
+@@ -2612,6 +2666,36 @@ sv_unmagic(SV *sv, int type)
+     return 0;
+ }
+ 
++SV*
++sv_rvsoft(sv)
++SV *sv;
++{
++    if (!SvROK(sv))
++	croak("panic: rvsoft: not a reference");
++    if (SvREFCNT(SvRV(sv)) == 1) 
++	sv_setsv(sv, &sv_undef);
++    else {
++	AV *av;
++	SV *tsv = SvRV(sv);
++	MAGIC *mg = mg_find(tsv, '<');
++	
++	if (mg)  {
++	    av = (AV*)mg->mg_obj;
++	} else {
++	    av = newAV();
++	    sv_magic(tsv, (SV*)av, '<', NULL, 0);
++	    SvREFCNT_dec(av);		/* for sv_magic */
++	}
++	av_push(av,sv);
++	/* When sv is freeed, it will be ROK_off before tsv may be CNT_dec. */
++	sv_magic(sv, tsv, '>', NULL, 0);
++	if (tsv != sv)			/* Quirks of sv_magic... */
++	    SvREFCNT_dec(tsv);		/* for sv_magic */
++	SvREFCNT_dec(tsv);		/* for ROK_off */
++    }
++    return sv;
++}
++
+ void
+ sv_insert(SV *bigstr, STRLEN offset, STRLEN len, char *little, STRLEN littlelen)
+ {
+@@ -3334,7 +3418,7 @@ sv_inc(register SV *sv)
+     if (!sv)
+ 	return;
+     if (SvTHINKFIRST(sv)) {
+-	if (SvREADONLY(sv)) {
++	if (SV_WEAKLY_READONLY(sv)) {
+ 	    dTHR;
+ 	    if (curcop != &compiling)
+ 		croak(no_modify);
+@@ -3411,7 +3495,7 @@ sv_dec(register SV *sv)
+     if (!sv)
+ 	return;
+     if (SvTHINKFIRST(sv)) {
+-	if (SvREADONLY(sv)) {
++	if (SV_WEAKLY_READONLY(sv)) {
+ 	    dTHR;
+ 	    if (curcop != &compiling)
+ 		croak(no_modify);
+@@ -3506,7 +3590,7 @@ sv_2mortal(register SV *sv)
+     dTHR;
+     if (!sv)
+ 	return sv;
+-    if (SvREADONLY(sv) && curcop != &compiling)
++    if (SV_STRONGLY_READONLY(sv) && curcop != &compiling)
+ 	croak(no_modify);
+     if (++tmps_ix >= tmps_max)
+ 	sv_mortalgrow();
+@@ -3882,7 +3966,7 @@ sv_pvn_force(SV *sv, STRLEN *lp)
+ {
+     char *s;
+ 
+-    if (SvREADONLY(sv)) {
++    if (SV_STRONGLY_READONLY(sv)) {
+ 	dTHR;
+ 	if (curcop != &compiling)
+ 	    croak(no_modify);
+@@ -4061,7 +4145,7 @@ sv_bless(SV *sv, HV *stash)
+         croak("Can't bless non-reference value");
+     ref = SvRV(sv);
+     if (SvFLAGS(ref) & (SVs_OBJECT|SVf_READONLY)) {
+-	if (SvREADONLY(ref))
++	if (SV_STRONGLY_READONLY(ref))
+ 	    croak(no_modify);
+ 	if (SvOBJECT(ref)) {
+ 	    if (SvTYPE(ref) != SVt_PVIO)
+@@ -4106,7 +4190,7 @@ sv_unref(SV *sv)
+     
+     SvRV(sv) = 0;
+     SvROK_off(sv);
+-    if (SvREFCNT(rv) != 1 || SvREADONLY(rv))
++    if (SvREFCNT(rv) != 1 || SV_STRONGLY_READONLY(rv))
+ 	SvREFCNT_dec(rv);
+     else
+ 	sv_2mortal(rv);		/* Schedule for freeing later */

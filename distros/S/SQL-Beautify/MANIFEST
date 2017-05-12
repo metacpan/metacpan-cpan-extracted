@@ -1,0 +1,16 @@
+Build.PL
+Changes
+lib/SQL/Beautify.pm
+MANIFEST
+README
+script/sqlbeautify
+t/add_keywords.t
+t/color.t
+t/custom_rules.t
+t/html.t
+t/many_parens.t
+t/multi.t
+t/plain_text.t
+t/pod-coverage.t
+t/pod.t
+t/uc_keywords.t

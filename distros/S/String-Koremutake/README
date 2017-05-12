@@ -1,0 +1,58 @@
+NAME
+    String::Koremutake - Convert to/from Koremutake Memorable Random Strings
+
+SYNOPSIS
+      use String::Koremutake;
+      my $k = String::Koremutake->new;
+
+      my $s = $k->integer_to_koremutake(65535);        # botretre
+      my $i = $k->koremutake_to_integer('koremutake'); # 10610353957
+
+DESCRIPTION
+    The String::Koremutake module converts to and from Koremutake Memorable
+    Random Strings.
+
+    The term "Memorable Random String" was thought up by Sean B. Palmer as a
+    name for those strings like dopynl, glargen, glonknic, spoopwiddle, and
+    kebble etc. that don't have any conventional sense, but can be used as
+    random identifiers, especially in URIs to keep them persistent. See
+    http://infomesh.net/2001/07/MeRS/
+
+    Koremutake is a MeRS algorithm which is used by Shorl
+    (http://shorl.com/koremutake.php). As they explain: "It is, in plain
+    language, a way to express any large number as a sequence of syllables.
+    The general idea is that word-sounding pieces of information are a lot
+    easier to remember than a sequence of digits."
+
+INTERFACE
+  new()
+    The new() method is the constructor:
+
+  integer_to_koremutake($i)
+    The integer_to_koremutake method converts a positive integer to a
+    Koremutake string:
+
+      my $s = $k->integer_to_koremutake(65535);        # botretre
+
+  koremutake_to_integer($s)
+    The koremutake_to_integer method converts a Koremutake string to the
+    integer it represents:
+
+      my $i = $k->koremutake_to_integer('koremutake'); # 10610353957
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests to
+    "bug-String-Koremutake@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org>.
+
+AUTHOR
+    Leon Brocard "acme@astray.com"
+
+LICENCE AND COPYRIGHT
+    Copyright (c) 2005, Leon Brocard "acme@astray.com". All rights reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

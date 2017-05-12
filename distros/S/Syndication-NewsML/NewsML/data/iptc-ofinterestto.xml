@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!DOCTYPE TopicSet PUBLIC "urn:newsml:iptc.org:20001006:NewsMLv1.0.dtd:1" "NewsMLv1.0.dtd">
+<TopicSet Duid="iptc.ofinterestto" FormalName="OfInterestTo">
+	<Comment xml:lang="en">The target audience for a NewsItem, based for example on demographics, geography or other groupings.</Comment>
+	<Topic Duid="ofint1">
+		<TopicType Scheme="IptcTopicType" FormalName="OfInterestTo"/>
+		<FormalName Scheme="IptcOfInterestTo">General</FormalName>
+		<Description xml:lang="en" Variant="">Content has no particular target audience.</Description>
+	</Topic>
+	<Topic Duid="ofint2">
+		<TopicType Scheme="IptcTopicType" FormalName="OfInterestTo"/>
+		<FormalName Scheme="IptcOfInterestTo">Over50</FormalName>
+		<Description xml:lang="en" Variant="">Content is relevant to individuals aged 50 and over.</Description>
+	</Topic>
+	<Topic Duid="ofint3">
+		<TopicType Scheme="IptcTopicType" FormalName="OfInterestTo"/>
+		<FormalName Scheme="IptcOfInterestTo">40to50</FormalName>
+		<Description xml:lang="en" Variant="">Content is relevant to individuals between 40 and 50 years old.</Description>
+	</Topic>
+	<Topic Duid="ofint4">
+		<TopicType Scheme="IptcTopicType" FormalName="OfInterestTo"/>
+		<FormalName Scheme="IptcOfInterestTo">30to40</FormalName>
+		<Description xml:lang="en" Variant="">Content is relevant to individuals between 30 and 40 years old..</Description>
+	</Topic>
+	<Topic Duid="ofint5">
+		<TopicType Scheme="IptcTopicType" FormalName="OfInterestTo"/>
+		<FormalName Scheme="IptcOfInterestTo">18to30</FormalName>
+		<Description xml:lang="en" Variant="">Content is relevant to individuals between 18 and 30 years old.</Description>
+	</Topic>
+	<Topic Duid="ofint6">
+		<TopicType Scheme="IptcTopicType" FormalName="OfInterestTo"/>
+		<FormalName Scheme="IptcOfInterestTo">Teenagers</FormalName>
+		<Description xml:lang="en" Variant="">Content is relevant to individuals between 12 and 20 years old.</Description>
+	</Topic>
+	<Topic Duid="ofint7">
+		<TopicType Scheme="IptcTopicType" FormalName="OfInterestTo"/>
+		<FormalName Scheme="IptcOfInterestTo">Parents</FormalName>
+		<Description xml:lang="en" Variant="">Content is relevant to all parents of children.</Description>
+	</Topic>
+</TopicSet>
+

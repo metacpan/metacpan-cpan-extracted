@@ -1,0 +1,30 @@
+SWIFT/Factory/Tag/Tag15
+=======================
+
+Provides a generic TAG15 for a SWIFT message.
+
+This class is generic in the sence that it can be used to provide TAG15A, TAG15B .. TAG15Z,
+all depending upon the parameters given to the object.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+Currently no other modules are used.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2003, BIKER. All rights reserved.
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

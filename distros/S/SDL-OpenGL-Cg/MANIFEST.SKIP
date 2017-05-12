@@ -1,0 +1,13 @@
+^_build
+^Build$
+^blib
+~$
+.bak$
+^MANIFEST\.SKIP$
+CVS
+\.swp$
+^Makefile$
+\.o$
+\.c$
+\.bs$
+\.yml$

@@ -1,0 +1,11 @@
+a
+ab
+ac
+abc
+#
+@TYPE    type1
+@TYPE    type2
+@INCLUDE b
+@EXCLUDE c
+@OPTION  a1
+@OPTION  a2 = vala2

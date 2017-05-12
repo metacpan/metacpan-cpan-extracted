@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:                Seeder
+version:             0.01
+abstract:            Motif discovery in DNA sequences
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.36
+distribution_type:   module
+requires:     
+    Algorithm::Loops:              0
+    Bio::LiveSeq::DNA:             0
+    Bio::LiveSeq::SeqI:            0
+    Bio::Perl:                     0
+    Bio::SeqIO:                    0
+    Carp:                          0
+    List::MoreUtils:               0
+    List::Util:                    0
+    Math::Spline:                  0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - François Fauteux <ffauteux@cpan.org>

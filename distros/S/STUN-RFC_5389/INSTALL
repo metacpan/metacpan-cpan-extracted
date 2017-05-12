@@ -1,0 +1,22 @@
+INSTALLATION
+
+This module can be installed on any Perl version with the Socket module
+installed.
+
+For installation do the usual
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+If you want to install in a specific directory, try:
+
+	perl Makefile.PL PREFIX=/tmp/myperl5
+	...
+
+If you'd like to see the raw output of the tests, try:
+
+	...
+	make test TEST_VERBOSE=1
+	...

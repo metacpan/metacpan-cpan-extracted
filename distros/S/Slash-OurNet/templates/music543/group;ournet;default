@@ -1,0 +1,107 @@
+__section__
+default
+__description__
+Print out all groups / boards inside a group
+
+* boards = all groups / boards
+* message = any additional prompts
+* display = 'root': hide name and article_count panels
+
+__title__
+
+__page__
+ournet
+__lang__
+zh_TW
+__name__
+group
+__template__
+<TABLE BORDER="0" WIDTH="100%">
+<caption><nobr><FONT COLOR="[% user.fg.0 %]" class="text"><strong>
+[% message %]
+</strong></font></nobr></caption>
+[% IF display != 'root' %]
+    <td class="text" align="center" BGCOLOR="[% user.bg.3 %]"><FONT COLOR="[% user.bg.0 %]">
+    [% loc('Name') %]
+    </font></td>
+[% END %]
+    <td class="text" align="center" BGCOLOR="[% user.bg.3 %]"><FONT COLOR="[% user.bg.0 %]"><nobr>
+    [% loc('Subject') %]
+    </nobr></font></td>
+    <td class="text" align="center" BGCOLOR="[% user.bg.3 %]"><FONT COLOR="[% user.bg.0 %]">
+    [% loc('Moderator') %]
+    </font></td>
+[% IF display != 'root' %]
+    <!--td class="text" align="center" BGCOLOR="[% user.bg.3 %]"><FONT COLOR="[% user.bg.0 %]"><nobr>
+    [% loc('Articles') %]
+    </nobr></font></td-->
+    </tr>
+[% END %]
+[% SET i = 0 %]
+[% FOREACH boards %]
+[% IF display == 'root' %]
+    <tr>
+    [% IF type == 'group' %]
+    <td class="text" width=80%><nobr>
+	<a class="text" href="[% script %]/[% group %]/[% board %]/">[% title %]</a>
+    [% ELSE %]
+    <td class="text" width=80%><nobr>
+	<a class="text" href="[% script %]/[% group %]/[% board %]/articles/">[% title %]</a>
+    [% END %]
+[% ELSE %]
+[% IF i % 2 %]
+    <tr>
+[% ELSE %]
+    <tr bgcolor="#ccccff">
+[% END %]
+    [% IF type == 'group' %]
+    <td class="text" width=20%><nobr><b>
+	<a href="[% script %]/[% group %]/[% board %]/">[% board %]</a></b>
+	<img src="[% imagedir %]/folder.gif" border=0>
+    </nobr></td><td class="text" width="60%"><nobr>
+    [% ELSE %]
+    <td class="text" width=20%><nobr>
+	<a class="link" href="[% script %]/[% group %]/[% board %]/articles/">[% board %]</a>
+	[% IF archives_count %]
+	<a title="[% etc_brief %]" href="[% script %]/[% group %]/[% board %]/archives/"><img align=top width=14 height=19 src="[% imagedir %]/archive.gif" border=0></a>
+	[% END %]
+    </nobr></td><td class="text" width="60%">
+    [% END %]
+    [% IF type == 'group' %]
+	<a href="[% script %]/[% group %]/[% board %]/">[% title %]</a>
+    [% ELSE %]
+	<a href="[% script %]/[% group %]/[% board %]/articles/">[% title %]</a>
+    [% END %]
+[% END %]
+[% IF type == 'group' %]
+    </nobr></td><td class="text" width="10%"><nobr><b>
+    [% bm %]
+    </nobr></b>
+[% IF display != 'root' %]
+    </td><!--td class="text" width="10%" %]" align="right"><b>
+    [% articles_count %]</b-->
+[% END %]
+[% ELSE %]
+    </nobr></td><td class="text" width="10%"><nobr>
+    [% bm %]
+    </nobr></td><!--td class="text" width="10%" align="right">
+    [% articles_count + 1 %]-->
+[% END %]
+[% SET i = i+1 %]
+[% END %]
+
+</tr>
+</TABLE>
+
+[% IF group %]
+<div align="center">
+<hr>|
+    [% IF group == topclass %]
+<a href="[% script %]">[% loc('Back to home') %]</a>
+    [% ELSE %]
+<a href="[% script %]/[% topclass %]/[% group %]/">[% loc('Back to group') %]</a>
+    [% END %]
+|</div>
+[% END %]
+__seclev__
+10000

@@ -1,0 +1,11 @@
+<SOFTPKG NAME="Statistics-Sequences" VERSION="0.15">
+    <ABSTRACT>Common methods/interface for sub-module sequential tests (of Runs, Joins, etc.)</ABSTRACT>
+    <AUTHOR>Roderick Garton &lt;rgarton@cpan.org&gt;</AUTHOR>
+    <IMPLEMENTATION>
+        <REQUIRE NAME="String::Numeric" VERSION="0.9" />
+        <REQUIRE NAME="Statistics::Data" VERSION="0.11" />
+        <REQUIRE NAME="Scalar::Util" VERSION="1.41" />
+        <REQUIRE NAME="Statistics::Lite" VERSION="3.2" />
+        <CODEBASE HREF="PPM-Statistics-Sequences-0.15.tar.gz" />
+    </IMPLEMENTATION>
+</SOFTPKG>

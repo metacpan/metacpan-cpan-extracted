@@ -1,0 +1,3 @@
+# Test the "Illegal return type for target" warning
+
+{ my %h; bless \%h, 'SomeClass' } :

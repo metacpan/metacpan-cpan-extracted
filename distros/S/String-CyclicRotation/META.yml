@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                String-CyclicRotation
+version:             0.01
+abstract:            Checks if a string is a cyclic rotation of another string.
+license:             ~
+author:              
+    - Joao Carreira <joao.carreira@ist.utl.pt>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Carp:                          	
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

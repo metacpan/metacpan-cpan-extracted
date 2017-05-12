@@ -1,0 +1,7 @@
+    </div>
+    <div id="footer">
+      <hr />
+      <p class="right"><em><a href="http://search.cpan.org/dist/SVN-Web/">[%|l%](powered by)[%END%]</a></em></p>
+    </div>
+  </body>
+</html>

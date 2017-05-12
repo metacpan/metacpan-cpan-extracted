@@ -1,0 +1,91 @@
+NAME
+    ShipIt::Step::Readme - Automatically create README for your Perl Package
+    before releasing
+
+VERSION
+    Version 0.03
+
+INSTALLATION
+    To install this module, run the following commands:
+
+        perl Build.PL
+        ./Build
+        ./Build test
+        ./Build install
+
+SYNOPSIS
+    Just add it to the ShipIt config, after all steps, that edit Pod,
+    because the README file is generated from the Pod of the distris' main
+    file.
+
+        steps = FindVersion, ChangeVersion, ChangePodVersion, Readme, ...
+
+    And make sure you have a VERSION or a NAME section in your Pod. The
+    README pod, which is not visible on CPAN, is added after any of them.
+
+DESCRIPTION
+    This ShipIt::Step autogenerates a README-file from your distris' main
+    package.
+
+    Therefore it adds a Pod INSTALLATION section, but only if it does not
+    exist yet. It contains installation instructions, for either an
+    installation via ./Build or an installation via make, depending on the
+    existence of a Build.PL or a Makefile.PL. If neither is found, we die.
+
+    The Pod INSTALLATION section is added after the Pod VERSION section, or
+    in case it does not exist, after the Pod NAME section. If neither is
+    found, we die. This section won't be visible on CPAN, and will only
+    appear in your README.
+
+    Run this after any ShipIt::Step, that edits Pod. For example
+    ShipIt::Step::ChangePodVersion does that to add a Pod VERSION section to
+    your module. Otherwise the changes made won't be reflected in your
+    README.
+
+CONFIG
+    Nothing to configure. Drop me an EMail if you have any wishes for
+    configuration.
+
+WARNING
+    This is not really tested with distris, which dont't use Build.PL. But
+    from a logic point of view, there shouldn't be any problem. However,
+    contact me if you encounter any problems.
+
+AUTHOR
+    Thomas Mueller, `<tmueller at cpan.org>'
+
+BUGS
+    Please report any bugs or feature requests to `bug-shipit-step-readme at
+    rt.cpan.org', or through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=ShipIt-Step-Readme. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc ShipIt::Step::Readme
+
+    You can also look for information at:
+
+    * RT: CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=ShipIt-Step-Readme
+
+    * AnnoCPAN: Annotated CPAN documentation
+        http://annocpan.org/dist/ShipIt-Step-Readme
+
+    * CPAN Ratings
+        http://cpanratings.perl.org/d/ShipIt-Step-Readme
+
+    * Search CPAN
+        http://search.cpan.org/dist/ShipIt-Step-Readme/
+
+LICENSE AND COPYRIGHT
+    Copyright 2010 Thomas Mueller.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

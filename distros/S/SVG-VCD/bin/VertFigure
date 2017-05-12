@@ -1,0 +1,206 @@
+#!/usr/local/bin/perl -w
+
+use strict;
+use warnings;
+use Getopt::Std;
+use Data::Dumper; 
+use SVG;
+use SVG::VCD;
+
+my %options;
+if (!getopts('d', \%options) || @ARGV != 1) {
+    print STDERR "\
+Usage: $0 [options] <VCD-file>
+	-d		Dump information about parsed VCD-file.
+";
+    exit 1;
+}
+
+if (@ARGV != 1) {
+    exit 1;
+}
+
+my $vcd = new SVG::VCD($ARGV[0]);
+if ($options{d}) {
+    print Dumper($vcd);
+    exit;
+}
+
+my $n = $vcd->ntaxa();
+my $th = $vcd->config("taxon-height");
+my $cw = $vcd->config("cervical-width");
+my $ch = $vcd->config("cervical-height");
+my $dw = $vcd->config("dorsal-width");
+my $dh = $vcd->config("dorsal-height");
+my $dhg = $vcd->config("dorsal-height-gradient");
+my $tyo = $vcd->config("text-y-offset") || 0;
+my $cdo = $vcd->config("cervico-dorsal-offset");
+my $cdc = $vcd->config("cervico-dorsal-color");
+
+my $width = $vcd->config("width");
+my $height = $vcd->config("height");
+my $svg = SVG->new(width => $width, height => $height);
+
+my $background = $vcd->config("background");
+if ($background) {
+    $svg->rectangle(x => 0, y => 0, width => $width, height => $height,
+		    style => { 'fill' => $background });
+}
+
+my $st = $svg->group(style => { 'font-family' => $vcd->config("font-family"),
+				'font-size' => $vcd->config("font-size"),
+				fill => 'black',
+		     });
+
+foreach my $i (1 .. $n) {
+    my $taxon = $vcd->taxon($i-1);
+    my $data = $taxon->field("data");
+    my($cdata, $ddata) = split('\|', $data);
+    $ddata = "" if !defined $ddata;
+    my $nc = length($cdata);
+    my $nd = length($ddata);
+
+    my $text = $st->text(x => 10, 'y' => $th * $i + $tyo);
+    my $tname = $taxon->field("taxon");
+    my %args = ( style => { 'font-style' => "italic" } );
+    if ($tname =~ s/^\///) {
+	%args = ();
+    }
+    $text->tspan(%args)->cdata($tname);
+    my $specimen = $taxon->field("specimen");
+    # I don't know why, but some versions of InkScape (e.g. v0.48 on
+    # Ubuntu 12.04.2) do not render an ordinary space in this context
+    # -- hence use of a non-breaking space.
+    $text->tspan()->cdata("&#160;$specimen") if defined $specimen;
+
+    # Cervicals
+    foreach (my $j = 0; $j < $nc; $j++) {
+	vertebra($svg, $vcd, $i, $j-$nc, $cw, $ch, substr($cdata, $j, 1));
+    }
+
+    # Dorsals
+    my $dheight = $dh;
+    foreach (my $j = 0; $j < $nd; $j++) {
+	vertebra($svg, $vcd, $i, $j, $dw, $dheight, substr($ddata, $j, 1));
+	$dheight += $dhg if defined $dhg;
+    }
+}
+
+if ($cdc) {
+    my $maxh = $ch > $dh ? $ch : $dh;
+    my $margin = $th - $maxh;
+    $svg->line(x1 => $cdo, y1 => $margin/2,
+	       x2 => $cdo, y2 => $n * $th + $margin/2,
+	       style => { stroke => $cdc } );
+}
+
+print $svg->xmlify();
+
+
+sub vertebra {
+    my($svg, $vcd, $yoff, $xoff, $width, $height, $char) = @_;
+    $char = lc($char);
+    my $cdo = $vcd->config("cervico-dorsal-offset");
+    my $th = $vcd->config("taxon-height");
+    my $bc = $vcd->config("box-color") || "grey";
+
+    my $x = $cdo + $xoff * $width;
+    my $y = $th * $yoff - $height;
+    $svg->rectangle(x => $x, 'y' => $y, width => $width, height => $height,
+		    style => { stroke => $bc, fill => 'white' });
+
+    if (my $polygon = $vcd->config("state-$char-polygon")) {
+	$svg->polygon(style => { fill => $vcd->config("state-$char-color") },
+		      points => compile_points($x, $y, $width, $height,
+					       0.2, 0,
+					       split(/[, ]/, $polygon)));
+    } elsif ($char eq "-") {
+	# Unknown state (e.g. vertebra missing): nothing to draw
+    } else {
+	die "unrecognised bifurcation state '$char'";
+    }
+}
+
+
+# Returns a string of the form '0,0 0,1 1,1 1,0'
+sub compile_points {
+    my $xoff = shift();
+    my $yoff = shift();
+    my $xscale = shift();
+    my $yscale = shift();
+    my $pMargin = shift();
+    my $aMargin = shift();
+    my $text = "";
+
+    while (@_) {
+	my $x = shift();
+	my $y = shift();
+
+	# Adjust for proportional margin
+	$x = $x * (1-$pMargin) + $pMargin/2;
+	$y = $y * (1-$pMargin) + $pMargin/2;
+
+	# Adjust for scale
+	$x *= $xscale;
+	$y *= $yscale;
+
+	### Adjust for absolute margin -- how?
+
+	# Adjust for translation
+	$x += $xoff;
+	$y += $yoff;
+
+
+	$text .= " " if $text ne "";
+	$text .= "$x,$y";
+    }
+
+    return $text;
+}
+
+
+=head1 NAME
+
+VertFigure - generate schematic illustrations of vertebral columns
+
+=head1 SYNOPSIS
+
+VertFigure
+[
+-d
+]
+I<VCD--file>
+
+=head1 DESCRIPTION
+
+C<VertFigure>
+reads a named file in VCD (Vertebral Column Description) format, and
+writes an illustration of the described vertebral columns in SVG
+(Scalable Vector Graphics) format. This is useful for preparing
+illustrations of scientific papers about vertebrates.
+
+=head1 OPTIONS
+
+=over 4
+
+=item -d
+
+Dump information about the parsed VCD file rather than rendering an
+illustration. This is useful only for debugging, ensuring that the
+input is interpreted as expected.
+
+=back
+
+=head1 SEE ALSO
+
+SVG::VCD::Format - description of the input file format.
+
+=head1 AUTHOR
+
+Copyright (C) 2013-2014 by Mike Taylor E<lt>mike@miketaylor.org.ukE<gt>
+
+=head1 LICENSE
+
+GNU General Public Licence v3.0
+
+=cut

@@ -1,0 +1,402 @@
+[Changes for 0.75 - Sep 13, 2008]
+
+* Modernize dist and fix signatures.
+
+[Changes for 0.74 - June 1, 2008]
+
+* Fix tests for svn 1.5.0.
+
+[Changes for 0.73 - Mar 19, 2007]
+
+* In get_latest_rev, resolve the right HEAD for use in get_logs.
+  [Rolf Schäuble]
+
+* Fix tests on win32. [David Golden]
+
+[Changes for 0.72 - Nov 2, 2006]
+
+* Use a custom transaction to commit the mirror rev, and have the
+  revision property set via txn for atomicy.
+
+* Requires Subversion 1.2.0.
+
+[Changes for 0.71 - Oct 3, 2006]
+
+* Fix url escape issues for replaced copied source.
+
+* Fix a bug in replace with history, where the copy source is related
+  to the current node, but outside the mirror.
+
+[Changes for 0.70 - Aug 25, 2006]
+
+* More fixes for the new replace code.
+
+[Changes for 0.69_3 - Aug 14, 2006]
+
+* Fix bugs mirroring revisions containing replace with history, that
+  is from different path.
+
+[Changes for 0.69_2 - Aug 14, 2006]
+
+* Fix bugs mirroring revisions containing replace with history.
+
+* When there is no change, only touch in root.
+
+[Changes for 0.69_1 - Jul 22, 2006]
+
+* Major overhaul of the mirror editor. [plasma]
+
+* When remote repository disallows property reading on '/', fallback
+  to normal mirror.
+
+* Workaround different behaviour of ra backends in ra->get_logs start
+  argument, which causes skipto to fail for some repositories.
+
+[Changes for 0.68 - Dec 12, 2005]
+
+* Escape the copyfrom_path, as that's what is expected by svn api.
+
+* Fix a memory leak when mirroring changes with lots of copies.
+
+* Fix a problem that there is a replaced item with history that is out
+  of the mirror anchor.
+
+[Changes for 0.67 - Sep 25, 2005]
+
+* Fix a very complicated case for replaced directory with file
+  modification under it, where a deletion should also be ignored.
+
+* Relax the condition so that when we are sure a change
+  entry is a directory, we can use cheap editor calls
+  rather than run the whole do_update.
+
+[Changes for 0.66 - Aug 18, 2005]
+
+* Fix a regression when the mirrored revision has copies from revision
+  numbers outside the path we are mirroring.
+
+* Fix a regression since 0.61 for the case that mirror anchor parent was
+  copied from somewhere else.
+
+[Changes for 0.65 - Aug 2, 2005]
+
+* Fix a bug when mirroring only HEAD with dav/svn-1.2.0 on server.
+
+* Performance imporvements on large repositories for revision lookup
+  and meta data lookup. [Sponsored by Fotango]
+
+[Changes for 0.64 - Jul 11, 2005]
+
+* Make git support load later to avoid circular dependency with svk.
+
+[Changes for 0.63 - Jun 28, 2005]
+
+* Fix missing dependency - Class::Accessor.
+
+[Changes for 0.62 - Jun 22, 2005]
+
+* Support HEAD and HEAD-n for --torev [Jody Belka]
+
+* Resolve the fromrev from headrev with the relayed source, so for
+  relayed skip-to mirror it won't explode.
+
+* When there's replaced directory, properly _enter_copied_path when
+  it's not a copy.
+
+* Git support.
+
+[Changes for 0.61 - May 8, 2005]
+
+* Perform reanchor only on paths involving copies.
+  This fixes kde svn repository problem.
+
+* Fix two minor pool usage that causes error on nfs-mounted fsfs (and
+  possibly win32).
+
+[Changes for 0.60 - Apr 29, 2005]
+
+* When doing get_latest_rev with 1.1.x, reset offset if it went below 0.
+  [Marcus Rueckert <darix@irssi.org>]
+
+* Fix uuid checking in --relocate. [Marcus Rueckert <darix@irssi.org>]
+
+[Changes for 0.59 - Apr 25, 2005]
+
+* Doc fixes. [Mathias Hennersdorf <henner@tty.ch>]
+
+* Fix a bad path translation in has_local.
+
+[Changes for 0.58 - Apr 18, 2005]
+
+* Fix edge case in local copy_source resolution and unresolvable source.
+
+* Remove bogus path translation in delete_entry that might result in segfaults.
+
+[Changes for 0.57 - Mar 29, 2005]
+
+* API catchup for latest svn-trunk.
+
+* Fix a bug that non-interesting changed paths are not properly
+  filtered.
+
+* Proper locking for concurrent mirror object load and sync.
+
+[Changes for 0.55 - Mar 2, 2005]
+
+* Resolve local rev properly for relayed mirror where the target
+  revision number is larger than the one on the relayed server.
+
+* Tell the user to install VCP instead of confusing "schema not handled".
+
+* Workaround ra_svn 1.2 vs svnserve 1.1 log limit problem.
+
+[Changes for 0.55 - Feb 1, 2005]
+
+* Partially support remote copies that cross local mirror anchors
+  with cb_copy_notify callback.
+
+* Fix a pool issue that session of ra->get_commit_editor is not
+  recycle due to ref holding in the wrong pool.
+
+* Cope with latest svn-trunk ra api changes.
+
+[Changes for 0.54 - Jan 10, 2005]
+
+* Don't requires BSD::Resources.
+
+[Changes for 0.53 - Jan 9, 2005]
+
+* Fix the case that a mirror anchor is intially created on remote
+  by a copy of its parent directory.
+
+* Use simple editor for 'R'-only changes too.
+
+* Fix a regression that simple copies are invoking full tree delta with
+  reporter.
+
+[Changes for 0.52 - Dec 29, 2004]
+
+* Workaround ra_dav memory leaks.
+
+* Fix an annoying bug that prevents most of the cases mirroring a
+  branch only.
+
+[Changes for 0.51 - Dec 20, 2004]
+
+* Get the real last-modified revision.  This fixes skip-to mirroring.
+
+* mod_dav_svn doesn't like ra connection anchored at root to do
+  check_path.  Use check_path on the first ra session instead.
+
+* regex cleanups; in particular, regex metacharacters in paths
+  are now properly mirrored. [Autrijus]
+
+[Changes for 0.50 - Nov 10, 2004]
+
+* Workaround fsfs/win32 txn_commit bug in close_edit of mirror editor.
+  [Autrijus]
+
+* Use iter pool for node_history tracing.
+
+* Add trailing /... for vcp source if not exist.
+
+* Use the same auth baton for all ra sessions.
+
+* Hold another reference to merge back editor in addition to
+  cached_ra, because the callback in merge_back_editor might create
+  another ra session.
+
+* Ignore signals before calling close_edit, instead of in commit callback.
+
+[Changes for 0.49 - Oct 17, 2004]
+
+* Copy-following-delete was not marked as is_copy properly. [Autrijus]
+
+* Win32API::GUID support on win32. [Autrijus]
+
+* Florian Weimer reported that repeated sync of an empty mirror
+  source will result in redundant local revisions.  Fix it by
+  always "touching" the add_directory() call, regardless of
+  whether anything was actually updated locally. [Autrijus]
+
+[Changes for 0.48 - Oct 4, 2004]
+
+* New: relocate. [Autrijus]
+
+* Use fsfs as SVNFSTYPE when using svn 1.1.
+
+* Fix delete and upgrade on win32. [Autrijus]
+
+* Support arch vcp source driver.
+
+* Fix find_local_rev cache that assumes uses the same cache for
+  different target repositories.
+
+* Fix an incorret pool used in _new_auth with wrong life time.
+
+[Changes for 0.46 - Sep 20, 2004]
+
+* Fix mirroring on root. [Autrijus]
+
+* Workaround fsfs/win32 problem. [Autrijus]
+
+[Changes for 0.45 - Sep 19, 2004]
+
+* Fix has_local for ::VCP.
+
+* Make ::VCP load headrev so find_local_rev will work.
+
+* properly workaround vcp file handler select problem.
+
+* Fix the remaining unescaped regex.
+
+* Support auth_prompt providers. [Autrijus]
+
+* Use even more unique uuid for cvs source.
+
+* Remove corresponding vcp state dir when discarding a mirror.
+
+* File::Spec -> File::Spec::Unix.
+
+* Report remote path removal.
+
+* Delay SVN::Mirror::VCP loading.
+
+* Use Win32API::GUID on win32.
+
+[Changes for 0.44 - Sep 4, 2004]
+
+* Support selective branches mapping with --branch-only=trunk,RELENG_5.
+  (cvs only)
+
+* Don't unconditionally load svn config.
+
+* Don't create dummy txn on init even just for loading.
+
+* Make MirrorEditor::delete_entry use local revisions instead of remote ones.
+
+[Changes for 0.43 - Aug 21, 2004]
+
+* Don't suggest vcp by default since it's not on CPAN these days.
+
+* Support VCP::Source::cvsbk.
+
+* skip_to now parsed for HEAD(-N)?.
+
+* Fix a bug for rev lookup when mirroring remote '/'.
+
+[Changes for 0.42 - Aug 9, 2004]
+
+* Don't die out when upgrading mirrors from vcp sources.
+
+* Skip test for relay for svn 1.0.x.
+
+[Changes for 0.41 - Aug 7, 2004]
+
+* Fix a bug mirroring over ra_dav. repos root doesn't like get_dir ('/').
+
+* Put source_uuid in VCP's source_repo_id so it's safe to switch.
+
+[Changes for 0.40 - Aug 4, 2004]
+
+* Change mirror state to avoid using '/' in property names that svn
+  forbids.
+
+* Add API for upgrading and remote revision lookup.
+
+* Add cache for find_local_rev.
+
+* Support relayed mirroring in Ra backend.
+
+* Fix some bizzare pool reference and usage that causes leak over long sync.
+
+[Changes for 0.38 - Jul 14, 2004]
+
+* Fix a bug that non-canonical path might enter svn api.
+
+* Ignore signals when mirror state is inconsistent.
+
+[Changes for 0.37 - Jun 30, 2004]
+
+* Fix a bug that has_local can't deal with mirroring remote '/'
+
+* Cleanup tmp files in make clean.
+
+[Changes for 0.36 - May 23, 2004]
+
+* Split VCP::Dest::svk to its own distribution.
+
+[Changes for 0.35 - Apr 26, 2004]
+
+* Fix a bug triggered by remote rename. [Plasmaball]
+
+* Add VCP support.
+
+[Changes for 0.30 - Mar 28, 2004 - YAPC::Taipei::2004 Release Party]
+
+* Fix a problem caused by the ra session doing log doens't load
+  config. Reported by: Stefan Metzmacher <metze at samba.org>
+
+* Support copy-following in the changes being mirrored. [Plasmaball]
+
+* has_local now checks remote descendents just like is_mirror.
+
+* Properly quote variables in regex. This fixes mirroring svn+ssh://.
+  [Plasmaball]
+
+* Support syncing specified remote rev_props.
+
+[Changes for 0.29 - Mar 5, 2004]
+
+* Add path parameter fo get_merge_back_editor.
+* Let is_mirror take care of descendents in mirror path.
+
+[Changes for 0.28 - Feb 16, 2004]
+
+* Add list_mirror function.
+* Store mirror info as dir_prop in / also.
+* API for checking if a remote uuid:path has local mirror.
+
+[Changes for 0.27 - Jan 15, 2004]
+
+* Support subversion 0.36.
+
+[Changes for 0.26 - Dec 27, 2003]
+
+* Fix a bug mirroring svn+ssh URL
+* Make paths canonical before entering the svn libraries.
+* Skip svm: properties when mirroring.
+  This allows branched mirrored paths to be mirrored and branched again.
+
+[Changes for 0.25 - Nov 13, 2003]
+
+* Allow init with repository object.
+* New function: is_mirrroed.
+* New method: find_local_rev.
+* Fix pool usage that breaks default pool.
+* svm:source now "root!path" - prepared for copy following.
+* Simplify finding anchors for mirroring.
+* Requires 0.33.
+
+[Changes for 0.22 - Nov 4, 2003]
+
+* Check uuid before initializing mirror.
+* Return youngest_rev along with commit editor for use as base rev.
+
+[Changes for 0.21 - Oct 15, 2003]
+
+* Fix version number package.
+* Provide get_merge_back_editor.
+* message cleanups.
+* Fix vsnurl bug for mirroring over dav.
+
+[Changes for 0.20 - Sep 24, 2003]
+
+* Reuse ra-session when same anchor is used.
+  this makes mirroring much faster.
+* svm mergeback support.
+* Fix a bug for partial repository mirroring.
+
+[Changes for 0.1 - Aug 25, 2003]
+
+Initial release.

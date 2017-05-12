@@ -1,0 +1,67 @@
+Spreadsheet/ReadSXC version 0.20
+=================================
+
+Extract OpenOffice 1.x spreadsheet data.
+
+Spreadsheet::ReadSXC extracts data from OpenOffice 1.x
+spreadsheet files (.sxc). It exports the function read_sxc()
+which takes a filename and an optional reference to a hash of
+options as arguments and returns a hash of references to
+two-dimensional arrays. The hash keys correspond to the names of
+worksheets in the OpenOffice workbook. The two-dimensional arrays
+correspond to rows and cells in the respective spreadsheets.
+
+Spreadsheet::ReadSXC requires XML::Parser to parse the XML
+contained in .sxc files. Only the contents of 'text:p' elements are
+returned, not the actual values of 'table:value' attributes.
+
+Empty spreadsheet cells correspond to undef values in array rows.
+If the .sxc file contains an empty spreadsheet its hash element will
+point to an empty array.
+
+Spreadsheet::ReadSXC truncates spreadsheets so that there are no
+empty rows after the last row containing data and no empty columns
+after the last column containing data (unless the 'NoTruncate'
+option is used).
+
+The behaviour of this module is controlled through several options,
+namely 'ReplaceNewlineWith', 'IncludeCoveredCells', 'DropHiddenRows',
+'DropHiddenColumns', 'NoTruncate', 'StandardDate', and
+'StandardTime'.
+
+I'll add more options in the future so that you can choose between
+'text:p' contents and 'table:value' values the same way the
+'StandardDate' option lets you use a 'table:date-value' instead of
+its 'text:p' equivalent.
+
+I've added the read_xml_file() and read_xml_string() functions in
+version 0.10. These approaches could be unified so that read_sxc()
+would handle .sxc files, content.xml files, and xml strings
+alternatively. H. Merijn Brand's Spreadsheet::ReadData does just
+that. It also treats Excel files (using Spreadsheet::ParseExcel)
+and CSV files.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   XML::Parser
+   Archive::Zip
+   Test::More
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Christoph Terhechte
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

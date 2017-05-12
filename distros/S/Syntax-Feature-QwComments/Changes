@@ -1,0 +1,24 @@
+Revision history for Syntax-Feature-QwComments
+
+1.12.0  2012-05-19
+        - Renamed from feature::qw_comments.
+
+1.10.0  2011-10-26
+        - An improper opcode tree was built for an empty qw().
+          This caused Perl 5.13.3+ to crash.
+
+1.8.0   2011-09-21
+        - A workaround for a bug in Perl 5.14 was needlessly being applied to 5.16.
+
+1.6.0   2011-09-19
+        - Added more tests, including testing of handling of non-ASCII chars.
+        - Added workaround for a bug in Perl's lex_read_unichar.
+        - Rename LICENSE.txt and CHANGES.txt to names recognised by search.cpan.org.
+
+1.4.0   2011-09-19
+        - Allow "#" to be escaped.
+        - Fix incorrect handling of "\ ".
+        - Increased test coverage.
+
+1.2.0   2011-09-18
+        Initial version.

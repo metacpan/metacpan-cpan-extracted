@@ -1,0 +1,42 @@
+Spreadsheet/BasicReadNamedCol version 1.03
+==========================================
+
+Provides methods for simple reading of a Excel spreadsheet row
+at a time returning the row as an array of column values.
+Properties can be set so that blank rows are skipped.
+
+There are a number of other properties that can be set.
+The aim is to make reading from Excel spreadsheets as
+easy as processing a text file
+
+The *KEY* feature of this module is the ability to define
+the order in which you want to see the columns without regard
+to the actual order in the spreadsheet.
+
+
+INSTALLATION
+------------
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+------------
+
+This module requires Spreadsheet::ParseExcel and Spreadsheet::BasicRead
+and optionally module File::Log can be used to allow simple logging of errors.
+
+All are available from CPAN
+
+
+COPYRIGHT AND LICENCE
+---------------------
+
+Copyright (c) 1999- Greg George. All rights reserved. This
+program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

@@ -1,0 +1,86 @@
+version 0.004; 2013-08-26
+
+  * bugfix: require bugfixed version of Attribute::Lexical (for not
+    exposing [perl #73174] prior to Perl 5.11)
+
+  * bugfix: require bugfixed version of Sub::Mutate (for not crashing
+    in an edge case)
+
+  * update for Perl 5.15.3, where padlists are now AvREAL
+
+  * update for Perl 5.17.4's new pad API
+
+  * update for Perl 5.19.3's tracking of the last named item in a pad
+
+  * port to FreeBSD's mutant Perl 5.8 which has the defined-or operator
+
+  * include META.json in distribution
+
+  * convert .cvsignore to .gitignore
+
+  * add MYMETA.json to .gitignore
+
+version 0.003; 2010-11-21
+
+  * bugfix: on Perl 5.13.3 and above, maintain CvSTASH backrefences
+    correctly
+
+  * include a reserve implementation of the ptr_table data structure,
+    because prior to Perls 5.9.5 and 5.8.9 it was not made available by
+    the core if Perl is not configured for ithreads
+
+version 0.002; 2010-10-24
+
+  * bugfix: when applying a filter to a Perl sub, avoid letting the core
+    munge entersub ops, which was causing allocation of target slots in
+    the wrong pad
+
+  * bugfix: on Perl 5.13.3+, correctly manage the CVf_CVGV_RC flag when
+    applying a filter to an xsub
+
+  * bugfix: correctly maintain PL_sv_objcount when applying a filter to
+    a blessed xsub
+
+  * bugfix: require bugfixed version of Sub::Mutate (for PL_sv_objcount
+    correctness)
+
+  * in XS, factor out Perl version variations into macros for greater
+    readability
+
+  * give the internal function _test_xs() a prototype
+
+  * in XS, declare "PROTOTYPES: DISABLE" to prevent automatic generation
+    of unintended prototypes
+
+  * jump through hoops to avoid compiler warnings
+
+  * use full stricture in test suite
+
+  * in Build.PL, complete declaration of configure-time requirements
+
+version 0.001; 2010-07-20
+
+  * bugfix: in XS, check SvOBJECT before looking at SvSTASH, because
+    the latter isn't guaranteed to be meaningful otherwise
+
+  * bugfix: require bugfixed version of Sub::Mutate (for SvSTASH safety)
+
+  * bugfix: require bugfixed version of Attribute::Lexical (for
+    passing package through to required code in pure-Perl version of
+    Lexical::SealRequireHints)
+
+  * port to Perl 5.13.3: use CvGV_set()
+
+  * in XS, use PERL_NO_GET_CONTEXT for efficiency
+
+  * check for required Perl version at runtime
+
+  * in Build.PL, explicitly declare configure-time requirements
+
+  * remove bogus "exit 0" from Build.PL
+
+  * add MYMETA.yml to .cvsignore
+
+version 0.000; 2009-08-28
+
+  * initial released version

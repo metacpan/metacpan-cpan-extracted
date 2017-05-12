@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+Syssgi.pm
+Syssgi.xs
+test.pl
+sgi-syssgi.c
+sgi-syssgi.h

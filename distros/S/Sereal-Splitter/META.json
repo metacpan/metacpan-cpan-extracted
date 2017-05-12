@@ -1,0 +1,60 @@
+{
+   "abstract" : "splits a Sereal blob in chunks of roughly the same size",
+   "author" : [
+      "Damien Krotkine <dams@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Sereal-Splitter",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "ExtUtils::ParseXS" : "2.21",
+            "File::Find" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "Scalar::Util" : "0",
+            "Sereal::Decoder" : "0",
+            "Sereal::Encoder" : "0",
+            "Test::More" : "0.88",
+            "XSLoader" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "XSLoader" : "0",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Sereal/Sereal/issues"
+      },
+      "repository" : {
+         "url" : "git://github.com/Sereal/Sereal.git"
+      }
+   },
+   "version" : "0.840",
+   "x_serialization_backend" : "JSON::PP version 2.27202"
+}

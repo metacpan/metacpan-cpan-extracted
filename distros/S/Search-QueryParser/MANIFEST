@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Search-QueryParser.t
+lib/Search/QueryParser.pm
+META.yml                                 Module meta-data (added by MakeMaker)

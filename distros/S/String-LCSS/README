@@ -1,0 +1,11 @@
+String::LCSS provides the function "lcss" to ferret out the longest common
+substring shared by two strings passed as arguments.  "undef" is returned
+if the susbstring length is one char or less.
+
+This is an algorithm I wrote some years ago in C and thought it might be
+fun to rewrite in Perl since CPAN seemed to be in want of such a thing.
+There is probably a Perlier way to write the algorithm, but...
+
+Not much planned for the future, perhaps changing the args of the "lcss"
+function to accept an arbitrary lenght array would be useful.  We wait
+then for a rainy day...

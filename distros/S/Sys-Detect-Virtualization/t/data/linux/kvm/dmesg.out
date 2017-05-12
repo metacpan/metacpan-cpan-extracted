@@ -1,0 +1,306 @@
+[    0.000000] Initializing cgroup subsys cpuset
+[    0.000000] Initializing cgroup subsys cpu
+[    0.000000] Linux version 2.6.26-1-686 (Debian 2.6.26-13lenny2) (dannf@debian.org) (gcc version 4.1.3 20080704 (prerelease) (Debian 4.1.2-25)) #1 SMP Fri Mar 13 18:08:45 UTC 2009
+[    0.000000] BIOS-provided physical RAM map:
+[    0.000000]  BIOS-e820: 0000000000000000 - 000000000009fc00 (usable)
+[    0.000000]  BIOS-e820: 000000000009fc00 - 00000000000a0000 (reserved)
+[    0.000000]  BIOS-e820: 00000000000e8000 - 0000000000100000 (reserved)
+[    0.000000]  BIOS-e820: 0000000000100000 - 000000000fff0000 (usable)
+[    0.000000]  BIOS-e820: 000000000fff0000 - 0000000010000000 (ACPI data)
+[    0.000000]  BIOS-e820: 00000000fffbd000 - 0000000100000000 (reserved)
+[    0.000000] 0MB HIGHMEM available.
+[    0.000000] 255MB LOWMEM available.
+[    0.000000] found SMP MP-table at [c00fb540] 000fb540
+[    0.000000] kvm-clock: cpu 0, msr 0:3baf81, boot clock
+[    0.000000] Entering add_active_range(0, 0, 65520) 0 entries of 256 used
+[    0.000000] Zone PFN ranges:
+[    0.000000]   DMA             0 ->     4096
+[    0.000000]   Normal       4096 ->    65520
+[    0.000000]   HighMem     65520 ->    65520
+[    0.000000] Movable zone start PFN for each node
+[    0.000000] early_node_map[1] active PFN ranges
+[    0.000000]     0:        0 ->    65520
+[    0.000000] On node 0 totalpages: 65520
+[    0.000000]   DMA zone: 32 pages used for memmap
+[    0.000000]   DMA zone: 0 pages reserved
+[    0.000000]   DMA zone: 4064 pages, LIFO batch:0
+[    0.000000]   Normal zone: 480 pages used for memmap
+[    0.000000]   Normal zone: 60944 pages, LIFO batch:15
+[    0.000000]   HighMem zone: 0 pages used for memmap
+[    0.000000]   Movable zone: 0 pages used for memmap
+[    0.000000] DMI 2.4 present.
+[    0.000000] ACPI: RSDP 000FB660, 0014 (r0 QEMU  )
+[    0.000000] ACPI: RSDT 0FFF0000, 002C (r1 QEMU   QEMURSDT        1 QEMU        1)
+[    0.000000] ACPI: FACP 0FFF002C, 0074 (r1 QEMU   QEMUFACP        1 QEMU        1)
+[    0.000000] ACPI: DSDT 0FFF0100, 253C (r1   BXPC   BXDSDT        1 INTL 20061109)
+[    0.000000] ACPI: FACS 0FFF00C0, 0040
+[    0.000000] ACPI: APIC 0FFF2640, 00E0 (r1 QEMU   QEMUAPIC        1 QEMU        1)
+[    0.000000] ACPI: PM-Timer IO Port: 0xb008
+[    0.000000] ACPI: Local APIC address 0xfee00000
+[    0.000000] ACPI: LAPIC (acpi_id[0x00] lapic_id[0x00] enabled)
+[    0.000000] ACPI: LAPIC (acpi_id[0x01] lapic_id[0x01] disabled)
+[    0.000000] ACPI: LAPIC (acpi_id[0x02] lapic_id[0x02] disabled)
+[    0.000000] ACPI: LAPIC (acpi_id[0x03] lapic_id[0x03] disabled)
+[    0.000000] ACPI: LAPIC (acpi_id[0x04] lapic_id[0x04] disabled)
+[    0.000000] ACPI: LAPIC (acpi_id[0x05] lapic_id[0x05] disabled)
+[    0.000000] ACPI: LAPIC (acpi_id[0x06] lapic_id[0x06] disabled)
+[    0.000000] ACPI: LAPIC (acpi_id[0x07] lapic_id[0x07] disabled)
+[    0.000000] ACPI: LAPIC (acpi_id[0x08] lapic_id[0x08] disabled)
+[    0.000000] ACPI: LAPIC (acpi_id[0x09] lapic_id[0x09] disabled)
+[    0.000000] ACPI: LAPIC (acpi_id[0x0a] lapic_id[0x0a] disabled)
+[    0.000000] ACPI: LAPIC (acpi_id[0x0b] lapic_id[0x0b] disabled)
+[    0.000000] ACPI: LAPIC (acpi_id[0x0c] lapic_id[0x0c] disabled)
+[    0.000000] ACPI: LAPIC (acpi_id[0x0d] lapic_id[0x0d] disabled)
+[    0.000000] ACPI: LAPIC (acpi_id[0x0e] lapic_id[0x0e] disabled)
+[    0.000000] ACPI: LAPIC (acpi_id[0x0f] lapic_id[0x0f] disabled)
+[    0.000000] ACPI: IOAPIC (id[0x01] address[0xfec00000] gsi_base[0])
+[    0.000000] IOAPIC[0]: apic_id 1, version 17, address 0xfec00000, GSI 0-23
+[    0.000000] ACPI: INT_SRC_OVR (bus 0 bus_irq 5 global_irq 5 high level)
+[    0.000000] ACPI: INT_SRC_OVR (bus 0 bus_irq 9 global_irq 9 high level)
+[    0.000000] ACPI: INT_SRC_OVR (bus 0 bus_irq 10 global_irq 10 high level)
+[    0.000000] ACPI: INT_SRC_OVR (bus 0 bus_irq 11 global_irq 11 high level)
+[    0.000000] ACPI: IRQ5 used by override.
+[    0.000000] ACPI: IRQ9 used by override.
+[    0.000000] ACPI: IRQ10 used by override.
+[    0.000000] ACPI: IRQ11 used by override.
+[    0.000000] Enabling APIC mode:  Flat.  Using 1 I/O APICs
+[    0.000000] Using ACPI (MADT) for SMP configuration information
+[    0.000000] Allocating PCI resources starting at 20000000 (gap: 10000000:effbd000)
+[    0.000000] PM: Registered nosave memory: 000000000009f000 - 00000000000a0000
+[    0.000000] PM: Registered nosave memory: 00000000000a0000 - 00000000000e8000
+[    0.000000] PM: Registered nosave memory: 00000000000e8000 - 0000000000100000
+[    0.000000] SMP: Allowing 8 CPUs, 7 hotplug CPUs
+[    0.000000] PERCPU: Allocating 37960 bytes of per cpu data
+[    0.000000] NR_CPUS: 8, nr_cpu_ids: 8
+[    0.000000] kvm-clock: cpu 0, msr 0:1208f81, primary cpu clock
+[    0.000000] Built 1 zonelists in Zone order, mobility grouping on.  Total pages: 65008
+[    0.000000] Kernel command line: root=/dev/md0 ro 
+[    0.000000] mapped APIC to ffffb000 (fee00000)
+[    0.000000] mapped IOAPIC to ffffa000 (fec00000)
+[    0.000000] Enabling fast FPU save and restore... done.
+[    0.000000] Enabling unmasked SIMD FPU exception support... done.
+[    0.000000] Initializing CPU#0
+[    0.000000] PID hash table entries: 1024 (order: 10, 4096 bytes)
+[    0.000000] Detected 3008.686 MHz processor.
+[    0.004000] Console: colour VGA+ 80x25
+[    0.004000] console [tty0] enabled
+[    0.004000] Dentry cache hash table entries: 32768 (order: 5, 131072 bytes)
+[    0.004000] Inode-cache hash table entries: 16384 (order: 4, 65536 bytes)
+[    0.004000] Memory: 253508k/262080k available (1769k kernel code, 7904k reserved, 752k data, 244k init, 0k highmem)
+[    0.004000] virtual kernel memory layout:
+[    0.004000]     fixmap  : 0xfff4c000 - 0xfffff000   ( 716 kB)
+[    0.004000]     pkmap   : 0xff800000 - 0xffc00000   (4096 kB)
+[    0.004000]     vmalloc : 0xd0800000 - 0xff7fe000   ( 751 MB)
+[    0.004000]     lowmem  : 0xc0000000 - 0xcfff0000   ( 255 MB)
+[    0.004000]       .init : 0xc037f000 - 0xc03bc000   ( 244 kB)
+[    0.004000]       .data : 0xc02ba4d3 - 0xc0376620   ( 752 kB)
+[    0.004000]       .text : 0xc0100000 - 0xc02ba4d3   (1769 kB)
+[    0.004000] Checking if this processor honours the WP bit even in supervisor mode...Ok.
+[    0.004000] CPA: page pool initialized 1 of 1 pages preallocated
+[    0.086730] Calibrating delay using timer specific routine.. 6045.81 BogoMIPS (lpj=12091629)
+[    0.088005] Security Framework initialized
+[    0.090481] SELinux:  Disabled at boot.
+[    0.091443] Capability LSM initialized
+[    0.092005] Mount-cache hash table entries: 512
+[    0.093289] Initializing cgroup subsys ns
+[    0.094316] Initializing cgroup subsys cpuacct
+[    0.095124] Initializing cgroup subsys devices
+[    0.096006] CPU: L1 I Cache: 64K (64 bytes/line), D cache 64K (64 bytes/line)
+[    0.097077] CPU: L2 Cache: 512K (64 bytes/line)
+[    0.097928] Intel machine check architecture supported.
+[    0.098944] Intel machine check reporting enabled on CPU#0.
+[    0.103408] SMP alternatives: switching to UP code
+[    0.437762] ACPI: Core revision 20080321
+[    0.448397] ENABLING IO-APIC IRQs
+[    0.450603] ..TIMER: vector=0x31 apic1=0 pin1=0 apic2=-1 pin2=-1
+[    0.495214] CPU0: AMD QEMU Virtual CPU version 0.9.1 stepping 03
+[    0.500031] Brought up 1 CPUs
+[    0.500031] Total of 1 processors activated (6045.81 BogoMIPS).
+[    0.502223] WARNING: This combination of AMDprocessors is not suitable for SMP.
+[    0.504031] CPU0 attaching sched-domain:
+[    0.504031]  domain 0: span 0
+[    0.504031]   groups: 0
+[    0.504031] net_namespace: 660 bytes
+[    0.505261] Booting paravirtualized kernel on KVM
+[    0.506318] NET: Registered protocol family 16
+[    0.507433] ACPI: bus type pci registered
+[    0.508031] PCI: PCI BIOS revision 2.10 entry at 0xfadb0, last bus=0
+[    0.508926] PCI: Using configuration type 1 for base access
+[    0.509910] Setting up standard PCI resources
+[    0.512368] ACPI: EC: Look up EC in DSDT
+[    0.513880] ACPI: Interpreter enabled
+[    0.516254] ACPI: (supports S0 S5)
+[    0.517661] ACPI: Using IOAPIC for interrupt routing
+[    0.523547] ACPI: PCI Root Bridge [PCI0] (0000:00)
+[    0.526235] pci 0000:00:01.3: quirk: region b000-b03f claimed by PIIX4 ACPI
+[    0.527173] pci 0000:00:01.3: quirk: region b100-b10f claimed by PIIX4 SMB
+[    0.530162] ACPI: PCI Interrupt Routing Table [\_SB_.PCI0._PRT]
+[    0.531803] ACPI: PCI Interrupt Link [LNKA] (IRQs 5 *10 11)
+[    0.533629] ACPI: PCI Interrupt Link [LNKB] (IRQs 5 *10 11)
+[    0.535072] ACPI: PCI Interrupt Link [LNKC] (IRQs 5 10 *11)
+[    0.538652] ACPI: PCI Interrupt Link [LNKD] (IRQs 5 10 *11)
+[    0.540078] Linux Plug and Play Support v0.97 (c) Adam Belay
+[    0.540986] pnp: PnP ACPI init
+[    0.541666] ACPI: bus type pnp registered
+[    0.543234] pnp: PnP ACPI: found 7 devices
+[    0.544175] ACPI: ACPI bus type pnp unregistered
+[    0.545014] PnPBIOS: Disabled
+[    0.545895] PCI: Using ACPI for IRQ routing
+[    0.548109] Switched to high resolution mode on CPU 0
+[    0.579103] NET: Registered protocol family 2
+[    0.580019] IP route cache hash table entries: 2048 (order: 1, 8192 bytes)
+[    0.580019] TCP established hash table entries: 8192 (order: 4, 65536 bytes)
+[    0.581526] TCP bind hash table entries: 8192 (order: 4, 65536 bytes)
+[    0.582750] TCP: Hash tables configured (established 8192 bind 8192)
+[    0.583762] TCP reno registered
+[    0.585200] NET: Registered protocol family 1
+[    0.586190] checking if image is initramfs... it is
+[    0.706592] Freeing initrd memory: 2073k freed
+[    0.708019] audit: initializing netlink socket (disabled)
+[    0.708886] type=2000 audit(1265647587.708:1): initialized
+[    0.709854] Total HugeTLB memory allocated, 0
+[    0.710745] VFS: Disk quotas dquot_6.5.1
+[    0.711519] Dquot-cache hash table entries: 1024 (order 0, 4096 bytes)
+[    0.712201] msgmni has been set to 499
+[    0.713151] Block layer SCSI generic (bsg) driver version 0.4 loaded (major 253)
+[    0.715184] io scheduler noop registered
+[    0.715917] io scheduler anticipatory registered
+[    0.716569] io scheduler deadline registered
+[    0.717375] io scheduler cfq registered (default)
+[    0.718241] pci 0000:00:00.0: Limiting direct PCI/PCI transfers
+[    0.719112] pci 0000:00:01.0: PIIX3: Enabling Passive Release
+[    0.719978] pci 0000:00:01.0: Activating ISA DMA hang workarounds
+[    0.721045] pci 0000:00:02.0: Boot video device
+[    0.721327] isapnp: Scanning for PnP cards...
+[    1.106977] isapnp: No Plug & Play device found
+[    1.109547] Serial: 8250/16550 driver $Revision: 1.90 $ 4 ports, IRQ sharing enabled
+[    1.111191] serial8250: ttyS0 at I/O 0x3f8 (irq = 4) is a 16450
+[    1.112528] 00:06: ttyS0 at I/O 0x3f8 (irq = 4) is a 16450
+[    1.115059] brd: module loaded
+[    1.116010] PNP: PS/2 Controller [PNP0303:KBD,PNP0f13:MOU] at 0x60,0x64 irq 1,12
+[    1.118243] serio: i8042 KBD port at 0x60,0x64 irq 1
+[    1.119176] serio: i8042 AUX port at 0x60,0x64 irq 12
+[    1.121837] mice: PS/2 mouse device common for all mice
+[    1.123374] rtc_cmos 00:01: rtc core: registered rtc_cmos as rtc0
+[    1.124104] rtc0: alarms up to one day
+[    1.124104] input: AT Translated Set 2 keyboard as /class/input/input0
+[    1.125042] cpuidle: using governor ladder
+[    1.125790] cpuidle: using governor menu
+[    1.126541] No iBFT detected.
+[    1.127658] TCP cubic registered
+[    1.128371] NET: Registered protocol family 17
+[    1.129157] Using IPI No-Shortcut mode
+[    1.129989] registered taskstats version 1
+[    1.130876] rtc_cmos 00:01: setting system clock to 2010-02-08 16:46:27 UTC (1265647587)
+[    1.132429] Freeing unused kernel memory: 244k freed
+[    1.229926] ACPI: PCI Interrupt Link [LNKD] enabled at IRQ 11
+[    1.231399] ACPI: PCI Interrupt 0000:00:04.0[A] -> Link [LNKD] -> GSI 11 (level, high) -> IRQ 11
+[    1.241891] ACPI: PCI Interrupt Link [LNKA] enabled at IRQ 10
+[    1.242780] ACPI: PCI Interrupt 0000:00:05.0[A] -> Link [LNKA] -> GSI 10 (level, high) -> IRQ 10
+[    1.252288]  vda:
+[    1.253972]  vdb: vdb1 vdb2 < vdb5 >
+[    1.344556] ACPI: ACPI0007:00 is registered as cooling_device0
+[    2.715478] md: linear personality registered for level -1
+[    2.748025] md: multipath personality registered for level -4
+[    2.759956] md: raid0 personality registered for level 0
+[    2.776760] md: raid1 personality registered for level 1
+[    2.788155] xor: automatically using best checksumming function: pIII_sse
+[    2.808101]    pIII_sse  :   525.000 MB/sec
+[    2.808872] xor: using function: pIII_sse (525.000 MB/sec)
+[    2.813502] async_tx: api initialized (async)
+[    2.920270] raid6: int32x1   1050 MB/s
+[    2.988483] raid6: int32x2   1018 MB/s
+[    3.056866] raid6: int32x4    924 MB/s
+[    3.126225] raid6: int32x8    672 MB/s
+[    3.194222] raid6: mmxx1     1260 MB/s
+[    3.262191] raid6: mmxx2     2194 MB/s
+[    3.330195] raid6: sse1x1    1291 MB/s
+[    3.398368] raid6: sse1x2    1644 MB/s
+[    3.466995] raid6: sse2x1    1780 MB/s
+[    3.534985] raid6: sse2x2    2272 MB/s
+[    3.535748] raid6: using algorithm sse2x2 (2272 MB/s)
+[    3.536017] md: raid6 personality registered for level 6
+[    3.536017] md: raid5 personality registered for level 5
+[    3.536017] md: raid4 personality registered for level 4
+[    3.571851] md: raid10 personality registered for level 10
+[    3.651359] md: bind<vdb1>
+[    3.655115] raid1: raid set md0 active with 1 out of 2 mirrors
+[    3.846087] kjournald starting.  Commit interval 5 seconds
+[    3.846087] EXT3-fs: mounted filesystem with ordered data mode.
+[    5.547062] udevd version 125 started
+[    7.166119] Uniform Multi-Platform E-IDE driver
+[    7.167413] ide: Assuming 33MHz system bus speed for PIO modes; override with idebus=xx
+[    7.248447] usbcore: registered new interface driver usbfs
+[    7.249355] usbcore: registered new interface driver hub
+[    7.250961] usbcore: registered new device driver usb
+[    7.291343] 8139too Fast Ethernet driver 0.9.28
+[    7.292177] 8139too 0000:00:03.0: This (id 10ec:8139 rev 20) is an enhanced 8139C+ chip
+[    7.293629] 8139too 0000:00:03.0: Use the "8139cp" driver for improved performance and stability.
+[    7.295662] ACPI: PCI Interrupt Link [LNKC] enabled at IRQ 11
+[    7.297386] ACPI: PCI Interrupt 0000:00:03.0[A] -> Link [LNKC] -> GSI 11 (level, high) -> IRQ 11
+[    7.299199] PCI: Setting latency timer of device 0000:00:03.0 to 64
+[    7.299224] 8139too 0000:00:03.0: unknown chip version, assuming RTL-8139
+[    7.299334] 8139too 0000:00:03.0: TxConfig = 0x74800000
+[    7.301965] eth0: RealTek RTL8139 at 0xc100, 00:75:2e:68:a3:00, IRQ 11
+[    7.302991] eth0:  Identified 8139 chip type 'RTL-8139'
+[    7.315682] input: Power Button (FF) as /class/input/input1
+[    7.324052] PIIX3: IDE controller (0x8086:0x7010 rev 0x00) at  PCI slot 0000:00:01.1
+[    7.325673] PIIX3: not 100% native mode: will probe irqs later
+[    7.326666] PCI: Setting latency timer of device 0000:00:01.1 to 64
+[    7.326685]     ide0: BM-DMA at 0xc000-0xc007
+[    7.327447]     ide1: BM-DMA at 0xc008-0xc00f
+[    7.328230] Probing IDE interface ide0...
+[    7.355236] ACPI: Power Button (FF) [PWRF]
+[    7.468895] USB Universal Host Controller Interface driver v3.0
+[    7.479292] 8139cp: 10/100 PCI Ethernet driver v1.3 (Mar 22, 2004)
+[    7.897056] Probing IDE interface ide1...
+[    8.124458] FDC 0 is a S82078B
+[    8.296713] hdc: QEMU DVD-ROM, ATAPI CD/DVD-ROM drive
+[    8.298775] input: PC Speaker as /class/input/input2
+[    8.410952] input: ImExPS/2 Generic Explorer Mouse as /class/input/input3
+[    8.413541] parport_pc 00:05: reported by Plug and Play ACPI
+[    8.414557] parport0: PC-style at 0x378, irq 7 [PCSPP,TRISTATE]
+[    8.646556] Error: Driver 'pcspkr' is already registered, aborting...
+[    8.972099] hdc: host max PIO4 wanted PIO255(auto-tune) selected PIO0
+[    8.972164] hdc: MWDMA2 mode selected
+[    8.973051] ide0 at 0x1f0-0x1f7,0x3f6 on irq 14
+[    8.974015] ide1 at 0x170-0x177,0x376 on irq 15
+[    8.975093] ACPI: PCI Interrupt 0000:00:01.2[D] -> Link [LNKD] -> GSI 11 (level, high) -> IRQ 11
+[    8.976736] PCI: Setting latency timer of device 0000:00:01.2 to 64
+[    8.976755] uhci_hcd 0000:00:01.2: UHCI Host Controller
+[    8.977743] uhci_hcd 0000:00:01.2: new USB bus registered, assigned bus number 1
+[    8.979188] uhci_hcd 0000:00:01.2: irq 11, io base 0x0000c020
+[    8.980833] usb usb1: configuration #1 chosen from 1 choice
+[    8.981841] hub 1-0:1.0: USB hub found
+[    8.982582] hub 1-0:1.0: 2 ports detected
+[    9.084147] usb usb1: New USB device found, idVendor=1d6b, idProduct=0001
+[    9.085091] usb usb1: New USB device strings: Mfr=3, Product=2, SerialNumber=1
+[    9.086459] usb usb1: Product: UHCI Host Controller
+[    9.087277] usb usb1: Manufacturer: Linux 2.6.26-1-686 uhci_hcd
+[    9.088170] usb usb1: SerialNumber: 0000:00:01.2
+[    9.089064] piix4_smbus 0000:00:01.3: Found 0000:00:01.3 device
+[    9.118150] No dock devices found.
+[    9.194367] SCSI subsystem initialized
+[    9.280069] libata version 3.00 loaded.
+[    9.332066] usb 1-2: new full speed USB device using uhci_hcd and address 2
+[    9.365638] hdc: ATAPI 4X CD-ROM drive, 512kB Cache
+[    9.366943] Uniform CD-ROM driver Revision: 3.20
+[    9.514633] usb 1-2: configuration #1 chosen from 1 choice
+[    9.521889] usb 1-2: New USB device found, idVendor=0627, idProduct=0001
+[    9.522987] usb 1-2: New USB device strings: Mfr=3, Product=2, SerialNumber=1
+[    9.524074] usb 1-2: Product: QEMU USB Tablet
+[    9.524899] usb 1-2: Manufacturer: QEMU 0.9.1
+[    9.525674] usb 1-2: SerialNumber: 1
+[    9.680343] usbcore: registered new interface driver hiddev
+[    9.688022] input: QEMU 0.9.1 QEMU USB Tablet as /class/input/input4
+[    9.698016] input,hidraw0: USB HID v0.01 Pointer [QEMU 0.9.1 QEMU USB Tablet] on usb-0000:00:01.2-2
+[    9.700021] usbcore: registered new interface driver usbhid
+[    9.701246] usbhid: v2.6:USB HID core driver
+[   11.063389] Unable to find swap-space signature
+[   12.216424] EXT3 FS on md0, internal journal
+[   13.390757] loop: module loaded
+[   14.188025] Unable to find swap-space signature
+[   15.196603] ip_tables: (C) 2000-2006 Netfilter Core Team
+[   16.258555] NET: Registered protocol family 10
+[   16.259839] lo: Disabled Privacy Extensions
+[   16.431927] eth0: link up, 100Mbps, full-duplex, lpa 0x05E1

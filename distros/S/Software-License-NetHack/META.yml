@@ -1,0 +1,201 @@
+---
+abstract: 'The NetHack General Public License'
+author:
+  - 'Jesse Luehrs <doy at cpan dot org>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.120921'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Software-License-NetHack
+requires:
+  Software::License: 0
+  base: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Software-License-NetHack
+  homepage: http://metacpan.org/release/Software-License-NetHack
+  repository: git://github.com/doy/software-license-nethack.git
+version: 0.01
+x_Dist_Zilla:
+  perl:
+    version: 5.018000
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: test
+          type: requires
+      name: '@DOY/TestMoreDoneTesting'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      name: '@DOY/GatherDir'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@DOY/PruneCruft'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@DOY/ManifestSkip'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@DOY/MetaYAML'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@DOY/License'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::Readme
+      name: '@DOY/Readme'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::RunExtraTests
+      name: '@DOY/RunExtraTests'
+      version: 0.011
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@DOY/ExecDir'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@DOY/ShareDir'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      name: '@DOY/MakeMaker'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@DOY/Manifest'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@DOY/TestRelease'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@DOY/ConfirmRelease'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@DOY/MetaConfig'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@DOY/MetaJSON'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: '@DOY/NextRelease'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::CheckChangesHasContent
+      name: '@DOY/CheckChangesHasContent'
+      version: 0.006
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: '@DOY/PkgVersion'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::Authority
+      name: '@DOY/Authority'
+      version: 1.006
+    -
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: '@DOY/PodCoverageTests'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@DOY/PodSyntaxTests'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::NoTabsTests
+      name: '@DOY/NoTabsTests'
+      version: 0.01
+    -
+      class: Dist::Zilla::Plugin::EOLTests
+      name: '@DOY/EOLTests'
+      version: 0.02
+    -
+      class: Dist::Zilla::Plugin::Test::Compile
+      name: '@DOY/Test::Compile'
+      version: 2.002
+    -
+      class: Dist::Zilla::Plugin::Metadata
+      name: '@DOY/Metadata'
+      version: 3.03
+    -
+      class: Dist::Zilla::Plugin::MetaResources
+      name: '@DOY/MetaResources'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::Git::Check
+      name: '@DOY/Git::Check'
+      version: 2.013
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      name: '@DOY/Git::Commit'
+      version: 2.013
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      name: '@DOY/Git::Tag'
+      version: 2.013
+    -
+      class: Dist::Zilla::Plugin::Git::NextVersion
+      name: '@DOY/Git::NextVersion'
+      version: 2.013
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      name: '@DOY/PodWeaver'
+      version: 3.101641
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@DOY/UploadToCPAN'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: AutoPrereqs
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: 4.300034
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: 0
+    version: 4.300034
+x_authority: cpan:DOY

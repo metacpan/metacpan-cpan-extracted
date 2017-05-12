@@ -1,0 +1,41 @@
+---
+abstract: 'Interface to Popular Shipping Services'
+author:
+  - 'Andrew Baerg <baergaj@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Shipment
+requires:
+  Class::Load: '0'
+  Class::Std::Fast::Storable: '0'
+  Data::Currency: '0'
+  Date::Parse: '0'
+  DateTime: '0'
+  File::Util: '0'
+  LWP::UserAgent: '0'
+  Locale::SubCountry: '0'
+  MIME::Base64: '0'
+  Moo: '0'
+  MooX::Aliases: '0'
+  MooX::HandlesVia: '0'
+  MooX::Types::MooseLike: '0'
+  MooX::Types::MooseLike::Base: '0'
+  MooX::Types::MooseLike::DateTime: '0'
+  Net::HTTP: '6.01'
+  SOAP::Lite: '0'
+  Scalar::Util: '0'
+  Try::Tiny: '0'
+  base: '0'
+  namespace::clean: '0'
+  strict: '0'
+  warnings: '0'
+version: '2.03'
+x_serialization_backend: 'YAML::Tiny version 1.69'

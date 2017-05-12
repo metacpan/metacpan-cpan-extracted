@@ -1,0 +1,18 @@
+Revision history for Perl extension Net::SOCKS.
+
+0.03 Tue May 19 04:51:20 PDT 1998
+	- SOCKS v5 support.
+	- SOCKS v5 Username/password support.
+	- POD cleanup.
+
+0.02 Sun Dec 28 21:37:15 PDT 1997 
+	- Methods now use a hash (or reference to a hash) for parameters.
+	- connect() and accept() now return a reference to a
+	  Net::Socket::INET object instead of a response code.
+	- Access to Net::SOCKS variables are now through 
+	  the param() method.
+	- Added status codes and human readable status messages.
+
+
+0.01 Tue Dec 16 15:36:36 PDT 1997
+	- original version; created by h2xs 1.16

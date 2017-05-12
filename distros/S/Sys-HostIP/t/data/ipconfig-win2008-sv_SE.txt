@@ -1,0 +1,21 @@
+
+IP-konfiguration f�r Windows
+
+
+Ethernet-anslutning Anslutning till lokalt n�tverk:
+
+    Anslutningsspecifika DNS-suffix . :
+    L�nklokal IPv6-adress . . . . . . : ff88::b6fa:c6e1:9a9a:9114%10
+    IPv4-adress . . . . . . . . . . . : 192.168.40.241
+    N�tmask . . . . . . . . . . . . . : 255.255.255.0
+    Standard-gateway. . . . . . . . . : 192.168.40.1
+
+Tunnelanslutning: Anslutning till lokalt n�tverk*:
+
+    Tillst�nd . . . . . . . . . . . . : Fr�nkopplad
+    Anslutningsspecifika DNS-suffix . :
+
+Tunnelanslutning: Anslutning till lokalt n�tverk* 8:
+
+    Tillst�nd . . . . . . . . . . . . : Fr�nkopplad
+    Anslutningsspecifika DNS-suffix . :

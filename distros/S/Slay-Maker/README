@@ -1,0 +1,28 @@
+README for Slay::Maker
+
+Slay::Maker is an all-perl make engine.  Rules are expressed in perl code:
+
+   [ qr/(.*).pm/, ':', "$1.pm.in", '=', sub { ... } ],
+
+and the make is implemented in perl.  Having the rules implemented in
+perl using constant strings, regular expressions, and subroutines
+give you a lot of power and control over the make process.
+
+Makefiles can be fairly simple subclasses of Slay::Maker.
+
+INSTALLATION
+
+uncompress & untar, then:
+
+   make
+   make test
+   make install
+
+
+BUGS & PATCHES
+
+Send 'em to barries@slaysys.com, thanks!
+
+LICENSE
+
+Completely unrestricted.  Have fun.

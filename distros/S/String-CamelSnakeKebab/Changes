@@ -1,0 +1,20 @@
+Revision history for String::CamelSnakeKebab
+
+0.05 2016-06-16T01:33:58Z
+    - Don't warn when coverting a string with just underscores in it.
+    - Be explicit in POD: the empty string is returned if you use a
+      sufficiently weird input string like "__- ".
+
+0.04 2015-11-02T14:15:19Z
+    - Don't warn when trying to convert an empty string.
+
+0.03 2014-05-27T20:20:15Z
+    - Allow digits 0-9 to be included in words.  Previously they indicated a
+      word boundary.
+
+0.02 2014-05-27T12:25:31Z
+    - Add missing dependencies for CPAN Testers
+
+0.01 2014-05-26T04:20:16Z
+    - Original version
+

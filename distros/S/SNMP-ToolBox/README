@@ -1,0 +1,62 @@
+NAME
+
+    SNMP::ToolBox - Set of SNMP-related utilities
+
+
+DESCRIPTION
+
+    This module contains a set of functions useful for writing SNMP-related
+    programs and modules: by_oid, find_next_oid(), oid_encode().
+
+
+INSTALLATION
+
+    To install this module, run the following commands:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+    Alternatively, to install with Module::Build, you can use the
+    following commands:
+
+        perl Build.PL
+        ./Build
+        ./Build test
+        ./Build install
+
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc SNMP::ToolBox
+
+    You can also look for information at:
+
+    * Search CPAN
+        http://search.cpan.org/dist/SNMP-ToolBox/
+
+    * Meta CPAN
+        https://metacpan.org/release/SNMP-ToolBox
+
+    * RT: CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/Public/Dist/Display.html?Name=SNMP-ToolBox
+
+    * AnnoCPAN: Annotated CPAN documentation
+        http://annocpan.org/dist/SNMP-ToolBox
+
+    * CPAN Ratings
+        http://cpanratings.perl.org/d/SNMP-ToolBox
+
+
+LICENSE AND COPYRIGHT
+
+    Copyright 2011 Sebastien Aperghis-Tramoni.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

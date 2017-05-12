@@ -1,0 +1,17 @@
+Build.PL
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+dist.ini
+lib/SysV/SharedMem.pm
+lib/SysV/SharedMem.xs
+ppport.h
+t/00-compile.t
+t/10-basics.t
+t/20-errors.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

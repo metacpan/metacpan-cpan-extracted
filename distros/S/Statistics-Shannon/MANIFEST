@@ -1,0 +1,11 @@
+ChangeLog
+Makefile.PL
+MANIFEST
+lib/Statistics/Shannon.pm
+README
+t/00new.t
+t/01base.t
+t/02anon.t
+t/03spec.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

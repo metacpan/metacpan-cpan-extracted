@@ -1,0 +1,170 @@
+{
+    "iphone4": {
+        "user_agent": "Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_2_1 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8C148 Safari/6533.18.5",
+        "pixel_ratio": 2,
+        "portrait": {
+            "width": 320,
+            "height": 480
+        },
+        "landscape": {
+            "width": 480,
+            "height": 320
+        }
+    },
+
+    "iphone5": {
+        "user_agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 7_0 like Mac OS X; en-us) AppleWebKit/537.51.1 (KHTML, like Gecko) Version/7.0 Mobile/11A465 Safari/9537.53",
+        "pixel_ratio": 2,
+        "portrait": {
+            "width": 320,
+            "height": 568
+        },
+        "landscape": {
+            "width": 568,
+            "height": 320
+        }
+    },
+
+    "iphone6": {
+        "user_agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 8_0 like Mac OS X) AppleWebKit/600.1.3 (KHTML, like Gecko) Version/8.0 Mobile/12A4345d Safari/600.1.4",
+        "pixel_ratio": 2,
+        "portrait": {
+            "width": 375,
+            "height": 667
+        },
+        "landscape": {
+            "width": 667,
+            "height": 375
+        }
+    },
+
+    "iphone6plus": {
+        "user_agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 8_0 like Mac OS X) AppleWebKit/600.1.3 (KHTML, like Gecko) Version/8.0 Mobile/12A4345d Safari/600.1.4",
+        "pixel_ratio": 3,
+        "portrait": {
+            "width": 414,
+            "height": 736
+        },
+        "landscape": {
+            "width": 736,
+            "height": 414
+        }
+    },
+
+    "ipad_mini": {
+        "user_agent": "Mozilla/5.0 (iPad; CPU OS 4_3_5 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8L1 Safari/6533.18.5",
+        "pixel_ratio": 1,
+        "portrait": {
+            "height": 1024,
+            "width": 768
+        },
+        "landscape": {
+            "height": 768,
+            "width": 1024
+        }
+    },
+
+    "ipad": {
+        "user_agent": "Mozilla/5.0 (iPad; CPU OS 7_0 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) Version/7.0 Mobile/11A465 Safari/9537.53",
+        "pixel_ratio": 2,
+        "portrait": {
+            "height": 1024,
+            "width": 768
+        },
+        "landscape": {
+            "height": 768,
+            "width": 1024
+        }
+    },
+
+    "galaxy_s3": {
+        "user_agent": "Mozilla/5.0 (Linux; U; Android 4.0; en-us; GT-I9300 Build/IMM76D) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30",
+        "pixel_ratio": 2,
+        "portrait": {
+            "height": 640,
+            "width": 360
+        },
+        "landscape": {
+            "height": 360,
+            "width": 640
+        }
+    },
+
+    "galaxy_s4": {
+        "user_agent": "Mozilla/5.0 (Linux; Android 4.4.2; GT-I9505 Build/JDQ39) AppleWebKit/537.36 (KHTML, like Gecko) Version/1.5 Chrome/28.0.1500.94 Mobile Safari/537.36",
+        "pixel_ratio": 3,
+        "portrait": {
+            "height": 640,
+            "width": 360
+        },
+        "landscape": {
+            "height": 360,
+            "width": 640
+        }
+    },
+
+    "galaxy_s5": {
+        "user_agent": "Mozilla/5.0 (Linux; Android 4.4.2; SM-G900F Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/30.0.0.0 Mobile Safari/537.36",
+        "pixel_ratio": 3,
+        "portrait": {
+            "height": 640,
+            "width": 360
+        },
+        "landscape": {
+            "height": 360,
+            "width": 640
+        }
+    },
+
+    "galaxy_note3": {
+        "user_agent": "Mozilla/5.0 (Linux; U; Android 4.3; en-us; SM-N900T Build/JSS15J) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30",
+        "pixel_ratio": 3,
+        "portrait": {
+            "height": 640,
+            "width": 360
+        },
+        "landscape": {
+            "height": 360,
+            "width": 640
+        }
+    },
+
+    "nexus4": {
+        "user_agent": "Mozilla/5.0 (Linux; Android 4.4.4; en-us; Nexus 4 Build/JOP40D) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2307.2 Mobile Safari/537.36",
+        "pixel_ratio": 2,
+        "portrait": {
+            "height": 640,
+            "width": 384
+        },
+        "landscape": {
+            "height": 384,
+            "width": 640
+        }
+    },
+
+    "nexus9": {
+        "user_agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 9 Build/MRA58N; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/47.0.2526.61 Safari/537.36",
+        "pixel_ratio": 2,
+        "portrait": {
+            "height": 1024,
+            "width": 768
+        },
+        "landscape": {
+            "height": 768,
+            "width": 1024
+        }
+    },
+
+    "nexus10": {
+        "user_agent": "Mozilla/5.0 (Linux; Android 4.3; Nexus 10 Build/JSS15Q) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2307.2 Mobile Safari/537.36",
+        "pixel_ratio": 2,
+        "portrait": {
+            "height": 1280,
+            "width": 800
+        },
+        "landscape": {
+            "height": 800,
+            "width": 1280
+        }
+    }
+}

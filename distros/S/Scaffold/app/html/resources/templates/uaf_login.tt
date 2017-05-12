@@ -1,0 +1,29 @@
+    <div id="header">
+      <h1>Scaffold</h1>
+      <h2>An Example Web Site</h2>
+    </div>
+    <div id="container">
+      <form method="post" action="/login/validate" name="login">
+        <div id="loginout" class="login">
+          <fieldset>
+            <legend>Please Login</legend>
+            <div class="username">
+              <label for="username">Username:</label>
+              <input type="text" name="username" size="32" value="demo" id="username">
+            </div>
+            <div class="password">
+              <label for="password">Password:</label>
+              <input type="password" name="password" size="32" value="demo" id="password">
+            </div>
+            <div class="message">
+              <p>Enter your username and password to log in.</p>
+            </div>
+            <label for="submit"></label>
+            <input type="submit" value="OK">
+          </fieldset>
+        </div>
+      </form>
+    </div>
+    <div id="footer">
+[% INCLUDE footer.tt -%]
+    </div>

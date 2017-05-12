@@ -1,0 +1,32 @@
+---
+abstract: 'Manipulate Sendmail queues directly'
+author:
+  - "Dave O'Neill, C<< <support at roaringpenguin.com> >>"
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::Class: 0
+  Test::Most: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Sendmail-Queue
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  File::Spec: 0
+  IO::File: 0
+  Mail::Header::Generator: 0
+  Scalar::Util: 0
+  Storable: 0
+  Time::Local: 0
+  perl: 5.8.0
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+version: 0.800

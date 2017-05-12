@@ -1,0 +1,24 @@
+NAME
+    Spreadsheet::XML_to_XLS - Create Excel document from XML file
+
+SYNOPSIS
+      use strict;
+      use warnings;
+      use Spreadsheet::XML_to_XLS;
+      Spreadsheet::XML_to_XLS->build("file.xml", "excel.xls");
+
+DESCRIPTION
+    This module uses Spreadsheet::WriteExcel to translate a XML file to
+    appropriate Excel document.
+
+API REFERENCE
+  build
+    Param: source XML file name and target Excel file name. No return.
+  It's the only function been provided for API. See complete description in doc/index.html.
+
+SEE ALSO
+    SpreadSheet::WriteExcel
+
+AUTHORS
+    Radik Usmanov radik.usmanov@ubs.com, rusmanov@luxoft.com
+

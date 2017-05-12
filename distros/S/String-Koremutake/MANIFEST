@@ -1,0 +1,10 @@
+Build.PL
+CHANGES
+lib/String/Koremutake.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/pod.t
+t/pod_coverage.t
+t/simple.t

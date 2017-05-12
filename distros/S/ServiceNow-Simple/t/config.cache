@@ -1,0 +1,7 @@
+package CCACHE;
+# enter your instance, soap role username and password below.
+
+sub instance { 'demo019' ; }
+sub user     { 'admin' ; }
+sub password { 'admin' ; }
+1;

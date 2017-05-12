@@ -1,0 +1,11 @@
+The first priority of Set::Scalar is to be a convenient interface
+to sets (as in: unordered colletions of Perl scalars.)  While not
+designed to be slow or big, neither has it been designed to be
+fast or compact.
+
+Please see lib/Set/Scalar.pm for more information, once you have
+installed this module, "perldoc Set::Scalar" should work.
+
+-- 
+jhi@iki.fi  :  Original author.
+davido@cpan.org : Current maintainer.

@@ -1,0 +1,46 @@
+---- THE FOLLOWING DOCUMENT IS PRESERVED FOR ITS HISTORICAL VALUE ONLY. ----
+
+This is a long-waited-for (I hope) rewrite of the venerable Set::Scalar
+module.  The original 0.00x series culminated in 0.003 back in May 1996,
+the 0.004 in October 1998 was just a minor update.
+
+The most egregious problem with the old implementation was that having
+complex things such as objects as set members (for example if sets of sets
+were wanted) didn't really work.
+
+While this new implementation is more correct, it may be also slower.
+Some operations are certainly slower, but some are faster.  It all
+depends on your mix of operations.
+
+Displaying sets is not as versatile as with the old implementation,
+but then on the other hand I doubt (hope) that anybody ever used the
+overly baroque interface anyway.  If, however, I am wrong in this,
+please let me know, I'll think of something.  The old interface should
+not be revived as such, I think, it was far too clunky.
+
+The "valued sets" concept is now moved to its own subclass,
+Set::Scalar::Valued.
+
+(There are two meta-classes, Set::Scalar::Universe and
+ Set::Scalar::ValuedUniverse, but do not use them overmuch, as there
+ are still some rough edges that may change in future releases.
+ Do not use them directly (by instantiating them yourself, for example),
+ $set->universe is about the only method that works and will continue
+ to work.  Even more internal-use-only are the Set::Scalar::Real and
+ Set::Scalar::Virtual.  Do not try to use them directly.
+ Their interfaces are left undocumented on purpose.)
+
+The "inverted sets" concept is history, removed, gone, not to return.
+You can just use -$set.
+
+Let me know what you think, did I miss anything obvious?  Any old
+functionality that I didn't purposefully/accidentally migrate to
+the new one?  Could the documentation be better? (a rhetorical question)
+Any new functionality you would like to see?  (Please don't say that
+you want the Cartesian product: it's a concept from wholly different
+world, the ordered sets.  My sets are unordered.)
+
+-- 
+Jarkko Hietaniemi <jhi@iki.fi>
+
+

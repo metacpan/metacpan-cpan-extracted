@@ -1,0 +1,14 @@
+# -*- yaml -*-
+# Revision history for Sub-Alias
+
+0.03:
+  - Use Devel::BeginLift so that compile time alias can be written as a multiple line statements.
+  - Use Devel::Declare to add runtime support.
+  - apparently this module really cant live with without rafl++
+
+0.02:
+  - Implement alias by ref: 'alias foo => \&bar'
+
+0.01:
+  - Initial release: alias foo => 'bar'
+

@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+README
+Makefile.PL
+Stemmer.pm
+Stemmer.xs
+test.pl
+lib/stemmer.c
+lib/stemmer.h
+lib/swish.h
+lib/Makefile.PL

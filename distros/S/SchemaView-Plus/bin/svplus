@@ -1,0 +1,3384 @@
+#! /usr/bin/perl
+eval 'exec /usr/bin/perl -S $0 ${1+"$@"}' if 0; # not running under some shell
+
+use strict;
+use lib '.';
+use FindBin;
+
+BEGIN {
+	unshift @INC,"$FindBin::Bin/../lib";
+	unshift @INC,"$FindBin::Bin/lib";
+	unshift @INC,"$FindBin::Bin";
+}
+
+use vars qw/$VERSION/;
+$VERSION = '0.17';
+
+use DBI;
+use Tk;
+use XML::Dumper;
+use XML::Parser;
+use Data::CompactDump;
+use DBIx::SystemCatalog;
+use Math::Project qw/abscissa_project/;
+use Hints::Base;
+use Hints::X;
+use Print::Printcap;
+use Logo::svplus;
+use PostScript::Poster;
+
+require Tk::Font;
+require Tk::FontDialog;
+require Tk::Listbox;
+require Tk::Dialog;
+require Tk::DialogBox;
+require Tk::Canvas;
+require Tk::Entry;
+require Tk::Optionmenu;
+require Tk::Menubutton;
+require Tk::Scrollbar;
+require Tk::Radiobutton;
+require Tk::Toplevel;
+require Tk::Frame;
+require Tk::Label;
+require Tk::Button;
+require Tk::ProgressBar;
+require Tk::DropSite;
+require Tk::DragDrop;
+require Tk::MListbox;
+require Tk::Photo;
+
+use vars qw/$main $filename %data $canvas $repository_window $all_show
+	$repository $repository_object_type $placebutton %fonts $login
+	$repository_object_filter $info $progress $or_extra $password %SIG
+	$global_bind_cancel $dragdrop $xhints %Pressed $noshowrepository
+	%last_relationship_in_progress $initdir $driver $database $splash
+	$logo/;
+
+$0 = 'svplus';
+
+my $logo = new Logo::svplus;
+
+splash_start();
+
+%data = ();  my %fonts = ();  $or_extra = 1;
+$filename = shift || 'noname.svp';
+$driver = '';  $database = '';  $login = '';  $password = '';
+
+# main program
+
+sub REAPER {
+	wait;
+	$SIG{CHLD} = \&REAPER;
+}
+
+$SIG{CHLD} = \&REAPER;
+
+$initdir = `pwd`;  chomp $initdir;
+
+$global_bind_cancel = undef;  $all_show = undef;
+%Pressed = ();
+$noshowrepository = undef;
+
+$main = new MainWindow;
+$main->title('SchemaView Plus ['.basename($filename).']');
+$main->appname('svplus');  $main->iconname('svplus');  $main->client('svplus');
+$main->CmdLine();
+
+reset_data();
+
+my $hints = new Hints::Base 'svplus';
+$xhints = new Hints::X -hints => $hints, -mw => $main;
+
+my $menubar = $main->Frame(-borderwidth => 2, -relief => 'raised')
+	->pack(-side => 'top', -fill => 'x');
+
+my $statusline = $main->Frame()->pack(-side => 'bottom', -fill => 'x');
+my $progframe = $statusline->Frame(-borderwidth => 2, -relief => 'ridge')
+	->pack(-side => 'left', -fill => 'y');
+my $infoframe = $statusline->Frame(-borderwidth => 2, -relief => 'ridge')
+	->pack(-side => 'right', -fill => 'both', -expand => 'yes');
+
+$progress = $progframe->ProgressBar(-width => 20, -from => 0, -to => 100,
+		-blocks => 0, -colors => [ 0 => 'green' ], -value => 0)
+		->pack(-fill => 'both');
+my $sl = $infoframe->Label()->pack(-fill => 'both', -expand => 'yes');
+
+my $menufile = $menubar->Menubutton(-text => 'File', -underline => 0)
+	->pack(-side => 'left', -padx => 2);
+$menufile->command(-label => 'New', -command => \&newfile, -underline => 0);
+$menufile->command(-label => 'Open...', -command => \&openfile, 
+	-underline => 0);
+$menufile->command(-label => 'Save', -command => \&savefile, -underline => 0);
+$menufile->command(-label => 'Save as...', -command => \&saveasfile, 
+	-underline => 5);
+$menufile->command(-label => 'Revert', -command => \&revertfile, 
+	-underline => 0);
+$menufile->separator;
+my $menuexport = $menufile->cascade(-label => 'Export', -underline => 0)
+	->cget(-menu)->Menu;
+$menufile->entryconfigure('Export', -menu => $menuexport);
+$menufile->separator;
+$menufile->command(-label => 'Exit', -command => \&exit, -underline => 1);
+
+$menuexport->command(-label => 'Plain Dump File (*.dmp)', -underline => 0,
+	-command => \&export_dmp);
+
+
+my $menuschema = $menubar->Menubutton(-text => 'Schema', -underline => 0)
+	->pack(-side => 'left', -padx => 2);
+$menuschema->command(-label => 'Print to PostScript...', -command => \&printps, 
+	-underline => 0);
+
+my $menudatabase = $menubar->Menubutton(-text => 'Database', -underline => 0)
+	->pack(-side => 'left', -padx => 2);
+$menudatabase->command(-label => 'Retrieve schema...', -command => \&retrieve, 
+	-underline => 0);
+
+my $menusettings = $menubar->Menubutton(-text => 'Settings', -underline => 2)
+	->pack(-side => 'left', -padx => 2);
+$menusettings->checkbutton(-label => 'Extra information in object repository',
+	-command => sub { 
+		if (Exists($repository_window)) {
+			$repository_window->destroy();
+			repository();
+		}
+	}, -underline => 0, -variable => \$or_extra);
+
+my $menuwindow = $menubar->Menubutton(-text => 'Window', -underline => 0)
+	->pack(-side => 'left', -padx => 2);
+$menuwindow->command(-label => 'Object repository...', -command => sub { 
+		deselect_all();
+		unless (Exists($repository_window)) {
+			repository();
+		} else {
+			$repository_window->deiconify();
+			$repository_window->raise();
+		}
+	}, -underline => 0);
+$menuwindow->separator;
+$menuwindow->command(-label => 'Font...', -command => \&changefont,
+	-underline => 0);
+
+my $menuhelp = $menubar->Menubutton(-text => 'Help', -underline => 0)
+	->pack(-side => 'right', -padx => 2);
+$menuhelp->command(-label => 'Hints...', -command => sub { $xhints->show; },
+	-underline => 0);
+$menuhelp->separator;
+$menuhelp->command(-label => 'About...', -command => sub { 
+	my $d = $main->DialogBox(-title => 'About', -buttons => [ 'OK' ]);
+	$d->Label(-text => ' ')->grid(-column => 0, -row => 0, -sticky => 'nw');
+	my $f = $d->Frame(-relief => 'solid',
+		-borderwidth => 1, -background => 'white')
+		->grid(-column => 1, -row => 1, -sticky => 'nw');
+	my $tmp = "/tmp/svplus.splash.".$$.".ppm";
+	if (open F,">$tmp") {
+		print F $logo->ppm();
+		close F;
+
+		$f->Label(-image => $d->Photo(-file => $tmp,
+			-format => 'ppm', -height => 87,
+			-width => 379), background => 'white')
+			->pack(-side => 'top', -ipadx => 0,
+			-ipady => 0, -padx => 0, -pady => 0);
+
+		system "rm -f $tmp";
+	} else {
+		$f->Label(-text => 'SchemaView Plus')
+		->pack(-side => 'top', -anchor => 'center');
+	}
+	$f->Label(-background => 'white', -text => 'Version '.$VERSION)
+		->pack(side => 'top', -anchor => 'center');
+	my $it = $f->Label(-background => 'white', -text => 
+		'(c) Copyright 2001-02 by Milan Sorm <sorm@pef.mendelu.cz>')
+		->pack(side => 'top', -anchor => 'center');
+	my $itfont = $it->Font();
+	$itfont->configure(-slant => 'italic', -weight => 'normal', -family => 'helvetica');
+	$f->Label(-background => 'white', -text => "This program is free software; you can redistribute it\n and/or modify it under the same terms as Perl itself.",
+		-font => $itfont)
+		->pack(side => 'bottom', -anchor => 'center');
+
+	$d->Label(-text => ' ')->grid(-column => 1, -row => 2, -sticky => 'nw');
+	$d->Label(-text => 'Many thanks goes to:')->grid(-column => 1,
+		-row => 3, -sticky => 'nw');
+	$d->Label(-text => '   Miroslav Kripac (SchemaView)')
+		->grid(-column => 1, -row => 4, -sticky => 'nw');
+	$d->Label(-text => '   Ludek Finstrle (PgSQL support, contributor, betatester)')
+		->grid(-column => 1, -row => 5, -sticky => 'nw');
+	$d->Label(-text => '   Ing. Hana Netrefova (betatester)')
+		->grid(-column => 1, -row => 6, -sticky => 'nw');
+	$d->Label(-text => '   Bc. Jan Muller (betatester)')
+		->grid(-column => 1, -row => 7, -sticky => 'nw');
+	$d->Label(-text => '   Jos T.J. van Eijdnhoven (original poster in C)')
+		->grid(-column => 1, -row => 8, -sticky => 'nw');
+	$d->Label(-text => ' ')->grid(-column => 2, -row => 9, -sticky => 'nw');
+
+	$d->gridRowconfigure(0, -weight => 1, -minsize => 20);
+	$d->gridRowconfigure(1, -weight => 1, -minsize => 60);
+	$d->gridRowconfigure(2, -weight => 1, -minsize => 30);
+	$d->gridRowconfigure(3, -weight => 1, -minsize => 30);
+	$d->gridRowconfigure(4, -weight => 1, -minsize => 30);
+	$d->gridRowconfigure(5, -weight => 1, -minsize => 30);
+	$d->gridRowconfigure(6, -weight => 1, -minsize => 30);
+	$d->gridRowconfigure(7, -weight => 1, -minsize => 30);
+	$d->gridRowconfigure(8, -weight => 1, -minsize => 30);
+	$d->gridRowconfigure(9, -weight => 1, -minsize => 30);
+	
+	$d->gridColumnconfigure(0, -weight => 1, -minsize => 20);
+	$d->gridColumnconfigure(1, -weight => 1, -minsize => 200);
+	$d->gridColumnconfigure(2, -weight => 1, -minsize => 20);
+
+	$d->Show;
+	}, -underline => 0);
+
+my $frame = $main->Frame()
+	->pack(-side => 'bottom', -expand => 'y', -fill => 'both');
+
+$canvas = $frame->Scrolled('Canvas', -width => 600, -height => 400,
+	-scrollbars => 'sre', -scrollregion => [ qw/0 0 4000 4000/ ],
+	-closeenough => 5)
+	->pack(-fill => 'both', -expand => 'y');
+my $real_canvas = $canvas->Subwidget("canvas");
+$real_canvas->DropSite(-droptypes => [ 'Local' ],
+	-dropcommand => \&dragdrop_paste);
+$real_canvas->CanvasBind('<1>', [ \&canvas_mouse_down, Ev('x'), Ev('y') ]);
+$real_canvas->CanvasBind('<3>', [ \&canvas_popup, Ev('x'), Ev('y') ]);
+$main->bind('<Key>', [ \&keypress, Ev('K') ]);
+$main->bind('<KeyRelease>', [ \&keyrelease, Ev('K') ]);
+$canvas->bind('_tables','<Enter>', sub { mouse_move($canvas) });
+$canvas->bind('_tables','<Leave>', sub { mouse_normal($canvas) });
+
+$main->update;
+
+if (-e $filename) {
+	loadfile();
+} else {
+	newfile();
+}
+
+mouse_hour($main);
+
+show_canvas();
+
+mouse_normal($main);
+
+splash_stop();
+
+Tk::MainLoop();
+
+# subs
+
+sub Tk::Error {
+	my ($widget,$error,@locations) = @_;
+	$main->messageBox(-icon => 'error', -type => 'OK', 
+		-title => 'Tk error', 
+		-message => $error);
+	if (open F,">>/tmp/svplus-error.log") {
+		print F "Error at ".localtime().":\n";
+		print F "\tWidget:\t\t".$widget."\n";
+		print F "\tDescription:\t".$error."\n";
+		print F "\tLocations:\t".join "\n\t\t\t",@locations;
+		print F "\n\n";
+		close F;
+	}
+}
+
+sub basename {
+	my $fn = shift;
+	$fn =~ s/^.*\///;
+	$fn =~ s/\.svp$//;
+	return $fn;
+}
+
+sub newfile {
+	%data = ();  %fonts = ();
+	reset_data();
+	$filename = 'noname.svp';
+	$main->title('SchemaView Plus ['.basename($filename).']');
+	$canvas->delete('all');
+	repository() unless Exists $repository_window;
+	$data{environment}->{windows}{repository}{showed} = 1;
+	show_all();
+}
+
+sub revertfile {
+	my $fn = $filename;
+	newfile();
+	$filename = $fn;
+	loadfile();
+	mouse_hour($main);
+	show_all();
+	mouse_normal($main);
+}
+
+sub openfile {
+	my $fn = $main->getOpenFile(-defaultextension => '.svp', 
+		-filetypes => [ [ 'SchemaView Plus Files', '.svp' ],
+#				[ 'SchemaView Files', [ '.xml', '.sv' ] ],
+				[ 'Plain Dump Files', '.dmp' ],
+				[ 'All Files', '*' ] ],
+		-title => 'Open data file',
+		-initialdir => $initdir);
+	if ($fn) {
+		newfile();
+		$filename = $fn;
+		$main->title('SchemaView Plus ['.basename($filename).']');
+		loadfile();
+		mouse_hour($main);
+		show_all();
+		mouse_normal($main);
+	}
+}
+
+sub loadfile {
+	%data = ();
+	reset_data();
+	mouse_hour($main);
+	$progress->value(0);
+	my $lenfile = (stat($filename))[7];
+	$progress->configure(-to => $lenfile);
+	$main->update();
+	my $parser = new XML::Parser Style => 'Tree';
+	$parser->setHandlers('Char',sub {
+		my $expat = shift;
+		$progress->value($expat->current_byte());
+		$main->update();
+		my $text = shift;
+		my $clist = $expat->{Curlist};
+		my $pos = $#$clist;
+		if ($pos > 0 and $clist->[$pos - 1] eq '0') 
+			{ $clist->[$pos] .= $text; } 
+		else { push @$clist, 0 => $text; }
+	});
+
+	my $data;
+	my $tree;
+	my $dump;
+
+	eval {
+		$tree = $parser->parsefile($filename);
+		$dump = new XML::Dumper;
+	};
+	if ($@) {
+		$data = {};
+		if (open F,$filename) {
+			my $evs = join '',<F>;
+			$evs = '$temp = '.$evs;
+			use vars qw/$temp/;
+			eval {
+				eval $evs;
+			};
+			$data = $temp->[0] unless $@;
+			close F;
+		}
+	} else {
+		$progress->configure(-to => 100, -value => 0);
+		$main->update();
+	
+		my $seekforbracket = 0;
+		my $newtree = undef;
+		for (@$tree) {
+			++$seekforbracket if $_ eq 'schemaviewplus';
+			if ($seekforbracket and ref $_) { $newtree = $_; last; }
+		}
+		unless (defined $newtree) { 
+			open_other_formats($tree);  return; 
+		}
+		$seekforbracket = 0;
+		$tree = undef;
+		for (@$newtree) {
+			++$seekforbracket if $_ eq 'perldata';
+			if ($seekforbracket and ref $_) { $tree = $_; last; }
+		}
+		unless (defined $newtree) { 
+			open_other_formats($tree);  return; 
+		}
+		$tree = [ 'perldata', $tree ];
+		
+		$data = $dump->xml2pl($tree);
+	}
+	if (defined $data and ref $data) {
+		my %loaded = %$data;
+		for (keys %loaded) {
+			$data{$_} = $loaded{$_};
+			# here we only copy changed master keys
+		}
+	}
+	mouse_normal($main);
+	for (@{$data{tables}},@{$data{relationships}}) 
+		{ delete $_->{selection}; }
+
+	deselect_all();
+	load_environment();
+}
+
+sub open_other_formats {
+	my $tree = shift;
+	# Still not supported
+}
+
+sub save_environment {
+	$data{environment}->{canvas}{offset}{x} = $canvas->canvasx(0);
+	$data{environment}->{canvas}{offset}{y} = $canvas->canvasy(0);
+	my @scroll = $canvas->cget('-scrollregion');
+	$data{environment}->{canvas}{all}{left} = $scroll[0];
+	$data{environment}->{canvas}{all}{top} = $scroll[1];
+	$data{environment}->{canvas}{all}{right} = $scroll[2];
+	$data{environment}->{canvas}{all}{bottom} = $scroll[3];
+	
+	$data{environment}->{windows}{main}{geometry} = $main->geometry;
+	if (Exists $repository_window) {
+		$data{environment}->{windows}{repository}{geometry} 
+			= $repository_window->geometry;
+		$data{environment}->{windows}{repository}{showed} = 1;
+	} else {
+		$data{environment}->{windows}{repository}{showed} = 0;
+	}
+	if ($xhints->showed()) {
+		$data{environment}->{windows}{hints}{geometry} 
+			= $xhints->geometry();
+		$data{environment}->{windows}{hints}{showed} = 1;
+	} else {
+		$data{environment}->{windows}{hints}{showed} = 0;
+	}
+	for (keys %fonts) {
+		$data{environment}->{fonts}{$_}{family} =
+			$fonts{$_}->actual('-family');
+		$data{environment}->{fonts}{$_}{size} = 
+			$fonts{$_}->actual('-size');
+		$data{environment}->{fonts}{$_}{weight} = 
+			$fonts{$_}->actual('-weight');
+		$data{environment}->{fonts}{$_}{slant} = 
+			$fonts{$_}->actual('-slant');
+		$data{environment}->{fonts}{$_}{underline} = 
+			$fonts{$_}->actual('-underline');
+		$data{environment}->{fonts}{$_}{overstrike} = 
+			$fonts{$_}->actual('-overstrike');
+	}
+}
+
+sub load_environment {
+	if (exists $data{environment}->{fonts}) {
+		my %f = %{$data{environment}->{fonts}};
+		for (keys %f) {
+			$fonts{$_} = $main->fontCreate(
+				-family => $f{$_}->{family},
+				-size => $f{$_}->{size},
+				-weight => $f{$_}->{weight},
+				-slant => $f{$_}->{slant},
+				-underline => $f{$_}->{underline},
+				-overstrike => $f{$_}->{overstrike});
+		}
+	}
+
+	$canvas->xviewMoveto($data{environment}->{canvas}{offset}{x} / 
+		( ($data{environment}->{canvas}{all}{right} || 4000) 
+		- ($data{environment}->{canvas}{all}{left} || 0) ));
+	$canvas->yviewMoveto($data{environment}->{canvas}{offset}{y} / 
+		( ($data{environment}->{canvas}{all}{bottom} || 4000) 
+		- ($data{environment}->{canvas}{all}{top} || 0) ));
+	$canvas->configure(-scrollregion => [ 
+		$data{environment}->{canvas}{all}{left} || 0,
+		$data{environment}->{canvas}{all}{top} || 0,
+		$data{environment}->{canvas}{all}{right} || 4000,
+		$data{environment}->{canvas}{all}{bottom} || 4000 ]);
+	
+	$main->geometry($data{environment}->{windows}{main}{geometry} ||
+		'600x400');
+
+	if (Exists $repository_window) {
+		unless ($data{environment}->{windows}{repository}{showed}) {
+			$repository_window->destroy();
+		} else {
+			$repository_window->deiconify();
+			$repository_window->raise();
+		} 
+	} else {
+		repository() if
+			$data{environment}->{windows}{repository}{showed};
+	}
+
+	$repository_window->geometry(
+		$data{environment}->{windows}{repository}{geometry})
+		if Exists($repository_window)
+			and $data{environment}->{windows}{repository}{geometry};
+
+	unless ($data{environment}->{windows}{hints}{showed}) {
+		$xhints->hide();
+	} else {
+		$xhints->show();
+	}
+	$xhints->geometry($data{environment}->{windows}{hints}{geometry} 
+		|| $xhints->default_geometry)
+		if $xhints->showed();
+}
+
+sub savefile {
+	save_environment();
+	my $dump = new XML::Dumper;
+	my $xml = $dump->pl2xml(\%data);
+	if (open F,">$filename") {
+		print F '<?xml version="1.0"?>'."\n";
+		print F '<schemaviewplus version="'.$VERSION.'">'."\n";
+		print F $xml;
+		print F '</schemaviewplus>'."\n";
+		close F;
+	}
+}
+
+sub saveasfile {
+	my $fn = $main->getSaveFile(-defaultextension => '.svp', 
+		-filetypes => [ [ 'SchemaView Plus Files','.svp' ],
+				[ 'All Files', '*' ] ],
+		-title => 'Save data file as',
+		-initialdir => $initdir);
+	if ($fn) {
+		$filename = $fn;
+		$main->title('SchemaView Plus ['.basename($filename).']');
+		savefile();
+	}
+}
+
+sub export_dmp {
+	my $fn = $main->getSaveFile(-defaultextension => '.dmp', 
+		-filetypes => [ [ 'Plain Dump Files','.dmp' ],
+				[ 'All Files', '*' ] ],
+		-title => 'Export data file as',
+		-initialdir => $initdir);
+	if ($fn) {
+		save_environment();
+		if (open F,">$fn") {
+			print F compact [ \%data ];
+			close F;
+			$main->messageBox(-icon => 'info', -type => 'OK', 
+				-title => 'Export file', 
+				-message => 'Export successful.');
+		}
+
+	}
+}
+
+sub in_array {
+	my ($what,@where) = @_;
+	for (@where) { return 1 if $what eq $_; }
+	0;
+}
+
+sub type_info {
+	my $type = shift;
+	return ' (T)' if $type == SC_TYPE_TABLE;
+	return ' (V)' if $type == SC_TYPE_VIEW;
+	return '';
+}
+
+sub type_desc {
+	my $type = shift;
+	return 'table' if $type == SC_TYPE_TABLE;
+	return 'view' if $type == SC_TYPE_VIEW;
+	return 'unknown';
+}
+
+sub mouse_hour {
+	my $w = shift;  $w->configure(-cursor => 'watch');  $w->update;
+}
+
+sub mouse_move {
+	my $w = shift;  $w->configure(-cursor => 'fleur');  $w->update;
+}
+
+sub mouse_normal {
+	my $w = shift;  $w->configure(-cursor => '');  $w->update;
+}
+
+sub retrieve {
+	my @driver_names = DBI->available_drivers;
+
+	my $d = $main->DialogBox(-title => 'Connect to database',
+		-buttons => [ 'Connect', 'Cancel' ]);
+
+	$d->Label(-justify => 'left', -text => 'Driver:')
+		->grid(-column => 2, -row => 1, -sticky => 'w');
+	$d->Optionmenu(-options => \@driver_names, -textvariable => \$driver)
+		->grid(-column => 3, -row => 1, -sticky => 'ew');
+	$d->Label(-justify => 'left', -text => 'DSN for database:')
+		->grid(-column => 2, -row => 2, -sticky => 'w');
+	$d->Entry(-textvariable => \$database)
+		->grid(-column => 3, -row => 2, -sticky => 'ew');
+	$d->Label(-justify => 'left', -text => 'Login:')
+		->grid(-column => 2, -row => 3, -sticky => 'w');
+	$d->Entry(-textvariable => \$login)
+		->grid(-column => 3, -row => 3, -sticky => 'ew');
+	$d->Label(-justify => 'left', -text => 'Password:')
+		->grid(-column => 2, -row => 4, -sticky => 'w');
+	$d->Entry(-textvariable => \$password, -show => '*')
+		->grid(-column => 3, -row => 4, -sticky => 'ew');
+
+	$d->gridRowconfigure(1, -weight => 0, -minsize => 30);
+	$d->gridRowconfigure(2, -weight => 0, -minsize => 30);
+	$d->gridRowconfigure(3, -weight => 0, -minsize => 30);
+	$d->gridRowconfigure(4, -weight => 0, -minsize => 30);
+	
+	$d->gridColumnconfigure(1, -weight => 0, -minsize => 10);
+	$d->gridColumnconfigure(2, -weight => 0, -minsize => 30);
+	$d->gridColumnconfigure(3, -weight => 0, -minsize => 166);
+	$d->gridColumnconfigure(4, -weight => 0, -minsize => 13);
+
+	if ($d->Show eq 'Connect') {
+		mouse_hour($main);
+		my $dsn = 'dbi:'.$driver.':'.$database;
+		my $dbh = DBI->connect($dsn,$login,$password,
+			{ RaiseError => 0, PrintError => 0, AutoCommit => 1 });
+		unless ($dbh) {
+			mouse_normal($main);
+			$main->messageBox(-icon => 'error', -type => 'OK', 
+				-title => 'Database error', 
+				-message => $DBI::errstr);
+			return;
+		}
+
+		my $catalog = new DBIx::SystemCatalog $dbh;
+
+		# fetching all schemas
+		my @schemas = $catalog->schemas;
+		my $schema = '';
+		mouse_normal($main);
+		if (@schemas) {
+			$d = $main->DialogBox(-title => 'Select schema',
+				-buttons => [ 'Retrieve', 'Cancel' ]);
+
+			$d->Label(-justify => 'left', -text => 'Schema:')
+				->grid(-column => 2, -row => 1, -sticky => 'w');
+			$d->Optionmenu(-options => \@schemas, 
+				-variable => \$schema)
+				->grid(-column => 3, -row => 1, -sticky =>'ew');
+	
+			$d->gridRowconfigure(1, -weight => 0, -minsize => 30);
+	
+			$d->gridColumnconfigure(1,-weight => 0, -minsize => 10);
+			$d->gridColumnconfigure(2,-weight => 0, -minsize => 30);
+			$d->gridColumnconfigure(3,-weight => 0, -minsize =>166);
+			$d->gridColumnconfigure(4,-weight => 0, -minsize => 13);
+
+			unless ($d->Show() eq 'Retrieve') {
+				$dbh->disconnect;
+				return;
+			}
+
+			# Set selected schema to catalog filter
+			$catalog->schema($schema);
+		}
+
+		mouse_hour($main);
+
+		# fetching all types of table and views
+		sctypes();
+
+		# fetching all tables and views for selection
+		my @tables = $catalog->tables_with_types;
+
+		mouse_normal($main);
+		$d = $main->DialogBox(-title => 'Select objects',
+			-buttons => [ 'Retrieve', 'Cancel' ]);
+		my $list1 = $d->Scrolled('Listbox', -setgrid => 1,
+			-scrollbars => 'e', -selectmode => 'multiple')
+			->grid(-column => 1, -row => 2, -rowspan => 9,
+				-sticky => 'nsew');
+		my $list2 = $d->Scrolled('Listbox', -setgrid => 1,
+			-scrollbars => 'e', -selectmode => 'multiple')
+			->grid(-column => 3, -row => 2, -rowspan => 9,
+				-sticky => 'nsew');
+		my %sources = ();
+		my %targets = ();
+		for (sort { $a->{name} cmp $b->{name} } @tables) { 
+			++$targets{$_->{name}.type_info($_->{type})};
+		}
+		my $filter1 = '';  my $ufilter1 = '';
+		my $frame1 = $d->Frame()->grid(-column => 1, -row => 11,
+			-sticky => 'ew');
+		my $fe1 = $frame1->Entry(-textvariable => \$filter1)
+			->pack(-side => 'left', -fill => 'x', -expand => 'y');
+		$frame1->Button(-text => 'Filter', -command => sub { 
+			$list1->delete(0,'end');
+			$ufilter1 = $filter1;
+			study $ufilter1;
+			for (sort keys %sources) { 
+				$list1->insert('end',$_) if $_ =~ /$ufilter1/;
+			}
+			$list1->selectionClear(0,'end');
+			$list1->see(0);
+			})->pack(-side => 'right');
+		my $filter2 = '';  my $ufilter2 = '';
+		my $frame2 = $d->Frame()->grid(-column => 3, -row => 11,
+			-sticky => 'ew');
+		my $fe2 = $frame2->Entry(-textvariable => \$filter2)
+			->pack(-side => 'left', -fill => 'x', -expand => 'y');
+		$frame2->Button(-text => 'Filter', -command => sub {
+			$list2->delete(0,'end');
+			$ufilter2 = $filter2;
+			study $ufilter2;
+			for (sort keys %targets) { 
+				$list2->insert('end',$_) if $_ =~ /$ufilter2/;
+			}
+			$list2->selectionClear(0,'end');
+			$list2->see(0);
+			})->pack(-side => 'right');
+		$d->Button(-text => '>>', -command => sub {
+			study $ufilter2;
+			for (sort $list1->get(0,'end')) {
+				$list2->insert('end',$_) if /$ufilter2/;
+				delete $sources{$_};
+				++$targets{$_};
+			}
+			$list1->delete(0,'end');
+			$list1->selectionClear(0,'end');
+			$list2->selectionClear(0,'end');
+			$list1->see(0);
+			$list2->see(0);
+			})->grid(-column => 2, -row => 3);
+		$d->Button(-text => '>', -command => sub {
+			study $ufilter2;
+			for my $pos (sort $list1->curselection) {
+				my $tx = $list1->get($pos);
+				$list2->insert('end',$tx)
+					if $tx =~ /$ufilter2/;
+				delete $sources{$tx};
+				++$targets{$tx};
+			}
+			for (reverse sort $list1->curselection) {
+				$list1->selectionClear($_);
+				$list1->delete($_);
+			}
+			})->grid(-column => 2, -row => 5);
+		$d->Button(-text => '<', -command => sub {
+			study $ufilter1;
+			for my $pos (sort $list2->curselection) {
+				my $tx = $list2->get($pos);
+				$list1->insert('end',$tx)
+					if $tx =~ /$ufilter1/;
+				delete $targets{$tx};
+				++$sources{$tx};
+			}
+			for (reverse sort $list2->curselection) {
+				$list2->selectionClear($_);
+				$list2->delete($_);
+			}
+			})->grid(-column => 2, -row => 7);
+		$d->Button(-text => '<<', -command => sub { 
+			study $ufilter1;
+			for (sort $list2->get(0,'end')) {
+				$list1->insert('end',$_) if /$ufilter1/;
+				delete $targets{$_};
+				++$sources{$_};
+			}
+			$list2->delete(0,'end');
+			$list1->selectionClear(0,'end');
+			$list2->selectionClear(0,'end');
+			$list1->see(0);
+			$list2->see(0);
+			})->grid(-column => 2, -row => 9);
+		$d->Label(-text => 'Available tables and views:')
+			->grid(-column => 1, -row => 1, -sticky => 'w');
+		$d->Label(-text => 'Tables and views to retrieve:')
+			->grid(-column => 3, -row => 1, -sticky => 'w');
+
+		$d->Label(-text => 'Filters are used only for showing in this dialog and not for retrieving objects from database.')
+			->grid(-column => 1, -columnspan => 3, -row => 12);
+
+		$d->gridRowconfigure(1, -weight => 0, -minsize => 30);
+		$d->gridRowconfigure(2, -weight => 0, -minsize => 90);
+		$d->gridRowconfigure(3, -weight => 0, -minsize => 30);
+		$d->gridRowconfigure(4, -weight => 0, -minsize => 30);
+		$d->gridRowconfigure(5, -weight => 0, -minsize => 30);
+		$d->gridRowconfigure(6, -weight => 0, -minsize => 30);
+		$d->gridRowconfigure(7, -weight => 0, -minsize => 30);
+		$d->gridRowconfigure(8, -weight => 0, -minsize => 30);
+		$d->gridRowconfigure(9, -weight => 0, -minsize => 30);
+		$d->gridRowconfigure(10, -weight => 0, -minsize => 30);
+		$d->gridRowconfigure(11, -weight => 0, -minsize => 30);
+		$d->gridRowconfigure(12, -weight => 0, -minsize => 30);
+
+		$d->gridColumnconfigure(1, -weight => 0, -minsize => 180);
+		$d->gridColumnconfigure(2, -weight => 0, -minsize => 50);
+		$d->gridColumnconfigure(3, -weight => 0, -minsize => 180);
+
+		$list1->delete(0,'end');
+
+		for (sort keys %targets) { $list2->insert('end',$_); }
+		$list2->see(0);
+
+		unless ($d->Show() eq 'Retrieve') {
+			$dbh->disconnect;
+			return;
+		}
+
+		mouse_hour($main);
+		my %tables = ();  
+		for (sort keys %targets) { s/ \([TV]\)$//g;  ++$tables{$_}; }
+
+		# fetching all tables and views with structure
+		$progress->configure(-to => 1+scalar (keys %tables), 
+			-value => 0);
+		$progress->update();  my $i = 0;
+
+		# delete all fetched tables from data-structure
+		my @old = ();
+		for (@{$data{tables}}) {
+			push @old,$_ unless $tables{$_->{name}};
+		}
+		$data{tables} = [ @old ];
+		for ($catalog->tables_with_types) {
+			next unless exists $tables{$_->{name}};
+			$progress->value(++$i);
+			$progress->update();
+			my %table = ();
+			$table{name} = $_->{name};
+			$table{type} = $_->{type};
+			$table{schema} = $schema;
+			my @columns = $catalog->table_columns($_->{name});
+			$table{columns} = [ @columns ];
+
+			my @pk = $catalog->primary_keys($_->{name});
+			$table{pk} = [ @pk ];
+			my @unique = $catalog->unique_indexes($_->{name});
+			$table{unique_indexes} = [ @unique ];
+			my @indexes = $catalog->indexes($_->{name});
+			$table{indexes} = [ @indexes ];
+
+			push @{$data{tables}},\%table;
+		}
+
+		# fetching all relationships between tables
+		my @allrel = $catalog->relationships;
+		my %rel = ();
+		for (@allrel) { ++$rel{$_->{name}}; }
+		my @oldrel = ();
+		for (@{$data{relationships}}) {
+			push @oldrel,$_ unless $rel{$_->{name}};
+		}
+		$data{relationships} = [ @oldrel ];
+
+		for my $relationship (@allrel) {
+			next unless exists $tables{$relationship->{from_table}}
+				and exists $tables{$relationship->{to_table}};
+			my %relation = ();
+			$relation{schema} = $schema;
+			for (keys %$relationship) { 
+				$relation{$_} = $relationship->{$_}; 
+			}
+
+			push @{$data{relationships}},\%relation;
+		}
+		$progress->value(++$i);
+		$progress->update();
+
+		mouse_normal($main);
+
+		$main->messageBox(-icon => 'info', -type => 'OK', 
+			-title => 'Database retrieve', 
+			-message => 'Retrieve successful.');
+		$dbh->disconnect;
+		$progress->configure(-to => 100, -value => 0);
+		$progress->update();
+		show_repository();
+		show_canvas();
+		deselect_all();
+		click_repository();
+	}	
+}
+
+sub repository {
+	$repository_window->destroy() if Exists $repository_window;
+	$repository_window = $main->Toplevel();  
+	$repository_window->title('Object repository');
+	my $fp = $repository_window->Frame()
+		->pack(-side => 'top', -anchor => 'n', -fill => 'x');
+	my $fhp = $fp->Frame()
+		->pack(-side => 'top', -anchor => 'n', -fill => 'x');
+
+	$fhp->Label(-text => 'Object type:')
+		->grid(-row => 0, -sticky => 'nsw', -column => 0);
+	$fhp->Optionmenu(-options => [ 'All', 'Tables', 'Views', 
+			'Tables and views', 'Relationships' ],
+		-textvariable => \$repository_object_type,
+		-command => \&show_repository)
+		->grid(-row => 0, -sticky => 'nsew', -column => 1);
+	$fhp->Label(-text => 'Object filter:')
+		->grid(-row => 1, -sticky => 'nsw', -column => 0);
+	$fhp->Optionmenu(-options => [ qw/All Unplaced Placed/ ],
+		-textvariable => \$repository_object_filter,
+		-command => \&show_repository)
+		->grid(-row => 1, -sticky => 'nsew', -column => 1);
+	$fhp->gridRowconfigure(0, -weight => 0, -minsize => 15);
+	$fhp->gridRowconfigure(1, -weight => 0, -minsize => 15);
+	$fhp->gridColumnconfigure(0, -weight => 0, -minsize => 60);
+	$fhp->gridColumnconfigure(1, -weight => 1, -minsize => 140);
+
+	$fhp->Label(-text => 'Find object:')
+		->grid(-row => 2, -sticky => 'nsw', -column => 0);
+	my $find = '';
+	my $fe = $fhp->Entry(-textvariable => \$find)
+		->grid(-row => 2, -sticky => 'nsew', -column => 1);
+
+	$repository = $repository_window->Scrolled('Listbox', -setgrid => 1,
+		-scrollbars => 'e', -selectmode => 'single')
+		->pack(-side => 'top', -expand => 'y', -fill => 'both');
+	$dragdrop = $repository->DragDrop(-event => '<B1-Motion>', 
+		-sitetypes => [ 'Local' ],
+		-handlers => [ [ \&dragdrop_string ] ],
+		-startcommand => \&dragdrop_allowing,
+		-text => 'No Function.' );
+	my $fb = $repository_window->Frame()
+		->pack(-side => 'bottom', -fill => 'x');
+	if ($or_extra) {
+		my $fi = $repository_window->Frame(-relief => 'sunken', 
+			-borderwidth => 2)
+			->pack(-side => 'bottom', -fill => 'x');
+		$info = $fi->Label(-justify => 'left')->pack(-side => 'left');
+	} else {
+		$info = undef;
+	}
+	$fb->Button(-text => 'More information', -command => sub {
+			if (defined (my $sel = $repository->curselection)) {
+				my $object = $repository->get($sel);
+				$object =~ s/^[+-] //;
+				$object =~ s/ \([RTV]\)$//;
+				for (@{$data{tables}}) {
+					if ($_->{name} eq $object) {
+						more_info_table($_);
+						return;
+					}
+				}
+				for (@{$data{relationships}}) {
+					if ($_->{name} eq $object) {
+						more_info_relationship($_);
+						return;
+					}
+				}
+				$main->messageBox(-icon => 'error', 
+					-type => 'OK', 
+					-title => 'More information', 
+					-message => 
+					'Object not found in object database.');
+				return;
+			}
+			$main->messageBox(-icon => 'error', 
+				-type => 'OK', 
+				-title => 'More information', 
+				-message => 
+				'You must select any object first.');
+		})->grid(-row => 1, -column => 1, -sticky => 'nsew');
+	$placebutton = $fb->Button(-text => 'Place', -width => 6, 
+		-command => sub {
+			if (defined (my $sel = $repository->curselection)) {
+				my $object = $repository->get($sel);
+				$object =~ s/^[+-] //;
+				$object =~ s/ \([RTV]\)$//;
+				$info->configure(-text => '') if defined $info;
+				for (@{$data{tables}}) {
+					if ($_->{name} eq $object) {
+						place_table($_);
+						return;
+					}
+				}
+				for (@{$data{relationships}}) {
+					if ($_->{name} eq $object) {
+						place_relationship($_);
+						return;
+					}
+				}
+				$main->messageBox(-icon => 'error', 
+					-type => 'OK', 
+					-title => $placebutton->cget('text'), 
+					-message => 
+					'Object not found in object database.');
+				return;
+			}
+			$main->messageBox(-icon => 'error', 
+				-type => 'OK', 
+				-title => $placebutton->cget('text'), 
+				-message => 
+				'You must select any object first.');
+		})->grid(-row => 1, -column => 2, -sticky => 'nsew');
+	$fb->Button(-text => 'Rename', -command => sub {
+			if (defined (my $sel = $repository->curselection)) {
+				my $object = $repository->get($sel);
+				$object =~ s/^[+-] //;
+				$object =~ s/ \([RTV]\)$//;
+				$info->configure(-text => '') if defined $info;
+				for (@{$data{tables}}) {
+					if ($_->{name} eq $object) {
+						rename_object($_,'table');
+						return;
+					}
+				}
+				for (@{$data{relationships}}) {
+					if ($_->{name} eq $object) {
+						rename_object($_,
+							'relationship');
+						return;
+					}
+				}
+				$main->messageBox(-icon => 'error', 
+					-type => 'OK', 
+					-title => 'Rename object', 
+					-message => 
+					'Object not found in object database.');
+				return;
+			}
+			$main->messageBox(-icon => 'error', 
+				-type => 'OK', 
+				-title => 'Rename object', 
+				-message => 
+				'You must select any object first.');
+		})->grid(-row => 1, -column => 3, -sticky => 'nsew');
+	$fb->Button(-text => 'New object', -command => \&new_object
+		)->grid(-row => 2, -column => 1, -sticky => 'nsew');
+	$fb->Button(-text => 'Edit', -command => sub {
+			if (defined (my $sel = $repository->curselection)) {
+				my $object = $repository->get($sel);
+				$object =~ s/^[+-] //;
+				$object =~ s/ \([RTV]\)$//;
+				$info->configure(-text => '') if defined $info;
+				for (@{$data{tables}}) {
+					if ($_->{name} eq $object) {
+						edit_table($_);
+						return;
+					}
+				}
+				for (@{$data{relationships}}) {
+					if ($_->{name} eq $object) {
+						edit_relationship($_);
+						return;
+					}
+				}
+				$main->messageBox(-icon => 'error', 
+					-type => 'OK', 
+					-title => 'Edit object', 
+					-message => 
+					'Object not found in object database.');
+				return;
+			}
+			$main->messageBox(-icon => 'error', 
+				-type => 'OK', 
+				-title => 'Edit object', 
+				-message => 
+				'You must select any object first.');
+		})->grid(-row => 2, -column => 2, -sticky => 'nsew');
+	$fb->Button(-text => 'Drop', -command => sub {
+			if (defined (my $sel = $repository->curselection)) {
+				my $object = $repository->get($sel);
+				$object =~ s/^[+-] //;
+				$object =~ s/ \([RTV]\)$//;
+				$info->configure(-text => '') if defined $info;
+				for (@{$data{tables}}) {
+					if ($_->{name} eq $object) {
+						delete_table($_);
+						return;
+					}
+				}
+				for (@{$data{relationships}}) {
+					if ($_->{name} eq $object) {
+						delete_relationship($_);
+						return;
+					}
+				}
+				$main->messageBox(-icon => 'error', 
+					-type => 'OK', 
+					-title => 'Drop object', 
+					-message => 
+					'Object not found in object database.');
+				return;
+			}
+			$main->messageBox(-icon => 'error', 
+				-type => 'OK', 
+				-title => 'Drop object',
+				-message => 
+				'You must select any object first.');
+		})->grid(-row => 2, -column => 3, -sticky => 'nsew');
+	$repository->bind('<1>',[ \&click_repository, 1 ]);
+	$repository->bind('<3>', [ \&repository_popup, Ev('x'), Ev('y') ]);
+	$repository->bind('<Key>', [ \&keypress, Ev('K') ]);
+	$repository->bind('<KeyRelease>', [ \&keyrelease, Ev('K') ]);
+	$repository_window->bind($fe,'<KeyPress>',sub {
+			$repository->selectionClear(0,'end');
+			click_repository(1);
+			my $f = uc $find;
+			$f =~ s/^\s+//;
+			$f =~ s/\s+$//;
+			return unless $f;
+			study $f;
+			my $i = 0;
+			for ($repository->get(0,'end')) {
+				my $h = uc $_;
+				$h =~ s/^[-+] //;
+				if ($h =~ /^$f/) {
+					$repository->selectionSet($i,$i);
+					click_repository(1);
+					last;
+				}
+				++$i;
+			}
+		});
+	show_repository();	
+}
+
+sub repository_popup {
+	my ($obj,$x,$y) = @_;
+
+	my $sel = $repository->nearest($y);
+	return unless defined $sel;
+
+	my $object = $repository->get($sel);
+	$object =~ s/^[+-] //;
+	$object =~ s/ \([RTV]\)$//;
+	my $or = undef;
+	my $type = undef;
+	for (@{$data{tables}}) {
+		if ($_->{name} eq $object) 
+			{ $or = $_;  $type = 'table';  last; }
+	}
+	unless (defined $or) {
+		for (@{$data{relationships}}) {
+			if ($_->{name} eq $object) { 
+				$or = $_;  $type = 'relationship'; last;
+			}
+		}
+	}
+	return unless defined $or;
+	click_repository($or);
+
+	if ($type eq 'table') {
+		select_table($or) unless $or->{selection};
+		table_popup($obj,$or,$x,$y); 
+	} else { 
+		select_relationship($or) unless $or->{selection};
+		relationship_popup($obj,$or,$x,$y); 
+	}
+}
+
+sub changefont {
+	my $fontdialog = $main->FontDialog(-font => $main->Font(),
+		-initfont => $fonts{canvas});
+
+	my $new_font = $fontdialog->Show;
+	if ($new_font) {
+		$fonts{canvas} = $new_font;
+		$fonts{canvas_bold} = $fonts{canvas};
+		$fonts{canvas_bold} = $main->fontCreate(
+			-family => $fonts{canvas}->actual('-family'),
+			-size => $fonts{canvas}->actual('-size'),
+			-weight => 'bold',
+			-slant => $fonts{canvas}->actual('-slant'),
+			-underline => $fonts{canvas}->actual('-underline'),
+			-overstrike => $fonts{canvas}->actual('-overstrike')
+		);
+		show_canvas();
+	}
+}
+
+sub conn_desc {
+	my $method = shift;
+
+	return $method if $method;
+	return 'auto';
+}
+
+sub side {
+	my $side = shift;
+
+	return $side if $side;
+	return 'unknown';
+}
+
+sub smooth_desc {
+	my $smooth = shift;
+
+	return 'yes' if $smooth;
+	return 'no';
+}
+
+sub dragdrop_paste {
+	my ($seltype,$x,$y) = @_;
+	return unless Exists $repository_window and defined $repository;
+	my ($dnd) = $repository->SelectionGet('-selection' => $seltype,
+		'STRING');
+	$dnd =~ s/ \([TVR]\)$//;
+
+	$x = $canvas->canvasx($x);
+	$y = $canvas->canvasy($y);
+	
+	for (@{$data{tables}}) {
+		if ($_->{name} eq $dnd) {
+			place_table($_,$x,$y);
+			return;
+		}
+	}
+	for (@{$data{relationships}}) {
+		if ($_->{name} eq $dnd) {
+			place_relationship($_);
+			return;
+		}
+	}
+}
+
+sub dragdrop_allowing {
+	return 1 unless Exists $repository_window and defined $repository;
+	if (defined (my $sel = $repository->curselection)) {
+		my $object = $repository->get($sel);
+		return 0 if $object =~ /^- /;
+	} 
+	return 1;
+}
+
+sub dragdrop_string {
+	my ($offset,$max) = @_;
+	return unless Exists $repository_window and defined $repository;
+	if (defined (my $sel = $repository->curselection)) {
+		my $object = $repository->get($sel);
+		$object =~ s/^([+-]) //;
+		if ($1 eq '-') {
+			return $object;
+		} else {
+			return 'No function.';
+		}
+	} else {
+		return 'No function.';
+	}
+}
+
+sub click_repository {
+	my $listbox_selection = shift;
+	return unless Exists $repository_window and defined $repository;
+	$dragdrop->configure(-text => dragdrop_string());
+	if (defined (my $sel = $repository->curselection)) {
+		$repository->see($sel);
+		my $object = $repository->get($sel);
+		$object =~ s/^[+-] //;  
+		$object =~ s/ \([RTV]\)$//;
+		for (@{$data{tables}}) {
+			if ($_->{name} eq $object) {
+				$info->configure(-text => 
+					"Name: ".$_->{name}."\n".
+					"Schema: ".$_->{schema}."\n".
+					'Type: '.type_desc($_->{type}).
+					"\n".placed_desc($_->{placed})) 
+					if defined $info;
+				select_table($_,1) if $listbox_selection;
+				place_button_change($_);
+				return;
+			}
+		}
+		for (@{$data{relationships}}) {
+			if ($_->{name} eq $object) {
+				$info->configure(-text => 
+					"Name: ".$_->{name}."\n".
+					"Schema: ".$_->{schema}."\n".
+					"Type: relationship\n".
+					'Foreign key '.$_->{from_table}.
+					' ('.join (',', map { $_->{column} } 
+					@{$_->{from_columns}}).')'.
+					" references ".$_->{to_table}.
+					' ('.join (',', map { $_->{column} } 
+					@{$_->{to_columns}}).').'.
+					"\n".placed_desc($_->{placed}).
+					"\nConnection method: ".
+					conn_desc($_->{connection}).
+					"\nSmooth: ".smooth_desc($_->{smooth}).
+					"\nFrom side: ".side($_->{from_side}).
+					"\nTo side: ".side($_->{to_side}))
+					if defined $info;
+				select_relationship($_,1) if $listbox_selection;
+				place_button_change($_);
+				return;
+			}
+		}
+	} else {
+		$info->configure(-text => '') if defined $info;
+	}
+}
+
+sub placed_info {
+	my $placed = shift;
+	return '+ ' if $placed;
+	return '- ';
+}
+
+sub placed_desc {
+	my $placed = shift;
+	return 'Placed in canvas.' if $placed;
+	return 'Unplaced in canvas.';
+}
+
+sub show_repository {
+	return if $noshowrepository;
+	return unless Exists($repository_window);
+	return unless defined $repository;
+	$repository->delete(0,'end');
+	my %crepository = ();
+	if ($repository_object_type eq 'All' 
+		or $repository_object_type eq 'Tables and views') {
+		for (@{$data{tables}}) {
+			next if $_->{placed} 
+				and $repository_object_filter eq 'Unplaced';
+			next if not $_->{placed} 
+				and $repository_object_filter eq 'Placed';
+			++$crepository{placed_info($_->{placed}).$_->{name}.
+				type_info($_->{type})};
+		}
+	}
+	if ($repository_object_type eq 'Tables') {
+		for (@{$data{tables}}) {
+			next unless $_->{type} == SC_TYPE_TABLE;
+			next if $_->{placed} 
+				and $repository_object_filter eq 'Unplaced';
+			next if not $_->{placed} 
+				and $repository_object_filter eq 'Placed';
+			++$crepository{placed_info($_->{placed}).$_->{name}.
+				' (T)'};
+		}
+	}
+	if ($repository_object_type eq 'Views') {
+		for (@{$data{tables}}) {
+			next unless $_->{type} == SC_TYPE_VIEW;
+			next if $_->{placed} 
+				and $repository_object_filter eq 'Unplaced';
+			next if not $_->{placed} 
+				and $repository_object_filter eq 'Placed';
+			++$crepository{placed_info($_->{placed}).$_->{name}.
+				' (V)'};
+		}
+	}
+	if ($repository_object_type eq 'Relationships' or
+		 $repository_object_type eq 'All') {
+		for (@{$data{relationships}}) {
+			next if $_->{placed} 
+				and $repository_object_filter eq 'Unplaced';
+			next if not $_->{placed} 
+				and $repository_object_filter eq 'Placed';
+			++$crepository{placed_info($_->{placed}).$_->{name}.
+				' (R)'};
+		}
+	}
+
+	for (sort keys %crepository) {
+		$repository->insert('end',$_);
+	}
+}
+
+sub show_all {
+	++$all_show;
+	show_repository();
+	show_canvas();
+	click_repository();
+	$all_show = undef;
+}
+
+sub more_info_table {
+	my $table = shift;
+	my $d = $main->DialogBox(-title => 'More information about '.
+		type_desc($table->{type}),
+		-buttons => [ 'OK' ]);
+
+	$d->Label(-text => 'Name:           ')
+		->grid(-row => 1, -column => 1, -sticky => 'w');
+	$d->Label(-text => $table->{name})
+		->grid(-row => 1, -column => 2, -sticky => 'w');
+	$d->Label(-text => 'Schema:')
+		->grid(-row => 2, -column => 1, -sticky => 'w');
+	$d->Label(-text => $table->{schema}.
+		sprintf('%*s',40-length($table->{schema}),''))
+		->grid(-row => 2, -column => 2, -sticky => 'w');
+	$d->Label(-text => 'Type:')
+		->grid(-row => 3, -column => 1, -sticky => 'w');
+	$d->Label(-text => type_desc($table->{type}))
+		->grid(-row => 3, -column => 2, -sticky => 'w');
+	$d->Label(-text => 'Columns:')
+		->grid(-row => 4, -column => 1, -sticky => 'w');
+	my $i = 0;
+	for (@{$table->{columns}}) {
+		$d->Label(-text => $_)
+			->grid(-row => 4+$i, -column => 2, -sticky => 'w');
+		$d->gridRowconfigure(4+$i++, -weight => 0, -minsize => 30);
+	}
+	if (scalar @{$table->{pk}}) {
+		$d->Label(-text => 'Primary key:')
+			->grid(-row => 4+$i, -column => 1, -sticky => 'w');
+		for (@{$table->{pk}}) {
+			$d->Label(-text => $_)->grid(-row => 4+$i,
+				-column => 2, -sticky => 'w');
+			$d->gridRowconfigure(4+$i++, -weight => 0,
+				-minsize => 30);
+		}
+	}
+	
+	$d->gridRowconfigure(1, -weight => 0, -minsize => 30);
+	$d->gridRowconfigure(2, -weight => 0, -minsize => 30);
+	$d->gridRowconfigure(3, -weight => 0, -minsize => 30);
+	
+	$d->gridColumnconfigure(1, -weight => 0, -minsize => 10);
+	$d->gridColumnconfigure(2, -weight => 0, -minsize => 30);
+	$d->gridColumnconfigure(3, -weight => 0, -minsize => 166);
+	$d->gridColumnconfigure(4, -weight => 0, -minsize => 13);
+
+	$d->Show();
+}
+
+sub more_info_relationship {
+	my $relationship = shift;
+	my $d = $main->DialogBox(
+		-title => 'More information about relationship',
+		-buttons => [ 'OK' ]);
+
+	$d->Label(-text => 'Name:           ')
+		->grid(-row => 1, -column => 1, -sticky => 'w');
+	$d->Label(-text => $relationship->{name})
+		->grid(-row => 1, -column => 2, -sticky => 'w');
+	$d->Label(-text => 'Schema:')
+		->grid(-row => 2, -column => 1, -sticky => 'w');
+	$d->Label(-text => $relationship->{schema}.
+		sprintf('%*s',40-length($relationship->{schema}),''))
+		->grid(-row => 2, -column => 2, -sticky => 'w');
+	$d->Label(-text => 'From:')
+		->grid(-row => 3, -column => 1, -sticky => 'w');
+	my $i = 3;
+	for (@{$relationship->{from_columns}}) {
+		$d->Label(-text => $_->{table}.' ('.$_->{column}.')')
+			->grid(-row => $i, -column => 2, -sticky => 'w');
+		$d->gridRowconfigure($i++, -weight => 0, -minsize => 30);
+	}
+	$d->Label(-text => 'To:')
+		->grid(-row => $i, -column => 1, -sticky => 'w');
+	for (@{$relationship->{to_columns}}) {
+		$d->Label(-text => $_->{table}.' ('.$_->{column}.')')
+			->grid(-row => $i, -column => 2, -sticky => 'w');
+		$d->gridRowconfigure($i++, -weight => 0, -minsize => 30);
+	}
+	
+	$d->gridRowconfigure(1, -weight => 0, -minsize => 30);
+	$d->gridRowconfigure(2, -weight => 0, -minsize => 30);
+	$d->gridRowconfigure(3, -weight => 0, -minsize => 30);
+	
+	$d->gridColumnconfigure(1, -weight => 0, -minsize => 10);
+	$d->gridColumnconfigure(2, -weight => 0, -minsize => 30);
+	$d->gridColumnconfigure(3, -weight => 0, -minsize => 166);
+	$d->gridColumnconfigure(4, -weight => 0, -minsize => 13);
+
+	$d->Show();
+}
+
+sub place_button_change {
+	my $object = shift;
+	my $what = 'Place';
+	$what = 'Unplace' if $object->{placed};
+	$placebutton->configure(-text => $what);
+}
+
+sub place_table {
+	my $table = shift;
+	my ($ox,$oy) = @_;
+	if ($table->{placed}) {
+		delete $table->{placed};
+		show_table($table);
+		for (@{$data{relationships}}) {
+			if ($_->{from_table} eq $table->{name} or
+				$_->{to_table} eq $table->{name}) {
+				delete $_->{placed};
+				show_relationship($_);
+			}
+		}
+	} else {
+		$table->{placed} = 'yes';
+		my %in_canvas = ();
+		for (@{$data{tables}}) { 
+			++$in_canvas{$_->{name}} if $_->{placed}; 
+		}
+		if (defined $ox and defined $oy) 
+			{ $_->{x} = $ox;  $_->{y} = $oy; }
+		show_table($table);
+		for (@{$data{relationships}}) {
+			if (($_->{from_table} eq $table->{name} and
+				$in_canvas{$_->{to_table}}) or
+				($_->{to_table} eq $table->{name} and
+				$in_canvas{$_->{from_table}})) {
+				place_relationship($_) unless $_->{placed};
+			}
+		}
+	}
+
+	unless ($all_show) {
+		place_button_change();
+		show_repository();
+	}
+}
+
+sub place_relationship {
+	my $relationship = shift;
+	if ($relationship->{placed}) {
+		delete $relationship->{placed};
+		show_relationship($relationship);
+	} else {
+		$relationship->{placed} = 'yes';
+		for (@{$data{tables}}) { 
+			place_table($_) if 
+				($relationship->{from_table} eq $_->{name} or 
+				$relationship->{to_table} eq $_->{name}) and
+				not $_->{placed};
+		}
+		show_relationship($relationship);
+	}
+
+	unless ($all_show) {
+		place_button_change();
+		show_repository();
+	}
+}
+
+sub relationship_mode {
+	my ($relationship,$mode) = @_;
+
+	$relationship->{connection} = $mode;
+	show_relationship($relationship);
+	click_repository();
+}
+
+sub auto_mode {
+	my $relationship = shift;
+
+	relationship_mode($relationship,'auto');
+}
+
+sub direct_mode {
+	my $relationship = shift;
+	
+	relationship_mode($relationship,'direct');
+}
+
+sub coords_mode {
+	my $relationship = shift;
+	
+	my @coords = make_coords($relationship);
+
+	shift @coords;  shift @coords;  pop @coords;  pop @coords;
+
+	$relationship->{coords} = [];
+	while (@coords) {
+		push @{$relationship->{coords}}, 
+			[ shift (@coords), shift (@coords) ];
+	}
+
+	relationship_mode($relationship,'coords');
+}
+
+sub make_coords {
+	my $relationship = shift;
+	
+	my $firstlinespace = $canvas->fontMetrics($fonts{canvas_bold},
+		-linespace);
+	my $linespace = $canvas->fontMetrics($fonts{canvas}, -linespace);
+
+	my ($from_width,$to_width,$from_multiple,$to_multiple) = (0,0,0,0);
+	my ($from_table,$to_table);
+	my $from_item = $relationship->{from_columns}[0]{column}; 
+	++$from_multiple if scalar @{$relationship->{from_columns}} > 1;
+	my $to_item = $relationship->{to_columns}[0]{column}; 
+	++$to_multiple if scalar @{$relationship->{to_columns}} > 1;
+	for my $t (@{$data{tables}}) {
+		next unless ($relationship->{from_table} eq $t->{name} or
+			$relationship->{to_table} eq $t->{name}); 
+		my $max = $canvas->fontMeasure($fonts{canvas_bold},
+			$t->{name});
+		for (@{$t->{columns}}) {
+			my $len = $canvas->fontMeasure($fonts{canvas},$_);
+			$max = $len if $len > $max;
+		}
+		$max += 25;
+		if ($relationship->{from_table} eq $t->{name}) 
+			{ $from_width = $max;  $from_table = $t; }
+		if ($relationship->{to_table} eq $t->{name}) 
+			{ $to_width = $max; $to_table = $t; }
+	}
+	my $distance = 0;
+	if ($from_table->{x} < $to_table->{x}) {
+		$distance = $to_table->{x}-$from_table->{x}-$from_width;
+	} else {
+		$distance = $from_table->{x}-$to_table->{x}-$to_width;
+	}
+	my $frompos = 0;
+	for (@{$from_table->{columns}}) 
+		{ ++$frompos; last if $_ eq $from_item; }
+	my $topos = 0;
+	for (@{$to_table->{columns}}) { ++$topos; last if $_ eq $to_item; }
+	$frompos = 10+$firstlinespace+$frompos*$linespace-$linespace/2;
+	$topos = 10+$firstlinespace+$topos*$linespace-$linespace/2;
+
+	my $from_x = $from_table->{x};
+	my $from_y = $from_table->{y}+$frompos;
+	my $to_x = $to_table->{x};
+	my $to_y = $to_table->{y}+$topos;
+	$relationship->{from_side} = 'left' unless $relationship->{from_side};
+	$relationship->{to_side} = 'left' unless $relationship->{to_side};
+	if ($relationship->{connection} eq 'direct' or 
+		($relationship->{connection} eq 'auto' and $distance >= 30)) {
+		if ($from_x < $to_x) {
+			$relationship->{from_side} = 'right';
+			$relationship->{to_side} = 'left';
+		} else {
+			$relationship->{from_side} = 'left';
+			$relationship->{to_side} = 'right';
+		}
+	}
+	$from_x += $from_width if $relationship->{from_side} eq 'right';
+	$to_x += $to_width if $relationship->{to_side} eq 'right';
+	
+	%last_relationship_in_progress = ();
+	if ($from_multiple) {
+		my $fd = $from_x-10;
+		$fd += 20 if $relationship->{from_side} eq 'right';
+ 		my @fp = ();  my $it = 0;  my %from_col = ();
+  		for (@{$relationship->{from_columns}}) { 
+			++$from_col{$_->{column}}; 
+		}
+		for (@{$from_table->{columns}}) { 
+			++$it;
+			push @fp,$from_table->{y}+10+$firstlinespace+
+				$it*$linespace-$linespace/2 if $from_col{$_}; 
+		}
+		@fp = sort @fp;
+		$from_y = ($fp[$#fp]-$fp[0])/2 + $fp[0];
+		$last_relationship_in_progress{from_delta} = $fd;
+		$last_relationship_in_progress{from_cols} = \@fp;
+		$last_relationship_in_progress{from_x} = $from_x;
+		$last_relationship_in_progress{from_y} = $from_y;
+		$from_x = $fd;
+	}
+	if ($to_multiple) {
+		my $td = $to_x-10;
+		$td += 20 if $relationship->{to_side} eq 'right';
+		my @tp = ();  my $it = 0;  my %to_col = ();
+		for (@{$relationship->{to_columns}}) { 
+			++$to_col{$_->{column}};
+		}
+		for (@{$to_table->{columns}}) { 
+			++$it;
+			push @tp,$to_table->{y}+10+$firstlinespace+
+				$it*$linespace-$linespace/2 if $to_col{$_}; 
+		}
+		@tp = sort @tp;
+		$to_y = ($tp[$#tp]-$tp[0])/2 + $tp[0];
+		$last_relationship_in_progress{to_delta} = $td;
+		$last_relationship_in_progress{to_cols} = \@tp;
+		$last_relationship_in_progress{to_x} = $to_x;
+		$last_relationship_in_progress{to_y} = $to_y;
+		$to_x = $td;
+	}
+
+	my $left = $from_table->{x};
+	$left = $to_table->{x} if $to_table->{x} < $from_table->{x};
+	$left -= 30;
+
+	my $right = $from_table->{x}+$from_width;
+	$right = $to_table->{x}+$to_width 
+		if $to_table->{x}+$to_width > $from_table->{x}+$to_width;
+	$right += 30;
+
+	my $vert = 0;
+	if ($from_y < $to_y) {
+		$vert = $from_y+($to_y-$from_y)/2;
+	} else {
+		$vert = $to_y+($from_y-$to_y)/2;
+	}
+
+	my @points = ();
+
+	if ($relationship->{connection} eq 'auto') { 
+		# Automatic connection method
+
+		if ($distance < 30) {
+			# We must use U-style or S-style long connection
+			if ($relationship->{from_side} eq 'left' and
+				$relationship->{to_side} eq 'left') {
+				@points = ($left,$from_y,$left,$to_y);
+			} elsif ($relationship->{from_side} eq 'right' and
+				$relationship->{to_side} eq 'right') {
+				@points = ($right,$from_y,$right,$to_y);
+			} elsif ($relationship->{from_side} eq 'left' and
+				$relationship->{to_side} eq 'right') {
+				@points = ($left,$from_y,$left,$vert,$right,
+					$vert,$right,$to_y);
+			} elsif ($relationship->{from_side} eq 'right' and
+				$relationship->{to_side} eq 'left') {
+				@points = ($right,$from_y,$right,$vert,$left,
+					$vert,$left,$to_y);
+			}
+		} else {
+			# Normal short connection
+			if ($from_table->{x} < $to_table->{x}) {
+				# right side (from) to left side (to)
+				@points = ($to_x-$distance/2,$from_y,
+					$to_x-$distance/2,$to_y);
+			} else {
+				# left side (from) to right side (to)
+				@points = ($from_x-$distance/2,$from_y,
+					$from_x-$distance/2,$to_y);
+			}
+		}
+	} elsif ($relationship->{connection} eq 'direct') {
+		# Direct connection method
+		@points = ();
+	} elsif ($relationship->{connection} eq 'coords') {
+		# Coords based connection method - not yet implemented
+		@points = map { @$_ } @{$relationship->{coords}};
+	}
+
+	return ($from_x,$from_y,@points,$to_x,$to_y);
+}
+
+sub show_relationship {
+	my $relationship = shift;
+	unless (ref $relationship) {
+		for (@{$data{relationships}}) {
+			if ($_->{name} eq $relationship) 
+				{ $relationship = $_; last; }
+		}	
+	}
+	return unless ref $relationship;
+	$canvas->delete($relationship->{name});
+	return unless $relationship->{placed};		
+	
+	$relationship->{connection} = 'auto' unless $relationship->{connection};
+
+	my $splinesteps = 1;  $splinesteps = 50 if $relationship->{smooth};
+
+	my @points = make_coords($relationship);
+
+	my @lines = ();
+	if (scalar @{$relationship->{from_columns}} > 1) {
+		# multiple from columns
+		my @y = @{$last_relationship_in_progress{from_cols}};
+		my $yp = $last_relationship_in_progress{from_y};
+		my $x1 = $last_relationship_in_progress{from_x};
+		my $x2 = $last_relationship_in_progress{from_delta};
+		for (sort @y) { push @lines,[$x1,$_,$x2,$yp]; }
+	}
+	if (scalar @{$relationship->{to_columns}} > 1) {
+		# multiple to columns
+		my @y = @{$last_relationship_in_progress{to_cols}};
+		my $yp = $last_relationship_in_progress{to_y};
+		my $x1 = $last_relationship_in_progress{to_x};
+		my $x2 = $last_relationship_in_progress{to_delta};
+		for (sort @y) { push @lines,[$x1,$_,$x2,$yp]; }
+	}
+	for (@lines) {
+		$canvas->createLine(@$_,
+			-tags => [ $relationship->{name}, '_relationships' ]);
+	}
+
+	my @sel = ($relationship->{name}.'_sel');
+	if ($relationship->{selection}) {
+		$canvas->createLine(@points, -fill => 'darkgray', -dash => '-',
+			-tags => [ $relationship->{name}, '_relationships', 
+				'selection', @sel ]) if $relationship->{smooth};
+		my @p = @points;
+		my $num = 0;
+		while (@p) {
+			my $x = shift @p;  my $y = shift @p;
+			my $dragname = '_dragpoint_'.$relationship->{name}.'_'.
+				$num;
+			$canvas->createRectangle($x-2,$y-2,$x+2,$y+2,
+				-tags => [ $relationship->{name}, $dragname,
+					'_relationships', 'selection', @sel ],
+				-fill => 'black');
+			++$num;
+		}
+	}
+	$canvas->createLine(@points, -arrow => 'last', -arrowshape => [10,10,3],
+		-tags => [ $relationship->{name}, '_relationships' ],
+		-splinesteps => $splinesteps, 
+		-smooth => $relationship->{smooth});
+	$canvas->bind($relationship->{name},'<1>', 
+		[ \&relationship_mouse_down, $relationship, Ev('x'), Ev('y') ]);
+	$canvas->bind($relationship->{name}.'_sel','<Control-1>', 
+		[ \&relationship_ctrl_mouse_down, $relationship, Ev('x'),
+			Ev('y') ]);
+	$canvas->bind($relationship->{name}.'_sel','<Control-3>', 
+		[ \&relationship_ctrl_mouse_2_down, $relationship, Ev('x'),
+			Ev('y') ]);
+	$canvas->bind($relationship->{name},'<B1-Motion>', 
+		[ \&relationship_motion, $relationship, Ev('x'), Ev('y') ]);
+	$canvas->bind($relationship->{name},'<B1-ButtonRelease>', 
+		[ \&relationship_mouse_up, $relationship, Ev('x'), Ev('y') ]);
+	$canvas->bind($relationship->{name},'<3>',
+		[ \&relationship_popup, $relationship, Ev('x'), Ev('y') ]);
+
+	my $subw = $canvas->Subwidget('canvas');
+	$subw->lower($relationship->{name},'all');
+}
+
+sub relationship_popup {
+	my ($obj,$relationship,$x,$y) = @_;
+
+	my $popup = $obj->Menu(-tearoff => 0);
+	if ($relationship->{selection}) {
+		if ($relationship->{connection} eq 'coords') {
+			my @coords = map { @$_ } @{$relationship->{coords}};
+
+			my $dropdrag = 0;
+			while (@coords) {
+				my $cx = shift @coords;  my $cy = shift @coords;
+				++$dropdrag if abs($x-$cx) <= 4 
+							and abs($y-$cy) <= 4;
+			}
+
+			if ($dropdrag) {
+				$popup->add('command',
+					 -label => 'Delete dragpoint',
+					-command => [ 
+					\&relationship_ctrl_mouse_2_down, $obj,
+					$relationship, $x, $y ]);
+				$popup->separator;
+			} elsif (ref $obj eq 'Tk::Canvas') {
+				$popup->add('command',
+					-label => 'Add dragpoint',
+					-command => [ 
+					\&relationship_ctrl_mouse_down, $obj,
+					$relationship, $x, $y ]);
+				$popup->separator;
+			}
+		}
+
+		my $mode = $relationship->{connection};
+		$popup->add('radiobutton', -variable => \$mode,
+			-label => 'Auto connection', -value => 'auto',
+			-command => [ \&auto_mode, $relationship ]);
+		$popup->add('radiobutton', -variable => \$mode,
+			-label => 'Direct connection', -value => 'direct',
+			-command => [ \&direct_mode, $relationship ]);
+		$popup->add('radiobutton', -variable => \$mode,
+			-label => 'Coords based connection', -value => 'coords',
+			-command => [ \&coords_mode, $relationship ]);
+		$popup->separator;
+		$popup->add('command', -label => 'From side: '.
+				$relationship->{from_side},
+			-command => [ \&from_side_change, $relationship ]);
+		$popup->add('command', -label => 'To side: '.
+				$relationship->{to_side},
+			-command => [ \&to_side_change, $relationship ]);
+		$popup->separator;
+		my $smooth = $relationship->{smooth};
+		$popup->add('checkbutton', -variable => \$smooth,
+			-label => 'Smooth mode', -onvalue => 1, -offvalue => 0,
+			-command => [ \&smooth_mode, $relationship ]);
+		$popup->separator;
+		$popup->add('command', -label => 'More information',
+			-command => [ \&more_info_relationship, 
+			$relationship ]);
+		$popup->add('command', -label => 'Edit',
+			-command => [ \&edit_relationship, $relationship ]);
+		$popup->add('command', -label => 'Rename',
+			-command => [ \&rename_object, $relationship,
+			'relationship' ]);
+		$popup->separator;
+		$popup->add('command', -label => 'Unselect',
+			-command => [ \&deselect_relationship, $relationship ]);
+		if ($relationship->{placed}) {
+			$popup->add('command', -label => 'Unplace',
+				-command => [ \&unplace_relationship, 
+				$relationship ]);
+		} else {
+			$popup->add('command', -label => 'Place',
+				-command => [ \&place_relationship, 
+				$relationship ]);
+		}
+		$popup->separator;
+		$popup->add('command', -label => 'Drop',
+			-command => [ \&delete_relationship, $relationship ]);
+	} else {
+		$popup->add('command', -label => 'Select',
+			-command => [ \&select_relationship, $relationship ]);
+	}
+	$popup->Popup(-popover => 'cursor', -popanchor => 'nw');
+	++$global_bind_cancel;
+}
+
+sub canvas_popup {
+	my ($obj,$x,$y) = @_;
+
+	if ($global_bind_cancel) {
+		$global_bind_cancel = undef;
+		return;
+	}
+
+	my $popup = $canvas->Menu(-tearoff => 0);
+	$popup->add('command', -label => 'Save', -command => \&savefile);
+	$popup->separator;
+	$popup->add('command', -label => 'Deselect all',
+		-command => \&deselect_all);
+	$popup->Popup(-popover => 'cursor', -popanchor => 'nw');
+}
+
+sub table_popup {
+	my ($obj,$table,$x,$y) = @_;
+
+	my $popup = $obj->Menu(-tearoff => 0);
+	if ($table->{selection}) {
+		$popup->add('command', -label => 'More information',
+			-command => [ \&more_info_table, $table ]);
+		$popup->add('command', -label => 'Edit',
+			-command => [ \&edit_table, $table ]);
+		$popup->add('command', -label => 'Rename',
+			-command => [ \&rename_object, $table, 'table' ]);
+		$popup->separator;
+		$popup->add('command', -label => 'Unselect',
+			-command => [ \&deselect_table, $table ]);
+		if ($table->{placed}) {
+			$popup->add('command', -label => 'Unplace',
+				-command => [ \&unplace_table, $table ]);
+		} else {
+			$popup->add('command', -label => 'Place',
+				-command => [ \&place_table, $table ]);
+		}
+		$popup->separator;
+		$popup->add('command', -label => 'Drop',
+			-command => [ \&delete_table, $table ]);
+	} else {
+		$popup->add('command', -label => 'Select',
+			-command => [ \&select_table, $table ]);
+	}
+	$popup->Popup(-popover => 'cursor', -popanchor => 'nw');
+	++$global_bind_cancel;
+}
+
+sub keyrelease {
+	my ($obj,$key) = @_;
+
+	$main->focus;
+	delete $Pressed{$key};
+}
+
+sub keypress {
+	my ($obj,$key) = @_;
+
+	$main->focus;
+	++$Pressed{$key};
+	if ($key eq 'a') {
+		# Auto mode for relationships
+		for (@{$data{relationships}}) {
+			auto_mode($_) if $_->{selection};
+		}
+	} elsif ($key eq 'd') {
+		# Direct mode for relationships
+		for (@{$data{relationships}}) {
+			direct_mode($_) if $_->{selection};
+		}
+	} elsif ($key eq 'c') {
+		# Coords mode for relationships
+		for (@{$data{relationships}}) {
+			coords_mode($_) if $_->{selection};
+		}
+	} elsif ($key eq 's') {
+		# Smooth for relationships
+		for (@{$data{relationships}}) {
+			smooth_mode($_) if $_->{selection};
+		}
+	} elsif ($key eq 'f') {
+		# Change from side
+		for (@{$data{relationships}}) {
+			from_side_change($_) if $_->{selection};
+		}
+	} elsif ($key eq 't') {
+		# Change to side
+		for (@{$data{relationships}}) {
+			to_side_change($_) if $_->{selection};
+		}
+	} elsif ($key eq 'Delete' and not $Pressed{Control_L} and 
+			not $Pressed{Control_R}) {
+		# Unplace object
+		for (@{$data{tables}}) {
+			unplace_table($_) if $_->{selection};
+		}
+		for (@{$data{relationships}}) {
+			unplace_relationship($_) if $_->{selection};
+		}
+	} elsif ($key eq 'Delete' and ($Pressed{Control_L} or
+			$Pressed{Control_R})) {
+		# Unplace object and delete it from database
+		for (@{$data{tables}}) {
+			delete_table($_) if $_->{selection};
+		}
+		for (@{$data{relationships}}) {
+			delete_relationship($_) if $_->{selection};
+		}
+	}
+}
+
+sub from_side_change {
+	my $relationship = shift;
+
+	if ($relationship->{from_side} eq 'left') {
+		$relationship->{from_side} = 'right';
+	} else {
+		$relationship->{from_side} = 'left';
+	}
+	show_relationship($relationship);
+	click_repository();
+}
+
+sub to_side_change {
+	my $relationship = shift;
+
+	if ($relationship->{to_side} eq 'left') {
+		$relationship->{to_side} = 'right';
+	} else {
+		$relationship->{to_side} = 'left';
+	}
+	show_relationship($relationship);
+	click_repository();
+}
+
+sub smooth_mode {
+	my $relationship = shift;
+
+	if ($relationship->{smooth}) {
+		delete $relationship->{smooth};
+	} else {
+		++$relationship->{smooth};
+	}
+	show_relationship($relationship);
+	click_repository();
+}
+
+sub unplace_table {
+	my $table = shift;
+	return unless $table->{placed};
+	place_table($table) if $table->{selection};
+	show_repository();
+}
+
+sub delete_table {
+	my $table = shift;
+	unplace_table($table);
+	push @{$data{deleted_tables}},$table;
+	my $i = 0;
+	for (@{$data{tables}}) {
+		last if $_->{name} eq $table->{name};
+		++$i;
+	}
+	if ($i < scalar @{$data{tables}}) {
+		splice @{$data{tables}},$i,1;
+	}
+	my @willgoout = ();
+	for (@{$data{relationships}}) {
+		if ($_->{from_table} eq $table->{name} or
+			$_->{to_table} eq $table->{name}) {
+			push @willgoout,$_;
+		}
+	}
+	++$noshowrepository;
+	for (@willgoout) {
+		delete_relationship($_);
+	}
+	$noshowrepository = undef;
+	show_repository();
+}
+
+sub unplace_relationship {
+	my $relationship = shift;
+	return unless $relationship->{placed};
+	place_relationship($relationship) if $relationship->{selection};
+	show_repository();
+}
+
+sub delete_relationship {
+	my $relationship = shift;
+	unplace_relationship($relationship) if $relationship->{placed};
+	push @{$data{deleted_relationships}},$relationship;
+	my $i = 0;
+	for (@{$data{relationships}}) {
+		last if $_->{name} eq $relationship->{name};
+		++$i;
+	}
+	if ($i < scalar @{$data{relationships}}) {
+		splice @{$data{relationships}},$i,1;
+	}
+	show_repository();
+}
+
+sub relationship_mouse_down {
+	my ($obj,$relationship,$x,$y) = @_;
+
+	$x = $canvas->canvasx($x);
+	$y = $canvas->canvasy($y);
+
+	if ($relationship->{selection}) {
+		my $i = 0;
+		for (@{$relationship->{coords}}) {
+			my ($dx,$dy) = @$_;
+			if (abs($x-$dx) <= 3 and abs($y-$dy) <= 3) {
+				$relationship->{dragpoint} = $i;
+				delete $relationship->{selection};
+			        $canvas->delete('selection');
+				++$relationship->{indrag};
+				last;
+			}
+			++$i;
+		}
+	}
+}
+
+sub relationship_ctrl_mouse_down {
+	my ($obj,$relationship,$x,$y) = @_;
+
+	$x = $canvas->canvasx($x);
+	$y = $canvas->canvasy($y);
+
+	if ($relationship->{selection}) {
+		my $i = 0;
+		my @coords = make_coords($relationship);
+		my $lx = shift @coords;  my $ly = shift @coords;
+		my @was = ();
+		while (@coords) {
+			my $sx = shift @coords;  my $sy = shift @coords;
+			my @proj = 
+				abscissa_project($lx,$ly,$sx,$sy,$x,$y);
+			if (@proj) {
+				my ($xc,$yc,$d) = @proj;
+				if ($d <= 4) {
+					push @was,[$xc,$yc];
+					while (@coords) {
+						push @was,[$sx,$sy];
+						$sx = shift @coords;
+						$sy = shift @coords;
+					}
+					$relationship->{coords} = \@was;
+					select_relationship($relationship);
+					++$global_bind_cancel;
+					Tk->break;
+					last;
+				}
+			}
+			push @was,[$sx,$sy];
+			($lx,$ly) = ($sx,$sy);
+			++$i;
+		}
+	}
+}
+
+sub relationship_ctrl_mouse_2_down {
+	my ($obj,$relationship,$x,$y) = @_;
+
+	$x = $canvas->canvasx($x);
+	$y = $canvas->canvasy($y);
+
+	if ($relationship->{selection}) {
+		my @coords = map { @$_ } @{$relationship->{coords}};
+
+		my @was = ();
+		while (@coords) {
+			my $cx = shift @coords;  my $cy = shift @coords;
+			next if abs($x-$cx) <= 4 and abs($y-$cy) <= 4;
+			push @was,[$cx,$cy];
+		}
+		$relationship->{coords} = \@was;
+		select_relationship($relationship);
+	}
+}
+
+sub relationship_mouse_up {
+	my ($obj,$relationship,$x,$y) = @_;
+
+	delete $relationship->{indrag};
+	if (exists $relationship->{dragpoint}) {
+		relationship_motion(@_);
+		delete $relationship->{dragpoint};
+		show_relationship($relationship);
+	}
+	select_relationship($relationship);
+}
+
+sub relationship_motion {
+	my ($obj,$relationship,$x,$y) = @_;
+
+	return unless $relationship->{indrag};
+	$x = $canvas->canvasx($x);
+	$y = $canvas->canvasy($y);
+	my $c = @{$relationship->{coords}}[$relationship->{dragpoint}];
+
+	# je treba od dragpointu obe usecky (na obe strany) posunout tak,
+	# ze jejich jedna strana se zmeni
+	my $dragname = '_dragpoint_'.$relationship->{name}.'_'.
+		$relationship->{dragpoint};
+	$canvas->move($dragname,$x-$c->[0],$y-$c->[1]);
+	$c->[0] = $x;  $c->[1] = $y;
+	$canvas->coords($relationship->{name},make_coords($relationship));
+}
+
+sub deselect_repository {
+	return unless Exists($repository_window);
+	return unless defined $repository;
+	$repository->selectionClear(0,'end');
+	click_repository();
+}
+
+sub deselect_all { 
+	my $from_listbox = shift;
+
+	for (@{$data{tables}}) {
+		deselect_table($_) if $_->{selection};
+	}
+	for (@{$data{relationships}}) {
+		deselect_relationship($_) if $_->{selection};
+	}
+	deselect_repository() unless $from_listbox;
+}
+
+sub select_relationship {
+	my $relationship = shift;
+	my $from_listbox = shift;
+
+	deselect_all($from_listbox);
+	++$relationship->{selection};
+	if (Exists $repository_window and defined $repository
+		and not $from_listbox) {
+		my $i = 0;
+		for ($repository->get(0,'end')) {
+			my $test = $_;
+			$test =~ s/^[+-] //;  $test =~ s/ \([RTV]\)$//;
+			if ($test eq $relationship->{name}) {
+				$repository->selectionClear(0, 'end');
+				$repository->selectionSet($i);
+				click_repository();  last;
+			}
+			++$i;
+		}
+	}
+	show_relationship($relationship);
+}
+
+sub deselect_relationship {
+	my $relationship = shift;
+
+	delete $relationship->{selection};
+	show_relationship($relationship);
+}
+
+sub show_table {
+	my $table = shift;
+	unless (ref $table) {
+		for (@{$data{tables}}) 
+			{ if ($_->{name} eq $table) { $table = $_; last; } }	
+	}
+	return unless ref $table;
+	$canvas->delete($table->{name});
+	my $firstlinespace = $canvas->fontMetrics($fonts{canvas_bold},
+		-linespace);
+	my $linespace = $canvas->fontMetrics($fonts{canvas}, -linespace);
+
+	return unless $table->{placed};		
+
+	$table->{x} = center_table_x($table) unless defined $table->{x};
+	$table->{y} = center_table_y($table) unless defined $table->{y};
+
+	my $max = $canvas->fontMeasure($fonts{canvas_bold},$table->{name});
+	for (@{$table->{columns}}) {
+		my $len = $canvas->fontMeasure($fonts{canvas},$_);
+		$max = $len if $len > $max;
+	}
+
+	my $height = scalar(@{$table->{columns}})*$linespace+$firstlinespace+17;
+	my $width = $max+25;
+
+	$canvas->create('rectangle',$table->{x},$table->{y},$table->{x}+$width,
+		$table->{y}+$height, -tags => [ $table->{name}, '_tables' ], 
+		-fill => 'white');
+
+	$canvas->create('line',$table->{x},$table->{y}+$firstlinespace+8,
+		$table->{x}+$width,$table->{y}+$firstlinespace+8,
+		-tags => [ $table->{name}, '_tables' ]);
+
+	$canvas->createText($table->{x}+5,$table->{y}+5, -anchor => 'nw', 
+		-text => $table->{name}, -font => $fonts{canvas_bold}, 
+		-tags => [ $table->{name}, '_tables' ]);
+
+	my $i = 0;  my %pk = ();
+	for (@{$table->{pk}}) {
+		++$pk{$_};
+	}
+	for (@{$table->{columns}}) {
+		$canvas->createText($table->{x}+5,
+			$table->{y}+$i*$linespace+$firstlinespace+12,
+			-anchor => 'nw', -text => '=',
+			-font => $fonts{canvas}, 
+			-tags => [ $table->{name}, '_tables' ]) if $pk{$_};
+		$canvas->createText($table->{x}+20,
+			$table->{y}+($i++)*$linespace+$firstlinespace+13,
+			-anchor => 'nw', -text => $_,
+			-font => $fonts{canvas}, 
+			-tags => [ $table->{name}, '_tables' ]);
+	}
+
+	if ($table->{selection}) {
+		$canvas->create('rectangle', $table->{x}-2, $table->{y}-2,
+			$table->{x}+2, $table->{y}+2, 
+			-tags => [ $table->{name}, '_tables', 'selection' ], 
+			-fill => 'black');
+		$canvas->create('rectangle', $table->{x}+$width-2, 
+			$table->{y}-2, $table->{x}+$width+2, $table->{y}+2, 
+			-tags => [ $table->{name}, '_tables', 'selection' ], 
+			-fill => 'black');
+		$canvas->create('rectangle', $table->{x}-2, 
+			$table->{y}+$height-2,
+			$table->{x}+2, $table->{y}+$height+2, 
+			-tags => [ $table->{name}, '_tables', 'selection' ], 
+			-fill => 'black');
+		$canvas->create('rectangle', $table->{x}+$width-2,
+			$table->{y}+$height-2,
+			$table->{x}+$width+2, $table->{y}+$height+2, 
+			-tags => [ $table->{name}, '_tables', 'selection' ], 
+			-fill => 'black');
+	}
+
+	$canvas->bind($table->{name},'<1>', 
+		[ \&table_mouse_down, $table, Ev('x'), Ev('y') ]);
+	$canvas->bind($table->{name},'<B1-Motion>', 
+		[ \&table_motion, $table, Ev('x'), Ev('y') ]);
+	$canvas->bind($table->{name},'<B1-ButtonRelease>', 
+		[ \&table_mouse_up, $table, Ev('x'), Ev('y') ]);
+	$canvas->bind($table->{name},'<3>',
+		[ \&table_popup, $table, Ev('x'), Ev('y') ]);
+}
+
+sub show_canvas {
+	$canvas->delete('all');
+
+	my $len = scalar(@{$data{relationships}})+scalar(@{$data{tables}});
+	$progress->configure(-to => $len, -value => 0);
+	$main->update();
+	my $i = 0;
+	for (@{$data{tables}}) {
+		next unless $_->{placed};		
+		show_table($_);
+		$progress->value(++$i);
+		$progress->update();
+	}
+	for (@{$data{relationships}}) {
+		next unless $_->{placed};		
+		show_relationship($_);
+		$progress->value(++$i);
+		$progress->update();
+	}
+	
+	$progress->configure(-to => 100, -value => 0);
+	$main->update();
+}
+
+sub table_mouse_down {
+	my ($obj, $table, $x, $y) = @_;
+
+	$table->{hotspot_x} = $canvas->canvasx($x)-$table->{x};
+	$table->{hotspot_y} = $canvas->canvasy($y)-$table->{y};
+
+	$table->{motion_rel} = ();
+	my %prac = ();
+	for (@{$data{relationships}}) {
+		++$prac{$_->{name}} if $_->{from_table} eq $table->{name} or
+				$_->{to_table} eq $table->{name};
+	}
+	for (keys %prac) { push @{$table->{motion_rel}},$_; }
+	delete $table->{selection};
+	$canvas->delete('selection');
+}
+
+sub select_table {
+	my $table = shift;
+	my $from_listbox = shift;
+
+	deselect_all($from_listbox);
+	++$table->{selection};
+	if (Exists $repository_window and defined $repository 
+		and not $from_listbox) {
+		my $i = 0;
+		for ($repository->get(0,'end')) {
+			my $test = $_;
+			$test =~ s/^[+-] //;  $test =~ s/ \([RTV]\)$//;
+			if ($test eq $table->{name}) {
+				$repository->selectionClear(0, 'end');
+				$repository->selectionSet($i);
+				click_repository();  last;
+			}
+			++$i;
+		}
+	}
+	show_table($table);
+}
+
+sub deselect_table {
+	my $table = shift;
+
+	delete $table->{selection};
+	show_table($table);
+}
+
+sub table_mouse_up {
+	my ($obj, $table, $x, $y) = @_;
+
+	table_motion(@_);
+	select_table($table);
+	delete $table->{hotspot_x};
+	delete $table->{hotspot_y};
+	delete $table->{motion_rel};
+}
+
+sub table_motion {
+	my ($obj, $table, $x, $y) = @_;
+
+	$x = $canvas->canvasx($x)-$table->{hotspot_x};
+	$y = $canvas->canvasy($y)-$table->{hotspot_y};
+	$canvas->move($table->{name},$x-$table->{x},$y-$table->{y});
+
+	$table->{x} = $x;  $table->{y} = $y;
+
+	for (@{$table->{motion_rel}}) 
+		{ $canvas->delete($_);  show_relationship($_); }
+}
+
+sub center_table_x {
+	my $table = shift;
+
+	my $max = $canvas->fontMeasure($fonts{canvas_bold},$table->{name});
+	for (@{$table->{columns}}) {
+		my $len = $canvas->fontMeasure($fonts{canvas},$_);
+		$max = $len if $len > $max;
+	}
+
+	my $width = $max+10;
+	my $wherex = ($canvas->cget('width')-$width)/2;
+	$wherex = 5 if $wherex < 5;
+	return $canvas->canvasx($wherex);
+}
+
+sub center_table_y {
+	my $table = shift;
+
+	my $firstlinespace = $canvas->fontMetrics($fonts{canvas_bold},
+		-linespace);
+	my $linespace = $canvas->fontMetrics($fonts{canvas},
+		-linespace);
+
+	my $height = scalar(@{$table->{columns}})*$linespace+$firstlinespace+15;
+	my $wherey = ($canvas->cget('height')-$height)/2;
+	$wherey = 5 if $wherey < 5;
+	return $canvas->canvasy($wherey);
+}
+
+sub printps {
+	deselect_all();
+	my ($x1,$y1,$x2,$y2) = $canvas->bbox('all');
+	my $xd = $x2 - $x1;
+	my $yd = $y2 - $y1;
+	unless ($xd and $yd) {
+		$main->messageBox(-icon => 'error', -type => 'OK', 
+			-title => 'Print Error',
+			-message => 'No schema to print.');
+		return;
+	}
+
+	my $printerselect = $main->DialogBox(-title => 'Printer Select',
+		-buttons => [ 'OK', 'Cancel' ] );
+
+	$printerselect->Label(-text => 'Please select output device:')
+		->grid(-row => 0, -column => 0, -sticky => 'ew');
+	my $lb = $printerselect->Scrolled('Listbox', -selectmode => 'single',
+			-setgrid => 1, -scrollbars => 'e')
+		->grid(-row => 1, -column => 0, -sticky => 'nsew');
+
+	$printerselect->gridRowconfigure(0, -weight => 0, -minsize => 200);
+
+	$printerselect->gridColumnconfigure(0, -weight => 0, -minsize => 300);
+	$printerselect->gridRowconfigure(0, -weight => 0, -minsize => 200);
+
+	my $gv = `type -p gv 2>/dev/null`;
+	chomp $gv;
+	unless ($gv) {
+		my $gv = `type -p ghostview 2>/dev/null`;
+		chomp $gv;
+	}
+
+	$lb->insert('end','PostScript file');
+	$lb->insert('end','GhostView') if $gv;
+
+	my $printcap = new Print::Printcap;
+	for ($printcap->printers) { $lb->insert('end','Printer '.$_); }
+
+	return unless $printerselect->Show eq 'OK';
+
+	my @i = $lb->curselection;
+	my $device = $lb->get($i[0]);
+	$device = ':ps' if $device eq 'PostScript file';
+	$device = ':gv' if $device eq 'GhostView';
+	$device =~ s/^Printer //;
+
+	my $psop = $main->DialogBox(-title => 'PostScript Options',
+		-buttons => [ 'OK', 'Cancel' ] );
+
+	# Limits from GhostView (gv)
+	my %format_par = (
+		A4 => { x => 595, y => 842 },
+		A3 => { x => 842, y => 1191 } );
+	my @formats = qw/A4 A3 Fit Poster/;
+
+	my $poster = new PostScript::Poster;
+
+	my $format = '';
+	my $ftype = 'predefined';
+	my $fori = 0;
+	my $printx = ''; my $printy = '';
+	$psop->Label(-justify => 'left', -text => 'Page format:')
+		->grid(-column => 1, -columnspan => 2, -row => 1,
+		-sticky => 'w');
+	$psop->Radiobutton(-variable => \$ftype, -value => 'predefined',
+		-text => 'Predefined ', -anchor => 'w')
+		->grid(-column => 1, -row => 2, -sticky => 'w');
+	$psop->Radiobutton(-variable => \$ftype, -value => 'manual',
+		-text => 'Manual ', -anchor => 'w')
+		->grid(-column => 1, -row => 3, -sticky => 'w');
+	$psop->Optionmenu(-options => \@formats, -variable => \$format)
+		->grid(-column => 2, -row => 2, -sticky => 'ew');
+	$psop->Label(-justify => 'left', -text => 'X: ')
+		->grid(-column => 1, -row => 4, -sticky => 'e');
+	$psop->Entry(-textvariable => \$printx)
+		->grid(-column => 2, -row => 4, -sticky => 'ew');
+	$psop->Label(-justify => 'left', -text => 'Y: ')
+		->grid(-column => 1, -row => 5, -sticky => 'e');
+	$psop->Entry(-textvariable => \$printy)
+		->grid(-column => 2, -row => 5, -sticky => 'ew');
+	$psop->Label(-justify => 'left', -text => 'Page orientation:')
+		->grid(-column => 1, -columnspan => 2, -row => 7,
+		-sticky => 'w');
+	$psop->Radiobutton(-variable => \$fori, -value => 0,
+		-text => 'Portrait ', -anchor => 'w')
+		->grid(-column => 1, -row => 8, -sticky => 'ew');
+	$psop->Radiobutton(-variable => \$fori, -value => 1,
+		-text => 'Landscape ', -anchor => 'w')
+		->grid(-column => 2, -row => 8, -sticky => 'ew');
+
+	return unless $psop->Show eq 'OK';
+
+	my $format_big = '';  my $format_paper = '';
+	if ($ftype eq 'predefined' and $format eq 'Poster') {
+		my $pop = $main->DialogBox(-title => 'Poster Options',
+			-buttons => [ "OK", "Cancel" ] );
+
+		# Limits from GhostView (gv)
+		my @fmts_big = qw/Fit A0 A1 A2 A3 A4/;
+		my @fmts_paper = qw/A4 A3/;
+		$format_big = 'Fit';
+		$format_paper = 'A4';
+		$pop->Label(-justify => 'left',
+			-text => 'Format for whole schema (big):')
+			->grid(-column => 1, -row => 1, -sticky => 'w');
+		$pop->Optionmenu(-options => \@fmts_big, 
+			-variable => \$format_big)
+			->grid(-column => 2, -row => 1, -sticky => 'ew');
+		$pop->Label(-justify => 'left', 
+			-text => 'Paper (media) format:')
+			->grid(-column => 1, -row => 2, -sticky => 'w');
+		$pop->Optionmenu(-options => \@fmts_paper,
+			-variable => \$format_paper)
+			->grid(-column => 2, -row => 2, -sticky => 'ew');
+
+		return unless $pop->Show eq 'OK';
+	}
+
+	my $fn = '';
+	if ($device eq ':ps') {
+		$fn = $main->getSaveFile(-defaultextension => '.ps', 
+			-filetypes => [ [ 'PostScript file', '.ps' ],
+					[ 'All Files', '*' ] ],
+			-title => 'Print to PostScript',
+			-initialdir => $initdir);
+		return unless $fn;
+	} else {
+		$fn = '/tmp/svplus.print.'.$$.".ps";
+	}
+
+	my %pspar = (-file => $fn, -colormode => 'gray', -x => $x1, 
+		-y => $y1, -height => $yd+1, -width => $xd+1);
+
+	if ($ftype eq 'predefined' and $format eq 'Poster') {
+		$pspar{-file} = "/tmp/svplus.poster.".$$.".ps";
+	} else {
+		if ($ftype eq 'predefined') {
+			if (defined $format_par{$format}) {
+				my $xr = $xd / $format_par{$format}{x};
+				my $yr = $yd / $format_par{$format}{y};
+				if ($xr > 1 or $yr > 1) {
+					if ($xr > $yr) {	
+						$pspar{-pagewidth} = 
+							$format_par{$format}{x};
+					} else {
+						$pspar{-pageheight} = 
+							$format_par{$format}{y};
+					}
+				}
+			}
+		} elsif ($ftype eq 'manual') {
+			my $xr = $xd / $printx;
+			my $yr = $yd / $printy;
+	
+			if ($xr > 1 or $yr > 1) {
+				if ($xr > $yr) {
+					$pspar{-pagewidth} = $printx;
+				} else {
+					$pspar{-pageheight} = $printy;
+				}
+			}
+		} else {
+			return;
+		}
+		$pspar{-rotate} = $fori;
+	}
+		
+	$canvas->postscript(%pspar);
+
+	if ($ftype eq 'predefined' and $format eq 'Poster') {
+		my @p = ();
+		if ($format_big ne 'Fit') { @p = (-poster => $format_big); }
+		$poster->posterize(-media => $format_paper, @p, -outfile => $fn, -infile => $pspar{-file});
+		system "rm -f $pspar{-file}";
+	}
+
+	if ($device eq ':gv') {
+		exec "$gv $fn ; rm -f $fn" unless fork();
+	} elsif ($device ne ':ps') {
+		exec "lpr -P$device $fn ; rm -f $fn" unless fork();
+	} else {
+		$main->messageBox(-icon => 'info', -type => 'OK', 
+			-title => 'Print to PostScript file',
+			-message => 'PostScript file '.$fn.' created.');
+	}
+}
+
+sub canvas_mouse_down {
+	my ($obj,$x,$y) = @_;
+
+	if ($global_bind_cancel) {
+		$global_bind_cancel = undef;
+		return;
+	}
+
+	deselect_all();
+}
+
+sub exists_name {
+	my $name = shift;
+
+	for (@{$data{tables}}) { return 1 if $_->{name} eq $name; }
+	for (@{$data{relationships}}) { return 1 if $_->{name} eq $name; }
+
+	return 0;
+}
+
+sub inc_name {
+	my $name = shift;
+
+	my ($a,$b) = split /_/,$name;
+	++$b;
+
+	return sprintf '%s_%08d',$a,$b;
+}
+
+sub new_object {
+	my $d = $main->DialogBox(-title => 'Type of object',
+		-buttons => [ 'Create', 'Cancel' ]);
+
+	my $type = 'table';
+	$d->Label(-text => 'Please select type of created object:')
+		->grid(-column => 1, -row => 1, -sticky => 'ew',
+		-columnspan => 3);
+	$d->Radiobutton(-variable => \$type, -value => 'table',
+		-text => 'Table', -anchor => 'w')
+		->grid(-column => 2, -row => 2, -sticky => 'ew');
+	$d->Radiobutton(-variable => \$type, -value => 'view', -text => 'View',
+		-anchor => 'w')
+		->grid(-column => 2, -row => 3, -sticky => 'ew');
+
+	if (@{$data{tables}}) {
+		$d->Radiobutton(-variable => \$type, -value => 'relationship',
+			-text => 'Relationship', -anchor => 'w')
+			->grid(-column => 2, -row => 4, -sticky => 'ew');
+	}
+
+	$d->gridRowconfigure(1, -weight => 0, -minsize => 30);
+	$d->gridRowconfigure(2, -weight => 0, -minsize => 30);
+	$d->gridRowconfigure(3, -weight => 0, -minsize => 30);
+	$d->gridRowconfigure(4, -weight => 0, -minsize => 30);
+	
+	$d->gridColumnconfigure(1, -weight => 0, -minsize => 100);
+	$d->gridColumnconfigure(2, -weight => 0, -minsize => 100);
+	$d->gridColumnconfigure(3, -weight => 0, -minsize => 100);
+
+	if ($d->Show eq 'Create') {
+		my $d = $main->DialogBox(-title => 'Name of '.$type,
+			-buttons => [ 'Create', 'Cancel' ]);
+
+		my $name = uc $type . '_00000000';
+
+		while (exists_name($name)) {
+			$name = inc_name($name);
+			if ($name =~ /99999999$/) {
+				$name = uc $type . '_????????';
+				last;
+			}
+		}
+		
+		$d->Label(-text => 'Please select name for created '.$type.':')
+			->grid(-column => 1, -row => 1, -sticky => 'ew');
+		$d->Entry(-textvariable => \$name)
+			->grid(-column => 1, -row => 2, -sticky => 'ew');
+
+		$d->gridRowconfigure(1, -weight => 0, -minsize => 30);
+		$d->gridRowconfigure(2, -weight => 0, -minsize => 30);
+	
+		$d->gridColumnconfigure(1, -weight => 0, -minsize => 100);
+		$d->gridColumnconfigure(2, -weight => 0, -minsize => 100);
+		$d->gridColumnconfigure(3, -weight => 0, -minsize => 100);
+
+		while ((my $res = $d->Show) ne 'Cancel') {
+			if ($res eq 'Create') {
+				unless ($name) {
+					$main->messageBox(-icon => 'error',
+						-type => 'OK', 
+						-title => 'Null error', 
+						-message => 
+							'Name must be filled.');
+				} elsif (exists_name($name)) {
+					$main->messageBox(-icon => 'error',
+						-type => 'OK', 
+						-title => 'Duplicate error', 
+						-message => 
+							'Name already used.');
+				} else {
+					if ($type eq 'relationship') {
+						create_relationship($name);
+					} else {
+						create_table($name,$type);
+					}
+					last;
+				}
+			}
+		} 
+	}
+	show_repository;
+	click_repository;
+}
+
+sub create_relationship {
+	my $name = shift;
+
+	my %relation = ();
+	$relation{schema} = 'DESIGN';
+	$relation{name} = $name;
+
+	my $d = $main->DialogBox(-title => 'Create new relationship',
+		-buttons => [ 'Accept', 'Cancel' ]);
+
+	$d->Label(-text => 'From table:')->grid(-column => 0, -row => 0,
+		-sticky => 'w');
+	$d->Label(-text => 'To table:')->grid(-column => 0, -row => 1,
+		-sticky => 'w');
+
+	my @tables = ();
+	for (sort { $a->{name} cmp $b->{name} } @{$data{tables}}) {
+		push @tables,$_->{name};
+	}
+
+	my $o1 = $tables[0];  my $o2 = $tables[0];
+	$d->Optionmenu(-options => \@tables, -textvariable => \$o1)
+		->grid(-column => 1, -row => 0, -sticky => 'ew');
+	$d->Optionmenu(-options => \@tables, -textvariable => \$o2)
+		->grid(-column => 1, -row => 1, -sticky => 'ew');
+
+	$d->gridRowconfigure(0, -weight => 1, -minsize => 30);
+	$d->gridRowconfigure(0, -weight => 1, -minsize => 30);
+	$d->gridColumnconfigure(0, -weight => 1, -minsize => 100);
+	$d->gridColumnconfigure(1, -weight => 1, -minsize => 100);
+
+	if ($d->Show eq 'Accept') {
+		$relation{from_table} = $o1;
+		$relation{to_table} = $o2;
+	
+		my $ref = \%relation;
+		push @{$data{relationships}},$ref;
+
+		my @rel = @{$data{relationships}};
+		edit_relationship($rel[$#rel]);
+	}
+}
+
+sub create_table {
+	my ($name,$type) = @_;
+
+	sctypes() unless $data{sc_types};
+
+	for (@{$data{sc_types}}) {
+		if (lc($_->{name}) eq $type) {
+			$type = $_->{value};
+			last;
+		}
+	}
+
+	my %table = ();
+	$table{name} = $name;
+	$table{type} = $type;
+	$table{schema} = 'DESIGN';
+	$table{columns} = [ ];
+
+	push @{$data{tables}},\%table;
+
+	edit_table($data{tables}->[scalar(@{$data{tables}})-1]);
+}
+
+sub edit_table {
+	my $table = shift;
+	my $d = $main->DialogBox(-title => 'Edit '.type_desc($table->{type}),
+		-buttons => [ 'Accept', 'Cancel' ]);
+
+	$d->Label(-text => 'Current structure of '.type_desc($table->{type}).
+		':')
+		->grid(-column => 1, -row => 1, -sticky => 'ew',
+		-columnspan => 3);
+	my $structure = $d->Scrolled('MListbox', # -setgrid => 1,
+		-scrollbars => 'e', -selectmode => 'multiple', -sortable => 0,
+		-columns => [ [ -text => 'Column' ], 
+			[ -text => 'PK', -width => 4 ],
+			[ -text => 'Indexes', -width => 8 ] ])
+		->grid(-column => 1, -row => 2, -sticky => 'ew',
+		-columnspan => 3);
+
+	$d->Label(-text => 'Item:')
+		->grid(-column => 1, -row => 6, -sticky => 'ew');
+	my $item = '';
+
+	my %reserved = ();  my %redraw = ();
+	for my $rel (@{$data{relationships}}) {
+		if ($rel->{from_table} eq $table->{name}) {
+			for (@{$rel->{from_columns}}) {
+				++$reserved{$_->{column}};
+			}
+			$redraw{$rel->{name}} = $rel;
+		}
+		if ($rel->{to_table} eq $table->{name}) {
+			for (@{$rel->{to_columns}}) {
+				++$reserved{$_->{column}};
+			}
+			$redraw{$rel->{name}} = $rel;
+		}
+	}
+	$d->Entry(-textvariable => \$item)
+		->grid(-column => 2, -row => 6, -sticky => 'ew');
+	$d->Button(-text => 'Add', -command => sub {
+			return unless $item;
+			$item = $item;
+			for ($structure->get(0,'end')) {
+				if ($_ eq $item) {
+					$main->messageBox(-icon => 'error',
+						-type => 'OK', 
+						-title => 'Duplicate error', 
+						-message => 
+						'Name of item already used.');
+					return;
+				}
+			}
+			$structure->insert('end',[$item]);
+			$item = '';
+		})->grid(-column => 3, -row => 6, -sticky => 'ew');
+
+	$structure->delete(0,'end');
+	my %pk = ();
+	for (@{$table->{pk}}) { ++$pk{$_}; }
+	for (@{$table->{columns}}) { 
+		$structure->insert('end',[$_,(exists $pk{$_})?'yes':'']); 
+	}
+	
+	$d->Button(-text => 'Delete all selected items', -command => sub {
+			my @sel = $structure->curselection();
+			my $res = 0;
+			for (reverse sort @sel) {
+				if ($reserved{$structure->get($_)}) {
+					++$res;
+				} else {
+					delete $pk{$_} if exists $pk{$_};
+					$structure->delete($_);
+				}
+			}
+			$main->messageBox(-icon => 'error', -type => 'OK', 
+				-title => 'Check error', 
+				-message => 'You try to delete item which is part of relationship. This operation is not allowed. You must drop relationship before this delete.')
+				if $res;
+		})->grid(-column => 1, -row => 4, -sticky => 'ew',
+			-columnspan => 3);
+	$d->Button(-text => 'Set selected items as PK', -command => sub {
+			%pk = ();
+			for ($structure->curselection()) {
+				my @it = $structure->get($_);
+				++$pk{$it[0]->[0]};
+			}
+			my @all = map { $_->[0]; } $structure->get(0,'end');
+			$structure->delete(0,'end');
+			for (@all) { 
+				$structure->insert('end',
+					[$_,(exists $pk{$_})?'yes':'']); 
+			}
+		})->grid(-column => 1, -row => 5, -sticky => 'ew',
+			-columnspan => 3);
+
+	# changing items order
+	$d->Button(-text => 'Up', -command => sub {
+			my $first = 0;
+			for (sort $structure->curselection()) {
+				if ($_ > $first) {
+					my @it = $structure->get($_);
+					$structure->delete($_);
+					$structure->insert($_-1,$it[0]);
+					$structure->selectionSet($_-1);
+				} else {
+					$first = $_+1;
+				}
+			}
+		})->grid(-column => 1, -row => 3, -sticky => 'w');
+	$d->Button(-text => 'Down', -command => sub {
+			my $last = $structure->index('end')-1;
+			for (reverse sort $structure->curselection()) {
+				if ($_ < $last) {
+					my @it = $structure->get($_);
+					$structure->delete($_);
+					$structure->insert($_+1,$it[0]);
+					$structure->selectionSet($_+1);
+				} else {
+					$last = $_-1;
+				}
+			}
+		})->grid(-column => 3, -row => 3, -sticky => 'e');
+	$d->Label(-text => 'Move selected items')
+		->grid(-column => 2, -row => 3, -sticky => 'ew');
+
+	$d->gridRowconfigure(1, -weight => 0, -minsize => 30);
+	$d->gridRowconfigure(2, -weight => 0, -minsize => 300);
+	$d->gridRowconfigure(3, -weight => 0, -minsize => 30);
+	$d->gridRowconfigure(4, -weight => 0, -minsize => 30);
+	$d->gridRowconfigure(5, -weight => 0, -minsize => 30);
+	$d->gridRowconfigure(6, -weight => 0, -minsize => 30);
+	
+	$d->gridColumnconfigure(1, -weight => 0, -minsize => 50);
+	$d->gridColumnconfigure(2, -weight => 0, -minsize => 150);
+	$d->gridColumnconfigure(3, -weight => 0, -minsize => 50);
+
+	if ($d->Show eq 'Accept') {
+		$table->{columns} = 
+			[ map { $_->[0]; } $structure->get(0,'end') ];
+		$table->{pk} = [ keys %pk ];
+		show_table($table);
+		for (keys %redraw) { show_relationship($redraw{$_}); }
+	}
+	click_repository;
+}
+
+sub select_columns {
+	my $table = shift;
+
+	my $d = $main->DialogBox(-title => 'Select columns',
+		-buttons => [ 'Select', 'Cancel' ]);
+
+	$d->Label(-text => 'Select columns from '.$table.':')
+		->pack(-side => 'top', -anchor => 'center');
+	my $l = $d->Scrolled('Listbox', -setgrid => 1,
+		-selectmode => 'multiple', -scrollbars => 'e')
+		->pack(-side => 'top', -fill => 'both', -expand => 1);
+
+	my $tab = undef;
+	for (@{$data{tables}}) {
+		if ($_->{name} eq $table) {
+			$tab = $_;
+			last;
+		}
+	}
+	return () unless defined $tab;
+
+	for (@{$tab->{columns}}) {
+		$l->insert('end',$_);
+	}
+
+	if ($d->Show() eq 'Select') {
+		my @all = ();
+		for ($l->curselection) {
+			push @all,$l->get($_);
+		}
+		return @all;
+	}
+
+	return ();
+}
+
+sub edit_relationship {
+	my $relationship = shift;
+
+	my $d = $main->DialogBox(-title => 'Edit '.$relationship->{name}.
+		' relationship', -buttons => [ 'Accept', 'Cancel' ]);
+
+	$d->Label(-text => 'From table: '.$relationship->{from_table})
+		->grid(-column => 0, -row => 0, -sticky => 'w',
+		-columnspan => 2);
+	$d->Label(-text => ' --> ')->grid(-column => 2, -row => 1);
+	$d->Label(-text => 'To table: '.$relationship->{to_table})
+		->grid(-column => 3, -row => 0, -sticky => 'w',
+		-columnspan => 2);
+	my $lb1 = $d->Scrolled('Listbox', -selectmode => 'multiple',	
+		-setgrid => 1, -scrollbars => 'e')
+		->grid(-column => 0, -row => 1, -sticky => 'nsew',
+		-columnspan => 2);
+	my $lb2 = $d->Scrolled('Listbox', -selectmode => 'multiple',	
+		-setgrid => 1, -scrollbars => 'e')
+		->grid(-column => 3, -row => 1, -sticky => 'nsew',
+		-columnspan => 2);
+
+	$d->Button(-text => 'Delete', -command => sub { 
+			for (sort $lb1->curselection) {
+				$lb1->delete($_);	
+			}
+		})->grid(-column => 0, -row => 2, -sticky => 'nsew');
+	$d->Button(-text => 'Add', -command => sub {
+			my %all = ();
+			for ($lb1->get(0,'end')) {
+				++$all{$_};
+			}
+			for (select_columns($relationship->{from_table})) {
+				++$all{$_};
+			}
+			$lb1->delete(0,'end');
+			for (sort keys %all) {
+				$lb1->insert('end',$_);
+			}
+		})->grid(-column => 1, -row => 2, -sticky => 'nsew');
+	$d->Button(-text => 'Delete', -command => sub {
+			for (sort $lb2->curselection) {
+				$lb2->delete($_);	
+			}
+		})->grid(-column => 3, -row => 2, -sticky => 'nsew');
+	$d->Button(-text => 'Add', -command => sub {
+			my %all = ();
+			for ($lb2->get(0,'end')) {
+				++$all{$_};
+			}
+			for (select_columns($relationship->{to_table})) {
+				++$all{$_};
+			}
+			$lb2->delete(0,'end');
+			for (sort keys %all) {
+				$lb2->insert('end',$_);
+			}
+		})->grid(-column => 4, -row => 2, -sticky => 'nsew');
+
+	for (@{$relationship->{from_columns}}) {
+		$lb1->insert('end',$_->{column});
+	}
+	for (@{$relationship->{to_columns}}) {
+		$lb2->insert('end',$_->{column});
+	}
+
+	$d->gridColumnconfigure(0, -weight => 1, -minsize => 75);
+	$d->gridColumnconfigure(1, -weight => 1, -minsize => 75);
+	$d->gridColumnconfigure(2, -weight => 1, -minsize => 50);
+	$d->gridColumnconfigure(2, -weight => 1, -minsize => 75);
+	$d->gridColumnconfigure(2, -weight => 1, -minsize => 75);
+
+	$d->gridRowconfigure(0, -weight => 1, -minsize => 30);
+	$d->gridRowconfigure(1, -weight => 1, -minsize => 200);
+	$d->gridRowconfigure(2, -weight => 1, -minsize => 30);
+	
+	my $res;
+	do {
+		$res = $d->Show;
+		unless (($lb1->index('end') and $lb2->index('end'))
+				or $res eq 'Cancel') {
+			$res = '';
+			$main->messageBox(-icon => 'error',
+				-type => 'OK', -title => 'Edit relationship', 
+				-message => 
+				'You must specify from and to columns.');
+		}
+	} until $res;
+	if ($res eq 'Accept') {
+		$relationship->{from_columns} = [];
+		for ($lb1->get(0,'end')) {
+			push @{$relationship->{from_columns}},
+				{ table => $relationship->{from_table},
+				  column => $_ };	
+		}
+		$relationship->{to_columns} = [];
+		for ($lb2->get(0,'end')) {
+			push @{$relationship->{to_columns}},
+				{ table => $relationship->{to_table},
+				  column => $_ };	
+		}
+	}
+
+	show_repository;
+	show_canvas;
+	click_repository;
+}
+
+sub rename_object {
+	my ($object,$what) = @_;
+
+	my $d = $main->DialogBox(-title => 'Rename of '.$object->{name},
+			-buttons => [ 'Rename', 'Cancel' ]);
+
+	my $name = $object->{name};
+
+	$d->Label(-text => 'Please select new name for '.
+		$object->{name}.':')
+		->grid(-column => 1, -row => 1, -sticky => 'ew');
+	$d->Entry(-textvariable => \$name)
+		->grid(-column => 1, -row => 2, -sticky => 'ew');
+
+	$d->gridRowconfigure(1, -weight => 0, -minsize => 30);
+	$d->gridRowconfigure(2, -weight => 0, -minsize => 30);
+	
+	$d->gridColumnconfigure(1, -weight => 0, -minsize => 100);
+	$d->gridColumnconfigure(2, -weight => 0, -minsize => 100);
+	$d->gridColumnconfigure(3, -weight => 0, -minsize => 100);
+
+	while ((my $res = $d->Show) ne 'Cancel') {
+		if ($res eq 'Rename') {
+			unless ($name) {
+				$main->messageBox(-icon => 'error',
+					-type => 'OK', 
+					-title => 'Null error', 
+					-message => 
+						'Name must be filled.');
+			} elsif (exists_name($name) and $name 
+					ne $object->{name}) {
+				$main->messageBox(-icon => 'error',
+					-type => 'OK', 
+					-title => 'Duplicate error', 
+					-message => 
+						'Name already used.');
+			} else {
+				last if $name eq $object->{name};	
+				$canvas->delete($object->{name});
+				if ($what eq 'relationship') {
+					$object->{name} = $name;
+					show_relationship($object);
+				} else {
+					my %redraw = ();
+					for my $rel (@{$data{relationships}}) {
+						if ($rel->{from_table} eq 
+							$object->{name}) {
+							$rel->{from_table}
+								= $name;
+							for (@{$rel->
+							 {from_columns}}) {
+								$_->{table} = 
+								 $name if 
+								  $_->{table} eq
+								  $object->
+								  {name};
+							}
+							$redraw{$rel->{name}} 
+								= $rel;
+						}
+						if ($rel->{to_table} eq 
+							$object->{name}) {
+							$rel->{to_table}
+								= $name;
+							for (@{$rel->
+							 {to_columns}}) {
+								$_->{table} = 
+								 $name if 
+								  $_->{table} eq
+								  $object->
+								  {name};
+							}
+							$redraw{$rel->{name}}
+								= $rel;
+						}
+					}
+					$object->{name} = $name;
+					show_table($object);
+					for (keys %redraw) {
+						show_relationship($redraw{$_});
+					}
+				}
+				last;
+			}
+		}
+	} 
+	show_repository;
+	click_repository;
+}
+sub reset_data {
+	%data = (relationships => [], tables => [], environment => {});
+
+	$fonts{canvas} = $main->Font();
+	$fonts{canvas}->configure(-family => 'Helvetica');
+
+	$fonts{canvas_bold} = $main->Font();
+	$fonts{canvas_bold}->configure(-family => 'Helvetica',
+		-weight => 'bold');
+
+	sctypes();
+}
+
+sub sctypes {
+	no strict 'refs';
+	$data{sc_types} = [ map { { name => $_, value => &$_ }; } 
+		DBIx::SystemCatalog->sc_types() ];
+	use strict 'refs';
+	for (@{$data{sc_types}}) { $_->{name} =~ s/^SC_TYPE_//; }
+}
+
+sub splash_start {
+	$splash = new MainWindow(-borderwidth => 0,
+			 -background => 'white', 
+			-height => 87, -width => 379);
+	$splash->{Shown} = 0;
+	my $f = $splash->Frame(-relief => 'solid',
+		-borderwidth => 1, -background => 'white')->pack();
+	my $tmp = "/tmp/svplus.splash.".$$.".ppm";
+	if (open F,">$tmp") {
+		print F $logo->ppm();
+		close F;
+
+		$f->Label(-image => $splash->Photo(-file => $tmp,
+			-format => 'ppm', -height => 87,
+			-width => 379), background => 'white')
+			->pack(-side => 'top', -ipadx => 0,
+			-ipady => 0, -padx => 0, -pady => 0);
+
+		system "rm -f $tmp";
+	} else {
+		$f->Label(-text => 'SchemaView Plus')
+		->pack(-side => 'top', -anchor => 'center');
+	}
+	$f->Label(-background => 'white', -text => 'Version '.$VERSION)
+		->pack(side => 'top', -anchor => 'center');
+	my $it = $f->Label(-background => 'white', -text => 
+		'(c) Copyright 2001-02 by Milan Sorm <sorm@pef.mendelu.cz>')
+		->pack(side => 'top', -anchor => 'center');
+	my $itfont = $it->Font();
+	$itfont->configure(-slant => 'italic', -weight => 'normal', -family => 'helvetica');
+	$f->Label(-background => 'white', -text => "This program is free software; you can redistribute it\n and/or modify it under the same terms as Perl itself.",
+		-font => $itfont)
+		->pack(side => 'bottom', -anchor => 'center');
+	my $x = int (($splash->screenwidth - $splash->reqwidth)/2 - 
+			$splash->vrootx);
+	my $y = int (($splash->screenheight - $splash->reqheight)/2 - 
+			$splash->vrooty);
+	$splash->overrideredirect(1);
+	$splash->transient;
+	$splash->geometry("+$x+$y");
+	$splash->configure(-cursor => 'watch');
+	++$splash->{Shown};
+	$splash->deiconify();
+	$splash->raise();
+	$splash->grab();
+	$splash->focus();
+	$splash->update();
+}
+
+sub splash_stop {
+	sleep 3;
+	$splash->Unbusy();
+	$splash->destroy();
+}
+1;
+
+__END__
+
+=head1 NAME
+
+svplus - SchemaView Plus GUI for drawing database schemas
+
+=head1 FORMAT
+
+	svplus [file]
+
+=head1 SYNOPSIS
+
+	svplus
+	svplus example.svp
+
+=head1 DESCRIPTION
+
+SchemaView Plus is a GUI for retrieve, drawing and printing database schema.
+
+Schema can be retrieved using DBIx::SystemCatalog (currently supported
+basicly all current DBD drivers, some better support for PostgreSQL and
+quite well support for Oracle).
+
+Program use XML for storing and retrieving data in text files. You can
+write any filters to modify these XML files for add new functionality
+based on your projects (e.g. droping off some relationships etc.).
+You can specify one filename on command line for autoloading it after
+GUI start up.
+
+Schema can be printed to PostScript file.
+
+=head1 VERSION
+
+0.15
+
+=head1 TODO
+
+Droping IDT relationships,
+layers for tables and views (for selecting some tables from schema as problem analysis),
+support for SV format,
+on-line web generating printing (to some image format), 
+context toolbox,
+hints on status line,
+alignment and grid,
+printing copies,
+text tool for making notes on canvas,
+integrated manual or web documentation,
+setting canvas size by user (enlarging), 
+backward update for databases,
+support comments in database schema,
+box with texts as special kind of objects,
+autoplacement,
+ortogonal moving of object with Shift key,
+multilanguage support,
+configuration rc file with environment options,
+bookmarks for connecting to database,
+solving known bugs.
+
+=head1 KNOWN BUGS
+
+Problem with manipulating of dragpoint in smooth coords based connection method,
+retrieving only updates from database -- now forgot all new informations,
+I retrieve always all relationships (e.g. for 1 table in large schema - slow),
+many tables in create relationship don't allow selection,
+selecting object on canvas don't click_repository(),
+d'n'd object from object repository rollback in object repository listbox and filter don't work.
+
+=head1 AUTHOR
+
+(c) 2001-02 Milan Sorm, sorm@pef.mendelu.cz
+at Faculty of Economics,
+Mendel University of Agriculture and Forestry in Brno, Czech Republic.
+
+Special thanks for Miroslav Kripac (SchemaView), Ludek Finstrle (PgSQL support, contributor, betatester), Ing. Hana Netrefova (betatester),
+Bc. Jan Muller (betatester) and Jos T.J. van Eijdnhoven (original poster in C).
+
+This program was made because we need draw large database schema for 
+University Information System at our university. Miroslav Kripac's
+SchemaView was our first solution but because SchemaView was written
+in Java (slow, slow and slow) and don't have needed functions like 
+scrollable canvas we write this yet another drawer.
+
+=head1 SEE ALSO
+
+perl(1); DBI(3), Tk(3), XML::Parser(3), XML::Dumper(3), DBIx::SystemCatalog(3),
+Math::Project(3), Hints(3), Print::Printcap(3), PostScript::Poster(3).
+
+=cut
+

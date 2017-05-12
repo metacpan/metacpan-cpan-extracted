@@ -1,0 +1,8 @@
+Revision history for Perl extension Sledge::Pages::Apache::I18N
+0.02  Tue Apr 18 20:55:41 2006
+    - Now use original Apache::Request wrapper Class Sledge::Request::Apache::I18N
+      instead of Apache::Request::I18N.
+      Apache::Request::I18N can't treat large upload file.
+
+0.01  Tue Mar  7 00:51:44 2006
+	- original version

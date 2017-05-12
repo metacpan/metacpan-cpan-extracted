@@ -1,0 +1,232 @@
+#!/usr/bin/perl
+use strict;
+use Getopt::Long;
+use IPC::Run    qw< start >;
+use Time::HiRes qw< sleep >;
+
+
+#
+# main
+# ----
+MAIN: {
+    run() unless caller();
+}
+
+
+#
+# run()
+# ---
+sub run {
+    # default options
+    my %options = (
+        count       => 5,
+    );
+
+    # process comand line options
+    Getopt::Long::Configure(qw< no_auto_abbrev no_ignore_case >);
+    GetOptions(\%options, qw{
+        help|h!  version|V!
+        loop|l!  count|c=i
+        debug|d!  format|as|F=s
+    }) or pod2usage(1);
+
+    # handle --help and --version
+    $options{help}    and pod2usage(2);
+    $options{version} and version();
+
+    # debug mode forces normal output
+    $options{format} = "human" if $options{debug};
+
+    # check the output format to use
+    if (lc $options{format} eq "json") {
+        if (eval "use JSON; 1") {
+            # use JSON v2 API even with JSON v1
+            if (JSON->VERSION < 2.00) {
+                no warnings;
+                *to_json   = *JSON::encode = \&JSON::objToJson;
+                *from_json = *JSON::decode = \&JSON::jsonToObj;
+            }
+        }
+        else {
+            $options{format} = "human";
+        }
+    }
+
+    # read the rest of the arguments
+    my ($first_oid, $extsnmp_bin, @extsnmp_args) = @ARGV;
+
+    # prepare the command
+    my @cmd = ( $extsnmp_bin, @extsnmp_args );
+    my ($in, $out, $err) = ("", "", "");
+
+    # execute the program
+    my $process = start(\@cmd, \$in, \$out, \$err)
+        or die "fatal: Can't execute '$extsnmp_bin'. Exit status: $?\n";
+
+    # wait for the program to initialise
+    sleep .5;
+
+    my $oid     = $first_oid;
+    my $count   = $options{count};
+    my $i       = 1;
+    my @data;
+
+    while ($process->pumpable) {
+        $oid = $oid eq "NONE" ? $first_oid : $oid;
+        $in = "getnext\n$oid\n";
+        print "--> getnext\n--> $oid\n" if $options{debug};
+
+        $process->pump until index($out, $/) > 0;
+        ($oid, my $type, my $value) = split /$\//, $out;
+        $out =~ s/^/<-- /gm, print $out if $options{debug};
+        $out = "";
+
+        if ($oid eq "NONE") {
+            if ($options{loop} and $count > 0) {
+                $count--;
+
+                if ($options{format} eq "json") {
+                    print to_json(\@data), $/;
+                    @data = ();
+                }
+                else {
+                    print "-" x 10, $/;
+                }
+
+                next
+            }
+            else {
+                last
+            }
+        }
+
+        if ($options{format} eq "csv") {
+            print "$oid;$type;$value\n";
+        }
+        elsif ($options{format} eq "json") {
+            push @data, { oid => $oid, type => $type, value => $value };
+        }
+        else {
+            print "$oid ($type) = $value\n";
+        }
+    }
+
+    print to_json(\@data), $/ if $options{format} eq "json";
+
+    $process->finish;
+}
+
+
+#
+# pod2usage()
+# ---------
+sub pod2usage {
+    my ($level) = @_;
+
+    if (eval { require Pod::Usage }) {
+        Pod::Usage::pod2usage({
+            -exitval => 0,  -verbose => $level,  -noperldoc => 1,
+        });
+    }
+    else {
+        require Pod::Text;
+        Pod::Text::pod2text(__FILE__, \*STDOUT);
+        exit;
+    }
+}
+
+
+#
+# version()
+# -------
+sub version {
+    print "$::PROGRAM v$::VERSION\n";
+    exit;
+}
+
+
+32272
+
+__END__
+
+=head1 NAME
+
+pseudo-walk - Manually walk the OID tree provided by a Net-SNMP extension
+
+=head1 SYNOPSIS
+
+    pseudo-walk [--debug] [--loop] [--count N] [--format type]
+                first-oid path/to/snmpext [snmpext args ..]
+
+    pseudo-walk --help
+    pseudo-walk --version
+
+
+=head1 OPTIONS
+
+B<Behaviour options>
+
+=over
+
+=item B<-l>, B<--loop>
+
+Run in loop mode.
+
+=item B<-c>, B<--count> I<number>
+
+Specify the number of times to loop over. Defaults to 5.
+
+=back
+
+B<Output options>
+
+=over
+
+=item B<-d>, B<--debug>
+
+Enable debug mode, printing the communication with the SNMP extension.
+
+=item B<-F>, B<--format> I<type>
+
+Specify how to print the data from the SNMP extension.
+Available types are C<csv>, C<json> and C<human>. Defaults to C<human>.
+
+=back
+
+B<Standard options>
+
+=over
+
+=item B<-h>, B<--help>
+
+Print this help screen and exit.
+
+=item B<-V>, B<---version>
+
+Print the program name and version and exit.
+
+=back
+
+
+=head1 DESCRIPTION
+
+This program is a tool to help developers of Net-SNMP C<pass_persist>
+extensions by manually walking the OID tree it provides, as Net-SNMP
+would do if queried by snmpwalk.
+
+
+=head1 AUTHOR
+
+SE<eacute>bastien Aperghis-Tramoni, C<< <sebastien at aperghis.net> >>
+
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2008-2010 SE<eacute>bastien Aperghis-Tramoni, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+
+

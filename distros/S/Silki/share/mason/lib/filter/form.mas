@@ -1,0 +1,30 @@
+<%args>
+$data        => undef
+@objects     => ()
+@exclude     => ()
+$is_fragment => 0
+$suffix      => q{}
+</%args>
+
+<%init>
+my $params = $c->session_object()->form_data();
+
+my @data_sources;
+push @data_sources, $params if keys %{ $params };
+push @data_sources, $data if defined $data;
+push @data_sources, grep { defined } @objects;
+
+my $form_data = Silki::Web::FormData->new( sources => \@data_sources,
+                                           suffix  => $suffix,
+                                         );
+
+my $form = Silki::Web::Form->new( html        => $m->content(),
+                                  errors      => [ $c->session_object()->errors ],
+                                  form_data   => $form_data,
+                                  exclude     => \@exclude,
+                                  is_fragment => $is_fragment,
+                                  make_pretty => ( ! Silki::Config->instance()->is_production() ),
+                                );
+
+$m->print( $form->filled_in_form() );
+</%init>

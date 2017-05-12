@@ -1,0 +1,12 @@
+  Sys::Virt Readme
+  ================
+
+This module provides a Perl XS binding for the libvirt APIs. For
+further details on libvirt consult its website http://libvirt.org/
+
+The only pre-requisite for this module is libvirt itself. For
+installation instructions, consult the INSTALL file.
+
+The current minimum required version of libvirt is 3.3.0
+
+-- End

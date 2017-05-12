@@ -1,0 +1,58 @@
+2003-04-18  Paul Stodghill  <stodghil@quimby-xp>
+
+	* wsdl-client.pl:
+	Print request/response statistics when verbose.
+
+2003-02-18  Paul Stodghill  <stodghil@quimby-xp>
+
+	* wsdl-client.pl:
+	Note for bug to fix
+
+2003-01-15  Paul Stodghill  <stodghil@quimby-xp>
+
+	* wsdl-client.pl:
+	Added copyright notice.
+
+	* wsdl-client.pl:
+	Moved to new location that is consistent with CPAN-style distribution.
+
+	* wsdl-client.pl:
+	Take SOAP::Clean from the standard include path.
+
+2003-01-08  Paul Stodghill  <stodghil@quimby-xp>
+
+	* wsdl-client.pl:
+	Use -v -v -v instead of -v 3
+
+2003-01-03  Paul Stodghill  <stodghil@quimby-xp>
+
+	* wsdl-client.pl:
+	Handle optional arguments.
+
+2003-01-02  Paul Stodghill  <stodghil@quimby-xp>
+
+	* wsdl-client.pl:
+	Ok. Actually check the _filename_. Grr.
+
+2003-01-01  Paul Stodghill  <stodghil@quimby-xp>
+
+	* wsdl-client.pl:
+	Use /usr/bin/env perl to start.
+	Check that the input files exist before trying to read them.
+
+2002-12-27  Paul Stodghill  <stodghil@quimby-xp>
+
+	* wsdl-client.pl:
+	input arguments can now be specified "by-file"
+	output arguments can now be returned "by-value", "by-file" or
+	    "by-status". See soap-client.sh for example usage.
+
+	* wsdl-client.pl:
+	Verbose takes a numeric argument.
+
+2002-12-26  Paul Stodghill  <stodghil@quimby-xp>
+
+	* wsdl-client.pl:
+	wsdl-client.pl subsumes the functionality of wsdl-invoke.pl and
+	    wsdl-usage.pl
+

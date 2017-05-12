@@ -1,0 +1,41 @@
+# Update domain, add and remove an admin contact
+template: update-domain.tt
+
+vars:
+  domain: updatable.co.te
+  admin: registrant-001
+  admin_old: 10d
+
+input_assertions:
+  class: SRS::EPP::Command::Update::Domain
+  count:
+    - [ '//domain:name', 1, 'SRS: Check for the domain' ]
+    - [ '//domain:contact', 2, 'SRS: Check the contacts' ]
+  match:
+    - [ '//domain:name', 'updatable.co.te', 'SRS: Check the domain name' ]
+    - [ '//domain:add/domain:contact', 'registrant-001', 'SRS: Check the new admin' ]
+    - [ '//domain:rem/domain:contact', '10d', 'SRS: Check the old admin' ]
+  match_all:
+    - [ '//domain:contact/@type', 'admin', 'SRS: Check all contacts are of type admin' ]
+
+SRS:
+  - assertions:
+      count:
+      match:
+        - [ '//DomainNameFilter', 'updatable.co.te', 'SRS: Check for the domain name' ]
+      match_all:
+      attr_is:
+        - [ '//FieldList', 'AdminContact', '1', 'SRS: Admin contact requested in DDQ field list' ]
+  - assertions:
+      count:
+      match:
+        - [ '//DomainNameFilter', 'updatable.co.te', 'SRS: Check for the domain name' ]
+      match_all:
+      attr_is:
+        - [ '//AdminContact', 'HandleId', 'registrant-001', 'SRS: Check for the admin contact' ]
+
+output_assertions:
+  count:
+    - [ '//epp:result', 1, 'EPP: Check for one result' ]
+  attr_is:
+    - [ '//epp:result', 'code', 1000, 'EPP: Check for correct result code' ]

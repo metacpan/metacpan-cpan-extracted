@@ -1,0 +1,60 @@
+#!/usr/bin/ruby
+
+#
+## Module inclusion
+#
+module Foo {
+    var hi = 42
+}
+
+module Baz {
+    include Foo
+    import Foo::hi
+    var hello = 100
+    assert_eq(hi, 42)
+}
+
+module Qux {
+    include Baz
+    assert_eq(Baz::hi, 42)
+    assert_eq(Baz::hello, 100)
+}
+
+module Baz {
+    assert_eq(hi, 42)
+    assert_eq(hello, 100)
+}
+
+module Bar {
+    include Baz
+    assert_eq(Baz::hi, 42)
+    assert_eq(Baz::hello, 100)
+}
+
+module ZZZ {
+    var zzz = 1234
+}
+
+module ABC {
+    include Baz
+    include ZZZ
+    var abc = 19
+    assert_eq(Baz::hi, 42)
+    assert_eq(Baz::hello, 100)
+    assert_eq(ZZZ::zzz, 1234)
+}
+
+module ABC {
+    include Baz                 # TODO: make this inclusion optional
+    include ZZZ                 # =//=
+    assert_eq(Baz::hi, 42)
+    assert_eq(ZZZ::zzz, 1234)
+    assert_eq(abc, 19)
+    abc += 1
+}
+
+module ABC {
+    assert_eq(abc, 20)          # makes sure the execution order is correct
+}
+
+say "** Test passed!"

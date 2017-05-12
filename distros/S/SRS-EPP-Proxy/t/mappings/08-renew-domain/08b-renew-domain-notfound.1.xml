@@ -1,0 +1,6 @@
+<NZSRSResponse VerMajor="5" VerMinor="0" RegistrarId="11">
+  <Response Action="Whois" FeId="8" FeSeq="4743564" OrigRegistrarId="1" RecipientRegistrarId="11">
+    <FeTimeStamp Day="24" Hour="12" Minute="22" Month="6" Second="47" TimeZoneOffset="+12:00" Year="2010"/>
+    <Domain DomainName="chedder.co.te" Status="Available"/>
+    </Response>
+</NZSRSResponse>

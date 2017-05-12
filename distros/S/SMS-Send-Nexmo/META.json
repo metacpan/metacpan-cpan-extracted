@@ -1,0 +1,54 @@
+{
+   "abstract" : "SMS::Send backend for the Nexmo.com SMS service.",
+   "author" : [
+      "Michiel Beijen <michielb@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "agpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "SMS-Send-Nexmo",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Nexmo::SMS" : "0",
+            "SMS::Send" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mbeijen/SMS-Send-Nexmo/issues"
+      },
+      "homepage" : "https://github.com/mbeijen/SMS-Send-Nexmo",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mbeijen/SMS-Send-Nexmo.git",
+         "web" : "https://github.com/mbeijen/SMS-Send-Nexmo"
+      }
+   },
+   "version" : "0.23",
+   "x_contributors" : [
+      "Renée Bäcker <reneeb@cpan.org>"
+   ]
+}
+

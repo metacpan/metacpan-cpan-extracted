@@ -1,0 +1,36 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 71215d83269583adf9c752c6a4df8fff47790c4f Build.PL
+SHA1 b6e7a78f94abf00c7d84b35f39a5703268f1d301 Changes
+SHA1 950227ef6d7a1b3572bac3cd9b6f03c58a5f4588 INSTALL
+SHA1 8cb63de1ae4c54a120beb97cacc1fe2efe4d266b LICENSE
+SHA1 9b2032d5d6308be9fa789514a3dde854e907960f MANIFEST
+SHA1 cf1e3b089be010832e8a7e3aecfd5cc503ce78ae META.yml
+SHA1 8acf957face3f15a7b9ad80d622f6f0529da8573 Makefile.PL
+SHA1 8fb5daabe5614da8963b90b841ed70e2d72489ea README
+SHA1 a637881bb1fe775fb67e536246488bafc0859ec3 dist.ini
+SHA1 0584901c33a80373b474989b730d03b0003860fa lib/Statistics/Contingency.pm
+SHA1 7003b69adf3459b676b70cb781d47bb9f3169aa0 t/01-basic.t
+SHA1 fa45d6e6ab1cd421349dea4ef527bfd5cdc8a09e t/author-critic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG/MacGPG2 v2.0.17 (Darwin)
+Comment: GPGTools - http://gpgtools.org
+
+iEYEARECAAYFAlGz+XkACgkQgrvMBLfvlHaeaQCfeOl8pRiOOORYrI3wLCP+ln3g
+ZfIAnjLU3eEahUwFQCCTxLSsPc/CNTos
+=j+74
+-----END PGP SIGNATURE-----

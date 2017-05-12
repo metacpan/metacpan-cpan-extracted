@@ -1,0 +1,124 @@
+NAME
+    String::Interpolate::Delayed - delay string interpolation until you really
+    want it
+
+SYNOPSIS
+       use strict;
+       use warnings;
+       use String::Interpolate::Delayed;
+   
+       my $str   = delayed "$role of the $thing";
+       my $role  = "Lord";
+       my $thing = [qw( Rings Flies Dance )]->[rand 3];
+   
+       print "$str\n";
+
+DESCRIPTION
+    This module allows you to create strings which are interpolated, but not
+    immediately.
+
+    Running the code in the SYNPOSIS will print the name of one of my
+    favourite lords, even though at the time $str was declared, the variables
+    $role and $thing had still not been declared!
+
+  Discussion
+    How does this pass strictures? You might expect that the line which
+    declares $str would trigger a compile-time error, as it refers to two
+    variables which don't exist. Fear not! `delayed` is technically a
+    quote-like operator, not a function; the string following it is parsed by
+    Perl as an *uninterpolated* string, even if it appears in double quotes.
+    We could equally have written:
+
+       my $str = delayed/$role of the $thing/;
+
+    I prefer the double-quoted style because it fares better with syntax
+    highlighting.
+
+    What is $str? It's actually a blessed object, but it uses UNIVERSAL::ref
+    to conceal this fact. (`blessed` from Scalar::Util knows the truth
+    though.)
+
+    And it overloads stringification, right? By George! You've got it! Yes, it
+    overloads stringification and plays silly games with PadWalker and
+    String::Interpolate.
+
+  Methods
+    As mentioned above, strings with delayed interpolation are blessed
+    objects. As such, they have methods:
+
+    `new($text)`
+        Object-oriented way to create a string with delayed interpretation,
+        bypassing the `delayed` quote-like operator.
+
+           my $str = "String::Interpolate::Delayed"->new('$foo');
+
+    `interpolated`
+        Retrieve the text as a Perl scalar string, performing interpolation.
+
+        The object overloads stringification to call this method. Passing a
+        hashref as a parameter, allows you to define additional variables:
+
+           my $str   = delayed "The $thing in $place @description.\n";
+           my $thing = "rain";
+   
+           print $str->interpolated({
+              place       => \"Spain",
+              description => [qw/ stays mainly on the plain /],
+           });
+
+    `uninterpolated`
+        Retrieve the text as a Perl scalar string, *without* performing
+        interpolation.
+
+    `ref`
+        Just returns `undef`. This is for the benefit of UNIVERSAL::ref.
+
+CAVEATS
+  Limitations on interpolation
+    Most variables, including lexical variables and "magic" variables (such as
+    $1, $_, etc) will work. There's one significant exception: @_. This
+    limitation is inherited from `String::Interpolate`.
+
+  Danger, Will Robinson!!
+    Interpolated Perl strings can execute arbitrary code:
+
+       my $str = "I think I might @{[ unlink '/etc/passwd' ]}";
+
+    This is a caveat with interpolated strings in Perl in general, however
+    String::Interpolate::Delayed makes it easier to fall into this trap,
+    because you might be tempted to load strings with delayed interpolation
+    from an untrusted external source and throw them at the OO constructor.
+
+  String::Interpolate
+    This module includes a workaround for a bug in String::Interpolate. If the
+    bug is fixed, the workaround may stop working. The workaround can be
+    disabled by setting
+
+       $String::Interpolate::Delayed::WORKAROUND = 0;
+
+BUGS
+  forkprove
+    Test suite fails when run using App::ForkProve, but runs fine using
+    App::Prove. I don't know what all that's about...
+
+  Bug tracker
+    Please report any other bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=String-Interpolate-Delayed>.
+
+SEE ALSO
+    String::Interpolate, PerlX::QuoteOperator.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2013 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

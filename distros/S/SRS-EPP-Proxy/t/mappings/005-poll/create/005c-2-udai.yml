@@ -1,0 +1,18 @@
+description: Update the Registrant-Name for an existing domain
+registrar: 100
+
+
+request: |-
+ <NZSRSRequest VerMajor="4" VerMinor="4" RegistrarId="100">
+  <DomainUpdate ActionId="005c-2-udai.yml">
+    <DomainNameFilter>chilli.co.te</DomainNameFilter>
+    <RegistrantContact Email="e@xample.com" Name="Someone new">
+      <PostalAddress Address1="52 Festive Rd" Address2="Putney" City="London" CountryCode="NZ"/>
+      <Phone AreaCode="207" CountryCode="44" LocalNumber="000000"/>
+    </RegistrantContact>
+  </DomainUpdate>
+ </NZSRSRequest>
+
+
+assertions:
+ - xpath_matches: [ '//Error', '0', 'No errors' ]

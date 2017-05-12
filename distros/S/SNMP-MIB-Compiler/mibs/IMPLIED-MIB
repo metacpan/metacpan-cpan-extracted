@@ -1,0 +1,12 @@
+IMPLIED-MIB DEFINITIONS ::= BEGIN
+
+ impliedEntry OBJECT-TYPE
+	SYNTAX     impliedEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		" "
+	INDEX      { IMPLIED impliedName }
+	::= { impliedTable 1 } 
+
+END

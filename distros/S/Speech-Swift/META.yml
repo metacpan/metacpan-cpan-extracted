@@ -1,0 +1,13 @@
+--- #YAML:1.0
+name:                Speech-Swift
+version:             1.0
+abstract:            Perl extension for the Cepstral Text-to-Speech Engine
+license:             ~
+author:              
+    - Mike Pultz <mike@mikepultz.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

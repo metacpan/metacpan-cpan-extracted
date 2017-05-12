@@ -1,0 +1,21 @@
+---
+abstract: 'Determine if a string looks like a perl warning'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: String-Perl-Warnings
+requires:
+  Regexp::Assemble: '0.34'
+  perl: '5.006'
+resources:
+  homepage: https://github.com/bingos/string-perl-warnings
+  repository: https://github.com/bingos/string-perl-warnings.git
+version: '1.16'

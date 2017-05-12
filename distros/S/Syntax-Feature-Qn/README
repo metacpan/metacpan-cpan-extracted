@@ -1,0 +1,69 @@
+NAME
+    Syntax::Feature::Qn - Perl syntax extension for line-based quoting
+
+SYNOPSIS
+      use qn;
+
+      @foo = qn {
+        line one
+        line two
+        line three
+      };
+      # ("line one", "line two", "line three")
+
+      $bar = 'BAR';
+      @foo = qqn {
+        foo
+        $bar
+        bam
+      };
+      # ("foo", "BAR", "bam")
+
+DESCRIPTION
+    This module adds line-based quoting operators to Perl, similar to
+    here-docs, but without the required outdenting.
+
+    The qn() and qqn() operators are drop-in replacements for q() and qq(),
+    respectively. The same delimiter rules apply.
+
+    The quote body is split on "\n" and each resulting list item is stripped
+    of leading and trailing whitespace. Inner whitespace is preserved.
+
+    Empty lines, or lines consisting of only whitespace, translate to empty
+    string list items.
+
+    The first and last items can be on the same line as the delimiter, or
+    not. So, these are the same:
+
+      @foo = qn {
+        first
+        second
+        third
+        fourth
+      };
+      # ("first", "second", "third", "fourth")
+
+      @foo = qn { first
+        second
+        third
+        fourth };
+      # ("first", "second", "third", "fourth")
+
+    You could even get away with this:
+
+      @foo = qn { first };
+      # ("first")
+
+SEE ALSO
+    q, qq in perlfunc.
+
+AUTHOR
+    Rick Myers, <jrm@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2017 by Rick Myers.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.20.1 or, at
+    your option, any later version of Perl 5 you may have available.
+

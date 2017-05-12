@@ -1,0 +1,94 @@
+# BEGIN BPS TAGGED BLOCK {{{
+# COPYRIGHT:
+# 
+# This software is Copyright (c) 2003-2008 Best Practical Solutions, LLC
+#                                          <clkao@bestpractical.com>
+# 
+# (Except where explicitly superseded by other copyright notices)
+# 
+# 
+# LICENSE:
+# 
+# 
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of either:
+# 
+#   a) Version 2 of the GNU General Public License.  You should have
+#      received a copy of the GNU General Public License along with this
+#      program.  If not, write to the Free Software Foundation, Inc., 51
+#      Franklin Street, Fifth Floor, Boston, MA 02110-1301 or visit
+#      their web page on the internet at
+#      http://www.gnu.org/copyleft/gpl.html.
+# 
+#   b) Version 1 of Perl's "Artistic License".  You should have received
+#      a copy of the Artistic License with this package, in the file
+#      named "ARTISTIC".  The license is also available at
+#      http://opensource.org/licenses/artistic-license.php.
+# 
+# This work is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+# 
+# CONTRIBUTION SUBMISSION POLICY:
+# 
+# (The following paragraph is not intended to limit the rights granted
+# to you to modify and distribute this software under the terms of the
+# GNU General Public License and is only of importance to you if you
+# choose to contribute your changes and enhancements to the community
+# by submitting them to Best Practical Solutions, LLC.)
+# 
+# By intentionally submitting any modifications, corrections or
+# derivatives to this work, or any other work intended for use with SVK,
+# to Best Practical Solutions, LLC, you confirm that you are the
+# copyright holder for those contributions and you grant Best Practical
+# Solutions, LLC a nonexclusive, worldwide, irrevocable, royalty-free,
+# perpetual, license to use, copy, create derivative works based on
+# those contributions, and sublicense and distribute those contributions
+# and any derivatives thereof.
+# 
+# END BPS TAGGED BLOCK }}}
+=head1 NAME
+
+SVK::Help::View - Introduction to svk view support
+
+=head1 DESCRIPTION
+
+[Views are a BETA-quality feature. We're very interested in bug reports 
+and feeback about them.]
+
+svk allows you to define multiple different I<view>s for an existing
+repository.
+
+=head2 DEFINING A VIEW
+
+views are stored as property C<svk:view:NAME> on a directory.  Suppose
+you have C<svk:view:ptest> set on C<//project>, you can refer to it by
+C<//^project/ptest>.  That is, a caret, and then path holding the
+property, a slash, and the name of the view.
+
+You can now use C<//^project/ptest> as a target for normal svk commands
+like ls, checkout and diff.
+
+Here is an example for the value of the property:
+
+ &:/project/trunk
+ -*
+ dir1  dir1
+ util  src/deep/util
+
+The first line is the base of the view.  The C<&:> sign means the root
+of a mirror, so the view can still be used even if other people
+mirrored the repository to a different path in their local repository.
+
+The second line means taking out all the content under the root.  And
+then take C<dir1> back, stick the directory C<src/deep/util> to
+C<util> under the view.  So running C<svk ls //^project/ptest> you
+should see:
+
+ dir1/
+ util/
+
+=cut
+
+1;

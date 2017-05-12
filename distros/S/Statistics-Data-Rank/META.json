@@ -1,0 +1,45 @@
+{
+   "abstract" : "Utilities for ranking data",
+   "author" : [
+      "Roderick Garton <rgarton@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Statistics-Data-Rank",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Array::Compare" : "2.02",
+            "Test::More" : "0.98"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.421"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::AllUtils" : "0.09",
+            "Statistics::Data" : "0.09",
+            "Statistics::Lite" : "3.2",
+            "String::Util" : "1.24"
+         }
+      }
+   },
+   "provides" : {
+      "Statistics::Data::Rank" : {
+         "file" : "lib/Statistics/Data/Rank.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.02"
+}

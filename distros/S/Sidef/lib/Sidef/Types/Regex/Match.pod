@@ -1,0 +1,94 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Regex::Match
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = Match.new(...);
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef::Object::Object
+
+=head1 METHODS
+
+
+=head2 ...
+
+I<Obj> B<...> I<Obj> -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 cap
+
+Match.cap() -> I<Obj>
+
+Return the
+
+Aliases: I<caps>, I<captures>
+
+=cut
+
+=head2 dump
+
+Match.dump() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 join
+
+Match.join() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ncap
+
+Match.ncap() -> I<Obj>
+
+Return the
+
+Aliases: I<ncaps>, I<named_captures>
+
+=cut
+
+=head2 pos
+
+Match.pos() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 to_bool
+
+Match.to_bool() -> I<Obj>
+
+Return the
+
+Aliases: I<matched>, I<is_successful>
+
+=cut
+
+=head2 to_s
+
+Match.to_s() -> I<Obj>
+
+Return the
+
+=cut

@@ -1,0 +1,55 @@
+Revision history for Perl extension Spreadsheet::BasicRead.
+
+
+BasicRead
+
+ Revision 1.12  2013/01/29 19:37:42  Greg
+ - Added handling of .xlxs files
+
+ Revision 1.11  2012/04/10 11:08:42  Greg
+ - Added handling of .xlxs files
+
+ Revision 1.10  2006/04/30 05:35:13  Greg
+ - added getRowNumber()
+
+ Revision 1.9  2006/03/05 02:43:34  Greg
+ - Update of Acknowledgments
+
+ Revision 1.8  2006/03/05 02:31:41  Greg
+ - Changes to cellValue return to cater for 'GENERAL' value sometimes returned from OpenOffice spreadsheets
+   patch provided by Ilia Lobsanov <samogon@gmail.com>
+   see http://www.annocpan.org/~KWITKNR/Spreadsheet-ParseExcel-0.2602/ParseExcel.pm#note_18
+
+Revision 1.7  2006/01/25 22:17:47  Greg
+- Correction to reading of the first row of the next sheet (without calling getFirstRow).
+  Error detected and reported by Tim Rossiter
+- Reviewed memory useage as reported by Ilia Lobsanov - this seems to be in the underlying OLE::Storage_Lite
+
+Revision 1.6  2005/02/21 09:54:08  Greg
+- Update to setCurrentSheetNum() so that the new sheet is handled by BasicRead functions
+
+Revision 1.5  2004/10/08 22:40:27  Greg
+- Changed cellValue to return '' for an empty cell rather than undef (requested by D D Allen).
+  Old functionality can be maintained by setting named parameter 'oldCell' to true in call to new().
+- Added examples to POD
+
+xlsgrep.pl
+Revision 1.4  2004/10/08 22:35:20  Greg
+- Wrap the open of each spreadsheet in an eval to trap the die
+- Add printing the name of each spreadsheet checked
+- Correct the printing of the column number
+- Added sample run output to POD
+
+Added xlsgrep.pl and dumpSS.pl examples.
+
+Revision 1.3  2004/09/30 12:32:25  Greg
+- Update to currentSheetNum and getNextSheet functions
+- Added dumpSS.pl and xlsgrep.pl applications as usefull sample apps.
+
+Revision 1.2  2004/08/21 02:30:29  Greg
+- Added setHeadingRow and setRow
+- Updated documentation
+- Remove irrelavant use lib;
+
+
+Release 1.01, intial release to CPAN

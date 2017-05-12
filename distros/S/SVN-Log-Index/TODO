@@ -1,0 +1,26 @@
+# $Id: /local/CPAN/SVN-Log-Index/trunk/TODO 563 2004-09-30T21:31:02.490154Z rooneg  $
+
+* a 'sync' command that goes out and gets all the revs for a repos you don't 
+  have in your index yet.  this means keeping track of what revs we have and 
+  what ones we don't have yet.
+
+* a way to replace a given rev's entry in the index, for use when someone does 
+  a propchange on svn:log for the rev.
+
+* avoid having multiple entries in the index for a given log entry, probably 
+  means storing the uuid rather than the url and searching for uuid/rev combos 
+  before adding to the index.  need to see how to make that fast...
+
+* have tests verify that the svn and svnadmin binaries are installed before 
+  trying to use them.
+
+* sli should take symbolic revision specifications in addition to numeric ones
+
+* Devel::Cover says we need tests for:
+  * empty svn:author
+  * user defined Analyzer
+  * various combinations of ranges for add
+  * passing in a Plucene::Search::Query to search
+  * undef field in results
+
+* Look into AlphaNumericIndexer, should fix ability to search on revs...

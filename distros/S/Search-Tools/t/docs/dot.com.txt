@@ -1,0 +1,15 @@
+foobar@foo.com
+google.com
+bing.co.uk
+.bashrc
+hello world.
+http://myfoo.net/foo/bar/index.html
+this is a bunch more text just to get the file length up so we hit the max chars
+setting. nothing more.
+this is a bunch more text just to get the file length up so we hit the max chars
+setting. nothing more.
+this is a bunch more text just to get the file length up so we hit the max chars
+setting. nothing more.
+this is a bunch more text just to get the file length up so we hit the max chars
+setting. nothing more.
+

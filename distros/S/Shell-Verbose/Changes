@@ -1,0 +1,11 @@
+0.4       2011-11-28 07:40:53 America/Los_Angeles
+  - Fix after line
+
+0.3       2011-11-18 12:05:05 America/New_York
+  - Correct return value
+
+0.2       2011-10-19 14:50:42 America/New_York
+  - Use Dist::Zilla
+
+2011-10-18  v0.1
+  - Initial version...everything is changed!

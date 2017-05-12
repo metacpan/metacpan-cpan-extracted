@@ -1,0 +1,42 @@
+SNMP-Trapinfo 
+=============
+
+This module allows the user to get to the useful parts of an snmptrapd 
+packet. This assumes that you are using the Net-SNMP package from 
+http://www.net-snmp.org and that you are letting snmptrapd do all the 
+OID translations (no -On option for snmptrapd) and that hostnames are 
+resolved itself (no -n option).
+
+The most useful method is expand, which evaluates macros based on the 
+packet, for your custom messages.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  File::Temp (only for testing)
+
+Although this module is expected to be used with Net-SNMP, it is not
+a dependency.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006-2008 Opsera Limited. All rights reserved
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+

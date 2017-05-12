@@ -1,0 +1,279 @@
+Revision history for Perl extension SWF::*.
+
+0.42 Sun May 21 22:06:02 2006
+       SWF::Element
+	- Tag::BitmapLossless/2 now has always a long tag header to avoid a player bug.
+                                                            (Thanks to Gordon McCreight)
+	- Fixed wrong unpacking font codes.
+
+0.41 Fri Jun  3 00:30:00 2005
+       SWF::Element
+	- mistook TEXTRECORD::TYPE0 and TYPE1 in some case. (Thanks to Quyen Phuong)
+	  TEXTRECORD::TYPE0 and TYPE1 are obsolete and now TEXTRECORD has both
+	  styles and glyph entries.
+	- supports SoundStreamHead/2 for MP3 without LatencySeek. (Thanks to Quyen Phuong)
+       SWF::Parser
+	- 'parsetag' unexpectedly quitted when the stream ran short. Fixed.
+
+0.40 Sun May  1 22:24:58 2005
+       SWF::Element
+	- Wrongly dropped CXFORM/WITHALPHA when HasAddTerms and HasMultTerms are both 0.
+	  						(Thanks to Quyen Phuong)
+
+0.39 Fri Mar 18 00:02:58 2005
+       SWF::Element
+	- Fixed wrong glyph shape offsets in DefineFont.(Thanks to Quyen Phuong)
+	- Fixed wrong flag accessors of DefineFontInfo/2.
+
+0.38 Tue Mar 15 00:57:57 2005
+       SWF::Parser
+	- 'parse' mathod did not call the 'tag-callback' sub properly. Fixed.
+                                                        (Thanks to Quyen Phuong)
+
+0.37 Sun Oct 31 02:04:31 2004
+       SWF::Element
+	- Fixed wrong bit shift in _create_flag_accessor.
+	- Fixed wrong flag accessors of Definesound and SoundStreamHead/2.
+	- Support ActionFSCommand2 and ActionStrictMode.
+
+0.36 Tue Sep 14 23:30:00 2004
+       SWF::Element
+	- Failed to unpack DefineFont2 if FontFlagsWideOffsets was true. Fixed.
+	- Rewrote 'lookahead_*'.
+       SWF::BinStream
+	- 'get_bits' returned a wrong value in a certain case. Restored previous version.
+							(Thanks to Leonard Holman)
+
+0.35 Wed Aug 11 09:27:51 2004
+       SWF::Element
+	- Improved to handle NaN.
+
+0.341 Sat Jul 10 11:34:42 2004
+       SWF::Element
+	- Fixed unpack CacheRegister in SWF::Element::ACTIONRECORD::ActionTry.
+
+0.34 Sat Jun 12 12:42:22 2004
+       SWF::Element
+	- Fixed wrong style index in DefineMorphShape.
+	- Added locking SWF version in CLIPACTIONRECORD.
+       SWF::Parser, SWF::BinStream
+	- Improved SWF version control. (Thanks to Anand Kellar)
+
+0.33 Mon Apr 26 01:02:03 2004
+       SWF::Element
+	- Added tag types.
+	- Added SWF::Element::Tag::Packed class.
+       SWF::BinStream
+	- Fixed wrong handling of initial data for a read stream.
+	- Version of a write stream can change now before writing any data.
+       SWF::Parser
+	- Removed redundant copy of the internal stream.
+ 
+0.32 Sat Mar  7 00:00:00 2004
+       SWF::Element
+	- Features described in the SWF file format specification version 7
+	   are supported.
+	- Invalid ActionCall packing/unpacking is fixed.
+
+0.31 Mon Dec 22 22:00:00 2003
+	- Minor bug fix for SWF::BinStream and SWF::Element.
+       SWF::Parser
+	- 'abort' did not work correctly for 'parse_file'. Fixed. 
+
+0.30 Sat Dec 20 02:22:00 2003
+       SWF::Element
+	- SWF::Element::MATRIX was initialized wrongly since ver.0.28. Fixed.
+
+0.29 Wed Dec 17 20:30:00 2003
+       SWF::Element
+	- Fixed SWF::Element::ACTIONDATA::Double to handle 'infinity' and
+	  'NaN' properly. (Thanks to Peter Sergeant)
+
+0.28 Mon Dec 15 22:45:00 2003
+       SWF::Element
+	- Some methods are redefined wrongly. fixed.
+	- Removed some warnings.
+       SWF::Parser
+	- Removed some warnings.
+
+0.27 Sun Nov 30 00:22:55 2003
+       SWF::Element
+	- SWF version was not set to TAGSTREAM. fixed.
+	- Added 'dumper' method for TAGSTREAM.
+
+0.26 Sat Nov 29 18:30:00 2003
+       SWF::Element
+	- '$' and '@' are not escaped correctly in dumper method. Fixed.
+	- Label positions for WaitForFrame/2 action is wrong. Fixed.
+	- Property names for ACTIONDATA::Property are supported.
+	- 'NaN' and 'Infinity' for ACTIONDATA::Double are supported.
+	- Added some read-only flag accessors.
+	- Added 'lookahead_FieldName' methods.
+	- Added a 'shallow_unpack' method for the DefineSprite tag.
+       SWF::BinStream
+	- get_SI16/32 failed to get negative minimum values. Fixed.
+	- Added lookahead_string/UI8/16/32/SI8/16/32 methods.
+       SWF::Parser
+	- Added a 'header' parameter for SWF::Parser->new.
+	- Added an 'abort' method.
+       Others
+	- Added a sample, linkext.plx, using lookahead_Flags and shallow_unpack.
+
+0.25 Thu Aug  7 22:00:00 2003
+       SWF::Element
+	- There remained a bug to pack EventFlags. Fixed. (Thanks to Sam Wong)
+       dumpswf.plx
+	- The output script cannot set the SWF version correctly. Fixed.
+						(Thanks to John Robens)
+
+0.24 Thu Jul 10 00:20:00 2003
+       SWF::Element
+	- EventFlags of PlaceObject2 for FLASH 6 was wrong. EventFlags6 is 
+	  now included in EventFlags.
+	- ActionScript data 'null' and 'undefined' were confused.
+      	  Use SWF::Element::ACTIONDATA::UNDEF for 'undefined'. 
+
+0.23 Sat Jun 14 19:10:00 2003
+       SWF::Element
+	- Support 256 or higher value in SWF::Element::ACTIONDATA::Lookup. 
+						 (Thanks to Scott Graham)
+
+0.22 Tue Mar 30 01:00:00 2003
+       SWF::Element
+	- SWF::Element::MATRIX->rotate was wrong. Fixed.
+	- ActionWith tag was interpreted wrongly. Fixed.
+	- Changed 'Depth' scalar into SWF::Element::Depth object.
+       SWF::File
+	- SWF::File->new can do without a file name now.
+	  The file name should be set in $swf->close/save.
+       SWF::Parser
+	- Revised POD. (Thanks to Ben Lamb)
+       Others
+	- Added some samples.
+
+0.21 Thu Nov 14 00:05:00 2002
+       SWF::Element
+	- Some flags are not reset properly when the wrong value is set
+	  to the flags field. Fixed.
+	- Revised POD.
+       SWF::BinStream, SWF::Parser
+	- Revised POD.
+
+       dumpswf.plx
+	- Add comment outputs of frame number.
+
+0.20  Sun Nov 11 00:00:00 2002
+	This version is not compatible with the previous version.
+
+       SWF::Element
+	- Each element name and class is changed according to 
+	  the SWF file format specification version 6.
+	- Fixed wrong class structures.
+	- X and Y values in SHAPERECORDs are not converted to 
+	  the position relative to the shape origin any longer.
+	  They are now delta values which are the raw data of SWF.
+	- SWF6 (Flash MX) tags and actions are supported.
+	- SI* and UI* classes are abolished.
+	  Each field which were blessed with them are not objects any longer
+          but simple scalars.
+	  STRING, PSTRING, ID, and BinData are still classes.
+	- ACTIONRECORDARRAY support local label.
+	  It can be used as the offset of ActionJump, ActionIf, 
+	  and ActionDefineFunction, and also used as the skipcount
+	  of ActionWaitForFrame/2. (Thanks to Scott Graham)
+       SWF::BinStream
+	- Support SWF version number. It is referred by some SWF::Element
+	  objects.
+	- require method becomes private.  It is not recommended to use.
+	- mark method accepts more than one tell positions and objects
+	  for each key.
+       SWF::File
+	- Version method becomes read only.  SWF version can be set by
+	  constructer.
+       SWF::BinStream::File, SWF::Parser
+	- Support SWF version number for SWF::BinStream.
+
+0.10  Mon Sep 16 01:00:00 2002
+       SWF::BinStream
+	- Supported Codec filter module.
+       SWF::File, SWF::Parser
+	- Supported zlib-compressed SWF file.
+       Others
+	- Added SWF::BinStream::Codec::Zlib.
+
+0.09  Wed Apr 17 23:30:00 2002
+       SWF::Element
+	- SHAPERECn was not re-blessed to SHAPERECn::STRAIGHTEDGE properly.
+
+0.08  Mon Mar  4 00:38:10 2002
+       SWF::BinStream
+	- Improved get_bits and set_bits a little.
+	- Fixed POD error.
+       SWF::Element
+	- SWF::Element->configure raised error with one argument. Fixed.
+	- Field accessor method now can take undef.
+	- SWF::Element->clone didn't work properly. Fixed.
+	- Overload '=' of SWF::Element::Scalar.
+	- SWF::Element::Scalar->value method is used to get a field value.
+	- The base of SWF::Element::* is changed from hash to array.
+
+0.07  Sat Jan 12 02:20:00 2002
+       SWF::Element
+	- Fixed Array::Scalar->configure. (Thanks to Briac Pilpré)
+	- Remove some warnings. (Thanks to Briac Pilpré)
+
+0.06  Thu Jan 10 10:00:00 2002
+       SWF::Element
+	- TEXTRECORD::Type0 wrongly re-re-blessed in unpack(). Fixed.
+						(Thanks to Briac Pilpré)
+0.05  Thu Jan 10 00:00:00 2002
+       SWF::Element
+	- TEXTRECORD1/2 was not re-blessed with proper subclass. Fixed.
+	- Array::TEXTRECORDARRAY1/2 did not handle TEXTRECORD*::Type0/1
+	  properly. Fixed. (Thanks to Briac Pilpré)
+	- Array::Scalar->configure now can take scalar array reference.
+
+0.04  Mon Dec  3 22:02:00 2001
+       SWF::Element
+	- Fixed bug in using array reference to set element.
+	- Minor fix to pass -w.
+       SWF::BinStream
+	- Fixed POD.
+       SWF::BinStream::File
+	- Fixed POD.
+
+0.03  Fri Nov 30 00:00:00 2001
+       SWF::Element
+        - Many Bug fixed.
+        - Rewrote and split POD.
+        - Rewrote source and changed the internal class structure.
+        - Added Flash5 actionscript support.
+       SWF::Parser
+        - Now parse frame rate in SWF header correctly.
+        - Fixed mistakes of POD about callback subroutines. 
+       SWF::BinStream
+        - Capitalized name of all method except 'Length' now changed into
+          small letter and underscore. ex. SetUI8 -> set_UI8.
+        - Callback subroutine is now called with the stream object itself.
+        - Added 'tell' method to SWF::BinStream::Read.
+        - Added 'tell', 'mark', 'sub_stream' methods and 
+          'get_maxbits_of_bits_list', 'get_maxbits_of_sbits_list' functions
+          to SWF::BinStream::Write.
+        - Added SWF::BinStream::Write::SubStream class.
+       dumpswf.plx
+        - Now use SWF::BinStream::File.
+        - Output script now use SWF::File.
+        - Added second parameter for output file.
+        - Added usage.
+       Others
+        - Added SWF::File and SWF::BinStream::File.
+        - makefdb.plx is no longer supported.
+
+0.02  Tue Aug 28 02:30:00 2001
+        - Some Bug fixed in SWF::Element.
+        - Add 'scale', 'rotate', and 'translate' method to 
+          SWF::Element::MATRIX.
+
+0.01  Sun Dec 24 22:00:00 2000
+	- original version; created by h2xs 1.19
+

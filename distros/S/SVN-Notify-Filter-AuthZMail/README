@@ -1,0 +1,55 @@
+SVN-Notify-Filter-AuthZMail
+
+SVN::Notify::Filter::AuthZMail determines Subversion accounts to receive the
+email notification, by scanning the AuthZSVNAccessFile file.  It removes the
+need to maintain "--to" arguments to svnnotify in your Subversion post-commit hook.
+
+           svnnotify --repos-path "$1" --revision "$2" ..etc..  \
+                     --filter AuthZMail                         \
+                           --authz_file /x/x/x/authz            \
+                           --authz_module yyy
+
+DEPENDENCIES
+
+Of course, this module depends upon SVN::Notify.  It also depends upon SVN::Access,
+for parsing the AuthZ file.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc SVN::Notify::Filter::AuthZMail
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=SVN-Notify-Filter-AuthZMail
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/SVN-Notify-Filter-AuthZMail
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/SVN-Notify-Filter-AuthZMail
+
+    Search CPAN
+        http://search.cpan.org/dist/SVN-Notify-Filter-AuthZMail
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Jeffrey Borlik
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

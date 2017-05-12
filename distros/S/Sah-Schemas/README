@@ -1,0 +1,24 @@
+SPECIFICATION VERSION
+
+    0.1.0
+
+DESCRIPTION
+
+    A Sah-Schemas-* distribution contains one or more related Sah schemas.
+
+      * Put each individual schema in Sah::Schema::<NAME> package
+
+      The schema is put in the $schema package variable inside the package.
+
+      This enables quick lookup/retrieval of a certain schema.
+
+      * Schema must be normalized
+
+      This relieves users from having to normalize it themselves.
+
+SEE ALSO
+
+    Sah::Schemas::*
+
+    Sah and Data::Sah
+

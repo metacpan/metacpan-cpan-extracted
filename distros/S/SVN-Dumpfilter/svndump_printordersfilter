@@ -1,0 +1,66 @@
+#!/usr/bin/perl -w
+# $Id$
+# Copyright (C) 2006 by Martin Scharrer <martin@scharrer-online.de>
+# This is free software under the GPL.
+
+use strict;
+use vars qw(%header_count %prop_count);
+use SVN::Dumpfilter;
+
+my $dumpfile = shift @ARGV;
+my $outfile  = shift @ARGV;
+
+sub printordersfilter (\%;$);
+
+Dumpfilter($dumpfile, $outfile, \&printordersfilter);
+
+{
+local $, = "\n";
+print STDERR keys %header_count;
+print STDERR "\n";
+}
+
+foreach my $hdr (sort keys %header_count)
+ {
+   print STDERR "\n$hdr:\n";
+   foreach my $count (sort keys %{$header_count{$hdr}})
+    {
+      print STDERR " $count : $header_count{$hdr}{$count}\n";
+    }
+ }
+ 
+exit(0);
+
+
+sub printordersfilter (\%;$)
+ {
+   local $_;
+   my $href = shift;
+   my $recalc = defined ($_[0]) ? shift : 0;
+
+   # Only nodes, please
+   return if exists $href->{'header'}{'Revision-number'};
+   
+   my $ho = $href->{'header_order'};
+   foreach my $i (0 .. (@$ho - 1))
+    {
+      # Save how often is a header on what position
+      $header_count{$ho->[$i]}{$i+1} ++;
+    }
+   
+   my $po = $href->{'properties_order'};
+   foreach my $i (0 .. (@$ho - 1))
+    {
+      # Save how often is a header on what position
+      $prop_count{$ho->[$i]}{$i+1} ++;
+    }
+    
+   if ($recalc)
+    {
+     svn_recalc_prop_header(%$href);        # call if you changed properties
+     svn_recalc_textcontent_header(%$href); # call if you modified text content
+    }
+ }
+
+
+__END__

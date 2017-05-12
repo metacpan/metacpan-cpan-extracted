@@ -1,0 +1,32 @@
+---
+abstract: 'Store::CouchDB - a simple CouchDB driver'
+author:
+  - 'Lenz Gschwendtner <norbu09@cpan.org>'
+build_requires:
+  Scalar::Util: 0
+  Test::More: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.132661'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Store-CouchDB
+requires:
+  Any::Moose: 0
+  Carp: 0
+  Data::Dump: 0
+  Data::Printer: 0
+  JSON: 0
+  LWP::UserAgent: 0
+  Types::Serialiser: 0
+  URI::Escape: 0
+resources:
+  bugtracker: https://github.com/norbu09/Store-CouchDB/issues
+  homepage: https://github.com/norbu09/Store-CouchDB/wiki
+  repository: git://github.com/norbu09/Store-CouchDB.git
+version: 3.8

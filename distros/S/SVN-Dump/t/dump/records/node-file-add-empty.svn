@@ -1,0 +1,15 @@
+Node-path: trunk/empty.txt
+Node-kind: file
+Node-action: add
+Prop-content-length: 40
+Text-content-length: 0
+Text-content-md5: d41d8cd98f00b204e9800998ecf8427e
+Content-length: 40
+
+K 13
+svn:eol-style
+V 6
+native
+PROPS-END
+
+

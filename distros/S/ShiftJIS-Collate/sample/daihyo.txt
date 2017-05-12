@@ -1,0 +1,45 @@
+#!perl
+# a sample of kan'i daihyo yomi shogo
+
+use ShiftJIS::Collate;
+
+my @data = (
+  [qw/ ƒÉŒvŽZ   ‚ç‚Þ‚¾‚¯‚¢‚³‚ñ /],
+  [qw/ JIS”Ô†  ‚¶‚·‚Î‚ñ‚²‚¤   /],
+  [qw/ ˆÀ’B     ‚ ‚¾‚¿         /],
+  [qw/ ˆÀ“¡     ‚ ‚ñ‚Ç‚¤       /],
+  [qw/ ‰Í¼     ‚©‚³‚¢         /],
+  [qw/ ‰Í“à     ‚©‚í‚¿         /],
+  [qw/ Šp“c     ‚©‚­‚½         /],
+  [qw/ Šp“c     ‚©‚Ç‚½         /],
+  [qw/ ”@ŒŽ     ‚«‚³‚ç‚¬       /],
+  [qw/ KŽR     ‚±‚¤‚â‚Ü       /],
+  [qw/ ‰Í“à     ‚±‚¤‚¿         /],
+  [qw/ ²“¡     ‚³‚Æ‚¤         /],
+  [qw/ ²˜a“c   ‚³‚í‚¾         /],
+  [qw/ KŽR     ‚³‚«‚â‚Ü       /],
+  [qw/ ‘ò“‡     ‚³‚í‚µ‚Ü       /],
+  [qw/ ‘ò“c     ‚³‚í‚¾         /],
+  [qw/ àV“c     ‚³‚í‚¾         /],
+  [qw/ “yˆä     ‚Â‚¿‚¢         /],
+  [qw/ “y‹     ‚Â‚¿‚¢         /],
+  [qw/ ’Æˆä     ‚Â‚¿‚¢         /],
+  [qw/ Šp“c     ‚Â‚Ì‚¾         /],
+  [qw/ “yˆä     ‚Ç‚¢           /],
+  [qw/ “y‹     ‚Ç‚¢           /],
+  [qw/ “yŠò     ‚Æ‚«           /],
+  [qw/ ŒËˆä     ‚Æ‚¢           /],
+  [qw/ ŒË“c     ‚Æ‚¾           /],
+  [qw/ ˆÀ“c     ‚â‚·‚¾         /],
+);
+
+use ShiftJIS::CP932::MapUTF;
+
+$touni = sub { unpack('v', cp932_to_utf16(shift)) };
+
+@sort = ShiftJIS::Collate->new(
+    kanji => 3, tounicode => $touni
+  )->sortDaihyo(reverse @data);
+
+print "@$_\n" foreach @sort;
+

@@ -1,0 +1,10 @@
+Building depend1 with deps (my_prereq1, your_prereq1) and match (1)
+   $* is 1
+   $FOO is [The lazy cow]
+Building depend2 with deps (my_prereq2, your_prereq2) and match (2)
+   $* is 2
+   $FOO is [The lazy cow]
+Building depend3 with deps (my_prereq3, your_prereq3) and match (3)
+   $* is 3
+   $FOO is [The lazy cow]
+Building default with matches: 

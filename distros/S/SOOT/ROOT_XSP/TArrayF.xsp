@@ -1,0 +1,13 @@
+%module{SOOT};
+
+class TArrayF {
+  TArrayF(AV* array)
+    %code{%
+      size_t len;
+      Float_t* ary = SOOT::AVToFloatVec<Float_t>(aTHX_ array, len);
+      RETVAL = new TArrayF(len, ary);
+      free(ary);
+    %};
+  TArrayFloatArray GetArray();
+};
+

@@ -1,0 +1,10 @@
+Build.PL
+lib/SOAP/Transport/HTTP/Log4perl.pm
+lib/SOAP/Transport/HTTP/MockReplay.pm
+Changes
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+examples/client.pl
+examples/daemon.pl
+examples/Server.pm

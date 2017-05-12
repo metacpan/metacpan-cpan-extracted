@@ -1,0 +1,11 @@
+#!/usr/bin/ruby
+
+func f(a) {
+    const x = a;
+    x + 2;
+}
+
+assert_eq(f(40), 42)
+assert_eq(f(33), 35)
+
+say "** Test passed!"

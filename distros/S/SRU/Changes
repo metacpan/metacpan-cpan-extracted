@@ -1,0 +1,107 @@
+Revision history for perl module SRU
+
+1.01 2013-10-18
+ - Move POD tests to release testing (RT #89420)
+
+1.00 2013-01-22
+ - Add asURI() method to SRU::Request
+ - SRU::Request constructor now supports PSGI
+ - CQL error handling is now in CQL::Parser
+
+0.99 2009-12-02
+ - remove use of UNIVERSAL->import
+
+0.98 2009-11-20
+ - repackaged with a new version of Module::Install
+
+0.97 2008-03-05
+ - switched to Module::Install and repackaged
+
+0.96 2007-02-26
+ - repackaged -- no functional changes
+
+0.95 2006-10-21
+ - doc fixes
+
+0.94 2006-10-20
+ - removed dep on CGI::Application (it's only used for SRU::Server)
+ - converted Catalyst::Plugin::SRU to a controller base class
+
+0.93 2006-01-09
+ - added better cql diagnostics for servers (Walter Lewis)
+ - resolve possible method conflict in Catalyst plugin
+
+0.92 2005-12-15
+ - updated Catalyst plugin for Catalyst 5.5
+ - pod updates
+ - made SRU::Response::type() more generic
+ - added type() to SRU::Request
+ - use case sensitive names in Catalyst plugin to be consistent
+   with SRU::Server
+
+0.91 2005-10-05
+ - modified Response/SearchRetrieve.pm to
+    - always return version 1.1
+    - allow different encoding types
+    - send back extra response data
+  (thanks Xiaorong Xiang and Eric Lease Morgan of the ockham project)
+
+0.90 2005-09-01
+ - added pod test
+
+0.89 2005-08-09
+ - added Catalyst plugin
+ - added default namespaces
+
+0.88 2005-02-02
+ - added resultSetId and resultSetIdleTime to searchRetrieve output
+
+0.87 2005-02-01
+ - added ability to set numberOfRecords() in searchRetrieve request: 
+   thanks Bernd Diekmann
+
+0.86 2005-01-11
+ - removed diagnostic handling for explain responses that lack version and
+   operator
+ - fixed explain response to use <record> element properly
+
+0.85 2004-12-20
+ - added diagnostic when a default explain is returned when no operator was
+   specified
+
+0.8 2004-12-17
+ - renamed SRU::Application to SRU::Server
+
+0.7 2004-12-09
+ - new tests for exception handling
+ - newFromCGI() now forces ampersands in query string
+ - removed base parameter from request constructors since it wasn't used
+ - fixed nesting problem with <record> in explain response (thanks Eric Morgan)
+
+0.6 2004-12-06
+ - needed to add SRU::Application to the MANIFEST
+ - require CQL::Parser 0.3
+
+0.5 2004-12-04
+ - CGI::Application framework courtesy of Brian Cassidy (who now shares
+   ownership of this module).
+ - Updated Makefile.PL to include new dependencies.
+ - Explain is now the default response.
+ - Responses automatically have an echo section added to their XML when using 
+   the newFromRequest() factory method.
+ - searchRetrieve and scan requests parse CQL where appropriate using
+   CQL::Parser.
+
+0.4 2004-11-16
+ - doc fixes and tuneups from Brian Cassidy
+
+0.3 2004-09-05
+ - fixed SRU::Request::newFromCGI() and added test t/cgi.t
+ - fixed stylesheet handling in response objects
+ - fixed diagnostics handling
+
+0.2 2004-09-05
+ - updated docs
+
+0.1 2004-09-04
+ - initial release

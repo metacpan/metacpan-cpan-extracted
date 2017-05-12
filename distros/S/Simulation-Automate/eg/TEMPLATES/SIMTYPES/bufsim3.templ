@@ -1,0 +1,176 @@
+#!/usr/bin/perl -w
+use strict;
+
+# Template for bufsim3 automation via SynSim
+=cvs_headers
+W. Vanderbauwhede 01/08/2002
+$Id: bufsim3.templ,v 1.2 2002/10/01 14:10:22 wim Exp $
+=cut
+my $outfile=$ARGV[0];
+my $simname='bufsim3';
+
+my $npackets=_NPACK;
+my $nports=_NPORTS;
+my $dest0ratio=0.5;
+my $contention_prob=_CONTENTION_PROB;
+my $more_contention='//';
+if( $contention_prob!=0){
+ $dest0ratio=0.5*(1+sqrt(1-2*(1-$contention_prob)));
+$more_contention='';
+}
+my $nbufs=_NBUFS;
+my $buftype=_BUFTYPE;
+my $keep_order=_KEEP_ORDER;
+my $blocking=_BLOCKING;
+
+my $trafdist=_TRAFDIST;
+my $mingapwidth=_MINGW;
+my $meangapwidth=_MEANGW;
+
+my $pldist=_PLDIST;
+my $fract_min=_FRACT_MIN;
+my $unitpacketlength=_UNITPL;
+my $nbitsh=_NBITSH;
+my $nmax=_NMAX;
+my $nmed=_NMED;
+if($nmed==0){$nmed=int($nmax/exp(1))}
+# $nmed1 =552/40; $nmed2=576/40;
+
+my $minbufgap=_MINBGW;
+
+my $pop_size=_POP_SAMPLE; # to calculate AGV & STDEV
+my $statistics='//';
+if($pop_size>1){$statistics=''}
+my $seed=int(1e3+(rand 1e3*($pop_size+1)));
+my $hists=_HISTS;
+my $histsc=$hists?'':'//';
+my $verb=_VERBOSE;
+my $script_verb='//';
+my $verbc=$verb?'':'//';
+my $only_traffic=_ONLY_TRAFFIC;
+my $only_trafficc=$only_traffic?'':'//';
+my $samplingfreq=_SAMPL;
+my $maxpl=_AGGREGATE;
+my $aggregate = $maxpl?'':'//';
+#samplingperiod=10ps=1unit=> samplingfreq=100GHz=1unitpl=450 a.u.
+
+if($samplingfreq) {
+ $mingapwidth= int($mingapwidth*$samplingfreq/$unitpacketlength); # 50*8+50 bits, and a timestep is a bit
+ $meangapwidth= int($meangapwidth*$samplingfreq/$unitpacketlength); # 50*8+50 bits, and a timestep is a bit
+ $minbufgap=int($samplingfreq*$minbufgap/$unitpacketlength); # "gap" between head and tail of packet in circulating buffer
+ $maxpl= int($maxpl*$samplingfreq/$unitpacketlength); # 50*8+50 bits, and a timestep is a bit
+ $unitpacketlength=$samplingfreq; # 50*8+50 bits, and a timestep is a bit
+
+}
+my $bufl=($maxpl>$unitpacketlength*$nmax)?$maxpl+$mingapwidth:$unitpacketlength*$nmax+$mingapwidth;
+
+  if($script_verb eq '') {
+print  "#Start simulation\n";
+}
+my $start=time();
+
+my $header=<<"ENDH";
+
+// number of packets to be generated
+#define NPACK $npackets
+// number of ports
+#define NPORTS $nports
+#if NPORTS == 2
+$more_contention#define DEST0RATIO $dest0ratio
+#endif
+// traffic distribution type: Poisson, Pareto, Uniform
+#define TRAFDIST $trafdist
+// packet length distribution type: IP, uniform, Ethernet, all min, all max
+#define PLDIST $pldist
+// fraction of packets with min. length, for PLDIST=5
+#define FRACT_MIN $fract_min
+// number of buffers
+#define NBUFS $nbufs
+// type of buffer
+// 0: adjustable; 1: fixed length; 2: multi-exit
+#define BUFTYPE $buftype
+// the output mux of the buffer can be blocking or non-blocking
+#define BLOCKING $blocking
+// unit packet length  50*8+50 bits, and a timestep is a bit
+#define UNITPL $unitpacketlength
+// number of header bits
+#define NBITSH $nbitsh
+// max number of units
+#define NMAX $nmax
+// intermediate number of units
+#define NMED $nmed
+// minimum gap width
+#define MINGW $mingapwidth
+// "gap" between head and tail of packet in circulating buffer
+#define MINBGW $minbufgap
+#define MEANGW $meangapwidth
+// keep packet order
+#define KEEP_ORDER $keep_order
+// aggregate short packets into longer ones
+$aggregate#define AGGREGATE 
+// maximum length of aggregated packet
+#ifdef AGGREGATE
+#define MAXPL $maxpl
+#endif
+// length of fixed buffer
+#define BUFL $bufl
+//verbose or not
+$verbc#define VERBOSE
+// to analyse the generated traffic
+$only_trafficc#define ONLY_TRAFFIC
+// generate data for histograms
+$histsc#define HISTS
+// for statistics, changes srand() seed at every call
+$statistics#define STATS $seed
+// Mersenne Twister random generator or not
+#define MERSENNE_TWISTER
+ENDH
+  if($script_verb eq '') {
+print "Creating header file $simname.h ...\n";
+}
+open(HEADER,">$simname.h");
+print HEADER $header;
+close HEADER;  
+if($script_verb eq '') {
+print "Compiling $simname.cc ...\n";
+}
+#create makefile
+open(MF,'>Makefile');
+
+print MF <<"ENDMF";
+# Simple makefile for $simname
+# Follow GNU conventions
+CXX = g++
+CXXFLAGS = -I/usr/include/g++-3
+objects = ../SOURCES/MTrandomgen.o $simname.o
+
+$simname : \$(objects)
+	\$(CXX) -o $simname \$(objects)
+
+$simname.o : $simname.h 
+
+MTrandomgen.o : ../SOURCES/MTrandomgen.h
+
+.PHONY : clean
+clean : 
+	rm -f $simname.o 
+ENDMF
+
+#system("make");
+
+unlink $simname;
+system("g++ -o $simname $simname.cc");
+
+if($script_verb eq '') {
+  print "Running $simname ...\n";
+}
+system("./$simname | tee $outfile");
+
+my $stop=time();
+  if($script_verb eq '') {
+print "\n";
+print  "#Finished simulation\n";
+print  "#Elapsed time: ",$stop-$start,"s\n";
+}
+#------------------------------------------------------------------------------
+

@@ -1,0 +1,27 @@
+Revision history for String::MkPasswd
+
+0.05  Sun Oct 20 05:24:38 PDT 2013
+    - Added option to disallow ambiguious characters in passwords (thanks
+      Jacob Rose) <https://github.com/sirhc/string-mkpasswd/pull/1>.
+
+0.04  Fri Aug 17 17:45:59 PDT 2012
+    - Use Dist::Zilla <https://rt.cpan.org/Ticket/Display.html?id=78952>
+
+0.03  Sun Oct 17 22:27:20 PDT 2010
+    - Documentation fix for the --nospecial option in mkpasswd.pl.
+      <https://rt.cpan.org/Ticket/Display.html?id=50183>
+    - Removed MANIFEST.SKIP and RPM spec files.
+    - Added Build.PL, cleaned up Makefile.PL and README.
+
+0.02  Wed Mar 17 08:17:10 PST 2004
+    - Applied changes from Adrian Gee <adrian.gee@anu.edu.au> allowing -minnum,
+      -minlower, -minupper and -minspecial to be zero in the call to
+      mkpasswd().
+    - Fixed mkpasswd.pl so it actually works.  It was passing the wrong key
+      names to mkpasswd(), so the defaults were always used.
+    - Added --no{num,lower,upper,special} options to mkpasswd.pl as
+      alternatives to --min{num,lower,upper,special}=0.
+
+0.01  Wed Nov 12 17:29:08 2003
+    - original version; created by h2xs 1.23 with options
+        --compat-version=5.6.1 --omit-autoload --omit-XS --name=String::MkPasswd --use-new-tests

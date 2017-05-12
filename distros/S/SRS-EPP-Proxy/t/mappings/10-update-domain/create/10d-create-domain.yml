@@ -1,0 +1,37 @@
+description: set up domain to use a handle
+registrar: 1
+
+
+request: |-
+ <NZSRSRequest VerMajor="4" VerMinor="4" RegistrarId="100">
+   <HandleCreate Email="Loopdigga@handlethis-orz.co.te" ActionId="[% actionid %] 1" HandleId="10d" Name="FooBar">
+       <PostalAddress
+                Address1="1400 E 8 Mile Rd"
+                Address2="Highland Park"
+                City="Detroit"
+                Province="Michigan"
+                CountryCode="US"
+                PostalCode="48203"
+                />   
+        <Phone
+            AreaCode="4"
+            CountryCode="64"
+            LocalNumber="Registrant phone s1c1"
+            />
+  </HandleCreate>
+  <DomainCreate Delegate="1" DomainName="updatable.co.te" Term="1" ActionId="[% actionid %] 2">
+    <RegistrantContact HandleId="10d"/>
+    <AdminContact HandleId="10d"/>
+    <TechnicalContact HandleId="10d"/>
+    <NameServers>
+      <Server FQDN="ns1.everydns.net"/>
+      <Server FQDN="ns2.everydns.net"/>
+      <Server FQDN="ns3.everydns.net"/>
+      <Server FQDN="ns4.everydns.net"/>
+    </NameServers>
+  </DomainCreate>
+ </NZSRSRequest>
+
+
+assertions:
+ - xpath_matches: [ '//Error', '0', 'No errors' ]

@@ -1,0 +1,10 @@
+#!/usr/bin/perl
+use Synapse::MailSender;
+use warnings;
+use strict;
+
+my $tmpl = $ENV{XML_FILE}  || shift || die "usage: $0 <xml-template> <yaml-file>";
+my $file = $ENV{YAML_FILE} || shift || die "usage: $0 <xml-template> <yaml-file>";
+my $mail = Synapse::MailSender->new();
+$mail->loadxml($tmpl, $file);
+$mail->send(); 

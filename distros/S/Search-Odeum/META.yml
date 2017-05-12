@@ -1,0 +1,13 @@
+--- #YAML:1.0
+name:                Search-Odeum
+version:             0.02
+abstract:            Perl interface to the Odeum inverted index API.
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.32
+distribution_type:   module
+requires:     
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Tomohiro IKEBE <ikebe@shebang.jp>

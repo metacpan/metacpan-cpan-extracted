@@ -1,0 +1,74 @@
+SMS::AQL  README
+===========================
+
+SMS::AQL is a simple module which provides a clean
+object-oriented interface to allow sending of SMS text messages
+to mobile phones using the HTTP gateway from AQL (www.aql.com).
+
+In order to use AQL's gateway, you will need to get an account
+with them (free), and purchase some credits (not free obviously).
+
+Note, I have no connection to AQL other than being a user of their
+services.  I started writing this module for myself, then thought 
+I should do the Right Thing and release it to CPAN.
+
+I contacted AQL to discuss doing this and ask for some test SMS
+credits to assist with testing the module, and they were most
+helpful - thanks guys, you're a top company :)
+
+
+INSTALLATION
+
+To install this module use the standard routine:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  LWP
+
+
+PROXY SUPPORT
+
+If you provide a proxy setting in the options when instantiating the object,
+it will be passed through to LWP.  If the proxy requires authentication, then
+supply the username and password in the proxy URL, like so:
+
+ http://user:pass@host:port/
+ 
+If you don't need a username and password, leave them out.
+
+An example:
+
+my $sms = new SMS::AQL({
+    username => 'user',
+    password => 'pass',
+    options => {
+        proxy => 'http://user:pass@host:port/',
+    }
+});
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006-2007 by David Precious
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+THANKS
+
+ - to Adam Beaumount and the AQL team for their assistance
+ - to Ton Voon at Altinity (http://www.altinity.com/) for contributing
+   several improvements
+
+
+$Id$

@@ -1,0 +1,19 @@
+Revision history for SQ
+
+v0.0.5      2014-11-21
+    - Now exporting only $S.
+        - One variable and it's an uppercase one.
+        - Thanks to https://metacpan.org/author/MSTROUT for the feedback.
+
+v0.0.4      2014-02-02
+    - Fix =encoding directive in POD.
+
+v0.0.3      2014-01-31
+    - Minimum version of perl (CPANTS).
+
+v0.0.2      2013-12-05
+    - Convert from 'use parent Exporter' to 'use Exporter import'
+        - Thanks to Olivier Mengué.
+
+v0.0.1      2013-12-04
+    - First version, released on an unsuspecting world

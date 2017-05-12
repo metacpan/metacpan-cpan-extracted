@@ -1,0 +1,3 @@
+# Test the dependency "Extraneous input" warning
+
+target: { 'depend' }def

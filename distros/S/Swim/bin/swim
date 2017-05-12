@@ -1,0 +1,4 @@
+#!/usr/bin/perl
+
+use Swim::Command;
+Swim::Command->new(argv => \@ARGV)->run;

@@ -1,0 +1,8 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Silki::CLI::Export;
+
+Silki::CLI::Export->new_with_options()->run();

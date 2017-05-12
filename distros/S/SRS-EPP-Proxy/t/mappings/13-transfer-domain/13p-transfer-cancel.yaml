@@ -1,0 +1,16 @@
+template: transfer-domain.tt
+
+vars:
+  domain: stilton.co.te
+  op: cancel
+
+input_assertions:
+  class: SRS::EPP::Command::Transfer::Domain
+  match:
+    - [ '//domain:name', 'stilton.co.te', 'Domain correctly included in XML' ]
+
+output_assertions:
+  attr_is:
+    - [ '//epp:result', 'code', 2102, 'EPP: Correct response code' ]
+
+

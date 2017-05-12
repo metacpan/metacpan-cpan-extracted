@@ -1,0 +1,33 @@
+---
+abstract: 'run code on scope exit (with pure Perl fallback)'
+author:
+  - 'Lukas Mai <l.mai@web.de>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.56'
+  strict: '0'
+  warnings: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Scope-OnExit-Wrap
+no_index:
+  directory:
+    - t
+    - inc
+recommends:
+  Scope::OnExit: '0'
+requires:
+  Exporter: '0'
+  base: '0'
+  perl: '5.006000'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: git://github.com/mauke/Scope-OnExit-Wrap.git
+version: '0.02'

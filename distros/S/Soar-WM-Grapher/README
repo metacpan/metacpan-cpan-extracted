@@ -1,0 +1,53 @@
+NAME
+    Soar::WM::Grapher - Utility for creating graphs of Soar's working memory
+
+VERSION
+    version 0.02
+
+SYNOPSIS
+      use Soar::WM;
+      use Soar::WM::Grapher qw(wm_graph);
+      my $wm = Soar::WM->new(file=>'path/to/wme/dump');
+      my $wme_id = 'S1'; #name of WME to begin graph from
+      my $depth = 2; #number of levels to traverse during graphing
+      my $g = wm_graph($wm, $wme_id, $depth, layout => 'twopi', ratio => 'compress', overlap=>'scale');
+      $g->as_svg('wm_graph.svg');
+
+DESCRIPTION
+    This module can be used to create GraphViz representations of Soar
+    working memory.
+
+NAME
+    Soar::WM - Perl extension for representing Soar working memory given a
+    WME dump file
+
+METHODS
+  "wm_graph"
+    There are three required arguments: a Soar::WM object, the ID of the
+    working memory element to begin graphing from, and the depth to graph.
+    If the depth is 1, then only the specified element and its
+    attribute-value pairs will be graphed. 2 will also graph each of the
+    WMEs attached to the first node, and so on. The return value is a
+    GraphViz object. Any extra arguments passed to this function are passed
+    on to the GraphViz constructor; therefore, you can specify graphing
+    options such as layout, as seen in the synopsis above.
+
+TODO
+    I understand that GraphViz is deprecated in favor of GraphViz2. However,
+    I cannot cleanly install GraphViz2 on my own computer (it has a rather
+    large dependency list). When I can cleanly install GraphViz2, I'll
+    switch to that module.
+
+SEE ALSO
+    The "wm_graph" function accepts many optional arguments specified by the
+    GraphViz module.
+
+AUTHOR
+    Nathan Glenn <garfieldnate@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Nathan Glenn.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

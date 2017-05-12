@@ -1,0 +1,25 @@
+---
+abstract: 'Perl extension for reading MS Excel 2007 files;'
+author:
+  - 'Dmitry Ovsyanko <do@eludia.ru>'
+  - 'Mike Blackwell <mike.blackwell@rrd.com'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Spreadsheet-XLSX
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Archive::Zip: '1.18'
+  Spreadsheet::ParseExcel: '0'
+  Test::NoWarnings: '0'
+version: '0.15'

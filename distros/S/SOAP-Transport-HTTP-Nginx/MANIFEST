@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/SOAP/Transport/HTTP/Nginx.pm
+lib/XMLRPC/Transport/HTTP/Nginx.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+examples/xmlrpc-server-handler.pl
+examples/xmlrpc-client.pl
+META.yml                                 Module meta-data (added by MakeMaker)

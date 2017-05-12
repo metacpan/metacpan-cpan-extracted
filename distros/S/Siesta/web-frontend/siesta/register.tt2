@@ -1,0 +1,59 @@
+[% USE Siesta( 'action' => 'register') %]
+[% INCLUDE _header.tt2 %]
+
+[% IF Siesta.success;
+       PROCESS register_success_block;
+   ELSE;
+       IF Siesta.errors.size;
+           PROCESS _errors_list.tt2;
+       END;
+       PROCESS register_form_block;
+   END;
+%]
+[% INCLUDE _footer.tt2 %]
+
+[% BLOCK register_success_block %]
+You are now registered on the following lists:
+  <ul>
+  [% FOR list = Siesta.logged_in_user.lists %]
+    <li>[% list.name %]</li>
+  [% END %]
+  </ul>
+You will now be sent an email to the address you registered to
+confirm that you can receive emails at that address. In order to
+activate your account you must reply to that email. Usually just
+pressing 'reply' on your email client is sufficient. Full instructions
+are included in the email. If simply pressing 'reply' doesn't work,
+read the instructions in the mail.
+[% END %]
+
+[% BLOCK register_form_block %]
+<form action="register.tt2" method="POST">
+<table>
+  <tr>
+    <td>Email:</td>
+    <td><input type="text" size="25" name="email"></td>
+  </tr>
+  <tr>
+    <td>Password:</td>
+    <td><input type="password" size="25" name="pass1"></td>
+  </tr>
+  <tr>
+    <td>Password confirm:</td>
+    <td><input type="password" size="25" name="pass2"></td>
+  </tr>
+  <tr><td colspan="2"><hr></td></tr>
+  <tr>
+    <td colspan="2">You may subscribe to the following lists:(check at least one)</td>
+  </tr>
+  [% FOREACH list = Siesta.lists %]
+  <tr>
+    <td>[% list.name %]</td>
+    <td><input type="checkbox" name="subscribe" value="[% list.name %]"></td>
+  </tr>
+  [% END %]
+</table>
+<input type="hidden" name="submit" value="1">
+<input type="submit">
+</form>
+[% END %]

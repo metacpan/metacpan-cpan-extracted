@@ -1,0 +1,8 @@
+Revision history for Search-Tokenizer
+
+1.01  13.02.2013
+  - use Unicode::CaseFold for proper case-folding of terms
+  - unaccenter also unaccents uppercase chars if arg lower => 0
+
+1.00    Don't remember when
+

@@ -1,0 +1,17 @@
+Revision history for String-JS
+
+0.03    2016-03-11 (PERLANCAR)
+
+	- Replace JSON with JSON::MaybeXS.
+
+
+0.02    2014-07-25 (SHARYANTO)
+
+        - Add $mode option to encode_js_string() which can be set to 1 to
+          produce single-quoted JS string literal, or 2 to produce single-quoted
+          inside double-quoted JS string literal.
+
+
+0.01    2014-07-25 (SHARYANTO)
+
+        - First release.

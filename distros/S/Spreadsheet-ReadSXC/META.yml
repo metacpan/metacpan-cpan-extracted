@@ -1,0 +1,12 @@
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Spreadsheet-ReadSXC
+version:      0.20
+version_from: ReadSXC.pm
+installdirs:  site
+requires:
+    Archive::Zip:                  0
+    Test::More:                    0
+    XML::Parser:                   0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.12

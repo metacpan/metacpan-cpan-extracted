@@ -1,0 +1,17 @@
+# an enveloped result (described in Rinci::function) is a 1-4 element-length
+# array: [status, message, result, meta]
+
+# we can validate each element of the array with the 'elems' clause. each
+# element in the 'elems' clause is a schema that corresponds to the element of
+# the array.
+
+[array, {
+   min_len: 1,
+   elems: [
+     [int, {req: 1, between: [100, 555]}], # status
+     'str*',
+     any,
+     'hash*' # XXX actually a defhash, see hash-defhash.yaml
+   ]
+}]
+

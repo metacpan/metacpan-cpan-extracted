@@ -1,0 +1,9 @@
+#!perl -T
+
+use Test::More tests => 1;
+
+BEGIN {
+	use_ok( 'Sledge::Plugin::JSON' );
+}
+
+diag( "Testing Sledge::Plugin::JSON $Sledge::Plugin::JSON::VERSION, Perl $], $^X" );

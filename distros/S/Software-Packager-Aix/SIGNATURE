@@ -1,0 +1,34 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.21.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 af703b6dd48adcdf9b838d954df1669013b8187f Changes
+SHA1 6585a6053fc6fa167271e47ce8d8f58c9d0f58e1 LICENSE
+SHA1 64a64f6cbc9a8c9fd812e703234ba79bbde577f2 MANIFEST
+SHA1 2cbc986d47f9f54aaa37f7ae70fcb4c7e1ad8d48 Makefile.PL
+SHA1 a3fd793dd105e301619cb76215a6e118a89f6913 README
+SHA1 2f1485da3e6ed63baa0928f520ce29cb3b5b337f TODO
+SHA1 49dd9a1c77879213a110a56bc9f23791a96795cb lib/Software/Packager/Aix.pm
+SHA1 b9908cfd637ee2263b873bb5e6227cbfa30f1bd6 lib/Software/Packager/Object/Aix.pm
+SHA1 6bf667bc66b35d6456a994b5636335c21db4957d t/00_signature.t
+SHA1 89a2c647eb383a84dd38e0dc82ddb051c12e5be5 t/01_initialise.t
+SHA1 66ecd6d9dc313f473e29cae3d27f63d76ddf5e33 t/02_aix.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.0.7 (Darwin)
+
+iD8DBQE+Vai2kdale0dK2vIRAoILAKC2sXcNX8AeUwh4q7yuBMXRH2KpAwCgpBxw
+bZ+O2G7JX6Mtp7tbyfolejc=
+=AA/U
+-----END PGP SIGNATURE-----

@@ -1,0 +1,47 @@
+Revision history for Perl extension SGML::Parser::OpenSP.
+
+0.992  Sun Jun 29 20:00:00 2008
+	- added simple example script eg/xhtml1val.pl
+	- added LICENSE => 'perl' to Makefile.PL
+	- hopefully cleared executable bit on Makefile.PL
+	- Updated copyright/license documentation
+	- removed version number from README
+
+0.991  Thu Dec  6 07:25:00 2007
+	- added 20passfd.t, 21parsestring.t, 22mwarnings.t
+	- multi-arg options no longer have the last arg ignored
+	- http://rt.cpan.org/Ticket/Display.html?id=26791
+	  Added note to the README file about -dev packages.
+
+0.99  Wed Aug 30 17:00:00 2006
+	- fixed a bug in how parse_string handles encodings
+	- added parse_string tests
+	- added parse_string documentation
+	- added parse_string and pass_file_descriptor option
+	- fixed a bug in handling warnings(qw/multiple args/)
+	- added more sanity checks to typemap
+	- added tests using Pod::Test, fixed found issues.
+	- added tests using Pod::Test::Coverage, fixed found issues.
+
+0.98  Sat Oct 02 01:19:04 2004
+	- added more split_message tests
+	- fixed remaining typemap flaws
+	- added description for ::Tools POD
+	- better headings in OpenSP POD
+	- added documentation for p->split_message
+	- updated README to mention PPMs
+	- optimized UTF-32 transcoder
+	- improved performance through PERL_NO_GET_CONTEXT
+	- major memory management improvements
+	- fixed 0.02 release date in CHANGES
+	- updated map_catalog_document documentation
+	- updated restrict_file_reading documentation
+	- included -wxml warnings in the OpenSP.pm POD
+
+0.02  Wed Sep 22 22:22:22 2004
+	- complete rewrite; created by h2xs 1.23 with options
+		-A -O -c -n SGML::Parser::OpenSP --skip-ppport --skip-exporter -v 0.02 -b 5.8.0
+
+0.01  Mon Mar 17 00:57:04 2003
+	- original version; created by h2xs 1.22 with options
+		-A -n SGML::Parser::OpenSP

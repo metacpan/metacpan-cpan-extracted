@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!DOCTYPE NZSRSResponse SYSTEM "protocol.dtd">
+<NZSRSResponse VerMajor="5" VerMinor="3">
+<Response Action="GetMessages" FeId="4" FeSeq="2995544" OrigRegistrarId="922" RecipientRegistrarId="922" Rows="1">
+<FeTimeStamp Day="7" Hour="16" Minute="05" Month="9" Second="32" TimeZoneOffset="+12:00" Year="2010"/>
+<Message Remaining="1">
+<Response Action="DomainUpdate" FeId="4" FeSeq="2995406" OrigRegistrarId="922" RecipientRegistrarId="922" Rows="0" TransId="contact update W-1283729612 2 (Auto-generated)">
+<FeTimeStamp Day="7" Hour="15" Minute="40" Month="9" Second="57" TimeZoneOffset="+12:00" Year="2010"/>
+</Response>
+</Message>
+</Response>
+</NZSRSResponse>

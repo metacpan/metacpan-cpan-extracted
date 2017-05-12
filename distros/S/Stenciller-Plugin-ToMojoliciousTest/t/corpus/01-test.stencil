@@ -1,0 +1,11 @@
+== stencil ==
+
+--input--
+    %= link_to 'Example', 'http://www.example.com/'
+    %= form_for '01_test_1'
+--end input--
+
+--output--
+    <a href="http://www.example.com/">Example</a>
+    <form action="/01_test_1"></form>
+--end output--

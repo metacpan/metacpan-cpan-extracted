@@ -1,0 +1,30 @@
+Sort::Merge -- When you need to merge sort.  Anything.  And do
+anything with it.
+
+Merge sorting is a technique for merging together multiple input
+streams, each of which is sorted, into one larger output stream, still
+sorted.  This module implements that algorithm.
+
+Note the large caveat above: the inputs must already be sorted.  If
+the inputs aren't sorted, you'll need to sort them yourself first, in
+which case a merge sort may not be the right algorithm for the job.
+
+Sort::Merge was designed to give you, the programmer, control over
+where your data comes from, and where it goes -- it's simply supposed
+to sort it, and not fetch it from files, parse out sort keys, etc,
+etc.  There's at least one merge-sorting module already on CPAN,
+File::MergeSort, but I wanted one that I could use to sort together
+multiple files that were of different formats, and not line-oriented
+formats either.
+
+The module I got out doesn't even require that the inputs are files at
+all, or that the output gets printed.  It also streams the output, so
+you needn't wait until the sort is complete before printing the first
+piece of output.  (The fact that this is possible at all is one of
+more useful properties of merge sorts vs. other sorts.)
+
+Most (OK, at the moment all) of the available interfaces require you to
+write your input and output handlers in terms of coderefs.  If this is
+too much work for you, I encourage you to not use this module, or,
+alternatively, to propose another interface to me.  I'm actively
+looking for more and better interfaces.

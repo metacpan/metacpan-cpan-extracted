@@ -1,0 +1,29 @@
+---
+abstract: 'create JSON with graph data for Status Board iPad App'
+author:
+  - 'Ivan Bessarabov <ivan@bessarabov.ru>'
+build_requires:
+  Test::JSON: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: StatusBoard-Graph
+requires:
+  Carp: 0
+  Clone: 0
+  File::Slurp: 0
+  JSON: 0
+  strict: 0
+  utf8: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/bessarabov/StatusBoard-Graph/issues
+  homepage: https://github.com/bessarabov/StatusBoard-Graph
+  repository: https://github.com/bessarabov/StatusBoard-Graph.git
+version: 1.0.1

@@ -1,0 +1,41 @@
+8
+
+dir
+860
+file:///usr/local/svn/trunk/dev/SETI-Drake/lib/SETI
+file:///usr/local/svn
+
+
+
+2007-12-01T05:31:45.524824Z
+760
+gene
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+c1b538e3-2b64-dc11-b5f0-00a0c9f4958b
+
+Drake.pm
+file
+868
+
+
+
+2008-04-20T07:24:28.000000Z
+1ed8fec0194abc6a14f9ffe235c16871
+2008-04-20T07:24:28.057189Z
+868
+gene
+has-props
+

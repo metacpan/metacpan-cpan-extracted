@@ -1,0 +1,12 @@
+1..2
+not ok 1 - jefferson.ok
+#   Failed test 'jefferson.ok'
+#          got: 'Bad
+# '
+#     expected: ''
+not ok 2 - madison.ok
+#   Failed test 'madison.ok'
+#          got: 'Bad
+# '
+#     expected: ''
+# Looks like you failed 2 tests of 2.

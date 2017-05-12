@@ -1,0 +1,148 @@
+=head1 NAME
+
+Sub::Curry::Cookbook
+
+
+=head1 DESCRIPTION
+
+This is the cookbook for L<Sub::Curry>.
+
+
+=head1 GOOD THINGS TO KNOW
+
+=over
+
+=item * C<< $self->$subref(...) >>
+
+This is valid Perl and calls C<$subref> directly without looking at C<$self>. I.e. it does C<< $subref->($self, ...) >>. See L<perlop/"The Arrow Operator">.
+
+=item * C<< $self->can($method) >>
+
+C<UNIVERSAL::can()> returns a code reference if used as a method and the method named as first argument was found. See L<perlobj/"Default UNIVERSAL methods">.
+
+=back
+
+
+=head1 RECIPES
+
+=head2 Right-curring
+
+Problem: You want to right-curry a function.
+
+Solution: See L</"Add trailing spice"> elsewhere in this cookbook.
+
+=head2 Name a curried subroutine
+
+Problem: You want to use a curried subroutine like a named function or method.
+
+Solution:
+
+    *name = $curried;
+
+or directly
+
+    *name = curry(...);
+
+See L<perldata/"Typeglobs and Filehandles">.
+
+You may want to use L<Sub::Name> if your source subroutine is anonymous.
+
+=head2 Convert function to method
+
+Problem: You want to call a function as a method
+
+Solution:
+
+    my $func = \&foo;
+    my $method = curry($func, ANTISPICE);
+    $self->$method(@args);
+
+Discussion: The antispice removes the callee, i.e. the LHS of the arrow operator, making it work just like a function call.
+
+=head2 Convert method to function
+
+Problem: You want to use a method like a plain function.
+
+Solution:
+
+    my $method = 'foo';
+    my $func = curry($self->can($method), $self);
+    $func->(@args);
+
+Discussion: C<$func> now has C<$self> as first object argument. This is handy when wanting to have methods in dispatch tables. Be aware though that the same object will be used when C<< $func->() >> is called, even if C<$self> is another object later.
+
+Note that the second argument to C<&curry> can be anything and not necessarily C<$self>.
+
+=head2 Curry a method
+
+Problem: You want a method to be curried.
+
+Solution:
+
+    my $method = 'foo';
+    my $curried_method = curry($self->can($method), HOLE, @spice);
+    $self->$curried_method(@args);
+
+Discussion: This just leaves a hole for the object.
+
+=head2 Add spice after a hole in a curried subroutine.
+
+Problem: You have a hole in your curried subroutine but want to add more spices after or fill out holes after your first hole.
+
+Solution: Assuming no special spice before the first hole:
+
+    my $curried2 = $curried->new(HOLE, @spice);
+
+Discussion: You simply put a hole in the hole. There's not much to it.
+
+=head2 Add trailing spice
+
+Problem: You want to add spice to the end of the argument list where the argument list is of unknown length.
+
+Solution:
+
+    my $curried = curry($func, @spice, BLACKHOLE, @trailing_spice);
+
+Discussion: Nothing special here, just a demonstration of how a blackhole works.
+
+=head2 Add trailing spice to a curried subroutine with a blackhole in it.
+
+Problem: You have a curried subroutine that you want to spice up some more and place the spice at the end. The problem is that there's a blackhole that slurps the spice placing where it's not intended. You still want the blackhole to exist after you added the new spice.
+
+Solution: Assuming there's no special spice in C<$curried> before the blackhole:
+
+    my $curried2 = $curried->new(BLACKHOLE, WHITEHOLE, @spice);
+
+Discussion: This is similar to L</"Add spice after a hole">. By giving the blackhole another blackhole, you have two successive blackholes, the first newly added and the second the one that added the new. The whitehole is then removes the B<second> blackhole -- the blackhole doing the inserting. The spice is then added like usual, yet a blackhole exists at the right place.
+
+=head2 Append spice without it being processed at all.
+
+Problem: You have a curried subroutine in C<$curried> that may have special spices in it. You want to add more spices. You do not want the new spice to be processed as an application on the old spice. You just want to append more spice.
+
+Solution:
+
+    my $curried2 = curry(
+        $curried->uncurried,
+        $curried->spice,
+        @spice
+    );
+
+or
+
+    my $curried2 = Sub::Curry::->new(
+        $curried->uncurried,
+        $curried->spice,
+        @spice
+    );
+
+Discussion: Since new spice will be processed if you try to use the second form of C<&new> you need to manually pull out the original subroutine and the applied spice. Then you curry the original subroutine but with the new spice added to the spice list.
+
+
+=head1 AUTHOR
+
+Johan Lodin <lodin@cpan.org>
+
+
+=head1 COPYRIGHT
+
+Copyright 2004 Johan Lodin. All rights reserved.

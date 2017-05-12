@@ -1,0 +1,11 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         SOAP-Data-ComplexType
+version:      0.044
+version_from: lib/SOAP/Data/ComplexType.pm
+installdirs:  site
+requires:
+    SOAP::Data::Builder:           0.8
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

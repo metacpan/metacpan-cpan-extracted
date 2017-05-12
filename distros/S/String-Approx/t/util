@@ -1,0 +1,42 @@
+sub t {
+    my ($a, $b) = @_;
+    my ($wa, $wb, $db);
+
+    my $fail = 0;
+
+    foreach (@$a) { chomp }
+    foreach (@$b) { chomp }
+
+    my @oa = @$a;
+    my @ob = @$b;
+
+    if (@$a == @$b) {
+	for $wa (@$a) {
+	    $wb = shift(@$b);
+	    $db = defined $wb;
+	    if ($db) {
+	        $wa =~ s/^\s+//;
+	        $wa =~ s/\s+$//;
+	        $wb =~ s/^\s+//;
+	        $wb =~ s/\s+$//;
+	        $wa =~ s/\n//g;
+	        $wb =~ s/\n//g;
+	    }
+	    if (not $db or $wa ne $wb) {
+		print STDERR "# ne: $wa $wb\n";
+		$fail = 1;
+		last;
+	    }
+	}
+    } else {
+	print STDERR "# !=: ", scalar @$a, " ", scalar @$b, "\n";
+	$fail = 1;
+    }
+    if ($fail) {
+	print STDERR "# EXPECTED: @oa\n";
+	print STDERR "# GOT:      @ob\n";
+    }
+    return !$fail;
+}
+
+1;

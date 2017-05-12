@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns="http://usefulinc.com/ns/doap#">
+
+  <Project>
+    <name>Shell::Base</name>
+    <created>2003-01-22</created>
+
+    <shortdesc xml:lang="en">
+      A generic class to build line-oriented command interpreters.
+    </shortdesc>
+
+    <description xml:lang="en">
+      Shell::Base is a base class designed for building command line
+      programs.  It defines a number of useful defaults, simplifies
+      adding commands and help, and integrates well with
+      Term::ReadLine.
+    </description>
+
+    <!-- License(s) -->
+    <license rdf:resource="http://usefulinc.com/doap/licenses/GPL"/>
+    <license rdf:resource="http://usefulinc.com/doap/licenses/Artistic"/>
+
+    <!-- Community resources -->
+    <homepage rdf:resource="http://search.cpan.org/dist/Shell-Base/"/>
+    <bug-database rdf:resource="https://rt.cpan.org/NoAuth/Bugs.html?Dist=Shell-Base"/>
+
+    <!-- Project maintainer -->
+    <maintainer>
+      <foaf:Person>
+        <foaf:name>Darren Chamberlain</foaf:name>
+        <foaf:mbox_sha1sum>d7b9cda719128fd2a792230ef6cbec0d1d08a6f7</foaf:mbox_sha1sum>
+      </foaf:Person>
+    </maintainer>
+
+    <!-- Source code type and location -->
+    <programming-language>Perl</programming-language>
+
+    <Repository>
+      <CVSRespository>
+        <anon-root>:pserver:anonymous@cvs.sourceforge.net:/cvsroot/sevenroot</anon-root>
+        <anon-module>Shell-Base</anon-module>
+      </CVSRespository>
+    </Repository>
+
+    <download-page rdf:resource="http://search.cpan.org/dist/Shell-Base/"/>
+    <download-mirror rdf:resource="http://www.cpan.org/modules/by-module/Shell/"/>
+
+    <!-- Releases -->
+    <release>
+      <Version>
+        <created>2003-01-22</created>
+        <revision>0.01</revision>
+      </Version>
+    </release>
+
+    <release>
+      <Version>
+        <created>2004-01-05</created>
+        <revision>0.04</revision>
+      </Version>
+    </release>
+
+    <release>
+      <Version>
+        <created>2004-09-21</created>
+        <revision>0.05</revision>
+      </Version>
+    </release>
+
+  </Project>
+</rdf:RDF>

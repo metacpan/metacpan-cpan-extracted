@@ -1,0 +1,7 @@
+^\.gitignore$
+^\.git/
+^Makefile$
+pm_to_blib
+^blib/
+^\.[^/]*\.swp$
+/\.[^/]*\.swp$

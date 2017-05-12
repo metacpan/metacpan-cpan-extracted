@@ -1,0 +1,12 @@
+Revision history for String-PerlQuote
+
+0.02    2016-10-07 (PERLANCAR)
+
+        - No functional changes.
+
+        - Fix grammar in Abstract (thanks FGasper).
+
+
+0.01    2014-12-10 (PERLANCAR)
+
+        - First release. Split from SHARYANTO-String-Util.

@@ -1,0 +1,29 @@
+0.99 2014-09-30 XAERXESS
+
+ - Added LICENSE file to MANIFEST (it was missing in 0.98 tarball)
+ - Cleaned up README
+
+0.98 2014-09-30 XAERXESS
+
+ - Removed undocumented behavior when binary_search was invoked in list
+   context (RT #58234)
+ - Added LICENSE file
+ - Mentioned List::BinarySearch::XS and removed TODO
+
+0.97 2014-09-30 XAERXESS
+
+ - Grzegorz Rożniecki (XAERXESS) has taken over maintenance
+ - Added deprecation notice and suggested using List::BinarySearch
+ - Changed default $size param value to 0 (RT #58233)
+   (previously it defaulted to 512 and caused sequential search)
+ - Fixed possible integer overflow (RT #19862)
+ - Fixed typo in documentation (RT #58143)
+ - Added tests for maintaining compatibility with List::BinarySearch
+ - Updated revision history in Changes (as per CPAN::Changes::Spec)
+ - Cleaned up documentation
+ - Moved Binary.pm to lib/Search/Binary.pm
+ - Tweaked Makefile.PL
+
+0.95 1998-12-15
+
+ - Initial public release

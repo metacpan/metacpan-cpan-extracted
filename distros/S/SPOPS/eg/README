@@ -1,0 +1,151 @@
+README: SPOPS/eg
+========================================
+
+This directory contains sample SPOPS code and classes you can use for
+users, groups and security, along with sample scripts to test them
+out. You can use these as you like. It will run without any
+modifications if you use DBD::SQLite.
+
+Note that if you create a database, run the data stocking script and
+then clear the data out, the security data won't match up properly. In
+particular, the ID of the group 'managers' (3) is hardcoded into both
+My/Group.pm and My/User.pm. You might need to change it.
+
+How to use these:
+
+ (1) Either pick a database to use or create a new one
+
+ (2) Create the schema -- this is dependent on your database. An
+ example is:
+
+ $ mysql --user=test --password=dingdong test < users_groups_mysql.sql
+
+ SQLite users can run:
+
+ $ perl users_groups_sqlite.pl
+
+ (3) Set the parameters in My/Common.pm for your database and
+ driver. The parameters are preconfigured for a DBD::SQLite setup.
+
+ (4) Run the user and group stocking script:
+
+ $ perl stock_user_group.pl
+
+ (5) Check out the raw data to see what it looks like:
+
+ $ mysql --user=test --password=dingdong test
+ mysql> select * from spops_user;
+ ...
+ mysql> select * from spops_security;
+
+ (6) Check out what SPOPS thinks the data should look like:
+
+ $ perl fetch_all.pl
+
+ (7) Run the doodad stocking script:
+
+ $ perl stock_doodads.pl
+
+ (8) Run the simple fetching script:
+
+ $ perl fetch_doodads.pl
+
+ (9) Export the data to an SPOPS-importable format:
+
+ $ perl export_doodads.pl
+
+ (10) Export the data to an XML format:
+
+ $ perl export_doodads.pl xml
+
+ (11) Import some data from an SPOPS-portable format:
+
+ $ perl import_doodads.pl
+
+ (12) Dump it back out to see what happened:
+
+ $ perl export_doodads.pl
+
+ (13) Clear out the tables and do it all again, playing around with the
+ different scripts and classes.
+
+ $ mysql--user=test --password=dingdong test < users_groups_clear.sql
+
+ SQLite users can just delete the file 'sqlite_test.db'.
+
+
+Logging:
+
+ Your actions are logged! Since SPOPS now uses Log::Log4perl you can
+ play with this a bit. Modify the file 'log4perl.conf' in this
+ directory and watch 'spops_eg.log' (also in this directory) to see
+ what happens. There's no harm in deleting the log.
+
+
+Schema files:
+
+ users_groups_(mysql|pgsql|tsql|oracle).sql
+     - SQL to create the user, group and linking tables. Three
+     separate files for MySQL (mysql), PostgreSQL (pgsql), Oracle
+     (oracle), and Transact-SQL-based databases like Sybase ASE,
+     Sybase ASA or Microsoft SQL Server (tsql).
+
+ users_groups_sqlite.pl
+     - Script to create the various tables.
+
+ users_groups_clear.sql
+     - SQL to clear out the tables (mysql and tsql)
+
+ users_groups_clear_pgsql.sql
+     - Extra SQL to clear out sequences and tables from PostgreSQL.
+
+ users_groups_clear_oracle.sql
+     - Extra SQL to clear out sequences and tables from Oracle.
+
+Scripts to manipulate the objects:
+
+ stock_user_group.pl
+     - add some sample user/group data
+
+ stock_doodads.pl
+     - add sample objects
+
+ fetch_all.pl
+     - dump a summary of everything
+
+ fetch_doodads.pl
+     - fetch sample objects as two different users, displaying
+     different security settings for each
+
+ export_doodads.pl
+     - export the doodads in the database to STDOUT
+
+ import_doodads.pl
+     - import some more doodads
+
+
+Object classes:
+
+ My/Common.pm
+     - common parents for the My::* hierarchy. You'll need to set a
+     few values here so the objects know what database they are
+     connecting to and how they'll connect.
+
+ My/CommonResources.pm
+     - holds the shared database connection, current user/group. You
+     don't need to edit anything here.
+
+ My/Doodad.pm
+     - sample dummy object
+
+ My/Group.pm
+     - sample group object
+
+ My/Security.pm
+     - sample security object
+
+ My/User.pm
+     - sample user object
+
+========================================
+$Id: README,v 3.2 2004/01/10 02:49:58 lachoy Exp $

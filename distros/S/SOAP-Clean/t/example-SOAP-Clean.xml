@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:server="cgifile:./soap-server.cgi" targetNamespace="cgifile:./soap-server.cgi">
+  <types>
+    <xsd:schema elementFormDefault="qualified" targetNamespace="cgifile:./soap-server.cgi">
+      <xsd:element name="Call">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="0" maxOccurs="1" name="w">
+              <xsd:complexType mixed="true">
+                <xsd:sequence>
+                  <xsd:any/>
+                </xsd:sequence>
+              </xsd:complexType>
+            </xsd:element>
+            <xsd:element minOccurs="0" maxOccurs="1" name="y" type="xsd:string"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="x" type="xsd:base64Binary"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="CallReply">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="0" maxOccurs="1" name="result" type="xsd:int"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="out2">
+              <xsd:complexType mixed="true">
+                <xsd:sequence>
+                  <xsd:any/>
+                </xsd:sequence>
+              </xsd:complexType>
+            </xsd:element>
+            <xsd:element minOccurs="0" maxOccurs="1" name="out1" type="xsd:base64Binary"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="Spawn">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="0" maxOccurs="1" name="w">
+              <xsd:complexType mixed="true">
+                <xsd:sequence>
+                  <xsd:any/>
+                </xsd:sequence>
+              </xsd:complexType>
+            </xsd:element>
+            <xsd:element minOccurs="0" maxOccurs="1" name="y" type="xsd:string"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="x" type="xsd:base64Binary"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="SpawnReply">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="0" maxOccurs="1" name="uid" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="Running">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="0" maxOccurs="1" name="uid" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="RunningReply">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="0" maxOccurs="1" name="is_running" type="xsd:boolean"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="Results">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="0" maxOccurs="1" name="uid" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="ResultsReply">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="0" maxOccurs="1" name="result" type="xsd:int"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="out2">
+              <xsd:complexType mixed="true">
+                <xsd:sequence>
+                  <xsd:any/>
+                </xsd:sequence>
+              </xsd:complexType>
+            </xsd:element>
+            <xsd:element minOccurs="0" maxOccurs="1" name="out1" type="xsd:base64Binary"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </types>
+  <message name="CallRequest">
+    <part name="parameters" element="server:Call"/>
+  </message>
+  <message name="CallResponse">
+    <part name="parameters" element="server:CallReply"/>
+  </message>
+  <message name="SpawnRequest">
+    <part name="parameters" element="server:Spawn"/>
+  </message>
+  <message name="SpawnResponse">
+    <part name="parameters" element="server:SpawnReply"/>
+  </message>
+  <message name="RunningRequest">
+    <part name="parameters" element="server:Running"/>
+  </message>
+  <message name="RunningResponse">
+    <part name="parameters" element="server:RunningReply"/>
+  </message>
+  <message name="ResultsRequest">
+    <part name="parameters" element="server:Results"/>
+  </message>
+  <message name="ResultsResponse">
+    <part name="parameters" element="server:ResultsReply"/>
+  </message>
+  <message name="Fault">
+    <part name="faultmess" type="xsd:string"/>
+  </message>
+  <portType name="soap_serverPortType">
+    <operation name="Call">
+      <input message="server:CallRequest"/>
+      <output message="server:CallResponse"/>
+    </operation>
+    <operation name="Spawn">
+      <input message="server:SpawnRequest"/>
+      <output message="server:SpawnResponse"/>
+    </operation>
+    <operation name="Running">
+      <input message="server:RunningRequest"/>
+      <output message="server:RunningResponse"/>
+    </operation>
+    <operation name="Results">
+      <input message="server:ResultsRequest"/>
+      <output message="server:ResultsResponse"/>
+    </operation>
+  </portType>
+  <binding name="soap_serverBinding" type="server:soap_serverPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <operation name="Call">
+      <soap:operation soapAction="cgifile:./soap-server.cgi#Call" style="document"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+    </operation>
+    <operation name="Spawn">
+      <soap:operation soapAction="cgifile:./soap-server.cgi#Spawn" style="document"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+    </operation>
+    <operation name="Running">
+      <soap:operation soapAction="cgifile:./soap-server.cgi#Running" style="document"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+    </operation>
+    <operation name="Results">
+      <soap:operation soapAction="cgifile:./soap-server.cgi#Results" style="document"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+    </operation>
+  </binding>
+  <service name="soap_server">
+    <documentation>WSDL File for soap_server</documentation>
+    <port name="soap_serverPort" binding="server:soap_serverBinding">
+      <soap:address location="http://quimby-lx.cs.cornell.edu:80/cgi-bin/stodghil/printenv.cgi"/>
+    </port>
+  </service>
+</definitions>

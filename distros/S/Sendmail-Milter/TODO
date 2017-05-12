@@ -1,0 +1,10 @@
+TODO
+----
+o Init several interpreters at startup.
+
+o Interpreter pool manager that cleans up the number of interpreters back down
+  to the minimum if the system is idle.
+
+o Forking interpreters with IPC instead of threaded. (Since perlthreads are
+  becoming more stable, this should become less relevant down the road)
+

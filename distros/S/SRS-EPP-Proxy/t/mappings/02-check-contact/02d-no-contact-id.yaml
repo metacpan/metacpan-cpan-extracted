@@ -1,0 +1,17 @@
+template: check-contact.tt
+
+vars:
+  contact_ids:
+    - ''
+
+input_assertions:
+  count:
+    - [ '//contact:id', 1, 'Initial EPP: Four contacts to check' ]
+
+output_assertions:
+  count:
+    - [ '//epp:resData', 0, 'EPP: No resData in the response' ]
+  match:
+    - [ '//epp:reason', 'XML Schema validation error at /epp/command/check/contact:check/contact:id; bad value ''''', 'Correct reason' ]
+  attr_is:
+    - [ '//epp:result', 'code', 2004, 'EPP: Error returned' ]

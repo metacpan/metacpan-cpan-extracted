@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                SOAP-Transport-HTTP-Nginx
+version:             0.01
+abstract:            transport for nginx (L<http://nginx.net/>) http server for SOAP::Lite module.
+license:             perl
+author:              
+    - Alexander Soudakov <cygakoB@gmail.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    SOAP::Transport::HTTP:         0
+    Test::More:                    0
+    XMLRPC::Transport::HTTP:       0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

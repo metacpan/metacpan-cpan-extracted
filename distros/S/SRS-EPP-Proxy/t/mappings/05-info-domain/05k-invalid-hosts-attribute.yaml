@@ -1,0 +1,15 @@
+# Test info domain where hosts attribute is set to something invalid
+template: info-domain.tt
+
+vars:
+  domain_name: cheese123.co.te
+  hosts: blah
+  pw:
+
+output_assertions:
+  count:
+  match:
+    - [ '//epp:reason', 'XML Schema validation error at /epp/command/info/domain:info/domain:name; invalid value of attribute hosts', 'EPP: correct reason' ]
+  match_all:
+  attr_is:
+    - [ '//epp:result', 'code', 2004, 'EPP: command failed' ]

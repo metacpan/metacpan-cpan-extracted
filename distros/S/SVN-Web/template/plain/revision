@@ -1,0 +1,54 @@
+<div class="title">
+[%|l(rev)%]revision %1[%END%] - [% author || '(no author)' %] - [% date %]:<br />
+</div>
+<p>
+[% msg | log_msg %]
+</p>
+[% FOREACH path = paths %]
+[% path.value.action %] -
+[% IF path.value.isdir %]
+        [% IF path.value.action == 'D' %]
+          [% path.key %]
+        [% ELSE %]
+          <a href="[% script %]/[% repos | uri %]/browse[% path.key | url %]/?rev=[% rev %]">[% path.key %]</a>
+          [% IF path.value.copyfrom %]
+            <a href="[% script %]/[% repos | uri %]/browse[% path.value.copyfrom | url %]/?rev=[% path.value.copyfromrev %]">[%|l(path.value.copyfrom, path.value.copyfromrev)%](from %1:%2)[%END%]</a>
+          [% END %]
+        [% END %]
+
+[% ELSE %]
+[% IF path.value.action == 'D' %]
+[% path.key %]
+[% ELSE %]
+<a href="[% script %]/[% repos | uri %]/view[% path.key | url %]?rev=[% rev %]">[% path.key %]</a>
+[% IF path.value.action == 'M' AND path.value.diff %]
+<a href="#diff_[% path.key.replace('/', '_') | uri | html %]">[%|l%](diff)[%END%]</a>
+[% END %]
+[% IF path.value.action == 'A' %]
+[% IF path.value.diff %]
+<a href="#diff_[% path.key.replace('/', '_') | uri | html %]">[%|l%](diff)[%END%]</a>
+[% END %]
+[% END %]
+<a href="[% script %]/[% repos | uri %]/checkout[% path.key | url %]?rev=[% rev %]">[%|l%](checkout)[%END%]</a>
+[% END %]
+[% IF path.value.copyfrom %]
+<a href="[% script %]/[% repos | uri %]/view[% path.value.copyfrom | url %]?rev=[% path.value.copyfromrev %]">[%|l(path.value.copyfrom, path.value.copyfromrev)%](from %1:%2)[%END%]</a>
+[% END %]
+[% END %]
+
+<br />
+[% END %]
+
+<!-- Diff output -->
+[% FOREACH path = paths %]
+[% IF path.value.action == 'M' %]
+<b><a name="diff_[% path.key.replace('/', '_') | uri | html %]">[% path.key %]</a></b><br />
+[% path.value.diff %]
+[% END %]
+[% IF path.value.action == 'A' %]
+[% IF path.value.diff %]
+<b><a name="diff_[% path.key.replace('/', '_') | uri | html %]">[% path.key %]</a></b><br />
+<pre>[% path.value.diff %]</pre>
+[% END %]
+[% END %]
+[% END %]

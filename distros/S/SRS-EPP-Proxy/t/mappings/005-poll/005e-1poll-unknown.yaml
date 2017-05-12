@@ -1,0 +1,26 @@
+template: poll-req.tt
+
+vars:
+
+input_assertions:
+  class: SRS::EPP::Command::Poll
+  match:
+
+SRS:
+ - assertions:
+     count:
+       - [ '/NZSRSRequest/*', 1, 'SRS: there is 1 srs command' ]
+       - [ '/NZSRSRequest/GetMessages/TypeFilter', 2, 'SRS: there are both typefilters' ]
+     attr_is:
+       - [ '/NZSRSRequest/GetMessages', 'QueueMode', '1', 'SRS: Get message correct' ]
+       - [ '/NZSRSRequest/GetMessages', 'MaxResults', '1', 'SRS: request wants just one row' ]
+output_assertions:
+  count:
+    - [ '//domain:infData/domain:name', 1, 'EPP: found the domain name ' ]
+    - [ '//epp:msgQ', 1, 'EPP: found a msg id' ]
+    - [ '//epp:msgQ/epp:msg', 1, 'EPP: found msg text' ]
+  attr_is:
+    - [ '//epp:result', 'code', 1301, 'EPP: Correct response code' ]
+  match:
+    - [ '//epp:msgQ/epp:msg', 'Domain Update', 'EPP: Correct message type' ]
+

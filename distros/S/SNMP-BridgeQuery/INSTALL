@@ -1,0 +1,14 @@
+If you are reading this then you were able to extract the
+archive, but just in case:
+
+   tar -xcvf BridgeQuery.x.xx.tar.gz
+
+Before installation, please make sure you have some version of
+NET::SNMP installed.  This can be retrieved from CPAN.
+
+Then, normal installation:
+
+   perl Makefile.PL
+   make
+   make install
+

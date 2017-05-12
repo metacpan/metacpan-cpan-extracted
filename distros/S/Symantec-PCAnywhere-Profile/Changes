@@ -1,0 +1,22 @@
+Revision history for Symantec::PCAnywhere::Profile
+
+0.01    2006-02-15T20:01
+        original version
+
+0.02    Somehow this is missing ...
+
+0.03    Somehow this is missing ...
+
+0.04    2006-07-20T13:50
+        License changed to public domain; I don't really have the right to
+        claim copyright on this, since it's mostly public domain code from
+        Stephen Friedl. Cleaned up (rebuilt) distribution to improve module
+        Kwalitee. Merged Symantec::PCAnywhere::Profile::CHF.
+
+0.05    2006-07-20T14:39:06
+        Forgot to set up prerequisites in Makefile.PL in last version.
+
+0.06    2007-11-24T14:20:00
+        Moving to Module::Install. Trying to make CPANTS happy. Merging code
+        from my other unorganized sources (including support for CIF) and
+        cleaning things up.

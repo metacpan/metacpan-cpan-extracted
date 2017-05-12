@@ -1,0 +1,15 @@
+Changes
+Escape.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README
+t/00-load.t
+t/10-backslash.t
+t/11-printable.t
+t/20-elide.t
+t/50-escape.t
+t/70-listandhash.t
+t/91-pod.t
+t/92-pod-coverage.t

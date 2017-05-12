@@ -1,0 +1,59 @@
+---
+abstract: 'Encrypted, expiring, compressed, serialized session data with integrity'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec::Functions: '0'
+  List::Util: '0'
+  Test::Deep: '0'
+  Test::Fatal: '0'
+  Test::More: '0.96'
+  Test::Tolerant: '0'
+  version: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.141170'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Session-Storage-Secure
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Session::Storage::Secure:
+    file: lib/Session/Storage/Secure.pm
+    version: '0.010'
+requires:
+  Carp: '0'
+  Crypt::CBC: '0'
+  Crypt::Rijndael: '0'
+  Crypt::URandom: '0'
+  Digest::SHA: '0'
+  MIME::Base64: '3.12'
+  Math::Random::ISAAC::XS: '0'
+  Moo: '0'
+  MooX::Types::MooseLike::Base: '0.16'
+  Sereal::Decoder: '0'
+  Sereal::Encoder: '0'
+  String::Compare::ConstantTime: '0'
+  namespace::clean: '0'
+  perl: '5.008001'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dagolden/Session-Storage-Secure/issues
+  homepage: https://github.com/dagolden/Session-Storage-Secure
+  repository: https://github.com/dagolden/Session-Storage-Secure.git
+version: '0.010'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'Tom Hukins <tom@eborcom.com>'

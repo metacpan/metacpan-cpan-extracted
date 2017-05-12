@@ -1,0 +1,15 @@
+Revision history for Perl extension Sub::Sequence
+
+0.03    Sun Nov 25 23:00:00 JST 2012
+    [NO CODE CHANGE]
+        - added samples/benchmark.pl
+
+0.02    Sat Nov 24 12:12:00 JST 2012
+    [INCOMPATIBLE CHANGE]
+        - `seq` function was called in the list context, then return faltten list
+    [IMPROVED]
+        - POD
+        - fixed a logic(no change the result)
+
+0.01    Fri Nov 23 14:08:36 2012
+        - original version

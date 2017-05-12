@@ -1,0 +1,30 @@
+0.08 Fri Feb 13 21:05:28 PST 2015
+ - Don't use dXSTARG. bulk88++
+
+0.07 Thu Feb 12 14:32:00 PST 2015
+ - Make much faster than substr for ascii buffers -- alh++
+ - Benchmarks seem to indicate that anyway
+
+0.06 Wed Feb 11 19:05:31 PST 2015
+ - Fix off by one bug. vicash++
+
+0.05 Wed Feb 11 11:11:17 PST 2015
+ - Redo the whole thing to work like substr
+ - Many more tests
+ - Retain previous char offset used
+
+0.04 Sat Jan  3 15:41:47 PST 2015
+ - Fix > 5.18 THINKFIRST issues.
+ - Patch - https://rt.cpan.org/Public/Ticket/Attachment/WithHeaders/757962
+
+0.03 Fri Jan  2 09:31:02 PST 2015
+ - DZ:P:InlineModule needed a fix
+ - bundle stuff was missing in inc
+
+0.02 Fri Jan  2 01:31:47 PST 2015
+ - Modernize to Zilla::Dist
+ - Convert XS to Inline::Module
+
+0.01 Tue Oct 16 00:02:29 PDT 2012
+ - First release.
+

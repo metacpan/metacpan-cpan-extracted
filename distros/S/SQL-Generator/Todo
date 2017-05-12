@@ -1,0 +1,239 @@
+# Author: Murat Uenalan (muenalan@cpan.org)
+#
+# Copyright (c) 2001 Murat Uenalan. All rights reserved.
+#
+# Note: This program is free software; you can redistribute
+#
+# it and/or modify it under the same terms as Perl itself.
+
+package SQL::Generator::Argument (Generator/Argument.pm)
+
+	Class for implementing token types mapping the perl datatypes and
+
+	there referencs to ascii-output. Its purpose is to convert later
+
+	the duo of function( key => value ) into text.
+
+	Supported methods:
+
+		getType - return the type of the value
+
+		testType - tests wether the given type is allowed and with undef argument returns list of allowed types
+
+		totext - dumps the argument to destination ascii-output
+
+		scalar_totext - scalar to text
+
+		array_totext - array to text
+
+		hash_totext - hash to text
+
+package SQL::Generator::Command (Generator/Command.pm)
+
+	Class implementing a rule which holds the elements subobjects and
+
+	describes how to a function translation is implemented.
+
+	Supported methods:
+
+		validate - check the parameters if they contain all the required fields
+
+package SQL::Generator
+
+	Class converting the perl function calls to sql-statement strings.
+
+	Supported methods:
+
+		AUTOLOAD
+
+		constructByRule
+
+		totext -
+
+			For advanced users only ! Interprets (current) command with a rule. It accepts following arguments:
+
+			RULE (a SQL::Generator::Command instance)
+
+    			RULE is not optional;
+
+			It translates the perl function call (via AUTOLOAD) to an SQL
+			function. For the construction of the SQL it uses an
+			SQL::Generator::Command instance, which holds the information how
+			to transform the function parameters to an SQL string.
+
+			see the SQL::Generator::Command pod for specific description.
+
+		change_dialect - change the translator definition module
+
+		load_dialect - helper function for change_dialect constructs the module name
+
+		close - dtor
+
+		dumpHistory - print the history if history-mode is on
+
+Test Scenario with Subcommands:
+
+CREATE::template => [ qw/DATABASE TABLE COLS/ ],
+
+COLS::template => [ qw/COLS PRIMARYKEY INDEX KEY UNIQUE/ ],
+
+COLS::required => [ qw/COLS/ ],
+
+CREATE::arguments =>
+{
+	COLS => { argtypes => { ALL => 1 }, token => '', param_printf => '(%s)' },
+
+	DATABASE => { argtypes => { SCALAR => 1 } },
+},
+
+COLS::arguments =>
+{
+	COLS => { argtypes => { ALL => 1 }, token => '', hash_assigner => ' ', hash_valueprintf => '%s' },
+
+	PRIMARYKEY => { argtypes => { ARRAY => 1 }, token => ', PRIMARY KEY', param_printf => '(%s)' },
+
+	KEY => { argtypes => { ARRAY => 1 }, token => ', KEY', param_printf => '(%s)' },
+
+	INDEX => { argtypes => { ARRAY => 1 }, token => ', INDEX', param_printf => '(%s)' },
+
+	UNIQUE => { argtypes => { ARRAY => 1 }, token => ', UNIQUE', param_printf => '(%s)' },
+}
+
+CREATE::subobjects =>
+{
+	COLS => $cols,
+},
+
+
+totext( { 	CREATE::TABLE => 'anytable',
+
+			CREATE::COLS => \%types,
+
+			COLS::PRIMARYKEY => 'row1' }
+	  );
+
+
+
+
+
+
+
+
+
+
+Todo 27.01.2001 23:40
+
+29.01.2001 18:41 MySql.pm CREATE( SUBOBJECTS...) feature !!! make use of recursive rules !
+
+Feature: 18.01.2001 14:08
+
+	History with unique id´s
+
+		- Implement as hash with unique hashkeys which do not exceed until
+		history is full, but the unique id is constantly counting
+
+Todo history for Perl extension SQL::Generator.
+
+12.01.2001 09:27 { TOKEN => '', PARAM_PRINTF => '%s' } should be substituted with REPLACE => 1
+
+12.01.2001 09:27 set PARAM_PRINTF default to " %s", because it is very often used
+
+18.01.2001 12:41 Command.pm and ::Lang::*
+
+1) Add default elements like $sql->TABLE( $tab ) for setting the current table, and which
+   will be used in all following commands when TABLE element used.
+
+   $sql->defaults_on();
+
+   $sql->defaults( TABLE => $tab, DATABASE => $db );
+
+   $sql->WHERE( $where )
+
+	... sql code here, which uses the defaults ...
+
+   $sql->defaults_off();
+
+	... sql code here, which uses no default values ...
+
+2) Add constructor paramters ( FILE => 'output.sql', HANDLE => * ) which pipes the output to
+   a filehandle or filename.
+
+18.01.2001 13:22 FILE implemented, HANDLE not.
+
+3) Use sessions for storing the "create table" tables and create command $sql->DROPALL() for
+   dropping session tables/databases.
+
+   $sql->TABLE( $tab )
+
+   $sql->DATABASE( $db )
+
+	... your changes here ...
+
+   $sql->DROPALL();	# which calls $sql->DROPT() && $sql->DROPD()
+
+0.03  Thu Dec 19 19:13:16 2000
+
+1) allow first constructor param to be a hashref {}
+
+ SELECT() connect to "key AS value" pairs ( ROWS param gets abundand )
+
+	$sqlgen->SELECT( { nam => "Name", tel => "Telefon" }, ...
+
+	should return: "SELECT name AS Name, tel AS Telefon" ..
+
+ INSERT() connect to "key=value" pairs ( ROWS and VALUE params get abundand )
+
+	$sqlgen->INSERT( { nam => "Al", tel => "0800-shoe" }, INTO => 'mytable', ...
+
+	should return: "INSERT INTO mytable (nam, tel) VALUES ( 'Al', '0800-shoe' )" ...
+
+12.01.2001 08:30 IMPLEMENTED, BUT NOT AS FIRST PARAMETER, USE COLS => INSTEAD.
+
+2) add a construct param called 'DESIGN'
+
+	This paramter should control sql output prettyprinting.
+
+12.01.2001 08:30 IMPLEMENTED, BUT NAMED PRETTYPRINT => [0|1]
+
+3) add a construct param called 'LANG'
+
+	should control the sql conformance (MYSQL, ORACLE, ..).
+
+18.01.2001 12:40 IMPLEMENTED
+
+4) add UPDATE method
+
+   $sqlobj->UPDATE( ROWS => ["Name","Telefon"], SET => ['mueller', '220'], TABLE => 'infomail', WHERE => "id = 12" );
+
+   sprintf( "UPDATE $table SET %s WHERE id = %d",  join( ', ', @sql_rows ), $this->get('id') );
+
+5) add CREATE param PRIMARYKEY, AUTOINCREMENT, INDEX
+
+	$sqlobj->CREATE(
+
+		TABLE => 'mytable',
+
+		COLS => {
+
+			id =>		'INTEGER NOT NULL',
+
+			created => 	'DATETIME NOT NULL',
+
+			status =>	'INTEGER',
+
+			name =>		'VARCHAR(100)',
+
+		},
+
+		PRIMARYKEY => [ qw( id ) ],
+
+		AUTOINCREMENT => [ qw(id) ],
+
+		INDEX => [ qw(status name) ]
+
+		);
+
+	sprintf( "CREATE TABLE $table ( col Coltype, col Coltype )" );
+
+0.01.2001 00:59 DONE !
+

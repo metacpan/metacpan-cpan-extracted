@@ -1,0 +1,10 @@
+<% $help->content() | n %>
+
+<%args>
+$help
+</%args>
+
+<%method title>
+<% loc( 'Documentation for Silki' ) %>
+</%method>
+

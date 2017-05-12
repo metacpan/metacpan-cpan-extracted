@@ -1,0 +1,23 @@
+---
+name: Statistics-FisherPitman
+version: 0.034
+author:
+  - 'Roderick Garton <rgarton@cpan.org>'
+abstract: Randomization-based alternative to one-way independent groups ANOVA; unequal variances okay
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  List::Util: 1.18
+  Statistics::Descriptive: 2.6
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.340201
+provides:
+  Statistics::FisherPitman:
+    file: lib/Statistics/FisherPitman.pm
+    version: 0.034
+generated_by: Module::Build version 0.340201
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

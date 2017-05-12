@@ -1,0 +1,2 @@
+Error: No initialization directory 'no_init.init' for this test
+ at no_init.t line 5

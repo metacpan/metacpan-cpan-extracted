@@ -1,0 +1,52 @@
+Changes
+=======
+
+1.12 2014-02-21T05:42:17Z
+    * Previously, Impl::File did not populate the content_type field.
+      This is now done using Plack::MIME (reported by tokuhirom)
+
+1.11 2013-06-11T06:02:04Z
+    * GET /foo/bar.tx WHERE /foo is a non-existing bucket used to
+      return 500, but now returns 404
+
+1.10 - Aug 29 2012
+    * Remove STF_DEBUG constant
+    * Remove unnecessary print statements to STDERR
+
+1.09 - May 02 2012
+    * Add support to rename buckets, using MOVE requests
+
+1.08 - Feb 25 2011
+    * Various minor fixes, mainly concerning error status cases
+    * Add support for MOVE
+
+1.07 - Dec 27 2011
+    * Add X-Content-Type-Options: nosniff by default. If you must disable it,
+      set nosniff_header => 0 in the constructor call
+
+1.06 - Dec 27 2011
+    * Do not include path names in error responses
+
+1.05 - Dec 22 2011
+    * Put a few more debug outputs.
+    * Give default values for HTTPException->as_psgi so that Middleware::Lint
+      is happy. This can be avoided if you set PLACK_ENV=production, but
+      you wil be very unhappy if you're hit, so we just gave it defaults
+
+1.04 - Dec 02 2011
+    * Fix how we rewind/seek the input buffer
+
+1.03 - Nov 30 2011
+    * Fix documentation. No code change
+
+1.02 - Nov 30 2011
+    * Fix t/002_net_stf.t to reflect the proper Net::STF::Client interface
+
+1.01 - Nov 30 2011
+    * Fix docs
+    * Return values from implementation's methods may not be Plack::Response
+      objects. Just use an HTTP exception (STF::Dispatcher::PSGI::HTTPException)
+
+1.00 - Nov 29 2011
+    * Initial release
+

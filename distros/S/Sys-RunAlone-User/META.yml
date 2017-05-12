@@ -1,0 +1,15 @@
+---
+abstract: 'make sure only one invocation of a script is active at a time per user'
+author:
+  - 'Madison Koenig <pedlar@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300015, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Sys-RunAlone-User
+version: 0.01

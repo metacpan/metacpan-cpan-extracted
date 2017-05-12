@@ -1,0 +1,123 @@
+NAME
+    Sub::Talisman - use attributes to tag or classify subs
+
+SYNOPSIS
+            package Local::Example;
+        
+            use Sub::Talisman qw( Awesome Info );
+        
+            sub mysub :Awesome {
+                    ...;
+            }
+        
+            sub othersub :Info("Hello World") {
+                    ...;
+            }
+        
+            my @awesome_subs = Sub::Talisman->get_subs("Local::Example::Awesome");
+        
+            print Sub::Talisman    # prints "Hello World"
+                    -> get_attribute_parameters(\&othersub, "Local::Example::Info")
+                    -> [0];
+
+DESCRIPTION
+    Sub::Talisman allows you to define "talisman" attibutes for your subs, and
+    provides a basic introspection API for these talismans.
+
+  Class Methods
+    Sub::Talisman's methods are designed to be called as class methods.
+
+    `setup_for $package, \%options`
+        This is used by `import` to setup a single attribute. As an example,
+        to create a "Purpose" talisman in UNIVERSAL, then:
+
+                Sub::Talisman->setup_for(
+                        'UNIVERSAL',
+                        { attribute => 'Purpose' },
+                );
+
+        The only option understood is "attribute" which provides the name of
+        the attribute.
+
+    `get_attributes($sub)`
+        Gets a list of attributes associated with the sub. Each attribute is a
+        package-qualified name, such as "Local::Example::Awesome" from the
+        SYNPOSIS.
+
+        $sub can be a code ref or a sub name. In the case of subs which have
+        been exported and imported between packages, using the sub name may
+        not be very reliable. Using a code reference is recommended.
+
+        This function only returns attributes defined via Sub::Talisman. For
+        other attributes such as the Perl built-in `:lvalue` attribute, see
+        the `get` function in the attributes package.
+
+    `get_attribute_parameters($sub, $attr)`
+        Given a sub and an attribute name, retrieves the parenthesized list of
+        parameters. For example:
+
+                sub foo :Info("Hello World") { ... }
+                my $params = Sub::Talisman->get_attribute_parameters(\&foo, "Info");
+
+        The attribute name can be package-qualified. If it is not, then the
+        caller package is assumed.
+
+        The list of parameters retrieved is a simple arrayref (or undef if the
+        attribute was used without parentheses). For a more structured
+        approach including compile-time validation of the parameters, see
+        Sub::Talisman::Struct.
+
+    `get_subs($attr)`
+        Finds all subs which have the attribute, and returns a list of their
+        names. Anonymous subs are not returned.
+
+CAVEATS
+  Anonymous subs
+    Talisman attributes may be added to anonymous subs too, but it is
+    suspected that this may not be thread-safe...
+
+            my $sub = sub :Awesome { ... };
+
+    Anonymous subs can of course be assigned into the symbol tables, a la:
+
+            *foo = sub :Awesome { ... };
+
+    But as far as Sub::Talisman is concerned, they were anonymous at the time
+    of definition, so remain anonymous. A workaround would be:
+
+            no warnings 'redefine';
+            sub foo :Awesome;
+            *foo = sub :Awesome { ... };
+
+  Talisman naming
+    Perl reserves lower-case attributes for its own future use; lower-cased
+    talisman attributes may work, but will probably spew warnings. Try to name
+    your talisman attributes in UpperCamelCase.
+
+  Talisman subs
+    Be aware that creating an attribute Foo will also create a sub called
+    "Foo" in your package. Sub::Talisman uses namespace::clean to later wipe
+    that sub away, but that temporary sub does need to exist during
+    compile-time, so you won't be able to use that name for your own subs.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Sub-Talisman>.
+
+SEE ALSO
+    attributes, Attribute::Handlers, Sub::Talisman::Struct.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

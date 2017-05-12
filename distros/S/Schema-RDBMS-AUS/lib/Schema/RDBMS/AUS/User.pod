@@ -1,0 +1,399 @@
+=pod
+
+=head1 NAME
+
+Schema::RDBMS::AUS::User - Manipulate users and groups in the AUS schema.
+
+=head1 SYNOPSIS
+
+  use Schema::RDBMS::AUS::User;
+  use DBIx::Transaction;
+  
+  my $dbh = DBIx::Transaction->connect('DBI:Pg:');
+  
+  if(my $user = Schema::RDBMS::AUS::User->login('user', 'pass', _dbh => $dbh)) {
+      print "user id is $user->{id}\n";
+      $user->clear_flag("never_logged_in");
+  }
+  
+  $user->change_password($old, $new);
+  
+  my $group = Schema::RDBMS::AUS::User->create(name => "Resellers", is_group => 1);
+  $user->add_to_group($group);
+  $user->save;
+  
+  $group->set_flag("back_room", 1, 1);
+  $group->save;
+  
+  $user->refresh;
+  
+  if($user->permission('back_room')) {
+      print "User $user->{name} is allowed in the back room.\n";
+  }
+  
+  etc...
+
+=head1 DESCRIPTION
+
+A C<Schema::RDBMS::AUS::User> object represents a User or a Group in the
+Authentication, Users and Sessions (AUS) schema. Most of the rest of the
+schema is managed via a user.
+
+=head1 DATA ELEMENTS
+
+The information stored about a user or group has been organized with
+maximum flexibility in mind. Each of the underlying SQL tables is as
+represents as small a piece of information as possible so that applications
+can easily cross-reference whatever they need with foreign keys.
+
+I<Users>, I<Groups>, I<Flags>, and I<Sessions> are concrete, editable
+information.
+
+I<Permissions> and I<Membership> are automatically generated based on
+the users, groups, and flags.
+
+Sessions are covered in L<CGI::Session::AUS>. The other data elements are
+described below:
+
+=head2 Users
+
+A user can log in using their username and password.
+
+=head2 Groups
+
+A "Group" is just a user with it's "C<is_group>" flag set. It behaves
+slightly differently than a user:
+
+A group can not log in. A group can have users (or groups) assigned to it.
+There is no limit to how "deep" group members can get (a group can be
+a member of a group that is a member 2 other groups, one of which is a member
+of...), but "circular" group memberships (group 1 is a member of group 2,
+who is a member of group 3, who is a member of group 1) are not allowed.
+
+=head2 Flags
+
+Flags may be assigned to users or groups. A flag may be set C<true>, set
+C<false>, or unset (C<1>, C<0>, or C<undef>).
+
+=head2 Membership
+
+A user or group may be a member of one or more groups. In turn, those groups
+can be members of other groups, etc. A membership tree is available on a
+User or Group, showing each of it's ancestors and how many hops away each
+one is. (A user or group is also considered to be a member of itself,
+zero hops away.)
+
+=head2 Permissions
+
+Flags set on groups are visible as "permissions" on their (user or group)
+children. If more than one parent to a user or group has the same flag
+set, the "nearest" parent's value for that flag is used. If two parents
+are just as close, but have conflicting values for a flag, C<false>, the
+least permissive setting, is used.
+
+This allows you to set default permissions as flags on a group,
+and then make small adjustments on a user-by-user basis.
+
+=head1 DATABASE HANDLES
+
+Any database handles passed to Schema::RDBMS::AUS::User B<must> be
+from the L<DBIx::Transaction|DBIx::Transaction> class. DBIx::Transaction
+is a DBI subclass that provides enhanced control over database transactions.
+
+=head1 METHODS
+
+All interaction with the User object is done through this object-oriented
+interface:
+
+=head2 Constructors
+
+=over
+
+=item login($user, $password, %args)
+
+Attempt to log a user in. If successful, a user object will be returned.
+If unsuccessful, login() will die with an error message explaining why
+the login failed.
+
+The following attributes are useful for the login() method:
+
+=over
+
+=item _dbh
+
+Database handle to use. If not specified, one will be created from the
+envrionment. (See L<Schema::RDBMS::AUS>.)
+
+=item _ip
+
+IP address the login attempt came from.
+
+=back
+
+Other attributes may be specified, but should start with an underscore (_)
+to distinguish them from user attributes. Any attributes specified will be
+written to the user's log entry for this login attempt.
+
+=item load(%args)
+
+Load a user. Returns the user object if successful, die()s with a useful
+error message if not. At least one of the following arguments must be provided:
+
+=over
+
+=item name
+
+The user's login name
+
+=item id
+
+The user's id
+
+=back
+
+C<_dbh> is also a useful argument to specify here.
+
+=item create(%args)
+
+Create a new user. At a minimum, "name" must be specified. Any of the other
+L<user attributes|/USER ATTRIBUTES> (except id) can be specified as well.
+If successful, a user object is returned, if not, create() will die with
+a useful error message.
+
+=back
+
+=head2 Object Methods
+
+=over
+
+=item password
+
+Validate a password (using the _validate_password attribute described below).
+If the password is valid, it is returned. If not, Schema::RDBMS::AUS::User
+will die with the error message "Invalid password.".
+
+=item reset_password($new_pass)
+
+Reset the user's password to $new_pass.
+
+=item change_password($old_pass, $new_pass, %args)
+
+Change a user's password. C<$old_pass> must match the user's old password.
+C<%args> are saved to the authentication log by the C<log> method;
+specifying things like "_ip" (ip address of the client that asked for the
+password change) can be useful here.
+
+=item save
+
+Save the user's data and flags. If successful, the user object is returned.
+If not, save will die() with a useful error message.
+
+=item used
+
+Specify that this account has been used. Updates 'time_used' to the current
+time and saves this update to the database immediately.
+
+=item log($event, %args)
+
+Write an entry to the user's event log. Typical values for C<$event> are
+'reset_password', 'login', 'login_fail', etc. %args is a hash of extra
+information that is saved to the log as a query string (eg;
+C<_ip=1.2.3.4&foo=bar>).
+
+=item crypt($string)
+
+Encrypt C<$string> using our current C<password_crypt> class. Returns the
+encrypted string.
+
+=item flag($name)
+
+Returns the current value of the flag C<$name> on the user:
+
+=over
+
+=item C<1>
+
+The flag is set to "true" on this user.
+
+=item C<0>
+
+The flag is set to "false" on this user.
+
+=item C<undef>
+
+The flag is not set on this user.
+
+=back
+
+=item permission($name)
+
+Returns the current value of the flag C<$name> on this user, or one of
+it's parent groups:
+
+=over
+
+=item C<1>
+
+The flag is set to "true" on this user, or one of it's parents.
+
+=item C<0>
+
+The flag is set to "false" on this user, or one of it's parents.
+
+=item C<undef>
+
+The flag is not set on this user or any of it's parents.
+
+=back
+
+=item set_flag($name, $value, $create)
+
+Set a flag on the current user. C<$name> is the name of the flag to set.
+C<$value> and C<$create> are optional. If C<$value> is not defined, the
+flag is set to "true" (if you want to un-set a flag, see clear_flag below).
+
+If C<$create> is a true value, the flag will be created in the database
+if it doesn't already exist. If C<$create> is not specified and the flag
+does not exist, set_flag will die() with a useful error message.
+
+The user's flag settings are not saved until you call the C<save> method
+above. I<However>, if you specified C<$create> to set_flag, the new flag
+will exist in the database right away.
+
+=item clear_flag($name)
+
+Remove a flag from the current user.
+
+=item add_to_group($group)
+
+Add a this user to group C<$group>. C<$group> may be specified as the
+group's C<name>, or as a user object containing the group itself. This
+change takes effect in the database I<immediately>, it does B<not> wait
+for the C<save> method to be called! (This may change in a future release.)
+
+=item remove_from_group($group)
+
+Remove this user from group C<$group>. As with add_to_group(), the effect
+on the database is currently immediate.
+
+=item refresh
+
+Reload the user's data, flags, and membership from the database. If you're
+keeping a user object around for awhile, you should call this method every
+so often to ensure that the user's settings on the object still reflect
+what's in the database.
+
+=item dbh
+
+Returns the L<DBIx::Transaction|DBIx::Transaction> database handle that
+Schema::RDBMS::AUS::User is using for it's transactions.
+
+=back
+
+=head1 USER ATTRIBUTES
+
+The following attributes are valid for a User's database record:
+
+=over
+
+=item id
+
+The user's unique ID#. This value should never be changed once a user is
+created.
+
+=item name
+
+The user's login name.
+
+=item password
+
+The user's password, encrypted with C<password_crypt> (see below.)
+When setting this, it is usually best to use either the C<change_password>
+or C<reset_password> method.
+
+=item password_crypt
+
+What type of encryption to apply to the password. Currently, this can be
+one of C<None>, C<MD5>, or C<SHA1>.
+
+=item is_group
+
+If true, this is a Group. If false, this is a regular user. This value
+should only be set when the user/group is first created and should never
+be changed after that.
+
+=item time_used
+
+Last time the user "used" their account (logged in, etc). This stamp doesn't
+usually get updated for groups.
+
+=back
+
+In addition, the following meta-attributes are stored on the User object:
+
+=over
+
+=item _validate_password
+
+A subroutine reference, which, when passed a password, is expected to return
+a true value if the password is valid, or a false value if not. The default
+handler will return true for any string that is more than zero bytes. Here
+is an example validator that will only allow passwords that contain a mix
+of numbers and letters, at least 6 characters long:
+
+  my $validator = sub { $_[0] =~ m{(?=.*\d)(?=.*[A-Za-z])^.+{6,}$}; };
+  my $user = Schema::RDBMS::AUS::User->load(name => "Bob", _validate_password => $validator);
+
+=item _crypt_class
+
+The perl package that supplies our C<crypt()> method for encrypting passwords.
+This is automatically set, based on the user's C<password_crypt> attribute.
+
+=item _dbh
+
+The database handle we are currently using. This must be a L<DBIx::Transaction>
+database handle.
+
+=item _dbh_driver
+
+The name of the database driver our handle uses (eg; "mysql", "Pg", etc).
+This is automatically set when the object is initialized, and can be used
+to compensate for quirks in certain SQL implementations.
+
+=item _flags
+
+A hash of all flags set on the current user. The keys are the flag names,
+and the values are "1" if the flag is set to true, "0" for false.
+
+=item _membership
+
+A hash describing all of the groups that the current user or group is a part
+of. The keys are user ID's, the values represent how many hops along the
+organizational chart each group is from the user. The current user's ID
+will always have a value of "0" in this hash, it's immediate parent groups
+will have a value of "1", their parents will have a value of "2", etc.
+
+=item _permissions
+
+A hash describing all permissions the user has. This is the culmination of
+all of the flags on the user and it's ancestors, as described in L</Permissions>
+above.
+
+=back
+
+=head1 AUTHOR
+
+Tyler "Crackerjack" MacDonald <japh@crackerjack.net>
+
+=head1 LICENSE
+
+Copyright 2006 Tyler "Crackerjack" MacDonald <japh@crackerjack.net>
+
+This is free software; You may distribute it under the same terms as perl
+itself.
+
+=head1 SEE ALSO
+
+L<Schema::RDBMS::AUS>, L<CGI::Session::AUS>.
+
+=cut

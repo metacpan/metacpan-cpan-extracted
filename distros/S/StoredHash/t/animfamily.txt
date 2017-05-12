@@ -1,0 +1,6 @@
+family;description
+bird;Flying animals with Wings and Feathers
+mammal;Breastfeeding Family of animal
+reptile;What's the definition of these ?
+insect;Six legged small creatures
+

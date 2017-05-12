@@ -1,0 +1,56 @@
+README
+----------------
+These files are a complete Nagios plugin for setup Siebel components monitoring:
+
+- commands.cfg: this file is the Nagios commands configuration file. It contains an example of how the comp_mon.pl should be executed
+- comp_mon.pl: this Perl script is the main part of the Nagios Plugin.
+- comp_mon.xml: this is the XML file used to configure which Siebel Server and corresponding modules should be monitored
+- comp_mon.xsd: the XML Schema to validate comp_mon.xml, if necessary
+- NSC.ini: this is an example of NSC client used to monitor the components. The NSC must be installed in a Windows computer
+that has the srvrmgr.exe program installed, since comp_mon.pl will use such program to connect to a Siebel Server.
+
+The NSC is not obligatory, but you will need to have srvrmgr program available somewhere (even in the Nagios box) to check the components.
+
+Beware that even that the XML and XML Schema files and the current API permits to configure multiple Siebel Servers, the program comp_mon.pl expects
+to use a single Siebel Server in a Siebel Enterprise to monitor: the reason for this is to give at least some more detail if something goes bad in some
+components since at least the problem will be detected in a specific Siebel Server.
+
+See www.nagios.org for more information about the Nagios project.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Siebel::Srvrmgr
+   Nagios::Plugin
+   XML::Rabbit
+   Test::Pod
+   Test::Pod::Coverage
+
+COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013 of Alceu Rodrigues de Freitas Junior, arfreitas@cpan.org
+
+This file is part of Siebel Monitoring Tools.
+
+Siebel Monitoring Tools is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Siebel Monitoring Tools is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Siebel Monitoring Tools.  If not, see <http://www.gnu.org/licenses/>.

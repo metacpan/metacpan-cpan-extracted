@@ -1,0 +1,35 @@
+Statistics-Cluto version 0.01
+=============================
+
+INSTALLATION
+
+Download CLUTO from http://glaros.dtc.umn.edu/gkhome/views/cluto
+
+Find libcluto.a which matches your environment and place it under
+your library path (or specify its path with LIBS option as shown below).
+
+Then do:
+
+   perl Makefile.PL [LIBS='-L/where/to/find/libcluto.a -lcluto']
+   make
+   make test
+   make install
+
+Tested with cluto-2.1.2/Darwin-i386, cluto-2.1.2/Darwin-ppc and
+cluto-2.1.1/Linux-i686.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+ libcluto.a from CLUTO
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Ikuhiro IHARA
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.
+
+

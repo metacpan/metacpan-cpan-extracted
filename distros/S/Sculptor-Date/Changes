@@ -1,0 +1,7 @@
+Revision history for Sculptor-Date
+
+0.01    Date/time
+        First version, released to CPAN on 2010-04-23
+
+0.02    Fixed up problems with missing META.yml etc for CPAN
+        due to failed CPAN testers reports.

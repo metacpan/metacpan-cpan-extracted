@@ -1,0 +1,9 @@
+# Test the action "Unmatched brace" warning
+
+target:
+        { # Begins a perl action that never ends...
+
+target2:
+        [ # Begins an anonymous array action that never ends...
+
+target3:

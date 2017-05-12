@@ -1,0 +1,50 @@
+Revision history for Perl extension Statistics::Gap.
+
+0.01  Tue Jun  7 10:45:58 2005
+	- original version; created by h2xs 1.23 with options
+		-XAn Statistics::Gap
+
+0.02  Wed Jul 13 2005
+	- Optimized the module by removing the calculation of
+	  distance between vectors from the loop and instead
+	  pre-computing all possible unique pairwise distances. 
+
+0.03  Sat Aug 13 2005
+	- Modified the reference distribution generation 
+	  method.	
+
+0.04  Sat Aug 20 2005
+	- Some bug fixes: Removed unnecessary division by 2 in the calculation of Dr
+	- Added log file to the set of output files.
+	- Added confidence interval calculation
+	- Updated documentation
+
+0.05  Mon Aug 22 2005
+	- Corrected the *.t files
+	
+0.06  Fri Feb 24 2006
+	- Added support for sparse format of the input matrix.
+	- Instead of generating B reference distributions - 
+      corrected the code to generate just one reference 
+      distribution and then sample B replicates from this 
+      reference distribution using Monte Carlo Sampling.
+	- Corrected a bug - vector distances computed from 
+      observed distribution were getting used as vector 
+      distances for reference distribution too.
+
+0.08  Wed Apr 26 2006
+	- Instead of within cluster dispersion measure (W(k)) 
+      this release uses clustering criterion functions (crfun).
+    - Uses Algorithm::RandomMatrixGeneration (v0.02) for
+      random matrix generation while holding row and column
+      marginals fixed.
+    - Instead of generating *.png files now provides the data
+      required for plot generation in *.dat files.
+    - Supports both, vector space and similiarity space.
+
+0.09 Fri Apr 28 2006
+	- Corrected a bug (about column index)
+	- Instead of 4 plot files (*.dat) now only 3 plot files are created - removed a redundant file. Also renamed the files.
+	
+0.10 Sat Apr 29 2006
+    - Corrected the test files.

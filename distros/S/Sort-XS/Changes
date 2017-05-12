@@ -1,0 +1,12 @@
+0.3
+    - use IV type for integer keys and a proper comparison funtion that doesn't overflows
+    - 'fair' compare : do not add the extra sub call
+
+0.2
+    - sort integers or string
+    - provide api for xsort, ixsort and sxsort
+    - improve benchmarks
+    - update pod
+
+0.1 alpha release, only sort integers
+

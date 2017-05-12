@@ -1,0 +1,29 @@
+#!/usr/bin/perl -w
+use strict;
+use Statistics::RankCorrelation;
+use List::Permutor;
+
+# How big are our vectors?
+my $n = 3;
+
+# Get 2 lists of 3 digit precision random numbers below 1.
+my $X = List::Permutor->new( map { sprintf '%0.3f', rand } 0 .. $n );
+my $Y = List::Permutor->new( map { sprintf '%0.3f', rand } 0 .. $n );
+
+# Get ready to increment!
+my $i = 0;
+
+# Loop over each combination of the sets together.
+while( my @x = $X->next ) {
+    while( my @y = $Y->next ) {
+        my $c = Statistics::RankCorrelation->new( \@x, \@y );
+
+        # Show the count, vector data, spearman and csim correlations.
+        printf "%d: [ %s ][ %s ] => spearman=%0.3f, csim=%0.3f\n",
+            ++$i, join( ' ', @x ), join( ' ', @y ),
+            $c->spearman, $c->csim;
+    }
+
+    # Start over...
+    $Y->reset;
+}

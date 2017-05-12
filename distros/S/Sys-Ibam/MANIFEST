@@ -1,0 +1,12 @@
+Changes
+ibam.hpp
+ibam.inl
+Ibam.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/Sys-Ibam.t
+typemap
+lib/Sys/Ibam.pm
+META.yml                                 Module meta-data (added by MakeMaker)

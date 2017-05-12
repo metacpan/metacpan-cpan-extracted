@@ -1,0 +1,9 @@
+#!/bin/sh
+BASE=`readlink $0`
+if [ "x${BASE}" = x ]; then
+	BASE=$0
+fi
+
+BASE=`echo $BASE | sed s/svk$//`;
+
+DYLD_LIBRARY_PATH=${BASE} LD_LIBRARY_PATH=${BASE} perl -I${BASE}perl ${BASE}bin/svk "$@"

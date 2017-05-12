@@ -1,0 +1,9 @@
+Changes
+Sig.pm
+GPL
+MANIFEST
+Makefile.PL
+README
+t/imports.t
+t/signals.t
+META.yml                                 Module meta-data (added by MakeMaker)

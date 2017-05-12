@@ -1,0 +1,52 @@
+Revision history for Perl module Set::CrossProduct
+
+2.002 2016-09-26T15:05:11Z
+	* Correct prereq in Makefile to match test files
+
+2.001 2016-09-22T15:47:56Z
+	* Update to stable version.
+
+2.000_02 2016-09-19T20:16:21Z
+	* Fix a test regression with named sets
+	* RT 117962 (https://rt.cpan.org/Ticket/Display.html?id=117962)
+
+2.000_01 2016-09-19T19:29:35Z
+	* Document the labeled sets feature.
+	* For this new feature, bump the major version
+
+1.96_01 2015-03-09T16:37:44Z
+	* Matt Miller implemented named sets.
+
+1.95 - 2011-11-28
+	* Fix the synopsis examples
+	* No code changes
+
+1.93 - 2007-11-24
+	* cleanups for the move from CVS to SVN
+	* added the cross(1) program to use this from the command line
+	* now requires Perl 5.006
+
+1.92 - 2007-06-20
+	* Handle empty sets in the product. This means that the product is
+	empty. Previously, it caused an infinite loop.
+	* Everyone should upgrade.
+
+1.91 - 2007-03-18
+	* Cleaning up dist for new SVN repository
+	* No feature changes, so no need to upgrade
+
+1.09 - 2007-01-09
+	* updated copyright and license info
+	* no code changes, so no need to upgrade
+
+1.08 - 2006-05-17
+	* Updated distribution, pod coverage tests, and copyright.
+	* There aren't any code changes so you don't need to upgrade.
+
+1.06 - 2005-03-11
+	* Added POD coverage tests, fixed issues
+	* no code changes: no need to upgrade
+
+1.05 - 2004-09-08
+	* cleaned up the distribution, added README
+	* no need to upgrade if you already have this module

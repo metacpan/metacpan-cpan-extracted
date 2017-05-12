@@ -1,0 +1,11 @@
+lib/SyslogScan/Daemon/BlacklistDetector.pm
+lib/SyslogScan/Daemon/BlacklistDetector.pod
+lib/SyslogScan/Daemon/BlacklistDetector/EmailNotify.pm
+lib/SyslogScan/Daemon/BlacklistDetector/Plugin.pm
+lib/SyslogScan/Daemon/BlacklistDetector/Postfix.pm
+lib/SyslogScan/Daemon/BlacklistDetector/Postfix.pod
+Makefile.PL
+MANIFEST
+META.yml                                 Module meta-data (added by MakeMaker)
+CHANGELOG
+README

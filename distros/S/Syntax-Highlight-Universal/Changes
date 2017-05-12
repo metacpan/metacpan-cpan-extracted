@@ -1,0 +1,31 @@
+Revision history for Perl extension Syntax::Highlight::Universal.
+
+0.4   13 Match 2005
+  * Removed MemoryChunks.cpp from the distribution, it wasn't
+    working correctly
+  * Added hrd2css script and translated color schemes from Colorer
+  * Fixed: compilation problems under MS Visual C++ 6.0
+  * Fixed: module wouldn't work without an explicit addConfig call
+  * Fixed: possible compilation problems with Perl 5.6 typemap
+
+0.35  13 March 2005
+  * Made precompiled configuration include region descriptions
+  * Made a proper representation for Colorer's regions and schemes
+    as Perl objects
+  * Fixed: illegal characters in class names
+
+0.31  13 March 2005
+  * Changed file format to conform CPAN distribution rules
+
+0.3   12 March 2005
+  * Added possibility to precompile configuration files to achieve
+    a speedup
+  * Made Colorer files use Perl memory management
+  * Moved caching functions into initParsing/finalizeParsing callbacks
+
+0.2   18 February 2005
+  * Added caching capabilities
+  * Removed unnecessary Colorer files
+
+0.1   11 February 2005
+  * original version, Colorer-take5 Library beta3 included

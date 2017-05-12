@@ -1,0 +1,48 @@
+---
+abstract: 'Fulltext search module'
+author:
+  - 'Sho Nakatani <lay.sakura@gmail.com>, a.k.a. @laysakura'
+build_requires:
+  File::Temp: 0
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.7.5, CPAN::Meta::Converter version 2.120921'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Search-Fulltext
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Search::Fulltext:
+    file: lib/Search/Fulltext.pm
+    version: 1.03
+  Search::Fulltext::SQLite:
+    file: lib/Search/Fulltext/SQLite.pm
+    version: 0
+  Search::Fulltext::TestSupport:
+    file: lib/Search/Fulltext/TestSupport.pm
+    version: 0
+requires:
+  Carp: 0
+  DBD::SQLite: 1.30_01
+  DBI: 0
+resources:
+  bugtracker: https://github.com/laysakura/Search-Fulltext/issues
+  homepage: https://github.com/laysakura/Search-Fulltext
+  repository: git://github.com/laysakura/Search-Fulltext.git
+version: 1.03

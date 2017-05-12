@@ -1,0 +1,42 @@
+---
+abstract: 'word case conversion'
+author:
+  - 'Eric Johnson (kablamo)'
+build_requires:
+  Data::Printer: '0'
+  Test::Most: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.2.0, CPAN::Meta::Converter version 2.142060'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: String-CamelSnakeKebab
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  String::CamelSnakeKebab:
+    file: lib/String/CamelSnakeKebab.pm
+    version: '0.05'
+requires:
+  Sub::Exporter: '0'
+resources:
+  bugtracker: https://github.com/kablamo/perl-string-camelsnakekebab/issues
+  homepage: https://github.com/kablamo/perl-string-camelsnakekebab
+  repository: git://github.com/kablamo/perl-string-camelsnakekebab.git
+version: '0.05'
+x_contributors:
+  - 'Aaron Crane <arc@cpan.org>'
+  - 'Eric Johnson <eric.git@iijo.org>'
+  - 'Lance Wicks <lw@judocoach.com>'
+  - 'Eric Johnson <github@iijo.org>'

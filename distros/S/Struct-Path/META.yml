@@ -1,0 +1,29 @@
+---
+abstract: 'Path for nested structures where path is also a structure'
+author:
+  - 'Michael Samoglyadov <mixas@cpan.org>'
+build_requires:
+  Storable: 2.01
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Struct-Path
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  parent: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  repository: https://github.com/mr-mixas/Struct-Path.pm
+version: 0.65

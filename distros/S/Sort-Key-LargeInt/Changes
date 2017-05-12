@@ -1,0 +1,6 @@
+Revision history for Perl extension Sort::Key::LargeInt.
+
+0.01  Thu Sep 17 23:15:17 2009
+	- original version; created by h2xs 1.23 with options
+		-An Sort::Key::LargeInt
+

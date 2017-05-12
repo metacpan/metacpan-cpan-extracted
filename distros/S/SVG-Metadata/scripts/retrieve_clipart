@@ -1,0 +1,26 @@
+#!/bin/sh
+
+# This shell script does the processing of the Open Clip Art Library
+# files to generate a release tarball
+
+distname=openclipart-0.04-pre
+distdir=$distname
+incomingdir=./ocal_incoming
+uploaduri=freedesktop.org:/projects/clipart/public_html/downloads/
+collateraldir=openclipart
+
+if [ -d $distdir ]
+then
+    echo "rm -rf $distdir"
+    rm -rf $distdir
+fi
+
+echo "mkdir -p '$distdir'"
+mkdir -p $distdir
+
+# TODO:  Download latest files
+echo "rsync --delete -a -e ssh  freedesktop.org:/projects/clipart/public_html/incoming/ $incomingdir/"
+rsync --delete -av -e ssh  freedesktop.org:/projects/clipart/public_html/incoming/ $incomingdir
+
+exit 0
+

@@ -1,0 +1,22 @@
+srvrmgr> list sessions
+
+SV_NAME      CC_ALIAS                   CG_ALIAS        TK_TASKID  TK_PID  TK_DISP_RUNSTATE  TK_IDLE_STATE  TK_PING_TIME  TK_HUNG_STATE  DB_SESSION_ID           OM_LOGIN                  OM_BUSSVC  OM_VIEW  OM_APPLET  OM_BUSCOMP  
+-----------  -------------------------  --------------  ---------  ------  ----------------  -------------  ------------  -------------  ----------------------  ------------------------  ---------  -------  ---------  ----------  
+foobar_0002  ServerMgr                  System          54525954           Running           FALSE                                                                                                                                    
+foobar_0002  ServerMgr                  System          47185922           Finished          FALSE                                                                                                                                    
+foobar_0002  eCommunicationsObjMgr_esn  Communications  36700181           Finished          FALSE                                       Shared Connection Id:   sadmin                                                               
+foobar_0002  eCommunicationsObjMgr_esn  Communications  36700178           Finished          FALSE                                       Shared Connection Id:   AADMIN                                                               
+foobar_0002  eCommunicationsObjMgr_esn  Communications  36700174           Finished          FALSE                                       Shared Connection Id:   GZURITA                                                              
+foobar_0002  eCommunicationsObjMgr_esn  Communications  36700170           Finished          FALSE                                       Shared Connection Id:   sblanon                                                              
+foobar_0002  SRProc                     SystemAux       5242888            Running           FALSE                                                                                                                                    
+foobar_0002  SRProc                     SystemAux       5242885            Running           FALSE                                                               Forwarding Task                                                      
+foobar_0002  SRBroker                   System          2097184            Running           FALSE                                                               COMP:FSMSrvr                                                         
+foobar_0002  SRBroker                   System          2097182            Running           FALSE                                                               COMP:WfProcMgr                                                       
+foobar_0002  SRBroker                   System          2097180            Running           FALSE                                                                                                                                    
+foobar_0002  SRBroker                   System          2097161            Running           FALSE                                                               Response task                                                        
+foobar_0002  SRBroker                   System          2097160            Running           FALSE                                                               Task creation task                                                   
+foobar_0002  SRBroker                   System          2097159            Running           FALSE                                                               Store task                                                           
+foobar_0002  SRBroker                   System          2097157            Running           FALSE                                                               Information caching task                                             
+
+15 rows returned.
+

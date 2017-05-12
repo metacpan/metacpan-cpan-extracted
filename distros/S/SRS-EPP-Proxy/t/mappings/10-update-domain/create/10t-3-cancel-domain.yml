@@ -1,0 +1,14 @@
+description: cancel domain
+registrar: 1
+
+
+request: |-
+ <NZSRSRequest VerMajor="4" VerMinor="4" RegistrarId="100">
+  <DomainUpdate Delegate="1" ActionId="[% actionid %] 2" Cancel="1">
+    <DomainNameFilter>10t.co.te</DomainNameFilter>
+  </DomainUpdate>
+ </NZSRSRequest>
+
+
+assertions:
+ - xpath_matches: [ '//Error', '0', 'No errors' ]

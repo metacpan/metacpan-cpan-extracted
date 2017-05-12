@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/t1.t
+lib/Statistics/CountAverage.pm
+META.yml                                 Module meta-data (added by MakeMaker)

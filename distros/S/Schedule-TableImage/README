@@ -1,0 +1,41 @@
+Schedule/TableImage version 1.00
+=  ==  ==  ==  ==  ==  ==  ==  ==  ==  ==  ==  ==  ==  ==  ==  ==
+
+Schedule::TableImage absolutely relies on Image::Magick being installed on your system.
+Schedule::TableImage creates a image of a schedule with labelled events. 
+This schedule image is a grid in which days are labelled horizontally and hours are labelled vertically.  
+This is useful to a week view, although you can have as many days as you would like, with any label you like.
+Events are colored boxes with text labels for a given time and day. 
+If events overlap on a given day or time, the width of the day expands to accomodate both (or all) events.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	Image::Magick
+	Text::Wrapper
+	Font files used by Image::Magick (Ghostscript, X server with font specifications, or TrueType fonts)
+
+NOTE ON FONTS:
+
+	The demo and test use a postscript format name "Helvetica".  This requires that you have the Ghostscript fonts installed on your system in order for the tests to pass.  You can use this module without the Ghostscript fonts, but you must then choose either the X server fonts, or true type fonts.  For more information, read the ImageMagick Fonts documentation.
+
+	If no font is passed in when a new instance of the module is created, this module looks for the truetype font: /usr/local/share/fonts/ttf/arial.ttf.  If you do not have this path or this font in your system, be sure to specify the font.
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2003 Rebecca A Hunt. All rights reserved. 
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself. 
+
+

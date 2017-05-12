@@ -1,0 +1,133 @@
+__section__
+default
+__description__
+Lists all articles in a board
+
+* board = the Board object
+* group = the Group object board belongs to
+* child = the ArticleGroup type: 'archive', 'article' or 'mailbox'
+* message = any additional prompts
+* display = 'top' means the 'recent articles' list in the top page
+
+__title__
+
+__page__
+ournet
+__lang__
+en_US
+__name__
+board
+__template__
+
+<TABLE BORDER="0" WIDTH="100%">
+<caption><nobr><FONT class="text" COLOR="[% user.fg.0 %]"><strong>
+<form action="[% script %]/[% group %]/[% board %]/[% child %]/" method="post">
+[% IF child == "articles" %]
+[% IF !user.is_anon %]
+    <INPUT type="hidden" name="op" value="article_edit">
+    <INPUT type="hidden" name="author" value="[% user.nickname %] ([% user.fakeemail %])">
+    <INPUT type="hidden" name="child" value="[% child %]">
+    <INPUT type="hidden" name="board" value="[% board %]">
+    <INPUT type="hidden" name="group" value="[% group %]">
+    <INPUT TYPE="submit" VALUE="[% loc('Post') %]">
+[% END %]
+    [% IF archives_count > 0 %]
+	<a href="[% script %]/[% group %]/[% board %]/archives/"><img align=top width=14 height=19 src="[% imagedir %]/archive.gif" border=0></a>
+    [% END %]
+[% END %]
+[% message %]</form>
+</strong></font></nobr></caption>
+    <tr>
+[% IF display != 'top' %]
+    <td class="text" align="center" BGCOLOR="[% user.bg.3 %]"><FONT COLOR="[% user.bg.0 %]"><nobr>
+    [% loc('No.') %]
+    </nobr></font></td>
+[% END %]
+    <td class="text" align="center" BGCOLOR="[% user.bg.3 %]"><FONT COLOR="[% user.bg.0 %]">
+    [% loc('Subject') %]
+    </font></td>
+    <td class="text" align="center" BGCOLOR="[% user.bg.3 %]"><FONT COLOR="[% user.bg.0 %]">
+    [% loc('From') %]
+    </font></td>
+[% IF display == 'top' %]
+    <td class="text" align="center" BGCOLOR="[% user.bg.3 %]"><FONT COLOR="[% user.bg.0 %]">
+    [% loc('Board') %]
+    </font></td>
+[% END %]
+    <td class="text" align="center" BGCOLOR="[% user.bg.3 %]"><FONT COLOR="[% user.bg.0 %]"><nobr>
+    [% loc('Date') %]
+    </nobr></font></td>
+    </tr>
+
+<form name='pageform' action="[% script %]/[% group %]/[% board %]/[% child %]/" method="get">
+[% FOREACH articles %]
+[% IF recno % 2 %]
+    <tr>
+[% ELSE %]
+    <tr bgcolor="[% user.bg.1 %]">
+[% END %]
+[% IF display != 'top' %]
+    <td class="text" align="center" width=10% BGCOLOR="[% user.bg.1 %]"><FONT COLOR="[% user.fg.1 %]">
+    [% recno + 1 %]
+    </font></td>
+[% END %]
+    <td class="text" width=60%>
+[% IF type == 'deleted' %]
+    [% title %]
+[% ELSIF type == 'article' %]
+    <a class="link" href="[% script %]/[% group %]/[% board %]/[% child %]/[% name %]">[% title %]</a>
+[% ELSE %]
+    [% IF articles_count > 0 %]
+    <a class="link" href="[% script %]/[% group %]/[% board %]/[% child %]/[% name %]/">[% title %]</a><img src="[% imagedir %]/folder.gif">
+    [% ELSE %]
+    [% title %]
+    [% END %]
+[% END %]
+    </td><td class="text" width="20%" align="center"><nobr>
+    [% author %]
+[% IF display == 'top' %]
+    </nobr></td><td class="text" width="10%"><nobr>
+    <a class="link" href="[% script %]/[% topclass %]/[% board %]/articles/">[% board %]</a>
+[% END %]
+    </nobr></td><td class="text" width="20%" align="center"><nobr>
+    [% date %]
+    </nobr></td></tr>
+[% END %]
+</table>
+[% IF display != 'top' %]
+<hr>
+<div align='center'>
+    <FONT class="text"><nobr>
+    |
+    <a href="[% script %]/[% topclass %]/[% group %]/">[% loc('Back to group') %]</a>
+    |
+[% IF child == "articles" %]
+    [% IF archives_count > 0 %]
+    <a href="[% script %]/[% group %]/[% board %]/archives/">[% loc('Back to archives') %]</a>
+    |
+    [% END %]
+[% ELSE %]
+    <a href="[% script %]/[% group %]/[% board %]/articles/">[% loc('Back to board') %]</a>
+    |
+[% END %]
+</nobr>
+[% IF pages %]
+    [% loc('Page') %] 
+<select name="begin" onchange="pageform.submit();">
+    [% FOREACH pages %]
+	[% IF iscurpage %]
+<OPTION SELECTED value="[% begin %]">[% number %]</OPTION>
+	[% ELSE %]
+<OPTION value="[% begin %]">[% number %]</OPTION>
+	[% END %]
+    [% END %]
+</SELECT>
+<input type='submit' style="font-size:12pt" value=" [% loc('Go_Page') %] ">
+    |
+[% END %]
+    </NOBR>
+</div>
+[% END %]
+</FORM>
+__seclev__
+10000

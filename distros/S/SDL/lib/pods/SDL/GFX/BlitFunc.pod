@@ -1,0 +1,15 @@
+
+=head1 NAME
+
+SDL::GFX::BlitFunc - blitting functions
+
+=head1 CATEGORY
+
+TODO, GFX
+
+=head1 METHODS
+
+=head1 AUTHORS
+
+See L<SDL/AUTHORS>.
+

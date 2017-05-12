@@ -1,0 +1,226 @@
+0.110
+Date:   2012-12-02 23:59:13 +0900
+    Fixed the bug in test script t/test12/Templates/MenuTmpl.pm for Perl 5.17.
+Date:   2012-11-03 00:14:58 +0900
+    Fixed the method Su::Template::expand() to expand falsy value correctly.
+Date:   2012-10-27 23:31:55 +0900
+    Add the feature to define the model global fields to the defs file.
+    
+      Features
+        - Add the feature to define the model globa fields to the defs file.
+    
+      Changes
+        - When called the method Su::Model::load_model, return the deep copy of the model instance instead of it's reference.
+    
+      Bug Fixes
+        - Fixed the caller information in the log header.
+Date:   2012-09-30 22:34:39 +0900
+    Add the method Su::get_instance to treat the process instance itself instead of return it's result.
+       Features
+          - Add the method Su::get_instance to get the process instance.
+       Changes
+          - Fixed the include path of the test files to load the lib directory correctly.
+
+0.100
+Date:   2011-10-30 22:19:59 +0900
+    Add pod comments.
+Date:   2011-10-30 11:43:20 +0900
+    Add the feature to Su::generate() to add the entry to Defs file without any option if Defs file is already exists.
+Date:   2011-10-30 11:42:50 +0900
+    Add the timestamp and the caller info to the default log output handler.
+Date:   2011-10-16 23:19:12 +0900
+    Remove unnecessary shebang in test scripts.
+Date:   2011-10-16 22:34:15 +0900
+    Add the time and called place to the header of the log message.
+Date:   2011-09-22 18:18:51 +0900
+    Add the option to generate Defs.pm to the method Su::generate.
+    
+    Features
+      - Add the parameter to generate Defs.pm to the method Su::generate.
+    
+    Docs
+      - Add the guide document under Su::Guides package.
+Date:   2011-07-22 22:45:18 +0900
+    Fixed the bug and Add the ResouceProc.pm to load resource strings.
+    
+    Bug Fixes
+      - Fixed the degrade of method Su::setup.
+    
+    Changes
+      - Separate template string to output Defs.pm to the extenal template file.
+      - Add the entry of ResouorceProc to the Defs file.
+Date:   2011-07-21 23:44:34 +0900
+    Add the feature to load localized Model and load values using key prefix and postfix of the Model.
+    
+       Featues
+         - Make it enable to load localized Model you prepared using specified locale variable $MODEL_LOCALE.
+         - Make it enable to load the value from a Model with modified key string using $Su::MODEL_KEY_PREFIX and $Su::MODEL_KEY_POSTFIX.
+         - Add the information message to standard output when you generate Model and Process file.
+         - Add the method Su::generate to generate the pair of Process and Model file.
+    
+       Changes
+         - Subroutine Process::generate_proc and Model::generate_model return the file name of loaded class instead of integer.
+Date:   2011-07-15 12:59:42 +0900
+    Make it enable to spacify the log file directly and adopt to call method Su::resolve directory.
+Date:   2011-07-07 01:16:02 +0900
+    Make it enable to search CustomBuild.pm from include pathes for listing custom build method.
+
+0.011
+Date:   Sat Jun 18 23:50:05 2011 +0900
+    Fixed CustomBuild.pm to adopt the change of the package location.
+Date:   Sat Jun 18 23:03:48 2011 +0900
+    Move CustomBuild.pm to the below of Su package.
+
+0.010
+Date:   2011-06-18 22:38:57 +0900
+    Remove unnecessary entry from MANIFEST.
+Date:   2011-06-05 23:45:37 +0900
+    Checking in changes prior to tagging of version 0.009.
+    
+    Changelog diff is:
+    
+    diff --git a/Changes b/Changes
+    index 060c618..f04ddd6 100644
+    --- a/Changes
+    +++ b/Changes
+    @@ -1,3 +1,23 @@
+    +0.009
+    +Date:   2011-06-05 23:33:47 +0900
+    +    Changes the end of line code in some test scripts.
+    +Date:   2011-05-06 22:04:09 +0900
+    +    Fixed the comment message in test script.
+    +Date:   2011-05-01 23:39:53 +0900
+    +    Add the file to describe the developing memo.
+    +Date:   2011-05-01 23:36:12 +0900
+    +    Fixed the template bug not to expand special charactor '&' twice.
+    +Date:   2011-05-01 23:34:32 +0900
+    +    Add the build command to test in Windows environment.
+    +Date:   2011-05-01 23:33:12 +0900
+    +    Make it enable to specify the log target using regex.
+    +Date:   2011-02-19 00:08:07 +0900
+    +    Make it enable to use regex to specify log target class name.
+    +Date:   2011-02-13 17:42:02 +0900
+    +    Add the method Su::Log::set_global_log_level for global log setting.
+    +Date:   2011-02-11 21:13:27 +0900
+    +    Fixed the test error that calls perl function from the command line at windows environment.
+    +
+     0.008
+     Date:   Wed Feb 2 22:53:00 2011 +0900
+         Modify pod comment.
+
+0.009
+Date:   2011-06-05 23:33:47 +0900
+    Changes the end of line code in some test scripts.
+Date:   2011-05-06 22:04:09 +0900
+    Fixed the comment message in test script.
+Date:   2011-05-01 23:39:53 +0900
+    Add the file to describe the developing memo.
+Date:   2011-05-01 23:36:12 +0900
+    Fixed the template bug not to expand special charactor '&' twice.
+Date:   2011-05-01 23:34:32 +0900
+    Add the build command to test in Windows environment.
+Date:   2011-05-01 23:33:12 +0900
+    Make it enable to specify the log target using regex.
+Date:   2011-02-19 00:08:07 +0900
+    Make it enable to use regex to specify log target class name.
+Date:   2011-02-13 17:42:02 +0900
+    Add the method Su::Log::set_global_log_level for global log setting.
+Date:   2011-02-11 21:13:27 +0900
+    Fixed the test error that calls perl function from the command line at windows environment.
+
+0.008
+Date:   Wed Feb 2 22:53:00 2011 +0900
+    Modify pod comment.
+Date:   2011-01-10 16:08:00 +0900
+    Modify pod comments.
+Date:   2011-01-08 21:05:44 +0900
+    Add the fakeuninstall command to the CustomBuild.pm.
+Date:   2010-12-31 22:52:08 +0900
+    Add uninstall command to the build script and remove CheckModuleMethod.pm from the distribution.
+    
+    Featues
+      - Add uninstall method to CustomBuild.pm.
+    
+    Changes
+      - Remove CheckModuleMethod.pm from dist files.
+Date:   2010-12-26 21:13:02 +0900
+    Fixed the template bug and add error message.
+    
+    Bug Fixes
+      - Fixed the <%== %> expansion in template not to escape special caractors.
+    
+    Changes
+      - Add the error message when user tring to apply scalar filters to the multiple result of the process.
+Date:   2010-11-25 22:47:20 +0900
+    Add some pod comment and rename internal method to make it has the prefix '_'.
+Date:   2010-11-24 22:13:26 +0900
+    Add the variable $Su::Process::SUPPRESS_LOAD_ERROR for suppress module loading error.
+    
+    Features
+      - Add the variable $Su::Process::SUPPRESS_LOAD_ERROR for suppress the error when
+        loading a process module.
+      - Add the method 'Su::Model->attr' for store variables in application scope.
+    
+    Changes
+      Make throw the error if loading process is not exist or failded to require.
+Date:   2010-11-24 21:53:32 +0900
+    Add some pod comment.
+
+0.007
+Date:   Sat Nov 20 22:41:37 2010 +0900
+    Suppress warnings when empty variable is passed to the <%= %> expression.
+
+0.006
+Date:   2010-11-20 17:25:58 +0900
+    Fixed the bug to use the model field of it's instance when injecting model deta to the Process.
+    
+    Bug fixes
+      Change the template for generating Process to use $self instance if $self is passed when the model accessor is called.
+    
+    Changes
+      Load Model class using 'new' method if thet Model has 'new' method.
+    
+    Misc
+      Add some tests to test filters.
+Date:   2010-11-20 00:05:27 +0900
+    Change the method name 'Su::Process::_has_suffix' and add POD document.
+    
+    Features
+      Add the feature to CustomBuild.pm to check whether the empty line is exist before a source code block in the pod document.
+    
+    Changes
+      Change the method name 'Su::Process::has_suffix' to 'Su::Process::_has_suffix'.
+    
+    Docs
+      Add the POD document.
+Date:   2010-11-15 23:15:46 +0900
+    Change .gitattributes.
+Date:   2010-11-15 23:09:01 +0900
+    Change .gitattributes.
+Date:   2010-11-15 22:54:27 +0900
+    Change .gitattributes.
+Date:   2010-11-14 17:29:59 +0900
+    Add .gitattribute file.
+
+0.005
+Date:   2010-11-14 08:54:51 +0900
+    Add the pod document.
+Date:   2010-11-13 17:14:56 +0900
+    Add and fixed the misspelling of the pod.
+
+0.004
+Date:   2010-11-11 23:09:16 +0900
+    Fixed the regex in the MANIFEST.SKIP.
+
+0.003
+Date:   2010-11-11 23:04:35 +0900
+    Add missing test script to MANIFEST and correct the regex in MANIFEST.SKIP.
+
+0.002
+Date:   2010-11-11 22:31:59 +0900
+    Fixed the CustomBuild::add_changes if the tag is not set.
+
+0.001
+Date:   2010-11-11 21:57:22 +0900
+    Init Project.
+

@@ -1,0 +1,15 @@
+bin/stemmer-se.pl
+Build.PL
+Changes
+examples/stemmer-se.pl
+lib/Lingua/Stem/Snowball/Se.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00-pod_coverage.t.disabled
+t/00-POD_valid.t
+t/01-load.t
+t/02-stem.t
+t/diffs.txt

@@ -1,0 +1,22 @@
+TODO list for Sidef
+
+Classes:
+    * Implement roles (from Perl 6) and add the `does` trait for classes
+      (http://doc.perl6.org/language/objects#Roles)
+
+Method/functions:
+    * Implement the `is exported` trait for functions and classes (maybe)
+
+New built-in classes:
+    * Implement a native `Matrix` class (as `Sidef::Types::Array::Matrix`) with functionality close to that of the `Math::Matrix` Perl module.
+    * Implement a native `Vector` class (as `Sidef::Types::Array::Vector`) with appropriate methods, such as: `dist`, `+`, `-`, `*`, `/`, etc...
+    * Implement a native `Set` class (as `Sidef::Types::Set::Set`) with appropriate methods, such as: `contains`, `remove`, `union`, `intersect`, etc...
+    * Implement a native `Bag` class (as `Sidef::Types::Set::Bag`) which would behave exactly like a multiset.
+
+Internal:
+    * Switch to subroutine `signatures` (as soon as this feature becomes stable).
+
+Speculations:
+    * Make all core methods (including user-defined methods) real multimethods, using Class::Multimethods.
+    * Bootstrap Sidef by writing a code generator in Sidef that generates Perl code.
+    * Rewrite all core libraries in Sidef.

@@ -1,0 +1,26 @@
+Changes
+examples/snmp_effective_example.pl
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/SNMP/Effective.pm
+lib/SNMP/Effective/Dispatch.pm
+lib/SNMP/Effective/Host.pm
+lib/SNMP/Effective/HostList.pm
+lib/SNMP/Effective/VarList.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00-basic.t
+t/10-host-hostlist.t
+t/10-varlist.t
+t/15-lock.t
+t/20-snmp-effective.t
+t/21-add.t
+t/22-execute.t

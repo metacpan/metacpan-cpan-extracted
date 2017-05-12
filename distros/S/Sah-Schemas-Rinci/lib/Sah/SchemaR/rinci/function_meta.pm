@@ -1,0 +1,218 @@
+package Sah::SchemaR::rinci::function_meta;
+
+our $DATE = '2016-12-26'; # DATE
+our $VERSION = '1.1.82.2'; # VERSION
+
+our $rschema = do {
+  my $a = [
+    "hash",
+    [
+      {
+        _prop   => {
+                     args => {
+                       _value_prop => {
+                         caption => {},
+                         cmdline_aliases => {
+                           _value_prop => { code => {}, description => {}, is_flag => {}, schema => {}, summary => {} },
+                         },
+                         cmdline_on_getopt => {},
+                         cmdline_prompt => {},
+                         cmdline_src => {},
+                         completion => {},
+                         default => {},
+                         default_lang => {},
+                         defhash_v => {},
+                         deps => { _keys => { all => {}, any => {}, arg => {}, none => {} } },
+                         description => {},
+                         element_completion => {},
+                         element_meta => { _prop => 'fix', _ver => 1.1, summary => "Rinci function metadata" },
+                         filters => {},
+                         greedy => {},
+                         index_completion => {},
+                         is_password => {},
+                         links => {},
+                         meta => 'fix',
+                         name => {},
+                         partial => {},
+                         pos => {},
+                         req => {},
+                         schema => {},
+                         stream => {},
+                         summary => {},
+                         tags => {},
+                         v => {},
+                         x => {},
+                       },
+                     },
+                     args_as => {},
+                     args_rels => {},
+                     caption => 'fix',
+                     default_lang => 'fix',
+                     defhash_v => 'fix',
+                     deps => {
+                       _keys => {
+                         all       => {},
+                         any       => {},
+                         code      => {},
+                         env       => {},
+                         func      => {},
+                         none      => {},
+                         pkg       => {},
+                         prog      => {},
+                         tmp_dir   => {},
+                         trash_dir => {},
+                       },
+                     },
+                     description => 'fix',
+                     entity_date => {},
+                     entity_v => {},
+                     examples => {
+                       _elem_prop => {
+                         args => {},
+                         argv => {},
+                         caption => 'fix',
+                         default_lang => 'fix',
+                         defhash_v => 'fix',
+                         description => 'fix',
+                         name => 'fix',
+                         result => {},
+                         src => {},
+                         src_plang => {},
+                         status => {},
+                         summary => 'fix',
+                         tags => 'fix',
+                         test => {},
+                         v => 'fix',
+                         x => 'fix',
+                       },
+                     },
+                     features => {
+                       _keys => {
+                         check_arg => {},
+                         dry_run => {},
+                         idempotent => {},
+                         immutable => {},
+                         pure => {},
+                         reverse => {},
+                         tx => {},
+                       },
+                     },
+                     is_class_meth => {},
+                     is_func => {},
+                     is_meth => {},
+                     links => {},
+                     name => 'fix',
+                     result => {
+                       _prop => {
+                         caption => 'fix',
+                         default_lang => 'fix',
+                         defhash_v => 'fix',
+                         description => 'fix',
+                         name => 'fix',
+                         partial => {},
+                         schema => {},
+                         statuses => {
+                           _value_prop => { description => {}, schema => {}, summary => {} },
+                         },
+                         stream => {},
+                         summary => 'fix',
+                         tags => 'fix',
+                         v => 'fix',
+                         x => 'fix',
+                       },
+                     },
+                     result_naked => {},
+                     summary => 'fix',
+                     tags => 'fix',
+                     v => 'fix',
+                     x => 'fix',
+                   },
+        _ver    => 1.1,
+        summary => "Rinci function metadata",
+      },
+    ],
+    ["hash"],
+  ];
+  $a->[1][0]{_prop}{args}{_value_prop}{element_meta}{_prop} = $a->[1][0]{_prop};
+  $a->[1][0]{_prop}{args}{_value_prop}{meta} = $a->[1][0]{_prop}{args}{_value_prop}{element_meta};
+  $a->[1][0]{_prop}{caption} = $a->[1][0]{_prop}{args}{_value_prop}{caption};
+  $a->[1][0]{_prop}{default_lang} = $a->[1][0]{_prop}{args}{_value_prop}{default_lang};
+  $a->[1][0]{_prop}{defhash_v} = $a->[1][0]{_prop}{args}{_value_prop}{defhash_v};
+  $a->[1][0]{_prop}{description} = $a->[1][0]{_prop}{args}{_value_prop}{description};
+  $a->[1][0]{_prop}{examples}{_elem_prop}{caption} = $a->[1][0]{_prop}{args}{_value_prop}{caption};
+  $a->[1][0]{_prop}{examples}{_elem_prop}{default_lang} = $a->[1][0]{_prop}{args}{_value_prop}{default_lang};
+  $a->[1][0]{_prop}{examples}{_elem_prop}{defhash_v} = $a->[1][0]{_prop}{args}{_value_prop}{defhash_v};
+  $a->[1][0]{_prop}{examples}{_elem_prop}{description} = $a->[1][0]{_prop}{args}{_value_prop}{description};
+  $a->[1][0]{_prop}{examples}{_elem_prop}{name} = $a->[1][0]{_prop}{args}{_value_prop}{name};
+  $a->[1][0]{_prop}{examples}{_elem_prop}{summary} = $a->[1][0]{_prop}{args}{_value_prop}{summary};
+  $a->[1][0]{_prop}{examples}{_elem_prop}{tags} = $a->[1][0]{_prop}{args}{_value_prop}{tags};
+  $a->[1][0]{_prop}{examples}{_elem_prop}{v} = $a->[1][0]{_prop}{args}{_value_prop}{v};
+  $a->[1][0]{_prop}{examples}{_elem_prop}{x} = $a->[1][0]{_prop}{args}{_value_prop}{x};
+  $a->[1][0]{_prop}{name} = $a->[1][0]{_prop}{args}{_value_prop}{name};
+  $a->[1][0]{_prop}{result}{_prop}{caption} = $a->[1][0]{_prop}{args}{_value_prop}{caption};
+  $a->[1][0]{_prop}{result}{_prop}{default_lang} = $a->[1][0]{_prop}{args}{_value_prop}{default_lang};
+  $a->[1][0]{_prop}{result}{_prop}{defhash_v} = $a->[1][0]{_prop}{args}{_value_prop}{defhash_v};
+  $a->[1][0]{_prop}{result}{_prop}{description} = $a->[1][0]{_prop}{args}{_value_prop}{description};
+  $a->[1][0]{_prop}{result}{_prop}{name} = $a->[1][0]{_prop}{args}{_value_prop}{name};
+  $a->[1][0]{_prop}{result}{_prop}{summary} = $a->[1][0]{_prop}{args}{_value_prop}{summary};
+  $a->[1][0]{_prop}{result}{_prop}{tags} = $a->[1][0]{_prop}{args}{_value_prop}{tags};
+  $a->[1][0]{_prop}{result}{_prop}{v} = $a->[1][0]{_prop}{args}{_value_prop}{v};
+  $a->[1][0]{_prop}{result}{_prop}{x} = $a->[1][0]{_prop}{args}{_value_prop}{x};
+  $a->[1][0]{_prop}{summary} = $a->[1][0]{_prop}{args}{_value_prop}{summary};
+  $a->[1][0]{_prop}{tags} = $a->[1][0]{_prop}{args}{_value_prop}{tags};
+  $a->[1][0]{_prop}{v} = $a->[1][0]{_prop}{args}{_value_prop}{v};
+  $a->[1][0]{_prop}{x} = $a->[1][0]{_prop}{args}{_value_prop}{x};
+  $a;
+};
+
+1;
+# ABSTRACT: Rinci function metadata
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Sah::SchemaR::rinci::function_meta - Rinci function metadata
+
+=head1 VERSION
+
+This document describes version 1.1.82.2 of Sah::SchemaR::rinci::function_meta (from Perl distribution Sah-Schemas-Rinci), released on 2016-12-26.
+
+=head1 DESCRIPTION
+
+This module is automatically generated by Dist::Zilla::Plugin::Sah::Schemas during distribution build.
+
+A Sah::SchemaR::* module is useful if a client wants to quickly lookup the base type of a schema without having to do any extra resolving. With Sah::Schema::*, one might need to do several lookups if a schema is based on another schema, and so on. Compare for example L<Sah::Schema::poseven> vs L<Sah::SchemaR::poseven>, where in Sah::SchemaR::poseven one can immediately get that the base type is C<int>. Currently L<Perinci::Sub::Complete> uses Sah::SchemaR::* instead of Sah::Schema::* for reduced startup overhead when doing tab completion.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schemas-Rinci>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Rinci>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Rinci>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,43 @@
+---
+common:
+  datasource:
+    - dbi:mysql:dbname
+    - user
+    - pass
+  tmpl_path: /usr/local/proj/template
+  info_addr: proj@example.com
+  favorite : precure
+
+develop:
+  datasource:
+    - dbi:mysql:proj
+    - dev_user
+    - dev_pass
+  session_servers:
+    - 127.0.0.1:XXXXX
+    - 127.0.0.2:XXXXX
+  cache_servers  :
+    - 127.0.0.1:XXXXX
+  host: proj.__ENV:USER__.dev.example.com
+  info_addr: __ENV:USER__@example.com
+  tmpl_path: __ENV:HOME__/template/proj
+  validator_message_file: __ENV:HOME__/conf/message.yaml
+
+develop_user:
+  org_param: foo
+  log: __ENV:HOME__/foo/__ENV:USER__.conf
+
+product:
+  datasource:
+    - dbi:mysql:proj
+    - proj
+    - pass_xxx
+  session_servers:
+    - 111.111.111.1:12345
+  cache_servers  :
+    - 222.222.222.2:12345
+  tmpl_path: /path/to/template/proj
+  host: proj.example.com
+  validator_message_file: /path/to/conf/message.yaml
+  info_addr: info@proj.example.com
+

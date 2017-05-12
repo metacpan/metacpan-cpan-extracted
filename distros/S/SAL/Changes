@@ -1,0 +1,20 @@
+Revision history for Perl extension SAL.
+
+3.03  Wed Jun 30 20:59:03 2005
+	- Added CSV export method to SAL::DBI (Thanks to Payal Pal for the suggestion.)
+	- Updated SAL::DBI, SAL::Graph, SAL::WebDDR pods
+
+3.02  Mon Jun 27 22:23:10 2005
+	- Updated SAL.pm pod
+	- Added SAL::DBI pod
+	- Added SAL::Graph pod
+	- Added SAL::WebDDR pod
+
+3.01  Sun Jun 26 18:44:46 2005
+	- Packaged for CPAN to clean up installation, and docs
+
+3.00  First public release, not properly packaged.
+
+2.00  Unreleased.  Massive overhaul (complete rewrite)
+
+1.00  Unreleased.  Basic Concepts (and terrible documentation.)

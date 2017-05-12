@@ -1,0 +1,58 @@
+# chat_server.stem
+#
+[
+	class	=>	'Stem::Console',
+],
+[
+	class	=>	'Stem::Hub',
+	name	=>	'server',
+	args	=>	[],
+],
+[
+	class	=>	'Stem::Portal',
+	args	=>	['server' => 1 ],
+],
+[
+	class	=>	'Stem::SockMsg',
+	name	=>	'C',
+	args	=>	[
+		port		=> 6668,
+		server		=> 1,
+		cell_attr	=> [
+			'data_addr'	=> ':sw:c'
+		],
+	],
+],
+[
+	class	=>	'Stem::SockMsg',
+	name	=>	'D',
+	args	=>	[
+		port		=> 6669,
+		server		=> 1,
+		cell_attr	=> [
+			'data_addr'	=> ':sw:d'
+		],
+	],
+],
+[
+	class	=>	'Stem::Switch',
+	name	=>	'sw',
+	args	=>	[
+
+		in_map => [
+
+			a => [ qw( a b c d ) ],
+			b => 'a',
+			c => [ qw( b d ) ],
+			d => 'c',
+		],
+
+		out_map => [
+
+			a => 'client:A',
+			b => 'client:B',
+			c => 'C',
+			d => 'D',
+		],
+	],
+],

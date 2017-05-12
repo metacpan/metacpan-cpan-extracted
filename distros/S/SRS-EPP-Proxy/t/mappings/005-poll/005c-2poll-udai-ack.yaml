@@ -1,0 +1,16 @@
+template: poll-ack.tt
+
+vars:
+  msg_id: 0100005c-2-udai.yml
+
+input_assertions:
+  class: SRS::EPP::Command::Poll
+  match:
+
+SRS:
+ - assertions:
+     count:
+     attr_is:
+output_assertions:
+  attr_is:
+    - [ '//epp:result', 'code', 1000, 'EPP: response code' ]

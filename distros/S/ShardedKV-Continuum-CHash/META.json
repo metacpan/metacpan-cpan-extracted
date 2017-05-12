@@ -1,0 +1,46 @@
+{
+   "abstract" : "Continuum implementation based on Algorithm::ConsistentHash::CHash",
+   "author" : [
+      "Steffen Mueller <smueller@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.005, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "ShardedKV-Continuum-CHash",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Algorithm::ConsistentHash::CHash" : "0.00008",
+            "Carp" : "0",
+            "JSON::XS" : "0",
+            "ShardedKV" : "0.18"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/tsee/p5-ShardedKV-Continuum-CHash",
+         "web" : "http://github.com/tsee/p5-ShardedKV-Continuum-CHash"
+      }
+   },
+   "version" : "0.01"
+}
+

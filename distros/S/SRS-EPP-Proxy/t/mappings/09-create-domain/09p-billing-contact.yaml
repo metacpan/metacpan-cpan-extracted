@@ -1,0 +1,16 @@
+# Create with billing contact, which is not supported
+template: create-domain.tt
+
+vars:
+  domain: 09n.co.te
+  owner: id123
+  billing: id123
+
+input_assertions:
+  class: SRS::EPP::Command::Create::Domain
+
+output_assertions:
+  count:
+  match:
+  attr_is:
+    - [ '//epp:result', 'code', '2102', 'SRS: Check result code' ]

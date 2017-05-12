@@ -1,0 +1,577 @@
+
+=encoding utf8
+
+=head1 NAME
+
+REVISION HISTORY - Set::Object
+
+=head1 1.35, 2015-06-10
+
+=over
+
+=item *
+
+Change to Artistic License 2.0
+
+=item *
+
+Add more misc tests. Add use strict to Set::Object::Weak
+
+=back
+
+=head1 1.34, 2013-12-25
+
+=over
+
+=item *
+
+Make synopsis examples work (tadzik)
+
+=back
+
+=head1 1.33, 2013-12-13
+
+=over
+
+=item *
+
+Fix RT #90070: Improve pod for sorted @$set in list context vs 
+unsorted ->elements (ftobin)
+
+=item *
+
+Fix RT #87658: Typo in pod (dsteinbrunner)
+
+=back
+
+=head1 1.32, 2013-05-15 rurban (released 2013-12-13)
+
+=over
+
+=item *
+
+Reverts Changes.pod patch RT#85244 as it conflicts with the Set::Object pod on metacpan.
+Also RT #85246
+
+=back
+
+=head1 1.31, 2013-05-13 rurban
+
+=over
+
+=item *
+
+Changes.pod patch by Gregor Hermann, debian perl group - RT#85244
+
+=back
+
+=head1 1.30, 2013-04-04 rurban (new maintainer)
+
+=over
+
+=item *
+
+Fixes for 5.16 and newer - RT#83426
+Sort by member names, not the refs.
+Fix wrong weak test with globals. Changed to lexicals and use strict/warnings.
+
+=item *
+
+Fix F<t/misc/segfault.t>, check SvMAGICAL before doing C<mg_find>
+
+=item *
+
+Fixed wrong C format types in warnings and C<SET_OBJECT_MAGIC_backref>.
+Added PREREQ_PMs, make L<Test::LeakTrace> and L<Moose> an optional dependency
+for F<t/misc/more_leaks.t>
+
+=item *
+
+Improve thread-safety (forbid concurrent writes), but still dealing with 
+Attempt to free non-existent shared string and 
+Unbalanced string table refcount: (1) for "8" during global destruction.
+- RT #22760
+
+=item *
+
+Add missing typemap entry const char * for 5.6
+
+=back
+
+=head1 1.29, 13 Feb 2013
+
+=over
+
+=item *
+
+Fixed a typo in a function which really shouldn't exist - RT#79653
+
+=item *
+
+Marked a couple of functions as deprecated for removal (including the
+above function).
+
+=item *
+
+Fixed the magic cleanup code to use the appropriate macro/function to
+clean up the magic list instead of trying to do it itself.
+Unsurprisingly, fixes a memory leak.  (RT#69967, also RT#67289)
+
+=back
+
+=head1 1.28, 22 Jul 2010
+
+=over
+
+=item *
+
+Fixed a portability concern for some platforms' C compilers (that do
+not support //-style comments) - RT#52690
+
+=item *
+
+Valid SIGNATURE file - RT#50492
+
+=back
+
+=head1 1.27, 15 Jan 2009
+
+=over
+
+=item *
+
+Fix a typo that affected building against Perls with debugging enabled.
+
+=item *
+
+A minor #define refactor (Yuval).
+
+=item *
+
+Squash some long-standing warnings I had been ignoring for ages and
+Havard Eidnes prompted me to fix by logging an RT ticket for it.
+
+=item *
+
+Squash some global clean-up warnings.
+
+=back
+
+=head1 1.26, 13 Oct 2008
+
+=over
+
+=item *
+
+Methods which destroyed C<$@> due to internal use of C<eval> now
+properly call C<local($@)> (Yuval)
+
+=item *
+
+Fix a leak and a corner case with weak set magic, and squash some
+warnings (Yuval)
+
+=item *
+
+Define behaviour when dealing with return values from operations on
+weak sets.  No longer hard-coded "Set::Object" - may affect
+Set::Object sub-classes (Sam).
+
+=item *
+
+(post-release changelog entry) related to the previous change,
+Set::Object::Weak::set did not use to shift the invocant off the
+stack, which caused result sets to have the inserted sets as members.
+It now does, fixing this bug.
+
+=back
+
+=head1 1.25, 22 Jul 2008
+
+=over
+
+=item *
+
+Portability: support Perls before 5.7.3, and make this dependency
+explicit in the F<Makefile.PL>
+
+=back
+
+=head1 1.24, 20 Jul 2008
+
+=over
+
+=item *
+
+Remove threads test which had inadvertantly slipped into the MANIFEST
+from source control, and add comprehensive documentation on the state
+of thread support in this module.
+
+=item *
+
+Correct other silly MANIFEST mistakes.
+
+=back
+
+=head1 1.23, 18 Jul 2008
+
+=over
+
+=item *
+
+Make behaviour when dealing with items which were C<undef> defined.
+Previously it might segfault (or Bus Error on Mac OS X) on some
+operations and Perl versions, or result in an empty string being
+inserted.
+
+=item *
+
+Fix a minor compile problem on IRIX, reported by David Cantrell.
+
+=back
+
+=head1 1.22, 8 Oct 2007
+
+=over
+
+=item *
+
+Sub-classing interface added; it is now much easier to make
+L<Set::Object> subclasses that return objects other than more
+L<Set::Object>s when subclassing.  From Brían Mach Aon Innéirghthe.
+
+=back
+
+=head1 1.21, 17 Feb 2007
+
+=over
+
+=item *
+
+Fix false negative when Test::Pod::Coverage isn't installed.  Reported
+by Anna Bernathova of SuSE.
+
+=back
+
+=head1 1.20, 16 Feb 2007
+
+=over
+
+=item *
+
+The C<-E<gt>compare> function was returning "disjoint" for empty sets.
+RT#24965.  (Nigel Metheringham)
+
+=item *
+
+Document lots of methods that were previously not documented.
+
+=item *
+
+Fix C<Set::Object::Weak::set()>.  It was not passing its arguments to
+C<Set::Object::Weak-E<gt>new()>, which was very broken.
+
+=back
+
+=head1 1.19, 23 Jan 2007
+
+=over
+
+=item *
+
+remove bogus inclusions of Data::Dumper and Devel::Peek
+
+=item *
+
+New class C<Set::Object::Weak>, which all weak sets should get
+re-blessed into when you call C<-E<gt>weaken>.  Also added alternative
+methods of constructing weak sets.
+
+=item *
+
+Fix a memory leak with scalar members (the internal hash used to store
+the items was never being freed).  RT#24508.
+
+=back
+
+=head1 1.18, 14 Sep 2006
+
+=over
+
+=item *
+
+We could only build on gcc due to the use of variadic macros.
+use C<#ifdef> to hide this GCC-specific extension (used only for
+debugging) from non-GCC compilers.
+
+=item *
+
+Add note to man page on compatibility of C<Storable> serializations of
+C<Set::Object>s between revisions.
+
+=back
+
+=head1 1.17, 1 Aug 2006
+
+=over
+
+=item *
+
+fix compile problem affecting some platforms
+
+=back
+
+=head1 1.16, 18 Jul 2006
+
+=over
+
+=item *
+
+weak reference support
+
+=back
+
+=head1 1.15, 21 Jun 2006
+
+=over
+
+=item *
+
+Dumping sets with scalars in them via L<Storable> now works.
+
+=back
+
+=head1 1.14
+
+=over
+
+=item *
+
+Fix build problem on Win32 (thanks Steffen Goeldner)
+
+=back
+
+=head1 1.13
+
+=over
+
+=item *
+
+Fix F<Makefile.PL> so this F<Changes.pod> is not delivered as
+C<Set::Changes> :-}
+
+=item *
+
+Restore compatibility with 5.6.0
+
+=item *
+
+Remove some compile-time warnings, please let me know if this version
+does not build on any platform!
+
+=back
+
+=head1 1.12, 30 Aug 2005
+
+=over
+
+=item *
+
+added patch from Sergey Skvortsov for backwards compatibility with
+Perl versions before 5.8 (include >100k F<ppport.h>!)
+
+=item *
+
+removed 'C<set()>' constructor from default export list, as its name
+conflicts with too many other modules.
+
+=back
+
+=head1 1.11, 27 Apr 2005
+
+=over
+
+=item *
+
+removed debugging C<&_> func (was causing strange errors on 5.9.1)
+
+=cut
+
+=back
+
+=head1 1.10, 2 Apr 2005
+
+
+=over
+
+=item *
+
+added 'C<set()>' constructor and use-as-array-ref interface
+
+=back
+
+=head1 1.09, 26 Mar 2005
+
+=over
+
+=item *
+
+added 'bool' overload operator to C<Set::Object>.  For backwards
+compatibility, always returns true.
+
+=back
+
+=head2 1.08_02, 14 Jan 2005
+
+=over
+
+=item *
+
+Cutting out the "Universe" representation; this module gives plain
+sets only.
+
+=item *
+
+documentation fixes
+
+=back
+
+=head2 1.08_01, 12 Jan 2005
+
+=over
+
+=item *
+
+First attempt at adding support for scalars.  This version tries to
+work as closely to C<Set::Scalar> as possible.
+
+This approach will not be continued unless there are a lot of requests
+for it to be implemented.  I think it's overly complicated, and not
+what people expect when they want a Set.
+
+=back
+
+=head1 1.08, 14 Oct 2004
+
+=over
+
+=item *
+
+another segfault bites the dust; this time, avoids a segfault when
+taking a difference between sets of exactly 31 and 0 size.  Same root
+fault as the previous bug, this time I have a test case for it, too.
+
+=back
+
+=head1 1.07, 16 Aug 2004
+
+=over
+
+=item *
+
+yet another segfault fix, this time due to incorrect use of PUSHs vs
+XPUSHs.  There is no test case for this bug unfortunately.
+
+=back
+
+=head1 1.06, 1 May 2004
+
+=over
+
+=item *
+
+Fixed segfault when attempting to remove items from an empty set (fix
+from Richard Sterling Cox)
+
+=back
+
+=head1 1.05, 5 Jan 2004
+
+=over
+
+=item *
+
+some segfault fixes with Storable and Perl 5.6.1 (Perl 5.8.1 should be
+OK)
+
+=back
+
+=head1 1.04, 3 Aug 2003
+
+=over
+
+=item *
+
+added various functions similar to some found in Scalar::Util, but
+with an extra one that performs a function that lays some groundwork
+for L<Container::Object> (C<ish_int>).
+
+Some of these functions were in the XS code anyway, and they are
+extremely small, so I didn't see a problem with duplicating them -
+saves an extra dependency.  Plus, Graham Barr won't let me put
+C<ish_int> or C<is_key> in his module.
+
+Knowing that they are available will also assist in fixing some longer
+standing bugs in Tangram (eg, using C<$obj + 0> to get a unique ID
+when C<refaddr($obj)> would be better)
+
+=item *
+
+lots more input marshalling; if you ever end up doing funny things to
+a C<Set::Object>, then at least now you'll get a clearer error
+message.
+
+=item *
+
+more tests; L<Devel::Cover> test coverage now at 91% (stmt), 67% (branch)
+
+=item *
+
+erroneously putting scalars into C<Set::Object>s now no longer dumps
+core.
+
+=item *
+
+serialisation of C<Set::Object> objects is now possible via the
+L<Storable> module (L<Data::Dumper> still does the wrong thing, but
+there is nothing I can do about that).
+
+=back
+
+=head1 1.03, 24 Jan 2003
+
+=over
+
+=item *
+
+fixed overload related bug
+
+=back
+
+=head1 HISTORIC RELEASES
+
+From original F<Changes> file.
+
+ Revision history for Perl extension Set::Object.
+ 
+ 0.01  Sat Jun  6 13:36:56 1998
+	 - original version; created by h2xs 1.18
+ 
+ 0.02  Sun Jul  12 1998
+	 - fixed refcount bug that leaked object when hash was
+           reorganized
+	 - ensured compatibility with Perl 5.004_71
+ 
+ 1.00 mid-99
+	 - fixed some bug (related to subsets?)
+	 - first mature release
+ 
+ 1.01 8 Nov 1999
+	 - no longer use Perl arrays internally, now compatible with
+           Perl 5.005_62
+ 
+ 1.02 8 May 08 2000
+	 - fixed bug that miscomputed new bucket while reindexing
+
+=cut
+

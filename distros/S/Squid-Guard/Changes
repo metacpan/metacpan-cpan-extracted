@@ -1,0 +1,43 @@
+Revision history for Perl extension Squid::Guard.
+
+0.15  Fri Feb 04 2011
+	- implemented a cache for expensive checkin*group calls
+	- decode escape sequences in username in request
+	- encode returned url parameters
+0.14  Thu Jan 20 2011
+	- do not return a leading space when concurrency is disabled
+	- checkincateg can check multiple categories
+	- checkin*group can check multiple groups
+0.13  Tue Nov 02 2010
+	- added experimental userdomains file support
+	- initial minimal support for concurrency protocol
+0.12  Mon Oct 11 2010
+	- minor documentation cleaning
+0.11  Sat Oct 09 2010
+	- support for key-value pairs in request
+0.10  Wed Sep 01 2010
+	- tweaks to support freebsd based platforms
+0.09  Tue Aug 31 2010
+	- tweaks to be happy with CPAN Testers
+0.08  Mon Aug 30 2010
+	- mkdb method for creating .db files
+	- first release submitted to CPAN
+0.07  Mon Aug 30 2010
+	- Added tests for urls and expressions
+	- Some code cleaning
+	- Some pod cleaning
+0.06  Fri Aug 27 2010
+	- Dont update .db files by default
+	- Some cleaning
+0.05  Thu Aug 24 2010
+	- Dont use URI anymore pfor url parsing: used it for canonicalizing urls, but squid is already giving cleaned urls
+0.04  Mon Aug 23 2010
+	- Name changed from Net::Squid::Guard to Squid::Guard
+0.03  Thu Aug 17 2010
+	- Added the 'CHECKF' special value for redir
+0.02  Mon Aug 16 2010
+	- automatic .db file (re)generation
+0.01  Fri Jul 23 21:46:07 2010
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -n Net::Squid::Guard
+

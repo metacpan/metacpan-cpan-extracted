@@ -1,0 +1,155 @@
+0.1.46 Sun Feb 12 13:45:52 PST 2017
+ - Release after pause-cleanup screwed up Swim dists
+
+0.1.45 Fri Dec 23 21:09:21 CET 2016
+ - Fix split lines on hyperlinks in Pod
+
+0.1.44 Fri Dec  2 15:26:19 PST 2016
+ - Apply PR/32 typo (@perlpunk++)
+ - Apply PR/34 IPC::Run dependency (@perlpunk++)
+ - Apply PR/35 Output IPC::Run stderr (@perlpunk++)
+
+0.1.43 Thu Feb 25 11:50:52 PST 2016
+ - Add a pod-custom-link support to meta
+ - Undocumented feature for now
+
+0.1.42 Wed Jan 27 22:07:11 PST 2016
+ - 2016 update
+
+0.1.41 Tue Oct 20 17:12:48 UTC 2015
+ - Change the manpage gen date to be 'Month YEAR'
+ - Like "October 2015"
+ - Less churn in generated docs
+
+0.1.40 Sat Oct 10 01:13:21 UTC 2015
+ - Replace Perl stuff in manpages with appropriate content
+
+0.1.39 Fri Mar 13 18:15:09 PDT 2015
+ - Fix Pod cpan-head bug
+
+0.1.38 Fri Jan 23 20:55:13 PST 2015
+ - Fix unicode in manpages
+ - Fix <a@b.com> not a pfunc
+
+0.1.37 Wed Jan  7 11:25:21 PST 2015
+ - Support utf8 in swim --to_man
+
+0.1.36 Mon Jan  5 08:26:34 PST 2015
+ - Doc fix by David Hand++ PR/29
+
+0.1.35 Thu Jan  1 18:16:49 PST 2015
+ - Allow spaces and arguments in one line block-func
+
+0.1.34 Wed Dec 31 23:22:30 PST 2014
+ - Fix to allow single char bold and italic phrases
+
+0.1.33 Wed Dec 31 21:19:10 PST 2014
+ - Refactor into OO classes
+ - Swim.pm is a converter class
+ - Swim::Command has all the bin/swim guts
+
+0.1.32 Wed Dec 31 15:55:12 PST 2014
+ - Add block-func support
+
+0.1.31 Sun Oct 26 22:56:22 UTC 2014
+ - Add ordered and data list support for HTML
+ - Add under support in Pod
+
+0.1.30 Fri Sep 19 17:36:19 PDT 2014
+ - Fix Issue/15. Bad titles in HTML rendering.
+
+0.1.29 Fri Sep 19 17:07:58 PDT 2014
+ - Add _underline_ support
+
+0.1.28 Fri Sep 19 11:30:57 PDT 2014
+ - Refactor the unit separation code.
+
+0.1.27 Sat Sep 13 19:23:45 PDT 2014
+ - Add Swim VERSION to Pod headers
+
+0.1.26 Sat Sep 13 02:09:40 PDT 2014
+ - Account for all phrases in Pod
+
+0.1.25 Sat Sep 13 02:00:32 PDT 2014
+ - Fixed bug in multi-block list items
+
+0.1.24 Fri Sep  5 06:45:36 UTC 2014
+ - Add support for numbered lists
+ - And nested! (davido++)
+
+0.1.23 Thu Aug 28 11:11:30 PDT 2014
+ - Add cursory image support for Pod. `<image url>`
+
+0.1.22 Sat Aug 16 16:57:38 PDT 2014
+ - Change ' / ' to '/' in doc
+
+0.1.21 Sat Aug 16 16:14:14 PDT 2014
+ - Fix strict/warnings
+
+0.1.20 Sat Aug 16 14:20:32 PDT 2014
+ - Remove =travis section
+
+0.1.19 Sat Aug 16 12:26:48 PDT 2014
+ - Meta 0.0.2
+
+0.1.18 Fri Aug 15 20:46:57 PDT 2014
+ - Fix bad Changes entry
+
+0.1.17 Fri Aug 15 20:44:07 PDT 2014
+ - Add t/000-compile-modules.t
+
+0.1.16 Wed Aug 13 16:35:02 PDT 2014
+ - Headers now can have phrase markup
+
+0.1.15 Thu Aug  7 00:19:12 PDT 2014
+ - Fix unicode issues
+
+0.1.14 Mon Aug  4 23:05:57 PDT 2014
+ - Refactor YAML loading into Swim::Util
+ - Add prereqs Hash::Merge and YAML::XS to Meta
+
+0.1.13 Mon Aug  4 14:12:24 PDT 2014
+ - Add support for meta data
+ - Both inline and external --meta=file
+ - Render with <$varname>
+
+0.1.12 Thu Jul 17 10:42:42 PDT 2014
+ - Dep on a fixed Pegex
+
+0.1.11 Sun Jul 13 21:15:35 PDT 2014
+ - Update Contributing file.
+
+0.1.10 Sun Jul 13 20:32:34 PDT 2014
+ - Add Contributing file.
+
+0.1.9 Sun Jul 13 18:24:59 PDT 2014
+ - Make --help exit (after helping).
+
+0.1.8 Mon Jul  7 22:47:50 PDT 2014
+ - Had to revert 0.1.7 from bug in Text::Autoformat :\
+
+0.1.7 Mon Jul  7 22:35:03 PDT 2014
+ - Don't wrap paragraphs with URLs in them.
+
+0.1.6 Mon Jul  7 21:36:35 PDT 2014
+ - Support .txt output. Formatted plain text.
+ - Add usage to `bin/swim`
+ - Update doc
+
+0.1.5 Mon Jul  7 20:45:10 PDT 2014
+ - Add --strikethough-- support for Pod and Markdown
+
+0.1.4 Sat Jul  5 19:07:18 PDT 2014
+ - Fix utf8 bug in --to=man
+
+0.1.3 Sun Jun 29 12:48:02 PDT 2014
+ - Add Text::Autoformat prereq. xdg++
+
+0.1.2 Wed Jun 25 14:40:14 PDT 2014
+ - Fix badges in doc
+
+0.1.1 Wed Jun 25 12:30:21 PDT 2014
+ - Change irc channel to
+
+0.1.0 Wed Jun 25 12:19:02 PDT 2014
+ - First Swim release. Simply migrated from Kwim.

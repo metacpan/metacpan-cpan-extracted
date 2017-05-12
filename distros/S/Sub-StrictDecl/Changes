@@ -1,0 +1,39 @@
+version 0.004; 2015-03-20
+
+  * bugfix: require bugfixed version of Lexical::SealRequireHints (for not
+    breaking version-implied features and for require argument context)
+
+  * port to Perl 5.21.4, where gv ops don't necessarily refer to real GVs
+
+version 0.003; 2011-11-21
+
+  * bugfix: require bugfixed version of Lexical::SealRequireHints (for
+    compatibility with early-loaded warnings.pm) and invoke it earlier
+    to make sure it takes effect in time
+
+  * in Build.PL, declare incompatibility with pre-0.19
+    B::Hooks::OP::Check, which doesn't play nicely around op check hooking
+
+  * convert .cvsignore to .gitignore
+
+version 0.002; 2011-07-26
+
+  * bugfix: require bugfixed version of Lexical::SealRequireHints (for
+    working around [perl #73174])
+
+  * fix test case for lexical hints leaking into require
+
+  * add Perl::Critic::StricterSubs to "see also" list
+
+version 0.001; 2011-07-04
+
+  * bugfix: cope with the speculative rv2cv op building performed by
+    Perl 5.11.2 and later
+
+  * ensure compatibility with Devel::CallParser
+
+  * add META.json, MYMETA.json, and MYMETA.yml to .cvsignore
+
+version 0.000; 2011-06-30
+
+  * initial released version

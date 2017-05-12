@@ -1,0 +1,386 @@
+{
+   "abstract" : "Determine if a string is a palindrome",
+   "author" : [
+      "Adam Lesperance <lespea@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200007, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "String-Palindrome",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt",
+         "utils",
+         "share",
+         "example",
+         "examples"
+      ],
+      "file" : [
+         "README.html"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : 0,
+            "perl" : "5.008",
+            "utf8" : 0,
+            "vars" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper" : 0,
+            "English" : 0,
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-String-Palindrome@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=String-Palindrome"
+      },
+      "homepage" : "http://search.cpan.org/dist/String-Palindrome",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/lespea/string-palindrome.git",
+         "web" : "https://github.com/lespea/string-palindrome"
+      }
+   },
+   "version" : "2.000001",
+   "x_Dist_Zilla" : {
+      "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::GatherDir",
+            "name" : "@Author::LESPEA/GatherDir",
+            "version" : "4.200007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CopyFilesFromBuild",
+            "name" : "@Author::LESPEA/CopyFilesFromBuild",
+            "version" : "0.103510"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::UploadToCPAN",
+            "name" : "@Author::LESPEA/UploadToCPAN",
+            "version" : "4.200007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ArchiveRelease",
+            "name" : "@Author::LESPEA/ArchiveRelease",
+            "version" : "3.01"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::AutoMetaResources",
+            "name" : "@Author::LESPEA/AutoMetaResources",
+            "version" : "1.110050"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Authority",
+            "name" : "@Author::LESPEA/Authority",
+            "version" : "1.005"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::SynopsisTests",
+            "name" : "@Author::LESPEA/SynopsisTests",
+            "version" : "1.101420"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PkgVersion",
+            "name" : "@Author::LESPEA/PkgVersion",
+            "version" : "4.200007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodWeaver",
+            "name" : "@Author::LESPEA/PodWeaver",
+            "version" : "3.101641"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::NextRelease",
+            "name" : "@Author::LESPEA/NextRelease",
+            "version" : "4.200007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MinimumPerl",
+            "name" : "@Author::LESPEA/MinimumPerl",
+            "version" : "1.003"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::AutoPrereqs",
+            "name" : "@Author::LESPEA/AutoPrereqs",
+            "version" : "4.200007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaConfig",
+            "name" : "@Author::LESPEA/MetaConfig",
+            "version" : "4.200007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CompileTests",
+            "name" : "@Author::LESPEA/CompileTests",
+            "version" : "1.110930"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ConsistentVersionTest",
+            "name" : "@Author::LESPEA/ConsistentVersionTest",
+            "version" : "0.02"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CriticTests",
+            "name" : "@Author::LESPEA/CriticTests",
+            "version" : "1.111450"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::DistManifestTests",
+            "name" : "@Author::LESPEA/DistManifestTests",
+            "version" : "1.101420"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::EOLTests",
+            "name" : "@Author::LESPEA/EOLTests",
+            "version" : "0.02"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::HasVersionTests",
+            "name" : "@Author::LESPEA/HasVersionTests",
+            "version" : "1.101420"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::KwaliteeTests",
+            "name" : "@Author::LESPEA/KwaliteeTests",
+            "version" : "1.101420"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaTests",
+            "name" : "@Author::LESPEA/MetaTests",
+            "version" : "4.200007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MinimumVersionTests",
+            "name" : "@Author::LESPEA/MinimumVersionTests",
+            "version" : "1.101421"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::NoTabsTests",
+            "name" : "@Author::LESPEA/NoTabsTests",
+            "version" : "0.01"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodCoverageTests",
+            "name" : "@Author::LESPEA/PodCoverageTests",
+            "version" : "4.200007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
+            "name" : "@Author::LESPEA/PodSyntaxTests",
+            "version" : "4.200007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PortabilityTests",
+            "name" : "@Author::LESPEA/PortabilityTests",
+            "version" : "1.101420"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::UnusedVarsTests",
+            "name" : "@Author::LESPEA/UnusedVarsTests",
+            "version" : "1.100860"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::CPAN::Changes",
+            "name" : "@Author::LESPEA/Test::CPAN::Changes",
+            "version" : "0.005"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::SpellingCommonMistakesTests",
+            "name" : "@Author::LESPEA/SpellingCommonMistakesTests",
+            "version" : "1.001000"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExtraTests",
+            "name" : "@Author::LESPEA/ExtraTests",
+            "version" : "4.200007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PruneCruft",
+            "name" : "@Author::LESPEA/PruneCruft",
+            "version" : "4.200007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ManifestSkip",
+            "name" : "@Author::LESPEA/ManifestSkip",
+            "version" : "4.200007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExecDir",
+            "name" : "@Author::LESPEA/ExecDir",
+            "version" : "4.200007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ShareDir",
+            "name" : "@Author::LESPEA/ShareDir",
+            "version" : "4.200007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ReportVersions::Tiny",
+            "name" : "@Author::LESPEA/ReportVersions::Tiny",
+            "version" : "1.03"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ModuleBuild",
+            "name" : "@Author::LESPEA/ModuleBuild",
+            "version" : "4.200007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MakeMaker",
+            "name" : "@Author::LESPEA/MakeMaker",
+            "version" : "4.200007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::DualBuilders",
+            "name" : "@Author::LESPEA/DualBuilders",
+            "version" : "1.001"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaNoIndex",
+            "name" : "@Author::LESPEA/MetaNoIndex",
+            "version" : "4.200007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::License",
+            "name" : "@Author::LESPEA/License",
+            "version" : "4.200007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::InstallGuide",
+            "name" : "@Author::LESPEA/InstallGuide",
+            "version" : "1.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaJSON",
+            "name" : "@Author::LESPEA/MetaJSON",
+            "version" : "4.200007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaYAML",
+            "name" : "@Author::LESPEA/MetaYAML",
+            "version" : "4.200007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ReadmeAnyFromPod",
+            "name" : "@Author::LESPEA/html.build",
+            "version" : "0.103522"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ReadmeAnyFromPod",
+            "name" : "@Author::LESPEA/text.build",
+            "version" : "0.103522"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ReadmeAnyFromPod",
+            "name" : "@Author::LESPEA/pod.root",
+            "version" : "0.103522"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Manifest",
+            "name" : "@Author::LESPEA/Manifest",
+            "version" : "4.200007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::TestRelease",
+            "name" : "@Author::LESPEA/TestRelease",
+            "version" : "4.200007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ConfirmRelease",
+            "name" : "@Author::LESPEA/ConfirmRelease",
+            "version" : "4.200007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Signature",
+            "name" : "Signature",
+            "version" : "1.100930"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Check",
+            "name" : "Git::Check",
+            "version" : "1.111590"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Commit",
+            "name" : "Commit_Changes",
+            "version" : "1.111590"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Tag",
+            "name" : "Git::Tag",
+            "version" : "1.111590"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Push",
+            "name" : "Git::Push",
+            "version" : "1.111590"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":InstallModules",
+            "version" : "4.200007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":IncModules",
+            "version" : "4.200007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":TestFiles",
+            "version" : "4.200007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ExecFiles",
+            "version" : "4.200007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ShareFiles",
+            "version" : "4.200007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":MainModule",
+            "version" : "4.200007"
+         }
+      ],
+      "zilla" : {
+         "class" : "Dist::Zilla::Dist::Builder",
+         "config" : {
+            "is_trial" : 0
+         },
+         "version" : "4.200007"
+      }
+   },
+   "x_authority" : "cpan:LESPEA"
+}
+

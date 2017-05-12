@@ -1,0 +1,73 @@
+<table class="standard-table" id="system-logs">
+  <thead>
+    <tr>
+      <th><% loc('Timestamp') %></th>
+      <th><% loc('User') %></th>
+      <th><% loc('Wiki') %></th>
+      <th><% loc('Page') %></th>
+      <th><% loc('Message') %></th>
+      <th></th>
+    </tr>
+  </thead>
+
+% while ( my $log = $logs->next() ) {
+  <tbody>
+    <tr class="<% defined $log->data_blob() ? 'has-child-row' : q{} %> <% $logs->index() % 2 ? 'odd' : 'even' %>">
+      <td><% loc( '%datetime(%1)', $c->user()->set_time_zone_for_dt( $log->log_datetime() ) ) %></td>
+      <td><a href="<% $log->user()->uri() %>"><% $log->user()->best_name() %></a></td>
+      <td>
+%  if ( my $wiki = $log->wiki() ) {
+        <a href="<% $wiki->uri() %>"><% $wiki->title() %></a>
+%  }
+      </td>
+      <td>
+%  if ( my $page = $log->page() ) {
+        <a href="<% $page->uri() %>"><% $page->title() %></a>
+%  }
+      </td>
+      <td><% $log->message() %></td>
+      <td>
+%   if ( defined $log->data_blob() ) {
+        <a href="#" class="toggle-more" id="toggle-more-<% $log->log_id() %>"><% loc('more') %></a>
+%   }
+      </td>
+    </tr>
+%   if ( defined $log->data_blob() ) {
+    <tr class="<% $logs->index() % 2 ? 'odd' : 'even' %>">
+      <td colspan="6">
+        <pre id="more-<% $log->log_id() %>"
+             class="log-blog"
+             style="display: none"
+             ><% Data::Dumper->new( [ $log->data_blob() ] )
+                             ->Terse(1)
+                             ->Indent(1)
+                             ->Useqq(1)
+                             ->Deparse(1)
+                             ->Quotekeys(0)
+                             ->Sortkeys(1)
+                             ->Dump() %></pre>
+      </td>
+    </tr>
+%   }
+  </tbody>
+% }
+
+<& /lib/table/pager.mas,
+   index     => $logs->index(),
+   pager     => $pager,
+   uri_maker => sub { $c->domain()->application_uri( path => '/logs', @_ ) } &>
+
+</table>     
+
+<%args>
+$logs
+$pager
+</%args>
+
+<%method title>
+System Logs
+</%method>
+
+<%attr>
+sidebar => [ 'admin' ]
+</%attr>

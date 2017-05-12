@@ -1,0 +1,50 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 2c7c9a8290005a917100cd27c450d44094a0ed03 CHANGES
+SHA1 2b8b815229aa8a61e483fb4ba0588b8b6c491890 LICENSE
+SHA1 66fad13678ecf830eb2846f38c07ae2d5605e716 MANIFEST
+SHA1 287201e257acb3b3b84dea2290dc29178fbd922e META.yml
+SHA1 25e0a29f2f554d081821c0e898f8f5cc2554b873 Makefile.PL
+SHA1 a1c332df2f8fe6811b03f1aa796ae4a1629a0962 README
+SHA1 a271db745849e9a56c393b387275384d5da45231 bin/svnhook
+SHA1 5b52cbdabc56a44e4c0a90a3f5a5609a90d26f84 inc/ExtUtils/AutoInstall.pm
+SHA1 603bb9de29fb8cba7f13409c546750972eff645d inc/Module/AutoInstall.pm
+SHA1 527aa5e20eec84dc92664ac55a10884c08b740d1 inc/Module/Install.pm
+SHA1 ae32c02b539901de91f06366ce9bdbb7a7bd040b inc/Module/Install/AutoInstall.pm
+SHA1 8ea4e37df83fd0c1c050be5c8da75545c3828d9b inc/Module/Install/Base.pm
+SHA1 1da6031583c32f0d1ec073b8376102fc51427dcc inc/Module/Install/Can.pm
+SHA1 b779375b90c16af2f31f38a1dd2b5df223c7f2fb inc/Module/Install/Fetch.pm
+SHA1 6bf0d0d100b94d1a2ce64d010c8813dec26ac480 inc/Module/Install/Include.pm
+SHA1 2054450e1e9c1dd8056362bf4a64ae70d5d71476 inc/Module/Install/Makefile.pm
+SHA1 5d6189b2cad15cf9932a28faafd55130c8247e83 inc/Module/Install/Metadata.pm
+SHA1 8015c2aceacb9b793e8a472036f93d0bac67c0db inc/Module/Install/Scripts.pm
+SHA1 02af973fae2ac3531fa6b704574b2b8cb2a08148 inc/Module/Install/Win32.pm
+SHA1 3a2eab96e91cca8d99938cda7791759ae9d97b3a inc/Module/Install/WriteAll.pm
+SHA1 f79ff1af159b9466a7c824f695f740a406396667 lib/SVN/Hook.pm
+SHA1 9b5412a3f6a21abdf8378d107cfe40c51e62c162 lib/SVN/Hook/CLI.pm
+SHA1 277e5cdb2418ab82d4b79fa6fddcfe230a49d9a3 lib/SVN/Hook/Redispatch.pm
+SHA1 f78ebf1365dfd319e59307a57fc15c3bd42fd3df lib/SVN/Hook/Script.pm
+SHA1 9a48ed4782e6a29bf79ba54924b32ba7a4b7a385 t/00use.t
+SHA1 fb5ca5167f891d7d61a9b1634f207e46b25f1e98 t/01basic.t
+SHA1 52213ed37372a687216cd38dffadeb9ef7add7b9 t/02partial.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+
+iD8DBQFG8aAyk1XldlEkA5YRAtKWAJ9TCJiqrpMix6Z7No+YvPMhVzTT3ACfajaN
+53Zgw6VIb8VIXUuxxkerQqM=
+=Tc3T
+-----END PGP SIGNATURE-----

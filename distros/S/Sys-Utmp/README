@@ -1,0 +1,40 @@
+README FOR Sys::Utmp
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+The module requires that your system's C libraries export the functions
+getutent(), setutent() and endutent() - if make complains that it can't find
+these functions and you know that they exist then you may have to supply the
+LIBS directive to Makefile.PL to include the appropriate library:
+
+   perl Makefile.PL LIBS='-lc'
+
+for example.
+
+If your system doesnt have these functions and Makefile.PL doesnt detect
+that it should try to supply them itself then you might try :
+
+   perl Makefile.PL DEFINE='-DNOUTFUNCS'
+
+which will force the module to use its built in versions of the functions.
+
+At version 1.6 Test::More is also required for the tests.
+
+COPYRIGHT AND LICENCE
+
+Copyright Netscalibur UK 2001.
+Copyright Jonathan Stowe 2001 - 2013
+
+This software carries no warranty either express or implied.
+
+This is free software it can be copied and/or modified under the same terms
+as perl itself.

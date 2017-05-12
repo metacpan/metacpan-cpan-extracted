@@ -1,0 +1,57 @@
+{
+   "abstract" : "Expand range-like strings",
+   "author" : [
+      "Mithun Ayachit <mithun@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "keywords" : [
+      "text",
+      "string",
+      "range",
+      "expand",
+      "permute",
+      "glob"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "String-Range-Expand",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0",
+            "version" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      }
+   },
+   "provides" : {
+      "String::Range::Expand" : {
+         "file" : "lib/String/Range/Expand.pm",
+         "version" : "v1.0.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mithun/perl-string-range-expand/issues"
+      },
+      "homepage" : "https://github.com/mithun/perl-string-range-expand",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/mithun/perl-string-range-expand.git"
+      }
+   },
+   "version" : "v1.0.1"
+}

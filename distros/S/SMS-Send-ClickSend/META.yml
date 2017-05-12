@@ -1,0 +1,32 @@
+---
+abstract: 'SMS::Send joins SMS::ClickSend'
+author:
+  - 'Fayland Lam <fayland@gmail.com>'
+build_requires:
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.8, Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SMS-Send-ClickSend
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  SMS::ClickSend: '0'
+  SMS::Send: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/fayland/perl-SMS-Send-ClickSend/issues
+  homepage: https://github.com/fayland/perl-SMS-Send-ClickSend
+  repository: https://github.com/fayland/perl-SMS-Send-ClickSend.git
+version: '0.01'

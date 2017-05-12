@@ -1,0 +1,19 @@
+Revision history for Stacktrace-Configurable
+
+0.06  2014-08-04 05:44:26 UTC
+        - add build-debian-package
+
+0.05  2014-07-25 10:30:00 UTC
+        - document and test recursion prevention
+
+0.04  2014-07-25 07:21:44 UTC
+        - prevent recursion in L4P
+
+0.03  2014-05-25 19:36:19 UTC
+        - frame limit and cutoff message
+
+0.02  2014-05-25 14:59:38 UTC
+        - fix various perl-version dependent tests
+
+0.01  2014-05-25 14:11:00 UTC
+        - Initial release

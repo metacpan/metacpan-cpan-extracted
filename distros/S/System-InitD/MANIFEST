@@ -1,0 +1,20 @@
+Changes
+lib/System/InitD.pm
+lib/System/InitD/Base.pm
+lib/System/InitD/Const.pm
+lib/System/InitD/GenInit.pm
+lib/System/InitD/GenInit/Centos.pm
+lib/System/InitD/GenInit/Debian.pm
+lib/System/InitD/Runner.pm
+lib/System/InitD/Template.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+script/geninitd
+share/centos.tpl
+share/debian.tpl
+t/00-deps.t
+t/01-import.t
+t/02-logic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

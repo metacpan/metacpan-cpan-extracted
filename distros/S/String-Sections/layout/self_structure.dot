@@ -1,0 +1,10 @@
+strict digraph Perl {
+	graph [compound=1, concentrate=1, overlap=false, rankdir=LR, ranksep=1, smoothing=triangle, splines=spline];
+	node [label="\N", shape=record, style=dotted];
+	edge [minlen=1];
+	"Moo::Object" [label="<port1> Moo::Object"];
+	"String::Sections" [label="{{<port1> class}|<port2> String::Sections}", shape=Mrecord, style=solid, color="#7e1e9c", fontsize=7, height="0.1"];
+	"String::Sections::Result" [label="{{<port1> class}|<port2> String::Sections::Result}", shape=Mrecord, style=solid, color="#7e1e9c", fontsize=7, height="0.1"];
+	"Moo::Object" -> "String::Sections" [arrowhead=open, arrowsize="0.5", color="#ff81c0", dir=forward, fontsize=6, headclip=1, label="inherited by", samehead=head, tailclip=1, weight=10];
+	"Moo::Object" -> "String::Sections::Result" [arrowhead=open, arrowsize="0.5", color="#ff81c0", dir=forward, fontsize=6, headclip=1, label="inherited by", samehead=head, tailclip=1, weight=10];
+}

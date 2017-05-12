@@ -1,0 +1,31 @@
+$Id: Changes 20429 2013-05-30 12:52:03Z rporres $
+
+Revision history for SNMP-MibProxy
+
+1.21422  30/05/2013
+	 Added configure_requires section in Build.PL as Module::Build is going to be deprecated from core. (Rafael Porres)
+
+1.0572  1/12/2007
+        Renamed module from NetSNMP-MibProxy to SNMP-MibProxy
+
+1.0530  17/10/2007
+        Removed taint mode in t/mibProxy.t (Problems with File::Path 2.01 in perl 5.6.2). I rather have it working in more versions than tainted
+
+1.0481  15/10/2007
+        Changed Build.PL for a dependency on File::Path 1.05 for Taint mode
+
+1.0480  14/10/2007
+        Changed t/mibProxy.t to not setup PERL5LIB
+
+1.0479  14/10/2007
+        Changed lib/NetSNMP/MibProxy.pm to not use the our declaration which breaks the test on perl5.005
+
+1.0478  14/10/2007
+        Changed t/mibProxy.t to not use snmptranslate but the SNMP::tranlateObj method
+
+1.0473  11/10/2007
+        Renamed from QND-NetSNMP-MibProxy to NetSNMP-MibProxy
+
+1.0462  9/10/2007
+        First version
+

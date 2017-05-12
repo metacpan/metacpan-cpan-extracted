@@ -1,0 +1,7 @@
+#!perl
+use strict;
+use warnings;
+use SOOT::App;
+
+SOOT::App->run(argv => \@ARGV);
+

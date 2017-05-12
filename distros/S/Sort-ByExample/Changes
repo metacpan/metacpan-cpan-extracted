@@ -1,0 +1,17 @@
+Revision history for Sort-ByExample
+
+0.007     2014-07-29 20:51:17-04:00 America/New_York
+        - add a more complex example to the synopsis (thanks, Olaf Anders)
+
+0.006     2013-10-15 22:34:22 America/New_York
+          update bugtracker and repo metadata
+
+0.005     2010-01-14
+          major API improvement: add "sorter" and "cmp" methods and exports
+
+0.004     2008-04-09
+          improve packaging
+
+0.003     2008-04-07
+          added this changelog!
+          updated other minor packaging problems

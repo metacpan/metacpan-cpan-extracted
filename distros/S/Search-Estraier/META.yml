@@ -1,0 +1,20 @@
+--- #YAML:1.0
+name:                Search-Estraier
+version:             0.09
+abstract:            pure perl module to use Hyper Estraier search engine
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.36
+distribution_type:   module
+requires:     
+    Carp:                          0
+    LWP::UserAgent:                0
+    MIME::Base64:                  0
+    Test::Exception:               0
+    Test::Simple:                  0
+    URI:                           0
+    URI::Escape:                   0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Dobrica Pavlinusic <dpavlin@rot13.org>

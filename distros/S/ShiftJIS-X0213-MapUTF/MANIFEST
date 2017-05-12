@@ -1,0 +1,35 @@
+Changes
+Makefile.PL
+MANIFEST
+MapUTF.pm
+MapUTF.xs
+MapUTF/Supplements.pm
+META.yml
+mkheader	makes header files
+README
+sjis0213.map	mapping table
+sxmuni.h	some macros and functions for Unicode
+t/s01simp.t	tests for sjis2004
+t/s02null.t	tests for sjis2004
+t/s03byte.t	tests for sjis2004
+t/s04xncr.t	tests for sjis2004
+t/s05surr.t	tests for sjis2004
+t/s06comb.t	tests for sjis2004
+t/s07supl.t	tests for sjis2004
+t/s08illeg.t	tests for sjis2004
+t/s09illfb.t	tests for sjis2004
+t/s10heavy.t	tests for sjis2004
+t/s11grade.t	tests for sjis2004
+t/s12trail.t	tests for sjis2004
+t/t01simp.t	tests for sjis0213
+t/t02null.t	tests for sjis0213
+t/t03byte.t	tests for sjis0213
+t/t04xncr.t	tests for sjis0213
+t/t05surr.t	tests for sjis0213
+t/t06comb.t	tests for sjis0213
+t/t07supl.t	tests for sjis0213
+t/t08illeg.t	tests for sjis0213
+t/t09illfb.t	tests for sjis0213
+t/t10heavy.t	tests for sjis0213
+t/t11grade.t	tests for sjis0213
+t/t12trail.t	tests for sjis0213

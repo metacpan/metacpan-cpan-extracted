@@ -1,0 +1,10 @@
+Revision history for Perl extension Starch::Plugin::TimeoutStore.
+
+0.06 2015-08-01
+
+ - Jump straight to version 0.06 so that this module can be indexed by PAUSE.
+ - Actually allow fractional seconds for the timeout argument.
+ - Don't pass the timeout value in sub_store_args, that makes no sense.
+ - Use Sys::SigAction to do the timeouts rather than hand rolling it.
+ - Move the TimeoutStore plugin to a separate distribution.
+

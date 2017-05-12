@@ -1,0 +1,14 @@
+Release history for SQL-Concrete
+
+1.003 Sat 10 Jan 2015
+	- No functional changes
+	- No longer contains INSTALL file with install-as-root instructions
+
+1.002 Mon 05 Jan 2015
+	- Minimum Perl requirement drop to 5.6
+
+1.001 Fri 02 Jan 2015
+	- Less runtime indirection for dollar placeholders
+
+1.000 Fri 02 Jan 2015
+	- Initial release

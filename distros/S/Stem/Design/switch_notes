@@ -1,0 +1,23 @@
+Stem::Switch
+
+The Stem::Switch cell is a very simple but powerful object which can 
+be used in a wide range of applications.  Its primary function is to 
+receive a message and to copy and redirect it to a list of 
+destination cells.  It can be used as a multiplexer in many-to-one, 
+one-to-many, and many-to-many configurations.  Currently it is used 
+as the heart of the chat server demo and the Inetd demo. 
+
+Stem::Switch has two maps: the input map is used to translate the 
+incoming target address to entries in the output map.  Each input map 
+entry can have multiple output targets and that list can be set via a 
+configuration file at start-up time or a command message at runtime. 
+The output map just converts the output name to an actual cell 
+address and is one-to-one; it also is set via the configuration file 
+or by runtime command messages.  In addition to the explicit command 
+message technique for changing the maps, a publish/subscribe 
+interface is supported.  A given cell can announce to a Stem::Switch 
+cell that it will be publishing messages to a given target address in 
+the switch.  Other cells can send a subscribe message which will 
+cause all messages sent to the selected publish address to be 
+forwarded to themselves. 
+

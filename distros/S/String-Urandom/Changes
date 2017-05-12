@@ -1,0 +1,11 @@
+Revision history for Perl module String::Urandom
+
+0.14
+    - Migrated project SCM and code repository to Google Project hosting.
+    - Fixed bias (issue #56491) for sets of characters not powers of 2
+
+0.15
+    - Fixed issue with 'make test' due to in place edit of character array.
+
+0.16
+    - Code cleanup and POD updates.

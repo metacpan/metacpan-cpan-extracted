@@ -1,0 +1,37 @@
+Changes
+lib/SQL/QueryBuilder/Flex.pm
+lib/SQL/QueryBuilder/Flex/Exp.pm
+lib/SQL/QueryBuilder/Flex/Join.pm
+lib/SQL/QueryBuilder/Flex/Statement.pm
+lib/SQL/QueryBuilder/Flex/Writer.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00-load.t
+t/01-writer.t
+t/02-select-with-params.t
+t/03-select-options.t
+t/04-multi-from.t
+t/05-inner-join-with-using.t
+t/06-inner-join-with-on.t
+t/07-left-join.t
+t/08-right-join.t
+t/09-double-left-join.t
+t/10-from-subquery.t
+t/11-left-join-subquery.t
+t/12-where-params.t
+t/13-where-complex.t
+t/14-having.t
+t/15-group-by.t
+t/16-group-by-complex.t
+t/17-order-by.t
+t/18-order-by-complex.t
+t/19-limit-params.t
+t/20-limit-with-offset.t
+t/21-delete-column.t
+t/22-delete-from.t
+t/23-delete-join.t
+t/24-alias.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,50 @@
+Sub::Delete, version 1.00002
+
+This module allows one to delete a subroutine. Not much to it.
+
+
+INSTALLATION
+
+The easiest way to install this module is to use the CPAN module or
+the cpan script:
+
+    [sudo] perl -MCPAN -e "install Sub::Delete"
+
+    [sudo] cpan Sub::Delete
+
+Or you can use the following:
+
+    perl Makefile.PL
+    make
+    make test
+    [sudo] make install
+
+
+CHANGES IN THIS RELEASE
+
+delete_sub no longer leaks messages into $@.
+
+
+DEPENDENCIES
+
+This module requires perl 5.8.3 or later.
+
+
+DOCUMENTATION
+
+After installing, you can find documentation for these modules with
+the perldoc command.
+
+    perldoc Sub::Delete
+
+Or try using man (it's faster, in my experience):
+
+    man Sub::Delete
+
+
+COPYRIGHT AND LICENCE
+
+Copyright © 2008-10 Father Chrysostomos
+
+This program is free software; you may redistribute it and/or modify
+it under the same terms as perl.

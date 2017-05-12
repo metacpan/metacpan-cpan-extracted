@@ -1,0 +1,103 @@
+--- #YAML:1.0
+name: Siesta
+version: 0.66
+license: perl
+distribution_type: module
+requires:
+  Apache::Session::SharedMem: 0
+  Class::Accessor::Fast: 0
+  Class::DBI: 0.93
+  Class::DBI::BaseDSN: 0
+  Class::DBI::SQLite: 0
+  Digest::MD5: 0
+  Email::Folder: 0
+  Email::LocalDelivery: 0.05
+  Email::Simple: 1.4
+  File::Basename: 0
+  File::Find::Rule: 0
+  File::Path: 0
+  Mail::Address: 0
+  Mail::DeliveryStatus::BounceParser: 0
+  Module::Build: 0.18
+  Python::Serialise::Marshal: 0
+  Storable: 0
+  String::Random: 0
+  String::ShellQuote: 0
+  Sys::Hostname: 0
+  Template: 0
+  Test::More: 0
+  Tie::IxHash: 0
+  UNIVERSAL::require: 0
+  YAML: 0
+  perl: 5.006
+recommends: {}
+build_requires: {}
+conflicts: {}
+dynamic_config: 1
+provides:
+  Apache::Constants:
+    file: lib/Siesta/Web/FakeApache.pm
+  Siesta:
+    file: lib/Siesta.pm
+    version: 0.66
+  Siesta::Build:
+    file: lib/Siesta/Build.pm
+  Siesta::DBI:
+    file: lib/Siesta/DBI.pm
+  Siesta::Deferred:
+    file: lib/Siesta/Deferred.pm
+  Siesta::List:
+    file: lib/Siesta/List.pm
+  Siesta::Member:
+    file: lib/Siesta/Member.pm
+  Siesta::Message:
+    file: lib/Siesta/Message.pm
+  Siesta::Plugin:
+    file: lib/Siesta/Plugin.pm
+  Siesta::Plugin::Archive:
+    file: lib/Siesta/Plugin/Archive.pm
+  Siesta::Plugin::Bounce:
+    file: lib/Siesta/Plugin/Bounce.pm
+  Siesta::Plugin::Challenge:
+    file: lib/Siesta/Plugin/Challenge.pm
+  Siesta::Plugin::Debounce:
+    file: lib/Siesta/Plugin/Debounce.pm
+  Siesta::Plugin::ListHeaders:
+    file: lib/Siesta/Plugin/ListHeaders.pm
+  Siesta::Plugin::MembersOnly:
+    file: lib/Siesta/Plugin/MembersOnly.pm
+  Siesta::Plugin::MessageFooter:
+    file: lib/Siesta/Plugin/MessageFooter.pm
+  Siesta::Plugin::Moderated:
+    file: lib/Siesta/Plugin/Moderated.pm
+  Siesta::Plugin::ReplyTo:
+    file: lib/Siesta/Plugin/ReplyTo.pm
+  Siesta::Plugin::Resume:
+    file: lib/Siesta/Plugin/Resume.pm
+  Siesta::Plugin::Send:
+    file: lib/Siesta/Plugin/Send.pm
+  Siesta::Plugin::SimpleSig:
+    file: lib/Siesta/Plugin/SimpleSig.pm
+  Siesta::Plugin::SubjectTag:
+    file: lib/Siesta/Plugin/SubjectTag.pm
+  Siesta::Plugin::Subscribe:
+    file: lib/Siesta/Plugin/Subscribe.pm
+  Siesta::Plugin::UnSubscribe:
+    file: lib/Siesta/Plugin/UnSubscribe.pm
+  Siesta::Pref:
+    file: lib/Siesta/Pref.pm
+  Siesta::Send::Sendmail:
+    file: lib/Siesta/Send/Sendmail.pm
+  Siesta::Send::Test:
+    file: lib/Siesta/Send/Test.pm
+  Siesta::Subscription:
+    file: lib/Siesta/Subscription.pm
+  Siesta::Test:
+    file: lib/Siesta/Test.pm
+  Siesta::Web:
+    file: lib/Siesta/Web.pm
+  Siesta::Web::FakeApache:
+    file: lib/Siesta/Web/FakeApache.pm
+  Template::Plugin::Siesta:
+    file: lib/Template/Plugin/Siesta.pm
+generated_by: Module::Build version 0.20

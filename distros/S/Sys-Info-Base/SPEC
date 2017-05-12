@@ -1,0 +1,19 @@
+{
+    module_name => 'Sys::Info::Base',
+    requires    => {},
+    meta_merge  => {
+        resources => {
+            repository => 'http://github.com/burak/cpan-sys-info-base/',
+        },
+    },
+    meta_merge     => {
+        resources => {
+            repository => 'http://github.com/burak/cpan-sys-info-base/',
+        },
+    },
+    BUILDER => {
+        change_versions                  => 1,
+        copyright_first_year             => 2006,
+        add_pod_author_copyright_license => 1,
+    },
+}

@@ -1,0 +1,16 @@
+#file:t/conf/extra.conf.in
+#-------------------------
+# this file will be Include-d by @ServerRoot@/conf/httpd.conf
+
+PerlSwitches -I@ServerRoot@/../lib
+PerlModule SleepTest::Handler
+PerlRequire @ServerRoot@/../startup/test_startup.pl
+PerlOptions +GlobalRequest
+
+# preload the module
+<Location />
+
+    SetHandler modperl
+    PerlResponseHandler $SleepTest::Global::object->handler
+</Location>
+

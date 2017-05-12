@@ -1,0 +1,21 @@
+ChangeLog
+commands.cfg
+comp_mon.pl
+comp_mon.xsd
+example.xml
+lib/Siebel/Srvrmgr/Nagios.pm
+lib/Siebel/Srvrmgr/Nagios/Config.pm
+lib/Siebel/Srvrmgr/Nagios/Server.pm
+lib/Siebel/Srvrmgr/Nagios/Server/Component.pm
+lib/Siebel/Srvrmgr/Nagios/Server/ComponentGroup.pm
+Makefile.PL
+MANIFEST			This list of files
+nsclient.ini
+README
+t/config.t
+t/data/bad.xml
+t/data/ok.xml
+t/pod-coverage.t
+t/pod.t
+t/Siebel-Srvrmgr-Nagios.t
+test.xml

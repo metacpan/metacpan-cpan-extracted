@@ -1,0 +1,59 @@
+<create>
+  <domain:create xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+    <domain:name>[% domain %]</domain:name>
+      [% IF period.defined %]<domain:period unit="[% period_unit || 'm' %]">[% period %]</domain:period>[% END %]
+      [% UNLESS no_ns %]
+      <domain:ns>
+        [%~ FOREACH dns IN ns %]
+        <domain:hostAttr>
+        	<domain:hostName>[% dns %]</domain:hostName>
+        </domain:hostAttr>
+        [%~ END %]
+        [% FOREACH dns IN host_obj %]
+        	<domain:hostObj>[% dns %]</domain:hostObj>
+        [% END %]
+        [% FOREACH dns_rec IN ns_with_ips %]
+        <domain:hostAttr>
+        	<domain:hostName>[% dns_rec.name %]</domain:hostName>
+        	[% IF dns_rec.ipv4 %]<domain:hostAddr ip="v4">[% dns_rec.ipv4 %]</domain:hostAddr>[% END %]
+        	[% IF dns_rec.ipv6 %]<domain:hostAddr ip="v6">[% dns_rec.ipv6 %]</domain:hostAddr>[% END %]
+        </domain:hostAttr>
+       	[% END %]
+      </domain:ns>
+      [% END %]
+    <domain:registrant>[% owner %]</domain:registrant>
+    [% IF admin.defined %]<domain:contact type="admin">[% admin %]</domain:contact>[% END %]
+    [% IF admin2.defined %]<domain:contact type="admin">[% admin2 %]</domain:contact>[% END %]
+    [% IF tech.defined %]<domain:contact type="tech">[% tech %]</domain:contact>[% END %]
+    [% IF billing.defined %]<domain:contact type="billing">[% billing %]</domain:contact>[% END %]
+    <domain:authInfo>
+      <domain:pw></domain:pw>
+    </domain:authInfo>
+  </domain:create>  
+</create>
+[% IF dnssec %]
+   <extension>
+     <secDNS:create
+      xmlns:secDNS="urn:ietf:params:xml:ns:secDNS-1.1">
+
+    [% IF dnssec_max_sig_life %]<secDNS:maxSigLife>[% dnssec_max_sig_life %]</secDNS:maxSigLife>[% END %]
+	[% FOREACH dnssec_data IN dnssec %]
+		[% IF dnssec_data.is_key_data %]
+          <secDNS:keyData>
+            <secDNS:flags>[% dnssec_data.flags %]</secDNS:flags>
+            <secDNS:protocol>[% dnssec_data.protocol %]</secDNS:protocol>
+            <secDNS:alg>[% dnssec_data.alg %]</secDNS:alg>
+            <secDNS:pubKey>[% dnssec_data.pub_key %]</secDNS:pubKey>
+          </secDNS:keyData>
+		[% ELSE %]
+	       <secDNS:dsData>
+	         <secDNS:keyTag>[% dnssec_data.keytag %]</secDNS:keyTag>
+	         <secDNS:alg>[% dnssec_data.alg %]</secDNS:alg>
+	         <secDNS:digestType>[% dnssec_data.digest_type %]</secDNS:digestType>
+	         <secDNS:digest>[% dnssec_data.digest %]</secDNS:digest>
+	       </secDNS:dsData>
+         [% END %]
+    [% END %]
+     </secDNS:create>
+   </extension>
+[% END %]

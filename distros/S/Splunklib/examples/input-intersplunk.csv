@@ -1,0 +1,12 @@
+splunkVersion:6.2.6
+allowStream:1
+keywords:%22%22%22index%3A%3Alocal_system%22%22%20%22
+search:search%20index%3Dlocal_system%20%7C%20fields%20_raw%20%7C%20base64pl%20field%3D_raw
+sid:1443870176.14
+realtime:0
+preview:0
+truncated:0
+
+"_bkt","_cd","_indextime","_raw","_serial","_si","_sourcetype","_time"
+"local_system~17~5004F7D1-06C9-44F3-A726-29190625C311","17:207",1443870169,"Oct  3 13:02:48 messiah sudo: pam_unix(sudo:session): session closed for user root",0,"messiah
+local_system",syslog,1443870168

@@ -1,0 +1,85 @@
+{
+   "abstract" : "This module can be nohup the processing",
+   "author" : [
+      "MacoTasu <maco.tasu+cpan@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.1.3",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Script-Nohup",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Handle" : "0",
+            "Mouse" : "0",
+            "Mouse::Util::TypeConstraints" : "0",
+            "Path::Class" : "0",
+            "Time::Piece" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Flatten" : "0",
+            "Test::Mock::Guard" : "0",
+            "Test::More" : "1.001009",
+            "Test::SharedFork" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Script::Nohup" : {
+         "file" : "lib/Script/Nohup.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://git@github.com/MacoTasu/p5-Script-Nohup/issues"
+      },
+      "homepage" : "https://git@github.com/MacoTasu/p5-Script-Nohup",
+      "repository" : {
+         "url" : "git://git@github.com/MacoTasu/p5-Script-Nohup.git",
+         "web" : "https://git@github.com/MacoTasu/p5-Script-Nohup"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [
+      "hisaichi5518 <hisaichi5518@gmail.com>",
+      "Ichinose Shogo <shogo82148@gmail.com>",
+      "MacoTasu <makomacomako@me.com>"
+   ]
+}

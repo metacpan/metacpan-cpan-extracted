@@ -1,0 +1,14 @@
+/Build
+/Makefile
+/_build
+/blib
+/META.json
+/META.yml
+/MYMETA.json
+/MYMETA.yml
+/Makefile.PL
+/SIGNATURE
+/Scope-Cleanup-*
+/lib/Scope/callchecker0.h
+/lib/Scope/Cleanup.c
+/lib/Scope/Cleanup.o

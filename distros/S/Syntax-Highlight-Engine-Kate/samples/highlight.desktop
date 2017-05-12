@@ -1,0 +1,19 @@
+[Desktop Entry]
+Comment=
+Comment[en_US]=
+Encoding=UTF-8
+Exec=timidity -iA -B 2,8 -EFreverb=0 -EFchorus=0
+GenericName=
+GenericName[en_US]=
+Icon=
+MimeType=
+Name=Start timidity server
+Name[en_US]=Start timidity server
+Path=
+StartupNotify=false
+Terminal=true
+TerminalOptions=\s--noclose
+Type=Application
+X-DCOP-ServiceType=none
+X-KDE-SubstituteUID=true
+X-KDE-Username=root

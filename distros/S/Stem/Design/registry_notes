@@ -1,0 +1,131 @@
+
+	     Stem Cell Registry and Message Address Design Notes
+
+The heart of Stem is the messaging subsystem and the heart of that is
+the registry. This is where all knowledge of how to address cells is
+located. Each cell gets registered by it name and optionally its target
+and messages are directed to it via its names. The decisions made by the
+registry when delivering a message are described here as well as the API
+and other related issues and modules.
+
+
+Stem Message Addresses
+
+Stem messages are sent to registered cells by using an address triplet:
+the hub name, the cell name and the target name.
+
+A hub is a single process running Stem. Its name must be unique among all
+Stem hubs in a single connected net. A hub consists of a set of objects
+and Stem cells. It contains the message registry, the core Stem system
+and it will load other modules on demand.
+
+A Stem cell is a single object in a Stem hub which has registered itself
+under a name and can receive messages via its methods. Not all objects
+in Stem are cells, but all Stem cells are objects. Cells are commonly
+registered by the Stem::Config system or by a parent cell spawning
+targeted cells. Only one cell can be registered in a hub for a given
+cell name. One unusual trick is that a whole class can register itself
+as a cell by using its class name as the object and some fixed string as
+the name (sometimes that is the class name as well). There can only be
+one cell by that class and name but there can be aliases for any cell
+name. That is used by cells which must be implemented with class level
+data.
+
+The target is the last part of an address and is optional. A given cell
+could be registered with a cell name and target and it can send and
+receive messages with its own globally unique address. The cell name is
+either the parent's cell name or a fixed one for the particular class
+(the Stem::Log::Filter class does this). The target name is commonly
+either a Stem::Id value or a name from a configuration. Another use for
+the target is a cell such as Stem::Switch which uses it to address its
+input/output maps. The use of the target is defined by the design of the
+cell.
+
+Message Delivery
+
+The first step in delivering a message is finding out which cell it goes
+to. This is done by looking up the cell that matches the hub/name/target
+address in the message. This is a multistep procedure with the following
+rules:
+
+If the hub name of the message is set and it is not the name of this
+hub, locate the portal that can send to that hub and deliver the message
+to that portal. Portal names are in a different namespace as regular
+cells but portals can also be registered as targeted cells so they can
+have commands sent to them. See more on Portals below.
+
+If the message has a cell name and an optional target name, the cell is
+looked up in the local registry. Cells with just a cell name don't share
+the namespace with cells that have cell and target names. If the cell is
+found the message is delivered by a method. (See how that is chosen
+below.)
+
+If the cell is not found locally it is sent out via a portal with the
+alias DEFAULT. This portal should be connected to a hub which would know
+how to direct the message to the proper destination cell. Typically a
+Stem hub that is a TCP client to a more central server hub will just
+have its portal to the server aliased to DEFAULT.
+
+If the message has the local hub name and couldn't be delivered, it is
+logged and thrown away. Optionally a delivery failure message could be
+sent back to the originator. But this is not the Internet and bounces
+can be automatically fixed in Stem.
+
+NOTE: This brings up the whole subject of message routing. I have been
+thinking about this issue for a while and it is not as tricky as the
+Internet because of several things. First, we can cheat. Stem is
+completely in charge of its routing so it can be smart about itself and
+not deal with worst case situations like the net. A hub can be
+configured to distribute routing information that supports the network
+topology. The discovery of the network and its topology can also be
+automated by a booting Stem network, even from a virgin boot. Remote
+Stem hubs could be installed with minimal (and not customized)
+configurations which will cause itself to connect to a server hub and
+download the real configuration. This simplifies deployment of Stem to a
+new set of boxes. Much more on this subject will be in another design
+notes file.
+
+
+Choosing the Cell Method
+
+Once the destination cell of a message is determined, you then have to
+find out its best method to call to deliver that message. Stem's
+messages can be delivered via a generic method (e.g. 'msg_in') which is
+expected to take any type of message, or via specific methods
+(e.g. 'data_in') which handle selected messages. Here are the rules for
+determining the cell method to call.
+
+If the message type is 'cmd' with a command 'foo' and there is a cell
+method 'foo_cmd', the message is delivered via that method. If a command
+message is delivered via a command method and a value is returned, that
+value is sent back to the 'from' address in a response message.
+
+For all other message types, if the Cell has a method that is the type
+name with '_in' appended to it, that method is used for delivery,
+e.g.; if the message type is 'data', and if the cell has a method named
+'data_in', that is called with the message as its sole argument.
+
+If the message is not delivered by any of those special methods, it will
+be delivered to the generic method 'msg_in'. This method should exist in
+every cell (except those that have the special methods cover all their
+message types).  The method delivery lookup simplifies writing Cells by
+moving the internal dispatching code from the Cell to the registry.
+
+
+
+Stem::Id is a simple module designed to manage a set of unique IDs for
+its owner object, i.e.; it is used by the Stem::SockMsg modules
+to register all of its accepted/connected sockets with unique targets.
+
+Stem::Portal is the class that send messages between hubs over
+pipes. These pipes can be direct sockets or indirect through a secure
+transport such as ssh or stunnel. It receives messages vis the 'send'
+method which are then converted to a string form and written out the
+pipe. The stringify format is currently Data::Dumper but it can be set
+via the configuration of the portal to use Storable, XML or something
+else. Each stringified message is prefixed with 1 or 2 lines containing
+its size and format. Incoming message strings are converted back into
+internal messages and then delivered locally by calling dispatch on
+them. Portals can use any communications channel as long as it gets read
+and write handles. This means that new security and transport protocols
+can be integrated easily into the portal.

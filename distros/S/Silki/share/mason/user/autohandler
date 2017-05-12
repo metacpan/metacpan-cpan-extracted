@@ -1,0 +1,44 @@
+<%init>
+return $m->call_next();
+</%init>
+
+<%method page_title>
+<h1>\
+% if ( my $image = $user->image() ) {
+<img id="profile-image" src="<% $image->uri( view => 'thumbnail' ) %>" />\
+% }
+<& SELF:title, %ARGS &></h1>
+
+<%args>
+$user
+</%args>
+
+</%method>
+
+<%method local_nav>
+  <ul>
+    <li>
+      <a href="<% $uri %>"><% $link %></a>
+    </li>
+  </ul>
+
+<%init>
+return unless $user;
+return unless $c->user()->can_edit_user($user);
+
+my $link
+    = $c->user()->user_id() == $user->user_id()
+    ? loc('Your preferences')
+    : loc( 'Preferences for %1', $user->best_name() );
+
+my $uri
+    = $wiki
+    ? $wiki->uri_for_member( $user, 'preferences_form' )
+    : $user->uri( view => 'preferences_form' );
+</%init>
+
+<%args>
+$user => undef
+$wiki => undef
+</%args>
+</%method>

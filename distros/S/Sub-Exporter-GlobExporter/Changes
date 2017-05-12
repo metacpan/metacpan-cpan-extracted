@@ -1,0 +1,18 @@
+Revision history for Sub-Exporter-GlobExporter
+
+0.005     2015-11-04 23:27:05-05:00 America/New_York
+          the "-as" argument can now be a scalar ref, to which the glob will be
+          assigned
+
+0.004     2013-10-15 22:40:24 America/New_York
+          fix links to github!
+
+0.003     2013-04-26 10:41:34 America/New_York
+          fix some confusing mistakes in the docs (thanks, George Hartzell)
+
+0.002     2010-11-23 18:34:44 America/New_York
+          pass arguments to collector through to globref locator
+
+0.001     2010-11-23 15:21:43 America/New_York
+
+          first release

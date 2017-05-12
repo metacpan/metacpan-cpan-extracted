@@ -1,0 +1,39 @@
+Statistics-PCA version 0.0.1
+
+Principal component analysis (PCA) transforms higher-dimensional data consisting of a number of possibly correlated variables into a smaller number of uncorrelated variables termed principal components (PCs). The higher the ranking of the PCs the greater the amount of variability that the PC accounts for. This PCA procedure involves the calculation of the eigenvalue decomposition using either the Math::Cephes::Matrix or Math::MatrixReal modules (see METHODS) from a data covariance matrix after mean centering the data. See http://en.wikipedia.org/wiki/Principal_component_analysis for more details.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+'version' => '0', 
+'Carp' => '1.08', 
+'Math::Cephes::Matrix' => '0.47', 
+'Math::Cephes' => '0.47', 
+'List::Util' => '1.19', 
+'Math::MatrixReal' => '2.05', 
+'Text::SimpleTable' => '2.0', 
+'Contextual::Return' => '0.2.1',
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009, Daniel S. T. Hughes
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

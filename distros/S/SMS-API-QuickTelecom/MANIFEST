@@ -1,0 +1,15 @@
+Changes
+lib/SMS/API/QuickTelecom.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-new.t
+t/02-balance.t
+t/03-status.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+ignore.txt
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

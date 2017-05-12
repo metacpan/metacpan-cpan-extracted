@@ -1,0 +1,49 @@
+Revision history for Perl extension Lingua::Stem::Snowball::No
+
+1.20  Tue May 08 2007
+  - from Faye Gibbons [faye@morpheux.org]:
+   Q:   When I try to install Lingua-Stem-Snowball-No-1.1 I get this:
+
+      fgibbins@geosl548 Lingua-Stem-Snowball-No-1.1 $ perl Makefile.PL
+      Checking if your kit is complete...
+      Looks good
+      Writing Makefile for Lingua::Stem::Snowball::No
+      fgibbins@geosl548 Lingua-Stem-Snowball-No-1.1 $ make
+      cp lib/Lingua/Stem/Snowball/No.pm blib/lib/Lingua/Stem/Snowball/No.pm
+      Manifying blib/man3/Lingua::Stem::Snowball::No.3pm
+      /usr/bin/perl "-Iblib/arch" "-Iblib/lib" Build.PL Build
+      Too early to specify a build action 'Build'.  Do 'Build Build' instead.
+      make: *** [Build] Error 2
+      fgibbins@geosl548 Lingua-Stem-Snowball-No-1.1 $
+
+   FIX: Seems like old MakeMaker versions thinks Buld.PL is a script.
+    Fixed by explicitly setting PL_FILES = { } in the Makefile.PL script.
+
+  - from salvejn on CPAN Discussion:
+   Q:     Topic: Conflicts between Lingua::Stem::Snowball::No and ::Se
+    
+        The "stemmer.pl" is present in both modules,
+        and when one tries to create distribution package
+        (e.g. Debian .deb files or RedHat .rpm files), this creates a conflict.
+
+        Would it be possible to release a new version of Lingua::Stem::Snowball::Se
+        and ::No, where the files have been removed or renamed?
+        (e.g. to stemmer-no.pl and stemmer-se.pl)
+    
+        Thanks! :-)
+
+    FIX: Moved the example to examples/ and made a copy stemmer-no.pl in bin/
+
+(a copy of this message has been added to the Lingua::Stem::Snowball::Se CPAN::Forum)
+
+1.10  Mon May 07 2007
+  Minor changes. Cache is now no longer a global variable.
+  Moved tests into t/, added distmeta.
+
+1.00  Fri Nov 01 2002
+  Works correctly against all the words in the diffs.txt database.
+  Changed the URL to the Snowball homepage.
+
+0.05  Wed Nov 28 2001
+	Initial Release.	
+

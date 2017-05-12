@@ -1,0 +1,193 @@
+# BEGIN BPS TAGGED BLOCK {{{
+# COPYRIGHT:
+# 
+# This software is Copyright (c) 2003-2008 Best Practical Solutions, LLC
+#                                          <clkao@bestpractical.com>
+# 
+# (Except where explicitly superseded by other copyright notices)
+# 
+# 
+# LICENSE:
+# 
+# 
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of either:
+# 
+#   a) Version 2 of the GNU General Public License.  You should have
+#      received a copy of the GNU General Public License along with this
+#      program.  If not, write to the Free Software Foundation, Inc., 51
+#      Franklin Street, Fifth Floor, Boston, MA 02110-1301 or visit
+#      their web page on the internet at
+#      http://www.gnu.org/copyleft/gpl.html.
+# 
+#   b) Version 1 of Perl's "Artistic License".  You should have received
+#      a copy of the Artistic License with this package, in the file
+#      named "ARTISTIC".  The license is also available at
+#      http://opensource.org/licenses/artistic-license.php.
+# 
+# This work is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+# 
+# CONTRIBUTION SUBMISSION POLICY:
+# 
+# (The following paragraph is not intended to limit the rights granted
+# to you to modify and distribute this software under the terms of the
+# GNU General Public License and is only of importance to you if you
+# choose to contribute your changes and enhancements to the community
+# by submitting them to Best Practical Solutions, LLC.)
+# 
+# By intentionally submitting any modifications, corrections or
+# derivatives to this work, or any other work intended for use with SVK,
+# to Best Practical Solutions, LLC, you confirm that you are the
+# copyright holder for those contributions and you grant Best Practical
+# Solutions, LLC a nonexclusive, worldwide, irrevocable, royalty-free,
+# perpetual, license to use, copy, create derivative works based on
+# those contributions, and sublicense and distribute those contributions
+# and any derivatives thereof.
+# 
+# END BPS TAGGED BLOCK }}}
+=head1 NAME
+
+SVK::Help::Environment - A list of svk's environment variables
+
+=head1 DESCRIPTION
+
+A number of system environment variables influence how svk runs. Below is 
+a complete list of variables you can use to alter svk's behavior.
+
+=head2 All Platforms
+
+=over 
+
+=item $SVKROOT
+
+Unless you tell it otherwise, svk stores your configuration and repository in
+$HOME/.svk.  If you set SVKROOT to a path on disk, svk will look there instead
+of in $HOME/.svk.
+
+
+=item $SVN_EDITOR / $EDITOR
+
+Sometimes, svk needs to pop up a text editor. svk first tries to launch
+the editor specified in $SVN_EDITOR and falls back to $EDITOR if that's
+not defined.
+
+
+=item $SVKDIFF
+
+If you'd prefer to use an external "diff" tool instead of svk's builtin
+diff library, set this variable to your tool's name or path.
+
+=item $SVKMERGE
+
+svk lets you resolve conflicts, interactively, with a text editor or
+use an external diff tool.  Out of the box, svk comes with support for
+the following merge tools:
+
+ AraxisMerge
+ Emacs
+ FileMerge
+ GtkDiff
+ Guiffy
+ GVim
+ KDiff3
+ Meld
+ P4WinMerge
+ TkDiff
+ TortoiseMerge
+ Vim
+ WinMerge
+ XXDiff
+
+If you want svk to spawn a specific merge tool, set this variable to
+the tool's name.
+
+=item $SVKLOGLEVEL
+
+The lowest log level that svk will present to the user. The log levels
+are: DEBUG, INFO, WARN, ERROR and FATAL. The default log level is INFO;
+this includes progress messages for long-running commands (such as
+sync). For non-interactive use (such as for cron jobs) it might be
+useful to set $SVKLOGLEVEL to WARN.
+
+=item $SVKRESOLVE
+
+If you set this variable, svk's interactive resolver will I<always>
+perform the command it's set to. For more details about the commands
+available in svk's interactive resolver, type C<perldoc SVK::Resolve>.
+
+=item $SVKMIME
+
+Indicates which module is used for automatically detecting the MIME types of
+files.  Implementations included with core SVK are: "File::LibMagic",
+"File::MMagic", "File::Type" and "Internal".  The value "Internal" means to use
+SVK's own internal MIME detection algorithm which requires no external modules.
+This poor, but fast algorithm simply assigns "application/octet-stream" to
+anything that looks binary.  If $SVKMIME has no value, "Internal" is used.
+
+=item $SVKPAGER
+
+When svk needs to pipe long output through a pager, it uses $SVKPAGER
+to send the output to your display.  If this variable is not set or set
+to something that's not executable, the output will not be paged.  svk
+ignores your $PAGER setting, so you must explicitly set $SVKPAGER if
+you want paging.
+
+=item $SVKLOGOUTPUT
+
+By specifying this variable, you change the default output filter used by the
+C<svk log> command.  The value of this variable can be anything that you can
+pass to C<svk log>'s C<--output> option.
+
+=item SVKBATCHMODE
+
+When you set this variable to a true value, SVK should never prompt the user for an 
+interactive response. 
+
+
+=item $SVNFSTYPE
+
+By default, svk creates its local repository as a B<fsfs> repository when
+running on Subversion 1.1 and newer. On Subversion 1.0, SVK defaults
+to B<bdb>.  To explicitly specify a repository type, set this variable
+to B<fsfs> or B<bdb>.
+
+=item $SVKNORAREPLAY
+
+By default, svk tries to make use of the replay api provided by
+Subversion if available.  You can turn this environment variable on to
+tell svk not to do so.  svk will then use the old C<SVN::Mirror>
+module to do mirroring.
+
+=item $SVKSVNBACKTRACE
+
+(For debugging use only.) If this environment variable is set to a
+true value, any error message which comes from the Subversion
+libraries will be accompanied by a stack backtrace.
+
+=item $SVKPGP
+
+svk supports the verification of historical changesets using the Gnu Privacy 
+Guard. Note that SVK no longer allows users to sign new changesets.
+By default, svk tries to run the first program called B<gpg> in your
+path. To tell svk to use a specific gpg executable, set this variable
+to the executable's name or path.
+
+=back
+
+=head2 Win32
+
+These variables only apply to svk on Windows.
+
+=over
+
+=item $ProgramFiles
+
+Set this variable to the directory you install programs into. It defaults
+to 'C:\Program Files'.
+
+=back
+
+=cut

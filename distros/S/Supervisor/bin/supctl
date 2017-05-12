@@ -1,0 +1,170 @@
+#!/usr/bin/perl
+# ============================================================================
+#             Copyright (c) 2009 Kevin L. Esteb All Rights Reserved
+#
+# TITLE:       supctl
+#
+# ABSTRACT:    This program is a command line interface to the Supervisor.
+#
+# ENVIRONMENT: Perl v5.8.8
+#
+# PARAMETERS:  --help......Display this simple help message
+#              --start.....Start the named process
+#              --stop......Stop the named process
+#              --status....The status of the named process
+#              --reload....Tell the named process to "reload"
+#              --port......The port the Supervisor is listening on
+#              --host......The host the Supervisor is running on
+#
+# RETURNS:     "started" when the process is started
+#              "stopped" when the process is stopped
+#              "alive" or "dead" depending on the status of the process
+#              "reloaded" if the process "reloaded"
+#              "unknown" if the process name is not found
+#
+#              Exit codes
+#
+#              0 - on success
+#              1 - on failure
+#
+#              Where success is defined as being able to connect 
+#              to the supervisor and send a command.
+#
+# Version      Author                                              Date
+# -------      ----------------------------------------------      -----------
+# 0.01         Kevin Esteb                                         11-Sep-2009
+#
+# ============================================================================
+#
+
+use strict;
+use warnings;
+
+our $VERSION = '0.01';
+
+# ---------------------------------------------------------------------
+# Required Modules
+# ---------------------------------------------------------------------
+
+use Getopt::Long;
+use Supervisor::RPC::Client;
+
+use Supervisor::Class
+  version   => $VERSION,
+  base      => 'Supervisor::Base',
+  constants => 'DEFAULT_ADDRESS DEFAULT_PORT',
+  constant => {
+      handler => __PACKAGE__
+  }
+;
+
+# ---------------------------------------------------------------------
+# Global variables
+# ---------------------------------------------------------------------
+
+my $port = DEFAULT_PORT;
+my $host = DEFAULT_ADDRESS;
+
+my ($start, $stop, $status, $reload, $rpc);
+
+# ---------------------------------------------------------------------
+
+sub setup {
+
+    my $help;
+
+    GetOptions(
+        'help|h|?'  => \$help,
+        'start=s'   => \$start,
+        'stop=s'    => \$stop,
+        'status=s'  => \$status,
+        'reload=s'  => \$reload,
+        'port=s'    => \$port,
+        'host=s'    => \$host
+    );
+
+    if ($help) {
+
+        usage();
+        exit(0);
+
+    }
+
+    $rpc = Supervisor::RPC::Client->new(
+        -port => $port,
+        -host => $host
+    );
+
+}
+
+sub usage {
+
+    my ($Script) = ( $0 =~ m#([^\\/]+)$# );
+    my $Line = "-" x length( $Script );
+    print << "EOT";
+
+$Script
+$Line
+supctl - A procedure to manipulate the Supervisor.
+Version: $VERSION
+
+  Usage:
+    $0 [--help]
+    $0 [--start | --stop | --status | --reload ] <name>
+
+    --help......Display this simple help message.
+    --start.....Start the named process.
+    --stop......Stop the named process
+    --status....The status of the named process
+    --reload....Tell the named process to "reload"
+    --port......The port the Supervisor is listening on (default 9505)
+    --host......The host the Supervisor is running on (default localhost)
+
+    Where a "named" process is one controlled by the Supervisor.
+
+    Examples:
+      $0 --help
+      $0 --host supervisor.example.com --stop sleeper
+
+EOT
+
+}
+
+main: {
+
+    my $result = "";
+
+    eval {
+
+        setup();
+
+        if (defined($stop)) {
+
+            $result = $rpc->stop($stop);
+
+        } elsif (defined($start)) {
+
+            $result = $rpc->start($start);
+
+        } elsif (defined($status)) {
+
+            $result = $rpc->status($status);
+
+        } elsif (defined($reload)) {
+
+            $result = $rpc->reload($reload);
+
+        }
+        
+        printf("%s\n", $result);
+        exit 0;
+
+    }; if (my $ex = $@) {
+
+        printf("%s\n", $ex);
+        exit 1;
+
+    }
+
+}
+

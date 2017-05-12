@@ -1,0 +1,72 @@
+---
+abstract: 'Transforms a flat file format to different output'
+author:
+  - 'Erik Carlsson <info@code301.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::Deep: '0'
+  Test::Differences: '0'
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, Dist::Iller version 0.1302, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Stenciller
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Stenciller:
+    file: lib/Stenciller.pm
+    version: '0.1400'
+  Stenciller::Plugin::ToHtmlPreBlock:
+    file: lib/Stenciller/Plugin/ToHtmlPreBlock.pm
+    version: '0.1400'
+  Stenciller::Plugin::ToUnparsedText:
+    file: lib/Stenciller/Plugin/ToUnparsedText.pm
+    version: '0.1400'
+  Stenciller::Stencil:
+    file: lib/Stenciller/Stencil.pm
+    version: '0.1400'
+  Stenciller::Transformer:
+    file: lib/Stenciller/Transformer.pm
+    version: '0.1400'
+  Stenciller::Utils:
+    file: lib/Stenciller/Utils.pm
+    version: '0.1400'
+  Types::Stenciller:
+    file: lib/Types/Stenciller.pm
+    version: '0.1400'
+requires:
+  Carp: '0'
+  HTML::Entities: '0'
+  List::MoreUtils: '0'
+  List::Util: '0'
+  Module::Pluggable: '0'
+  Moose: '2.1400'
+  MooseX::AttributeDocumented: '0'
+  MooseX::AttributeShortcuts: '0'
+  Path::Tiny: '0'
+  PerlX::Maybe: '0'
+  Syntax::Feature::Qs: '0.2004'
+  Types::Path::Tiny: '0'
+  Types::Standard: '1.000000'
+  namespace::autoclean: '0.24'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/Csson/p5-Stenciller/issues
+  homepage: https://metacpan.org/release/Stenciller
+  repository: https://github.com/Csson/p5-Stenciller.git
+version: '0.1400'

@@ -1,0 +1,47 @@
+Revision history for Perl extension Scalar::Validation.
+
+0.600  Sat Jul  5 18:21:51 2014
+    - original version; created by h2xs 1.23 with options
+        -AX Scalar::Validation
+
+0.601  Sun Jul  6 08:16:05 2014
+    - documentation and CPAN configuration issues solved
+    - defaults now only used for undefined values, not for "unless $value".
+    - declare_rule overworked
+    - delete_rule, replace_rule added
+
+0.602  Sun Jul  6 08:16:05 2014
+       - repair syntax of Makefile.PL
+
+0.610  Thu Jul 10 11:22:34 2014
+    - Incompatible change
+      - Validation mode "ignore" renamed to "silent"
+    - shorthand comparision rule names
+    - trouble_value: count failed validations
+    - better argument parsing in special rules
+    - -name and -description added to rules
+
+0.611  Thu Jul 10 11:35:21 2014
+    - No functional changes
+	  - Remove examples out of MANIFEST
+
+0.612  Mon Jul 14 10:42:39 2014
+    - "class" + "is_a" rule added
+	- update examples to use validation_trouble
+	- update POD
+
+0.613  Mon Jul 21 16:28:32 2014
+    - added tests
+	- update documentation
+
+0.614  Thu Sep  4 10:10:17 2014
+    - added special rule -Default + $validate_defaults
+	- remove -default option from validate_and_correct()
+	- add ignore_caller_pattern for Carp
+	- add optional rule attribute -owner
+	- update documentation
+0.700  Sat Oct 25 15:00:54 2014
+    - added Meta Information Mode to extract meta information
+      about called functions
+    - update documentation
+

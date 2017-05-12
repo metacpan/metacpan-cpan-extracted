@@ -1,0 +1,84 @@
+This is Sys::PortIO, a Perl interface to direct port I/O functions
+(on Unix-like systems, inb() and outb() and friends).
+You can install it in the typical CPAN module manner:
+
+    % perl Makefile.PL
+    % make
+    % make test
+    # make install
+
+You can find the latest distribution at the following URL:
+
+    http://www.zeuscat.com/andrew/src/Sys-PortIO-0.1.tar.gz
+
+You can also find it at your friendly neighborhood CPAN:
+
+    http://www.perl.com/CPAN-local/modules/by-module/Sys/
+
+Appended below is are the Changes and POD documentation from PortIO.pm.
+
+Contact Andrew Ho (andrew@zeuscat.com) with comments or bug reports.
+
+
+========================================================================
+
+Revision history for Perl extension Sys::PortIO.
+
+0.1 - March 4, 2005
+
+  * Original version, created by Andrew Ho (andrew@zeuscat.com), rolled.
+
+
+========================================================================
+
+NAME
+
+    Sys::PortIO - perform direct port I/O from Perl
+
+SYNOPSIS
+
+        use Sys::PortIO;
+
+        port_open($portnum);
+        write_byte($portnum, $value);
+        $value = read_byte($portnum);
+        port_close($portnum);
+
+DESCRIPTION
+
+    This module provides a Perl interface to the low-level port I/O
+    operations provided by Linux, FreeBSD, or OpenBSD. Among other things,
+    this is useful for writing Perl scripts that interface with parallel,
+    serial, or joystick ports.
+
+BUGS
+
+    On some systems (for example, Linux), doing a port read or write on an
+    unopened port will cause a segmentation fault.
+
+TODO
+
+    Support optional range argument to "port_open()".
+    Set $! on errors, instead of dying (sometimes with a segfault).
+    Alternately, automatically open ports as needed.
+
+SEE ALSO
+
+    Linux I/O port mini-HOWTO:
+    <http://www.faqs.org/docs/Linux-mini/IO-Port-Programming.html>
+
+    On Linux or other glibc systems, see ioperm(2), inb(2), and outb(2).
+    FreeBSD uses /dev/io for port access. On OpenBSD and NetBSD, see
+    i386_iopl(2) and sysarch(2).
+
+AUTHOR
+
+    Andrew Ho, <andrew@zeuscat.com>
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2005 by Andrew Ho.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.6.0 or, at
+    your option, any later version of Perl 5 you may have available.

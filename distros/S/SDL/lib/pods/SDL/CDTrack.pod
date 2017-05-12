@@ -1,0 +1,87 @@
+
+=pod
+
+=head1 NAME
+
+SDL::CDTrack -- SDL Bindings for structure SDL_CDTrack
+
+=head1 CATEGORY
+
+Core, CDROM, Structure
+
+=head1 SYNOPSIS
+
+ use SDL;
+ use SDL::CDROM;
+ use SDL::CD ':status';
+ use SDL::CDTrack;
+
+ SDL::init( SDL_INIT_CDROM );
+ 
+ my $drives = SDL::CDROM::num_drives(); 
+
+ if( $drives > 0 )
+ {
+     my $CD = SDL::CD->new(0); #first drive's CD
+ 
+     if($CD)
+     {
+         if( $CD->status != CD_TRAYEMPTY )
+         {
+             my $track = SDL::CD->track(0);
+         }
+     }
+ }
+
+=head1 CONSTANTS
+
+The constants are exported by default. You can avoid this by doing:
+
+ use SDL::CDTrack ();
+
+and access them directly:
+
+ SDL::CDTrack::SDL_AUDIO_TRACK;
+
+or by choosing the export tags below:
+
+Export tag: ':type'
+
+ SDL_AUDIO_TRACK
+ SDL_DATA_TRACK
+
+=head1 METHOD
+
+=head2 id
+
+ $track->id() # 0-99 
+
+Track number
+
+=head2 type
+
+ $track->type() # SDL_AUDIO_TRACK or SDL_DATA_TRACK 
+
+Type of track
+
+=head2 length
+
+ $track->length() 
+
+Length, in frames, of this track 
+
+=head2 offset 
+
+ $track->offset()
+
+Frame offset to the beginning of this track 
+
+=head1 SEE ALSO
+
+L<SDL::CDROM>, L<SDL::CD>
+
+=head1 AUTHORS
+
+See L<SDL/AUTHORS>.
+
+=cut

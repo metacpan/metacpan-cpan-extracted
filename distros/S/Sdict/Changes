@@ -1,0 +1,56 @@
+# $RCSfile: ChangeLog,v $
+# $Author: swaj $
+# $Revision: 1.3.2.1 $
+
+3.0
+	File format was updated (dct v2). Embedded images and sounds
+	are supported now.
+
+2.8
+	Detection of big-endian systems was added (but those systems are
+	still not supported yet).
+
+2.7
+	Documentation was updated. More files included into distribution.
+
+2.6
+	Dictionary compiler fixes for win32 platform.
+
+2.5
+	Dictionary compiler bug was fixed.
+
+2.4
+	New features in Web dictionary script: dictionary browser,
+	logging, new page layout. Numeric sorting was added to dictionary
+	compiler. Small utility called 'dctinfo' was added to
+	distribution. Bugfixes.
+
+2.3
+	Optional 'charset' keyword added to dictionary source file
+	header. A number of bugs were fixed. Code cleanups.
+
+2.2
+	'--lowercase-alias', '--force-to-lowercase' and
+	'--disable-duplicates' options were added to dictionary
+	compiler. Non-standard indexes now supported in ptksdict. Online
+	dictionary compiler is launched. Code cleanups. Bugfixes. 
+	
+2.1
+	Variable short index levels added to .dct file compiler.
+	Sdict library now supports 'analyze' function to get overall
+	information about optimal dictionary compilation
+	method. Configurable article format in ptksdict. Documentation was
+	updated as well as bugfixes were made. Documentation added to
+	Sdict.pm. Full Win32 support.
+
+2.0
+	Initial announcement.
+
+
+	
+__END__
+
+
+
+
+

@@ -1,0 +1,6 @@
+simfs / simfs rw 0 0
+tmpfs /lib/init/rw tmpfs rw,nosuid,mode=755 0 0
+proc /proc proc rw,nosuid,nodev,noexec 0 0
+sysfs /sys sysfs rw,nosuid,nodev,noexec 0 0
+tmpfs /dev/shm tmpfs rw,nosuid,nodev 0 0
+devpts /dev/pts devpts rw,nosuid,noexec,gid=5,mode=620 0 0

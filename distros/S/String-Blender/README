@@ -1,0 +1,36 @@
+String-Blender version 0.04
+
+String::Blender is an OO implementation of random generator of compound
+words based on one or more priority driven word vocabularies. Originally the
+module was created for the purpose of constructing new attractive thematic domain
+names. Later it was used to improve dictionary attack tool.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+Moose 0.74 or newer.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009, Alexey Skorikov
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

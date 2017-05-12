@@ -1,0 +1,9 @@
+severity = 5
+verbose = 8
+
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = Moo
+
+[TestingAndDebugging::RequireUseWarnings]
+severity = 5
+equivalent_modules = Moo

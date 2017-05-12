@@ -1,0 +1,12 @@
+Revision history for Perl extension Sledge::SessionManager::Auto
+
+0.03    Mon Jan 21 12:20:29 2008
+        - fixed bug `reidrect`
+        - fixed load test
+
+0.02    Thu Jan 17 16:10:15 2008
+        - support Sledge::SessionManager::MobileID
+        - fixed POD
+
+0.01    Wed Jan 16 15:36:39 2008
+        - original version

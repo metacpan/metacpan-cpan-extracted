@@ -1,0 +1,41 @@
+severity = brutal
+verbose = 8
+exclude = Editor::RequireEmacsFileVariables Miscellanea::RequireRcsKeywords Modules::RequireExplicitInclusion Modules::RequireExplicitPackage Modules::RequirePerlVersion Tics::ProhibitLongLines CodeLayout::ProhibitHashBarewords
+
+[Lax::RequireExplicitPackage::ExceptForPragmata]
+allowed_pragmata = diagnostics feature perlversion strict warnings utf8 Modern::Perl
+
+[CodeLayout::RequireTidyCode]
+perltidyrc = xt/author/perltidy.rc
+
+# since we're using Modern::Perl
+[Compatibility::PerlMinimumVersionAndWhy]
+above_version = 5.010
+[Compatibility::PodMinimumVersion]
+above_version = 5.010
+
+[ControlStructures::ProhibitPostfixControls]
+flowcontrol = carp cluck confess croak die exit goto warn exit
+
+[Documentation::PodSpelling]
+stop_words = Perldoc perldoc annonations PASSed API accessor filesystem SvnRoot SvnFs SvnTxn SvnRepos
+
+[Documentation::RequirePodSections]
+lib_sections = NAME | VERSION | SYNOPSIS | DESCRIPTION | SUPPORT | AUTHOR | COPYRIGHT AND LICENSE
+script_sections = NAME | USAGE | DESCRIPTION | CONFIGURATION | SUPPORT | AUTHOR | COPYRIGHT AND LICENSE
+
+[InputOutput::RequireCheckedSyscalls]
+functions = :builtins
+exclude_functions = print
+
+[Subroutines::ProhibitCallsToUndeclaredSubs]
+exempt_subs = Moose::after Moose::has MooseX::Types::class_type MooseX::Types::coerce MooseX::Types::from MooseX::Types::via Path::Class::dir Path::Class::file Try::Tiny::catch Try::Tiny::try
+
+[Subroutines::ProhibitUnusedPrivateSubroutines]
+private_name_regex = _(?!build_)\w+
+
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = Modern::Perl
+
+[TestingAndDebugging::RequireUseWarnings]
+equivalent_modules = Modern::Perl

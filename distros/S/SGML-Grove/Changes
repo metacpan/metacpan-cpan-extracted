@@ -1,0 +1,23 @@
+Revision history for Perl extension SGML::Grove.
+
+`*' indicates backward incompatible changes
+
+2.03  Sun Mar  8 21:23:22 CST 1998
+	* Simple/BuilderBuilder: rules now take an iterator as
+	  `$parent' and need to create an iterator when passing a new
+	  object to `accept_children'
+
+2.02  Mon Feb  9 19:59:10 CST 1998
+	- fixes
+	  - my-html.pl: typo in `use SGML::SPGroveBuilder'
+	    remove carriage returns from embedded Perl
+
+2.01  Sun Feb  1 16:37:18 CST 1998
+	- RPM spec: install examples in docdir and entities in
+	  lib/sgml
+	- fixes
+	  - RPM spec: missing man pages
+
+2.00  Sat Jan 17 18:17:26 CST 1998
+	- first release after splitting from SGML::SPGrove
+	- renamed SGML::SPGrove to SGML::Grove

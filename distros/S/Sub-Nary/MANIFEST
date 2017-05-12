@@ -1,0 +1,25 @@
+Changes
+MANIFEST
+Makefile.PL
+Nary.xs
+README
+lib/Sub/Nary.pm
+samples/cx.pl
+t/00-load.t
+t/02-can.t
+t/10-obj.t
+t/11-cache.t
+t/15-misc-xs.t
+t/16-combine.t
+t/20-return.t
+t/21-list.t
+t/22-call.t
+t/23-branch.t
+t/24-ops.t
+t/25-grepmap.t
+t/90-boilerplate.t
+t/91-pod.t
+t/92-pod-coverage.t
+t/95-portability-files.t
+t/99-kwalitee.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,26 @@
+<p>
+  <% loc('Are you sure you want to delete this wiki?') %>
+</p>
+
+<p>
+  <strong>
+    <% loc('Deleting this wiki will delete all of its pages and files!') %>
+  </strong>
+</p>
+
+<p>
+  <% loc( 'Wiki: <em>%html(%1)</em>', $wiki->title() ) | n %>
+</p>
+
+<form action="<% $wiki->uri() %>" method="post">
+  <input type="hidden" name="x-tunneled-method" value="DELETE" />
+  <input type="submit" value="<% loc('Yes, delete it') %>" />
+</form>
+
+<%args>
+$wiki
+</%args>
+
+<%method title>
+<% loc( 'Delete this wiki?') %>
+</%method>

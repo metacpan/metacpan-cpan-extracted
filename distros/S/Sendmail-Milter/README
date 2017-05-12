@@ -1,0 +1,105 @@
+Sendmail::Milter - Perl interface to sendmail's Mail Filter API
+===============================================================
+
+Copyright Notice
+----------------
+
+Copyright (c) 2000-2001 Charles Ying. All rights reserved. This program is
+free software; you can redistribute it and/or modify it under the same terms
+as sendmail itself.
+
+The interpreter pools portion (found in the intpools.c, intpools.h, and test.pl
+files) of this code is also available under the same terms as perl itself.
+
+
+About Sendmail::Milter
+----------------------
+
+Sendmail::Milter provides users with the ability to write mail filters in Perl
+that tightly integrate with sendmail's mail filter API.
+
+With this module, you can define and register Perl callbacks with the Milter
+engine. This module calls your perl callbacks using interpreters from a
+threaded persistent interpreter pool. Milter contexts are presented using an
+object-oriented style interface for performing operations on a Milter context.
+
+The main project web page for this module is:
+
+    http://sourceforge.net/projects/sendmail-milter/
+
+
+Prerequisites
+-------------
+
+Sendmail::Milter has been tested with the following:
+
+    sendmail 8.12.1 built with -DMILTER
+    perl 5.6.1 built with -Dusethreads
+
+You can find the latest version of sendmail from:
+
+    ftp://ftp.sendmail.org/pub/sendmail/
+
+You can try this module out with newer versions of Perl, hopefully interpreter
+threads support will come out of its experimental state in the future.
+
+You'll also need to have an operating system with a viable POSIX threads
+implementation.
+
+This module has only been tested on FreeBSD 4.0-RELEASE. Your mileage may vary.
+
+Sendmail::Milter uses the new perl_clone() call in 5.6.0 to make copies of the
+Perl interpreter for its interpreter pools (see intpools.c and intpools.h). See
+the perldelta manpage for more information on this feature.
+
+
+Before You Begin
+----------------
+
+Read the libmilter/README file that comes with the sendmail source
+distribution to find out how to build sendmail with the Mail Filter API.
+
+
+Building Sendmail::Milter
+-------------------------
+
+Begin by building sendmail, libmilter, and perl with -Dusethreads. Next,
+perform the following commands:
+
+% perl Makefile.PL ../sendmail ../sendmail/obj.FreeBSD.4.0-RELEASE.i386
+% make
+% make install
+
+The paths ../sendmail and ../sendmail/obj.FreeBSD.4.0-RELEASE.i386 should point
+to the sendmail source tree and the sendmail build directory, respectively.
+
+
+Using Sendmail::Milter
+----------------------
+
+See the pod documentation for complete information on writing your own mail
+filters with this module.
+
+
+Testing the sample sample.pl mail filter
+----------------------------------------
+
+sample.pl, a sample test case has been provided. You can run it by using the
+following command:
+
+% perl sample.pl myfilter /etc/mail/sendmail.cf
+
+But before you do that, add a line similar to:
+
+INPUT_MAIL_FILTER(`myfilter', `S=local:/var/run/perl.sock')dnl
+
+to your .mc file. sample.pl isn't terribly interesting, but should give you a
+good feel for how mail filters are written with Sendmail::Milter.
+
+
+Mailing List
+------------
+
+You can subscribe to the sendmail-milter-users@lists.sourceforge.net mailing
+list. Instructions on how to do so can be found off the Sendmail::Milter
+project page.

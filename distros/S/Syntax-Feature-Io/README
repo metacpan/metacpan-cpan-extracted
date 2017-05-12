@@ -1,0 +1,62 @@
+NAME
+    Syntax::Feature::Io - Provides IO::All
+
+VERSION
+    version 0.001
+
+SYNOPSIS
+        use syntax qw( io );
+
+        my @own_lines = io(__FILE__)->getlines;
+
+DESCRIPTION
+    This is a syntax feature extension for syntax providing IO::All.
+
+    Not much additional use is provided, besides much easier access if you
+    are already using syntax in one way or another.
+
+METHODS
+  install
+        $class->install( %arguments )
+
+    Used by syntax to install the extension in the requesting namespace.
+    Only the arguments "into" and "options" are recognized.
+
+OPTIONS
+  -import
+        use syntax io => { -import => [-strict] };
+
+    You can use this option to pass import flags to IO::All. Since this is
+    the option you'll most likely use, if any, you can skip the hash
+    reference and provide the import list directly if you wish:
+
+        use syntax io => [-strict];
+
+    Please see "USAGE" in IO::All for documentation on the import arguments.
+
+  -as
+        use syntax io => { -as => 'IO' };
+
+        my @own_lines = IO(__FILE)->getlines;
+
+    Set the name of the import.
+
+SEE ALSO
+    *   IO::All
+
+    *   syntax
+
+BUGS
+    Please report any bugs or feature requests to
+    bug-syntax-feature-io@rt.cpan.org or through the web interface at:
+    http://rt.cpan.org/Public/Dist/Display.html?Name=Syntax-Feature-Io
+
+AUTHOR
+    Robert 'phaylon' Sedlacek <rs@474.at>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Robert 'phaylon' Sedlacek.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,21 @@
+Backup/Snapback.pm
+Changes
+examples/conf/perusion/clients/bill.heins.net
+examples/conf/perusion/clients/jean.heins.net
+examples/conf/perusion/clients/perusion.com
+examples/conf/perusion/clients/sam.heins.net
+examples/conf/perusion/clients/tim.perusion.com
+examples/conf/perusion/snapback.conf
+examples/conf/snapback.conf
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+relocate.util
+scripts/snap_charge.PL
+scripts/snapback2.PL
+scripts/snapback_loop.PL
+scripts/snapcopy.PL
+t/1.t
+t/2.t

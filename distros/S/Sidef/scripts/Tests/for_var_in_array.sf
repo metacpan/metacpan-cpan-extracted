@@ -1,0 +1,75 @@
+#!/usr/bin/ruby
+
+var arr = [1,2,3,4];
+
+for i in arr {
+    next if i==2;
+    if (i == 2) {
+        die "next error!";
+    }
+}
+
+var i = 42;
+assert_eq(i, 42);
+
+for i in arr {
+    break if i==2;
+    if (i >= 2) {
+        die "break error!";
+    }
+}
+
+assert_eq(i, 42);
+i = 99;
+
+for i in arr {
+    say i;
+}
+
+assert_eq(i, 99);
+
+for c in "string" {
+    say "<#{c}>"
+}
+
+for i,k in Hash(a => 1, b => 2) {
+    say "<#{i}> <#{k}>";
+}
+
+for i,j,k in [
+    %w(a b d),
+    %w(e f g),
+] {
+    say "<#{i}> <#{j}> <#{k}>"
+}
+
+assert_eq(i, 99)
+
+var a1 = []
+var a2 = []
+for i,j,*k in [[1,2,3,4], [5,6,7,8]] {
+    say "<#{i}> <#{j}> <#{k}>";
+    a1 << j
+    a2 << k
+}
+
+assert_eq(a1, [2, 6])
+assert_eq(a2, [[3,4],[7,8]])
+
+for i,:j in [
+    %w(a b c d e),
+    %w(f g h i j),
+] {
+    say "#{i} => #{j}"
+}
+
+var h = []
+for :j in [
+    %w(a b c d),
+    %w(e f g h),
+] {
+    h << j
+}
+
+assert_eq(i, 99)
+assert_eq(h, [Hash(<a b c d>...), Hash(<e f g h>...)])

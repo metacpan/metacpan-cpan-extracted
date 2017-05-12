@@ -1,0 +1,37 @@
+_fileVersion = 2.1;
+eventtype SOAP::Reply {
+    storageType = Persistent;
+    timeToLive = 30;
+    description = "";
+
+    string Content_Type;
+    int Content_Length;
+    string envelope;
+}
+eventtype SOAP::Request {
+    storageType = Persistent;
+    timeToLive = 30;
+    description = "";
+
+    string Content_Type;
+    int Content_Length;
+    string SOAPClass;
+    string SOAPAction;
+    string envelope;
+    int DebugRequest;
+}
+clientgroup "SOAP" {
+    description = "SOAP Testing";
+    lifeCycle = DestroyOnDisconnect;
+    storageType = Volatile;
+    requiredEncryption = None;
+    accessLabelRequired = false;
+    canPublish = {
+        SOAP::Reply,
+        SOAP::Request
+    };
+    canSubscribe = {
+        SOAP::Reply,
+        SOAP::Request
+    };
+}

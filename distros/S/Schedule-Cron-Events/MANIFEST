@@ -1,0 +1,11 @@
+MANIFEST
+Makefile.PL
+README
+cron_event_predict.plx
+lib/Schedule/Cron/Events.pm
+t/01base.t
+t/02errs.t
+t/03-rt68393.t
+t/04-rt53899.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

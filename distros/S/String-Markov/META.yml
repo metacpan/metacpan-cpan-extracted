@@ -1,0 +1,28 @@
+---
+abstract: 'A Moo-based, text-oriented Markov Chain module'
+author:
+  - 'Grant Mathews <gmathews@cpan.org>'
+build_requires:
+  Storable: 0
+  Test::Deep: 0
+  Test::Exception: 0
+  Test::Most: 0
+  open: 0
+  perl: 5.012
+  utf8: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.120921'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: String-Markov
+requires:
+  List::Util: 0
+  Moo: 0
+  Unicode::Normalize: 0
+  namespace::autoclean: 0
+  perl: 5.012
+version: 0.009

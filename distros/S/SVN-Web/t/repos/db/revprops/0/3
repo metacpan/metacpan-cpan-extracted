@@ -1,0 +1,15 @@
+K 10
+svn:author
+V 3
+nik
+K 8
+svn:date
+V 27
+2006-05-06T12:29:41.721774Z
+K 7
+svn:log
+V 151
+Add a directory and a file with spaces in their names, to ensure that spaces
+are properly encoded and decoded through SVN::Web.  Prompted by rt#19093.
+
+END

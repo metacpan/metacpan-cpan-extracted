@@ -1,0 +1,70 @@
+0.12    8 May 2012
+        Restored to $VERSION setting, for now.
+
+0.11    8 May 2012
+        PAUSE now understands new package syntax, search.cpan.org also, but
+        MetaCPAN still doesn't.  Anyway, removing the specific $VERSION setting
+        now.
+
+0.10    5 May 2012
+        Apparently, PAUSE doesn't understand -package name version- syntax yet.
+        Added back $VERSION setting to appease PAUSE.
+
+0.09    5 May 2012 
+        Somehow 0.08 didn't make it to CPAN.  Trying again.
+
+0.08    4 May 2012
+        Settled back to using 5.14 after having seen Damian Conway's excellent
+        "New Perl" workshop in Lisbon.  Nobody should settle for anything less
+        than 5.14!  Introduced autodie because that's in core now.
+
+        Fixed problem with version information in pod not getting updated since
+        0.06 (because of misunderstanding how Devel::Required works).
+
+        Verified it works with 5.15.9 threaded and unthreaded.
+
+0.07    2 May 2012
+        Oops, had documented the environment variable feature for FlatFile
+        but not implemented, nor tested it.  Now fixed.
+
+        The words test was not cleaning up after itself, now fixed.
+
+        Work started on AsyncDBI backend storage module, no tests or
+        functionality just yet.
+
+        Fixed automatic version setting in all source files by String::Lookup.
+
+0.06    29 April 2012
+        Added some more flatfile tests.
+
+0.05    28 April 2012
+        Really reduced dependency on Perl to 5.10.0.
+
+        Added support for persistent backends, and the FlatFile and DBI
+        backends.  No tests for the DBI backend just yet, soon!
+
+0.04    22 April 2012
+        Reduced dependency on Perl to 5.10.0 (instead of 5.14.0).  Seems to
+        pass fine with this older Perl.
+
+        Fixed problem if hash would be filled with ID values not matching the
+        offset / increment given at creation.  This may happen if a hash is
+        filled from a database that has ID's merged with several different
+        offsets.
+
+0.03    21 April 2012
+        Documented and tested the "offset" and "increment" parameters.  Plus
+        some small code and pod tweaks.
+
+0.02    21 April 2012
+        Order of keys is now the order in which they were added.  This now
+        bypasses the normal way of generating keys of a hash.
+
+        Added support for autoflushing.  Initialization can now also be done
+        by just specifying a hash ref.  More tests, including something of a
+        performance test: on my MacBook it does ~110K new ID's / second and
+        about ~400K existing ID's / second using the optimized ro_hash
+        construct.
+
+0.01    20 April 2012
+        First public version of String::Lookup.

@@ -1,0 +1,34 @@
+---
+abstract: 'Split any SQL code into atomic statements'
+author:
+  - 'Emanuele Zeppieri <emazep@cpan.org>'
+build_requires:
+  English: 0
+  File::Find: 0
+  File::Temp: 0
+  Test::Exception: 0.27
+  Test::More: 0.7
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110580'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: SQL-SplitStatement
+requires:
+  Carp: 0
+  Class::Accessor::Fast: 0
+  Getopt::Long: 0
+  List::MoreUtils: 0
+  Pod::Usage: 0
+  Regexp::Common: 0
+  SQL::Tokenizer: 0.22
+  constant: 0
+  perl: 5.008
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=SQL-SplitStatement
+  homepage: http://search.cpan.org/dist/SQL-SplitStatement
+  repository: git://github.com/emazep/SQL-SplitStatement.git
+version: 1.00020

@@ -1,0 +1,17 @@
+---
+name: Sub-Compose
+version: 0.01
+author: ~
+abstract: ~
+license: perl
+requires:
+  Carp: 0.01
+  Data::Dump::Streamer: 0.01
+  Sub::Name: 0.01
+build_requires:
+  Test::More: 0.47
+provides:
+  Sub::Compose:
+    file: lib/Sub/Compose.pm
+    version: 0.01
+generated_by: Module::Build version 0.2701

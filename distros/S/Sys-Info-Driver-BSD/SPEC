@@ -1,0 +1,21 @@
+use strict;
+my $OK = ($^O =~ m{ (?:free|open|net) bsd \z }xmsi) ? 1 : 0;
+die "OS unsupported\n" if ! $OK;
+
+{
+    module_name => 'Sys::Info::Driver::BSD',
+    requires    => {
+        'BSD::Sysctl'      => '0.08',
+        'Unix::Processors' => 0,
+        'Sys::Info::Base'  => '0.7801',
+        ($] < 5.006 ? ( 'warnings::compat' => 0 ) : ()),
+    },
+    build_requires => {
+        'Test::Sys::Info'  => '0.20',
+    },
+    meta_merge     => {
+        resources => {
+            repository => 'http://bitbucket.org/burak/cpan-sys-info-driver-bsd/',
+        },
+    },
+}

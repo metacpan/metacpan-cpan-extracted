@@ -1,0 +1,10 @@
+This module implements to Chi Squared test, using pre-computed tables.
+
+To install, do the usual:
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+You may use, modify and distribute this code under the same terms as you
+may use, modify and distribute perl itself.

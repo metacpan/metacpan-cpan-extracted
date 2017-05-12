@@ -1,0 +1,27 @@
+---
+abstract: 'declare individual handlers for AUTLOADed subs, respecting can and inheritance'
+author:
+  - 'AND LICENSE'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Sub-Auto
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Class::AutoloadCAN: 0
+  Devel::Declare: 0.002
+  Scope::Guard: 0
+  Sub::Name: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.0202

@@ -1,0 +1,64 @@
+template: info-domain.tt
+
+vars:
+  domain_name: cheese123.co.te
+  pw:
+
+input_assertions:
+  class: SRS::EPP::Command::Info::Domain
+
+SRS:
+  - assertions:
+      count:
+        - [ '/NZSRSRequest/*', 2, 'SRS: Check that there are two requests' ]
+        - [ '//Whois', 1, 'SRS: Check for only one Whois' ]
+        - [ '//DomainNameFilter', 1, 'SRS: Check for only one DomainNameFilter' ]
+      element_is:
+        - [ '/NZSRSRequest/*[1]', 'Whois', 'SRS: The first request should be a Whois' ]
+        - [ '/NZSRSRequest/*[2]', 'DomainDetailsQry', 'SRS: The second request should be a DomainDetailsQry' ]
+      match:
+        - [ '//DomainNameFilter', 'cheese123.co.te', 'SRS: Check the domain name' ]
+      match_all:
+      attr_is:
+        - [ '//FieldList', 'NameServers', '1', 'SRS: Nameservers field requested' ]
+        - [ '//FieldList', 'Status', '1', 'SRS: Status field requested' ]
+        - [ '//FieldList', 'RegisteredDate', '1', 'SRS: RegisteredDate field requested' ]
+        - [ '//FieldList', 'RegistrarId', '1', 'SRS: RegistrarId field requested' ]
+        - [ '//FieldList', 'BilledUntil', '1', 'SRS: BilledUntil field requested' ]
+        - [ '//FieldList', 'AuditText', '1', 'SRS: AuditText field requested' ]
+        - [ '//FieldList', 'EffectiveFrom', '1', 'SRS: EffectiveFrom field requested' ]
+        - [ '//FieldList', 'RegistrantContact', '1', 'SRS: RegistrantContact field requested' ]
+        - [ '//FieldList', 'AdminContact', '1', 'SRS: AdminContact field requested' ]
+        - [ '//FieldList', 'TechnicalContact', '1', 'SRS: TechnicalContact field requested' ]
+        - [ '//FieldList', 'LockedDate', '1', 'SRS: LockedDate field requested' ]
+        - [ '//FieldList', 'Delegate', '1', 'SRS: Delegate field requested' ]
+        - [ '//FieldList', 'ChangedByRegistrarId', '1', 'SRS: ChangedByRegistrarId field requested' ]
+        - [ '//FieldList', 'DNSSEC', '1', 'SRS: DNSSEC field requested' ]
+        - [ '//FieldList', 'CancelledDate', '1', 'SRS: DNSSEC field requested' ]
+
+output_assertions:
+  count:
+    - [ '//epp:resData', 1, 'EPP: Check for resData' ]
+    - [ '//domain:hostAttr', '4', 'EPP: Four nameservers' ]
+    - [ '//domain:hostAttr/domain:hostAddr', '2', 'EPP: Two glue records' ]
+    - [ '//domain:hostAttr/domain:hostAddr[@ip="v6"]', '1', 'EPP: One of which is v6' ]
+    - [ '//domain:hostAttr/domain:hostAddr[@ip="v4"]', '1', 'EPP: One of which is v4' ]
+  match:
+    - [ '//domain:name', 'cheese123.co.te', 'EPP: Check domain name is correct' ]
+    - [ '//domain:roid', 'a6e226cce5cb-DOM', 'EPP: Check domain roid is correct' ]
+    - [ '//domain:crDate', '/\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d:\d\d/', 'EPP: Check created date' ]
+    - [ '//domain:upDate', '/\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d:\d\d/', 'EPP: Check updated date' ]
+    - [ '//domain:exDate', '/\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d:\d\d/', 'EPP: Check expiry date' ]
+    - [ '//domain:hostAttr[1]/domain:hostName', 'ns1.everydns.net', 'EPP: correct nameserver 1']
+    - [ '//domain:hostAttr[2]/domain:hostName', 'ns2.everydns.net', 'EPP: correct nameserver 2']
+    - [ '//domain:hostAttr[3]/domain:hostName', 'ns3.everydns.net', 'EPP: correct nameserver 3']
+    - [ '//domain:hostAttr[4]/domain:hostName', 'ns4.cheese123.co.te', 'EPP: correct nameserver 4']
+    - [ '//domain:hostAttr[4]/domain:hostAddr[@ip="v6"]', '2401:1::7', 'EPP: correct nameserver 4 ipv6 glue']
+    - [ '//domain:hostAttr[4]/domain:hostAddr[@ip="v4"]', '1.2.3.4', 'EPP: correct nameserver 4 ipv4 glue']
+    - [ '//domain:clID', '100', 'EPP: Creating Registrar ID returned correctly']
+    - [ '//domain:clID', '100', 'EPP: Creating Registrar ID returned correctly']
+    - [ '//domain:upID', '001', 'EPP: Updating Registrar ID returned correctly']
+  match_all:
+  attr_is:
+    - [ '//epp:result', 'code', 1000, 'EPP: command ok' ]
+    - [ '//domain:status', 's', 'ok', 'EPP: correct status' ]

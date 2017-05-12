@@ -1,0 +1,88 @@
+theme:
+    class: Statocles::Theme
+    args:
+        store: site/theme
+
+gh_pages:
+    class: Statocles::Deploy::Git
+    args:
+        base_url: http://preaction.github.io/Statocles
+        path: '.'
+        branch: gh-pages
+
+personal:
+    class: Statocles::Deploy::Git
+    args:
+        base_url: http://preaction.me/statocles
+        path: '.'
+        remote: www
+        branch: deploy
+
+site:
+    class: Statocles::Site
+    args:
+        title: Statocles
+        base_url: http://preaction.me/statocles/
+        nav:
+            main:
+                - title: Blog
+                  href: /blog
+                - title: Docs
+                  href: /docs
+                - title: Gallery
+                  href: /gallery
+                - title: Code
+                  href: 'http://github.com/preaction/Statocles'
+                - title: Bugs
+                  href: 'http://github.com/preaction/Statocles/issues'
+                - title: CPAN
+                  href: 'http://metacpan.org/pod/Statocles'
+                - title: IRC
+                  href: 'https://chat.mibbit.com/?channel=%23statocles&server=irc.perl.org'
+        deploy:
+            $ref: personal
+        index: /
+        theme:
+            $ref: theme
+        apps:
+
+            page:
+                $class: Statocles::App::Basic
+                $args:
+                    url_root: /
+                    store: site/
+
+            pod:
+                $class: Statocles::App::Perldoc
+                $args:
+                    url_root: /pod
+                    inc:
+                        - lib/
+                    modules:
+                        - 'Statocles'
+                        - 'Statocles::'
+                    index_module: 'Statocles::Help'
+                    weave: 1
+
+            blog:
+                $class: Statocles::App::Blog
+                $args:
+                    store: site/blog
+                    url_root: /blog
+
+        plugins:
+            highlight:
+                $class: Statocles::Plugin::Highlight
+                $args:
+                    style: solarized-light
+
+        data:
+            google_analytics_id: 'UA-61295159-3'
+            disqus:
+                shortname: 'statocles'
+
+    on:
+        - build:
+            $class: Statocles::Plugin::LinkCheck
+            $sub: check_pages
+

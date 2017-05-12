@@ -1,0 +1,8 @@
+0.03  2014-06-06 10:43:10 EDT
+        - bump IO::File dep, since it fails with earlier versions (plack/#460)
+
+0.02  2012-09-30 19:24:00 CST
+        - fix subclassing (so that Plack::TempBuffer continues to work)
+
+0.01  2012-09-30 15:44:11 CST
+        - original version

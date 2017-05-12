@@ -1,0 +1,47 @@
+{
+   "abstract" : "Check if a string is an email address.",
+   "author" : [
+      "John Karr <brainbuz@brainbuz.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "String-Validator-Email",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Email::Address" : "1.896",
+            "Email::Valid" : "0.19",
+            "Net::DNS" : "0.68",
+            "Net::Domain::TLD" : "1.69",
+            "Regexp::Common" : "2011121001",
+            "String::Validator::Common" : "0.97",
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.98"
+}

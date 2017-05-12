@@ -1,0 +1,77 @@
+This code implements the basic 'bitap' algorithm for approximate
+string matching, within "edit distance" (Levenshtein measure).  The
+edit distance is defined as the total number of insertions, deletions,
+and substitutions required to transfrom a string to (possibly a
+substring of) another. "sale" is within 1 edit from "salve", "ale",
+and "same", and within 2 edits from "fake".
+
+The algorithm was developed by Udi Manber and Sun Wu, as described in
+the "Fast text search allowing errors", Communications of the ACM, Vol
+35, No. 10, October 1992.  An earlier version of the paper, "Fast Text
+Searching with Errors", Technical Report TR-91-11, Department of
+Computer Science, University of Arizona, Tucson, AZ, June 1991, is
+available online [1].
+
+The 'bitap' algorithm is best known as part of the agrep(1)
+("approximate grep") implementation [2].  The implementation has been
+explored in the "agrep - a fast approximate pattern matching tool",
+Proceedings of the Winter 1992 USENIX Conference, USENIX Association,
+Berkeley, CA. A version of that paper is available online [3].  Newer
+version of agrep, by Udi Manber, Sun Wu, and Burra Gopal, comes with
+the Glimpse [4][5] indexing tool, the search engine of Harvest [6].
+The version number of agrep hasn't been updated from 2.04 but the
+interface has been librarised and the code made more portable (for
+example--the original release didn't handle ISO Latin, only pure
+ASCII).  Note also that the 'bitap' algorithm is just one of the many
+string searching algorithms agrep uses--see the agrep implementations
+for more details.  'bitap' is not the fastest approximate matching
+algorithm in agrep, it is the most versatile one.
+
+[1]	ftp://ftp.cs.arizona.edu/agrep/agrep.ps.1.Z
+[2]	ftp://ftp.cs.arizona.edu/agrep/agrep-2.04.tar.Z
+[3]	ftp://ftp.cs.arizona.edu/agrep/agrep.ps.1.Z
+[4]	http://glimpse.cs.arizona.edu/
+[5]	ftp://ftp.cs.arizona.edu/glimpse/glimpse-4.1.src.tar.gz
+[6]	http://harvest.transarc.com/
+
+agrep itself is not in public domain, it is copyright by University
+of Arizona.
+
+I also used the book "String Searching Algorithms",
+Graham A. Stephen, World Scientific 1994, ISBN 981-02-1829-X,
+in which the 'bitap' ("Wu-Manber k-differences shift-add") and
+many other string searching algorithms are nicely summarized.
+
+This code doesn't implement the "partition-scan" improvement described
+in the TR-91-11, so this could still be made to run faster.  Neither
+does it implement all the described extensions (implemented are "sets
+of characters" (any-character and caseignoring as special cases of
+this) and "patterns with and without errors"; missing are: "wild
+cards" (Kleene star), "unknown number of errors" (finding out the edit
+distance when given two strings), "non-uniform costs", "set of
+patterns", "long patterns", and "regular expressions"), so it can
+still be made to run slower, too.  In place of "non-uniform costs"
+feature I have an invention of mine where one can for example
+completely disallow substitutions.  The feature is still largely
+untested (as is the whole program, come to think of it).
+
+Please read the COPYRIGHT.  This implementation shares no code with
+agrep, none, it was made from scratch based on the Manber and Wu
+papers.  Still, I have looked at the source code of agrep.  Therefore
+I also include in this distribution the original agrep copyright, in
+the file COPYRIGHT.agrep.  The inclusion of this file in no way
+affects the copyright of my code or the applicability of it to any
+purposes, even commercial ones.  The existence of COPYRIGHT.agrep only
+serves the clause (2) in it, courtesy.  The clauses (1) and (4) don't
+apply because this is not agrep.  In clause (3) our copyrights agree,
+we guarantee nothing.  This interpretation has been kindly sanctioned
+by Udi Manber.
+
+If you have any questions, detailed bug reports, enhancement
+suggestions, feature requests, or fan mail (I would like to know of
+any uses you put this code into), please feel free to contact me at
+<jhi@iki.fi>.
+
+All bugs are mine, mine, all mine.
+
+	Jarkko Hietaniemi November 1998

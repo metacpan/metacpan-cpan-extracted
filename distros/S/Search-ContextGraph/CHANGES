@@ -1,0 +1,107 @@
+0.15  8.14.2004
+
+- Changed hard-coded 'D' and 'T' prefixing to use _nodeify subroutine
+- Added connected_components method 
+- Began adding support for file-based hashes using MLDBM, enabling very
+	large collections.
+- Minor bugfixes, now tests for D: and T: prefixes explicitly,
+	instead of assuming that those are the only node types.
+	
+0.14  7.13.2004
+
+- Fixed bug in orphan removal on node delete operation
+- Updated 'store' method to use network order
+- Fixed bug where spurious 'D:' and 'T:' in doc titles misled 
+  term/doc list methods
+- Added find_by_title method and tests
+  
+0.13  3.14.2004
+
+- Changed interface on 'delete' to support term node deletion
+- Updated invariant.t and add_subtract.t with interface change
+
+0.12  3.13.2004
+
+- Added intersection method
+- Added merge method
+
+0.11  3.11.2004
+
+- Added add_file method at suggestion of Aaron Cope
+- Fixed bug in term_list method that would always return full list
+
+0.10  3.03.2004
+
+- Made adding content-free document a fatal error
+- Added simple_search method
+- Added load_from_dir constructor
+- Added dependency on File::Find
+- Normalize all terms to lower case
+
+0.09  2.23.2004
+
+- It's now possible to add, delete, and update individual docs
+- Some regrettable but correct interface changes
+- Fixed serious bug where weighting was not being recalculated
+- Graph can now be rebalanced by hand
+- Adjusted graph to store lcounts as well as weights
+- Made global weighting optional
+- Broke C implementation :-(
+- Added new test suites
+
+0.08 ( not released )
+
+- Reduced size of Node struct in XS code (removed type field)
+- XS and Perl code now preallocates space when reading from TDM file
+- Added max_depth attribute, to limit search depth
+
+0.07
+
+- Altered energy distribution scheme to more effective log(degree)+1 
+	(thanks to Martin Spernau for testing this)
+
+0.06  7.23.2003
+
+- Merged in XS implementation from Schuyler Erle
+- Fixed global weighting bug where counts and weights were being computed in
+	the same loop
+- Updated test cases to reflect bugfixes
+- Added XS/pure Perl switch in constructor
+- Updated test cases to test both XS and pure Perl versions
+
+0.05  7.17.2003
+
+- Module now inherits from Storable.pm
+- Added "find similar" method for document similarity search
+- Added "mixed_search" method for term + document search;
+- Edges are now normalized around each document
+- Renamed TDM load method to "load_from_tdm"
+- Singletons now inhabit the graph, instead of living in a lookup table
+- Special check prevents bounce-back from singletons
+- Many more test cases
+- Two levels of debugging output
+- Added credits for John Cuadrado and Scott Preece	
+
+0.04  7.14.2003
+
+- Applied patches from Leon Brocard
+	 - actual test cases
+	 - fixed typo that broke module
+	 - cleanup of debugging flag and output
+	 - added dependency on Test::More
+
+0.03  7.11.2003 
+
+- Added check to make sure no edges can have greater than unit weight
+
+0.02  7.11.2003
+
+- Added interface for just adding document titles + word lists, and having the sucker
+  build the search engine for you.   Earlier TDM format universally reviled by 
+  Perl community...
+- Added some POD and minor code patches from Ken Williams
+
+0.01 6.01.2003
+
+- And Maciej said, "Let there be Search::ContextGraph"!
+

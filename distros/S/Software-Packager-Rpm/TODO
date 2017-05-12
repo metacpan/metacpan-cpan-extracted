@@ -1,0 +1,55 @@
+Software::Packager
+	Extend and improve the API and POD.
+
+Software::Packager::Object
+	This should be okay but I'd like to improve the mode method some what.
+	At present you must pass an octal value or face teh consequences.
+
+Software::Packager::Aix
+	This module needs to be finished
+	Test script may need improving.
+
+Software::Packager::Dec_ofs
+	This module needs to have all the implementation done.
+	Test script needs to be written
+
+Software::Packager::Darwin
+	This module creates basic packages. The package format needs to be
+	brought up to the current format requirements.
+	Test script could be improved by doing some checks on the files in the
+	package directory.
+	Packages created with this module hang when installing. I think this is
+	something to do with the format of the package.
+
+Software::Packager::Hpux
+	This module needs to have all the implementation done.
+	Test script needs to be written
+
+Software::Packager::Solaris
+	This module needs to have the class functionality finished.
+	Test script may need to be improved.
+
+Software::Packager::Object::Solaris
+	Improve POD
+
+Software::Packager::Mswin32
+	This module needs to have all the implementation done.
+	Test script needs to be written
+
+Software::Packager::Rpm
+	This module needs to have all the implementation done.
+	Test script needs to be written
+
+Software::Packager::Tar
+	creates tar files okay but if you do a tar -tvf on the archive it gives
+	direcory checksum errors.
+	Test script may need improving.
+
+Software::Packager::Perl
+	This module needs to have all the implementation done.
+	Test script needs to be written
+
+Software::Packager::Zip
+	This module needs to have all the implementation done.
+	Test script needs to be written
+

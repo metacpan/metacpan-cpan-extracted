@@ -1,0 +1,34 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.50.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 cad4d995f33ab0f79316439f9066466c90946258 Build.PL
+SHA1 2ef8d2e91e85b50c9c3d93f274655cee51547f51 Changes
+SHA1 f235ba4160673bcb7c9d58c2f09dbc7fc0efadea LICENSE
+SHA1 29f96ac4cd8a4c6fb77962f62e04f279b7ed6ed6 MANIFEST
+SHA1 8b9cbd0e68d11d00531f63077a8296b13123f6e1 MANIFEST.SKIP
+SHA1 84e723b676aa047f1741cfe3dc6bc8afff4315cf META.yml
+SHA1 9118f5f8e5b4c66d724b91c3705999e99b1d5086 Makefile.PL
+SHA1 ec8e632c30516a925323b922433550c47c6d4123 README
+SHA1 d58afa997a31f8a453829a6ee0a9b5e358b5b492 lib/Spoon/Template/Mason.pm
+SHA1 cccaf885419c2b9791a4311424002ccf8ef5dccd t/01-load.t
+SHA1 b44b6a83c74779839d6b1284e16af0d40a332763 t/02-render.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.1 (GNU/Linux)
+
+iD8DBQFDtZ2z3Or3ZzQuifMRAvPTAKC5psz2JD2S7eWgolcN1NVFW8YwwQCg6605
+D+5T2KjlWwnBNtqUt3B9s3U=
+=x5Sp
+-----END PGP SIGNATURE-----

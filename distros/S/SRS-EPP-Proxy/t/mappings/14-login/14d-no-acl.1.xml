@@ -1,0 +1,45 @@
+<NZSRSResponse VerMajor="5" VerMinor="0"><Response Action="RegistrarDetailsQry" FeId="8" FeSeq="4803230" OrigRegistrarId="100" RecipientRegistrarId="100" Rows="1">
+<FeTimeStamp Day="8" Hour="14" Minute="08" Month="7" Second="43" TimeZoneOffset="+12:00" Year="2010"/><Registrar AccRef="n/a" Name="Test Registrar" RegistrarId="90" URL="www.nzrs.net.nz"><RegistrarPublicContact Name="Test Registrar Public Name" Email="initial@testemail.co.nz"><PostalAddress Address1="Test Address 1 Initial" City="Test City Initial" CountryCode="NZ" PostalCode="23456"/><Phone AreaCode="12" CountryCode="64" LocalNumber="123456"/><Fax AreaCode="34" CountryCode="64" LocalNumber="12345"/></RegistrarPublicContact><RegistrarSRSContact Name="Handle-DELETE7" Email="db1@nzrs.net.nz"><PostalAddress Address1="123 Main Street" City="Wellington" CountryCode="NZ"/><Phone AreaCode="4" CountryCode="64" LocalNumber="12345679"/></RegistrarSRSContact><DefaultTechnicalContact Name="Test Registrar Technical Name" Email="tech@testemail.co.nz"><PostalAddress Address1="Test Address 1 Initial" Address2="Test Address 2 Initial" City="Test City Initial" CountryCode="NZ" PostalCode="23456"/><Phone AreaCode="12" CountryCode="64" LocalNumber="321"/>
+<Fax AreaCode="34" CountryCode="64" LocalNumber="543221"/></DefaultTechnicalContact>
+<EncryptKeys><EncryptKey><![CDATA[-----BEGIN PGP PUBLIC KEY BLOCK-----
+Version: GnuPG v1.0.6 (GNU/Linux)
+Comment: For info see http://www.gnupg.org
+
+mQGiBD2mASURBAC8ELfHNMeFkoOeaH9AeiB8gdnYfD0vl55tcUsIEdN6TbqLmxyE
+R6+hn+JprHiZ8eVxa7BwnCjc31inN5dB2/KtOxGVbmyXihl3P3Mgc/cY2D9ufVDx
+aai3RNDweiObreDL1+3sSp1DDC+Jmm9jnLlt26ZeAsIZSlQom65GvCIcowCgkeFq
+oRtrWDyQexFw5/gar30EoY0D/3AH88M+5k36isrXEZHjUgi4QO6wAJNkzSwRCKB3
+ug0nDlD1sB0Z3coRlfXBjDlvrAYlDeh2DJQa2dLHXBriTY6qI8PmluGy7nsnxLNf
+/5yYgiQZrzKz90lYFHXtxuYplcI0lsVvIlRehw2iHkiTrciMdSRxKNTDnuhlTJyn
+wrpLA/9JsSeGgKZFdjFemGccZYhYazpu76xGLXLPzMgBjtZxzgk0ZAJBYTyiE6N/
+cdPTdVndzIxrsYID2VS/HlCNrQEhBd3oJP+tsUXLdM1Ay1iCu8/vGnUhgPzlI8Ie
+ASFlPvtdj35Crk76qeNYgcdNxEewLGLDBpMXo+ss3ugMAtN6CLQUTlogUmVnaXN0
+cnkgU2VydmljZXOIVwQTEQIAFwUCPaYBJQULBwoDBAMVAwIDFgIBAheAAAoJECvU
+c6XZCUibUhcAoI88lZDCNvMLa0Ogk0eyzN7wGJfNAJ93B7O1FWDCpD0uTpIsqKlL
+tRm/aLkBDQQ9pgEoEAQAknWw2O7LVY0fk6+8PyLEEARvY0fLwn4+JA76srWUkWLY
+8CZ8MiuXiPWf0FwhxQUKsnhfnNL0NvndwDc2k+7doEbUOkNtNT2sS2ZkL1unC6ZO
+DBJJtMJjzmR0LLBqouvVSk1DsDzT291tKFb48qxCo3KOPG6+zeeUEtoRSiq9GKMA
+AwUD/jij4RZ4jBD9ToAYq8qoHMOHMQTngtSlW2wwg3r3kbbvr1AJHGOaDhPkGk2x
+ZBt+S49F+Y1zWM1UGDtSE+AZQ0gApCg5O7D6H9pE4bZyzcCgd05AD7lDhnGHzvd2
+k2w/UjBXMIk09d8c5kdZoO16TZ45wm6Qf799KtCul6lQ+IhniEYEGBECAAYFAj2m
+ASgACgkQK9RzpdkJSJsyjQCdHeSieOyL7LuNnTu8f1yvYlwfC40An2C3RcynllKX
+nxX1TYFMCXdHHLiq
+=JbX9
+-----END PGP PUBLIC KEY BLOCK-----]]></EncryptKey></EncryptKeys>
+<EPPAuth Password="$5$7PzBN2aQ$vlkphb1Isb3UzVZ535oOxFiGPGdxbYWSfNQ8G.ELTR8"/>
+<Allowed2LDs><SecondLD DomainName="ac.nz"/><SecondLD DomainName="co.nz"/><SecondLD DomainName="geek.nz"/>
+<SecondLD DomainName="gen.nz"/><SecondLD DomainName="maori.nz"/><SecondLD DomainName="net.nz"/><SecondLD DomainName="org.nz"/>
+<SecondLD DomainName="school.nz"/></Allowed2LDs><Roles><Role RoleName="CancelDomain"/><Role RoleName="Connect"/>
+<Role RoleName="CreateDomain"/><Role RoleName="Query"/><Role RoleName="QueryACL"/><Role RoleName="Registrar"/>
+<Role RoleName="TransferDomain"/><Role RoleName="UncancelDomain"/><Role RoleName="UpdateDomain"/>
+<Role RoleName="UpdateRegistrar"/><Role RoleName="Whois"/></Roles>
+<AuditDetails ActionId="srsrps-1_413" RegistrarId="1">
+<AuditTime><From Day="07" Hour="17" Minute="30" Month="7" Second="27" TimeZoneOffset="+12:00" Year="2010"/></AuditTime>
+<AuditText><![CDATA[User Id: evan]]></AuditText></AuditDetails></Registrar></Response>
+<Response Action="AccessControlListQry" FeId="8" FeSeq="4803230" OrigRegistrarId="90" RecipientRegistrarId="90" Rows="1">
+<FeTimeStamp Day="8" Hour="14" Minute="08" Month="7" Second="43" TimeZoneOffset="+12:00" Year="2010"/>
+</Response>
+<Response Action="AccessControlListQry" FeId="8" FeSeq="4803230" OrigRegistrarId="90" RecipientRegistrarId="90" Rows="1">
+<FeTimeStamp Day="8" Hour="14" Minute="08" Month="7" Second="43" TimeZoneOffset="+12:00" Year="2010"/>
+</Response>
+</NZSRSResponse>

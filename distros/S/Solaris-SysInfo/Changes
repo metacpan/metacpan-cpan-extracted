@@ -1,0 +1,25 @@
+Revision history for Solaris-SysInfo
+
+0.06    CHANGES:
+         * Various small updates to keep CPANTS happy
+
+0.05    CHANGES:
+         * Declare OS unsupported unless building on a Solaris machine
+
+0.04    CHANGES:
+         * Use 'passthrough' rather than 'traditional' Makefile.PL style
+
+0.03    CHANGES:
+         * Added licence declarations to files
+         * Declare dependency on Test::More
+
+0.02    CHANGES:
+         * t/02sysinfo.t now compares first 5 results against results from
+           POSIX::uname()
+
+        BUGFIXES:
+         * Solaris 8 doesn't like sysinfo( cmd, "", 0 ). Replaced with static
+           buffer that might be big enough already. Retry if not.
+
+0.01    First version, released on an unsuspecting world.
+

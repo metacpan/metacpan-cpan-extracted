@@ -1,0 +1,162 @@
+NAME
+    Syntax::Keyword::Junction - Perl6 style Junction operators in Perl5
+
+VERSION
+    version 0.003008
+
+SYNOPSIS
+      use Syntax::Keyword::Junction qw/ all any none one /;
+
+      if (any(@grant) eq 'su') {
+        ...
+      }
+
+      if (all($foo, $bar) >= 10) {
+        ...
+      }
+
+      if (qr/^\d+$/ == all(@answers)) {
+        ...
+      }
+
+      if (all(@input) <= @limits) {
+        ...
+      }
+
+      if (none(@pass) eq 'password') {
+        ...
+      }
+
+      if (one(@answer) == 42) {
+        ...
+      }
+
+    or if you want to rename an export, use Sub::Exporter options:
+
+      use Syntax::Keyword::Junction any => { -as => 'robot_any' };
+
+      if (robot_any(@grant) eq 'su') {
+        ...
+      }
+
+DESCRIPTION
+    This is a lightweight module which provides 'Junction' operators, the
+    most commonly used being "any" and "all".
+
+    Inspired by the Perl6 design docs,
+    <http://dev.perl.org/perl6/doc/design/exe/E06.html>.
+
+    Provides a limited subset of the functionality of
+    Quantum::Superpositions, see "SEE ALSO" for comment.
+
+    Notice in the "SYNOPSIS" above, that if you want to match against a
+    regular expression, you must use "==" or "!=". Not "=~" or "!~". You
+    must also use a regex object, such as "qr/\d/", not a plain regex such
+    as "/\d/".
+
+SUBROUTINES
+  all()
+    Returns an object which overloads the following operators:
+
+      '<',  '<=', '>',  '>=', '==', '!=',
+      'lt', 'le', 'gt', 'ge', 'eq', 'ne',
+      '~~'
+
+    Returns true only if all arguments test true according to the operator
+    used.
+
+  any()
+    Returns an object which overloads the following operators:
+
+      '<',  '<=', '>',  '>=', '==', '!=',
+      'lt', 'le', 'gt', 'ge', 'eq', 'ne',
+      '~~'
+
+    Returns true if any argument tests true according to the operator used.
+
+  none()
+    Returns an object which overloads the following operators:
+
+      '<',  '<=', '>',  '>=', '==', '!=',
+      'lt', 'le', 'gt', 'ge', 'eq', 'ne',
+      '~~'
+
+    Returns true only if no argument tests true according to the operator
+    used.
+
+  one()
+    Returns an object which overloads the following operators:
+
+      '<',  '<=', '>',  '>=', '==', '!=',
+      'lt', 'le', 'gt', 'ge', 'eq', 'ne',
+      '~~'
+
+    Returns true only if one and only one argument tests true according to
+    the operator used.
+
+ALTERING JUNCTIONS
+    You cannot alter junctions. Instead, you can create new junctions out of
+    old junctions. You can do this by calling the "values" method on a
+    junction.
+
+     my $numbers = any(qw/1 2 3 4 5/);
+     print $numbers == 3 ? 'Yes' : 'No';   # Yes
+
+     $numbers = any( grep { $_ != 3 } $numbers->values );
+     print $numbers == 3 ? 'Yes' : 'No';   # No
+
+    You can also use the "map" method:
+
+     my $numbers = any(qw/1 2 3 4 5/);
+     my $prime   = $numbers->map( \&is_prime );
+
+     say for $prime->values; # prints 0, 1, 1, 0, 1
+
+EXPORT
+    'all', 'any', 'none', 'one', as requested.
+
+    All subroutines can be called by its fully qualified name, if you don't
+    want to export them.
+
+      use Syntax::Keyword::Junction;
+
+      if (Syntax::Keyword::Junction::any( @questions )) {
+        ...
+      }
+
+WARNING
+    When comparing against a regular expression, you must remember to use a
+    regular expression object: "qr/\d/" Not "/d/". You must also use either
+    "==" or "!=". This is because "=~" and "!~" cannot be overridden.
+
+TO DO
+    Add overloading for arithmetic operators, such that this works:
+
+      $result = any(2,3,4) * 2;
+
+      if ($result == 8) {...}
+
+SEE ALSO
+    This module is actually a fork of Perl6::Junction with very few
+    (initial) changes. The reason being that we want to avoid the incendiary
+    name containing Perl6.
+
+    Quantum::Superpositions provides the same functionality as this, and
+    more. However, this module provides this limited functionality at a much
+    greater runtime speed, with my benchmarks showing between 500% and 6000%
+    improvement.
+
+    <http://dev.perl.org/perl6/doc/design/exe/E06.html> - "The Wonderful
+    World of Junctions".
+
+AUTHORS
+    *   Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
+
+    *   Carl Franks
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Arthur Axel "fREW" Schmidt.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

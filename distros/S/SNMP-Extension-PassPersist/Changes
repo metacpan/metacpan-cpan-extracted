@@ -1,0 +1,40 @@
+Revision history for SNMP-Extension-PassPersist
+
+0.07    2013.01.07 - Sebastien Aperghis-Tramoni (SAPER)
+        [FEATURE] CPAN-RT#82362: Add support for counter64 (Pete Bristow).
+        [TESTS] Skip some tests under Win32.
+        [CODE] Replaced $/ with explicit "\n" to try fixing tests under Win32.
+        [DIST] No longer include README.pod in the CPAN version.
+
+0.06    2011.08.12 - Sebastien Aperghis-Tramoni (SAPER)
+        [TESTS] Added a mock version of Sys::Syslog to avoid useless dies
+        when running with old versions of the module in white boxes.
+        [TESTS] t/90-pod.t also makes use of Pod::Checker.
+
+0.05    2010.12.15 - Sebastien Aperghis-Tramoni (SAPER)
+        [DIST] Forgot to update MANIFEST.
+
+0.04    2010.12.15 - Sebastien Aperghis-Tramoni (SAPER)
+        [BUGFIX] CPAN-RT#46256: Fixed add_oid_tree(), thanks to Simon Brown.
+        [BUGFIX] CPAN-RT#43579: Fixed fetch_next_entry(), thanks to Aymeric Blazy.
+        [FEATURE] Added forked backend support.
+        [DOC] Improved documentation.
+        [DIST] Seperated build/tests prereqs from run prereqs, and bumped
+        minimum version of File::Temp to 0.14, thanks to Yves Blusseau.
+        [DIST] Added pseudo-walk utility.
+
+0.03    2008.12.18 - Sebastien Aperghis-Tramoni (SAPER)
+        [CODE] CPAN-RT#41749: Applied a patch from Kris Beevers to avoid
+        sorting OIDs when it's unnecessary, then optimising it a bit.
+        [CODE] Fixed a bug regarding how idle cycles are counted, found by
+        Pascal Beringuie.
+
+0.02    2008.11.12 - Sebastien Aperghis-Tramoni (SAPER)
+        [CODE] Made the code compatible with Perl 5.6
+        [CODE] Implemented add_oid_tree().
+        [TESTS] Implemented t/11-new.t, t/12-run.t
+        [EG] Added two examples based on the synopsis in eg/.
+
+0.01    2008.11.11 - Sebastien Aperghis-Tramoni (SAPER)
+        First version, released on an unsuspecting world.
+

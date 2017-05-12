@@ -1,0 +1,64 @@
+--- empty
+--- empty
+--- !perl/SVN::Notify::Dummy
+files:
+  A:
+    - project1/trunk/dir1/
+    - project1/trunk/dir1/file2
+    - project1/trunk/file1
+from: jpeacock@example.com
+handle_path: project1/trunk
+message:
+  - start work on first project
+message_size: 27
+revision: 2
+subject: '[2] start work on first project'
+to:
+  - trunk@example.com
+  - other@example.com
+--- !perl/SVN::Notify::Dummy
+from: tags@example.com
+handle_path: project1/tags
+revision: 3
+to: []
+to_regex_map:
+  tags@example.com: PROD_
+--- empty
+--- !perl/SVN::Notify::Dummy
+files:
+  A:
+    - project1/branches/branch1/dir2/
+    - project1/branches/branch1/dir2/file4
+    - project1/branches/branch1/file3
+from: branch@example.com
+handle_path: project1/branches/branch1
+message:
+  - simulate branch development
+message_size: 27
+revision: 5
+subject: '[5] simulate branch development'
+to:
+  - 'branches@example.com,branch1@example.com'
+--- !perl/SVN::Notify::Dummy
+files:
+  A:
+    - project1/trunk/dir2/
+    - project1/trunk/file3
+from: jpeacock@example.com
+handle_path: project1/trunk
+message:
+  - merge from branch1
+message_size: 18
+revision: 6
+subject: '[6] merge from branch1'
+to:
+  - trunk@example.com
+  - other@example.com
+--- !perl/SVN::Notify::Dummy
+from: tags@example.com
+handle_path: project1/tags
+revision: 7
+to: []
+to_regex_map:
+  tags@example.com: PROD_
+

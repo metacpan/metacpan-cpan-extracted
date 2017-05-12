@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<!DOCTYPE NZSRSResponse SYSTEM "protocol.dtd">
+<NZSRSResponse VerMajor="5" VerMinor="2">
+<Error Hint="INVALID_REQUEST_ERROR" ErrorId="LOCK_ERROR" Severity="err">
+<Description><![CDATA[An error occured when attempting to gain a lock on the domain.]]></Description>
+<ErrorDetails><![CDATA[foo.co.nz]]></ErrorDetails></Error></NZSRSResponse>

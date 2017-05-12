@@ -1,0 +1,31 @@
+---
+abstract: 'Identify which non-feature constructs are used in the code.'
+author:
+  - 'E. Choroba <choroba@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  FindBin: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Syntax-Construct
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Syntax::Construct:
+    file: lib/Syntax/Construct.pm
+    version: '0.29'
+requires:
+  Config: '0'
+  perl: '5.006'
+resources:
+  repository: https://github.com/choroba/syntactic-construct
+version: '0.29'

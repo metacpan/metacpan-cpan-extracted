@@ -1,0 +1,107 @@
+
+############################################################################## 
+SDL::App::FPS - base/parent class for frame rate centric SDL/OpenGL apps
+
+This base class can be easy subclassed for your own projects. It is a basic
+building block for building SDL/OpenGL applications that need a fast framerate
+with event handling before each frame.
+
+In examples/, there are quite a few examples, including a Mandelbrot Fractal
+drawing program for your perusal.
+
+Features
+========
+
+* Easy config file reading and command line parsing.
+* Both SDL and OpenGL support.
+* Framerate monitoring, so you can adjust the scene complexity in real-time
+* Capping the framerate, even with the inaccurate timer delays
+* event handling in between frames (very fast response to user action) which
+  means you don't need locking since events always occur at definite times
+* Decoupling of the animaition speed from the framerate by using an extra clock
+  (meaning the animation has the same speed, independed from the current frame
+   rate)
+* Time warp of the clock (see above): the clock can be warped by a factor,
+  which can even be changed on a frame-by-frame basis. This allows effects
+  like slow motion or fast forward, complete with ramping (e.g. slowly slowing
+  down). The clock can even go backwards!
+* Has timers that are syncronized with the warped clock and only expire at
+  the start of each frame (and not in-mid frame). Their overshot value still
+  allows you to determine the exact time the timer should have fired, so you
+  can correct for this.
+* Of course, for really real-time events (like starting the next musik track)
+  you can still use the normal SDL timers.
+* Buttons: Mouse sensitive areas of rectangular, circular or elliptic shape
+  that react to mouse clicks, mouse going in or out or hovering over the area
+* Convenience methods for setting up event handlers for often used events and
+  for accessing often used colors (SDL::App::FPS::Color)
+
+This setup allows you to get away without any locking or worry about the
+simulation code removing and object that is currently drawn or something
+along these lines.
+
+Check out the examples, they show you how simple it is to use this framework!
+
+Installation
+============
+
+* You need at least SDL for Perl <http://www.sdlperl.org/> and SDL itself from
+  <http://www.libsdl.org/>.
+
+* Warning! v0.18 needs at least SDL_perl v1.20.2 which is not an official
+  release (but a fork by me) and can be found at:
+	
+	http://bloodgate.com/perl/sdl/sdl_perl.html
+ 
+  SDL_perl 2.0 beta2 (current as I write this) does _not_ work!
+ 
+* untar/ungzip the package (replace 0.18 with the version you got)
+
+	tar -xzf SDL-App-FPS-0.18.tar.gz
+
+* Check the signature. Download my key from http://bloodgate.com/tels.asc or
+  from my CPAN directory. Then do in the build directory (where you unwrapped
+  stuff):
+
+	cpansign -v
+
+* if the signature verifies OK, proceed. Otherwise NOTIFY ME IMMIDIATELY. Do
+  NOT INSTALL THE PACKAGE! Your system might get compromised!
+
+* Build the make file:
+
+	perl Makefile.PL
+
+* Make the project
+
+	make
+
+* Run the tests:
+
+	make test
+
+* If some tests fail, please notify me.
+
+* If all tests pass, install as root:
+
+	su
+	[enter password]
+	make install
+	exit
+
+Go to the example/ directory and run the example applications for fun. Enjoy!
+
+Usage
+=====
+
+Look at the files in t/ (MyFPS.pm and myfpm.t) and the examples for how to
+use it. Read the documentation with
+
+	perldoc SDL::App::FPS
+
+after installing this package.
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

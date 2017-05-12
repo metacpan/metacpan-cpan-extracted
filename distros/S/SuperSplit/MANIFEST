@@ -1,0 +1,6 @@
+Changes
+MANIFEST
+Makefile.PL
+SuperSplit.pm
+SuperSplit/Obj.pm
+test.pl

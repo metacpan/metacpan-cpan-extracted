@@ -1,0 +1,26 @@
+Sub::Signatures version 0.20
+=====================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+ Filter::Simple
+ Test::Exception (only for the tests, of course)
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004-2005 Curtis "Ovid" Poe
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

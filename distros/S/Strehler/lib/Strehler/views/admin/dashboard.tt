@@ -1,0 +1,34 @@
+[% PROCESS admin/blocks/dashboard_blocks.tt %]
+<div class="span12">
+    <h1>Dashboard</h1>
+</div>
+<div class="content homepage">
+    <div class="row span12 dash-languages">
+        <div class="btn-group">
+        [% FOREACH lan in languages %]
+        [% IF lan != language %]
+            <a class="span1 btn" href="/admin/dashboard/[% lan %]">[% lan %]</a>
+        [% ELSE %]
+            <span class="span1 btn btn-info disabled">[% lan %]</span>
+        [% END %]
+        [% END %]
+        </div>
+    </div>
+    [% FOREACH element in dashboard %]
+        [% IF element.type == 'list' %]
+            [% INCLUDE list %]
+        [% END %]
+        [% IF element.type == 'page' %]
+            [% INCLUDE page %]
+        [% END %]
+        [% IF element.type == 'links' %]
+            [% INCLUDE links %]
+        [% END %]    
+    [% END %]
+</div>
+
+[% FOREACH element in dashboard %]
+    [% IF element.type == 'page' %]
+        [% INCLUDE pagepopup %]
+    [% END %]
+[% END %]

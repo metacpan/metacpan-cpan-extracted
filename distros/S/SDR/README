@@ -1,0 +1,57 @@
+NAME
+    SDR - Software-Defined Radio
+
+SYNOPSIS
+        use SDR;
+
+        my $radio = SDR->radio(can => 'rx');
+
+        $radio->frequency(104_500_000);
+        $radio->sample_rate(2_000_000);
+
+        $radio->rx(sub {
+          ## process IQ samples in $_[0]
+        });
+
+        $radio->run;
+
+DESCRIPTION
+    This is the parent module and primary interface for the SDR system of
+    perl modules.
+
+    SDR stands for Software-Defined Radio. It is a technology where raw
+    radio samples are created and decoded purely in software -- kind of like
+    a "sound card for radio". It's exciting because a single device can
+    communicate using many different modulations and protocols, usually
+    across a large range of frequencies.
+
+    It provides a wrapper around certain tasks like creating a radio with
+    the "radio" method and creating an audio sink with the "audio_sink"
+    method. There are also some handy utilities in SDR::DSP.
+
+    When creating a radio, you specify what capabilities you want the radio
+    to have (currently either "tx" or "rx"). The "radio" method will figure
+    out which SDRs you have drivers installed for and which, if any, are
+    currently plugged in. It will use the first suitable one it can find.
+
+    NOTE: The current radio drivers create background threads so you
+    shouldn't fork after you create instances of any radio objects.
+
+DRIVERS
+    SDR::Radio::HackRF - Can transmit and receive.
+
+    SDR::Radio::RTLSDR - Can only receive.
+
+SEE ALSO
+    SDR github repo <https://github.com/hoytech/SDR>
+
+    The examples in the "ex/" directory of this distribution.
+
+AUTHOR
+    Doug Hoyte, "<doug@hcsw.org>"
+
+COPYRIGHT & LICENSE
+    Copyright 2015 Doug Hoyte.
+
+    This module is licensed under the same terms as perl itself.
+

@@ -1,0 +1,10 @@
+#test that the module is loaded properly
+
+use strict;
+use Test::More 0.88;
+plan tests => 1;
+
+require Soar::Production::Parser;
+new_ok('Soar::Production::Parser');
+
+__END__

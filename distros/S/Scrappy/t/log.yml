@@ -1,0 +1,327 @@
+--- 
+custom: 
+  - 
+    metadata: 
+      a: b
+      c: d
+      e: f
+      g: h
+      i: j
+      k: l
+    notation: User-defined error message here
+    occurred: 2011-04-20 03:29:44
+  - 
+    metadata: 
+      // filename: t\08_test_logger_method.t
+      // line: 31
+      // package: main
+      a: b
+      c: d
+      e: f
+      g: h
+      i: j
+      k: l
+    notation: Verbosity event
+    occurred: 2011-04-20 03:29:44
+  - 
+    metadata: 
+      a: b
+      c: d
+      e: f
+      g: h
+      i: j
+      k: l
+    notation: User-defined error message here
+    occurred: 2011-04-20 03:30:09
+  - 
+    metadata: 
+      // filename: t\08_test_logger_method.t
+      // line: 31
+      // package: main
+      a: b
+      c: d
+      e: f
+      g: h
+      i: j
+      k: l
+    notation: Verbosity event
+    occurred: 2011-04-20 03:30:09
+  - 
+    metadata: 
+      a: b
+      c: d
+      e: f
+      g: h
+      i: j
+      k: l
+    notation: User-defined error message here
+    occurred: 2011-04-20 15:10:29
+  - 
+    metadata: 
+      // filename: t\08_test_logger_method.t
+      // line: 31
+      // package: main
+      a: b
+      c: d
+      e: f
+      g: h
+      i: j
+      k: l
+    notation: Verbosity event
+    occurred: 2011-04-20 15:10:29
+  - 
+    metadata: 
+      a: b
+      c: d
+      e: f
+      g: h
+      i: j
+      k: l
+    notation: User-defined error message here
+    occurred: 2011-04-20 15:13:50
+  - 
+    metadata: 
+      // filename: t\08_test_logger_method.t
+      // line: 31
+      // package: main
+      a: b
+      c: d
+      e: f
+      g: h
+      i: j
+      k: l
+    notation: Verbosity event
+    occurred: 2011-04-20 15:13:50
+  - 
+    metadata: 
+      a: b
+      c: d
+      e: f
+      g: h
+      i: j
+      k: l
+    notation: User-defined error message here
+    occurred: 2011-04-20 15:16:26
+  - 
+    metadata: 
+      // filename: t\08_test_logger_method.t
+      // line: 31
+      // package: main
+      a: b
+      c: d
+      e: f
+      g: h
+      i: j
+      k: l
+    notation: Verbosity event
+    occurred: 2011-04-20 15:16:26
+  - 
+    metadata: 
+      a: b
+      c: d
+      e: f
+      g: h
+      i: j
+      k: l
+    notation: User-defined error message here
+    occurred: 2011-04-20 15:20:28
+  - 
+    metadata: 
+      // filename: t\08_test_logger_method.t
+      // line: 31
+      // package: main
+      a: b
+      c: d
+      e: f
+      g: h
+      i: j
+      k: l
+    notation: Verbosity event
+    occurred: 2011-04-20 15:20:28
+  - 
+    metadata: 
+      a: b
+      c: d
+      e: f
+      g: h
+      i: j
+      k: l
+    notation: User-defined error message here
+    occurred: 2011-04-20 15:59:20
+  - 
+    metadata: 
+      // filename: t\08_test_logger_method.t
+      // line: 31
+      // package: main
+      a: b
+      c: d
+      e: f
+      g: h
+      i: j
+      k: l
+    notation: Verbosity event
+    occurred: 2011-04-20 15:59:20
+error: 
+  - 
+    notation: Great scotts, something strange has happened here
+    occurred: 2011-04-20 03:29:44
+  - 
+    notation: Verbosity error message
+    occurred: 2011-04-20 03:29:44
+  - 
+    notation: Great scotts, something strange has happened here
+    occurred: 2011-04-20 03:30:09
+  - 
+    notation: Verbosity error message
+    occurred: 2011-04-20 03:30:09
+  - 
+    notation: Great scotts, something strange has happened here
+    occurred: 2011-04-20 15:10:29
+  - 
+    notation: Verbosity error message
+    occurred: 2011-04-20 15:10:29
+  - 
+    notation: Great scotts, something strange has happened here
+    occurred: 2011-04-20 15:13:50
+  - 
+    notation: Verbosity error message
+    occurred: 2011-04-20 15:13:50
+  - 
+    notation: Great scotts, something strange has happened here
+    occurred: 2011-04-20 15:16:26
+  - 
+    notation: Verbosity error message
+    occurred: 2011-04-20 15:16:26
+  - 
+    notation: Great scotts, something strange has happened here
+    occurred: 2011-04-20 15:20:28
+  - 
+    notation: Verbosity error message
+    occurred: 2011-04-20 15:20:28
+  - 
+    notation: Great scotts, something strange has happened here
+    occurred: 2011-04-20 15:59:20
+  - 
+    notation: Verbosity error message
+    occurred: 2011-04-20 15:59:20
+info: 
+  - 
+    notation: Captains log, stardate 123456
+    occurred: 2011-04-20 03:29:44
+  - 
+    metadata: 
+      foo: bar
+    notation: Backwards me, whereami 987654
+    occurred: 2011-04-20 03:29:44
+  - 
+    notation: Verbosity information
+    occurred: 2011-04-20 03:29:44
+  - 
+    notation: Captains log, stardate 123456
+    occurred: 2011-04-20 03:30:09
+  - 
+    metadata: 
+      foo: bar
+    notation: Backwards me, whereami 987654
+    occurred: 2011-04-20 03:30:09
+  - 
+    notation: Verbosity information
+    occurred: 2011-04-20 03:30:09
+  - 
+    notation: Captains log, stardate 123456
+    occurred: 2011-04-20 15:10:29
+  - 
+    metadata: 
+      foo: bar
+    notation: Backwards me, whereami 987654
+    occurred: 2011-04-20 15:10:29
+  - 
+    notation: Verbosity information
+    occurred: 2011-04-20 15:10:29
+  - 
+    notation: Captains log, stardate 123456
+    occurred: 2011-04-20 15:13:50
+  - 
+    metadata: 
+      foo: bar
+    notation: Backwards me, whereami 987654
+    occurred: 2011-04-20 15:13:50
+  - 
+    notation: Verbosity information
+    occurred: 2011-04-20 15:13:50
+  - 
+    notation: Captains log, stardate 123456
+    occurred: 2011-04-20 15:16:26
+  - 
+    metadata: 
+      foo: bar
+    notation: Backwards me, whereami 987654
+    occurred: 2011-04-20 15:16:26
+  - 
+    notation: Verbosity information
+    occurred: 2011-04-20 15:16:26
+  - 
+    notation: Captains log, stardate 123456
+    occurred: 2011-04-20 15:20:28
+  - 
+    metadata: 
+      foo: bar
+    notation: Backwards me, whereami 987654
+    occurred: 2011-04-20 15:20:28
+  - 
+    notation: Verbosity information
+    occurred: 2011-04-20 15:20:28
+  - 
+    notation: Captains log, stardate 123456
+    occurred: 2011-04-20 15:59:20
+  - 
+    metadata: 
+      foo: bar
+    notation: Backwards me, whereami 987654
+    occurred: 2011-04-20 15:59:20
+  - 
+    notation: Verbosity information
+    occurred: 2011-04-20 15:59:20
+warn: 
+  - 
+    notation: This is not a drill
+    occurred: 2011-04-20 03:29:44
+  - 
+    notation: Verbosity warning
+    occurred: 2011-04-20 03:29:44
+  - 
+    notation: This is not a drill
+    occurred: 2011-04-20 03:30:09
+  - 
+    notation: Verbosity warning
+    occurred: 2011-04-20 03:30:09
+  - 
+    notation: This is not a drill
+    occurred: 2011-04-20 15:10:29
+  - 
+    notation: Verbosity warning
+    occurred: 2011-04-20 15:10:29
+  - 
+    notation: This is not a drill
+    occurred: 2011-04-20 15:13:50
+  - 
+    notation: Verbosity warning
+    occurred: 2011-04-20 15:13:50
+  - 
+    notation: This is not a drill
+    occurred: 2011-04-20 15:16:26
+  - 
+    notation: Verbosity warning
+    occurred: 2011-04-20 15:16:26
+  - 
+    notation: This is not a drill
+    occurred: 2011-04-20 15:20:28
+  - 
+    notation: Verbosity warning
+    occurred: 2011-04-20 15:20:28
+  - 
+    notation: This is not a drill
+    occurred: 2011-04-20 15:59:20
+  - 
+    notation: Verbosity warning
+    occurred: 2011-04-20 15:59:20

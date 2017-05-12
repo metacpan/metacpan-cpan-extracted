@@ -1,0 +1,14 @@
+Changes
+lib/Search/Query/Dialect/Lucy.pm
+lib/Search/Query/Field/Lucy.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/01-parser.t
+t/02-search.t
+t/03-compiler-matcher.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

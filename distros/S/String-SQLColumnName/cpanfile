@@ -1,0 +1,2 @@
+requires Lingua::EN::Numbers;
+requires String::CamelCase;

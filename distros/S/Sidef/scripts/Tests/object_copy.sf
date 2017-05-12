@@ -1,0 +1,27 @@
+#!/usr/bin/ruby
+
+class T(value) {
+    method display {
+        say value;
+    }
+}
+
+class S(value) < T {
+    method display {
+        say value;
+    }
+}
+
+var obj1 = T("T");
+var obj2 = S("S");
+var obj3 = obj2.dclone;         # make a deep clone of obj2
+
+obj2.value = "foo";             # change the value of obj2
+
+assert_eq(obj1.value, "T");
+assert_eq(obj2.value, "foo");
+assert_eq(obj3.value, "S");
+
+obj1.display;
+obj2.display;
+obj3.display;

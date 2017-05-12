@@ -1,0 +1,61 @@
+StatsView Version 1.4
+=====================
+
+DESCRIPTION
+-----------
+
+StatsView is a GUI-based tool for viewing the output of the various utilities
+that produce system performance statistics.  At the moment sar, iostat, vmstat
+mpstat and vxstat are supported.  There is also a GUI to allow the collection
+of these statistics.  It is also possible to collect and display Oracle
+statistics.  Suggestions for other statistic types are welcome!
+
+StatsView offers the following features:
+
+o Allows multiple data sources and graphs to be displayed simultaneously
+o Supports both printing and saving of the graphs in a wide range of
+  formats: Postscript, CGM, (Microsoft Office), MIF (FrameMaker), GIF and as a
+  CSV - useful for extracting data from sar files!
+o Supports both binary (sar -o) and text (sar > file) sar data files.
+o Allows the selection of which category of sar data is to be viewed, e.g.
+  CPU, Paging, Disk I/O etc.
+o Within a category, it allows the selection of individual data items, e.g.
+  for CPU data %usr, %sys, %wio and %idle are individually selectable.
+o Supports iostat -x and vmstsat output, providing a header line is added to
+  the start of the file (see below).
+o Has a GUI interface for statistics collection, allowing all the supported
+  statistics to be collected in an ingegrated manner.
+
+PREREQUISITES
+-------------
+
+StatsView is written in Perl5, using the Perl Tk extension library.  I recommend
+that you use perl5.005_03 or later, and Tk800.014 or later, as StatsView has
+been tested with these versions.  You will also need the Tk::GBARR add-on
+package for this version.
+
+The graphing is done with gnuplot, and version 3.7 or later is required -
+a copy can be found in the gnuplot_src subdirectory.
+
+INSTALLATION
+------------
+
+1.  Check you have all the prequisites installed and working.
+2.  perl Makefile.PL; make install
+3.  run "sv" or "sv <stats file>" to get started.
+
+COPYRIGHT AND DISCLAIMER
+------------------------
+
+Copyright 1998-2001 Alan Burlison
+
+You may distribute under the terms of either the GNU General Public License
+or the Artistic License, as specified in the Perl README file, with the
+exception that it cannot be placed on a CD-ROM or similar media for commercial
+distribution without the prior approval of the author.
+
+This code is provided with no warranty of any kind, and is used entirely at
+your own risk.
+
+This code was written by the author as a private individual, and is in no way
+endorsed or warrantied by Sun Microsystems.

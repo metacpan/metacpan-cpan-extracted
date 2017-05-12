@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NZSRSResponse VerMajor="5" VerMinor="3">
+  <Response Action="GetMessages" FeId="4" FeSeq="2995590" MoreRowsAvailable="1" OrigRegistrarId="921" RecipientRegistrarId="921" Rows="1">
+    <FeTimeStamp Day="7" Hour="16" Minute="57" Month="9" Second="23" TimeZoneOffset="+12:00" Year="2010" />
+    <Message Remaining="4">
+      <Response Action="DomainUpdate" FeId="4" FeSeq="2995507" OrigRegistrarId="1" RecipientRegistrarId="921" Rows="1" TransId="srsstage-1_4152">
+        <FeTimeStamp Day="7" Hour="15" Minute="58" Month="9" Second="07" TimeZoneOffset="+12:00" Year="2010" />
+        <Domain DomainName="daveepptest8.co.nz" Status="PendingRelease">
+          <AuditDetails ActionId="srsstage-1_4152" RegistrarId="1">
+            <AuditTime>
+              <From Day="07" Hour="15" Minute="58" Month="9" Second="07" TimeZoneOffset="+12:00" Year="2010" />
+            </AuditTime>
+            <AuditText>Dave</AuditText>
+          </AuditDetails>
+        </Domain>
+      </Response>
+    </Message>
+  </Response>
+</NZSRSResponse>

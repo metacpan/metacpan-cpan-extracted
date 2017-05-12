@@ -1,0 +1,60 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 294505f858f11dd062e9916e3f50d88210a9ef54 CONTRIBUTING
+SHA1 8782af48d9bb4ff67a6605573321c17d45b975a9 COPYRIGHT
+SHA1 6bd7b17d81be63d08d4efa6cb80106e72887842c CREDITS
+SHA1 9680fdf0a4e55c41a177082ac6d148142d23ea7c Changes
+SHA1 63581b2c01b0672c3c7884d866be07274ff6159f INSTALL
+SHA1 ec5a7b4f3023f03ebf821b57690758f7e6f3ae2a LICENSE
+SHA1 cd9d7272fa75b4846df5271583109e2d8f4764ac MANIFEST
+SHA1 103e3ddf7c216cbfc7e916303ed8b62d5f09c209 META.json
+SHA1 8756dcb210b4f4056919d46fe1ae969f5fbc8237 META.yml
+SHA1 cadd29a92b588d0a13dbff253fa006b0a97dc04f Makefile.PL
+SHA1 85dbf111237e41c0f14253f422079cbfbf3ad535 README
+SHA1 66b76f6a19fe5f71fef0576b07585a34deb6452c dist.ini
+SHA1 20aa3b49dbadf99b858d9348d47435e448953987 doap.ttl
+SHA1 c37a4fa85e3e228d80dbca86a20241a27c55990c examples/sets-and-moo.pl
+SHA1 58f3264d770b329b299a930ed3064d8a195ccfbe examples/sets-and-moose.pl
+SHA1 8389540e37cc8ad1f61d74c2e291063a52bee409 examples/sets-and-mop.pl
+SHA1 eb70f9f1151a1d25b7c6d15c8cb27c394db3df19 lib/Set/Equivalence.pm
+SHA1 9be638074345570ba1ec2a44b13f02f661cbb613 lib/Set/Equivalence/_Tie.pm
+SHA1 4662a5c21fc503da0bb3a0aed0a0c34e4fd5a873 lib/Types/Set.pm
+SHA1 7fa6bfaa65cb9a811bc842db1b1311262595bf70 t/01basic.t
+SHA1 7ac78d51dbd94a77a6d61f67a067ff62f53f8744 t/02constructors.t
+SHA1 3da53913a659606f2c061f0de0788afa44bd339e t/03accessors.t
+SHA1 5af586fade57eb5ead7d824eb15b4bc12ff8d693 t/04predicates.t
+SHA1 afc06228e610d40159d85b18f0adb3c975a263c5 t/05mutators.t
+SHA1 140266cf08ef8b7e50eb08ae7df1b36d08e9fb01 t/06comparison.t
+SHA1 22667696183dbe28a95d6557466ea068031a2ae5 t/07arithmetic.t
+SHA1 2257945dfe4bf8ee4c79737c05fbcbd714ec7c5f t/08misc.t
+SHA1 e72e2990125f6198902d849f69a0a864ed83ea77 t/20tied.t
+SHA1 bca903ac92b1c6c743c91b0fdafd1ee041cfdf7a t/30equivrel.t
+SHA1 84f208b0a71513e03d519d5bd8d74cc8eebef1f7 t/40objects.t
+SHA1 12e0dc15dfacb2b38139085fb6d761208746731c t/41objects-stringlike.t
+SHA1 3225a4130902afd98b6ca9964816a23dd071b741 t/50constraints.t
+SHA1 3d66c9d2e528e16993965b8815405992c15a2902 t/51coercions.t
+SHA1 f0eda32f5cbbf14fad44e3a18ec19d5c54cdf2d1 t/60overload.t
+SHA1 7090bd9cae102b47eb9e1313cfce8f55523238bb t/80types.t
+SHA1 c9f2c8d8c0cdece179684f7aaefbc071db171e38 t/81coercions.t
+SHA1 c1aa0c485b243e3083b42dc0b1b59e90710c7efd t/99todo.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iEYEARECAAYFAlJJeZYACgkQzr+BKGoqfTkRnACeNCEqwikeuuygeKGcFehaqfeL
+KJsAn3sRRlrLZDzsvGcHa/NceizXv0MI
+=1Ley
+-----END PGP SIGNATURE-----

@@ -1,0 +1,38 @@
+            <table width='200' border='0' cellpadding='0' cellspacing='0'>
+              <tr bgcolor='#4C4C4C'>
+                <td colspan='3'><img src='images/zero.gif' alt='' width='200' height='2'></td>
+              </tr>
+              <tr>
+                <td bgcolor='#4C4C4C'><img src='images/zero.gif' alt='' width='2' height='95'></td>
+                <td bgcolor='#ADADE7' align="center">
+		    [% IF session.user %]
+			Session for [% session.user.email | html %]<br />
+			<a href="logout.tt2">Log out</a>
+		    [% ELSE %]
+                    <table border='0' cellpadding='0' cellspacing='0'>
+		    <form method="post" action="login.tt2">
+                      <tr align='right'>
+                        <td align='right' class='clsLoginText'>email</td>
+                        <td>&nbsp;<input name="email" type='text' class='clsLoginBox'><img src='images/zero.gif' alt='' width='1' height='1'></td>
+                      </tr>
+                      <tr>
+                        <td align='right' class='clsLoginText'>password</td>
+                        <td>&nbsp;<input name="pass" type='password' class='clsLoginBox'><img src='images/zero.gif' alt='' width='1' height='20'></td>
+                      </tr>
+                      <tr>
+                        <td colspan='2'><img src='images/zero.gif' alt='' width='2' height='5'></td>
+                      </tr>
+                      <tr>
+                        <td><a href='register.tt2'>register</a><br>
+                        <td align='right'><input type="submit" name="submit" value="Sign In"></td>
+                      </tr>
+                      </form>
+                    </table>
+		    [% END %]
+                </td>
+                <td bgcolor='#4C4C4C'><img src='images/zero.gif' alt='' width='2' height='2'></td>
+              </tr>
+              <tr bgcolor='#4C4C4C'>
+                <td colspan='3'><img src='images/zero.gif' alt='' width='2' height='2'></td>
+              </tr>
+            </table>

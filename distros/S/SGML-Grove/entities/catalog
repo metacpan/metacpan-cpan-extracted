@@ -1,0 +1,10 @@
+--
+
+    Copyright (C) 1997 Ken MacLeod
+    See the file COPYING for distribution terms.
+
+    $Id: catalog,v 1.2 1998/01/18 00:21:22 ken Exp $
+
+--
+
+PUBLIC "-//Ken MacLeod//DTD Grove Simple Spec//EN" simple-spec.dtd

@@ -1,0 +1,9 @@
+0.05 (2011-02-04)
+    - Ported to perl 5.10.1+
+    - Added export groups
+
+0.04
+	- actually dep on Sub::Exporter =P
+
+0.03
+	- use Sub::Exporter

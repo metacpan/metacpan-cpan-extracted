@@ -1,0 +1,4 @@
+name = "Smart-Options"
+badges = ['travis', 'coveralls']
+[FileGatherer]
+exclude_match = ['Dockerfile', 'circle.yml']

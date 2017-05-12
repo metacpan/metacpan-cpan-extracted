@@ -1,0 +1,140 @@
+Revision history for Perl extension Statistics::R.
+
+0.34  2015-10-19
+    - Fixed obscure issue in DESTROY (reported by Pär Larsson, RT #107246)
+
+0.33  2014-08-28
+    - Better way to set large arrays (patch by Ken Yamaguchi, RT #97359)
+    - Properly handle the quit() command (reported by tecolo, Github #5)
+    - Prefer using the 'bin' constructor instead of 'r_bin'
+    - Method version() to get the version of R
+    - Better handling of R internationalization
+
+0.32  2013-12-18 
+    - Fixed POD error (reported by Srividya Vaidyanathan, RT #91438)
+
+0.31  2013-02-07
+    - Simplification and speedup of communications with R
+    - Handle multiple locales when looking for errors (patch by Jean Véronis and
+      Brian Cassidy)
+
+0.30  2012-11-15
+    - Skip tests that hang on Windows (thanks Clifford Sobchuk and Gisbert W.
+      Selke, RT #77761)
+    - Automatically destroy the R bridge when Statistics::R goes out of scope
+      (unless running in shared mode)
+
+0.29  2012-11-07
+    - Fixed cross-platform filename problem in run_from_file (thanks Clifford
+      Sobchuk, RT #77761)
+
+0.28  2012-11-06
+    - Fixed packaging issue by repackaging with Module::Install version 1.06
+    - Fixed character causing failure of POD test
+
+0.27  2012-03-22
+    - Better handling of R line length limits
+    - Better quoting of strings passed to R
+    - Optimizations
+    
+0.26  2012-01-28
+    - Support more R installation paths in Windows (patch by Adam Kennedy)
+
+0.25  2011-12-21
+    - Fixed a bug in the get() method (reported by Manuel A. Alonso Tarajano,
+      patched by Brian Cassidy)
+
+0.24  2011-11-09
+    - Require Text::Balanced >= 0.97 to prevent bad surprises (reported by Ryan
+      Golhar)
+
+0.23  2011-10-28
+    - Arrays of number-containing strings are now handled properly (RT bug 
+      #71988, patch by dheiman)
+
+0.22  2011-10-09
+    - The run() method now accepts an array of strings as input
+    - New run_from_file() method to read and execute commands from an R file
+    - Better detection of R errors by using the R exception system (issue
+      reported by Mike Imelfort)
+    - Updated error handling mechanism to detect R syntax errors in addition
+      to R runtime errors
+    - Tests now work for different locales (issue reported by Knut Behrends)
+
+0.21  2011-09-04
+    - Tweaked the regular expressions that parse the R output stream for added
+      speed and robustness
+
+0.20  2011-08-31
+    - Refactored the entire R communication bridge to avoid writing and reading
+      files. All data is now stored in memory and passed by pipes. This fixes
+      bug RT #11309, #11918, #66190 and #70314
+    - Refactored the communications in shared mode
+    - Put platform-specific code and legacy code in separate modules
+
+0.10  2011-08-27  
+    - Refactoring to remove old code doing platform-specific operations.
+    - Lots of code cleanup
+    - Removed the now useless r_dir and tmp_dir options of new()
+    - Fix for change of dir bug (RT #6724). Also fixes missing synopsis file (RT
+      #70307)
+    - More subtle cleanup procedure (RT #70392)
+
+0.09  2011-08-23 
+    - Changes in the new() method:
+       * it automatically calls start()
+       * it has the 'shared' option to start a shared bridge
+    - More portable filenames (RT #70391)
+    - Added convenience methods:
+       * run() replaces send() and read() and checks for errors (RT #70361)
+       * get() fetches the values in an R vector (RT #70361)
+       * set() assigns values to an R vector
+    - Fixed a bug in the unlock() method
+    - Removed the R() and error() methods and renamed some other. These changes
+      should be transparent and backward compatible
+    - Maintenance: many more unit tests, synopsis clarification, POD work, script
+      touchups, small code cleanups, version numbering, better README generation,
+      Git and bug tracker URLs
+
+0.08  2011-03-01
+    - Pass options in new() to Statistics::R::Bridge constructor (RT #63906)
+
+0.07  2010-11-08
+    - Tidy up SYNOPSIS (RT #62776)
+    - Fix undef warning on Win32 (RT #62776)
+    - Fix is_started() method (RT #62776)
+
+0.06  2010-09-17
+    - Fix error() when used as an accessor (RT #61335)
+    - Silence DESTROY() when R is not found
+    - Fix "uninitialized value" warning in read_processR() (RT #61414)
+
+0.05  2010-09-13
+    - Major code refactor:
+      - strict + warnings wherever possible
+      - Removed some layers of abstraction
+      - Win32/Linux classes are now simple subs
+      - Basic syntax tidying
+      - POD fix, plus pod test
+    - Skip tests if R is not available
+
+0.04  2010-08-28
+    - Basic code cleanup with the intention of doing major refactoring by-and-by
+    - Fix the test suite
+
+0.03  2008-08-16
+    - Fixed RT Bug #23948: bug in Statistics::R 
+    - Fixed --gui
+      - RT Bug #17925: R --slave --vanilla --gui=none is now R --slave --vanilla --gui=X11
+      - RT Bug #20515: Fwd: Delivery Status Notification (Failure)
+      - RT Bug #14324: error message with recent versions of R
+      We used the patch from barry.moore since it correctly identifies that we probably 
+      don't want the GUI.  
+    - Fixed RT Bug #17956: Win32: log_dir is not in tmp_dir by default as advertised
+
+0.02  2004-02-23
+    - Just minor changes and POD fix.
+
+0.01  2004-01-29 23:04:46
+    - original version;
+

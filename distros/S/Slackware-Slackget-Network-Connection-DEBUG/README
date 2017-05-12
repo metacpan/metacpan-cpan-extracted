@@ -1,0 +1,46 @@
+Slackware-Slackget-Network-Connection-DEBUG
+
+This module is a Slackware::Slackget::Network::Connection driver which add the support for debug:// protocol.
+This well known protocol is usefull for ... debuging ! It show all informations used in each methods of the driver, activate the debug mode of Slackware::Slackget::Network::Connection (wich produce a lot of outputs on the terminal).
+
+For the little story : while coding this module I found a bug in the driver laoding code of Slackware::Slackget::Network::Connection ^^
+I think this module name was very well choose :)
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Slackware::Slackget::Network::Connection::DEBUG
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Slackware-Slackget-Network-Connection-DEBUG
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Slackware-Slackget-Network-Connection-DEBUG
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Slackware-Slackget-Network-Connection-DEBUG
+
+    Search CPAN
+        http://search.cpan.org/dist/Slackware-Slackget-Network-Connection-DEBUG
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 DUPUIS Arnaud
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

@@ -1,0 +1,68 @@
+SMS-Send-MessageBird
+
+SMS::Send Driver for the SMS::MessageBird distribution - provides a simple
+interface for SMS sending via MessageBird.
+
+Enables sending of SMS messages with the SMS::Send distribution using
+MessageBird's API as the providing gateway via the SMS::MessageBird
+distribution.
+
+    use SMS::Send;
+    use SMS::Send::MessageBird;
+
+    my $messagebird = SMS::Send->new(
+        'SMS::Send::MessageBird',
+        _api_key    => 'test_ABCDEF123456',
+        _originator => 'James Ronan',
+    );
+    $messagebird->send_sms(
+        text => 'Hi, How are you?',
+        to   => '+441234567890',
+    );
+
+This module isn't designed to be used on its own. Please see L<SMS::Send>
+for more information.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc SMS::Send::MessageBird
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=SMS-Send-MessageBird
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/SMS-Send-MessageBird
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/SMS-Send-MessageBird
+
+    Search CPAN
+        http://search.cpan.org/dist/SMS-Send-MessageBird/
+
+The source code is also available on GitHub:
+    https://github.com/jamesronan/SMS-Send-MessageBird
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2016 James Ronan
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.
+

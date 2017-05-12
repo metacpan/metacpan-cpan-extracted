@@ -1,0 +1,457 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>SDL::OpenGL::Cg - SDL::OpenGL interface to the Cg shader language.</title>
+<link rev="made" href="mailto:molt@josephine.molt" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<ul>
+
+		<li><a href="#naming_convention">NAMING CONVENTION</a></li>
+		<li><a href="#cgbindprogram">cgBindProgram</a></li>
+		<li><a href="#cgcreatecontext">cgCreateContext</a></li>
+		<li><a href="#cgcreateprogram">cgCreateProgram</a></li>
+		<li><a href="#cgcreateprogramfromfile">cgCreateProgramFromFile</a></li>
+		<li><a href="#cgdestroycontext">cgDestroyContext</a></li>
+		<li><a href="#cgdisableprofile">cgDisableProfile</a></li>
+		<li><a href="#cgenableprofile">cgEnableProfile </a></li>
+		<li><a href="#cggeterror">cgGetError</a></li>
+		<li><a href="#cggetlastlisting">cgGetLastListing</a></li>
+		<li><a href="#cggetlatestprofile">cgGetLatestProfile</a></li>
+		<li><a href="#cggetprofilestring">cgGetProfileString</a></li>
+		<li><a href="#cgisprofilesupported">cgIsProfileSupported</a></li>
+		<li><a href="#cgloadprogram">cgLoadProgram</a></li>
+		<li><a href="#cgsetmatrixparameterc">cgSetMatrixParameterc</a></li>
+		<li><a href="#cgsetmatrixparameterr">cgSetMatrixParameterr</a></li>
+		<li><a href="#cgsetstatematrixparameter">cgSetStateMatrixParameter</a></li>
+		<li><a href="#matrix_constants">MATRIX CONSTANTS</a></li>
+	</ul>
+
+	<li><a href="#usage">USAGE</a></li>
+	<li><a href="#test_scripts">TEST SCRIPTS</a></li>
+	<li><a href="#bugs">BUGS</a></li>
+	<li><a href="#support">SUPPORT</a></li>
+	<li><a href="#history">HISTORY</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#copyright">COPYRIGHT</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>SDL::OpenGL::Cg - SDL::OpenGL interface to the Cg shader language.</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  See the examples in 'test-scripts'.</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>This module provides an interface to the nVidia Cg GL runtime.  This
+allows a SDL::OpenGL programmer access to the shader capabilities
+that many new graphics card provide.</p>
+<p>In order to use this module you will need an installation of the
+Cg runtime development kit, downloadable from nVidia at 
+<a href="http://developer.nvidia.com/object/cg_toolkit.html">http://developer.nvidia.com/object/cg_toolkit.html</a></p>
+<p>
+</p>
+<h2><a name="naming_convention">NAMING CONVENTION</a></h2>
+<p>This module provides access to functionality provided by two different
+libraries, Cg and CgGL.  Whilst it may be important to a C programmer
+which of the two libraries a given call is from, it is of no real
+importance to users of this module.</p>
+<p>With this in mind, and to aid people in identifying SDL::OpenGL::Cg
+calls, all of the methods in this module have the prefix 'cg'.  As
+such the Cg library's <code>cgGetProfileString()</code> has retained it's name
+whilst <code>cgGLIsProfileSupported()</code> has become cgIsProfileSupported().</p>
+<p>In line with this the constants this module provides have been
+rationalised with the common prefix CG_, thus CG_PROFILE_FP30
+has retained it's name whilst CG_GL_MODELVIEW_MATRIX has become
+CG_MODELVIEW_MATRIX.</p>
+<p>Apart from this simple change all method names are identical to
+their C counterparts, and so the documentation on the original
+C version of a method should be easily found in nVidia's
+documentation on the Cg and CgGL libraries.</p>
+<p>
+</p>
+<h2><a name="cgbindprogram">cgBindProgram</a></h2>
+<pre>
+ Usage     : cgBindProgram($prog) or die (&quot;Cannot bind program&quot;);
+ Purpose   : Makes a loaded program active.
+ Returns   : True if the program has been successfully bound,
+             and false if it was unable to do so.
+        
+=head2 cgCopyProgram</pre>
+<pre>
+ Usage     : (my $prog2 = cgCopyProgram($prog1) or die &quot;Cannot dupe&quot;;
+ Purpose   : Creates a copy of a program and adds it to the same context.
+ Returns   : A copy of the program on success, or undef for failure.
+ Throws    : None
+ Comments  :</pre>
+<pre>
+ See Also  : cgCompileProgram, cgDestroyProgram</pre>
+<p>
+</p>
+<h2><a name="cgcreatecontext">cgCreateContext</a></h2>
+<pre>
+
+ Usage     : my $context = cgCreateContext() or die &quot;Cannot create context&quot;;
+ Purpose   : Obtain a Cg context that programs can be stored in.
+ Returns   : An identifier for the context, or false for failure.
+ Throws    : None
+ Comments  :</pre>
+<pre>
+ See Also  : DestroyContext</pre>
+<p>
+</p>
+<h2><a name="cgcreateprogram">cgCreateProgram</a></h2>
+<pre>
+ Usage     : my $program = cgCreateProgram
+               ($context, $type, $program_code, $profile, $entry, $args);
+             $program or die(&quot;Cannot create program&quot;);
+ Purpose   : Creates a cgShader program from a string containing source. 
+ Returns   : The program itself, or undef if an error has occured.
+ Throws    : None
+ Comments  : Context is a CGcontext returned from CreateContext,
+             Type is either SDL::OpenGL::Cg::SOURCE or
+               SDL::OpenGL::Cg::Object dependant upon whether the
+               shader is compiled or not.
+             Program_code is the entire source code for the shader, as
+               a single string.
+             Entry is the name of the entry point of the shader.
+             Args is an array reference containing strings which
+               are passed directly to the compiler (Currently
+               unimplemented).</pre>
+<pre>
+ See Also  : cgBindProgram, cgCopyProgram, cgCreateProgramFromFile,
+             cgLoadProgram</pre>
+<p>
+</p>
+<h2><a name="cgcreateprogramfromfile">cgCreateProgramFromFile</a></h2>
+<pre>
+ Usage     : my $program = cgCreateProgramFromFile
+               ($context, $type, $file, $profile, $entry, $args);
+             $program or die(&quot;Cannot create program&quot;);
+ Purpose   : Creates a cgShader program from a file.
+ Returns   : The program itself, or undef if an error has occured.
+ Throws    : None
+ Comments  : Context is a CGcontext returned from CreateContext,
+             Type is either SDL::OpenGL::Cg::SOURCE or
+               SDL::OpenGL::Cg::Object dependant upon whether the
+               shader is compiled or not.
+             File is the name of the file containing the shader.
+             Entry is the name of the entry point of the shader.
+             Args is an array reference containing strings which
+               are passed directly to the compiler (Currently
+               unimplemented).</pre>
+<pre>
+ See Also  : cgBindProgram, cgCopyProgram, cgCreateProgram,
+             cgLoadProgram</pre>
+<p>
+</p>
+<h2><a name="cgdestroycontext">cgDestroyContext</a></h2>
+<pre>
+
+ Usage     : cgDestroyContext($context) or die &quot;Cannot destroy context&quot;;
+ Purpose   : Deletes a context and all of the programs it contains.
+ Returns   : True if the context has been successfully deleted,
+             false if it hasn't.
+ Throws    : None
+ Comments  :</pre>
+<pre>
+ See Also  : cgCreateContext</pre>
+<p>
+</p>
+<h2><a name="cgdisableprofile">cgDisableProfile</a></h2>
+<pre>
+ Usage     : cgDisableProfile(PROFILE_FP20()) or die &quot;Cannot disable FP20&quot;;
+ Purpose   : Deactivate a profile
+ Returns   : True if the profile is successfully disabled, false if
+             it failed for some reason
+ Throws    : None
+ Comments  :</pre>
+<pre>
+ See Also  : cgEnableProfile, cgIsProfileSupported, PROFILE CONSTANTS</pre>
+<p>
+</p>
+<h2><a name="cgenableprofile">cgEnableProfile</a></h2>
+<pre>
+
+ Usage     : cgEnableProfile(PROFILE_FP20()) or die &quot;Cannot enable FP20&quot;;
+ Purpose   : Activate a profile
+ Returns   : True if the profile is successfully enabled, false if
+             it failed for some reason.
+ Throws    : None
+ Comments  :</pre>
+<pre>
+ See Also  : cgDisableProfile, cgIsProfileSupported, cgGetLatestProfile
+             PROFILE CONSTANTS</pre>
+<p>
+</p>
+<h2><a name="cggeterror">cgGetError</a></h2>
+<pre>
+ Usage     : my $err = cgGetError();
+ Purpose   : Obtaining the error code of the last error which occured. 
+ Returns   : The error code.
+ Throws    : None
+ Comments  :</pre>
+<pre>
+ See Also  :</pre>
+<p>
+</p>
+<h2><a name="cggetlastlisting">cgGetLastListing</a></h2>
+<pre>
+
+ Usage     : my $listing = cgGetLastListing($context);
+ Purpose   : Obtain the results of the last listing compiled in a given
+             context, often used for working out why a shader compilation
+             failed.
+ Returns   : The output string, or undef if no program has been compiled
+             in that context.
+ Throws    : None
+ Comments  :</pre>
+<pre>
+ See Also  :</pre>
+<p>
+</p>
+<h2><a name="cggetlatestprofile">cgGetLatestProfile</a></h2>
+<pre>
+
+ Usage     : my $profile = cgGetLatestProfile(CG_VERTEX());
+ Purpose   : Obtaining the profile code of the last profile of a class
+             to have been enabled.
+ Returns   : The profile code.
+ Throws    : None
+ Comments  :</pre>
+<pre>
+
+ See Also  : cgEnableProfile, cgDisableProfile</pre>
+<pre>
+
+=head2 cgGetNamedParameter</pre>
+<pre>
+ Usage     : my $param = cgGetNamedParameter($program, 'paramname');
+ Purpose   : Returns a handle to a shader's parameter so it can be
+             manipulated.
+ Throws    : None
+ Comments  :
+ 
+ See Also  : cgSetMatrixParameterc, cgSetMatrixParameterr, cgSetParameter,
+             cgSetStateMatrixParameter</pre>
+<p>
+</p>
+<h2><a name="cggetprofilestring">cgGetProfileString</a></h2>
+<pre>
+ Usage     : print &quot;FP20 is called &quot;,cgGetProfileString(PROFILE_FP20());
+ Purpose   : Obtains the profile name associated with a particular ID.
+ Returns   : The name of the profile, or undef if the ID isn't known.
+ Throws    : None
+ Comments  :</pre>
+<pre>
+ See Also  : PROFILE CONSTANTS</pre>
+<p>
+</p>
+<h2><a name="cgisprofilesupported">cgIsProfileSupported</a></h2>
+<pre>
+
+ Usage     : my $can_fp20 = cgIsProfileSupported(PROFILE_FP20);
+ Purpose   : Find out whether a given profile is supported.
+ Returns   : True is the profile is supported, false is it
+             isn't.
+ Arguments : The profile ID to be checked.
+ Throws    : None
+ Comments  :</pre>
+<pre>
+ See Also  : PROFILE CONSTANTS, cgDisableProfile, cgEnableProfile</pre>
+<p>
+</p>
+<h2><a name="cgloadprogram">cgLoadProgram</a></h2>
+<pre>
+ Usage     : cgLoadProgram($prog) or die (&quot;Cannot load program&quot;);
+ Purpose   : Loads a compiled program into memory.
+ Returns   : True if the program was loaded successfully, false
+             if there was an error.
+ Arguments : The program to be loaded.
+ Throws    : None
+ Comments  : Should be called after cgCompileProgram() and before
+             cgBindProgram().</pre>
+<pre>
+ SeeAlso   : cgBindProgram, cgCompileProgram</pre>
+<p>
+</p>
+<h2><a name="cgsetmatrixparameterc">cgSetMatrixParameterc</a></h2>
+<pre>
+ Usage     : cgSetMatrixParameterc ($param, @vals) or die &quot;Error!&quot;;
+ Purpose   : Sets the value of a matrix parameter
+ Returns   : True if the assignment went okay, false if there
+             was an error.
+ Arguments : The parameter to be set, and the values to set it to.
+ Throws    : None
+ Comments  : Differs from cgSetMatrixParameterr in that this version
+             expects the data to be in column format.
+ TODO      : Currently only sets float4x4 matrices.</pre>
+<pre>
+ SeeAlso   : cgGetNamedParameter, cgSetMatrixParameterc, cgSetParameter,
+             cgSetStateMatrixParameter</pre>
+<p>
+</p>
+<h2><a name="cgsetmatrixparameterr">cgSetMatrixParameterr</a></h2>
+<pre>
+ Usage     : cgSetMatrixParameterr ($param, @vals) or die &quot;Error!&quot;;
+ Purpose   : Sets the value of a matrix parameter
+ Returns   : True if the assignment went okay, false if there
+             was an error.
+ Arguments : The parameter to be set, and the values to set it to.
+ Throws    : None
+ Comments  : Differs from cgSetMatrixParameterc in that this version
+             expects the data to be in row format.
+ TODO      : Currently only sets float4x4 matrices.</pre>
+<pre>
+ SeeAlso   : cgGetNamedParameter, cgSetMatrixParameterc, cgSetParameter,
+             cgSetStateMatrixParameter</pre>
+<p>
+</p>
+<h2><a name="cgsetstatematrixparameter">cgSetStateMatrixParameter</a></h2>
+<pre>
+ Usage     : cgSetStateMatrixParameter($param,
+              CG_MODELVIEW_PROJECTION_MATRIX(), CG_MATRIX_IDENTITY())
+              or die &quot;Error!&quot;;
+ Purpose   : To allow parameters to follow the OpenGL matrix state
+             more easily, to allow setting Modelview etc. for the
+             shaders.
+ Returns   : True if the parameter was set without difficulty,
+             undefined if a problem was experienced.
+ Arguments : None
+ Throws    : None
+ Comments  : The second argument indicates which of OpenGL's matrices
+             it should follow, and the third indicates which of the
+             transforms to apply as it's copied.  See MATRIX CONSTANTS
+             for more information.
+ 
+=head2 COMPILE CONSTANTS</pre>
+<pre>
+ Usage     : my $from_source = CG_SOURCE();
+ Purpose   : To indicate whether Cg code is to be built from source
+             or simply read from a compiled object.
+ Returns   : The constant's ID
+ Arguments : None
+ Throws    : None
+ Comments  : Currently includes CG_SOURCE and CG_OBJECT.
+ 
+=head2 PROFILE CONSTANTS</pre>
+<pre>
+ Usage     : my $fp20 = CG_PROFILE_FP20();
+ Purpose   : A set of constants for the Cg profile IDs. 
+ Returns   : The profile ID. 
+ Argument  : None 
+ Throws    : None 
+ Comments  : Currently includes CG_PROFILE_FP20, CG_PROFILE_FP30,
+             CG_PROFILE_VP20, CG_PROFILE_VP30, CG_PROFILE_ARBFP1
+             and CG_PROFILE_ARBVP1.</pre>
+<pre>
+ See Also   : cgEnableProfile, cgDisableProfile</pre>
+<p>
+</p>
+<h2><a name="matrix_constants">MATRIX CONSTANTS</a></h2>
+<pre>
+ Usage     : cgSetStateMatrixParameter($param,
+              CG_MODELVIEW_PROJECTION_MATRIX(), CG_MATRIX_IDENTITY())
+              or die &quot;Error!&quot;;
+ Purpse    : Identifies the different OpenGL matrices and the
+             transforms that can be applied to them as they are
+             transfered to the shader.
+ Comments  : Matrix identification constants include:
+             CG_MODELVIEW_MATRIX, CG_PROJECTION_MATRIX,
+             CG_TEXTURE_MATRIX, CG_MODELVIEW_PROJECTION_MATRIX.
+             Transformation identification constants include:
+             CG_MATRIX_IDENTITY, CG_MATRIX_TRANSPOSE,
+             CG_MATRIX_INVERSE, CG_MATRIX_INVERSE_TRANSPOSE.</pre>
+<p>
+</p>
+<hr />
+<h1><a name="usage">USAGE</a></h1>
+<p>
+</p>
+<hr />
+<h1><a name="test_scripts">TEST SCRIPTS</a></h1>
+<p>The test-scripts subdirectory of the install contains a set of
+scripts intended to demonstrate Cg coding.  Whilst at the moment
+these are pretty much really there more to ensure correct 
+functioning of various parts of the module they should act to
+ensure the module works on a given machine.</p>
+<p>In order to run these you should be in the test-scripts directory.
+Many of them use relative paths to find their shader files and
+so attempting to run them from another directory will result
+in files not being found.</p>
+<p>
+</p>
+<hr />
+<h1><a name="bugs">BUGS</a></h1>
+<p>This module is currently judged to be PRE-ALPHA.  Whilst I have
+made some efforts to make it as bug-free as possible I have no
+doubt that there are many bugs lurking in the undergrowth,
+waiting to bite the unwary.</p>
+<p>Also, at present only a small (but important) fraction of the C
+API is supported.  I am still working on the rest of the API and
+expect a complete version to be released reasonably soon.</p>
+<p>
+</p>
+<hr />
+<h1><a name="support">SUPPORT</a></h1>
+<p>
+</p>
+<hr />
+<h1><a name="history">HISTORY</a></h1>
+<p>0.01 Tue Aug 19 
+Release 0.01 released.  This contained a subset of the functionality
+of the libraries, enough only to run and control a basic shader.</p>
+<p>0.00 Wed Jul 30
+Work began!</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<pre>
+        Paul Golds      
+        Molt@Simbio51s.com      
+
+</pre>
+<p>
+</p>
+<hr />
+<h1><a name="copyright">COPYRIGHT</a></h1>
+<p>This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+</p>
+<p>The full text of the license can be found in the
+LICENSE file included with this module.
+
+</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>perl(1), SDL, SDL::OpenGL
+
+</p>
+
+</body>
+
+</html>

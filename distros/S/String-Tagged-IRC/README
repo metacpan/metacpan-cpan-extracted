@@ -1,0 +1,62 @@
+NAME
+
+    String::Tagged::IRC - parse and format IRC messages using
+    String::Tagged
+
+TAGS
+
+    This module provides the following tags, conforming to the
+    String::Tagged::Formatting API specification.
+
+ bold, under, italic, reverse
+
+    Boolean values indicating bold, underline, italics, or reverse-video.
+
+ fg, bg
+
+    Convert::Color objects encoding the color. These will likely be
+    instances of Convert::Color::mIRC, unless a full RGB triplet colour
+    code has been provided; in which case it will be an instance of
+    Convert::Color::RGB8.
+
+METHODS
+
+ $st = String::Tagged::IRC->parse_irc( $raw, %opts )
+
+    Parses a text string containing IRC formatting codes and returns a new
+    String::Tagged::IRC instance.
+
+    Takes the following named options:
+
+    parse_plain_formatting => BOOL
+
+      If true, also parse "poor-man's" plain-text formatting of *bold*,
+      /italic/ and _underline_. In this case, formatting tags are added but
+      the original text formatting is preserved.
+
+ $raw = $st->build_irc
+
+    Returns a plain text string containing IRC formatting codes built from
+    the given instance. When outputting a colour index, this method always
+    outputs it as a two-digit number, to avoid parsing ambiguity if the
+    coloured text starts with a digit.
+
+    Currently this will only output mIRC-style formatting, not irssi-style.
+
+    Takes the following options:
+
+    default_fg => INT
+
+      Default foreground colour to emit for extents that have only the bg
+      tag set. This is required because mIRC formatting codes cannot set
+      just the background colour without setting the foreground as well.
+
+TODO
+
+      * Define a nicer way to do the ANSI terminal colour space of
+      irssi-style formatting codes.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

@@ -1,0 +1,7 @@
+Revision history for Perl extension SWF::Generator
+
+0.011   Tue Nov 24 09:32:59 2009
+        - add requires_external_bin
+
+0.01    Fri Nov 20 10:44:24 2009
+        - original version

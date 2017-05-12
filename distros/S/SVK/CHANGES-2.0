@@ -1,0 +1,285 @@
+[Changes for 2.0.2 - 20 Jul, 2007]
+
+  Mirror subsystem
+    * be more friendly when trying to relocating incorrect mirror
+      path.
+
+  Merge subsystem
+    * Fix a problem when repeatedly merging renames tracked with
+      --track-renames, and when merging back such files.
+    * Fix the "file not found at revision 0" bug when smerge to a
+      mirror where copy source is not normalized.
+    * Fix a bug that deletes inside copies aren't properly merged
+      across branches even the status output says so.
+    * Fix a bug when merging copies across branches we be using
+      incorrect dst revision causing "file not found at revision 0".
+    * Fix a bug where copies outside the mirror source across merge
+      are not expanded as non-copies.
+    * Fix an inconsistency for smerge -IC behaviour when the base is
+      a txn path.
+
+  Pullyu
+    * properly translate to local path when mirroring remote root.
+    * Fix pullyu for translating "included" records, which are
+      replaced entries.
+
+  Others
+    * Improve error reporting when failed to save config.
+    * Perl 5.9.5 compatibility fixes.
+    * Work around a problem that push -P might be using outdated
+      memory pool.
+    * svk diff -r:123 should report invalid -r rather than blow up.
+    * Add -i as shorthand for --interactive in svk ci.
+    * Various win32 fixes.
+    * Various i18n fixes.
+
+[Changes for 2.0.1 - 26 Mar, 2007]
+
+  Mirror subsystem
+    * You can now use $SVKNORAREPLAY forcing svk to use old SVN::Mirror
+      for sync.
+    * Fix a bug when mirroring partial repository with copies, the from
+      revision number might not be exactly the ones we have mirrored.
+    * In the pipelined sync editor, use pool more wisely for invoking
+      editor calls.  This fixes the memory bloat for syncing revisions
+      with large number of deleted files.
+    * In pipelined replay, make perl don't segfault on SIGINT.
+    * Fix the bug committing to subdirs of mirrors that are on /.
+    * Fix a bug preventing mirror --relocate to work on mirrors on '/'.
+    * Fix a problem replaying failing with RA_DAV_REQUEST_FAILED in some
+      servers.
+
+  Merge subsystem
+    * Fix a pool usage in Editor::Merge::apply_textdelta, which has a
+      side-effect causing rename-tracking smerge on a new file inside a
+      renamed directory to fail with SWIG-runtime error.
+    * Prevent unwanted repeated merges when repeatedly merging tags to a
+      branch.  We now also record the copy source(s) of the path being
+      merged from in the merge ticket.
+    * Fix a bug in merging moved files that are modified.
+    * Fix a bug that smerge to checkout with changes to a copied file is
+      causing incomplete svn delta string.
+    * When merging the replaced directory, do not ignore the fact when
+      the delete part is already conflicting.
+    * Fix a bug when merging a copy that happened on an intermediate
+      branch, which might not map back to the merge destination.
+
+  Tools
+    * verify-mirror improvements.
+    * Ship vc-svk.el with the distribution.
+
+  Others
+    * Make updating a checkout that no longer exists in the depot give
+      proper message.
+    * Make checkout more robust when resuming a interrupted checkout.
+    * Check for .svk/floating before assuming floating checkout.
+    * Fix a regression which caused binary files to sometimes be
+      displayed as text during an "svk diff".
+
+[Changes for 2.0.0 - 28 Dec, 2006]
+
+  Dependency
+    * Require Subversion 1.3.0
+    * Require App::CLI, UNIVERSAL::require, YAML::Syck, Path::Class,
+      Class::Accessor::Fast, Class::Data::Inheritable
+    * No longer require YAML, Clone, Regexp::Shellish, Date::Parse
+
+  Performance:
+    * Don't load Locale::* modules if the user's language is English
+    * Reduce Data::Hierarchy calls in checkout_delta
+    * SVK::Mirror now uses a separate process to pipeline sync
+    * Use POSIX::strftime for date formatting rather than Date::Parse
+      The log command now runs about 25% faster when generating long
+      logs
+
+  Merge subsystem
+    * Renames and copies can now be merged across branches
+    * svk now tries to use alleged merge result as next merge base,
+      making push more reliable and accurate
+    * Interactive tree conflict resolution
+    * Display the anchor along with THEIR and YOUR during interactive
+      conflict resolution
+    * Use svn:date to find the closest ancestor, not the revision number
+    * use only related node as base if it is one of merge source or
+      destination
+    * When picking base, the immediate merged-from source should take
+      precedence
+    * When doing add-merge on checkout, unschedule the add
+    * Only consider a g-merge to be a change when the merge source and
+      destination paths are the same
+    * Fix a leak in SVK::Editor::Merge in delete_entry
+    * Fix merging a file change or deletion which has been replaced as
+      directory
+
+  Tests:
+    * Test helpers are now in SVK::Test
+    * Don't use the user's .subversion/config during tests
+
+  General 
+    * Support view spec as depotpath
+    * Support win32 and keychain auth providers if available
+    * Modularize the MIME type detection code which makes that feature
+      optional
+    * New command: svk ignore
+    * New global option --ignore
+    * svk --version now displays the Subversion bindings version number
+    * Make -r{DATE} consistent with Subversion, by making YYYY-MM-DD be
+      midnight at the beginning of that day
+    * Add the negative number revision support
+    * Make -r HEAD and -r BASE case insensitive
+    * Most svk commands now find peg revision.  -r N PATH@M will find
+      the correct path if PATH@M was copied from somewhere else after N
+    * Fix a bug in replaced copy schedule entries in XD
+
+  svk add
+    * Display " - (bin)" when adding executable files
+
+  svk annotate
+    * Documented --remoterev option
+
+  svk checkout
+    * Support floating checkout
+    * Allow svk co --detach to be applied to multiple checkouts
+    * Fix co --relocate with checkout schedule information
+    * When doing autovivification from URL, release the giant lock and
+      tell user what to do if the sync failed
+
+  svk commit
+    * Support chunk-based interactive commit
+    * Don't suck file into memory on commit
+    * Support --set-revprop
+    * Fix committing single-file checkout
+
+  svk copy
+    * Fix a bug that svk cp A B would die if A has properties
+    * Support -r N@
+    * When trying to copy across mirrors, suggests sm -IB for publish
+    * Cleanup stalled txn after died
+    * Fix "svk cp //path%2Fwith_escape //path/other", which the underlying
+      library was unescaping for us
+    * Make copy work with directory with unknown files
+
+  svk delete
+    * Support --force
+    * On failed rm, report all modified, unknown and scheduled nodes
+      instead of just the first one, and suggests --force
+    * Support rm multiple depotpath
+
+  svk describe
+    * Fix "svk desc 1234@"
+    * Report error immediate if a nonexistent revision is given
+    * Let 'svk desc 456' work even the checkout in . is only at r123
+
+  svk depot
+    * Fix error messages in depot --relocate
+
+  svk diff
+    * Fix svk diff on 0-length file on checkout
+    * Support --non-recursive (-N)
+    * Support --change (-c)
+    * Only show differences from copy source for copied nodes
+      unless -X is specified
+    * Show 'new directory' and copied from in diffs
+    * Fix svk diff depotfile checkoutfile
+    * Fix diff with copies and modified files
+    * Changed diff output for binaries to show file names using local
+      path separators
+
+  svk info
+    * Improve the "Depot path" information
+    * Fix the bug that "svk info non-existent-file" display exception
+      messages twice
+    * Support -R
+    * fix the bug that "svk info" blows up on checkout added with history
+    * Sort "merged from" in "svk info" output
+    * Make info path@N work even if path is deleted on revision N+1
+
+  svk list
+    * Display single when used on a file
+
+  svk log
+    * filter and output plugin support
+    * Support --quiet
+    * Support --xml
+    * Change behavior of log not to stop on a rename
+
+  svk merge
+    * Support -c REV@ and -REV@
+
+  svk mirror
+    * Make sure that columns in mirror listings line up even if the depot
+      paths are long
+
+  svk move
+    * Fix unicde filename bugs
+    * Fix 'svk mv dir dir/subdir' and 'svk mv * dir'
+
+  svk patch
+    * Allow for "svk patch ls" to stand for "svk patch --ls"
+      and generally dropping -- off subcommands for "patch"
+    * Fix a bug for displaying patch with copies
+
+  svk proplist, propget
+    * Support -R
+
+  svk pull
+    * Support --force-incremental
+
+  svk push
+    * Fix a problem pushing from renamed branch
+
+  svk revert
+    * Support --quiet
+    * Fix unicde filename bugs
+    * Fix a revert bug when reverting a copied directory with
+      deleted entries
+
+  svk smerge
+    * Document sm --summary
+    * Allow --base in merge command to override merge base
+      when there's one
+    * Fix a bug where smerge fails to merge files to checkout that
+      are copied from somewhere else
+    * Disallow smerge with -c or -r, as they will be ignored
+    * Allow --track-rename for smerge
+
+  svk status
+    * Support --verbose
+    * Fix svk st on deeply deleted nodes
+    * Fix st when run inside a added path
+
+  svk sync
+    * Exit with non-zero when failed
+
+  svk switch
+    * Fix switching from a branch that is removed in HEAD
+    * Switch now takes url
+
+  svk update
+    * Disallow up -N, as it doesn't update the DH state correctly
+    * Fix a bug that 'svk update' can assume part of your directory
+      are already up-to-date even when they are not
+
+  Tools
+    * "verify-mirror" for verifying mirrored revision integrity
+    * "pullyu" for reconstructing original repository from a mirror
+
+  Internal
+    * Optionally use Log4perl to log debug information
+    * The callbacks used in merge editor are now SVK::Inspector
+    * Use SVK::Accessor for classes requires cloning but keeping certain
+      fields shared
+    * SVN::Mirror is now replaced by SVK::Mirror if you use Subversion 1.4
+      and the server support replay
+    * Support mirror on root path as repository replication
+    * Workaround problems in some SVN::Core build that swig doesn't
+      like overloaded or magic pv as const char *
+    * Overhaul SVK's global lock and checkout lock handling
+    * If svk:notify-commit is set on rev 0, set the svk:commit property on
+      the txn so the hook scripts know the commit is coming from svk
+    * Allow post_handler used in get_editor to stop committed callback from
+      being run by returning 0
+    * Rewrite support of svn:ignore and auto-props to use apr_fnmatch
+    * SVK::Config and SVK::Depot
+    * We now use SVK::Editor as editor base class
+    * $SVKSVNBACKTRACE environment variable to do stack dump on svn errors

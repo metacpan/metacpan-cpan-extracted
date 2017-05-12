@@ -1,0 +1,63 @@
+NAME
+
+    Sereal::Dclone - Deep (recursive) cloning via Sereal
+
+SYNOPSIS
+
+     use Sereal::Dclone 'dclone';
+     my $cloned = dclone $ref;
+
+DESCRIPTION
+
+    Sereal::Dclone provides a "dclone" function modeled after the function
+    from Storable, using Sereal for fast serialization.
+
+    Sereal is presently known to support serializing SCALAR, ARRAY, HASH,
+    REF, and Regexp references. Sereal will also serialize and recreate
+    blessed objects, provided the underlying reference type is supported,
+    or the object class provides FREEZE and THAW serialization methods
+    ("FREEZE/THAW CALLBACK MECHANISM" in Sereal::Encoder). Be cautious with
+    cloned objects as only the internal data structure is cloned, and the
+    destructor will still be called when it is destroyed.
+
+FUNCTIONS
+
+    Sereal::Dclone provides one function, which is exported on demand.
+
+ dclone
+
+     my $cloned = dclone $ref;
+     my $cloned = dclone $ref, {undef_unknown => 1, warn_unknown => 1};
+
+    Recursively clones a referenced data structure by serializing and then
+    deserializing it with Sereal. Unlike Storable's dclone, the argument
+    can be any serializable scalar, not just a reference. If an unsupported
+    value is encountered, an exception will be thrown as it cannot be
+    cloned.
+
+    Options can be passed to the underlying Sereal::Encoder object in an
+    optional hash reference. To prevent exceptions when serializing
+    unsupported values, the undef_unknown or stringify_unknown options may
+    be useful. The croak_on_bless or no_bless_objects options can be used
+    to control cloning of objects. freeze_callbacks is enabled by default.
+
+BUGS
+
+    Report any issues on the public bugtracker.
+
+AUTHOR
+
+    Dan Book <dbook@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2016 by Dan Book.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+
+SEE ALSO
+
+    Storable, Sereal
+

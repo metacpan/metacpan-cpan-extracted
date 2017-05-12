@@ -1,0 +1,47 @@
+Search::InvertedIndex
+
+ A general purpose inverted indexing system suitable for medium
+ scale searching. The compiled external modules used are Digest::SHA1
+ (needed because it uses the 'Tie::FileLRUCache' module for
+ performance enhancment on searches) and DB_File (because it
+ used by the 'Tie::DB_File::SplitHash' module). The module itself
+ is Perl with the two exceptions noted above. If you have
+ 'Digest::SHA1' and 'DB_File' on your system, no compilation is
+  required.
+
+ It is designed to allow the easy 'plug in' of any wanted
+ backend database in place of DB_File. Requires (as of now)
+ 'Digest::SHA1', 'DB_File', 'Class::NamedParms', 'Class::ParmList',
+ 'Tie::FileLRUCache', 'Tie::DB_File::SplitHash' and 'Test::More',
+ modules for support. Additionally, it requires either 'Storable' or
+ 'Data::Dumper' to be installed for data serialization.
+
+ Support for MySQL via DBI is also included.
+ MySQL use requires that the DBI and DBD::mysql modules be installed.
+
+ To enable running of the MySQL tests during installation, set the
+ following environment variables:
+  - either SII_TESTDB_NAME (name of database to run tests against)
+        or SII_TESTDB_DSN  (DSN connection string for passing to DBI
+                            - unless you know for sure that you need
+                            this extra flexibility, use SII_TESTDB_NAME)
+  - SII_TESTDB_USER (user to connect to database as)
+  - SII_TESTDB_PASS (password of that user if required for authentication)
+  - SII_TESTDB_HOST (hostname of the database server if not local)
+
+ Note that these tests are destructive.  Do not run them against any
+ database containing data that you wish to keep.
+
+To install:
+
+perl Makefile.PL
+make
+make test
+make install
+
+Type 'perldoc Search::InvertedIndex' after installation for the documentation or
+go to <URL:http://www.nihongo.org/snowhare/utilities/modules/search-invertedindex/>
+
+Copyright 1999-2002, Benjamin Franz (<URL:http://www.nihongo.org/snowhare/>) and
+FreeRun Technologies, Inc. (<URL:http://www.freeruntech.com/>). All Rights Reserved.
+This software may be copied or redistributed under the same terms as Perl itelf.

@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 6b99cadd6c37db3a1d350e605031282723af3277 CONTRIBUTORS
+SHA1 510b5a4a459bd3d2d8a2947697bb4920c22c11b5 Changes
+SHA1 31080a4e78e656d0ac03db02320e252076adefec LEGAL
+SHA1 a694c1c481769d19a29083a980add09b4e1da3ab LICENSE
+SHA1 fa8925ca82180f28fcf038686940db026dd99db2 MANIFEST
+SHA1 bac2cf3dd6ead88075e80d9a772588755097f78a META.yml
+SHA1 c164871d38ccb6c8fd587d2965b8b2877affdc10 Makefile.PL
+SHA1 de20b2633a162378db5a54e2db6ae6081c2c3953 README
+SHA1 718565e0538c7c2f474729bb7c22048c1c558b7b dist.ini
+SHA1 7b7157156b7e2ede001ad20fb7df9d8bd63390c6 lib/Software/License/ISC.pm
+SHA1 f214de96cfe8b70da71201ab8859bb32cbdafe1d t/author-critic.t
+SHA1 1bf69b71b924777ef46b198af9435e8381149fc7 t/release-cpan-changes.t
+SHA1 bdd52baa1a968cc0e1a577a7b073f046d563a317 t/release-kwalitee.t
+SHA1 ca37d7b91c2299a98877a6f36d3fab51e8dd906f t/release-pod-coverage.t
+SHA1 e7fc4d8f3f29ee522cb53914648393524fc7a6d4 t/release-pod-syntax.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+Comment: GPGTools - http://gpgtools.org
+
+iQIcBAEBAgAGBQJVLMVIAAoJEHwWRyBU62lqi/kQAIm2Ay9zGmj8u5rtAezjJ9dz
+YAA9ApTwH5x7KcmfIp0zY0fzOGVZlHwAz/8cf5CzUyWpj+xdLcRUJWBz2DcNklt4
+QMSu8/YRyqlPmdd+opVZY+BEA+TiL0oHtAojs9HzE8tmeto6vLViLDXFuRTTGsYy
+pC87bbXojzscmyycjhI2TDECQBrGxtqdaJbdl9YM3jqZ3BM9mPC4p/1faiak0JV6
+t9x6IZyP4Zu9kOYXPxjf66XDYvFbLih39xZuqj3UGequTH7MF+q3YeMzdWpMJO8/
+F49K1MMSsaKRknV/fsGgWlC8uHaY+hlra/hjzpAQoW0v4dIVRRkkcuHBcdGjaxEG
+H0EocmvuEOkd1yt7ggjQlzVzmKbkiJhokZvkO46sd58201YKmLOqo7t63aGp9ufl
+6pLHwbNgwVuAQn9wlaZQpNlEbw5sIuV9GIF4GQyjHOTEGFC/taWZHyhTR494TFDb
+RTrEG4puA2Y72O9M76N1LzxGe6/+GUkuJZPYEsPcmb3EeZiFxAH1ZvE7kKGwKtOI
+KCXCZw6cGqLG9q6KG8pEisDLKYujF3mzqtwYW1MIuvC82fT6bRgQcse0ay7gFeB1
+X9LI5PL5hTA65ja4SV5RdbhEY0+uHJqDtbe34nRT+8kzGxB5giDseeyVGdAiYr+V
+zyPlFHdGqvF/KOz0c906
+=CAlP
+-----END PGP SIGNATURE-----

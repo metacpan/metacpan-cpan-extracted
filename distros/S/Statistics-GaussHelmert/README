@@ -1,0 +1,50 @@
+NAME
+    Statistics::GaussHelmert - General weighted least squares estimation
+
+DESCRIPTION
+    This module is a flexible tool for estimating model parameters given a
+    set of observations. The module provides function for a linear
+    estimation model, the underlying model is called Gauss-Helmert model.
+
+    Statistics::GaussHelmert is different to modules such as Statistics::OLS
+    in the sense that it may fit arbitrary functions to data of any
+    dimensions. You have to specify an implicit minimization function (in
+    contrast to explicit functions as in traditional regression methods) and
+    its derivatives with respects to the unknown and the observations. You
+    may also specify constraint function on the unknowns (with its
+    derivative). Furthermore you already need an approximate solution. For
+    some problems it is easy finding approximate solutions by directly
+    solving for the unknown parameters with some well chosen observations.
+
+REQUIREMENTS
+    This module requires Perl 5.6.0 and PDL 2.3.2. Furthermore it
+    requires Math::Random for testing purposes. Note that installing
+    PDL requires a series of other modules such as ExtUtils::F77, etc.
+
+LITERATURE
+    Press et al. (1992) Numerical Recipes in C, 2nd Ed., Cambridge
+    University Press, Chapter 15.
+        Chapter 15, "Modeling of Data", deals with general weighted least
+        squares estimation, though it describes the Levenber-Marquardt
+        method in more detail. Additionally, it is assumed that only one
+        maesurement is observed.
+
+    Mikhail, E.M. and Ackermann, F. (1976): Observations and Least Squares
+    University Press of America
+        This book covers the classical Gauss-Helmert model.
+
+    Koch, K. (1999) Parameter Estimation and Hypothesis Testing in Linear
+    Models, Springer Verlag, 2nd edition
+        This book covers the Gauss-Markoff model, a cousin of the
+        Gauss-Helmert model, but modelling explicit functions.
+
+AUTHOR
+    Stephan Heuel (perl@heuel.org)
+
+COPYRIGHT
+    Copyright (C) 2000/2001 Stephan Heuel and Institute for Photogrammetry,
+    University of Bonn. All rights reserved. There is no warranty. You are
+    allowed to redistribute this software / documentation under certain
+    conditions, see the GNU Public License, GPL for details,
+    http://www.gnu.org/copyleft/gpl.html.
+

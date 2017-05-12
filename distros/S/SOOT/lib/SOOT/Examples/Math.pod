@@ -1,0 +1,989 @@
+
+=head1 NAME
+
+SOOT::Examples::Math - SOOT Examples for Math
+
+=head1 DESCRIPTION
+
+This is a listing of all SOOT examples for Math.
+
+=head1 EXAMPLES
+
+
+=head2 FeldmanCousins.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  
+  # FIXME: this SEGV's somehow...
+  
+  sub _FeldmanCousins {
+    # Example macro of using the TFeldmanCousins class in root.
+    # Author : Adrian John Bevan <bevan@SLAC.Stanford.EDU>
+    # get a FeldmanCousins calculation object with the default limits
+    # of calculating a 90% CL with the minimum signal value scanned 
+    # = 0.0 and the maximum signal value scanned of 50.0
+    
+    my $f = TFeldmanCousins->new(0.9, "");
+  
+    # calculate either the upper or lower limit for 10 observerd
+    # events with an estimated background of 3.  The calculation of
+    # either upper or lower limit will return that limit and fill
+    # data members with both the upper and lower limit for you.
+  
+    my $Nobserved   = 10.0;
+    my $Nbackground = 3.0;
+  
+    my $ul = $f->CalculateUpperLimit($Nobserved, $Nbackground);
+    my $ll = $f->GetLowerLimit();
+  
+    print <<VERBATIM;
+  For $Nobserved data observed with and estimated background
+  of $Nbackground candidates, the Feldman-Cousins method of
+  calculating confidence limits gives:
+  	Upper Limit = $ul
+  	Limit       = $ll
+  at the 90% CL
+  VERBATIM
+  }
+  
+  _FeldmanCousins();
+  
+
+
+
+=head2 binomial.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  
+  sub _binomialSimple {
+    #
+    # Simple test for the binomial distribution
+    #
+    printf("\nTMath:::Binomial simple test\n");
+    printf("Build the Tartaglia triangle\n");
+    printf("============================\n");
+    use constant max => 13;
+    foreach my $i (0..max-1) {
+      printf "n=%2d", $i;
+      print "  " x (max-$i);
+      for my $j (0..$i) {
+        my $bin = TMath::Nint( TMath::Binomial($i,$j));
+        printf("%4d", $bin);
+      } 
+      print "\n";
+    }
+  }
+  
+  sub _binomialFancy {
+    my $serr = 0;
+    use constant nmax => 10000;
+  
+    print <<'VERBATIM';
+  
+  TMath:::Binomial fancy test
+  Verify Newton formula for (x+y)^n
+  x,y in [-2,2] and n from 0 to 9
+  =================================
+  VERBATIM
+    my $val = 0.;
+    my ($x, $y);
+    for (0..nmax-1) {
+      do {
+          $x = 2 * (1 - 2*rand());
+          $y = 2 * (1 - 2*rand());
+          $val = abs($x+$y)*1.;
+      } while ($val < 0.75); # Avoid large cancellations
+  
+      foreach my $j (0..9) {
+         my $res1 = ($x+$y) ** $j;
+         my $res2 = 0;
+         foreach my $k (0..$j) {
+            $res2 += $x**$k
+                   * $y**($j-$k)
+                   * TMath::Binomial($j,$k);
+         }
+         my $err = abs($res1-$res2)/abs($res1);
+         print "res1=$res1 res2=$res2 x=$x y=$y err=$err j=$j\n" if $err > 1e-10;
+       
+         $serr += $err;
+       }
+    }
+    print "Average Error = ". $serr/nmax . "\n";
+  }
+  
+  _binomialSimple;
+  _binomialFancy;
+  
+  
+
+
+
+=head2 limit.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  
+  my $c1 = TCanvas->new("c1","Dynamic Filling Example",200,10,700,500);
+  $c1->SetFillColor(42);
+  
+  # Create some histograms
+  my $background = TH1D->new("background","The expected background",30,-4,4);
+  my $signal     = TH1D->new("signal","the expected signal",30,-4,4);
+  my $data       = TH1D->new("data","some fake data points",30,-4,4);
+  $background->SetFillColor(48);
+  $signal->SetFillColor(41);
+  $data->SetMarkerStyle(21);
+  $data->SetMarkerColor(kBlue);
+  $background->Sumw2; # needed for stat uncertainty
+  $signal->Sumw2;     # needed for stat uncertainty
+  
+  # Fill histograms randomly
+  my $r = TRandom->new;
+  my ($bg, $sig, $dt);
+  for (0..24999) {
+    $bg  = $r->Gaus(0.,1.)*1.0;
+    $sig = $r->Gaus(1.,.2)*1.0;
+    $background->Fill($bg,0.02);
+    $signal->Fill($sig,0.001);
+  }
+  for (0..499) {
+    $dt = $r->Gaus(0.,1.)*1.0;
+    $data->Fill($dt,1.0);
+  }
+  
+  my $hs = THStack->new("hs","Signal and background compared to data...");
+  $hs->Add($background);
+  $hs->Add($signal);
+  $hs->Draw("hist");
+  $data->Draw("PE1,Same");
+  
+  $c1->Modified;
+  $c1->Update;
+  
+  my $frame = $c1->GetFrame;
+  $frame->SetFillColor(21); 
+  $frame->SetBorderSize(6);
+  $frame->SetBorderMode(-1);
+  $c1->Modified;
+  $c1->Update;
+  
+  $gSystem->ProcessEvents;
+  
+  # Compute the limits
+  my $ds = TLimitDataSource->new($signal, $background, $data);
+  my $l  = TLimit->new();
+  
+  my $cl = $l->ComputeLimit($ds, 50000);
+  printCL($cl, "Computing limits...");
+  
+  # Add stat uncertainty
+  my $scl = $l->ComputeLimit($ds,50000,1);
+  printCL($scl, "Computing limits with stat systematics...");
+  
+  
+  # Add some systematics
+  my $errorb = TH1D->new("errorb","errors on background",1,0,1);
+  my $errors = TH1D->new("errors","errors on signal",1,0,1);
+  my $names  = TObjArray->new;
+  my $name1  = TObjString->new("bg uncertainty");
+  my $name2  = TObjString->new("sig uncertainty");
+  $names->AddLast($name1);
+  $names->AddLast($name2);
+  $errorb->SetBinContent(0,0.05); # error source 1: 5%
+  $errorb->SetBinContent(1,0);    # error source 2: 0%
+  $errors->SetBinContent(0,0);    # error source 1: 0%
+  $errors->SetBinContent(1,0.01); # error source 2: 1%
+  
+  my $nds  = TLimitDataSource->new;
+  $nds->AddChannel(
+    $signal, $background, $data,
+    TVectorD->new($errors->GetNbinsX(), $errors->GetArray()), # FIXME AddChannel expects a TVectorD argument, but that's really TVectorT<double>, which is templated and not really supported by SOOT...
+    TVectorD->new($errorb->GetNbinsX(), $errorb->GetArray()),
+    $names
+  );
+  
+  my $ncl = $l->ComputeLimit($nds,50000,1);
+  printCL($ncl, "Computing limits with systematics...");
+  
+  # show canonical -2lnQ plots in a new canvas
+  # - The histogram of -2lnQ for background hypothesis (full)
+  # - The histogram of -2lnQ for signal and background hypothesis (dashed)
+  my $c2 = TCanvas->new("c2");
+  $cl->Draw;
+  
+  $gApplication->Run;
+  
+  sub printCL {
+    my ($obj, $anot) = @_;
+    print "== ", $anot, " ==\n";
+    print "CLs    : ", $obj->CLs,  "\n";
+    print "CLsb   : ", $obj->CLsb, "\n";
+    print "CLb    : ", $obj->CLb,  "\n";
+    print "<CLs>  : ", $obj->GetExpectedCLs_b,  "\n";
+    print "<CLsb> : ", $obj->GetExpectedCLsb_b, "\n";
+    print "<CLb>  : ", $obj->GetExpectedCLb_b,  "\n\n";
+  }
+  
+
+
+
+=head2 mathBeta.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  
+  my $c1 = TCanvas->new("c1", "TMath::BetaDist",600,800);
+  $c1->Divide(1, 2);
+  my $pad1 = $c1->cd(1);
+  $pad1->SetGrid();
+  my $fbeta = TF1->new("fbeta", "TMath::BetaDist(x, [0], [1])", 0, 1);
+  $fbeta->SetParameters(0.5, 0.5);
+  my $f1 = $fbeta->DrawCopy();
+  $f1->SetLineColor(kRed);
+  $f1->SetLineWidth(1);
+  $fbeta->SetParameters(0.5, 2);
+  my $f2 = $fbeta->DrawCopy("same");
+  $f2->SetLineColor(kGreen);
+  $f2->SetLineWidth(1);
+  $fbeta->SetParameters(2, 0.5);
+  my $f3 = $fbeta->DrawCopy("same");
+  $f3->SetLineColor(kBlue);
+  $f3->SetLineWidth(1);
+  $fbeta->SetParameters(2, 2);
+  my $f4 = $fbeta->DrawCopy("same");
+  $f4->SetLineColor(kMagenta);
+  $f4->SetLineWidth(1);
+  my $legend1 = TLegend->new(.5,.7,.8,.9);
+  $legend1->AddEntry($f1,"p=0.5  q=0.5","l");
+  $legend1->AddEntry($f2,"p=0.5  q=2","l");
+  $legend1->AddEntry($f3,"p=2    q=0.5","l");
+  $legend1->AddEntry($f4,"p=2    q=2","l");
+  $legend1->Draw();
+  
+  my $pad2 = $c1->cd(2);
+  $pad2->SetGrid();
+  my $fbetai = TF1->new("fbetai", "TMath::BetaDistI(x, [0], [1])", 0, 1);
+  $fbetai->SetParameters(0.5, 0.5);
+  my $g1=$fbetai->DrawCopy();
+  $g1->SetLineColor(kRed);
+  $g1->SetLineWidth(1);
+  $fbetai->SetParameters(0.5, 2);
+  my $g2 = $fbetai->DrawCopy("same");
+  $g2->SetLineColor(kGreen);
+  $g2->SetLineWidth(1);
+  $fbetai->SetParameters(2, 0.5);
+  my $g3 = $fbetai->DrawCopy("same");
+  $g3->SetLineColor(kBlue);
+  $g3->SetLineWidth(1);
+  $fbetai->SetParameters(2, 2);
+  my $g4 = $fbetai->DrawCopy("same");
+  $g4->SetLineColor(kMagenta);
+  $g4->SetLineWidth(1);
+  
+  my $legend2 = TLegend->new(.7,.15,0.9,.35);
+  $legend2->AddEntry($f1,"p=0.5  q=0.5","l");
+  $legend2->AddEntry($f2,"p=0.5  q=2","l");
+  $legend2->AddEntry($f3,"p=2    q=0.5","l");
+  $legend2->AddEntry($f4,"p=2    q=2","l");
+  $legend2->Draw();
+  $c1->cd();
+  $c1->Update();
+  
+  
+  $gApplication->Run;
+  
+
+
+
+=head2 mathGammaNormal.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  
+  my $myc = TCanvas->new("c1","gamma and lognormal",10,10,600,800);
+  $myc->Divide(1,2);
+  my $pad1 = $myc->cd(1);
+  $pad1->SetLogy();
+  $pad1->SetGrid();
+  
+  # TMath::GammaDist
+  my $fgamma = TF1->new("fgamma", "TMath::GammaDist(x, [0], [1], [2])", 0, 10);
+  $fgamma->SetParameters(0.5, 0, 1);
+  my $f1 = $fgamma->DrawCopy();
+  $f1->SetMinimum(1e-5);
+  $f1->SetLineColor(kRed);
+  $fgamma->SetParameters(1, 0, 1);
+  my $f2 = $fgamma->DrawCopy("same");
+  $f2->SetLineColor(kGreen);
+  $fgamma->SetParameters(2, 0, 1);
+  my $f3 = $fgamma->DrawCopy("same");
+  $f3->SetLineColor(kBlue);
+  $fgamma->SetParameters(5, 0, 1);
+  my $f4 = $fgamma->DrawCopy("same");
+  $f4->SetLineColor(kMagenta);
+  my $legend1 = TLegend->new(.2,.15,.5,.4);
+  $legend1->AddEntry($f1,"gamma = 0.5 mu = 0  beta = 1","l");
+  $legend1->AddEntry($f2,"gamma = 1   mu = 0  beta = 1","l");
+  $legend1->AddEntry($f3,"gamma = 2   mu = 0  beta = 1","l");
+  $legend1->AddEntry($f4,"gamma = 5   mu = 0  beta = 1","l");
+  $legend1->Draw();
+  
+  # TMath::LogNormal
+  my $pad2 = $myc->cd(2);
+  $pad2->SetLogy();
+  $pad2->SetGrid();
+  my $flog = TF1->new("flog", "TMath::LogNormal(x, [0], [1], [2])", 0, 5);
+  $flog->SetParameters(0.5, 0, 1);
+  my $g1 = $flog->DrawCopy();
+  $g1->SetLineColor(kRed);
+  $flog->SetParameters(1, 0, 1);
+  my $g2 = $flog->DrawCopy("same");
+  $g2->SetLineColor(kGreen);
+  $flog->SetParameters(2, 0, 1);
+  my $g3 = $flog->DrawCopy("same");
+  $g3->SetLineColor(kBlue);
+  $flog->SetParameters(5, 0, 1);
+  my $g4 = $flog->DrawCopy("same");
+  $g4->SetLineColor(kMagenta);
+  my $legend2 = TLegend->new(.2,.15,.5,.4);
+  $legend2->AddEntry($g1,"sigma = 0.5 theta = 0  m = 1","l");
+  $legend2->AddEntry($g2,"sigma = 1   theta = 0  m = 1","l");
+  $legend2->AddEntry($g3,"sigma = 2   theta = 0  m = 1","l");
+  $legend2->AddEntry($g4,"sigma = 5   theta = 0  m = 1","l");
+  $legend2->Draw();
+  
+  $myc->Update();
+  
+  $gApplication->Run;
+  
+
+
+
+=head2 mathLaplace.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  
+  # Test the TMath::LaplaceDist and TMath::LaplaceDistI functions
+  # author: Anna Kreshuk
+     
+  my $c1 = TCanvas->new("c1", "TMath::LaplaceDist",600,800);
+  $c1->Divide(1, 2);
+  my $pad1 = $c1->cd(1);
+  $pad1->SetGrid();
+  my $flaplace = TF1->new("flaplace", "TMath::LaplaceDist(x, [0], [1])", -10, 10);
+  $flaplace->SetParameters(0, 1);
+  
+  my $f1 = $flaplace->DrawCopy();
+  $f1->SetLineColor(kRed);
+  $f1->SetLineWidth(1);
+  $flaplace->SetParameters(0, 2);
+  
+  my $f2 = $flaplace->DrawCopy("same");
+  $f2->SetLineColor(kGreen);
+  $f2->SetLineWidth(1);
+  $flaplace->SetParameters(2, 1);
+  
+  my $f3 = $flaplace->DrawCopy("same");
+  $f3->SetLineColor(kBlue);
+  $f3->SetLineWidth(1);
+  $flaplace->SetParameters(2, 2);
+  
+  my $f4 = $flaplace->DrawCopy("same");
+  $f4->SetLineColor(kMagenta);
+  $f4->SetLineWidth(1);
+  
+  my $legend1 = TLegend->new(.7,.7,.9,.9);
+  $legend1->AddEntry($f1,"alpha=0 beta=1","l");
+  $legend1->AddEntry($f2,"alpha=0 beta=2","l");
+  $legend1->AddEntry($f3,"alpha=2 beta=1","l");
+  $legend1->AddEntry($f4,"alpha=2 beta=2","l");
+  $legend1->Draw();
+  
+  my $pad2 = $c1->cd(2);
+  $pad2->SetGrid();
+  my $flaplacei = TF1->new("flaplacei", "TMath::LaplaceDistI(x, [0], [1])", -10, 10);
+  $flaplacei->SetParameters(0, 1);
+  my $g1 = $flaplacei->DrawCopy();
+  $g1->SetLineColor(kRed);
+  $g1->SetLineWidth(1);
+  $flaplacei->SetParameters(0, 2);
+  
+  my $g2 = $flaplacei->DrawCopy("same");
+  $g2->SetLineColor(kGreen);
+  $g2->SetLineWidth(1);
+  $flaplacei->SetParameters(2, 1);
+  
+  my $g3 = $flaplacei->DrawCopy("same");
+  $g3->SetLineColor(kBlue);
+  $g3->SetLineWidth(1);
+  $flaplacei->SetParameters(2, 2);
+  
+  my $g4 = $flaplacei->DrawCopy("same");
+  $g4->SetLineColor(kMagenta);
+  $g4->SetLineWidth(1);
+  
+  my $legend2 = TLegend->new(.7,.15,0.9,.35);
+  $legend2->AddEntry($f1,"alpha=0 beta=1","l");
+  $legend2->AddEntry($f2,"alpha=0 beta=2","l");
+  $legend2->AddEntry($f3,"alpha=2 beta=1","l");
+  $legend2->AddEntry($f4,"alpha=2 beta=2","l");
+  $legend2->Draw();
+  $c1->cd();
+  
+  $gApplication->Run;
+
+
+
+=head2 mathStudent.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  
+  my $DistCanvas = TCanvas->new("DistCanvas", "Distribution graphs", 10, 10, 1000, 800);  
+  $DistCanvas->SetFillColor(17);
+  $DistCanvas->Divide(2, 2);
+  my $pad1 = $DistCanvas->cd(1);
+  $pad1->SetGrid();
+  $pad1->SetFrameFillColor(19);
+  
+  my $leg = TLegend->new(0.6, 0.7, 0.89, 0.89); 
+  
+  my $fgaus = TF1->new("gaus", "TMath::Gaus(x, [0], [1], [2])", -5, 5);
+  $fgaus->SetTitle("Student density");  
+  $fgaus->SetLineStyle(2);
+  $fgaus->SetLineWidth(1);
+  $fgaus->SetParameters(0, 1, 1);
+  $leg->AddEntry($fgaus->DrawCopy(), "Normal(0,1)", "l");
+  
+  my $student = TF1->new("student", "TMath::Student(x,[0])", -5, 5);
+  $student->SetTitle("Student density");  
+  $student->SetLineWidth(1); 
+  $student->SetParameter(0, 10);
+  $student->SetLineColor(4);  
+  $leg->AddEntry($student->DrawCopy("lsame"), "10 degrees of freedom", "l");
+  
+  $student->SetParameter(0, 3);
+  $student->SetLineColor(2);
+  $leg->AddEntry($student->DrawCopy("lsame"), "3 degrees of freedom", "l");
+  
+  $student->SetParameter(0, 1);
+  $student->SetLineColor(1);
+  $leg->AddEntry($student->DrawCopy("lsame"), "1 degree of freedom", "l");
+  
+  $leg->Draw();
+  
+  #drawing the set of student cumulative probability functions
+  my $pad2 = $DistCanvas->cd(2);
+  $pad2->SetFrameFillColor(19);
+  $pad2->SetGrid();
+  
+  my $studentI = TF1->new("studentI", "TMath::StudentI(x, [0])", -5, 5);
+  $studentI->SetTitle("Student cumulative dist.");  
+  $studentI->SetLineWidth(1); 
+  my $leg2 = TLegend->new(0.6, 0.4, 0.89, 0.6); 
+  
+  $studentI->SetParameter(0, 10);
+  $studentI->SetLineColor(4);
+  $leg2->AddEntry($studentI->DrawCopy(), "10 degrees of freedom", "l");
+    
+  $studentI->SetParameter(0, 3);
+  $studentI->SetLineColor(2);
+  $leg2->AddEntry($studentI->DrawCopy("lsame"), "3 degrees of freedom", "l");
+  
+  $studentI->SetParameter(0, 1);
+  $studentI->SetLineColor(1);
+  $leg2->AddEntry($studentI->DrawCopy("lsame"), "1 degree of freedom", "l");
+  $leg2->Draw();
+  
+  #drawing the set of F-dist. densities  
+  my $fDist = TF1->new("fDist", "TMath::FDist(x, [0], [1])", 0, 2);
+  $fDist->SetTitle("F-Dist. density");
+  $fDist->SetLineWidth(1);
+  my $legF1 = TLegend->new(0.7, 0.7, 0.89, 0.89);
+    
+  my $pad3 = $DistCanvas->cd(3);
+  $pad3->SetFrameFillColor(19);
+  $pad3->SetGrid();
+   
+  $fDist->SetParameters(1, 1);
+  $fDist->SetLineColor(1);
+  $legF1->AddEntry($fDist->DrawCopy(), "N=1 M=1", "l");
+  
+  $fDist->SetParameter(1, 10); 
+  $fDist->SetLineColor(2);
+  $legF1->AddEntry($fDist->DrawCopy("lsame"), "N=1 M=10", "l");
+  
+  $fDist->SetParameters(10, 1);
+  $fDist->SetLineColor(8);
+  $legF1->AddEntry($fDist->DrawCopy("lsame"), "N=10 M=1", "l");
+  
+  $fDist->SetParameters(10, 10);
+  $fDist->SetLineColor(4);
+  $legF1->AddEntry($fDist->DrawCopy("lsame"), "N=10 M=10", "l");
+  
+  $legF1->Draw();
+  
+  # drawing the set of F cumulative dist.functions
+  my $fDistI = TF1->new("fDist", "TMath::FDistI(x, [0], [1])", 0, 2);
+  $fDistI->SetTitle("Cumulative dist. function for F");
+  $fDistI->SetLineWidth(1);
+  my $legF2 = TLegend->new(0.7, 0.3, 0.89, 0.5);
+  
+  my $pad4 = $DistCanvas->cd(4);
+  $pad4->SetFrameFillColor(19);
+  $pad4->SetGrid();
+  $fDistI->SetParameters(1, 1);
+  $fDistI->SetLineColor(1);
+  $legF2->AddEntry($fDistI->DrawCopy(), "N=1 M=1", "l");
+  
+  $fDistI->SetParameters(1, 10); 
+  $fDistI->SetLineColor(2);
+  $legF2->AddEntry($fDistI->DrawCopy("lsame"), "N=1 M=10", "l");
+    
+  $fDistI->SetParameters(10, 1); 
+  $fDistI->SetLineColor(8);
+  $legF2->AddEntry($fDistI->DrawCopy("lsame"), "N=10 M=1", "l");
+   
+  $fDistI->SetParameters(10, 10); 
+  $fDistI->SetLineColor(4);
+  $legF2->AddEntry($fDistI->DrawCopy("lsame"), "N=10 M=10", "l");
+  
+  $legF2->Draw();
+  $DistCanvas->Update();
+  
+  $gApplication->Run;
+  
+
+
+
+=head2 mathcoreCDF.pl
+
+  use strict;
+  use SOOT ':all';
+  
+  # Example macro describing how to use the different cumulative
+  # distribution functions in ROOT. The macro shows four of them with
+  # respect to their two variables. In order to run the macro type:
+  
+  # FIXME doesn't work... didn't work in CINT either. Need to figure out MathCore better
+  
+  $gSystem->Load("root/libMathCore");
+  my $f1a = TF2->new("f1a", "ROOT::Math::breitwigner_prob(x, y)", -10, 10, 0, 10);
+  my $f2a = TF2->new("f2a", "ROOT::Math::cauchy_quant(x,y)", 0, 20, 0,20);
+  my $f3a = TF2->new("f3a", "ROOT::Math::normal_quant(x,y)", -10, 10, 0, 5);
+  my $f4a = TF2->new("f4a", "ROOT::Math::exponential_prob(x,y)", 0, 10, 0, 5);
+  
+  my $c1 = TCanvas->new("c1","c1",1000,750);
+  
+  $c1->Divide(2,2); 
+  
+  $c1->cd(1);
+  $f1a->Draw("surf1");
+  $c1->cd(2);
+  $f2a->Draw("surf1");
+  $c1->cd(3);
+  $f3a->Draw("surf1");
+  $c1->cd(4);
+  $f4a->Draw("surf1");
+  
+  $c1->Update;
+  
+  $gApplication->Run;
+
+
+
+=head2 mathcoreSpecFunc.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  
+  # Example macro describing how to use the special mathematical functions
+  # taking full advantage of the precision and speed of the C99 compliant
+  # environments. To execute the macro type in:
+  #
+  # root[0]: .x mathcoreSpecFunc.C 
+  #
+  # It will create two canvases: 
+  #
+  #   a) one with the representation of the tgamma, lgamma, erf and erfc functions
+  #   b) one with the relative difference between the old ROOT versions and the
+  #      C99 implementation (on obsolete platform+compiler combinations which are
+  #      not C99 compliant it will call the original ROOT implementations, hence
+  #      the difference will be 0)
+  #
+  # The naming and numbering of the functions is taken from
+  # <A HREF="http:#www.open-std.org/jtc1/sc22/wg21/docs/papers/2004/n1687.pdf">
+  # Matt Austern,
+  # (Draft) Technical Report on Standard Library Extensions,
+  # N1687=04-0127, September 10, 2004</A>
+  #
+  #  Author: Andras Zsenei
+  
+  $gSystem->Load("libMathCore");
+  my $f1a = TF1->new("f1a","ROOT::Math::tgamma(x)",0,100);
+  my $f1b = TF1->new("f1b","TMath::Abs((ROOT::Math::tgamma(x)-TMath::Gamma(x))/ROOT::Math::tgamma(x))",0,100);
+  
+  my $f2a = TF1->new("f2a","ROOT::Math::lgamma(x)",0,100);
+  my $f2b = TF1->new("f2b","TMath::Abs((ROOT::Math::lgamma(x)-TMath::LnGamma(x))/ROOT::Math::lgamma(x))",0,100);
+  
+  my $f3a = TF1->new("f3a","ROOT::Math::erf(x)",0,5);
+  my $f3b = TF1->new("f3b","TMath::Abs((ROOT::Math::erf(x)-TMath::Erf(x))/ROOT::Math::erf(x))",0,5);
+  
+  my $f4a = TF1->new("f4a","ROOT::Math::erfc(x)",0,5);
+  my $f4b = TF1->new("f4b","TMath::Abs((ROOT::Math::erfc(x)-TMath::Erfc(x))/ROOT::Math::erfc(x))",0,5);
+  
+  
+  my $c1 = TCanvas->new("c1","c1",1000,750);
+  $c1->Divide(2,2);
+  
+  $c1->cd(1);
+  $f1a->Draw();
+  $c1->cd(2);
+  $f2a->Draw();
+  $c1->cd(3);
+  $f3a->Draw();
+  $c1->cd(4);
+  $f4a->Draw();
+  
+  
+  my $c2 = TCanvas->new("c2","c2",1000,750);
+  $c2->Divide(2,2);
+  
+  $c2->cd(1);
+  $f1b->Draw();
+  $c2->cd(2);
+  $f2b->Draw();
+  $c2->cd(3);
+  $f3b->Draw();
+  $c2->cd(4);
+  $f4b->Draw();
+  
+  $gApplication->Run;
+
+
+
+=head2 mathcoreStatFunc.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  
+  # Example macro describing how to use the different probability
+  # density functions in ROOT. The macro shows four of them with
+  # respect to their two variables. In order to run the macro type:
+  #
+  #  Author: Andras Zsenei
+  
+  $gSystem->Load("libMathCore");
+  my $f1a = TF2->new("f1a","ROOT::Math::cauchy_pdf(x, y)",0,10,0,10);
+  my $f2a = TF2->new("f2a","ROOT::Math::chisquared_pdf(x,y)",0,20, 0,20);
+  my $f3a = TF2->new("f3a","ROOT::Math::gaussian_pdf(x,y)",0,10,0,5);
+  my $f4a = TF2->new("f4a","ROOT::Math::tdistribution_pdf(x,y)",0,10,0,5);
+  
+  my $c1 = TCanvas->new("c1","c1",1000,750);
+  $c1->Divide(2,2);
+  
+  $c1->cd(1);
+  $f1a->Draw("surf1");
+  $c1->cd(2);
+  $f2a->Draw("surf1");
+  $c1->cd(3);
+  $f3a->Draw("surf1");
+  $c1->cd(4);
+  $f4a->Draw("surf1");
+  
+  $gApplication->Run;
+  
+
+
+
+=head2 principal.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  
+  #  Principal Components Analysis (PCA) example
+  #  
+  #  Example of using TPrincipal as a stand alone class. 
+  #  
+  #  We create n-dimensional data points, where c = trunc(n / 5) + 1
+  #  are  correlated with the rest n - c randomly distributed variables. 
+  # 
+  my $n = shift || 10;
+  my $m = shift || 10000;
+  
+  my $c = $n / 5 + 1;
+  
+  printf "*************************************************\n";
+  printf "*         Principal Component Analysis          *\n";
+  printf "*                                               *\n";
+  printf "*  Number of variables:           %8d      *\n", $n;
+  printf "*  Number of data points:         %8d      *\n", $m;
+  printf "*  Number of dependent variables: %4d          *\n", $c;
+  printf "*                                               *\n";
+  printf "*************************************************\n"; 
+  
+  # Initilase the TPrincipal object. Use the empty string for the
+  # final argument, if you don't wan't the covariance
+  # matrix. Normalising the covariance matrix is a good idea if your
+  # variables have different orders of magnitude. 
+  
+  my $principal = TPrincipal->new($n,"N");
+  
+  # Use a pseudo-random number generator
+  my $random = TRandom->new;
+  
+  # Make the m data-points
+  # Make a variable to hold our data
+  # Allocate memory for the data point
+  my $data = [];
+  for my $i (0..$m-1) {
+  
+    # First we create the un-correlated, random variables, according
+    # to one of three distributions 
+    for my $j (0..($n-$c-1)) {
+      if ($j % 3 == 0) {
+        $data->[$j] = $random->Gaus(5,1);
+      }
+      elsif ($j % 3 == 1) {
+        $data->[$j] = $random->Poisson(8);
+      }
+      else {
+        $data->[$j] = $random->Exp(2);
+      }
+    }
+  
+    # Then we create the correlated variables
+    for my $j (0..$c-1) {
+      $data->[$n - $c + $j] = 0;
+      for my $k (0..($n-$c-$j-1)) {
+        $data->[$n - $c + $j] += $data->[$k];
+      }
+    }
+    
+    # Finally we're ready to add this datapoint to the PCA
+    $principal->AddRow($data);
+  }
+    
+  # Do the actual analysis
+  $principal->MakePrincipals();
+  
+  # Print out the result on
+  $principal->Print();
+  
+  # Test the PCA 
+  $principal->Test();
+  
+  # Make some histograms of the orginal, principal, residue, etc data 
+  $principal->MakeHistograms();
+  
+  # Make two functions to map between feature and pattern space 
+  $principal->MakeCode();
+  
+  # Start a browser, so that we may browse the histograms generated
+  # above 
+  my $b = TBrowser->new("principalBrowser", $principal);
+  
+  $gApplication->Run;
+  
+
+
+
+=head2 rolke.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  
+  my $bm = 0.0;
+  my $tau = 2.5;
+  my $mid = 1;
+  my $m = 100;
+  my $z = 50;
+  my $y = 10;
+  my $x = 5;
+  
+  # Initialize parameters not used.
+  my $e = 0.0;
+  my $em = 0.0;
+  my $sde=0.0;
+  my $sdb=0.0;
+  my $b = 0.0;
+  
+  my $g = TRolke->new();
+  $g->SetCL(0.90);
+   
+  my $ul = $g->CalculateInterval($x,$y,$z,$bm,$em,$e,$mid,$sde,$sdb,$tau,$b,$m);
+  my $ll = $g->GetLowerLimit();
+   
+  print "Assuming MODEL 1\n"; 
+  print "the Profile Likelihood interval is :\n";
+  print "[", $ll, ",", $ul, "]\n";
+  
+  $tau = 2.5;
+  $mid = 2;
+  $y = 3;
+  $x = 10;
+  $em=0.9;
+  $sde=0.05;
+  
+  $g->SetCL(0.95);
+  
+  $ul = $g->CalculateInterval($x,$y,$z,$bm,$em,$e,$mid,$sde,$sdb,$tau,$b,$m);
+  $ll = $g->GetLowerLimit();
+   
+  print "Assuming MODEL 2\n"; 
+  print "the Profile Likelihood interval is :\n";
+  print "[", $ll, ",", $ul, "]\n";
+  
+  $mid = 3;
+  $bm = 5.0;
+  $x = 10;
+  $em = 0.9;
+  $sde=0.05;
+  $sdb=0.5;
+  
+  $g->SetCL(0.99);
+  
+  $ul = $g->CalculateInterval($x,$y,$z,$bm,$em,$e,$mid,$sde,$sdb,$tau,$b,$m);
+  $ll = $g->GetLowerLimit();
+  
+  print "Assuming MODEL 3\n"; 
+  print "the Profile Likelihood interval is :\n";
+  print "[", $ll, ",", $ul, "]\n";
+  
+  $tau = 5;
+  $mid = 4;
+  $y = 7;
+  $x = 1;
+  $e = 0.25;
+  
+  $g->SetCL(0.68);
+  $ul = $g->CalculateInterval($x,$y,$z,$bm,$em,$e,$mid,$sde,$sdb,$tau,$b,$m);
+  $ll = $g->GetLowerLimit();
+   
+  print "Assuming MODEL 4\n"; 
+  print "the Profile Likelihood interval is :\n";
+  print "[", $ll, ",", $ul, "]\n";
+  
+  $mid = 5;
+  $bm = 0.0;
+  $x = 1;
+  $e = 0.65;
+  $sdb=1.0;
+  
+  $g->SetCL(0.80);
+  $ul = $g->CalculateInterval($x,$y,$z,$bm,$em,$e,$mid,$sde,$sdb,$tau,$b,$m);
+  $ll = $g->GetLowerLimit();
+  
+  print "Assuming MODEL 5\n"; 
+  print "the Profile Likelihood interval is :\n";
+  print "[", $ll, ",", $ul, "]\n";
+   
+  $y = 1;
+  $mid = 6;
+  $m = 750;
+  $z = 500;
+  $x = 25;
+  $b = 10.0;
+  
+  $g->SetCL(0.90);
+  $ul = $g->CalculateInterval($x,$y,$z,$bm,$em,$e,$mid,$sde,$sdb,$tau,$b,$m);
+  $ll = $g->GetLowerLimit();
+  print "Assuming MODEL 6\n"; 
+  print "the Profile Likelihood interval is :\n";
+  print "[", $ll, ",", $ul, "]\n";
+    
+  
+  $mid = 7;
+  $x = 15;
+  $em = 0.77;
+  $sde=0.15;
+  $b = 10.0;
+  
+  $g->SetCL(0.95);
+  $ul = $g->CalculateInterval($x,$y,$z,$bm,$em,$e,$mid,$sde,$sdb,$tau,$b,$m);
+  $ll = $g->GetLowerLimit();
+  
+  print "Assuming MODEL 7\n"; 
+  print "the Profile Likelihood interval is :\n";
+  print "[", $ll, ",", $ul, "]\n";
+  
+
+
+
+=head2 vavilov.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  
+  #test of the TMath::Vavilov distribution
+  use constant n => 1000;
+  my $x  = [];
+  my $y1 = [];
+  my $y2 = [];
+  my $y3 = [];
+  my $y4 = [];
+  
+  my $r = TRandom->new();
+  for my $i (0..n-1) {
+    my $rv = $r->Uniform(-2, 10);
+    push @$x, $rv;
+    push @$y1, TMath::Vavilov($x->[$i], 0.30, 0.5);
+    push @$y2, TMath::Vavilov($x->[$i], 0.15, 0.5);
+    push @$y3, TMath::Vavilov($x->[$i], 0.25, 0.5);
+    push @$y4, TMath::Vavilov($x->[$i], 0.05, 0.5);
+  }
+  
+  my $c1 = TCanvas->new("c1", "Vavilov density");
+  $c1->SetGrid();
+  $c1->SetHighLightColor(19);
+  my $gr1 = TGraph->new(n, $x, $y1);
+  my $gr2 = TGraph->new(n, $x, $y2);
+  my $gr3 = TGraph->new(n, $x, $y3);
+  my $gr4 = TGraph->new(n, $x, $y4);
+  $gr1->SetTitle("TMath::Vavilov density");
+  $gr1->Draw("ap");
+  $gr2->Draw("psame");
+  $gr2->SetMarkerColor(kRed);
+  $gr3->Draw("psame");
+  $gr3->SetMarkerColor(kBlue);
+  $gr4->Draw("psame");
+  $gr4->SetMarkerColor(kGreen);
+  
+  $gApplication->Run;
+
+
+
+
+=head1 SEE ALSO
+
+L<SOOT>
+
+=head1 AUTHOR
+
+Steffen Mueller, E<lt>smueller@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2010 by Steffen Mueller
+
+SOOT, the Perl-ROOT wrapper, is free software; you can redistribute it and/or modify
+it under the same terms as ROOT itself, that is, the GNU Lesser General Public License.
+A copy of the full license text is available from the distribution as the F<LICENSE> file.
+
+=cut
+

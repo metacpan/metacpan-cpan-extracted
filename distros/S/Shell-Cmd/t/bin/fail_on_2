@@ -1,0 +1,9 @@
+#!/usr/bin/perl
+$| = 1;
+$i = $ARGV[0] || '';
+
+print "Input: $i\n";
+if ($i eq '2') {
+   exit 10;
+}
+exit 0;

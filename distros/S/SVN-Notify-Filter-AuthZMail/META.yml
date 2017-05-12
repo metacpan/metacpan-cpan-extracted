@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         SVN-Notify-Filter-AuthZMail
+version:      1.01
+version_from: lib/SVN/Notify/Filter/AuthZMail.pm
+installdirs:  site
+requires:
+    SVN::Access:                   0
+    SVN::Notify:                   2.72
+    Test::More:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30_01

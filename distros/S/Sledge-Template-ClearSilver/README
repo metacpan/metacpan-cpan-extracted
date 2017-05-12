@@ -1,0 +1,22 @@
+NAME
+       Sledge::Template::ClearSilver - ClearSilver template system for Sledge
+
+SYNOPSIS
+         package MyApp::Pages;
+         use strict;
+         use base qw(Sledge::Pages::Apache);
+         use Sledge::Template::ClearSilver
+
+DESCRIPTION
+       Sledge::Template::ClearSilver is ClearSilver template system for Sledge.
+
+AUTHOR
+       Jiro Nishiguchi <jiro@cpan.org>
+
+       This library is free software; you can redistribute it and/or modify it under the same
+       terms as Perl itself.
+
+SEE ALSO
+       Bundle::Sledge
+
+       ClearSilver Documentation:  <http://www.clearsilver.net/docs/>

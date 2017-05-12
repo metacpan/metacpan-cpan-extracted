@@ -1,0 +1,35 @@
+commit 6b311f0079a92e6b573405c494a85132c6a7b374 (refs/heads/master)
+Author: nadim khemir <nkh@cpan.org>
+Date:   Wed Jan 14 18:22:14 2009 +0100
+
+    FIXED: dependencies
+
+commit d3d1ba35f5993629e3bd73990fc3390589ff1509
+Author: nadim khemir <nkh@cpan.org>
+Date:   Mon Jan 12 11:41:11 2009 +0100
+
+    ADDED: pod spelling dictionary
+
+commit 7181981a7ccdbf92c4e074fb9fad4d2701e112bc
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Mon Dec 29 19:32:14 2008 +0100
+
+    CHANGED: using git to generate Changes file
+
+commit ac5efe320d28a7805246b4aa9e65fa21e6527d4d
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Mon Dec 29 19:26:19 2008 +0100
+
+    CHANGED: move author test to xt/
+
+commit 12f6bf74e03fc32b8bf3eca2748532f06a1e81f6
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Sat Nov 1 19:37:26 2008 +0100
+
+    CHANGED: updated documentation after Data::TreeDumper release
+
+commit bd02129ed9c7cd86c7e572ab3da28a2b34360927
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Sat Nov 1 17:28:11 2008 +0100
+
+    ADDED: Initial commit

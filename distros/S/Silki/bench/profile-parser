@@ -1,0 +1,186 @@
+use strict;
+use warnings;
+
+use lib './lib';
+
+use Silki::Formatter::WikiToHTML;
+use Silki::Schema::User;
+use Silki::Schema::Wiki;
+
+my $wiki = Silki::Schema::Wiki->new( wiki_id => 1 );
+my $user = Silki::Schema::User->SystemUser();
+
+my $formatter = Silki::Formatter::WikiToHTML->new(
+    user        => $user,
+    wiki        => $wiki,
+    include_toc => 1,
+);
+
+my $wikitext = do { local $/; <DATA> };
+
+DB::enable_profile() if $ENV{NYTPROF};
+
+$formatter->wiki_to_html($wikitext) for 1 .. ( shift || 50 );
+
+DB::disable_profile() if $ENV{NYTPROF};
+
+__DATA__
+## Welcome to The Wiki!
+
+* ((Introduction To CAA)) - What we do, core values, history
+* ((Guide To CAA Wiki)) - Guide on using and editing CAA's wiki
+* [Google calendar](http://tinyurl.com/nyh89c) - See calendar for all CAA events, meetings, and other happenings 
+* ((Totally new page))
+
+## Current Volunteers and Volunteer Opportunities
+
+* ((Volunteers)) - View a listing of coordinators and regular volunteers  - yay live preview!
+* ((Active Volunteer Opportunities)) - Current opportunities that we need help with
+* ((Updates Blog)) - Find out what's happening internally at our CAA Updates Blog
+
+## Current Events Being Planned - this works quite well - get the most frequent updates
+
+* ((Cooking Classes August 2010))
+* ((Donor Appreciation Event 2010))
+* ((Fundraising Event Fall 2010))
+* ((Homecoming 2010))
+* ((Food Giveaway MNPaw Zoo 2010))
+* ((New Volunteer Meeting 2010))
+* ((Restaurant Fundraiser First 2009))
+* ((Strategy Day 2010))
+* ((Summer Camping Trip 2010))
+* ((Summer Food Giveaways 2010))
+* ((Tabling UMN Fall Semester 2010))
+* ((Thanksgiving Potluck 2010))
+* ((TLOV 2011))
+* ((Vegan Food Showcase 2010))
+* ((Veg Month 2010))
+* ((Volunteer Appreciation Party 2010))
+* ((Welcome Week 2010))
+
+## Ongoing Campaigns and Outreach
+
+* ((Book Club))
+* ((Bridges Of Respect))
+* ((Cable Access))
+* ((College Outreach))
+* ((Cooking Classes))
+* ((Community Cable Program))
+* ((Compassionate Times))
+* ((Dine Outs))
+* ((Displays))
+* ((Food Giveaways))
+* ((Leafleting))
+* ((Literature Distribution))
+* ((Postering))
+* ((Public Speaking))
+* ((No Battery Eggs))
+* ((Tabling))
+* ((Restaurant Outreach))
+* ((Movement Strategy))
+* ((Social Events))
+* ((Social Networking Websites))
+* ((Vegan After Dark))
+* ((Volunteer Contacts In Rapport))
+* ((Weekly Update))
+* ((Writers Group))
+
+## Current Projects
+
+* ((Community Office Signage))
+* ((Explore Veg Revamp))
+* ((Messaging Guide))
+* ((Multimedia Team))
+* ((State Fair 2010))
+* ((Student Group Grants Fall 2010))
+* ((Student Group Registration And Reservations 2010))
+* ((TAf A 2010))
+* ((Training Videos))
+* ((Updating Website Text))
+* ((VegGuide))
+* ((Videos For Explore Veg))
+
+## Promotions
+
+* ((Mailing Lists)) - For advertising events
+
+## Media
+
+* ((CAA In The News)) - An archive of press garnered by or about CAA
+* ((Media And Press)) - Contact info for Twin Cities media outlets
+* ((Calendar Releases)) - Where to send event announcements to Twin Cities media
+
+## Directories of Area Groups
+
+* ((MNGroups)) - A listing of MN animal and veg groups
+* ((Community And Student Groups)) - A listing of MN/regional organizations that overlap with some of CAA's work
+* ((Regional Animal Groups)) - Non-MN animal advocacy organizations in the Midwest
+
+## Meeting related
+
+* ((Board Minutes))
+* ((Community Meeting Minutes))
+* ((Fundraising Meeting Minutes))
+* ((Meeting Attendees)) - Times and attendees for weekly planning meetings
+* ((Meeting Guidelines))
+* ((Student Group Meeting Minutes))
+* ((Strategic Plans))
+* ((Dave Agenda Items))
+
+## Administrative and Office Management
+
+* ((Announce List Emails))
+* ((CAA Library))
+* ((CAA Wishlist))
+* ((Community Office))
+* ((Literature To Keep And Not To Keep))
+* ((UMN Office))
+* ((Reservations And Permits))
+* ((Shopping List))
+* ((Volunteer Email Addresses))
+
+## Organizational management
+
+* ((Advisory Board))
+* ((Board)) - Board of Directors 
+* ((Calendar))
+* ((Computer Resources)) - Computer, website, and technology related
+* ((Finances))
+* ((Fundraising)) - Development, fundraising, and membership
+* ((Google Calendar))
+* ((Insurance))
+* ((Personnel)) - Personnel
+* ((Volunteer Resources)) - Volunteer management and databases
+* ((Guide To Checking Mail))
+
+## Guides
+
+* ((Adding An Event On Explore Veg))
+* ((Organizing An Event)) - Includes links for potlucks, dine-outs, speakers, banquet, etc.
+* ((Coordinating Responsibilities)) - General responsibilities for coordinators
+* ((Flickr Photo Uploading))
+* ((Organizing Food Giveaways))
+* ((Guide To Preparing Mailings))
+* ((Hosting Film Showings))
+* ((Website Guides)) - Activist guides featured on ExploreVeg.org
+
+## Other
+
+* ((Advertisement Ideas)) - TV commercial or poster ideas
+* ((AR Quotes)) - Famous quotes on animal rights and vegetarianism
+* ((Art)) - Images for buttons, shirts, etc.
+* ((Attachments)) - A page for people to temporarily save attachments to
+* ((Interviews)) - People to interview and other info
+* ((CAA Letter Head)) - CAA letterhead
+* ((Speaker Event Project Ideas)) - Ideas on speakers, events, campaigns, and activities
+* ((Testimonials)) - Testimonials from donors, volunteers, etc
+* ((Useful Instructors)) - Listing of sympathetic teachers at the U of M 
+* ((Veg Nutrition Info)) - Info, veg dietitians, etc
+* ((Venues)) - A list of local venues we can use for events
+
+## Past Events, Projects, and Campaigns
+
+* Add event attendance and demographics to ((Past Events 2010))
+* Old projects, instructions, and wiki pages, ((Archives))
+* See also ((Past Events 2009)), ((Past Events 2008)), ((Past Events 2007)), ((Past Events 2006)), ((Past Events 2005)), ((Past Events 2004))
+

@@ -1,0 +1,16 @@
+Build.PL
+Changes
+lib/SeeAlso/Identifier/PND.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.json
+META.yml
+README
+t/001_load.t
+t/010_methods.t
+t/020_values.t
+t/021_canonical.t
+t/022_hash.t
+t/030_operators.t
+Todo

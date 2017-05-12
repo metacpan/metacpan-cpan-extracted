@@ -1,0 +1,456 @@
+@prefix cpan-uri: <http://purl.org/NET/cpan-uri/terms#> .
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-bugs: <http://ontologi.es/doap-bugs#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/IO-Detect/project>
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/IO-Detect/v_0-005>.
+
+<http://purl.org/NET/cpan-uri/dist/IO-Detect/v_0-005>
+	a                    doap:Version;
+	dc:identifier        "IO-Detect-0.005"^^xsd:string;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/IO-Detect-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Scalar-Does/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008"^^doap-deps:CpanId ], [
+		doap-deps:on "namespace::clean 0.19"^^doap-deps:CpanId;
+	], [ doap-deps:on "URI::file"^^doap-deps:CpanId ], [ doap-deps:on "Scalar::Util 1.24"^^doap-deps:CpanId ], [ doap-deps:on "Type::Tiny 0.004"^^doap-deps:CpanId ], [
+		doap-deps:on "lexical::underscore"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "Exporter::Tiny 0.026"^^doap-deps:CpanId;
+	];
+	doap-deps:test-requirement [ doap-deps:on "URI"^^doap-deps:CpanId ], [ doap-deps:on "Test::NoWarnings 0"^^doap-deps:CpanId ], [
+		doap-deps:on "Test::Requires 0.06"^^doap-deps:CpanId;
+	], [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Scalar-Does>;
+	doap:created         "2012-08-01"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/Scalar-Does>;
+	doap:homepage        <https://metacpan.org/release/Scalar-Does>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "Scalar-Does";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Scalar-Does/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Scalar-Does/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Scalar-Does/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Scalar-Does/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Scalar-Does/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Scalar-Does/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Scalar-Does/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Scalar-Does/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Scalar-Does/v_0-009>, <http://purl.org/NET/cpan-uri/dist/Scalar-Does/v_0-010>, <http://purl.org/NET/cpan-uri/dist/Scalar-Does/v_0-011_01>, <http://purl.org/NET/cpan-uri/dist/Scalar-Does/v_0-012>, <http://purl.org/NET/cpan-uri/dist/Scalar-Does/v_0-100>, <http://purl.org/NET/cpan-uri/dist/Scalar-Does/v_0-101>, <http://purl.org/NET/cpan-uri/dist/Scalar-Does/v_0-102>, <http://purl.org/NET/cpan-uri/dist/Scalar-Does/v_0-200>, <http://purl.org/NET/cpan-uri/dist/Scalar-Does/v_0-201>, <http://purl.org/NET/cpan-uri/dist/Scalar-Does/v_0-202>, <http://purl.org/NET/cpan-uri/dist/Scalar-Does/v_0-203>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-scalar-does>;
+	];
+	doap:shortdesc       "like ref() but useful".
+
+<http://purl.org/NET/cpan-uri/dist/Scalar-Does/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "Scalar-Does-0.001"^^xsd:string;
+	dc:issued            "2012-09-02"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Scalar-Does-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Scalar-Does/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "Scalar-Does-0.002"^^xsd:string;
+	dc:issued            "2012-09-19"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Export constants for pre-defined roles.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Better documentation for interaction with Moose roles and type constraints.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Document relationship with Object::DOES.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Minor improvements.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Export looks_like_number.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Clarify that does($thing, '0+') is not the same as looks_like_number.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Correctly determine Regexp role.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Improved test suite with 100% Devel::Cover coverage.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Scalar-Does-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Scalar-Does/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "Scalar-Does-0.003"^^xsd:string;
+	dc:issued            "2012-09-19"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Ensure t/99smartmatch.t is skipped properly on Perl < 5.10.1.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Scalar-Does-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Scalar-Does/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "Scalar-Does-0.004"^^xsd:string;
+	dc:issued            "2012-10-03"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Scalar::Does::MooseTypes.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Better document interaction with Role::Tiny and Moo.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "make_role function for creating anonymous roles.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Scalar-Does-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Scalar-Does/v_0-005>
+	a                    doap:Version;
+	dc:identifier        "Scalar-Does-0.005"^^xsd:string;
+	dc:issued            "2012-10-05"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Correct inaccurate information about Moo type constraints.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Scalar-Does-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Scalar-Does/v_0-006>
+	a                    doap:Version;
+	dc:identifier        "Scalar-Does-0.006"^^xsd:string;
+	dc:issued            "2012-10-07"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Fix failing test case in Perl 5.8.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Scalar-Does-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Scalar-Does/v_0-007>
+	a                    doap:Version;
+	rdfs:label           "Skyfall";
+	dc:identifier        "Scalar-Does-0.007"^^xsd:string;
+	dc:issued            "2012-10-23"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix warning on does(undef, $role) when $^W is true.";
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/80121>;
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/dami>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Scalar-Does-0.007.tar.gz>;
+	doap:revision        "0.007"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Scalar-Does/v_0-008>
+	a                    doap:Version;
+	dc:identifier        "Scalar-Does-0.008"^^xsd:string;
+	dc:issued            "2012-10-27"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Revise documentation about Role::Tiny/Moo::Role's lack of DOES; it is now implemented.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "INCOMPATIBLE CHANGE: single-argument does($role) and overloads($role) now check $_.";
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/dami>;
+			rdfs:comment "I've gone through the reverse dependencies on metacpan, and don't think anything should break.";
+			rdfs:seeAlso <http://purl.org/NET/cpan-uri/rt/ticket/80434>;
+		], [
+			a doap-changeset:Documentation, doap-changeset:Removal;
+			rdfs:label "Remove references to Object-DOES in documentation.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Scalar-Does-0.008.tar.gz>;
+	doap:revision        "0.008"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Scalar-Does/v_0-009>
+	a                    doap:Version;
+	rdfs:label           "Gunpowder, treason and plot";
+	dc:identifier        "Scalar-Does-0.009"^^xsd:string;
+	dc:issued            "2012-11-05"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Skip test '10underscore.t' on Perl 5.008 as it doesn't support lexical $_.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Requires UNIVERSAL::DOES in Perl < 5.010.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "use if $] < 5.010, 'UNIVERSAL::DOES'.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Scalar-Does-0.009.tar.gz>;
+	doap:revision        "0.009"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Scalar-Does/v_0-010>
+	a                    doap:Version;
+	dc:identifier        "Scalar-Does-0.010"^^xsd:string;
+	dc:issued            "2012-12-05"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Add documentation for test suite.";
+		], [
+			a doap-changeset:Update;
+			rdfs:label "Perl 5.17 has changed the behaviour of UNIVERSAL::can($pkg, 'can'), so that it is no longer useful for detecting whether a package is loaded. Changed Scalar::Does::MooseLike to avoid this idiom.";
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/81622>;
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/dami>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Scalar-Does-0.010.tar.gz>;
+	doap:revision        "0.010"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Scalar-Does/v_0-011_01>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "Scalar-Does-0.011_01"^^xsd:string;
+	dc:issued            "2012-12-15"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Attempt to fix some problems CPAN smoke tests are reporting in 09warnings.t.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Scalar-Does-0.011_01.tar.gz>;
+	doap:revision        "0.011_01"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Scalar-Does/v_0-012>
+	a                    doap:Version;
+	dc:identifier        "Scalar-Does-0.012"^^xsd:string;
+	dc:issued            "2013-01-11"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Copyright 2013.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Scalar-Does-0.012.tar.gz>;
+	doap:revision        "0.012"^^xsd:string;
+	rdfs:comment         "No functional changes since 0.011_01.".
+
+<http://purl.org/NET/cpan-uri/dist/Scalar-Does/v_0-100>
+	a                    doap:Version;
+	dc:identifier        "Scalar-Does-0.100"^^xsd:string;
+	dc:issued            "2013-03-07"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Merge IO-Detect distribution into Scalar-Does.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "The IO-Detect-Changes.txt file lists changes to the IO-Detect distribution prior to merge.";
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/Scalar-Does/v_0-012>;
+	], [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "New test case for IO::Detect/Path::Tiny interaction.";
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/IO-Detect/v_0-005>;
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Scalar-Does-0.100.tar.gz>;
+	doap:revision        "0.100"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Scalar-Does/v_0-101>
+	a                    doap:Version;
+	dc:identifier        "Scalar-Does-0.101"^^xsd:string;
+	dc:issued            "2013-03-08"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "use lexical::underscore instead of directly mucking around with PadWalker.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Show how IO::Detect's constants can be used with Scalar::Does's does() function.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "IO::Detect now performs the same namespace::clean trickery as Scalar::Does to fake lexical subs.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "does($class, $overloaded_operation) no longer returns true. does($instance, $overloaded_operation) still works of course!";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Improve test suite cleanliness; use Test::Requires, etc.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Scalar-Does-0.101.tar.gz>;
+	doap:revision        "0.101"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Scalar-Does/v_0-102>
+	a                    doap:Version;
+	dc:identifier        "Scalar-Does-0.102"^^xsd:string;
+	dc:issued            "2013-03-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Scalar::Util version in lib/Scalar/Does.pm and meta/makefile.pret should match.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Scalar-Does-0.102.tar.gz>;
+	doap:revision        "0.102"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Scalar-Does/v_0-200>
+	a                    doap:Version;
+	dc:identifier        "Scalar-Does-0.200"^^xsd:string;
+	dc:issued            "2013-05-24"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Use Type::Tiny and Types::Standard to perform type checking for built-in Scalar::Does roles, and also Scalar::Does::MooseTypes roles.";
+		], [
+			a doap-changeset:Update;
+			rdfs:label "Deprecate Scalar::Does::MooseTypes.";
+		], [
+			a doap-changeset:Update;
+			rdfs:label "Use Exporter::TypeTiny instead of Sub::Exporter.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Document relationship with Type::Tiny.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Skip tests involving given/when, smart match, and lexical $_ in Perl >= 5.17.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Scalar-Does-0.200.tar.gz>;
+	doap:revision        "0.200"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Scalar-Does/v_0-201>
+	a                    doap:Version;
+	dc:identifier        "Scalar-Does-0.201"^^xsd:string;
+	dc:issued            "2013-09-30"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Use Exporter::Tiny instead of Exporter::TypeTiny.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Use Dist::Inkt.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Scalar-Does-0.201.tar.gz>;
+	doap:revision        "0.201"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Scalar-Does/v_0-202>
+	a                    doap:Version;
+	dc:identifier        "Scalar-Does-0.202"^^xsd:string;
+	dc:issued            "2014-04-05"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix, doap-changeset:Tests;
+			rdfs:label "Make t/iod-02filehandles.t clean up after itself.";
+			doap-changeset:blame <http://purl.org/NET/cpan-uri/person/pdcawley>;
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/91497>;
+			doap-changeset:thanks <urn:uuid:f4c99fd1-c557-4f57-b7eb-b15915c0745d>;
+			rdfs:seeAlso <https://github.com/tobyink/p5-scalar-does/pull/1>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Scalar-Does-0.202.tar.gz>;
+	doap:revision        "0.202"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Scalar-Does/v_0-203>
+	a                    doap:Version;
+	dc:identifier        "Scalar-Does-0.203"^^xsd:string;
+	dc:issued            "2017-01-31"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix, doap-changeset:Tests, doap-changeset:Update;
+			rdfs:label "Make t/09warnings.t work with recent Test::Builder.";
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/119030>;
+			rdfs:seeAlso <https://rt.cpan.org/Ticket/Display.html?id=119030>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Scalar-Does-0.203.tar.gz>;
+	doap:revision        "0.203"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/dami>
+	a                    foaf:Person;
+	foaf:nick            "DAMI";
+	foaf:page            <https://metacpan.org/author/DAMI>.
+
+<http://purl.org/NET/cpan-uri/person/pdcawley>
+	a                    foaf:Person;
+	foaf:name            "Piers Cawley";
+	foaf:nick            "PDCAWLEY";
+	foaf:page            <https://metacpan.org/author/PDCAWLEY>.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/119030>
+	a                    doap-bugs:Issue;
+	doap-bugs:id         "119030"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=119030>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/80121>
+	a                    doap-bugs:Issue;
+	doap-bugs:id         "80121"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=80121>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/80434>
+	a                    doap-bugs:Issue;
+	doap-bugs:id         "80434"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=80434>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/81622>
+	a                    doap-bugs:Issue;
+	doap-bugs:id         "81622"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=81622>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/91497>
+	a                    doap-bugs:Issue;
+	doap-bugs:id         "91497"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=91497>.
+
+<urn:uuid:f4c99fd1-c557-4f57-b7eb-b15915c0745d>
+	foaf:mbox            <mailto:jon@endpoint.com>;
+	foaf:name            "Jon Jensen".
+

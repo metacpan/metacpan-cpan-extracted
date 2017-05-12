@@ -1,0 +1,79 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Object::Enumerator
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = Enumerator.new(...);
+
+=head1 METHODS
+
+
+=head2 each
+
+Enumerator.each() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 first
+
+Enumerator.first() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 grep
+
+Enumerator.grep() -> I<Obj>
+
+Return the
+
+Aliases: I<select>
+
+=cut
+
+=head2 len
+
+Enumerator.len() -> I<Obj>
+
+Return the
+
+Aliases: I<size>, I<length>
+
+=cut
+
+=head2 map
+
+Enumerator.map() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 new
+
+Enumerator.new() -> I<Obj>
+
+Return the
+
+Aliases: I<call>
+
+=cut
+
+=head2 to_a
+
+Enumerator.to_a() -> I<Obj>
+
+Return the
+
+=cut

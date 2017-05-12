@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding='Windows-1251'?>
+<!DOCTYPE hrc PUBLIC "-//Cail Lomecb//DTD Colorer HRC take5//EN"
+  "http://colorer.sf.net/2003/hrc.dtd">
+<hrc version="take5" xmlns="http://colorer.sf.net/2003/hrc"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://colorer.sf.net/2003/hrc http://colorer.sf.net/2003/hrc.xsd">
+   <type name="foxpro">
+      <annotation>
+       <documentation>
+        FoxPro Extended v1.1 Syntax
+        <contributors>
+          Alexander Polosow/Александр Полозов (2:5025/54.32aka2:5025/23.82)
+          build with 'FoxPro Syntax' by
+          Cyrill Panov/Кирилл Панов Cyrill.Panov@usu.ru
+        </contributors>
+       </documentation>
+      </annotation>
+
+      <import type="def"/>
+      <import type="ole"/>
+
+      <region name="foxString" parent="String"/>
+      <region name="foxComment" parent="Comment"/>
+      <region name="foxSymb" parent="Symbol"/>
+      <region name="foxWord" parent="Keyword"/>
+      <region name="foxNumb" parent="Number"/>
+
+      <scheme name="foxpro">
+<!-- Linear Comments -->
+         <regexp match="/&amp;&amp;.*$/" region0="foxComment"/>
+         <regexp match="/\/\/.*$/" region0="foxComment"/>
+         <regexp match="/^\s*\*.*$/" region0="foxComment"/>
+<!-- Strings -->
+         <regexp match="/\&#34;.*?\&#34;/" region0="foxString"/>
+         <regexp match="/\'.*?\'/" region0="foxString"/>
+         <block start="/(\{)(\|.*?\|)?/" end="/(\})/" scheme="foxpro" region="Insertion" region00="foxSymb" region02="foxString" region10="foxSymb" region01="PairStart" region11="PairEnd"/>
+         <inherit scheme="PairedBrackets">
+            <virtual scheme="PairedBrackets" subst-scheme="foxpro"/>
+         </inherit>
+         <regexp match="/^\s* \M (procedure|function) \s+ (?{Function}[_\w]+)/ix"/>
+<!-- Numbers -->
+         <regexp match="/\b0[xX][\da-fA-F]+\b/" region0="foxNumb"/>
+         <regexp match="/\b[0-9]+\b/" region0="foxNumb"/>
+         <inherit scheme="ole"/>
+         <keywords region="foxSymb">
+            <symb name=";"/>
+            <symb name="="/>
+            <symb name="+"/>
+            <symb name="-"/>
+            <symb name="/"/>
+            <symb name="*"/>
+            <symb name="&amp;"/>
+            <symb name="|"/>
+            <symb name="^"/>
+            <symb name="("/>
+            <symb name=")"/>
+            <symb name="["/>
+            <symb name="]"/>
+            <symb name=","/>
+            <symb name="."/>
+            <symb name=":"/>
+            <symb name="!"/>
+            <symb name="~"/>
+            <symb name="&lt;"/>
+            <symb name="&gt;"/>
+            <symb name="%"/>
+            <symb name="?"/>
+            <symb name="{"/>
+            <symb name="}"/>
+         </keywords>
+         <keywords ignorecase="yes" region="foxWord">
+            <symb name=".T."/>
+            <symb name=".F."/>
+            <word name="AND"/>
+            <symb name=".AND."/>
+            <word name="OR"/>
+            <symb name=".OR."/>
+            <word name="NOT"/>
+            <symb name=".NOT."/>
+         </keywords>
+         <keywords ignorecase="yes" region="foxWord">
+            <word name="@"/>
+            <word name="_MSYSMENU"/>
+            <word name="_SCREEN"/>
+            <word name="ABS"/>
+            <word name="ACCEPT"/>
+            <word name="ACTI"/>
+            <word name="ACTIVATE"/>
+            <word name="AGAIN"/>
+            <word name="ALIAS"/>
+            <word name="ALL"/>
+            <word name="ALLTRIM"/>
+            <word name="ALTERNATE"/>
+            <word name="ANSI"/>
+            <word name="ANSITOOEM"/>
+            <word name="APLABOUT"/>
+            <word name="APPE"/>
+            <word name="APPEND"/>
+            <word name="ARRAY"/>
+            <word name="ASC"/>
+            <word name="AT"/>
+            <word name="ATAN"/>
+            <word name="ATLINE"/>
+            <word name="AUTOSAVE"/>
+            <word name="BACKCOLOR"/>
+            <word name="BAR"/>
+            <word name="BARCOUNT"/>
+            <word name="BARPROMPT"/>
+            <word name="BEGIN"/>
+            <word name="BELL"/>
+            <word name="BETWEEN"/>
+            <word name="BLAN"/>
+            <word name="BLANK"/>
+            <word name="BLINK"/>
+            <word name="BLOCKSIZE"/>
+            <word name="BOF"/>
+            <word name="BORDER"/>
+            <word name="BOTT"/>
+            <word name="BOTTOM"/>
+            <word name="BOX"/>
+            <word name="BROW"/>
+            <word name="BROWSE"/>
+            <word name="BRSTATUS"/>
+            <word name="BUILD"/>
+            <word name="CALL"/>
+            <word name="CANCEL"/>
+            <word name="CAPSLOCK"/>
+            <word name="CAPTION"/>
+            <word name="CARRY"/>
+            <word name="CASE"/>
+            <word name="CENTURY"/>
+            <word name="CHR"/>
+            <word name="CLASS"/>
+            <word name="CLASSLIB"/>
+            <word name="CLEAR"/>
+            <word name="CLOCK"/>
+            <word name="CLOS"/>
+            <word name="CLOSE"/>
+            <word name="COLLATE"/>
+            <word name="COLOR"/>
+            <word name="COMM"/>
+            <word name="COMMAND"/>
+            <word name="COMMANDS"/>
+            <word name="COMPATIBLE"/>
+            <word name="CONFIRM"/>
+            <word name="CONSOLE"/>
+            <word name="COPY"/>
+            <word name="CREATE"/>
+            <word name="CURDIR"/>
+            <word name="CURRENCY"/>
+            <word name="CURSOR"/>
+            <word name="DATABASE"/>
+            <word name="DATABASES"/>
+            <word name="DATE"/>
+            <word name="DEBUG"/>
+            <word name="DECIMALS"/>
+            <word name="DEFAULT"/>
+            <word name="DEFINE"/>
+            <word name="DELE"/>
+            <word name="DELETE"/>
+            <word name="DELETED"/>
+            <word name="DELIMITE"/>
+            <word name="DELIMITERS"/>
+            <word name="DEVELOPMENT"/>
+            <word name="DEVICE"/>
+            <word name="DIM"/>
+            <word name="DIMENSION"/>
+            <word name="DISPLAY"/>
+            <word name="DO"/>
+            <word name="DOHISTORY"/>
+            <word name="ECHO"/>
+            <word name="EDIT"/>
+            <word name="ELSE"/>
+            <word name="EMPTY"/>
+            <word name="ENDCASE"/>
+            <word name="ENDDO"/>
+            <word name="ENDFOR"/>
+            <word name="ENDIF"/>
+            <word name="ENDPROC"/>
+            <word name="ENDSCAN"/>
+            <word name="EOF"/>
+            <word name="ESCAPE"/>
+            <word name="EXACT"/>
+            <word name="EXCLUSIVE"/>
+            <word name="EVENT"/>
+            <word name="EVENTS"/>
+            <word name="FCLOSE"/>
+            <word name="FCOUNT"/>
+            <word name="FCREATE"/>
+            <word name="FIELD"/>
+            <word name="FIELDS"/>
+            <word name="FILE"/>
+            <word name="FILES"/>
+            <word name="FILL"/>
+            <word name="FILTER"/>
+            <word name="FIXED"/>
+            <word name="FOPEN"/>
+            <word name="FOR"/>
+            <word name="FORMAT"/>
+            <word name="FPUTS"/>
+            <word name="FROM"/>
+            <word name="FULLPATH"/>
+            <word name="FUNC"/>
+            <word name="FUNCTI"/>
+            <word name="FUNCTION"/>
+            <word name="FWRITE"/>
+            <word name="GATH"/>
+            <word name="GATHER"/>
+            <word name="GET"/>
+            <word name="GO"/>
+            <word name="HEADINGS"/>
+            <word name="HELP"/>
+            <word name="HELPFILTER"/>
+            <word name="HOURS"/>
+            <word name="IF"/>
+            <word name="INDEX"/>
+            <word name="INSERT"/>
+            <word name="INTENSITY"/>
+            <word name="INTO"/>
+            <word name="KEY"/>
+            <word name="KEYCOMP"/>
+            <word name="LIBRARY"/>
+            <word name="LOCAL"/>
+            <word name="LOCATE"/>
+            <word name="LOCK"/>
+            <word name="LOGERRORS"/>
+            <word name="MACDESKTOP"/>
+            <word name="MACHELP"/>
+            <word name="MACKEY"/>
+            <word name="MARGIN"/>
+            <word name="MARK"/>
+            <word name="MEMO"/>
+            <word name="MEMOWIDTH"/>
+            <word name="MEMVAR"/>
+            <word name="MENU"/>
+            <word name="MESSAGE"/>
+            <word name="MODAL"/>
+            <word name="MODI"/>
+            <word name="MODIFY"/>
+            <word name="MOUSE"/>
+            <word name="MULTILOCKS"/>
+            <word name="NEAR"/>
+            <word name="NEXT"/>
+            <word name="NOCPTRANS"/>
+            <word name="NOTIFY"/>
+            <word name="NOWAIT"/>
+            <word name="ODOMETER"/>
+            <word name="OF"/>
+            <word name="OFF"/>
+            <word name="ON"/>
+            <word name="OPTIMIZE"/>
+            <word name="ORDER"/>
+            <word name="OTHERWISE"/>
+            <word name="PALETTE"/>
+            <word name="PARA"/>
+            <word name="PARAMETER"/>
+            <word name="PARAMETERS"/>
+            <word name="PATH"/>
+            <word name="PDSETUP"/>
+            <word name="POINT"/>
+            <word name="PRINTER"/>
+            <word name="PRIVATE"/>
+            <word name="PROC"/>
+            <word name="PROCED"/>
+            <word name="PROCEDURE"/>
+            <word name="PROMPT"/>
+            <word name="PUBLIC"/>
+            <word name="PUSH"/>
+            <word name="QUIT"/>
+            <word name="READ"/>
+            <word name="READBORDER"/>
+            <word name="RECNO"/>
+            <word name="REFRESH"/>
+            <word name="REGION"/>
+            <word name="REGIONAL"/>
+            <word name="RELA"/>
+            <word name="RELATI"/>
+            <word name="RELATION"/>
+            <word name="RELEASE"/>
+            <word name="REPL"/>
+            <word name="REPLA"/>
+            <word name="REPLACE"/>
+            <word name="REPROCESS"/>
+            <word name="RESOURCE"/>
+            <word name="RETU"/>
+            <word name="RETURN"/>
+            <word name="RGB"/>
+            <word name="SAFETY"/>
+            <word name="SAY"/>
+            <word name="SCAN"/>
+            <word name="SCAT"/>
+            <word name="SCATT"/>
+            <word name="SCATTER"/>
+            <word name="SCHEME"/>
+            <word name="SCHEMES"/>
+            <word name="SCOREBOARD"/>
+            <word name="SCREEN"/>
+            <word name="SEEK"/>
+            <word name="SELE"/>
+            <word name="SELECT"/>
+            <word name="SEPARATOR"/>
+            <word name="SET"/>
+            <word name="SHADOWS"/>
+            <word name="SKIP"/>
+            <word name="SPACE"/>
+            <word name="STATUS"/>
+            <word name="STEP"/>
+            <word name="STICKY"/>
+            <word name="STORE"/>
+            <word name="STR"/>
+            <word name="SYSMENU"/>
+            <word name="TABLE"/>
+            <word name="TAG"/>
+            <word name="TALK"/>
+            <word name="TEXT"/>
+            <word name="TEXTMERGE"/>
+            <word name="THIS"/>
+            <word name="THISFORM"/>
+            <word name="TO"/>
+            <word name="TOP"/>
+            <word name="TOPIC"/>
+            <word name="TRBETWEEN"/>
+            <word name="TYPEAHEAD"/>
+            <word name="UDFPARMS"/>
+            <word name="UNIQUE"/>
+            <word name="USE"/>
+            <word name="VAL"/>
+            <word name="VIEW"/>
+            <word name="VOLUME"/>
+            <word name="WAIT"/>
+            <word name="WHILE"/>
+            <word name="WINDOW"/>
+            <word name="WITH"/>
+            <word name="XCMDFILE"/>
+            <word name="YEAR"/>
+         </keywords>
+      </scheme>
+
+   </type>
+</hrc>
+<!-- ***** BEGIN LICENSE BLOCK *****
+   - Version: MPL 1.1/GPL 2.0/LGPL 2.1
+   -
+   - The contents of this file are subject to the Mozilla Public License Version
+   - 1.1 (the "License"); you may not use this file except in compliance with
+   - the License. You may obtain a copy of the License at
+   - http://www.mozilla.org/MPL/
+   -
+   - Software distributed under the License is distributed on an "AS IS" basis,
+   - WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+   - for the specific language governing rights and limitations under the
+   - License.
+   -
+   - The Original Code is the Colorer Library.
+   -
+   - The Initial Developer of the Original Code is
+   - Cail Lomecb <cail@nm.ru>.
+   - Portions created by the Initial Developer are Copyright (C) 1999-2003
+   - the Initial Developer. All Rights Reserved.
+   -
+   - Contributor(s):
+   -
+   - Alternatively, the contents of this file may be used under the terms of
+   - either the GNU General Public License Version 2 or later (the "GPL"), or
+   - the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
+   - in which case the provisions of the GPL or the LGPL are applicable instead
+   - of those above. If you wish to allow use of your version of this file only
+   - under the terms of either the GPL or the LGPL, and not to allow others to
+   - use your version of this file under the terms of the MPL, indicate your
+   - decision by deleting the provisions above and replace them with the notice
+   - and other provisions required by the LGPL or the GPL. If you do not delete
+   - the provisions above, a recipient may use your version of this file under
+   - the terms of any one of the MPL, the GPL or the LGPL.
+   -
+   - ***** END LICENSE BLOCK ***** -->

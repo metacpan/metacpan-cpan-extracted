@@ -1,0 +1,25 @@
+template: transfer-domain.tt
+
+vars:
+  domain: mozzarella2.co.te
+  auth: UDAjUDAj
+
+input_assertions:
+  class: SRS::EPP::Command::Transfer::Domain
+  match:
+    - [ '//domain:name', 'mozzarella2.co.te', 'Domain correctly included in XML' ]
+    - [ '//domain:pw', 'UDAjUDAj', 'found auth info data' ]
+
+SRS:
+ - assertions:
+     count:
+       - [ '//Whois', 1, 'SRS: generated Whois' ]
+       - [ '//DomainUpdate', 1, 'SRS: generated DomainUpdate' ]
+     match:
+       - [ '//DomainNameFilter', 'mozzarella2.co.te', 'SRS: Updating correct domain' ]
+   
+output_assertions:
+  attr_is:
+    - [ '//epp:result', 'code', 2202, 'EPP: Correct response code' ]
+
+

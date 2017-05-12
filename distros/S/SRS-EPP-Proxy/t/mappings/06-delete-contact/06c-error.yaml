@@ -1,0 +1,20 @@
+template: delete-contact.tt
+
+vars:
+  contact_id: c_id2
+  transaction_id: delete-this
+
+input_assertions:
+  match:
+
+SRS:
+  - assertions:
+      attr_is:
+
+output_assertions:
+  count:
+    - [ '//epp:resData', 0, 'EPP: No resData in the response' ]
+    - [ '//epp:clTRID', 1, 'EPP: clTRID returned' ]
+  match:
+  attr_is:
+    - [ '//epp:result', 'code', 2305, 'EPP: Unexpected failure' ]

@@ -1,0 +1,13 @@
+Revision history for Sentry-Log-Raven
+
+1.00    2014/11/14
+        First version, with support for SSL and v4 of the Sentry API.
+
+1.01    2014/11/20
+	Minor bug fixes to documentation, tags, added module dependencies
+
+1.02    2014/11/20
+	Minor fixes to build files
+
+1.03    2014/11/26
+        Minor fixes to pod coverage tests

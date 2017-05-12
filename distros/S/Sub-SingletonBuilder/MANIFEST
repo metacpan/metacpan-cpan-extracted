@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/00-base.t
+lib/Sub/SingletonBuilder.pm
+META.yml                                 Module meta-data (added by MakeMaker)

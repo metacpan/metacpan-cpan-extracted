@@ -1,0 +1,6 @@
+Revision history for Perl extension String::FormatX.
+
+0.01  Mon Mar 28 23:21:39 2005
+	- original version; created by h2xs 1.23 with options
+		-x -n String::FormatX
+

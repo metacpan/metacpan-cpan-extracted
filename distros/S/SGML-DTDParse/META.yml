@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         SGML-DTDParse
+version:      2.00
+version_from: lib/SGML/DTDParse.pm
+installdirs:  site
+requires:
+    Getopt::Long:                  0
+    Text::DelimMatch:              1.05
+    XML::DOM:                      1.43
+    XML::Parser:                   2.25
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

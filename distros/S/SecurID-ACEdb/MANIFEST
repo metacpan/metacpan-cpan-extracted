@@ -1,0 +1,11 @@
+ACEdb.pm
+ACEdb.xs
+Changes
+MANIFEST
+Makefile.PL
+test.pl
+eg/clrnext
+eg/activity
+eg/tokeninf
+INSTALL
+README

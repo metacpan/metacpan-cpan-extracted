@@ -1,0 +1,13 @@
+Revision history for Syntax-Feature-Loop
+
+1.6.0  2012/05/18
+       - Didn't work on Perl builds with support for
+         multiple interpreters (such as builds with
+         multi-threading support).
+
+1.4.0  2012/05/18
+       - Renamed from feature::loop.
+       - Documentation improvements.
+
+1.2.0  2012/05/16
+       - Initial version.

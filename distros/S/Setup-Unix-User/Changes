@@ -1,0 +1,112 @@
+Revision history for Setup-Unix-User
+
+0.13    2015-09-04 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.12    2015-08-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Log::Any to Log::Any::IfLOG.
+
+
+0.11    2014-05-17 (SHARYANTO)
+
+        - No functional changes.
+
+        - Replace File::Slurp with File::Slurp::Tiny.
+
+
+0.10    2012-09-06 (SHARYANTO)
+
+        [INCOMPATIBLE CHANGES]
+
+        - Update to Rinci 1.1.28 (transaction protocol v=2).
+
+        - Now uses Unix::Passwd::File as the backend instead of
+          Passwd::Unix::Alt. This is because UPF has working locking and gives
+          detailed per-call error messages instead of using global variable.
+
+        - Parameter name change: in setup_unix_user(), 'name' becomes 'user'; in
+          setup_unix_group(), 'name' becomes 'group'. This is to align better
+          with Unix::Passwd::File. Some parameters also got changed.
+
+        - Parameter default change: default 'min_new_uid' and 'min_new_gid' is
+          now 1000 instead of 0. You can of course still set it to 0.
+
+
+0.09    2012-03-29 (SHARYANTO)
+
+        - Fix: Ignore membership to non-existant group.
+
+        - Use Test::Setup.
+
+        - build: Replace SubSpec PodWeaver plugin with Perinci.
+
+
+0.08    2012-03-02 (SHARYANTO)
+
+        - No functional changes. Replace Sub::Spec with Rinci.
+
+
+0.07    2011-08-11 (SHARYANTO)
+
+        [ENHANCEMENTS]
+
+        - User: Add new option 'primary_group' to allow adding a user without
+          creating a group with the same name as user [RT#70202]
+
+
+0.06    2011-05-20 (SHARYANTO)
+
+        - No functional changes.
+
+        [BUG FIXES]
+
+        - (build) Add missing dep: Setup::File.
+
+
+0.05    2011-05-18 (SHARYANTO)
+
+        - No functional changes. Tweaked log messages.
+
+
+0.04    2011-05-18 (SHARYANTO)
+
+        - No functional changes. Changed logging levels.
+
+
+0.03    2011-05-17 (SHARYANTO)
+
+        [ENHANCEMENTS]
+
+        - setup_unix_user(): Add 'should_already_exist' parameter
+
+        [ETC]
+
+        - Change default max UID/GID from 65535 to 65534, to be compatible with
+          Debian
+
+
+0.02    2011-05-17 (SHARYANTO)
+
+        [ENHANCEMENTS]
+
+        - Add max_new_gid & max_new_uid parameters.
+
+        [BUG FIXES]
+
+        - Fixed some typos in POD
+
+        - Bug: redo didn't recreate group with same GID.
+
+
+0.01    2011-04-28 (SHARYANTO)
+
+        - First release.

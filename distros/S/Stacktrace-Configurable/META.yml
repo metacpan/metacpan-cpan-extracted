@@ -1,0 +1,34 @@
+---
+abstract: 'a configurable Perl stack trace'
+author:
+  - 'Torsten Förtsch <torsten.foertsch@gmx.net>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  Module::Build::Tiny: '0.037'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.4, Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Stacktrace-Configurable
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Data::Dumper: 2.130_02
+  Log::Log4perl: '1.29'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/tfoertsch/Stacktrace-Configurable/issues
+  homepage: https://github.com/tfoertsch/Stacktrace-Configurable
+  repository: https://github.com/tfoertsch/Stacktrace-Configurable.git
+version: '0.06'
+x_contributors:
+  - 'Torsten Förtsch <torsten@binary.com>'

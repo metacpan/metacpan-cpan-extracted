@@ -1,0 +1,79 @@
+Revision history for String-Tagged
+
+0.14    2017/04/24 15:46:45
+        [BUGFIXES]
+         * Ensure that ->get_tag_extent can see non-initial tags (RT120691)
+
+0.13    2017/03/16 17:59:47
+        [CHANGES]
+         * Define a String::Tagged::Formatting spec name for monospace text
+         * Updated documentation style to  =head2 barename
+
+0.12    2014/11/17 16:14:04
+        [BUGFIXES]
+         * Fix for ->get_tag_at ignoring tags in some situations (RT100392)
+         * Fix for ->substr for length of copied tags that start elsewhere
+           than offset 0 in the copied chunk (RT100409)
+
+0.11    2014/11/14 17:40:35
+        [CHANGES]
+         * Added ->split method
+         * Allow ->apply_tag/->unapply_tag/->delete_tag to take an Extent
+           object instead of two integers for position
+         * Added ->clone method with tag set restriction and conversion
+         * Document the String::Tagged::Formatting spec
+
+        [BUGFIXES]
+         * Set the overload 'fallback' key
+
+0.10    2014/09/08 17:48:53
+        [CHANGES]
+         * Have ->apply_tagged return the object itself, for chaining
+         * Have ->substr return a String::Tagged; add ->plain_substr for plain
+           perl strings
+         * Added ->matches
+
+        [BUGFIXES]
+         * Ensure ->get_tags_at at nonzero index works (RT98700)
+
+0.09    2014/07/31 20:28:59
+        [CHANGES]
+         * Have apply_tag, unapply_tag, delete_tag accessors return the object
+           itself, so they're nice for chaining constructors
+
+0.08    CHANGES:
+         * Efficiency updates to improve the performance of common append
+           operations
+
+0.07    CHANGES:
+         * Respect subclassing in ->concat and . operator
+         * Added ->new_tagged convenience constructor
+         * Added 'only' and 'except' filters to iteration methods
+
+0.06    CHANGES:
+         * Use Test::Identity to work around recent behavioural change in
+           Test::More when comparing object references
+
+0.05    CHANGES:
+         * Allow use of ->new() as a clone constructor
+         * Copy tags if ->set_substr/insert/append are passed a String::Tagged
+         * Define . and .= operator overloads
+
+0.04    CHANGES:
+         * Added ->merge_tags() method
+         * Created terminal colours/attributes example
+         * Various small fixes to keep CPANTS happy
+
+0.03    CHANGES:
+         * use warnings
+        
+        BUGFIXES:
+         * Ensure that, of multiple tags that start at the same position, the
+           shortest one wins.
+
+0.02    CHANGES:
+         * New 'extent' API - methods to return extent objects
+         * Added ->get_tag_extent() and ->get_tag_missing_extent()
+
+0.01    First version, released on an unsuspecting world.
+

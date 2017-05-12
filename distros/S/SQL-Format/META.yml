@@ -1,0 +1,42 @@
+---
+abstract: 'Yet another yet another SQL builder'
+author:
+  - 'xaicron <xaicron {at} cpan.org>'
+build_requires:
+  Test::More: '0'
+  Tie::IxHash: '0'
+configure_requires:
+  CPAN::Meta: '0'
+  CPAN::Meta::Prereqs: '0'
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SQL-Format
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  SQL::Format:
+    file: lib/SQL/Format.pm
+    version: '0.16'
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/xaicron/p5-SQL-Format/issues
+  homepage: https://github.com/xaicron/p5-SQL-Format
+  repository: git://github.com/xaicron/p5-SQL-Format.git
+version: '0.16'
+x_contributors:
+  - 'Olivier Mengué <dolmen@cpan.org>'
+  - 'xaicron <xaicron@gmail.com>'

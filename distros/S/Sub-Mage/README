@@ -1,0 +1,518 @@
+NAME
+    Sub::Mage - Multi-Use utility for manipulating subroutines, classes and
+    more.
+
+DESCRIPTION
+    What this module attempts to do is make a developers life easier by
+    allowing them to manage and manipulate subroutines and modules. You can
+    override a subroutine, then restore it as it was originally, create
+    after, before and around hook modifiers, delete subroutines, or even tag
+    every subroutine in a class to let you know when each one is being run,
+    which is great for debugging.
+
+SYNOPSIS
+        # Single file
+
+        use Sub::Mage;
+
+        sub greet { print "Hello, World!"; }
+
+        greet(); # prints Hello, World!
+
+        override 'greet' => sub {
+            print "Goodbye, World!";
+        };
+
+        greet(); # now prints Goodbye, World!
+
+        restore 'greet'; # restores it back to its original state
+
+    Changing a class method, by example
+
+        # Foo.pm
+
+        use Sub::Mage;
+
+        sub hello {
+            my $self = shift;
+
+            $self->{name} = "World";
+        }
+
+        # test.pl
+
+        use Foo;
+
+        my $foo = Foo->new;
+
+        Foo->override( 'hello' => sub {
+            my $self = shift;
+
+            $self->{name} = "Town";
+        });
+
+        print "Hello, " . $foo->hello . "!\n"; # prints Hello, Town!
+
+        Foo->restore('hello');
+
+        print "Hello, " . $foo->hello . "!\n"; # prints Hello, World!
+
+IMPORT ATTRIBUTES
+    When you "use Sub::Mage" there are currently a couple of options you can
+    pass to it. One is ":5.010". This will import the 5.010 feature.. this
+    has nothing to do with subs, but I like this module, so it's there. The
+    other is ":Debug". If for some reason you want some kind of debugging
+    going on when you override, restore, create or create hook modifiers
+    then this will enable it for you. It can get verbose, so use it only
+    when you need to.
+
+        use Sub::Mage ':5.010';
+
+        say "It works!";
+
+        #--
+
+        use Sub::Mage qw/:5.010 :Debug/;
+
+        create 'this_sub' => sub { }; # notifies you with [debug] that a subroutine was createed
+
+METHODS
+  override
+    Overrides a subroutine with the one specified. On its own will override
+    the one in the current script, but if you call it from a class, and that
+    class is visible, then it will alter the subroutine in that class
+    instead. Overriding a subroutine inherits everything the old one had,
+    including $self in class methods.
+
+        override 'subname' => sub {
+            # do stuff here
+        };
+
+        # class method
+        FooClass->override( 'subname' => sub {
+            my $self = shift;
+
+            # do stuff
+        });
+
+  withdraw
+    Deletes an entire subroutine from the current package, or a remote one.
+    Please be aware this is non-reversable. There is no recycle bin for
+    subroutines unfortunately. Not yet, anyway.
+
+        package MyBin;
+
+        sub test { print "Huzzah!" }
+    
+        __PACKAGE__->test; # prints Huzzah!
+    
+        withdraw 'test'
+
+        __PACKAGE__->test; # fails, because there's no subroutine named 'test'
+
+        use AnotherPackage;
+        AnotherPackage->withdraw('test'); # removes the 'test' method from 'AnotherPackage'
+
+  restore
+    Restores a subroutine to its original state.
+
+        override 'foo' => sub { };
+
+        restore 'foo'; # and we're back in the room
+
+  after
+    Adds an after hook modifier to the subroutine. Anything in the after
+    subroutine is called directly after the original sub. Hook modifiers can
+    also be restored.
+
+        sub greet { print "Hello, "; }
+    
+        after 'greet' => sub { print "World!"; };
+
+        greet(); # prints Hello, World!
+
+  before
+    Very similar to "after", but calls the before subroutine, yes that's
+    right, before the original one.
+
+        sub bye { print "Bye!"; }
+
+        before 'bye' => sub { print "Good "; };
+
+        bye(); # prints Good Bye!
+
+    Fancy calling "before" on multiple subroutines? Sure. Just add them to
+    an array.
+
+        sub like {
+            my ($self, $what) = @_;
+        
+            print "I like $what\n";
+        }
+    
+        sub dislike {
+            my ($self, $what) = @_;
+        
+            print "I dislike $what\n";
+        }
+
+        before [qw( like dislike )] => sub {
+            my ($self, $name) = @_;
+
+            print "I'm going to like or dislike $name\n";
+        };
+
+  around
+    Around gives the user a bit more control over the subroutine. When you
+    create an around method the first argument will be the old method, the
+    second is $self and the third is any arguments passed to the original
+    subroutine. In a away this allows you to control the flow of the entire
+    subroutine.
+
+        sub greet {
+            my ($self, $name) = @_;
+
+            print "Hello, $name!\n";
+        }
+
+        # only call greet if any arguments were passed to Class->greet()
+        around 'greet' => sub {
+            my $method = shift;
+            my $self = shift;
+
+            $self->$method(@_)
+                if @_;
+        };
+
+  create
+    Creates a new subroutine into the current script or a class. It will not
+    allow you to override a subroutine.
+
+        create 'test' => sub { print "In test\n"; }
+        test;
+
+        Foo->create( hello => sub {
+            my ($self, $name) = @_;
+
+            print "Hello, $name!\n";
+        });
+
+  sub_alert
+    Very verbose: Adds a before hook modifier to every subroutine in the
+    package to let you know when a sub is being called. Great for debugging
+    if you're not sure a method is being ran.
+
+        __PACKAGE__->sub_alert;
+
+        # define a normal sub
+        sub test { return "World"; }
+
+        say "Hello, " . test(); # prints Hello, World but also lets you know 'test' in 'package' was called.
+
+  clone
+    Clones a subroutine from one class to another. Probably rarely used, but
+    the feature is there if you need it.
+
+        use ThisPackage;
+        use ThatPackage;
+
+        clone 'subname' => ( from => 'ThisPackage', to => 'ThatPackage' );
+
+        ThatPackage->subname; # duplicate of ThisPackage->subname
+
+  extends
+    To use "extends" you need to have ":Class" imported. This will extend
+    the given class thereby inheriting it into the current class.
+
+        package Foo;
+
+        sub baz { }
+
+        1;
+
+        package Fooness;
+
+        use Sub::Mage ':Class';
+        extends 'Foo';
+
+        override 'baz' => sub { say "Hello!" };
+        Foo->baz;
+
+        1;
+
+    The above would not have worked if we had not have extended 'Foo'. This
+    is because when we inheritted it, we also got access to its "baz"
+    method.
+
+  exports
+    Exporting subroutines is not generally needed or a good idea, so
+    Sub::Mage will only allow you to export one subroutine at a time. Once
+    you export the subroutine you can call it into the given package without
+    referencing the class of the subroutines package.
+
+        package Foo;
+    
+        use Sub::Mage;
+    
+        exports 'boo' => ( into => [qw/ThisClass ThatClass/] );
+        exports 'spoons' => ( into => 'MyClass' );
+
+        sub spoons { print "Spoons!\n"; }
+        sub boo { print "boo!!!\n"; }
+        sub test { print "A test\n"; }
+
+        package ThisClass;
+
+        use Foo;
+
+        boo(); # instead of Foo->boo;
+        test(); # this will fail because it was not exported
+
+  have
+    A pretty useless function, but it may be used to silently error, or
+    create custom errors for failed subroutines. Similar to
+    $class->can($method), but with some extra sugar.
+
+        package Foo;
+
+        use Sub::Mage;
+
+        sub test { }
+    
+        package MyApp;
+
+        use Sub::Mage qw/:5.010/;
+    
+        use Foo;
+    
+        my $success = sub {
+            my ($class, $name) = @_;
+      
+            say "$class\::$name checked out OK";  
+            after $class => sub {
+                say "Successfully ran $name in $class";
+            };
+        };
+
+        Foo->have( 'test' => ( then => $success ) );
+
+    On success the above will run whatever is in "then". But what about
+    errors? If this fails it will not do anything - sometimes you just want
+    silent deaths, right? You can create custom error handlers by using
+    "or". This parameter may take a coderef or a string.
+
+        package Foo;
+    
+        use Sub::Mage;
+
+        sub knife { }
+    
+        package MyApp;
+
+        use Sub::Mage qw/:5.010/;
+
+        use Foo;
+
+        my $error = sub {
+            my ($class, $name) = @_;
+
+            say "Oh dear! $class failed because no method $name exists";
+            # do some other funky stuff if you wish
+        };
+
+        Foo->have( 'spoon' => ( then => $success, or => $error ) );
+
+    Or you may wish for something really simply.
+
+        Foo->have( 'spoon' => ( then => $success, or => 'There is no spoon') );
+
+    This one will simply throw a warning with "warn" so to still execute any
+    following code you may have.
+
+  accessor
+    Simply creates an accessor for the current class. You will need to first
+    import ":Class" when using Sub::Mage before you can use "accessor". When
+    you create an accessor it adds the subroutine for you with the specified
+    default value. The parameter in the subroutine will cause its default
+    value to change to whatever that is.
+
+        package FooClass;
+
+        use Sub::Mage qw/:Class/;
+
+        accessor 'name' => 'World'; # creates the subroutine 'name'
+
+        1;
+
+        package main;
+
+        use FooClass;
+
+        my $foo = FooClass->new;
+        print "Hello, " . $foo->name; # prints Hello, World
+
+        $foo->name('Foo');
+    
+        print "Seeya, " . $foo->name; # prints Seeya, Foo
+
+  chainable
+    Another ":Class" only method is "chainable". It doesn't really do
+    anything you can't do yourself, but I find it helps to keep a visual of
+    your chains at the top of your code so you can see in plain sight where
+    they are leading you. Let's look at an example. As of 0.015 you can now
+    bless a different reference other than $self. Whatever you bless will be
+    "$self-"{option}>.
+
+        # test.pl
+
+        use Greeter;
+    
+        my $foo = Greeter->new;
+        print "Hello, " . $foo->greet('World')->hello;
+
+        # Greeter.pm
+        package Greeter;
+
+        use Greet::Class;
+        use Sub::Mage qw/:Class/;
+
+        chainable 'greet' => ( class => 'Greet::Class' );
+
+        sub greet {
+            my ($self, $name) = @_;
+            $self->{_name} = $name;
+        }
+
+        # Greet/Class.pm
+        package Greet;
+    
+        sub hello {
+            my $self = shift;
+
+            return $self->{_name};
+        }
+
+    If you don't want to bless the entire $self, use "bless".
+
+        chainable 'greet' => ( bless => '_source', class => 'Greet::Class' );
+
+        sub greet {
+            my $self = shift;
+
+            $self->{_source} = {
+                _name => $self->{_name},
+            };
+        }
+
+  has
+    Create a more advanced accessor similar to Moose (but not as cool). It
+    currently supports "is" and "default". Don't forget to import ":Class"
+
+        package Foo;
+
+        use Sub::Mage ':Class';
+
+        has name => ( is => 'rw' );
+        has x => ( is => 'ro', default => 7 );
+        print __PACKAGE__->x; # 7
+        __PACKAGE__->x(5); # BAD! It's Read-Only!!
+        __PACKAGE__->name('World'); # set and return 'World'
+
+  sub_run
+    Runs multiple subroutines in a class, with arguments if necessary. This
+    function takes two arrayrefs, the first being the subroutines you want
+    to run, and the last is the arguments to pass to each subroutine.
+
+        # MyApp.pm
+        package MyApp;
+        use Sub::Mage;
+
+        sub greet {
+            my ($self, $name) = @_;
+            print "Hello, $name!\n";
+        }
+
+        sub bye {
+            my ($self, $name, $where) = @_;
+            print "Bye, $name. I'm going $where\n";
+        }
+
+        # run.pl
+        use MyApp;
+        MyApp->sub_run(
+            [qw/greet bye/],
+            [qw/World home/]
+        );
+
+        # Hello, World!
+        # Bye, World. I'm going home
+
+  tag
+    Same sort of principle as "sub_alert" but a little more flexible. You
+    can "tag" a subroutine, or multiple subroutines using an arrayref and
+    give them a custom message when ran. If you group multiple subs they
+    will have the same message. Great for debugging.
+
+        use Sub::Mage;
+    
+        tag 'test' => 'Test was run!'
+
+        sub test { print "World"; }
+        test; # outputs 'Test was run!' then 'World'
+
+    You can call it from a remote package, too.
+
+        # Foo.pm
+        package Foo;
+    
+        use Sub::Mage;
+    
+        sub hello { print "hi"; }
+        sub bye   { print "goodbye"; }
+
+        # goose.pl
+    
+        use Foo;
+
+        Foo->tag( [qw(hello goodbye)], 'Tagged subroutines called' );
+
+        Foo->hello;
+        Foo->goodbye;
+
+    If you tag multiple subroutines, to avoid confusion Sub::Mage will
+    output the name of the subroutine in brackets at the end of the message.
+
+  constructor
+    Basically just "sub import". I wanted to keep the initialisation of a
+    module and the destruction of it same-ish.
+
+        constructor sub {
+            my ($class, $args) = @_;
+            print "$class has loaded\n";
+        };
+
+  destructor
+    Same as constructor, but is run when the module has finished.
+
+        destructor sub {
+            my $self = shift;
+            print "Module finished: $self->{some_var}\n";
+        };
+
+  sublist
+    Fetches an array of available subroutines in the current package.
+
+        foreach my $sub (sublist) {
+            print "Running $sub\n";
+            eval $sub;
+        }
+
+        my @subs = sublist;
+        print "Found " . scalar(@subs) . " subroutines\n";
+
+AUTHOR
+    Brad Haywood <brad@geeksware.net>
+
+LICENSE
+    You may distribute this code under the same terms as Perl itself.
+

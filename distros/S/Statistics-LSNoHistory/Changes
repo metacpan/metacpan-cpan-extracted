@@ -1,0 +1,6 @@
+Revision history for Perl extension Statistics::LSNoHistory.
+
+0.01  Sun Feb 16 11:18:17 2003
+	- original version; created by h2xs 1.21 with options
+		-X -n Statistics::LSNoHistory
+

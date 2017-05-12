@@ -1,0 +1,293 @@
+# Pegex grammar for the Swim markup language
+#
+#   Copyright 2014-2015. Ingy döt Net <ingy@ingy.net>
+#
+
+%grammar swim
+%version 0.0.2
+
+document: block-top*
+
+block-top:
+  | block-func
+  | block-blank
+  | block-comment
+  | line-comment
+  | block-rule
+  | block-meta
+  | block-head
+  | block-code
+  | block-pref
+  | block-list
+  | block-title
+  | block-verse
+  | block-para
+
+block-blank: line-blank
+
+block-func: /
+  LANGLE LANGLE LANGLE SPACE*
+  ( [ WORD DASH ]+ ) SPACE*
+  (:
+    ( ANY*?) SPACE*
+      |
+    EOL ( (: ANY* EOL )*? )
+  )
+  RANGLE RANGLE RANGLE EOL
+/
+
+block-comment: /
+  HASH{3} EOL
+  ( line*? )
+  HASH{3} END
+  line-blank?
+/
+
+line-comment: /
+  HASH SPACE? ( ANY*? ) END
+  line-blank?
+/
+
+block-rule: /
+  DASH{4} END
+  line-blank?
+/
+
+block-meta: /
+  DASH{3} EOL
+  ( ALL*? EOL | )
+  DOT{3} END
+  line-blank?
+/
+
+block-head: /
+  ( EQUAL{1,4} ) SPACE+ (:
+    ( ANY+? ) SPACE+ EQUAL+ END
+  | ( ANY+ EOL (: [^ WS ] ANY* EOL )* [^ WS ] ANY*? ) SPACE+ EQUAL+ END
+  | ( ANY+ EOL (: [^ WS ] ANY* EOL )*) (= [ marker-block-start ] | END )
+  ) line-blank?
+/
+
+block-code: /
+  BACK{3} EOL
+  ( line*? )
+  BACK{3} END
+  line-blank?
+/
+
+block-pref: /
+  (
+    (:
+      line-blank*
+      SPACE SPACE ANY* END
+    )+
+  )
+  line-blank?
+/
+
+block-list:
+  | block-list-bullet
+  | block-list-number
+  | block-list-data
+
+block-list-bullet: /(
+  line-list-item-bullet
+  (: line-list-item-bullet | line-blank | line-indented )*
+)/
+
+block-list-number: /(
+  line-list-item-number
+  (: line-list-item-number | line-blank | line-indented )*
+)/
+
+block-list-data: /(
+  line-list-item-data
+  (: line-list-item-data | line-blank | line-indented )*
+)/
+
+line-list-item-bullet: /
+  STAR SPACE ANY* END
+/
+
+line-list-item-number: /
+  PLUS SPACE ANY* END
+/
+
+line-list-item-data: /
+  DASH SPACE ANY* END
+/
+
+block-list-item: (
+  | block-blank
+  | block-comment
+  | line-comment
+  | block-head
+  | block-pref
+  | block-list
+  | block-title
+  | block-verse
+  | block-para
+)*
+
+line-indented: /
+  SPACE{2} ANY* END
+/
+
+block-title: /
+  ( text-line )
+  EQUAL{3,} EOL
+  (:
+    line-blank
+    ( text-line )
+    (= line-blank )
+  )?
+  line-blank?
+/
+
+block-verse: /
+  DOT EOL
+  ( text-line+ )
+  line-blank?
+/
+
+block-para: /
+  ( text-line+ )
+  line-blank?
+/
+
+text-markup: phrase-markup+
+
+phrase-markup:
+  | phrase-text
+  | marker-escape
+  | phrase-meta
+  | phrase-func
+  | phrase-code
+  | phrase-bold
+  | phrase-emph
+  | phrase-del
+  | phrase-under
+  | phrase-hyper
+  | phrase-link
+  | marker-next
+
+marker-escape: / BACK ( ANY ) /
+
+phrase-text: /
+  (
+    (: (! [ marker-phrase-start ] |https? COLON ) ALL)+
+  )
+/
+
+phrase-code: /
+  marker-code
+  ( [^ marker-code]*? )
+  marker-code
+/
+
+# This is just a special case of phrase-func.
+# Should be removed and handled there.
+phrase-meta: /
+  marker-pfunc-start '$'
+  ( [^ marker-pfunc-end]+ )
+  marker-pfunc-end
+/
+
+phrase-func: /
+  marker-pfunc-start
+  ( [^ marker-pfunc-end]+ )
+  marker-pfunc-end
+/
+
+phrase-bold:
+  / marker-bold (= NS) (! marker-bold) /
+  ( !marker-bold phrase-markup )+
+  marker-bold
+
+phrase-emph:
+  / marker-emph (= NS) (! marker-emph) /
+  ( !marker-emph phrase-markup )+
+  marker-emph
+
+phrase-del:
+  / marker-del (= NS) (! marker-del) /
+  ( !marker-del phrase-markup )+
+  marker-del
+
+phrase-under:
+  / marker-under (= NS) (! marker-under) /
+  ( !marker-under phrase-markup )+
+  marker-under
+
+phrase-hyper:
+  | phrase-hyper-named
+  | phrase-hyper-explicit
+  | phrase-hyper-implicit
+
+phrase-hyper-named: /
+  DOUBLE ( [^ DOUBLE ]+ ) DOUBLE
+  LSQUARE (https?: NS*? ) RSQUARE
+/
+
+phrase-hyper-explicit: /
+  LSQUARE (https?: NS*? ) RSQUARE
+/
+
+phrase-hyper-implicit: /(https? COLON NS+)/
+
+phrase-link:
+  | phrase-link-named
+  | phrase-link-plain
+
+phrase-link-named: /
+  DOUBLE ( [^ DOUBLE ]+ ) DOUBLE
+  LSQUARE ( NS*? ) RSQUARE
+/
+
+phrase-link-plain: /
+  LSQUARE ( NS*? ) RSQUARE
+/
+
+marker-next: / ( ALL ) /
+
+line: / (: ANY* END ) /
+
+text-line: / (: (! [ marker-block-start NL ] SPACE) ANY* NS ANY* END ) /
+
+line-blank: / (: SPACE+ END | EOL ) /
+
+END: / (: EOL | EOS ) /
+
+marker-block-start: /
+  marker-pref
+  marker-list
+  marker-head
+  marker-comment
+/
+
+marker-phrase-start: /
+  marker-pfunc-start
+  marker-code
+  marker-bold
+  marker-emph
+  marker-del
+  marker-under
+  marker-link
+  marker-esc
+/
+
+marker-pref: / SPACE /
+marker-list: / STAR /
+marker-head: / EQUAL /
+marker-comment: / HASH /
+marker-pfunc-start: / LANGLE /
+marker-pfunc-end: / RANGLE /
+marker-code: / GRAVE /
+marker-bold: / STAR /
+marker-emph: / SLASH /
+marker-del: / DASH DASH /
+marker-under: / UNDER /
+marker-link: / DOUBLE LSQUARE /
+marker-esc: / BACK /
+
+# vim: set lisp sw=2:

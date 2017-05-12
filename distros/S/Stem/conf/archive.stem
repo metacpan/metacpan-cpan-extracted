@@ -1,0 +1,66 @@
+# archive.stem
+#
+[
+	class	=>	'Stem::Console',
+],
+[
+	'class'	=>	'Stem::Hub',
+	'name'	=>	'archive',
+	'args'	=>	[],
+],
+[
+	'class'	=>	'Stem::Portal',
+	'args'	=>	[
+		'server'	=> 1,
+	],
+],
+[
+	'class'	=>	'Stem::Log',
+	'args'	=>	[
+
+		'name'		=> 'bar',
+
+		'file'		=> [
+			'path'		=> 'tail/bar.log',
+		],
+
+		'filters'	=> [
+			file	=> 1,
+			forward	=> [ 'bar_stdout' ],
+		],
+
+	],
+],
+[
+	'class'	=>	'Stem::Log',
+	'args'	=>	[
+
+		'name'		=> 'bar_stdout',
+		'format'	=> '%f [%L][%l] %T',
+		'strftime'	=> '%D %T',
+		'filters'	=> [
+			'env_gt_level'	=> 'bar_stdout',
+			stdout	=> 1,
+		],
+	],
+],
+[
+	'class'	=>	'Stem::Log',
+	'args'	=>	[
+
+		'name'		=> 'bar_status',
+
+		'file'		=> [
+			'path'		=> 'tail/bar_status.log',
+		],
+
+		'format'	=> '[%f]%h:%H:%P - %T',
+		'strftime'	=> '%T',
+		'filters'	=> [
+			file	=> 1,
+			'env_gt_level'	=> 'bar_status',
+#			stdout	=> 1,
+			console	=> 1,
+		],
+	],
+],

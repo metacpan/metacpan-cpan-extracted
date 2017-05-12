@@ -1,0 +1,53 @@
+{
+   "abstract" : "Yet another method signatures system",
+   "author" : [
+      "Gennadiy Filatov <gfilatov@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Salvation-Method-Signatures",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "B" : "0",
+            "Devel::Declare" : "0",
+            "Module::Load" : "0",
+            "Salvation::TC" : "0.12",
+            "Salvation::UpdateGvFLAGS" : "0",
+            "boolean" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/kainwinterheart/salvation-method-signatures.git",
+         "web" : "https://github.com/kainwinterheart/salvation-method-signatures"
+      }
+   },
+   "version" : "0.04"
+}

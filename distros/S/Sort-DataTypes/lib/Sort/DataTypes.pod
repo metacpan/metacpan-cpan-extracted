@@ -1,0 +1,908 @@
+=pod
+
+=head1 NAME
+
+Sort::DataTypes - Sort a list of data using methods relevant to the type of data
+
+=head1 SYNOPSIS
+
+   use Sort::DataTypes qw(:all);
+
+=head1 DESCRIPTION
+
+This module allows you to sort a list of data elements using methods
+that are relevant to the type of data contained in the list. This
+modules does not attempt to be the fastest sorter on the block. If you
+are sorting thousands of elements and need a lot of speed, you should
+refer to a module specializing in the specific type of sort you will
+be doing. However, to do smaller sorts of different types of data,
+this is the module to use.
+
+=head1 TYPES OF SORT METHODS
+
+When sorting a list of elements, the elements are taken two at a time
+and compared using some comparison function or operator. For example,
+if you are comparing two strings alphabetically, the perl 'cmp'
+operator is used to compare two strings.  The power of this module is
+that the comparison can be done in a way that is relevant to the type
+of data (for example, when comparing dates, it can determine which is
+earlier, or when sorting a list of IP numbers, it knows how to compare
+two different IPs).
+
+There are serveral types of sort methods which determine how the
+comparison will be done:
+
+=over 4
+
+=item B<Unambiguous Methods>
+
+Unambiguous sort methods are those which unambiguously determine the
+order of two elements in all cases.
+
+As an example, an alphabetic sort is unambiguous. It takes the entire
+string of both elements and compares them and the order is well
+defined.
+
+=item B<Ambiguous Methods>
+
+Ambiguous methods are methods which compare the content of the two
+elements but are not able to determine the relative order in all
+situations.  In these situations, additional sort methods may be used
+to refine the comparison.
+
+As an example, if you sort strings by length, there is an unambiguous
+order when comparing a string of length 3 to one of length 4, but if
+you have two strings of the same length, a secondary sort method may
+be used to determine the order of these elements.
+
+=item B<Split-Element Methods>
+
+Split-element methods are used to split an element into pieces, and
+two different elements are compared by comparing the individual
+pieces.
+
+As an example, if you are sorting domain names, you would first split
+the domain name into a list of subdomains (i.e. foo.bar.com contains
+the subdomains foo, bar, and com) and then each subdomain is sorted
+separately.
+
+These elements require at least three pieces of information.  1) They
+need information on how to split the element into pieces.  2) They
+need to know whether the pieces are left most significant (LMS) or
+right most significant (RMS).  In other words, whether to sort the
+pieces from left to right or right to left.  3) They need sorting
+information about how to compare individual pieces of two elements.
+
+=item B<Partial-Element Methods>
+
+Partial-element methods are methods which work with only a portion of
+the element. These require two types of information. 1) They require
+some information about what portion of the element to sort on. 2) They
+requires information about how to compare those subelements.
+
+As an example, you might sort a list of lines of text based on the Nth
+field in each line.  So the first information required will be used to
+determine how to find the Nth field. The second information will be
+the actual sort method to use for ordering those fields.
+
+=back
+
+=head1 USING SORT ROUTINES
+
+All sort routines are named sort_METHOD where METHOD is the name of
+the method. All sort_METHOD have both a forward and reverse sort:
+
+   $flag = sort_METHOD(\@list [,@args]);
+   $flag = sort_rev_METHOD(\@list [,@args]);
+
+where B<@args> are any additional arguments used for the sort.  These
+will be described below.
+
+Corresponding to every sort_METHOD routine is a cmp_METHOD routine
+which takes two elements and returns a -1, 0, or 1 (similar to
+the cmp or <=> operators).
+
+   $flag = cmp_METHOD($x,$y [,@args]);
+   $flag = cmp_rev_METHOD($x,$y [,@args]);
+
+Finally, there is an alternate way to do the sort/comparison:
+
+   $flag = sort_by_method('METHOD',    \@list [,@args]);
+   $flag = sort_by_method('rev_METHOD',\@list [,@args]);
+
+   $flag = cmp_by_method('METHOD',    \@list [,@args]);
+   $flag = cmp_by_method('rev_METHOD',\@list [,@args]);
+
+As an example, the following two calls are identical:
+
+   $flag = sort_alphabetic(\@list);
+   $flag = sort_by_method('alphabetic',\@list);
+
+The value of B<$flag> for a sort method is undef (if there is an
+error) or 1 if the sort succeeds (and in this case, B<@list> has been
+reordered to be in the sorted order).  The value of B<$flag> for a cmp
+method is undef (if there is an error) or -1, 0, or 1.
+
+The contents of B<@args> depends on the type of sort method and
+are described in the sections below.
+
+=head1 UNAMBIGUOUS METHODS
+
+As described above, unambiguous methods do not use any secondary sort
+methods.  For each of these sort methods, the contents of B<@args>
+are:
+
+   @args = (@method_args, $hash)
+
+and for cmp methods, the contents of B<@args> are:
+
+   @args = (@method_args)
+
+B<@method_args> is a list of arguments that will be passed to the
+method.  Most unambiguous methods do not require any additional
+arguments, but if they do, they would be here.  The list of possible
+arguments are described in the documentation for each method.
+
+B<$hash> is an optional hash reference.  All sort_METHOD functions can
+be used to sort a list using a hash.  For example, in the following
+case:
+
+   @list = qw(foo bar ick);
+   %hash = ( foo => 3, bar => 5, ick => 1 );
+
+   sort_numerical(\@list,\%hash);
+
+would result in B<@list> containing:
+
+   (ick, foo, bar)
+
+since those correspond to numerical values of (1,3,5) respectively.
+
+Each element in B<@list> must be a key in B<%hash>, and the value of
+that key must be of the appropriate type.
+
+The following methods are supported:
+
+=over 4
+
+=item B<sort_numerical>
+
+=item B<sort_rev_numerical>
+
+=item B<cmp_numerical>
+
+=item B<cmp_rev_numerical>
+
+   use Sort::DataTypes qw(:all)
+
+   $flag = sort_numerical(\@list [,@args]);
+   $flag = sort_rev_numerical(\@list [,@args]);
+
+   $flag = cmp_numerical($x,$y [,@args]);
+   $flag = cmp_rev_numerical($x,$y [,@args]);
+
+These sort/compare numbers.  There is little reason to use any of these
+routines since it would be more efficient to simply call sort as:
+
+   sort { $a <=> $b } @list
+
+but they are included for the sake of completeness, and to make them
+available for use by the sort_by_method and cmp_by_method
+routines.
+
+=item B<sort_alphabetic>
+
+=item B<sort_rev_alphabetic>
+
+=item B<cmp_alphabetic>
+
+=item B<cmp_rev_alphabetic>
+
+   use Sort::DataTypes qw(:all)
+
+   $flag = sort_alphabetic(\@list [,@args]);
+   $flag = sort_rev_alphabetic(\@list [,@args]);
+
+   $flag = cmp_alphabetic($x,$y [,@args]);
+   $flag = cmp_rev_alphabetic($x,$y [,@args]);
+
+These sort/compare strings alphabetically. As with numerical sorts,
+there is little reason to call these, and they are included for the
+sake of completeness.
+
+=item B<sort_alphanum>
+
+=item B<sort_rev_alphanum>
+
+=item B<cmp_alphanum>
+
+=item B<cmp_rev_alphanum>
+
+   use Sort::DataTypes qw(:all)
+
+   $flag = sort_alphanum(\@list [,@args]);
+   $flag = sort_rev_alphanum(\@list [,@args]);
+
+   $flag = cmp_alphanum($x,$y [,@args]);
+   $flag = cmp_rev_alphanum($x,$y [,@args]);
+
+These do numeric sort/comparison if two elements are numeric (integer or real)
+and alphabetic sorts otherwise.
+
+=item B<sort_random>
+
+=item B<sort_rev_random>
+
+=item B<cmp_random>
+
+=item B<cmp_rev_random>
+
+   use Sort::DataTypes qw(:all)
+
+   $flag = sort_random(\@list [,@args]);
+   $flag = sort_rev_random(\@list [,@args]);
+
+   $flag = cmp_random($x,$y [,@args]);
+   $flag = cmp_rev_random($x,$y [,@args]);
+
+This randomly shuffles an array in place.
+
+The sort_random and sort_rev_random routines are identical, and are
+included simply for the situation where the sort routines are being
+called in some automatically generated code that may add the 'rev_'
+prefix.
+
+The cmp_random and cmp_rev_random routines simply returns a random -1,
+0, or 1.
+
+=item B<sort_version>
+
+=item B<sort_rev_version>
+
+=item B<cmp_version>
+
+=item B<cmp_rev_version>
+
+   use Sort::DataTypes qw(:all)
+
+   $flag = sort_version(\@list [,@args]);
+   $flag = sort_rev_version(\@list [,@args]);
+
+   $flag = cmp_version($x,$y [,@args]);
+   $flag = cmp_rev_version($x,$y [,@args]);
+
+These sort a list of version numbers of the form MAJOR.MINOR.SUBMINOR ...
+(any number of levels are allowed). The following examples should illustrate
+the ordering:
+
+   1.1.x < 1.2 < 1.2.x  Numerical versions are compared first at
+                        the highest level, then at the next highest,
+                        etc. The first non-equal compare sets the
+                        order.
+   1.a < 1.b            Alphanumeric levels that start with a letter
+                        are compared alphabetically.
+   1.2a < 1.2 < 1.03a   Alphanumeric levels that start with a number
+                        are first compared numerically with only the
+                        numeric part. If they are equal, alphanumeric
+                        levels come before purely numerical levels.
+                        Otherwise, they are compared alphabetically.
+   1.a < 1.2a           An alphanumeric level that starts with a letter
+                        comes before one that starts with a number.
+   1.01a < 1.1a         Two alphanumeric levels that are numerically
+                        equal in the number part and equal in the
+                        remaining part are compared alphabetically.
+
+=item B<sort_date>
+
+=item B<sort_rev_date>
+
+=item B<cmp_date>
+
+=item B<cmp_rev_date>
+
+   use Sort::DataTypes qw(:all)
+
+   $flag = sort_date(\@list [,@args]);
+   $flag = sort_rev_date(\@list [,@args]);
+
+   $flag = cmp_date($x,$y [,@args]);
+   $flag = cmp_rev_date($x,$y [,@args]);
+
+These sort/compare a list of dates. Dates are anything that can be parsed
+with Date::Manip.
+
+It should be noted that the dates will only be parsed a single time,
+so it is not necessary to pre-parse them for performance reasons.
+
+=item B<sort_ip>
+
+=item B<sort_rev_ip>
+
+=item B<cmp_ip>
+
+=item B<cmp_rev_ip>
+
+   use Sort::DataTypes qw(:all)
+
+   $flag = sort_ip(\@list [,@args]);
+   $flag = sort_rev_ip(\@list [,@args]);
+
+   $flag = cmp_ip($x,$y [,@args]);
+   $flag = cmp_rev_ip($x,$y [,@args]);
+
+These sort/compare IP numbers. Each value can be a pure IP (in the form A.B.C.D)
+or a CIDR notation which includes the netmask (A.B.C.D/MASK).
+
+When comparing CIDR representations, if the IP part of two elements is identical,
+the following two rules are used:
+
+   an element without a mask comes before one that has a mask
+
+   two elements with masks are sorted by mask
+
+So the following elements are in sorted order:
+
+   10.20.30.40 < 10.20.30.40/4 < 10.20.30.40/16
+
+=item B<sort_nosort>
+
+=item B<sort_rev_nosort>
+
+=item B<cmp_nosort>
+
+=item B<cmp_rev_nosort>
+
+   use Sort::DataTypes qw(:all)
+
+   $flag = sort_nosort(\@list [,@args]);
+   $flag = sort_rev_nosort(\@list [,@args]);
+
+   $flag = cmp_nosort($x,$y [,@args]);
+   $flag = cmp_rev_nosort($x,$y [,@args]);
+
+These leave the list unchanged.  This primarily useful as an alternative sort method
+if you do not wish to sort beyond a method that is ambiguous.
+
+=item B<sort_function>
+
+=item B<sort_rev_function>
+
+=item B<cmp_function>
+
+=item B<cmp_rev_function>
+
+   use Sort::DataTypes qw(:all)
+
+   $flag = sort_function(\@list [,@args]);
+   $flag = sort_rev_function(\@list [,@args]);
+
+   $flag = cmp_function($x,$y [,@args]);
+   $flag = cmp_rev_function($x,$y [,@args]);
+
+This is a catch-all sort function. B<@method_args> contains a single
+argument.  It is either a coderef or the name of a function suitable
+to compar two elements and return -1, 0, or 1 depending on the order
+of the elements.
+
+The following both work:
+
+   $flag = sort_function(\@list,\&somefunc);
+   $flag = sort_function(\@list,"somefunc");
+
+If the function is passed in by name, it must be in the calling programs
+namespace OR it must be passed in as a fully specified function name including
+package (i.e. "package::functionname").
+
+=back
+
+=head1 AMBIGUOUS METHODS
+
+As described above, ambiguous methods do use a secondary sort methods.
+For these sort methods, the contents of B<@args> are:
+
+   @args = (@method_args, $hash, @extra_cmp_info)
+
+and for cmp methods, the contents of B<@args> are:
+
+   @args = (@method_args, @extra_cmp_info)
+
+B<@method_args> and B<$hash> are similar to those described above for
+unambiguous methods.
+
+The contents of B<@extra_cmp_info> are:
+
+   @extra_cmp_info  = ( [$method, @method_args],
+                        [$method, @method_args],
+                        ...
+                      )
+
+Since an ambiguous method cannot always determine the order of two
+elements, a backup method (or methods) may be specified.  The backup
+sort method contains a method name (B<$method>) and any arguments
+required for that method.  The method must be either ambiguous or
+unambiguous.  If it is ambiguous, an additional backup method may be
+used.  If a method is unambiguous, no additional sort methods should
+be included.
+
+If a backup method is not supplied for an ambiguous method, a default
+method will be used (typically alphabetic).
+
+For the example where you sort strings by length, if you want to sort
+all elements of the same length randomnly, you could use the following
+sort:
+
+   sort_length(\@list, ['random']);
+
+The following methods are supported:
+
+=over 4
+
+=item B<sort_length>
+
+=item B<sort_rev_length>
+
+=item B<cmp_length>
+
+=item B<cmp_rev_length>
+
+   use Sort::DataTypes qw(:all)
+
+   $flag = sort_length(\@list [,@args]);
+   $flag = sort_rev_length(\@list [,@args]);
+
+   $flag = cmp_length($x,$y [,@args]);
+   $flag = cmp_rev_length($x,$y [,@args]);
+
+These take strings and compare them by length. If they are the same length, it sorts them
+by a secondary method (which defaults to 'alphabetic').
+
+=back
+
+=head1 SPLIT-ELEMENT METHODS
+
+As described above, split-element methods split an element into
+pieces, and each of the pieces are compared separately using a
+secondary sort method.
+
+For these sort methods, the contents of B<@args> are:
+
+   @args = (@method_args, $hash, @extra_sort_info)
+
+and for cmp methods, the contents of B<@args> are:
+
+   @args = (@method_args, @extra_cmp_info)
+
+B<@method_args> and B<$hash> are similar to those described for
+unambiguous methods.
+
+A split-element method is not truly a sort method.  It is simply
+a method for splitting an element into parts.  Then, every part
+must be sorted.
+
+As such, every split-element method will use other sort methods
+for actually sorting the pieces.  If no B<@extra_sort_info> or
+B<@extra_cmp_info> is supplied, it will typically default to
+alphabetic sort.
+
+If other sort methods are supplied, any other ambiguous, or
+unambiguous method may be supplied.
+
+It should be understood that all pieces are compared using the same
+sort methods.  In other words, you cannot split an element into pieces
+and compare the first set alphabetically, the second numerically, and
+the third as dates.  To do this, you have to use the partial-element
+methods described next.
+
+Another note is that if a piece is empty in one element and not in the
+other, the empty one will sort before the filled one (unless a reverse
+sort is being done).
+
+Once the element is split into pieces, they may be compared starting
+at the leftmost piece:
+
+  a:b:c < a:c:d
+
+or starting at the rightmost piece:
+
+  c:b:a < a:b:c
+
+It should be noted that if an element is missing a piece, it will
+always come BEFORE an element that has the piece (unless it's a
+reverse sort in which case it will come after.
+
+As an example, if you are sorting strings containing colon separated
+pieces, the following order will be used:
+
+   a::c < a:c:d
+
+since the second piece is missing in the first element.  Likewise:
+
+   a:b < a:b:c
+
+since the third piece is missing in the first element.
+
+The following split-element methods exist:
+
+=over 4
+
+=item B<sort_split>
+
+=item B<sort_rev_split>
+
+=item B<cmp_split>
+
+=item B<cmp_rev_split>
+
+   use Sort::DataTypes qw(:all)
+
+   $flag = sort_split(\@list [,@args]);
+   $flag = sort_rev_split(\@list [,@args]);
+
+   $flag = cmp_split($x,$y [,@args]);
+   $flag = cmp_rev_split($x,$y [,@args]);
+
+The B<@method_args> segments of the arguments contain two optional
+arguments.
+
+The first argument is either 'lms' or 'rms' (all options are case
+sensitive, so they must be entered lowercase).  If 'lms' is given,
+pieces are sorted starting at the left.  If 'rms' is given, they are
+sorted from the right.  'lms' is the default.
+
+The second argument is a regexp.  It can be passed in as a string that
+will be turned into a regular expression, or as an actaul
+regexp, so one argument could be either of:
+
+   \s+
+   qr/\s+/
+
+If no regexp is passed in, it defaults to
+
+   qr/\s+/
+
+=back
+
+The following functions are also included for backward compatibility with
+previous versions of this module.
+
+These are deprecated, and may be removed at some point in the
+future.
+
+These can all be done trivially with the B<split> functions listed
+above (and all are coded as wrappers around those functions), so
+slightly better performance can be obtained by using the B<split>
+functions directly.
+
+=over 4
+
+=item B<sort_domain>
+
+=item B<sort_rev_domain>
+
+=item B<cmp_domain>
+
+=item B<cmp_rev_domain>
+
+   use Sort::DataTypes qw(:all)
+
+   $flag = sort_domain(\@list [,@args]);
+   $flag = sort_rev_domain(\@list [,@args]);
+
+   $flag = cmp_domain($x,$y [,@args]);
+   $flag = cmp_rev_domain($x,$y [,@args]);
+
+Domain sorting is equivalent to split-element sorting with the priority of 'rms'
+and a regular expression of qr/\./ .  In other words, the following are equivalent:
+
+   $flag = sort_domain(\@list);
+   $flag = sort_split(\@list,'rms',qr/\./);
+
+A single argument can be passed in in B<@method_args> containing an alternate
+regular expression if the elements should be split on something other than dots,
+but the priority will always be 'rms'.
+
+Since the most significant subvalue in the domain is at the right, any
+domain ending with ".com" would come before any domain ending in ".edu".
+
+   a.b < z.b < a.bb < z.bb < a.c
+
+=item B<sort_numdomain>
+
+=item B<sort_rev_numdomain>
+
+=item B<cmp_numdomain>
+
+=item B<cmp_rev_numdomain>
+
+   use Sort::DataTypes qw(:all)
+
+   $flag = sort_numdomain(\@list [,@args]);
+   $flag = sort_rev_numdomain(\@list [,@args]);
+
+   $flag = cmp_numdomain($x,$y [,@args]);
+   $flag = cmp_rev_numdomain($x,$y [,@args]);
+
+A related type of sorting is numdomain sorting. This is identical to
+domain sorting except that if two elements in the domain are numerical,
+numerical sorts will be done. So:
+
+  a.2.c < a.11.c
+
+It should be noted that if a field may be either numeric or alphanumeric,
+sorting with this method may yield unexpected results. For example, sorting
+the three elements:
+
+  a.1.b
+  a.2.b
+  a.X.b
+
+will use numeric comparisons when comparing the 2nd field of the first
+and second elements, but it will use alphabetic comparisons when
+comparing the first and third elements (or the second and third
+elements).
+
+=item B<sort_path>
+
+=item B<sort_rev_path>
+
+=item B<cmp_path>
+
+=item B<cmp_rev_path>
+
+   use Sort::DataTypes qw(:all)
+
+   $flag = sort_path(\@list [,@args]);
+   $flag = sort_rev_path(\@list [,@args]);
+
+   $flag = cmp_path($x,$y [,@args]);
+   $flag = cmp_rev_path($x,$y [,@args]);
+
+Path sorting is equivalent to split-element sorting with the priority of 'lms'
+and a regular expression of qr/\// .  In other words, the following are equivalent:
+
+   $flag = sort_path(\@list);
+   $flag = sort_split(\@list,'lms',qr/\//);
+
+A single argument can be passed in in B<@method_args> containing an alternate
+regular expression if the elements should be split on something other than slashes,
+but the priority will always be 'lms'.
+
+Since the most significant element in the domain is at the left, you
+get the following behavior:
+
+   a/b < a/z < aa/b < aa/z < b/b
+
+When sorting lists that have a mixture of relative paths and
+explicit paths, the explicit paths will come first. So:
+
+   /b/c < a/b
+
+=item B<sort_numpath>
+
+=item B<sort_rev_numpath>
+
+=item B<cmp_numpath>
+
+=item B<cmp_rev_numpath>
+
+   use Sort::DataTypes qw(:all)
+
+   $flag = sort_numpath(\@list [,@args]);
+   $flag = sort_rev_numpath(\@list [,@args]);
+
+   $flag = cmp_numpath($x,$y [,@args]);
+   $flag = cmp_rev_numpath($x,$y [,@args]);
+
+A related type of sorting is numpath sorting. This is identical to
+path sorting except that if two elements in the path are numbers,
+numerical sorts will be done. So:
+
+   a/2/c < a/11/c
+
+=back
+
+=head1 PARTIAL-ELEMENT METHODS
+
+Partial-element sorting is, as described above, to split the element into fields
+and then compare based on the Nth field.  In addition, you are allowed to sort
+one field in one way, and a second field in an entirely different way.
+
+For example, you could sort lines of the format:
+
+   2010-01-30  Smith  John
+   2010-01-30  Smith  Adam
+
+first by date (the 1st field), alphabetically by last name (2nd field), and
+alphabetically by first name (3rd field).
+
+For these sort/cmp methods, the contents of B<@args> are:
+
+   @args = ( $sep, [@field_args], [@field_args], ...)
+
+B<$sep> is a regular expression used to split an element into fields.  It can
+be entered as either a regular expression or a string that is turned into a regular
+expression:
+
+   qr/\s+/
+   \s+
+
+It is optional, and defaults to qr/\s+/ (i.e. split on whitespace).
+
+B<@field_args> describes how to sort one of the fields.  It is of the
+form:
+
+   @field_args = ( $n, $hash, @extra_cmp_info )
+
+where B<$n> is an integer and tells which field to sort (fields start
+at 0), $hash is an optional hashref to use for this field (it's keys
+are the values of the field, NOT the values of the element), and
+B<@extra_cmp_info> is described in the ambiguous methods section
+above:
+
+   @extra_cmp_info  = ( [$method, @method_args],
+                        [$method, @method_args],
+                        ...
+                      )
+Sort methods must be either ambiguous or unambiguous.
+
+To sort the above example (by date, last name, and first name), you could use:
+
+   $flag = sort_partial(\@list, qr/\s+/, [1, ['date']],
+                                         [2, ['alphabetic']],
+                                         [3, ['alphabetic']]);
+
+=over 4
+
+=item B<sort_partial>
+
+=item B<sort_rev_partial>
+
+=item B<cmp_partial>
+
+=item B<cmp_rev_partial>
+
+   use Sort::DataTypes qw(:all)
+
+   $flag = sort_partial(\@list [,@args]);
+   $flag = sort_rev_partial(\@list [,@args]);
+
+   $flag = cmp_partial($x,$y [,@args]);
+   $flag = cmp_rev_partial($x,$y [,@args]);
+
+This is the basic partial-element sort routine.
+
+=back
+
+The following functions are also included for backward compatibility with
+previous versions of this module.
+
+These are deprecated, and may be removed at some point in the
+future.
+
+These can all be done trivially with the B<partial> functions listed above (and
+all are coded as wrappers around those functions), so slightly better performance
+can be obtained by using the B<split> functions directly.
+
+=over 4
+
+=item B<sort_line>
+
+=item B<sort_rev_line>
+
+=item B<cmp_line>
+
+=item B<cmp_rev_line>
+
+   use Sort::DataTypes qw(:all)
+
+   $flag = sort_line(\@list,$n [,$sep,] [,\%hash]);
+   $flag = sort_rev_line(\@list,$n [,$sep] [,\%hash]);
+
+   $flag = cmp_line($x,$y,$n [,$sep]);
+   $flag = cmp_rev_line($x,$y,$n [,$sep]);
+
+These take a list of lines and sort on the Nth field using $sep as the
+regular expression splitting the lines into fields. Fields are
+numbered starting at 0.  If no $sep is given, it defaults to white
+space.
+
+This is included for backward compatibility only and does not allow sorting
+on more than one field, or specifying the sort method for that field.
+It is recommended that you use the B<partial> methods above.
+
+=item B<sort_numline>
+
+=item B<sort_rev_numline>
+
+=item B<cmp_numline>
+
+=item B<cmp_rev_numline>
+
+   use Sort::DataTypes qw(:all)
+
+   $flag = sort_numline(\@list,$n [,$sep,] [,\%hash]);
+   $flag = sort_rev_numline(\@list,$n [,$sep] [,\%hash]);
+
+   $flag = cmp_numline($x,$y,$n [,$sep]);
+   $flag = cmp_rev_numline($x,$y,$n [,$sep]);
+
+These are similar but will sort numerically if the Nth field is
+numerical, and alphabetically otherwise.
+
+=back
+
+=head1 MISC. ROUTINES
+
+=over 4
+
+=item B<sort_valid_method>
+
+=item B<cmp_valid_method>
+
+   use Sort::DataTypes qw(:all)
+
+   $flag = sort_valid_method($string);
+   $flag = cmp_valid_method($string);
+
+These are identical and return 1 if there is a valid sort method named
+$string in the module. For example, there is a function
+"sort_numerical" defined in this modules, but there is no function
+"sort_foobar", so the following would occur:
+
+   sort_valid_method("numerical")
+      => 1
+
+   sort_valid_method("rev_numerical")
+      => 1
+
+   sort_valid_method("foobar")
+      => 0
+
+Note that the methods must NOT include the "sort_" or "cmp_" prefix, but
+the "rev_" prefix is allowed as shown in the example.
+
+=item B<sort_by_method>
+
+=item B<cmp_by_method>
+
+   use Sort::DataTypes qw(:all)
+
+   $flag = sort_by_method($method,\@list [,@args]);
+   $flag = cmp_by_method ($method,$ele1,$ele2 [,@args]);
+
+These sort a list, or compare two elements, using the given method
+(which is any string which returns 1 when passed to
+sort_valid_method).
+
+If the method is not valid, the list is left untouched.
+
+=back
+
+=head1 BACKWARDS INCOMPATIBILITIES
+
+The following are a list of backwards incompatibilities.
+
+=over 4
+
+=item B<Version 2.00 handling of hashes>
+
+In version 1.xx, when sorting by hash, the hash was passed in
+as the hash. As of 2.00, it is passed in by reference to avoid
+any confusion with optional arguments.
+
+=back
+
+=head1 KNOWN PROBLEMS
+
+None at this point.
+
+=head1 LICENSE
+
+This script is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sullivan Beck (sbeck@cpan.org)
+
+=cut

@@ -1,0 +1,24 @@
+String/BitCount version 1.12
+============================
+
+The String::BitCount module for perl5 may be used to determine the number
+of 'one bits' in strings and to show the number of bits in each byte of a
+string. Only code points in the range 0x00 .. 0xFF are allowed.
+
+
+To install this module type the following:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+Copyright (C) 1995, 1996, 2003 Winfried Koenig
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+-- 
+Winfried Koenig, Arendsstrasse 12, 63075 Offenbach, Germany
+Phone: +49 69 868707,  Mail: <w.koenig@acm.org>

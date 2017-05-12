@@ -1,0 +1,34 @@
+Search-WuManber version 0.02
+============================
+
+See also Text::Scan, Algorithm::AhoCorasick, Algorithm::RabinKarp
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Compile-time option STIEBE_EXAMPLE should be switched to 0 in WuManber.xs
+for production strength code. 
+STIEBE_EXAMPLE=1:
+  Use simple hash functions suitable for demonstration with an alphabet [0,1,2,3,4]
+STIEBE_EXAMPLE=0:
+  Use has functions optimized for ascii-text or random byte strings (alphabet [0 .. 255]).
+
+DEPENDENCIES
+
+This module requires no other modules or libraries.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Juergen Weigert
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl (version 5.8.8) itself.
+
+

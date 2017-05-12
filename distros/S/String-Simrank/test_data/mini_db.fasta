@@ -1,0 +1,12 @@
+>stringM | 33-char | 30 4-mers
+Man does not live by bread alone.
+>StringW | 35-char | 32 4-mers, 30 shared with stringM, 30of30=100.00% 
+Woman does not live by bread alone.
+>stringF | 37-char | 34 4-mers, 27 shared with stringM, 27of30=90.00% | to stringW 27of32=84.38
+Manfred does not live by bread alone.
+>stringA | 13-char | 10 unique 4-mers
+AAAACCCGGGTTT
+>stringA2 | 14-char | 10 unique 4-mers, should appear identical to stringA
+AAAAACCCGGGTTT
+>stringC | 13-char | 10 4-mers, 9 of 10 shared with stringA and stringA2
+CAAACCCGGGTTT

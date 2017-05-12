@@ -1,0 +1,8 @@
+    <div class="yui-b">
+      <div id="sidebar">
+
+% for my $comp ( @{ $m->request_comp()->attr('sidebar') } ) {
+      <& $comp . '.mas', %ARGS, sidebar => 1 &>
+% }
+      </div>
+    </div>

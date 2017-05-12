@@ -1,0 +1,22 @@
+# Test of sending a Transfer/Contact (which isn't allowed)
+
+template: transfer-contact.tt
+
+vars:
+  contact_id: sh8013
+  pw:
+
+input_assertions:
+  class: SRS::EPP::Command::Transfer::Contact
+  count:
+  match:
+  match_all:
+  attr_is:
+
+output_assertions:
+  count:
+    - [ '//epp:result', 1, 'Check for one result' ]
+  match:
+  match_all:
+  attr_is:
+    - [ '//epp:result', 'code', 2101, 'Check for correct result code' ]

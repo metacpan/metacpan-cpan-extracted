@@ -1,0 +1,30 @@
+Revision history for Software-Release-Watch
+
+0.04    2015-09-04 (PERLANCAR)
+
+	- No functional changes.
+
+	- Replace Log::Any with Log::Any::IfLOG.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.03     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+
+         - [build] CLI scripts are now generated automatically using
+           Dist::Zilla::Plugin::ScriptFromFunc. The plugin is still at 0.01 so the
+           generated script is not as polished as it should be. Stay tuned.
+
+
+0.02    2014-05-26 (SHARYANTO)
+
+        - No functional changes.
+
+        - Add 'use experimental smartmatch' for perl 5.18+ [CT].
+
+
+0.01    2012-11-08 (SHARYANTO)
+
+        - First release (proof of concept).

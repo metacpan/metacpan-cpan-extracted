@@ -1,0 +1,1131 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::String::String
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = String.new(...);
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef::Object::Object
+	* Sidef::Convert::Convert
+
+=head1 METHODS
+
+
+=head2 %
+
+I<Obj> B<%> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<sprintf>
+
+=cut
+
+=head2 &
+
+I<Obj> B<&> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<and>
+
+=cut
+
+=head2 *
+
+I<Obj> B<*> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<mul>
+
+=cut
+
+=head2 +
+
+I<Obj> B<+> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<append>, I<concat>
+
+=cut
+
+=head2 ++
+
+I<Obj> B<++> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<inc>
+
+=cut
+
+=head2 -
+
+I<Obj> B<-> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<diff>
+
+=cut
+
+=head2 ..
+
+I<Obj> B<..> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<to>, I<upto>
+
+=cut
+
+=head2 /
+
+I<Obj> B</> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<÷()>, I<div>
+
+=cut
+
+=head2 :
+
+I<Obj> B<:> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<pair_with>
+
+=cut
+
+=head2 <
+
+I<Obj> B<E<lt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<lt>
+
+=cut
+
+=head2 <<
+
+I<Obj> B<E<lt>E<lt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<drop_left>, I<shift_left>
+
+=cut
+
+=head2 <=>
+
+I<Obj> B<E<lt>=E<gt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<cmp>
+
+=cut
+
+=head2 ==
+
+I<Obj> B<==> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<eq>
+
+=cut
+
+=head2 =~
+
+I<Obj> B<=~> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<match>
+
+=cut
+
+=head2 >
+
+I<Obj> B<E<gt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<gt>
+
+=cut
+
+=head2 >>
+
+I<Obj> B<E<gt>E<gt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<drop_right>, I<shift_right>
+
+=cut
+
+=head2 ^
+
+I<Obj> B<^> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<xor>
+
+=cut
+
+=head2 apply_escapes
+
+String.apply_escapes() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 backtick
+
+String.backtick() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 begins_with
+
+String.begins_with() -> I<Obj>
+
+Return the
+
+Aliases: I<starts_with>
+
+=cut
+
+=head2 bin
+
+String.bin() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 bytes
+
+String.bytes() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 bytes_len
+
+String.bytes_len() -> I<Obj>
+
+Return the
+
+Aliases: I<bytes_length>
+
+=cut
+
+=head2 center
+
+String.center() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 char
+
+String.char() -> I<Obj>
+
+Return the
+
+Aliases: I<char_at>
+
+=cut
+
+=head2 chars
+
+String.chars() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 chomp
+
+String.chomp() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 chop
+
+String.chop() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 clear
+
+String.clear() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 contain
+
+String.contain() -> I<Obj>
+
+Return the
+
+Aliases: I<include>, I<contains>, I<includes>
+
+=cut
+
+=head2 count
+
+String.count() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 crypt
+
+String.crypt() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 decode
+
+String.decode() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 decode_utf8
+
+String.decode_utf8() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 die
+
+String.die() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 digits
+
+String.digits() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 downto
+
+String.downto() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 dump
+
+String.dump() -> I<Obj>
+
+Return the
+
+Aliases: I<inspect>
+
+=cut
+
+=head2 each
+
+String.each() -> I<Obj>
+
+Return the
+
+Aliases: I<each_char>
+
+=cut
+
+=head2 each_byte
+
+String.each_byte() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 each_graph
+
+String.each_graph() -> I<Obj>
+
+Return the
+
+Aliases: I<each_grapheme>
+
+=cut
+
+=head2 each_line
+
+String.each_line() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 each_num
+
+String.each_num() -> I<Obj>
+
+Return the
+
+Aliases: I<each_number>
+
+=cut
+
+=head2 each_word
+
+String.each_word() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 encode
+
+String.encode() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 encode_utf8
+
+String.encode_utf8() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ends_with
+
+String.ends_with() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 escape
+
+String.escape() -> I<Obj>
+
+Return the
+
+Aliases: I<quotemeta>
+
+=cut
+
+=head2 esub
+
+String.esub() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 fc
+
+String.fc() -> I<Obj>
+
+Return the
+
+Aliases: I<foldcase>
+
+=cut
+
+=head2 findall
+
+String.findall() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 first
+
+String.first() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 flip
+
+String.flip() -> I<Obj>
+
+Return the
+
+Aliases: I<reverse>
+
+=cut
+
+=head2 format
+
+String.format() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 frequire
+
+String.frequire() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ft
+
+String.ft() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 gesub
+
+String.gesub() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 glob
+
+String.glob() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 gmatch
+
+String.gmatch() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 graphs
+
+String.graphs() -> I<Obj>
+
+Return the
+
+Aliases: I<graphemes>
+
+=cut
+
+=head2 graphs_len
+
+String.graphs_len() -> I<Obj>
+
+Return the
+
+Aliases: I<graphs_length>
+
+=cut
+
+=head2 gsub
+
+String.gsub() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 hex
+
+String.hex() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 index
+
+String.index() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 insert
+
+String.insert() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ints
+
+String.ints() -> I<Obj>
+
+Return the
+
+Aliases: I<integers>
+
+=cut
+
+=head2 is_empty
+
+String.is_empty() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_numeric
+
+String.is_numeric() -> I<Obj>
+
+Return the
+
+Aliases: I<looks_like_number>
+
+=cut
+
+=head2 is_palindrome
+
+String.is_palindrome() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 iter
+
+String.iter() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 jaro_distance
+
+String.jaro_distance() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 join
+
+String.join() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 last
+
+String.last() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 lc
+
+String.lc() -> I<Obj>
+
+Return the
+
+Aliases: I<lower>, I<downcase>
+
+=cut
+
+=head2 lcfirst
+
+String.lcfirst() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 len
+
+String.len() -> I<Obj>
+
+Return the
+
+Aliases: I<size>, I<length>, I<chars_len>, I<chars_length>
+
+=cut
+
+=head2 lev
+
+String.lev() -> I<Obj>
+
+Return the
+
+Aliases: I<leven>, I<levenshtein>
+
+=cut
+
+=head2 lines
+
+String.lines() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ltrim
+
+String.ltrim() -> I<Obj>
+
+Return the
+
+Aliases: I<trim_beg>, I<strip_beg>
+
+=cut
+
+=head2 md5
+
+String.md5() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 new
+
+String.new() -> I<Obj>
+
+Return the
+
+Aliases: I<call>
+
+=cut
+
+=head2 num
+
+String.num() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 nums
+
+String.nums() -> I<Obj>
+
+Return the
+
+Aliases: I<numbers>
+
+=cut
+
+=head2 oct
+
+String.oct() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 open
+
+String.open() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 open_r
+
+String.open_r() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ord
+
+String.ord() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 overlaps
+
+String.overlaps() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 pack
+
+String.pack() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 pipe
+
+String.pipe() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 pop
+
+String.pop() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 prepend
+
+String.prepend() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 printf
+
+String.printf() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 printlnf
+
+String.printlnf() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 range
+
+String.range() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 repeat
+
+String.repeat() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 require
+
+String.require() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 rindex
+
+String.rindex() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 rtrim
+
+String.rtrim() -> I<Obj>
+
+Return the
+
+Aliases: I<trim_end>, I<strip_end>
+
+=cut
+
+=head2 scan
+
+String.scan() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sha1
+
+String.sha1() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sha256
+
+String.sha256() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sha512
+
+String.sha512() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sort
+
+String.sort() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 split
+
+String.split() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sprintlnf
+
+String.sprintlnf() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sub
+
+String.sub() -> I<Obj>
+
+Return the
+
+Aliases: I<replace>
+
+=cut
+
+=head2 substr
+
+String.substr() -> I<Obj>
+
+Return the
+
+Aliases: I<substring>
+
+=cut
+
+=head2 tc
+
+String.tc() -> I<Obj>
+
+Return the
+
+Aliases: I<ucfirst>, I<titlecase>
+
+=cut
+
+=head2 tclc
+
+String.tclc() -> I<Obj>
+
+Return the
+
+Aliases: I<capitalize>
+
+=cut
+
+=head2 to_s
+
+String.to_s() -> I<Obj>
+
+Return the
+
+Aliases: I<to_str>
+
+=cut
+
+=head2 tr
+
+String.tr() -> I<Obj>
+
+Return the
+
+Aliases: I<translit>
+
+=cut
+
+=head2 trans
+
+String.trans() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 trim
+
+String.trim() -> I<Obj>
+
+Return the
+
+Aliases: I<strip>
+
+=cut
+
+=head2 uc
+
+String.uc() -> I<Obj>
+
+Return the
+
+Aliases: I<upper>, I<upcase>
+
+=cut
+
+=head2 unescape
+
+String.unescape() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 unpack
+
+String.unpack() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 warn
+
+String.warn() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 wc
+
+String.wc() -> I<Obj>
+
+Return the
+
+Aliases: I<wordcase>
+
+=cut
+
+=head2 words
+
+String.words() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 |
+
+I<Obj> B<|> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<or>
+
+=cut
+
+=head2 ~
+
+I<Obj> B<~> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<not>
+
+=cut
+
+=head2 ≠
+
+I<Obj> B<≠> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<!=()>, I<ne>
+
+=cut
+
+=head2 ≤
+
+I<Obj> B<≤> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<E<lt>=>, I<le>
+
+=cut
+
+=head2 ≥
+
+I<Obj> B<≥> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<E<gt>=>, I<ge>
+
+=cut

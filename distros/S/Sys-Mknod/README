@@ -1,0 +1,41 @@
+Sys/Mknod version 0.02
+======================
+
+Ever want to use a Perl function rather than system() to make a
+character or block special device, or to make a named pipe (FIFO)?
+Now you can.
+
+BUGS
+
+On my system, I needed to modify sysmacros.ph;
+
+--- /usr/lib/perl/5.8.1/sys/sysmacros.ph~       Sat Sep 27 04:19:47 2003
++++ /usr/lib/perl/5.8.1/sys/sysmacros.ph        Mon Jan  5 16:29:24 2004
+@@ -15,7 +15,7 @@
+        }' unless defined(&minor);
+        eval 'sub makedev {
+            local($major, $minor) = @_;
+-           eval q((( << 8) | ( ($minor))));
++           eval q((($major << 8) | ( ($minor))));
+        }' unless defined(&makedev);
+     } else {
+        require 'endian.ph';
+
+The test suite will detect and warn if the makedev macro does not
+return a sensible value.  Note that you will need to be root for most
+of the tests to work.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright 2001, 2004, Sam Vilain <samv@cpan.org>.  All rights
+reserved.  This program is free software; you may use and/or
+redistribute it under the same terms as Perl itself.

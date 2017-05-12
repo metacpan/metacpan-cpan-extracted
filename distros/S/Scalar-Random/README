@@ -1,0 +1,45 @@
+Scalar-Random version 0.01
+==========================
+
+Scalar::Random will turn a scalar variable into an automatic random number
+generator. All you need to do to get the next random number is use it!
+
+SYNOPSIS
+
+  use Scalar::Random 'randomize';
+
+  my $random;
+  my $MAX_RANDOM = 100;
+
+  randomize( $random, $MAX_RANDOM );
+
+  print $random, "\n"; # '42'
+  print $random, "\n"; # '17'
+  print $random, "\n"; # '88'
+  print $random, "\n"; # '4'
+  print $random, "\n"; # '50'
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module uses XS to perform magic. Requirements are standard C:
+
+	#include <stdlib.h>
+	#include <sys/time.h>
+	#include <time.h>
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Alfie John
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.

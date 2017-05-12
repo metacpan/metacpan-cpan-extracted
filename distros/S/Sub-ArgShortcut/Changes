@@ -1,0 +1,16 @@
+Release history for Sub-ArgShortcut
+
+1.021 Tue 06 Jan 2015
+	- No functional changes
+	- Minimum Perl requirement declared
+	- Test suite cleanup
+	- Now uses Dist::Zilla (and ExtUtils::MakeMaker)
+
+1.02 Fri 20 Jun 2008
+	- Declare Attribute::Handlers dependency on old perls
+
+1.01 Sun 08 Apr 2007
+	- Improved documentation (thanks to Juerd Waalboer)
+
+1.0 Sat 31 Mar 2007
+	- Initial release

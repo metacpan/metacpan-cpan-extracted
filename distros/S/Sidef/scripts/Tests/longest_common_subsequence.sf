@@ -1,0 +1,22 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Longest_common_subsequence#Sidef
+#
+
+func lcs(String xstr, String ystr) is cached -> String {
+    (xstr.is_empty || ystr.is_empty) && return '';
+
+    var(x, xs, y, ys) = (xstr.first, xstr.ft(1),
+                         ystr.first, ystr.ft(1));
+
+    if (x == y) {
+        x + lcs(xs, ys)
+    } else {
+        [lcs(xstr, ys), lcs(xs, ystr)].max_by {|x| x.len };
+    }
+}
+
+assert_eq(lcs("thisisatest", "testing123testing"), "tsitest");
+
+say "** Test passed!";

@@ -1,0 +1,192 @@
+#!/usr/bin/perl -w
+# BEGIN BPS TAGGED BLOCK {{{
+# COPYRIGHT:
+# 
+# This software is Copyright (c) 2003-2008 Best Practical Solutions, LLC
+#                                          <clkao@bestpractical.com>
+# 
+# (Except where explicitly superseded by other copyright notices)
+# 
+# 
+# LICENSE:
+# 
+# 
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of either:
+# 
+#   a) Version 2 of the GNU General Public License.  You should have
+#      received a copy of the GNU General Public License along with this
+#      program.  If not, write to the Free Software Foundation, Inc., 51
+#      Franklin Street, Fifth Floor, Boston, MA 02110-1301 or visit
+#      their web page on the internet at
+#      http://www.gnu.org/copyleft/gpl.html.
+# 
+#   b) Version 1 of Perl's "Artistic License".  You should have received
+#      a copy of the Artistic License with this package, in the file
+#      named "ARTISTIC".  The license is also available at
+#      http://opensource.org/licenses/artistic-license.php.
+# 
+# This work is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+# 
+# CONTRIBUTION SUBMISSION POLICY:
+# 
+# (The following paragraph is not intended to limit the rights granted
+# to you to modify and distribute this software under the terms of the
+# GNU General Public License and is only of importance to you if you
+# choose to contribute your changes and enhancements to the community
+# by submitting them to Best Practical Solutions, LLC.)
+# 
+# By intentionally submitting any modifications, corrections or
+# derivatives to this work, or any other work intended for use with SVK,
+# to Best Practical Solutions, LLC, you confirm that you are the
+# copyright holder for those contributions and you grant Best Practical
+# Solutions, LLC a nonexclusive, worldwide, irrevocable, royalty-free,
+# perpetual, license to use, copy, create derivative works based on
+# those contributions, and sublicense and distribute those contributions
+# and any derivatives thereof.
+# 
+# END BPS TAGGED BLOCK }}}
+use strict;
+
+BEGIN {
+    eval {
+        my $x = '';
+        my $y = \$x;
+        require Scalar::Util; Scalar::Util::weaken($y);
+    };
+   if ($@) {
+       CORE::die <<"EOF";
+
+SVK requires the Scalar::Util module be built with support for  the 'weaken'
+function. 
+
+It is sometimes the case that operating system upgrades will replace 
+a working Scalar::Util with a non-working one. If your system was working
+correctly up until now, this is likely the cause of the problem.
+
+Please reinstall Scalar::Util, being careful to let it build with your C 
+compiler. Usually this is as simple as running the following command as
+root:
+
+    perl -MCPAN -e'install Scalar::Util'
+
+EOF
+    } 
+}
+
+use SVK;
+our $VERSION = $SVK::VERSION;
+use SVK::I18N;
+use Getopt::Long qw(:config no_ignore_case bundling);
+use autouse 'SVK::Util' => qw(get_anchor catfile catdir find_dotsvk);
+use Class::Autouse qw(SVK::Command SVK::XD);
+
+=head1 NAME
+
+svk - A Distributed Version Control System
+
+=head1 SYNOPSIS
+
+B<svk> I<command> S<[I<options>]> [I<args>]
+
+=head1 DESCRIPTION
+
+B<SVK> is a decentralized version control system written in Perl.
+It uses the Subversion filesystem but provides additional features:
+
+=over 4
+
+=item * Offline operations like C<checkin>, C<log>, C<merge>.
+
+=item * Distributed branches.
+
+=item * Lightweight checkout copy management (no F<.svn> directories).
+
+=item * Advanced merge algorithms, like I<star-merge> and I<cherry picking>.
+
+=back
+
+For more information about the SVK project, visit L<http://svk.bestpractical.com/>.
+
+Run C<svk help> to access the built-in tool documentation.
+
+By default svk stores its state in the F<.svk> directory in your home
+directory. You can change this default by setting the SVKROOT environment
+variable to your preferred svk depot path.
+
+=cut
+
+my $cmd = shift;
+
+if (!$cmd or $cmd =~ /^-{0,2}[Hh](?:elp)?$/) {
+    SVK::Command->invoke (undef, 'help', undef, @ARGV);
+    exit 0;
+}
+
+{
+    my $show_version;
+    local *ARGV = [$cmd || ''];
+    GetOptions ('v|version' => \$show_version) or exit;
+
+    if ($show_version || ($cmd && $cmd eq 'version')) {
+	print loc("This is svk, version %1 (using Subversion bindings %2)\n",
+        $VERSION, $SVN::Core::VERSION);
+	exit 0;
+    }
+}
+
+$ENV{HOME} ||= (
+    $ENV{HOMEDRIVE} ? catdir(@ENV{qw( HOMEDRIVE HOMEPATH )}) : ''
+) || (getpwuid($<))[7];
+$ENV{USER} ||= (
+    (defined &Win32::LoginName) ? Win32::LoginName() : ''
+) || $ENV{USERNAME} || (getpwuid($<))[0];
+
+my $svkpath = find_dotsvk || $ENV{SVKROOT} || catfile($ENV{HOME}, ".svk");
+my $floating = undef;
+if (-e catfile($svkpath, 'floating')) {
+    require Path::Class;
+    $floating = Path::Class::Dir->new( $svkpath )->parent();
+}
+my $ret;
+{
+    my $xd = SVK::XD->new ( giantlock => catfile($svkpath, 'lock'),
+			    statefile => catfile($svkpath, 'config'),
+			    svkpath => $svkpath,
+			    floating => $floating,
+			  );
+    $xd->load();
+    $SIG{INT} = sub {
+	die loc("Interrupted.\n");
+    };
+
+    $ret = SVK::Command->invoke ($xd, $cmd, undef, @ARGV);
+    $xd->store ();
+}
+
+1;
+
+exit (defined $ret ? $ret : 1);
+
+require PerlIO;
+require PerlIO::via;
+require PerlIO::scalar;
+require Encode::TW;
+
+=head1 AUTHORS
+
+Chia-liang Kao E<lt>clkao@clkao.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2003-2005 by Chia-liang Kao E<lt>clkao@clkao.orgE<gt>.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+See L<http://www.perl.com/perl/misc/Artistic.html>
+
+=cut

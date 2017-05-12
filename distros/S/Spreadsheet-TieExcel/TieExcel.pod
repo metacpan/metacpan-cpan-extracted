@@ -1,0 +1,223 @@
+=head1 NAME
+
+Spreadsheet::TieExcel - Perl extension for tie'ing Excel spreadsheets.
+
+=head1 SYNOPSIS
+
+    use Spreadsheet::TieExcel;
+    tie $x, 'Spreadsheet::TieExcel::Scalar';
+    tie *XL, 'Spreadsheet::TieExcel::File', {row => 1, column => 1, width => 1, height => 5};
+    tie %x, 'Spreadsheet::TieExcel::Hash';
+    tie @x, 'Spreadsheet::TieExcel::Array', {row => 1, column => 1, width => 1, height => 5};
+
+=head1 DESCRIPTION
+
+This moduel allows tie'ing of  Excel spreadsheets to arrays, files and
+(soon)  hashes.  Tied  variables  can  then be  read  and  written  to
+normally.  The  data  is  read  or written  to  an  Excel  spreadsheet
+transparently.
+
+=head1 USAGE
+
+=head2 Tie'ing
+
+See documentation for the different types of variables below.
+
+=head2 Selecting the range
+
+The range which will be tied can be specified in different ways:
+
+=over
+
+=item *
+
+by passing a valid Excel range to the tie function:
+
+     $range = Win32::OLE->GetActiveObject('Excel.Application')->Selection;
+     tie @xl, 'Spreadsheet::TieExcel::Array', $range;
+
+=item *
+
+by passing  it an  array, or an  arrayref containing row,  column, and
+optionally sheet name.
+
+     tie @xl, 'Spreadsheet::TieExcel::Array', 1, 1, 'Sheet3';
+
+=item *
+
+by passing it a hashref,  containing row, column, and optionally sheet
+name, width and height of range to be used
+
+     tie @xl, 'Spreadsheet::TieExcel::Array', {
+	                          row => 1,
+	                          column => 1,
+	                          width => 4,
+                                  sheet => 'Sheet3'
+                                  };
+
+=item *
+
+by default, in which case the current selection is tied.
+
+=back
+
+=head2 Quirks
+
+You can't, for now, write  anywhere else than the active workbook, and
+Excel must be open for all this to work.
+
+In the best  M$ tradition, this and other  quite obvious and necessary
+features will be available in some future version.
+
+=head1 Tie'ing arrays
+
+=head2 Usage
+
+      use Spreadsheet::TieExcel::Array;
+
+      tie @xl, 'Spreadsheet::TieExcel::Array';
+
+      for (@xl) {
+	      # whatever you want
+      }
+
+=head2 Quirks
+
+You can't, for now, pop or  push to a tie'd array. However, addressing
+farther  than the  selection's size  will  write farther  along, in  a
+row-by-row  fashion. This doesn't  however resize  the array.  I still
+have to decide whether it's a bug or a feature.
+
+=head1 Tie'ing filehandles
+
+=head2 Usage
+
+      use Spreadsheet::TieExcel::File;
+
+      tie *XL, 'Spreadsheet::TieExcel::File';
+
+      while (<XL>) {
+	      # whatever you want
+      }
+
+      print XL 'foo bar';
+
+=head2 Quirks
+
+If you write an array to the filehandle, cells will be written for the
+whole  width of the  array, regardless  of the  original width  of the
+range selected. Also  they will overwrite any previous  data, so watch
+out where you write.
+
+=head1 Tie'ing scalars
+
+=head2 Usage
+
+=head2 Messing around
+
+After  you've tied  a  scalar to  an  Excel cell,  you  use a  tied'ed
+variable  to  move  the  pointer  to the  cell  around,  changing  the
+underlying range and acting much the way you do with a mouse.
+
+Easier shown than said:
+
+    use Spreadsheet::TieExcel;
+
+    tie $x, 'Spreadsheet::TieExcel::Scalar', 3, 2; # Tie cell at row 3, column 2
+
+    $x = 'a';                           # assign value to cell
+
+    print $x;                           # read value from cell
+
+    $X = tied $x;
+    $X << 1;                            # move pointer one cell to the left
+                                        # $x is now tied to cell at row 3, column 2
+
+    $x = 'b';                           # set cell
+    print $x;                           # read cell
+
+=head2 Moving around
+
+You can change the cell being pointed to explicitly:
+
+    $X->move(10, 3);                    # move 10 rows down, 3 to the right
+
+or you can use one of the overloaded methods provided:
+
+    $X << 1;                            # move left one column
+    $X >> 4;                            # move right four columns
+
+    $X + 5;                             # move down five rows
+    $X - 4;                             # move up four rows
+
+
+=head2 Setting properties
+
+You can change the properties of the underlying cell like this:
+
+    $X->set('Font', 'Italic', 1);          # Set the cell's font to italic
+
+much like you would do with
+
+    $cell->{'Font'}->{'Italic'} = 1;
+
+=head2 Worksheets are round 
+
+The worksheet  is almost  circular (actually a  torus), when  you move
+further than the top, you end up at the bottom, and moving to muuch to
+the left takes you to the rightmost column of the sheet.
+
+For example:
+
+    use Spreadsheet::TieExcel;
+
+    tie $x, 'Spreadsheet::TieExcel::Scalar', 1, 1; # Tie cell at row 1, column 1
+
+    $X = tied $x;
+    $X << 1;                            # you are now at the rightmost column on the sheet
+
+=head1 Tie'ing hashes
+
+=head2 Usage
+
+      use Spreadsheet::TieExcel::Hash;
+
+      tie %xl, 'Spreadsheet::TieExcel::Hash';
+
+      $xl{'foo'} = [12, 4];
+      $xl{'foo'} = 'bar';
+      for (keys %xl) {
+	  print
+      }
+
+=head2 Quirks
+
+You tie a  hash to Excel named ranges.  It's quite straightforward, only you
+can't set a value to a new hash element, unless you've assigned a range to it.
+
+Therefore you do:
+
+      tie %xl, 'Spreadsheet::TieExcel::Hash';
+
+      $xl{'foo'} = [12, 4];              # $xl{'foo'} points to range at row 12, column 4 of the active sheet
+      $xl{'foo'} = 'bar';                # and now you can assign a value to it
+
+That is,  the first  time you  assign to a  new element,  you actually
+assign  the range it  refers to,  and only  thereafter you  assign its
+value.
+
+=head1 Author
+
+Simone Cesano simonecesano@libero.it
+
+=head1 Copyright
+
+Copyright (c) 2003, Simone  Cesano.  All Rights Reserved.  This module
+is free software. It may  be used, redistributed and/or modified under
+the same terms as Perl itself.
+
+=head1 Thanks
+
+Thanks to Brad Shaw and ikegami for 'strict' fixes and highligthing beginner's errors.
+
+=cut

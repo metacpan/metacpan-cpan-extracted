@@ -1,0 +1,21 @@
+SSN/Validate 
+=========================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+The documentation is in the module file.  Once you install
+the file, you can read it with perldoc.
+
+	perldoc SSN::Validate
+	
+If you want to read it before you install it, you can use
+perldoc directly on the module file.
+
+	perldoc lib/SSN/Validate.pm

@@ -1,0 +1,1364 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<content_types>
+    <content_type name="application/abiword" description="AbiWord document" icon="5.gif">
+        <extensions>
+            <extension default="1">abw</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/binhex" description="BinHex archive" icon="1.gif">
+        <extensions>
+            <extension default="1">hqx</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/mac-binhex</synonym>
+            <synonym>application/mac-binhex40</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="application/gzip" description="Compressed gzip archive" icon="1.gif">
+        <extensions>
+            <extension default="1">gz</extension>
+            <extension default="0">tgz</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/gzip-compressed</synonym>
+            <synonym>application/gzipped</synonym>
+            <synonym>application/x-gunzip</synonym>
+            <synonym>application/x-gzip</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="application/illustrator" description="Adobe Illustrator file" icon="18.gif">
+        <extensions>
+            <extension default="1">ai</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/pics-rules" description="PICS Rules file" icon="5.gif">
+        <extensions>
+            <extension default="1">prf</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/java-archive" description="Java Archive file" icon="24.gif">
+        <extensions>
+            <extension default="1">jar</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/x-java" description="Java bytecode file" icon="24.gif">
+        <extensions>
+            <extension default="1">class</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/java</synonym>
+            <synonym>application/java-byte-code</synonym>
+            <synonym>application/java-vm</synonym>
+            <synonym>application/x-java-applet</synonym>
+            <synonym>application/x-java-bean</synonym>
+            <synonym>application/x-java-class</synonym>
+            <synonym>application/x-java-vm</synonym>
+            <synonym>application/x-jinit-bean</synonym>
+            <synonym>application/x-jinit-applet</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="text/x-java" description="Java source file" icon="5.gif">
+        <extensions>
+            <extension default="1">java</extension>
+        </extensions>
+        <synonyms>
+            <synonym>java/*</synonym>
+            <synonym>text/java</synonym>
+            <synonym>text/x-java-source</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="application/mathematica" description="Mathematica file" icon="19.gif">
+        <extensions>
+            <extension default="1">ma</extension>
+            <extension default="0">nb</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/ms-tnef" description="Microsoft Exchange TNEF file" icon="5.gif">
+        <extensions>
+            <extension default="1">tnef</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/msonenote" description="Microsoft OneNote file" icon="5.gif">
+        <extensions>
+            <extension default="1">one</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/x-ms-wmz" description="Windows Media Compressed file" icon="1.gif">
+        <extensions>
+            <extension default="1">wmz</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/octet-stream" description="" icon="0.gif">
+        <extensions/>
+        <synonyms>
+            <synonym>application/applefile</synonym>
+            <synonym>application/base64</synonym>
+            <synonym>application/binary</synonym>
+            <synonym>application/download</synonym>
+            <synonym>application/export</synonym>
+            <synonym>application/force-download</synonym>
+            <synonym>application/macbinary</synonym>
+            <synonym>application/ms-download</synonym>
+            <synonym>application/octetstream</synonym>
+            <synonym>application/text</synonym>
+            <synonym>application/unknown</synonym>
+            <synonym>application/x-diskcopy</synonym>
+            <synonym>application/x-download</synonym>
+            <synonym>application/x-forcedownload</synonym>
+            <synonym>application/x-macbinary</synonym>
+            <synonym>application/x-ms-download</synonym>
+            <synonym>application/x-msdownload</synonym>
+            <synonym>application/x-unknown</synonym>
+            <synonym>audio/unknown</synonym>
+            <synonym>dropload/binary</synonym>
+            <synonym>video/unknown</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="application/ogg" description="OGG audio file" icon="10.gif">
+        <extensions>
+            <extension default="1">ogg</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/x-ogg</synonym>
+            <synonym>audio/x-ogg</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="application/pdf" description="Adobe Acrobat file" icon="7.gif">
+        <extensions>
+            <extension default="1">pdf</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/acrobat</synonym>
+            <synonym>application/nappdf</synonym>
+            <synonym>application/x-pdf</synonym>
+            <synonym>application/vnd.pdf</synonym>
+            <synonym>text/pdf</synonym>
+            <synonym>text/x-pdf</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="application/photoshop" description="Adobe Photoshop file" icon="6.gif">
+        <extensions>
+            <extension default="1">psd</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/psd</synonym>
+            <synonym>application/x-photoshop</synonym>
+            <synonym>image/photoshop</synonym>
+            <synonym>image/psd</synonym>
+            <synonym>image/x-photoshop</synonym>
+            <synonym>image/x-psd</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="application/postscript" description="PostScript file" icon="0.gif">
+        <extensions>
+            <extension default="1">ps</extension>
+            <extension default="0">eps</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/eps</synonym>
+            <synonym>application/x-eps</synonym>
+            <synonym>image/eps</synonym>
+            <synonym>image/x-eps</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="application/rar" description="Compressed archive" icon="1.gif">
+        <extensions>
+            <extension default="1">rar</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/x-rar-compressed</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="application/rtf" description="Rich Text Format file" icon="5.gif">
+        <extensions>
+            <extension default="1">rtf</extension>
+            <extension default="0">rtx</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/richtext</synonym>
+            <synonym>application/x-rtf</synonym>
+            <synonym>text/richtext</synonym>
+            <synonym>text/rtf</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="application/sas" description="SAS file" icon="4.gif">
+        <extensions>
+            <extension default="1">sas</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/x-sas</synonym>
+            <synonym>application/x-sas-data</synonym>
+            <synonym>application/x-sas-log</synonym>
+            <synonym>application/x-sas-output</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="application/smil" description="SMIL file" icon="5.gif">
+        <extensions>
+            <extension default="1">smil</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/smil+xml</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="application/spss" description="SPSS file" icon="4.gif">
+        <extensions>
+            <extension default="1">sav</extension>
+            <extension default="0">sd2</extension>
+            <extension default="0">spo</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/stuffit" description="Stuffit archive" icon="1.gif">
+        <extensions>
+            <extension default="1">sit</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/x-sit</synonym>
+            <synonym>application/x-stuffit</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="application/tar" description="Compressed tar file" icon="1.gif">
+        <extensions>
+            <extension default="1">tar</extension>
+            <extension default="0">gtar</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/x-gtar</synonym>
+            <synonym>application/x-tar</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="application/twb" description="Tableau Workbook file" icon="4.gif">
+        <extensions>
+            <extension default="1">twb</extension>
+            <extension default="0">twbx</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/twbx</synonym>
+            <synonym>application/x-twb</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="application/vnd.framemaker" description="FrameMaker file" icon="0.gif">
+        <extensions>
+            <extension default="1">mif</extension>
+            <extension default="0">fm</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/framemaker</synonym>
+            <synonym>application/maker</synonym>
+            <synonym>application/vnd.mif</synonym>
+            <synonym>application/x-framemaker</synonym>
+            <synonym>application/x-maker</synonym>
+            <synonym>application/x-mif</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="application/vnd.google-earth.kml+xml" description="KML file" icon="5.gif">
+        <extensions>
+            <extension default="1">kml</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/vnd.google-earth.kmz" description="Compressed KML file" icon="1.gif">
+        <extensions>
+            <extension default="1">kmz</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/vnd.ms-access" description="Microsoft Access file" icon="14.gif">
+        <extensions>
+            <extension default="1">mdb</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/mdb</synonym>
+            <synonym>application/msaccess</synonym>
+            <synonym>application/vnd.msaccess</synonym>
+            <synonym>application/x-mdb</synonym>
+            <synonym>application/x-msaccess</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="application/vnd.ms-cab-compressed" description="Microsoft Cabinet archive" icon="1.gif">
+        <extensions>
+            <extension default="1">cab</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/cab</synonym>
+            <synonym>application/x-cabinet</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="application/vnd.ms-excel" description="Microsoft Excel file" icon="2.gif">
+        <extensions>
+            <extension default="1">xls</extension>
+            <extension default="0">xll</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/excel</synonym>
+            <synonym>application/msexcel</synonym>
+            <synonym>application/msexcell</synonym>
+            <synonym>application/x-dos_ms_excel</synonym>
+            <synonym>application/x-excel</synonym>
+            <synonym>application/x-ms-excel</synonym>
+            <synonym>application/x-msexcel</synonym>
+            <synonym>application/x-xls</synonym>
+            <synonym>application/xls</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="application/vnd.ms-excel.addin.macroEnabled.12" description="Microsoft Excel file" icon="2.gif">
+        <extensions>
+            <extension default="1">xlam</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/vnd.ms-excel.sheet.binary.macroEnabled.12" description="Microsoft Excel file" icon="2.gif">
+        <extensions>
+            <extension default="1">xlsb</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/vnd.ms-excel.sheet.macroEnabled.12" description="Microsoft Excel file" icon="2.gif">
+        <extensions>
+            <extension default="1">xlsm</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/vnd.ms-excel.template.macroEnabled.12" description="Microsoft Excel file" icon="2.gif">
+        <extensions>
+            <extension default="1">xltm</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/vnd.ms-powerpoint" description="Microsoft PowerPoint file" icon="12.gif">
+        <extensions>
+            <extension default="1">ppt</extension>
+            <extension default="0">pps</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/ms-powerpoint</synonym>
+            <synonym>application/mspowerpoint</synonym>
+            <synonym>application/powerpoint</synonym>
+            <synonym>application/ppt</synonym>
+            <synonym>application/vnd-mspowerpoint</synonym>
+            <synonym>application/vnd_ms-powerpoint</synonym>
+            <synonym>application/x-mspowerpoint</synonym>
+            <synonym>application/x-powerpoint</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="application/vnd.ms-powerpoint.addin.macroEnabled.12" description="Microsoft PowerPoint file" icon="12.gif">
+        <extensions>
+            <extension default="1">ppam</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/vnd.ms-powerpoint.presentation.macroEnabled.12" description="Microsoft PowerPoint file" icon="12.gif">
+        <extensions>
+            <extension default="1">pptm</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/vnd.ms-powerpoint.slideshow.macroEnabled.12" description="Microsoft PowerPoint file" icon="12.gif">
+        <extensions>
+            <extension default="1">ppsm</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/vnd.ms-powerpoint.template.macroEnabled.12" description="Microsoft PowerPoint template file" icon="12.gif">
+        <extensions>
+            <extension default="1">potm</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/vnd.ms-project" description="Microsoft Project file" icon="0.gif">
+        <extensions>
+            <extension default="1">mpp</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/mpp</synonym>
+            <synonym>application/msproj</synonym>
+            <synonym>application/msproject</synonym>
+            <synonym>application/x-dos_ms_project</synonym>
+            <synonym>application/x-ms-project</synonym>
+            <synonym>application/x-msproject</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="application/vnd.ms-publisher" description="Microsoft Publisher file" icon="0.gif">
+        <extensions>
+            <extension default="1">pub</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/x-mspublisher</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="application/vnd.ms-word" description="Microsoft Word document" icon="9.gif">
+        <extensions>
+            <extension default="1">doc</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/doc</synonym>
+            <synonym>application/msword</synonym>
+            <synonym>application/msword-doc</synonym>
+            <synonym>application/vnd.msword</synonym>
+            <synonym>application/winword</synonym>
+            <synonym>application/word</synonym>
+            <synonym>application/x-msw6</synonym>
+            <synonym>application/x-msword</synonym>
+            <synonym>application/x-msword-doc</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="application/vnd.ms-word.document.macroEnabled.12" description="Microsoft Word document" icon="9.gif">
+        <extensions>
+            <extension default="1">docm</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/vnd.ms-word.template.macroEnabled.12" description="Microsoft Word template file" icon="9.gif">
+        <extensions>
+            <extension default="1">dotm</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/vnd.ms-works" description="Microsoft Works file" icon="21.gif">
+        <extensions>
+            <extension default="1">wps</extension>
+            <extension default="0">wdb</extension>
+            <extension default="0">wks</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/x-msworks-wp</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="application/vnd.ms-xpsdocument" description="Microsoft XPS file" icon="0.gif">
+        <extensions>
+            <extension default="1">xps</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/vnd.oasis.opendocument.formula" description="OpenOffice formula file" icon="4.gif">
+        <extensions>
+            <extension default="1">odf</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/vnd.oasis.opendocument.graphics" description="OpenOffice graphics file" icon="6.gif">
+        <extensions>
+            <extension default="1">odg</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/vnd.oasis.opendocument.presentation" description="OpenOffice presentation file" icon="4.gif">
+        <extensions>
+            <extension default="1">odp</extension>
+        </extensions>
+        <synonyms/>
+    </content_type> 
+    <content_type name="application/vnd.oasis.opendocument.spreadsheet" description="OpenOffice spreadsheet file" icon="4.gif">
+        <extensions>
+            <extension default="1">ods</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/vnd.oasis.opendocument.text" description="OpenOffice document" icon="5.gif">
+        <extensions>
+            <extension default="1">odt</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/vnd.openxmlformats-officedocument.presentationml.presentation" description="Microsoft PowerPoint file" icon="12.gif">
+        <extensions>
+            <extension default="1">pptx</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/vnd.openxmlformats-officedocument.presentationml.slideshow" description="Microsoft PowerPoint file" icon="12.gif">
+        <extensions>
+            <extension default="1">ppsx</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/vnd.openxmlformats-officedocument.presentationml.template" description="Microsoft PowerPoint template file" icon="12.gif">
+        <extensions>
+            <extension default="1">potx</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" description="Microsoft Excel file" icon="2.gif">
+        <extensions>
+            <extension default="1">xlsx</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/vnd.openxmlformats-officedocument.spreadsheetml.template" description="Microsoft Excel template file" icon="2.gif">
+        <extensions>
+            <extension default="1">xltx</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/vnd.openxmlformats-officedocument.wordprocessingml.document" description="Microsoft Word file" icon="9.gif">
+        <extensions>
+            <extension default="1">docx</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/vnd.ms-word.document.12</synonym>
+            <synonym>application/vnd.openxmlformats-officedocument.word</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="application/vnd.openxmlformats-officedocument.wordprocessingml.template" description="Microsoft Word template file" icon="9.gif">
+        <extensions>
+            <extension default="1">dotx</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/vnd.rn-realmedia" description="RealMedia file" icon="10.gif">
+        <extensions>
+            <extension default="1">rm</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/vnd.sun.xml.writer" description="OpenOffice.org document" icon="5.gif">
+        <extensions>
+            <extension default="1">sxw</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/vnd.visio" description="Microsoft Visio file" icon="20.gif">
+        <extensions>
+            <extension default="1">vsd</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/visio</synonym>
+            <synonym>application/visio.drawing</synonym>
+            <synonym>application/vsd</synonym>
+            <synonym>application/x-visio</synonym>
+            <synonym>application/x-vsd</synonym>
+            <synonym>image/x-vsd</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="application/wordperfect" description="WordPerfect document" icon="5.gif">
+        <extensions>
+            <extension default="1">wpd</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/wordperf</synonym>
+            <synonym>application/wpd</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="application/x-asp" description="ASP source file" icon="5.gif">
+        <extensions>
+            <extension default="1">asp</extension>
+        </extensions>
+        <synonyms>
+            <synonym>text/asp</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="application/x-autocad" description="AutoCAD drawing" icon="0.gif">
+        <extensions>
+            <extension default="1">dxf</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/dxf</synonym>
+            <synonym>application/x-dxf</synonym>
+            <synonym>drawing/x-dxf</synonym>
+            <synonym>image/vnd.dxf</synonym>
+            <synonym>image/x-autocad</synonym>
+            <synonym>image/x-dxf</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="application/x-bzip2" description="Compressed bzip2 file" icon="1.gif">
+        <extensions>
+            <extension default="1">bz2</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/bzip2</synonym>
+            <synonym>application/x-bz2</synonym>
+            <synonym>application/x-bzip</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="application/x-cfm" description="ColdFusion source file" icon="0.gif">
+        <extensions>
+            <extension default="1">cfm</extension>
+            <extension default="0">cfc</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/x-csh" description="C Shell file" icon="0.gif">
+        <extensions>
+            <extension default="1">csh</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/x-director" description="Adobe Director file" icon="17.gif">
+        <extensions>
+            <extension default="1">dir</extension>
+            <extension default="0">cct</extension>
+            <extension default="0">cst</extension>
+            <extension default="0">cxt</extension>
+            <extension default="0">dcr</extension>
+            <extension default="0">dxr</extension>
+            <extension default="0">fqd</extension>
+            <extension default="0">swa</extension>
+            <extension default="0">w3d</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/x-dvi" description="DVI file" icon="5.gif">
+        <extensions>
+            <extension default="1">dvi</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/x-elc" description="Emacs source file" icon="24.gif">
+        <extensions>
+            <extension default="1">elc</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/x-endnote-library" description="EndNote Library file" icon="15.gif">
+        <extensions>
+            <extension default="1">enl</extension>
+            <extension default="0">enz</extension>
+            <extension default="0">lib</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/x-endnote-refer</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="application/x-hdf" description="Hierarchical Data Format file" icon="0.gif">
+        <extensions>
+            <extension default="1">hdf</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/x-indesign" description="Adobe InDesign file" icon="0.gif">
+        <extensions>
+            <extension default="1">indd</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/x-labview" description="LabVIEW application file" icon="0.gif">
+        <extensions>
+            <extension default="1">llb</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/x-labview-vi</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="application/x-labview-exec" description="LabVIEW CAL Simulation file" icon="0.gif">
+        <extensions>
+            <extension default="1">lvx</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/x-latex" description="LATEX file" icon="0.gif">
+        <extensions>
+            <extension default="1">latex</extension>
+        </extensions>
+        <synonyms>
+            <synonym>text/x-latex</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="application/x-lha" description="Compressed archive file" icon="1.gif">
+        <extensions>
+            <extension default="1">lha</extension>
+            <extension default="0">lzh</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/lha</synonym>
+            <synonym>application/lzh</synonym>
+            <synonym>application/x-lzh</synonym>
+            <synonym>application/x-lzh-archive</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="application/x-maple" description="Maple Worksheet file" icon="0.gif">
+        <extensions>
+            <extension default="1">mws</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/maple-v-r4</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="application/x-mathcad" description="MathCaD file" icon="0.gif">
+        <extensions>
+            <extension default="1">mcd</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/mcad</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="application/x-msdos-program" description="Windows executable file" icon="24.gif">
+        <extensions>
+            <extension default="1">exe</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/dos-exe</synonym>
+            <synonym>application/exe</synonym>
+            <synonym>application/msdos-windows</synonym>
+            <synonym>application/x-sdlc</synonym>
+            <synonym>application/x-exe</synonym>
+            <synonym>application/x-winexe</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="application/x-perl" description="Perl source file" icon="22.gif">
+        <extensions>
+            <extension default="1">pl</extension>
+            <extension default="0">pm</extension>
+        </extensions>
+        <synonyms>
+            <synonym>text/x-perl</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="application/x-php" description="PHP source file" icon="8.gif">
+        <extensions>
+            <extension default="1">php</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/php</synonym>
+            <synonym>text/php</synonym>
+            <synonym>text/x-php</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="application/x-research-info-systems" description="ProCite file" icon="24.gif">
+        <extensions/>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/x-sea" description="Self-extracting archive" icon="1.gif">
+        <extensions>
+            <extension default="1">sea</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/x-sh" description="Shell script file" icon="5.gif">
+        <extensions>
+            <extension default="1">sh</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/x-shellscript</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="application/x-shockwave-flash" description="Adobe Flash file" icon="16.gif">
+        <extensions>
+            <extension default="0">mfp</extension>
+            <extension default="1">swf</extension>
+            <extension default="0">spl</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/futuresplash</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="application/x-stata" description="Stata Data file" icon="0.gif">
+        <extensions>
+            <extension default="1">dta</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/x-tcl" description="TCL source file" icon="24.gif">
+        <extensions>
+            <extension default="1">tcl</extension>
+        </extensions>
+        <synonyms>
+            <synonym>text/x-script.tcl</synonym>
+            <synonym>text/x-tcl</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="application/x-tex" description="TeX file" icon="24.gif">
+        <extensions>
+            <extension default="1">tex</extension>
+        </extensions>
+        <synonyms>
+            <synonym>text/x-tex</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="application/x-troff" description="Troff file" icon="5.gif">
+        <extensions>
+            <extension default="1">tr</extension>
+            <extension default="0">roff</extension>
+            <extension default="0">t</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/x-troff-man" description="Troff with MAN macros file" icon="5.gif">
+        <extensions>
+            <extension default="1">man</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/x-troff-me" description="Troff with ME macros file" icon="5.gif">
+        <extensions>
+            <extension default="1">me</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/x-troff-ms" description="Troff with MS macros file" icon="5.gif">
+        <extensions>
+            <extension default="1">ms</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/x-wais-source" description="WAIS source file" icon="0.gif">
+        <extensions>
+            <extension default="1">src</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/x-webarchive" description="KDE Web archive" icon="1.gif">
+        <extensions>
+            <extension default="1">war</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="application/x-x509-ca-cert" description="Internet Security Certificate file" icon="5.gif">
+        <extensions>
+            <extension default="1">crt</extension>
+            <extension default="0">cer</extension>
+            <extension default="0">der</extension>
+            <extension default="0">p12</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/pkix-cert</synonym>
+            <synonym>application/x-pkcs12</synonym>
+            <synonym>application/keychain_access</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="application/zip" description="Compressed zip archive" icon="1.gif">
+        <extensions>
+            <extension default="1">zip</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/x-compress</synonym>
+            <synonym>application/x-compressed</synonym>
+            <synonym>application/x-zip</synonym>
+            <synonym>application/x-zip-compressed</synonym>
+            <synonym>application/zip-compressed</synonym>
+            <synonym>application/x-7zip-compressed</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="audio/aac" description="AAC audio file" icon="10.gif">
+        <extensions>
+            <extension default="1">aac</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="audio/aiff" description="AIFF audio file" icon="10.gif">
+        <extensions>
+            <extension default="1">aif</extension>
+            <extension default="0">aifc</extension>
+            <extension default="0">aiff</extension>
+        </extensions>
+        <synonyms>
+            <synonym>audio/aifc</synonym>
+            <synonym>audio/x-aiff</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="audio/basic" description="Audio file" icon="10.gif">
+        <extensions>
+            <extension default="1">au</extension>
+            <extension default="0">snd</extension>
+        </extensions>
+        <synonyms>
+            <synonym>audio/au</synonym>
+            <synonym>audio/x-au</synonym>
+            <synonym>audio/x-basic</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="audio/m4a" description="MPEG-4 audio file" icon="10.gif">
+        <extensions>
+            <extension default="1">m4a</extension>
+        </extensions>
+        <synonyms>
+            <synonym>audio/x-m4a</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="audio/mpeg" description="MP3 audio file" icon="10.gif">
+        <extensions>
+            <extension default="1">mp3</extension>
+        </extensions>
+        <synonyms>
+            <synonym>audio/mp3</synonym>
+            <synonym>audio/mpeg3</synonym>
+            <synonym>audio/mpg</synonym>
+            <synonym>audio/x-mp3</synonym>
+            <synonym>audio/x-mpeg</synonym>
+            <synonym>audio/x-mpeg3</synonym>
+            <synonym>audio/x-mpg</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="audio/vnd.rn-realaudio" description="RealAudio file" icon="10.gif">
+        <extensions>
+            <extension default="1">ra</extension>
+            <extension default="0">ram</extension>
+            <extension default="0">rpm</extension>
+        </extensions>
+        <synonyms>
+            <synonym>audio/vnd.pn-realaudio</synonym>
+            <synonym>audio/x-pn-realaudio</synonym>
+            <synonym>audio/x-pn-realaudio-plugin</synonym>
+            <synonym>audio/x-pn-realvideo</synonym>
+            <synonym>audio/x-realaudio</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="audio/wav" description="Waveform audio file" icon="10.gif">
+        <extensions>
+            <extension default="1">wav</extension>
+        </extensions>
+        <synonyms>
+            <synonym>audio/s-wav</synonym>
+            <synonym>audio/wave</synonym>
+            <synonym>audio/x-wav</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="audio/x-midi" description="MIDI audio file" icon="10.gif">
+        <extensions>
+            <extension default="1">mid</extension>
+            <extension default="0">midi</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/x-midi</synonym>
+            <synonym>audio/mid</synonym>
+            <synonym>audio/midi</synonym>
+            <synonym>audio/soundtrack</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="audio/x-mpeg-2" description="MPEG layer 2 audio file" icon="10.gif">
+        <extensions>
+            <extension default="1">mp2</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="audio/x-mpegurl" description="MP3 playlist file" icon="10.gif">
+        <extensions>
+            <extension default="1">m3u</extension>
+            <extension default="0">pls</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/x-winamp-playlist</synonym>
+            <synonym>audio/mpegurl</synonym>
+            <synonym>audio/mpeg-url</synonym>
+            <synonym>audio/playlist</synonym>
+            <synonym>audio/scpls</synonym>
+            <synonym>audio/x-scpls</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="audio/x-ms-wma" description="Windows Media file" icon="11.gif">
+        <extensions>
+            <extension default="1">wma</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="image/bmp" description="Bitmap image" icon="6.gif">
+        <extensions>
+            <extension default="1">bmp</extension>
+            <extension default="0">dib</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/bmp</synonym>
+            <synonym>application/x-bmp</synonym>
+            <synonym>image/ms-bmp</synonym>
+            <synonym>image/x-bitmap</synonym>
+            <synonym>image/x-bmp</synonym>
+            <synonym>image/x-ms-bmp</synonym>
+            <synonym>image/x-win-bitmap</synonym>
+            <synonym>image/x-windows-bmp</synonym>
+            <synonym>image/x-xbitmap</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="image/gif" description="GIF image" icon="6.gif">
+        <extensions>
+            <extension default="1">gif</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="image/jpeg" description="JPEG image" icon="6.gif">
+        <extensions>
+            <extension default="1">jpg</extension>
+            <extension default="0">jfif</extension>
+            <extension default="0">jpe</extension>
+            <extension default="0">jpeg</extension>
+            <extension default="0">pjpeg</extension>
+        </extensions>
+        <synonyms>
+            <synonym>image/pjpeg</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="image/png" description="PNG image" icon="6.gif">
+        <extensions>
+            <extension default="1">png</extension>
+        </extensions>
+        <synonyms>
+            <synonym>image/x-png</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="image/tiff" description="Tagged image file" icon="6.gif">
+        <extensions>
+            <extension default="1">tif</extension>
+            <extension default="0">tiff</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/tif</synonym>
+            <synonym>application/tiff</synonym>
+            <synonym>application/x-tif</synonym>
+            <synonym>application/x-tiff</synonym>
+            <synonym>image/tif</synonym>
+            <synonym>image/x-tif</synonym>
+            <synonym>image/x-tiff</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="image/vnd.ms-modi" description="Microsoft image" icon="6.gif">
+        <extensions/>
+        <synonyms/>
+    </content_type>
+    <content_type name="image/x-cmu-raster" description="Raster image" icon="6.gif">
+        <extensions>
+            <extension default="1">ras</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="image/x-dwg" description="AutoCAD drawing" icon="6.gif">
+        <extensions>
+            <extension default="1">dwg</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/acad</synonym>
+            <synonym>application/autocad_dwg</synonym>
+            <synonym>application/dwg</synonym>
+            <synonym>application/x-acad</synonym>
+            <synonym>application/x-autocad</synonym>
+            <synonym>application/x-dwg</synonym>
+            <synonym>image/vnd.dwg</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="image/x-ico" description="Favicon file" icon="6.gif">
+        <extensions>
+            <extension default="1">ico</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="image/x-photo-cd" description="Kodak Photo CD file" icon="6.gif">
+        <extensions>
+            <extension default="1">pcd</extension>
+        </extensions>
+        <synonyms>
+            <synonym>image/pcd</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="image/x-pict" description="Macintosh Quickdraw image" icon="6.gif">
+        <extensions>
+            <extension default="1">pic</extension>
+            <extension default="0">pict</extension>
+            <extension default="0">pct</extension>
+        </extensions>
+        <synonyms>
+            <synonym>image/pict</synonym>
+            <synonym>image/x-macpict</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="image/x-portable-bitmap" description="Portable bitmap image" icon="6.gif">
+        <extensions>
+            <extension default="1">pbm</extension>
+        </extensions>
+        <synonyms>
+            <synonym>image/pbm</synonym>
+            <synonym>image/portable-bitmap</synonym>
+            <synonym>image/x-pbm</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="image/x-portable-graymap" description="Portable graymap image" icon="6.gif">
+        <extensions>
+            <extension default="1">pgm</extension>
+        </extensions>
+        <synonyms>
+            <synonym>image/x-pgm</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="image/x-portable-pixmap" description="Portable pixmap image" icon="6.gif">
+        <extensions>
+            <extension default="1">ppm</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/ppm</synonym>
+            <synonym>application/x-ppm</synonym>
+            <synonym>image/x-ppm</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="image/x-rgb" description="IRIS image" icon="6.gif">
+        <extensions>
+            <extension default="1">rgb</extension>
+        </extensions>
+        <synonyms>
+            <synonym>image/rgb</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="image/x-targa" description="Truevision Targa image" icon="6.gif">
+        <extensions>
+            <extension default="1">tga</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/tga</synonym>
+            <synonym>application/x-targa</synonym>
+            <synonym>application/x-tga</synonym>
+            <synonym>image/targa</synonym>
+            <synonym>image/tga</synonym>
+            <synonym>image/x-tga</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="image/x-wmf" description="Windows Media file" icon="6.gif">
+        <extensions>
+            <extension default="1">wmf</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/wmf</synonym>
+            <synonym>application/x-msmetafile</synonym>
+            <synonym>application/x-wmf</synonym>
+            <synonym>image/wmf</synonym>
+            <synonym>image/x-win-metafile</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="image/x-xbitmap" description="Bitmap image" icon="6.gif">
+        <extensions>
+            <extension default="1">xbm</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="image/x-xpixmap" description="Pixmap image" icon="6.gif">
+        <extensions>
+            <extension default="1">xpm</extension>
+        </extensions>
+        <synonyms>
+            <synonym>image/x-xpm</synonym>
+            <synonym>image/xpm</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="message/rfc822" description="Web Archive file" icon="0.gif">
+        <extensions>
+            <extension default="0">eml</extension>
+            <extension default="1">mhtml</extension>
+            <extension default="0">mail</extension>
+            <extension default="0">mht</extension>
+            <extension default="0">nws</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="text/calendar" description="Calendar file" icon="5.gif">
+        <extensions>
+            <extension default="1">ics</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="text/css" description="Cascading stylesheet file" icon="8.gif">
+        <extensions>
+            <extension default="1">css</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/css-stylesheet</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="text/csv" description="Comma-delimited file" icon="5.gif">
+        <extensions>
+            <extension default="1">csv</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/csv</synonym>
+            <synonym>text/comma-separated-values</synonym>
+            <synonym>text/x-comma-separated-values</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="text/html" description="HTML file" icon="8.gif">
+        <extensions>
+            <extension default="1">html</extension>
+            <extension default="0">htm</extension>
+            <extension default="0">shtml</extension>
+            <extension default="0">xhtml</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/xhtml+xml</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="text/javascript" description="JavaScript source file" icon="8.gif">
+        <extensions>
+            <extension default="1">js</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/javascript</synonym>
+            <synonym>application/x-javascript</synonym>
+            <synonym>application/x-js</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="text/plain" description="Plain text file" icon="5.gif">
+        <extensions>
+            <extension default="1">txt</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="text/tsv" description="Tab-delimited file" icon="5.gif">
+        <extensions>
+            <extension default="1">tsv</extension>
+        </extensions>
+        <synonyms>
+            <synonym>text/tab-separated-values</synonym>
+            <synonym>text/x-tab-separated-values</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="text/x-chdr" description="C header file" icon="24.gif">
+        <extensions>
+            <extension default="1">h</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="text/x-csrc" description="C source file" icon="24.gif">
+        <extensions>
+            <extension default="1">c</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="text/x-objcsrc" description="Objective C source file" icon="24.gif">
+        <extensions>
+            <extension default="1">m</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="text/x-c++src" description="C++ source file" icon="24.gif">
+        <extensions>
+            <extension default="1">cpp</extension>
+            <extension default="0">cp</extension>
+            <extension default="0">c++</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="text/x-log" description="Log text file" icon="5.gif">
+        <extensions>
+            <extension default="1">log</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="text/x-patch" description="Patch source file" icon="5.gif">
+        <extensions>
+            <extension default="1">diff</extension>
+            <extension default="0">patch</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="text/x-pod" description="Perl documentation file" icon="22.gif">
+        <extensions>
+            <extension default="1">pod</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="text/x-python" description="Python source file" icon="5.gif">
+        <extensions>
+            <extension default="1">py</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="text/x-script.scheme" description="Scheme file" icon="5.gif">
+        <extensions>
+            <extension default="1">scm</extension>
+        </extensions>
+        <synonyms>
+            <synonym>text/x-scheme</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="text/x-sql" description="SQL file" icon="5.gif">
+        <extensions>
+            <extension default="1">sql</extension>
+        </extensions>
+        <synonyms>
+            <synonym>text/sql</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="text/xml" description="XML file" icon="5.gif">
+        <extensions>
+            <extension default="1">xml</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/x-xml</synonym>
+            <synonym>application/xml</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="text/xsl" description="XSLT stylesheet file" icon="5.gif">
+        <extensions>
+            <extension default="1">xsl</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="video/avi" description="AVI video file" icon="11.gif">
+        <extensions>
+            <extension default="1">avi</extension>
+        </extensions>
+        <synonyms>
+            <synonym>application/x-troff-msvideo</synonym>
+            <synonym>image/avi</synonym>
+            <synonym>video/msvideo</synonym>
+            <synonym>video/x-msvideo</synonym>
+            <synonym>video/xmpg2</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="video/mp4" description="MPEG-4 video file" icon="11.gif">
+        <extensions>
+            <extension default="1">m4v</extension>
+        </extensions>
+        <synonyms>
+            <synonym>video/mpeg4</synonym>
+            <synonym>video/x-m4v</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="video/mpeg" description="MPEG video file" icon="11.gif">
+        <extensions>
+            <extension default="1">mpeg</extension>
+            <extension default="0">m1v</extension>
+            <extension default="0">m2v</extension>
+            <extension default="0">mpe</extension>
+            <extension default="0">mpg</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="video/quicktime" description="Quicktime video file" icon="25.gif">
+        <extensions>
+            <extension default="1">qt</extension>
+            <extension default="0">mov</extension>
+            <extension default="0">mqv</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="video/vnd.rn-realvideo" description="RealVideo file" icon="11.gif">
+        <extensions>
+            <extension default="1">rv</extension>
+        </extensions>
+        <synonyms>
+            <synonym>video/x-pn-realvideo</synonym>
+        </synonyms>
+    </content_type>
+    <content_type name="video/x-dv" description="Digital video file" icon="11.gif">
+        <extensions>
+            <extension default="1">dv</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="video/x-ms-asf" description="Windows Media file" icon="11.gif">
+        <extensions>
+            <extension default="1">asf</extension>
+            <extension default="0">asr</extension>
+            <extension default="0">asx</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="video/x-ms-wmv" description="Windows Media file" icon="11.gif">
+        <extensions>
+            <extension default="1">wmv</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+    <content_type name="video/x-sgi-video" description="Silicon Graphics video file" icon="11.gif">
+        <extensions/>
+        <synonyms/>
+    </content_type>
+    <content_type name="x-world/x-vrml" description="VRML 3D file" icon="13.gif">
+        <extensions>
+            <extension default="1">wrl</extension>
+            <extension default="0">wrz</extension>
+        </extensions>
+        <synonyms/>
+    </content_type>
+</content_types>

@@ -1,0 +1,21 @@
+__section__
+default
+__description__
+Text that makes up the bottom of a page
+
+No specially passed variables
+__title__
+
+__page__
+ournet
+__lang__
+en_US
+__name__
+footer
+__template__
+</TD></TR>
+</TABLE>
+</HTML>
+
+__seclev__
+10000

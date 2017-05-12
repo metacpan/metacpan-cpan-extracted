@@ -1,0 +1,102 @@
+
+
+Highlights
+==========
+
+    *  Direct SOAP dialog with ActiveWorks brokers.
+    *  Apache Forwarding of SOAP requests to an ActiveWorks brokers.
+    *  Make ActiveWorks requests via SOAP.
+
+
+Overview
+========
+
+SOAP-ActiveWorks provides a transport layer for sending and receiving SOAP
+requests to and from an ActiveWorks broker.  Example adapter and client scripts
+are provided.
+
+The approach mirrors that of the original Transport::HTTP modules from which
+Transport::ActiveWorks borrows heavily.
+
+
+Demo Scripts & Setup
+====================
+You must first have the SOAP and Aw packages installed.  It is advisable that
+you also install the SOAP-AutoInvoke v0.25 or later to use the demo scripts.
+Using the AW event_type_editor import the event defintions from
+"server/soap.data".  This creates the "SOAP" client group, event scope,
+SOAP::Request and SOAP::Reply events.
+
+After the classes are installed with "make install" start "server/soap_adapter.pl"
+in one window and dialog with it using "client/calculator.pl" in another
+(which in turn depends on "Calculator.pm" module from SOAP-AutoInvoke).
+
+The "client/get_time.pl" may also be used at this point.
+
+
+To use an ActiveWorks broker thru an HTTP server prepare a mod_perl handler
+similar to the following which can peacefully coexist with your present
+SOAP HTTP installation:
+
+-------------------------------8<------------------------------------------
+package Apache::SOAPServer;
+use strict;
+use Apache;
+use SOAP::Transport::HTTP::Apache;
+use SOAP::Transport::ActiveWorks::HTTP::Apache;
+
+sub handler {
+
+    my $http_safe_classes = {
+        ClassA => undef,
+        ClassB => undef,
+    };
+
+    my $aw_safe_classes = {
+        Calculator => undef,
+        Time       => undef,
+    };
+
+    my $r = Apache->request();
+
+    my %args = $r->args();
+
+    if ( $http_safe_classes->{$args{class}} ) {
+         #
+         #  Handle requests here and now.
+         #
+         SOAP::Transport::HTTP::Apache->handler($http_safe_classes);
+    }
+    else {
+         #
+         #  Forward to an adapter for handling. 
+         #
+         SOAP::Transport::ActiveWorks::HTTP::Apache->handler($aw_safe_classes);
+    }
+
+}
+1;
+__END__
+------------------------------->8------------------------------------------
+~
+Alternatively SOAP::Transport::ActiveWorks::HTTP::Proxy provides the
+"http_proxy" subroutine which may be used as an optional dispatcher
+with "safe_classes" with the standard SOAP::Transport::HTTP::Apache
+handler.  This approach incurs a little more overhead however.
+
+The "client/get_time_via_http.pl" script and the the "client/calculator.pl"
+script from SOAP-AutoInvoke may both be used now thru the HTTP server.
+It is assumed that a time adapter is running.
+
+
+Future
+======
+With direct SOAP to ActiveWorks connectivity the possibility is present to
+create persistant objects on the server side.
+
+
+Comments and suggestions are of course appreciated.
+
+
+Daniel
+yacob@rcn.com

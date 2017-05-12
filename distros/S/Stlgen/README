@@ -1,0 +1,103 @@
+Stlgen
+
+Stlgen is based off the Standard Template Library (STL) for C++ here:
+
+	http://www.cplusplus.com/reference/stl/
+
+The difference is that Stlgen will generate instances of STL templates
+in a different language. By default, the language is c.
+
+This example uses Stlgen to generate list_uint.(c/h) files which will implement
+a linked list container coded in the c language.
+
+	#!/usr/bin/perl -w
+
+	use Stlgen;
+
+	my $inst = Stlgen->New(
+		Template=>'list', 
+		Instancename => 'uint',
+		payload => [
+			{name=>'uint',   type=>'unsigned int', dumper=>'printf("\t\tuint = %u\n", currelement->uint);'},
+		],
+	);
+
+	$inst->Instantiate();
+
+You could use these files in a main.c program like this:
+
+	#include <stdio.h>
+	#include "list_uint.h"
+
+	int main (void) {
+
+		struct list_uint_list *mylist;
+
+		mylist = list_uint_constructor();
+	
+		list_uint_push_back(mylist, 21);
+		list_uint_push_back(mylist, 99);
+		list_uint_push_back(mylist, 33);
+		list_uint_push_back(mylist, 34);
+		list_uint_push_back(mylist, 67);
+		list_uint_push_back(mylist, 12);
+		list_uint_push_back(mylist, 28);
+		list_uint_push_back(mylist, 55);
+		list_uint_push_back(mylist, 76);
+
+		list_uint_sort(mylist);
+
+		printf("\n\n\nThis is the sorted list\n");
+		list_uint_list_dumper(mylist);
+
+		return 0;
+	}
+
+Note: this is a pre-alpha version. Currently the only STL container 
+implemented is the linked list. And that hasn't been tested very well yet.
+The "push", "pop", "sort", and "dumper" functions are known to work.
+
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Stlgen
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Stlgen
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Stlgen
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Stlgen
+
+    Search CPAN
+        http://search.cpan.org/dist/Stlgen/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 Greg London
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

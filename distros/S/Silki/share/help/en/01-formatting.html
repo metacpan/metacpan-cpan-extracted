@@ -1,0 +1,369 @@
+<h2>Text Formatting</h2>
+
+<p>
+Silki uses an extended dialect of
+the <a href="http://daringfireball.net/projects/markdown/">Markdown</a> text
+formatting language. Markdown is designed to be a natural language for adding
+formatting to plain text.
+</p>
+
+<h3>Paragraphs</h3>
+
+<p>
+A paragraph is one or more lines of text. Paragraphs are separated by a blank
+line.
+</p>
+
+<&| .markdown-and-output, keep_paras => 1 &>
+This is a paragraph. It has several sentences. It
+also has a line break.
+
+This is a separate paragraph consisting of a single
+sentence on two lines.
+</&>
+
+<h3>Headers</h3>
+
+<p class="advice">
+We recommend that you don't use first-level headers in pages. The page title
+itself should serve as the first-level header. Inside the page, start with
+second-level headers and work from there.
+</p>
+
+<p>
+Headers come in two variants. underlined and prefixed. The underlined variant
+puts the header text on one line and the header markers on the next:
+</p>
+
+<&| .markdown-and-output, fixed => 1 &>
+Second-level Header
+-------------------
+</&>
+
+<p>
+You can also create headers by prefixing the text with hash marks (#):
+</p>
+
+<&| .markdown-and-output &>
+## Second-level Header
+
+### Third-level Header
+</&>
+
+<h3>Wiki Links</h3>
+
+<p>
+Linking to a page in the same wiki is simple, just wrap the page title in
+double parentheses:
+</p>
+
+<pre class="markdown-docs">
+((Page Title))
+</pre>
+
+<p>
+If you want to link to a page in another wiki on the same server, you need to
+include the wiki name with the page name, separated by a slash (/):
+</p>
+
+<pre class="markdown-docs">
+((Other Wiki/Page Title))
+</pre>
+
+<h3>External Links</h3>
+
+<p>
+When linking to an external site, you can set the link text (the text people
+see in the page), and the URL:
+</p>
+
+<&| .markdown-and-output &>
+[a great directory of veg-friendly restaurants](http://www.vegguide.org)
+</&>
+
+<p>
+If you just want to put a URL in the text, wrap it in angle brackets:
+</p>
+
+<&| .markdown-and-output &>
+<http://www.vegguide.org>
+</&>
+
+<h3>Linking to Files</h3>
+
+<p>
+You can link to files in the current wiki, or any other wiki you have access
+to. By default, Silki looks for files attached to the current page.
+</p>
+
+<pre class="markdown-example">Take a look at the PDF: {{file: file.pdf}}</pre>
+
+<div class="markdown-output">
+  <p>Take a look at the PDF: <a href="#" title="Download this file">file.pdf</a></p>
+</div>
+
+<p>
+If you want to change the link text, put the link text in square brackets
+before the link:
+</p>
+
+<pre class="markdown-example">Take a look at [the attached PDF]{{file: file.pdf}}</pre>
+
+<div class="markdown-output">
+  <p>Take a look at <a href="#" title="Download this file">the attached PDF</a></p>
+</div>
+
+<p>
+You can also link to files attached to other pages, even in other wikis. Of
+course, if a user viewing the page does not have access to the other wiki,
+they won't be able to see the file.
+</p>
+
+<pre class="markdown-example">Take a look at the PDF: {{file: Other Page In This Wiki/file.pdf}}</pre>
+
+<div class="markdown-output">
+  <p>Take a look at the PDF: <a href="#" title="Download this file">file.pdf</a></p>
+</div>
+
+<pre class="markdown-example">Take a look at the PDF: {{file: Other Wiki/Other Page/file.pdf}}</pre>
+
+<div class="markdown-output">
+  <p>Take a look at the PDF: <a href="#" title="Download this file">file.pdf</a></p>
+</div>
+
+<h3>Linking to Images</h3>
+
+<p>
+Image links are very similar to file links, but they embed the image in the
+wiki page:</p>
+</p>
+
+<pre class="markdown-example">The attached logo: {{image: logo.png}}</pre>
+
+<div class="markdown-output">
+  <p>
+    The attached logo:
+    <a href="<% Silki::URI::static_uri( '/images/vegguide-logo.png' ) %>"
+       title="View this file"
+       ><img src="<% Silki::URI::static_uri( '/images/vegguide-logo.png' ) %>"
+             alt="vegguide-logo.png"
+             height="66"
+             width="400"
+             /></a>
+  </p>
+</div>
+
+<p>
+The image will be scaled down so that is no wider than 400 pixels, and no
+taller than 150 pixels. The image will also link to a larger version of
+itself.
+</p>
+
+<h3>Bold and Italics</h3>
+
+<p>
+To make some text bold, wrap it with two asterisks (**):
+</p>
+
+<&| .markdown-and-output &>
+A **bold chunk** in the middle.
+</&>
+
+<p>
+To make text italic, wrap it with one asterisk (*):
+</p>
+
+<&| .markdown-and-output &>
+An *italic chunk* in the middle.
+</&>
+
+<p>
+You can also mix these italics and bold:
+</p>
+
+<&| .markdown-and-output &>
+A *ridiculously **strong piece of text***!
+</&>
+
+<h3>Lists</h3>
+
+<p>
+You can create bullet lists and numbered lists by prefixing each line with
+either a bullet (*) or a number (1., 2.).
+</p>
+
+<&| .markdown-and-output &>
+* Bullet 1
+* Bullet 2
+</&>
+
+<&| .markdown-and-output &>
+1. Number 1
+2. Number 2
+</&>
+
+<p>
+You can also nest lists using indentation:
+</p>
+
+<&| .markdown-and-output &>
+* 1-A
+* 1-B
+    * 2-B
+    * 3-B
+* 1-C
+    * 2-C
+        * three
+* 1-D
+</&>
+
+<h3>Tables</h3>
+
+<p>
+Silki extends Markdown to add table support. A table can have an optional set
+of header rows, a body, and an optional caption. Here's a basic table:
+</p>
+
+<&| .markdown-and-output, fixed => 1 &>
++-------------+------------------------------+--------+
+| name        | description                  | price  |
++-------------+------------------------------+--------+
+| gizmo       | Takes care of the doohickies |   1.99 |
+| doodad      | Collects *gizmos*            |  23.80 |
+| dojigger    | Foo                          | 102.98 |
+| thingamabob | Self-explanatory, no?        |   0.99 |
++-------------+------------------------------+--------+
+</&>
+
+<p>
+The header rows are marked off by a line consisting only of "+---+". You can
+have multiple header rows:
+</p>
+
+<&| .markdown-and-output, fixed => 1 &>
++-------------+-------+--------+---------+
+| Location           || Services        ||
++-------------+-------+--------+---------+
+| City        | State | Sales? | Repair? |
++-------------+-------+--------+---------+
+| Minneapolis | MN    | Yes    | Yes     |
+| Chicago     | IL    | Yes    | No      |
+| Columbus    | OH    | No     | No      |
++-------------+-------+--------+---------+
+</&>
+
+<p>
+This example also demonstrates column grouping. By putting two column
+separators next to each other ("||"), we can group cells together.
+</p>
+
+<p>
+Header rows are not required, nor are the markers at the beginning and end of
+the table:
+</p>
+
+<&| .markdown-and-output, fixed => 1 &>
+[Locations and Services]
+| Minneapolis | MN    | Yes    | Yes     |
+| Chicago     | IL    | Yes    | No      |
+| Columbus    | OH    | No     | No      |
+</&>
+
+<p>
+The text in brackets ("[...]") is the table's caption.
+</p>
+
+<p>
+By default, text in a cell is left-aligned. By adding appropriate whitespace,
+you can cause the cell to be centered or right-aligned:
+</p>
+
+<&| .markdown-and-output, fixed => 1 &>
+| Left        |    Center    |          Right |
+| Longer text | For contrast | And cell width |
+</&>
+
+<h3>Blockquotes</h3>
+
+<p>
+Use a blockquote for extended quotes of material from somewhere else. A
+blockquote is created by prefixing each line with an greater-than (>):
+</p>
+
+<&| .markdown-and-output, keep_paras => 1 &>
+> This is our hope. This is the faith that I go
+> back to the South with. With this faith we will
+> be able to hew out of the mountain of despair
+> a stone of hope. With this faith we will be
+> able to transform the jangling discords of
+> our nation into a beautiful symphony of
+> brotherhood. With this faith we will be able
+> to work together, to pray together, to
+> struggle together, to go to jail together,
+> to stand up for freedom together, knowing
+> that we will be free one day.
+>
+> -- Martin Luther King, Jr.
+</&>
+
+<h3>Horizontal Rule</h3>
+
+<p>
+You can insert a horizontal rule into a page by inserting four or more dashes
+(-) surrounded by blank lines
+</p>
+
+<&| .markdown-and-output &>
+Content ...
+
+----
+
+More content ...
+</&>
+
+<h3>Monospace / Code</h3>
+
+<p>
+If you want to insert code (monospaced text) inside some text, you can
+surround it by backticks (`). If you want a standalone pre-formatted monospace
+block, simply indent each line by four spaces:
+</p>
+
+<&| .markdown-and-output &>
+To set the variable `$foo`, write `$foo = $value`.
+</&>
+
+<&| .markdown-and-output, fixed => 1,  &>
+    while ( $x > 1 ) {
+        ....
+    }
+</&>
+
+<h3>More Info</h3>
+
+<p>
+We have purposely only documented a part of the full Markdown specification
+here, in order to keep things simple. However, we do support
+the <a href="http://daringfireball.net/projects/markdown/">full Markdown
+language</a>.
+</p>
+
+<%once>
+my $simple = Markdent::Simple::Fragment->new();
+</%once>
+
+<%def .markdown-and-output>
+<pre class="markdown-example <% $fixed ? 'fixed' : q{} %>"><% $markdown %></pre>
+<div class="markdown-output"><% $formatted | n %></div>
+
+<%args>
+$fixed => 0
+$keep_paras => 0
+</%args>
+
+<%init>
+my $markdown = $m->content();
+my $formatted = $simple->markdown_to_html( markdown => $markdown, dialect => 'Theory' );
+$formatted =~ s{<p>|</p>}{}g unless $keep_paras;
+</%init>
+</%def>

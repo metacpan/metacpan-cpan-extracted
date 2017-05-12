@@ -1,0 +1,22 @@
+Release 0.04
+	Software::Packager::Solaris	- Inital release done needs more support
+		for classes to comply with the documentation.
+	Software::Packager::Darwin	- basic support added.
+		It seems that the MacOS X packager program creates invalid
+		packages. They seem to hang on my machine when installing. Some
+		more testing needs to be done.
+	Software::Packager::Aix		- progressing slowly
+	
+Release 0.03
+	This release is the first alpha release.
+	Software::packager base API seems okay.
+	Software::packager::Object seems okay.
+	Software::Packager::Tar		- finished inital release
+	Software::Packager::Aix		- under development
+	Software::Packager::Darwin	- under development
+	Software::Packager::Dec_osf	- under development
+	Software::Packager::Hpux	- under development
+	Software::Packager::Mswin32	- under development
+	Software::Packager::Perl	- under development
+	Software::Packager::Rpm		- under development
+	Software::Packager::Solaris	- under development

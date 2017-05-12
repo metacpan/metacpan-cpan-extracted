@@ -1,0 +1,34 @@
+SWIFT/Factory/ApplicationHeader version 0.01
+============================================
+
+The Application Header is block number 2 of a SWIFT message.
+
+The block is normally built for "input", which in SWIFT
+speak means "input to the SWIFT network".
+
+This module will implement an "Input Application Header".
+
+TODO
+
+Implement a way to produce an output message.
+(For those who need to 'fake' a SWIFT message to some in-house system.)
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None.
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2003, BIKER. All rights reserved.
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

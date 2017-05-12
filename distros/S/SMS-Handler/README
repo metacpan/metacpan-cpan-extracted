@@ -1,0 +1,81 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+
+SMS::Handler
+============
+
+Classes to process a SMS message.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Net::POP3
+Net::SMTP
+Test::More
+Digest::MD5
+Date::Parse
+HTML::Parser
+Mail::Header
+Text::Abbrev
+Mail::Address
+Unicode::Map8
+Net::SMPP::XML
+Params::Validate
+MIME::WordDecoder
+MIME::QuotedPrint
+
+Some of them, are part of the core installation. Please insure that
+all of them are properly installed and working before issuing bug
+reports.
+
+SECURITY CONSIDERATIONS
+
+I have no control on the machanisms involved in the storage or
+transport of this distribution. This means that I cannot guarantee
+that the distribution you have in your hands is indeed, the same
+distribution I packed and uploaded.
+
+Along the distribution file, you should have a file with the extension
+".asc". This contains a GPG "detached signature" that makes it
+impossible for anybody to alter this distribution. If security is of
+any concern to you, by all means verify the signature of this file and
+contact the author if any discrepancy is detected.
+
+You can find more information about this at the following URL
+
+             http://mipagina.cantv.net/lem/gpg/
+
+COPYRIGHT AND LICENSE
+
+This code comes with no warranty of any kind. The author cannot be
+held liable for anything arising of the use of this code under no
+circumstances.
+
+This code is released under the terms and conditions of the
+GPL. Please see the file LICENSE that accompains this distribution for
+more specific information.
+
+Copyright (C) 2002 Luis E. Muñoz <luismunoz@cpan.org>
+All rights reserved
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.0.6 (Darwin)
+Comment: For info see http://www.gnupg.org
+
+iD8DBQE+Bgv9QyDWGRI/hhARAp0JAJ9sSrFBT4MRIalgph1DKCfjjtQcKQCgqWMv
+WfHX3DPgIAXyWiech+zP1Lw=
+=lSOB
+-----END PGP SIGNATURE-----
+
+$Id: README,v 1.2 2002/12/22 19:03:02 lem Exp $

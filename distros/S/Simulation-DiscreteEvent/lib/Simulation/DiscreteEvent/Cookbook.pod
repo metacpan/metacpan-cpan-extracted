@@ -1,0 +1,56 @@
+=pod
+
+=head1 NAME
+
+Simulation::DiscreteEvent::Cookbook - Simulation::DiscreteEvent Cookbook
+
+=head1 DESCRIPTION
+
+Purpose of Simulation::DiscreteEvent module is to simplify process of writing
+models, collecting and processing statistics about model behavior. This
+document provides some examples that should help you to start using
+Simulation::DiscreteEvent.
+
+I assume here that you familiar with basics of queueing theory and
+discrete-event simulation.
+
+=head1 RECIPES
+
+=head2 L<Simulation::DiscreteEvent::Cookbook::MM10>
+
+This recipe contains description of using library for modelling M/M/1/0 queue.
+
+=head2 L<Simulation::DiscreteEvent::Cookbook::Callcenter>
+
+This describes modelling of call center, and using
+L<Simulation::DiscreteEvent::NumericState> and
+L<Simulation::DiscreteEvent::Recorder> for collecting statistics.
+
+=head1 AUTHOR
+
+Pavel Shaydo, C<< <zwon at cpan.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-simulation-discreteevent at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Simulation-DiscreteEvent>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 SEE ALSO
+
+L<Simulation::DiscreteEvent>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2010 Pavel Shaydo.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+
+=cut
+
+

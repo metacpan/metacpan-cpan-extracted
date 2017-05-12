@@ -1,0 +1,32 @@
+Revision history for Perl extension Sub::Signatures.
+
+0.21  2005-12-03
+      - Switched from FILTER_ONLY to FILTER due to issues with
+        Text:::Balanced.  Ultimately, this leads to more robust code (and
+        slightly faster, too).
+      - Allow private subs and methods to be "signified"
+      - Fixed odd corner case where "substr" could confused filter if used
+        with parens and embedded in an "if" statement.  Thanks to Jerry
+        Sievert for the report.
+      - Eliminated useless INIT block.
+
+0.20  2005-10-06
+      - Added Pod Tests
+      - Converted to Module::Build
+      - Removed broken "strict" mode
+      - Added "fallback" method/subroutines
+      - Thorough documentation update
+
+0.11  Mon Dec 6, 2004
+      - whoops!  Fixed serious bug where we did not allow classnames
+        signatures to have colons.
+      - improved debugging code.
+
+0.1   Sun Dec 5, 2004
+      - Updated the docs.
+      - Made anonymous functions work.
+      - Dies if you try to define a sub with a duplicate signature
+
+0.01  Sat Dec  4 08:44:46 PST 2004
+	- original version; created by make_project 0.1
+

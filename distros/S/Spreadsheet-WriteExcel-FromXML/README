@@ -1,0 +1,96 @@
+NAME
+    Spreadsheet::WriteExcel::FromXML - Create Excel Spreadsheet from XML
+
+SYNOPSIS
+      use strict;
+      use warnings;
+      use Spreadsheet::WriteExcel::FromXML;
+      my $fromxml = Spreadsheet::WriteExcel::FromXML->new( "file.xml" );
+      $fromxml->parse;
+      $fromxml->buildSpreadsheet;
+      $fromxml->writeFile("file.xls");
+      # or
+      my $data = $fromxml->getSpreadsheetData;
+      # then write $data to a file...or do with it as you wish
+
+      # or, even simpler:
+      my $data = Spreadsheet::WriteExcel::FromXML->BuildSpreadsheet( "file.xml" );
+
+      # or, even simpler:
+      Spreadsheet::WriteExcel::FromXML->XMLToXLS( "file.xml", "file.xls" );
+
+DESCRIPTION
+    This module uses Spreadsheet::WriteExcel to turn a simple XML data file
+    into a binary Excel XLS file.
+
+    See also the FromXML.dtd file in the distribution.
+
+API REFERENCE
+  new($)
+    Param: XML file name - name of file to be parsed. Return: ToExcel
+    object.
+
+    Constructor. Requires and XML file name.
+
+  private void _initializeXMLSource($)
+    Param: XML file source (GLOB, IO::Handle, file name or XML as a string
+    [or scalar ref]) Return: true Throws: exception if unable to
+
+    Initializer method to check for existance of the XML file.
+
+  parse
+    Param: XML file name or an IO::Handle [optional]. Return: true Throws:
+    exception if xmlsource initialization fails, or if parsing fails
+
+    A method to make the necessary calls to parse the XML file. Remember, if
+    a file handle is passed in the calling code is responsible for closing
+    it.
+
+  _parseXMLFileToTree
+    Param: none. Return: true Calls: XML::Parse new & parse.
+
+    A method to parse an XML file into a tree-style data structure using
+    XML::Parser.
+
+  _processTree
+      Param: $ar         - child xml elements
+      Param: $xmltag     - the xml tag name (string)
+      Param: $rownum     - the current row number in the internal worksheet
+      Param: $column     - the current column number in the current row
+      Param: $rowformat
+      Return: void.
+
+    A method for taking the tree-style data structure from XML::Parser and
+    sticking the data into our object structure & Spreadsheet::WriteExcel.
+    After this method is called, we have an Excel spreadsheet ready for
+    output.
+
+  writeFile($)
+    Param: filename - file name to output Excel data to. Return: true/false
+    Throws: exception if unable to open the file.
+
+    writeFile takes a file name and writes the XLS data from the internal
+    buffer to the specified file.
+
+  getSpreadsheetData
+    Once the spreadsheet has been generated, this method returns the binary
+    representation of the spreadsheet.
+
+  workbook([$])
+    Get/set method to reference our Workbook object.
+
+  _treeData([$])
+    Get/set method for the raw XML tree data.
+
+  _xmlfh([$])
+    Get/set method for the XML file that is being parsed.
+
+SEE ALSO
+    SpreadSheet::WriteExcel SpreadSheet::WriteExcel::FromDB
+    OLE::Storage_Lite
+
+AUTHORS
+    Justin Bedard juice@lerch.org
+
+    Kyle R. Burton mortis@voicenet.com, krburton@cpan.org
+

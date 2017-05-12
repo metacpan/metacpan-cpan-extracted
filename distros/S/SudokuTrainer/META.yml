@@ -1,0 +1,45 @@
+---
+abstract: "Train on detecting successful Sudoku stategies.\nAlso help to get over an obstacle while solving a Sudoku puzzle."
+author:
+  - 'Klaus Wittrock <Wittrock@cpan.org>'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: SudokuTrainer
+no_index:
+  file:
+    - Games/Sudoku/Trainer/Run.pm
+  package:
+    - Games::Sudoku::Trainer::Cell
+provides:
+  Games::Sudoku::Trainer::Cell:
+    file: lib/Games/Sudoku/Trainer/Cell.pm
+    version: v0.2.0
+  Games::Sudoku::Trainer::General_info:
+    file: lib/Games/Sudoku/Trainer/General_info.pm
+    version: v0.2.0
+  Games::Sudoku::Trainer::Nextvalue:
+    file: lib/Games/Sudoku/Trainer/Nextvalue.pm
+    version: v0.2.0
+  Games::Sudoku::Trainer::Obstacle:
+    file: lib/Games/Sudoku/Trainer/Obstacle.pm
+    version: v0.3.0
+  Games::Sudoku::Trainer::Run:
+    file: lib/Games/Sudoku/Trainer/Run.pm
+    version: v0.4.0
+  Games::Sudoku::Trainer::Training:
+    file: lib/Games/Sudoku/Trainer/Training.pm
+    version: v0.2.0
+requires:
+  List::MoreUtils: 0
+  Tk: 0
+  perl: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: v0.01.5

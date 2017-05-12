@@ -1,0 +1,49 @@
+template: info-contact.tt
+
+vars:
+  contact_id: 04a
+  pw: 
+
+input_assertions:
+  class: SRS::EPP::Command::Info::Contact
+  count:
+    - [ '//contact:id', 1, 'Initial EPP: One contact' ]
+    - [ '//contact:authInfo', 0, 'Initial EPP: Zero authInfos' ]
+  match:
+  match_all:
+  attr_is:
+
+SRS:
+  - assertions:
+      count:
+        - [ '//HandleIdFilter', 1, 'SRS: Check for only one HandleIdFilter' ]
+      match:
+        - [ '//HandleIdFilter', '04a', 'SRS: Check the first HandleIdFilter' ]
+      match_all:
+      attr_is:
+
+output_assertions:
+  count:
+    - [ '//contact:id', 1, 'Check for one ID' ]
+    - [ '//contact:upDate', 0, 'No updated date returned' ]
+    - [ '//contact:upID', 0, 'No updated id returned' ]
+  match:
+    - [ '//contact:id', '04a', 'Correct id returned']
+    - [ '//contact:name', 'A Person', 'Correct name returned']
+    - [ '//contact:street[1]', '1 Acacia Ave', 'Correct street 1 returned']
+    - [ '//contact:street[2]', 'Treewood', 'Correct street 1 returned']
+    - [ '//contact:city', 'Wellington', 'Correct city returned']
+    - [ '//contact:sp', 'Wellington', 'Correct province returned']
+    - [ '//contact:pc', '6021', 'Correct postcode returned']
+    - [ '//contact:cc', 'NZ', 'Correct country code returned']
+    - [ '//contact:voice', '+4.40000000', 'Phone number correct']
+    - [ '//contact:email', 'someone@example.com', 'Email correct']
+    - [ '//contact:roid', 'e0b1b9deeada-CON', 'roid correct']
+    - [ '//contact:crDate', '/\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d:\d\d/', 'Created date returned' ]
+    - [ '//contact:crID', '100', 'Created id correct' ]
+    - [ '//contact:clID', '100', 'Client id correct' ]
+  match_all:
+  attr_is:
+    - [ '//epp:result', 'code', 1000, 'SRS: Check for correct result code' ]
+    - [ '//contact:status', 's', 'ok', 'Status correct' ]
+    - [ '//contact:postalInfo', 'type', 'int', '"int" type returned' ]

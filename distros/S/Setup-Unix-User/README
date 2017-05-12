@@ -1,0 +1,18 @@
+FAQ
+
+ How to create user without creating a group with the same name as that
+ user?
+
+    By default, group is set to the same name as the user. This will create
+    group with the same name as the user (if the group didn't exist). You
+    can set group to an existing group, e.g. users and the setup function
+    will not create a new group with the same name as user. But note that
+    the group must already exist (if it does not, you can create it first
+    using Setup::Unix::Group).
+
+SEE ALSO
+
+    Setup
+
+    Setup::Unix::Group
+

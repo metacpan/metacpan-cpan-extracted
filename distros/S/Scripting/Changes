@@ -1,0 +1,8 @@
+Revision history for Perl extension Scripting.
+
+0.01  Fri Jul 18 17:27:56 2003
+	- original version; created by h2xs 1.2 with options
+		-A -X Scripting
+
+0.99 Mon Jul 21 11:44:00 2003
+       - First release

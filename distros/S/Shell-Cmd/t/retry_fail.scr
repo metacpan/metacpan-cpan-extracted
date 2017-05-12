@@ -1,0 +1,3 @@
+rm -f fail_twice_1 fail_twice_2
+TESTDIR/bin/fail_twice               #OPTS retry 2
+TESTDIR/bin/succ

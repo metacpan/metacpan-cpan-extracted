@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!DOCTYPE catalog
+	PUBLIC "-//OASIS/DTD Entity Resolution XML Catalog V1.0//EN"
+	"http://www.oasis-open.org/committees/entity/release/1.0/catalog.dtd"
+>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+
+	<public
+		publicId="-//CUSTOM//DOCKBOOK 4.4//EN"
+		uri="custom.dtd"/>
+
+	<public
+		publicId="-//OASIS//DTD DocBook XML V4.3//EN"
+		uri="file:///usr/share/xml/docbook/schema/dtd/4.4/docbookx.dtd"/>
+
+	<group prefer="public" xml:base="file:///usr/share/xml/docbook/stylesheet/nwalsh/">
+		<uri
+			name="html-stylesheet.xsl"
+			uri="html/docbook.xsl"/>
+
+		<uri
+			name="fo-stylesheet.xsl"
+			uri="fo/docbook.xsl"/>
+	</group>
+
+</catalog>

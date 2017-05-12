@@ -1,0 +1,46 @@
+Search-Indexer version 0.70
+===========================
+
+This module provides support for indexing a collection of documents,
+for searching the collection, and displaying the sorted results, 
+together with contextual excerpts of the original document.
+
+As far as this module is concerned, a document is just a buffer of
+plain text, together with a unique identifying number. The caller is
+responsible for supplying unique numbers, and for converting the
+original source (HTML, PDF, whatever) into plain text. Documents could
+also contain more information (other fields like date, author, Dublin
+Core, etc.), but this must be handled externally, in a database or any
+other store; for example we built a document management system 
+where metadata about documents is indexed through 
+File::Tabular, and document content is indexed 
+through this module.
+
+The indexer uses three files in BerkeleyDB format : a) a mapping from
+words to wordIds; b) a mapping from wordIds to lists of documents ; c)
+a mapping from pairs (docId, wordId) to lists of positions within the
+document. This third file holds detailed information and therefore is
+quite big ; but it allows us to quickly retrieve "exact phrases"
+(sequences of adjacent words) in the document.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Search::QueryParser
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Laurent Dami.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+

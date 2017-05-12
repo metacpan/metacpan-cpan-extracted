@@ -1,0 +1,69 @@
+From an e-mail to the Openinteract Dev list ...
+<http://www.geocrawler.com/archives/3/8393/2002/1/0/7464826/>
+
+To:      Chris Winters <chris@cwinters.com>,
+         OpenInteract Dev List <openinteract-dev@lists.sourceforge.net>
+From:    Ray Zimmerman <rz10@cornell.edu>
+Subject: [Openinteract-dev] SPOPS enhanced HAS-A semantics (changes to proposal)
+Date:    Fri, 4 Jan 2002 16:59:40 -0500
+
+Chris,
+
+I realized the other day that the enhanced has-a semantics I proposed in
+an e-mail to the list back on 7/3/01 is not quite general enough for all
+of our needs.  (I've included the entire original proposal at the end of
+this e-mail for reference).
+
+The issue is that I assumed that any secondary objects auto-fetched (or
+lazy-fetched) with the primary object should always be auto-saved with
+that object as well. Based on this assumption, I did not include any
+explicit 'save' configuration in the new has-a syntax. The 3 rules for
+saving were ...
+
+----------
+
+(I'm pulling this text directly out of the original write-up, where $x
+belongs to class X which has-a field named 'myA' which is an object of
+type A, and a field named 'myB' which is an object of type B) ...
+
+1. In all forward direction fetch configurations (manual, auto and
+lazy), if $x->{myA} contains a reference to an A object when $x is
+saved, it will save the A object during the pre_save stage before saving
+$x with the updated id of the A object. If $x->{myA} contains an id
+only, nothing special is done when $x is saved.
+
+2. In all reverse direction fetch configurations (manual_by, auto_by and
+lazy_by), if $a->{'list_of_Xs'} contains an arrayref of X objects when
+$a is saved, it will save each X during the post_save stage after
+updating the myA field in each X with the new id of $a.
+
+3. For all links (manual, auto and lazy), whether or not
+$a->{'linked_Bs'} contains anything when $a is saved, it will NOT
+automatically save any X's or B's.
+
+----------
+
+I've run across some cases where that isn't the desired behavior. In
+particular, sometimes one may not want to auto-save the secondary
+objects even though they are being auto/lazy-fetched. This could be the
+case for either forward or backward direction fetch configurations. On
+the other hand, one may want to allow auto-saving of linked secondary
+objects (not allowed by 3 above).
+
+My new proposal is to let the old proposal define the default behavior,
+but add an optional parameter to the 'fetch' and 'link' parts of the
+configuration. In the 'fetch' configuration allow an optional 'no_save'
+parameter with values 0 or 1, where 0 corresponds to the default
+behavior (saving all secondary objects) and 1 specifies that it should
+not do any saving of secondary objects.
+
+In the 'link' configuration, allow an optional 'save' parameter with
+values 0 or 1, where 0 specifies the default (don't auto-save anything)
+and 1 means to save any linked objects, if necessary creating the
+corresponding linking objects.
+
+There are more details to be worked out with this, but I thought I'd
+better send you what I have at the moment, before I get pulled off to
+other things.
+
+	Ray

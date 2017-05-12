@@ -1,0 +1,57 @@
+ShiftJIS::CP932::Correct version 0.06
+================
+
+NAME
+
+ShiftJIS::CP932::Correct - corrects a string in Windows CP-932
+(a variant of Shift_JIS)
+
+SYNOPSIS
+
+  use ShiftJIS::CP932::Correct;
+
+  $corrected_cp932_string = correct_cp932($cp932_string);
+
+  $bool = is_cp932($cp932_string);
+
+  $bool = is_corrected_cp932($corrected_cp932_string);
+
+DESCRIPTION
+
+This module provides some functions.
+
+C<correct_cp932> corrects Windows CP-932 string.
+i.e. converts less preferred code points
+of duplicates (doubly-defined characters) to the preferred one.
+
+C<is_cp932> returns false if the string contain any not-CP932 code point.
+
+C<is_corrected_cp932> returns false if the string contain 
+any not-CP932 code point or any less preferred codepoint
+of duplicates.
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+    Perl 5.003 or later.
+
+COPYRIGHT AND LICENSE
+
+   Copyright(C) 2001-2002, SADAHIRO Tomoyuki. Japan. All rights reserved.
+
+   This module is free software; you can redistribute it
+   and/or modify it under the same terms as Perl itself.
+
+SEE ALSO
+
+Microsoft PRB: Conversion Problem Between Shift-JIS and Unicode
+(Article ID: Q170559)
+

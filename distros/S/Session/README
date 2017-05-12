@@ -1,0 +1,49 @@
+Session 0.01
+============
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+NAME
+    Session - Object Oriented wrapper around Apache::Session to avoid its
+    tie mechanism
+
+DESCRIPTION
+    This module is a simple wrapper around Apache::Session without the "tie"
+    interface. Tie is too slow for web applications (think mod_perl) and you
+    may prefere a standard OO API instead of a poor tie interface (I hate
+    tie).
+
+    You should look for Apache::Session and Apache::Session::Flex man page
+    for more details on the session management. We will explain here only
+    things that differs from Apache::Session.
+
+    Note that neither Apache::Session nor Session are liked with mod_perl,
+    you should use Session in any programs for the web or not.
+
+AUTHORS
+    Olivier Poitrey <rs@rhapsodyk.net> is the author of Session.
+
+    Jeffrey Baker <jwbaker@acm.org> is the author of Apache::Session.
+
+LICENCE
+    This library is free software; you can redistribute it and/or modify it
+    under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation; either version 2.1 of the License, or (at
+    your option) any later version.
+
+    This library is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser
+    General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with this library; if not, write to the Free Software Foundation,
+    Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+

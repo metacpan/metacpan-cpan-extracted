@@ -1,0 +1,194 @@
+Linux version 2.6.16-2-686 (Debian 2.6.16-18~bpo.1) (nobse@backports.org) (gcc version 3.3.5 (Debian 1:3.3.5-13)) #1 Mon Aug 21 11:33:09 CEST 2006
+BIOS-provided physical RAM map:
+ BIOS-e820: 0000000000000000 - 000000000009fc00 (usable)
+ BIOS-e820: 000000000009fc00 - 00000000000a0000 (reserved)
+ BIOS-e820: 00000000000e0000 - 0000000000100000 (reserved)
+ BIOS-e820: 0000000000100000 - 000000001fff0000 (usable)
+ BIOS-e820: 000000001fff0000 - 000000001ffff000 (ACPI data)
+ BIOS-e820: 000000001ffff000 - 0000000020000000 (ACPI NVS)
+ BIOS-e820: 00000000fffc0000 - 0000000100000000 (reserved)
+0MB HIGHMEM available.
+511MB LOWMEM available.
+On node 0 totalpages: 131056
+  DMA zone: 4096 pages, LIFO batch:0
+  DMA32 zone: 0 pages, LIFO batch:0
+  Normal zone: 126960 pages, LIFO batch:31
+  HighMem zone: 0 pages, LIFO batch:0
+DMI 2.3 present.
+ACPI: RSDP (v000 ACPIAM                                ) @ 0x000f52c0
+ACPI: RSDT (v001 A M I  OEMRSDT  0x09000520 MSFT 0x00000097) @ 0x1fff0000
+ACPI: FADT (v002 A M I  OEMFACP  0x09000520 MSFT 0x00000097) @ 0x1fff0200
+ACPI: OEMB (v001 A M I  OEMBIOS  0x09000520 MSFT 0x00000097) @ 0x1ffff040
+ACPI: DSDT (v001  AMIBI AMIBI002 0x00000002 INTL 0x02002026) @ 0x00000000
+ACPI: PM-Timer IO Port: 0x408
+Allocating PCI resources starting at 30000000 (gap: 20000000:dffc0000)
+Built 1 zonelists
+Kernel command line: root=/dev/hda1 ro 
+Local APIC disabled by BIOS -- you can enable it with "lapic"
+mapped APIC to ffffd000 (01402000)
+Enabling fast FPU save and restore... done.
+Enabling unmasked SIMD FPU exception support... done.
+Initializing CPU#0
+PID hash table entries: 2048 (order: 11, 32768 bytes)
+PM-Timer running at invalid rate: 93% of normal - aborting.
+Detected 2664.150 MHz processor.
+Using tsc for high-res timesource
+Console: colour VGA+ 80x25
+Dentry cache hash table entries: 131072 (order: 7, 524288 bytes)
+Inode-cache hash table entries: 65536 (order: 6, 262144 bytes)
+Memory: 515248k/524224k available (1469k kernel code, 8424k reserved, 610k data, 152k init, 0k highmem)
+Checking if this processor honours the WP bit even in supervisor mode... Ok.
+Calibrating delay using timer specific routine.. 5528.90 BogoMIPS (lpj=11057814)
+Security Framework v1.0.0 initialized
+SELinux:  Disabled at boot.
+Capability LSM initialized
+Mount-cache hash table entries: 512
+CPU: After generic identify, caps: 07c0a97b 00000000 00000000 00000000 00000000 00000000 00000000
+CPU: After vendor identify, caps: 07c0a97b 00000000 00000000 00000000 00000000 00000000 00000000
+CPU: Trace cache: 12K uops, L1 D cache: 8K
+CPU: L2 cache: 512K
+CPU: After all inits, caps: 07c0a97b 00000000 00000000 00000080 00000000 00000000 00000000
+Intel machine check architecture supported.
+Intel machine check reporting enabled on CPU#0.
+CPU: Intel(R) Pentium(R) 4 CPU 2.80GHz stepping 07
+Checking 'hlt' instruction... OK.
+ACPI: setting ELCR to 0200 (from 0800)
+checking if image is initramfs... it is
+Freeing initrd memory: 994k freed
+NET: Registered protocol family 16
+ACPI: bus type pci registered
+PCI: Using configuration type 1
+ACPI: Subsystem revision 20060127
+ACPI: Interpreter enabled
+ACPI: Using PIC for interrupt routing
+ACPI: PCI Root Bridge [PCI0] (0000:00)
+PCI: Probing PCI hardware (bus 00)
+PCI quirk: region 0400-043f claimed by PIIX4 ACPI
+PCI quirk: region 0440-044f claimed by PIIX4 SMB
+Boot video device is 0000:00:08.0
+ACPI: PCI Interrupt Routing Table [\_SB_.PCI0._PRT]
+ACPI: PCI Interrupt Link [LNKA] (IRQs 3 4 5 7 9 10 *11 12 14 15)
+ACPI: PCI Interrupt Link [LNKB] (IRQs 3 4 5 7 9 10 11 12 14 15) *0, disabled.
+ACPI: PCI Interrupt Link [LNKC] (IRQs 3 4 5 7 9 10 11 12 14 15) *0, disabled.
+ACPI: PCI Interrupt Link [LNKD] (IRQs 3 4 5 7 9 10 11 12 14 15) *0, disabled.
+Linux Plug and Play Support v0.97 (c) Adam Belay
+pnp: PnP ACPI init
+pnp: PnP ACPI: found 14 devices
+PnPBIOS: Disabled by ACPI PNP
+PCI: Using ACPI for IRQ routing
+PCI: If a device doesn't work, try "pci=routeirq".  If it helps, post a report
+pnp: 00:0c: ioport range 0x400-0x43f could not be reserved
+pnp: 00:0c: ioport range 0x370-0x371 has been reserved
+pnp: 00:0c: ioport range 0x440-0x44f has been reserved
+PCI: Ignore bogus resource 6 [0:0] of 0000:00:08.0
+audit: initializing netlink socket (disabled)
+audit(1266996729.632:1): initialized
+VFS: Disk quotas dquot_6.5.1
+Dquot-cache hash table entries: 1024 (order 0, 4096 bytes)
+Initializing Cryptographic API
+io scheduler noop registered
+io scheduler anticipatory registered (default)
+io scheduler deadline registered
+io scheduler cfq registered
+Limiting direct PCI/PCI transfers.
+isapnp: Scanning for PnP cards...
+isapnp: No Plug & Play device found
+PNP: PS/2 Controller [PNP0303:PS2K,PNP0f03:PS2M] at 0x60,0x64 irq 1,12
+serio: i8042 AUX port at 0x60,0x64 irq 12
+serio: i8042 KBD port at 0x60,0x64 irq 1
+Serial: 8250/16550 driver $Revision: 1.90 $ 4 ports, IRQ sharing enabled
+serial8250: ttyS0 at I/O 0x3f8 (irq = 4) is a TI16750
+serial8250: ttyS1 at I/O 0x2f8 (irq = 3) is a TI16750
+00:07: ttyS0 at I/O 0x3f8 (irq = 4) is a TI16750
+00:08: ttyS1 at I/O 0x2f8 (irq = 3) is a TI16750
+RAMDISK driver initialized: 16 RAM disks of 8192K size 1024 blocksize
+NET: Registered protocol family 2
+input: AT Translated Set 2 keyboard as /class/input/input0
+IP route cache hash table entries: 8192 (order: 3, 32768 bytes)
+TCP established hash table entries: 32768 (order: 5, 131072 bytes)
+TCP bind hash table entries: 32768 (order: 5, 131072 bytes)
+TCP: Hash tables configured (established 32768 bind 32768)
+TCP reno registered
+TCP bic registered
+NET: Registered protocol family 1
+NET: Registered protocol family 17
+NET: Registered protocol family 8
+NET: Registered protocol family 20
+Using IPI Shortcut mode
+ACPI wakeup devices: 
+
+ACPI: (supports S0 S5)
+Freeing unused kernel memory: 152k freed
+mice: PS/2 mouse device common for all mice
+Uniform Multi-Platform E-IDE driver Revision: 7.00alpha2
+ide: Assuming 33MHz system bus speed for PIO modes; override with idebus=xx
+PIIX4: IDE controller at PCI slot 0000:00:07.1
+PIIX4: chipset revision 1
+PIIX4: not 100% native mode: will probe irqs later
+    ide0: BM-DMA at 0xffa0-0xffa7, BIOS settings: hda:DMA, hdb:pio
+    ide1: BM-DMA at 0xffa8-0xffaf, BIOS settings: hdc:DMA, hdd:pio
+Probing IDE interface ide0...
+hda: Virtual HD, ATA DISK drive
+ide0 at 0x1f0-0x1f7,0x3f6 on irq 14
+Probing IDE interface ide1...
+hdc: Virtual CD, ATAPI CD/DVD-ROM drive
+ide1 at 0x170-0x177,0x376 on irq 15
+hda: max request size: 128KiB
+hda: 33554304 sectors (17179 MB) w/64KiB Cache, CHS=33288/16/63, DMA
+ hda: hda1 hda2
+EXT3-fs: INFO: recovery required on readonly filesystem.
+EXT3-fs: write access will be enabled during recovery.
+kjournald starting.  Commit interval 5 seconds
+EXT3-fs: recovery complete.
+EXT3-fs: mounted filesystem with ordered data mode.
+Real Time Clock Driver v1.12ac
+Generic RTC Driver v1.07
+Adding 1032688k swap on /dev/hda2.  Priority:-1 extents:1 across:1032688k
+EXT3 FS on hda1, internal journal
+hdc: ATAPI DVD-ROM drive, 128kB Cache, DMA
+Uniform CD-ROM driver Revision: 3.20
+SCSI subsystem initialized
+Floppy drive(s): fd0 is 1.44M
+FDC 0 is an 82078.
+usbcore: registered new driver usbfs
+usbcore: registered new driver hub
+usbcore: registered new driver usbkbd
+drivers/usb/input/usbkbd.c: :USB HID Boot Protocol keyboard driver
+Initializing USB Mass Storage driver...
+usbcore: registered new driver usb-storage
+USB Mass Storage support registered.
+USB Universal Host Controller Interface driver v2.3
+ohci_hcd: 2005 April 22 USB 1.1 'Open' Host Controller (OHCI) Driver (PCI)
+usbcore: registered new driver usbserial
+drivers/usb/serial/usb-serial.c: USB Serial support registered for generic
+usbcore: registered new driver usbserial_generic
+drivers/usb/serial/usb-serial.c: USB Serial Driver core
+drivers/usb/serial/usb-serial.c: USB Serial support registered for FTDI USB Serial Device
+usbcore: registered new driver ftdi_sio
+drivers/usb/serial/ftdi_sio.c: v1.4.3:USB FTDI Serial Converters Driver
+ACPI: PCI Interrupt Link [LNKA] enabled at IRQ 11
+PCI: setting IRQ 11 as level-triggered
+ACPI: PCI Interrupt 0000:00:0a.0[A] -> Link [LNKA] -> GSI 11 (level, low) -> IRQ 11
+0000:00:0a.0: DC21140 at 0xec00, h/w address 00:03:ff:1a:37:88,
+eth%d: Using generic MII device control. If the board doesn't operate, 
+please mail the following dump to the author:
+
+MII device address: 0
+MII CR:  3100
+MII SR:  782c
+MII ID0: fff
+MII ID1: fc41
+MII ANA: 1e1
+MII ANC: 41e1
+MII 16:  400
+MII 17:  8008
+MII 18:  7800
+
+      and requires IRQ11 (provided by PCI BIOS).
+de4x5.c:V0.546 2001/02/22 davies@maniac.ultranet.com
+device-mapper: 4.5.0-ioctl (2005-10-04) initialised: dm-devel@redhat.com
+eth0: media is 100Mb/s.
+NET: Registered protocol family 10
+lo: Disabled Privacy Extensions
+IPv6 over IPv4 tunneling driver
+eth0: no IPv6 routers present

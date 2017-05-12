@@ -1,0 +1,57 @@
+{
+   "abstract" : "Server plugin for Salvation::AnyNotify",
+   "author" : [
+      "Gennadiy Filatov <gfilatov@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Salvation-AnyNotify-Plugin-Server",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "Plack" : "0",
+            "Salvation::AnyNotify" : "0.01",
+            "Salvation::AnyNotify::Plugin::Daemon" : "0",
+            "Salvation::DaemonDecl" : "0",
+            "Salvation::Method::Signatures" : "0.02",
+            "Salvation::TC" : "0.11",
+            "Sub::Recursive" : "0",
+            "Twiggy" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/kainwinterheart/salvation-anynotify-server.git",
+         "web" : "https://github.com/kainwinterheart/salvation-anynotify-server",
+         "x_bugtracker" : "https://github.com/kainwinterheart/salvation-anynotify-server/issues"
+      }
+   },
+   "version" : "0.01"
+}

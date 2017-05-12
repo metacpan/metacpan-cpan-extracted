@@ -1,0 +1,29 @@
+
+Perl Module String::CRC32
+
+This packages provides a perl module to generate checksums from strings
+and from files.
+
+Written 19990310 by Soenke J. Peters <peters__perl@opcenter.de>.
+
+The checksums are the same as those calculated by ZMODEM, PKZIP,
+PICCHECK and many others.
+There's another perl module called String::CRC which allows to calculate
+not only 32 bit CRC numbers, but the generated sums differ from those of
+the programs mentioned above.
+
+Installation:
+   "perl Makefile.PL"
+   "make"
+   "make test"
+   "make install"
+
+If you find any bugs, please send me a good description (or a patch ;-) ).
+Thanks to s0lar(at)gmx.li who sent me a patch to replace PerlIO_getc with
+PerlIO_read to improve performance.
+
+Have fun,
+    Soenke J. Peters
+    Hamburg, Germany
+
+

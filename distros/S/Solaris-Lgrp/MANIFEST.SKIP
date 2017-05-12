@@ -1,0 +1,6 @@
+SCCS
+\.(gz|bak|old|bs|o|c)$
+blib
+\.~
+^Makefile$
+

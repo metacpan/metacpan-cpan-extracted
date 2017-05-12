@@ -1,0 +1,11 @@
+The scripts in this directory are scripts which use the SNMP::Util library.
+The example usage is shown below.  The snmptest scripts tests all the different
+input and output formats for the library.
+
+
+snmptest - prompts for input
+snmpget - snmpget <IP> <community> <oid list>
+snmpset - snmpset <IP> <community> <oid value oid value etc>
+snmpwalk - snmpwalk <IP> <community> <oid list>
+snmpnext - snmpwalk <IP> <community> <oid list>
+ 

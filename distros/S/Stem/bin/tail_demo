@@ -1,0 +1,76 @@
+#!/usr/local/bin/perl -s
+
+$line_cnt = 10 ;
+$offset = 175 ;
+$base_off = 0 ;
+$xskip = ( $^O eq 'solaris' ) ? 600 : 500 ;
+
+my @children ;
+
+my $tail_dir = 'tail' ;
+
+$SIG{ 'INT' } = \&cleanup ;
+
+if ( $s ) {
+
+	$ssfe = 'ssfe' ;
+	$prompt = '-prompt Stem:' ;
+	$echo = 'console_echo=1'
+}
+
+-d $tail_dir or mkdir $tail_dir, 0722 or
+		die "can't create $tail_dir working directory" ;
+
+foreach my $log ( qw( foo bar bar_status ) ) {
+	unlink "$tail_dir/$log.log" ;
+}
+
+
+foreach $cmd ( split /\n/, <<EOT ) {
+xterm -T Archive -n Archive -geometry 80x35+0+0 -e $ssfe $prompt run_stem $echo archive
+xterm -T Monitor -n Monitor -geometry 80x35+$xskip+0 -e $ssfe $prompt run_stem $echo monitor
+xterm -T Tail -n Tail -geometry 80x20+275+420
+EOT
+
+	print "$cmd\n" ;
+
+	@cmd = split ' ', $cmd ;
+
+	s/:/: / for @cmd ;
+
+	chdir $tail_dir unless $cmd =~ /run_stem/ ;
+
+	fork_exec( @cmd ) ;
+
+	sleep 2 ;
+}
+
+while( <STDIN> ) {
+
+	next unless /^q/i ;
+
+	cleanup() ;
+}
+
+sub cleanup {
+
+	print "clean up\n" ;
+
+	kill 9, @children ;
+	wait ;	
+	exit ;
+
+}
+
+sub fork_exec {
+
+	my( @exec ) = @_ ;
+
+	if ( $pid = fork() ) {
+
+		push @children, $pid ;
+		return ;
+	}
+
+	exec @exec ;
+}

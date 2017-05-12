@@ -1,0 +1,123 @@
+---
+abstract: 'A simple yet powerful forms validation system that promotes reuse.'
+author:
+  - 'James Laver L<http://jameslaver.com>'
+generated_by: 'Dist::Zilla::Plugin::MetaYAML version 1.092450'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Spark-Form
+provides:
+  Spark::Form:
+    file: lib/Spark/Form.pm
+    version: 0.2102
+  Spark::Form::FAQ:
+    file: lib/Spark/Form/FAQ.pm
+    version: 0.2102
+  Spark::Form::Field:
+    file: lib/Spark/Form/Field.pm
+    version: 0.2102
+  Spark::Form::Field::Role::Printable:
+    file: lib/Spark/Form/Field/Role/Printable.pm
+    version: 0.2102
+  Spark::Form::Field::Role::Printable::HTML:
+    file: lib/Spark/Form/Field/Role/Printable/HTML.pm
+    version: 0.2102
+  Spark::Form::Field::Role::Printable::XHTML:
+    file: lib/Spark/Form/Field/Role/Printable/XHTML.pm
+    version: 0.2102
+  Spark::Form::Field::Role::Validateable:
+    file: lib/Spark/Form/Field/Role/Validateable.pm
+    version: 0.2102
+  Spark::Form::Printer:
+    file: lib/Spark/Form/Printer.pm
+    version: 0.2102
+  Spark::Form::Printer::HTML:
+    file: lib/Spark/Form/Printer/HTML.pm
+    version: 0.2102
+  Spark::Form::Printer::XHTML:
+    file: lib/Spark/Form/Printer/XHTML.pm
+    version: 0.2102
+  Spark::Form::Source:
+    file: lib/Spark/Form/Source.pm
+    version: 0.2102
+  SparkX::Form::BasicFields:
+    file: lib/SparkX/Form/BasicFields.pm
+    version: 0.2102
+  SparkX::Form::BasicPrinters:
+    file: lib/SparkX/Form/BasicPrinters.pm
+    version: 0.2102
+  SparkX::Form::BasicValidators:
+    file: lib/SparkX/Form/BasicValidators.pm
+    version: 0.2102
+  SparkX::Form::Field::Button:
+    file: lib/SparkX/Form/Field/Button.pm
+    version: 0.2102
+  SparkX::Form::Field::Checkbox:
+    file: lib/SparkX/Form/Field/Checkbox.pm
+    version: 0.2102
+  SparkX::Form::Field::File:
+    file: lib/SparkX/Form/Field/File.pm
+    version: 0.2102
+  SparkX::Form::Field::Hidden:
+    file: lib/SparkX/Form/Field/Hidden.pm
+    version: 0.2102
+  SparkX::Form::Field::Image:
+    file: lib/SparkX/Form/Field/Image.pm
+    version: 0.2102
+  SparkX::Form::Field::MultiSelect:
+    file: lib/SparkX/Form/Field/MultiSelect.pm
+    version: 0.2102
+  SparkX::Form::Field::Password:
+    file: lib/SparkX/Form/Field/Password.pm
+    version: 0.2102
+  SparkX::Form::Field::Radio:
+    file: lib/SparkX/Form/Field/Radio.pm
+    version: 0.2102
+  SparkX::Form::Field::Reset:
+    file: lib/SparkX/Form/Field/Reset.pm
+    version: 0.2102
+  SparkX::Form::Field::Select:
+    file: lib/SparkX/Form/Field/Select.pm
+    version: 0.2102
+  SparkX::Form::Field::Submit:
+    file: lib/SparkX/Form/Field/Submit.pm
+    version: 0.2102
+  SparkX::Form::Field::Text:
+    file: lib/SparkX/Form/Field/Text.pm
+    version: 0.2102
+  SparkX::Form::Field::Textarea:
+    file: lib/SparkX/Form/Field/Textarea.pm
+    version: 0.2102
+  SparkX::Form::Field::Validator::Confirm:
+    file: lib/SparkX/Form/Field/Validator/Confirm.pm
+    version: 0.2102
+  SparkX::Form::Field::Validator::MaxLength:
+    file: lib/SparkX/Form/Field/Validator/MaxLength.pm
+    version: 0.2102
+  SparkX::Form::Field::Validator::MinLength:
+    file: lib/SparkX/Form/Field/Validator/MinLength.pm
+    version: 0.2102
+  SparkX::Form::Field::Validator::NotEmpty:
+    file: lib/SparkX/Form/Field/Validator/NotEmpty.pm
+    version: 0.2102
+  SparkX::Form::Field::Validator::Regex:
+    file: lib/SparkX/Form/Field/Validator/Regex.pm
+    version: 0.2102
+  SparkX::Form::Printer::List:
+    file: lib/SparkX/Form/Printer/List.pm
+    version: 0.2102
+requires:
+  Data::Couplet: 0.02004312
+  HTML::Tiny: 0
+  List::MoreUtils: 0
+  List::Util: 0
+  Module::Pluggable: 0
+  Moose: 0.89
+  MooseX::AttributeHelpers: 0.21
+  MooseX::LazyRequire: 0.04
+  Test::More: 0
+resources:
+  repository: http://github.com/jjl/Spark-Form
+version: 0.2102

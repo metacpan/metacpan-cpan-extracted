@@ -1,0 +1,5 @@
+# Sub::Identify
+
+This perl module allows you to retrieve the real name of code references
+as well as their original package and location. See the module's POD
+documentation for examples.

@@ -1,0 +1,141 @@
+Beyond (unreleased)
+  * add proper support for file uploads wherever possible.  #lack-of-maturity
+    # I think adding an upload method to the controllers would work.
+  * do a better job of simulating requests in squatting -C
+  * BUG: POST -> perlbal -> thttpd -> Squatting::On::CGI == FAIL
+    Strangely enough, GET is fine.
+    Take perlbal out of the setup and everything is fine.
+  * implement Squatting::On::Jifty
+  * implement Squatting::On::Squatting
+    * move mount method out of the core and into Squatting::With::Mount
+  * use Rhetoric and Pod::Server as examples of how to document a Squatting app.
+    * OLD: in Squatting::Controller's POD, teach people how to document controllers.
+    * OLD: in Squatting::View's POD, teach people how to document views.
+  * Make bin/squatting use Plack::Runner
+  * Things that would make Squatting easier to get started with:
+    - an app generator (using Module::Setup?)
+      - PSGI support by default
+  * Replace Shell::Perl with something based on Eval::WithLexicals.
+
+0.83 Wed Feb 19 19:13:33 PST 2014
+  - bin/squatting :: wrapped qw() in parens to avoid syntax warning
+
+0.82 2013-08-11
+  - Squatting::With::PerHostConfig was removed, because I realized
+    that it couldn't work the way I wanted it, too.  By the time
+    it modified %CONFIG, it would be too late to affect the response
+    in a meaningful way.
+  - Small patch from Duncan Garland to remove warnings issued by perl 5.14
+
+0.81 2011-04-27
+  - Slight improvements to Squatting::With::MockRequest were made
+    to facilitate doing static exports of Rhetoric sites.
+
+0.80 2011-04-27
+  - [ MAJOR API CHANGE! ]
+    - You don't say:  use base 'Squatting' anymore.
+    - When creating a Squatting app,
+      you just say:   use Squatting;
+    - You don't say:  use Squatting ':controllers' or
+                      use Squatting ':views' anymore
+    - use Squatting takes care of what those statements used to do.
+  - Squatting::H->merge renamed to Squatting::H->extend to
+    be consistent w/ the way these words are used in contemporary
+    Javascript libraries.
+  - Added Squatting::With::PerHostConfig
+  - hacked bin/squatting so that the console experience is a bit nicer.
+    App->get and App->post will work a tiny bit more reliably.
+
+0.70 2009-08-27
+  - reimplemented Squatting::With::Log using Squatting::H
+  - added Squatting::H->bless (breaking all the rules ;)
+  - changed Squatting::Mapper semantics
+    - $controller->{queue} has been deprecated in favor of
+      $controller->{continuity}
+    - Squatting::Mapper now dispatches on
+      $sid + $controller + $path
+      (in that order)
+      - It used to just be $sid + $controller,
+        but when people start opening multiple tabs,
+        that wasn't enough.  It was necessary to be
+        able to distinguish between the different tabs,
+        and putting something random at the end of a path
+        was one way to do that, so it's now the default.
+  - updated L<Squatting::Cookbook/The Anatomy of a Squatting Application>
+
+0.60 2009-04-21
+  - More documentation updates and corrections.
+  - Fixed URL for Tenjin in Squatting::Cookbook.
+  - Implemented Squatting::With::Log
+  - added --module parameter to bin/squatting
+  - added default in-memory session to Squatting::On::Continuity
+  - removed bin/vw from distribution, because it will be
+    distributed with App::VW from now on.
+  - worked around a weird bug where
+    Squatting::On::Catalyst + FastCGI
+    was using the wrong path.
+  - added support for nested %CONFIG vars in bin/squatting
+  - resurrected Squatting::H
+  - implemented Squatting::With::Coro::Debug
+  - implemented Squatting::On::MP13
+  - implemented Squatting::On::MP20
+
+0.52
+  - More documentation updates and corrections
+  - Massive updates to Squatting::Cookbook
+
+0.51
+  - implemented Squatting::On::CGI
+  - implemented OpenID::Consumer example
+
+0.50
+  - More documentation updates and corrections.
+  - Moved last if-block in service to Squatting::On::Continuity
+  - Moved controller log into Squatting::With::AccessTrace
+  - Allow more HTTP methods when using Squatting::On::Continuity
+  - Started documenting Continuity's special powers.
+
+0.42
+  - Revised the documentation a bit.
+  - Made squatting --help have a higher precedence.
+
+0.41
+  - Fixed a few documentation errors.
+  - Minimized namespace pollution from Squatting::On::* plugins.
+  - Fixed Squatting <=> Catalyst cookie mapping.
+
+0.40
+  - Removed $Squatting::app and became both mod_perl compatible and embeddable.
+  - Added unit tests for Squatting::Controller and Squatting::View
+  - Allow views to have access to outgoing HTTP headers.
+  - Fixed yet another obscure cookie bug.
+  - Learned that the attribute handler in Squatting::Q must be invoked
+    during the INIT phase rather than the earlier CHECK phase, because
+    the coderef's address during the CHECK phase may not be final.
+    (Trivia:  coderef's that close over variables outside their own
+    lexical scope get changed sometime after the CHECK phase.)
+  - Unfortunately, even that's not good enough.
+    Squatting::Q has been removed, because Attribute::Handlers
+    can't be made to work for this purpose.  (RIP Squatting::Q July 4, 2008)
+  - Implemented Squatting::On::Catalyst.
+  - Implemented Squatting::On::Continuity.
+  - We're using Class::C3::Componentised to load extensions like
+    those found in Squatting::On::*.
+  - Added sample application, Chat.
+  - Added sample application, UniCodePoints.
+
+0.31
+  - Fixed a bug in the cookie parsing code.
+
+0.30
+  - In view objects, $self->{template} is the name of the current template.
+  - $controller->set_cookies renamed to $controller->cookies
+  - $controller->cookies now handles both incoming and outgoing cookies
+  - made $controller->headers and $controller->cgi_cookies lvalue subs, too.
+  - lots of documentation added
+
+0.21
+  - Fixed the URL to Io's web site
+
+0.20
+  - Initial Release

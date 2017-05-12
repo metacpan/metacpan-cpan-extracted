@@ -1,0 +1,57 @@
+{
+   "abstract" : "Base Module for creating new String::Validator Modules.",
+   "author" : [
+      "John Karr <brainbuz@brainbuz.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "String-Validator-Common",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "base" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/brainbuz/String-Validator/issues"
+      },
+      "homepage" : "https://github.com/brainbuz/String-Validator",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/brainbuz/String-Validator.git",
+         "web" : "https://github.com/brainbuz/String-Validator"
+      }
+   },
+   "version" : "1.01"
+}
+

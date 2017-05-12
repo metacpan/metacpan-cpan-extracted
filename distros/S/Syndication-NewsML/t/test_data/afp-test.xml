@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="iso-8859-1" standalone="yes"?>
+<NewsML>
+        <Catalog Href="http://www.afp.com/dtd/AFPCatalog.xml"/>
+        <NewsEnvelope>
+                <DateAndTime>20011212T140117Z</DateAndTime>
+                <NewsService FormalName="AFP-PH-FRA"/>
+        </NewsEnvelope>
+        <NewsItem>
+                <Identification>
+                        <NewsIdentifier>
+                                <ProviderId>afp.com</ProviderId>
+                                <DateId>20020211</DateId>
+                                <NewsItemId>GAZ08-pih</NewsItemId>
+                                <RevisionId PreviousRevision="0"
+Update="N">1</RevisionId>
+
+<PublicIdentifier>urn:newsml:afp.com:20020211:GAZ08-pih:1</PublicIdentifier>
+                        </NewsIdentifier>
+                        <NameLabel>MIDEAST-PALESTINIAN-ISRAEL</NameLabel>
+                </Identification>
+                <NewsManagement>
+                        <NewsItemType FormalName="News"/>
+                        <FirstCreated>20020211T140117Z</FirstCreated>
+
+<ThisRevisionCreated>20020211T140117Z</ThisRevisionCreated>
+                        <Status FormalName="Usable"/>
+                </NewsManagement>
+                <NewsComponent>
+                        <NewsLines>
+                                <HeadLine>ALL</HeadLine>
+                        </NewsLines>
+                        <AdministrativeMetadata>
+                                <Provider>
+                                        <Party FormalName="AFP"/>
+                                </Provider>
+                                <Creator>
+                                        <Party FormalName="FAYEZ
+NURELDINE"/>
+                                </Creator>
+                                <Source>
+                                        <Party FormalName="AFP"/>
+                                </Source>
+                                <Contributor>
+                                        <Party FormalName="fn/mro"/>
+                                </Contributor>
+                        </AdministrativeMetadata>
+                        <DescriptiveMetadata>
+                                <Language FormalName="GB"/>
+                                <SubjectCode>
+                                        <Subject FormalName="16000000"/>
+                                </SubjectCode>
+                                <Property FormalName="Importance"
+Value="4"/>
+                                <Property FormalName="Location">
+                                        <Property FormalName="Country"
+Value=""/>
+                                        <Property FormalName="CountryCode"
+Value="ZZZ"/>
+                                        <Property FormalName="Area"
+Value="GAZA STRIP"/>
+                                        <Property FormalName="City"
+Value="GAZA CITY    "/>
+                                </Property>
+                        </DescriptiveMetadata>
+                        <NewsComponent>
+                                <Role FormalName="Caption"/>
+                                <ContentItem>
+                                        <MediaType FormalName="Text"/>
+                                        <Format FormalName="bcNITF2.5"/>
+                                        <DataContent>
+                                                <p>A Palestinian policeman
+stands 11 February 2002 next to a crater in front of the damaged Ansar base
+of Palestinian leader Yasser Arafat's elite Force 17 in Gaza City, which was
+bombed by Israeli F-16 fighters last night in retaliation to a deadly attack
+at a restaurant outside the Israeli army's southern headquarters in
+Beersheva in which two women soldiers, and the two Palestinian assailants,
+were killed. Some 40 people were wounded in the Israeli raids on Palestinian
+targets in the Gaza Strip overnight. </p>
+                                        </DataContent>
+                                </ContentItem>
+                        </NewsComponent>
+                        <NewsComponent>
+                                <Role FormalName="Main"/>
+                                <ContentItem Href="GAZ08-pih.jpg">
+                                        <MediaType FormalName="Photo"/>
+                                        <Format FormalName="JPEG"/>
+                                        <Characteristics>
+                                                <Property FormalName="Width"
+Value="2048"/>
+                                                <Property
+FormalName="Height" Value="1543"/>
+                                        </Characteristics>
+                                </ContentItem>
+                        </NewsComponent>
+                        <NewsComponent>
+                                <Role FormalName="Preview"/>
+                                <ContentItem Href="GAZ08-pim.jpg">
+                                        <MediaType FormalName="Photo"/>
+                                        <Format FormalName="JPEG"/>
+                                        <Characteristics>
+                                                <Property FormalName="Width"
+Value="512"/>
+                                                <Property
+FormalName="Height" Value="386"/>
+                                        </Characteristics>
+                                </ContentItem>
+                        </NewsComponent>
+                        <NewsComponent>
+                                <Role FormalName="Thumbnail"/>
+                                <ContentItem Href="GAZ08-pil.jpg">
+                                        <MediaType FormalName="Photo"/>
+                                        <Format FormalName="JPEG"/>
+                                        <Characteristics>
+                                                <Property FormalName="Width"
+Value="128"/>
+                                                <Property
+FormalName="Height" Value="96"/>
+                                        </Characteristics>
+                                </ContentItem>
+                        </NewsComponent>
+                </NewsComponent>
+        </NewsItem>
+</NewsML>

@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/2000/REC-xhtml1-20000126/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<!--
+     SOGGYONION EXAMPLE WRAPPER
+
+     This is an example file that will be a wrapper for all
+     processed output. This makes use of Template Toolkit, which
+     you can find more about by reading the docs for Template.pm
+     or by visiting http://www.template-toolkit.org/
+-->
+
+<head>
+    <title>SoggyOnion - [% thispage.title %]</title>
+
+    <link rel="SHORTCUT ICON" href="http://soggyonion.com/favicon.ico"/>
+    <meta http-equiv="refresh" content="1800; url=[% thispage.name %]"/>
+
+    <style type="text/css">
+        body {
+            font-family: sans-serif;
+            margin: 0em;
+        }
+        #menu {
+            border-bottom: 1px solid #060;
+            padding: 0.3em; margin: 0em;
+        }
+        #menu, #menu a {
+            color: #060; background: #9f9;
+        }
+        #menu a {
+            padding: 0.1em;
+        }
+        #menu a.selected {
+            color: #9f9; background: #393;
+        }
+        #body {
+            margin: 1em;
+        }
+        #body small {
+            font-size: 60%;
+            font-weight: normal;
+            color: #999; background: inherit;
+        }
+        #disclaimer {
+            border-top: 1px solid #999;
+            padding: 0.1em; margin: 0em;
+            font-size: x-small;
+        }
+        #disclaimer, #disclaimer a {
+            color: #999; background: inherit;
+        }
+    </style>
+</head>
+<body>
+
+<!-- a menu is created by iterating over the given 'pages' array -->
+<div id="menu">
+    <strong>
+      <a href="http://soggyonion.com/">SoggyOnion</a>
+    </strong> |
+    [% FOREACH page = allpages %]
+        <a href="[% page.name %]" 
+            [% IF thispage.name == page.name %]
+                class="selected"
+            [% END %]
+        >[% page.title %]</a> |
+    [% END %]
+</div>
+
+
+<!-- content is created by processing the items for each page as
+     defined in your config.yaml. every item is automatically
+     placed in its own <div> whose id is the plugin name/key -->
+<div id="body">
+    [% content %]
+</div>
+
+<div id="disclaimer">
+Please note that none of the content of this site is the property of SoggyOnion.com other than the <a href="http://soggyonion.com/logo.png">SoggyOnion logo</a>. The content present on this site has been collected from various sources, which are clearly labeled and hyperlinked above each section of content. This site is completely non-profit and non-commerical. Please email <tt>ian</tt> at this domain with questions or comments.
+</div>
+
+</body>
+</html>

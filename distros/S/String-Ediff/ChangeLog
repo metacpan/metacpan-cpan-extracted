@@ -1,0 +1,42 @@
+2007-05-04  Bo Zou  <boxzou at yahoo.com>
+	* Makefile.PL: removed LDDLFLAGS, OPTIMIZE, CCFLAGS based on recommendations in
+                       https://rt.cpan.org/Public/Bug/Display.html?id=15270
+	* st.c: replace // with /* */
+        The changes here should also fix: http://rt.cpan.org/Public/Bug/Display.html?id=4646
+        Raised by: guest (?)
+        Investigated by: Ryan Wagner and Billy Zophar
+        Tested by: Roger Persson
+        Thank you all.
+
+2005-08-03  Bo Zou  <boxzou at yahoo.com>
+	* st.c: white space in middle of line.
+
+2005-08-02  Bo Zou  <boxzou at yahoo.com>
+	* st.c: Skip trailing white space (ws before \n) when adjusting.
+
+2005-04-11  Bo Zou  <boxzou at yahoo.com>
+	* Ediff.pm: Add copy right and licencing info.
+
+2005-03-10  Bo Zou  <boxzou at yahoo.com>
+	* st.c: Fix compiler warnings on Fedora:
+          https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=150012
+
+2005-02-16  Bo Zou  <boxzou at yahoo.com>
+
+	* st.c: Fix a core dump when malloc(0) 
+	  > 746       ret = (char*)malloc(sizeof(char) * INT_LEN * ix * 8);
+          > 747       ret[0] = 0;
+          Note if ix == 0, then ret has no memory allocated, ret[0] = 0
+               could core_dump perl
+          Reported by: Jonathan Noack
+          Analyzed by: Anton Berezin
+
+2003-08-08  Bo Zou  <boxzou at yahoo.com>
+
+	* st.c: removed main function because it contains multi-line string
+	constants.  While GCC 3.2 warns, GCC 3.3 will error.
+	* ChangeLog: added this file.
+
+2003-08-07  Bo Zou  <boxzou at yahoo.com>
+
+	* st.c: reinitialize trailing_ws.

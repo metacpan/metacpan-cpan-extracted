@@ -1,0 +1,14 @@
+Revision history for Perl extension Seis
+
+0.12 2013-09-06T00:54:18Z
+
+    - Added documentation about seis command.
+
+0.11 2013-09-05T13:46:21Z
+
+    - Fixed PAUSE Indexing issue.
+
+0.10 2013-09-05T10:31:11Z
+
+    - Initial release to CPAN
+

@@ -1,0 +1,19 @@
+== stencil ==
+
+If you <code>write</code> this:
+
+--input--
+
+    <%= badge '3' %>
+    <!-- a badge -->
+
+--end input--
+
+It becomes <b>this</b>:
+
+--output--
+
+    <span class="badge">3</span>
+    <!-- a badge -->
+
+--end output--

@@ -1,0 +1,12 @@
+LICENSE
+Changes
+Makefile.PL
+README
+TODO
+MANIFEST
+SIGNATURE
+lib/Software/Packager/Aix.pm
+lib/Software/Packager/Object/Aix.pm
+t/00_signature.t
+t/01_initialise.t
+t/02_aix.t

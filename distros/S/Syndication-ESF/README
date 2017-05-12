@@ -1,0 +1,89 @@
+NAME
+    Syndication::ESF - Create and update ESF files
+
+SYNOPSIS
+        use Syndication::ESF;
+
+        my $esf = Syndication::ESF->new;
+
+        $esf->parsefile( 'my.esf' );
+
+        $esf->channel( title => 'My channel' );
+
+        $esf->add_item(
+            date  => time,
+            title => 'new item',
+            link  => 'http://example.org/#foo'
+        );
+
+        print "Channel: ", $esf->channel( 'title' ), "\n";
+        print "Items  : ", scalar @{ $esf->{ items } }, "\n";
+
+        my $output = $esf->as_string;
+
+        $esf->save( 'my.esf' );
+
+DESCRIPTION
+    This module is the basic framework for creating and maintaing Epistula
+    Syndication Format (ESF) files. More information on the format can be
+    found at the Aquarionics web site:
+    http://www.aquarionics.com/article/name/esf
+
+    This module tries to copy the XML::RSS module's interface. All
+    applicable methods have been copied and should respond in the same
+    manner.
+
+    Like in XML::RSS, channel data is accessed through the "channel()" sub,
+    and item data is accessed straight out of the items array.
+
+INSTALLATION
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+METHODS
+  new()
+    Creates a new Syndication::ESF object. It currently does not accept any
+    parameters.
+
+  channel(title => $title, contact => $contact, link => $link)
+    Supplying no parameters will give you a reference to the channel data.
+    Specifying a field name returns the value of the field. Giving it a hash
+    will update the channel data with the supplied values.
+
+  contact_name()
+    shortcut to get the contact name
+
+  contact_email()
+    shortcut to get the contact email
+
+  add_item(date => $date, title => $title, link => $link, mode => $mode)
+    By default, this will append the new item to the end of the list.
+    Specifying 'insert' for the "mode" parameter adds it to the front of the
+    list.
+
+  parse($string)
+    Parse the supplied raw ESF data.
+
+  parsefile($filename)
+    Same as "parse()", but takes a filename as input.
+
+  as_string()
+    Returns the current data stored in the object as a string.
+
+  save($filename)
+    Saves the value of "as_string()" to the supplied filename.
+
+AUTHOR
+    Brian Cassidy <bricas@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2003-2009 by Brian Cassidy
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    *   XML::RSS
+

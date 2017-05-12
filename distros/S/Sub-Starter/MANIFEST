@@ -1,0 +1,15 @@
+Build.PL
+Changes
+MANIFEST
+README
+lib/Sub/Starter.pm
+script/substarter
+t/00-load.t
+t/01-parse_usage.t
+t/02-gen-usage.t
+t/03-gen-sub.t
+t/04-gen-pod.t
+t/pod-coverage.t
+t/pod.t
+Makefile.PL
+META.yml

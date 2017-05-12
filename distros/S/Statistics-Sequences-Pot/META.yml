@@ -1,0 +1,25 @@
+---
+abstract: "Helmut Schmidt's test of force-like runs of a discrete state within a numerical or categorical sequence"
+author:
+  - 'Roderick Garton <rgarton@cpan.org>'
+build_requires:
+  Statistics::Sequences: 0.11
+  Statistics::Zed: 0.072
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3624'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Statistics-Sequences-Pot
+provides:
+  Statistics::Sequences::Pot:
+    file: lib/Statistics/Sequences/Pot.pm
+    version: 0.12
+requires:
+  perl: 5.006
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.12

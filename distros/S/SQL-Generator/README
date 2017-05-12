@@ -1,0 +1,69 @@
+MODULE
+	SQL::Generator (Readme)
+
+DESCRIPTION
+
+	With SQL::Generator you can easily (and very flexibly) construct / generate sql-statements.
+	As a rookie, you are used to write thousands of sprintf`s every time you need a statement (i.e.for DBI). Later you start
+	writing your own functions for every statement and every sql-dialect (RDBMS use to have their own dialect
+	extending the general SQL standard). This SQL::Generator module is an approach to have a
+	flexible abstraction above the statement generation, which makes it easy to implement
+	in your perl code.
+
+PREREQUISITES
+
+	Module	Carp (2.0)
+	Module	Devel::SymDump (0.1)
+	Module	Data::Dumper (2.101)
+	Module	Exporter (5.562)
+	Module	IO::File (1.08)
+
+	Let the CPAN module install everything you need with:
+
+	shell>> perl -MCPAN -e 'shell install Bundle::SQLGenerator'
+
+BUILD/INSTALL
+
+	shell>> perl Makefile.PL
+	shell>> make
+	shell>> make test
+	shell>> make install
+
+	or if CPAN module is working, type in your shell:
+
+	shell>> perl -MCPAN -e 'shell install SQL::Generator'
+
+WIN32 BUILD/INSTALL (when Microsoft Developer Studio installed)
+
+	shell>> perl Makefile.PL
+	shell>> nmake
+	shell>> nmake test
+	shell>> nmake install
+
+	or using CPAN, type in your shell:
+
+	shell>> perl -MCPAN -e "shell install SQL::Generator"
+
+HISTORY
+
+	See the Changes file in this distribution.
+
+TODO
+
+	See the Todo file in this distribution (if exists).
+
+EXAMPLES
+
+	You should have a look into the test1.pl script.
+
+AUTHOR
+
+	Murat Uenalan (muenalan@cpan.org)
+
+COPYRIGHT NOTICE
+
+	Copyright (c) 1997 Murat Uenalan. All rights reserved.
+
+	This program is free software; you can redistribute it and/or modify it
+
+	under the same terms as Perl itself.

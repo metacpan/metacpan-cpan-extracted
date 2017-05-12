@@ -1,0 +1,451 @@
+
+=head1 NAME
+
+ShiftJIS::Collate - collation of Shift-JIS strings
+
+=head1 SYNOPSIS
+
+  use ShiftJIS::Collate;
+
+  @sorted = ShiftJIS::Collate->new(%tailoring)->sort(@source);
+
+=head1 DESCRIPTION
+
+This module provides some functions to compare and sort strings
+in Shift-JIS based on B<JIS X 4061:1996>,
+collation of Japanese character strings, "Nihongo mojiretsu shogo junban".
+
+This module is an implementation of JIS X 4061:1996 and
+the collation rules are based on that standard.
+See Conformance to the Standard.
+
+=head2 Constructor and Tailoring
+
+The C<new> method returns a collator object.
+
+   $Collator = ShiftJIS::Collate->new(
+      ignoreChar => $regexIgnoredChar,
+      kanji => $kanji_class,
+      katakana_before_hiragana => $bool,
+      level => $collationLevel,
+      position_in_bytes => $bool,
+      tounicode  => \&sjis_to_unicode,
+      preprocess => \&preprocess,
+      upper_before_lower => $bool,
+   );
+   # if %tailoring is false (empty),
+   # $Collator should do the default collation.
+
+=over 4
+
+=item ignoreChar
+
+If specified as a regular expression,
+any characters that match it are ignored on collation.
+
+e.g. If you want to ignore C<KATAKANA-HIRAGANA PROLONGED SOUND MARK>
+and its halfwidth form, say
+
+   ignoreChar => '^(?:\x81\x5B|\xB0)',
+
+=item katakana_before_hiragana
+
+By default, hiragana is before katakana.
+
+If the parameter is true, this is reversed.
+
+=item kanji
+
+Set the kanji class. See L<Kanji Classes>.
+
+  Class 1: 'saisho' (minimal)
+  Class 2: 'kihon' (basic)
+  Class 3: 'kakucho' (extended)
+
+The kanji class is specified as 1, 2, or 3. If omitted, class 2 is applied.
+
+This module does not support 'kakucho' kanji class,
+since the repertoire of Shift-JIS does not define
+all the Unicode CJK unified ideographs.
+
+But if the kanji class 3 is specified, you can collate kanji
+in the unicode order. In this case you must provide
+L<tounicode> coderef which gives a unicode codepoint
+from a Shift-JIS character.
+
+=item level
+
+Set the maximum level. See L<Collation Levels>.
+Any higher levels than the specified one are ignored.
+
+  Level 1: alphabetic ordering
+  Level 2: diacritic ordering
+  Level 3: case ordering
+  Level 4: script ordering
+  Level 5: width ordering
+
+The collation level is specified as a number
+between 1 and 5. If omitted, level 4 is applied.
+
+=item tounicode
+
+If you want to collate kanji in the unicode order,
+specify a coderef which gives a unicode codepoint
+from a Shift-JIS character.
+
+Such a subroutine should map a string comprising of
+a kanji of level 1 and 2 in Shift-JIS to a codepoint
+in the range between 0x4E00 and 0x9FFF.
+
+=item position_in_bytes
+
+By default, the C<index> method returns its results in characters.
+
+If this parameter is true, it returns the results in bytes.
+
+=item preprocess
+
+If specified, the coderef is used to preprocess
+before the formation of sort keys.
+I.e. a sort key is formed from a return value returned by the coderef.
+
+=item upper_before_lower
+
+By default, lowercase is before uppercase.
+
+If the parameter is true, this is reversed.
+
+=back
+
+=head2 Comparison
+
+=over 4
+
+=item C<$result = $Collator-E<gt>cmp($a, $b)>
+
+Returns C<1> (when C<$a> is greater than C<$b>)
+or C<0> (when C<$a> is equal to C<$b>)
+or C<-1> (when C<$a> is lesser than C<$b>).
+
+=item C<$result = $Collator-E<gt>eq($a, $b)>
+
+=item C<$result = $Collator-E<gt>ne($a, $b)>
+
+=item C<$result = $Collator-E<gt>gt($a, $b)>
+
+=item C<$result = $Collator-E<gt>ge($a, $b)>
+
+=item C<$result = $Collator-E<gt>lt($a, $b)>
+
+=item C<$result = $Collator-E<gt>le($a, $b)>
+
+They works like the same name operators as theirs.
+
+=back
+
+=head2 Sorting
+
+=over 4
+
+=item C<$sortKey = $Collator-E<gt>getSortKey($string)>
+
+Returns a sort key.
+
+You compare the sort keys using a binary comparison
+and get the result of the comparison of the strings.
+
+   $Collator->getSortKey($a) cmp $Collator->getSortKey($b)
+
+      is equivalent to
+
+   $Collator->cmp($a, $b)
+
+=item C<@sorted = $Collator-E<gt>sort(@source)>
+
+Sorts a list of strings by B<tanjun shogo>: 'the simple collation'.
+
+=item C<@sorted = $Collator-E<gt>sortYomi(@source)>
+
+Sorts a list of references to arrays of (spell, reading)
+by B<yomi-hyoki shogo>: 'the collation using readings and spells'.
+
+B<Yomi-hyoki shogo> is carried out through two comparison stages.
+
+First, order by reading;
+next, order by spelling among strings having the same reading.
+
+See also F<sample/yomi.txt>.
+
+=item C<@sorted = $Collator-E<gt>sortDaihyo(@source)>
+
+Sorts a list of references to arrays of (spell, reading)
+by B<kan'i-daihyo-yomi shogo>:
+'the simplified representative reading collation'.
+
+B<Note>: This module does not support B<kihon-daihyo-yomi shogo>:
+'the basic representative reading collation',
+in which B<daihyo-yomi jisho>, a dictionary of representative readings,
+is required.
+
+B<kan'i-daihyo-yomi shogo> is carried out through B<five> comparison stages.
+This ordered list is an example of the result of C<"kan'i-daihyo-yomi shogo">.
+
+(1) Compare the character class of the first character of the spell.
+
+(2) Compare the first character of the reading.
+
+(3) Compare the first character of the spell.
+
+(4) Compare the whole string of the reading.
+
+(5) Compare the whole string of the spell.
+
+See also F<sample/daihyo.txt>.
+
+=back
+
+=head2 Searching
+
+=over 4
+
+=item C<$position = $Collator-E<gt>index($string, $substring)>
+
+=item C<($position, $length) = $Collator-E<gt>index($string, $substring)>
+
+If C<$substring> matches a part of C<$string>, returns
+the position of the first occurrence of the matching part in scalar context;
+in list context, returns a two-element list of
+the position and the length of the matching part.
+
+B<Notice> that the length of the matching part may differ from
+the length of C<$substring>.
+
+If C<$substring> does not match any part of C<$string>,
+returns C<-1> in scalar context and an empty list in list context.
+
+If your C<substr> function is aware of Shift-JIS,
+specify true as C<position_in_bytes>. See L<Constructor and Tailoring>.
+
+=back
+
+=head1 NOTE
+
+=head2 Collation Levels
+
+The following criteria are considered in order
+until the collation order is determined.
+By default, Levels 1 to 4 are applied and Level 5 is ignored,
+for JIS X 4061 does not specify level 5.
+
+=over 4
+
+=item Level 1: alphabetic ordering.
+
+Character classes ordered as following:
+
+    1    space
+    2   'kijutsu kigou' (punctuation marks)
+    3   'kakko kigou' (quotes, parentheses, and braces)
+    4   'gakujutsu kigou' (mathematical and technical signs)
+    5   'ippan kigou' (general symbols)
+    6   'tan-i kigou' (unit signs)
+    7    digits (European)
+    8   'ouji kigou' (Greek and Cyrillic letters, as "European signs")
+    9    Latin alphabets
+   10    kana (hiragana and katakana)
+   11    kanji
+   12   'geta' mark
+
+In the class, alphabets are collated alphabetically;
+kana letters are AIUEO-betically (in the Gozyuon order);
+kanji are in the JIS X 0208 order.
+
+According to JIS X 4061, C<GETA MARK> (0x81AC, U+3013)
+must be the greatest character (ordered at the last).
+
+Any character for which the order is no defined,
+like control characters, box drawings, unassigned characters, etc.
+is regarded as a completely ignorable character.
+
+=item Level 2: diacritic ordering.
+
+In kana, the order is as shown the following list.
+
+    A voiceless kana, the voiced, then the semi-voiced (if exists).
+
+=item Level 3: case ordering.
+
+A small Latin is lesser than the corresponding Capital.
+
+In kana, the order is as shown the following list.
+see Replacement of PROLONGED SOUND MARK and ITERATION MARKs.
+
+    Replaced PROLONGED SOUND MARKs (U+30FC and U+FF70);
+    Small Kana;
+    Replaced ITERATION MARKs (U+309D, U+309E, U+30FD, and U+30FE);
+    then, Normal Kana.
+
+=item Level 4: script ordering.
+
+Any hiragana is lesser than the corresponding katakana.
+
+=item Level 5: width ordering.
+
+A character that belongs to the block
+C<Halfwidth and Fullwidth Forms>
+is greater than the corresponding normal character.
+
+B<BN: JIS X 4061 does not mention this level.
+Level 5 is an extention by this module.>
+
+=back
+
+=head2 Kanji Classes
+
+JIS X 4061 specifies three Kanji Classes.
+This modules supports 'Saisho' and 'Kihon' Kanji Classes.
+
+=over 4
+
+=item the 'saisho' (minimal) kanji class
+
+It comprises five kanji-like characters:
+
+    0x8156 (U+3003)
+    0x8157 (U+4EDD)
+    0x8158 (U+3005)
+    0x8159 (U+3006)
+    0x815A (U+3007)
+
+Any kanji except U+4EDD are ignored on collation.
+
+=item the 'kihon' (basic) kanji class
+
+It comprises JIS level 1 and 2 kanji in addition to
+the minimal kanji class. Sorted in the JIS codepoint order.
+Any kanji excepting those defined by JIS X 0208 are ignored on collation.
+
+=item the 'kakucho' (extended) kanji class
+
+All the CJK Unified Ideographs in addition to
+the minimal kanji class. Sorted in the Unicode codepoint order.
+
+=back
+
+=head2 Replacement of PROLONGED SOUND MARKs and ITERATION MARKs
+
+   SJIS    UCS     Name
+
+   0x815B  U+30FC  KATAKANA-HIRAGANA PROLONGED SOUND MARK
+   0xB0    U+FF70  HALFWIDTH KATAKANA-HIRAGANA PROLONGED SOUND MARK
+   0x8154  U+309D  HIRAGANA ITERATION MARK
+   0x8155  U+309E  HIRAGANA VOICED ITERATION MARK
+   0x8152  U+30FD  KATAKANA ITERATION MARK
+   0x8153  U+30FE  KATAKANA VOICED ITERATION MARK
+
+These characters, if replaced, are secondary equal to
+the replacing kana, while ternary not equal to.
+
+=over 4
+
+=item KATAKANA-HIRAGANA PROLONGED SOUND MARKs
+
+The PROLONGED MARKs (including the halfwidth equivalent)
+are repleced to a normal vowel or nasal
+katakana corresponding to the preceding kana if exists.
+
+=item HIRAGANA- and KATAKANA ITERATION MARKs
+
+The ITERATION MARKs (VOICELESS) are repleced
+to a normal kana corresponding to the preceding kana if exists.
+
+=item HIRAGANA- and KATAKANA VOICED ITERATION MARKs
+
+The VOICED ITERATION MARKs are repleced to a voiced kana
+corresponding to the preceding kana if exists.
+
+=item Cases of no replacement
+
+Otherwise, no replacement occurs. Especially in the
+cases when these marks follow any character except kana.
+
+The unreplaced characters are primary greater than any kana.
+
+  e.g.  CJK Ideograph followed by PROLONGED SOUND MARK
+        Digit followed by ITERATION MARK
+        Kana that has no voiced variant followed by VOICED ITERATION MARK
+
+=back
+
+=head2 Conformance to the Standard [JIS X 4061, 6.2]
+
+  (1) charset: Shift-JIS.
+
+  (2) No limit of the number of characters in the string considered
+      to collate.
+
+  (3) No character class is added.
+
+  (4) The following characters are added as collation elements.
+
+      IDEOGRAPHIC SPACE is added in the space class.
+
+      ACUTE ACCENT, GRAVE ACCENT, DIAERESIS, CIRCUMFLEX ACCENT
+      are added in 'kijutsu kigou'.
+
+      APOSTROPHE, QUOTATION MARK are added in 'kakko kigou'.
+
+      HYPHEN-MINUS is added in 'gakujutsu kigou'.
+
+  (5) Collation of Latin alphabets with macron and with circumflex
+      is not supported.
+
+  (6) Kanji Classes:
+       i) the minimal kanji class (Five kanji-like chars).
+       ii) the basic kanji class (Levels 1 and 2 kanji of JIS)..
+
+=head1 AUTHOR
+
+SADAHIRO Tomoyuki <SADAHIRO@cpan.org>
+
+  Copyright(C) 2001-2007, SADAHIRO Tomoyuki. Japan. All rights reserved.
+
+  This module is free software; you can redistribute it
+  and/or modify it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item JIS X 4061
+
+Collation of Japanese character strings
+
+=item JIS X 0201
+
+7-bit and 8-bit coded character sets for information interchange
+
+=item JIS X 0208
+
+7-bit and 8-bit double byte coded KANJI sets for information interchange
+
+=item JIS X 0221
+
+Information technology - Universal Multiple-Octet Coded
+Character Set (UCS) - part 1 : Architectute and Basic Multilingual Plane
+
+=item Japanese Industrial Standards Committee (JISC)
+
+L<http://www.jisc.go.jp/>
+
+=item Japanese Standards Association (JSA)
+
+L<http://www.jsa.or.jp/>
+
+=item L<ShiftJIS::String>
+
+=item L<ShiftJIS::Regexp>
+
+=back
+
+=cut

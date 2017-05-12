@@ -1,0 +1,73 @@
+{
+   "abstract" : "qwa(), qwh() and qwk() quote-like operators to create arrayrefs and hashrefs",
+   "author" : [
+      "Toby Inkster <tobyink@cpan.org>",
+      "TOBYINK <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Moose::Meta::Class::__ANON__::SERIAL::6 version , CPAN::Meta::Converter version 2.140640",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Syntax-Feature-Qwa",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "B::Hooks::EndOfScope" : "0",
+            "Devel::Declare" : "0",
+            "Devel::Declare::Context::Simple" : "0",
+            "Sub::Install" : "0",
+            "namespace::clean" : "0",
+            "strict" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.61"
+         }
+      }
+   },
+   "provides" : {
+      "Syntax::Feature::Qwa" : {
+         "file" : "lib/Syntax/Feature/Qwa.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/Syntax-Feature-Qwa/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=Syntax-Feature-Qwa"
+      },
+      "homepage" : "https://metacpan.org/release/Syntax-Feature-Qwa",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-syntax-feature-qwa.git",
+         "web" : "https://github.com/tobyink/p5-syntax-feature-qwa"
+      }
+   },
+   "version" : "0.002"
+}

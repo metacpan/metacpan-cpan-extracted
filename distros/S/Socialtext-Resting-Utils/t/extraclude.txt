@@ -1,0 +1,7 @@
+Monkey
+.extraclude [Foo Bar]
+Cows
+.extraclude
+.extraclude [Bar Baz]
+Bears are godless killing machines
+.extraclude

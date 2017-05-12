@@ -1,0 +1,333 @@
+=pod
+
+=head1 NAME
+
+Switch::Perlish::Smatch::Comparators - Overall document for comparator behaviour.
+
+=head1 COMPARATORS
+
+Below is a complete listing of the default comparators that come with
+L<Switch::Perlish>.
+
+In each comparator description C<$t> refers to the topic and C<$m> refers to
+the match, or the first and second arguments, respectively. 
+
+=head2 Array
+
+=over
+
+=item ARRAY
+
+Smatch for an element of C<@$m> in C<@$t>.
+
+=item CODE
+
+Call C<&$m> with C<@$t>.
+
+=item HASH
+
+Check if an element of C<@$t> exists as a key in C<%$m>.
+
+=item OBJECT
+
+Check if an element of C<@$t> exists as a method of C<$m>.
+
+=item Regexp
+
+Match C<$m> against the elements of C<@$t>.
+
+=item SCALAR
+
+Check if C<$m> points to an element of C<@$t>.
+
+=item UNDEF
+
+Return false as C<$t> is already defined.
+
+=item VALUE
+
+Smatch for C<$m> in C<@$t>.
+
+=back
+
+=head2 Code
+
+=over
+
+=item ARRAY
+
+Check if C<$m> refers to C<$t>.
+
+=item CODE
+
+Pass C<%$m> to C<$t>.
+
+=item HASH
+
+Pass C<@$m> to C<$t>.
+
+=item OBJECT
+
+Pass C<$m> to C<$t>.
+
+=item Regexp
+
+Pass C<$m> to C<$t>.
+
+=item SCALAR
+
+Call C<$t> with C<$m>.
+
+=item VALUE
+
+Call C<$t> with C<$m>.
+
+=back
+
+=head2 Hash
+
+=over
+
+=item ARRAY
+
+Check if an element of C<@$m> exists as a key of C<%$t>.
+
+=item CODE
+
+Check if the return from C<&$m> is a hash key of C<%$t>.
+
+=item HASH
+
+Check if a C<< key => value >> pair exists in both C<%$t> and C<%$m>.
+
+=item OBJECT
+
+Check if a key of C<%$t> exists as a method of C<$m>.
+
+=item Regexp
+
+Check if any keys from C<%$t> match C<$m>.
+
+=item SCALAR
+
+Check if C<$m> points to value in C<%$t>.
+
+=item UNDEF
+
+Check for an undefined value in C<%$t> (better suggestions welcome).
+
+=item VALUE
+
+Check if C<$m> exists as a key in C<%$t>.
+
+=back
+
+=head2 Object
+
+=over
+
+=item ARRAY
+
+If the C<$t> is a blessed ARRAY, delegate to the C<< ARRAYE<lt>=>ARRAY >>
+comparator, otherwise returns false.
+
+=item CODE
+
+Call the C<$t> on C<&$m> i.e C<< $t->$m >>.
+
+=item HASH
+
+If the C<$t> is a blessed HASH, delegate to the C<< HASHE<lt>=>HASH >> comparator,
+otherwise returns false.
+
+=item OBJECT
+
+Check if the C<< $t->isa($m) >> or the same class (better suggestions welcome).
+
+=item Regexp
+
+Match the class of C<$t> against the C<$m>.
+
+=item SCALAR
+
+Check if the C<$m> points to the C<$t>.
+
+=item UNDEF
+
+croak("Can't compare OBJECT with an undef") # Suggestions welcome.
+
+=item VALUE
+
+Check if C<$t> has C<$m> as a method.
+
+=back
+
+=head2 Regexp
+
+=over
+
+=item ARRAY
+
+Match C<$t> for every element in C<@$m>.
+
+=item CODE
+
+Pass C<$t> to C<&$m>.
+
+=item HASH
+
+Check if any of keys of C<%$m> match C<$t>.
+
+=item OBJECT
+
+Match C<$t> against C<$m>'s class.
+
+=item Regexp
+
+Match C<$m> to C<$t>.
+
+=item SCALAR
+
+Check if C<$m> refers to C<$t>.
+
+=item UNDEF
+
+croak("Can't compare Regexp with an undef") # suggestions welcome.
+
+=item VALUE
+
+Match C<$t> against C<$m>.
+
+=back
+
+=head2 Scalar
+
+=over
+
+=item ARRAY
+
+Check if C<$t> points to an element of C<@$m>.
+
+=item CODE
+
+Check if C<$t> points to C<$m>.
+
+=item HASH
+
+Check if C<$t> points to value in C<%$m>.
+
+=item OBJECT
+
+Check if C<$t> refers to the object C<$m>.
+
+=item Regexp
+
+Check if C<$t> refers to the Regexp object C<$m>.
+
+=item SCALAR
+
+Numerically compare the scalar refs C<$t> and C<$m>.
+
+=item UNDEF
+
+Check if C<$$t> is undef.
+
+=item VALUE
+
+Call L<Switch::Perlish::Smatch::value_cmp()|Switch::Perlish::Smatch/"Helper_subroutines">
+with C<$$t> and C<$m>.
+
+=back
+
+=head2 Undef
+
+=over
+
+=item ARRAY
+
+Check for an undef in C<@$m>.
+
+=item CODE
+
+Pass undef to C<&$m> (to be consistent with other CODE comparators).
+
+=item HASH
+
+Check for an undefined value in C<%$m> (better suggestions welcome).
+
+=item OBJECT
+
+croak("Can't compare undef with OBJECT") # Suggestions welcome.
+
+=item Regexp
+
+croak("Can't compare undef with Regexp") # Suggestions welcome.
+
+=item SCALAR
+
+Check if C<$$m> is undef.
+
+=item UNDEF
+
+Return true as C<$m> is also undefined.
+
+=item VALUE
+
+Return false as C<$m> is already defined.
+
+=back
+
+=head2 Value
+
+=over
+
+=item ARRAY
+
+Check if C<$t> is in C<$m>.
+
+=item CODE
+
+Pass C<$t> to C<&$m>.
+
+=item HASH
+
+Check if C<$t> exists as a key in C<$m>.
+
+=item OBJECT
+
+Check if the method C<$t> exists in C<$m>.
+
+=item Regexp
+
+Match C<$t> against C<$m>.
+
+=item SCALAR
+
+Check if what C<$$m> is the same as C<$t>.
+
+=item UNDEF
+
+Return false, a C<VALUE> is always defined.
+
+=item VALUE
+
+Call L<Switch::Perlish::Smatch::value_cmp()|Switch::Perlish::Smatch/"Helper_subroutines">
+with C<$t> and C<$m>.
+
+=back
+
+=head1 SEE. ALSO
+
+L<Switch::Perlish::Smatch>
+
+=head1 AUTHOR
+
+Dan Brook C<< <mr.daniel.brookC<@gmail>.com> >>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2006, Dan Brook. All Rights Reserved. This module is free
+software. It may be used, redistributed and/or modified under the same
+terms as Perl itself.
+
+=cut

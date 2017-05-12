@@ -1,0 +1,53 @@
+NAME
+    Shell::Verbose - A verbose version of system()
+
+SYNOPSIS
+        # Nothing is exported by default
+        use Shell::Verbose qw/verboseSystem vsys/;
+
+        verboseSystem('echo "foo"');
+        # echo "foo"
+        # foo
+
+        # Short form
+        vsys('echo "foo"');
+        # echo "foo"
+        # foo
+
+        # Returns a true value when the command is successful
+        print "How did true fail!?\n" unless (vsys('true');
+
+        Shell::Verbose->prefix('===> ');
+        # ===> echo 'foo'
+        # foo
+
+        Shell::Verbose->before('Running the next line');
+        # Running the next line
+        # ===> echo 'foo'
+        # foo
+
+        Shell::Verbose->after('That was easy');
+        # Running the next line
+        # ===> echo 'foo'
+        # foo
+        # That was easy
+
+DESCRIPTION
+    A simple wrapper for system() that prints the command
+
+METHODS
+  verboseSystem($command)
+    Run the specified command, printing the command along with before,
+    prefix, and after if defined.
+
+    Returns the inverse of shell success, that is a true value (1) if the
+    command exited with zero status (success) and a false value (0) if the
+    command exited with a non-zero status (failure). See $? ($CHILD_ERROR)
+    for the real deets.
+
+SOURCE
+    <https://github.com/dinomite/Shell-Verbose>
+
+AUTHOR
+    Drew Stephens <drew@dinomite.net>
+

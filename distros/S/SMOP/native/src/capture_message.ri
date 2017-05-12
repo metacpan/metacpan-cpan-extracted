@@ -1,0 +1,43 @@
+%prefix smop_capture_message
+
+%method positional
+    SMOP__Object* i = SMOP__NATIVE__capture_positional(interpreter,capture,1);
+    ret = SMOP__NATIVE__capture_positional(interpreter,invocant,SMOP__NATIVE__int_fetch(i));
+    SMOP_RELEASE(interpreter,i);
+
+%method named
+    SMOP__Object* key = SMOP__NATIVE__capture_positional(interpreter,capture,1);
+    ret = SMOP__NATIVE__capture_named(interpreter,invocant,key);
+    if (!ret) ret = SMOP__NATIVE__bool_false;
+    SMOP_REFERENCE(interpreter,ret);
+
+%method elems
+  int count = SMOP__NATIVE__capture_positional_count(interpreter,invocant);
+  ret = SMOP__NATIVE__int_create(count);
+
+%method named_count
+  int count = SMOP__NATIVE__capture_named_count(interpreter,invocant);
+  ret = SMOP__NATIVE__int_create(count);
+
+%method new
+  ret = SMOP__NATIVE__capture_create_from_capture(interpreter,capture);
+
+%method delegate
+  SMOP__Object* new_invocant = SMOP__NATIVE__capture_positional(interpreter,capture,1);
+  ret = SMOP__NATIVE__capture_delegate(interpreter,invocant,new_invocant);
+
+%method FETCH
+  int count = SMOP__NATIVE__capture_positional_count(interpreter,invocant);
+  if (count == 1) {
+    SMOP__Object* value = SMOP__NATIVE__capture_positional(interpreter,invocant,0);
+    ret = SMOP_DISPATCH(interpreter,SMOP_RI(value),SMOP__ID__FETCH,SMOP__NATIVE__capture_create(interpreter,(SMOP__Object*[]) {value,NULL},(SMOP__Object*[]) {NULL}));
+  } else {
+    ___VALUE_FETCH___;
+  }
+
+%method STORE
+  ___VALUE_STORE___;
+
+%init {
+  ((SMOP__ResponderInterface*)SMOP__capture__RI)->MESSAGE = ((SMOP__ResponderInterface*)RI)->MESSAGE;
+%}

@@ -1,0 +1,12 @@
+TYPEMAP
+ibam* T_IBAM_WRAPPER
+
+OUTPUT
+
+T_IBAM_WRAPPER
+	$arg = new_ibam_object($var);
+
+INPUT
+
+T_IBAM_WRAPPER
+	$var = get_ibam_object($arg);

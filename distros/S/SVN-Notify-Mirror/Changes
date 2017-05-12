@@ -1,0 +1,465 @@
+2012-07-04  John Peacock  <john.peacock@havurah-software.org>
+
+	* .hgtags:
+	Tagging version '0.040' using shipit.
+	[d841fdcb122b] [tip]
+
+	* .shipit, MANIFEST.SKIP:
+	Final release bits related to ShipIt
+	[08ac8b953514] [0.040]
+
+	* .hgignore, Build.PL, MANIFEST.SKIP, README,
+	lib/SVN/Notify/Mirror.pm, lib/SVN/Notify/Mirror/Rsync.pm,
+	lib/SVN/Notify/Mirror/SSH.pm:
+	Prep for release of 0.040 to CPAN
+	[1f9264ef17d5]
+
+2012-07-04  Salvatore Bonaccorso  <carnil@debian.org>
+
+	* t/coretests.pm:
+	Work with changed output from subversion 1.7 Patch t/corelist.pm to
+	work with changed output of svnnotify. Fix FTBFS "tests failed".
+
+	Closes: #678791
+	--- t/coretests.pm | 1 + 1 file changed, 1 insertion(+)
+	[b4d0a6f371f3]
+
+2012-07-04  John Peacock  <john.peacock@havurah-software.org>
+
+	* .hgignore, Build.PL, MANIFEST, MANIFEST.SKIP:
+	Finish work to migrate to Mercurial. Eliminate SIGNATURE for now
+	[329152d3aabb]
+
+2009-11-28  convert-repo  <convert-repo>
+
+	* .hgtags:
+	update tags
+	[450f8073b39a]
+
+2008-12-18  jpeacock  <jpeacock>
+
+	* MANIFEST, lib/SVN/Notify/Mirror.pm, lib/SVN/Notify/Mirror/Rsync.pm,
+	lib/SVN/Notify/Mirror/SSH.pm, t/005_shortest_path.t:
+	Apply patch from JSWARTZ to make shortest_path more robust.
+	[e0e56db793c7]
+
+2008-05-17  jpeacock  <jpeacock>
+
+	* README, lib/SVN/Notify/Mirror.pm, lib/SVN/Notify/Mirror/Rsync.pm,
+	lib/SVN/Notify/Mirror/SSH.pm, t/002_config.t.PL:
+	Fix problem with the Module::Build released with Perl 5.10.0
+	[aa3a65796550] [RELEASE_0_038]
+
+2008-03-02  jpeacock  <jpeacock>
+
+	* README:
+	Consistently forget to update README before prep for release.
+	[9ff0afe70294] [RELEASE_0.037]
+
+2008-02-27  jpeacock  <jpeacock>
+
+	* Build.PL, Makefile.PL, lib/SVN/Notify/Mirror.pm,
+	lib/SVN/Notify/Mirror/Rsync.pm, lib/SVN/Notify/Mirror/SSH.pm:
+	New feature to support generic ssh configation stanzas. Suggested by
+	Wolfgang Kohnen <wk@ko-sys.com>
+	[11eb8f0e5f32]
+
+2007-05-16  jpeacock  <jpeacock>
+
+	* Build.PL, README, lib/SVN/Notify/Mirror.pm,
+	lib/SVN/Notify/Mirror/Rsync.pm, lib/SVN/Notify/Mirror/SSH.pm,
+	t/004_rsynctest.t.PL:
+	Enabled rsync test to be optional (like ssh tests). Added Copyright
+	text. Added explicit $VERSION to implementation classes (to match
+	main $VERSION).
+	[ee2604decbb4] [RELEASE_0.03603]
+
+2007-03-14  jpeacock  <jpeacock>
+
+	* README, lib/SVN/Notify/Mirror.pm:
+	--minimal would fail to create new directory if there wasn't also a
+	file modified higher in the tree.
+	[ca2204191b91] [RELEASE_0.03602]
+
+2007-03-02  jpeacock  <jpeacock>
+
+	* README, lib/SVN/Notify/Mirror.pm, lib/SVN/Notify/Mirror/SSH.pm:
+	Quick release to fix brokeness in --tag-regex handling.
+	[e2c68db35199] [RELEASE_0.03601]
+
+	* README:
+	Ready to release to CPAN.
+	[a56d525f4d88] [RELEASE_0.036]
+
+	* lib/SVN/Notify/Mirror.pm, lib/SVN/Notify/Mirror/SSH.pm:
+	Handle multiple targets (i.e. To) which to_regex_map and
+	S::N::Config can produce. Also improve tunneling of e.g. http[s]
+	paths.
+	[0b21664f8604]
+
+2007-01-29  jpeacock  <jpeacock>
+
+	* t/005_minimal.t:
+	Don't require standalone test for '--minimal' now.
+	[b1784ec33cba] [RELEASE_0.035]
+
+	* lib/SVN/Notify/Mirror.pm, lib/SVN/Notify/Mirror/Rsync.pm,
+	lib/SVN/Notify/Mirror/SSH.pm, t/001_basic.t, t/003_sshtest.t.PL,
+	t/004_rsynctest.t.PL:
+	Replace _get_prefix() with inline call to _cd_run(). Change
+	_cd_run() signature to return list. Change all tests to run both
+	with and without '--minimal'.
+	[56dd8ba41e07]
+
+2007-01-28  jpeacock  <jpeacock>
+
+	* lib/SVN/Notify/Mirror.pm, t/002_config.t.PL, t/005_minimal.t:
+	Support and test for '--minimal' flag. Only works with local
+	mirrors and all config-driven mirrors.
+	[8b584fb7f7b7]
+
+2006-11-23  jpeacock  <jpeacock>
+
+	* MANIFEST:
+	Need to add SIGNATURE to the MANIFEST so that release won't barf.
+	[fdde4bec9cd9]
+
+2006-11-21  jpeacock  <jpeacock>
+
+	* README, lib/SVN/Notify/Mirror.pm, t/001_basic.t, t/002_config.t.PL,
+	t/coretests.pm:
+	Use lessons learned from testing SVN::Notify::Config about external
+	binaries. No actual code changes, just test tweaks.
+	[bef57e0f11f3] [RELEASE_0.03403, RELEASE_0.3403]
+
+2006-11-14  jpeacock  <jpeacock>
+
+	* Build.PL:
+	Bring Build.PL up to date
+	[cf78e2625eea]
+
+2006-11-01  jpeacock  <jpeacock>
+
+	* README, lib/SVN/Notify/Mirror.pm, t/001_basic.t:
+	More robustness in tests
+	[0dec4b824ec8] [RELEASE_0.03402, RELEASE_0_03402]
+
+2006-10-31  jpeacock  <jpeacock>
+
+	* MANIFEST, MANIFEST.SKIP:
+	Add MANIFEST.SKIP so that release script is happy
+	[1aac676e7036]
+
+	* t/coretests.pm:
+	ENV overrides find_exev() call
+	[21793c062ea0]
+
+	* README, lib/SVN/Notify/Mirror.pm, t/coretests.pm:
+	Don't rely on svnadmin being in the path for testing.
+	[5d8ddea98f78]
+
+2006-07-07  jpeacock  <jpeacock>
+
+	* README:
+	Ready to release to CPAN (now that SVN-Notify-Config is fixed).
+	[ed63e887f7c3] [RELEASE_0.034, RELEASE_0_034]
+
+2006-06-30  jpeacock  <jpeacock>
+
+	* lib/SVN/Notify/Mirror.pm:
+	This should be working but is having some problems
+	[bf3a6a48890e]
+
+	* Build.PL, lib/SVN/Notify/Mirror.pm:
+	Quick release to cope with backwards incompatible API changes in
+	SVN::Notify 2.61. Don't release until POD is rewritten and I hear
+	from Audrey Tang about SVN::Notify::Config fixes (to add to README).
+	[0023caf4af26]
+
+2006-02-25  jpeacock  <jpeacock>
+
+	* Build.PL, lib/SVN/Notify/Mirror.pm:
+	* Build.PL Depend on the newly minted SVN::Notify-2.53.
+
+	* lib/SVN/Notify/Mirror.pm Use SVN::Notify->find_exe() to locate
+	the 'svn' binary.
+	[fb7e6c8b77bd] [RELEASE_0.033, RELEASE_0_033]
+
+2006-02-24  jpeacock  <jpeacock>
+
+	* lib/SVN/Notify/Mirror.pm:
+	Further improvements in making sure that the svn_binary is found.
+	[78ab8a18cea4] [RELEASE_0.032, RELEASE_0_032]
+
+2006-02-17  jpeacock  <jpeacock>
+
+	* Build.PL, README, lib/SVN/Notify/Mirror.pm:
+	* Build.PL Add explicit dependency on SVN::Notify. Duh.
+
+	* README lib/SVN/Notify/Mirror.pm Improve documentation of
+	optional features.
+	[924d7e47475f]
+
+	* README, lib/SVN/Notify/Mirror.pm:
+	Don't hardcode path to svn executable.
+	[2ee8a722bf22]
+
+2006-02-16  jpeacock  <jpeacock>
+
+	* README, lib/SVN/Notify/Mirror.pm, t/coretests.pm:
+	Older Subversion clients choke if you give them the repos path when
+	they weren't expecting it (go figure).
+	[03b026173f01] [RELEASE_0.031, RELEASE_0_031]
+
+2006-01-03  jpeacock  <jpeacock>
+
+	* README, lib/SVN/Notify/Mirror.pm:
+	Release 0.03 to CPAN.
+
+	* README Clarify a few points.
+
+	* lib/SVN/Notify/Mirror.pm Bump the $VERSION.
+	[56a571b18def] [RELEASE_0.03, RELEASE_0_03]
+
+2005-12-29  jpeacock  <jpeacock>
+
+	* lib/SVN/Notify/Mirror/Rsync.pm:
+	One last file to add.
+
+	* lib/SVN/Notify/Mirror/Rsync.pm Forgot to add this back to the
+	repository in its current form.
+	[7c4ec8ac2657] [RELEASE_0.02_09, RELEASE_0_02_09]
+
+	* MANIFEST:
+	Nearly forgot to add files to the MANIFEST.
+
+	* MANIFEST Add Rsync.pm and tests for same.
+	[95428e3362bb]
+
+	* Build.PL, README, lib/SVN/Notify/Mirror.pm, t/004_rsynctest.t.PL,
+	t/coretests.pm:
+	* Build.PL Add support structure for Rsync class.
+
+	* README Simplify and discuss features that have changed.
+
+	* lib/SVN/Notify/Mirror.pm Update $VERSION. Add POD describing
+	tag-regex option.
+
+	* t/coretests.pm Replicate wc_map structure for Rsync tests.
+
+	* t/004_rsynctest.t.PL New test for Rsync transport method.
+	[a0fca6f6646b]
+
+	* MANIFEST, README, lib/SVN/Notify/Mirror.pm,
+	lib/SVN/Notify/Mirror/Rsync.pm, t/coretests.pm, t/survey_repos:
+	Ready to release alpha code to CPAN.
+
+	* MANIFEST Need to add new file or it doesn't get included in
+	tar.
+
+	* README Mention Mirror::SSH in example.
+
+	* lib/SVN/Notify/Mirror/Rsync.pm Take this out until design
+	questions are resolved.
+
+	* lib/SVN/Notify/Mirror.pm Bump $VERSION and standardize
+	whitespace.
+
+	* t/coretests.pm Tweak $changes slightly to test empty updates,
+	too.
+
+	* t/survey_repos First pass at improving code to autogenerate
+	test cases.
+	[18419d75ce5c] [RELEASE_0.02_07, RELEASE_0_02_07]
+
+2005-12-28  jpeacock  <jpeacock>
+
+	* lib/SVN/Notify/Mirror.pm, lib/SVN/Notify/Mirror/Rsync.pm,
+	lib/SVN/Notify/Mirror/SSH.pm, t/002_config.t.PL, t/coretests.pm:
+	Finally have tests succeeding 100% (not testing Rsync yet).
+
+	* t/coretests.pm Rework test framework to only test the right
+	things at the right time.
+
+	* t/002_config.t.PL Change test to call SVN::Notify::Mirror::SSH
+	directly.
+
+	* lib/SVN/Notify/Mirror.pm Add compatibility for SSH call for
+	next release.
+
+	* lib/SVN/Notify/Mirror/SSH.pm
+	* lib/SVN/Notify/Mirror/Rsync.pm Use parent module's $VERSION (to
+	each maintainence).
+	[15ae10791c6f]
+
+	* lib/SVN/Notify/Mirror.pm, lib/SVN/Notify/Mirror/Rsync.pm,
+	lib/SVN/Notify/Mirror/SSH.pm, t/coretests.pm:
+	Split out the SSH and add Rsync subclasses (tests still not
+	working).
+
+	* t/coretests.pm More tweaks to test framework but still no
+	solution.
+
+	* lib/SVN/Notify/Mirror.pm Remove SSH code and place in seperate
+	file. Deprecate using SSH from parent module.
+
+	* lib/SVN/Notify/Mirror/SSH.pm Completely working subclass based
+	on code stripped from parent.
+
+	* lib/SVN/Notify/Mirror/Rsync.pm Skeleton subclass (not tested
+	at all). Suggested by Guillaume Rousse
+	<Guillaume.Rousse@inria.fr>
+	[5b2546e432f3]
+
+2005-12-27  jpeacock  <jpeacock>
+
+	* lib/SVN/Notify/Mirror.pm, t/002_config.t.PL, t/coretests.pm:
+	Tests 001_basic.t and 003_sshtest.t pass 100% but 002_config.t fails
+	due to out-of-order evaluation.
+
+	* lib/SVN/Notify/Mirror.pm Simplify non-switch path. Chop
+	URL from wc and source on /tags/ then stitch together. Echo the
+	command run in the error case.
+
+	* t/coretests.pm Working test framework to loop over each WC in
+	turn. _compare_directories() stubbed out for now.
+	[4a321c1b820c]
+
+	* t/coretests.pm, t/test-repos.dump:
+	Interim commit (tests still fail).
+
+	* t/coretests.pm Add wc_map to try and make it easier to keep
+	track of what wc contains what path.
+
+	* t/test-repos.dump Actually didn't save the correct dumpfile
+	last time.
+	[fd7fd720710c]
+
+2005-12-26  jpeacock  <jpeacock>
+
+	* t/coretests.pm, t/recreate, t/survey_repos, t/test-repos.dump:
+	Complexify the testing regime to handle realworld repositories with
+	multiple projects. Testing does not work yet.
+
+	* t/recreate t/survey_repos Private scripts to recreate the
+	repository and to survey the repository structure and create the
+	appropriate test structure within coretests.pm.
+
+	* t/coretests.pm Partially updated with new repository structure
+	(tests fail).
+
+	* t/test-repos.dump New repository dump (not really related to
+	previous dump).
+	[efb3da119271]
+
+2005-12-24  jpeacock  <jpeacock>
+
+	* lib/SVN/Notify/Mirror.pm, t/002_config.t.PL:
+	Completely working switch feature.
+
+	* lib/SVN/Notify/Mirror.pm Modularize _cd_run and _ssh_run to
+	work exactly the same way. Run `svn info` on target directory to
+	get URL.
+
+	* t/002_config.t.PL Add 'tags/' target to both local and SSH
+	configfile.
+	[71f61c612931]
+
+2005-12-23  jpeacock  <jpeacock>
+
+	* MANIFEST, lib/SVN/Notify/Mirror.pm, t/002_config.t.PL,
+	t/coretests.pm, t/test-repos.dump:
+	Working switch case for tags, but only on local dir.
+
+	* MANIFEST Need to have Makefile.PL so `release` doesn't get
+	confused
+
+	* lib/SVN/Notify/Mirror.pm Rename all internal attributes to use
+	underscore (as this is what YAML does anyways. Add
+	'switch' case for tags.
+
+	* t/002_config.t.PL Add stanza for 'tags/' path.
+
+	* t/coretests.pm Add new wc-tag directory. Add tests for
+	switch case in tags.
+
+	* t/test-repos.dump Append two tags to repos dump.
+	[35702240e9c4]
+
+2005-12-03  jpeacock  <jpeacock>
+
+	* Makefile.PL:
+	Need compatibility Makefile.PL so release works
+	[f1fd53a9b444] [RELEASE_0.02, RELEASE_0_02]
+
+	* Build.PL, README, lib/SVN/Notify/Mirror.pm:
+	Final changes for 0.02 release
+	[c8b90e39f4d8]
+
+2005-11-23  jpeacock  <jpeacock>
+
+	* Build.PL, Changes, META.yml, lib/SVN/Notify/Mirror.pm,
+	t/coretests.pm:
+	Remove dynamically created files from repository. Add dynamic
+	creation of Changes from repos log. Add tests to compare files at
+	each rev. Ready for next CPAN beta release.
+	[8686fe050e5e]
+
+	* Build.PL, t/002_config.t.PL, t/coretests.pm:
+	All three testfiles working (though not optimal)
+	[812679e3b767]
+
+2005-11-21  jpeacock  <jpeacock>
+
+	* Build.PL, MANIFEST, t/001_basic.t, t/002_config.t.PL,
+	t/003_sshtest.t.PL, t/coretests.pm, t/test-repos.dump:
+	Working 001 and 003 tests. 002 test does something, but need more
+	robust way to check it.
+	[26ecf686b508]
+
+	* lib/SVN/Notify/Mirror.pm:
+	Fix stupid global replace errors.
+	[6f227b6218d5]
+
+2005-11-20  jpeacock  <jpeacock>
+
+	* Build.PL, t/001_basic.t, t/001_basic.t.PL:
+	Always run the basic test without extracting files
+	[65409e878245]
+
+	* Build.PL, MANIFEST, t/001_basic.t.PL, t/003_sshtest.t.PL,
+	t/coretests.pm:
+	First cut at adding tests
+	[1395aa2e779c]
+
+	* lib/SVN/Notify/Mirror.pm:
+	Replace underbar with hyphens in all parameters
+	[3a5e6ade89c9]
+
+2005-11-18  jpeacock  <jpeacock>
+
+	* Build.PL, MANIFEST, META.yml, README, lib/SVN/Notify/Mirror.pm,
+	t/001_basic.t.PL, t/002_config.t.PL, t/003_sshtest.t.PL:
+	Structure to permit intelligent testing
+	[a4eaa49895c6]
+
+2005-11-16  jpeacock  <jpeacock>
+
+	* Build.PL, META.yml, lib/SVN/Notify/Mirror.pm:
+	r434@dsl092-168-024: jpeacock | 2005-11-15 10:41:18 -0500 Prepare
+	to add SSH support. r435@dsl092-168-024: jpeacock | 2005-11-16
+	16:49:43 -0500 Implement support for remote mirrors via ssh
+	[31e903eb40ae]
+
+2005-09-11  jpeacock  <jpeacock>
+
+	* Build.PL, Changes, LICENSE, MANIFEST, META.yml, README, Todo,
+	lib/SVN/Notify/Mirror.pm:
+	For some reason, I never added this to the repository before
+	releasing to CPAN. I'm not even sure where I did this development
+	now... ;-)
+	[4c21c404dd91] [0.01, RELEASE_0.01]
+
+	* Directory for svk import.
+	[0634bc2c1ece]
+

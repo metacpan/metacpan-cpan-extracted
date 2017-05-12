@@ -1,0 +1,22 @@
+0.102800  2010-10-07 15:25:16 America/Chicago
+
+    * Added the increment and decrement methods to Sword::Module
+    * Added lookup to the examples scripts
+    * Added the top, bottom, and strip_text methods to Sword::Module
+    * Added the Sword::Key module for interfacing with SWKey. This provides the
+      methods clone, set_text, get_text, get_short_text, get_range_text,
+      compare, equals, increment, decrement, top, bottom, and index.
+    * Corrected a memory leak in Sword::Manager::modules().
+    * Added a BUGS section to the Sword POD regarding the fact that this thing
+      probably leaks memory terribly at the moment.
+    * Corrected the typemap so that error messages on incorrect types passed to
+      the XS methods would correctly report the type without "Ptr" being incorrectly
+      added to the end of the message.
+
+0.102770  2010-10-04 18:18:50 America/Chicago
+
+    * The initial release of the Sword library
+    * Provides Sword::Manager to interface with SWMgr. Provides a new
+      constructor, and modules and get_module methods.
+    * Provides Sword::Module to interface with SWModule. Provides name,
+      description, type, set_key, and render_text methods.

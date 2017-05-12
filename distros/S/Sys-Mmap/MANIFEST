@@ -1,0 +1,12 @@
+Artistic
+Changes
+Copying
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+Mmap.pm
+Mmap.xs
+README
+t/mmap.t
+t/munmap_errors.t
+META.json                                Module JSON meta-data (added by MakeMaker)

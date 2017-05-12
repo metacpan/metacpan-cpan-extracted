@@ -1,0 +1,19 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+bin/VertFigure
+examples/README
+examples/bifurcation/README
+examples/bifurcation/bifurcation.vcd
+examples/pbj/README
+examples/pbj/pbj-phylogeny.svg
+examples/pbj/pbj-phylogeny.tre
+examples/pbj/pbj.vcd
+lib/SVG/VCD.pm
+lib/SVG/VCD/Format.pm
+lib/SVG/VCD/Taxon.pm
+t/SVG-VCD.t
+META.yml                                 Module meta-data (added by MakeMaker)

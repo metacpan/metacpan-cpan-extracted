@@ -1,0 +1,15 @@
+MANIFEST
+Makefile.PL
+README
+CHANGES
+lib/Search/InvertedIndex.pm
+lib/Search/InvertedIndex/AutoLoader.pm
+lib/Search/InvertedIndex/DB/DB_File_SplitHash.pm
+lib/Search/InvertedIndex/DB/Mysql.pm
+lib/Search/InvertedIndex/Query.pm
+lib/Search/InvertedIndex/Query/Leaf.pm
+lib/Search/InvertedIndex/Result.pm
+lib/Search/InvertedIndex/Update.pm
+t/base.t
+t/mysql.t
+META.yml                                 Module meta-data (added by MakeMaker)

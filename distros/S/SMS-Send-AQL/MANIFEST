@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+META.yml
+eg/simple-example.pl
+t/1-basic.t
+t/2-pod.t
+t/3-pod-coverage.t
+lib/SMS/Send/AQL.pm

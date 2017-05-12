@@ -1,0 +1,33 @@
+# Simple test setup for synsim
+TITLE: Quadratic function
+SIMULATION : quadratic
+#DEVTYPE : OPSnode
+# extension of template files (default: .templ)
+#TEMPL : .templ
+#PLOTCOMMAND: /usr/bin/X11/gv
+# the command line to run the simulation (default: perl inputfile outputfile)
+# 'inputfile' and 'outputfile' are keywords
+COMMAND : ./quadratic.py -i inputfile -o outputfile
+# extension of input file (default: .pl)
+#EXT : .in
+# To filter the output of the simulation
+# To filter the output of the simulation (defaults to .*)
+#OUTPUT_FILTER_PATTERN : .*
+
+# Name of the template file for the result analysis
+ANALYSIS : XYPlot
+GROUP: _X,_C
+XVAR : _X
+
+# assuming the raw output comes in whitespace-separated columns
+#YCOL: 1
+#logscale : x, y or xy
+#LOGSCALE: Y
+#YLABEL: Y-values
+#XLABEL: X-values
+#PLOTSTYLE: linespoints
+#PREPROCESSOR: show_source
+_A = 1,2
+_B = -10
+_C = -4,4,0.5
+_X = -4,4,0.5

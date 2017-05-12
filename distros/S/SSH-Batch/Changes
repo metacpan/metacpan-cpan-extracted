@@ -1,0 +1,140 @@
+0.030
+- atnodes: added the -W option to atnodes to allow prompting
+  for passwords for sudo only. thanks JamesPan for the patch.
+
+0.029
+- atnodes: added a '-q' parameter to run SSH in quiet mode,
+  which prevents banners and motd messages from being
+  displayed in the output. thanks Mithun Ayachit for the patch.
+
+0.028
+- atnodes: fixed tmp file leaks.
+- atnodes: automatically check if openssh version >= 4.1.
+
+0.027
+- added support for the environment SSH_BATCH_RC to specify a
+  different file name than the default ~/.fornodesrc.
+  thanks Mithun Ayachit.
+- updated host variable format check to /\w[-\.\w]*/.
+- added the SSH_BATCH_PASSPHRASE environment for -P and
+  SSH_BATCH_PASSWORD env for -w.
+- added passphrase support.
+- added some docs for tty option.
+
+0.024
+- tonodes: added rsync archive, update and compress mode. (liseen)
+- fornodes: trim expressions when parsing them. (liseen)
+- atnodes: added the use-tty option.
+- fornodes: now we automatically create a default ~/.fornodesrc when it's missing.
+- atnodes: added the "StrictHostChecking no" option for the first login.
+
+0.023
+- key2nodes: more examples added to SYNOPSIS in its POD. thanks cnhackTNT++.
+- added repository address into Makefile.PL, thanks Alexandr Ciornii.
+
+0.022
+- tonodes: now we automatically expand ~ and ~foo using local USER env if set
+- added support for SSH_BATCH_SSH_CMD env and --ssh option to key2nodes.
+- tonodes now print a warning message while expanding ~ and ~foo locally in the target path.
+- added more docs explaining how to disable StrictHostKeyChecking for ssh
+
+0.021
+- fixed the homedir mocking bug of the test suite for Mac.
+- no longer skipped those tests marked as linux_only on non-linux systems.
+
+0.020
+- explains the "sudo: sorry, you must have a tty to run sudo" error a bit in
+  the POD.
+- fixed the license name in Makefile.PL (and thus META.yml too).
+
+0.019
+- fixed the typo in the fornodes usage and docs. it should be -x rather than
+  -l.
+- fixed the test suite on non-linux systems.
+
+0.018
+- now the fornodes script puts hosts in a single line. use -x to get the
+  old one-host-per-line behavior.
+- now the use can set the SSH_BATCH_LINE_MODE env to set -L for every
+  atnodes/tonodes execution.
+
+0.017
+- now in the test scaffold, we use LC_ALL=C rather than LC_ALL=en_US.UTF-8.
+  the latter is not available on certain systems.
+- skipped the "no home" tests on non-linux systems.
+- minor doc fixes.
+
+0.016
+- fixed a doc typo found by franck.
+
+0.015
+- added a tip for port and user name integration in the cluster spec
+  expressions.
+
+0.014
+- display Net::OpenSSH's error messages when failures occur.
+- added a lot more docs.
+
+0.013
+- apply the invalid PID fixes to tonodes and key2nodes as well.
+- implemented -L option in tonodes.
+- now we install key2nodes in Makefile.PL as well.
+
+0.012
+- fixed the special case when Net::OpenSSH::spawn returns invalid PID (-1).
+
+0.011
+- now we ignore user's SSH_BATCH_SSH_CMD environment settings in the test
+  scaffold, fixing a bogus test failure on some user's machines with
+  the env set.
+
+0.010
+- added -L option to use host-very-output-line output format.
+
+0.009
+- ignored status code difference in t/fornodes.pm so that there won't be
+  bogus test failures on BSD.
+- added support for the SSH_BATCH_SSH_CMD environment to let user specify
+  his own ssh path. But it could be further overriden by the -ssh command
+  line option.
+- added docs to explain how to pass custom options to the underlying "ssh"
+  program by means of custom ssh wrapper scripts.
+- added docs to make clear that we require at least OpenSSH 4.1 client
+  side executable "ssh".
+
+0.008
+- added -ssh <path> option to atnodes.
+
+0.007
+- added -c <concurrency> option to atnodes/tonodes/key2nodes and it has the
+  default SSH concurrency limit of 20.
+- skip directories in tonode if no -r specified.
+
+0.006
+- fixed a bug in multiline expression handling in ~/.fornodesrc parsing.
+- added multi-line expression samples to the POD docs.
+
+0.005
+- updated the POD docs.
+- fixed the bogus test failures on machines with a different locale.
+
+0.004
+- no longer set tty => 1 explicitly to Net::OpenSSH's call.
+- implemented the set division operator.
+- now we consider set opeartor precedence.
+- added -rsync option to tonodes to use "rsync" rather than the default "scp".
+- added -b <num> option to limit transfer bandwidth.
+
+0.003
+- added the key2nodes script.
+- fixed the waitpid bug in atnodes.
+- minor doc cleanup.
+
+0.002
+- added the tonodes script.
+- more tests added.
+- more docs added.
+
+0.001
+- initial CPAN release.
+

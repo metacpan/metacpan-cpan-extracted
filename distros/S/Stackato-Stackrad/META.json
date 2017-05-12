@@ -1,0 +1,63 @@
+{
+   "abstract" : "Curses Client for Stackato",
+   "author" : [
+      "Ingy döt Net <ingy@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Stackato-Stackrad",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt",
+         "example"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Curses::UI" : "0",
+            "HTTP::Request" : "0",
+            "JSON::XS" : "0",
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent" : "0",
+            "Mo" : "0",
+            "URI::Escape" : "0",
+            "YAML::XS" : "0",
+            "perl" : "v5.8.1"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ingydotnet/stackato-stackrad-pm/issues"
+      },
+      "homepage" : "https://github.com/ingydotnet/stackato-stackrad-pm",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ingydotnet/stackato-stackrad-pm.git",
+         "web" : "https://github.com/ingydotnet/stackato-stackrad-pm"
+      }
+   },
+   "version" : "0.13"
+}
+

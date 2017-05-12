@@ -1,0 +1,41 @@
+0.0306  2016-10-30      Piotr Roszatycki <dexter@cpan.org>
+
+* Workaround for missing TCP_NODELAY on Android.
+
+0.0305  2016-03-28      Piotr Roszatycki <dexter@cpan.org>
+
+* Use address 127.0.0.1 rather than localhost for testing.
+
+0.0304  2015-08-02      Piotr Roszatycki <dexter@cpan.org>
+
+* Server resets SIGCHLD to default for workers so they work correctly with CGI
+  emulation.
+* The default protocol is HTTP/1.0.
+* Bugfix for 08chunked_req.t: should not use external files.
+
+0.0303  2014-11-16      Piotr Roszatycki <dexter@cpan.org>
+
+* Workaround for HTTP::Tiny + Test::TCP conflict, which prevented installing
+  this package.
+
+0.0302  2014-06-28      Piotr Roszatycki <dexter@cpan.org>
+
+* Support for "quiet" option.
+* Does not hang up on daemonize without error log file.
+* Bugfix for streaming mode (Use of uninitialized value).
+
+0.0301  2014-05-03      Piotr Roszatycki <dexter@cpan.org>
+
+* Requirement for Time::HiRes is optional.
+
+0.0300  2014-02-07      Piotr Roszatycki <dexter@cpan.org>
+
+* Support for "user", "group" and "umask" options.
+
+0.0200  2014-01-30      Piotr Roszatycki <dexter@cpan.org>
+
+* Support for "daemonize", "pid" and "error-log" options.
+
+0.0100  2014-01-25      Piotr Roszatycki <dexter@cpan.org>
+
+* Initial CPAN release.

@@ -1,0 +1,8 @@
+Revision history for Perl extension Sub::Throttle.
+
+0.02  Mon Oct  6 19:43:00 2008
+	- fix throttle() returning 1 if called in scalar context and if subref returned a scalar value
+
+0.01  Fri Aug  1 17:30:00 2008
+	- initial version
+

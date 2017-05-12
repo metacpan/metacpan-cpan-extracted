@@ -1,0 +1,6 @@
+Revision history for Perl extension Sub::Regex.
+
+0.01  Tue Jan 21 11:04:40 2003
+	- original version; created by h2xs 1.21 with options
+		-XA Sub::Regex
+

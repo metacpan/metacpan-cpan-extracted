@@ -1,0 +1,120 @@
+SOAPjr
+
+Traditional SOAP is no longer the Simple Object Access Protocol it was 
+initially designed to be. It's bloated and overly verbose making it 
+bandwidth hungry and slow. It's also based on XML, making it expensive 
+to parse and manipulate - especially on mobile or embedded clients. 
+However, it's core Envelope/Head/Body design pattern is really useful 
+for AJAX style API's.
+
+SOAPjr uses a similar Envelope/Head/Body model, but instead of bloated 
+and verbose XML it uses lightweight and easy to manipulate JSON. 
+After all, there's no X in SOAP and it's Envelope/Head/Body concept 
+is not bound in any way to requiring XML.
+
+In contrast to SOAP, JR (JSON-RPC) is overly simplistic and basically 
+tunnels HTTP GET style key/value pairs within a query string using JSON. 
+However, within JR there is no Head/Body separation leaving metadata 
+to pollute the main data space.
+
+SOAPjr combines the best of these two concepts and is designed to 
+create modern AJAX API's that can easily be used by mobile devices, 
+embedded systems or PC browsers.
+
+So how does this make building AJAX API's any easier? 
+Getting a browser to talk to make XMLHttpRequest calls is easy enough. 
+But the complex part is defining what data structures each request and 
+response will contain, and debugging invisible requests to find out if 
+it's an HTTP transport error, a Server error, a JSON parser error or a 
+web server or DB error. SOAPjr makes all of this simple by providing a 
+simple and clean framework and associated data structures.
+
+SOAPjr even let's you work with and extend common data models across 
+specific domains (e.g. contacts, calendars, payments, etc.) helping 
+standardise API's even further. 
+
+A common model would be to use POSH, CSS and Microformats at the 
+presentation layer bound together with a Javascript toolkit like jQuery. 
+SOAPjr is the glue between the browser and the Server, and on the 
+Server-side you can use Perl, Java, PHP, Python, Ruby or any HTTP 
+aware language. 
+
+These modules are an example of a pre-built SOAPjr toolkits in Perl.
+
+So if you want to create clean, fast AJAX API's then 
+SOAPjr is what you've been looking for. 
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc SOAPjr
+
+
+You can quickly create jQuery clients that speak SOAPjr using these:
+
+    SOAPjr plugin
+        http://plugins.jquery.com/project/SOAPjr
+
+    Valid JSON plugin
+        http://plugins.jquery.com/project/JSONSchemaValidator
+
+
+You can also look for information at:
+
+    SOAPjr.org
+        http://SOAPjr.org
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=SOAPjr
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/SOAPjr
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/SOAPjr
+
+    Search CPAN
+        http://search.cpan.org/dist/SOAPjr/
+
+
+TODO
+
+Need to write t/ tests and add detailed documentation then replace t/pod-coverage.t.
+
+Also need to create Server and Client modules ala JSON::RPC and more detailed example scripts.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Rob Manson, Sean McCarthy and 
+http://SOAPjr.org, some rights reserved.
+
+This file is part of SOAPjr.
+
+SOAPjr is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+SOAPjr is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with SOAPjr.  If not, see <http://www.gnu.org/licenses/>.
+

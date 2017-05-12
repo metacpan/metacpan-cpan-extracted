@@ -1,0 +1,99 @@
+NAME
+    SQL::Type::Guess - guess an appropriate column type for a set of data
+
+SYNOPSIS
+        my @data=(
+          { fool => 1, when => '20140401', greeting => 'Hello', value => '1.05'  },
+          { fool => 0, when => '20140402', greeting => 'World', value => '99.05' },
+          { fool => 0, when => '20140402', greeting => 'World', value => '9.005' },
+        );
+
+        my $g= SQL::Type::Guess->new();
+        $g->guess( @data );
+
+        print $g->as_sql( table => 'test' );
+        # create table test (
+        #    "fool" decimal(1,0),
+        #    "greeting" varchar(5),
+        #    "value" decimal(5,3),
+        #    "when" date
+        # )
+
+METHODS
+  `SQL:::Type::Guess->new( %OPTIONS )'
+      my $g= SQL::Type::Guess->new();
+
+    Creates a new `SQL::Type::Guess' instance. The following options are
+    supported:
+
+    column_type
+        Hashref of already known column types.
+
+    column_map
+        Hashref mapping the combinations SQL type names to the resulting
+        type name.
+
+  `$g->column_type'
+        $g->guess({ foo => 1, bar => 'Hello' },{ foo => 1000, bar => 'World' });
+        print $g->column_type->{ 'foo' } # decimal(4,0)
+
+    Returns a hashref containing the SQL types to store all values in the
+    columns seen so far.
+
+  `$g->column_map'
+    Returns the hashref used for the type transitions. The current
+    transitions used for generalizing data are:
+
+      date -> decimal -> varchar
+
+    This is not entirely safe, as `2014-01-01' can't be safely loaded into
+    an `decimal' column, but assuming your data is representative of the
+    data to be stored that shouldn't be much of an issue.
+
+  `$g->guess_data_type $OLD_TYPE, @VALUES'
+        my $type= $g->guess_data_type( $type, 1,2,3,undef,'Hello','World', );
+
+    Returns the data type that encompasses the already established data type
+    in `$type' and the new values as passed in via `@values'.
+
+    If there is no preexisting data type, `$type' can be `undef' or the
+    empty string.
+
+  `$g->guess( @RECORDS )'
+        my @data= (
+            { rownum => 1, name => 'John Smith', street => 'Nowhere Road', birthday => '1996-01-01' },
+            { rownum => 2, name => 'John Doe', street => 'Anywhere Plaza', birthday => '1904-01-01' },
+            { rownum => 3, name => 'John Bull', street => 'Everywhere Street', birthday => '2001-09-01' },
+        );
+        $g->guess( @data );
+
+    Modifies the data types for the keys in the given hash.
+
+  `$g->as_sql %OPTIONS'
+        print $g->as_sql();
+
+    Returns an SQL string that describes the data seen so far.
+
+    Options:
+
+    user
+        Supply a username for the table
+
+    columns
+        This allows you to specify the columns and their order. The default
+        is alphabetical order of the columns.
+
+BUG TRACKER
+    Please report bugs in this module via the RT CPAN bug queue at
+    https://rt.cpan.org/Public/Dist/Display.html?Name=SQL-Type-Guess or via
+    mail to sql-type-guess-Bugs@rt.cpan.org.
+
+AUTHOR
+    Max Maischein `corion@cpan.org'
+
+COPYRIGHT (c)
+    Copyright 2014 by Max Maischein `corion@cpan.org'.
+
+LICENSE
+    This module is released under the same terms as Perl itself.
+

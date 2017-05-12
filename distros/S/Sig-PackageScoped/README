@@ -1,0 +1,49 @@
+NAME
+    Sig::PackageScoped - Make $SIG{__DIE__} and $SIG{__WARN__} package
+    scoped
+
+SYNOPSIS
+      use Sig::PackageScoped qw(set_sig unset_sig);
+
+      set_sig( __DIE__ => sub { die "Really dead: @_" } );
+
+      unset_sig( __DIE__ => 1 );
+
+DESCRIPTION
+    If all your modules use this module's functions to declare their signal
+    handlers, then they won't overwrite each other. If you're working with
+    modules that don't play nice, see Sig::PackageScoped::Paranoid. But
+    really, this is more of a demonstration of weird things you can do with
+    Perl than a good thing to use in production. You have been warned.
+
+EXPORTS
+    This module will optionally export the "set_sig" and <unset_sig>
+    subroutines. By default, nothing is exported.
+
+FUNCTIONS
+    This module provides the following functions:
+
+  set_sig()
+    This function accepts a hash of options. The keys can be either
+    "__DIE__" or "__WARN__", and the values should be coderefs to handle the
+    specified pseudo-signal.
+
+  unset_sig()
+    This function also expects a hash. The keys should be the pseudo-signal
+    to unset, and the value can be any true value.
+
+AUTHOR
+    Dave Rolsky <autarch@urth.org>
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-sig-packagescoped@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org>. I will be notified, and then you'll automatically
+    be notified of progress on your bug as I make changes.
+
+COPYRIGHT & LICENSE
+    Copyright 2001-2007 David Rolsky, All Rights Reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

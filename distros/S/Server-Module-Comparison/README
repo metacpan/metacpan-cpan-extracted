@@ -1,0 +1,92 @@
+NAME
+
+    Server::Module::Comparison - check perl module versions installed on
+    servers.
+
+VERSION
+
+    version 0.012
+
+SYNOPSIS
+
+    Gets versions of perl modules on servers.
+
+        my $comparer = Server::Module::Comparison->new({
+             perl_path => '/opt/perl5/bin',
+             modules => [qw/OpusVL::CMS OpusVL::FB11X::CMSView OpusVL::FB11X::CMS/]
+         });
+        my $versions = $comparer->check_container('quay.io/opusvl/prem-website:staging');
+    
+    
+        my $comparer = Server::Module::Comparison::FromModuleList(
+            'modules.txt',
+            { perl_path => '/opt/perl5/bin/' }
+        );
+
+DESCRIPTION
+
+    A module for checking which versions of a particular list of perl
+    modules are installed on a server.
+
+    This relies on mversion (Module::Version) being installed on the server
+    to make querying the module version numbers simple.
+
+    This module uses system and isn't expected to defend against malicous
+    input at all. It is designed as a quick and simple developer tool.
+
+METHODS
+
+ FromModuleList
+
+    Createa a new Server::Module::Comparison object from a line delimited
+    list of modules.
+
+ check_container
+
+    Run mversion in a docker container.
+
+        my $versions = $comparer->check_container('quay.io/user/some-website:staging');
+
+    This is done by running the container locally. It does not try to pull
+    the container. It is assumed you have access to docker and the correct
+    image to hand.
+
+ check_ssh_server
+
+    Checks modules via ssh.
+
+ check_local
+
+    Checks modules locally.
+
+ check_correct_guess
+
+    This takes a string and guesses whether to assume it's a container
+    identifier or an ssh server.
+
+    Also supports a docker:// or ssh:// type uri scheme to help identify
+    the server being identified.
+
+ATTRIBUTES
+
+ perl_path
+
+    Location of perl (and therefore also where mversion will be installed).
+    Set this if you have your perl installed in a non default location not
+    on the path. We have ours installed to /opt/perl5/bin for example.
+
+ modules
+
+    The list of modules to check. This is an array ref.
+
+AUTHOR
+
+    Colin Newell <colin@opusvl.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2016 by OpusVL.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

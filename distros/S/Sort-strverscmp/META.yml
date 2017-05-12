@@ -1,0 +1,43 @@
+---
+abstract: 'Compare strings while treating digits characters numerically.'
+author:
+  - 'Nathaniel Nutter C<nnutter@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.2, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Sort-strverscmp
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Sort::strverscmp:
+    file: lib/Sort/strverscmp.pm
+    version: '0.014'
+  Sort::strverscmp::StringIterator:
+    file: lib/Sort/strverscmp/StringIterator.pm
+requires:
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/nnutter/perl-sort-strverscmp/issues
+  homepage: https://github.com/nnutter/perl-sort-strverscmp
+  repository: git://github.com/nnutter/perl-sort-strverscmp.git
+version: '0.014'
+x_authority: cpan:NNUTTER
+x_contributors:
+  - 'Nathan Nutter <nnutter@genome.wustl.edu>'
+  - 'Nathaniel Nutter <iam@nnutter.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

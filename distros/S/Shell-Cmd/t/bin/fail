@@ -1,0 +1,7 @@
+#!/usr/bin/perl
+$| = 1;
+
+print "This is the 'fail' command\n";
+warn  "It will give an error\n";
+print "It will fail\n";
+exit 10;

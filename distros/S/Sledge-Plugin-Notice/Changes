@@ -1,0 +1,9 @@
+Revision history for Perl extension Sledge::Plugin::Notice.
+
+0.03  Tue Dec 27 04:56:44 2005
+	- modify session key.
+      Thank you Mr.Tanimoto!
+0.02  Sat Dec 24 20:37:04 2005
+	- fix Makefile.PL..
+0.01  Sat Dec 24 16:30:00 2005
+	- original version

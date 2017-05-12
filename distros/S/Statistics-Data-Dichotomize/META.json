@@ -1,0 +1,51 @@
+{
+   "abstract" : "Dichotomize one or more numerical or categorical sequences into a single two-valued sequence",
+   "author" : [
+      "Roderick Garton <rgarton@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Statistics-Data-Dichotomize",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Array::Compare" : "2.11",
+            "Test::More" : "0.98"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.421"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Number::Misc" : "1.2",
+            "Statistics::Data" : "0.09",
+            "Statistics::Lite" : "3.62",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Statistics::Data::Dichotomize" : {
+         "file" : "lib/Statistics/Data/Dichotomize.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

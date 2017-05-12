@@ -1,0 +1,158 @@
+NAME
+    SysV::Init::Service - Class for SysV init service manipulation.
+
+SYNOPSIS
+     use SysV::Init::Service;
+     my $obj = SysV::Init::Service->new(%parameters);
+     my @commands = $obj->commands;
+     my $name = $obj->name;
+     my $exit_code = $obj->start;
+     my $exit_code = $obj->status;
+     my $exit_code = $obj->stop;
+
+METHODS
+    "new(%parameters)"
+            Constructor.
+
+            *       "service"
+
+                     Service.
+                     Default value is undef.
+                     It is required.
+
+            *       "service_dir"
+
+                     Service directory.
+                     Default value is '/etc/init.d'.
+
+    "commands()"
+             Get service commands.
+             Be avare, command might not print any information to stdout in some
+             configuration (rewrited /etc/lsb-base-logging.sh routines to blank code for
+             quiet output).
+             Returns array of possible commands alphabetically sorted.
+
+    "name()"
+             Get service name.
+             Returns string with service name.
+
+    "start()"
+             Run service start command.
+             Returns exit code.
+
+    "status()"
+             Run service status command and return exit code.
+             Returns exit code.
+
+    "stop()"
+             Run service stop command.
+             Returns exit code.
+
+ERRORS
+     new():
+             Parameter 'service' is required.
+             Service '%s' doesn't present.
+             Service with .sh suffix doesn't possible.
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+
+     start():
+             Problem with service '%s' start.
+                     STDERR: %s
+                     Exit code: %s
+
+     status():
+             Problem with service '%s' status.
+                     STDERR: %s
+                     Exit code: %s
+
+     stop():
+             Problem with service '%s' stop.
+                     STDERR: %s
+                     Exit code: %s
+
+THEORY
+     Exit codes of init.d script in status command.
+     see Debian Wheezy /lib/lsb/init-functions pidofproc() and status_of_proc()
+     routines.
+     Exit codes:
+     0 - Program is running (pidfile exist).
+     0 - Program is running, but not owned by this user (pidfile exist).
+     0 - Program is running (pidfile doesn't exist and is defined PID).
+     1 - Program is dead (pidfile exist).
+     3 - Program is not running (pidfile doesn't exist and is defined PID).
+     3 - Program probably stopped (pidfile doesn't exist and is defined PID).
+     3 - Almost certain program is not running (pidfile doesn't exist).
+     4 - PID file not readable, hence status is unknown.
+     4 - Unable to determine status (pidfile doesn't exist).
+
+EXAMPLE
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use File::Spec::Functions qw(catfile);
+     use File::Temp qw(tempfile tempdir);
+     use IO::Barf qw(barf);
+     use SysV::Init::Service;
+
+     # Temporary directory.
+     my $temp_dir = tempdir('CLEANUP' => 1);
+
+     # Create fake service.
+     my $fake = <<'END';
+     #!/bin/sh
+     echo "[ ok ] Usage: /fake {start|stop|status}."
+     END
+
+     # Save to file.
+     my $fake_file = catfile($temp_dir, 'fake');
+     barf($fake_file, $fake);
+
+     # Chmod.
+     chmod 0755, $fake_file;
+
+     # Service object.
+     my $obj = SysV::Init::Service->new(
+             'service' => 'fake',
+             'service_dir' => $temp_dir,
+     );
+
+     # Get commands.
+     my @commands = $obj->commands;
+
+     # Print commands to output.
+     map { print $_."\n"; } @commands;
+
+     # Clean.
+     unlink $fake_file;
+
+     # Output:
+     # start
+     # stop
+     # status
+
+DEPENDENCIES
+    Capture::Tiny, Class::Utils, English, Error::Pure,
+    File::Spec::Functions.
+
+SEE ALSO
+    service
+        run a System V init script
+
+REPOSITORY
+    <https://github.com/tupinek/SysV-Init-Service>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2013-2015 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.06
+

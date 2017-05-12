@@ -1,0 +1,12 @@
+<SOFTPKG NAME="Statistics-Autocorrelation" VERSION="0.06">
+    <ABSTRACT>Coefficients for any lag, as correlogram, with significance tests</ABSTRACT>
+    <AUTHOR>Roderick Garton &lt;rgarton@cpan.org&gt;</AUTHOR>
+    <IMPLEMENTATION>
+        <REQUIRE NAME="Statistics::Lite" VERSION="3.2" />
+        <REQUIRE NAME="Statistics::Zed" VERSION="0.10" />
+        <REQUIRE NAME="Math::Cephes" VERSION="0.5303" />
+        <REQUIRE NAME="List::AllUtils" VERSION="0.07" />
+        <REQUIRE NAME="Statistics::Data" VERSION="0.08" />
+        <CODEBASE HREF="PPM-Statistics-Autocorrelation-0.06.tar.gz" />
+    </IMPLEMENTATION>
+</SOFTPKG>

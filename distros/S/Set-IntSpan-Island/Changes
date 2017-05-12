@@ -1,0 +1,36 @@
+Revision history for Perl extension Set::IntSpan::Island.
+
+0.10 3 Mar 2010
+
+- now inherits from Set::IntSpan vis C<parent> pragma.
+- added clone() as an alias to duplicate().
+- on error, now C<confess> is used instead of C<croak>.
+- expanded testing, now with Test::More.
+- minor style adjustments in documentation.
+
+0.05 22 Sep 2008
+
+- minor cosmetic fixes.
+
+0.04 Wed Sep 17 2008
+
+- excise() now takes both an integer and set as argument
+- added keep() which is the same as excise() but with complement size criteria
+- distance() returns undef for empty set input
+- fill() now takes both an integer and set as argument
+- fixed bug in sets()
+- extract_covers() now returns empty array when empty hash is passed in
+
+0.03  10 Apr 2007
+
+- fixed bug in extract_cover
+
+0.02  12 Mar 2007
+
+- added island iterator (c.f. Set::IntSpan's iterator): num_islands, at_island, current_island, first, next, prev, last
+- added extract_cover example
+
+0.01  5 Mar 2007
+
+- original version; created by h2xs 1.19
+

@@ -1,0 +1,205 @@
+
+=pod
+
+=head1 NAME
+
+Starch::Extending - How to alter the behavior of Starch.
+
+=head1 DESCRIPTION
+
+Starch provides almost limitless ways to extend how it works.  This is
+done by creating plugins and stores.
+
+=head1 PLUGINS
+
+Plugins can modify any of the manager (L<Starch::Manager>), state
+(L<Starch::State>), and store (L<Starch::Store>) classes to extend
+functionality.
+
+A plugin may extend several of these classes, via plugin bundles, or just one.  A common
+setup is a plugin bundle which adds arguments to the manager object and then adds logic
+to the state objects which acts upon the arguments.
+
+See L<Starch::Plugin::CookieArgs> for a basic example plugin.  See
+L<Starch::Manual/PLUGINS> for more existing plugins.
+
+See the SYNOPSIS in L<Starch::Plugin::Bundle>, L<Starch::Plugin::ForManager>,
+L<Starch::Plugin::ForState>, and L<Starch::Plugin::ForStore> documentation
+for some decent boilerplate for writing new plugins.
+
+Plugins and plugin bundles are applied by L<Starch::Factory>, which itself
+acts as a dynamic plugin bundle.
+
+=head1 STORES
+
+Stores provide the persistence layer for Starch by exposing a generic
+interface on top of the driver code which communicates with the persistent
+backend (such as a database).
+
+A store must implement the L</set>, L</get>, and L</remove> methods and consume
+the L<Starch::Store> role.  Writing new stores is generally a trivial process where
+the store class does nothing more than glue those three methods with some underlying
+implementation such as L<DBI> or L<CHI>.
+
+The L<Starch::Store::CHI> store is a good example store to use for
+building new store classes.  See L<Starch::Manual/STORES> for more existing stores.
+
+Stores should be written so that the underlying driver object (the C<$dbh>
+for a DBI store, for example) can be passed as an argument.   This allows
+the user to utilize L<Starch::Manual/METHOD PROXIES> to build their own driver objects.
+
+A state's expires duration is stored in the state data under the
+L<Starch::Manager/expires_state_key>.  This should B<not> be considered
+as anything meaningful to the store, since stores can have their
+L<Starch::Store/max_expires> argument set which will automatically
+change the value of the C<expiration> argument passed to C<set>.
+
+=head2 REQUIRED METHODS
+
+Stores must implement three methods for setting, getting, and removing
+state data.  These methods receive a state ID and a namespace array ref
+as their first two arguments.  The combination of these two values should
+identify a unique location in the store.  They can be combined to create
+a single key string using L<Starch::Store/stringify_key>.
+
+A more detailed description of the methods that a store must
+implement:
+
+=head3 set
+
+Sets the data for the key.  The C<$expires> value will always be set and
+will be either C<0> or a positive integer representing the number of seconds
+in the future that this state data should be expired.  If C<0> then the
+store may expire the data whenever it chooses.
+
+=head3 get
+
+Returns the data for the given key.  If the data was not found then
+C<undef> is returned.
+
+=head3 remove
+
+Deletes the data for the key.  If the data does not exist then
+this is just a no-op.
+
+=head2 EXCEPTIONS
+
+Stores should detect issues and throw exceptions loudly.  If the user
+would like to automatically turn store exceptions into log messages
+they can use the L<Starch::Plugin::LogStoreExceptions> plugin.
+
+=head2 REAPING EXPIRED STATES
+
+Stores may choose to support an interface for deleting old state data
+suitable for a cronjob.  To do this two methods must be declared,
+L</can_reap_expired> and L</reap_expires>.  See
+L<Starch::Store::Amazon::DynamoDB> for an example of a store which
+supports this feature.
+
+The actual implementation of how to reap old state data is a per-store
+and is something that will differ greatly between them.
+
+Consider adding extra arguments to your store class to control how state
+reaping functions.  For example, a DBI store may allow the user to reap
+the states in batches, and a DynamoDB store may allow the user to specify
+a secondary global index to do the scan on.
+
+
+
+=head1 TESTING
+
+All plugin and store modules should use L<Test::Starch> to ensure that
+they have not broken the core functionality of Starch.
+
+=head1 EXCEPTIONS
+
+Exceptions for known issues should be thrown using L<Starch::Util/croak>
+which automatically internalizes all core Starch packages so that the
+error will report the caller in the user's code.  In non-core stores and
+plugins it is important that you localize the package in Carp so that
+the errors point to the user's code as the caller, for example in a
+store you could localize the package in the get, set, and remove methods:
+
+    package My::Store;
+    use Moo;
+    use Carp qw();
+    with 'Starch::Store';
+    sub get {
+        local $Carp::Internal{ (__PACKAGE__) } = 1;
+
+        ...
+    }
+
+This is especially important for plugins where you are often augmenting
+existing methods which may themselves be croak()ing, you don't want your
+plugin's code to be reported at the source of the known error.
+
+=head1 EXTENDING BUILD
+
+The L<Moo> BUILD method doesn't play well with roles.  If a role provides
+provides a BUILD method and then the class which consumes the role also
+defines a BUILD method the class will win and the role's BUILD method will
+never be called.  To get around this the L<Starch::Manager> class, the
+L<Starch::State> class, and the L<Starch::Store> role declare BUILD methods.
+Any plugin or store which wishes to extend the BUILD method should do so
+via an C<after> method modifier as in:
+
+    after BUILD => sub{
+        ...
+    };
+
+=head1 INTERNALS
+
+                                                          +------+
+                                                          v      |
+    +------------------------+       +------------------------+  |
+    |      1. manager        | ----> |       3. store         |--+
+    |   (Starch::Manager)    | < - - |     (Starch::Store)    |
+    +------------------------+       +------------------------+
+                ^    |
+                |    |
+                |    +---------------------------+
+                |                                V
+    +------------------------+       +------------------------+
+    |      4. session        |       |      2. factory        |
+    |   (Starch::Session)    |       |   (Starch::Factory)    |
+    +------------------------+       +------------------------+
+
+This diagram shows which objects hold references to other objects.  Solid
+lines depict a hard reference while dashed lines depict a weak reference.
+Weak references are used to avoid memory leaks.
+
+=over
+
+=item 1.
+
+B<manager> - The manager is the entry point for configuration and retrieving
+session objects.  It holds a strong reference to the factory and the store.
+The manager doesn't have much logic in and of itself, as most of the compile-time
+work is handled by the factory, and the runtime work by the sessions and store.
+
+=item 2.
+
+B<factory> - The factory handles constructing anonymous classes from base
+classes and roles.
+
+=item 3.
+
+B<store> - The store does all of the backend heavy-lifting.  It holds a
+weak reference to the manager so that it can, primarily, get at the factory
+object and create sub-stores.  The L<Starch::Store::Layered> store depends
+on this functionality to create the inner and outer sub-stores.
+
+=item 4.
+
+B<session> - The session provides the runtime public interface to the store
+and other parts of starch.  It holds a strong reference to the manager.
+
+=back
+
+=head1 AUTHORS AND LICENSE
+
+See L<Starch/AUTHOR>, L<Starch/CONTRIBUTORS>, and L<Starch/LICENSE>.
+
+=cut
+

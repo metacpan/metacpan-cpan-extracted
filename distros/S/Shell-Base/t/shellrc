@@ -1,0 +1,45 @@
+# Example Shell::Base rcfile
+# The file format for these config files is pretty standard:
+#
+#   o '#' begins a oconfig line
+#
+#   o whitespace is (mostly) ignored
+#
+#   o All variable definitions are in the form 'name' = 'value'
+
+# Whitespace within assignments is OK
+name =     John Smith
+phone=6175551212
+
+# Leading whitespace is OK
+        date_format  = %Y/%m/%d
+
+# This works too
+lemon => meringue
+
+# later assignments of items clobber the first (there are no
+# array types)
+foo = bar
+
+# foo is turned into 1
+foo
+
+# negated boolean (variable is 'bar')
+nobar
+
+# Embedded spaces and such
+spacetest = hello,  world  and  all  that
+
+# line continuation
+baz = \
+  quux
+
+# Multi-line continuation
+quote = \
+Holy \
+shit \
+w00t!
+
+
+# quoted variables retain their quotes
+quoted = "Hello, world"

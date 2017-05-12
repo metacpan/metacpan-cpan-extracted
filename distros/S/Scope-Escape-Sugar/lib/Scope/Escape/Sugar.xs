@@ -1,0 +1,922 @@
+#define PERL_NO_GET_CONTEXT 1
+#include "EXTERN.h"
+#include "perl.h"
+#include "callchecker0.h"
+#include "callparser.h"
+#include "XSUB.h"
+
+#define PERL_VERSION_DECIMAL(r,v,s) (r*1000000 + v*1000 + s)
+#define PERL_DECIMAL_VERSION \
+	PERL_VERSION_DECIMAL(PERL_REVISION,PERL_VERSION,PERL_SUBVERSION)
+#define PERL_VERSION_GE(r,v,s) \
+	(PERL_DECIMAL_VERSION >= PERL_VERSION_DECIMAL(r,v,s))
+
+#if PERL_VERSION_GE(5,13,0)
+# define lex_stuff_sv_(sv, flags) lex_stuff_sv((sv), (flags))
+# define lex_stuff_pvn_(pv, len, flags) lex_stuff_pvn((pv), (len), (flags))
+#else /* <5.13.0 */
+# define lex_stuff_fixup() \
+		SvCUR_set(PL_parser->linestr, \
+			PL_parser->bufend - SvPVX(PL_parser->linestr))
+# define lex_stuff_sv_(sv, flags) \
+		(lex_stuff_sv((sv), (flags)), lex_stuff_fixup())
+# define lex_stuff_pvn_(pv, len, flags) \
+		(lex_stuff_pvn((pv), (len), (flags)), lex_stuff_fixup())
+#endif /* <5.13.0 */
+
+#define lex_stuff_pvs_(s, flags) \
+		lex_stuff_pvn_((""s""), sizeof(""s"")-1, (flags))
+
+#define SVt_PADNAME SVt_PVMG
+
+#ifndef COP_SEQ_RANGE_LOW_set
+# define COP_SEQ_RANGE_LOW_set(sv,val) \
+	do { ((XPVNV*)SvANY(sv))->xnv_u.xpad_cop_seq.xlow = val; } while(0)
+# define COP_SEQ_RANGE_HIGH_set(sv,val) \
+	do { ((XPVNV*)SvANY(sv))->xnv_u.xpad_cop_seq.xhigh = val; } while(0)
+#endif /* !COP_SEQ_RANGE_LOW_set */
+
+#ifndef PERL_PADSEQ_INTRO
+# define PERL_PADSEQ_INTRO I32_MAX
+#endif /* !PERL_PADSEQ_INTRO */
+
+#ifndef pad_findmy_sv
+# define pad_findmy_sv(sv, flags) pad_findmy(SvPVX(sv), SvCUR(sv), flags)
+#endif /* !pad_findmy_sv */
+
+#define sv_is_string(sv) \
+	(SvTYPE(sv) != SVt_PVGV && SvTYPE(sv) != SVt_REGEXP && \
+	 (SvFLAGS(sv) & (SVf_IOK|SVf_NOK|SVf_POK|SVp_IOK|SVp_NOK|SVp_POK)))
+
+#define QPARSE_DIRECTLY PERL_VERSION_GE(5,13,8)
+
+#define block_start(f) Perl_block_start(aTHX_ f)
+#define block_end(f,o) Perl_block_end(aTHX_ f,o)
+
+/*
+ * pad handling
+ *
+ * The public API for the pad system is lacking any way to add items to
+ * the pad.  This is a minimal implementation of the necessary facilities.
+ * It doesn't warn about shadowing.
+ */
+
+#define pad_add_my_scalar_pvn(namepv, namelen) \
+		THX_pad_add_my_scalar_pvn(aTHX_ namepv, namelen)
+static PADOFFSET THX_pad_add_my_scalar_pvn(pTHX_
+	char const *namepv, STRLEN namelen)
+{
+	PADOFFSET offset;
+	SV *namesv, *myvar;
+	myvar = *av_fetch(PL_comppad, AvFILLp(PL_comppad) + 1, 1);
+	offset = AvFILLp(PL_comppad);
+	SvPADMY_on(myvar);
+	PL_curpad = AvARRAY(PL_comppad);
+	namesv = newSV_type(SVt_PADNAME);
+	sv_setpvn(namesv, namepv, namelen);
+	COP_SEQ_RANGE_LOW_set(namesv, PL_cop_seqmax);
+	COP_SEQ_RANGE_HIGH_set(namesv, PERL_PADSEQ_INTRO);
+	PL_cop_seqmax++;
+	av_store(PL_comppad_name, offset, namesv);
+	return offset;
+}
+
+#define pad_add_my_scalar_sv(namesv) THX_pad_add_my_scalar_sv(aTHX_ namesv)
+static PADOFFSET THX_pad_add_my_scalar_sv(pTHX_ SV *namesv)
+{
+	char const *pv;
+	STRLEN len;
+	pv = SvPV(namesv, len);
+	return pad_add_my_scalar_pvn(pv, len);
+}
+
+/*
+ * parser pieces
+ *
+ * These functions reimplement fairly low-level parts of the Perl syntax,
+ * using the character-level public lexer API.
+ */
+
+#define DEMAND_IMMEDIATE 0x00000001
+#define DEMAND_NOCONSUME 0x00000002
+#define demand_unichar(c, f) THX_demand_unichar(aTHX_ c, f)
+static void THX_demand_unichar(pTHX_ I32 c, U32 flags)
+{
+	if(!(flags & DEMAND_IMMEDIATE)) lex_read_space(0);
+	if(lex_peek_unichar(0) != c) croak("syntax error");
+	if(!(flags & DEMAND_NOCONSUME)) lex_read_unichar(0);
+}
+
+#define parse_idword(prefix) THX_parse_idword(aTHX_ prefix)
+static SV *THX_parse_idword(pTHX_ char const *prefix)
+{
+	STRLEN prefixlen, idlen;
+	SV *sv;
+	char *start, *s, c;
+	s = start = PL_parser->bufptr;
+	c = *s;
+	if(!isIDFIRST(c)) croak("syntax error");
+	do {
+		c = *++s;
+	} while(isALNUM(c));
+	lex_read_to(s);
+	prefixlen = strlen(prefix);
+	idlen = s-start;
+	sv = sv_2mortal(newSV(prefixlen + idlen));
+	Copy(prefix, SvPVX(sv), prefixlen, char);
+	Copy(start, SvPVX(sv)+prefixlen, idlen, char);
+	SvPVX(sv)[prefixlen + idlen] = 0;
+	SvCUR_set(sv, prefixlen + idlen);
+	SvPOK_on(sv);
+	return sv;
+}
+
+#define parse_scalar_varname() THX_parse_scalar_varname(aTHX)
+static SV *THX_parse_scalar_varname(pTHX)
+{
+	demand_unichar('$', DEMAND_IMMEDIATE);
+	lex_read_space(0);
+	return parse_idword("$");
+}
+
+#define parse_quoted_string() THX_parse_quoted_string(aTHX)
+static SV *THX_parse_quoted_string(pTHX)
+{
+	I32 delim;
+	STRLEN len = 1;
+	delim = lex_peek_unichar(0);
+	if(delim != '"' && delim != '\'') croak("syntax error");
+	while(1) {
+		char *end = PL_parser->bufend;
+		char *s = PL_parser->bufptr + len;
+		while(s != end) {
+			if(*s == '\\') {
+				if(s+1 == end) break;
+				s += 2;
+			} else if(*s == delim) {
+				SV *stringsv;
+				s++;
+				stringsv = newSVpvn(PL_parser->bufptr,
+						s - PL_parser->bufptr);
+				lex_read_to(s);
+				return stringsv;
+			} else {
+				s++;
+			}
+		}
+		len = s - PL_parser->bufptr;
+		if(!lex_next_chunk(LEX_KEEP_PREVIOUS))
+			croak("syntax error");
+	}
+}
+
+/*
+ * op generators
+ *
+ * Escape continuations are generated by a custom op implemented
+ * in Scope::Escape.  The custom op is generated at op check time,
+ * as a rewrite of a call to one of the pseudo-functions provided by
+ * Scope::Escape.  gen_current_escape_continuation_op() here returns a
+ * suitable custom op.  It works by building the required pseudo-function
+ * call, which immediately gets rewritten before newUNOP() returns.
+ */
+
+static SV *current_escape_function_rv, *current_escape_continuation_rv;
+
+#define gen_current_escape_continuation_op(blessp) \
+		THX_gen_current_escape_continuation_op(aTHX_ blessp)
+static OP *THX_gen_current_escape_continuation_op(pTHX_ bool blessp)
+{
+	return newUNOP(OP_ENTERSUB, OPf_STACKED,
+		newCVREF(0, newSVOP(OP_CONST, 0,
+			blessp ? SvREFCNT_inc(current_escape_continuation_rv) :
+				 SvREFCNT_inc(current_escape_function_rv))));
+}
+
+#define current_escape_op_setup() THX_current_escape_op_setup(aTHX)
+static void THX_current_escape_op_setup(pTHX)
+{
+	current_escape_function_rv =
+		newRV_inc((SV*)get_cv(
+			"Scope::Escape::current_escape_function", 0));
+	current_escape_continuation_rv =
+		newRV_inc((SV*)get_cv(
+			"Scope::Escape::current_escape_continuation", 0));
+}
+
+/*
+ * function call op replacement
+ *
+ * The call-parser API requires that custom parsers return ops that are
+ * used as arguments to the function they are attached to, but in every
+ * case in this module the custom parser needs the resulting ops to not
+ * be of the standard function call format.  This is arranged by using
+ * as the function's op checker myck_entersub_argexpr(), which rewrites
+ * the function call to just the first parameter, throwing away the rest
+ * of the call.
+ */
+
+static OP *myck_entersub_argexpr(pTHX_ OP *entersubop, GV *namegv, SV *ckobj)
+{
+	OP *pushop, *realop;
+	PERL_UNUSED_ARG(namegv);
+	PERL_UNUSED_ARG(ckobj);
+	pushop = cUNOPx(entersubop)->op_first;
+	if(!pushop->op_sibling) pushop = cUNOPx(pushop)->op_first;
+	realop = pushop->op_sibling;
+	if(!realop || !realop->op_sibling) return entersubop;
+	pushop->op_sibling = realop->op_sibling;
+	realop->op_sibling = NULL;
+	op_free(entersubop);
+	return realop;
+}
+
+/*
+ * method wrapper source rewriting hack
+ *
+ * Some of the operators implemented by this module use a rewriting trick
+ * where they return a constant-empty-string op after stuffing "->x("
+ * and some more source into the input buffer, leading to an expression
+ * ""->x(stuff...).  This pattern of method invocation, on the specific
+ * empty string SV in use for this trick, then gets rewritten at op check
+ * time to just the parameter (the method call being thrown away).
+ */
+
+#if !QPARSE_DIRECTLY
+
+static SV *methodwrapper_sv;
+
+# define gen_method_wrapper_op() THX_gen_method_wrapper_op(aTHX)
+static OP *THX_gen_method_wrapper_op(pTHX)
+{
+	return newSVOP(OP_CONST, 0, SvREFCNT_inc(methodwrapper_sv));
+}
+
+static OP *(*methodwrapper_nxck_entersub)(pTHX_ OP *o);
+
+static OP *methodwrapper_myck_entersub(pTHX_ OP *entersubop)
+{
+	OP *pushop, *sigop, *realop, *methop;
+	pushop = cUNOPx(entersubop)->op_first;
+	if(!pushop->op_sibling) pushop = cUNOPx(pushop)->op_first;
+	if((sigop = pushop->op_sibling) && sigop->op_type == OP_CONST &&
+			cSVOPx_sv(sigop) == methodwrapper_sv &&
+			(realop = sigop->op_sibling) &&
+			(methop = realop->op_sibling) &&
+			!methop->op_sibling &&
+			methop->op_type == OP_METHOD_NAMED) {
+		sigop->op_sibling = realop->op_sibling;
+		realop->op_sibling = NULL;
+		op_free(entersubop);
+		return realop;
+	}
+	return methodwrapper_nxck_entersub(aTHX_ entersubop);
+}
+
+# define methodwrapper_setup() THX_methodwrapper_setup(aTHX)
+static void THX_methodwrapper_setup(pTHX)
+{
+	methodwrapper_sv = newSVpvs("");
+	methodwrapper_nxck_entersub = PL_check[OP_ENTERSUB];
+	PL_check[OP_ENTERSUB] = methodwrapper_myck_entersub;
+}
+
+#else /* QPARSE_DIRECTLY */
+
+# define methodwrapper_setup() ((void)0)
+
+#endif /* QPARSE_DIRECTLY */
+
+/*
+ * generic scoped operator parsing
+ *
+ * This is concerned with operators that have some effect that is
+ * restricted to the lexical or dynamic extent of a block.  All of this
+ * module's catching operators (with_escape_{function,continuation},
+ * block, catch) are of this type and use this generic code.  These
+ * operators can each be used in three distinct forms:
+ *
+ * OPERATOR ARGS;
+ *     Statement ending with the semicolon.  Takes effect for the
+ *     remainder of the enclosing block.
+ *
+ * OPERATOR ARGS { ... }
+ *     Statement ending with the close brace.  Takes effect for the
+ *     entirety of the inner block, which is run once.
+ *
+ * OPERATOR(ARGS { ... })
+ *     Expression ending with the close paren.  Takes effect for the
+ *     entirety of the inner block, which is run once.
+ *
+ * The overall objective is to generate ops corresponding to:
+ *
+ * OPERATOR ARGS;
+ *     EFFECT;
+ *
+ * OPERATOR ARGS { ... }
+ *     do { EFFECT; ... };
+ *
+ * OPERATOR(ARGS { ... })
+ *     do { EFFECT; ... }
+ *
+ * When it is possible to parse all of this directly (QPARSE_DIRECTLY),
+ * it is implemented by the operator-specific caller supplying
+ * callback functions that parse the ARGS and generate the EFFECT ops.
+ * The op-generation callback needs to not only generate some ops to go
+ * in the block's op tree but also make whatever changes are required
+ * to the lexical environment.  For the latter purpose, the callback
+ * must be called at the lexically correct point in compilation, which
+ * is why it must be a callback rather than arg-parser callback just
+ * supplying an op tree.
+ *
+ * When it is not possible to parse the block contents directly
+ * (!QPARSE_DIRECTLY), the forms that include an inscribed block have
+ * to be implemented by source rewriting hacks.  The three forms are
+ * handled thus:
+ *
+ * OPERATOR ARGS;
+ *     Ops for still generated directly, corresponding to
+ *         EFFECT;
+ *
+ * OPERATOR ARGS { ... }
+ *     Parsed up to the opening brace.  A null statement is generated,
+ *     with the code rewritten to
+ *         do { OPERATOR ARGS; ... };
+ *     The final semicolon is actually injected via more code stuffing
+ *     at the start of the block.  So the immediate rewrite is actually to
+ *         do {
+ *             BEGIN {
+ *                 B::Hooks::EndOfScope::on_scope_end {
+ *                     Scope::Escape::Sugar::_stuff(";");
+ *                 }
+ *             }
+ *             OPERATOR ARGS;
+ *             ...
+ *         }
+ *
+ * OPERATOR(ARGS { ... })
+ *     Parsed up to the opening brace.  A constant-empty-string expression
+ *     is generated, with the code rewritten to
+ *         ->x(do { OPERATOR ARGS; ... })
+ *     The existence of the mandatory closing parenthesis immediately
+ *     following the closing brace (which is not mandatory in the Perl
+ *     syntax of the rewritten code) is checked via more code stuffing
+ *     at the start of the block.  So the immediate rewrite is actually to
+ *         ->x(do {
+ *             BEGIN {
+ *                 B::Hooks::EndOfScope::on_scope_end {
+ *                     Scope::Escape::Sugar::_expect_close_paren();
+ *                 }
+ *             }
+ *             OPERATOR ARGS;
+ *             ...
+ *         })
+ *     At op check time, the ops which look like
+ *         ""->x(do { OPERATOR ARGS; ... })
+ *     are recognised (by the "method wrapper" code above) and rewritten
+ *     to
+ *         do { OPERATOR ARGS; ... }
+ *
+ * In order to perform this rewriting, the operator-specific caller
+ * supplyies a callback function that will stuff "OPERATOR ARGS" into
+ * the source.  This rewriting is relatively fragile.  For the "OPERATOR
+ * ARGS { ... }" case, the null-statement trick assumes that a sequence
+ * of two statements will work just as well as a single statement,
+ * which is always true in standard Perl syntax but could interact badly
+ * with other syntax-bending modules.  The stuffing of "OPERATOR ARGS"
+ * relies on there being a way for source code to refer to the operator
+ * and on this module knowing which keyword to use for it, but neither
+ * of these is guaranteed in non-standard situations.
+ */
+
+#if QPARSE_DIRECTLY
+# define parse_args_scopedop(pa1, gop, soa, arg0, flagsp) \
+	THX_parse_args_scopedop(aTHX_ pa1, gop, arg0, flagsp)
+#else /* !QPARSE_DIRECTLY */
+# define parse_args_scopedop(pa1, gop, soa, arg0, flagsp) \
+	THX_parse_args_scopedop(aTHX_ pa1, gop, soa, arg0, flagsp)
+#endif /* !QPARSE_DIRECTLY */
+
+static OP *THX_parse_args_scopedop(pTHX_
+	void *(*parse_arg1)(pTHX_ void *arg0),
+	OP *(*gen_op)(pTHX_ void *arg1),
+#if !QPARSE_DIRECTLY
+	void (*stuff_opargs)(pTHX_ void *arg1),
+#endif /* !QPARSE_DIRECTLY */
+	void *arg0,
+	U32 *flagsp)
+{
+	I32 c;
+	bool had_paren;
+	void *arg1;
+	lex_read_space(0);
+	had_paren = lex_peek_unichar(0) == '('/*)*/;
+	if(had_paren) {
+		lex_read_unichar(0);
+		lex_read_space(0);
+	}
+	arg1 = parse_arg1(aTHX_ arg0);
+	lex_read_space(0);
+	c = lex_peek_unichar(0);
+	switch(c) {
+		case ';': {
+			lex_read_unichar(0);
+		} /* fall through */
+		case /*{*/'}': {
+			if(had_paren) croak("syntax error");
+			*flagsp |= CALLPARSER_STATEMENT;
+			return newLISTOP(OP_LIST, 0, gen_op(aTHX_ arg1), NULL);
+		} break;
+		case '{'/*}*/: {
+#if QPARSE_DIRECTLY
+			int blk_floor;
+			OP *initop, *blkop;
+			lex_read_unichar(0);
+			blk_floor = block_start(1);
+			initop = gen_op(aTHX_ arg1);
+			PL_hints |= HINT_BLOCK_SCOPE;
+			blkop = op_prepend_elem(OP_LINESEQ, initop,
+					parse_stmtseq(0));
+			blkop = block_end(blk_floor, blkop);
+			demand_unichar(/*{*/'}', DEMAND_IMMEDIATE);
+			if(had_paren) {
+				demand_unichar(/*(*/')', 0);
+				*flagsp |= CALLPARSER_PARENS;
+			} else {
+				*flagsp |= CALLPARSER_STATEMENT;
+			}
+			return op_scope(blkop);
+#else /* !QPARSE_DIRECTLY */
+			lex_read_unichar(0);
+			lex_stuff_pvs_(";", 0);
+			stuff_opargs(aTHX_ arg1);
+			lex_stuff_pvs_(/*{{*/"}}", 0);
+			if(had_paren) {
+				lex_stuff_pvs_(
+					"Scope::Escape::Sugar::"
+					"_expect_close_paren();",
+					0);
+			} else {
+				lex_stuff_pvs_(
+					"Scope::Escape::Sugar::_stuff(\";\");",
+					0);
+			}
+			lex_stuff_pvs_(
+				"do{"
+				"BEGIN{B::Hooks::EndOfScope::on_scope_end{"
+				/*}}}*/, 0);
+			if(had_paren) lex_stuff_pvs_("->x("/*)*/, 0);
+			if(had_paren) {
+				*flagsp |= CALLPARSER_PARENS;
+				return gen_method_wrapper_op();
+			} else {
+				*flagsp |= CALLPARSER_STATEMENT;
+				return newOP(OP_NULL, 0);
+			}
+#endif /* !QPARSE_DIRECTLY */
+		} break;
+		default: {
+			croak("syntax error");
+		} break;
+	}
+}
+
+/*
+ * with_escape_{function,continuation}
+ *
+ * The two operators do the same things as each other.  The only
+ * difference is in whether the reified continuation object is blessed.
+ * They both use the generic scoped operator system above.  The base
+ * form of the operator is thus:
+ *
+ * with_escape_function $e;
+ *     The ops generated correspond precisely to those that would be
+ *     generated by
+ *         my $e = Scope::Escape::current_escape_function();
+ */
+
+static void *myparsearg1_with_escape(pTHX_ void *arg0)
+{
+	SV *psobj = (SV*)arg0;
+	SV *namesv = parse_scalar_varname();
+	if(SvTRUE(psobj)) SvREADONLY_on(namesv);
+	return namesv;
+}
+
+static OP *mygenop_with_escape(pTHX_ void *arg1)
+{
+	SV *namesv = (SV*)arg1;
+	OP *pvarop;
+	pvarop = newOP(OP_PADSV, (OPpLVAL_INTRO<<8));
+	pvarop->op_targ = pad_add_my_scalar_sv(namesv);
+	return newASSIGNOP(OPf_STACKED, pvarop, 0,
+		gen_current_escape_continuation_op(!!SvREADONLY(namesv)));
+}
+
+#if !QPARSE_DIRECTLY
+static void mystuffopargs_with_escape(pTHX_ void *arg1)
+{
+	SV *namesv = (SV*)arg1;
+	lex_stuff_sv_(namesv, 0);
+	if(SvREADONLY(namesv))
+		lex_stuff_pvs_("with_escape_continuation", 0);
+	else
+		lex_stuff_pvs_("with_escape_function", 0);
+}
+#endif /* !QPARSE_DIRECTLY */
+
+static OP *myparse_args_with_escape(pTHX_ GV *namegv, SV *psobj, U32 *flagsp)
+{
+	PERL_UNUSED_ARG(namegv);
+	return parse_args_scopedop(myparsearg1_with_escape,
+		mygenop_with_escape, mystuffopargs_with_escape, psobj, flagsp);
+}
+
+/*
+ * block and return_from
+ *
+ * The block escape functions are stored in the pad as lexical scalar
+ * variables.  For a block named "foo", the scalar variable is named
+ * "$Scope::Escape::Sugar::_block_foo".  The colons make this not a valid
+ * name for a lexical scalar in normal Perl syntax, thus ensuring that
+ * this can't clash with any ordinary lexicals.  The apparent package
+ * qualifier here has nothing to do with the actual package, it's just
+ * avoiding clashes with any other module that pulls the same trick.
+ *
+ * The "block" operator uses the generic scoped operator system above.
+ * The base form of the operator is thus:
+ *
+ * block foo;
+ *     The ops generated correspond precisely to those that would be
+ *     generated by
+ *        my $Scope::Escape::Sugar::_block_foo =
+ *                Scope::Escape::current_escape_function();
+ *     if that were a legal name for a lexical variable.
+ *
+ * The versions of the "return_from" operator are handled thus:
+ *
+ * return_from(foo ...)
+ *     If parsing directly (QPARSE_DIRECTLY), generates ops that look like
+ *         $Scope::Escape::Sugar::_block_foo->(...)
+ *     If parsing indirectly (!QPARSE_DIRECTLY), parsed up to the end
+ *     of the tag.  An expression referencing the escape function is
+ *     generated, with the code rewritten to
+ *         ->(...)
+ *     So the overall result is ops that look like
+ *         $Scope::Escape::Sugar::_block_foo->(...)
+ *
+ * return_from foo ...
+ *     If parsing directly (QPARSE_DIRECTLY), generates ops that look like
+ *         $Scope::Escape::Sugar::_block_foo->(...)
+ *     If parsing indirectly (!QPARSE_DIRECTLY), parsed up to the end of
+ *     the tag.  A null statement is generated, with the code rewritten to
+ *         Scope::Escape::Sugar::_block_return_wrapper "foo", ...
+ *     At op check time, the ops resulting from this are recognised and
+ *     rewritten to
+ *         $Scope::Escape::Sugar::_block_foo->(...)
+ */
+
+#define BLOCK_NAME_PREFIX "$Scope::Escape::Sugar::_block_"
+#define BLOCK_NAME_PREFIX_LEN (sizeof(BLOCK_NAME_PREFIX)-1)
+
+static void *myparsearg1_block(pTHX_ void *arg0)
+{
+	PERL_UNUSED_ARG(arg0);
+	return parse_idword(BLOCK_NAME_PREFIX);
+}
+
+static OP *mygenop_block(pTHX_ void *arg1)
+{
+	SV *namesv = (SV*)arg1;
+	OP *pvarop;
+	pvarop = newOP(OP_PADSV, (OPpLVAL_INTRO<<8));
+	pvarop->op_targ = pad_add_my_scalar_sv(namesv);
+	return newASSIGNOP(OPf_STACKED, pvarop, 0,
+		gen_current_escape_continuation_op(0));
+}
+
+#if !QPARSE_DIRECTLY
+static void mystuffopargs_block(pTHX_ void *arg1)
+{
+	SV *namesv = (SV*)arg1;
+	lex_stuff_pvn_(SvPVX(namesv)+BLOCK_NAME_PREFIX_LEN,
+		SvCUR(namesv)-BLOCK_NAME_PREFIX_LEN, 0);
+	lex_stuff_pvs_("block ", 0);
+}
+#endif /* !QPARSE_DIRECTLY */
+
+static OP *myparse_args_block(pTHX_ GV *namegv, SV *psobj, U32 *flagsp)
+{
+	PERL_UNUSED_ARG(namegv);
+	PERL_UNUSED_ARG(psobj);
+	return parse_args_scopedop(myparsearg1_block,
+		mygenop_block, mystuffopargs_block, NULL, flagsp);
+}
+
+#define gen_block_returner_op(namesv) THX_gen_block_returner_op(aTHX_ namesv)
+static OP *THX_gen_block_returner_op(pTHX_ SV *namesv)
+{
+	PADOFFSET offset;
+	OP *op;
+	offset = pad_findmy_sv(namesv, 0);
+	if(offset == NOT_IN_PAD)
+		croak("no block named \"%s\" is visible",
+			SvPVX(namesv)+BLOCK_NAME_PREFIX_LEN);
+	op = newOP(OP_PADSV, 0);
+	op->op_targ = offset;
+	return op;
+}
+
+#if 0 /* this operator is not available yet */
+static OP *myparse_args_block_returner(pTHX_ GV *namegv, SV *psobj, U32 *flagsp)
+{
+	SV *namesv;
+	bool had_paren;
+	PERL_UNUSED_ARG(namegv);
+	PERL_UNUSED_ARG(psobj);
+	lex_read_space(0);
+	had_paren = lex_peek_unichar(0) == '('/*)*/;
+	if(had_paren) {
+		lex_read_unichar(0);
+		lex_read_space(0);
+	}
+	namesv = parse_idword(BLOCK_NAME_PREFIX);
+	if(had_paren) demand_unichar(/*(*/')', 0);
+	return gen_block_returner_op(namesv);
+}
+#endif /* this operator is not available yet */
+
+static OP *myparse_args_return_from(pTHX_ GV *namegv, SV *psobj, U32 *flagsp)
+{
+	SV *namesv;
+#if QPARSE_DIRECTLY
+	OP *argsop;
+#endif /* QPARSE_DIRECTLY */
+	bool had_paren;
+	PERL_UNUSED_ARG(namegv);
+	PERL_UNUSED_ARG(psobj);
+	lex_read_space(0);
+	had_paren = lex_peek_unichar(0) == '('/*)*/;
+	if(had_paren) {
+		lex_read_unichar(0);
+		lex_read_space(0);
+	}
+	namesv = parse_idword(BLOCK_NAME_PREFIX);
+#if QPARSE_DIRECTLY
+	if(had_paren) {
+		argsop = parse_fullexpr(PARSE_OPTIONAL);
+		demand_unichar(/*(*/')', 0);
+		*flagsp |= CALLPARSER_PARENS;
+	} else {
+		argsop = parse_listexpr(PARSE_OPTIONAL);
+	}
+	return newUNOP(OP_ENTERSUB, OPf_STACKED,
+		op_append_elem(OP_LIST, argsop,
+			newCVREF(0, gen_block_returner_op(namesv))));
+#else /* !QPARSE_DIRECTLY */
+	lex_read_space(0);
+	if(lex_peek_unichar(0) == ',') croak("syntax error");
+	if(had_paren) {
+		lex_stuff_pvs_("->("/*)*/, 0);
+		*flagsp |= CALLPARSER_PARENS;
+		return gen_block_returner_op(namesv);
+	} else {
+		lex_stuff_pvs_("\",", 0);
+		lex_stuff_pvn_(SvPVX(namesv)+BLOCK_NAME_PREFIX_LEN,
+			SvCUR(namesv)-BLOCK_NAME_PREFIX_LEN, 0);
+		lex_stuff_pvs_(
+			"Scope::Escape::Sugar::_block_return_wrapper \"", 0);
+		*flagsp |= CALLPARSER_STATEMENT;
+		return newOP(OP_NULL, 0);
+	}
+#endif /* !QPARSE_DIRECTLY */
+}
+
+#if !QPARSE_DIRECTLY
+static OP *myck_entersub_block_return_wrapper(pTHX_
+	OP *entersubop, GV *namegv, SV *ckobj)
+{
+	OP *pushop, *tagop, *cvop, *cvprevop;
+	SV *tagsv, *namesv;
+	PERL_UNUSED_ARG(namegv);
+	PERL_UNUSED_ARG(ckobj);
+	pushop = cUNOPx(entersubop)->op_first;
+	if(!pushop->op_sibling) pushop = cUNOPx(pushop)->op_first;
+	tagop = pushop->op_sibling;
+	if(!((tagop = pushop->op_sibling) && tagop->op_type == OP_CONST &&
+			(tagsv = cSVOPx_sv(tagop)) && sv_is_string(tagsv)))
+		return entersubop;
+	pushop->op_sibling = tagop->op_sibling;
+	namesv = sv_2mortal(newSVpvs(BLOCK_NAME_PREFIX));
+	sv_catsv(namesv, tagsv);
+	op_free(tagop);
+	for(cvprevop = pushop; (cvop = cvprevop->op_sibling)->op_sibling;
+			cvprevop = cvop) ;
+	cvprevop->op_sibling = newCVREF(0, gen_block_returner_op(namesv));
+	op_free(cvop);
+	return PL_check[OP_ENTERSUB](aTHX_ entersubop);
+}
+#endif /* !QPARSE_DIRECTLY */
+
+/*
+ * catch and throw
+ *
+ * The dynamically current catchers are registered in the hash
+ * catcher_hv.  The hash is keyed by catch tag, and the value for each
+ * tag is a reference to the unblessed escape function for that catch
+ * block.  If source rewriting is required, catcher_hv is actually
+ * %Scope::Escape::Sugar::_catch, so that it can be referred to from
+ * rewritten source.
+ *
+ * The "catch" operator uses the generic scoped operator system above.
+ * The base form of the operator is thus:
+ *
+ * catch "foo";
+ *     The ops ultimately generated correspond to those that would be
+ *     generated by
+ *         local $Scope::Escape::Sugar::_catch{"foo"} =
+ *                 Scope::Escape::current_escape_function();
+ *     If parsing directly, these ops are generated nearly directly,
+ *     the only exception being that some stuffing is used to parse
+ *     the tag string.  If not parsing directly, a null statement is
+ *     generated, with the code rewritten to this localised assignment.
+ *
+ * The "throw" function is a completely normal xsub.
+ */
+
+static HV *catcher_hv;
+#if QPARSE_DIRECTLY
+static SV *catcher_hashref_sv;
+#endif /* QPARSE_DIRECTLY */
+
+#define catcher_setup() THX_catcher_setup(aTHX)
+static void THX_catcher_setup(pTHX)
+{
+#if QPARSE_DIRECTLY
+	catcher_hv = newHV();
+	catcher_hashref_sv = newRV_noinc((SV*)catcher_hv);
+	SvREADONLY_on(catcher_hashref_sv);
+#else /* !QPARSE_DIRECTLY */
+	catcher_hv = get_hv("Scope::Escape::Sugar::_catch", 1);
+#endif /* !QPARSE_DIRECTLY */
+}
+
+static void *myparsearg1_catch(pTHX_ void *arg0)
+{
+	PERL_UNUSED_ARG(arg0);
+	return parse_quoted_string();
+}
+
+static OP *mygenop_catch(pTHX_ void *arg1)
+{
+	SV *tagsv = (SV*)arg1;
+#if QPARSE_DIRECTLY
+	OP *tagop;
+	lex_stuff_pvs_(/*(*/")", 0);
+	lex_stuff_sv_(tagsv, 0);
+	tagop = parse_fullexpr(0);
+	demand_unichar(/*(*/')', DEMAND_IMMEDIATE);
+	return newASSIGNOP(OPf_STACKED,
+		op_lvalue(
+			newBINOP(OP_HELEM, 0,
+				newHVREF(newSVOP(OP_CONST, 0,
+					SvREFCNT_inc(catcher_hashref_sv))),
+				tagop),
+			OP_NULL),
+		0, gen_current_escape_continuation_op(0));
+#else /* !QPARSE_DIRECTLY */
+	lex_stuff_pvs_(/*{*/"}=Scope::Escape::current_escape_function();", 0);
+	lex_stuff_sv_(tagsv, 0);
+	lex_stuff_pvs_("local$Scope::Escape::Sugar::_catch{"/*}*/, 0);
+	return newOP(OP_NULL, 0);
+#endif /* !QPARSE_DIRECTLY */
+}
+
+#if !QPARSE_DIRECTLY
+static void mystuffopargs_catch(pTHX_ void *arg1)
+{
+	SV *tagsv = (SV*)arg1;
+	lex_stuff_sv_(tagsv, 0);
+	lex_stuff_pvs_("catch ", 0);
+}
+#endif /* !QPARSE_DIRECTLY */
+
+static OP *myparse_args_catch(pTHX_ GV *namegv, SV *psobj, U32 *flagsp)
+{
+	PERL_UNUSED_ARG(namegv);
+	PERL_UNUSED_ARG(psobj);
+	return parse_args_scopedop(myparsearg1_catch,
+		mygenop_catch, mystuffopargs_catch, NULL, flagsp);
+}
+
+#define look_up_catcher(tag) THX_look_up_catcher(aTHX_ tag)
+static SV *THX_look_up_catcher(pTHX_ SV *tag)
+{
+	HE *he;
+	if(!sv_is_string(tag)) croak("throw tag is not a string");
+	he = hv_fetch_ent(catcher_hv, tag, 0, 0);
+	if(!he) croak("no catcher named \"%s\" is visible", SvPV_nolen(tag));
+	return HeVAL(he);
+}
+
+MODULE = Scope::Escape::Sugar PACKAGE = Scope::Escape::Sugar
+
+PROTOTYPES: DISABLE
+
+BOOT:
+{
+	CV *cv;
+	current_escape_op_setup();
+	methodwrapper_setup();
+	cv = get_cv("Scope::Escape::Sugar::with_escape_function", 0);
+	cv_set_call_parser(cv, myparse_args_with_escape, &PL_sv_no);
+	cv_set_call_checker(cv, myck_entersub_argexpr, &PL_sv_undef);
+	cv = get_cv("Scope::Escape::Sugar::with_escape_continuation", 0);
+	cv_set_call_parser(cv, myparse_args_with_escape, &PL_sv_yes);
+	cv_set_call_checker(cv, myck_entersub_argexpr, &PL_sv_undef);
+	cv = get_cv("Scope::Escape::Sugar::block", 0);
+	cv_set_call_parser(cv, myparse_args_block, &PL_sv_undef);
+	cv_set_call_checker(cv, myck_entersub_argexpr, &PL_sv_undef);
+#if !QPARSE_DIRECTLY
+	cv_set_call_checker(
+		get_cv("Scope::Escape::Sugar::_block_return_wrapper", 0),
+		myck_entersub_block_return_wrapper, &PL_sv_undef);
+#endif /* !QPARSE_DIRECTLY */
+	cv = get_cv("Scope::Escape::Sugar::return_from", 0);
+	cv_set_call_parser(cv, myparse_args_return_from, &PL_sv_undef);
+	cv_set_call_checker(cv, myck_entersub_argexpr, &PL_sv_undef);
+	catcher_setup();
+	cv = get_cv("Scope::Escape::Sugar::catch", 0);
+	cv_set_call_parser(cv, myparse_args_catch, &PL_sv_undef);
+	cv_set_call_checker(cv, myck_entersub_argexpr, &PL_sv_undef);
+}
+
+#if !QPARSE_DIRECTLY
+
+void
+_stuff(SV *sv)
+PROTOTYPE: $
+CODE:
+	lex_stuff_sv_(sv, 0);
+
+void
+_expect_close_paren()
+PROTOTYPE:
+CODE:
+	demand_unichar(/*(*/')', DEMAND_NOCONSUME);
+
+#endif /* !QPARSE_DIRECTLY */
+
+void
+with_escape_function(...)
+PROTOTYPE: $;$
+CODE:
+	PERL_UNUSED_VAR(items);
+	croak("with_escape_function called as a function");
+
+void
+with_escape_continuation(...)
+PROTOTYPE: $;$
+CODE:
+	PERL_UNUSED_VAR(items);
+	croak("with_escape_continuation called as a function");
+
+void
+block(...)
+PROTOTYPE: $;$
+CODE:
+	PERL_UNUSED_VAR(items);
+	croak("block called as a function");
+
+void
+return_from(...)
+PROTOTYPE: $@
+CODE:
+	PERL_UNUSED_VAR(items);
+	croak("return_from called as a function");
+
+#if !QPARSE_DIRECTLY
+
+void
+_block_return_wrapper(...)
+PROTOTYPE: $@
+CODE:
+	PERL_UNUSED_VAR(items);
+	croak("_block_return_wrapper called as a function");
+
+#endif /* !QPARSE_DIRECTLY */
+
+void
+catch(...)
+PROTOTYPE: $;$
+CODE:
+	PERL_UNUSED_VAR(items);
+	croak("catch called as a function");
+
+void
+throw(SV *tag, ...)
+PROTOTYPE: $@
+CODE:
+	PUSHMARK(MARK+1);
+	call_sv(look_up_catcher(tag), 0);
+	croak("failed to transfer control to catcher");

@@ -1,0 +1,131 @@
+0.898
+
+Fixed permissions errors.  Downgraded back to MakeMaker.  :)
+
+0.892
+
+Upgraded to Module::Build
+
+0.891
+
+Fixed Makefile.PL issues.  Doh.
+
+0.862
+
+Added repeatCount as well.
+
+0.861
+
+Allowing sequence and parallel tags to have the "repeat" attribute.
+
+0.85 
+
+Finished off the documentation of all exposed methods.  Added
+RN::RealText module which allows you to create simple RealText
+files using Perl.  More importantly, you can inline these RT
+files right into SMIL, without ever writing them to disk.  Check out
+smil2.pl for details.  In fact, you can inline any object 
+which supports the getAsString and getMimeType method interface.
+
+0.8
+
+Added some code for preliminary support of SMIL 2.0.  For example, you 
+can now specify transitions when adding your media, and you can 
+add transition effects using the addTransition method.  Peruse the
+documentation for more information.  I also added support for inlining
+dynamically generated media types.  For example, you can create a RealText
+file inside your perl script, and then inline that in the SMIL
+without writing the RealText to disk at all.  You can also inline 
+SMIL files, which is something that RealOne should support, since it
+supports referencing SMIL files.  Other general code cleanups as well.
+Also, improving the documentation as best I can, but this might
+have to wait until the next version.
+
+0.72
+
+Added method which forces the Smil module to output proper code based on the version 
+of the player.  Right now only RealPlayer is supported.  If you call the method:
+setBackwardsCompatible( player => "rp", version => 6 ) then the module will 
+create code which can execute on any RealPlayer of version 6 and above, for example.
+This is useful when using the "inline" attribute for adding media.  Inlining base64
+encodes a piece of media directly into the SMIL file, but was not available as a 
+feature of the RealPlayer until version 7.
+
+0.701
+
+Named the module more appropriately for CPAN upload, which requires a new version number.
+
+0.7 
+
+Added the "inline" attribute to media tags.  When you add a media file now
+using the addMedia method, if you specify "inline" => 1 (or any true value)
+the module will attempt to download and inline the media according to spec
+http://www.ietf.org/rfc/rfc2397.  Thanks to Robla at RealNetworks for the
+speedy answer to this.
+
+Added quicktime extension code xmlns to the smil tag element.  Now, just specify
+any of the methods listed in the qt.pl to have the module automatically add the 
+quicktime namespace into the smil element.  I am including a small qt.pl file 
+which demonstrates the usage of this, with a few QuickTime tags included.
+
+Also, you no longer call 'use SYMM::Smil;' or 'new SYMM::Smil;'.  
+Just 'use Smil;' now.  Also changed the webpage links and email address. 
+Old scripts won't break (unless you manually delete the SYMM directory whereever it
+is installed in your lib directory) but they won't be able to take advantage of 
+any new functionality after and including 0.7
+
+0.63 
+
+Fixed a debugging error.  
+
+0.51
+
+Installation information was updated.  Make sure to run make after you
+run the perl Makefile.pl command.
+
+0.5
+
+Added new member functions so that users can add arbitrary code to their 
+SMIL files.  Call "addCode" to add user-defined code, or "addComment"
+to add a comment.  The user is responsible for formatting.
+
+0.44 
+
+Updated makefile so that it uses the standard ExtUtils::MakeMaker.
+
+0.4
+
+The makefile is now working.  This means that you can install simply
+by untarring and running "perl Makefile.PL"  
+
+0.31
+
+Added more datatypes to the addRegion( "sm-src" ) functionality. You
+can now specify a RealText or RealPix file and the region will snoop
+out the size of the files and create the region with those sizes.
+
+0.3
+
+New cool feature: specify a src when defining a region and the 
+module will determine the media dimensions and use those dimensions
+as the dimensions of the region.
+
+$s->addRegion( "sm-src" => "http://www.server.com/img.gif" ... );
+
+This even works with hyperlinks, if LWP is installed.  You can also
+specify locally referenced files within the current filesystem.
+
+Currently, the only media type supported is GIF, but I plan to support
+JPG and of course all the RealMedia file types.  I imagine that 
+Flash/Shockwave won't be too hard since the file format is publically
+documented.
+
+0.22 
+
+More bug fixes
+
+0.2 
+
+First release
+
+

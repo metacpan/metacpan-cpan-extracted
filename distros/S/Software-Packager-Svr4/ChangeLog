@@ -1,0 +1,10 @@
+Release 0.08
+	This version requires version 0.07 of Software::Packager
+	It is slowly coming into line with the documention that SUN have
+	created.
+	The API has been rationalised to meet the API in Software::Packager.
+	Packages are created but it is still not possible to use Classes that
+	will come in time.
+
+Release 0.05
+        Split this module from Software::Packager

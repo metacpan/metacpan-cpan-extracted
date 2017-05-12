@@ -1,0 +1,20 @@
+0.07      Jun 14 2010
+	- fix meta to be open_source
+	- unmaintain
+
+0.06      May 11 2010
+	- add NOTICE that license isn't needed
+
+0.05      May 10 2010
+	- fix documentation
+
+0.04      May 09 2010
+	- remove __END__ I think it's causing an issue
+
+0.03      May 09 2010
+	- rename because _ means dev release
+
+0.02      May 05 2010
+	- correct metadata
+	- add description
+	- add changes

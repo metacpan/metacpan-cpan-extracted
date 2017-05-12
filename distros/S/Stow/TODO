@@ -1,0 +1,74 @@
+* Add support for pre/post-(un)install hooks
+
+  This would allow correct handling of the Info dir file via
+  install-info, amongst other things:
+
+*** http://unix.stackexchange.com/questions/73426/dealing-with-gnu-stow-conflicts
+*** http://article.gmane.org/gmane.comp.gnu.stow.general/6661
+
+* Next release should be under GPL v3
+
+* Get permission for next documentation release to be under FDL 1.3
+
+* Import a debian/ tree from an older package and update it.
+
+* Import a .spec file from somewhere and update it.
+
+* Distinguish between .stow and (undocumented) .nonstow / .notstowed
+
+** .stow is for marking stow directories - avoids altering them
+
+   but also allows --override to work
+
+** .nonstow should be only for protecting non-stow directories against modification by stow
+
+   but currently allows modification via --override
+
+** .notstowed is only honoured by chkstow
+
+** Documentation needs to be clear on this.
+
+* Prevent folding of directories which contain ignored files
+
+* Honour .no-stow-folding and --no-folding
+
+* Add semi-automatic conflict resolution
+
+  (This idea is possibly obsoleted via --override and --adopt.)
+
+*** STOW_RESOLVE_CONFLICTS="non_stow_symlinks=t stow_symlinks=r"
+
+*** Add documentation about conflict resolution
+
+* Autodetect "foreign" stow directories
+
+From e-mail with meyering@na-net.ornl.gov:
+
+    > My /usr/local/info equivalent is a symlink to /share/info
+    > because I want installs on all systems to put info files in that
+    > directory.  With that set-up, stow chokes on fact that
+    > /usr/local/info is a symlink.
+
+    [...] Stow is designed to be paranoid about modifying anything it
+    doesn't "own."  If it finds a symlink in the target tree (e.g.,
+    /usr/local/info) which doesn't point into the stow tree, its
+    paranoid response is to leave it the hell alone.  But I can see in
+    this case how traversing the link and populating the directory on
+    the far end would be OK.  Question: is that a special
+    circumstance, or would it always be OK to populate the far end of
+    a symlink in the target tree (when the symlink points to a
+    directory in a context where a directory is needed)?  And: if it's
+    a special circumstance requiring a command-line option, should the
+    option be a mere boolean (such as, "--traverse-target-links") or
+    should it be an enumeration of which links are OK to traverse
+    (such as, "--traversable='info man doc'")?
+
+Does Version 2 fix this? (Kal)
+I think that because it never needs to create /usr/local/info,
+it only needs to check the ownership of links that it _operates_ on,
+not on all the elements of the path.
+
+* emacs local variables
+  Local Variables:
+  mode: org
+  End:

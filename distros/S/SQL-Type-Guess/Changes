@@ -1,0 +1,12 @@
+TO DO:
+
+0.03 20140508
+    . Allow leading/trailing whitespace for numbers
+
+0.02 20140504
+    . No need to upgrade
+    . Documentation fixes
+    . Require Perl 5.8, as 5.6 does not understand sprintf '%2$d', ...
+
+0.01 20140502
+    . Released unto a propably suspecting audience

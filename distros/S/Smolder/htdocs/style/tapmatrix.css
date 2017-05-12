@@ -1,0 +1,153 @@
+.tap a { color: #000066; text-decoration: none; }
+
+.tap pre {
+    font-size: 10pt;
+}
+
+.tap th, .tap tfoot td {
+	background-color: #efefef;
+    border: 1px solid #505050; 
+	color: black;
+	font-size: 0.85em;
+	font-weight: bold;
+	padding: 0.1em;
+	text-align: center;
+	vertical-align: middle;
+}
+
+.tap td, .tap th {
+    vertical-align: top;
+}
+
+.tap td.filename {
+	vertical-align: top;
+    padding-right: 8px;
+}
+
+.tap tbody.results {
+    border-bottom: 1px solid #cccccc;
+}
+
+.tap #details {
+	border-collapse: collapse;
+    border: 1px solid #505050;
+    width: 650px;
+    margin-bottom: 15px;
+}
+
+.tap #details thead th, #details tfoot th {
+    text-align: center;
+    border-bottom: 1px solid #505050;
+}
+
+.tap #details th, #details td {
+    text-align: left;
+    border-bottom: 1px solid #cccccc;
+}
+
+.tap #details th.last, #details td.last {
+    text-align: left;
+    border-bottom: none;
+}
+
+.tap #matrix {
+	border-collapse: collapse;
+	border: 1px solid #444444;
+	background-color: #fbfbfb;
+    width: 650px;
+}
+
+.tap .sum {
+    width: 1em;  
+	border: 1px solid #505050;
+	padding: 0px;
+	text-align: center;
+	font-weight: bold;
+	font-size: 0.85em;
+	padding: 0.1em;
+}
+
+.tap table.subtests td {
+    vertical-align: middle;
+    text-align: center;
+}
+
+.tap td.ok, .tap td.failed { 
+    width: 1em;  
+	text-align: center;
+	font-weight: bold;
+	font-size: 0.85em;
+	padding: 0.1em;
+}
+
+.tap td.failed, .tap a.failed, .tap span.failed {
+    color: #e76423;
+    font-weight: bold;
+}
+
+.tap .exp {
+	display: block;
+}
+
+.tap .x { 
+    color: black; 
+    border: 1px solid #505050; 
+}
+
+.tap .fail    { background-color: #cc0033; }
+.tap .ok      { background-color: #00ff00; }
+.tap .skip    { background-color: #ddffdd; }
+.tap .todo_ok { background-color: #ffdd20; color: white; }
+.tap .todo    { background-color: #007f00; color: white; }
+.tap .nottest { background-color: #7f7f7f; color: white ; }
+
+/* Tooltip styling */
+.tap .tooltip {
+    min-width: 200px;
+    padding: 5px;
+    background: #ffffff;
+    text-align: left;
+    border: 1px solid #CCCCCC;
+    border-right: 1px solid #555555;
+    border-bottom: 1px solid #555555;
+    font-weight: bold;
+    z-index: 100;
+    color: #000000;
+}
+
+.tap .tooltip > .header {
+    background-color: #C47147;
+    font-weight: bold;
+    font-size: 11pt;
+    color: #FFFFFF;
+    padding-left: 3px;
+    padding-right: 3px;
+    border-bottom: 1px solid #555555;
+    border-right: 1px solid #555555;
+}
+
+.tap .tooltip:hover, .tooltip_trigger:hover {
+    cursor: pointer;
+}
+
+.tap div.tooltip {
+    background-color: #ffffff;
+    border: 1px solid #999999;
+    border-bottom: 1px solid #333333;
+    border-right: 1px solid #333333;
+    padding: 5px;
+    text-align: left;
+}
+
+.tap div.tooltip > pre {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+.tap div.tooltip > pre.unknown {
+    margin-top: 0px;
+    margin-bottom: 0px;
+    border: 1px solid #cccccc;
+    background: #dddddd;
+}
+

@@ -1,0 +1,61 @@
+Revision history for Perl extension SVG::Parser.
+
+1.03   Sun Mar 30 2008
+         - convert to Build.PL (Module::Build)
+
+1.02   Sat Mar 29 2008
+         - change installation to force a dependency on XML::SAX if neither
+           of XML::Parser or XML::SAX are present on the system       
+         - minor documentation cleanup
+ 
+1.01   Sun Mar 12 2006
+         - minor tweaks to handling of import lists for inheritance control
+         - eliminate some warnings from test suite in some circumstances
+
+1.00   Mon Jan 16 2006
+         - improve handling of passed arguments to ancestor parser classes
+         - cleared up some messages and documentation
+
+1.00a1 Sat Dec 17 2005
+         - several enchancements to support parsing some internal DTD constructs.
+         - don't try to record comments prior to the start of the document, as
+           SVG.pm doesn't handle that.
+         - refactor Parser/Expat.pm and Parser/SAX/Handler.pm to place more common
+           functionality in Parser/Base.pm
+         - overhaul tests into a more conventional 'prove'able form
+
+0.97   Mon Apr 29
+         - added parsefile/parse_file compatability method to SVG::Parser::Expat/SAX
+         - updated POD documentation
+         - expanded tests
+
+0.96   Sat Apr 27
+         - added improved import interface for selecting parser parent and grandparent
+           classes, both Expat and SAX.
+         - added 'Expat' and 'SAX' shorthand notations
+         - pass double-minused attriutes to SVG.pm constructor
+
+0.95   Thu Apr 25
+         - abstracted some common constants and debug to SVG::Parser::Base. Some of
+           these will move into SVG.pm in time.
+
+0.90   Sun Apr 21 2002
+         - modified parser to use closures to maintain state
+         - renamed SVG::Parser to SVG::Parser::Expat
+         - added SVG::Parser::SAX for parsing with XML::SAX
+         - recreated SVG::Parser as generic interface to load either SVG::Parser::SAX or
+           SVG::Parser::Expat as applicable
+
+0.85   Thu Nov 22
+         - added simple debugging support
+         - fully objectified the module
+         - even more documentation
+         - updated to use new features in SVG 2.0
+
+0.80   Mon Nov 19 
+         - added documentation
+         - created some simple tests
+         - added an example script 'svgparse'
+
+0.01   Mon Nov 19 2001
+         - original version; created by h2xs 1.20 with options -n SVG::Parser

@@ -1,0 +1,9 @@
+This is a small module for a small but very common task: counting things,
+in another words, frequencies.  Sure, you can $freq{$elem}++ yourself,
+but what if you need to normalize the frequencies, or what if you have
+several frequencies you want to combine?  Statistics::Frequency to rescue.
+
+Copyright (C) 2002-2015, Jarkko Hietaniemi <jhi@iki.fi>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl 5.18.3.

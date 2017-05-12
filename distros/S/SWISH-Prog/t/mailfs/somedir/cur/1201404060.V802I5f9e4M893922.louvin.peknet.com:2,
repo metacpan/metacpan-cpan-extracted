@@ -1,0 +1,31 @@
+Return-Path: <peter@peknet.com>
+X-Original-To: swishtest@peknet.com
+Delivered-To: swishtest@peknet.com
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by peknet.com (Postfix) with ESMTP id BDADD126E23
+	for <swishtest@peknet.com>; Sat, 26 Jan 2008 21:21:00 -0600 (CST)
+X-Virus-Scanned: amavisd-new at peknet.com
+Received: from peknet.com ([127.0.0.1])
+	by localhost (louvin.peknet.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id ep8nklPQNilk for <swishtest@peknet.com>;
+	Sat, 26 Jan 2008 21:20:57 -0600 (CST)
+Received: from cenn-smtp.mc.mpls.visi.com (cenn.mc.mpls.visi.com [208.42.156.9])
+	by peknet.com (Postfix) with ESMTP id 23068126DDE
+	for <swishtest@peknet.com>; Sat, 26 Jan 2008 21:20:57 -0600 (CST)
+Received: from dhcp2.peknet.com (karman.dsl.visi.com [209.98.116.241])
+	by cenn-smtp.mc.mpls.visi.com (Postfix) with ESMTP id 6CB808129
+	for <swishtest@peknet.com>; Sat, 26 Jan 2008 21:21:01 -0600 (CST)
+Message-ID: <479BF89A.20602@peknet.com>
+Date: Sat, 26 Jan 2008 21:20:58 -0600
+From: Peter Karman <peter@peknet.com>
+Reply-To: peter@peknet.com
+User-Agent: Thunderbird 2.0.0.9 (Macintosh/20071031)
+MIME-Version: 1.0
+To: swishtest@peknet.com
+Subject: test
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+
+hello world.
+-- 
+Peter Karman  .  http://peknet.com/  .  peter@peknet.com

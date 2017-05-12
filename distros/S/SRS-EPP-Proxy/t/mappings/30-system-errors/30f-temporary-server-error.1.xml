@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NZSRSResponse VerMajor="5" VerMinor="4">
+  <Error Hint="TEMPORARY_SERVER_ERROR" ErrorId="SYSTEM_ERROR" Severity="err">
+    <Description>SRS server system error - please inform the SRS system administrator. Please attach the full original XML Request and XML Response</Description>
+    <ErrorDetails />
+  </Error>
+</NZSRSResponse>

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<svg width="730" height="447" viewBox="0 0 730 447" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<!-- outer furnishings -->
+	<g fill="#FFFFFF" stroke="#411DA4" id="backgrounds">
+		<rect width="729" y="0.5" fill="none" x="0.5" stroke-width="1.5" id="background_all" height="446" />
+		<rect width="584" y="87.5" fill="white" stroke="red" x="89.5" stroke-width="4" id="rectangle.graph.data.space.bg" height="246" />
+	</g>
+	<!-- traces -->
+	<g id="group.traces">
+		<!-- trace insertion takes place here -->
+		<g id="group.trace.1" fill="none" stroke="red" stroke-width="2">
+			<g id="group.trace.data.1" fill="blue" stroke="black" stroke-width="2" fill-opacity="0.7"/>
+			<g id="group.trace.grid.1" stroke="gray" stroke-width="1"/>
+			<g id="group.trace.tick.1" stroke="gray" stroke-width="1"/>
+			<g id="group.trace.axes.1" stroke="none" fill="black">
+				<g id="group.trace.axes.x.1" stroke="gray" fill="none" stroke-width="1"/>
+				<g id="group.trace.axes.y.1" stroke="gray" fill="none" stroke-width="1"/>
+				<g id="group.trace.axes.values.x.1" stroke="none" fill="black" transform="translate(0,260)"/>
+				<g id="group.trace.axes.values.y.1" stroke="none" fill="black" transform="translate(-40,0)"/>
+				<g id="group.trace.axes.title.x.1" text-anchor="middle" transform="translate(365,370)"/>
+				<g id="group.trace.axes.title.y.1.c" text-anchor="middle" transform="translate(60,200)">
+					<g id="group.trace.axes.title.y.1" transform="rotate(-90)"/>
+				</g>
+			</g>
+		</g>
+		<!-- trace insertion takes place here -->
+		<g id="group.trace.2" fill="none" stroke="blue" stroke-width="2">
+			<g id="group.trace.data.2" fill="white" stroke="black" stroke-width="2" fill-opacity="0.9"/>
+			<g id="group.trace.grid.2" stroke="gray" stroke-width="1"/>
+			<g id="group.trace.axes.2" stroke="none" fill="black">
+				<g id="group.trace.axes.x.2" stroke="none" fill="black"/>
+				<g id="group.trace.axes.y.2" stroke="none" fill="black"/>
+				<g id="group.trace.axes.values.x.2" stroke="none" fill="black"/>
+				<g id="group.trace.axes.values.y.2" stroke="none" fill="black" transform="translate(40,0)"/>
+				<g id="group.trace.axes.title.x.2" transform="translate(365,400)"/>
+				<g id="group.trace.axes.title.y.2.c" text-anchor="middle" transform="translate(700,200)">
+					<g id="group.trace.axes.title.y.2" transform="rotate(90)"/>
+				</g>
+			</g>
+		</g>
+		<!-- trace insertion takes place here -->
+		<g id="group.trace.3" fill="none" stroke="red" stroke-width="2">
+			<g id="group.trace.data.3" fill="white" stroke="green"/>
+			<g id="group.trace.grid.3" stroke="gray" stroke-width="1"/>
+			<g id="group.trace.axes.3" stroke="none" fill="black">
+				<g id="group.trace.axes.x.3" stroke="none" fill="black"/>
+				<g id="group.trace.axes.y.3" stroke="none" fill="black"/>
+				<g id="group.trace.axes.values.x.3" stroke="none" fill="black"/>
+				<g id="group.trace.axes.values.y.3" stroke="none" fill="black"/>
+				<g id="group.trace.axes.title.x.3"/>
+				<g id="group.trace.axes.title.y.3"/>
+			</g>
+		</g>
+		<!-- trace insertion takes place here -->
+		<g id="group.trace.4" fill="none" stroke="blue" stroke-width="2">
+			<g id="group.trace.data.4" fill="black" stroke="cyan"/>
+			<g id="group.trace.grid.4" stroke="gray" stroke-width="1"/>
+			<g id="group.trace.axes.4" stroke="none" fill="black">
+				<g id="group.trace.axes.x.4" stroke="none" fill="black"/>
+				<g id="group.trace.axes.y.4" stroke="none" fill="black"/>
+				<g id="group.trace.axes.values.x.4" stroke="none" fill="black"/>
+				<g id="group.trace.axes.values.y.4" stroke="none" fill="black"/>
+				<g id="group.trace.axes.title.x.4"/>
+				<g id="group.trace.axes.title.y.4"/>
+			</g>
+		</g>
+	</g>
+	<!-- graph global titles -->
+	<g id="group.graph.title" text-anchor="middle" fill="black" stroke="none" font-size="12px" transform="translate(365,30)"/>
+	<!-- trace labels -->
+	<g id="titles" text-anchor="middle" fill="black" stroke="none" transform="translate(300 420)">
+		<!-- trace label 1 -->
+		<g transform="translate(-200,0)">
+			<g stroke="yellow" fill="red">
+				<rect x="0" y="-10" width="20" height="10"/>
+			</g>
+			<g id="group.trace.title.1" transform="translate(20,0)" text-anchor="start" stroke="none" fill="black"/>
+		</g>
+		<!-- trace label 1 -->
+		<g transform="translate(-75,0)">
+			<g stroke="yellow" fill="red">
+				<rect x="0" y="-10" width="20" height="10"/>
+			</g>
+			<g id="group.trace.title.2" transform="translate(20,0)" text-anchor="start" stroke="none" fill="black"/>
+		</g>
+		<!-- trace label 1 -->
+		<g transform="translate(75,0)">
+			<g stroke="yellow" fill="red">
+				<rect x="0" y="-10" width="20" height="10"/>
+			</g>
+			<g id="group.trace.title.3" transform="translate(20,0)" text-anchor="start" stroke="none" fill="black"/>
+		</g>
+
+		<!-- trace label 1 -->
+		<g transform="translate(200,0)">
+			<g stroke="yellow" fill="red">
+				<rect x="0" y="-10" width="20" height="10"/>
+			</g>
+			<g id="group.trace.title.4" transform="translate(20,0)" text-anchor="start" stroke="none" fill="black"/>
+		</g>
+
+
+
+
+	</g>
+
+
+
+	<rect width="584" y="87.5" fill="none" stroke="blue" x="89.5" stroke-width="4" id="rectangle.graph.data.space" height="246" />
+</svg>

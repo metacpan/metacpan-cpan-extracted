@@ -1,0 +1,77 @@
+<?xml version="1.0" ?>
+<solstice_config>
+
+    <keys><!-- sol_loop keys -->
+        <key name="<!-- sol_var name -->"><!-- sol_var value --></key><!-- /sol_loop -->
+    </keys>
+
+    <virtual_root><!-- sol_var virtual_root --></virtual_root>
+    <server_string><!-- sol_var server_string --></server_string>
+    <support_email><!-- sol_var support_email --></support_email>
+    <admin_email><!-- sol_var admin_email --></admin_email>
+    <data_root><!-- sol_var data_root --></data_root>
+    <debug_level><!-- sol_var debug_level --></debug_level>
+    <development_mode><!-- sol_var development_mode --></development_mode>
+
+
+    <db_hosts><!-- sol_loop db_hosts -->
+        <host
+            type="<!-- sol_var type -->" 
+            host_name="<!-- sol_var host_name -->"
+            database_name="<!-- sol_var database_name-->"
+            user="<!-- sol_var user -->" 
+            password="<!-- sol_var password-->"<!-- sol_if port -->
+            port="<!-- sol_var port-->"<!-- /sol_if -->
+            /><!-- /sol_loop -->
+    </db_hosts>
+
+    <session_backend><!-- sol_var session_backend --></session_backend>
+    <session_db><!-- sol_var session_db --></session_db>
+    <memcached_servers><!-- sol_loop memcached_servers -->
+        <server><!-- sol_var server --></server><!-- /sol_loop -->
+    </memcached_servers>
+
+    <log_modules><!-- sol_loop log_modules -->
+        <module><!-- sol_var module --></module><!-- /sol_loop -->
+    </log_modules>
+    
+    <app_dirs><!-- sol_loop app_dirs -->
+        <app_dir><!-- sol_var dir --></app_dir><!-- /sol_loop -->
+    </app_dirs>
+
+    <smtp_server><!-- sol_var smtp_server --></smtp_server>
+    <smtp_mailname><!-- sol_var smtp_mailname --></smtp_mailname>
+    <smtp_msg_wait><!-- sol_var smtp_msg_wait --></smtp_msg_wait>
+    <smtp_use_queue><!-- sol_var smtp_use_queue --></smtp_use_queue>
+
+    <webservice_rest_root><!-- sol_var webservice_rest_root --></webservice_rest_root>
+    <lang><!-- sol_var lang --></lang>
+    <session_cookie><!-- sol_var session_cookie --></session_cookie>
+    <encryption_key><![CDATA[<!-- sol_var encryption_key -->]]></encryption_key>
+    <require_ssl><!-- sol_var require_ssl --></require_ssl>
+    <error_html><![CDATA[<!-- sol_var error_html -->]]></error_html>
+    <boilerplate_view><!-- sol_var boilerplate_view --></boilerplate_view>
+    <slow_query_time><!-- sol_var slow_query_time --></slow_query_time>
+    <compiled_view_path><!-- sol_var compiled_view_path --></compiled_view_path>
+
+    <remotes><!-- sol_loop remotes -->
+        <remote name="<!-- sol_var name -->"><!-- sol_var controller --></remote><!-- /sol_loop -->
+    </remotes>
+
+    <css_files><!-- sol_loop css_files -->
+        <css_file><!-- sol_var file --></css_file><!-- /sol_loop -->
+    </css_files>
+
+    <js_files><!-- sol_loop js_files -->
+        <js_file><!-- sol_var file --></js_file><!-- /sol_loop -->
+    </js_files>
+
+    <statics><!-- sol_loop statics -->
+        <static<!-- sol_if virtual_path--> virtual_path="<!-- sol_var virtual_path-->"<!-- /sol_if -->><!-- sol_var filesys_path --></static><!-- /sol_loop -->
+    </statics>
+
+    <cgis><!-- sol_loop cgis -->
+        <cgi<!-- sol_if virtual_path--> virtual_path="<!-- sol_var virtual_path-->"<!-- /sol_if --> requires_auth="<!-- sol_var requires_auth-->" url_is_prefix="<!-- sol_var url_is_prefix -->"><!-- sol_var filesys_path --></cgi><!-- /sol_loop -->
+    </cgis>
+
+</solstice_config>

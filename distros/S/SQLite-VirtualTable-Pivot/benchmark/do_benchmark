@@ -1,0 +1,68 @@
+#!/bin/bash
+
+rm -rf /tmp/vpt_*
+
+DBFILE="/tmp/vpt_test.db"
+DATAFILE="/tmp/vpt_data.csv"
+OUTPUTDIR="/tmp/vpt_out"
+
+ATTRIBUTES=50
+SPARSENESS=25
+ROWS=5000
+
+mkdir $OUTPUTDIR
+
+echo "Rows       : $ROWS"
+echo "Columns    : $ATTRIBUTES"
+echo "Sparseness : $SPARSENESS"
+perl mk-data-sparse.pl $ATTRIBUTES $ROWS $SPARSENESS > $DATAFILE
+
+sqlite3 $DBFILE << _DONE_
+create table base_table (id integer, field varchar, value integer, primary key (id, field));
+create index base_field_value on base_table(field,value);
+.separator ,
+.import $DATAFILE base_table
+_DONE_
+
+#
+# make two views and one virtual table
+#
+
+echo "making views and virtual tables"
+
+perl aggregate_view.pl $ATTRIBUTES | sqlite3 $DBFILE
+
+perl joined_view.pl    $ATTRIBUTES |  sqlite3 $DBFILE
+
+export PERL5LIB=../lib:$PERL5LIB
+export SQLITE_CURRENT_DB=$DBFILE
+sqlite3 $DBFILE < virtual_table.sql
+
+rm -f $OUTPUTDIR/last.out
+
+LOADPERLVTAB=
+if [ -e $HOME/.sqliterc ] && ! egrep -q '^.load perlvtab.so' $HOME/.sqliterc; then
+    LOADPERLVTAB="\n.load perlvtab.so"
+fi
+
+for i in query/*.sql; do
+    echo "query : " `basename $i .sql`
+    for j in aggregate virtual; do
+    #for j in aggregate joined virtual; do
+        cat <(echo -e ".timer on $LOADPERLVTAB") $i \
+      | sed "s/__table__/$j\_pivot_table/" \
+      | sqlite3 $DBFILE > $OUTPUTDIR/$j.out
+      printf "%10s :" $j
+      tail -1 $OUTPUTDIR/$j.out | perl -lne '/CPU Time: user (\S+ )/ and print $1'
+      # compare to last run
+      head -n-1 $OUTPUTDIR/$j.out > $OUTPUTDIR/this.out
+      if [ -e "$OUTPUTDIR/last.out" ]; then
+        diff $OUTPUTDIR/last.out $OUTPUTDIR/this.out
+      fi
+      mv $OUTPUTDIR/this.out $OUTPUTDIR/last.out
+    done
+    echo -n "rows : "
+    wc -l $OUTPUTDIR/last.out | awk '{print $1}'
+    rm $OUTPUTDIR/last.out
+done
+

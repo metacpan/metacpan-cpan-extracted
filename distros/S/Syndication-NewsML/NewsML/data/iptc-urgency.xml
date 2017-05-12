@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<!DOCTYPE TopicSet PUBLIC "urn:newsml:iptc.org:20001006:NewsMLv1.0.dtd:1" "NewsMLv1.0.dtd">
+<TopicSet Duid="iptc.urgency" FormalName="Urgency">
+	<Comment xml:lang="en">The relative importance of a NewsItem for editorial examination.</Comment>
+	<Topic Duid="urg1">
+		<TopicType Scheme="IptcTopicType" FormalName="Urgency"/>
+		<FormalName Scheme="IptcUrgency">1</FormalName>
+		<Description xml:lang="en">Highest</Description>
+	</Topic>
+	<Topic Duid="urg2">
+		<TopicType Scheme="IptcTopicType" FormalName ="Urgency"/>
+		<FormalName Scheme="IptcUrgency">2</FormalName>
+		<Description xml:lang="en">Level 2</Description>
+	</Topic>
+	<Topic Duid="urg3">
+		<TopicType Scheme="IptcTopicType" FormalName="Urgency"/>
+		<FormalName Scheme="IptcUrgency">3</FormalName>
+		<Description xml:lang="en">Level 3</Description>
+	</Topic>
+	<Topic Duid="urg4">
+		<TopicType Scheme="IptcTopicType" FormalName="Urgency"/>
+		<FormalName Scheme="IptcUrgency">4</FormalName>
+		<Description xml:lang="en">Level 4</Description>
+	</Topic>
+	<Topic Duid="urg5">
+		<TopicType Scheme="IptcTopicType" FormalName="Urgency"/>
+		<FormalName Scheme="IptcUrgency">5</FormalName>
+		<Description xml:lang="en">Normal</Description>
+	</Topic>
+	<Topic Duid="urg6">
+		<TopicType Scheme="IptcTopicType" FormalName="Urgency"/>
+		<FormalName Scheme="IptcUrgency">6</FormalName>
+		<Description xml:lang="en">Level 6</Description>
+	</Topic>
+	<Topic Duid="urg7">
+		<TopicType Scheme="IptcTopicType" FormalName="Urgency"/>
+		<FormalName Scheme="IptcUrgency">7</FormalName>
+		<Description xml:lang="en">Level 7</Description>
+	</Topic>
+	<Topic Duid="urg8">
+		<TopicType Scheme="IptcTopicType" FormalName="Urgency"/>
+		<FormalName Scheme="IptcUrgency">8</FormalName>
+		<Description xml:lang="en">Lowest</Description>
+	</Topic>
+	<Topic Duid="urg9">
+		<TopicType Scheme="IptcTopicType" FormalName="Urgency"/>
+		<FormalName Scheme="IptcUrgency">9</FormalName>
+		<Description xml:lang="en">User defined.</Description>
+	</Topic>
+</TopicSet>
+

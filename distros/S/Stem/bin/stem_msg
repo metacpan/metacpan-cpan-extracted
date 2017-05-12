@@ -1,0 +1,191 @@
+#!/usr/local/bin/perl
+
+use Getopt::Long ;
+use strict ;
+
+use Stem ;
+
+my %args ;
+my $hub_name ;
+my $portal ;
+
+parse_args() ;
+
+setup_hub() ;
+
+send_msg() ;
+
+Stem::Event::start_loop() ;
+
+# no return from here.
+######################
+
+sub setup_hub {
+
+	$hub_name = "Stem_msg_$$" ;
+
+	Stem::Route::register_class( __PACKAGE__ ) ;
+
+	Stem::Hub->new( 'reg_name' => $hub_name ) ;
+
+	my @portal_args ;
+
+	push @portal_args, ( 'host' => $args{'host'} ) if $args{'host'} ;
+	push @portal_args, ( 'port' => $args{'port'} ) if $args{'port'} ;
+
+#print "portal args: @portal_args\n" ;
+
+	$portal = Stem::Portal->new( @portal_args ) ;
+
+	die "Can't create Portal: $portal" if $portal ;
+}
+
+sub send_msg {
+
+	my ( @msg_args, @target ) ;
+
+	if ( $args{'cmd'} ) {
+
+		@msg_args = ( 'type' => 'cmd', 'cmd' => $args{'cmd'} ) ;
+	}
+	else {
+
+		@msg_args = ( 'type' => 'data' ) ;
+	}
+
+	@target = ( 'to_target' => $args{'target'} ) if $args{'target'} ;
+
+	push( @msg_args, ( 'ack_req' => 1 ) ) if $args{'ack'} ;
+
+	my $data = exists( $args{'data'} ) ? $args{'data'} : '' ;
+
+	my $msg = Stem::Msg->new( 
+			'to_hub'	=> 'DEFAULT',
+			'to_cell'	=> $args{'cell'},
+			@target,
+			'from_cell'	=> __PACKAGE__,
+			'from_hub'	=> $hub_name,
+			'data'		=> \$data,
+			@msg_args,
+		) ;
+
+	$msg->dispatch() ;
+}
+
+# this is the class method that gets back the response and ack messages.
+
+sub msg_in {
+
+	my( $class, $msg ) = @_ ;
+
+	if( $msg->type() eq 'msg_ack' ) {
+
+#		print "ACK\n" ;
+		exit ;
+	}
+
+	if ( my $data = $msg->data() ) {
+
+		print ${$data} ;
+	}
+
+#	$portal->shut_down() ;
+
+	exit unless $args{'ack'} ;
+
+	return ;
+}
+
+
+sub parse_args {
+
+	Getopt::Long::Configure( 'no_ignore_case' ) ;
+
+	GetOptions( \%args,
+		    'cell|C=s',
+		    'hub|H=s',
+		    'target|T=s',
+		    'cmd|c=s',
+		    'data|d=s',
+		    'ack|a',
+		    'host|h=s',
+		    'port|p=s',
+		    'help|?',
+	) ;
+
+#print map "$_ => $args{$_}\n", sort keys %args ;
+
+	usage( '' ) if $args{ 'help' } ;
+
+	usage( 'Missing Cell address' ) unless $args{ 'cell' } ;
+}
+
+sub usage {
+
+	my $err_msg = shift ;
+
+	my $usage = <<'=cut' ;
+=pod
+
+=head1 NAME
+
+stem_msg - Inject a message into a Stem Hub
+
+=head1 SYNOPSIS
+
+stem_msg -cell <cell> [-hub <hub>] [-target <target>]
+        [-cmd <cmd>] [-data <data>] [-ack]
+        [-host <host>] [-port <port>]
+
+	-C <cell>		The Stem Cell to send this message to.
+	-cell <cell>		This is required.
+
+	-H <hub>		The hub which has the addressed Stem Cell.
+	-hub <hub>		
+
+	-T <target>		The target address of the Stem Cell
+	-target <target>
+
+	-c <cmd>		The cmd type to send in the message
+	-cmd <cmd>		If no cmd is set, it will be a data type
+				message. 
+
+	-d <data>		The data to be sent in the message.
+	-data <data>		Default is an empty string.
+
+	-a			Wait for an acknowledge message before
+	-ack 			exiting.
+
+	-h <host>		The host which the Stem Hub is on.
+	-host <host>		Default: localhost
+
+	-p <port>		The port which the Stem Portal is listening
+	-port <port>		to.
+				Default: 10,000 (probably will change)
+
+=head1 DESCRIPTION
+
+This program is meant to inject a single message into a Stem Hub. You
+set the Cell address with the command line options and then which
+command to execute in that Cell. If you don't set a command, then a
+data message will be sent. You can send data in the message as well.
+
+If the Cell generates a response message, then its data will be
+printed on stdout.
+
+If the -ack option is set, then the message will have the ack_req flag
+will be set in the outgoing message. This will cause an 'ack' type
+message to be sent back after the original message has been
+delivered. This is meant for when you send a message to a Cell which
+doesn't generate a response. It lets this program know that it can
+exit.
+
+=cut
+
+	$usage =~ s/^=\w+.*$//mg ;
+
+	$usage =~ s/\n{2,}/\n\n/ ;
+	$usage =~ s/\A\n+/\n/ ;
+
+	die "$err_msg\n$usage" ;
+}

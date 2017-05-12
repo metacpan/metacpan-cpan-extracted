@@ -1,0 +1,25 @@
+Revision history for Perl extension Sub::Apply.
+
+0.06  Mon Nov 21 00:56:37 2011
+    - improved documentation.
+    - add LICENSE attribute in Makefile.PL.
+
+0.05  Sun Nov 20 18:26:34 2011
+    - fix carp in apply_if.
+
+0.04  Sat Nov 19 01:53:03 2011
+    - add $Sub::Apply::WARNING for debugging. (thanks to koji_magi)
+
+0.03  Thu Nov 17 23:47:22 2011
+    - use symbol table to test subroutine existence. #2 (thanks to Vincent)
+    - rename _proc to _find_proc.
+    - more friendly error message.
+
+0.02  Thu Nov 17 11:07:48 2011
+    - use MIN_PERL_VERSION attribute instead of use $VERSION #1 (thanks to syohex)
+    - fix copyright
+
+0.01  Thu Nov 17 01:47:43 2011
+	- original version; created by h2xs 1.23 with options
+		-AXce --use-new-tests --skip-exporter --skip-ppport -v 0.01 -n Sub::Apply
+

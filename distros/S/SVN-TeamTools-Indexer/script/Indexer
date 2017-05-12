@@ -1,0 +1,7 @@
+#!/usr/bin/perl
+
+use SVN::TeamTools::Indexer;
+
+SVN::TeamTools::Indexer->run();
+
+

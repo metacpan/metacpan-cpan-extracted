@@ -1,0 +1,134 @@
+NAME
+
+    Scalar::IfDefined - Apply block to scalar depending on if it's defined.
+
+SYNOPSIS
+
+        use Scalar::IfDefined qw/ifdef/;
+    
+        my $hash = {
+            a => 1,
+            b => 2,
+            c => 3,
+            d => {
+                E => 1,
+                F => 2,
+            },
+        };
+    
+        ifdef { $_ + 1 } $hash->{a};   # ---> 2
+        ifdef { $_ + 1 } $hash->{missing};    # ---> undef
+        ifdef { $_ + 1 } ifdef { $_->{F} } $hash->{d};  # ---> 3
+        ifdef { $_ + 1 } ifdef { $_->{MISSING} } $hash->{d};  # ---> undef
+    
+    
+        # Or perhaps with Perl6::Flows
+    
+        use Perl6::Flows;
+        my $result = (
+            $hash->{a} 
+                ==> ifdef { $_->{F} }
+                ==> ifdef { $_ + 1 }
+        );            # ---> 3
+
+EXPORT
+
+    ifdef
+
+    $ifdef
+
+SUBROUTINES/METHODS
+
+ ifdef
+
+    Takes a block and a scalar value.
+
+    If the scalar value is undef, the block is ignored and undef is
+    returned straight away.
+
+    If the scalar value is defined, then the block is evaluated with $_ as
+    the value passed in, and the result of the block is returned.
+
+ lifdef
+
+    Like ifdef, except returns the empty list. In scalar context,
+    therefore, this works identically to ifdef, but when in a list (e.g. an
+    argument list or hashref constructor), it will return zero values if
+    the argument was undef.
+
+        # Creates { key => $some_value }, or { undef } and warnings:
+        # Odd number of elements in anonymous hash
+        # Use of uninitialized value in anonymous hash
+        my $href = {
+            ifdef { key => $_ } $some_value
+        };
+    
+        # Creates { key => value }, or {}
+        my $href = {
+            lifdef { key => $_ } $some_value
+        };
+
+ $ifdef
+
+    Used to dereference a possibly-undef scalar.
+
+    If the scalar is undef, returns undef.
+
+    If the scalar is an object, the first argument is the method to call,
+    and the rest of the arguments are the method arguments.
+
+    If the scalar is an array ref, the first argument is used to index into
+    the array.
+
+    If the scalar is a hash ref, the first argument is used to access the
+    hash.
+
+    If the scalar is a code ref, the code ref is run with all the
+    arguments.
+
+    As a special case, if the first argument is a code ref, it will be run
+    with the scalar as the first argument and the other arguments as the
+    rest. This form allows you to use $ifdef on a simple scalar - but you
+    might be better off with ifdef itself for that.
+
+    The following uses will all return undef if the $scalar is undef, or
+    The Right Thing if not.
+
+        # Run "method_name" on $obj, if $obj is defined.
+        $obj->$ifdef("method_name", "argument", "argument");
+    
+        # Run $coderef with two arguments if $coderef is defined.
+        $coderef->$ifdef("argument", "argument");
+    
+        # Lowercase the zeroth element of the arrayref, or undef if either of those
+        # things is undef.
+        $arrayref->$ifdef(0)->$ifdef(sub { lc });
+    
+        # Call "method_name" on $hashref->{object}, or return undef if either of
+        # those is undef
+        $hashref->$ifdef('object')->$ifdef('method_name');
+
+AUTHOR
+
+    Nick Booker, <NMBooker at gmail.com>
+
+BUGS
+
+    https://github.com/nmbooker/p5-Scalar-IfDefined/issues
+
+ACKNOWLEDGEMENTS
+
+ Alastair McGowan-Douglas (ALTREUS)
+
+    For developing the $ifdef (coderef) form.
+
+LICENSE AND COPYRIGHT
+
+    Copyright (C) 2015 Nick Booker
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,42 @@
+Syntax-Highlight-Universal version 0.4
+======================================
+
+This module can process text of any format and produce a syntax
+highlighted version of it. The default output format is (X)HTML,
+custom formats are also possible. It uses parts of the Colorer library
+(http://colorer.sf.net/) and supports its HRC configuration files
+(http://colorer.sf.net/hrc-ref/). Configuration files for about
+100 file formats are included.
+
+REQUIREMENTS
+
+* Perl 5.6 or higher
+
+  This module might work with older Perl versions
+  as well, but it has only been tested with Perl 5.6 and 5.8.
+
+* gcc or MS Visual C++ 6.0 compiler
+
+  This module hasn't been tested with other compilers and there
+  is a number of reasons why this module might fail to compile.
+  But you can always try...
+
+INSTALLATION
+
+To install this module type the following:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Wladimir Palant
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+Colorer is (C) by Igor Russkih. For information on the license see
+http://colorer.sf.net/.

@@ -1,0 +1,68 @@
+Please send all email to cdawson@webiphany.com
+
+WHAT IS THIS?
+
+The Smil.pm module.  This module provides an interface for generating 
+SMIL files using perl.  SMIL is a W3C langauge for multi-media authoring.
+
+HOW DO I INSTALL IT?
+
+Use the makefile.  Run these commands.  Make might
+be nmake (for Win32 systems) or another command depending on your platform.
+You will have to be the "superuser" to run the last command.
+
+perl Makefile.PL
+make
+make test
+make install 
+
+If you have the correct privileges, perl will place it in the right spot.
+
+If you are not administrator, or have insufficient privileges to install
+into the perl lib path, then you will have to modify your @INC variable 
+using this command (substitute the directory where Smil.pm is for 
+the fake directory /install/path/)
+
+use lib '/install/path/';
+use Smil;
+
+OR
+
+BEGIN { unshift @INC, '/install/path/'; }
+
+Either one of these commands will allow you to use the module, provided
+you fill in the correct path for '/install/path/'
+
+WHAT SYSTEMS DOES IT WORK WITH?
+
+I have tested it on several Linux distributions and ActiveState Perl for
+Win32.  The module is pure perl, so it should work with any standard
+perl distribution.  If it doesn't, please email me and tell me your problem.
+
+WHERE IS THE DOCUMENTATION?
+
+Run 'perldoc Smil'  If you haven't installed it as superuser, you will 
+have to perpend the installation directory to the front of the module
+name.
+
+WHERE ARE THE EXAMPLES?
+
+I have provided a few examples within the perldoc documentation.  You can
+find plently of example scripts in the installation directory as well.
+It is a top priority for me to add these to the web page for perlysmil, 
+which is here:
+
+http://webiphany.com/perlysmil/
+
+I'll try to add more to this soon.
+
+WHERE IS THE ONLINE DOCUMENTATION?
+
+http://webiphany.com/perlysmil/
+
+
+Hope this helps you with MM authoring.
+
+Chris Dawson
+cdawson@webiphany.com
+

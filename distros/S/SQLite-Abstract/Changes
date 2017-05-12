@@ -1,0 +1,15 @@
+Revision history for Perl module SQLite::Abstract
+
+0.14 Tue Mar 28 06:51:00 2006
+	- logical error bug fixig in _do_ method fixing
+	- Exporter usage removed
+	- CREATE/DROP VIEW added
+	- localtime, time, time_ahead methods added
+	- tables method added ('show tables' simulation)
+	- pod errors fixing
+	
+0.13 Sun Mar 26 06:28:42 2006
+    - pod errors fixing
+
+0.12 Thu Mar 23 15:13:48 2006
+    - rewriten from scratch

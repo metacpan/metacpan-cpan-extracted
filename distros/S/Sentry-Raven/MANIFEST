@@ -1,0 +1,26 @@
+.travis.yml
+Changes
+INSTALL
+LICENSE
+MANIFEST
+Makefile.PL
+README
+lib/Sentry/Raven.pm
+lib/Sentry/Raven/Processor.pod
+lib/Sentry/Raven/Processor/RemoveStackVariables.pm
+t/00-load.t
+t/10-dsn.t
+t/11-generic-event.t
+t/12-specialized-event.t
+t/13-service-call.t
+t/14-does-not-die.t
+t/15-error-handler.t
+t/16-processors.t
+t/90-perl-critic.t
+t/91-pod-coverage.t
+t/92-pod-syntax.t
+t/93-spelling.t
+t/94-changes.t
+t/99-todo.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

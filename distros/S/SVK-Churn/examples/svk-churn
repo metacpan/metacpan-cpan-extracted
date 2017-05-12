@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# After installed SVK::Command::Churn
+
+svk churn -t loc -o /tmp/churn.png //
+

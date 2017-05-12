@@ -1,0 +1,6 @@
+[% PROCESS header %]
+<h1>An error occured</h1>
+
+<p>[% error_msg | html_para %]</p>
+
+[% PROCESS footer %]

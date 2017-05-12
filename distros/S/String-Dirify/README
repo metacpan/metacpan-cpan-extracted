@@ -1,0 +1,79 @@
+NAME
+    "String::Dirify" - Convert a string into a directory name
+
+Synopsis
+            use String::Dirify;
+
+            my($dir_1) = String::Dirify -> dirify('frobnitz');
+
+    Or:
+
+            use String::Dirify ':all';
+
+            my($dir_2) = dirify('bar baz');
+
+    Or even:
+
+            use String::Dirify;
+
+            my($sd)    = String::Dirify -> new();
+            my($dir_3) = $sd -> dirify('!Q@W#E$R%T^Y');
+
+Description
+    "String::Dirify" is a pure Perl module.
+
+    This module allows you to convert a string (possibly containing high
+    ASCII characters, and even HTML) into another, lower-cased, string which
+    can be used as a directory name.
+
+    For usage, see the Synopsis.
+
+    This code is derived from similar code in Movable Type.
+
+Method: dirify($string [, $separator])
+    Returns a string, which can be used as a directory name.
+
+    The default separator is '_'.
+
+    Each run of spaces in the string is replaced by this separator.
+
+Algorithm
+    1: Each high ASCII character is replaced by its normal equivalent
+    2: The string is converted to lower case
+    3: Any HTML (including HTML entities) in the string is removed
+    4: Any characters which are not (Perl) words, spaces or hyphens, are
+    removed
+    5: Runs of spaces are converted to the separator character
+        For more details about this character, see the discussion of the
+        dirify() method (above).
+
+Melody 'v' Movable Type
+    See http://openmelody.org for details.
+
+Backwards Compatibility with Movable Type
+    Unfortunately, Movable Type's usage of dirify() allows a fake separator
+    - '1' - to be used for the second parameter in the call to dirify().
+
+    The '1' triggered usage of '_' as the separator, rather than the '1'
+    provided.
+
+    This 'feature' has been preserved in "String::Dirify", but is
+    discouraged. Instead, simply drop the second parameter and let the code
+    default to '_'.
+
+Distributions
+    This module is available as a Unix-style distro (*.tgz).
+
+    See http://savage.net.au/Perl-modules.html for details.
+
+Authors
+    "String::Dirify" started out as part of Movable Type's code.
+
+    Then, Mark Stosberg cut down the original code to provide just the
+    English/ISO/ASCII features.
+
+    Lastly, the code was cleaned up, tests added, and all packaged, by Ron
+    Savage *<ron@savage.net.au>* in 2009.
+
+    Home page: http://savage.net.au/index.html
+

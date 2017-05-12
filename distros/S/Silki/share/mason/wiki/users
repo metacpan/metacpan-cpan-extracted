@@ -1,0 +1,41 @@
+<table class="standard-table">
+  <thead>
+    <tr>
+      <th><% loc('Member') %></th>
+      <th><% loc('Role') %></th>
+      <th><% loc('# of Pages Created') %></th>
+      <th><% loc('# of Pages Edited') %></th>
+    </tr>
+  </thead>
+% while ( my ( $user, $role ) = $users->next() ) {
+  <tbody>
+    <tr class="<% $users->index() % 2 ? 'odd' : 'even' %>">
+      <td>
+        <& /lib/user-link.mas, user => $user, wiki => $wiki &>
+      </td>
+      <td><% loc( $role->name() ) %></td>
+      <td><% $wiki->pages_created_by_user_count($user) %></td>
+      <td><% $wiki->pages_edited_by_user_count($user) %></td>
+    </tr>
+  </tbody>
+% }
+
+<& /lib/table/pager.mas,
+   index     => $users->index(),
+   pager     => $pager,
+   uri_maker => sub { $wiki->uri( view => 'users', @_ ) } &>
+
+</table>
+
+<%args>
+$wiki
+$users
+$pager
+</%args>
+
+<%method title>
+<% loc( '%1 Members', $wiki->title() ) %>
+<%args>
+$wiki
+</%args>
+</%method>

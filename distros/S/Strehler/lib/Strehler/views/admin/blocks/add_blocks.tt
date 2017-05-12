@@ -1,0 +1,16 @@
+[% PROCESS admin/blocks/js_blocks.tt %]
+[% BLOCK addpagejs %]
+    [% INCLUDE categoryinit %]
+    <script>
+        $(document).ready(function() {
+            item_type = '[% entity %]';
+            [% DEFAULT id = 'null' %]
+            object_id = [% id %];
+            starting_category = $('#category').val();
+            tags_init();
+            saved_category = null;
+            $("#last").on("click", get_last_chapter);
+            $("#date_of_pub").datepicker({ format: "dd/mm/yyyy" });
+        });
+    </script>
+[% END %]

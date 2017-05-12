@@ -1,0 +1,56 @@
+{
+   "abstract" : "A simple application layer to divide and integrate data and processes in the Perl program.",
+   "author" : [
+      "lottz <lottzaddr@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Su",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      }
+   },
+   "provides" : {
+      "Su" : {
+         "file" : "lib/Su.pm",
+         "version" : "0.110"
+      },
+      "Su::Log" : {
+         "file" : "lib/Su/Log.pm",
+         "version" : 0
+      },
+      "Su::Model" : {
+         "file" : "lib/Su/Model.pm",
+         "version" : 0
+      },
+      "Su::Process" : {
+         "file" : "lib/Su/Process.pm",
+         "version" : 0
+      },
+      "Su::Procs::ResourceProc" : {
+         "file" : "lib/Su/Procs/ResourceProc.pm",
+         "version" : 0
+      },
+      "Su::Template" : {
+         "file" : "lib/Su/Template.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.110"
+}

@@ -1,0 +1,4 @@
+Revision history for Perl extension String::CP1251.
+
+0.01  2010-11-22 11:50
+	- lc(), uc()

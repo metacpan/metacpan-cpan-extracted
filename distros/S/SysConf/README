@@ -1,0 +1,100 @@
+SysConf
+
+ABOUT
+
+This module is specifically to enable very simplified access to CentOS/Red Hat
+style sysconfig files.  It reads/writes them, provides a simple way to 
+create, update, delete keys within these files.  
+
+Primarily it is for ease of munging /etc/sysconfig/* files, and specifically
+/etc/sysconfig/network-scripts/ifcfg-* files.
+
+
+NOTE/WARNING/CAVEAT:
+
+This code does NOT preserve comments in any form.  If you use this module to
+process files, those files WILL NOT HAVE ANY COMMENTS IN THEM AFTER IT 
+UPDATES THE FILE ON DISK.  So if you document changes in the file via comments
+you probably want to be aware of this before you run this module against
+the file.
+
+
+USAGE:
+
+
+    use SysConf;
+
+    my $sysconf_file   = 'name_of_file';
+    my $sysconf_path   = '/etc/sysconfig';
+    my $foo = SysConf->new({'file' => $sysconf_file ,'path' => $sysconf_path});
+    
+    # attach the object to the file
+    $foo->attach;
+    
+    # get a list of all keys in the file (ignore commented ones)
+    my @k = $foo->keys;
+    
+    # set a particular key to a particular value (will insert the key if needed)
+    $foo->update('bar'=>1);
+    
+    # get a particular value given a key
+    my $val = $foo->retrieve('oof');
+    
+    # delete a key/value pair
+    my $rv = $foo->delete('bar');
+    
+    # detach the object from the file
+    $foo->detach;
+
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc SysConf
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=SysConf
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/SysConf
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/SysConf
+
+    Search CPAN
+        http://search.cpan.org/dist/SysConf/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2013 Joe Landman
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; version 2 dated June, 1991 or at your option
+any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+A copy of the GNU General Public License is available in the source tree;
+if not, write to the Free Software Foundation, Inc.,
+59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+

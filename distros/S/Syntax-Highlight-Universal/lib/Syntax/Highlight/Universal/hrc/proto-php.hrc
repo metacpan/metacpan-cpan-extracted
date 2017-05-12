@@ -1,0 +1,128 @@
+<parameters>
+   <param name="Include-PHP-Language-Constructs" value='true' description='PHP Language Constructs' />
+   <param name="Include-PHP-Core-Predefined-Constants" value='true' description='PHP Core Predefined Constants' />
+   <param name="Include-PHP-Standard-Predefined-Constants" value='true' description='PHP Standard Predefined Constants' />
+   <param name="Include-Apache-specific-Functions" value='true' description='I. Apache-specific Functions' />
+   <param name="Include-Array-Functions" value='true' description='II. Array Functions' />
+   <param name="Include-Aspell-Functions-deprecated" value='true' description='III. Aspell functions [deprecated]' />
+   <param name="Include-BCMath-Arbitrary-Precision-Mathematics-Functions" value='true' description='IV. BCMath Arbitrary Precision Mathematics Functions' />
+   <param name="Include-Bzip-Compression-Functions" value='true' description='V. Bzip2 Compression Functions' />
+   <param name="Include-Calendar-Functions" value='true' description='VI. Calendar Functions' />
+   <param name="Include-CCVS-API-Functions-deprecated" value='true' description='VII. CCVS API Functions [deprecated]' />
+   <param name="Include-COM-Support-Functions-For-Windows" value='true' description='VIII. COM support functions for Windows' />
+   <param name="Include-Class-Object-Functions" value='true' description='IX. Class/Object Functions' />
+   <param name="Include-ClibPDF-Functions" value='true' description='X. ClibPDF Functions' />
+   <param name="Include-Crack-Functions" value='true' description='XI. Crack Functions' />
+   <param name="Include-CURL-Client-URL-Library-Functions" value='true' description='XII. CURL, Client URL Library Functions' />
+   <param name="Include-Cybercash-Payment-Functions" value='true' description='XIII. Cybercash Payment Functions' />
+   <param name="Include-Cyrus-IMAP-Administration-Functions" value='true' description='XIV. Cyrus IMAP administration Functions' />
+   <param name="Include-Character-Type-Functions" value='true' description='XV. Character Type Functions' />
+   <param name="Include-Database-dbm-style-Abstraction-Layer-Functions" value='true' description='XVI. Database (dbm-style) Abstraction Layer Functions' />
+   <param name="Include-Date-And-Time-Functions" value='true' description='XVII. Date and Time Functions' />
+   <param name="Include-DBase-Functions" value='true' description='XVIII. dBase Functions' />
+   <param name="Include-DBM-Functions-deprecated" value='true' description='XIX. DBM Functions [deprecated]' />
+   <param name="Include-Dbx-Functions" value='true' description='XX. dbx Functions' />
+   <param name="Include-DB-Functions" value='true' description='XXI. DB++ Functions' />
+   <param name="Include-Direct-IO-Functions" value='true' description='XXII. Direct IO Functions' />
+   <param name="Include-Directory-Functions" value='true' description='XXIII. Directory Functions' />
+   <param name="Include-DOM-XML-Functions" value='true' description='XXIV. DOM XML Functions' />
+   <param name="Include-NET-Functions" value='true' description='XXV. .NET Functions' />
+   <param name="Include-Error-Handling-And-Logging-Functions" value='true' description='XXVI. Error Handling and Logging Functions' />
+   <param name="Include-File-Alteration-Monitor-Functions" value='true' description='XXVII. File Alteration Monitor Functions' />
+   <param name="Include-FrontBase-Functions" value='true' description='XXVIII. FrontBase Functions' />
+   <param name="Include-FilePro-Functions" value='true' description='XXIX. filePro Functions' />
+   <param name="Include-Filesystem-Functions" value='true' description='XXX. Filesystem Functions' />
+   <param name="Include-Forms-Data-Format-Functions" value='true' description='XXXI. Forms Data Format Functions' />
+   <param name="Include-FriBiDi-Functions" value='true' description='XXXII. FriBiDi Functions' />
+   <param name="Include-FTP-Functions" value='true' description='XXXIII. FTP Functions' />
+   <param name="Include-Function-Handling-Functions" value='true' description='XXXIV. Function Handling Functions' />
+   <param name="Include-Gettext" value='true' description='XXXV. Gettext' />
+   <param name="Include-GMP-Functions" value='true' description='XXXVI. GMP Functions' />
+   <param name="Include-HTTP-Functions" value='true' description='XXXVII. HTTP Functions' />
+   <param name="Include-Hyperwave-Functions" value='true' description='XXXVIII. Hyperwave Functions' />
+   <param name="Include-Hyperwave-API-Functions" value='true' description='XXXIX. Hyperwave API Functions' />
+   <param name="Include-Iconv-Functions" value='true' description='XL. iconv Functions' />
+   <param name="Include-Image-Functions" value='true' description='XLI. Image Functions' />
+   <param name="Include-IMAP-POP-And-NNTP-Functions" value='true' description='XLII. IMAP, POP3 and NNTP Functions' />
+   <param name="Include-Informix-Functions" value='true' description='XLIII. Informix Functions' />
+   <param name="Include-InterBase-Functions" value='true' description='XLIV. InterBase Functions' />
+   <param name="Include-Ingres-II-Functions" value='true' description='XLV. Ingres II Functions' />
+   <param name="Include-IRC-Gateway-Functions" value='true' description='XLVI. IRC Gateway Functions' />
+   <param name="Include-PHP-Java-Integration" value='true' description='XLVII. PHP / Java Integration' />
+   <param name="Include-LDAP-Functions" value='true' description='XLVIII. LDAP Functions' />
+   <param name="Include-LZF-Functions" value='true' description='XLIX. LZF Functions' />
+   <param name="Include-Mail-Functions" value='true' description='L. Mail Functions' />
+   <param name="Include-Mailparse-Functions" value='true' description='LI. mailparse Functions' />
+   <param name="Include-Mathematical-Functions" value='true' description='LII. Mathematical Functions' />
+   <param name="Include-Multi-Byte-String-Functions" value='true' description='LIII. Multi-Byte String Functions' />
+   <param name="Include-MCAL-Functions" value='true' description='LIV. MCAL Functions' />
+   <param name="Include-Mcrypt-Encryption-Functions" value='true' description='LV. Mcrypt Encryption Functions' />
+   <param name="Include-MCVE-Payment-Functions" value='true' description='LVI. MCVE Payment Functions' />
+   <param name="Include-Mhash-Functions" value='true' description='LVII. Mhash Functions' />
+   <param name="Include-Mimetype-Functions" value='true' description='LVIII. Mimetype Functions' />
+   <param name="Include-Microsoft-SQL-Server-Functions" value='true' description='LIX. Microsoft SQL Server Functions' />
+   <param name="Include-Ming-Functions-For-Flash" value='true' description='LX. Ming functions for Flash' />
+   <param name="Include-Miscellaneous-Functions" value='true' description='LXI. Miscellaneous Functions' />
+   <param name="Include-MnoGoSearch-Functions" value='true' description='LXII. mnoGoSearch Functions' />
+   <param name="Include-MSQL-Functions" value='true' description='LXIII. mSQL Functions' />
+   <param name="Include-MySQL-Functions" value='true' description='LXIV. MySQL Functions' />
+   <param name="Include-Improved-MySQL-Extension" value='true' description='LXV. Improved MySQL Extension' />
+   <param name="Include-Mohawk-Software-Session-Handler-Functions" value='true' description='LXVI. Mohawk Software Session Handler Functions' />
+   <param name="Include-Muscat-Functions" value='true' description='LXVII. muscat Functions' />
+   <param name="Include-Network-Functions" value='true' description='LXVIII. Network Functions' />
+   <param name="Include-Ncurses-Terminal-Screen-Control-Functions" value='true' description='LXIX. Ncurses Terminal Screen Control Functions' />
+   <param name="Include-Lotus-Notes-Functions" value='true' description='LXX. Lotus Notes Functions' />
+   <param name="Include-NSAPI-specific-Functions" value='true' description='LXXI. NSAPI-specific Functions' />
+   <param name="Include-Unified-ODBC-Functions" value='true' description='LXXII. Unified ODBC Functions' />
+   <param name="Include-Object-Aggregation-Composition-Functions" value='true' description='LXXIII. Object Aggregation/Composition Functions' />
+   <param name="Include-Oracle-New-Functions" value='true' description='LXXIV. Oracle 8 new functions' />
+   <param name="Include-OpenSSL-Functions" value='true' description='LXXV. OpenSSL Functions' />
+   <param name="Include-Oracle-Functions" value='true' description='LXXVI. Oracle Functions' />
+   <param name="Include-Ovrimos-SQL-Functions" value='true' description='LXXVII. Ovrimos SQL Functions' />
+   <param name="Include-Output-Control-Functions" value='true' description='LXXVIII. Output Control Functions' />
+   <param name="Include-Object-Property-And-Method-Call-Overloading" value='true' description='LXXIX. Object property and method call overloading' />
+   <param name="Include-PDF-Functions" value='true' description='LXXX. PDF functions' />
+   <param name="Include-Verisign-Payflow-Pro-Functions" value='true' description='LXXXI. Verisign Payflow Pro Functions' />
+   <param name="Include-PHP-Options-Information" value='true' description='LXXXII. PHP Options&amp;Information' />
+   <param name="Include-POSIX-Functions" value='true' description='LXXXIII. POSIX Functions' />
+   <param name="Include-PostgreSQL-Functions" value='true' description='LXXXIV. PostgreSQL Functions' />
+   <param name="Include-Process-Control-Functions" value='true' description='LXXXV. Process Control Functions' />
+   <param name="Include-Program-Execution-Functions" value='true' description='LXXXVI. Program Execution Functions' />
+   <param name="Include-Printer-Functions" value='true' description='LXXXVII. Printer Functions' />
+   <param name="Include-Pspell-Functions" value='true' description='LXXXVIII. Pspell Functions' />
+   <param name="Include-GNU-Readline" value='true' description='LXXXIX. GNU Readline' />
+   <param name="Include-GNU-Recode-Functions" value='true' description='XC. GNU Recode Functions' />
+   <param name="Include-Regular-Expression-Functions-Perl-Compatible" value='true' description='XCI. Regular Expression Functions (Perl-Compatible)' />
+   <param name="Include-Qtdom-Functions" value='true' description='XCII. qtdom Functions' />
+   <param name="Include-Regular-Expression-Functions-POSIX-Extended" value='true' description='XCIII. Regular Expression Functions (POSIX Extended)' />
+   <param name="Include-Semaphore-Shared-Memory-And-IPC-Functions" value='true' description='XCIV. Semaphore, Shared Memory and IPC Functions' />
+   <param name="Include-SESAM-Database-Functions" value='true' description='XCV. SESAM Database Functions' />
+   <param name="Include-Session-Handling-Functions" value='true' description='XCVI. Session Handling Functions' />
+   <param name="Include-Shared-Memory-Functions" value='true' description='XCVII. Shared Memory Functions' />
+   <param name="Include-SimpleXML-Functions" value='true' description='XCVIII. SimpleXML functions' />
+   <param name="Include-SOAP-Functions" value='true' description='XCIX. SOAP Functions' />
+   <param name="Include-SQLite" value='true' description='C. SQLite' />
+   <param name="Include-Shockwave-Flash-Functions" value='true' description='CI. Shockwave Flash Functions' />
+   <param name="Include-SNMP-Functions" value='true' description='CII. SNMP Functions' />
+   <param name="Include-Socket-Functions" value='true' description='CIII. Socket Functions' />
+   <param name="Include-Standard-PHP-Library-SPL-Functions" value='true' description='CIV. Standard PHP Library (SPL) Functions' />
+   <param name="Include-Stream-Functions" value='true' description='CV. Stream Functions' />
+   <param name="Include-String-Functions" value='true' description='CVI. String Functions' />
+   <param name="Include-Sybase-Functions" value='true' description='CVII. Sybase Functions' />
+   <param name="Include-TCP-Wrappers-Functions" value='true' description='CVIII. TCP Wrappers Functions' />
+   <param name="Include-Tidy-Functions" value='true' description='CIX. Tidy Functions' />
+   <param name="Include-Tokenizer-Functions" value='true' description='CX. Tokenizer Functions' />
+   <param name="Include-URL-Functions" value='true' description='CXI. URL Functions' />
+   <param name="Include-Variable-Functions" value='true' description='CXII. Variable Functions' />
+   <param name="Include-Vpopmail-Functions" value='true' description='CXIII. vpopmail Functions' />
+   <param name="Include-W-api-Functions" value='true' description='CXIV. W32api Functions' />
+   <param name="Include-WDDX-Functions" value='true' description='CXV. WDDX Functions' />
+   <param name="Include-XML-Parser-Functions" value='true' description='CXVI. XML Parser Functions' />
+   <param name="Include-XML-RPC-Functions" value='true' description='CXVII. XML-RPC Functions' />
+   <param name="Include-Xdiff-Functions" value='true' description='CXVIII. xdiff Functions' />
+   <param name="Include-XSLT-Functions" value='true' description='CXIX. XSLT Functions' />
+   <param name="Include-YAZ-Functions" value='true' description='CXX. YAZ Functions' />
+   <param name="Include-YP-NIS-Functions" value='true' description='CXXI. YP/NIS Functions' />
+   <param name="Include-Zip-File-Functions-Read-Only-Access" value='true' description='CXXII. Zip File Functions (Read Only Access)' />
+   <param name="Include-Zlib-Compression-Functions" value='true' description='CXXIII. Zlib Compression Functions' />
+</parameters>

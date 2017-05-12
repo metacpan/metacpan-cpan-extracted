@@ -1,0 +1,22 @@
+TYPEMAP
+CircleShape*		O_OBJECT
+Color*			O_OBJECT
+Texture*		O_OBJECT
+Transform*		O_OBJECT
+ConvexShape*		O_OBJECT
+Font*			O_OBJECT
+Glyph*			O_OBJECT
+Image*			O_OBJECT
+RectangleShape*		O_OBJECT
+RenderStates*		O_OBJECT
+Shader*			O_OBJECT
+BlendMode*		O_OBJECT
+RenderTexture*		O_OBJECT
+View*			O_OBJECT
+RenderWindow*		O_OBJECT
+Shader*			O_OBJECT
+Sprite*			O_OBJECT
+Text*			O_OBJECT
+Transformable*		O_OBJECT
+Vertex*			O_OBJECT
+VertexArray*		O_OBJECT

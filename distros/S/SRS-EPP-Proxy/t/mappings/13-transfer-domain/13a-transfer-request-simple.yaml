@@ -1,0 +1,34 @@
+template: transfer-domain.tt
+
+vars:
+  domain: mozzarella.co.te
+  auth: UDAjUDAj
+
+input_assertions:
+  class: SRS::EPP::Command::Transfer::Domain
+  match:
+    - [ '//domain:name', 'mozzarella.co.te', 'Domain correctly included in XML' ]
+    - [ '//domain:pw', 'UDAjUDAj', 'found auth info data' ]
+
+SRS:
+ - assertions:
+     count:
+       - [ '//Whois', 1, 'SRS: generated Whois' ]
+       - [ '//DomainUpdate', 1, 'SRS: generated DomainUpdate' ]
+     match:
+       - [ '//DomainNameFilter', 'mozzarella.co.te', 'SRS: Updating correct domain' ]
+     attr_is:
+        - [ '//DomainUpdate', 'ConvertContactsToHandles', 1, 'Requested contacts be updated to handles' ]
+   
+output_assertions:
+  attr_is:
+    - [ '//epp:result', 'code', 1000, 'EPP: Correct response code' ]
+  match:
+    - [ '//domain:name', 'mozzarella.co.te', 'EPP: Correct domain name returned' ]
+    - [ '//domain:trStatus', 'serverApproved', 'EPP: Correct status' ]
+    - [ '//domain:reID', '100', 'EPP: Correct reID' ]
+    - [ '//domain:reDate', '/\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d:\d\d/', 'EPP: Correct reDate' ]
+    - [ '//domain:acID', '100', 'EPP: Correct acID' ]
+    - [ '//domain:acDate', '/\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d:\d\d/', 'EPP: Correct acDate' ]
+  count:
+    - [ '//domain:exDate', '0', 'EPP: No exDate returned' ]

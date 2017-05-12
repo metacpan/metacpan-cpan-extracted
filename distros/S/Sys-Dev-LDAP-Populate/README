@@ -1,0 +1,54 @@
+Sys-Dev-LDAP-Populate
+
+This provides a EESDP compatible method for populating entries under
+"/dev/ldap/".
+
+A rcNG implementation is also provided to initiating it upon boot on rcNG systems.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+If rcNG support is desired.
+
+	cp -rp rcNG/* /usr/local/etc/rc.d/
+	echo devldappopulate_enable=\"YES\" >> /etc/rc.conf
+
+RCNG SUPPORT
+
+rcNG startup scripts for FreeBSD are also provided.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Sys::Dev::LDAP::Populate
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Sys-Dev-LDAP-Populate
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Sys-Dev-LDAP-Populate
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Sys-Dev-LDAP-Populate
+
+    Search CPAN
+        http://search.cpan.org/dist/Sys-Dev-LDAP-Populate/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Zane C. Bowers
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

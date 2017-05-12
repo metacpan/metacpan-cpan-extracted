@@ -1,0 +1,25 @@
+---
+name: SOAP-DirectI
+version: 0.001
+author: []
+abstract: 'SOAP::DirectI -- extra-lite SOAP module for DirectI-like webservices'
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Smart::Comments: 0
+  perl: 5.006
+build_requires:
+  Test::More: 0
+provides:
+  SOAP::DirectI:
+    file: lib/SOAP/DirectI.pm
+    version: 0.001
+  SOAP::DirectI::Parse:
+    file: lib/SOAP/DirectI/Parse.pm
+  SOAP::DirectI::Serialize:
+    file: lib/SOAP/DirectI/Serialize.pm
+generated_by: Module::Build version 0.3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

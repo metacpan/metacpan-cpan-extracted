@@ -1,0 +1,13 @@
+Revision history for Perl extension String::BitCount.
+
+1.1   Thu Nov  2 16:31:29 1995
+	- original version
+
+1.11  Wed Dec 11 14:09:35 1996
+	- integrate MakeMaker
+
+1.12  Thu Mar 27 23:50:32 2003
+        - warn on wide character arguments
+
+1.13  Mon Mar 31 15:25:22 2003
+	- use 'unpack("%32b*", $string)'

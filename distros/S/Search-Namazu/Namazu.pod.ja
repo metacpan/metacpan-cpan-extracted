@@ -1,0 +1,149 @@
+=head1 名前 (NAME)
+
+Search::Namazu - Namazu 検索モジュール
+
+=head1 書式 (SYNOPSIS)
+
+  use Search::Namazu;
+
+  @hlists = Search::Namazu::Search(index => '/usr/local/namazu/index',
+				query => 'foo');
+
+  foreach my $hlist (@hlists) {
+      print ($hlist->score, $hlist->uri, $hlist->date, $hlist->rank);
+  }
+
+=head1 説明 (DESCRIPTION)
+
+このモジュールは、Namzu ライブラリのインターフェースです。
+Namazu は全文検索システムの一種で、
+http://www.namazu.org/
+より入手できます。
+
+=head1 概要 (OVERVIEW)
+
+検索用インターフェースとして、Search::Namazu::Search という関数が
+用意されています。この関数を呼ぶと、引数の応じた検索が行なわれ、結果として
+Search::Namazu::Result オブジェクトの配列を返します。
+
+Search::Namazu::Result オブジェクトは個々の検索結果として、
+スコア, URI, 日付, ランクを保持しています。
+
+=head2 Search::Namazu::Search
+
+関数 Search::Namazu::Search は引数としてハッシュのリファレンスをとります。
+指定可能なキーは以下の通りです。
+
+=head3 index
+
+インデックスファイルの存在するパスを指定します。単独のインデックスを
+参照する場合は文字列をスカラ値をして与えますが、複数のインデックスを指定する
+場合には配列のリファレンスを指定します。
+
+以下の例では、/var/www/index/site1 と /var/www/index/site1 の2つの
+インデックスから、文字列 'foo' を検索しています。
+
+  @result = Search::Namazu::Search(
+  	index => ['/var/www/index/site1', '/var/www/index/site2'],
+        query => 'foo'
+        );
+
+=head3 query
+
+検索式を文字列として指定します。式は namazu コマンドで利用できる
+ものと同じです。
+
+=head3 sortMethod
+
+検索結果の並べ方を指定します。指定可能な引数は以下の通りです。
+
+=over 4
+
+=item B<NMZ_SORTBYDATE>
+
+日付順に並べる
+
+=item B<NMZ_SORTBYSCORE>
+
+スコア順に並べる
+
+=item  B<NMZ_SORTBYFIELD>
+
+フィールド順に並べる
+
+=back
+
+省略した場合は NMZ_SORTBYDATE が指定されたものとして扱われます。
+
+=head3 sortOrder
+
+検索結果の並び順を指定します。指定可能な引数は以下の通りです。
+
+=over 4
+
+=item B<NMZ_DESCENDSORT>
+
+降順
+
+=item B<NMZ_ASCENDSORT>
+
+昇順
+
+=back
+
+省略した場合は NMZ_DESCENDSORT が指定されたものとして扱われます。
+
+=head3 lang
+
+言語を指定します。
+日本語文章を対象に検索を行なう場合は、'ja' を指定する必要があります。
+
+=head2 Search::Namazu::Result
+
+Search::Namazu::Result は検索結果を保持するためのオブジェクトです。
+このオブジェクトには以下のメソッドがあります。
+
+=head3 score
+
+スコアを返します。
+
+=head3 uri
+
+URI を返します。
+
+=head3 date
+
+日付を返します。
+
+=head3 rank
+
+ランクを返します。
+
+=head3 summary
+
+サマリを返します。
+
+=head3 title
+
+タイトルを返します。
+
+=head1 著作権 (COPYRIGHT)
+
+Copyright 1999,2000,2001,2002 NOKUBI Takatsugu All rights reserved.
+This is free software with ABSOLUTELY NO WARRANTY.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA
+

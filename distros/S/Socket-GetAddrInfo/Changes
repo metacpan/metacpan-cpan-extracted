@@ -1,0 +1,174 @@
+Revision history for Socket-GetAddrInfo
+
+0.22    CHANGES:
+         * Move most exports into @EXPORT_OK
+         * Provide exception-throwing version of API in
+           Socket::GetAddrInfo::Strict
+         * Wrap lots more flag constants
+            + AI_IDN, AI_V4MAPPED, AI_ALL, AI_ADDRCONFIG
+            + NI_IDN, NI_NOFQDN
+            + EAI_SYSTEM, EAI_BADHINTS, EAI_PROTOCOL
+         * Implement NIx_NOHOST and NIx_NOSERV; flags to getnameinfo to
+           request only one of host or service name
+         * No longer supports API import tags
+         * Docs improvements - added some code examples
+
+0.21    BUGFIXES:
+         * Exporter 5.57 is required - this has shipped with perl since 5.8.3,
+           but now explicitly declared for 5.6.2
+         * getservbyport() needs a protocol name on 5.6.2
+
+0.20    CHANGES:
+         * Added bin/getaddrinfo and bin/getnameinfo script (replaces previous
+           examples/gai.pl)
+         * Split Socket6api into its own module
+         * Emulate AI_NUMERICSERV in PP emulation since most OSes in practice
+           support it, even though RFC 2553 doesn't define it
+         * Provide Exporter tags for named constants
+         * Don't even attempt to build XS code if no C compiler is available
+         * Try to use core's Socket::getaddrinfo if it exists; as it does on
+           Socket 1.93 (perl 5.13.9).
+         * Avoid Test::Exception and Test::Warn as they're non-core and pull
+           in Sub::UpLevel
+         * Use ExtUtils::CChecker 0.06's ability to write a config.h rather
+           than using C commandline -DFOO that might not be portable
+         * Moved legacy resolver emulation code into its own PP.pm for code
+           neatness
+
+        BUGFIXES:
+         * Bugfix for non-C99 compilers - avoid C99-style struct initialiser
+         * Bugfix for threaded perls - aTHX/pTHX in err_to_SV()
+         * More MSWin32 fixes [rurban]
+         * Use ppport.h
+
+0.19    BUGFIXES:
+         * Can't store &PL_sv_undef in an HV; store newSV(0) instead
+         * Handle magic in getaddrinfo() args [chansen]
+         * Win32 build fixes [chansen]
+
+0.18    BUGFIXES:
+         * Fix plain number passing for getaddrinfo()'s service on perl
+           versions <5.10.0
+
+0.17    BUGFIXES:
+         * Fix 'protocol' hint to getaddrinfo()
+
+0.16    CHANGES:
+         * Accept undef as absent host/service name, as well as ""
+
+        BUGFIXES:
+         * Need -lsocket on some OSes; hunt it using ExtUtils::CChecker
+
+0.15    CHANGES:
+         * Use XSLoader instead of DynaLoader
+         * import Exporter::import instead of @ISAing it
+         * Use ExtUtils::CChecker for build checking
+
+0.14    BUGFIXES:
+         * Don't leak memory on getnameinfo() failures
+         * Avoid possible sockaddr alignment errors by allocating/copying a
+           new buffer
+         (thanks to Zefram)
+
+0.13    CHANGES:
+         * Don't warn if only importing symbolic constants; test this
+         * Added Test::Pod testing
+         * Docs neatening in L<> links
+
+0.12    CHANGES:
+         * Added 'use warnings'
+         * Added 'gai.pl' example
+
+0.11    CHANGES:
+         * Pass "socktype => SOCK_STREAM" hint in example
+         * Use "return 1" rather than "exit(1)" in C code to avoid needing
+           <unistd.h>; may improve builds on non-UNIX platforms
+
+        BUGFIXES:
+         * Declare ExtUtils::CBuilder as a configure_requires dependency, and
+           fail gracefully if it still isn't installed when Build.PL runs
+
+0.10    BUGFIXES:
+         * Fixed a bug in getnameinfo() when handling IPv6 addresses, where
+           a buffer overrun causes at least a failure from libc, but has the
+           potential to cause a stack corruption or segfault.
+
+0.09    CHANGES:
+         * Conditionally skip the tests for missing hostnames if the legacy
+           resolver finds an address anyway. This may mitigate test FAILs on
+           smoke test machines with wildcard DNS servers.
+
+0.08    CHANGES:
+         * Declare as release
+
+0.08_7  CHANGES:
+         * Make sure to sv_2mortal() returned SV*s in XS code
+
+        BUGFIXES:
+         * Minor changes to test scripts that should reduce cornercase FAILs,
+           or at least help debug them if they occur
+
+0.08_6  BUGFIXES:
+         * Set 'sa_len' member of sockaddr structure if platform needs it
+
+0.08_5  BUGFIXES:
+         * Better comparison of sockaddr returns - unpack and test components
+           to avoid errors on platforms that use sin_len, since Socket doesn't
+         * Use XSRETURN() in XS functions to ensure stack is correct height
+         * Better diagnostic if $err tests fail - convert number to symbolic
+           constant
+
+0.08_4  BUGFIXES:
+         * Define constants in XS code wrapped in #ifdef tests, to ensure
+           only ones that the platform defines are attempted.
+         * Print whether PP or XS implementation are being used in the
+           t/00use.t file
+
+0.08_3  BUGFIXES:
+         * Use ExtUtils::CBuilder to compile the test .c file in the
+           Configure() stage, to make it (hopefully) more portable
+         * Some OSes return $err==0 but no results for invalid names - make
+           sure the test script can cope.
+
+0.08_2  BUGFIXES:
+         * Declare variables in "PREINIT" XS section, not "INIT"; keeps
+           non-C99 compilers happy
+         * Skip tests that require internet connectivity unless the tester
+           declares it possible
+         * Declare test counts upfront in testing scripts
+         * Renamed XS functions 'getaddrinfo' and 'getnameinfo'; no need to
+           prefix with 'real_'
+         * Folded Configure.pl inline into Build.PL, in case it has to make
+           further decisions
+
+0.08_1  CHANGES:
+         * Complete rewrite to XS+PP emulation system. No longer uses Socket6
+           on account of API and error reporting issues.
+         * Provided two styles of API at import time (:newapi and :Socket6api)
+           to allow caller to choose between RFC2553-like or Socket6 styles
+
+0.07    BUGFIXES:
+         * Ensure that emulated getaddrinfo() copes with family=AF_UNSPEC (0)
+
+0.06    BUGFIXES:
+         * Avoid (harmless) "Constant subroutine .. redefined" warnings if
+           'use'd multiple times, when Socket6 is not available.
+
+0.05    CHANGES:
+         * Reworded DESCRIPTION section of documentation
+         * Fixed some bugs in the SYNOPSIS example
+
+0.04    BUGFIXES:
+         * Declare dependency on Test::Exception
+         * Fixed skip count in test in 01getaddrinfo-socket6.t
+
+0.03    CHANGES:
+         * Changed getnameinfo() to avoid needing sockaddr_family(), which
+           avoids a version check, which means it works on perl 5.6.1
+
+0.02    BUGFIXES:
+         * Declare required version of Socket.pm sufficient to have
+           sockaddr_family()
+
+0.01    First version, released on an unsuspecting world.
+

@@ -1,0 +1,63 @@
+{
+   "abstract" : "Common Widgets using SDL",
+   "author" : [
+      "Dustin Mays, garu, Zpmorgan, kthakore, FROGGS"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "SDLx-Widget",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "SDL" : "2.523",
+            "Test::More" : "0.88"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Clipboard" : "0",
+            "Mouse" : "0",
+            "SDL" : "2.523"
+         }
+      }
+   },
+   "provides" : {
+      "SDLx::Widget" : {
+         "file" : "lib/SDLx/Widget.pm",
+         "version" : "0.072"
+      },
+      "SDLx::Widget::Menu" : {
+         "file" : "lib/SDLx/Widget/Menu.pm",
+         "version" : "0.072"
+      },
+      "SDLx::Widget::Textbox" : {
+         "file" : "lib/SDLx/Widget/Textbox.pm",
+         "version" : "0.072"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/PerlGameDev/SDLx-Widget/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/PerlGameDev/SDLx-Widget"
+      }
+   },
+   "version" : "0.072"
+}

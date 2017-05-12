@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Spreadsheet-WriteExcel-FromXML
+version:      1.1
+version_from: lib/Spreadsheet/WriteExcel/FromXML.pm
+installdirs:  site
+requires:
+    OLE::Storage_Lite:             0.11
+    Spreadsheet::WriteExcel:       0.41
+    XML::Parser:                   2.31
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

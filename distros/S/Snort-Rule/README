@@ -1,0 +1,142 @@
+NAME
+    Snort::Rule - Perl extension for dynamically building snort rules
+
+SYNOPSIS
+      use Snort::Rule;
+      $rule = Snort::Rule->new(
+            -action => 'alert',
+            -proto  => 'tcp',
+            -src    => 'any',
+            -sport  => 'any',
+            -dir    => '->',
+            -dst    => '192.188.1.1',
+            -dport  => '44444',
+      );
+
+      $rule->opts('msg','Test Rule"');
+      $rule->opts('threshold','type limit,track by_src,count 1,seconds 3600');
+      $rule->opts('sid','500000');
+
+      print $rule->string()."\n";
+
+      OR
+
+      $rule = 'alert tcp $SMTP_SERVERS any -> $EXTERNAL_NET 25 (msg:"BLEEDING-EDGE POLICY SMTP US Top Secret PROPIN"; flow:to_server,established; content:"Subject|3A|"; pcre:"/(TOP\sSECRET|TS)//[\s\w,/-]*PROPIN[\s\w,/-]*(?=//(25)?X[1-9])/ism"; classtype:policy-violation; sid:2002448; rev:1;)';
+
+      $rule = Snort::Rule->new(-parse => $rule);
+      print $rule->string()."\n";
+
+DESCRIPTION
+    This is a very simple snort rule object. It was developed to allow for
+    scripted dynamic rule creation. Ideally you could dynamically take a
+    list of bad hosts and build an array of snort rule objects from that
+    list. Then write that list using the string() method to a snort rules
+    file.
+
+OBJECT METHODS
+  new
+    Reads in the initial headers to generate a rule and constructs the
+    snort::rule object around it.
+
+    Accepts:
+
+      -action => [string] ? [alert|log|pass|...] : 'alert'
+      -proto => [string] ? [ip|udp|tcp|...] : 'IP'
+      -src => [string] ? [$strIp] : 'any'
+      -sport => [int] ? [$sport] : 'any'
+      -dir => [string] ? [->|<-|<>] : '->'
+      -dst => [string] ? [$strIp] : 'any'
+      -dport => [int] ? [$dport] : 'any'
+      -opts => [hashref] ? [hashref] : '';
+
+      -parse => $strRule # for parsing an existing rule into the object
+
+    Returns: OBJECTREF
+
+  string
+    Outputs the rule in string form.
+
+      print $sr->string()."\n";
+
+    Prints "options only" string:
+
+      print $sr->string(-optionsOnly => 1)."\n";
+
+  action
+    Sets and returns the rule action [alert,log,pass,...]
+
+      $rule->action('alert');
+
+  proto
+    Sets and returns the protocol used in the rule [tcp,icmp,udp]
+
+      $rule->proto('tcp');
+
+  src
+    Sets and returns the source used in the rule. Make sure you use SINGLE
+    QUOTES for variables!!!
+
+      $rule->src('$EXTERNAL_NET');
+
+  sport
+    Sets and returns the source port used in the rule
+
+      $rule->sport(80);
+
+  dir
+    Sets and returns the direction operator used in the rule, -> <- or <>
+
+      $rule->dir('->');
+
+  dst
+    Sets and returns the destination used in the rule
+
+      $rule->dst('$HOME_NET');
+      $rule->dst('192.168.1.1');
+
+  dport
+    Sets and returns the destination port used in the rule
+
+      $rule->dport(6667);
+
+  opts
+    Sets an option and a value used in the rule. This currently can only be
+    done one set at a time, and is printed in the order it was set.
+
+      $rule->opts(option,value);
+      $rule->opts('msg','this is a test rule');
+
+    This will return a hashref: $hashref->{$keyOrderValue}->{option} and
+    $hashref->{$keyOrderValue}->{value}
+
+      my $hashref = $rule->opts();
+
+    There is a fixQuotes() function that reads through this information
+    before setting it, just to ensure the right options are sane. It's a
+    very very basic function, but it seems to get the job done.
+
+    This method will also accept HASHREF's for easier use:
+
+      $rule->opts({
+            msg     => 'test1',
+            rev     => '222',
+            content => 'Subject|3A|',
+            nocase => '',
+      });
+
+      By passing an option => '', the parser will set its value to "''". When $self->string() is called, the option will be written as: option;
+      ex: nocase => '', will result in an option output of: ...., nocase; ...
+
+  opt
+    Gets the value of the first option with a given name.
+
+      $rule->opt(option);
+      print $rule->opt('sid') . ': ' . $rule->opt('msg');
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2006 by Wes Young
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.6 or, at
+    your option, any later version of Perl 5 you may have available.
+

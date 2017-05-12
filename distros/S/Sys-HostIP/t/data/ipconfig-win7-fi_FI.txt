@@ -1,0 +1,39 @@
+
+Windows IP-m‰‰ritykset
+
+
+Ethernet-sovitin LAN-Verbindung:
+
+        Yhteyskohtainen DNS-liite . . . . : S_W_3V_1_3_0
+   IPv6-osoite . . . . . . . . . . . : 2003:e7:93ce:2801:71f4:f151:8100:f395
+   Tilap‰inen IPv6-osoite. . . . . . : 2003:e7:93ce:2801:2d03:317f:1567:19ee
+   Linkin paikallinen IPv6-osoite. . : fe80::71f4:f151:8100:f395%11
+   IPv4-osoite . . . . . . . . . . . : 192.168.2.118
+        Aliverkon peite . . . . . . . . . : 255.255.255.0
+        Oletusyhdysk‰yt‰v‰. . . . . . . . : fe80::1%11
+                                            192.168.2.1
+
+Ethernet-sovitin VirtualBox Host-Only Network:
+
+        Yhteyskohtainen DNS-liite . . . . :
+   Linkin paikallinen IPv6-osoite. . : fe80::a8fa:b31b:672b:b415%14
+   IPv4-osoite . . . . . . . . . . . : 192.168.56.1
+        Aliverkon peite . . . . . . . . . : 255.255.255.0
+        Oletusyhdysk‰yt‰v‰. . . . . . . . :
+
+Tunnelisovitin isatap.S_W_3V_1_3_0:
+
+        Laitteen tila . . . . . . . . . . : Ei kytketty
+        Yhteyskohtainen DNS-liite . . . . : S_W_3V_1_3_0
+
+Tunnelisovitin LAN-Verbindung* 3:
+
+        Yhteyskohtainen DNS-liite . . . . :
+   IPv6-osoite . . . . . . . . . . . : 2001:0:9d38:78cf:c02:3711:a4ee:a12d
+   Linkin paikallinen IPv6-osoite. . : fe80::c02:3711:a4ee:a12d%13
+        Oletusyhdysk‰yt‰v‰. . . . . . . . :
+
+Tunnelisovitin isatap.{2F276BC5-ADC1-4179-BFB7-161CEA6B8A27}:
+
+        Laitteen tila . . . . . . . . . . : Ei kytketty
+        Yhteyskohtainen DNS-liite . . . . :

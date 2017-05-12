@@ -1,0 +1,33 @@
+# Successful update
+template: update-contact.tt
+
+vars:
+  email: update@email.com
+  contact_id: simple1
+  city: blah
+  ccode: NZ
+  street: street1
+  transaction_id: cheese
+
+input_assertions:
+  class: SRS::EPP::Command::Update::Contact
+  match:
+
+SRS:
+ - assertions:
+     attr_is:
+       - [ '/NZSRSRequest/HandleUpdate', 'HandleId', 'simple1', 'SRS: handle id correct on request' ]
+       - [ '/NZSRSRequest/HandleUpdate', 'Email', 'update@email.com', 'SRS: email correct on request' ]
+       - [ '/NZSRSRequest/HandleUpdate/PostalAddress', 'Address1', 'street1', 'SRS: address1 correct on request' ]
+       - [ '/NZSRSRequest/HandleUpdate/PostalAddress', 'Address2', '', 'SRS: address2 correct on request' ]
+       - [ '/NZSRSRequest/HandleUpdate/PostalAddress', 'PostalCode', '', 'SRS: postalcode correct on request' ]
+       - [ '/NZSRSRequest/HandleUpdate/PostalAddress', 'Province', '', 'SRS: province correct on request' ]
+       - [ '/NZSRSRequest/HandleUpdate/PostalAddress', 'City', 'blah', 'SRS: city correct on request' ]
+       - [ '/NZSRSRequest/HandleUpdate/PostalAddress', 'CountryCode', 'NZ', 'SRS: country code correct on request' ]
+output_assertions:
+  count: 
+    - [ '//epp:resData', 0, "No res data returned"]
+  attr_is:
+    - [ '//epp:result', 'code', 1000, 'EPP: Correct response code' ]
+
+

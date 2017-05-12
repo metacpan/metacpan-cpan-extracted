@@ -1,0 +1,39 @@
+Revision history for Perl extension Syndication::ESF.
+
+0.13  Wed Nov 18 2009
+    - repackaged with a new version of Module::Install
+
+0.12  Wed Feb 27 2008
+    - Module::Install update
+
+0.11  Thu Oct 18 2007
+    - fix versioning
+    - repackaged with Module::Install
+
+0.1   Tue Apr 18 2006
+    - minor code cleanup
+    - switch to Module::Build
+
+0.06  Fri Mar 04 2005
+    - made file parsing more portable (thanks RJBS)
+
+0.05  Wed Mar 02 2005
+    - added pod and pod_coverage tests
+
+0.04  Sun Sep 19 2004
+    - Pod fixups
+    - file opening now croaks on failure
+
+0.03  Wed Jan 21 2004
+    - Fixed up directory structure of distribution
+    - Internally, channel() is used rather than direct data access
+    - Contact name/email is extract when contact info is set not
+      when the accessors are used
+
+0.02  Sun Aug 10 2003
+    - Added (get) contact_name, contact_email convenience methods
+
+0.01  Fri May 30 16:20:10 2003
+    - original version; created by h2xs 1.21 with options
+        -AX Syndication::ESF
+

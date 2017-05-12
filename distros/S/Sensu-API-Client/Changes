@@ -1,0 +1,7 @@
+Revision history for Sensu-API-Client
+
+0.02      2014-06-10 17:15:13+02:00 Europe/Madrid
+    - Wrong version of HTTP::Tiny required
+
+0.01      2014-05-28 15:40:15+02:00 Europe/Madrid
+    - Initial release

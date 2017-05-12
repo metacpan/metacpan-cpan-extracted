@@ -1,0 +1,446 @@
+ifconfigs:
+
+Slackware 12
+eth0      Link encap:Ethernet  HWaddr 00:60:08:9A:20:54 
+          inet addr:10.0.0.171  Bcast:10.0.0.175  Mask:255.255.255.248         
+          inet6 addr: fe80::260:8ff:fe9a:2054/64 Scope:Link 
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1 
+          RX packets:6883796 errors:0 dropped:0 overruns:0 frame:0 
+          TX packets:7407322 errors:0 dropped:0 overruns:0 carrier:0 
+          collisions:0 txqueuelen:1000 
+          RX bytes:1176340119 (1.0 GiB)  TX bytes:971282220 (926.2 MiB) 
+          Interrupt:10 Base address:0xe400 
+ 
+eth1      Link encap:Ethernet  HWaddr 00:50:04:C1:6E:9C 
+          inet addr:10.10.10.10  Bcast:10.10.10.255  Mask:255.255.255.0 
+          inet6 addr: fe80::250:4ff:fec1:6e9c/64 Scope:Link 
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1 
+          RX packets:362589 errors:0 dropped:0 overruns:0 frame:0 
+          TX packets:68804 errors:0 dropped:0 overruns:0 carrier:0 
+          collisions:0 txqueuelen:1000 
+          RX bytes:76791617 (73.2 MiB)  TX bytes:8630153 (8.2 MiB) 
+          Interrupt:12 Base address:0x6000 
+ 
+lo        Link encap:Local Loopback 
+          inet addr:127.0.0.1  Mask:255.0.0.0 
+          inet6 addr: ::1/128 Scope:Host 
+          UP LOOPBACK RUNNING  MTU:16436  Metric:1 
+          RX packets:8558002 errors:0 dropped:0 overruns:0 frame:0 
+          TX packets:8558002 errors:0 dropped:0 overruns:0 carrier:0 
+          collisions:0 txqueuelen:0 
+          RX bytes:810375725 (772.8 MiB)  TX bytes:810375725 (772.8 MiB) 
+#####################################################################
+
+RHEL 5
+eth0      Link encap:Ethernet  HWaddr 00:0D:29:E6:3D:CB
+          inet addr:10.0.0.134  Bcast:10.0.0.255  Mask:255.255.255.0
+          inet6 addr: fe80::20c:29ff:feb6:2dcb/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:717960 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:300550 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000
+          RX bytes:95051326 (90.6 MiB)  TX bytes:115335543 (109.9 MiB)
+          Interrupt:177 Base address:0x1400
+
+lo        Link encap:Local Loopback
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:16436  Metric:1
+          RX packets:5616664 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:5616664 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:616629734 (588.0 MiB)  TX bytes:616629734 (588.0 MiB)
+
+sit0      Link encap:IPv6-in-IPv4
+          NOARP  MTU:1480  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 b)  TX bytes:0 (0.0 b)
+#####################################################################
+RHEL 7
+
+ens192: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 10.0.0.10  netmask 255.255.255.0  broadcast 10.0.0.255
+        inet6 0000::000:0000:0000:0000  prefixlen 64  scopeid 0x20<link>
+        ether 00:0c:29:a9:97:b3  txqueuelen 1000  (Ethernet)
+        RX packets 1705673  bytes 1471246853 (1.3 GiB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 644264  bytes 1227662821 (1.1 GiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+ens224: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 11.0.0.10  netmask 255.255.255.192  broadcast 0.0.0.0
+        inet6 fe80::20c:29ff:fea9:97bd  prefixlen 64  scopeid 0x20<link>
+        ether 00:0c:29:a9:97:bd  txqueuelen 1000  (Ethernet)
+        RX packets 195933  bytes 47326211 (45.1 MiB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 148883  bytes 219509319 (209.3 MiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet6 ::1  prefixlen 128  scopeid 0x10<host>
+        loop  txqueuelen 0  (Local Loopback)
+        RX packets 1852  bytes 176253 (172.1 KiB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 1852  bytes 176253 (172.1 KiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+#####################################################################
+
+FREEBSD 6.1-RELEASE:
+xl0: flags=8843<UP,BROADCAST,RUNNING,SIMPLEX,MULTICAST> mtu 1500
+        options=8<VLAN_MTU>
+        inet6 fe80::260:97ff:fec3:b458%xl0 prefixlen 64 scopeid 0x1 
+        inet 172.24.14.18 netmask 0xfffffc00 broadcast 172.24.15.255
+        inet 172.24.14.28 netmask 0xfffffc00 broadcast 172.24.15.255
+        ether 00:60:97:c3:b4:58
+        media: Ethernet autoselect (100baseTX <full-duplex>)
+        status: active
+fxp0: flags=8843<UP,BROADCAST,RUNNING,SIMPLEX,MULTICAST> mtu 1500
+        options=8<VLAN_MTU>
+        inet6 fe80::2d0:b7ff:fe88:cd91%fxp0 prefixlen 64 scopeid 0x2 
+        inet 10.0.0.42 netmask 0xffffff80 broadcast 10.0.0.127
+        ether 00:d0:b7:88:cd:91
+        media: Ethernet autoselect (100baseTX <full-duplex>)
+        status: active
+plip0: flags=108810<POINTOPOINT,SIMPLEX,MULTICAST,NEEDSGIANT> mtu 1500
+lo0: flags=8049<UP,LOOPBACK,RUNNING,MULTICAST> mtu 16384
+        inet6 ::1 prefixlen 128 
+        inet6 fe80::1%lo0 prefixlen 64 scopeid 0x4 
+        inet 127.0.0.1 netmask 0xff000000 
+######################################################################
+
+DEBIAN LINUX 2.6:
+eth0      Link encap:Ethernet  HWaddr 00:09:3D:10:30:0F  
+          inet addr:10.0.0.14  Bcast:10.0.0.255  Mask:255.255.255.0
+          inet6 addr: fe80::209:3dff:fe10:300f/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:7144152 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:5458726 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:1849676368 (1.7 GiB)  TX bytes:975642847 (930.4 MiB)
+          Interrupt:193 
+
+eth1      Link encap:Ethernet  HWaddr 00:09:3D:10:30:10  
+          inet addr:192.168.128.129  Bcast:192.168.131.255  Mask:255.255.252.0
+          inet6 addr: fe80::209:3dff:fe10:3010/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:378122 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:925514 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:31414290 (29.9 MiB)  TX bytes:1367006880 (1.2 GiB)
+          Interrupt:201 
+
+eth1:1    Link encap:Ethernet  HWaddr 00:09:3D:10:30:10  
+          inet addr:10.2.3.4  Bcast:10.2.3.255  Mask:255.255.255.0
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          Interrupt:201 Base address:0x100 
+
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:16436  Metric:1
+          RX packets:62255 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:62255 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:4582175 (4.3 MiB)  TX bytes:4582175 (4.3 MiB)
+
+sit0      Link encap:IPv6-in-IPv4  
+          NOARP  MTU:1480  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:0 (0.0 b)  TX bytes:0 (0.0 b)
+######################################################################
+
+SOLARIS 10:
+lo0: flags=2001000849<UP,LOOPBACK,RUNNING,MULTICAST,IPv4,VIRTUAL> mtu 8232 index 1
+        inet 127.0.0.1 netmask ff000000 
+bge0: flags=1000843<UP,BROADCAST,RUNNING,MULTICAST,IPv4> mtu 1500 index 2
+        inet 10.0.0.48 netmask ffffff00 broadcast 10.0.0.255
+bge1: flags=1000843<UP,BROADCAST,RUNNING,MULTICAST,IPv4> mtu 1500 index 3
+        inet 10.216.210.9 netmask ffffff00 broadcast 10.216.210.255
+bge1:1: flags=1000803<UP,BROADCAST,MULTICAST,IPv4> mtu 1500 index 3
+        inet 10.10.10.1 netmask ffffff00 broadcast 10.10.10.255
+bge1: flags=2000840<RUNNING,MULTICAST,IPv6> mtu 1500 index 3
+        inet6 fe80::209:3dff:fe13:33b8/10 
+lo0: flags=2002000848<LOOPBACK,RUNNING,MULTICAST,IPv6,VIRTUAL> mtu 8252 index 1
+        inet6 ::1/128 
+######################################################################
+
+SOLARIS 7:
+lo0: flags=849<UP,LOOPBACK,RUNNING,MULTICAST> mtu 8232
+        inet 127.0.0.1 netmask ff000000 
+hme0: flags=863<UP,BROADCAST,NOTRAILERS,RUNNING,MULTICAST> mtu 1500
+        inet 10.0.0.18 netmask ffffff80 broadcast 10.0.0.127
+        ether 8:0:20:a7:3d:56 
+hme0:1: flags=863<UP,BROADCAST,NOTRAILERS,RUNNING,MULTICAST> mtu 1500
+        inet 10.0.0.4 netmask ffffff80 broadcast 10.0.0.127
+hme0:3: flags=863<UP,BROADCAST,NOTRAILERS,RUNNING,MULTICAST> mtu 1500
+        inet 10.0.0.8 netmask ffffff80 broadcast 10.0.0.127
+hme0:4: flags=863<UP,BROADCAST,NOTRAILERS,RUNNING,MULTICAST> mtu 1500
+        inet 10.0.0.9 netmask ffffff80 broadcast 10.0.0.127
+hme0:5: flags=863<UP,BROADCAST,NOTRAILERS,RUNNING,MULTICAST> mtu 1500
+        inet 10.0.0.6 netmask ffffff80 broadcast 10.0.0.127
+hme1: flags=863<UP,BROADCAST,NOTRAILERS,RUNNING,MULTICAST> mtu 1500
+        inet 172.24.14.3 netmask fffffc00 broadcast 172.24.15.255
+        ether 8:0:20:a7:3d:56 
+######################################################################
+
+OSX 10.5.8:
+lo0: flags=8049<UP,LOOPBACK,RUNNING,MULTICAST> mtu 16384
+    inet6 fe80::1%lo0 prefixlen 64 scopeid 0x1 
+    inet 127.0.0.1 netmask 0xff000000 
+    inet6 ::1 prefixlen 128 
+gif0: flags=8010<POINTOPOINT,MULTICAST> mtu 1280
+stf0: flags=0<> mtu 1280
+en0: flags=8863<UP,BROADCAST,SMART,RUNNING,SIMPLEX,MULTICAST> mtu 1500
+    ether 00:1f:5b:f3:9a:a6 
+    media: autoselect status: inactive
+    supported media: autoselect 10baseT/UTP <half-duplex> 10baseT/UTP <full-duplex> 10baseT/UTP <full-duplex,hw-loopback> 10baseT/UTP <full-duplex,flow-control> 100baseTX <half-duplex> 100baseTX <full-duplex> 100baseTX <full-duplex,hw-loopback> 100baseTX <full-duplex,flow-control> 1000baseT <full-duplex> 1000baseT <full-duplex,hw-loopback> 1000baseT <full-duplex,flow-control> none
+en1: flags=8863<UP,BROADCAST,SMART,RUNNING,SIMPLEX,MULTICAST> mtu 1500
+    inet 172.16.5.203 netmask 0xffffff00 broadcast 172.16.5.255
+    ether 00:1e:c2:b0:69:ee 
+    media: autoselect status: active
+    supported media: autoselect
+fw0: flags=8863<UP,BROADCAST,SMART,RUNNING,SIMPLEX,MULTICAST> mtu 2030
+    lladdr 00:1f:f3:ff:fe:26:c3:c0 
+    media: autoselect <full-duplex> status: inactive
+    supported media: autoselect <full-duplex>
+vmnet8: flags=8863<UP,BROADCAST,SMART,RUNNING,SIMPLEX,MULTICAST> mtu 1500
+    inet 172.16.150.1 netmask 0xffffff00 broadcast 172.16.150.255
+    ether 00:50:56:c0:00:08 
+vmnet1: flags=8863<UP,BROADCAST,SMART,RUNNING,SIMPLEX,MULTICAST> mtu 1500
+    inet 192.168.224.1 netmask 0xffffff00 broadcast 192.168.224.255
+    ether 00:50:56:c0:00:01 
+en3: flags=8963<UP,BROADCAST,SMART,RUNNING,PROMISC,SIMPLEX,MULTICAST> mtu 1500
+    inet6 fe80::21c:42ff:fe00:8%en3 prefixlen 64 scopeid 0x9 
+    inet 10.211.55.2 netmask 0xffffff00 broadcast 10.211.55.255
+    ether 00:1c:42:00:00:08 
+    media: autoselect status: active
+    supported media: autoselect
+en4: flags=8963<UP,BROADCAST,SMART,RUNNING,PROMISC,SIMPLEX,MULTICAST> mtu 1500
+    inet6 fe80::21c:42ff:fe00:9%en4 prefixlen 64 scopeid 0xa 
+    inet 10.37.129.2 netmask 0xffffff00 broadcast 10.37.129.255
+    ether 00:1c:42:00:00:09 
+    media: autoselect status: active
+    supported media: autoselect
+vboxnet0: flags=8842<BROADCAST,RUNNING,SIMPLEX,MULTICAST> mtu 1500
+    ether 00:76:62:00:00:00 
+######################################################################
+
+BUSYBOX (linux 2.6.24, codesourcery libc, busybox tools):
+bsl0      Link encap:Ethernet  HWaddr 00:1D:FE:56:9B:CD  
+          BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:500 
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth0      Link encap:Ethernet  HWaddr 00:1D:FE:BB:7C:06  
+          inet addr:192.168.0.11  Bcast:192.168.0.255  Mask:255.255.255.0
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:44501 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:28484 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:62413536 (59.5 MiB)  TX bytes:2607992 (2.4 MiB)
+
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          UP LOOPBACK RUNNING  MTU:16436  Metric:1
+          RX packets:2654 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:2654 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:393371 (384.1 KiB)  TX bytes:393371 (384.1 KiB)
+
+ppp0      Link encap:Point-to-Point Protocol  
+          inet addr:10.121.184.248  P-t-P:10.174.201.64  Mask:255.255.255.255
+          UP POINTOPOINT RUNNING NOARP MULTICAST  MTU:1500  Metric:1
+          RX packets:381 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:468 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:3 
+          RX bytes:95988 (93.7 KiB)  TX bytes:100782 (98.4 KiB)
+######################################################################
+
+Gentoo (Linux bluesata 2.6.31-gentoo-r6)
+eth0      Link encap:Ethernet  HWaddr 00:1a:92:97:3e:b9
+          inet addr:192.168.1.55  Bcast:192.168.1.255  Mask:255.255.255.0
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:195344405 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:119899377 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000
+          RX bytes:1722338088 (1.6 GiB)  TX bytes:3930628775 (3.6 GiB)
+          Interrupt:11 Base address:0x8000
+
+eth1      Link encap:Ethernet  HWaddr 00:1a:92:97:41:00
+          inet addr:192.168.3.1  Bcast:192.168.3.255  Mask:255.255.255.0
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:54 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000
+          RX bytes:0 (0.0 B)  TX bytes:4338 (4.2 KiB)
+          Interrupt:5 Base address:0x6000
+
+lo        Link encap:Local Loopback
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          UP LOOPBACK RUNNING  MTU:16436  Metric:1
+          RX packets:644557006 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:644557006 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:1235017685 (1.1 GiB)  TX bytes:1235017685 (1.1 GiB)
+######################################################################
+
+Windows XP:
+Windows IP Configuration
+
+        Host Name . . . . . . . . . . . . : example-machine
+        Primary Dns Suffix  . . . . . . . : 
+        Node Type . . . . . . . . . . . . : Unknown
+        IP Routing Enabled. . . . . . . . : No
+        WINS Proxy Enabled. . . . . . . . : No
+        DNS Suffix Search List. . . . . . : example.net
+
+Ethernet adapter Wireless Network Connection:
+
+        Connection-specific DNS Suffix  . : example.net
+        Description . . . . . . . . . . . : Broadcom 802.11b/g WLAN
+        Physical Address. . . . . . . . . : C4-17-FE-8C-73-6B
+        Dhcp Enabled. . . . . . . . . . . : Yes
+        Autoconfiguration Enabled . . . . : Yes
+        IP Address. . . . . . . . . . . . : 10.1.1.215
+        Subnet Mask . . . . . . . . . . . : 255.255.255.0
+        Default Gateway . . . . . . . . . : 10.1.1.1
+        DHCP Server . . . . . . . . . . . : 10.1.1.3
+        DNS Servers . . . . . . . . . . . : 10.232.4.14
+        Lease Obtained. . . . . . . . . . : Thursday, March 11, 2010 3:13:11 AM
+        Lease Expires . . . . . . . . . . : Friday, March 12, 2010 3:13:11 AM
+
+PPP adapter example:
+
+        Connection-specific DNS Suffix  . : 
+        Description . . . . . . . . . . . : WAN (PPP/SLIP) Interface
+        Physical Address. . . . . . . . . : 00-53-45-00-00-00
+        Dhcp Enabled. . . . . . . . . . . : No
+        IP Address. . . . . . . . . . . . : 10.118.22.29
+        Subnet Mask . . . . . . . . . . . : 255.255.255.255
+        Default Gateway . . . . . . . . . : 
+        DNS Servers . . . . . . . . . . . : 10.118.13.50
+                                            10.118.13.51
+
+
+#####################################################################
+WINDOWS 7:
+Windows IP Configuration
+
+   Host Name . . . . . . . . . . . . : jexample-e6400
+   Primary Dns Suffix  . . . . . . . :
+   Node Type . . . . . . . . . . . . : Hybrid
+   IP Routing Enabled. . . . . . . . : No
+   WINS Proxy Enabled. . . . . . . . : No
+   DNS Suffix Search List. . . . . . : example.net
+
+Ethernet adapter Local Area Connection 2:
+
+   Media State . . . . . . . . . . . : Media disconnected
+   Connection-specific DNS Suffix  . : internal.example.com
+   Description . . . . . . . . . . . : TAP-Win32 Adapter V8
+   Physical Address. . . . . . . . . : 00-FF-BF-2E-6C-69
+   DHCP Enabled. . . . . . . . . . . : Yes
+   Autoconfiguration Enabled . . . . : Yes
+
+Ethernet adapter Bluetooth Network Connection:
+
+   Media State . . . . . . . . . . . : Media disconnected
+   Connection-specific DNS Suffix  . :
+   Description . . . . . . . . . . . : Bluetooth Device (Personal Area Network)
+   Physical Address. . . . . . . . . : 0C-60-76-8F-AF-5C
+   DHCP Enabled. . . . . . . . . . . : Yes
+   Autoconfiguration Enabled . . . . : Yes
+
+Wireless LAN adapter Wireless Network Connection:
+
+   Connection-specific DNS Suffix  . : example.net
+   Description . . . . . . . . . . . : Intel(R) WiFi Link 5100 AGN
+   Physical Address. . . . . . . . . : 00-24-D6-3D-1B-D2
+   DHCP Enabled. . . . . . . . . . . : Yes
+   Autoconfiguration Enabled . . . . : Yes
+   Link-local IPv6 Address . . . . . : fe80::b1de:3d88:2241:599f%13(Preferred)
+   IPv4 Address. . . . . . . . . . . : 10.9.1.214(Preferred)
+   Subnet Mask . . . . . . . . . . . : 255.255.255.0
+   Lease Obtained. . . . . . . . . . : Wednesday, February 24, 2010 11:21:18 PM
+   Lease Expires . . . . . . . . . . : Sunday, March 07, 2010 5:08:55 PM
+   Default Gateway . . . . . . . . . : 10.9.1.1
+   DHCP Server . . . . . . . . . . . : 10.9.1.3
+   DHCPv6 IAID . . . . . . . . . . . : 234890454
+   DHCPv6 Client DUID. . . . . . . . : 00-01-00-01-12-8D-A2-ED-00-24-E8-DE-6D-F4
+   DNS Servers . . . . . . . . . . . : 10.0.0.14
+                                       10.0.0.14
+   NetBIOS over Tcpip. . . . . . . . : Enabled
+
+Ethernet adapter Local Area Connection:
+
+   Media State . . . . . . . . . . . : Media disconnected
+   Connection-specific DNS Suffix  . : internal.example.com
+   Description . . . . . . . . . . . : Intel(R) 82567LM Gigabit Network Connection
+   Physical Address. . . . . . . . . : 00-24-E8-DE-6D-F4
+   DHCP Enabled. . . . . . . . . . . : Yes
+   Autoconfiguration Enabled . . . . : Yes
+
+Tunnel adapter isatap.internal.example.com:
+
+   Media State . . . . . . . . . . . : Media disconnected
+   Connection-specific DNS Suffix  . :
+   Description . . . . . . . . . . . : Microsoft ISATAP Adapter
+   Physical Address. . . . . . . . . : 00-00-00-00-00-00-00-E0
+   DHCP Enabled. . . . . . . . . . . : No
+   Autoconfiguration Enabled . . . . : Yes
+
+Tunnel adapter Local Area Connection* 12:
+
+   Connection-specific DNS Suffix  . :
+   Description . . . . . . . . . . . : Teredo Tunneling Pseudo-Interface
+   Physical Address. . . . . . . . . : 00-00-00-00-00-00-00-E0
+   DHCP Enabled. . . . . . . . . . . : No
+   Autoconfiguration Enabled . . . . : Yes
+   IPv6 Address. . . . . . . . . . . : 2001:0:4137:9e76:3c79:3898:9d8d:a5df(Preferred)
+   Link-local IPv6 Address . . . . . : fe80::3c79:3898:9d8d:a5df%12(Preferred)
+   Default Gateway . . . . . . . . . : ::
+   NetBIOS over Tcpip. . . . . . . . : Disabled
+
+Tunnel adapter isatap.example.net:
+
+   Media State . . . . . . . . . . . : Media disconnected
+   Connection-specific DNS Suffix  . : example.net
+   Description . . . . . . . . . . . : Microsoft ISATAP Adapter #2
+   Physical Address. . . . . . . . . : 00-00-00-00-00-00-00-E0
+   DHCP Enabled. . . . . . . . . . . : No
+   Autoconfiguration Enabled . . . . : Yes
+
+Tunnel adapter isatap.{7A68CFEB-7E9B-46B2-81CC-A21369B7C2EA}:
+
+   Media State . . . . . . . . . . . : Media disconnected
+   Connection-specific DNS Suffix  . :
+   Description . . . . . . . . . . . : Microsoft ISATAP Adapter #3
+   Physical Address. . . . . . . . . : 00-00-00-00-00-00-00-E0
+   DHCP Enabled. . . . . . . . . . . : No
+   Autoconfiguration Enabled . . . . : Yes
+######################################################################
+
+Ubuntu 10.04 LTS (2.6.32-37-server)
+david@sideshowbob:~$ ip addr show
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 16436 qdisc noqueue state UNKNOWN
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+    inet6 ::1/128 scope host
+       valid_lft forever preferred_lft forever
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP qlen 1000
+    link/ether 80:ee:73:14:7a:25 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.0.104/24 brd 192.168.0.255 scope global eth0
+    inet 192.168.0.101/24 scope global secondary eth0
+    inet6 fe80::82ee:73ff:fe14:7a25/64 scope link valid_lft forever preferred_lft forever
+3: eth1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UNKNOWN qlen 1000
+    link/ether 00:05:5d:0d:12:e9 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.7.104/24 brd 192.168.7.255 scope global eth1
+    inet 192.168.7.101/24 scope global secondary eth1
+    inet6 fe80::205:5dff:fe0d:12e9/64 scope link valid_lft forever preferred_lft forever 

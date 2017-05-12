@@ -1,0 +1,18 @@
+Revision history for Perl extension SOOT::App.
+
+0.04  Wed Aug 10 21:00:00 2011
+  - Method autocompletion for lexical and package objects in scalars.
+  - Now uses the Package plugin for Devel::REPL.
+
+0.03  Wed Jun  9 21:00:00 2010
+  - Automatically open files provided as arguments in the command
+    line into @main::files
+  - Use threads for asynchroneous gApplication.
+
+0.02  Fri Feb 26 21:44:00 2010
+  - Readline history
+  - Load .rootrc/.rootlogon
+
+0.01  Sun Feb 21 21:44:00 2010
+  - original version
+

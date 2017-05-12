@@ -1,0 +1,11 @@
+<Backup bill.heins.net>
+	DestinationList /space
+	Hourlies  2
+	Directory /home/mike/
+	Directory /home/work/
+	Directory /var/mail/
+	Directory /var/lib/mysql/
+	Directory /var/lib/pgsql/
+	Directory /etc/
+</Backup>
+

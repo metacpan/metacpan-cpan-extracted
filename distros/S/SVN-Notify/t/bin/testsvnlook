@@ -1,0 +1,16 @@
+#!/usr/bin/perl -w
+
+use strict;
+use FindBin;
+use File::Spec::Functions;
+
+my ($command, undef, undef, $rev, @others) = @ARGV;
+$command .= '-noadd' if grep { $_ =~ /--no-diff-added/ } @others;
+
+my $file = catfile($FindBin::Bin, updir, 'data', $command, "$rev.txt");
+
+open F, "<$file" or die "Cannot open '$file': $!\n";
+binmode F, ':raw';
+binmode STDOUT, ':raw';
+print for <F>;
+close F;

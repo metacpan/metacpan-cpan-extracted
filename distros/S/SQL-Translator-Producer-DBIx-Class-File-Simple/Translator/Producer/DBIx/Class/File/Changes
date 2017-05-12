@@ -1,0 +1,3 @@
+0.1
+This module is ALMOST the same as SQL::Translator::Producer::DBIx::Class::File,
+just add the usage of no-comments parameter.

@@ -1,0 +1,44 @@
+<table class="standard-table">
+  <thead>
+    <tr>
+      <th><% loc('Web Hostname') %></th>
+      <th><% loc('Email Hostname') %></th>
+      <th><% loc('Requires SSL?') %></th>
+      <th><% loc('Wiki Count') %></th>
+      <th><% loc('Created On') %></th>
+      <th></th>
+    </tr>
+  </thead>
+
+% while ( my $domain = $domains->next() ) {
+  <tbody>
+    <tr class="<% $domains->index() % 2 ? 'odd' : 'even' %>">
+      <td><a href="<% $domain->uri() %>"><% $domain->web_hostname() %></a></td>
+      <td><% $domain->email_hostname() %></td>
+      <td><% $domain->requires_ssl() ? loc('Yes') : loc('No') %></td>
+      <td><% $domain->wiki_count() %></td>
+      <td><% loc( '%datetime(%1)', $c->user()->set_time_zone_for_dt( $domain->creation_datetime() ) ) %></td>
+      <td><a href="<% $domain->entity_uri( view => 'edit_form' ) %>"><% loc('edit') %></a></td>
+    </tr>
+  </tbody>
+% }
+
+<& /lib/table/pager.mas,
+   index     => $domains->index(),
+   pager     => $pager,
+   uri_maker => sub { $c->domain()->application_uri( path => '/domains', @_ ) } &>
+
+</table>     
+
+<%args>
+$domains
+$pager
+</%args>
+
+<%method title>
+All Domains
+</%method>
+
+<%attr>
+sidebar => [ 'admin' ]
+</%attr>

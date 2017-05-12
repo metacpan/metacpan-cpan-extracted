@@ -1,0 +1,117 @@
+
+                        Sprite Notes and Tips
+                     Last Updated: March 12 1998
+                     ---------------------------
+
+* "How do I sort the results that I get back from Sprite?"
+
+It's actually very easy to sort, thanks to Perl. Here's an example:
+
+    $data    = $rdb->sql ( "select Player, Points from $DB" );
+    @results = sort { $a->[1] <=> $b->[1] } @$data;
+
+This sorts the data based on the second field (index 1), and stores
+it in the array @results. If you want a reference to the results array,
+do this:
+
+    $results = [ sort { $a->[1] <=> $b->[1] } @$data ];
+
+And here's how you can use this data:
+
+    foreach $record (@$results) {
+	($player, $points) = @$record;
+    }
+
+* "Can Sprite handle multi-line records?"
+
+Sorry! Sprite operates only on text-delimited _one_ line records; a 
+newline starts a new record. If you do have multi-line data, the 
+best way to handle it is to convert your data to a format Sprite
+can handle. 
+
+Suppose you have a file like the following:
+
+    George Clooney
+    E.R.
+    Batman and Robin
+    -=-
+    Pierce Brosnan
+    Remington Steele
+    Tommorrow Never Dies
+
+where a newline is the field separator and '-=-' is the record 
+separator. Here's a _simple_ way to convert this:
+
+    open (FILE, '/some/path/to/stars.dat') || die "$!\n";
+
+    $/ = "\n-=-\n";
+
+    print "Star,TV,Movie\n";          # Header for Sprite
+
+    while (<FILE>) {
+        chomp;                        # Remove -=-
+        s/,/\\,/g;                    # Convert any ',' to '\,'
+        s/\n/,/g;                     # Convert newline to ','
+        s/,$//;                       # Remove final ','
+
+        print "$_\n";                 # Print converted line to STDOUT
+    }
+
+    close (FILE);
+
+* "Why am I getting errors when dealing with strings in queries?"
+
+Depending on what you use as the string delimiter (either a single or
+double quote), you need to make sure and escape that delimiter within
+the query.
+
+For example:
+
+   $myname =~ s/'/\\'/g;
+
+   $data = $rdb->sql ( "select * from $DB where (name = '$myname')" );
+
+You'll get some strange runtime eval. errors if you don't follow this!
+
+* "Why can't I use @ or $ in queries?"
+
+There's nothing preventing you from using these characters. However,
+you may need to escape them depending on how you are passing the
+query to Sprite.
+
+If you're passing the query to Sprite as a single quoted string:
+
+    $data = $rdb->sql 
+            ('select * from $DB where Address =~ /bird@ora.com/');
+
+Normally, you would get the right results with this, but the problem
+is that $DB will not get interpolated, and Sprite will give you an
+error.
+
+But, you can do something like this:
+
+    $data = $rdb->sql 
+            ('select * from /path/email.db where Address =~ /bird@ora.com/');
+
+If you want interpolation, however, you need to use double quotes, like so:
+
+    $data = $rdb->sql 
+            ("select * from $DB where Address =~ /bird\@ora.com/");
+
+but you _must_ escape any characters that have a special significance 
+to Perl. See the answer to the next question for an example.
+
+* "How do I update records that contain parentheses?"
+
+You need to escape them, like so:
+
+   $rdb->sql (<<End_of_Query);
+
+    update $DB
+        set Phone = ('\\(111\\) 222 3333')
+        where (Name = /Bird\$/i)
+
+   End_of_Query
+
+Notice how the '$' (matches end of line) is escaped as well! 
+

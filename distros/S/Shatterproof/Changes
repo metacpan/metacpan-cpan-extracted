@@ -1,0 +1,59 @@
+Revision history for Perl extension ShatterProof.
+
+0.13 Mon Jun 22 17:00:00 2015
+	-Avoid division by zero when there are no matching breakpoints for the
+	 insertions provided
+
+0.13 Tue Jul 16 17:00:00 2013
+	-corrected logical error in calculate_loh_score that was allowing
+	 negative sized regions of heterozygozity
+
+0.12 Fri Jun 28 15:00:00 2013
+	-updates to testing package
+	-changed sorting order of interchromosomal translocation output file
+
+0.11 Mon Jun 24 17:00:00 2013
+	-updates to testing package
+	-changed JSON to JSON::XS
+	-changed all sorts in Shatterproof.pm to stable sorts
+	-reduced the number of posix::ceil calculations
+
+0.10 Wed Jun 19 20:00:00 2013
+	-updates to testing package
+
+0.09 Mon Jun 10 14:00:00 2013
+	-updates to testing package
+
+0.08 Wed May 22 13:00:00 2013
+	-added testing package
+
+0.07 Sun Dec 27  14:00:00 2012
+	-added example guide for provided sample data
+
+0.06 Sun Dec 27  13:00:00 2012
+	-added additional documentation for new translocation cut-off config
+	 variable
+
+0.05 Sun Dec 26  19:00:00 2012
+	-modification to scoring equations for translocation hallmark
+	-added maximum number of translocation chromosomes parameter
+	-added check for tailing backslash on directory paths
+	-removed POD method headers
+	-tp53 score can only be achieved by setting the command line option, tp53
+	 mutations that are discovered will be reported but will have not affect
+	 on scores
+	-added sample data directory with example run guide
+
+0.04 Sun Nov 25  18:22:00 2012
+	-minor commenting changes
+	-stable build before changes to translocation scoring equation
+
+0.003  Thur Nov 8 17:23:00 2012
+	- added missing dependency declaration on File::Basename, List::Util, POSIX
+
+0.002  Thur Nov 8 14:54:00 2012
+	- added missing dependency declaration on Switch
+
+0.001  Tue Sep 25 16:20:41 2012
+	- original version; created by h2xs 1.23 with options
+		-AXc -n ShatterProof

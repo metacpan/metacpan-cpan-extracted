@@ -1,0 +1,18 @@
+Release 0.10
+	Fixed up a problem that has been causing the module to fail tests 
+	on newer versions of Perl. I'm not sure how the module ever worked.
+	What was I thinking... Special Thanks to Krist van Besien for a patch
+	to the problem and pointing it out in the first place.
+	It's been quite some time since I've worked on these modules much and
+	it now looks like I'd better get some more done.
+
+Release 0.08
+	This version requires version 0.07 of Software::Packager
+	It is slowly coming into line with the documention that SUN have
+	created.
+	The API has been rationalised to meet the API in Software::Packager.
+	Packages are created but it is still not possible to use Classes that
+	will come in time.
+
+Release 0.05
+        Split this module from Software::Packager

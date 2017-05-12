@@ -1,0 +1,17 @@
+# slave.stem
+# this is used for slave Hubs which get their configs from a master Hub
+#
+[
+	class	=>	'Stem::Console',
+],
+[
+	class	=>	'Stem::Hub',
+	name	=>	'slave',
+	args	=>	[],
+],
+[
+	class	=>	'Stem::Portal',
+	args	=>	[
+		'server'	=> 1
+	],
+],

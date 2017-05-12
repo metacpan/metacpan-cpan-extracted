@@ -1,0 +1,91 @@
+NAME
+    Syntax::Highlight::RDF - syntax highlighting for various RDF-related
+    formats
+
+SYNOPSIS
+      use Syntax::Highlight::RDF;
+      my $syntax = "Syntax::Highlight::RDF"->highlighter("Turtle");
+      print $syntax->highlight($filehandle);
+
+DESCRIPTION
+    Outputs pretty syntax-highlighted HTML for RDF-related formats. (Actually
+    just adds `<span>` elements with `class` attributes. You're expected to
+    bring your own CSS.)
+
+  Formats
+    *   N-Triples
+
+    *   N-Quads
+
+    *   Turtle
+
+    *   TriG
+
+    *   Notation 3
+
+    *   Pretdsl
+
+    *   SPARQL Query 1.1 (but not property paths yet)
+
+    *   SPARQL Update 1.1 (but not property paths yet)
+
+    *   JSON - intended for RDF/JSON and SPARQL Results JSON, but just generic
+        highlighting
+
+    *   XML - intended for RDF/XML and SPARQL Results XML, but just generic
+        highlighting
+
+  Methods
+    `highlighter($format)`
+        Factory method; generally preferred over calling `new` on a specific
+        class.
+
+          "Syntax::Highlight::RDF"->highlighter("Turtle");
+          "Syntax::Highlight::RDF::Turtle"->new;  # avoid!
+
+    `highlight($input, $base)`
+        Highlight some RDF.
+
+        $input may be a file handle, filename or a scalar ref of text. (Most
+        highlighters will also attempt to Do What You Mean if passed something
+        else sane like an RDF::Trine::Model.) $base is an optional base for
+        resolving relative URIs.
+
+        Returns a string of HTML.
+
+    `tokenize($input)`
+        This is mostly intended for subclassing Syntax::Highlight::RDF.
+
+        $input may be a file handle, filename or a scalar ref of text.
+
+        Returns an arrayref of token objects. The exact API for the token
+        objects is subject to change, but currently they support `TYPE` and
+        `spelling` methods.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Syntax-Highlight-RDF>.
+
+SEE ALSO
+    Syntax::Highlight::JSON2, Syntax::Highlight::XML.
+
+    PPI::HTML, Syntax::Highlight::Engine::Kate.
+
+    RDF::Trine, RDF::Query.
+
+    <http://www.perlrdf.org/>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2013 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

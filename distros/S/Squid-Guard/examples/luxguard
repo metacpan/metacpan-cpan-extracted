@@ -1,0 +1,100 @@
+#!/usr/bin/perl -w
+use strict;
+# to use this example:
+# 1) create the $redir page where blocked requests will be sent to
+# 2) create the $dbdir (see comments below) and its content
+# 3) launch this script with the -C toption to create the .db files
+# 4) do some testing like (the echoed lines are in the format used by squid to ask the redirector):
+#    echo "http://www.youporn.com/ 172.31.30.132/- user1 GET -" | luxguard -v
+#    echo "0-6.us:443 172.31.40.131/- user2 CONNECT -" | luxguard -v
+# 5) put this script (or your own based on this) in your squid's url_rewrite_program
+#    then reload
+
+# uncomment to keep debug messages
+#open(STDERR, ">> /var/log/squid/luxguard") or die "Can't open /var/log/squid/luxguard for writing: $!";
+
+# In case of redirection, where I will send the client to
+# Note the substitution patterns %a, %n etc.
+my $redir = "http://proxy/cgi-bin/denymessage?clientaddr=%a&clientname=%n&clientident=%i&url=%u&block=%t&path=%p";
+
+# Set to something true concurrency protocol. See url_rewrite_concurrency in squid.conf
+my $concurrency = 0;
+
+# Set to a positive value to cache checkingroup and checkinwbgroup calls
+my $cache = 0;
+
+# Always allowed to surf the net
+my @servers = (
+        '127.0.0.1',
+        '192.168.1.100',
+);
+
+# where I will put my lists (both text and generated .db files)
+my $dbdir = '/var/lib/luxguard';
+
+# categories stored in .db files
+# You have to create the directories whitelist, blacklists/porn, blacklists/socialnet in $dbdir (for the latter 2 you can download some
+# readily-available list like Shalla), then create some (or all) the domains, urls, expressions file in thesedirectories, dontainig 
+# what is to be allowed or blocked.
+# Note: you DO NOT write here if a certain domain, or url, is to be allowed or blocked. You will decide it in the check function.
+# Here you simply define a category of domains, or urls. In the check function you will match the request against these categories.
+my %categ = (
+	'whitelist'		=> 'whitelist',
+	'porn'			=> 'blacklists/porn',
+	'socialnet'		=> 'blacklists/socialnet',
+);
+
+sub check($$) {
+	my ( $lg, $req ) = @_;
+
+	return 0 if grep { $req->addr eq $_ } @servers;	# Servers are always allowed
+
+	return 0 if $lg->checkingroup( $req->{ident}, "root"); # Administrators are always allowed
+	
+	# uncomment if you use Winbind
+	#return 0 if $lg->checkinwbgroup( $req->{ident}, "Domain Admins", "internet" );
+
+	# uncomment if you want open internet access in off-work hours
+	#my ($min,$hour,$wday) = (localtime(time))[1,2,6];	# some tests based on date/time
+	#my $i = $hour * 100 + $min;
+	#return 0 if $wday == 0 || 		# allow surfing on sunday
+	#	    $wday == 6 ||		# allow surfing on saturday
+	#	    $i < 830 || $i > 1830 ||	# allow before 8:30 and after 18:30
+	#	    ( $i > 1300 && $i < 1400 ); # some prefer Facebook than meal
+
+	return 0 if $lg->checkincateg( $req, 'whitelist');		# Local WL
+	return 'in-addr' if $lg->checkinaddr($req);	# Explicit IPs are not allowed here
+
+	return $lg->checkincateg( $req, qw/porn socialnet/ );
+
+	0;
+}
+
+
+###########################
+# 
+#  End of initializations
+# 
+###########################
+
+use Getopt::Std;
+my %opts;
+getopts('C1vd', \%opts);	# v: verbose ; d: debug ; 1: single-shot
+
+use Squid::Guard;
+my $lg = Squid::Guard->new( dbdir => $dbdir );
+$lg->redir($redir);
+$opts{v} and $lg->verbose(1);
+$opts{d} and $lg->debug(1);
+$opts{1} and $lg->oneshot(1);
+
+
+if( $opts{C} ) {
+	$lg->mkdb(%categ);
+} else {
+	$lg->addcateg(%categ);
+	$lg->checkf(\&check);
+	$concurrency && $lg->concurrency($concurrency);
+	$cache && $lg->cache($cache);
+	$lg->run();
+}

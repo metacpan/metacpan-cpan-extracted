@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                SGML-Parser-OpenSP
+version:             0.994
+abstract:            Parse SGML documents using OpenSP
+license:             perl
+author:              
+    - Bjoern Hoehrmann <bjoern@hoehrmann.de>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Class::Accessor:               0
+    File::Temp:                    0
+    Test::Exception:               0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

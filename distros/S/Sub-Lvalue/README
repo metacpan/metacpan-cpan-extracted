@@ -1,0 +1,91 @@
+NAME
+    Sub::Lvalue - use lvalue subroutines with ease
+
+VERSION
+    Version 0.01
+
+SYNOPSIS
+    Simply put get and set blocks at the end of your lvalue sub. Please
+    note, no comma or semicolon between statements are allowed (in case of
+    semicolon only last statement will be take an action)
+
+        use Sub::Lvalue;
+
+        sub mysub : lvalue {
+            get {
+                return 'result for get';
+            }
+            set {
+                my $set_value = shift;
+                # ...
+            }
+        }
+
+        mysub() = 'test'; # will invoke set block with argument 'test';
+        print mysub(); # will invoke get block without arguments. result will be returned to print;
+
+        sub readonly : lvalue {
+            get {
+                return 'readonly value';
+            }
+        }
+
+        print readonly();  # ok
+        readonly = 'test'; # fails
+
+        sub writeonly : lvalue {
+            set {
+                my $set_value = shift;
+                # ...
+            }
+        }
+
+        writeonly = 'test'; # ok
+        print writeonly();  # fails
+
+EXPORT
+    There are 2 export functions: "set" and "get". If you don't want to use
+    export, you may use full names
+
+        sub mysub : lvalue {
+            Sub::Lvalue::get {
+                return 'something';
+            }
+            Sub::Lvalue::set {
+                my $set_value = shift;
+            }
+        }
+
+FUNCTIONS
+  set
+    invoked with argument from right side
+
+  get
+    invoked without arguments. the returned value passed out
+
+RENAMING
+    From it's creation in 2009 till 2016 this module has name lvalue. In
+    2010 there were appeared module Lvalue.
+
+    During years, there were semantic conflict between Lvalue and lvalue.
+    But this days PAUSE threats CPAN module names case insensitive that
+    leads us to name conflict.
+
+    After all, there is another great module LV. As stated by its author,
+    some part of it was inspired by "lvalue".
+
+    I decided to eliminame original name lvalue and to keep original source
+    code if someone needs it under the name Sub::Lvalue
+
+AUTHOR
+    Mons Anderson, <mons@cpan.org>
+
+BUGS
+    None known
+
+COPYRIGHT & LICENSE
+    Copyright 2009 Mons Anderson.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

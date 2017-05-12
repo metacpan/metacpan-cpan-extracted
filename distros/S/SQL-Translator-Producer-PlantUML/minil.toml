@@ -1,0 +1,6 @@
+name = "SQL-Translator-Producer-PlantUML"
+# badges = ["travis"]
+authority="cpan:HIMACHOCO"
+
+module_maker="ModuleBuildTiny"
+

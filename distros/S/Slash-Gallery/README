@@ -1,0 +1,74 @@
+This is Slash::Gallery, a picture gallery plugin for Slash.
+
+        http://slashcode.com/
+
+It requires the Imager and Image::Info modules.
+
+It is not yet ready for prime time, but it works.  Some quick
+instructions:
+
+1. Place all of your images in your datadir, under gallery/full/.
+You may organize the images any way you wish.  I prefer year/month/,
+so I have:
+
+        /usr/local/slash/sites/pudge.net/gallery/full/2001/08/
+        /usr/local/slash/sites/pudge.net/gallery/full/2001/09/
+        /usr/local/slash/sites/pudge.net/gallery/full/2001/10/
+
+etc.  The location of the files in the filesystem is not relevant
+to Slash::Gallery.
+
+Slash::Gallery will automatically create other directories under
+gallery for scaled images (including thumbnails), so make sure it
+is writable by your web server user.
+
+
+2. Install Slash::Gallery if you haven't already, and go to
+gallery.pl in your browser.  Make sure you are logged in as an
+admin (default admin seclev for Slash::Gallery is 1000).
+
+
+3. Add pictures from the filesystem to the database by clicking
+the "Add Pictures" link.  This will go through all the pictures
+under $datadir/gallery/full/ and add the ones that are not yet
+in the database.  The images are differentiated by filename,
+so don't change the location of a file.
+
+Each image is added to the database with a name (by default,
+the relative filename, but can be anything) and a date.
+The date is pulled out of the embedded date in the image's
+EXIF tag, if it exists.  If not, the file's date on the filesystem
+is used.
+
+
+4. If you want to prerender all the scaled images, click
+"Render Pictures", and go have a cup of coffee.  If you don't
+do this step, the first time each scaled image (including
+thumbnails) is requested, Slash::Gallery will have to create it.
+Slash::Gallery won't create the scaled image again, unless it
+finds that the original is newer than the scaled image.
+
+Pictures are rendered according to the specs at the top of
+gallery.pl.  By default, there are big, large, medium, small, and
+thumnbnail pictures (as well as the original "full" size).
+Images are scaled according to the X coordinate for the given
+size (unless the image is vertical (Y > X), in which case it uses
+Y), so images of different aspect ratios are allowed.
+
+
+5. Start browsing by clicking "All Pictures".  You will be shown
+thumnails, along with the picture name and date, and a menu
+allowing you to select [s]mall, [m]edium, [l]arge, [b]ig, or
+[d]isplay.
+
+The Display screen shows the picture's description and any
+EXIF information you want.  Customize this template to suit your
+needs.  See Image::Info docs etc. for information on what
+tags are available; they are all in the [% picture.info %]
+data structure.
+
+
+That's about it for now.  Have fun,
+
+-- Chris Nandor <pudge@pobox.com>
+Thursday, December 20, 2001

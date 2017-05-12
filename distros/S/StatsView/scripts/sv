@@ -1,0 +1,1252 @@
+#!/usr/local/bin/perl -w
+
+use strict;
+use File::Basename qw(basename dirname);
+use POSIX qw(:sys_wait_h strftime);
+use Tk 8.0;
+use Tk::Dialog;
+use Tk::FileSelect;
+use Tk::NoteBook;
+use Tk::Pane;
+use IO::Pipe;
+use Cwd qw(cwd fast_abs_path);
+use StatsView::Graph;
+
+################################################################################
+
+package main;
+use vars qw($VERSION $Main %Monitor $DatDir $SaveDir
+            $OpenFileTypes $SaveFileTypes);
+$VERSION = "1.4";
+$OpenFileTypes =
+   [
+      [ All     => "*"       ],
+      [ iostat  => ".iostat" ],
+      [ "iost+" => ".iost+"  ],
+      [ mpstat  => ".mpstat" ],
+      [ sar     => ".sar"    ],
+      [ vmstat  => ".vmstat" ],
+      [ vxstat  => ".vxstat" ],
+      [ Oracle  => ".oar"    ],
+   ];
+
+$SaveFileTypes =
+   [
+      [ CSV        => ".csv" ],
+      [ CGM        => ".cgm" ],
+      [ MIF        => ".mif" ],
+      [ GIF        => ".gif" ],
+      [ Postscript => ".ps"  ],
+      [ All        => "*"    ],
+   ];
+
+################################################################################
+
+sub hhmmss($)
+{
+my ($s) = @_;
+my ($h, $m);
+$h = int($s / 3600);
+$s %= 3600;
+$m = int($s / 60);
+$s %= 60;
+return(sprintf("%.2d:%.2d:%.2d", $h, $m, $s));
+}
+
+################################################################################
+
+sub error
+{
+my ($parent) = shift(@_);
+$parent->Dialog(-title      => "Error",
+                -bitmap     => "error",
+                -text       => join("\n", @_),
+                -wraplength => "4i",
+                -buttons    => ["OK"] )->Show();
+}
+
+################################################################################
+
+sub about($)
+{
+my ($parent) = @_;
+my $msg = <<EOM;
+
+                           StatsView version $VERSION
+                        Copyright 1998-2001 Alan Burlison
+                            Alan.Burlison\@uk.sun.com
+
+ You may distribute under the terms of either the GNU General Public License
+ or the Artistic License, as specified in the Perl README file, with the
+ exception that it cannot be placed on a CD-ROM or similar media for commercial
+ distribution without the prior approval of the author.
+
+ This code is provided with no warranty of any kind, and is used entirely at
+ your own risk.
+
+ This code was written by the author as a private individual, and is in no way
+ endorsed or warrantied by Sun Microsystems.
+
+EOM
+
+my $dialog = $parent->Toplevel(-title => "About StatsView");
+$dialog->withdraw();
+$dialog->resizable(0, 0);
+my $text = $dialog->Text(-borderwidth => 3, -width => 80, -height => 16,
+                         -relief => "raised")
+   ->pack(-padx => 5, -pady => 5);
+$text->insert("1.0", $msg);
+$dialog->Button(-text => "OK", -command => sub { $dialog->destroy(); })
+   ->pack(-padx => 6, -pady => 6);
+$dialog->Popup();
+return($dialog);
+}
+
+################################################################################
+# Figure out how big a 2x2 grid is going to be for the given number of items
+# Returns ($cols, $rows)
+
+sub grid_size(@)
+{
+my (@items) = @_;
+
+# Work out the average length of an item;
+my $nitems = @items;
+my $avlen = 0;
+foreach my $i (@items) { $avlen += length($i); }
+$avlen /= $nitems;
+
+my $cols = int(sqrt($nitems * $avlen) / ($avlen / 1.5) + 0.5) || 1;
+return($cols, int(($nitems / $cols) + 0.5));
+}
+
+################################################################################
+# Printing plots
+################################################################################
+
+# Print dialog "print" button callback
+sub print_print_cb($$$$$$)
+{
+my ($parent, $graph, $printer, $type, $orientation, $color) = @_;
+
+$parent->Busy();
+if (! eval { $graph->print(printer => $printer, type => $type,
+                           orientation => $orientation, color => $color); })
+   {
+   my $err = $@;
+   $parent->Unbusy();
+   error($parent, $err);
+   return(0);
+   }
+$parent->Unbusy();
+return(1);
+}
+
+################################################################################
+
+# Print dialog
+sub print_dialog($$)
+{
+my ($parent, $graph) = @_;
+$parent->Busy();
+
+# Default dialog settings
+my $printer     = "lp ";
+my $type        = "postscript";
+my $orientation = "landscape";
+my $color       = "color";
+
+my $dialog = $parent->Toplevel(-title => "Print " . $graph->get_title());
+$dialog->withdraw();
+$dialog->resizable(0, 0);
+
+# Printer
+my $box1 = $dialog->Frame(-borderwidth => 1, -relief => "raised");
+$box1->Label(-text => "Printer")
+   ->pack(-expand => 1, -anchor => "e",
+          -side => "left", -padx => 5, -pady => 5);
+$box1->Entry(-textvariable => \$printer, -width => 30)
+   ->pack(-expand => 1, -anchor => "w",
+          -side => "left", -padx => 5, -pady => 5);
+
+# Format
+my $box2 = $dialog->Frame(-borderwidth => 1, -relief => "raised");
+$box2->Label(-text => "Format")->pack(-anchor => "w", -padx => 5, -pady => 5);
+$box2->Radiobutton(-text => "Postscript", -value => "postscript",
+                   -variable => \$type, -highlightthickness => 0)
+   ->pack(-anchor => "w");
+$box2->Radiobutton(-text => "Laserjet II", -value => "laserjet ii",
+                   -variable => \$type, -highlightthickness => 0)
+   ->pack(-anchor => "w");
+$box2->Radiobutton(-text => "Laserjet III", -value => "laserjet iii",
+                   -variable => \$type, -highlightthickness => 0)
+   ->pack(-anchor => "w");
+
+# Options.  box3a is just there to get stuff to float to the top
+my $box3 = $dialog->Frame(-borderwidth => 1, -relief => "raised");
+my $box3a = $box3->Frame();
+$box3a->Label(-text => "Options")
+   ->grid(-column =>0, -row => 0, -sticky => "w", -padx => 5, -pady => 5);
+$box3a->Radiobutton(-text => "Landscape", -value => "landscape",
+                    -variable => \$orientation, -highlightthickness => 0)
+   ->grid(-column => 0, -row => 1, -sticky => "w");
+$box3a->Radiobutton(-text => "Portrait", -value => "portrait",
+                   -variable => \$orientation, -highlightthickness => 0)
+   ->grid(-column => 0, -row => 2, -sticky => "w");
+$box3a->Radiobutton(-text => "Colour", -value => "color",
+                   -variable => \$color, -highlightthickness => 0)
+   ->grid(-column => 1, -row => 1, -sticky => "w");
+$box3a->Radiobutton(-text => "Monochrome", -value => "monochrome",
+                   -variable => \$color, -highlightthickness => 0)
+   ->grid(-column => 1, -row => 2, -sticky => "w");
+$box3a->pack(-anchor => "n");
+
+# Buttons
+my $box4 = $dialog->Frame(-borderwidth => 1, -relief => "raised");
+$box4->Button(-text => "Print",
+              -command => sub { print_print_cb($dialog, $graph, $printer,
+                                               $type, $orientation, $color); })
+   ->pack(-side => "left", -expand => 1, -padx => 5, -pady => 5);
+$box4->Button(-text => "Quit",
+              -command => sub { $dialog->destroy() })
+   ->pack(-side => "right", -expand => 1, -padx => 5, -pady => 5);
+
+$box1->form(-top => "%0", -left => "%0", -right => "%100");
+$box2->form(-top => $box1, -left => "%0", -right => "%50", -bottom => $box4);
+$box3->form(-top => $box1, -left => $box2, -right => "%100", -bottom => $box4);
+$box4->form(-left => "%0", -right => "%100", -bottom => "%100");
+
+$dialog->Popup();
+$parent->Unbusy();
+}
+
+################################################################################
+# Saving plots
+################################################################################
+
+# Save dialog "browse" button callback
+sub save_browse_cb($$$)
+{
+my ($parent, $title, $file) = @_;
+
+$parent->Busy();
+if (defined($file))
+   {
+   $SaveDir = dirname($file);
+   $file = basename($file);
+   }
+else
+   {
+   $SaveDir = cwd() if (! $SaveDir);
+   $file = "";
+   }
+$file = $parent->getSaveFile(-initialdir  => $SaveDir,
+                             -initialfile => $file,
+                             -title       => $title);
+$parent->Unbusy();
+if (defined($file)) { $SaveDir = dirname($file); }
+return($file);
+}
+
+################################################################################
+
+# Save dialog "save" button callback
+sub save_save_cb($$$$$$)
+{
+my ($parent, $graph, $file, $format, $orientation, $color) = @_;
+
+my $dir = dirname($file);
+if (! -d $dir)
+   {
+   error($parent, "Directory $dir does not exist");
+   return(0);
+   }
+if (-f $file)
+   {
+   if ($parent->Dialog(-title          => "Warning",
+                       -bitmap         => "questhead",
+                       -text           => "$file already exists.\n" .
+                                          "Do you want to overwrite it?",
+                       -wraplength     => "4i",
+                       -buttons        => ["Yes", "No"],
+                       -default_button => "No")->Show() eq "No")
+      { return(0); }
+   }
+$parent->Busy();
+if (! eval { $graph->save(file => $file, format => $format,
+                          orientation => $orientation, color => $color); })
+   {
+   my $err = $@;
+   $parent->Unbusy();
+   error($parent, $err);
+   return(0);
+   }
+$parent->Unbusy();
+return(1);
+}
+
+################################################################################
+
+# Save dialog
+sub save_dialog($$)
+{
+my ($parent, $graph) = @_;
+$parent->Busy();
+
+# Default dialog settings
+my $file        = "";
+my $format      = "csv";
+my $orientation = "landscape";
+my $color       = "color";
+
+my $dialog = $parent->Toplevel(-title => "Save " . $graph->get_title());
+$dialog->withdraw();
+$dialog->resizable(0, 0);
+
+# File
+my $box1 = $dialog->Frame(-borderwidth => 1, -relief => "raised");
+$box1->Label(-text => "File")
+   ->pack(-expand => 1, -anchor => "e",
+          -side => "left", -padx => 5, -pady => 5);
+$box1->Entry(-textvariable => \$file, -width => 30)
+   ->pack(-side => "left", -padx => 5, -pady => 5);
+$box1->Button(-text => "Browse", -highlightthickness => 0,
+   -command => sub { $file = save_browse_cb($parent, "Save Graph", $file); })
+   ->pack(-expand => 1, -anchor => "w",
+          -side => "left", -padx => 5, -pady => 5);
+
+# Format
+my $box2 = $dialog->Frame(-borderwidth => 1, -relief => "raised");
+$box2->Label(-text => "Format")->pack(-anchor => "w", -padx => 5, -pady => 5);
+$box2->Radiobutton(-text => "CSV (Microsoft Office)", -value => "csv",
+                   -variable => \$format, -highlightthickness => 0)
+   ->pack(-anchor => "w");
+$box2->Radiobutton(-text => "CGM (Microsoft Office)", -value => "cgm",
+                   -variable => \$format, -highlightthickness => 0)
+   ->pack(-anchor => "w");
+$box2->Radiobutton(-text => "MIF (FrameMaker)", -value => "mif",
+                   -variable => \$format, -highlightthickness => 0)
+   ->pack(-anchor => "w");
+$box2->Radiobutton(-text => "GIF", -value => "gif",
+                   -variable => \$format, -highlightthickness => 0)
+   ->pack(-anchor => "w");
+$box2->Radiobutton(-text => "Postscript", -value => "postscript",
+                   -variable => \$format, -highlightthickness => 0)
+   ->pack(-anchor => "w");
+
+# Options.  box3a is just there to get stuff to float to the top
+my $box3 = $dialog->Frame(-borderwidth => 1, -relief => "raised");
+my $box3a = $box3->Frame();
+$box3a->Label(-text => "Options")
+   ->grid(-column =>0, -row => 0, -sticky => "w", -padx => 5, -pady => 5);
+$box3a->Radiobutton(-text => "Landscape", -value => "landscape",
+                   -variable => \$orientation, -highlightthickness => 0)
+   ->grid(-column => 0, -row => 1, -sticky => "w");
+$box3a->Radiobutton(-text => "Portrait", -value => "portrait",
+                   -variable => \$orientation, -highlightthickness => 0)
+   ->grid(-column => 0, -row => 2, -sticky => "w");
+$box3a->Radiobutton(-text => "Colour", -value => "color",
+                   -variable => \$color, -highlightthickness => 0)
+   ->grid(-column => 1, -row => 1, -sticky => "w");
+$box3a->Radiobutton(-text => "Monochrome", -value => "monochrome",
+                   -variable => \$color, -highlightthickness => 0)
+   ->grid(-column => 1, -row => 2, -sticky => "w");
+$box3a->pack(-anchor => "n");
+
+# Buttons
+my $box4 = $dialog->Frame(-borderwidth => 1, -relief => "raised");
+$box4->Button(-text => "Save",
+              -command => sub { save_save_cb($dialog, $graph, $file,
+                                             $format, $orientation, $color); })
+   ->pack(-side => "left", -expand => 1, -padx => 5, -pady => 5);
+$box4->Button(-text => "Quit",
+              -command => sub { $dialog->destroy() })
+   ->pack(-side => "right", -expand => 1, -padx => 5, -pady => 5);
+
+$box1->form(-top => "%0", -left => "%0", -right => "%100");
+$box2->form(-top => $box1, -left => "%0", -right => "%50", -bottom => $box4);
+$box3->form(-top => $box1, -left => $box2, -right => "%100", -bottom => $box4);
+$box4->form(-left => "%0", -right => "%100", -bottom => "%100");
+
+$dialog->Popup();
+$parent->Unbusy();
+}
+
+################################################################################
+# Plotting graphs
+################################################################################
+
+# plot dialog "apply" callback
+sub plot_apply_cb($$;%)
+{
+my ($parent, $graph, %args) = @_;
+$parent->Busy();
+if (! eval { $graph->define(%args); $graph->plot(); })
+   {
+   my $err = $@;
+   $parent->Unbusy();
+   error($parent, $err);
+   return(0);
+   }
+$parent->Unbusy();
+return(1);
+}
+
+################################################################################
+# Interval selection stuff
+
+sub interval_tab($$$$)
+{
+my ($notebook, $graph, $start, $finish, $sub, $locked, $lock_diff) = @_;
+my ($begin, $interval, $end) = $graph->get_times();
+my $min_diff = $interval * 5;
+($$start, $$finish) =  ($begin, $end);
+my ($start_lab, $finish_lab);
+
+my $tab = $notebook->add("interval", -label => "Interval");
+$tab->Label(-text => "Please select the start and finish times\n"
+                   . "of the data you wish to see on the plot")
+   ->pack(-padx => 5, -pady => 5);
+$sub = sub
+   {
+   my $d;
+   my ($s, $f) = ($$start, $$finish);
+   if ($locked) { $d = $lock_diff;  $f = $s + $d; }
+   elsif ($s + $min_diff > $f) { $d = $min_diff; $f = $s + $d }
+   if ($f > $end) { $f = $end; $s = $end - $d };
+   $$start = $s; $$finish = $f;
+   $start_lab = POSIX::strftime("%d/%m/%Y %T", localtime($$start));
+   $finish_lab = POSIX::strftime("%d/%m/%Y %T", localtime($$finish));
+   };
+$tab->Scale(-orient => "horizontal", "-length" => "5c", -showvalue => 0,
+            -from => $begin, -to => $end, -resolution => $interval,
+            -variable => $start, -highlightthickness => 0, -width => 10,
+            -sliderlength => 20, -label => "Start time", -command => $sub)
+   ->pack(-padx => 5, -pady => 5);
+$tab->Label(-textvariable => \$start_lab)->pack(-padx => 5, -pady => 5);
+$sub = sub
+   {
+   my $d;
+   my ($s, $f) = ($$start, $$finish);
+   if ($locked) { $d = $lock_diff;  $s = $f - $d; }
+   elsif ($f - $min_diff < $s) { $d = $min_diff; $s = $f - $d }
+   if ($s < $begin) { $s = $begin; $f = $begin + $d };
+   $$start = $s; $$finish = $f;
+   $start_lab = POSIX::strftime("%d/%m/%Y %T", localtime($$start));
+   $finish_lab = POSIX::strftime("%d/%m/%Y %T", localtime($$finish));
+   };
+$tab->Scale(-orient => "horizontal", "-length" => "5c", -showvalue => 0,
+            -from => $begin, -to => $end, -resolution => $interval,
+            -variable => $finish, -highlightthickness => 0, -width => 10,
+            -sliderlength => 20, -label => "Finish time", -command => $sub)
+   ->pack(-padx => 5, -pady => 5);
+$tab->Label(-textvariable => \$finish_lab)->pack(-padx => 5, -pady => 5);
+$tab->Checkbutton(-text => "Lock sliders together?", -variable => \$locked,
+                  -offvalue => 0, -onvalue => 1, -highlightthickness => 0,
+                  -command =>
+                  sub { $lock_diff = $$finish - $$start if ($locked); })
+   ->pack(-padx => 5, -pady => 5);
+}
+
+################################################################################
+# 2d plot dialog
+
+sub plot_2d_dialog($$;$)
+{
+my ($parent, $file, $cat) = @_;
+
+$parent->Busy();
+my $graph;
+if (! eval { $graph = StatsView::Graph->new($file); $graph->read($cat); })
+   {
+   my $err = $@;
+   $parent->Unbusy();
+   error($parent, $err);
+   return;
+   }
+
+my (@cols, %sel_cols, $start, $finish, $scale, $sub,
+    $box1, $box2, $print, $save, $apply);
+@cols = $graph->get_columns();
+
+### Create the top-level dialog
+my $dialog = $parent->Toplevel(-title => $graph->get_title());
+$dialog->withdraw();
+#$dialog->resizable(0, 0);
+$dialog->OnDestroy(sub { undef($graph); });
+
+### Create the notebook
+my $notebook = $dialog->NoteBook(-ipadx => 0, -ipady => 0);
+my $tab = $notebook->add("data", -label => "  Data  ");
+
+# Create the "select values" box
+$box1 = $tab->Frame(-borderwidth => 1, -relief => "raised");
+$box1->Label(-text => "Select the values you wish to see on the plot")
+   ->pack(-padx => 5, -pady => 5);
+
+# Callback for when a value is selected/deselected
+$sub = sub
+   {
+   my ($col) = @_;
+   if (defined($sel_cols{$col})) { delete($sel_cols{$col}); }
+   else { $sel_cols{$col} = 1; };
+   if (scalar(keys(%sel_cols)) == 0)
+      { $apply->configure(-state => "disabled"); }
+   else
+      { $apply->configure(-state => "normal"); }
+   $print->configure(-state => "disabled");
+   $save->configure(-state => "disabled");
+   };
+
+# Figure out how big the grid is going to be
+my ($width, $rows) = grid_size(@cols);
+my ($x, $y) = (0, 0);
+
+$box2 = $box1->Frame(-borderwidth => 0);
+foreach my $col (@cols)
+   {
+   $box2->Checkbutton(-text => $col, -command => [ $sub, $col ],
+                      -highlightthickness => 0)
+      ->grid(-column => $x, -row => $y, -sticky => "w");
+   if (++$x >= $width) { $x = 0; $y++; }
+   }
+$box2->pack(-padx => 5, -pady => 5);
+$box1->pack(-fill => "x");
+
+# Create the "Select log scaling" checkbox
+$sub = sub
+   {
+   $print->configure(-state => "disabled");
+   $save->configure(-state => "disabled");
+   };
+$scale = "";
+$box1 = $tab->Frame(-borderwidth => 1, -relief => "raised");
+$box1->Checkbutton(-text => "Logarithmic scaling?", -variable => \$scale,
+                   -offvalue => "", -onvalue => "log",
+                   -highlightthickness => 0, -command => $sub)
+   ->pack(-padx => 5, -pady => 5);
+$box1->pack(-fill => "both", -expand => 1);
+
+### Create the interval tab
+interval_tab($notebook, $graph, \$start, \$finish);
+$notebook->pack();
+
+### Create the buttons
+$box1 = $dialog->Frame(-borderwidth => 3, -relief => "raised");
+
+# Create the "Apply" button
+$sub = sub
+   {
+   plot_apply_cb($dialog, $graph, scale => $scale,
+                 start => $start, finish => $finish,
+                 columns => [ keys(%sel_cols) ]);
+   $print->configure(-state => "normal");
+   $save->configure(-state => "normal");
+   };
+$apply = $box1->Button(-text => "Apply", -state => "disabled",
+                       -command => $sub)
+   ->pack(-side => "left", -expand => 1, -padx => 5, -pady => 5);
+
+# Create the "Print" button
+$print = $box1->Button(-text => "Print", -state => "disabled",
+                       -command => sub { print_dialog($dialog, $graph); })
+   ->pack(-side => "left", -expand => 1, -padx => 5, -pady => 5);
+
+# Create the "Save" button
+$save = $box1->Button(-text => "Save", -state => "disabled",
+                      -command => sub { save_dialog($dialog, $graph); })
+   ->pack(-side => "left", -expand => 1, -padx => 5, -pady => 5);
+
+# Create the "Quit" button
+$box1->Button(-text => "Quit", -command => sub { $dialog->destroy() })
+   ->pack(-side => "left", -expand => 1, -padx => 5, -pady => 5);
+$box1->pack(-fill => "x");
+
+$dialog->Popup();
+$parent->Unbusy();
+}
+
+################################################################################
+
+# 3d plot dialog
+sub plot_3d_dialog($$;$)
+{
+my ($parent, $file, $cat) = @_;
+$parent->Busy();
+
+# Open & read the file
+my $graph;
+if (! eval { $graph = StatsView::Graph->new($file); $graph->read($cat); })
+   {
+   my $err = $@;
+   $parent->Unbusy();
+   error($parent, $err);
+   return;
+   }
+
+# Find out what's what
+my @cols  = $graph->get_columns();
+my @insts = $graph->get_instances();
+my ($sel_col, %all_insts, %sel_insts, $start, $finish,
+    $scale, $button_sub, $sub, $box1, $box2, $pattern, $apply, $save, $print);
+$pattern = "";
+
+# Callback for when a column or item is selected/deselected
+$button_sub = sub
+   {
+   if (! $sel_col || scalar(keys(%sel_insts)) == 0)
+      { $apply->configure(-state => "disabled"); }
+   else
+      { $apply->configure(-state => "normal"); }
+   $print->configure(-state => "disabled");
+   $save->configure(-state => "disabled");
+   };
+
+### Create the top-level dialog & notebook
+my $dialog = $parent->Toplevel(-title => $graph->get_title());
+$dialog->withdraw();
+#$dialog->resizable(0, 0);
+$dialog->OnDestroy(sub { undef($graph); });
+my $notebook = $dialog->NoteBook(-ipadx => 0, -ipady => 0);
+
+### Create the data tab
+my $tab = $notebook->add("data", -label => "  Data  ");
+
+# Create the "select a value" box
+$box1 = $tab->Frame(-borderwidth => 1, -relief => "raised");
+$box1->Label(-text => "Select the value you wish to see on the plot")
+   ->pack(-padx => 5, -pady => 5);
+my ($width, $rows) = grid_size(@cols);
+my ($x, $y) = (0, 0);
+$box2 = $box1->Frame(-borderwidth => 0);
+foreach my $col (@cols)
+   {
+   $box2->Radiobutton(-text => $col, -variable => \$sel_col, -value => $col,
+                      -highlightthickness => 0, -command => $button_sub)
+      ->grid(-column => $x, -row => $y, -sticky => "w");
+   if (++$x >= $width) { $x = 0; $y++; }
+   }
+$box2->pack(-padx => 5, -pady => 5);
+$box1->pack(-fill => "x");
+
+# Create the "select an item" box
+$box1 = $tab->Frame(-borderwidth => 1, -relief => "raised");
+$box1->Label(-text => "Select the items you wish to see on the plot")
+   ->pack(-padx => 5, -pady => 5);
+
+# Callback for when an item is selected/deselected
+$sub = sub
+   {
+   my ($inst) = @_;
+   if (defined($sel_insts{$inst})) { delete($sel_insts{$inst}); }
+   else { $sel_insts{$inst} = 1; };
+   &$button_sub();
+   };
+
+# Figure out how big the grid is going to be
+($width, $rows) = grid_size(@insts);
+($x, $y) = (0, 0);
+
+$box2 = $box1->Scrolled("Pane", -scrollbars => "osow", -borderwidth => 1,
+                        -relief => "flat",
+                        -gridded => "xy", -sticky => "nsew");
+foreach my $inst (@insts)
+   {
+   $all_insts{$inst} = $box2->Checkbutton(-text => $inst,
+                                          -command => [ $sub, $inst ],
+                                          -highlightthickness => 0)
+      ->grid(-column => $x, -row => $y, -sticky => "w");
+   if (++$x >= $width) { $x = 0; $y++; }
+   }
+$box2->pack(-fill=> "both", -expand => 1, -padx => 5, -pady => 5);
+$box1->pack(-fill => "both", -expand => 1);
+
+# Create the pattern-match item selector
+# Callback for the pattern-match selector
+$sub = sub
+   {
+   $pattern =~ s/\s+//g;
+   while (my ($name, $inst) = each(%all_insts))
+      {
+      if ($pattern ne "" && eval { $name =~ /$pattern/; })
+         {
+         $inst->select();
+         $sel_insts{$name} = 1;
+         }
+      else
+         {
+         $inst->deselect();
+         delete($sel_insts{$name});
+         }
+      }
+   &$button_sub();
+   };
+
+$box1 = $tab->Frame(-borderwidth => 1, -relief => "raised");
+$box1->Label(-text => "Specify a pattern to select multiple items")
+   ->pack(-padx => 5, -pady => 5);
+$box2 = $box1->Frame(-borderwidth => 0);
+$box2->Label(-text => "Pattern:")
+   ->pack(-side => "left", -expand => 1, -anchor => "e",
+          -padx => 5, -pady => 5);
+$box2->Entry(-textvariable => \$pattern, -width => 20)
+   ->pack(-side => "left", -padx => 5, -pady => 5);
+$box2->Button(-text => "Select", -command => $sub)
+   ->pack(-side => "left", -expand => 1, -anchor => "w",
+          -padx => 5, -pady => 5);
+$box2->pack(-padx => 5, -pady => 5);
+$box1->pack(-fill => "x");
+
+# Create the "Select log scaling" checkbox
+$scale = "";
+$box1 = $tab->Frame(-borderwidth => 1, -relief => "raised");
+$box1->Checkbutton(-text => "Logarithmic scaling?", -variable => \$scale,
+                   -offvalue => "", -onvalue => "log",
+                   -highlightthickness => 0, -command => $button_sub)
+   ->pack(-padx => 5, -pady => 5);
+$box1->pack(-fill => "x");
+
+### Create the interval tab
+interval_tab($notebook, $graph, \$start, \$finish);
+$notebook->pack(-fill => "both", -expand => 1);
+
+### Create the buttons
+$box1 = $dialog->Frame(-borderwidth => 3, -relief => "raised");
+
+# Create the "Apply" button
+$sub = sub
+   {
+   plot_apply_cb($dialog, $graph, scale => $scale,
+                 start => $start, finish => $finish,
+                 column => $sel_col, instances => [ keys(%sel_insts) ]);
+   $print->configure(-state => "normal");
+   $save->configure(-state => "normal");
+   };
+$apply = $box1->Button(-text => "Apply", -command => $sub,
+                       -state => "disabled")
+   ->pack(-side => "left", -expand => 1, -padx => 5, -pady => 5);
+
+# Create the "Print" button
+$print = $box1->Button(-text => "Print", -state => "disabled",
+                       -command => sub { print_dialog($dialog, $graph); })
+   ->pack(-side => "left", -expand => 1, -padx => 5, -pady => 5);
+
+# Create the "Save" button
+$save = $box1->Button(-text => "Save", -state => "disabled",
+                      -command => sub { save_dialog($dialog, $graph); })
+   ->pack(-side => "left", -expand => 1, -padx => 5, -pady => 5);
+
+# Create the "Quit" button
+$box1->Button(-text => "Quit",
+              -command => sub { $dialog->destroy() })
+   ->pack(-side => "left", -expand => 1, -padx => 5, -pady => 5);
+$box1->pack(-fill => "x");
+
+$dialog->Popup();
+$parent->Unbusy();
+}
+
+################################################################################
+# Monitoring
+################################################################################
+
+sub monitor_running_cb
+{
+# Figure out if svdc has exited
+my ($exited, $stat, $sig);
+if (waitpid($Monitor{pid}, &WNOHANG) == $Monitor{pid})
+   { $exited = 1; $stat = $? >> 8; $sig =  $? & 0xff; }
+   
+# If svdc is still running
+if (! $exited)
+   {
+   # If still time left
+   if ($Monitor{timeleft})
+      {
+      $Monitor{status} = "Monitoring running\n"
+                       . hhmmss($Monitor{timeleft}) . " left";
+      $Monitor{timeleft}--;
+      }
+   # Otherwise, no time left
+   else 
+      {
+      $Monitor{status} = "Monitoring finished\ncleaning up";
+      }
+   }
+
+# Otherwise, svdc has exited or been killed
+else
+   {
+   $Main->afterCancel($Monitor{repeater});
+   $Monitor{timeleft} = 0;
+
+   # If svdc was killed (naughty!)
+   if ($sig != 0)
+      { $Monitor{status} = "Monitoring aborted\nkilled with signal $sig" }
+   # Otherwise, svdc has exited
+   else
+      {
+      if ($stat == 0)
+         { $Monitor{status} = "Monitoring completed\nsucessfully"; }
+      elsif ($stat == 1)
+         { $Monitor{status} = "Monitoring cancelled\n"; }
+      elsif ($stat == 2)
+         { $Monitor{status} = "Monitoring failed to start\n"; }
+      elsif ($stat == 3)
+         { $Monitor{status} = "Monitoring subprocess failed\n"; }
+      if ($stat > 1)
+         {
+         while (my $line = $Monitor{pipe}->getline())
+            { $Monitor{status} .= $line if ($line !~ /Terminated/i); }
+         }
+      }
+   $Monitor{pipe}->close();
+   $Monitor{start}->configure(-state => "normal");
+   $Monitor{stop}->configure(-state => "disabled");
+   }
+}
+
+################################################################################
+
+sub start_monitor_cb()
+{
+my $cmd = "svdc $Monitor{output} $Monitor{interval} $Monitor{count}";
+$cmd .= " " . join(" ", keys(%{$Monitor{unix_mons}}));
+my @dgs = sort(keys(%{$Monitor{vxvm_dgs}}));
+$cmd .= " vxstat:" . join(",", @dgs) if (@dgs);
+my @ora = sort(keys(%{$Monitor{oracle_mons}}));
+if (@ora)
+   {
+   my $user = $Monitor{oracle_user};
+   my $pass = $Monitor{oracle_pass};
+   my $sid  = $Monitor{oracle_sid};
+   $user .= '/' if ($user !~ /\/$/);
+   $sid = '@' . $sid if ($sid);
+   $cmd .= " oar:$user$pass$sid:" . join(",", @ora);
+   }
+$Monitor{timeleft} = $Monitor{interval} * $Monitor{count};
+my $pipe = IO::Pipe->new();
+
+# Parent
+if ((my $pid = fork()) > 0)
+   {
+   $pipe->reader();
+   $Monitor{pipe} = $pipe;
+   $Monitor{pid} = $pid;
+   $Monitor{start}->configure(-state => "disabled");
+   $Monitor{stop}->configure(-state => "normal");
+   monitor_running_cb();
+   $Monitor{repeater} = $Main->repeat(1000, \&monitor_running_cb);
+   }
+# Child
+elsif ($pid == 0)
+   {
+   $pipe->writer();
+   open(STDOUT, ">&" . $pipe->fileno());
+   open(STDERR, ">&" . $pipe->fileno());
+   $pipe->close();
+   exec($cmd) || die("Can't exec $cmd: $!\n");
+   }
+# Error
+else
+   {
+   error("Couldn't start monitoring: $!\n");
+   }
+$Monitor{dialog}->withdraw();
+}
+
+################################################################################
+# Monitor dialog
+
+sub start_monitor($)
+{
+my ($parent) = @_;
+
+if (! $Monitor{dialog})
+   {
+   # Figure out if VxVm is installed
+   my ($vxvm_state, @vxvm_dgs) = ("disabled", "rootdg");
+   if (((system("pkginfo -q SUNWvxvm") / 256 == 0) ||
+       (system("pkginfo -q VRTSvxvm") / 256 == 0))
+      &&
+       (-r "/etc/vx/vold_diag"))
+      {
+      $vxvm_state = "normal";
+      @vxvm_dgs = split(" ", `/usr/sbin/vxprint -AG -F %name`);
+      }
+
+   # Figure out if Oracle is installed & running
+   my $oracle_state =
+      grep(-f "$_/DBD/Oracle.pm", @INC) &&
+      defined($ENV{ORACLE_HOME}) && -d $ENV{ORACLE_HOME} &&
+      (`ps -ef | awk '/ora_/ && ! /awk/ { print "yes"; exit }'` =~ "yes")
+      ? "normal" : "disabled";
+   
+   # Figure out if iost+ is installed
+   my $iost_state = "disabled";
+   foreach my $p (split(/:/, $ENV{PATH}))
+      { if (-x "$p/iost+") { $iost_state = "normal"; last; } }
+
+   # Set up the default parameters
+   $Monitor{interval}     = 30,
+   $Monitor{count}        = 60,
+   $Monitor{output}       = "",
+   $Monitor{unix_mons}    = { },
+   $Monitor{vxvm_dgs}     = { },
+   $Monitor{oracle_user}  = "/",
+   $Monitor{oracle_pass}  = "",
+   $Monitor{oracle_sid}   = $ENV{ORACLE_SID},
+   $Monitor{oracle_mons}  = { },
+   $Monitor{start_button} = undef,
+
+   # Callback for altering state of "Start" button
+   my $start_sub = sub
+      {
+      my $d = dirname($Monitor{output});
+      my $f = basename($Monitor{output});
+      if (scalar(keys(%{$Monitor{unix_mons}})) +
+          scalar(keys(%{$Monitor{vxvm_dgs}})) +
+          scalar(keys(%{$Monitor{oracle_mons}})) > 0
+          && ($f && -d $d && -w $d))
+         { $Monitor{start_button}->configure(-state => "normal"); }
+      else
+         { $Monitor{start_button}->configure(-state => "disabled"); }
+      };
+
+   # Callback for radiobutton select/deselect
+   my $sel_sub = sub
+      {
+      my ($sels, $sel) = @_;
+      if (defined($sels->{$sel})) { delete($sels->{$sel}); }
+      else { $sels->{$sel} = 1; };
+      &$start_sub();
+      };
+
+   # Callback for updating total time
+   my $time_sub = sub
+      {
+      $Monitor{duration} = "Duration: "
+                        . hhmmss($Monitor{interval} * $Monitor{count});
+      };
+   &$time_sub();
+
+   # Create the top-level dialog
+   $Monitor{dialog} = $parent->Toplevel(-title => "Monitor");
+   $Monitor{dialog}->withdraw();
+   $Monitor{dialog}->resizable(0, 0);
+
+   # Create the notebook
+   my ($tab, $box1, $box2, $row, $col);
+   $Monitor{notebook} = $Monitor{dialog}->NoteBook(-ipadx => 0, -ipady => 0);
+
+   ### Notebook "output" tab
+   $tab = $Monitor{notebook}->add("output", -label => "Output");
+   $box1 = $tab->Frame(-borderwidth => 1, -relief => "raised");
+   $box1->Label(-text => "Select the sample frequency and number of samples")
+      ->pack(-padx => 5, -pady => 5);
+   $box1->Scale(-orient => "horizontal", "-length" => "5c",
+                -from => 10, -to => 600, -variable => \$Monitor{interval},
+                -highlightthickness => 0, -width => 10,
+                -sliderlength => 20, -label => "Interval (secs)",
+                -command => $time_sub)->pack(-padx => 5, -pady => 5);
+   $box1->Scale(-orient => "horizontal", "-length" => "5c",
+                -from => 6, -to => 144, -variable => \$Monitor{count},
+                -highlightthickness => 0, -width => 10,
+                -sliderlength => 20, -label => "Samples",
+                -command => $time_sub)->pack(-padx => 5, -pady => 5);
+   $box1->Label(-textvariable => \$Monitor{duration})
+                ->pack(-padx => 5, -pady => 5);
+   $box1->pack(-fill => "x");
+
+   $box1 = $tab->Frame(-borderwidth => 1, -relief => "raised");
+   $box1->Label(-text => "\nEnter the filename prefix to use")
+      ->pack(-padx => 5, -pady => 5);
+
+   $box2 = $box1->Frame();
+   $box2->Label(-text => "File\nprefix")
+      ->pack(-side => "left", -anchor => "e", -padx => 5, -pady => 5);
+   my $entry = $box2->Entry(-textvariable => \$Monitor{output}, -width => 30)
+      ->pack(-side => "left", -padx => 5, -pady => 5);
+   $entry->bind("<Any-Key>" => $start_sub);
+   $box2->Button(-text => "Browse",
+      -command => sub { $Monitor{output} =
+                        save_browse_cb($parent, "Save Statistics",
+                                       $Monitor{output}); &$start_sub(); })
+      ->pack(-side => "left", -anchor => "w", -padx => 5, -pady => 5);
+   $box2->pack(-padx => 5, -pady => 5);
+   $box1->pack(-fill => "both", -expand => 1);
+
+   ### Notebook "Unix" tab
+   $tab = $Monitor{notebook}->add("unix", -label => " Unix ");
+   $box1 = $tab->Frame(-borderwidth => 1, -relief => "raised");
+   $box1->Label(-text => "Select the Unix statistics you wish to gather")
+      ->pack(-padx => 5, -pady => 5);
+
+   $box2 = $box1->Frame();
+   $box2->Checkbutton(-text => "iostat", -highlightthickness => 0,
+                      -command => [ $sel_sub, $Monitor{unix_mons}, "iostat" ])
+      ->grid(-row => 0, -column => 0, -sticky => "w");
+   $box2->Checkbutton(-text => "iost+", -highlightthickness => 0,
+                      -state => $iost_state,
+                      -command => [ $sel_sub, $Monitor{unix_mons}, "iost+" ])
+      ->grid(-row => 0, -column => 1, -sticky => "w");
+   $box2->Checkbutton(-text => "mpstat", -highlightthickness => 0,
+                      -command => [ $sel_sub, $Monitor{unix_mons}, "mpstat" ])
+      ->grid(-row => 0, -column => 2, -sticky => "w");
+   $box2->Checkbutton(-text => "sar", -highlightthickness => 0,
+                      -command => [ $sel_sub, $Monitor{unix_mons}, "sar" ])
+      ->grid(-row => 0, -column => 3, -sticky => "w");
+   $box2->Checkbutton(-text => "vmstat", -highlightthickness => 0,
+                      -command => [ $sel_sub, $Monitor{unix_mons}, "vmstat" ])
+      ->grid(-row => 0, -column => 4, -sticky => "w");
+   $box2->pack(-padx => 5, -pady => 5);
+   $box1->pack(-fill => "x");
+
+   $box1 = $tab->Frame(-borderwidth => 1, -relief => "raised");
+   $box1->Label(-text => "\nSelect the Veritas Disk Groups you wish to monitor")
+      ->pack(-padx => 5, -pady => 5);
+
+   $box2 = $box1->Frame();
+   ($row, $col) = (0, 0);
+   foreach my $dg (@vxvm_dgs)
+      {
+      $box2->Checkbutton(-text => $dg, -highlightthickness => 0,
+                         -state => $vxvm_state,
+                         -command => [ $sel_sub, $Monitor{vxvm_dgs}, $dg ])
+         ->grid(-row => $row, -column => $col, -sticky => "w",
+                -padx => 5, -pady => 5);
+      if (++$col >= 4) { $col = 0; $row++; }
+      }
+   $box2->pack(-padx => 5, -pady => 5);
+   $box1->pack(-fill => "both", -expand => 1);
+
+   ### Notebook "Oracle" tab
+   $tab = $Monitor{notebook}->add("oracle", -label => "Oracle");
+   $box1 = $tab->Frame(-borderwidth => 1, -relief => "raised");
+   $box1->Label(-text => "\nEnter the Oracle User ID, Password "
+                       . "and Instance Name")
+      ->pack(-padx => 5, -pady => 5);
+   $box2 = $box1->Frame();
+   $box2->Label(-text => "User")
+      ->grid(-column => 0, -row => 0, -sticky => "e");
+   $box2->Entry(-state => $oracle_state,
+                -textvariable => \$Monitor{oracle_user})
+      ->grid(-column => 1, -row => 0, -sticky => "w");
+   $box2->Label(-text => "Password")
+      ->grid(-column => 0, -row => 1, -sticky => "e");
+   $box2->Entry(-state => $oracle_state, -show => "*",
+                -textvariable => \$Monitor{oracle_pass})
+      ->grid(-column => 1, -row =>1, -sticky => "w");
+   $box2->Label(-text => "Database")
+      ->grid(-column => 0, -row => 2, -sticky => "e");
+   $box2->Entry(-state => $oracle_state, -textvariable => \$Monitor{oracle_sid})
+      ->grid(-column => 1, -row => 2, -sticky => "w");
+   $box2->pack(-padx => 5, -pady => 5);
+   $box1->pack(-fill => "x");
+
+   $box1 = $tab->Frame(-borderwidth => 1, -relief => "raised");
+   $box1->Label(-text => "Select the Database statistics you wish to monitor")
+      ->pack(-padx => 5, -pady => 5);
+
+   $box2 = $box1->Frame();
+   $box2->Checkbutton(-text => "Buffer Cache", -highlightthickness => 0,
+                      -state => $oracle_state,
+                      -command => [ $sel_sub, $Monitor{oracle_mons}, "-bc" ])
+      ->grid(-column => 0, -row => 0, -sticky => "w");
+   $box2->Checkbutton(-text => "Data Dictionary Cache",
+                      -highlightthickness => 0, -state => $oracle_state,
+                      -command => [ $sel_sub, $Monitor{oracle_mons}, "-ddc" ])
+      ->grid(-column => 1, -row => 0, -sticky => "w");
+   $box2->Checkbutton(-text => "Datafile I/O", -highlightthickness => 0,
+                      -state => $oracle_state,
+                      -command => [ $sel_sub, $Monitor{oracle_mons}, "-dio" ])
+      ->grid(-column => 0, -row => 1, -sticky => "w");
+   $box2->Checkbutton(-text => "Dynamic Extension", -highlightthickness => 0,
+                      -state => $oracle_state,
+                      -command => [ $sel_sub, $Monitor{oracle_mons}, "-de" ])
+      ->grid(-column => 1, -row => 1, -sticky => "w");
+   $box2->Checkbutton(-text => "Library Cache", -highlightthickness => 0,
+                      -state => $oracle_state,
+                      -command => [ $sel_sub, $Monitor{oracle_mons}, "-lc" ])
+      ->grid(-column => 0, -row => 2, -sticky => "w");
+   $box2->Checkbutton(-text => "Shared Pool", -highlightthickness => 0,
+                      -state => $oracle_state,
+                      -command => [ $sel_sub, $Monitor{oracle_mons}, "-sp" ])
+      ->grid(-column => 1, -row => 2, -sticky => "w");
+   $box2->Checkbutton(-text => "Tablespace I/O", -highlightthickness => 0,
+                      -state => $oracle_state,
+                      -command => [ $sel_sub, $Monitor{oracle_mons}, "-tio" ])
+      ->grid(-column => 0, -row => 3, -sticky => "w");
+   $box2->pack(-padx => 5, -pady => 5);
+   $box1->pack(-fill => "both", -expand => 1);
+
+   $Monitor{notebook}->pack();
+
+   $box1 = $Monitor{dialog}->Frame(-borderwidth => 3, -relief => "raised");
+   $Monitor{start_button} = $box1->Button(-text => "Start",
+                                          -state => "disabled",
+                                          -command => \&start_monitor_cb)
+      ->pack(-side => "left", -expand => 1, -padx => 5, -pady => 5);
+   $box1->Button(-text => "Cancel",
+      -command => sub { $Monitor{dialog}->withdraw() })
+      ->pack(-side => "right", -expand => 1, -padx => 5, -pady => 5);
+   $box1->pack(-fill => "both", -expand => 1);
+   }
+else
+   {
+   $Monitor{output} = "";
+   $Monitor{start_button}->configure(-state => "disabled");
+   $Monitor{notebook}->raise("output");
+   }
+
+$Monitor{dialog}->Popup();
+}
+
+################################################################################
+
+sub stop_monitor($)
+{
+my ($parent) = @_;
+return if ($parent->messageBox(-title   => "Stop Monitoring",
+                               -icon    => "question",
+                               -message =>
+                                  "Do you really want\nto stop monitoring?",
+                               -type    => "YesNo") eq "No");
+kill("TERM", $Monitor{pid});
+}
+
+################################################################################
+# Opening files
+################################################################################
+
+# Open file function
+sub open_file($$)
+{
+my ($parent, $file) = @_;
+
+my $graph;
+$parent->Busy();
+if (! eval { $graph = StatsView::Graph->new($file); })
+   {
+   my $err = $@;
+   $parent->Unbusy();
+   error($parent, $err);
+   return;
+   }
+$parent->Unbusy();
+
+# Files with only one category of info can be plotted directly
+my @cats = $graph->get_categories();
+if (@cats == 0)
+   {
+   if ($graph->get_data_type() eq "2d")
+      {
+      plot_2d_dialog($parent, $file);
+      }
+   else
+      {
+      plot_3d_dialog($parent, $file);
+      }
+   }
+else
+   {
+   my $menu = $parent->Menu(-type => "tearoff");
+   $menu->title(basename($file));
+   foreach my $cat (@cats)
+      {
+      if ($graph->get_data_type($cat) eq "2d")
+         {
+         $menu->command(-label => $cat,
+                        -command => sub { plot_2d_dialog($menu, $file,
+                                                         $cat); });
+         }
+      else
+         {
+         $menu->command(-label => $cat,
+                        -command => sub { plot_3d_dialog($menu, $file,
+                                                         $cat); });
+         }
+      }
+   $menu->separator();
+   $menu->command(-label => "Close", -underline => 0,
+                  -command => sub { $menu->destroy(); });
+   $menu->post($Main->x() + 30, $Main->y() + 30);
+   }
+}
+
+################################################################################
+
+sub open_dialog($)
+{
+my ($parent) = @_;
+
+$parent->Busy();
+$DatDir = cwd() if (! $DatDir);
+my $file = $parent->getOpenFile(-initialdir       => $DatDir,
+                                -filetypes        => $OpenFileTypes,
+                                -defaultextension => "*");
+$parent->Unbusy();
+return if (! $file);
+$DatDir = dirname($file);
+open_file($parent, $file);
+}
+
+################################################################################
+# Main
+################################################################################
+
+$Main = MainWindow->new();
+$Main->withdraw();
+$Main->resizable(0, 0);
+$Main->title("sv");
+
+### Splash screen
+my $splash;
+if (@ARGV == 0 || $ARGV[0] ne "-q")
+   {
+   $splash = about($Main);
+   $splash->after(10000,
+                  sub { if ($splash) { $splash->destroy(); undef($splash); } });
+   $Main->update();
+   }
+else
+   { shift(@ARGV); }
+
+# Create the menubar & cascades
+my $menubar = $Main->Menu();
+$Main->configure(-menu => $menubar);
+
+my $menubar_file = $menubar->cascade(-label => "~File");
+$menubar_file->command(-label => "~Open File ...",
+                       -command => sub { open_dialog($Main); });
+$menubar_file->separator();
+$menubar_file->command( -label => "~Exit",
+                        -command => sub { Tk::exit(0); });
+
+my $menubar_monitor = $menubar->cascade(-label => "~Monitor");
+$Monitor{start} =
+   $menubar_monitor->command(-label => "St~art ...",
+                             -command => sub { start_monitor($Main); });
+$Monitor{stop} =
+   $menubar_monitor->command(-label => "St~op ...",
+                             -command => sub { stop_monitor($Main); },
+                             -state => "disabled");
+
+# Put up the status message
+$Monitor{status} = "Monitoring not running\n";
+$Main->Label(-textvariable => \$Monitor{status})->pack(-pady => 3);
+
+foreach my $file (@ARGV)
+   {
+   if (-f $file)
+      {
+      open_file($Main, $file);
+      $DatDir = fast_abs_path(dirname($file));
+      }
+   }
+
+$Main->update();
+$Main->deiconify();
+MainLoop;
+
+################################################################################

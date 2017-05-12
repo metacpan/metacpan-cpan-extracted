@@ -1,0 +1,93 @@
+#!/usr/bin/perl -w
+use strict;
+use Carp;
+use Getopt::Long
+
+use lib './lib'; # FOR TESTING
+use SWISH::API::Remote;
+
+############################################
+# swishedsearch : an example SWISH::API::Remote client
+#
+#
+
+
+############################################ 
+# RUN THE PROGRAM
+main(); 
+
+
+############################################
+sub Usage {
+	return "swishedsearch: -w searchword [-index=index]\n" . 
+		"  [--swished=yourserverasdf.com/swished]\n" .
+		"  [-b=beginat]  [-m=max] [-p=prop1,prop] [--debug]\n" . 
+		"  [--headers] \n" .
+		"  * Example to test a swished server at 'http://asdj24.com/swished'\n" .
+		"    'swishedsearch -w search --swished=http://asdj24.com/swished'\n\n";
+}
+
+
+############################################
+sub main {
+    my $swished = 'http://localhost/swished/swished';
+    my $index = "DEFAULT";
+    my $w = 'unix';	# what to search for
+    my ($p, $b) = ("swishrank,swishdocpath,swishtitle,swishdocsize", 0);
+    my $max = 10;	# max to fetch
+    my $debug = 0;
+    my $headers = 0;
+
+    GetOptions( "swished=s" => \$swished,	# base url to swished server
+                "index=s" => \$index,		# name of index
+                "headers!" => \$headers,	# to fetch headers
+                "w=s" => \$w,				# what to search for
+                "b=i" => \$b,				# begin at
+                "m=i" => \$max,				# max to fetch
+                "debug" => \$debug,			# debug mode
+                "p=s" => \$p ) 				# list of props to fetch
+            || die Usage();
+
+    # override die() and warn() to give stack traces
+    $SIG{__DIE__} = sub { Carp::confess $_[0] };    # override these after we've parsed options
+    $SIG{__WARN__} = sub { Carp::carp $_[0] }; 
+
+    print STDERR "$0: Connecting to index '$index' via $swished\n" if $debug;
+    my $remote = SWISH::API::Remote->new( $swished, $index, { DEBUG=>$debug}); 
+
+    print STDERR "$0: Searching on $w\n" if $debug;
+
+    # if we asked for headers with -h, then get the MetaList, PropertyList and HeaderList
+    # note that this can generate a roundtrip to SWISHED. (TODO: cache this info smartly)
+    if ($headers) {
+        # this is straight from the SWISH::API examples, but we're using SWISH::API::Remote!
+        for my $index_name ( $remote->IndexNames ) { 
+
+            my @metas = $remote->MetaList( $index_name );
+            print "IndexMetaNames: " . join(", ", sort map { $_->Name() } @metas) . "\n";
+
+            my @props = $remote->PropertyList( $index_name ); 
+            print "IndexProperties: " . join(", ", sort map { $_->Name() } @props) . "\n";
+        
+            my @headers= $remote->HeaderList( $index_name );
+            print join("\n", sort map { "IndexHeader: " . $_->Name() . ": " . $_->Value() } @headers) . "\n";
+        }
+    }
+
+    # run the query!
+    my $results = $remote->Execute( $w , 
+        {BEGIN=>$b, PROPERTIES=>$p, MAX=>$max, DEBUG=>$debug, HEADERS=>$headers}    # pass opts in hashref
+    );
+
+    if ($results->Error()) {
+        warn $results->ErrorString();
+    }
+    printf("Fetched %d of %d hits for search on '%s'\n",
+        $results->Fetched(), $results->Hits(), $w); 
+
+    while ( my $r = $results->NextResult() ) {
+        print join("\t", map { sprintf("%-10s", $r->Property($_)) } ( split(/,/, $p) ) ) . "\n"; 
+    }
+}
+
+

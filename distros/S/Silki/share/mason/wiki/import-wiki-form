@@ -1,0 +1,26 @@
+<&| /lib/filter/form.mas &>
+<form id="file-upload-form"
+      class="flush-left"
+      action="<% $c->domain()->application_uri( path => '/wikis' ) %>"
+      method="post"
+      enctype="multipart/form-data">
+
+  <fieldset>
+    <div class="form-item">
+      <label class="for-field" for="tarball"><% loc('Wiki Tarball') %></label>
+      <input id="tarball" class="file" name="tarball" type="file" />
+    </div>
+
+    <input class="submit" value="Import" type="submit" />
+  </fieldset>
+
+</form>
+</&>
+
+<%method title>
+<% loc('Import a Wiki') %>
+</%method>
+
+<%flags>
+inherit => '/autohandler'
+</%flags>

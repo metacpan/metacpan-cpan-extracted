@@ -1,0 +1,177 @@
+Revision history for Stenciller
+
+0.1400 2016-02-03T21:39:45Z UTC
+ [Other Changes]
+ - Removed Stenciller::Wrap. Its contents are now in Stenciller.pm.
+ - Removed Stenciller::Standard.
+
+ [Requirements]
+ - Removed dependency on Kavorka/Moops, so will now work on 5.10+ (instead
+   of 5.14+).
+
+0.1302 2015-11-28T15:40:49Z UTC
+ [Enhancements]
+ - ToHtmlPreBlock: Reduce amount of tags when using 'output_also_as_html'.
+
+ [Requirements]
+ - Added missing prereq (Types::Standard).
+
+0.1301 2015-11-23T13:05:45Z UTC
+ [Enhancements]
+ - ToUnparsedText: Added option for generating html blocks for pod
+   (text_as_html_pod).
+ - ToHtmlPreBlock: Added option for generating 'output' as html too
+   (output_also_as_html).
+ - ToHtmlPreBlock: Added option for specifying the separator between
+   transformed stencils (separator).
+
+0.1300 2015-11-22T23:25:16Z UTC
+ [Bug Fixes]
+ - Fixed looping stencils.
+
+ [Enhancements]
+ - Added stencil_name attribute to Stenciller::Stencil.
+ - Added strict and warnings to a couple of Moops classes (kwalitee).
+
+ [Meta]
+ - Removed cpanfile.
+ - Adapted iller.yaml to latest syntax.
+
+0.1212 2015-02-10T18:20:28Z CET
+ [Meta]
+ - Stop using DZP::Prereqs::FromCPANfile, instead generate Prereqs plugins
+   from iller.yaml.
+
+0.1211 2015-02-10T16:31:06Z CET
+ [Bug Fixes]
+ - There were some issues with the previously required version of
+   Syntax::Feature::Qs.
+
+ [Enhancements]
+ - Added 1; to a couple of modules (travis build errors).
+
+ [Requirements]
+ - Bumped Syntax::Feature::Qs req to 0.2004.
+ - Added Test::Warnings to test prereqs.
+
+0.1210 2015-02-09T20:16:55Z CET
+ [Documentation]
+ - Types from Types::Stenciller are now correctly linked.
+
+0.1209 2015-02-09T20:02:41Z CET
+ [Bug Fixes]
+ - In Stenciller->transform, plugin_name was optional in the signature (and
+   documentation), when in reality it is required.
+
+ [Documentation]
+ - Fixed faulty synopsis.
+
+ [Meta]
+ - Now generates dist.ini and weaver.ini from iller.yaml.
+
+0.1208 2015-02-08T20:07:41Z CET
+ [Documentation]
+ - Previous version failed to build a correct README.md
+
+0.1207 2015-02-08T20:05:03Z CET
+ [Documentation]
+ - Moved (and improved) documentation for transform from
+   ::Plugin::ToUnparsedText to ::Transformer.
+
+ [Enhancements]
+ - ::Plugin::ToHtmlPreBlock: Trim four leading spaces from <pre> content
+   (input and output sections in stencils).
+ - Moved duplicated code from ::Plugin::* to ::Transformer.
+ - Added require_in_extra key to $transform_args in ::Transformer to allow
+   finer filtering.
+
+ [Requirements]
+ - Added Module::Pluggable (was already necessary)
+ - Added Moose to quiet kwalitee (we already require Moops)
+
+0.1206 2015-02-07T15:23:49Z CET
+ [Bug Fixes]
+ - Fixed a problem with the stencil filtering in the included plugins (and
+   added tests to catch it).
+
+0.1205 2015-01-18T14:55:50Z CET
+ [Bug Fixes]
+ - Previous version had cpan problems.
+
+0.1202 2015-01-18T02:08:59Z CET
+ [Bug Fixes]
+ - The previous release lacked version numbers.
+
+0.1201 2015-01-18T01:16:00Z CET
+ [Documentation]
+ - Fixed some faulty pod that caused ugliness.
+ - Fixed a couple of typos.
+
+ [Meta]
+ - Add travis config.
+
+0.1200 2015-01-17T19:08:26Z CET
+ [Enhancements]
+ - A simple test is done after parsing to ensure that the last thing parsed
+   is the end of a stencil. This is done to help hunt down syntax errors in
+   stencil files.
+ - Stenciller can now be created with both key-value pair and with a
+   hashref.
+ - The transform() method now takes plugin name, constructor args for the
+   plugin, and arguments for the transformation.
+ - ToHtmlPreBlock: Reduce number of line-breaks in output
+ - ToUnparsedText: Ensure there are always (at least) one empty line
+   between the output of each block in the stencil file.
+ - ToHtmlPreBlock/ToUnparsedText: The pod author can choose to skip
+   header_lines or specific stencils by giving arguments to the plugin from
+   the pod command.
+
+ [Requirements]
+ - Fixed missing prereq, Types::Path::Tiny.
+
+0.1100 2015-01-16T20:42:04Z CET
+ [API Changes]
+ - Removed the Stenciller::Renderer role, again.
+
+ [Enhancements]
+ - Improved rendering of both bundled transformers.
+ - Improved tests (added test prereq: Test::Differences).
+
+0.1005 2015-01-16T01:57:34Z CET
+ [API Changes]
+ - Renamed the Stenciller::Renderer role Stenciller::Transformer (they
+   don't render anything)
+
+ [Bug Fixes]
+ - Also transform the headers in stencil files.
+ - Removed a forgotten use statement.
+
+ [Enhancements]
+ - Ensure that transformers actually do the Transformer role.
+
+ [Meta]
+ - Added Croak.
+
+ [New Features]
+ - Created a new role (named Stenciller::Renderer..) to be used by things
+   that render.
+
+0.1004 2015-01-15T12:51:26Z CET
+ [Meta]
+ - Use DZP::MetaProvides.
+
+0.1003 2015-01-15T04:04:15Z CET
+ [Meta]
+ - Added missing prereq.
+
+0.1002 2015-01-15T03:53:11Z CET
+ [Documentation]
+ - Fixed faulty layout.
+
+0.1001 2015-01-15T00:58:34Z CET
+ [Documentation]
+ - Minor tweaks.
+
+0.1000 2015-01-15T00:50:12Z CET
+ - Initial release
+

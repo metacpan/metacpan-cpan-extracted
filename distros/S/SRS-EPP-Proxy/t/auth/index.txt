@@ -1,0 +1,9 @@
+V	110809005028Z		A842A000AF8DBF71	unknown	/C=NZ/ST=Test State or Province/O=Organization Name/OU=Organizational Unit Name/CN=Test CA
+V	110809005239Z		A842A000AF8DBF72	unknown	/C=NZ/ST=Test State or Province/O=Organization Name/OU=Organizational Unit Name/CN=Test Client
+V	110809030749Z		A842A000AF8DBF73	unknown	/C=NZ/ST=Test State or Province/O=Organization Name/OU=Organizational Unit Name/CN=Test Server
+V	110809033601Z		A842A000AF8DBF74	unknown	/C=NZ/ST=Test State or Province/O=Organization Name/OU=Organizational Unit Name/CN=Test Server
+V	110809041932Z		A842A000AF8DBF75	unknown	/C=NZ/ST=Test State or Province/O=Organization Name/OU=Organizational Unit Name/CN=Test Client
+V	210814021032Z		A842A000AF8DBF76	unknown	/C=NZ/ST=Test State or Province/O=Organization Name/OU=Organizational Unit Name/CN=Test Client
+V	120816033147Z		A842A000AF8DBF77	unknown	/C=NZ/ST=Test State or Province/O=Organization Name/OU=Organizational Unit Name/CN=Test CA
+V	210814033156Z		A842A000AF8DBF78	unknown	/C=NZ/ST=Test State or Province/O=Organization Name/OU=Organizational Unit Name/CN=Test CA
+V	210814033228Z		A842A000AF8DBF79	unknown	/C=NZ/ST=Test State or Province/O=Organization Name/OU=Organizational Unit Name/CN=Test Client

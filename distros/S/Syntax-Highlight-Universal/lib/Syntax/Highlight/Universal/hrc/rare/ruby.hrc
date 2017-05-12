@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<!DOCTYPE hrc PUBLIC "-//Cail Lomecb//DTD Colorer HRC take5//EN"
+  "http://colorer.sf.net/2003/hrc.dtd">
+<hrc version="take5" xmlns="http://colorer.sf.net/2003/hrc"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://colorer.sf.net/2003/hrc http://colorer.sf.net/2003/hrc.xsd">
+
+  <type name="ruby">
+
+    <region name="String" parent="def:String"/>
+    <region name="Comment" parent="def:Comment"/>
+    <region name="CommentDoc" parent="def:CommentDoc"/>
+
+    <region name="Parameter" parent="def:Parameter"/>
+    <region name="Keyword" parent="def:Keyword"/>
+    <region name="Number" parent="def:Number"/>
+
+    <region name="ClassOutline" parent="def:Outlined"/>
+    <region name="AliasOutline" parent="def:Outlined"/>
+    
+
+    <scheme name="String">
+
+    </scheme>
+
+    <scheme name="ruby">
+
+      <block start='/\#/' end='/$/' scheme='def:Comment' region='Comment'/>
+      <block start='/^=begin/' end='/^=end/' scheme='def:Comment' region='CommentDoc'/>
+
+      <inherit scheme="def:Number"/>
+
+      <block start='/([\x22\x27\`])/' end='/\y1/' scheme="String" region='String'/>
+
+      <block start='/\%[Qqx](\{)/' end='/\}/' scheme="String" region='String'/>
+      <block start='/\%[Qqx](\[)/' end='/\]/' scheme="String" region='String'/>
+      <block start='/\%[Qqx](\()/' end='/\)/' scheme="String" region='String'/>
+      <block start='/\%[Qqx](.)/' end='/\y1/' scheme="String" region='String'/>
+
+
+      <regexp match='/ (?{Keyword}alias) \s+ (?{AliasOutline}\S+ \s+ \S+)/x'/>
+      <regexp match='/\M class \s+ (?{ClassOutline}\S+)/x'/>
+
+      <block start='/(?{def:PairStart}(?{Keyword}def)) \s+ (\S+?) (\(.*?\))?/x' end='/\b(?{def:PairEnd}(?{Keyword}end))\b/' scheme='ruby'/>
+
+
+      <block start='/\b(case|class|while|until|for)\b/' end='/\b(end)\b/' scheme="ruby"
+             region00='Keyword' region10='Keyword'
+             region01='def:PairStart' region11='def:PairEnd'
+             />
+      <block start='/^\s*(if)\b/' end='/\b(end)\b/' scheme="ruby"
+             region00='Keyword' region10='Keyword'
+             region01='def:PairStart' region11='def:PairEnd'
+             />
+
+      <inherit scheme="def:PairedBrackets">
+        <virtual scheme='def:PairedBrackets' subst-scheme='ruby'/>
+      </inherit>
+
+      <keywords region="def:Symbol">
+        <symb name='+'/><symb name='-'/><symb name='/'/><symb name='*'/><symb name='='/><symb name='!='/>
+        <symb name='.'/>
+      </keywords>
+      <keywords region="Keyword">
+        <word name="BEGIN"/>
+        <word name="END"/>
+        <word name="class"/>
+        <word name="ensure"/>
+        <word name="nil"/>
+        <word name="self"/>
+        <word name="when"/>
+        <word name="def"/>
+        <word name="false"/>
+        <word name="true"/>
+        <word name="not"/>
+        <word name="super"/>
+        <word name="while"/>
+        <word name="alias"/>
+        <word name="defined"/>
+        <word name="for"/>
+        <word name="or"/>
+        <word name="then"/>
+        <word name="yield"/>
+        <word name="and"/>
+        <word name="do"/>
+        <word name="if"/>
+        <word name="redo"/>
+        <word name="begin"/>
+        <word name="else"/>
+        <word name="in"/>
+        <word name="rescue"/>
+        <word name="undef"/>
+        <word name="break"/>
+        <word name="elsif"/>
+        <word name="module"/>
+        <word name="retry"/>
+        <word name="unless"/>
+        <word name="case"/>
+        <word name="end"/>
+        <word name="next"/>
+        <word name="return"/>
+        <word name="until"/>
+      </keywords>
+
+      <keywords region="def:FunctionKeyword">
+        <word name="Array"/>
+        <word name="Float"/>
+        <word name="Integer"/>
+        <word name="String"/>
+        <word name="at_exit"/>
+        <word name="autoload"/>
+        <word name="binding"/>
+        <word name="caller"/>
+        <word name="catch"/>
+        <word name="chop"/>
+        <word name="chop!"/>
+        <word name="chomp"/>
+        <word name="chomp!"/>
+        <word name="eval"/>
+        <word name="exec"/>
+        <word name="exit"/>
+        <word name="exit!"/>
+        <word name="fail"/>
+        <word name="fork"/>
+        <word name="format"/>
+        <word name="gets"/>
+        <word name="global_variables"/>
+        <word name="gsub"/>
+        <word name="gsub!"/>
+        <word name="iterator?"/>
+        <word name="lambda"/>
+        <word name="load"/>
+        <word name="local_variables"/>
+        <word name="loop"/>
+        <word name="open"/>
+        <word name="p"/>
+        <word name="print"/>
+        <word name="printf"/>
+        <word name="proc"/>
+        <word name="putc"/>
+        <word name="puts"/>
+        <word name="raise"/>
+        <word name="rand"/>
+        <word name="readline"/>
+        <word name="readlines"/>
+        <word name="require"/>
+        <word name="select"/>
+        <word name="sleep"/>
+        <word name="split"/>
+        <word name="sprintf"/>
+        <word name="srand"/>
+        <word name="sub"/>
+        <word name="sub!"/>
+        <word name="syscall"/>
+        <word name="system"/>
+        <word name="test"/>
+        <word name="trace_var"/>
+        <word name="trap"/>
+        <word name="untrace_var"/>
+      </keywords>
+
+    </scheme>
+
+  </type>
+</hrc>
+<!-- ***** BEGIN LICENSE BLOCK *****
+   - Version: MPL 1.1/GPL 2.0/LGPL 2.1
+   -
+   - The contents of this file are subject to the Mozilla Public License Version
+   - 1.1 (the "License"); you may not use this file except in compliance with
+   - the License. You may obtain a copy of the License at
+   - http://www.mozilla.org/MPL/
+   -
+   - Software distributed under the License is distributed on an "AS IS" basis,
+   - WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+   - for the specific language governing rights and limitations under the
+   - License.
+   -
+   - The Original Code is the Colorer Library.
+   -
+   - The Initial Developer of the Original Code is
+   - Cail Lomecb <cail@nm.ru>.
+   - Portions created by the Initial Developer are Copyright (C) 1999-2003
+   - the Initial Developer. All Rights Reserved.
+   -
+   - Contributor(s):
+   -
+   - Alternatively, the contents of this file may be used under the terms of
+   - either the GNU General Public License Version 2 or later (the "GPL"), or
+   - the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
+   - in which case the provisions of the GPL or the LGPL are applicable instead
+   - of those above. If you wish to allow use of your version of this file only
+   - under the terms of either the GPL or the LGPL, and not to allow others to
+   - use your version of this file under the terms of the MPL, indicate your
+   - decision by deleting the provisions above and replace them with the notice
+   - and other provisions required by the LGPL or the GPL. If you do not delete
+   - the provisions above, a recipient may use your version of this file under
+   - the terms of any one of the MPL, the GPL or the LGPL.
+   -
+   - ***** END LICENSE BLOCK ***** -->

@@ -1,0 +1,10 @@
+{ use vars qw(@OUTPUT); }\
+{ $BUILD = "Building" }
+
+default:
+	# The actions are below
+	{
+	    my ($maker, $target, $deps, $matches) = @_;
+	    push @OUTPUT, "$BUILD $target\n";
+	}
+        

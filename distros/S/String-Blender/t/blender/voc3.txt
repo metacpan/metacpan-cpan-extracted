@@ -1,0 +1,5 @@
+hood
+region
+spot
+location
+district

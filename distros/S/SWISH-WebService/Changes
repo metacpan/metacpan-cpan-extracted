@@ -1,0 +1,9 @@
+Revision history for Perl extension SWISH::WebService.
+
+0.01  Wed Jun 28 12:59:08 2006
+
+0.02  1 Feb 2008
+      * fix missing Search::Tools::XML req [bug reported by eric@NeoPaper.net]
+      * fix metaname separator to use =
+
+

@@ -1,0 +1,27 @@
+SYNOPSIS
+
+     use ShellQuote::Any::Tiny qw(shell_quote);
+    
+     my $cmd = 'echo ' . shell_quote("hello world");
+    
+     # On Windows, $cmd becomes 'echo "hello world"'.
+     # On Unix, $cmd becomes q(echo 'hello world').
+
+DESCRIPTION
+
+    This module tries to quote command-line argument when passed to shell
+    (either Unix shells or Windows) using as little code as possible. For
+    more proper quoting, see See Also section.
+
+FUNCTIONS
+
+ shell_quote($str) => str
+
+SEE ALSO
+
+    String::ShellQuote for Unix shells
+
+    Win32::ShellQuote for Windows shells
+
+    PERLANCAR::ShellQuote::Any
+

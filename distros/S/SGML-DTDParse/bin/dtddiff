@@ -1,0 +1,1175 @@
+#!/usr/bin/perl -w
+# $Id: dtddiff,v 2.2 2005/07/16 03:22:57 ehood Exp $
+# Author(s): Earl Hood, <earl@earlhood.com>
+# POD at end of file.
+
+use XML::Parser;
+use File::Basename;
+use Getopt::Long;
+use SGML::DTDParse;
+
+MAIN: {
+  my %opts = (
+    'attributes'	     => 1,
+    'content-model-expanded' => 1,
+    'dump'		     => 0,
+    'elements'		     => 1,
+    'general-ents'	     => 0,
+    'param-ents'	     => 0,
+  );
+
+  GetOptions(\%opts,
+    'attributes!',		# Show attribute differences
+    'content-model-expanded!',	# Show expanded content-models
+    'elements!',		# Show element differences
+    'general-ents!',		# Show general entity differences
+    'param-ents!',		# Show parameter entity differences
+
+    'dump',
+    @SGML::DTDParse::CommonOptions
+  ) || SGML::DTDParse::usage(-verbose => 0, -exitval => 1);
+  SGML::DTDParse::process_common_options(\%opts);
+
+  my $outfh = \*STDOUT;
+  select($outfh);
+
+  my $file1 = shift @ARGV;
+  if (!defined($file1)) {
+    usage(-verbose => 0,
+          -exitval => 1,
+	  -message => 'Error: No input file(s) specified');
+  }
+
+  my $file2 = shift @ARGV;
+  if (!$opts{'dump'} && !defined($file2)) {
+    usage(-verbose => 0,
+          -exitval => 1,
+	  -message => 'Error: Second input file not specified');
+  }
+
+  my $dtd1 = read_xml($file1);
+  my $dtd2 = read_xml($file2)  unless $opts{'dump'};
+
+  if ($opts{'dump'}) {
+    dump_dtd_info($dtd1);
+    last MAIN;
+  }
+
+  my $title1 = $dtd1->{'title'};
+  my $title2 = $dtd2->{'title'};
+  $title1 = basename($file1, '.xml')  unless defined $title1;
+  $title2 = basename($file2, '.xml')  unless defined $title2;
+
+  my @param_subtracted = ( );
+  my @param_added      = ( );
+  my @param_diff       = ( );
+
+  my @elems_subtracted = ( );
+  my @elems_added      = ( );
+  my @elems_diff       = ( );
+  my $elem_diff_rec;
+  my $gi;
+  my $aname;
+
+  if ($opts{'param-ents'}) {
+    # Check for param ents substracted
+    foreach $gi (sort keys %{$dtd1->{'entities'}{'param'}}) {
+      if (!defined($dtd2->{'entities'}{'param'}{$gi})) {
+	push(@param_subtracted, $gi);
+      }
+    }
+    # Check for param ents added
+    foreach $gi (sort keys %{$dtd2->{'entities'}{'param'}}) {
+      if (!defined($dtd1->{'entities'}{'param'}{$gi})) {
+	push(@param_added, $gi);
+	next;
+      }
+      # XXX: Should comparison be case-sensitive? Configurable?
+      my $text1 = lc $dtd1->{'entities'}{'param'}{$gi}{'text-expanded'};
+      my $text2 = lc $dtd2->{'entities'}{'param'}{$gi}{'text-expanded'};
+      $text1 =~ s/^\s+//; $text1 =~ s/\s+\z//;
+      $text2 =~ s/^\s+//; $text2 =~ s/\s+\z//;
+      if ($text1 ne $text2) {
+	push(@param_diff, $gi);
+      }
+    }
+  }
+
+  if ($opts{'elements'} || $opts{'attributes'}) {
+    # Check for elements substracted
+    if ($opts{'elements'}) {
+      foreach $gi (sort keys %{$dtd1->{'elements'}}) {
+        if (!defined($dtd2->{'elements'}{$gi})) {
+          push(@elems_subtracted, $gi);
+        }
+      }
+    }
+    # Check for elements added and changed
+    foreach $gi (sort keys %{$dtd2->{'elements'}}) {
+      if (!defined($dtd1->{'elements'}{$gi})) {
+	push(@elems_added, $gi)  if ($opts{'elements'});
+	next;
+      }
+      $elem_diff_rec = { };
+
+      my $elem_info1 = $dtd1->{'elements'}{$gi};
+      my $elem_info2 = $dtd2->{'elements'}{$gi};
+      if ($opts{'elements'}) {
+        my $model_type = $opts{'content-model-expanded'}
+                         ? 'content-model-expanded-tree'
+                         : 'content-model-tree';
+        my $cmp_model1 = 
+              sort_content_model_tree($elem_info1->{$model_type});
+           $cmp_model1 .=
+              sort_content_model_tree($elem_info1->{'inclusion-tree'})
+                  if $elem_info1->{'inclusion-tree'};
+           $cmp_model1 .=
+              sort_content_model_tree($elem_info1->{'exclusion-tree'})
+                  if $elem_info1->{'exclusion-tree'};
+        my $cmp_model2 = 
+              sort_content_model_tree($elem_info2->{$model_type});
+           $cmp_model2 .=
+              sort_content_model_tree($elem_info2->{'inclusion-tree'})
+                  if $elem_info2->{'inclusion-tree'};
+           $cmp_model2 .=
+              sort_content_model_tree($elem_info2->{'exclusion-tree'})
+                  if $elem_info1->{'exclusion-tree'};
+
+        # content models differ
+        if ($cmp_model1 ne $cmp_model2) {
+          $elem_diff_rec->{'name'}  = $gi;
+          $elem_diff_rec->{'model'} = 1;
+        }
+      }
+
+      # check attributes
+      if ($opts{'attributes'}) {
+	my $attrs1 = $elem_info1->{'attributes'} || +{ };
+	my $attrs2 = $elem_info2->{'attributes'} || +{ };
+	my $attrs_added      = [ ];
+	my $attrs_subtracted = [ ];
+	my $attrs_diff       = [ ];
+
+	# attributes subtracted
+	foreach $aname (sort keys %$attrs1) {
+	  if (!defined($attrs2->{$aname})) {
+	    push(@$attrs_subtracted, $aname);
+	  }
+	}
+	# attributes added and changed
+	foreach $aname (sort keys %$attrs2) {
+	  if (!defined($attrs1->{$aname})) {
+	    push(@$attrs_added, $aname);
+	    next;
+	  }
+	  my $attr_info1  = $attrs1->{$aname};
+	  my $attr_info2  = $attrs2->{$aname};
+	  my $attr_value1 = $attr_info1->{'value'};
+	  my $attr_value2 = $attr_info2->{'value'};
+	  my $attr_def1   = $attr_info1->{'default'};
+	  my $attr_def2   = $attr_info2->{'default'};
+	  my $attr_type1  = $attr_info1->{'type'};
+	  my $attr_type2  = $attr_info2->{'type'};
+
+	  $attr_def1 = lc $attr_def1  if $dtd1->{'namecase-general'} &&
+					 $attr_type1 !~ /^cdata$/i;
+	  $attr_def2 = lc $attr_def2  if $dtd2->{'namecase-general'} &&
+					 $attr_type2 !~ /^cdata$/i;
+
+	  $attr_value1 = lc $attr_value1  if $dtd1->{'namecase-general'};
+	  $attr_value2 = lc $attr_value2  if $dtd2->{'namecase-general'};
+
+	  if ($attr_type1  ne $attr_type2  ||
+	      $attr_value1 ne $attr_value2 ||
+	      $attr_def1   ne $attr_def2   ||
+	      $attr_info1->{'enumeration'} ne $attr_info2->{'enumeration'}) {
+	    push(@$attrs_diff, $aname);
+	  }
+	}
+
+	if (scalar(@$attrs_added)) {
+	  $elem_diff_rec->{'name'}  = $gi;
+	  $elem_diff_rec->{'attr_added'} = $attrs_added;
+	}
+	if (scalar(@$attrs_subtracted)) {
+	  $elem_diff_rec->{'name'}  = $gi;
+	  $elem_diff_rec->{'attr_subtracted'} = $attrs_subtracted;
+	}
+	if (scalar(@$attrs_diff)) {
+	  $elem_diff_rec->{'name'}  = $gi;
+	  $elem_diff_rec->{'attr_diff'} = $attrs_diff;
+	}
+      }
+
+      push(@elems_diff, $elem_diff_rec)  if scalar(%$elem_diff_rec);
+    }
+  }
+
+  # Print diff
+  print $outfh "*** $title1\n";
+  print $outfh "--- $title2\n";
+
+  if ($opts{'param-ents'}) {
+    if (@param_subtracted) {
+      print $outfh ('*' x 15), " Parameter Entities Subtracted\n";
+      print $outfh "*** $title1 ****\n";
+      foreach $gi (@param_subtracted) {
+	print $outfh '- ', $gi, "\n";
+      }
+    }
+    if (@param_added) {
+      print $outfh ('*' x 15), " Parameter Entities Added\n";
+      print $outfh "--- $title2 ----\n";
+      foreach $gi (@param_added) {
+	print $outfh '+ ', $gi, "\n";
+      }
+    }
+    if (@param_diff) {
+      print $outfh ('*' x 15), " Parameter Entities Changed\n";
+      foreach $gi (@param_diff) {
+	print $outfh "*** $title1 ****\n\n";
+	print $outfh '! %', $gi, "; = \n";
+	local $param_value = $dtd1->{'entities'}{'param'}{$gi}{'text-expanded'};
+	select((select($outfh),
+		$~ = "PARAM_DIFF_CHNG",
+		$= = 10000000,
+		$: = "|&, \t\n"
+	       )[0]);
+	write $outfh;
+
+	print $outfh "\n--- $title2 ----\n\n";
+	print $outfh '! %', $gi, "; = \n";
+	$param_value = $dtd2->{'entities'}{'param'}{$gi}{'text-expanded'};
+	write $outfh;
+	print $outfh "\n";
+      }
+    }
+  } # End: $opts{param-ents}
+
+  if ($opts{'elements'} || $opts{'attributes'}) {
+    if (@elems_subtracted) {
+      print $outfh ('*' x 15), " Elements Subtracted\n";
+      print $outfh "*** $title1 ****\n";
+      foreach $gi (@elems_subtracted) {
+	print $outfh '- ', $gi, "\n";
+      }
+    }
+    if (@elems_added) {
+      print $outfh ('*' x 15), " Elements Added\n";
+      print $outfh "--- $title2 ----\n";
+      foreach $gi (@elems_added) {
+	print $outfh '+ ', $gi, "\n";
+      }
+    }
+    if (@elems_diff) {
+      print $outfh ('*' x 15), " Elements Changed\n";
+      foreach $elem_diff_rec (@elems_diff) {
+	$gi = $elem_diff_rec->{'name'};
+
+	print $outfh "*** $title1 ****\n\n"
+	    if ($elem_diff_rec->{'model'}) ||
+	       ($opts{'attributes'} &&
+		(($elem_diff_rec->{'attr_subtracted'}) ||
+		 ($elem_diff_rec->{'attr_diff'})));
+
+	if ($elem_diff_rec->{'model'}) {
+	  print $outfh '! ';
+	  print_elem($outfh, $gi, $dtd1->{'elements'}{$gi},
+		     $opts{'content-model-expanded'}, 2);
+	}
+
+	if ($opts{'attributes'}) {
+	  print $outfh "\n   $gi Attributes:\n"
+	      if ($elem_diff_rec->{'attr_subtracted'}) ||
+		 ($elem_diff_rec->{'attr_diff'});
+	  if ($elem_diff_rec->{'attr_subtracted'}) {
+	    foreach $aname (@{$elem_diff_rec->{'attr_subtracted'}}) {
+	      print_attr_subtracted($outfh, $aname,
+		  $dtd1->{'elements'}{$gi}{'attributes'}{$aname});
+	    }
+	  }
+	  if ($elem_diff_rec->{'attr_diff'}) {
+	    foreach $aname (@{$elem_diff_rec->{'attr_diff'}}) {
+	      print_attr_chng($outfh, $aname,
+		  $dtd1->{'elements'}{$gi}{'attributes'}{$aname});
+	    }
+	  }
+	}
+
+	print $outfh "\n--- $title2 ----\n\n"
+	    if ($elem_diff_rec->{'model'}) ||
+	       ($opts{'attributes'} &&
+		(($elem_diff_rec->{'attr_added'}) ||
+		 ($elem_diff_rec->{'attr_diff'})));
+
+	if ($elem_diff_rec->{'model'}) {
+	  print $outfh '! ';
+	  print_elem($outfh, $gi, $dtd2->{'elements'}{$gi},
+		     $opts{'content-model-expanded'}, 2);
+	}
+
+	if ($opts{'attributes'}) {
+	  print $outfh "\n   $gi Attributes:\n"
+	      if ($elem_diff_rec->{'attr_added'}) ||
+		 ($elem_diff_rec->{'attr_diff'});
+	  if ($elem_diff_rec->{'attr_added'}) {
+	    foreach $aname (@{$elem_diff_rec->{'attr_added'}}) {
+	      print_attr_added($outfh, $aname,
+		  $dtd2->{'elements'}{$gi}{'attributes'}{$aname});
+	    }
+	  }
+	  if ($elem_diff_rec->{'attr_diff'}) {
+	    foreach $aname (@{$elem_diff_rec->{'attr_diff'}}) {
+	      print_attr_chng($outfh, $aname,
+		  $dtd2->{'elements'}{$gi}{'attributes'}{$aname});
+	    }
+	  }
+	}
+
+	print $outfh "\n";
+      }
+    }
+  } # End: $opts{elements}
+}
+
+##############################################################################
+
+#** Read XML representation of DTD
+#
+#   =param  $file	XML filename.
+#   =return Reference to hash contain DTD data extracted.
+#*
+sub read_xml {
+  my $file = shift;
+
+  my $dtd = {
+    filename => $file,
+  };
+
+  # closure globals used in parsing
+  my @element_stack = ();
+  my @model_group = ();
+  my $model_group = "";
+  my @first_in_group = ();
+  my $first_in_group = 0;
+  my $cur_dtd_elem = undef;
+  my $cur_model = undef;
+  my $cur_entity = undef;
+  my @group_occurrence = ();
+  my $group_occurrence = "";
+  my $tree_node = undef;
+  my @node_stack = ();
+
+  # Create parser with handlers
+  my $parser = XML::Parser->new(Handlers =>
+  {
+    ## Start tag handler ----------------------------------------------------
+    Start =>
+    sub {
+      my $expat = shift;
+      my $gi    = shift;
+      my %attr  = @_;
+
+      push(@element_stack, $gi);
+
+      SW: {
+	if ($gi eq 'dtd') {
+	  $dtd->{'namecase-general'} = $attr{'namecase-general'};
+	  $dtd->{'title'} = $attr{'title'};
+	  last SW;
+	}
+
+	if ($gi eq 'notation') {
+	  my $name = $attr{'name'};
+	  $dtd->{'notations'}{$name} = {
+	    'system' => $attr{'system'},
+	    'public' => $attr{'public'},
+	  };
+	  last SW;
+	}
+
+	if ($gi eq 'entity') {
+	  my $name = $attr{'name'};
+	  my $type = $attr{'type'};
+	  $cur_entity = {
+	    'system'        => $attr{'system'},
+	    'public'        => $attr{'public'},
+	    'notation'      => $attr{'notation'},
+	    'text-expanded' => '',
+	    'text'	    => '',
+	  };
+	  $dtd->{'entities'}{$type}{$name} = $cur_entity;
+	  last SW;
+	}
+
+	if ($gi eq 'element') {
+	  $cur_dtd_elem = $attr{'name'};
+	  $cur_dtd_elem = lc($cur_dtd_elem)  if ($dtd->{'namecase-general'});
+	  $dtd->{'elements'}{$cur_dtd_elem}{'stagm'} = $attr{'stagm'};
+	  $dtd->{'elements'}{$cur_dtd_elem}{'etagm'} = $attr{'etagm'};
+	  $dtd->{'elements'}{$cur_dtd_elem}{'content-type'} =
+	      $attr{'content-type'};
+	  last SW;
+	}
+
+	if ($gi eq 'content-model-expanded') {
+	  last SW  unless defined $cur_dtd_elem;
+	  $dtd->{'elements'}{$cur_dtd_elem}{'content-model-expanded'} = '';
+	  $cur_model = \$dtd->{'elements'}{$cur_dtd_elem}
+			      {'content-model-expanded'};
+	  $tree_node = 
+	      $dtd->{'elements'}{$cur_dtd_elem}
+		    {'content-model-expanded-tree'} = [ ];
+	  last SW;
+	}
+
+	if ($gi eq 'content-model') {
+	  last SW  unless defined $cur_dtd_elem;
+	  $dtd->{'elements'}{$cur_dtd_elem}{'content-model'} = '';
+	  $cur_model = \$dtd->{'elements'}{$cur_dtd_elem}{'content-model'};
+	  $tree_node = 
+	      $dtd->{'elements'}{$cur_dtd_elem}
+		    {'content-model-tree'} = [ ];
+	  last SW;
+	}
+
+	if ($gi eq 'inclusions') {
+	  last SW  unless defined $cur_dtd_elem;
+	  $dtd->{'elements'}{$cur_dtd_elem}{'inclusions'} = '';
+	  $cur_model = \$dtd->{'elements'}{$cur_dtd_elem}{'inclusions'};
+	  $tree_node = 
+	      $dtd->{'elements'}{$cur_dtd_elem}{'inclusion-tree'} = [ ];
+	  last SW;
+	}
+
+	if ($gi eq 'exclusions') {
+	  last SW  unless defined $cur_dtd_elem;
+	  $dtd->{'elements'}{$cur_dtd_elem}{'exclusions'} = '';
+	  $cur_model = \$dtd->{'elements'}{$cur_dtd_elem}{'exclusions'};
+	  $tree_node = 
+	      $dtd->{'elements'}{$cur_dtd_elem}{'exclusion-tree'} = [ ];
+	  last SW;
+	}
+
+	if ($gi eq 'sequence-group' ||
+	    $gi eq 'or-group' ||
+	    $gi eq 'and-group') {
+	  last SW  if !defined($cur_dtd_elem) || !defined($cur_model);
+	  if (scalar(@first_in_group)) {
+	    $$cur_model .= $model_group
+		if (!$first_in_group[$#first_in_group]);
+	    $first_in_group[$#first_in_group] = 0;
+	  }
+	  $$cur_model .= '(';
+
+	  $group_occurrence = $attr{'occurrence'} || "";
+	  push(@group_occurrence, $group_occurrence);
+
+	  $model_group =   $gi eq 'sequence-group' ? ','
+			 : $gi eq 'or-group'       ? '|'
+			 :                           '&';
+	  push(@model_group, $model_group);
+	  push(@first_in_group, 1);
+
+	  my $new_node = [ $model_group, $group_occurrence ];
+	  push(@$tree_node, $new_node);
+	  push(@node_stack, $tree_node);
+	  $tree_node = $new_node;
+
+	  last SW;
+	}
+
+	if ($gi eq 'element-name') {
+	  last SW  if !defined($cur_dtd_elem) || !defined($cur_model);
+	  $elem_name = $attr{'name'};
+	  $occurrence = $attr{'occurrence'} || '';
+	  $elem_name = lc($elem_name)  if ($dtd->{'namecase-general'});
+	  $$cur_model .= $model_group  if (!$first_in_group[$#first_in_group]);
+	  $$cur_model .= $elem_name . $occurrence;
+	  $first_in_group[$#first_in_group] = 0;
+
+	  push(@$tree_node, $elem_name.$occurrence);
+	  last SW;
+	}
+
+	if ($gi eq 'parament-name') {
+	  last SW  if !defined($cur_dtd_elem) || !defined($cur_model);
+	  $$cur_model .= $model_group  if (!$first_in_group[$#first_in_group]);
+	  $$cur_model .= '%'.$attr{'name'}.';';
+	  $first_in_group[$#first_in_group] = 0;
+
+	  push(@$tree_node, '%'.$attr{'name'}.';');
+	  last SW;
+	}
+
+	if ($gi eq 'pcdata') {
+	  last SW  if !defined($cur_dtd_elem) || !defined($cur_model);
+	  $$cur_model .= $model_group  if (!$first_in_group[$#first_in_group]);
+	  $$cur_model .= '#PCDATA';
+	  $first_in_group[$#first_in_group] = 0;
+
+	  push(@$tree_node, '#PCDATA');
+	  last SW;
+	}
+
+	if ($gi eq 'rcdata') {
+	  last SW  if !defined($cur_dtd_elem) || !defined($cur_model);
+	  $$cur_model .= 'RCDATA';
+
+	  push(@$tree_node, 'RCDATA');
+	  last SW;
+	}
+
+	if ($gi eq 'cdata') {
+	  last SW  if !defined($cur_dtd_elem) || !defined($cur_model);
+	  $$cur_model .= 'CDATA';
+	  push(@$tree_node, 'CDATA');
+	  last SW;
+	}
+
+	if ($gi eq 'empty') {
+	  last SW  if !defined($cur_dtd_elem) || !defined($cur_model);
+	  $$cur_model .= 'EMPTY';
+	  push(@$tree_node, 'EMPTY');
+	  last SW;
+	}
+
+
+	if ($gi eq 'attlist') {
+	  $cur_dtd_elem = $attr{'name'};
+	  $cur_dtd_elem = lc($cur_dtd_elem)  if ($dtd->{'namecase-general'});
+	  $dtd->{'elements'}{$cur_dtd_elem}{'attributes'} = { };
+	  last SW;
+	}
+
+	if ($gi eq 'attribute') {
+	  last SW  unless defined($cur_dtd_elem);
+	  my $attr_name = $attr{'name'};
+	  $attr_name = lc($attr_name)  if ($dtd->{'namecase-general'});
+	  $dtd->{'elements'}{$cur_dtd_elem}{'attributes'}{$attr_name} = {
+	    type => $attr{'type'},
+	    value => $attr{'value'},
+	    default => $attr{'default'},
+	    enumeration => ($attr{'enumeration'} || 'no'),
+	  };
+	  last SW;
+	}
+
+      } # End: SW
+    }, # End: Start Handler
+
+    ## End tag handler ------------------------------------------------------
+    End =>
+    sub {
+      my $expact = shift;
+      my $gi     = shift;
+
+      my $name = pop(@element_stack);
+      SW: {
+	if ($gi eq 'entity') {
+	  $cur_entity->{'text-expanded'} =~ s/\s+/ /g;
+	  $cur_entity->{'text'}          =~ s/\s+/ /g;
+	  $cur_entity = undef;
+	  last SW;
+	}
+
+	if ($gi eq 'element' ||
+	    $gi eq 'attlist') {
+	  $cur_dtd_elem = undef;
+	  $cur_model = undef;
+	  last SW;
+	}
+
+	if ($gi eq 'content-model-expanded' ||
+	    $gi eq 'content-model' ||
+	    $gi eq 'inclusions' ||
+	    $gi eq 'exclusions') {
+	  $cur_model = undef;
+	  $tree_node = undef;
+	  @node_stack = ( );
+	  last SW;
+	}
+
+	if ($gi eq 'sequence-group' ||
+	    $gi eq 'or-group' ||
+	    $gi eq 'and-group') {
+
+	  pop(@model_group);
+	  $model_group = scalar($model_group)
+			 ? $model_group[-1]
+			 : '';
+
+	  pop(@first_in_group);
+
+	  $$cur_model .= ')' . $group_occurrence  if defined($cur_model);
+	  $tree_node = pop(@node_stack);
+
+	  pop(@group_occurrence);
+	  $group_occurrence = scalar(@group_occurrence)
+			      ? $group_occurrence[-1]
+			      : '';
+	  last SW;
+	}
+
+      } # End: SW
+    }, # End: End tag handler
+
+    ## Character data handler -----------------------------------------------
+    Char =>
+    sub {
+      my $expat  = shift;
+      my $string = shift;
+
+      my $open_elem = $element_stack[-1];
+      SW: {
+	if ($open_elem eq 'text-expanded') {
+	  $cur_entity->{'text-expanded'} .= $string;
+	  last SW;
+	}
+	if ($open_elem eq 'text') {
+	  $cur_entity->{'text'} .= $string;
+	  last SW;
+	}
+      } # End: SW
+    }, # End: Character data handler
+  });
+
+  $parser->parsefile($file);
+  return $dtd;
+
+} # End: sub read_xml
+
+##--------------------------------------------------------------------------##
+
+sub sort_content_model_tree {
+  my $tree = shift;
+
+  return '' unless defined $tree;
+  return '' if (!scalar(@$tree));
+  return $tree->[0]  if !ref($tree->[0]) && ($tree->[0] !~ /[,|&]/);
+
+  my @items	 = @$tree;
+  my $con	 = ref($items[0]) ? '' : shift(@items);
+  my $occurrence = $con ? shift(@items) : '';
+
+  my @sort_items = ( );
+  foreach my $item (@items) {
+    if (ref($item)) {
+      push(@sort_items, sort_content_model_tree($item));
+      next;
+    }
+    push(@sort_items, $item);
+  }
+
+  @sort_items = sort {
+      my $A = $a;
+      my $B = $b;
+      $A =~ s/[\(\)*?+]//g;
+      $B =~ s/[\(\)*?+]//g;
+      $A cmp $B;
+  } @sort_items  unless $con eq ',';
+
+  my $text = '';
+  $text   .= '('  if $con;
+  $text	  .= join($con, @sort_items);
+  $text   .= ')'  if $con;
+  $text   .= $occurrence;
+
+  $text;
+}
+
+##--------------------------------------------------------------------------##
+
+sub format_content_model {
+  my $model  = shift;
+  my $indent = shift || 0;
+  my $maxlen = shift || 65;
+
+  my $tokens;
+  if (ref($model) =~ /ARRAY/) {
+    $tokens = $model;
+  } else {
+    $model =~ s/\s+//g;
+    $tokens = [ split(/([,|&\(\)?*+])/, $model) ];
+  }
+
+  my $nl     = "\n" . (' ' x $indent);
+  my $first  = 1;
+  my $open   = 0;
+  my $prev   = '';
+  my $fmt    = '';
+  my $len    = 0;
+  my($tmp);
+
+  foreach my $token (@$tokens) {
+    next  unless $token =~ /\S/;
+
+    if ($token eq '(') {
+      if ($prev eq $token) {      # Print consecutive ('s together
+	$fmt .= $token;
+      } else {                    # Else, start newline
+	if ($first) {
+	  $first = 0;
+	} else {
+	  $fmt .= $nl;
+	}
+	$fmt .= (' ' x $open) . $token;
+      }
+      $open++;                    # Increase group open counter
+      $len = $open+1;             # Adjust length of line counter
+      next;                       # Goto next token
+    }
+    $len += length($token);
+
+    if ($token eq '&' ||               # Put spaces around '&'.
+	$token eq '|') {               # Put spaces around '|'.
+      $fmt .= ' ' . $token . ' ';
+      $len += 2;
+
+    } elsif ($token eq ',') {          # Put space after ','.
+      $fmt .= $token . ' ';
+      ++$len;
+
+    } elsif ($token eq ')') {
+      $fmt .= $token;
+      $open--;
+
+    } elsif ($token =~ /[*+?]/) {
+      $fmt .= $token;
+
+    } elsif (($len+length($token)) > $maxlen) {
+      $fmt .= $nl . (' ' x $open) . $token;
+      $len = $open + length($token);
+
+    } else {
+      $fmt .= $token;
+    }
+
+  } continue {
+      $prev = $token  if $token =~ /\S/;
+  }
+  $fmt .= "\n";
+
+  $fmt;
+}
+
+##--------------------------------------------------------------------------##
+
+sub print_elem {
+  my $fh      = shift;
+  my $gi      = shift;
+  my $info    = shift;
+  my $expand  = shift;
+  my $indent  = shift || 0;
+  my $model_type = $expand
+		   ? 'content-model-expanded-tree'
+		   : 'content-model-tree';
+
+  $expand  = 1  unless defined $expand;
+  $indent += 4;
+  print $fh "$gi ::=\n", (' ' x $indent),
+	    format_content_model(sort_content_model_tree(
+	      $info->{$model_type}), $indent);
+  print $fh ' ' x ($indent-1), '+',
+	    format_content_model(sort_content_model_tree(
+	      $info->{'inclusion-tree'}), $indent),
+	    if $info->{'inclusion-tree'};
+  print $fh ' ' x ($indent-1), '-',
+	    format_content_model(sort_content_model_tree(
+	      $info->{'exclusion-tree'}), $indent),
+	    if $info->{'exclusion-tree'};
+}
+
+##--------------------------------------------------------------------------##
+
+sub print_attr_added {
+  my $fh = shift;
+  my $name = shift;
+  my $attr_rec = shift;
+  local($attr_name, $attr_type, $attr_default);
+  set_attr_form_variables($name, $attr_rec);
+  select((select($fh),
+	  $~ = "ATTR_DIFF_ADD",
+	  $= = 10000000
+	 )[0]);
+  write $fh;
+}
+
+sub print_attr_subtracted {
+  my $fh = shift;
+  my $name = shift;
+  my $attr_rec = shift;
+  local($attr_name, $attr_type, $attr_default);
+  set_attr_form_variables($name, $attr_rec);
+  select((select($fh),
+	  $~ = "ATTR_DIFF_SUB",
+	  $= = 10000000
+	 )[0]);
+  write $fh;
+}
+
+sub print_attr_chng {
+  my $fh = shift;
+  my $name = shift;
+  my $attr_rec = shift;
+  local($attr_name, $attr_type, $attr_default);
+  set_attr_form_variables($name, $attr_rec);
+  select((select($fh),
+	  $~ = "ATTR_DIFF_CHNG",
+	  $= = 10000000
+	 )[0]);
+  write $fh;
+}
+
+sub set_attr_form_variables {
+  my $name = shift;   # attribute name
+  my $rec  = shift;   # attribute record
+  my $enum = $rec->{'enumeration'};
+  $attr_name = $name;
+  $attr_type = $enum eq 'yes'
+		      ? join(', ', split(' ', $rec->{'value'}))
+		      : $rec->{'value'};
+  $attr_default = $rec->{'default'};
+  if ($enum eq 'yes') {
+    $attr_type = "[Enumeration]                      \n".$attr_type;
+  } elsif ($enum eq 'notation') {
+    $attr_type = "[Notation]                         \n".$attr_type;
+  }
+  if ($attr_default eq "") {
+    $attr_default = $rec->{'type'};
+  } else {
+    $attr_default = '"'.$attr_default.'"';
+  }
+}
+
+##--------------------------------------------------------------------------##
+
+sub dump_dtd_info {
+  my $dtd = shift;
+  $= = 10000000;
+  $: = "|,& \t\n";
+
+  $~ = "PARAM_DUMP";
+  foreach my $gi (sort keys %{$dtd->{'entities'}{'param'}}) {
+    my $param_info = $dtd->{'entities'}{'param'}{$gi};
+    print '-' x 72, "\n";
+    print '%', $gi, " = \n";
+    if ($param_info->{'text-expanded'}) {
+      local $param_value = $param_info->{'text-expanded'};
+      write;
+    } else {
+      if ($param_info->{'public'}) {
+	print '    PUBLIC "', $param_info->{'public'}, '"', "\n";
+      }
+      if ($param_info->{'system'}) {
+	print '    PUBLIC "', $param_info->{'system'}, '"', "\n";
+      }
+    }
+  }
+
+  $~ = "ATTR_DUMP";
+  foreach my $gi (sort keys %{$dtd->{'elements'}}) {
+    print '-' x 72, "\n";
+    my $elem_info = $dtd->{'elements'}{$gi};
+    print "$gi ::=\n    ",
+	  format_content_model(sort_content_model_tree(
+	    $elem_info->{'content-model-tree'}), 4),
+	  "\n";
+    print "$gi(expanded) ::=\n    ",
+	  format_content_model(sort_content_model_tree(
+	    $elem_info->{'content-model-expanded-tree'}), 4);
+    print "\n"  if $elem_info->{'inclusion-tree'} ||
+		   $elem_info->{'exclusion-tree'};
+    print "   +",
+	  format_content_model(sort_content_model_tree(
+	    $elem_info->{'inclusion-tree'}), 4),
+	  if $elem_info->{'inclusion-tree'};
+    print "   -",
+	  format_content_model(sort_content_model_tree(
+	    $elem_info->{'exclusion-tree'}), 4),
+	  if $elem_info->{'exclusion-tree'};
+
+    my $attrs = $elem_info->{'attributes'};
+    print "\n  Attributes:\n";
+    foreach my $attr (sort keys %$attrs) {
+      my $enum = $attrs->{$attr}{'enumeration'};
+      local $attr_name = $attr;
+      local $attr_type = $enum eq 'yes'
+			  ? join(', ', split(' ', $attrs->{$attr}{'value'}))
+			  : $attrs->{$attr}{'value'};
+      local $attr_default = $attrs->{$attr}{'default'};
+
+      if ($enum eq 'yes') {
+	$attr_type = "[Enumeration]                      \n".$attr_type;
+      } elsif ($enum eq 'notation') {
+	$attr_type = "[Notation]                         \n".$attr_type;
+      }
+
+      if ($attr_default eq "") {
+	$attr_default = $attrs->{$attr}{'type'};
+      } else {
+	$attr_default = '"'.$attr_default.'"';
+      }
+
+      write;
+    }
+    print "\n";
+  }
+
+}
+
+##############################################################################
+
+format ATTR_DUMP =
+    @<<<<<<<<<<<<<<<<<<<<  ^<<<<<<<<<<<<<<<<<<<<<<<<  ^<<<<<<<<<<<<<<<<<<<<<<
+    $attr_name,            $attr_type,                $attr_default
+~~                         ^<<<<<<<<<<<<<<<<<<<<<<<<  ^<<<<<<<<<<<<<<<<<<<<<<
+                           $attr_type,                $attr_default
+.
+format ATTR_DIFF_SUB =
+-   @<<<<<<<<<<<<<<<<<<<<  ^<<<<<<<<<<<<<<<<<<<<<<<<  ^<<<<<<<<<<<<<<<<<<<<<<
+    $attr_name,            $attr_type,                $attr_default
+-~~                        ^<<<<<<<<<<<<<<<<<<<<<<<<  ^<<<<<<<<<<<<<<<<<<<<<<
+                           $attr_type,                $attr_default
+.
+format ATTR_DIFF_ADD =
++   @<<<<<<<<<<<<<<<<<<<<  ^<<<<<<<<<<<<<<<<<<<<<<<<  ^<<<<<<<<<<<<<<<<<<<<<<
+    $attr_name,            $attr_type,                $attr_default
++~~                        ^<<<<<<<<<<<<<<<<<<<<<<<<  ^<<<<<<<<<<<<<<<<<<<<<<
+                           $attr_type,                $attr_default
+.
+format ATTR_DIFF_CHNG =
+!   @<<<<<<<<<<<<<<<<<<<<  ^<<<<<<<<<<<<<<<<<<<<<<<<  ^<<<<<<<<<<<<<<<<<<<<<<
+    $attr_name,            $attr_type,                $attr_default
+!~~                        ^<<<<<<<<<<<<<<<<<<<<<<<<  ^<<<<<<<<<<<<<<<<<<<<<<
+                           $attr_type,                $attr_default
+.
+format PARAM_DUMP =
+    ^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    $param_value
+~~  ^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    $param_value
+.
+format PARAM_DIFF_CHNG =
+!     ^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+      $param_value
+!~~   ^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+      $param_value
+.
+
+__END__
+
+=head1 NAME
+
+dtddiff - Compare two SGML/XML DTDs
+
+=head1 SYNOPSIS
+
+  dtddiff [options] <parsed-dtd1.xml> <parsed-dtd2.xml>
+
+=head1 DESCRIPTION
+
+B<dtddiff> compares two SGML/XML DTDs based upon the XML dumps generated
+by B<dtdparse>.  The following summarizes the typically usage of
+dtddiff:
+
+  dtdparse --outfile parsed-dtd1.xml dtd1.dtd
+  dtdparse --outfile parsed-dtd2.xml dtd2.dtd
+  dtddiff parsed-dtd1.xml parsed-dtd2.xml > dtd.diff
+
+Since dtddiff processes the XML dumps from dtdparse, a full reparse
+of the DTDs is avoided.
+
+dtddiff does a structural-based comparision.  Therefore, the order
+of declarations in the DTDs does not affect the comparison.
+
+The output generated by dtddiff is similiar in style to a context-based
+diff done by the program diff(1).  The following is an example of
+the type of output generated:
+
+  *** DocBook 4.1 DTD
+  --- DocBook 4.2 DTD
+  *************** Elements Added
+  --- DocBook 4.2 DTD ----
+  + bibliocoverage
+  + biblioid
+  + bibliorelation
+  + bibliosource
+  + blockinfo
+  + citebiblioid
+  + coref
+  + errortext
+  + personblurb
+  + personname
+  + refsection
+  + refsectioninfo
+  + textdata
+  *************** Elements Changed
+  ... [snip] ...
+
+  *** DocBook 4.1 DTD ****
+
+  ! entrytbl ::=
+        (colspec*, spanspec*, thead?, tbody)
+       -(entrytbl)
+
+     entrytbl Attributes:
+  !   charoff                NUTOKEN                    #IMPLIED
+  !   colname                NMTOKEN                    #IMPLIED
+  !   cols                   NUMBER                     #REQUIRED
+  !   colsep                 NUMBER                     #IMPLIED
+  !   nameend                NMTOKEN                    #IMPLIED
+  !   namest                 NMTOKEN                    #IMPLIED
+  !   rowsep                 NUMBER                     #IMPLIED
+  !   spanname               NMTOKEN                    #IMPLIED
+  !   tgroupstyle            NMTOKEN                    #IMPLIED
+
+  --- DocBook 4.2 DTD ----
+
+  ! entrytbl ::=
+        (colspec*, spanspec*, thead?, tbody)
+
+     entrytbl Attributes:
+  !   charoff                CDATA                      #IMPLIED
+  !   colname                CDATA                      #IMPLIED
+  !   cols                   CDATA                      #REQUIRED
+  !   colsep                 CDATA                      #IMPLIED
+  !   nameend                CDATA                      #IMPLIED
+  !   namest                 CDATA                      #IMPLIED
+  !   rowsep                 CDATA                      #IMPLIED
+  !   spanname               CDATA                      #IMPLIED
+  !   tgroupstyle            CDATA                      #IMPLIED
+
+  ... [snip] ...
+
+  *** DocBook 4.1 DTD ****
+
+
+     graphic Attributes:
+  !   depth                  NUTOKEN                    #IMPLIED
+  !   format                 [Enumeration]              #IMPLIED
+  !                          BMP, CGM-CHAR, CGM-
+  !                          BINARY, CGM-CLEAR,
+  !                          DITROFF, DVI, EPS, EQN,
+  !                          FAX, GIF, GIF87a, GIF89a,
+  !                          JPG, JPEG, IGES, PCX,
+  !                          PIC, PNG, PS, SGML, TBL,
+  !                          TEX, TIFF, WMF, WPG,
+  !                          linespecific
+  !   scale                  NUMBER                     #IMPLIED
+  !   scalefit               NUMBER                     #IMPLIED
+  !   width                  NUTOKEN                    #IMPLIED
+
+  --- DocBook 4.2 DTD ----
+
+
+     graphic Attributes:
+  +   contentdepth           CDATA                      #IMPLIED
+  +   contentwidth           CDATA                      #IMPLIED
+  +   valign                 [Enumeration]              #IMPLIED
+  +                          top, middle, bottom
+  !   depth                  CDATA                      #IMPLIED
+  !   format                 [Enumeration]              #IMPLIED
+  !                          BMP, CGM-CHAR, CGM-
+  !                          BINARY, CGM-CLEAR,
+  !                          DITROFF, DVI, EPS, EQN,
+  !                          FAX, GIF, GIF87a, GIF89a,
+  !                          JPG, JPEG, IGES, PCX,
+  !                          PIC, PNG, PS, SGML, TBL,
+  !                          TEX, TIFF, WMF, WPG, SVG,
+  !                          linespecific
+  !   scale                  CDATA                      #IMPLIED
+  !   scalefit               CDATA                      #IMPLIED
+  !   width                  CDATA                      #IMPLIED
+
+  ... [snip] ...
+
+Lines starting with a C<- > (minus followed by a space) denote
+items removed.  Lines starting with a C<+ > (plus followed by a
+space) denote items added.  Lines starting with a C<! >
+(explanation point followed by a space) denote items changed.
+
+=head1 OPTIONS
+
+=over
+
+=item --attributes
+
+=item --noattributes
+
+Print, or not, element attribute differences.  The default is to
+print differences.
+
+=item --content-model-expanded
+
+=item --nocontent-model-expanded
+
+Expand, or not expand, element content models during comparison.
+Expanded models have all parameter entities resolved.  The default
+is to use expanded content model.
+
+=item --elements
+
+=item --noelements
+
+Print, or not, element content model differences.  The default is to
+print differences.
+
+=item --general-ents
+
+=item --nogeneral-ents
+
+Print, or not, general entity differences.  The default is to B<not>
+print differences.
+
+=item --parameter-ents
+
+=item --noparameter-ents
+
+Print, or not, parameter entity differences.  The default is to B<not>
+print differences.
+
+=item --dump
+
+Do a textual dump of a DTD.  When this option is specified, only
+a single DTD is dumped.  This is mainly used for debugging purposes.
+
+=item --version
+
+Print version and synopsis.
+
+=item --help
+
+Print synopsis and options available.
+
+=item --man
+
+Print manual page.
+
+=back
+
+=head1 SEE ALSO
+
+L<dtdparse|dtdparse>,
+L<dtddiff2html|dtddiff2html>
+
+See L<SGML::DTDParse|SGML::DTDParse> for an overview of the DTDParse package.
+
+=head1 PREREQUISITES
+
+B<File::Basename>,
+B<Getopt::Long>,
+B<Xml::Parser>
+
+=head1 AVAILABILITY
+
+E<lt>I<http://dtdparse.sourceforge.net/>E<gt>
+
+=head1 AUTHORS
+
+Earl Hood, <earl@earlhood.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+See L<SGML::DTDParse|SGML::DTDParse> for copyright and license information.
+

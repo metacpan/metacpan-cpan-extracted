@@ -1,0 +1,71 @@
+- use Sub::Name to set anonymous functions names
+
+
+# a few shots at getting a usable syntax for
+# a source filter variant of the contract declaration
+
+#-------------------------------------
+#
+# simple way
+#
+#-------------------------------------
+
+package MyPkg;
+
+use Sub::Contract;
+
+contract('foo',
+	       in => [ &valid1, &valid2, a => &valid3, b => &valid4 ],
+	       out => [ &valid1, a => &valid3 ],
+	       cache => SIZE,
+);
+# contract_in/out dies if foo already declared previously
+
+sub foo {
+
+
+    return @aa;
+}
+
+# since we have encountered a contract declaration
+# for both in and out arguments for foo, 
+# source filter replaces foo by:
+
+sub foo {
+    Sub::Contract::validate_MyPkg_foo_in(@_);
+
+
+    return Sub::Contract::validate_MyPkg_foo_out @aa;
+}
+
+# in Sub::Contract:
+
+sub UNIVERSAL {
+    # called when Sub::Contract::validate_... called from somewhere
+    # if ... validator does not exist, create it!
+}
+
+# EVAL: 
+# - quite efficient: call validate_... only when a contract exists.
+# - easy to enable/disable contracts during runtime by putting
+#    a 'return if disabled' in beginning of validate_...
+# - problem: no support for variable lenght argument lists in contract_in/out
+# - a bit hard to parse all perl variants of sub { and return declarations (but
+#    not too hard)
+
+
+#-------------------------------------
+#
+# the function prototype way
+#
+#-------------------------------------
+
+sub foo :contract(in => {}, out => {})
+
+
+
+
+
+
+
+

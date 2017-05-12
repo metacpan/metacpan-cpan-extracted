@@ -1,0 +1,6 @@
+Revision history for SMS-Send-Sergel-Simple-HTTP
+
+0.02  2017-02-19 00:30:35 CET
+        - Added cpanfile dependencies
+0.01  2017-01-21 17:49:06 CET
+        - Initial release

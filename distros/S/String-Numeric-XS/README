@@ -1,0 +1,17 @@
+NAME
+    String::Numeric::XS - XS implementation of String::Numeric
+
+DESCRIPTION
+    The main String::Numeric package will use this package automatically if
+    it can find it. Do not use this package directly, use String::Numeric
+    instead.
+
+AUTHOR
+    Christian Hansen, <chansen@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2009 by Christian Hansen
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

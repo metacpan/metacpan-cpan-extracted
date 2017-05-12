@@ -1,0 +1,44 @@
+---
+doctype: dist
+
+header:
+  name: Stenciller
+
+prereqs:
+  runtime:
+    requires:
+      - perl: 5.010001
+      - Carp
+      - HTML::Entities
+      - List::Util
+      - List::MoreUtils
+      - Module::Pluggable
+      - Moose: 2.1400
+      - MooseX::AttributeDocumented
+      - MooseX::AttributeShortcuts
+      - namespace::autoclean: 0.24
+      - Path::Tiny
+      - PerlX::Maybe
+      - Syntax::Feature::Qs: 0.2004
+      - Types::Standard: 1.000000
+      - Types::Path::Tiny
+  test:
+    requires:
+      - Test::Deep
+      - Test::Differences
+
+plugins:
+  - +config: Author::CSSON
+
+  - +extend_plugin: TravisYML
+
+---
+doctype: weaver
+
+plugins:
+  - +config: Author::CSSON
+    splint: 1
+
+  - +extend_plugin: Splint
+    type_libraries: Types::Stenciller=Stencil,Stenciller
+    attribute_renderer: HTML=HtmlDefault, markdown=HtmlDefault

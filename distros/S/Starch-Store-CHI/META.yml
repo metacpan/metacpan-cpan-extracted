@@ -1,0 +1,28 @@
+---
+abstract: 'Starch storage backend using CHI.'
+author:
+  - 'Aran Deltac <bluefeet@gmail.com>'
+build_requires:
+  Test::Fatal: '0'
+  Test::Simple: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Starch-Store-CHI
+requires:
+  CHI: '0.58'
+  Moo: '2'
+  Scalar::Util: '0'
+  Starch: '0.05'
+  Type::Tiny: '1.000005'
+  namespace::clean: '0.24'
+  strictures: '2'
+resources:
+  bugtracker: https://github.com/bluefeet/Starch-Store-CHI/issues
+  repository: git://github.com/bluefeet/Starch-Store-CHI.git
+version: '0.03'

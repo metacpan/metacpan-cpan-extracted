@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         SNMPMonitor
+version:      0.10
+version_from: lib/SNMPMonitor.pm
+installdirs:  site
+requires:
+    common::sense:                 0
+    Module::Pluggable:             0
+    NetSNMP::agent:                0
+    NetSNMP::ASN:                  0
+    NetSNMP::OID:                  0
+    parent:                        0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

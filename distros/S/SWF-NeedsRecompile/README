@@ -1,0 +1,124 @@
+NAME
+    SWF::NeedsRecompile - Tests if any SWF or FLA file dependencies have
+    changed
+
+LICENSE
+    Copyright 2002-2006 Clotho Advanced Media, Inc., http://www.clotho.com/
+
+    Copyright 2007-2008 Chris Dolan
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SYNOPSIS
+        use SWF::NeedsRecompile qw(check_files);
+        foreach my $file (check_files(<*.swf>)) {
+           print "SWF needs recompilation: $file\n";
+        }
+
+DESCRIPTION
+    This module parses .fla and .as files and determines dependencies
+    recursively, via import and #include statements. It then compares the
+    timestamps of all of the dependencies against the timestamp of the .swf
+    file. If any dependency is newer than the .swf, that file needs to be
+    recompiled.
+
+LIMITATIONS
+    This module only works in its entirety on Mac OS X, and for Flash MX
+    2004. Help wanted: extend it to Windows (add appropriate search paths at
+    the top of the .pm file) and extend it to the Flash 8 author when that
+    is available.
+
+    This module only reports whether or not the .swf is up to date. It would
+    be useful to know whether it is out of date because of the .fla file or
+    any .as files. In the latter case, the open source MTASC
+    (http://www.mtasc.org/) application could perform the recompilation.
+
+    This module likely only works with ASCII file names. The heuristic used
+    to parse the binary .fla files discards the upper Unicode byte of any
+    file names.
+
+    If there are `import' statements with wildcards in any .as files, then
+    all files in the specified directory are considered dependencies, even
+    if only a subset are actually used.
+
+    Direct access to class methods are not detected. So, if you Actionscript
+    does something like `com.example.Foo.doSomething()' then
+    com/example/Foo.as is not detected as a dependency. The workaround is to
+    add an import; in this example it would be `import com.example.Foo;'
+
+FUNCTIONS
+    check_files($file, $file, ...)
+        Examine a list of .swf and/or .fla files and return the file names
+        of the ones that need to be recompiled.
+
+        Performance note: Information is cached across files, so it's faster
+        to call this function once with a bunch of files than a bunch of
+        times with one file each invocation.
+
+    $pkg->as_classpath()
+        Returns a list of Classpath directories specified globally in Flash.
+
+    $pkg->flash_prefs_path()
+        Returns the file name of the Flash preferences XML file.
+
+    $pkg->flash_config_path()
+        Returns the path where Flash stores all of its class prototypes.
+
+    $pkg->set_verbose($boolean)
+    $pkg->set_verbosity($number)
+        Changes the verbosity of the whole module. Defaults to false. Set to
+        a number higher than 1 to get very verbose output.
+
+        The `SWFCOMPILE_VERBOSITY' environment variable sets this at module
+        load time.
+
+        The default is `0' (silent), but we recommend setting verbosity to
+        `1', which emits error messages. Setting to `2' also emits debugging
+        messages.
+
+    $pkg->get_verbosity()
+        Returns the current verbosity number.
+
+BUGS AND LIMITATIONS
+  Comments
+
+    This module tries to ignore dependencies specified inside comments like
+    these:
+
+       /* #include "foo.as" */
+       // var inst = new Some.Class();
+
+    but for reasons I don't understand, searching for the latter style of
+    comments inside binary `.fla' files can cause a (seemingly) infinite
+    loop. So, as a hack we DO NOT ignore `//...' style comments in
+    Actionscript that is embedded inside of `.fla' files. This can lead to
+    spurious errors. Perhaps this is a problem with Regexp::Common::comment
+    or just that some `.fla' files have too few line endings?
+
+  Unicode Class Names and Paths
+
+    Flash stores source code and include paths inside of the `.fla' binary
+    as (I think) UCS2 strings. This code converts those strings to ASCII by
+    simply stripping all of the `\0' characters. This is REALLY BAD, but it
+    works fine for pure-ASCII path names.
+
+  Operating Systems
+
+    This code works great on Mac OS X. The typical paths for the Flash
+    configuration directory are provided for that platform.
+
+    This code will still work marginally under Windows, but for full support
+    I need to know the path to the preferences file and the configuration
+    directory. I need those locations for Macromedia classes and default
+    include paths.
+
+SEE ALSO
+    Module::Build::Flash uses this module.
+
+AUTHOR
+    Chris Dolan
+
+    This module was originally developed by me at Clotho Advanced Media Inc.
+    Now I maintain it in my spare time.
+

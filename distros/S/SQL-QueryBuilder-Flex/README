@@ -1,0 +1,176 @@
+NAME
+    SQL::QueryBuilder::Flex - Yet another flexible SQL builder
+
+SYNOPSIS
+        use SQL::QueryBuilder::Flex 'SQL';
+
+        my ($stmt, @bind) = SQL
+            ->select(qw/user_id name/)
+            ->from('user')
+            ->where('user_id = ?', 1)
+            ->to_sql
+        ;
+        # $stmt: SELECT user_id, name FROM user
+        # @bind: (1)
+
+
+        my ($stmt, @bind) = SQL
+            ->select(
+                'user_id',
+                'now() AS now',
+                ['LEFT(name, ?)', 'name', 5],
+                {
+                    name     => 'user_name',
+                    group_id => 'group_id',
+                },
+            )
+            ->from(qw/user u/)
+            ->left_join(
+                    SQL
+                        ->select('user_id', 'SUM(balance) AS balance')
+                        ->from('balance')
+                        ->where
+                            ->or('group_id = ?', 1)
+                            ->or('group_id = ?', 2)
+                        ->group_by('user_id')
+                    , 'b'
+                )->on
+                    ->and('u.user_id = b.user_id')
+                    ->and('b.balance > 0')
+            ->where
+                ->and('u.user_id = ?', 7)
+                ->and('b.balance BETWEEN ? AND ?', 100, 200)
+                ->and_exp
+                    ->or('group_id = ?', 1)
+                    ->or('group_id = ?', 2)
+                    ->or_in('group_id', 5, 6)
+                ->parent
+            ->group_by('LEFT(name, ?)', undef, 2)
+            ->order_by(qw/name desc/)
+            ->limit(10)
+            ->to_sql(1)
+        ;
+        # SELECT
+        #   user_id,
+        #   now() AS now,
+        #   LEFT(name, ?) AS name,
+        #   group_id AS group_id,
+        #   name AS user_name
+        # FROM
+        #   user u
+        #   LEFT JOIN (
+        #     SELECT
+        #       user_id,
+        #       SUM(balance) AS balance
+        #     FROM
+        #       balance
+        #     WHERE
+        #       group_id = ?
+        #       OR group_id = ?
+        #     GROUP BY user_id
+        #   ) AS b
+        #   ON
+        #     u.user_id = b.user_id
+        #     AND b.balance > 0
+        # WHERE
+        #   u.user_id = ?
+        #   AND b.balance BETWEEN ? AND ?
+        #   AND (
+        #     group_id = ?
+        #     OR group_id = ?
+        #     OR group_id IN(?,?)
+        #   )
+        # GROUP BY LEFT(name, ?)
+        # ORDER BY name desc
+        # LIMIT ?
+        # @bind: (5, 1, 2, 7, 100, 200, 1, 2, 5, 6, 2, 10)
+
+
+        my ($stmt, @bind) = SQL
+            ->select('name')
+            ->from('user1')
+            ->union( SQL->select('name')->from('user2') )
+            ->to_sql
+        ;
+        # SELECT name FROM user1 UNION SELECT name FROM user2
+
+
+        my ($stmt, @bind) = SQL
+            ->update('user')
+            ->set(
+                status  => 'expired',
+                updated => \'NOW()',
+            )
+            ->where('(last_activity + INTERVAL ? DAY) < NOW()', 30)
+            ->to_sql
+        ;
+        # UPDATE user SET status=?, updated=NOW() WHERE (last_activity + INTERVAL ? DAY) < NOW()
+        # @bind: ('expired', 30)
+
+
+        my ($stmt, @bind) = SQL
+            ->insert('user',
+                name    => 'User',
+                status  => 'active',
+                updated => \'NOW()',
+            )
+            ->options(qw/LOW_PRIORITY IGNORE/)
+            ->to_sql
+        ;
+        # INSERT LOW_PRIORITY IGNORE user SET name=?, status=?, updated=NOW()
+        # @bind: ('User', 'active')
+
+
+        my $q1 = SQL
+            ->select(qw/user_id balance/)
+            ->from('balance')
+        ;
+        my $q2 = SQL
+            ->select(qw/
+                name
+                b.balance
+            /)
+            ->from('user')
+            ->left_join($q1, 'b')->using('user_id')->parent
+        ;
+        $q2->where('b.balance < 0') if 1;
+        my ($stmt, @bind) = $q2->to_sql(1);
+        # SELECT
+        #   name,
+        #   b.balance
+        # FROM
+        #   user
+        #   LEFT JOIN (
+        #     SELECT
+        #       user_id,
+        #       balance
+        #     FROM
+        #       balance
+        #   ) AS b
+        #   USING (user_id)
+        # WHERE
+        #   b.balance < 0
+
+DESCRIPTION
+    SQL::QueryBuilder::Flex is yet another flexible SQL builder.
+
+METHODS
+    new(<%options>)
+        Create instance.
+
+        my $query = SQL::QueryBuilder::Flex->new()
+
+    to_sql(<indent>)
+        Build SQL.
+
+        my ($stmt, @bind) = $query->to_sql()
+
+AUTHOR
+        Yuriy Ustushenko, <<yoreek@yahoo.com>>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2014 Yuriy Ustushenko
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,13 @@
+abstract: JSON plugin for Sledge
+author: Atsushi Kobayashi  C<< <atsushi __at__ mobilefactory.jp> >>
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Sledge-Plugin-JSON
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  JSON::Syck: 0
+version: 0.01

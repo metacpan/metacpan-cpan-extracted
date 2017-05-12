@@ -1,0 +1,161 @@
+NAME
+    Sub::Assert - Subroutine pre- and postconditions, etc.
+
+SYNOPSIS
+      use Sub::Assert;
+  
+      sub squareroot {
+          my $x = shift;
+          return $x**0.5;
+      }
+  
+      assert
+             pre     => {
+                # named assertion:
+               'parameter larger than one' => '$PARAM[0] >= 1',
+             },
+             post    => '$VOID or $RETURN <= $PARAM[0]', # unnamed assertion
+             sub     => 'squareroot',
+             context => 'novoid',
+             action  => 'carp';
+  
+      print squareroot(2), "\n";  # prints 1.41421 and so on
+      print squareroot(-1), "\n"; # warns
+                                  # "Precondition 1 for main::squareroot failed."
+      squareroot(2);              # warns
+                                  # "main::squareroot called in void context."
+  
+      sub faultysqrt {
+          my $x = shift;
+          return $x**2;
+      }
+
+      assert
+             pre    => '$PARAM[0] >= 1',
+             post   => '$RETURN <= $PARAM[0]',
+             sub    => 'faultysqrt';
+  
+      print faultysqrt(2), "\n";  # dies with 
+                                  # "Postcondition 1 for main::squareroot failed."
+
+DESCRIPTION
+    The Sub::Assert module implements subroutine pre- and postconditions.
+    Furthermore, it allows restricting the subroutine's calling context.
+
+    There's one big gotcha with this: It's slow. For every call to
+    subroutines you use assert() with, you pay for the error checking with
+    an extra subroutine call, some memory and some additional code that's
+    executed.
+
+    Fortunately, there's a workaround for mature software which does not
+    require you to edit a lot of your code. Instead of use()ing Sub::Assert,
+    you simply use Sub::Assert::Nothing and leave the assertions intact.
+    While you still suffer the calls to assert() once, you won't pay the
+    run-time penalty usually associated with subroutine pre- and
+    postconditions. Of course, you lose the benefits, too, but as stated
+    previously, this is a workaround in case you want the verification at
+    development time, but prefer speed in production without refactoring
+    your code.
+
+  assert
+    The assert subroutine takes a key/value list of named parameters.
+
+    sub The only required parameter is the 'sub' parameter that specifies
+        which subroutine (in the current package) to replace with the
+        assertion wrapper. The 'sub' parameter may either be a string in
+        which case the current packages subroutine of that name is replaced,
+        or it may be a subroutine reference. In the latter case, assert()
+        returns the assertion wrapper as a subroutine reference.
+
+    pre This parameter specifies one or more preconditions that the data
+        passed to the transformed subroutine must match. The preconditions
+        may either be a string in case there's only one, unnamed
+        precondition, an array (reference) of strings in case there's many
+        unnamed preconditions, or a hash reference of name/condition pairs
+        for named preconditions.
+
+        There are several special variables in the scope in which these
+        preconditions are evaluated. Most importantly, @PARAM will hold the
+        list of arguments as passed to the subroutine. Furthermore, there is
+        the scalar $SUBROUTINEREF which holds the reference to the
+        subroutine that does the actual work. I am mentioning this variable
+        because I don't want you to muck with it.
+
+    post
+        This parameter specifies one or more postconditions that the data
+        returned from the subroutine must match. Syntax is identical to that
+        of the preconditions except that there are more special vars:
+
+        In scalar context, $RETURN holds the return value of the subroutine
+        and $RETURN[0] does, too. $VOID is undefined.
+
+        In list context, @RETURN holds all return values of the subroutine
+        and $RETURN holds the first. $VOID is undefined.
+
+        In void context, $RETURN is undefined and @RETURN is empty. $VOID,
+        however, is true.
+
+        Note the behaviour in void context. May be a bug or a feature. I'd
+        appreciate feedback and suggestions on how to solve is more
+        elegantly.
+
+    context
+        Optionally, you may restrict the calling context of the subroutine.
+        The context parameter may be any of the following and defaults to no
+        restrictions ('any'):
+
+        any This means that there is no restriction on the calling context
+            of the subroutine. Please refer to the documentation of the
+            'post' parameter for a gotcha with void context.
+
+        scalar
+            This means that the assertion wrapper will throw an error of the
+            calling context of the subroutine is not scalar context.
+
+        list
+            This means that the assertion wrapper will throw an error of the
+            calling context of the subroutine is not list context.
+
+        void
+            This means that the assertion wrapper will throw an error of the
+            calling context of the subroutine is not void context. Please
+            refer to the documentation of the 'post' parameter for a gotcha
+            with void context.
+
+        novoid
+            This restricts the calling context to any but void context.
+
+    action
+        By default, the assertion wrapper croaks when encountering an error.
+        You may override this behaviour by supplying an action parameter.
+        This parameter is to be the name of a function to handle the error.
+        This function will then be passed the error string. Please note that
+        the immediate predecessor of the subroutine on the call stack is the
+        code evaluation. Thus, for a helpful error message, you'd want to
+        use 'carp' and 'croak' instead of the analogeous 'warn' and 'die'.
+        Your own error handling functions need to be aware of this, too.
+        Please refer to the documentation of the Carp module and the
+        caller() function. Examples:
+
+          action => 'carp',
+          action => 'my_function_that_handles_the_error',
+          action => '$anon_sub->',  # works only in the lexical scope of $anon_sub!
+
+  EXPORT
+    Exports the 'assert' subroutine to the caller's namespace.
+
+AUTHOR
+    Steffen Mueller <smueller@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2003-2009 Steffen Mueller
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    Sub::Assert::Nothing
+
+    Look for new versions of this module on CPAN or at
+    http://steffen-mueller.net
+

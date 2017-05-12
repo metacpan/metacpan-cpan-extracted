@@ -1,0 +1,7 @@
+2007-04-26
+	- Point release (1.01)
+	- Added additional support to the API for using pre-opened transactions
+	- Added support for obtaining the underlying transaction object
+
+2007-04-11
+	- Initial release (1.00)

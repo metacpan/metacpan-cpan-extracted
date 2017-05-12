@@ -1,0 +1,11 @@
+Build.PL
+Changes
+lib/SPOPSx/Tool/YAML.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+spops_tests.log
+t/array.t
+t/hash.t
+t/scalar.t
+README

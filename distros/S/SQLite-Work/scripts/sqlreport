@@ -1,0 +1,571 @@
+#!/usr/bin/env perl
+package main;
+$main::VERSION = '0.1601';
+# vim:ts=8 sw=4 sts=4 ai
+use strict;
+use warnings;
+
+=head1 NAME
+
+sqlreport - make reports on a table in an SQLite database
+
+=head1 VERSION
+
+version 0.1601
+
+=head1 SYNOPSIS
+
+sqlreport --help | --manpage | --version
+
+sqlreport [ --all_pages ] --database I<database_file>
+[ --distinct ] { --force_show I<colname>=1 }
+{ --groups I<template> } { --headers I<template> } { --header_start I<num> }
+[ --index_template I<template> ] [ --filename_format I<format> ]
+[ --layout I<string> ] [ --limit I<number> ] [ --link_suffix I<string> ]
+{ --not_where I<colname>=1 } [ --outfile I<filename> ]
+[ --page I<number> ] [ --report_style I<string> ]
+{ --row_ids I<table>=I<colname> } [ --report_template I<template> ]
+[ --row_template I<template> ] [ --prev_next_template I<template> ]
+[ --multi_page_template I<template> ] [ --split_ind_template I<template> ]
+{ --show I<colname> }
+{ --sort_by I<colname> } { --sort_reversed I<colname>=1 }
+[ --split_col I<colname> [ --split_alpha I<number> ] ]
+--table I<table> [ --table_border I<number> ]
+[ -- table_header I<string> ]
+[ --title I<string> ] [ --total ] [ --truncate_colnames I<number> ]
+{ --use_package I<pkgname> } { --where I<colname>=I<string> }
+
+=head1 DESCRIPTION
+
+This makes a report in HTML format, of a single table from an
+SQLite database.  One can also create a non-HTML report if one
+gives a certain combination of options, but this is more oriented
+towards HTML reports.
+
+=head1 OPTIONS
+
+=over
+
+=item --all_pages
+
+Make a multi-page report, generating all pages, by page-number.
+The --limit and --outfile options are required for this.
+
+=item --database
+
+The name of the database file to use. (required)
+
+=item --distinct
+
+If columns are given to show (see L<show>), then this will
+ensure that rows with exactly the same values will not be
+repeated.
+
+=item --force_show
+
+An set of columns to always show in a row, even if they've
+already been shown in a header (see L<show>).
+
+=item --groups
+
+Group template(s) (or filenames of files containing
+group templates).  A group template is a template for values
+which are "grouped" under a corresponding header.  The first
+group in the array is placed just after the first header in
+the report, and so on.
+
+This argument can be repeated.
+
+See L<headers> for more information.
+
+=item --headers
+
+An array of header templates (or filenames of files containing header
+templates).  A header template lays out what values should be put
+into headers rather than the body of the report.  The first header
+template is given a H1 header, the second a H2 header, and so on.
+Headers are shown only when the value(s) they depend on change,
+but they get their values from each row in the report.  Therefore
+the columns used in the headers should match the columns used in the
+L<sort_by> array.
+
+The column names are the variable names in this template.  This has
+a different format to the L<report_template>; it is more sophisticated.
+
+The format is as follows:
+
+=over
+
+=item {$colname}
+
+A variable; will display the value of the column, or nothing if
+that value is empty.
+
+=item {?colname stuff [$colname] more stuff}
+
+A conditional.  If the value of 'colname' is not empty, this will
+display "stuff value-of-column more stuff"; otherwise it displays
+nothing.
+
+    {?col1 stuff [$col1] thing [$col2]}
+
+This would use both the values of col1 and col2 if col1 is not
+empty.
+
+=item {?colname stuff [$colname] more stuff!!other stuff}
+
+A conditional with "else".  If the value of 'colname' is not empty, this
+will display "stuff value-of-column more stuff"; otherwise it displays
+"other stuff".
+
+This version can likewise use multiple columns in its display parts.
+
+    {?col1 stuff [$col1] thing [$col2]!![$col3]}
+
+=back
+
+The same format is used for L<groups> and L<row_template> and L<prev_next_template>.
+
+=item --help
+
+Print help message and exit.
+
+=item --index_template
+
+Similar to the L<report_template>, but this is used for the index-pages
+in multi-page and split reports.  It has the same format, but it
+can be useful to have them as two separate templates as one may wish
+to change the way the title is treated for indexes versus actual
+reports.
+
+=item --layout
+
+The layout of the report.  This determines both how rows are grouped,
+and what is in the generated L<row_template> if no row_template is
+given.
+
+=over
+
+=item table
+
+The report is a (group of) tables, each row of the report is a row in
+the table; a new table occurs after the heading(s).
+
+=item para
+
+The report is in paragraphs, each row of the report is one paragraph.
+
+=item list
+
+The report is a (group of) lists, each row of the report is an item in
+the list; a new list occurs after the heading(s).
+
+=item fieldval
+
+The rows are not HTML-formatted.  The generated row_template is made up
+of Field:Value pairs, one on each line.
+
+=item none
+
+The rows are not HTML-formatted.  The generated row_template is made up
+of values, one on each line.
+
+=back
+
+=item --limit
+
+The maximum number of rows to display per page.  If this is zero,
+then all rows are displayed in one page.
+
+=item --link_suffix I<string>
+
+The 'link_suffix' argument, if given, overrides the suffix given
+in links to the other pages in a multi-page report; this is useful
+if you're post-processing the files (and thus changing their extensions)
+or are using something like Apache MultiViews to eliminate the need for
+extensions in links.
+
+    --link_suffix '.shtml'
+
+    --link_suffix ''
+
+=item --manpage
+
+Print the full help documentation (manual page) and exit.
+
+=item --not_where
+
+A hash containing the column names where the selection criteria
+in L<where> should be negated.
+
+=item --outfile
+
+The name of the output file.  If this is not given, or the name is '-'
+then the output goes to STDOUT.
+
+=item --page
+
+Select which page to generate, if limit is not zero.
+
+=item --prev_next_template
+
+Template for previous and next links on multi-page reports.
+
+=item --report_style
+
+The style of the report, especially as regards table layout.
+
+=over
+
+=item full
+
+=item medium
+
+=item compact
+
+=item bare
+
+=back
+
+=item --report_template
+
+Either a string containing a template, or string containing the name of
+a template file.  The template variables are in the following format:
+
+<!--sqlr_title-->
+
+The following variables are set for the report:
+
+=over
+
+=item sqlr_title
+
+Title (generally the table name).
+
+=item sqlr_contents
+
+The report itself.
+
+=back
+
+=item --row_ids
+
+The default column-name which identifies rows in SQLite is 'rowid', but
+for tables which have a primary integer key, this doesn't work (even
+though the documentation says it ought to).  Therefore it is necessary
+to identify, for the given database, which tables need to use a
+different column-name for this.  (This can be repeated)
+
+=item --row_template
+
+The template for each row.  This uses the same format as for L<headers>.
+If none is given, then a default row_template will be generated,
+depending on what L<layout> and which columns are going to be shown
+(see L<show>).
+
+Therefore it is important that if one provides a row_template, that
+it matches the current layout.
+
+Also note that if a column is given in a header, it will not be
+displayed in a row, even if it is put into the row_template.
+
+=item --show
+
+An array of columns to select; also the order in which they should
+be shown when a L<row_template> has not been given.
+If this option is not used, all columns in the table will be shown.
+
+=item --sort_by
+
+An array of column names by which the result should be sorted.
+(Repeat the argument for each new value)
+
+=item --sort_reversed
+
+A hash of column names where the sorting given in L<sort_by> should
+be reversed.
+
+=item --split_col
+
+Generate a multi-page report where pages are split by the value
+of the given column (as well as by page-number if a limit is given)
+
+=item --split_alpha
+
+If one is generating a split_col report, giving the 'split_alpha' option
+splits the report not by the distinct values of that column, but
+by truncated values of the column; giving a split_alpha value
+of 1 takes only the first letter, and so on.
+
+=item --table
+
+The table to report on. (required)
+
+=item --table_border
+
+For fine-tuning the L<report_style>; if the L<layout> is 'table',
+then this overrides the default border-size of the table.
+
+=item --table_header
+
+When the report layout is 'table' and the report_style is not 'bare',
+then this argument can be used to customize the table-header
+of the report table.  This must either contain the contents
+of the table-header, or the name of a file which contains
+the contents of the table-header.
+
+If this argument is not given, the table-header will be constructed
+from the column names of the columns to be shown.
+
+=item --title
+
+The title of the report; if this is empty, a title will be generated.
+
+=item --total
+
+Just print the total matching rows, then exit.
+
+=item --truncate_colnames
+
+For fine-tuning the L<report_style>; this affects the length of
+column names given in layouts which use them, that is, 'table'
+(for all styles except 'bare') and 'para'.  If the value is zero,
+the column names are not truncated at all; otherwise they are
+truncated to that number of characters.
+
+=item --verbose
+
+Print informational messages.
+
+=item --version
+
+Print version information and exit.
+
+=item --where
+
+A hash containing selection criteria.  The keys are the column names
+and the values are strings suitable for using in a GLOB condition;
+that is, '*' is a multi-character wildcard, and '?' is a
+single-character wildcard.  All the conditions will be ANDed together.
+
+Yes, this is limited and doesn't use the full power of SQL, but it's
+useful enough for most purposes.
+
+=item --use_package
+
+An array of package names of packages to "use".
+This is mainly so that the {&funcname())} construct of
+the templates (see L<SQLite::Work::Template>) can call
+functions within these packages (using their fully-qualified
+names).
+
+=back
+
+=head1 REQUIRES
+
+    Getopt::Long
+    Pod::Usage
+    Getopt::ArgvFile
+    SQLite::Work;
+
+=head1 SEE ALSO
+
+perl(1)
+Getopt::Long
+Getopt::ArgvFile
+Pod::Usage
+
+=cut
+
+use Getopt::Long 2.34;
+use Getopt::ArgvFile qw(argvFile);
+use Pod::Usage;
+use SQLite::Work;
+
+#========================================================
+# Subroutines
+
+sub init_data ($) {
+    my $data_ref = shift;
+
+    $data_ref->{args} = {};
+    $data_ref->{args}->{manpage} = 0;
+    $data_ref->{args}->{verbose} = 0;
+    $data_ref->{args}->{debug} = 0;
+    $data_ref->{args}->{link_suffix} = undef;
+} # init_data
+
+sub process_args ($) {
+    my $data_ref = shift;
+
+    my $ok = 1;
+
+    argvFile(home=>1,
+	current=>1,
+	startupFilename=>'.sqlreportrc',
+	fileOption=>'options');
+
+    pod2usage(2) unless @ARGV;
+
+    my $op = new Getopt::Long::Parser;
+    $op->configure(qw(auto_version auto_help));
+    $op->getoptions($data_ref->{args},
+	       'verbose!',
+	       'debug!',
+	       'manpage',
+	       'database=s',
+	       'distinct!',
+	       'row_ids=s%',
+	       'report_template=s',
+	       'index_template=s',
+	       'filename_format=s',
+	       'table=s',
+	       'where=s%',
+	       'not_where=s%',
+	       'sort_by=s@',
+	       'sort_reversed=s%',
+	       'show=s@',
+	       'force_show_cols=s%',
+	       'headers=s@',
+	       'header_start=i',
+	       'groups=s@',
+	       'limit=i',
+	       'page=i',
+	       'report_style=s',
+	       'table_border=i',
+	       'table_header=s',
+	       'truncate_colnames=i',
+	       'layout=s',
+	       'row_template=s',
+	       'prev_next_template=s',
+	       'multi_page_template=s',
+	       'split_ind_template=s',
+	       'default_format=s%',
+	       'title=s',
+	       'outfile=s',
+	       'all_pages!',
+	       'total!',
+	       'split_col=s',
+	       'split_titlefmt=s',
+	       'split_alpha=n',
+	       'use_package=s@',
+	       'link_suffix=s',
+	      ) or pod2usage(2);
+
+    if ($data_ref->{'manpage'})
+    {
+	pod2usage({ -message => "$0 version $::VERSION",
+		    -exitval => 0,
+		    -verbose => 2,
+	    });
+    }
+    # set the parameters for 'new'
+    $data_ref->{new_params} = {};
+    foreach my $key (qw(database row_ids report_template index_template use_package))
+    {
+	if (exists $data_ref->{args}->{$key})
+	{
+	    $data_ref->{new_params}->{$key}
+		= $data_ref->{args}->{$key};
+	}
+    }
+    if (!$data_ref->{new_params}->{database})
+    {
+	warn "$0: no database given!\n";
+	pod2usage({ -message => "$0 version $::VERSION",
+		    -exitval => 1,
+		    -verbose => 0,
+	    });
+    }
+
+    # parse the default_format argument
+    if (exists $data_ref->{args}->{default_format}
+	and defined $data_ref->{args}->{default_format})
+    {
+	$data_ref->{new_params}->{default_format} = {};
+	while (my ($key, $val) = each %{$data_ref->{args}->{default_format}})
+	{
+	    if ($key =~ m/(\w+)\+(\w+)/)
+	    {
+		my $table = $1;
+		my $col = $2;
+		$data_ref->{new_params}->{default_format}->{$table}->{$col}
+		    = $val;
+	    }
+	}
+    }
+
+    # set the parameters for 'report'
+    $data_ref->{report_params} = {};
+    foreach my $key (qw(verbose title table distinct where not_where sort_by sort_reversed force_show_cols show headers header_start groups limit page report_style layout link_suffix table_border table_header truncate_colnames prev_next_template multi_page_template split_ind_template row_template filename_format outfile split_col split_alpha split_titlefmt debug))
+    {
+	if (exists $data_ref->{args}->{$key})
+	{
+	    $data_ref->{report_params}->{$key}
+		= $data_ref->{args}->{$key};
+	}
+    }
+    if (!$data_ref->{report_params}->{table})
+    {
+	warn "$0: no table given!\n";
+	pod2usage({ -message => "$0 version $::VERSION",
+		    -exitval => 1,
+		    -verbose => 0,
+	    });
+    }
+
+} # process_args
+
+#========================================================
+# Main
+
+MAIN: {
+    my %data = ();
+
+    init_data(\%data);
+    process_args(\%data);
+    my $rep = SQLite::Work->new(%{$data{new_params}});
+    if ($rep->do_connect())
+    {
+	if ($data{args}->{total})
+	{
+	    my $total = $rep->get_total_matching(%{$data{report_params}});
+	    print $total, "\n";
+	}
+	elsif ($data{args}->{split_col})
+	{
+	    $rep->do_split_report(%{$data{report_params}});
+	}
+	elsif ($data{args}->{all_pages})
+	{
+	    $rep->do_multi_page_report(%{$data{report_params}});
+	}
+	else
+	{
+	    $rep->do_report(%{$data{report_params}});
+	}
+	$rep->do_disconnect();
+    }
+}
+
+=head1 BUGS
+
+Please report any bugs or feature requests to the author.
+
+=head1 AUTHOR
+
+    Kathryn Andersen (RUBYKAT)
+    perlkat AT katspace dot com
+    http://www.katspace.com
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (c) 2005 by Kathryn Andersen
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+
+=cut
+
+__END__

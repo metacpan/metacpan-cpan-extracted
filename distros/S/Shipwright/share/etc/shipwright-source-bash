@@ -1,0 +1,13 @@
+if [ $# = 1 ]; then
+    export PATH=$1/sbin:$1/bin:$1/usr/sbin:$1/usr/bin:$PATH
+    # fix vessels which ship their own ncurses, but don't clobber $TERMINFO
+    # if it's already been set
+    if [ ! $TERMINFO ] && [ -d $1/share/terminfo ]; then
+        export TERMINFO=$1/share/terminfo
+    fi
+    export PERL5LIB=$1/lib/perl5/site_perl:$1/lib/perl5:${PERL5LIB}
+    export LD_LIBRARY_PATH=$1/lib:${LD_LIBRARY_PATH}
+    export DYLD_LIBRARY_PATH=$1/lib:${DYLD_LIBRARY_PATH}
+else
+    echo 'USAGE: source shipwright-source-bash BASEPATH'
+fi

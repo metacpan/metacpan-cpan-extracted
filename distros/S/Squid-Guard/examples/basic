@@ -1,0 +1,17 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Squid::Guard;
+
+my $redir = "http://myproxy/cgi-bin/denymessage";
+
+sub check($$) {
+	my ( $self, $req ) = @_;
+	return 'deny' if $req->host =~ /somethingnasty.com/;
+	0;
+}
+
+my $redir = Squid::Guard->new();
+$redir->redir($redir);
+$redir->checkf(\&check);
+$redir->run();

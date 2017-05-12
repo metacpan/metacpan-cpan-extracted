@@ -1,0 +1,11 @@
+Revision history for Perl extension SQL::Dialect.
+
+0.02      2011-10-04
+- Rename the _type() attribute to type().
+- Documentation tweaks.
+- Add a simple auto-test.
+
+0.01      2011-09-21
+ - First release.
+ - Renamed from DBIx::Dialect.
+

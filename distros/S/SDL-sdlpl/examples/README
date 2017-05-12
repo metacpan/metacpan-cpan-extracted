@@ -1,0 +1,29 @@
+examples/README					Tue May 23 11:25:52 EDT 2000
+
+	The files in this directory provide some basic examples of
+using this extension to perl.  They are of differing level of difficulty
+and documentation.  Here is a brief overview of what they are:
+
+	./Viewer.pl filename
+
+This app opens a graphics file and displays its contents in a window. To
+close the application, you may either use your window manager's close button,
+or press the Escape key on your keyboard.  
+
+	./CDplayer.pl
+
+This app creates a graphical cd player from a simple "skin" (which in this case
+is any image that is divided horizontally into 6 parts.)  By clicking the
+various 'buttons', you can then play cd music.  Basically, it is a simple
+GUI that shows how one can use the Cdrom.pm module to write a basic cdplayer.
+
+	./Flicker.pl
+
+This is a simple-minded "slideshow" style image viewer.  It will cycle through
+all of the gifs, jpegs, and png files in the directory, displaying them
+in the center of the screen.  Since we don't do any resizing, if the image
+doesn't fit on the screen, parts of it will be cropped.  Resizing surfaces
+is an exercise best left to C code.  Moving the mouse quits the viewer.
+
+
+

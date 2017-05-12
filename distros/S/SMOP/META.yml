@@ -1,0 +1,24 @@
+---
+abstract: 'Simple Meta Object Programming'
+author:
+  - 'Pawel Murias <pawelmurias@gmail.com>'
+  - 'Daniel Ruoso <daniel@ruoso.com>'
+build_requires:
+  Module::Build: 0.3601
+configure_requires:
+  Config::AutoConf: 0.14
+  ExtUtils::CBuilder: 0.27
+  File::Copy: 0
+  File::Path: 2.08
+  List::MoreUtils: 0
+  Mildew: 0.05
+  Module::Build: 0.3601
+  String::Escape: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.101900, CPAN::Meta::Converter version 2.101670'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: SMOP
+version: 0.6

@@ -1,0 +1,48 @@
+---
+abstract: 'Perl module to extract and show Siebel component parameters between servers'
+author:
+  - 'Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>'
+build_requires:
+  Cwd: '0'
+  Test::HTML::Lint: '0'
+  Test::More: '0'
+  perl: '5.014004'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.014004'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150001'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Siebel-Params-Checker
+no_index:
+  directory:
+    - inc
+requires:
+  Carp: '0'
+  Config::IniFiles: '2.88'
+  Exporter: '0'
+  File::HomeDir: '1.00'
+  File::Spec: '0'
+  Getopt::Std: '0'
+  Moose: '2.1604'
+  Set::Tiny: '0.03'
+  Siebel::Srvrmgr::Daemon::Action: '0'
+  Siebel::Srvrmgr::Daemon::ActionStash: '0'
+  Siebel::Srvrmgr::Daemon::Command: '0'
+  Siebel::Srvrmgr::Daemon::Heavy: '0'
+  Siebel::Srvrmgr::ListParser::Output::ListComp::Server: '0'
+  Siebel::Srvrmgr::ListParser::Output::Tabular::ListParams: '0'
+  Siebel::Srvrmgr::Util::IniDaemon: '0'
+  Template: '2.26'
+  namespace::autoclean: '0.28'
+  perl: '5.014004'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/glasswalk3r/siebel-monitoring-tools/issues
+  homepage: https://github.com/glasswalk3r/siebel-monitoring-tools
+  repository: https://github.com/glasswalk3r/siebel-monitoring-tools.git
+version: '0.002'

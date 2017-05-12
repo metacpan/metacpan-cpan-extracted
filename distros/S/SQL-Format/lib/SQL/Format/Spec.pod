@@ -1,0 +1,889 @@
+=pod
+
+=encoding utf-8
+
+=for stopwords
+
+=head1 NAME
+
+SQL::Format::Spec - The SQL::Format cheat sheet
+
+=head1 sqlf() CHEAT SHEET
+
+This cheat sheet rules are:
+
+  # Comment
+  Input  : $format
+  Input  : \@arguments
+  Expects: $stmt
+  Expects: \@bind
+
+For example:
+
+  # basic select query
+  SELECT %c FROM %t WHERE %w
+  [qw/foo bar/], 'hoge', { fuga => 'piyo' }
+  SELECT `foo`, `bar` FROM `hoge` WHERE (`fuga` = ?)
+  [qw/piyo/]
+
+  # maybe your code are
+  my ($stmt, @bind) = sqlf 'SELECT %c FROM %t WHERE %w' => (
+      [qw/foo bar/],
+      'hoge',
+      { fuga => 'piyo' },
+  );
+
+=head2 columns
+
+  # scalar
+  SELECT %c FROM table
+  'foo'
+  SELECT `foo` FROM table
+  []
+
+  # array
+  SELECT %c FROM table
+  [qw/foo bar/]
+  SELECT `foo`, `bar` FROM table
+  []
+
+  # empty array
+  SELECT %c FROM table
+  []
+  SELECT * FROM table
+  []
+
+  # undef
+  SELECT %c FROM table
+  undef
+  SELECT * FROM table
+  []
+
+  # '*'
+  SELECT %c FROM table
+  '*'
+  SELECT * FROM table
+  []
+
+  # scalar ref
+  SELECT %c FROM table
+  \'foo bar'
+  SELECT foo bar FROM table
+  []
+
+  # scalar ref in array
+  SELECT %c FROM table
+  [\'foo bar', 'baz']
+  SELECT foo bar, `baz` FROM table
+  []
+
+  # hash in array
+  SELECT %c FROM table
+  [ { foo => 'bar' } ]
+  SELECT `foo` `bar` FROM table
+  []
+
+  # array in array
+  SELECT %c FROM table
+  [ [foo => 'bar'] ]
+  SELECT `foo` `bar` FROM table
+  []
+
+  # scalar ref into array in array
+  SELECT %c FROM table
+  [ [\'UNIX_TIMESTAMP()' => 'bar'] ]
+  SELECT UNIX_TIMESTAMP() `bar` FROM table
+  []
+
+  # ref array in array (will deprecate)
+  SELECT %c FROM table
+  [ \[\'UNIX_TIMESTAMP(?)' => 'bar', '2012-12-12 12:12:12'] ]
+  SELECT UNIX_TIMESTAMP(?) `bar` FROM table
+  ['2012-12-12 12:12:12']
+
+  # array in array in array
+  SELECT %c FROM table
+  [ [ [\'UNIX_TIMESTAMP(?)', '2012-12-12 12:12:12'], 'bar' ] ]
+  SELECT UNIX_TIMESTAMP(?) `bar` FROM table
+  ['2012-12-12 12:12:12']
+
+  # ref array in array in array
+  SELECT %c FROM table
+  [ [ \[\'UNIX_TIMESTAMP(?)', '2012-12-12 12:12:12'], 'bar' ] ]
+  SELECT UNIX_TIMESTAMP(?) `bar` FROM table
+  ['2012-12-12 12:12:12']
+
+=head2 table
+
+  # scalar
+  SELECT foo FROM %t
+  'table'
+  SELECT foo FROM `table`
+  []
+
+  # hash
+  SELECT foo FROM %t
+  { table => 't' }
+  SELECT foo FROM `table` `t`
+  []
+
+  # hash multi value
+  SELECT foo FROM %t
+  { tableA => 'a', tableB => 'b' }
+  SELECT foo FROM `tableA` `a`, `tableB` `b`
+  []
+
+  # array
+  SELECT foo FROM %t
+  [qw/t1 t2/]
+  SELECT foo FROM `t1`, `t2`
+  []
+
+  # array mixied
+  SELECT foo FROM %t
+  [ 't1', { t2 => 'foo' }, { t3 => 'bar', t4 => 'baz' } ]
+  SELECT foo FROM `t1`, `t2` `foo`, `t3` `bar`, `t4` `baz`
+  []
+
+  # add index hint
+  SELECT foo FROM %t
+  { table => { index => { type => 'force', keys => [qw/key1 key2/] } } }
+  SELECT foo FROM `table` FORCE INDEX (`key1`, `key2`)
+  []
+
+  # add index hint (default type is USE INDEX)
+  SELECT foo FROM %t
+  { table => { index => { keys => [qw/key1 key2/] } } }
+  SELECT foo FROM `table` USE INDEX (`key1`, `key2`)
+  []
+
+  # add index hint (keys is scalar)
+  SELECT foo FROM %t
+  { table => { index => { keys => 'key1' } } }
+  SELECT foo FROM `table` USE INDEX (`key1`)
+  []
+
+  # add index hint with alias
+  SELECT foo FROM %t
+  { table => { alias => 't1', index => { type => 'force', keys => [qw/key1 key2/] } } }
+  SELECT foo FROM `table` `t1` FORCE INDEX (`key1`, `key2`)
+  []
+
+=head2 where array in
+
+  # array
+  WHERE %w
+  { id => [qw/1 2 3/] }
+  WHERE (`id` IN (?, ?, ?))
+  [qw/1 2 3/]
+
+  # empry array
+  WHERE %w
+  { id => [] }
+  WHERE (0=1)
+  []
+
+  # subquery
+  WHERE %w
+  { id => \['SELECT x_id FROM foo WHERE bar = ? AND baz = ?', qw/hoge fuga/] }
+  WHERE (`id` IN (SELECT x_id FROM foo WHERE bar = ? AND baz = ?))
+  [qw/hoge fuga/]
+
+  # subquery using sqlf
+  WHERE %w
+  { id => \[sqlf('SELECT %c FROM %t WHERE %w', x_id => 'foo', { bar => 'hoge', baz => 'fuga'})] }
+  WHERE (`id` IN (SELECT `x_id` FROM `foo` WHERE (`bar` = ?) AND (`baz` = ?)))
+  [qw/hoge fuga/]
+
+=head2 where array and
+
+  # scalars
+  WHERE %w
+  { id => [ -and => qw/1 2 3/ ] }
+  WHERE ((`id` = ?) AND (`id` = ?) AND (`id` = ?))
+  [qw/1 2 3/]
+
+  # hashes
+  WHERE %w
+  { id => [ -and => { '>' => 10 }, { '<' => 20 } ] }
+  WHERE ((`id` > ?) AND (`id` < ?))
+  [qw/10 20/]
+
+  # array(s)
+  WHERE %w
+  { id => [ -and => [qw/1 2 3/], [qw/4 5 6/] ] }
+  WHERE ((`id` IN (?, ?, ?)) AND (`id` IN (?, ?, ?)))
+  [qw/1 2 3 4 5 6/]
+
+  # IN and scalar
+  WHERE %w
+  { id => [ -and => { IN => [qw/1 2 3/] }, 4 ] }
+  WHERE ((`id` IN (?, ?, ?)) AND (`id` = ?))
+  [qw/1 2 3 4/]
+
+=head2 where array or
+
+  # scalars
+  WHERE %w
+  { id => [ -or => qw/1 2 3/ ] }
+  WHERE ((`id` = ?) OR (`id` = ?) OR (`id` = ?))
+  [qw/1 2 3/]
+
+  # hashes
+  WHERE %w
+  { id => [ -or => { '>' => 10 }, { '<' => 20 } ] }
+  WHERE ((`id` > ?) OR (`id` < ?))
+  [qw/10 20/]
+
+  # array(s)
+  WHERE %w
+  { id => [ -or => [qw/1 2 3/], [qw/4 5 6/] ] }
+  WHERE ((`id` IN (?, ?, ?)) OR (`id` IN (?, ?, ?)))
+  [qw/1 2 3 4 5 6/]
+
+  # IN and scalar
+  WHERE %w
+  { id => [ -or => { IN => [qw/1 2 3/] }, 4 ] }
+  WHERE ((`id` IN (?, ?, ?)) OR (`id` = ?))
+  [qw/1 2 3 4/]
+
+  # no-op equals OR
+  WHERE %w
+  { id => [ { '>' => 10 }, { '<' => 20 } ] }
+  WHERE ((`id` > ?) OR (`id` < ?))
+  [qw/10 20/]
+
+=head2 where special key -or
+
+  # single
+  WHERE %w
+  +{ -or => { a => 1, b => 2 } }
+  WHERE ((`a` = ?) AND (`b` = ?))
+  [qw/1 2/]
+
+  # multi
+  WHERE %w
+  +{ -or => [ { a => 1, b => 2 }, { c => 3, d => 4 } ] }
+  WHERE (((`a` = ?) AND (`b` = ?)) OR ((`c` = ?) AND (`d` = ?)))
+  [qw/1 2 3 4/]
+
+  # multi complex
+  WHERE %w
+  +{ -or => [ { a => 1, b => 2 }, { c => 3, d => 4 } ], foo => 'bar' }
+  WHERE (((`a` = ?) AND (`b` = ?)) OR ((`c` = ?) AND (`d` = ?))) AND (`foo` = ?)
+  [qw/1 2 3 4 bar/]
+
+=head2 where special key -and
+
+  # single
+  WHERE %w
+  +{ -and => { a => 1, b => 2 } }
+  WHERE ((`a` = ?) AND (`b` = ?))
+  [qw/1 2/]
+
+  # multi
+  WHERE %w
+  +{ -and => [ { a => 1, b => 2 }, { c => 3, d => 4 } ] }
+  WHERE (((`a` = ?) AND (`b` = ?)) AND ((`c` = ?) AND (`d` = ?)))
+  [qw/1 2 3 4/]
+
+  # multi complex
+  WHERE %w
+  +{ -and => [ { a => 1, b => 2 }, { c => 3, d => 4 } ], foo => 'bar' }
+  WHERE (((`a` = ?) AND (`b` = ?)) AND ((`c` = ?) AND (`d` = ?))) AND (`foo` = ?)
+  [qw/1 2 3 4 bar/]
+
+  # complex
+  WHERE %w
+  +{ -and => [ -or => [ { a => 1 }, { b => 2 } ], -or => [ { c => 3 }, { d => 4 } ], { foo => 'bar' } ], hoge => 'fuga' }
+  WHERE ((((`a` = ?)) OR ((`b` = ?))) AND (((`c` = ?)) OR ((`d` = ?))) AND ((`foo` = ?))) AND (`hoge` = ?)
+  [qw/1 2 3 4 bar fuga/]
+
+=head2 where multiple
+
+  # basic
+  WHERE %w
+  [ { a => 1, b => 2 }, { c => 3, d => 4 }]
+  WHERE ((`a` = ?) AND (`b` = ?)) OR ((`c` = ?) AND (`d` = ?))
+  [qw/1 2 3 4/]
+
+=head2 where hash in
+
+  # IN (array)
+  WHERE %w
+  { id => { IN => [qw/1 2 3/] } }
+  WHERE (`id` IN (?, ?, ?))
+  [qw/1 2 3/]
+
+  # iN (ignore case)
+  WHERE %w
+  { id => { iN => [qw/1 2 3/] } }
+  WHERE (`id` IN (?, ?, ?))
+  [qw/1 2 3/]
+
+  # -in
+  WHERE %w
+  { id => { -in => [qw/1 2 3/] } }
+  WHERE (`id` IN (?, ?, ?))
+  [qw/1 2 3/]
+
+  # IN (empry array)
+  WHERE %w
+  { id => { IN => [] } }
+  WHERE (0=1)
+  []
+
+  # IN (scalar)
+  WHERE %w
+  { id => { IN => 'foo' } }
+  WHERE (`id` = ?)
+  [qw/foo/]
+
+  # IN (ref)
+  WHERE %w
+  { id => { IN => \['SELECT foo FROM bar WHERE hoge = ?', 'fuga'] } }
+  WHERE (`id` IN (SELECT foo FROM bar WHERE hoge = ?))
+  [qw/fuga/]
+
+  # IN (scalar ref)
+  WHERE %w
+  { id => { 'IN' => \'SELECT foo FROM bar' } }
+  WHERE (`id` IN (SELECT foo FROM bar))
+  []
+
+  # IN (undef)
+  WHERE %w
+  { id => { IN => undef } }
+  WHERE (`id` IS NULL)
+  []
+
+=head2 where hash not in
+
+  # NOT IN (array)
+  WHERE %w
+  { id => { 'NOT IN' => [qw/1 2 3/] } }
+  WHERE (`id` NOT IN (?, ?, ?))
+  [qw/1 2 3/]
+
+  # Not iN (ignore case)
+  WHERE %w
+  { id => { 'Not iN' => [qw/1 2 3/] } }
+  WHERE (`id` NOT IN (?, ?, ?))
+  [qw/1 2 3/]
+
+  # -not_in
+  WHERE %w
+  { id => { -not_in => [qw/1 2 3/] } }
+  WHERE (`id` NOT IN (?, ?, ?))
+  [qw/1 2 3/]
+
+  # NOT IN (empry array)
+  WHERE %w
+  { id => { 'NOT IN' => [] } }
+  WHERE (1=1)
+  []
+
+  # NOT IN (scalar)
+  WHERE %w
+  { id => { 'NOT IN' => 'foo' } }
+  WHERE (`id` <> ?)
+  [qw/foo/]
+
+  # NOT IN (ref)
+  WHERE %w
+  { id => { 'NOT IN' => \['SELECT foo FROM bar WHERE hoge = ?', 'fuga'] } }
+  WHERE (`id` NOT IN (SELECT foo FROM bar WHERE hoge = ?))
+  [qw/fuga/]
+
+  # NOT IN (scalar ref)
+  WHERE %w
+  { id => { 'NOT IN' => \'SELECT foo FROM bar' } }
+  WHERE (`id` NOT IN (SELECT foo FROM bar))
+  []
+
+  # NOT IN (undef)
+  WHERE %w
+  { id => { 'NOT IN' => undef } }
+  WHERE (`id` IS NOT NULL)
+  []
+
+=head2 where hash like
+
+  # scalar
+  WHERE %w
+  { id => { LIKE => 'foo%' } }
+  WHERE (`id` LIKE ?)
+  [qw/foo%/]
+
+  # -like
+  WHERE %w
+  { id => { -like => 'foo%' } }
+  WHERE (`id` LIKE ?)
+  [qw/foo%/]
+
+  # scalar ref
+  WHERE %w
+  { id => { LIKE => \'"foo%"' } }
+  WHERE (`id` LIKE "foo%")
+  []
+
+  # array
+  WHERE %w
+  { id => { LIKE => ['%foo', \'"bar%"'] } }
+  WHERE (`id` LIKE ? OR `id` LIKE "bar%")
+  [qw/%foo/]
+
+  # with escape
+  WHERE %w
+  { id => { LIKE => { '@' => '@_foo%' } } }
+  WHERE (`id` LIKE ? ESCAPE ?)
+  [qw/@_foo% @/]
+
+  # scalar ref with escape
+  WHERE %w
+  { id => { LIKE => { '@' => \'"@_foo%"' } } }
+  WHERE (`id` LIKE "@_foo%" ESCAPE ?)
+  [qw/@/]
+
+  # array with escape
+  WHERE %w
+  { id => { LIKE => { '@' => [\'"@_foo%"', '@_bar%'] } } }
+  WHERE (`id` LIKE "@_foo%" ESCAPE ? OR `id` LIKE ? ESCAPE ?)
+  [qw/@ @_bar% @/]
+
+  # -like_binaray
+  WHERE %w
+  { id => { -LIKE_BINARY => '%foo' } }
+  WHERE (`id` LIKE BINARY ?)
+  [qw/%foo/]
+
+  # like binaray
+  WHERE %w
+  { id => { 'LIKE BINARY' => '%foo' } }
+  WHERE (`id` LIKE BINARY ?)
+  [qw/%foo/]
+
+=head2 where hash not like
+
+  # scalar
+  WHERE %w
+  { id => { 'NOT LIKE' => 'foo%' } }
+  WHERE (`id` NOT LIKE ?)
+  [qw/foo%/]
+
+  # -not_like 
+  WHERE %w
+  { id => { -not_like => 'foo%' } }
+  WHERE (`id` NOT LIKE ?)
+  [qw/foo%/]
+
+  # scalar ref
+  WHERE %w
+  { id => { 'NOT LIKE' => \'"foo%"' } }
+  WHERE (`id` NOT LIKE "foo%")
+  []
+
+  # array
+  WHERE %w
+  { id => { 'NOT LIKE' => ['%foo', \'"bar%"'] } }
+  WHERE (`id` NOT LIKE ? OR `id` NOT LIKE "bar%")
+  [qw/%foo/]
+
+  # -not_like_binaray
+  WHERE %w
+  { id => { -NOT_LIKE_BINARY => '%foo' } }
+  WHERE (`id` NOT LIKE BINARY ?)
+  [qw/%foo/]
+
+  # like binaray
+  WHERE %w
+  { id => { 'NOT LIKE BINARY' => '%foo' } }
+  WHERE (`id` NOT LIKE BINARY ?)
+  [qw/%foo/]
+
+=head2 where hash between
+
+  # array
+  WHERE %w
+  { id => { BETWEEN => [qw/10 20/] } }
+  WHERE (`id` BETWEEN ? AND ?)
+  [qw/10 20/]
+
+  # -between
+  WHERE %w
+  { id => { -between => [qw/10 20/] } }
+  WHERE (`id` BETWEEN ? AND ?)
+  [qw/10 20/]
+
+  # ref
+  WHERE %w
+  { id => { BETWEEN => \['? AND ?', 10, 20] } }
+  WHERE (`id` BETWEEN ? AND ?)
+  [qw/10 20/]
+
+  # scalar
+  WHERE %w
+  { id => { BETWEEN => \'lower(x) AND upper(y)' } }
+  WHERE (`id` BETWEEN lower(x) AND upper(y))
+  []
+
+  # mixed
+  WHERE %w
+  { id => { BETWEEN => [ \'lower(x)', \['upper(?)', 'stuff'] ] } }
+  WHERE (`id` BETWEEN lower(x) AND upper(?))
+  ['stuff']
+
+=head2 where hash not between
+
+  # array
+  WHERE %w
+  { id => { 'NOT BETWEEN' => [qw/10 20/] } }
+  WHERE (`id` NOT BETWEEN ? AND ?)
+  [qw/10 20/]
+
+  # -between
+  WHERE %w
+  { id => { -not_between => [qw/10 20/] } }
+  WHERE (`id` NOT BETWEEN ? AND ?)
+  [qw/10 20/]
+
+  # ref
+  WHERE %w
+  { id => { 'NOT BETWEEN' => \['? AND ?', 10, 20] } }
+  WHERE (`id` NOT BETWEEN ? AND ?)
+  [qw/10 20/]
+
+  # scalar
+  WHERE %w
+  { id => { 'NOT BETWEEN' => \'lower(x) AND upper(y)' } }
+  WHERE (`id` NOT BETWEEN lower(x) AND upper(y))
+  []
+
+  # mixed
+  WHERE %w
+  { id => { 'NOT BETWEEN' => [ \'lower(x)', \['upper(?)', 'stuff'] ] } }
+  WHERE (`id` NOT BETWEEN lower(x) AND upper(?))
+  ['stuff']
+
+=head2 where hash other operator
+
+  # scalar
+  WHERE %w
+  { id => { '<' => 12345 } }
+  WHERE (`id` < ?)
+  [qw/12345/]
+
+  # scalar ref
+  WHERE %w
+  { id => { '>' => \'UNIX_TIMESTAMP()' } }
+  WHERE (`id` > UNIX_TIMESTAMP())
+  []
+
+  # ref array
+  WHERE %w
+  { id => { '!=' => \['UNIX_TIMESTAMP(?)', '2012-12-12 00:00:00'] } }
+  WHERE (`id` != UNIX_TIMESTAMP(?))
+  ['2012-12-12 00:00:00']
+
+  # array =
+  WHERE %w
+  { id => { '=' => [qw/1 2 3/] } }
+  WHERE (`id` IN (?, ?, ?))
+  [qw/1 2 3/]
+
+  # empty array =
+  WHERE %w
+  { id => { '=' => [] } }
+  WHERE (0=1)
+  []
+
+  # array !=
+  WHERE %w
+  { id => { '!=' => [qw/1 2 3/] } }
+  WHERE (`id` NOT IN (?, ?, ?))
+  [qw/1 2 3/]
+
+  # empty array !=
+  WHERE %w
+  { id => { '!=' => [] } }
+  WHERE (1=1)
+  []
+
+=head2 where hash mixed
+
+  # mixied scalar
+  WHERE %w
+  { id => { '>' => '12345', '<' => '67890' } }
+  WHERE ((`id` < ?) AND (`id` > ?))
+  [qw/67890 12345/]
+
+  # mixied array
+  WHERE %w
+  { id => { '!=' => [qw/a b c/], '=' => [qw/1 2 3/] } }
+  WHERE ((`id` NOT IN (?, ?, ?)) AND (`id` IN (?, ?, ?)))
+  [qw/a b c 1 2 3/]
+
+=head2 where scalar
+
+  # scalar
+  WHERE %w
+  { id => 12345 }
+  WHERE (`id` = ?)
+  [12345]
+
+=head2 where scalar ref
+
+  # scalar ref
+  WHERE %w
+  { id => \'> UNIX_TIMESTAMP()' }
+  WHERE (`id` > UNIX_TIMESTAMP())
+  []
+
+=head2 where undef
+
+  # is null
+  WHERE %w
+  { id => undef }
+  WHERE (`id` IS NULL)
+  []
+
+=head2 group by
+
+  # scalar
+  %o
+  { group_by => 'foo' }
+  GROUP BY `foo`
+  []
+
+  # undef
+  %o
+  { group_by => undef }
+  GROUP BY NULL
+  []
+
+  # hashref
+  %o
+  { group_by => { foo => 'DESC' } }
+  GROUP BY `foo` DESC
+  []
+
+  # hashref -asc
+  %o
+  { group_by => { -asc => 'foo' } }
+  GROUP BY `foo` ASC
+  []
+
+  # hashref multi value
+  %o
+  { group_by => { foo => 'DESC', -asc => 'bar' } }
+  GROUP BY `bar` ASC, `foo` DESC
+  []
+
+  # array mixed
+  %o
+  { group_by => ['hoge', { foo => 'DESC', -asc => 'bar' }] }
+  GROUP BY `hoge`, `bar` ASC, `foo` DESC
+  []
+
+=head2 having (same as where)
+
+  # simple
+  %o
+  { having => { foo => 'bar' } }
+  HAVING (`foo` = ?)
+  [qw/bar/]
+
+  # with group by
+  %o
+  { having => { 'SUM(foo)' => { '>=' => 10 } }, group_by => 'bar' }
+  GROUP BY `bar` HAVING (SUM(foo) >= ?)
+  [qw/10/]
+
+=head2 order by
+
+  # scalar
+  %o
+  { order_by => 'foo' }
+  ORDER BY `foo`
+  []
+
+  # undef
+  %o
+  { order_by => undef }
+  ORDER BY NULL
+  []
+
+  # hashref
+  %o
+  { order_by => { foo => 'DESC' } }
+  ORDER BY `foo` DESC
+  []
+
+  # hashref -asc
+  %o
+  { order_by => { -asc => 'foo' } }
+  ORDER BY `foo` ASC
+  []
+
+  # hashref multi value
+  %o
+  { order_by => { foo => 'DESC', -asc => 'bar' } }
+  ORDER BY `bar` ASC, `foo` DESC
+  []
+
+  # array mixed
+  %o
+  { order_by => ['hoge', { foo => 'DESC', -asc => 'bar' }] }
+  ORDER BY `hoge`, `bar` ASC, `foo` DESC
+  []
+
+=head2 limit offset
+
+  # limit only
+  %o
+  { limit => 100 }
+  LIMIT 100
+  []
+
+  # limit offset
+  %o
+  { limit => 100, offset => 20 }
+  LIMIT 100 OFFSET 20
+  []
+
+=head2 set clause
+
+  # hash
+  UPDATE foo SET %s
+  { bar => 'baz' }
+  UPDATE foo SET `bar` = ?
+  [qw/baz/]
+
+  # hash multi
+  UPDATE foo SET %s
+  { bar => 'baz', hoge => 'fuga' }
+  UPDATE foo SET `bar` = ?, `hoge` = ?
+  [qw/baz fuga/]
+
+  # scalar ref into hash
+  UPDATE foo SET %s
+  { bar => \'UNIX_TIMESTAMP()' }
+  UPDATE foo SET `bar` = UNIX_TIMESTAMP()
+  []
+
+  # array ref into hash
+  UPDATE foo SET %s
+  { bar => \['UNIX_TIMESTAMP(?)', '2012-12-12'] }
+  UPDATE foo SET `bar` = UNIX_TIMESTAMP(?)
+  ['2012-12-12']
+
+  # array
+  UPDATE foo SET %s
+  [ bar => 'baz' ]
+  UPDATE foo SET `bar` = ?
+  [qw/baz/]
+
+  # array multi
+  UPDATE foo SET %s
+  [ hoge => 'fuga', bar => 'baz' ]
+  UPDATE foo SET `hoge` = ?, `bar` = ?
+  [qw/fuga baz/]
+
+  # scalar ref into array
+  UPDATE foo SET %s
+  [ bar => \'UNIX_TIMESTAMP()' ]
+  UPDATE foo SET `bar` = UNIX_TIMESTAMP()
+  []
+
+  # array ref into array
+  UPDATE foo SET %s
+  [ bar => \['UNIX_TIMESTAMP(?)', '2012-12-12'] ]
+  UPDATE foo SET `bar` = UNIX_TIMESTAMP(?)
+  ['2012-12-12']
+
+=head2 join
+
+  # inner join on scalar
+  %j
+  { table => 'bar', condition => 'foo.id = bar.id' }
+  INNER JOIN `bar` ON foo.id = bar.id
+  []
+
+  # inner join on ref hash
+  %j
+  { table => 'bar', condition => { 'foo.id' => 'bar.id' } }
+  INNER JOIN `bar` ON `foo`.`id` = `bar`.`id`
+  []
+
+  # inner join on hash multi
+  %j
+  { table => 'bar', condition => { 'foo.id' => 'bar.id', 'foo.created_at' => 'bar.created_at' } }
+  INNER JOIN `bar` ON (`foo`.`created_at` = `bar`.`created_at`) AND (`foo`.`id` = `bar`.`id`)
+  []
+
+  # inner join on hash with op
+  %j
+  { table => 'bar', condition => { 'foo.id' => { '>' => 'bar.id' } } }
+  INNER JOIN `bar` ON `foo`.`id` > `bar`.`id`
+  []
+
+  # inner join on hash with ref array
+  %j
+  { table => 'bar', condition => { 'foo.id' => \['UNIX_TIMESTAMP(?)', '2012-12-12'] } }
+  INNER JOIN `bar` ON `foo`.`id` = UNIX_TIMESTAMP(?)
+  ['2012-12-12']
+
+  # inner join on hash with op multi
+  %j
+  { table => 'bar', condition => { 'foo.id' => { '<' => 'bar.id', '>' => \['?', '12345'] } } }
+  INNER JOIN `bar` ON (`foo`.`id` < `bar`.`id`) AND (`foo`.`id` > ?)
+  [qw/12345/]
+
+  # inner join on where clause
+  %j
+  { table => 'bar', condition => { -where => { foo => 12345 } } }
+  INNER JOIN `bar` ON (`foo` = ?)
+  [qw/12345/]
+
+  # inner join on array
+  %j
+  { table => 'bar', condition => [qw/id created_at/] }
+  INNER JOIN `bar` USING (`id`, `created_at`)
+  []
+
+  # with alias
+  %j
+  { table => { bar => 'b' }, condition => { 'f.id' => 'b.id' } }
+  INNER JOIN `bar` `b` ON `f`.`id` = `b`.`id`
+  []
+
+  # left join
+  %j
+  { type => 'left', table => { bar => 'b' }, condition => { 'f.id' => 'b.id' } }
+  LEFT JOIN `bar` `b` ON `f`.`id` = `b`.`id`
+  []
+
+  # array
+  %j
+  [ { type => 'left', table => { bar => 'b'}, condition => { 'f.id' => 'b.id' } }, { table => { hoge => 'h' }, condition => { 'h.id' => 'f.id' } } ]
+  LEFT JOIN `bar` `b` ON `f`.`id` = `b`.`id` INNER JOIN `hoge` `h` ON `h`.`id` = `f`.`id`
+  []
+
+=head1 AUTHOR
+
+xaicron E<lt>xaicron {at} cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2012 - xaicron
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<< SQL::Format >>
+
+=cut

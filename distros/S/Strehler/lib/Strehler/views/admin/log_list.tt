@@ -1,0 +1,27 @@
+[% PROCESS admin/blocks/listblocks.tt %]
+<div class="span12">
+    <h1>[% label %]</h1>
+</div>
+<div class="content articlelist span12">
+        [% INCLUDE pager_no_new %]
+        <table class="table table-striped">
+        [% INCLUDE listhead %]
+        <tbody>
+            [% FOREACH el IN elements %]
+            <tr>
+                <td>[% el.id %]</td>
+                <td>[% el.timestamp.strftime('%d-%m-%Y %T') %]</td>
+                <td>[% el.user %]</td>
+                <td>[% el.action %] [% el.entity_type %]</td>
+                <td>
+                    <a href="/admin/[% el.entity_type %]/edit/[% el.entity_id %]">[% el.entity_id %]</a>
+                </td>
+            </tr>
+            [% END %]
+        </tbody>
+        </table>
+        [% INCLUDE pager_no_new %]
+</div>
+[% INCLUDE filterscripts %]
+
+

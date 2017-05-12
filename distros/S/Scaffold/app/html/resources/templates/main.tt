@@ -1,0 +1,15 @@
+    <div id="header">
+      <h1>[% view.title %]</h1>
+      <h2>[% view.data.header %]</h2>
+    </div>
+    <div id="container">
+      <div id="menu">
+[% INCLUDE $view.data.menu -%]
+      </div>
+      <div id="content">
+[% INCLUDE $view.data.content -%]
+      </div>
+    </div>
+    <div id="footer">
+[% INCLUDE footer.tt -%]
+    </div>

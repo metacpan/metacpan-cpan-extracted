@@ -1,0 +1,91 @@
+{
+   "abstract" : "argument validation for you",
+   "author" : [
+      "Tokuhiro Matsuno <tokuhirom@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.2",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Smart-Args",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Params::Validate" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "5.63",
+            "Mouse" : "0.92",
+            "Mouse::Util::TypeConstraints" : "0",
+            "PadWalker" : "1.92",
+            "Scalar::Util" : "1.21",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Moose::Util::TypeConstraints" : "0",
+            "MooseX::Types::Moose" : "0",
+            "MouseX::Types" : "0",
+            "MouseX::Types::Mouse" : "0",
+            "Test::Builder::Module" : "0",
+            "Test::More" : "0.96",
+            "Test::Requires" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Smart::Args" : {
+         "file" : "lib/Smart/Args.pm",
+         "version" : "0.14"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tokuhirom/Smart-Args/issues"
+      },
+      "homepage" : "https://github.com/tokuhirom/Smart-Args",
+      "repository" : {
+         "url" : "git://github.com/tokuhirom/Smart-Args.git",
+         "web" : "https://github.com/tokuhirom/Smart-Args"
+      }
+   },
+   "version" : "0.14",
+   "x_contributors" : [
+      "Fuji, Goro <gfuji@cpan.org>",
+      "Neil Bowers <neil@bowers.com>",
+      "aereal <aereal@aereal.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

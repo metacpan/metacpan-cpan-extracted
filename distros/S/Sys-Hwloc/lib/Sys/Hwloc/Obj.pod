@@ -1,0 +1,258 @@
+=head1 NAME
+
+Sys::Hwloc::Obj - Class representing a hwloc topology object
+
+=head1 SYNOPSIS
+
+       use Sys::Hwloc;
+
+       $obj    = $topology->get_obj_by_depth( $depth, $idx );
+       $obj    = $topology->get_obj_by_type( $type, $idx );
+
+       $type   = $obj->type;
+       $idx    = $obj->os_index;
+       $name   = $obj->name;
+       $href   = $obj->memory;
+       $href   = $obj->attr;
+       $depth  = $obj->depth;
+       $idx    = $obj->logical_index;
+       $level  = $obj->os_level;
+       $oobj   = $obj->next_cousin;
+       $oobj   = $obj->prev_cousin;
+       $oobj   = $obj->parent;
+       $rank   = $obj->sibling_rank;
+       $oobj   = $obj->next_sibling;
+       $oobj   = $obj->prev_sibling;
+       $arity  = $obj->arity;
+       @oobjs  = $obj->children;
+       $oobj   = $obj->first_child;
+       $oobj   = $obj->last_child;
+       $set    = $obj->cpuset;
+       $set    = $obj->complete_cpuset;
+       $set    = $obj->online_cpuset;
+       $set    = $obj->allowed_cpuset;
+       $set    = $obj->nodeset;
+       $set    = $obj->complete_nodeset;
+       $set    = $obj->allowed_nodeset;
+       $href   = $obj->infos;
+
+       $string = $obj->sprintf_type( $verbose );
+       $string = $obj->sprintf_attr( $separator, $verbose );
+       $string = $obj->sprintf_cpuset;
+       $string = $obj->sprintf( $prefix, $verbose );
+       $string = $obj->info_by_name ( $name );
+
+       $oobj   = $obj->ancestor_by_depth( $depth );
+       $oobj   = $obj->ancestor_by_type( $type );
+       $oobj   = $obj->next_child( $oobj );
+       $oobj   = $obj->common_ancestor( $oobj );
+
+       $rc     = $obj->is_same_obj( $oobj );
+
+=head1 DESCRIPTION
+
+Sys::Hwloc::Obj is the Perl namespace used for I<struct hwloc_obj>
+data.
+
+The Sys::Hwloc::Obj class provides an object-oriented interface
+for members of I<struct hwloc_obj>, and for hwloc C functions that act on
+topology objects without involving the topology context. In particular,
+every hwloc C function that gets a hwloc_obj pointer as first argument
+has an OO-ish counterpart in Sys::Hwloc::Obj.
+
+There are no constructors and destructors of Sys::Hwloc::Obj instances.
+
+A Sys::Hwloc::Obj instance is retrieved either from a L<Sys::Hwloc::Topology> instance,
+or from another Sys::Hwloc::Obj instance.
+
+=head1 METHODS
+
+Refer to L<http://www.open-mpi.org/projects/hwloc> for the full specification.
+
+This section lists only methods that are specific to Sys::Hwloc. These are
+methods, which have no pendants in the hwloc C API, or which behave differently
+compared to their hwloc C API counterparts.
+
+=over 4
+
+=item B<memory>
+
+  $memory = $obj->memory;
+
+Retrieves the object memory as reference to a hash.
+
+The corresponding hwloc C struct member points to a I<struct hwloc_obj_memory_s>.
+
+As with hwloc-1.1, the memory hashref consists of the following:
+
+  $memory->{total_memory}
+  $memory->{local_memory}
+  $memory->{page_types_len}
+  @{$memory->{page_types}}
+
+The $memory->{page_types} array reference contains $memory->{page_types_len}
+references to hashes with
+
+  $memory->{page_types}->[$i]->{size}
+  $memory->{page_types}->[$i]->{count}
+
+=item B<attr>
+
+  $attrs = $obj->attr;
+
+Retrieves the object attributes as reference to a hash.
+
+The corresponding hwloc C struct member points to a I<union hwloc_obj_attr_u>.
+
+The content of the attrs hashref depends on the object type and the hwloc version, and may be empty.
+
+As with hwloc-1.1, if e.g. $obj->type == HWLOC_OBJ_CACHE, there will be
+
+  $obj->attr->{cache}->{depth}
+  $obj->attr->{cache}->{size}
+  $obj->attr->{cache}->{linesize}
+
+To inspect the content, parse it like
+
+  while(my ($key, $value) = each %{$obj->attr}) {
+    ...
+  }
+
+=item B<children>
+
+  @oobj = $obj->children;
+
+Returns an array with Sys::Hwloc::Obj instances representing the child objects of $obj.
+The returned array has $obj->arity members. If $obj->arity is 0, the array is empty.
+
+The array may be processed by array index or with B<foreach>() and the like. The following
+constructs are equivalent:
+
+  for($i = 0; $i < $obj->arity; $i++) {
+    $type = ($obj->children)[$i]->type;
+  }
+
+  foreach($obj->children) {
+    $type = $_->type;
+  }
+
+=item B<cpuset>
+
+  $set = $obj->cpuset
+
+Returns an object that represents the object's cpuset.
+
+Before hwloc-1.1, this method returns an instance of L<Sys::Hwloc::Cpuset>.
+
+Since hwloc-1.1, this method returns an instance of L<Sys::Hwloc::Bitmap>. A class
+Sys::Hwloc::Cpuset does not exist.
+
+=item B<nodeset>
+
+  $set = $obj->nodeset
+
+Returns an object that represents the object's nodeset.
+
+In hwloc-1.0, this method returns an instance of L<Sys::Hwloc::Cpuset>. There is
+no class Sys::Hwloc::Nodeset.
+
+Since hwloc-1.1, this method returns an instance of L<Sys::Hwloc::Bitmap>. A class
+Sys::Hwloc::Nodeset does not exist.
+
+=item B<infos>
+
+  $infos = $obj->infos;
+
+Retrieves the object info as reference to a hash.
+
+The corresponding hwloc C struct member points to an array of I<struct hwloc_obj_info_s>.
+
+The $infos hash represents individual object infos as name->value pairs.
+
+There also exists the method $obj->B<info_by_name>($name), which allows the
+retrieval of an individual B<value> that corresponds to a B<name> key
+via the hwloc C API directly from the topology object.
+
+A method B<infos_count> that returns the extent of the $infos hash is not provided.
+
+=item B<sprintf_type>
+
+  $string = $obj->sprintf_type( $verbose );
+
+This method is an alias of B<Sys::Hwloc::hwloc_obj_type_sprintf>($obj,$verbose).
+
+It returns a string that represents the type of a given topology object in human-readable form.
+
+The argument B<$verbose> is optional, and defaults to 0.
+The handling of this default is done by the hwloc C API.
+
+=item B<sprintf_attr>
+
+  $string = $obj->sprintf_attr( $separator, $verbose );
+
+This method is an alias of B<Sys::Hwloc::hwloc_obj_attr_sprintf>($obj,$separator,$verbose).
+
+It returns a string that represents the attributes of a given topology object in human-readable form.
+
+The arguments B<$separator> and B<$verbose> are optional, and default to I<undef> and 0, respectively.
+The handling of these defaults is done by the hwloc C API.
+
+=item B<sprintf_cpuset>
+
+  $string = $obj->sprintf_cpuset;
+
+This method is an alias of B<Sys::Hwloc::hwloc_obj_cpuset_sprintf>($obj).
+
+It returns a string that represents the cpuset of a given single topology object in human-readable form.
+
+The call B<$obj->cpuset->sprintf> yields the same result.
+
+In contrast to that, the function B<Sys::Hwloc::hwloc_obj_cpuset_sprintf>() understands more than one object in its argument list.
+
+=item B<sprintf>
+
+  $string = $obj->sprintf( $prefix, $verbose );
+
+This method is an alias of B<Sys::Hwloc::hwloc_obj_sprintf>($obj,$prefix,$verbose).
+
+It returns a string that represents a given topology object in human-readable form.
+
+The arguments B<$prefix> and B<$verbose> are optional, and default to undef and 0, respectively.
+The handling of these defaults is done by the hwloc C API.
+
+Note that this method is regarded as depreciated in hwloc-1.1.
+
+=item B<is_same_obj>
+
+  $rc = $obj->is_same_obj( $oobj );
+
+Compares the Sys::Hwloc::Obj instance $obj with the Sys::Hwloc::Obj instance $oobj.
+
+Returns 1, if they are equal. Returns 0, if they are not equal.
+
+Comparison is done by comparing the underlying raw B<hwloc_obj_t> pointer values.
+
+The method is an alias for B<Sys::Hwloc::hwloc_compare_objects($topo,$obj1,$obj2)>.
+
+=back
+
+=head1 SEE ALSO
+
+L<hwloc>(7),
+L<Sys::Hwloc::Topology>(3pm),
+L<Sys::Hwloc::Cpuset>(3pm),
+L<Sys::Hwloc::Bitmap>(3pm)
+
+=head1 AUTHOR
+
+Bernd Kallies, E<lt>kallies@zib.deE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011 Zuse Institute Berlin
+
+This package and its accompanying libraries is free software; you can
+redistribute it and/or modify it under the terms of the GPL version 2.0,
+or the Artistic License 2.0. Refer to LICENSE for the full license text.
+
+=cut

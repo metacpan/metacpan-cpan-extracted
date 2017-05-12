@@ -1,0 +1,709 @@
+NAME
+    Shell::Cmd - run shell commands with enhanced support
+
+SYNOPSIS
+       use Shell::Cmd;
+
+       $obj = new Shell::Cmd;
+
+DESCRIPTION
+    A very common use of perl is to act as a wrapper around shell commands
+    where perl is used to prepare the shell commands, execute them, and deal
+    with the resulting output. Even where the bulk of the work is actually
+    done in the perl script, creating small shell scripts within it to do
+    some portion of the task is common.
+
+    In the simplest form, running shell commands can be done very simply
+    using the "system()" call, backticks, or several other ways, but I
+    usually find myself wanting to do a bit (and sometimes a lot) more,
+    especially when I am writing a long-term script that I want to be
+    robust. In these cases, I frequently ended up writing a subroutine to
+    run the shell command(s) for me with added functionality.
+
+    This module is designed to take a list of shell commands and
+    automatically turn them into a shell script (using only basic shell
+    commands) which adds some common desirable functionality including:
+
+    Handle STDOUT/STDERR
+        Commonly, I want to treat STDOUT and STDERR in some way. I may want
+        to keep one or both of them, or discard one or both of them, or
+        merge them.
+
+    Command echoing
+        A common option I want to set is command echoing where the commands
+        I run are echoed as they are run. I want to be able to easily turn
+        this on or off.
+
+    Dry-run
+        Another common option is to create a dry-run environment where the
+        shell commands may be printed, but not actually run. Again, I want
+        to be able to turn this on and off easily.
+
+    Error trapping
+        Even though I may combine a number of shell commands into a single
+        script (so that it all runs in one shell), I still want to have
+        built in error trapping at a per-command basis. I want to take a
+        series of commands and know exactly which one failed.
+
+        I also want to be able to control what happens to commands that are
+        listed after a failed command. I may want to ignore an error and
+        continue to run the remaining commands. I may want to simply exit.
+        Or I may want to echo, but not run the remaining commands so that I
+        can see what didn't get completed.
+
+    Shell environment
+        I sometimes want to set up some environment for the script such as
+        what directory it will be run in and what environment variables
+        should be set in advance.
+
+    Command alternates
+        Sometimes, especially if you are running the script on multiple
+        platforms, you may not know which command you should use. You can of
+        course generate a platform specific script, but an alternative is to
+        specify alternate commands. If ANY of those commands succeed, then
+        that portion of the script succeeds.
+
+    Command retrying
+        Occasionally you have a command that may fail, but on retrying, it
+        will succeed. This is especially true when some effect from a
+        previous command takes some amount of time to actually go into
+        effect. By allowing a certain number of retries, you can often work
+        around this situation.
+
+    Remote execution
+        Sometimes you want to run the commands locally. Other times, you
+        want to run it remotely using ssh. When running remotely, you may
+        want to run the same script on multiple hosts.
+
+    SSH handling
+        When running on multiple hosts using SSH, sometimes you need to run
+        the script serially (i.e. one host at a time), but other times, it
+        would be nice to run it in parallel to speed up execution. When
+        running in parallel, you should be able specify how many instances
+        to run at at time.
+
+    Quoting and special characters
+        Since shell commands often have quotes, dollar signs, and other
+        special characters, this module can handle that for you by properly
+        escaping them as necessary.
+
+    This module is designed to run multiple commands in a single shell,
+    wrapping them in very simple, standard shell commands to automatically
+    add all of this functionality.
+
+METHODS
+    new
+           $obj = new Shell::Cmd;
+
+        This creates a new object containing commands.
+
+    version
+           $vers = $obj->version();
+
+        Returns the version of this module.
+
+    cmd
+           $err=$obj->cmd($cmd [,\%options], $cmd [,\%options], ...);
+
+        This is used to add one or more commands to the list of commands
+        that will be executed.
+
+        Here, each $cmd is a string containing a command, or a listref where
+        each element in the list is a command.
+
+        In the listref form, the list of commands are alternates to try
+        until one succeeds, and the command only fails if all of the
+        alternates fail. This might be used to specify different paths to an
+        executable, or different executables that perform essentially the
+        same function, but which might not all be available on all
+        platforms.
+
+        For example, if you wanted to run a command to get the contents of a
+        web site, and you didn't know which of curl, wget, or lftp were
+        available, you might use something like this:
+
+           $err = $obj->cmd([ "wget $URL", "curl $URL", "lftp $URL"]);
+
+        and in this case, it would try wget, and if that failed, it would
+        try curl, and if that failed, it would try lftp. The command will
+        only fail if all three alternates fail.
+
+        Each command (or list of alternates) can have options passed in.
+        These options apply only to this command (or list), and are
+        described in the "PER-COMMAND OPTIONS" section below.
+
+        All of the commands stored in $obj will be run in a single shell, so
+        it is fine to gather information in one command and store it in a
+        shell variable for use in a later command. Also, it is not necessary
+        (or desirable) to include a trailing semi-colon on the command as
+        these will be added automatically as needed.
+
+        An error is returned if any of the arguments are invalid.
+
+        It should be noted that no attempt is made to see if the syntax of
+        the shell command is correct. That is beyond the scope of this
+        module.
+
+        If only simple lists of commands are used, handling them is
+        relatively straightforward, but trying to include commands that
+        affect the flow of the script (such as "while...done", "if...else",
+        and the like) then handling can be much more complicated. Only a
+        subset of these are supported. Refer to the "FLOW COMMANDS" section
+        below.
+
+    run
+           $obj->run();
+
+        This prepares a shell script based on the commands and options
+        entered and runs it as appropriate. There are several different ways
+        in which the commands can be run, and these are described in the
+        options method below. The most important option is the mode option
+        which sets the mode which determines the form of the script, and how
+        it is run.
+
+        If $obj is in 'run' mode, the method can be called as either:
+
+           ($err)    = $obj->run();
+           $err      = $obj->run();
+
+        In this mode, the script is run, and output is sent directly to
+        STDOUT and STDERR as appropriate for the options specified. In
+        essence, this generates a script and runs it with the "system()"
+        call.
+
+        If a temporary script file is used, but it cannot be written, $err
+        will be -2. Otherwise, the return value of the method is the exit
+        code of the script (which is the exit code of the first failing
+        command).
+
+        If $obj is in 'dry-run' mode, the method should be called as either:
+
+           ($script) = $obj->run();
+           $script   = $obj->run();
+
+        In this mode, the commands are not actually executed. Instead, the
+        script is built and returned. The form of the script is determined
+        by the script option described below.
+
+        If $obj is in 'script' mode, the output from the commands are kept
+        for further analysis. The method should be called as:
+
+           @out      = $obj->run();
+
+        Here, @out is a list of command output descriptors:
+
+           @out      = ( FAILED_COMMAND, COMMAND_SUMMARY_1, COMMAND_SUMMARY_2, ... )
+
+        Here, FAILED_COMMAND is the command number that failed. If
+        FAILED_COMMAND is 0, it means that the script completed
+        successfully. If it is -1, it means that the script initialization
+        failed before any of the commands were run. This typically means
+        that an invalid directory was specified with the dire method. If
+        FAILED_COMMAND is any other value, it will be an integer I. In this
+        case, the failed command is described in COMMAND_SUMMARY_I.
+
+        For each command that ran, the output is returned along with
+        information about the command status. The format of each
+        COMMAND_SUMMARY is a listref of the form:
+
+           COMMAND_SUMMARY = [ CMD_NUM, STATUS, ALT_SUMMARY_1, ALT_SUMMARY_2, ... ]
+
+        CMD_NUM is the number of the command as it was entered with the cmd
+        method starting at 0. Each ALT_SUMMARY is the summary for one of the
+        alternates for this command.
+
+        STATUS is one of the strings:
+
+           ''       : Any command that succeeds will be given either a
+           succ       STATUS of an empty string, or the string 'succ'.
+                      If the B<failure> option is set to 'continue',
+                      all commands which succeed are given the empty
+                      string until a command fails.  Commands run after
+                      that are given a STATUS of 'succ'.
+
+                      If B<failure> is set to any other option, only
+                      the empty string is ever assigned as STATUS for
+                      a successful command.
+
+           retried  : If a command is retried, all attempts may fail
+                      (except the final one) and it is not counted as
+                      a script failure.  These failing commands are
+                      given this STATUS.
+
+           exit     : The first command that actually fails is given
+           fail       the status 'exit'.  Other commands that fail
+                      (if the B<failure> option is set to 'continue')
+                      are given the status 'fail'.
+
+           disp     : This is only available if the B<failure>
+                      option is set to 'display', and will apply to
+                      all commands after the failing command.
+
+        It should be noted that if a command is retried multiple times, each
+        attempt will be returned as a separate COMMAND_SUMMARY structure.
+        Since any attempt but the final one failed, the status in those will
+        all be 'retried'. Only the final attempt will include a status
+        indicating success or failure for the command as a whole.
+
+        Each alternate will return a separate summary, also a listref, of
+        the form:
+
+           ALT_SUMMARY_i = [ CMD, EXIT, STDOUT, STDERR ]
+
+        CMD is the full command that was run.
+
+        EXIT is the exit value from that command. Note that if a command has
+        alternates, then one or more of them may fail (causing an exit value
+        to appear here) without causing the overall command to fail.
+
+        STDOUT and STDERR are the output produced by that command. Depending
+        on the values of the output and f-output options, one or both of
+        these may be empty, even if the command actually produced that type
+        of output. So, if the value of output is 'stderr', the the STDOUT
+        will be empty, even if the command produced something. Both are
+        listrefs of lines.
+
+    ssh
+           $obj->ssh(@hosts);
+
+        This behaves similar to the run method except it will run the
+        commands on each host in @hosts using ssh.
+
+        In 'dry-run' mode, the call is:
+
+           @script = $obj->ssh(@hosts);
+
+        In 'run' mode, the call is:
+
+           @err = $obj->ssh(@hosts);
+
+        In 'script' mode, the call is:
+
+           ($out1,$out2,...) = $obj->ssh(@hosts);
+
+        where $out1 is a reference to the list of output on the 1st host,
+        etc.
+
+        Note that when running in parallel in 'run' mode, the output that is
+        printed to the terminal will be a mix of the output from each of the
+        hosts the commands are being run on.
+
+        If the tmp_script option is set but the file cannot be written, the
+        return value in both cases will be (-2). If the file cannot be
+        copied to a host, then the return value for that host will be -3.
+
+    flush
+           $obj->flush( [@opts] );
+
+        If @opts is not given, it removes the commands, directory, and
+        environment stored in the object, and resets the options to the
+        default values.
+
+        If @opts is given, it can include any of the following:
+
+           commands   : clears commands
+           dire       : clears the directory
+           env        : clears the environment
+           opts       : clears all options
+
+    dire
+           $err = $obj->dire($dire);
+
+        This method is used to set the dire option. For a description,
+        please see the entry in "GLOBAL OPTIONS" below.
+
+        You can also check the value that is set using:
+
+           $dire = $obj->dire();
+
+    mode
+           $err = $obj->mode($mode);
+
+        This method is used to set the mode option. For a description,
+        please see the entry in "GLOBAL OPTIONS" below.
+
+        You can also check the value that is set using:
+
+           $mode = $obj->mode();
+
+    env
+           $obj->env(VAR, VAL, VAR, VAL, ...);
+
+        This can be called any number of times to set some environment
+        variables. If $val is undef, the environment variable will be
+        explicitly unset.
+
+        You can also query the environment variables with:
+
+           @env = $obj->env();
+
+        It will return a list of ( VAR VAL VAR VAL ... ).
+
+    options
+           $err = $obj->options(%options);
+
+        This can be used to set some options about what will be done when
+        the commands are run.
+
+        The hash is of the form:
+
+           %options = ( OPTION => VALUE,
+                        OPTION => VALUE, ...)
+
+        The options are defined in the "GLOBAL OPTIONS" section below.
+
+GLOBAL OPTIONS
+    The following global options exist can can be set using the options
+    method:
+
+    mode
+        The mode option determines how the commands will be handled by the
+        run method. The following values are available.
+
+           dry-run
+           run
+           script
+
+        The default option is to use 'run' mode.
+
+        The 'dry-run' mode will simply return the script that would have
+        been run, but it doesn't actually run it.
+
+        The 'run' mode is the standard way to run commands in an interactive
+        setting. It will run the commands in real-time and allow you to
+        watch STDOUT and/or STDERR (depending on the options you choose) as
+        they run.
+
+        The 'script' mode is more appropriate for running in an unattended
+        script. It gathers the output and post-processes it allowing for
+        more useful handling of the output. For example, you could discard
+        the output from commands that succeed and keep only the output for
+        the one that failed.
+
+        The mode option can also be set using the mode method.
+
+    tmp_script, tmp_script_keep
+        The tmp_script option is used to specify a temporary script name.
+
+        The script that is generated by this module may exceed the length of
+        a string that can be passed directly to a shell. In order to avoid
+        this problem, the script can be stored in a temporary script file
+        (set with the tmp_script option) which will be executed.
+
+        Once execution is complete, the temporary script file will be
+        removed unless the tmp_script_keep option is set.
+
+    ssh_script, ssh_script_keep
+        These are related to the tmp_script and tmp_script_keep options. If
+        tmp_script is created, then when the ssh method is used to run the
+        script remotely, it is copied to the remote host (via. scp) to a
+        temporary location (given by ssh_script). The remote script is then
+        removed (unless ssh_script_keep is passed in).
+
+        If tmp_script is set but ssh_script is NOT, ssh_script defaults to
+        the same value as tmp_script.
+
+        ssh_script_keep defaults to 0, even if tmp_script_keep is set.
+
+    dire
+        The dire option is use to specify the directory where all of the the
+        commands should be run. This can be overridden on a per-command
+        basis using the cmd method, but all commands not specifically set
+        will run in this directory.
+
+        This does NOT check the existence of the directory until the
+        commands are actually run since the commands may be run via. ssh.
+
+        The dire option can also be set using the dire method.
+
+    output
+        The output option can be one of the following:
+
+           both
+           merged
+           stdout
+           stderr
+           quiet
+
+        In the 'run' mode, these determine what output will be displayed.
+
+        It can display only STDOUT, only STDERR, or both, or both can be
+        discarded with the 'quiet' option. The default is to include 'both'.
+        The 'merged' option is used to display both but merge STDERR into
+        STDOUT (using a "2>&1" redirection).
+
+        The default in both cases is 'both'.
+
+        In the 'script' mode, the output is determined by using a
+        combination of the 'output' and 'f-output' options as described
+        next.
+
+    f-output
+        The f-output option can be one of the following:
+
+           both
+           merged
+           stdout
+           stderr
+           quiet
+
+        and is only used in 'script' mode.
+
+        In 'script' mode, all of the output is gathered and analyzed after
+        the commands are run, so the output can be tailored to whether a
+        command completed successfully or failed.
+
+        The 'output' option controls what output is returned for commands
+        that completed successfully, and the 'f-output' option controls the
+        output given for a failed command. Note that if a command has
+        multiple alternatives, and one of them succeeds, the command is
+        treated as succeeding, and the output for all alternates (even the
+        individual ones that fail) will follow the rules of 'output' rather
+        than 'f-output'.
+
+        It should be noted that since the command runs fully before it can
+        be seen whether it failed or not, STDOUT/STDERR will either be
+        separate or merged based on the first option. If the first option is
+        'both', 'stdout, or 'stderr', they will be separate, and the
+        'f-merged' option is not supported (it will be replaced by
+        'f-both'). If the first option is 'merged', then the 'f-both',
+        'f-stdout', and 'f-stderr' options are not supported and will be
+        replaced by 'f-merged'.
+
+        The default to these are 'both' and 'f-both'.
+
+    script
+        The script option is used only in dry-run mode.
+
+        When commands are run in dry-run mode, a script is produced. The
+        form of that script is controlled by this option. The value may be
+        any of:
+
+           run
+           script
+           simple
+
+        If the value is 'run' (which is the default), the script produced
+        will be exactly the script produced in the 'run' mode. If the value
+        is 'script', the script will be the script produced in 'script'
+        mode.
+
+        If the value is 'simple', the script will simply be the list of
+        commands with the minimum necessary additions to handle directory
+        and environment variables. No additional scripting will be added to
+        do error checking or add other functionality.
+
+    echo
+        The 'echo' option is used in 'run' mode. With it, you can choose
+        whether or not the commands should be displayed before they are run.
+
+        The values are:
+
+           echo
+           noecho
+           failed
+
+        With 'echo' and 'noecho', commands will be displayed or NOT
+        displayed respectively.
+
+        If the value is 'failed', a command that failed will be displayed.
+        Since it has already run, the command will be echoed after execution
+        rather than before.
+
+    failure
+        When a command fails, there are several alternatives that can be
+        done. Values for this option are:
+
+           exit
+           display
+           continue
+
+        The default is 'exit'. With this option, the shell will stop
+        executing commands once one has failed. The exit code is the code
+        from the failed command. When running in script mode, no information
+        about remaining commands is returned.
+
+        With the 'display' option, the simple script is displayed (in 'run'
+        mode) and the point of failure is marked. The exit code is the code
+        from the failed command.
+
+        With the 'continue' option, remaining command are executed, but the
+        overall exit values is still set to point at the first failed
+        command.
+
+    ssh_num
+        When running a command on multiple hosts via SSH, it is possible to
+        run them serially (one at a time) or in parallel.
+
+        This option can be set to a number 0 or more. If the number is 1,
+        then only a single ssh connection will be made at a time so the
+        hosts will all be contacted serially.
+
+        If the option is set to 0, all of the hosts will be run
+        simultaneously.
+
+        If the option is set to N, N simultaneous connections will be
+        allowed.
+
+    ssh_sleep
+        When running a command on multiple hosts via SSH, it is sometimes
+        desirable to stagger them slightly so multiple copies are running at
+        the same time, but not at EXACTLY the same time.
+
+        If this option is set to 0 (the default), all of the commands will
+        be run with no delay. If it is set to the value N, commands will
+        sleep a random amount of time (from 0 to N seconds) before running.
+
+    ssh:XXX
+        When running a command on a remote host via. ssh, the Net::OpenSSH
+        module is used.
+
+        Every option that can be passed to the 'new' method can be set here.
+        For example, if you want to call Net::OpenSSH as:
+
+           $ssh = Net::OpenSSH->new($host, user => $user_name);
+
+        just set the option:
+
+           ssh:user = $user_name
+
+PER-COMMAND OPTIONS
+    The following options exists that can be applied to individual commands.
+    They can be set in the cmd method.
+
+    dire
+        The dire option refers to the directory which this single command
+        should be executed in. The value of the option is the directory.
+
+        This will basically wrap a command in:
+
+           CURR_DIR=`pwd`
+           cd $dire
+           COMMAND
+           cd $CURR_DIR
+
+    noredir
+        If the noredir option is included, no command line redirection is
+        done for this command. Most commands automatically redirect STDOUT
+        and STDERR based on the output and f-output global options.
+
+        If the command explicitly sends these to somewhere (such as a log
+        file or temporary file), use the noredir option so automatic
+        redirection is not done.
+
+    retry, sleep
+        The retry and sleep options can be used to retry a command.
+
+        Sometimes, a command may fail but running it a second time can
+        succeed. Often, a command completes, but for various reasons, it
+        takes a certain amount of time after the command completes for the
+        full results to take effect. A later command might be run before
+        those results have taken effect, but rerunning it a few seconds
+        later would succeed.
+
+        With the retry option, you can retry a command. The value of the
+        retry option should be an integer (N). If N is greater than 1, the
+        command will be run up to N times total. Any other value of N will
+        be ignored, and the command will run only a single time.
+
+        There can be an optional sleep time between running the command. The
+        optional sleep option (which should also be an integer) sets the
+        number of seconds between retries. If the value is 0, or not an
+        integer, there will be no delay between retries.
+
+        This command will be marked as failed only if all of the retries
+        fail.
+
+        You cannot retry a flow command.
+
+    check
+        Sometimes, a command is written such that the exit code does not
+        accurately reflect whether the command failed or not. It may produce
+        a zero exit code but still have failed, or it may have succeeded but
+        still produce an error code.
+
+        In these cases, you can supply a command with this option which will
+        check the result of the command and set the error flag
+        appropriately.
+
+        If the command succeeded, the error flag should be set to zero. If
+        it failed, it should be set to something non-zero.
+
+        If this is given for a command which has alternatives, it will be
+        run after every alternative.
+
+FLOW COMMANDS
+    When simple shell commands are given, there is no ambiguity about how to
+    treat each, so handling them is relatively simple. Simple commands are
+    fully supported, and all of the functionality described above can be
+    added.
+
+    However, when flow commands are included, there is a great deal of
+    difficulty in handling them properly. This is because the added
+    functionality is done by wrapping each command with some enclosing shell
+    structure to add it. It is very easy to wrap regular shell commands in
+    some enclosing structure. For example, it is easy to turn:
+
+       mycommand arg1 arg2
+
+    into
+
+       if [ SOME_CONDITION ]; then
+          DO_SOMETHING
+          mycommand arg1 arg2
+          DO_SOMETHING
+       fi
+
+    but you can't wrap the commands of an "if/else/fi" block or a
+    "while/done" block. As a result, each type of flow must be considered
+    carefully.
+
+    Currently, the supported flow commands are:
+
+    "if...elsif...else...fi"
+        In order to recognize them, the commands will be partially parsed,
+        and they must be of the forms:
+
+           if ... ; then
+           elif ... ; then
+           else
+           fi
+
+        where '...' may be any string. In other words, the first line must
+        start with if, followed by whitespace, and end with a ';' followed
+        by optional whitespace, followed by 'then'.
+
+        The alternate formatting of:
+
+           if ...
+           then
+           fi
+
+        is not supported.
+
+    "while...done"
+    "until...done"
+    "for...done"
+        The commands must be of the form:
+
+           while ... ; do
+           until ... ; do
+           for ... ;do
+           done
+
+    At some point, the "select" and "case" structures may be supported, but
+    this in not yet available.
+
+KNOWN PROBLEMS
+    Minimal support for complex scripts
+        These methods work best for simple lists of commands. Using simple
+        command flow (<if...then...else>, etc.) is allowed, but must be used
+        carefully.
+
+LICENSE
+    This script is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+AUTHOR
+    Sullivan Beck (sbeck@cpan.org)
+

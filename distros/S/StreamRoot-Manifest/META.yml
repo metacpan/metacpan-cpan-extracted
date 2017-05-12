@@ -1,0 +1,23 @@
+---
+abstract: 'StreamRoot Manifest API'
+author:
+  - 'Lucas Tiago de Moraes <lucastiagodemoraes@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4212, CPAN::Meta::Converter version 2.150001'
+license: Artistic_2_0
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: StreamRoot-Manifest
+provides:
+  StreamRoot::Manifest:
+    file: lib/StreamRoot/Manifest.pm
+    version: '0.03'
+requires:
+  JSON: '0'
+  WWW::Curl: '0'
+version: '0.03'

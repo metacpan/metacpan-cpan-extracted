@@ -1,0 +1,24 @@
+---
+abstract: 'Calculate precision, recall, F1, accuracy, etc.'
+author:
+  - 'Ken Williams <kwilliams@cpan.org>'
+build_requires:
+  Module::Build: 0.3601
+  Test: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Statistics-Contingency
+requires:
+  Params::Validate: 0
+  strict: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Statistics-Contingency
+  repository: git://github.com/kenahoo/Statistics-Contingency.git
+version: 0.09

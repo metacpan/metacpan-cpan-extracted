@@ -1,0 +1,150 @@
+<!--
+  FromXML.dtd - this is FromXML's target DTD.  Currently there is only partial
+  support for each of the tags and attributes speicfied here.  This DTD
+  basically represents a TODO list for us.
+  NOTE: This DTD is for version 1.1
+-->
+<!ELEMENT workbook (worksheet)+>
+<!ELEMENT worksheet (row|column|cell|format|range|margins)+>
+<!-- for landscape, if the attribute is defined, then landscape is used. otherwise it's portrait
+    Index   Paper format            Paper size
+    =====   ============            ==========
+      0     Printer default         -
+      1     Letter                  8 1/2 x 11 in
+      2     Letter Small            8 1/2 x 11 in
+      3     Tabloid                 11 x 17 in
+      4     Ledger                  17 x 11 in
+      5     Legal                   8 1/2 x 14 in
+      6     Statement               5 1/2 x 8 1/2 in
+      7     Executive               7 1/4 x 10 1/2 in
+      8     A3                      297 x 420 mm
+      9     A4                      210 x 297 mm
+     10     A4 Small                210 x 297 mm
+     11     A5                      148 x 210 mm
+     12     B4                      250 x 354 mm
+     13     B5                      182 x 257 mm
+     14     Folio                   8 1/2 x 13 in
+     15     Quarto                  215 x 275 mm
+     16     -                       10x14 in
+     17     -                       11x17 in
+     18     Note                    8 1/2 x 11 in
+     19     Envelope  9             3 7/8 x 8 7/8
+     20     Envelope 10             4 1/8 x 9 1/2
+     21     Envelope 11             4 1/2 x 10 3/8
+     22     Envelope 12             4 3/4 x 11
+     23     Envelope 14             5 x 11 1/2
+     24     C size sheet            -
+     25     D size sheet            -
+     26     E size sheet            -
+     27     Envelope DL             110 x 220 mm
+     28     Envelope C3             324 x 458 mm
+     29     Envelope C4             229 x 324 mm
+     30     Envelope C5             162 x 229 mm
+     31     Envelope C6             114 x 162 mm
+     32     Envelope C65            114 x 229 mm
+     33     Envelope B4             250 x 353 mm
+     34     Envelope B5             176 x 250 mm
+     35     Envelope B6             176 x 125 mm
+     36     Envelope                110 x 230 mm
+     37     Monarch                 3.875 x 7.5 in
+     38     Envelope                3 5/8 x 6 1/2 in
+     39     Fanfold                 14 7/8 x 11 in
+     40     German Std Fanfold      8 1/2 x 12 in
+     41     German Legal Fanfold    8 1/2 x 13 in
+-->
+
+<!ATTLIST worksheet
+    title CDATA #REQUIRED
+	landscape CDATA #IMPLIED
+	paper 	(0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24|25|26|27|28|29|30|31|32|33|34|35|36|37|38|39|40|41) "0"
+	header CDATA #IMPLIED
+	header_margin CDATA #IMPLIED
+	footer CDATA #IMPLIED
+	footer_margin CDATA #IMPLIED
+>
+<!ELEMENT margins (#PCDATA)>
+<!ATTLIST margins
+	lr CDATA #IMPLIED
+	tb CDATA #IMPLIED
+	left CDATA #IMPLIED
+	right CDATA #IMPLIED
+	top CDATA #IMPLIED
+	bottom CDATA #IMPLIED
+!>
+
+
+<!ELEMENT row (cell)*>
+<!ATTLIST row
+   index  CDATA #IMPLIED
+   format CDATA #IMPLIED
+   type   (string|number|url|formula|blank) "string"
+>
+
+<!ELEMENT column (cell)*>
+<!ATTLIST column
+  index  CDATA #IMPLIED
+  format CDATA #IMPLIED
+  type   (string|number|url|formula|blank) "string"
+>
+
+<!ELEMENT cell (#PCDATA)>
+<!ATTLIST cell
+  format CDATA #IMPLIED
+  index  CDATA #IMPLIED
+  type   (string|number|url|formula|blank) "string"
+>
+
+<!-- implements set_column from WriteExcel BWM, 06/21/06 -->
+<!-- See the Spreadsheet::WriteExcel docs on set_column for details -->
+<!ELEMENT range EMPTY>
+<!ATTLIST range
+  first_col CDATA #REQUIRED
+  last_col CDATA #REQUIRED
+  width CDATA #IMPLIED
+  format CDATA #IMPLIED
+  hidden CDATA #IMPLIED
+  level CDATA #IMPLIED
+>
+
+<!ELEMENT format EMPTY>
+<!-- NOTE: Halign and Valign are exclusive of align...if you use these, align is ignored in code -->
+<!ATTLIST format
+  name  CDATA #REQUIRED
+  font  CDATA #IMPLIED
+  size  CDATA #IMPLIED
+  color CDATA #IMPLIED
+  bold ( 1 | 0 ) #IMPLIED
+  italic ( 1 | 0 ) #IMPLIED
+  underline ( 1 | 0 ) #IMPLIED
+  strikeout ( 1 | 0 ) #IMPLIED
+  superscript ( 1 | 0 ) #IMPLIED
+  subscript ( 1 | 0 ) #IMPLIED
+  font_outline ( 1 | 0 ) #IMPLIED
+  font_shadow ( 1 | 0 ) #IMPLIED
+
+  num_format CDATA #IMPLIED
+
+  locked ( 1 | 0 ) #IMPLIED
+  hidden ( 1 | 0 ) #IMPLIED
+
+  align ( left | center | right | fill | justify | center_across | merge | top | vcenter | bottom | vjustify ) "left"
+  halign ( left | center | right | fill | justify | center_across ) #IMPLIED
+  valign ( top | vcenter | bottom | vjustify ) #IMPLIED
+
+  text_wrap ( 1 | 0 ) #IMPLIED
+  merge ( 1 | 0 ) #IMPLIED
+
+  bg_color CDATA #IMPLIED
+  fg_color CDATA #IMPLIED
+
+  border ( 0|1|2|3|4|5|6|7 ) #IMPLIED
+  left   ( 0|1|2|3|4|5|6|7 ) #IMPLIED
+  right  ( 0|1|2|3|4|5|6|7 ) #IMPLIED
+  top    ( 0|1|2|3|4|5|6|7 ) #IMPLIED
+  bottom ( 0|1|2|3|4|5|6|7 ) #IMPLIED
+  border_color ( black | blue | brown | cyan | gray | green | lime | magenta | navy | orange | purple | red | sliver | white | yellow ) #IMPLIED
+  top_color ( black | blue | brown | cyan | gray | green | lime | magenta | navy | orange | purple | red | sliver | white | yellow ) #IMPLIED
+  bottom_color ( black | blue | brown | cyan | gray | green | lime | magenta | navy | orange | purple | red | sliver | white | yellow ) #IMPLIED
+  left_color ( black | blue | brown | cyan | gray | green | lime | magenta | navy | orange | purple | red | sliver | white | yellow ) #IMPLIED
+  right_color ( black | blue | brown | cyan | gray | green | lime | magenta | navy | orange | purple | red | sliver | white | yellow ) #IMPLIED
+>

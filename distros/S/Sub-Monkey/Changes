@@ -1,0 +1,12 @@
+Revision history for Sub-Monkey
+
+0.003   18/03/2012
+        You can now call the original version of a patched method WITHOUT actually unpatching it. 
+        There are two ways to do this, you can call the 'original' method, or call it like a normal method - Sub::Monkey::PatchedClass::themethod(@args)
+
+0.002   17/03/2012
+        Added the 'instance' method which allows you to patch (override) an instance of a class, not the entire class. Please see pod for more information.
+
+0.001   15/03/2012
+        First version, released on an unsuspecting world.
+

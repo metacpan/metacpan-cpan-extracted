@@ -1,0 +1,255 @@
+NAME
+    SVN::Log::Index - Index and search over Subversion commit logs.
+
+SYNOPSIS
+      my $index = SVN::Log::Index->new({ index_path => '/path/to/index' });
+
+      if($creating) {    # Create from scratch if necessary
+        $index->create({ repo_url => 'url://for/repo' });
+      }
+
+      $index->open();    # And then open it
+
+      # Now add revisions from the repo to the index
+      $index->add({ start_rev => $start_rev,
+                    end_rev   => $end_rev);
+
+      # And query the index
+      my $results = $index->search('query');
+
+DESCRIPTION
+    SVN::Log::Index builds a KinoSearch index of commit logs from a
+    Subversion repository and allows you to do arbitrary full text searches
+    over it.
+
+METHODS
+  new
+      my $index = SVN::Log::Index->new({
+          index_path => '/path/to/index'
+      });
+
+    Create a new index object.
+
+    The single argument is a hash ref. Currently only one key is valid.
+
+    index_path
+        The path that contains (or will contain) the index files.
+
+    This method prepares the object for use, but does not make any changes
+    on disk.
+
+  create
+      $index->create({
+          repo_url       => 'url://for/repo',
+          analyzer_class => 'KinoSearch::Analysis::PolyAnalyzer',
+          analyzer_opts  => [ language => 'en' ],
+          overwrite      => 0, # Optional
+      });
+
+    This method creates a new index, in the "index_path" given when the
+    object was created.
+
+    The single argument is a hash ref, with the following possible keys.
+
+    repo_url
+        The URL for the Subversion repository that is going to be indexed.
+
+    analyzer_class
+        A string giving the name of the class that will analyse log message
+        text and tokenise it. This should derive from the
+        KinoSearch::Analysis::Analyzer class. SVN::Log::Index will call this
+        class' "new()" method.
+
+        Once an analyzer class has been chosen for an index it can not be
+        changed without deleting the index and creating it afresh.
+
+        The default value is "KinoSearch::Analysis::PolyAnalyzer".
+
+    analyzer_opts
+        A list of options to be passed, as is, to the constructor for the
+        "analyzer_class" object.
+
+    overwrite
+        A boolean indicating whether or not a pre-existing index_path should
+        be overwritten.
+
+        Given this sequence;
+
+          my $index = SVN::Log::Index->new({index_path => '/path'});
+          $index->create({repo_url => 'url://for/repo'});
+
+        The call to "create()" will fail if "/path" already exists.
+
+        If "overwrite" is set to a true value then "/path" will be cleared.
+
+        The default is false.
+
+    After creation the index directory will exist on disk, and a
+    configuration file containing the create()-time parameters will be
+    created in the index directory.
+
+    Newly created indexes must still be opened.
+
+  open
+      $index->open();
+
+    Opens the index, in preparation for adding or removing entries.
+
+  add
+      $index->add ({
+          start_rev      => $start_rev,  # number, or 'HEAD'
+          end_rev        => $end_rev,    # number, or 'HEAD'
+      });
+
+    Add one or more log messages to the index.
+
+    The single argument is a hash ref, with the following possible keys.
+
+    start_rev
+        The first revision to add to the index. May be given as "HEAD" to
+        mean the repository's most recent (youngest) revision.
+
+        This key is mandatory.
+
+    end_rev
+        The last revision to add to the index. May be given as "HEAD" to
+        mean the repository's most recent (youngest) revision.
+
+        This key is optional. If not included then only the revision
+        specified by "start_rev" will be indexed.
+
+    Revisions from "start_rev" to "end_rev" are added inclusive. "start_rev"
+    and "end_rev" may be given in ascending or descending order. Either:
+
+      $index->add({ start_rev => 1, end_rev => 10 });
+
+    or
+
+      $index->add({ start_rev => 10, end_rev => 1 });
+
+    In both cases, revisons are indexed in ascending order, so revision 1,
+    followed by revision 2, and so on, up to revision 10.
+
+  get_last_indexed_rev
+      my $rev = $index->get_last_indexed_rev();
+
+    Returns the revision number that was most recently added to the index.
+
+    Most useful in repeated calls to "add()".
+
+      # Loop forever.  Every five minutes wake up, and add all newly
+      # committed revisions to the index.
+      while(1) {
+        sleep 300;
+        $index->add({ start_rev => $index->get_last_indexed_rev() + 1,
+                      end_rev   => 'HEAD' });
+      }
+
+    The last indexed revision number is saved as a property of the index.
+
+  search
+      my $hits = $index->search($query);
+
+    Search for $query and returns a KinoSearch::Search::Hits object which
+    contains the result.
+
+QUERY SYNTAX
+    This module supports the Lucene query syntax, described in detail at
+    <http://lucene.apache.org/java/docs/queryparsersyntax.html>. A brief
+    overview follows.
+
+    *   A query consists of one or more terms, joined with boolean
+        operators.
+
+    *   A term is either a single word, or two or more words, enclosed in
+        double quotes. So
+
+          foo bar baz
+
+        is a different query from
+
+          "foo bar" baz
+
+        The first searches for any of "foo", "bar", or "baz", the second
+        searches for any of "foo bar", or "baz".
+
+    *   By default, multiple terms in a query are OR'd together. You may
+        also use "AND", or "NOT" between terms.
+
+          foo AND bar
+          foo NOT bar
+
+        Use "+" before a term to indicate that it must appear, and "-"
+        before a term to indicate that it must not appear.
+
+          foo +bar
+          -foo bar
+
+    *   Use parantheses to control the ordering.
+
+          (foo OR bar) AND baz
+
+    *   Searches are conducted in *fields*. The default field to search is
+        the log message. Other fields are indicated by placing the field
+        name before the term, separating them both with a ":".
+
+        Available fields are:
+
+        revision
+        author
+        date
+        paths
+
+        For example, to find all commit messages where "nik" was the
+        committer, that contained the string "foo bar":
+
+          author:nik AND "foo bar"
+
+DIAGNOSTICS
+    Any of these methods may fail. If they do, they throw an
+    Exception::Class subclass representing the error, trappable with "eval".
+    Uncaught exceptions will cause the client application to "die".
+
+  SVN::Log::Index::X::Args
+    Represents an error that occurs if the parameters given to any of the
+    methods are wrong. This might be because there are too few or too many
+    parameters, or that the types of those parameters are wrong.
+
+    The text of the error can be retrieved with the "error()" method.
+
+  SVN::Log::Index::X::Fault
+    Represents any other error.
+
+  Example
+      my $e;
+      eval { $index->search('query string'); };
+
+      if($e = SVN::Log::Index::X::Fault->caught()) {
+          print "An error occured: ", $e->string(), "\n";
+      } elsif ($e = Exception::Class->caught()) {
+          # Something else failed, rethrow the error
+          ref $e ? $e->rethrow() : die $e;
+      }
+
+SEE ALSO
+    SVN::Log, KinoSearch
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-svn-log-index@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=SVN-Log-Index>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+AUTHOR
+    The current maintainer is Nik Clayton, <nikc@cpan.org>.
+
+    The original author was Garrett Rooney, <rooneg@electricjellyfish.net>
+
+COPYRIGHT AND LICENSE
+    Copyright 2006-2007 Nik Clayton. All Rights Reserved.
+
+    Copyright 2004 Garrett Rooney. All Rights Reserved.
+
+    This software is licensed under the same terms as Perl itself.
+

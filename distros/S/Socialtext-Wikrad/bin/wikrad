@@ -1,0 +1,48 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Socialtext::Resting::Getopt qw/get_rester rester_usage/;
+use lib 'lib';
+use Socialtext::Wikrad;
+use Getopt::Long;
+
+my $r = get_rester(); # reads @ARGV and ~/.wikeditrc
+$r->server('https://www.socialtext.net') unless $r->server;
+$r->workspace('open') unless $r->workspace;
+
+my %opts;
+GetOptions(
+    'l|latest=s' => \$opts{latest_tagged_page},
+    'd|download' => \$opts{download},
+) or usage();
+usage() unless $r->username and $r->password;
+
+my $app = Socialtext::Wikrad->new(rester => $r);
+
+if ($opts{latest_tagged_page}) {
+    $app->set_last_tagged_page($opts{latest_tagged_page});
+}
+else {
+    $app->set_page(shift);
+}
+
+if ($opts{download}) {
+    $app->download;
+    exit;
+}
+
+$app->run;
+exit;
+
+sub usage {
+    my $rester_usage = rester_usage();
+    die <<EOT;
+USAGE: wikrad [<rester options>] ['Page Name']
+
+Wikrad options:
+  -l or --latest <tag>  Jump to the most recently modified page with that tag
+  -d or --download      Download content and attahcments then exit
+
+$rester_usage
+EOT
+}

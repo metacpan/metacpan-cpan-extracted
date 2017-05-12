@@ -1,0 +1,28 @@
+Schedule/Cron/Nofork version 0.02
+=================================
+
+This is a simple subclass of Schedule::Cron, that dosen't fork
+for executing a cron job. This is nice if you want to keep the
+system load lower and have several short running jobs that
+you want to run from a crontab.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Schedule::Cron
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2003 Max Maischein, corion@cpan.org

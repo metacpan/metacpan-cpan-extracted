@@ -1,0 +1,14 @@
+Sub-Trigger-Lock
+================
+
+Created:      2013-12-17
+Home page:    <https://metacpan.org/release/Sub-Trigger-Lock>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Sub-Trigger-Lock>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.002	2014-09-13
+
+ [ Packaging ]
+ - Add link to repo.
+
+0.001	2014-01-01	Initial release

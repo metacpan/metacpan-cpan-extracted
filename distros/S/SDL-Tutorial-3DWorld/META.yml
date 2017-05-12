@@ -1,0 +1,40 @@
+---
+abstract: 'Create a 3D world from scratch with SDL and OpenGL'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.82
+  Test::NoWarnings: 1.00
+  Test::Script: 1.05
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: SDL::Tutorial::3DWorld
+name: SDL-Tutorial-3DWorld
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  File::ShareDir: 1.02
+  File::Spec: 3.31
+  IO::File: 1.14
+  List::MoreUtils: 0.22
+  OpenGL: 0.64
+  OpenGL::List: 0.01
+  Params::Util: 1.00
+  SDL: 2.527
+  perl: 5.8.5
+resources:
+  ChangeLog: http://fisheye2.atlassian.com/changelog/cpan/trunk/SDL-Tutorial-3DWorld
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.ali.as/cpan/trunk/SDL-Tutorial-3DWorld
+version: 0.33

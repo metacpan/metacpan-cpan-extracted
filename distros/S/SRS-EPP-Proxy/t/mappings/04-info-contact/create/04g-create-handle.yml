@@ -1,0 +1,13 @@
+description: set up handle
+registrar: 1
+
+request: |-
+ <NZSRSRequest VerMajor="4" VerMinor="4" RegistrarId="100">
+    <HandleCreate HandleId="04g" Name="EPP Test Registrar II" Email="initial@testemail.co.nz" ActionId="[% actionid %]">
+        <PostalAddress Address1="Address 1" City="New City" CountryCode="NZ" Province="New State"/>
+        <Phone AreaCode="12" CountryCode="12" LocalNumber="123456"/>
+    </HandleCreate> 
+ </NZSRSRequest>
+
+assertions:
+ - xpath_matches: [ '//Error', '0', 'No errors' ]

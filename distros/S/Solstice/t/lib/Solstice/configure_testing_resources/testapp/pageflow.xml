@@ -1,0 +1,1196 @@
+<?xml version="1.0"?>
+<application>
+    <states>
+        <state name="admin_email_urls" controller="WebQ::Controller::Application::Admin::EmailURLs" />
+        <state name="admin_manage_surveys" controller="WebQ::Controller::Application::Admin::ManageSurveys" />
+        <state name="admin_menu" controller="WebQ::Controller::Application::Admin::Menu" />
+        <state name="admin_undelete_responses" controller="WebQ::Controller::Application::Admin::UndeleteResponses" />
+        <state name="authenticate_user" controller="WebQ::Controller::Application::Survey::Render::Login::AuthenticationContainer" />
+        <state name="begin_preview" controller="WebQ::Controller::Application::Survey::BeginPreview" />
+        <state name="cancel_confirmed" controller="WebQ::Controller::Application::Survey::Render::CancelConfirmed" />
+        <state name="cancel_survey" controller="WebQ::Controller::Application::Survey::Render::Cancel" />
+        <state name="collaboration_add_group" controller="WebQ::Controller::Application::Survey::Collaboration::AddGroup" />
+        <state name="collaboration_hub" controller="WebQ::Controller::Application::Survey::Collaboration::Hub" />
+        <state name="confirm_responses" controller="WebQ::Controller::Application::Survey::Render::ConfirmResponses" />
+        <state name="copy_survey" controller="WebQ::Controller::Application::Survey::Copy" />
+        <state name="copy_survey_confirm_accept" controller="WebQ::Controller::Application::Survey::CopyToAccount::ConfirmAccept" />
+        <state name="copy_survey_confirm_reject" controller="WebQ::Controller::Application::Survey::CopyToAccount::ConfirmReject" />
+        <state name="copy_survey_to_account_choose_account" controller="WebQ::Controller::Application::Survey::CopyToAccount::ChooseAccount" />
+        <state name="copy_survey_to_account_settings" controller="WebQ::Controller::Application::Survey::CopyToAccount::Settings" />
+        <state name="create_survey" controller="WebQ::Controller::Application::Survey::Create" />
+        <state name="delete_survey" controller="WebQ::Controller::Application::Survey::Delete" />
+        <state name="destination_chooser" controller="WebQ::Controller::Application::Survey::Render::DestinationChooser" />
+        <state name="generate_survey_graph" controller="WebQ::Controller::Application::Survey::Graph" />
+        <state name="grading_by_participant" controller="WebQ::Controller::Application::Survey::Results::Grading::ByParticipant" />
+        <state name="grading_by_question" controller="WebQ::Controller::Application::Survey::Results::Grading::ByQuestion" />
+        <state name="grading_participant_hub" controller="WebQ::Controller::Application::Survey::Results::Grading::ParticipantHub" />
+        <state name="grading_question_hub" controller="WebQ::Controller::Application::Survey::Results::Grading::QuestionHub" />
+        <state name="home" controller="WebQ::Controller::Application::Home" />
+        <state name="login_anonymous" controller="WebQ::Controller::Application::Survey::Render::Login::Anonymous" />
+        <state name="login_authenticated" controller="WebQ::Controller::Application::Survey::Render::Login::Authenticated" />
+        <state name="login_choice" controller="WebQ::Controller::Application::Survey::Render::Login" />
+        <state name="login_custom_tag" controller="WebQ::Controller::Application::Survey::Render::Login::CustomTag" />
+        <state name="login_email" controller="WebQ::Controller::Application::Survey::Render::Login::Email" />
+        <state name="magazine_build" controller="WebQ::Controller::Application::Magazine::Build" />
+        <state name="magazine_build_create" controller="WebQ::Controller::Application::Magazine::Build" />
+        <state name="magazine_preview" controller="WebQ::Controller::Application::Magazine::Preview" />
+        <state name="magazine_quiz_options" controller="WebQ::Controller::Application::Magazine::QuizOptions" />
+        <state name="magazine_skip_logic" controller="WebQ::Controller::Application::Magazine::SkipLogic" />
+        <state name="manage_copied_surveys" controller="WebQ::Controller::Application::SurveyList::ManageCopiedSurveys" />
+        <state name="participant_hub" controller="WebQ::Controller::Application::Survey::Render::ParticipantHub" />
+        <state name="participant_error" controller="WebQ::Controller::Application::ParticipantError" />
+        <state name="rename_survey" controller="WebQ::Controller::Application::Survey::Rename" />
+        <state name="responses_stored" controller="WebQ::Controller::Application::Survey::Render::ResponsesConfirmed" />
+        <state name="results_by_participant" controller="WebQ::Controller::Application::Survey::Results::ByParticipant" />
+        <state name="results_by_question" controller="WebQ::Controller::Application::Survey::Results::ByQuestion" />
+        <state name="results_code_translation_table" controller="WebQ::Controller::Application::Survey::Results::CodeTranslation" />
+        <state name="results_create_custom_report" controller="WebQ::Controller::Application::Survey::Results::CreateCustomReport" />
+        <state name="results_custom_report" controller="WebQ::Controller::Application::Survey::Results::CustomReport" />
+        <state name="results_delete" controller="WebQ::Controller::Application::Survey::Results::Delete" />
+        <state name="results_download" controller="WebQ::Controller::Application::Survey::Results::Download" />
+        <state name="results_hub" controller="WebQ::Controller::Application::Survey::Results::Hub" />
+        <state name="results_post_download" controller="WebQ::Controller::Application::Survey::Results::PostDownload" />
+        <state name="results_pre_delete" controller="WebQ::Controller::Application::Survey::Results::PreDelete" />
+        <state name="results_pre_download" controller="WebQ::Controller::Application::Survey::Results::PreDownload" />
+        <state name="results_statistics" controller="WebQ::Controller::Application::Survey::Results::Statistics" />
+        <state name="review_security_announce_remind" controller="WebQ::Controller::Application::Survey::SecurityNotificationReview" />
+        <state name="save_for_later" controller="WebQ::Controller::Application::Survey::Render::SaveForLater" />
+        <state name="spss_codebook" controller="WebQ::Controller::Application::Survey::Results::CodeBook" />
+        <state name="survey_announcement_settings" controller="WebQ::Controller::Application::Survey::Notification" />
+        <state name="survey_appearance_settings" controller="WebQ::Controller::Application::Survey::AppearanceSettings" />
+        <state name="survey_appearance_settings_via_build" controller="WebQ::Controller::Application::Survey::AppearanceSettings" />
+        <state name="survey_build" controller="WebQ::Controller::Application::Survey::Build" />
+        <state name="survey_contact_info_settings" controller="WebQ::Controller::Application::Survey::ContactInfo" />
+        <state name="survey_participant_experience_settings" controller="WebQ::Controller::Application::Survey::ParticipantExperience" />
+        <state name="survey_preview" controller="WebQ::Controller::Application::Survey::Preview" />
+        <state name="survey_publishing_settings" controller="WebQ::Controller::Application::Survey::Publish" />
+        <state name="survey_reorder" controller="WebQ::Controller::Application::Survey::Reorder" />
+        <state name="survey_results_notification_settings" controller="WebQ::Controller::Application::Survey::NotificationSettings" />
+        <state name="survey_security_settings" controller="WebQ::Controller::Application::Survey::Security" />
+        <state name="survey_summary" controller="WebQ::Controller::Application::Survey::Summary" />
+        <state name="take_survey" controller="WebQ::Controller::Application::Survey::Render::InProgress" />
+        <state name="view_responses" controller="WebQ::Controller::Application::Survey::Render::ViewResponses" />
+        <state name="view_statistics" controller="WebQ::Controller::Application::Survey::Render::ViewStatistics" />
+    </states>
+    <pageflows>
+        <pageflow name="Main" entrance="home">
+            <state name="collaboration_add_group">
+                <transitions>
+                    <transition action="cancel_group_roles" state="collaboration_hub">
+                        <lifecycle name="revert" />
+                    </transition>
+                    <transition action="save_group_roles" state="collaboration_hub">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                    <transition action="webq_collaboration_remove_group" state="collaboration_add_group">
+                        <lifecycle name="revert" />
+                    </transition>
+                    <transition action="webq_survey_collaboration_group_attach" state="collaboration_add_group">
+                        <lifecycle name="update" />
+                    </transition>
+                    <begin action="webq_survey_collaboration_group_create" application="CrowdControl" pageflow="Edit">
+                        <lifecycle name="freshen" />
+                        <lifecycle name="update" />
+                    </begin>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="collaboration_hub">
+                <transitions>
+                    <transition action="done" state="survey_summary">
+                    </transition>
+                    <transition action="survey_summary" state="survey_summary">
+                    </transition>
+                    <transition action="webq_collaboration_add_group" state="collaboration_add_group">
+                    </transition>
+                    <transition action="webq_collaboration_remove_group" state="collaboration_hub">
+                        <lifecycle name="commit" />
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="copy_survey">
+                <transitions>
+                    <transition action="cancel_copy" state="survey_summary">
+                        <lifecycle name="revert" />
+                    </transition>
+                    <transition action="save_copy" state="home">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="copy_survey_confirm_accept">
+                <transitions>
+                    <transition action="accept_survey" state="manage_copied_surveys">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                    <transition action="cancel_accept" state="manage_copied_surveys">
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="copy_survey_confirm_reject">
+                <transitions>
+                    <transition action="cancel_reject" state="manage_copied_surveys">
+                    </transition>
+                    <transition action="reject_survey" state="manage_copied_surveys">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="copy_survey_to_account_choose_account">
+                <transitions>
+                    <transition action="cancel_copy" state="survey_summary">
+                        <lifecycle name="revert" />
+                    </transition>
+                    <transition action="copy_survey_to_account_settings" state="copy_survey_to_account_settings">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                    <transition action="webq_send_email" state="home">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="copy_survey_to_account_settings">
+                <transitions>
+                    <transition action="cancel_copy" state="survey_summary">
+                    </transition>
+                    <transition action="save_copy" state="survey_summary">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="create_survey">
+                <transitions>
+                    <transition action="webq_cancel_survey_create" state="home">
+                    </transition>
+                    <transition action="webq_survey_create_save" state="survey_build" onback="cannot_back_on_survey_create">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="delete_survey">
+                <transitions>
+                    <transition action="cancel_delete" state="survey_summary">
+                        <lifecycle name="revert" />
+                    </transition>
+                    <transition action="confirm_delete_survey" state="home" onback="confirm_survey_delete">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="grading_by_participant">
+                <transitions>
+                    <transition action="apply_grades" state="grading_by_participant">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                    <transition action="cancel_grading" state="grading_participant_hub">
+                    </transition>
+                    <transition action="save_grades" state="grading_participant_hub">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="grading_by_question">
+                <transitions>
+                    <transition action="apply_grades" state="grading_by_question">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                    <transition action="cancel_grading" state="grading_question_hub">
+                    </transition>
+                    <transition action="change_sorting" state="grading_by_question">
+                        <lifecycle name="update" />
+                    </transition>
+                    <transition action="save_grades" state="grading_question_hub">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="grading_participant_hub">
+                <transitions>
+                    <transition action="change_sorting" state="grading_participant_hub">
+                        <lifecycle name="update" />
+                    </transition>
+                    <transition action="change_window" state="grading_participant_hub">
+                        <lifecycle name="update" />
+                    </transition>
+                    <transition action="grade_participant" state="grading_by_participant">
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="grading_question_hub">
+                <transitions>
+                    <transition action="change_sorting" state="grading_question_hub">
+                        <lifecycle name="update" />
+                    </transition>
+                    <transition action="change_window" state="grading_question_hub">
+                        <lifecycle name="update" />
+                    </transition>
+                    <transition action="webq_grade_question" state="grading_by_question">
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="home">
+                <transitions>
+                    <transition action="create_survey" state="create_survey">
+                    </transition>
+                    <transition action="process_copied_surveys" state="manage_copied_surveys">
+                    </transition>
+                    <transition action="recent_activity_toggle" state="home">
+                        <lifecycle name="update" />
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="magazine_build">
+                <transitions>
+                    <transition action="magazine_build_alter" state="magazine_build">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                    </transition>
+                    <transition action="magazine_build_cancel" state="survey_build">
+                        <lifecycle name="revert" />
+                    </transition>
+                    <transition action="magazine_build_preview" state="magazine_preview">
+                        <lifecycle name="update" />
+                    </transition>
+                    <transition action="magazine_build_save" state="survey_build">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                    <transition action="magazine_build_transform" state="magazine_build">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                    <transition action="magazine_quiz_options" state="magazine_quiz_options">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                    <transition action="survey_preview" state="survey_preview">
+                        <lifecycle name="update" />
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="magazine_build_create">
+                <transitions>
+                    <transition action="magazine_build_alter" state="magazine_build">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                    </transition>
+                    <transition action="magazine_build_cancel" state="survey_build">
+                        <lifecycle name="revert" />
+                    </transition>
+                    <transition action="magazine_build_preview" state="magazine_preview">
+                        <lifecycle name="update" />
+                    </transition>
+                    <transition action="magazine_build_save" state="survey_build" onback="question_creation_back_blocker">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                    <transition action="magazine_build_transform" state="magazine_build">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                    <transition action="magazine_quiz_options" state="magazine_quiz_options">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                    <transition action="survey_preview" state="survey_preview">
+                        <lifecycle name="update" />
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="magazine_preview">
+                <transitions>
+                    <transition action="preview_cancel" state="magazine_build">
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="magazine_quiz_options">
+                <transitions>
+                    <transition action="magazine_quiz_options_back" state="magazine_build">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                    <transition action="magazine_quiz_options_cancel" state="survey_build">
+                        <lifecycle name="revert" />
+                    </transition>
+                    <transition action="magazine_quiz_options_preview" state="magazine_preview">
+                        <lifecycle name="update" />
+                    </transition>
+                    <transition action="magazine_quiz_options_save" state="survey_build">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                    <transition action="survey_preview" state="survey_preview">
+                        <lifecycle name="update" />
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="magazine_skip_logic">
+                <transitions>
+                    <transition action="magazine_skip_logic_cancel" state="survey_build">
+                        <lifecycle name="revert" />
+                    </transition>
+                    <transition action="magazine_skip_logic_remove" state="survey_build">
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                    <transition action="magazine_skip_logic_save" state="survey_build">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="manage_copied_surveys">
+                <transitions>
+                    <transition action="accept_copy" state="copy_survey_confirm_accept">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                    <transition action="done" state="home">
+                    </transition>
+                    <transition action="reject_copy" state="copy_survey_confirm_reject">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="rename_survey">
+                <transitions>
+                    <transition action="cancel_rename_survey" state="survey_summary">
+                        <lifecycle name="revert" />
+                    </transition>
+                    <transition action="save_rename_survey" state="survey_summary">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="results_by_participant">
+                <transitions>
+                    <transition action="change_pager_settings" state="results_by_participant">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                    </transition>
+                    <transition action="quickview_by_participant" state="results_by_participant">
+                        <lifecycle name="freshen" />
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="results_by_question">
+                <transitions>
+                    <transition action="change_pager_settings" state="results_by_question">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                    </transition>
+                    <transition action="view_results_by_question" state="results_by_question">
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="results_code_translation_table">
+                <transitions>
+                    <transition action="view_code_translation_table" state="results_code_translation_table">
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="results_create_custom_report">
+                <transitions>
+                    <transition action="cancel" state="results_hub">
+                        <lifecycle name="revert" />
+                    </transition>
+                    <transition action="save" state="results_custom_report">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="results_custom_report">
+                <transitions>
+                    <transition action="change_pager_settings" state="results_custom_report">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                    </transition>
+                    <transition action="quickview_by_participant" state="results_by_participant">
+                        <lifecycle name="freshen" />
+                    </transition>
+                    <transition action="quickview_statistics" state="results_statistics">
+                    </transition>
+                    <transition action="results_new_report" state="results_create_custom_report">
+                        <lifecycle name="revert" />
+                    </transition>
+                    <transition action="view_results_by_question" state="results_by_question">
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="results_delete">
+                <transitions>
+                    <transition action="cancel_results_delete" state="results_hub">
+                        <lifecycle name="revert" />
+                    </transition>
+                    <transition action="new_results_delete" state="results_pre_delete">
+                        <lifecycle name="revert" />
+                    </transition>
+                    <transition action="save_results_delete" state="results_hub" onback="confirm_results_delete">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="results_download">
+                <transitions>
+                    <transition action="rebuild_results_download" state="results_pre_download">
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="results_hub">
+                <transitions>
+                    <transition action="create_custom_report" state="results_create_custom_report">
+                    </transition>
+                    <transition action="delete_results" state="results_pre_delete">
+                    </transition>
+                    <transition action="download_results" state="results_pre_download">
+                    </transition>
+                    <transition action="grade_by_participant" state="grading_participant_hub">
+                    </transition>
+                    <transition action="grade_by_question" state="grading_question_hub">
+                    </transition>
+                    <transition action="quick_download_results" state="results_post_download">
+                    </transition>
+                    <transition action="quickview_by_participant" state="results_by_participant">
+                        <lifecycle name="freshen" />
+                    </transition>
+                    <transition action="quickview_statistics" state="results_statistics">
+                    </transition>
+                    <transition action="view_code_translation_table" state="results_code_translation_table">
+                    </transition>
+                    <transition action="view_results_by_question" state="results_by_question">
+                    </transition>
+                    <transition action="view_spss_code" state="spss_codebook">
+                    </transition>
+                </transitions>
+                <failovers>
+                    <failover name="validPreConditions" state="home" />
+                </failovers>
+            </state>
+            <state name="results_post_download">
+                <transitions>
+                    <transition action="cancel_results_download" state="results_hub">
+                        <lifecycle name="revert" />
+                    </transition>
+                    <transition action="perform_results_download" state="results_download">
+                    </transition>
+                    <transition action="rebuild_results_download" state="results_pre_download">
+                        <lifecycle name="revert" />
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="results_pre_delete">
+                <transitions>
+                    <transition action="cancel_results_delete" state="results_hub">
+                        <lifecycle name="revert" />
+                    </transition>
+                    <transition action="save_results_delete" state="results_delete">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="results_pre_download">
+                <transitions>
+                    <transition action="cancel_results_download" state="results_hub">
+                        <lifecycle name="revert" />
+                    </transition>
+                    <transition action="save_results_download" state="results_post_download">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="results_statistics">
+                <transitions>
+                    <transition action="change_pager_settings" state="results_statistics">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                    </transition>
+                    <transition action="quickview_statistics" state="results_statistics">
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="survey_announcement_settings">
+                <transitions>
+                    <begin action="create_group" application="CrowdControl" pageflow="Edit">
+                        <lifecycle name="update" />
+                    </begin>
+                    <begin action="edit_group" application="CrowdControl" pageflow="Edit">
+                        <lifecycle name="update" />
+                    </begin>
+                    <transition action="publishing_wizard" state="survey_publishing_settings">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                    <transition action="webq_survey_notification_cancel" state="survey_summary">
+                        <lifecycle name="revert" />
+                    </transition>
+                    <transition action="webq_survey_notification_group_attach" state="survey_announcement_settings">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                    </transition>
+                    <transition action="webq_survey_notification_group_remove" state="survey_announcement_settings">
+                        <lifecycle name="update" />
+                    </transition>
+                    <begin action="webq_survey_notification_group_view" application="CrowdControl" pageflow="group_member_view">
+                        <lifecycle name="freshen" />
+                    </begin>
+                    <transition action="webq_survey_notification_save" state="survey_summary">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="survey_appearance_settings">
+                <transitions>
+                    <transition action="cancel_appearance_settings" state="survey_summary">
+                        <lifecycle name="revert" />
+                    </transition>
+                    <transition action="save_appearance_settings" state="survey_summary">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                    <transition action="survey_preview" state="survey_preview">
+                        <lifecycle name="update" />
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="survey_appearance_settings_via_build">
+                <transitions>
+                    <transition action="cancel_appearance_settings" state="survey_build">
+                        <lifecycle name="revert" />
+                    </transition>
+                    <transition action="save_appearance_settings" state="survey_build">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="survey_build">
+                <transitions>
+                    <transition action="results_survey" state="results_hub">
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                    <transition action="survey_build" state="survey_build">
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                    <transition action="survey_preview" state="survey_preview">
+                        <lifecycle name="update" />
+                    </transition>
+                    <transition action="survey_summary" state="survey_summary">
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                    <transition action="webq_home" state="home">
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                    <transition action="webq_survey_build_alter" state="survey_build">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                    <transition action="webq_survey_build_appearance" state="survey_appearance_settings_via_build">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                    <transition action="webq_survey_build_detail_toggle" state="survey_build">
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                    <transition action="webq_survey_build_magazine_build" state="magazine_build">
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                    <transition action="webq_survey_build_magazine_create" state="magazine_build_create">
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                    <transition action="webq_survey_build_magazine_delete" state="survey_build" onback="back_button_disabled">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                    <transition action="webq_survey_build_magazine_preview" state="magazine_preview">
+                        <lifecycle name="freshen" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                    <transition action="webq_survey_build_magazine_skip_logic" state="magazine_skip_logic">
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                    <transition action="webq_survey_build_reorder" state="survey_reorder">
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                    <transition action="webq_survey_summary_save" state="survey_summary">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                    <transition action="wizard_next_announcements" state="survey_announcement_settings">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                    <transition action="wizard_next_security" state="survey_security_settings">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="survey_contact_info_settings">
+                <transitions>
+                    <transition action="cancel_contact_info" state="survey_summary">
+                        <lifecycle name="revert" />
+                    </transition>
+                    <transition action="save_contact_info" state="survey_summary">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="survey_participant_experience_settings">
+                <transitions>
+                    <transition action="cancel_participant_settings" state="survey_summary">
+                        <lifecycle name="revert" />
+                    </transition>
+                    <transition action="preview_participant_settings" state="survey_preview">
+                        <lifecycle name="update" />
+                    </transition>
+                    <transition action="save_participant_settings" state="survey_summary">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                    <transition action="survey_preview" state="survey_preview">
+                        <lifecycle name="update" />
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="survey_preview">
+                <transitions>
+                    <transition action="cancel_survey" state="survey_preview">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                    </transition>
+                    <transition action="change_page_next" state="survey_preview">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                    </transition>
+                    <transition action="change_page_next_no_backtracking" state="survey_preview">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                    </transition>
+                    <transition action="change_page_previous" state="survey_preview">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                    </transition>
+                    <transition action="confirm_cancel" state="survey_preview">
+                    </transition>
+                    <transition action="confirm_responses" state="survey_preview">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                    </transition>
+                    <transition action="preview_cancel" state="survey_summary">
+                    </transition>
+                    <transition action="resume_survey" state="survey_preview">
+                    </transition>
+                    <transition action="save_for_later" state="survey_preview">
+                        <lifecycle name="update" />
+                    </transition>
+                    <transition action="submit_responses" state="survey_preview">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                    </transition>
+                    <transition action="submit_responses_timer" state="survey_preview">
+                        <lifecycle name="update" />
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="survey_publishing_settings">
+                <transitions>
+                    <transition action="survey_publish_cancel" state="survey_summary">
+                        <lifecycle name="revert" />
+                    </transition>
+                    <transition action="survey_publish_save" state="survey_summary">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="survey_reorder">
+                <transitions>
+                    <transition action="survey_reorder_cancel" state="survey_build">
+                        <lifecycle name="revert" />
+                    </transition>
+                    <transition action="survey_reorder_save" state="survey_build">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                </transitions>
+                <failovers>
+                    <failover name="update" state="survey_build" />
+                </failovers>
+            </state>
+            <state name="survey_results_notification_settings">
+                <transitions>
+                    <transition action="cancel_notification_settings" state="survey_summary">
+                        <lifecycle name="revert" />
+                    </transition>
+                    <transition action="save_notification_settings" state="survey_summary">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="survey_security_settings">
+                <transitions>
+                    <transition action="webq_survey_security_cancel" state="survey_summary">
+                        <lifecycle name="revert" />
+                    </transition>
+                    <transition action="webq_survey_security_save" state="survey_announcement_settings">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="survey_summary">
+                <transitions>
+                    <transition action="copy_survey" state="copy_survey">
+                    </transition>
+                    <transition action="copy_survey_to_account" state="copy_survey_to_account_choose_account">
+                    </transition>
+                    <transition action="delete_survey" state="delete_survey">
+                    </transition>
+                    <transition action="edit_announcements" state="survey_announcement_settings">
+                    </transition>
+                    <transition action="edit_appearance" state="survey_appearance_settings">
+                    </transition>
+                    <transition action="edit_collaboration" state="collaboration_hub">
+                    </transition>
+                    <transition action="edit_contact_info" state="survey_contact_info_settings">
+                    </transition>
+                    <transition action="edit_participant_experience" state="survey_participant_experience_settings">
+                    </transition>
+                    <transition action="edit_publishing" state="survey_publishing_settings">
+                    </transition>
+                    <transition action="edit_results_notification" state="survey_results_notification_settings">
+                    </transition>
+                    <transition action="edit_security" state="survey_security_settings">
+                    </transition>
+                    <transition action="rename_survey" state="rename_survey">
+                    </transition>
+                    <transition action="review_security_announce_remind" state="review_security_announce_remind">
+                    </transition>
+                </transitions>
+                <failovers>
+                    <failover name="validPreConditions" state="home" />
+                </failovers>
+            </state>
+        </pageflow>
+        <pageflow name="webq_admin" entrance="webq_admin">
+            <state name="admin_manage_surveys">
+                <transitions>
+                    <transition action="delete_toggle" state="admin_manage_surveys">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                    <transition action="menu" state="admin_menu">
+                        <lifecycle name="revert" />
+                    </transition>
+                    <transition action="sort" state="admin_manage_surveys">
+                    </transition>
+                    <transition action="survey_graph" state="generate_survey_graph">
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="admin_menu">
+                <transitions>
+                    <transition action="conf_decrypt" state="admin_menu">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                    <transition action="manage_surveys" state="admin_manage_surveys">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                    </transition>
+                    <transition action="undelete_responses" state="admin_undelete_responses">
+                    </transition>
+                    <transition action="url_decrypt" state="admin_menu">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="admin_undelete_responses">
+                <transitions>
+                    <transition action="del_toggle" state="admin_undelete_responses">
+                        <lifecycle name="update" />
+                    </transition>
+                    <transition action="menu" state="admin_menu">
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+        </pageflow>
+        <pageflow name="webq_participant" entrance="login_choice">
+            <state name="cancel_confirmed">
+                <transitions>
+                    <transition action="participant_hub" state="participant_hub">
+                        <lifecycle name="freshen" />
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="cancel_survey">
+                <transitions>
+                    <transition action="confirm_cancel" state="cancel_confirmed" onback="back_button_disabled">
+                        <lifecycle name="commit" />
+                    </transition>
+                    <transition action="resume_survey" state="take_survey">
+                        <lifecycle name="update" />
+                    </transition>
+                    <transition action="submit_responses_timer" state="responses_stored" onback="back_button_responses_stored">
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="destination_chooser">
+                <transitions>
+                    <transition action="participant_hub" state="participant_hub">
+                    </transition>
+                    <transition action="take_survey" state="take_survey" onback="back_button_disabled">
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="login_anonymous">
+                <transitions>
+                    <transition action="destination_chooser" state="destination_chooser">
+                        <lifecycle name="freshen" />
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="login_authenticated">
+                <transitions>
+                    <transition action="destination_chooser" state="destination_chooser">
+                        <lifecycle name="freshen" />
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="login_choice">
+                <transitions>
+                    <transition action="anonymous_login" state="login_anonymous">
+                    </transition>
+                    <transition action="authenticated_login" state="login_authenticated">
+                    </transition>
+                    <transition action="custom_tag_login" state="login_custom_tag">
+                    </transition>
+                    <transition action="email_login" state="login_email">
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="login_custom_tag">
+                <transitions>
+                    <transition action="destination_chooser" state="destination_chooser">
+                        <lifecycle name="freshen" />
+                        <lifecycle name="validate" />
+                        <lifecycle name="commit" />
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="login_email">
+                <transitions>
+                    <transition action="destination_chooser" state="destination_chooser">
+                        <lifecycle name="freshen" />
+                        <lifecycle name="commit" />
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="participant_hub">
+                <transitions>
+                    <transition action="take_survey" state="take_survey">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                    </transition>
+                    <transition action="view_responses" state="view_responses">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                    </transition>
+                    <transition action="view_statistics" state="view_statistics">
+                    </transition>
+                </transitions>
+                <failovers>
+                    <failover name="update" state="participant_error" />
+                </failovers>
+            </state>
+            <state name="responses_stored">
+                <transitions>
+                    <transition action="participant_hub" state="participant_hub">
+                        <lifecycle name="freshen" />
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="save_for_later">
+                <transitions>
+                    <transition action="participant_hub" state="participant_hub">
+                        <lifecycle name="freshen" />
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="take_survey">
+                <transitions>
+                    <transition action="cancel_survey" state="cancel_survey">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                    </transition>
+                    <transition action="change_page_next" state="take_survey" onback="back_button_disabled">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                    <transition action="change_page_next_no_backtracking" state="take_survey" onback="back_button_disabled">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                    <transition action="change_page_previous" state="take_survey" onback="back_button_disabled">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                    </transition>
+                    <transition action="confirm_responses" state="confirm_responses" onback="back_button_take_survey">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                    </transition>
+                    <transition action="participant_hub" state="participant_hub">
+                        <lifecycle name="freshen" />
+                    </transition>
+                    <transition action="resume_survey" state="take_survey" onback="back_button_disabled">
+                        <lifecycle name="update" />
+                    </transition>
+                    <transition action="save_for_later" state="save_for_later" onback="back_button_disabled">
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                    <transition action="submit_responses" state="responses_stored" onback="back_button_responses_stored">
+                        <lifecycle name="validate" />
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                    <transition action="submit_responses_timer" state="responses_stored" onback="back_button_responses_stored">
+                        <lifecycle name="update" />
+                        <lifecycle name="commit" />
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="view_responses">
+                <transitions>
+                    <transition action="participant_hub" state="participant_hub">
+                        <lifecycle name="freshen" />
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+            <state name="view_statistics">
+                <transitions>
+                    <transition action="participant_hub" state="participant_hub">
+                        <lifecycle name="freshen" />
+                    </transition>
+                </transitions>
+                <failovers>
+                </failovers>
+            </state>
+        </pageflow>
+    </pageflows>
+    <globaltransitions>
+        <transition action="grade_by_question" state="grading_question_hub">
+        </transition>
+        <transition action="results_survey" state="results_hub">
+            <lifecycle name="revert" />
+        </transition>
+        <transition action="survey_build" state="survey_build">
+            <lifecycle name="revert" />
+        </transition>
+        <transition action="survey_preview" state="survey_preview">
+        </transition>
+        <transition action="survey_summary" state="survey_summary">
+            <lifecycle name="revert" />
+        </transition>
+        <transition action="webq_home" state="home">
+            <lifecycle name="revert" />
+        </transition>
+    </globaltransitions>
+</application>

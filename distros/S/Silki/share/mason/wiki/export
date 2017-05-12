@@ -1,0 +1,30 @@
+% if ( $process->is_complete() ) {
+%   if ( $process->was_successful() ) {
+<p>
+<% loc('Export is complete.') %>
+</p>
+%   } else {
+<p>
+<% loc('Export failed.') %>
+</p>
+%   }
+% } else {
+<pre id="process-status" class="js-process-id-<% $process->process_id() %> js-process-type-Export">
+<img src="/images/small-spinner.gif" /> <% loc('Waiting for export to start ...') %>
+</pre>
+% }
+<div id="process-complete" style="display: none">
+<% loc('You can <a href="%html(%1)">download the export tarball</a>.', $download_uri) | n %>
+</div>
+
+<%args>
+$download_uri
+$process
+</%args>
+
+<%method title>
+<% loc( 'Exporting %1', $wiki->title() ) %>
+<%args>
+$wiki
+</%args>
+</%method>

@@ -1,0 +1,39 @@
+SMS::Ringtone::RTTTL::MIDI
+==========================
+
+Description
+-----------
+
+This module contains a subroutine for converting RTTTL songs into MIDI format.
+See POD for details. I've included a HTML version of the POD docs in the docs
+subdirectory.
+See http://members.tripod.lycos.nl/jupp/linux/soft/rtttl_player/EBNF.txt for
+RTTTL syntax in BNF.
+
+Copyright
+---------
+
+Copyright (C) 2001 Craig Manley <c.manley@skybound.nl>. All rights reserved.
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. There is NO warranty; not even for
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Prerequisites
+-------------
+The following modules are required. Download them from CPAN.
+SMS::Ringtone::RTTTL::Parser
+MIDI::Simple
+IO::String (see comment printed by MakeFile.PL about bug)
+
+Installation
+------------
+
+perl Makefile.PL
+make
+make install
+perldoc SMS::Ringtone::RTTTL::MIDI
+
+Author
+------
+
+Craig Manley c.manley@skybound.nl

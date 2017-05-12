@@ -1,0 +1,35 @@
+<!--
+
+    Copyright (C) 1997 Ken MacLeod
+    See the file COPYING for distribution terms.
+
+    $Id: simple-spec.dtd,v 1.2 1998/01/18 00:21:23 ken Exp $
+
+-->
+
+<!ENTITY % actions "code|holder|ignore|make|port|rules">
+<!ELEMENT spec - - (head, rules, stuff?)>
+<!ATTLIST spec
+	version CDATA #FIXED "1.0" -- Version Number.  -->
+<!ELEMENT head - o (defaultobject,defaultprefix,use-gi?,copy-id?)>
+<!ELEMENT rules - o (rule+)>
+<!ELEMENT stuff - - ((attr|attr-as-string|#PCDATA)*)>
+
+<!ELEMENT (defaultobject, defaultprefix) - - (#PCDATA)>
+<!ELEMENT (use-gi, copy-id) - o EMPTY>
+
+<!ELEMENT rule - o (query, (%actions;)*)>
+<!ELEMENT query - - (#PCDATA)>
+<!ELEMENT (holder, ignore) - o EMPTY>
+<!ELEMENT port - - (#PCDATA)>
+<!ELEMENT make - - ((attr|attr-as-string|#PCDATA)*)>
+<!ELEMENT (attr, attr-as-string) - - (#PCDATA)>
+<!ELEMENT code - - (#PCDATA)>
+
+<!ENTITY ctx    SDATA "[ctx   ]"--=current context-->
+<!ENTITY data   SDATA "[data  ]"--=data of this element-->
+<!ENTITY gi     SDATA "[gi    ]"--=gi-->
+<!ENTITY qi     SDATA "[qi    ]"--=query identifier-->
+<!ENTITY lt     SDATA "[lt    ]"--=less-than sign-->
+<!ENTITY amp    SDATA "[amp   ]"--=ampersand-->
+<!ENTITY tfm    SDATA "[tfm   ]"--=transform subroutine-->

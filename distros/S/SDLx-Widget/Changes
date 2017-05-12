@@ -1,0 +1,41 @@
+Revision history for Perl module SDLx::Widget
+
+0.072 Aug 12 2012
+    - added release tests for pod syntax and coverage [jtpalmer]
+    - updated menu example [jtpalmer, garu]
+    - added submenu example [garu]
+    - added mouse functionality to SDLx::Widget::Menu [jtpalmer, garu]
+    - menu has a default font (uses SDLx::Text) [garu]
+    - menu text now aligns to 'left', 'center' or 'right' [garu]
+    - different colors for hovering and selecting items in the menu [garu]
+
+0.071 Feb 09 2011
+    - cleaned up SDLx::Widget::Textbox's code, fixed blinking cursor [FROGGS]
+
+0.07
+    - Checking for extra SDL deps
+
+0.06
+    - Using CPAN compliant SDLx-Widget versioning modules
+
+0.05
+    - Moved SDLx::Widget::Textbox to use Mouse
+
+0.04
+    - updated examples [garu]
+    - complete overhaul on SDLx::Widget::Sprite [garu]
+    - added SDLx::Widget::Textbox [FROGGS]
+
+0.03
+    - Build.PL deps fixed
+    - Added missing Build.PL
+
+0.02
+    - Fixed a critical bug
+
+0.01 Thu Apr  8 14:06:19 2010
+    - Added examples
+    - Add controller
+    - Add menu widget
+
+

@@ -1,0 +1,32 @@
+#!/usr/bin/ruby
+
+var arr_test = [["x", "y", "z"]];
+
+arr_test[0][1]->say;
+arr_test[0][-1]->say;
+
+arr_test[1] = "x";
+arr_test->to_s->say;
+
+arr_test[0][0,2]->to_s->say;
+
+var ref_slice = [arr_test[0,1,2]];
+ref_slice[0,1,2,3] = ("hu","hi","hei","no");
+
+ref_slice.to_s.say;
+arr_test->to_s.say;
+
+arr_test->len->to_s->say;
+
+["zzzz","ioana"][1]->say;
+[[["zzz","trizen","zzz"]]][0][0][1]->say;
+
+#
+## Test `nil` return-values
+#
+
+var a = [4, 8, 10, 12]
+var r = [a.first_by { .is_odd }, a.last_by { .is_odd }]
+
+assert_eq(r.len, 2)
+assert_eq(r, [nil, nil])

@@ -1,0 +1,65 @@
+ShiftJIS::String: version 1.11
+==============
+
+NAME
+
+ShiftJIS::String - functions to manipulate Shift-JIS strings
+
+SYNOPSIS
+
+  use ShiftJIS::String qw(length substr index rindex);
+
+  $str = 'プログラミング-Perl';
+  $sub = substr($str, index($str, 'ラミ') + length('ラミ'));
+
+   # $sub eq 'ング-Perl'.
+   # If you want to use core functions after importing,
+   # prefix the core function name with 'CORE::', like CORE::length.
+
+DESCRIPTION
+
+This module provides some functions which emulate
+the corresponding CORE functions and will help someone
+to manipulate Shift-JIS string.
+
+* Functions other than length(), substr(), index(), and rindex()
+will have different names from those of the corresponding CORE:: functions.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you have a C compiler and want to use XSUB edition,
+type the following (!! "enableXS" must run before "Makefile.PL" !!):
+
+   perl enableXS
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you decide to install pure Perl (i.e. non-XS) edition after trying
+to build XSUB, type the following:
+
+   make clean
+   perl disableXS
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+PREREQUISITES
+
+   Perl 5.003 or later (Recommended: Perl 5.005 or later)
+
+COPYRIGHT AND LICENSE
+
+   Copyright(C) 2001-2010, SADAHIRO Tomoyuki. Japan. All rights reserved.
+
+   This module is free software; you can redistribute it
+   and/or modify it under the same terms as Perl itself.

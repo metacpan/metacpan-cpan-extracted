@@ -1,0 +1,187 @@
+NAME
+    Switcheroo - yet another switch statement for Perl
+
+SYNOPSIS
+       my $day_type;
+   
+       switch ($day) {
+          case 0, 6:  $day_type = "weekend";
+          default:    $day_type = "weekday";
+       }
+
+STATUS
+    Experimental.
+
+    No backwards compatibility between releases is guaranteed. Both the
+    surface syntax and the internals of the module are liable to change at my
+    whim.
+
+DESCRIPTION
+    This module provides Perl with a switch statement. It's more reliable than
+    the Switch module (which is broken on recent versions of Perl anyway),
+    less confusing than `use feature 'switch'`, and more powerful than
+    Switch::Plain (though Switch::Plain is significantly faster).
+
+    Switcheroo uses the Perl keyword API, which was introduced in Perl 5.14,
+    so this module does not work on older releases of Perl.
+
+    The basic grammar of the switch statement is as follows:
+
+       switch ( TEST ) {
+          case EXPR1: STATEMENT1;
+          case EXPR2: STATEMENT2;
+          default:    STATEMENT3;
+       }
+
+    TEST is evaluated in scalar context. Each expression EXPR1, EXPR2, etc is
+    evaluated in list context. If TEST matches any of the expression, then the
+    statement following it is executed. Matching is performed by
+    match::simple, which is a simplified version of the Perl smart match
+    operator. If no match is successful, then the `default` statement is
+    executed.
+
+    `switch` is whole statement, so does not need to be followed by a
+    semicolon.
+
+    Within the switch block, $_ is a read-only alias to the TEST value.
+
+    That's the basics taken care of, but there are several variations...
+
+  Implicit test
+    If the test is omitted, then $_ is tested:
+
+       my $day_type;
+   
+       $_ = $day;
+       switch {
+          case 0, 6:  $day_type = "weekend";
+          default:    $day_type = "weekday";
+       }
+
+  Expression blocks
+    If `case` is followed by a `{` character, this is *not* interpreted as the
+    start of an anonymous hashref, but as a block. Matching via match::simple
+    is not attempted; instead the block is evaluated as a boolean.
+
+       switch ($number) {
+          case 0:           say "zero";
+          case { $_ % 2 }:  say "an odd number";
+          default:          say "an even number";
+       }
+
+  Regexp Expressions
+    If this module encounters:
+
+       switch ($foo) { case /foo/: say "foo" }
+
+    Don't worry; we know you meant `qr/foo/` and not `m/foo/`.
+
+  Statement blocks
+    If the first non-whitespace character is `{`, the statement is treated as
+    a block rather than a single statement:
+
+       switch ($number) {
+          case 0: {
+             say "zero";
+          }
+          case { $_ % 2 }: {
+             say "an odd number";
+          }
+          default: {
+             say "an even number";
+          }
+       }
+
+  Comparison expression
+    Above I said that matching is performed by match::simple. That was a lie.
+    match::simple is just the default. You can provide your own expression for
+    matching:
+
+       switch ($number) mode ($a > $b) {
+          case 1000:   say "greater than 1000";
+          case 100:    say "greater than 100";
+          case 10:     say "greater than 10";
+          case 1:      say "greater than 1";
+       }
+
+    $a is the TERM and $b is the EXPR. These are the same special package
+    variables used by `sort` and by `reduce` from List::Util.
+
+  Switch expressions
+    Although `switch` acts as a full statement usually, it can be used as part
+    of an expression if the keyword `do` appears before the block:
+
+       my $day_type = switch ($day) do {
+          case 0, 6:  "weekend";
+          default:    "weekday";
+       };
+
+  Fallthrough
+    There's no fallthrough.
+
+  `match($x, $y)`
+    This module can also re-export the `match` function from match::simple,
+    but not by default.
+
+       use Switcheroo qw( match switch );
+
+HINTS
+    Switcheroo intentionally works nicely with Types::Standard and other
+    Type::Tiny-based type libraries:
+
+       use Switcheroo;
+       use Types::Standard -types;
+   
+       switch ($value) {
+          case Int:       say "it's an integer";
+          case ArrayRef:  say "it's an array ref";
+          case HashRef:   say "it's a hash ref";
+       }
+
+    It also plays well with Smart::Match:
+
+       use Switcheroo;
+       use Smart::Match qw( range at_least );
+   
+       switch ($value) {
+          case range(0, 10):    say "small";
+          case range(11, 100):  say "medium";
+          case at_least(101):   say "large";
+       }
+
+    This is all thanks to match::simple which respects the overloaded `~~`
+    operator.
+
+CAVEATS
+    Internally a lot of parts of code are passed around as coderefs, so
+    certain things might not work how you'd expect inside `switch`:
+
+    *   `caller`
+
+    *   `return`
+
+    *   @_
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Switcheroo>.
+
+SEE ALSO
+    "Switch Statements" in perlsyn, Switch, Switch::Plain.
+
+    <http://en.wikipedia.org/wiki/The_Burning_(Seinfeld)>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2013 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

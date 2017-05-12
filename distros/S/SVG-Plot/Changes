@@ -1,0 +1,21 @@
+Revision history for Perl extension SVG::Plot.
+
+0.06  Fixed uninitialised value warning caught by Ronan Oger.
+
+      Added 'svg_options' parameter to pass options through to SVG.pm
+
+0.05  Optionally use Algorithm::Points::MinimumDistance to work out the
+      radii for the plotted points.
+
+      Fixed bug with default point sizes and styles not getting passed
+      through with multiple pointsets.
+
+0.04  You can now supply more than one set of points, to be plotted in
+      different styles.
+
+0.03  Added max_height and max_width parameters, added tests.
+
+0.01  Sat May 10 22:23:00 2003
+	- original version; created by h2xs 1.22 with options
+		SVG::Plot -X
+

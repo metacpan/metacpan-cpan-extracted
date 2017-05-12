@@ -1,0 +1,75 @@
+Switcheroo
+==========
+
+Created:      2013-09-01
+Home page:    <https://metacpan.org/release/Switcheroo>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Switcheroo>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.008	2013-10-11
+
+ [ Documentation ]
+ - Document usage of Switcheroo with Smart::Match.
+ - Document usage of Switcheroo with Types::Standard.
+
+ [ Test Suite ]
+ - Test cases for using Switcheroo with Smart::Match.
+ - Test cases for using Switcheroo with Types::Standard.
+
+ [ Other ]
+ - Drop dependency on Devel::Caller - there are other methods to access
+   your caller's @_ array which are no more unreliable.
+ - Drop dependency on Devel::LexAlias - allow PadWalker to do it all!
+
+0.007	2013-10-10	Bond, James Bond
+
+ [ Test Suite ]
+ - More test cases for using @_ within switch blocks.
+ - Test cases for closing over variables.
+
+ [ Other ]
+ - Improve support for using @_ within switch blocks.
+
+0.006	2013-10-10
+
+ - Export using Exporter::Tiny.
+ - Sugar for regexps in case expressions.
+
+0.005	2013-10-10
+
+ [ Packaging ]
+ - Rename PerlX::Switch -> Switcheroo.
+
+0.004	2013-09-22
+
+ [ Bug Fixes ]
+ - Minor pod syntax fix.
+
+ [ Packaging ]
+ - Use a newer version of Dist::Inkt.
+
+0.003	2013-09-22
+
+ [ Documentation ]
+ - Document `$a` and `$b` better.
+ - Document the status of this distribution.
+
+ [ Other ]
+ - Prevent warnings from `$a` and `$b` using a little trick in `import`.
+ - The `if` option is now called `mode`.
+
+0.002	2013-09-22
+
+ [ Documentation ]
+ - Document Perl 5.14 requirement.
+ - Document that the module re-exports `match`.
+
+ [ Test Suite ]
+ - Include some test cases for @_ within switch blocks.
+
+ [ Other ]
+ - Some improvements accessing @_ within switch blocks, but still... caveat
+   invocator!
+ - switch now internally uses tail calls (`goto`) when possible.
+
+0.001	2013-09-21	Initial release

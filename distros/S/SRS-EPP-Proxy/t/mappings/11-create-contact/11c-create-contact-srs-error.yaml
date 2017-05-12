@@ -1,0 +1,25 @@
+# Failed, duplicate handle
+template: create-contact.tt
+
+vars:
+  name: Albert Einstein
+  street: electric avenue
+  city: Anywhere
+  ccode: NZ
+  phone: +64.44798699
+  email: a@smartarse.co.te
+  contact_id: simple1
+
+input_assertions:
+  class: SRS::EPP::Command::Create::Contact
+  match:
+
+SRS:
+ - assertions:
+     attr_is:
+       - [ '/NZSRSRequest/HandleCreate', 'HandleId', 'simple1', 'SRS: create handle' ]
+output_assertions:
+  attr_is:
+    - [ '//epp:result', 'code', 2302, 'EPP: Correct response code' ]
+
+

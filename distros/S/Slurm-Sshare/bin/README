@@ -1,0 +1,66 @@
+Slurm::Share is copyright 2014-2016 by the University of Maryland.
+
+========================================================================
+ 	Slurm::Share - bin directory
+========================================================================
+
+----------- sbalance
+
+This directory contains the 'sbalance' script.  This script will print
+usage of allocation accounts for specified users, etc. in some common
+Slurm environments.
+
+It is assumed that users have access to charge jobs against one or more
+allocation accounts, and that each allocation account has a single
+GrpCPUMins limit set which applies to all users with access to that allocation.
+I believe that is a fairly common setup.
+
+This script will issue one or more Slurm sshare commands to obtain the
+GrpCPUMins limit and the usage for each allocation account to be displayed,
+and will output both in human friendly units.  It also displays the amount
+of unused compute time (i.e. the limit less what is used).  Optionally, the
+usage can be broken down by each user with access to the allocation account.
+
+By default it will display this information for all allocation accounts to
+which the user running the command has access to, although options to display
+this information for other users or specific allocation accounts are also 
+available.
+
+========================================================================
+ 	Installation
+========================================================================
+
+The sbalance script will be installed automatically by a 'make install'.
+
+However, system administrators might wish to make some site specific
+edits (either in the script in the build directory before the make install,
+or in the installed file afterwards):
+
+1) By default, the script will run with
+#!/usr/bin/env perl
+I.e., it will run using whatever perl interpretter is found in the
+user's path.  While this is the best global default, it might make sense
+for a system administrator to change this to the actual path of the
+system Perl for which the Slurm::Sshare module was installed.
+
+2) By default, the script will use the default Slurm sshare command as
+set by Slurm::Sshare.  By default, that is whatever sshare is found in
+the user's path.  It is advised to either set the variable $DEFAULT_SSHARE_PATH
+in the script (there should be a commented out line near the top of the script)
+to the path for the proper sshare command to use, and/or set the default
+path to sshare command in the Slurm::Sshare module (by setting the $SSHARE_CMD
+variable appropriately; again, there is a commented out line as an example).
+
+In either case, the user will be override this using the "hidden" command
+line option 'sshare-alternate-path' (this option is intended only for use
+in regression tests, etc. and so is not documented), but if users are going to
+go that far out of their way to break things then they deserve what they get.
+
+3) If the Slurm::Sshare module is not installed in the standard site_perl
+library location for the Perl being used, you might wish to uncomment
+the 'use lib' line in the script and edit it appropriately for your system.
+
+4) You might also wish to customize the subroutine 'default_our_cluster'
+to default the cluster parameter, especially if you have multiple clusters
+sharing the same database.  E.g., we have it return the cluster based on the
+hostname of the machine being run on.

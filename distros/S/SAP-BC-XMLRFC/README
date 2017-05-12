@@ -1,0 +1,16 @@
+SAP::BC and SAP::BC::XMLRFC
+===========================
+
+
+Version 0.5 is a big revision of SAP::BC and SAP::BC::XMLRFC inorder to bring it up to speed for SAP Business Connector 4.x.  If you want to continue to use SAP::BC* for SAP BC 3.x then you must use VERSION 0.4.   Major changes have been made to the service list look up and the XML document format for the call has changed too.  Note: all calls now need a user that can lookup some of the sap.admin functions for createTemplate, listServers, and listServiceMaps ( this is a bit of a pain in the a*** - but you need to sort this out up front ).
+
+This module set is designed for doing XML encoded RFC calls to and SAP R/3 system via the SAP Business Connector ( which is based on the Web Methods server ).
+Endure that your services that you have configured in the SAP BC use the XML return type, and have a simple template that use %value  xmlData% to return the whole document.  The last step in the process must be sap.rfc:encode.
+
+Look at the examples directory.  These are setup to run from the examples directory and do not require you to install the package.
+It is setup for my test environment which uses the SAP WAS system ( Web Application Server ), and SAP BC 4.0.
+Create two services WAS:readReport ( uses RFC_READ_REPORT ), and WAS:readTable ( uses RFC_READ_TABLE ).
+
+I can be contacted at piers@ompa.net
+
+Cheers.

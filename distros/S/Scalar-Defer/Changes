@@ -1,0 +1,115 @@
+[Changes for 0.23 - 0210-02-17]
+
+* Fix for [rt.cpan.org #54609] If Scalar::Defer is loaded after a thread is created, no more threads can be started. - SPROUT
+
+[Changes for 0.22 - 2010-01-29]
+
+* No code changes; note performance problems under 5.8.9
+
+[Changes for 0.21 - 2010-01-18]
+
+* Upgrade to a newer Module::Install
+
+[Changes for 0.20 - 2009-02-04]
+
+* No code changes. 0.19 dist was incorrectly built from blib
+
+[Changes for 0.19 - 2009-02-04]
+
+* Silence Scalar::Defer::Deferred::DEMOLISH warnings - SARTAK++
+
+[Changes for 0.18 - 2008-08-12]
+
+* Patch from ISHIGAKI++ to fix broken tests on perl 5.10.0
+
+[Changes for 0.17 - 2008-08-08]
+
+* Warnings avoidance on AUTOLOAD subs. Patch and test by ISHIGAKI++
+
+[Changes for 0.16 - 2008-07-01]
+
+* The previous version would clobber @ARGV when used with
+  UNIVERSAL::require.  Sorry.
+
+[Changes for 0.15 - 2008-06-27]
+
+* Fix infinite recursion on UNIVERSAL methods used as class methods on
+  Scalar::Defer::Deferred itself.
+  http://rt.cpan.org/Public/Bug/Display.html?id=37153
+
+[Changes for 0.14 - 2008-01-09]
+
+* Avoid harmless '(in cleanup)' warnings caused by Class::InsideOut's
+  DESTROY method.
+
+* Mention Data::Thunk, a sneakier XS-based implementation of lazy{}.
+
+[Changes for 0.13 - 2008-01-01]
+
+* New exportable function 'is_deferred'.
+
+* Minor code cleanup: removing unused import
+  and constants.
+
+[Changes for 0.12 - 2007-12-18]
+
+* Fixed major memory leak caused by defer{} and lazy{}, by cleaning out
+  the local storage when the InsideOut object goes away.
+  Contributed by: Alex Vandiver
+
+[Changes for 0.11 - 2007-11-26]
+
+* Refactored internals for the upcoming (optional) support for
+  UNIVERSAL::ref instead of blessing into the "0" package.
+  Contributed by: Matt S Trout
+
+[Changes for 0.10 - 2007-03-16]
+
+* Recover gracefully after the Perl runtime reallocates
+  lazy value's pointer address.
+  Reported by: Yves Agostini
+
+* Much more improved error message when a thunk cannot be located.
+
+[Changes for 0.07 - 2006-07-21]
+
+* Updated internals to work with Pel 5.9.x.
+  Suggested by: Rafael Garcia-Suarez
+
+[Changes for 0.06 - 2006-07-20]
+
+* Inhibit redefinition warning when Scalar::Defer is loaded twice.
+
+* Comment and syntax cleanup.
+
+[Changes for 0.05 - 2006-07-19]
+
+* Calling methods on a deferred value now works correctly.
+
+* Deferred values are now blessed into the "0" package, which means
+  Scalar::Util::blessed() and ref() will both return false on them.
+
+* The ->force method is now replaced by an exported "force"
+  function instead.
+
+[Changes for 0.04 - 2006-07-19]
+
+* Document the ->force method for getting a normal value out of a
+  deferred value.
+  Requested by: Nathan Gray
+
+[Changes for 0.03 - 2006-07-17]
+
+* Documentation cleanup; no functional changes.
+
+[Changes for 0.02 - 2006-07-17]
+
+* Changed name from Data::Thunk to Scalar::Defer, per suggestion
+  from obra++, mstrout++ and gaal++.
+  
+* The "thunk" function is gone; "lazy" is now the memoizing
+  variant of "defer".
+
+[Changes for 0.01 - 2006-07-17]
+
+* Initial CPAN release.

@@ -1,0 +1,19 @@
+1.03    2010-05-08
+
+    * Return list elements in sorted order.
+
+1.02    2008-07-30
+
+    * The 1.01 distribution tarball was broken; this is what it should
+      have been.
+
+1.01    2008-07-30
+
+    * Relicensed on request from the old Artistic License to "the same
+      terms as Perl itself" (i.e. new Artistic/GPL).
+
+      (No functional changes.)
+
+1.00    2001-05-01
+
+    * First stable release.

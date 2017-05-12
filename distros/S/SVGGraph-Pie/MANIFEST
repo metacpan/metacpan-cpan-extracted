@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/SVGGraph/Pie.pm
+t/00_compile.t
+t/01_xmlfy.t
+META.yml                                 Module meta-data (added by MakeMaker)

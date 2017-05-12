@@ -1,0 +1,114 @@
+---
+version: 0.24
+date:    Wed Aug 30 10:45:22 PDT 2006
+changes:
+- Include Time::HiRes dependency into Makefile.PL (RT #19291)
+- Include URI and DB_File dependency into Makefile.PL (RT #15036)
+- Upgraded to Module::Install 0.64
+- Added File::Spec path name portability fixes all over the place.
+- Incorporated parts of Barbie's patch to fix tests on Win32 Perl 5.6
+  (RT #17506)
+---
+version: 0.23
+date:    Mon Apr  4 09:11:51 PDT 2005
+changes:
+- Makefile.PL was missing :(
+---
+version: 0.22
+date:    Mon Apr  4 03:15:32 PDT 2005
+changes:
+- Added tests for UTF8 handling internally and in files via ContentObject.
+- Added CGI tests.
+- All CGI parameters are now decoded as UTF8.  The -utf8 flag is now
+  deprecated, but will continue to work as a no-op for now.
+- socialtext changes to allow formatter hooking
+- Changes for themes
+- -compress works better
+- Fix the mixin problem with resolve_install_path
+- Refactors to get rid of hub connections
+- Kwid Formatter for Spork
+- make sure the module_path comes from lib under cwd
+- Make installer better
+- Miyagawa's patch to bake cookies in redirect
+- CGI patch from cdent
+- Miyagawa added jar_opt support for different expires for each cookies
+- Miyagawa added unit test for Spoon::Cookie
+- fix deep-recursion bug on 'kwiki -update'
+--- 
+version: 0.21
+date:    Tue Jan 11 07:28:06 PST 2005
+changes:
+- WAFL blocks and phrase matching is now case-insensitive, and dashes
+  (-) are converted to underscores. (Dave Rolsky)
+- Redo Spoon::Hook into Spoon::Hooks
+- Call $hub->add_hook
+- Hooks removed when hub goes out scope
+- Spoon::Config can take glob params
+- Add hook points to support KwikiPagePrivacy
+- Add a domain field to cookies
+- AUTOLOAD class object pointers. replaces load_class in most cases.
+- Add pre_process and post_process hook points in hub
+- Have a load_dynamic method for Registry 
+---
+version: 0.20
+date:    Sat Dec 18 00:39:23 PST 2004
+changes:
+- Only require TemplateToolkit 2.10 because of Debian stable
+- 'hub' in Spoon::Installer caused memory cycles in Kwiki
+---
+version: 0.19
+date:    Wed Dec 15 13:13:10 PST 2004
+changes:
+- Spoon is now memory cycle free, which makes it much more suitable for use
+  under mod_perl (Dave Rolsky)
+- Added Spoon::Trace tracing and benchmarking facility
+- Added Spoon::Hook method hooking facility
+- Added assert, clone, conf functions to base
+- WARNING: Removed old hook facility!!
+- Split Spoon::Cookie into Spoon::Headers
+- Redo how redirects work. Use a redirect method.
+- -quiet mode for file installation
+- Add BEGIN/END comments to html templates automatically
+- Use template toolkit caching. Big speed improvement. (Chris Dent)
+---
+version: 0.18
+date:    Sun Aug  8 23:02:27 PDT 2004
+changes:
+- Use Spiffy::new for constructor instead of special Spoon::Base one.
+- unicode fixes
+---
+version: 0.17
+date:    Fri Jul 16 23:42:53 PDT 2004
+changes:
+- Use only the UTF8 character encoding
+---
+version: 0.16
+date:    Tue Jun 22 10:14:45 PDT 2004
+changes:
+- Support locked files in Installer
+---
+version: 0.15
+date:    Sun Jun 20 20:32:01 PDT 2004
+changes:
+- Support for Kwiki 0.30 release
+---
+version: 0.13
+date:    Fri May  7 00:57:06 PDT 2004
+changes:
+- Support for Kwiki release
+---
+version: 0.12
+date:    Wed Mar 31 00:16:13 CST 2004
+changes:
+- Refactoring for Spork-0.12
+---
+version: 0.11
+date:    Sun Mar 21 12:45:18 PST 2004
+changes:
+- Added Spoon::debug
+- Added Spoon::Installer
+---
+version: 0.10
+date:    Sun Mar 21 01:58:22 PST 2004
+changes:
+- Initial release.

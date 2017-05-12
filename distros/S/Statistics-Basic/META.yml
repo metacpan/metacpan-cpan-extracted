@@ -1,0 +1,32 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+keywords:
+  - stats
+  - statistics
+  - mean
+  - average
+  - correlation
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Statistics-Basic
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Number::Format: '1.42'
+  Scalar::Util: '0'
+  perl: '5.006'
+resources:
+  repository: http://github.com/jettero/statistics--basic
+version: '1.6611'

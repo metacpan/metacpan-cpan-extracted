@@ -1,0 +1,8 @@
+\bCVS/\b.*
+\bMakefile$
+\bpm_to_blib$
+\.old$
+~$
+\.exists$
+^blib/
+^Speech-Recognizer-ScLite-\d

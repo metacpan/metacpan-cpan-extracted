@@ -1,0 +1,88 @@
+[% PROCESS header %]
+[% USE Number.Format %]
+
+<div id="jumprev">
+  <form action="[% c.self_uri | url %]" method="get">
+   <div>
+    <label for="rev">[%|l%](goto revision)[%END%]</label>
+    <input type="text" id="rev" name="rev" value="[% rev %]" size="4" />
+   </div>
+  </form>
+</div>
+
+[% PROCESS _action_menu %]
+
+[% IF entries.size == 0 %]
+<p>[%|l%](no directory entries)[%END%]</p>
+[% ELSE %]
+<table class="listing" id="dirlist" summary="[%|l%](browse listing)[%END%]">
+  <thead>
+    <tr>
+      <th class="name">[%|l%](name)[%END%]</th>
+      <th class="rev">[%|l%](revision)[%END%]</th>
+      <th class="size">[%|l%](size)[%END%]</th>
+      <th class="age">[%|l%](age)[%END%]</th>
+      <th class="change">[%|l%](last change)[%END%]</th>
+    </tr>
+  </thead>
+  <tbody>
+  [% FOREACH entries %]
+    <tr class="[% loop.count % 2 ? "even" : "odd" %]">
+      <td class="name">
+      [% IF isdir %]
+        <a class="dir" href="[% c.script %]/[% c.repos | uri %]/browse[% c.path | url %]/[% name | uri | html %][% revstr %]">[% name %]</a>
+      [% ELSE %]
+        <a class="file" href="[% c.script %]/[% c.repos | uri %]/view[% c.path | url %]/[% name | uri | html %][% revstr %]">[% name %]</a>
+      [% END %]
+      </td>
+      <td class="rev"><a href="[% c.script %]/[% c.repos | uri %]/revision?rev=[% rev %]">[% rev %]</a></td>
+      <td class="size">[% IF ! isdir; size | format_bytes; END %]</td>
+[% quanta = { '60'         => 'second',
+              '3600'       => 'minute',
+              '86400'      => 'hour',
+              '604800'     => 'day',
+              '2592000'    => 'week',
+              '31536000'   => 'month',
+	      '4294967295' => 'year'
+ } %]
+      <td class="age">
+[% FOREACH quantum = quanta.keys.nsort %]
+  [% IF loop.last %]
+    [% quant_age = age / loop.prev | round(0) %]
+    [% LAST %]
+  [% END %]
+  [% IF age < quantum %]
+    [% IF loop.index == 0 %]
+      [% quant_age = age | round(0) %]
+    [% ELSE %]
+      [% quant_age = age / loop.prev | round(0) %]
+    [% END %]
+    [% LAST %]
+  [% END %]
+[% END %][%|l(quant_age)%](%1 [% quanta.$quantum %])[%END%]</td>
+      <td class="change"><span class="author">[% author %]:</span> <span class="change">[% msg | truncate(100) | html %]</span></td>
+    </tr>
+  [% END %]
+  </tbody>
+</table>
+[% END %]
+
+[% IF props.size != 0 %]
+<table class="listing" id="proplist">
+  <thead>
+    <tr>
+      <th class="name">[%|l%](prop-name)[%END%]</th>
+      <th class="change">[%|l%](prop-value)[%END%]</th>
+    </tr>
+  </thead>
+  <tbody>
+  [% FOREACH props %]
+    <tr class="[% loop.count % 2 ? "even" : "odd" %]">
+      <td class="propname">[% name %]</td>
+      <td class="propvalue">[% value | html | html_line_break %]</td>
+    </tr>
+  [% END %]
+  </tbody>
+</table>
+[% END %]
+[% PROCESS footer %]

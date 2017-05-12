@@ -1,0 +1,8 @@
+depend%: prereq%
+	echo Building $TARGET with match $1
+
+default: { map "depend$_", 1..3 }
+	echo Building $TARGET
+
+prereq%:
+	echo Building $TARGET

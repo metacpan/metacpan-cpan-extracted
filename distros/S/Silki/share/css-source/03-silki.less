@@ -1,0 +1,782 @@
+.rounded-corners-top (@radius: 0px) {
+    border-radius-topleft: @radius;
+    border-radius-topright: @radius;
+    -moz-border-radius-topleft: @radius;
+    -moz-border-radius-topright: @radius;
+    -webkit-border-radius-topleft: @radius;
+    -webkit-border-radius-topright: @radius;
+}
+
+.rounded-corners-bottom (@radius: 0px) {
+    border-radius-bottomleft: @radius;
+    border-radius-bottomright: @radius;
+    -moz-border-radius-bottomleft: @radius;
+    -moz-border-radius-bottomright: @radius;
+    -webkit-border-radius-bottomleft: @radius;
+    -webkit-border-radius-bottomright: @radius;
+}
+
+.rounded-corners-both (@radius: 0px) {
+    .rounded-corners-top(@radius);
+    .rounded-corners-bottom(@radius);
+}
+
+.rounded-box (@radius: 6px, @color: black) {
+    .rounded-corners-both(@radius);
+    border: 1px solid @color;
+    margin-bottom: 1em;
+}     
+
+.rounded-box-h2 (@color: black) {
+    background-color: @color;
+    color: white;
+    margin-top: 0;
+    padding: 0.2em 0.4em;
+}
+
+@light-yellow: #ffffd9;
+@light-blue: #a3d3e3;
+@dark-blue: #13708f;
+@dark-purple: #21379d;
+@dark-green: #02501c;
+@light-orange: #f9d5b0;
+@orange-brown: #8f683f;
+@light-orange-brown: @orange-brown + #222;
+@dark-orange-brown: @orange-brown - #222;
+
+@error-orange: #fcc841;
+
+/* See http://colorschemedesigner.com/#3p61TsOsOK-K- for the scheme. */
+
+html {
+    background-color: white;
+}
+
+body {
+    font-family: sans-serif;
+}
+
+/* There are two rules in YUI Base that fuck up nesting ol inside ul and vice
+versa. These two more specific rules fix that problem. */
+ol > li {
+	list-style: decimal outside;
+}
+
+ul > li {
+	list-style: disc outside;
+}
+
+/* No margin on sub-lists */
+ul * ul, ul * ol, ol * ol, ol * ul {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+h1 {
+    margin: 0.3em 0 0.5em 0;
+    font-size: 170%;
+}
+
+a {
+    text-decoration: none;
+
+    :hover {
+        text-decoration: underline;
+    }
+}
+
+#doc3 {
+    background-color: white;
+}
+
+#hd, #bd, #ft {
+    /* yui base defaults to relatively small fonts, putting this in
+       the body or #doc4 selector destroys the yui layout */
+    font-size: 120%;
+}
+
+#ft {
+    background-color: white;
+    color: black;
+    font-size: 90%;
+    padding: 1em 1em;
+}
+
+#global-nav {
+    margin-bottom: 0.2em;
+    text-align: right;
+
+    #quick-search {
+        display: inline;
+        font-size: 90%;
+        text-align: left;
+
+        input {
+            color: #999;
+            display: inline;
+
+            :focus {
+                color: black;
+            }
+        }
+    }
+
+    ul {
+        display: inline;
+        font-size: 80%;
+
+        li {
+            display: inline;
+            list-style: none;
+
+            a {
+                color: #111;
+                padding-left: 1.1em;
+            }
+        }
+    }
+}
+
+#tabs {
+    background-color: @light-blue;
+    line-height: 1.2;
+    padding-top: 2em;
+    .rounded-corners-top(6px);
+
+    ul {
+        border-bottom: 8px solid @dark-blue;
+        margin: 0 0 0 0;
+        padding: 0 0 0 0.5em;
+    }
+
+    li {
+        background-color: white;
+        display: inline;
+        font-variant: small-caps;
+        list-style: none;
+        margin-right: 0.3em;
+        padding: 0;
+
+        a {
+            background-color: white;
+            color: #333;
+            font-weight: bold;
+            padding: 0.3em 1em 0 1em;
+            .rounded-corners-top(6px);
+            text-decoration: none;
+
+            :hover {
+                background-color: @dark-purple;
+                color: white;
+            }
+        }
+    }
+
+    li.selected {
+        a {
+            background-color: @dark-blue;
+            color: white;
+            font-size: 110%;
+            padding: 0.5em 1.2em 0 1.2em;
+
+            :hover {
+                background-color: @dark-blue;
+                color: white;
+            }
+        }
+    }
+
+    /* This makes sure that the header is the same height with our without tabs */
+    li.invisible {
+        background-color: transparent;
+        padding: 0.3em 1em 0 1em;
+    }
+}
+
+#local-nav {
+    background-color: #eee;
+    padding: 0.4em 0 0.4em 0.7em;
+
+    ul {
+        display: inline;
+        font-size: 90%;
+        margin: 0;
+        padding: 0;
+        li {
+            display: inline;
+            list-style: none;
+            margin-right: 1em;
+            padding: 0;
+        }
+        a, a:visited {
+            color: black;
+            text-decoration: underline;
+        }
+    }
+    .current {
+        font-weight: bold;
+    }
+}
+
+#messages {
+    background-color: @light-yellow;
+    font-size: 90%;
+}
+
+#content {
+    background-color: white;
+    padding: 0.5em;
+}
+
+#sidebar {
+    margin-top: 1.5em;
+}
+
+.sidebar-box {
+    .rounded-box(6px, @dark-green);
+
+    h2 {
+        .rounded-box-h2(@dark-green);
+    }
+}
+
+img.user-image-mini {
+    vertical-align: top;
+}
+
+/* === Page View === */
+
+#table-of-contents {
+    background-color: @light-yellow;
+    border: 1px dotted @dark-blue;
+    font-size: 90%;
+}
+
+#table-of-contents + p {
+    margin-top: 1em;
+}
+
+#page-content {
+    table {
+        border-top: 1px solid @dark-purple;
+        border-right: 1px solid @dark-purple;
+        border-bottom: 1px solid @dark-purple;
+        border-left: 5px solid @dark-purple;
+
+        th, td {
+            border: none;
+            border-right: 1px dotted #999;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        td {
+            padding: 0.3em 0.5em;
+        }
+
+        thead tr {
+            background-color: @dark-purple;
+            color: white;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid @dark-purple;
+        }
+    }
+
+    a.new-page {
+        :after {
+            color: red;
+            content: "?";
+            font-size: 80%;
+            vertical-align: top;
+        }
+    }
+
+    pre {
+        background-color: #f0f0f0;
+        padding: 0.1em 0 0.1em 1em;
+
+        code {
+            line-height: 1.21;
+        }
+    }
+}
+
+#tags {
+    ul, form {
+        margin-right: 1em;
+        margin-left: 1em;
+    }
+
+    form {
+        margin-bottom: 1em;
+    }
+}
+
+#tags-list {
+    margin: 0 0 1em 0;
+    padding: 0;
+    li { 
+        display: inline;
+        margin-right: 0.5em;
+        img {
+            margin-right: 2px;
+        }
+        a { 
+            text-decoration: none;
+        }
+        a.view-tag { 
+            background: transparent url('/images/icons/tag_blue.png') no-repeat left bottom;
+            padding-left: 18px;
+        }
+    }
+}
+
+#tags-form {
+    font-size: 80%;
+    p {
+        margin: 0 0 0.1em 0;
+    }
+}
+
+#incoming-links {
+    p {
+        font-size: 80%;
+        margin-right: 1em;
+        margin-left: 1em;
+    }
+}
+
+#revision-controls {
+    font-size: 90%;
+}
+
+#revision-controls h2 {
+    font-size: 110%;
+    margin-bottom: 0.3em;
+}
+
+#revision-controls p {
+    margin: 0.2em 0;
+}
+
+#attribution {
+    border-top: 2px solid #11a844;
+    clear: both;
+    font-size: 90%;
+    font-style: italic;
+    margin-top: 1em;
+    padding: 0.1em 0;
+
+    p {
+        margin-bottom: 0.5em;
+    }
+}
+
+/* === Dashboard === */
+
+#dashboard {
+    /* This is needed to avoid a too-large gap from the <h1> at
+       the top of the page to the first dashboard item. */
+    margin-top: -1em;
+}
+
+.dashboard-item {
+    .rounded-box(6px, @dark-purple);
+    margin-top: 1em;
+    margin-bottom: 0;
+
+    h2 {
+        .rounded-box-h2(@dark-purple);
+    }
+}
+
+#active-users {
+    margin-left: 0.5em;
+    padding-left: 0;
+
+    li {
+        list-style: none;
+        margin-bottom: 0.2em;
+    }
+}
+
+/* === Tables === */
+
+table.standard-table {
+    border-bottom: 1px solid @dark-purple;
+    border-right: 1px solid @dark-purple;
+    width: 100%;
+
+    th, td {
+        border: none;
+        vertical-align: top;
+    }
+
+    th {
+        text-align: left;
+    }
+
+    td {
+        padding: 0.3em 0.5em;
+    }
+
+    thead tr {
+        background-color: @dark-purple;
+        border-left: 5px solid @dark-purple;
+        color: white;
+    }
+
+    tbody tr {
+        border-bottom: 1px solid @dark-purple;
+    }
+
+    tbody:hover tr {
+        background-color: #EEE;
+    }
+
+    tr.odd {
+        border-left: 5px solid #999;
+    }
+
+    tr.even {
+        border-left: 5px solid @dark-purple;
+    }
+
+    tr.has-child-row {
+        border-bottom: 0;
+    }
+}
+
+table.revision-diff {
+    border: 1px solid black;
+    width: 100%;
+}
+
+table.revision-diff > thead > tr > th.rev1,
+table.revision-diff > thead > tr > th.rev2 {
+    width: 49%;
+}
+
+table.revision-diff > tbody > tr {
+    border: 0;
+}
+
+table.revision-diff > tbody > tr.attribution {
+    font-size: 90%;
+    font-style: italic;
+}    
+
+table.revision-diff > tbody > tr > td {
+    border: 1px dashed #ccc;
+    vertical-align: top;
+}
+
+table.revision-diff > tbody > tr.diff-changed > td {
+    background-color: #ddf;
+}
+
+table.revision-diff > tbody > tr.diff-changed > td {
+    background-color: #eee;
+}
+
+table.revision-diff > tbody > tr > td.diff-removed {
+    background-color: #fdd;
+}
+
+table.revision-diff > tbody > tr > td.diff-added {
+    background-color: #dfd;
+}
+
+table.revision-diff > tbody > tr > td.marker {
+    background-color: white;
+    font-weight: bold;
+    text-align: center;
+}
+
+pre.log-blog {
+    line-height: 110%;
+    margin-top: 1em;
+}
+
+#attachments img {
+    margin-top: 0.3em;
+}
+
+/* === Forms === */
+
+fieldset {
+    background-color: @light-orange;
+    border-top: 1px solid @light-orange-brown;
+    padding: 0.5em;
+    padding-bottom: 1em;
+
+    legend {
+        background-color: @orange-brown;
+        color: white;
+        font-weight: bold;
+        padding: 0.4em;
+    }
+}
+
+fieldset.last {
+    padding-bottom: 0;
+}
+
+form {
+    div.form-error {
+        background-color: @error-orange;
+        border: 1px solid black;
+        margin: 0.3em 0 0.3em 0;
+        padding: 0.3em;
+
+        p {
+            margin: 0.1em 0;
+        }
+    }
+
+    div.error {
+        background-color: @error-orange;
+        margin-top: 2px;
+
+        p.error-message {
+            margin-bottom: 0.2em;
+            margin-left: 12.5em;
+        }
+
+        p span {
+            font-size: 85%;
+        }
+    }
+
+    div.form-item { 
+        padding: 0.4em 0 0.4em 0;
+
+        /* Having the help-text div allows us to set the margin in ems, to
+           match the width of the label tag. Without the div, we'd have to set
+           the margin on the p tag, but this has a different font-size than
+           the label, so the em size is not the same. */
+        div.help-text { 
+            margin-top: 0.1em;
+
+            p {
+                font-size: 85%;
+                margin-bottom: 0em;
+            }
+        }
+
+        span.required {
+            font-weight: bold;
+        }
+    }
+
+    label {
+        font-weight: bold;
+    }
+
+    label.for-radio, label.for-checkbox {
+        display: inline;
+    }
+
+    input.checkbox,
+    input.text,
+    input.file,
+    select {
+        border: 1px solid #333;
+        color: black;
+        display: block;
+        font-weight: bold;
+        padding: 0.2em;
+    }
+
+    textarea {
+        display: block;
+    }
+
+    .text-for-hidden {
+        color: black;
+    }
+
+    input.error,
+    textarea.error,
+    select.error,
+    p.error {
+        background-color: #FFCC66;
+    }
+
+    input.disabled,
+    textarea.disabled,
+    select.disabled {
+        background-color: #CCC;
+        border-color: #333;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+        background-color: #FAFFCA;
+        border-color: black;
+    }
+
+    input.narrow {
+        width: 7em;
+    }
+
+    input.medium {
+        width: 18em;
+    }
+
+    input.wide {
+        width: 30em;
+    }
+
+    textarea.medium {
+        height: 7em;
+        width: 24em;
+    }
+
+    input.submit {
+        background-color: @orange-brown;
+        border-bottom: 2px solid @dark-orange-brown;
+        border-left: 1px solid @light-orange-brown;
+        border-right: 2px solid @dark-orange-brown;
+        border-top: 1px solid @light-orange-brown;
+        color: white;
+        font-weight: bold;
+        margin-top: 0.5em;
+        padding: 0.1em;
+        :hover {
+            background-color: @orange-brown + #222;
+        }
+    }
+}
+
+form select optgroup {
+    font-size: 110%;
+    font-weight: bold;
+
+    option {
+        font-weight: normal;
+        font-size: 91%;
+    }
+}
+
+/* Page edit form */
+
+#form-and-preview {
+    width: 98%;
+}
+
+#toolbar {
+    ul {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+    }
+
+    li {
+        display: inline;
+        list-style: none;
+
+        img {
+            background-color: #f9f9f9;
+            border-bottom: 2px solid #333;
+            border-left: 1px solid #999;
+            border-right: 2px solid #333;
+            border-top: 1px solid #999;
+            padding: 3px;
+        }
+    }
+}
+
+textarea#page-content {
+    font-family: "courier new", courier, monospace;
+    font-weight: normal;
+    height: 20em;
+    margin: 0;
+    padding: 0.5em;
+    width: 100%;
+}
+
+#preview {
+    background-color: #f9f9f9;
+    border: 1px solid black;
+    margin-top: 1em;
+    padding: 0.5em;
+    width: 100%;
+}
+
+/* Attachments */
+
+#file-upload-form {
+    /* This makes its left border line up with the table below it */
+    margin-left: -2px;
+}
+
+#upload-lightbox {
+    text-align: center;
+}
+
+#file-view-iframe {
+    border: 1px solid #bbb;
+}
+
+/* Users */
+
+#profile-image {
+    float: left;
+    margin-right: 0.5em;
+}
+
+/* Help */
+
+.advice {
+    background-color: @light-yellow;
+    font-style: italic;
+    margin-left: 1em;
+    padding: 0.5em;
+}
+
+.markdown-example {
+    background-color: #eee;
+    font-family: sans-serif;
+    line-height: 1.21;
+    padding: 0.5em;
+}
+
+.markdown-output {
+    background-color: #eff;
+    margin-bottom: 0.5em;
+    padding: 0.5em;
+}
+
+.markdown-output table {
+    border-top: 1px solid @dark-purple;
+    border-right: 1px solid @dark-purple;
+    border-bottom: 1px solid @dark-purple;
+    border-left: 5px solid @dark-purple;
+
+    th, td {
+        border: none;
+        border-right: 1px dotted #999;
+        vertical-align: top;
+    }
+
+    td {
+        padding: 0.3em 0.5em;
+    }
+
+    thead tr {
+        background-color: @dark-purple;
+        color: white;
+    }
+
+    tbody tr {
+        border-bottom: 1px solid @dark-purple;
+    }
+}
+
+.fixed {
+    font-family: monospace;
+}

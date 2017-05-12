@@ -1,0 +1,21 @@
+Revision history for Perl extension Sledge::Config::YAML
+
+0.09  Wed Mar 10 10:41:49 2010
+        - fixed warnings
+
+0.08  Thu Mar  4 20:59:05 2010
+        - remove dependency for Data::Visitor::Callback
+        - use YAML::Syck only
+
+0.07  Wed Jun 11 19:23:07 2008
+        - fixed tests.
+
+0.05  Mon Dec 17 19:26:30 2007
+        - fixed syntax `__ENV:(.+?)__`. you can use its anytime in a line.
+
+0.04  Mon Nov 27 13:20:10 2007
+        - You can use syntax `__ENV:(.+)__`. It's replaced with environment variable.
+        - The setting according to the user became not indispensable. 
+
+0.01  Tue Feb 28 17:26:50 2006
+        - original version

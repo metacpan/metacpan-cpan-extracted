@@ -1,0 +1,53 @@
+{
+   "abstract" : "Perl interface to libswish3",
+   "author" : [
+      "Peter Karman <perl@peknet.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "SWISH-3",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dump" : "0",
+            "Test::More" : "0",
+            "perl" : "5.008003"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=SWISH-3"
+      },
+      "homepage" : "http://dev.swish-e.org/wiki/swish3",
+      "repository" : {
+         "url" : "http://svn.swish-e.org/libswish3"
+      }
+   },
+   "version" : "1.000015",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

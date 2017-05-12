@@ -1,0 +1,35 @@
+This is Perl module Sub::Spy.
+
+INSTALLATION
+
+Install cpanm (App::cpanminus) and then run the following command to install
+Sub::Spy:
+
+    $ cpanm Sub::Spy
+
+If you get an archive of this distribution, unpack it and build it
+as per the usual:
+
+    $ tar xzf Sub-Spy-$version.tar.gz
+    $ cd Sub-Spy-$version
+    $ perl Makefile.PL
+    $ make && make test
+
+Then install it:
+
+    $ make install
+
+DOCUMENTATION
+
+Sub::Spy documentation is available as in POD. So you can do:
+
+    $ perldoc Sub::Spy
+
+to read the documentation online with your favorite pager.
+
+LICENSE AND COPYRIGHT
+
+Copyright (c) 2011, Naosuke Yokoe. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

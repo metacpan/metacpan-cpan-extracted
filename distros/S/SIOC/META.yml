@@ -1,0 +1,20 @@
+--- #YAML:1.0
+name:                SIOC
+version:             v1.0.0
+abstract:            ~
+license:             ~
+author:              
+    - Jochen Lillich <geewiz@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Moose:                         0
+    MooseX::AttributeHelpers:      0
+    Readonly:                      0
+    Template:                      0
+    Template::Provider::FromDATA:  0
+    Test::More:                    0
+    version:                       0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,12 @@
+#!/bin/sh
+
+rm ocal_incoming/etiquette-0.1.tar.gz 
+rm ocal_incoming/EtiquetteIcons-0.1.tar.gz  
+rm ocal_incoming/etiquette-icons-0.2.tar.gz 
+rm ocal_incoming/etiquette-icons-0.3.tar.gz 
+rm ocal_incoming/etiquette-icons-0.4.tar.gz 
+rm ocal_incoming/etiquette-icons-0.5_pre.tar.gz 
+rm ocal_incoming/homes.tar.gz
+rm ocal_incoming/homes-0.1.tar.gz
+rm ocal_incoming/scandinavian-servicesigns-0.1.tar.gz
+mv ocal_incoming/starsmile. ocal_incoming/starsmile.svg

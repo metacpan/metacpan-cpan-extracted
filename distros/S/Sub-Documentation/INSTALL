@@ -1,0 +1,27 @@
+
+This is the Perl distribution Sub-Documentation.
+
+## Installation
+
+Sub-Documentation installation is straightforward.
+If your CPAN shell is set up, you should just be able to do
+
+    % cpan Sub::Documentation
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+## Documentation
+
+Sub-Documentation documentation is available as in POD.
+So you can do:
+
+    % perldoc Sub::Documentation
+
+to read the documentation with your favorite pager.

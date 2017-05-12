@@ -1,0 +1,27 @@
+use strict;
+
+# Slightly amended from the main Search::InvertedIndex distro.
+
+###############################################################################
+# Generate a large normal curve random dataset                                #
+###############################################################################
+
+sub make_dataset {
+    my ($max_keys, $n_indexes, $range) = @_;
+
+    $range = 300 unless defined $range;
+    my $dataset = {};
+    for (my $count=0; $count < $n_indexes; $count++) {
+        my $index = $count;
+        my $data   = { int(rand(987234)) => int(rand (9823123)) };
+        $dataset->{$index}->{-data} = $data; 
+        for (my $key_counter=0; $key_counter < $max_keys; $key_counter++) {
+            my $key     = int (rand ($range/3) +rand($range/3) + rand($range/3));
+            my $ranking = int (rand (60000)) - 30000;
+            $dataset->{$index}->{'-keys'}->{$key} = $ranking; 
+        }
+    }
+    $dataset;
+}
+
+1;

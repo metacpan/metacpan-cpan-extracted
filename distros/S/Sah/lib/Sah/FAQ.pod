@@ -1,0 +1,330 @@
+package Sah::FAQ; # just to make PodWeaver happy
+
+# VERSION
+
+1;
+# ABSTRACT: Frequently asked questions
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Sah::FAQ - Frequently asked questions
+
+=head1 VERSION
+
+This document describes version 0.9.45 of Sah::FAQ (from Perl distribution Sah), released on 2017-03-09.
+
+=head1 GENERAL
+
+=head2 General
+
+=head3 Why use a schema (a.k.a "Turing tarpit")? Why not use pure Perl?
+
+Schema language is a specialized language (DSL) that should be more concise to
+write than equivalent Perl code for common validation tasks. Its goal is never
+to be as powerful as Perl.
+
+90% of the time, my schemas are some variations of the simple cases like:
+
+ "str*"
+ ["str":   {"len_between": [1, 10], "match": "some regex"}]
+ ["str":   {"in": ["a", "b", "c", ...]}]
+ ["array": {"of": "some_other_type"}]
+ ["hash":  {"keys": {"key1": "some schema", ...}, "req_keys": [...], ...}]
+
+and writing schemas is faster and less tedious/error-prone than writing
+equivalent Perl code, plus L<Data::Sah> can generate JavaScript code and human
+description text for me. For more complex validation I stay with Sah until it
+starts to get unwieldy. It usually can go pretty far since I can add functions
+and custom clauses to its types; it's for the very complex and dynamic
+validation needs that I go pure Perl. Your mileage may vary.
+
+=head3 What does "Sah" mean?
+
+Sah is an Indonesian word, meaning "valid" or "legal". It's picked because it's
+short.
+
+The previous incarnation of this module uses the namespace L<Data::Schema>,
+started in 2009 and deprecated in 2011 in favor of "Sah".
+
+=head2 Comparison to other schema languages and type systems
+
+=head3 Comparison to JSON schema?
+
+=over 4
+
+=item * JSON schema limits its type system to that supported by JSON/JavaScript.
+
+=item * JSON schema's syntax is simpler.
+
+Its metaschema (schema for the schema) is only about 130 lines. There are no
+shortcut forms.
+
+=item * JSON schema's features are more limited.
+
+No expression, no function.
+
+=back
+
+=head3 Comparison to Data::Rx?
+
+TBD
+
+=head3 Comparison to Data::FormValidator (DFV)?
+
+TBD
+
+=head3 Comparison to Moose types?
+
+TBD
+
+=head1 SYNTAX
+
+=head2 General
+
+=head3 Why is C<req> not enabled the default?
+
+I am following SQL's behavior. A type declaration like:
+
+ INT
+
+in SQL means C<NULL> is allowed, while:
+
+ INT NOT NULL
+
+means C<NULL> is not allowed. The above is equivalent to specifying this in Sah:
+
+ int*
+
+One could argue that setting C<req> to 1 by default is safer/more convenient to
+her/whatever, and C<int> should mean C<< ["int", "req", 1] >> while something
+like perhaps C<int?> means C<< ["int", "req", 0] >>. But this is simply a design
+choice and each has its pros/cons. Nullable by default can also be convenient in
+some cases, like when specifying program options where most of the options are
+optional.
+
+=head3 How about adding a C<default_req> configuration in C<Data::Sah> then?
+
+In general I am against compiler configuration which changes language behavior
+(think PHP's C<register_globals> or <magic_quotes_*> settings). In this case, it
+makes a simple schema like C<int> to have ambiguous meaning (is undefined value
+allowed? Or not allowed? It depends on compiler configuration).
+
+=head3 Why C<int> instead of C<integer>? Why C<req> instead of C<required>? C<str> instead of C<string>? Etc.
+
+This is also a design choice. To be consistent, either we abbreviate or we
+don't. Although there is very little reason to abbreviate when it comes to
+disk/memory size (compared to the eras of early Unix or C language), there are
+other limited resources to consider: source code column width (usually still
+around 80 characters in many best practices) and developer's time/energy (typing
+more takes more time and effort).
+
+I want to make it possible for short schemas to be specified on a single line.
+For example compare:
+
+ [integer => {required => 1, minimum => 0, maximum => 100, divisible_by => 2}]
+
+versus:
+
+ [int => {req=>1, min=>0, max=>100, div_by=>2}]
+
+The latter is not that much less readable than the first, but is less tedious to
+type, especially if you write lots of schemas.
+
+Therefore, the decision is to use commonly used (and unambiguous) abbreviations
+for type and clause names.
+
+=head3 How to express "not-something"? Why isn't there a C<not> or C<not_in> clause?
+
+There are generally no C<not_CLAUSE> clauses. Instead, a generic C<!CLAUSE>
+syntax is provided. Examples:
+
+ // an integer that is not 0
+ ["int", {"!is": 0}]
+
+ // a username that is not one of the forbidden/reserved ones
+ ["str", {"!in": ["root", "admin", "superuser"]}]
+
+=head3 How to state C<in> as well as C<!in> in the same clause set?
+
+You can't do this since it will cause a conflict:
+
+ ["str ", {"in": ["a","b","c"], "!in": ["x","y","z"]}]
+
+However, you can do this:
+
+ ["str ", {"clset&": [{"in": ["a","b","c"]}, {"!in": ["x","y","z"]}]}]
+
+=head3 How to express mutual failure ("if A fails, B must also fail")?
+
+You can use C<if> clause and negate the clauses. For example:
+
+ "if": [{"!div_by": 2}, {"!div_by": 5}]
+
+=head3 How about "len_in" clause for str? Or "values_uniq" for hash? Or perhaps "len_div_by"? Or some other clauses that test a property/transform of a value?
+
+Except for some commonly used cases like C<len_between>, C<min_len>, C<max_len>,
+C<allowed_keys>, C<forbidden_keys>, to validate a certain property of the value
+(instead of the raw value itself), you can use the generic C<prop> clause:
+
+ // check hash values are unique
+ ["hash", {"prop": ["values", ["array", {"uniq":1}]]}]
+
+Or, for more general use, you can apply a temporary prefilter first to the data:
+
+ // check hash values are unique
+ ["array", {"prefilters.temp":1, "prefilters":["values($_)"], "uniq":1}]
+
+=head3 General advice when writing schemas?
+
+=over 4
+
+=item * Avoid C<any> or C<all> if you know that data is of a certain type
+
+For performance and ease of reflection, it is better to create a custom clause
+than using the C<any> type, especially with long list of alternatives. An
+example:
+
+ // dns_record is either a_record, mx_record, ns_record, cname_record, ...
+ ["any", "of", [
+         "a_record",
+         "mx_record",
+         "ns_record",
+         "cname_record",
+         ...
+     ]
+ ]
+
+ // base_record
+ ["hash", "keys", {
+     "owner": "str*",
+     "ttl": "int",
+ }]
+
+ // a_record
+ ["base_record", "merge.normal.keys", {
+     "type": ["str*", "is", "A"],
+     "address": "str*"
+ }]
+
+ // mx_record
+ ["base_record", "merge.normal.keys", {
+     "type": ["str*", "is", "MX"],
+     "host": "str*",
+     "prio": "int"
+ }]
+
+ ...
+
+If you see the declaration above, every record is a hash. So it is better to
+declare C<dns_record> as a C<hash> instead of an C<any>. But we need to select a
+different schema based on the C<type> key. We can develop a custom clause like
+this:
+
+ ["hash", "select_schema_on_key", ["type", {
+     "A": "a_record",
+     "MX": "mx_record",
+     "NS": "ns_record",
+     "CNAME": "cname_record",
+     ...
+ }]]
+
+This will be faster.
+
+=back
+
+=head2 Hash
+
+=head3 How does Sah check allowed/unallowed keys?
+
+If C<keys> clause is specified, then by default only keys defined in C<keys>
+clause is allowed, unless the C<.restrict> attribute is set to false, in which
+case no restriction to allowed keys is done by the clause. The same case for
+C<re_keys>.
+
+If C<allowed_keys> and/or C<allowed_keys_re> clause is specified, then only keys
+matching those clauses are allowed. This is in addition to restriction placed by
+other clauses, of course.
+
+=head3 How do I specify schemas for some keys, but still allow some other keys?
+
+Set the C<.restrict> attribute for C<keys> or C<re_keys> to false. Example:
+
+ ["hash", {
+     "keys": {"a": "int", "b": "int"},
+     "keys.restrict": 0,
+     "allowed_keys": ["a", "b", "c", "d", "e"]
+ ]
+
+The above schema allows keys C<a, b, c, d, e> and specifies values for C<a, b>.
+Another example:
+
+ ["hash", {
+     "keys": {"a": "int", "b": "int"},
+     "keys.restrict": 0,
+     "allowed_keys_re": "^[ab_]",
+ ]
+
+The above schema specifies values for C<a, b> but still allows other keys
+beginning with an underscore.
+
+=head3 What is the difference between the C<keys> and C<req_keys> clauses?
+
+C<req_keys> require keys to I<exist>, but their values are governed by the
+schemas in C<keys> or C<keys_re>. Here are four combination possibilities, each
+with the schema:
+
+To require a hash key to exist, but its value can be undef:
+
+ ["hash", "keys", {"a": "int"}, "req_keys": ["a"]]
+
+To allow a hash key to not exist, but when it exists it must not be
+undef:
+
+ ["hash", "keys", {"a": "int*"}]
+
+To allow a hash key to not exist, or its value to be undef when exists:
+
+ ["hash", "keys", {"a": "int"}]
+
+To require hash key exist and its value must not be undef:
+
+ ["hash", "keys", {"a": "int*"}, "req_keys": ["a"]]
+
+=head3 Merging and hash keys?
+
+XXX (Turn off hash merging using the C<''> Data::ModeMerge options key.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Sah>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Sah>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sah>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

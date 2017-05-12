@@ -1,0 +1,29 @@
+---
+abstract: 'interpolate variables into strings'
+author:
+  - ', 2014 The Smithsonian Astrophysical Observatory'
+  - 'Diab Jerius'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::Fatal: 0
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  ExtUtils::MakeMaker: 6.36
+dynamic_config: 0
+generated_by: 'Module::Install version 1.06, CPAN::Meta::Converter version 2.120921'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: String-Interpolate-RE
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=String-Interpolate-RE
+  license: http://opensource.org/licenses/gpl-license.php
+  repository: https://bitbucket.org/djerius/string-interpolate-re
+version: 0.05

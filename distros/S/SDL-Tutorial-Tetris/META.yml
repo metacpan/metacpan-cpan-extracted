@@ -1,0 +1,39 @@
+---
+abstract: 'tetris game using SDL(2)'
+author: []
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: SDL-Tutorial-Tetris
+provides:
+  SDL::Tutorial::Tetris:
+    file: lib/SDL/Tutorial/Tetris.pm
+    version: 0.04
+  SDL::Tutorial::Tetris::Base:
+    file: lib/SDL/Tutorial/Tetris/Base.pm
+    version: 0.01
+  SDL::Tutorial::Tetris::Controller::CPUSpinner:
+    file: lib/SDL/Tutorial/Tetris/Controller/CPUSpinner.pm
+  SDL::Tutorial::Tetris::Controller::Game:
+    file: lib/SDL/Tutorial/Tetris/Controller/Game.pm
+  SDL::Tutorial::Tetris::Controller::Keyboard:
+    file: lib/SDL/Tutorial/Tetris/Controller/Keyboard.pm
+  SDL::Tutorial::Tetris::EventManager:
+    file: lib/SDL/Tutorial/Tetris/EventManager.pm
+  SDL::Tutorial::Tetris::Model::Grid:
+    file: lib/SDL/Tutorial/Tetris/Model/Grid.pm
+  SDL::Tutorial::Tetris::Model::Pieces:
+    file: lib/SDL/Tutorial/Tetris/Model/Pieces.pm
+  SDL::Tutorial::Tetris::View::Game:
+    file: lib/SDL/Tutorial/Tetris/View.pm
+requires:
+  Class::XSAccessor: 1.03
+  Readonly: 1.03
+  SDL: 2.4
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.04

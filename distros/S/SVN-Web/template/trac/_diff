@@ -1,0 +1,122 @@
+<div class="changeset">
+<div class="diff">
+  <ul class="entries">
+  [% IF diff_size > max_diff_size %]
+    <li>[%|l(diff_size, max_diff_size)%](diff too large: %1 %2)[%END%]</li>
+  [% ELSE %]
+    [% FOREACH filename IN diff.files.unique.sort %]
+    <li class="entry" id="diff_[% '/' _ filename | uri | anchor %]">
+      <h2>[% filename %]</h2>
+      <table class="inline">
+        <colgroup>
+          <col class="lineno" />
+          <col class="lineno" />
+          <col class="content" />
+        </colgroup>
+
+        <thead>
+          <tr>
+            <th>[% IF rev1 %]<a href="[% c.script %]/[% c.repos | uri %]/revision?rev=[% rev1 %]">[% rev1 %]</a>[% END %]</th>
+            <th>[% IF rev2 %]<a href="[% c.script %]/[% c.repos | uri %]/revision?rev=[% rev2 %]">[% rev2 %]</a>[% END %]</th>
+            <th>&nbsp;</th>
+          </tr>
+        </thead>
+
+    [%# Iterate over the list of changes.  Do this with an index, rather
+        than a normal loop, because of the need to index around the list
+        changes when working out the class="first/last" shenanigans %]
+    [% changes = diff.changes(filename) # Copy the list of changes        %]
+    [% FOREACH change_idx IN [0 .. changes.max] %]
+      [% change = changes.$change_idx    # Note the current change         %]
+      [% oldline1 = line1                # Previous line number from file1 %]
+      [% oldline2 = line2                # Previous line number file file2 %]
+      [% line1 = change.line1 %]
+      [% line2 = change.line2 %]
+
+      [%# Make sure the '...' skipped section is only displayed for
+          hunks *after* the first hunk %]
+      [% IF oldline1.defined AND oldline1 != '' AND
+            line1 > oldline1 AND (change_idx || 0) > 0 %]
+        <tbody class="skippedlines">
+          <tr>
+            <th>&hellip;</th>
+            <th>&hellip;</th>
+            <td>&nbsp;</td>
+          </tr>
+        </tbody>
+      [% END %]
+
+      [% size  = change.size - 1  # Avoids recalculation later %]
+      [% type  = change.type      # Avoids repeated lookups later %]
+
+      [%# Iterate over the lines that make up this change section %]
+
+      [% FOREACH line IN [0 .. size] # Get the correct for this fragment%]
+        <tbody [% SWITCH type %]
+                [% CASE 'REMOVE' %]
+                  class="rem"
+                [% CASE 'ADD' %]
+                  class="add"
+                [% END %]>
+
+    [%# Work out the classes that apply to this row.
+
+              If this is the first line for this change type, *and*
+        the previous change type wasn't 'REMOVE' then give this
+        the class 'first'.
+
+              If this is the last line for thie change type, *and*
+              the next change type is not 'ADD' then give this the class
+              'last'.
+
+              This means that the first and last lines of each change
+              get the correct class (which results in a border being
+              rendered at the top or bottom of the row -- unless this
+              is where a removal and an addition butt up to each other;
+              if they do there's no border where they meet. %]
+          [% row_classes = [];
+       prev_idx = change_idx - 1;
+             next_idx = change_idx + 1;
+             row_classes.push('first') IF loop.first
+               AND prev_idx >= 0
+               AND changes.$prev_idx.type != 'REMOVE';
+             row_classes.push('last') IF loop.last
+               AND next_idx <= changes.max
+               AND changes.$next_idx.type != 'ADD';
+             %]
+
+          <tr [% IF row_classes %]class="[% row_classes.join(' ') %]"[% END %]>
+            [%# If this is an addition don't show the left hand row number.
+                If this is a deletion don't show the right hand row number. %]
+            <th>[% IF type != 'ADD' %][% line1 %][% END %]</th>
+            <th>[% IF type != 'REMOVE' %][% line2 %][% END %]</th>
+            <td style="white-space: pre; "
+              [% SWITCH type %]
+              [% CASE 'REMOVE' %]
+                class="base"
+              [% CASE 'ADD' %]
+                class="chg"
+              [% END %]><span>[% change.text(line) | html %]</span></td>
+          </tr>
+
+  [%# Increment the line numbers.  These may increment unevenly
+            depending on whether lines have been added or removed. %]
+  [% SWITCH type %]
+        [% CASE '' %]
+          [% line1 = line1 + 1 %]
+          [% line2 = line2 + 1 %]
+        [% CASE 'REMOVE' %]
+          [% line1 = line1 + 1 %]
+        [% CASE 'ADD' %]
+          [% line2 = line2 + 1 %]
+        [% END %]
+        </tbody>
+      [% END %]
+    [% END %]
+    </table></li>
+    [% END %]
+  [% END %]
+  </ul>
+</div>
+</div>
+

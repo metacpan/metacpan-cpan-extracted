@@ -1,0 +1,43 @@
+#!/usr/bin/env perl
+
+# PODNAME:  staticvolt
+# ABSTRACT: Static website generator
+
+use strict;
+use warnings;
+
+use StaticVolt;
+
+my $staticvolt = StaticVolt->new(
+    'includes'    => '_includes',
+    'layouts'     => '_layouts',
+    'source'      => '_source',
+    'destination' => '_site',
+);
+$staticvolt->compile;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+staticvolt - Static website generator
+
+=head1 VERSION
+
+version 1.00
+
+=head1 AUTHOR
+
+Alan Haggai Alavi <haggai@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Alan Haggai Alavi.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

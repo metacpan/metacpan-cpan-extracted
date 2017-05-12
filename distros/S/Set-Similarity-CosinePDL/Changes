@@ -1,0 +1,40 @@
+Revision history for Set::Similarity::CosinePDL
+
+0.013  2016-11-24 12:19:39 CET
+       - travis for Perl 5.24
+
+0.012  2016-11-24 11:25:29 CET
+       - requires 'parent'
+
+0.011  2015-04-27 16:04:49 CEST
+       - improved travis, badges
+
+0.010  2014-10-19 22:22:13 CEST
+       - naming of internal methods
+
+0.009  2014-10-10 10:56:15 CEST
+       requires Set::Similarity 0.022
+
+0.008  2014-08-16 23:44:36 CEST
+       - badges in pod
+
+0.007  2014-08-16 07:49:34 CEST
+       - add travis
+
+0.006  2014-08-10 08:54:27 CEST
+       - code simplification
+
+0.005  2014-08-05 22:35:52 CEST
+       - code cleanup
+
+0.004  2014-08-04 22:02:53 CEST
+       - quote version
+
+0.003  2014-08-02 11:27:04 CEST
+       - change minimal Perl version to 5.6
+
+0.002  2014-07-29 21:37:17 CEST
+       - tests need proper rounding on some platforms
+
+0.001  2014-07-28 20:06:38 CEST
+       - Initial release.

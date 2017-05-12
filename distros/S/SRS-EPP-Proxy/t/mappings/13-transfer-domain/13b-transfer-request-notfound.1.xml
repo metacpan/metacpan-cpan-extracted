@@ -1,0 +1,9 @@
+<NZSRSResponse VerMajor="4" VerMinor="3" RegistrarId="104">
+<Response Action="Whois" FeId="8" FeSeq="4775126" OrigRegistrarId="1" RecipientRegistrarId="1">
+  <FeTimeStamp Day="1" Hour="08" Minute="50" Month="7" Second="34" TimeZoneOffset="+12:00" Year="2010"/>
+  <Domain DomainName="mozzarella.co.te" Status="Available"/>
+</Response>
+<Response Action="DomainUpdate" FeId="8" FeSeq="4775126" OrigRegistrarId="1" RecipientRegistrarId="1" TransId="20100701 1">
+  <FeTimeStamp Day="1" Hour="08" Minute="50" Month="7" Second="34" TimeZoneOffset="+12:00" Year="2010"/>
+</Response>
+</NZSRSResponse>

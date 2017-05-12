@@ -1,0 +1,6 @@
+Revision history for Perl extension SMS::Send::IN::Unicel.
+
+0.01  Wed Apr 29 03:57:55 2015
+	- original version; created by h2xs 1.23 with options
+		-AX -n SMS::Send::IN::Unicel
+

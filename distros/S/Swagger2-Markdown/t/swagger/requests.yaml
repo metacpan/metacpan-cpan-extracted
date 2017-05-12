@@ -1,0 +1,63 @@
+---
+x-api-blueprint:
+  resource_section: name_uri
+  action_section: name_method
+swagger: "2.0"
+info:
+  version: "1.0"
+  title: Requests API
+  description: |
+    Following the [Responses](05.%20Responses.md) example, this API will show you how to define multiple requests and what data these requests can bear. Let's demonstrate multiple requests on a trivial example of content negotiation.
+
+    ## API Blueprint
+    + [Previous: Responses](05.%20Responses.md)
+    + [This: Raw API Blueprint](https://raw.github.com/apiaryio/api-blueprint/master/examples/06.%20Requests.md)
+    + [Next: Parameters](07.%20Parameters.md)
+
+paths:
+  /message:
+    x-api-blueprint:
+      group: Messages
+      summary: My Message
+      description: |
+        Group of all messages-related resources.
+    get:
+      summary: Retrieve a Message
+      description: |
+        In API Blueprint requests can hold exactly the same kind of information and can be described by exactly the same structure as responses, only with different signature - using the `Request` keyword. The string that follows after the `Request` keyword is a request identifier. Again, using an explanatory and simple naming is the best way to go.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: Accept
+          type: string
+      responses:
+        200:
+          description: The response message
+          headers:
+            X-My-Message-Header:
+              description: some header
+              type: integer
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+            example: "{ \"message\": \"Hello World!\" }"
+    put:
+      summary: Update a Message
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: message
+          schema:
+            format: string
+            example: "{ \"message\": \"All your base are belong to us.\" }"
+      responses:
+        204:
+          description: The response message
+
+# vim: ts=2:sw=2:et

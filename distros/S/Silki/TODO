@@ -1,0 +1,52 @@
+* Print-friendly stylesheet
+
+* Table layout can overlap tags box and other parts of page
+
+* Export
+    * set of HTML pages
+    * pdf
+
+* Inline feed - {{feed: http://.../foo.rss}}
+
+* Inline internal and external (Google) search
+
+* Backlinks for attachments?
+    * wikipedia implements attachments & images as special types of pages, I think
+
+* Determine wiki by path or hostname (dev.wiki.company.com or wiki.company.com/wiki/dev)?
+
+* AJAX suggestions for tags
+
+* FT search for attachment content
+
+* Make per-wiki user lists sortable on something besides name.
+
+* Move/copy pages between wikis
+
+* Gardening features - mass tag/untag, mass delete, mass move, mass rename via
+  regex, ...
+
+* Proper WYSIWYG editor
+
+* Image gallery like MojoMojo?
+
+= Reporting
+
+* Logins?
+* Attachment views, edits?
+
+= Archiving feature
+
+* auto-archiving of unread content somehow
+    * only shows up in search when explicitly asked for
+
+= Users
+
+* allow email aliases for purposes of logging in
+
+= Other
+
+* Remove all monkey-patching (Session plugin, ErrorHandling, HTTP::Body
+  filename preservation hack)
+    * session unhacking would ideally involve building an alternate, much simpler
+      session mechanism

@@ -1,0 +1,8 @@
+0.003     2017-03-21 01:16:49 EDT
+  - Include Sereal::Encoder and Sereal::Decoder versions in tests for debugging purposes
+
+0.002     2016-08-24 13:27:50 EDT
+  - Allow Sereal::Encoder options to be passed to dclone()
+
+0.001     2016-02-05 03:15:43 EST
+  - First release

@@ -1,0 +1,39 @@
+Revision history for Perl module String::Tokenizer
+
+0.06 2016-02-23
+    - Tweaked format of this file closer to CPAN::Changes::Spec
+    - Switched to Dist::Zilla, adding the github repo to the metadata,
+      ensuring dist has META.{json,yml}, and min perl version specified.
+    - Changed tests t/pod.t and t/pod_coverage.t to be release tests
+    - Applied spelling corrections from RT#70040; thanks to BJ Webb.
+    - Made the module names in SEE ALSO be L<...> links
+
+0.05 2004-08-31 STEVAN
+    - added support for whitespace tokens, feature
+      requested by Stephan Tobias.
+        - added tests for this
+        - added documenation for this
+    - fixed bug where the '0' token got ignored, also
+      thanks to Stephan Tobias for this.
+
+0.04 2004-08-22 STEVAN
+    - added skipTokensUntil and collectTokensUntil methods
+      to the String::Tokenizer::Iterator
+        - added test for this
+        - added documentation for this
+    - added the pod.t and pod_coverage.t test files
+
+0.03 2004-05-06 STEVAN
+    - fixed some documentation issues.
+    - added token iteration support with the inner class
+      String::Tokenizer::Iterator.
+        - added tests for iteration
+        - added documentation for iteration
+
+0.02 2004-04-12 STEVAN
+    - error in the Makefile.PL file, no changes on this release
+
+0.01 2004-04-12 STEVAN
+    - original version; created by h2xs 1.22
+      with options -X -n String::Tokenizer
+

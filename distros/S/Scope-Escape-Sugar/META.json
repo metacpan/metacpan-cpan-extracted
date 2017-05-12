@@ -1,0 +1,65 @@
+{
+   "abstract" : "whizzy syntax for non-local control transfer",
+   "author" : [
+      "Andrew Main (Zefram) <zefram@fysh.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Scope-Escape-Sugar",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Devel::CallChecker" : "0.003",
+            "Devel::CallParser" : "0.001",
+            "ExtUtils::CBuilder" : "0.15",
+            "Module::Build" : 0,
+            "Test::More" : 0,
+            "perl" : "5.011002",
+            "strict" : 0,
+            "warnings" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : 0,
+            "perl" : "5.011002",
+            "strict" : 0,
+            "warnings" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "B::Hooks::EndOfScope" : "0.05",
+            "Devel::CallChecker" : "0.003",
+            "Devel::CallParser" : "0.001",
+            "Exporter" : 0,
+            "Scope::Escape" : "0.004",
+            "XSLoader" : 0,
+            "parent" : 0,
+            "perl" : "5.011002",
+            "strict" : 0,
+            "warnings" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Scope::Escape::Sugar" : {
+         "file" : "lib/Scope/Escape/Sugar.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.002"
+}

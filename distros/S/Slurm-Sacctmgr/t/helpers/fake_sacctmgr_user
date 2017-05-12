@@ -1,0 +1,310 @@
+#!/bin/sh
+#
+#Fake sacctmgr show user results for testing
+
+#Updated to handle preTRES (Slurm v 14.x.y) and postTRES (Slurm 15.x.y) data
+#USe env var FAKE_SLURM_VERSION to set this
+#Also accepts --version and format= arguments
+
+#Order of fields is now controllable via format option
+#Below is the default if no format given
+FORMAT_FIELDS="user defaultaccount adminlevel"
+
+verbose_flag=
+
+print_version()
+{	version=$1
+	cat - <<EOF
+slurm $version
+EOF
+	exit 0
+}
+
+print_header()
+{
+	tmptext=
+	for fld in $FORMAT_FIELDS
+	do
+		case $fld in
+		#-----	Common stuff
+		    adminlevel)
+			tmptext="${tmptext}Admin"
+			;;
+		    defaultaccount)
+			tmptext="${tmptext}Def Acct"
+			;;
+		    user)
+			tmptext="${tmptext}User"
+			;;
+
+		#-----	special (read-only) stuff
+		    coordinators)
+			tmptext="${tmptext}Coord"
+			;;
+
+		#-----	no preTRES stuff
+		#-----	no postTRES stuff
+		#-----	ERROR
+		    *)
+			echo >&2 "Unrecognized field name $fld in format string, aborting"
+			exit 1;
+			;;
+		esac
+		tmptext="${tmptext}|"
+	done
+	echo $tmptext
+}
+
+
+print_user()
+{	
+	#Clear values
+	#	common
+	tmp_adminlevel=None
+	tmp_defaultaccount=
+	tmp_user=
+	tmp_coordinators=
+
+	#no preTRES stuff
+	#no postTRES stuff
+
+
+	#Set values
+	while [ $# -gt 0 ]
+	do
+		key=$1
+		val=$1
+		shift
+		key=`echo $key | sed -e 's/=.*$//'`
+		val=`echo $val | sed -e 's/^[^=]*=//'`
+		#echo >&2 "$key = $val"
+
+		case $key in
+		#----	Common fields
+		    adminlevel)
+			tmp_adminlevel=$val
+			;;
+		    defaultaccount)
+			tmp_defaultaccount=$val
+			;;
+		    user)
+			tmp_user=$val
+			;;
+
+		#-----	special (read-only) stuff
+		    coordinators)
+			tmp_coordinators=$val
+			;;
+
+		#----	no preTRES fields
+		#----	no postTRES fields
+		#----	ERROR
+		    *)
+			echo >&2 "Unrecognized parm $key, aborting"
+			exit 1
+			;;
+		esac
+	done
+		    
+	#Print values
+	tmptext=
+	for fld in $FORMAT_FIELDS
+	do
+		case $fld in
+		#----	common fields
+		    adminlevel)
+			tmptext="${tmptext}${tmp_adminlevel}"
+			;;
+		    defaultaccount)
+			tmptext="${tmptext}${tmp_defaultaccount}"
+			;;
+		    user)
+			tmptext="${tmptext}${tmp_user}"
+			;;
+		    coordinators)
+			tmptext="${tmptext}${tmp_coordinators}"
+			;;
+
+
+		#----	no preTRES fields
+		#----	no preTRES fields
+		#----	ERROR
+		    *)
+			echo >&2 "Unrecognized field name $fld in format string, aborting"
+			exit 1;
+			;;
+		esac
+		tmptext="${tmptext}|"
+	done
+	echo $tmptext
+
+
+}
+
+print_specified_user()
+{	usr=$1
+
+	case $usr in
+	   aaa)
+		print_user user='aaa' defaultaccount='test'
+		;;
+	   bbb)
+		print_user user='bbb' defaultaccount='test' adminlevel='Administrator'
+		;;
+	   ccc)
+		print_user user='ccc' defaultaccount='abc114' adminlevel='Administrator'
+		;;
+	   ddd)
+		print_user user='ddd' defaultaccount='test'
+		;;
+	   *)
+		x=x
+		#echo >&2 "Unknown user $usr"
+		;;
+	esac
+}
+
+print_users()
+{	if [ "x$verbose_flag" = "xyes" ]; then
+		print_header
+	fi
+	while [ $# -gt 0 ]
+	do
+		usr=$1
+		shift
+		print_specified_user $usr
+	done
+}
+
+print_all_users()
+{	#Must do alphabetically
+	print_users 'aaa' 'bbb' 'ccc' 'ddd'
+}
+
+
+print_test_users()
+{	#Print all users with defacct test
+	print_users 'aaa' 'bbb' 'ddd'
+}
+
+print_abc114_users()
+{	#Print all users with defacct test
+	print_users 'ccc'
+}
+
+print_all_admins()
+{	#Print all users with adminlevel Admin
+	print_users 'bbb' 'ccc'
+}
+
+print_test_admins()
+{	#Print all users with defacct test and adminlevel Admin
+	print_users 'bbb'
+}
+
+print_abc114_admins()
+{	#Print all users with defacct test and adminlevel Admin
+	print_users 'ccc'
+}
+
+print_all_nonadmins()
+{	#Print all non-admins
+	print_users 'aaa' 'ddd'
+}
+
+print_test_nonadmins()
+{	print_users 'aaa' 'ddd'
+}
+
+print_abc114_nonadmins()
+{	return
+}
+
+#Parse options
+defacct_flag=
+name_flag=
+alevel_flag=
+
+while [ $# -gt 0 ]
+do
+	arg=$1
+	shift
+
+	case $arg in
+	    --version)
+		#Print version and exit
+		if [ "x$FAKE_SLURM_VERSION" = "x" ]; then
+			print_version 14
+		else
+			print_version $FAKE_SLURM_VERSION
+		fi
+		exit 0
+		;;
+	    format=*)
+		#Set our format string
+		tmp=`echo $arg | sed -e 's/^format=//' -e "s/'//g" -e 's/"//g' -e 's/,/ /g'`
+		FORMAT_FIELDS=$tmp
+		;;
+	    name=* )
+		tmp=`echo $arg | sed -e 's/^name=//' -e "s/'//g" -e 's/"//g' `
+		name_flag=$tmp
+		;;
+	    user=* )
+		tmp=`echo $arg | sed -e 's/^user=//' -e "s/'//g" -e 's/"//g' `
+		name_flag=$tmp
+		;;
+	    adminlevel=* )
+		tmp=`echo $arg | sed -e 's/^adminlevel=//' -e "s/'//g" -e 's/"//g' `
+		alevel_flag=$tmp
+		;;
+	     defaultaccount=* )
+		tmp=`echo $arg | sed -e 's/^defaultaccount=//' -e "s/'//g" -e 's/"//g' `
+		defacct_flag=$tmp
+		;;
+	     -v|--verbose)
+		verbose_flag=yes
+		;;
+	esac
+done
+
+if [ "x${alevel_flag}" != "x" ]; then
+	#adminlevel requested, possibly with defacct
+	if [ "x${defacct_flag}" = "x" ]; then
+		if [ "x${alevel_flag}" = "xAdministrator" ]; then
+			#adminlevel only
+			print_all_admins;
+		elif [ "x${alevel_flag}" = "xNone" ]; then
+			print_all_nonadmins
+		fi
+	else
+	    if [ "x${alevel_flag}" = "xAdministrator" ]; then
+		#admin + defacct
+		if [ "x${defacct_flag}" = "xtest" ]; then
+			print_test_admins;
+		elif [ "x$defacct_flag}" = "xabc114" ]; then
+			print_abc114_admins;
+		fi
+	    elif [ "x${alevel_flag}" = "xNone" ]; then
+		#nonadmin + defacct
+		if [ "x${defacct_flag}" = "xtest" ]; then
+			print_test_nonadmins;
+		elif [ "x$defacct_flag}" = "xabc114" ]; then
+			print_abc114_nonadmins;
+		fi
+	    fi
+	fi
+elif [ "x${defacct_flag}" != "x" ]; then
+	#defacct specified.  Do not handle multiple flags here
+	if [ "x$defacct_flag" = "xtest" ]; then
+		print_test_users
+	elif [ "x$defacct_flag" = "xabc114" ]; then
+		print_abc114_users
+	fi
+elif [ "x${name_flag}" != "x" ]; then
+	#name specified.  Do not handle multiple flags here
+	print_specified_user $name_flag
+else
+	#No flags, print everyone
+	print_all_users
+fi
+

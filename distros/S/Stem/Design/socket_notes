@@ -1,0 +1,19 @@
+		       Stem::Socket Design Notes
+
+The Stem::Socket module provides an interface to create connected
+sockets. It can either connect to a remote socket as a client or listen
+for connections as a server. Its constructor takes an owner object, an
+optional host or IP address and a required port number. Also a boolean
+flag designates whether is it a client or server. If no host argument is
+provided, it will default to localhost. To make a server listen on any
+IP address (with the wild card INADDR_ANY), pass in the empty string ''
+as the host.
+
+When a socket connection is made (either a client or a server), the
+owner object is notified by a callback and the handle of the newly
+created socket is passed to it. Since a client socket can timeout when
+connecting to a server, a timeout value can be set. If the connection
+request times out a different method is used as the callback to the
+owner object.
+
+This module is only used internally and should not be configured.

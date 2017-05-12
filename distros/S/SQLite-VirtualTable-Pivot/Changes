@@ -1,0 +1,7 @@
+Revision history for SQLite-VirtualTable-Pivot
+
+0.01    September 30, 2009
+        First version
+
+0.02    November 11, 2009
+        Optimizations, improved algorithm

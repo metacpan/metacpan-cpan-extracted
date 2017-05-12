@@ -1,0 +1,16 @@
+Changes
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/Scope/Context.pm
+samples/synopsis.pl
+t/00-load.t
+t/02-can.t
+t/10-basic.t
+t/11-target.t
+t/12-actions.t
+t/13-valid.t
+t/14-cmp.t
+t/15-info.t

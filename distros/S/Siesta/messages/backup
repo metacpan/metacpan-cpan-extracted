@@ -1,0 +1,54 @@
+#!/bin/sh
+[% USE Date %]
+# siesta backup up script created on [% Date.format %] by nacho 
+# report bugs to the siesta-dev team
+# http://siesta.unixbeard.net
+
+###
+# First create the database
+###
+nacho create-database
+
+###
+# Then, let's create users ...
+###
+[% FOREACH member = members %]
+# [% member.email %]
+nacho create-member [% member.email %]
+    [%- FOREACH col = member.columns -%]
+        [%- IF col != 'email' && col != 'id' %]
+nacho modify-member [% member.email %] [% col %] [% shellq( member.$col ) %]
+        [%- END -%] 
+    [%- END -%]
+[% END %]
+
+###
+# Finally we create the lists, add the plugins
+# and set the plugin prefs for the list and each user
+###
+[% FOREACH list = lists %]
+
+# [% list.name %]
+nacho create-list [% list.name %] [% list.owner.email %] [% list.post_address %] [% list.return_path %]
+    [%- FOREACH queue  = list.queues %] 
+
+nacho set-plugins [% list.name %] [% queue %] [%- FOREACH plugin = list.plugins( queue ) -%] [% plugin.personal ? '+' : '' %][% plugin.name %][% END -%]
+        [%- FOREACH plugin = list.plugins( queue ) -%]
+            [%- FOREACH key = plugin.options.keys %] 
+nacho modify-plugin [% plugin.name %] [% list.name %] [% shellq( key ) %] [% shellq( plugin.pref( key ) ) %]
+            [%- END -%]
+
+            [%- IF plugin.personal -%]
+                [%- FOREACH member = list.members -%][% x = plugin.member( member ) %]
+                    [%- FOREACH key = plugin.options.keys %]
+                        [%- val = plugin.pref( key ) %]
+                        [%- IF val != plugin.options.$key.default %]
+nacho modify-plugin [% plugin.name %] [% list.name %] [% shellq( key ) %] [% shellq( plugin.pref( key ) )%] [% member.email %] 
+                        [%- END -%]
+                    [%- END -%]
+                [%- END -%]
+            [% END %]
+        [%- END -%]
+
+    [%- END -%]
+[%- END -%]

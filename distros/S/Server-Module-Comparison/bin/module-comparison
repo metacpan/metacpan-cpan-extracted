@@ -1,0 +1,84 @@
+#!/usr/bin/perl
+use strictures 2;
+# PODNAME: module-comparison
+# ABSTRACT: check perl module versions installed on servers.
+
+use Pod::Usage;
+use Getopt::Long qw(:config gnu_getopt);
+
+my %option = (
+    help => sub { pod2usage(verbose => 2) },
+);
+GetOptions(\%option,
+    'modules|m=s', 
+    'list=s', 
+    'live=s', 
+    'staging=s', 
+    'perl=s', 
+);
+unless((($option{live} && $option{staging}) || $option{list}) && $option{modules})
+{
+    pod2usage(
+        verbose => 0, 
+        exitval => 1, 
+        message => "Missing specify module list and live and staging servers"
+    );
+}
+use Server::Module::Comparison;
+my $extra = {};
+if($option{perl})
+{
+    $extra->{perl_path} = $option{perl};
+}
+my $comp = Server::Module::Comparison::FromModuleList($option{modules}, $extra);
+if($option{staging})
+{
+    my $staging = $comp->check_correct_guess($option{staging});
+    my $live = $comp->check_correct_guess($option{live});
+    my $report = $comp->difference_report($live, $staging);
+    print $comp->human_readable_report($report);
+}
+elsif($option{list})
+{
+    my $modules = $comp->check_correct_guess($option{list});
+    print "Loaded modules\n\n";
+    $DB::single = 1;
+    print $comp->human_readable_list($modules);
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+module-comparison - check perl module versions installed on servers.
+
+=head1 VERSION
+
+version 0.012
+
+=head1 SYNOPSIS
+
+    module-comparison --modules module-list.txt --live live-server.somedomain --staging quay.io/opusvl/somecontainer [--perl /opt/perl5/bin]
+    module-comparison --modules module-list.txt --list quay.io/opusvl/somecontainer [--perl /opt/perl5/bin]
+    module-comparison --modules - --list docker://somecontainer [--perl /opt/perl5/bin]
+
+=head1 DESCRIPTION
+
+Compare a list of perl modules on each server to see what is different.
+
+=head1 AUTHOR
+
+Colin Newell <colin@opusvl.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by OpusVL.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

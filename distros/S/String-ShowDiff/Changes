@@ -1,0 +1,13 @@
+Revision history for Perl extension String::ShowDiff.
+
+0.03  Tue May 06, 2003
+    - enabled that module also works with some older Perls
+
+0.02  Sat Apr 26, 2003
+    - added option context for the ansi_colored_diff method
+    
+0.01  Fri Apr 25, 2003
+	- original version; created by h2xs 1.22 with options
+		-XA -b5.6.0 String::ShowDiff
+	- enabled method
+	  ansi_colored_diff($string, $newstring, $options)

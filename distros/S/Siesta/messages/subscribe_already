@@ -1,0 +1,8 @@
+Hi,
+ You could not be subscribed to [% list.name %].
+
+Maybe you are already subscribed?  You might like to contact
+the list owner, [% list.owner.email %], for more assistance.
+
+Apologies,
+ - Siesta::Plugin::Subscribe

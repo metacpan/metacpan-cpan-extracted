@@ -1,0 +1,10 @@
+Revision history for Perl extension Slauth.
+
+0.02  Sat Mar 25 23:22:01 PST 2006
+	- add mod_perl 2.0 compatibility
+	- add small test suite (3 scripts, 19 tests)
+	- bug fix: configuration realm gets updated automatically at start
+	  if it's an alias for another realm
+
+0.01  Sat Dec 12 03:39:40 2004
+	- original version; running code as of Dec 12

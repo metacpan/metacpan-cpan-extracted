@@ -1,0 +1,24 @@
+---
+abstract: 'Simple subroutine alias.'
+author:
+  - 'Kang-min Liu  C<< <gugod@gugod.org> >>'
+build_requires:
+  Test::More: 0.42
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Sub::Alias
+name: Sub-Alias
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Devel::BeginLift: 0
+  Devel::Declare: 0
+  Sub::Exporter: 0
+  perl: 5.8.0
+version: 0.03

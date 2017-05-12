@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/SVK/Log/Filter/Date.pm
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+SIGNATURE
+t/0-signature.t
+t/00-load.t
+t/pod.t
+Makefile.PL
+SIGNATURE    Added here by Module::Build

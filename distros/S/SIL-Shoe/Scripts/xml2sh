@@ -1,0 +1,335 @@
+#!/usr/bin/perl
+
+use SIL::Shoe::XPath;
+use SIL::Shoe::Settings;
+use XML::XPath;
+use XML::XPath::Node qw(:node_keys);
+use Encode::Registry;
+use Encode qw(encode_utf8);
+use Getopt::Std;
+use Pod::Usage;
+
+getopts('a:dhl:ms:t:');
+
+if ($opt_h)
+{
+    pod2usage( -verbose => 2);
+    exit;
+}
+
+unless (defined $ARGV[0])
+{
+    pod2usage(1);
+    exit;
+}
+
+my @months = (qw(error Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec));
+
+if ($opt_m)
+{ $opt_a ||= "_"; }
+else
+{ $opt_a ||= 'value'; }
+
+my ($t) = Text::LangTag->parse($opt_l);
+my ($s) = $t->just_script;
+$vern_script = $s->to_string;
+$vern_lang = $t->no_script->to_string;
+
+$opt_s = "." unless defined $opt_s;
+$settings = SIL::Shoe::Settings->new($opt_s) || die "Unable to read settings directory at $opt_s";
+
+$typef = $settings->type($opt_t) || die "Can't find .typ file for type: $s->{' Type'}";
+$typef->read;
+$typef->add_specials;
+
+$lngdef = $settings->lang($typef->{'lngDefault'});
+$lngdef->add_specials if ($lngdef);
+if ($opt_c)
+{ $deflang = $opt_c; }
+elsif ($lngdef->{'codepage'})
+{ $deflang = $lngdef->{'codepage'}; }
+elsif ($^O eq 'MSWin32')
+{
+    require Win32::TieRegistry;
+    Win32::TieRegistry->import(Delimiter => '/');
+
+    $deflang = $Registry->{"LMachine/SYSTEM/ControlSet/CurrentControlSet/Control/Nls/CodePage//ACP"};
+}
+
+unless ($deflang)
+{ $deflang = 1252; }
+
+$defenc = Encode::Registry::find_encoding($deflang) || Encode::Registry::find_encoding('iso-8859-1')
+    || die "Can't make an encoding converter for $deflang";
+
+my ($count) = 2;
+foreach $k (sort keys %{$typef->{'mkr'}})
+{
+    $nk = transform($k);
+    $tree->{$k}{'element'} = $nk;
+    $parent = $typef->{'mkr'}{$k}{'mkrOverThis'};
+    if (defined $tree->{$k}{'interlinid'})
+    {
+        if (defined $tree->{$k}{'parent'})
+        { $parent = $tree->{$k}{'parent'}[0]; }
+        else
+        { 
+            push (@{$tree->{'interlinear block'}{'child'}}, $k);
+            $nk = 'interlinear block';
+            $tree->{$nk}{'element'} = 'interlinear-block';
+            $tree->{$k}{'parent'} = [$nk];
+            $k = 'interlinear block';
+        }
+    }
+    $parent ||= 'shoebox';
+    $tree->{$k}{'parent'} = [$parent] unless defined $tree->{$k}{'parent'};
+    $tree->{$parent}{'child'}{$k} = 1;
+    if (defined $typef->{'mkr'}{$k} && defined $typef->{'mkr'}{$k}{'mkrsOverThis'})
+    {
+        foreach (split(' ', $typef->{'mkr'}{$k}{'mkrsOverThis'}))
+        {
+            push (@{$tree->{$k}{'parent'}}, $_);
+            $tree->{$_}{'child'}{$k} = 1;
+        }
+    }
+    $tree->{$k}{'xpath_prefers'} = [split(' ', $typef->{'mkr'}{$k}{'xpath_prefers'})];
+    $tree->{$k}{'xpath_index'} = $count;
+    $count += 2;
+}
+$tree->{''}{'xpath_index'} = $count;
+
+foreach $k (sort keys %{$typef->{'mkr'}}, '')
+{
+    my ($xt) = $k ? $typef->{'mkr'}{$k}{'xpath'} : $typef->{'xpath_default'};
+    my ($nk) = transform($k);
+    my ($lang) = $settings->lang($k ? $typef->{'mkr'}{$k}{'lng'} : $typef->{'lngDefault'});
+    my (%vars) = (
+        'm' => $k,
+        'vl' => $vern_lang,
+        'vs' => $vern_script,
+        'll' => $lang->lang_tag || 'und',
+        'ls' => $lang->script_tag || 'Zyyy'
+    );
+
+    if ($xt)
+    { }
+    elsif ($opt_m)
+    { $xt = "$nk/$opt_a=\$v"; }
+    elsif (@{$tree->{$k}{'child'}})
+    { $xt = "$nk\[\@$opt_a=\$v]"; }
+    else
+    { $xt = "$nk=\$v"; }
+
+    print STDERR "$k: $xt, " . join(",", %vars) . "\n" if ($opt_d);
+    my ($xp) = XML::XPath::Parser->new->parse($xt);
+#    set_self($xp);
+    foreach (keys %vars)
+    { $xp->{'pp'}->set_var($_, XML::XPath::Literal->new($vars{$_})); }
+
+    $xp->{'pp'}->set_mode('collect');
+    $xps{$k} = $xp;
+    $tree->{$k}{'xpath_index'} = shift_index($tree, @{$tree->{$k}{'xpath_prefers'}})
+            if (@{$tree->{$k}{'xpath_prefers'}} && !$tree->{$k}{'xpath_set'});
+    $tree->{$k}{'xpath_set'} = 1;
+}
+
+$root = $xps{$typef->{'mkrRecord'}[0]};
+set_self($root);
+
+print STDERR "Splitting on: " . $root->as_string . "\n" if ($opt_d);
+
+$context = SIL::Shoe::XPath->parse_file($ARGV[0], [[$root => \&process_record]]);
+
+sub process_record
+{
+    my ($nodes, $path) = @_;
+    my ($n);
+
+    foreach $n ($nodes->get_nodelist)
+    {
+        print process_node($n, $path, $typef->{'mkrRecord'}[0]);
+        print "\n";
+    }
+}
+
+sub process_node
+{
+    my ($node, $path, $mkr) = @_;
+    my ($c, $res, %res, $n, $enc, $cp, %masks, $m, $xk, $masked);
+
+    my ($val) = $node->getNodeVars->{'v'}->string_value;
+    $val =~ s/^\s*//o;
+    $val =~ s/\s*$//o;
+    unless ($mkr)
+    {
+        return '' unless ($node->getNodeVars && $node->getNodeVars->{'m'});
+        $mkr = $node->getNodeVars->{'m'}->string_value;
+    }
+    if (defined $typef->{'mkr'}{$mkr}{'xtype'})
+    { $val = datatype($typef->{'mkr'}{$mkr}{'xtype'}, $val); }
+    ($enc, $cp) = get_enc($mkr, $settings, $typef, $defenc, $opt_s);
+    $val = $enc ? $enc->encode($val) : encode_utf8($val);
+    print STDERR "data: \\$mkr $val\n" if ($opt_d);
+    $res .= "\\$mkr $val\n";
+    return $res unless ($node->isElementNode);
+    foreach $xk (sort {$tree->{$a}{'xpath_index'} <=> $tree->{$b}{'xpath_index'}} keys %{$tree->{$mkr}{'child'}}, '')
+    {
+        print STDERR "testing \\$xk: " . $xps{$xk}->as_string . "\n" if ($opt_d);
+        my ($tres) = $xps{$xk}->evaluate($node);
+        my ($masked) = 0;
+        if ($tres->isa('XML::XPath::NodeSet') && $tres->to_boolean->value)
+        {
+            $masks{$xp} = $tres;
+            foreach $m (@{$tree->{$xk}{'xpath_prefers'}})
+            {
+                if (defined $masks{$m})
+                {
+                    $masked = 1;
+                    last;
+                }
+            }
+            unless ($masked)
+            {
+                foreach $n ($tres->get_nodelist)
+                {
+                    my ($ind) = $n->get_global_pos;
+                    print STDERR "at: $ind - " if ($opt_d);
+                    $res{$ind} .= process_node($n, $xps{$xk}, $xk);
+                }
+            }
+        }
+    }
+    $res .= join('', map {$res{$_}} sort {$a == 0 ? 1 : $a <=> $b} keys %res);
+    $res;
+}
+
+sub transform
+{
+    my ($str) = (@_);
+    $str =~ s/^(\d)/_.$1/o;
+    $str;
+}
+
+sub set_self
+{
+    my ($xp) = @_;
+    my ($s);
+
+    foreach $s (qw(lhs rhs))
+    {
+        next unless (defined $xp->{$s});
+        if ($xp->{$s}->isa('XML::XPath::Expr'))
+        { set_self($xp->{$s}); }
+        elsif ($xp->{$s}->isa('XML::XPath::LocationPath') && ($xp->{$s}[0]{'axis'} eq 'child' || $xp->{$s}[0]{'axis'} eq 'exist'))
+        {
+            $xp->{$s}[0]{'axis'} = 'self';
+            $xp->{$s}[0]{'axis_method'} = 'axis_self';
+        }
+    }
+}
+
+sub get_enc
+{
+    my ($marker, $settings, $typef, $defenc, $base) = @_;
+    my ($res, $enc);
+    
+    unless ($lang = $settings->lang($typef->{'mkr'}{$marker}{'lng'}))
+    { $enc = $defenc; }
+    elsif (defined $lang->{'encoding'})
+    { $enc = $lang->{'encoding'}; }
+    elsif (defined $lang->{'UnicodeLang'})
+    { undef $enc; }
+    else
+    {
+        my ($cp);
+        $lang->add_specials;
+        $cp = $lang->{'codepage'};
+        if ($cp eq 'none')
+        { $enc = undef; }           # this may cause problems since data can be non utf8 conformant
+        elsif ($cp =~ /\.tec$/o)
+        {
+            $enc = Encode::TECkit->new(File::Spec->catfile($base, $cp));
+            unless ($enc)
+            {
+                print STDERR "Unable to find TECkit mapping $cp, using default encoding\n";
+                $enc = $defenc;
+            }
+        }
+        else
+        {
+            $cp ||= $charsets{hex($lang->{'charset'})};
+            $enc = Encode::Registry::find_encoding($cp);
+            $res = $cp;
+            if (!$enc && $cp)
+            {
+                print STDERR "Unable to find encoding $cp, using default\n";
+                $enc = $defenc;
+            }
+        }
+        $lang->{'encoding'} = $enc;
+    }
+    ($enc, $res);
+}
+
+sub datatype
+{
+    my ($type, $str) = @_;
+    my ($res) = $str;
+
+    $type =~ s/\s*$//o;
+    if ($type eq 'date')
+    {
+        my (@f) = split('-', $str);
+        $res = sprintf("%02d/%s/%04d", $f[2], $months[$f[1]], $f[0]);
+    }
+    return $res;
+}
+
+sub shift_index
+{
+    my ($tree, @masks) = @_;
+    my ($m, $max);
+    
+    foreach $m (@masks)
+    {
+        if (@{$tree->{$m}{'xpath_prefers'}} && !$tree->{$m}{'xpath_set'})
+        {
+            $tree->{$m}{'xpath_index'} = shift_index($tree, @{$tree->{$m}{'xpath_prefers'}});
+            $tree->{$m}{'xpath_set'} = 1;
+        }
+        my ($newind) = $tree->{$m}{'xpath_index'} + 1;
+        $max = $newind if ($max < $newind);
+    }
+    return $max;
+}
+
+__END__
+
+=head1 TITLE
+
+xml2sh - Convert XML data to Toolbox
+
+=head1 SYNOPSIS
+
+    xml2sh [-s settings_dir] [-a attrib] [-d]
+            [-x stylesheet] [-e encs] [-m] [-i] [-f] infile
+
+Converts XML to Toolbox data, sending the outputs to stdout.
+
+=head1 OPTIONS
+
+    -a attrib       Default attribute name (or tag if -m) [value]
+    -d              print debug statements saying what xpath is being tested
+    -h              Print copious help (the manpage)
+    -l lang         Specifies language tag of vernacular language
+    -m              MDF style output with character marker support
+    -s dir          Directory to find .typ files in [.]
+    -t type         Database type name (not the .typ filename)
+    
+=head1 DESCRIPTION
+
+The aim of xml2sh is to convert XML data into standard format. It does this
+by using the \xpath statements in the database description. In effect this
+allows XML data generated by C<sh2xml -p> to be converted back to SFM.
+
+=cut

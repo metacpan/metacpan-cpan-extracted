@@ -1,0 +1,24 @@
+Sub-Deferrable
+
+Sub::Deferrable implements a simple means of either executing a sub
+or saving its invocation on a stack for execution later. This is
+loosely analogous to deferring interrupts: normally, the interrupt
+handler runs; when the interrupt is deferred, the interrupt is
+queued and the handler is run later.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005-2012 Budney, Len
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

@@ -1,0 +1,1532 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE NewsML SYSTEM "../ref/NewsMLv1.0.dtd" [ <!ELEMENT body (body.content)><!ELEMENT body.content (p*)><!ELEMENT p (#PCDATA)>]>
+<?xml-stylesheet type="text/xsl" href="..\Resources\XMLLinks.xsl"?>
+<NewsML>
+	<Catalog>
+		<Resource>
+			<Url>http://www.reuters.com/ids/vocabularies/ids/subjref.xml</Url>
+			<DefaultVocabularyFor Context="Subject"/>
+		</Resource>
+		<Resource>
+			<Url>http://www.reuters.com/ids/vocabularies/ids/product.xml</Url>
+			<DefaultVocabularyFor Context="NewsProduct"/>
+		</Resource>
+		<Resource>
+			<Url>http://www.reuters.com/ids/vocabularies/ids/destination.xml</Url>
+			<DefaultVocabularyFor Context="NewsService"/>
+		</Resource>
+		<Resource>
+			<Url>http://www.reuters.com/ids/vocabularies/ids/roles.xml</Url>
+			<DefaultVocabularyFor Context="Role"/>
+		</Resource>
+		<Resource>
+			<Url>http://www.reuters.com/ids/vocabularies/ids/newslines.xml</Url>
+			<DefaultVocabularyFor Context="NewsLine"/>
+		</Resource>
+		<Resource>
+			<Url>http://www.reuters.com/ids/vocabularies/iptc-priority.xml</Url>
+			<DefaultVocabularyFor Context="Priority"/>
+		</Resource>
+		<Resource>
+			<Url>http://www.reuters.com/ids/vocabularies/iptc-provider.xml</Url>
+			<DefaultVocabularyFor Context="ProviderId"/>
+		</Resource>
+		<Resource>
+			<Url>http://www.reuters.com/ids/vocabularies/iptc-newsitemtype.xml</Url>
+			<DefaultVocabularyFor Context="NewsItemType"/>
+		</Resource>
+		<Resource>
+			<Url>http://www.reuters.com/ids/vocabularies/iptc-status.xml</Url>
+			<DefaultVocabularyFor Context="Status"/>
+		</Resource>
+		<Resource>
+			<Url>http://www.reuters.com/ids/vocabularies/iptc-urgency.xml</Url>
+			<DefaultVocabularyFor Context="Urgency"/>
+		</Resource>
+		<Resource>
+			<Url>http://www.reuters.com/ids/vocabularies/iptc-mediatype.xml</Url>
+			<DefaultVocabularyFor Context="MediaType"/>
+		</Resource>
+		<Resource>
+			<Url>http://www.reuters.com/ids/vocabularies/iptc-mimetype.xml</Url>
+			<DefaultVocabularyFor Context="MimeType"/>
+		</Resource>
+		<Resource>
+			<Url>http://www.reuters.com/ids/vocabularies/iso-language.xml"</Url>
+			<DefaultVocabularyFor Context="Language"/>
+		</Resource>
+	</Catalog>
+	<NewsEnvelope>
+		<DateAndTime>20010907T151305+0000</DateAndTime>
+		<NewsService FormalName="OUWDPLUS"/>
+		<Priority FormalName="4"/>
+	</NewsEnvelope>
+	<NewsItem>
+		<Identification>
+			<NewsIdentifier>
+				<ProviderId>Reuters.Com</ProviderId>
+				<DateId>20010907</DateId>
+				<NewsItemId>ID00301</NewsItemId>
+				<RevisionId PreviousRevision="0" Update="N">1</RevisionId>
+				<PublicIdentifier>urn:newsml:Reuters.Com:20010907:ID00301:1</PublicIdentifier>
+			</NewsIdentifier>
+		</Identification>
+		<NewsManagement>
+			<NewsItemType FormalName="News"/>
+			<FirstCreated>20010907T151305+0000</FirstCreated>
+			<ThisRevisionCreated>20010907T151305+0000</ThisRevisionCreated>
+			<Status FormalName="Usable"/>
+			<Urgency FormalName="4"/>
+		</NewsManagement>
+		<NewsComponent EquivalentsList="no">
+			<Catalog>
+				<Resource>
+					<Url>http://www.reuters.com/ids/vocabularies/topictypes.xml</Url>
+					<DefaultVocabularyFor Context="TopicSet/@FormalName"/>
+				</Resource>
+			</Catalog>
+			<TopicSet FormalName="companies">
+				<Catalog>
+					<Resource>
+						<Url>http://www.reuters.com/ids/vocabularies/nasdaqvocab.xml</Url>
+						<DefaultVocabularyFor Context="Topic/TopicType/@FormalName"/>
+					</Resource>
+				</Catalog>
+				<Topic Details="www.reuters.com" Duid="company1">
+					<TopicType FormalName="company"/>
+					<FormalName Scheme="ric">RTRSY.O</FormalName>
+					<FormalName Scheme="nasdticker">RTRSY</FormalName>
+					<FormalName Scheme="companyshortname">Reuters</FormalName>
+					<Description xml:lang="en" Variant="fullcompanyname">REUTERS PLC</Description>
+				</Topic>
+			</TopicSet>
+			<Role FormalName="SUPER_LINKED_LIST"/>
+			<NewsLines>
+				<HeadLine>SLL-SHOWCASE</HeadLine>
+				<ByLine></ByLine>
+				<DateLine>20010907</DateLine>
+				<CreditLine>REUTERS</CreditLine>
+				<CopyrightLine>Â© 2000 Reuters Limited. All rights 
+reserved. Republication or redistribution of Reuters content or 
+maintenance releases or similar, including by framing or similar means, 
+is expressly prohibited without the prior written consent of Reuters. 
+Reuters and the Reuters Sphere logo are registered trademarks and 
+trademarks of the Reuters group of companies around the 
+world.</CopyrightLine>
+				<SlugLine>OUWDPLUS-SUPER-LINK</SlugLine>
+				<NewsLine>
+					<NewsLineType FormalName="caption"/>
+					<NewsLineText>Super Linked List</NewsLineText>
+				</NewsLine>
+			</NewsLines>
+			<AdministrativeMetadata>
+				<FileName></FileName>
+				<Provider>
+					<Party FormalName="Reuters" Topic="#company1"/>
+				</Provider>
+				<Creator>
+					<Party FormalName="Reuters" Topic="#company1"/>
+				</Creator>
+			</AdministrativeMetadata>
+			<RightsMetadata>
+				<Copyright>
+					<CopyrightHolder>
+						<Origin Href="#company1"/>
+					</CopyrightHolder>
+					<CopyrightDate/>
+				</Copyright>
+			</RightsMetadata>
+			<DescriptiveMetadata>
+				<Language FormalName="en"/>
+			</DescriptiveMetadata>
+			<!--Start of NEWS EVENT NewsComponent-->
+			<NewsComponent>
+				<Role FormalName="NEWS_EVENT"/>
+				<NewsLines>
+					<HeadLine>OUKWDPLUS-LUS-MICROSOFT-JUSTICE</HeadLine>
+					<SlugLine></SlugLine>
+				</NewsLines>
+				<Metadata>
+					<MetadataType FormalName="Order"/>
+					<Property FormalName="StoryOrder" Value="1"/>
+				</Metadata>
+				<!--Start of 'grouping' NewsComponent-->
+				<NewsComponent EquivalentsList="no">
+					<Role FormalName="MAIN"/>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="TEXT"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="1"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>U.S. abandons Microsoft break-up effort</HeadLine>
+								<SlugLine>OUKWDPLUS-LUS-MICROSOFT-JUSTICE</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T084140Z_01_CAS731511_RTRIDST_0_OUKWDPLUS-LUS-MICROSOFT-JUSTICE.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="2"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>BILL GATES LISTENS DURING A MICROSOFT FORUM IN REDMOND</HeadLine>
+								<SlugLine>TECH MICROSOFT</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T100716Z_01_WAS22D_RTRIDSP_0_TECH-MICROSOFT.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="COMPOSITE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="3"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>Microsoft to remain intact</HeadLine>
+								<SlugLine>OLUKWDPLUS-Video</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T145200Z_01_RTRIDSP_0_MICROSOFT_TO.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="4"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>BILL GATES SIGNS OFF ON RELEASE OF WINDOWS XP TO MANUFACTURING</HeadLine>
+								<SlugLine>gatesandallchin.jpg</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T101747Z_01_NONE01_RTRIDSP_0_GATESANDALLCHIN-JPG.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="5"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>MICROSOFT CHIEF EXECUTIVE STEVE BALLMER IN BRAZIL</HeadLine>
+								<SlugLine>balmer01.jpg</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T102824Z_01_NONE01_RTRIDSP_0_BALMER01-JPG.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="6"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>JUDGE THOMAS PENFIELD JACKSON</HeadLine>
+								<SlugLine>jackson02.jpg</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T104723Z_01_NONE01_RTRIDSP_0_JACKSON02-JPG.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="7"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>BILL GATES WITH A COPY OF WINDOWS XP</HeadLine>
+								<SlugLine>gates02.jpg</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T102437Z_01_NONE01_RTRIDSP_0_GATES02-JPG.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="8"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>POP STAR A-MEI AT MICROSOFT CHARITY CONCERT</HeadLine>
+								<SlugLine>amei.jpg</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T103743Z_01_NONE01_RTRIDSP_0_AMEI-JPG.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--End of 'grouping' NewsComponent-->
+				</NewsComponent>
+				<!--Start of 'grouping' NewsComponent-->
+				<NewsComponent EquivalentsList="no">
+					<Role FormalName="SIDEBAR_A"/>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="TEXT"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="1"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>Open code and licenses among possible Microsoft fates</HeadLine>
+								<SlugLine>OUKWDPLUS-LUS-MICROSOFT-JUSTICE-REMEDIES</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T084158Z_01_CAS731547_RTRIDST_0_OUKWDPLUS-LUS-MICROSOFT-JUSTICE-REMEDIES.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="2"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>BILL GATES GESTURES DURING A MICROSOFT FORUM IN REDMOND</HeadLine>
+								<SlugLine>OFRIN-MICROSOFT-USA-JUSTICE</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T100645Z_01_NONE01_RTRIDSP_0_OFRIN-MICROSOFT-USA-JUSTICE.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="3"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>MICROSOFT'S JIM ALLCHIN WITH FIRST PRODUCTION COPIES OF WINDOWS XP</HeadLine>
+								<SlugLine>allchin.jpg</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T101604Z_01_NONE01_RTRIDSP_0_ALLCHIN-JPG.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="4"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>MICROSOFT SHARES</HeadLine>
+								<SlugLine>Microsoft.jpg</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T105714Z_01_NONE01_RTRIDSP_0_MICROSOFT-JPG.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--End of 'grouping' NewsComponent-->
+				</NewsComponent>
+				<!--Start of 'grouping' NewsComponent-->
+				<NewsComponent EquivalentsList="no">
+					<Role FormalName="SIDEBAR_B"/>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="TEXT"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="1"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>Judge Jackson's remedies in Microsoft case</HeadLine>
+								<SlugLine>OUKWDPLUS-MICROSOFT-JUSTICE-REMEDIES-FACTBOX</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T084412Z_01_CAS731627_RTRIDST_0_OUKWDPLUS-MICROSOFT-JUSTICE-REMEDIES-FACTBOX.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="2"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>JUDGE THOMAS PENFIELD JACKSON</HeadLine>
+								<SlugLine>jackson01.jpg</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T104217Z_01_NONE01_RTRIDSP_0_JACKSON01-JPG.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="3"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>BILL GATES AT RESEARCH EVENT</HeadLine>
+								<SlugLine>gates01.jpg</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T101247Z_01_NONE01_RTRIDSP_0_GATES01-JPG.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--End of 'grouping' NewsComponent-->
+				</NewsComponent>
+				<!--Start of 'grouping' NewsComponent-->
+				<NewsComponent EquivalentsList="no">
+					<Role FormalName="SIDEBAR_C"/>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="TEXT"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="1"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>Key events in U.S. versus Microsoft</HeadLine>
+								<SlugLine>OUKWDPLUS-MICROSOFT-CHRONOLOGY</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T085301Z_01_CAS732160_RTRIDST_0_OUKWDPLUS-MICROSOFT-CHRONOLOGY.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="2"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>MICROSOFT'S GATES AND INTEL'S GROVE LOOK AT HISTORIC IBM PC</HeadLine>
+								<SlugLine>groveandgates.jpg</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T103402Z_01_NONE01_RTRIDSP_0_GROVEANDGATES-JPG.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--End of 'grouping' NewsComponent-->
+				</NewsComponent>
+				<!--Start of 'grouping' NewsComponent-->
+				<NewsComponent EquivalentsList="no">
+					<Role FormalName="SIDEBAR_D"/>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="TEXT"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="1"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>Justice Department statement on Microsoft</HeadLine>
+								<SlugLine>OUKWDPLUS-MICROSOFT-JUSTICE-TEXT</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T084712Z_01_CAS731752_RTRIDST_0_OUKWDPLUS-MICROSOFT-JUSTICE-TEXT.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="2"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>BILL GATES SPEAKING AT ARTIFICIAL INTELLIGENCE CONFERENCE IN SEATTLE</HeadLine>
+								<SlugLine>gates03.jpg</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T103606Z_01_NONE01_RTRIDSP_0_GATES03-JPG.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--End of 'grouping' NewsComponent-->
+				</NewsComponent>
+				<!--Start of 'grouping' NewsComponent-->
+				<NewsComponent EquivalentsList="no">
+					<Role FormalName="SIDEBAR_E"/>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="TEXT"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="1"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>HP unveils handheld with upgraded chip and software</HeadLine>
+								<SlugLine>OUKWDPLUS-TECH-INTEL-HP</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T125519Z_01_CAS746738_RTRIDST_0_OUKWDPLUS-TECH-INTEL-HP.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="2"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>HP'S NEW JORNADA</HeadLine>
+								<SlugLine>hp.jpg</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T140334Z_01_NONE01_RTRIDSP_0_HP-JPG.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--End of 'grouping' NewsComponent-->
+				</NewsComponent>
+				<!--End of NEWS EVENT NewsComponent-->
+			</NewsComponent>
+			<!--Start of NEWS EVENT NewsComponent-->
+			<NewsComponent>
+				<Role FormalName="NEWS_EVENT"/>
+				<NewsLines>
+					<HeadLine>OUKWDPLUS-LUS-ZIMBABWE</HeadLine>
+					<SlugLine></SlugLine>
+				</NewsLines>
+				<Metadata>
+					<MetadataType FormalName="Order"/>
+					<Property FormalName="StoryOrder" Value="2"/>
+				</Metadata>
+				<!--Start of 'grouping' NewsComponent-->
+				<NewsComponent EquivalentsList="no">
+					<Role FormalName="MAIN"/>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="TEXT"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="1"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>Zimbabwe land deal fuels hopes</HeadLine>
+								<SlugLine>OUKWDPLUS-LUS-ZIMBABWE</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T125221Z_01_CAS746569_RTRIDST_0_OUKWDPLUS-LUS-ZIMBABWE.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="2"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>BRITISH FOREIGN SECRETARY STRAW SPEAKS WITH ZIMBABWEAN FOREIGN MINISTER MUDENGE </HeadLine>
+								<SlugLine>OUKWD-ZIMBABWE-TALKS</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T115155Z_01_NONE01_RTRIDSP_0_OUKWD-ZIMBABWE-TALKS.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="3"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>ZIMBABWE FARMER WILLIAM STEELE HUGS MOTHER AND SISTER</HeadLine>
+								<SlugLine>zim01.jpg</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T120212Z_01_NONE01_RTRIDSP_0_ZIM01-JPG.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="4"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>FARM WORKER CLEARS UP AFTER LOOTING</HeadLine>
+								<SlugLine>zim02.jpg</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T120511Z_01_NONE01_RTRIDSP_0_ZIM02-JPG.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="5"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>CLEANING UP AFTER LOOTING</HeadLine>
+								<SlugLine>zim03.jpg</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T121726Z_01_NONE01_RTRIDSP_0_ZIM03-JPG.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--End of 'grouping' NewsComponent-->
+				</NewsComponent>
+				<!--Start of 'grouping' NewsComponent-->
+				<NewsComponent EquivalentsList="no">
+					<Role FormalName="SIDEBAR_A"/>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="TEXT"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="1"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>Zimbabwe links funding to ending land occupations</HeadLine>
+								<SlugLine>OUKWDPLUS-LUS-ZIMBABWE-TALKS</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T145158Z_01_CAS753744_RTRIDST_0_OUKWDPLUS-LUS-ZIMBABWE-TALKS.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="2"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>INSERT YOUR HEADLINE HERE</HeadLine>
+								<SlugLine>mudenge.jpg</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T153404Z_01_NONE01_RTRIDSP_0_MUDENGE-JPG.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--End of 'grouping' NewsComponent-->
+				</NewsComponent>
+				<!--Start of 'grouping' NewsComponent-->
+				<NewsComponent EquivalentsList="no">
+					<Role FormalName="SIDEBAR_B"/>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="TEXT"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="1"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>Zimbabwe opposition wants Mugabe pressured on land</HeadLine>
+								<SlugLine>OUKWDPLUS-ZIMBABWE-TALKS-REACTION</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T103956Z_01_CAS738586_RTRIDST_0_OUKWDPLUS-ZIMBABWE-TALKS-REACTION.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="2"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>OPPOSITION LEADER MORGAN TSVANGIRAI</HeadLine>
+								<SlugLine>zim04.jpg</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T121926Z_01_NONE01_RTRIDSP_0_ZIM04-JPG.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--End of 'grouping' NewsComponent-->
+				</NewsComponent>
+				<!--Start of 'grouping' NewsComponent-->
+				<NewsComponent EquivalentsList="no">
+					<Role FormalName="SIDEBAR_C"/>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="TEXT"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="1"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>Zimbabwe deal-broker Obasanjo is no diplomat</HeadLine>
+								<SlugLine>OUKWDPLUS-ZIMBABWE-TALKS-OBASANJO</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T142251Z_01_CAS751906_RTRIDST_0_OUKWDPLUS-ZIMBABWE-TALKS-OBASANJO.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="2"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>NIGERIA PRESIDENT OLUSEGUN OBASANJO </HeadLine>
+								<SlugLine>OUKTP-ZIMBABWE-TALKS</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T115450Z_01_ABU06_RTRIDSP_0_OUKTP-ZIMBABWE-TALKS.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--End of 'grouping' NewsComponent-->
+				</NewsComponent>
+				<!--Start of 'grouping' NewsComponent-->
+				<NewsComponent EquivalentsList="no">
+					<Role FormalName="SIDEBAR_D"/>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="TEXT"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="1"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>As Britain backs off, Africa steps in on Zimbabwe</HeadLine>
+								<SlugLine>OUKWDPLUS-BRITAIN-ZIMBABWE-DIPLOMACY</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T141724Z_01_CAS751670_RTRIDST_0_OUKWDPLUS-BRITAIN-ZIMBABWE-DIPLOMACY.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="2"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>SOFTLY-SOFTLY STRAW</HeadLine>
+								<SlugLine>straw.jpg</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T153811Z_01_NONE01_RTRIDSP_0_STRAW-JPG.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="3"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>HARD MAN HAIN</HeadLine>
+								<SlugLine>hain.jpg</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T154131Z_01_NONE01_RTRIDSP_0_HAIN-JPG.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--End of 'grouping' NewsComponent-->
+				</NewsComponent>
+				<!--Start of 'grouping' NewsComponent-->
+				<NewsComponent EquivalentsList="no">
+					<Role FormalName="SIDEBAR_E"/>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="TEXT"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="1"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>Displaced Zimbabwe farmer doubts land deal</HeadLine>
+								<SlugLine>OUKWDPLUS-LUS-BRITAIN-ZIMBABWE-FARMER</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T145203Z_01_CAS753757_RTRIDST_0_OUKWDPLUS-LUS-BRITAIN-ZIMBABWE-FARMER.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="2"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>ZIMBABWE FARM WORKER WALKS THROUGH BURNT PASTURE</HeadLine>
+								<SlugLine>OUKTP-BRITAIN-ZIMBABWE</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T115800Z_01_NONE01_RTRIDSP_0_OUKTP-BRITAIN-ZIMBABWE.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--End of 'grouping' NewsComponent-->
+				</NewsComponent>
+				<!--End of NEWS EVENT NewsComponent-->
+			</NewsComponent>
+			<!--Start of NEWS EVENT NewsComponent-->
+			<NewsComponent>
+				<Role FormalName="NEWS_EVENT"/>
+				<NewsLines>
+					<HeadLine>OUKWDPLUS-LUS-IRISH</HeadLine>
+					<SlugLine></SlugLine>
+				</NewsLines>
+				<Metadata>
+					<MetadataType FormalName="Order"/>
+					<Property FormalName="StoryOrder" Value="3"/>
+				</Metadata>
+				<!--Start of 'grouping' NewsComponent-->
+				<NewsComponent EquivalentsList="no">
+					<Role FormalName="MAIN"/>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="TEXT"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="1"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>Silence reigns as Northern Irish Catholics walk to school</HeadLine>
+								<SlugLine>OUKWDPLUS-LUS-IRISH</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T133517Z_01_CAS749025_RTRIDST_0_OUKWDPLUS-LUS-IRISH.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="2"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>NATALIE MCDONALD WATCHES BROTHER WEEP</HeadLine>
+								<SlugLine>IRISH</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T150729Z_01_BFT10D_RTRIDSP_0_IRISH.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="3"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>THOMAS MCDONALD WEEPS AS HE  CARRIES THE COFFIN OF HIS SON</HeadLine>
+								<SlugLine>IRISH</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T151022Z_01_BFT15D_RTRIDSP_0_IRISH.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="4"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>PALL BEARERS CARRIES THE COFFIN OF SCHOOLBOY THOMAS MCDONALD IN BELFAST</HeadLine>
+								<SlugLine>IRISH</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T151159Z_01_BFT14D_RTRIDSP_0_IRISH.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="5"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>RELATIVES OF BOY  HUG IN FRONT OF HIS COFFIN</HeadLine>
+								<SlugLine>IRISH</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T151005Z_01_BFT16D_RTRIDSP_0_IRISH.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--End of 'grouping' NewsComponent-->
+				</NewsComponent>
+				<!--Start of 'grouping' NewsComponent-->
+				<NewsComponent EquivalentsList="no">
+					<Role FormalName="SIDEBAR_A"/>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="TEXT"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="1"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>Pope calls for goodwill in Northern Ireland school row</HeadLine>
+								<SlugLine>OUKWDPLUS-IRISH-POPE</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T133144Z_01_CAS748923_RTRIDST_0_OUKWDPLUS-IRISH-POPE.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="2"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>A CATHOLIC CHILD BITES HER LIP AS SHE IS ESCORTED TO HOLY CROSS PRIMARY SCHOOL</HeadLine>
+								<SlugLine>IRISH</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T151644Z_01_BFT01D_RTRIDSP_0_IRISH.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="3"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>PROTESTANT SCHOOLGIRLS  BLOW WHISTLES AS CATHOLIC CHILDREN ARE LED TO SCHOOL IN </HeadLine>
+								<SlugLine>IRISH</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T151555Z_01_BFT02D_RTRIDSP_0_IRISH.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="4"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>A CATHOLIC CHILD  IS ESCORTED TO HOLY CROSS PRIMARY SCHOOL</HeadLine>
+								<SlugLine>IRISH</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T151520Z_01_BFT05D_RTRIDSP_0_IRISH.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="5"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>CATHOLIC CHILD IS COMFORTED BY HER PARENTS AS SHE IS ESCORTED TO HOLY CROSS SCHO</HeadLine>
+								<SlugLine>OUKTP-IRISH</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T151428Z_01_NONE01_RTRIDSP_0_OUKTP-IRISH.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="6"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>CATHOLIC SCHOOLGIRL LED TO SCHOOL ON ARDOYNE ROAD</HeadLine>
+								<SlugLine>BRITAIN IRISH</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T151311Z_01_BFT06_RTRIDSP_0_BRITAIN-IRISH.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--End of 'grouping' NewsComponent-->
+				</NewsComponent>
+				<!--Start of 'grouping' NewsComponent-->
+				<NewsComponent EquivalentsList="no">
+					<Role FormalName="SIDEBAR_B"/>
+					<!--End of 'grouping' NewsComponent-->
+				</NewsComponent>
+				<!--Start of 'grouping' NewsComponent-->
+				<NewsComponent EquivalentsList="no">
+					<Role FormalName="SIDEBAR_C"/>
+					<!--End of 'grouping' NewsComponent-->
+				</NewsComponent>
+				<!--Start of 'grouping' NewsComponent-->
+				<NewsComponent EquivalentsList="no">
+					<Role FormalName="SIDEBAR_D"/>
+					<!--End of 'grouping' NewsComponent-->
+				</NewsComponent>
+				<!--Start of 'grouping' NewsComponent-->
+				<NewsComponent EquivalentsList="no">
+					<Role FormalName="SIDEBAR_E"/>
+					<!--End of 'grouping' NewsComponent-->
+				</NewsComponent>
+				<!--End of NEWS EVENT NewsComponent-->
+			</NewsComponent>
+			<!--Start of NEWS EVENT NewsComponent-->
+			<NewsComponent>
+				<Role FormalName="NEWS_EVENT"/>
+				<NewsLines>
+					<HeadLine>OUKWDPLUS-LEISURE-MTV</HeadLine>
+					<SlugLine></SlugLine>
+				</NewsLines>
+				<Metadata>
+					<MetadataType FormalName="Order"/>
+					<Property FormalName="StoryOrder" Value="4"/>
+				</Metadata>
+				<!--Start of 'grouping' NewsComponent-->
+				<NewsComponent EquivalentsList="no">
+					<Role FormalName="MAIN"/>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="TEXT"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="1"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>"Lady Marmalade," 'N Sync top MTV Video Awards</HeadLine>
+								<SlugLine>OUKWDPLUS-LEISURE-MTV</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T133829Z_01_CAS749174_RTRIDST_0_OUKWDPLUS-LEISURE-MTV.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="2"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>JAMIE FOXX SINGS AT THE MTV AWARDS</HeadLine>
+								<SlugLine>ENTERTAINMENT MTV</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T145648Z_01_NYK25D_RTRIDSP_0_ENTERTAINMENT-MTV.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="3"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>MUSIC GROUP NSYNC ACCEPTS THEIR AWARD FOR BEST DANCE VIDEO</HeadLine>
+								<SlugLine>ENTERTAINMENT MTV</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T145730Z_01_NYK40D_RTRIDSP_0_ENTERTAINMENT-MTV.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="4"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>KID ROCK AND PAM ANDERSON</HeadLine>
+								<SlugLine>ENTERTAINMENT MTV</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T145526Z_01_NYK18D_RTRIDSP_0_ENTERTAINMENT-MTV.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="5"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>JANET JACKSON AND HER DATE ARRIVE AT THE MTV AWARDS</HeadLine>
+								<SlugLine>ENTERTAINMENT MTV</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T145337Z_01_NYK13D_RTRIDSP_0_ENTERTAINMENT-MTV.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="6"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>MACY GRAY'S DRESS TELLS A STORY</HeadLine>
+								<SlugLine>OUKEN-PEOPLE-MACY</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T144852Z_01_NYK60D_RTRIDSP_0_OUKEN-PEOPLE-MACY.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="7"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>BRITNEY SPEARS PERFORMS ON STAGE</HeadLine>
+								<SlugLine>ENTERTAINMENT MTV</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T150302Z_01_NYK55D_RTRIDSP_0_ENTERTAINMENT-MTV.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="8"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>MICHAEL JACKSON</HeadLine>
+								<SlugLine>ENTERTAINMENT MTV</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T150028Z_01_NYK66D_RTRIDSP_0_ENTERTAINMENT-MTV.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="9"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>JENNIFER LOPEZ PERFORMS</HeadLine>
+								<SlugLine>ENTERTAINMENT MTV</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T145915Z_01_NYK64D_RTRIDSP_0_ENTERTAINMENT-MTV.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="10"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>BONO ON STAGE</HeadLine>
+								<SlugLine>ENTERTAINMENT MTV</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T150136Z_01_NYK56D_RTRIDSP_0_ENTERTAINMENT-MTV.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--End of 'grouping' NewsComponent-->
+				</NewsComponent>
+				<!--Start of 'grouping' NewsComponent-->
+				<NewsComponent EquivalentsList="no">
+					<Role FormalName="SIDEBAR_A"/>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="TEXT"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="1"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>List of MTV winners</HeadLine>
+								<SlugLine>OUKWDPLUS-LEISURE-MTV-LIST</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T140342Z_01_CAS750810_RTRIDST_0_OUKWDPLUS-LEISURE-MTV-LIST.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="2"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>BRITNEY SPEARS AND FRIEND</HeadLine>
+								<SlugLine>OUKEN-PEOPLE-BRITNEY</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T144756Z_01_NONE01_RTRIDSP_0_OUKEN-PEOPLE-BRITNEY.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="3"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>ALICIA KEYS WINS BEST NEW ARTIST IN A VIDEO</HeadLine>
+								<SlugLine>ENTERTAINMENT MTV</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T145805Z_01_NYK41D_RTRIDSP_0_ENTERTAINMENT-MTV.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="4"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>MOBY ACCEPTS AWARD FOR BEST MALE VIDEO</HeadLine>
+								<SlugLine>ENTERTAINMENT MTV</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T150332Z_01_NYK35D_RTRIDSP_0_ENTERTAINMENT-MTV.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="5"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>U2 ACCEPTS AWARD</HeadLine>
+								<SlugLine>ENTERTAINMENT MTV</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T150231Z_01_NYK49D_RTRIDSP_0_ENTERTAINMENT-MTV.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--Start of 'ordered item' NewsComponent-->
+					<NewsComponent EquivalentsList="yes">
+						<Role FormalName="PICTURE"/>
+						<BasisForChoice>/@xml:lang</BasisForChoice>
+						<Metadata>
+							<MetadataType FormalName="Order"/>
+							<Property FormalName="ComponentNumber" Value="6"/>
+						</Metadata>
+						<!--Start of bottom level per-language NewsComponent-->
+						<NewsComponent xml:lang="en">
+							<NewsLines>
+								<HeadLine>MUDVAYNE ACCEPT AWARD</HeadLine>
+								<SlugLine>ENTERTAINMENT MTV</SlugLine>
+							</NewsLines>
+							<NewsItemRef NewsItem="2001-09-07T150107Z_01_NYK58D_RTRIDSP_0_ENTERTAINMENT-MTV.XML"/>
+							<!--End of bottom level NewsComponent-->
+						</NewsComponent>
+						<!--End of 'ordered item' NewsComponent-->
+					</NewsComponent>
+					<!--End of 'grouping' NewsComponent-->
+				</NewsComponent>
+				<!--Start of 'grouping' NewsComponent-->
+				<NewsComponent EquivalentsList="no">
+					<Role FormalName="SIDEBAR_B"/>
+					<!--End of 'grouping' NewsComponent-->
+				</NewsComponent>
+				<!--Start of 'grouping' NewsComponent-->
+				<NewsComponent EquivalentsList="no">
+					<Role FormalName="SIDEBAR_C"/>
+					<!--End of 'grouping' NewsComponent-->
+				</NewsComponent>
+				<!--Start of 'grouping' NewsComponent-->
+				<NewsComponent EquivalentsList="no">
+					<Role FormalName="SIDEBAR_D"/>
+					<!--End of 'grouping' NewsComponent-->
+				</NewsComponent>
+				<!--Start of 'grouping' NewsComponent-->
+				<NewsComponent EquivalentsList="no">
+					<Role FormalName="SIDEBAR_E"/>
+					<!--End of 'grouping' NewsComponent-->
+				</NewsComponent>
+				<!--End of NEWS EVENT NewsComponent-->
+			</NewsComponent>
+		</NewsComponent>
+	</NewsItem>
+</NewsML>

@@ -1,0 +1,33 @@
+Secret::Simple version 0.11
+
+This module implements a straightforward interface for encrypting and
+decrypting secret information like user IDs and passwords. Use is
+primarily geared towards accessing or embedding secure credentials from
+or within Perl code and configuration files (e.g. database connection
+or remote account credentials), but in can also be used to encrypt
+arbitrary data. See the POD documentation for more details.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Carp
+    Crypt::CBC
+    Crypt::Rijndael_PP
+    MIME::Base64
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006, Adam Foust. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

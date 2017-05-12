@@ -1,0 +1,24 @@
+Revision history for Perl extension VCD.
+
+TODO
+	- Move more of the functionality in the bin/VertFigure script
+	  down into the library.
+	- Documentation for the library.
+	- Add ability to draw atlas/axis shapes.
+	- Add ability to draw key of glyphs.
+
+0.4  Sat Apr 12 11:51:46 BST 2014
+	- Rename the command-line program, the GitHub repo, and the
+	  project in general from vcd2svg to VertFigure.
+
+0.3  Mon Apr  7 09:48:04 BST 2014
+	- Move top-level VCD module down into SVG::VCD. This is more
+	  polite for CPAN.
+
+0.2  Mon Apr  7 09:26:03 BST 2014
+	- First public release.
+
+0.1  Thu Feb  6 11:12:35 2014
+	- original version; created by h2xs 1.23 with options
+		-X -n VCD -a --skip-exporter
+

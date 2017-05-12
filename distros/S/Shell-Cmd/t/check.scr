@@ -1,0 +1,2 @@
+TESTDIR/bin/fail      #OPTS check TESTDIR/bin/succ
+TESTDIR/bin/succ.2

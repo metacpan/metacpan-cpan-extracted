@@ -1,0 +1,42 @@
+---
+abstract: 'Indents all lines in a multi-line string'
+author:
+  - 'Erik Carlsson <info@code301.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Syntax::Feature::Qi: '0.2004'
+  Test::More: '0.96'
+  syntax: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, Dist::Iller version 0.1407, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: String-Nudge
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  String::Nudge:
+    file: lib/String/Nudge.pm
+    version: '1.0001'
+requires:
+  Exporter: '5.67'
+  perl: '5.010000'
+resources:
+  bugtracker: https://github.com/Csson/p5-String-Nudge/issues
+  homepage: https://metacpan.org/release/String-Nudge
+  repository: https://github.com/Csson/p5-String-Nudge.git
+version: '1.0001'
+x_authority: cpan:CSSON

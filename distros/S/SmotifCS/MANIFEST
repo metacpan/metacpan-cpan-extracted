@@ -1,0 +1,25 @@
+bin/smotifcs.pl
+bin/smotifcs_config.ini
+Changes
+lib/SmotifCS.pm
+lib/SmotifCS/ClusterRankSmotifs.pm
+lib/SmotifCS/Compare_shifts_torsion.pm
+lib/SmotifCS/EnumerateSmotifCombinations.pm
+lib/SmotifCS/GenerateShiftFiles.pm
+lib/SmotifCS/GeometricalCalculations.pm
+lib/SmotifCS/MYSQLSmotifs.pm
+lib/SmotifCS/PhylipParser.pm
+lib/SmotifCS/Protein.pm
+lib/SmotifCS/RankEnumeratedStructures.pm
+lib/SmotifCS/RunModeller.pm
+lib/SmotifCS/StatisticalPotential.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+smotifcs.pl
+smotifcs_config.ini
+t/pod.t
+t/t
+t/xt
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

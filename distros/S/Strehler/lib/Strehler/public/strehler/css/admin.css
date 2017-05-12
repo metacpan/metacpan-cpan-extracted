@@ -1,0 +1,243 @@
+.navbar .navbar-inner .nav .user
+{
+    border-right: 2px solid;
+}
+.navbar .navbar-inner .nav .first-admin
+{
+    border-left: 2px solid;
+}
+.navbar .navbar-inner .nav .user .user-toggle
+{
+    color: #ed0000;
+}
+.homepage p
+{
+    padding-top: 40px;
+    padding-bottom: 40px;
+}
+.error-msg
+{
+    font-weight: bold;
+    color: #ED0000;
+}
+.divider
+{
+    height: 10px;
+}
+.grey
+{
+    background: #D3D3D3;
+}
+.inlist-icon
+{
+    margin-top: 4px;
+    margin-left: 12px;
+}
+table th .ordered
+{
+    margin-left: 8px;
+    margin-top: 8px;
+}
+table th .asc
+{
+    border-top-width: 0;
+    border-bottom: 4px solid #000000;
+}
+.articlelist .thumbnail img
+{
+    height: 80px;
+}
+.articlelist .table .row
+{
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+.articlelist #tools .row
+{
+    padding-bottom: 10px;
+}
+.articlelist .elementID
+{
+    font-size:30px;
+    padding-top: 20px;
+}
+.article .label
+{
+    margin-bottom: 10px;
+}
+.categorylist .categoryadd div
+{
+    display: inline-block;
+}
+.categorylist .categoryadd button
+{
+    display: inline-block;
+    margin-bottom: 10px;
+}
+
+#tags-place
+{
+    margin-bottom: 7px;
+    font-size: 14px;
+}
+#tags-place span
+{
+    margin-left: 6px;
+    margin-right: 6px;
+}
+
+#footer
+{
+    margin-top: 30px;
+}
+.parent_category
+{
+    background: #eee;
+}
+.table .sub_category
+{
+    padding-left: 40px;
+}
+.table .category-line0
+{
+    background: #F7F7F7;
+}
+.table .category-line1
+{
+    background: #E8E8E8;
+}
+.table .category-line1 .category-display
+{
+    padding-left: 30px;
+}
+.table .category-line2
+{
+    background: #DCDCDC;
+}
+.table .category-line2 .category-display
+{
+    padding-left: 50px;
+}
+.table .category-line3
+{
+    background: #D1D1D1;
+}
+.table .category-line3 .category-display
+{
+    padding-left: 70px;
+}
+.table .category-line4
+{
+    background: #C4C4C4;
+}
+.table .category-line4 .category-display
+{
+    padding-left: 90px;
+}
+.table .category-line5
+{
+    background: #BABABA;
+}
+.table .category-line5 .category-display
+{
+    padding-left: 110px;
+}
+.order-widget div
+{
+    display: inline-block;
+}
+.order-widget button
+{
+    margin-bottom: 12px;
+}
+.btn-tools
+{
+    margin-bottom: 7px;
+}
+.slug
+{
+    color: #8d8d8d;
+}
+.dashboard-first-buttons
+{
+    margin-bottom: 10px;
+}
+.dashboard-section-buttons
+{
+    padding-bottom: 35px;
+}
+.homepage .dashboard-box
+{
+    min-height: 160px;
+}
+.homepage .dashboard-box-p
+{
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+.dashboard-title
+{
+    text-align: center;
+    margin-bottom: 5px;
+}
+.dashboard-subtitle
+{
+    text-align: center;
+    line-height: 10px;
+    margin-top: 0px;
+    color: #bdbdbd;
+    margin-bottom: 25px;
+}
+.backlink
+{
+    margin-bottom: 10px;
+}
+.dash-languages
+{
+    margin-bottom: 10px;
+}
+.tools-buttons
+{
+    margin-top: 10px;
+}
+.navbar .alert
+{
+    max-height: 20px;
+    padding-left: 30px;
+    padding-top: 1px;
+    padding-bottom: 1px;
+}
+.category-widget div
+{
+    display: inline-block;
+}
+.articlelist .sel-category-input label
+{
+    font-weight: bold;
+}
+.articlelist legend
+{
+    border: 0;
+    margin: 0;
+    font-size: 14px;
+    font-weight: normal;
+}
+.category-widget .sel-category-input
+{
+    display: block;
+}
+.category-widget button
+{
+    margin-bottom: 12px;
+}
+.languages-filter span
+{
+    display: inline-block;
+}
+.languages-filter span label
+{
+    display: inline-block;
+    margin-right: 5px;
+}
+
+

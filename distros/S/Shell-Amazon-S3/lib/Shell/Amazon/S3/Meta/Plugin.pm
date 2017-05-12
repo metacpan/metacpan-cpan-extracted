@@ -1,0 +1,21 @@
+package Shell::Amazon::S3::Meta::Plugin;
+
+use Moose;
+
+extends 'Moose::Meta::Role';
+
+before 'apply' => sub {
+    my ( $self, $other ) = @_;
+    if ( my $pre = $self->get_method('BEFORE_PLUGIN') ) {
+        $pre->body->( $other, $self );
+    }
+};
+
+after 'apply' => sub {
+    my ( $self, $other ) = @_;
+    if ( my $pre = $self->get_method('AFTER_PLUGIN') ) {
+        $pre->body->( $other, $self );
+    }
+};
+
+1;

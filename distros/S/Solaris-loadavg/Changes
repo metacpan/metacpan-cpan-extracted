@@ -1,0 +1,6 @@
+Revision history for Perl extension Solaris::loadavg.
+
+0.01  Tue Jun 17 14:41:03 2003
+	- original version; created by h2xs 1.21 with options
+		-A -nSolaris::loadavg -v0.01
+

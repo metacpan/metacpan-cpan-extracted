@@ -1,0 +1,86 @@
+$Id: README,v 1.1.1.1 1998/01/17 23:47:37 ken Exp $
+
+
+			 SGML::SPGroveBuilder
+
+                   A Perl 5 module for loading SGML,
+                   XML, and HTML document instances
+		       into SGML::Grove objects
+		   using James Clark's SGML Parser.
+
+
+                             Ken MacLeod
+                         ken@bitsko.slc.ut.us
+
+OVERVIEW
+
+    The SGML::SPGrove module links with James Clark's SGML Parser (SP)
+    to load SGML, XML, and HTML document instances into SGML::Grove
+    objects.
+
+    SGML::SPGroveBuilder takes a system identifier and passes it to SP
+    to parse, as each element is parsed from the document SPGrove
+    builds SGML::Grove objects to match.  When done parsing, SPGrove
+    returns the SGML::Grove object that contains the root element of
+    the parsed document and an array (hopefully empty :-) of parser
+    errors.
+
+    See the man/pod for SGML::SPGroveBuilder for details on calling
+    SGML::SPGroveBuilder.  See the file Changes for user-visible
+    changes.  See the Perl module SGML::Grove for details on using the
+    grove built by SGML::SPGroveBuilder.
+
+    Newer versions of this module can be found at
+    <ftp://ftp.uu.net/vendor/bitsko/gdo/>.  SGML::SPGroveBuilder
+    shares a mailing list with Quilt.  To subscribe to the Quilt
+    mailing list, send a message with the word `subscribe' in the
+    Subject: field to <quilt-request@bitsko.slc.ut.us>.
+
+    Copyright (C) 1997 Ken MacLeod
+    SGML::SPGroveBuilder is distributed under the same terms as SP.
+    See the file COPYING for distribution terms.
+
+DIFFERENCES FROM SGML::SPGrove
+
+    SGML::SPGrove was split into SGML::SPGroveBuilder (the module that
+    compiles and links with SP to build groves) and SGML::Grove (the
+    module that implements the grove objects).  The module name was
+    changed from SGML::SPGrove to SGML::SPGroveBuilder.
+
+INSTALLATION
+
+    SGML::SPGroveBuilder requires Perl 5 and James Clark's SP (from
+    the Jade distribution).  SP requires a C++ compiler.  Although not
+    strictly a requirement, you will probably want to also install
+    SGML::Grove.
+
+<http://www.perl.com/>
+<http://www.jclark.com/>
+<http://www.perl.com/CPAN/modules/by-module/SGML/> or
+<ftp://ftp.uu.net/vendor/bitsko/gdo/>
+
+    WARNING: Remove SGML::SPGrove before installing
+    SGML::SPGroveBuilder and SGML::Grove.
+
+    1)  SPGrove needs SP's `libsp.a' and include files.  SP's `make
+        install' does not install these.  Create a workarea for
+        compiling SP, compile it and keep the workarea until SPGrove
+        is done.
+
+        Edit SPGrove's Makefile.PL to point `LIBS' to SP's `lib'
+        directory and `INC' to SP's three include directories.  I've
+        left my templates in to point the way.
+
+    2)  standard Perl module after that,
+
+            perl Makefile.PL
+            make
+            make test
+            make install
+
+        Just so you know, SPGrove's copy of SP's library is included
+        in the install, that's over a megabyte and a half.
+
+        FYI, a statically linked perl executable (`make perl') appears
+        to run significantly faster, in one test, 17 seconds instead
+        of 25 seconds.

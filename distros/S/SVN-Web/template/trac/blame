@@ -1,0 +1,58 @@
+[% PROCESS header %]
+
+[% PROCESS _action_menu %]
+
+<div class="diff">
+  [% IF mimetype.match('^text/') %]
+  <table class="inline">
+    <colgroup>
+      <col class="lineno" />
+      <col style="width: 6em;" />
+      <col style="width: 8em;" />
+    </colgroup>
+
+    <thead>
+      <tr>
+        <th>[%|l%](line number)[%END%]</th>
+        <th class="chgset">[%|l%](revision)[%END%]</th>
+        <th class="author">[%|l%](author)[%END%]</th>
+        <th></th>
+      </tr>
+    </thead>
+
+    <tbody>
+    [% colors = [ '#e0e0e0', '#f7f7f7' ] %]
+    [% color_idx = 0 %]
+    [% FOREACH line IN blame_details %]
+      [% same_rev = 0;
+         IF loop.index == 0;
+           same_rev = 0;
+         ELSE;
+           prev_index = loop.index - 1;
+           IF blame_details.${loop.index}.rev == blame_details.${prev_index}.rev;
+             same_rev = 1;
+           ELSE;
+             same_rev = 0;
+           END;
+         END;
+         IF ! same_rev;
+           color_idx = (color_idx + 1) % 2;
+         END
+       %]
+      <tr>
+        <td>[% line.line_no + 1 %]</td>
+        <td class="chgset">[% IF ! same_rev %]<a href="[% c.script %]/[% c.repos | uri %]/revision/?rev=[% line.rev %]">[% line.rev %]</a>[% END %]</td>
+
+        <td class="author" align="center">[% line.author UNLESS same_rev %]</td>
+        <td style="white-space: pre; background: [% colors.$color_idx %];">[% line.line | html %]</td>
+      </tr>
+    [% END %]
+    </tbody>
+  </table>
+  [% ELSIF mimetype.match('^image/') %]
+    <img src="[% c.script %]/[% c.repos | uri %]/checkout[% c.path | url %]" />
+  [% ELSE %]
+<p>This file can not be displayed in the browser.  You can <a href="[% c.script %]/[% c.repos | uri %]/checkout[% c.path | url %]">download it</a>.</p>
+  [% END %]
+</div>
+[% PROCESS footer %]

@@ -1,0 +1,17 @@
+Revision history for Perl extension SMS::Send::AQL.
+
+0.04  2011-02-11
+    - Document _login as correct way to supply username
+
+0.03  2008-03-09
+    - Kwalitee-boosting (include META.yml with valid licence)
+    
+0.02  2008-01-19
+    - stupidly forgot to declare SMS::Send::Driver as a pre-req
+    
+0.01  2008-01-19
+	- original version
+
+
+
+$Id: Changes 280 2008-03-09 01:53:31Z davidp $

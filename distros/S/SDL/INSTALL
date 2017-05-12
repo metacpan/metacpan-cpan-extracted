@@ -1,0 +1,101 @@
+------------------------------------------------------------------------------
+| SDL Perl
+| INSTALL Information Doc
+-------------------------
+
+Table of Contents:
+-----------------
+  * System Requirements
+  * Grabbing the Necessary Version of SDL Perl, Release
+  * Same as Above, but Bleeding Edge
+
+System Requirements:
+-------------------
+
+SDL Perl's package on your system should be able to install everything needed
+for the SDL module to be properly installed. FYI, this may include the
+following libraries (as pre-compiled DLLs for Microsoft Windows platforms):
+
+  * libSDL
+  * png
+  * tiff
+  * jpeg
+  * smpeg
+  * OpenGL (GL)
+  * GLUT   (GLU)
+  * SDL_image
+  * SDL_mixer
+  * SDL_gfx
+  * SDL_ttf
+
+Grabbing the Necessary Version of SDL Perl, Release:
+---------------------------------------------------
+
+It might be a good idea to run from your shell prompt (where the '$' dollar-
+sign denotes the prompt itself, so what you should type follows it):
+
+  $ cpan
+
+You will be presented with the CPAN prompt at this point.
+
+  CPAN> upgrade /.*/
+
+Yeah, CPAN> denotes we are now prompted inside CPAN and recommending upgrading
+everything out-of-date. Then with your site up-to-date:
+
+  CPAN> install SDL
+
+This should fully prepare you to run and program SDL Perl applications.
+
+Same as Above, but Bleeding Edge:
+--------------------------------
+
+As of Thu Mar 17, 2011, you'll need git installed on your machine in order to
+clone from GitHub by running:
+
+  $ git clone https://GitHub.Com/PerlGameDev/SDL.git
+
+To update your clone, go into the directory that the git repo is in
+(i.e., into the git repo itself, not merely the directory that you did the
+`git clone` in) and type the following:
+
+  $ git pull
+
+Now to build, run:
+
+  $ perl Build.PL
+
+Then to test:
+
+  $ perl Build test
+
+Only MacOS used to also require you to:
+
+  $ perl Build bundle
+
+... but that shouldn't be necessary anymore.
+
+Katrina Payne (the original author of this file) had a cute anecdote here
+about SDL Perl being a blushing girl who fails testing and enjoys watching
+InuYasha. Quirky! ;) I couldn't quite bear to replace it all so here's her
+paragraph of glory from Thu Oct 22, 2009:
+
+  "Then if there is an issue getting herself all pretty this command will have 
+her just stop there... your best bet is to give her comfort food. Of the 
+kind of reports on the SDL Perl tracker, as I am not really certain if SDL 
+Perl likes Hagan Daaz, but then I have not ask her, and well, you really are 
+not in the place to ask. After all, she will likely blame you or your system 
+for why she does not look pretty--programs that end up not compiling 
+properly tend to have self esteem issues. Sending something to the tracker 
+pretty much is a way of telling her you are interested... this usually helps 
+her to stop watching old reruns of Inu Yasha (yeah, SDL Perl is still kind of 
+young) and get back to feeling better."
+
+Finally you're done with melodramatic testing and ready to type:
+
+  # perl Build install
+
+The '#' above denotes that this command should be entered from a root or
+super-user account which has sufficient module installation permissions.
+
+Then your installation of SDL Perl should be complete. Yay! Enjoy! =)

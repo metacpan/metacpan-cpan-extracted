@@ -1,0 +1,48 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 66ec8a5d6e238c3fbcc84975dda9ffb3dd091182 CHANGES
+SHA1 d6a6c30ee6d9ba6b9afab8bbf6a25e1b23c744e0 LICENSE
+SHA1 6582329eec9f3a30abd98e0caddc92ff03307b00 MANIFEST
+SHA1 3ceeca0a1cb4977e960c710f501bf9c9d144842a MANIFEST.SKIP
+SHA1 e1895e40df4cfa2a72ff3ff27496beae7e30e0e7 META.yml
+SHA1 9785afc123077c532835291fdc67cf549d5b2bd5 Makefile.PL
+SHA1 1e21ab0c3f1ceee6407d2ee4a53d37afe21465d1 README
+SHA1 3dd7983c02d09107710b76202554dcc129db39b1 TODO
+SHA1 d8f6d2df4e75cb9e6e77a8377457f0ececd00e31 inc/Module/Install.pm
+SHA1 03590cde5c3de0d0d8a84d2b96917ed1a2cf9a30 inc/Module/Install/Base.pm
+SHA1 8ef3c70e905be7d1007b446f21d4eb3ff6ae24cb inc/Module/Install/Can.pm
+SHA1 79054604a1cd4e99443b05cbb62832568a204a33 inc/Module/Install/Fetch.pm
+SHA1 dfa433f2f41d990946f1b3d68a29299539f2dea6 inc/Module/Install/Makefile.pm
+SHA1 72cab336b6be5716aae0a1cb6d9add6c98a7a1f5 inc/Module/Install/Metadata.pm
+SHA1 35a62725a7eade0fa617ef2ba4cf2f4d4a69a3fe inc/Module/Install/Win32.pm
+SHA1 19dcc6d1e9f02c56d3f6d184642f4cd68aa371e6 inc/Module/Install/WriteAll.pm
+SHA1 2eaf8267c72654432ec52238c200379818ba4f1e lib/Set/Light.pm
+SHA1 5b28515e629511858c870474db3ca40b4583a2c1 t/hash.t
+SHA1 0688ebc20a190150f4577ec3c9c5756bebbaab1f t/lightpm.t
+SHA1 a7d7706f851d3bdadce59e7a1bd041fd6f1e3740 t/pod.t
+SHA1 097cc884454c80c73b1bdb0a6eca9d2a99735120 t/pod_cov.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+
+iQEVAwUBR/jhsHcLPEOTuEwVAQKZeAf+KdzDcP9uBz+JTPwoCoVsRkeMqLek9UGi
+RX0J+TmTFVF4CoMNy43M8e9xvu15Wtkcl+3y6UIpNqYkdTf61H7/NuuhEpvx7NxY
+Y64wyUIXuZcFyaXls+K86XrBiJKys3uKI1E5vZRmR/zGXzA788L5ISS7YP/4VLaA
+rg0g135pNHUHXGyuBYDeaYY5Xa2IjKK3C1mdWK0llbcQt6NvinK/DQzu2ApbEWKK
+aXF82bjbEI/mHgmmQ8l2pLwfrjS7JVBmrLfGa01y41U9mkfbOoidaG5heB795WK4
+9YA68dAAPaaRM6HiRTCRV5lj97EGsOePm867HlSzwBP0vgzJ3pQSmw==
+=IIq5
+-----END PGP SIGNATURE-----

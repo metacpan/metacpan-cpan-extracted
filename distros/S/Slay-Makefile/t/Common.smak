@@ -1,0 +1,10 @@
+# -*- makefile -*-
+# A common SlayMakefile for executing tests
+# It is intended to be called from one level lower in the directory
+# hierarchy using "-f ../Common.smak".
+
+default: test
+
+# Include the directory's SlayMakefile.main if it exists
+-include SlayMakefile.main
+

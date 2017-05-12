@@ -1,0 +1,21 @@
+Revision history for Sub::Frequency
+
+0.05    2012-11-25
+ - updated docs to mention return values
+   (thanks blabos for reporting)
+ - updated SEE ALSO section
+
+0.04    2011-06-20
+ - internal refactoring (tbr)
+ - more tests
+
+0.03    2011-06-19
+ - Added often() as an alias for normally (blabos)
+ - Chained frequencies (blabos)
+
+0.02    2010-12-17
+ - Improving documentation
+
+0.01    2010-12-17
+ - First version, released on an unsuspecting world.
+

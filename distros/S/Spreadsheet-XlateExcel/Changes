@@ -1,0 +1,23 @@
+Revision history for Spreadsheet-XlateExcel
+
+0.03    2015-03-04
+        - Fixed a documentation typo.
+        - Added a safeguard on /on_columns_heads/ options processing.
+
+0.02_02 2012-05-15
+        - Added META files.
+
+0.02_01 2012-05-15
+        - Added formatter option to parse sub.
+
+0.02    2010-10-14
+        - Depends on Test::More+Test::Differences instead of Test::Most to work around
+          a bizarre 2.6.24-27-server/i486-linux-gnu-thread-multi combo (ID 9016456)
+          fail. Most likely a Test::Warn problem with its Tree::DAG_Node
+          dependency.
+          http://www.cpantesters.org/cpan/report/4c13c062-d602-11df-8217-a2945457a2d0
+        - Added link to github.
+          http://github.com/maspalio/Spreadsheet-XlateExcel
+
+0.01    2010-10-11
+        - First version, released on an unsuspecting world.

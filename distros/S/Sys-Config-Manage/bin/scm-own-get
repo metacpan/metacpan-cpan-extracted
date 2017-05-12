@@ -1,0 +1,193 @@
+#!/usr/bin/perl
+#Copyright (c) 2011, Zane C. Bowers-Hadley
+#All rights reserved.
+#
+#Redistribution and use in source and binary forms, with or without modification,
+#are permitted provided that the following conditions are met:
+#
+#   * Redistributions of source code must retain the above copyright notice,
+#    this list of conditions and the following disclaimer.
+#   * Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+#THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+#ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
+#WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+#IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+#INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+#BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+#DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+#THE POSSIBILITY OF SUCH DAMAGE.
+
+use strict;
+use warnings;
+use Sys::Config::Manage;
+use Sys::Config::Manage::Ownership;
+use Getopt::Std;
+
+$Getopt::Std::STANDARD_HELP_VERSION = 1;
+
+#version function
+sub main::VERSION_MESSAGE {
+        print "scm-own-get 0.0.0\n";
+}
+
+#print help
+sub main::HELP_MESSAGE {
+        print "\n".
+		      "Switches...\n".
+			  "-c <config directory>\n".
+			  "-b <base directory>\n".
+			  "\n".
+			  "Enviromental Variables...\n".
+			  "SysConfigManage_baseDir - The base directory.\n".
+			  "SysConfigManage_selectionMethod - Selection method.\n".
+			  "SysConfigManagePerms_defaultUID - The default UID\n".
+			  "SysConfigManagePerms_defaultGID - The default GID\n".
+			  "\n".
+			  "\n".
+			  "Default...\n".
+			  "SysConfigManage_baseDir - undef\n".
+			  "SysConfigManage_selectionMethod - hostname\n".
+			  "SysConfigManagePerms_defaultUID - 0\n".
+			  "SysConfigManagePerms_defaultGID - 0\n";
+}
+
+
+
+#gets the options
+my %opts=();
+getopts('b:c:', \%opts);
+
+#real in the settings
+my %args;
+if (defined( $ENV{'SysConfigManage_baseDir'} )) {
+	$args{'baseDir'}=$ENV{'SysConfigManage_baseDir'};
+}
+if (defined( $ENV{'SysConfigManage_selectionMethod'} )) {
+	$args{'selectionMethod'}=$ENV{'SysConfigManage_selectionMethod'};
+}
+
+#sets the base directory if requested command line
+if (defined( $opts{b} )) {
+	$args{baseDir}=$opts{b};
+}
+
+#initializes it
+my $scm=Sys::Config::Manage->new(\%args);
+if ( $scm->error ) {
+	warn('scm-own-get: Failed to initiate the module');
+	exit 254;
+}
+
+#gets the perms opts
+my %oargs;
+$oargs{scm}=$scm;
+if( defined( $ENV{'SysConfigManagePerms_defaultUID'} ) ){
+	$oargs{defaultUID}=$ENV{'SysConfigManagePerms_defaultUID'};
+}
+if( defined( $ENV{'SysConfigManagePerms_defaultGID'} ) ){
+	$oargs{defaultGID}=$ENV{'SysConfigManagePerms_defaultGID'};
+}
+
+my $scmo=Sys::Config::Manage::Ownership->new( \%oargs );
+
+my @files=$scmo->listConfigFiles;
+
+if ($scmo->error) {
+	warn('scm-perms-get: Errors encountered trying to list the config files');
+	exit 254;
+}
+
+#lists each one
+my $int=0;
+while ( defined( $files[$int] ) ){
+
+	  my $uid=$scmo->getUID( undef , $files[$int] );
+	  my $gid=$scmo->getGID( undef , $files[$int] );
+
+	  print $uid.':'.$gid.' '.$files[$int]."\n";
+
+	  $int++;	  
+}
+
+
+#if we get here, it has worked
+exit 0;
+
+=head1 NAME
+
+scm-owm-get - Gets ownership info for the files.
+
+=head1 SYNOPSIS
+
+scm-own-get [B<-b> <base directory>] [B<-c> <configuration directory]
+
+=head1 SWITCHES
+
+=head2 -b <base directory>
+
+The -b switch can be used to to specify a base directory.
+
+If not specified via switch, the enviromental variable will be used.
+
+=head2 -c <configuration directory>
+
+This is the configuration directory to use.
+
+If not specified, one will automatically be choosen.
+
+=head1 ENVIROMENTAL VARIABLES
+
+=head2 SysConfigManage_baseDir
+
+This is the base directory to use.
+
+=head2 SysConfigManage_selectionMethod
+
+This is the election method to use.
+
+If not specified, the default will be used.
+
+=head1 EXIT CODES
+
+Any error codes not specified below are Sys::Config::Manage::Ownership error codes.
+
+=head2 254
+
+Something script specific.
+
+=head1 AUTHOR
+
+Copyright (c) 2011, Zame C. Bowers-Hadley <vvelox@vvelox.net>
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+     this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS` OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=head1 README
+
+scm-owm-get - Gets ownership info for the files.
+
+=cut

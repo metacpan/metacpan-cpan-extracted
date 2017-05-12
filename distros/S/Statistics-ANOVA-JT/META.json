@@ -1,0 +1,46 @@
+{
+   "abstract" : "Jonckheere-Terpstra statistics and test",
+   "author" : [
+      "Roderick Garton <rgarton@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Statistics-ANOVA-JT",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.421"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Algorithm::Combinatorics" : "0.27",
+            "List::AllUtils" : "0.09",
+            "Statistics::Data" : "0.09",
+            "Statistics::Data::Rank" : "0.01",
+            "Statistics::Lite" : "3.2",
+            "Statistics::Zed" : "0.10"
+         }
+      }
+   },
+   "provides" : {
+      "Statistics::ANOVA::JT" : {
+         "file" : "lib/Statistics/ANOVA/JT.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.01"
+}

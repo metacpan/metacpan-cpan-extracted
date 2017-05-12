@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/SMS-Send-TW-ShareSMS.t
+lib/SMS/Send/TW/ShareSMS.pm
+META.yml                                 Module meta-data (added by MakeMaker)

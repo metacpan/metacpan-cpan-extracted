@@ -1,0 +1,260 @@
+#!/usr/bin/perl -- # -*- Perl -*-
+# $Id: dtdparse,v 2.2 2005/07/16 03:22:57 ehood Exp $
+# Author(s): Norman Walsh, <ndw@nwalsh.com>
+#	     Earl Hood, <earl@earlhood.com>
+# POD at end of file.
+
+package Dtdparse;
+
+use strict;
+use vars qw($CVS);
+
+$CVS = '$Id: dtdparse,v 2.2 2005/07/16 03:22:57 ehood Exp $ ';
+
+use Getopt::Long;
+use SGML::DTDParse;
+use SGML::DTDParse::DTD;
+
+MAIN: {
+    my %option = ('debug' => 0,
+		  'verbose' => 1,
+		  'title' => '?untitled?',
+		  'unexpanded' => 1,
+		  'public-id' => '',
+		  'system-id' => '',
+		  'namecase-general' => 1,
+		  'namecase-entity' => 0,
+		  'output' => '',
+		  'xml' => 0,
+		  'declaration' => '');
+
+    my %opt = ();
+    &GetOptions(
+	\%opt,
+	'debug+',
+	'verbose!',
+	'title=s',
+	'unexpanded!',
+	'catalog=s@',
+	'public-id=s',
+	'system-id=s',
+	'output=s',
+	'xml!',
+	'namecase-general!',
+	'namecase-entity!',
+	'declaration=s',
+
+	@SGML::DTDParse::CommonOptions
+    ) || SGML::DTDParse::usage(-verbose => 0, -exitval => 1);
+    SGML::DTDParse::process_common_options(\%opt);
+
+    foreach my $key (keys %option) {
+	$option{$key} = $opt{$key} if exists($opt{$key});
+    }
+
+    my @catalogs = exists($opt{'catalog'}) ? @{$opt{'catalog'}} : ();
+
+    my $file = shift @ARGV;
+    my $xmlfile = $option{'output'} || '';
+
+    warn "Warning: Title not specified\n" if !defined($option{'title'});
+
+    my $dtd = new SGML::DTDParse::DTD (
+	'Verbose'             => $option{'verbose'},
+	'Debug'               => $option{'debug'},
+	'SgmlCatalogFilesEnv' => $option{'use-sgml-catalog-files'},
+	'Title'               => $option{'title'},
+	'UnexpandedContent'   => $option{'unexpanded'},
+	'SourceDtd'           => $file,
+	'Xml'                 => $option{'xml'},
+	'NamecaseGeneral'     => $option{'namecase-general'},
+	'NamecaseEntity'      => $option{'namecase-entity'},
+	'PublicId'            => $option{'public-id'},
+	'SystemId'            => $option{'system-id'},
+	'Declaration'         => $option{'declaration'}
+    );
+
+    foreach my $catalog (@catalogs) {
+	$dtd->parseCatalog($catalog);
+    }
+
+    $dtd->parse($file);
+
+    my $out_fh = \*STDOUT;
+    if ($xmlfile ne '') {
+	use Symbol;
+	$out_fh = gensym;
+	open ($out_fh, ">$xmlfile") ||
+	    die qq{Error: Unable to create "$xmlfile": $!\n};
+	$dtd->status("Writing $xmlfile...\n");
+    }
+
+    $dtd->xml($out_fh);
+    close($out_fh)  if $xmlfile;
+
+    $dtd->status("Done.\n");
+
+} # End: MAIN
+
+##############################################################################
+
+sub usage {
+  require Pod::Usage;
+  Pod::Usage::pod2usage(@_);
+}
+
+__END__
+
+=head1 NAME
+
+dtdparse - Generate an XML representation of an SGML or XML DTD.
+
+=head1 SYNOPSIS
+
+ dtdparse [options] [dtdfile]
+
+=head1 DESCRIPTION
+
+B<dtdparse> parses an XML or SGML DTD and prints an XML representation
+of it.  The XML version can be further processed by other tools to
+aid in the analysis and documentation of the DTD.
+
+The first non-option-related argument provided on the command-line
+specifies the file to parse.  If no filename is given, then the
+DTD is read from standard input.
+
+The generated XML document is printed to standard output unless
+the C<--output> option is specified.
+
+=head1 OPTIONS
+
+=over 4
+
+=item --catalog <catalog>
+
+Specify catalog files to parse for resolving external entity
+references.  This option can be specified multiple times.
+
+B<NOTE:> Currently, only SGML Open Catalog format is supported.
+XML Catalog support is not implemented (yet).
+
+=item --debug
+
+Extra debugging output.  This option can be specified multiple
+times to increase the amount of output.
+
+Debugging output is sent to standard error.
+
+=item --declaration <file>
+
+Specify the SGML declaration.  The SGML declaration is parsed
+to determine the type of DTD being parsed, XML or SGML.  The
+key parts of the SGML declaration examined are the NAMECASE
+and CHARSET directives to determine the DTD type.
+
+If no SGML declaration is available, the C<--xml>,
+C<--namecase-general>, and C<--namecase-entity> options can
+be used.
+
+=item --namecase-general
+
+=item --nonamecase-general
+
+In the absence of an SGML declaration, these options specifiy
+if C<NAMECASE GENERAL> is YES or NO.  The default is YES unless
+C<--xml> is specified.
+
+=item --namecase-entity
+
+=item --nonamecase-entity
+
+In the absence of an SGML declaration, these options specifiy
+if C<NAMECASE ENTITY> is YES or NO.  The default is NO.
+
+=item --output <file>
+
+Specifies the filename to send XML output.
+
+=item --public-id <pubid>
+
+The DTD's public ID.
+
+=item --system-id <sysid>
+
+The DTD's system ID.
+
+=item --title <title>
+
+Set the title of the DTD.
+
+=item --unexpanded
+
+=item --nounexpanded
+
+Include, or do not include, unexpanded content models in generated XML.
+By default, unexpanded content models are included.
+
+It is common for DTD authors and maintainers to use parameter entities
+within content models.  When this option is enabled, dtdparse will
+include a version of content models with parameter entities not
+expanded.
+
+=item --verbose
+
+=item --noverbose
+
+Print parsing progress.  By default, this option is enabled.
+Verbose output is sent to standard error.
+
+If C<--debug> is specified, then this option is automatically
+enabled.
+
+=item --xml
+
+=item --noxml
+
+In the absence of an SGML declaration, this option specifies if
+the DTD is an XML DTD or an SGML DTD (the default is --noxml).
+
+=item --version
+
+Print version and synopsis.
+
+=item --help
+
+Print synopsis and options available.
+
+=item --man
+
+Print manual page.
+
+=back
+
+=head1 SEE ALSO
+
+L<dtdformat|dtdformat>,
+L<dtddiff|dtddiff>,
+L<dtdflatten|dtdflatten>
+
+See L<SGML::DTDParse|SGML::DTDParse> for an overview of the DTDParse package.
+
+=head1 PREREQUISITES
+
+B<Getopt::Long>,
+B<Text::DelimMatch>
+
+=head1 AVAILABILITY
+
+E<lt>I<http://dtdparse.sourceforge.net/>E<gt>
+
+=head1 AUTHORS
+
+Originally developed by Norman Walsh, E<lt>ndw@nwalsh.comE<gt>.
+
+Earl Hood E<lt>earl@earlhood.comE<gt> picked up support and
+maintenance.
+
+=head1 COPYRIGHT AND LICENSE
+
+See L<SGML::DTDParse|SGML::DTDParse> for copyright and license information.
+

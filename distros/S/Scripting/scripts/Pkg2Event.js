@@ -1,0 +1,1 @@
+Pkg2.test("bar");

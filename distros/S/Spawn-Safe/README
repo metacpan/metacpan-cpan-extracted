@@ -1,0 +1,203 @@
+NAME
+    Spawn::Safe - Fork and exec a process "safely".
+
+EXAMPLE
+    A basic example:
+
+     use Spawn::Safe;
+     use Data::Dumper;
+     my $results = spawn_safe({ argv => [ 'ls', '-al', '/var/' ], timeout => 2 });
+     die Dumper $results;
+
+    As a replacement for backticks:
+
+     use Spawn::Safe;
+     # $output = `ls -al /var/`;
+     $output = spawn_safe(qw{ ls -al /var/ })->{stdout};
+
+SYNOPSIS
+    Spawn::Safe is a module designed to make "safe" calls to outside
+    binaries easier and more reliable. Spawn::Safe never invokes a shell
+    (unless the shell is explicitly requested), so escaping for the shell is
+    not a concern. An optional timeout is made available, so scripts will
+    not hang forever, and the caller is able to retrieve both stdout and
+    stderr. An optional string can be passed to the executed program's
+    standard input stream.
+
+FUNCTIONS
+  spawn_safe
+    Spawn (via fork and exec) the specified binary and capture its output.
+
+   Parameters
+    If passed a single scalar, spawn_safe will assume that to be the the
+    target binary, and execute it without a limit on runtime.
+
+    If passed an array, spawn_safe will execute the first element of the
+    array as the target binary, with the remaining elements passed as
+    parameters to the target binary, without a limit on runtime.
+
+    The preferred mode is to pass in a single hash reference. When called
+    this way, the following keys are available:
+
+    *   argv
+
+        Either a string containing the name of the binary which will be
+        called with no parameters:
+
+         my $r = spawn_safe({ argv => 'ls' });
+
+        Or an array reference containing the binary and all of its
+        parameters:
+
+         my $r = spawn_safe({ argv => [ 'ls', '-al' ] });
+
+    *   timeout
+
+        The amount of time, in seconds, the binary will be allowed to run
+        before being killed and a timeout error being returned. If false (or
+        is otherwise undefined or unset), the timeout will be infinite.
+
+    *   env
+
+        A hash reference containing the new environment for the executed
+        binary. If false (or otherwise undefined or unset), it will default
+        to the current environment. You must specify the complete
+        environment, as the current environment will be overwritten as a
+        whole. To alter only one variable, a copy of the enviornment must be
+        made, altered, and then passed in as a whole, eg:
+
+         my %new_env = %ENV;
+         $new_env{'TMP'} = '/var/tmp/';
+         my $r = spawn_safe({ argv => 'ls', env => \%new_env });
+
+        Please note that if a new environment is specified, the new binary's
+        environment will be altered before the call to exec() (but after the
+        fork(), so the caller's environment will be unchanged), so the new
+        environment will take effect before the new binary is launched. This
+        means that if you alter a part of the environment needed to launch
+        the binary (eg, by changing PATH, LD_LIBRARY_PATH, etc), these new
+        variables will need to be set such that the binary can be executed
+        successfully.
+
+    *   stdin
+
+        A string to be passed to the target binary's standard input stream.
+        The string will be written into the stream and then the stream will
+        be closed.
+
+         my $r = spawn_safe({ argv => [ '/usr/bin/tr', 'a', 'b' ], stdin => 'aaa' });
+
+   Return value
+    A hash reference will be returned containing one of the following sets
+    of values:
+
+    *   If the binary could not be spawned, the single key, 'error' will be
+        set, which is a text description of the reason the binary could not
+        be spawned.
+
+    *   If the binary was executed successfully, but terminated due to a
+        timeout, the keys 'error', 'stdout', and 'stderr', will be set. The
+        value for 'error' will be set to 'timed out'. Any data collected
+        from the executed binary's stdout or stderr will also be made
+        available, but since the binary was forcefully terminated, the data
+        may be incomplete.
+
+    *   If the binary was executed successfully and ran to completion, the
+        keys 'exit_code', 'stdout, and 'stderr', will all be available.
+
+    The key "exit_zero" will always be present, which is true if the binary
+    is executed successfully and exited with a code of zero.
+
+   Notes
+    The current PATH will be searched for the binary, if available. Open
+    filehandles are subject to Perl's standard close-on-exec behavior. A
+    shell will not be invoked unless explicitly defined as the target
+    binary, as such output redirection and other shell features are
+    unavailable.
+
+    If passed invalid parameters, spawn_safe will croak.
+
+    Please note that when specifying a timeout, alarm() is no longer used.
+    If the clock is stepped significantly backwards during a timeout, a
+    possibly false timeout error may be thrown. Timeout accuracy should be
+    within one second.
+
+    If a timeout does occur, the spawned program will be sent a SIGKILL
+    before spawn_safe returns.
+
+COMPATIBILITY
+    This module attempts to work on MSWin32 but I've been unable to get it
+    working due to strange issues with IO::Select. I haven't been able to
+    track down the exact cause, so for now I don't believe this module
+    functions on MSWin32.
+
+    Linux and BSD are tested and supported platforms.
+
+LICENSE
+    This module is licensed under the same terms as Perl itself.
+
+CHANGES
+  Version 2.006 - 2013-11-12, jeagle
+    Modify PIPE_BUF_SIZE to be more conservative to ensure non-blocking
+    writes on all OSs.
+
+  Version 2.005 - 2013-11-11, jeagle
+    Add stdin option, clarify docs, add exit_zero return flag.
+
+  Version 2.004 - 2012-08-13, jeagle
+    Include license. Oops.
+
+  Version 2.003 - 2012-04-01, jeagle
+    Untie any tied filehandles before we re-open them to ourselves to work
+    around any weird tie behavior (should fix issues running under FCGI).
+    Thanks Charly.
+
+  Version 2.002 - 2012-01-04, jeagle
+    Correct documentation (RT#72831, thanks Stas)
+
+    Update unit tests to specify number of tests instead of using no_plan,
+    otherwse CPAN Testers reports tests fail.
+
+  Version 2.001 - 2011-06-13, jeagle
+    Give the spawned program its own STDIN.
+
+  Version 2.000 - 2011-05-12, jeagle
+    Correct timeout handling. Attempt to correct unit tests for MSWin32, but
+    there seems to be an issue with IO::Select preventing it from working
+    properly. Update docs for MSWin32.
+
+  Version 1.9 - 2011-05-10, jeagle
+    Don't use clock_gettime(), use time() and return a timeout if time steps
+    backwards.
+
+  Version 1.8 - 2011-05-09, jeagle
+    Clean up docs, stop using SIGALARM for timeouts.
+
+  Version 1.7 - 2010-07-09, jeagle
+    Clean up for release to CPAN.
+
+  Version 0.4 - 2009-05-13, jeagle
+    Correct a warning issued when using spawn_safe without a timeout.
+
+    Fix compatibility with perl < 5.8.
+
+  Version 0.3 - 2009-04-21, jeagle
+    Clarify documentation regarding use of SIGALRM and for passing of a new
+    environment.
+
+    Correct a warning thrown by exec().
+
+    Correct an issue with incorrectly handled timeouts.
+
+  Version 0.2 - 2009-04-20, jeagle
+    Modify API, breaking compatibility, for clarity and expandability.
+
+    Add the ability to specify the target program's environment.
+
+    Return the (partial) stdout and stderr on a timeout.
+
+    Update and clarify documentation.
+
+  Version 0.1 - 2009-04-11, jeagle
+    Inital release.
+

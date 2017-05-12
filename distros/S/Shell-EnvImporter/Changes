@@ -1,0 +1,21 @@
+Revision history for Perl extension Shell::EnvImporter.
+
+0.01  Fri Feb 25 14:02:42 2005
+	- original version; created by h2xs 1.23 with options
+		-A -X --skip-exporter --name=Shell::EnvImporter
+
+1.02  Mon Aug 28 18:00:99 2006
+	- First CPAN release
+
+1.03  Mon Sep 11 17:50:31 PDT 2006
+	- Added newly ignored variables to csh and tcsh:
+          GROUP HOST HOSTTYPE MACHTYPE OSTYPE VENDOR
+
+1.05  Thu Apr 10 21:09:53 PDT 2008
+	- Bugfix:  blank output lines no longer cause the rest of output
+          to be ignored.
+
+1.06  Wed Jun  4 01:07:24 PDT 2008
+	- Bugfix:  add Class::MethodMaker dependency to Makefile
+          (thanks to Elliot Shank).
+

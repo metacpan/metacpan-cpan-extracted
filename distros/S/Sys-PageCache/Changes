@@ -1,0 +1,17 @@
+Revision history for Sys::PageCache
+
+0.03  2016-08-05
+    [TRIVIAL]
+        - [RT #116724] Unescaped left brace in regex is illegal here in regex
+
+0.02  2013-09-13
+    [IMPROVEMENTS]
+        - Initial release
+
+0.01_002  2013-09-11
+    [IMPROVEMENTS]
+        - Support FreeBSD >= 8.3
+
+0.01_001  2013-09-10
+    [NEW FEATURES]
+        - Initial developers release

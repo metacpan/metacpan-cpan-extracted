@@ -1,0 +1,38 @@
+* Write a 'help' action with associated documentation.
+
+  * SVN::Web::Help?  Or should each action provide its own help() method?
+
+* cleanup the template structure with hooks
+
+* distinguish different node under same path in different revisions.
+
+* provide link with svn dav url.
+
+* users might only be interested in the latest few active
+  branches/tags - hlb
+  - as well as log history. it shouldn't list all by default.
+
+* some switches for svnweb-install to do upgrade and file merging.
+
+* use svn_fs_history_t to get fixed amount of log first.
+
+* supply last-modified in header and check it.
+
+* Add an 'annotation' action
+
+* Fix bugs reported through RT
+
+* Possibly a difference in the localisation between "Revision" as a
+  title, column heading, or whatever, and "Revision \d+" referring to
+  a specific revision number.
+
+* Templates and I18N should be more tightly coupled.
+
+* Working directory diff support in Diff.pm using SVK::Editor
+
+* Where get_logs is used, is it faster to get the revision properties?
+  Need to benchmark to find out.
+
+* Split SVN::Web::RSS in to a separate distribution
+
+* SVN::Web::Search, based on SVN::Log::Index?

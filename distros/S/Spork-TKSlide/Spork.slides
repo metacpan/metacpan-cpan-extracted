@@ -1,0 +1,38 @@
+----
+presentation_topic: Spork:TKSlide
+presentation_title: Spork:TKSlide Generate TKSlide with Spork.
+presentation_place: NO
+presentation_date: NO
+----
+image<http://gugod.org/imgs/spork/SporkCollection.jpg>
+== What is Spork?
+* Spork Stands for:
++** Slide Presentation (Only Really Kwiki)
++* Spork is an HTML Slideshow Generator
+** All slides are in one simple file
+** Run |spork -make| to make the slides
++* Spork is a CPAN Module
++* Spork is Based on Spoon
+----
+image<http://gugod.org/imgs/kirby/kirby.jpg>
+== What is TKSlide?
+* TKSlide stands for:
++** Tkirby's slides
++* Pure JavaScript navigation
++* XML / HTML backend
++* Cross Browser
++* http://www.csie.ntu.edu.tw/~b88039/slide/
+----
+== Spork::TKSlide
+* Use Spork/Kwiki syntax
++** Thats easy
++* Generate the tkslide effect
++** That's cool.
++* So, That's *POWERFUL*
+image<http://gugod.org/imgs/powerful/upside-down.jpg>
++* Check the source code of this slide:
+** http://gugod.org/Slides/Spork-TKSlide/Spork.slides
+----
+== That's All
+image<http://gugod.org/imgs/thank-you/thank-you.gif>
+* The END

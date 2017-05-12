@@ -1,0 +1,19 @@
+Changes
+lib/ServiceNow/Simple.pm
+Makefile.PL
+Config.PL
+Config
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-get.t
+t/02-get_records.t
+t/03-update.t
+t/04-get_instance_url.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/config.cache
+ignore.txt
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

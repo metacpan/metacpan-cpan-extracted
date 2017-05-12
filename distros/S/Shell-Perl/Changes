@@ -1,0 +1,152 @@
+Revision history for Perl extension Shell::Perl.
+
+0.004   Tue May 02 17:19 PT 2017
+    - only set ornaments if term supports it
+
+0.003   Mon Feb 20 12:12 PT 2017
+    - exit & quit works as :exit & :quit at top level
+    - on_quit attribute https://github.com/aferreira/pirl/issues/4
+
+0.0026  Sun Jan 08 12:40 PT 2017
+    - fix t/20expect_quit.t when TERM is not set
+
+0.0025  Sat Jan 07 11:59 PT 2017
+    - requires version 0.77
+    - requires Getopt::Long 2.43 – bundling_values
+
+0.0024  Fri Jan 06 2017
+    - every statement is now evalued by default
+      with the current perl version running the shell
+    - new shell command :set perl_version <version>
+    - change in CLI options: case-sensitivity & no auto abbreviations
+    - pirl -I dir1 -Idir2
+    - drop File::Slurp as a prereq
+
+0.0023  Fri Jan 14:05:00 2014
+	- Update Makefile.PL from 'use 5.006' to 'use 5.008' as per RT#43117. Thanx ANDK.
+	- Fix dates in this file.
+
+0.0022  Sat Mar 12 12:00:00 2011
+	- no real change
+	- Fix test again for 5.6 sake
+	- Improved Makefile.PL / META.yml
+
+0.0021  Sat Mar 12 12:00:00 2011
+	- no real change
+	- New test fix for happy 5.6 testing
+
+0.0020  Thu Mar 10 12:00:00 2011
+	- no real change
+	- Test fixes for keeping 5.6 happy
+
+0.0019  Wed Mar 09 12:00:00 2011
+	- Dumper updated to work with Data::Dump 1.16+
+
+0.0018  Sat Oct 25 12:00:00 2008
+	- fix t/11version.t to deal with IPC::Cmd $err
+		as an error message (undef on success) rather
+		than an error code (0 on success)
+		[Thanks, Andreas, for spotting that]
+		http://rt.cpan.org/Ticket/Display.html?id=40157
+
+0.0017  Sun Mar 09 12:00:00 2008
+	- assume this is not supposed to work for Perls
+		under 5.6.0
+	- cope with noisy 5.6 blib at t/20expect_quit.t
+		(illustrated by test report http://www.nntp.perl.org/group/perl.cpan.testers/2008/03/msg1099937.html)
+	- pirl now accepts switches --version and -v
+	- added IPC::Cmd and Test::Deep as prerequisites
+		for testing
+
+0.0016  Mon Mar 03 12:00:00 2008
+	- quit is now a method
+	- history is now persistent across sections
+		(should work with T::RL::Gnu and T::RL::Perl)
+	- new dependencies: File::HomeDir, Path::Class,
+		and File::Slurp
+
+0.0015  Fri Jul 27 12:00:00 2007
+	- fixed 'quit'
+	- the first of the Expect tests: t/20expect_quit.t
+	- pirl now accepts switches --ornaments and --noornaments
+
+0.0014  Thu Jul 26 12:00:00 2007
+	- Shell::Perl now prints to the output stream of the
+		associated term
+	- new test t/10compile.t
+	- :x is the same as :exit, :quit, :q
+	- quit is an alias to "sub { exit }" in the sandbox package
+
+0.0013  Thu Jun 21 12:00:00 2007
+	- the dumpers now deparse Perl code
+	- added new dumper based on Data::Dump::Streamer,
+		no docs by now (try it with ":set out DDS")
+
+0.0012  Thu Jun 21 12:00:00 2007
+	- added an experimental "dump history" command
+		(RT #26973, by mgrimes)
+	- hopefully get rid of the double newline in eval output
+
+0.0011  Thu Jun 21 12:00:00 2007
+	- some minor improvements to Makefile.PL - conformance
+		to META.yml specification
+	- when dumping YAML, prefer YAML::Syck to YAML if available
+	- we have a bug to fix: the REPL and the running interpreter
+		share global state (like $_) and so relying on these
+		between lines is not nice (to say the least)
+
+0.0010  Wed Mar 14 12:00:00 2007
+	- this is a read-eval-print loop and not a
+		read-eval-loop, doh
+	- total rewrite for the implementation of dumpers
+	- new output style with the plain dumper (idea
+		borrowed from Sepia by Sean O'Rourke)
+	- Data::Dump, Data::Dumper, YAML are only required
+		at runtime and fail gracefully if not there
+	- the preferred dumper is via Data::Dump, but it
+		falls back to Data::Dumper, YAML and the plain
+		dumper according to availability
+	- fix bug: inline contexts (like #scalar)
+		were not being respected for printing
+	- Makefile.PL required ExtUtils::MakeMaker 6.31
+		and we are more tolerant now (thanks, Lorn)
+	- now the right line number is used at
+		warnings and errors (Lorn again)
+
+0.0009  Tue Mar 13 12:00:00 2007
+	- forgot README in MANIFEST
+	- the default evaluation package is now
+		"Shell::Perl::sandbox"
+
+0.0008  Tue Mar 13 12:00:00 2007
+	- cmarcelo: some doc typos fixed
+	- a SEE ALSO section
+	- first CPAN release
+
+0.0007  Wed Mar 07 12:00:00 2007
+	- added some POD to Shell.pm and pirl source files
+
+0.0006  Fri Feb 23 12:00:00 2007
+	- sources imported to Google code (no history :(, yet)
+	- patches by cmarcelo:
+		* implement list and void contexts for evaluation
+		* implement context override in a per-input basis
+	- we have tests now, even though t/98pod-coverage.t
+		does not pass yet
+
+0.0005  Sat Jan 27 12:00:00 2007
+	- relax the restrictions during eval - no strict qw(vars subs)
+
+0.0004  Thu Jan 25 12:00:00 2007
+	- the same changes as before, now working
+
+0.0003  Thu Jan 25 12:00:00 2007
+	- prompt changes with the script name
+	- psh renamed to pirl
+	- borked
+
+0.0002  Wed Jan 24 12:00:00 2007
+	- Date fabricated.
+
+0.0001  Tue Jan 23 12:00:00 2007
+	- Date fabricated.

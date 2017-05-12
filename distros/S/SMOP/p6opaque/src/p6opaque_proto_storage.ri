@@ -1,0 +1,20 @@
+%RI.id p6opaque proto storage
+%prefix smop_p6opaque_proto_storage
+
+%include <smop/s1p.h>,<smop/p6opaque.h>
+%has $^!how = SMOP__S1P__Scalar_create(interpreter, SMOP_REFERENCE(interpreter,SMOP__p6opaque_default_how))
+%has $^!who
+%has @^!isa
+%has @^!does
+%has %^!class_storage
+%has %^!attributes
+%has %^!methods
+%has %^!submethods
+
+%{
+   SMOP__Object* smop_p6opaque_proto_storage_create(SMOP__Object* interpreter) {
+    SMOP__Object* proto = smop_nagc_alloc(sizeof(smop_p6opaque_proto_storage_struct));
+    proto->RI = (SMOP__ResponderInterface*)RI;
+    return proto;
+   }
+%}

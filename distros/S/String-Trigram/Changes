@@ -1,0 +1,35 @@
+Revision history for Perl extension String::Trigram.
+
+0.01  Fri Nov 16 19:37:41 2001
+  - original version; created by h2xs 1.21 with options -AX Trigram
+
+0.02  Wed Jan 16, 2002
+  - Added use locale to methods getSimilarStrings() and _trigramify()
+    on kind suggestion by Oleg Bartunov. This should make keepOnlyAlNums
+    and ignoreCase work correctly with non-ascii characters.
+
+0.1   Sat Mar 8,  2003
+  - moved use locale to top of package
+  - Added method extendBase which adds strings to base of comparison
+    any time after object has been created (like reInit, but it does not
+    delete the old base of comparison).
+  - getSimilarStrings has now optional parameters warp and minSim to
+    change those temporarily
+  - Implemented one internal method in C (makes it somewhat faster)
+  - Made module faster in other places
+  - Extended module to be 1-gramable, 2-gramable, 4-gramable etc.
+  - Set default padding to n - 1 for (n from n-gram), i.e. 2 for
+    3-grams, 3 for 4-grams etc. (this changes the default behaviour of
+    a padding of 1 for trigrams!!!)
+  - debogustified module in some places
+  - removed one bug which should have occurred extremely rarely and
+    only, when feeding the same string(s) several times to the Trigram
+    object, but nevertheless ...
+  - made compare function save against getting no parameters (croaks
+    now)
+  - made getBestMatch return 0 instead of -1, when no match is found
+0.11  Fri Jul 25,  2008
+  - Fixed bug in reInit()
+
+0.12  Sun, Dec 22, 2013
+  - Remove c code, replace by pure perl

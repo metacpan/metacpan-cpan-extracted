@@ -1,0 +1,10 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+Todo
+dist.ini
+lib/String/Mutate.pm
+t/001_load.t

@@ -1,0 +1,18 @@
+author.t/Client.t
+Build.PL
+Changes
+examples/noop-shell.pl
+examples/time-client.pl
+examples/time-shell.pl
+examples/time-shell.readme
+examples/TimeShell.pm
+lib/SSH/RPC/Client.pm
+lib/SSH/RPC/Result.pm
+lib/SSH/RPC/Shell.pm
+MANIFEST			This list of files
+t/Client.t
+t/Result.t
+t/Shell.t
+Makefile.PL
+README
+META.yml

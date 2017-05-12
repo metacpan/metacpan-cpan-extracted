@@ -1,0 +1,74 @@
+Sub-Timebound version 1.00
+==========================
+
+Perl extension for timebound execution of a subroutine.
+Useful for graceful error recovery.
+
+NAME
+	Sub::Timebound - Perl extension for timebound computations
+
+SYNOPSIS
+	     use Sub::Timebound;
+
+	     sub fun 
+	     {
+	     	my $i = shift;
+		if ($i =~ /7$/) {
+			die "Simulated internal error\n";
+		}
+		while ($i) {
+			$i--;
+		}
+		return "All is well";
+	     }
+
+	     my	$x = timeboundretry(10, 3, 5, \&fun, 10);
+	     ### Returns { value => '...', status => 0(FAILURE)/1(SUCCESS) }
+	     ### 'value' is the return value of fun()
+
+	     if	($x->{status}) {
+		     # SUCCESS
+		     $x->{value}
+	     } else {
+		      #	FAILURE
+	     }
+
+DESCRIPTION
+	     Module exports "timeboundretry" - this is a wrapper that watches a	function call.
+
+	     my	$x = timeboundretry([TimeAllocated], [NumberOfAttempts], 
+	     			[PauseBetweenAttempts],[CodeRef],[Param1], [Param2], ...);
+
+	     [TimeAllocated]	     - Seconds allocated to [CodeRef] to complete
+	     [NumberOfAttempts]	     - Number of attempts made to [CodeRef]
+	     [PauseBetweenAttempts]  - Seconds to wait before making subsequent	attempts
+	     [CodeRef]		     - Reference to subroutine
+	     [Param1]...	     - Parameters to subroutine
+
+     EXPORT
+
+	     timeboundretry()
+
+SEE ALSO
+	     Proc::Reliable is a similar module	that addresses external	processes
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2005 by Ramana Mokkapati
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Scalar/Lazy.pm
+t/00-load.t
+t/01-basic.t
+t/02-combinator.t
+t/03-tarai.t
+t/04-once.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

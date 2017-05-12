@@ -1,0 +1,587 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Glob::File
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = File.new(...);
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef::Convert::Convert
+	* Sidef::Types::String::String
+
+=head1 METHODS
+
+
+=head2 abs
+
+File.abs() -> I<Obj>
+
+Return the
+
+Aliases: I<abs_name>, I<absname>, I<rel2abs>
+
+=cut
+
+=head2 abs_path
+
+File.abs_path() -> I<Obj>
+
+Return the
+
+Aliases: I<realpath>
+
+=cut
+
+=head2 access_time_days_diff
+
+File.access_time_days_diff() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 append
+
+File.append() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 base
+
+File.base() -> I<Obj>
+
+Return the
+
+Aliases: I<base_name>, I<basename>
+
+=cut
+
+=head2 change_time_days_diff
+
+File.change_time_days_diff() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 chmod
+
+File.chmod() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 chown
+
+File.chown() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 compare
+
+File.compare() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 cp
+
+File.cp() -> I<Obj>
+
+Return the
+
+Aliases: I<copy>
+
+=cut
+
+=head2 delete
+
+File.delete() -> I<Obj>
+
+Return the
+
+Aliases: I<remove>
+
+=cut
+
+=head2 dir
+
+File.dir() -> I<Obj>
+
+Return the
+
+Aliases: I<dir_name>, I<dirname>
+
+=cut
+
+=head2 dump
+
+File.dump() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 edit
+
+File.edit() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 exists
+
+File.exists() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 has_setgid_bit
+
+File.has_setgid_bit() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 has_setuid_bit
+
+File.has_setuid_bit() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 has_sticky_bit
+
+File.has_sticky_bit() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_abs
+
+File.is_abs() -> I<Obj>
+
+Return the
+
+Aliases: I<is_absolute>
+
+=cut
+
+=head2 is_binary
+
+File.is_binary() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_block
+
+File.is_block() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_char_device
+
+File.is_char_device() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_dir
+
+File.is_dir() -> I<Obj>
+
+Return the
+
+Aliases: I<is_directory>
+
+=cut
+
+=head2 is_empty
+
+File.is_empty() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_executable
+
+File.is_executable() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_file
+
+File.is_file() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_link
+
+File.is_link() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_owned
+
+File.is_owned() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_readable
+
+File.is_readable() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_real_executable
+
+File.is_real_executable() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_real_owned
+
+File.is_real_owned() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_real_readable
+
+File.is_real_readable() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_real_writeable
+
+File.is_real_writeable() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_socket
+
+File.is_socket() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_text
+
+File.is_text() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_writeable
+
+File.is_writeable() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 lstat
+
+File.lstat() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 make
+
+File.make() -> I<Obj>
+
+Return the
+
+Aliases: I<touch>, I<create>, I<mkfile>
+
+=cut
+
+=head2 md5
+
+File.md5() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 modification_time_days_diff
+
+File.modification_time_days_diff() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 mv
+
+File.mv() -> I<Obj>
+
+Return the
+
+Aliases: I<move>
+
+=cut
+
+=head2 name
+
+File.name() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 new
+
+File.new() -> I<Obj>
+
+Return the
+
+Aliases: I<call>
+
+=cut
+
+=head2 open
+
+File.open() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 open_a
+
+File.open_a() -> I<Obj>
+
+Return the
+
+Aliases: I<open_append>
+
+=cut
+
+=head2 opendir
+
+File.opendir() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 open_r
+
+File.open_r() -> I<Obj>
+
+Return the
+
+Aliases: I<open_read>
+
+=cut
+
+=head2 open_rw
+
+File.open_rw() -> I<Obj>
+
+Return the
+
+Aliases: I<open_read_write>
+
+=cut
+
+=head2 open_w
+
+File.open_w() -> I<Obj>
+
+Return the
+
+Aliases: I<open_write>
+
+=cut
+
+=head2 read
+
+File.read() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 read_link
+
+File.read_link() -> I<Obj>
+
+Return the
+
+Aliases: I<readlink>
+
+=cut
+
+=head2 rel
+
+File.rel() -> I<Obj>
+
+Return the
+
+Aliases: I<abs2rel>, I<rel_name>, I<relname>
+
+=cut
+
+=head2 rename
+
+File.rename() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sha1
+
+File.sha1() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sha256
+
+File.sha256() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sha512
+
+File.sha512() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 size
+
+File.size() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 split
+
+File.split() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 splitpath
+
+File.splitpath() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 stat
+
+File.stat() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sysopen
+
+File.sysopen() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 to_file
+
+File.to_file() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 truncate
+
+File.truncate() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 unlink
+
+File.unlink() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 utime
+
+File.utime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 write
+
+File.write() -> I<Obj>
+
+Return the
+
+=cut

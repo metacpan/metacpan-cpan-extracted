@@ -1,0 +1,120 @@
+#!/usr/bin/perl -w
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use POSIX qw( EXIT_FAILURE EXIT_SUCCESS );
+use Sys::Detect::Virtualization;
+
+=head1 NAME
+
+virtdetect -- Detect if this system is running as a virtual machine
+
+=head1 SYNOPSIS
+
+virtdetect [ --verbose ] [ --detect-host ]
+
+=head1 DESCRIPTION
+
+Attempts to determine if this system is running under some form of
+virtualization.
+
+If --verbose is enabled, each check will be output.  Otherwise, only the result
+will be output.
+
+if --detect-host is enabled, try and detect virtualization host (as opposed to
+guest) platforms
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--verbose>
+
+Enable debug output
+
+=item B<--detect-host>
+
+Try to detect virtualization host (as opposed to guest) platform.
+
+=item B<--help>
+
+This help
+
+=item B<--man>
+
+Full manpage
+
+=back
+
+=head1 EXIT STATUS
+
+=over 4
+
+=item 0
+
+No virtualization detected
+
+=item 1
+
+Virtualization detected
+
+=item 2
+
+More than one kind of virtualization detected
+
+=back
+
+=head1 SEE ALSO
+
+L<Sys::Detect::Virtualization>, 
+L<http://www.dmo.ca/blog/detecting-virtualization-on-linux>
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (C) 2009 Roaring Penguin Software Inc.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+=cut
+
+my $verbose = 0;
+my $detect_host = 0;
+my $rc = GetOptions(
+	'verbose'  => \$verbose,
+	'detect-host'  => \$detect_host,
+	'help'     => sub { pod2usage(-exitval => EXIT_SUCCESS, -verbose => 1) },
+	'man'      => sub { pod2usage(-exitval => EXIT_SUCCESS, -verbose => 2) },
+);
+
+if(!$rc) {
+	# Commandline parse failure.
+	pod2usage(-exitval => EXIT_FAILURE, -verbose => 0);
+}
+
+my $d = eval { Sys::Detect::Virtualization->new({ verbose => $verbose, ignore_host => !$detect_host }); };
+if( $@ ) {
+	my $err = $@;
+	$err =~ s/ at .*//;
+	pod2usage(
+		-exitval => EXIT_FAILURE,
+		-message => $err,
+		-verbose => 0
+	);
+}
+
+
+my @types = $d->detect();
+if( @types == 0 ) {
+	print "No virtualization detected\n";
+	exit(0);
+} elsif(@types == 1) {
+	print "Detected $types[0]\n";
+	exit(1);
+} else {
+	print "Multiple possible virtualization systems detected:\n";
+	print "\t$_\n" for @types;
+	exit(2);
+}

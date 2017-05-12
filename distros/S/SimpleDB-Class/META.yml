@@ -1,0 +1,35 @@
+---
+abstract: 'An Object Relational Mapper (ORM) for the Amazon SimpleDB service.'
+author:
+  - 'JT Smith <RIZEN@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200006, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: SimpleDB-Class
+no_index:
+  directory:
+    - author.t
+    - bin
+requires:
+  Clone: 0.31
+  DateTime: 0
+  DateTime::Format::Strptime: 0
+  Exception::Class: 0
+  JSON: 2.16
+  Memcached::libmemcached: 0.3102
+  Module::Find: 0
+  Moose: 0.93
+  MooseX::ClassAttribute: 0.26
+  MooseX::Types: 0.20
+  SimpleDB::Client: 1.0400
+  Sub::Name: 0.04
+  Test::Deep: 0
+  Test::More: 0
+  UUID::Tiny: 0
+version: 1.0503

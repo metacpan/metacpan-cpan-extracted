@@ -1,0 +1,33 @@
+---
+name: SVG-Parser
+version: 1.03
+author:
+  - 'Peter Wainwright, peter.wainwright@cybrid.net'
+abstract: XML Parser for SVG documents
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  SVG: 2
+  XML::Parser: 0
+  XML::SAX: 0
+provides:
+  SVG::Parser:
+    file: lib/SVG/Parser.pm
+    version: 1.03
+  SVG::Parser::Base:
+    file: lib/SVG/Parser/Base.pm
+    version: 1.03
+  SVG::Parser::Expat:
+    file: lib/SVG/Parser/Expat.pm
+    version: 1.03
+  SVG::Parser::SAX:
+    file: lib/SVG/Parser/SAX.pm
+    version: 1.03
+  SVG::Parser::SAX::Handler:
+    file: lib/SVG/Parser/SAX/Handler.pm
+    version: 1.03
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

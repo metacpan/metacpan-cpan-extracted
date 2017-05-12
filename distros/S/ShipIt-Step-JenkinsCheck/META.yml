@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:               ShipIt-Step-JenkinsCheck
+version:            0.01
+abstract:           Checks your package in your Jenkins CI server before building
+author:
+    - Dave Lambley <davel@state51.co.uk>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    JSON:            0
+    LWP::UserAgent:  0
+    ShipIt::Step:    0
+    Term::ReadLine:  0
+    Try::Tiny:       0
+resources:
+    repository:  https://github.com/davel/ShipIt-Step-JenkinsCheck
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -1,0 +1,62 @@
+Readme for Sprocket
+-------------------
+http://sprocketframework.com/
+
+
+DESCRIPTION
+-----------
+Sprocket is a POE based networking framework.  Sprocket uses plugins
+to handle client and server connections.
+
+
+INSTALLATION
+------------
+To install Sprocket you can use CPAN:
+$ perl -MCPAN -e 'install Sprocket'
+
+or install it manually:
+$ perl Makefile.PL
+$ make test
+$ sudo make install
+
+
+EXAMPLES
+--------
+You can find some examples in the examples/ directory
+
+The cookbook is located at
+http://code.google.com/p/sprocket/wiki/Cookbook
+
+
+GETTING HELP
+------------
+Sprocket is documented, you can either use:
+man Sprocket
+
+or visit CPAN:
+http://search.cpan.org/dist/Sprocket/
+
+Sprocket is POE based:
+http://poe.perl.org/
+
+There is also a mailing list located at:
+http://groups.google.com/group/sprocket-dev
+
+If you still need help you can join #poe on irc.perl.org
+and ask the author: xantus
+
+THANKS
+------
+
+I've put a lot of hard work into this project and I hope you enjoy it.
+
+I'd like to thank a few people
+
+Chris Prather (perigrin)
+Andy Grundman (andyg)
+Tom ? (dec)
+
+If I missed anyone, it wasn't intentional, please contact
+me if you think your name should be here.
+
+Thanks for using Sprocket!

@@ -1,0 +1,14 @@
+pod2text SVN::Agent.pm > README
+
+SVN::Agent - simple way of working with SVN directory.
+For a detailed description see SVN::Agent man page.
+
+To install the module do:
+
+perl Makefile.PL
+make
+make test
+make install
+
+
+If you are on a windows box you should use 'nmake' rather than 'make'.

@@ -1,0 +1,116 @@
+                    Statistics::Gtest version 0.07
+                    ==============================
+
+NAME
+    Statistics::Gtest - calculate G-statistic for tabular data
+
+SYNOPSIS
+       use Statistics::Gtest;
+
+       $gt = Statistics::Gtest->new($data);
+    
+        $degreesOfFreedom = $gt->getDF();
+        $gstat = $gt->getG();
+    
+        $gt->setExpected($expectedvalues);
+        $uncorrectedG = $gt->getRawG();
+    
+DESCRIPTION
+    "Statistics::Gtest" is a class that calculates the G-statistic for
+    goodness of fit for frequency data. It can be used on simple frequency
+    distributions (1-way tables) or for analyses of independence (2-way
+    tables).
+
+    Note that "Statistics::Gtest" will not, by itself, perform the
+    significance test for you -- it just provides the G-statistic that can
+    then be compared with the chi-square distribution to determine
+    significance.
+
+OVERVIEW and EXAMPLES
+    A goodness of fit test attempts to determine if an observed frequency
+    distribution differs significantly from a hypothesized frequency
+    distribution. From "Statistics::Gtest"'s point of view, these tests come
+    in two flavors: 1-way tests (where a single frequency distribution is
+    tested against an expected distribution) and 2-way tests (where a matrix
+    of observed values is tested for independence -- that is, the lack of
+    interaction effects among the two axes being measured).
+
+    A simple example might help here. You've grown 160 plants from seed
+    produced by a single parent plant. You observe that among the offspring
+    plants, some have spiny leaves, some have hairy leaves, and some have
+    smooth leaves. What is the likelihood that the distribution of this
+    trait follows the expected values for simple Mendelian inheritance?
+
+     Observed values:
+       Spiny Hairy Smooth
+         95    53    12
+
+     Expected values (for a 9:3:3:1 ratio):
+         90    60    10
+
+    If the observed and expected values are put into two files,
+    "Statistics::Gtest" can create a G-statistic object that will calculate
+    the likelihood that the observed distribution is significantly different
+    from the distribution that would be expected by simple inheritance. (The
+    value of G for this comparison is approximately 1.495, with 2 degrees of
+    freedom; the observed results are not significantly different from
+    expected at the .05 -- or even .1 level.)
+
+    2-way tests will usually not need a table of expected values, as the
+    expected values are generated from the observed value sums. However, one
+    can be loaded for 2-way tables as well.
+
+    To determine if the calculated G statistic indicates a statistically
+    significant result, you will need to look up the values in a chi-square
+    distribution on your own, or make use of the "Statistics::Distributions"
+    module:
+
+     use Statistics::Gtest;
+     use Statistics::Distributions;
+
+     ...
+
+     my $gt = Statistics::Gtest->new($data);
+     my $df = $gt->getDF();
+     my $g = $gt->getG();
+     my $sig = '.05';
+     my $chis=Statistics::Distributions::chisqrdistr ($df,$sig);
+     if ($g > $chis) {
+       print "$g: Sig. at the $sv level. ($chis cutoff)\n"
+     } 
+
+    By default, "Statistics::Gtest" returns a G statistic that has been
+    modified by William's correction (Williams 1976). This correction
+    reduces the value of G for smaller sample sizes, and has progressively
+    less effect as the sample size increases. The raw, uncorrected G
+    statistic is also available.
+
+    Calculation methods based on Sokal, R.R., and F.J. Rohlf, Biometry.
+    1981. W.H. Freeman and Company, San Francisco.
+
+    Williams, D.A. 1976. Improved likelihood ratio test for complete
+    contingency tables. Biometrika, 63:33 - 37.
+
+INSTALLATION
+
+    To install this module type the following:
+
+    perl Makefile.PL ARGS (see the ExtUtils::MakeMaker documentation for
+                           possible arguments)
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+    Carp
+    IO::File
+
+COPYRIGHT AND LICENCE
+
+    Copyright (C) 2007 by David Fleck
+
+    This library is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself, either Perl version 5.8.4 or,
+    at your option, any later version of Perl 5 you may have available.
+         

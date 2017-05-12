@@ -1,0 +1,101 @@
+NAME
+    Spreadsheet::ParseExcel_XLHTML - Parse Excel Spreadsheets using xlhtml
+
+SYNOPSIS
+        use Spreadsheet::ParseExcel_XLHTML;
+
+        my $excel = Spreadsheet::ParseExcel_XLHTML->new;
+
+        my $book = $excel->Parse('/some/excel/file.xls');
+
+        # Cheesy CSV printer...
+        for my $sheet (@{$book->{Worksheet}}) {
+                print STDERR "Worksheet: ", $sheet->{Name}, "\n";
+                for my $i ($sheet->{MinRow}..$sheet->{MaxRow}) {
+                        print join ',', map { qq|"$_"| }
+                                        map { defined $_ ? $_->Value : "" }
+                                        @{$sheet->{Cells}[$i]};
+                        print "\n";
+                }
+        }
+
+        # or...
+
+        use Spreadsheet::ParseExcel_XLHTML qw/-install/;
+
+        # then use the Spreadsheet::ParseExcel API
+
+        my $book  = Spreadsheet::ParseExcel::Workbook->parse('/some/file.xls');
+        my $sheet = $book->{Worksheet}[0];
+
+DESCRIPTION
+    This module follows the interface of the Spreadsheet::ParseExcel module,
+    except only the "Value" fields of cells are filled, there is no extra
+    fancy stuff. The reason I wrote it was to have a faster way to parse
+    Excel spreadsheets in Perl. This module parses around six times faster
+    according to my own informal benchmarks then the original
+    Spreadsheet::ParseExcel at the time of writing.
+
+    To achieve this, it uses a program called "xlhtml" by Stev Grubb. You
+    can find it here:
+
+    <http://chicago.sourceforge.net/xlhtml/>
+
+    It is also in Debian as the "xlhtml" package.
+
+    Get the latest developer release. Once compiled, it needs to be in the
+    PATH of your Perl program for this module to work correctly.
+
+    You only need to use this module if you have a large volume of big Excel
+    spreadsheets that you are parsing, or perhaps need to speed up a
+    CGI/mod_perl handler. Otherwise stick to the Spreadsheet::ParseExcel
+    module.
+
+    Now, someday we will have a nice C library with an XS interface, but
+    this is not someday :)
+
+COMPATIBILITY
+    The workbook 'Author' attribute is supported, and the following
+    worksheet attributes are supported: 'Name', 'MinRow', 'MaxRow',
+    'MinCol', 'MaxCol'.
+
+    In terms of behaviour, there is one other difference which may or may
+    not affect you. Spreadsheet::ParseExcel will often create
+    Spreadsheet::ParseExcel::Cell objects with empty or whitespace-filled
+    Value fields, while this module will only create Cell objects if a value
+    exists; otherwise the Cells array will contain an "undef" for that cell.
+
+    In other words, don't blindly call "$sheet->{Cells}[$i][$j]->Value",
+    check if the cell is defined first.
+
+OPTIONS
+    When used with the "-install" (dash optional) option, it will install
+    its own "new" and "Parse" methods into the Spreadsheet::ParseExcel
+    namespace, useful if you want to try using this module along with
+    modules that depend on the Spreadsheet::ParseExcel module, and/or
+    minimize changes to your code for compatibility.
+
+AUTHOR
+    Rafael Kitover <rkitover@cpan.org>
+
+COPYRIGHT & LICENSE
+    This program is Copyright (c) 2001-2009 by Rafael Kitover. This program
+    is free software; you can redistribute it and/or modify it under the
+    same terms as Perl itself.
+
+ACKNOWLEDGEMENTS
+    Thanks to the authors of Spreadsheet::ParseExcel and xlhtml for allowing
+    us to deal with Excel files in the UNIX world.
+
+    Thanks to my employer, Gradience, Inc., for allowing me to work on
+    projects as free software.
+
+BUGS
+    are tasty!
+
+TODO
+    I'll take suggestions.
+
+SEE ALSO
+    Spreadsheet::ParseExcel, xlhtml
+

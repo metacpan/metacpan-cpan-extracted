@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+appveyor.yml
+cpanfile
+lib/Scope/UndefSafe.pm
+minil.toml
+t/00_compile.t
+t/Util.pm
+t/scope/undef_safe/apply.t
+t/scope/undef_safe/let.t
+xt/00_lint.t
+xt/perlcriticrc
+META.yml
+MANIFEST

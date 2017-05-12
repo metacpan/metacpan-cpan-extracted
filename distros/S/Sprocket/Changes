@@ -1,0 +1,40 @@
+Revision history for Sprocket
+
+0.06 Thu Oct 04 2007
+    - moved Sprocket::Plugin::Test to the template test where it belongs
+    - added soft shutdown
+    - added a test for soft shutdown
+    - fixed adjust_params to lowercase all keys, so oddball CamelCase
+      params like SSLKeyFile becomes sslkey_file
+    - updated the license
+    - added an SSL filter
+    - added super_event to Sprocket::Common (it's a sugar function for
+      calling the superclass' event ( see Server::PreFork )
+    - local_error added to Sprocket::Pluigin
+    - rewrote the manager plugin, and added an example
+    - added a port forwarding example that uses connection fusion
+    - added a test for a bind error case
+    - fixed a bug in connection fusion that caused a loop on close
+    - as_string is not needed in plugins anymore, it is now the uuid
+    - the client event remote_resolve_failed is now combined with remote_connect_error
+    - added $sprocket->callback and $sprocket->postback
+    - renamed con_list to con_id_list and aliased con_list
+    - added observer system, and tests
+    - added FD passer util, and tests
+
+0.05 Sat Apr 28 2007
+    - dns prereq was wrong
+    - adjusted AIO semantics
+
+0.04 Thu Apr 26 2007
+    - added poco dns as a prereq
+    
+0.03 Thu Apr 26 2007
+    - removed Sprocket::Event
+    - finally added this file
+
+0.02 Wed Apr 25 2007
+    - added prefork server
+
+0.01 Tue Apr 24 2007
+    - first version

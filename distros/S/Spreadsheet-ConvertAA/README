@@ -1,0 +1,31 @@
+Spreadsheet/ConvertAA version 0.04
+==================================
+
+This module allows you to convert from Spreadsheet column notation ( 'A', 'AZ', 'BC', ..) to decimal and back.
+
+  my $baseAA = ToAA(475255) ;
+  my $base10 = FromAA('AAAZ') ;
+
+Base AA (the name I give to the column notation) doesn't have the 'zero' notion. There is certainly a better
+and faster way to do the convertion.
+
+New in this version:
+
+0.04-05  Thu Jun  30 01:00:00 2005
+	CHANGED: Implementation, taken from Spreadsheet::Read
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+	None.
+
+COPYRIGHT AND LICENCE
+	See the pod documentation
+

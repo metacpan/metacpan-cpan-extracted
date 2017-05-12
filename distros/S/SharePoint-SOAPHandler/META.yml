@@ -1,0 +1,29 @@
+---
+abstract: 'Perl extension for providing a Sharepoint connecter instance for CopyTree::VendorProof.'
+author:
+  - 'dbmolester de gmail.com'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: SharePoint-SOAPHandler
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Authen::NTLM: 1.09
+  Carp: 0
+  CopyTree::VendorProof: 0
+  Data::Dumper: 0
+  File::Basename: 0
+  MIME::Base64: 0
+  SOAP::Lite: 0
+  Term::ReadKey: 0
+version: 0.0013

@@ -1,0 +1,34 @@
+<h2>
+    [% IF image.url %]
+        <a href="[% image.link %]">
+            <img src="[% image.url %]" align="middle" 
+             alt="[% channel.description %]" border="0">
+        </a><br/>
+    [% ELSE %]
+        <a href="[% channel.link %]">
+            [% channel.title %]
+        </a><br/>
+    [% END %]
+    <small>[% channel.description %]</small>
+</h2>
+
+<ul>
+[% FOREACH item = items %]
+    <li>
+        <a href="[% item.link %]" 
+          title="[% item.stripped_description %]">
+            [% item.title %]
+        </a>
+        [% IF allow_html %]
+            [% IF show_descriptions && item.description %]
+                - [% item.description %]
+            [% END %]
+        [% ELSE %]
+            [% IF show_descriptions && item.stripped_description %]
+                - [% item.stripped_description %]
+            [% END %]
+        [% END %]
+    </li>
+[% END %]
+</ul>
+

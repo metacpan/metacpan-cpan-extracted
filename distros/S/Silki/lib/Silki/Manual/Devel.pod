@@ -1,0 +1,105 @@
+package Silki::Manual::Devel;
+
+# ABSTRACT: Hack on Silki
+
+
+
+=pod
+
+=head1 NAME
+
+Silki::Manual::Devel - Hack on Silki
+
+=head1 VERSION
+
+version 0.29
+
+=head1 POSTGRES
+
+In order to hack on Silki, you'll need to make sure that you can connect to
+Postgres without a username or password as yourself, and that you can create
+and drop databases.
+
+In the future, this requirement may change, and patches are certainly welcome.
+
+=head1 PERL MODULES
+
+You'll need to install several additional prereqs, including
+L<Catalyst::Devel>, L<Catalyst::Plugin::Static::Simple>, and
+L<Catalyst::Plugin::StackTrace>.
+
+Silki uses L<Dist::Zilla> to build the distribution. Unless you are planning
+on hacking on the release tool portion of Silki, you won't need this, but
+installing it may be useful. You'll also need a number of dzil plugins.
+
+=head1 DEV SCRIPTS
+
+The Silki distribution includes a number of tools that are useful for
+development:
+
+=over 4
+
+=item * F<bin/silki_server.pl>
+
+This runs a standalone server for Silki. This is very handy for development.
+
+You can make it auto-restart when relevant files change. Here's the best
+command to do this:
+
+  bin/silki_server.pl -r \
+    --restart_directory lib \
+    --restart_directory share/i18n \
+    -rr (?:\/|^)(?!\.\#).+(?:\.pm|\.po)$ \
+    -d
+
+=item * F<dev-bin/extract-po>
+
+This extracts strings which need localization. If you're just using English,
+you don't need to extract new strings immediately. By default, the English
+string is used as both the msgid I<and> the translation of that string in
+English.
+
+=item * F<dev-bin/manage-db>
+
+This rebuilds the Silki schema and optionally populates it with some initial
+users and wikis. Run it with the C<--help> flag to see options. If you want to
+drop the existing schema you'll have to pass the C<--drop> flag.
+
+Typically, you'll run it like this:
+
+  > dev-bin/manage-db --db-name Silki --drop --seed
+
+Be careful not to run this on a system where you have a production install of
+Silki! You could easily destroy a real database.
+
+=item * F<dev-bin/make-test-schema>
+
+Some of the tests create a L<Fey::Schema> object without talking to
+Postgres. This is faster than using L<Fey::Loader>. This is done by using
+Storable to store a copy of the schema in a file. You can regenerate the
+serialized schema by running this command.
+
+=item * F<dev-bin/populate-db>
+
+This inserts a whole bunch of pages into the database. This script could be
+improved to add more variations in the data, more user, revisions, etc.
+
+=back
+
+=head1 AUTHOR
+
+Dave Rolsky <autarch@urth.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2011 by Dave Rolsky.
+
+This is free software, licensed under:
+
+  The GNU Affero General Public License, Version 3, November 2007
+
+=cut
+
+
+__END__
+

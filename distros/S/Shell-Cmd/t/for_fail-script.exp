@@ -1,0 +1,13 @@
+FAILED: 0
+CMD: 3 [  ]
+ALT [0]: TESTDIR/bin/fail_on_2 $i
+STDOUT:
+Input: 1
+STDERR:
+
+CMD: 2 [ exit ]
+ALT [10]: TESTDIR/bin/fail_on_2 $i
+STDOUT:
+Input: 2
+STDERR:
+

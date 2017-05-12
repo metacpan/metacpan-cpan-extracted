@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/SQL/Translator/Producer/GoogleBigQuery.pm
+minil.toml
+t/00_compile.t
+t/01_schema.t
+t/02_outdir.t
+t/03_typemap.t
+t/04_errors.t
+t/schema/mysql.sql
+t/schema/sqlite.sql
+META.yml
+MANIFEST

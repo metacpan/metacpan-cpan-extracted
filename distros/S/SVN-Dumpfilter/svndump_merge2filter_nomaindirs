@@ -1,0 +1,228 @@
+#!/usr/bin/perl -w
+# $Id: svndump_merge2filter_nomaindirs 278 2007-01-13 12:37:13Z martin $
+# Copyright (C) 2006 by Martin Scharrer <martin@scharrer-online.de>
+# This is free software under the GPL.
+
+use strict;
+use SVN::Dumpfilter qw(Dumpfilter dos2unix_filter svn_recalc_prop_header
+                       svn_recalc_textcontent_header svn_print_entry
+                       svn_read_entry);
+use Data::Dumper;
+use Date::Parse;
+use vars qw($dumpfile $repository @times);
+
+my %dir;
+
+sub save_filter (\%;$); 
+
+sub svn_compare_revs (\%\%);
+
+#if (@ARGV < 3)
+# { die "Usage: $0 indumpfile1 indumpfile2 [...] (outdumpfile|-)\n" }
+
+my $outfile = pop @ARGV;
+my @dumpfiles = @ARGV;
+
+if (-e $outfile)
+ { die "Out dumpfile '$outfile' already exists. Will not overwrite.\n" }
+
+my @revs;
+my $current_rev;
+my $errors = 0;
+my @repositories;
+
+foreach $dumpfile (@dumpfiles)
+ {
+   next unless -f $dumpfile;
+   my $repos;
+   # Delete all pathes and .dump ending 
+   ( $repos = $dumpfile ) =~ s{^(.*/)?(.*?)(\.dump)?$}{$2};
+   $repository = \$repos; # use pointer to save memory later
+   push @repositories, $repos;
+   $errors += Dumpfilter($dumpfile, "", \&save_filter);
+ }
+
+print STDERR "Debug: Number of revs: ", scalar @revs, "\n";
+
+### Now sort the revs after date (we will use a sort trick)
+
+# Get numeric values of all rev. dates
+foreach my $rev (@revs) 
+ {
+   push @times, str2time($rev->[0]{'properties'}{'svn:date'})
+ }
+
+# Sort them and save the indices of the result
+my @indices = sort { $times[$a] <=> $times[$b] } 0..$#times;
+
+# Test for duplicates
+{ 
+ my $lasttime = 0;
+ my $lastidx  = 0;
+ my $dupfound = 0;
+ # the loop
+foreach my $i (1 .. $#indices)
+ {
+   my $idx = $indices[$i];
+   if ($times[$idx] == $times[$lastidx])
+    {
+      if (svn_compare_revs(%{$revs[$idx][0]}, %{$revs[$lastidx][0]}))
+       {
+         print STDERR "Deleting index $idx\n";
+         $indices[$i] = undef;
+         $dupfound = 1;
+         next;
+       }
+    }
+   $lastidx  = $idx;
+ }
+ if ($dupfound)
+  { @indices = grep {defined} @indices }
+}
+
+undef @times; # free memory
+
+open(OUT,">$outfile");
+print OUT "SVN-fs-dump-format-version: 2\n\n";
+my $revnum = 1;
+
+ 
+my %oldrevs; # Structure to save old to new rev number mapping per original
+             # repository
+# Now print all entries in the new order
+foreach my $rev (@revs[@indices])
+ {
+   my $header = $rev->[0]{'header'};
+   my $prop = $rev->[0]{'properties'};
+   my $repository = ${$rev->[0]{'repository'}};
+   my $oldrevnum = $header->{'Revision-number'};
+
+   print STDERR "From '$repository'\n";
+   print STDERR "Revision-number: $oldrevnum\n";
+   print STDERR "Date: $prop->{'svn:date'}\n";
+   print STDERR "\n";
+
+   # Add origin info to log message.
+   $prop->{'svn:log'} .= 
+     "\n(Mergefilter: comes from revision $oldrevnum ".
+     "of repository '$repository')";
+   svn_recalc_prop_header(%{$rev->[0]});
+
+   # Save new values of original revision numbers.
+   # This is needed to locate copyfrom-revs
+   $oldrevs{$repository}[$oldrevnum] = $revnum;
+   
+   # Correct revision numbers
+   $header->{'Revision-number'} = $revnum;
+   
+   # print revision entry
+   svn_print_entry (*OUT, %{$rev->[0]} );
+   print OUT "\n";
+   
+   # read revision from dumpfile again
+   # and print all nodes
+
+   open (DUMPFILE, "<" . $rev->[0]{'dumpfile'}) 
+     or do { warn "Can't reopen dumpfile\n"; next; };
+   seek (DUMPFILE, $rev->[0]{'filepos'}, 0) 
+     or do { warn "Can't seek"; next; };
+
+   while (1)
+    {
+      my $node = {};
+      my $line;
+
+      while ( defined($line = <DUMPFILE>) && $line =~ /^$/) {};
+      last unless defined($line);
+             
+      if (svn_read_entry (*DUMPFILE, %$node, $line))
+       { warn "svn_read_entry errors"; }
+      
+      my $header = $node->{'header'};
+      last if exists $header->{'Revision-number'} or eof DUMPFILE;
+
+      if (exists $header->{'Node-kind'} and $header->{'Node-kind'} eq 'dir')
+       {
+         if    ($header->{'Node-action'} eq 'add')
+          { 
+            # Don't create dirs twice
+            next if exists $dir{$header->{'Node-path'}};
+            $dir{$header->{'Node-path'}} = 1; 
+          }
+          # Allow recreation of deleted dirs
+         elsif ($header->{'Node-action'} eq 'delete')
+          { delete $dir{$header->{'Node-path'}} }
+       }
+
+      # and to Node-copyfrom-path
+      if (exists $header->{'Node-copyfrom-path'})
+       {
+         # Set correct Node-copyfrom-rev value
+         $header->{'Node-copyfrom-rev'} = 
+           $oldrevs{$repository}[$header->{'Node-copyfrom-rev'}];
+       }
+      svn_print_entry (*OUT, %$node );
+      print OUT "\n";
+    }
+   
+   close (DUMPFILE);
+   $revnum++;
+ }
+  
+exit($errors ? 1 : 0);
+
+
+sub save_filter (\%;$)  #
+ {
+   my $href = shift;
+   my $recalc = shift || 1;
+   my $header = $href->{'header'};
+   my $prop   = $href->{'properties'};
+
+   if (exists $header->{'Revision-number'})
+    {
+      return if $header->{'Revision-number'} == 0; # skip rev 0
+      $href->{'repository'} = $repository; # save orignal repository in hash
+      
+      # Save original dumpfile with position to be able to read the revision
+      # again
+      $href->{'dumpfile'} = $SVN::Dumpfilter::dumpfile;
+      $href->{'filepos'}  = tell $SVN::Dumpfilter::dumpfh;
+
+      # struct with pointer to rev.hash and array to hold node hashes of this rev
+      my $revstruct = [ $href, [] ]; 
+      $current_rev = $revstruct->[1]; # set current rev pointer to empty array
+      push @revs, $revstruct;
+    }
+   else 
+    {
+      #push @$current_rev, $href; # Add node entry to node array of current rev
+    }
+ }
+
+sub svn_compare_revs (\%\%)
+ {
+   my $hrefa = shift;
+   my $hrefb = shift;
+   my $propa = $hrefa->{'properties'};
+   my $propb = $hrefb->{'properties'};
+
+   # Need revision numbers
+   return undef if (!exists $hrefa->{'header'}{'Revision-number'} or 
+                    !exists $hrefb->{'header'}{'Revision-number'});
+
+   print STDERR "svn_compare_revs: Debug a\n";
+
+   # Return 1 if this properties are equal:
+   if (
+       $propa->{'svn:date'}   eq $propb->{'svn:date'}   &&
+       $propa->{'svn:author'} eq $propb->{'svn:author'} &&
+       $propa->{'svn:log'}    eq $propb->{'svn:log'}
+      ) 
+    { return 1 }
+
+   print STDERR "svn_compare_revs: Debug b\n";
+   return 0;
+ }
+ 
+__END__

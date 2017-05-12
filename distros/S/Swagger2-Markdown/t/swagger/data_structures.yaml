@@ -1,0 +1,121 @@
+---
+x-api-blueprint:
+  resource_section: name_uri
+  action_section: name_method
+  attributes: true
+  data_structures: true
+swagger: "2.0"
+info:
+  version: "1.0"
+  title: Data Structures API
+  description: |
+    Following [Advanced Attributes](09.%20Advanced%20Attributes.md), this example demonstrates defining arbitrary data structure to be reused by various attribute descriptions.
+
+    Since a portion of the `Coupon` data structure is shared between the `Coupon` definition itself and the `Create a Coupon` action, it was separated into a `Coupon Base` data structure in the `Data Structures` API Blueprint Section. Doing so enables us to reuse it as a base-type of other attribute definitions.
+
+    ## API Blueprint
+    + [Previous: Advanced Attributes](09.%20Advanced%20Attributes.md)
+    + [This: Raw API Blueprint](https://raw.github.com/apiaryio/api-blueprint/master/examples/10.%20Data%20Structures.md)
+    + [Next: Resource Model](11.%20Resource%20Model.md)
+paths:
+  /coupons/{id}:
+    x-api-blueprint:
+      group: Coupons
+      summary: Coupon
+      description:
+      group_description: |
+        A coupon contains information about a percent-off or amount-off discount you might want to apply to a customer.
+    get:
+      summary: Retrieve a Coupon
+      description: |
+        Retrieves the coupon with the given ID.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: id
+          description: |
+
+            The ID of the desired coupon.
+          type: string
+          required: true
+      responses:
+        200:
+          description: The response message
+          schema:
+            $ref: "#/definitions/Coupon"
+  /coupons:
+    x-api-blueprint:
+      group: Coupons
+      summary: Coupons
+      description: 
+      group_description:
+    get:
+      summary: List all Coupons
+      description: |
+        Returns a list of your coupons.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: limit
+          description: |
+
+            A limit on the number of objects to be returned. Limit can range between 1 and 100 items.
+          type: number
+          default: 10
+          required: false
+      responses:
+        200:
+          description: The response message
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Coupon"
+    post:
+      summary: Create a Coupon
+      description: |
+        Creates a new Coupon.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: coupon
+          required: true
+          schema:
+            $ref: "#/definitions/Coupon"
+      responses:
+        200:
+          description: The response message
+          schema:
+            $ref: "#/definitions/Coupon"
+definitions:
+  Coupon:
+    type: object
+    properties:
+      id:
+        type: string
+        x-example: 250FF
+      created:
+        type: number
+        description: Time stamp
+        x-example: 1415203908
+      percent_off:
+        type:
+          - number
+          - null
+        x-example: 25
+        description: |
+
+          A positive integer between 1 and 100 that represents the discount the coupon will apply.
+      redeem_by:
+        type: number
+        description: Date after which the coupon can no longer be redeemed
+
+# vim: ts=2:sw=2:et

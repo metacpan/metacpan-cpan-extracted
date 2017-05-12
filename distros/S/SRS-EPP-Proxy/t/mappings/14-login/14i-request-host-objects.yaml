@@ -1,0 +1,20 @@
+# Send a request without logging in (which should fail)
+template: login.tt
+
+user: ~
+no_auto_login: 1
+
+vars:
+  user: 100
+  pass: foobar
+  svcs:
+    - urn:ietf:params:xml:ns:domain-1.0
+    - urn:ietf:params:xml:ns:contact-1.0
+    - urn:ietf:params:xml:ns:host-1.0
+
+output_assertions:
+  match:
+    - [ '//epp:value', '/host-1.0/', 'EPP: errant value pointed out' ]
+    - [ '//epp:reason', '/not available/', 'EPP: says why' ]
+  attr_is:
+    - [ '//epp:result', 'code', '2307', 'EPP: login failed' ]

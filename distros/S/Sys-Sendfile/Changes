@@ -1,0 +1,56 @@
+Revision history for Sys-Sendfile
+
+0.16      2015-02-17 16:34:45+01:00 Europe/Amsterdam
+          Moved PERL_VERSION_ATLEAST to after perl headers
+
+0.15      2015-02-16 01:09:00+01:00 Europe/Amsterdam
+          Convert descriptors to handles correctly on Windows
+
+0.14      2015-02-14 16:29:03+01:00 Europe/Amsterdam
+          Explicitly include winsock on Windows again
+
+0.13      2015-01-31 12:46:16+01:00 Europe/Amsterdam
+          Fix compilation issue on Windows
+          Document $offset parameter
+
+0.12      2013-12-02 00:24:06 Europe/Amsterdam
+          Switched to Dist::Zilla
+          Also support GNU/kFreeBSD
+
+0.11    2010-03-02
+        Fixed unit test on Windows
+
+0.10    2009-11-14
+        Port to Windows, by Yasuhiro Matsumoto
+
+0.09    2009-09-19
+        Port to macosx, by Kazuho Oku
+
+0.08    2009-02-04
+        Undid my screwing up during the previous release
+        Skip testing on Solaris for now...
+
+0.07    2009-01-30
+        Fixed tests for Solaris
+
+0.06    2009-01-29
+		Fixed typo on Solaris
+
+0.05    2009-01-28
+        Fixed compilation using the Intel compiler
+        Made the error message for unsupported OSs work on non-GCC compilers
+
+0.04    2009-01-25
+        Fixed linking on Solaris
+        Fixed order of arguments for FreeBSD
+
+0.03    2009-01-20
+        Fixed code portability
+        More fixes to Build.PL
+
+0.02    2009-01-18
+        Fixed Build.PL
+
+0.01    2009-01-17
+        First version, released on an unsuspecting world.
+

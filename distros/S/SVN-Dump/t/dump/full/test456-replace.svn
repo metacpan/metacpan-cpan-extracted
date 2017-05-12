@@ -1,0 +1,154 @@
+SVN-fs-dump-format-version: 2
+
+UUID: 541afdc7-9084-4cd7-887f-f2551ef8e0b3
+
+Revision-number: 0
+Prop-content-length: 56
+Content-length: 56
+
+K 8
+svn:date
+V 27
+2010-03-28T23:49:45.160092Z
+PROPS-END
+
+Revision-number: 1
+Prop-content-length: 127
+Content-length: 127
+
+K 7
+svn:log
+V 28
+Create repository structure.
+K 10
+svn:author
+V 4
+troc
+K 8
+svn:date
+V 27
+2010-03-28T23:50:46.353043Z
+PROPS-END
+
+Node-path: branches
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: tags
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: trunk
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Revision-number: 2
+Prop-content-length: 113
+Content-length: 113
+
+K 7
+svn:log
+V 14
+Create a file.
+K 10
+svn:author
+V 4
+troc
+K 8
+svn:date
+V 27
+2010-03-28T23:51:03.607629Z
+PROPS-END
+
+Node-path: trunk/file
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 9
+Text-content-md5: 88fa9f694690e11239096536ccf2702b
+Text-content-sha1: c9e870f04c9a67f50f304ab2bb80cbefa3960adb
+Content-length: 19
+
+PROPS-END
+original
+
+
+Revision-number: 3
+Prop-content-length: 114
+Content-length: 114
+
+K 7
+svn:log
+V 15
+Replace a file.
+K 10
+svn:author
+V 4
+troc
+K 8
+svn:date
+V 27
+2010-03-28T23:51:30.012226Z
+PROPS-END
+
+Node-path: trunk/file
+Node-kind: file
+Node-action: replace
+Prop-content-length: 10
+Text-content-length: 18
+Text-content-md5: 8efeaa3175ba793bae99b778d329c9bd
+Text-content-sha1: e5e3a41d191bc31b0c4d4d100268ed3d102ec595
+Content-length: 28
+
+PROPS-END
+different content
+
+
+Revision-number: 4
+Prop-content-length: 122
+Content-length: 122
+
+K 7
+svn:log
+V 23
+Edit the replaced file.
+K 10
+svn:author
+V 4
+troc
+K 8
+svn:date
+V 27
+2010-03-28T23:52:06.642103Z
+PROPS-END
+
+Node-path: trunk/file
+Node-kind: file
+Node-action: change
+Text-content-length: 64
+Text-content-md5: 0a1f1c7d4eab154e7c023ce18d9acf54
+Text-content-sha1: f42beb5266cccc1deba602ae1a7e72aafb8da809
+Content-length: 64
+
+And now we make a plain change.
+Two lines.
+Three?
+Four...
+Five!
+
+

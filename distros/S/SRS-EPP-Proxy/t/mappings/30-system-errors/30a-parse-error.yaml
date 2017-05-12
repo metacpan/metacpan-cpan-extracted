@@ -1,0 +1,24 @@
+# Test how we behave if we get a parse error
+# not likely to ever happen, but we should still handle it correctly
+template: check-domain.tt
+
+# Too hard to make this happen in an integration test
+integration_skip: 1
+
+vars:
+  domains:
+    - cheese.co.te
+    - ffo.co.te
+    - foo.net.te
+    - bar.org.te
+
+input_assertions:
+  class: SRS::EPP::Command::Check::Domain
+
+output_assertions:
+  count:
+  match:
+  match_all:
+  attr_is:
+    - [ '//epp:result', 'code', '2500', 'EPP: correct result code' ]
+

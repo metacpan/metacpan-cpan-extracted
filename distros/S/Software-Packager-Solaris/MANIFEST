@@ -1,0 +1,10 @@
+LICENSE
+Changes
+Makefile.PL
+README
+TODO
+MANIFEST
+lib/Software/Packager/Solaris.pm
+lib/Software/Packager/Object/Solaris.pm
+t/01_initialise.t
+t/02_solaris.t

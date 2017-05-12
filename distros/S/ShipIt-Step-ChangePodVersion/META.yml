@@ -1,0 +1,27 @@
+---
+abstract: 'Keep VERSION in your Pod in sync with $VERSION'
+author:
+  - 'Thomas Mueller <tmueller@cpan.org>'
+build_requires:
+  Test::Exception: 0.29
+  Test::More: 0.88
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: ShipIt-Step-ChangePodVersion
+provides:
+  ShipIt::Step::ChangePodVersion:
+    file: lib/ShipIt/Step/ChangePodVersion.pm
+    version: 0.04
+requires:
+  File::Find::Rule: 0.32
+  ShipIt: 0.53
+  base: 0
+  strict: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.04

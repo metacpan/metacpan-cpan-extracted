@@ -1,0 +1,124 @@
+#!/usr/bin/perl -w
+# See copyright, etc in below POD section.
+######################################################################
+
+require 5.005;
+use Getopt::Long;
+use IO::File;
+use Pod::Usage;
+use strict;
+
+use vars qw ($Debug $VERSION);
+
+$VERSION = '1.450';
+
+#======================================================================
+# main
+
+$Debug = 0;
+my @params;
+if (! GetOptions (
+		  "help"	=> \&usage,
+		  "debug"	=> \&debug,
+		  "version"	=> sub { print "Version $VERSION\n"; exit(0); },
+		  "<>"		=> \&parameter,
+		  )) {
+    die "%Error: Bad usage, try 'sp_includer --help'\n";
+}
+
+foreach my $param (@params) {
+    print "#include \"$param\"\n"
+}
+
+#----------------------------------------------------------------------
+
+sub usage {
+    print "Version $VERSION\n";
+    pod2usage(-verbose=>2, -exitval=>2, -output=>\*STDOUT, -noperldoc=>1);
+    exit (1);
+}
+
+sub debug {
+    $Debug = 1;
+}
+
+sub parameter {
+    my $param = shift;
+    push @params, $param;
+}
+
+#######################################################################
+__END__
+
+=pod
+
+=head1 NAME
+
+sp_includer - Form include statements
+
+=head1 SYNOPSIS
+
+  sp_includer <file1.cpp>...
+
+=head1 DESCRIPTION
+
+sp_includer simply takes all of the arguments on the command line and
+prints #include statements for each argument.
+
+This allows multiple files to be compiled in one pass; rather than using
+
+    gcc file1.cpp
+    gcc file2.cpp
+    gcc file3.cpp
+
+or the equivalently slow
+
+    gcc file1.cpp file2.cpp file3.cpp
+
+this program allows
+
+    sp_includer file1.cpp file2.cpp file3.cpp > file_CONCAT.cpp
+    gcc file_CONCAT.cpp
+
+where any headers all files require will be read only once.  With the
+SystemC headers, this saves ~5 seconds per file, many minutes across an
+entire large project.
+
+=head1 ARGUMENTS
+
+=over 4
+
+=item --help
+
+Displays this message and program version and exits.
+
+=item --version
+
+Displays program version and exits.
+
+=back
+
+=head1 DISTRIBUTION
+
+SystemPerl is part of the L<http://www.veripool.org/> free SystemC software
+tool suite.  The latest version is available from CPAN and from
+L<http://www.veripool.org/systemperl>.
+
+Copyright 2001-2014 by Wilson Snyder.  This package is free software; you
+can redistribute it and/or modify it under the terms of either the GNU
+Lesser General Public License Version 3 or the Perl Artistic License Version 2.0.
+
+=head1 AUTHORS
+
+Wilson Snyder <wsnyder@wsnyder.org>
+
+=head1 SEE ALSO
+
+L<SystemC::Manual>
+
+=cut
+
+######################################################################
+### Local Variables:
+### compile-command: "./sp_includer a.cpp b.cpp c.cpp"
+### End:

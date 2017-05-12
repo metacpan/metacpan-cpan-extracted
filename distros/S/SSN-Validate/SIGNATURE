@@ -1,0 +1,41 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.35.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 055198c15493f1613c83cb4d7ecbaa883e826947 Changes
+SHA1 5ea03dfb98cdb70454a735b7480d1f74b12ca71a MANIFEST
+SHA1 381989652c51cdd78ab33a7e37d0f04f6dc93da7 MANIFEST.SKIP
+SHA1 693a977a79aac30238a9cb3db52c0a2d786446e7 META.yml
+SHA1 1b03c01daa1ff8c4f1f100737553c47e3b218b02 Makefile.PL
+SHA1 50dfcade7ae7e69c295a391fe9a8426621dc3cb0 README
+SHA1 5de4367eec7b81b9e4b8a8c9ff326f4224870b66 Validate.pm
+SHA1 8cf7798818a8446887747c358b8175d65b991464 t/0-signature.t
+SHA1 d57d29e55fddcdcdebba7e92b84f7f822ba0758b t/001_load.t
+SHA1 f2bae625425912e94c5b719f32d9c9ed934ec0dc t/002_valid.t
+SHA1 23cb6ca3dddce77eba192227bb89081b42c0b167 t/003_tax_range.t
+SHA1 136d48ba0a861a5118594f7fa509f72c284cb869 t/004_invalid.t
+SHA1 3c407baf4af85991c20afbaa7577673f73cf38d5 t/005_ad.t
+SHA1 14c96531ba41bda27f3bd12beebcbb7aaaaac2eb t/006_bad_combo.t
+SHA1 49a1d83382a7af826e643e9aa824403323f5ec62 t/007_valid_area.t
+SHA1 a39b05bf31a286f555e27afc0239e61b19c552eb t/008_invalid_area.t
+SHA1 c82d35cf30e952bc47ed9ca08d9c3c2ec32b435e t/009_groups.t
+SHA1 4cf4cf46065c6500a49d6f674961175e691e2208 t/010_bad_combo_ignore.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.2 (FreeBSD)
+
+iD8DBQFJtYAHVlEcTGnBGSQRAl34AKCdq40IIErpBKQLsZPrROMVlNF89QCeOwYE
+mveyRD7xtwyVC7bm3kINGjY=
+=GA8y
+-----END PGP SIGNATURE-----

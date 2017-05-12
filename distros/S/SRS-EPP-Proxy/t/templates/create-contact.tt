@@ -1,0 +1,27 @@
+<create>
+  <contact:create xmlns:contact="urn:ietf:params:xml:ns:contact-1.0">
+    <contact:id>[% contact_id %]</contact:id>
+    <contact:postalInfo type="int">
+      <contact:name>[% name %]</contact:name>
+      [% IF company.defined %]<contact:org>[% company %]</contact:org>[% END %]
+      <contact:addr>
+        <contact:street>[% street %]</contact:street>
+        <contact:street>[% street2 %]</contact:street>
+        <contact:city>[% city %]</contact:city>
+        <contact:sp>[% state %]</contact:sp>
+        <contact:pc>[% pcode %]</contact:pc>
+        <contact:cc>[% ccode %]</contact:cc>
+      </contact:addr>
+    </contact:postalInfo>
+    [% IF phone.defined %]<contact:voice>[% phone %]</contact:voice>[% END -%]
+    [% IF fax.defined %]<contact:fax>[% fax %]</contact:fax>[% END %]
+    <contact:email>[% email %]</contact:email>
+    <contact:authInfo>
+      <contact:pw></contact:pw>
+    </contact:authInfo>
+    [% IF disclose %]<contact:disclose flag="0">
+      <contact:voice/>
+      <contact:email/>
+    </contact:disclose>[% END %]
+  </contact:create>
+</create>

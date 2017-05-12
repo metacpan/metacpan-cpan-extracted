@@ -1,0 +1,151 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+#use Smart::Comments::JSON '##';
+use lib 'lib';
+use SSH::Batch::ForNodes;
+
+sub help ($);
+
+SSH::Batch::ForNodes::init_rc();
+
+my $expand_list;
+my @args;
+for (@ARGV) {
+    if (/^-(.*)/) {
+        my $group = $1;
+        if ($group eq 'x') {
+            $expand_list = 1;
+        } elsif ($group eq 'h') {
+            help(0);
+        } else {
+            die "ERROR: Unknown option $_\n";
+        }
+    } else {
+        push @args, $_;
+    }
+}
+
+## @ARGV
+my $expr = join ' ', @args;
+if (!$expr) {
+    warn "No argument specified.\n\n";
+    help(1);
+}
+
+my $set = SSH::Batch::ForNodes::parse_expr($expr);
+
+if ($expand_list) {
+    for my $host (sort $set->elements) {
+        print $host, "\n";
+    }
+} else {
+    print join(' ', sort $set->elements), "\n";
+}
+
+sub help ($) {
+    my $exit_code = shift;
+    my $msg = <<'_EOC_';
+USAGE:
+
+    fornodes [OPTIONS] HOST_PATTERN... [OPTIONS]
+
+OPTIONS:
+    -h      Print this help
+    -x      Expand the host list output to multiple lines.
+_EOC_
+    if ($exit_code == 0) {
+        print $msg;
+        exit 0;
+    } else {
+        warn $msg;
+        exit $exit_code;
+    }
+}
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+fornodes - Expand patterns to machine host list
+
+=head1 SYNOPSIS
+
+    $ cat > ~/.fornodesrc
+    ps=blah.ps.com bloo.ps.com boo[2-25,32,41-70].ps.com
+    as=ws[1101-1105].as.com
+    # use set operations to define new sets:
+    foo={ps} + {ps} * {as} - {ps} / {as}
+     bar = foo.com bar.org \
+        bah.cn \
+        baz.com
+    ^D
+
+    $ fornodes 'api[02-10].foo.bar.com' 'boo*.ps.com'
+    $ fornodes 'tq[ab-ac].[1101-1105].foo.com'
+    $ fornodes '{ps} + {as} - ws1104.as.com'  # set union and subtraction
+    $ fornodes '{ps} * {as}'  # set intersect
+
+=head1 USAGE
+
+    fornodes [OPTIONS] HOST_PATTERN... [OPTIONS]
+
+=head1 OPTIONS
+
+    -h      Print this help
+    -x      Expand the host list output to multiple lines.
+
+=head1 DESCRIPTION
+
+Please refer to L<SSH::Batch> for more documentation.
+
+=head1 AUTHORS
+
+=over
+
+=item *
+
+Zhang "agentzh" Yichun (章亦春) C<< <agentzh@gmail.com> >>
+
+=item *
+
+Liseen Wan (万珣新) C<< <liseen.wan@gmail.com> >>
+
+=back
+
+=head1 COPYRIGHT & LICENSE
+
+This module as well as its programs are licensed under the BSD License.
+
+Copyright (c) 2009, Yahoo! China EEEE Works, Alibaba Inc.
+
+Copyright (C) 2009, 2010, 2011, Zhang "agentzh" Yichun (章亦春).
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+=over
+
+=item *
+
+Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+
+=item *
+
+Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+=item *
+
+Neither the name of the Yahoo! China EEEE Works, Alibaba Inc. nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+
+=back
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=head1 SEE ALSO
+
+L<key2nodes>, L<atnodes>, L<tonodes>, L<SSH::Batch>, L<Net::OpenSSH>.
+

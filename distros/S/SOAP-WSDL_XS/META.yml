@@ -1,0 +1,22 @@
+---
+name: SOAP-WSDL_XS
+version: 0.2
+author:
+  - 'Martin Kutter - MKUTTER@cpan.org'
+abstract: Fast XML deserializer for SOAP::WSDL
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Class::Std::Fast: 0
+  SOAP::WSDL: 2
+provides:
+  SOAP::WSDL::Deserializer::XSD_XS:
+    file: lib/SOAP/WSDL/Deserializer/XSD_XS.pm
+    version: 0.1
+  SOAP::WSDL::Expat::MessageParser_XS:
+    file: lib/SOAP/WSDL/Expat/MessageParser_XS.pm
+generated_by: Module::Build version 0.31012
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

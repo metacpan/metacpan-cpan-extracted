@@ -1,0 +1,24 @@
+Sun Aug 18 00:51:42 2002  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* "use warnings" is 5.6.0-ism, just remove that
+	  and remember to test with -w
+	  (reported by Dans Testorama <smoke@nambit.net>)
+
+	* Release 0.04.
+
+Mon Oct 22 20:36:48 2001  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Small documentation updates, mostly just POD formatting.
+
+	* Release 0.03.
+
+Tue Aug  7 02:12:36 2001  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Corrections and clarifications from John C. Gunther.
+	 
+	* Release 0.02.
+
+Thu Aug  7 03:42:17 2001  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Release 0.01.
+

@@ -1,0 +1,54 @@
+---
+abstract: 'apparently run a function in a higher stack frame'
+author:
+  - 'Michael Schwern <mschwern@cpan.org>'
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  Exporter: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  lib: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Sub-Uplevel
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  Sub::Uplevel:
+    file: lib/Sub/Uplevel.pm
+    version: '0.2800'
+requires:
+  Carp: '0'
+  constant: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/Perl-Toolchain-Gang/Sub-Uplevel/issues
+  homepage: https://github.com/Perl-Toolchain-Gang/Sub-Uplevel
+  repository: https://github.com/Perl-Toolchain-Gang/Sub-Uplevel.git
+version: '0.2800'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'Adam Kennedy <adamk@cpan.org>'
+  - 'Alexandr Ciornii <alexchorny@gmail.com>'
+  - 'David Golden <xdg@xdg.me>'
+  - 'Graham Ollis <plicease@cpan.org>'
+  - 'J. Nick Koston <nick@cpanel.net>'
+  - 'Michael Gray <mg13@sanger.ac.uk>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

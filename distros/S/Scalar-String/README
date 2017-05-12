@@ -1,0 +1,38 @@
+NAME
+
+Scalar::String - string aspects of scalars
+
+DESCRIPTION
+
+This module is about the string part of plain Perl scalars.  A scalar has
+a string value, which is notionally a sequence of Unicode codepoints, but
+may be internally encoded in either ISO-8859-1 or UTF-8.  In places, and
+more so in older versions of Perl, the internal encoding shows through.
+To fully understand Perl strings it is necessary to understand these
+implementation details.
+
+This module provides functions to classify a string by encoding and to
+encode a string in a desired way.
+
+This module is implemented in XS, with a pure Perl backup version for
+systems that can't handle XS.
+
+INSTALLATION
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+AUTHOR
+
+Andrew Main (Zefram) <zefram@fysh.org>
+
+COPYRIGHT
+
+Copyright (C) 2009, 2010, 2011 Andrew Main (Zefram) <zefram@fysh.org>
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

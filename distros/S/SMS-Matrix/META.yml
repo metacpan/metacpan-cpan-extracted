@@ -1,0 +1,23 @@
+---
+abstract: 'Module for the SMS Matrix API!'
+author:
+  - 'Daniel Rokosz<daniel@smsmatrix.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300003, CPAN::Meta::Converter version 2.112621'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: SMS-Matrix
+requires:
+  HTTP::Response: 5.836
+  JSON::PP: 2.26000
+  LWP::UserAgent: 5.835
+  Net::SSLeay: 1.60
+  Net::HTTPS: 6.04
+  IO::Compress::Gzip: 2.064
+  Compress::Raw::Zlib: 2.065
+version: 1.01

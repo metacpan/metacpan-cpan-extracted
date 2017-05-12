@@ -1,0 +1,20 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/Storable/CouchDB.pm
+t/001_load.t
+t/002_types.t
+t/003_inheritance.t
+t/004_deep.t
+t/005_binary.t
+t/010_store.t
+t/015_update.t
+t/020_retrieve.t
+t/030_delete.t
+t/040_retrieve.t
+perl-Storable-CouchDB.spec
+scripts/perl-Storable-CouchDB-counter.pl
+META.yml                                 Module meta-data (added by MakeMaker)

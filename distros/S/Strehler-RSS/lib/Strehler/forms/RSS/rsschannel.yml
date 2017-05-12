@@ -1,0 +1,79 @@
+attributes:
+    class: well 
+elements:
+    - name: link
+      label: Link
+      constraints:
+        - type: Required
+          message: "Link required"
+      attributes:
+        class: span7
+    - label: Entity
+      name: entity_type
+      type: "+Strehler::FormFu::Element::EntityTypeSelect"
+      excluded: ['log', 'user']
+      attributes:
+        id: entitytype
+      constraints:
+        - type: Required
+          message: "Select an entity"
+    - type: "+Strehler::FormFu::Element::Category"
+    - type: Checkbox
+      name: deep
+      label: "Include subcategories"
+    - type: Select
+      name: titlefield-select
+      label: "Field for title"
+      attributes:
+        id: titlefield-select
+      constraints:
+        - type: Required
+          message: "Select an attribute for title"
+    - type: Hidden
+      name: title_field
+      attributes:
+        id: title_field
+    - type: Select
+      name: descriptionfield-select
+      label: "Field for description"
+      attributes:
+        id: descriptionfield-select
+      constraints:
+        - type: Required
+          message: "Select an attribute for description"
+    - type: Hidden
+      name: description_field
+      attributes:
+        id: description_field
+    - type: Select
+      name: linkfield-select
+      label: "Field for link"
+      attributes:
+        id: linkfield-select
+      constraints:
+        - type: Required
+          message: "Select an attribute for link"
+    - type: Hidden
+      name: link_field
+      attributes:
+        id: link_field
+    - name: link_template
+      label: "Link template (use %% to indicate where link field will go)"
+      attributes:
+        class: span7
+      constraints:
+        - type: Required
+          message: "Link template required"
+    - type: Select
+      name: order_by
+      label: "Order by"
+      options: 
+        - ['id', 'id']
+        - ['display_order', 'order']
+        - ['publish_date', 'date']
+    - type: "+Strehler::FormFu::Element::SubmitBlockMulti"
+      actions:
+        - submit-go
+        - submit-continue
+        - submit-publish 
+    

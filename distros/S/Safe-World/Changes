@@ -1,0 +1,104 @@
+Revision history for Perl extension Safe::World.
+
+
+0.14  12 Sept 2004
+      - Added methods [un]block_[stdout|stderr].
+      - Added option to paste arguments for use_shared('module::foo' , qw(bar baz)).
+
+
+0.13  9 Apr 2004
+      - Fixed PREREQ_PM, adding Hash::NoRef to it.
+
+
+0.12  9 Apr 2004
+      - Added wrapper for caller() to handle rigth the package names.
+
+
+0.11  5 Feb 2004
+      - New trace system for global variables of compartments linkeds to others and
+        for complex cache systems.
+
+
+0.10  23 Jan 2004
+      - Safe::Hole is back as a dependences. Safe::Hole 0.10+ works well.
+      - Bug fixes for global variables of cache compartments and persistent code.
+
+
+0.09  16 Jan 2004
+      - Fixed bug with select() overwrited, for slection of handlers from a package
+        (forgot to keep the caller base).
+      - Added Safe::World::Hole, to keep compatiblity, since Safe::World/0.09 breaks *INC behavior for Safe::World.
+      - Removed dependency of Safe::Hole
+      - Added wrapper for UNIVERSAL::isa() to handle rigth the package names.
+
+
+0.08  29 Dec 2003
+      - Added method reset_internals().
+      - Added method stdout_buffer_data().
+      - Fixed %INC access for link_workd() and unlink_world().
+      - Added unshare_vars() call on DESTROY().
+      - Added method use_shared().
+      - Fixed bug on reuse of cached package and compiled references to *_, specialy @_.
+      - Fixed behavior of $^R, that is a global variable that can't be shared, since doesn't exists at $main::^R,
+        and have his SCALAR reference change during the RE. ($^R is used by REGEXP, see perlvar POD).
+      - Added method eval_no_warn(), to run codes and do not have any alert, error, die, or warn.
+      - Fixed bug with select(), that happens due the different behaviors of select() with STDOUT inside compartments
+        on Perl-5.6x and Perl-5.8x. (Bug found with mod_perl2).
+
+
+0.07  21 Dec 2003
+      - Added cache of scopes at Safe::World::Scope.
+      - Blocked access to the symbols tables through Safe::World::Scope objects.
+      - Fixed bug on unlink_world(), where the call to unlink_package() was wrong.
+      - Removed select() of previous output on print_stderr(), due problems when called from internal erros,
+        like use on inexistent modules. But the select() of previous output on print_stdout() is kept to avoid self loops!
+
+
+0.06  19 Dec 2003
+      - Added method op_deny, op_deny_only, op_permit, op_permit_only.
+      - Fixed minor bug on eval(), when called from inside.
+      - Fixed DESTROY for HOOK of Safe::World::Scope.
+      - Added some internal select_static() calls for optimization.
+      - Fixed autohead for print_header().
+
+
+0.05  16 Dec 2003
+      - Added method op_deny, op_deny_only, op_permit, op_permit_only.
+      - Added methods reset_output(), unlink_all_worlds().
+      - Fixed bug on destroy.
+      - Fixed minor bug on eval(), when called from inside.
+      - New module Safe::World::Scope, for objects that works inside the World without share packages.
+      - Added dependece to Safe::Hole/0.08, due Safe::World::Scope.
+      - All the Safe::World* packages reviseds to use Safe::World::Scope access.
+
+
+0.04  09 Dec 2003
+      - New test with IO::Socket to test select() inside the compartment.
+        (Due old problems in other works with Safe and mod_perl, just to ensure that it's ok in Safe::World).
+      - Fixed warnings for constant redefinition on Perl-5.8.x when cleanning the compartment.
+      - Added method redirect_stdout() and restore_stdout().
+      - Fixed bug for internal call of die(). Now die() doesn't exit from the World, only from it's own eval().
+        What enables other eval() calls to the World.
+      - Fixed bug with ignored warnings, like syntax error.
+      - Added method eval_args() and eval_pack_args().
+
+
+0.03  30 Nov 2003
+      - No more dependence of Safe. Own implementation of Safe at Safe::World::Compartment,
+        with simpler code and less sub call and variables criations for reval().
+      - use of select_static on initialization to avoid new selections.
+      - Fixed some minor bug in the headers handler for HEADOUT.
+      - Added method reset().
+      - Added methods close_tiestdout() and close_tiestderr().
+
+0.02  30 Nov 2003
+      - Fixed tests on Perl-5.8+ & Perl-5.6.2.
+      - Fixed link_world() for Perl-5.8+ & Perl-5.6.2.
+      - Fixed symbol table link on linux (skip loaded modules reference =~ /[^\w:]/)
+      - Fixed STDERR redirection for Perl-5.8+.
+      - POD updates and fixes.
+
+0.01  Sat Nov 29 19:19:42 2003
+      - original version; created by h2xs 1.21 with options
+         -X -n Safe::World
+

@@ -1,0 +1,16 @@
+MANIFEST
+README
+CHANGES
+TODO
+BUGS
+Makefile.PL
+Source.pm
+t/Basic.pm
+t/t.csh
+t/t.sh
+t/csh.t
+t/tcsh.t
+t/sh.t
+t/ksh.t
+t/zsh.t
+t/bash.t

@@ -1,0 +1,15 @@
+description: Renew an existing domain
+registrar: 1
+
+
+request: |-
+ <NZSRSRequest VerMajor="4" VerMinor="4" RegistrarId="100">
+  <DomainUpdate ActionId="005b-2-renew.yml" Renew="1" Term="1">
+    <DomainNameFilter>mustard.co.te</DomainNameFilter>
+    <AuditText>We RenewDomains for cash - we are pretending to be a scheduled job</AuditText>
+  </DomainUpdate>
+ </NZSRSRequest>
+
+
+assertions:
+ - xpath_matches: [ '//Error', '0', 'No errors' ]

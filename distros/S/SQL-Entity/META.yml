@@ -1,0 +1,21 @@
+--- #YAML:1.0
+name:                SQL-Entity
+version:             0.05
+author:
+  - 'Adrian Witas <adrian@webapp.strefa.pl>'
+abstract: Entity sql abstraction layer
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+version_from: lib/Persistence/Entity.pm
+installdirs:  site
+generated_by:        ExtUtils::MakeMaker version 6.3201
+distribution_type:   module
+requires:     
+    Abstract::Meta::Class:         0
+    Storable:                      0
+    Test::Pod:                     0
+    Test::Pod::Coverage:           0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2

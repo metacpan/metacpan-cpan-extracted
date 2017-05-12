@@ -1,0 +1,46 @@
+SMS::Send::AQL  README
+===========================
+
+An SMS::Send driver to send messages via AQL (www.aql.com).
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  SMS::AQL
+
+
+USAGE
+
+Please see the documentation for SMS::Send for details on how to use SMS::Send
+to send messages using an SMS::Send driver such as this one.
+
+When creating an instance of SMS::Send, you must supply your AQL account
+username and password, in the parameters _username and _password (alternatively,
+_login can be used in place of _username, for consistency with the example
+provided by SMS::Send).
+
+There is a simple example usage script distributed with SMS::Send::AQL which
+you will find in eg/simple-example.pl.
+
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by David Precious
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+$Id: README 213 2008-01-19 15:32:33Z davidp $

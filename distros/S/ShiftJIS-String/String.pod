@@ -1,0 +1,719 @@
+
+=head1 NAME
+
+ShiftJIS::String - functions to manipulate Shift-JIS strings
+
+=head1 SYNOPSIS
+
+  use ShiftJIS::String;
+
+  ShiftJIS::String::substr($str, ShiftJIS::String::index($str, $substr));
+
+=head1 DESCRIPTION
+
+This module provides some functions which emulate
+the corresponding C<CORE> functions and helps someone
+to manipulate multiple-byte character sequences in Shift-JIS.
+
+* 'Hankaku' and 'Zenkaku' mean 'halfwidth' and 'fullwidth' characters
+in Japanese, respectively.
+
+=head1 FUNCTIONS
+
+=head2 Check Whether the String is Legal
+
+=over 4
+
+=item C<issjis(LIST)>
+
+Returns a boolean indicating whether all the strings in the parameter list
+are legally encoded in Shift-JIS.
+
+Returns false if C<LIST> includes one (or more) invalid string.
+
+=back
+
+=head2 Length
+
+=over 4
+
+=item C<length(STRING)>
+
+Returns the length in characters of the supplied string.
+
+=back
+
+=head2 Reverse
+
+=over 4
+
+=item C<strrev(STRING)>
+
+Returns a reversed string,
+i.e., a string that has all characters of C<STRING>
+but in the opposite order.
+
+=back
+
+=head2 Search
+
+=over 4
+
+=item C<index(STRING, SUBSTR)>
+
+=item C<index(STRING, SUBSTR, POSITION)>
+
+Returns the position of the first occurrence
+of C<SUBSTR> in C<STRING> at or after C<POSITION>.
+If C<POSITION> is omitted, starts searching
+from the beginning of the string.
+
+If the substring is not found, returns C<-1>.
+
+=item C<rindex(STRING, SUBSTR)>
+
+=item C<rindex(STRING, SUBSTR, POSITION)>
+
+Returns the position of the last occurrence of C<SUBSTR> in C<STRING>.
+If C<POSITION> is specified, returns the last
+occurrence at or before C<POSITION>.
+
+If the substring is not found, returns C<-1>.
+
+=item C<strspn(STRING, SEARCHLIST)>
+
+Returns the position of the first occurrence of
+any character that is not contained in <SEARCHLIST>.
+
+If C<STRING> consists of the characters in C<SEARCHLIST>,
+the returned value must equal the length of C<STRING>.
+
+While C<SEARCHLIST> is not aware of character ranges,
+you can utilize C<mkrange()>.
+
+  strspn("+0.12345*12", "+-.0123456789");
+  # returns 8 (at '*')
+
+=item C<strcspn(STRING, SEARCHLIST)>
+
+Returns the position of the first occurrence of
+any character contained in C<SEARCHLIST>.
+
+If C<STRING> does not contain any character in C<SEARCHLIST>,
+the returned value must equal the length of C<STRING>.
+
+While C<SEARCHLIST> is not aware of character ranges,
+you can utilize C<mkrange()>.
+
+=item C<rspan(STRING, SEARCHLIST)>
+
+Searches the last occurence of any character
+that is not contained in C<SEARCHLIST>.
+
+If such a character is found, returns the next position to it;
+otherwise (any character in C<STRING> is contained in C<SEARCHLIST>),
+it returns C<0> (as the first position of the string).
+
+While C<SEARCHLIST> is not aware of character ranges,
+you can utilize C<mkrange()>.
+
+=item C<rcspan(STRING, SEARCHLIST)>
+
+Searches the last occurence of any character
+that is contained in C<SEARCHLIST>.
+
+If such a character is found, returns the next position to it;
+otherwise (any character in C<STRING> is not contained in C<SEARCHLIST>),
+it returns C<0> (as the first position of the string).
+
+While C<SEARCHLIST> is not aware of character ranges,
+you can utilize C<mkrange()>.
+
+=back
+
+=head2 Trimming
+
+=over 4
+
+=item C<trim(STRING)>
+
+=item C<trim(STRING, SEARCHLIST)>
+
+=item C<trim(STRING, SEARCHLIST, USE_COMPLEMENT)>
+
+Erases characters in C<SEARCHLIST> from the beginning and the end
+of C<STRING> and the returns the result.
+
+If C<USE_COMPLEMENT> is true, erases characters
+that are B<not contained> in C<SEARCHLIST>.
+
+If C<SEARCHLIST> is omitted (or C<undef>),
+it is used the list of whitespace characters
+i.e., C<"\t">, C<"\n">, C<"\r">, C<"\f">, C<"\x20"> (C<SP>),
+and C<"\x81\x40"> (C<IDSP>).
+
+While C<SEARCHLIST> is not aware of character ranges,
+you can utilize C<mkrange()>,
+like C<trim($string, mkrange("\x00-\x20"))>.
+
+=item C<ltrim(STRING)>
+
+=item C<ltrim(STRING, SEARCHLIST)>
+
+=item C<ltrim(STRING, SEARCHLIST, USE_COMPLEMENT)>
+
+Erases characters in C<SEARCHLIST> from the beginning
+of C<STRING> and the returns the result.
+
+If C<USE_COMPLEMENT> is true, erases characters
+that are B<not contained> in C<SEARCHLIST>.
+
+While C<SEARCHLIST> is not aware of character ranges,
+you can utilize C<mkrange()>.
+
+=item C<rtrim(STRING)>
+
+=item C<rtrim(STRING, SEARCHLIST)>
+
+=item C<rtrim(STRING, SEARCHLIST, USE_COMPLEMENT)>
+
+Erases characters in C<SEARCHLIST> from the end
+of C<STRING> and the returns the result.
+
+If C<USE_COMPLEMENT> is true, erases characters
+that are B<not contained> in C<SEARCHLIST>.
+
+While C<SEARCHLIST> is not aware of character ranges,
+you can utilize C<mkrange()>.
+
+=back
+
+=head2 Substring
+
+=over 4
+
+=item C<substr(STRING or SCALAR REF, OFFSET)>
+
+=item C<substr(STRING or SCALAR REF, OFFSET, LENGTH)>
+
+=item C<substr(SCALAR, OFFSET, LENGTH, REPLACEMENT)>
+
+It works like C<CORE::substr>, but
+using character semantics of Shift-JIS.
+
+If the C<REPLACEMENT> as the fourth parameter is specified, replaces
+parts of the C<SCALAR> and returns what was there before.
+
+You can utilize the lvalue reference,
+returned if a reference to a scalar variable is used as the first argument.
+
+    ${ &substr(\$str,$off,$len) } = $replace;
+
+        works like
+
+    CORE::substr($str,$off,$len) = $replace;
+
+The returned lvalue is not aware of Shift-JIS,
+then successive assignment may cause unexpected results.
+
+Get lvalue before any assignment if you are not sure.
+
+=back
+
+=head2 Split
+
+=over 4
+
+=item C<strsplit(SEPARATOR, STRING)>
+
+=item C<strsplit(SEPARATOR, STRING, LIMIT)>
+
+This function emulates C<CORE::split>, but splits on the C<SEPARATOR> string,
+not by a pattern.
+If not in list context, only return the number of fields found,
+but does not split into the C<@_> array.
+
+If an empty string is specified as C<SEPARATOR>, splits the specified string
+into characters (similarly to C<CORE::split //, STRING, LIMIT>).
+
+  strsplit('', 'This is Perl.', 7);
+  # ('T', 'h', 'i', 's', ' ', 'i',  's Perl.')
+
+If an undefined value is specified as C<SEPARATOR>, splits the specified string
+on whitespace characters (including C<IDEOGRAPHIC SPACE>).
+Leading whitespace characters do not produce any field
+(similarly to C<CORE::split ' ', STRING, LIMIT>).
+
+  strsplit(undef, '   This  is   Perl.');
+  # ('This', 'is', 'Perl.')
+
+=back
+
+=head2 Comparison
+
+=over 4
+
+=item C<strcmp(LEFT-STRING, RIGHT-STRING)>
+
+Returns C<1> (when C<LEFT-STRING> is greater than C<RIGHT-STRING>)
+or C<0> (when C<LEFT-STRING> is equal to C<RIGHT-STRING>)
+or C<-1> (when C<LEFT-STRING> is lesser than C<RIGHT-STRING>).
+
+The order is roughly as shown the following list.
+
+    JIS X 0201 Roman, JIS X 0201 Kana, then JIS X 0208 Kanji (Zenkaku).
+
+For example,
+C<0x41> as C<'A'> is lesser than C<0xB1> (C<HANKAKU KATAKANA A>).
+C<0xB1> is lesser than C<0x8341> (C<KATAKANA A>).
+C<0x8341> is lesser than C<0x8383> (C<KATAKANA SMALL YA>).
+C<0x8383> is lesser than C<0x83B1> (C<GREEK CAPITAL TAU>).
+
+B<Caveat!>
+Compare the 2nd and the 4th examples.
+Byte C<"\xB1"> is lesser than byte C<"\x83"> as the leading bytes;
+while greater as the trailing bytes.
+Shortly, the ordering as binary is broken for the Shift-JIS codepoint order.
+
+=item C<strEQ(LEFT-STRING, RIGHT-STRING)>
+
+Returns a boolean whether C<LEFT-STRING> is equal to C<RIGHT-STRING>.
+
+B<Note:> C<strEQ> is an expensive equivalence of the C<CORE>'s C<eq> operator.
+
+=item C<strNE(LEFT-STRING, RIGHT-STRING)>
+
+Returns a boolean whether C<LEFT-STRING> is not equal to C<RIGHT-STRING>.
+
+B<Note:> C<strNE> is an expensive equivalence of the C<CORE>'s C<ne> operator.
+
+=item C<strLT(LEFT-STRING, RIGHT-STRING)>
+
+Returns a boolean whether C<LEFT-STRING> is lesser than C<RIGHT-STRING>.
+
+=item C<strLE(LEFT-STRING, RIGHT-STRING)>
+
+Returns a boolean whether C<LEFT-STRING> is lesser than or equal to
+C<RIGHT-STRING>.
+
+=item C<strGT(LEFT-STRING, RIGHT-STRING)>
+
+Returns a boolean whether C<LEFT-STRING> is greater than C<RIGHT-STRING>.
+
+=item C<strGE(LEFT-STRING, RIGHT-STRING)>
+
+Returns a boolean whether C<LEFT-STRING> is greater than or equal to
+C<RIGHT-STRING>.
+
+=item C<strxfrm(STRING)>
+
+Returns a string transformed so that C<CORE:: cmp> can be used
+for binary comparisons (B<NOT> the length of the transformed string).
+
+I.e. C<strxfrm($a) cmp strxfrm($b)> is equivalent to C<strcmp($a, $b)>,
+as long as your C<cmp> doesn't use any locale other than that of Perl.
+
+=back
+
+=head2 Character Range
+
+=over 4
+
+=item C<mkrange(EXPR, EXPR)>
+
+Returns the character list (not in list context, as a concatenated string)
+gained by parsing the specified character range.
+
+A character range is specified with a C<'-'> (C<HYPHEN-MINUS>).
+The backslashed combinations C<'\-'> and C<'\\'> are used
+instead of the characters C<'-'> and C<'\'>, respectively.
+The hyphen at the beginning or end of the range is
+also evaluated as the hyphen itself.
+
+For example, C<mkrange('+\-0-9a-fA-F')> returns
+C<('+', '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+'a', 'b', 'c', 'd', 'e', 'f', 'A', 'B', 'C', 'D', 'E', 'F')>.
+
+The order of Shift-JIS characters is:
+  C<0x00 .. 0x7F, 0xA1 .. 0xDF, 0x8140 .. 0x9FFC, 0xE040 .. 0xFCFC>.
+
+If true value is specified as the second parameter,
+Reverse character ranges such as C<'9-0'>, C<'Z-A'> can be used;
+otherwise, reverse character ranges are croaked.
+
+=back
+
+=head2 Transliteration
+
+=over 4
+
+=item C<strtr(STRING or SCALAR REF, SEARCHLIST, REPLACEMENTLIST)>
+
+=item C<strtr(STRING or SCALAR REF, SEARCHLIST, REPLACEMENTLIST, MODIFIER)>
+
+=item C<strtr(STRING or SCALAR REF, SEARCHLIST, REPLACEMENTLIST, MODIFIER, PATTERN)>
+
+=item C<strtr(STRING or SCALAR REF, SEARCHLIST, REPLACEMENTLIST, MODIFIER, PATTERN, TOPATTERN)>
+
+Transliterates all occurrences of the characters found in the search list
+with the corresponding character in the replacement list.
+
+If a reference to a scalar variable is specified as the first argument,
+returns the number of characters replaced or deleted;
+otherwise, returns the transliterated string and
+the specified string is unaffected.
+
+B<SEARCHLIST and REPLACEMENTLIST>
+
+Character ranges (internally utilizing C<mkrange()>) are supported.
+
+If the C<REPLACEMENTLIST> is empty, the C<SEARCHLIST> is replicated.
+
+If the replacement list is shorter than the search list,
+the final character in the replacement list
+is replicated till it is long enough
+(but differently works when the 'd' modifier is used).
+
+B<MODIFIER>
+
+    c   Complement the SEARCHLIST.
+    d   Delete found but unreplaced characters.
+    s   Squash duplicate replaced characters.
+    h   Returns a hash (or a hashref in scalar context) of histogram
+    R   No use of character ranges.
+    r   Allows to use reverse character ranges.
+    o   Caches the conversion table internally.
+
+  strtr(\$str, " \x81\x40\n\r\t\f", '', 'd');
+    # deletes all whitespace characters including IDEOGRAPHIC SPACE.
+
+If C<'h'> modifier is specified, returns a hash (or a hashref in scalar
+context) of histogram (key: a character as a string, value: count),
+whether the first argument is a reference or not.
+If you want to get the histogram and the modified string at once,
+pass a reference as the first argument and use its value after.
+
+If C<'R'> modifier is specified, C<'-'> is not evaluated as a meta character
+but C<HYPHEN-MINUS> itself like in C<tr'''>. Compare:
+
+  strtr("90 - 32 = 58", "0-9", "A-J");
+    # output: "JA - DC = FI"
+
+  strtr("90 - 32 = 58", "0-9", "A-J", "R");
+    # output: "JA - 32 = 58"
+    # cf. ($str = "90 - 32 = 58") =~ tr'0-9'A-J';
+    # '0' to 'A', '-' to '-', and '9' to 'J'.
+
+If C<'r'> modifier is specified, you are allowed to use reverse
+character ranges. For example, C<strtr($str, "0-9", "9-0", "r")>
+is equivalent to C<strtr($str, "0123456789", "9876543210")>.
+
+B<PATTERN and TOPATTERN>
+
+By use of C<PATTERN> and C<TOPATTERN>, you can transliterate the string
+using lists containing some multi-character substrings.
+
+If called with four arguments, C<SEARCHLIST>, C<REPLACEMENTLIST>,
+and C<STRING> are splited characterwise;
+
+If called with five arguments, a multi-character substring
+that matchs C<PATTERN> in C<SEARCHLIST>, C<REPLACEMENTLIST>, or C<STRING>
+is regarded as an transliteration unit.
+
+If both C<PATTERN> and C<TOPATTERN> are specified,
+a multi-character substring
+either that matchs C<PATTERN> in C<SEARCHLIST>, or C<STRING>,
+or that matchs C<TOPATTERN> in C<REPLACEMENTLIST>
+is regarded as an transliteration unit.
+
+  print strtr(
+    "Caesar Aether Goethe",
+    "aeoeueAeOeUe",
+    "&auml;&ouml;&ouml;&Auml;&Ouml;&Uuml;",
+    "",
+    "[aouAOU]e",
+    "&[aouAOU]uml;");
+
+  # output: C&auml;sar &Auml;ther G&ouml;the
+
+B<LISTs as Anonymous Arrays>
+
+Instead of specification of C<PATTERN> and C<TOPATTERN>, you can use
+anonymous arrays as C<SEARCHLIST> and/or C<REPLACEMENTLIST> as follows.
+
+  print strtr(
+    "Caesar Aether Goethe",
+    [qw/ae oe ue Ae Oe Ue/],
+    [qw/&auml; &ouml; &ouml; &Auml; &Ouml; &Uuml;/]
+  );
+
+B<Caching the conversion table>
+
+If C<'o'> modifier is specified, the conversion table is cached internally.
+e.g.
+
+  foreach (@strings) {
+    print strtr($_, $from_list, $to_list, 'o');
+  }
+
+will be almost as efficient as this:
+
+  $closure = trclosure($from_list, $to_list);
+
+  foreach (@strings) {
+    print &$closure($_);
+  }
+
+You can use whichever you like.
+
+Without C<'o'>,
+
+  foreach (@strings) {
+    print strtr($_, $from_list, $to_list);
+  }
+
+will be very slow since the conversion table is made
+whenever the function is called.
+
+=back
+
+=head2 Generation of the Closure to Transliterate
+
+=over 4
+
+=item C<trclosure(SEARCHLIST, REPLACEMENTLIST)>
+
+=item C<trclosure(SEARCHLIST, REPLACEMENTLIST, MODIFIER)>
+
+=item C<trclosure(SEARCHLIST, REPLACEMENTLIST, MODIFIER, PATTERN)>
+
+=item C<trclosure(SEARCHLIST, REPLACEMENTLIST, MODIFIER, PATTERN, TOPATTERN)>
+
+Returns a closure to transliterate the specified string.
+The return value is an only code reference, not blessed object.
+By use of this code ref, you can save yourself time
+as you need not specify the parameter list every time.
+
+The functionality of the closure made by C<trclosure()> is equivalent
+to that of C<strtr()>. Frankly speaking, the C<strtr()> calls
+C<trclosure()> internally and uses the returned closure.
+
+=back
+
+=head2 Case of the Alphabet
+
+=over 4
+
+=item C<toupper(STRING)>
+
+=item C<toupper(SCALAR REF)>
+
+Returns an uppercased string of C<STRING>.
+Converts only half-width Latin characters C<a-z> to C<A-Z>.
+
+If a reference of scalar variable is specified as the first argument,
+the string referred to it is uppercased and
+the number of characters replaced is returned.
+
+=item C<tolower(STRING)>
+
+=item C<tolower(SCALAR REF)>
+
+Returns a lowercased string of C<STRING>.
+Converts only half-width Latin characters C<A-Z> to C<a-z>.
+
+If a reference of scalar variable is specified as the first argument,
+the string referred to it is lowercased and
+the number of characters replaced is returned.
+
+=back
+
+=head2 Conversion between hiragana and katakana
+
+If a reference to a scalar variable is specified as the first argument,
+the string referred to it is converted and
+the number of characters replaced is returned.
+Otherwise, returns a string converted and
+the specified string is unaffected.
+
+=over 4
+
+=item Note
+
+=over 4
+
+=item *
+
+The conversion between a voiced (or semi-voiced) hiragana
+and katakana (a single character), and halfwidth katakana with a voiced
+or semi-voiced mark (a sequence of two characters) is counted as C<1>.
+Similarly, the conversion between hiragana VU, represented by
+two characters (hiragana U + voiced mark), and katakana VU
+or halfwidth katakana VU is counted as C<1>.
+
+=item *
+
+Conversion concerning halfwidth katakana includes halfwidth symbols:
+C<HALFWIDTH IDEOGRAPHIC FULL STOP>, C<HALFWIDTH LEFT CORNER BRACKET>,
+C<HALFWIDTH RIGHT CORNER BRACKET>, C<HALFWIDTH IDEOGRAPHIC COMMA>,
+C<HALFWIDTH KATAKANA MIDDLE DOT>,
+C<HALFWIDTH KATAKANA-HIRAGANA PROLONGED SOUND MARK>,
+C<HALFWIDTH KATAKANA VOICED SOUND MARK>,
+C<HALFWIDTH KATAKANA SEMI-VOICED SOUND MARK>.
+Conversion between hiragana and katakana includes those between
+hiragana iteration marks and katakana iteration marks.
+
+=item *
+
+Hiragana WI, WE, small WA and katakana WI, WE, small WA, small KA, small
+KE will be regarded as hiragana I, E, WA and katakana I, E, WA, KA, KE
+if the fallback conversion is necessary.
+
+=back
+
+=item C<kanaH2Z(STRING)>
+
+=item C<kanaH2Z(SCALAR REF)>
+
+Converts Halfwidth Katakana to Katakana. Hiragana are not affected.
+
+=item C<kataH2Z(STRING)>
+
+=item C<kataH2Z(SCALAR REF)>
+
+Converts Halfwidth Katakana to Katakana. Hiragana are not affected.
+
+B<Note:> C<kataH2Z> is an alias of C<kanaH2Z>.
+
+=item C<hiraH2Z(STRING)>
+
+=item C<hiraH2Z(SCALAR REF)>
+
+Converts Halfwidth Katakana to Hiragana. Katakana are not affected.
+
+=item C<kataZ2H(STRING)>
+
+=item C<kataZ2H(SCALAR REF)>
+
+Converts Katakana to Halfwidth Katakana. Hiragana are not affected.
+
+=item C<kanaZ2H(STRING)>
+
+=item C<kanaZ2H(SCALAR REF)>
+
+Converts Hiragana to Halfwidth Katakana, and Katakana to Halfwidth Katakana.
+
+=item C<hiraZ2H(STRING)>
+
+=item C<hiraZ2H(SCALAR REF)>
+
+Converts Hiragana to Halfwidth Katakana. Katakana are not affected.
+
+=item C<hiXka(STRING)>
+
+=item C<hiXka(SCALAR REF)>
+
+Converts Hiragana to Katakana and Katakana to Hiragana at once.
+Halfwidth Katakana are not affected.
+
+=item C<hi2ka(STRING)>
+
+=item C<hi2ka(SCALAR REF)>
+
+Converts Hiragana to Katakana. Halfwidth Katakana are not affected.
+
+=item C<ka2hi(STRING)>
+
+=item C<ka2hi(SCALAR REF)>
+
+Converts Katakana to Hiragana. Halfwidth Katakana are not affected.
+
+=back
+
+=head2 Conversion of Whitespace Characters
+
+If a reference to a scalar variable is specified as the first argument,
+the string referred to it is converted and
+the number of characters replaced is returned.
+Otherwise, returns a string converted and
+the specified string is unaffected.
+
+=over 4
+
+=item C<spaceH2Z(STRING)>
+
+=item C<spaceH2Z(SCALAR REF)>
+
+Converts C<"\x20"> (space) to C<"\x81\x40"> (ideographic space).
+
+=item C<spaceZ2H(STRING)>
+
+=item C<spaceZ2H(SCALAR REF)>
+
+Converts C<"\x81\x40"> (ideographic space) to C<"\x20"> (space).
+
+=back
+
+=head1 CAVEAT
+
+A legal Shift-JIS character in this module
+must match the following regular expression:
+
+   [\x00-\x7F\xA1-\xDF]|[\x81-\x9F\xE0-\xFC][\x40-\x7E\x80-\xFC]
+
+Any string from an external source should be checked by C<issjis()>
+function, excepting you know it is surely coded in Shift-JIS.
+
+Use of an illegal Shift-JIS string may lead to odd results.
+
+Some Shift-JIS double-byte characters have a trailing byte
+in the range of C<[\x40-\x7E]>, viz.,
+
+   @ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~
+
+The Perl lexer (parhaps) doesn't take any care to these bytes,
+so they sometimes make trouble.
+For example, the quoted literal ending with a double-byte character
+whose trailing byte is C<0x5C> causes a B<fatal error>,
+since the trailing byte C<0x5C> backslashes the closing quote.
+
+Such a problem doesn't arise when the string is gotten from
+any external resource.
+But writing the script containing Shift-JIS
+double-byte characters needs the greatest care.
+
+The use of single-quoted heredoc, C<E<lt>E<lt> ''>,
+or C<\xhh> meta characters is recommended
+in order to define a Shift-JIS string literal.
+
+The safe ASCII-graphic characters, C<[\x21-\x3F]>, are:
+
+   !"#$%&'()*+,-./0123456789:;<=>?
+
+They are preferred as the delimiter of quote-like operators.
+
+=head1 BUGS
+
+This module supposes C<$[> is always equal to 0, never 1.
+
+=head1 AUTHOR
+
+SADAHIRO Tomoyuki <SADAHIRO@cpan.org>
+
+  Copyright(C) 2001-2007, SADAHIRO Tomoyuki. Japan. All rights reserved.
+
+  This module is free software; you can redistribute it
+  and/or modify it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<ShiftJIS::Regexp>
+
+=item L<ShiftJIS::Collate>
+
+=back
+
+=cut
+

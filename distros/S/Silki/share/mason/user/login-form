@@ -1,0 +1,38 @@
+<&| /lib/filter/form.mas &>
+<form action="<% $c->domain()->application_uri( path => '/user/authentication' ) %>" method="post">
+  <input type="hidden" name="return_to" value="<% $return_to %>" />
+  <fieldset>
+    <legend><% loc('Credentials') %></legend>
+
+    <div class="form-item">
+      <label for="username" class="for-field"><% loc('Email') %></label>
+      <input type="text" class="text" name="username" id="username" />
+    </div>
+
+    <div class="form-item">
+      <label for="password" class="for-field"><% loc('Password') %></label>
+      <input type="password" class="text" name="password" id="password" />
+    </div>
+
+    <input type="submit" class="submit" value="<% loc('Submit') %>" />
+  </fieldset>
+</form>
+</&>
+
+<p>
+  <a href="<% $c->domain()->application_uri( path => '/user/forgot_password_form', query => { return_to => $return_to } ) %>"
+     ><% loc('I forgot my password') %></a>.
+</p>
+
+<%init>
+my $return_to = $c->request()->params()->{return_to} || q{};
+</%init>
+
+<%attr>
+show_title => 0
+sidebar => []
+</%attr>
+
+<%method title>
+<% loc('Log in') %>
+</%method>

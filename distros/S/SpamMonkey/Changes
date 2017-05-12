@@ -1,0 +1,14 @@
+Revision history for Perl extension SpamMonkey.
+
+0.03 Fri Mar 24 11:46:27 GMT 2006
+    - Elementary support for RBLs
+    - Fixed a timeout issue
+
+0.02 Wed Oct 26 19:15:06 BST 2005
+    - First public release
+    - Support for URI DNS blacklists
+
+0.01  Wed Sep  7 15:41:43 2005
+	- original version; created by h2xs 1.23 with options
+		-AX -b 5.6.0 -n SpamMonkey
+

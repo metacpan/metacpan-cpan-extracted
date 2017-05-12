@@ -1,0 +1,56 @@
+
+AV *            T_AVREF 
+HV *			T_HVREF
+PerlIO *		T_INOUT
+SortExternal*		SORTEX
+SortExRun*		SORTEXRUN
+
+#############################################################################
+INPUT
+
+T_AVREF
+    if (SvROK($arg) && SvTYPE(SvRV($arg))==SVt_PVAV)
+        $var = (AV*)SvRV($arg);
+    else
+        Perl_croak(aTHX_ \"$var is not an array reference\")
+
+T_HVREF
+	if (SvROK($arg) && SvTYPE(SvRV($arg))==SVt_PVHV)
+	    $var = (HV*)SvRV($arg);
+	else
+	    Perl_croak(aTHX_ \"$var is not a hash reference\")
+
+T_INOUT
+	$var = IoIFP(sv_2io($arg))
+
+SORTEX
+    if (sv_derived_from($arg, \"Sort::External\")) {
+        IV tmp = SvIV((SV*)SvRV($arg));
+        $var = INT2PTR(SortExternal*,tmp);
+    }
+    else
+        croak(\"Not a Sort::External\");
+
+SORTEXRUN
+    if (sv_derived_from($arg, \"Sort::External::SortExRun\")) {
+        IV tmp = SvIV((SV*)SvRV($arg));
+        $var = INT2PTR(SortExRun*,tmp);
+    }
+    else
+        croak(\"Not a Sort::External::SortExRun\");
+
+#############################################################################
+OUTPUT
+
+SORTEX
+    sv_setref_pv($arg, \"Sort::External\", (void*)$var);
+
+SORTEXRUN
+    sv_setref_pv($arg, \"Sort::External::SortExRun\", (void*)$var);
+
+T_AVREF
+    $arg = newRV((SV*)$var);
+
+T_HVREF
+	$arg = newRV((SV*)$var);
+

@@ -1,0 +1,32 @@
+Revision history for Perl extension Sort::Packed.
+
+0.08  May 24, 2014
+        - on perl 5.20 Drand01() requires the perl context to be around
+        - we have COW now
+
+0.07  Feb 14, 2012
+        - add shuffle_packed function
+
+0.06  Nov 17, 2009
+        - filter merge.h with dos2unix and several signed/unsigned
+          char casts to make SUN C compiler happy
+
+0.05  Jun 26, 2008
+        - comment out debugging functions (bug report by Taro
+          Nishino).
+
+0.04  Jun 25, 2008
+        - try to solve some negative zero bug.
+
+0.03  Jun 23, 2008
+        - resolves conflict in BSD based OSs having their own
+          merge/radixsort.
+
+0.02  Jun 19, 2008
+        - add support for mergesort algorithm and mergesort custom.
+        - skip tests for formats not supported on old perls
+
+0.01  Sun Jun 15 19:16:13 2008
+	- original version; created by h2xs 1.23 with options
+		-An Sort::Packed
+

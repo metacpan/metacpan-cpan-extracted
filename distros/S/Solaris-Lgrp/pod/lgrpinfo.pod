@@ -1,0 +1,340 @@
+#!/usr/perl5/bin/perl -w
+
+# CDDL HEADER START
+#
+# The contents of this file are subject to the terms
+# of the Common Development and Distribution License
+# (the "License").  You may not use this file except
+# in compliance with the License.
+#
+# You can obtain a copy of the license at
+# usr/src/OPENSOLARIS.LICENSE
+# or http://www.opensolaris.org/os/licensing.
+# See the License for the specific language governing
+# permissions and limitations under the License.
+#
+# When distributing Covered Code, include this CDDL
+# HEADER in each file and include the License file at
+# usr/src/OPENSOLARIS.LICENSE.  If applicable,
+# add the following below this CDDL HEADER, with the
+# fields enclosed by brackets "[]" replaced with your
+# own identifying information: Portions Copyright [yyyy]
+# [name of copyright owner]
+#
+# CDDL HEADER END
+#
+# Copyright 2006 Sun Microsystems, Inc.  All rights reserved.
+# Use is subject to license terms.
+#
+# ident	"@(#)lgrpinfo.pod	1.1	06/05/31 SMI"
+
+=head1 NAME
+
+lgrpinfo - display information about locality groups
+
+=head1 SYNOPSYS
+
+  lgrpinfo [-aceGhIlLmrt] [-u unit] [-C|-P] lgrp ...
+  lgrpinfo -T [-aceGlLmr] [-u unit]
+
+=head1 DESCRIPTION
+
+The lgrpinfo command prints information about the locality group (lgroup)
+hierarchy and its contents.
+
+An lgroup represents the set of CPU and memory-like hardware devices that are
+at most some distance (latency) apart from each other. All lgroups in the
+system are identified by a unique integer called an "lgroup ID".
+
+The lgroups are organized into a hierarchy to facilitate finding the nearest
+resources. Leaf lgroups each contain a set of resources that are closest
+(local) to each other. Each parent lgroup in the hierarchy contains the
+resources of its child lgroups plus their next nearest resources. Finally, the
+root lgroup contains all the resources in the domain within the largest
+latency.
+
+A Uniform Memory Access (UMA) machine will simply be represented by the root
+lgroup. A Non Uniform Memory Access (NUMA) machine is represented by a
+hierarchy of lgroups to show the corresponding levels of locality. For example,
+a NUMA machine with two latencies (local and remote) will have an lgroup
+hierarchy consisting of two levels with its leaves and the root.
+
+Every application thread is assigned a "home" lgroup. When the system needs to
+allocate a CPU or memory resource for a thread, it searches lgroup hierarchy
+from the thread's home lgroup for the closest available resources to the
+thread's home.
+
+When called without arguments, lgrpinfo(1) prints general information about all
+lgroups in the system. If any lgroup IDs are given in the command line, the
+command will only print information about the specified lgroups.
+
+The lgroup(s) may be specified on the command line as lgroup IDs or by using
+one of the following keywords:
+
+=over
+
+=item B<all>
+
+All lgroups (default)
+
+=item B<root>
+
+Root lgroup (which contains all the resources in the domain within the largest
+latency and has no parent lgroup)
+
+=item B<leaves>
+
+All leaf lgroups (where a leaf lgroup is an lgroup that has no children in the
+lgroup hierarchy)
+
+=item B<intermediate>
+
+All intermediate lgroups (where an intermediate lgroup is an lgroup that has a
+parent and children)
+
+=back
+
+If an invalid lgroup is specified, the lgrpinfo command prints a message on
+standard error showing the invalid ID and continues processing other lgroups
+given in the command line. When none of the specified lgroups are valid,
+lgrpinfo(1) will exit with 2 as its exit status.
+
+=head1 OPTIONS
+
+Various options control which lgroups are displayed and the exact information
+that is printed for each lgroup. Options may be combined together and the order
+given is not important. Lowercase options select what information should be
+printed about lgroup(s) and the uppercase options affect which lgroups are
+displayed.
+
+Calling the program without any arguments is equivalent to
+
+  lgrpinfo -c -e -l -m -r -t -u m all
+
+Valid options are:
+
+=over
+
+=item B<-a>
+
+Print topology, CPU, memory, load and latency information. This option is a
+shorthand for C<-t -c -e -m -r -l -L> unless -T is specified as well. When -T
+is specified, the -t option is not included.
+
+=item B<-c>
+
+Print CPU information (default)
+
+=item B<-C>
+
+Replace each lgroup in the list with its children(s). This option cannot be
+used with the -P or -T option.  With no other options given, this option will
+be applied to the lgroups displayed by default which is all of them.
+
+=item B<-e>
+
+Print lgroup load average (default).
+
+=item B<-G>
+
+Print OS view of lgroup hierarchy.  By default, the caller's view of the lgroup
+hierarchy is displayed which only includes what the caller can use (eg. only
+the CPUs in the caller's processor set will be displayed, etc.).  Please see
+lgrp_init(3LGRP) for more details on the OS and caller's view.
+
+=item B<-h>
+
+Print short help message and exit.
+
+=item B<-I>
+
+Only print matching IDs. If C<-c> is specified as well, print list of CPUs
+contained in all matching lgroups. Otherwise, the IDs for the matching lgroups
+will be displayed (see examples).  With no other options given, this option
+will be applied to the lgroups displayed by default which is all of them.
+
+
+=item B<-l>
+
+Print information about lgroup latencies.
+
+=item B<-L>
+
+Print the lgroup latency table.
+
+=item B<-m>
+
+Print memory information (default). Memory is rounded to the closest unit
+specified with B<-u>.
+
+=item B<-P>
+
+Replace each lgroup in the list with its parent(s). This option cannot be used
+with the -C or -T option.  With no other options given, this option will
+be applied to the lgroups displayed by default which is all of them.
+
+
+=item B<-r>
+
+Print information about lgroup resources. If C<-T> is specified as well, only
+prints information about resources for the intermediate lgroups. The resources
+are represented by a set of lgroups in which each lgroup directly contains CPU
+and/or memory resources.
+
+=item B<-t>
+
+Print information about lgroup topology (default).
+
+=item B<-T>
+
+Print the lgroup topology of a system graphically as a tree. This option may
+only be used with the C<-a>, C<-c>, C<-e>, C<-m>, C<-l>, C<-r>, and C<-u>
+options. If this option is combined with C<-c>, C<-e>, C<-l>, C<-m>, or C<-r>,
+it prints the relevant information for all leaf lgroups. The -t option is
+omitted when C<-T> is used with C<-a>.
+
+=item B<-u> units
+
+Specify memory units. Units should be C<b>, C<k>, C<k>, C<g>, C<t> for bytes,
+kilobytes, megabytes, gigabytes and terabytes respectively. By default, memory
+is printed in megabytes. This option implies C<-m>.
+
+=back
+
+
+=head1 EXAMPLES
+
+=over
+
+=item 1
+
+Print general information about lgroups in the system. The system is a 2 CPU
+AMD Opteron machine with two nodes, each having one CPU and 1Gb of memory. Each
+CPU and memory node go into a leaf lgroup and the root lgroup contains all the
+resources in the machine:
+
+  $ lgrpinfo
+  lgroup 0 (root):
+          children: 1 2
+          CPUs: 0 1
+          Memory: installed 2048 Mb,  allocated 1454 Mb,  free 594 Mb
+          Lgroup resources:  1 2 (CPU); 1 2 (memory)
+          Latency: 103
+  lgroup 1 (leaf):
+          children: none, parent: 0
+          CPU: 0
+          Memory: installed 1024 Mb,  allocated 821 Mb,  free 203 Mb
+          Lgroup resources:  1 (CPU); 1 (memory)
+          Latency: 72
+  lgroup 2 (leaf):
+          children: none, parent: 0
+          CPU: 1
+          Memory: installed 1024 Mb,  allocated 633 Mb,  free 391 Mb
+          Lgroup resources:  2 (CPU); 2 (memory)
+          Latency: 72
+
+=item 2
+
+Print lgroup topology tree on a 4 CPU AMD Opteron machine:
+
+
+  $ lgrpinfo -T
+  0
+  |-- 5
+  |   `-- 1
+  |-- 6
+  |   `-- 2
+  |-- 7
+  |   `-- 3
+  `-- 8
+      `-- 4
+
+=item 3
+
+Print lgroup topology tree, resources, memory and CPU information
+on a 2 CPU AMD Opteron machine:
+
+  $ lgrpinfo -Ta
+  0
+  |-- 1
+  |   CPU: 0
+  |   Memory: installed 2048 Mb, allocated 659 Mb, free 1389 Mb
+  |   Load: 0.713
+  |   Latency: 56
+  `-- 2
+      CPU: 1
+      Memory: installed 2047 Mb, allocated 323 Mb, free 1724 Mb
+      Load: 0.187
+      Latency: 56
+
+  Lgroup latencies:
+
+  ------------
+    |  0  1  2
+  ------------
+  0 | 83 83 83
+  1 | 83 56 83
+  2 | 83 83 56
+  ------------
+
+
+=item 4
+
+Print lgroup IDs for children of the root lgroup:
+
+  $ lgrpinfo -I -C root
+  1 2
+
+=item 5
+
+Print CPU IDs for all CPUs in lgroup 1:
+
+  $ lgrpinfo -c -I 1
+  0
+
+=item 6
+
+Print information about lgroup latencies:
+
+  $ lgrpinfo -l
+  lgroup 0 (root):
+          Latency: 103
+  lgroup 1 (leaf):
+          Latency: 72
+  lgroup 2 (leaf):
+          Latency: 72
+
+=back
+
+=head1 EXIT STATUS
+
+The following exit values are returned:
+
+  0	Successful operation.
+
+  1	Unable to get lgroup information from the system.
+
+  2     Invalid lgroup
+
+  3     Invalid syntax
+
+=head1 ATTRIBUTES
+
+See C<attributes(5)> for descriptions of the following attributes:
+
+  ___________________________________________________________
+ |       ATTRIBUTE TYPE        |       ATTRIBUTE VALUE       |
+ |_____________________________|_____________________________|
+ | Availability                | SUNWesu                     |
+ |_____________________________|_____________________________|
+ | Interface Stability         | Evolving                    |
+ |_____________________________|_____________________________|
+
+Invocation is evolving. Human readable output is unstable.
+
+=head1 SEE ALSO
+
+L<Sun::Solaris::Lgrp(1)>, L<liblgrp(3LIB)>, L<plgrp(1)>, L<pmap(1)>,
+L<lgrp_init(3LGRP)>, L<attributes(5)>.
+
+=cut

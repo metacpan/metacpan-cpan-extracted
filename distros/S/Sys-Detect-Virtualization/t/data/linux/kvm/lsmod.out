@@ -1,0 +1,63 @@
+Module                  Size  Used by
+ip6table_filter         2432  0 
+ip6_tables             11376  1 ip6table_filter
+ipv6                  235300  50 
+ipt_REJECT              2784  14 
+xt_tcpudp               2816  4 
+iptable_filter          2624  1 
+ip_tables              10160  1 iptable_filter
+x_tables               13284  4 ip6_tables,ipt_REJECT,xt_tcpudp,ip_tables
+loop                   12748  0 
+joydev                  8480  0 
+usbhid                 35904  0 
+hid                    33184  1 usbhid
+ff_memless              4392  1 usbhid
+ide_cd_mod             27652  0 
+cdrom                  30176  1 ide_cd_mod
+ata_generic             4676  0 
+libata                140384  1 ata_generic
+scsi_mod              129356  1 libata
+dock                    8304  1 libata
+snd_pcm                62596  0 
+snd_timer              17800  1 snd_pcm
+snd                    45604  2 snd_pcm,snd_timer
+soundcore               6368  1 snd
+snd_page_alloc          7816  1 snd_pcm
+serio_raw               4740  0 
+parport_pc             22500  0 
+parport                30988  1 parport_pc
+pcspkr                  2432  0 
+psmouse                32336  0 
+floppy                 47716  0 
+8139cp                 16800  0 
+uhci_hcd               18672  0 
+i2c_piix4               7216  0 
+piix                    6568  0 [permanent]
+ide_pci_generic         3908  0 [permanent]
+button                  6096  0 
+8139too                20320  0 
+mii                     4896  2 8139cp,8139too
+usbcore               118160  3 usbhid,uhci_hcd
+i2c_core               19828  1 i2c_piix4
+ide_core               96168  3 ide_cd_mod,piix,ide_pci_generic
+evdev                   8000  0 
+ext3                  105512  1 
+jbd                    39444  1 ext3
+mbcache                 7108  1 ext3
+raid10                 18560  0 
+raid456               117264  0 
+async_xor               3520  1 raid456
+async_memcpy            2304  1 raid456
+async_tx                6316  3 raid456,async_xor,async_memcpy
+xor                    14696  2 raid456,async_xor
+raid1                  18016  1 
+raid0                   6368  0 
+multipath               6112  0 
+linear                  4544  0 
+md_mod                 67036  7 raid10,raid456,raid1,raid0,multipath,linear
+thermal                15228  0 
+processor              32576  1 thermal
+fan                     4164  0 
+thermal_sys            10856  3 thermal,processor,fan
+virtio_blk              4680  6 
+virtio_pci              5120  0 

@@ -1,0 +1,793 @@
+#!/usr/local/bin/perl -w
+# $Id: nacho 1366 2003-08-23 08:35:54Z simon $
+use strict;
+use File::Path qw(mkpath);
+use File::Basename;
+use Data::Dumper;
+use Tie::IxHash;
+use String::ShellQuote;
+use UNIVERSAL::require;
+use Siesta::Config;
+
+BEGIN {
+    while (@ARGV) {
+        if ($ARGV[0] eq '-d') {
+            shift;
+            @Siesta::Config::STORAGE = split / /, shift;
+            next;
+        }
+
+        if ($ARGV[0] eq '-f') {
+            shift;
+            Siesta::Config->load_from( shift );
+            next;
+        }
+
+        # do create-database before the require of Siesta::List
+        # otherwise Siesta::List &c will choke when they come to
+        # __PACKAGE__->set_up_table
+
+        if ($ARGV[0] eq 'create-database' ) {
+            require Siesta::DBI;
+            Siesta::DBI->init_db;
+            exit;
+        }
+        last;
+    }
+}
+
+eval {
+    require Siesta;
+    require Siesta::List;
+};
+if ($@) {
+    print "Error initializing Siesta:\n$@\n";
+    print "\n\nTry 'nacho create-database' if you are installing siesta for the first time\n";
+    exit;
+}
+
+use YAML;
+Siesta->log("nacho invoked by $< $> args\n" . Dump \@ARGV);
+
+tie my %commands, 'Tie::IxHash';
+
+=head1 NAME
+
+nacho - the siesta command line configuration tool
+
+=head1 DESCRIPTION
+
+Via nacho you can control pretty much every aspect of you Siesta system.
+
+This includes things like creating new lists, creating new members, adding
+members to lists, setting up and configuring plugins for lists and, later,
+probably handling administrative tasks.
+
+=head1 COMMANDS
+
+You can optionally pass a database to act on (the default is the
+one defined in Siesta::Config). By doing
+
+        -d database
+
+
+You can also specify an alternative config file using
+
+        -f <path to config file>
+
+
+The following commands are then valid
+
+=cut
+
+=head2 create-database
+
+Initialise a new database
+
+=cut
+
+$commands{'create-database'} = sub { die "dummy" };
+
+# dummy to put a space in
+$commands{' '} = sub { };
+
+#####
+#
+# List stuff
+#
+#####
+
+=head2 show-lists
+
+Show all the lists that are in the system
+
+=cut
+
+$commands{'show-lists'} = sub {
+    foreach my $list ( Siesta::List->retrieve_all ) {
+        print $list->name . "\n";
+    }
+    return;
+};
+
+
+
+=head2 create-list I<list_id> I<list_owner> I<post_address> I<return_path>
+
+I<list_id> is the name of the list, I<list_owner> is the administrator
+of the list, I<post_address> is the email address that member's send mail
+to post to the list and I<return_path> is the address that bounces
+should come back to.
+
+=cut
+
+$commands{'create-list'} = sub {
+    my $list_id     = shift || die "You must supply a list id\n";
+    my $list_owner  = shift || die "You must supply a list owner\n";
+    my $post_addr   = shift || die "You must supply a post address\n";
+    my $return_path = shift || die "You must supply a bounce address\n";
+
+    my $list = Siesta::List->new (
+        name         => $list_id,
+        owner        => Siesta::Member->find_or_create({ email => $list_owner }),
+        post_address => $post_addr,
+        return_path  => $return_path,
+       )
+      or die "Failed to create a new list\n";
+
+    # set up default plugin queues
+    $list->set_plugins( post  => qw( Archive Send ) );
+    $list->set_plugins( sub   => qw( Subscribe ) );
+    $list->set_plugins( unsub => qw( UnSubscribe ) );
+
+    print "Created the new list '$list_id' <$post_addr>\n";
+    print "put this in your /etc/aliases";
+    $commands{'show-alias'}->( $list_id);
+};
+
+
+=head2 show-alias I<list_id>
+
+Print out an alias file entry for the list specified.
+
+=cut
+
+$commands{'show-alias'} = sub {
+    my $list_id = shift || die "You must pass a list id\n";
+
+    my $list = Siesta::List->load( $list_id )
+      or die "Not a valid list id\n";
+
+    print $list->alias('nacho (the siesta configuration tool)');
+
+};
+
+
+
+=head2 describe-list I<list_id>
+
+Show all the properties of a list and their values.
+
+=cut
+
+$commands{'describe-list'} = sub {
+    my $list_id = shift || die "You must pass a list id\n";
+
+    my $list = Siesta::List->load( $list_id )
+      or die "Not a valid list id\n";
+
+    foreach my $key ($list->columns) {
+        my $value = $list->$key() || '';
+        print "$key = $value\n";
+    }
+
+    for my $queue ($list->queues) {
+        print "$queue plugins: ", join( ' ', map { ($_->personal)? "+".$_->name:$_->name  } $list->plugins( $queue )), "\n";
+    }
+};
+
+=head2 modify-list I<list_id> I<key> I<value>
+
+Change a property of the list specified.  See B<Siesta::List> for
+valid properties.
+
+Note: you can effectively copy the configuration of a list by modifying
+the id - a new list with the new id will be created for you.
+
+=cut
+
+$commands{'modify-list'} = sub {
+    my $list_id = shift || die "You must pass a list id\n";
+
+    my $list = Siesta::List->load( $list_id )
+      or die "Not a valid list id\n";
+
+    my ( $key, $value ) = @_;
+
+    die "You must pass a key\n" unless defined $key;
+    die "You must pass a value\n" unless defined $value;
+
+    my %fields = map { $_ => 1 } $list->columns;
+    die "'$key' is not a valid property - valid properties are\n",
+        (join "\n",$list->columns),"\n" unless $fields{$key};
+
+    $list->$key($value);
+    print "Property '$key' set to '$value' for the list $list_id\n";
+};
+
+
+=head2 delete-list I<list_id>
+
+Remove the list indicated from the system.
+
+=cut
+
+$commands{'delete-list'} = sub {
+    my $list_id = shift || die "You must pass a list id\n";
+
+    my $list = Siesta::List->load( $list_id )
+      or die "Not a valid list id\n";
+
+    # gosh, Class::DBI makes this easy
+    $list->delete;
+
+    print "List '$list_id' deleted\n";
+};
+
+=head2 set-plugins I<list_id> I<queue> [ I<plugin> [ I<plugin>... ] ]
+
+Set the list plugins to be the ones specified.
+
+=cut
+
+$commands{'set-plugins'} = sub {
+    my $list_id = shift || die "You must pass a list id\n";
+    my $queue   = shift || die "need a queue\n";
+    my @plugins = @_;
+
+    my $list = Siesta::List->load( $list_id )
+      or die "Not a valid list id\n";
+
+    $list->set_plugins( $queue => @plugins )
+      or die "Sorry, couldn't do that for some reason\n";
+
+    unless (@plugins) {
+        print "Deleted plugins from $list_id\n";
+        return;
+    }
+};
+
+
+
+=head2 add-member I<list_id> I<member> [I<member> ...]
+
+Add the member(s) specified to the list specified. This will create new
+members if necessary.
+
+=cut
+
+$commands{'add-member'} = sub {
+    my $list_id   = shift || die "You must pass a list id\n";
+    my $member_id = shift || die "You must pass a member id\n";
+
+    my $list = Siesta::List->load( $list_id )
+      or die "Not a valid list id\n";
+
+    while ($member_id) {
+        my $member = Siesta::Member->find_or_create({ email => $member_id })
+          or die "Couldn't get/create a member '$member_id'\n";
+
+        $list->add_member($member);
+        print "Member <".$member->email."> (".$member->id.") added to list '$list_id'\n";
+        $member_id = shift;
+    }
+};
+
+
+=head2 remove-member I<list_id> I<member> [I<member>...]
+
+removes the specified I<member>(s) from the list.
+
+=cut
+
+$commands{'remove-member'} =  sub {
+    my $list_id   = shift || die "You must pass a list id\n";
+    my $member_id = shift || die "You must pass a member id\n";
+
+    my $list = Siesta::List->load( $list_id )
+      or die "Not a valid list id\n";
+
+    while ($member_id) {
+        my $member = Siesta::Member->load($member_id)
+          or die "$member_id is not a valid member id\n";
+
+        $list->remove_member($member);
+        print "Member '$member_id' removed from list '$list_id'\n";
+        $member_id = shift;
+    }
+};
+
+
+# dummy to put a space in
+$commands{'  '} = sub { };
+
+#####
+#
+# Member stuff
+#
+#####
+
+
+=head2 show-members [ I<list_id> ]
+
+Show all the members that are in the system or, if a list-id is
+passed, then just the ones subbed to that list
+
+=cut
+
+$commands{'show-members'} = sub  {
+    if (!@_) {
+          print "All members for system:\n";
+        foreach my $member ( Siesta::Member->retrieve_all ) {
+            print $member->email, "\n";
+        }
+        return;
+    }
+    for (@_) {
+        my $list = Siesta::List->load($_)
+          or die "No list '$_'!\n";
+        print "Members of $_:\n";
+
+           foreach my $member ($list->members) {
+            print $member->email, "\n";
+        }
+    }
+};
+
+
+=head2 create-member I<member_id>
+
+Add a new member to the system.
+
+=cut
+
+$commands{'create-member'} = sub {
+    my $email = shift
+      || die "You need to pass an email address as a member id\n";
+    my $member = Siesta::Member->find_or_create({ email => $email })
+      or die "Errk : couldn't create a member";
+
+    print "Member $email added\n";
+};
+
+
+=head2 describe-member I<member_id>
+
+Show all the properties of a member and their values.
+
+=cut
+
+$commands{'describe-member'} = sub {
+    my $member_id = shift || die "You must pass a member id (i.e an email address)\n";
+
+    my $member = Siesta::Member->load($member_id) || die "Not a valid member id\n";
+
+    foreach my $key ($member->columns) {
+        my $value = $member->$key() || '';
+        print "$key = $value\n";
+    }
+
+    print "Subscribed to : ", (join ", ", map { $_->name } $member->lists), "\n";
+};
+
+
+=head2 modify-member I<member_id> I<key> I<value>
+
+Change a property of the member specified.  See B<Siesta::Member> for
+valid properties.
+
+Note: you can effectively copy the configuration of a member by modifying
+the id - a new member with the new id will be created for you.
+
+=cut
+
+$commands{'modify-member'} = sub {
+    my $member_id = shift || die "You must pass a member id\n";
+
+    my $member = Siesta::Member->load( $member_id )
+      or die "Not a valid member id\n";
+
+    my ( $key, $value ) = @_;
+
+    die "You must pass a key\n" unless defined $key;
+    die "You must pass a value\n" unless defined $value;
+
+    my %fields = map { $_ => 1 } $member->columns;
+    die "'$key' is not a valid property - valid properties are\n",
+        (join "\n",$member->columns),"\n" unless $fields{$key};
+
+    $member->$key($value);
+    $member->update;
+    print "Property '$key' set to '$value' for the list $member_id\n";
+};
+
+=head2 delete-member I<member_id>
+
+Remove a member from the system.
+
+=cut
+
+$commands{'delete-member'} = sub {
+    my $member_id = shift || die "You must pass a member id (i.e an email address)\n";
+
+    my $member = Siesta::Member->load($member_id) || die "Not a valid member id\n";
+
+    foreach my $list ( Siesta::List->retrieve_all ) {
+        $list->remove_member($member);
+    }
+
+    $member->delete;
+
+    print "Member '$member_id' deleted\n";
+};
+
+
+# dummy to put a space in
+$commands{'   '} = sub { };
+
+
+#####
+#
+# Plugin stuff
+#
+#####
+
+=head2 show-plugins <list id>
+
+List all plugins available to the system or just the plugins
+for a list.
+
+=cut
+
+$commands{'show-plugins'} = sub {
+    if (!@_) {
+        print "This system currently has these plugins installed : \n\n";
+        foreach my $name ( Siesta->available_plugins ) {
+            my $p = "Siesta::Plugin::$name";
+            $p->require;
+            printf "%s\n -\n %s\n\n",$name,  $p->description;
+        }
+    }
+
+    for (@_) {
+        my $list = Siesta::List->load($_)
+          or die "No list '$_'!\n";
+        print "Plugins for $_:\n";
+
+        foreach my $queue ($list->queues()) {
+            print "\n$queue:\n";
+            foreach my $plugin ($list->plugins($queue)) {
+                print $plugin->name,"\n";
+            }
+        }
+    }
+};
+
+
+=head2 describe-plugin I<plugin> [ I<list_id> ] [ I<member_id> ]
+
+List all the options for a particular plugin. If a I<list_id> is
+passed then it will show the current settings for that list. If,
+additionally, a I<member_id> is passed then the member's options
+for that list will be shown.
+
+=cut
+
+$commands{'describe-plugin'} = sub {
+    my $plugin_id = shift || die "You must pass a plugin name\n";
+    my $list_id   = shift;
+
+    if ($list_id) {
+        _plugin_list_options($plugin_id,$list_id,@_);
+    }
+    else {
+        _plugin_options($plugin_id);
+    }
+
+};
+
+
+sub _plugin_options {
+    my $plugin_id = shift;
+
+    my %plugins = map { $_ => 1 } Siesta->available_plugins;
+
+    die "Not a valid plugin\n" unless $plugins{$plugin_id};
+
+    my $class = "Siesta::Plugin::$plugin_id";
+    $class->require;
+
+    my $options = $class->options;
+
+    print "\n\nThe plugin $plugin_id has the following options :\n";
+    foreach my $option ( keys %{$options} ) {
+        print " - ", $option, " : ", $options->{$option}->{description}, "\n";
+    }
+    print "\n";
+}
+
+sub _plugin_list_options {
+    my ($plugin_id, $list_id, $member_id) = @_;
+
+    die "No plugin name passed\n" unless defined $plugin_id;
+    die "No list name passed\n"   unless defined $list_id;
+
+    my $list = Siesta::List->load($list_id)
+      or die "Not a valid list $list_id\n";
+
+	my @plugins;
+	foreach my $queue ($list->queues) {
+		 push @plugins, $list->plugins($queue);
+	}
+
+    my %plugins = map { $_->name => $_ } @plugins;
+    
+	my $plugin  = $plugins{$plugin_id}
+      or die "That plugin is not used in the list '$list_id'\n";
+
+
+    my $member;
+    if (defined $member_id) {
+        $member = Siesta::Member->load($member_id)
+          or die "Not a valid member id\n";
+
+        die "$member_id is not subscribed to $list_id\n"
+          unless $list->is_member($member);
+
+        $plugin->member($member);
+    }
+
+    my $options = $plugin->options;
+
+    if (defined $member) {
+        printf "Personal preferences for member %s on list %s\n", $member_id, $list_id;
+    }
+    else {
+        printf "Preferences for list %s\n", $list_id;
+    }
+
+    foreach my $option ( keys %{$options} ) {
+        print " - ", $option, " : ", $plugin->pref($option), "\n";
+    }
+        print $plugin->name," is set personal\n" if $plugin->personal();
+}
+
+
+=head2 modify-plugin I<plugin> I<list_id> I<key> I<val> [ I<member_id> ]
+
+Sets the preference for a list. If optionally passed a member email,
+it will set their personal preference.
+
+=cut
+
+
+$commands{'modify-plugin'} = sub {
+    my ($plugin_id, $list_id, $key, $val, $member_id) = @_;
+
+    die "No plugin name passed\n" unless defined $plugin_id;
+    die "No list name passed\n"   unless defined $list_id;
+    die "You must pass a preference to change\n" unless defined $key;
+    die "You must pass a value to the '$key' preference to\n" unless defined $val;
+
+    my $list    = Siesta::List->load($list_id) || die "Not a valid list $list_id\n";
+
+    my %plugins = map { $_->name => $_ } $list->plugins;
+    my $plugin  = $plugins{$plugin_id}         || die "Not a valid plugin $plugin_id\n";
+
+
+    my $member;
+    if (defined $member_id) {
+        $member    = Siesta::Member->load($member_id)
+          || die "No such member $member_id\n";
+
+        die "$member_id is not subscribed to $list_id\n"
+          unless $list->is_member($member);
+
+        $plugin->member($member);
+    }
+
+    $plugin->pref($key, $val);
+
+    my $options = $plugin->options;
+
+    if (defined $member) {
+        printf "Personal preferences for member %s on list %s\n", $member_id, $list_id;
+    }
+    else {
+        printf "Preferences for list %s\n", $list_id;
+    }
+
+    foreach my $option ( keys %{$options} ) {
+        print " - ", $option, " : ", $plugin->pref($option), "\n";
+    }
+};
+
+
+#####
+#
+# Deferred message stuff
+#
+#####
+
+# dummy to put a space in
+$commands{'      '} = sub { };
+
+
+
+=head2 show-deferred [ deferred_id ]
+
+Show all the deferred messages or, if an id is
+passed in, show that deferred message.
+
+=cut
+
+
+$commands{'show-deferred'} = sub {
+    my $mess_id = shift;
+
+    # show an individual deferred message
+    if (defined $mess_id) {
+        my $deferred = Siesta::Deferred->retrieve($mess_id)
+            or die "No such deferred message\n";
+        print $deferred->message->as_string;
+        return;
+    }
+
+    my @all = Siesta::Deferred->retrieve_all;
+    unless (@all) {
+        print "No deferred messages\n";
+        return;
+    }
+
+    foreach my $deferred (@all) {
+        print +(
+            "Deferred-Id: ", $deferred->id,
+            "\nReason: ", $deferred->why,
+            "\nOwner: ", $deferred->who->email,
+            "\n\n From: ",    $deferred->message->header('From'),
+            "\n To: ",      $deferred->message->header('To'),
+            "\n Subject: ", $deferred->message->subject,
+            "\n Date: ",    $deferred->message->header('Date'),
+            "\n\n",
+           );
+    }
+};
+
+
+=head2 resume-deferred deferred_id
+
+Resume a deferred message.
+
+=cut
+
+$commands{'resume-deferred'} = sub {
+    my $mess_id = shift;
+
+    my $message = Siesta::Deferred->retrieve($mess_id)
+      or die "No such deferred message\n";
+
+    Siesta::Message->resume( $mess_id );
+
+    print "Sucessfully resumed message $mess_id\n";
+};
+
+$commands{'delete-deferred'} = sub {
+    my $mess_id = shift;
+
+    my $message = Siesta::Deferred->retrieve($mess_id)
+      or die "No such deferred message\n";
+
+    $message->delete;
+    print "Message deleted from deferral queue\n";
+};
+
+
+#####
+#
+# Misc stuff
+#
+#####
+
+# dummy to put a space in
+$commands{'       '} = sub { };
+
+=head2 run-mariachi
+
+invoke mariachi to make webified archives (depends on the Archive plugin)
+
+=cut
+
+$commands{'run-mariachi'} = sub {
+    for my $archive (Siesta::Plugin->search( name => 'Archive' )) {
+        $archive = $archive->promote;
+        my $input  = $archive->pref('path');
+        my $name   = $archive->list->name;
+        my $output = $Siesta::Config::ROOT . "/mariachi-html/$name";
+        print "invoking mariachi for $name\n";
+        system 'mariachi', '-i', $input, '-o', $output, '-n', $name;
+    }
+};
+
+
+=head2 create-backup [list name]
+
+Prints out shell script that will restore you system when run
+
+Optionally can take a list anme and will only dump a backup script
+for that list.
+
+=cut
+
+$commands{'create-backup'} = sub {
+    my @members;
+    my @lists;
+
+    if ($_[0]) {
+        # we have been passed a list
+        my $list = Siesta::List->load($_[0]) || die "No such list '$_[0]'\n";
+        push @lists, $list;
+        @members = $list->members();
+    }
+    else {
+        # otherwise do everything
+        @members = Siesta::Member->retrieve_all;
+        @lists   = Siesta::List->retrieve_all;
+    }
+
+    print Siesta->bake('backup',
+                       'members' => \@members,
+                       'lists'   => \@lists,
+                       'shellq'  => sub { return shell_quote $_[0] },
+                      );
+};
+
+
+sub usage {
+    my $name = basename $0;
+
+    return join '', "Usage: $name <-d database> COMMAND\nRecognised commands:",
+      (map { "\n\t $_" } keys %commands ),
+        "\n\nSee the $name manpage for more details";
+}
+
+# not enough arguments
+my $usage = usage();
+die "$usage\n" unless @ARGV;
+
+# what are we doing?
+my $mode = shift @ARGV;
+
+my $cmd = $commands{$mode}
+  or die usage;
+
+$cmd->(@ARGV);
+
+exit 0;
+__END__
+
+=head1 SEE ALSO
+
+L<Siesta>, L<Siesta::UserGuide>
+
+=head1 AUTHOR
+
+Written by Simon Wistow <simon@thegestalt.org>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2002 the Siesta dev team.
+
+Distributed under the same terms as Perl itself.
+
+=cut
+

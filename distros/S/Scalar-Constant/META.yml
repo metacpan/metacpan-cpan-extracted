@@ -1,0 +1,26 @@
+---
+abstract: 'lightweight constant scalars. '
+author:
+  - 'Arun Prasaad  C<< <arunbear@cpan.org> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Scalar-Constant
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Scalar::Quote: 0.26
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/arunbear/perl5-scalar-constant
+version: 0.001005

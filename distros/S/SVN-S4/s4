@@ -1,0 +1,1082 @@
+#!/usr/bin/perl -w
+# See copyright, etc in below POD section.
+######################################################################
+
+require 5.006_001;
+use FindBin qw($RealBin);
+use lib "$RealBin/blib/arch";
+use lib "$RealBin/blib/lib";
+use lib "$RealBin/lib";
+use lib "$RealBin";
+
+use Getopt::Long;
+use IO::File;
+use Pod::Text;
+use Pod::Usage;
+use Cwd qw(getcwd chdir);
+use File::Find;
+use File::Spec;
+use File::Spec::Functions;
+use Data::Dumper; $Data::Dumper::Indent=$Data::Dumper::Sortkeys=1;
+use Carp;
+use strict;
+
+use SVN::S4;
+use SVN::S4::Debug qw (DEBUG is_debug debug_option);
+
+use vars qw ($VERSION);
+
+#======================================================================
+# main
+
+$VERSION = '1.064';
+
+autoflush STDOUT 1;
+autoflush STDERR 1;
+
+our $Opt_Cmd;
+our @Opt_CmdParams = ();
+our @Opt_CmdParamsEnd = ();   # options to put at the end
+# NOTE: I use Opt_CmdParamsEnd for options like "--message MSG" to
+# allow them to be typed before the svn command.  Really, the SVN
+# documentation says you can put any argument anywhere, but SVN::S4::GetOpt
+# doesn't work that way.  It expects to see the svn subcomand before
+# parsing the arguments (like --message), so that it can immediately reject the
+# arguments that do not apply to that subcommand.  I made a special exception
+# for --message because it was used before the subcommand in a svn regression test.
+# It's not a great solution, but I wasn't ready to rewrite all the parsing just
+# to allow somebody to type "svn -m MSG commit FILE".
+
+our $Opt_Orig;
+our $Opt_Quiet;
+our $Opt_SvnBinary;
+our $Opt_Version;
+
+our $SvnOpt = new SVN::S4::Getopt;
+Getopt::Long::config ("pass_through", "no_auto_abbrev");
+
+if (! GetOptions (
+		  "help"	=> \&usage,
+		  "debug"	=> \&debug_option,
+		  "debugi=s"	=> \&debug_option,
+	  	  "orig!"	=> \$Opt_Orig,
+		  "svn=s"	=> \$Opt_SvnBinary,
+		  "quiet"	=> \&global_option_no_arg,
+		  "version"	=> \&global_option_no_arg,
+		  "config-dir=s" => \&global_option_with_arg,
+		  "message|m=s"	=> \&global_option_with_arg,
+		  "<>"		=> \&parameter,
+		  )) {
+    die "%Error: Type 's4 help' for usage.\n";
+}
+
+$ENV{RSVN_CALLING_SSH}=1;
+
+$Opt_Cmd = '' if !defined $Opt_Cmd;  # to avoid perl warnings about undef
+# Put any CmdParamsEnd at the end of the list, so that they will be after the
+# svn subcommand.
+push @Opt_CmdParams, @Opt_CmdParamsEnd;
+undef @Opt_CmdParamsEnd;
+DEBUG "Cmd: $Opt_Cmd\n" if is_debug;
+DEBUG "  Pos: '",join("' '",@Opt_CmdParams),"'\n" if is_debug;
+
+# Bypass?
+if ($Opt_Orig) {
+    our $s4 = new SVN::S4(SVN::S4::args_to_params());	# No arguments, in case parser broken
+    cmd_svn();
+    exit(0);
+}
+
+# Create one SVN::S4 object
+our %opts = $SvnOpt->hashCmd($Opt_Cmd, @Opt_CmdParams);
+our $s4 = new SVN::S4(SVN::S4::args_to_params(%opts));	# Process --quiet etc
+$s4->{svn_binary} = $Opt_SvnBinary || $ENV{'S4_SVN'} || "svn";
+DEBUG "Using '$s4->{svn_binary}' for subversion commands\n" if is_debug;
+$s4->{s4_binary} = $0;
+DEBUG "Using '$s4->{s4_binary}' for s4 commands\n" if is_debug;
+DEBUG "Using SVN_SSH='".($ENV{SVN_SSH}||'')."\n" if is_debug;
+
+DEBUG "opts=", Dumper(\%opts), "\n" if is_debug>=9;
+
+if ($Opt_Cmd eq '') {
+    # in svn, a few things work even with no subcommand
+    if ($Opt_Version) {
+	if (!$Opt_Quiet) {
+	    print "s4 wrapper around subversion (Version $VERSION)\n";
+	    print "by Bryce Denney and Wilson Snyder\n";
+	    print "\n";
+	}
+        $s4->run("$s4->{svn_binary} --version " . ($Opt_Quiet?"--quiet" : ""));
+	exit 0;
+    } else {
+	die "%Error: Type 's4 help' for usage.\n";
+    }
+}
+
+
+# Execute comand
+if ($Opt_Cmd eq "help-summary") {
+    print "All commands:\n";
+    cmd_help_summary();
+} elsif ($Opt_Cmd eq "help") {
+    cmd_help();
+} elsif ($Opt_Cmd eq "add") {
+    cmd_add();
+} elsif ($Opt_Cmd eq "cat-or-mods") {
+    cmd_cat_or_mods();
+} elsif ($Opt_Cmd eq "checkout") {
+    cmd_checkout();
+} elsif ($Opt_Cmd eq "commit") {
+    cmd_commit();
+} elsif ($Opt_Cmd eq "fixprop") {
+    cmd_fixprop();
+} elsif ($Opt_Cmd eq "info-switches") {
+    cmd_info_switches();
+} elsif ($Opt_Cmd eq "merge") {
+    cmd_merge();
+} elsif ($Opt_Cmd eq "quick-commit") {
+    cmd_quick_commit();
+} elsif ($Opt_Cmd eq "scrub") {
+    cmd_scrub();
+} elsif ($Opt_Cmd eq "snapshot") {
+    cmd_snapshot();
+} elsif ($Opt_Cmd eq "status") {
+    cmd_status();
+} elsif ($Opt_Cmd eq "switch") {
+    cmd_switch();
+} elsif ($Opt_Cmd eq "update") {
+    cmd_update();
+} elsif ($Opt_Cmd eq "workpropdel") {
+    cmd_workpropdel();
+} elsif ($Opt_Cmd eq "workpropget") {
+    cmd_workpropget();
+} elsif ($Opt_Cmd eq "workproplist") {
+    cmd_workproplist();
+} elsif ($Opt_Cmd eq "workpropset") {
+    cmd_workpropset();
+} else {
+    cmd_svn();
+}
+
+#----------------------------------------------------------------------
+
+sub usage {
+    print "Version $VERSION\n";
+    pod2usage(-verbose=>2, -exitval=>2, -output=>\*STDOUT, -noperldoc=>1);
+    exit (1);
+}
+
+sub global_option_no_arg {
+    my $param = shift;
+    if ($param eq 'version') {
+        $Opt_Version = 1;
+    	push @Opt_CmdParamsEnd, "--version";
+    } elsif ($param eq 'quiet') {
+        $Opt_Quiet = 1;
+    	push @Opt_CmdParamsEnd, "--quiet";
+    } else {
+	push @Opt_CmdParamsEnd, "--$param";
+    }
+}
+
+sub global_option_with_arg {
+    my $param = shift;
+    my $value = shift;
+    push @Opt_CmdParamsEnd, "--$param", $value;
+}
+
+sub parameter {
+    my $param = shift;
+    if ($param =~ /^-/) {
+	if (!defined $Opt_Cmd) {
+	    die "s4: %Error: Invalid global option: $param\n";
+	} else {
+	    push @Opt_CmdParams, $param;
+	}
+    } else {
+	if (!defined $Opt_Cmd) {
+	    $Opt_Cmd = $SvnOpt->dealias($param);
+	} else {
+	    push @Opt_CmdParams, $param;
+	}
+    }
+}
+
+#######################################################################
+#######################################################################
+#######################################################################
+# Commands invoked by the user
+
+sub cmd_svn {
+    # Call s4 using all the default parameters from the command line
+    local $! = undef;
+    my $cmdref = raw_svn_command();
+    $s4->run(@{$cmdref});
+}
+
+sub raw_svn_command {
+    if ($s4->debug) {
+	DEBUG "Building raw command from:\n";
+	DEBUG "  svn_binary = $s4->{svn_binary}\n";
+	DEBUG "  opt_cmd = $Opt_Cmd\n";
+	DEBUG "  opt_cmdparams = ", join(' ', @Opt_CmdParams), "\n";
+	DEBUG "But not using:\n";
+	DEBUG "  opts = ", Dumper(\%opts), "\n";
+    }
+    my @cmd = (split(/\s+/,$s4->{svn_binary}));
+    push @cmd, $Opt_Cmd;
+    push @cmd, @Opt_CmdParams;
+    return \@cmd;
+}
+
+sub _clean_path {
+    # SVN throws some odd errors with trailing /'s on paths
+    my $path = shift;
+    return undef if !defined $path;
+    $path =~ s!/$!!;
+    return $path;
+}
+
+sub cmd_add {
+    DEBUG "cmd_add ",join(' ',@Opt_CmdParams),"\n"  if is_debug;
+    #Ignore: !$opts{unknown} or die "%Error: s4 add: Unknown argument: $opts{unknown}[0]\n";
+    @Opt_CmdParams = $SvnOpt->stripOneArg('--raw',@Opt_CmdParams);
+    @Opt_CmdParams = $SvnOpt->stripOneArg('--fixprop',@Opt_CmdParams);
+    @Opt_CmdParams = $SvnOpt->stripOneArg('--no-fixprop',@Opt_CmdParams);
+
+    my $fp = $s4->config_get_bool('s4','add-fixprop');
+    $fp = 1 if $opts{"--fixprop"};
+    $fp = 0 if $opts{"--no-fixprop"} || $opts{"--raw"};
+
+    cmd_svn();  # Do the normal add
+
+    if ($fp) {
+	foreach my $filename (@{$opts{path}}) {
+	    $s4->fixprops(filename=>_clean_path($filename),
+			  recurse=>!$opts{"--non-recursive"},
+			  personal=>$opts{"--personal"});
+	}
+    }
+}
+
+sub cmd_cat_or_mods {
+    DEBUG "cmd_cat_or_mods ",join(' ',@Opt_CmdParams),"\n"  if is_debug;
+    !$opts{unknown} or die "%Error: s4 cat-or-mods: Unknown argument: $opts{unknown}[0]\n";
+
+    $opts{path} or die "%Error: s4 cat-or-mods: File path is required\n";
+    foreach my $filename (@{$opts{path}}) {
+	$s4->cat_or_mods(filename=>_clean_path($filename),);
+    }
+}
+
+sub cmd_fixprop {
+    DEBUG "cmd_fixprop ",join(' ',@Opt_CmdParams),"\n"  if is_debug;
+    !$opts{unknown} or die "%Error: s4 fixprop: Unknown argument: $opts{unknown}[0]\n";
+
+    $opts{path} or die "%Error: s4 fixprop: File path is required\n";
+    foreach my $filename (@{$opts{path}}) {
+	$s4->fixprops(filename=>_clean_path($filename),
+		      # --recursive is default, so only check for non-recursive
+		      recurse=>(!$opts{"--non-recursive"}),
+		      personal=>$opts{"--personal"},
+		      autoprops=>(!$opts{"--no-autoprops"}),
+		      ignores=>(!$opts{"--no-ignores"}),
+		      keywords=>(!$opts{"--no-keywords"}),);
+    }
+}
+
+sub cmd_info_switches {
+    !$opts{unknown} or die "%Error: s4 info-switches: Unknown argument: $opts{unknown}[0]\n";
+    # If no paths specified, update the current directory.
+    my @paths;
+    @paths = @{$opts{path}} if $opts{path};
+    push @paths, '.' if !@paths;
+    $s4->info_switches (paths => \@paths);
+}
+
+sub cmd_update {
+    DEBUG "cmd_update ",join(' ',@Opt_CmdParams),"\n"  if is_debug;
+    !$opts{unknown} or die "%Error: s4 update: Unknown argument: $opts{unknown}[0]\n";
+    @Opt_CmdParams = $SvnOpt->stripOneArg('--top',@Opt_CmdParams);
+    # If no paths specified, update the current directory.
+    ($opts{"--top"} && $opts{path}[0])
+	and die "s4: %Error: s4 update with both path and --top is contradictory\n";
+    $s4->update (revision=>($opts{revision}[0]||$opts{pathrev}[0]),
+		 paths=>_clean_path($opts{path}),
+		 top => $opts{"--top"},
+		 fallback_cmd=>raw_svn_command());
+}
+
+sub cmd_status {
+    DEBUG "cmd_status ",join(' ',@Opt_CmdParams),"\n"  if is_debug;
+    !$opts{unknown} or die "%Error: s4 status: Unknown argument: $opts{unknown}[0]\n";
+    @Opt_CmdParams = $SvnOpt->stripOneArg('--top',@Opt_CmdParams);
+    # If no paths specified, update the current directory.
+    if ($opts{"--top"}) {
+	$opts{path}[0] and die "s4: %Error: s4 update with both path and --top is contradictory\n";
+        my $dir = $s4->dir_top_svn(".");
+	push @{$opts{path}}, $dir;
+	push @Opt_CmdParams, $dir;
+    }
+    cmd_svn();
+}
+
+sub cmd_switch {
+    DEBUG "cmd_switch ",join(' ',@Opt_CmdParams),"\n"  if is_debug;
+    !$opts{unknown} or die "%Error: s4 switch: Unknown argument: $opts{unknown}[0]\n";
+    DEBUG "  opts = ", Dumper(\%opts), "\n" if is_debug;
+    # Goal: Add ability to create switchpoints.
+    # Use standard svn if they used "--relocate" syntax.
+    if ($opts{'--relocate'}) {
+        cmd_svn();
+	return; # no viewspec checking
+    }
+    # Now we know that arg array means "URL PATH";
+    my ($url,$path) = @{$opts{arg}};
+    $url = _clean_path($url);
+    $path = "." if !defined $path;
+    if (!defined $url || !defined $path) {
+        return cmd_svn();  # no viewspec checking
+    }
+    my $rev = ($opts{revision}[0]||$opts{argrev}[0]);
+
+    # FIXME: great potential for performance improvement here.  If a viewspec
+    # will be present after the switch, do nonrecursive switch first and then
+    # parse viewspec, and let that inform how we proceed.
+    #
+    # See if the directory they tried to switch exists. If so, nothing to do.
+    if (-d $path) {
+        cmd_svn();
+	$s4->clear_viewspec_state (path=>$path);  # switch wipes out switches
+	return check_viewspec_after_svn_cmd(path=>$path, revision=>$rev);
+    }
+    # Aha, now we can help out by making the switchpoint at $path.
+    # Identify the lowest-level directory that is a working copy, and
+    # start building switchpoints until you reach path.
+    my @basedirs = File::Spec->splitdir ($path);
+    my @reldirs;
+    my $basedir;
+    while (@basedirs) {
+	unshift @reldirs, (pop @basedirs);  # start at parent of $path.
+        my $candidate = File::Spec->catdir (@basedirs);
+	last if ($candidate eq '/');  # please don't touch the root!
+	$candidate = "." if length $candidate < 1;
+	DEBUG "Is $candidate a working copy?\n" if is_debug;
+	if (-d $candidate && -d "$candidate/.svn") {
+	    $basedir = $candidate;
+	    last;
+	}
+    }
+    if (!defined $basedir) {
+        DEBUG "Cannot find working copy at any point above $path. Run normal command.\n" if is_debug;
+        cmd_svn();
+	$s4->clear_viewspec_state (path=>$path);  # switch wipes out switches
+	return check_viewspec_after_svn_cmd (path=>$path, revision=>$rev);
+
+    }
+    print "s4: Creating empty directory to switch into: $path\n";
+    my $reldir = File::Spec->catdir (@reldirs);
+    #die "create_switchpoint_hierarchical with basedir=$basedir, reldir=$reldir";
+    $s4->create_switchpoint_hierarchical ($basedir, $reldir);
+    # Now that we made the switchpoint, run the normal command.
+    cmd_svn ();
+    $s4->clear_viewspec_state (path=>$path);  # switch wipes out switches
+    check_viewspec_after_svn_cmd (path=>$path, revision=>$rev);
+}
+
+sub check_viewspec_after_svn_cmd {
+    my %params = (#path=>,
+                  #revision=>,
+                  @_);
+    my $path = _clean_path($params{path});
+    # Is there a viewspec file? If so parse and update accordingly.
+    if (!$s4->dir_uses_viewspec($path)) {
+        DEBUG "after switch, there is no viewspec. done.\n" if $s4->debug;
+        return;
+    }
+    my $viewspec = "$path/" . $s4->{viewspec_file};
+    my $rev = $params{revision};
+    $rev = $s4->which_rev (revision=>$rev, path=>$path) if !$rev;
+    DEBUG "Using revision $rev for all viewspec operations\n" if $s4->debug;
+    DEBUG "Parse the viewspec file $viewspec\n" if $s4->debug;
+    $s4->parse_viewspec (filename=>$viewspec, revision=>$rev);
+    # Test to see if a normal update will suffice, since it is a whole lot faster
+    # than a bunch of individual updates.  For every successful checkout/update
+    # we make an MD5s hash of the viewspec actions list (minus rev number) and
+    # save it away.  Next time, if the viewspec hash is the same, and every
+    # directory is scheduled to be updated to the same version (no rev NUM clauses),
+    # then you can safely use a single update.
+    if (!$s4->viewspec_changed(path=>$path) && $s4->viewspec_compare_rev($rev)) {
+        print "No viewspec changes. Done.\n" if !$s4->quiet;
+	return;
+    }
+    $s4->apply_viewspec (path=>$path);
+    $s4->save_viewspec_state (path=>$path);
+}
+
+sub cmd_checkout {
+    DEBUG "cmd_checkout ",join(' ',@Opt_CmdParams),"\n"  if is_debug;
+    !$opts{unknown} or die "%Error: s4 checkout: Unknown argument: $opts{unknown}[0]\n";
+    # The documentation for svn checkout says "checkout URL... [PATH]".
+    # I'm only going to support one URL here, e.g. "checkout URL [PATH]".
+    # Because of the ... after URL, both the url and the path will appear
+    # in the $opts{url}.
+    unless ($opts{url}) { die "%Error: s4 checkout with no arguments!"; }
+    my ($url,$path) = @{$opts{url}};
+    $url = _clean_path($url);
+    my $nopts = scalar @{$opts{url}};
+    unless (defined $url && ($nopts == 1 || $nopts == 2)) {
+        die "%Error: s4 checkout only supports these forms: checkout URL | checkout URL PATH";
+    }
+    if (!defined $path) {
+	# Grab basename of url. I know svn co would do this implicitly, but
+	# we do other things with the $path like parse the viewspec, so
+	# we need it anyway.
+	$path = $url;
+	$path =~ s/.*\///;
+    }
+    $s4->checkout (revision=>($opts{revision}[0]||$opts{urlrev}[0]),
+		   url=>$url, path=>$path,
+		   fallback_cmd=>raw_svn_command());
+}
+
+sub cmd_commit {
+    DEBUG "cmd_commit ",join(' ',@Opt_CmdParams),"\n"  if is_debug;
+    !$opts{unknown} or die "%Error: s4 commit: Unknown argument: $opts{unknown}[0]\n";
+    @Opt_CmdParams = $SvnOpt->stripOneArg('--unsafe',@Opt_CmdParams);
+    my @paths;
+    if (defined $opts{path}[0]) {
+	@paths = map {_clean_path($_) } @{$opts{path}};
+    }
+    $s4->commit (paths => \@paths,
+		 unsafe => $opts{"--unsafe"},
+		 fallback_cmd=>raw_svn_command());
+}
+
+sub cmd_merge {
+    DEBUG "cmd_merge ",join(' ',@Opt_CmdParams),"\n"  if is_debug;
+
+    my @urls = @{$opts{pathorurl}};
+    my $path_or_url = $urls[$#urls];
+    my $path = (-e $path_or_url) ? $path_or_url : '.';  # If not a path, presume a URL and override path
+    $s4->merge (path=>$path,
+		fallback_cmd=>raw_svn_command());
+}
+
+# Usage: s4 quick_commit PATH
+sub cmd_quick_commit {
+    DEBUG "cmd_quick_commit ",join(' ',@Opt_CmdParams),"\n"  if is_debug;
+    !$opts{unknown} or die "%Error: s4 quick_commit: Unknown argument: $opts{unknown}[0]\n";
+    DEBUG "opts=",Dumper(\%opts), "\n" if is_debug;
+    my @paths;
+    if (!defined $opts{path}[0]) {
+	push @paths, ".";
+    } else {
+	@paths = map {_clean_path($_) } @{$opts{path}};
+    }
+    $s4->quick_commit (paths => \@paths,
+		       recurse => (!$opts{"--non-recursive"}),
+		       file => $opts{file},
+		       message => $opts{message},
+		       );
+}
+
+# Usage: s4 snapshot PATH
+sub cmd_snapshot {
+    DEBUG "cmd_snapshot ",join(' ',@Opt_CmdParams),"\n"  if is_debug;
+    !$opts{unknown} or die "%Error: s4 snapshot: Unknown argument: $opts{unknown}[0]\n";
+    !defined($opts{path}[1]) or die "%Error: s4 snapshot: Only one path allowed: $opts{path}[1]\n";
+    #DEBUG "opts=",Dumper(\%opts), "\n" if is_debug;
+    my $path = _clean_path($opts{path}[0]);
+    $path = "." if !defined $path;
+    my $no_ignore = $opts{'--no-ignore'} || 0;
+    $s4->snapshot (path=>$path, disregard_ignore_list=>$no_ignore, scrub_cmd=>"\$S4 scrub");
+}
+
+# Usage: s4 scrub PATH
+sub cmd_scrub {
+    DEBUG "cmd_scrub ",join(' ',@Opt_CmdParams),"\n"  if is_debug;
+    !$opts{unknown} or die "%Error: s4 scrub: Unknown argument: $opts{unknown}[0]\n";
+    !defined($opts{path}[1]) or die "%Error: s4 scrub: Only one path allowed: $opts{path}[1]\n";
+    #DEBUG "opts=",Dumper(\%opts), "\n" if is_debug;
+    my $path = _clean_path($opts{path}[0]);
+    my $rev = ($opts{revision}[0]||$opts{pathrev}[0]);
+    if (!defined $path) {
+	print "%Error: s4 scrub requires the path of the area to scrub.\n";
+	die "%Error: s4 scrub: Please read the help messages very carefully before using scrub!";
+    }
+    ###$path = "." if !defined $path;  # make them type it
+    $s4->scrub (path=>$path,
+		revision=>$rev,
+		url=>$opts{url}[0],
+		verbose=>(!defined $opts{'--noverbose'}));
+    check_viewspec_after_svn_cmd(path=>$path,
+				 revision=>$rev);
+}
+
+sub cmd_workpropdel {
+    DEBUG "cmd_workpropdel ",join(' ',@Opt_CmdParams),"\n"  if is_debug;
+    !$opts{unknown} or die "%Error: s4 workpropdel: Unknown argument: $opts{unknown}[0]\n";
+    #DEBUG "opts=",Dumper(\%opts), "\n" if is_debug;
+    my $propname = $opts{propname}[0];
+    (defined $propname) or die "%Error: s4 workpropdel requires the property name\n";
+    $s4->workpropdel (propname=>$propname);
+}
+
+sub cmd_workpropget {
+    DEBUG "cmd_workpropget ",join(' ',@Opt_CmdParams),"\n"  if is_debug;
+    !$opts{unknown} or die "%Error: s4 workpropget: Unknown argument: $opts{unknown}[0]\n";
+    #DEBUG "opts=",Dumper(\%opts), "\n" if is_debug;
+    my $propname = $opts{propname}[0];
+    (defined $propname) or die "%Error: s4 workpropget requires the property name\n";
+    $s4->workpropget (propname=>$propname, print=>1);
+}
+
+sub cmd_workproplist {
+    DEBUG "cmd_workpropget ",join(' ',@Opt_CmdParams),"\n"  if is_debug;
+    !$opts{unknown} or die "%Error: s4 workpropget: Unknown argument: $opts{unknown}[0]\n";
+    #DEBUG "opts=",Dumper(\%opts), "\n" if is_debug;
+    $s4->workproplist (print=>1,
+		       verbose=>$opts{'-v'},
+		       xml=>$opts{'--xml'});
+}
+
+sub cmd_workpropset {
+    DEBUG "cmd_workpropset ",join(' ',@Opt_CmdParams),"\n"  if is_debug;
+    !$opts{unknown} or die "%Error: s4 workpropset: Unknown argument: $opts{unknown}[0]\n";
+    #DEBUG "opts=",Dumper(\%opts), "\n" if is_debug;
+    my $propname = $opts{propname}[0];
+    my $propval = $opts{propval}[0];
+    (defined $propname) or die "%Error: s4 workpropset requires the property name\n";
+    (defined $propval) or die "%Error: s4 workpropset requires the property value\n";
+    $s4->workpropset (propname=>$propname, value=>$propval);
+}
+
+sub cmd_help {
+    my $cmd;
+    if ($opts{subcommand}) {
+	$cmd = $opts{subcommand}[0];
+	$cmd = $SvnOpt->dealias($cmd);
+	my $needdash;
+	if ($SvnOpt->command_s4_addition($cmd)
+	    || $SvnOpt->command_s4_changed($cmd)) {
+	    print "s4 $cmd options:\n";
+	    print $SvnOpt->command_help_summary($cmd);
+	    print "\ns4 $cmd from manpage:\n";
+	    _pod_section_for($cmd);
+	    $needdash = 1;
+	}
+	if (!$SvnOpt->command_s4_addition($cmd)) {
+	    print "\n","-"x70,"\n" if $needdash;
+	    print "Svn Help:\n\n";
+	    cmd_svn();
+	}
+    } else {
+	print "S4 Unique commands:\n";
+	print "\ts4      --help\n";
+	foreach my $cmd ($SvnOpt->commands_sorted) {
+	    if ($SvnOpt->command_s4_addition($cmd)) {
+		printf "\ts4      %s\n", $cmd;
+	    }
+	}
+	print "S4 Modified commands:\n";
+	foreach my $cmd ($SvnOpt->commands_sorted) {
+	    if ($SvnOpt->command_s4_changed($cmd)) {
+		printf "\ts4      %s\n", $cmd;
+	    }
+	}
+	print "\n","-"x70,"\n";
+	print "Svn Help:\n\n";
+	cmd_svn();
+    }
+}
+
+sub cmd_help_summary {
+    my $longest = 1;
+    foreach my $cmd ($SvnOpt->commands_sorted) {
+	$longest = length($cmd) if length($cmd)>$longest;
+    }
+    foreach my $cmd ($SvnOpt->commands_sorted) {
+	my $args = $SvnOpt->command_arg_text($cmd);
+	printf("    %-${longest}s  %s\n",$cmd,$args);
+    }
+}
+
+#######################################################################
+
+sub _pod_section_for {
+    my $cmd = shift;
+    #$SIG{__WARN__} = sub{};	#pod2text isn't clean.
+    #pod2text($0);
+
+    use Pod::Select;
+    my $parser = new Pod::Select();
+    $parser->select("COMMANDS/$cmd.*");
+    $parser->parse_from_file($0);
+}
+
+#######################################################################
+__END__
+
+=pod
+
+=head1 NAME
+
+s4 - Wrapper for subversion program
+
+=head1 SYNOPSIS
+
+    s4        help
+
+    s4 <any svn command>
+       i.e.:  s4 add <file>
+              s4 delete <file>
+              s4 diff <file>
+
+=head1 DESCRIPTION
+
+S4 provides a wrapper to subversion that extends several of the commands.
+It understands all svn commands; you may simply use "s4" whereever you
+would normally type "svn".
+
+In many cases, S4 simply runs "svn" with the same arguments as you passed
+to s4.  If you want s4 to run a particular version of svn, you can either
+set the environment variable S4_SVN to the name of the subversion binary,
+or use --svn=SVN_BINARY to override the default.
+
+=head1 COMMANDS
+
+Any command not listed here is passed directly to subversion.
+
+=head2 add
+
+Perform normal subversion add, then if the add-fixprop configuration option
+is set, do a "s4 fixprop" on all of the new files.
+
+With --no-fixprop, ignore the config setting and run the normal svn add, do
+not fixprop.  With --fixprop, ignore the config setting and fixprop.
+
+=head2 cat-or-mods
+
+Perform a "svn cat HEAD" if the file has no modifications, else show the
+local file with modifications.  This is a convient way of editing what
+would otherwise need to be a global file.  If the file is unchanged you'll
+get HEAD (basically a global file), but you can also edit it locally to
+make changes.
+
+=head2 checkout
+
+s4 checkout behaves exactly the same way as svn checkout, unless the top
+directory that you check out contains a file called Project.viewspec.
+If Project.viewspec is present, s4 does the following steps instead.
+
+1. Check out/update the top directory with --non-recursive, so that
+subdirectories are not fetched.
+
+2. Parse the Project.viewspec file to see how the working area should be
+laid out.  Project.viewspec specifies which directories in your working
+area should be mapped to which URLs in the repository.  If any problems
+are found during viewspec parsing, s4 ends with an error.
+
+3. Do a series of "svn switch" commands to build the working area.
+In normal svn, you cannot switch a directory unless it is already
+in the working copy, and checked in.  S4 works around this (see
+SVN::S4::ViewSpec.pm if you must know), so the viewspec can put any
+directory at any location.
+
+=head2 fixprop
+
+Processes all files and directories passed as arguments.
+
+* Unless --no-ignores is used, any .cvsignore or .gitignore files will be
+read and set their directory's svn:ignore property. (See below for the
+format of .cvsignore or .gitignore).
+
+* Unless --no-keywords is used, any non-binary file which contains a CVS
+metacomment, and which do not have a svn:keyword property will have the
+svn:keyword property added.
+
+* Unless --no-autoprops is used, any tsvn:autoprops property on a parent
+directory will be applied to all files that have no property of the same
+name already set.
+
+With -N or --non-recursive, don't recurse across directories.
+
+With --personal, only change files the current user has added, or was the
+last author of.
+
+=head2 help I<subcommand>
+
+Invokes subversion help.  With a subcommand modified or specific to s4,
+also prints s4 help on that command.
+
+=head2 help-summary
+
+Prints a summary of all Subversion and S4 commands.
+
+=head2 commit [-unsafe]
+
+s4 commit generally behaves exactly the same way as svn checkout, unless
+the following optional configurations are set:
+
+If commit-block-non-top configuration file option is 'yes', commits will
+fail if no path is specified and the current directory is not at the top of
+the checkout tree, for example "s4:%Error: Blocked unsafe commit as not
+committing from top of tree.  Use commit --unsafe to override." To override
+this check use "s4 ci ." so a specific path is specified, or use --unsafe.
+This message is suppressed if the directory's URL is trunk/branches/tags,
+as it is common to have multiple working areas under a single view, and
+wish to commit only one of them.
+
+If commit-block-unversioned configuration file option is 'yes', commits
+will fail if unversioned (?) or conflict (C) files are present, for example
+"s4: %Error: Blocked unsafe commit as unversioned files present.  Add,
+repair svn:ignore, or use commit --unsafe to override."  Ideally the
+unversioned file should be either added or added to a svn:ignore list so it
+is no longer unversioned, or alternatively to override this check use "s4
+ci --unsafe".
+
+=head2 info-switches I<path>
+
+Given a working file path, prints a non-recursive "svn info" at the path
+specified, plus every switch point under the path.  Given an URL prints the
+info on any views underneath that URL.
+
+=head2 merge
+
+s4 merge behaves exactly the same way as svn merge, unless the top
+directory that you update contains a file called Project.viewspec.  If
+Project.viewspec is present, s4 will print an error message.  Merging is
+not supported in s4 views, as SVN creates many extranious svn:mergeinfo
+properties.  Instead you should checkout a non-viewed area, and merge
+there.
+
+=head2 quick-commit|qci PATH...
+
+s4 quick-commit, or "qci" for short, performs a commit of the current tree.
+Unlike the normal commit command, qci will not create lock files, and so
+may be significantly faster on large trees.  It is semantically equivelent
+to doing a svn status, then only commiting the files listed as changing
+rather then committing the entire tree.
+
+=head2 scrub [--revision REV] [--url URL] PATH
+
+s4 scrub turns a "used" source tree into a pristine one, as efficiently as it
+can.
+
+WARNING: That means that it will permanently throw away all the changes you've
+made in your working copy.  Is that really what you want?  If not, stop right
+here.
+
+It first does a "svn status" to look for any files that aren't checked in,
+anything that has been added but not checked in, etc. and erases/reverts them
+all.  Then it updates the tree to the specified revision.  When it's done, your
+tree should look exactly like a clean checkout.  (If not it's a bug.)
+
+You probably ask, why not just do "svn revert -R" or "svn update -r".
+Those commands tend to leave some junk behind, or sometimes they get jammed
+(e.g. object of the same name already exists).  Also svn is understandably
+very conservative about erasing a file or directory that it is not SURE is
+checked in already.  But this command is not; it's happy to blow away the
+changes in your working copy...in fact that's its primary job.
+
+=head2 status [--top]
+
+With --top, update the highest subversion directory found at or above the
+current directory, rather than the current directory itself.
+
+Otherwise s4 status behaves exactly the same way as svn status.
+
+=head2 snapshot
+
+s4 snapshot generates a compact patch file that describes how to reproduce a
+svn working copy exactly, including:
+  - modified files (text or binary)
+  - files and dirs that are not yet checked in
+  - inconsistent svn revision numbers throughout the tree
+  - property changes on files and dirs
+  - svn switched files and directories
+  - svn externals
+
+The output of the s4 snapshot command is Bourne shell script that contains
+commands to create a new working copy or modify an existing one, run some svn
+commands, and apply all your changes.  It is sort of like a "super-patch."
+When the script is done, the new working should match the original in every
+respect.  If anything prevents such a patch from being created, it will die
+with an error.  For example, if your working copy has deleted files or
+directories, or other unhealthy things, the snapshot code may not know how to
+recreate it so it will refuse to make a patch.
+
+Snapshots can be useful for backing up your work (without having to check in),
+for bug reporting, or any time you want to "save your state" so that you can
+recreate your area later, or in another place.
+
+Changes in text files appear in svn diff format.  Changes in binary files are
+TARred, base64 encoded, and the encoded text appears in the patch file.
+I keep calling the output file a "patch" because in fact it can be used with
+the patch program.  But it's also a shell script that recreates the svn state
+as well.
+
+Example of making a snapshot and restoring:
+   s4 checkout -r22100 http://svn.collab.net/repos/svn/trunk/www  svnwebsite
+   cd svnwebsite
+   # add some files, modify some files, svn update to other revisions
+   s4 rm images
+   cp index.html myindex.html
+   s4 add myindex.html
+   echo Finish my new favorite feature >> roadmap.html
+   echo as soon as possible >> roadmap.html
+   s4 snap > /tmp/snapshot
+   # The snapshot is a script to recreate these changes.
+   # Let's run it.
+   s4 revert -R . ; rm -f myindex.html   # make it clean again
+   bash /tmp/snapshot
+
+
+=head2 update [--top]
+
+s4 update behaves exactly the same way as svn checkout, unless the
+top directory that you update contains a file called Project.viewspec.
+If Project.viewspec is present, s4 does the steps described in the
+"checkout" section above.
+
+In most updates, the viewspec file has not changed drastically, so there is
+no need to redo the svn switches, and s4 will do svn update.  But if the
+tree structure changes, s4 will redo the switch commands.
+
+With --top, update the highest subversion directory found at or above the
+current directory, rather than the current directory itself.
+
+=head2 workpropdel I<propname>
+
+s4 workpropdel deletes a work-area property of the given name, if it
+exists.
+
+=head2 workpropget I<propname>
+
+s4 workpropget returns a work-area property of the given name, if it
+exists, otherwise "".
+
+=head2 workproplist [--xml]
+
+s4 workproplist lists all work area properties, with their values.
+
+=head2 workpropset I<propname> I<propvalue>
+
+s4 workpropset sets a work-area property of the given name to the given
+value.  Work area properties are associated and unique to a given work
+area, and stored in the top level .svn directory.
+
+=head1 ARGUMENTS
+
+=over 4
+
+=item --help
+
+Displays this message and program version and exits.
+
+=item --orig
+
+Pass all commands through to the original version of svn.  Useful when svn
+has been aliased to a different command.
+
+=item --svn I<name>
+
+Name of svn executable, or "svn" if not specified.  See also S4_SVN.
+
+=item --version
+
+Displays program version and exits.
+
+=back
+
+=head1 VIEWSPEC FILES
+
+A viewspec file is a text file containing a series of one-line commands.
+Anything after a # character is considered a comment.  Whitespace and blank
+lines are ignored.  The commands must be one of:
+
+=over 4
+
+=item set VAR VALUE
+
+Set environment variable VAR to VALUE.  This is useful for making
+abbreviations to be used within the viewspec file, for frequently typed
+things such as the name of the svn repository.
+
+=item include FILE
+
+Read another file that contains viewspec commands.  If the filename does
+not begin with a slash, it is considered to be relative to the directory
+containing the Project.viewspec.
+
+=item include URL
+
+Read a file out of the SVN repository that contains viewspec commands.
+
+=item view URL DIR
+
+Directory DIR will be svn switched to URL.
+
+=item view URL/(.*) DIR$1
+
+Directory DIR will be svn switched to URL.  URL may contain a parenthesized
+regexp, which indicates the repository should be searched for matching
+files/subdirectories with the matching name.  If found, $1 will be
+substituted into DIR.  The URL parenthesis must follow all /s, that is they
+can only match against the final path component, not a mid-level part of
+the path.
+
+=item view URL DIR rev REVNUM
+
+Directory DIR will be svn switched to URL at revision REVNUM.  Note that
+this is not "sticky" the way CVS was.  Svn updates will override the
+revision number, while s4 update will not.
+
+REVNUM can also be a date in normal subversion format, as listed here:
+http://svnbook.red-bean.com/nightly/en/svn-book.html#svn.tour.revs.dates
+Example: view URL DIR rev {2006-07-01}
+
+=item view URL@REVNUM DIR
+
+Alternative form of revision pegging.  This form must have a numeric
+revision.
+
+=item unview DIR
+
+Ignore any view/unview commands that came above, for directories that begin
+with DIR, which may be a Perl regular expression. (The regexp must match
+everything from the beginning up through the end of the directory name.)
+This may be useful if you have included a viewspec and want to override
+some of its view commands.
+
+=back
+
+=head1 FILES
+
+=over 4
+
+=item .cvsignore, .gitignore
+
+Used by the fixprop command to specify the contents for the svn:ignore
+property.
+
+The contents "[recursive]" indicates that everything following that tag
+until the end of the file should be applied to all directories underneath
+this one.
+
+=item .svn/workprops
+
+S4 workprop* commands store the work area properties in a workprops file in
+the highest .svn directory.  This file is in YAML format.
+
+=item /etc/subversion/config
+
+S4 configuration file, also used by Subversion.
+
+=item ~/.subversion/config
+
+S4 configuration file, also used by Subversion.
+
+=back
+
+=head1 CONFIG FILES
+
+The following svn config file options are added by s4.
+
+=over 4
+
+=item [s4] add-fixprop = yes
+
+If yes, an "add" command will also do a fixprop.  Note this defaulted to
+true prior to version 1.041.
+
+=item [s4] co-under-co = yes
+
+If yes, a "checkout" command will be allowed when inside an existing
+checkout.  Defaults no.
+
+=item [s4] commit-block-ignores = *.new *.old *.tmp
+
+List of glob-style regexps of files to ignore for commit-block-unversioned.
+
+=item [s4] commit-block-non-top = yes
+
+If yes, a "commit" command will fail when no path is specified and not in
+the top of the checkout tree.  Defaults no.
+
+=item [s4] commit-block-unversioned = yes
+
+If yes, a "commit" command will fail when unversioned (?) or conflicted (C)
+files are present.  Defaults no.
+
+=item [s4] merge-under-view = yes
+
+If yes, a "merge" command will be allowed when inside a viewed directory.
+Defaults no.
+
+=back
+
+=head1 ENVIRONMENT
+
+=over 4
+
+=item RSVN_CALLING_SSH
+
+Set by this script to 1.  See C<rsvn> for details.
+
+=item S4_CONFIG
+
+Filename of additional configuration options.  Processed fourth, in order
+of /etc/subversion/config, S4_CONFIG_SITE, ~/.subversion/config, and
+S4_CONFIG files.
+
+=item S4_CONFIG_SITE
+
+Filename of additional site configuration options.  Processed second, in
+order of /etc/subversion/config, S4_CONFIG_SITE, ~/.subversion/config, and
+S4_CONFIG files.
+
+=item S4_SVN
+
+Name of svn executable, or "svn" if not specified.
+
+=back
+
+=head1 BUGS
+
+=over 4
+
+=item S4 relys on some obscure features of Subversion, in that s4 needs to
+to modify the .svn directory to create empty directories and svn externals
+that switch to them.  This has only been tested on Subversion 1.1, 1.2, and
+1.6.6, newer versions will probably break.
+
+=back
+
+=head1 DISTRIBUTION
+
+The latest version is available from CPAN and from L<http://www.veripool.org/>.
+
+Copyright 2005-2017 by Bryce Denney and Wilson Snyder.  This package is
+free software; you can redistribute it and/or modify it under the terms of
+either the GNU Lesser General Public License Version 3 or the Perl Artistic License Version 2.0.
+
+=head1 AUTHORS
+
+Bryce Denney <bryce.denney@sicortex.com> and
+Wilson Snyder <wsnyder@wsnyder.org>
+
+=head1 SEE ALSO
+
+L<svn>,
+L<SVN::S4>,
+
+L<rsvn> package, which provides L<rs4> to run s4 on NFS servers.
+
+=cut
+
+######################################################################
+### Local Variables:
+### compile-command: "./s4 "
+### End:

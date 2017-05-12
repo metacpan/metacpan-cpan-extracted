@@ -1,0 +1,14 @@
+TYPEMAP
+unsigned char *              T_PV
+unsigned long                T_UV
+swf_object_t *               SWF_OBJECT_T
+swf_tag_t *                  SWF_TAG_T
+swf_tag_info_t *             SWF_TAG_INFO_T 
+
+INPUT
+SWF_OBJECT_T
+    $var = (swf_object_t *) mg_find(SvRV($arg), PERL_MAGIC_ext)->mg_obj;
+SWF_TAG_T
+    $var = (swf_tag_t *) mg_find(SvRV($arg), PERL_MAGIC_ext)->mg_obj;
+SWF_TAG_INFO_T
+    $var = (swf_tag_info_t *) mg_find(SvRV($arg), PERL_MAGIC_ext)->mg_obj;

@@ -1,0 +1,69 @@
+{
+   "abstract" : "Try extra hard to get IP address related info",
+   "author" : [
+      "Sawyer X <xsawyerx@cpan.org>",
+      "Jonathan Schatz <jon@divisionbyzero.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Sys-HostIP",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.1101"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "File::Basename" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Sys::HostIP" : {
+         "file" : "lib/Sys/HostIP.pm",
+         "version" : "2.000"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/xsawyerx/sys-hostip/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/xsawyerx/sys-hostip.git",
+         "web" : "https://github.com/xsawyerx/sys-hostip"
+      }
+   },
+   "version" : "2.000",
+   "x_serialization_backend" : "JSON::XS version 3.03"
+}
+

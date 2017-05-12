@@ -1,0 +1,27 @@
+Revision history for Search-Elasticsearch-Compat
+
+0.10    2014-03-05
+        Moved all modules to Search::Elasticsearch namespace.
+        See https://github.com/elasticsearch/elasticsearch-perl/issues/20
+
+0.05    2014-03-05
+
+        Deprecated the Elasticsearch namespace in favour of Search::Elasticsearch.
+        See https://github.com/elasticsearch/elasticsearch-perl/issues/20
+
+0.04    2014-02-27
+        Changed the dependency list to rely on Elasticsearch, rather
+        than on classes within that dist.
+
+0.03    2013-12-03
+        Bumped Elasticsearch dependency to 0.76
+        Fixed test suite for ES 0.90.7
+        Fixed timeout param in mget
+        Added timeout param in bulk
+
+0.02    2013-10-03
+        Fixed a bug when not specifying a timeout
+
+0.01    2013-10-02
+        First release
+

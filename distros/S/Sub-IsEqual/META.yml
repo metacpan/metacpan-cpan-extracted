@@ -1,0 +1,28 @@
+---
+abstract: 'determine if two arguments are equal'
+author:
+  - 'Aaron Cohen <aaarondcohen@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker::CPANfile: 0.06
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Sub-IsEqual
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  ExtUtils::MakeMaker::CPANfile: 0
+  Set::Functional: 0
+  Test::Most: 0
+resources:
+  bugtracker: http://github.com/aarondcohen/perl-sub-isequal/issues
+  homepage: http://github.com/aarondcohen/perl-sub-isequal
+  repository: git://github.com/aarondcohen/perl-sub-isequal.git
+version: 0.03

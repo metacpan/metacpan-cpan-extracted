@@ -1,0 +1,98 @@
+NAME
+
+    Sys::PageCache - handling page cache related on files
+
+INSTALLATION
+
+    To install this module, run the following commands:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+SYNOPSIS
+
+        use Sys::PageCache;
+        
+        # determine whether pages are resident in memory
+        $r = fincore "/path/to/file";
+        printf("cached/total_size=%llu/%llu cached/total_pages=%llu/%llu\n",
+               $r->{cached_size}, $r->{file_size},
+               $r->{cached_pages}, $r->{total_pages},
+           );
+        
+        # free cached pages on a file
+        $r = fadvise "/path/to/file", 0, 0, POSIX_FADV_DONTNEED;
+
+DESCRIPTION
+
+    Sys::PageCache is for handling page cache related on files.
+
+METHODS
+
+    fincore($filepath:Str [, $offset:Int [, $length:Int]])
+
+      Determine whether pages are resident in memory. $offset and $length
+      are optional.
+
+      fincore returns a following hash ref.
+
+          {
+             cached_pages => Int, # number of cached pages
+             cached_size  => Int, # size of cached pages
+             total_pages  => Int, # number of pages if cached whole file
+             file_size    => Int, # size of file
+             page_size    => Int, # page size on your system
+          }
+
+    fadvise($filepath:Str, $offset:Int, $length:Int, $advice:Int)
+
+      Call posix_fadvise(2).
+
+      fadvise returns 1 if success.
+
+    page_size()
+
+      Returns size of page size on your system.
+
+EXPORTS
+
+    fincore
+
+    fadvise
+
+    POSIX_FADV_NORMAL
+
+    POSIX_FADV_SEQUENTIAL
+
+    POSIX_FADV_RANDOM
+
+    POSIX_FADV_NOREUSE
+
+    POSIX_FADV_WILLNEED
+
+    POSIX_FADV_DONTNEED
+
+AUTHOR
+
+    HIROSE Masaaki <hirose31 _at_ gmail.com>
+
+REPOSITORY
+
+    https://github.com/hirose31/Sys-PageCache
+
+      git clone git://github.com/hirose31/Sys-PageCache.git
+
+    patches and collaborators are welcome.
+
+SEE ALSO
+
+    mincore(2), posix_fadvise(2), https://code.google.com/p/linux-ftools/,
+    https://github.com/nhayashi/pagecache-tool
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

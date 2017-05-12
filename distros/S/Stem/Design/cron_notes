@@ -1,0 +1,80 @@
+
+		     Stem Cron System Design Notes
+
+Stem::Cron is designed to both supplant the standard OS cron and
+extending it to support more useful time filters. The key difference
+from the OS cron is that Stem::Cron sends a Stem message when it is
+triggered instead of running a process. This message can be addressed to
+any cell on any Stem hub and so it can cause any action to occur. To
+emulate the OS cron, all the message needs to do is to trigger an
+addressed Stem::Proc cell to spawn a process.
+
+
+
+Stem::Cron entries are similar to the OS cron. You can select a set of
+time parts (minutes, hours, dates, months, days of week) to trigger the
+entry and each part is a list which filters the triggers. Each minute
+(run by infinite repeat timer) the list of cron entries is scanned. If
+the current broken out time matches one corresponding value in each of
+the parts of the entry, then the entry is triggered and its message
+is dispatched.
+
+The cron entry is configured with name/value pairs which are the time
+parts and the set of which values to trigger on in that part. If a time 
+is not specified, it is assumed to match all values for that time part
+(like * in crontab). These two differences already make Stem::Cron
+easier to configure than crontab. In addition, each Stem::Cron entry
+must have a message value. This is sent when the cron entry passes all
+of its time filters and gets triggered. The message can be any type,
+carry any data and be addressed to any cell in the Stem network.
+
+Beyond the simple time filters of crontab, Stem::Cron allows you to
+specify complex date descriptions such as last date of the month, first
+weekday of the month, 2nd Thursday of the month, etc. 
+
+Another feature I am looking at is not well defined but i have a use for
+it. The log filters want to have a time based toggle so for example, you
+can enable/disable sending logs to a pager at night by sending it the
+right messages. By attaching those messages to properly configured cron
+entries, you have automated managing the times when the log filter is
+enabled/disabled. But there are several open design issues. First, what
+is the initial boolean state of the log time filter? Maybe we should make
+another boolean attribute: time_filter_enabled => 1. Then how often do
+you send the boolean toggle messages? A normal cron time range would
+send messages every minute from enable to disable time (huh?). or we can
+just send the disable message on one tightly defined cron entry and the
+enable on another. The initial boolean state is used and that will keep
+the log filter in the right state. This time controlled boolean toggle
+is a useful idea we can apply elsewhere. A module just for managing
+these things could be a good idea. It would, of course, use Stem::Cron,
+but it could be specialized in setting the cron entries up and other
+stuff.
+
+Right now, Stem::Cron entries are only created in configuration
+files. Creating remote entries would just require sending a config via a
+message to the global Cron cell.
+
+Stem::Cron is a high-level layer above Stem::Event timers.  The major 
+difference is that Stem::Event only uses callbacks, whereas 
+Stem::Cron only sends out messages.  Also, Stem::Cron has a much more 
+powerful and flexible API for specifying the timing of these messages.
+
+Besides the emulation of the standard OS cron, Stem::Cron can send 
+out a message at a repeated interval which has a resolution of 
+seconds.
+
+TODO
+
+more testing
+
+fancy time parts. i have developed perl code that calculates most of
+those dates so it should be simple to port the logic over to stem. 
+
+timed boolean triggers needs more design work and then coding.
+
+Sending remote configs has not been developed yet but should be done
+soon. should be generic and go into the Stem::Config module.
+
+
+
+

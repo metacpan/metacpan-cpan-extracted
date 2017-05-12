@@ -1,0 +1,9 @@
+Revision history for Perl extension String::CyclicRotation.
+
+0.01  Wed Jul  1 23:39:21 2009
+	- first release ready
+
+0.01  Wed Jul  1 19:07:21 2009
+	- original version; created by h2xs 1.23 with options
+		-XAn String::CyclicRotation -b 5.6.0
+

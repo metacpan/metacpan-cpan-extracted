@@ -1,0 +1,16 @@
+=pod
+
+=head1 NAME
+
+SQL::Template - A new way to organize your database code
+
+=head1 VERSION
+
+version 0.2.0
+
+=head1 SYNOPSIS
+
+https://metacpan.org/pod/release/NICEPERL/SQL-Template-0.2.0/lib/SQL/Template.pm
+
+=cut
+

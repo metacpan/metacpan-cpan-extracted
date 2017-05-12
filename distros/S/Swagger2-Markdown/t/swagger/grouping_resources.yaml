@@ -1,0 +1,61 @@
+---
+x-api-blueprint:
+  resource_section: name_uri
+  action_section: name_method
+swagger: "2.0"
+info:
+  version: "1.0"
+  title: Grouping Resources API
+  description: |
+    This API example demonstrates how to group resources and form **groups of resources**. You can create as many or as few groups as you like. If you do not create any group all your resources will be part of an "unnamed" group.
+
+    ## API Blueprint
+    + [Previous: Named Resource and Actions](03.%20Named%20Resource%20and%20Actions.md)
+    + [This: Raw API Blueprint](https://raw.github.com/apiaryio/api-blueprint/master/examples/04.%20Grouping%20Resources.md)
+    + [Next: Responses](05.%20Responses.md)
+
+paths:
+  /message:
+    x-api-blueprint:
+      group: Messages
+      summary: My Message
+      description: |
+        Group of all messages-related resources.
+
+        This is the first group of resources in this document. It is **recognized** by the **keyword `group`** and its name is `Messages`.
+
+        Any following resource definition is considered to be a part of this group until another group is defined. It is **customary** to increase header level of resources (and actions) nested under a resource.
+
+    get:
+      summary: Retrieve a Message
+      produces:
+        - text/plain
+      responses:
+        200:
+          description: The response message
+          schema:
+            format: string
+            example: "Hello World!"
+    put:
+      summary: Update a Message
+      consumes:
+        - text/plain
+      parameters:
+        - in: body
+          name: message
+          schema:
+            format: string
+            example: "All your base are belong to us."
+      responses:
+        204:
+          description: The response message
+  /users:
+    x-api-blueprint:
+      group: Users
+      summary: My User
+      description: |
+        Group of all user-related resources.
+
+        This is the second group in this blueprint. For now, no resources were defined here and as such we will omit it from the next installement of this course.
+
+# vim: ts=2:sw=2:et

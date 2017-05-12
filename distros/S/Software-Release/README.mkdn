@@ -1,0 +1,75 @@
+# NAME
+
+Software::Release - Object representing a release of software.
+
+# VERSION
+
+version 0.03
+
+# SYNOPSIS
+
+    use DateTime;
+    use Software::Release;
+    use Software::Release::Change;
+
+    my $change = Software::Release::Change->new(
+        author => 'gphat',
+        change_id => 'abc1234',
+        date => DateTime->now,
+        description => 'Frozzled the wozjob'
+    );
+
+    my $rel = Software::Release->new(
+        version => '0.1',
+        name => 'Angry Anteater',
+        date => DateTime->now,
+    );
+
+    $rel->add_to_changes($change);
+
+# DESCRIPTION
+
+Software::Release is a purely informational collection of objects that you
+can use to represent a release of software.  Its original use-case was to
+provide a contract between a git log parser and a formatter class that outputs
+a changelog, but it may be useful to others to create bug trackers, dashboards
+or whathaveyou.
+
+# ATTRIBUTES
+
+## changes
+
+A list of [Software::Release::Change](http://search.cpan.org/perldoc?Software::Release::Change) objects for this release.
+
+## date
+
+The date this software was released.
+
+## name
+
+The name of this release.
+
+## version
+
+The version of the release, as a string.
+
+# METHODS
+
+## add_to_changes ($change)
+
+Add a change to this release's list of changes.
+
+## has_no_changes
+
+Returns true if this release's list of changes is empty.
+
+# AUTHOR
+
+Cory G Watson <gphat@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Infinity Interactive, Inc.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

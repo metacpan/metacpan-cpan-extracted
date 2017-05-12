@@ -1,0 +1,89 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Time::Time
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = Time.new(...);
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef::Object::Object
+	* Sidef::Convert::Convert
+
+=head1 METHODS
+
+
+=head2 dump
+
+Time.dump() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 gmtime
+
+Time.gmtime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 local
+
+Time.local() -> I<Obj>
+
+Return the
+
+Aliases: I<localtime>
+
+=cut
+
+=head2 micro
+
+Time.micro() -> I<Obj>
+
+Return the
+
+Aliases: I<micro_sec>, I<micro_seconds>
+
+=cut
+
+=head2 new
+
+Time.new() -> I<Obj>
+
+Return the
+
+Aliases: I<call>
+
+=cut
+
+=head2 now
+
+Time.now() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sec
+
+Time.sec() -> I<Obj>
+
+Return the
+
+Aliases: I<time>
+
+=cut

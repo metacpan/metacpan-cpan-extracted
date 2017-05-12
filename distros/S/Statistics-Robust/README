@@ -1,0 +1,49 @@
+Statistics-Robust
+
+Statistics::Robust is a perl implementation of a few of the methods described
+in the books "Introduction to Robust Estimation and Hypothesis Testing" and
+"Fundamentals of Modern Statistical Methods" by Rand Wilcox.  Many of the
+functions were implemented with copious hints from the R functions provided by
+the author on his website:
+
+http://www-rcf.usc.edu/~rwilcox/
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Statistics::Robust
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Statistics-Robust
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Statistics-Robust
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Statistics-Robust
+
+    Search CPAN
+        http://search.cpan.org/dist/Statistics-Robust
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008,2012 Walter Szeliga
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

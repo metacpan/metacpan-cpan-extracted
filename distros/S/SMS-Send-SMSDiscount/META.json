@@ -1,0 +1,55 @@
+{
+   "abstract" : "SMS::Send driver to send via smsdiscount.com",
+   "author" : [
+      "Mark Hindess <soft-cpan@temporalanomaly.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.101670",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "SMS-Send-SMSDiscount",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Request::Common" : 0,
+            "LWP::UserAgent" : 0,
+            "SMS::Send::Driver" : 0,
+            "URI::Escape" : 0,
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "English" : 0,
+            "LWP::Protocol::PSGI" : 0,
+            "LWP::Protocol::https" : 0,
+            "Plack::Request" : 0,
+            "SMS::Send" : 0,
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/beanz/sms-send-smsdiscount-perl/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/beanz/sms-send-smsdiscount-perl.git",
+         "web" : "http://github.com/beanz/sms-send-smsdiscount-perl"
+      }
+   },
+   "version" : "1.111780"
+}
+

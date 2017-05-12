@@ -1,0 +1,14 @@
+description: update the domain so it has a different timestamp
+registrar: 1
+
+sleep: 1
+
+request: |-
+ <NZSRSRequest VerMajor="4" VerMinor="4" RegistrarId="100">
+  <DomainUpdate Term="1" ActionId="[% actionid %] 2">
+     <DomainNameFilter>cheese123.co.te</DomainNameFilter>
+  </DomainUpdate>
+ </NZSRSRequest>
+
+assertions:
+ - xpath_matches: [ '//Error', '0', 'No errors' ]

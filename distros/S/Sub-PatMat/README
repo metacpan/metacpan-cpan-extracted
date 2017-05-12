@@ -1,0 +1,11 @@
+Sub-PatMat version 0.01
+
+Sub::PatMat - call a version of subroutine depending on its arguments
+
+The Sub::PatMat module provides the programmer with the ability 
+to define a subroutine multiple times and to specify what version
+of the subroutine should be called, depending on the parameters
+passed to it (or any other condition).
+
+This is somewhat similar to argument pattern matching facility
+provided by many programming languages.

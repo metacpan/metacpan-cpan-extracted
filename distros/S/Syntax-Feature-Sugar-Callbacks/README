@@ -1,0 +1,129 @@
+NAME
+    Syntax::Feature::Sugar::Callbacks - Add sugar for declarative method
+    callbacks
+
+VERSION
+    version 0.002
+
+SYNOPSIS
+        use AnythingExportingMethodModifiers;
+        use syntax 'sugar/callbacks' => {
+            -callbacks => {
+                after   => {},
+                before  => {},
+                around  => { -before => ['$orig'] },
+            },
+        };
+
+        after  foo ($n) { $self->something($n) }
+        before bar ($n) { $self->something($n) }
+        around baz ($n) { $self->something($self->$orig($n)) }
+
+DESCRIPTION
+    You probably won't use this extension directly. That's why it doesn't
+    even have an "import" method. Its main reasoning is the ability to
+    provide on-the-fly sugar for method declarators, most commonly "before",
+    "after" and "around". This extension will directly dispatch to the
+    original subroutine, and requires these to be setup before-hand.
+    Currently, all callbacks will first receive the name of the declared
+    method, followed by the code reference.
+
+    Note that no cleanup of the original handlers will be performed. This is
+    up to the exporting library or the user.
+
+METHODS
+  install
+        $class->install( %arguments )
+
+    Called by syntax (or others) to install this extension into a namespace.
+
+SYNTAX
+    All declarations must currently be in one of the forms
+
+        <keyword> <name> (<signature>) { <body> }
+        <keyword> <name> { <body> }
+
+    The "keyword" is the name of the declared callback. The "name" can
+    either be an identifier like you'd give to "sub", or a double-quoted
+    string if you want the name to be dynamic:
+
+        after "$name" ($arg) { ... }
+
+    The signature, if specified, should be in one of the following forms:
+
+        ($foo)
+        ($foo, $bar)
+        ($class:)
+        ($class: $foo, $bar)
+
+    Variables before ":" will be used as replacement for the invocant.
+    Parameters specified via "-before" and "-middle" will always be
+    included.
+
+    The statement will automatically terminate after the block. The return
+    value will be whatever the original callback returns.
+
+    You can supply subroutine attributes right before the block.
+
+OPTIONS
+  -invocant
+    Defaults to $self, but you might want to change this for very
+    specialized classes.
+
+  -callbacks
+    This is the set of callbacks that should be setup. It should be a hash
+    reference using callback names as keys and hash references of options as
+    values. Possible per-callback options are
+
+    "-before"
+        An array reference of variable names that come before the invocant.
+        A typical example would be the original code reference in "around"
+        method modifiers.
+
+    "-middle"
+        An array reference of variable names that come after the invocants,
+        but before the parameters specified in the signature. Use this if
+        the code reference declared with the construct will receive a
+        constant parameter. There is no current way to override this in the
+        signature on a per-construct basis.
+
+    "-default"
+        An array reference of variable names that are used when no signature
+        was provided. An empty signature will not lead to the defaults being
+        used.
+
+    "-stmt"
+        By default, anonymous constructs will not automatically terminate
+        the statement after the code block. If this option is set to a true
+        value, all uses of the construct will be terminated.
+
+    "-allow_anon"
+        If set to a true value, anonymous versions of this construct can be
+        declared. If no name was specified, only the code reference will be
+        passed on to the callback.
+
+    "-only_anon"
+        If set to a true value, a name will not be expected after the
+        keyword and before the signature.
+
+SEE ALSO
+    *   syntax
+
+    *   Devel::Declare
+
+BUGS
+    Please report any bugs or feature requests to
+    bug-syntax-feature-sugar-callbacks@rt.cpan.org or through the web
+    interface at:
+    http://rt.cpan.org/Public/Dist/Display.html?Name=Syntax-Feature-Sugar-Ca
+    llbacks
+
+AUTHOR
+    Robert 'phaylon' Sedlacek <rs@474.at>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Robert 'phaylon' Sedlacek.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

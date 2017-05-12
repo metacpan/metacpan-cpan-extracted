@@ -1,0 +1,47 @@
+0.71  2013-03    - Marked as DEPRECATED
+
+0.58  2009-08-.. - Added support of Caching
+                 - added 'serve' method
+                 - some refactoring and cleanup (rewrote DBI support)
+                 - added idtype parameter to autoload identifiers
+                 - added isbn10/isbn13 methods
+                 - Introduced YAML configuration files
+0.57  2009-08-06 - rewrote SeeAlso::Identifier
+                 - added SeeAlso::Identifier::Factory
+                 - rewrote SeeAlso::Identifier::ISBN
+0.56  2009-06-01 - added a simple command line client and updated XSL client
+                 - fixed SeeAlso::Client
+                 - added several methods to SeeAlso::Response (get, toRDF...)
+0.55  2009-04-16 - added first version of SeeAlso::Client
+                 - changed and enhanced SeeAlso::Identifier::ISBN
+                 - minor changes/fixes in SeeAlso::Response, ::Server, ::Source
+                 - toJSON does no utf8 encoding anymore
+                 - added fromJSON
+                 - minor fixes in SeeAlso::Identifier::ISIL and ::GND
+                 - removed query_seealso_server
+                 - modified showservice.xsl
+0.53  2009-01-13 - fixed support of additional unAPI formats
+                 - moved SeeAlso::Identifier::PND to SeeAlso::Identifier::GND
+                 - added SeeAlso::Identifier::ISIL
+                 - added Test::Perl::Critic (enable by setting TEST_AUTHOR)
+0.52  2008-11-27 - added support of additional unAPI formats
+                 - fixed double-encoding UTF8 in Response->toJSON
+                 - removed hasErrors method
+                 - updated seealso.js and showservice.xslt
+0.51  2008-03-19 - sources can now have examples
+                 - added function query_seealso_server
+                 - switched to JSON::XS
+                 - updated seealso.js to 0.6.5
+                 - minor changes to showservice.xsl
+0.50  2008-02-28 - added showservice.xsl to unAPI format list
+                 - added a JavaScript client ('client' directory)
+                 - added SeeAlso::Identifier::ISIL identifier (preliminary)
+                 - better detection of base URL
+0.48  2008-01-22 - rewrote SeeAlso::Source::DBI
+                 - extended and fixed usage of SeeAlso::Logger
+                 - the callback is now safely tested
+                 - fixed ISBN bugs (ISBN-10 with invalid checksum)
+                 - better error handling
+                 - added thingISBN examples with SeeAlso::Source::ThingISBN
+0.41  2008-01-14 - fixed initial public release ;-)
+0.40  2008-01-14 - initial public release.

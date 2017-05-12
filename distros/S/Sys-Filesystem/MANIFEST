@@ -1,0 +1,30 @@
+Changes
+CREDITS
+INSTALL
+lib/Sys/Filesystem.pm
+lib/Sys/Filesystem/Aix.pm
+lib/Sys/Filesystem/Cygwin.pm
+lib/Sys/Filesystem/Darwin.pm
+lib/Sys/Filesystem/Dummy.pm
+lib/Sys/Filesystem/Freebsd.pm
+lib/Sys/Filesystem/Hpux.pm
+lib/Sys/Filesystem/Linux.pm
+lib/Sys/Filesystem/Mswin32.pm
+lib/Sys/Filesystem/Netbsd.pm
+lib/Sys/Filesystem/Solaris.pm
+lib/Sys/Filesystem/Unix.pm
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+NOTICE
+README
+t/01_load.t
+t/02_basic.t
+t/03_whereami.t
+t/04_special.t
+t/05_error.t
+t/06_settings.t
+TODO
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,25 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/SVN-Dumpfilter.t
+lib/SVN/Dumpfilter.pm
+svndump_checkfilter
+svndump_cleanrevifilter
+svndump_delpathfilter
+svndump_delrevifilter
+svndump_delrevifilter2
+svndump_dos2unixfilter
+svndump_filter
+svndump_logfilter
+svndump_merge2filter
+svndump_merge2filter_nomaindirs
+svndump_mergefilter
+svndump_nullfilter
+svndump_nullrecalcfilter
+svndump_printordersfilter
+svndump_remapauthors
+svndump_renamefilter
+svndump_revifilter
+svndump_savefilter
+META.yml                                 Module meta-data (added by MakeMaker)

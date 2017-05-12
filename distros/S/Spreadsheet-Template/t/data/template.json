@@ -1,0 +1,50 @@
+%% my $default = { color => '#000000', size => 14 };
+%% format(normal     => $default.merge({}));
+%% format(date       => $default.merge({ num_format => 'd-mmm' }));
+%% format(money      => $default.merge({ num_format => '$#,##0.00_);[Red]($#,##0.00)' }));
+%% format(title      => $default.merge({ bg_color   => '#c6d9f0', pattern => 'solid' }));
+%% format(bold       => $default.merge({ bold       => true() }));
+%% format(bold_money => $default.merge({ bold       => true(), num_format => '$#,##0.00_);[Red]($#,##0.00)' }));
+{
+   "selection"  : 0,
+   "worksheets" : [
+      {
+         "column_widths" : [ 14.6, 18.5, 15.8, 12.2 ],
+         "name"          : "Report 1",
+         "selection"     : [ 1, 9 ],
+         "row_heights"   : [ 25, 18, 18, 18 ],
+         "cells"         : [
+            [
+               [% c("Descriptions", "title") %],
+               [% c("Numbers",      "title") %],
+               [% c("Dates",        "title") %],
+               [% c("Money",        "title") %]
+            ],
+            %% for $rows -> $row {
+            [
+               [% c($row.description, "normal")              %],
+               [% c($row.number,      "normal", "number")    %],
+               [% c($row.date,        "date",   "date_time") %],
+               [% c($row.money,       "money",  "number")    %]
+            ],
+            %% }
+            [
+               [% c("Totals:", "bold") %],
+               [% c(
+                  $rows.map(-> $a { $a.number }).reduce(-> $a, $b { $a + $b }),
+                  "bold",
+                  "number",
+                  formula => 'SUM(B2:B' ~ ($rows.size() + 1) ~ ')',
+               ) %],
+               [% c("", "bold") %],
+               [% c(
+                  $rows.map(-> $a { $a.money }).reduce(-> $a, $b { $a + $b }),
+                  "bold_money",
+                  "number",
+                  formula => 'SUM(D2:D' ~ ($rows.size() + 1) ~ ')',
+               ) %]
+            ]
+         ]
+      }
+   ]
+}

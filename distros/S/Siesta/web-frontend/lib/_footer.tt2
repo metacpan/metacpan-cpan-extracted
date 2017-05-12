@@ -1,0 +1,20 @@
+    <table width='100%' border='0' cellpadding='0' cellspacing='0'>
+      <tr bgcolor='#4C4C4C'>
+        <td><img src='images/zero.gif' alt='' width='2' height='2'></td>
+      </tr>
+      <tr bgcolor='#ADADE7'>
+        <td><img src='images/zero.gif' alt='' width='2' height='5'></td>
+      </tr>
+      <tr bgcolor='#ADADE7'>
+        <td align='center'><span class='clsSmall'><a href='http://siesta.unixbeard.net/'>Siesta [% Siesta.version %]</a></span>
+&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+<span class='clsSmall'>Powered by <a href='http://www.perl.org/'>Perl</a> and the <a href="http://template-toolkit.org/">Template Toolkit</a></span>
+&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+<span class='clsSmall'>&copy; Copyright <a href=''>SlutCorp</a> 2003</span></td>
+      </tr>
+      <tr bgcolor='#ADADE7'>
+        <td><img src='images/zero.gif' alt='' width='2' height='5'></td>
+      </tr>
+   </table>
+  </body>
+</html>

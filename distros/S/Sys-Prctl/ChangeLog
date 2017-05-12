@@ -1,0 +1,10 @@
+Version 1.02 (Tue Sep 20 2011) 
+  * Fix critic test
+
+Version 1.01 (Wed Apr 21 2010) 
+ * Don't import everything from POSIX, only what is used.
+ * Add support for arch in current Linux kernel
+ * Fixed test suite so it now works when perl is not called perl.
+
+Version 1.00 (Wed Jan 1 2007)
+ * First version released

@@ -1,0 +1,47 @@
+Schedule-Week version 0.01
+============================
+
+Schedule::Week represents an hourly week-long schedule (Sunday -> Saturday)
+as an array of arrays, where the top-level array is days of the week, and
+each day of the week holds a reference to an array of hours for the week.
+
+Schedule::Week includes a number of ways to set and retrieve information 
+from the schedule representation and also has the following functionality:
+* Serialize and deserialize schedules into a format that is easy to
+  store and retrieve with any language (168 char array of 1s and 0s)
+* Check to see if any Unix epoch time would be active in the schedule
+  with is_active($timestamp)
+* Easily add hour ranges across all days with hours() function, e.g.
+ 
+  #  Turn on 9 to 5 7 days a week
+  $schedule->hours([9 ... 17])
+* Loads of regression tests
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Carp
+Readonly
+Readonly::XS (optional, recommended for speed reasons)
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by Max Schubert / Comcast
+
+Special thanks to Mike Fischer and Jason Livingood, my managers at
+Comcast, for allowing me to release this project back to the OSS
+community.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

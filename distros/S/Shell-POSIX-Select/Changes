@@ -1,0 +1,34 @@
+2017-02-04  Kingpin  <martin@martin-M17x>
+
+	* lib/Shell/POSIX/Select.pm: added new MAINTAINER
+
+Revision history for Perl extension Shell::POSIX::Select.
+
+0.01  Sun May  4 00:47:26 PDT 2003
+		- original version; created by h2xs 1.21 with options
+						-XA -n Shell::POSIX::Select
+
+0.02  Mon May  5 11:07:55 PDT 2003
+		- fixed some typos and bugs in sample scripts
+		- reworked documentation slightly
+		- deleted some test programs, modified others
+		- removed some debugging statements to simplify code
+		- added vi:ts=2 sw=2: to dumped source code samples for readability
+
+0.03  Mon May  5 17:51:54 PDT 2003
+		- fixed more typos in documentation
+		- rearranged documentation slightly
+		- added some diagnostics to test.pl
+
+0.04  Thu May  8 10:34:49 PDT 2003
+		- enhanced "Failure to identify" section in docs
+		- modified test.pl to omit screen dumps for comparison testing;
+				seems that even with buffering disabled, order of STDERR vs STDOUT
+				outputs is unpredictable, and causing tests to fail although
+				everything actually works okay
+		- removed disturbing messages from eval if killed by signal
+
+0.05  Sun May 11 11:34:59 PDT 2003
+		- removed large chunks of commented-out code, no longer needed
+		- dumbed-down the markup for SYNOPSIS in documentation, which the 
+				PAUSE version of pod2html was not handling correctly correctly.

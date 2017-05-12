@@ -1,0 +1,10 @@
+Revision history for String-Blender
+
+0.04   Wed Jul 22 12:42:18 2009
+       * Non-whitespace restriction has been removed for string elements.
+       * Code cleanup, minor fixes. Currently the module passes Perl::Critic test
+         at the maximum severety level (brutal). The test itself has been excluded
+         from the distribution.
+
+0.02   Tue Jul 21 17:29:18 2009
+       Initial release.

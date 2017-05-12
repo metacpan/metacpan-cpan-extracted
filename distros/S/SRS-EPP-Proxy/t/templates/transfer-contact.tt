@@ -1,0 +1,10 @@
+<transfer op="query">
+  <contact:transfer xmlns:contact="urn:ietf:params:xml:ns:contact-1.0">
+    <contact:id>[% contact_id %]</contact:id>
+[% IF pw -%]
+    <contact:authInfo>
+      <contact:pw>[% pw %]</contact:pw>
+    </contact:authInfo>
+[% END -%]
+  </contact:transfer>
+</transfer>

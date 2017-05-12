@@ -1,0 +1,230 @@
+#!/usr/bin/perl -w
+# $Id: subplay,v 1.3 2007/03/09 10:07:29 dk Exp $
+
+=pod
+
+=head1 NAME
+
+subplay - play subtitles file
+
+=head1 SYNOSIS
+
+subplay my_movie.srt
+
+=head1 DESCRIPTION
+
+So, you're thinking that my player doesn't display subtitles? No, it does wery
+well. The reason for this script is there, is that it happened so that I
+wanted to see a movie with both Danish and English subtitles. Usually, not a
+problem, if you've text subtitles - but in my case one sub was in .srt text
+format, while the another in .idx/.sub binary ( dvd-rip? ) format. I couldn't
+find anything related, so this script was born.
+
+=head1 OPTIONS
+
+None. Tweak colors, fonts, etc in the source.
+There are some run-time switches, right-click to get them displayed in
+a pop-up menu.
+
+=head1 PREREQUISTIES
+
+Prima - L<http://www.prima.eu.org>.
+
+=head1 AUTHOR
+
+Dmitry Karasik
+
+=cut
+
+use strict;
+use Prima qw(Application Sliders Label Buttons);
+use Subtitles;
+use Time::HiRes qw(time);
+
+# do your local changes here
+my %font = ( size => 16 ); # style => fs::Bold|fs::Italic, encoding => 'iso8859-5', etc etc
+my $refresh_rate  = 100;   # ms
+my $window_height = 120;
+my $fore_color    = 0xFFFFFF;
+my $back_color    = 0x000000;
+my $hilite_color  = 0x000080;
+
+
+die "format: subplay filename.sub\n" unless @ARGV;
+my $fn = shift @ARGV;
+open F, "< $fn" or die "Cannot open $fn:$!\n";
+
+my $subs = Subtitles->new();
+$subs-> load(\*F) or die "Cannot load $fn:$@\n";
+
+# convert cues to events
+my $from = $subs->{from};
+my $to   = $subs->{to};
+my $text = $subs->{text};
+my $length = $subs-> length;
+my ( @cues, @events);
+push @events, [0, ''];
+
+for ( my $i = 0; $i < @$from; $i++) {
+	my @exit_cues = grep { $cues[$_][0] < $$from[$i] } 0..$#cues;
+	if ( @exit_cues) {
+		for ( sort { $cues[$a][0] <=> $cues[$b][0] } @exit_cues) {
+			$cues[$_][1] = undef;
+			my $text = join("\n",  map { $$_[1] } grep { defined $$_[1] } @cues );
+			if ( @events and $events[-1][0] eq $cues[$_][0]) {
+				$events[-1][1] = $text;
+			} else {
+				push @events, [ $cues[$_][0], $text];
+			}
+		}
+		splice( @cues, $_, 1) for reverse @exit_cues;
+	}
+	my $cue = '';
+	if ( @cues) {
+		$cue = join("\n", map { $$_[1] } @cues ) . "\n";
+	}
+	push @events, [ $$from[$i], $cue . $$text[$i]];
+	push @cues, [ $$to[$i], $$text[$i]];
+}
+push @events, [ $length + 0.1, ''];
+
+my $playing = 0;
+my $start_time;
+my $ticking;
+my $current_event = -1;
+my $w = Prima::MainWindow-> create( 
+	packPropagate => 0,
+	height 		=> $window_height,
+	width		=> $::application-> width - $::application-> get_system_value( sv::XbsSizeable) * 2,
+	bottom		=> 0,
+	left		=> $::application-> get_system_value( sv::XbsSizeable),
+	text		=> $fn,
+	backColor	=> $back_color,
+	color		=> $fore_color,
+	popupItems	=> [
+		['Stop/Play' => 'Space' , kb::Space , \&button ],
+		['Set/clear decorations', 'F1', => kb::F1 , \&set_decorations ],
+		['Show/hide controls', 'F2', => kb::F2 , \&set_controls ],
+		['Stay/no stay on top', 'F3', => kb::F3 , \&set_on_top ],
+		[],
+		['Quit', 'Ctrl+Q', => '^Q' , sub { exit } ],
+	],
+);
+$text = $w-> insert( 'Label', 
+	pack => { fill => 'both', expand => 1 },
+	text => '',
+	font => \%font,
+	alignment => ta::Center,
+	valignment => ta::Center,
+	ownerColor => 1,
+);
+my $button = $w-> insert( 'Button' => 
+	pack => { anchor => 'sw', side => 'left' },
+	default => 1,
+	text    => '~Play',
+	hiliteColor   => $fore_color,
+	hiliteBackColor => $back_color,
+	flat => 1,
+	onClick => \&button,
+);
+my $timer = $w-> insert( 'Timer', 
+	timeout => $refresh_rate,
+	onTick	=> \&tick,
+);
+my $slider = $w-> insert( 'Slider', 
+	pack => { fill => 'x', side => 'left', expand => 1 },
+	height => 36,
+	min  => 0,
+	max  => $length,
+	step => 0.001,
+	ribbonStrip => 1,
+	shaftBreadth => 12,
+	onChange => \&track,
+	hiliteBackColor => $back_color,
+	hiliteColor => $hilite_color,
+);
+
+sub time2event
+{
+	my $time = $_[0];
+	my ( $l, $r) = ( 0, $#events);
+	return $l if $time < 0;
+	return $r if $time >= $length;
+	my $lastt = -1;
+	while ( 1) {
+		my $t = int(( $r + $l) / 2);
+		# print "start $time, $l, $r => $t/$lastt $events[$t]->[0]-".$events[$t+1]->[0]."\n";
+		return $t if $t == $lastt;
+		return $t 
+			if $events[$t]->[0] <= $time and 
+			( !defined $events[$t+1] or $events[$t+1]->[0] > $time);
+		(( $events[$t]->[0] < $time) ? $l : $r) = $lastt = $t;
+	}
+}
+
+sub track
+{
+	my $v = $slider-> value;
+	my $x;
+	if ( $ticking) {
+		$x = $subs-> time2str( int $v);
+		$x =~ s/\.000//g;
+	} else {
+		$x = $subs-> time2str( $v);
+	}
+	$w-> text( "$fn: $x");
+	my $e = time2event( $v);
+	$text-> text( $events[$current_event = $e]->[1]) if $e != $current_event;
+	$start_time = time - $slider-> value unless $ticking;
+}
+
+sub button
+{
+	if ( $playing) {
+		$playing = 0;
+		$timer-> stop;
+		$button-> text('~Play');
+	} else {
+		$playing = 1;
+		$timer-> start;
+		$start_time = time - $slider-> value;
+		$button-> text('~Stop');
+	}
+}
+
+sub set_decorations
+{
+	if ( $w-> borderIcons) {
+		$w-> set( borderIcons => 0, borderStyle => bs::None);
+	} else {
+		$w-> set( borderIcons => bi::All, borderStyle => bs::Sizeable);
+	}
+}
+
+sub set_on_top
+{
+	return unless $w-> can('onTop'); # 1.17 and higher
+	$w-> onTop( !$w-> onTop);
+}
+
+sub set_controls
+{
+	if ( $button-> visible) {
+		$button-> hide;
+		$slider-> hide;
+	} else {
+		$button-> show;
+		$slider-> show;
+	}
+}
+
+sub tick
+{
+	my $t = time - $start_time;
+	$ticking = 1;
+	$slider-> value( $t);
+	$ticking = 0;
+	button() if $playing and $t >= $length;
+}
+
+run Prima;

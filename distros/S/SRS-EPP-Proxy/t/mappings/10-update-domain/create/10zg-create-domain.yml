@@ -1,0 +1,16 @@
+description: set up domain to use a handle
+registrar: 1
+
+
+request: |-
+ <NZSRSRequest VerMajor="4" VerMinor="4" RegistrarId="100">
+  <DomainCreate Delegate="1" DomainName="10zg.co.te" Term="1" ActionId="[% actionid %] 1">
+    <RegistrantContact HandleId="10d"/>
+    <AdminContact HandleId="10d"/>
+    <TechnicalContact HandleId="10d"/>
+  </DomainCreate>
+ </NZSRSRequest>
+
+
+assertions:
+ - xpath_matches: [ '//Error', '0', 'No errors' ]

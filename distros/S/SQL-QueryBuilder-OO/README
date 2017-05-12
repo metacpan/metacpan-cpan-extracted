@@ -1,0 +1,259 @@
+NAME
+    SQL::QueryBuilder::OO - Object oriented SQL query builder
+
+SYNOPSIS
+      use SQL::QueryBuilder::OO;
+
+      $sql = sqlQueryBase::select(qw(id title description), {name => 'author'})
+          ->from('article')
+          ->innerJoin('users', 'userId')
+          ->leftJoin({'comments' => 'c'}, sqlCondition::EQ('userId', 'c.from'))
+          ->where(sqlCondition::AND(
+                  sqlCondition::EQ('category')->bind($cat),
+                  sqlCondition::NE('hidden')->bind(1)))
+          ->limit(10,20)
+          ->groupBy('title')
+          ->orderBy({'timestamp' => 'DESC'});
+
+      $dbh->do($sql, undef, $sql->gatherBoundArgs());
+
+DESCRIPTION
+    This module provides for an object oriented way to create complex SQL
+    queries while maintaining code readability. It supports conditions
+    construction and bound query parameters. While the module is named
+    "SQL::QueryBuilder::OO", this name is actually not used when
+    constructing queries. The three main packages to build queries are
+    "sqlQueryBase", "sqlCondition" and "sqlQuery".
+
+    The project is actually a port of PHP classes to construct queries used
+    in one of my proprietary projects (which may explain the excessive use
+    of the scope resolution operator ("::") in the module's sytax).
+
+BUILDING QUERIES
+    The package to provide builder interfaces is called "sqlQueryBase" and
+    has these methods:
+
+  SELECT queries
+    select(*COLUMNS...*[, *OPTIONS*])
+        Creates a SELECT query object. Columns to select default to "*" if
+        none are given. They are otherwise to be specified as a list of
+        expressions that can be literal column names or HASH references with
+        column aliases.
+
+        Column names are quoted where appropriate:
+
+          # Build SELECT * query
+          $all = sqlQueryBase::select();
+
+          # Build SELECT ... query
+          $sql = sqlQueryBase::select(
+               # literal column names
+                  qw(id title),
+               # column alias
+                  {'u.username' => 'author', timestamp => 'authored'},
+               # SELECT specific options
+                  [qw(SQL_CACHE SQL_CALC_FOUND_ROWS)]);
+
+        The references returned from the above statements are blessed into
+        an internal package. Those internal packages will not be documented
+        here, since they may be subject to change. Their methods, however,
+        are those of a valid SQL SELECT statement. When constructing queries
+        you'll have to maintain the order of SQL syntax. This means, that
+        the following will be treated as an error *by perl itself*:
+
+          $sql = sqlQueryBase::select()
+                  ->from('table')
+                  ->limit(10)
+                  ->where(...);
+
+          Can't locate object method "where" via package "sqlSelectAssemble" at ...
+
+        The correct order would have been:
+
+          $sql = sqlQueryBase::select()
+                  ->from('table')
+                  ->where(...)
+                  ->limit(10);
+
+        The following methods are available to construct the query further:
+
+    from(*TABLES...*)
+        This obviously represents the "FROM" part of a select query. It
+        accepts a list of string literals as table names or table aliases:
+
+          $sql = sqlQueryBase::select()->from('posts', {'user' => 'u'});
+
+    leftJoin(*TABLE*, *CONDITION*)
+    innerJoin(*TABLE*, *CONDITION*)
+    rightJoin(*TABLE*, *CONDITION*)
+        These methods extend the "FROM" fragment with a left, inner or right
+        table join. The table name can either be a string literal or a HASH
+        reference for aliasing table names.
+
+        The condition should either be an "sqlCondition" object (see
+        "Creating conditions"):
+
+          # SELECT * FROM `table_a` LEFT JOIN `table_b` ON(`column_a` = `column_b`)
+          $sql = sqlQueryBase::select()
+                  ->from('table_a')
+                  ->leftJoin('table_b', sqlCondition::EQ('column_a', 'column_b'));
+
+        ...or a string literal of a common column name for the USING clause:
+
+          # SELECT * FROM `table_a` LEFT JOIN `table_b` USING(`id`)
+          $sql = sqlQueryBase::select()
+                  ->from('table_a')
+                  ->leftJoin('table_b', 'id');
+
+    where(*CONDITION*)
+        This represents the "WHERE" part of a SELECT query. It will accept
+        one object of the "sqlCondition" package (see "Creating
+        conditions").
+
+    groupBy(*COLUMNS...*)
+        This represents the "GROUP BY" statement of a SELECT query.
+
+    having(*CONDITION*)
+        This represents the "HAVING" part of a SELECT query. It will accept
+        one object of the "sqlCondition" package (see "Creating
+        conditions").
+
+    orderBy(*COLUMNS...*)
+        This represents the "ORDER BY" statement of a SELECT query. Columns
+        are expected to be string literals or HASH references (one member
+        only) with ordering directions:
+
+          $sql = sqlQueryBase::select()
+                  ->from('table')
+                  ->orderBy('id', {timestamp => 'DESC'}, 'title');
+
+    limit(*COUNT*[, *OFFSET*])
+        This represents the "LIMIT" fragment of a SELECT query. It deviates
+        from the standard SQL expression, as the limit count is always the
+        first argument to this method, regardless of a given offset. The first
+        or both parameters may be undef to skip the LIMIT clause.
+
+  Creating conditions
+    Conditions can be used as a parameter for "leftJoin", "having",
+    "innerJoin", "rightJoin" or "where". They are constructed with the
+    "sqlCondition" package, whose methods are not exported due to their
+    generic names. Instead, the "namespace" has to be mentioned for each
+    conditional:
+
+      $cond = sqlCondition::AND(
+              sqlCondition::EQ('id')->bind(1337),
+              sqlCondition::BETWEEN('stamp', "2013-01-06", "2014-03-31"));
+
+    Those are all operators:
+
+   Booleans
+    To logically connect conditions, the following to methods are available:
+
+    AND(*CONDITIONS...*)
+        Connect one or more conditions with a boolean AND.
+
+    OR(*CONDITIONS...*)
+        Connect one or more conditions with a boolean OR.
+
+    NOT(*CONDITION*)
+        Negate a condition with an unary NOT.
+
+   Relational operators
+    All relational operators expect a mandatory column name as their first
+    argument and a second optional ride-hand-side column name.
+
+    If the optional second parameter is left out, the conditional can be
+    bound (see "Binding parameters").
+
+    EQ(*COLUMN*[, *RHS-COLUMN*])
+        Equal to operator ("=").
+
+    NE(*COLUMN*[, *RHS-COLUMN*])
+        Not equal to operator ("!=").
+
+    LT(*COLUMN*[, *RHS-COLUMN*])
+        Less than operator ("<").
+
+    GT(*COLUMN*[, *RHS-COLUMN*])
+        Greater than operator (">").
+
+    LTE(*COLUMN*[, *RHS-COLUMN*])
+        Less than or equal to operator ("<=").
+
+    GTE(*COLUMN*[, *RHS-COLUMN*])
+        Greater than or equal to operator (">=").
+
+   SQL specific operators
+    BETWEEN(*COLUMN*, *START*, *END*)
+        Creates an "x BETWEEN start AND end" conditional.
+
+    IN(*COLUMN*)
+        Creates an "x IN(...)" conditional.
+
+        Note that, if bound, this method will croak if it encounters an
+        empty list. *This behavior is subject to change in future versions:
+        the statement will be reduced to a "falsy" statement and a warning
+        will be issued.*
+
+    ISNULL(*COLUMN*)
+        Creates an "x IS NULL" conditional.
+
+    ISNOTNULL(*COLUMN*)
+        Creates an "x IS NOT NULL" conditional.
+
+    LIKE(*COLUMN*, *PATTERN*)
+        Creates an "x LIKE pattern" conditional.
+
+        Note that the pattern is passed unmodified. Beware of the LIKE
+        pitfalls concerning the characters "%" and "_".
+
+  Binding parameters
+    An SQL conditional can be bound against a parameter via its "bind()"
+    method:
+
+      $cond = sqlCondition::AND(
+              sqlCondition::EQ('id')->bind(1337),
+              sqlCondition::NOT(
+                 sqlCondition::IN('category')->bind([1,2,3,4])));
+
+      print $cond;                        # "`id` = ? AND NOT(`category` IN(?))"
+      @args = $cond->gatherBoundArgs();   # (sqlValueInt(1337),sqlValueList([1,2,3,4]))
+
+    A special case are conditionals bound against "undef" (which is the
+    equivalent to SQL "NULL"):
+
+      $cat = undef;
+      $cond = sqlCondition::OR(
+              sqlCondition::EQ('author')->bind(undef),
+              sqlCondition::NE('category')->bind($cat));
+
+      print $cond;                        # `author` IS NULL OR `category` IS NOT NULL
+      @args = $cond->gatherBoundArgs();   # ()
+
+    Since "`author` = NULL" would never be "true", the condition is replaced
+    with the correct "`author` IS NULL" statement. (Note that the first
+    conditional could actually be written "sqlCondition::ISNULL('author')".
+    The substitution is thus useful when binding against variables of
+    unknown content).
+
+TODO
+    *   Implement support for UPDATE, INSERT, REPLACE and DELETE statements.
+
+    *   Implement support for UNION.
+
+DEPENDENCIES
+    Params::Validate
+
+COPYRIGHT
+      Copyright (C) 2013-2014 Oliver Schieche.
+
+      This software is a free library. You can modify and/or distribute it
+      under the same terms as Perl itself.
+
+AUTHOR
+    Oliver Schieche <schiecheo@cpan.org>
+
+    http://perfect-co.de/
+
+    $Id: README 43 2015-02-11 09:02:16Z schieche $
+

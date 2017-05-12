@@ -1,0 +1,184 @@
+# ABSTRACT: how Sloth works
+# PODNAME: Sloth::Manual::Architecture
+
+
+__END__
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Sloth::Manual::Architecture - how Sloth works
+
+=head1 The Anatomy of a Sloth
+
+    He who loves practice without theory is like the sailor who boards ship
+    without a rudder and compass and never knows where he may cast.
+
+Sloth is a simple framework, with not a whole lot to it, but by understanding
+how each component interacts, you'll be able to use it all much more efficiency.
+
+=head2 The Big Picture
+
+It helps to consider the flow of a request through the application. 
+
+    +  $app->call
+    |  $app->router->match => $resource
+    `+  $resource->get_method_handler($request)
+     |  $resource->process_request
+     `+  $method->get_request_parser->parse($request)
+     ||  $method->request_data_validator->process($input) => $clean
+     |`- $method->execute($clean) => $entity
+     `- $resource->get_representation->serialize($entity) 
+
+In more detail:
+
+=over 4
+
+=item Match the path to a resource
+
+If no match is found, raise a 404 Not Found exception.
+
+=item Get a method handler from the resource
+
+If no method handler is available, raise a Method Not Available exception.
+
+=item Get a request parser
+
+If the method has request parser, try and get a request parser for the given
+content-type in the request, and parse the request. If no request parser can be
+found, throw a Unsupported Media exception.
+
+=item Validate the request input
+
+Validate path parts, query parameters, and the request content body, and return
+a clean data structure.
+
+=item Execute the request
+
+Given the clean data, run the request and return some sort of resource.
+
+=item Represent the entity
+
+Find a suitable representation, based on the users Accept header, and return the
+entity in a given representation. If no representation can be found, throw a
+Not Acceptable exception.
+
+=back
+
+=head2 The Sloth Application
+
+The L<Sloth> module defines the L<Plack::Component> that can be ran on servers,
+and can be considered the "entry-point" or "event-loop" of your application. A
+Sloth application requires very little, and the essential attribute is
+C<resources>. Let us consider the following example application:
+
+    MyLittlePony
+    MyLittlePony::Resources::Pony
+    MyLittlePony::Resources::Pony::GET
+    MyLittlePony::Resources::Pony::FoodStore
+    MyLittlePony::Resources::Pony::FoodStore::PUT
+    MyLittlePony::Representations::PNG
+
+=head3 Resources
+
+C<resources> defines a list of all possible resources in your application. As
+you will likely have a large amount of these, Sloth automates this discovery for
+you, by looking in the C<::Resources> namespace of your application. In the
+C<MyLittlePony> application we define 2 resources - C<Pony> and C<FoodStore>.
+
+Each resource is an instance of L<Sloth::Resource>  which contains, amongst
+other things, a list of applicable methods and representations, and also
+provides an implementation of handling a request and appropriately dispatching
+it. Note that a resource B<doesn't> have any type of logic behind it - that's
+down to the methods.
+
+A resource defines a single path, which is the URI that it is exposed from,
+relative from the root of the application. This path is specified in a format
+compatible with L<Path::Router>. For example, the C<Pony> resource might live at
+the following path:
+
+    sub path { 'pony/:id' }
+
+This would match paths such as C<pony/42> and C<pony/alfred>. Note that
+C<pony/alfred> matches but is not valid, in our application. This validation
+will be addressed later. The C<:id> part signifies a path variable, and will be
+passed into each L<Sloth::Method> as part of the user parameters.
+
+=head3 Resource Methods
+
+A resource can have a set of associated methods. Each method is an instance of
+L<Sloth::Method>, which provides a general implementation to handle a
+request. You should consider a method object to work very much like a single
+method in a class - you call it with a set of parameters and get something back.
+
+Method classes live under the resource namespace. In our example application
+this means that C<Pony> resources can be accessed via C<GET>, and a pony's
+C<FoodStore> can be modified via C<PUT>.
+
+In this case, the set of parameters is automatically derived for you from the
+query parameters, and the path part (as mentioned above). However, the set of
+parameters has not yet been sanitized and while values are present they might
+not be what you are looking for. Sloth uses Data::TreeValidator to validate user
+input. We might want to validate our C<Pony> resource to make sure the ID is
+correct, for example:
+
+     # in package Resource::Pony::GET
+     use Data::TreeValidator::Sugar qw( branch leaf );
+     use Data::TreeValidator::Constraints qw( type );
+     has request_data_validator => (
+         default => sub {
+             branch {
+                 name => leaf( constraints => [ type('Num') ] )
+             }
+         }
+     );
+
+This means that C<pony/42> is still valid, but C<pony/alfred> is now
+B<invalid>. Trying to C<GET pony/alfred> will result in error 400, bad request,
+with the error message serialized into the response body.
+
+Once validation passes, the control passes down to the method to fulfil some
+sort of action, be that fetch something from the database or launch nuclear
+missles. This all happens with the C<execute> method. Let's implement a way to
+C<GET> ponies:
+
+    sub execute {
+        my ($self, $input) = @_;
+        return $self->c->pony_store->get($input->{id});
+    }
+
+=head3 Representations
+
+Once a method returns something, we need to convey it back to the user. REST
+allows for the user to specify the format, so Sloth allows for multiple
+representations to be around. Representations live under the C<::Representation>
+namespace of your application, and are objects that do the
+L<Sloth::Representation> role. In our C<MyLittlePony> application, we have 1
+representation which is C<PNG>.
+
+Representations are checked in the order of a clients C<Accept> header, and the
+first one that matches will be used. Matching is done by using the
+L<Sloth::Representation/content_type> value, which can either be a string or a
+regular expression.
+
+When a valid representation is found, the resource returned from the method is
+passed through to the C<serialize> method, which is then expected to return data
+to place in the response body.
+
+And that's it!
+
+=head1 AUTHOR
+
+Oliver Charles
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Oliver Charles <sloth.cpan@ocharles.org.uk>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

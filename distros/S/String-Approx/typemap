@@ -1,0 +1,31 @@
+TYPEMAP
+
+apse_t *	O_OBJECT
+apse_bool_t	T_IV
+apse_size_t	T_UV
+apse_ssize_t	T_IV
+
+###########################################################################
+OUTPUT
+
+O_OBJECT
+        sv_setref_pv( $arg, CLASS, (void*)$var );
+
+T_UV
+        $var = ($type)SvUV($arg)
+
+###########################################################################
+INPUT
+
+O_OBJECT
+	if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG) )
+		$var = ($type)SvIV((SV*)SvRV( $arg ));
+	else{
+		warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+		XSRETURN_UNDEF;
+	}
+
+T_UV
+        sv_setuv($arg, (UV)$var);
+
+###########################################################################

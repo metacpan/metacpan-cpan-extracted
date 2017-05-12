@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NZSRSResponse VerMajor="5" VerMinor="3">
+  <Response Action="Whois" FeId="4" FeSeq="2998511" OrigRegistrarId="921" RecipientRegistrarId="921">
+    <FeTimeStamp Day="8" Hour="17" Minute="12" Month="9" Second="05" TimeZoneOffset="+12:00" Year="2010" />
+    <Domain DomainName="daveepptest1.maori.nz" Status="Active" />
+  </Response>
+  <Response Action="DomainDetailsQry" FeId="4" FeSeq="2998511" OrigRegistrarId="921" RecipientRegistrarId="921" Rows="1">
+    <FeTimeStamp Day="8" Hour="17" Minute="12" Month="9" Second="05" TimeZoneOffset="+12:00" Year="2010" />
+    <Domain Delegate="1" DomainName="daveepptest1.maori.nz" DomainNameUnicode="daveepptest1.māori.nz" DomainNameUnicodeHex="daveepptest1.m&lt;U+0101&gt;ori.nz" RegistrarId="921" Status="Active">
+      <RegistrantContact HandleId="dbconepp1" Name="Dave Baker" Email="dave@nzrs.net.nz" ActionId="modifycontact-2010-08-21-testrun2-2">
+        <PostalAddress Address1="10 Fixit Close" City="WellingtonCity" CountryCode="nz" PostalCode="6002" />
+        <Phone CountryCode="64" LocalNumber="412345678" />
+        <Fax CountryCode="64" LocalNumber="412345678" />
+      </RegistrantContact>
+      <AdminContact HandleId="dbconepp2" Name="Dave" Email="dave@nzrs.net.nz" ActionId="modifycontact-2010-08-21-testrun2-3">
+        <PostalAddress Address1="10 Fixit Close" City="WellingtonCity" CountryCode="nz" PostalCode="6002" />
+        <Phone CountryCode="64" LocalNumber="412345678" />
+        <Fax CountryCode="64" LocalNumber="412345678" />
+      </AdminContact>
+      <TechnicalContact HandleId="dbconepp8" Name="Dave baker" Email="email@thisisaverylongemailaddress.net.nz" ActionId="modifycontact-2010-08-21-dbconepp8-6">
+        <PostalAddress Address1="1001 Willis street" Address2="Brooklyn" City="Wellington" CountryCode="NZ" Province="Wellington" />
+        <Phone CountryCode="123" LocalNumber="1234567890" />
+        <Fax CountryCode="64" LocalNumber="412345678" />
+      </TechnicalContact>
+      <BilledUntil Day="08" Hour="17" Minute="11" Month="7" Second="57" TimeZoneOffset="+12:00" Year="2011" />
+      <RegisteredDate Day="08" Hour="17" Minute="11" Month="9" Second="57" TimeZoneOffset="+12:00" Year="2010" />
+      <AuditDetails RegistrarId="921">
+        <AuditTime>
+          <From Day="08" Hour="17" Minute="11" Month="9" Second="57" TimeZoneOffset="+12:00" Year="2010" />
+        </AuditTime>
+        <AuditText />
+      </AuditDetails>
+    </Domain>
+  </Response>
+</NZSRSResponse>

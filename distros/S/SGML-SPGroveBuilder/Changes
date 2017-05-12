@@ -1,0 +1,12 @@
+Revision history for Perl extension SGML::SPGroveBuilder.
+
+`*' indicates backward incompatible changes
+
+2.01  Sun Feb  1 16:39:11 CST 1998
+	- RPM spec: use SPLIBDIR environment variable to point to SP's
+	  lib, use wildcard for Perl version
+
+2.00  Sat Jan 17 17:56:01 CST 1998
+	- first release after split from SGML::SPGrove
+	- changed module name name from SGML::SPGrove to
+	  SGML::SPGroveBuilder

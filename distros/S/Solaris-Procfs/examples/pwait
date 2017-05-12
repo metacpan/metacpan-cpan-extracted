@@ -1,0 +1,72 @@
+#!/usr/local/bin/perl -w
+
+use strict;
+
+$|++;
+
+my $pid;
+
+foreach $pid (@ARGV) {
+
+	# We open a filehandle to the psinfo file for that process,
+	# and then select() it for out-of-band data.  There will never be 
+	# any out-of-band data on this filehandle, so select() will block 
+	# until the process exits.
+	#
+	if (! -f "/proc/$pid/psinfo") {
+
+		warn "$0: no such process: $pid\n";
+		next;
+
+	} elsif (! open FILE,"</proc/$pid/psinfo") {
+
+		warn "Can't open file /proc/$pid/psinfo: $!\n";
+		next;
+
+	} else {
+
+		my $ein = "";
+		vec($ein, fileno(FILE), 1) = 1;
+
+		select(undef,undef,$ein,undef);
+
+		print "$pid: terminated\n";
+	}
+}
+
+__END__
+
+open(0xEF7C0A94, 0)                             Err#2 ENOENT
+     0xEF7C0A94: "/usr/platform/SUNW,SPARCstation-10/lib/libc_psr.so.1"
+close(3)                                        = 0
+getrlimit(5, 0xEFFFF2C0)                        = 0
+        cur = 64  max = 1024
+open64(0x0001136C, 04)                          = 3
+     0x0001136C: "/proc/self/fd"
+fcntl(3, 2, 0x00000001)                         = 0
+fstat64(3, 0xEFFFEFB0)                          = 0
+    d=0x02940000 i=5462  m=0040500 l=2  u=100   g=1     sz=1040
+        at = Jun  3 10:56:35 PDT 2000  [ 960054995 ]
+        mt = Jun  3 10:56:35 PDT 2000  [ 960054995 ]
+        ct = Jun  3 10:56:35 PDT 2000  [ 960054995 ]
+    bsz=512   blks=3     fs=proc
+brk(0x00021928)                                 = 0
+brk(0x00023928)                                 = 0
+getdents64(3, 0x00021940, 1048)                 = 176
+    ino=5462  off=16   rlen=24  "."
+    ino=5443  off=32   rlen=24  ".."
+    ino=5463  off=48   rlen=32  "0"
+    ino=136535 off=64   rlen=32  "1"
+    ino=267607 off=80   rlen=32  "2"
+    ino=398679 off=96   rlen=32  "3"
+getdents64(3, 0x00021940, 1048)                 = 0
+close(3)                                        = 0
+open(0xEFFFF25C, 0)                             = 3
+     0xEFFFF25C: "/proc/1826/psinfo"
+poll(0x00021938, 1, -1)         (sleeping...)
+poll(0x00021938, 1, -1)                         = 1
+        fd=3  ev=POLLPRI rev=POLLHUP
+close(3)                                        = 0
+llseek(0, 0, 1)                                 = 35119
+_exit(0)
+

@@ -1,0 +1,34 @@
+---
+abstract: 'Class-wrapped system calls and qx operator'
+author:
+  - 'Pedro Silva <pedros@berkeley.edu>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.39
+dynamic_config: 1
+generated_by: 'Module::Build version 0.3901, CPAN::Meta::Converter version 2.120630'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: System-Wrapper
+provides:
+  System::Wrapper:
+    file: lib/System/Wrapper.pm
+    version: v0.0.2
+  System::Wrapper::Parallel:
+    file: lib/System/Wrapper/Parallel.pm
+    version: v0.0.2
+requires:
+  Carp: 0
+  File::Spec: 0
+  Moose: 0
+  POSIX: 0
+  Storable: 0
+  constant: 0
+  overload: 0
+  version: 0
+resources:
+  license: http://www.gnu.org/licenses/gpl-3.0.txt
+version: v0.0.2

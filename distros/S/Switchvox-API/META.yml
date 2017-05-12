@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+name:         Switchvox-API
+version:      1.02
+version_from: lib/Switchvox/API.pm
+installdirs:  site
+requires:
+    Crypt::SSLeay:                 0
+    HTTP::Request:                 0
+    HTTP::Response:                0
+    LWP::UserAgent:                0
+    XML::Parser:                   0
+    XML::Simple:                   0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

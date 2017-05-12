@@ -1,0 +1,49 @@
+Signals-XSIG
+------------
+
+Signals::XSIG  extends Perl's simple %SIG interface for trapping
+signals to allow installing multiple handlers for signals.
+
+See the perldoc for a description and use cases of this module.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Signals::XSIG
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Signals-XSIG
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Signals-XSIG
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Signals-XSIG
+
+    Search CPAN
+        http://search.cpan.org/dist/Signals-XSIG
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (c) 2010-2016 Marty O'Brien
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

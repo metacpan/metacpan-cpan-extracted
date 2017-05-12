@@ -1,0 +1,39 @@
+Socialtext::Resting 
+===================
+
+Socialtext::Resting is an interface to the Socialtext REST
+API.  Developers can use the methods in this module to perform
+various actions.
+
+Included in this distribution is 'strut', a command line utility
+which accesses the Socialtext REST API using Socialtext::Resting
+methods.
+
+INSTALLATION
+
+To install this module, run the following commands:
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Note that if you answer 'yes' to the 'Socialtext server' question,
+you will create a page on Socialtext's server - if you want to avoid
+this simply answer 'no'.
+
+SUPPORT AND DOCUMENTATION
+
+You can look for information at:
+
+    Socialtext REST Documentation
+        http://www.socialtext.net/st-rest-docs/index.cgi
+
+    Search CPAN
+        http://search.cpan.org/dist/Socialtext-Resting
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2006 Socialtext
+
+This program is free software;  you can redistribute it and/or modify
+it under the same terms as Perl itself.

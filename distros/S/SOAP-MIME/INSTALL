@@ -1,0 +1,26 @@
+#
+# INSTALL Readme file
+#
+
+SOAP::MIME follows the conventions of any CPAN Perl Module. The simplest way
+to install SOAP::MIME manually is the typical:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+** Naturally, you would use nmake instead of make on Windows platform.
+
+Of course, CPAN shell is yet another way to install the module, and arguably
+easier considering that it automatically resolves any dependencies for you:
+
+   perl -MCPAN -e shell
+   > install SOAP::Lite
+
+or even 
+
+   perl -MCPAN -e 'install SOAP::Lite'
+
+
+

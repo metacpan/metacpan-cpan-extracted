@@ -1,0 +1,8 @@
+0.02 - Wed Mar 21 14:26:45 PDT 2007
+ - Fixed subject reply bug
+ - Tagged message with the thread subject
+ - Slight obfuscation of email addresses, like mailman
+
+0.01 - Wed Feb 14 17:05:34 PST 2007
+ - stripped noisy headers
+ - initial release

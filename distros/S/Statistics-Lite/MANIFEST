@@ -1,0 +1,15 @@
+Changes
+Lite.pm
+Makefile.PL
+MANIFEST
+META.yml                                 Module meta-data (added by MakeMaker)
+t/00_use_ok.t
+t/01_functional_basic.t
+t/02_functional_negative.t
+t/03_functional_undefs.t
+t/04_functional_unbiased.t
+t/05_functional_population.t
+t/06_statshash_basic.t
+t/07_statshash_more.t
+t/08_statshash_var_freq.t
+META.json                                Module JSON meta-data (added by MakeMaker)

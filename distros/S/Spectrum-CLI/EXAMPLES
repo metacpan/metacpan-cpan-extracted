@@ -1,0 +1,44 @@
+EXAMPLES for Spectrum-CLI
+-------------------------
+
+   The following scripts are roughly equivalent...
+
+   1) Using vnmsh commands:
+
+         #! /bin/ksh
+
+         connect
+         show models
+         disconnect
+
+         exit
+
+      Using Spectrum::CLI:
+
+         #! /usr/local/bin/perl
+
+	 use English;
+	 use Spectrum::CLI;
+
+	 $FORMAT_LINES_PER_PAGE = 23;
+	 map { write } Spectrum::CLI->new->show_models;
+	 exit;
+
+	 format STDOUT_TOP =
+	 MHandle     MName                               MTypeHnd    MTypeName
+	 .
+
+	 format STDOUT =
+	 @<<<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< @<<<<<<<<<< @<<<<<<<<<<<<<<<<<<<
+	 $_->{MHandle} $_->{MName}                       $_->{MTypeHnd} $_->{MTypeName}
+	 .
+
+	 __END__
+     
+     For other examples please see the supplied scripts:
+
+        ShowModels
+        DatabaseTally
+        UserReport
+        CreateUsers
+

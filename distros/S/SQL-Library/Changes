@@ -1,0 +1,19 @@
+Revision history for Perl module SQL::Library
+
+0.0.5 2012-06-05
+    - updated dates in Changes (chrisv)
+    - fixed: rt.cpan.org #77639 SQL::Library bundles an old copy of GPL2
+      updated FSF postal address (thanks Petr Šabata) (chrisv)
+
+0.0.4 2012-05-24
+    - Co-maintainer Chris Vertonghen <chrisv@cpan.org>
+    - re-arrange & update pod (chrisv)
+    - fixed: rt.cpan.org Bug #22796 for SQL-Library: Wrong version for
+      ExtUtils::MakeMaker (thanks Serguei Trouchelle) (chrisv)
+
+0.0.3 2004-03-17
+    - (undocumented)
+
+0.0.2 Wed Mar 17 13:08:15 2004
+    - original version; created by ExtUtils::ModuleMaker 0.32
+

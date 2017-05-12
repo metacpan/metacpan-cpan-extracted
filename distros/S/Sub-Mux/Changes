@@ -1,0 +1,9 @@
+Revision history for Perl extension Sub::Mux
+
+0.02    Sat Jun 29 16:48:55 JST 2013
+        - fixed unshift_subs method(WARN: This is incompatible change)
+        - enhancement POD
+        - fixed xt/ test for travis-ci
+
+0.01    Sat Jun 29 13:10:50 JST 2013
+        - original version

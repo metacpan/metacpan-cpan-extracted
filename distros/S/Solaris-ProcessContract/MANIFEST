@@ -1,0 +1,30 @@
+MANIFEST
+README
+Changes
+Makefile.PL
+ProcessContract.xs
+lib/Solaris/ProcessContract.pm
+lib/Solaris/ProcessContract.pod
+lib/Solaris/ProcessContract/Base.pm
+lib/Solaris/ProcessContract/Contract.pm
+lib/Solaris/ProcessContract/Contract.pod
+lib/Solaris/ProcessContract/Contract/Control.pm
+lib/Solaris/ProcessContract/Contract/Control.pod
+lib/Solaris/ProcessContract/Exceptions.pm
+lib/Solaris/ProcessContract/Exceptions.pod
+lib/Solaris/ProcessContract/Template.pm
+lib/Solaris/ProcessContract/Template.pod
+lib/Solaris/ProcessContract/XS.pm
+t/01-use_ok.t
+t/02-xs.t
+t/03-exports.t
+t/04-exceptions.t
+t/10-methods-base.t
+t/10-methods-contract.t
+t/10-methods-control.t
+t/10-methods-process_contract.t
+t/10-methods-template.t
+t/20-process_contract.t
+t/30-template.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,113 @@
+#NEXUS 
+
+[
+ Diplodocoids after Whitlock 2011
+ Basal macronrians after Mannion et al. 2013
+ Titanosaurs after Calvo et al. 2007
+ Trigonosaurus in "Titanosauridae" according to Campos et al. 2005.
+ Xianshanosaurus is some kind of Titanosaur according to Mannion et al. 2013
+]
+
+Begin trees;
+
+tree 1 = (
+ Pterosauria,
+ (
+  Ornithischia,
+  (
+   Theropoda,
+   (
+    'Basal sauropodomorphs',
+    (
+     Mamenchisaurus,
+     (
+      '"Bothriospondylus" NHM 2599',
+      'Haplocanthosaurus CM 879',
+      'Neosauropoda incertae sedis PMU R263',
+      (
+       (
+	'Rebbachisauridae incertae sedis MIWG 5384',
+	(
+	 'Limaysaurus MUCPv 205',
+	 (
+	  'Demandasaurus MPS-RV II-15'
+	 )
+	)
+       ),
+       (
+	Dicraeosaurus,
+	(
+	 (
+	  'Apatosaurus AMNH 222',
+	  'Apatosaurus AMNH 460',
+	  'Apatosaurus CM 3018',
+	  'Apatosaurus FMNH P25112',
+	  'Apatosaurus OMNH 1436',
+	  'Apatosaurus YPM 1980',
+	  '?Apatosaurus AMNH 860'
+	 ),
+	 (
+	  'Supersaurus WDC DMJ-021',
+	  (
+	   'Dinheirosaurus ML 414',
+	   'Tornieria MB.R.2956.13',
+	   (
+	    'Barosaurus AMNH 6341',
+	    (
+	     'Diplodocus AMNH 223',
+	     'Diplodocus DMNH 1494',
+	     'Diplodocus USNM 10865'
+	    )
+	   )
+	  )
+	 )
+	)
+       )
+      ),
+      (
+       Camarasaurus,
+       (
+	(
+	 (
+	  'Giraffatitan M.B. R. 2181',
+	  'Giraffatitan M.B. R. 2921',
+	  'Giraffatitan M.B. R. 3736'
+	 ),
+	 (
+	  'Cedarosaurus DMNH 39045',
+	  'Venenosaurus DMNH 40932'
+	 )
+	),
+	(
+	 'Malawisaurus MAL-200',
+	 'Trigonosaurus MCT 1719-R',
+	 'Xianshanosaurus KLR-07-62-6',
+	 (
+	  (
+	   'Gondwanatitan MN 4111-V',
+	   'Aeolosaurus UNPSJB PV 959'
+	  ),
+	  (
+	   (
+	    'Alamosaurus',
+	    'Opisthocoelicaudia'
+           ),
+	   (
+	    'Neuquensaurus MCS-5',
+	    (
+	     'Rocasaurus MPCV-Pv 58',
+	     'Saltasaurus PVL 4017-28'
+	    )
+	   )
+	  )
+	 )
+	)
+       )
+      )
+     )
+    )
+   )
+  )
+ )
+);
+End;

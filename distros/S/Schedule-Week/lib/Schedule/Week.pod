@@ -1,0 +1,92 @@
+=head1 NAME
+
+Schedule::Week - Perl extension for creating and manipulating an hourly
+                 weekly schedule.
+
+=head1 SYNOPSIS
+
+  use Schedule::Week qw(:days); 
+  my $schedule = Schedule::Week->new();
+
+  #  On for Mondays, Tuesdays, and Wednesdays, 9 AM to 9 PM
+
+  for my $day ($MONDAY, $TUESDAY, $WEDNESDAY) {
+      $schedule->hours_for_day($day, [9 ... 21], 1);
+  }
+
+  #  Is right now a valid time within this schedule?
+  print ($schedule->is_active(time())) ? "Yes\n" : "No\n";
+
+  #  Get the states of all hours across all days, returns an array
+  #  of arrays .. index 1 is days indexed by number from 0 to 6 and 
+  #  each element holds a reference to an array of the hours, from 0 
+  # (midnight) to 11 PM (23).
+  my @all_hours_all_days = $schedule->hours([0 ... 23]);
+
+  #  Is Monday at 11 AM included in this schedule? 
+  #  $monday_hours[0] == 1
+  #
+  #  Returns an array
+  #  of results representing each hour passed in, indexed starting
+  #  at 0.
+  my @monday_hours = $schedule->monday([11]);
+
+  # returns 168 byte array representing 168 hours in the week
+  my $serialized = $schedule->serialize(); 
+
+  # Restore to object from serialized form
+  my $other_schedule = Schedule::Week::deserialize($serialized);
+
+  #  Reset the whole thing
+  $other_schedule->reset();
+
+  # M T W TH F are weekdays - turn on 9 - 5 schedule for the week
+  $other_schedule->weekday_hours([9 ... 17], 1);  
+
+  # Weekends we work 9 - 1 PM
+  $other_schedule->weekend_hours([9 ... 13], 1);
+
+  # Now kill 1 PM to 5 PM across all days 
+  $other_schedule->hours([13 ... 17], 0);
+
+  # prints 168 byte array of 1s and 0s
+  print $other_schedule->serialize();
+
+  # Reset the initial schedule to everything off
+  $schedule->reset();
+
+=head1 DESCRIPTION
+
+Module to make it easy to create a basic weekly schedule that includes
+limits on what days and hours the schedule is active during; schedule
+can be serialized into an easy to store format and you can quickly
+query a schedule to see if a given Unix time would be active within the
+schedule.
+
+Please note that *all* hours in the schedule will be represented in the time 
+zone the script is run in.
+
+=head2 EXPORT
+
+ :days = $MONDAY, $TUESDAY, $WEDNESDAY, $THURSDAY, $FRIDAY, $SATURDAY,
+         $SUNDAY
+
+ You can request each day be exported individually as well.
+
+ use Schedule::Week qw($SUNDAY $MONDAY);
+
+=head1 SEE ALSO
+
+=head1 AUTHOR
+
+Max Schubert, E<lt>max_schubert@cable.comcast.com<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2009 by Max Schubert / Comcast
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

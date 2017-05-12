@@ -1,0 +1,344 @@
+NAME
+    Set::Equivalence - a set of objects or scalars with no duplicates and a
+    user-configurable equivalence relation
+
+SYNOPSIS
+       use v5.12;
+       use Set::Equivalence qw(set);
+   
+       my $numbers = set(1..4) + set(2, 4, 6, 8);
+       say for $numbers->members; # 1, 2, 3, 4, 6, 8
+
+DESCRIPTION
+    If you're familiar with Set::Object or Set::Scalar, then you should be
+    right at home with Set::Equivalence.
+
+    In mathematical terms, a set
+    <http://en.wikipedia.org/wiki/Set_(mathematics)> is an unordered
+    collection of zero or more members. In computer science, this translates
+    to a set data type <http://en.wikipedia.org/wiki/Set_(abstract_data_type)>
+    which is much like an array or list, but without ordering and without
+    duplicates. (Adding an item to a set that is already a member of the set
+    is a no-op.)
+
+    Like Set::Object and Set::Scalar, Set::Equivalence sets are mutable by
+    default; that is, it's possible to add and remove items after constructing
+    the set. However, it is possible to mark sets as being immutable; after
+    doing so, any attempts to modify the set will throw an exception.
+
+    The main distinguishing feature of Set::Equivalence is that it is possible
+    to define an equivalence relation (a coderef taking two arguments) which
+    will be used to judge whether two set members are considered duplicates.
+
+    Set::Equivalence expects your coderef to act as a true equivalence
+    relation <http://en.wikipedia.org/wiki/Equivalence_relation> and may act
+    unexpectedly if it is not. In particular, it expects:
+
+    *   Reflexivity. In other words for any $x, `$equiv->($x, $x)` is always
+        true.
+
+    *   Symmetry. In other words for any $x and $y, `$equiv->($x, $y)` implies
+        `$equiv->($y, $x)`.
+
+    *   Transitivity. In other words for any $x, $y and $z, `$equiv->($x, $y)
+        && $equiv->($y, $z)` implies `$equiv->($x, $z)`.
+
+    *   Determinism. For any $x and $y, `$equiv->($x, $y)` will always return
+        the same thing, at least for the lifetime of the set object. (If $x
+        and $y are mutable objects, then it's easy for an equivalence function
+        to become non-deterministic.)
+
+    This approach to implementing a set is unavoidably slow, because it means
+    we can't use a hash of incoming values to detect duplicates; instead the
+    equivalence relation needs to be called on each pair of members. However,
+    performance is generally tolerable for sets of a few dozen members.
+
+    The API documented below is roughly compatible with Set::Object and
+    Set::Tiny.
+
+  Constructors
+    A methods and a function for creating a new set from nothing.
+
+    `new(%attrs)`
+        Standard Moose-style constructor function (though this module does not
+        use Moose). Valid attributes are:
+
+        *members*
+            An initial collection of members to add to the set, provided as an
+            arrayref. Optional; defaults to none.
+
+        *mutable*
+            Boolean, indicating whether the set should be mutable. Optional;
+            defaults to true.
+
+        *equivalence_relation*
+            Coderef accepting to arguments. Optional; defaults to a coderef
+            that checks string equality, but treats `undef` differently to "",
+            and handles overloaded objects properly.
+
+        *type_constraint*
+            A type constraint for set members. Optional; accepts Type::Tiny
+            and MooseX::Types type constraints (or indeed any object
+            implementing Type::API::Constraint).
+
+        *coerce*
+            Boolean; whether type coercion should be attempted. Optional;
+            defaults to false. Ignored unless the set has a type constraint
+            which has coercions.
+
+    `set(@members)`, `typed_set($constraint, @members)`
+        Exportable functions (i.e. not a method) that act as shortcuts for
+        `new`.
+
+        Note that this module uses Exporter::Tiny, which allows exported
+        functions to be renamed.
+
+    `clone`
+        Returns a shallow clone of an existing set, with the same members and
+        the same equivalence function. (The clone will be mutable.)
+
+  Accessors
+    A methods for accessing the set's data.
+
+    `members`
+        Returns all members of the set, as a list.
+
+        Alias: `elements`.
+
+    `size`
+        Returns the set cardinality (i.e. a count of the members).
+
+    `member($member)`
+        Returns $member if it is a member of the set; returns undef otherwise.
+        (Of course, undef may be a member of the set!) In list context,
+        returns an empty list if the member is not a member of the set.
+
+        Alias: `element`.
+
+    `equivalence_relation`
+        Returns the equivalence relation coderef.
+
+    `type_constraint`
+        Returns the type constraint (if any).
+
+  Predicates
+    Methods returning booleans.
+
+    `is_mutable`
+        Returns true iff the set is mutable.
+
+        Negated: `is_immutable`.
+
+    `is_null`
+        Returns true iff the set is empty.
+
+        Alias: `is_empty`.
+
+    `is_weak`
+        Implemented for compatibility with Set::Object. Always returns false.
+
+    `contains(@members)`
+        Returns a boolean indicating whether all @members are members of the
+        set.
+
+        Alias: `includes`, `has`.
+
+    `should_coerce`
+        Returns true iff this set will attempt type coercion of incoming
+        members.
+
+  Mutators
+    Methods that alter the contents or behaviour of the set.
+
+    `insert(@members)`
+        Adds members to the set. Returns the number of new members added (i.e.
+        that were not already members).
+
+        Throws an exception if the set is immutable.
+
+    `remove(@members)`
+        Removes members from the set. Returns the number of members removed.
+        Any members not found in the set are ignored.
+
+        Throws an exception if the set is immutable.
+
+        Alias: `delete`.
+
+    `invert(@members)`
+        For each argument: if it already exists in the set, removes it;
+        otherwise, adds it.
+
+        Throws an exception if the set is immutable.
+
+    `clear`
+        Empties the set. Significantly faster than `remove`.
+
+        Throws an exception if the set is immutable.
+
+    `pop`
+        Removes an arbitrary member from the set and returns it.
+
+        Throws an exception if the set is immutable.
+
+    `make_immutable`
+        Converts the set to an immutable one.
+
+        Returns the invocant, which means this method is suitable for
+        chaining.
+
+           my $even_primes = set(2)->make_immutable;
+
+    `weaken`
+        Unimplemented.
+
+    `strengthen`
+        Ignored.
+
+  Comparison
+    The following methods can be called as object methods with a single
+    parameter, or class methods with two parameters:
+
+       $set1->equal($set2);
+       # or:
+       'Set::Equivalent'->equal($set1, $set2);
+
+    `equal($set1, $set2)`
+        Returns true iff all members of $set1 occur in $set2 and all members
+        of $set2 occur in $set1.
+
+        Negated: `not_equal`.
+
+    `subset($set1, $set2)`
+        Returns true iff all members of $set1 occur in $set2. That is, if
+        $set1 is a subset of $set2.
+
+    `superset($set1, $set2)`
+        Returns true iff all members of $set2 occur in $set1. That is, if
+        $set2 is a subset of $set1.
+
+    `proper_subset($set1, $set2)`, `proper_superset($set1, $set2)`
+        Sets that are equal are trivially subsets and supersets of each other.
+        These methods return false if the sets are equal, but otherwise return
+        the same as `subset` and `superset`.
+
+    `is_disjoint($set1, $set2)`
+        Returns true iff the sets have no elements in common.
+
+    `compare`
+        Unimplemented.
+
+  Arithmetic
+    The following methods can be called as object methods with a single
+    parameter, or class methods with two parameters:
+
+       $set1->union($set2);
+       # or:
+       'Set::Equivalent'->union($set1, $set2);
+
+    They all return mutable sets. If called as an object method, the returned
+    sets have the same equivalence relation and type constraint as the set
+    given in the first argument; if called as a class method, the returned
+    sets have the default equivalence relation and no type constraint.
+
+    `intersection($set1, $set2)`
+        Returns the set which is the largest common subset of both sets.
+
+    `union($set1, $set2)`
+        Returns the set which is the smallest common superset of both sets.
+
+    `difference($set1, $set2)`
+        Returns a copy of $set1 with all members of $set2 removed.
+
+    `symmetric_difference($set1, $set2)`
+        Returns a copy of the union with all members of the intersection
+        removed.
+
+    `map($set1, $coderef)`
+        Returns a new set created by passing each member of $set1 through a
+        coderef.
+
+        See also `map` in perlfunc.
+
+    `grep($set1, $coderef)`
+        Returns a new set created by filtering each member of $set1 by a
+        coderef that should return a boolean.
+
+        See also `grep` in perlfunc.
+
+    `part($set1, $coderef)`
+        Returns a list of sets created by partitioning $set1 by a coderef that
+        should return an integer.
+
+        See also `part` in List::MoreUtils.
+
+  Miscellaneous Methods
+    `as_string`
+        A basic string representation of the set.
+
+    `as_string_callback`
+        Unimplemented.
+
+    `as_array`
+        Returns a reference to a tied array that can be used to iterate
+        through the set members, `push` new members onto, and `pop` members
+        off.
+
+        The order of members in the array is arbitrary.
+
+        Set::Equivalent::_Tie does not implement the entire Tie::Array
+        interface, so some bits will crash. In particular, STORE operations
+        are not implemented, so you can't do `$set->as_array->[1] = 42`.
+        `splice`, `exists` and `delete` will probably also fail. (But `exists`
+        and `delete` on array elements are insane anyway.)
+
+    `iterator`
+        Returns an iterator that will walk through the current members of the
+        set.
+
+    `reduce($set, $coderef)`
+        Reduces the set to a single value.
+
+        See also `reduce` in List::Util.
+
+  Overloaded Operators
+       '""'     => 'as_string',
+       '+'      => 'union',
+       '*'      => 'intersection',
+       '%'      => 'symmetric_difference',
+       '-'      => 'difference',
+       '=='     => 'equal',
+       'eq'     => 'equal',
+       '!='     => 'not_equal',
+       'ne'     => 'not_equal',
+       '<'      => 'proper_subset',
+       '>'      => 'proper_superset',
+       '<='     => 'subset',
+       '>='     => 'superset',
+       '@{}'    => 'as_array',
+       'bool'   =>  sub { 1 },
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Set-Equivalence>.
+
+SEE ALSO
+    Types::Set.
+
+    Set::Object, Set::Scalar, Set::Tiny.
+
+    List::Objects::WithUtils.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2013 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

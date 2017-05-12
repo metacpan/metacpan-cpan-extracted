@@ -1,0 +1,84 @@
+NAME
+    Statistics::Standard_Normal - Z scores and percentiles using standard
+    normal table
+
+SYNOPSIS
+      use Statistics::Standard_Normal qw/z_to_pct pct_to_z/;;
+
+      while (defined my $z = get_z_score($name)) {
+        say "$name's result was at the ", z_to_pct($z), ' percentile';
+      }
+
+      while (defined my $pct = get_percentile($name)) {
+        say "$name's result had a Z score of ", pct_to_z($pct);
+        say "Be careful of flattening at high percentiles!" if $pct > 98;
+      }
+
+DESCRIPTION
+    Statistics::Standard_Normal provides convenience functions to convert
+    between Z scores and percentile scores using values taken from a
+    standard normal distribution (that is, a normal distribution with a mean
+    of 0 and a standard deviation of 1). Percentile scores are often used
+    for informal reporting of results, since they make intuitive sense to
+    many readers, while Z scores are less familiar, but a better behaved for
+    values far from the mean.
+
+    The intent of this package is to be lightweight -- it has no
+    prerequisites outside the Perl core, no compiler requirement, and a
+    small footprint -- while providing values accurate enough for most uses.
+
+  FUNCTIONS
+    Two conversion functions are provided:
+
+    z_to_pct(*$z*)
+        Returns the percentile corresponding to the Z-score *$z*. This is
+        the percentage of the area under the standard normal curve located
+        to the left of a vertical line at "mean" + *$z*.
+
+        A closed-form solution to this problem does not exist, so "z_to_pct"
+        uses a rapid estimation that is generally accurate to "0.1%" over
+        the range of -3.719 < *$z* < 3.719. Values outside this range return
+        "0.01%" or "99.99%", depending on the sign of *$z*.
+
+    pct_to_z(*$pctile*)
+        Returns the Z-score corresponding to *$pctile*. This uses an
+        approximation similar to the one used by "z_to_pct"; the result is
+        generally accurate to 0.005. Values of *$pctile* <0.01 or >99.9
+        return -3.719 and 3.719, respectively.
+
+  EXPORT
+    Both "pct_to_z" and "z_to_pct" are available for importation, but
+    neither are exported by default.
+
+BUGS AND CAVEATS
+    Conversion to Z scores of percentiles very close to 0 or 100 becomes
+    increasingly inaccurate, as smaller and smaller changes in percentile
+    are associated with a given change in Z score.
+
+SEE ALSO
+    For intensive usage, a compiled library may provide better performance
+    (cf. "ndtr" in Math::Cephes or Math::CDF for Perl bindings to some
+    options).
+
+    If you have a set of observations and want to perform statistical tests,
+    there are a host of modules in the "Statistics::" namespace; ones that
+    may help you derive Z scores include Statistics::Zscore and
+    Statistics::Zed.
+
+VERSION
+    version 1.00
+
+AUTHOR
+    Charles Bailey <cbail@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2012-2014 Charles Bailey.
+
+    This software may be used under the terms of the Artistic License or the
+    GNU General Public License, as the user prefers.
+
+ACKNOWLEDGMENT
+    The code incorporated into this package was originally written with
+    United States federal funding as part of research work done by the
+    author at the Children's Hospital of Philadelphia.
+

@@ -1,0 +1,35 @@
+---
+abstract: 'Provides IO::All'
+author:
+  - "Robert 'phaylon' Sedlacek <rs@474.at>"
+build_requires:
+  Test::Fatal: 0.003
+  Test::More: 0.96
+  syntax: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200001, CPAN::Meta::Converter version 2.110240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Syntax-Feature-Io
+provides:
+  Syntax::Feature::Io:
+    file: lib/Syntax/Feature/Io.pm
+    version: 0.001
+requires:
+  B::Hooks::EndOfScope: 0.09
+  Carp: 0
+  IO::All: 0.41
+  Params::Classify: 0.013
+  Sub::Install: 0.925
+  namespace::clean: 0
+  strictures: 1
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Syntax-Feature-Io
+  homepage: https://github.com/phaylon/Syntax-Feature-Io/wiki
+  repository: git://github.com/phaylon/Syntax-Feature-Io.git
+version: 0.001
+x_authority: cpan:PHAYLON

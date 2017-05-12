@@ -1,0 +1,59 @@
+---
+abstract: 'helper to generate optimied lbconfig file'
+author:
+  - 'Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>'
+build_requires:
+  Digest::MD5: '0'
+  Siebel::Srvrmgr::Daemon::ActionFactory: '0.27'
+  Siebel::Srvrmgr::ListParser: '0.27'
+  Test::More: '0'
+  perl: '5.014004'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.014004'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Siebel-Lbconfig
+no_index:
+  directory:
+    - inc
+provides:
+  Siebel::Lbconfig:
+    file: lib/Siebel/Lbconfig.pm
+    version: '0.002'
+  Siebel::Lbconfig::Daemon::Action::AOM:
+    file: lib/Siebel/Lbconfig/Daemon/Action/AOM.pm
+    version: '0.002'
+  Siebel::Lbconfig::Daemon::Action::ListServers:
+    file: lib/Siebel/Lbconfig/Daemon/Action/ListServers.pm
+    version: '0.002'
+requires:
+  Carp: '0'
+  Config::IniFiles: '2.88'
+  Cwd: '0'
+  Exporter: '0'
+  File::HomeDir: '1.00'
+  File::Spec: '0'
+  Getopt::Std: '0'
+  Moose: '2.0401'
+  Scalar::Util: '0'
+  Set::Tiny: '0.03'
+  Siebel::Srvrmgr::Daemon::Action: '0'
+  Siebel::Srvrmgr::Daemon::ActionStash: '0.27'
+  Siebel::Srvrmgr::Daemon::Command: '0.27'
+  Siebel::Srvrmgr::Daemon::Light: '0.27'
+  Siebel::Srvrmgr::Util::IniDaemon: '0.27'
+  namespace::autoclean: '0.13'
+  perl: '5.014004'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/glasswalk3r/siebel-monitoring-tools/issues
+  homepage: https://github.com/glasswalk3r/siebel-monitoring-tools
+  repository: https://github.com/glasswalk3r/siebel-monitoring-tools.git
+version: '0.002'
+x_serialization_backend: 'YAML::Tiny version 1.69'

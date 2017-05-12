@@ -1,0 +1,56 @@
+{
+   "abstract" : "work with the cross product of two or more sets",
+   "author" : [
+      "brian d foy <bdfoy@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Set-CrossProduct",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::Spec::Functions" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.95"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/briandfoy/Set-CrossProduct/issues"
+      },
+      "homepage" : "https://github.com/briandfoy/Set-CrossProduct",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/briandfoy/Set-CrossProduct.git",
+         "web" : "https://github.com/briandfoy/Set-CrossProduct"
+      }
+   },
+   "version" : "2.002"
+}

@@ -1,0 +1,146 @@
+#!/usr/bin/perl
+
+# Copyright (C) 2008 Eric L. Wilhelm
+
+use warnings;
+use strict;
+
+=head1 NAME
+
+shebangtree - process a tree of shebangml
+
+=cut
+
+package bin::shebangtree;
+
+use warnings;
+use strict;
+use Carp;
+
+use Shebangml;
+use File::Fu;
+
+sub main {
+  my (@args) = @_;
+  my $dest_dir = shift(@args);
+
+  my $root = 'html';
+
+  (-d $root) or croak("missing root");
+  (-d $dest_dir) or croak("missing dir");
+  $_ = File::Fu->dir($_) for($root, $dest_dir);
+
+  my $hbml = Shebangml->new;
+  my $config = '.shebangrc';
+  if(-e $config) {
+    require YAML;
+    my ($data) = YAML::LoadFile($config);
+    $hbml->configure(%$data);
+  }
+
+  my %seen = map {$_ => 1}
+    my @todo = qw(index.hbml robots.txt);
+
+  my $current_dir;
+  my @col;
+  my %look = qw(
+    a    href
+    link href
+    img  src
+  );
+  # TODO form => action
+  my $collect = sub {
+    my ($tag, $att) = @_;
+    my $what = $look{$tag} or die "$tag not configured";
+    $att or return;
+    if(defined(my $ans = $att->get($what))) {
+      $ans =~ s/#.*//;
+      unless($ans =~ m#^/# or $ans =~ m#^[a-z]+://#) {
+        $ans = $current_dir + $ans;
+      }
+      push(@col, $ans);
+    }
+  };
+
+  $hbml->add_hook($_ => $collect) for(keys %look);
+  my $get = sub {
+    my $base = shift;
+
+    if($base =~ m#^[a-z]+://#) {
+      # TODO link check with cache
+      warn "link $base\n";
+      return();
+    }
+    my $file = $root + $base;
+
+    my @auto;
+
+    if(-d $file) {
+      if(-e "$file/index.hbml") {
+        $base = "$base/index.hbml";
+      }
+      elsif(-e "$file/index.html") {
+        $base = "$base/index.html";
+        my $subdir = File::Fu->dir($file);
+        @auto = grep({$_ ne $base} map({$_->relative($root)} $subdir->find(sub {
+          return shift->prune if($_->is_dir and $_->part(-1) eq '.svn');
+          $_->is_file and $_->file !~ m/^\./;
+        })));
+      }
+      $file = $root + $base;
+    }
+    warn "fetch $base\n";
+    $base =~ s/\.hbml/.html/;
+    my $outfile = $dest_dir + $base;
+    $current_dir = File::Fu->file($base)->dirname;
+
+    my $dir = $outfile->dirname->create;
+
+    # warn $file->file;
+    if($file !~ m/\.hbml$/) {
+      return if($file->file eq 'javascript:;');
+      $file->copy($outfile);
+    }
+    else {
+      my $out_fh = $outfile->open('>');
+      $hbml->set_out_fh($out_fh);
+      $hbml->process("$file");
+      $out_fh->close;
+    }
+    $outfile->utime(time, $file->stat->mtime);
+    $outfile->dirname->utime($file->dirname->stat->mtime);
+
+    my @found = @col; @col = ();
+    #warn "found: @found";
+    return(@found, @auto);
+  };
+
+  while(@todo) {
+    my $fetch = shift(@todo);
+    next if($fetch =~ m#^/?svn/#);
+    my @next = $get->($fetch);
+    @next or next;
+    # warn join("|", @next), "\n";
+    for(@next) {
+      s#^/##;
+      unless(m#^[a-z]+://#) {
+        s/\.html$/.hbml/;
+        while(s#(^|/)[^/\.]+/\.\./#$1#) {1}
+        s#/+$#/index.hbml#;
+        s#\./##g;
+      }
+      warn "$fetch has a link to itself" if($_ eq $fetch);
+    }
+    push(@todo, grep({length($_) and ! $seen{$_}++} @next));
+    #warn join("|", @todo), "\n";
+  }
+}
+
+package main;
+
+if($0 eq __FILE__) {
+  bin::shebangtree::main(@ARGV);
+}
+
+# vi:ts=2:sw=2:et:sta
+my $package = 'bin::shebangtree';

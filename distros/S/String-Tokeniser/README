@@ -1,0 +1,21 @@
+
+String::Tokeniser - Perl extension for, uhm, tokenising strings.
+
+
+String::Tokeniser provides an interface to a tokeniser class, allowing
+one to manipulate strings on a token-by-token basis without having to
+keep track of list element numbers and so on.
+
+
+Originaly written by Simon Cozens;
+Maintained by Alberto Simões <ambs@cpan>
+
+
+Installation as any other standard module:
+
+  perl Makefile.PL
+  make
+  make test
+  make install #... (probably as root)
+
+

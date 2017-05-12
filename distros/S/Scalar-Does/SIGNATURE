@@ -1,0 +1,61 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 5a1365fe14daabc265c3efe3d11eeb63b4138264 COPYRIGHT
+SHA1 c4660a1b84ee3d336d2c034e6691ca31828a1c9e CREDITS
+SHA1 bc33e7f7b5e6d905b73fe3dad0d16d4bb6703b1f Changes
+SHA1 b34513aeed923d3e7227421ddeb76fb5d944ffa2 INSTALL
+SHA1 f596e25feab3c59ca095da6b8864876a623bb953 IO-Detect-Changes.txt
+SHA1 c4c1e6c578edcfd14d13eadebc8f56dd9ca46821 LICENSE
+SHA1 921eea412c92c532759485874a66c3a98feb8fa2 MANIFEST
+SHA1 ff985a3259f184f5b2d299501b3b2ebce401864e META.json
+SHA1 5c3c11a0daafaa8055b2c35e2a1d6ec0dda02fc7 META.yml
+SHA1 d078da0e35aab2de4e5129a3d7d895a132e20cb7 Makefile.PL
+SHA1 a1f15fc47c0871101ff217ab5e1abe85f49b7acb NEWS
+SHA1 61cf482493e890ef83c7b86052bdcb36dc7c693c README
+SHA1 2b923a21dec40d781654d7549de880213c28ac6b TODO
+SHA1 8ba37a05ff536406f270324bbdb5e032c39acba4 dist.ini
+SHA1 7218b0986b489ab5130f8b271801d743d888e5de doap.ttl
+SHA1 f78f81fc6a32275bba42dcaa61702e18f19e998d lib/IO/Detect.pm
+SHA1 aab6b90230b68eef439ad32e20f7ce8d152a1501 lib/Scalar/Does.pm
+SHA1 8d283f3a2133b4d2035c87dc9a0613ff9a030e80 lib/Scalar/Does/MooseTypes.pm
+SHA1 ba72c241739742035b3baf706cd706942bc8dc99 t/01basic.t
+SHA1 5e899f9f5b9800bf347b10e602f76699f069a984 t/02does.t
+SHA1 488b72bd854f0eeb32e4be5a0bee16e1ed85040f t/03moosey.t
+SHA1 2488d4d2137cc7c26825f8cfe76e60bf96816f77 t/04cleanliness.t
+SHA1 d9a8927022b6ade4efb228b584227ad44a461572 t/05custom.t
+SHA1 4b4fd762e485a7fd0ab2e89779f414fef911b97b t/06constants.t
+SHA1 21e0113370f8c7d7072dc78d430669d2e0ce716f t/07makerole.t
+SHA1 2c1d93dde6f547e62826906fe8d35e199646e94a t/08mooselike.t
+SHA1 2742cc1d98ed5c06b2619e1a77e671353a15626d t/09warnings.t
+SHA1 92a13307dd3cb4f983504b274c8f535b43075523 t/10underscore.t
+SHA1 ad0782019415a2c5978edbfcc227b92b88b15197 t/11givenwhen.t
+SHA1 22486bf048b47dc13dc9665e70cc5cd78bd0c054 t/iod-01basic.t
+SHA1 b87bfa7523f379652ecef9d778a9d286fba7eb59 t/iod-02filehandles.t
+SHA1 bdb5e1f2bea582092efafc9a9fc8b9a8472cc4c5 t/iod-03filenames.t
+SHA1 9fc46fdfc99eb27854a1c96d691b47b1492c8eef t/iod-04fileuris.t
+SHA1 9522999b73950bb401ac03b0ab540454d9bb71a9 t/iod-05ducktype.t
+SHA1 af629aecb2f4c1295f33dc6562e5043fa17c6c75 t/iod-06asfh.t
+SHA1 a401b4c05acf56ec05841666aa509804c6fabc1b t/iod-11ioall.t
+SHA1 a8eb39dbe3dbedb79a679c32d24f0a632f7f498f t/iod-12pathclass.t
+SHA1 7c0b1b13360de44b368c9d461a8e22fab47e6bcd t/iod-13pathtiny.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAliQyZ4ACgkQzr+BKGoqfTkmpACgohMNRGuNhpglDaHnL/p7Sjs9
+nmcAnAiuv2qA4LT5dJxNQVGxcdTsn9U2
+=tTgd
+-----END PGP SIGNATURE-----

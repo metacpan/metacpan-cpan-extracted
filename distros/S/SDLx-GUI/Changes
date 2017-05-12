@@ -1,0 +1,13 @@
+Changelog for SDLx-GUI
+
+0.002     2014-04-04 13:58:44+02:00 Europe/Paris
+  - Fixes RT#90679 Moose enum warnings
+  - fixes smartmatch warnings
+
+0.001     2013-02-26 15:15:46 Europe/Paris
+  - first revision
+  - widgets: toplevel, label, button
+  - widget options: bg_color
+  - label options: text, size, fg_color
+  - button options: text, size, fg_color
+  - pack options: side

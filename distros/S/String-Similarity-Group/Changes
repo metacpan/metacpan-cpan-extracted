@@ -1,0 +1,53 @@
+2009-07-17 11:59  cvs
+
+	* Makefile.PL: The makefile had an error. It was not properly
+	  stating requirements.
+
+2009-05-08 12:14  cvs
+
+	* lib/String/Similarity/Group.pm, lib/String/Similarity/Group.pod,
+	  t/00.t: fixed a bug in similarest(), improved test
+
+2009-05-07 14:33  cvs
+
+	* lib/String/Similarity/Group.pm, t/06_group_by_similarity_new.pl,
+	  t/benchmarks.dev.list, t/benchmarks.dev.zip: added benchmarking
+	  dev
+
+2009-05-05 12:08  cvs
+
+	* lib/String/Similarity/Group.pm: took out some debug junk
+
+2009-05-04 16:41  cvs
+
+	* lib/String/Similarity/Group.pm, t/04_sort_by_similarity.t: added
+	  sort_by_similarity()
+
+2009-03-19 16:19  cvs
+
+	* lib/String/Similarity/Group.pm, t/03_hard.t: made slight
+	  modification to similarest(), using limit on
+	  String::Similarity::similarity(), hopefully to speed up searching
+
+2009-03-18 11:38  cvs
+
+	* lib/String/Similarity/Group.pm: made separate pod file, added
+	  documentation
+
+2009-03-12 18:20  cvs
+
+	* bin/gbs, lib/String/Similarity/Group.pm, t/02.t, t/03_hard.t:
+	  added option for much more in depth matching, is slow but useful
+	  in some cases added flags to use these alternate depths to gbs
+
+2009-03-12 16:06  cvs
+
+	* bin/gbs, lib/String/Similarity/Group.pm: added some doc to bin,
+	  also allow to print yaml string added and cleaned up doc and
+	  added examples
+
+2009-03-11 17:48  cvs
+
+	* MANIFEST, Makefile.PL, bin/gbs, lib/String/Similarity/Group.pm,
+	  t/0.t, t/02.t, t/listlong.txt, t/listshort.txt: Initial revision
+

@@ -1,0 +1,149 @@
+Revision history for Search-Query
+
+0.307 xxx
+ - fix regression where explicit field_class was always overridden by query dialect class.
+
+0.306 28 Dec 2015
+ - specify minimum version of namespace::autoclean. See https://rt.cpan.org/Ticket/Display.html?id=110500
+
+0.305 08 June 2015
+ - removed references to Rose::ObjectX::CAF in pod. See https://rt.cpan.org/Ticket/Display.html?id=101097
+ - swapped namespace::autoclean in, namespace::sweep out. See https://rt.cpan.org/Ticket/Display.html?id=104819
+
+0.304 05 June 2014
+ - fix s/Moose/Moo/ typo
+
+0.303 05 June 2014
+ - fix debug builder method
+
+0.302 05 June 2014
+ - add Type::Tiny dependency, use it in base Dialect->debug to ensure
+   we have an Int.
+
+0.301 03 June 2014
+ - support phrases/doublequotes in range queries
+
+0.300 18 April 2014
+ - first official release based on Moo
+
+0.290_02 15 April 2014
+ - fix Moo type constraint def bug, Dialect->debug, to use sub {} for
+   the default value.
+
+0.290_01 08 April 2014
+ - switch to Moo from Rose::ObjectX::CAF
+
+0.25 02 March 2014
+ - check for length() not truth so a query of '0' parses correctly
+
+0.24 23 Feb 2014
+ - fix default_field as array bug reported in 
+   https://rt.cpan.org/Ticket/Display.html?id=93287
+
+0.23 28 Aug 2013
+ - improvements to sqd -d lucy debugging
+ - fix extra right-hand paren parsing bug
+
+0.22 19 Feb 2013
+ - add fixup() feature to Parser (idea from Clinton Gormley)
+ - add null_term() feature to Parser
+
+0.21 23 June 2012
+ - fix docs for default_field, add dialect_opts alias param
+
+0.20 16 May 2012
+ - add 'field' to term_expander API, via
+   https://rt.cpan.org/Ticket/Display.html?id=77243 patch from
+   dapatrick@cpan
+
+0.19 19 June 2011
+ - fix case where croak_on_error was not respected (credit justatheory)
+ - add 'sloppy' feature
+ - add missing error() method for base Field class and document validate(). 
+ - allow field_class in Parser->new() to override default in query_class.
+
+0.18 25 July 2010
+ - add Parser->term_expander feature
+ - refactor Dialect->tree() and ->translate_to() methods to avoid
+   dependency on Clone module. This also fixes a segfault when calling
+   those methods on objects that contain blessed C pointers, like
+   Search::Query::Dialect::KSx.
+
+0.17 22 June 2010
+ - add field=(a..b) regex case to Parser so that the Clause is not stored
+   as a child of a () Clause.
+ - simplify the preservation of () clauses.
+
+0.16 08 May 2010
+ - fix uninitialized value warning in Clause->stringify
+
+0.15 06 May 2010
+ - add sanity check in Parser so that stringify() is tested. If a parsed
+   query cannot be re-parsed after stringify() then the stringify() method
+   is broken.
+
+0.14 30 April 2010
+ - add !: operator support to Parser
+ - fix Dialect->add_*_clause methods to properly add () around	the
+   existing and new clauses, to get logical groupings correct.
+ - add stringify() method to Clause
+ - add clear_error() method to Parser
+ - fix bug where expanded alias_for field array was not passing through
+   quote or proximity values.
+
+0.13 10 April 2010
+ - fix bug with stringification of SWISH dialect and compound negatives.
+ - fix bug in Dialect->add_sub_clause()
+
+0.12 02 April 2010
+ - fix bug with compound proximity queries.
+
+0.11 26 March 2010
+ - add proximity support.
+
+0.10 14 March 2010
+ - fix (NOT query) bug.
+ - add range support to SQL dialect.
+
+0.09 03 March 2010
+ - fix bug in sqd where default_field was not also setting fields.
+ - POD fixes.
+
+0.08 01 March 2010
+ - clarify NOT regex comments to include !
+ - SWISH dialect does not (as SQL dialect does) expand to all defined if
+   fields if 'default_field' is not specified.
+ - add translate_to() method to base Dialect class.
+
+0.07 06 Feb 2010
+ - add sqd program.
+ - allow queries with no ANDs or ORs (just NOTs)
+ - add SWISH Dialect and Field classes.
+ - add range operator to parser: N..M
+ - add more documentation.
+ - add |, & and ! as synonyms for OR, AND and NOT in their respective
+   default regex.
+
+0.06 30 Jan 2009
+ - add SQL Dialect and Field classes.
+
+0.05 23 Jan 2009
+ - added compatability for param names in new() for Search::QueryParser
+ - add Search::Query::Dialect->add_sub_clause() method.
+
+0.04 19 Jan 2009
+ - fix RT53772 by making DEFAULT constant into my %DEFAULT private var.
+
+0.03 14 Jan 2009
+ - fix bug in parser expansion of aliased fields.
+ - add parser validation of fields.
+ - fix skip test count in t/01-parser.t
+
+0.02 13 Jan 2009
+ - add missing POD to Parser class
+ - flesh out classes: add Field, Clause, plus walk() and add_*_clause()
+   methods.
+
+0.01 12 Jan 2009
+ - First version, released on an unsuspecting world.
+

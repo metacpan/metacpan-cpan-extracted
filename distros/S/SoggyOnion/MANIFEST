@@ -1,0 +1,26 @@
+.releaserc
+bin/soggyonion-install.PL
+bin/soggyonion.PL
+Changes
+defaults/config.yaml
+defaults/templates/imagescraper.tt2
+defaults/templates/main.tt2
+defaults/templates/rss.tt2
+lib/SoggyOnion.pm
+lib/SoggyOnion/Plugin.pm
+lib/SoggyOnion/Plugin/GeoWeather.pm
+lib/SoggyOnion/Plugin/ImageScraper.pm
+lib/SoggyOnion/Plugin/RSS.pm
+lib/SoggyOnion/Resource.pm
+logo.svg
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+SIGNATURE
+t/0-signature.t
+t/all.t
+t/pod-coverage.t
+t/pod.t
+TODO

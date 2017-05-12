@@ -1,0 +1,37 @@
+---
+abstract: 'escape strings for the shell on Linux, UNIX or MSWin32'
+author:
+  - 'Dai Okabayashi <bayashi@cpan.org>'
+build_requires:
+  Module::Build::Pluggable::CPANfile: '0.05'
+  Test::More: '0.88'
+configure_requires:
+  Module::Build: '0.40'
+  Module::Build::Pluggable: '0'
+  Module::Build::Pluggable::CPANfile: '0.05'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: ShellQuote-Any
+provides:
+  ShellQuote::Any:
+    file: lib/ShellQuote/Any.pm
+    version: '0.03'
+requires:
+  String::ShellQuote: '0'
+  Win32::ShellQuote: '0'
+  perl: '5.008005'
+  strict: '0'
+  warnings: '0'
+resources:
+  IRC:
+    url: irc://chat.freenode.org/#bayadev
+    web: http://webchat.freenode.net/?channels=%23bayadev
+  bugtracker: http://github.com/bayashi/ShellQuote-Any/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/bayashi/ShellQuote-Any
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

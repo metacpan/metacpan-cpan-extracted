@@ -1,0 +1,6 @@
+Revision history for Perl extension Socket::Mmsg.
+
+0.01  Tue May 14 10:37:28 2013
+	- original version; created by h2xs 1.23 with options
+		-Afn Socket::Mmsg
+

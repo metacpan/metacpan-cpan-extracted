@@ -1,0 +1,15 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/SVN-Deploy.t
+t/build.pl
+t/post.pl
+t/pre.pl
+t/stree/subdir1/source11.pl
+t/stree/subdir1/subdir11/source111.pl
+t/stree/subdir1/subdir11/source112.pl
+t/stree/subdir2/source21.pl
+lib/SVN/Deploy.pm
+lib/SVN/Deploy/Utils.pm
+META.yml                                 Module meta-data (added by MakeMaker)

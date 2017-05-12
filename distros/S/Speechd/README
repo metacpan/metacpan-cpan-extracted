@@ -1,0 +1,186 @@
+NAME
+    Speechd - Perl Module wrapper for speech-dispatcher.
+
+DESCRIPTION
+    Speechd is a Perl module to make it easy to use speech-dispatcher for
+    text to speech functions.
+
+SYNOPSIS
+    my $sd = Speachd->new([property => value, property => value, ...]);
+
+  PROPERTIES
+    port : Port number.
+        Default is 6560
+
+    ip : IP address.
+        Default is 127.0.0.1
+
+    voice : Voice name.
+        Default is MALE1. Possible voice names are: MALE1 MALE2 MALE3
+        FEMALE1 FEMALE2 FEMALE3 CHILD_MALE CHILD_FEMALE
+
+    rate : Speaking rate.
+        Default is 0. Possible values are from -100 to 100.
+
+    volume : Speaking volume.
+        Default is 0. Possible values are from -100 to 100.
+
+    pitch : Speaking pitch.
+        Default is 0. Possible values are from -100 to 100.
+
+    lang : Speaking lanuage.
+        Default value is en (english).
+
+  METHODS
+    new my $sd = Speachd->new([property => value, property => value, ...]);
+
+        Creates a new instance of the Speachd object.
+
+    connect
+        $sd->connect();
+
+        Connect a socket to speech-dispatcher. This must be called before
+        methods say, cancel, voice, volume, pitch, lang, and config_voice
+        can be used.
+
+    disconnect
+        $sd->disconnect();
+
+        Disconnect socket from speech-dispatcher.
+
+    port
+        $sd->port([$port_number]);
+
+        If port number is given; sets port number and returns previos value.
+        If no port number is given; returns value. Default value is 6560
+
+    ip  $sd->ip([$ip_address]);
+
+        If ip address is given; sets ip address and returns previos value.
+        If no ip address is given; returns value. Default value is 127.0.0.1
+
+    voice
+        $sd->voice([$voice]);
+
+        If voice is given; sets voice and returns previos value. If no voice
+        is given; returns value. Default value is MALE1. Possible values
+        are: MALE1 MALE2 MALE3 FEMALE1 FEMALE2 FEMALE3 CHILD_MALE
+        CHILD_FEMALE If not connected, method msg will return error.
+
+    rate
+        $sd->rate([$rate]);
+
+        If rate is given; sets rate and returns previos value. If no rate is
+        given; returns value. Default value is 0. Possible values are from
+        -100 to 100. If not connected, method msg will return error.
+
+    volume
+        $sd->volume([$volume]);
+
+        If volume is given; sets volume and returns previos value. If no
+        volume is given; returns value. Default value is 0. Possible values
+        are from -100 to 100. If not connected, method msg will return
+        error.
+
+    pitch
+        $sd->pitch([$pitch]);
+
+        If volume is given; sets volume and returns previos value. If no
+        volume is given; returns value. Default value is 0. Possible values
+        are from -100 to 100. If not connected, method msg will return
+        error.
+
+    lang
+        $sd->lang([$lang]);
+
+        If lang is given; sets language and returns previos value. If no
+        lang is given; returns value. Default value is en. If not connected,
+        method msg will return error.
+
+    config_voice
+        $sd->config_voice($voice, $lang, [$rate, $volume, $pitch]);
+
+        Sets parameters for speech-dispatcher. See individual methods for
+        possible values.
+
+    msg my $message = $sd->msg();
+
+        Returns and clears messages from previous command sent to speechd.
+
+    say $sd->say($text_to_speak);
+
+        Sends text to speech-dispatcher to be spoken.
+
+    cancel
+        $sd->cancel();
+
+        Kills speech.
+
+    get_voices
+        my $voices = $sd->get_voices();
+
+        Returns a reference to an array holding all possible voice names.
+
+    sendraw
+        $sd->sendraw($command_to_send_to_speech-dispatcher);
+
+        Available to send commands directly to speech-dispatcher. Puts
+        return messages into msg.
+
+EXAMPLE
+     #!/usr/bin/perl
+
+     use strict;
+     use warnings;
+
+     use Speechd;
+
+     my $rate = 0;
+     my $vol = 0;
+     my $pitch = 0;
+     my $lang = "en";
+     my $voice = "MALE1";
+
+     my $sd = Speechd->new(
+        'rate' => $rate,
+        'volume' => $vol,
+        'lang' => $lang,
+        'voice' => $voice,
+     );
+
+     $sd->connect();
+
+     while (1) {
+        print "Enter text to speak:\n";
+        my $text = <>;
+        $sd->say($text);
+        my $message = $sd->msg();
+        print $message;
+        chomp $text;
+        $text = lc($text);
+        last if $text eq "goodbye";
+     }
+
+     $sd->disconnect();
+
+     exit 0;
+
+SEE ALSO
+    More information about speech-dispatcher can be fount at:
+    http://www.freebsoft.org
+
+AUTHOR
+    Joe Kamphaus, <joe@joekamphaus.net>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2009 by Joe Kamphaus
+
+     This program is free software; you can redistribute it and/or modify
+     it under the terms of the GNU General Public License as published by
+     the Free Software Foundation; version 2 of the License or any later version.
+
+     This module is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     GNU General Public License for more details.
+

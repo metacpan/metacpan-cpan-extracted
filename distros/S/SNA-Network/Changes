@@ -1,0 +1,83 @@
+Revision history for SNA-Network
+
+0.21  2016-01-29
+      - betweenness algorithm now includes edge betweenness
+      - normalisation is now optional in betweenness algorithm
+      - communities method returns an empty list by default (fixed bug #100384)
+
+0.20  2014-11-20
+      - introduced a new community structure class
+      - Louvain method now stores the hierarchical structure
+
+0.19  2013-04-16
+      - added module values and modularity methods for community classes
+      - fixed Louvain algorithm's erroneous quadratic memory consumption
+
+0.17  2012-10-29
+      - maintenance
+
+0.17  2012-09-27
+      - fixed the MCMC Generator not to produce multi edges
+
+0.16  2012-09-05
+      - added Markov Chain Monte Carlo (MCMC) Generator
+
+0.15  2012-08-17
+      - core algorithm accelerated by an order of magnitude
+      - added method total_weight() to SNA::Network
+      - added Louvain community detection algorithm with some basic community handling code
+
+0.14  2012-08-06
+      - added direct generators I<new_from_$format> in Guess and Pajek Filters
+      - added create_node method with automatic indexing
+      - pagerank algorithms accelerated by factor 2 using forward propagation of values
+
+0.13  2010-11-12
+      - added algorithm for in-core collapse sequence
+
+0.12  2010-10-08
+      - added missing test network
+      - linked all submodules in the main documentation
+
+0.11  2010-09-15
+      - added algorithm for betweenness centrality
+
+0.10  2010-09-06
+      - fixed bug in PageRank calculation without any sink nodes
+      - fixed bug in PageRank calculation with a damping factor of 0
+      - added special PageRank calculation for weighted networks
+      - fixed bug in repeated identification of weak components after a change of network structure
+
+0.09  2010-09-01
+      - internal changes to improve speed, API unaffected
+      - use of Object::Tiny::XS for accessors
+
+0.08  2010-07-28
+      - Fixed missing dependency Test::Mem::Cycle
+      - Added PageRank Algorithm
+
+0.07  2010-07-14
+      - Fixed memory leak in edge deletion
+
+0.06  2010-07-12
+      - Fixed bug in edge deletion: edges stayed in node's edge reference list
+
+0.05  2010-04-20
+      - Internal speed-up using hash keys directly instead of sub calls
+      - Changed node degree methods to ignore weights
+      - Introduced specific node degree methods respecting weights
+      - Fixed memory leak: networks with cycles were not freed after usage
+
+0.04  2009-08-25
+      - Fixed edge deletion in some special cases
+      - Added missing test file to MANIFEST
+
+0.03  2009-07-07
+      - Introduced weak component identification
+
+0.02  2009-03-12
+      - Introduced support for network and node plugins
+
+0.01  2009-03-09
+      - First version, released on an unsuspecting world.
+

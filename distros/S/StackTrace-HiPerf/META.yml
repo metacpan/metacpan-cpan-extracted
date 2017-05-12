@@ -1,0 +1,22 @@
+---
+abstract: 'High performance stacktraces'
+author:
+  - 'Justin DeVuyst, C<justin@devuyst.com>'
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: StackTrace::HiPerf
+name: StackTrace-HiPerf
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  XSLoader: 0
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

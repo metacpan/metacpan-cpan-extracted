@@ -1,0 +1,9 @@
+{
+   # Should fail because of strict default
+   @GLOBAL = (1 .. 5);
+}
+
+test: washington.ok adams.ok
+
+%.ok:
+        touch $TARGET

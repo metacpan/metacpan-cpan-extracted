@@ -1,0 +1,89 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Server::Control::Apache;
+
+Server::Control->handle_cli();
+
+
+
+=pod
+
+=head1 NAME
+
+serverctlp - apachectl style controller for servers
+
+=head1 VERSION
+
+version 0.20
+
+=head1 SYNOPSIS
+
+   serverctlp -c class -k start|stop|restart|ping [-d server_root] [-v] [-q]
+   serverctlp -h
+
+=head1 DESCRIPTION
+
+C<serverctlp> uses a L<Server::Control|Server::Control> subclass to start,
+stop, restart or ping (show status of) a server.
+
+=head1 OPTIONS
+
+Required options: -c and -k, and possibly others depending on subclass
+
+ -c, --class         Specify the subclass of Server::Control to use
+ -d, --server-root   Specify the server root - will determine from configuration file if given
+ -h, --help          Print help message
+ -k, --action        Specify action - start, stop, restart, or ping
+ -q, --quiet         Show only errors and warnings
+ -v, --verbose       Show verbose output
+ -I                  Library paths to include
+
+In general, any constructor parameter to L<Server::Control|Server::Control> to
+the subclass can be passed here (replacing underscores with dashes), e.g.
+
+ --name
+ --wait-for-status-secs
+
+=head1 RC FILE
+
+You may place options in an rc file called serverctl.yml in the server root,
+e.g.
+
+    # This is my serverctl.yml
+    use_sudo: 1
+    wait_for_status_secs: 5
+
+You can also specify the path of the rc file with --serverctlrc.
+
+=head1 AUTHOR
+
+Jonathan Swartz
+
+=head1 SEE ALSO
+
+L<Server::Control|Server::Control>, L<apachectlp>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (C) 2007 Jonathan Swartz.
+
+This software is provided "as is" and without any express or implied
+warranties, including, without limitation, the implied warranties of
+merchantibility and fitness for a particular purpose.
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Jonathan Swartz.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
+
+__END__
+

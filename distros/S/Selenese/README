@@ -1,0 +1,43 @@
+NAME
+
+    Selenese - Run Selenium IDE tests without the IDE
+
+SYNOPSIS
+
+     selenese
+
+DESCRIPTION
+
+    This module allows you to run Selenium IDE tests without the IDE.
+
+    This makes your Selenium IDE tests useful for general testing purposes.
+    For example, they could be used in a headless Continuous Integration
+    environment.
+
+REQUIREMENTS
+
+      * Perl 5.18.2 or greater
+
+      This is probably not a hard requirement, but I've not thought much
+      about earlier versions.
+
+      * V8
+
+      On debian and ubuntu this requirement can be satisfied by installing
+      the module libv8-dev.
+
+OPTIONS
+
+ENVIRONMENT
+
+SEE ALSO
+
+BUGS
+
+LICENCE
+
+    Copyright 2016, Paul Johnson (paul@pjcj.net) http://www.pjcj.net
+
+    This software is free. It is licensed under the same terms as Perl
+    itself.
+

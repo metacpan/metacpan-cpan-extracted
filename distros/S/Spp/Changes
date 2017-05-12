@@ -1,0 +1,8 @@
+Revision history for Spp
+
+0.01    2015-11-1
+        First version, released on an unsuspecting world.
+
+0.02    2015-11-2
+        to-rule use JSON function encode_json.
+

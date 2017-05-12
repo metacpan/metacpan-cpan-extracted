@@ -1,0 +1,25 @@
+if ( $# == 1 ) then
+    setenv PATH $1/sbin:$1/bin:$1/usr/sbin:$1/usr/bin:$PATH
+    # fix vessels which ship their own ncurses, but don't clobber $TERMINFO
+    # if it's already been set
+    if ( ! $?TERMINFO && -d $1/share/terminfo ) then
+        setenv TERMINFO $1/share/terminfo
+    endif
+    if ( $?PERL5LIB ) then
+        setenv PERL5LIB $1/lib/perl5/site_perl:$1/lib/perl5:${PERL5LIB}
+    else
+        setenv PERL5LIB $1/lib/perl5/site_perl:$1/lib/perl5
+    endif
+    if ( $?LD_LIBRARY_PATH ) then
+        setenv LD_LIBRARY_PATH $1/lib:${LD_LIBRARY_PATH}
+    else
+        setenv LD_LIBRARY_PATH $1/lib
+    endif
+    if ( $?DYLD_LIBRARY_PATH ) then
+        setenv DYLD_LIBRARY_PATH $1/lib:${DYLD_LIBRARY_PATH}
+    else
+        setenv DYLD_LIBRARY_PATH $1/lib
+    endif
+else
+    echo 'USAGE: source shipwright-source-tcsh BASEPATH'
+endif

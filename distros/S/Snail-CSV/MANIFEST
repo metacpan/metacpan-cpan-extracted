@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Snail-CSV.t
+lib/Snail/CSV.pm

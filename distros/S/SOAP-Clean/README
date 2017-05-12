@@ -1,0 +1,160 @@
+Copyright (c) 2003, Cornell University
+See the file COPYING for the status of this software
+
+SOAP::Clean version 0.02
+========================
+
+		    *** THIS IS AN ALPHA RELEASE ***
+			*** USE WITH CAUTION ***
+
+SOAP::Clean is a set of modules for quickly and simply deploying SOAP
+client and servers. On the server-side, it is intended to enable legacy,
+command-line oriented applications to be made into Web Services with
+little or no modification. On the client-side, it is intended to make
+Web Services look like legacy, command-line oriented applications!
+
+SOAP::Clean was original developed to provide a framework for
+computational scientists to use one another's components, without having
+to download and compile each others codes. The name SOAP::Clean comes
+from the fact that it is designed for entire XML documents and non-XML
+files to be embedded within SOAP requests and responses without losing
+their integrety. These files are passed directly to the legacy
+application on the server and stored directly to disk on the client.
+
+SOAP::Clean is _not_ intended for implementing "servlets". In
+particular, it makes absolutely no attempt to map XML data types into
+convenient Perl datatypes. Nor does it allow arbitrary Perl functions on
+the server to be invoked by SOAP requests. If need this functionality, I
+recommend SOAP::Lite.
+
+You can download the latest release for SOAP::Clean from CPAN or,
+
+	http://www.asp.cornell.edu/soap-clean/SOAP-Clean-lastest.tar.gz
+
+Support 
+======= 
+We wish to acknowledge that the development of this software was/is
+supported by the following National Science Foundation (NSF) under the
+following awards,
+ 
+ACIR-0085969 - Adaptive Software for Field-driven Simulations
+EIA-9972853 - A Two-tier Computation and Visualization Facility for
+	Multiscale Problems
+
+Any opinions, findings, and conclusions or recommendations expressed in
+this publication are those of the author(s) and do not necessarily
+reflect the views of the National Science Foundation.
+
+DEPENDENCIES
+============
+This module requires these other modules and libraries:
+
+    Perl 5.6.x or better
+    XML::LibXML (or XML::Twig 3.10 or better)
+    LWP::Version
+    libxml2 from http://xmlsoft.org/
+
+INSTALLATION
+============
+To install this module type the following (probably as root):
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you are not root, you might try changing the first command to something
+like,
+
+   perl Makefile.PL PREFIX=~/usr/share LIB=~/usr/share/lib/perl5
+
+
+Configuring your web server
+===========================
+
+Then the first thing that has to be done is for your administrative
+people to set up a directory into which you can put CGI scripts. You
+will need write access to this directory so that you can update the
+scripts as we make changes.
+
+Yes, I know - this is a huge security hole. 
+
+Once this is done, save the following script into this directory as
+"printenv".
+
+#!/usr/bin/env perl
+##
+##  printenv -- demo CGI program which just prints its environment
+##
+
+print "Content-type: text/plain\n\n";
+foreach $var (sort(keys(%ENV))) {
+    $val = $ENV{$var};
+    $val =~ s|\n|\\n|g;
+    $val =~ s|"|\\"|g;
+    print "${var}=\"${val}\"\n";
+}
+
+Make sure that the "printenv" script has world read and execute
+permission.
+
+Now try accessing this script from a web browser with the appropriate
+URL. NOTE: When you access the script, you should see the results of
+running the script, not the Perl code for the script!
+
+Once this is working, then you can proceed to installing SOAP::Clean.
+
+Running the sample client and server
+====================================
+
+soap-client.pl contains a sample client. soap-server.cgi contains a
+sample server. These are configured to run without going through the web
+server. This is a quick check that you have installed the external Perl
+libraries and SOAP::Clean correctly.
+
+To run the client, which invokes the server, use,
+
+    % cd examples
+    % perl soap-client.pl
+
+If you get errors from Perl that it can't find some libraries, make sure
+that you have set the PERL5LIB environment variable correctly.
+
+Running the test client and server
+==================================
+
+Copy the files "test.cgi" and "test.sh", which are attached to this
+message, into your CGI directory and make sure that their permissions
+are set correctly.
+
+If you install any of the external Perl library in a non-standard
+location (ie, if you have PERL5LIB in order to get the sample scripts to
+work), then you will have to add,
+
+    use lib '/where/you/installed/the/perl/libs';
+
+or whatever to test.cgi, before the line 'use SOAP::Clean::CGI;'.
+
+Go back to the SOAP-Clean directory and try the following,
+
+    % cd examples
+    % ./wsdl-usage.pl http://.../test.cgi?wsdl
+    % ./wsdl-invoke.pl http://.../test.cgi?wsdl Call x=1 y=2
+
+Congratulations! You've installed and run your first web service!
+
+Writing web services
+====================
+
+Once this is working, then you are ready to write your own web services.
+Unfortunately, I haven't written the documentation for that yet.
+
+Authors
+=======
+Paul Stodghill <mailto:stodghil@cs.cornell.edu>
+Rob Cronin <mailto:rmc24@cornell.edu>
+
+Feedback
+========
+Please send any comments, suggestions, or bug reports to
+<mailto:soap-clean@asp.cornell.edu>

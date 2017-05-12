@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+ShowDiff.pm
+t/1.t
+t/ansi_colored_diff.t
+t/context.t

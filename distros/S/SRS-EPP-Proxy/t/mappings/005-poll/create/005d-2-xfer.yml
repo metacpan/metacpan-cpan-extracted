@@ -1,0 +1,14 @@
+description: Transfer an existing domain away from registrar 100
+registrar: 1
+
+
+request: |-
+ <NZSRSRequest VerMajor="4" VerMinor="4" RegistrarId="101">
+  <DomainUpdate ActionId="005d-2-xfer.yml ">
+    <DomainNameFilter>pepper.co.te</DomainNameFilter>
+  </DomainUpdate>
+ </NZSRSRequest>
+
+
+assertions:
+ - xpath_matches: [ '//Error', '0', 'No errors' ]

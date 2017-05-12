@@ -1,0 +1,104 @@
+Changes for perl module Storm
+
+
+0.240     2013-04-17 14:30:59
+- added table prefix
+
+- 0.22
+Fixed issue with primary key/identifier
+
+0.19      2012-10-03 18:26:16
+- Does not try to install foreign keyes on SQLite DBD driver
+
+0.16
+- Added Storm::Role for composing roles with Storm-enabled attributes
+- Compliant with Moose 2.0+
+
+
+0.15
+- BUG FIX: Update/clear current scope when scope demolished
+
+
+0.14
+- Removed dependancy on MooseX::Method::Signatures
+
+
+0.13
+BUG FIXES:
+- Fixed Limit calues
+
+
+0.12
+- added dbh method to Storm class
+- added trait ForeignKey
+- added on_delete and on_update attributes to relationship objects
+- program no longer dies when trying to inflate an object with a reference to
+another object which no longer exists, no throws a warning and stack trace instead
+- added SotrmForeignKeyConstraintValue type
+
+
+0.11
+- added DeleteWhere query
+
+0.10
+- update to Storm::Role::Query::HasBindParams
+- update Storm::Role::Query, first two arguments passed to query constructor
+are now always the Storm instance and the class to work on
+- supports StormsX::Query::DeleteWhere
+
+0.09
+- removed use of MooseX::Method::Signatures
+
+
+0.08
+- add "has_object" method to Storm::LiveObjects
+BUG FIXES:
+- fixed bug where refresh query was not working on objects with inherited attributes
+
+
+
+0.07
+- updated tutorial (section on creating relationships was outdated)
+
+
+0.06 (ALPHA)
+- added "define" attribute property for custom column definitions
+- added "disconnect" method to Storm::Source
+BUG FIXES:
+- fixed bug with custom inflators/deflators where the Storm object $orm was not
+being passed to the inflator/deflator codeblock
+
+0.05 (ALPHA)
+BUG FIXES:
+- fixed error when overriding properties of inherited attributes
+
+0.04.1 (ALPHA)
+- added ::SQL::Column class
+BUG FIXES:
+- column names were incorrect in sql statements for objects with inherited
+    attributes
+- column names were incorrect in the where clause of sql statements
+
+0.04 (ALPHA)
+- added Storm::Model, for constructing models
+- added "install_model" method to aeolus
+- disabled installation of foreign_keys in "install_class" and
+    "install_junction_tables"
+- deprecated "has_many" sugar
+- added "many_to_many" and "one_to_many" sugar for defining relationships
+- automatically defines foreign_match, local_match, junction_table values
+    in many-to-many relationships if not supplied by user
+- added support for inheritance (needs more work)
+- Storm::Builder renamed to Storm::Object
+- Storm::Role::Meta::Class::table to Storm::Role::Meta::Class::storm_table
+- added meta-trait "AutoTable"
+
+0.03 (ALPHA)
+- updated documentation
+- added StormSQLWhereBoolean type
+
+0.02 (ALPHA)
+- updated documentation
+
+0.01 (ALPHA)
+- original release, 11/20/2010

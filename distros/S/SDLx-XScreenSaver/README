@@ -1,0 +1,37 @@
+SDLx-XScreenSaver
+=============================
+
+This module provides a framework for creating SDL XScreenSaver hacks.
+It follows the same interface as OpenGL::XScreenSaver.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module links to libX11 to determine the size of the XScreenSaver
+provided window.
+
+The following additional Perl modules are required:
+
+SDLx::App
+SDL::Event
+SDL::Events
+SDL::Cursor
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 by John Lightsey <john@nixnuts.net>
+
+Portions of the test code borrowed from OpenGL::XScreenSaver are
+Copyright (C) 2010 by Lars Stoltenow
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.

@@ -1,0 +1,90 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+use Getopt::Std;
+use Siebel::Lbconfig qw(recover_info get_daemon create_files);
+use File::HomeDir 1.00;
+use File::Spec;
+
+our $VERSION = '0.002'; # VERSION
+
+$| = 1;
+
+$Getopt::Std::STANDARD_HELP_VERSION = 2;
+
+sub HELP_MESSAGE {
+    my $option = shift;
+
+    if ( ( defined($option) ) and ( ref($option) eq '' ) ) {
+        print "'-$option' parameter cannot be null\n";
+    }
+
+    print <<BLOCK;
+
+lbconfig - version $main::VERSION
+
+This program will connect to a Siebel server, verify all AOM components eligible for load balancing and generate a corresponding lbconfig.txt file.
+
+The parameters available are:
+
+    -h: prints this help message and exits
+    -e <PATH TO EAPPS*.CFG>: required parameter with the pathname to a directory with the eapps*.cfg files to be edited.
+    -p <PORT>: the Siebel Connection Broker port. This parameter is optional, the default value for it is 2321.
+    -c: optional parameter to the complete path to the configuration file (defaults to .lbconfig.cfg in the user home directory).
+        See the Pod of Siebel::Lbconfig for details on the configuration file.
+
+Beware that environment variables required to connect to a Siebel Enterprise are expected to be already in place.
+
+BLOCK
+
+    exit(0);
+
+}
+
+our %opts;
+getopts( 'e:p:c:h', \%opts );
+HELP_MESSAGE() if ( exists( $opts{h} ) );
+
+foreach my $option (qw(e)) {
+    HELP_MESSAGE($option) unless ( defined( $opts{$option} ) );
+}
+
+my $cfg_file;
+my $default = File::Spec->catfile( File::HomeDir->my_home(), '.lbconfig.cfg' );
+
+if ( exists( $opts{c} ) ) {
+
+    if ( -r $opts{c} ) {
+        $cfg_file = $opts{c};
+        print "Using configuration file at $cfg_file\n";
+    }
+    else {
+        die "file $opts{c} does not exist or is not readable";
+    }
+
+}
+elsif ( -e $default ) {
+    $cfg_file = $default;
+    print "Using default configuration file\n";
+}
+else {
+    die
+"No default configuration file available, create it or specify one with -c option";
+}
+
+my $port;
+if ( exists( $opts{p} ) ) {
+    $port = $opts{p};
+}
+else {
+    $port = 2321;
+}
+
+print "Connecting to the Siebel Enterprise and collecting data...\n";
+my ( $daemon, $stash ) = get_daemon($cfg_file);
+$daemon->run;
+print "Data acquired, checking components and servers...\n";
+my $data_ref = recover_info( $stash, $port );
+print "Creating files...\n";
+create_files( $opts{e}, $data_ref );
+print "Done\n";

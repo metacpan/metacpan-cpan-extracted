@@ -1,0 +1,204 @@
+fam-perl 0.1 Wed, 23 Jul 1997 16:32:38 -0400 by jesse
+Version-Log:
+A good start.
+
+Project-Description: Perl interface to SGI File Access Monitor.
+
+fam-perl 0.2 Wed, 23 Jul 1997 17:59:50 -0400 by jesse
+Parent-Version:      0.1
+Version-Log:
+Messed around w/ structure.
+
+Project-Description: as above
+
+fam-perl 0.3 Wed, 23 Jul 1997 23:01:04 -0400 by jesse
+Parent-Version:      0.2
+Version-Log:
+Wrote most of the wrapper code. Looks good.
+
+Project-Description: as above
+
+fam-perl 0.4 Wed, 23 Jul 1997 23:07:24 -0400 by jesse
+Parent-Version:      0.3
+Version-Log:         empty
+Project-Description: as above
+
+fam-perl 0.5 Wed, 23 Jul 1997 23:08:06 -0400 by jesse
+Parent-Version:      0.4
+Version-Log:         empty
+Project-Description: as above
+
+fam-perl 0.6 Wed, 23 Jul 1997 23:18:11 -0400 by jesse
+Parent-Version:      0.5
+Version-Log:         empty
+Project-Description: as above
+
+fam-perl 0.7 Thu, 24 Jul 1997 11:37:10 -0400 by jesse
+Parent-Version:      0.6
+Version-Log:
+TODO: much more stuff.
+`->new()': appname defaults to script name.
+
+Project-Description: as above
+
+fam-perl 0.8 Thu, 24 Jul 1997 14:18:36 -0400 by jesse
+Parent-Version:      0.7
+Version-Log:
+Wrote `monitor'. Added known bug list.
+
+Project-Description: as above
+
+fam-perl 0.9 Thu, 24 Jul 1997 19:46:39 -0400 by jesse
+Parent-Version:      0.8
+Version-Log:
+Beginnings of `monitor'.
+
+Project-Description: as above
+
+fam-perl 0.10 Fri, 25 Jul 1997 14:56:50 -0400 by jesse
+Parent-Version:      0.9
+Version-Log:
+`magicrcs': continuing.
+
+Project-Description: as above
+
+fam-perl 0.11 Fri, 25 Jul 1997 16:02:30 -0400 by jesse
+Parent-Version:      0.10
+Version-Log:
+`magicrcs': full description.
+
+Project-Description: as above
+
+fam-perl 0.12 Fri, 25 Jul 1997 16:57:16 -0400 by jesse
+Parent-Version:      0.11
+Version-Log:
+`magicrcs' idea & docs developed more.
+
+Project-Description: as above
+
+fam-perl 0.13 Mon, 28 Jul 1997 15:08:35 -0400 by jesse
+Parent-Version:      0.12
+Version-Log:
+`magicrcs': progress.
+
+Project-Description: as above
+
+fam-perl 0.14 Mon, 28 Jul 1997 15:58:21 -0400 by jesse
+Parent-Version:      0.13
+Version-Log:
+`magicrcs': all should be in place.
+
+Project-Description: as above
+
+fam-perl 0.15 Mon, 28 Jul 1997 19:26:43 -0400 by jesse
+Parent-Version:      0.14
+Version-Log:
+`magicrcs': many fixes, looks in good shape.
+
+Project-Description: as above
+
+fam-perl 0.16 Mon, 28 Jul 1997 19:47:26 -0400 by jesse
+Parent-Version:      0.15
+Version-Log:
+`magicrcs': more bugfixes. Seems to work OK!
+
+Project-Description: as above
+
+fam-perl 0.17 Mon, 28 Jul 1997 19:54:12 -0400 by jesse
+Parent-Version:      0.16
+Version-Log:         empty
+Project-Description: as above
+
+fam-perl 0.18 Tue, 29 Jul 1997 15:24:04 -0400 by jesse
+Parent-Version:      0.17
+Version-Log:
+SGI::FAM: cleaner XSUB; simpler `monitor' method; better error-checking;
+fixed request-number thing (I hope); "unique" option to monitoring; fixed
+absolute-path restriction.
+`magicrcs': generalized and expanded permissions modifications; better 
+debugging
+support; somewhat clearer documentation.
+
+Project-Description: as above
+
+fam-perl 0.19 Wed, 30 Jul 1997 16:56:01 -0400 by jesse
+Parent-Version:      0.18
+Version-Log:
+`magicrcs': using absolute paths internally.
+
+Project-Description: as above
+
+fam-perl 0.20 Wed, 30 Jul 1997 19:02:12 -0400 by jesse
+Parent-Version:      0.19
+Version-Log:
+`magicrcs': using non-strict locking on RCS, and other RCS tweaks.
+Using MD5 hashes to streamline change detection.
+
+Project-Description: as above
+
+fam-perl 0.21 Thu, 31 Jul 1997 13:16:50 -0400 by jesse
+Parent-Version:      0.20
+Version-Log:
+`magicrcs' (untested): added --dwim; added stop/restart capacity 
+(undocumented);
+reorganized code a little.
+
+Project-Description: as above
+
+fam-perl 0.22 Thu, 31 Jul 1997 13:40:33 -0400 by jesse
+Parent-Version:      0.21
+Version-Log:
+`magicrcs': Minor bugfixes.
+
+Project-Description: as above
+
+fam-perl 0.23 Thu, 31 Jul 1997 15:07:25 -0400 by jesse
+Parent-Version:      0.22
+Version-Log:
+`magicrcs': fixed up signals.
+
+Project-Description: as above
+
+fam-perl 0.24 Thu, 31 Jul 1997 16:38:19 -0400 by jesse
+Parent-Version:      0.23
+Version-Log:
+`rcsmagic': added RCS logging capability.
+
+Project-Description: as above
+
+fam-perl 0.25 Fri, 01 Aug 1997 11:36:31 -0400 by jesse
+Parent-Version:      0.24
+Version-Log:
+Prep for distribution.
+
+Project-Description: as above
+
+fam-perl 0.26 Tue, 05 Aug 1997 18:10:33 -0400 by jesse
+Parent-Version:      0.25
+Version-Log:
+`magicrcs': more sensible --exclude + --dwim.
+
+Project-Description: as above
+
+fam-perl 1.1 Fri, 08 Aug 1997 11:44:29 -0400 by jesse
+Parent-Version:      0.26
+Version-Log:
+`magicrcs': trivial tweaks. Everything seems useful now.
+
+Project-Description:
+Perl interface to SGI File Access Monitor, and related tools.
+
+fam-perl 1.2 Fri, 19 Sep 1997 13:00:45 -0400 by jesse
+Parent-Version:      1.1
+Version-Log:
+autouse on Pod::Usage in scripts.
+
+Project-Description: as above
+
+fam-perl 1.3 Thu, 25 Sep 1997 22:56:42 -0400 by jesse
+Parent-Version:      1.2
+Version-Log:
+RELEASE 1.002
+Made VC::Rcs::File optional in magicrcs (untested).
+
+Project-Description: as above

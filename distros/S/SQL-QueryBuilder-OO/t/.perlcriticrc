@@ -1,0 +1,87 @@
+
+# $Id: .perlcriticrc 54 2016-03-02 07:02:07Z schieche $
+
+severity = 1
+verbose  = 8
+theme = docs || mine || pbp || bugs
+
+#------------------------------------------------------------------------------
+
+[-Bangs::ProhibitBitwiseOperators]
+
+[BuiltinFunctions::ProhibitBooleanGrep]
+add_themes = mine
+
+[BuiltinFunctions::ProhibitReverseSortBlock]
+add_themes = mine
+
+[BuiltinFunctions::ProhibitStringySplit]
+add_themes = mine
+
+[BuiltinFunctions::RequireBlockGrep]
+add_themes = mine
+
+[BuiltinFunctions::RequireBlockMap]
+add_themes = mine
+
+[-CodeLayout::RequireTidyCode]
+
+[CodeLayout::ProhibitHardTabs]
+allow_leading_tabs = 1
+add_themes = mine
+
+[CodeLayout::ProhibitTrailingWhitespace]
+add_themes = mine
+
+[-CodeLayout::RequireTrailingCommas]
+
+[ControlStructures::ProhibitCascadingIfElse]
+[-ControlStructures::ProhibitCStyleForLoops]
+
+# FUCK ME SIDEWAYS
+[-ControlStructures::ProhibitPostfixControls]
+[-ControlStructures::ProhibitUnlessBlocks]
+[-ControlStructures::ProhibitUntilBlocks]
+
+[Documentation::PodSpelling]
+stop_words = RHS OO TODO
+add_themes = docs
+
+[Documentation::RequirePodSections]
+lib_sections    = NAME|SYNOPSIS|DESCRIPTION|TODO|AUTHOR|LICENSE AND COPYRIGHT
+add_themes = docs
+
+[-Modules::ProhibitMultiplePackages]
+
+[-NamingConventions::Capitalization]
+
+
+[-Subroutines::ProhibitBuiltinHomonyms]
+
+[-References::ProhibitDoubleSigils]
+
+# WHO THE FUCK CAME UP WITH THESE
+[-RegularExpressions::ProhibitComplexRegexes]
+[-RegularExpressions::RequireDotMatchAnything]
+[-RegularExpressions::RequireExtendedFormatting]
+[-RegularExpressions::RequireLineBoundaryMatching]
+
+[-Subroutines::ProhibitSubroutinePrototypes]
+[-Subroutines::RequireArgUnpacking]
+[TestingAndDebugging::RequireUseStrict]
+add_themes = mine
+
+[TestingAndDebugging::RequireUseWarnings]
+add_themes = mine
+
+[ValuesAndExpressions::ProhibitCommaSeparatedStatements]
+[-ValuesAndExpressions::ProhibitConstantPragma]
+[-ValuesAndExpressions::ProhibitEmptyQuotes]
+[-ValuesAndExpressions::ProhibitNoisyQuotes]
+
+[-Variables::ProhibitLocalVars]
+[Variables::ProhibitPackageVars]
+[-Variables::ProhibitPunctuationVars]
+
+[Variables::RequireLocalizedPunctuationVars]
+allow = %ENV %SIG

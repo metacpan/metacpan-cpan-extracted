@@ -1,0 +1,16 @@
+Build.PL
+Changes
+lib/Scalar/Andand.pm
+lib/Scalar/Andand/Scalar.pm
+lib/Scalar/Andand/Undef.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/00-load.t
+t/10-basics.t
+t/11-class_methods.t
+t/pod-coverage.t
+t/pod.t
+SIGNATURE    Added here by Module::Build

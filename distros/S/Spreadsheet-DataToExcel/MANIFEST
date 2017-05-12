@@ -1,0 +1,13 @@
+Build.PL
+Changes
+MANIFEST
+README
+lib/Spreadsheet/DataToExcel.pm
+examples/dump.pl
+examples/interactive_dump.pl
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+Makefile.PL
+META.yml
+META.json

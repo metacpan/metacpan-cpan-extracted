@@ -1,0 +1,10 @@
+#!/usr/bin/env perl
+#!/usr/bin/perl
+
+# For development:
+use FindBin; use lib "$FindBin::RealBin/../lib";
+
+use Strategic::Wiki::Command;
+
+exit Strategic::Wiki::Command->new($0, @ARGV)->run;
+

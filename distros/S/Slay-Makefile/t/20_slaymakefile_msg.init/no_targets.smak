@@ -1,0 +1,3 @@
+# Test make on a file with no default target
+
+%foo:   %bar

@@ -1,0 +1,207 @@
+<!-- sol_lang name=install_header -->
+<script language="javascript">
+function toggle() {
+    input = document.getElementById('generate_key_check');
+    enc = document.getElementById('encryption_key');
+    if (input.checked) {
+        enc.disabled = true;
+    } else {
+        enc.disabled = false;
+    }
+}
+</script>
+<input type="hidden" name="state" value="basic" />
+<!-- sol_var name=messaging_pane -->
+<h1 class="header">Welcome to Solstice</h1>
+<p>Solstice is installed and running, but not fully configured.  Please complete this form to help Solstice generate a configuation file.
+<h2 class="subheader">Basic Configuration</h2>
+<p>Please provide some basic information about your server and your preferences.</p>
+<div class="solstice_box">
+    <table>
+        <tr>
+            <td>
+                Server string:</td>
+            <td><input size="50" type="text" name="server_name" value="<!-- sol_var name=server_name -->" /> <!-- sol_var name=err_server_name --><br />
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" class="sol_formtip">
+                The server string is used to identify this Solstice installation in error messaging and diagnostics.
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Support email: </td>
+            <td><input size="50" type="text" name="support_email" value="<!-- sol_var name=support_email -->"/> <!-- sol_var name=err_support_email --><br />
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" class="sol_formtip">
+                The support email will be shown to users in case of a server error.
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Admin email: </td>
+            <td><input size="50" type="text" name="admin_email" value="<!-- sol_var name=admin_email -->" /> <!-- sol_var name=err_admin_email --><br />
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" class="sol_formtip">
+                Any server-level notifications of errors will go to this address.
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <!-- sol_if name=is_dev_server -->
+                <input type="checkbox" name="is_dev" value="1" checked="checked" id="is_dev_check" />
+                <!-- sol_else -->
+                <input type="checkbox" name="is_dev" value="1" id="is_dev_check" />
+                <!-- /sol_if -->
+                <label for="is_dev_check">Use development mode</label>  <br />
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" class="sol_formtip">
+                Development mode re-checks config files and templates for changes every click, but is slower.
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="2">
+
+                <!-- sol_if name=generate_key -->
+                <input type="radio" name="generate_key" value="1" checked="checked" id="generate_key_check" onChange="toggle();" />
+                <!-- sol_else -->
+                <input type="radio" name="generate_key" value="1" id="generate_key_check" onChange="toggle();" />
+                <!-- /sol_if -->
+                <label for="generate_key_check">Generate a random encryption key.</label> <br />
+
+                <!-- sol_if name=generate_key -->
+                <input type="radio" name="generate_key" value="0" id="provide_key_check" onChange="toggle();">
+                <!-- sol_else -->
+                <input type="radio" name="generate_key" value="0" checked="checked" id="provide_key_check" onChange="toggle();">
+                <!-- /sol_if -->
+                <label for="provide_key_check">Provide a key:</label> <input type="text" id="encryption_key" name="encryption_key" value="<!-- sol_var name=encryption_key -->" <!-- sol_if generate_key --> disabled="true" <!-- /sol_if --> />
+<!-- sol_var name=err_encryption_key -->
+
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" class="sol_formtip">
+                Solstice encrypts much of the data it exposes to the client. If you have an existing key, you can enter it here - otherwise, let us generate a key for you.
+            </td>
+        </tr>
+    </table>
+</div>
+<br/>
+<br/>
+
+<h2 class="subheader">Host Configuration</h2>
+<p>Now help Solstice find a few critical pieces of information about your host.</p>
+<div class="solstice_box">
+    <table>
+        <tr>
+            <td>Fully Qualified Hostname: </td>
+            <td><input size="50" type="text" name="host_name" value="<!-- sol_var name=host_name-->" /> <!-- sol_var name=err_host_name--><br />
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" class="sol_formtip">
+                Solstice will use this hostname when constructing URLs for the user.
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Path to Applications: </td>
+            <td><input size="50" type="text" name="app_path" value="<!-- sol_var name=app_path -->" /> <!-- sol_var name=err_app_path --><br />
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" class="sol_formtip">
+                Solstice applications live in a particular parent directory. Please specify one here - you can add more later.
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Data directory: </td>
+            <td><input size="50" type="text" name="log_directory" value="<!-- sol_var name=log_directory -->" /> <!-- sol_var name=err_log_directory --><br />
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" class="sol_formtip">
+                Please provide the path to a directory your webserver can write to.  Solstice will use this directory to cache resources and write log files.
+            </td>
+        </tr>
+        <tr>
+            <td>
+                URL Root: </td>
+            <td><input size="50" type="text" name="virtual_root" value="<!-- sol_var name=virtual_root -->" /> <!-- sol_var name=err_virtual_root --><br />
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" class="sol_formtip">
+                What URL would you like Solstice to manage? The default, for example, is http://your-host.com<b>/solstice/</b>
+            </td>
+        </tr>
+    </table>
+</div>
+<br/>
+<br/>
+
+<h2 class="subheader">Database Configuration</h2>
+<p>
+The install process will try to connect to the database with the username and password given.  If there are no tables in the 
+databases, we'll go ahead and populate them.  Solstice currently only supports MySQL.
+</p>
+<div class="solstice_box">
+    <table>
+        <tr>
+            <td>Database host:</td>
+            <td>
+                <input size="50" type="text" name="dbhost" value="<!-- sol_var name=dbhost -->" /> <!-- sol_var name=err_dbhost -->
+            </td>
+        </tr>
+        <tr>
+            <td>Database port:</td>
+            <td>
+                <input size="50" type="text" name="dbport" value="<!-- sol_var name=dbport -->" /> <!-- sol_var name=err_dbport -->
+            </td>
+        </tr>
+        <tr>
+            <td> Database user:</td>
+            <td>
+                <input size="50" type="text" name="dbuser" value="<!-- sol_var name=dbuser -->" /> <!-- sol_var name=err_dbuser -->
+            </td>
+        </tr>
+        <tr>
+            <td> Database password: </td>
+            <td>
+                <input size="50" type="password" name="dbpass" value="<!-- sol_var name=dbpass -->" /> <!-- sol_var name=err_dbpass -->
+            </td>
+        </tr>
+        <tr>
+            <td> Confirm password: </td>
+            <td>
+                <input size="50" type="password" name="dbpass2" value="<!-- sol_var name=dbpass -->" /> 
+            </td>
+        </tr>
+        <tr>
+            <td> Solstice Database name:</td>
+            <td>
+                <input size="50" type="text" name="solstice_dbname" value="<!-- sol_var name=solstice_dbname -->" /> <!-- sol_var name=err_solstice_dbname --><br />
+            </td>
+        </tr>
+        <tr>
+            <td> Session Database name:</td>
+            <td>
+                <input size="50" type="text" name="session_dbname" value="<!-- sol_var name=session_dbname -->" /> <!-- sol_var name=err_session_dbname --><br />
+            </td>
+        </tr>
+    </table>
+</div>
+<input type="hidden" name="submit" value="1"/>
+<br/>
+<br/>
+<input type="submit" value="<!-- sol_lang name=install_save_button -->" />
+<!-- sol_lang name=install_footer -->

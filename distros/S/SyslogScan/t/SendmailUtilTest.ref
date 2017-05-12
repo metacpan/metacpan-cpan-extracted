@@ -1,0 +1,514 @@
+@gLogLineList = (
+   0  SyslogScan::SendmailLineFrom=HASH
+      'attrHash' => HASH
+         'class' => 0
+         'from' => 'joinkids@foo.phyast.pitt.edu'
+         'msgid' => '<199606130458.VAA27831@surf.aqua.net>'
+         'nrcpts' => 1
+         'pri' => 35357
+         'proto' => 'ESMTP'
+         'relay' => 'hamlet.phyast.pitt.edu [136.142.111.40]'
+         'size' => 5357
+      'attrListString' => undef
+      'content' => 'BAA26050: from=<joinkids@foo.phyast.pitt.edu>, size=5357, class=0, pri=35357, nrcpts=1, msgid=<199606130458.VAA27831@surf.aqua.net>, proto=ESMTP, relay=hamlet.phyast.pitt.edu [136.142.111.40]'
+      'day' => 13
+      'executable' => 'sendmail'
+      'machine' => 'satellife'
+      'messageID' => 'BAA26050'
+      'month' => 'Jun'
+      'raw' => 'Jun 13 01:38:10 satellife sendmail[26050]: BAA26050: from=<joinkids@foo.phyast.pitt.edu>, size=5357, class=0, pri=35357, nrcpts=1, msgid=<199606130458.VAA27831@surf.aqua.net>, proto=ESMTP, relay=hamlet.phyast.pitt.edu [136.142.111.40]'
+      'tag' => 26050
+      'time' => '01:38:10'
+      'unix_time
+   1  SyslogScan::SendmailLineFrom=HASH
+      'attrHash' => HASH
+         'class' => 0
+         'from' => 'shookway@fs1.ho.man.ac.uk'
+         'msgid' => '<5B013544E0D@fs1.ho.man.ac.uk>'
+         'nrcpts' => 1
+         'pri' => 30954
+         'proto' => 'ESMTP'
+         'relay' => 'curlew.cs.man.ac.uk [130.88.13.7]'
+         'size' => 954
+      'attrListString' => undef
+      'content' => 'DAA29556: from=<shookway@fs1.ho.man.ac.uk>, size=954, class=0, pri=30954, nrcpts=1, msgid=<5B013544E0D@fs1.ho.man.ac.uk>, proto=ESMTP, relay=curlew.cs.man.ac.uk [130.88.13.7]'
+      'day' => 13
+      'executable' => 'sendmail'
+      'machine' => 'satellife'
+      'messageID' => 'DAA29556'
+      'month' => 'Jun'
+      'raw' => 'Jun 13 01:50:16 satellife sendmail[29556]: DAA29556: from=<shookway@fs1.ho.man.ac.uk>, size=954, class=0, pri=30954, nrcpts=1, msgid=<5B013544E0D@fs1.ho.man.ac.uk>, proto=ESMTP, relay=curlew.cs.man.ac.uk [130.88.13.7]'
+      'tag' => 29556
+      'time' => '01:50:16'
+      'unix_time
+   2  SyslogScan::SendmailLineTo=HASH
+      'attrHash' => HASH
+         'delay' => '00:00:05'
+         'mailer' => 'fidogate'
+         'stat' => 'Sent'
+         'to' => '<shoko@time.healthnet.org>'
+      'attrListString' => undef
+      'content' => 'DAA29556: to=<shoko@time.healthnet.org>, delay=00:00:05, mailer=fidogate, stat=Sent'
+      'day' => 13
+      'executable' => 'sendmail'
+      'machine' => 'satellife'
+      'messageID' => 'DAA29556'
+      'month' => 'Jun'
+      'raw' => 'Jun 13 01:50:17 satellife sendmail[29558]: DAA29556: to=<shoko@time.healthnet.org>, delay=00:00:05, mailer=fidogate, stat=Sent'
+      'tag' => 29558
+      'time' => '01:50:17'
+      'toList' => ARRAY
+         0  'shoko@time.healthnet.org'
+      'unix_time
+   3  SyslogScan::SendmailLineTo=HASH
+      'attrHash' => HASH
+         'delay' => '03:48:49'
+         'mailer' => 'smtp'
+         'relay' => 'utmem1.utmem.edu. [132.192.1.1]'
+         'stat' => 'Sent (Ok.)'
+         'to' => 'AntCount1@ANT.UTMEM.EDU'
+      'attrListString' => undef
+      'content' => 'WAA18702: to=AntCount1@ANT.UTMEM.EDU, delay=03:48:49, mailer=smtp, relay=utmem1.utmem.edu. [132.192.1.1], stat=Sent (Ok.)'
+      'day' => 13
+      'executable' => 'sendmail'
+      'machine' => 'satellife'
+      'messageID' => 'WAA18702'
+      'month' => 'Jun'
+      'raw' => 'Jun 13 02:31:32 satellife sendmail[21570]: WAA18702: to=AntCount1@ANT.UTMEM.EDU, delay=03:48:49, mailer=smtp, relay=utmem1.utmem.edu. [132.192.1.1], stat=Sent (Ok.)'
+      'tag' => 21570
+      'time' => '02:31:32'
+      'toList' => ARRAY
+         0  'antcount1@ant.utmem.edu'
+      'unix_time
+   4  SyslogScan::SendmailLineFrom=HASH
+      'attrHash' => HASH
+         'class' => 0
+         'from' => 'help-net@bar.temple.edu'
+         'msgid' => '<199606130634.BAA26035@satellife.healthnet.org>'
+         'nrcpts' => 1
+         'pri' => 37000
+         'proto' => 'SMTP'
+         'relay' => 'vm.temple.edu [155.247.14.2]'
+         'size' => 7000
+      'attrListString' => undef
+      'content' => 'BAA26035: from=<HELP-NET@BAR.TEMPLE.EDU>, size=7000, class=0, pri=37000, nrcpts=1, msgid=<199606130634.BAA26035@satellife.healthnet.org>, proto=SMTP, relay=vm.temple.edu [155.247.14.2]'
+      'day' => 13
+      'executable' => 'sendmail'
+      'machine' => 'satellife'
+      'messageID' => 'BAA26035'
+      'month' => 'Jun'
+      'raw' => 'Jun 13 02:34:54 satellife sendmail[26035]: BAA26035: from=<HELP-NET@BAR.TEMPLE.EDU>, size=7000, class=0, pri=37000, nrcpts=1, msgid=<199606130634.BAA26035@satellife.healthnet.org>, proto=SMTP, relay=vm.temple.edu [155.247.14.2]'
+      'tag' => 26035
+      'time' => '02:34:54'
+      'unix_time
+   5  SyslogScan::SendmailLineTo=HASH
+      'attrHash' => HASH
+         'delay' => '00:00:03'
+         'mailer' => 'fidogate'
+         'stat' => 'Sent'
+         'to' => '<joil_Gupta@ok.healthnet.org>'
+      'attrListString' => undef
+      'content' => 'BAA26050: to=<joil_Gupta@ok.healthnet.org>, delay=00:00:03, mailer=fidogate, stat=Sent'
+      'day' => 13
+      'executable' => 'sendmail'
+      'machine' => 'satellife'
+      'messageID' => 'BAA26050'
+      'month' => 'Jun'
+      'raw' => 'Jun 13 02:38:12 satellife sendmail[26052]: BAA26050: to=<joil_Gupta@ok.healthnet.org>, delay=00:00:03, mailer=fidogate, stat=Sent'
+      'tag' => 26052
+      'time' => '02:38:12'
+      'toList' => ARRAY
+         0  'joil_gupta@ok.healthnet.org'
+      'unix_time
+   6  SyslogScan::SendmailLineTo=HASH
+      'attrHash' => HASH
+         'delay' => '00:00:05'
+         'mailer' => 'fidogate'
+         'stat' => 'Sent'
+         'to' => '<helkaire@OK.HEALTHNET.ORG>'
+      'attrListString' => undef
+      'content' => 'BAA26035: to=<helkaire@OK.HEALTHNET.ORG>, delay=00:00:05, mailer=fidogate, stat=Sent'
+      'day' => 13
+      'executable' => 'sendmail'
+      'machine' => 'satellife'
+      'messageID' => 'BAA26035'
+      'month' => 'Jun'
+      'raw' => 'Jun 13 02:34:56 satellife sendmail[26038]: BAA26035: to=<helkaire@OK.HEALTHNET.ORG>, delay=00:00:05, mailer=fidogate, stat=Sent'
+      'tag' => 26038
+      'time' => '02:34:56'
+      'toList' => ARRAY
+         0  'helkaire@ok.healthnet.org'
+      'unix_time
+   7  SyslogScan::SendmailLineFrom=HASH
+      'attrHash' => HASH
+         'class' => 0
+         'from' => 'unique3%sswmbx%fdaoc@mr.cvmvax.gov'
+         'msgid' => '<01I5UFEL02D08WWMKN@fdavm.cvm.fda.gov>'
+         'nrcpts' => 2
+         'pri' => 60519
+         'proto' => 'SMTP'
+         'relay' => 'CVMVAX.CVM.FDA.GOV [150.148.182.51]'
+         'size' => 519
+      'attrListString' => undef
+      'content' => 'CAA26881: from=<UNIQUE3%SSWMBX%FDAOC@MR.CVMVAX.GOV>, size=519, class=0, pri=60519, nrcpts=2, msgid=<01I5UFEL02D08WWMKN@fdavm.cvm.fda.gov>, proto=SMTP, relay=CVMVAX.CVM.FDA.GOV [150.148.182.51]'
+      'day' => 13
+      'executable' => 'sendmail'
+      'machine' => 'satellife'
+      'messageID' => 'CAA26881'
+      'month' => 'Jun'
+      'raw' => 'Jun 13 02:11:59 satellife sendmail[26888]: CAA26881: from=<UNIQUE3%SSWMBX%FDAOC@MR.CVMVAX.GOV>, size=519, class=0, pri=60519, nrcpts=2, msgid=<01I5UFEL02D08WWMKN@fdavm.cvm.fda.gov>, proto=SMTP, relay=CVMVAX.CVM.FDA.GOV [150.148.182.51]'
+      'tag' => 26888
+      'time' => '02:11:59'
+      'unix_time
+   8  SyslogScan::SendmailLineTo=HASH
+      'attrHash' => HASH
+         'delay' => '00:00:06'
+         'mailer' => 'local'
+         'stat' => 'Sent'
+         'to' => '<uniman@ok.edu>'
+      'attrListString' => undef
+      'content' => 'CAA26881: to=<uniman@ok.edu>, delay=00:00:06, mailer=local, stat=Sent'
+      'day' => 13
+      'executable' => 'sendmail'
+      'machine' => 'satellife'
+      'messageID' => 'CAA26881'
+      'month' => 'Jun'
+      'raw' => 'Jun 13 02:12:01 satellife sendmail[26888]: CAA26881: to=<uniman@ok.edu>, delay=00:00:06, mailer=local, stat=Sent'
+      'tag' => 26888
+      'time' => '02:12:01'
+      'toList' => ARRAY
+         0  'uniman@ok.edu'
+      'unix_time
+   9  SyslogScan::SendmailLineTo=HASH
+      'attrHash' => HASH
+         'ctladdr' => 'phil (251/30)'
+         'delay' => '00:00:11'
+         'mailer' => 'prog'
+         'stat' => 'Sent'
+         'to' => '"<uni>|IFS=" " && exec /usr/local/bin/procmail -f- || exit 75 #phil"@ok.com'
+      'attrListString' => undef
+      'content' => 'CAA26881: to="<uni>|IFS=\' \' && exec /usr/local/bin/procmail -f- || exit 75 #phil"@ok.com, ctladdr=phil (251/30), delay=00:00:11, mailer=prog, stat=Sent'
+      'day' => 13
+      'executable' => 'sendmail'
+      'machine' => 'satellife'
+      'messageID' => 'CAA26881'
+      'month' => 'Jun'
+      'raw' => 'Jun 13 02:12:06 satellife sendmail[26888]: CAA26881: to="<uni>|IFS=\' \' && exec /usr/local/bin/procmail -f- || exit 75 #phil"@ok.com, ctladdr=phil (251/30), delay=00:00:11, mailer=prog, stat=Sent'
+      'tag' => 26888
+      'time' => '02:12:06'
+      'toList' => ARRAY
+         0  '"<uni>|ifs=" " && exec /usr/local/bin/procmail -f- || exit 75 #phil"@ok.com'
+      'unix_time
+   10  SyslogScan::SendmailLineFrom=HASH
+      'attrHash' => HASH
+         'class' => 0
+         'from' => 'unique3@vm.temple.edu'
+         'msgid' => '<199606130827.DAA29007@satellife.healthnet.org>'
+         'nrcpts' => 1
+         'pri' => 31531
+         'proto' => 'SMTP'
+         'relay' => 'vm.temple.edu [155.247.14.2]'
+         'size' => 1531
+      'attrListString' => undef
+      'content' => 'DAA29007: from=<UNIQUE3@VM.TEMPLE.EDU>, size=1531, class=0, pri=31531, nrcpts=1, msgid=<199606130827.DAA29007@satellife.healthnet.org>, proto=SMTP, relay=vm.temple.edu [155.247.14.2]'
+      'day' => 13
+      'executable' => 'sendmail'
+      'machine' => 'satellife'
+      'messageID' => 'DAA29007'
+      'month' => 'Jun'
+      'raw' => 'Jun 13 03:27:42 satellife sendmail[29007]: DAA29007: from=<UNIQUE3@VM.TEMPLE.EDU>, size=1531, class=0, pri=31531, nrcpts=1, msgid=<199606130827.DAA29007@satellife.healthnet.org>, proto=SMTP, relay=vm.temple.edu [155.247.14.2]'
+      'tag' => 29007
+      'time' => '03:27:42'
+      'unix_time
+   11  SyslogScan::SendmailLineClone=HASH
+      'attrHash' => HASH
+         'owner' => 'hello-l-owner'
+      'attrListString' => undef
+      'clonedFrom' => 'DAA29007'
+      'content' => 'DAA29008: clone DAA29007, owner=hello-l-owner'
+      'day' => 13
+      'executable' => 'sendmail'
+      'machine' => 'satellife'
+      'messageID' => 'DAA29008'
+      'month' => 'Jun'
+      'raw' => 'Jun 13 03:27:43 satellife sendmail[24788]: DAA29008: clone DAA29007, owner=hello-l-owner'
+      'tag' => 24788
+      'time' => '03:27:43'
+      'unix_time
+   12  SyslogScan::SendmailLineTo=HASH
+      'attrHash' => HASH
+         'delay' => '00:00:03'
+         'mailer' => 'fidogate'
+         'stat' => 'Sent'
+         'to' => '<unizney@OK.HEALTHNET.ORG>'
+      'attrListString' => undef
+      'content' => 'DAA29007: to=<unizney@OK.HEALTHNET.ORG>, delay=00:00:03, mailer=fidogate, stat=Sent'
+      'day' => 13
+      'executable' => 'sendmail'
+      'machine' => 'satellife'
+      'messageID' => 'DAA29007'
+      'month' => 'Jun'
+      'raw' => 'Jun 13 03:27:44 satellife sendmail[29009]: DAA29007: to=<unizney@OK.HEALTHNET.ORG>, delay=00:00:03, mailer=fidogate, stat=Sent'
+      'tag' => 29009
+      'time' => '03:27:44'
+      'toList' => ARRAY
+         0  'unizney@ok.healthnet.org'
+      'unix_time
+   13  SyslogScan::SendmailLineTo=HASH
+      'attrHash' => HASH
+         'delay' => '00:00:03'
+         'mailer' => 'fidogate'
+         'stat' => 'Sent'
+         'to' => '<unilo@OK.HELLO.ORG>'
+      'attrListString' => undef
+      'content' => 'DAA29008: to=<unilo@OK.HELLO.ORG>, delay=00:00:03, mailer=fidogate, stat=Sent'
+      'day' => 13
+      'executable' => 'sendmail'
+      'machine' => 'satellife'
+      'messageID' => 'DAA29008'
+      'month' => 'Jun'
+      'raw' => 'Jun 13 03:27:44 satellife sendmail[29019]: DAA29008: to=<unilo@OK.HELLO.ORG>, delay=00:00:03, mailer=fidogate, stat=Sent'
+      'tag' => 29019
+      'time' => '03:27:44'
+      'toList' => ARRAY
+         0  'unilo@ok.hello.org'
+      'unix_time
+   14  SyslogScan::SendmailLineFrom=HASH
+      'attrHash' => HASH
+         'class' => 0
+         'from' => 'unique1@usa.healthnet.org'
+         'msgid' => '<199606131826.OAA20646@satellife.healthnet.org>'
+         'nrcpts' => 2
+         'pri' => 60214
+         'relay' => 'majordom@localhost'
+         'size' => 214
+      'attrListString' => undef
+      'content' => 'OAA20646: from=unique1@usa.healthnet.org, size=214, class=0, pri=60214, nrcpts=2, msgid=<199606131826.OAA20646@satellife.healthnet.org>, relay=majordom@localhost'
+      'day' => 13
+      'executable' => 'sendmail'
+      'machine' => 'satellife'
+      'messageID' => 'OAA20646'
+      'month' => 'Jun'
+      'raw' => 'Jun 13 03:27:57 satellife sendmail[20646]: OAA20646: from=unique1@usa.healthnet.org, size=214, class=0, pri=60214, nrcpts=2, msgid=<199606131826.OAA20646@satellife.healthnet.org>, relay=majordom@localhost'
+      'tag' => 20646
+      'time' => '03:27:57'
+      'unix_time
+   15  SyslogScan::SendmailLineTo=HASH
+      'attrHash' => HASH
+         'delay' => '00:00:00'
+         'mailer' => 'local'
+         'stat' => 'Sent'
+         'to' => 'unione@ok.healthnet.org'
+      'attrListString' => undef
+      'content' => 'OAA20646: to=unione@ok.healthnet.org, delay=00:00:00, mailer=local, stat=Sent'
+      'day' => 13
+      'executable' => 'sendmail'
+      'machine' => 'satellife'
+      'messageID' => 'OAA20646'
+      'month' => 'Jun'
+      'raw' => 'Jun 13 03:27:57 satellife sendmail[20648]: OAA20646: to=unione@ok.healthnet.org, delay=00:00:00, mailer=local, stat=Sent'
+      'tag' => 20648
+      'time' => '03:27:57'
+      'toList' => ARRAY
+         0  'unione@ok.healthnet.org'
+      'unix_time
+   16  SyslogScan::SendmailLineTo=HASH
+      'attrHash' => HASH
+         'ctladdr' => 'phil (251/30)'
+         'delay' => '00:00:02'
+         'mailer' => 'prog'
+         'stat' => 'Sent'
+         'to' => 'unitwo@ok.foo.org'
+      'attrListString' => undef
+      'content' => 'OAA20646: to=unitwo@ok.foo.org, ctladdr=phil (251/30), delay=00:00:02, mailer=prog, stat=Sent'
+      'day' => 13
+      'executable' => 'sendmail'
+      'machine' => 'satellife'
+      'messageID' => 'OAA20646'
+      'month' => 'Jun'
+      'raw' => 'Jun 13 03:27:59 satellife sendmail[20648]: OAA20646: to=unitwo@ok.foo.org, ctladdr=phil (251/30), delay=00:00:02, mailer=prog, stat=Sent'
+      'tag' => 20648
+      'time' => '03:27:59'
+      'toList' => ARRAY
+         0  'unitwo@ok.foo.org'
+      'unix_time
+   17  SyslogScan::SendmailLineFrom=HASH
+      'attrHash' => HASH
+         'class' => 0
+         'from' => 'netprod@radirect.isinet.com'
+         'msgid' => '<9606130821.AA24400@radirect>'
+         'nrcpts' => 1
+         'pri' => 43148
+         'proto' => 'ESMTP'
+         'relay' => '[199.4.155.10]'
+         'size' => 13148
+      'attrListString' => undef
+      'content' => 'DAA29033: from=<netprod@radirect.isinet.com>, size=13148, class=0, pri=43148, nrcpts=1, msgid=<9606130821.AA24400@radirect>, proto=ESMTP, relay=[199.4.155.10]'
+      'day' => 13
+      'executable' => 'sendmail'
+      'machine' => 'satellife'
+      'messageID' => 'DAA29033'
+      'month' => 'Jun'
+      'raw' => 'Jun 13 03:29:32 satellife sendmail[29033]: DAA29033: from=<netprod@radirect.isinet.com>, size=13148, class=0, pri=43148, nrcpts=1, msgid=<9606130821.AA24400@radirect>, proto=ESMTP, relay=[199.4.155.10]'
+      'tag' => 29033
+      'time' => '03:29:32'
+      'unix_time
+   18  SyslogScan::SendmailLineTo=HASH
+      'attrHash' => HASH
+         'delay' => '00:00:04'
+         'mailer' => 'fidogate'
+         'stat' => 'Deferred: 451 collect: unexpected close, from=<netprod@radirect.isinet.com>: Host is unreachable'
+         'to' => '<netnusi@ign.healthnet.org>'
+      'attrListString' => undef
+      'content' => 'DAA29033: to=<netnusi@ign.healthnet.org>, delay=00:00:04, mailer=fidogate, stat=Deferred: 451 collect: unexpected close, from=<netprod@radirect.isinet.com>: Host is unreachable'
+      'day' => 13
+      'executable' => 'sendmail'
+      'machine' => 'satellife'
+      'messageID' => 'DAA29033'
+      'month' => 'Jun'
+      'raw' => 'Jun 13 03:29:33 satellife sendmail[29035]: DAA29033: to=<netnusi@ign.healthnet.org>, delay=00:00:04, mailer=fidogate, stat=Deferred: 451 collect: unexpected close, from=<netprod@radirect.isinet.com>: Host is unreachable'
+      'tag' => 29035
+      'time' => '03:29:33'
+      'toList' => ARRAY
+         0  'netnusi@ign.healthnet.org'
+      'unix_time
+   19  SyslogScan::SendmailLineFrom=HASH
+      'attrHash' => HASH
+         'class' => 0
+         'from' => 'unique2@usa.healthnet.org'
+         'msgid' => '<199606131023.GAA01612@satellife.healthnet.org>'
+         'nrcpts' => 1
+         'pri' => 31531
+         'relay' => 'majordom@localhost'
+         'size' => 1531
+      'attrListString' => undef
+      'content' => 'GAA01612: from=unique2@usa.healthnet.org, size=1531, class=0, pri=31531, nrcpts=1, msgid=<199606131023.GAA01612@satellife.healthnet.org>, relay=majordom@localhost'
+      'day' => 13
+      'executable' => 'sendmail'
+      'machine' => 'satellife'
+      'messageID' => 'GAA01612'
+      'month' => 'Jun'
+      'raw' => 'Jun 13 06:23:47 satellife sendmail[1612]: GAA01612: from=unique2@usa.healthnet.org, size=1531, class=0, pri=31531, nrcpts=1, msgid=<199606131023.GAA01612@satellife.healthnet.org>, relay=majordom@localhost'
+      'tag' => 1612
+      'time' => '06:23:47'
+      'unix_time
+   20  SyslogScan::SendmailLineTo=HASH
+      'attrHash' => HASH
+         'delay' => '00:00:06'
+         'mailer' => 'smtp'
+         'relay' => 'mom.yorkhospital.edu. [192.206.231.90]'
+         'stat' => 'Sent (OK ; Job SMTP-NETMAIL (queue MULTINET_SMTP, entry 942) started on SMTP_MOM)'
+         'to' => 'unione@OK.WPGATE.GALAXY.dnet.yorkhospital.edu,unitwo@ok.healthnet.org'
+      'attrListString' => undef
+      'content' => 'GAA01612: to=unione@OK.WPGATE.GALAXY.dnet.yorkhospital.edu,unitwo@ok.healthnet.org, delay=00:00:06, mailer=smtp, relay=mom.yorkhospital.edu. [192.206.231.90], stat=Sent (OK ; Job SMTP-NETMAIL (queue MULTINET_SMTP, entry 942) started on SMTP_MOM)'
+      'day' => 13
+      'executable' => 'sendmail'
+      'machine' => 'satellife'
+      'messageID' => 'GAA01612'
+      'month' => 'Jun'
+      'raw' => 'Jun 13 06:23:53 satellife sendmail[1614]: GAA01612: to=unione@OK.WPGATE.GALAXY.dnet.yorkhospital.edu,unitwo@ok.healthnet.org, delay=00:00:06, mailer=smtp, relay=mom.yorkhospital.edu. [192.206.231.90], stat=Sent (OK ; Job SMTP-NETMAIL (queue MULTINET_SMTP, entry 942) started on SMTP_MOM)'
+      'tag' => 1614
+      'time' => '06:23:53'
+      'toList' => ARRAY
+         0  'unione@ok.wpgate.galaxy.dnet.yorkhospital.edu'
+         1  'unitwo@ok.healthnet.org'
+      'unix_time
+   21  SyslogScan::SendmailLineFrom=HASH
+      'attrHash' => HASH
+         'class' => 0
+         'from' => 'cougithendu@iastate.edu'
+         'msgid' => '<m0uU97Y-0005O1C@uctmail2.uct.ac.za>'
+         'nrcpts' => 1
+         'pri' => 38471
+         'proto' => 'ESMTP'
+         'relay' => 'pop-3.iastate.edu [129.186.6.63]'
+         'size' => 8471
+      'attrListString' => undef
+      'content' => 'FAA01850: from=<CouGithendu@iastate.edu>, size=8471, class=0, pri=38471, nrcpts=1, msgid=<m0uU97Y-0005O1C@uctmail2.uct.ac.za>, proto=ESMTP, relay=pop-3.iastate.edu [129.186.6.63]'
+      'day' => 13
+      'executable' => 'sendmail'
+      'machine' => 'satellife'
+      'messageID' => 'FAA01850'
+      'month' => 'Jun'
+      'raw' => 'Jun 13 08:31:24 satellife sendmail[1850]: FAA01850: from=<CouGithendu@iastate.edu>, size=8471, class=0, pri=38471, nrcpts=1, msgid=<m0uU97Y-0005O1C@uctmail2.uct.ac.za>, proto=ESMTP, relay=pop-3.iastate.edu [129.186.6.63]'
+      'tag' => 1850
+      'time' => '08:31:24'
+      'unix_time
+   22  SyslogScan::SendmailLineTo=HASH
+      'attrHash' => HASH
+         'delay' => '00:00:04'
+         'mailer' => 'fidogate'
+         'stat' => 'Sent'
+         'to' => '<Count11@ok.healthnet.org>'
+      'attrListString' => undef
+      'content' => 'FAA01850: to=<Count11@ok.healthnet.org>, delay=00:00:04, mailer=fidogate, stat=Sent'
+      'day' => 13
+      'executable' => 'sendmail'
+      'machine' => 'satellife'
+      'messageID' => 'FAA01850'
+      'month' => 'Jun'
+      'raw' => 'Jun 13 08:31:26 satellife sendmail[1852]: FAA01850: to=<Count11@ok.healthnet.org>, delay=00:00:04, mailer=fidogate, stat=Sent'
+      'tag' => 1852
+      'time' => '08:31:26'
+      'toList' => ARRAY
+         0  'count11@ok.healthnet.org'
+      'unix_time
+   23  SyslogScan::SendmailLineTo=HASH
+      'attrHash' => HASH
+         'delay' => '00:00:02'
+         'mailer' => 'fidogate'
+         'stat' => 'Sent'
+         'to' => '<Count1@prev.healthnet.org>'
+      'attrListString' => undef
+      'content' => 'NAA20697: to=<Count1@prev.healthnet.org>, delay=00:00:02, mailer=fidogate, stat=Sent'
+      'day' => 13
+      'executable' => 'sendmail'
+      'machine' => 'satellife'
+      'messageID' => 'NAA20697'
+      'month' => 'Jun'
+      'raw' => 'Jun 13 08:42:59 satellife sendmail[20699]: NAA20697: to=<Count1@prev.healthnet.org>, delay=00:00:02, mailer=fidogate, stat=Sent'
+      'tag' => 20699
+      'time' => '08:42:59'
+      'toList' => ARRAY
+         0  'count1@prev.healthnet.org'
+      'unix_time
+   24  SyslogScan::SendmailLineFrom=HASH
+      'attrHash' => HASH
+         'class' => 0
+         'from' => 'countdomo-owner@usa.healthnet.org'
+         'msgid' => '<199606131832.OAA20769@satellife.healthnet.org>'
+         'nrcpts' => 2
+         'pri' => 60216
+         'relay' => 'majordom@localhost'
+         'size' => 216
+      'attrListString' => undef
+      'content' => 'OAA20769: from=Countdomo-Owner@usa.healthnet.org, size=216, class=0, pri=60216, nrcpts=2, msgid=<199606131832.OAA20769@satellife.healthnet.org>, relay=majordom@localhost'
+      'day' => 13
+      'executable' => 'sendmail'
+      'machine' => 'satellife'
+      'messageID' => 'OAA20769'
+      'month' => 'Jun'
+      'raw' => 'Jun 13 08:59:21 satellife sendmail[20769]: OAA20769: from=Countdomo-Owner@usa.healthnet.org, size=216, class=0, pri=60216, nrcpts=2, msgid=<199606131832.OAA20769@satellife.healthnet.org>, relay=majordom@localhost'
+      'tag' => 20769
+      'time' => '08:59:21'
+      'unix_time
+   25  SyslogScan::SendmailLineTo=HASH
+      'attrHash' => HASH
+         'delay' => '00:00:01'
+         'mailer' => 'local'
+         'stat' => 'Sent'
+         'to' => 'Count2@time'
+      'attrListString' => undef
+      'content' => 'OAA20769: to=Count2@time, delay=00:00:01, mailer=local, stat=Sent'
+      'day' => 13
+      'executable' => 'sendmail'
+      'machine' => 'satellife'
+      'messageID' => 'OAA20769'
+      'month' => 'Jun'
+      'raw' => 'Jun 13 09:00:22 satellife sendmail[20771]: OAA20769: to=Count2@time, delay=00:00:01, mailer=local, stat=Sent'
+      'tag' => 20771
+      'time' => '09:00:22'
+      'toList' => ARRAY
+         0  'count2@time'
+      'unix_time
+)

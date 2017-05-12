@@ -1,0 +1,110 @@
+$Id: DOM,v 1.2 1998/01/18 00:21:12 ken Exp $
+
+These are some notes relating SGML::Grove to the core Document Object
+Model <http://www.w3.org/DOM/> (WD-DOM-971009).  In theory it should
+be relatively easy to create a ``DOM layer'' that closely matches the
+DOM spec, I will keep such a possible layer in mind to avoid
+conflicting designs.
+
+The most unique difference between DOM and SGML::Grove is that
+SGML::Grove objects do not carry parent references, in almost all
+cases navigation in a grove will be done using iterator shadow
+classes.  Except as noted below, all navigation methods return a new
+iterator that acts as a proxy for the real node.  Get your first
+iterator by calling `$grove->iter' or `$element->iter', by default
+this iterator will become the new root node for all subsequent
+iterations.
+
+On the left are DOM classes and methods and on the right are equivalent
+SGML::Grove classes, methods, and notes.
+
+Document                            SGML::Grove
+  Node documentType                   not yet implemented
+  Element documentElement             $grove->root
+
+DocumentContext                     there isn't a comparable object
+  Document document                 in SGML::Grove at this time
+
+`Node' in DOM is a supertype of all other nodes in DOM, most `Node'
+functionality is implemented in the `*::Iter' shadow classes in
+SGML::Grove.
+
+Node                                Iter
+  getNodeType()                       use `ref()' and pattern matching to
+                                      match both `TYPE' and `TYPE::Iter'
+  Node getParentNode()                $iter->parent
+  Node getFirstChild()                $iter->contents->[0]
+  NodeList getChildren()              $iter->contents
+                                        returns array
+  boolean hasChildren()               $#{$node->contents} != -1
+  Node getPreviousSibling()           $node->previous
+                                        not yet implemented
+  Node getNextSibling()               $node->next
+  Node insertChild(index, newChild)   splice (@{$node->contents}, $index,
+                                              0, $new_child)'
+                                        returns empty list (see
+                                        `perlfunc(1)' for more info)
+  Node replaceChild(index, newChild)  splice (@{$node->contents}, $index,
+                                              1, $new_child)'
+                                        returns the old child, not an iterator
+  Node removeChild(index)             splice (@{$node->contents}, $index, 1)
+                                        returns the child, not an iterator
+  getElementsByTagName                not yet implemented
+
+NodeList                            NodeList's are Perl arrays
+  getEnumerator, item, replace,
+  append, prepend, insert,
+  remove, getLength
+
+NodeEnumerator                      use Perl array functions or create an Iter
+  getFirst, getNext, getPrevious,
+  getLast, getCurrent, atStart,
+  atEnd
+
+NamedNodeList                       NamedNodeList's are Perl hashes
+  getNode, setNode, remove,
+  item, getLength, getEnumerator
+
+Element                             SGML::Element
+  wstring tagName                     $element->id
+                                      $element->name
+  NamedNodeList attributes            $element->attributes
+                                        returns Perl hash
+  void setAttribute (newAttr)         $element->attr ($name, $value)
+
+Attribute                           Attributes are an anonymous hash member
+                                    of Element, use Element's functions to
+                                    access attributes
+  wstring name                        hash key
+  NodeList value                      $element->attr ($name)
+                                        returns Perl array
+  boolean specified                   defined ($element->attr ($name))
+  wstring toString                    $element->attr_as_string ($name)
+
+Comment                             SGML::Comment
+                                    not yet implemented
+  wstring data
+
+PI                                  SGML::PI
+  wstring name                        not yet implemented, data returns
+                                      whole PI
+  wstring data                       $pi->data
+
+Reference                           `Reference' in DOM is a supertype of
+                                    other references
+  name                                $ref->name
+
+NamedCharacterReference             SGML::SData
+  getReplacementText                  $sdata->as_string ($context)
+                                        context must provide a
+                                        `sdata_mapper' function, otherwise
+                                        references will be returned as
+                                        `[NAME]'
+
+NumericCharacterReference           not yet implemented
+  character, original
+
+Text                                `Text' in DOM is simply Perl scalar data
+  data
+  isIgnorableWhitespace               not yet implemented, will be a
+                                      seperate class

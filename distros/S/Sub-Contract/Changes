@@ -1,0 +1,61 @@
+Revision history for Perl extension Sub::Contract
+
+0.00  2007-02-20
+	- alfa version, still under development
+
+0.01  2008-04-25
+        - releasing alfa version
+
+0.02  2008-04-28
+        - replace Hook::WrapSub with builtin equivalent to enable memoizing later on
+        - more tests
+        - added benchmarking
+
+0.03  2008-04-29
+        - improve code generation
+        - more POD
+        - more tests
+
+0.04  2008-05-07
+        - named contract closure and make it visible in error stack traces
+        - fixed dependencies
+
+0.05  2008-05-22
+        - skip tests if missing module dependencies
+        - added is_a
+        - implemented Cache
+
+0.06  2008-05-24
+        - fixed broken dependency. thanks to Maddingue!
+        - added benchmarking for inline variant
+
+0.07  2008-06-16
+        - force calling context based on ->out()
+        - better validation of return values
+        - pod++
+        - smarter compiler
+
+0.08  2008-06-17
+        - pod++
+        - better error messages
+        - implemented cache profiler
+
+0.09  2008-06-18
+        - fix shared cache bug
+
+0.10  2009-06-02
+        - Sub::Contract now uses its own cache implementation to improve speed
+        - a cache's max size is now a number of entries instead of a memory size
+        - added is_not(), is_one_of(), is_all_of()
+	- renamed undef_or() and defined_and()
+        - pod++
+
+0.11  2009-06-08
+        - bugfix: refused to cache undef results
+        - pod++
+        - added find_contract to Sub::Contract::Pool
+
+0.12  2009-06-16
+        - cache statistics now shows how often cache gets emptied
+        - pod example of cache statistics
+        - test the cache report

@@ -1,0 +1,25 @@
+SqlObject version 0.01
+======================
+
+SQL::SqlObject is a very very simple wrapper for the DBI module, by
+Tim Bunce, providing simple hash and list based access to a database.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires the DBI by Tim Bunce
+
+COPYRIGHT AND LICENCE
+
+This program may be distributed under the same terms as perl.
+
+Copyright (C) 2003 Jeff Goff, Corwin Brust.
+

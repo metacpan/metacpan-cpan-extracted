@@ -1,0 +1,29 @@
+IO-Detect
+=========
+
+Created:      2012-07-09
+Home page:    <https://metacpan.org/release/IO-Detect>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=IO-Detect>
+Maintainer:   Toby Inkster <mailto:tobyink@cpan.org>
+
+0.005  2012-09-05
+
+ - (Addition) as_filehandle function.
+ - Perl 5.8 compatibility.
+
+0.004  2012-07-11
+
+ - (Packaging) Require version 1.24 of Scalar::Util.
+
+0.003  2012-07-10
+
+ - (Bugfix) Re-implementation of IO::Detect::_oneline.
+
+0.002  2012-07-09
+
+ - (Addition) Export configurable ducktype function.
+ - (Bugfix) Add space between two words in qw() list.
+
+0.001  2012-07-09  # Initial release
+
+

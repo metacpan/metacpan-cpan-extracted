@@ -1,0 +1,15 @@
+---
+abstract: 'CeCILL FREE SOFTWARE LICENSE AGREEMENT, Version 2.1'
+author:
+  - 'Jérôme Audoux <jerome.audoux@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.133380'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Software-License-CeCILL
+version: '0.001'

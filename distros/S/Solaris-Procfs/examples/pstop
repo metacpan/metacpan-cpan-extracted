@@ -1,0 +1,18 @@
+#!/usr/local/bin/perl -w
+
+use strict;
+use ExtUtils::testlib;
+use Solaris::Procfs qw(:control_codes writectl);
+use lib '.';
+
+$|++;
+
+my $pid;
+
+foreach $pid (@ARGV) {
+
+	# Stop the process
+	#
+	writectl($pid,PCSTOP) or warn "Can't control process $pid: $!\n";
+}
+

@@ -1,0 +1,125 @@
+Revision history for Perl module ShiftJIS::String.
+
+1.11  Sun Aug  7 07:46:47 2011
+    - rename JAPANESE to String/Japanese.pod.
+
+1.10  Sat Aug  6 10:57:44 2011
+    - fix the tarball with world writable files.
+
+1.08  Sun Feb 21 14:39:58 2010
+    - replaced kana1.t with kana0.t.
+
+1.07  Fri Feb 19 22:32:39 2010
+    - kana1.t: thank you CPAN testers! but parhaps I don't realize why
+      it causes parse errors. I tried to tidy up the initialization.
+    - added kana0.t using \xHH and with the same tests as kana1.t.
+
+1.06  Wed Feb 17 22:02:43 2010
+    - test: I don't know why kana.t sometimes fails...
+            divided the old kana.t into 7 files (kana1.t to kana7.t)
+
+1.05  Sun Feb 14 13:46:20 2010
+    - tr.t: silence perl 5.11.x warning.
+
+1.04  Mon Jan  1 17:07:22 2007
+    - new functions hiraH2Z() and hiraZ2H are added.
+
+1.03  Sat Apr 24 05:48:48 2004
+    - test 22 in test.t is removed since the result of using a substr
+      lvalue multiple times is fixed in perl 5.9.1.
+    - POD in Japanese is renamed as JAPANESE.
+
+1.02  Sun Jul 20 12:35:10 2003
+    - changed INSTALLATION (cf. README).
+    - simplified Makefile.PL.
+    - modified how to build XSUB edition (sorry for inconvenience).
+      The purePerl-XSUB converter is now provided as two perl script files,
+      named "enableXS" and "disableXS".
+      (no longer <perl Makefile.PL xs> and <perl Makefile.PL noxs>.)
+
+1.01  Tue Apr 29 10:49:07 2003
+    - added trim(), ltrim(), rtrim(), rspan(), rcspan().
+    - fix: With Perl 5.003, index and rindex were wrong
+      when SUBSTR ends with \0.
+
+1.00  Sat Sep 15 17:12:22 2002
+    - strtr supports 'h' modifier (returns a hash or a hashref).
+    - added POD in Japanese (see *.pod.jp)
+
+0.20  Sat May 11 15:29:05 2002
+    - added a new test, t/capture.t.
+    - [XS] unreferenced local variables are removed.
+    - modified doc and codes.
+
+0.19  Sat Jan 12 20:21:16 2002
+    - [XS] added some missing sv_2mortal().
+
+0.18  Sat Jan 12 15:11:35 2002
+    - Perl 5.003 warns bareword 'cmp'
+      even if it places on the left of the '=>' operator.
+    - tweaks to internal of XS.
+
+0.17  Sat Jan 05 15:23:18 2002
+    - added strxfrm().
+    - modified internal of strcmp and other comparison functions.
+
+0.16  Wed Jan 02 13:25:02 2002
+    - added strcmp(), strEQ(), strNE(), strLT(), strLE(), strGT(), strGE(),
+      and strsplit().
+
+0.15  Sun Dec 30 10:24:36 2001
+    - bug fix (XS): when toupper, tolower, strrev had gotten
+      a numeral (i.e. not a string), the program crashed!
+
+0.14  Wed Dec 26 20:52:17 2001
+    - Don't call strtr_light() by yourself! (XS version)
+      But now checks TABLE briefly and croaks if weird.
+
+0.13  Wed Dec 26 01:36:34 2001
+    - performance of strtr() and trclosure() in XS is improved.
+
+0.12  Mon Dec 24 17:57:11 2001
+    - strtr() and trclosure() use XS when task is simpler,
+      i.e. both SEARCHLIST and REPLACEMENTLIST are strings (not an arrayref),
+       and neither PATTERN nor TOPATTERN are specified.
+      ('n' modifier enforces to use the Non-XS subroutine.)
+    - amplify tests and documents a bit.
+
+0.11  Sun Dec 23 12:20:47 2001
+    - an XS version and a Non-XS version are in the package.
+    - reverse character ranges without confirmation (by a true 2nd argument
+      for mkrange() or 'r' modifier for trclosure(), strtr()) are croaked.
+
+0.10  Sat Oct 06 11:38:08 2001
+    - improvement of internal.
+
+0.09  Sun Sep 02 22:08:15 2001
+    - bug fix: length, index, rindex passed "" as an argument.
+    - prototypes: any parameters (excluding those of issjis)
+      forces scalar context.
+
+0.08  Sun Jun 10 23:40:38 2001
+    - bug fix: __expand, mkrange on Perl 5.003.
+
+0.07  Fri Jun  8 22:11:38 2001
+    - now runs on Perl 5.003 (maybe). (tested on Active Perl 316)
+    - bug fix: mkrange, end by trail 0x5C following hyphen.
+    - modify t/subst.t (thank you, Andreas Marcel Riechert)
+
+0.06  Wed Jun  6 22:11:38 2001
+    - added README. (thank you, Andreas Marcel Riechert)
+
+0.05  Mon Jun  4 23:15:12 2001
+    - make ./t/*.t files.
+
+0.04  Sat May 12 15:44:25 2001
+    - deprecated split() and related functions. use ShiftJIS::Regexp.
+
+0.03  Sun May  6 23:52:02 2001
+    - bug fix about double byte characters in the pattern fot split().
+
+0.02  Sun May  6 19:18:58 2001
+    - spaceH2Z() and spaceZ2H().
+
+0.01  Sat May  5 09:39:40 2001
+    - original version; created by h2xs 1.19

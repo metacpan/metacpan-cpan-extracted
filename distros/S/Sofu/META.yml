@@ -1,0 +1,50 @@
+--- #YAML:1.0
+name:    Sofu
+version: 0.3
+abstract: |-
+  Perl Interface to Sofu files
+license: MIT
+author:              
+  - Marc Lucksch <perl@marc-s.de>
+distribution_type: module
+requires:     
+    Encode:              2.2
+    Data::Dumper:        0
+    Carp:                0
+recommends:
+    XML::Parser:         0
+build_requires:
+    Test::More:          0
+    Test::Pod:           0
+    Test::Pod::Coverage: 0
+provides:
+   Data::Sofu:
+     file:    lib/Data/Sofu.pm
+     version: 0.3 
+   Data::Sofu::Binary:
+     file:    lib/Data/Sofu/Binary.pm
+     version: 0.3 
+   Data::Sofu::Binary::Bin0200:
+     file:    lib/Data/Sofu/Binary/Bin0200.pm
+     version: 0.3 
+   Data::Sofu::Map:
+     file:    lib/Data/Sofu/Map.pm
+     version: 0.3 
+   Data::Sofu::Object:
+     file:    lib/Data/Sofu/Object.pm
+     version: 0.3 
+   Data::Sofu::Reference:
+     file:    lib/Data/Sofu/Reference.pm
+     version: 0.3 
+   Data::Sofu::SofuML:
+     file:    lib/Data/Sofu/SofuML.pm
+     version: 0.3 
+   Data::Sofu::Undefined:
+     file:    lib/Data/Sofu/Undefined.pm
+     version: 0.3 
+   Data::Sofu::Value:
+     file:    lib/Data/Sofu/Value.pm
+     version: 0.3 
+meta-spec:
+   version: 1.4
+   url: http://module-build.sourceforge.net/META-spec-v1.3.html

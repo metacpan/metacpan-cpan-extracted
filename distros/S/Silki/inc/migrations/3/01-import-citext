@@ -1,0 +1,10 @@
+{
+    use strict;
+    use warnings;
+    use autodie qw( :all );
+
+    return sub {
+        my $installer = shift;
+        $installer->import_contrib_file('citext.sql');
+    };
+}

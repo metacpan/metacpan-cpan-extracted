@@ -1,0 +1,48 @@
+{
+   "abstract" : "Framework for the daily business scripts",
+   "author" : [
+      "Matthias Eckardt <me@imunixx.de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Script-Toolbox",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dumper" : "2",
+            "Fatal" : "1",
+            "File::stat" : "1",
+            "IO::Dir" : "1",
+            "IO::File" : "1",
+            "Time::ParseDate" : "1",
+            "UNIVERSAL" : "1"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.54",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

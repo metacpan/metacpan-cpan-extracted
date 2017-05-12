@@ -1,0 +1,22 @@
+.gitignore
+Build.PL
+Changes
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/Sub/Metadata.pm
+lib/Sub/Metadata.xs
+t/body_type.t
+t/closure_role.t
+t/is_constant.t
+t/is_debuggable.t
+t/is_lvalue.t
+t/is_method.t
+t/package.t
+t/pod_cvg.t
+t/pod_syn.t
+t/prototype.t
+typemap
+SIGNATURE    Added here by Module::Build

@@ -1,0 +1,24 @@
+TYPEMAP
+
+SANE_Auth_Callback		T_PTRREF
+SANE_Bool			T_BOOL
+SANE_Handle			T_SANE_HANDLE
+SANE_Int			T_IV
+SANE_Status			T_IV
+SANE_String_Const		T_PV
+
+
+INPUT
+
+T_SANE_HANDLE
+   if (sv_derived_from($arg, \"Sane::Device\")) {
+       $var = INT2PTR (SANE_Handle, SvIV ((SV*)SvRV ($arg)));
+   } else {
+       croak(\"$var is not of type Sane::Device\");
+   }
+
+
+OUTPUT
+
+T_SANE_HANDLE
+   sv_setref_pv($arg, \"SANE_Handle\", (void*)$var);

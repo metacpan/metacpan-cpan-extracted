@@ -1,0 +1,19 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Script/Carp.pm
+t/00-load.t
+t/01-file.t
+t/02-stop.t
+t/03-croak.t
+t/04-log.t
+t/05-eval_die.t
+t/pod-coverage.t
+t/pod.t
+t/bin/file.pl
+t/bin/file-die.pl
+t/bin/log.pl
+t/tmp/error_log.txt
+META.yml
+META.json                                Module JSON meta-data (added by MakeMaker)

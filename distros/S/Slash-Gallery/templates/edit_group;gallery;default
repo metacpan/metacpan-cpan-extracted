@@ -1,0 +1,46 @@
+__section__
+default
+__description__
+
+__title__
+
+__page__
+gallery
+__lang__
+en_US
+__name__
+edit_group
+__template__
+[% mytitle = BLOCK %][% FILTER strip_literal %]
+[% Slash.getData('header') %]: Edit Gallery
+[% END; END; INCLUDE titlebar title => mytitle %]
+
+<FORM METHOD="POST" ACTION="[% constants.rootdir %]/gallery.pl">
+<TABLE BORDER="0" WIDTH="99%">
+	<TR>
+		<TD>Name</TD>
+		<TD><INPUT NAME="name" VALUE="[% group.name | strip_attribute %]" SIZE="60"></TD>
+	</TR>
+	<TR>
+		<TD>Public</TD>
+		<TD><INPUT TYPE="checkbox" NAME="public" VALUE="1"[% group.public ? " CHECKED" : "" %]></TD>
+	</TR>
+	<TR>
+		<TD>Description</TD>
+		<TD><TEXTAREA NAME="description" ROWS="10" COLS="80">[% group.description | strip_literal %]</TEXTAREA></TD>
+	</TR>
+	<TR>
+		<TD>Users</TD>
+		<TD>Yes, this is a bad interface, but you gotta add/delete users
+			as a comma-separated list of UIDs.
+		<P><TEXTAREA NAME="users" ROWS="10" COLS="80">[% users | strip_literal %]</TEXTAREA></TD>
+	</TR>
+</TABLE>
+<INPUT TYPE="hidden" NAME="formkey" VALUE="[% form.formkey %]">
+<INPUT TYPE="hidden" NAME="group_id" VALUE="[% group.id | strip_attribute %]">
+<INPUT TYPE="hidden" NAME="op" VALUE="save_group">
+<INPUT TYPE="submit">
+</FORM>
+
+__seclev__
+500

@@ -1,0 +1,3 @@
+0.01 - Thu Mar 22 17:22:46 PDT 2007
+* Refactored code from one script into modules
+* Added a cpan filter list, loaded from the wiki we're uploading to

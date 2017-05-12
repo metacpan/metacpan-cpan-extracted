@@ -1,0 +1,46 @@
+Scope-OnExit-Wrap
+
+Running code on scope exit (with pure Perl fallback)
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Scope::OnExit::Wrap
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Scope-OnExit-Wrap
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Scope-OnExit-Wrap
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Scope-OnExit-Wrap
+
+    Search CPAN
+        http://search.cpan.org/dist/Scope-OnExit-Wrap/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013 Lukas Mai
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.

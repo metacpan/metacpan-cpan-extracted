@@ -1,0 +1,49 @@
+Revision history for Perl extension STAFService.
+
+0.25 Nov 5, 2008
+    - Fixing bugs in the SyncHelper module, fixing lockup under load
+      (still need to add more tests about it)
+
+0.24 Oct 25, 2008
+    - Adapting to Perl 5.10
+
+0.23 Oct 1, 2008
+    - Fixed Segfault in PreparePerlInterpreter (thanks Mike)
+
+0.22  Jan 15, 2008
+	- Improved Documentation
+	- Fixed a memory leak that would have happen if the service creator would, for
+	  reasons unknown, call STAF::DelayedAnswer() on the request, and then return
+	  normally instead of returning $STAF::DelayedAnswer.
+
+0.21  Dec 24, 2007
+    - Improved Documentation
+	- The Threaded example does not print warnings anymore
+
+0.20  Dec 5, 2007
+	- Support for threaded services
+
+0.07  Nov 28, 2007
+	- Fixed bug of unclean crash when service failed to load
+	- Improved Linux makefile
+
+0.06  Oct 26, 2007
+    - Improved module-loading. (won't crash STAF when itself crash)
+	- Improved unix-makefile. but probably not working yet.
+	- now have 7 unit tests.
+
+0.05  Sep 24, 2007
+	- Fixed "unreferenced scalar" on service unloading
+
+0.04  Jul 15, 2007
+	- Distributing Issus.
+
+0.03  Jul 15, 2007
+	- Minor bug fixes.
+
+0.02  Jul 6, 2007
+	- Portability, bug fixes.
+
+0.01  Jun 28, 2007
+	- original version; created by Shmuel Fomberg.
+

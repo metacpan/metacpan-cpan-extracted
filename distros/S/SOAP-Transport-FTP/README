@@ -1,0 +1,11 @@
+This package adds MQ support to SOAP::Lite.
+
+To install, perform the following steps:
+
+ perl Build.PL
+ ./Build
+ ./Build test
+ ./Build install
+
+This module is currently unmaintained - if you want to take up maintainership,
+feel free to ask - just send an email to mkutter@cpan.org

@@ -1,0 +1,359 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use File::Slurp;
+use File::Temp qw/tempdir/;
+
+use Getopt::Long;
+use Pod::Usage;
+use VMware::Vix::Host;
+
+my %opt;
+GetOptions(
+    \%opt,
+    "image=s",
+    "store=s",
+    "vessel=s",
+    "base=s",
+    "flags=s",
+    "skip-test!",
+    "partial!",
+    "finalize!",
+    "rcfile=s",
+    "username=s",
+    "password=s",
+    "resume!",
+    "help",
+) or pod2usage(1);
+
+pod2usage(-exitval => 0, -verbose => 2) if $opt{help};
+pod2usage("No image specified") unless $opt{image};
+my @datastores = VMware::Vix::Host->datastore;
+$opt{store} = $datastores[0] if @datastores == 1 and not $opt{store};
+pod2usage("No datastore specified, and can't intuit it") unless $opt{store};
+pod2usage("No vessel specified") unless $opt{vessel};
+
+# Defaults
+$opt{base} = $opt{image} . "-base" unless $opt{base};
+$opt{flags} = "--flags $opt{flags}" if $opt{flags};
+$opt{'skip-test'} = $opt{'skip-test'} ? "--skip-test" : "";
+pod2usage("Can't finalize based on a partial build!") if $opt{finalize} and $opt{partial};
+
+# Connect to the host
+my $passwd = read_file('.passwd', err_mode => 'quiet'); chomp $passwd;
+my $host = VMware::Vix::Host->new( password => $passwd )
+    or die VMware::Vix::Host->error;
+
+# Connect to VM
+my $vm = $host->open( store => $opt{store}, name => $opt{image} )
+    or die VMware::Vix::Host->error;
+if ($vm->power_state eq "powered off") {
+    # no-op; we're all set
+    $opt{resume} = 0;
+} elsif ($opt{resume}) {
+    # XXX: Should check that it doesn't have /opt/install/bin-wrapped yet
+    warn "Resuming build already in progress...\n";
+} else {
+    die "Host is already in state @{[$vm->power_state]}!\n";
+}
+
+# Find the path to the store
+my $path = $host->datastore($opt{store});
+die "Can't find store $opt{store}" unless $path;
+
+# Explode if either path is mounted
+my $mounted = qx(/usr/bin/vmware-mount -L);
+die "Disk is already mounted; please unmount before continuing.\n"
+    if $mounted =~ m{$path/($opt{image}|$opt{base})};
+
+# XXX: This used to be a tmpdir, but it exploded -- I don't recall how
+# right now.  For now, you need a "disk-image" directory to mount it
+# under.
+mkdir("disk-image") unless -d "disk-image";
+my $mountpoint = "disk-image";
+
+# If we're resuming, skip all of the below
+unless ($opt{resume}) {
+
+    # Clone from image if base doesn't exist
+    unless ( -e "$path/$opt{base}" ) {
+        unless ( -e "$path/$opt{image}" ) {
+            die "Can't find image in $path/$opt{image} to clone from";
+        }
+        warn "Creating base '$opt{base}' from '$opt{image}'...\n";
+        !system( '/usr/bin/rsync', "-az", "$path/$opt{image}/", "$path/$opt{base}/" )
+            or die "rsync failed";
+    }
+
+    if (not $opt{partial} or not -e "$path/$opt{image}" ) {
+        # Rsync to clean it up
+        warn "Cloning image...\n";
+        !system(
+            '/usr/bin/rsync',   "-az", "--delete",
+            "$path/$opt{base}/", "$path/$opt{image}/"
+        ) or die "rsync failed";
+    }
+
+    # Mount the disk image
+    $vm->mount($mountpoint);
+
+    # Copy files over
+    warn "Installing source...\n";
+    system( 'sudo', '/bin/rm', '-rf', "$mountpoint/opt/build", "$mountpoint/opt/install" )
+        if $opt{partial};
+    !system( '/usr/bin/svn', 'co', '-q', $opt{vessel}, "$mountpoint/opt/build" )
+        or die "svn co failed";
+
+    # Write init file
+    open( RC, ">", "$mountpoint/etc/rc.local" ) or die "Can't write rc.init: $!";
+    print RC <<EOT;
+#!/bin/sh
+apt-get update
+apt-get install build-essential autoconf libtool perl-modules -y
+cd /opt/build/
+./bin/shipwright-builder --install-base /opt/install $opt{flags} $opt{'skip-test'} 2>&1 | tee /opt/build/complete.log
+halt
+EOT
+    close RC;
+
+    # Unmount
+    `sync`;
+    sleep 5;
+    $vm->unmount;
+
+    # Start 'er up!
+    warn "Starting build...\n";
+    $vm->power_on;
+}
+
+# Wait for it to finish
+my $laststate = "";
+my $lastinstall = 0;
+{
+    sleep 10;
+    my $state = $vm->power_state;
+    if ($laststate ne $state) {
+        warn ucfirst($state) . "...\n";
+        if ($state =~ /tools running/ and $laststate !~ /tools running/ and $opt{username}) {
+            warn "Logging in..\n";
+            $vm->login($opt{username}, $opt{password});
+            warn "Logged in successfully..\n";
+        }
+    }
+    if ($state =~ /tools running/ and $opt{username} and $opt{password}) {
+        require YAML;
+        eval {$vm->copy("/opt/install/installed.yml","installed.yml")};
+        unless ($@) {
+            my $ref = YAML::LoadFile("installed.yml");
+            if ($ref) {
+                if (scalar(@{$ref}) != $lastinstall) {
+                    warn "Installed " . scalar(@{$ref}) ." packages: "
+                        . join(",", @{$ref}[$lastinstall .. @{$ref}-1]) . "\n";
+                }
+                $lastinstall = scalar @{$ref};
+            }
+        }
+    }
+    $laststate = $state;
+    redo unless $state =~ /powered off/;
+}
+sleep 20;
+
+# Check if it succeeded
+$vm->mount($mountpoint);
+!system( "cp", "$mountpoint/opt/build/complete.log", "complete.log" )
+    or warn "(Copy of log failed?)\n";
+unlink("$mountpoint/etc/rc.local");
+die "Build failure!  See complete.log\n"
+    unless -e "$mountpoint/opt/install/bin-wrapped";
+
+# If we want a partial build, don't clone into a clean image
+unless ($opt{partial}) {
+    # Copy out of the image
+    warn "Successfully built!  Copying out of image...\n";
+    !system(
+        "/usr/bin/rsync", "-az",
+        "--delete",       "$mountpoint/opt/install/",
+        "installed-image/"
+    ) or die "rsync extract failed";
+    $vm->unmount;
+
+    # Rsync a clean copy over
+    warn "Cloning a clean image...\n";
+    !system(
+        "/usr/bin/rsync",   "-az", "--delete",
+        "$path/$opt{base}/", "$path/$opt{image}/"
+    ) or die "rsync failed";
+
+    # Mount it again, and copy the built version
+    warn "Installing binaries...\n";
+    $vm->mount($mountpoint);
+    !system(
+        "/usr/bin/rsync", "-az",
+        "installed-image/", "$mountpoint/opt/install/"
+    ) or die "rsync placement failed";
+}
+
+# If we're finalizing, we need a boot cycle on this image to clean
+# everything out
+if ($opt{finalize}) {
+    open( RC, ">", "$mountpoint/etc/rc.local" ) or die "Can't write rc.init: $!";
+    print RC <<EOT;
+#!/bin/sh
+apt-get clean
+sudo rm -rf /tmp/vmware-root
+sudo rm -rf /home/pushmi/.bash_history /home/pushmi/.sudo_as_admin_successful
+sudo rm -rf /root/.bash_history /root/vmware-tools-distrib
+halt
+EOT
+    close RC;
+
+    # Sync and unmount
+    `sync`;
+    sleep 5;
+    $vm->unmount;
+
+    # Boot and wait for it to halt
+    $vm->power_on;
+    warn "Booting and finalizing...\n";
+    sleep 10 until $vm->power_state =~ /powered off/;
+
+    # Re-mount for final rc.local, path changes
+    $vm->mount($mountpoint);
+}
+
+!system( 'cp', $opt{rcfile}, "$mountpoint/etc/rc.local" )
+    or die "run rc.init copy failed" if $opt{rcfile};
+
+# Prepend the installed path to PATH
+my $PATH = do {local @ARGV = "$mountpoint/etc/environment"; $_ = <>; close ARGV; $_};
+$PATH =~ s/PATH="(.*)"\n?/$1/;
+open(ENV, ">", "$mountpoint/etc/environment") or die "Can't open environment for writing: $!";
+print ENV qq{PATH="/opt/install/bin:$PATH"\n};
+close ENV;
+
+# Unmount
+`sync`;
+$vm->unmount;
+
+if ($opt{finalize}) {
+    warn "Defragmenting...\n";
+    $vm->defragment;
+    my @date = (localtime)[5,4,3];
+    my $date = join("-",$date[0]+1900, $date[1]+1, $date[2]);
+    my (@dirs) = File::Spec->splitdir((File::Spec->splitpath($vm->absolute($vm->disk)))[1]);
+    warn "dirs are @dirs";
+    my $dir = pop @dirs;
+    my $path = File::Spec->catdir(@dirs);
+    warn "path is $path; removing $path/*.log";
+    unlink for <$path/*.log>;
+    warn "tar cj -C $path $dir | split -d -b 100M - $opt{image}-$date.tar.bz2.\n";
+    `tar cj -C $path $dir | split -d -b 100M - $opt{image}-$date.tar.bz2.`;
+    warn "Split files into: $opt{image}-$date.tar.bz2.*\n";
+} else {
+    # Power it on to take it for a test ride
+    $vm->power_on;
+    warn "Image started!\n";
+}
+
+__END__
+
+=head1 NAME
+
+jeos-build - Create a stand-alone VMware image from a Shipwright vessel
+
+=head1 SYNOPSIS
+
+  jeos-build --image Vessel \
+             --vessel file://path/to/svn \
+             --skip-test \
+             --rcfile boot-rc.local
+
+=head1 OPTIONS
+
+=over
+
+=item --image C<IMAGENAME>
+
+Sets the name of the VMware image to create.  This option is required.
+
+=item --base C<IMAGENAME>
+
+The base VMware image to clone from.  If this option is not provided,
+it is assumed to be the C<--image> argument with C<-base> appended.
+If the base image does not exist, but the destination image does, the
+base image is first created by copying the destination image.
+
+=item --vessel C<URI>
+
+The URI to the shipwright source vessel.  This should be a URI that
+can be understood by C<svn co>.  This option is required.
+
+=item --store C<PATH>
+
+Specifies the name of the local VMware datastore to use.  This option
+is required if there is more than one local VMware datastore.
+
+=item --flags C<FLAGS>
+
+Specifies the set of flags to be passed on to C<shipwright-build>.
+
+=item --skip-test
+
+Passes C<--skip-test> to the C<shipwright-build> invocation, which
+skips all tests when building the finished vessel.
+
+=item --partial
+
+Creates a I<partial> build.  That is, the completed F</opt/install> is
+not copied out into a new clean copy of the base image, but is left
+in-place.  This option is faster, and usually suffices for all but the
+last clean build.
+
+=item --rcfile C<PATH>
+
+Sets the F<rc.local> file which is copied over to the image after a
+sucessful build.  This file should set up first run properties of the
+appliance.  It omitted, defaults to the default, no-op F<rc.local>.
+
+=item --username C<USERNAME>
+
+A valid username on the VMware image.  Providing this, though not
+required, allows for realtime updates as to the status of the install.
+
+=item --password C<PASSWORD>
+
+The password for the above account.
+
+=item --resume
+
+Used if the build is already in progress on the VMware instance, but
+the corresponding invocation to C<jeos-build> was aborted.  In all
+other cases, it is an error to run C<jeos-build> with the destination
+VMware instance not in the "powered off" state.
+
+=item --help
+
+These help pages.
+
+=back
+
+=head2 FILES
+
+=over
+
+=item F<.passwd>
+
+The password to use when connecting to the local VMware Server.  If
+this file does not exist, or cannot be read, the user will be
+prompted.
+
+=item F</etc/vmware/hostd/datastores.xml>
+
+The default path to the local VMware Server datastore configuration
+file.
+
+=back
+
+=cut
+

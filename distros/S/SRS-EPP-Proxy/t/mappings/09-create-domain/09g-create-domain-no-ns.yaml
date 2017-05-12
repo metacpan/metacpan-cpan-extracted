@@ -1,0 +1,25 @@
+# Create a domain without specifying nameservers
+template: create-domain.tt
+
+vars:
+  domain: 09g.co.te
+  owner: id123
+  admin: shazzam1234
+  tech: alcatraz367
+  no_ns: 1
+
+input_assertions:
+  class: SRS::EPP::Command::Create::Domain
+
+SRS:
+  - assertions:
+      count:
+        - [ '//NameServers/Server', 0, 'SRS: No nameservers' ]
+      match:
+      match_all:
+      attr_is:
+
+
+output_assertions:
+  attr_is:
+    - [ '//epp:result', 'code', '1000', 'EPP: correct response code' ]

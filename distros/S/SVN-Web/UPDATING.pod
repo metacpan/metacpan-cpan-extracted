@@ -1,0 +1,437 @@
+=head1 NAME
+
+UPDATING
+
+=head1 SYNOPSIS
+
+Notes on updating from previous versions of SVN::Web
+
+=head1 WARNING
+
+This is out of date for 0.60
+
+=head1 DESCRIPTION
+
+If you have not modified the supplied template files the update can
+be carried out by:
+
+=over 4
+
+=item 1.
+
+Backing up your existing F<config.yaml> file.
+
+=item 2.
+
+Removing all the files in your current C<svnweb> directory.
+
+=item 3.
+
+Running C<svnweb-install> from this distribution.  This will copy the new
+templates, as well as creating a new F<config.yaml>.
+
+=item 4.
+
+Restoring the F<config.yaml> that you backed up in step 1, and making
+any changes, as described below.
+
+=back
+
+If you have made local modifications then the following information should
+help you merge the changes in this version in to your modified files.
+
+=head2 0.52 to 0.53
+
+=over
+
+=item
+
+Update the C<version> key in your configuration file to 0.53.
+
+=item
+
+Subversion paths are now escaped by SVN::Web before being passed to the
+templates, resulting in a change to every template that contains a path.
+In general, this means that where previously you would write:
+
+  [% path | uri | html %]
+
+in a template, now you can just write
+
+  [% path %]
+
+If you do not re-run C<svnweb-install> when you upgrade to this
+version you B<must> update the templates by hand.
+
+=back
+
+=head2 0.51 to 0.52
+
+=over
+
+=item
+
+Update the C<version> key in your configuration file to 0.52.
+
+=back
+
+=head2 0.50 to 0.51
+
+=over
+
+=item
+
+Update the C<version> key in your configuration file to 0.51.
+
+=back
+
+=head2 0.49 to 0.50
+
+=over 4
+
+=item
+
+The configuration file must now contain a C<version> key, the value of
+which must match the SVN::Web version.  If it is not present, or does
+not match, SVN::Web will C<die()>, and generate an appropriate error in
+the logs.
+
+Add this line:
+
+  version: 0.50
+
+to F<config.yaml>, after making sure that you have updated the
+configuration file to contain all the necessary new directives.
+
+=item
+
+There are many new configuration options for actions.  Either run
+C<svnweb-install>, as advised above, or view the documentation for
+each action, which has been updated to show the new entries that
+should be placed in F<config.yaml> for the action.
+
+This change has also affected all the action templates save for
+F<list> and F<rss>.  There is a new F<Template/trac/_action_menu>
+template.
+
+=item
+
+L<SVN::Web::Blame> has been added, with an associated
+F<Template/trac/blame> template.
+
+=item
+
+Diff generation has changed, resulting in changes to F<Template/trac/diff>
+and F<Template/trac/revision>.  There is a new F<Template/trac/_diff>
+template.
+
+=item
+
+The F<Template/trac/log> template has changed to support paging through
+results and changing how many results are displayed per page.
+
+=item
+
+The F<Template/trac/rss> template has changed to wrap the contents
+of the <description> element in a CDATA marker.
+
+=item
+
+The F<I18N/en.po> localisation file contains several new and updated
+entries.
+
+=back
+
+=head2 0.48 to 0.49
+
+=over 4
+
+=item
+
+F<Template/trac/header>, F<Template/trac/browse>, F<Template/trac/log>,
+F<Template/trav/view>, and F<Style/trac/browser.css> have been updated
+for HTML compliance.
+
+=item
+
+F<Template/trac/diff> no longer uses the CGI module to retrieve the
+current URL.
+
+=back
+
+=head2 0.47 to 0.48
+
+=over 4
+
+=item
+
+F<I18N/fr.po> has a small update.  The diff is at L<http://jc.ngo.org.uk/svnweb/jc/diff/nik/CPAN/SVN-Web/trunk/lib/SVN/Web/I18N/fr.po?rev1=958;rev2=959>.
+
+=item
+
+F<I18N/en.po> has a small update.  The diff is at L<http://jc.ngo.org.uk/svnweb/jc/diff/nik/CPAN/SVN-Web/trunk/lib/SVN/Web/I18N/en.po?rev1=972;rev2=973>.
+
+=item
+
+F<I18N/zh_cn.po> has a small update.  The diff is at L<http://jc.ngo.org.uk/svnweb/jc/diff/nik/CPAN/SVN-Web/trunk/lib/SVN/Web/I18N/zh_cn.po?rev1=898;rev2=899>.
+
+=item
+
+There have been several changes to the templates to support new RSS feeds
+and the new timedate formatting options.
+
+The diffs are:
+
+=over
+
+=item F<trac/browse>
+
+L<http://jc.ngo.org.uk/svnweb/jc/diff/nik/CPAN/SVN-Web/trunk/lib/SVN/Web/Template/trac/browse?revs=977&revs=881>
+
+=item F<trac/diff>
+
+L<http://jc.ngo.org.uk/svnweb/jc/diff/nik/CPAN/SVN-Web/trunk/lib/SVN/Web/Template/trac/diff?rev1=894;rev2=895>
+
+=item F<trac/header>
+
+L<http://jc.ngo.org.uk/svnweb/jc/diff/nik/CPAN/SVN-Web/trunk/lib/SVN/Web/Template/trac/header?revs=977&revs=959>
+
+=item F<trac/list>
+
+L<http://jc.ngo.org.uk/svnweb/jc/diff/nik/CPAN/SVN-Web/trunk/lib/SVN/Web/Template/trac/list?rev1=894;rev2=895>
+
+=item F<trac/log>
+
+L<http://jc.ngo.org.uk/svnweb/jc/diff/nik/CPAN/SVN-Web/trunk/lib/SVN/Web/Template/trac/log?revs=975&revs=891>
+
+=item F<trac/revision>
+
+L<http://jc.ngo.org.uk/svnweb/jc/diff/nik/CPAN/SVN-Web/trunk/lib/SVN/Web/Template/trac/revision?revs=895&revs=890>
+
+=item F<trac/view>
+
+L<http://jc.ngo.org.uk/svnweb/jc/diff/nik/CPAN/SVN-Web/trunk/lib/SVN/Web/Template/trac/view?revs=977&revs=891>
+
+=item F<trac/x>
+
+L<http://jc.ngo.org.uk/svnweb/jc/diff/nik/CPAN/SVN-Web/trunk/lib/SVN/Web/Template/trac/x?rev1=894;rev2=895>
+
+=back
+
+In addition, there is a new F<trac/rss> template, and a new
+F<Style/trac/feed-icon-16x16.png>, both of which must be copied in to
+place.
+
+=item
+
+F<Style/trac/browser.css> contains changes to support the new language
+selection box.  The diff is at L<http://jc.ngo.org.uk/svnweb/jc/diff/nik/CPAN/SVN-Web/trunk/lib/SVN/Web/Style/trac/browser.css?rev1=958;rev2=959>.
+
+=back
+
+=head2 0.46 to 0.47
+
+=over 4
+
+=item
+
+F<I18N/en.po> contains changes relating to caching and bug fixes.  The
+diffs for these changes are at L<http://jc.ngo.org.uk/svnweb/jc/diff/nik/CPAN/SVN-Web/trunk/lib/SVN/Web/I18N/en.po?rev1=863;rev2=864> and L<http://jc.ngo.org.uk/svnweb/jc/diff/nik/CPAN/SVN-Web/trunk/lib/SVN/Web/I18N/en.po?rev1=879;rev2=880>.
+
+=item
+
+All of the F<trac/> templates have been updated to URI escape paths and
+filenames in appropriate places.  The revisions showing these changes are
+L<http://jc.ngo.org.uk/svnweb/jc/revision/?rev=879> and
+L<http://jc.ngo.org.uk/svnweb/jc/revision/?rev=881>.
+
+=item
+
+F<trac/header> and F<trac/log> have been updated to use the C<at_head>
+variable.  The revision with the change is L<http://jc.ngo.org.uk/svnweb/jc/revision/?rev=871>.
+
+=back
+
+=head2 0.45 to 0.46
+
+This was a bug fix release, with no changes to the templates,
+localisation, or configuration files.
+
+=head2 0.44 to 0.45
+
+This was a bug fix release, with no changes to the templates,
+localisation, or configuration files.
+
+=head2 0.43 to 0.44
+
+If you have not modified the supplied templates and localisation files
+the update can be carried out by:
+
+=over 4
+
+=item 1.
+
+Backing up your existing F<config.yaml> file.
+
+=item 2.
+
+Removing all the files in your current C<svnweb> directory.
+
+=item 3.
+
+Running C<svnweb-install> from this distribution.  This will copy the new
+templates and localisation files, as well as creating a new F<config.yaml>.
+
+=item 4.
+
+Restoring the F<config.yaml> that you backed up in step 1.
+
+=back
+
+If you have made local modifications then the following information should
+help you merge the changes in this version in to your modified files.
+
+=over 4
+
+=item
+
+The F<trac/log> template has been changed to remove some output from
+comments.  Although this output was never seen, generating it used CPU
+and memory.  This was especially apparent on changes that affected
+many files.  Using the new F<trac/log> template (or merging the change
+in by hand) will speed up log browsing.
+
+The diff for these changes is at
+L<http://jc.ngo.org.uk/svnweb/jc/revision/?rev=793>.
+
+=item
+
+F<I18N/en.po> has been updated with a new error message when an invalid
+revision number is specified.
+
+The diff for these changes is at
+L<http://jc.ngo.org.uk/svnweb/jc/diff/nik/CPAN/SVN-Web/trunk/lib/SVN/Web/I18N/en.po?revs=794&revs=788>.
+
+=item
+
+F<I18N/en.po> and F<trac/browse> have been updated to show a file's age,
+relative to the last commit that affected it.
+
+The diffs for these changes are at L<http://jc.ngo.org.uk/svnweb/jc/diff/nik/CPAN/SVN-Web/trunk/lib/SVN/Web/I18N/en.po?revs=788&revs=719>
+and L<http://jc.ngo.org.uk/svnweb/jc/diff/nik/CPAN/SVN-Web/trunk/lib/SVN/Web/Template/trac/browse?revs=788&revs=553>.
+
+=back
+
+=head2 0.42 to 0.43
+
+=over 4
+
+=item
+
+The F<en.po> localisation file and F<diff> template have been changed to
+support viewing plain text diffs.  Either copy the supplied files over
+your copies, or merge the changes in by hand if you are using your own
+templates.
+
+The diff for these changes is at
+L<http://jc.ngo.org.uk/svnweb/jc/revision/?rev=719>.
+
+=item
+
+L<SVN::Web::Revision> has a new option controlling whether or not diffs
+are shown when viewing a revision.  To support it the F<revision> template
+has changed.  Either copy the supplied template over your copy, or merge
+the changes by hand if you are using your own template.
+
+The diff for this change is at
+L<http://jc.ngo.org.uk/svnweb/jc/revision?rev=721>.
+
+=item
+
+The templates F<trac/trac.css> and F<trac/code.css> have been changed
+to remove references to images that are not shipped in this distribution.
+This will stop web browsers requesting them, and keeps C<svnweb-server>
+quiet.  It's not essential that you update your copies accordingly, but
+it doesn't hurt either.
+
+The diff for this change is at
+L<http://jc.ngo.org.uk/svnweb/jc/revision?rev=764>.
+
+=back
+
+=head2 0.41 to 0.42
+
+=over 4
+
+=item
+
+The format for specifying actions in the configuration file has changed.
+In addition, there are no longer any default actions -- any actions not
+specified in the configuration file will be ignored.
+
+To retain existing functionality you must ensure that the following
+appears in F<config.yaml>.
+
+  actions:
+    browse:
+      class: SVN::Web::Browse
+    checkout:
+      class: SVN::Web::Checkout
+    diff:
+      class: SVN::Web::Diff
+    list:
+      class: SVN::Web::List
+    log:
+      class: SVN::Web::Log
+    revision:
+      class: SVN::Web::Revision
+    rss:
+      class: SVN::Web::RSS
+    view:
+      class: SVN::Web::View
+
+=item
+
+There have been several changes to the F<trac> templates.  If you have made
+any local modifications then you will need to merge your changes in to the
+new templates.
+
+=item
+
+Use of the C<templatedir> configuration directive is now deprecated.  You
+should use C<templatedirs> instead.  This is to support third party actions
+that supply their own templates in different directories.
+
+C<templatedir> in the configuration file will continue to work, but you
+should change existing entries of the form:
+
+  templatedir: '/path/to/directory'
+
+to this form:
+
+  templatedirs:
+    - '/path/to/directory'
+
+A configuration file that specifies both C<templatedir> and C<templatedirs>
+will generate an exception when anyone browses the repository.
+
+=back
+
+=head2 0.40 to 0.41
+
+After installing the new module you should copy
+F<lib/Templates/trac/header> to F<< <dir>/template/trac/header >>, where
+F<< <dir> >> is the directory in which you ran C<svnweb-install>.
+
+=head2 Anything < 0.40 to 0.40
+
+The 0.40 release includes sweeping changes to the templates, as well
+as additional functionality and configuration directives.  See F<CHANGES>
+for details.
+
+The simplest approach is to backup your existing F<config.yaml> and then
+re-run C<svnweb-install>.  This will generate a new F<config.yaml> and
+copy over the new templates and other files.
+
+It should be easy to migrate your old configuration directives to the new
+configuration file.

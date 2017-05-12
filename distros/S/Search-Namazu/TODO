@@ -1,0 +1,8 @@
+TODO
+
+* 基本的な機能の実装
+	+ 定数の export
+	+ title, author, summary の取得
+* ドキュメントの整備
+* test suites
+	+ test 用 index の作成

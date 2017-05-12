@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE NZSRSResponse SYSTEM "protocol.dtd">
+<NZSRSResponse VerMajor="5" VerMinor="0" RegistrarId="90">
+<Response Action="Whois" FeId="8" FeSeq="6800734" OrigRegistrarId="1" RecipientRegistrarId="90">
+<FeTimeStamp Day="30" Hour="15" Minute="50" Month="7" Second="18" TimeZoneOffset="+12:00" Year="2010"/>
+<Error Hint="MALFORMED_REQUEST_ERROR" ErrorId="INVALID_FIELD" Severity="err">
+<Description><![CDATA[Invalid value in field]]></Description><ErrorDetails><![CDATA[cheese.te]]></ErrorDetails>
+<ErrorDetails><![CDATA[DomainName]]></ErrorDetails></Error></Response>
+<Response Action="Whois" FeId="8" FeSeq="6800734" OrigRegistrarId="1" RecipientRegistrarId="90">
+<FeTimeStamp Day="30" Hour="15" Minute="50" Month="7" Second="18" TimeZoneOffset="+12:00" Year="2010"/>
+<Error Hint="MALFORMED_REQUEST_ERROR" ErrorId="INVALID_FIELD" Severity="err">
+<Description><![CDATA[Invalid value in field]]></Description><ErrorDetails><![CDATA[blah.te]]></ErrorDetails>
+<ErrorDetails><![CDATA[DomainName]]></ErrorDetails></Error></Response></NZSRSResponse>

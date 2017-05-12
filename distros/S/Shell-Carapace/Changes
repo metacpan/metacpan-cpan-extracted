@@ -1,0 +1,74 @@
+Revision history for Shell-Carapace
+
+0.22 2015-12-21T21:54:00Z
+    - Another attempt to deal with open2pty() failures correctly.
+
+0.21 2015-12-21T20:55:22Z
+    - Retry if open2pty() fails and then die if it fails again.
+
+0.20 2015-12-21T19:15:26Z
+    - Last release broke handling of ssh_options attr.  This fixes it.
+
+0.19 2015-12-21T16:16:21Z
+    - Don't connect to remote host lazily -- connect on instantiation.
+
+0.18 2015-12-15T13:46:06Z
+    - Added Test::Fatal to the cpanfile
+    - Made Minilla a 'develop' dependency in the cpanfile
+
+0.17 2015-12-15T13:39:24Z
+    - Die if ssh connection can't be established.
+
+0.16 2015-11-15T23:48:14Z
+    - Pass command to callback on error
+
+0.15 2015-11-15T02:27:26Z
+    - Skip t/ssh.t
+
+0.14 2015-11-15T02:22:03Z
+    - Now passing a hostname to the callback
+
+0.13 2015-09-07T03:05:55Z
+    - Major rewrite.  Not backwards compatible at all.  Splits module into two
+      parts -- Shell::Carapace::Shell and Shell::Carapace::SSH.
+
+0.12 2015-09-05T20:20:50Z
+    - Major rewrite.  Not backwards compatible at all.  Introduces callback
+      concept.
+
+0.11 2015-03-24T23:45:49Z
+    - Die noisely
+
+0.10 2015-02-24T22:02:17Z
+    - Made print_cmd attribute read/write.
+
+0.09 2015-02-18T20:30:00Z
+    - Tee output to the log file.  This time the exit code is preserved.
+
+0.08 2015-02-18T15:42:16Z
+    - Revert most of 0.07.  Piping to tee means we can't know what the exit
+      code of the command is.  Added a test so this case isn't missed in the
+      future.
+
+0.07 2015-02-18T00:56:10Z
+    - Pipe command to tee by default so logfile is written to in realtime.
+
+0.06 2015-02-12T15:28:05Z
+    - Die earlier if logfile has bad permissions
+
+0.05 2015-02-12T00:09:13Z
+    - Don't use 'coerce => 1' so Shell::Carapace is compatible with 
+      Moo <1.006000
+
+0.04 2015-02-09T18:54:46Z
+    - Allow logfile attr to be undef
+
+0.03 2015-02-09T14:25:24Z
+    - Made logging to a file optional
+
+0.02 2015-02-09T11:06:44Z
+    - Minor updates to pod
+
+0.01 2015-02-08T23:37:48Z
+    - Original version
+

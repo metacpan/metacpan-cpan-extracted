@@ -1,0 +1,14 @@
+t/pod-coverage.t
+t/00_regression.t
+t/pod.t
+lib/Sort/MultipleFields.pm
+examples/sort-books
+ARTISTIC.txt
+GPL2.txt
+Makefile.PL
+README
+CHANGELOG
+TODO
+MANIFEST
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

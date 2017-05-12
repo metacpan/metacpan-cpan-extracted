@@ -1,0 +1,25 @@
+# org (company) provided - not supported
+template: create-contact.tt
+
+vars:
+  name: Albert Einstein
+  company: emc2
+  street: electric avenue
+  city: ''
+  state: Everywhere
+  pcode: 300000
+  ccode: NZ
+  phone: +64.44798699
+  fax: +64.44798699
+  email: a@smartarse.co.te
+  contact_id: reject1
+
+output_assertions:
+  attr_is:
+    - [ '//epp:result', 'code', 2004, 'EPP: Correct response code' ]
+  xpath_matches:
+    - [ '//epp:value/contact:city', 1, 'EPP: error value is specific' ]
+  match:
+    - [ '//epp:reason', '/XML Schema validation error .*/contact:city; bad value ''/', 'EPP: correct reason returned' ]
+
+

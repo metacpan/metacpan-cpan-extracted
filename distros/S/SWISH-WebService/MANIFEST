@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/SWISH-WebService.t
+lib/SWISH/WebService.pm
+META.yml                                 Module meta-data (added by MakeMaker)

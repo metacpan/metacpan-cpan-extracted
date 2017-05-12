@@ -1,0 +1,211 @@
+Revision history for Perl extension SOOT.
+
+0.17  Sat Dec 24 15:15 2011
+* New features
+  - Yay, birthday and Christmas release!
+
+* Bug fixes:
+  - Autocasting and TFitResultPtr code could collide and produce
+    ouchy segfaults. This is fixed now.
+
+* Maintenance:
+  - Compatibility with recent versions of ExtUtils::ParseXS.
+  - Author test for examples.
+  - A gazillion little fixes in the example.
+
+0.16  Wed Aug 10 18:00 2011
+* New features:
+  - Additional interface for TClass to make method-related information
+    such as "which methods of this object start with Foo?" and full
+    method prototypes available conveniently to Perl. To be used by
+    SOOT::App autocompletion.
+  - Some operations (such as filling histograms) are faster because
+    they were explicitly wrapped instead of relying on the slow
+    dynamic wrapping.
+  - More examples.
+
+* Maintenance:
+  - Upgraded all the bundled build tools.
+
+0.15  Tue Jul 26 18:40 2011
+* Bug fixes:
+  - 0.14 was missing files.
+
+0.14  Tue Jul 26 18:30 2011
+* New features:
+  - Autocasting.
+    Some methods like Clone() or FindObject() return a TObject*
+    according to ROOT. In practice, these objects will be of types
+    that inherit from TObject but seldomly JUST a TObject.
+    From now in, when returning a ROOT object, SOOT will attempt
+    to auto-cast into the right class instead of relying on the ROOT
+    interface definition to return the correct type.
+    If you would previously do
+      $clone = $th1d->Clone()->as('TH1D');
+      $clone->Draw();
+    you can now get away with
+      $clone = $th1d->Clone;
+      $clone->Draw();
+  - TExec was wrapped to allow CINT and Perl callbacks:
+      my $texec = TExec->new("name", sub { do_something() });
+      $texec->Exec();
+    Same for TPad::AddExec().
+  - !$tobject is now overloaded to DWIM.
+  - Documented more differences to C++/ROOT
+  - Wrapped TRandom::Rannor() (see "perldoc SOOT")
+  - More examples
+
+* Bug fixes:
+  - When the ->Fit method of, say, TGraph returned a TFitResultPtr,
+    SOOT didn't really know how to handle it properly. TFitResultPtr's
+    are now automatically dereferenced into TFitResult objects or
+    become a Perl undef. 
+  - Various fixes to make the build system lazier.
+
+0.13  Wed Mar 23 20:50 2011
+* New features:
+  - SOOT can export a convenience Run() function.
+  - SOOT::Struct now generates TObject subclasses. This is
+    subject to change.
+
+0.12  Thu Dec  2 22:35 2010
+* Bug fixes:
+  - They gave me a Mac and now I have to support the OS...
+
+0.11  Tue Sep 21 21:00 2010
+* Bug fixes:
+  - Compile fix in PtrTable for some gccs.
+
+0.10  Tue Sep 21 20:00 2010
+* Bug fixes:
+  - Better error reporting (no more false error location
+    in TObject.pm)
+* New features:
+  - Optimized TF1::GetRandom calls
+  - Wrapped TFitResultPtr
+  - Updated examples.
+  - Updated all the bundled modules.
+
+0.09  Wed Apr 21 18:00 2010
+* New features:
+  - Using Alien::ROOT, on which we now depend at configure time,
+    it's possible to get an entirely working, private copy of ROOT
+    for SOOT. That means on a virgin (Linux!) machine, you can do the
+    following to install SOOT and all of its dependencies:
+    $ cpan SOOT
+  - Now using Alien::ROOT to detect ROOT.
+
+0.08  Sun Apr 11 12:12 2010
+* Bug Fixes:
+  - Perl 5.12 compatibility.
+  - Now buildable on unthreaded perls.
+* New features:
+  - SOOT::Struct: Dynamic struct generation
+    You can use SOOT::Struct to create new C-level struct types
+    at run-time. These structs are then also available as Perl
+    classes with the corresponding accessor methods for the
+    struct attributes.
+  - RunTimeXS: Cached accessor methods for structs.
+    RunTimeXS is a mechanism to create XSUBs at run time. It's
+    currently used to install the accessor methods for structs.
+    This brings a 60-fold speed-up for struct access:
+    O(millions) calls per second!
+* Internals:
+  - unsigned int array conversions
+  - AVToIntegerVecInPlace and friends for conversion of an
+    AV to existing, pre-allocated data members
+* Updates, etc:
+  - Brought bundled Module::Build and ExtUtils::CBuilder up to date.
+
+0.07  Wed Mar 30 20:00 2010
+* Bug Fixes:
+  - Fix memory leak on each method call.
+    => currently all leak checks pass!
+  - Call *correct* object destructors before free-ing ROOT objects.
+* Internals:
+  - Some refactoring
+    => Replace macro IS_TOBJECT with an inlined function.
+    => Better debugging mode/output
+    => Better leak tests
+    => Replace some use of char* with std::strings
+
+0.06  Fri Mar 26 20:00 2010
+* New features:
+  - Conversion to Module::Build!
+  - All non-core build-time dependencies should be bundled now.
+  - Expose $gHistImagePalette $gWebImagePalette
+  - Quite a few more examples.
+  - Copy constructors.
+  - Installation documentation
+  - SOOT->LoadNUpdate('libGeomBuilder.so');
+    => Will load the shared library and regenerate the class templates.
+* Bug fixes:
+  - Fix for method calling bug wrt. invalidated MethodInfo.
+* Internals:
+  - AUTOLOAD bootstrapping now done in XS (read: C) for performance.
+  - Various simplifications and refactoring of the internals.
+
+0.05  Mon Mar  8 20:00 2010
+  - Completely revamped the way that the ROOT classes are bootstrapped.
+  - Fix for the "enum*" return value bug (cf. TH1D::GetXaxis())
+  - Implemented function calling (I.e. TMath::Abs())
+    => Hacky implementation, needs revisiting.
+  - TF1::GetParErrors() returns a Perl array now and so does
+    TFormula::GetParameters()
+  - Optimizations in TObjectEncapsulation.
+  - Fix for the return value of SOOT::API::type()
+  - SOOT::API::is_same_tobject() (and tests for object equality)
+  - SOOT::API::is_soot_class()
+  - Started documenting SOOT <-> ROOT differences for users
+  - Many more examples
+
+0.04  Fri Feb 26 21:00 2010
+  - Memory leak fixes.
+  - Inlined copy of toolchain => Doesn't fully work for building
+    the src/ subdirectory yet.
+  - Examples now also shipped as documentation.
+  - Manual casting with $axis->as('TAxis')
+    This is sometimes necessary to work around mistakes in
+    the type inference.
+  - $obj->keep() to manually mark an object as "do not free this
+    on behalf of Perl".
+  - Expose $gEnv.
+  - Expose SOOT::Init(bool) which intializes the underlying TCint
+    and (if bool is true) load the .rootrc logon macros (C!).
+  - Inheritance-respecting, recursive class generation.
+  - SOOT::Load(className, ...) for exposing extra ROOT classes to
+    Perl.
+  - Pointer-table state can be dumped for debugging (see GC
+    item below).
+  - Added complete reference counting "garbage collector"
+    or rather ROOT<->Perl memory interface a la PyROOT's
+    TMemoryRegulator.
+
+0.03  Sun Feb 21 21:00 2010
+  - Many more examples.
+  - Lazy initialization of ROOT globals (gPad!)
+  - Constants actually work now.
+  - gBenchmark
+  - TH1* doesn't inherit from TArray in the wrapper - for now.
+  - TArray* construction from Perl arrays:
+     my $tarrayd = TArrayD->new([1., 2., ...]);
+  - More tests!
+
+0.02  Sat Feb 20 17:30 2010
+  - List of candidate methods shown on bad method invocation.
+  - Fixed problems with globals (gROOT, etc) and global
+    interpreter destruction.
+  - Implemented wrapping of more globals: gStyle, gDirectory,
+    gROOT, gSystem, etc.
+  - A bunch of examples (some working, some not yet) in examples/
+  - Recognize "short" as integer type.
+  - Fixed memory leak of array-of-basic-type arguments and return
+    types.
+  - Fixed MethodInfo leak.
+  - Reference/Pointer equality. "const" references still to-do.
+  - More Perl-SOOT API: Class name iterator.
+  - Allow export of various constants/enums such as kRed, kTRUE, etc.
+
+0.01  Tue Feb  9 19:31 2010
+  - original version
+

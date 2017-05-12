@@ -1,0 +1,144 @@
+SVN-fs-dump-format-version: 2
+
+UUID: 2785358f-ed1c-0410-8d81-93a2a39f1216
+
+Revision-number: 0
+Prop-content-length: 56
+Content-length: 56
+
+K 8
+svn:date
+V 27
+2006-09-08T09:09:02.348832Z
+PROPS-END
+
+Revision-number: 1
+Prop-content-length: 125
+Content-length: 125
+
+K 7
+svn:log
+V 26
+Standard repository layout
+K 10
+svn:author
+V 4
+book
+K 8
+svn:date
+V 27
+2006-09-08T11:48:32.736884Z
+PROPS-END
+
+Node-path: branches
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: tags
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: trunk
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Revision-number: 2
+Prop-content-length: 116
+Content-length: 116
+
+K 7
+svn:log
+V 17
+Add an empty file
+K 10
+svn:author
+V 4
+book
+K 8
+svn:date
+V 27
+2006-09-08T11:49:03.913665Z
+PROPS-END
+
+Node-path: trunk/empty.txt
+Node-kind: file
+Node-action: add
+Prop-content-length: 40
+Text-content-length: 0
+Text-content-md5: d41d8cd98f00b204e9800998ecf8427e
+Content-length: 40
+
+K 13
+svn:eol-style
+V 6
+native
+PROPS-END
+
+
+Revision-number: 3
+Prop-content-length: 120
+Content-length: 120
+
+K 7
+svn:log
+V 21
+some dummy latin text
+K 10
+svn:author
+V 4
+book
+K 8
+svn:date
+V 27
+2006-09-08T12:35:49.304317Z
+PROPS-END
+
+Node-path: trunk/loremipsum.txt
+Node-kind: file
+Node-action: add
+Prop-content-length: 40
+Text-content-length: 1090
+Text-content-md5: 60262fd14bd1b59416820cc37e4ee982
+Content-length: 1130
+
+K 13
+svn:eol-style
+V 6
+native
+PROPS-END
+quo fugiat quos quam voluptate nostrum perferendis eum animi fugit unde
+nam accusantium laboriosam quaerat asperiores assumenda praesentium
+iure eaque dicta explicabo autem vero voluptates sed itaque repellat
+dignissimos quia laudantium temporibus consequuntur beatae dolore eligendi
+doloremque quas recusandae proident sapiente mollit aliqua veniam culpa
+cillum voluptatem tempore exercitationem ullamco nobis nihil corrupti
+anim dolores soluta reiciendis
+
+necessitatibus sequi officia do dolorum a nisi consectetur quisquam illum
+amet delectus minim porro provident error dolorem repudiandae pariatur
+occaecat rem aspernatur
+
+tempora excepturi ab similique repellendus voluptatum neque totam aliquip
+adipisicing cum vitae eveniet minus placeat nemo quibusdam laborum velit
+saepe aute fuga reprehenderit eius ratione magnam aperiam sit mollitia
+lorem facilis debitis distinctio non facere natus maiores alias iste
+aliquid rerum ullam sunt possimus minima qui nostrud nesciunt at et
+deleniti tempor hic corporis suscipit commodo odio quis quae harum
+molestiae exercitation inventore cumque
+
+

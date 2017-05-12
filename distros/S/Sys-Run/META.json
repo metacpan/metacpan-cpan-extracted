@@ -1,0 +1,67 @@
+{
+   "abstract" : "Run commands and handle their output.",
+   "author" : [
+      "Dominik Schulz <tex@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.005, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Sys-Run",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "File::Blarf" : "0",
+            "File::Temp" : "0",
+            "Log::Tree::RequiredLogger" : "0",
+            "Moose" : "0",
+            "Net::Domain" : "0",
+            "Time::HiRes" : "0",
+            "feature" : "0",
+            "mro" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.010_000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::MockObject::Universal" : "0",
+            "Test::More" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gittex/Sys-Run/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/gittex/Sys-Run.git",
+         "web" : "https://github.com/gittex/Sys-Run"
+      }
+   },
+   "version" : "0.16",
+   "x_authority" : "cpan:TEX"
+}
+

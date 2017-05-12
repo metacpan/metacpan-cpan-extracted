@@ -1,0 +1,138 @@
+=head1 SimpleDB::Class FAQ
+
+The following are some of the questions people have asked about how to use the L<SimpleDB::Class>.
+
+=head2 Sharding
+
+=head3 How can I store multiple objects in the same domain?
+
+Use L<SimpleDB::Class::Item/"recast_using">. It works like this. First you have a base class like so:
+
+ package Planet;
+
+ use Moose;
+ extends 'SimpleDB::Class::Item';
+
+ __PACKAGE__->set_domain_name('planets');
+ __PACKAGE__->add_attributes(
+    name        => { isa=>'Str' },
+    star_id     => { isa=>'Str' },
+    class_name  => { isa=>'Str' },
+ );
+ 
+ __PACKAGE__->recast_using('class_name');
+
+ 1;
+
+The C<recast_using> command sets up the ability to then dynamically load multiple object types depending upon what's in the C<class_name> field. For example:
+
+ package GasGiant;
+
+ use Moose;
+ extends 'Planet';
+
+ __PACKAGE__->add_attributes(
+    density     => { isa=>'Int' },
+ );
+
+ 1;
+
+So now when an object is loaded from SimpleDB with a C<class_name> field of C<GasGiant>, that object will be loaded instead of C<Planet>.
+
+=head3 I get errors when I search using an attribute that doesn't exist in my base item. How do I fix this?
+
+If you search in C<planets> for an attribute that isn't defined in that class, you're going to get errors, even if there are sub classes that do have those attributes. This is the wrong way to do it:
+
+ my $results = $simpledb->domain('planets')->search( where => { density=>1 });
+
+Instead search using the classname that does have that attribute:
+
+ my $results = $simpledb->domain('GasGiant')->search( where => { density=>1 });
+
+You have to be careful though, if you're looking only for gas giants, and there happen to be other items with a C<density> property (like subclasses of C<GasGiant>), then you'll get those back too. So it might be safer to run your search like this:
+
+ my $results = $simpledb->domain('GasGiant')->search( where => { density=>1, class_name=>'GasGiant' } );
+
+That way you will be searching on a class that has the attribute you're looking for, and you'll only get back classes that match the specific class name you want.
+
+=head3 How can I store objects across multiple domains?
+
+Given the previous example of using C<recast_using> to store multiple object types in the same domain, you can do something similar to make sure that some object types get stored in a different domain. You simply add a new C<set_domain_name> command to the subclass:
+
+ package GasGiant;
+
+ use Moose;
+ extends 'Planet';
+
+ __PACKAGE__->add_attributes(
+    density     => { isa=>'Int' },
+ );
+
+ __PACKAGE__->set_domain_name('gas_giants');
+
+ 1;
+
+Now all C<GasGiant> objects will be stored in the C<gas_giants> domain, but all other C<Planet> objects and subclasses will be stored in the C<planets> domain.
+
+
+=head2 Miscellaneous
+
+=head3 How do I search by primary key?
+
+In SimpleDB, the primary key (aka C<id> or ItemName) is not actually part of the data stored in the item, so you can't use it in a where clause or order by clause. However, there is a special fucntion called C<itemName()> that allows you to do just that. Assuming you were searching a domain here's what that might look like:
+
+ $books->search(where => { 'itemName()' => ['in','x','y','z'] });
+
+The above statement says to return any items that have an id of C<x>, C<y>, or C<z>. This can be useful if you just want to retreive a specific set of items in a single request. Or if you actually specifiy the ids at creation time, and have some sort of logic in them, you may be able to do other things.
+
+You can also use it in an order by clause like this:
+
+ $books->search( where => { color => 'green' }, order_by => 'itemName()');
+
+That says return all items where color is green ordered by id. If you're using the auto-generated ids that L<SimpleDB::Class::Item> provides for you, this is a way to produce a semi-random ordered result set. 
+
+=head3 How do I instantiate an item without inserting it into the database?
+
+As you might notice when you call 
+
+ $domain->insert(\%attributes);
+
+it creates the item and inserts it into the database. Sometimes you want to create the item in advance, play around with it, and then decide whether to insert it into the database. This is fairly easy, but not entirely intuitive. Let's assume you have a L<SimpleDB::Class::Item> subclass called C<Book> that you've created. Do the following:
+
+ $attributes{simpledb} = $simpledb;
+ my $item = Book->new(\%attributes);
+
+or
+
+ my $item = Book->new(simpledb=>$simpledb);
+ $item->some_attribute($value);
+
+or
+
+ my $item = Book->new(simpledb=>$simpledb)->update(\%attributes);
+
+
+Then when you're ready to insert it:
+
+ $item->put;
+
+That's all there is to it. Some people are so used to using
+
+ my $books = $simpledb->domain('books');
+ my $book = $books->find($id);
+ my $book = $books->insert(\%attributes);
+
+that they forget that you can create an object directly using the class.
+
+=head3 Does the module version number have meaning?
+
+Yes. In a version number like C<1.0402> there are three pieces of information that can be gleened. 
+
+The first is the number before the decimal (C<1>). That is the API version number, and only changes if the API or data storage mechanisms change in an incompatible way to previous releases. Therefore if you write code against version C<1.0001> and then sometime later C<1.5702> comes out, you can be reasonably sure your code will still function as you expect it to on C<1.5702>. However, if C<2.0000> comes out, all bets are off.
+
+The second number (C<04>) is the feature release. That number is changed every time a new feature is added to the system and released. It gets reset to C<00> if the API version number changes.
+
+The third number (C<02>) is the bug fix number. That number is changed every time a new release comes out that only contains bug fixes. It gets reset to C<00> if the feature release number is incremented.
+
+
+=cut

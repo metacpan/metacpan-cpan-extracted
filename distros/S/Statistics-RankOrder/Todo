@@ -1,0 +1,12 @@
+TODO list for Perl module Statistics::RankOrder
+
+- check for data before trying a method
+- error checking on input
+    - have new() take a list of valid candidates?
+    - check judges input for valid candidates
+- implement new ranking methods
+- allow judge input to come as hash to allow for ties on input
+- allow adding multiple judges in one go
+- naming judges?
+- string with table of results?
+

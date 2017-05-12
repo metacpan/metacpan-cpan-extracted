@@ -1,0 +1,25 @@
+# Specify a period outside the max allowed by the SRS
+template: create-domain.tt
+
+vars:
+  domain: 09l.co.te
+  owner: id123
+  period: 11
+  period_unit: y
+
+input_assertions:
+  class: SRS::EPP::Command::Create::Domain
+
+SRS:
+  - assertions:
+      count:
+      match:
+      match_all:
+      attr_is:
+        - [ '//DomainCreate', 'Term', '132', 'SRS: Check the term is correct' ]
+
+output_assertions:
+  count:
+  match:
+  attr_is:
+    - [ '//epp:result', 'code', '2306', 'SRS: Check result code' ]

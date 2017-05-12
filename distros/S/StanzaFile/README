@@ -1,0 +1,78 @@
+Copyright (c) 2001-2003, Dick Munroe (munroe@csworks.com).  All rights
+reserved.  This program is free software;  you can redistribute it and/or
+modify it under the Open Software Group license.
+
+Purpose of StanzaFile:
+
+A variety of Linux configuration files contain information stored in stanzas.
+A stanza is data collected into a named section.  Therefore a stanza file has 
+an entry that names (introduces) a new stanza, one or more additional entries 
+that are the data contained within that stanza, followed by [optionally] one or
+more additional stanzas.  Stanza files may also [optionally] contain a 
+collection of global data that appears before the first stanza.  Not all
+stanza file formats provide global data although the StanzaFile class is
+prepared to parse files that contain global data.
+
+The base class of StanzaFile parses WINDOWS.INI format file.  In particular it
+was designed to parse wvdial configuration files.  As examples and extensions
+two subclasses, StanzaFile::Grub and StanzaFile::Lilo are also provided.  These
+classes parse Grand Unified Bootloader and Linux Loader configuration files and
+are provided as an example of how to extend StanzaFile to provide parsing
+support for other types of configuration files.
+
+Getting StanzaFile:
+
+The source code and distributions are kept on sourceforge.net as:
+
+    http://www.sourceforge.net/projects/stanzafile/
+
+The source code is available via anonymous cvs, the installation kit can be
+downloaded via http or ftp from any of the sourceforge mirrors.
+
+You can also get it from my PAUSE account:
+
+    http://www.cpan.org/authors/id/M/MU/MUNROER/StanzaFile/
+
+And I usually keep the latest development version available at:
+
+    http://www.csworks.com/download/stanzafile.html
+
+Installing StanzaFile:
+
+StanzaFile is provided with a standard perl module installation script.  After
+unpacking the installation kit, do the following:
+
+cd /stanzafile/directory/
+perl Makefile.PL
+make
+make install
+
+and that's it.  There aren't any tests.
+
+Reporting Bugs:
+
+Please use the bug reporting and tracking interface provided by sourceforge.
+
+Extending StanzaFile:
+
+If you modify or extend StanzaFile, please contact me [Dick Munroe,
+(munroe@csworks.com)] with the changes so that I can include them in the
+next release.  Documentation of all changes is required as is adherance to the
+Revision History format used in each source file.  (I use tools to keep track
+of and build the Changes file, so if you don't follow the rules it makes more
+work for me).
+
+If you want to be part of the StanzaFile development "team" let me know why and
+what you want to do and I'll consider it.
+
+Looking for work:
+
+On another subject entirely, I'm looking for work (contract or permanent).  I
+do a lot more than just hack Perl.  Take a look at my:
+
+Resume:	http://www.csworks.com/resume
+Skills:	http://www.csworks.com/skills
+CV:	http://www.csworks.com/cv
+
+for the gory details.  If you see a match, drop me a not and we'll see what we
+can work out.

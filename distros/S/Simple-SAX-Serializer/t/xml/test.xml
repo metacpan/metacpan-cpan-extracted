@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<root xmlns:lm="http://www.webapp.strefa.pl/layout_manager" attr1="1">
+ <child attr="1"  />
+ <child attr="2" lm:grid_with="3" >
+    <child_a id="1" />
+    <child_a id="2" />
+ </child>
+ <child attr="3" lm:grid_with="2" />
+ <element attr="3" lm:grid_with="2" />
+</root>

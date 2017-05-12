@@ -1,0 +1,56 @@
+Changes as of: 20-May-2003
+
+20-May-2003:
+    Grub.pm (1.02): Dick Munroe (munroe@csworks.com)
+        Make the test harness happy.
+
+    Lilo.pm (1.02): Dick Munroe (munroe@csworks.com)
+        Make the test harness happy.
+
+    Stanza.pm (1.02): Dick Munroe (munroe@csworks.com)
+        Make sure package variables don't leak.
+        Make the test harness happy.
+
+    StanzaFile.pm (1.05): Dick Munroe (munroe@csworks.com)
+        Make the test harness happy.
+        Forgot the tests in the MANIFEST.
+        Backport to 5.6.1
+
+17-May-2003:
+    Grub.pm: Dick Munroe (munroe@csworks.com)
+        Fix things so that package variables can't leak and clobber
+        other packages.
+
+    Lilo.pm: Dick Munroe (munroe@csworks.com)
+        Fix things so that package variables can't leak and clobber
+        other packages.
+
+    StanzaFile.pm: Dick Munroe (munroe@csworks.com)
+        Fix things so that package variables can't leak.
+
+22-Dec-2002:
+    Lilo.pm: Dick Munroe (munroe@csworks.com)
+        Add documentation on use and overridden methods.
+
+21-Dec-2002:
+    Grub.pm: Dick Munroe (munroe@csworks.com)
+        Add documentation detailing the overridden methods.
+
+    Stanza.pm: Dick Munroe (munroe@csworks.com)
+        Finish Documentation.
+
+20-Dec-2002:
+    StanzaFile.pm: Dick Munroe (munroe@csworks.com)
+        Add use strict, restrict the version of perl to 5.8.0 or higher,
+        and necessary changes imposed by use strict.
+
+27-Nov-2002:
+    Lilo.pm: Dick Munroe (munroe@csworks.com)
+        Initial Version Created.
+
+    StanzaFile.pm: Dick Munroe (munroe@csworks.com)
+        Break structure initialization out of the new function to make
+        inheritance easier.
+        Allow Stanzas to have keywords without arguments when converting
+        back to strings.
+

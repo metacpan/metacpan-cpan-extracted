@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name: SVN-Churn
+version: 0.02
+author:
+  - Richard Clamp <richardc@unixbeard.net>
+abstract: generate a graph for repository churn
+license: perl
+requires:
+  Chart::Strip: 0
+  Class::Accessor: 0
+  Date::Parse: 0
+  Getopt::Declare: 0
+  List::Util: 0
+  SVN::Log: 0
+  String::ShellQuote: 0
+  perl: 5.006
+recommends:
+  SVN::Core: 0
+build_requires:
+  Test::More: 0
+conflicts: {}
+provides:
+  SVN::Churn:
+    file: lib/SVN/Churn.pm
+    version: 0.02
+generated_by: Module::Build version 0.22

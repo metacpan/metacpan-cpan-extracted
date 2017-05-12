@@ -1,0 +1,139 @@
+NAME
+     SyslogScan::Daemon::SpamDetector - Notice spammers in the log files
+
+SYNOPSIS
+     plugin SyslogScan::Daemon::SpamDetector as sd_
+            debug           0
+            ignoreip        /etc/postfix/ourip
+
+DESCRIPTION
+    SyslogScan::Daemon::SpamDetector is a plugin for SyslogScan::Daemon that
+    watches log files for indications of Spam.
+
+    To do it's job it uses additional plugins.
+
+CONFIGURATION PARAMETERS
+    The following configuration parameters are supported:
+
+    debug
+        Debugging on (1) or off (0).
+
+    configfile
+        Usually defaulted to the config file for SyslogScan::Daemon.
+
+    idcachesize
+        How big should the message id cache be? This is used by some of the
+        plugins to match up what happens to a message. For example, we need
+        to remember the IP address of that a message came from
+        (SyslogScan::Daemon::SpamDetector::Sendmail or
+        SyslogScan::Daemon::SpamDetector::Postfix) and then later decide if
+        it's spam (SyslogScan::Daemon::SpamDetector::SpamAssassin). Default
+        is 10,000.
+
+    spam_command
+        A shell command to run when spam is found. In the command, $ip will
+        be substituted for the IP address the message came from. All of the
+        other keys to the %info array (documented blow) are also available
+        as substitutions.
+
+    ham_command
+        A shell command to run when a non-spam message is found.
+
+    ignoreip
+        A filename that contains a list of IP blocks (one per line) that
+        should be ignored. The blocks are in the format A.B.C.D/bits
+
+WRITING PLUGINS
+    Plugins for SyslogScan::Daemon::SpamDetector will either help recognize
+    spam or do something with recognized spam.
+
+    Either way, they create or use an <%info> hash that describes an event:
+
+    status
+        What is being reported? Values are:
+
+        spam   A spammy message has been found.
+
+        ham    A non-spam message has been found.
+
+        idmap  A message has come in, establish a mapping from the "id" to
+               the "ip".
+
+    id  The message id. Usually required.
+
+    ip  The IP address. This is required unless an "idmap" established an
+        "id" -> "ip" mapping previously in which case an "id" may be used
+        instead.
+
+    score
+        The spam score from SpamAssassin. If not reporting SpamAssassin,
+        make something else up.
+
+    match
+        What kind of match was made. Example values are: "spamassassin",
+        "spamsink", "badaddrs", etc.
+
+    host
+        Hostname of the system receiving the message.
+
+    hideid
+        If you report message ids to outsiders (like, for example if you're
+        using this information to block mail) then don't report the message
+        id *this time* because it is sensitive information. Optional.
+
+    SyslogScan::Daemon::SpamDetector invokes the following methods on it's
+    plugins:
+
+    @logs = get_logs()
+        Inherited from SyslogScan::Daemon.
+
+    %info = parse_logs($logfile, $regex_matched)
+        When this is called, $_ will be set to the logfile line that
+        matched. Please leave $_ alone so that other plugins that matched
+        the same line can also use it.
+
+        Return "()" if not providing an %info.
+
+    preconfig($configfile)
+        Inherited from SyslogScan::Daemon.
+
+    periodic()
+        Inherited from SyslogScan::Daemon.
+
+    spam_found(%info)
+        Called when spam is found. Called though Plugins::API.
+
+    ham_found(%info)
+        Called when non-spam is found. Called though Plugins::API.
+
+    SyslogScan::Daemon::SpamDetector provides some Plugins::API callbacks:
+
+    process_spam_match(%info)
+        Calling this is the same as returning %info from "parse_logs()".
+
+    is_ourip($ip_address)
+        Is this one of our own IP addresses and thus should be ignored? A
+        return of "undef" doesn't answer but a return of 0 says that the
+        item is *not* our IP address.
+
+SEE ALSO
+    The context for this: SyslogScan::Daemon, Plugins, Plugins::API,
+    Daemon::Generic.
+
+    Plugins for this module: SyslogScan::Daemon::SpamDetector::BlockList.
+    SyslogScan::Daemon::SpamDetector::Sendmail,
+    SyslogScan::Daemon::SpamDetector::Postfix,
+    SyslogScan::Daemon::SpamDetector::SpamSink,
+    SyslogScan::Daemon::SpamDetector::SpamAssassin.
+    SyslogScan::Daemon::SpamDetector::Bogofilter.
+    SyslogScan::Daemon::SpamDetector::BadAddr.
+
+THANK THE AUTHOR
+    If you need high-speed internet services (T1, T3, OC3 etc), please send
+    me your request-for-quote. I have access to very good pricing: you'll
+    save money and get a great service.
+
+LICENSE
+    Copyright(C) 2006 David Muir Sharnoff <muir@idiom.com>. This module may
+    be used and distributed on the same terms as Perl itself.
+

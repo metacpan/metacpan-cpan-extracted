@@ -1,0 +1,9 @@
+<NZSRSResponse VerMajor="5" VerMinor="0">
+  <Response Action="DomainCreate" FeId="8" FeSeq="4794859" OrigRegistrarId="90" RecipientRegistrarId="90" TransId="brause2346">
+    <FeTimeStamp Day="6" Hour="12" Minute="01" Month="7" Second="57" TimeZoneOffset="+12:00" Year="2010"/>
+    <Error ErrorId="HANDLE_DOES_NOT_EXIST" Hint="UNKNOWN_ERROR_HINT" Severity="err">
+      <Description><![CDATA[There is no Handle with the given HandleId.]]></Description>
+      <ErrorDetails><![CDATA[RegistrantContact]]></ErrorDetails>
+    </Error>
+  </Response>
+</NZSRSResponse>

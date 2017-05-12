@@ -1,0 +1,50 @@
+Statistics/Descriptive/Discrete version 0.01
+============================================
+
+Calculates descriptive statistics for discrete data sets (e.g. data 
+sets with a known, discrete number of values or levels in the data,
+such as the output of an analog-to-digital conversion).
+
+The interface is very similar (almost identical) to Statistics::Descriptive
+but the performance is an order of magnitude better when the data set is very
+large relative to the number of discrete values in the data set.  
+
+For example, a data set with 2.6 million numbers but only 256 discrete values
+took 561 seconds to process with Statistics::Descriptive but on 40 seconds
+to process with Statistics::Descriptive::Discrete.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2002 Rhet Turnbull. All rights reserved.  This
+program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+Portions of this code is from Statistics::Descriptive which is under
+the following copyrights:
+
+Copyright (c) 1997,1998 Colin Kuskie. All rights reserved.  This
+program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+Copyright (c) 1998 Andrea Spinelli. All rights reserved.  This program
+is free software; you can redistribute it and/or modify it under the
+same terms as Perl itself.
+
+Copyright (c) 1994,1995 Jason Kastner. All rights
+reserved.  This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+

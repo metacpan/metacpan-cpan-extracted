@@ -1,0 +1,6 @@
+Revision history for Perl extension Sort::Radix.
+
+0.01  Fri Jan 21 05:46:09 2005
+	- original version; created by h2xs 1.23 with options
+		-A -X -n Sort::Radix
+

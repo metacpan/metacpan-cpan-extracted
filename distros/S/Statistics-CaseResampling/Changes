@@ -1,0 +1,56 @@
+Revision history for Perl extension Statistics::CaseResampling.
+
+0.15  Tue May 14 18:38:00 2013
+  - Do not override compiler optimization level in Makefile.PL (P Pisar)
+
+0.14  Mon May 13 21:50:00 2013
+  - MSVC (== C89) compatibility fixes (Daniel Dragan)
+
+0.13  Wed Aug  1 15:00:00 2012
+  - Fixes to std. dev. functions: They were actually the variance. DOH.
+
+0.12  Sat Feb 18 15:00:00 2012
+  - Test accuracy fixes.
+
+0.11  Fri Feb 17 13:00:00 2012
+  - Implement minor extra statistics functions in XS:
+    sample std. dev. and population std. dev.
+  - Shuffle docs around a little bit.
+
+0.10  Mon Feb 13 08:26:00 2012
+  - Document the choice of O(n) median algorithm.
+
+0.09  Mon Jan 16 08:28:00 2012
+  - Implements median_absolute_deviation.
+
+0.08  Sun Aug 21 21:54:00 2011
+  - Tiny darwin fix [jtpalmer]
+
+0.07  Mon Jan 24 23:00:00 2011
+  - Updated ppport.h for compatibility with older perls.
+
+0.06  Fri Sep 24 21:00:00 2010
+  - Calculation of confidence limits for various statistics.
+  - Rewrite of the documentation.
+  - More exposed XS functions:
+  => erf, erf^-1, nsigma <=> alpha conversion,
+     first and third quartiles, mean
+
+0.05  Fri Sep 24 20:00:00 2010
+  - Implement resample_means.
+  - Optimize using PERL_NO_GET_CONTEXT
+
+0.04  Thu Sep 23 21:00:00 2010
+  - Exposes select_kth() to Perl.
+
+0.03  Thu Sep 23 20:00:00 2010
+  - median() is now much faster thanks to using
+    O(n) selection instead of O(n*log(n)) quick sort.
+  - Docs upgrade.
+
+0.02  Wed Sep 22 22:00:00 2010
+  - OBIWAN. Nuff said.
+
+0.01  Wed Sep 22 20:00:00 2010
+  - original version
+

@@ -1,0 +1,39 @@
+1.1 Wed Jun 28 17:31:15 EDT 2006 bwm
+	* Updated DTD w/ several new features
+	* Added code support for ranges; updated options on unsupported dtd element to match Spreadsheet::WriteExcel methods (See DTD)
+
+	* Added margins (see DTD). Based on Spreadsheet::WriteExcel methods; note that for standard set_margins you need to set CDATA (<margins>5</margins>)
+	* Added headers & footers, with margins for same (attributes of worksheet)
+	* Added a worksheet attribute flag for landscape paper orientation (if set, landscape, else, portrait)
+	* Added a paper type attribute on worksheet; set according to documentation for Spreadsheet::WriteExcel (or see comment notes in dtd) 
+	* Added halign and valign to format; these allow usability of the two separate types as Spreadsheet::WriteExcel allows; if you set either of these, the align attribute is ignored. 
+	* TODO: Update tests to represent new code. I have some test stuff that can be used.
+
+1.02 Mon Sep 15 17:00:27 EDT 2003 wjb
+        * Updated DTD w/ syntax rxp understands.
+	* Removed 'name' attribute from worksheet (redundant to 'title')
+	* Updated example XML document in test directory so that it validates
+	  correctly against DTD.
+	* Fixed bug where you could not declare 2 tags next to each other.
+	  For example <row><cell>1</cell></row> wouldn't work.
+
+1.01 Fri Aug 29 17:09:14 EDT 2003 wjb
+	* Added parameter for large spreadsheets (>7Mb), this allows
+	  FromXML to work with versions of OLE::Storage_Lite that do not
+	  yet support IO::Scalar output.  This also means that until 
+	  OLE::Storage_Lite is patched, FromXML will only support the 
+	  production of 'smaller' XLS files.
+        * Added data type functionality to rows & cells.
+	  The following types are now supported:
+	    - string
+	    - number
+	    - url
+	    - formula
+	    - blank
+	  An invalid type will default to write_string.
+	  Not defining a type will default to write_string.
+        * Updated DTD
+
+1.00 Tue Jul 29 22:38:39 EDT 2003
+	* first version/release  krburton@cpan.org
+

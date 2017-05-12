@@ -1,0 +1,7 @@
+id;name;description;family;lifespan
+1;Cat;"Furry Livingroom Sofa Animal";mammal;3-6y
+2;Dog;"Barking Yard Beast";mammal;5-12y
+3;CanaryBird;"Screaming Wing Creature";bird;1-3y
+4;Poodle;"Curly Fur Fluff Ball";mammal;4-7y
+5;Lizard;"Scaly Green Reptile";reptile;1-2y
+7;Kitty;"Thomas O'Malley";mammal;6-8y

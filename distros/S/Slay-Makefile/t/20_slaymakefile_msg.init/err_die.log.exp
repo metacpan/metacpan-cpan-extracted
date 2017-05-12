@@ -1,0 +1,2 @@
+err_die.smak, 3: I don't wanna at err_die.smak line 4.
+BEGIN failed--compilation aborted at err_die.smak line 4. at SlayMakefile.main line 23

@@ -1,0 +1,24 @@
+1.4 11 Jul 2006
+    - Added 'chart_transition' method
+    - Fixed 'add_dataset' method so that it does not alter array refs passed
+      to it
+
+1.3 11 Jan 2006
+    - Updated draw_* methods to contain themselves within a '<draw>' element
+      rather than individual <draw_line>, <draw_circle>, <draw_x> elements.
+    - Added a 'draw' method that can draw any of the primitives
+
+1.2 15 Sep 2005
+    - Fixed 'chart_value_text' method to work properly
+    - Updated 'add_dataset' to make adding labels to multiple sets easier
+
+1.1 31 Aug 2005
+    - Fixed incorrect package name in Makefile.PL
+    - Updated example in POD
+
+1.0 28 July 2005
+    - First released version
+    - Updated for XML/SWF Charts v4.1
+
+0.9 21 June 2005
+    - Initial version

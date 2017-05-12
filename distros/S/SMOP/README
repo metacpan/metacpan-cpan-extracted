@@ -1,0 +1,77 @@
+SMOP is a polymorphic meta-OO runtime library and
+specification. Although some default implementations are presented
+here, they are entirely optional.
+
+ base - This module is actually composed only of the basic
+   headers that define SMOP__Object* and SMOP__ResponderInterface*
+   along with its respective macros. Theoretically, two SMOP objects
+   can interoperate even without linking the same libraries.
+
+ s0native - This module contains the stage 0 native types, they are
+   packaged separated because they are not subject to garbage
+   collection, and because of its importance to everything else, it
+   builds libsmop-s0native. It contains:
+   - bool
+   - idconst
+     (including the definition of some common used values)
+   - empty interpreter
+     (used as a short-circuit so you know there isn't one)
+
+ nagc - This module implements the garbage collector for native
+   types. It defines an additional member in the ResponderInterface of
+   the types that use it that is called during destruction, as opposed
+   to calling the DESTROYALL method.
+
+ util
+
+ capture - This module implements the native capture which is the base
+   for the implementation of smop method calls. It is packaged
+   separatedly because it is needed for far too many types.
+
+ interpreter - In SMOP the interpreter is really just the container
+   for the current continuation. It delegates the runloop to the
+   continuation classes.
+
+ mold - This is the default continuation class. It is a register-based
+   bytecode interpreter.
+
+ native - This module contains the regular native types, subject to
+   garbage collection.
+
+ s1p - This module contains simplification of Perl 6 types that exist
+   for bootstrapping purposes:
+   * SMOP::S1P::Scalar
+   * SMOP::S1P::Array
+   * SMOP::S1P::Array::BValue
+   * SMOP::S1P::Hash
+   * SMOP::S1P::Hash::BValue
+   * SMOP::S1P::LexicalScope
+   * SMOP::S1P::LexicalScope::Flattened
+   * SMOP::S1P::Package
+   * SMOP::S1P::Signature::Adhoc
+   * SMOP::S1P::Signature::BindCapture
+   * SMOP::S1P::Signature::BlockDefault
+   * SMOP::S1P::Code
+   * SMOP::S1P::Code::NativeC
+   * SMOP::S1P::Capturize
+   * SMOP::S1P::RITest
+   * SMOP::S1P::ControlExceptionReturn
+   * SMOP::S1P::OutOfItemsException
+
+ p6opaque - This is the default representation for Perl 6 objects. It
+   should support storing all kinds of meta information required by
+   the Perl 6 default object system. It invokes the DESTROYALL method
+   during its destruction.
+
+ s1p-oo - This module contains types that aid OO bootstrapping
+   * SMOP::S1P::PrototypeHOW
+   * SMOP::S1P::RoleHOW
+   * SMOP::S1P::Attribute
+   * SMOP::S1P::Signature::MethodDefault
+
+ core - This module contains the code for the core loading.
+   * SMOP::S1P::MildewSOLoader
+
+ pcl - libpcl integration
+
+ p5 - embedded p5

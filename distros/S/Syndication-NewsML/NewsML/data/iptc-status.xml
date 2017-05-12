@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!DOCTYPE TopicSet PUBLIC "urn:newsml:iptc.org:20001006:NewsMLv1.0.dtd:1" "NewsMLv1.0.dtd">
+<TopicSet Duid="iptc.status" FormalName="Status">
+	<Comment xml:lang="en">The current usability of a NewsItem.</Comment>
+	<Topic Duid="stat1">
+		<TopicType Scheme="IptcTopicType" FormalName="Status"/>
+		<FormalName Scheme="IptcStatus">Usable</FormalName>
+		<Description xml:lang="en">The NewsItem and its content may be published without restriction.</Description>
+	</Topic>
+	<Topic Duid="stat2">
+		<TopicType Scheme="IptcTopicType" FormalName="Status"/>
+		<FormalName Scheme="IptcStatus">Embargoed</FormalName>
+		<Description xml:lang="en">Neither the NewsItem nor its content may be published until released for publication by the provider.</Description>
+	</Topic>
+	<Topic Duid="stat3">
+		<TopicType Scheme="IptcTopicType" FormalName="Status"/>
+		<FormalName Scheme="IptcStatus">Withheld</FormalName>
+		<Description xml:lang="en">Neither the NewsItem nor its content may be published until further notice.</Description>
+	</Topic>
+	<Topic Duid="stat4">
+		<TopicType Scheme="IptcTopicType" FormalName="Status"/>
+		<FormalName Scheme="IptcStatus">Canceled</FormalName>
+		<Description xml:lang="en">Neither the NewsItem nor its content may be used under any circumstances. If the NewsItemor its content has been published the publisher must take immediate action to withdraw or retract it, as may be legally necessary.</Description>
+	</Topic>
+</TopicSet>
+

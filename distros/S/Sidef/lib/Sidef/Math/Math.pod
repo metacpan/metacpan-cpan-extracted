@@ -1,0 +1,122 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Math::Math
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = Math.new(...);
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef::Object::Object
+
+=head1 METHODS
+
+
+=head2 avg
+
+Math.avg() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 chinese
+
+Math.chinese() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 gcd
+
+Math.gcd() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 lcm
+
+Math.lcm() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 map
+
+Math.map() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 max
+
+Math.max() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 min
+
+Math.min() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 num2percent
+
+Math.num2percent() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 prod
+
+Math.prod() -> I<Obj>
+
+Return the
+
+Aliases: I<product>
+
+=cut
+
+=head2 range_map
+
+Math.range_map() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 range_sum
+
+Math.range_sum() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sum
+
+Math.sum() -> I<Obj>
+
+Return the
+
+=cut

@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+cpanfile.snapshot
+lib/Shell/Carapace.pm
+lib/Shell/Carapace/SSH.pm
+lib/Shell/Carapace/Shell.pm
+minil.toml
+t/00_compile.t
+t/shell.t
+t/ssh.t
+META.yml
+MANIFEST

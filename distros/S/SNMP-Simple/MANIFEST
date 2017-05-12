@@ -1,0 +1,13 @@
+.releaserc
+Changes
+examples/printerstats.pl
+lib/SNMP/Simple.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml			Module meta-data (added by MakeMaker)
+README
+SIGNATURE
+t/0-signature.t
+t/basic.t
+t/pod-coverage.t
+t/pod.t

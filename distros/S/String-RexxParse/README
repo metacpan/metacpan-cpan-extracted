@@ -1,0 +1,99 @@
+
+String::RexxParse Module
+
+Copyright (c) 1999, 2000, 2001, 2002 Dan Campbell (String::RexxParse->email)
+All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+
+Some long-time REXX programmers switching to Perl find it difficult 
+to give up REXX's template-based parsing abilities.  This module is 
+my attempt to provide such parsing in Perl.  The documentation assumes 
+a familiarity with REXX parse statements.
+
+
+I tested this module on OS/2, Linux (RedHat 6.1), AIX, and OS/390.  It
+should work exactly the same on any platform.
+
+Revision history for Perl extension String::RexxParse:
+------------------------------------------------------
+
+1.00  Sat Aug 27 1999
+      - original version; 
+
+1.01  Sat Sep 4 1999
+      - Fixed incorrect template parsing when a pattern is the 
+        first template item. 
+
+1.02  Sat Sep 4 1999
+      - Fixed incorrect handling of variable pattern in template 
+        when variable's value contains regex meta characters. 
+
+1.03  Sat Sep 6 1999
+      - Fixed incorrect handling of template when two or more
+        patterns are next to each other, or when last template
+        item is a pattern.
+
+1.04  Fri Oct 1 1999
+      - Changed module name from String::Parser to String::RexxParse.
+
+1.05  Tue Oct 19 1999
+      - Minor doc changes.
+
+1.06  Sun Mar 26 2000
+      - Internal optimizations for the following type of templates:
+        - template is only a single lvalue
+        - template is only lvalues and '.' place holders
+        - template is only patterns, lvalues, and '.' place holders
+      - Removed my email address to avoid spam.  My email address
+        will be returned by calling String::RexxParse->email from 
+        a perl program that uses String::RexxParse.
+      - Minor doc changes.
+
+1.07  Sat Apr 1 2000
+      - additional internal optimizations for the following type of templates:
+        - template is only lvalues and '.' place holders
+        - template is only patterns, lvalues, and '.' place holders
+
+1.08  Thu May 18 2000
+      - fixed bug introduced in 1.07
+      - added j.t to test suite
+
+1.09  Thu Jul 7 2000
+      - general cleanup
+      - no functional changes
+
+1.10  Fri Mar 8 2002
+      - Put eval around processing of numeric patterns in order to set $@
+        in calling module when there is an error.
+      - Added protection against errors for numeric patterns when string
+        to be parsed is shorter than the pattern calls for.
+
+Latest Version:
+---------------
+
+The latest version of String::RexxParse in .tar.gz format can
+be obtained from:
+
+       http://www.cpan.org/modules/by-module/String/BLCKSMTH 
+
+The latest version of String::RexxParse in .tar.gz format can 
+be obtained from:
+
+       http://www.danofsteel.com/Parser 
+
+
+Installation:
+-------------
+
+
+  tar -xzf String-RexxParse-1.10.tar.gz
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+

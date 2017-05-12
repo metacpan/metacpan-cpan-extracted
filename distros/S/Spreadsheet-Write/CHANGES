@@ -1,0 +1,10 @@
+0.03 - 25-May-2007
+    * Formats are cached to improve performance in Excel
+    * 'content' in extended cell info blocks can be an array to simplify
+      headers creation and such.
+
+0.02 - 7-May-2007
+    * 'width' added to set column widths
+
+0.01 - 5-May-2007
+    * Original release

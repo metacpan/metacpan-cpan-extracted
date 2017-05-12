@@ -1,0 +1,28 @@
+# org (company) provided - not supported
+template: create-contact.tt
+
+vars:
+  name: Albert Einstein
+  company: emc2
+  street: electric avenue
+  city: Anywhere
+  state: Everywhere
+  pcode: 300000
+  ccode: NZ
+  phone: +64.44798699
+  fax: +64.44798699
+  email: a@smartarse.co.te
+  contact_id: reject1
+
+input_assertions:
+  class: SRS::EPP::Command::Create::Contact
+  match:
+
+output_assertions:
+  attr_is:
+    - [ '//epp:result', 'code', 2306, 'EPP: Correct response code' ]
+  match:
+    - [ '//epp:value', 'emc2', 'EPP: correct value returned' ]
+    - [ '//epp:reason', 'org field not supported', 'EPP: correct reason returned' ]
+
+

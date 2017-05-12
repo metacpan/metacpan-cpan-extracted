@@ -1,0 +1,96 @@
+NAME
+    SSH::RPC::Client - The requestor, or client side, of an RPC call over
+    SSH.
+
+SYNOPSIS
+     use SSH::RPC::Client;
+
+     my $rpc = SSH::RPC::Client->new($host, $user);
+     my $result = $rpc->run($command, \%args); # returns a SSH::RPC::Result object
+
+     if ($result->isSuccess) {
+        say $result->getResponse;
+     }
+     else {
+        die $result->getError;
+     }
+
+DESCRIPTION
+    SSH::RPC::Client allows you to make a remote procedure call over SSH to
+    an SSH::RPC::Shell on the other end. In this way you can execute methods
+    remotely on other servers while also passing and receiving complex data
+    structures. The arguments and return values are serialized into JSON
+    allowing shells to be written in languages other than Perl.
+
+METHODS
+    The following methods are available from this class.
+
+  ssh
+    Constructs and returns a reference to the Net::OpenSSH object.
+
+  new ( host, user,  [ pass ])
+    Constructor.
+
+   host
+    The hostname or ip address you want to connect to.
+
+   user
+    The username you want to connect as.
+
+   pass
+    The password to connect to this account. Can be omitted if you've set up
+    an ssh key to automatically authenticate. See man ssh-keygen for
+    details.
+
+  run ( command, [ args ] )
+    Execute a command on the remote shell. Returns a reference to an
+    SSH::RPC::Result object.
+
+   command
+    The method you wish to invoke.
+
+   args
+    If the method has any arguments pass them in here as a scalar, hash
+    reference, or array reference.
+
+SEE ALSO
+    GRID::Machine and IPC::PerlSSH are also good ways of solving this same
+    problem. I chose not to use either for these reasons:
+
+    Arbitrary Execution
+        They both allow arbitrary execution of Perl on the remote machine.
+        While that's not all bad, in my circumstance that was a security
+        risk that was unacceptable. Instead, SSH::RPC requires both a client
+        and a shell be written, so you know exactly what's allowed to be
+        executed.
+
+    Language Neutral
+        Because SSH::RPC uses JSON as a serialization layer between the
+        connection, clients and shells can be written in languages other
+        than Perl and still interoperate.
+
+    Net::OpenSSH
+        The Net::OpenSSH module that SSH::RPC is based upon is fast,
+        flexible, and most importantly way easier to install than the
+        modules required by GRID::Machine and IPC::PerlSSH.
+
+PREREQS
+    This package requires the following modules:
+
+    Net::OpenSSH JSON Class::InsideOut
+
+CAVEATS
+    You cannot use this module inside of mod_perl currently. Not sure why,
+    but it hoses the SSH connection.
+
+AUTHOR
+    JT Smith <jt_at_plainblack_com>
+
+LEGAL
+     -------------------------------------------------------------------
+      SSH::RPC::Client is Copyright 2008-2009 Plain Black Corporation
+      and is licensed under the same terms as Perl itself.
+     -------------------------------------------------------------------
+      http://www.plainblack.com                     info@plainblack.com
+     -------------------------------------------------------------------
+

@@ -1,0 +1,22 @@
+#########################################################
+# Sample Program for Perl Module "Shell::POSIX::Select" #
+#  tim@TeachMePerl.com  (888) DOC-PERL  (888) DOC-UNIX  #
+#  Copyright 2002-2003, Tim Maher. All Rights Reserved  #
+#########################################################
+
+use Shell::POSIX::Select (
+	'$Eof',		# for ^D detection
+	prompt => 'Choose file for deletion:'
+) ;
+
+# Eradicate serpents, like St. Patrick! 8-}
+OUTER:
+	while ( @files=<*.py> ) {
+		select ( @files ) { 
+			 print STDERR  "Really delete $_? [y/n]: " ;
+			 my $answer = <STDIN>;	    # ^D sets $Eof below
+			 defined $answer  or  last OUTER ;  # exit on ^D
+			 $answer eq "y\n"  and  unlink  and  last ;
+		}
+		$Eof and last;
+}

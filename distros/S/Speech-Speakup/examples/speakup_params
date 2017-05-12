@@ -1,0 +1,189 @@
+#! /usr/bin/perl
+#########################################################################
+#        This Perl script is Copyright (c) 2013, Peter J Billam         #
+#                          www.pjb.com.au                               #
+#                                                                       #
+#     This script is free software; you can redistribute it and/or      #
+#            modify it under the same terms as Perl itself.             #
+#########################################################################
+my $Version       = '1.0';
+my $VersionDate   = '12apr2013';
+use open ':locale';
+eval 'require Speech::Speakup'; if ($@) { die
+	"you'll need to install the Speech::Speakup module from www.cpan.org\n";
+}
+
+my $List = 0;
+while ($ARGV[$[] =~ /^-([a-z])/) {
+	if ($1 eq 'v')      { shift;
+		my $n = $0; $n =~ s{^.*/([^/]+)$}{$1};
+		print "$n version $Version $VersionDate\n";
+		exit 0;
+	} elsif ($1 eq 'l') { $List = 1; shift;
+	} else {
+		print "usage:\n";  my $synopsis = 0;
+		while (<DATA>) {
+			if (/^=head1 SYNOPSIS/)     { $synopsis = 1; next; }
+			if ($synopsis && /^=head1/) { last; }
+			if ($synopsis && /\S/)      { s/^\s*/   /; print $_; next; }
+		}
+		exit 0;
+	}
+}
+
+my @speakup_gettables = Speech::Speakup::speakup_get();
+my @synth_gettables   = Speech::Speakup::synth_get();
+my @speakup_settables = Speech::Speakup::speakup_set();
+my @synth_settables   = Speech::Speakup::synth_set();
+
+my $line = '';
+my $version = Speech::Speakup::speakup_get('version');
+$version =~ s/\s+$//;
+$version =~ s/\n/, /;
+print "$version\n\n";
+print "Speakup parameters:\n";
+foreach my $param (@speakup_gettables) {
+	if ($param eq 'keymap') { next; }
+	if ($param eq 'version') { next; }
+	my $s =  "$param ".Speech::Speakup::speakup_get($param);
+	if (62 < length $line.$s) {
+		print $line."\n";
+		$line = $s;
+	} else {
+		if ($line) { $line .= " "x(17-((length $line)%17)); }
+		$line .= $s;
+	}
+}
+if ($line) { print $line."\n"; }
+print "\n";
+
+$line = '';
+print "Synth parameters:\n";
+foreach my $param (@synth_gettables) {
+	my $s =  "$param ".Speech::Speakup::synth_get($param);
+	if (62 < length ($line.$s)) {
+		print $line."\n";
+		$line = $s;
+	} else {
+		if ($line) { $line .= " "x(17-((length $line)%17)); }
+		$line .= $s;
+	}
+}
+if ($line) { print $line."\n"; }
+print "\n";
+if ($List) { exit; }
+
+eval 'require Term::Clui'; if ($@) { die
+	"you'll need to install the Term::Clui module from www.cpan.org\n";
+}
+
+while (1) {
+	my $param = Term::Clui::choose('Adjust which speakup parameter ?',
+		@speakup_settables);
+	if (! $param) { last; }
+	my $old = Speech::Speakup::speakup_get($param);
+	my $question = " set $param to what ?";
+	Term::Clui::set_default($question, $old);
+	my @range = 0..10;
+	if ($param eq 'synth') {
+		my $param = Term::Clui::choose(" synth=$old; adjust which parameter ?",
+			@synth_settables);
+		if (! $param) { last; }
+		my $old = Speech::Speakup::synth_get($param);
+		my $question = " set $param to what ?";
+		Term::Clui::set_default($question, $old);
+		my @range = 0..9;
+		if ($param eq 'punct' or $param eq 'tone') { @range = (0,1,2); }
+		my $new = Term::Clui::choose($question, @range);
+		if (defined $new) { Speech::Speakup::synth_set($param, $new) }
+		if ($Speech::Speakup::Message) { warn "$Speech::Speakup::Message\n"; }
+		next;
+	} elsif ($param eq 'synth_direct') {
+		my $new = Term::Clui::ask(' feed what into synth_direct ?');
+		if ($new) { Speech::Speakup::speakup_set($param, $new) }
+		next;
+	} elsif ($param =~ /^repeats|^punc_(all|some|most)/) {
+		my $new = Term::Clui::ask($question, $old);
+		if (defined $new) { Speech::Speakup::speakup_set($param, $new) }
+		if ($Speech::Speakup::Message) { warn "$Speech::Speakup::Message\n"; }
+		next;
+	} elsif ($param eq 'key_echo' or $param eq 'no_interrupt') {
+		@range = (0,1);
+	} elsif ($param eq 'punc_level' or $param eq 'reading_punc') {
+		@range = (0,1,2,3);
+	} elsif ($param eq 'silent') {
+		@range = (0..7);
+	}
+	my $new = Term::Clui::choose($question, @range);
+	if (defined $new) {
+		Speech::Speakup::speakup_set($param, $new);
+		if ($Speech::Speakup::Message) { warn "$Speech::Speakup::Message\n"; }
+	}
+}
+exit 0;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+speakup_params - to adjust Speakup parameters
+
+=head1 SYNOPSIS
+
+ speakup_params       # interactively adjusts the parameters
+ speakup_params -l    # Lists the current parameter values
+
+=head1 DESCRIPTION
+
+This script, conceived as an example of the I<Speech::Speakup> module,
+could actually be useful to I<speakup> users in general.
+
+By default, it lists the current values of the parameters
+of the I<speakup> screen-reader, and then enters an interactive
+dialogue which allows the user to adjust those parameters.
+
+The parameters are documented in
+ perldoc Speech::Speakup
+
+It uses the I<Term::Clui> CPAN module to provide the user interface.
+
+=head1 OPTIONS
+
+=over 3
+
+=item I<-l>
+
+B<L>ists the current parameter values, then exits.
+
+=item I<-v>
+
+Prints version number.
+
+=back
+
+=head1 CHANGES
+
+ 20130416  1.1  parameter ranges more exact
+ 20130412  1.0  first working version
+
+=head1 AUTHOR
+
+Peter J Billam   http://www.pjb.com.au/comp/contact.html
+
+=head1 CREDITS
+
+Based on the I<Speech::Speakup> and I<Term::Clui> CPAN modules
+
+=head1 SEE ALSO
+
+ perldoc Speech::Speakup
+ http://search.cpan.org/perldoc?Speech::Speakup
+ http://search.cpan.org/perldoc?Term::Clui
+ http://linux-speakup.org
+ http://www.pjb.com.au/
+ perl(1).
+
+=cut
+

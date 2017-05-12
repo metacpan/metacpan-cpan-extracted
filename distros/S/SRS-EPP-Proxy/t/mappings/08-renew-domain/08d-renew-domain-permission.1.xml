@@ -1,0 +1,39 @@
+<NZSRSResponse VerMajor="5" VerMinor="0" RegistrarId="11">
+  <Response Action="Whois" FeId="8" FeSeq="4739778" OrigRegistrarId="1" RecipientRegistrarId="11">
+    <FeTimeStamp Day="23" Hour="10" Minute="31" Month="6" Second="46" TimeZoneOffset="+12:00" Year="2010"/>
+    <Domain Delegate="1" DomainName="chedder.co.te" Status="Active">
+      <NameServers>
+        <Server FQDN="ns1.dns.net.nz"/>
+        <Server FQDN="ns2.dns.net.nz"/>
+        <Server FQDN="ns3.dns.net.nz"/>
+     </NameServers>
+     <RegistrantContact Name="Internet New Zealand Incorporated" Email="exe.dir@internetnz.net.nz">
+       <PostalAddress Address1="PO Box 11-881" City="Wellington" CountryCode="NZ" PostalCode="6001"/>
+       <Phone AreaCode="4" CountryCode="64" LocalNumber="472 1600"/>
+       <Fax AreaCode="4" CountryCode="64" LocalNumber="495 2115"/>
+     </RegistrantContact>
+     <RegistrarPublicContact Name="Domain Name Commissioner" Email="info@dnc.org.nz">
+       <PostalAddress Address1="PO Box 11881" City="Wellington" CountryCode="NZ"/>
+       <Phone AreaCode="4" CountryCode="64" LocalNumber="472-1600"/>
+       <Fax AreaCode="4" CountryCode="64" LocalNumber="495-2115"/>
+     </RegistrarPublicContact>
+     <AdminContact Name="Internet New Zealand Incorporated" Email="exe.dir@internetnz.net.nz">
+       <PostalAddress Address1="PO Box 11-881" City="Wellington" CountryCode="NZ" PostalCode="6001"/>
+       <Phone AreaCode="4" CountryCode="64" LocalNumber="472 1600"/>
+       <Fax AreaCode="4" CountryCode="64" LocalNumber="495 2115"/>
+     </AdminContact>
+     <TechnicalContact Name="Technical Manager" Email="soa@internetnz.net.nz">
+       <PostalAddress Address1="InternetNZ" Address2="PO Box 11881" City="Wellington" CountryCode="NZ"/>
+       <Phone AreaCode="4" CountryCode="64" LocalNumber="472-1600"/>
+       <Fax AreaCode="4" CountryCode="64" LocalNumber="495-2115"/>
+     </TechnicalContact>
+     <BilledUntil Day="01" Hour="00" Minute="00" Month="1" Second="00" TimeZoneOffset="+12:00" Year="2010"/>
+     <RegisteredDate Day="07" Hour="00" Minute="00" Month="2" Second="00" TimeZoneOffset="+13:00" Year="2002"/>
+     <AuditDetails>
+       <AuditTime>
+         <From Day="14" Hour="10" Minute="01" Month="6" Second="37" TimeZoneOffset="+12:00" Year="2010"/>
+       </AuditTime>
+    </AuditDetails>
+  </Domain>
+</Response>
+</NZSRSResponse>

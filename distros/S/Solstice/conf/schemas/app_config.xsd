@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+    <xsd:simpleType name="boolType">
+        <xsd:restriction base="xsd:integer">
+            <xsd:enumeration value="0" />
+            <xsd:enumeration value="1" />
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:complexType name="nameType">
+        <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+                <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:extension>
+        </xsd:simpleContent>
+    </xsd:complexType>
+
+    <xsd:element name="app_config">
+        <xsd:complexType>
+            <xsd:all>
+                <xsd:element name="application_url" type="xsd:string" minOccurs="0" />
+                <xsd:element name="config_namespace" type="xsd:string" />
+                <xsd:element name="error_handler" type="xsd:string" minOccurs="0" />
+                <xsd:element name="db_name" type="xsd:string" minOccurs="0" />
+
+                <xsd:element name="css_files" minOccurs="0">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="css_file" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+
+                <xsd:element name="js_files" minOccurs="0">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="js_file" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+
+                <xsd:element name="urls" minOccurs="0">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="url" minOccurs="0" maxOccurs="unbounded">
+                                <xsd:complexType>
+                                    <xsd:attribute name="virtual_path" type="xsd:string" use="required" />
+                                    <xsd:attribute name="url_is_prefix" type="boolType" use="optional" />
+                                    <xsd:attribute name="pageflow" type="xsd:string" use="optional" />
+                                    <xsd:attribute name="initial_state" type="xsd:string" use="required" />
+                                    <xsd:attribute name="requires_auth" type="boolType" use="required" />
+                                    <xsd:attribute name="disable_back_button" type="boolType" use="optional" />
+                                    <xsd:attribute name="escape_frames" type="boolType" use="optional" />
+                                    <xsd:attribute name="debug_level" type="xsd:string" use="optional" />
+                                    <xsd:attribute name="view_top_nav" type="boolType" use="optional" />
+                                    <xsd:attribute name="title" type="xsd:string" use="optional" />
+                                    <xsd:attribute name="boilerplate_view" type="xsd:string" use="optional" />
+                                    <xsd:attribute name="require_session" type="boolType" use="optional" />
+                                    <!-- These are not in use; they will be dropped at some point! -->
+                                    <xsd:attribute name="timer" type="boolType" use="optional" />
+                                    <xsd:attribute name="wire_frames" type="boolType" use="optional" />
+                                    <xsd:attribute name="show_lang_tags" type="boolType" use="optional" />
+                                </xsd:complexType>
+                            </xsd:element>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+
+                <xsd:element name="statics" minOccurs="0">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="static" minOccurs="0" maxOccurs="unbounded">
+                                <xsd:complexType>
+                                    <xsd:simpleContent>
+                                        <xsd:extension base="xsd:string">
+                                            <xsd:attribute name="virtual_path" type="xsd:string" use="optional" />
+                                        </xsd:extension>
+                                    </xsd:simpleContent>
+                                </xsd:complexType>
+                            </xsd:element>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+
+                <xsd:element name="cgis" minOccurs="0">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="cgi" minOccurs="0" maxOccurs="unbounded">
+                                <xsd:complexType>
+                                    <xsd:simpleContent>
+                                        <xsd:extension base="xsd:string">
+                                            <xsd:attribute name="virtual_path" type="xsd:string" use="optional" />
+                                            <xsd:attribute name="requires_auth" type="xsd:string" use="required" />
+                                            <xsd:attribute name="url_is_prefix" type="boolType" use="optional" />
+                                        </xsd:extension>
+                                    </xsd:simpleContent>
+                                </xsd:complexType>
+                            </xsd:element>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+
+                <xsd:element name="webservices" minOccurs="0">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="resource" minOccurs="0" maxOccurs="unbounded">
+                                <xsd:complexType>
+                                    <xsd:attribute name="virtual_path" type="xsd:string" use="required" />
+                                    <xsd:attribute name="controller" type="xsd:string" use="required" />
+                                    <xsd:attribute name="url_is_prefix" type="boolType" use="optional" />
+                                    <xsd:attribute name="requires_auth" type="boolType" use="optional" />
+                                </xsd:complexType>
+                            </xsd:element>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+
+                <xsd:element name="remotes" minOccurs="0">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="remote" type="nameType" minOccurs="0" maxOccurs="unbounded" />
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+
+                <xsd:element name="keys" minOccurs="0">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="key" type="nameType" minOccurs="0" maxOccurs="unbounded" />
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </xsd:all>
+        </xsd:complexType>
+    </xsd:element>
+
+</xsd:schema>

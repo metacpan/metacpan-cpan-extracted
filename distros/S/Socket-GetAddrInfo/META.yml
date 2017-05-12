@@ -1,0 +1,47 @@
+---
+abstract: 'address-family independent name resolving functions'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  ExtUtils::CBuilder: 0
+  ExtUtils::CChecker: 0.06
+  Module::Build: 0
+  Module::Build::Compat: 0
+  Scalar::Util: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::CBuilder: 0
+  ExtUtils::CChecker: 0.06
+  Module::Build: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Socket-GetAddrInfo
+provides:
+  Socket::GetAddrInfo:
+    file: lib/Socket/GetAddrInfo.pm
+    version: 0.22
+  Socket::GetAddrInfo::Core:
+    file: lib/Socket/GetAddrInfo/Core.pm
+    version: 0.22
+  Socket::GetAddrInfo::Emul:
+    file: lib/Socket/GetAddrInfo/Emul.pm
+    version: 0.22
+  Socket::GetAddrInfo::Socket6api:
+    file: lib/Socket/GetAddrInfo/Socket6api.pm
+    version: 0.22
+  Socket::GetAddrInfo::Strict:
+    file: lib/Socket/GetAddrInfo/Strict.pm
+    version: 0.22
+  Socket::GetAddrInfo::XS:
+    file: lib/Socket/GetAddrInfo/XS.pm
+    version: 0.22
+requires:
+  Exporter: 5.57
+  Socket: 2.001_001
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.22

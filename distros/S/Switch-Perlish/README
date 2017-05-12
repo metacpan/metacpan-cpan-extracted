@@ -1,0 +1,41 @@
+Switch::Perlish version 1.0.5
+=============================
+
+This is a Perl-oriented implementation of the "switch" statement. It uses
+smart-matching in "case"s which can be configured and extended by the user.
+There is no magical syntax so "switch"/"case"/"default" expect coderefs,
+which are most simply provided by anonymous subroutines. By default
+successful "case" statements do not fall through[1]. To fall through a
+"case" block call the "fallthrough" subroutine explicitly. For "C" style
+"switch" behaviour[2] simply call the module with an upper-case C i.e
+
+  use Switch::Perlish 'C';
+
+[1] To 'fall through' in a "case" block means that the "switch" block
+isn't exited upon success.
+
+[2] upon a "case" succesfully matching all subsequent "case"s succeed;
+to break out from the current "switch" completely use "stop".
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  warnings
+  Scalar::Util
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Dan Brook
+
+This code is distributed under the same copyright terms as Perl itself.
+

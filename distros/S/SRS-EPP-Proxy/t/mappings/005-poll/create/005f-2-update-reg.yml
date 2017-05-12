@@ -1,0 +1,14 @@
+description: Update the registrar
+registrar: 1
+
+
+request: |-
+ <NZSRSRequest VerMajor="1" VerMinor="0" RegistrarId="100"> 
+   <RegistrarUpdate ActionId="005f-2-update-reg.yml" Name="Changed">
+
+   </RegistrarUpdate>
+ </NZSRSRequest>
+
+
+assertions:
+ - xpath_matches: [ '//Error', '0', 'No errors' ]

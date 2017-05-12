@@ -1,0 +1,246 @@
+Revision history for Perl extension Statistics::Descriptive.
+
+3.0612      2016-01-09
+    - Move the VCS repository to GitHub.
+        - People are more used to it, and it can take part in the CPAN pull-req
+        challenge.
+
+3.0611      2016-01-07
+    - Apply patch from Debian to correct a spelling error.
+        - https://rt.cpan.org/Ticket/Display.html?id=110987
+        - Thanks to Salvatore Bonaccorso for the report and patch.
+
+3.0610      2016-01-06
+    - Clarified the docs for add_data_with_samples().
+        - Some people thought they were repeat counts of the data , but they
+        are normally ignored.
+    - Replace remaining tabs with spaces.
+
+3.0609      2015-06-19
+    - Update some old URLs and addresses.
+
+3.0608      2015-01-14
+    - Apply patch to speed up skewness calculations.
+        - https://rt.cpan.org/Public/Bug/Display.html?id=101422
+        - Thanks to Shawn (SLAFFAN).
+
+3.0607      2014-02-01
+    - Fix the List::MoreUtils prereqs.
+        - http://www.cpantesters.org/cpan/report/365b752c-8adf-11e3-bd14-e3bee4621ba3
+        - Thanks to Chris Williams (BINGOS) for the CPAN Testers Report.
+
+3.0606      2014-01-31
+    - Implement the median_absolute_deviation method.
+        - https://bitbucket.org/shlomif/perl-statistics-descriptive/pull-request/5/median-absolute-deviation-method/diff
+        - Thanks to Kang-min Liu.
+    - Minimal version of perl set to 5.6.0 (CPANTS).
+    - Add standalone LICENSE file (CPANTS).
+
+3.0605      2013-05-21
+    - Add t/style-trailing-space.t .
+    - Add t/cpan-changes.t .
+        - Convert Changes to it.
+
+3.0604      2012-07-14
+    - Correct a misspelling of "weight" in
+    lib/Statistics/Descriptive/Smoother/Weightedexponential.pm
+        - Thanks to Wilhelm for the report.
+    - Update the scripts/tag-release.pl file for Mercurial.
+
+3.0603      2012-05-15
+    - Use in_between to compare decimal numbers
+        - Smoothing tests were failing because of rounding problems
+        - Thanks to Andreas J. König for reporting it and to
+          Fabio Ponciroli for fixing it.
+
+3.0602      2012-05-12
+    - Correct a typo:
+        - https://rt.cpan.org/Ticket/Display.html?id=77145
+        - Thanks to Salvatore Bonaccorso and the Debian Perl Group
+        for the report.
+
+3.0601      2012-05-11
+    - No longer using Test::Exception in the tests.
+        - It was used by the tests and not specified in
+        test_requires/build_requires.
+        - Thanks to hsk@fli-leibniz.de for the report.
+
+3.0600      2012-05-11
+    - Add the smoothing functionality.
+        - Add the following public methods: add_data_with_samples(),
+        set_smoother(), get_smoothed_data() to the main module.
+        - Add the lib/Statistics/Descriptive/Smoother.pm and
+        lib/Statistics/Descriptive/Smoother/Exponential.pm
+        lib/Statistics/Descriptive/Smoother/Weightedexponential.pm
+        modules.
+        - Thanks to Fabio Ponciroli
+    - Add the scripts/bump-version-number.pl to facilitate bumping the
+    version number.
+
+3.0500      2012-05-03
+    - Add the get_data_without_outliers() and the set_outlier_filter()
+    methods.
+        - See https://bitbucket.org/barbasa/perl-statistics-descriptive/overview
+        - Thanks to Fabio Ponciroli
+
+3.0400      2012-03-01
+    - Fix https://rt.cpan.org/Ticket/Display.html?id=74890
+        - some function should return undef() in list context so they can
+        be easily assigned to values in hash initialisations.
+        - thanks to SLAFFAN for a preliminary patch which was modified
+        by SHLOMIF (the current Statistics-Descriptive maintainer).
+
+3.0300      2012-02-11
+    - Now mean() and median() and other routines return undef() if there are
+    no data.
+    - Somewhat incompatible change: some methods that returned undef() under
+    list context now return an empty list (so it will be false).
+        - it is generally not recommended to call such methods in list context
+        as they should always be called in scalar context.
+    - Resolves https://rt.cpan.org/Ticket/Display.html?id=74693
+        - thanks to Shawn Laffan for the report and the patch.
+
+3.0203      2011-11-17
+    - Fix https://rt.cpan.org/Ticket/Display.html?id=72495 .
+        - percentile should not die and should return undef if there are
+        no elements in the collection.
+
+3.0202      2011-07-23
+    - Moved tag-release.pl to scripts/tag-release.pl (though we now use
+    Mercurial instead of Subversion.)
+    - Add t/mode.t to test the ->mode() method.
+    - Documented ->mode() better.
+    - Optimized ->mode().
+
+3.0201      2010-10-14
+    - Add some documentation clarifying the 0th percentile return, as it
+    returns undef() for representing -inf:
+        - Fix https://rt.cpan.org/Ticket/Display.html?id=62055
+        - Thanks to Dave Breimann for reporting it.
+    - Add the tag-release.pl to tag a release using Subversion.
+
+3.0200      2010-06-18
+    - Added skewness and kurtosis
+        - https://rt.cpan.org/Ticket/Display.html?id=58187
+        - Thanks to Shawn Laffan.
+    - Removed the Changes / Revision log from the .pm file.
+
+3.0102      2010-06-15
+    - Add the $VERSION variable to Statistics::Descriptive::Sparse and
+    Statistics::Descriptive::Full. This was done to silence the CPAN indexer.
+
+3.0101      2010-06-15
+    - Moved the trimmed_mean caching test (that used the Benchmark.pm module)
+    to rejects/descr.t , because it kept failing.
+
+3.0100      2009-07-20
+    - Added the quantile method - thanks to Djibril Ousmanou (DJIBEL).
+        - https://rt.cpan.org/Ticket/Display.html?id=47948
+
+3.0000      2009-05-29
+    - Added tests (for ->count, ->sum, ->sumsq, ->min, ->max)
+    - Localized the scope of $stat and other variables in t/descr.t
+    - Got rid of AUTOLOAD in favour of individual accessors.
+    - Converted many direct member accesses to the accessors.
+    - Added ->frequency_distribution_ref() which deprecates
+      frequency_distribution().
+    - Some refactoring of the lib/Statistics/Descriptive.pm module
+    (without breaking the documented API).
+
+2.9         2009-05-13
+
+    - Fixed bug https://rt.cpan.org/Public/Bug/Display.html?id=46026 :
+        - standard_deviation failing due to a variance that got evaluated
+        to 0 due to rounding errors.
+    - Kwalitee : added a LICENSE section to the POD.
+    - Kwalitee (CPANTS) : added an examples/ directory with a script.
+
+2.8         2009-05-09
+
+    - Enabled "./Build runtest" and "./Build distruntest" (using Test::Run)
+    in the distribution.
+
+    - Fixed incomplete/broken tests in t/descr.t.
+
+2.7         2009-05-03
+
+    - Converted the distribution to Build.PL and re-organized it to
+    put everything under its proper place. Started maintaining it in:
+        - [Old SVN Repository] - URL Elided.
+
+    - Converted t/descr.t to use "use strict;" and "use warnings;".
+
+    - Converted t/descr.t to use Test::More.
+
+    - Cleaned up the "use" statement of lib/Statistics/Descriptive.pm.
+
+    - Added more explicit dependencies (core, though) to Build.PL.
+
+    - Fixed RT bug #34999: freq distribution generated too many bins.
+        - https://rt.cpan.org/Ticket/Display.html?id=34999
+
+    - Added some keywords and resources to the META.yml, using Build.PL's
+    meta_merge.
+
+    - Fixed https://rt.cpan.org/Ticket/Display.html?id=32183
+        - more authoritative (and non-broken) link to the RFC.
+
+    - Applied the patch in https://rt.cpan.org/Ticket/Display.html?id=9160
+        - {{#9160: Variance and Standard Deviation use costly pseudo-variance,
+        instead of computing real variance}}.
+
+2.6         2002-10-10
+    - Fixed caching in trimmed mean and modified code to allow trimming
+      0% from upper bound.  Formerly if 0 was requested then it used the
+      lower bound!
+
+    - POD format patch from ddunlap
+
+2.5         1999-05-12
+    - Forgot to document change in v2.4, which included fixing
+      percentile so that it worked right and added to the test
+      harness.
+    - Modified frequency_distribution so that specific bins could
+      be passed in.  Fixed caching so that it actually works
+      (it only used to get stuck returning the result of the
+      first call).
+    - Turned off caching for least_squares_fit because there's no
+      way to generate a unique key for memorization.
+
+2.3         1998-11-12
+    - Fix for frequency distribution.
+      Changed Makefile.PL to ease ActiveState distribution of the module.
+      Andrea's code for preventing division by zero and other
+      improvements.  He also wrote a great test bench.
+      Added code from Warren Matthews to calculate percentile.
+
+2.2         1998-02-23
+    - Multiple bug fixes:
+      Fixed min/max bug with '0' vs defined.
+      Provided fix for bug with AUTOLOAD/DESTROY/Carp problem.
+
+2.1         1997-09-02
+    - Multiple bug fixes:
+      Cleaned up syntax error with my scoping.
+      Fixed errors in least_squares_fit and median methods
+
+2.00        1997-08-20
+    - new version; created by h2xs 1.16
+    - Complete rewrite of OO interface by Colin Kuskie.
+    - Now has 2 classes instead of 1.5, a base class without data
+      storage and a class that inherits the base methods and
+      extends them with data storage and more statistics.
+
+1.1         1995-04-01
+        - Added LeastSquaresFit and FrequencyDistribution.
+
+1.0         1995-03-01
+        - Released to comp.lang.perl and placed on archive sites.
+
+0.20        1994-12-01
+        - Complete rewrite after extensive and invaluable e-mail
+          correspondence with Anno Siegel.
+
+0.10        1994-12-01
+        - Initital concept, released to perl5-porters list.
+    - Jason Kastner <jkastner@tuba.aix.calpoly.edu>

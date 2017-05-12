@@ -1,0 +1,53 @@
+SGML-Parser-OpenSP
+==================
+
+This module provides an interface to the OpenSP SGML parser.
+
+INSTALLATION
+
+To install this module type the following:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+PPM PACKAGE
+
+A Win32 ppm package, suitable for use with ActivePerl compatible
+Perl packages, is kindly provided by Randy Kobes at
+
+  http://theoryx5.uwinnipeg.ca/ppms/
+
+To install it, within the ppm shell set the repository to
+
+  http://theoryx5.uwinnipeg.ca/cgi-bin/ppmserver?urn:/PPMServer58
+
+and then
+
+  ppm> install SGML-Parser-OpenSP
+
+This should run a post-install script to fetch and install the
+needed OpenSP 1.5.2+ DLL; if this doesn't work, the DLL can be
+obtained from
+
+  http://theoryx5.uwinnipeg.ca/ppms/scripts/
+
+which should subsequently be placed somewhere in the PATH.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Perl 5.8.0 or later
+  Class::Accesor
+  The OpenSP library v1.5.2 or later, see http://openjade.sf.net/
+
+Note that you need the header files and link libraries included in
+"-dev" packages for OpenSP, not just the command line applications.
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2006-2008 by Bjoern Hoehrmann <bjoern@hoehrmann.de>
+
+This module is licensed under the same terms as Perl itself.

@@ -1,0 +1,31 @@
+Revision history for Statistics-Sequences-Vnomes-0.20
+
+0.20    1 Mar 2016
+        - corrected calculation of circularized psi-sq: was implemented from Good (1953, Eq. 2), the original paper on this test. However, it was seen (after multiple use) to sometimes yield negative values - because it does not square the observed-expected count difference in the sum-of-squares. This was (silently) corrected in Good & Gover (1957), which is now implemented.
+        - psisq() called in list context now also returns df and p_value
+        - removed z_value method - only appropriate if df = 1, and requires test of validity
+        - removed from code undocumented and inappropriate option to set "tails" for p_value (error of code-recycling from other Sequence modules)
+        - removed "nstates" arg from nnomes() method; just supply aref of "states" if necessary, as for other methods
+        - croak re undefined or zero length argument rewritten, made method-specific
+        - removed croak from observed() if a defined length of v is not valid so that frequencies can still be obtained
+        - removed doc of excessive aliases for observed() and other methods - support remains but will be removed in next version
+        - removed NIST examples from testing as these appear to be basd on circularizing the sequence but then calculating the expectation value in the sum-of-squares in a way that is appropriate for uncircularized sequences.
+        - added DIAGNOSTICS section to POD
+
+0.11    18 July 2013
+        - Corrected calculation of psisq for uncircularized sequences, with test of it in ref.t from Tart
+        - Added variance(), stdev(), nnomes() and prob_r() methods.
+        - More verbosity in dump() with format => 'table'
+        - Clean up redundant code for expected() and psisq()
+        - Ensure tails => 1 by default whenever getting p_value(). Could make more intelligent later on.
+        - Misc. POD revisions, including adding formulae for psisq
+
+0.10    27 June 2013
+        - Integrated with Statistics::Data via Statistics::Sequences
+        - Methods for observed(), expected(), etc., standrdized so work as in other Statistics::Sequences sub-modules
+        - No croak if only 1 event in sequence
+        - Not compatible with previous versions 0.01-0.05
+
+0.01	Tue Nov  6  1:45:43 2012
+        First version, released on an unsuspecting world.
+

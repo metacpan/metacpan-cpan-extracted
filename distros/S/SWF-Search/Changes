@@ -1,0 +1,6 @@
+Revision history for Perl extension SWF::Search.
+
+0.01  Tue Jun 11 13:44:14 2002
+	- original version; basic editText and label search
+          implemented from my homebrew SWF::Parser code
+

@@ -1,0 +1,25 @@
+bin/sendmail
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Sendmail/Queue.pm
+lib/Sendmail/Queue/Base.pm
+lib/Sendmail/Queue/Df.pm
+lib/Sendmail/Queue/Qf.pm
+Makefile.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00-load.t
+t/lock.t
+t/pod-coverage.t
+t/pod.t
+t/sendmail-queue-df.t
+t/sendmail-queue-qf.t
+t/sendmail-queue.t

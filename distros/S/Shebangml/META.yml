@@ -1,0 +1,40 @@
+---
+name: Shebangml
+version: v0.0.1
+author:
+  - 'Eric Wilhelm @ <ewilhelm at cpan dot org>'
+abstract: markup with bacon
+license: perl
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Shebangml
+  homepage: http://scratchcomputing.com/
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.scratchcomputing.com/Shebangml/trunk
+build_requires:
+  Module::Build: 0.26
+  Test::More: 0
+requires:
+  Class::Accessor::Classy: 0
+  XML::Parser::Expat: 2.36
+  perl: 5.006002
+configure_requires:
+  Module::Build: 0.31
+provides:
+  Shebangml:
+    file: lib/Shebangml.pm
+    version: v0.0.1
+  Shebangml::Attrs:
+    file: lib/Shebangml.pm
+  Shebangml::FromHTML:
+    file: lib/Shebangml/FromHTML.pm
+    version: v0.0.1
+  Shebangml::FromXML:
+    file: lib/Shebangml/FromXML.pm
+    version: v0.0.1
+  Shebangml::State:
+    file: lib/Shebangml/State.pm
+    version: v0.0.1
+generated_by: Module::Build version 0.3406
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

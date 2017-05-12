@@ -1,0 +1,25 @@
+Socket/MsgHdr version 0.02
+==========================
+
+Advanced socket messaging operations:  sendmsg, recvmsg and cmsghdr
+manipulation.  Available as plain functions or IO::Socket methods.
+
+XS handles structure packing (possible but unpleasant in Perl) and wraps
+the syscalls; you and Perl do the rest!
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003, 2010 Michael J. Pomraning
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

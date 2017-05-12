@@ -1,0 +1,7 @@
+ChangeLog
+lib/String/Scanf.pm
+Makefile.PL
+MANIFEST
+README
+t/scanf.t
+META.yml                                Module meta-data (added by MakeMaker)

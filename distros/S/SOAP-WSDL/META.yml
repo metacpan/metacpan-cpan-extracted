@@ -1,0 +1,43 @@
+---
+abstract: 'SOAP with WSDL support'
+author:
+  - 'Scott Walters <scott@slowass.net>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.88, CPAN::Meta::Converter version 2.133380'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SOAP-WSDL
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Class::Load: '0.2'
+  Class::Std::Fast: '0.000005'
+  Cwd: '0'
+  Data::Dumper: '0'
+  Date::Format: '0'
+  Date::Parse: '0'
+  File::Basename: '0'
+  File::Path: '0'
+  File::Spec: '0'
+  Getopt::Long: '0'
+  LWP::UserAgent: '0'
+  List::Util: '0'
+  Module::Build: '0'
+  Storable: '0'
+  Template: '2.18'
+  Term::ReadKey: '0'
+  Test::More: '0'
+  URI: '0'
+  XML::Parser::Expat: '0'
+  perl: '5.008'
+resources:
+  repository: https://github.com/scrottie/SOAP-WSDL.git
+version: 3.003

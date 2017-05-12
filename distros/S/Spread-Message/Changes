@@ -1,0 +1,15 @@
+Revision history for Perl extension Spread::Message.
+
+0.01  Wed Jul 23 15:01:27 2003
+	- original version; created by h2xs 1.21 with options
+		-Xcfn Spread::Message
+
+0.2 released Mon Apr 24 16:58:23 EST 2006
+	- This is the first public release - in fear and trepidation!
+	- This has been used consistently now for a few years but is probably
+	  still full of bugs.
+
+0.21 Wed Apr 26 21:38:15 EST 2006
+	- added sendcmd.pl and cmd.pl examples
+	- fixed some doco as well
+	- no code changes made at all

@@ -1,0 +1,199 @@
+Revision history for Sman.  
+http://joshr.com/src/sman/
+Copyright 2004-2016 Josh Rabinowitz  <joshr>
+
+1.04  Sat Sep 02 2016
+      - Use IPC::Run::run()
+      - Changes to make Sman installable as non-root
+      - Improved some entries in this Changes file.
+      - Add timeout around conversion of files to text.
+      - Changes for PAUSE, and changes for swish-e 2.6.
+        
+1.03   Wed May 28 2008
+      - 'cat %F | gunzip -f --stdout | man -c' method removed
+          to get ascii from manpages; (it caused warnings on Centos 4
+          when autoconfiguring under cron)
+      - Look in /usr/local/lib/swish-e/perl and /usr/libexec/swish-e/perl/
+            for SWISH::DefaultHighlight. Latter is where rpms put it.
+      - Better error outputs if we can't locate swish-e or load SWISH::API.
+      - No known machines use 'cat %F | gunzip -f --stdout | man -c' 
+          to get ascii from manpages; method removed (it caused warnings on Centos4)
+      - Added to and changed the TODO file
+
+1.02  Thu Jul 27 2006
+      - Minor code cleanup
+      - Enable ability to use doclifter as a manpage-to-xml converter
+      - Added --scheme=[0|1] command line option to sman (default is 1, if the
+          version of Swish-e installed supports it)
+      - add /sw/bin to PATH we set in sman-update
+          version of Swish-e installed supports it).
+      - Add support for fink on MacOSX.
+      - Support for debian 4.0 and later.
+      - Code cleanups and corrections; better error reporting.
+      - Not released
+1.01  Thu Jul 06 2006
+      - Documentation updates
+      - Tiny change to sman.conf.pm's pod for Test::Pod
+      - Changes to sman-defaults.conf for swished's swished_example.cgi
+		  (see http://search.cpan.org/dist/swished/ )
+      - Updates to TODO file
+1.00  Thu May 04 2006
+      - Removed spurious error message when using sman's -v option without a query
+      - Changed source & -V version string to show Swish-e capitalized as here
+      - Test current Swish-e version more carefully in Sman::Util
+      - More error output in sman's undocumented --Debug mode
+      - Cleanup how we check for $SWISH::API::VERSION
+      - Touchups to formatting of Changes file
+      - Updated various dates to 2006
+      - Tiny POD touchups
+0.99   Tue May 02 2006
+      - Avoid warnings from sman-update for nonexistant dirs in manpath
+      - Be more careful about configuration files and temp files
+      - Changes for win32 under cygwin
+      - Typo fixes and rewordings in docs, more TODO changes
+      - Little changes to sman-defaults.conf
+      - Added dependencies to Makefile.PL
+      - POD error in sman.conf.pm fixed as per cpants
+      - Tests added to test POD and POD coverage
+0.98   Tue Aug 30 2005
+      - bugfix: added Sman/IndexVersion.pm to MANIFEST (thanks to testers!)
+      - added t/34_SmanIndexVersion.t to test Sman::IndexVersion
+      - TODO modified
+0.97   Mon Aug 29 2005
+      - Check that a sufficient SWISH::API version is installed,
+          handle absence better
+      - Fixed Sman::IndexVersion, it now uses Sman::Config
+      - Handle errors in sman better
+      - Added --progress and --max options to sman-update
+      - Documentation updates
+0.96   Fri Aug 26 2005
+      - Choose number of results to show based on rows returned from Term::Size
+          (to override use sman's --max=N command line option)
+      - Put quotes around verbatim error string from Swish-e if we show one
+      - Avoid warnings from zcat during sman-update autoconfiguration on OSX 10.4
+      - Use 'man -c' (and ENV_MANWIDTH) to actually wrap manpages to 256 char lines
+      - Fix NAME section of sman-update perldocs (to fix problem of 
+          sman-update not appearing at http://search.cpan.org/~joshr/Sman-0.95/ )
+      - Document running as low-priv user in sman-update
+      - Update TODO and sman.conf documentation
+      - Show index update time in sman and sman-update --VERSION output
+      - Added /var/lib/sman/sman.index.version file and usage
+      - Use Swish-e's rank scheme 1 by default if index allows
+0.95   Sat Jun 25 2005
+      - Changes for Swish-e deprecation of 'FuzzyIndexingMode Stem'
+      - Changed default to use 'zcat -f --stdout', not 'zcat -f'
+      - Changed -V output slightly
+      - More changes to tests
+      - Doc and typo fixes
+      - Avoid various warnings from different perls/OSs/helper programs
+0.94   Wed Jan 05 2005 
+      - Renumbered versions from 0.9.x to 0.9x
+      - Fixed perldoc for Sman.pm 
+      - Prefix warnings from sman and sman-update with 'sman[-update]: '
+      - Have sman mention sman-update if the index file appears empty
+0.9.3  Tue Jan 04 2005
+      - Moved perldocs from script/sman to Sman.pm
+0.9.2  Tue Jan 04 2005
+      - Updated README to mention sman's --extract option
+      - Updated Usage in README and sman
+      - Change example in sman docs to use --rank instead of -r
+      - Show total hits and less about config files in sman -v
+      - Added Swish-e WordCharacters, BeginCharacters, and EndCharacters
+         settings to sman-default.conf so underscores and colons are
+         accepted as word characters, thus (for example) mod_perl and 
+         Apache::Test are each indexed as single words
+      - use length(content) & 'use bytes' instead of pack() 
+      - Changed tests to succeed even if there is no /usr/local/lib/swish-e/ directory
+0.9.1  Sun Jun 06 2004
+      - Updated README to reflect current output of 'sman -h'
+      - First Sman release on CPAN
+0.9.0  Sun Jun 06 2004
+      - sman: added --extract option, which shows extract of manpage,
+         use ResultPropertyString() to avoid exceptions, 
+         make default width 80 chars if not connected to a terminal
+      - sman-update: only print errors from 'man' if -warn is enabled
+      - Added 'manpage' and 'digest' metas and props to index
+      - Added basic tests for sman and sman-update scripts
+      - Updated TODO file
+      - This version was never released
+0.8.9  Mon May 31 2004
+      - Updated TODO, fixed copyright year and typos in README & sman-defaults.conf
+      - Get version string for perl, not its API version 
+          in Sman::Util::GetVersionString
+      - Consider output of choice of MANCMD verbose 
+0.8.8  Mon Apr 19 2004
+      - Disable warnings in some of Sman::Man::Cache::FileCache for perl 5.8.0
+      - Added perl version to -V(ERSION) output, show versions as '5.8.3'
+      - Updated README
+      - Remove config entries for defunct DB_File caching
+      - Use 'no warnings', not $^W to disable warnings in .../FileCache.pm
+      - Updated 'TODO' file.
+      - Tiny change to sman to avoid perl warnings on OS X 10.3.3
+      - Fixed years to 2004 in Changes files
+0.8.7  Sat Apr 17 2004
+      - Update TODO, README
+      - Add stemming back with Swish-e's new FuzzyIndexingMode directive
+0.8.6  Sat Apr 17 2004
+      - Prereq perl modules are v0.00, not v0.01 in Makefile.PL
+      - There is no 'cmd' property, remove to work with Swish-e 2.4.2
+      - Added 'clearcache' feature to sman-update & documented
+      - Always name sman-update correctly in docs
+      - Remove Stemming from default config file
+      - Make sure to remove /tmp/tmpswish*.conf at end
+0.8.5  Mon Dec 29 2003
+      - Fixed problem introduced in sman-defaults.conf
+0.8.4  Sun Dec 28 2003
+      - Turned off stemming.
+      - Added --quote option in sman to quote descriptions.
+      - Added --clearcache option to sman-update.
+      - Made Term::Size optional.
+      - Doc touches.
+0.8.3  Sat Dec 13 2003
+      - Respect terminal width in sman.
+      - Bug fixes and documentation updates.
+      - Use Cache::FileCache for cachedir if we can.
+      - Hardcode default paths to zcat, col, and rman.
+      - Added TMPDIR and DEBUGXML directives.
+0.8.2  Sun Dec 07 2003
+      - Tagged correctly in CVS.
+0.8.1  Sun Dec 07 2003
+      - Moved sman and sman-update to scripts/ for 
+         Mac OS X (sman & Sman/ were in same dir).
+      - Modularized -V (show version) option in sman
+         and sman-update.  
+0.8.0  Thu Jun 19 2003
+      - Doc changes, bug fixes.
+      - Can set env vars via ENV_* config directives
+      - sman:
+          By default skip repeat manpages
+          --repeat config shows repeats like before
+      - sman-update:
+          Set ENV_MANWIDTH 256 in sman-defaults.conf
+          Added --begin and --number options to sman
+          Trap all stderr from child processes- 
+           show some, though.
+0.7.9  Thu Jun 19 2003
+      - Touched up XML for older libxml2 libs.
+      - Added RCS Id tags to more files.
+0.7.8  Tue Jun 17 2003
+      - sman and sman-update:
+          show version with -V[ERSION] option
+          show verbose data with -v[erbose] option
+          use config file spec'd in --config opt if present
+          command line options are case-sensitive.
+      - sman-update:
+          supports --warn opt (show manpage conversion warnings) 
+          won't write swishe index if --dryrun|-n opt present
+      - Many doc changes, bug fixes, clarifications.
+0.7.7  Mon Jun 16 2003
+      - Added %S, %C, %F formats to MANCMD 
+      - Added TODO file.
+0.7.6  Mon Jun 16 2003
+      - More docs, command line overrides config file,
+      - more changes.
+0.7.5  Sun Jun 15 2003
+      - Rman disabled. Bug fixes.
+      - First near-complete documentation.  
+0.7.4  Sat Jun 14 2003
+      - First release.
+

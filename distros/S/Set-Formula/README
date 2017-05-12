@@ -1,0 +1,177 @@
+Set-Formula
+
+   Set::Formula - Formula calculation for sets.
+
+SYNOPSIS
+   use Set::Formula;
+   formula_checker (string_containing_formula);    # syntax check without debug
+   formula_checker (string_containing_formula, 1); # syntax check with    debug
+
+   formula_calcul  (string_containing_formula, \%result, \%HoH_sets);    # without 
+   formula_calcul  (string_containing_formula, \%result, \%HoH_sets, 1); # with    
+
+   equality_checker (\%set1, \%set2);              # without debug
+   equality_checker (\%set1, \%set2, 1);           # with    debug
+
+DESCRIPTION
+   formula_checker  - checks syntax of formula without its calculation.
+   formula_calcul   - calculates formula without its syntax check.
+   equality_checker - checks, if 2 sets are equal.
+
+   Formula should be written in common arithmetic notation (infix notation)
+   and can contain unrestricted amount of nested parentheses ().
+
+   Supported set operators are
+   "+"    - union,
+   "-"    - complement,
+   "^"    - intersection.
+
+   All these operators are binary operators, i.e. they require 2 operands.
+
+   Formula without parentheses is evaluated from left to right
+   with equal priority for all operators.
+   Parentheses increase priority of partial formula expressions.
+
+   White characters including new line in formula are accepted and ignored.
+   Thus formula might be placed into both a single line and multiple lines.
+
+   Return Values
+   formula_checker and formula_calcul return nonzero on success,
+   the undefined value otherwise.
+
+   equality_checker returns 1 if both sets are equal, else 0.
+
+TECHNICAL IMPLEMENTATION OF SETS
+   For formula_checker and formula_calcul
+   --------------------------------------
+   All formula operands must be highest level keys of a hash of hashes,
+   that is named in example below as %HoH_sets.
+   Lowest level keys of this hash of hashes form corresponding sets.
+   Values of lowest level hashes are irrelevant (can be undefined).
+
+   Name convention for formula operands: begin with a character, optionally
+   following by any amount of characters, digits, underlines.
+   Operand names are case sensitive.
+
+   For equality_checker
+   --------------------
+   Operands are sets, written in keys of one dimensional hashes.
+
+EXAMPLES
+   use Set::Formula;
+
+   @A{qw (bisque  red      blue  yellow)} = ();
+   @B{qw (bisque  brown    white yellow)} = ();
+   @C{qw (magenta pink     green       )} = ();
+   @D{qw (magenta pink     rose        )} = ();
+   @E{qw (bisque  honeydew             )} = ();
+   %HoH_sets = ( A=>\%A, B=>\%B, C=>\%C, D=>\%D, E=>\%E );
+
+   # or alternatively
+   %HoH_sets = (
+   A => { bisque  => 0,  red      => 0,  blue  => 0,  yellow => 0, },
+   B => { bisque  => 0,  brown    => 0,  white => 0,  yellow => 0, },
+   C => { magenta => 0,  pink     => 0,  green => 0,               },
+   D => { grey    => 0,  pink     => 0,  rose  => 0,               },
+   E => { bisque  => 0,  honeydew => 0,                            }
+   );
+   #  A, B, C, D, F are operands. Every of them is a set, written in keys of sublev
+
+   $formula  = "A ^ ( B + (C ^ D) ) - E";
+   %result = ();  # this hash must be declared, but it must not be emptied before
+   # call of formula_calcul()
+
+   # Usage of formula_checker() before formula_calcul() is recommended,
+   # but is not mandatory
+   formula_checker ($formula)                       || die "Error in formula\n";
+   formula_calcul  ($formula, \%result, \%HoH_sets) || die "Error in formula\n";
+
+   for (keys %result) {print "$_\n"}   # prints result of formula calculation
+
+   @expected_result{qw (magenta yellow)} = ();
+   if (equality_checker (\%result, \%expected_result)) { print "equal\n" }
+   else                                                { print "not equal\n" }
+
+EXPORT
+   formula_checker,
+   formula_calcul,
+   equality_checker.
+
+SEE ALSO
+   Part "Basic operations" - http://en.wikipedia.org/wiki/Set_(mathematics)
+   Infix notation          - http://en.wikipedia.org/wiki/Infix_notation
+
+AUTHOR
+   Mart E. Rivilis, rivilism@cpan.org
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Set::Formula
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Set-Formula
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Set-Formula
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Set-Formula
+
+    Search CPAN
+        http://search.cpan.org/dist/Set-Formula/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2013 Mart Rivilis
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Any use, modification, and distribution of the Standard or Modified
+Versions is governed by this Artistic License. By using, modifying or
+distributing the Package, you accept this license. Do not use, modify,
+or distribute the Package, if you do not accept this license.
+
+If your Modified Version has been derived from a Modified Version made
+by someone other than you, you are nevertheless required to ensure that
+your Modified Version complies with the requirements of this license.
+
+This license does not grant you the right to use any trademark, service
+mark, tradename, or logo of the Copyright Holder.
+
+This license includes the non-exclusive, worldwide, free-of-charge
+patent license to make, have made, use, offer to sell, sell, import and
+otherwise transfer the Package with respect to any patent claims
+licensable by the Copyright Holder that are necessarily infringed by the
+Package. If you institute patent litigation (including a cross-claim or
+counterclaim) against any party alleging that the Package constitutes
+direct or contributory patent infringement, then this Artistic License
+to you shall terminate on the date that such litigation is filed.
+
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+

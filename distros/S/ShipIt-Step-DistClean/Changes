@@ -1,0 +1,10 @@
+---
+global:
+  name: ShipIt-Step-DistClean
+releases:
+  - author: 'Marcel Gruenauer <marcel@cpan.org>'
+    changes:
+      - original version
+    date: 2007-11-09T10:30:21Z
+    tags: []
+    version: 0.01

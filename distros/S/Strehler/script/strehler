@@ -1,0 +1,870 @@
+#!/usr/bin/env perl
+
+use v5.10; ## no critic qw(ValuesAndExpressions::ProhibitVersionStrings)
+use Cwd;
+use File::Copy;
+use File::Copy::Recursive 'dircopy';
+use File::Path 'remove_tree';
+use Dancer2;
+use Dancer2::Core::Runner;
+use Dancer2::Core::App;
+use Strehler;
+use Strehler::Schema;
+use Strehler::Forms;
+require Strehler::Helpers;
+require Strehler::Meta::Category;
+use Term::ReadKey;
+use Authen::Passphrase::BlowfishCrypt;
+use DBI;
+use DBIx::Class::Schema::Loader qw/ make_schema_at /;
+use Data::Dumper;
+use Module::Load;
+use Carp;
+use lib getcwd() . "/lib";
+use IO::Prompt;
+use Try::Tiny;
+
+BEGIN
+{
+    local $ENV{DANCER_CONFDIR} = getcwd();
+}
+
+my $strehler_root = $INC{'Strehler.pm'};
+$strehler_root =~ s/\.pm$//;
+
+my $configured_schema_name = app->config->{'Strehler'}->{'schema'};
+my $configured_public_directory = Strehler::Helpers::public_directory();
+my $configured_views_directory = app->config->{views} || path( app->config_location, 'views' );
+
+my %available_commands = ('commands' => 'show available commands',
+                          'statics' => 'copy of static resources needed by Strehler to Dancer2 App',
+                          'demo' => 'create a complete Dancer2 App with Strehler already configured, for trial purpose',
+                          'initdb' => 'generate strehler tables on the wanted database',
+                          'layout' => 'import Strehler Admin layout, mandatory for admin interface extension',
+                          'pwdchange' => 'reset password for admin user',
+                          'batch' => 'as initdb+layout, standard installation. Eventually launch also schemadump',
+                          'categories' => 'load categories in DB from a file',
+                          'testelement' => 'test if a custom element has been created the right way',
+                          'schemadump' => 'call dbicdump to generate DBIx::Class packages',
+                          'initentity' => 'configure environment for not-standard entities'
+                      );
+
+my $command = shift || "";
+my @parameters = @ARGV;
+
+print "\n### Strehler CMS Manager ###\n\n";
+print "Strehler Version: " . $Strehler::VERSION . "\n\n";
+
+if(exists $available_commands{$command})
+{
+    print "-$command- command: $available_commands{$command}\n\n";
+}
+
+if($command eq 'statics')
+{
+    statics();
+}
+elsif($command eq 'initdb')
+{
+    initdb(@parameters);
+}
+elsif($command eq 'layout')
+{
+
+    layout(@parameters);
+}
+elsif($command eq 'demo')
+{
+    my $app  = shift @parameters || 'StrehlerDemo';
+    say "STEP 1: Creating Dancer App... $app";
+    my $exit_code = system("dancer2 -a $app");
+    print "\n\n";
+    if($exit_code != 0)
+    {
+        say "dancer2 command failed!\n";
+        exit(1); 
+    }
+
+    chdir $app;
+    demo_components();
+    statics(getcwd() . "/public");
+    initdb(1);
+    #layout(getcwd(). "/views"); //No more needed from dashboard
+    say "Demo SUCCESSFULLY DEPLOYED!";
+    say "Run Dancer2 devserver under $app, go to ADDRESS:PORT/admin, insert admin as user and as password and ENJOY!\n\n";
+}
+elsif($command eq 'pwdchange')
+{
+    my $schema = $configured_schema_name;
+    say "Getting database info...";
+    my ($schema_name, $dsn, $user, $password) = get_database($schema);
+    if(! $schema_name)
+    {
+        say "No schema in site configuration\n";
+        exit(1);
+    }
+    say "Checking connection info...";
+    exit(1) if(! check_database_connection($dsn, $user, $password));
+    say "Connected to database...";
+    my $conn = Strehler::Schema->connect($dsn, $user, $password);
+    my $user_password = choose_admin_password();
+    my ($hash, $salt) = encrypt_password($user_password);
+   
+    my $admin_user = $conn->resultset('User')->find({ user => 'admin' });
+    $admin_user->password_hash($hash);
+    $admin_user->password_salt($salt);
+    $admin_user->update();
+}
+elsif($command eq 'batch')
+{
+    initdb();
+    statics();
+    my ($schema_name, $dsn, $user, $password, $schema_class) = get_database($configured_schema_name);
+    if($schema_class ne 'Strehler::Schema')
+    {
+        schemadump($configured_schema_name);
+    }
+}
+elsif($command eq 'categories')
+{
+    my $filename = shift || 'categories.txt';
+    open( my $file, "<", $filename ) or croak "Impossible to open $filename";
+    my @to_create;
+    my %post_data;
+    say "Processing file: $filename\n";
+    while ( my $line = <$file> )
+    {
+        #Tags management
+        if($line =~ /^ /)
+        {
+            chomp $line;
+            $line =~ s/^ +//;
+            $line =~ s/#.*//g;
+            $line =~ s/ +$//;
+            next if($line =~ /^ *$/);
+            if(! %post_data )
+            {
+                say "Tags line with no category. File malformed?";
+            }
+            say "Processing tags line for category " . $post_data{'line'};
+            my @tags_data = split ';', $line;
+            $post_data{'tags-' . $tags_data[0]} = $tags_data[1];
+            $post_data{'default-' . $tags_data[0]} = $tags_data[2];
+        }
+        #Category management
+        else
+        {
+            $line =~ s/#.*//g;
+            $line =~ s/ +$//;
+            if(%post_data)
+            {
+                my %insert = %post_data;
+                push @to_create, \%insert;
+                %post_data = ();
+            }
+            chomp $line;
+            next if($line =~ /^ *$/);
+            say "\n=== Processing $line ===";
+            $post_data{'line'} = $line;
+            my @elements = split '/', $line;
+            my $examined_category = "";
+            my $parent_id = undef;
+            my $previous_category = "";
+            while(@elements)
+            {
+                my $examined_category_name = shift @elements;
+                $examined_category .= '/' if($examined_category ne "");
+                $examined_category .= $examined_category_name;
+                my $cat = Strehler::Meta::Category->explode_name($examined_category);
+                if($cat->exists())
+                {
+                    #Category is the one written in the file and exists. We manage it considering existence of tag lines.
+                    if(! @elements)
+                    {
+                        $post_data{'post_id'} = $cat->get_attr('id');
+                        $post_data{'prev-name'} = $examined_category_name;
+                        $post_data{'category'} = $examined_category_name;
+                        $post_data{'prev-parent'} = $parent_id;
+                        $post_data{'parent'} = $parent_id;
+                        say "Category $examined_category_name already exists";
+                        say "---";
+                    }
+                    #It just a parent of the category in the file
+                    else
+                    {
+                        say "Existing parent $examined_category_name";
+                        $parent_id = $cat->get_attr('id');
+                    }
+                }
+                else
+                {
+                    #Let's create the new category as asked by the file
+                    if(! @elements)
+                    {
+                        $post_data{'post_id'} = undef;
+                        $post_data{'category'} = $examined_category_name;
+                        if($parent_id)
+                        {
+                            $post_data{'parent'} = $parent_id;
+                        }
+                        else
+                        {   
+                            if($previous_category)
+                            {
+                                $post_data{'created_parent'} = 1;
+                                $post_data{'parent_name'} = $previous_category if($previous_category);
+                            }
+                        }
+                        say "New category: $examined_category_name";
+                        say "---";
+                    }
+                    #Parent creation (could be necessary to create more parents)
+                    else
+                    {
+                        my %parent_data = ( 'line' => $examined_category, 
+                                            'category' => $examined_category_name, 
+                                            'im_parent' => 1 ); 
+                        #Previous category existed
+                        if($parent_id)
+                        {
+                            say "There's a parent: $parent_id";
+                            $parent_data{'parent'} = $parent_id;
+                        }                       
+                        else
+                        {
+                            if($previous_category)
+                            {
+                                say "There's a previous: $previous_category";
+                                $parent_data{'created_parent'} = 1;
+                                $parent_data{'parent_name'} = $previous_category if($previous_category);
+                            }
+                        }
+                        say "Parent category to be created: " . $examined_category_name;
+                        push @to_create, \%parent_data;
+                        $parent_id = undef;
+                    }
+                }
+                $previous_category = $examined_category;
+            }
+        }
+    }
+    if(%post_data)
+    {
+        my %insert = %post_data;
+        push @to_create, \%insert;
+    }
+    my $parent = undef;
+    print "\n";
+    my %created_categories;
+    foreach my $c (@to_create)
+    {
+        say "Working on " . $c->{'line'};
+        if(exists $created_categories{$c->{'line'}}) 
+        {
+            if($c->{'im_parent'})
+            {
+                say "Parent submit already executed, no action";
+                next;
+            }
+            say "Submit already executed, refreshing";
+            $c->{'post_id'} = $created_categories{$c->{'line'}};
+            $c->{'prev-name'} = $c->{'category'};
+        }
+        if($c->{'created_parent'} && $c->{'created_parent'} == 1)
+        {
+            $c->{'parent'} = $created_categories{$c->{'parent_name'}};
+        }
+        if($c->{'post_id'})
+        {
+            $c->{'prev-parent'} = $c->{'parent'};
+        }
+        $created_categories{$c->{'line'}} = create_category($c->{'post_id'}, $c);
+        if($created_categories{$c->{'line'}})
+        {
+            say $c->{'line'} . " correctly submitted";
+        }
+        else
+        {
+            say "Problems submitting " . $c->{'line'};
+        }
+    }
+    say "\nCategory generation completed!\n\n";
+}
+elsif($command eq 'testelement')
+{
+    my $class = shift;
+    if(! $class)
+    {
+        say "No entity package provided";
+        exit(1);
+    }
+    else
+    {
+        say "Checking $class...\n";
+    }
+    load $class;
+    if($@)
+    {
+        say $@;
+        say "Bad entity package provided";
+        exit(1);
+    }
+    my $rs;
+    try
+    {
+        $rs = $class->get_schema()->resultset($class->ORMObj());
+    } catch {
+        say "WARNING: Wrong ORM object linked to the entity";
+    };
+
+    if($class->multilang_children ne '' && ! $class->multilang_form())
+    {
+        say " WARNING: element has multilang db management, but not multilang form";
+    }
+    if($class->multilang_children eq '' && $class->multilang_form())
+    {
+        say " WARNING: element has multilang form, but not multilang db management";
+    }
+
+    my $form;
+    say "Form:";
+    try
+    {
+        $form = Strehler::Forms::form_generic($class->form(), $class->multilang_form(), {languages => ['en', 'it'], default_language => 'en', only_default_required => $class->only_default_required()}); 
+    }
+    catch{
+        say " WARNING: Form generation KO!";
+        print $@;
+        print "\n";
+    };
+    if($form)
+    {
+        say "    Form generation OK!";
+    }
+    else
+    {
+        say "No errors returned but form is null";
+    }
+
+    if($class->categorized())
+    {
+        my $all_ok = 1;
+        say "Categorized item:";
+        if(! $class->get_schema()->resultset('Category')->result_source()->related_source($class->metaclass_data('category_accessor')))
+        {
+            $all_ok = 0;
+            say " WARNING: Bad category accessor!";
+        }
+        if($form)
+        {
+            my @els = @{$form->get_all_elements({ name => 'category'})};
+            if($#els < 0 )
+            {
+                $all_ok = 0;
+                say " WARNING: No category block configured in form (or category configured in a non-standard way)!";
+            }
+        }
+        else
+        {
+            say " WARNING: Form not generated! No check for category field";
+        }
+        if(! $class->get_schema()->resultset($class->ORMObj())->result_source()->has_column('category'))
+        {
+        
+            $all_ok = 0;
+            say " WARNING: No category column on DB table!";
+        }
+        if($all_ok)
+        {
+            say "    Category configuration OK!";
+        }
+    }    
+    if($class->slugged())
+    {
+        say "Slugged item:";
+        if($class->multilang_slug)
+        {
+            if($class->get_schema()->resultset($class->ORMObj())->result_source()->related_source($class->multilang_children())->has_column('slug'))
+            {
+                say "    Slug configuration OK!";
+            }
+            else
+            {
+                say " WARNING: No slug column on DB!";
+            }
+        }
+        else
+        {
+            if($class->get_schema()->resultset($class->ORMObj())->result_source()->has_column('slug'))
+            {
+                say "    Slug configuration OK!";
+            }
+            else
+            {
+                say " WARNING: No slug column on DB!";
+            }
+        }
+    }
+    if($class->ordered())
+    {
+        my $all_ok = 1;
+        say "Ordered item:";        
+        if($form)
+        {
+            if(! $form->get_element({ name => 'orderblock'}))
+            {
+                $all_ok = 0;
+                say " WARNING: No order block configured in form (or block configured in a non-standard way)!";
+            }
+        }
+        else
+        {
+            say " WARNING: Form not generated! No check for display_order field";
+        }
+        if(! $class->get_schema()->resultset($class->ORMObj())->result_source()->has_column('display_order'))
+        {
+            $all_ok = 0;
+            say " WARNING: No display_orderd column on DB table!";
+        }
+        if($all_ok)
+        {
+            say "    Order configuration OK!";
+        }
+    }
+    if($class->dated())
+    {
+        my $all_ok = 1;
+        say "Dated item:";        
+        if($form)
+        {
+            if(! $form->get_element({ name => 'publish_date'}))
+            {
+                $all_ok = 0;
+                say " WARNING: No publish_date field configured in form!";
+            }
+        }
+        else
+        {
+            say " WARNING: Form not generated! No check for publish_date field";
+        }
+        if(! $class->get_schema()->resultset($class->ORMObj())->result_source()->has_column('publish_date'))
+        {
+            $all_ok = 0;
+            say " WARNING: No publish_date column on DB table!";
+        }
+        if($all_ok)
+        {
+            say "    Date configuration OK!";
+        }
+    }
+    if($class->publishable())
+    {
+        my $all_ok = 1;
+        say "Publishable item:";        
+        if(! $class->get_schema()->resultset($class->ORMObj())->result_source()->has_column('published'))
+        {
+            $all_ok = 0;
+            say " WARNING: No published column on DB table!";
+        }
+        if($all_ok)
+        {
+            say "    Publishable configuration OK!";
+        }
+    }
+    if($class->add_main_column_span() < 1 || $class->add_main_column_span() > 12)
+    {
+        say " WARNING: form box out of twitter bootstrap boundaries"    
+    }
+}
+elsif($command eq 'schemadump')
+{
+    schemadump(@parameters);
+}
+elsif($command eq 'initentity')
+{
+    my $class = shift;
+    if(! $class)
+    {
+        say "No entity package provided";
+        exit(1);
+    }
+    else
+    {
+        say "Installing $class...\n";
+    }
+    load $class;
+    if($@)
+    {
+        say $@;
+        say "Bad entity package provided";
+        print "\n\n";
+        exit(1);
+    }
+    my ($schema_name, $dsn, $user, $password, $schema_class) = get_database($configured_schema_name);
+    
+
+    my $dbh = DBI->connect($dsn, $user, $password, {
+                            PrintError       => 0,
+                            RaiseError       => 1,
+                            AutoCommit       => 1,
+                            FetchHashKeyName => 'NAME_lc'});
+    if(! $class->can('install'))
+    {
+        say "$class hasn't install method. Not an entity or entity created without following guidelines\n";
+        print "\n\n";
+        exit(1);
+    }
+    my $output_message = $class->install($dbh, $configured_public_directory);
+    say "$class installation reported:\n";
+    say $output_message;
+    print "\n\n";
+}
+else
+{
+    if($command eq 'commands')
+    {
+    }
+    else
+    {
+        print "Wrong command provided. I'll show you available commands\n\n";
+    }
+    for(keys %available_commands)
+    {
+        say $_ . " => " . $available_commands{$_};
+    }
+    print "\n\n";
+}
+
+sub statics
+{
+    my $public_dir = shift || $configured_public_directory;
+
+    my $origin = $strehler_root . '/public/strehler';
+
+    my $destination = $public_dir;
+
+    if(! -d $destination)
+    {
+        say "Directory $destination doesn't exists!";
+        if($public_dir eq 'public')
+        {
+            print "\"public\" directory used as standard dancer static files directory. Different from yours? Pass your directory as second parameter to the script\n";
+        }
+        print "\n\n";
+        exit(1);
+    }
+
+    my $nocopy = 0;
+    if(-d $destination . '/strehler') ## no critic qw(ValuesAndExpressions::ProhibitMismatchedOperators)
+    {
+        say "Deleting old $destination" . '/strehler';
+        my $deleted = remove_tree($destination . '/strehler');
+        if($deleted == 0)
+        {
+            print "COPY FAILED! Impossibile to delete old directory: $!\n\n";
+            $nocopy = 1;
+        }
+        else
+        {
+            say "$deleted old files correctly removed";
+        }
+    }
+    if(! $nocopy)
+    {
+        $File::Copy::Recursive::CPRFComp = 1; ## no critic qw(Variables::ProhibitPackageVars)
+        say "Copying statics from $origin to $destination...";
+        my $done = dircopy($origin, $destination);
+        if(! $done)
+        {
+            print "COPY FAILED! A problem occured: $!\n\n";
+        }
+        else
+        {
+            print "SUCCESS! Files copied in your Dancer2 App!\n\n";
+        }
+    }
+    if(-d $destination . '/upload') ## no critic qw(ValuesAndExpressions::ProhibitMismatchedOperators)
+    {
+        print "Upload directory already present\n\n" 
+    }
+    else
+    { 
+        my $done = mkdir $destination . '/upload';
+        say "Creating upload directory... $destination/upload";
+        if(! $done)
+        {
+            print "UPLOAD DIRECTORY CREATION FAILED! A problem occured: $!\n\n";
+        }
+        else
+        {
+            print "SUCCESS! Upload directory created!\n\n";
+        }
+    }
+
+    return;
+}
+
+sub initdb
+{
+    my $wanted_schema = $configured_schema_name;
+    my $demo = shift || 0;
+
+    my $schema_name;
+    my $dsn;
+    my $user;
+    my $password;
+    my $schema_class;
+
+    if(! $demo)
+    {
+        ($schema_name, $dsn, $user, $password, $schema_class) = get_database($wanted_schema);
+        if(! $schema_name)
+        {
+            say "No schema in site configuration\n";
+            exit(1);
+        }
+        print "Schema: $schema_name\n\n";
+        say "DSN: $dsn" if $dsn;
+        say "User: $user" if $user;
+        say "Password: $password" if $password;
+        my $continue = "";
+        $continue = prompt("\nWARNING: this script will ERASE (DROP TABLE) all the tables with a name used by Strehler tables. Are you sure you want to continue? (y/n)\n", "-yn");
+        if(uc($continue) eq 'N')
+        {
+            print "NO DEPLOY. Exiting...\n\n";
+            exit(0);
+        }
+    }
+    else
+    {
+        $schema_name = 'default';
+        $dsn = "dbi:SQLite:dbname=demo.sqlite";
+        $user = undef;
+        $password = undef;
+    }
+    exit(1) if(! check_database_connection($dsn, $user, $password));
+
+    my $schema = Strehler::Schema->connect($dsn, $user, $password);
+    $schema->deploy( { add_drop_table => 1 } );
+    my $user_password;
+    if(! $demo)
+    {
+        $user_password = choose_admin_password();
+    }
+    else
+    {
+        $user_password = 'admin';
+    }
+    my ($hash, $salt) = encrypt_password($user_password);
+    $schema->populate('User', [[qw/user password_hash password_salt role/],
+                              ['admin', $hash, $salt, 'admin']]);
+
+    print "Database deploy COMPLETED!\n\n";
+
+    return;
+}
+
+sub layout
+{
+    my $views_dir  = shift || $configured_views_directory;
+    my $origin = $strehler_root . '/views/layouts/admin.tt';
+
+    my $app_directory = getcwd();
+    my $destination = $views_dir . '/layouts';
+
+    if(! -d $destination)
+    {
+        say "Directory $destination doesn't exists!";
+        if($views_dir eq 'views')
+        {
+            print "\"views\" directory used as standard dancer views files directory. Different from yours? Pass your directory as second parameter to the script\n";
+        }
+        print "\n\n";
+        exit(1);
+    }
+
+    say "Copying layout from $origin to $destination...";
+    my $done = copy($origin, $destination . '/admin.tt');
+    if(! $done)
+    {
+        print "\nCOPY FAILED! A problem occured: $!\n\n";
+    }
+    else
+    {
+        print "\nSUCCESS! Files copied in your Dancer2 App!\n\n";
+    }
+
+    return;
+}
+
+sub demo_components
+{
+    my $origin = $strehler_root . '/demo';
+    my $app_directory = getcwd();
+    my $destination = $app_directory;
+    
+    my %demo_resources = (
+        'config.yml' => 'config.yml',
+        'Demo.pm.ex' => 'lib/Demo.pm',
+        'Site.pm.ex' => 'lib/Site.pm',
+        'app.pl' => 'bin/app.pl',
+        'app.psgi' => 'bin/app.psgi',
+        'strehler-home.tt' => 'views/strehler-home.tt',
+        'home.tt' => 'views/home.tt',
+        'element.tt' => 'views/element.tt',
+        'dummy_list.tt' => 'views/dummy_list.tt',
+        'mypage.tt' => 'views/mypage.tt',
+        'main.tt' => 'views/layouts/main.tt'
+    );
+    say "Demo resources will be injected in the app...";
+    say "$origin -> $destination";
+    foreach my $file (keys %demo_resources)
+    {
+        say $demo_resources{$file} . "...";
+        my $done = copy($origin . "/" . $file, $destination . '/' . $demo_resources{$file});
+        if(! $done)
+        {
+            print "\nCOPY FAILED! A problem occured: $!\n\n";
+        }
+    }
+
+    return;
+}
+
+sub get_database
+{
+    my $schema  = $configured_schema_name;
+    if(! config->{'plugins'}->{'DBIC'})
+    {
+        say "Can't read config.yml or no DBIC plugin configured in it\n";
+        return (undef, undef, undef, undef, undef)
+    }
+    my $schema_name = $schema || 'default';
+    if(! config->{'plugins'}->{'DBIC'}->{$schema_name} && $schema)
+    {
+        say "Schema $schema doesn't exists in the config.yml file we're using!\n";
+        return (undef, undef, undef, undef, undef)
+    }
+    if(! $schema && ! config->{'plugins'}->{'DBIC'}->{'default'})
+    {
+        my @availables = keys %{config->{'plugins'}->{'DBIC'}};
+        $schema_name = $availables[0];
+    }
+    if(! $schema_name)
+    {
+        say "DBIC plugin bad configuration!\n";
+        return (undef, undef, undef, undef, undef)
+    }
+    my $dsn = config->{'plugins'}->{'DBIC'}->{$schema_name}->{'dsn'};
+    my $user = config->{'plugins'}->{'DBIC'}->{$schema_name}->{'user'};
+    my $password = config->{'plugins'}->{'DBIC'}->{$schema_name}->{'pass'};
+    my $schema_class = config->{'plugins'}->{'DBIC'}->{$schema_name}->{'schema_class'};
+    return ($schema_name, $dsn, $user, $password, $schema_class);
+}
+
+sub check_database_connection
+{
+    my ($dsn, $user, $password) = @_;
+    my $connected = 0;
+    #DBI used just to check database connection
+    my $connection_status = DBI->connect($dsn, $user, $password);    
+    if(! $connection_status)
+    {
+       print "\nConnection to database $dsn (user: $user, password: $password) failed!\nInit db operation aborted\n\n"; 
+    }
+    else
+    {
+       $connected = 1;
+    }   
+    $connection_status->disconnect();
+    return $connected;
+}
+
+sub choose_admin_password
+{
+    my $password_chosen = 0;
+    my $user_password;
+    while(! $password_chosen)
+    {
+        $user_password = prompt( "Enter password for admin: ", -echo => '*');
+        my $user_password_confirm = prompt( "Re-type password: ", -echo => '*');
+        if($user_password eq $user_password_confirm)
+        {
+            $password_chosen = 1;
+        }
+        else
+        {
+            say "Password inputs don't match!";
+        }
+    }
+    chomp $user_password;
+    return $user_password;
+}
+
+sub encrypt_password
+{
+    my $password = shift;
+    my $ppr = Authen::Passphrase::BlowfishCrypt->new(
+                    cost => 8, salt_random => 1,
+                    passphrase => $password);
+    my $hash = $ppr->hash_base64;
+    my $salt = $ppr->salt_base64;
+    return ($hash, $salt);
+}
+
+sub create_category
+{
+    my $id = shift;
+    my $post = shift;
+    my $form = Strehler::Forms::form_category();
+    my @entities = Strehler::Helpers::get_categorized_entities();
+    my $posted_id;
+
+    $form->process($post);
+    if($form->submitted_and_valid)
+    {
+        $posted_id = Strehler::Meta::Category->save_form($id, $form, \@entities);    
+        if($id)
+        {
+            Strehler::Element::Log->write('*** AUTO ***', 'edit', 'category', $posted_id);
+        }
+        else
+        {
+            Strehler::Element::Log->write('*** AUTO ***', 'add', 'category', $posted_id);
+        }
+        return $posted_id;
+    }
+    else
+    {
+        say $form->render();
+        return undef;
+    }    
+}
+
+sub schemadump
+{
+    my $schema = $configured_schema_name;
+    my ($schema_name, $dsn, $user, $password, $schema_class) = get_database($schema);
+    if(! $schema_name)
+    {
+        say "No schema in site configuration!";
+        print "\n\n";
+        exit(1);
+    }
+    if($schema_class eq 'Strehler::Schema')
+    {
+        say "You can't use Strehler::Schema as schema package name!";
+        print "\n\n";
+        exit(1);
+    }
+    say "DBIx::Class packages will be created now under lib directory using DBIx::Class:Schema::Loader...";
+    say "Target schema: $schema_class";
+    make_schema_at(
+        $schema_class,
+        { debug => 1, dump_directory => './lib', 
+          components => ["InflateColumn::DateTime"] },
+        [ $dsn, $user, $password]
+    );
+
+    return;
+}

@@ -1,0 +1,94 @@
+Revision history for Perl extension String::Random:
+
+0.29    2015-12-24
+     - Add a dependency on the 'parent' module:
+        - This caused some CPAN Testers failures on perl-5.8.x.
+            - http://www.cpantesters.org/cpan/report/d21f0078-6c11-1014-b233-6b3058476d35
+
+0.28    2015-01-22
+     - Convert Changes to CPAN::Changes and add t/cpan-changes.t .
+
+0.27    2015-01-22
+    - Cache parsed range patterns.
+        - Pull Request from Kosuke Asami (co-me). Thanks!
+            - https://github.com/shlomif/String-Random/pull/1
+    - Clean up the code according to perlcritic.
+        - Pull Request from Lance Brown. Thanks!
+            - https://github.com/shlomif/String-Random/pull/2
+    - Add rand_gen parameter to new to specify a custom random generator.
+        - Pull Request from Lance Brown. Thanks!
+            - https://github.com/shlomif/String-Random/pull/3
+
+0.26   2014-01-31
+    - LICENSE section and file (CPANTS).
+    - Minimum version of perl in Build.PL / META.yml .
+
+0.25   2013-12-27
+    - Update the link to the version control repository.
+
+0.24   2013-12-03
+    - Add keywords and a link to he repository to Build.PL / META.yml.
+
+0.23   2013-12-03
+    - Add t/style-trailing-space.t .
+    - Update the POD in lib/String/Random.pm .
+    - Add t/pod.t .
+    - Convert Build.PL to Test::Run::Builder.
+    - Hopefully fix https://rt.cpan.org/Public/Bug/Display.html?id=86894
+        - Bug #86894 for String-Random: Spurious warnings
+
+0.22   2006-09-21
+    - Fix README to reflect current reality.
+    - Random cleanup in this file.
+    - Since we've broken compatibility with *really* old Perl5 anyway,
+      modernize a bit more ("our" instead of "use vars").  Also
+      explicitly require 5.6.1.
+
+0.21   2006-04-20
+    - Modify test.pl to use Test::More.
+    - Build with Module::Build.
+    - Minor whitespace cleanup.
+    - Avoid undefined results from randregex() and randpattern().
+    - Turn on warnings in the module.
+
+0.20   2003-09-29
+    - Added support for *, +, and ? in regular expressions.
+
+0.1992 2002-07-25
+    - Added support for {n,m} ranges in regular expressions.
+    - Cleaned up the initialization of @punct.
+
+0.1991 2002-02-28
+    - Added a "b" for random binary data in randpattern().
+
+0.199  2002-02-26
+    - fixed randregex() and randpattern() to Do The Right Thing(TM)
+      when called in an array or scalar context, and when passed
+      multiple arguments.
+      (* WARNING * This is an incompatible change. Code expecting the
+      behavior of earlier versions may break. Of course, the documentation
+      warned that this change would be made, and everybody reads
+      documentation, right? :-)
+    - fixed use of $_ in randpattern().
+      (Unfortunately, there's still one use of $_ in a grep(), but I don't
+      see how that can be avoided, and it only happens once on
+      initialization.)
+
+0.198  2000-05-16
+    - fixed \W generating "_"
+    - reorganized a bit to make it easier to add more patterns
+    - added \s and \S
+    - added two-character literals (\t, \n, \r, \f, \a, \e)
+
+0.197  1999-07-10
+    - moved most of randregex() to %regch
+    - added random_regex() function interface
+
+0.195  1999-07-07
+    - regex support is (at least mostly) complete
+
+0.19   1999-07-04
+    - first pass of regex support
+
+0.1    1998-09-10
+    - original version

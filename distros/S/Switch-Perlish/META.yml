@@ -1,0 +1,11 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Switch-Perlish
+version:      1.0.5
+version_from: lib/Switch/Perlish.pm
+installdirs:  site
+requires:
+    Scalar::Util:                  1.01
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

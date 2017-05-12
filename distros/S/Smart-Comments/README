@@ -1,0 +1,27 @@
+Smart::Comments
+
+Smart comments provide an easy way to insert debugging and tracking code
+into a program. They can report the value of a variable, track the
+progress of a loop, and verify that particular assertions are true.
+
+Best of all, when you're finished debugging, you don't have to remove them.
+Simply commenting out the C<use Smart::Comments> line turns them back into
+regular comments.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005, Damian Conway
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

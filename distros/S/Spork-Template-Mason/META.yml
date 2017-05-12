@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name: Spork-Template-Mason
+version: 0.04
+author:
+  - Dave Rolsky <autarch@urth.org>
+abstract: Spork templating with Mason
+license: perl
+requires:
+  Spoon::Template::Mason: 0.03
+provides:
+  Spork::Template::Mason:
+    file: lib/Spork/Template/Mason.pm
+    version: 0.04
+generated_by: Module::Build version 0.25

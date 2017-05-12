@@ -1,0 +1,7 @@
+This subdirectory contains the source for GNUplot, and for the GD library
+(needed for GIF output from GNUPlot).  In order to build GNUPlot, you should
+first build the GD library, and then GNUPlot.
+
+Also in this directory is a patch for GNUPlot which increases the number of
+available line styles - useful for plots that include a large number of items,
+eg disks.  Use the "patch" utility to apply this patch if you require it.

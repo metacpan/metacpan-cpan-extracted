@@ -1,0 +1,42 @@
+description: set registrar 101, with no ACL
+registrar: 1
+
+
+request: |-
+ <NZSRSRequest VerMajor="1" VerMinor="0" RegistrarId="101"> 
+   <RegistrarUpdate ActionId="[% actionid %] 1">
+ <EncryptKeys><EncryptKey><![CDATA[
+ -----BEGIN PGP PUBLIC KEY BLOCK-----
+ Version: GnuPG v1.4.9 (GNU/Linux)
+ 
+ mI0ES95VnwEEAJrnQXzbyd8mlBuFj3vqb7DNI0lfwYM8gDZrOTAV/YroK3xNjHmn
+ hb+AUPrytt7UtUGQkhW78vv3Ydri6JMKFozYkm8xja31k+s5cinaOcvrhj97AZwy
+ a1n2PrfoArBRQAk62f/gJK7pC0Pe8k8jNl82E/RmN859Wfi6ZC/Sl0djABEBAAG0
+ OFNSUyBFUFAgUHJveHkgKERhZW1vbikgPHNycy1lcHAtcHJveHktc3JzcnBzQHNy
+ cy5uZXQubno+iLwEEwECACYFAkveVZ8CGwMFCQHhM4AGCwkIBwMCBBUCCAMEFgID
+ AQIeAQIXgAAKCRDlST+x5EQPb+hlA/0Y5l9TUAeZP58HLZmXkzIY3zFfS2Rasbnt
+ OWjWx2MDlR3BiebK7dUtvhtPJtJVdOIPCOM+XC1qIXWLHW9oqoanuMHz3qWjXnXX
+ cBdZHzkIwW1bwShJA41yCES7uoE5iDkFeCpRUHnL+d9pemIVGLlo1CALGye/T6QH
+ aacYNfaA6A==
+ =A2qP
+ -----END PGP PUBLIC KEY BLOCK-----
+ ]]></EncryptKey></EncryptKeys>
+  <EPPAuth Password="foobar" />
+  <Roles>
+    <Role RoleName="Registrar"/>
+    <Role RoleName="Connect"/>
+    <Role RoleName="Whois"/>
+    <Role RoleName="Query"/>
+    <Role RoleName="CreateDomain"/>
+    <Role RoleName="UpdateDomain"/>
+    <Role RoleName="TransferDomain"/>
+    <Role RoleName="CancelDomain"/>
+    <Role RoleName="UncancelDomain"/>
+    <Role RoleName="UpdateRegistrar"/>
+    <Role RoleName="QueryRegACL"/>
+   </Roles>
+   </RegistrarUpdate>   
+ </NZSRSRequest>
+
+assertions:
+ - xpath_matches: [ '//Error', '0', 'No errors' ]

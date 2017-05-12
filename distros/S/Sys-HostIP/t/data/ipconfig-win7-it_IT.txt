@@ -1,0 +1,41 @@
+
+Configurazione IP di Windows
+
+
+Scheda Ethernet LAN-Verbindung:
+
+   Suffisso DNS specifico per connessione: S_W_3V_1_3_0
+   Indirizzo IPv6 . . . . . . . . . . . . . . . . . : 2003:e7:93ce:2801:71f4:f151:8100:f395
+   Indirizzo IPv6 temporaneo. . . . . . . . . . . . : 2003:e7:93ce:2801:dd3:a13a:4d7b:9b35
+   Indirizzo IPv6 locale rispetto al collegamento . : fe80::71f4:f151:8100:f395%11
+   Indirizzo IPv4. . . . . . . . . . . . : 192.168.2.118
+   Subnet mask . . . . . . . . . . . . . : 255.255.255.0
+   Gateway predefinito . . . . . . . . . : fe80::1%11
+                                           192.168.2.1
+
+Scheda Ethernet VirtualBox Host-Only Network:
+
+   Suffisso DNS specifico per connessione:
+   Indirizzo IPv6 locale rispetto al collegamento . : fe80::a8fa:b31b:672b:b415%14
+   Indirizzo IPv4. . . . . . . . . . . . : 192.168.56.1
+   Subnet mask . . . . . . . . . . . . . : 255.255.255.0
+   Gateway predefinito . . . . . . . . . :
+
+Scheda Tunnel isatap.S_W_3V_1_3_0:
+
+   Stato supporto. . . . . . . . . . . . : Supporto disconnesso
+   Suffisso DNS specifico per connessione: S_W_3V_1_3_0
+
+Scheda Tunnel LAN-Verbindung* 3:
+
+   Suffisso DNS specifico per connessione:
+   Indirizzo IPv6 . . . . . . . . . . . . . . . . . : 2001:0:9d38:78cf:c02:3711:
+a4ee:a12d
+   Indirizzo IPv6 locale rispetto al collegamento . : fe80::c02:3711:a4ee:a12d%1
+3
+   Gateway predefinito . . . . . . . . . :
+
+Scheda Tunnel isatap.{2F276BC5-ADC1-4179-BFB7-161CEA6B8A27}:
+
+   Stato supporto. . . . . . . . . . . . : Supporto disconnesso
+   Suffisso DNS specifico per connessione:

@@ -1,0 +1,66 @@
+Spreadsheet-WriteExcel-Styler
+
+DESCRIPTION
+
+This is a small utility to help formatting cells while
+creating Excel workbooks through the wonderful
+L<Spreadsheet::WriteExcel> module.
+
+When working within the Excel application, users often change one
+format feature at a time (highlight a row, add a border to a column,
+etc.); these changes do not affect other format features (for example
+if you change the background color, it does not affect fonts, borders,
+or cell alignment).  By contrast, when generating a workbook through
+L<Spreadsheet::WriteExcel>, formats express complete sets of features,
+and they cannot be combined together. This means that the programmer
+has to prepare in advance all formats for all possible combinations of
+format features, and has to invent a way of cataloguing those
+combinations.
+
+Objects from this module hold a catalogue of I<styles>, where each
+style is a collection of format features.  Then, for any combination
+of styles, the styler generats a L<Spreadsheet::WriteExcel::Format> 
+on the fly, or, if a similar combination was already encountered, 
+retrieves the format from its internal cache.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	perl Build
+	perl Build test
+	perl Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Spreadsheet::WriteExcel::Styler
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Spreadsheet-WriteExcel-Styler
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Spreadsheet-WriteExcel-Styler
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Spreadsheet-WriteExcel-Styler
+
+    Search CPAN
+        http://search.cpan.org/dist/Spreadsheet-WriteExcel-Styler/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 Laurent Dami
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

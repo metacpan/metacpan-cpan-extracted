@@ -1,0 +1,104 @@
+                     S O A P - P E R L
+                   ---------------------
+
+SOAP/Perl is a collection of Perl modules which provides a simple
+and consistent application programming interface (API) to the 
+Simple Object Access Protocl (SOAP).
+
+To learn more about SOAP, see
+<URL:http://www.w3.org/TR/SOAP>
+
+This library provides tools for you to build SOAP clients and servers.
+
+The library contains modules for high-level use of SOAP, but also modules
+for lower-level use in case you need something a bit more customized.
+
+SOAP/Perl uses Perl's object oriented features exclusively. There are
+no subroutines exported directly by these modules.
+
+This version of SOAP/Perl supports a subset of the SOAP 1.1 specification,
+which is an IETF internet draft. See <URL:http://www.ietf.org>
+for details. See below for SOAP/Perl's major limitations.
+
+PREREQUISITES
+
+This library has been tested by the author on Perl version 5.6.0.
+Some modules within this package depend on other packages that are
+distributed separately from Perl.  We recommend that you have the
+following distributions installed before you install SOAP/Perl:
+
+  libwww-perl
+  XML-Parser
+
+Specifically, if you plan on using Apache, you should also obtain:
+
+  mod-perl
+
+unless you're satisfied with CGI performance.
+
+These distributions/modules should be available on CPAN.
+For details on which versions are recommended, please see
+MakeFile.PL.
+
+INSTALLATION
+
+You install SOAP/Perl as you would install any perl module library,
+by running these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+During the "make test" phase, there is an optional test that makes a
+live SOAP call over HTTP to an example server running on the author's
+machine. If you aren't connected to the Internet, you should skip
+this test.
+
+
+DOCUMENTATION
+
+See lib/SOAP.pm for an overview of the library. See Changes for
+recent changes.  POD style documentation is included in all modules
+and scripts.  These are normally converted to manual pages and
+installed as part of the "make install" process.  You should also be
+able to use the 'perldoc' utility to extract and read documentation
+from the module files directly.
+
+LIMITATIONS
+
+SOAP/Perl currently does not support arrays. This will be added
+in a future version.
+
+SUPPORT
+
+Questions about how to use this library should be directed to the
+SOAP mailing list at <URL:http://discuss.develop.com/soap.html>.
+Bug reports and suggestions for improvements can also be sent here.
+This mailing list is also the place for general discussions and
+development of the SOAP/Perl package and the SOAP protocol itself.
+
+Instructions for joining the mailing list can be found at the 
+<URL:http://discuss.develop.com/soap.html>.
+
+
+AVAILABILITY
+
+The latest version of SOAP/Perl should always be available from:
+
+     http://soapl.develop.com/soap_perl_current
+
+The library is also available from the Comprehensive Perl Archive
+Network (CPAN).  Visit <URL:http://www.perl.com/CPAN/> to find a CPAN
+site near you.
+
+
+COPYRIGHT
+
+  © 1999-2000 DevelopMentor. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+
+Enjoy!

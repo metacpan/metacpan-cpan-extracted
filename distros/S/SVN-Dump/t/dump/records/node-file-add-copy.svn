@@ -1,0 +1,7 @@
+Node-path: trunk/latin.txt
+Node-kind: file
+Node-action: add
+Node-copyfrom-rev: 3
+Node-copyfrom-path: trunk/loremipsum.txt
+
+

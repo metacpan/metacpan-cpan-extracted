@@ -1,0 +1,30 @@
+String/ExpandEscapes version 0.01
+=================================
+
+This module contains functions for parsing and doing substitutions
+in format strings similar to those used by printf. The %-escapes to be
+replaced can either be given using a hash, or, for maximum flexibility,
+using a callback function.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+There are currently no dependencies.
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2003 Matthias Friedrich <matt@mafr.de>.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+$Id: README,v 1.1.1.1 2003/04/03 19:10:10 matthias Exp $

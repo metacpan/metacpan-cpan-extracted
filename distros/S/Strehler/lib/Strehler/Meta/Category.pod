@@ -1,0 +1,139 @@
+=encoding utf8
+
+=head1 NAME
+
+Strehler::Meta::Category - Strehler Category class. Best tool to organize contents.
+
+=head1 DESCRIPTION
+
+You can use categories in Strehler to organize contents of the site and to assign to different sections of your site different bunch of articles, images or whatever you have categorized.
+
+=head1 SYNOPSIS
+
+You can refer to categories in queries using Strehler::Element get_list. They come useful also in methods like next/prev_in_category_by...
+
+Usually categories represent site sections (sometimes also the site navigation tree) and putting articles and stuff in them give you opportunity to have complete control on publishin things.
+
+=head1 OBTAINING CATEGORY OBJECT
+
+You can obtain a category object (referrend to a real category) using the class constructor.
+
+You can call it just passing a category ID:
+
+    my $cat = Strehler::Meta::Category->new($id)
+
+You can call it with a DBIx::Class::Result already retrieved from db:
+
+    my $category_row = schema->resultset('Category')->find($id);
+    my $cat = Strehler::Meta::Category->new(row => $category_row);
+
+These two methods are mainly used by internal methods and Strehler libraries. They're probably useless while developing your site.
+
+If you know category name and eventually the name of its parent you can call the constructor as:
+
+    my $cat = Strehler::Meta::Category->new(category => $category_name, parent => $parent_name);
+
+explode_name is a shortcut for this, easier to use:
+
+    my $cat = Strehler::Meta::Category->explode_name("$parent/$category");
+
+All these methods return a Strehler::Meta::Category object, also in case the id (or the name) of the category in not present in the DB. In this case the object will be empty. You can test it with the exists method
+
+    $cat->exists();
+
+=head1 STANDARD ENTITY METHODS
+
+Many category methods are similar to Strehler::Element methods because category are managed through Strehler backend too.
+
+=over 4
+
+=item get_basic_data
+
+Return Value: %data
+
+Return category info. They are:
+
+=over 8
+
+=item * id: database id
+
+=item * name: just the name of the category, with no path
+
+=item * ext_name: name of the category with path. If the category has no parent it's equal to name.
+
+=item * subcategories: an array with the info (recursive call to get_besic_data) about all the subcategories this cateogry has.
+
+=back
+
+ext_name can also been obteined using ext_name method.
+
+=item delete
+
+Delete the category. A category can't be deleted if it has subcategories but the check about this is done admin-level. Calling the delete directly on the object category a SQL exception will rise if it has subcategories.
+
+=item get_attr
+
+Arguments: $attr
+
+Return Value: $attr_value
+
+Return the value for the attribute (the database column) named $attr.
+
+=item get_list
+
+Arguments $params
+
+Return Value: $to_view
+
+Similar to the Strehler::Element->get_list method. Only parameters available are:
+
+=over 8
+
+=item * order: asc|desc
+
+=item * order_by: field to use to order
+
+=item * parent: id of the parent, to obtain only its subcategories
+
+=back
+
+Return a pointer to an array containing all the hashes from the get_basic_data for all the selected categories.
+
+=item get_form_data
+
+Method used to initialize a form in edit mode. Used by Strhler libraries.
+
+=item save_form
+
+Method used to save category forms. Used by Strehler libraries.
+
+=back
+
+=head1 EXTRA INFO METHODS
+
+=over 4
+
+=item subcategories
+
+Return Value: @subs
+
+Return an array of Strehler::Meta:Category containing all the subcategories of the category itself.
+
+=item has_elements
+
+Return Value: $has_elements
+
+Return true if some entity object is linked to this category
+
+=item is_parent
+
+Return Value: $is_parent
+
+Return true if category has subcategories.
+
+=back
+
+=cut
+
+
+

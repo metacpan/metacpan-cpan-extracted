@@ -1,0 +1,22 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Longest_Common_Substring
+#
+
+func createSubstrings(String word) -> Array {
+  gather {
+    combinations(word.len+1, 2, {|i,j|
+        take(word.substr(i, j-i))
+    })
+  }
+}
+
+func findLongestCommon(String first, String second) -> String {
+    createSubstrings(first) & createSubstrings(second) -> max_by { .len }
+}
+
+var substr = findLongestCommon("thisisatest", "testing123testing")
+
+say substr
+assert_eq(substr, "test")

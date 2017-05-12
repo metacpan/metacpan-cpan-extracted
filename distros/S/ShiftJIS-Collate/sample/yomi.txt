@@ -1,0 +1,22 @@
+#!perl
+# a sample of yomi hyoki shogo
+
+use ShiftJIS::Collate;
+
+my @data = (
+  [qw/ 小山 おやま /],
+  [qw/ 児島 こじま /],
+  [qw/ 小島 こじま /],
+  [qw/ 小嶋 こじま /],
+  [qw/ 小山 こやま /],
+  [qw/ 鈴木 すずき /],
+  [qw/ 田中 たなか /],
+  [qw/ 永田 ながた /],
+  [qw/ 長田 ながた /],
+  [qw/ 山田 やまだ /],
+);
+
+@sort = ShiftJIS::Collate->new()->sortYomi(reverse @data);
+
+print "@$_\n" foreach @sort;
+

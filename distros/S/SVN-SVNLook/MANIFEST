@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+META.yml
+Build.PL
+t/SVN-SVNLook.t
+lib/SVN/SVNLook.pm

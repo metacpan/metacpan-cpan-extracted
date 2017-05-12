@@ -1,0 +1,83 @@
+#!/usr/bin/perl
+
+# kickstart test script
+# by Patrick Devine (c) 2001
+#
+# This script demonstrates how to use various methods in
+# SysConfig::Kickstart can be used to generate a RedHat
+# kickstart file.
+#
+
+use lib 'lib';
+
+use SysConfig::Kickstart;
+
+my $x = new SysConfig::Kickstart();
+
+$x->inst_type( 'nfs' );
+$x->inst_type( { nfsserver => 'engr-fez:/u1/RedHat' } );
+
+$x->rootpw( '123bob' );
+
+$x->auth( { 'useshadow' => '', 'enablemd5' => '' } );
+
+$x->package( apache );
+$x->package( samba );
+$x->package( portmap );
+$x->package( openssh );
+
+
+$x->lilo( { 'location' => 'mbr' } );
+
+$x->keyboard( 'us' );
+$x->mouse( 'genericps/2' );
+$x->timezone( 'US/Pacific' );
+
+$x->network( 'dhcp' );
+
+$x->clearpart( 'all' );
+
+$x->partition( {
+	dir	=> 'raid.01',
+	ondisk	=> 'sda',
+	size	=> 20,
+	onprimary	=> 1
+	} );
+$x->partition( {
+	dir	=> 'raid.02',
+	ondisk	=> 'sdb',
+	size	=> 20,
+	onprimary	=> 1
+	} );
+$x->partition( {
+	dir	=> 'raid.11',
+	ondisk	=> 'sda',
+	size	=> 200,
+	grow
+	} );
+$x->partition( {
+	dir	=> 'raid.12',
+	ondisk	=> 'sdb',
+	size	=> 200,
+	grow
+	} );
+
+$x->partition( {
+	type	=> 'swap',
+	size	=> 128,
+	ondisk => 'sda'
+	} );
+$x->partition( {
+	type	=> 'swap',
+	size	=> 128,
+	ondisk => 'sdb'
+	} );
+
+$x->raid( { dir => '/boot', level => 1, device => 'md0', partitions =>
+	    [ 'raid.01', 'raid.02' ] } );
+$x->raid( { dir => '/', level => 0, device => 'md1', partitions =>
+	    [ 'raid.11', 'raid.12' ] } );
+
+
+print ${ $x->kickstart() };
+

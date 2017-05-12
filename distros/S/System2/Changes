@@ -1,0 +1,22 @@
+Revision history for Perl extension System2.
+
+0.01  Fri Apr  6 11:38:59 2001
+	- original version; created by h2xs 1.19
+
+0.80 Thu Apr  5 19:01:49 EST 2001
+	- original release
+
+0.81 Thu Jun 28 16:17:02 EDT 2001
+	- fixed bugs WRT signal handling, preserving exit status
+
+0.82 Fri Oct  5 15:25:15 EDT 2001
+	- added copyright/license information into README
+
+0.83 Sat Oct 25 17:31:01 EDT 2003
+	- as per suggestion from Remy Chibois <rchibois@free.fr>,
+	  added method for overriding arg(0).
+	  (expanded into named arguments, etc.)
+
+0.84 Thu Jan 20 02:03:18 EST 2005
+	- fixed bug caught by yqao99 <yqiao99@yahoo.com>; I was
+	  failing to reset the file descriptor mask.

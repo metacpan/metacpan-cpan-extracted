@@ -1,0 +1,41 @@
+---
+abstract: 'Google BigQuery specific producer for SQL::Translator'
+author:
+  - 'karupanerura <karupa@cpan.org>'
+build_requires:
+  File::Temp: '0'
+  SQL::Translator: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SQL-Translator-Producer-GoogleBigQuery
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  SQL::Translator::Producer::GoogleBigQuery:
+    file: lib/SQL/Translator/Producer/GoogleBigQuery.pm
+    version: '0.01'
+requires:
+  DBI: '0'
+  JSON::PP: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/karupanerura/SQL-Translator-Producer-GoogleBigQuery/issues
+  homepage: https://github.com/karupanerura/SQL-Translator-Producer-GoogleBigQuery
+  repository: git://github.com/karupanerura/SQL-Translator-Producer-GoogleBigQuery.git
+version: '0.01'
+x_authority: cpan:KARUPA

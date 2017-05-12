@@ -1,0 +1,30 @@
+---
+abstract: 'Quickly build & query relational data'
+author:
+  - 'Traian Nedelea <tron1point0@gmail.com>'
+build_requires:
+  Data::Dump: 0
+  File::Find: 0
+  File::Temp: 0
+  Module::Build: 0.3601
+  Test::More: 0
+  Test::Requires: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300015, CPAN::Meta::Converter version 2.120630'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: SQL-Abstract-Builder
+requires:
+  DBIx::Simple: 0
+  Exporter: 0
+  Hash::Merge: 0
+  List::Util: 0
+  SQL::Abstract::More: 0
+  perl: v5.14.0
+version: v0.1.1

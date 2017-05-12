@@ -1,0 +1,9 @@
+include common.smakh
+
+default:   { map "depend$_",
+             1..3 }
+	{ trace(@_) }
+
+depend%:   \
+           prereq%.out
+	{ trace(@_) }

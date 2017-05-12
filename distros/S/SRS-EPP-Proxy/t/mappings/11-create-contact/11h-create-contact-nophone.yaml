@@ -1,0 +1,19 @@
+# org (company) provided - not supported
+template: create-contact.tt
+
+vars:
+  name: Albert Einstein
+  street: electric avenue
+  city: Nowhere
+  state: Everywhere
+  pcode: 300000
+  ccode: NZ
+  email: a@smartarse.co.te
+  contact_id: reject1
+
+output_assertions:
+  attr_is:
+    - [ '//epp:result', 'code', 2306, 'EPP: Correct response code' ]
+  match:
+    - [ '//epp:msg', '/phone number must be provided/', 'EPP: correct reason returned' ]
+

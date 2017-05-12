@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                Sort-Key-LargeInt
+version:             0.01
+abstract:            ~
+license:             ~
+author:              
+    - Salvador Fandino <sfandino@yahoo.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Sort::Key:                     1.28
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

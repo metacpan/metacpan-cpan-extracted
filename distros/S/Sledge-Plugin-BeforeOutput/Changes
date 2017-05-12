@@ -1,0 +1,11 @@
+Revision history for Sledge-Plugin-BeforeOutput
+
+0.03 Wed Apr 29 2009
+        - First public release.
+
+0.02 Tue Apr 1 2008
+        - Adapted to a difference between versions of the Class::Trigger.
+
+0.01 Sun Apr 1 2007
+        - First version. Only use inside of company.
+

@@ -1,0 +1,53 @@
+String::Multibyte.pm version 1.12
+================
+
+String::Multibyte - locale-independent manipulation
+of multibyte character strings
+
+SYNOPSIS
+
+  use String::Multibyte
+  $sjis = String::Multibyte->new('ShiftJIS');
+  $sjis_length = $sjis->length($sjis_string);
+
+DESCRIPTION
+
+This module provides some functions which emulate
+the corresponding CORE:: functions
+to manipulate multiple-byte character strings.
+
+This module uses the object-oriented syntax to tell methods
+in which charset the specified strings should be handled.
+
+PREREQUISITES
+
+ Perl 5.003 or later
+(Perl 5.005 or later Recommended)
+
+* The following modules taking advantage of the Unicode Support
+(see <perlunicode>) are required Perl 5.8.0 or later.
+
+    String::Multibyte::Grapheme
+    String::Multibyte::Unicode
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Note: t/long.t does stress tests to cope with long strings.
+     If it takes long long time on your machine,
+     try again after removing it.
+
+COPYRIGHT AND LICENSE
+
+SADAHIRO Tomoyuki <SADAHIRO@cpan.org>
+
+Copyright(C) 2001-2015, SADAHIRO Tomoyuki. Japan. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

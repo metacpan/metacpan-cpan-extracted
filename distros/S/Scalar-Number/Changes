@@ -1,0 +1,134 @@
+version 0.006; 2010-10-23
+
+  * port to Perl 5.13.6, which changed the behaviour of signed zeroes
+    in Perl arithmetic
+
+  * fix test suite's treatment of signed zeroes in some places, where
+    it was liable to produce false test failures depending on the C
+    library implementation
+
+  * in XS, turn the runtime-determined iok_maybe_spurious flag into a
+    compile-time constant derived from the Perl version number
+
+  * in XS, declare "PROTOTYPES: DISABLE" to prevent automatic generation
+    of unintended prototypes
+
+  * in t/setup_pp.pl, avoid a warning that occurs if XSLoader::load()
+    is given no arguments, which is now a valid usage
+
+version 0.005; 2010-10-20
+
+  * in XS, use PERL_NO_GET_CONTEXT for efficiency
+
+  * in XS, declare all local symbols static
+
+  * check for required Perl version at runtime
+
+  * use full stricture in test suite
+
+  * also test POD coverage of pure Perl implementation, and rename an
+    internal function to satisfy the coverage test
+
+  * in Build.PL, explicitly set needs_compiler to avoid bogus
+    auto-dependency on ExtUtils::CBuilder
+
+  * in Build.PL, explicitly declare configure-time requirements
+
+  * remove bogus "exit 0" from Build.PL
+
+  * add MYMETA.yml to .cvsignore
+
+version 0.004; 2009-05-02
+
+  * load some modules at build time instead of configure time, to avoid
+    dependency problems
+
+version 0.003; 2009-04-29
+
+  * bugfix: when loading pure Perl implementation, check for numeric
+    semantics that make it impossible to operate correctly (perl 5.6
+    with integers longer than floats), and refuse to load if the module
+    won't work right
+
+  * bugfix: in sclnum_val_cmp(), work around perl bug #41202 which
+    caused some comparisons on values originating as strings to yield
+    the wrong answers
+
+  * bugfix: in scalar_num_part(), handle numeric conversions of non-number
+    types correctly
+
+  * bugfix: require bugfixed version of Data::Integer (it gave incorrect
+    constants on perl 5.6)
+
+  * bugfix: require bugfixed version of Data::Float (for $SIG{__DIE__}
+    handling)
+
+  * XS implementation, used if available with fallback to existing pure
+    Perl implementation if XS is not available; the XS implementation
+    works on Perl 5.6 with wide integers
+
+  * test classification and comparison functions with values that are
+    internally expressed in each possible way
+
+  * test classification and value comparison functions with a set of
+    test values that adapts to the format widths encountered, rather
+    than using separate test scripts for each combination of format widths
+
+  * change very lengthy value comparison test function to not run as
+    part of the default test suite
+
+  * document that sclnum_*() functions must be given only numeric
+    arguments
+
+  * use simpler "parent" pragma in place of "base"
+
+  * in documentation, use the term "truth value" instead of the less
+    precise "boolean"
+
+  * test POD syntax and coverage
+
+  * build with Module::Build instead of ExtUtils::MakeMaker
+
+  * complete dependency list
+
+  * include signature in distribution
+
+  * in documentation, separate "license" section from "copyright" section
+
+version 0.002; 2007-09-02
+
+  * in tests, catch exceptions from sprintf("%.1f", $_), to work around a
+    "panic: frexp" problem seen on BSD
+
+  * in documentation, note fundamental problem with Perl 5.6 with wide
+    integers
+
+version 0.001; 2007-02-05
+
+  * bugfix: in comparison, handle all cases of integers not representable
+    as floats (sclnum_val_cmp() and sclnum_id_cmp() were broken for
+    systems where natint_bits > significand_bits+2)
+
+  * bugfix: in scalar_num_part(), sclnum_is_natint(), sclnum_is_float(),
+    sclnum_val_cmp(), and sclnum_id_cmp(), avoid side effects on zero
+    arguments (sign of a zero can be lost via perl bug #39875 in perl-5.8
+    and a similar problem in earlier perls)
+
+  * express large test values in hexadecimal to avoid bugs in decimal
+    conversions
+
+  * test handling of zero arguments in all functions, to ensure that
+    they don't destroy their signs via perl bug #39875 or the perl-5.6
+    equivalent
+
+  * loosen tests on zeroes in t/part.t to cope with perl-5.6's differing
+    behaviour for numeric values of strings and dualvar(0, $_)
+
+  * test classification with values originating both as integers and
+    as floats
+
+  * revised set of classification and comparison test cases
+
+version 0.000; 2007-01-23
+
+  * initial released version

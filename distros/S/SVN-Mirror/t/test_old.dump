@@ -1,0 +1,178 @@
+SVN-fs-dump-format-version: 2
+
+UUID: 86e01e1c-0de0-0310-82fd-c5c5c4d93db4
+
+Revision-number: 0
+Prop-content-length: 56
+Content-length: 56
+
+K 8
+svn:date
+V 27
+2004-07-25T16:10:41.119430Z
+PROPS-END
+
+Revision-number: 1
+Prop-content-length: 197
+Content-length: 197
+
+K 7
+svn:log
+V 49
+SVM: initialziing mirror for /tmp/svm-test.client
+K 10
+svn:author
+V 3
+svm
+K 38
+svm:headrev:file:///tmp/svm-test/trunk
+V 1
+0
+K 8
+svn:date
+V 27
+2004-07-25T16:10:44.352560Z
+PROPS-END
+
+Node-path: 
+Node-kind: dir
+Node-action: change
+Prop-content-length: 81
+Content-length: 81
+
+K 54
+svm:mirror:33bf8a11-0de0-0310-9866-918724611fc3:/trunk
+V 6
+/trunk
+PROPS-END
+
+
+Node-path: trunk
+Node-kind: dir
+Node-action: add
+Prop-content-length: 114
+Content-length: 114
+
+K 10
+svm:source
+V 27
+file:///tmp/svm-test!/trunk
+K 8
+svm:uuid
+V 36
+33bf8a11-0de0-0310-9866-918724611fc3
+PROPS-END
+
+
+Revision-number: 2
+Prop-content-length: 200
+Content-length: 200
+
+K 7
+svn:log
+V 49
+SVM: initialziing mirror for /tmp/svm-test.client
+K 10
+svn:author
+V 3
+svm
+K 41
+svm:headrev:file:///tmp/svm-test/branches
+V 1
+0
+K 8
+svn:date
+V 27
+2004-07-25T16:10:51.974617Z
+PROPS-END
+
+Node-path: 
+Node-kind: dir
+Node-action: change
+Prop-content-length: 158
+Content-length: 158
+
+K 54
+svm:mirror:33bf8a11-0de0-0310-9866-918724611fc3:/trunk
+V 6
+/trunk
+K 57
+svm:mirror:33bf8a11-0de0-0310-9866-918724611fc3:/branches
+V 9
+/branches
+PROPS-END
+
+
+Node-path: branches
+Node-kind: dir
+Node-action: add
+Prop-content-length: 117
+Content-length: 117
+
+K 10
+svm:source
+V 30
+file:///tmp/svm-test!/branches
+K 8
+svm:uuid
+V 36
+33bf8a11-0de0-0310-9866-918724611fc3
+PROPS-END
+
+
+Revision-number: 3
+Prop-content-length: 158
+Content-length: 158
+
+K 7
+svn:log
+V 6
+source
+K 10
+svn:author
+V 5
+clkao
+K 41
+svm:headrev:file:///tmp/svm-test/branches
+V 1
+1
+K 8
+svn:date
+V 27
+2004-07-25T16:08:32.116173Z
+PROPS-END
+
+Revision-number: 4
+Prop-content-length: 155
+Content-length: 155
+
+K 7
+svn:log
+V 6
+source
+K 10
+svn:author
+V 5
+clkao
+K 38
+svm:headrev:file:///tmp/svm-test/trunk
+V 1
+1
+K 8
+svn:date
+V 27
+2004-07-25T16:08:32.116173Z
+PROPS-END
+
+Node-path: trunk/foo
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 5
+Text-content-md5: 43abcc013536adb10f0bedcc1a185eb1
+Content-length: 15
+
+PROPS-END
+dfkl
+
+

@@ -1,0 +1,28 @@
+Revision history for perl module Statistics-Autocorrelation
+
+0.06 2013-12-15
+    - added methods autocovariance(), correlogram()
+    - made class object descendant of (ISA) Statistics::Data to make available all its load(), save(), etc. methods here
+    - added handling lag => 0, which is now the default lag (no longer lag => 1)
+    - added handling of negatively signed lags
+    - corrected some circularized lagging issues; prior results only accurate if lag => 1, if at all, not implemented if exact => 1
+    - removed "efficient" option in coefficient() - see the new option "unbias" that defines this better (for now)
+    - revised misc. other aspects of methods for calculating exact coefficients - more issues to be reviewed
+    - added expanded checks for non-zero variance before division
+    - added NIST-published example for testing of default (non-circularized and approximate) values returned from coefficient()
+    - added some function transcripts into POD manual, among misc manual revisions
+    - versions 0.03 to now had the same changes as above but with dist issues for cpan.
+
+0.02 2011-03-30
+	- ensure sample-size >= lag size (avoid div by zero error) 
+	- implemented circularized lagging
+	- avoid "divide by zero" error in final computation of coefficient
+	- argument "simple" renamed "efficient" - a deprecation warning printed if used
+	- Statistics::Lite as prereq
+    - added "coeff" alias
+	- POD cleanup
+
+0.01 2011-01-31
+    - First version, released on an unsuspecting world.
+
+

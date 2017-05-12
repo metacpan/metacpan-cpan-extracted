@@ -1,0 +1,56 @@
+SysConfig.pm
+------------
+
+Designing an operating system installer can be a fairly daunting and complex
+task.  There are a myriad of ways to install a computer including installing
+a set of packages, a set of files (such as from a tarball) or even straight
+bit-for-bit disk imaging. 
+
+Ultimately, however, each one of those installation methods have a number of
+different pieces of common configuration data, such as network address
+settings, mouse and keyboard settings or even file partitioning schemes.
+
+SysConfig.pm is not a system installer, but rather it is an object class
+with methods which provide a uniform way of describing how to install a
+system.  Ultimately you can use one of the SysConfig classes such as
+SysConfig::Kickstart or SysConfig::XML which will describe all of the bits of
+system configuration necessary to get an installer up and running.
+
+
+Author
+------
+
+Written by Patrick Devine, (c) 2001
+Send complaints, comments, suggestions, proposals to:
+patrick@bubblehockey.org
+
+
+License
+-------
+
+This package is distributed under the same terms as Perl itself.  Please
+including any and all copyright notices including this README file if
+you redistribute this software.
+
+
+Warranty
+--------
+
+None is expressed or implied.  If your equipment is damaged, or if any part
+of this software contains bugs which cause you finacial loss as a result of
+using it, we will refund the full price of this software for ZERO dollars
+and ZERO cents.  Use at your own risk.
+
+
+Installation
+------------
+
+This set of modules uses MakeMaker, so you can use the normal method of
+installing a perl module:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+

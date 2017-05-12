@@ -1,0 +1,28 @@
+#!perl
+#
+# This file is part of String-Substitution
+#
+# This software is copyright (c) 2010 by Randy Stauner.
+#
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+#
+
+use strict;
+use warnings;
+use String::Substitution -copy;
+
+my @names = qw(string pattern replacement);
+my %vars;
+
+foreach my $name ( @names ){
+	# get value from command line or prompt
+	if( !($vars{$name} = shift @ARGV) ){
+		print "\u$name: ";
+		chomp($vars{$name} = <STDIN>);
+	}
+}
+
+print " '$vars{string}' =~ s/$vars{pattern}/$vars{replacement}/g\n",
+	gsub(@vars{ @names }),
+	"\n";

@@ -1,0 +1,49 @@
+# Example Resource Map for JCDL2008 paper
+# $Id: example.n3,v 1.5 2010-05-05 23:31:02 simeon Exp $
+
+# Standard prefixes
+@prefix  dc:  <http://purl.org/dc/elements/1.1/>.
+@prefix  dcterms:  <http://purl.org/dc/terms/>.
+@prefix  ore:  <http://www.openarchives.org/ore/terms/>.
+@prefix  owl:  <http://www.w3.org/2002/07/owl#>.
+@prefix  rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+
+# Resource Map (ReM-1) describes the Aggregation (A-1)
+<http://arxiv.org/rem/0801.2244v1>		rdf:type	ore:ResourceMap.
+<http://arxiv.org/rem/0801.2244v1#aggregation>	rdf:type	ore:Aggregation.
+<http://arxiv.org/rem/0801.2244v1>		ore:describes	<http://arxiv.org/rem/0801.2244v1#aggregation>.
+
+# Metadata about ReM-1
+# mandatory
+# When example created this was dc:creator, on ORE v1.0 it is dcterms:creator [simeon/2010-05-05]
+<http://arxiv.org/rem/0801.2244v1>		dcterms:creator	<http://arxiv.org/>.
+<http://arxiv.org/rem/0801.2244v1>		dcterms:modified "2008-01-15T10:01:19Z".
+# optional
+<http://arxiv.org/rem/0801.2244v1>		dc:rights	<http://creativecommons.org/licenses/publicdomain/>.
+<http://arxiv.org/rem/0801.2244v1>		dcterms:created	"2008-01-15T10:01:19Z".
+
+# About the aggregation A-1:
+<http://arxiv.org/rem/0801.2244v1#aggregation>	ore:analogousTo	<info:doi/10.1103/PhysRevD.72.095016>.
+<http://arxiv.org/rem/0801.2244v1#aggregation>	rdf:type	<http://purl.org/eprint/type/JournalArticle>.
+##<http://arxiv.org/rem/0801.2244v1#aggregation>	dcterms:isPartOf <http://arxiv.org/rem/0801.2244#aggregation>.
+
+# A-1 aggregates AR-1 and AR-2 which are Aggregated Resources
+<http://arxiv.org/rem/0801.2244v1#aggregation>		ore:aggregates	<http://arxiv.org/abs/0801.2244v1>.
+<http://arxiv.org/abs/0801.2244v1>	rdf:type	ore:AggregatedResource.
+<http://arxiv.org/rem/0801.2244v1#aggregation>		ore:aggregates	<http://arxiv.org/pdf/0801.2244v1>.
+<http://arxiv.org/pdf/0801.2244v1>	rdf:type	ore:AggregatedResource.
+
+# AR-1, the arXiv /abs/ page, is a splash page
+<http://arxiv.org/abs/0801.2244v1>	rdf:type	<info:eu-repo/semantics/humanStartPage>.
+
+# AR-2, the PDF file is of Genre Text
+<http://arxiv.org/pdf/0801.2244v1>	rdf:type	<http://purl.org/dc/dcmitype/Text>.
+
+# arXiv has the notion of versions, this version is aggregated by the article 
+# whole and in the rem for tha
+<http://arxiv.org/rem/0801.2244v1#aggregation>	ore:isAggregatedBy	<http://arxiv.org/rem/0801.2244#aggregation>.
+<http://arxiv.org/rem/0801.2244v1#aggregation>	ore:alsoInResourceMap	<http://arxiv.org/rem/0801.2244>.
+
+## We imagine that there is a resource map for the journal issue http://prd.aps.org/rem/i72
+## that includes this resource as an aggregated resource
+#<http://arxiv.org/rem/0801.2244v1#aggregation>	ore:alsoInResourceMap	<http://prd.aps.org/rem/i72>.

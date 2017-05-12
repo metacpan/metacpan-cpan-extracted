@@ -1,0 +1,19 @@
+{
+  'fax_no_cc' => undef,
+  'address3' => 'Karla-Marksa str 500-4',
+  'state' => 'Samara',
+  'city' => 'Samara',
+  'customer_id' => 4088541,
+  'fax_no' => undef,
+  'tel_no' => '9047454821',
+  'company' => 'Private person',
+  'country' => 'RU',
+  'name' => 'Pavel & Pupkin',
+  'address2' => 'Samara city',
+  'zip' => '443106',
+  'extra_info' => {},
+  'address1' => 'Russian Federation',
+  'email_addr' => 'boldin.pavel@gmail.com',
+  'tel_no_cc' => '7',
+  'type' => 'Contact'
+};

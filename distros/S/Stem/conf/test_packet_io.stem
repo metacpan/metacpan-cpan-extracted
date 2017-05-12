@@ -1,0 +1,12 @@
+[
+        class   =>      'Stem::Test::Echo',
+        name    =>      'echo',
+        args    =>      [],
+],
+[
+	class	=>	'Stem::Test::PacketIO',
+	name	=>	'packet_io',
+	args	=>	[
+		write_addr => 'client_sock',
+	],
+],

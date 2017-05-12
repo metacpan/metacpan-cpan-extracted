@@ -1,0 +1,9 @@
+# hello.stem
+#
+[
+	class	=>	'Stem::Console',
+],
+[
+	class	=>	'Stem::Demo::World',
+	name	=>	'world',
+],

@@ -1,0 +1,31 @@
+Revision history for Perl extension Search::WuManber.
+
+0.25 Wed Mar  9 00:42:45 CET 2011
+	- added t/*.t to MANIFEST, fixed pod syntax
+	
+0.24 Fri Nov 19 18:53:24 CET 2010
+	- pacified perlcritic
+	- converted demo.pl into t/01-demo.t, so that we have at least one selftest.
+
+0.23 Thu May 20 18:05:58 CEST 2010
+	- MANIFEST misses *.h *.c files.
+
+0.22 Fri Jan 29 16:07:57 CEST 2010
+	- rebased the C-part of the module on agrep-2.04
+
+0.11 Sat Jan  9 18:03:58 CET 2010
+	- made {return_string} optional. Default off.
+
+0.03  Fri Aug 17 19:03:46 CEST 2007
+	- using PREINIT to avoid compiler warnings.
+	- using STRLEN type with SvPV avoids now all warnings.
+
+0.02  Mon May 14 02:57:11 2007
+	- first(), next(), advance() done.
+	- BLOCKSIZE=3 hash code done. Required 
+          blockcmp3_0x3f() instead of strncmp(). Sigh.
+
+0.01  Sun May 13 15:54:18 2007
+	- initial version; created after perldoc perlxstut.
+	- init() done, verified t_shift with demo.pl to conform 
+          to R.Stiebe's example.

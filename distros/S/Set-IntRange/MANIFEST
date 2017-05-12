@@ -1,0 +1,13 @@
+IntRange.pm
+MANIFEST
+Makefile.PL
+README.txt
+t/00____version.t
+t/01________new.t
+t/02_parameters.t
+t/03__intervals.t
+t/04_____string.t
+t/05_____resize.t
+t/06______empty.t
+t/07_overloaded.t
+META.yml                                 Module meta-data (added by MakeMaker)

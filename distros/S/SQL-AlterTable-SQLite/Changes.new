@@ -1,0 +1,19 @@
+Revision history for SQL-AlterTable-SQLite
+
+0.003   2016-07-10 (PERLANCAR)
+
+	- Bump prereq version Test::WithDB::SQLite 0.08 to pull DBD::SQLite as a
+	  dependency [CT].
+
+
+0.002   2016-07-09 (PERLANCAR)
+
+        - [Bugfix] Forgot to implement 'rename_table' and rename temporary table
+          to final one.
+
+        - [doc] Fix mention of SQL::Schema::Versioned.
+
+
+0.001   2016-07-09 (PERLANCAR)
+
+        - First release.

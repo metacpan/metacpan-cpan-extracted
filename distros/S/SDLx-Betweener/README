@@ -1,0 +1,56 @@
+SDLx::Betweener
+===============
+
+SDL Perl XS Tweening Animation Library
+
+Writing Perl SDL move handlers for games is hard. SDLx::Betweener helps.
+
+See docs in lib/SDLx/Betweener.pm.
+
+
+STATUS
+
+Ready but untested. Only built on Linux.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Alien::SDL
+  SDL
+  Moose
+
+
+COPYRIGHT AND LICENCE
+
+
+Copyright (C) 2012 by Ran Eilam
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+Big thanks to:
+
+    Sam Hocevar, from 14 rue de Plaisance, 75014 Paris, France
+    https://raw.github.com/warrenm
+
+For his excellent AHEasing lib which SDLx-Betweener uses for easing
+functions. The license is in the tweencee/ dir. It is at:
+
+    https://github.com/warrenm/AHEasing
+
+Check that page for some great info about easing functions.
+
+

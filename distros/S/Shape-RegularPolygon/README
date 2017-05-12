@@ -1,0 +1,38 @@
+Shape-RegularPolygon version 0.01
+=================================
+
+Shape::RegularPolygon is a class that treats the shape of the regular
+polygon. This class creates and returns vertex list of specified reg-
+ular polygon. It is possible to draw in the regular polygon easily by
+combining GD::Polyline etc.
+
+The README is used to introduce the module and provide instructions on
+how to install the module, any machine dependencies it may have (for
+example C compilers and installed libraries) and any other information
+that should be provided before the module is installed.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2007 by Kazuyoshi Tomita
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+

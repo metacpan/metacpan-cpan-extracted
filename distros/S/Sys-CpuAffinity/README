@@ -1,0 +1,98 @@
+Sys-CpuAffinity v1.12
+=====================
+
+The Sys::CpuAffinity module seeks to "do one thing and do it well":
+set CPU affinities for processes on any system that can use Perl
+and by any means necessary.
+
+The module is composed of several subroutines, each one 
+implementing a different technique to perform a CPU affinity
+operation. A technique might try to import a Perl module,
+run an external program that might be installed on your system,
+or invoke some C code to access your system libraries.
+Usually, a technique is applicable to only a single
+or small group of operating systems, and on any particular 
+system, the vast majority of techniques would fail. 
+Regardless of your particular system and configuration,
+it is hoped that at least one of the techniques will work
+and you will be able to get and set the CPU affinities of
+your processes.
+
+
+SUPPORTED SYSTEMS
+
+The techniques for manipulating CPU affinities for Windows
+(including Cygwin) and Linux have been refined and tested
+pretty well. Some techniques applicable to BSD systems
+(particularly FreeBSD) and Solaris have been tested a little 
+bit. The hope is that this module will include more techniques 
+for more systems in future releases. See the NOTE TO 
+DEVELOPERS in the module's POD for information about 
+how you can help.
+
+MacOS and OpenBSD are explicitly not supported, as there does
+not appear to be any public interface for specifying the CPU 
+affinity of a process directly on these platforms.
+
+NetBSD support is very limited. The getAffinity and setAffinity
+calls will only work on the calling process, and will probably
+only work for the super-user.
+
+
+RECOMMENDED MODULES
+
+The following modules are not required by Sys::CpuAffinity,
+but Sys::CpuAffinity will try to use them if they are 
+available.
+
+        Win32::API, Win32::Process [MSWin32, cygwin]
+        BSD::Process::Affinity     [FreeBSD]
+
+
+INSTALLATION
+
+To install this module, the Module::Build module must be
+installed on your system. Then you may run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+If you need to rebuild the module, or install it for several
+different version of Perl, it is recommended that you also
+"./Build clean" before each new installation.
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Sys::CpuAffinity
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Sys-CpuAffinity
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Sys-CpuAffinity
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Sys-CpuAffinity
+
+    Search CPAN
+        http://search.cpan.org/dist/Sys-CpuAffinity/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (c) 2010-2017, Marty O'Brien
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,31 @@
+Revision history for SMS-Send-Twilio
+
+0.18  2015-08-06
+  - Die if sending the SMS message is unsuccesful, as stated in
+    SMS::Send docs. Try to include a helpful error message.
+    Previously the call did not die but simply did not return.
+    Fixes issue #2 raised by GoodMirek.
+
+0.17  2015-03-10
+  - Added !#include_default to MANIFEST.SKIP because of RT102636.
+  - Added POD tests.
+
+0.16  2015-03-05
+  - Corrected MANIFEST, added test for that.
+
+0.15  2015-01-13
+  - No more Dist::Zilla.
+  - More tests.
+  - Use croak instead of die.
+
+0.14  2013-06-07 03:21:08 EDT
+  - Corrected POD, fixes Github issue #1 (rpnoble).
+
+0.12  2013-06-03 11:36:20 EDT
+  - Fixed author email address.
+
+0.11  2013-05-26 08:47:31 EDT
+  - Added dependency on 'parent' module for perls < 5.10.1.
+
+0.10  2013-05-22 15:40:06 EDT
+  - Initial release

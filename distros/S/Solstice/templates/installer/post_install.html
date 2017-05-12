@@ -1,0 +1,21 @@
+<!-- sol_lang name=install_header -->
+  <h1 class="header">Welcome to Solstice</h1>
+  <h2 class="subheader">Install finished</h2>
+  <p>
+    <!-- sol_unless name=non_writable_config -->
+    Configuration of Solstice is complete.  
+    <!-- sol_else -->
+    Configuration of Solstice is complete, but the config file wasn't writable.  Add the following to
+    <code><!-- sol_var name=config_file_path --></code> or <code>/etc/solstice_config.xml</code> manually:
+    <div class="solstice_box">
+<pre>
+<!-- sol_var name=config_content -->
+</pre>
+    </div>
+    <!-- /sol_unless -->
+    <br/>
+    You will need to restart Apache for the changes to take effect.
+    <br/>
+    <a href="../">Click here to continue</a>
+  </p>
+<!-- sol_lang name=install_footer -->

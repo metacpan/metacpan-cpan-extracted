@@ -1,0 +1,49 @@
+NAME
+    SPOPSx::Tool::HashField - A SPOPS extension for the storage of complex
+    objects
+
+SYNOPSIS
+      %conf = (
+          table_alias => {
+              # ...
+              yaml_fields => [ qw/ arguments locals results / ],
+              # ...
+          }
+      );
+
+DESCRIPTION
+    This allows for the storage of Perl aggregate types in a database field.
+    This uses YAML to perform the marshalling and unmarshalling. This is
+    handy because you can use third-party tools to update the stored data
+    with relative ease and the data is readable even in other languages that
+    have a YAML model. The data structure can be arbritraily deep.
+
+INSTALLATION
+    Just the typical install tricks will do:
+
+      perl Build.PL
+      ./Build
+      ./Build test
+      ./Build install
+
+    or:
+
+      perl Makefile.PL
+      make
+      make test
+      make install
+
+    Take your pick.
+
+SEE ALSO
+    SPOPS, YAML
+
+AUTHOR
+    Andrew Sterling Hanenkamp, <hanenkamp@users.sourceforge.net>
+
+COPYRIGHT AND LICENSE
+    Copyright 2005 Andrew Sterling Hanenkamp. All Rights Reserved.
+
+    Contentment is distributed and licensed under the same terms as Perl
+    itself.
+

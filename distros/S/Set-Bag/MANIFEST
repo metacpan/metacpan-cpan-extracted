@@ -1,0 +1,11 @@
+Bag.pm
+Changes
+COPYRIGHT
+Makefile.PL
+MANIFEST
+README
+t/bag.t
+TODO
+
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json

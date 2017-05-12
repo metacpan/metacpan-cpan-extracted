@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Schedule-Week.t
+lib/Schedule/Week.pm
+lib/Schedule/Week.pod

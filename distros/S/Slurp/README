@@ -1,0 +1,60 @@
+NAME
+    Slurp - Slurp entire files into variables
+
+SYNOPSIS
+     use Slurp;
+
+     my $file = slurp($file1, $file2, ...);
+
+     my @array = Slurp::to_array($filename);
+     my $scalar = Slurp::to_scalar($filename);
+
+DESCRIPTION
+    This simple module serves one purpose - to provide a simple means to
+    read (or slurp) an entire file into memory for processing. This module
+    allows the replacement of the prototypical foreach- or while- loops used
+    for opening and reading of files with single-line constructs.
+
+    Of note with this module is that the magic of the @ARGV variable and the
+    input record separator, $/, are used to facilitate the reading of entire
+    files into either an array or scalar using minimal code.
+
+METHODS
+    The following methods are available through this module for use in other
+    applications. By default, the "slurp" method is exported into the
+    calling namespace - The other methods of this module, "to_array" and
+    "to_scalar", may also be exported into the calling namespace.
+
+    slurp
+         my @array = slurp($filename, ...);
+         my $scalar = slurp($filename, ...);
+
+        This method slurps one or more files, specified by filenames passed
+        to this method as arguments, into memory. The assignment can be made
+        either either an array or scalar depending upon the context in which
+        this method was called.
+
+    to_array
+         my @array = Slurp::to_array($filename, ...);
+         my $array_ref = Slurp::to_array($filename, ...);
+
+        This method slurps one or more files, specified by filenames passed
+        to this method as arguments, into memory. If called in a scalar
+        context, this method returns an array reference - This is
+        particularly useful if dealing with large files.
+
+    to_scalar
+         my $scalar = Slurp::to_scalar($filename, ...);
+
+        This method slurps one or more files, specified by filenames passed
+        to this method as arguments, into a scalar variable.
+
+SEE ALSO
+    File::Slurp
+
+VERSION
+    0.4
+
+AUTHOR
+    Rob Casey
+

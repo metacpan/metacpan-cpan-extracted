@@ -1,0 +1,10 @@
+Changes
+README
+INSTALL
+MANIFEST
+Makefile.PL
+Semicolons.pm
+t/Semicolons.t
+t/Alternate.t
+t/Quoted.t
+META.yml                                 Module meta-data (added by MakeMaker)

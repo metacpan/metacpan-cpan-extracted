@@ -1,0 +1,48 @@
+Supervisor version 0.08
+=======================
+
+The Supervisor modules provide a simple framework to monitor and control
+other processes in a *nix like environment. It is partially based on
+Supervisord, Proc::Safetynet and POE::Component::Supervisor. For a variety 
+of reason these solutions were not practical to install on systems that I had 
+to support. So I wrote my own.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+DEPENDENCIES
+
+These modules requires these other modules and libraries:
+
+    POE
+    JSON
+    Badger
+    DateTime
+    File::Pid
+    Set::Light
+    Config::IniFiles
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Supervisor
+
+There is also sample supervisor and supctl programs in the bin directory 
+and sample startup scripts for Debian, RHEL and Novell SUSE in the 
+init.d directory.
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2009 Kevin L. Esteb
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

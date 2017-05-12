@@ -1,0 +1,34 @@
+<NZSRSResponse VerMajor="5" VerMinor="0">
+<Response Action="GetMessages" FeId="8" FeSeq="4798908" OrigRegistrarId="90" RecipientRegistrarId="90" Rows="1">
+<FeTimeStamp Day="7" Hour="09" Minute="45" Month="7" Second="37" TimeZoneOffset="+12:00" Year="2010"/>
+<Message Remaining="0">
+<Response Action="DomainUpdate" FeId="8" FeSeq="123456" OrigRegistrarId="1" RecipientRegistrarId="90" Rows="1" TransId="srsrps-1_378">
+<FeTimeStamp Day="7" Hour="09" Minute="45" Month="7" Second="31" TimeZoneOffset="+12:00" Year="2010"/>
+<Domain Delegate="1" DomainName="cliche.net.te" RegistrarId="90" Status="Active" Term="1">
+<RegistrantContact Name="brie" Email="cheesepuff@catalyst.net.te">
+<PostalAddress Address1="Street address" Address2="Suburb" City="Wellington" CountryCode="TE" PostalCode="6035"/>
+<Phone AreaCode="4" CountryCode="64" LocalNumber="123456"/>
+</RegistrantContact>
+<AdminContact Name="brie" Email="cheesepuff@catalyst.net.te">
+<PostalAddress Address1="Street Address" Address2="Suburb" City="Wellington" CountryCode="TE" PostalCode="6035"/>
+<Phone AreaCode="4" CountryCode="64" LocalNumber="123456"/>
+</AdminContact>
+<TechnicalContact Name="Update test 2" Email="DefaultEmail@srs.net.te">
+<PostalAddress Address1="Update test 2" Address2="Update test 2" City="Update Test 2" CountryCode="TE" PostalCode="Update test 2" Province="Update test 2"/>
+<Phone AreaCode="4" CountryCode="64" LocalNumber="Update test 2"/>
+</TechnicalContact>
+<BilledUntil Day="16" Hour="10" Minute="44" Month="7" Second="41" TimeZoneOffset="+12:00" Year="2010"/>
+<RegisteredDate Day="16" Hour="10" Minute="44" Month="1" Second="41" TimeZoneOffset="+13:00" Year="2008"/>
+<AuditDetails ActionId="srsrps-1_378" RegistrarId="1">
+<AuditTime>
+<From Day="07" Hour="09" Minute="45" Month="11" Second="31" TimeZoneOffset="+12:00" Year="2010"/>
+</AuditTime>
+<AuditText>
+<![CDATA[User Id: cheesepuff]]>
+</AuditText>
+</AuditDetails>
+</Domain>
+</Response>
+</Message>
+</Response>
+</NZSRSResponse>

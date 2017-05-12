@@ -1,0 +1,86 @@
+#!/usr/bin/perl -w
+# $Id: svndump_cleanrevifilter 307 2007-01-02 22:18:29Z martin $
+# Copyright (C) 2006 by Martin Scharrer <martin@scharrer-online.de>
+# This is free software under the GPL.
+
+use strict;
+use SVN::Dumpfilter qw(:recalc Dumpfilter svn_remove_entry);
+
+my $revision = 0;
+my $cleanminrev = 1;
+my $cleanmaxrev = 100;
+my %seen;
+
+my $dumpfile = shift @ARGV;
+my $outfile  = shift @ARGV;
+
+sub cleanrevifilter (\%;$);
+
+Dumpfilter($dumpfile, $outfile, \&cleanrevifilter);
+
+exit(0);
+
+
+sub cleanrevifilter (\%;$)
+ {
+   my $href = shift;
+   my $recalc = shift || 0;
+   my $header = $href->{'header'};
+   my $prop   = $href->{'properties'};
+
+   # Save revision number
+   if (exists $header->{'Revision-number'}) {
+      $revision = $header->{'Revision-number'};
+
+      print STDERR "Filtering revision $revision.\n";
+
+      return if ($revision < $cleanminrev || $revision > $cleanmaxrev);
+
+      $prop->{'svn:log'} .= "\n(Cleaned by filter)";
+      svn_recalc_prop_header(%$href);
+      return;
+   }
+
+   if ($revision < $cleanminrev || $revision > $cleanmaxrev) {
+       no warnings 'uninitialized';
+
+       if ($header->{'Node-kind'} eq 'file') {
+           my $action = $header->{'Node-action'};
+           my $path   = $header->{'Node-path'};
+
+           # Remember added files
+           if ($action eq 'add') {
+               $seen{$path} = 1;
+           }
+           # Fix later revisions:
+           # Files which got original added in the given rev range and are 
+           # changed in later revs must set from 'change' to 'add' at the
+           # first change.
+           elsif ($revision > $cleanmaxrev
+               && $action eq 'change') {
+               if (!exists $seen{$path}) {
+                   $header->{'Node-action'} = 'add';
+                   $seen{$path} = 1;
+               }
+           }
+           
+       }
+       return;
+   }
+
+   
+   # Do not clean dirs
+   return if (exists $header->{'Node-kind'} and $header->{'Node-kind'} eq 'dir');
+
+   svn_remove_entry ( %$href );
+  
+   
+   if ($recalc)
+    {
+     svn_recalc_prop_header(%$href);        # call if you changed properties
+     svn_recalc_textcontent_header(%$href); # call if you modified text content
+    }
+ }
+
+
+__END__

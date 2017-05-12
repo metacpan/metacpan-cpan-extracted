@@ -1,0 +1,206 @@
+#!/usr/bin/perl
+# ============================================================================
+#             Copyright (c) 2009 Kevin L. Esteb All Rights Reserved
+#
+# TITLE:       supervisor
+#
+# ABSTRACT:    This program will supervise other processes.
+#
+# ENVIRONMENT: Perl v5.8.8
+#
+# PARAMETERS:  --help......Display this simple help message
+#              --port......The port the Supervisor is listening on
+#              --address...The address to bind too
+#              --config....The config file to use
+#              --pidfile...The filename to use for the pid file
+#              --logfile...The name of the log file
+#              --debug.....Turn on debugging output
+#
+# RETURNS:     0 - on success
+#              1 - on failure
+#
+# Version      Author                                              Date
+# -------      ----------------------------------------------      -----------
+# 0.01         Kevin Esteb                                         11-Sep-2009
+#              Initial release
+#
+# 0.02         Kevin Esteb                                         25-Nov-2009
+#              Implemented the debug switch
+#
+# 0.03         Kevin Esteb                                         09-Dec-2009
+#              Implemented a logfile parameter. This is so I can
+#              define a logfile to use on Debian. The Debian
+#              start-stop-daemon command does not allow redirection
+#              of stdout and stderr.
+#
+# 0.04         Kevin Esteb                                         17-Jun-2010
+#              Performed some cleanup, switched over to Try::Tiny.
+#
+# ============================================================================
+#
+
+use lib '../lib';
+
+use strict;
+use warnings;
+
+our $VERSION = '0.04';
+
+# ---------------------------------------------------------------------
+# Required Modules
+# ---------------------------------------------------------------------
+
+use File::Pid;
+use Try::Tiny;
+use Getopt::Long;
+use Supervisor::Controller;
+use Supervisor::RPC::Server;
+use Supervisor::ProcessFactory;
+
+use Supervisor::Class
+  version   => $VERSION,
+  base      => 'Supervisor::Base',
+  constants => 'DEFAULT_PORT DEFAULT_ADDRESS TRUE FALSE',
+  constant => {
+      handler => __PACKAGE__
+  }
+;
+
+# ---------------------------------------------------------------------
+# Global variables
+# ---------------------------------------------------------------------
+
+my $pid;
+my $debug;
+my $pidfile;
+
+my $logfile = '';
+my $port = DEFAULT_PORT;
+my $host = DEFAULT_ADDRESS;
+my $config = 'supervisor.ini';
+
+# ---------------------------------------------------------------------
+
+sub setup {
+
+    my $num;
+    my $help;
+
+    GetOptions(
+        'help|h|?'  => \$help,
+        'config=s'  => \$config,
+        'port=s'    => \$port,
+        'address=s' => \$host,
+        'pidfile=s' => \$pidfile,
+        'logfile=s' => \$logfile,
+        'debug'     => \$debug,
+    );
+
+    if ($help) {
+
+        usage();
+        exit(0);
+
+    }
+
+    # create a pid file
+
+    if (defined($pidfile)) {
+
+        $pid = File::Pid->new({file => $pidfile});
+        if ($num = $pid->running()) {
+
+            printf("supervisor is already running: %s\n", $num);
+            exit 1
+
+        }
+
+        $pid->write();
+
+    }
+
+}
+
+sub usage {
+
+    my $Line;
+    my ($Script) = ( $0 =~ m#([^\\/]+)$# );
+
+    $Script .= " - v$VERSION";
+    $Line = "-" x length( $Script );
+
+    print << "EOT";
+
+$Script
+$Line
+A procedure to monitor other processes.
+
+  Usage:
+    $0 [--help]
+    $0 [--port] <port>
+    $0 [--address] <address>
+    $0 [--config] <filename>
+    $0 [--pidfile] <filename>
+    $0 [--logfile] <filename>
+
+    --help......Display this simple help message.
+    --port......The port to listen on (default 9505)
+    --address...The address to bind too (default localhost)
+    --config....The configuration file to use
+    --pidfile...The name of the pid file to use
+    --logfile...The name of the log file to use (default stderr)
+
+  Examples:
+    $0 --help
+    $0 --config supervisor.ini
+
+EOT
+
+}
+
+main: {
+
+    my $ec = 0;
+    my $supervisor;
+
+    try {
+
+        setup();
+
+        $supervisor = Supervisor::Controller->new(
+            Name => 'Supervisor',
+            Logfile => $logfile,
+            Debug => defined($debug) ? TRUE : FALSE,
+            Processes => Supervisor::ProcessFactory->load(
+                Config => $config,
+                Supervisor => 'Supervisor',
+                Logfile => $logfile,
+                Debug => defined($debug) ? TRUE : FALSE,
+            ),
+            RPC => Supervisor::RPC::Server->new(
+                Name => 'RPC',
+                Port => $port,
+                Address => $host,
+                Logfile => $logfile,
+                Supervisor => 'Supervisor'
+            )
+        );
+
+        $supervisor->run();
+        $pid->remove() if (defined($pid));
+
+    } catch {
+
+        my $ex = $_;
+
+        printf("%s\n", $ex);
+        $pid->remove() if (defined($pid));
+
+        $ec = 1;
+
+    };
+
+    exit $ec;
+
+}
+

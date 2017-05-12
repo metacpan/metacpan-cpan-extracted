@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- converted with SWISH::Prog::Config ver2_to_ver3()  -->
+<swish>
+ <FollowSymLinks>yes</FollowSymLinks>
+ <SourceDir>docs /home/otherdocs</SourceDir>
+ <SourceOnly>.htm .html</SourceOnly>
+ <UndefinedMetaNames>ignore</UndefinedMetaNames>
+ <MetaNames>
+  <author />
+  <description />
+ </MetaNames>
+ <Index>
+  <Admin>Doc Manager (dmanager@foo.invalid)</Admin>
+  <Description>This is an index of our two document directories.</Description>
+  <File>/home/indexfiles/docs.index</File>
+  <Format>Native</Format>
+  <Name>Test index</Name>
+  <Pointer>http://someplace</Pointer>
+ </Index>
+</swish>

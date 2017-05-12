@@ -1,0 +1,20 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         SWISH-WebService
+version:      0.02
+version_from: lib/SWISH/WebService.pm
+installdirs:  site
+requires:
+    Carp:                          0.01
+    Class::Accessor::Fast:         0.22
+    Data::Dumper:                  0.01
+    Data::Pageset:                 0.02
+    Search::Tools:                 0.01
+    SWISH::API:                    0.04
+    SWISH::API::Remote:            0.10
+    Template:                      2
+    Time::HiRes:                   1
+    URI::Escape:                   0.01
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<remote>
+    <!-- sol_loop name=actions -->
+    <action type="<!-- sol_var type -->" <!-- sol_if block_id -->block_id="<!-- sol_var name=block_id -->"<!-- /sol_if -->>
+        <![CDATA[<!-- sol_var name=content -->]]>
+    </action>
+    <!-- /sol_loop -->
+</remote>

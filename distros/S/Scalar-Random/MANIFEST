@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+Random.xs
+README
+t/Scalar-Random.t
+lib/Scalar/Random.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,83 @@
+﻿2016-05-15  pfeiffer  <occitan@esperanto.org>
+
+Release v0.3.2
+
+	* lib/SQL/Steno.pm: New syntax ":\{Perl code}".
+	New "show create" canned queries "&cX".
+
+2016-04-24  DP  <occitan@esperanto.org>
+
+Release v0.3.1
+
+	* lib/SQL/Steno.pm: Again support Perl v5.14.
+	Allow named quoting specs.
+
+2016-03-30  DP  <occitan@esperanto.org>
+
+Release v0.3.0
+
+	* lib/SQL/Steno.pm: Bump Perl to minimum v5.16.
+	Replace rigid I(...) by generic i\(...), with same syntax used as a macro, for all functions and Query parameters.
+	In default rendering, NULL is replaced by DB theory's ω.
+	Grep puts i after the regexp like Perl and joins fields on a more regexp friendly ~.
+
+2015-10-29  trobador  <occitan@esperanto.org>
+
+Release v0.2.4.1
+
+	* lib/SQL/Steno.pm (render_table): Support ISO 8601 long form fully.
+	(shell): Previous ';' change also for file suffix opts.
+
+2015-10-27  trobador  <occitan@esperanto.org>
+
+Release v0.2.4
+
+	* lib/SQL/Steno.pm (render_table): More consistent date and time shortening.
+	(convert_Queries): &-arg separator changed to ';', so as to match 'select' & 'update'.
+
+2015-08-29  trobador  <occitan@esperanto.org>
+
+Release v0.2.3
+
+	* lib/SQL/Steno.pm (render_*): Add options to output formats.
+
+2015-08-18  trobador  <occitan@esperanto.org>
+
+Release v0.2.2
+
+	* lib/SQL/Steno.pm (render_csv): Distinguish empty "" from null (totally empty).
+	(render_yaml): Inline formatter.
+	(shell): More flexible and efficient filtering.
+	* t/*.t: Add regression tests.
+
+2015-07-29  trobador  <occitan@esperanto.org>
+
+Release v0.2.1
+
+	* lib/SQL/Steno.pm (render_yaml): Rename print handlers to render and add yaml.
+
+2015-07-20  trobador  <occitan@esperanto.org>
+
+Release v0.2
+
+	* lib/SQL/Steno.pm: Modularize print handlers and &.csv selects
+	the format without needing to open a file.
+
+2015-06-16  Daniel  <occitan@esperanto.org>
+
+Release v0.1.2
+
+	* lib/SQL/Steno.pm (convert): Add :{perl} macros.
+	(convert_table_column): Add column alias syntax same as for tables.
+	(shell): Add &{perl} queries and change {perl} to line filter.
+
+2015-05-05  Daniel  <occitan@esperanto.org>
+
+Release v0.1.1
+
+	* lib/SQL/Steno.pm (run): Fix reconnect.
+	(convert): Default args for SQL functions.
+
+2015-04-27  Daniel  <occitan@esperanto.org>
+
+Initial release of v0.1

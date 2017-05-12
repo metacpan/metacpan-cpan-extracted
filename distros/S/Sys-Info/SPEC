@@ -1,0 +1,32 @@
+use strict;
+# copy-paste from Sys::Info::Constants
+BEGIN {
+    if ( ! defined &OSID ) {
+        my %OS = (
+            MSWin32  => 'Windows',
+            MSWin64  => 'Windows',
+            linux    => 'Linux',
+            darwin   => 'OSX',
+        );
+        $OS{$_} = 'BSD' for qw( freebsd openbsd netbsd );
+        my $ID = $OS{ $^O } || 'Unknown';
+        *OSID = sub () { "$ID" }
+    }
+}
+
+{
+    module_name    => 'Sys::Info',
+    requires       => {
+        'Sys::Info::Base'              => '0.78',
+        'Sys::Info::Driver::' . OSID() => '0.78',
+        ( $] < 5.006 ? ( 'warnings::compat' => 0 ) : ()),
+    },
+    build_requires => {
+        'Test::Sys::Info' => '0.20',
+    },
+    meta_merge     => {
+        resources => {
+            repository => 'http://bitbucket.org/burak/cpan-sys-info/',
+        },
+    },
+}

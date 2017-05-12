@@ -1,0 +1,53 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 a8ad94aa718e86315b2f0eb1893b6c2f27f39766 Changes
+SHA1 8b015a9f87d55343414c169b045e226e4cc30d65 LICENSE
+SHA1 a07b0f1926f57b4e9127da5ca32ee05a72000dee MANIFEST
+SHA1 4e1e2408374537cee1768eee978b72a8865382e5 META.yml
+SHA1 df3c5db742e98d8202f44ce5bd7043a288170e04 Makefile.PL
+SHA1 216d9bd42c0bb6b7504f3c61b8e3432e90957aed README
+SHA1 87ffbc8f3e6266ebcab8e8b6c1ad24344b9d96a3 TODO
+SHA1 ea018c3fcab581b3cb394788a0cca5d84d866a5d lib/Selenium/Element.pm
+SHA1 0e084bda4b8c72d32d2cf6443c4f6a306a963c3b lib/Selenium/PageObject.pm
+SHA1 9cee6e87afe54c08d74b76c29cecf2131a991619 t/00-compile.t
+SHA1 7b1920acf2058a969df368c392704a7ff83b42a2 t/Selenium-PageObject.t
+SHA1 00a59482fa74fd536a1a3ea919bbe46b0ff91ae1 t/author-eol.t
+SHA1 13065472eaedf907a1de18ade1a2e1de7b010cc5 t/author-no-tabs.t
+SHA1 2213b63f58eb8dbdf058d65efbb2a06aba1b74ad t/author-pod-spell.t
+SHA1 c019f763f1afade90b7f6f24628af4d8fde358fa t/release-cpan-changes.t
+SHA1 a8a3b6c291113fff0f1765ef584a08bc4498bdc0 t/release-kwalitee.t
+SHA1 54ed25287b7e1c9ff328eaf126d438438c8a1d48 t/release-minimum-version.t
+SHA1 54b7f39e355424cbc367105b84ff02a6cb29d93b t/release-mojibake.t
+SHA1 5cf386f49901e8ccaad5ab271036754d67114081 t/release-pod-coverage.t
+SHA1 4f2933df3566db6f337817aa885889deb213960b t/release-pod-linkcheck.t
+SHA1 dc3eefcab3399f9a70861c332bb4a81ddcbb45e4 t/release-pod-syntax.t
+SHA1 bf4fdda27bd4e8ec177c38cca43083317494cba8 t/release-portability.t
+SHA1 44aad671b03350a7f2d915c721dab2f1c2e068f5 t/release-synopsis.t
+SHA1 af34d5f9f8bd79b21b6c01c69e0afdd81f25c16b t/release-test-version.t
+SHA1 17514255b5ff5f46ac8ce9e9e3c887c9a205c8ba t/release-unused-vars.t
+SHA1 5e20340fc4f854d9e029a7353abf3b71b889227a t/test.html
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJUgkd7AAoJEFuXw5BFhGAy82oH/RS0v+P3D9nYaYQzaVBgvFy5
+2RDwmwzsET5uluZjZ/7S5GrjESGYC15mx78n7PdRRRsblsyOXUcfYp6+f4HX0iCO
+nZoHEJVI1iyC9caKdtDTz74Is1yEBVJRSME5Bb7nG5AGd4sFj7G6OUp950GA4+VW
+pe0eE19GRo2iASsrivB7HznkLdQm+qO92/20krYXqpLJRPY+JWsbDY8i8InmnOew
+mgGLgPC6waciuRQWsG3yU7O9NGfIRsSrIKFGJQWpnFIS6iriS3jkQsAFndtcdApA
+E3kkziBts8WxPXFLihlYNv74AaXWuaNizCpsoTk8gwOWDjjwZlKJrSTfiYwaO6w=
+=Lfqs
+-----END PGP SIGNATURE-----

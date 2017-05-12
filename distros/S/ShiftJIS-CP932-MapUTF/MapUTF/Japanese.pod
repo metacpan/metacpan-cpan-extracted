@@ -1,0 +1,292 @@
+
+=pod
+
+=encoding Shift_JIS
+
+=head1 名称
+
+ShiftJIS::CP932::MapUTF - Microsoft CP-932とUnicodeとの変換
+
+=head1 概要
+
+    use ShiftJIS::CP932::MapUTF qw(:all);
+
+    $utf8_string  = cp932_to_utf8($cp932_string);
+    $cp932_string = utf8_to_cp932($utf8_string);
+
+=head1 説明
+
+マイクロソフトウィンドウズ (Microsoft Windows) コードページ 932 (CP-932)
+のテーブルは 7915 文字からなります。
+
+    JIS X 0201 一バイト文字（191 文字）
+    JIS X 0208 二バイト文字（6879 文字）
+    NEC特殊文字（83 文字、13区）
+    NEC選定IBM拡張文字（374 文字、89～92区）
+    IBM拡張文字（388 文字、115～119区）
+
+この表は、往復変換できない二重定義文字を含んでいます。
+これらの二重定義文字はベンダー（NEC および IBM）定義の拡張文字のためです。
+例えば、Unicode の C<U+2252> に対応付けられる文字は二個あります。
+つまり、JIS X 0208 文字の C<0x81e0> と NEC 特殊文字の C<0x8790> です。
+
+実際、CP-932 の 7915 文字を Unicode の 7517 文字に対応付けなければなりません。
+このため、398 の往復変換できない対応関係が存在します。
+
+このモジュールは、CP-932 から Unicode に、また、
+Unicode から CP-932 に、適切に変換する関数を提供します。
+
+=head2 CP-932 から Unicode への変換
+
+第一引数がレファレンスの場合、それは C<SJIS_CALLBACK> として、
+Unicode への対応がない CP-932 文字の処理に用いられます。
+(C<STRING> にレファレンスを与えることはできません。)
+
+C<SJIS_CALLBACK> が与えられている場合、
+第二引数が C<STRING> として用いられます。
+さもなければ第一引数が C<STRING> になります。
+
+もし C<SJIS_CALLBACK> が与えられていない場合、
+Unicode への対応がない CP-932 文字は黙って削除され、
+部分文字は一バイト分跳ばされます。
+C<SJIS_CALLBACK> として、常に空文字列を返す
+コードリファレンス (C<sub {''}>) が渡されたかのように動作します。
+
+今のところ、C<SJIS_CALLBACK> としては、
+コードリファレンスのみが使えます。
+コードリファレンスの返り値がマッピングのない文字の代わりに挿入されます。
+
+コードリファレンス C<SJIS_CALLBACK> は、一個以上の引数とともに
+呼び出されます。マッピングのない文字が部分的な二バイト文字
+（第一バイトのみの一バイト長の文字列）の場合、
+第一引数は未定義値（C<undef>）になり、
+第二引数はバイトを表す符号なし整数値になります。
+部分文字でなければ、第一引数は、文字を表す文字列になります。
+
+デフォルトでは、部分的な二バイト文字は、文字列（C<STRING>）の末尾にのみ
+現れる可能性があり、文字列の先頭や途中には現れません
+（C<SJIS_OPTION> の C<'t'> も参照のこと）。
+
+例
+
+    my $sjis_callback = sub {
+        my ($char, $byte) = @_;
+        return function($char) if defined $char;
+        die sprintf "found partial byte 0x%02x", $byte;
+    };
+
+上記の例で、C<$char> としては、C<"\x80">, C<"\x82\xf2">, C<"\xfc\xfc">,
+C<"\xff"> などがあり得ます。
+
+C<SJIS_CALLBACK> の返り値は、変換先の形式に合わせなければなりません。
+例えば、C<cp932_to_utf16be()> とともに UTF-8 を返す
+C<SJIS_CALLBACK> を使ってはいけません。
+つまり、UTF ごとに、C<SJIS_CALLBACK> を用意する必要があります。
+
+C<SJIS_OPTION> を C<STRING> の後におくことができます。
+これらは C<'tg'> や C<'gst'> のように組み合わせることも
+できます（順序は任意です）。
+
+    'g'    CP-932 外字（ユーザ定義文字）[0xF040～0xF9FC (95～114区)] を
+           Unicode の PUA [0xE000～0xE757] に変換します（1880 文字）。
+
+    's'    CP-932 未定義の一バイト文字を以下のように変換します。
+           0x80 => U+0080,  0xA0 => U+F8F0,
+           0xFD => U+F8F1,  0xFE => U+F8F2,  0xFF => U+F8F3.
+
+    't'    第二バイトの範囲 [0x40..0x7E, 0x80..0xFC] をチェックします。
+           例えば "\x81\x39" はデフォルトでは未定義の二バイト文字と
+           みなしますが、't' を用いると、部分文字バイト 0x81 の後に
+           一バイト文字 "\x39" が続いたものとみなします。
+
+=over 4
+
+=item C<cp932_to_utf8([SJIS_CALLBACK,] STRING [, SJIS_OPTION])>
+
+CP-932 を UTF-8 に変換します。
+
+=item C<cp932_to_unicode([SJIS_CALLBACK,] STRING [, SJIS_OPTION])>
+
+CP-932 を Unicode に変換します。
+（C<SVf_UTF8> フラグ付きの Perlの内部形式, F<perlunicode> を参照。）
+
+B<この関数は Perl 5.6.1 以降、かつ XS 版でのみ提供されます。>
+
+=item C<cp932_to_utf16le([SJIS_CALLBACK,] STRING [, SJIS_OPTION])>
+
+CP-932 を UTF-16LE に変換します。
+
+=item C<cp932_to_utf16be([SJIS_CALLBACK,] STRING [, SJIS_OPTION])>
+
+CP-932 を UTF-16BE に変換します。
+
+=item C<cp932_to_utf32le([SJIS_CALLBACK,] STRING [, SJIS_OPTION])>
+
+CP-932 を UTF-32LE に変換します。
+
+=item C<cp932_to_utf32be([SJIS_CALLBACK,] STRING [, SJIS_OPTION])>
+
+CP-932 を UTF-32BE に変換します。
+
+=back
+
+=head2 Unicode から CP-932 への変換
+
+二重定義文字はすべて、Microsoft PRB Q170559 に従って変換されます。
+例えば C<U+2252> は C<"\x87\x90"> ではなく C<"\x81\xE0"> に変換されます。
+
+第一引数がレファレンスの場合、それは C<UNICODE_CALLBACK> として、
+CP-932 への対応がない Unicode 文字の処理に用いられます。
+(C<STRING> にレファレンスを与えることはできません。)
+
+C<UNICODE_CALLBACK> が与えられている場合、
+第二引数が C<STRING> として用いられます。
+さもなければ第一引数が C<STRING> になります。
+
+もし C<UNICODE_CALLBACK> が与えられていない場合、
+CP-932 への対応がない Unicode 文字は黙って削除され、
+また、部分文字は一バイト分跳ばされます。
+C<UNICODE_CALLBACK> として、常に空文字列を返す
+コードリファレンス (C<sub {''}>) が渡されたかのように動作します。
+
+今のところ、C<UNICODE_CALLBACK> としては、
+コードリファレンスのみが使えます。
+そのコードリファレンスの返り値が
+マッピングのない文字の代わりに挿入されます。
+
+コードリファレンス C<UNICODE_CALLBACK> は、
+一個以上の引数とともに呼び出されます。マッピングのない文字が
+部分的文字（不正なバイト）の場合、第一引数は未定義値（C<undef>）になり、
+第二引数はバイトを表す符号なし整数値になります。
+部分文字でなければ、第一引数は、Unicode文字の符号位置を表す
+符号なし整数値になります。
+
+例えば、CP-932 への対応がない文字を HTML 4.01 の数値文字参照に
+変換する方法を示します。
+
+    sub toHexNCR {
+        my ($char, $byte) = @_;
+        return sprintf("&#x%x;", $char) if defined $char;
+        die sprintf "illegal byte 0x%02x was found", $byte;
+    }
+
+    $cp932 = utf8_to_cp932   (\&toHexNCR, $utf8_string);
+    $cp932 = unicode_to_cp932(\&toHexNCR, $unicode_string);
+    $cp932 = utf16le_to_cp932(\&toHexNCR, $utf16le_string);
+
+C<UNICODE_CALLBACK> の返り値は CP-932 として正しくある必要があります。
+
+C<UNICODE_OPTION> を C<STRING> の後におくことができます。
+これらは C<'fg'> や C<'gsf'> のように組み合わせることも
+できます（順序は任意です）。
+
+    'g'    CP-932 外字（ユーザ定義文字）[0xF040～0xF9FC (95～114区)] に
+           Unicode の PUA [0xE000～0xE757] から変換します（1880 文字）。
+
+    's'    CP-932 未定義の一バイト文字の対応付けを追加します。
+           U+0080 => 0x80,  U+F8F0 => 0xA0,
+           U+F8F1 => 0xFD,  U+F8F2 => 0xFE,  U+F8F3 => 0xFF.
+
+    'f'    Unicode から CP-932 への幾つかの代用的な変換 (fallbacks) を
+           追加します。マッピングが追加される文字は、latin-1 領域
+           [U+00A0..U+00FF] のうちの幾つかの文字と、平仮名のヴ [U+3094,
+           片仮名のヴ (0x8394) になります] です。
+
+=over 4
+
+=item C<utf8_to_cp932([UNICODE_CALLBACK,] STRING [, UNICODE_OPTION])>
+
+UTF-8 を CP-932 に変換します。
+
+=item C<unicode_to_cp932([UNICODE_CALLBACK,] STRING [, UNICODE_OPTION])>
+
+Unicode を CP-932 に変換します。
+
+この B<Unicode> は、Perl の内部形式（F<perlunicode> 参照）。
+C<SVf_UTF8> フラグ付きでない場合、ISO 8859-1 (latin1) 文字列として
+Unicode に upgrade されます。
+
+B<この関数は Perl 5.6.1 以降、かつ XS 版でのみ提供されます。>
+
+=item C<utf16_to_cp932([UNICODE_CALLBACK,] STRING [, UNICODE_OPTION])>
+
+UTF-16 (C<BOM> 付きまたは無し) を CP-932 に変換します。
+
+=item C<utf16le_to_cp932([UNICODE_CALLBACK,] STRING [, UNICODE_OPTION])>
+
+UTF-16LE を CP-932 に変換します。
+
+=item C<utf16be_to_cp932([UNICODE_CALLBACK,] STRING [, UNICODE_OPTION])>
+
+UTF-16BE を CP-932 に変換します。
+
+=item C<utf32_to_cp932([UNICODE_CALLBACK,] STRING [, UNICODE_OPTION])>
+
+UTF-32 (C<BOM> 付きまたは無し) を CP-932 に変換します。
+
+=item C<utf32le_to_cp932([UNICODE_CALLBACK,] STRING [, UNICODE_OPTION])>
+
+UTF-32LE を CP-932 に変換します。
+
+=item C<utf32be_to_cp932([UNICODE_CALLBACK,] STRING [, UNICODE_OPTION])>
+
+UTF-32BE を CP-932 に変換します。
+
+=back
+
+=head2 輸出
+
+B<デフォルト:>
+
+    cp932_to_utf8     utf8_to_cp932
+    cp932_to_utf16le  utf16le_to_cp932
+    cp932_to_utf16be  utf16be_to_cp932
+
+    cp932_to_unicode  unicode_to_cp932 (XS のみで提供されます)
+
+B<要求されれば:>
+
+    cp932_to_utf32le  utf32le_to_cp932
+    cp932_to_utf32be  utf32be_to_cp932
+                      utf16_to_cp932 [*]
+                      utf32_to_cp932 [*]
+
+[*] これらと対応すべき C<cp932_to_utf16()> および C<cp932_to_utf32()>
+は未実装です。まだ C<SJIS_CALLBACK> の返り値についてもう少し検討が
+必要と考えています。
+（文字列の連結に C<BOM> の認識と処理が必要となるでしょう。）
+
+=head1 注意事項
+
+このモジュールの Pure Perl 版はワイド文字（F<perlunicode> を参照）を
+理解できません。必要なら、Perl 5.7 以降の
+C<utf8::decode>/C<utf8::encode>（F<utf8> を参照）を使ってください。
+
+=head1 作者
+
+SADAHIRO Tomoyuki <SADAHIRO@cpan.org> （貞廣 知行）
+
+Copyright(C) 2001-2007, SADAHIRO Tomoyuki. Japan. All rights reserved.
+
+This module is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+=head1 参考資料
+
+=over 4
+
+=item Microsoft PRB, Article ID: Q170559
+
+Conversion Problem Between Shift-JIS and Unicode
+
+=item cp932 to Unicode table
+
+http://www.unicode.org/Public/MAPPINGS/VENDORS/MICSFT/WINDOWS/CP932.TXT
+
+http://www.unicode.org/Public/MAPPINGS/VENDORS/MICSFT/WindowsBestFit/bestfit932.txt
+
+http://www.microsoft.com/globaldev/reference/dbcs/932.htm
+
+=back
+
+=cut

@@ -1,0 +1,32 @@
+
+= 2007/10/08	0.44
+
+Bugfix in the content matching regular expression: parenthesis
+were misplaced.
+
+Adjust regular expressions:
+	... For security reasons we do not accept messages containing images 
+	... Blocked by policy: blacklisted URL in mail
+	... URL in message blacklisted
+	... MSN/Hotmail changed their blacklist error message
+
+= 2007/08/01	0.43
+
+Bugfix: don't complain about empty callbacks.
+
+Bugfix: make the debug flag work.
+
+Adjust content and recipient rejection regular expressions.
+
+Notice hotmail bounces.
+
+= 2007/01/21	0.42
+
+Major bug fixed: parameters weren't passed through.  The
+module didn't work.  Now it does.
+
+Search for the string "Spam source" as an indication of
+a problem.
+
+= 2007/01/03	0.41
+

@@ -1,0 +1,55 @@
+=head1 NAME
+
+Shipwright::Manual - Shipwright Manual
+
+=head1 DESCRIPTION
+
+This manual is divided into several parts, each covering a specific topic.
+
+=over 4
+
+=item L<Shipwright::Manual::Tutorial>
+
+a simple tutorial that leads through the creation of a simple vessel.
+
+=item L<Shipwright::Manual::Glossary>
+
+a glossary of terms relevant.
+
+=item L<Shipwright::Manual::ENV>
+
+a summary of all the environment variables relevant.
+
+=item L<Shipwright::Manual::CustomizeBuild>
+
+a guide of customizing the build process of individual sources.
+
+=item L<Shipwright::Manual::UsingFlags>
+
+a guide of using flags feature.
+
+=item L<Shipwright::Manual::UsingBranches>
+
+a guide of using branches feature.
+
+=item L<Shipwright::Manual::BuildMultiArchVessel>
+
+a guide of building a vessel with multi-arch support.
+
+=back
+
+=head1 SEE ALSO
+
+L<Shipwright>
+
+=head1 AUTHORS
+
+sunnavy  C<< <sunnavy@bestpractical.com> >>
+
+=head1 LICENCE AND COPYRIGHT
+
+Shipwright is Copyright 2007-2015 Best Practical Solutions, LLC.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

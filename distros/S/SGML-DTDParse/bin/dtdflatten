@@ -1,0 +1,449 @@
+#!/usr/bin/perl -- # -*- Perl -*-
+# $Id: dtdflatten,v 2.2 2005/07/16 03:22:57 ehood Exp $
+# Author(s): Norman Walsh, <ndw@nwalsh.com>
+#	     Earl Hood, <earl@earlhood.com>
+# POD at end of file.
+
+use strict;
+use Getopt::Long;
+use SGML::DTDParse;
+use SGML::DTDParse::DTD;
+
+my %option = ('debug' => 0,
+	      'verbose' => 1,
+	      'output' => '-',
+	      'declaration' => '');
+
+my %opt = ();
+&GetOptions(
+    \%opt,
+    'debug+',
+    'verbose!',
+    'output=s',
+    'catalog=s@',
+    'preserve=s@',
+    'declaration=s',
+    @SGML::DTDParse::CommonOptions
+) || SGML::DTDParse::usage(-verbose => 0, -exitval => 1);
+SGML::DTDParse::process_common_options(\%opt);
+
+foreach my $key (keys %option) {
+    $option{$key} = $opt{$key} if exists($opt{$key});
+}
+
+my @catalogs = exists($opt{'catalog'}) ? @{$opt{'catalog'}} : ();
+my @preserve = exists($opt{'preserve'}) ? @{$opt{'preserve'}} : ();
+
+my $file = shift @ARGV;
+my $output = $option{'output'} || '';
+
+my $dtd = new SGML::DTDParse::DTD (
+		'Verbose'             => $option{'verbose'},
+		'Debug'               => $option{'debug'},
+		'SgmlCatalogFilesEnv' => $option{'use-sgml-catalog-files'},
+		'SourceDtd'           => $file,
+		'Declaration'         => $option{'declaration'});
+
+foreach my $catalog (@catalogs) {
+    $dtd->parseCatalog($catalog);
+}
+
+$dtd->parse($file);
+
+my $out_fh = \*STDOUT;
+if ($output ne '') {
+    use Symbol;
+    $out_fh = gensym;
+    open ($out_fh, ">$output") ||
+	die qq{Error: Unable to create "$output": $!\n};
+    $dtd->status("Writing $output...", 1);
+}
+
+my $declcount = $dtd->declaration_count();
+my @decls = $dtd->declarations();
+
+my %peindex = ();
+
+for (my $count = 0; $count < $declcount; $count++) {
+    $peindex{$decls[$count]->name()} = $count
+	if $decls[$count]->type() eq 'param';
+}
+
+$dtd->status("$declcount declarations.", 1);
+$dtd->status("Calculating used entities...", 1);
+
+my %usedPE = ();
+
+foreach my $decl (@decls) {
+    if ($decl->type() eq 'element') {
+	my $cm = $decl->content_model();
+	while ($cm =~ /^(.*?)%(\S+?);/s) {
+	    my $pe = $2;
+	    $usedPE{$pe} = 0 if !exists($usedPE{$pe});
+	    $usedPE{$pe}++;
+	    $cm = $';
+	}
+    } elsif ($decl->type() eq 'attlist') {
+	my $text = $decl->text();
+	while ($text =~ /^(.*?)%(\S+?);/s) {
+	    my $pe = $2;
+	    $usedPE{$pe} = 0 if !exists($usedPE{$pe});
+	    $usedPE{$pe}++;
+	    $text = $';
+	}
+    }
+}
+
+# Now we know which elements use them, let's recurse...
+
+my %checkedPE = ();
+my $changed = 1;
+
+while ($changed) {
+    $changed = 0;
+
+    foreach my $decl (@decls) {
+	if ($decl->type() eq 'param') {
+	    my $name = $decl->name();
+	    my $text = $decl->text();
+
+	    if ($usedPE{$name} && !$checkedPE{$name}) {
+		$checkedPE{$name} = 1;
+		$changed = 1;
+
+		while ($text =~ /^(.*?)%(\S+?);/s) {
+		    my $pe = $2;
+		    $usedPE{$pe} = 0 if !exists($usedPE{$pe});
+		    $usedPE{$pe}++;
+		    $text = $';
+		}
+	    }
+	}
+    }
+}
+
+# now output the flattened DTD
+
+print $out_fh <<'EOT';
+<!-- *********************************************************************
+     *** THIS IS THE FLATTENED DTD. DO NOT EDIT THIS DTD BY HAND, EDIT ***
+     *** THE CUSTOMIZATION LAYER AND REGNERATE THE FLATTENED DTD!      ***
+     ********************************************************************* -->
+EOT
+
+print $out_fh "<!-- Flattened:\n";
+print $out_fh "     Public: ", $dtd->{'PUBLIC_ID'}, "\n";
+print $out_fh "     System: ", $dtd->{'SYSTEM_ID'}, "\n";
+print $out_fh "-->\n\n";
+
+foreach my $decl (@decls) {
+    if ($decl->type() eq 'element') {
+	my $name = $decl->name();
+	my $cm = $decl->content_model();
+
+	$cm = &expandPE($cm);
+
+	print $out_fh "<!ELEMENT $name $cm>\n";
+    } elsif ($decl->type() eq 'attlist') {
+	my $name = $decl->name();
+	my $text = $decl->text();
+
+	$text = &expandPE($text);
+
+	print $out_fh "<!ATTLIST $name";
+	print $out_fh $text;
+	print $out_fh ">\n";
+    } elsif ($decl->type() eq 'param') {
+	my $name = $decl->name();
+	my $keep = 0;
+
+	if ($usedPE{$name}) {
+	    foreach my $re (@preserve) {
+		$keep = 1 if $name =~ /$re/;
+		last if $keep;
+	    }
+
+	    if ($keep) {
+		my $text = $decl->text();
+		$text = &expandPE($text);
+
+		my $quote = '"';
+		if ($text =~ /\"/s) {
+		    $quote = "'";
+		    $text =~ s/\'/\&apos;/sg;
+		}
+
+		print $out_fh "<!ENTITY % $name $quote$text$quote>\n";
+	    }
+	}
+    } elsif ($decl->type() eq 'gen') {
+	my $name = $decl->name();
+	my $public = $decl->public();
+	my $system = $decl->system();
+
+	if ($public || $system) {
+	    print $out_fh "<!ENTITY $name ";
+
+	    if ($public) {
+		my $quote = '"';
+		if ($public =~ /\"/s) {
+		    $quote = "'";
+		    $public =~ s/\'/\&apos;/sg;
+		}
+		print $out_fh "PUBLIC $quote$public$quote";
+	    }
+
+	    if ($system) {
+		my $quote = '"';
+		if ($system =~ /\"/s) {
+		    $quote = "'";
+		    $system =~ s/\'/\&apos;/sg;
+		}
+		print $out_fh "SYSTEM" if !$public;
+		print $out_fh " $quote$system$quote";
+	    }
+
+	    print $out_fh ">\n";
+	} else {
+	    my $text = $decl->text();
+	    $text = &expandPE($text);
+
+	    my $quote = '"';
+	    if ($text =~ /\"/s) {
+		$quote = "'";
+		$text =~ s/\'/\&apos;/sg;
+	    }
+	    print $out_fh "<!ENTITY $name $quote$text$quote>\n";
+	}
+    } elsif ($decl->type() eq 'sdata'
+	     || $decl->type() eq 'pi') {
+	my $name = $decl->name();
+
+	print $out_fh "<!ENTITY $name " . uc($decl->type()) . " ";
+
+	my $text = $decl->text();
+	$text = &expandPE($text);
+
+	my $quote = '"';
+	if ($text =~ /\"/s) {
+	    $quote = "'";
+	    $text =~ s/\'/\&apos;/sg;
+	}
+
+	print $out_fh "$quote$text$quote>\n";
+    } elsif ($decl->type() eq 'ndata'
+	     || $decl->type() eq 'cdata') {
+	my $name = $decl->name();
+	my $public = $decl->public();
+	my $system = $decl->system();
+
+	print $out_fh "<!ENTITY $name ";
+
+	if ($public) {
+	    my $quote = '"';
+	    if ($public =~ /\"/s) {
+		$quote = "'";
+		$public =~ s/\'/\&apos;/sg;
+	    }
+	    print $out_fh "PUBLIC $quote$public$quote";
+	}
+
+	if ($system) {
+	    my $quote = '"';
+	    if ($system =~ /\"/s) {
+		$quote = "'";
+		$system =~ s/\'/\&apos;/sg;
+	    }
+	    print $out_fh "SYSTEM" if !$public;
+	    print $out_fh " $quote$system$quote";
+	}
+
+	print $out_fh " ", uc($decl->type()), " ", $decl->notation();
+	print $out_fh ">\n";
+    } elsif ($decl->type() eq 'notation') {
+	my $name = $decl->name();
+	my $public = $decl->public();
+	my $system = $decl->system();
+
+	print $out_fh "<!NOTATION $name ";
+
+	if ($public) {
+	    my $quote = '"';
+	    if ($public =~ /\"/s) {
+		$quote = "'";
+		$public =~ s/\'/\&apos;/sg;
+	    }
+	    print $out_fh "PUBLIC $quote$public$quote";
+	}
+
+	if ($system) {
+	    my $quote = '"';
+	    if ($system =~ /\"/s) {
+		$quote = "'";
+		$system =~ s/\'/\&apos;/sg;
+	    }
+	    print $out_fh "SYSTEM" if !$public;
+	    print $out_fh " $quote$system$quote";
+	}
+
+	if (!$public && !$system) {
+	    print $out_fh "SYSTEM";
+	}
+
+	print $out_fh ">\n";
+    } else {
+	die "Error: Unexpected declaration type: " . $decl->type() . "\n";
+    }
+}
+
+close($out_fh)  if $output;
+
+$dtd->status("Done.", 1);
+exit 0;
+
+# =================================================================
+
+sub expandPE {
+    my $text = shift;
+
+    my $expanded = "";
+
+    while ($text =~ /%(\S+?);/s) {
+	$expanded .= $`;
+	my $post = $';
+	my $pe = $1;
+	my $keep = 0;
+
+	foreach my $re (@preserve) {
+	    $keep = 1 if $pe =~ /$re/;
+	    last if $keep;
+	}
+
+	if ($keep) {
+	    $expanded .= "%$pe;";
+	    $text = $post;
+	} else {
+	    my $index = $peindex{$pe};
+	    die "Error: Unexpected PE: $pe\n" if !defined($index);
+	    $text = $decls[$index]->text() . $post;
+	}
+    }
+
+    return $expanded . $text;
+}
+
+__END__
+
+=head1 NAME
+
+dtdflatten - Flatten an SGML/XML DTD.
+
+=head1 SYNOPSIS
+
+  dtdflatten [options]
+
+=head1 DESCRIPTION
+
+B<dtdflatten> parses a DTD and prints out a flatten/expanded version
+of it with all parameter entities expanded.
+
+The first non-option-related argument provided on the command-line
+specifies the file to parse.  If no filename is given, then the
+DTD is read from standard input.
+
+The flatten DTD is printed to standard output unless
+the C<--output> option is specified.
+
+=head1 OPTIONS
+
+=over 4
+
+=item --catalog <catalog>
+
+Specify catalog files to parse for resolving external entity
+references.  This option can be specified multiple times.
+
+B<NOTE:> Currently, only SGML Open Catalog format is supported.
+XML Catalog support is not implemented (yet).
+
+=item --debug
+
+Extra debugging output.  This option can be specified multiple
+times to increase the amount of output.
+
+Debugging output is sent to standard error.
+
+=item --declaration <file>
+
+Specify the SGML declaration.  The SGML declaration is parsed
+to determine the type of DTD being parsed, XML or SGML.  The
+key parts of the SGML declaration examined are the NAMECASE
+and CHARSET directives to determine the DTD type.
+
+If no SGML declaration is available, the C<--xml>,
+C<--namecase-general>, and C<--namecase-entity> options can
+be used.
+
+=item --output <file>
+
+Output file.  If not specified, standard output is used.
+
+=item --preserve <entity-name>
+
+Preserve parameter entity declaration denoted by <entity-name>.  This
+option can be specified multiple times.
+
+Note, if <entity-name> matches any portion of a parameter entity,
+the parameter entity declaration will be preserved.
+
+=item --verbose
+
+=item --noverbose
+
+Print parsing progress.  By default, this option is enabled.
+Verbose output is sent to standard error.
+
+If C<--debug> is specified, then this option is automatically
+enabled.
+
+=item --version
+
+Print version and synopsis.
+
+=item --help
+
+Print synopsis and options available.
+
+=item --man
+
+Print manual page.
+
+=back
+
+=head1 SEE ALSO
+
+L<dtdparse|dtdparse>
+
+See L<SGML::DTDParse|SGML::DTDParse> for an overview of the DTDParse package.
+
+=head1 PREREQUISITES
+
+B<Getopt::Long>,
+B<Text::DelimMatch>,
+B<XML::Parser>
+
+=head1 AVAILABILITY
+
+E<lt>I<http://dtdparse.sourceforge.net/>E<gt>
+
+=head1 AUTHORS
+
+Originally developed by Norman Walsh, E<lt>ndw@nwalsh.comE<gt>.
+
+Earl Hood E<lt>earl@earlhood.comE<gt> picked up support and
+maintenance.
+
+=head1 COPYRIGHT AND LICENSE
+
+See L<SGML::DTDParse|SGML::DTDParse> for copyright and license information.
+

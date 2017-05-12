@@ -1,0 +1,14 @@
+CHANGELOG
+lib/Statistics/ChiSquare.pm
+Makefile.PL
+MANIFEST
+README
+t/all.t
+t/pod-coverage.t
+t/pod.t
+ARTISTIC.txt
+GPL2.txt
+MANIFEST.SKIP
+t/coverage.sh
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

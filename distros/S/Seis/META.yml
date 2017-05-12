@@ -1,0 +1,159 @@
+---
+abstract: 'Perl6ish syntax on Perl5'
+author:
+  - 'tokuhirom <tokuhirom@gmail.com>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.6.5, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Seis
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  IO::Path:
+    file: lib/Seis/IO/Path.pm
+  IO::Path::Cygwin:
+    file: lib/Seis/IO/Path.pm
+  IO::Path::Unix:
+    file: lib/Seis/IO/Path.pm
+  IO::Path::Win32:
+    file: lib/Seis/IO/Path.pm
+  IO::Spec::Cygwin:
+    file: lib/Seis/IO/Path.pm
+  IO::Spec::Unix:
+    file: lib/Seis/IO/Path.pm
+  IO::Spec::Win32:
+    file: lib/Seis/IO/Path.pm
+  Perl6::PVIP:
+    file: lib/Perl6/PVIP.pm
+    version: 0.12
+  Perl6::PVIP::Node:
+    file: lib/Perl6/PVIP/Node.pm
+  Seis:
+    file: lib/Seis.pm
+    version: 0.12
+  Seis::Any:
+    file: lib/Seis/Any.pm
+  Seis::Array:
+    file: lib/Seis/Array.pm
+  Seis::Autobox:
+    file: lib/Seis/Autobox.pm
+  Seis::Bool:
+    file: lib/Seis/Bool.pm
+  Seis::Buf:
+    file: lib/Seis/Buf.pm
+  Seis::BuiltinFunctions:
+    file: lib/Seis/BuiltinFunctions.pm
+  Seis::CLI:
+    file: lib/Seis/CLI.pm
+  Seis::Class:
+    file: lib/Seis/Class.pm
+  Seis::Compiler:
+    file: lib/Seis/Compiler.pm
+  Seis::Complex:
+    file: lib/Seis/Complex.pm
+  Seis::Duration:
+    file: lib/Seis/Duration.pm
+  Seis::Exception:
+    file: lib/Seis/Exception.pm
+  Seis::Exception::ArgumentCount:
+    file: lib/Seis/Exceptions.pm
+  Seis::Exception::CompilationFailed:
+    file: lib/Seis/Exceptions.pm
+  Seis::Exception::IO:
+    file: lib/Seis/Exceptions.pm
+  Seis::Exception::NotImplemented:
+    file: lib/Seis/Exceptions.pm
+  Seis::Exception::ParsingError:
+    file: lib/Seis/Exceptions.pm
+  Seis::Exception::UnknownNode:
+    file: lib/Seis/Exceptions.pm
+  Seis::Exceptions:
+    file: lib/Seis/Exceptions.pm
+  Seis::Exporter:
+    file: lib/Seis/Exporter.pm
+  Seis::Hash:
+    file: lib/Seis/Hash.pm
+  Seis::IO:
+    file: lib/Seis/IO.pm
+  Seis::IO::Handle:
+    file: lib/Seis/IO/Handle.pm
+  Seis::IO::Path:
+    file: lib/Seis/IO/Path.pm
+  Seis::Instant:
+    file: lib/Seis/Instant.pm
+  Seis::Int:
+    file: lib/Seis/Int.pm
+  Seis::List:
+    file: lib/Seis/List.pm
+  Seis::Match:
+    file: lib/Seis/Runtime.pm
+  Seis::MetaClass:
+    file: lib/Seis/MetaClass.pm
+  Seis::Mu:
+    file: lib/Seis/Mu.pm
+  Seis::Object:
+    file: lib/Seis/Object.pm
+  Seis::Order:
+    file: lib/Seis/Order.pm
+  Seis::Pair:
+    file: lib/Seis/Pair.pm
+  Seis::Range:
+    file: lib/Seis/Range.pm
+  Seis::Real:
+    file: lib/Seis/Real.pm
+  Seis::Runtime:
+    file: lib/Seis/Runtime.pm
+  Seis::Socket:
+    file: lib/Seis/Socket.pm
+  Seis::Str:
+    file: lib/Seis/Str.pm
+  Seis::Sub:
+    file: lib/Seis/Sub.pm
+  Seis::Undef:
+    file: lib/Seis/Undef.pm
+  Seis::Whatever:
+    file: lib/Seis/Whatever.pm
+requires:
+  Caroline: 0
+  Class::XSAccessor: 1.16
+  Encode: 0
+  Exception::Tiny: 0
+  Math::BaseCnv: 0
+  Math::BigInt: 0
+  Math::Prime::Util: 0
+  Sub::Identify: 0
+  Sub::Name: 0
+  Time::HiRes: 0
+  autobox: 2.79
+  perl: 5.018000
+resources:
+  bugtracker: https://github.com/perl-seis/Seis/issues
+  homepage: https://github.com/perl-seis/Seis
+  repository: git://github.com/perl-seis/Seis.git
+version: 0.12
+x_contributors:
+  - '_why <why@whytheluckystiff.net>'
+  - 'nddrylliog <nddrylliog@gmail.com>'
+  - 'Onne Gorter <onne@onnlucky.com>'
+  - 'Ali Rantakari <visit-with-web-browser@hasseg.org>'
+  - 'Steve White <swhite@lekkerste.local>'
+  - 'Amos Wenger <amos@official.fm>'
+  - 'Reini Urban <rurban@cpanel.net>'
+  - 'Amos Wenger <amos@lockfree.ch>'

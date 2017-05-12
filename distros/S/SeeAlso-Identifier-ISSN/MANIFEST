@@ -1,0 +1,15 @@
+Build.PL
+Changes
+lib/SeeAlso/Identifier/ISSN.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.json
+META.yml
+README
+t/001_load.t
+t/010_methods.t
+t/020_values.t
+t/030_operators.t
+t/040_cycles.t
+Todo

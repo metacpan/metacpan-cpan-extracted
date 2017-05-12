@@ -1,0 +1,12 @@
+<& /lib/forms/domain.mas, domain => $domain &>
+
+<%args>
+$domain
+</%args>
+
+<%method title>
+<% loc( 'Edit %1', $domain->web_hostname() ) %>
+<%args>
+$domain
+</%args>
+</%method>

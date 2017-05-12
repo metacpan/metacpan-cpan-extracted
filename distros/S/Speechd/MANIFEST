@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Speechd.t
+lib/Speechd.pm
+LICENSE
+example.pl
+META.yml                                 Module meta-data (added by MakeMaker)

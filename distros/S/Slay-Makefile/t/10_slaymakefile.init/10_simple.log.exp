@@ -1,0 +1,2 @@
+10_simple.smak, 2: Global symbol "$BUILD" requires explicit package name at 10_simple.smak line 2. at SlayMakefile.main line 26
+Building default

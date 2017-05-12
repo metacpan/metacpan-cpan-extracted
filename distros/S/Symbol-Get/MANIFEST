@@ -1,0 +1,11 @@
+.gitignore
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README.pod
+lib/Symbol/Get.pm
+t/001_load.t
+t/002_usage.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

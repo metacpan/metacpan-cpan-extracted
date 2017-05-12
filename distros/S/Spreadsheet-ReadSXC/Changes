@@ -1,0 +1,35 @@
+Revision history for Perl extension Spreadsheet::ReadSXC.
+
+0.20  Fri Jun 17 2005
+	- almost completely rewritten to use XML::Parser's event style (instead of its tree
+	  style), resulting in more readable and (hopefully) maintainable code
+	- this version allows for multiple open files by returning an anonymous data structure
+	  instead of a data reference (thanks to H. Merijn Brand for fixing this)
+	- new option to return an array of hashes instead of a hash of arrays
+	- new option to return time cells as time value
+
+0.12  Sun May 8 2005
+	- comments no longer appear in cells (have to find a cleaner way of returning annotations)
+
+0.11  Sun May 8 2005
+	- eliminated a bug with 'DropHiddenColumns' which would populate an empty table
+	- edited documentation
+
+0.10  Fri May 6 2005
+	- almost completely rewritten to use XML::Parser instead of XML::Parser::Lite::Tree
+	- new options to include/drop hidden rows/col, covered cells etc.
+	- optionally truncate empty rows and columns
+	- optionally replace newlines in cells with any string
+	- new subroutines for reading unpacked XML data from SXC files
+	- option to return date cells as standard date value
+
+0.03  Tue May 3 2005
+	- more prerequisites in Makefile.PL
+	- minor corrections in documentation
+
+0.02  Mon May 1 2005
+	- fixed prerequisites in Makefile.PL
+
+0.01  Sat Apr 30 2005
+	- original version; created by h2xs 1.22 with options
+		-XAn Spreadsheet::ReadSXC

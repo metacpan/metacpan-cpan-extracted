@@ -1,0 +1,14 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+cpanfile
+dist.ini
+lib/Syntax/Keyword/Val.pm
+t/100-val.t
+t/release-distmeta.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

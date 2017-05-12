@@ -1,0 +1,57 @@
+{
+   "abstract" : "Perl interface with the R statistical program",
+   "author" : [
+      "Florent Angly <florent.angly@gmail.com> (2011 rewrite)"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Install version 1.16, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Statistics-R",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59",
+            "Test::More" : "0.47"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IPC::Run" : "0.1",
+            "Regexp::Common" : "0",
+            "Text::Balanced" : "1.97",
+            "Text::Wrap" : "0",
+            "perl" : "5.006",
+            "version" : "0.77"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Name=Statistics-R"
+      },
+      "homepage" : "http://search.cpan.org/search?query=statistics%3A%3AR&mode=dist",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.33",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

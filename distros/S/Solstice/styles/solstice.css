@@ -1,0 +1,103 @@
+/* 
+
+Only styles that are necessary for the functioning of the solstice framework 
+should go in this file.
+
+*/
+
+.soldevtoolbar { padding: 5px; background-color: #A70000; color: #fff; font-size: 11px; display: none; position: fixed; bottom: 0; }
+.soldevtoolbar a, .soldevtoolbar a:link, .soldevtoolbar a:hover { color: #fff; text-decoration: underline; padding: 0 7px; }
+.soldevtoolbar code { font-size: 11px; color: #eee; }
+.soldevtoolbar span { padding: 0 7px; white-space: nowrap; }
+
+.solwireframe { padding: 1px; margin: 1px; border: 1px green solid; }
+.solwireframe .solwireframetxt { color: white; font-size: 10px; font-weight: normal; text-decoration: none; position: absolute; background-color: green; z-index: 1000; padding: 1px 5px; opacity: .5; margin: -1px 0 0 -1px; }
+.solwireframe div.solwireframetxt:hover { z-index: 1001; background-color: #00A600; opacity: 1; }
+
+.transparent { filter: alpha(opacity=0); opacity: 0.0; background-color: gray; display:none; width: 0; height: 0; display: none; position: absolute; color: white; border: 1px gray solid; }
+
+/* flyout menus */
+.sol_flyoutmenu img        { border: 0px; vertical-align: middle; }
+
+div.yuimenu { z-index: 99; position: absolute; visibility: hidden; top: 0px; left: 0px; font-size: 1em; white-space: nowrap; }
+div.yuimenu .bd { border: 1px solid #999; position: relative; background-color: #fff; z-index: 101; }
+div.yuimenu ul { list-style-type: none; margin: 0; padding: 0; border: 0px; }
+div.yuimenu li { padding: 0; margin: 0; cursor: pointer; text-decoration: none; position: relative; }
+div.yuimenu li .yuimenuitemlabel { color: #0A50A1; white-space: nowrap; display: block; padding: 4px 20px; }
+
+div.yuimenu li a.selected,
+div.yuimenu li a:hover								{ padding: 4px 20px; color: #fff; background-color: #5681AF; cursor: pointer; text-decoration: none; }
+
+div.yuimenu li a.disabled,
+div.yuimenu li em.disabled 							{ color: #ccc; text-decoration: none; }
+
+div.yuimenu li .yuimenuitemlabel .checkedindicator 	{ position: absolute; display: block; height: 8px; width: 8px; overflow: hidden; vertical-align: middle; text-indent: 12px; background-image: url(../images/yui_map.gif); background-repeat: no-repeat; background-position: 0 -48px; left: 6px; margin-top: -3px; top: 50%; }
+div.yuimenu li a.selected .checkedindicator 		{ background-position: 0 -56px; }
+div.yuimenu li a.disabled .checkedindicator 		{ background-position: 0 -64px; }
+
+/* hack for ie6 so checkmark is not on top of text  */
+div.yuimenu li .yuimenuitemlabel .checkedindicator, 
+div.yuimenu li a.selected em.checkedindicator      	{ _left:-12px; _top: .8em; }
+
+div.yuimenu .yui-menu-shadow-visible,
+.yui-panel-container .underlay 						{ height: 100%; position: absolute; top: 3px; right: -3px; left: -3px; bottom: -3px; background-color: #000; opacity: .12; *filter: alpha(opacity=12);  /* For IE */ }
+
+* html div.yuimenu { background: none; }
+
+
+/* tooltips */
+.yui-tt { visibility: hidden; position: absolute; background: transparent url(../images/yui_menu_ds.png) no-repeat bottom right; padding: 0 3px 3px 0; }
+.yui-tt .bd { font-size: 11px; line-height: 1.4; border: 1px solid #333; padding: 2px 4px; color: #666; background-color: #FFFFCC; width: auto; }
+
+* html .yui-tt { background: none; }
+
+
+/* processing mask & message box */
+.yui-overlay { position:absolute; display:block; }
+
+.mask { z-index:0; display:none; position:absolute; top:0; left:0; -moz-opacity: 0.5; opacity:.50; filter: alpha(opacity=50); background-color:#CCC; }
+
+.yui-panel-container { position:absolute; top: -100px; background-color:transparent; z-index:6; visibility:hidden; overflow:visible; width:auto; }
+.yui-panel { visibility:hidden; border-collapse:separate; position:relative; left:0px;top:0px; font-size:1em; background-color:#FFF; border: 10px solid #7F9DB9; z-index:1; padding: 10px; overflow:hidden; }
+.yui-panel .hd { font-size:100%; line-height:100%; font-weight:bold; padding:5px 10px 0 10px; }
+.yui-panel .hd h2 { margin: 5px 0 0 0; color: #555; }
+.yui-panel .bd { overflow:hidden; padding:10px; }
+.yui-panel .bd p { margin:0 0 1em 0; }
+.yui-panel .bd .sol_panel_height_limit { max-height: 450px; overflow-y: auto; } /* won't work in ie6 */
+.yui-panel .ft { padding:4px; overflow:hidden; }
+
+.yui-dialog .ft, .simple-dialog .ft { padding-bottom:5px; padding-right:5px; text-align:right; }
+.yui-dialog form, .yui-simple-dialog form {	margin:0; }
+
+
+/* Dialog box */
+.container-close { position: absolute; top: 3px; right: 4px; height: 16px; width: 16px; background: url(../images/remove.gif) no-repeat 0 0; cursor: pointer; }
+
+
+
+/* pop-ins */
+.sol_popin            { visibility: hidden; z-index: 111; position: absolute; border: 2px outset #999999; background-color: #FFFFFF; width: 300px; top: 0; left: 0; }
+.sol_popin_title      { padding: 4px; background-color: #CCCCCC; font-weight: bold; cursor: pointer; }
+.sol_popin_title img  { border: 0px; float: right; }
+.sol_popin_content    { padding: 4px; }
+
+/* file uploads */
+.sol_upload_container { border: 0; width: 350px; overflow: hidden; vertical-align: middle; }
+.sol_upload_form_container { white-space: nowrap; padding-bottom: 5px; }
+.sol_upload_form_container form { display: inline; margin: 0; }
+.sol_upload_form_container input.sol_hidden_input { position: absolute; top: -100px; }
+.sol_upload_meter_container { border: 1px solid black; height: 10px; width: 300px; }
+.sol_upload_meter_progress_bar { height: 10px; width: 0px; position: relative; background: #81cd70 url(../images/progress_bar_bg.jpg) repeat-x top left; }
+.sol_upload_meter_percentage { font-size: .8em; width: 300px; text-align: center; margin-top: -12px; position: relative; }
+form a.sol_file_upload_remove { margin-left: 1em; font-size: .8em; }
+.sol_file_upload_spacer { font-size: 2px; border: 1px solid red;}
+
+/* textarea resizing */
+.sol_resizeguide            { z-index: 112; position: absolute; top: -10px; left: -10px; border: 1px dotted #333333; }
+* html .sol_resizeguide     { background-color: #fff; filter: alpha(opacity=50); }
+
+.sol_resizebutton           { background: transparent url(../images/resize_br.gif) no-repeat scroll 0 0; width: 13px; height: 13px; position: absolute; bottom: 4px; right: 4px; }
+* html .sol_resizebutton    { bottom: 19px; }
+
+/* RTE Switch  */
+.sol_rte_switch             { color: #777; font-size:.8em; text-align: right; margin-top: 10px; _margin-top: -12px; /* for ie6 */ }

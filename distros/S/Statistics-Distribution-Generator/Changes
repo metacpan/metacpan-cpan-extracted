@@ -1,0 +1,43 @@
+Revision history for Data-Dumper-Tabluate
+
+0.013   2015-01-12
+        Kwalitee bump
+
+0.012   2015-01-11
+        Kwalitee bump
+
+0.011   2015-01-10
+        Kwalitee bump
+
+0.010   2015-01-10
+        Adding more sanity tests
+
+0.009   2015-01-09
+        Adding more sanity tests. Had an idea of how to turn any supplied PDF
+        into an RNG, by using the CDF of that PDF, and picking a random y
+        (0 .. 1) and then returning that x that has probability y. Not
+        implemented yet ...
+
+0.008   2015-01-07
+        Adding more sanity tests.
+
+0.007   2015-01-07
+        Start thinking about sanity tests.
+
+0.006   2015-01-07
+        More tinkering. Get rid of prototypes except where fully needed.
+
+0.005   2015-01-06
+        I was generating PDFs for some of them, instead of _using_ the PDFs
+
+0.004   2015-01-06
+        Improve documentation with more examples and discussion
+
+0.003   2015-01-06
+        Fixed some more POD errors
+
+0.002   2015-01-06
+        Fixed some POD errors
+
+0.001   2015-01-06
+        First version, released on an unsuspecting world.

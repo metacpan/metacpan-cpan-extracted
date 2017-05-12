@@ -1,0 +1,31 @@
+---
+abstract: 'Load, access, update one or more data lists for statistical analysis'
+author:
+  - 'Roderick Garton <rgarton@cpan.org>'
+build_requires:
+  Array::Compare: '2.11'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.4214'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Statistics-Data
+provides:
+  Statistics::Data:
+    file: lib/Statistics/Data.pm
+    version: '0.11'
+requires:
+  Clone: '0.38'
+  List::AllUtils: '0.09'
+  Number::Misc: '1.2'
+  Scalar::Util: '1.41'
+  String::Util: '1.24'
+  Text::SimpleTable: '2.03'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.11'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

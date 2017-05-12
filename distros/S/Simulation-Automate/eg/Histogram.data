@@ -1,0 +1,80 @@
+# Example datafile for Histograms
+
+TITLE: Gap width distribution
+SIMTYPE : bufsim6
+#DEVTYPE : OPSnode
+# extension of template files (default: .templ)
+TEMPL : .templ
+# the command line to run the simulation (default: perl inputfile outputfile)
+# 'inputfile' and 'outputfile' are keywords
+COMMAND : perl inputfile outputfile
+# extension of input file (default: .pl)
+EXT : .pl
+# To filter the output of the simulation
+# To filter the output of the simulation (defaults to .*)
+OUTPUT_FILTER_PATTERN : B
+
+# Name of the template file for the result analysis
+ANALYSIS_TEMPLATE : Histogram
+SWEEPVAR : _NBINS
+NORMVAR :  _NPACK
+# assuming the raw output comes in whitespace-separated columns
+DATACOL: 3
+#The file gnuplot.data is included, it contains gnuplot settings
+INCL: gnuplot.data
+#number of bins in the histogram
+_NBINS = 20
+# number of packets to be generated
+_NPACK = 100000
+# number of packets for warm-up period
+_WARMUP = 20000
+# number of packets to generated before recycling (_RECIRC=0 means no recirculation)
+_RECIRC = 0,10000
+# number of ports
+_NPORTS = 4
+# traffic distribution type: Poisson, Pareto, Uniform , Uniform (old)
+_TRAFDIST = 0,1
+#_FRACT_MIN = 0.5 
+# packet length distribution type: uniform, Ethernet, IP, all MIN, all MAX, FRACT_MIN MIN, new IP
+_PLDIST = 6
+# number of buffers
+#_NBUFS = 8,12,16,24,32,48
+_NBUFS = 48 #8;12;16;24;32;48
+# type of buffer
+# 0: adjustable; 1: fixed length; 2: multi-exit
+_BUFTYPE = 1
+#_NEXITS = 8
+# unit packet length  40*8 bits, and a timestep is a bit
+_UNITPL = 320
+_MAXPL = 12000
+_NBITSH = 0
+# max number of units
+#_NMAX = 38
+# intermediate number of units
+#_NMED = 0
+# minimum gap width
+_MINGW = 320
+# average packet length for IP dist (6)
+_MEANPL = ((_AGGREGATE==0)?2784:9120)
+# average gap width (for all distributions!)
+#_MEANGW= 500;600;700;800;1000;1200;2400;4800;6400
+_MEANGW= int(_MEANPL*(1/_LOAD-1)) 
+# average load
+_LOAD = 0.7 #0.5,0.7,0.9 #0.1;0.2;0.3;0.4;0.5;0.6;0.7;0.8;0.9
+# "gap" between head and tail of packet in circulating buffer
+_MINBGW = 80
+# keep packet order
+_KEEP_ORDER = 0
+# aggregate 
+_AGGREGATE =  0 #,12000 #,24000
+#verbose or not
+_VERBOSE = 0
+# to analyse the generated traffic
+_ONLY_TRAFFIC = 0
+# generate data for histograms (this is not a SynSim variable, but a parameter to tell the bufsim 6 simulator to generate raw data for statistics)
+_HISTS = 1
+# size of population
+_POP_SAMPLE = 1
+# a little slower but a little more accurate
+#_HIGHEST_ACCURACY=1
+#_DEFLECTION = 1

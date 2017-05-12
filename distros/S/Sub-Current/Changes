@@ -1,0 +1,7 @@
+0.03 - Mon Jan 30 2017
+    Fix a crash when run under the debugger (Mattia Barbon)
+0.02 - Wed Jul  4 2007
+    More tests.
+    Require 5.8.x.
+0.01 - Tue Jul  3 2007
+    Initial release

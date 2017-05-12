@@ -1,0 +1,9 @@
+<%init>
+my $content = $m->content();
+
+if ( $content =~ /<tbody>/ ) {
+    $m->print($content);
+}
+
+return;
+</%init>

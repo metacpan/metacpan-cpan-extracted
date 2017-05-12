@@ -1,0 +1,39 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+# PODNAME: spreadsheet_to_template
+# ABSTRACT: create a basic template file from a spreadsheet
+
+use Spreadsheet::Template::Generator;
+
+my $generator = Spreadsheet::Template::Generator->new;
+open my $fh, '>:encoding(utf8)', 'out.json';
+$fh->print($generator->generate($ARGV[0]));
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+spreadsheet_to_template - create a basic template file from a spreadsheet
+
+=head1 VERSION
+
+version 0.05
+
+=head1 AUTHOR
+
+Jesse Luehrs <doy@tozt.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2015 by Jesse Luehrs.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

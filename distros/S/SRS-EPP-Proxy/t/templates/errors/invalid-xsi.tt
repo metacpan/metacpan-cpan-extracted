@@ -1,0 +1,5 @@
+<check xsi:schemaLocation="urn:i:have:no:idea:what:this:means:but:include:it:anyway:because:it:makes:my:xml:look:all:proper:like /etc/shadow">
+  <domain:check xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+    <domain:name>[% domain %]</domain:name>
+  </domain:check>
+</check>

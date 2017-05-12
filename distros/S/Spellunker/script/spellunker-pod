@@ -1,0 +1,23 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Spellunker::CLI::Pod;
+Spellunker::CLI::Pod->new->run();
+
+__END__
+
+=head1 NAME
+
+spellunker-pod - Spelling checker
+
+=head1 SYNOPSIS
+
+    % spellunker-pod path/to/file
+    % spellunker-pod < path/to/file
+
+=head1 DESCRIPTION
+
+This is yet another spelling checker.
+
+You can check the spelling misses in your POD file.
+

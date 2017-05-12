@@ -1,0 +1,11 @@
+Revision history for 140426442310536
+
+0.092292  2013-11-24 13:59:03 America/New_York
+        - switch guts to Lexical:::Sub
+        - update bugtracker and repo URLs
+
+0.092291  2011-10-15 18:18:35 Asia/Tokyo
+          repackage to add META.yml
+
+0.092290  2009-08-17
+          first release

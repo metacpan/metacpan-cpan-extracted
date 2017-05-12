@@ -1,0 +1,77 @@
+=head1 NAME
+
+System::Info - Basic information about the system
+
+=head1 SYNOPSIS
+
+  $ perl sysinfo.pl
+
+=head1 DESCRIPTION
+
+  use System::Info;
+
+  my $si = System::Info->new;
+
+  printf "Hostname:              %s\n", $si->host;
+  printf "Number of CPU's:       %s\n", $si->ncpu;
+  printf "Processor type:        %s\n", $si->cpu_type; # short
+  printf "Processor description: %s\n", $si->cpu;      # long
+  printf "OS and version:        %s\n", $si->os;
+
+=head1 INSTALLATION
+
+The standard install procedure applies:
+
+    $ perl Makefile.PL
+    $ make test
+    $ make install
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (C) 2016 - 2017
+
+  * H.Merijn Brand
+  * Abe Timmerman
+
+This suite is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself, without consulting the author.
+
+(Future) Co-Authors and or contributors should agree to this before
+submitting patches.
+
+See:
+
+=over 4
+
+=item * http://www.perl.com/perl/misc/Artistic.html
+
+=item * http://www.gnu.org/copyleft/gpl.html
+
+=back
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+=head1 AUTHOR
+
+This module is maintained by Abe Timmerman <abeltje@cpan.org> and
+H.Merijn Brand <hmbrand@cpan.org>.
+
+=head1 MISC
+
+As always, have the appropriate amount of fun!
+
+=head1 SEE ALSO
+
+L<System>
+
+=head1 TODO
+
+=over 4
+
+=item * VMS?
+
+=back
+
+=cut

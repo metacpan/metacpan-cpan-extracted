@@ -1,0 +1,8 @@
+Revision history for Perl extension Spork::S5ThemeBlue
+
+0.03  Sat Mar 10 12:12:34 2007
+    - Added Spork::S5Theme to the prerequisites.
+0.02  Thu Aug 31 18:05:42 2006
+    - Added Changes and README files.
+    - Added POD tests.
+0.01  Tue Dec 18 13:35:00 2005

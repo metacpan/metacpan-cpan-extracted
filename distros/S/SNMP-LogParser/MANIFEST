@@ -1,0 +1,27 @@
+bin/logparser
+Build
+Build.PL
+Changes
+etc/log4perl.conf
+etc/logparser.conf
+EXAMPLES/ProxyLog.pm
+lib/SNMP/LogParser.pm
+lib/SNMP/LogParserDriver.pm
+lib/SNMP/LogParserDriver/ExampleDriver.pm
+log/logparser.log
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml			# Will be created by "make dist"
+README
+t/00-load.t
+t/boilerplate.t
+t/concurrentProcess.t
+t/etc/log4perl.conf
+t/etc/logparser.conf
+t/logparser.t
+t/pod-coverage.t
+t/pod.t
+work/logparser.properties
+SIGNATURE    Added here by Module::Build

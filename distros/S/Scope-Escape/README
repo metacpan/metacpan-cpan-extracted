@@ -1,0 +1,57 @@
+NAME
+
+Scope::Escape - reified escape continuations
+
+DESCRIPTION
+
+This module provides a generalised facility for non-local control transfer
+(jumping between stack frames), based on the well-thought-out semantics
+of Common Lisp.  It provides operators that will capture and reify the
+escape (return) continuation of the current stack frame.  The stack frame
+can then be returned from, at (nearly) any time while it still exists,
+via the reified continuation.  This applies not only to subroutine stack
+frames, but also to intermediate frames for code blocks, and other kinds
+of stack frame.  This facility can be used directly, or wrapped up to
+build a more structured facility, as is done by Scope::Escape::Sugar.
+
+The system of reified escape continuations is fundamentally different
+from Perl's native "eval"/"die" exception facility.  With "die", the code
+initiating the non-local transfer has no control over where it will go to.
+Each "eval" frame gets to decide whether it wants to act as the target of
+the thrown exception, but it must make this decision based almost entirely
+on what was recorded in the exception object, because the stack frames
+between the "die" and the "eval" have already been unwound by that time.
+With reified continuations, however, the code initiating the transfer
+determines where it will go to (by choosing which continuation to use),
+and that decision can be made with all information about the circumstances
+still available.
+
+A reified escape continuation appears in Perl as a function object.
+Calling the function results in returning from the stack frame that
+is the target of the continuation.  Values passed to the function are
+returned from the target stack frame.  Optionally, the continuation may be
+blessed into the Scope::Escape::Continuation class.  This class provides
+a method-based interface to the continuation: transferring through the
+continuation, and querying its state, can be performed by method calls
+on the continuation object.  The methods can also be called directly,
+as functions, on unblessed continuation functions.
+
+INSTALLATION
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+AUTHOR
+
+Andrew Main (Zefram) <zefram@fysh.org>
+
+COPYRIGHT
+
+Copyright (C) 2010, 2011 Andrew Main (Zefram) <zefram@fysh.org>
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

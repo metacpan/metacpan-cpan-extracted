@@ -1,0 +1,37 @@
+---
+abstract: 'Clean subroutines with an attribute'
+author:
+  - 'Mark Fowler <mark@twoshortplanks.com>'
+build_requires:
+  File::Spec: 0
+  FindBin: 0
+  Test::More: 0
+  Test::Perl::Critic: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.101612, CPAN::Meta::Converter version 2.101670'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Sub-Clean
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+    - utils
+    - example
+    - examples
+requires:
+  Attribute::Lexical: 0
+  B::Hooks::EndOfScope: 0
+  Sub::Identify: 0
+  namespace::clean: 0
+  perl: 5.008
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Sub-Clean
+  homepage: http://github.com/2shortplanks/Sub-Clean/tree
+  repository: git://github.com/2shortplanks/Sub-Clean.git
+version: 0.01

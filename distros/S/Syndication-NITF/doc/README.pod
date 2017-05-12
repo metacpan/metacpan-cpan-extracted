@@ -1,0 +1,165 @@
+$Id: README.pod,v 0.2 2001/12/19 05:27:20 brendan Exp $
+
+=for html 
+<div id="content">
+<H1>Syndication::NITF -- A NITF v3.0 library for Perl</H1>
+</div><div id="content">
+
+=begin text
+
+=head1 Syndication::NITF -- a NITF v3.0 library for Perl
+
+=end text
+
+Syndication::NITF is an object-oriented Perl interface to NITF documents, allowing
+you to manage (and one day create) NITF documents without any specialised NITF
+or XML knowledge.
+
+NITF is a standard format for the markup of textual news content (eg newspaper and
+magazine articles), ratified by the International Press Telecommunications
+Council (http://www.iptc.org). 
+
+This module supports the version 3.0 DTD of NITF. It makes no attempt to support
+eariler versions of the DTD.
+
+=over 4
+
+=back
+
+You can find out more about NITF at
+B<http://www.nitf.org/>
+or B<http://www.iptc.org/>
+
+=head1 LATEST VERSION AND WHAT'S NEW
+
+The latest version is 0.02, released 19 December 2001.
+
+Download: http://www.cpan.org/authors/id/B/BQ/BQUINN/
+
+=head2 What's New in 0.02:
+
+=over 4
+
+=item *
+
+B<Example Parser>
+
+Simple example parser added that outputs information about
+an NITF file, handling most types of tag.
+
+=back
+
+=for html
+<P>See the <A HREF="Changes.html">Changes file</A> for previous releases.</P>
+
+=for text
+See the Changes file for previous releases.
+
+=head1 INSTALLING Syndication::NITF
+
+The simple way to install Syndication::NITF:
+
+   $ perl -MCPAN -e shell
+   cpan> install Syndication::NITF
+
+Or you can do it by hand
+
+Retrieve the latest copy from CPAN: http://www.cpan.org/authors/id/B/BQ/BQUINN/
+
+   $ perl Makefile.PL # Creates the Makefile
+   $ make             # Runs the makefile
+   $ make test        # Optional (See Interopability below)
+   $ make install     # Installs Syndication::NITF into  your Perl library location
+
+With this method you will first have to install the pre-requisite module XML::DOM.
+See L<what are the prerequisites?>.
+
+=head2 What Are The Prerequisites?
+
+=over 4
+
+=item * 
+
+XML::DOM (Have not tested lower than v1.27) 
+
+=item *
+
+Perl5 (Have not tested lower than v5.6) 
+
+=back
+
+To get the latest versions of the prerequisite module you can simply type this at the command prompt:
+
+   $ perl -MCPAN -e shell
+   cpan> install XML::DOM
+
+or if you just 'install Syndication::NITF' the CPAN module should automagically install all of the prerequisites for you.
+
+=head2 What Systems Does It Work With?
+
+Syndication::NITF B<should> work on any machine that supports XML::DOM, and any filesystem
+including Windows, although I haven't tested it on Windows yet. It's still early days, so
+expect some bugs.
+
+=head1 WHERE ARE THE MANUALS?
+
+Once you've installed, you can type: 
+
+   $ perldoc Syndication::NITF
+
+=for html
+<P>Or you can view them starting from here:
+<A HREF="Syndication-NITF.html">Syndication::NITF</A>,
+
+=head1 GETTING HELP
+
+The best place to ask questions now would be the NITF mailing list at
+B<http://groups.yahoo.com/group/nitf/>, or ask
+me directly at brendan\@clueful.com.au. If there is enough demand we may start up a specialised list.
+
+General Perl/XML questions should be asked on the Perl-XML mailing list, which you can find at
+B<http://aspn.activestate.com/ASPN/Mail/Browse/Threaded/perl-xml>
+
+=head1 THE TEST SUITE & INTEROPERABILITY
+
+The standard C<make test> test suite checks most elements in a small range of test NITF documents
+obtained from the Net. You can find the test documents in the C<t/test_data/> directory.
+
+=head1 BUGS and TODO
+
+There are probably bugs all over the place -- this is still an early version.
+
+At the moment, C<Syndication::NITF> only reads NITF files -- in the future it should be able to modify and
+write them as well.
+
+=for html
+<P>See <A HREF="TODO.html">TODO</A> for what I'm thinking of building and what would be nice to have.</P>
+
+=for text
+See TODO for what I'm thinking of building and what would be nice to have.
+
+=head1 AUTHOR AND COPYRIGHT
+
+This module is Copyright (C) 2001 by
+
+	Brendan Quinn
+	Clueful Consulting Pty Ltd
+	GPO Box 2747EE
+	Melbourne 3001
+	Victoria, AUSTRALIA
+
+All rights reserved.
+
+This module is free software. It may be used, redistributed
+and/or modified under the same terms as Perl itself.
+
+$Id: README.pod,v 0.2 2001/12/19 05:27:20 brendan Exp $
+
+=cut
+
+=for text
+** This file was automatically generated from **
+** doc/README.pod. To edit it, see there.    **
+
+=for html
+</div>

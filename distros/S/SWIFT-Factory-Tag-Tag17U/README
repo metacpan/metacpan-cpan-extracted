@@ -1,0 +1,28 @@
+SWIFT/Factory/Tag/Tag17U
+========================
+
+This class provides the TAG17U for a SWIFT message.
+
+TAG17U is used as a "Split Settlement Indicator".
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+SWIFT::Factory::Tag::Tag17.pm
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2003, BIKER. All rights reserved.
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

@@ -1,0 +1,8 @@
+Revision history for Perl extension Spreadsheet::PrintExcelSheet.
+
+0.01  Fri Sep 25 11:45:25 2009
+	- original version; created by h2xs 1.23 with options
+		-XA -n Spreadsheet::PrintExcelSheet
+
+0.02  Wed Dec 29 14:22:00 2010
+   - bugfix: Win32::OLE

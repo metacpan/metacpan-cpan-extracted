@@ -1,0 +1,7 @@
+<doc>
+ <foo>blue black green</foo>
+ <bar>tall small medium</bar>
+ <bing>WOMAN Man</bing>
+ <storecaseinsensitive>FLIP hIGHEr</storecaseinsensitive>
+ <tokenizecasesensitive>GLOWER bRIGHTLy</tokenizecasesensitive>
+</doc>

@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/Syntax/Feature/Sugar/Callbacks.pm
+t/basic.t
+t/release-distmeta.t
+t/release-eol.t
+t/release-no-tabs.t
+t/release-pod-syntax.t

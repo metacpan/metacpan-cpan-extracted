@@ -1,0 +1,122 @@
+Statistics-Normality
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+NORMALITY TESTS
+
+#######################
+#  SHAPIRO-WILK TEST  #
+#######################
+
+The L<Shapiro-Wilk W-Statistic test|http://en.wikipedia.org/wiki/Shapiro%E2%80%93Wilk_test>
+[Shapiro65] is considered to be among the most objective tests of
+normality [Royston92] and also one of the most powerful ones for detecting
+non-normality [Chen71].
+Its statistic is essentially the roughly best unbiased estimator
+of population standard deviation to the sample variance [Dagostino71].
+The test is mathematically complex and most implementations use several
+conventional approximations (as we do here), including Blom's formula
+for the expected value of the order statistics [Harter61] and transformation
+to standard normal distribution for evaluation, especially for large
+samples [Royston92].
+
+	$pval = shapiro_wilk_test ([0.34, -0.2, 0.8, ...]);
+	($pval, $w_statistic) = shapiro_wilk_test ([0.34, -0.2, 0.8, ...]);
+
+This test may not be the best if there are many repeated values in the test
+distribution or when the number of points in the test distribution is very
+large, e.g. more than 5000.
+The routine will L<carp|Carp> about the latter, but not the
+former.
+This particular implementation of the test also requires at
+least 6 data points in the sample distribution and will L<croak|Carp>
+otherwise.
+
+
+##############################
+#  D'AGOSTINO K-SQUARE TEST  #
+##############################
+
+The L<D'Agostino K-Squared test|http://en.wikipedia.org/wiki/D%27Agostino%27s_K-squared_test> is a good test against non-normality arising from
+L<kurtosis|http://en.wikipedia.org/wiki/Kurtosis> and/or
+L<skewness|http://en.wikipedia.org/wiki/Skewness> [Dagostino90].
+
+	$pval = dagostino_k_square_test ([0.34, -0.2, ...]);
+	($pval, $ksq_statistic) = dagostino_k_square_test ([0.34, -0.2, ...]);
+
+The test statistic depends upon both the sample kurtosis and skewness, as
+well as the moments of these parameters from a normal population, as quantified
+by Pearson's coefficients [Pearson31].
+These are transformed [Dagostino70,Anscombe83] to expressions that sum
+to the K-squared statistic, which is essentially chi-square-distributed
+with 2 degrees of
+freedom [Dagostino90].
+The kurtosis transform, and thus the overall test, generally works best
+when the sample distribution has at least 20 data points [Anscombe83] and the
+routine will L<carp|Carp>
+otherwise.
+
+GENERAL IMPLEMENTATION NOTES FOR STATISTICAL TESTS
+
+(1) Use standard Horner's Rule for polynomial evaluations, see e.g. Forsythe,
+    Malcolm, and Moler "Computer Methods for Mathematical Computations"
+    (1977) Prentice-Hall, pp 68.
+
+(2) VAGARIES OF THE PERL Statistics::Distributions PACKAGE    symmetric
+    This package is implemented in the opposite way that one     :   |
+    finds tables of the standard normal function presented in   /:\  |
+    textbooks, where F(z) = A1 is the area from -infinity to : / : \ |
+    Z (or sometimes from 0 to Z). Instead, the Perl package  :/  :  \|
+    gives f(z) = A2 as the area from Z to +infinity, i.e.    /   :   \
+    in the *context of a significance test*. Note the       /:   :   |\
+    following implications for this package:               / :   A1  | \
+                                                          /  :   :   |A2\
+        f(Z) = F(-Z)       F(Z) + f(Z) + 1             __/___:___:___|___\___
+                                                            -Z   0   Z
+                       -1          -1              -1
+       udistr:    Z = f  [f(Z)] = f  [1 - F(Z)] = f  (1 - A1)
+
+     and the same appears to be true for other distributions in this package,
+     e.g. chi-square, student's T, etc.
+
+ (3) Tests that should perhaps be implemented in future versions:
+
+     * Anderson-Darling test
+     * Jarque-Bera test
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Statistics::Normality
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Statistics-Normality
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Statistics-Normality
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Statistics-Normality
+
+    Search CPAN
+        http://search.cpan.org/dist/Statistics-Normality/
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2012 Mike Wendl
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

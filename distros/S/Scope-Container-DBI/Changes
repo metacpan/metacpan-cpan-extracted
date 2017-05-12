@@ -1,0 +1,29 @@
+Revision history for Perl extension Scope::Container::DBI
+
+0.09    Mon Apr 8 11:45:57 2013
+        - enable Data::Dumper::SortKeys. perl-5.18 randomizes hash order 
+
+0.08    Thu Jan 10 14:01:56 2013
+        - show correct connection errors (thanks tagomoris)
+
+0.07    Thu Jun 14 10:22:11 2012
+        - fixed requires
+
+0.06    Wed Jun 13 19:36:46 2011
+        - uses Module::Load instead of Class::Load for less dependencies
+
+0.05    Thu Jun 30 19:10:34 2011
+        - requires DBI >= 1.615
+        - no code changes
+
+0.04    Tue May 24 10:24:14 2011
+        - supports retring connection
+
+0.03    Thu Apr 7 18:09:41 2011
+        -  fixed loading DBI_CLASS
+
+0.02    Thu Apr 7 17:55:03 2011
+        - support DBI's subclass
+
+0.01    Thu Mar 10 00:00:20 2011
+        - original version

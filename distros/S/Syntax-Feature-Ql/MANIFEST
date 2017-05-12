@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/Syntax/Feature/Ql.pm
+t/00-compile.t
+t/author-pod-spell.t
+t/basic.t
+t/release-distmeta.t
+t/release-eol.t
+t/release-no-tabs.t
+t/release-pod-syntax.t
+t/release-portability.t

@@ -1,0 +1,41 @@
+Revision history for String-MFN
+
+1.29    2007-06-16
+	* PREFIX no longer hardcoded in Makefile.PL; now set to
+	  Perl's $Config{siteprefix}
+
+1.28    2006-12-23
+        * Unicode classes/categories now used instead of simple regex
+          character ranges and operators
+	* Due to this, Perl 5.8 is now required
+        * Actual test suite now exhaustively verifies operation
+        * Tildes now turn into hyphens instead of being dropped
+	* Track/sequence numbers no longer handled (this is an
+          application domain problem)
+
+1.27    2005-10-16
+        * Fixed bug where strings like '23.foo' would become '23-foo'
+        * mfn(1p) now installs into /usr/local/bin (or where ever
+          PREFIX points
+        * Config::YAML is required if mfn(1p) is selected for install
+
+1.26    2005-03-03
+        * Leading-numeral regex now strips trailing period (if one exists)
+        * Doc updates
+        * More tests
+        * mfn(1p) now reports String::MFN version along with its own version
+
+1.17    2004-11-16
+        * mfn(1p) now included in distro
+
+1.13    2004-08-03
+        * Tyop fixed.
+        * Docs now have some choice (but not exhaustive) examples.
+
+1.11    2004-07-30
+        * mfn() now operates on $_ if no argument is passed.
+        * Minor doc fixes.
+
+1.0     2004-07-29
+        * First version, released on an unsuspecting world.
+          Thanks to RJBS for help/prodding/etc.

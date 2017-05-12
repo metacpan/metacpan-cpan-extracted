@@ -1,0 +1,47 @@
+---
+abstract: 'Perl extension for one time script.'
+author:
+  - 'Masayuki Matsuki <y.songmu@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+  Test::Requires: '0.06'
+configure_requires:
+  CPAN::Meta: '0'
+  CPAN::Meta::Prereqs: '0'
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v1.1.0, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Script-Ichigeki
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Script::Ichigeki:
+    file: lib/Script/Ichigeki.pm
+    version: '0.04'
+  Script::Ichigeki::Hissatsu:
+    file: lib/Script/Ichigeki/Hissatsu.pm
+requires:
+  File::Tee: '0'
+  IO::Prompt::Simple: '0'
+  Mouse: '0'
+  Path::Class: '0'
+  Term::Encoding: '0'
+  Time::Piece: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/Songmu/p5-Script-Ichigeki/issues
+  homepage: https://github.com/Songmu/p5-Script-Ichigeki
+  repository: git://github.com/Songmu/p5-Script-Ichigeki.git
+version: '0.04'

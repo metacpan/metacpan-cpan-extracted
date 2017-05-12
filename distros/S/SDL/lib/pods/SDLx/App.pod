@@ -1,0 +1,192 @@
+
+=pod
+
+=head1 NAME
+
+SDLx::App - a SDL perl extension
+
+=head1 CATEGORY
+
+Extension
+
+=head1 SYNOPSIS
+
+    use SDL;
+    use SDLx::App; 
+    use SDL::Event;
+    use SDL::Events; 
+    
+    my $app = SDLx::App->new( 
+        title  => 'Application Title',
+        width  => 640,
+        height => 480,
+        depth  => 32
+    ); 
+
+This is the manual way of doing things
+
+    my $event = SDL::Event->new; # create a new event 
+    
+    SDL::Events::pump_events();
+       
+    while ( SDL::Events::poll_event($event) ) { 
+        my $type = $event->type(); # get event type 
+        print $type; 
+        exit if $type == SDL_QUIT; 
+    }
+
+An alternative to the manual Event processing is through the L<SDLx::Controller> module. L<SDLx::App> is a Controller so see the CALLBACKS section below.
+
+=head1 DESCRIPTION
+
+L<SDLx::App> controls the root window of the of your SDL based application.
+It extends the L<SDL::Surface> class, and provides an interface to the window
+manager oriented functions.
+
+=head1 METHODS
+
+=head2 new
+
+C<SDLx::App::new> initializes the SDL, creates a new screen,
+and initializes some of the window manager properties.
+C<SDLx::App::new> takes a series of named parameters:
+
+=over 4
+
+=item * title
+the window title. Defaults to the file name. Shorter alias: 't'
+
+=item * icon_title
+the icon title. Defaults to file name. Shortcut: 'it'
+
+=item * icon
+the icon itself. Defaults to none. Shortcut: 'i'
+
+=item * width
+Window width, in pixels. Defaults to 800. Shortcut: 'w'
+
+=item * height
+Window height, in pixels. Defaults to 600. Shortcut: 'h'
+
+=item * depth
+Screen depth. Defaults to 16. Shortcut: 'd'.
+
+=item * flags
+Any flags you want to pass to L<SDL::Video> upon initialization. Defaults to SDL_ANYFORMAT. Flags should be I<or'ed> together if you're passing more than one (flags => FOO|BAR). Shortcut: 'f'.
+
+=item * resizeable
+Set this to a true value to make the window resizeable by the user. Default is off.
+
+=item * exit_on_quit
+Set this to a true value to make the app exit if a SDL_QUIT event is triggered. Shortcut: 'eoq'.
+
+=back
+
+=head1 METHODS
+
+=head2 title()
+
+=head2 title( $new_title )
+
+=head2 title( $window_title, $icon_title )
+
+C<SDLx::App::title> takes 0, 1, or 2 arguments. If no parameter is given,
+it returns the current application window title. If one parameter is
+passed, both the window title and icon title will be set to its value.
+If two parameters are passed the window title will be set to the first,
+and the icon title to the second.
+
+=head2 delay( $ms )
+
+C<SDLx::App::delay> takes 1 argument, and will sleep the application for
+that many ms.
+
+=head2 ticks
+
+C<SDLx::App::ticks> returns the number of ms since the application began.
+
+=head2 error
+
+C<SDLx::App::error> returns the last error message set by the SDL.
+
+=head2 resize( $width, $height )
+
+C<SDLx::App::resize> takes a new width and height of the application. Only
+works if the application was originally created with the resizable option.
+
+=head2 fullscreen
+
+C<SDLx::App::fullscreen> toggles the application in and out of fullscreen mode.
+
+=head2 iconify
+
+C<SDLx::App::iconify> iconifies the application window.
+
+=head2 grab_input( $CONSTANT )
+
+C<SDLx::App::grab_input> can be used to change the input focus behavior of
+the application. It takes one argument, which should be one of the following:
+
+=over 4
+
+=item * SDL_GRAB_QUERY
+
+=item * SDL_GRAB_ON
+
+=item * SDL_GRAB_OFF
+
+=back
+
+=head2 sync
+
+C<SDLx::App::sync> encapsulates the various methods of synchronizing the screen with the
+current video buffer. C<SDLx::App::sync> will do a fullscreen update, using the double buffer
+or OpenGL buffer if applicable. This is preferred to calling flip on the application window.
+
+=head2 attribute( $attr )
+
+=head2 attribute( $attr, $value )
+
+C<SDLx::App::attribute> allows one to get and set GL attributes. By passing a value
+in addition to the attribute selector, the value will be set. C<SDL:::App::attribute>
+always returns the current value of the given attribute, or Carp::confess on failure.
+
+=head1 CALLBACKS
+
+C<SDLx::App> is a C<SDLx::Controller>. Use the event, show and handlers to run the app.
+
+  use SDL;
+  use SDLx::App;
+ 
+  use SDL::Event; #Where ever the event call back is processed
+
+  my $app = SDLx::App->new( width => 200, height => 200);
+
+  $app->add_event_handler( sub{
+      my ($event, $app) = @_;
+      return $_[0]->type == SDL_QUIT ? 0 : 1;
+  });
+
+  $app->add_show_handler( sub{
+      my ($delta, $app) = @_;
+      $app->update;
+  } );
+
+  $app->add_move_handler( sub{ 
+      my ($step, $app, $t) = @_;
+      #calc your physics here 
+  } );
+
+  $app->run();
+
+see L<SDLx::Controller> for more details.
+
+=head1 AUTHORS
+
+See L<SDL/AUTHORS>.
+
+=head1 SEE ALSO
+
+L<perl> L<SDL::Surface> L<SDL::Event>  L<SDL::OpenGL>
+
+=cut

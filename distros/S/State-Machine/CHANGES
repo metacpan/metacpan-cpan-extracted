@@ -1,0 +1,36 @@
+Changelog for State-Machine
+
+0.07 2014-08-21T19:04:00
+ - Updated POD, Makefile, README, etc.
+ - Optimized next-transition deducing functionality.
+
+0.06 2014-08-21T12:35:28
+ - v0.06
+ - Updated POD, Makefile, README, etc.
+ - Standardized importing of type-checking functions.
+ - Fixed issue importing DSL from State::Machine::Simple, Added transition
+   deducing functionality.
+
+0.05 2014-08-21T08:28:29
+ - v0.05
+ - Updated POD, Makefile, README, etc.
+ - Refactored to use the new Bubblegum, Miscellaneous updates.
+
+0.04 2014-03-30T19:55:42
+ - v0.04
+ - Added missing dependency.
+
+0.03 2014-03-30T19:47:32
+ - v0.03
+ - Updated Makefile and README.
+ - Added better exception handling.
+
+0.02 2014-03-30T03:08:02
+ - v0.02
+ - Updated POD for State::Machine::Simple.
+
+0.01 2014-03-30T02:17:57
+ - v0.01
+ - Initial release.
+ - Initial commit.
+

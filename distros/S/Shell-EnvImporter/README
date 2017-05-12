@@ -1,0 +1,44 @@
+Shell-EnvImporter version 0.01
+==============================
+
+Shell::EnvImporter allows you to import environment variables set in an external
+shell script into the environment of a Perl script.  For instance, if your
+ORACLE_HOME variable is set in ~oracle/.bashrc, you can use Shell::EnvImporter
+to import it thus:
+
+  my $importer = Shell::EnvImporter->new(file => glob("~oracle/.bashrc"));
+
+This imports all variables added or changed by ~oracle/.bashrc into the
+current environment (%ENV).  By using Shell::EnvImporter's advanced
+features, one can exert more control over the process -- which shell is 
+required, which variables are imported, etc.
+
+Currently supported shells: bash, csh, ksh, sh, tcsh, zsh, and of course, 
+perl.  :)
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Class::MethodMaker (>= v2)
+  IO::Handle
+  IO::Select
+  IPC::Open3
+
+
+COPYRIGHT AND LICENCE
+
+  Copyright (C) 2005-2006 by Dave Faraldo
+
+  This library is free software; you can redistribute it and/or modify it
+  under the same terms as Perl itself.  No warranty is expressed or implied.
+

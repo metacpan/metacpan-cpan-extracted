@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/STANAG.t
+lib/STANAG.pm
+lib/STANAG/Messages.pm
+lib/STANAG/CountryAndVehicleIDs.pm
+META.yml                                 Module meta-data (added by MakeMaker)

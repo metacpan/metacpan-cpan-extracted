@@ -1,0 +1,13 @@
+Revision history for Soar-WM
+
+0.04      2013-01-16 22:01:23 UTC
+	Fixed bug in S:WM:Element that caused death when querying for a non-existent value.
+
+0.03      2012-12-18 02:22:37 UTC
+	Fixed some documentation, and added the children() method to Soar::WM::Element.
+	
+0.02      2012-12-01 00:23:58 UTC
+    Fixed some documentation, as well as adding a new() method and a get_wme() method.
+
+0.01      2012-11-29 22:08:22 UTC
+	First release. Uses code written by Deryle Lonsdale to slurp a WME dump.

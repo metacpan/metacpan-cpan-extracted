@@ -1,0 +1,14 @@
+Revision history for Perl extension Sys::Hostname::Long
+
+0.01  Sun Aug 26 18:07:52 2001
+
+1.3   Sun Jun 26 08:14:13 2005
+	New version to fix major Solaris problem
+	Thanks to patch from Piotr Klaban
+	and many others for reporting the problem.
+
+1.4   Sun Jun 26 08:14:13 2005
+	Damn... forgot something...
+
+1.5  Tue Jan 13 22:01:31 AEDT 2015
+	Improvements by Michiel Bejen <michiel.beijen@gmail.com>

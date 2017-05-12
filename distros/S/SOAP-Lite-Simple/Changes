@@ -1,0 +1,58 @@
+Revision history
+
+1.9 Wed Aug 30 2006
+	- Depreciating in favour of SOAP::XML::Client
+
+1.8 Thur May 4 16:18:00 GMT 2006
+	- Doc tweek about _value_type, it's only .net that REALLY needs it
+
+1.7 Sun Mar 12 09:08:50 GMT 2006
+	- Doc patch - thanks to Scott Lanning for the spot
+
+1.6 Wed Feb 15 11:23:12 GMT 2005
+        - Update to support new base64 in SOAP::Lite 0.67 (patch by Leon)
+
+1.5 Tue Dec 13 11:26:06 GMT 2005
+        - Add encoding() and disable_base64() methods (patch by Leon)
+
+1.4 Wed 26th Oct 2005
+	- Bug fix, timeout was only being set unless soapversion was defined!
+		- thanks Leon
+
+1.3 Wed 9th Aug 2005
+	- Added Class::Accessor::Fast to prereq as it was missing
+	- MAJOR Bug fix with processing user supplied XML
+	- MAJOR Bug fix in creating the Soap::Data::Builder stuff
+
+1.2 Sat 6th Aug 2005
+	- Updated docs - replacing soap:Fault with Fault/faultstring
+	- Updated docs - lots of minor things and reorganise packages
+	- added 'filename' option, instead of 'xml' for fetch()
+	- fetch() now returns 1 or undef 
+		- use $obj->results() or $obj->results_xml() to get data
+
+1.1 Mon 1st Aug 2005
+	- Updated documentation
+	- Added XML wrapper so can parse several top level nodes,
+	  removed before converting to SOAP Data structure.
+	- Switched to check for Fault/faultstring, any Namespace
+	- Added strip_default_xmlns which defaults to true
+	  makes parsing results easier
+	- Added t/02_dotnet.pl
+
+1.0 Sat 23rd July 2005
+	- Added in validation of the XML respoonce
+		- check it is valid
+		- check for soap:Fault/faultstring
+		- check for soapenv:Fault/faultstring
+	- Updated documentation to mention
+		- results()
+		- results_xml()
+
+0.2 Fri 8th July 2005
+	- Added Simple::Real
+	- Few more tests and doc changes
+
+0.1 Thur 7th July 2005
+	- First public release
+

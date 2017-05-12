@@ -1,0 +1,11 @@
+Revision history for Perl extension Spellunker-CLI-Perl
+
+v0.3.2 2013-10-30T02:45:52Z
+
+    - fixed deps
+      (syohex)
+
+v0.3.1 2013-10-29T23:13:10Z
+
+    - original version
+

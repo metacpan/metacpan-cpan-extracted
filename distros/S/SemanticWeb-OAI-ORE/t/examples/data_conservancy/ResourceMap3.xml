@@ -1,0 +1,76 @@
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:ore="http://www.openarchives.org/ore/terms/"
+         xmlns:dc="http://purl.org/dc/elements/1.1/"
+         xmlns:dcterms="http://purl.org/dc/terms/"
+         xmlns:foaf="http://xmlns.com/foaf/0.1/"
+         xmlns:dcsterms="http://datapub.dataconservancy.org/terms/"
+         xmlns:arxiv="http://arxiv.org/schemas/atom/">
+  <rdf:Description rdf:about="http://datapub.dataconservancy.org/ResourceMap">
+    <rdf:type rdf:resource="ore:ResourceMap"/>
+    <ore:describes rdf:resource="http://datapub.dataconservancy.org/Aggregation"/>
+    <dcterms:creator rdf:parseType="Resource">
+      <foaf:name>datapub web app</foaf:name>
+    </dcterms:creator>
+    <dcterms:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2010-01-07T15:13:41.866-05:00</dcterms:created>
+    <dcterms:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2010-01-07T15:13:41.866-05:00</dcterms:modified>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://datapub.dataconservancy.org/Aggregation">
+    <rdf:type rdf:resource="ore:Aggregation"/>
+    <ore:isDescribedBy rdf:resource="http://datapub.dataconservancy.org/ResourceMap"/>
+    <rdf:type rdf:resource="http://purl.org/eprint/type/JournalArticle"/>
+    <dc:title>The Second Survey of the Molecular Clouds</dc:title>
+    <dcterms:abstract>This is an abstract</dcterms:abstract>
+    <dcterms:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2010-01-07T15:13:41.000-05:00</dcterms:created>
+    <dcterms:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2010-01-07T15:13:41.000-05:00</dcterms:modified>
+    <dcterms:creator rdf:parseType="Resource">
+      <foaf:name>Fukui, Y.</foaf:name>
+      <foaf:mbox>mailto:fukui@a.phys.nagoya-u.ac.jp</foaf:mbox>
+      <foaf:Organization>Department of Astrophysics, Japan</foaf:Organization>
+      <dcsterms:rank>0</dcsterms:rank>
+    </dcterms:creator>
+    <dcterms:creator rdf:parseType="Resource">
+      <foaf:name>Kawamura, A.</foaf:name>
+      <foaf:Organization>Department of Astrophysics, Japan</foaf:Organization>
+      <dcsterms:rank>1</dcsterms:rank>
+    </dcterms:creator>
+    <!-- Two forms illustrated, first if only resource is specified, second if a -->
+    <!-- human readable name is to be added -->
+    <dcterms:subject rdf:resource="http://arxiv.org/terms/arXiv/astro-ph.HE"/>
+    <dcterms:subject>
+      <rdf:Description rdf:about="http://arxiv.org/terms/arXiv/astro-ph.IM">
+         <foaf:name xmlns:foaf="http://xmlns.com/foaf/0.1/">Physics - Instrumentation and Methods for Astrophysics</foaf:name>
+      </rdf:Description>
+    </dcterms:subject>
+    <arxiv:primary_category rdf:resource="http://arxiv.org/terms/arXiv/astro-ph.IM"/>
+
+    <ore:aggregates rdf:resource="http://datapub.dataconservancy.org/Document"/>
+    <ore:aggregates rdf:resource="file:///ms.tex"/>
+    <ore:aggregates rdf:resource="file:///gbfits2.fits"/>
+    <ore:aggregates rdf:resource="http://datapub.dataconservancy.org/table:1"/>
+    <ore:aggregates rdf:resource="http://datapub.dataconservancy.org/figure:1"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://datapub.dataconservancy.org/Document">
+    <dcterms:hasPart rdf:resource="http://datapub.dataconservancy.org/table:1"/>
+    <dcterms:hasPart rdf:resource="http://datapub.dataconservancy.org/figure:1"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://datapub.dataconservancy.org/table:1">
+    <dcterms:source>tab1.tex</dcterms:source>
+    <dcterms:title>Catalog of 230 GMCs</dcterms:title>
+    <dcterms:conformsTo rdf:resource="http://dopey.mcmaster.ca/MR/aasetables.html"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://datapub.dataconservancy.org/figure:1">
+    <dcterms:source>ms.tex</dcterms:source>
+    <dcterms:title>The boundary to be observed</dcterms:title>
+    <dcterms:conformsTo rdf:resource="http://datapub.dataconservancy.org/type/AAS-Figure"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="file:///ms.tex">
+    <dcterms:type>tex</dcterms:type>
+    <dcterms:title>The Second Survey of the Molecular Clouds</dcterms:title>
+    <dcterms:conformsTo rdf:resource="http://purl.org/dc/dcmitype/Text"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="file:///gbfits2.fits">
+    <dcterms:type>fits</dcterms:type>
+    <dcterms:description/>
+    <dcterms:conformsTo rdf:resource="http://datapub.dataconservancy.org/type/DataPub-DS"/>
+  </rdf:Description>
+</rdf:RDF>

@@ -1,0 +1,71 @@
+{
+   "abstract" : "BSD driver for Sys::Info",
+   "author" : [
+      "Burak Gursoy <burak@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Sys-Info-Driver-BSD",
+   "no_index" : {
+      "directory" : [
+         "monolithic_version",
+         "builder",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.40",
+            "Test::Sys::Info" : "0.20"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "BSD::Sysctl" : "0.08",
+            "Sys::Info::Base" : "0.7801",
+            "Unix::Processors" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Sys::Info::Driver::BSD" : {
+         "file" : "lib/Sys/Info/Driver/BSD.pm",
+         "version" : "0.7801"
+      },
+      "Sys::Info::Driver::BSD::Device" : {
+         "file" : "lib/Sys/Info/Driver/BSD/Device.pm",
+         "version" : "0.7801"
+      },
+      "Sys::Info::Driver::BSD::Device::CPU" : {
+         "file" : "lib/Sys/Info/Driver/BSD/Device/CPU.pm",
+         "version" : "0.7801"
+      },
+      "Sys::Info::Driver::BSD::OS" : {
+         "file" : "lib/Sys/Info/Driver/BSD/OS.pm",
+         "version" : "0.7801"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://bitbucket.org/burak/cpan-sys-info-driver-bsd/"
+      }
+   },
+   "version" : "0.7801"
+}

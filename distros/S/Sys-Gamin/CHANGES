@@ -1,0 +1,5 @@
+2005-05-04  Carlos Garnacho Parro
+
+	* Taken SGI::FAM perl module, fixed some bugs and adapted it to use 
+	Gamin
+

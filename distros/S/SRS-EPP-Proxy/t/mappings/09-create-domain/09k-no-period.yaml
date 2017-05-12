@@ -1,0 +1,25 @@
+# Create a domain without specifying a period
+template: create-domain.tt
+
+vars:
+  domain: 09k.co.te
+  owner: id123
+
+input_assertions:
+  class: SRS::EPP::Command::Create::Domain
+
+SRS:
+  - assertions:
+      count:
+      match:
+      match_all:
+      attr_is:
+        - [ '//DomainCreate', 'Term', '1', 'SRS: Check the term is correct' ]
+
+output_assertions:
+  count:
+    - [ '//domain:creData', 1, 'SRS: Check for one creData' ]
+  match:
+    - [ '//domain:name', '09k.co.te', 'SRS: Check domain name' ]
+  attr_is:
+    - [ '//epp:result', 'code', '1000', 'SRS: Check result code' ]

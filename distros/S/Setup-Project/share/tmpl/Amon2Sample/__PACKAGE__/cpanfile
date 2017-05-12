@@ -1,0 +1,2 @@
+requires 'Amon2';
+requires 'Plack::Loader';

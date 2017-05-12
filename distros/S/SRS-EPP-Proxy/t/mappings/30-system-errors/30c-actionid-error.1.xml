@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<!DOCTYPE NZSRSResponse SYSTEM "protocol.dtd">
+<NZSRSResponse VerMajor="5" VerMinor="2">
+  <Response Action="HandleCreate" FeId="8" FeSeq="4988881" OrigRegistrarId="922" TransId="brause">
+    <FeTimeStamp Day="18" Hour="16" Minute="50" Month="8" Second="02" TimeZoneOffset="+12:00" Year="2010"/>
+    <Error Hint="MALFORMED_REQUEST_ERROR" ErrorId="ACTION_ID_ALREADY_USED" Severity="err">
+      <Description><![CDATA[Action id already used]]></Description>
+      <ErrorDetails><![CDATA[brause]]></ErrorDetails>
+    </Error>
+  </Response>
+</NZSRSResponse>

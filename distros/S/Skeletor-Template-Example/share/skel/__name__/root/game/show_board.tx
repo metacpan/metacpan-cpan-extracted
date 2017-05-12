@@ -1,0 +1,12 @@
+<: cascade "html.tx" :>
+<: around title -> { :>TicTacToe - Game<: } :>
+<: around body -> { :>
+  <h1>Current Game Status</h1>
+  <: include '_status.tx' :>
+  <: if $game.status == 'in_play' { :>
+    <h1>Make a new move in this game</h1>
+    <: include '_form.tx' } :>
+  <h1>Links</h1>
+  <p>See all <a href="<: $index :>">games</a></a>
+<: } :>
+

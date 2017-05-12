@@ -1,0 +1,46 @@
+Revision history for Set::Similarity::CosinePP
+
+0.015  2016-11-24 12:16:41 CET
+       - travis for Perl 5.24
+
+0.014  2016-11-24 11:28:53 CET
+       - requires 'parent'
+
+0.013  2015-04-27 15:49:41 CEST
+       - improved travis config, badges
+
+0.012  2014-10-19 22:32:00 CEST
+       - naming internal methods
+
+0.011  2014-10-10 10:23:37 CEST
+       - requires Set::Similarity 0.022
+
+0.010  2014-08-16 23:45:30 CEST
+       - badges in pod
+
+0.009  2014-08-16 07:50:52 CEST
+       - add travis
+
+0.008  2014-08-10 08:56:06 CEST
+       - code simplification
+
+0.007  2014-08-09 22:25:11 CEST
+       - simplify code
+
+0.006  2014-08-05 23:17:20 CEST
+       - use hashes for sparse vectors
+
+0.005  2014-08-05 21:52:25 CEST
+       - code cleanup
+
+0.004  2014-08-04 21:59:49 CEST
+       - quote version
+
+0.003  2014-08-02 11:24:19 CEST
+       - change minimal Perl version to 5.6
+
+0.002  2014-07-29 23:11:21 CEST
+       - cleanup
+
+0.001  2014-07-29 23:06:14 CEST
+       - Initial release.

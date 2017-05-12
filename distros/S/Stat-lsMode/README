@@ -1,0 +1,12 @@
+
+This module is for formatting file modes and permissions the way that
+ls -l does.  For example, if you have a file that is world-readable,
+but only writable by its owner, you can use
+
+	file_mode($file)
+
+which will return the string '-rw-r--r--'.
+
+Beta version 0.50.
+
+20 April 1998.  M-J. Dominus (mjd-perl-lsmode@plover.com)

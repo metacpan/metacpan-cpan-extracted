@@ -1,0 +1,27 @@
+Sub/Context version 1.00
+========================
+
+Sub::Context allows you to control subroutine dispatch based on calling
+context.  See the documentation.
+
+To install this module, type:
+
+   $ perl Build.PL
+   $ ./Build
+   $ ./Build test
+   # ./Build install
+
+You can also use the generated Makefile.PL, but I don't.
+
+DEPENDENCIES
+
+This module requires two libraries to run the tests:
+
+	Test::More version 0.60 or better
+	Test::Exception
+
+COPYRIGHT AND LICENCE
+
+This module is available under the same terms as Perl itself.
+
+Copyright (c) 2001, 2005 chromatic <chromatic at wgz dot org>

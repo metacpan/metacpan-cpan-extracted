@@ -1,0 +1,38 @@
+---
+abstract: 'Background job processing based on Resque, using Stomp'
+author:
+  - 'William Wolf <throughnothing@gmail.com>'
+build_requires:
+  Capture::Tiny: '0'
+  Exporter: '0'
+  File::Temp: '0'
+  Moose: '0'
+  POE::Component::MessageQueue: '0'
+  POSIX: '0'
+  Test::More: '0'
+  base: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.014, CPAN::Meta::Converter version 2.132830'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Sque
+requires:
+  Any::Moose: '0'
+  App::Cmd::Setup: '0'
+  JSON: '0'
+  Net::Stomp: '0'
+  Parallel::ForkManager: '0'
+  Try::Tiny: '0'
+  UNIVERSAL::require: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/throughnothing/Sque/issues
+  homepage: http://metacpan.org/release/Sque/
+  repository: git://github.com/throughnothing/Sque.git
+version: '0.010'

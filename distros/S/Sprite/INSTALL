@@ -1,0 +1,32 @@
+
+                       Sprite Installation
+                       -------------------
+
+If you have access to the Perl library, then you can go ahead and
+install Sprite in the same way as you would any other module:
+
+	% mv Sprite-3.21.tar.gz /some/directory
+	% cd /some/directory
+	% gzip -d Sprite-3.21.tar.gz
+	% tar -xvf Sprite-3.21.tar
+	% cd Sprite-3.21
+        % perl Makefile.PL
+	% make
+	% make install
+
+Remember, you need Perl v5.002 or above for Sprite to work properly!
+
+If you _dont_ have access to the Perl library, then you can simply
+copy the file Sprite.pm from the distribution to any directory
+you choose and then add the following to the top of your script.
+
+	#!/usr/local/bin/perl5
+
+        use lib '/home/user/lib';
+
+	use Sprite;
+
+The example assumes you have copied Sprite.pm to /home/usr/lib.
+
+That's it! I included a simple example with this distribution. 
+

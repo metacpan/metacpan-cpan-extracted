@@ -1,0 +1,43 @@
+Statistics::FactorAnalysis version 0.0.2
+
+DESCRIPTION
+
+Factor analysis is a statistical method by which the variability of a large set of observed variables is described in
+terms of a smaller set of unobserved variables termed factors. Factor analysis uses the premise that data observed from
+such a large number of variables are in some way a function of these factors that cannot be measured directly.
+The observed variables are modeled as linear combinations of the factors. Factor analysis is related to principal
+component analysis (PCA). However, unlike PCA that takes into account all variability in the variables, factor analysis 
+estimates how much of the variability is due to common factors ("communality"). See http://en.wikipedia.org/wiki/Factor_analysis.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+DEPENDENCIES
+
+'Carp'                      =>  '1.08',
+'Moose'                     =>  '0.93',
+'MooseX::NonMoose'          =>  '0.07',
+'Statistics::PCA::Varimax'  =>  '0.0.2',
+'Statistics::PCA'           =>  '0.0.1',
+'Math::GSL::Linalg::SVD'    =>  '0.0.2', 
+'List::Util'                =>  '1.22',
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009, Daniel S. T. Hughes
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

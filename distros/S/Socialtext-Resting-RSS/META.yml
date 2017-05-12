@@ -1,0 +1,20 @@
+--- #YAML:1.0
+name:                Socialtext-Resting-RSS
+version:             0.01
+abstract:            Create rss feeds for a Socialtext workspace
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.36
+distribution_type:   module
+requires:     
+    JSON:                          0
+    Socialtext::Resting:           0.22
+    Socialtext::Resting::Utils:    0.17
+    Test::More:                    0
+    Text::Diff:                    0
+    XML::RSS:                      0
+    YAML:                          0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Luke Closs <cpan@5thplane.com>

@@ -1,0 +1,17 @@
+Revision history for Perl extension Sys::Proctitle.
+
+0.04  Thu Mar 11 12:55:57 CET 2010
+      - prctl(PR_SET_NAME) if supported by the kernel
+
+0.03  Sun Sep  7 20:03:44 CEST 2008
+      - spec file added
+      - ppport.h removed
+      - no longer depend on Class::Member
+
+0.02  Thu Dec 30 11:58:28 CET 2004
+      - 1st publicly available version
+      - OO interface
+
+0.01  Fri Nov 19 21:42:32 2004
+      - original version
+

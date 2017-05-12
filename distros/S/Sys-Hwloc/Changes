@@ -1,0 +1,80 @@
+Revision history for Perl extension Sys::Hwloc.
+
+0.09 2011/01/11
+      - added module "Advanced Traversal Helpers"
+
+0.08 2011/01/05
+      - bug fix prototype hwloc_get_next_child, added corresponding test
+      - prepared for upcoming availability of hwloc_bitmap_list_snprintf/sscanf
+        by renaming
+          hwloc_bitmap_sprintf_list -> hwloc_bitmap_list_sprintf
+          hwloc_bitmap_sscanf_list  -> hwloc_bitmap_list_sscanf
+        (internally still using our own implementation)
+      - added module "Finding Objects Inside a CPU set"
+
+0.07  2010/12/29
+      - implemented CPU binding
+      - implemented Memory binding
+      - added support for upcoming hwloc_get_api_version() check
+      - refined Makefile.PL (use %Config for preproc and compile/link)
+      - not export Cpuset API, Bitmap API, Binding API by default,
+        but by %EXPORT_TAGS going into @EXPORT_OK
+
+0.06  2010/12/22
+      - corrected typos in PODs
+      - added dependency on ExtUtils::Constant in Makefile.PL
+      - added high-level cpuset/nodeset tests on current topology
+      - added examples/gen_cpumapping (useful to set affinity maps
+        for MPI apps)
+
+0.05  2010/12/21
+      - added Sys::Hwloc::Obj->sprintf() as additional alias for
+        hwloc_obj_sprintf() and Sys::Hwloc::Topology->sprintf_obj()
+
+      - added Sys::Hwloc::hwloc_compare_objects with aliases
+        Sys::Hwloc::Topology->compare_objects and
+        Sys::Hwloc::Obj->is_same_obj
+        to compare the raw C pointer values
+
+      - added constant HWLOC_XSAPI_VERSION
+        (returns 0 where HWLOC_API_VERSION returns undef)
+
+      - implemented Cpuset and Bitmap API with some basic helpers
+        and handy functions that are not part of the hwloc C API,
+        like $set->sprintf_list
+
+      - destructors $topology->destroy, $cpuset->free, $bitmap->free
+        set the unlerlying C pointer to NULL after freeing the
+        C struct. This helps to circumvent double-free and
+        SIGSEGV. We should implement a DESTROY some day. This
+        needs the perl objects to be proxies that store the
+        C pointer in some hidden property, instead of being
+        simple T_PTROBJ.
+
+      - added PODs for Sys::Hwloc::Topology,
+        Sys::Hwloc::Obj, Sys::Hwloc::Cpuset, Sys::Hwloc::Bitmap
+
+      - added the "Artistic License 2.0" to LICENSE
+
+0.04  2010/12/14
+      - rewrote from scratch using typemapping
+      - added OO-ish methods for hwloc_obj_t and hwloc_topology_t objects
+      - support for HWLOC_API_VERSION (undef) .. 0x00010100
+      - named the module Sys::Hwloc and submitted to CPAN
+
+0.03  2010/12/07
+      - additional constants for hwloc_get_obj_data retrieval
+          HWLOC_ObjName       string or undef
+          HWLOC_ObjMemory     hashref
+          HWLOC_ObjChildren   array
+      - rewrote hwloc_get_obj_data with direct stack manipulation
+      - made 2nd arg to hwloc_get_obj_data optional,
+        if not present, return object data as hashref
+      - use perl type UV for unsigned C types
+
+0.02  2010/09/11
+      - constant definitions created by h2xs 1.23 with options
+          -O -n Hwloc /usr/local/hwloc-1.0.2/include/hwloc.h
+
+0.01  2010/08/18
+      - started project

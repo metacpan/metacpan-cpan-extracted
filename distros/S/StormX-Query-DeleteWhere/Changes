@@ -1,0 +1,7 @@
+Changes for perl module StormX::Query::DeleteWhere
+
+0.200     2012-10-03 14:58:04
+- using Dist::Zilla
+
+0.01
+- original release, 11/20/2010

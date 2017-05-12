@@ -1,0 +1,35 @@
+NAME
+    Sub::Prototype - Set a subs prototype
+
+SYNOPSIS
+        use Sub::Prototype;
+
+        BEGIN {
+            my $code = sub { ... };
+            set_prototype($code, '&@');
+            *main::my_func = $code;
+        }
+
+        my_func { ... } @list;
+
+FUNCTIONS
+    This module only has one function, which is also exported by default:
+
+  set_prototype(\&coderef, $prototype)
+        set_prototype(\&some_function, '$$');
+
+    Sets the prototype for "coderef" to $prototype.
+
+THANKS
+    Shawn M Moore for the idea and tests.
+
+AUTHOR
+    Florian Ragwitz <rafl@debian.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2008 Florian Ragwitz
+
+    This module is free software.
+
+    It may distribute it under the same terms as perl itself.
+

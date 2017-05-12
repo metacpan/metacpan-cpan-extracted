@@ -1,0 +1,735 @@
+#!/usr/bin/perl
+
+use utf8;
+use 5.016;
+
+BEGIN {    # support for running sidef locally from everywhere
+    require File::Spec;
+    require File::Basename;
+    unshift @INC,
+      File::Spec->catdir(
+                         File::Basename::dirname(
+                                                   File::Spec->file_name_is_absolute(__FILE__)
+                                                 ? __FILE__
+                                                 : File::Spec->rel2abs(__FILE__)
+                                                ),
+                         File::Spec->updir,
+                         'lib'
+                        );
+}
+
+binmode STDIN,  ":utf8";
+binmode STDOUT, ":utf8";
+binmode STDERR, ":utf8" if $^P == 0;    # to work under Devel::* modules
+
+use Sidef;
+
+my $name    = 'Sidef';
+my $version = $Sidef::VERSION;
+
+my %args;
+if ($#ARGV != -1 and chr ord $ARGV[0] eq '-') {
+    require Getopt::Std;
+    Getopt::Std::getopts('e:E:Dho:ivHWwbcrR:tCO:kP:M:s', \%args);
+}
+
+# Fix potential case mismatches for -R
+if (defined $args{R}) {
+    if (lc($args{R}) eq 'perl') {
+        $args{R} = 'Perl';
+    }
+    elsif (lc($args{R}) eq 'sidef') {
+        $args{R} = 'Sidef';
+    }
+}
+
+# Help
+if (defined $args{h}) {
+    output_usage();
+    exit 0;
+}
+
+# Version
+if (defined $args{v}) {
+    output_version();
+    exit 0;
+}
+
+# Warnings
+if (defined $args{w}) {
+    $SIG{__WARN__} = sub {
+        require Carp;
+        Carp::cluck(@_);
+    };
+}
+elsif (defined $args{W}) {
+    $SIG{__DIE__} = $SIG{__WARN__} = sub {
+        require Carp;
+        Carp::confess(@_);
+    };
+}
+
+# Interactive help
+if (defined $args{H}) {
+    help_interactive();
+    exit 0;
+}
+
+# Interactive coding
+if (defined $args{i}) {
+    code_interactive();
+    exit 0;
+}
+
+# Precision
+if (defined $args{P}) {
+    require Sidef::Types::Number::Number;
+    if ($args{P} <= 0) {
+        die "Invalid precision: <<$args{P}>> (expected a positive integer)\n";
+    }
+    $Sidef::Types::Number::Number::PREC = $args{P} << 2;
+}
+
+# Test mode
+if (defined $args{t}) {
+    my @argv = splice(@ARGV);
+
+    require Encode;
+    while (defined(my $script_name = shift @argv)) {
+
+        my $script_name = Encode::decode_utf8($script_name);
+
+        say "\n** Executing: $script_name";
+        say "-" x 80;
+
+        my $sidef = Sidef->new(opt  => \%args,
+                               name => $script_name,);
+
+        my $code = read_script($script_name);
+        my $deparsed = eval { $sidef->compile_code($code, 'Perl') };
+
+        my $slept = 0;
+        if ($@) {
+            warn "[ERROR] Can't parse the script `$script_name`: $@";
+            sleep 2;
+            $slept = 1;
+        }
+        else {
+            local $SIG{INT} = sub {
+                die "Stopped by user...";
+            };
+            $sidef->execute_perl($deparsed);
+        }
+
+        if (not($slept) and $@) {
+            warn "[ERROR] Error encountered on script `$script_name': $@";
+            sleep(2) if @argv;
+        }
+    }
+}
+
+# Default
+else {
+    my $script_name = '-';
+
+    $args{E} = $args{e} if exists($args{e});
+
+    my $code = exists($args{E})
+      ? do {
+        defined($args{E}) || die "No code specified for -E.\n";
+        $script_name = '-E';
+        require Encode;
+        Encode::decode_utf8($args{E});
+      }
+      : defined($ARGV[0]) && (-t STDIN or -f $ARGV[0]) ? do {
+        $script_name = shift @ARGV;
+        read_script($script_name);
+      }
+      : (-t STDIN) ? do { code_interactive(); exit 0; }
+      :              do { local $/;           <STDIN> };
+
+    $code // exit 2;
+
+    my $sidef = Sidef->new(opt  => \%args,
+                           name => $script_name,);
+
+    # Dump the AST
+    if (defined $args{D}) {
+        dump_ast($sidef->parse_code($code));
+    }
+
+    # Deparse code
+    elsif (defined($args{r}) or defined($args{R})) {
+        my $deparsed = $sidef->compile_code($code, $args{R});
+
+        if (defined($args{R}) and $args{R} eq 'Perl') {
+
+            my $header =
+                "\nuse lib (" . q{"}
+              . quotemeta(File::Basename::dirname($INC{"Sidef.pm"})) . q{"}
+              . ");\n\n"
+              . "use Sidef;\n\n"
+              . "binmode(STDIN, ':utf8');\n"
+              . "binmode(STDOUT, ':utf8');\n"
+              . "binmode(STDERR, ':utf8') if \$^P == 0;\n";
+
+            $deparsed = $header . $deparsed;
+        }
+
+        output($deparsed);
+    }
+
+    # Compile the code to a Perl program
+    elsif (defined $args{c}) {
+        compile_to_perl(code => $sidef->compile_code($code, 'Perl'));
+    }
+
+    # Check the syntax
+    elsif (defined $args{C}) {
+        eval { $sidef->parse_code($code) };
+        die $@ if $@;
+        say "$script_name syntax OK";
+    }
+
+    # Execute the code
+    else {
+        $sidef->execute_code($code);
+        die $@ if $@;
+    }
+}
+
+#
+## Subroutines
+#
+
+sub output_usage {
+#<<<
+    my %switches = (
+                    '-i'         => 'interactive mode',
+                    '-c'         => 'compile the code as a stand-alone Perl program',
+                    '-C'         => 'check syntax only',
+                    '-D'         => 'dump the syntax tree of a program',
+                    '-o file'    => 'file where to dump the output',
+                    '-O level'   => ['perform code optimizations before execution',
+                                     'valid levels: [0], 1, 2'],
+                    '-P int'     => 'set the precision of floating-point numbers (default: ' . int($Sidef::Types::Number::Number::PREC / 4) . ')',
+                    '-M mode'    => ['set the rounding mode of floating-point numbers',
+                                     'valid modes: [near], zero, inf, +inf, -inf'],
+                    '-k'         => 'keep track of potential unsafe parser interpretations',
+                    '-E program' => 'one line of program',
+                    '-H'         => 'interactive help',
+                    '-s'         => 'save compiled code in a database to reduce boot-time',
+                    '-v'         => 'print version number and exit',
+                    '-t'         => 'treat all command-line arguments as scripts',
+                    '-r'         => 'parse and deparse a Sidef program',
+                    '-R lang'    => ['parse and deparse a Sidef program into a given language',
+                                     'valid values: sidef, perl'],
+                    '-w'         => 'enable warnings with stack backtrace',
+                    '-W'         => 'make warnings fatal (with stack backtrace)',
+    );
+#>>>
+    require File::Basename;
+    my $basename = File::Basename::basename($0);
+
+    print <<"USAGE";
+
+Usage: $basename [switches] [--] [programfile] [arguments]
+
+USAGE
+
+    require List::Util;
+    my $max_width = List::Util::max(map { length } keys %switches);
+    $max_width += 4;
+
+    foreach my $key (sort { lc($a) cmp lc($b) or lc($b) cmp lc($a) or $b cmp $a } keys %switches) {
+        if (ref $switches{$key} eq 'ARRAY') {
+            printf "  %-${max_width}s%s\n", $key, $switches{$key}[0];
+            foreach my $i (1 .. $#{$switches{$key}}) {
+                printf "  %-${max_width}s%s\n", '', $switches{$key}[$i];
+            }
+        }
+        else {
+            printf "  %-${max_width}s%s\n", $key, $switches{$key};
+        }
+    }
+
+    print <<"END";
+
+Run '$basename -H' for interactive help.
+
+END
+}
+
+sub output_version {
+    print "$name $version\n";
+}
+
+sub read_script {
+    my ($script_name) = @_;
+    open my $fh, '<:utf8', $script_name
+      or die qq{Can't open sidef script "$script_name": $!\n};
+    local $/;
+    <$fh>;
+}
+
+sub help_interactive {
+
+    require File::Basename;
+    require File::Spec;
+
+    require Encode;
+    require Term::ReadLine;
+
+    my $term = Term::ReadLine->new("$name $version -- help interactive mode");
+
+    print <<"HELP";
+Welcome to $name $version!  This is the interactive help utility.
+
+Enter the name of any object, keyword, or topic to get help on writing
+$name programs and using $name modules.  To quit this help utility, just
+type "quit".
+
+HELP
+
+    my $sidef = Sidef->new(
+                           name       => '-H',
+                           opt        => \%args,
+                           parser_opt => {interactive => 1},
+                          );
+
+    {
+        my $line = Encode::decode_utf8(
+            $term->readline('help> ')
+              // do { print "\n"; return }
+        );
+
+        my $ccode = eval { $sidef->compile_code($line, 'Perl') };
+
+        if ($@) {
+
+            # Valid keywords for 'exit'
+            if ($line eq 'quit' or $line eq 'q' or $line eq 'exit') {
+                return;
+            }
+
+            # Otherwise, a syntax error
+            warn $@;
+            redo;
+        }
+
+        my @refs = (map { ref($_) } $sidef->execute_perl($ccode));
+
+        foreach my $ref (@refs) {
+            $ref eq '' && do { warn "Not an object!\n"; next };
+            my $name = $ref =~ s{::}{/}gr;
+            my $file = $INC{$name . '.pm'};
+            my $pod;
+            foreach my $dir (@INC) {
+                if (-e (my $f = File::Spec->catfile($dir, $name . '.pod'))) {
+                    $pod = $f;
+                    last;
+                }
+            }
+            if (defined($pod)) {
+                system 'perldoc', $pod;
+                $? && system 'man', $ref;
+            }
+            else {
+                system 'man', $ref;
+                $? && system 'perldoc', $ref;
+            }
+        }
+
+        redo;
+    }
+}
+
+sub code_interactive {
+    require Encode;
+    require Term::ReadLine;
+
+    my $term = Term::ReadLine->new("$name $version -- interactive mode");
+
+    my $sidef;
+    my $init_sidef = sub {
+        $sidef = Sidef->new(
+                            name       => '-i',
+                            opt        => \%args,
+                            parser_opt => {interactive => 1},
+                           );
+    };
+
+    $init_sidef->();
+    $sidef->execute_code('');    # warm-up
+
+    my ($copy_array, $copy_hash);
+
+    $copy_array = sub {
+        my ($array) = @_;
+
+        my @copy;
+        foreach my $item (@$array) {
+            if (ref($item) eq 'ARRAY') {
+                push @copy, __SUB__->($item);
+            }
+            elsif (ref($item) eq 'HASH') {
+                push @copy, $copy_hash->($item);
+            }
+            else {
+                push @copy, $item;
+            }
+        }
+
+        \@copy;
+    };
+
+    $copy_hash = sub {
+        my ($hash) = @_;
+
+        my %copy;
+        foreach my $key (keys %$hash) {
+            my $value = $hash->{$key};
+
+            if (ref($value) eq 'ARRAY') {
+                $copy{$key} = $copy_array->($value);
+            }
+            elsif (ref($value) eq 'HASH') {
+                $copy{$key} = __SUB__->($value);
+            }
+            else {
+                $copy{$key} = $value;
+            }
+        }
+
+        \%copy;
+    };
+
+    print qq{$name $version on $^O\n};
+    print qq{Type "help", "copyright" or "license" for more information.\n};
+
+    my $valid_lines = '';
+    my ($vars, $ref_vars_refs);
+
+    my $history_support = $term->can('ReadHistory') && $term->can('WriteHistory');
+    my $history_file = File::Spec->catfile($sidef->get_sidef_config_dir(), 'sidef_history.txt');
+
+    if ($history_support) {
+        if (not -e $history_file) {
+            open my $fh, '>', $history_file;
+        }
+
+        $term->ReadHistory($history_file);
+    }
+
+  MAINLOOP: {
+        my $line = '';
+
+      LINE: {
+            $line .= Encode::decode_utf8($term->readline($line eq '' ? '>> ' : '   ') // return);
+
+            if ($line eq 'help') {
+                help_interactive();
+                redo MAINLOOP;
+            }
+            elsif ($line =~ /^#\h*load\h+(.+)/) {
+                $init_sidef->();
+                $sidef->execute_code('');
+                my $file = unpack('A*', $1);
+                open my $fh, '<:utf8', $file or do {
+                    warn "Can't open file <<$file>> for read: $!\n";
+                    redo MAINLOOP;
+                };
+                $line = do { local $/; <$fh> };
+                close $fh;
+            }
+            elsif ($line =~ /^#\h*save\h+(.+)/) {
+                my $file = unpack('A*', $1);
+                open my $fh, '>:utf8', $file or do {
+                    warn "Can't open file <<$file>> for write: $!\n";
+                    redo MAINLOOP;
+                };
+                print $fh $valid_lines;
+                close $fh;
+                say "** Created file: $file";
+            }
+            elsif ($line eq 'copyright') {
+                print <<'EOT';
+Copyright © 2013-2017 Daniel Șuteu, Ioana Fălcușan
+All Rights Reserved.
+EOT
+                redo MAINLOOP;
+            }
+            elsif ($line eq 'license') {
+                print <<'EOT';
+
+This program is free software; you can redistribute it
+and/or modify it under the terms of the Artistic License (2.0).
+For more details, see the full text in the LICENSE file.
+
+This program is distributed in the hope that it will be
+useful, but without any warranty; without even the implied
+warranty of merchantability or fitness for a particular purpose.
+
+See http://www.perlfoundation.org/artistic_license_2_0 for more information.
+
+EOT
+                redo MAINLOOP;
+            }
+        }
+
+        # Replace top-level variables and constants with globals
+        if (not defined($args{r}) and not defined($args{R})) {
+            $line =~ s/^\h*(?:var|define|const|static)\b/global/;
+        }
+
+        $vars          = $copy_hash->($sidef->{parser}{vars});
+        $ref_vars_refs = $copy_hash->($sidef->{parser}{ref_vars_refs});
+
+        my $ccode = eval { $sidef->compile_code($line, $args{r} ? 'Sidef' : ($args{R} || 'Perl')) };
+
+        if ($@) {
+
+            # Valid keywords for 'exit'
+            if ($line eq 'q' or $line eq 'exit' or $line eq 'quit') {
+                return;
+            }
+
+            # Reset the parser
+            if ($line eq 'reset') {
+                $init_sidef->();
+                undef $vars;
+                undef $ref_vars_refs;
+                redo;
+            }
+
+            # Restore parser variables
+            if (defined($vars) and defined($ref_vars_refs)) {
+                %{$sidef->{parser}{vars}}          = %$vars;
+                %{$sidef->{parser}{ref_vars_refs}} = %$ref_vars_refs;
+            }
+
+            # Give up if the previous line is blank,
+            # or when it's impossible to recover from an error
+            if (
+                   $@ =~ /is not declared in the current scope/i
+                or $@ =~ /invalid \S+ declaration/i
+                or $@ =~ /attempt to call method/i
+                or $@ =~ /not declared in the current scope/i
+                or $@ =~ /expected a block after/i
+                or $@ =~ /invalid module declaration/i
+                or $@ =~ /unexpected end-of-statement/i
+                or (
+                      $@ =~ /unbalanced/ || $@ =~ /string terminator/
+                    ? $line =~ /\R\R\z/
+                    : $line =~ /\R\z/
+                   )
+              ) {
+                warn $@;
+                redo;
+            }
+
+            $line .= "\n";
+            goto LINE;
+        }
+        else {
+            $valid_lines .= "$line\n";    # store valid lines
+        }
+
+        if ($history_support) {
+            if ($line =~ /\R/) {
+                $term->addhistory($line);
+            }
+            $term->append_history(1, $history_file);
+        }
+
+        if (defined($args{r}) or defined($args{R})) {
+            output($ccode);
+        }
+        elsif ($line =~ /\S/ and not $line =~ /^\s*#.*$/) {
+            my @results = $sidef->execute_perl($ccode);
+            print $@ if $@;
+
+            use overload;
+
+            my $dump = join(
+                ', ',
+                map {
+                        ref($_)
+                      ? overload::StrVal($_)
+                          ? "$_"
+                          : UNIVERSAL::can($_, 'dump') ? $_->dump
+                        : $_
+                      : defined($_) ? $_
+                      : 'nil'
+                  } @results
+            );
+            $dump = "($dump)" if @results > 1;
+
+            say "=> $dump";
+        }
+        redo;
+    }
+}
+
+sub _get_namespaces {
+    @Sidef::NAMESPACES
+      ? ('push(@Sidef::NAMESPACES, ' . join(', ', map { qq{"\Q$_\E"} } @Sidef::NAMESPACES) . ");\n")
+      : '';
+}
+
+sub _get_loaded_modules {
+    my @modules;
+    foreach my $key (sort { length($a) <=> length($b) || $a cmp $b } keys %INC) {
+        if ($key =~ /^(Sidef\b.*)\.pm\z/) {
+            push @modules, $1 =~ s{/}{::}gr;
+        }
+    }
+    return @modules;
+}
+
+sub output {
+    my ($content) = @_;
+
+    my $out_fh = \*STDOUT;
+
+    if (defined $args{o}) {
+        open $out_fh, '>:utf8', $args{o}
+          or die "Can't open file '$args{o}' for write: $!\n";
+    }
+    print {$out_fh} $content;
+
+    return $out_fh;
+}
+
+sub dump_ast {
+    my ($ast) = @_;
+
+    eval { require Data::Dump };
+
+    if ($@) {
+        die qq{** "Data::Dump" is not installed!\n};
+    }
+    else {
+        my $out_fh = output('');
+
+        my $requirify = sub {
+            join('', map { "require '" . (s{::}{/}gr) . ".pm';\n" } @_);
+        };
+
+        print {$out_fh} _get_namespaces();
+        print {$out_fh} $requirify->(_get_loaded_modules());
+        print {$out_fh} Data::Dump::pp($ast) . "\n";
+    }
+}
+
+sub compile_to_perl {
+    my (%opt) = @_;
+
+    require File::Basename;
+    my $path = File::Spec->catdir(File::Basename::dirname($INC{'Sidef.pm'}), 'Sidef');
+
+    my $package_content = <<"HEAD";
+#!$^X
+
+eval 'exec $^X  -S \$0 \${1+"\$@"}'
+    if 0; # not running under some shell
+
+use utf8;
+
+binmode STDIN,  ":utf8";
+binmode STDOUT, ":utf8";
+binmode STDERR, ":utf8" if \$^P == 0;    # to work under Devel::* modules
+
+my %REQ;
+my %MODULE;
+HEAD
+
+    $package_content .= "BEGIN { %MODULE = (\n";
+
+    require File::Find;
+    File::Find::find(
+        {
+         no_chdir => 1,
+         wanted   => sub {
+             if (/\.pm\z/ and -f) {
+
+                 local $/;
+                 open my $fh, '<:utf8', $_
+                   or die "Can't open file `$_' for reading: $!";
+
+                 my $token   = tr/A-Za-z0-9/_/cr;
+                 my $content = <$fh>;
+
+                 if ($content =~ /^package\h+([\w:]+)/) {
+                     $package_content .= qq{'$1' => };
+                 }
+                 else {
+                     die qq{ERROR: can't get the package name from file `$_`};
+                 }
+
+                 $package_content .= qq{<<'${token}',\n};
+                 $package_content .= $content;
+                 $package_content .= "\n$token\n";
+
+                 close $fh;
+             }
+         }
+        } => ($path, $INC{'Sidef.pm'})
+    );
+
+    $package_content .= <<'FOOT';
+);
+
+sub __load_sidef_module__ {
+    my ($name) = @_;
+    if (not exists $REQ{$name}) {
+        my $module = $name =~ s{::}{/}gr . '.pm';
+        if (exists $MODULE{$name} and not exists $INC{$module}) {
+
+            # Load the Sidef used modules
+            $MODULE{$name} =~ s{^\h*
+                  use \h+ (?:
+                      parent \s+ qw\((.*?)\)
+                    | (Sidef::[\w:]+)
+                  )
+            }{
+                  join(
+                  ";\n" => map{
+                    exists($REQ{$_})
+                        ? ()
+                        : "BEGIN{ main::__load_sidef_module__('$_') }" } split(' ', $+)
+                  ) . (defined($1) ? "\nuse parent qw(-norequire $1);\n" : '')
+            }gxmse;
+
+            $INC{$module} = 1;
+            eval($MODULE{$name});
+            die "[FATAL ERROR] Can't load `$module`: $@" if $@;
+        }
+        else {
+            require $module;
+        }
+        $REQ{$name} = 1;
+    }
+    return 1;
+}
+
+FOOT
+
+    my $requirify = sub {
+        join('', map { "__load_sidef_module__('$_');\n" } @_);
+    };
+
+    $package_content .= $requirify->(_get_loaded_modules(), 'Sidef::Module::OO', 'Sidef::Module::Func');
+
+    my @used_pkgs;
+    while ($opt{code} =~ /^use (Sidef::\S+);$/gm) {
+        push @used_pkgs, $1;
+    }
+
+    $package_content .= $requirify->(@used_pkgs) if @used_pkgs;
+    $package_content .= "}\n\n";
+
+    my $out_fh = output('');
+    print {$out_fh} $package_content;
+    print {$out_fh} $opt{code};
+}

@@ -1,0 +1,21 @@
+# ======================================================================
+#                       --- String::Format ---
+# ======================================================================
+
+# ----------------------------------------------------------------------
+# Version 1.14                                        December 22,  2005
+# ----------------------------------------------------------------------
+
+* Updated tests so that 04subrefs.t no longer fails if getpwuid is not
+  defined.  RT#2083.
+
+# ----------------------------------------------------------------------
+# Version 1.13                                         February 11, 2002 
+# ----------------------------------------------------------------------
+
+* Modified regex to use \S, rather than a regenerated one based on
+  stuff passed in. This is feasible because _replace now passes
+  through everything it does not recognize.  Updated t/02basic.t to
+  refect this change.
+
+# vim: set tw=70 ts=2 sw=2 fo=trcqo2n:

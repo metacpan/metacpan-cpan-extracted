@@ -1,0 +1,38 @@
+Revision history for Perl extension Snail::CSV.
+
+0.07  2006-05-14
+
+        * DOCS: update documentation.
+
+
+0.06  2006-05-03
+
+        * NEW: add method save.
+
+
+0.05  2006-04-19
+
+        * FIX: cleaning data of the previous file (in batch mode).
+
+
+0.04  2006-04-18
+
+        * DOCS: update documentation.
+
+
+0.03  2006-04-18
+
+        * NEW: add method setData.
+        * NEW: add method update.
+        * NEW: add method fetchall_arrayref and fetchall_hashref.
+
+
+0.02  2006-04-14
+
+        * FIX: plain filter is not a SCALAR reference.
+        * NEW: counter file lines.
+
+
+0.01  2006-04-12
+
+        * original version.

@@ -1,0 +1,13 @@
+name=Gallery
+description="Picture gallery"
+mysql_schema=mysql_schema.sql
+mysql_dump=dump.sql
+htdoc=gallery.pl
+template=templates/data;gallery;default
+template=templates/display;gallery;default
+template=templates/edit_group;gallery;default
+template=templates/gallery;menu;default
+template=templates/list;gallery;default
+template=templates/list_groups;gallery;default
+template=templates/list_pictures;gallery;default
+template=templates/picture_menu;gallery;default

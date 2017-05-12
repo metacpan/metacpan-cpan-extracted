@@ -1,0 +1,10 @@
+Revision history for SVG-Convert
+
+0.02  2007/10/09 13:04
+      Move XAML driver to another dist.
+      Add $convert_opts parameter to convert() method.
+
+0.01  2007/09/13 20:58
+      First version.
+
+

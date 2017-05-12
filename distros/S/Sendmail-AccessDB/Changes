@@ -1,0 +1,57 @@
+Revision history for Perl extension Sendmail::AccessDB.
+
+1.04  Mon Dec 22 2014
+	- Removed the locked sub attributes because they seem to have no gain(no object acces/modification is done)
+	- Enhanced the POD
+	- Enhanced the test so they skip if /usr/sbin/makemap is not installed(might be needed to bundle a .db again)
+	- In 2012: Enhanced the lookup function so it does correctly check all variations of an email address
+
+1.01  Tue Nov 10 2009
+	- Fixed a permissions issue where a test file didn't exist prior
+	  to testing.
+
+0.09  Sun May 02 2004
+        - added PREREQ_PM to Makefile.PL
+
+0.08  Sun May 02 2004
+	- Changed whitelisted() function to also check for RELAY since
+	  according to the sendmail spec, RELAY implies OK.
+
+	- Switched to using BerkeleyDB package instead of File_DB since
+          File_DB didn't seen to be working with BDB 4.2 libraries
+
+	- No longer include a test.db file. Call /usr/sbin/makemap at
+	  `make test` time. 
+
+0.07  Sat Dec 08 2001
+	- Added 'file' argument to lookup() to allow looking up in files
+          other than /etc/mail/access.db
+
+0.05  Tue Aug 28 2001
+        - Fixed bug where one of the _expand_* private calls was not 
+          threadsafe.
+
+0.04  Sun Aug 19 2001
+        - Made a generic "lookup" routine, which will return the value of 
+          in the DB. 
+        - genericised some private function calls for the purpose of finding
+          parent lookups for email addresses, ip addresses, hostnames, etc.
+        - Made the lookup and whitelisted routines take a 'qualifier' 
+	  argument (e.g., the "Spam" in "Spam:lookup"), as well as to add 
+	  a 'type' argument, where a particular lookup-expansion type
+	  (previous change)is desired. (e.g., doing a lookup on 'postmaster'
+	  is ambiguous, as it could be both a hostname and a recipient or 
+	  sender, and the method of determining "parent lookups" for each
+	  is different.
+
+0.03  Fri Aug 17 16:46:00 2001
+        - Per the sendmail folks, whitelisting lookups now check LHS@ 
+          in the DB instead of LHS.
+
+0.02  Fri Aug 17 14:39:00 2001
+        - Fixed whitelisting bug where the RHS of an email address wasn't
+          scanned to see if parent domains were whitelisted.
+
+0.01  Sun Aug 12 15:55:28 2001
+	- original version; created by ExtUtils::ModuleMaker 0.20102
+

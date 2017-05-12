@@ -1,0 +1,13 @@
+abstract: 'a simple frondend for manager the svnserve.conf, authz and passwd for subversion'
+author: Hsin-Chan Chien <hcchien@hcchien.org>
+distribution_type: module
+generated_by: Module::Install version 0.50
+license: perl
+name: SVN-ACL
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  YAML: 0
+version: 0.02

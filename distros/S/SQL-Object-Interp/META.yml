@@ -1,0 +1,25 @@
+---
+abstract: 'Yet another SQL condition builder with SQL::Interp'
+author:
+  - 'Narazaka (http://narazaka.net/)'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: SQL-Object-Interp
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  ExtUtils::MakeMaker: 6.42
+  SQL::Interp: 0
+  SQL::Object: 0.01
+  Test::More: 0.94
+version: 0.04

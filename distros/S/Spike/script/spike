@@ -1,0 +1,18 @@
+#!/bin/sh
+
+SCRIPT_HOME=$(dirname $(readlink -s -f $(which $0)))
+SCRIPT=$(basename $0)
+
+COMMAND="$1"
+shift
+
+if [ -n "$COMMAND" ] && [ -x "$SCRIPT_HOME/$SCRIPT-$COMMAND" ]; then
+    "$SCRIPT_HOME/$SCRIPT-$COMMAND" $@
+    exit $?
+fi
+
+>&2 cat << _END_
+Usage: $SCRIPT COMMAND [ARGUMENTS]...
+  Commands:
+    make SITE [TMPL]        Make new site from template
+_END_

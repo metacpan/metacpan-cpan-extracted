@@ -1,0 +1,31 @@
+Revision history for String-Flogger
+
+1.101245  2014-08-08 18:43:38-04:00 America/New_York
+        - switch from JSON to JSON::MaybeXS
+
+1.101244  2013-10-15 22:35:34 America/New_York
+          update bugtracker and repo
+
+1.101243  2013-01-31 11:42:28 America/New_York
+          use horrible hack to avoid dying when a data structure to log
+          contains an object
+
+1.101242  2012-03-26 08:20:22 America/New_York
+          make ->flog({...}) act like ->flog([ '%s', {...} ])
+          (thanks, Randy Stauner)
+
+1.101241  2011-01-13 12:31:38 America/New_York
+          add format_string method for subclassing
+
+1.101240  2010-05-04 16:25:47 America/New_York
+          better stringification of unblessed scalar refs (to ref(...))
+          better stringification of undef (to null)
+
+1.101170  2010-04-27 14:59:36 America/New_York
+          fix a typo in docs (thanks MJD)
+
+1.001     2008-10-14
+          crank up the JSON prereq (thanks, alexchorny, for the test report)
+
+1.000     2008-10-13
+          first release

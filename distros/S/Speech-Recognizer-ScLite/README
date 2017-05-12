@@ -1,0 +1,30 @@
+Speech/Recognizer/ScLite
+=====================================
+
+Object-based wrapper around the 'sclite' tool from the SCTK ("SCoring
+ToolKit") for speech recognition from NIST.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+The 'sclite' executable must be in the path.  You can get this from:
+
+  http://www.nist.gov/speech/tools/index.htm
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2001 Jeremy Kahn <kahn@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

@@ -1,0 +1,40 @@
+NAME
+    SVN::Hook - Managing subversion hooks
+
+SYNOPSIS
+     my $hooks = SVN::Hook->new({ repospath => '/path/to/repos' });
+
+     $hooks->init($_) for SVN::Hook->ALL_HOOKS;
+
+     my $pre_commit = $hooks->scripts('pre-commit');
+     print $_->path."\n" for (@$pre_commit);
+
+DESCRIPTION
+    "SVN::Hook" provides a programmable interface to manage hook scripts for
+    Subversion. See svnhook for the CLI usage.
+
+TODO
+    *   CLI to manage enable/disable scripts
+
+    *   CLI to display and dry-run for subdir scripts for redispatch
+
+    *   More tests and doc
+
+LICENSE
+    Copyright 2007 Best Practical Solutions, LLC.
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may
+    not use this file except in compliance with the License. You may obtain
+    a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+AUTHORS
+    Chia-liang Kao <clkao@bestpractical.com<gt>
+

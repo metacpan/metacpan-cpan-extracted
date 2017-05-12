@@ -1,0 +1,397 @@
+=head1 NAME
+
+SPOPS::Manual - User Guide and Reference Manual for SPOPS
+
+=head1 DESCRIPTION
+
+This is the manual for SPOPS, Simple Perl Object Persistence with
+Security. SPOPS is an object persistence framework that allows you to
+serialize your objects in Perl to different datastores. It also allows
+you to protect individual objects with a flexible security scheme and
+flexibly register pre- and post- serialization handlers. 
+
+And all this can be done without writing any code -- common
+serialization usage can be implemented with a configuration file
+that's processed by SPOPS to create a fully functional class at
+run-time.
+
+This manual provides an overview of the framework along with examples,
+directions, etc. If you need implementation-specific information,
+please see the documentation for the appropriate module. (All modules
+are listed below.)
+
+The manual is broken down into:
+
+=over 4
+
+=item L<SPOPS::Manual::Intro|SPOPS::Manual::Intro>
+
+Introduction to SPOPS and a discussion of how all the pieces fit
+together.
+
+=item L<SPOPS::Manual::Object|SPOPS::Manual::Object>
+
+Shows how you interact with SPOPS objects.
+
+=item L<SPOPS::Manual::Configuration|SPOPS::Manual::Configuration>
+
+Describes how the configuration process works and what common
+configuration values are for the different implementations (e.g.,
+L<SPOPS::DBI|SPOPS::DBI>, L<SPOPS::LDAP|SPOPS::LDAP>,
+L<SPOPS::GDBM|SPOPS::GDBM>). Also contains information about
+security-specific configuration items.
+
+=item L<SPOPS::Manual::Relationships|SPOPS::Manual::Relationships>
+
+Shows how to declaratively define different types of relationships
+between SPOPS objects.
+
+=item L<SPOPS::Manual::ObjectRules|SPOPS::Manual::ObjectRules>
+
+Lists the general behaviors that every SPOPS object has, and shows how
+you can use other pre- and post- serialization handlers as well as
+create your own.
+
+=item L<SPOPS::Manual::CodeGeneration|SPOPS::Manual::CodeGeneration>
+
+Shows how the SPOPS classes are created from configuration and how you
+can modify the process for your own (hopefully benevolent) ends.
+
+=item L<SPOPS::Manual::Serialization|SPOPS::Manual::Serialization>
+
+Describes how objects are saved, fetched and removed. Illustrates how
+SPOPS generates keys (if you ask nicely) and caches objects. Also
+describes how to create your own serialization class.
+
+=item L<SPOPS::Manual::Datasource|SPOPS::Manual::Datasource>
+
+Information about how SPOPS uses datasources and how you can make one
+or more datasources available to a number of objects at once.
+
+=item L<SPOPS::Manual::Security|SPOPS::Manual::Security>
+
+Details about the SPOPS security system.
+
+=item L<SPOPS::Manual::Exceptions|SPOPS::Manual::Exceptions>
+
+Error handling in the SPOPS framework.
+
+=item L<SPOPS::Manual::ImportExport|SPOPS::Manual::ImportExport>
+
+Getting data in and out of datasources using SPOPS.
+
+=item L<SPOPS::Manual::Cookbook|SPOPS::Manual::Cookbook>
+
+Recipes for SPOPS usage.
+
+=back
+
+=head1 MODULE LISTING
+
+General object behavior
+
+=over 4
+
+=item L<SPOPS|SPOPS>
+
+=back
+
+Initializing objects
+
+This is the most common gateway to SPOPS, so be sure to see how to use
+the C<process()> method.
+
+=over 4
+
+=item L<SPOPS::Initialize|SPOPS::Initialize>
+
+=back
+
+Error handling
+
+=over 4
+
+=item L<SPOPS::Exception|SPOPS::Exception>
+
+=item L<SPOPS::Exception::DBI|SPOPS::Exception::DBI>
+
+=item L<SPOPS::Exception::LDAP|SPOPS::Exception::LDAP>
+
+=item L<SPOPS::Exception::Security|SPOPS::Exception::Security>
+
+=back
+
+Security
+
+=over 4
+
+=item L<SPOPS::Secure|SPOPS::Secure>
+
+=item L<SPOPS::Secure::DBI|SPOPS::Secure::DBI>
+
+=item L<SPOPS::Secure::Hierarchy|SPOPS::Secure::Hierarchy>
+
+=back
+
+DBI items
+
+=over 4
+
+=item L<SPOPS::DBI|SPOPS::DBI>
+
+=item L<SPOPS::SQLInterface|SPOPS::SQLInterface>
+
+=item L<SPOPS::ClassFactory::DBI|SPOPS::ClassFactory::DBI>
+
+=item L<SPOPS::DBI::TypeInfo|SPOPS::DBI::TypeInfo>
+
+=item L<SPOPS::DBI::InterBase|SPOPS::DBI::InterBase>
+
+=item L<SPOPS::DBI::MySQL|SPOPS::DBI::MySQL>
+
+=item L<SPOPS::DBI::Oracle|SPOPS::DBI::Oracle>
+
+=item L<SPOPS::DBI::Pg|SPOPS::DBI::Pg>
+
+=item L<SPOPS::DBI::SQLite|SPOPS::DBI::SQLite>
+
+=item L<SPOPS::DBI::Sybase|SPOPS::DBI::Sybase>
+
+=item L<SPOPS::Key::DBI::HandleField|SPOPS::Key::DBI::HandleField>
+
+=item L<SPOPS::Key::DBI::Identity|SPOPS::Key::DBI::Identity>
+
+=item L<SPOPS::Key::DBI::Pool|SPOPS::Key::DBI::Pool>
+
+=item L<SPOPS::Key::DBI::Sequence|SPOPS::Key::DBI::Sequence>
+
+=item L<SPOPS::Tool::DBI::Datasource|SPOPS::Tool::DBI::Datasource>
+
+=item L<SPOPS::Tool::DBI::DiscoverField|SPOPS::Tool::DBI::DiscoverField>
+
+=item L<SPOPS::Tool::DBI::FindDefaults|SPOPS::Tool::DBI::FindDefaults>
+
+=item L<SPOPS::Tool::DBI::MaintainLinkedList|SPOPS::Tool::DBI::MaintainLinkedList>
+
+=item L<SPOPS::Iterator::DBI|SPOPS::Iterator::DBI>
+
+=back
+
+LDAP items
+
+=over 4
+
+=item L<SPOPS::LDAP|SPOPS::LDAP>
+
+=item L<SPOPS::LDAP::MultiDatasource|SPOPS::LDAP::MultiDatasource>
+
+=item L<SPOPS::ClassFactory::LDAP|SPOPS::ClassFactory::LDAP>
+
+=item L<SPOPS::Tool::LDAP::Datasource|SPOPS::Tool::LDAP::Datasource>
+
+=item L<SPOPS::Iterator::LDAP|SPOPS::Iterator::LDAP>
+
+=back
+
+Iterators (general)
+
+=over 4
+
+=item L<SPOPS::Iterator|SPOPS::Iterator>
+
+=item L<SPOPS::Iterator::DBI|SPOPS::Iterator::DBI>
+
+=item L<SPOPS::Iterator::LDAP|SPOPS::Iterator::LDAP>
+
+=item L<SPOPS::Iterator::WrapList|SPOPS::Iterator::WrapList>
+
+=back
+
+Exporting/Importing
+
+=over 4
+
+=item L<SPOPS::Export|SPOPS::Export>
+
+=item L<SPOPS::Export::Object|SPOPS::Export::Object>
+
+=item L<SPOPS::Export::Perl|SPOPS::Export::Perl>
+
+=item L<SPOPS::Export::SQL|SPOPS::Export::SQL>
+
+=item L<SPOPS::Export::XML|SPOPS::Export::XML>
+
+=item L<SPOPS::Export::DBI::Data|SPOPS::Export::DBI::Data>
+
+=item L<SPOPS::Import|SPOPS::Import>
+
+=item L<SPOPS::Import::Object|SPOPS::Import::Object>
+
+=item L<SPOPS::Import::DBI::Table|SPOPS::Import::DBI::Table>
+
+=item L<SPOPS::Import::DBI::Data|SPOPS::Import::DBI::Data>
+
+=item L<SPOPS::Import::DBI::TableTransform|SPOPS::Import::DBI::TableTransform>
+
+=item L<SPOPS::Import::DBI::TableTransform::InterBase|SPOPS::Import::DBI::TableTransform::InterBase>
+
+=item L<SPOPS::Import::DBI::TableTransform::MySQL|SPOPS::Import::DBI::TableTransform::MySQL>
+
+=item L<SPOPS::Import::DBI::TableTransform::Oracle|SPOPS::Import::DBI::TableTransform::Oracle>
+
+=item L<SPOPS::Import::DBI::TableTransform::Pg|SPOPS::Import::DBI::TableTransform::Pg>
+
+=item L<SPOPS::Import::DBI::TableTransform::SQLite|SPOPS::Import::DBI::TableTransform::SQLite>
+
+=item L<SPOPS::Import::DBI::TableTransform::Sybase|SPOPS::Import::DBI::TableTransform::Sybase>
+
+=back
+
+Utilities that might be useful:
+
+=over 4
+
+=item L<SPOPS::Key::Random|SPOPS::Key::Random>
+
+=item L<SPOPS::Key::UUID|SPOPS::Key::UUID>
+
+=item L<SPOPS::Tool::CreateOnly|SPOPS::Tool::CreateOnly>
+
+=item L<SPOPS::Tool::ReadOnly|SPOPS::Tool::ReadOnly>
+
+=item L<SPOPS::Utility|SPOPS::Utility>
+
+=back
+
+More information about how data are stored in an object
+
+=over 4
+
+=item L<SPOPS::Tie|SPOPS::Tie>
+
+=item L<SPOPS::Tie::StrictField|SPOPS::Tie::StrictField>
+
+=back
+
+Class Factory
+
+This handles the code generation for objects at initialization. It's
+useful for hacking SPOPS.
+
+=over 4
+
+=item L<SPOPS::ClassFactory|SPOPS::ClassFactory>
+
+=item L<SPOPS::ClassFactory::DefaultBehavior|SPOPS::ClassFactory::DefaultBehavior>
+
+=item L<SPOPS::ClassFactory::DBI|SPOPS::ClassFactory::DBI>
+
+=item L<SPOPS::ClassFactory::LDAP|SPOPS::ClassFactory::LDAP>
+
+=back
+
+=head1 SEE ALSO
+
+Find out more about SPOPS -- current versions, updates, rants, ideas
+-- at:
+
+ http://spops.sourceforge.net/
+
+CVS access and mailing lists (SPOPS is currently supported by the
+openinteract-dev list) are at:
+
+ http://sourceforge.net/projects/spops/
+
+Also see the 'Changes' file in the source distribution for comments
+about how the module has evolved.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2001-2004 Chris Winters. All rights reserved.
+
+Permission is granted to copy, distribute and::or modify this document
+under the terms of the GNU Free Documentation License, Version 1.1 or
+any later version published by the Free Software Foundation; with no
+Invariant Sections, with no Front-Cover Texts, and with no Back-Cover
+Texts. A copy of the license is included in the file titled
+"COPYING-DOCS".
+
+=head1 AUTHORS
+
+Chris Winters E<lt>chris@cwinters.comE<gt>
+
+The following people have offered patches, advice, development funds,
+etc. to SPOPS:
+
+=over 4
+
+=item *
+
+intes.net (http://www.intes.net/) has funded and supported SPOPS
+development from its inception.
+
+=item *
+
+Ray Zimmerman E<lt>rz10@cornell.eduE<gt> -- had offered tons of great design
+ideas and general help, pushing SPOPS into new domains. Too much to
+list here.
+
+=item *
+
+Simon Ilyushchenko E<lt>simonf@cshl.eduE<gt> -- real-world usage
+advice, work on improving the object linking semantics, lots of little
+items.
+
+=item *
+
+Christian Lemburg E<lt>lemburg@aixonix.deE<gt> -- contributed excellent
+documentation, too many good ideas to implement as well as design help
+with L<SPOPS::Secure::Hierarchy|SPOPS::Secure::Hierarchy> and the
+impetus for moving methods from the main SPOPS subclass to
+L<SPOPS::Utility|SPOPS::Utility>.
+
+=item *
+
+MSN Marketing Service Nordwest, GmbH -- funded development of LDAP
+functionality, including L<SPOPS::LDAP|SPOPS::LDAP>,
+L<SPOPS::LDAP::MultiDatasource>, and
+L<SPOPS::Iterator::LDAP|SPOPS::LDAP::MultiDatasource>, and
+L<SPOPS::Iterator::LDAP>.
+
+=item *
+
+Rusty Foster E<lt>rusty@kuro5hin.orgE<gt> -- was influential in the early (!)
+days of this library and offered up an implementation for 'limit'
+functionality in L<SPOPS::DBI|SPOPS::DBI>
+
+=item *
+
+Rick Myers E<lt>rik@sumthin.nuE<gt> -- got rid of lots of warnings when
+running under C<-w> and helped out with permission issues with
+L<SPOPS::GDBM|SPOPS::GDBM>.
+
+=item *
+
+Harry Danilevsky E<lt>hdanilevsky@DeerfieldCapital.comE<gt> -- helped out with
+Sybase-specific issues, including inspiring
+L<SPOPS::Key::DBI::Identity|SPOPS::Key::DBI::Identity>.
+
+=item *
+
+Leon Brocard E<lt>acme@astray.comE<gt> -- prodded better docs of
+C<SPOPS::Configure> (now deprecated, but folded into
+L<SPOPS::ClassFactory|SPOPS::ClassFactory>), specifically the linking
+semantics.
+
+=item *
+
+Gert Thiel E<lt>thiel@baerkatalog.deE<gt> -- prodded better docs for
+multifield primary keys in L<SPOPS::DBI|SPOPS::DBI> and for defining
+and using relationships.
+
+=item *
+
+David Boone E<lt>dave@bis.bc.caE<gt> -- prodded the creation of
+L<SPOPS::Initialize|SPOPS::Initialize>.
+
+=back

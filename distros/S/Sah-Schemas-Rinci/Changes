@@ -1,0 +1,19 @@
+Revision history for Sah-Schemas-Rinci
+
+1.1.82.2  2016-12-10 (PERLANCAR)
+
+          - No functional changes.
+
+          - [build] Rebuild with updated Dist::Zilla::Plugin::Sah::Schemas to
+            fix typos [RT#119466].
+
+
+1.1.82.1  2016-12-10 (PERLANCAR)
+
+          - Update to Sah 1.1.82 (introduced argument spec's 'index_completion'
+            property).
+
+
+1.1.80.1  2016-07-25 (PERLANCAR)
+
+          - First release, split from Rinci.

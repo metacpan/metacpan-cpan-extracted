@@ -1,0 +1,161 @@
+
+=pod
+
+=head1 NAME
+
+Starch::Cookbook - Starch recipes for common situations.
+
+=head1 CACHING STORES
+
+Often time states are stored in persistent stores which provide a high
+level of data reliability, but as a trade off do not perform as well
+as some less reliable stores.
+
+Using the L<Starch::Store::Layered> store you can put a caching store
+in front of your persistent store.  For example you may have a
+L<Starch::Store::DBI> store:
+
+    store => {
+        class => '::DBI',
+        dbh => [ $dbn, $user, $pass ],
+    },
+
+Which you'd like to put Memcached in front of:
+
+    store => {
+        class => '::Layered',
+        outer => {
+            class => '::CHI',
+            chi => {
+                driver => 'Memcached::Fast',
+                ...,
+            },
+        },
+        inner => {
+            class => '::DBI',
+            dbh => [ $dbn, $user, $pass ],
+        },
+    },
+
+Starch will attempt to retrieve all data from the outer, Memcached,
+store, and failing that will try the inner, DBI, store.  If the
+data is found in the DBI store then it will be written to Memcached
+before being returned.  Starch will handle all aspects of the caching
+automatically in a sensible and reliable manner.
+
+=head1 MIGRATING STORES
+
+The L<Starch::Store::Layered> store provides a reliable
+mechanism for migrating stores.  Let's say you were using
+the L<Starch::Store::DBI> store and found that you could
+get a performacen boost from using the L<Starch::Store::Amazon::DynamoDB>
+store instead.  Your DBI store currently looks something like:
+
+    store => {
+        class => '::DBI',
+        dbh => [ $dbn, $user, $pass ],
+    },
+
+To migrate your data to DynamoDB you'd set it up like this:
+
+    store => {
+        class => '::Layered',
+        outer => {
+            class => '::Amazon::DynamoDB',
+            ddb => { ... },
+        },
+        inner => {
+            class => '::DBI',
+            dbh => [ $dbn, $user, $pass ],
+        },
+    },
+
+In addition you probably want to disable any writes to the old store,
+so change the above to use L<Starch::Plugin::DisableStore>:
+
+    plugins => ['::DisableStore'],
+    store => {
+        class => '::Layered',
+        outer => {
+            class => '::Amazon::DynamoDB',
+            ddb => { ... },
+        },
+        inner => {
+            class => '::DBI',
+            dbh => [ $dbn, $user, $pass ],
+            disable_set => 1,
+        },
+    },
+
+If you are already using a layered store, such as for caching, it is
+perfectly fine to put layered stores inside of layered stores.
+
+The behavior of this configuration is:
+
+=over
+
+=item *
+
+Every requests for state data will first be made agains the outer
+(DynamoDB) store.
+
+=item *
+
+If the data exists in DynamoDB it will be returned.
+
+=item *
+
+If the data does not exists in the DynamoDB store then it will
+be requested from the DBI store.
+
+=item *
+
+If the data exists in DBI it will be set in DynamoDB and then
+returned.
+
+=item *
+
+Any removes issued against the store will be applied to both DynamoDB
+and DBI.
+
+=item *
+
+Any sets issued against the store will only be applied to the DynamoDB
+store.
+
+=back
+
+You'll want to run your application in this setup for however long your
+sessions are set to expire for.  At this point you can change the configuration
+to just use the outer store:
+
+    store => {
+        class => '::Amazon::DynamoDB',
+        ddb => { ... },
+    },
+
+And your migration is complete.
+
+If your session expiration is very long, weeks, months, or even years, you may
+find that you want to retire your old store sooner than later.  In this case
+you'll want to run a background process (such as a cron job) to migrate all
+states not yet migrated to the new store.  You can use starch to do this for
+you by retrieving all the state IDs from your old store and then loading it
+into starch.  For example:
+
+    my $state_ids = $dbh->selectcol_arrayref(...);
+    foreach my $state_id (@$state_ids) {
+        $starch->state( $state_id )->data();
+    }
+
+Just the act of retrieving the data will cause Starch to go through the steps
+of retrieving the data from the outer (DynamoDB in our example) store and, if
+its not there, then retrieving from the inner (DBI) store, and setting it in
+DynamoDB.
+
+=head1 AUTHORS AND LICENSE
+
+See L<Starch/AUTHOR>, L<Starch/CONTRIBUTORS>, and L<Starch/LICENSE>.
+
+=cut
+

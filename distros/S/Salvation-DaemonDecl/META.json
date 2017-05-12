@@ -1,0 +1,54 @@
+{
+   "abstract" : "Yet another daemon maker",
+   "author" : [
+      "Gennadiy Filatov <gfilatov@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Salvation-DaemonDecl",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "B::Hooks::EndOfScope" : "0",
+            "Salvation::Method::Signatures" : "0.02",
+            "Salvation::TC" : "0.11",
+            "Sub::Prototype" : "0",
+            "boolean" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/kainwinterheart/salvation-daemondecl.git",
+         "web" : "https://github.com/kainwinterheart/salvation-daemondecl",
+         "x_bugtracker" : "https://github.com/kainwinterheart/salvation-daemondecl/issues"
+      }
+   },
+   "version" : "0.03"
+}

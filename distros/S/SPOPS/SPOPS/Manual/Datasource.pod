@@ -1,0 +1,33 @@
+=head1 NAME
+
+SPOPS::Manual::Datasource - SPOPS datasource use and how you can customize
+
+=head1 DESCRIPTION
+
+This document aims to answer the questions:
+
+=over 4
+
+=item *
+
+What is a datastore?
+
+=item *
+
+How do SPOPS objects access the datastore?
+
+=item *
+
+How do I implement a datastore connection manager?
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright (c) 2001-2004 Chris Winters. All rights reserved.
+
+See L<SPOPS::Manual|SPOPS::Manual> for license.
+
+=head1 AUTHORS
+
+Chris Winters E<lt>chris@cwinters.comE<gt>

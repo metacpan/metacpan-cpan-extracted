@@ -1,0 +1,57 @@
+SYNOPSIS
+
+     use Simple::Timer; # exports timer() and $TIMER
+    
+     # pick your preferred interface. either ...
+     $TIMER = 0; do_something(); say $TIMER;
+    
+     # or ...
+     timer { do_something_else() }; # prints elapsed time
+
+DESCRIPTION
+
+    This module offers yet another way (actually two ways) to time your
+    code. The goal of this module is very simple interface, so no
+    cumbersombe OO with the need to instantiate a class. You just use a
+    single variable or a single function.
+
+    There are two ways which you can choose. You can either:
+
+    Use a special (tied) variable $TIMER. This variable is a stopwatch that
+    starts running when you load the module. At the top of the portion of
+    code you want to time, reset $TIMER to 0. Then at the bottom of the
+    code, you read the value of $TIMER to get elapsed time.
+
+    Or alternatively you can also use the timer function. Just enclose the
+    code you want to time with this function and at the end the elapsed
+    time is printed.
+
+    Using the timer function is simpler, but it introduces another scope so
+    you can't always use it. That's why there's an alternative $TIMER
+    method.
+
+EXPORTS
+
+ $TIMER => float
+
+    A tied variable that contains a running stopwatch. You can read its
+    value to get elapsed time, or you can also set its value (usually reset
+    it to 0).
+
+FUNCTIONS
+
+ timer CODE
+
+    Execute CODE and print the number of seconds passed.
+
+SEE ALSO
+
+    Benchmark modules which I often use: Benchmark, Benchmark::Dumb, Bench
+
+    To time whole programs simply, you might want to try Bench (just
+    use/load it).
+
+    For alternatives to this module, you can try: Time::HiRes directly,
+    Time::Stopwatch (the backend module which this module uses),
+    Timer::Simple (OO), Devel::Timer (OO).
+

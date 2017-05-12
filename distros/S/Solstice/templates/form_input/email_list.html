@@ -1,0 +1,10 @@
+<textarea name="<!-- sol_var name=name -->" id="<!-- sol_var name -->"><!-- sol_loop name=addresses -->
+<!-- sol_var name=address --><!-- /sol_loop --></textarea>
+<!-- sol_if name=error --><div>
+  <!-- sol_var name=error -->
+  <ul class="sol_error_notification_text">
+    <!-- sol_loop name=invalid -->
+    <li><!-- sol_var name=address --></li><!-- /sol_loop -->
+  </ul>
+</div><!-- /sol_if -->
+<br class="sol_clear" />

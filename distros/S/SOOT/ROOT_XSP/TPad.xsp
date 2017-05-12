@@ -1,0 +1,53 @@
+%module{SOOT};
+
+%{
+#include <sstream>
+%}
+
+class TPad {
+
+  void Modified(Bool_t flag = 1);
+  void Closed();
+  void CopyPixmap();
+  void CopyPixmaps();
+  void DeleteExec(const char* name);
+  Int_t GetCrosshair();
+  Double_t GetAbsHNDC();
+  Double_t GetAbsWNDC();
+  Double_t GetAbsXlowNDC();
+  Double_t GetAbsYlowNDC();
+  Double_t GetAspectRatio();
+  Int_t GetEvent();
+  Int_t GetEventX();
+  Int_t GetEventY();
+  Bool_t GetGridx();
+  Bool_t GetGridy();
+  Int_t GetLogx();
+  Int_t GetLogy();
+  Int_t GetLogz();
+  const char* GetName();
+  Int_t GetNumber();
+
+  void AddExec(const char* name, SV* command)
+    %code{%
+      SV* tmpsv;
+      if (SvROK(command)
+          && (tmpsv = SvRV(command))
+          && SvTYPE(tmpsv) == SVt_PVCV)
+      {
+        THIS->AddExec(name, "");
+        TList* execs = THIS->GetListOfExecs();
+        TExec* exec = (TExec*)execs->At(execs->GetLast());
+        const unsigned long int id = (unsigned long int)exec;
+        // FIXME this callback is never cleaned up...
+        SOOT::StorePerlCallback(aTHX_ id, command);
+        std::stringstream cmd;
+        cmd << "TExecImpl::RunPerlCallback(" << id << ")";
+        exec->SetAction(cmd.str().c_str());
+      }
+      else {
+        THIS->AddExec(name, SvPV_nolen(command));
+      }
+    %};
+};
+

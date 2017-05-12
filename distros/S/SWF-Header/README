@@ -1,0 +1,22 @@
+SWF::Header 0.01
+
+DESCRIPTION
+
+This is a simple module that uses Yasuhiro Sasama's SWF::Bitstream to
+pull descriptive information out of the header of a shockwave file. It 
+is intended for quick and easy use where shockwave files are uploaded
+or archived, and allows one to interrogate the file for the information
+needed to display it.
+
+In use, it is trivially simple:
+
+  my $header_data = SWF::Header->read_file('/path/to/file.swf');
+
+Gives you a hashref of all the header information. See the POD for 
+slightly more detail.
+
+This module is highly dependent on YSAS's SWF::Bitstream, and also on 
+his SWF::Parser, of which it is a simplified version with a more 
+friendly interface but to which it adds very little.
+
+Any problems, contact will on wross@cpan.org.

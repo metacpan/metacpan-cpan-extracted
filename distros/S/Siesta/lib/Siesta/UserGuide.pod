@@ -1,0 +1,372 @@
+# This document is written in pod.  To read it without the funny
+# formatting use perldoc Siesta::UserGuide
+
+=pod 
+
+=head1 NAME
+
+Siesta::UserGuide - a guide to setting up your siesta system.
+
+=head1 DESCRIPTION
+
+This document should take you through setting up lists and users,  and 
+generally administering your system.
+
+
+=head1 Setting up the database
+
+The first thing you need to do is create a database.
+
+Fortunately this is easy. Running
+
+    % nacho create-database
+
+should do everything for you (providing the config in your siesta.conf 
+is ok).
+
+
+=head1 Migrating a list from Mailman
+
+Use the I<bandito> tool shipped with Siesta to steal the
+config - given the path to a mailman list config db it
+should automatically create a new sistes list, subscribe any
+necessary users, set up configs and generally 'just work'.
+
+It will even migrate your archives across for you.
+
+How handy :)
+
+
+=head1 Creating a List
+
+Run this command:
+
+
+  % nacho create-list myfirstlist admin@thegestalt.org \
+                     myfirstlist@thegestalt.org \ 
+             myfirstlist-bounce@thegestalt.org
+
+which will print out. 
+
+  Created the new list 'myfirstlist' <myfirstlist@thegestalt.org>
+  Paste this into your alias file to activate the list
+
+
+
+  ## myfirstlist mailing list
+  ## created: 06-Sep-2002 nacho (the siesta config tool)
+  myfirstlist:       "/usr/bin/tequila myfirstlist"
+  myfirstlist-sub:   "/usr/bin/tequila myfirstlist sub"
+  myfirstlist-unsub: "/usr/bin/tequila myfirstlist unsub"
+  myfirstlist-admin:  admin@thegestalt.org 
+  myfirstlist-bounce: admin@thegestalt.org
+
+
+
+
+This prints out the appropriate aliases to put in your /etc/alias 
+(or equivalent) file. This can be printed out again at any 
+time by doing :
+
+
+  % nacho show-alias myfirstlist
+
+  ## myfirstlist mailing list
+  ## created: 06-Sep-2002 nacho (the siesta config tool)
+  myfirstlist:       "/usr/bin/tequila myfirstlist"
+  myfirstlist-sub:   "/usr/bin/tequila myfirstlist sub"
+  myfirstlist-unsub: "/usr/bin/tequila myfirstlist unsub"
+  myfirstlist-admin:  admin@thegestalt.org
+  myfirstlist-bounce: admin@thegestalt.org
+
+To find all the lists on the system 
+
+  % nacho show-lists
+  myfirstlist
+
+
+To look at the information for a list do 
+
+  % nacho describe-list myfirstlist
+  owner = 1
+  return_path = myfirstlist-bounce@thegestalt.org
+  post_address = myfirstlist@thegestalt.org
+  name = myfirstlist
+  id = 2
+  plugins : MembersOnly Archive SubjectTag ListHeaders Send ReplyTo
+
+or to modify that information 
+
+  % nacho modify-list myfirstlist name somenewname
+  Property 'name' set to 'somenewname' for list myfirstlist
+
+TIP : if you modify the id then what will actually happen is that a new
+list will be created with that id but with information exactly the same
+details as the previous list.
+
+
+=head1 Creating Members 
+
+You can either subscribe members manually by creating them and inserting 
+them using nacho 
+
+  % nacho create-member simon@thegestalt.org
+  Member simon@thegestalt.org added    
+
+  % nacho add-member myfirstlist simon@thegestalt.org
+  Member 'simon@thegestalt.org' added to list 'myfirstlist'
+
+Or, nacho will automatically create members if they don't exist.
+
+  % nacho add-member myfirstlist newmember@notexists.org
+
+You can add multiple people at the same time. Que Convenient.
+
+  % nacho add-member myfirstlist richardc@unibeard.net greg@mccarroll.demon.co.uk
+  Member 'richardc@unixbeard.net' added to list 'myfirstlist'
+  Member 'greg@mccarroll.demon.co.uk' added to list 'myfirstlist'
+
+
+Finally a person can subscribe by mailing 
+
+    myfirstlist-sub@thegestalt.org 
+
+address or by going through the web interface
+
+
+=head1 Managing members
+
+You can get a list of every members that's on the system.
+
+  % nacho show-members
+  greg@mccarroll.demon.co.uk
+  richardc@unixbeard.net
+  simon@thegestalt.org
+
+... or just the members subbed to a particular list.
+
+  % nacho show-members myfirstlist
+
+
+To find out all about a member, use the describe command
+
+  % nacho describe-member simon@thegestalt.org
+
+    email = simon@thegestalt.org
+    lastbounce =
+    bouncing =
+    password = bar
+    nomail =
+    id = 36
+    Subscribed to : myfirstlist, somerandomlist
+
+
+To modify information that information :
+ 
+  % nacho modify-member simon@thegestalt.org password foo
+  Property 'password' set to 'foo' for member simon@thegestalt.org
+
+Again,just changing the id will copy the member.
+
+
+=head1 Managing Plugins
+
+You can list all the plugins installed on the system.
+
+  % nacho show-plugins
+  Archive
+   -
+   save messages to maildirs
+  ...
+  UnSubscribe
+   -
+   A system plugin used for unsubscribing a member to the list
+
+
+or see the ones set for a particular list
+
+  % nacho show-plugins test
+  Plugins for test:
+
+  post:
+  Debounce
+  MembersOnly
+  Moderated
+  ListHeaders
+  ReplyTo
+  SubjectTag
+  MessageFooter
+  Send
+  Archive
+
+  sub:
+  Subscribe
+
+  unsub:
+  UnSubscribe
+
+Since plugins are 'just' normal Perl modules you can write your own or 
+download plugins other people have written and install them like any 
+other module. Siesta will autmatically detect them.
+
+To set the plugin order explicity do 
+
+  % nacho set-plugins siesta-dev Debounce SimpleSig SubjectTag Send
+  Set the plugins for siesta-dev to be :
+  1) Debounce
+  2) SimpleSig
+  3) SubjectTag
+  4) Send
+
+or to delete all the plugins just do an empty list
+
+  % nacho set-plugins siesta-dev
+  Deleted plugins from siesta-dev
+
+It should be noted that you probably always want to have the Send plugin
+(or a replacement plugin) as the last plugin.
+
+To get more information about a plugin either do 
+
+  % perldoc Siesta::Plugin::ReplyTo
+
+or ...
+
+  % nacho describe-plugin ReplyTo
+  The plugin ReplyTo has the following options :
+  - munge : should we munge the reply-to address of the message to be the list post address
+
+To find out what the current config for a list is, just add the list name.
+
+  % nacho describe-plugin ReplyTo myfirstlist
+  Preferences for list myfirstlist
+  - munge : 0
+
+And to find out a member's config options, add their email address.
+
+  % nacho describe-plugin ReplyTo myfirstlist simon@thegestalt.org
+  Personal preferences for member simon@thegestalt.org on list myfirstlist
+  - munge : 1
+
+
+
+To modify configuration for any of these
+
+  % nacho modify-plugin myfirstlist ReplyTo munge 1
+  Preferences for list myfirstlist
+
+or if you want to change a member's preference ...
+
+  % nacho modify-plugin myfirstlist ReplyTo munge 0 simon@thegestalt.org
+  Personal preferences for member simon@thegestalt.org on list myfirstlist
+
+=head1 Removing Members
+
+To remove a member from a list just do :
+
+  % nacho remove-member myfirstlist greg@mccarroll.demon.co.uk
+  Member 'greg@mccarroll.demon.co.uk' removed from list 'myfirstlist'
+
+=head1 Deleting Members
+
+Deleting a member from the system will remove them from all the lists 
+they're subscribed to and then deleted from the system.
+
+  % nacho delete-member richardc@unixbeard.net 
+  Member 'richardc@unixbeard.net' deleted.
+
+
+=head1 Handling deferred messages
+
+Deferred messages are ones being held for approval or contain 
+administrative tasks.
+
+You can see how many deferred messages there are by doing :
+
+    % nacho show-deferred
+
+    Deferred-Id: 1
+    Reason: the hell of it
+    Owner: test@foo
+
+     From: simon@thegestalt.org
+     To: people@somewhere.org
+     Subject: some subject lin
+     Date: Wed, 13 Aug 2003 15:49:30 +0100  
+
+or you can view an individual message by supplying the id
+
+    % nacho show-deferred 1
+    From: simon@thegestalt.org
+    To: people@somewhere.org
+    Subject: some subject line
+    Date: Wed, 13 Aug 2003 15:49:30 +0100  
+
+    Hello people
+
+    Simon
+
+To resume a message simply do this :
+
+    % nacho resume-deferred 1
+    Sucessfully resumed message 1
+
+
+alternatively to delete a deferred message :
+
+    % nacho delete-deferred 1
+    Message deleted from deferral queue
+
+=head1 Deleting Lists
+
+Similarly deleting a list will unsub all member from that list and then 
+remove it from the system.
+ 
+  % nacho delete-list myfirstlist
+  List 'myfirstlist' deleted
+
+
+
+=head1 Making backups
+
+Running the command 
+
+    % nacho create-backup 
+
+will print a shell script to STDOUT. 
+
+This shell script consists of nacho commands to restore your 
+systems to its glorious past should anything go wrong.
+
+=head1 Upgrading
+
+Simply make a backup as described above, install the latest version from CPAN and then 
+run the nacho generated script to restore your system.
+
+
+=head1 Miscellanous
+
+This will run mariach for all lists and output the html
+into B<siesta base>/mariachi-html/B<list name>
+
+  % nacho run-mariachi
+  
+but you're probably better off running mariachi on its own.
+
+See
+
+ % man mariachi
+
+for options.
+
+
+=head1 COPYRIGHT
+
+Copyright (C) 2002 - The Siesta Dev Team 
+
+=head1 SEE ALSO
+
+L<Siesta>, L<nacho>, L<tequila>, L<mariachi>, L<bandito>
+
+=cut
+

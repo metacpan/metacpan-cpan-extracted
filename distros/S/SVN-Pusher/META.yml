@@ -1,0 +1,33 @@
+---
+abstract: 'Propagate changesets between two different svn repositories.'
+author:
+  - '(based on SVN::Push by Gerald Richter E<lt>richter@dev.ecos.deE<gt>)'
+build_requires: {}
+configure_requires:
+  Module::Build: '0.36'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SVN-Pusher
+provides:
+  SVN::Pusher:
+    file: lib/SVN/Pusher.pm
+    version: '0.09'
+  SVN::Pusher::CmdLine:
+    file: lib/SVN/Pusher/CmdLine.pm
+  SVN::Pusher::MirrorEditor:
+    file: lib/SVN/Pusher.pm
+  SVN::Pusher::MyCallbacks:
+    file: lib/SVN/Pusher.pm
+requires:
+  SVN::Core: '0'
+  URI::Escape: '0'
+  perl: v5.8.8
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://bitbucket.org/shlomif/perl-svn-pusher
+version: '0.09'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

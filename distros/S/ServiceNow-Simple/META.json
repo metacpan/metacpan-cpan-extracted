@@ -1,0 +1,53 @@
+{
+   "abstract" : "Simple yet powerful ServiceNow API interface",
+   "author" : [
+      "Greg George <GNG@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.78, CPAN::Meta::Converter version 2.130880",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "ServiceNow-Simple",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Crypt::SSLeay" : "0",
+            "File::Basename" : "0",
+            "HTTP::Cookies" : "0",
+            "HTTP::Request::Common" : "0",
+            "IO::Socket::SSL" : "0",
+            "LWP::UserAgent" : "0",
+            "MIME::Base64" : "0",
+            "MIME::Type" : "0",
+            "MIME::Types" : "0",
+            "SOAP::Lite" : "1.06",
+            "XML::Simple" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.10"
+}

@@ -1,0 +1,62 @@
+NAME
+    String::LineNumber - Give line number to each line of string
+
+VERSION
+    This document describes version 0.01 of String::LineNumber (from Perl
+    distribution String-LineNumber), released on 2014-12-10.
+
+FUNCTIONS
+  linenum($str, \%opts) => STR
+    Add line numbers. For example:
+
+         1|line1
+         2|line2
+          |
+         4|line4
+
+    Known options:
+
+    *   width => INT (default: 4)
+
+    *   zeropad => BOOL (default: 0)
+
+        If turned on, will output something like:
+
+          0001|line1
+          0002|line2
+              |
+          0004|line4
+
+    *   skip_empty => BOOL (default: 1)
+
+        If set to false, keep printing line number even if line is empty:
+
+             1|line1
+             2|line2
+             3|
+             4|line4
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/String-LineNumber>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-String-LineNumber>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=String-LineNumber>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

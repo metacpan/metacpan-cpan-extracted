@@ -1,0 +1,32 @@
+STAFService version 0.23
+========================
+
+This module was create to enable writing STAF services in Perl.
+It is done by placing a DLL/SO that STAF can refer to, and embeding Perl inside it.
+For the service writer - just write a service handler. Its simple.
+See the documentation.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+You might need to fiddle a bit with the make file, if it is not working on you platform.
+Is known to work in MSWindowsXP, with MSVC6, and should work on linux.
+
+DEPENDENCIES
+
+This module requires STAF 3 and up, up and running.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Shmuel Fomberg
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+

@@ -1,0 +1,9 @@
+<div class="content login span12 text-center">
+    [% IF message %]
+    <div class="alert alert-error">
+        [% message %]
+    </div>
+    [% END %]
+    [% form %]
+</div>
+

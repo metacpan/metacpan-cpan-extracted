@@ -1,0 +1,2151 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Number::Number
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = Number.new(...);
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef::Object::Object
+	* Sidef::Convert::Convert
+
+=head1 METHODS
+
+
+=head2 !
+
+I<Obj> B<!> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<fac>, I<factorial>
+
+=cut
+
+=head2 !!
+
+I<Obj> B<!!> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<dfac>, I<dfactorial>, I<double_factorial>
+
+=cut
+
+=head2 %
+
+I<Obj> B<%> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<mod>
+
+=cut
+
+=head2 %%
+
+I<Obj> B<%%> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<is_div>
+
+=cut
+
+=head2 &
+
+I<Obj> B<&> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<and>
+
+=cut
+
+=head2 *
+
+I<Obj> B<*> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<mul>
+
+=cut
+
+=head2 **
+
+I<Obj> B<**> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<pow>
+
+=cut
+
+=head2 +
+
+I<Obj> B<+> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<add>
+
+=cut
+
+=head2 ++
+
+I<Obj> B<++> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<inc>
+
+=cut
+
+=head2 -
+
+I<Obj> B<-> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<sub>
+
+=cut
+
+=head2 --
+
+I<Obj> B<--> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<dec>
+
+=cut
+
+=head2 ..
+
+I<Obj> B<..> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<to>, I<upto>
+
+=cut
+
+=head2 ..^
+
+I<Obj> B<..^> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<xto>, I<xupto>
+
+=cut
+
+=head2 /
+
+I<Obj> B</> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<÷()>, I<div>
+
+=cut
+
+=head2 //
+
+I<Obj> B<//> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<idiv>
+
+=cut
+
+=head2 :
+
+I<Obj> B<:> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<pair>
+
+=cut
+
+=head2 <
+
+I<Obj> B<E<lt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<lt>
+
+=cut
+
+=head2 <<
+
+I<Obj> B<E<lt>E<lt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<lsft>, I<shift_left>
+
+=cut
+
+=head2 <=>
+
+I<Obj> B<E<lt>=E<gt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<cmp>
+
+=cut
+
+=head2 ==
+
+I<Obj> B<==> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<eq>
+
+=cut
+
+=head2 >
+
+I<Obj> B<E<gt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<gt>
+
+=cut
+
+=head2 >>
+
+I<Obj> B<E<gt>E<gt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<rsft>, I<shift_right>
+
+=cut
+
+=head2 ^
+
+I<Obj> B<^> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<xor>
+
+=cut
+
+=head2 ^..
+
+I<Obj> B<^..> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<xdownto>
+
+=cut
+
+=head2 abs
+
+Number.abs() -> I<Obj>
+
+Return the
+
+Aliases: I<pos>, I<positive>
+
+=cut
+
+=head2 acos
+
+Number.acos() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 acosh
+
+Number.acosh() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 acot
+
+Number.acot() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 acoth
+
+Number.acoth() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 acsc
+
+Number.acsc() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 acsch
+
+Number.acsch() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 agm
+
+Number.agm() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ai
+
+Number.ai() -> I<Obj>
+
+Return the
+
+Aliases: I<airy>
+
+=cut
+
+=head2 as_bin
+
+Number.as_bin() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 as_dec
+
+Number.as_dec() -> I<Obj>
+
+Return the
+
+Aliases: I<as_float>
+
+=cut
+
+=head2 asec
+
+Number.asec() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 asech
+
+Number.asech() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 as_frac
+
+Number.as_frac() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 as_hex
+
+Number.as_hex() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 asin
+
+Number.asin() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 asinh
+
+Number.asinh() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 as_int
+
+Number.as_int() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 as_oct
+
+Number.as_oct() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 as_rat
+
+Number.as_rat() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 atan
+
+Number.atan() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 atan2
+
+Number.atan2() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 atanh
+
+Number.atanh() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 base
+
+Number.base() -> I<Obj>
+
+Return the
+
+Aliases: I<in_base>
+
+=cut
+
+=head2 bell
+
+Number.bell() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 bern
+
+Number.bern() -> I<Obj>
+
+Return the
+
+Aliases: I<bernfrac>, I<bernoulli>
+
+=cut
+
+=head2 bernreal
+
+Number.bernreal() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 bessel_j
+
+Number.bessel_j() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 bessel_y
+
+Number.bessel_y() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 beta
+
+Number.beta() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 C
+
+Number.C() -> I<Obj>
+
+Return the
+
+Aliases: I<catalan>
+
+=cut
+
+=head2 carmichael_lambda
+
+Number.carmichael_lambda() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 cbrt
+
+Number.cbrt() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ceil
+
+Number.ceil() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 chr
+
+Number.chr() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 cis
+
+Number.cis() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 commify
+
+Number.commify() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 complex
+
+Number.complex() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 conj
+
+Number.conj() -> I<Obj>
+
+Return the
+
+Aliases: I<conjug>, I<conjugate>
+
+=cut
+
+=head2 cos
+
+Number.cos() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 cosh
+
+Number.cosh() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 cot
+
+Number.cot() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 coth
+
+Number.coth() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 csc
+
+Number.csc() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 csch
+
+Number.csch() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 de
+
+Number.de() -> I<Obj>
+
+Return the
+
+Aliases: I<denominator>
+
+=cut
+
+=head2 defs
+
+Number.defs() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 deg2rad
+
+Number.deg2rad() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 digit
+
+Number.digit() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 digits
+
+Number.digits() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 divides
+
+Number.divides() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 divisors
+
+Number.divisors() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 divmod
+
+Number.divmod() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 downto
+
+Number.downto() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 dump
+
+Number.dump() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 e
+
+Number.e() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ei
+
+Number.ei() -> I<Obj>
+
+Return the
+
+Aliases: I<eint>
+
+=cut
+
+=head2 erf
+
+Number.erf() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 erfc
+
+Number.erfc() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 exp
+
+Number.exp() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 exp10
+
+Number.exp10() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 exp2
+
+Number.exp2() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 exp_mangoldt
+
+Number.exp_mangoldt() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 expmod
+
+Number.expmod() -> I<Obj>
+
+Return the
+
+Aliases: I<modpow>, I<powmod>
+
+=cut
+
+=head2 factor
+
+Number.factor() -> I<Obj>
+
+Return the
+
+Aliases: I<factors>
+
+=cut
+
+=head2 factor_exp
+
+Number.factor_exp() -> I<Obj>
+
+Return the
+
+Aliases: I<factors_exp>
+
+=cut
+
+=head2 fib
+
+Number.fib() -> I<Obj>
+
+Return the
+
+Aliases: I<fibonacci>
+
+=cut
+
+=head2 float
+
+Number.float() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 floor
+
+Number.floor() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 forcomb
+
+Number.forcomb() -> I<Obj>
+
+Return the
+
+Aliases: I<combinations>
+
+=cut
+
+=head2 forperm
+
+Number.forperm() -> I<Obj>
+
+Return the
+
+Aliases: I<permutations>
+
+=cut
+
+=head2 gcd
+
+Number.gcd() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 harm
+
+Number.harm() -> I<Obj>
+
+Return the
+
+Aliases: I<harmfrac>, I<harmonic>
+
+=cut
+
+=head2 harmreal
+
+Number.harmreal() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 hypot
+
+Number.hypot() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 i
+
+Number.i() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 iadd
+
+Number.iadd() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 icbrt
+
+Number.icbrt() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ilog
+
+Number.ilog() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ilog10
+
+Number.ilog10() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ilog2
+
+Number.ilog2() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 im
+
+Number.im() -> I<Obj>
+
+Return the
+
+Aliases: I<imag>, I<imaginary>
+
+=cut
+
+=head2 imod
+
+Number.imod() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 imul
+
+Number.imul() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 inf
+
+Number.inf() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 int
+
+Number.int() -> I<Obj>
+
+Return the
+
+Aliases: I<trunc>
+
+=cut
+
+=head2 inv
+
+Number.inv() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 invmod
+
+Number.invmod() -> I<Obj>
+
+Return the
+
+Aliases: I<modinv>
+
+=cut
+
+=head2 ipow
+
+Number.ipow() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 irand
+
+Number.irand() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 iroot
+
+Number.iroot() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 irootrem
+
+Number.irootrem() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_complex
+
+Number.is_complex() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 iseed
+
+Number.iseed() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_even
+
+Number.is_even() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_imag
+
+Number.is_imag() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_inf
+
+Number.is_inf() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_int
+
+Number.is_int() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_mersenne_prime
+
+Number.is_mersenne_prime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_mone
+
+Number.is_mone() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_nan
+
+Number.is_nan() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_neg
+
+Number.is_neg() -> I<Obj>
+
+Return the
+
+Aliases: I<is_negative>
+
+=cut
+
+=head2 is_ninf
+
+Number.is_ninf() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_odd
+
+Number.is_odd() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_one
+
+Number.is_one() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_pos
+
+Number.is_pos() -> I<Obj>
+
+Return the
+
+Aliases: I<is_positive>
+
+=cut
+
+=head2 is_pow
+
+Number.is_pow() -> I<Obj>
+
+Return the
+
+Aliases: I<is_power>
+
+=cut
+
+=head2 is_prime
+
+Number.is_prime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_prime_power
+
+Number.is_prime_power() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_primitive_root
+
+Number.is_primitive_root() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_prob_prime
+
+Number.is_prob_prime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_prov_prime
+
+Number.is_prov_prime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 isqrt
+
+Number.isqrt() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 isqrtrem
+
+Number.isqrtrem() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_rat
+
+Number.is_rat() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_real
+
+Number.is_real() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_semiprime
+
+Number.is_semiprime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_sqr
+
+Number.is_sqr() -> I<Obj>
+
+Return the
+
+Aliases: I<is_square>
+
+=cut
+
+=head2 is_square_free
+
+Number.is_square_free() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 isub
+
+Number.isub() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_zero
+
+Number.is_zero() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 jacobi
+
+Number.jacobi() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 jordan_totient
+
+Number.jordan_totient() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 kronecker
+
+Number.kronecker() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 lambert_w
+
+Number.lambert_w() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 lcm
+
+Number.lcm() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 legendre
+
+Number.legendre() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 len
+
+Number.len() -> I<Obj>
+
+Return the
+
+Aliases: I<size>, I<length>
+
+=cut
+
+=head2 lgamma
+
+Number.lgamma() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 lgrt
+
+Number.lgrt() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 li
+
+Number.li() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 li2
+
+Number.li2() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 liouville
+
+Number.liouville() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ln
+
+Number.ln() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ln2
+
+Number.ln2() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 lngamma
+
+Number.lngamma() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 log
+
+Number.log() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 log10
+
+Number.log10() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 log2
+
+Number.log2() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 lucas
+
+Number.lucas() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 make_coprime
+
+Number.make_coprime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 max
+
+Number.max() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 mfac
+
+Number.mfac() -> I<Obj>
+
+Return the
+
+Aliases: I<mfactorial>
+
+=cut
+
+=head2 min
+
+Number.min() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 mone
+
+Number.mone() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 nan
+
+Number.nan() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 neg
+
+Number.neg() -> I<Obj>
+
+Return the
+
+Aliases: I<negative>
+
+=cut
+
+=head2 new
+
+Number.new() -> I<Obj>
+
+Return the
+
+Aliases: I<call>
+
+=cut
+
+=head2 next_pow
+
+Number.next_pow() -> I<Obj>
+
+Return the
+
+Aliases: I<next_power>
+
+=cut
+
+=head2 next_pow2
+
+Number.next_pow2() -> I<Obj>
+
+Return the
+
+Aliases: I<next_power2>
+
+=cut
+
+=head2 next_prime
+
+Number.next_prime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ninf
+
+Number.ninf() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 nok
+
+Number.nok() -> I<Obj>
+
+Return the
+
+Aliases: I<binomial>
+
+=cut
+
+=head2 norm
+
+Number.norm() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 nu
+
+Number.nu() -> I<Obj>
+
+Return the
+
+Aliases: I<numerator>
+
+=cut
+
+=head2 nude
+
+Number.nude() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 of
+
+Number.of() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 one
+
+Number.one() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 partitions
+
+Number.partitions() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 perfect_power
+
+Number.perfect_power() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 perfect_root
+
+Number.perfect_root() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 phi
+
+Number.phi() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 pi
+
+Number.pi() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 pn_primorial
+
+Number.pn_primorial() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 popcount
+
+Number.popcount() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 prev_prime
+
+Number.prev_prime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 prime
+
+Number.prime() -> I<Obj>
+
+Return the
+
+Aliases: I<nth_prime>
+
+=cut
+
+=head2 prime_count
+
+Number.prime_count() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 prime_power
+
+Number.prime_power() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 prime_root
+
+Number.prime_root() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 primes
+
+Number.primes() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 primorial
+
+Number.primorial() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 rad
+
+Number.rad() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 rad2deg
+
+Number.rad2deg() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ramanujan_tau
+
+Number.ramanujan_tau() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 rand
+
+Number.rand() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 random_nbit_prime
+
+Number.random_nbit_prime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 random_ndigit_prime
+
+Number.random_ndigit_prime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 random_prime
+
+Number.random_prime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 range
+
+Number.range() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 rat
+
+Number.rat() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 re
+
+Number.re() -> I<Obj>
+
+Return the
+
+Aliases: I<real>
+
+=cut
+
+=head2 reals
+
+Number.reals() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 remdiv
+
+Number.remdiv() -> I<Obj>
+
+Return the
+
+Aliases: I<remove>
+
+=cut
+
+=head2 root
+
+Number.root() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 round
+
+Number.round() -> I<Obj>
+
+Return the
+
+Aliases: I<roundf>
+
+=cut
+
+=head2 sec
+
+Number.sec() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sech
+
+Number.sech() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 seed
+
+Number.seed() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sgn
+
+Number.sgn() -> I<Obj>
+
+Return the
+
+Aliases: I<sign>
+
+=cut
+
+=head2 sigma0
+
+Number.sigma0() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sin
+
+Number.sin() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sin_cos
+
+Number.sin_cos() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sinh
+
+Number.sinh() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sqr
+
+Number.sqr() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sqrt
+
+Number.sqrt() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 square_free_count
+
+Number.square_free_count() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 stirling
+
+Number.stirling() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 stirling2
+
+Number.stirling2() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 stirling3
+
+Number.stirling3() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 tan
+
+Number.tan() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 tanh
+
+Number.tanh() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 tau
+
+Number.tau() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 times
+
+Number.times() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 valuation
+
+Number.valuation() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 Y
+
+Number.Y() -> I<Obj>
+
+Return the
+
+Aliases: I<γ>, I<euler>
+
+=cut
+
+=head2 zero
+
+Number.zero() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 znorder
+
+Number.znorder() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 znprimroot
+
+Number.znprimroot() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 |
+
+I<Obj> B<|> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<or>
+
+=cut
+
+=head2 ~
+
+I<Obj> B<~> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<not>
+
+=cut
+
+=head2 Γ
+
+Number.Γ() -> I<Obj>
+
+Return the
+
+Aliases: I<gamma>
+
+=cut
+
+=head2 ζ
+
+Number.ζ() -> I<Obj>
+
+Return the
+
+Aliases: I<zeta>
+
+=cut
+
+=head2 η
+
+Number.η() -> I<Obj>
+
+Return the
+
+Aliases: I<eta>
+
+=cut
+
+=head2 μ
+
+Number.μ() -> I<Obj>
+
+Return the
+
+Aliases: I<mobius>, I<moebius>
+
+=cut
+
+=head2 σ
+
+Number.σ() -> I<Obj>
+
+Return the
+
+Aliases: I<sigma>
+
+=cut
+
+=head2 Ψ
+
+Number.Ψ() -> I<Obj>
+
+Return the
+
+Aliases: I<digamma>
+
+=cut
+
+=head2 Ω
+
+Number.Ω() -> I<Obj>
+
+Return the
+
+Aliases: I<big_omega>
+
+=cut
+
+=head2 ω
+
+Number.ω() -> I<Obj>
+
+Return the
+
+Aliases: I<omega>
+
+=cut
+
+=head2 ϕ
+
+Number.ϕ() -> I<Obj>
+
+Return the
+
+Aliases: I<totient>, I<euler_phi>, I<euler_totient>
+
+=cut
+
+=head2 ≠
+
+I<Obj> B<≠> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<!=()>, I<ne>
+
+=cut
+
+=head2 ≤
+
+I<Obj> B<≤> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<E<lt>=>, I<le>
+
+=cut
+
+=head2 ≥
+
+I<Obj> B<≥> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<E<gt>=>, I<ge>
+
+=cut

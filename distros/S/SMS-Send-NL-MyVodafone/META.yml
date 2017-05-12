@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                SMS-Send-NL-MyVodafone
+version:             0.04
+abstract:            An SMS::Send driver for the my.vodafone.nl website
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.36
+distribution_type:   module
+requires:     
+    SMS::Send:                     0.02
+    Test::Simple:                  0.44
+    WWW::Mechanize:                0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - M. Blom (blom@cpan.org)

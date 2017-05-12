@@ -1,0 +1,37 @@
+Revision history for String-Truncate
+
+1.100602  2014-03-15 17:21:42+01:00 Europe/Paris
+          typo fixes (thanks, David Steinbrunner)
+
+1.100601  2013-10-15 22:38:52 America/New_York
+          update bugtracker and repo metadata
+
+1.100600  2011-03-26 07:32:57 America/New_York
+          fix documention: the argument is "truncate" not "elite"
+          (thanks for the report, Tommy Stanton!)
+
+1.100570  2010-02-26 15:09:16 America/New_York
+          do not break elide at_space on newline; resolves RT #45493
+          convert to Dist::Zilla
+
+0.102     2007-07-23
+          add at_space option to break text at whitespace
+
+0.100     2006-06-10
+          use Sub::Exporter::Util::merge_col to allow per-import args
+
+0.06      2006-03-12
+          replace custom exporter with Sub::Exporter
+
+0.05      2006-02-24
+          fixed some bugs with short strings or long markers
+          trunc_ and elide_with_defaults for custom elide/trunc
+          new exporter with per-import defaults
+          extensive refactoring; 100% coverage!
+
+0.02      2005-10-15, a little later
+          added 'ends' truncation
+
+0.01      2005-10-15
+          released!
+

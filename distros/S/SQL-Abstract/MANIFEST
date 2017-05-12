@@ -1,0 +1,42 @@
+Changes
+examples/console.pl
+examples/dbic-console.pl
+examples/sqla-format
+lib/DBIx/Class/Storage/Debug/PrettyPrint.pm
+lib/SQL/Abstract.pm
+lib/SQL/Abstract/Test.pm
+lib/SQL/Abstract/Tree.pm
+maint/Makefile.PL.include
+Makefile.PL
+MANIFEST			This list of files
+t/00new.t
+t/01generate.t
+t/02where.t
+t/03values.t
+t/04modifiers.t
+t/05in_between.t
+t/06order_by.t
+t/07subqueries.t
+t/08special_ops.t
+t/09refkind.t
+t/10test.t
+t/11parser.t
+t/12confmerge.t
+t/12format_keyword.t
+t/13whitespace_keyword.t
+t/14roundtrippin.t
+t/15placeholders.t
+t/16no_sideeffects.t
+t/20injection_guard.t
+t/21op_ident.t
+t/22op_value.t
+t/23_is_X_value.t
+t/dbic/bulk-insert.t
+t/dbic/no-repeats.t
+t/dbic/show-progress.t
+xt/90pod.t
+xt/91podcoverage.t
+xt/92whitespace.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+README                                   README file (added by Distar)

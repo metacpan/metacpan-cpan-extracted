@@ -1,0 +1,10 @@
+Revision history for Perl module SMS::Send::NANP::Raco_TMO
+
+0.03 2015-12-03
+  - Moving SMS-Send-Raco_TMO to SMS-Send-NANP-Raco_TMO namespace per SMS-Send business rules
+
+0.02 2015-11-23
+  - Updated lib/SMS/Send/Raco_TMO.pm to use SMS::Send::Driver::WebService as a place for common code
+
+0.01 2015-10-21
+  - original version; created by ExtUtils::ModuleMaker 0.51

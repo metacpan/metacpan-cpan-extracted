@@ -1,0 +1,41 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Perl::Perl
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = Perl.new(...);
+
+=head1 METHODS
+
+
+=head2 eval
+
+Perl.eval() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 new
+
+Perl.new() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 to_sidef
+
+Perl.to_sidef() -> I<Obj>
+
+Return the
+
+=cut

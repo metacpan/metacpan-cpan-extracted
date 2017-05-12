@@ -1,0 +1,53 @@
+Set::Toolkit
+
+Version 0.11
+
+The Set Toolkit intends to provide a broad, robust interface to sets of
+data.  Largely inspired by Set::Object, a default set from the Set Toolkit
+should behave similarly enough to those created by Set::Object that 
+interchanging between the two is fairly easy and intuitive.
+
+In addition to the set functionality already available around the CPAN,
+the Set Toolkit provides the ability to perform fairly complex, chained
+searches against the set, ordered and unordered considerations, as well
+as the ability to enforce or relax a uniqueness constraint (enforced by
+default).  Sets can be taken in various contexts, including string, boolean,
+and array(ref).
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Set::Toolkit
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Set::Toolkit
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Set::Toolkit
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Set::Toolkit
+
+    Search CPAN
+        http://search.cpan.org/dist/Set::Toolkit
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 Sir Robert Burbridge
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

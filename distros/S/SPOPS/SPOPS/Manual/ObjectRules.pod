@@ -1,0 +1,224 @@
+=head1 NAME
+
+SPOPS::Manual::ObjectRules - Use rules to give your object custom behavior
+
+=head1 SYNOPSIS
+
+This document aims to answer the questions:
+
+=over 4
+
+=item *
+
+What is a rule?
+
+=item *
+
+What can a rule do?
+
+=item *
+
+What is a ruleset?
+
+=item *
+
+How do I implement a rule?
+
+=back
+
+=head1 DESCRIPTION
+
+When a SPOPS object calls C<save()>, C<fetch()>, or C<remove()>, the
+implementing class (e.g., L<SPOPS::DBI|SPOPS::DBI>) takes care of most
+of the details for retrieving and constructing the object. However,
+sometimes you want to do something more complex or different. Each
+data manipulation method allows you to define two methods to
+accomplish these things. One is called before the action is taken
+(usually at the very beginning of the action) and the other after the
+action has been successfully completed.
+
+What kind of actions might you want to accomplish? Cascading deletes
+(when you delete one object, delete a number of dependent objects as
+well); dependent fetches (when you fetch one object, fetch all its
+component objects as well); implement a consistent data layer (such as
+full-text searching) by sending all inserts and updates to a separate
+module or daemon; data validation (by submitting the data in the
+object to a rules engine). Whatever -- it's up to you.
+
+Each of these actions is a rule, and together they are rulesets.
+
+=head2 Rule Guidelines
+
+There are some fairly simple guidelines to rules:
+
+=over 4
+
+=item 1.
+
+Each rule is independent of every other rule. Why? Rules for a
+particular action may be executed in an arbitrary order. You cannot
+guarantee that the rule from one class will execute before the rule
+from a separate class.
+
+=item 2.
+
+A rule should not change the data of the object on which it
+operates. Each rule should be operating on the same data. And since
+guideline 1 states the rules can be executed in any order, changing
+data for use in a separate rule would create a dependency between
+them.
+
+NOTE: This item is up for debate
+
+=item 3.
+
+If a rule fails, then the action is aborted. This is central to how
+the ruleset operates, since it allows inherited behaviors to have a
+say on whether a particular object is fetched, saved or removed.
+
+NOTE: This will probably be dropped in favor of a more flexible scheme
+that allows non-essential rules to fail without forcing the entire
+action to fail.
+
+=back
+
+=head2 Rule Uses
+
+Rules enable you to implement a 'layer' over certain classes of
+data. Perhaps you want to collect how many times users from various
+groups visit a set of objects on your website. You can create a fairly
+simple class that puts a rule into the ruleset of its children that
+creates a log entry every time a particular object is
+I<fetch()>ed. The class could also contain methods for dealing with
+this information.
+
+This rule is entirely separate and independent from other rules, and
+does not interfere with the normal operation except to add information
+to a separate area of the database as the actions are happening. In
+this manner, you can think of them as a trigger as implemented in a
+relational database. However, triggers can (and often do) modify the
+data of the row that is being manipulated, whereas a rule should not.
+
+=head2 Rules and Aspects
+
+Another useful way to think of rules is in terms of aspect oriented
+programming (AOP). AOP works in conjunction with other methods of
+programming (object-oriented, procedural, functional) and allows you
+to create joinpoints at which you perform actions with and on
+different types of data.
+
+Read up more about AOP in the L<Aspect|Aspect> module, particularly
+L<Aspect::Intro|Aspect::Intro>.
+
+=head1 RULESET HOOKS
+
+B<pre_fetch_action({ id =E<gt> $ })>
+
+Called before a fetch is done, although if an object is retrieved from
+the cache this action is skipped. (NOTE: THIS MIGHT NOT BE TRUE -- WE
+NEED TO IMPLEMENT CACHING AND SEE HOW THIS WORKS IN REALITY.) The only
+argument is the ID of the object you are trying to fetch.
+
+This hook is generally not used very often.
+
+B<post_fetch_action( \% )>
+
+Called after a fetch has been successfully completed, including after
+a positive cache hit.
+
+B<pre_save_action({ is_add =E<gt> bool })>
+
+Called before a save has been attempted. If this is an add operation
+(versus an update), we pass in a true value for the 'is_add' parameter.
+
+B<post_save_action({ is_add =E<gt> bool })>
+
+Called after a save has been successfully completed. If this object
+was just added to the data store, we pass in a true value for the
+'is_add' parameter.
+
+B<pre_remove_action( \% )>
+
+Called before a remove has been attempted.
+
+B<post_remove_action( \% )>
+
+Called after a remove has been successfully completed.
+
+=head1 RULE IMPLEMENTATION
+
+Adding rules to an object class is very simple. You have one simple
+method to create to add your rule(s) to the ruleset for an object, and
+then the actual rules.
+
+=head2 Rule Factory
+
+B<ruleset_factory( $class, \%class_ruleset )>
+
+Interface for adding rules to a class. The first argument is the class
+to which we want to add the ruleset, the second is the ruleset for the
+class. The ruleset is simply a hash reference with keys as the methods
+named above ('pre_fetch_action', etc.) pointing to an arrayref of code
+references.
+
+This means that every phase named above above ('pre_fetch_action',
+etc.) can run more than one rule. Here is an example of what such a
+method might look like -- this one is taken from a class that
+implements full-text indexing. When the object is saved successfully,
+we want to submit the object contents to our indexing routine. When
+the object has been removed successfully, we want to remove the object
+from our index:
+
+  sub ruleset_factory {
+    my ( $class, $rs_table ) = @_;
+    my $obj_class = ref $class || $class;
+    push @{ $rs_table->{post_save_action} }, \&reindex_object;
+    push @{ $rs_table->{post_remove_action} }, \&remove_object_from_index;
+    return __PACKAGE__;
+  }
+
+Note that the return value is always the package that inserted the
+rule(s) into the ruleset. This enables the module that creates the
+class (L<SPOPS::Configure::Ruleset|SPOPS::Configure::Ruleset>) to
+ensure that the same rule does not get entered multiple times.
+
+B<POSSIBLE CHANGES>
+
+Instead of the above, we may change to something like:
+
+  sub ruleset_factory {
+    my ( $class ) = @_;
+    return { post_save_action   => \&reindex_object,
+             post_remove_action => \&remove_object_from_index };
+  }
+
+This is simpler, easier to follow and more consistent with how we
+discover behaviors to execute during the code generation process.
+
+=head2 Rule Processor
+
+You should never have to worry about this since it is implemented in
+L<SPOPS|SPOPS> and therefore part of every SPOPS class. But it is here
+for completeness:
+
+B<ruleset_process_action( ($object|$class), $action, \%params )>
+
+This method executes all the rules in a given ruleset for a given
+action. For instance, when called with the action name
+'pre_fetch_action' it executes all the rules in that part of the
+ruleset.
+
+Return value is true if all the rules executed ok, false if not.
+
+NOTE: THIS MAY BE MODIFIED SO THAT EACH RULE CAN REPORT A STATUS WHICH
+IS AVAILABLE FOR LATER INSPECTION.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2001-2004 Chris Winters. All rights reserved.
+
+See L<SPOPS::Manual|SPOPS::Manual> for license.
+
+=head1 AUTHORS
+
+Chris Winters E<lt>chris@cwinters.comE<gt>

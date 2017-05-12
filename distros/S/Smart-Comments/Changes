@@ -1,0 +1,50 @@
+Revision history for Perl module Smart::Comments
+
+1.06 2015-10-24 NEILB
+    - Added min perl version to code, so it will now appear in metadata
+    - Added L<> links around the dependencies listed in the doc. RT#16456
+    - Fixed some failing tests reported from CPAN Testers
+
+1.05_01 2015-10-22 NEILB
+    - The test t/while_num.t was using subtests in a way that requires
+      *I think* at least verson 0.99 of Test::More.
+      This caused some CPAN Testers failures.
+      Set min version on Test::More in just that test.
+    - The github repo changed to reflect my changed github username
+
+1.05_01 2015-10-20 NEILB
+    - Reformatted as per CPAN::Changes::Spec, most recent release first.
+    - Switched to Dist::Zilla
+    - Added min perl version to code, so it will now appear in metadata
+    - Added L<> links around the dependencies listed in the doc. RT#16456
+
+1.000005 2013-07-19 DCONWAY
+    - Fixed typo in docs
+    - Fixed bad assumption (nolongdouble) in t/while_num.t
+
+1.000004 2013-06-26 DCONWAY
+    - Fixed bug in handling of <line> and <file> (thanks Fred)
+
+v1.0.3 2008-02-22 DCONWAY
+    - Added -ENV config option (thanks Steven)
+    - Added doc note about -MSmart::Comments approach (thanks David)
+    - Smartened up vertical spacing of output (thanks Steve!)
+
+v1.0.2 2006-02-17 DCONWAY
+    - Cleaned up bracket alignment when printing variable contents
+    - Added [][] (and other bracket pairs) as valid fill sequences
+      (thanks Jerrad)
+    - Added <now>, <here>, etc. timespace stamps (thanks Tomi)
+
+1.0.1 2005-05-25 DCONWAY
+    - New release to override previous CPAN version
+
+0.0.3 2005-05-24 DCONWAY
+    - New release to reacquire CPAN ownership (thanks Autrijus)
+
+0.0.2 2005-05-24 DCONWAY
+    - No changes logged
+
+0.01 2004-09-27 AUTRIJUS
+    - Initial release.
+

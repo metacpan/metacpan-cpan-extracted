@@ -1,0 +1,72 @@
+#!/usr/local/bin/perl -s
+
+$line_cnt = 10 ;
+$offset = 175 ;
+$base_off = 0 ;
+$xskip = ( $^O eq 'solaris' ) ? 600 : 500 ;
+
+my @children ;
+
+$SIG{ 'INT' } = \&cleanup ;
+
+if ( $s ) {
+
+	$ssfe = 'ssfe' ;
+	$prompt = '-prompt Stem:' ;
+	$prompt2 = '-prompt Chat:' ;
+	$echo = 'console_echo=1'
+}
+
+foreach $cmd ( split /\n/, <<EOT ) {
+xterm -T Chat1 -n Chat1 -geometry 80x25+XSKIP+0   -e $ssfe $prompt run_stem $echo  chat_server
+xterm -T Chat2 -n Chat2 -geometry 80x25+XSKIP+250 -e $ssfe $prompt run_stem $echo  chat_client
+xterm -T A -n A -geometry 80xLINE+0+OFF -e $ssfe $prompt2 telnet localhost 6666
+xterm -T B -n B -geometry 80xLINE+0+OFF -e $ssfe $prompt2 telnet localhost 6667
+xterm -T C -n C -geometry 80xLINE+0+OFF -e $ssfe $prompt2 telnet localhost 6668
+xterm -T D -n D -geometry 80xLINE+0+OFF -e $ssfe $prompt2 telnet localhost 6669
+EOT
+
+	$cmd =~ s/XSKIP/$xskip/ ;
+
+	$cmd =~ s/LINE/$line_cnt/ ;
+	$cmd =~ s/OFF/$base_off/ and $base_off += $offset ;
+
+print "$cmd\n" ;
+
+	@cmd = split ' ', $cmd ;
+
+	s/:/: / for @cmd ;
+
+	fork_exec( @cmd ) ;
+	sleep 2 unless $cmd =~ /localhost/ ;
+}
+
+while( <STDIN> ) {
+
+	next unless /^q/i ;
+
+	cleanup() ;
+}
+
+sub cleanup {
+
+	print "clean up\n" ;
+
+	kill 9, @children ;
+	wait ;	
+	exit ;
+
+}
+
+sub fork_exec {
+
+	my( @exec ) = @_ ;
+
+	if ( $pid = fork() ) {
+
+		push @children, $pid ;
+		return ;
+	}
+
+	exec @exec ;
+}

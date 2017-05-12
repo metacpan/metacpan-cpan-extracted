@@ -1,0 +1,29 @@
+Readme for SVN::TXN::Props version 1.00
+=====================================
+
+SVN::TXN::Props is a module that provides a hash interface to revision
+properties in a subversion transaction.  When use in a pre-commit hook
+script, this allows revision properties to be manipulated before the
+transaction is commited to the repository, for instance by updating
+the svn:author or svn:log properties.
+
+For more details, see the pod documentation in SVN/TXN/Props.pm
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires the SVN perl bindings to be available.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Chris Leishman
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.

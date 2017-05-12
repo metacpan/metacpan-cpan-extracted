@@ -1,0 +1,14 @@
+NAME
+    Sort::Fields - Sort lines containing delimited fields
+
+SYNOPSIS
+      use Sort::Fields;
+      @sorted = fieldsort [3, '2n'], @lines;
+      @sorted = fieldsort '\+', [-1, -3, 0], @lines;
+
+      $sort_3_2n = make_fieldsort [3, '2n'], @lines;
+      @sorted = $sort_3_2n->(@lines);
+
+AUTHOR
+    Joseph N. Hall, joseph@5sigma.com
+

@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         SMS-Send-NL-Mollie
+version:      0.01
+version_from: lib/SMS/Send/NL/Mollie.pm
+installdirs:  site
+requires:
+    Carp:                          0
+    Net::SMS::Mollie:              0
+    SMS::Send:                     0
+    Test::More:                    0.47
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

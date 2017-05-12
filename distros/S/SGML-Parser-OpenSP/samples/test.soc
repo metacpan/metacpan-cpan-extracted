@@ -1,0 +1,3 @@
+SGMLDECL "xml.dcl"
+OVERRIDE YES
+PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "xhtml1-strict-s.dtd"

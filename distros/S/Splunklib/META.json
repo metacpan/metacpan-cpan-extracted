@@ -1,0 +1,47 @@
+{
+   "abstract" : "the Splunk SDK to create custom commands in Perl",
+   "author" : [
+      "GomoR <gomor_at_cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "artistic_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Splunklib",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Module::Build" : "0",
+            "Text::CSV_XS" : "0",
+            "URI::Escape" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "v5.6.1"
+         }
+      }
+   },
+   "provides" : {
+      "Splunklib" : {
+         "file" : "lib/Splunklib.pm",
+         "version" : "0.23"
+      },
+      "Splunklib::Intersplunk" : {
+         "file" : "lib/Splunklib/Intersplunk.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_1_0"
+      ]
+   },
+   "version" : "0.23"
+}

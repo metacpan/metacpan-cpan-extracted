@@ -1,0 +1,322 @@
+#!/usr/bin/perl -w
+# $Id$ 
+# ranked, enhanced 'apropos' emulator
+use strict; 
+use warnings;
+
+use Getopt::Long qw(:config no_ignore_case);
+use Sman::Util; # for $VERSION
+use Sman::IndexVersion;
+use FindBin qw($Bin); 
+use Sman::Config;
+use bytes; # NOTE: swish-e won't understand UTF8/multi-byte chars
+
+my ($max,$rankshow,$fileshow,$cnt,$help,$configfile) = (undef,0,0,0,0,"");
+my $numbershow;
+my $begin = 0;
+my $verbose;
+my $debug=0;    # undocumented, and can only be set from cmd line, for testing.
+my $versionshow;
+my $index = "";
+my $repeatshow = 0;
+my $quote = ""; # no quoting
+my $extractshow;    # do we show extract of text?
+my $digestshow;     # do we show the digest?
+my $scheme = 1; # the default desired rankscheme
+
+############################################
+main();
+
+############################################
+sub main {
+
+    GetOptions( "max=i"   => \$max, 
+                "index=s" => \$index,
+                "config=s"=> \$configfile,
+                "number!"  => \$numbershow,
+                "repeats" => \$repeatshow,
+                "begin=i" => \$begin,
+                "rank!"    => \$rankshow,
+                "file!"    => \$fileshow,
+                "extract!" => \$extractshow,
+                "digest!" => \$digestshow,
+                "Debug!" => \$debug,
+                "verbose!"=> \$verbose,
+                "help!"    => \$help,
+                "quote=s" => \$quote,
+                "VERSION!" => \$versionshow,
+                "scheme=n" => \$scheme,
+    ) or ($help = 1);
+
+    my ($width, $height) = (80, 24);
+    if (-t STDIN && -t STDOUT) {    # if we're connected to a terminal, as per Perl Cookbook p.518
+        eval {
+            require 'Term/Size.pm';     # we 'require' this so we don't require it :)
+            ($width, $height) = (Term::Size::chars(*STDOUT{"IO"})); 
+            # Term::Size::chars doesn't seem to work on OS X
+            print "sman: Got width, height of $width, $height\n" if $debug;
+            if($width && $height) { 
+                $height = MAX(1, MIN(20, $height-3)); 
+            } else {
+                ($width, $height) = (80, 24); 
+            }
+        };
+    }
+
+
+    my $smanconfig = new Sman::Config();    
+    if ($configfile) {
+        my $fileread = $smanconfig->ReadSingleConfigFile($configfile);
+        if ($debug) { print "sman: Read config file $fileread.\n"; }
+    } else {
+        my $fileread = $smanconfig->ReadDefaultConfigFile($verbose);
+    }
+    unless($max) {  
+        # unless user set a max number of rows to show,
+        # show 1/2 as many rows (because there's two lines for each hit)
+        ($max) = (($extractshow) ? ($height/2) : ($height));    
+    }
+
+    if (defined($verbose)) { $smanconfig->SetConfigData("VERBOSE", $verbose); }
+
+    if (!$index && $smanconfig->GetConfigData("SWISHE_IndexFile")) {
+        $index = $smanconfig->GetConfigData("SWISHE_IndexFile");
+    }
+    unless($index) {
+        $index = "sman.index";
+    }
+    unless (-f $index || $index =~ m!/!) {
+        $index = $Bin . "/" . $index;
+    }
+    if ($help) {    # the search comes in through @ARGV
+        print Usage();
+        exit(0);
+    } 
+    my $versionok = Sman::Util::CheckSwisheVersion();
+    die "sman: swish-e not in PATH, /usr/local/lib not in ldconfig, or need newer version?: $!" unless $versionok;
+
+    if ($versionshow) { # move this to Sman/Util.pm ?
+        $|++;
+        my $str = Sman::Util::GetVersionString("sman",
+            $smanconfig->GetConfigData("SWISHECMD") || 'swish-e');
+        print "$str\n";
+        print Sman::Util::GetIndexDescriptionString( $index || "/dev/null");
+        exit(0);
+    }
+
+    my $index_versions = new Sman::IndexVersion( $smanconfig );
+    my $versions_hashref = $index_versions->get_versions();
+    #if ($debug) { print Data::Dumper::Dumper( $versions_hashref ); }
+    my ($rankscheme1_ok) = 
+        (exists($versions_hashref->{SMAN_DATA_VERSION}) && 
+            $versions_hashref->{SMAN_DATA_VERSION});
+    # will have values like 'VERSION' and 'SMAN_DATA_VERSION'
+
+    if ($verbose) {
+        print Sman::Util::GetIndexDescriptionString( $index || "/dev/null" );
+    }
+
+    # we used to test for just "$index", but that fails on 2.6
+    # "$index.prop" works for 2.4 & 2.6
+    my $mtime =  sprintf("%0.1f", ((-M "$index.prop" || 0) / 30));
+    if ($mtime >= 1) {
+        my ($month) = ($mtime > 1 ? "months" : "month");
+        warn "sman: Index $index $mtime $month old. Re-run sman-update!\n";
+    }
+
+    my $query = join(" ", @ARGV); 
+    my @parsed_query_words;
+    my $handle;
+    my $results;
+    eval { 
+        require SWISH::API; # defer to here so we can give a nicer error message
+        $handle = SWISH::API->new($index); 
+        check_for_swishe_error($handle);
+        if ($rankscheme1_ok) {
+            print "Setting rank scheme\n" if $debug;
+            $handle->RankScheme( $scheme );
+            check_for_swishe_error($handle);
+        }
+
+        if ($query ne "") { 
+            print "Setting query to '$query'\n" if $debug; 
+            $results = $handle->Query( $query );    
+            @parsed_query_words = $results->parsed_words( $index );
+
+            # this aborts (uncatchably without an eval, in Swish-e 2.4.3) 
+            #  if rankscheme is 1, unless index was built w/ 
+            #  IgnoreTotalWordCountWhenRanking set to 0  
+            check_for_swishe_error($handle);
+
+            print "Checking num hits\n" if $debug;
+            if ( $results->Hits() <= 0 ) {
+               warn "sman: No Results for '$query'.\n"; 
+            }
+            check_for_swishe_error($handle);
+        }
+    };
+    if ($@) { 
+            if (-e $index) {    # if  there is an index, assume it's a rankscheme error
+                warn "sman: index not updated for new rankscheme.\n" if $verbose; 
+                warn "sman: index not updated for new rankscheme: got error ($@)\n" if $debug; 
+                $handle->RankScheme(0); 
+            }
+    }
+
+    exit(0) unless $query ne "";    # THERE IS NO QUERY
+
+    my (%seen, %digests);
+    my $numrepeats = 0;
+    my @toshow = ();
+    die "sman: Error: can't get results from swish-e. Bad index?\n" unless $results;
+    while ( my $res = $results->NextResult() ) {
+        check_for_swishe_error($handle);
+        $cnt++;
+        next if ($begin && $cnt - $numrepeats <= $begin);
+        my $isskippedrepeat = 0;
+        my ($title, $sec, $desc, $digest, $manpage) = (
+            $res->ResultPropertyStr( "swishtitle" ), 
+            $res->ResultPropertyStr( "sec" ),
+            $res->ResultPropertyStr( "desc" ),
+            $res->ResultPropertyStr( "digest" ),
+            $extractshow ? $res->ResultPropertyStr( "manpage" ) : "" );
+        if ($digest eq "(null)") { $digest = ""; }  # fixup in case of old sman data
+        $desc = "" unless defined($desc);
+        chomp($desc);   # this should be done at parse time: TODO
+        next unless ($title || $sec || $desc);
+        unless($repeatshow) {
+            my $k = "$title/$sec/$desc"; 
+            $numrepeats++, $isskippedrepeat++ if (defined($seen{$k}) || defined($digests{$digest}));
+            $seen{$k}++;
+            $digests{$digest}++ if $digest;
+        }
+        next if ($isskippedrepeat);
+        push(@toshow, [$title, $sec, $desc, $digest, $manpage, $res]);
+        last if (scalar(@toshow) >= $max);
+    }
+    for (my $i=0; $i < scalar(@toshow) && $i < $max; $i++) {
+        my ($title, $sec, $desc, $digest, $manpage, $res) = @ { $toshow[$i] };
+        # this style, where we build up the output a little at a time, is very old-school
+        # unixy c-ish, except we don't print the stuff immediately
+        my $line = "";
+        $line .= sprintf("#%d ", $i + $begin + 1) if $numbershow;
+        $line .= sprintf("x%s.. ", substr($digest,0,4)) if $digestshow;
+        $line .= sprintf("%4d ", $res->ResultPropertyStr( "swishrank" ))
+            if $rankshow;
+
+        $line .= sprintf("%-15s (%s) ", $quote.$title.$quote, $sec);
+        my $sofarlen = length($line);
+        my ($docpath) = ($fileshow ?  ($res->ResultPropertyStr( "swishdocpath" )) : ("") );
+        my ($docpathlen) = ($docpath ? (length($docpath)+1) : (0) );
+        my $descbytes = MAX(0, $width - $sofarlen - $docpathlen);
+        if (length($desc) > $descbytes) {
+            $desc = substr($desc, 0, $descbytes - 3 - 2*length($quote)) || "";
+            $desc =~ s/\s+$//;  # remove trailing ws
+            $desc .= "..." if (length($desc) <= $descbytes - 3 - 2*length($quote));
+        }
+        $desc = $quote . $desc . $quote;    # if quote is empty this makes no change
+        my $extrabytes = $descbytes - length($desc);    # how many spaces to fill?
+        $desc .= " " x $extrabytes if ($extrabytes > 0);
+        if ($descbytes > 0) {
+           $line .= sprintf('%-' . $descbytes . 's', $desc);
+        }
+        $line .= sprintf(" %s", $docpath) if $fileshow; 
+        my ($nl) = (($^O =~ /cygwin/) ? "\r" : "\n");   
+            #otherwise we get what looks like "\n\n" on cygwin!  Hoist this somewhere cleaner? TODO
+        print "$line$nl";
+        if ($extractshow) {
+            my $manpage = $res->ResultPropertyStr("manpage") || "";
+            if ($manpage eq "(null)") {
+                $extractshow = 0;
+            } else {
+                $manpage =~ s/^(\s*)NAME:?\s*/$1/;  
+                    # many manpages begin with NAME blah blah blah, strip that off
+                    # because that data is in the other fields returned
+                my $extract = Sman::Util::ExtractSummary($manpage, \@parsed_query_words, " " x 20, $width - 3);
+                print $extract . "\n" if $extract;
+                # strangely, on cygwin, this shows one newline, not "\n\n" like above
+            }
+        }
+    } 
+    if ($verbose) {
+        printf "  (Total %d hits found", $results->Hits();
+        print ", $numrepeats repeats not shown" if ($numrepeats);
+        print ")\n";
+    }
+}
+
+sub check_for_swishe_error {
+    my $handle = shift;
+    if ( my $error = $handle->Error( ) ) {
+        my $errstr = $handle->ErrorString();
+        my $extra = "";
+        if ($errstr =~ /is empty/) {
+            $extra = "(perhaps you need to run sman-update?)";
+        }
+        die "sman: Error: ",  join(": ", "'" . $handle->ErrorString() . "'", $extra) .  "\n";
+    } 
+}
+
+sub Usage {
+    return "Usage: sman [--max=#] [--rank] [--number] [--index='index'] \n" . 
+          "            [--file] [--help] [--repeats] [--begin=#'] [--config=file]\n" .
+          "            [--quote='\"'] [--verbose] [--VERSION] searchword [...]\n" . 
+             "Ranked freetext searches on manpages.\n" . 
+             "Options:\n" . 
+             "  --max=#:                limit number of results, default 20\n" .
+             "  --rank:                 show the rank of each hit\n" . 
+             "  --number:               show the number of each hit\n" . 
+             "  --index=index:          specify an index (overrides config)\n" . 
+             "  --file:                 show the source man file for each hit\n" . 
+             "  --help:                 this help information\n" .
+             "  --repeats:              show repeat manpages\n" . 
+             "  --begin=#:              start showing hits at number N\n" . 
+             "  --config=my-sman.conf:  a config file (specs an index file)\n" . 
+             "  --quote='\"':            specify a quoting char for output\n" . 
+             "  --extract:              show extraction of manpage for each hit\n" . 
+             "  --verbose:              show more output\n" .
+             "  --VERSION:              show version and exit\n" .
+             "  --scheme=[0|1]:         swish-e RankScheme to use. Default is 1\n";
+}
+sub MAX {
+    my $max = shift;
+    for (@_) { $max = $_ if $_ > $max; }
+    return $max;
+}
+sub MIN {
+    my $min = shift;
+    for (@_) { $min = $_ if $_ < $min; }
+    return $min;
+}
+
+__END__ 
+
+=head1 NAME
+
+sman - Perl program for searching man pages indexes built with sman-update
+
+=head1 SYNOPSIS
+
+See 'sman --help'
+
+  % sman -m 10 --file --rank linux kernel
+    # show first 10 hits about the linux kernel
+    # with the manpage's Rank and Filename
+
+  % sman '(linux and kernel and module) or (eepro100 and ipchains)'
+    # a more complex query
+
+=head1 DESCRIPTION 
+
+Sman is a Searcher for Man pages. 
+
+=head1 AUTHOR
+
+Josh Rabinowitz <joshr>
+
+=head1 SEE ALSO
+
+L<sman>, L<sman-update>, L<sman.conf>
+
+=cut
+

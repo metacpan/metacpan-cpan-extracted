@@ -1,0 +1,35 @@
+Revision history for String-Nudge
+
+1.0001 2016-02-19 13:46:56 UTC
+ [Other Changes]
+ - Fix a small packaging issue.
+
+ [Stats & Dependency Changes]
+ - 2 files changed, 1 insertion(+), 3 deletions(-)
+ - (dev req) + Dist::Zilla::Plugin::ChangeStats::Dependencies::Git 0.0100
+
+1.0000 2016-02-19T00:00:46Z UTC
+ - Fix typo in link.
+ - Use Exporter instead of Sub::Exporter::Progressive.
+ - Small improvements to tests.
+
+0.1001 2015-01-17T14:58:00Z CET
+ [Meta]
+ - Add github info to meta.
+ - Use @Author::CSSON dist zilla bundle, expanded.
+
+ [Requirements]
+ - Add Test::More as a test prereq.
+ - Bump Syntax::Feature::Qi test req to 0.2002.
+ - Remove Syntax::Feature::Simple::V2 as a test prereq.
+ - Remove Test::NoTabs as a test prereq.
+
+ [Documentation]
+ - Cleanup, add qs example, and rebuilt with Pod::Weaver.
+
+0.0101 2014-12-11T20:51:23Z CET
+ [Meta]
+ - Added prereq.
+
+0.0100 2014-12-10T19:01Z -55Z CET
+ - Initial release.

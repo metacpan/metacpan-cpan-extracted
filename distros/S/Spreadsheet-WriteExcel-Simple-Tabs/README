@@ -1,0 +1,13 @@
+To INSTALL
+
+cpan2rpm Spreadsheet-WriteExcel-Simple-Tabs-0.XX.tar.gz
+sudo rpm -Uhv perl-Spreadsheet-WriteExcel-Simple-Tabs-0.XX-1.noarch.rpm
+
+OR
+
+perl Makefile.PL
+make
+make test
+make install
+
+If you are on a windows box you should use 'nmake' rather than 'make'.

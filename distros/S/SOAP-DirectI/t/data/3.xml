@@ -1,0 +1,8 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+  <SOAP-ENV:Envelope SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:si="http://soapinterop.org/xsd" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="com.logicboxes.foundation.sfnb.order.DomContact">
+    <SOAP-ENV:Body>
+      <impl:getDetails>
+        <contactId xsi:type="xsd:int" >8625408</contactId><option xsi:type="apachesoap:Vector" ><item xsi:type="xsd:string">All</item></option>
+      </impl:getDetails>
+    </SOAP-ENV:Body>
+  </SOAP-ENV:Envelope>

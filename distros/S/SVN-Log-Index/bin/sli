@@ -1,0 +1,296 @@
+#!/usr/bin/perl
+# -*- Mode: cperl-mode; cperl-indent-level: 4 -*-
+
+# $Id: /local/CPAN/SVN-Log-Index/trunk/bin/sli 1474 2007-01-13T21:14:25.326886Z nik  $
+
+use strict;
+use warnings;
+
+use SVN::Log::Index;
+
+use Getopt::Long;
+use Pod::Usage;
+
+=head1 NAME
+
+sli - Build and query SVN::Log::Index indices
+
+=head1 SYNOPSIS
+
+B<sli> I<command> S<[I<options>]> [I<args>]
+
+=head1 DESCRIPTION
+
+sli is a command line interface to L<SVN::Log::Index>.  It supports adding
+revisions to an index, and then querying that index for revisions that
+match the query.
+
+Each index remembers the URL of the Subversion repository that it is
+indexing and the revision number that was last successfully indexed.
+
+The command line follows the Subversion/SVK model.  There may be some
+global options, followed by a command name.  The command may then require
+a number of other options to be specified.
+
+=head1 GLOBAL OPTIONS
+
+=over
+
+=item --index PATH
+
+The full path to the index to operate on.  If not specified then the
+default value is ${HOME}/.sli/index/.
+
+=back
+
+=head1 COMMANDS
+
+=cut
+
+my %options;
+
+my %cmds = (create => \&do_create,
+	    add    => \&do_add,
+	    search => \&do_search,
+	    help   => \&do_help,
+	    );
+
+$options{index}     = "$ENV{HOME}/.sli/index";
+$options{overwrite} = 0;
+$options{verbose}   = 0;
+
+GetOptions('index=s'     => \$options{index},
+	   'repos=s'     => \$options{repos},
+	   'overwrite'   => \$options{overwrite},
+	   'revision=s'  => \$options{revision},
+	   'query=s'     => \$options{query},
+	   'verbose'     => \$options{verbose},
+	  ) or pod2usage(-verbose => 2);
+
+my $cmd = shift;
+
+pod2usage(-verbose => 2) if ! defined $cmd;
+$cmd = 'help' if ! exists $cmds{$cmd};
+
+$cmds{$cmd}->(\%options);
+
+exit;
+
+=head2 create
+
+Creates a new index.  The options and their meanings are:
+
+=over
+
+=item --repos URL
+
+This option is mandatory.
+
+The URL of the Subversion repository that will be indexed.  Only one
+repository can be indexed per C<--index>.  This option is mandatory.
+
+=item --overwrite
+
+If present then the C<--index> will be overwritten.  If not present
+then the existence of any files in C<--index> will cause the command
+to stop.
+
+=back
+
+=cut
+
+sub do_create {
+    my $o = shift;
+
+    my $index = SVN::Log::Index->new ({ index_path => $options{index} });
+
+    $index->create({ repo_url  => $o->{repos},
+		     overwrite => $o->{overwrite} });
+
+}
+
+=head2 add
+
+Adds information about one or more revisions to an existing index.  The
+options and their meanings are:
+
+=over
+
+=item --revision N or --revision N:M
+
+This option is mandatory.
+
+The revision, or revisions, to be added to the index.  If a single
+revision number is given then just that revision is added to the index.
+If two revision numbers are given, then information about all revisions
+between those two numbers, inclusive, are added to the index.
+
+Two symbolic revision names may be used instead of numbers.  C<LAST>
+means the revision number one higher than the revision number last
+indexed.  C<HEAD> means the repository's youngest revision.
+
+=back
+
+=cut
+
+sub do_add {
+    my $o = shift;
+    my $index = SVN::Log::Index->new ({ index_path => $options{index} });
+
+    $index->open();
+
+    $o->{revision} =~ s/LAST/$index->get_last_indexed_rev() + 1/e;
+
+    if($o->{revision} !~ /:/) {
+	$index->add({ start_rev => $o->{revision} });
+    } else {
+	my ($startrev, $endrev) = $o->{revision} =~ m/^([^:]+):([^:]+)$/;
+
+	$index->add({ start_rev => $startrev, end_rev => $endrev });
+    }
+}
+
+=head2 search
+
+Search the repository, generating a report of all the revisions that
+matched the query.  The options and their meanings are:
+
+=over
+
+=item --query QUERY
+
+This option is mandatory.
+
+The query string to search for.  See the documentation for
+L<SVN::Log::Index/"QUERY SYNTAX"> for details of the query string syntax.
+
+=item --verbose
+
+Boolean, indicating whether the report should include each matching
+revision's log message.
+
+=back
+
+=cut
+
+sub do_search {
+    my $o = shift;
+    my $index = SVN::Log::Index->new({ index_path => $o->{index} });
+
+    $index->open();
+
+    my $hits = $index->search($o->{query});
+
+    my $total = $hits->total_hits();
+
+    while(my $result = $hits->fetch_hit_hashref()) {
+	printf "%s\n", "-----" x 15 if $o->{verbose};
+
+	printf "r%-8d | %-8s | %s\n",
+	    $result->{revision}, $result->{author}, $result->{date};
+
+	my $msg = $result->{message}; $msg =~ s/^\n*//; $msg =~ s/\n*$//;
+
+	printf "\n%s\n\n", $msg if $o->{verbose};
+	print "Relevance: $result->{score}\n" if $o->{verbose};
+    }
+    printf "%s\n", "-----" x 15 if $o->{verbose} and $total;
+}
+
+=head2 help
+
+Displays help about each command.
+
+The available commands are:
+
+  create        - create a new index
+  add           - add one or more revisions to the index
+  search        - search the index
+  help          - display this help
+
+Use
+
+  sli help <command>
+
+for more.
+
+=cut
+
+sub do_help {
+    my $subcmd = shift @ARGV;
+    $subcmd = 'help' unless defined $subcmd;
+    $subcmd = 'help' if ! exists $cmds{$subcmd};
+
+    pod2usage(-verbose => 99,
+	      -sections => 'SYNOPSIS|GLOBAL OPTIONS|COMMANDS/!.+',
+	      -exitval => 'NOEXIT');
+    pod2usage(-verbose => 99,
+	      -sections => "COMMANDS/$subcmd");
+}
+
+exit 0;
+
+=head1 EXAMPLES
+
+Create a new index.
+
+  sli create --index /path/to/index --repos url://for/repos
+
+Add the first 100 revisions to the index.
+
+  sli add --index /path/to/index --revision 1:100
+
+Add the next revision to the index.
+
+  sli add --index /path/to/index --revision 101
+
+Add up to revision 150 to the index.
+
+  sli add --index /path/to/index --revision LAST:150
+
+Add all the remaining revisions to the index.
+
+  sli add --index /path/to/index --revision LAST:HEAD
+
+Search the index for commits by C<nik> that contain the string C<fixed>.
+Show basic information about the revision.
+
+  sli search --index /path/to/index --query "author:nik AND fixed"
+
+Repeat the previous query, but use C<+> to connect terms.
+
+  sli search --index /path/to/index --query "author:nik +fixed"
+
+Repeat the previous query, but include each revision's log message
+too.
+
+  sli search --index /path/to/index --query "author:nik AND fixed" \
+    --verbose
+
+=head1 SEE ALSO
+
+L<SVN::Log::Index>, L<KinoSearch::QueryParser::QueryParser>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to
+C<bug-svn-log-index@rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=SVN-Log-Index>.
+I will be notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
+
+=head1 AUTHOR
+
+The current maintainer is Nik Clayton, <nikc@cpan.org>.
+
+The original author was Garrett Rooney, <rooneg@electricjellyfish.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2006-2007 Nik Clayton.  All Rights Reserved.
+
+Copyright 2004 Garrett Rooney.  All Rights Reserved.
+
+This software is licensed under the same terms as Perl itself.
+
+=cut

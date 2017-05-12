@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+Makefile.PL
+META.yml
+README
+lib/Sledge/Template/ClearSilver/I18N.pm
+t/00-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t

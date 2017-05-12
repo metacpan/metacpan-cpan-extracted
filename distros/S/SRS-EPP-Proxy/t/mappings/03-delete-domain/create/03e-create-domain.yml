@@ -1,0 +1,40 @@
+description: set up domain for another registrar
+registrar: 1
+
+
+request: |-
+ <NZSRSRequest VerMajor="4" VerMinor="4" RegistrarId="101">
+   <DomainCreate
+       Term="12" ActionId="[% actionid %]" Delegate="1"
+       DomainName="03e.co.te" RegistrantRef="RefRuff"
+       >
+      <RegistrantContact
+          Name="Loopdigga"
+          Email="Loopdigga@handlethis-orz.co.te"
+          >
+        <PostalAddress
+                Address1="1400 E 8 Mile Rd"
+                Address2="Highland Park"
+                City="Detroit"
+                Province="Michigan"
+                CountryCode="US"
+                PostalCode="48203"
+                />
+        <Phone
+            AreaCode="4"
+            CountryCode="64"
+            LocalNumber="Registrant phone s1c1"
+            />
+        <Fax
+            AreaCode="4"
+            CountryCode="64"
+            LocalNumber="Registrant fax s1c1"
+            />
+      </RegistrantContact>
+      <AdminContact />
+      <TechnicalContact />
+    </DomainCreate>
+ </NZSRSRequest>
+
+assertions:
+ - xpath_matches: [ '//Error', '0', 'No errors' ]

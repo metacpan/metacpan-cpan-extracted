@@ -1,0 +1,8 @@
+<NZSRSResponse VerMajor="5" VerMinor="0">
+  <Response Action="Whois" FeId="4" FeSeq="1981693" OrigRegistrarId="90"
+	    RecipientRegistrarId="90">
+    <FeTimeStamp Day="10" Hour="16" Minute="33" Month="6" Second="32"
+		 TimeZoneOffset="+12:00" Year="2010"/>
+    <Domain DomainName="cheese.co.te" Status="Active">
+  </Response>
+</NZSRSResponse>

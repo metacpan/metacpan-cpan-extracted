@@ -1,0 +1,29 @@
+SWISH::3 is a Perl interface to libswish3, the Swish-e compatible
+document parser.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  libswish3   <http://dev.swish-e.org/wiki/swish3>
+  libxml2     <http://xmlsoft.org/>
+
+libswish3 is not yet available for Windows, so you can only
+build it on Unix and Unix-like (Linux) systems.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by Peter Karman
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

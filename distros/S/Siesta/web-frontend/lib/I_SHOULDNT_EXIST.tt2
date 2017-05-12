@@ -1,0 +1,4 @@
+[%-
+  admin.name = "Ad Min Istrator"
+  admin.email = "admin@this.domain.tld"
+-%]

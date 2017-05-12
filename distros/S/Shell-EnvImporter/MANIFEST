@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Shell-EnvImporter.t
+lib/Shell/EnvImporter.pm

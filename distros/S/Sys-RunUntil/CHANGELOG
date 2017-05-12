@@ -1,0 +1,14 @@
+0.04	4 April 2012
+	Change in the test-suite so that tests should also run ok on Windows
+	with Strawberry Perl.
+
+0.03	1 April 2012
+	Some code refactoring and code esthetics.  Verified it runs on
+	5.14.2 threaded and unthreaded.
+
+0.02	19 July 2005
+	Added support for CPU usage limitation (as opposed to just wallclock
+	time).
+
+0.01    17 July 2005
+	First public version of Sys/RunUntil.pm.

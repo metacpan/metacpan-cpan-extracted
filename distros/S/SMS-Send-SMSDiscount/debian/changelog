@@ -1,0 +1,24 @@
+libsms-send-smsdiscount-perl (1.111780-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Mark Hindess <soft-debian@temporalanomaly.com>  Mon, 27 Jun 2011 22:59:01 +0100
+
+libsms-send-smsdiscount-perl (1.102671-1) unstable; urgency=low
+
+  * Fix $VERSION.
+
+ -- Mark Hindess <soft-debian@temporalanomaly.com>  Fri, 24 Sep 2010 16:49:55 +0100
+
+libsms-send-smsdiscount-perl (1.102670-1) unstable; urgency=low
+
+  * Make tests more robust.
+
+ -- Mark Hindess <soft-debian@temporalanomaly.com>  Fri, 24 Sep 2010 13:26:55 +0100
+
+libsms-send-smsdiscount-perl (1.102600-1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Mark Hindess <soft-debian@temporalanomaly.com>  Fri, 17 Sep 2010 10:33:43 +0100
+

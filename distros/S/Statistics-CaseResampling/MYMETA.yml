@@ -1,0 +1,23 @@
+---
+abstract: 'Efficient resampling and calculation of medians with confidence intervals'
+author:
+  - 'Steffen Mueller <smueller@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+distribution_type: module
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.57_05'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Statistics-CaseResampling
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  List::Util: 0
+version: 0.15

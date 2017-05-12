@@ -1,0 +1,37 @@
+# this file will be Included by @ServerRoot@/httpd.conf
+
+# addition to Apache config
+<IfModule mod_cgi.c>
+	ScriptLog logs/script_log
+</IfModule>
+
+# preload the module
+PerlLoadModule Slauth::Config::Apache
+
+# now we have config directives defined in Slauth::Config::Apache
+SlauthConfig "@ServerRoot@/slauth.conf"
+PerlOptions +GlobalRequest
+<Directory @ServerRoot@/htdocs/protected>
+	AuthName localhost
+	Slauth On
+	AuthType Slauth
+	ErrorDocument 401 /slauth
+</Directory>
+<Directory @ServerRoot@/htdocs/basic-protected>
+	AuthName localhost
+	Slauth On
+	AuthType basic
+	ErrorDocument 401 /slauth
+</Directory>
+<Location /TestSlauth__10__SlauthEnabled>
+	Slauth on
+</Location>
+<Location /slauth>
+	Slauth Off
+	SetHandler modperl
+	PerlResponseHandler Slauth::User::Web
+</Location>
+#<Location /TestSlauth__ConfigApache>
+#	Slauth on
+#</Location>
+

@@ -1,0 +1,12 @@
+%module{SOOT};
+
+class TSystem {
+  int LoadNUpdate(const char* module, const char* entry = "", bool system = false)
+    %code{%
+      RETVAL = THIS->Load(module, entry, system);
+      if (RETVAL == 0)
+        SOOT::GenerateClassStubs(aTHX);
+    %};
+
+};
+

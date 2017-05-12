@@ -1,0 +1,26 @@
+This directory contains the sample programs shown in the 
+documentation for the Shell::POSIX::Select module.
+
+The module's installation routine does not install them in
+any system command directory, but you should be able to find
+them where the module was installed. And I guess you did,
+if you're reading this!
+
+Note that some of these programs won't do anything at all
+if they're invoked without arguments, so please examine
+the documentation or the scripts themselves to learn how
+to run them.
+
+These programs are provided for their educational value,
+and I believe they work correctly, but they do not come
+with a warranty of any kind. 
+
+I hope you find them useful!  
+
+I am the copyright holder, so for any questions about fair
+use, please contact me.
+
+Tim Maher, CEO
+Consultix, Inc.
+tim@teachmeperl.com
+

@@ -1,0 +1,15 @@
+Tue Feb 23 15:14:01 2016 - 1.15
+    Releasing 1.14_02 as 1.15 since all tests pass on all platforms (cpantesters.org).
+
+Tue Feb 23 12:10:01 2016 - 1.14_02
+    New maintainer (MGUALDRON).
+    Fixed existing bugs.
+
+Tue Dec  5 14:25:01 2006 - 1.14
+    sqlsh: corrected regex for exiting "impolitely"
+
+Mon Sep  4 12:00:50 2006 - 1.13
+    Initial CPAN release
+
+Version 1.12 - 08/08/06
+    Initial release prepared for CPAN

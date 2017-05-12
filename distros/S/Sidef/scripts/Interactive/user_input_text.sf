@@ -1,0 +1,11 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/User_input/Text
+#
+
+var s = read("string: ", String);
+var i = read("number: ", Number);    # auto-conversion to a number
+
+say s;
+say i;

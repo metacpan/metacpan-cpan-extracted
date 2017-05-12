@@ -1,0 +1,20 @@
+
+=pod
+
+=head1 NAME
+
+SDL::MultiThread - Bindings to the MultiThread category in SDL API
+
+=head2 CATEGORY
+
+TODO, Core, MultiThread
+
+=head1 SYNOPSIS
+
+This module is not an object. 
+
+=head1 AUTHORS
+
+See L<SDL/AUTHORS>.
+
+=cut

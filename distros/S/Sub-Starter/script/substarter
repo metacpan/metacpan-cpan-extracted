@@ -1,0 +1,956 @@
+#!/usr/bin/env perl
+# --------------------------------------
+#
+#   Title: Sub Starter
+# Purpose: Starts a sub from a usage statement formatted from a template.
+#
+#    Name: substarter
+#    File: substarter
+# Created: July 25, 2009
+#
+# Copyright: Copyright 2009 by Shawn H Corey.  All rights reserved.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+# --------------------------------------
+# Pragmatics
+
+require 5.008;
+
+use strict;
+use warnings;
+
+# --------------------------------------
+# Version
+use version; our $VERSION = qv(v1.0.2);
+
+# --------------------------------------
+# Modules
+use Carp;
+use Data::Dumper;
+use English qw( -no_match_vars ) ;  # Avoids regex performance penalty
+use Getopt::Long;
+use Pod::Usage;
+use POSIX;
+
+use Sub::Starter;
+
+# --------------------------------------
+# Configuration Parameters
+
+my @Template_files = (
+  glob( '~/.substarterrc' ),
+  '/etc/substarterrc',
+);
+
+# Make Data::Dumper pretty
+$Data::Dumper::Sortkeys = 1;
+$Data::Dumper::Indent   = 1;
+$Data::Dumper::Maxdepth = 0;
+
+# --------------------------------------
+# Variables
+
+# command line options
+my $Command_line = 0;
+my @Displays = qw( sub );
+
+# templates, see POD for details
+my %Templates = ();
+
+# Documentation levels
+my $DOC_USAGE = 0;
+my $DOC_HELP  = 1;
+my $DOC_VER   = 2;
+my $DOC_MAN   = 3;
+
+# --------------------------------------
+# Subroutines
+
+# --------------------------------------
+#       Name: print_documentation
+#      Usage: print_documentation( $documentation_level );
+#    Purpose: Print the usage, help, or man documentation.
+#    Returns: Does not return.
+# Parameters: $documentation_level -- how much documentation to display.
+#                                     0 == usage
+#                                     1 == help
+#                                     2 == version
+#                                     other == man
+#
+sub print_documentation {
+  my $level = shift @_ || $DOC_USAGE;
+
+  # print the usage documentation
+  if( $level == $DOC_USAGE ){
+    pod2usage(
+      -exitval => 2,
+      -verbose => 99,
+      -sections => 'USAGE',
+    );
+  }
+
+  # print the help documentation
+  if( $level == $DOC_HELP ){
+    pod2usage(
+      -exitval => 2,
+      -verbose => 99,
+      -sections => 'NAME|VERSION|USAGE|REQUIRED ARGUMENTS|OPTIONS',
+    );
+  }
+
+  # print the version
+  if( $level == $DOC_VER ){
+    pod2usage(
+      -exitval => 2,
+      -verbose => 99,
+      -sections => 'NAME|VERSION',
+    );
+  }
+
+  # print the man documentation
+  pod2usage(
+    -exitval => 2,
+    -verbose => 2,
+  );
+}
+
+# --------------------------------------
+#       Name: get_cmd_opts
+#      Usage: get_cmd_opts();
+#    Purpose: Process the command-line switches.
+#    Returns: none
+# Parameters: none
+#
+sub get_cmd_opts {
+  my @displays = ();
+  my @template_files = ();
+
+  # Check command-line options
+  unless( GetOptions(
+    commandline => \$Command_line,  # read the usage statements from command line, one per ARG
+    'displays=s' => \@displays,
+    'templatefiles=s' => \@template_files,
+
+    usage   => sub { print_documentation( $DOC_USAGE ); },
+    help    => sub { print_documentation( $DOC_HELP  ); },
+    version => sub { print_documentation( $DOC_VER   ); },
+    man     => sub { print_documentation( $DOC_MAN   ); },
+  )){
+    print_documentation( $DOC_USAGE );
+  }
+
+  # replace defaults, not augment them
+  @Displays = @displays if @displays;
+
+  # are the user's files valid?
+  for my $file ( @template_files ){
+    die "cannot read $file\n" unless -r $file;
+  }
+  unshift @Template_files, @template_files;
+
+}
+
+# --------------------------------------
+#       Name: read_template
+#      Usage: read_template( $fh );
+#    Purpose: Divide into templates.
+# Parameters:   $fh -- file handle
+#    Returns: none
+#
+sub read_template {
+  my $fh   = shift @_;
+  my $template = '';
+
+  while( <$fh> ){
+
+    # skip comments at end
+    last if m{ \A __END__ }msx;
+
+    # template names in square brackets
+    if( m{ \A \[ ([^\]]*) \] }msx ){
+      $template = $1;
+      # skip if one already exists
+      if( exists $Templates{$template} ){
+        $template = '';
+      }
+      next;
+    }
+
+    if( length $template ){
+      push @{ $Templates{$template} }, $_;
+    }
+  }
+
+  return;
+}
+
+# --------------------------------------
+#       Name: load_templates
+#      Usage: load_templates();
+#    Purpose: Find and load templates.
+# Parameters: none
+#    Returns: none
+#
+sub load_templates {
+
+  for my $file ( @Template_files ){
+    next unless -r $file;
+    open my $fh, '<', $file or die "could not open $file: $OS_ERROR\n";
+    read_template( $fh );
+    close $fh or die "could not close $file: $OS_ERROR\n";
+  }
+
+  # read the DATA file handle last
+  read_template( \*DATA );
+
+  # print '%Templates ', Dumper \%Templates;
+  return;
+}
+
+# --------------------------------------
+#       Name: start_sub
+#      Usage: start_sub( $usage );
+#    Purpose: Convert the usage statemnt into a skeleton
+# Parameters: $usage -- The statement
+#    Returns: none
+#
+sub start_sub {
+  my $usage = shift @_;
+
+  my $sub_starter = Sub::Starter->new();
+  $sub_starter->parse_usage( $usage );
+  # print 'sub ', Dumper $sub_starter;
+
+  for my $display ( @Displays ){
+    if( $Templates{$display} ){
+      print $sub_starter->fill_out( $Templates{$display} );
+    }else{
+      warn "no template for $display, skipped\n";
+    }
+  }
+
+  return;
+}
+
+# --------------------------------------
+# Main
+
+get_cmd_opts();
+load_templates();
+
+if( $Command_line ){
+  for ( @ARGV ){
+    start_sub( $_ );
+  }
+}else{
+  while( <> ){
+    next if m{ \A \s* \z }msx;
+    next if m{ \A \s* \# }msx;
+    start_sub( $_ );
+  }
+}
+
+__DATA__
+
+=begin __NO_POD__
+
+[usage]
+[1m(usage)[0m
+[sub]
+# --------------------------------------
+#       Name: [1m(name)[0m
+#      Usage: [1m(usage)[0m
+#    Purpose: TBD
+# Parameters: (none)[1m(parameters arenot)[0m
+# Parameters: [1m(parameters first %*s)[0m -- TBD
+#             [1m(parameters rest %*s)[0m -- TBD
+#    Returns: (none)[1m(returns arenot)[0m
+#    Returns: [1m(returns first %*s)[0m -- TBD
+#             [1m(returns rest %*s)[0m -- TBD
+#
+sub [1m(name)[0m {
+  my [1m(definitions %-*s\s=\s%s)[0m;
+
+  return[1m(returns expression)[0m;
+}
+
+[pod]
+=head2 [1m(name)[0m()
+
+TBD
+
+=head3 Usage
+
+  [1m(usage)[0m
+
+=head3 Parameters
+
+(none)[1m(parameters arenot)[0m
+=over 4[1m(parameters are \n)[0m
+=item [1m(parameters each %s\n\nTBD\n)[0m
+=back[1m(parameters are)[0m
+
+=head3 Returns
+
+(none)[1m(returns arenot)[0m
+=over 4[1m(returns are \n)[0m
+=item [1m(returns each %s\n\nTBD\n)[0m
+=back[1m(returns are)[0m
+
+[]
+
+=end __NO_POD__
+
+=cut
+
+__END__
+
+=head1 NAME
+
+substarter - Starts a sub from a usage statement formatted from a template.
+
+=head1 VERSION
+
+This document refers to substarter version v1.0.2
+
+=head1 USAGE
+
+  substarter [<options>] [<file>] ...
+  substarter --usage|help|version|man
+
+=head1 REQUIRED ARGUMENTS
+
+(none)
+
+=head1 OPTIONS
+
+=over 4
+
+=item --commandline
+
+Read the usage statements from command line, one per argument.
+
+=item --displays=<template>
+
+Display the sub's in the template.
+This option may be repeat for more than one template.
+Default is 'sub' template.
+
+=item --templatefiles=<file>
+
+Read the templates from the file.  This option may be repeat
+for more than one file.  Templates in the files that appear
+  first, override those in later files.  The default
+  template files are still read.  See L<Templates> for
+  details.
+
+=item --usage
+
+Print a brief usage message.
+
+=item --help
+
+Print usage, required arguments, and options.
+
+=item --version
+
+Print the version number.
+
+=item --man
+
+Print the manual page.
+
+=back
+
+=head1 DESCRIPTION
+
+This script creates the skeleton of a Perl sub from a usage
+statement, formatted from a template.
+
+A usage statement is B<not valid> Perl code.
+This is because it is difficult to distinguish a scalar and a reference.
+Instead, parameters and returns that are references are written with the take-a-reference-to notation.
+For example, a reference to an array is written as C<\@array>.
+See L<EXAMPLES> for details.
+
+=head2 Templates
+
+Templates are read from templates files.  First, any
+template files given via the command-line option,
+C<--templatefiles> are scanned.  Then, the file
+C<~/.substarterrc> is scanned, if it exists.  Then, the file
+C</etc/substarterrc> is scanned, if it exists.  Then,
+internal templates are scanned.
+
+Templates that appear first in the scan order override those
+that appear later.
+
+The internal templates are for C<usage>, C<sub>, and C<pod>.
+
+See L<Sub::Starter|Templates> for details on how to write a template.
+
+=head1 REQUIREMENTS
+
+L<Sub::Starter>
+
+=head1 FILES
+
+=over 4
+
+=item /etc/substarterrc
+
+System-wide template file used for overriding the internal
+templates.  See L<Sub::Starter|Templates> for details on how
+to write a template.
+
+=item ~/.substarterrc
+
+Personal template file used for overriding the system-wide
+templates and internal templates.  See
+L<Sub::Starter|Templates> for details on how to write a
+template.
+
+=back
+
+=head1 EXAMPLES
+
+=head2 trim()
+
+=over 4
+
+=item usage
+
+  $text | @text = trim( @text );
+
+=item sub
+
+  # --------------------------------------
+  #       Name: trim
+  #      Usage: $text | @text = trim( @text );
+  #    Purpose: TBD
+  # Parameters: @text -- TBD
+  #    Returns: $text -- TBD
+  #             @text -- TBD
+  #
+  sub trim {
+    my @text = @_;
+    my $text = '';
+
+    return wantarray ? @text : $text;
+  }
+
+=item pod
+
+  =head2 trim
+
+  =head3 Usage
+
+    $text | @text = trim( @text );
+
+  =head3 Parameters
+
+  =over 4
+
+  =item @text
+
+  TBD
+
+  =back
+
+  =head3 Returns
+
+  =over 4
+
+  =item $text
+
+  TBD
+
+  =item @text
+
+  TBD
+
+  =back
+
+=back
+
+=head2 $object->get_options()
+
+=over 4
+
+=item usage
+
+  \%options = $object->get_options( ; @option_names );
+
+=item sub
+
+  # --------------------------------------
+  #       Name: get_options
+  #      Usage: \%options = $object->get_options( ; @option_names );
+  #    Purpose: TBD
+  # Parameters: @option_names -- TBD
+  #    Returns:     \%options -- TBD
+  #
+  sub get_options {
+    my $self         = shift @_;
+    my @option_names = @_;
+    my $options      = {};
+
+    return $options;
+  }
+
+=item pod
+
+  =head2 get_options
+
+  =head3 Usage
+
+    \%options = $object->get_options( ; @option_names );
+
+  =head3 Parameters
+
+  =over 4
+
+  =item @option_names
+
+  TBD
+
+  =back
+
+  =head3 Returns
+
+  =over 4
+
+  =item \%options
+
+  TBD
+
+  =back
+
+=back
+
+=head2 baselines()
+
+=over 4
+
+=item usage
+
+  @y_values = baselines( $height, $size; $spacing, $bottom );
+
+=item sub
+
+  # --------------------------------------
+  #       Name: baselines
+  #      Usage: @y_values = baselines( $height, $size; $spacing, $bottom );
+  #    Purpose: TBD
+  # Parameters:   $height -- TBD
+  #                 $size -- TBD
+  #              $spacing -- TBD
+  #               $bottom -- TBD
+  #    Returns: @y_values -- TBD
+  #
+  sub baselines {
+    my $height   = shift @_;
+    my $size     = shift @_;
+    my $spacing  = shift @_ || '';
+    my $bottom   = shift @_ || '';
+    my @y_values = ();
+
+    return @y_values;
+  }
+
+=item pod
+
+  =head2 baselines
+
+  =head3 Usage
+
+    @y_values = baselines( $height, $size; $spacing, $bottom );
+
+  =head3 Parameters
+
+  =over 4
+
+  =item $height
+
+  TBD
+
+  =item $size
+
+  TBD
+
+  =item $spacing
+
+  TBD
+
+  =item $bottom
+
+  TBD
+
+  =back
+
+  =head3 Returns
+
+  =over 4
+
+  =item @y_values
+
+  TBD
+
+  =back
+
+=back
+
+=head2 column_blocks()
+
+=over 4
+
+=item usage
+
+  \@blocks = column_blocks( \@block, $columns; $gap );
+
+=item sub
+
+  # --------------------------------------
+  #       Name: column_blocks
+  #      Usage: \@blocks = column_blocks( \@block, $columns; $gap );
+  #    Purpose: TBD
+  # Parameters:  \@block -- TBD
+  #             $columns -- TBD
+  #                 $gap -- TBD
+  #    Returns: \@blocks -- TBD
+  #
+  sub column_blocks {
+    my $block   = shift @_;
+    my $columns = shift @_;
+    my $gap     = shift @_ || '';
+    my $blocks  = [];
+
+    return $blocks;
+  }
+
+=item pod
+
+  =head2 column_blocks
+
+  =head3 Usage
+
+    \@blocks = column_blocks( \@block, $columns; $gap );
+
+  =head3 Parameters
+
+  =over 4
+
+  =item \@block
+
+  TBD
+
+  =item $columns
+
+  TBD
+
+  =item $gap
+
+  TBD
+
+  =back
+
+  =head3 Returns
+
+  =over 4
+
+  =item \@blocks
+
+  TBD
+
+  =back
+
+=back
+
+=head2 format_paragraph()
+
+=over 4
+
+=item usage
+
+  ( \@lines, \@mut ) = format_paragraph( \%paragraph_options, @mut );
+
+=item sub
+
+  # --------------------------------------
+  #       Name: format_paragraph
+  #      Usage: ( \@lines, \@mut ) = format_paragraph( \%paragraph_options, @mut );
+  #    Purpose: TBD
+  # Parameters: \%paragraph_options -- TBD
+  #                            @mut -- TBD
+  #    Returns:             \@lines -- TBD
+  #                           \@mut -- TBD
+  #
+  sub format_paragraph {
+    my $paragraph_options = shift @_;
+    my @mut               = @_;
+    my $lines             = [];
+    my $mut               = [];
+
+    return ( $lines, $mut );
+  }
+
+=item pod
+
+  =head2 format_paragraph
+
+  =head3 Usage
+
+    ( \@lines, \@mut ) = format_paragraph( \%paragraph_options, @mut );
+
+  =head3 Parameters
+
+  =over 4
+
+  =item \%paragraph_options
+
+  TBD
+
+  =item @mut
+
+  TBD
+
+  =back
+
+  =head3 Returns
+
+  =over 4
+
+  =item \@lines
+
+  TBD
+
+  =item \@mut
+
+  TBD
+
+  =back
+
+=back
+
+=head2 print_lines()
+
+=over 4
+
+=item usage
+
+  ( \@y_values, \@lines ) = print_lines( $left, \@y_values, \@lines );
+
+=item sub
+
+  # --------------------------------------
+  #       Name: print_lines
+  #      Usage: ( \@y_values, \@lines ) = print_lines( $left, \@y_values, \@lines );
+  #    Purpose: TBD
+  # Parameters:      $left -- TBD
+  #             \@y_values -- TBD
+  #                \@lines -- TBD
+  #    Returns: \@y_values -- TBD
+  #                \@lines -- TBD
+  #
+  sub print_lines {
+    my $left     = shift @_;
+    my $y_values = shift @_;
+    my $lines    = shift @_;
+
+    return ( $y_values, $lines );
+  }
+
+=item pod
+
+  =head2 print_lines
+
+  =head3 Usage
+
+    ( \@y_values, \@lines ) = print_lines( $left, \@y_values, \@lines );
+
+  =head3 Parameters
+
+  =over 4
+
+  =item $left
+
+  TBD
+
+  =item \@y_values
+
+  TBD
+
+  =item \@lines
+
+  TBD
+
+  =back
+
+  =head3 Returns
+
+  =over 4
+
+  =item \@y_values
+
+  TBD
+
+  =item \@lines
+
+  TBD
+
+  =back
+
+=back
+
+=head2 print_paragraph()
+
+=over 4
+
+=item usage
+
+  ( $bottom, \@mut ) = print_paragraph( \%print_options, \%paragraph_options, @mut );
+
+=item sub
+
+  # --------------------------------------
+  #       Name: print_paragraph
+  #      Usage: ( $bottom, \@mut ) = print_paragraph( \%print_options, \%paragraph_options, @mut );
+  #    Purpose: TBD
+  # Parameters:     \%print_options -- TBD
+  #             \%paragraph_options -- TBD
+  #                            @mut -- TBD
+  #    Returns:             $bottom -- TBD
+  #                           \@mut -- TBD
+  #
+  sub print_paragraph {
+    my $print_options     = shift @_;
+    my $paragraph_options = shift @_;
+    my @mut               = @_;
+    my $bottom            = '';
+    my $mut               = [];
+
+    return ( $bottom, $mut );
+  }
+
+=item pod
+
+  =head2 print_paragraph
+
+  =head3 Usage
+
+    ( $bottom, \@mut ) = print_paragraph( \%print_options, \%paragraph_options, @mut );
+
+  =head3 Parameters
+
+  =over 4
+
+  =item \%print_options
+
+  TBD
+
+  =item \%paragraph_options
+
+  TBD
+
+  =item @mut
+
+  TBD
+
+  =back
+
+  =head3 Returns
+
+  =over 4
+
+  =item $bottom
+
+  TBD
+
+  =item \@mut
+
+  TBD
+
+  =back
+
+=back
+
+=head1 DIAGNOSTICS
+
+(none)
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+(none)
+
+=head1 INCOMPATIBILITIES
+
+(none)
+
+=head1 BUGS AND LIMITATIONS
+
+(none known)
+
+=head1 SEE ALSO
+
+L<Sub::Starter>
+
+=head1 ORIGINAL AUTHOR
+
+Shawn H Corey  C<< <SHCOREY at cpan.org> >>
+
+=head2 Contributing Authors
+
+(Insert your name here if you modified this program or its documentation.
+Do not remove this comment.)
+
+=head1 ACKNOWLEDGEMENTS
+
+Andy Lester for suggesting C<module-starter> aka C<Module::Starter>.
+
+The PerlMonks L<http://perlmonks.org/> for brainstroming the name.
+
+=head1 COPYRIGHT & LICENCES
+
+Copyright 2009 by Shawn H Corey.  All rights reserved.
+
+=head2 Software Licence
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+=head2 Document Licence
+
+Permission is granted to copy, distribute and/or modify this document under the
+terms of the GNU Free Documentation License, Version 1.2 or any later version
+published by the Free Software Foundation; with the Invariant Sections being
+ORIGINAL AUTHOR, COPYRIGHT & LICENCES, Software Licence, and Document Licence.
+
+You should have received a copy of the GNU Free Documentation Licence
+along with this document; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+=cut

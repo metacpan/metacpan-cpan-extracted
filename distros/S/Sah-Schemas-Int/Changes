@@ -1,0 +1,36 @@
+Revision history for Sah-Schemas-Int
+
+0.06    2016-07-22 (PERLANCAR)
+
+        - [build] Rebuild to generate Sah::SchemaR::* modules.
+
+
+0.05    2016-07-18 (PERLANCAR)
+
+	- Base {neg,pos}{even,odd} on {neg,pos}int instead of directly on
+	  int, for testing.
+
+
+0.04    2016-07-18 (PERLANCAR)
+
+	- Add schemas: even, odd, {neg,pos}{even,odd} (currently mainly for
+	  testing).
+
+
+0.03    2016-05-08 (PERLANCAR)
+
+        - [Incompatible change] Rename Sah-Schema-* distribution to
+          Sah-Schemas-*. Follow Sah::Schemas convention (put individual schemas
+          in separate Sah::Schema::* packages).
+
+
+0.02    2016-03-08 (PERLANCAR)
+
+        - Fix schemas.
+
+        - [dist] Use Pod::Weaver::Plugin::Sah::Schema.
+
+
+0.01    2014-04-26 (SHARYANTO)
+
+        - First release.

@@ -1,0 +1,28 @@
+Sub/NamedParams version 1.00
+============================
+
+Use named parameters with any subroutine.  If you have a long list of arguments
+to a sub, this allows you to specify them in any order and set defaults for
+arguments you would prefer to omit.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+ Test (for testing, duh!) 
+
+COPYRIGHT AND LICENCE
+
+Copyright 2002, Curtis "Ovid" Poe <poec@yahoo.com>.  All rights reserved.
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

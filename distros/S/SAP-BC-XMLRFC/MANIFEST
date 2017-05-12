@@ -1,0 +1,12 @@
+Changes
+README
+MANIFEST
+Makefile.PL
+lib/SAP/BC.pm
+lib/SAP/BC/XMLRFC.pm
+lib/SAP/BC/Iface.pm
+test.pl
+examples/examples.pl
+examples/thread.pl
+examples/report.pl
+examples/bc_test.pl

@@ -1,0 +1,21 @@
+Changes
+Key.xs
+Makefile.PL
+MANIFEST
+ppport.h
+sort.h
+typemap
+README
+t/strings.t
+t/ints.t
+t/floats.t
+t/multi.t
+t/natural.t
+lib/Sort/Key.pm
+lib/Sort/Key/Maker.pm
+lib/Sort/Key/Multi.pm
+lib/Sort/Key/Natural.pm
+lib/Sort/Key/Register.pm
+lib/Sort/Key/Types.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

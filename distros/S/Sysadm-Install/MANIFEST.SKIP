@@ -1,0 +1,10 @@
+blib
+^Makefile$
+^Makefile.old$
+CVS
+.cvsignore
+MANIFEST.bak
+^adm
+.git
+.gz$
+MYMETA\..*

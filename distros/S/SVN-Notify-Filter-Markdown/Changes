@@ -1,0 +1,28 @@
+Revision history for Perl extension SVN::Notify::Filter::Markdown.
+
+0.05  2011-06-26T05:28:51
+      - Moved the repository to
+        [GitHub](https://github.com/theory/svn-notify-filter-markdown/). Yes,
+        I'm aware of the irony.
+
+0.04  2010-10-21T18:29:20
+      - Added Test::Pod to the `recommends` parameter in `Build.PL`.
+      - Now requring Text::Markdown 1.04 or higher. Always depended on
+        features added then, just didn't realize it. Thanks cpan-testers!
+      - Switched to "traditional" `Makefile.PL` compatibility.
+
+0.03  2008-05-18T03:41:38
+      - Removed the spelling test from the distribution, since it can
+        fail on systems without a spell program or using a different locale.
+
+0.02  2008-05-15T03:24:13
+      - Updated copyright.
+      - Added Test::More to the "build_requires" parameter in Build.PL.
+      - Added spelling test. No spelling errors found.
+      - Now requiring HTML::Entities, since SVN::Notify only recommends it,
+        but this module only does HTML.
+      - Fixed a test failure when for systems without sendmail. Now
+        SVN::Notify won't even look.        
+
+0.01  2008-04-02T05:11:13
+      - Initial public release.

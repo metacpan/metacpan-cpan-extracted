@@ -1,0 +1,14 @@
+Revision history for Perl extension SETI::WebStats.
+
+1.03  Sun Oct 15 16:46:11 2003
+	- Added tests.
+	- Added support for querying SETI server for group data
+
+1.02  Mon Dec 30 09:32:15 2002
+	- fixed a wee URL bug
+
+1.01  Sun Dec 29 08:55:13 2002
+	- removed 'warnings' pragma
+	
+1.00  Mon Dec 23 10:56:14 2002
+	- and so it begins, initial release

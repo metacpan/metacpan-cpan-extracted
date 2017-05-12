@@ -1,0 +1,5 @@
+Revision history for Perl extension SMS::Send::TW::Socket2Air.
+
+0.01  Tue Jan 21 12:02:12 2010
+	- original version; created by h2xs 1.23 with options
+		-XA -n SMS::Send::TW::Socket2Air

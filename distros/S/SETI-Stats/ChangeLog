@@ -1,0 +1,24 @@
+2001-08-24  Andrea Whitlock  <whitlock@mobius-soft.com>
+
+	* Put out 1.06, which adds the patches for HTMLPerlSETI
+	(mainly .txt <-> .sah changes)
+
+1999-08-06  Martin Hamilton  <martin@not-invented-here.lut.ac.uk>
+
+	* Put out 1.05, which adds " ... " wrappers around the
+	cat command used to remotely read files - needed for NT
+
+1999-08-04  Martin Hamilton  <martin@not-invented-here.lut.ac.uk>
+
+	* Put out 1.04, which now properly sets the $x hash array
+	which is used to generate new perlseti_data state files
+
+1999-07-29  Martin Hamilton  <martin@not-invented-here.lut.ac.uk>
+
+	* Folded in patches from Andrea Whitlock for running on NT
+	and setting the status message properly
+
+1999-07-13  Martin Hamilton  <martin@uk.gnu.org>
+
+	* Packaged up for first public test release
+

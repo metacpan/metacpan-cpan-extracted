@@ -1,0 +1,28 @@
+---
+abstract: 'an XS module for SNMP translateObj'
+author:
+  - 'Robert Drake <rdrake@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Devel::CheckLib: '0.9'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SNMP-OID-Translate
+requires:
+  DynaLoader: '0'
+  Exporter: '0'
+  perl: v5.8.0
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/rfdrake/p5-SNMP-OID-Translate/issues
+  homepage: https://github.com/rfdrake/p5-SNMP-OID-Translate
+  repository: https://github.com/rfdrake/p5-SNMP-OID-Translate.git
+version: '0.0005'

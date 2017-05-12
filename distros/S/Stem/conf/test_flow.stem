@@ -1,0 +1,6 @@
+# test_flow.stem
+[
+	class	=>	'Stem::Test::Flow',
+	name	=>	'flow',
+	args	=>	[],
+],

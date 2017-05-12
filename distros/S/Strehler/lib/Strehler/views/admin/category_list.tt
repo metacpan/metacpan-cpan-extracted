@@ -1,0 +1,60 @@
+[% PROCESS admin/blocks/add_blocks.tt %]
+[% IF message == 'fast-created' %]
+    <div class="alert alert-success">
+    <button class="close" data-dismiss="alert" type="button">x</button>
+    <strong>Category created!</strong>
+</div>
+[% END %]
+<div class="span12">
+    <h1>Categories</h1>
+</div>
+<div class="content categorylist span12">
+        <div class="row">
+          <a href="add" class="span2 btn btn-primary">New category</a>
+        </div>
+        <br />
+       <div class="categoryadd row">
+            [% form %]
+        </div>
+        <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Category</th>
+            </tr>
+        </thead>
+        <tbody>
+            [% FOREACH el IN categories %]
+            [% IF el.depth > 5 %]
+            <tr class="category-line5">
+            [% ELSE %]
+            <tr class="category-line[% el.depth %]">
+            [% END %]
+                <td>[% el.id %]</td>
+                <td class="category-display">[% el.display_name %]</td>
+                <td>
+                    <div class="btn-group span2 offset1">
+                        <a href="/admin/category/edit/[% el.id %]" class="btn">Edit</a>
+                        <a href="/admin/category/delete/[% el.id %]" class="btn">Delete</a>
+                        <a class="asparent btn" rel="[% el.id %]" href="#">Pick as Parent</a>
+                    </div>
+                </td>
+            </tr>
+            [% END %]
+        </tbody>
+        </table>
+</div>
+[% INCLUDE categoryinit %]
+<script>
+    $(document).ready(function() {
+        $(".asparent").on("click", function()
+            {
+                var el = $(this).attr('rel');
+                $('#parent').val(el);
+                init_category_boxes();
+                return false;
+            });
+    });
+</script>
+
+

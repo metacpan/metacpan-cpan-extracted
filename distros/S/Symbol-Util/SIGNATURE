@@ -1,0 +1,57 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 64187a35467f5d3caaf4aa9de38bc4c5b3b8e8c8 Build.PL
+SHA1 78b87ef61b3fbaacd72da19dd4122c85e65f5b47 Changes
+SHA1 39d4369e877ca8afd2c5736d89d21b67976f2d07 LICENSE
+SHA1 3e63773211bc5f3e1e98a6a662257bad74bfd66b MANIFEST
+SHA1 c3a34543c726b0d9c39e90592d1db5ae07b6f1b3 MANIFEST.SKIP
+SHA1 f5bab1c0fdf4a688b6459fae03f7835dda160afc META.json
+SHA1 2ee4aefd21c3fb220d0948a560dd02170ac5e8de META.yml
+SHA1 da87b7fe0e3592609e071cdd7805a69df847b5fb Makefile.PL
+SHA1 a71689014a5facf86c62e5486869d84bfe8450d7 README
+SHA1 01bd53ec0aa49f117e2efcec0eba6a6e79dddbcd examples/delete_glob.pl
+SHA1 6d8505ceb14cf4e88bd3a3711bf00dbcd3d6d806 lib/Symbol/Util.pm
+SHA1 b97b512bb745d3cfba183fb7bb602d202ab0c64a t/10use.t
+SHA1 e8a68b237414b6f66c6417c53049c9fed82566ac t/20fetch_glob.t
+SHA1 f3e33e6dff6c02eea6ff5198900733cf934fdd32 t/30stash.t
+SHA1 33d9c4ea87d7ff432af36f3465cbd6dcccb2c624 t/40delete_glob.t
+SHA1 f74093b7a32ea26d53a92bab4b74a23d9e3297b6 t/50delete_sub.t
+SHA1 69e58b80300689ac1824567abaea4f79cb7d249f t/60list_glob_slots.t
+SHA1 6a584065dc0cbc1bacb8b45ebbc88ad6b178504e t/70export_glob.t
+SHA1 f380dd4a98a1fd0f310641ba2990dfa924411641 t/80export_package.t
+SHA1 abec3fa7149e59f9f36680c5a49dfbbebd9d6ecc t/test.pl
+SHA1 90353a99ac0f719b6f3e58029804d8556cedc2ab xt/check_changes.t
+SHA1 a56d0c02b6c992e04a77d13a6ee89504bd718572 xt/consistent_version_numbers.t
+SHA1 67bb4c141ea95809f3db2d526ce91d9e6d894756 xt/copyright.t
+SHA1 650dccfa9b6f5a98cf731c89041bea8935dbc623 xt/cover.pl
+SHA1 f5aac658ae1888964274e68d179413782082b7ad xt/distribution.t
+SHA1 44147122d52fef90ab3a2c65ebba4f89342174f8 xt/kwalitee.t
+SHA1 6e7f9dde7560793bcb40acc41561e07d163ad6d1 xt/minimumversion.t
+SHA1 e8daa0c73cfc304c240fad2d2c2b1b628175a89d xt/perlcritic.t
+SHA1 ab8306fa77897b01df453d1353b5acfb02cce80b xt/perlcriticrc
+SHA1 775b3ac02805b6d703614f42608732fb43af2a41 xt/pod_coverage.t
+SHA1 bef7d46eb5cbc3e67956d4e823ec199f41ab9268 xt/pod_spell.t
+SHA1 676c85e06d6e0845e3990a9976d33ef84a883a4b xt/pod_spellrc
+SHA1 2c579b58def8daec94f41b628ac81c256faaa2b1 xt/pod_syntax.t
+SHA1 a38994922fda6d64e2ee75198fadc464a221fea9 xt/signature.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAk9iXN8ACgkQhMHHe8CxClv5CQCgsu+wcbUavM2WIM6kvUk1RK2S
+MJkAn1dEQS1FLHtC59HTF5tPz2ckvC6k
+=J2Be
+-----END PGP SIGNATURE-----

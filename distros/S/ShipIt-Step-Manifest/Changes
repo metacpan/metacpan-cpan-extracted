@@ -1,0 +1,10 @@
+---
+global:
+  name: ShipIt-Step-Manifest
+releases:
+  - author: 'Marcel Gruenauer <marcel@cpan.org>'
+    changes:
+      - original version
+    date: 2007-11-09T10:27:57Z
+    tags: []
+    version: 0.01

@@ -1,0 +1,12 @@
+Changes
+examples/comparison.pl
+examples/comparison_integer.pl
+lib/Statistics/Test/RandomWalk.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00pod.t
+t/00podcover.t
+t/11n_over_k.t
+t/20tests.t
+META.yml                                 Module meta-data (added by MakeMaker)

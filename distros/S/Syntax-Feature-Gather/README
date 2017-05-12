@@ -1,0 +1,43 @@
+NAME
+    Syntax::Feature::Gather - Provide a gather keyword
+
+VERSION
+    version 1.002001
+
+SYNOPSIS
+     use syntax 'gather';
+
+     my @list = gather {
+        # Try to extract odd numbers and odd number names...
+        for (@data) {
+           if (/(one|three|five|seven|nine)$/) { take qq{'$_'} }
+           elsif (/^\d+$/ && $_ %2)            { take $_ }
+        }
+        # But use the default set if there aren't any of either...
+        take @defaults unless gathered;
+     }
+
+    or to use the stuff that Sub::Exporter gives us, try
+
+     # this is a silly idea
+     use syntax gather => {
+       gather => { -as => 'bake' },
+       take   => { -as => 'cake' },
+     };
+
+     my @vals = bake { cake (1...10) };
+
+    The full documentation for this module is in Syntax::Keyword::Gather.
+    This is just a way to use the sugar that syntax gives us.
+
+AUTHORS
+    *   Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
+
+    *   Damian Conway
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Arthur Axel "fREW" Schmidt.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

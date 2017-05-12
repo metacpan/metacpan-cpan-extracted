@@ -1,0 +1,39 @@
+Revision history for SyntaxHighlight-Any
+
+0.06    2015-08-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Log::Any to Log::Any::IfLOG.
+
+
+0.05    2015-01-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Rebuild (Generate TODO.md).
+
+
+0.04    2014-05-17 (SHARYANTO)
+
+        - No functional changes.
+
+        - Replace File::Slurp with File::Slurp::Tiny.
+
+
+0.03    2013-03-21 (SHARYANTO)
+
+        - Minor tweaks to POD/messages.
+
+        - Add some more commonly-used langs.
+
+
+0.02    2013-03-21 (SHARYANTO)
+
+        - highlight_string(): Instead of dying when no backend is available,
+          warn via Log::Any and return input as-is.
+
+
+0.01    2013-03-21 (SHARYANTO)
+
+        - First release.

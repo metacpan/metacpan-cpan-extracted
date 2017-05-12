@@ -1,0 +1,742 @@
+#!/bin/sh
+#
+#Fake sshare results for testing
+#
+# I think I got usage numbers to be self-consistent, but I don't really understand
+# share numbers, so those are probably inconsistent.
+#
+# NOTE: any changes here need to be reflected in the Perl test data as well (e.g.
+# file parse-help.pl)
+
+#Order of fields is
+#We always should be run with --parsable2 --noheaders --long
+#On older sshares, expect
+#Account|User|Raw Shares|Norm Shares|Raw Usage|Norm Usage|Effectv Usage|FairShare|GrpCPUMins|CPURunMins
+#On sshares starting around 15.08.1-2 ??
+#Account|User|Partition|Raw Shares|Norm Shares|Raw Usage|Norm Usage|Effectv Usage|FairShare|GrpTRESMins|TRESRunMins
+#
+#For this fake sshare, control via environment variable
+#FAKESSHARE_EMULATE_VERSION
+#if set to
+#	14 :	never print partition info, print GrpCPUMins/CPURunMins instead of GrpTRESMins/TRESRunMins
+#	15.08.2 :print partition info if requested, print GrpTRESMins/TRESRunMins instead of GrpCPUMins/CPURunMins 
+#Default is 14
+
+verbose_flag=
+DEBUG=
+#Uncomment for help debugging script
+#DEBUG=yes
+
+debug()
+{	if [ "x$DEBUG" = "xyes" ]; then
+		echo >&2 "[DEBUG] $@"
+	fi
+}
+
+#Version emulation stuff
+if [ "x$FAKESSHARE_EMULATE_VERSION" = "x" ]; then
+	FAKESSHARE_EMULATE_VERSION=14
+fi
+
+FLAG_DO_GRPTRESMIN=
+FLAG_DO_TRESRUNMIN=
+FLAG_DO_PARTITION=
+FLAG_CAN_DO_PARTITION=
+
+case $FAKESSHARE_EMULATE_VERSION in
+	14)
+		#Nothing to do
+		;;
+	15.08.2)
+		FLAG_DO_GRPTRESMIN=yes
+		FLAG_DO_TRESRUNMIN=yes
+		FLAG_CAN_DO_PARTITION=yes
+		;;
+	*)
+		echo >&2 "Unrecognized value $FAKESSHARE_EMULATE_VERSION for FAKESSHARE_EMULATE_VERSION"
+		echo >&2 "Expecting 14 or 15.08.02"
+		exit 1;
+esac
+
+print_help()
+{	
+	cat - <<EOF
+Usage:  sshare [OPTION]                                                    
+  Valid OPTIONs are:                                                       
+    -a or --all            list all users                                  
+    -A or --accounts=      display specific accounts (comma separated list)
+EOF
+	case $FAKESSHARE_EMULATE_VERSION in
+	    14)
+		cat - <<EOF
+    -h or --noheader       omit header from output                         
+    -M or --cluster=name   cluster to issue commands to.  Default is       
+                           current cluster.  cluster with no name will     
+                           reset to default.                               
+    -l or --long           include normalized usage in output              
+EOF
+		;;
+	    15*)
+		cat - <<EOF
+    -e or --helpformat     Print a list of fields that can be specified    
+                           with the '--format' option                      
+    -l or --long           include normalized usage in output              
+    -m or --partition      print the partition part of the association     
+    -M or --cluster=name   cluster to issue commands to.  Default is       
+                           current cluster.  cluster with no name will     
+                           reset to default.                               
+    -n or --noheader       omit header from output                         
+    -o or --format=        Comma separated list of fields. (use            
+                           ("--helpformat" for a list of available fields).
+EOF
+		;;
+	    *)
+		echo >&2 "Unrecognized FAKESSHARE_EMULATE_VERSION $FAKESSHARE_EMULATE_VERSION"
+		echo >&2 "Trying to continue, but likely will be problems."
+		;;
+	esac
+
+	cat - <<EOF
+    -p or --parsable       '|' delimited output with a trailing '|'        
+    -P or --parsable2      '|' delimited output without a trailing '|'     
+    -u or --users=         display specific users (comma separated list)   
+    -U or --Users          display only user information                   
+    -v or --verbose        display more information                        
+    -V or --version        display tool version number                     
+          --help           display this usage description                  
+          --usage          display this usage description                  
+EOF
+}
+                                                                           
+
+
+print_header()
+{
+	tmp_part=''
+	if [ "x$FLAG_DO_PARTITION" = "xyes" ]; then
+		tmp_part="|Partition"
+	fi
+	tmp_grptresmins=GrpCPUMins
+	tmp_tresrunmins=CPURunMins
+	if [ "x$FLAG_DO_GRPTRESMIN" = "xyes" ]; then
+		tmp_grptresmins=GrpTRESMins
+	fi
+	if [ "x$FLAG_DO_TRESRUNMIN" = "xyes" ]; then
+		tmp_tresrunmins=TRESRunMins
+	fi
+	echo "Account|User${tmp_part}|Raw Shares|Norm Shares|Raw Usage|Norm Usage|Effectv Usage|FairShare|$tmp_grptresmins|$tmp_tresrunmins"
+}
+
+print_record()
+{	
+	#Clear values
+	tmp_acct=
+	tmp_user=
+	tmp_partition=
+	tmp_rshares=
+	tmp_nshares=
+	tmp_rusage=
+	tmp_nusage=
+	tmp_eusage=
+	tmp_fshare=
+	tmp_grpcpumins=
+	tmp_cpurunmins=
+	tmp_grptresmins=
+	tmp_tresrunmins=
+	tmpPREFIX=
+
+	#Set values
+	while [ $# -gt 0 ]
+	do
+		key="$1"
+		val="$1"
+		shift
+		#echo >&2 "key=val is $key"
+		key=`echo $key | sed -e 's/=.*$//'`
+		val=`echo $val | sed -e 's/^[^=]*=//'`
+		#echo >&2 "$key = $val"
+
+		case $key in
+		    account)
+			tmp_acct=$val
+			;;
+		    user)
+			tmp_user=$val
+			;;
+		    partition)
+			tmp_partition=$val
+			;;
+		    rawshares)
+			tmp_rshares=$val
+			;;
+		    normshares)
+			tmp_nshares=$val
+			;;
+		    rawusage)
+			tmp_rusage=$val
+			;;
+		    normusage)
+			tmp_nusage=$val
+			;;
+		    effusage)
+			tmp_eusage=$val
+			;;
+		    fairshare)
+			tmp_fshare=$val
+			;;
+		    grpcpumins)
+			tmp_grpcpumins=$val
+			;;
+		    cpurunmins)
+			tmp_cpurunmins=$val
+			;;
+		    grptresmins)
+			tmp_grptresmins="$val"
+			;;
+		    tresrunmins)
+			tmp_tresrunmins="$val"
+			;;
+		    PREFIX)
+			tmpPREFIX=`echo $val | sed -e 's/x/ /g'`
+			;;
+		    *)
+			echo >&2 "Unrecognized parm $key, aborting"
+			exit 1
+			;;
+		esac
+	done
+
+	tmp_grpmins="$tmp_grpcpumins"
+	tmp_runmins="$tmp_cpurunmins"
+	if [ "x$FLAG_DO_GRPTRESMIN" = "xyes" ]; then
+		tmp_grpmins="$tmp_grptresmins"
+	fi
+	if [ "x$FLAG_DO_TRESRUNMIN" = "xyes" ]; then
+		tmp_runmins="$tmp_tresrunmins"
+	fi
+		    
+	if [ "x$FLAG_DO_PARTITION" = "xyes" -a "x$FLAG_CAN_DO_PARTITION" = "xyes" ]; then
+		tmp_partition="|$tmp_partition"
+	else
+		tmp_partition=""
+	fi
+
+	echo "${tmpPREFIX}$tmp_acct|$tmp_user$tmp_partition|$tmp_rshares|$tmp_nshares|$tmp_rusage|$tmp_nusage|$tmp_eusage|$tmp_fshare|$tmp_grpmins|$tmp_runmins|"
+
+}
+
+sort_words()
+{	#We need to sort (and uniq) lists of words
+	#This is not the most elegant, but only uses tr, sort, and uniq, so
+	#should be pretty portable
+	words="$@"
+
+	sorted=`echo $words | tr ' ' '\n' | sort | uniq | tr '\n' ' '`
+	echo $sorted
+}
+	
+#Fake output for yottascale cluster
+print_recs_for_ys_acct_user()
+{	accts=$1
+	users=$2
+
+	tmpaccts="$accts"
+	tmpusers="$users"
+
+	doroot=no
+	#allaccts and allusers MUST be alphabetical
+	allaccts="abc124 fbi nsa"
+	allusers="george kevin payerle"
+
+	#If no user given, should only print for current user, which we assume is george
+	if [ "x$tmpusers" = "x" ]; then
+		tmpusers="george"
+		#And if no accounts given, all accounts get shown, even root
+		if [ "x$tmpaccts" = "x" ]; then
+			doroot=yes
+			tmpaccts="$allaccts"
+		fi
+	fi
+
+	#Handle special case for ALL-USERS
+	if [ "x$tmpusers" = "xALL-USERS" ]; then
+		tmpusers="$allusers"
+	fi
+
+
+	#If no accounts given, do all accounts (including root)
+	if [ "x$tmpaccts" = "x" ]; then
+		tmpaccts="$allaccts"
+		doroot=yes
+	fi
+
+	#basePREFIX has an x for each space before userless account entry
+	basePREFIX=
+	if [ "x$doroot" = "xyes" ]; then
+		debug "about to print ys, root,  ROOT"
+		print_record \
+			account=root \
+			normshares=1.000000 \
+			rawusage=42000000 \
+			effusage=0.000000 \
+			fairshare=1.000000 \
+			cpurunmins=5700070 \
+			tresrunmins="cpu=5700070,mem=600000,energy=0,node=20000,gres/gpu=4000"
+		#If doing root, all non-root accounts will have one space
+		basePREFIX=x
+	fi
+
+	for acct in $allaccts
+	do
+
+		#Skip account if not in our list
+		echo "$tmpaccts" | grep $acct > /dev/null
+		if [ $? -ne 0 ]; then
+			#acct not in tmpaccts, skip it
+			continue
+		fi
+
+		#Have a valid account
+
+		case $acct in
+		   abc124)
+			#Print the user-less account record
+			debug "about to print ys, abc124, ROOT"
+			print_record \
+				PREFIX=$basePREFIX \
+				account=$acct \
+				rawshares=1 \
+				normshares=0.333333 \
+				rawusage=20000000 \
+				normusage=0.476190 \
+				effusage=0.476190 \
+				fairshare=0.321144 \
+				grpcpumins=12321153 \
+				cpurunmins=3156000 \
+				grptresmins="cpu=12321153,gres/gpu=8000" \
+				tresrunmins="cpu=3156000,gres/gpu=1000,node=7000"
+			#Now print user records for each specified user
+			for user in $allusers
+			do
+				
+				#Skip user if not in our list
+				echo "$tmpusers" | grep $user > /dev/null
+				if [ $? -ne 0 ]; then
+					continue
+				fi
+
+				case $user in
+				    george)
+					debug "about to print ys, abc124, george"
+					print_record \
+						PREFIX=x$basePREFIX \
+						account=$acct \
+						user=$user \
+						partition=standard \
+						rawshares=1 \
+						normshares=0.1 \
+						rawusage=5049600 \
+						normusage=0.120226 \
+						effusage=0.120226 \
+						fairshare=0.500000 \
+						cpurunmins=315520 \
+						tresrunmins="cpu=315520,gres/gpu=0,node=3000" \
+					;;
+				    kevin)
+					debug "about to print ys, abc124, kevin"
+					print_record \
+						PREFIX=x$basePREFIX \
+						account=$acct \
+						partition=standard \
+						user=$user \
+						rawshares=1 \
+						normshares=0.1 \
+						rawusage=11960320 \
+						normusage=0.284770 \
+						effusage=0.284770 \
+						fairshare=0.500000 \
+						cpurunmins=1420240 \
+						tresrunmins="cpu=1420240,gres/gpu=0,node=2000" \
+					;;
+				    payerle)
+					#Have multiple associations
+					debug "about to print ys, abc124, payerle (1)"
+					print_record \
+						PREFIX=x$basePREFIX \
+						account=$acct \
+						user=$user \
+						partition=standard \
+						rawshares=1 \
+						normshares=0.1 \
+						rawusage=1495040 \
+						normusage=0.035596 \
+						effusage=0.035596 \
+						fairshare=0.300000 \
+						cpurunmins=236707 \
+						tresrunmins="cpu=236707,gres/gpu=0,node=500" 
+					debug "about to print ys, abc124, payerle (2)"
+					print_record \
+						PREFIX=x$basePREFIX \
+						account=$acct \
+						user=$user \
+						partition=highpri \
+						rawshares=1 \
+						normshares=0.1 \
+						rawusage=996693 \
+						normusage=0.023737 \
+						effusage=0.023737 \
+						fairshare=0.600000 \
+						tresrunmins="cpu=473413,gres/gpu=0,node=1200" \
+						cpurunmins=473413
+					debug "about to print ys, abc124, payerle (3)"
+					print_record \
+						PREFIX=x$basePREFIX \
+						account=$acct \
+						user=$user \
+						partition=gpu \
+						rawshares=1 \
+						normshares=0.1 \
+						rawusage=498347 \
+						normusage=0.011865 \
+						effusage=0.011865 \
+						fairshare=0.200000 \
+						tresrunmins="cpu=710120,gres/gpu=1000,node=300" \
+						cpurunmins=710120
+					;;
+				esac
+			done
+			;;
+
+		    fbi)
+			#Print the user-less account record
+			debug "about to print ys, fbi, ROOT"
+			print_record \
+				PREFIX=$basePREFIX \
+				account=$acct \
+				rawshares=1 \
+				normshares=0.333333 \
+				rawusage=16500000 \
+				normusage=0.392857 \
+				effusage=0.392857 \
+				fairshare=0.500000 \
+				grpcpumins=30000000 \
+				grptresmins="cpu=30000000,gres/gpu=8000,nodes=100000" \
+				grpcpumins=30000000 \
+				tresrunmins="cpu=1234000,gres/gpu=50,nodes=1000" \
+				cpurunmins=1234000
+			#Now print user records for each specified user
+			for user in $allusers
+			do
+				#Skip user if not in our list
+				echo "$tmpusers" | grep $user > /dev/null
+				if [ $? -ne 0 ]; then
+					continue
+				fi
+
+				case $user in
+				    george)
+					debug "about to print ys, fbi, george"
+					print_record \
+						PREFIX=x$basePREFIX \
+						account=$acct \
+						user=$user \
+						partition=highpri \
+						rawshares=1 \
+						normshares=0.1 \
+						rawusage=4125000 \
+						normusage=0.098214 \
+						effusage=0.098214 \
+						fairshare=0.400000 \
+						tresrunmins="cpu=308500,gres/gpu=0,nodes=320" \
+						cpurunmins=308500
+					;;
+				    payerle)
+					#Have multiple associations
+					debug "about to print ys, fbi, payerle (1)"
+					print_record \
+						PREFIX=x$basePREFIX \
+						account=$acct \
+						user=$user \
+						partition=standard \
+						rawshares=1 \
+						normshares=0.1 \
+						rawusage=4125000 \
+						normusage=0.098214 \
+						effusage=0.098214 \
+						fairshare=0.333333 \
+						tresrunmins="cpu=308500,gres/gpu=0,nodes=320" \
+						cpurunmins=308500
+					debug "about to print ys, fbi, payerle (2)"
+					print_record \
+						PREFIX=x$basePREFIX \
+						account=$acct \
+						partition=highpri \
+						user=$user \
+						rawshares=1 \
+						normshares=0.1 \
+						rawusage=4125000 \
+						normusage=0.098214 \
+						effusage=0.098214 \
+						fairshare=0.333333 \
+						tresrunmins="cpu=308500,gres/gpu=0,nodes=320" \
+						cpurunmins=308500
+					debug "about to print ys, fbi, payerle (3)"
+					print_record \
+						PREFIX=x$basePREFIX \
+						account=$acct \
+						user=$user \
+						partition=gpu \
+						rawshares=1 \
+						normshares=0.1 \
+						rawusage=4125000 \
+						normusage=0.098214 \
+						effusage=0.098214 \
+						fairshare=0.333333 \
+						tresrunmins="cpu=308500,gres/gpu=50,nodes=40" \
+						cpurunmins=308500
+					;;
+				esac
+			done
+			;;
+
+		    nsa)
+			#Print the user-less account record
+			debug "about to print ys, nsa, ROOT"
+			print_record \
+				PREFIX=$basePREFIX \
+				account=$acct \
+				rawshares=1 \
+				normshares=0.333333 \
+				rawusage=5500000 \
+				normusage=0.130952 \
+				effusage=0.130952 \
+				fairshare=0.500000 \
+				grpcpumins=90000000 \
+				grptresmins="cpu=90000000,gres/gpu=8000,nodes=100000" \
+				cpurunmins=1111111 \
+				tresrunmins="cpu=1111111,gres/gpu=0,nodes=1000" 
+			#Now print user records for each specified user
+			for user in $allusers
+			do
+				#Skip user if not in our list
+				echo "$tmpusers" | grep $user > /dev/null
+				if [ $? -ne 0 ]; then
+					continue
+				fi
+
+				case $user in
+				    george)
+					debug "about to print ys, nsa, george"
+					#No paritition
+					print_record \
+						PREFIX=x$basePREFIX \
+						account=$acct \
+						user=$user \
+						rawshares=1 \
+						normshares=0.1 \
+						rawusage=5500000 \
+						normusage=0.130952 \
+						effusage=0.130952 \
+						fairshare=0.500000 \
+						tresrunmins="cpu=1111111,gres/gpu=0,nodes=1000" \
+						cpurunmins=1111111
+					;;
+				esac
+			done
+			;;
+		esac
+	done
+}
+
+#Fake output for test cluster
+print_recs_for_test_acct_user()
+{	accts=$1
+	users=$2
+
+	tmpaccts="$accts"
+	tmpusers="$users"
+
+	doroot=no
+	#allaccts and allusers MUST be alphabetical
+	allaccts="abc124"
+	allusers="george payerle"
+
+	#If no user given, should only print for current user, which we assume is george
+	if [ "x$tmpusers" = "x" ]; then
+		tmpusers="george"
+		#And if no accounts given, all accounts get shown, even root
+		if [ "x$tmpaccts" = "x" ]; then
+			doroot=yes
+			tmpaccts=$allaccts
+		fi
+	fi
+
+	#Handle special case for ALL-USERS
+	if [ "x$tmpusers" = "xALL-USERS" ]; then
+		tmpusers="$allusers"
+	fi
+
+
+	#If no accounts given, do all accounts (including root)
+	if [ "x$tmpaccts" = "x" ]; then
+		tmpaccts="$allaccts"
+		doroot=yes
+	fi
+
+	#basePREFIX has an x for each space before userless account entry
+	basePREFIX=
+	if [ "x$doroot" = "xyes" ]; then
+		debug "about to print test, root, ROOT"
+		print_record \
+			account=root \
+			normshares=1.000000 \
+			rawusage=12400 \
+			effusage=0.000000 \
+			fairshare=1.000000 \
+			tresrunmins="cpu=248,gres/gpu=0,nodes=1" \
+			cpurunmins=248
+		#If doing root, all non-root accounts will have one space
+		basePREFIX=x
+	fi
+
+	for acct in $allaccts
+	do
+		echo "$tmpaccts" | grep $acct > /dev/null
+		if [ $? -ne 0 ]; then
+			#acct not in tmpaccts, skip it
+			continue
+		fi
+
+		#Have a valid account
+
+		case $acct in
+		   abc124)
+			#Print the user-less account record
+			debug "about to print test, abc124, ROOT"
+			print_record \
+				PREFIX=$basePREFIX \
+				account=$acct \
+				rawshares=1 \
+				normshares=1.000000 \
+				rawusage=12400 \
+				normusage=1.000000 \
+				effusage=1.000000 \
+				fairshare=0.321144 \
+				grpcpumins=98765432 \
+				grptresmins="cpu=98765432,gres/gpu=0,nodes=10" \
+				tresrunmins="cpu=248,gres/gpu=0,nodes=1" \
+				cpurunmins=248
+			#Now print user records for each specified user
+			for user in $allusers
+			do
+				#Skip user if not in our list
+				echo "$tmpusers" | grep $user > /dev/null
+				if [ $? -ne 0 ]; then
+					continue
+				fi
+
+				case $user in
+				    george)
+					debug "about to print test, abc124, george"
+					print_record \
+						PREFIX=x$basePREFIX \
+						account=$acct \
+						user=$user \
+						rawshares=1 \
+						normshares=0.500000 \
+						rawusage=0 \
+						normusage=0.000000 \
+						effusage=0.000000 \
+						fairshare=1.000000 \
+						tresrunmins="cpu=0,gres/gpu=0,nodes=0" \
+						cpurunmins=0
+					;;
+				    payerle)
+					#Have multiple associations
+					debug "about to print test, abc124, payerle"
+					print_record \
+						PREFIX=x$basePREFIX \
+						account=$acct \
+						user=$user \
+						rawshares=1 \
+						normshares=0.500000 \
+						rawusage=12400 \
+						normusage=1.000000 \
+						effusage=1.000000 \
+						fairshare=0.050000 \
+						grpcpumins=10000 \
+						grptresmins="cpu=10000" \
+						tresrunmins="cpu=248,gres/gpu=0,nodes=1" \
+						cpurunmins=248
+					;;
+				esac
+			done
+			;;
+		esac
+	done
+}
+
+
+
+#Parse options
+acct_flag=
+user_flag=
+clus_flag=
+verbose_flag=
+
+while [ $# -gt 0 ]
+do
+	arg=$1
+	shift
+
+	case $arg in
+	    --accounts=* )
+		tmp=`echo $arg | sed -e 's/^--accounts=//' -e "s/'//g" -e 's/"//g' `
+		acct_flag=$tmp
+		;;
+	    --users=* )
+		tmp=`echo $arg | sed -e 's/^--users=//' -e "s/'//g" -e 's/"//g' `
+		user_flag=$tmp
+		;;
+	    --clusters=* )
+		tmp=`echo $arg | sed -e 's/^--clusters=//' -e "s/'//g" -e 's/"//g' `
+		clus_flag=$tmp
+		;;
+	    --all )
+		user_flag='ALL-USERS'
+		;;
+	    -v|--verbose)
+		verbose_flag=yes
+		;;
+	     --help)
+		print_help
+		exit 0
+		;;
+	     --partition)
+		if [ "x$FLAG_CAN_DO_PARTITION" = "xyes" ]; then
+			FLAG_DO_PARTITION=yes
+		else
+			echo >&2 "ERROR: unrecognized argument --partition"
+			exit 1
+		fi
+		;;
+	esac
+done
+
+
+if [ "x$verbose_flag" = "xyes" ]; then
+	print_header
+fi
+
+case $clus_flag in
+    yottascale)
+	print_recs_for_ys_acct_user "$acct_flag" "$user_flag"
+	;;
+    test)
+	print_recs_for_test_acct_user "$acct_flag" "$user_flag"
+	;;
+    *)
+	print_recs_for_ys_acct_user "$acct_flag" "$user_flag"
+	;;
+esac
+

@@ -1,0 +1,49 @@
+{
+   "abstract" : "Efficient way to load or handle all submodules for a specific package.",
+   "author" : [
+      "Francisco Zarabozo <zarabozo@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Submodules",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "fakelib",
+         "fakelib2"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Basename" : "0",
+            "File::Find" : "0",
+            "File::Spec" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Basename" : "0",
+            "File::Find" : "0",
+            "File::Spec" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.0014"
+}

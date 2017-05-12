@@ -1,0 +1,19 @@
+#!/usr/bin/perl -w
+
+use Sys::Utmp ;
+use POSIX qw(strftime);
+use strict;
+
+my $utmp = Sys::Utmp->new();
+
+
+while (my $utent = $utmp->getutent()) 
+{ 
+
+    if ( $utent->user_process() )
+    {
+       print $utent->ut_user(),"\t",
+             $utent->ut_line(),"\t",
+             strftime("%b %d %I:%M",localtime($utent->ut_time())),"\n";
+    }
+}

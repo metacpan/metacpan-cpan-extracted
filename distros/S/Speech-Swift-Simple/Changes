@@ -1,0 +1,12 @@
+Revision History for Speech::Swift::Simple
+==========================================
+
+1.1
+---
+2011-04-20	- fixed the Makefile.PL; I forgot to reference Speech::Swift as a
+		  dependency (Mike)
+
+
+1.0
+---
+2011-04-14	- initial release (Mike)

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN"
+"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Created with Sodipodi ("http://www.sodipodi.com/") -->
+<svg
+   version="1.0"
+   x="0"
+   y="0"
+   width="744.094482"
+   height="1052.36218"
+   id="svg559"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   sodipodi:version="0.33"
+   sodipodi:docname="/home/ian/proj/soggyonion/trunk/logo.svg"
+   sodipodi:docbase="/home/ian/proj/soggyonion/trunk/">
+  <sodipodi:namedview
+     id="base" />
+  <defs
+     id="defs561" />
+  <rect
+     width="734.064514"
+     height="734.064453"
+     x="6.09182167"
+     y="123.359344"
+     style="font-size:12.000;fill:#99ff99;fill-rule:evenodd;"
+     id="rect564"
+     sodipodi:insensitive="1" />
+  <path
+     d="M 133.4615 523.3167 C 122.9070 323.2041 281.5992 327.6032 319.8994 310.1639 C 336.4761 302.6157 369.4579 287.1714 366.0251 281.4549 C 354.5151 261.2852 293.6762 274.3096 294.1448 268.0979 C 294.6083 261.6127 337.1420 254.3187 362.6164 269.0042 C 372.3607 274.7533 402.3332 272.2117 396.9768 267.1004 C 378.8289 248.4048 356.0496 241.6451 337.8631 238.2676 C 319.6765 234.8903 306.0825 234.8950 306.3047 229.7282 C 307.4303 221.9261 364.9757 222.4944 398.5565 254.3411 C 406.6624 262.1371 434.8093 258.5240 435.1412 251.1511 C 436.8262 204.9491 381.1232 186.6497 387.8533 176.2798 C 392.1419 168.7934 438.0819 193.0659 447.9458 235.2016 C 450.5963 246.3387 464.3729 263.7979 471.7258 262.3156 C 489.1646 258.7206 490.3596 221.1502 495.9009 230.4169 C 499.7053 236.4628 492.5345 268.0658 480.8720 276.6702 C 468.7544 285.6102 433.3621 270.7337 424.1659 283.0498 C 419.3839 289.5542 424.0096 298.1198 439.8618 303.5506 C 463.3031 312.0610 593.6699 335.1792 607.1839 516.9092 C 611.4339 684.8874 459.9260 722.4402 442.1876 735.4434 C 426.0357 744.3478 439.3821 762.1740 417.1560 758.9237 C 361.2470 767.4564 400.8704 798.4206 377.6239 805.1768 C 360.6272 810.1168 361.9267 798.8703 345.7157 786.9531 C 330.8297 776.0096 338.6094 759.8499 323.2244 749.1182 C 295.9273 730.0776 142.9800 731.1579 133.4615 523.3167 z "
+     style="font-size:12.000;fill:#006600;fill-rule:evenodd;stroke-width:0;"
+     id="path565"
+     sodipodi:nodetypes="cccccccccccccccccccccccc"
+     sodipodi:insensitive="1" />
+  <text
+     x="5.356577"
+     y="80.79942"
+     transform="scale(1.379253,1.379256)"
+     style="font-size:12.000;font-weight:normal;stroke-width:1;font-family:Arial;"
+     id="text565">
+    <tspan
+       x="5.356577"
+       y="80.79942"
+       id="tspan578">Copyright (c) 2004 Ian Langworth</tspan>
+  </text>
+  <text
+     x="533.1588"
+     y="80.79938"
+     transform="scale(1.379253,1.379256)"
+     style="font-size:12.000;font-weight:normal;stroke-width:1;font-family:Arial;text-anchor:end;"
+     id="text580">
+    <tspan
+       x="533.1588"
+       y="80.79938"
+       id="tspan583">www.soggyonion.com</tspan>
+  </text>
+  <path
+     style="fill:#99ff99;fill-rule:evenodd;stroke:none;stroke-opacity:1.0000;stroke-width:1pt;stroke-linejoin:miter;stroke-linecap:butt;fill-opacity:1.0000;"
+     d="M 473.2991 391.8441 C 451.4575 408.5840 438.4530 423.8794 433.3438 435.4963 C 425.3526 453.0562 424.0482 484.7856 449.5495 472.9097 C 470.0364 464.2780 469.2487 446.0719 466.7301 438.0289 C 461.4157 420.1619 476.5317 389.1548 473.2991 391.8441 z "
+     id="path599"
+     sodipodi:nodetypes="cscss" />
+  <g
+     id="g601">
+    <path
+       style="fill:#99ff99;fill-rule:evenodd;stroke:none;stroke-opacity:1.0000;stroke-width:1pt;stroke-linejoin:miter;stroke-linecap:butt;fill-opacity:1.0000;"
+       d="M 447.4847 372.1911 C 372.4339 389.4510 320.5544 420.3493 292.6009 454.1914 C 249.7030 504.7625 203.7314 624.7216 281.0034 634.2495 C 341.8540 645.4219 364.5433 573.2473 369.3543 536.6396 C 380.7153 455.9277 458.8783 368.8172 447.4847 372.1911 z "
+       id="path596"
+       sodipodi:nodetypes="cscss" />
+    <path
+       sodipodi:type="arc"
+       style="fill-rule:evenodd;stroke:none;fill:#006600;fill-opacity:1.0000;stroke-opacity:1;stroke-width:1pt;stroke-linejoin:miter;stroke-linecap:butt;"
+       id="path598"
+       d="M 357.5204 521.1313 A 39.38785 12.11937 0 1 "
+       sodipodi:cx="318.1325"
+       sodipodi:cy="521.1313"
+       sodipodi:rx="39.38785"
+       sodipodi:ry="12.11937"
+       transform="matrix(0.291938,-0.749556,0.725244,0.301724,-203.1871,635.6792)" />
+  </g>
+</svg>

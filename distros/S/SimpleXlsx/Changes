@@ -1,0 +1,16 @@
+Revision history for Perl extension SimpleXlsx.
+
+0.05 Thu Jul  25 15:30:00 2013
+  - Fixed issue with missing/unavailable font information
+  - Fixed issue with parsing certain versions of spreadsheets
+
+0.03  Fri Sep  2 15:27:13 2011
+  - Inadvertantly uploaded the wrong tarball. Corrected version information.
+
+0.02  Fri Sep  2 15:27:13 2011
+  - Implemented patch provided by Matt Ulman to support strings
+
+0.01  Thu Feb  4 13:02:13 2010
+	- original version; created by h2xs 1.23 with options
+		-AXc -n SimpleXlsx
+

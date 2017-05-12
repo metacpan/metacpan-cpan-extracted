@@ -1,0 +1,105 @@
+NAME
+    SMS::Server::Tools - parse SMS Server Tools files
+
+VERSION
+    Version 0.02
+
+SYNOPSIS
+    Read file with SMS text message received by SMS Server Tools.
+
+        use SMS::Server::Tools;
+
+        my $file = "/path/to/smsfile";
+        my $sms  = SMS::Server::Tools->new({SMSFile => $file});
+
+        $sms->parse;
+
+        my $sender_number      = $sms->From;
+        my $datetime_sent      = $sms->Sent;
+        my $datetime_received  = $sms->Received;
+        my $sms_text           = $sms->Text;
+
+DESCRIPTION
+    SMS::Server::Tools provides an object-oriented interface to access sms
+    files used by the SMS Server Tools.
+
+    The "SMS Server Tools" send and receive short messages through GSM
+    modems or mobile phones <http://smstools3.kekekasvi.com>.
+
+SMS File Format Getter
+    SMS::Server::Tool parse the sms file and give the access to the
+    following sms file fields.
+
+        $sms->Text;
+        $sms->From;    
+        $sms->Sent;
+        $sms->Received;
+        $sms->IMSI;
+        $sms->From_TOA;    
+        $sms->From_SMSC;
+        $sms->Subject;
+        $sms->Report;
+        $sms->Alphabet;
+        $sms->UDH;
+
+    For the complete SMS file format used by SMS Server Tools see
+    <http://smstools3.kekekasvi.com/index.php?p=fileformat>
+
+METHODS
+  new
+    Create an new sms object.
+
+  SMSFile
+    Set path to sms file.
+
+  parse
+    The parse method read the sms file.
+
+  write
+    The write method write the sms file.
+
+AUTHOR
+    Thomas Lenz, "<tholen at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-sms-server-tools at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=SMS-Server-Tools>. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+SEE ALSO
+    For more Information about SMS Server Tools follow this links.
+
+    <http://smstools3.kekekasvi.com/>
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc SMS::Server::Tools
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=SMS-Server-Tools>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/SMS-Server-Tools>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/SMS-Server-Tools>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/SMS-Server-Tools/>
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2009 Thomas Lenz, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

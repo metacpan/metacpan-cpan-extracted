@@ -1,0 +1,19 @@
+Revision history for Spreadsheet-Template
+
+0.05  2015-03-25
+      - add json as a param instead of hardcoding from_json (edibleenergy, #7)
+
+0.04  2014-09-10
+      - support more border types (merrilymeredith, #5)
+
+0.03  2014-07-04
+      - fix default color handling to line up with changes in
+        Spreadsheet::ParseExcel and Spreadsheet::ParseXLSX (edibleenergy, #3,
+        #4)
+
+0.02  2013-08-29
+      - add 'merge' and 'autofilter' options to the template format
+        (jasonshaev, #1)
+
+0.01  2013-07-18
+      - Initial release

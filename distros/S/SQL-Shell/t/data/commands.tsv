@@ -1,0 +1,12 @@
+COMMAND	DESCRIPTION
+show drivers	Displays a list of DBI drivers
+show datasources	Displays a list of available data sources for a driver
+connect	Connects to a data source
+disconnect	Disconnects from a data source
+show tables	List the tables in the schema with a rowcount for each table
+show schema	Lists the columns in each table in the schema
+desc	List the columns in a table
+set	Set a parameter
+help	Displays sqlsh help in your $PAGER
+reload	Reloads sqlsh
+exit	Quits sqlsh

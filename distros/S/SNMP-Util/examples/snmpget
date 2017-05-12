@@ -1,0 +1,34 @@
+#!/usr/local/bin/perl 
+#
+# snmpget
+#
+# Author: Wayne Marquette - 12/14/96
+#
+# Command line interface for PERL snmp->get funcion
+#
+
+use SNMP::Util;
+$ENV{'MAX_LOG_LEVEL'} = 'status';
+
+if (@ARGV < 1){
+   print "Usage: \n";
+   print "       snmpget <IP> <community string> <oid_list>\n";
+   print "\n";
+   print "       IP = IP address or Switch name\n";
+   print "       comm = defaults to hostname\n";
+   print "       oid_list = list of oids or names\n";
+   exit;
+}
+
+#Look for command line arguements
+$IP = $ARGV[0];
+$Comm_string = $ARGV[1];
+for ($i = 2; $i <= $#ARGV; $i ++){
+       push @oid_list,$ARGV[$i];
+}
+
+$snmp = new SNMP::Util(-device     => $IP,
+                 -community => $Comm_string);
+
+@get_values = $snmp->get('ontvef',@oid_list);
+print "@get_values\n";

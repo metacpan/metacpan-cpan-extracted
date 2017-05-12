@@ -1,0 +1,33 @@
+--- 
+abstract: Manage a Samba PDC with an LDAP Backend
+author: Gavin Henry  C<< <ghenry@suretecsystems.com> >>
+build_requires: 
+  Test::Distribution: 1.23
+  Test::More: 0.62
+distribution_type: module
+generated_by: Module::Install version 0.67
+license: gpl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Samba-LDAP
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Class::Base: 0.03
+  Config::Tiny: 2.05
+  Crypt::SmbHash: 0.12
+  Digest::MD5: 2.36
+  Digest::SHA1: 2.11
+  File::Path: 0
+  List::MoreUtils: 0.19
+  MIME::Base64: 3.07
+  Net::LDAP: 0.33
+  Readonly: 1.03
+  Regexp::DefaultFlags: 0.01
+  UNIVERSAL::require: 0.10
+  Unicode::MapUTF8: 1.11
+  perl: 5.6.0
+version: 0.05

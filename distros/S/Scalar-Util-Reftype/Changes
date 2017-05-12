@@ -1,0 +1,32 @@
+Revision history for Perl extension Scalar::Util::Reftype
+
+0.44 Tue Jul  5 01:08:59 2016
+    => This module is DEPRECATED. Please use Ref::Util instead.
+
+0.43 Sun Jul  8 01:50:04 2012
+    => Bump version.
+
+0.42 Wed Nov  4 07:45:11 2009
+   => Defer Data::Dump::Streamer loading to runtime.
+
+0.41 Tue Sep 22 01:01:16 2009
+   => Perl::Critic fixes.
+
+0.40 Wed Sep  9 05:26:13 2009
+   => LVALUE & FORMAT support. Documented VSTRING as unsupported.
+   => OO back-end is now hidden.
+
+0.31 Thu Sep  3 01:43:48 2009
+   => Distro & Pod fix.
+
+0.30 Wed Aug 19 03:24:38 2009
+   => Data::Dump::Streamer is needed for $] < 5.10 to detect blessed regexen.
+
+0.21 Tue Aug 18 02:16:37 2009
+   => Implemented full IO & Regexp support for both regular and blessed refs.
+
+0.20 Mon Aug 17 20:45:30 2009
+   => Disable object usage in boolean contexts.
+
+0.10 Mon Aug 17 06:43:56 2009
+    => First release.

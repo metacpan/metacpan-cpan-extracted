@@ -1,0 +1,13 @@
+--- #YAML:1.0
+name:                Speechd
+version:             0.50
+abstract:            Perl Module wrapper for speech-dispatcher.
+license:             ~
+author:              
+    - root <root@>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

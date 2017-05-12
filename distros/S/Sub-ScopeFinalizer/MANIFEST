@@ -1,0 +1,17 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+SIGNATURE
+inc/ExtUtils/MY_Metafile.pm
+example/execute-order.pl
+lib/Sub/ScopeFinalizer.pm
+lib/Sub/ScopeFinalizer.mlpod
+t/00-load.t
+t/01-basic.t
+t/02-args.t
+t/03-disable.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t

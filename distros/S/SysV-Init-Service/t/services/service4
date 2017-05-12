@@ -1,0 +1,23 @@
+#!/usr/bin/env perl
+
+# Pragmas.
+use strict;
+use warnings;
+
+# Arguments.
+if (@ARGV < 1) {
+	print STDERR "Usage: $0 {start|stop}\n";
+	exit 1;
+}
+my $command = $ARGV[0];
+
+# Run.
+if ($command eq 'start') {
+	print "Start\n";
+	exit 0;
+} elsif ($command eq 'stop') {
+	print "Stop\n";
+	exit 0;
+} else {
+	exit 3;
+}

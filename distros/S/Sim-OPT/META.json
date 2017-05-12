@@ -1,0 +1,59 @@
+{
+   "abstract" : "Sim::OPT is a decomposition-oriented optimization and morphing program that can mix sequential and parallel block search methods.",
+   "author" : [
+      "Gian Luca Brunetti <gianluca.brunetti@polimi.it>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Sim-OPT",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dump" : "0",
+            "Data::Dumper" : "0",
+            "Devel::REPL" : "0",
+            "File::Copy" : "0",
+            "IO::Tee" : "0",
+            "List::AllUtils" : "0",
+            "List::Compare" : "0",
+            "List::MoreUtils" : "0",
+            "List::Util" : "0",
+            "Math::Polygon::Tree" : "0",
+            "Math::Round" : "0",
+            "Math::Trig" : "0",
+            "Parallel::ForkManager" : "0",
+            "Set::Intersection" : "0",
+            "Statistics::Basic" : "0",
+            "Storable" : "0",
+            "Vector::Object3D::Polygon" : "0",
+            "warnings::unused" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v0.72.71",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

@@ -1,0 +1,15 @@
+<NZSRSResponse VerMajor="5" VerMinor="0">
+  <Response Action="DomainDetailsQry" FeId="8" FeSeq="4739999" OrigRegistrarId="1" RecipientRegistrarId="1" Rows="1">
+    <FeTimeStamp Day="23" Hour="17" Minute="29" Month="6" Second="44" TimeZoneOffset="+12:00" Year="2010"/>
+    <Domain DomainName="10-dnssec.co.te" Status="Active">
+      <DNSSEC>
+       <DS DigestType="1" KeyTag="1" Algorithm="5">
+         <Digest>1234abcd11111111111111111111111111111111</Digest>
+       </DS>
+       <DS DigestType="2" KeyTag="4" Algorithm="6">
+         <Digest>8888ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff</Digest>
+       </DS>
+     </DNSSEC>          
+    </Domain>
+  </Response>
+</NZSRSResponse>

@@ -1,0 +1,233 @@
+-- file: sit-nt.mib
+--
+
+SIT-NT DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Opaque, enterprises
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString
+        FROM SNMPv2-TC
+    OBJECT-GROUP, MODULE-COMPLIANCE
+        FROM SNMPv2-CONF;
+
+
+sitNtModule MODULE-IDENTITY
+    LAST-UPDATED        "9805060000Z"
+    ORGANIZATION        "SNMPinfo"
+    CONTACT-INFO
+        "Email: info@snmpinfo.com"
+    DESCRIPTION
+        "This module defines objects to test out
+        the following new types:
+           Unsigned64
+           Int64
+           Float
+           Double"
+    ::= { sitModules 3 }
+
+
+siRoot OBJECT IDENTIFIER ::= { enterprises  1194 }
+sitRoot OBJECT IDENTIFIER ::= { siRoot 2 }
+sitReg OBJECT IDENTIFIER ::= { sitRoot 1 }
+sitModules OBJECT IDENTIFIER ::= { sitReg 1 }
+sitItems OBJECT IDENTIFIER ::= { sitRoot 2 }
+
+-- root for items in the Counter MIB module
+sitNtMIB OBJECT IDENTIFIER ::= { sitItems 2 }
+
+-- conformance area containing group and compliance specifications
+sitNtConfs OBJECT IDENTIFIER ::= { sitNtMIB 1 }
+  sitNtGroups OBJECT IDENTIFIER ::= { sitNtConfs 1 } 
+  sitNtCompls OBJECT IDENTIFIER ::= { sitNtConfs 2 }
+
+-- sub-tree for objects, and for each functional area
+sitNtObjs OBJECT IDENTIFIER ::= { sitNtMIB 2 }
+  sitNtTest1Objs OBJECT IDENTIFIER ::= { sitNtObjs 1 }
+
+-- sub-tree for events
+sitNtEvents OBJECT IDENTIFIER ::= { sitNtMIB 3 }
+  sitNtEventsV2 OBJECT IDENTIFIER ::= { sitNtEvents 0 }
+
+-- Some TCs for the Types
+Integer64 ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A 64-bit signed integer.  The value is restricted to
+        the BER serialization of the following ASN.1 type:
+           I64TYPE ::= [122] IMPLICIT I64Type
+        (note: the value 122 is the sum of '30'h and '4a'h)
+        The BER serialization of the length for values of
+        this type must use the definite length, short
+        encoding form.
+
+        For example, the BER serialization of value 129
+        of type I64TYPE is '9f7a020081'h.  (The tag is '9f7a'h;
+        the length is '02'h; and the value is '0081'h.) The
+        BER serialization of value '9f7a020081'h of data
+        type Opaque is '44059f7a020081'h. (The tag is '44'h;
+        the length is '05'h; and the value is '9f7a020081'h.)
+        Also for example, the BER serialization of value -129
+        of type I64TYPE is '9f7a02ff7f'h.  (The tag is '9f7a'h;
+        the length is '02'h; and the value is 'ff7f'h.) The
+        BER serialization of value '9f7a02ff7f'h of data
+        type Opaque is '44059f7a02ff7f'h. (The tag is '44'h;
+        the length is '05'h; and the value is '9f7a02ff7f'h.)"
+    SYNTAX      Opaque (SIZE(4..11))
+
+Unsigned64 ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A 64-bit unsigned signed integer.  The value is
+        restricted to the BER serialization of the following
+        ASN.1 type:
+            U64TYPE ::= [123] IMPLICIT U64Type
+        (note: the value 123 is the sum of '30'h and '4b'h)
+        The BER serialization of the length for values of
+        this type must use the definite length, short
+        encoding form.
+        For example, the BER serialization of value 129
+        of type U64TYPE is '9f7b020081'h.  (The tag is '9f7b'h;
+        the length is '02'h; and the value is '0081'h.) The
+        BER serialization of value '9f7b020081'h of data
+        type Opaque is '44059f7b020081'h. (The tag is '44'h;
+        the length is '05'h; and the value is '9f7b020081'h.)"
+    SYNTAX      Opaque (SIZE(4..12))
+
+Float ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A single precision floating-point number.  The semantics
+        and encoding are identical for type 'single' defined in
+        IEEE Standard for Binary Floating-Point,
+        ANSI/IEEE Std 754-1985.
+        The value is restricted to the BER serialization of
+        the following ASN.1 type:
+            FLOATTYPE ::= [120] IMPLICIT FloatType
+        (note: the value 120 is the sum of '30'h and '48'h)
+        The BER serialization of the length for values of
+        this type must use the definite length, short
+        encoding form.
+
+        For example, the BER serialization of value 123
+        of type FLOATTYPE is '9f780442f60000'h.  (The tag
+        is '9f78'h; the length is '04'h; and the value is
+        '42f60000'h.) The BER serialization of value
+        '9f780442f60000'h of data type Opaque is
+        '44079f780442f60000'h. (The tag is '44'h; the length
+        is '07'h; and the value is '9f780442f60000'h."
+	    SYNTAX      Opaque (SIZE(7))
+
+Double ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A double precision floating-point number.  The semantics
+        and encoding are identical for type 'double' defined in
+        IEEE Standard for Binary Floating-Point,
+        ANSI/IEEE Std 754-1985.
+
+        The value is restricted to the BER serialization of
+        the following ASN.1 type:
+            DOUBLETYPE ::= [121] IMPLICIT DoubleType
+        (note: the value 121 is the sum of '30'h and '49'h)
+        The BER serialization of the length for values of
+        this type must use the definite length, short
+        encoding form.
+
+        For example, the BER serialization of value 123
+        of type DOUBLETYPE is '9f7908405ec00000000000'h.
+        (The tag is '9f79'h; the length is '08'h; and the
+        value is '405ec00000000000'h.)  The BER serialization
+        of value '9f7908405ec00000000000'h of data type Opaque
+        is '440b9f7908405ec00000000000'h.  (The tag is '44'h;
+        the length is '07'h; and the value is
+        '9f7908405ec00000000000'h.)"
+    SYNTAX      Opaque (SIZE(11))
+  
+-- the test objects
+
+sitNtI64 OBJECT-TYPE
+    SYNTAX      Integer64
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "A test object that is a 64-bit signed integer."
+    ::= { sitNtTest1Objs 1 }
+
+sitNtI64A OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of object sitNtI64 in ASCII."
+    ::= { sitNtTest1Objs 2 }
+
+sitNtU64 OBJECT-TYPE
+    SYNTAX      Unsigned64
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "A test object that is a 64-bit unsigned integer."
+    ::= { sitNtTest1Objs 3 }
+
+sitNtU64A OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of object sitNtU64 in ASCII."
+    ::= { sitNtTest1Objs 4 }
+
+sitNtFloat OBJECT-TYPE
+    SYNTAX      Float
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "A test object that is a 'single' floating point number."
+    ::= { sitNtTest1Objs 5 }
+
+sitNtFloatA OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of object sitNtFloat in ASCII."
+    ::= { sitNtTest1Objs 6 }
+
+sitNtDouble OBJECT-TYPE
+    SYNTAX      Double
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "A test object that is a 'double' floating point number."
+    ::= { sitNtTest1Objs 7 }
+
+sitNtDoubleA OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of object sitNtDouble in ASCII."
+    ::= { sitNtTest1Objs 8 }
+
+
+-- object and event groups
+sitNt1Group OBJECT-GROUP
+    OBJECTS     { sitNtI64, sitNtI64A,
+                sitNtU64, sitNtU64A,
+                sitNtFloat, sitNtFloatA,
+                sitNtDouble, sitNtDoubleA }
+    STATUS      current
+    DESCRIPTION
+        "Objects for the first test."
+    ::= { sitNtGroups 1 }
+
+-- compliance specifications
+sitNtComplV1 MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION "All objects are required."
+    MODULE      -- this module
+        MANDATORY-GROUPS { sitNt1Group }
+    ::= { sitNtCompls 1 }
+
+END

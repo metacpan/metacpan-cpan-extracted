@@ -1,0 +1,10 @@
+
+use Statistics::Basic qw(:all);
+
+my $median = median( 1,2,3 );
+my $mean   = mean(  [1,2,3]); # array refs are ok too
+
+my $variance = variance( 1,2,3 );
+my $stddev   = stddev(   1,2,3 );
+
+my $correlation = correlation( [1 .. 3], [1 .. 3] );

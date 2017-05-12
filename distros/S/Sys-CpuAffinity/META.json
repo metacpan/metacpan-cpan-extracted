@@ -1,0 +1,54 @@
+{
+   "abstract" : "Set CPU affinity for processes",
+   "author" : [
+      "Marty O'Brien <mob@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "keywords" : [
+      "affinity"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Sys-CpuAffinity",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.25",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.25"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "ExtUtils::CBuilder" : "0.15"
+         }
+      }
+   },
+   "provides" : {
+      "Sys::CpuAffinity" : {
+         "file" : "lib/Sys/CpuAffinity.pm",
+         "version" : "1.12"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Sys-CpuAffinity"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.12",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+Makefile.PL
+META.yml
+bin/st-archive-mail
+t/mail-archive.t
+lib/Socialtext/MailArchive.pm

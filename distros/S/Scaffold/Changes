@@ -1,0 +1,63 @@
+Revision history for Scaffold
+
+0.01    14-Jul-2010 K.Esteb
+        First version, released on an unsuspecting world.
+        svn log -r 1:84
+
+0.02    23-Jul-2010 K.Esteb
+        Improved the exception handling within the Uaf modules. It should
+        not allow a resource to remain locked if an exception occurs.
+        svn log -r 85:88
+
+0.03    05-Sep-2010 K.Esteb
+        Added Lockmgr/UnixMutex.pm and made it the default lock manager.
+        Improved the look of the example web site.
+        svn log -r 89:114
+
+0.04    17-Sep-2010 K.Esteb
+        Fixed Lockmgr/UnixMutex.pm so that the named resources are stored in
+        shared memory, instead of a hash within the object.
+        svn log -r 115:119
+
+0.05    24-Feb-2011 K.Esteb
+        Added Scaffold::Routes to parse the URL using regex. Should be
+        more flexiable now. At least the dispatching logic is now simpler.
+        svn log -r 120:129
+
+0.06    02-Apr-2011 K.Esteb
+        Changed when the scaffold object is injected into handlers. This 
+        now happens when they are initiated instead of when they are being 
+        called. 
+        Fixed a minor error with routes. Routes can now be like this:
+          qr{!/login$|^/login/(\w+)$}
+        And they will parse correctly. 
+        Removed all undef's from the parameter array returned from
+        routes.
+        svn log -r 130:148
+
+0.07    15-Jun-2011 K.Esteb
+        Started to implement the caching of static template output. 
+        The invocation of the method within the handler now uses 
+        lower case for the method name.
+        Changed several instances where "unless" was being used instead
+        of "if" when checking for held locks.
+        svn log -r 149:160
+
+0.08    10-Nov-2011 K.Esteb
+        Fixed a problem where the cache was not being cleared correctly,
+          Cache/FastMmap.pm was using the wrong set() method.
+        Fixed returning an uninitialized value in Routes.pm
+        Fixed an error message in UnixMutex.pm
+        svn log -r 161:167
+
+0.09    22-Dec-2011 K.Esteb
+        Rewrote UnixMutex.pm to work properly. This should resolve
+        problems with ramdom lockup and semaphore errors.
+        svn log -r 168:170
+
+0.10    23-Apr-2012 K.Esteb
+        Added the setting of gid, uid and mode within UnixMutex.pm. This
+          should resolve the problem of the semaphore and shared memory
+          segmenets being removed under RHEL v5.*.
+        svn log -r 171:178
+

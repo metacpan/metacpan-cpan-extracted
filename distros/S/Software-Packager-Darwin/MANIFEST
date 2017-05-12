@@ -1,0 +1,10 @@
+LICENSE
+Changes
+Makefile.PL
+README
+TODO
+MANIFEST
+lib/Software/Packager/Darwin.pm
+t/01_initialise.t
+t/02_darwin.t
+t/test_icon.tiff

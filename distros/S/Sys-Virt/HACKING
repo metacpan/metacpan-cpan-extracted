@@ -1,0 +1,197 @@
+   Hacking on libvirt perl
+   =======================
+
+The libvirt Perl release versions are tied directly to the libvirt C
+library release versions. ie Sys::Virt 1.2.10 will require libvirt
+version 1.2.10 or newer in order to build. We do not aim to support
+conditional compilation against versions of libvirt that are older
+than the version of Sys::Virt.
+
+
+General changes for new APIs
+----------------------------
+
+Additions to the libvirt C API will require changes to a minimum
+of two parts of the Sys::Virt codebase.
+
+ - Virt.xs - this provides the C glue code to access the libvirt C
+   library APIs and constants from the Perl interpretor. As a general
+   rule, every new function and header file constant/enum requires an
+   addition to this file.  The exceptions are functions that are only
+   provided for the benefit of language bindings and not intended for
+   use by application code. For example the reference counting APIs
+   don't need exposing to Perl applications
+
+ - lib/ - this directory contains the pure Perl part of the binding.
+   There are separate files for each core libvirt object type
+
+     - lib/Sys/Virt.pm - mapping for virConnectPtr
+     - lib/Sys/Virt/Domain.pm - mapping for virDomainPtr
+     - lib/Sys/Virt/Error.pm - mapping for virErrorPtr
+     - lib/Sys/Virt/Event.pm - mapping for virEventPtr
+     - lib/Sys/Virt/Interface.pm - mapping for virInterfacePtr
+     - lib/Sys/Virt/Network.pm - mapping for virNetworkPtr
+     - lib/Sys/Virt/NodeDevice.pm - mapping for virNodeDevicePtr
+     - lib/Sys/Virt/NWFilter.pm - mapping for virNWFilterPtr
+     - lib/Sys/Virt/Secret.pm - mapping for virSecretPtr
+     - lib/Sys/Virt/StoragePool.pm - mapping for virStoragePoolPtr
+     - lib/Sys/Virt/StorageVol.pm - mapping for virStorageVolPtr
+     - lib/Sys/Virt/Stream.pm - mapping for virStreamPtr
+
+   There is rarely a need to write Perl code in the .pm modules, as
+   the mapping in the Virt.xs file is usually sufficient. As such
+   the primary purpose of the .pm modules is to hold the POD inline
+   documentation. Every function and constants is required to have
+   full API documentation provided
+
+There are a number of unit tests available in the t/ directory which
+assist in creation of new APIs.
+
+ - t/010-pod-coverage.t - ensures that every Perl method and constant
+   has POD documentation present
+ - t/030-api-coverage.t - ensures that every C library method/constant
+   in the libvirt-api.xml file has corresponding code in the Virt.xs.
+   Certain functions can be blacklisted in t/030-api-coverage.t as not
+   needed mapping to Perl. This only runs if TEST_MAINTAINER=1 is set.
+ - t/*.t - the other files mostly do functional testing against the
+   test:///default API - if the new function has support in the test
+   driver, then suitable additions should be made
+
+If use of the API is not obvious, it is often worth providing a small
+example program in the examples/ directory. These examples are also
+useful when adding APIs to ensure that they are operating correctly,
+if it wasn't possible to unit test them with test:///default.
+
+Every addition / change to the API must be documented in the Changes
+file.
+
+
+New API addition workflow
+-------------------------
+
+When the libvirt C library is changed, the following workflow is an
+effective way to update the Perl binding.
+
+ - Build the libvirt C library
+
+    # cd $HOME/src/libvirt
+    # ./autogen.sh --system
+    # make
+
+ - Configure & build the Sys::Virt module to build against the just
+   built libvirt library
+
+    # cd $HOME/src/libvirt-perl
+    # ../libvirt/run perl Makefile.PL
+    # ../libvirt/run make
+
+ - Run the test suite to identify which new functions/constants need
+   handling
+
+    # ../libvirt/run make test TEST_MAINTAINER=1
+
+ - For each missing item reported in the test suite...
+
+     - Edit Virt.xs to add the C binding
+     - Edit lib/*.pm to add the POD documentation (and occassionally Perl glue code)
+     - Edit Changes to document the addition
+     - Run the test suite (without maintainer mode) to verify POD docs
+         # ../libvirt/run make test
+     - Optionally add to one of the t/*.t test cases
+     - Optionally add demo to examples/
+     - Commit the changes to GIT
+
+
+Understanding Virt.xs glue layer
+--------------------------------
+
+The Perl XS glue (Virt.xs) is a pretty bizarre language, that mostly
+looks like C but is actually run through a Perl specific preprocessor
+to turn it into real C code. Learning and understanding XS code well
+is a really difficult task, but fortunately such knowledge is rarely
+required in order to add new APIs to the Perl Sys::Virt code.
+
+When adding constants just look for the REGISTER_CONSTANT() macro
+at the end of Virt.xs. Make sure that the constant is registered against
+the correct Sys::Virt::XXXX object namespace - look for the adjacent
+'gv_stashpv' calls to see which namespace is currently in effect.
+
+When adding methods, you must again make sure they are put in the
+correct object namespace. For methods, look for the statements
+that look like:
+
+   MODULE = Sys::Virt::NWFilter  PACKAGE = Sys::Virt::NWFilter
+
+these indicate the start of a namespace for the object in question.
+When implementing the binding for a method, if not already familiar
+with XS code, the best technique is to just do cut+paste programming.
+Find an existing libvirt API call that has the same kind of API
+signature as the new API. Then just copy the XS code for that method
+and tweak the parameter names as needed.
+
+Async event callbacks have a little bit of special handling too. The
+callbacks are all implemented as static methods at the very top of
+the Virt.XS file. Look for method names like _domain_event_pmsuspend_callback
+and just copy the code for an existing callback method that has a similar
+set of parameters to the new callback.
+
+Once the callback is implemented look for the domain_event_register_any()
+or network_event_register_any() methods and extend the switch() statement
+so that it maps the event ID constant to your new callback.
+
+
+Making new releases
+-------------------
+
+The Sys::Virt releases are hosted on the Perl project CPAN infrastructure
+rather than libvirt.org
+
+ 1. Build the new release of libvirt as an RPM and install it on the
+    local machine.
+
+ 2. Set the release date in the Changes file and commit the change
+
+ 3. Tag the release with a GPG signed tag using vX.Y.Z syntax for
+    the tag name
+
+     git tag -s -m 'Release 1.2.14' v1.2.14
+
+ 4. Clone the repository or run 'git clean -x -f -d' to ensure a
+    100% pristine state
+
+ 5. Run autobuild.sh to test the full test suite and generate local
+    RPMs. This results in Sys-Virt-1.2.14.tar.gz file being created
+
+ 6. Take the src.rpm file that was just generated by autobuild.sh
+    and run a scratch build against Fedora rawhide
+
+      # cd $HOME/src/fedora/perl-Sys-Virt
+      # fedpkg scratch-build --srpm /path/to/src/rpm/file
+
+ 7. Push the Changes commit and tag to GIT master
+
+      # git push
+      # git push origin v1.2.14
+
+If there is a failure at any step then this must be corrected
+as follows
+
+  a. Delete the signed release tag
+
+       git tag -d v1.2.14
+
+  b. Fix whatever the problem was and update the Changes file
+     if appropriate
+
+  c. Go to release process step 3 again.
+
+
+Assuming the release has now been made, the Sys-Virt-1.2.14.tar.gz
+file should be uploaded to CPAN using https://pause.cpan.org form.
+The upload is currently done by Daniel Berrange (username DANBERR).
+
+Now open the tree for the next release version by editing the files
+lib/Sys/Virt.pm, README, Makefile.PL to update the version number
+listed. Also edit Changes to add a placeholder entry for the new
+release number. Run 'make test' to ensure Changes file is syntax
+valid.

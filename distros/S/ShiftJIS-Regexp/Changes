@@ -1,0 +1,123 @@
+Revision history for Perl extension ShiftJIS::Regexp.
+
+1.03  Wed Nov  7 21:27:45 2012
+    - avoid "Unescaped left brace in regex is deprecated" from 5.17.x.
+
+1.02  Sat Aug  6 21:52:51 2011
+    - fix the tarball with world writable files.
+    - rename JAPANESE to Regexp/Japanese.pod.
+
+1.01  Mon Jul 19 21:10:38 2010
+    - POD: revised, fixed and modied.
+    - cntrl.t: tests avoid a new warning against \c` etc with perl 5.13.x.
+    - added class2.t.
+    - Const.pm: $PadG and $PadGA avoid \C.
+
+1.00  Tue Jan  2 22:21:08 2007
+    - POD: revised, fixed and modied.
+    - added Japanese POD.
+    - added class.t and META.yml.
+
+0.26  Wed Apr 17 23:53:23 2002
+    - I don't know why perl 5.005_02 on sun4-solaris fails in t/test.t,
+      when C<my $str> (a file-scoped) precedes C<my $str> (in a block)...
+      Anyway, it seems better to put a my-variable in a block.
+    - a caveat on match() is documented.
+
+0.25  Sun Apr 14 22:23:46 2002
+    - modifications breaking backward compatibility.
+      \p{Roman}, \pR, and [:roman:]  consists of 94 graphic characters only.
+	(no longer equivalent to \p{ASCII} nor [:ascii:])
+      \p{X0201} and [:x0201:] exclude C0 control characters of JIS X 0211.
+	(no longer equivalent to \p{^Zenkaku} nor [:^zenkaku:].)
+    - add \p{X0211} and [:x0211:].
+
+0.24  Sun Apr 14 19:29:08 2002
+    - Some tweaks in internals.
+    - A special regular expression \R{padG} is documented.
+
+0.23  Mon Dec 31 13:07:52 2001
+    - When jsplit() gets undef as PATTERN,
+      splits the string on whiltespace characters
+      equivalently to splitspace().
+    - prototypes: all parameters are enforced in scalar context.
+
+0.22  Sun Dec 09 13:20:02 2001
+    - add \p{Halfwidth}, \p{Fullwidth}, etc.
+
+0.21  Sat Dec 08 00:09:52 2001
+    - modifications breaking backward compatibility.
+      \pB is a short form for \p{blank}, not for \p{Boxdrawing}.
+      \p{Space}, \pS, and [:space:] include VT.
+      \p{Cntrl}, \pC, and [:cntrl:] include DEL.
+      \p{Graph}, \pG, and [:graph:] exclude unassigned codepoints on JIS.
+      \p{Print}, \pT, and [:print:] exclude unassigned codepoints on JIS
+          and whitespace control characters.
+
+0.20  Sat Nov 24 13:30:18 2001
+    - modify documentation (about \p{IsProp} and \p{InProp})
+
+0.19  Thu Nov 22 23:34:38 2001
+    - add \p{Xdigit}, \p{Roman}, etc.
+
+0.18  Thu Nov 22 00:01:12 2001
+    - jsplit() etc. of an empty string should return an empty list.
+    - add \p{JIS}, \p{NEC}, \p{IBM}, \p{MSWin}, etc.
+    - add \pP, \PP, etc.
+    - now Prop in \p{Prop} and class in [:class:] are case-insensitive.
+
+0.17  Sun Sep 16 00:59:12 2001
+    - internal: match and replace.
+
+0.16  Sat Sep 15 20:32:45 2001
+    - \p{ }, \P{ } in character classes.
+
+0.15  Thu Aug 30 22:47:31 2001
+    - extended embedded modifiers at the beginning the regexp
+
+0.14  Sun Jul 22 22:07:58 2001
+    - change test.t ([:print:] is not tested).
+
+0.13  Sat Jul 07 00:55:24 2001
+    - add [=cc=] character classes.
+
+0.12  Sat Jun 23 23:37:19 2001
+    - add \p{IsX0201}, \p{IsX0208}, etc.
+
+0.11  Wed Jun 13 02:56:24 2001
+    - add o modifier.
+    - now jsplit accepts pattern with modifiers (but somewhat tricky).
+    - issjis is deprecated (use issjis of ShiftJIS::String).
+
+0.10  Tue Jun 12 00:09:10 2001
+    - add I and j modifiers.
+    - now runs on perl 5.003 (maybe).
+
+0.09  Tue Jun  5 00:30:43 2001
+    - divide ./t and ./sample.
+
+0.08  Fri May 25 01:12:07 2001
+    - restricted support of (?{ ... }) assertions.
+
+0.07  Wed May 23 23:39:41 2001
+    - add \p{IsWord} etc.
+    - bug fix in mkclass().
+    - bug fix about wrong matching of double-byte chars on ignore_case.
+
+0.06  Tue May 15 21:52:03 2001
+    - bug fix to prevent $ from interpolation in the regexp for replace().
+
+0.05  Mon May 14 00:21:58 2001
+    - add README. minor changes.
+
+0.04  Sun May 13 15:38:15 2001
+    - bug fix. croak against illegal byte sequences.
+
+0.03  Sun May 13 12:28:51 2001
+    - change some character classes. bug fix.
+
+0.02  Sat May 12 15:46:05 2001
+    - add jsplit(). bug fix.
+
+0.01  Sat May 12 01:12:38 2001
+    - original version; created by h2xs 1.19

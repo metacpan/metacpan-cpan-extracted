@@ -1,0 +1,108 @@
+NAME
+    SMS::Send::UK::AA - Send SMS messages using Andrews and Arnold's gateway
+
+VERSION
+    version 0.005
+
+SYNOPSIS
+      use SMS::Send;
+
+      my $sender = SMS::Send->new("UK::AA",
+        _login    => '0123xxxxxx',
+        _password => 'secret');
+
+      my $sent = $sender->send_sms(
+        text => 'y u no txt bak',
+        to   => '+44 7xxx xxxxx'
+      );
+
+      if($sent) {
+        say "Message successfully sent";
+      }
+
+DESCRIPTION
+    This is a SMS::Send compatible module that sends using the UK based
+    provider Andrews and Arnold Ltd <http://aa.net.uk> (A&A). You will need
+    a VoIP account with A&A in order to use this module.
+
+METHODS
+  send_sms
+    Sends an SMS. The return value will evaluate in boolean context to a
+    false value, but will stringify to a useful message. It also has a
+    "status_line" method which will return a one line status.
+
+PARAMETERS
+    Certain private parameters not part of SMS::Send's API are implemented
+    by this module. They all begin with an underscore ("_"). See the A&A
+    docs for full details if not explained here.
+
+  Constructor parameters
+    *   _login
+
+        If using a VoIP line, must be provided, your A&A VoIP username
+        (usually your phone number). Not required for direct to SIM
+        delivery.
+
+    *   _password
+
+        Must be provided, either the password associated with the above, or
+        the SMS password configured along with your SIM.
+
+    *   _endpoint
+
+        Set to the URI of an endpoint implementing this interface if a
+        different endpoint to the default is needed. This module defaults to
+        "https://sms.aa.net.uk/sms.cgi", if for some reason SSL doesn't work
+        for you, you might want to set it to the non-SSL version.
+
+    *   _ssl_verify
+
+        Set to a false value to disable SSL verification. This will
+        automatically be disabled if you supply a HTTP URI above.
+
+  "send_sms" parameters
+    These parameters may be provided to either the constructor or the
+    "send_sms" method.
+
+    *   _limit
+
+        Limit number of parts.
+
+    *   _costcentre
+
+        Reported on XML bill.
+
+    *   _private
+
+        Do not show the text on the bill.
+
+    *   _oa
+
+        Set a specific sender.
+
+    *   _originator
+
+        Set a specific sender (same as oa, for backwards compatiblity).
+
+    *   _udh
+
+        User data header, in hex.
+
+SEE ALSO
+    *   An example of an email to SMS gateway is in eg/sms.pl in the
+        distribution.
+
+    *   SMS::Send
+
+    *   The HTTP interface this module implements is documented here:
+        <http://aa.net.uk/kb-telecoms-sms.html>.
+
+AUTHOR
+    David Leadbeater <dgl@dgl.cx>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by David Leadbeater.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

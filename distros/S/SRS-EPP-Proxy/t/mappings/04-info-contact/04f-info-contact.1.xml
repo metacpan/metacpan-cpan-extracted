@@ -1,0 +1,11 @@
+<!DOCTYPE NZSRSResponse SYSTEM "protocol.dtd"><NZSRSResponse VerMajor="5" VerMinor="2">
+<Response Action="HandleDetailsQry" FeId="8" FeSeq="4923017" OrigRegistrarId="922" RecipientRegistrarId="922" Rows="1">
+<FeTimeStamp Day="4" Hour="10" Minute="27" Month="8" Second="24" TimeZoneOffset="+12:00" Year="2010"/><Handle HandleId=
+"registrant-001" Name="Test Registrant 1" Email="new@registrant.co.nz" RegistrarId="922">
+<PostalAddress Address1="Regisrant New Address 1" Address2="add a 2nd line" City="Wellington" CountryCode="NZ" PostalCode="12345" Province="Wellington"/>
+<Phone AreaCode="4" CountryCode="64" LocalNumber="123-456 ext 1"/>
+<Fax AreaCode="4" CountryCode="64" LocalNumber="123666"/>
+<CreatedDate Day="03" Hour="17" Minute="03" Month="6" Second="58" TimeZoneOffset="+12:00" Year="2010"/>
+<AuditDetails ActionId="srsrps-1_518" RegistrarId="1"><AuditTime>
+<From Day="04" Hour="10" Minute="26" Month="8" Second="42" TimeZoneOffset="+12:00" Year="2010"/></AuditTime>
+<AuditText><![CDATA[populate all fields␊User Id: manuela]]></AuditText></AuditDetails></Handle></Response></NZSRSResponse>

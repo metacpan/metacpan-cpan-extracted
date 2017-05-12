@@ -1,0 +1,14 @@
+SWISH - Sat Nov  1 22:47:45 UTC 2003
+
+    The modules SWISH and SWISH::Fork are depreciated
+
+    Swish-e 2.4.0 has been released.  2.4.0 is a major rewrite of
+    the C API, and thus there's a new Perl module SWISH::API
+    available.  SWISH::API is a better interface for Swish-e
+    than this module and is now the recommend way to access
+    Swish-e with Perl.
+    
+    SWISH::API is distributed with Swish-e 2.4.0, but will soon be
+    removed from the distribution and placed on CPAN.
+    
+

@@ -1,0 +1,38 @@
+---
+abstract: 'Compare and contrast Webdriver screenshots in PNG format'
+author:
+  - 'Daniel Gempesaw <gempesaw@gmail.com>'
+build_requires:
+  FindBin: '0'
+  Test::More: '0'
+  Test::Spec: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Selenium-Screenshot
+requires:
+  Carp: '0'
+  Cwd: '0'
+  Image::Compare: '0'
+  Imager: '0'
+  Imager::Color: '0'
+  Imager::File::PNG: '0'
+  Imager::Fountain: '0'
+  MIME::Base64: '0'
+  Moo: '0'
+  Moo::Role: '0'
+  Scalar::Util: '0'
+resources:
+  bugtracker: https://github.com/gempesaw/Selenium-Screenshot/issues
+  homepage: https://github.com/gempesaw/Selenium-Screenshot
+  repository: https://github.com/gempesaw/Selenium-Screenshot.git
+version: '0.08'
+x_contributors:
+  - 'Nicolas Georges <xlat@cpan.org>'

@@ -1,0 +1,26 @@
+NAME
+
+  Sub::DeferredPartial - Deferred evaluation / partial application
+
+DESCRIPTION
+
+  An instance of this class behaves like a sub (or, more precisely: subroutine
+  reference), but it supports partial application and the evaluation of
+  operators applied to such function objects is deferred too.
+  That means, evaluation has to be forced explicitly (which makes it easier to
+  add introspection capabilities).
+
+  Objects that represent deferred (delayed, suspended) expressions are known
+  as suspensions or thunks in various programming circles.
+  Don't confuse with the same terms in the context of threads!
+
+AUTHOR
+
+  Steffen Goeldner <sgoeldner@cpan.org>
+
+COPYRIGHT
+
+  Copyright (c) 2004 Steffen Goeldner. All rights reserved.
+
+  This program is free software; you can redistribute it and/or
+  modify it under the same terms as Perl itself.

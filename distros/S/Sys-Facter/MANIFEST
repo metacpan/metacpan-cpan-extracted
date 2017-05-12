@@ -1,0 +1,12 @@
+README
+Changes
+MANIFEST
+MANIFEST.SKIP
+META.yml
+Makefile.PL
+lib/Sys/Facter.pm
+pffacter
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t

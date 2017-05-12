@@ -1,0 +1,17 @@
+Revision history for Perl extension SVGGraph::Pie.
+
+0.06  Mon May  7 2012
+        - apply patches.
+          https://rt.cpan.org/Public/Bug/Display.html?id=76977
+          https://rt.cpan.org/Public/Bug/Display.html?id=76976
+0.05  Mon Jul 28 2003
+	- Change paint style, downsize PieGraph's src.
+	  Thanks to <brooksch@mac.com>
+0.04  Fri May 12 2003
+	- fix up unit test
+0.03  Fri May  9 2003
+	- fix up unit test
+0.02  Fri May  9 2003
+	- fix up unit test
+0.01  Tue May  6 2003
+	- original version

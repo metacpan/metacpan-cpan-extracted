@@ -1,0 +1,6 @@
+MANIFEST
+Makefile.PL
+bin/mounpointq
+lib/Sys/Filesystem/MountPoint.pm
+t/00.t
+META.yml                                 Module meta-data (added by MakeMaker)

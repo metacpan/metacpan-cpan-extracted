@@ -1,0 +1,682 @@
+#!/usr/bin/perl
+# sh2xml_l.pl
+# This is about as good as I can do without any more information. Any suggestions
+# for where to go from here. Someone could take the output from this automated
+# solution and use XSLT to re-organise according to a different DTD.
+
+$VERSION = '1.2.4'; #   MJPH    21-SEP-2007     Add documentation for -t %T
+# $VERSION = '1.2.3'; #   MJPH    22-SEP-2006     Add documentation
+# $VERSION = '1.2.2'; #   MJPH    30-JUN-2006     Add normalising for normal conversion
+# $VERSION = '1.2.1'; #   MJPH    30-JUN-2006     Fix normalising and unicode
+# $VERSION = '1.2';   #   MJPH    26-JUN-2006     Add -n (normalising)
+# $VERSION = '1.1.1'; #   MJPH    22-APR-2005     Add \codepage xxx.tec direct TECkit support
+# $VERSION = '1.1.0'; #   MJPH    21-JAN-2005     Add interlinear text support and -t (move -t to -f)
+# $VERSION = '1.0.2'; #   MJPH     8-JUN-2004     Add charset support
+# $VERSION = '1.0.1'; #   MJPH     5-MAR-2003     Add system codepage support
+# $VERSION = '1.0';   #   MJPH     9-MAY-2003     Add Unicode support for Toolbox
+
+use SIL::Shoe::Settings;
+use SIL::Shoe::Data;
+use Encode qw(_utf8_on _utf8_off decode_utf8 encode_utf8 find_encoding);
+use Encode::Registry;
+use Encode::TECkit;
+use Unicode::Normalize 'normalize';
+use File::Spec;
+use Getopt::Std;
+use Pod::Usage;
+
+getopts("bc:e:f:hn:s:t:");
+
+%charsets = (
+    0 => 1252,      # ansi - Western European
+    1 => 0,         # default
+    2 => 0,         # symbol
+    3 => 0,         # invalid
+    77 => 10000,    # mac
+    128 => 932,     # Shift JIS
+    129 => 949,     # Hangul
+    130 => 1361,    # Johab
+    134 => 936,     # GB2312 Simplified Chinese
+    136 => 950,     # Big5 Traditional Chinese
+    161 => 1253,    # Greek
+    162 => 1254,    # Turkish
+    163 => 1258,    # Vietnamese
+    177 => 1255,    # Hebrew
+    178 => 1256,    # Arabic
+    179 => 'arabictrad',
+    180 => 'arabicuser',
+    181 => 'hebrewuser',
+    186 => 1257,    # Baltic
+    204 => 1251,    # Russian (Cyrillic)
+    222 => 874,     # Thai
+    238 => 1250,    # Eastern European
+    254 => 437,     # PC 437
+    255 => 'oem'
+    );
+
+if ($opt_h)
+{
+    pod2usage( -verbose => 2);
+    exit;
+}
+
+unless (defined $ARGV[0])
+{
+    pod2usage(1);
+    exit;
+}
+
+unless (defined $ARGV[1])
+{
+    $ARGV[1] = $ARGV[0];
+    $ARGV[1] =~ s/(\.[^.]*)?$/.db1/o;
+}
+
+if ($] > 5.007 && $opt_e)
+{
+    foreach (split(/\s*[,;]\s*/, $opt_e))
+    {
+        require "Encode/$opt_e.pm";
+        &{"Encode::$opt_e::import"};
+    }
+}
+
+$opt_s = "." unless defined $opt_s;
+$settings = SIL::Shoe::Settings->new($opt_s) || die "Unable to read settings directory at $opt_s";
+
+$s = SIL::Shoe::Data->new($ARGV[0], undef, nostripnl => 1)
+        || die "Can't open $ARGV[0]";
+open(OUTFILE, ">$ARGV[1]") || die "Can't create $ARGV[1]";
+# binmode(OUTFILE, ":utf8");
+select OUTFILE;
+
+$typef = $settings->type($opt_f || $s->{' Type'}) || die "Can't find .typ file for type: $s->{' Type'}";
+$typef->read;
+$s->{' key'} = $typef->{'mkrRecord'}[0] || $typef->{'mkrRecord'};        # bug in .typ file results in mkrRecord going in twice
+$lngdef = $settings->lang($typef->{'lngDefault'});
+$lngdef->add_specials if ($lngdef);
+if ($opt_c)
+{ $deflng = $opt_c; }
+elsif ($lngdef->{'codepage'})
+{ $deflng = $lngdef->{'codepage'}; }
+elsif ($^O eq 'MSWin32')
+{
+    require Win32::TieRegistry;
+    Win32::TieRegistry->import(Delimiter => '/');
+
+    $deflng = $Registry->{"LMachine/SYSTEM/ControlSet/CurrentControlSet/Control/Nls/CodePage//ACP"};
+}
+
+$deflng ||= '1252';
+
+$defenc = Encode::Registry::find_encoding($deflng) || Encode::Registry::find_encoding('iso-8859-1')
+    || die "Can't make an encoding converter for $deflng";
+
+$i = 0;
+foreach $x (@{$typef->{'intprc'}})
+{
+    foreach $mk ($x->{'mkrFrom'}, $x->{'mkrTo'})
+    {
+        unless (defined $markers{$mk})
+        {
+            $markers{$mk} = $i;
+            $markers[$i++] = $mk;
+        }
+    }
+    $parent[$markers{$x->{'mkrTo'}}] = $markers{$x->{'mkrFrom'}};
+    push(@{$children[$markers{$x->{'mkrFrom'}}]}, $markers{$x->{'mkrTo'}});
+}
+$lastrow = $i - 1;
+
+$opt_t =~ s/%T/$s->{' Type'}/og;
+$opt_t ||= $s->{' Type'} if ($opt_n);
+
+if ($opt_t)
+{
+    printf "\\_sh %s  %d  %s\n", $s->{' Version'}, $s->{' CSum'}, $opt_t;
+    print "\\_DateStampHasFourDigitYear\n" if ($s->{' DateStamp'} == 4);
+    print "\n";
+}
+
+while ($s->readrecord(\@fields))
+{
+    $indent = 0; $instack = 0;
+    @stack = ('shoebox');
+    for ($i = 0; $i <= $#fields; $i++)
+    {
+        $f = $fields[$i];
+        $marker = $f;
+        $marker =~ s/\s+.*$//oi;    # strip to the name back to its sfm
+        $ind = $markers{$marker};
+        if (defined $ind)
+        {
+            unless (defined $parent[$ind])
+            {
+                process_stack($root, \@rows, $lastrow) if ($instack);
+                $root = $ind;
+                $instack = 1;
+                @rows = ();
+                $rows[$ind] = build_pos($s->{$f}, $ind);
+#                print STDERR "$indnum, $innum\n";
+            } else
+            {
+                $rows[$ind] = build_pos($s->{$f}, $ind);
+                $p = $parent[$ind];
+                make_tree($rows[$ind], $rows[$p], $ind, $p) if (defined $p);
+            }
+        } else
+        {
+            if ($instack)
+            {
+                process_stack($root, \@rows, $lastrow);
+                $instack = 0;
+            }
+            if ($s->{$f} eq "")
+            {
+                print "\\$marker\n" unless ($opt_b);
+                next;
+            }
+    
+            $temp = convert($s->{$f}, $marker);
+            _utf8_off($temp);
+            print "\\$marker $temp\n";
+        }
+    }
+    process_stack($root, \@rows, $lastrow) if ($instack);
+    print "\n";
+}
+
+
+sub convert
+{
+    my ($str, $marker) = @_;
+    
+    if ($opt_n and $lang = $settings->lang($typef->{'mkr'}{$marker}{'lng'})
+               and defined $lang->{'UnicodeLang'})
+    { return normalize($opt_n, decode_utf8($str)); }
+
+    unless ($lang = $settings->lang($typef->{'mkr'}{$marker}{'lng'}))
+    { $enc = $defenc; }
+    elsif (defined $lang->{'encoding'})
+    { $enc = $lang->{'encoding'}; }
+    elsif (defined $lang->{'UnicodeLang'})
+    { $enc = find_encoding("UTF-8"); }		# be strict UTF-8
+    else
+    {
+        my ($cp);
+        $lang->add_specials;
+        $cp = $lang->{'codepage'};
+        if ($cp eq 'none')
+        { $enc = undef; }
+        elsif ($cp =~ /\.tec$/o)
+        {
+            $enc = Encode::TECkit->new(File::Spec->catfile($opt_s, $cp));
+            unless ($enc)
+            {
+                print STDERR "Unable to find TECkit mapping $cp, using default encoding\n";
+                $enc = $defenc;
+            }
+        }
+        else
+        {
+            $cp ||= $charsets{hex($lang->{'charset'})};
+            $enc = Encode::Registry::find_encoding($cp);
+            if (!$enc && $cp)
+            {
+                print STDERR "Unable to find encoding $cp, using default\n";
+                $enc = $defenc;
+            }
+        }
+        $lang->{'encoding'} = $enc;
+    }
+    $str = $enc->decode($str) if ($enc);
+	$str = normalize($opt_n, $str) if ($opt_n);
+    $str;
+}
+    
+sub build_pos
+{
+# make linked list of nodes corresponding to each word in the line
+# store starting and ending offsets and indices for each word
+    my ($str, $ind) = @_;
+    my ($match, $num, $pos, $substr, $first, $new, $last);
+
+    $pos = 0;
+    $num = 0;
+#    $str =~ s/^\s?//og;
+    while ($str =~ m/^(\S+)\s*/oi)
+    {
+        $substr = $1;
+        $match = $&;
+        $str = $';      #'
+        $new = SIL::Shoe::Interlin::Node->new(
+            text => $substr,
+            num => $num,
+            line => $ind,
+            pos => $pos,
+            end => $pos + length($substr));
+        if ($last)
+        {
+            $last->{'next'} = $new;
+            $new->{'prev'} = $last;
+            $last = $new;
+        }
+        else
+        {
+            $first = $new;
+            $last = $new;
+        }
+        $pos += length($match);
+        $num++;
+    }
+    return $first;
+}
+    
+
+sub make_tree
+{
+# work out the parent of each word in a row
+# inform parent of its added child. Note we only work at one level, resulting
+# in a tree.
+    my ($row, $prow, $ind, $pind) = @_;
+    my ($child, $parent, $oldp, $plast);
+
+    for ($child = $row; defined $child; $child = $child->{'next'})
+    {
+# find actual parent of this child
+        for ($parent = $prow; defined $parent; $parent = $parent->{'next'})
+        {
+            if ($child->{'pos'} == $parent->{'pos'})
+            {
+                $plast = $parent;
+                last;
+            }
+            elsif ($child->{'pos'} < $parent->{'pos'})
+            { last; }
+            $plast = $parent;
+        }
+        
+        $child->{'parent'} = $plast;
+        push(@{$plast->{'children'}[$ind]}, $child);
+
+        $oldp = $plast;
+        for ($parent = $plast->{'next'}; defined $parent; $parent = $parent->{'next'})
+        {
+            last unless ($child->{'end'} >= $parent->{'pos'});
+            $oldp = $parent;
+        }
+
+        mark_links($plast, $oldp, $pind) if ($oldp ne $plast);
+    }
+}
+
+
+sub mark_links
+{
+# indicates that a range of nodes in a line should be considered as one word
+    my ($first, $last, $ind) = @_;
+    my ($pfirst, $plast, $pind);
+
+    $pind = $parent[$ind];
+    if (defined $pind)
+    {
+        $pfirst = $first->{'parent'};
+        $plast = $last->{'parent'};
+        mark_links($pfirst, $plast, $pind) if ($pfirst ne $plast);
+    }
+
+    for ($pfirst = $first; $pfirst ne $last; $pfirst = $pfirst->{'next'})
+    { $pfirst->{'linked'} = 1; }
+}
+
+
+sub process_stack
+{
+# output a stack:
+#   Link nodes in the row that are empty
+#   link children of linked nodes
+#   remove links: coallesce linked nodes and tidy up linked lists of nodes
+#   convert and set widths for each node
+#   output stack
+    my ($ind, $rows, $lastrow) = @_;
+    my ($p, $c, $op);
+
+    # add default links for parents with no children to merge with previous word
+    for ($p = $rows->[$ind]; defined $p; $p = $p->{'next'})
+    {
+        $op->{'linked'} = 1 if (defined $op && !$p->{'children'});
+        $op = $p;
+    }
+
+    # link children of a linked set of words (for phrase to phrase translation)
+    for ($c = $rows->[$ind]; defined $c; $c = $c->{'next'})
+    {
+        for ($p = $c; defined $p && $p->{'linked'}; $p = $p->{'next'})
+        { }
+
+        if ($p ne $c)
+        {
+            $c->{'chained'} = $p;
+            mark_children($c, $p, $ind);
+            $c = $p;
+        }
+    }
+
+    # convert linked nodes into single nodes and tidy up node sequences
+    for ($c = $rows->[$ind]; defined $c; $c = $c->{'next'})
+    {
+        next unless ($c->{'chained'});
+        remove_links($c, $c->{'chained'}, $ind);
+    }
+
+    # convert stack to unicode and set widths
+    print OUTFILE "$int_mark\n" unless ($contstack);
+    for ($p = $rows->[$ind]; defined $p; $p = $p->{'next'})
+    { stack_convert($p, $ind); }
+    
+    # output stack
+    foreach $c ($ind .. $lastrow)
+    {
+        print "\\$markers[$c] ";
+        for ($p = $rows->[$c]; defined $p; $p = $p->{'next'})
+        { print $p->{'text'}; }
+#        { print convert($p->{'text'}, $markers[$c]); }
+        print "\n";
+    }
+}
+
+
+sub mark_children
+{
+# links all the children in a tree for a given range of nodes in a parent line
+    my ($first, $last, $ind) = @_;
+    my ($cind, $cfirst, $clast, $c, $p);
+
+    foreach $cind (@{$children[$ind]})
+    {
+        # find the spanning range in the children based on starting offsets
+        $cfirst = $first->{'children'}[$cind][0];
+        next unless $cfirst;
+        for ($p = $first; defined $p && $p ne $last->{'next'}; $p = $p->{'next'})
+        {
+            foreach $c (@{$p->{'children'}[$cind]})
+            {
+                if ($cfirst->{'pos'} <= $c->{'pos'})
+                { $clast = $c; }
+                else
+                {
+                    $clast = $cfirst;
+                    $cfirst = $c;
+                }
+            }
+        }
+
+        # link the children and recurse
+        if ($cfirst)
+        {
+            $clast ||= $cfirst;
+            $cfirst->{'chained'} = $clast;
+            for ($c = $cfirst; $c ne $clast; $c = $c->{'next'})
+            { $c->{'linked'} = 1; }
+            $first->{'fchild'}[$cind] = $cfirst;
+            mark_children($cfirst, $clast, $cind);
+        }
+    }
+}
+
+
+sub remove_links
+{
+# coallesce a linked series of words into a single node and adjust node chain
+# accordingly
+    my ($first, $last, $ind) = @_;
+    my ($cind, $c);
+
+    # recurse and set the parent for each first child node
+    foreach $cind (@{$children[$ind]})
+    {
+        $c = $first->{'fchild'}[$cind];
+        next unless $c;
+        remove_links($c, $c->{'chained'}, $cind);
+        $first->{'children'}[$cind] = [$c];
+        $c->{'parent'} = $first;
+    }
+
+    # merge the text of a linked series of words, remove intermediate words from 
+    # linked list of row. IOW true coallescing.
+    for ($c = $first->{'next'}; defined $c && $c ne $last->{'next'}; $c = $c->{'next'})
+    { $first->{'text'} .= " $c->{'text'}"; }
+    $first->{'next'} = $c;
+    $c->{'prev'} = $first;
+    $first->{'linked'} = 0;
+}
+
+sub stack_convert
+{
+# recursively, convert the string in the node, calculate new max width for node,
+# inform all children of new max width of parent, return new max width as width
+# of node
+    my ($p, $ind) = @_;
+    my ($maxwidth, $mwidth, $wid, $cwid, @cwids);
+    
+    $p->{'text'} = convert($p->{'text'}, $markers[$ind]);
+    $p->{'text'} =~ s/\s*$//o;
+    _utf8_off($p->{'text'});
+    $mwidth = bytes::length($p->{'text'});
+    $p->{'width'} = $mwidth;
+    $maxwidth = $mwidth + 1;
+    
+    foreach $cind (@{$children[$ind]})
+    {
+        $cwid = 0;
+        foreach $c (@{$p->{'children'}[$cind]})
+        {
+            $c->{'width'} = stack_convert($c, $cind);
+            $cwid += $c->{'width'};
+        }
+        $p->{'cwids'}[$cind] = $cwid;
+        $maxwidth = $cwid if ($cwid > $maxwidth);
+    }
+    
+    stack_setwidth($p, $ind, $maxwidth);
+    $maxwidth;
+}
+
+sub stack_setwidth
+{
+    my ($p, $ind, $wid) = @_;
+    
+    if ($wid > $p->{'width'})
+    {
+        $p->{'text'} .= ' ' x ($wid - $p->{'width'});
+        $p->{'width'} = $wid;
+    }
+    
+    foreach $cind (@{$children[$ind]})
+    {
+        unless (defined $p->{'children'}[$cind][-1])
+        {
+            my ($new) = SIL::Shoe::Interlin::Node->new();
+            if (defined $p->{'prev'})
+            {
+                $new->{'prev'} = $p->{'prev'}{'children'}[$cind][-1];
+                $new->{'prev'}{'next'} = $new;
+            }
+            if (defined $p->{'next'})
+            {
+                $new->{'next'} = $p->{'next'}{'children'}[$cind][-1];
+                $new->{'next'}{'prev'} = $new;
+            }
+            push (@{$p->{'children'}[$cind]}, $new);
+        }
+        stack_setwidth($p->{'children'}[$cind][-1], $cind, $wid) if ($wid > $p->{'cwids'}[$cind]);
+    }
+}    
+
+
+package SIL::Shoe::Interlin::Node;
+
+sub new
+{
+    my ($class, %attrs) = @_;
+    my ($self) = {%attrs};
+
+    bless $self, ref $class || $class;
+}
+
+sub le
+{
+    my ($test, $against) = @_;
+    my ($p);
+
+    for ($p = $test; defined $p; $p = $p->{'next'})
+    { return 1 if ($p eq $against); }
+    return 0;
+}
+
+__END__
+
+=head1 TITLE
+
+sh2sh - convert Shoebox data to Unicode
+
+=head1 SYNOPSIS
+
+    sh2sh -s settings_dir [-c codepage] [-e encs] infile [outfile]
+
+Converts Shoebox data to Shoebox converting to Unicode as it goes.
+
+=head1 OPTIONS
+
+    -b              Delete empty fields
+    -c codepage     Set default codepage conversion, otherwise none
+    -e enc,enc      Add Encoding:: subsets in Perl 5.8.1
+    -f type         Force database type
+    -n normalform   normalize unicode text to D,C,KD,KC form
+    -s dir          Directory to find .typ files in [.]
+    -t type         Generate Toolbox database of given type
+    
+If outfile is missing, it is created as the input file with extension replaced
+by .db1. This allows a user to drop a data file on a shortcut.
+
+=head1 DESCRIPTION
+
+sh2sh converts a Shoebox (or Toolbox) database to Unicode. In particular it
+
+=over 4
+
+=item *
+
+Sonverts strings according to whcih field they are in and the corresponding
+language
+
+=item *
+
+Lays out interlinear text so that it remains as interlinear text when the
+corresponding underlying strings have changed length.
+
+=back
+
+Using sh2sh involves two aspects: preparing for conversion in terms of giving
+information about encoding conversion; and running the program, knowing what
+command line option does what.
+
+=head2 Running sh2sh
+
+Here we list the various command line options and give further details on each
+
+=over 4
+
+=item -b
+
+Any empty fields in the input file will be deleted.
+
+=item -c
+
+Specifies the default codepage to be used when converting data. In effect it
+specifies that sh2sh should act as though it were running on a system with the
+given default codepage. This means that data in languages with no given encoding
+conversion will be converted using this codepage.
+
+=item -e
+
+Perl has internal support for a large number of industry standard encodings. This
+option specifies which sets to pull in apart from the default set. Values include
+
+  Byte - standard ISO 8859 type single byte encodings
+  CN   - Continental China encodings including cp 936, GB 12345 and GB 2312
+  JP   - Japanese encodings including cp 932 and ISO 2022
+  KR   - Korean encodings including cp 949
+  TW   - Taiwanese encodings including cp 950
+  HanExtra - more Chinese encodings including GB 18030
+  JIS2K - More Japanese encodings
+  Ebcdic - surely not!
+  Symbols - various symbol encodings
+
+See man Encode::Supported or the corresponding module documentation for details of
+what is supported on your Perl installation.
+
+=item -f
+
+Rather than analysing the data in the file using the database type specified in
+the database, it is possible to specify that a different one should be used.
+
+=item -n
+
+Particularly with respect to Roman script languages involving letters with
+diacritics, there are two options as to how these are to be stored. They can
+either be stored as a single code (if such exists in Unicode) in which case
+the form to be asked for is C (composed), otherwise they can be stored using
+separate codes for base and diacritic and the normal form is D (decomposed).
+There are other normal forms which should only be used if you really know
+what you are doing (and then you will know why they shouldn't be used).
+
+=item -s
+
+sh2xml requires access to information about the structure of the database
+and language information. This is held in files in the same directory as the
+C<.prj> project file used when running Shoebox/Toolbox.
+
+=item -t
+
+Gives the name of a database type that is given to the output file. Since the
+encoding has changed, the old database type is no longer appropriate for the
+output data. If a new database type has already been created that makes reference
+to the appropriate languages based on Unicode. In order to access the old
+database type name as part of the new name, all occurrences of the string C<%T>
+in the C<-t> option will be replaced with the old database type name.
+
+=back
+
+=head2 Preparing for Conversion
+
+The basic need is to be able to specify how to convert text in a particular
+language into Unicode. This can be done by specifying a conversion mapping
+in each language file. Shoebox and Toolbox do not have a UI for specifying
+such conversion information, so we add information to the options/description
+field. The codepage specification takes the form:
+
+  \codepage = value
+
+The specification needs to be on a line on its own. The I<value> can take a
+number of forms.
+
+=over 4
+
+=item I<name>
+
+A mapping name either from the set of names supported by the Perl Encode
+module, or specified in an SIL Converters repository.
+
+=item I<filename>.tec
+
+The path and filename of a TECkit binary mapping file. The path is
+relative to the settings directory.
+
+=item none
+
+No mapping should be done. The data is assumed to be in UTF-8 encoding.
+
+=back
+
+=cut

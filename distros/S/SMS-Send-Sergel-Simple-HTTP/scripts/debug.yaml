@@ -1,0 +1,5 @@
+# Get this info from your provider
+login: "user"
+password: "pass"
+destination: "+46123456789"
+userdata: "Test SMS äöå ÄÖÅ !@#$%^&*()_+;'?/"

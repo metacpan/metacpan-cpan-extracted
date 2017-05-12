@@ -1,0 +1,592 @@
+#!/bin/sh
+#
+#Fake sacctmgr show qos results for testing
+
+#Order of fields is
+#format=account,description,organization
+# list account format=account,description,organization --parsable2 --noheader --readonly
+
+#Updated to handle preTRES (Slurm v 14.x.y) and postTRES (Slurm 15.x.y) data
+#USe env var FAKE_SLURM_VERSION to set this
+#Also accepts --version and format= arguments
+
+#Order of fields is now controllable via format option
+#Below is the default if no format given
+FORMAT_FIELDS="name priority gracetime preempt preemptmode flags usagethreshold usagefactor grpcpus grpcpumins grpjobs grpnodes grpsubmitjobs grpwall maxcpus maxcpumins maxnodes maxwall maxcpusperuser  mincpus"
+#FORMAT_FIELDS="description gracetime grpcpumins grpcpus grpjobs grpnodes grpsubmitjobs grpwall maxcpumins maxcpus maxcpusperuser maxjobs maxnodes maxnodesperuser maxsubmitjobs name preempt preemptmode priority usagefactor"
+
+verbose_flag=
+
+print_version()
+{	version=$1
+	cat - <<EOF
+slurm $version
+EOF
+	exit 0
+}
+
+print_header()
+{
+	tmptext=
+	for fld in $FORMAT_FIELDS
+	do
+		case $fld in
+		#-----	Common stuff
+		    description)
+			tmptext="${tmptext}Descr"
+			;;
+		    flags)
+			tmptext="${tmptext}Flags"
+			;;
+		    gracetime)
+			tmptext="${tmptext}GraceTime"
+			;;
+		    grpjobs)
+			tmptext="${tmptext}GrpJobs"
+			;;
+		    grpsubmitjobs)
+			tmptext="${tmptext}GrpSubmit"
+			;;
+		    grpwall)
+			tmptext="${tmptext}GrpWall"
+			;;
+		    id)
+			tmptext="$tmptext}ID"
+			;;
+		    maxjobs)
+			tmptext="${tmptext}MaxJobs"
+			;;
+		    maxsubmitjobs)
+			tmptext="${tmptext}MaxSubmit"
+			;;
+		    maxwall)
+			tmptext="${tmptext}MaxWall"
+			;;
+		    name)
+			tmptext="${tmptext}Name"
+			;;
+		    preempt)
+			tmptext="${tmptext}Preempt"
+			;;
+		    preemptmode)
+			tmptext="${tmptext}PreemptMode"
+			;;
+		    priority)
+			tmptext="${tmptext}Priority"
+			;;
+		    usagefactor)
+			tmptext="${tmptext}UsageFactor"
+			;;
+		    usagethreshold)
+			tmptext="${tmptext}UsageThresh"
+			;;
+		#-----	preTRES stuff
+		    grpcpus)
+			tmptext="${tmptext}GrpCPUs"
+			;;
+		    grpnodes)
+			tmptext="${tmptext}GrpNodes"
+			;;
+		    grpcpumins)
+			tmptext="${tmptext}GrpCPUMins"
+			;;
+		    maxcpumins)
+			tmptext="${tmptext}MaxCPUMins"
+			;;
+		    maxcpus)
+			tmptext="${tmptext}MaxCPUs"
+			;;
+		    maxnodes)
+			tmptext="${tmptext}MaxNodes"
+			;;
+		    maxcpusperuser)
+			tmptext="${tmptext}MaxCPUsPU"
+			;;
+		    maxnodesperuser)
+			tmptext="${tmptext}MaxNodesPU"
+			;;
+		    mincpus)
+			tmptext="${tmptext}MinCPUs"
+			;;
+
+		#-----	postTRES stuff
+		    grptresmins)
+			tmptext="${tmptext}GrpTRESMins"
+			;;
+		    grptresrunmins)
+			tmptext="${tmptext}GrpTRESRunMins"
+			;;
+		    grptres)
+			tmptext="${tmptext}GrpTRES"
+			;;
+		    maxtresmins)
+			tmptext="${tmptext}MaxTRESMins"
+			;;
+		    maxtresperjob)
+			tmptext="${tmptext}MaxTRES"
+			;;
+		    maxtresperuser)
+			tmptext="${tmptext}MaxTRESPU"
+			;;
+		    maxtrespernode)
+			tmptext="${tmptext}MaxTRESPN"
+			;;
+		    mintresperjob)
+			tmptext="${tmptext}MinTRES"
+			;;
+
+		#------ ERROR
+		    *)
+			echo >&2 "Unrecognized field name $fld in format string (1), aborting"
+			exit 1;
+			;;
+		esac
+		tmptext="${tmptext}|"
+	done
+	echo $tmptext
+}
+
+
+print_qos()
+{	
+	#Clear values
+	#	common
+	tmp_description=
+	tmp_flags=
+	tmp_gracetime=
+	tmp_grpjobs=
+	tmp_grpsubmitjobs=
+	tmp_grpwall=
+	tmp_id=
+	tmp_maxjobs=
+	tmp_maxsubmitjobs=
+	tmp_maxwall=
+	tmp_name=
+	tmp_preempt=
+	tmp_preemptmode=
+	tmp_priority=
+	tmp_usagefactor=
+	tmp_usagethreshold=
+
+	#preTRES
+	tmp_grpcpus=
+	tmp_grpcpumins=
+	tmp_grpnodes=
+	tmp_maxcpus=
+	tmp_maxcpumins=
+	tmp_maxcpusperuser=
+	tmp_maxnodes=
+	tmp_maxnodesperuser=
+	tmp_mincpus=
+
+	#postTRES
+	tmp_grptres=
+	tmp_grptresmins=
+	tmp_grptresrunmins=
+	tmp_maxtresperjob=
+	tmp_maxtrespernode=
+	tmp_maxtresperuser=
+	tmp_maxtresmins=
+	tmp_mintresperjob=
+
+	#Set values
+	while [ $# -gt 0 ]
+	do
+		key=$1
+		val=$1
+		shift
+		key=`echo $key | sed -e 's/=.*$//'`
+		val=`echo $val | sed -e 's/^[^=]*=//'`
+		#echo >&2 "$key = $val"
+
+		case $key in
+		#----	Common fields
+		    description)
+			tmp_description=$val
+			;;
+		    flags)
+			tmp_flags=$val
+			;;
+		    gracetime)
+			tmp_gracetime=$val
+			;;
+		    grpjobs)
+			tmp_grpjobs=$val
+			;;
+		    grpsubmitjobs)
+			tmp_grpsubmitjobs=$val
+			;;
+		    grpwall)
+			tmp_grpwall=$val
+			;;
+		    id)
+			tmp_id=$val
+			;;
+		    maxjobs)
+			tmp_maxjobs=$val
+			;;
+		    maxsubmitjobs)
+			tmp_maxsubmitjobs=$val
+			;;
+		    maxwall)
+			tmp_maxwall=$val
+			;;
+		    name)
+			tmp_name=$val
+			;;
+		    preempt)
+			tmp_preempt=$val
+			;;
+		    preemptmode)
+			tmp_preemptmode=$val
+			;;
+		    priority)
+			tmp_priority=$val
+			;;
+		    usagefactor)
+			tmp_usagefactor=$val
+			;;
+		    usagethreshold)
+			tmp_usagethreshold=$val
+			;;
+
+		#----	preTRES fields
+		    grpcpumins)
+			tmp_grpcpumins=$val
+			;;
+		    grpcpus)
+			tmp_grpcpus=$val
+			;;
+		    grpnodes)
+			tmp_grpnodes=$val
+			;;
+		    maxcpumins)
+			tmp_maxcpumins=$val
+			;;
+		    maxcpus)
+			tmp_maxcpus=$val
+			;;
+		    maxcpusperuser)
+			tmp_maxcpusperuser=$val
+			;;
+		    maxnodes)
+			tmp_maxnodes=$val
+			;;
+		    maxnodesperuser)
+			tmp_maxnodesperuser=$val
+			;;
+		    mincpus)
+			tmp_mincpus=$val
+			;;
+
+		#----	postTRES fields
+		    grptres)
+			tmp_grptres=$val
+			;;
+		    grptresmins)
+			tmp_grptresmins=$val
+			;;
+		    grptresrunmins)
+			tmp_grptresrunmins=$val
+			;;
+		    maxtresperjob)
+			tmp_maxtresperjob=$val
+			;;
+		    maxtresperuser)
+			tmp_maxtresperuser=$val
+			;;
+		    maxtrespernode)
+			tmp_maxtrespernode=$val
+			;;
+		    maxtresmins)
+			tmp_maxtresmins=$val
+			;;
+		    maxtrespernode)
+			tmp_maxtrespernode=$val
+			;;
+		    mintresperjob)
+			tmp_mintresperjob=$val
+			;;
+
+		#----	ERROR
+		    *)
+			echo >&2 "Unrecognized parm $key, aborting"
+			exit 1
+			;;
+		esac
+	done
+		    
+	#Print values
+	tmptext=
+	for fld in $FORMAT_FIELDS
+	do
+		case $fld in
+		#----	common fields
+		    description)
+			tmptext="${tmptext}${tmp_description}"
+			;;
+		    flags)
+			tmptext="${tmptext}${tmp_flags}"
+			;;
+		    gracetime)
+			tmptext="${tmptext}${tmp_gracetime}"
+			;;
+		    grpjobs)
+			tmptext="${tmptext}${tmp_grpjobs}"
+			;;
+		    grpsubmitjobs)
+			tmptext="${tmptext}${tmp_grpsubmitjobs}"
+			;;
+		    grpwall)
+			tmptext="${tmptext}${tmp_grpwall}"
+			;;
+		    id)
+			tmptext="${tmptext}${tmp_id}"
+			;;
+		    maxjobs)
+			tmptext="${tmptext}${tmp_maxjobs}"
+			;;
+		    maxsubmitjobs)
+			tmptext="${tmptext}${tmp_maxsubmitjobs}"
+			;;
+		    maxwall)
+			tmptext="${tmptext}${tmp_maxwall}"
+			;;
+		    name)
+			tmptext="${tmptext}${tmp_name}"
+			;;
+		    preempt)
+			tmptext="${tmptext}${tmp_preempt}"
+			;;
+		    preemptmode)
+			tmptext="${tmptext}${tmp_preemptmode}"
+			;;
+		    priority)
+			tmptext="${tmptext}${tmp_priority}"
+			;;
+		    partition)
+			tmptext="${tmptext}${tmp_partition}"
+			;;
+		    usagefactor)
+			tmptext="${tmptext}${tmp_usagefactor}"
+			;;
+		    usagethreshold)
+			tmptext="${tmptext}${tmp_usagethreshold}"
+			;;
+
+		#----	preTRES fields
+		    grpcpumins)
+			tmptext="${tmptext}${tmp_grpcpumins}"
+			;;
+		    grpcpus)
+			tmptext="${tmptext}${tmp_grpcpus}"
+			;;
+		    grpnodes)
+			tmptext="${tmptext}${tmp_grpnodes}"
+			;;
+		    maxcpumins)
+			tmptext="${tmptext}${tmp_maxcpumins}"
+			;;
+		    maxcpus)
+			tmptext="${tmptext}${tmp_maxcpus}"
+			;;
+		    maxcpusperuser)
+			tmptext="${tmptext}${tmp_maxcpusperuser}"
+			;;
+		    maxnodes)
+			tmptext="${tmptext}${tmp_maxnodes}"
+			;;
+		    maxnodesperuser)
+			tmptext="${tmptext}${tmp_maxnodesperuser}"
+			;;
+		    mincpus)
+			tmptext="${tmptext}${tmp_mincpus}"
+			;;
+
+		#----	postTRES fields
+		    grptresmins)
+			tmptext="${tmptext}${tmp_grptresmins}"
+			;;
+		    grptresrunmins)
+			tmptext="${tmptext}${tmp_grptresrunmins}"
+			;;
+		    grptres)
+			tmptext="${tmptext}${tmp_grptres}"
+			;;
+		    maxtresmins)
+			tmptext="${tmptext}${tmp_maxtresmins}"
+			;;
+		    maxtresperjob)
+			tmptext="${tmptext}${tmp_maxtresperjob}"
+			;;
+		    maxtresperuser)
+			tmptext="${tmptext}${tmp_maxtresperuser}"
+			;;
+		    maxtrespernode)
+			tmptext="${tmptext}${tmp_maxtrespernode}"
+			;;
+		    mintresperjob)
+			tmptext="${tmptext}${tmp_mintresperjob}"
+			;;
+
+		#----	ERROR
+		    *)
+			echo >&2 "Unrecognized field name $fld in format string (2), aborting"
+			exit 1;
+			;;
+		esac
+		tmptext="${tmptext}|"
+	done
+	echo $tmptext
+
+
+}
+
+
+print_qos_hi()
+{	print_qos \
+		id=1 \
+		name='high-priority'  description='High priority QoS' \
+		gracetime=120  \
+		grpjobs=75  grpsubmitjobs=100  grpwall=600 \
+		maxjobs=75  maxsubmitjobs=100  maxwall=600 \
+		preempt='scavenger'  preemptmode='cluster' \
+		priority=500  usagefactor=2 \
+		grpcpumins=6000  grptresmins="cpu=6000" \
+		grpcpus=50  grpnodes=10 grptres="cpu=50,node=10,mem=800000" \
+		maxcpumins=12000 maxtresmins="cpu=12000" \
+		maxcpus=100  maxnodes=20 maxtresperjob="cpu=100,node=20,mem=24000000" \
+		maxcpusperuser=25  maxnodesperuser=5 maxtresperuser="cpu=25,node=5,mem=320000" 
+}
+
+
+print_qos_std()
+{	print_qos \
+		id=2 \
+		name='standard'  description='standard priority QoS' \
+		gracetime=60  \
+		maxjobs=150  maxsubmitjobs=200  maxwall=1200 \
+		preempt='scavenger'  preemptmode='cluster' \
+		priority=100  usagefactor=1 \
+		maxcpus=200  maxnodes=40 maxtresperjob="cpu=200,node=40" \
+		maxcpumins=24000 maxtresmins="cpu=24000" \
+		maxcpusperuser=50  maxnodesperuser=10 maxtresperuser="cpu=50,node=10" 
+}
+
+
+print_qos_scav()
+{	print_qos \
+		id=3 \
+		name='scavenger'  description='bottom feeder QoS' \
+		gracetime=10  preemptmode='cluster' \
+		priority=0  usagefactor=0 
+}
+
+
+
+print_specified_qos()
+{	qos=$1
+
+	case $qos in
+	   hi|high)
+		print_qos_hi
+		;;
+	   std|standard)
+		print_qos_std
+		;;
+	   scav|scavenger)
+		print_qos_scav
+		;;
+	   *)
+		x=x
+		;;
+	esac
+}
+
+print_qoses()
+{	#We always have --noheader
+	if [ "x$verbose_flag" = "xyes" ]; then
+		print_header
+	fi
+	while [ $# -gt 0 ]
+	do
+		qos=$1
+		shift
+		print_specified_qos $qos
+	done
+}
+
+print_all_qoses()
+{	#Must do alphabetically
+	print_qoses hi std scav
+}
+
+
+print_high_qos()
+{	
+	print_qoses hi
+}
+
+print_std_qos()
+{	
+	print_qoses std
+}
+
+print_scav_qos()
+{	
+	print_qoses  scav
+}
+
+print_no_qoses()
+{	print_qoses 'no-such-qos'
+}
+
+#Parse options
+name_flag=
+
+while [ $# -gt 0 ]
+do
+	arg=$1
+	shift
+
+	case $arg in
+	    --version)
+		#Print version and exit
+		if [ "x$FAKE_SLURM_VERSION" = "x" ]; then
+			print_version 14
+		else
+			print_version $FAKE_SLURM_VERSION
+		fi
+		exit 0
+		;;
+	    format=*)
+		#Set our format string
+		tmp=`echo $arg | sed -e 's/^format=//' -e "s/'//g" -e 's/"//g' -e 's/,/ /g'`
+		FORMAT_FIELDS=$tmp
+		;;
+	    name=* )
+		tmp=`echo $arg | sed -e 's/^name=//' -e "s/'//g" -e 's/"//g' `
+		name_flag=$tmp
+		;;
+	    -v|--verbose)
+		verbose_flag=yes
+		;;
+	esac
+done
+
+
+if [ "x${name_flag}" != "x" ]; then
+	#cluster requested, possibly with user
+	if [ "x${name_flag}" = "xhigh-priority" ]; then
+		print_high_qos
+	elif [ "x${name_flag}" = "xstandard" ]; then
+		print_std_qos
+	elif [ "x${name_flag}" = "xscavenger" ]; then
+		print_scav_qos
+	else
+		print_no_qoses
+	fi
+else
+	print_all_qoses
+fi
+

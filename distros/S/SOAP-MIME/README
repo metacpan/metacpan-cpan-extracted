@@ -1,0 +1,72 @@
+OVERVIEW
+
+This Version: 0.55-6
+
+SOAP::Lite (http://www.soaplite.com/) is a SOAP Toolkit
+that allows users to create SOAP clients and services. As
+of June 12, 2002, MIME support in SOAP::Lite was minimal.
+It could parse MIME formatted messages, but the data 
+contained in those attachments was "lost." This Perl module,
+patches SOAP::Lite so that those MIME attachments are
+stored and placed into a SOAP::SOM object.
+
+PREREQUISITES
+
+You must first install SOAP::Lite prior to installing SOAP::MIME, as
+SOAP::MIME is a patch to SOAP::Lite. SOAP::Lite version 0.55 required.
+
+You can install SOAP::Lite easily, by downloading the module from 
+http://soaplite.com/ or as you would install any perl module library,
+by running these commands:
+
+If you have CPAN.pm installed and are connected to the Internet:
+
+   perl -MCPAN -e shell
+   > install SOAP::Lite
+
+or even 
+
+   perl -MCPAN -e 'install SOAP::Lite'
+
+INSTALLATION
+
+Install SOAP::MIME just as you would any other Perl module:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Use nmake instead of make on Windows platform.
+
+DOCUMENTATION
+
+See lib/SOAP/Lite.pm for an overview of the library. Documentation is 
+included in modules and scripts. These are normally converted to manual 
+pages and installed as part of the "make install" process.  You should 
+also be able to use the 'perldoc' utility to extract and read 
+documentation from the module files directly.
+
+LIMITATIONS
+
+- This implementation patches SOAP::Lite. But 'use'ing it, you completely
+  override functions found in SOAP::Lite. This may produce weird behavior
+  if you are not using attachments. What 'wierd' means, I don't know. But
+  if you find something, please file a bug in sourceforge:
+  http://sourceforge.net/projects/soapmime
+
+SUPPORT
+
+Feel free to send mail directly to author with your comments, suggestions, 
+bug reports and complaints. 
+
+COPYRIGHT
+
+Copyright (C) 2002-2003 majordojo.com. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+AUTHOR
+
+Byrne Reese (soapmime at majordojo.com)

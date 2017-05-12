@@ -1,0 +1,289 @@
+#!/usr/local/bin/perl
+
+#
+# Term::Readline interface to SQL::Shell
+#
+# $Id: sqlsh,v 1.50 2006/12/05 11:38:47 andreww Exp $
+#
+
+use strict;
+use vars qw($VERSION);
+$VERSION = ('$Revision: 1.50 $' =~ /([\d\.]+)/)[0];
+
+use constant HISTORY_FILE => '~/.sqlsh_history';
+
+use Term::ReadLine;
+use Term::ReadKey;
+use Getopt::Long;
+use Pod::Usage;
+use Log::Trace;
+use SQL::Shell;
+
+#Argument processing
+use vars qw(@Arguments);
+@Arguments = @ARGV; #Store away @ARGV for reload
+
+my $dsn = $ENV{DBI_DSN};
+my ($username, $password);
+my ($read_from_stdin, $help, $quiet);
+GetOptions(
+	'u:s' => \$username, 
+	'p:s' => \$password, 
+	'd=s' => \$dsn, 
+	'i' => \$read_from_stdin, 
+	'H' => \$help,
+	'q' => \$quiet, 
+);
+pod2usage(-verbose=>2) if($help);
+welcome() unless($quiet);
+
+#Create SQL::Shell
+my $sqlsh = new SQL::Shell({
+	Verbose => 1,
+});
+
+# Connect to database
+if($dsn){
+	$password = prompt_for_password($username, $dsn) if(defined $username and not defined $password);	
+	$sqlsh->connect($dsn,$username,$password);
+}
+
+# Allow sqlsh to be batched from a pipe or a single command on @ARGV
+my @batch_commands; 
+if($read_from_stdin) {
+	@batch_commands = map {chomp; $_} <STDIN>;
+} else {
+	push(@batch_commands,  join(" ", @ARGV)) if(@ARGV);
+}
+
+if(@batch_commands)
+{
+	#Run on batch of commands
+	foreach(@batch_commands) {$sqlsh->execute_cmd($_) }
+}
+else
+{
+	#Run as a shell
+	$sqlsh->set('Interactive', 1);
+
+	# Set readline type according to user's preference
+	($ENV{EDITOR}) = $ENV{PERL_READLINE_MODE} ? $ENV{PERL_READLINE_MODE}
+		: $ENV{SHELLOPTS} ? $ENV{SHELLOPTS} =~ /\b(emacs|vi)\b/
+		: $ENV{EDITOR};
+
+	my $term = new Term::ReadLine "SQL Shell (sqlsh)";
+	my $autohistory = $term->Features()->{autohistory};
+	my $ornaments = $term->ornaments;
+	if (defined $ornaments && $ornaments ne ',,,') {
+		$sqlsh->set('NULL', "\x1B[1mNULL\x1B[0m"); #bold
+	}
+
+	#Wire up the history to the mechanism provided by $term
+	$sqlsh->set('GetHistory',  sub {[$term->GetHistory()]}); #Callback to get history
+	$sqlsh->set('SetHistory',  sub {my $history = shift; $term->SetHistory(@$history)}); #Callback to set history
+	$sqlsh->set('AddHistory',  sub {my $cmd = shift; $term->addhistory($cmd) if !$autohistory});
+
+	#Wire up additional commands
+	my $quit = 0;
+	$sqlsh->install_cmds({
+		qr/^help|\?$/ => \&_help,
+		qr/^reload$/ => \&_reload,
+		qr/^(cat|more|less) (.+)/ => \&_display_file,
+		qr/^(?:exit|quit|bye|\w+\s+off)$/i => sub {
+			my $sqlsh = shift;
+			$sqlsh->disconnect();
+			$quit = 1;		
+		}
+	});
+
+	#Load any previous history
+	$sqlsh->load_history(HISTORY_FILE) if(-f _expand_filename(HISTORY_FILE));
+	
+	#Command loop
+	local $_;
+	my $prompt = $dsn . "> ";
+	while ( defined ($_ = $term->readline($prompt)) ) {
+		my $rv;
+		eval
+		{
+			$sqlsh->execute_cmd($_);
+		};
+		print "Error: $@" if($@);
+		last if $quit;
+
+		#Update prompt based on connection/log status 
+		$dsn = $sqlsh->dsn();
+		my $logging = $sqlsh->get('LogLevel') && 1;
+		$prompt = $dsn .($logging?">":""). "> ";
+	}
+	
+	#Save history on exit
+	$sqlsh->save_history(HISTORY_FILE);
+}
+
+sub prompt_for_password
+{
+	my ($username, $dsn) = @_;
+	
+	print "Enter password for $username connecting to $dsn: ";	
+	ReadMode 2;
+	my $password = <STDIN>;
+	ReadMode 0;
+	print "\n";
+	chomp $password;
+	return $password;
+}
+
+sub welcome
+{
+print '
+               _       _      
+              | |     | |     
+     ___  ____| |  ___| |__   
+    /___)/ _  | | /___)  _ \  
+   |___ | |_| | ||___ | | | | 
+   (___/ \__  |\_|___/|_| |_| 
+            |_|               
+   
+Type HELP for a list of commands
+';	
+}
+
+##################################################################
+#
+# Additional commands for the readline shell
+#
+##################################################################
+
+sub _help
+{
+	my $self = shift;
+	use Config;
+	require Pod::Select;
+	my $pager = $Config{pager};
+	my $have_pager = ($pager && -f $pager && -x _);
+	
+	my $helptext = '
+            _       _                                               _      
+           | |     | |                                             | |     
+  ___  ____| |  ___| |__      ____ ___  ____  ____  _____ ____   __| | ___ 
+ /___)/ _  | | /___)  _ \    / ___) _ \|    \|    \(____ |  _ \ / _  |/___)
+|___ | |_| | ||___ | | | |  ( (__| |_| | | | | | | / ___ | | | ( (_| |___ |
+(___/ \__  |\_|___/|_| |_|   \____)___/|_|_|_|_|_|_\_____|_| |_|\____(___/ 
+         |_|                                                               
+';
+	{
+		local (*STDOUT, $^W);
+		require Pod::Select;
+		require IO::Scalar;
+		tie *STDOUT, 'IO::Scalar', \$helptext;
+		Pod::Select::podselect({-sections => ['COMMANDS']}, $INC{'SQL/Shell.pm'});	
+		Pod::Select::podselect({-sections => ['COMMANDS ADDED BY SQLSH']}, $0);
+		untie *STDOUT;
+		$helptext =~ s/=head1.*?\n//sg;
+		$helptext =~ s/\n\n/\n/g;		
+	}
+
+	if ($have_pager) 
+	{
+		local (*STDOUT, $^W);
+		open PAGER, "| $pager";
+		*STDOUT = \*PAGER;
+		print $helptext;
+		close PAGER;
+	} else {
+		print $helptext;
+	}
+
+	return 1;
+}
+
+sub _reload
+{
+	my $self = shift;
+	my $settings = $self->{settings};
+	if($settings->{Interactive}) {
+		exec($^X, $0, @Arguments) || warn;
+		warn; #Should never get here
+		return 0;
+	}
+	return 1;	
+}
+
+sub _display_file
+{
+	my ($self, $_pager, $file) = @_;
+	$file = _expand_filename($file);
+	return system($_pager, $file) == 0;	
+}
+
+sub _expand_filename 
+{
+	my $file = shift;
+	if ($file =~ s/^~([^\/]*)//) {
+		my $home = $1 ? ((getpwnam ($1)) [7]) : $ENV{HOME};
+		$file = $home . $file;
+	}
+	return $file;
+}
+
+
+=head1 NAME
+
+sqlsh - SQL shell
+
+=head1 SYNOPSIS
+
+	sqlsh -d DBI:Oracle:DEVDB -u scott -p tiger
+
+=head1 DESCRIPTION
+
+sqlsh is an interactive shell run from the command-line for working with databases.
+This is a terse summary for quick reference.  For a full description see L<SQL::Shell::Manual>.
+For a list of commands, type: 
+
+	help
+
+at the prompt after running sqlsh.  If you pass a username with -u and don't pass a password with -p,
+sqlsh will prompt you for a password.  You can pass a blank password with -p if required (-p followed by nothing).
+
+=head1 OPTIONS
+
+	-d <DSN>
+	-u <username>
+	-p <password>
+	-i - read list of commands from STDIN
+	-q - quiet (no banner)
+	-H - help
+
+=head1 COMMANDS ADDED BY SQLSH
+
+ cat|more|less <file> - display file
+ help|? - show this
+ reload - reload the shell
+ exit|quit|bye|\w+ off - quit the shell
+
+=head1 READLINE MODE
+
+This script uses Term::Readline. Term::Readline sets the editing mode
+(vi/emacs) based on the user's F<.inputrc>, or the C<$EDITOR> environment
+variable.
+
+This script will set $EDITOR based on $PERL_READLINE_MODE or bash's $SHELLOPTS
+variable. Any .inputrc C<editing-mode> declaration still takes precedence.
+
+=head1 VERSION
+
+$Revision: 1.50 $ on $Date: 2006/12/05 11:38:47 $ by $Author: andreww $
+
+=head1 AUTHOR
+
+John Alden with contributions by Simon Flack <cpan _at_ bbc _dot_ co _dot_ uk>
+
+=head1 COPYRIGHT
+
+(c) BBC 2006. This program is free software; you can redistribute it and/or modify it under the GNU GPL.
+
+See the file COPYING in this distribution, or http://www.gnu.org/licenses/gpl.txt
+						
+=cut

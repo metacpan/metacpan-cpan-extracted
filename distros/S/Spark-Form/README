@@ -1,0 +1,181 @@
+NAME
+    Spark::Form - A simple yet powerful forms validation system that
+    promotes reuse.
+
+VERSION
+    version 0.2102
+
+SYNOPSIS
+     use Spark::Form;
+     use CGI; #Because it makes for a quick and oversimplistic example
+     use Third::Party::Field;
+     $form = Spark::Form->new(plugin_ns => 'MyApp::Field');
+     # Add a couple of inbuilt modules
+     $form->add('email','email',confirm_field => 'email-confirm')
+          ->add('email','email-confirm')
+          ->add('password','password',regex => qr/^\S{6,}$/),
+          #This one will be autoloaded from MyApp::Field::Username
+          ->add('username','username')
+          # And this shows how you can use a third party field of any class name
+          ->add(Third::Party::Field->new(name => 'blah'));
+     #Pass in a HashRef of params to populate the virtual form with data
+     $form->data(CGI->new->params);
+     #And do the actual validation
+     if ($form->validate) {
+         print "You are now registered";
+     } else {
+         print join "\n", $form->errors;
+     }
+
+    and over in MyApp/Field/Username.pm...
+
+     package MyApp::Form::Field::Username;
+     use base Spark::Form::Field;
+
+     sub _validate {
+
+       my ($self,$v) = @_;
+
+       if (length $v < 6 or length $v > 12) {
+         $self->error("Usernames must be 6-12 characters long");
+       } elsif ($v =~ /[^a-zA-Z0-9_-]/) {
+         $self->error("Usernames may contain only a-z,A-Z,0-9, _ and -");
+       } else {
+         $self->error(undef);
+       }
+       $self->valid(!!$self->error());
+     }
+
+INSTABILITY
+    Periodically the API may break. I'll try to make sure it's obvious so it
+    doesn't silently malfunction.
+
+    By 0.5, we shouldn't have to do this.
+
+DEPENDENCIES
+    Moose. I've dropped using Any::Moose. If you need the performance
+    increase, perhaps it's time to start thinking about shifting off CGI.
+
+METHODS
+  import (%options)
+    Allows you to set some options for the forms class.
+
+    class => String
+        Optional, gives the basename for searching for form plugins.
+
+        Given 'MyApp', it will try to load form plugins from
+        MyApp::Form::Field::*
+
+    source => String
+        Optional, names a plugin to try and extract form data from.
+
+        If unspecified, you will need to call $form->data(\%data);
+
+  add ($thing,@rest)
+    If $thing is a string, attempts to instantiate a plugin of that type and
+    add it to the form. Requires the second argument to be a string name for
+    the field to identify it in the form. Rest will become %kwargs If it is
+    an ArrayRef, it loops over the contents (Useful for custom fields, will
+    probably result in bugs for string field names).@rest will be passed in
+    each iteration. If it looks sufficiently like a field (implements
+    Spark::Form::Field), then it will add it to the list of fields. @rest
+    will just become %kwargs
+
+    Uses 'field name' to locate it from the data passed in.
+
+    This is a streaming interface, it returns the form itself.
+
+  validate
+    Validates the form. Sets "valid" and then also returns the value.
+
+  data
+    Allows you to pass in a HashRef of data to populate the fields with
+    before validation. Useful if you don't use a plugin to automatically
+    populate the data.
+
+    This is a streaming interface, it returns the form itself.
+
+  fields () => Fields
+    Returns a list of Fields in the form in their current order
+
+  BUILD
+    Moose constructor. Test::Pod::Coverage made me do it. Adds "class" to
+    the search path for field modules.
+
+  get (Str)
+    Returns the form field of that name
+
+  get_at (Int)
+    Returns the form field at that index (counting from 0)
+
+  keys () :: Array
+    Returns the field names
+
+  field_couplet () :: Data::Couplet
+    Returns the Data::Couplet used to store the fields. Try not to use this
+    too much.
+
+  remove (Array[Str]) :: Spark::Form
+    Removes the field(s) bearing the given name(s) from the form object.
+    Silently no-ops any that do not exist.
+
+  remove_at (Array[Int]) :: Spark::Form
+    Removes the field at the given ID(s) from the form object. Silently
+    no-ops any that do not exist.
+
+    WARNING: Things will get re-ordered when you do this. If you have a form
+    with IDs 0..3 and you remove (1, 3), then (0, 2) will remain but they
+    will now be (0, 1) as Data::Couplet will move them to keep a consistent
+    array.
+
+  clone_all () :: Spark::Form
+    Returns a new copy of the form with freshly instantiated fields.
+
+  clone_except_names (Array[Str]) :: Spark::Form
+    Clones, removing the fields with the specified names.
+
+  clone_only_names (Array[Str]) :: Spark::Form
+    Clones, removing the fields without the specified names.
+
+  clone_except_ids (Array[Int]) :: Spark::Form
+    Clones, removing the fields with the specified IDs.
+
+  clone_only_ids (Array[Int]) :: Spark::Form
+    Clones, removing the fields without the specified IDs.
+
+  clone_if (SubRef[(Int, Str, Any) -> Bool]) :: Spark::Form
+    Clones, removing items for which the sub returns false. Sub is passed
+    (Id, Key, Value).
+
+  clone_unless (SubRef[(Int, Str, Any) -> Bool]) :: Spark::Form
+    Clones, removing items for which the sub returns true. Sub is passed
+    (Id, Key, Value).
+
+  compose (Spark::Form) :: Spark::Form
+    Clones the current form object and copies fields from the supplied other
+    form to the end of that form. Where names clash, items on the current
+    form take priority.
+
+Docs?
+    <http://sparkengine.org/docs/forms/>
+
+  Source?
+    <http://github.com/jjl/Spark-Form/>
+
+THANKS
+    Thanks to the Django Project, whose forms module gave some inspiration.
+
+SEE ALSO
+    The FAQ: Spark::Form::FAQ Data::Couplet used to hold the fields (see
+    "field_couplet")
+
+AUTHOR
+      James Laver L<http://jameslaver.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2009 by James Laver "<sprintf qw(%s@%s.%s
+    cpan jameslaver com)>".
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

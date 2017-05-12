@@ -1,0 +1,40 @@
+
+Configuration IP de Windows
+
+
+Carte Ethernet LAN-Verbindung :
+
+   Suffixe DNS propre à la connexion. . . : S_W_23V_1_3_0
+   Adresse IPv6. . . . . . . . . . . . . .: 2003:e7:93ce:2801:71f4:f151:8100:f395
+   Adresse IPv6 temporaire . . . . . . . .: 2003:e7:93ce:2801:8dd:1829:d3ce:9915
+
+   Adresse IPv6 de liaison locale. . . . .: fe80::71f4:f151:8100:f395%11
+   Adresse IPv4. . . . . . . . . . . . . .: 192.168.2.118
+   Masque de sous-réseau. . . . . . . . . : 255.255.255.0
+   Passerelle par défaut. . . . . . . . . : fe80::1%11
+                                       192.168.2.1
+
+Carte Ethernet VirtualBox Host-Only Network :
+
+   Suffixe DNS propre à la connexion. . . :
+   Adresse IPv6 de liaison locale. . . . .: fe80::a8fa:b31b:672b:b415%14
+   Adresse IPv4. . . . . . . . . . . . . .: 192.168.56.1
+   Masque de sous-réseau. . . . . . . . . : 255.255.255.0
+   Passerelle par défaut. . . . . . . . . :
+
+Carte Tunnel isatap.S_W_23V_1_3_0 :
+
+   Statut du média. . . . . . . . . . . . : Média déconnecté
+   Suffixe DNS propre à la connexion. . . : S_W_23V_1_3_0
+
+Carte Tunnel LAN-Verbindung* 3 :
+
+   Suffixe DNS propre à la connexion. . . :
+   Adresse IPv6. . . . . . . . . . . . . .: 2001:0:9d38:78cf:c02:3711:a4ee:a12d
+   Adresse IPv6 de liaison locale. . . . .: fe80::c02:3711:a4ee:a12d%13
+   Passerelle par défaut. . . . . . . . . :
+
+Carte Tunnel isatap.{2F276BC5-ADC1-4179-BFB7-161CEA6B8A27} :
+
+   Statut du média. . . . . . . . . . . . : Média déconnecté
+   Suffixe DNS propre à la connexion. . . :

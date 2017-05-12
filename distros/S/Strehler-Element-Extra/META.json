@@ -1,0 +1,87 @@
+{
+   "abstract" : "Extra entities for Strehler CMS, ready to be installed.",
+   "author" : [
+      "Simone Fare' <cymon@tiscali.it>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Strehler-Element-Extra",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cwd" : "0",
+            "DBIx::Class::Core" : "0",
+            "Dancer2" : "0.154000",
+            "Moo" : "0",
+            "Strehler" : "v1.6.3",
+            "Strehler::Element" : "0",
+            "Strehler::Element::Article" : "0",
+            "Strehler::Element::Role::Maintainer" : "0",
+            "Text::Markdown" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBIx::Class::Schema" : "0",
+            "Dancer2::Plugin::DBIC" : "0",
+            "FindBin" : "0",
+            "HTTP::Request" : "0",
+            "HTTP::Request::Common" : "0",
+            "JSON" : "0",
+            "Plack::Builder" : "0",
+            "Plack::Test" : "0",
+            "Strehler::API" : "0",
+            "Strehler::Admin" : "0",
+            "Strehler::Dancer2::Plugin::EX" : "0",
+            "Strehler::Element::Role::Slugged" : "0",
+            "Strehler::Meta::Category" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Strehler::Element::Extra" : {
+         "file" : "lib/Strehler/Element/Extra.pm",
+         "version" : "v1.0.1"
+      },
+      "Strehler::Element::Extra::Artwork" : {
+         "file" : "lib/Strehler/Element/Extra/Artwork.pm",
+         "version" : "v1.0.1"
+      },
+      "Strehler::Element::Extra::Chapter" : {
+         "file" : "lib/Strehler/Element/Extra/Chapter.pm",
+         "version" : "v1.0.1"
+      },
+      "Strehler::Schema::Extra::Artdescription" : {
+         "file" : "lib/Strehler/Schema/Extra/Artdescription.pm",
+         "version" : "v1.0.1"
+      },
+      "Strehler::Schema::Extra::Artwork" : {
+         "file" : "lib/Strehler/Schema/Extra/Artwork.pm",
+         "version" : "v1.0.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://www.strehler-cms.org/other-projects",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/cym0n/Strehler-Element-Extra.git",
+         "web" : "https://github.com/cym0n/Strehler-Element-Extra"
+      }
+   },
+   "version" : "1.0.1"
+}
+

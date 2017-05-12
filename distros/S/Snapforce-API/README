@@ -1,0 +1,47 @@
+Snapforce-API version 0.01
+==========================
+
+This Perl module interfaces with the Snapforce CRM's API to make using the system simple and intuitive in the Perl environment.
+
+The Snapforce API documentation can be found on https://www.snapforce.com/crm/resources/developers/api/
+
+Full documentation for this module can be found in pod format in API.pm.
+
+VERSION INFO
+
+Version 0.01
+============
+
+This is the initial version of the Snapforce API module for Perl, which includes a generic runAPI function, as well as a fetchRecords function, equivalent to the official Snapforce API function.  This module also comes equipped with an XML parser and converter into a hash format which can then be navigated in Perl.
+
+Version 0.02
+============
+
+Removed an erroneous line of code that managed to make its way into the final distribution
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  XML::Parser 			2.44
+  HTTP::Request::Common 6.11
+  LWP::UserAgent		6.15
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2016 by Snapforce
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.18.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

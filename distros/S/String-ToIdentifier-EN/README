@@ -1,0 +1,105 @@
+NAME
+    String::ToIdentifier::EN - Convert Strings to English Program
+    Identifiers
+
+SYNOPSIS
+        use utf8;
+        use String::ToIdentifier::EN 'to_identifier';
+
+        to_identifier 'foo-bar';             # fooDashBar
+        to_identifier 'foo-bar', '_';        # foo_dash_bar
+        to_identifier 'foo.bar', '_';        # foo_dot_bar
+        to_identifier "foo\x{4EB0}bar";      # fooJingBar
+        to_identifier "foo\x00bar";          # fooNullCharBar
+        to_identifier "foo\x00\x00bar";      # foo2NullCharsBar
+        to_identifier "foo\x00\x00bar", '_'; # foo_2_null_chars_bar
+
+        {
+            no utf8;
+            to_identifier "foo\xFF\xFFbar.baz";      # foo_2_0xFF_BarDotBaz
+            to_identifier "foo\xFF\xFFbar.baz", '_'; # foo_2_0xFF_bar_dot_baz
+        }
+
+DESCRIPTION
+    This module provides a utility method, "to_identifier" for converting an
+    arbitrary string into a readable representation using the ASCII subset
+    of "\w" for use as an identifier in a computer program. The intent is to
+    make unique identifier names from which the content of the original
+    string can be easily inferred by a human just by reading the identifier.
+
+    If you need the full set of "\w" including Unicode, see the subclass
+    String::ToIdentifier::EN::Unicode.
+
+    Currently, this process is one way only, and will likely remain this
+    way.
+
+    The default is to create camelCase identifiers, or you may pass in a
+    separator char of your choice such as "_".
+
+    Binary char groups will be separated by "_" even in camelCase
+    identifiers to make them easier to read, e.g.: "foo_2_0xFF_Bar".
+
+EXPORT
+    Optionally exports the "to_identifier" function.
+
+SUBROUTINES
+  to_identifier
+    Takes the string to be converted to an identifier, and optionally a
+    separator char such as "_". If a separator char is not provided, a
+    camelCase identifier will be returned.
+
+METHODS
+  string_to_identifier
+    The class method version of "to_identifier", if you want to use the
+    object oriented interface.
+
+SEE ALSO
+    String::ToIdentifier::EN::Unicode, Text::Unidecode,
+    Lingua::EN::Inflect::Phrase
+
+AUTHOR
+    Rafael Kitover, "<rkitover@cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-string-toidentifier-en at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=String-ToIdentifier-EN>.
+    I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+REPOSITORY
+    <http://github.com/rkitover/string-toidentifier-en>
+
+SUPPORT
+    More information on this module is available at:
+
+    *   RT: CPAN's request tracker (report bugs here)
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=String-ToIdentifier-EN>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/String-ToIdentifier-EN>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/String-ToIdentifier-EN>
+
+    *   MetaCPAN
+
+        <https://metacpan.org/module/String::ToIdentifier::EN>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/String-ToIdentifier-EN/>
+
+LICENSE AND COPYRIGHT
+    Copyright (c) 2011 Rafael Kitover <rkitover@cpan.org>.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

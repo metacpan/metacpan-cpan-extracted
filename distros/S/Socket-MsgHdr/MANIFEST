@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+MsgHdr.xs
+ppport.h
+README
+t/10basic.t
+t/20send.t
+t/30recv.t
+lib/Socket/MsgHdr.pm
+META.yml                                 Module meta-data (added by MakeMaker)

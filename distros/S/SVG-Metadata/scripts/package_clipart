@@ -1,0 +1,27 @@
+#!/bin/sh
+
+# This script does the processing of the Open Clip Art Library
+# files to generate a release tarball
+
+distdir=$1
+distname=$2
+collateraldir=$3
+
+# TODO:  Create AUTHORS
+
+# TODO:  Create INDEX
+
+# TODO:  Copy in README, LICENSE, etc.
+echo "cp $collateraldir/README $destdir/"
+cp $collateraldir/README $distdir/README.txt
+echo "cp $collateraldir/LICENSE.txt $destdir/"
+cp $collateraldir/LICENSE.txt $distdir/
+
+# Copy in the release's template example
+echo "cp -r $collateraldir/examples/ $destdir/"
+cp -r $collateraldir/examples/ $destdir/
+
+# TODO:  Create tarball files
+echo "tar czf $distname.tgz $distdir"
+tar czf $distname.tgz $distdir
+

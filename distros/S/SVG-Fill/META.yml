@@ -1,0 +1,37 @@
+---
+abstract: 'use svg file as templates, replace strings and images by id   '
+author:
+  - 'Jens Gassmann <jens.gassmann@atomix.de>'
+build_requires:
+  Data::Printer: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SVG-Fill
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  SVG::Fill:
+    file: lib/SVG/Fill.pm
+    version: '0.09'
+requires:
+  Mojolicious: '6.0'
+  Path::Class: '0'
+  URI: '0'
+  perl: '5.008001'
+version: '0.09'
+x_authority: cpan:JEGADE

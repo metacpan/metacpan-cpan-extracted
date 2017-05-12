@@ -1,0 +1,41 @@
+#!/bin/bash
+LOG=run_svn_regressions.log
+SVN_SRC=svn130branch
+MAILTO=denney
+TMPFILE=/tmp/run_svn_regressions$$
+
+rm -rf $LOG
+echo =================================================== >>$LOG 2>&1
+echo output of run_svn_regressions script                >>$LOG 2>&1
+echo date=`date`                                         >>$LOG 2>&1
+echo host=`hostname`					 >>$LOG 2>&1
+echo svn source=${SVN_SRC}				 >>$LOG 2>&1
+echo =================================================== >>$LOG 2>&1
+svn info 				>>$LOG 2>&1
+
+cp test_this_s4.template test_this_s4
+pwd=`pwd`
+sed -i "s%__S4TOP__%$pwd%" test_this_s4
+script=`pwd`/test_this_s4
+
+#$script help                           >>$LOG 2>&1
+
+
+perl Makefile.PL 			>>$LOG 2>&1
+make test 				>>$LOG 2>&1
+
+if test ! -h ${SVN_SRC}; then
+  echo Could not find subversion source area ${SVN_SRC}
+  echo so I cannot run subversion regressions.
+fi
+
+(cd ${SVN_SRC}/subversion/tests/clients/cmdline && \
+  for i in *.py; do echo ==== $i; ./$i --svn=$script; done) >>$LOG 2>&1
+
+snum=`svn info|awk '/Revision:/{print $2}'`
+mail -s "svn $snum: s4 regression results" $MAILTO < $LOG
+
+rm -f $TMPFILE
+svn diff $LOG > $TMPFILE
+mail -s "svn $snum: s4 regression differences" $MAILTO < $TMPFILE
+rm -f $TMPFILE

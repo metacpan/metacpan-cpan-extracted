@@ -1,0 +1,20 @@
+# This file documents the revision history for Perl extension SMS::Send::Wadja.
+
+1.01  2010-02-01
+  - bugfix: delivery info may not be available right after sending the SMS
+
+  
+1.0  2010-01-26
+  + added support for delivery confirmation after Wadja fixed their API
+  + updated Wadja API URL
+  + future-resistence: the API call now follows HTTP 'POST' redirects
+  * bumped version number to 1.0 after 8 months of daily testing
+
+
+0.03  2009-05-11
+  - POD fixes
+
+  
+0.01  2009-05-10
+  * First version. Wadja's API is still broken. Expect a new version
+    after they fix it.

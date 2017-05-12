@@ -1,0 +1,28 @@
+---
+abstract: 'SMS::Send backend for the Twilio API.'
+author:
+  - 'Michiel Beijen <michielb@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SMS-Send-Twilio
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  SMS::Send: '1'
+  WWW::Twilio::API: '0.15'
+  perl: '5.006001'
+resources:
+  bugtracker: https://github.com/mbeijen/SMS-Send-Twilio/issues
+  repository: https://github.com/mbeijen/SMS-Send-Twilio
+version: '0.18'

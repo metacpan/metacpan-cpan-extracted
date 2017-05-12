@@ -1,0 +1,13 @@
+template: errors/invalid-xml.tt
+
+vars: {}
+
+output_assertions:
+  count:
+    - [ '//epp:resData', 0, 'EPP: No resData in the response' ]
+
+  match:
+    - [ '//epp:result', '/tag mismatch: hello .* and command/', 'knows what happened' ]
+    - [ '//epp:msg', "/Input XML not valid/", "Message makes sense" ]
+  attr_is:
+    - [ '//epp:result', 'code', 2001, 'EPP: XML invalid' ]

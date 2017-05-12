@@ -1,0 +1,20 @@
+-*- indented-text -*-
+
+$Id: TODO,v 1.6 2003/02/12 14:35:13 lem Exp $
+
+This is the "rolling" TODO file. Entries beginning with a '-' are
+pending. Entries beginning with 'X' are done but pending release.
+
+*** Email.pm: 
+
+- Need a command to fetch headers of n messages
+
+- Macros that substitute themselves by commonly used text in the
+  messages.
+
+- Create a .OPTIONS command to control other aspects of the
+  applications. .INTERFACE should become a sub-command.
+
+- .CHECK must be revisited, sp its messages.
+
+

@@ -1,0 +1,231 @@
+
+		Demonstration of Inetd Server Emulation
+
+This demonstration script emulates the standard inetd super-daemon found
+on all Unix systems. It showcases the Stem modules Stem::Proc (which
+handle processes) and Stem::SockMsg (a socket to message gateway).  This
+demonstration runa a single Hub which listens for socket connections on
+two ports. When a connection comes in, a new process is spawned which
+interacts with the remote client that made the connection. This is
+effectively what inetd does but inetd_demo has several major
+advantages. StemInetd can insert filters and/or taps in the data stream,
+all its connections and status changes can be logged and filtered and it
+can be distributed securely across a network.  The demo script is
+described in detail below with sections on running, using, configuring
+and experimenting with it.
+
+Running inetd_demo
+
+The single Hub inetd demonstration is called inetd_demo and it uses the
+inetd.stem configuration file (found in conf/). It is run with the simple
+command:
+
+inetd_demo
+
+To exit, just enter 'q' in the inetd_demo script window itself. It will
+kill all the other windows and then exit. This will also happen if you
+interrupt the demo script with ^C.
+
+If the -s option is used, then all the windows will use ssfe (split
+screen front end) which provides a command line edit and history window
+section and an output section. A single Hub window named Stem will be
+created and then 4 smaller telnet windows which will be connected to
+listen sockets in the Stem Hub. These telnet windows are the inetd users
+and they can type data and interact with a simple command line server
+program named proc_serv. The telnet windows are named A, B, C and D and
+if you use ssfe, each will display the telnet command it ran.
+
+Using inetd_demo
+
+Now enter the help command into window A and hit return. These are the
+commands you give the proc_serv application. Each of the user windows is
+connected to a different running proc_serv process. You can verify this
+by running the pid command in each window. Then have fun with the yow
+and insult commands. Later in the experimenting section, you can change
+the program to run and its options. The major difference among the user
+windows is that two of them A and C are connected to the 6666 port in
+the Hub and run the proc_serv in normal mode. The B and D windows are
+connected to the 6667 port in the Hub and run the proc_serv with -n so
+numbers the successful output lines.
+
+You can print out the list of all the registered Cells by sending a
+status command message to the Stem:Route Class Cell which is aliased to
+'reg'.  In the Hub window (named Stem) type this command:
+
+reg status
+
+You will see this printout:
+
+Route Status for Hub ''
+
+        Object Cells with Target names of their Cloned Cells
+
+        A                               => Stem::SockMsg=HASH(0x2dd5a0)
+                :aaaaaa                 => Stem::SockMsg=HASH(0x2fda20)
+                :aaaaab                 => Stem::SockMsg=HASH(0x350ab0)
+        B                               => Stem::SockMsg=HASH(0x2ed474)
+                :aaaaaa                 => Stem::SockMsg=HASH(0x2c10ac)
+                :aaaaab                 => Stem::SockMsg=HASH(0x355040)
+        proc_serv                       => Stem::Proc=HASH(0x2fdbc4)
+                :aaaaac                 => Stem::Proc=HASH(0x3515c4)
+                :aaaaad                 => Stem::Proc=HASH(0x35554c)
+                :aaaaaa                 => Stem::Proc=HASH(0x2f881c)
+                :aaaaab                 => Stem::Proc=HASH(0x352660)
+
+        Class Cells with their Aliases
+
+        Stem::Conf              => conf
+        Stem::Demo::Cmd         => cmd
+        Stem::Hub               => hub
+        Stem::Log               =>
+        Stem::Log::Entry        => entry
+        Stem::Portal            => port
+        Stem::Route             => foo reg
+        Stem::TtyMsg            => tty
+        Stem::Vars              => var
+
+This shows the Parent Object Cells A, B and proc_serv each with their
+own set of Cloned Cells. Below that are the loaded Class Cells.
+The two Stem::SockMsg Cells have 2 telnet users connected to them and
+the proc_serv Cell has cloned four Objects, each of which manages a
+single process. Note that parent Cells don't do the work, they manage
+the Cloned Cells which do it.
+
+
+How inetd_demo is Configured
+
+Look at the file conf/inetd.stem. That is the configuration file used by
+inetd_demo. It is very simple and easy to understand. It is a Perl list
+of lists structure with pairs of keys and values. Read the config_notes
+for more on this.
+
+The first Cell configured is Stem::TtyMsg which supports typing in and
+sending command messages. This is done in all the demo configurations.
+
+	[
+		class	=>	'Stem::TtyMsg',
+		args	=>	[],
+	],
+
+Then come two Stem::SockMsg Cells named A and B. Each has a server
+socket listening on its own port. Also they each will create a piped
+connection to the cell named 'proc_serv'. The Cell B has one extra
+attribute set, it adds the -n option when a process is spawned for it.
+
+[
+	class	=>	'Stem::SockMsg',
+	name	=>	'A',
+	args	=>	[
+		port		=> 6666,
+		server		=> 1,
+		piped_to	=> 'proc_serv',
+	],
+],
+[
+	class	=>	'Stem::SockMsg',
+	name	=>	'B',
+	args	=>	[
+		port		=> 6667,
+		server		=> 1,
+		piped_to	=> 'proc_serv',
+		piped_args	=> [ '-n' ],
+	],
+],
+
+
+
+Finally we have the Stem::Proc Cell named 'proc_serv' which can clone
+itself and spawn off processes.
+
+[
+	class	=>	'Stem::Proc',
+	name	=>	'proc_serv',
+	args	=>	[
+		path		=> 'proc_serv',
+		use_stderr	=> 1,
+		piped_to	=> 1,
+		no_init_spawn	=> 1,
+	],
+],
+
+The 'path' attribute is the absolute path or program name to
+be run. Note that this configuration assumes it will find 'proc_serv in
+$PATH. The three boolean attributed tell the Cell that it should handle
+output from stderr of the process, it is expecting a pipe connection
+request and it should only spawn processes when it has been cloned.
+
+
+Experimenting with inetd_demo
+
+These experiments are similar to the Hub and Portal ones in
+DEMO_CHAT. They show you how to change the processes StemInetd runs, and
+to distribute it over multiple systems over secure connections. Choose a
+second system and make sure Stem is properly installed on it (NFS
+mounting the tarball dir will help).
+
+To support a remote Hub connecting the Hub which owns the Stem::Proc
+Cell, you have to add a Stem::Portal Cell to each of them.
+
+Make two copies of the configuration file conf/inetd.stem and call them
+inetd_server.stem and inetd_client.stem
+
+Edit inetd_server.stem and rename the Stem::Hub configuration to
+inetd_server. Also insert this Stem::Portal Cell configuration into it
+replacing 'foo_host' with the server hostname:
+
+[
+	class	=>	'Stem::Portal',
+	args	=>	[
+		'server'	=> 1,
+		'host'		=> 'foo_host'
+	],
+],
+
+
+Edit inetd_client.stem and rename the Stem::Hub configuration to
+inetd_client. Delete the Stem::Proc Cell configuration.  Also insert
+this Stem::Portal Cell configuration into it replacing 'foo_host' with
+the server hostname:
+
+[
+	class	=>	'Stem::Portal',
+	args	=>	[
+		'host'		=> 'foo_host'
+	],
+],
+
+
+You can create and modify as many of the Stem::SockMsg Cells as you want
+on each Hub.  Then in a window on the server box, do:
+
+run_stem inetd_server
+
+and on a window in the other box (called bar_host) where Stem is setup do:
+
+run_stem inetd_client
+
+You can create telnet sessions from the 'server' system that connect
+to the ports of the Stem::SockMsg Cells.
+
+telnet localhost 6666
+telnet localhost 6667
+
+And on the 'inetd_client' system, connect telnets to the ports of its
+Stem::SockMsg Cells.
+
+telnet localhost 6666
+telnet localhost 6667
+
+You can now interact with this Stem application just as you did when it
+was running on one system as it did with inetd_demo.
+
+Instead of editing the configuration files, you could also set the
+Stem::Portal host attribute by setting a command line argument or
+environment variable. This command will make the 'server' Hub accept
+connections from the 'foo' host interface:
+
+run_stem host=foo chat_server
+
+You can do the same for the 'client' Hub and have it connect to host
+'foo'. By setting the STEM_HOST environment variable to the host name
+you can get the same effect.

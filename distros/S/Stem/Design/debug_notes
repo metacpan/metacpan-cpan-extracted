@@ -1,0 +1,22 @@
+		       Stem::Debug Design Notes
+
+Stem modules have a need to report error conditions and trace critical
+events while being able to control when, where and how this information
+is presented.  The Stem::Debug module provides a way for any Stem module
+to create debug/trace subs customized to that module's needs.
+Stem::Debug delegates all of this backend filtering, formatting and
+distribution of these messages to the Stem::Log subsystem. In effect,
+Stem::Debug creates specialized front ends subs to Stem::Log.
+
+Using Stem::Debug is very simple. A module just does a use Stem::Debug
+statement with optional key/value parameters. More than one use
+statement can be made in a module and each one will create a new debug sub
+inside that module's namespace. When you create this sub, you can select
+its name, which logical log the message goes to, and the label and severity
+levels. Also a command line argument name may be specified for filtering
+even before the log entry is generated.
+
+The final design of the Stem::Debug is still in flux. It is not yet
+ready to be used by external developers.
+
+This module is only used internally and should not be configured.

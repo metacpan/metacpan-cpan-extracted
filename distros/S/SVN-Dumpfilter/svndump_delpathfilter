@@ -1,0 +1,56 @@
+#!/usr/bin/perl -w
+# $Id: svndump_delpathfilter 278 2007-01-13 12:37:13Z martin $
+# Copyright (C) 2006 by Martin Scharrer <martin@scharrer-online.de>
+# This is free software under the GPL.
+
+use strict;
+use SVN::Dumpfilter;
+
+my $revision = 0;
+my $delrev = 38;
+my $deleting = 0;
+
+my $dumpfile = shift @ARGV;
+my $outfile  = shift @ARGV;
+
+sub delrevifilter (\%;$);
+
+my $pathpattern = qr(/papers);
+my $deleted = 0;
+
+Dumpfilter($dumpfile, $outfile, \&delpathfilter);
+print STDERR "Deleted $deleted files\n";
+exit(0);
+
+
+sub delpathfilter (\%;$)
+ {
+   my $href = shift;
+   my $recalc = shift;
+   my $header = $href->{'header'};
+   my $prop   = $href->{'properties'};
+
+   # No revisions, please
+   return if (exists $header->{'Revision-number'});
+ 
+   return if ($header->{'Node-path'} !~ /$pathpattern/);
+
+   print STDERR "Deleting: " . $header->{'Node-path'} . "\n";
+   $deleted++;
+  
+   # Delete entries (do not call 'delete' because this would only delete the
+   # pointer to the data structures - the module has own pointers!) 
+   %{$href->{'header'}}           = ();
+   %{$href->{'properties'}}       = ();
+   @{$href->{'properties_order'}} = () if exists $href->{'properties_order'};
+   ${$href->{'content'}}          = "";
+   
+   if ($recalc)
+    {
+     svn_recalc_prop_header(%$href);        # call if you changed properties
+     svn_recalc_textcontent_header(%$href); # call if you modified text content
+    }
+ }
+
+
+__END__

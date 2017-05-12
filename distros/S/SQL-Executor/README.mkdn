@@ -1,0 +1,332 @@
+# NAME
+
+SQL::Executor - Thin DBI wrapper using SQL::Maker
+
+# SYNOPSIS
+
+    use DBI;
+    use SQL::Executor;
+    my $dbh = DBI->connect($dsn, $id, $pass);
+    my $ex = SQL::Executor->new($dbh);
+    #
+    # SQL::Maker-like interfaces
+    my @rows = $ex->select('SOME_TABLE', { id => 123 });
+    $ex->insert('SOME_TABLE', { id => 124, value => 'xxxx'} );
+    $ex->update('SOME_TABLE', { value => 'yyyy'}, { id => 124 } );
+    $ex->delete('SOME_TABLE', { id => 124 } );
+    #
+    # select using SQL with named placeholder
+    my @rows= $ex->select_named('SELECT id, value1 FROM SOME_TABLE WHERE value2 = :arg1', { arg1 => 'aaa' });
+
+# DESCRIPTION
+
+SQL::Executor is thin DBI wrapper using [SQL::Maker](http://search.cpan.org/perldoc?SQL::Maker). This module provides interfaces to make easier access to SQL.
+
+You can execute SQL via SQL::Maker-like interface in select(), select\_row(), select\_all(), select\_with\_fields(), select\_row\_with\_fields(), select\_all\_with\_fields(), insert(), insert\_multi(), update() and delete().
+
+If you want to use more complex select query, you can use select\_named(), select\_row\_named() or select\_all\_named() these execute SQL with named placeholder. If you don't want to use named placeholder, you can use select\_by\_sql(), select\_row\_by\_sql() or select\_all\_by\_sql() these execute SQL with normal placeholder('?').
+
+# METHODS
+
+## new($dbh, $option\_href)
+
+$dbh: Database Handler
+$option\_href: option
+
+available option is as follows
+
+- allow\_empty\_condition (BOOL default 1): allow empty condition(where) in select/delete/update
+- callback (coderef): specify callback coderef. callback is called for each select\* method
+- check\_empty\_bind (BOOL default 0): if TRUE(1), select\*\_named() do not accept unbound parameter, see named\_bind() for detail.
+
+These callbacks are useful for making row object.
+
+    my $ex = SQL::Executor->new($dbh, {
+        callback => sub {
+            my ($self, $row, $table_name, $select_id) = @_;
+            return CallBack::Class->new($row);
+        },
+    });
+
+    my $row = $ex->select_by_sql($sql1, \@binds1, 'TEST');
+    # $row isa 'CallBack::Class'
+
+
+
+## connect($dsn, $user, $pass, $option\_for\_dbi, $option\_href)
+
+$dsn: DSN
+$user: database user
+$pass: database password
+$option\_href\_for\_dbi: options passed to DBI
+$option\_href: option for SQL::Executor (options are same as new() method)
+
+connect database and create SQL::Executor instance. using this method, SQL::Executor uses
+managed connection and transaction via [DBIx::Handler](http://search.cpan.org/perldoc?DBIx::Handler)
+
+## dbh()
+
+return database handler
+
+## select($table\_name, $where, $option)
+
+select row(s). parameter is the same as select method in [SQL::Maker](http://search.cpan.org/perldoc?SQL::Maker). But array ref for filed names are not needed.
+In array context, this method behaves the same as select\_all. In scalar context, this method behaves the same as select\_one
+
+## select\_row($table\_name, $where, $option)
+
+select only one row. parameter is the same as select method in [SQL::Maker](http://search.cpan.org/perldoc?SQL::Maker). But array ref for filed names are not needed.
+this method returns hash ref and it is the same as return value in DBI's selectrow\_hashref/fetchrow\_hashref.
+
+## select\_all($table\_name, $where, $option)
+
+select all rows. parameter is the same as select method in [SQL::Maker](http://search.cpan.org/perldoc?SQL::Maker). But array ref for filed names are not needed.
+this method returns array that is composed of hash refs. (hash ref is same as DBI's selectrow\_hashref/fetchrow\_hashref).
+
+## select\_itr($table\_name, $where, $option)
+
+select and returns iterator. parameter is the same as select method in [SQL::Maker](http://search.cpan.org/perldoc?SQL::Maker). But array ref for field names are not needed.
+Iterator is [SQL::Executor::Iterator](http://search.cpan.org/perldoc?SQL::Executor::Iterator) object.
+
+    my $itr = select_itr('SOME_TABLE', { name => 'aaa' });
+    while( my $row = $itr->next ) {
+        # ... using row
+    }
+
+## select\_named($sql, $params\_href, $table\_name)
+
+select row(s). In array context, this method behaves the same as select\_all\_with\_fields.
+In scalar context, this method behaves the same as select\_one\_with\_fileds
+
+You can use named placeholder in SQL like this,
+
+    my $ex = SQL::Executor->new($dbh);
+    my $row = $ex->select_named("SELECT * FROM SOME_TABLE WHERE id = :id", { id => 1234 });
+
+$table\_name is used for callback.
+
+## select\_row\_named($sql, $params\_href, $table\_name)
+
+select only one row. You can use named placeholder in SQL like this,
+
+    my $ex = SQL::Executor->new($dbh);
+    my $row = $ex->select_row_named("SELECT * FROM SOME_TABLE WHERE id = :id", { id => 1234 });
+
+this method returns hash ref and it is the same as return value in DBI's selectrow\_hashref/fetchrow\_hashref.
+
+$table\_name is used for callback.
+
+## select\_all\_named($sql, $params\_href, $table\_name)
+
+select all rows. You can use named placeholder in SQL like this,
+
+    my $ex = SQL::Executor->new($dbh);
+    my @rows = $ex->select_all_named("SELECT * FROM SOME_TABLE WHERE id = :id", { id => 1234 });
+
+this method returns array that is composed of hash refs. (hash ref is same as DBI's selectrow\_hashref/fetchrow\_hashref).
+$table\_name is used for callback.
+
+## select\_itr\_named($sql, $params\_href, $table\_name)
+
+select and returns iterator. You can use named placeholder in SQL like this,
+
+    my $ex = SQL::Executor->new($dbh);
+    my $itr = $ex->select_itr_named("SELECT * FROM SOME_TABLE WHERE id = :id", { id => 1234 });
+
+$table\_name is used for callback.
+
+## named\_bind($sql, $params\_href, $check\_empty\_bind)
+
+returns sql which is executable in execute\_query() and parameters for bind.
+
+    my ($sql, @binds) = named_bind("SELECT * FROM SOME_TABLE WHERE id = :id", { id => 123 });
+    # $sql   =>  "SELECT * FROM SOME_TABLE WHERE id = ?"
+    # @binds => (123)
+
+parameter $check\_empty\_bind is optional. By default (or set $check\_empty\_bind=0), 
+named\_bind() accepts unbound parameter like this,
+
+    my ($sql, @binds) = named_bind("SELECT * FROM SOME_TABLE WHERE id = :id", { });# do not bind :id
+    # $sql   =>  "SELECT * FROM SOME_TABLE WHERE id = ?"
+    # @binds => (undef)
+
+if $check\_empty\_bind is 1, named\_bind() dies when unbound parameter is specified.
+
+## select\_by\_sql($sql, \\@binds, $table\_name)
+
+select row(s). In array context, this method behaves the same as select\_all\_with\_fields.
+In scalar context, this method behaves the same as select\_one\_with\_fileds
+
+    my $ex = SQL::Executor->new($dbh);
+    my $row = $ex->select_by_sql("SELECT * FROM SOME_TABLE WHERE id = ?", [1234]);
+
+$table\_name is only used for callback.
+
+## select\_row\_by\_sql($sql, \\@binds, $table\_name)
+
+select only one row.
+
+    my $ex = SQL::Executor->new($dbh);
+    my $row = $ex->select_row_by_sql("SELECT * FROM SOME_TABLE WHERE id = ?", [1234]);
+
+this method returns hash ref and it is the same as return value in DBI's selectrow\_hashref/fetchrow\_hashref.
+
+## select\_all\_by\_sql($sql, \\@binds, $table\_name)
+
+select all rows.
+
+    my $ex = SQL::Executor->new($dbh);
+    my @rows = $ex->select_all_by_sql("SELECT * FROM SOME_TABLE WHERE id = ?", [1234]);
+
+this method returns array that is composed of hash refs. (hash ref is same as DBI's selectrow\_hashref/fetchrow\_hashref).
+
+## select\_itr\_by\_sql($sql, \\@binds, $table\_name)
+
+select and returns iterator
+
+    my $ex = SQL::Executor->new($dbh);
+    my $itr = $ex->select_itr_by_sql("SELECT * FROM SOME_TABLE WHERE id = ?", [1234]);
+
+Iterator is [SQL::Executor::Iterator](http://search.cpan.org/perldoc?SQL::Executor::Iterator) object.
+
+## select\_with\_fields($table\_name, $fields\_aref, $where, $option)
+
+select row(s). parameter is the same as select method in [SQL::Maker](http://search.cpan.org/perldoc?SQL::Maker). 
+In array context, this method behaves the same as select\_all\_with\_fields.
+In scalar context, this method behaves the same as select\_one\_with\_fileds
+
+## select\_row\_with\_fields($table\_name, $fields\_aref, $where, $option)
+
+select only one row. parameter is the same as select method in [SQL::Maker](http://search.cpan.org/perldoc?SQL::Maker).
+this method returns hash ref and it is the same as return value in DBI's selectrow\_hashref/fetchrow\_hashref.
+
+## select\_all\_with\_fields($table\_name, $fields\_aref, $where, $option)
+
+select all rows. parameter is the same as select method in [SQL::Maker](http://search.cpan.org/perldoc?SQL::Maker). But array ref for filed names are not needed.
+this method returns array that is composed of hash refs. (hash ref is same as DBI's selectrow\_hashref/fetchrow\_hashref).
+
+## select\_itr\_with\_fields($table\_name, $fields\_aref, $where, $option)
+
+select and return iterator object([SQL::Executor::Iterator](http://search.cpan.org/perldoc?SQL::Executor::Iterator)). parameter is the same as select method in [SQL::Maker](http://search.cpan.org/perldoc?SQL::Maker).
+
+## insert($table\_name, $values)
+
+Do INSERT statement. parameter is the same as select method in [SQL::Maker](http://search.cpan.org/perldoc?SQL::Maker).
+
+## insert\_multi($table\_name, @args)
+
+Do INSERT-multi statement using [SQL::Maker::Plugin::InsertMulti](http://search.cpan.org/perldoc?SQL::Maker::Plugin::InsertMulti).
+
+## insert\_on\_duplicate($table\_name, $insert\_value\_href, $update\_value\_href)
+
+Do "INSERT ... ON DUPLICATE KEY UPDATE" query (works only MySQL) using [SQL::Maker::Plugin::InsertOnDuplicate](http://search.cpan.org/perldoc?SQL::Maker::Plugin::InsertOnDuplicate).
+
+this method is available when [SQL::Maker](http://search.cpan.org/perldoc?SQL::Maker) >= 1.09 is installed. If older version is installed, you will
+got error like "Can't locate SQL/Maker/Plugin/InsertOnDuplicate.pm in @INC ..."
+
+## delete($table\_name, $where)
+
+Do DELETE statement. parameter is the same as select method in [SQL::Maker](http://search.cpan.org/perldoc?SQL::Maker).
+
+## update($table\_name, $set, $where)
+
+Do UPDATE statement. parameter is the same as select method in [SQL::Maker](http://search.cpan.org/perldoc?SQL::Maker).
+
+## execute\_query($sql, \\@binds)
+
+execute query and returns statement handler($sth).
+
+## execute\_query\_named($sql, $params\_href)
+
+execute query with named placeholder and returns statement handler($sth).
+
+## disable\_callback()
+
+disable callback temporarily, 
+
+## restore\_callback()
+
+restore disabled callback.
+
+## last\_insert\_id(@args)
+
+If driver is mysql, return $dbh->{mysql\_insertid}.If driver is SQLite, return $dbh->sqlite\_last\_insert\_rowid.
+If other driver is used, return $dbh->last\_insert\_id(@args)
+
+## handle\_exception($sql, $binds\_aref, $err\_message)
+
+show error message. you can override this method in subclass to provide
+customized error message.
+
+default error message is like this,
+
+Error <I>$error\_message</I> sql: <I>$sql</I>, binds: \[<I>$binds\_aref</I>\]\\n
+
+## select\_id()
+
+generate id for select statament. but by default, id is not generated.
+If you want to generate id, please override
+
+# How to use Transaction.
+
+When create instance using connect() method, you can use [DBIx::Handler](http://search.cpan.org/perldoc?DBIx::Handler)'s
+transaction management, 
+
+    use SQL::Executor;
+    my $ex = SQL::Executor->connect($dsn, $id, $pass);
+    my $txn = $ex->handler->txn_scope();
+    $ex->insert('SOME_TABLE', { id => 124, value => 'xxxx'} );
+    $ex->insert('SOME_TABLE', { id => 125, value => 'yyy'} );
+    $txn->commit();
+
+
+
+Or You can use [DBI](http://search.cpan.org/perldoc?DBI)'s transaction (begin\_work and commit).
+
+    use DBI;
+    use SQL::Executor;
+    my $dbh = DBI->connect($dsn, $id, $pass);
+    my $ex = SQL::Executor->new($dbh);
+    $dbh->begin_work();
+    $ex->insert('SOME_TABLE', { id => 124, value => 'xxxx'} );
+    $ex->insert('SOME_TABLE', { id => 125, value => 'yyy'} );
+    $dbh->commit();
+
+
+
+Or you can also use transaction management modules like [DBIx::TransactionManager](http://search.cpan.org/perldoc?DBIx::TransactionManager).
+
+    use DBI;
+    use SQL::Executor;
+    use DBIx::TransactionManager;
+    my $dbh = DBI->connect($dsn, $id, $pass);
+    my $ex = SQL::Executor->new($dbh);
+    my $tm = DBIx::TransactionManager->new($dbh);
+    my $txn = $tm->txn_scope;
+    $ex->insert('SOME_TABLE', { id => 124, value => 'xxxx'} );
+    $ex->insert('SOME_TABLE', { id => 125, value => 'yyy'} );
+    $txn->commit;
+
+# FAQ
+
+## Why don't you use [DBIx::Simple](http://search.cpan.org/perldoc?DBIx::Simple)?
+
+- I want to use [SQL::Maker](http://search.cpan.org/perldoc?SQL::Maker).
+- When I need to use complex query, I want to use named placeholder.
+
+# AUTHOR
+
+Takuya Tsuchida <tsucchi {at} cpan.org>
+
+# SEE ALSO
+
+[DBI](http://search.cpan.org/perldoc?DBI), [SQL::Maker](http://search.cpan.org/perldoc?SQL::Maker), [DBIx::Simple](http://search.cpan.org/perldoc?DBIx::Simple)
+
+Codes for named placeholder is taken from [Teng](http://search.cpan.org/perldoc?Teng)'s search\_named.
+
+# LICENSE
+
+Copyright (C) Takuya Tsuchida
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

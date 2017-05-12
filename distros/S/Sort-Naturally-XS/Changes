@@ -1,0 +1,47 @@
+Revision history for Perl extension Sort::Naturally::XS.
+
+0.1.0  Sat Oct 22 21:59:46 2016
+	- original version; created by h2xs 1.23 with options
+		-O -n Sort::Naturally::XS ./Sort-Naturally-XS/src/nsort.h
+
+0.2.0  Wed Oct 26 22:40:00 2016
+    - beta implemented; initial commit
+
+0.3.0  Fri Oct 26 18:25:00 2016
+    - support Sort::Naturally API, add ncmp subroutine
+
+0.4.0 Sun Nov 13 22:17:00 2016
+    - add nsort subroutine and minimal documentation
+
+0.5.0 Thu Nov 17 11:21:00 2016
+    - add light pre-process to comparator, increase performance
+
+0.6.0 Wed Nov 23 22:08:00 2016
+    - refactor pre-process in comparator, properly sort dimensions (like 2400x2600), improve tests
+
+0.6.1 Sat Now 26 22:13:00 2016
+    - support perl v5.10.1
+
+0.6.2 Sat Now 26 22:40:00 2016
+    - minor fix digit only sort, avoid useless iteration for each element
+
+0.7.0 Tue Now 29 22:14:00 2016
+    - add sorted subroutine with locale and reverse support
+
+0.7.1 Thu Dec 01 21:38:00 2016
+    - fix simultaneously locale and reverse sort
+
+0.7.2 Wed Dec 07 23:13:00 2016
+    - fix locale support, improve locale tests
+
+0.7.3 Tue Dec 27 14:16:00 2016
+    - fix perl 5.10.1 support
+
+0.7.4 Wed Jan 25 22:13:00 2017
+    - skip locale tests if detect not POSIX-conformant OS
+
+0.7.5 Sun Jan 29 23:47:00 2017
+    - fix make on BSD systems
+
+0.7.6 Fri Feb 17 23:01:00 2017
+    - improve portability, fix NetBSD support

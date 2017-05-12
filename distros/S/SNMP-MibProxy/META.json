@@ -1,0 +1,57 @@
+{
+   "abstract" : "Simple pass_persist script for Net-SNMP",
+   "author" : [
+      "Nito Martinez <nito@qindel.es>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "SNMP-MibProxy",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "IPC::Open2" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.14",
+            "Test::Pod::Coverage" : "1.04"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::Properties" : "0",
+            "Config::Properties::Simple" : "0.14",
+            "Data::Dumper" : "0",
+            "Getopt::Std" : "0",
+            "Log::Dispatch::FileRotate" : "0",
+            "Log::Log4perl" : "0",
+            "Pod::Usage" : "0",
+            "SNMP" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "SNMP::MibProxy" : {
+         "file" : "lib/SNMP/MibProxy.pm",
+         "version" : "1.21422"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.21422"
+}

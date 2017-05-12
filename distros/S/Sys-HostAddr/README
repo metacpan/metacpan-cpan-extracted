@@ -1,0 +1,32 @@
+Sys::HostAddr version 0.993
+=======================
+
+Sys::HostAddr provides methods to help retreive IP address and
+interface information about a local host.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Sys::Hostname
+
+COPYRIGHT AND LICENCE
+
+    Copyright (C) 2010-2014 Jeremy Kister.
+
+    This software may be copied and distributed under the terms
+    found in the Perl "Artistic License".
+
+    A copy of the "Artistic License" may be found in the standard
+    Perl distribution and in the file "Artistic" included with this
+    package.

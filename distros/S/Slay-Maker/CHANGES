@@ -1,0 +1,42 @@
+CHANGES for vcp - Version CoPy
+
+0.07 Thu Sep 20 11:19:43 CDT 2007
+   - Reverted to the 0.05 behavior that a target does *not* get
+     rebuilt if it has exactly the same time as a dependency.  Forcing
+     a rebuild can cause problems when execution of the rule is not
+     idempotent.
+
+0.06 Wed Sep 12 15:00:57 CDT 2007
+   - Fixed check for recursive dependencies
+   - Default to rebuilding a target if it has exactly the same time as
+     a dependency
+   - Fixed the tests so that they avoid a race condition when checking
+     that the modification time changes when there's a new file size
+     or the file contents change
+
+0.05 Fri Jul 13 09:57:42 CDT 2007
+   - Restructured MakerRule to add a subroutine "var_expand_dep" that
+     is usable from other contexts (original patch supplied by dakkar
+     <dakkar@thenautilus.net>).
+
+0.04 Tue Jun 27 17:26:32 CDT 2007
+   - Fixed a problem with getting options with Slay::Maker->new.
+
+0.03 Tue Jun 26 15:05:41 CDT 2007
+   - Reimplemented to Class::Std instead of pseudohashes.  This change
+     necessitated a new interface for the "new" constructor routines,
+     so the interface is not backwards-compatible with version 0.02.
+   - Fixed a number of typos in the pod documentation.
+   - Added the get_rule_info method to Slay::Maker.
+
+0.02 Thu Apr 12 10:16:01 CDT 2007
+   - Created $MATCH0, $MATCH1, ... environment variables for shell
+     commands to use.
+   - Added processing to allow shell commands to use $1, $2, ... to
+     access the matches.
+
+0.01 Sat Dec  2 23:10:43 EST 2000
+   - First public release.  Moderately functional alpha code.  Supports
+     p4, cvs, RevML.  Expect APIs, UIs and enerthing else to change before
+     things settle down.
+

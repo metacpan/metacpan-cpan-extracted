@@ -1,0 +1,21 @@
+# Test an unknown error (i.e. one we made up)
+#  This makes sure we handle things gracefully if new errors are added to the SRS
+template: check-domain.tt
+
+# Too hard to make this happen in an integration test
+integration_skip: 1
+
+vars:
+  domains:
+    - cheese.co.te
+
+input_assertions:
+  class: SRS::EPP::Command::Check::Domain
+
+output_assertions:
+  count:
+  match:
+  match_all:
+  attr_is:
+    - [ '//epp:result', 'code', '2308', 'EPP: correct result code' ]
+

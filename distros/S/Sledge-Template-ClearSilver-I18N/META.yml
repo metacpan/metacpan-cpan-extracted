@@ -1,0 +1,21 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Sledge-Template-ClearSilver-I18N
+version:      0.01
+author: syushi matsumoto <matsumoto@alink.co.jp>
+build_requires:
+  Test::More: 0
+license: perl
+version_from: lib/Sledge/Template/ClearSilver/I18N.pm
+installdirs:  site
+requires:
+  ClearSilver: 0
+  Sledge::Template::ClearSilver: 0
+  Sledge::Request::Apache::I18N: 0
+  Sledge::Pages::Apache::I18N: 0
+  Sledge::Charset::UTF8::I18N: 0
+  Encode: 1
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17
+

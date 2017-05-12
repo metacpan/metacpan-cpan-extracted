@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                String-Unquotemeta
+version:             0.1
+abstract:            undo what quotemeta() does, nothing more nothing less
+license:             ~
+author:              
+    - Daniel Muey <http://drmuey.com/cpan_contact.pl>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

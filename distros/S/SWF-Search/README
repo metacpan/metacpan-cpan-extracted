@@ -1,0 +1,44 @@
+SWF/Search version 0.01
+=======================
+
+This module allows the searching of Macromedia SWF files for text
+strings.  The supported methods of searching for text are currently
+limited to strings within editable text fields, and frame labels.
+Future versions will support strings created by font-shape based text,
+and text used within actionscript expressions.
+
+This initial release also does not support the compressed SWF files
+created by Flash MX.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+IO::File
+
+
+COPYRIGHT AND LICENCE
+
+Copyright 2002, Marc Majcher.  All rights reserved.
+
+This library is free software; you may redistribute it and/or modify
+it under the same terms as Perl itself.
+
+Address bug reports and comments to: swf-search@majcher.com
+
+This module is based on the OpenSWF specification and SDK released by
+Macromedia at:
+  http://www.macromedia.com/software/flash/open/licensing/fileformat/
+
+

@@ -1,0 +1,38 @@
+Revision history for Perl extension SVGGraph.
+
+0.01 2002-07-11
+	- original version; created by h2xs 1.21 with options -XA -n SVGGraph
+
+0.02 2002-07-24
+	- Some bugs fixed and styling features added
+
+0.03 2002-07-26
+	- Some bugs fixed
+	- Added XML escaping of content
+
+0.04 2002-09-04
+	- Some more bugs fixed
+	- Tons of optimalisations
+	- use of separate style definitions in header
+	- use of separate icon definitions in header
+	- added unlimited icon generator
+	- Fixed some layout errors in the pod documentation
+	- Added feature for darker icons
+
+0.05 2002-09-27
+	- Better XML encoding of special characters like the euro symbol \x{20ac}
+	- Better cutting off of large floating point numbers
+	- Fixed an error in the pod
+
+0.06 2002-11-26
+	- Fixed "Divide by 0" bug if only 1 x or y value exists
+
+0.07 2002-11-28
+	- Fixed "strange dot colors" bug
+	- Moved legend default to right side of graph
+
+
+
+
+Still to be fixed:
+	- Use of svgz, a gzipped version of svg for more compact (smaller) files

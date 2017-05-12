@@ -1,0 +1,17 @@
+---
+name: SVN-SVNLook
+version: 0.04
+author:
+  - 'Salvatore E. ScottoDiLuzio <lt>sal.scotto@gmail.com<gt>'
+abstract: Module to aid in creating subversion hooks
+license: perl
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+provides:
+  SVN::SVNLook:
+    file: lib/SVN/SVNLook.pm
+    version: 0.04
+resources:
+  license: http://dev.perl.org/licenses/

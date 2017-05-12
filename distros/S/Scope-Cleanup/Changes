@@ -1,0 +1,37 @@
+version 0.002; 2012-02-04
+
+  * don't preserve ghost context on Perl 5.13.7 and above, where the
+    core's reliance on it has supposedly been rectified
+
+  * trigger custom op generation via Devel::CallChecker rather than by
+    hooking the underlying op checker
+
+  * include META.json in distribution
+
+  * convert .cvsignore to .gitignore
+
+  * add MYMETA.json to .cvsignore
+
+version 0.001; 2010-10-24
+
+  * bugfix: during unwinding, preserve ghost context regardless of
+    its type and on all Perl versions, because there have been and are
+    several things relying on it, not just the C stack unwinding control
+
+  * update documentation to reflect Perl 5.13.1's improvement in $@
+    behaviour
+
+  * in XS, use PERL_NO_GET_CONTEXT for efficiency
+
+  * in XS, declare "PROTOTYPES: DISABLE" to prevent automatic generation
+    of unintended prototypes
+
+  * jump through a hoop to avoid a compiler warning
+
+  * use full stricture in test suite
+
+  * in Build.PL, complete declaration of configure-time requirements
+
+version 0.000; 2010-04-10
+
+  * initial released version

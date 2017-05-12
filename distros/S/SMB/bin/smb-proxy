@@ -1,0 +1,81 @@
+#!/usr/bin/perl
+
+# Copyright (C) 2014 Mikhael Goikhman <migo@freeshell.org>
+
+use strict;
+use warnings;
+use sigtrap qw(die untrapped normal-signals  stack-trace any error-signals);
+
+use Getopt::Long qw(:config no_ignore_case bundling);
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use SMB::Proxy;
+
+my $port = 445;
+my $fifo_filename = undef;
+my $quiet = 0;
+my $verbose = 0;
+my $username = undef;
+my $password = undef;
+
+sub show_usage (;$) {
+	my $is_error = shift || 0;
+	my $out = $is_error ? \*STDERR : \*STDOUT;
+	my $usage = qq{
+		Usage: $0 [OPTIONS] server.host.or.ip[:port]
+		Start a simple SMB proxy forwarding traffic to the actual server
+
+		Options:
+			-h --help            show this usage
+			-p --port PORT       use port different from the default $port
+			-f --fifo FILENAME   use named file (fifo) file to listen on instead
+			-q --quiet           do not show any messages
+			-v --verbose         show more debug messages
+			-U --username u[%p]  SMB server username and password (not used)
+	};
+	$usage =~ s/^\n//; $usage =~ s/^\t\t?//mg;
+	print $out $usage;
+	exit $is_error;
+}
+
+GetOptions(
+	'h|help'       => sub { show_usage(0) },
+	'p|port=i'     => \$port,
+	'f|fifo=s'     => \$fifo_filename,
+	'q|quiet'      => \$quiet,
+	'v|verbose+'   => \$verbose,
+	'U|username:s' => \$username,
+) or show_usage(1);
+
+sub prompt ($) {
+	my $message = shift;
+
+	$| = 1;
+	print "$message: ";
+	my $answer = <> || die "Cancelled\n";;
+	chomp($answer);
+	print "\n";
+
+	return $answer;
+}
+
+my $server_addr = shift || show_usage(1);
+
+# server username and password are not really needed for dumb SMB proxy
+if ($username) {
+	$password = $username =~ s/%(.*)$// ? $1 : undef;
+	$password //= prompt("Enter password on server $server_addr for user '$username'");
+}
+
+my $proxy = SMB::Proxy->new(
+	server_addr     => $server_addr,
+	server_username => $username,
+	server_password => $password,
+	port            => $port,
+	fifo_filename   => $fifo_filename,
+	quiet           => $quiet,
+	verbose         => $verbose,
+);
+
+$proxy->run;

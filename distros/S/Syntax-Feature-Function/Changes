@@ -1,0 +1,7 @@
+
+0.002     2012-08-25 21:49:22 Europe/Berlin
+    - Fixed dist.ini to contain correct MetaRequires.
+    - use Import::Into to export Function::Parameters.
+
+0.001     2010-08-10 00:04:44 Europe/Berlin
+    - Initial release.

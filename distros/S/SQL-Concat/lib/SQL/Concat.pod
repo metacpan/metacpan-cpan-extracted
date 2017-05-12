@@ -1,0 +1,355 @@
+=encoding utf-8
+
+=head1 NAME
+
+SQL::Concat - SQL concatenator, only cares about bind-vars, to write SQL generator
+
+=head1 SYNOPSIS
+
+    # Functional interface
+    use SQL::Concat qw/SQL PAR/;
+
+    my $composed = SQL(SELECT => "*" =>
+                       FROM   => entries =>
+                       WHERE  => ("uid =" =>
+                                  PAR(SQL(SELECT => uid => FROM => authors =>
+                                          WHERE => ["name = ?", 'foo'])))
+                     );
+
+    my ($sql, @bind) = $composed->as_sql_bind;
+    # ==>
+    # SQL: SELECT * FROM entries WHERE uid = (SELECT uid FROM authors WHERE name = ?)
+    # BIND: foo
+
+    # OO Interface
+    my $comp = SQL::Concat->new(sep => ' ')
+      ->concat(SELECT => foo => FROM => 'bar');
+
+
+=head1 DESCRIPTION
+
+SQL::Concat is B<NOT> a I<SQL generator>, but a minimalistic I<SQL
+fragments concatenator> with safe bind-variable handling.  SQL::Concat
+doesn't care anything about SQL but B<placeholder> and
+bind-variables. Other important topics to generate correct SQL
+such as SQL syntaxes, SQL keywords, quotes, or even parens are
+all remained your-side.
+
+In other words, generating correct SQL is all up-to-you users of
+SQL::Concat. If you don't (want to) learn about SQL, use other SQL
+generators (e.g. L<SQL::Maker>, L<SQL::Abstract>, ...) instead.
+
+This module only focuses on correctly concatenating SQL fragments
+with keeping their corresponding bind variables.
+
+=head2 What concat() does is...
+
+C<join($SEP, @ITEMS)>! except it knows about bind variables and placeholders.
+Default $SEP is a space character C<' '> but you can give it as L<sep =E<gt> $sep|/sep> option
+for L<new()|/new>
+or constructor argument like L<SQL::Concat-E<gt>concat_by($SEP)|/concat_by>.
+
+=over 4
+
+=item STRING
+
+Non-reference values are used just as resulting SQL as-is.
+This means each given strings are treated as B<RAW> SQL fragment.
+If you want to use foreign values, you must use next L</BIND_ARRAY>.
+
+  use SQL::Concat qw/SQL/;
+
+  SQL(SELECT => 1)->as_sql_bind;
+  # SQL: "SELECT 1"
+  # BIND: ()
+
+  SQL(SELECT => 'foo, bar' => FROM => 'baz', "\nORDER BY bar")->as_sql_bind;
+  # SQL: "SELECT foo, bar FROM baz
+  #       ORDER BY bar"
+  # BIND: ()
+
+Note: C<SQL()> is just a shorthand of C<< SQL::Concat->new(sep => ' ')->concat( @ITEMS... ) >>. See L<SQL()|/SQL> for more equivalent examples.
+
+
+=item BIND_ARRAY [$RAW_SQL, @BIND]
+X<BIND_ARRAY>
+
+If item is ARRAY reference, it is treated as BIND_ARRAY.
+The first element of BIND_ARRAY is treated as RAW SQL.
+The rest of the elements are pushed into C<< ->{bind} >> array.
+This SQL fragment must contain same number of SQL-placeholders(C<?>)
+with corresponding @BIND variables.
+
+  SQL(["city = ?", 'tokyo'])->as_sql_bind
+  # SQL: "city = ?"
+  # BIND: ('tokyo')
+
+  SQL(["age BETWEEN ? AND ?", 20, 65])->as_sql_bind
+  # SQL: "age BETWEEN ? AND ?"
+  # BIND: (20, 65)
+
+=item SQL::Concat
+X<compose>
+
+Finally, concat() can accept SQL::Concat instances. In this case, C<< ->{sql} >> and C<< ->{bind} >> are extracted and treated just like L</BIND_ARRAY>
+
+  SQL(SELECT => "*" =>
+      FROM => members =>
+      WHERE =>
+      SQL(["city = ?", "tokyo"]),
+      AND =>
+      SQL(["age BETWEEN ? AND ?", 20, 65])
+  )->as_sql_bind;
+  # SQL: "SELECT * FROM members WHERE city = ? AND age BETWEEN ? AND ?"
+  # BIND: ('tokyo', 20, 65)
+
+=back
+
+=head2 Helper methods/functions for complex SQL construction
+
+To build complex SQL, we often need to put parens around some SQL fragments.
+For example:
+
+  SQL(SELECT =>
+      , SQL(SELECT => "count(*)" => FROM => "foo")
+      , ","
+      , SQL(SELECT => "count(*)" => FROM => "bar")
+  )
+  # (WRONG) SQL: SELECT SELECT count(*) FROM foo , SELECT count(*) FROM bar
+
+Fortunately, SQL::Concat has L<-E<gt>paren()|/paren> method, so you can write
+
+  SQL(SELECT =>
+      , SQL(SELECT => "count(*)" => FROM => "foo")->paren
+      , ","
+      , SQL(SELECT => "count(*)" => FROM => "bar")->paren
+  )
+  # SQL: SELECT (SELECT count(*) FROM foo) , (SELECT count(*) FROM bar)
+
+Or you can use another function L<PAR()|/PAR>.
+
+  use SQL::Concat qw/SQL PAR/;
+
+  SQL(SELECT =>
+      , PAR(SELECT => "count(*)" => FROM => "foo")
+      , ","
+      , PAR(SELECT => "count(*)" => FROM => "bar")
+  )
+
+You may feel C<","> is ugly. In this case, you can use L<CSV()|/CSV>.
+
+  use SQL::Concat qw/SQL PAR CSV/;
+
+  SQL(SELECT =>
+      , CSV(PAR(SELECT => "count(*)" => FROM => "foo")
+           , PAR(SELECT => "count(*)" => FROM => "bar"))
+  )
+  # SQL: SELECT (SELECT count(*) FROM foo), (SELECT count(*) FROM bar)
+
+You may want to use other separator to compose "UNION" query. For this,
+use L<CAT()|/CAT>. This will be useful to compose AND/OR too.
+
+  use SQL::Concat qw/SQL CAT/;
+
+  CAT(UNION =>
+      , SQL(SELECT => "*" => FROM => "foo")
+      , SQL(SELECT => "*" => FROM => "bar"))
+  )
+  # SQL: SELECT * FROM foo UNION SELECT * FROM bar
+
+To construct SQL conditionally, you can use L<Ternary|perlop/ternary> operator
+in L<list context|perlglossary/list context> as usual.
+
+  SQL(SELECT => "*" => FROM => members =>
+      ($name ? SQL(WHERE => ["name = ?", $name]) : ())
+  )
+  # SQL: SELECT * FROM members WHERE name = ?
+
+  # (or when $name is empty)
+  # SQL: SELECT * FROM members
+
+You may feel above cumbersome. If so, you can try another helper L<OPT()|/OPT>
+and L<PFX()|/PFX>.
+
+  use SQL::Concat qw/SQL PFX OPT/;
+
+  SQL(SELECT => "*" => FROM => members =>
+      PFX(WHERE => OPT("name = ?", $name))
+  )
+
+=head2 Complex example
+
+    use SQL::Concat qw/SQL PAR OPT CSV/;
+  
+    sub to_find_entries {
+       my ($tags, $limit, $offset, $reverse) = @_;
+
+       my $pager = OPT("limit ?", $limit, OPT("offset ?", $offset));
+     
+       my ($sql, @bind)
+         = SQL(SELECT => CSV("datetime(ts, 'unixepoch', 'localtime') as dt"
+                             , qw/eid path/)
+               , FROM => entrytext =>
+               , ($tags
+                  ? SQL(WHERE => eid =>
+                        IN => PAR(SELECT => eid =>
+                                  FROM =>
+                                  PAR(CAT("\nINTERSECT\n" => map {
+                                    SQL(SELECT => DISTINCT => "eid, ts" =>
+                                        FROM => entry_tag =>
+                                        WHERE => tid =>
+                                        IN => PAR(SELECT => tid =>
+                                                  FROM => tag =>
+                                                  WHERE => ["tag glob ?", lc($_)]))
+                                  } @$tags))
+                                  , "\nORDER BY"
+                                  , CSV(map {$reverse ? "$_ desc" : $_} qw/ts eid/)
+                                  , $pager))
+                  : ())
+               , "\nORDER BY"
+               , CSV(map {$reverse ? "$_ desc" : $_} qw/fid feno/)
+               , ($tags ? () :$pager)
+             )->as_sql_bind;
+       }
+
+
+=head1 FUNCTIONS
+
+=head2 C<< SQL( @ITEMS... ) >>
+X<SQL>
+
+Equiv. of
+
+=over 4
+
+=item * C<< SQL::Concat->concat( @ITEMS... ) >>
+
+=item * C<< SQL::Concat->concat_by(' ', @ITEMS... ) >>
+
+=item * C<< SQL::Concat->new(sep => ' ')->concat( @ITEMS... ) >>
+
+=back
+
+=head2 C<< CSV( @ITEMS... ) >>
+X<CSV>
+
+Equiv. of C<< SQL::Concat->concat_by(', ', @ITEMS... ) >>
+
+Note: you can use "," anywhere in concat() items. For example,
+you can write C<< SQL(SELECT => "x, y, z") >> instead of C<< SQL(SELECT => CSV(qw/x y z/)) >>.
+
+=head2 C<< CAT($SEP, @ITEMS... ) >>
+X<CAT>
+
+Equiv. of C<< SQL::Concat->concat_by($SEP, @ITEMS... ) >>, except
+C<$SEP> is wrapped by whitespace when necessary.
+
+XXX: Should I use C<"\n"> as wrapping char instead of C<" ">?
+
+=head2 C<< PAR( @ITEMS... ) >>
+X<PAR>
+
+Equiv. of C<< SQL( ITEMS...)->paren >>
+
+=head2 C<< PFX($ITEM, @OTHER_ITEMS...) >>
+X<PFX>
+
+Prefix C<$ITEM> only when C<@OTHER_ITEMS> are not empty.
+Usually used like C<< PFX(WHERE => ...conditional...) >>.
+
+=head2 C<< OPT(RAW_SQL, VALUE, @OTHER_ITEMS...) >>
+X<OPT>
+
+If VALUE is defined, C<< (SQL([$RAW_SQL, $VALUE]), @OTHER_ITEMS) >> are returned. Otherwise empty list is returned.
+
+This is designed to help generating C<"LIMIT ? OFFSET ?">.
+
+=head1 METHODS
+
+=head2 C<< SQL::Concat->new(%args) >>
+X<new>
+
+Constructor, inherited from L<MOP4Import::Base::Configure>.
+
+=head3 Options
+
+Following options has their getter.
+To set these options after new,
+use L<MOP4Import::Base::Configure/configure> method.
+
+=over 4
+
+=item sep
+X<sep>
+
+Separator, used in L<concat()|/concat>.
+
+=item sql
+X<sql>
+
+SQL, constructed when L<concat()|/concat> is called.
+Once set, you are not allowed to call L</concat> again.
+
+=item bind
+X<bind>
+
+Bind variables, constructed when L</BIND_ARRAY> is given to L<concat()|/concat>.
+
+=back
+
+
+=head2 C<< SQL::Concat->concat( @ITEMS... ) >>
+X<concat>
+
+Central operation of SQL::Concat. It basically does:
+
+  $self->{bind} = [];
+  foreach my MY $item (@_) {
+    next unless defined $item;
+    if (not ref $item) {
+      push @sql, $item;
+    } else {
+      $item = SQL::Concat->of_bind_array($item)
+        if ref $item eq 'ARRAY';
+
+      $item->validate_placeholders;
+
+      push @sql, $item->{sql};
+      push @{$self->{bind}}, @{$item->{bind}};
+    }
+  }
+  $self->{sql} = join($self->{sep}, @sql);
+
+
+=head2 C<< SQL::Concat->concat_by($SEP, @ITEMS) >>
+X<concat_by>
+
+Equiv. of C<< SQL::Concat->new(sep => $SEP)->concat( @ITEMS... ) >>
+
+=head2 C< paren() >
+
+Equiv. of C<< $obj->format('(%s)') >>.
+
+=head2 C< format_by($FMT) >
+
+Apply C<< sprintf($FMT, $self->{sql}) >>.
+This will create a clone of $self.
+
+=head2 C< as_sql_bind() >
+
+Extract C<< $self->{sql} >> and C<< @{$self->{bind}} >>.
+If caller is scalar context, wrap them with C<[]>.
+
+
+=head1 LICENSE
+
+Copyright (C) KOBAYASI, Hiroaki.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+KOBAYASI, Hiroaki E<lt>hkoba @ cpan.orgE<gt>
+
+=cut

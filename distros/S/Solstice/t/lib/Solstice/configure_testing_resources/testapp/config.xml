@@ -1,0 +1,153 @@
+<app_config>
+
+    <application_url>webq</application_url>
+    <config_namespace>Solstice</config_namespace>
+    <error_handler>WebQ::ErrorHandler</error_handler>
+    <db_name>webq</db_name>
+
+    <css_files>
+        <css_file>content/webq.css</css_file>
+    </css_files>
+
+    <js_files>
+        <js_file>content/webq.js</js_file>
+    </js_files>
+
+    <urls> 
+        <url
+            virtual_path="/"
+            initial_state="home"
+            debug_level=""
+            escape_frames="1"
+            disable_back_button="0"
+            view_top_nav="1"
+            requires_auth="1"
+            boilerplate_view="BlueSlash::View"
+            title="WebQ"
+            />
+<url
+            virtual_path="summary"
+            initial_state="survey_summary"
+            debug_level="0"
+            url_is_prefix="1"
+            escape_frames="1"
+            disable_back_button="0"
+            view_top_nav="1"
+            requires_auth="1"
+            boilerplate_view="BlueSlash::View"
+            title="WebQ"
+            />
+<url
+            virtual_path="build"
+            initial_state="survey_build"
+            debug_level="0"
+            url_is_prefix="1"
+            escape_frames="1"
+            disable_back_button="0"
+            view_top_nav="1"
+            requires_auth="1"
+            boilerplate_view="BlueSlash::View"
+            title="WebQ"
+            />
+<url
+            virtual_path="results"
+            initial_state="results_hub"
+            debug_level="0"
+            url_is_prefix="1"
+            escape_frames="1"
+            disable_back_button="0"
+            view_top_nav="1"
+            requires_auth="1"
+            boilerplate_view="BlueSlash::View"
+            title="WebQ"
+            />
+        <url
+            virtual_path="admin"
+            initial_state="admin_menu"
+            pageflow="webq_admin"
+            debug_level="0"
+            escape_frames="1"
+            disable_back_button="0"
+            view_top_nav="1"
+            requires_auth="1"
+            boilerplate_view="Sol::View"
+            title="WebQ"
+            />
+        <url
+            virtual_path="preview"
+            initial_state="survey_preview"
+            debug_level="0"
+            escape_frames="1"
+            disable_back_button="0"
+            view_top_nav="0"
+            requires_auth="1"
+            boilerplate_view="BlueBerry::View"
+            title="WebQ Preview"
+            />
+       <url
+            virtual_path="begin_preview"
+            initial_state="begin_preview"
+            debug_level="0"
+            disable_back_button="1"
+            view_top_nav="0"
+            requires_auth="1"
+            url_is_prefix="1"
+            boilerplate_view="BlueBerry::View"
+            title="WebQ Preview"
+            /> 
+        <url
+            virtual_path="survey"
+            pageflow="webq_participant"
+            initial_state="login_choice"
+            debug_level="0"
+            escape_frames="1"
+            disable_back_button="0"
+            view_top_nav="1"
+            requires_auth="0"
+            boilerplate_view="BlueBerry::View"
+            title="WebQ"
+            url_is_prefix="1"
+            />
+        <url
+            virtual_path="survey/login"
+            pageflow="webq_participant"
+            initial_state="authenticate_user"
+            debug_level="0"
+            escape_frames="1"
+            disable_back_button="0"
+            view_top_nav="1"
+            requires_auth="1"
+            boilerplate_view="BlueBerry::View"
+            title="WebQ"
+            />
+        <url
+            virtual_path="graph"
+            initial_state="generate_survey_graph"
+            debug_level="0"
+            requires_auth="1"
+            />
+    </urls>
+
+    <statics>
+        <static>content</static>
+        <static>images</static>
+    </statics>
+
+    <webservices>
+        <resource virtual_path="v1/" controller="WebQ::Controller::REST::v1::List" url_is_prefix="0"/>
+        <resource virtual_path="v1/{user}/{id}/results" controller="WebQ::Controller::REST::v1::SurveyResults" url_is_prefix="1"/>
+    </webservices>
+
+    <cgis>
+        <cgi virtual_path="testing.cgi" requires_auth="0">testo.cgi</cgi>
+    </cgis>
+
+    <remotes>
+        <remote name="participant_moniker">WebQ::Controller::Remote::ParticipantMoniker</remote>
+        <remote name="question_content">WebQ::Controller::Remote::QuestionContent</remote>
+        <remote name="response_content">WebQ::Controller::Remote::ResponseContent</remote>
+        <remote name="download_progress">WebQ::Controller::Remote::DownloadProgress</remote>
+        <remote name="email_urls">WebQ::Controller::Remote::EmailURLs</remote>
+    </remotes>
+
+</app_config>

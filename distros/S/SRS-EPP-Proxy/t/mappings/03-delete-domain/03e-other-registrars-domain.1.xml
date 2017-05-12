@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NZSRSResponse VerMajor="5" VerMinor="3">
+  <Response Action="DomainUpdate" FeId="4" FeSeq="3001669" OrigRegistrarId="921" RecipientRegistrarId="921" TransId="deletedomain-2010-08-26-dns.org.nz-3">
+    <FeTimeStamp Day="9" Hour="13" Minute="23" Month="9" Second="45" TimeZoneOffset="+12:00" Year="2010" />
+    <Error Hint="INVALID_REQUEST_ERROR" ErrorId="MISSING_MANDATORY_FIELD" Severity="err">
+      <Description>Mandatory Field missing from Transaction</Description>
+      <ErrorDetails>UDAI</ErrorDetails>
+    </Error>
+  </Response>
+</NZSRSResponse>

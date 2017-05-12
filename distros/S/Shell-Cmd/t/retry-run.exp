@@ -1,0 +1,13 @@
+Running first time
+Failing first time
+Running second time
+Failing second time
+Running third time
+This is the 'succ' command
+It will give a warning
+It will succeed
+
+###STDERR
+
+###EXIT
+0

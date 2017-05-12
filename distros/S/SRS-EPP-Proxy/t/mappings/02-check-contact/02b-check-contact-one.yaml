@@ -1,0 +1,47 @@
+# <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+# <epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+#   <command>
+#     <check>
+#       <contact:check xmlns:contact="urn:ietf:params:xml:ns:contact-1.0">
+#         <contact:id>one</contact:id>
+#       </contact:check>
+#     </check>
+#     <clTRID>brause</clTRID>
+#   </command>
+# </epp>
+
+# <NZSRSRequest VerMajor='5' VerMinor='0'>
+#    <HandleDetailsQry>
+#        <HandleIdFilter>one</HandleIdFilter>
+#    </HandleDetailsQry>
+# </NZSRSRequest>
+
+template: check-contact.tt
+
+vars:
+  contact_ids:
+    - one
+
+input_assertions:
+  count:
+    - [ '//contact:id', 1, 'Initial EPP: Only one contact to check' ]
+
+SRS:
+  - assertions:
+      count:
+        - [ '//HandleIdFilter', 1, 'SRS: Check that there were 1 HandleIdFilters' ]
+        - [ '/NZSRSRequest/*', 1, 'SRS: Check there is only 1 command' ]
+      match:
+        - [ '//HandleIdFilter[1]', 'one', 'SRS: Check one is the first contact check' ]
+      match_all:
+      attr_is: []
+
+output_assertions:
+  count:
+   - [ '//contact:cd', '1', 'Check for 4 contacts' ]
+   - [ '//contact:id', 1, 'Check there are 4 ids' ]
+  match:
+   - [ '//contact:id[1]', 'one', 'Check one is first' ]
+  match_all:
+    - [ '//contact:id/@avail', '1', 'EPP: check all contacts are available' ]
+  attr_is:

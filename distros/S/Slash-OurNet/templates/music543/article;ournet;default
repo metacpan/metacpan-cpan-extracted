@@ -1,0 +1,173 @@
+__section__
+default
+__description__
+Display a single article
+
+* article = the Article object
+* board = the Board object article belongs to
+* group = the Group object board belongs to
+* child = the ArticleGroup type: 'archive', 'article' or 'mailbox'
+* message = any additional prompts
+
+__title__
+
+__page__
+ournet
+__lang__
+en_US
+__name__
+article
+__template__
+<a name='top'>[% message %]</a>
+
+<FORM action="[% script %]" method="post">
+    <INPUT type="hidden" name="child" value="[% child %]">
+    <INPUT type="hidden" name="board" value="[% board %]">
+    <INPUT type="hidden" name="group" value="[% group %]">
+
+    <TABLE BORDER="0" cellpadding="0" cellspacing="0" WIDTH="100%">
+    <tr>
+    <td class="text" size="5%" align="center" BGCOLOR="[% user.bg.3 %]">
+    <FONT COLOR="[% user.bg.0 %]"><nobr>
+    [% loc('From') %]
+    </nobr></font></td>
+
+    <td class="text" size="30%" align="left" BGCOLOR="[% user.bg.1 %]"><nobr>　
+    [% article.header.From %]
+    </nobr></td>
+
+    <td class="text" size="5%" align="center" BGCOLOR="[% user.bg.3 %]"><FONT COLOR="[% user.bg.0 %]"><nobr>
+    [% loc('Board') %]
+    </nobr></font></td>
+
+    <td class="text" size="30%" 
+[% IF child == 'articles' %] colspan="[% user.is_anon ? 2 : 1 %]" [% END %]
+    align="center" BGCOLOR="[% user.bg.1 %]"><nobr>
+    <a href="[% script %]/[% group %]/[% board %]/[% child %]/">[% board %]</a>
+    </nobr></td>
+
+[% IF !user.is_anon %]
+[% IF display == 'edit' %]
+
+    <td class="text" align=center rowspan=3 size="5%" BGCOLOR="[% user.bg.3 %]">
+	<INPUT TYPE="submit" NAME="submit" VALUE="[% loc('Post') %]">
+    </td>
+
+[% ELSIF child == 'articles' %]
+
+    <td class="text" align=center rowspan=3 size="5%" BGCOLOR="[% user.bg.3 %]">
+    <INPUT TYPE="submit" NAME="submit" style="font-size:9pt" VALUE="[% loc('Reply') %]">
+    </td>
+
+[% END %]
+[% END %]
+
+    </tr>
+
+    <tr>
+    <td class="text" size="5%" align="center" BGCOLOR="[% user.bg.3 %]"><FONT COLOR="[% user.bg.0 %]"><nobr>
+    [% loc('Subject') %]
+    </nobr></font>
+    </td>
+
+    <td class="text" size="30%"
+[% IF child == 'articles' AND !user.is_anon %] colspan=3 [% ELSE %] colspan=4 [% END %]
+    BGCOLOR="[% user.bg.1 %]"><nobr>　
+
+[% IF display == 'edit' %]
+
+<INPUT type="text" name="title" value="[% article.header.Subject %]" size=30 maxlength=60>
+<INPUT type="hidden" name="reply" value="[% reply %]">
+<INPUT type="hidden" name="state" value="1">
+[% ELSE %]
+[% article.header.Subject %]
+<INPUT type="hidden" name="reply" value="[% article.name %]">
+[% END %]
+
+    </nobr></td>
+    </tr>
+
+    <tr>
+    <td class="text" size="5%" align="center" BGCOLOR="[% user.bg.3 %]"><FONT COLOR="[% user.bg.0 %]"><nobr>
+    [% loc('Date') %]
+    </nobr></font>
+    </td>
+
+    <td class="text" size="30%"  align="left" 
+[% IF child == 'articles' AND !user.is_anon %] colspan=3 [% ELSE %] colspan=4 [% END %]
+    BGCOLOR="[% user.bg.1 %]"><nobr>　
+    [% article.header.Date %]
+    <INPUT type="hidden" name="op" value="article_edit">
+    </nobr></td>
+    </tr>
+
+    <tr>
+    <td class="text" colspan=5 bgcolor="[% ansi2html ? 'black' : user.bg.5 %]">
+
+      <table BGCOLOR="[% user.bg.2 %]" width=100% cellspacing="0" cellpadding="0" border="0">
+      <tr><td align="center" class="text">
+
+[% IF display == 'edit' %]
+
+請在下列方框鍵入欲張貼的文字（不支援 HTML 碼）：
+
+<TEXTAREA class="text1" name="body" cols=80 rows=15 style="font-familly: 新細明體, 細明體, Fixedsys, Lucida Console, ming">
+[% article.body %]
+</TEXTAREA>
+<p>
+
+[% ELSE %]
+
+      <table width=90% cellspacing="0" cellpadding="0" border="0">
+      <tr><td align="left" class="text1">
+<br>
+[% article.body %]
+<br><br>
+
+      </td></tr>
+      </table>
+
+[% END %]
+
+</td></tr>
+</table>
+
+</form>
+</td></tr>
+
+[% FOREACH related %]
+<tr><td class="text" size="5%" align="center" BGCOLOR="[% user.bg.3 %]"><FONT COLOR="[% user.bg.0 %]"><nobr>
+[% relation %]
+</nobr></font></td>
+<td class="text" align="left" colspan=2 BGCOLOR="[% user.bg.1 %]"><nobr>　<a class="link" href="[% script %]/[% group %]/[% board %]/[% child %]/[% name %]">[% header.Subject %]</a></nobr></td>
+<td class="text" align="center" BGCOLOR="[% user.bg.3 %]"><FONT COLOR="[% user.bg.0 %]"><nobr>
+[% loc('Author') %]
+</nobr></font></td>
+<td class="text" align="center" BGCOLOR="[% user.bg.1 %]"><nobr>[% author %]</nobr>
+</td>
+</tr>
+[% END %]
+</table>
+
+  <hr>
+
+    <div align='center'>
+    <FONT class="text"><nobr>
+    |
+[% IF child == "articles" %]
+    [% IF archives_count > 0 %]
+    <a href="[% script %]/[% group %]/[% board %]/archives/"> [% loc('Archives') %]</a>
+    |
+    [% END %]
+[% ELSE %]
+    <a href="[% script %]/[% group %]/[% board %]/articles/">[% loc('Back to board') %]</a>
+    |
+[% END %]
+    <a href="[% script %]/[% article.group %]/[% article.board %]/[% child %]/">[% loc('Back to article list') %]</a>
+    |
+    <a href='#top'>[% loc('Top') %]</a>
+    |
+    </nobr>
+</div>
+__seclev__
+10000

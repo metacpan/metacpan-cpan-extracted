@@ -1,0 +1,15 @@
+Revision history for Perl extension Spectrum::CLI.
+
+1.16  2003-12-16 09:50:04-06
+        - tested operating system (to detect Windows) the way MRTG does
+
+1.15  2003-12-16 09:46:38-06
+        - applied patch from Bill Barnes <wbarnes at aprisma dot com>
+	  for Windows support
+
+1.14  2000-02-23 12:12:22-06
+        - first stable release
+
+0.01  Mon Jul 26 11:28:57 1999
+	- original version; created by h2xs 1.18
+

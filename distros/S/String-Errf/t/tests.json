@@ -1,0 +1,87 @@
+[
+  [ "%{x}i",    10,  "10" ],
+  [ "%{x;+}i",  10, "+10" ],
+
+  [ "%{x}i",     0,   "0" ],
+  [ "%{x;+}i",   0,  "+0" ],
+
+  [ "%{x}i",   -10, "-10" ],
+  [ "%{x;+}i", -10, "-10" ],
+
+  [ "%{x}f",    10,  "10" ],
+  [ "%{x;+}f",  10, "+10" ],
+
+  [ "%{x}f",     0,   "0" ],
+  [ "%{x;+}f",   0,  "+0" ],
+
+  [ "%{x}f",   -10, "-10" ],
+  [ "%{x;+}f", -10, "-10" ],
+
+  [ "%{x}f",    10.1234,  "10.1234" ],
+  [ "%{x;+}f",  10.1234, "+10.1234" ],
+
+  [ "%{x}f",     0.1234,   "0.1234" ],
+  [ "%{x;+}f",   0.1234,  "+0.1234" ],
+
+  [ "%{x}f",   -10.1234, "-10.1234" ],
+  [ "%{x;+}f", -10.1234, "-10.1234" ],
+
+  [ "%{x;.2}f",   10.1234,  "10.12" ],
+  [ "%{x;+.2}f",  10.1234, "+10.12" ],
+
+  [ "%{x;.2}f",    0.1234,   "0.12" ],
+  [ "%{x;+.2}f",   0.1234,  "+0.12" ],
+
+  [ "%{x;.2}f",  -10.1234, "-10.12" ],
+  [ "%{x;+.2}f", -10.1234, "-10.12" ],
+
+  [ "%{x}t",          1280530906, "2010-07-30 19:01:46" ],
+  [ "%{x;datetime}t", 1280530906, "2010-07-30 19:01:46" ],
+  [ "%{x;time}t",     1280530906, "19:01:46" ],
+  [ "%{x;date}t",     1280530906, "2010-07-30" ],
+
+  [ "%{x;tz=UTC}t",          1280530906, "2010-07-30 23:01:46 UTC" ],
+  [ "%{x;datetime;tz=UTC}t", 1280530906, "2010-07-30 23:01:46 UTC" ],
+  [ "%{x;time;tz=UTC}t",     1280530906, "23:01:46 UTC" ],
+  [ "%{x;date;tz=UTC}t",     1280530906, "2010-07-30 UTC" ],
+
+  [ "%{x;thing}n",   -1, "-1 thing"  ],
+  [ "%{x;thing}n",    0,  "0 things" ],
+  [ "%{x;thing}n",    1,  "1 thing"  ],
+  [ "%{x;thing}n",    2,  "2 things" ],
+  [ "%{x;thing;prefix=+}n", -1, "-1 thing"  ],
+  [ "%{x;thing;prefix=+}n",  0, "+0 things" ],
+  [ "%{x;thing;prefix=+}n",  1, "+1 thing"  ],
+  [ "%{x;thing;prefix=+}n",  2, "+2 things" ],
+  [ "%{x;thing;prefix= }n",  2, " 2 things" ],
+
+  [ "%{x;dollar;precision=2}n",  1.8629, "1.86 dollars" ],
+  [ "%{x;dollar;plural=d's;precision=2}n",  1.8629, "1.86 d's" ],
+  [ "%{x;singular=dollar;plural=d's;precision=2}n",  1.8629, "1.86 d's" ],
+  [ "%{x;singular=dollar;plural=d's;precision=2}n",  1, "1.00 dollar" ],
+
+  [ "%{x;thing;precision=0}n", 1.25, "1 thing" ],
+
+  [ "%{x;singular=thing}n", 1, "1 thing" ],
+  [ "%{x;singular=thing}n", 2, "2 things" ],
+
+  [ "%{x;thing}N",   -1, "thing"  ],
+  [ "%{x;thing}N",    0, "things" ],
+  [ "%{x;thing}N",    1, "thing"  ],
+  [ "%{x;thing}N",    2, "things" ],
+  [ "%{x;thing;prefix=+}N", -1, "thing"  ],
+  [ "%{x;thing;prefix=+}N",  0, "things" ],
+  [ "%{x;thing;prefix=+}N",  1, "thing"  ],
+  [ "%{x;thing;prefix=+}N",  2, "things" ],
+
+  [ "%{x;ox+en}N",        1,  "ox"    ],
+  [ "%{x;ox+en}N",        2,  "oxen"  ],
+  [ "%{x;goose/geese}N",  1,  "goose" ],
+  [ "%{x;goose/geese}N",  2,  "geese" ],
+
+  [ "%{x;box}N",      2,  "boxes"   ],
+  [ "%{x;buzz}N",     2,  "buzzes"  ],
+  [ "%{x;mass}N",     2,  "masses"  ],
+  [ "%{x;lush}N",     2,  "lushes"  ],
+  [ "%{x;party}N",    2,  "parties" ]
+]

@@ -1,0 +1,16 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Stlgen.pm
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+lib/Stlgen/templates/c/list/list_NAME.h
+lib/Stlgen/templates/c/list/list_NAME.c
+debug/list_uint_main.c
+debug/quick.csh
+debug/debug.pl
+
+META.yml                                 Module meta-data (added by MakeMaker)

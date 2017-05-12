@@ -1,0 +1,33 @@
+# Avoid version control files.
+\B\.svn\b
+\B\.git\b
+\B\.gitignore\b
+
+# Avoid Makemaker generated and utility files.
+\bMANIFEST\.bak
+\bMakefile$
+\bblib/
+\bpm_to_blib\.ts$
+\bpm_to_blib$
+
+# Avoid temp and backup files.
+~$
+\.old$
+\#$
+\b\.#
+\.bak$
+\.swp$
+
+# skip dot files
+^\.
+
+# skip object files
+XS\.c$
+\.o(?:bj)?$
+\.bs$
+\.def$
+\.out$
+
+SWFEditor-
+\.cache$
+MYMETA\.(?:json|yml)$

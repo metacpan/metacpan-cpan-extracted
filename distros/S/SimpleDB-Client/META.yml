@@ -1,0 +1,29 @@
+---
+abstract: 'The network interface to the SimpleDB service.'
+author:
+  - 'JT Smith <RIZEN@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: SimpleDB-Client
+no_index:
+  directory:
+    - author.t
+requires:
+  Crypt::SSLeay: 0.57
+  Digest::SHA: 0
+  Exception::Class: 0
+  LWP: 5.834
+  Moose: 0.93
+  Test::Deep: 0
+  Test::More: 0
+  Time::HiRes: 1.9719
+  URI: 0
+  XML::Fast: 0.10
+version: 1.0600

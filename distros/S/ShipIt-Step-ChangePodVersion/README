@@ -1,0 +1,100 @@
+NAME
+    ShipIt::Step::ChangePodVersion - Keep VERSION in your Pod in sync with
+    $VERSION
+
+VERSION
+    Version 0.04
+
+INSTALLATION
+    To install this module, run the following commands:
+
+        perl Build.PL
+        ./Build
+        ./Build test
+        ./Build install
+
+SYNOPSIS
+    Just add it to the ShipIt config, maybe after the ChangeVersion-Step
+
+        steps = FindVersion, ChangeVersion, ChangePodVersion, CheckChangeLog, ...
+
+    And make sure you have a VERSION or at least a NAME section in your Pod.
+
+        =head1 VERSION
+
+        version 123
+
+DESCRIPTION
+    This is a Step for ShipIt to keep your Pod VERSION in sync with your
+    $VERSION. If a VERSION section is discovered in your Pod, it is tried to
+    find and replace numbers or "." or "_" within this section with your new
+    version.
+
+    You can write whatever you want before your version-number, but make
+    sure it does not contain numbers or "." or "_".
+
+    In case no VERSION section is found, a VERSION section is created after
+    the NAME section. If no NAME section is found, we die.
+
+    By default all your modules' Pod VERSION sections are updated to the
+    files' $VERSION. Add ChangePodVersion.all to your shipit config and set
+    it to 0 to change only the Pod of your distribution package.
+
+    In case no $VERSION is found in your package, we don't die, but continue
+    with other packages.
+
+CONFIG
+  ChangePodVersion.all
+    DEFAULT 1
+
+    Set this config value to 0 to deactivate VERSION Changes for all your
+    dists modules. Only the dist-packages' Pod VERSION will be changed then.
+
+WARNING
+    The code to change all Modules' Pod VERSION is not automatically tested
+    yet, because it is hard to write tests for it. I use it with
+    HTTP::Exception now and didn't notice any problems, although automatic
+    testing is better than having not experienced any problems. If you
+    encounter problems, just deactivate it with ChangePodVersion.all = 0 and
+    drop me an email.
+
+AUTHOR
+    Thomas Mueller, `<tmueller at cpan.org>'
+
+BUGS
+    Please report any bugs or feature requests to
+    `bug-shipit-step-changepodversion at rt.cpan.org', or through the web
+    interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=ShipIt-Step-ChangePodVers
+    ion. I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc ShipIt::Step::ChangePodVersion
+
+    You can also look for information at:
+
+    * RT: CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=ShipIt-Step-ChangePodVersio
+        n
+
+    * AnnoCPAN: Annotated CPAN documentation
+        http://annocpan.org/dist/ShipIt-Step-ChangePodVersion
+
+    * CPAN Ratings
+        http://cpanratings.perl.org/d/ShipIt-Step-ChangePodVersion
+
+    * Search CPAN
+        http://search.cpan.org/dist/ShipIt-Step-ChangePodVersion/
+
+LICENSE AND COPYRIGHT
+    Copyright 2010 Thomas Mueller.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

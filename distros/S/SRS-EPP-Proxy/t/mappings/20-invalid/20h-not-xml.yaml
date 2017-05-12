@@ -1,0 +1,16 @@
+xml: xml_sucks!!
+
+vars: {}
+
+# Integration tests don't (yet) support not having a template
+integration_skip: 1
+
+output_assertions:
+  count:
+    - [ '//epp:resData', 0, 'EPP: No resData in the response' ]
+
+  match:
+    - [ '//epp:result', '/Start tag expected,/', 'knows what happened' ]
+    - [ '//epp:msg', "/Input XML not valid/", "Message makes sense" ]
+  attr_is:
+    - [ '//epp:result', 'code', 2001, 'EPP: XML invalid' ]

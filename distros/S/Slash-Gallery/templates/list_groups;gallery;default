@@ -1,0 +1,29 @@
+__section__
+default
+__description__
+
+__title__
+
+__page__
+gallery
+__lang__
+en_US
+__name__
+list_groups
+__template__
+[% mytitle = BLOCK %][% FILTER strip_literal %]
+[% Slash.getData('header') %]: List Galleries
+[% END; END; INCLUDE titlebar title => mytitle %]
+
+<UL>
+[% IF is_admin %]<LI><A HREF="[% constants.rootdir %]/gallery.pl?op=list">All Pictures</A></LI>[% END %]
+[% FOREACH group = groups.values.sort("name");
+   NEXT UNLESS is_admin || group.users.${user.uid} || group.public;
+ %]<LI><A HREF="[% constants.rootdir %]/gallery.pl?op=list&amp;group_id=[% group.id %]"
+>[% group.name | strip_literal %]</A>[% IF is_admin %] - <A HREF="[% constants.rootdir %]/gallery.pl?op=edit_group&amp;group_id=[% group.id %]"
+>Edit</A>[% END %]</LI>
+[% END %]
+</UL>
+
+__seclev__
+500

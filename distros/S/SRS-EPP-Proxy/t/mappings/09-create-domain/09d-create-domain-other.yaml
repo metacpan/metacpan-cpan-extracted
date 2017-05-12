@@ -1,0 +1,21 @@
+template: create-domain.tt
+
+vars:
+  domain: cheese.co.nz
+  ns:
+    - ns1.hidns.com
+    - ns2.hidns.com
+    - ns3.hidns.com
+  owner: id123
+  admin: shazzam1234
+  tech: alcatraz367
+
+input_assertions:
+  class: SRS::EPP::Command::Create::Domain
+
+SRS:
+ - assertions: {}
+
+output_assertions:
+  attr_is:
+    - [ '//epp:result', 'code', '2306', 'EPP: correct response code' ]

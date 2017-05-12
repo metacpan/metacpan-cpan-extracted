@@ -1,0 +1,26 @@
+Changes
+ignore.txt
+inc/Module/AutoInstall.pm
+inc/Module/Install.pm
+inc/Module/Install/AutoInstall.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/SWISH/Filters/ImageToXml.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00-load.t
+t/01-filter.t
+t/boilerplate.t
+t/image_data.xml
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/test.jpg

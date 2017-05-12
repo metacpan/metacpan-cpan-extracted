@@ -1,0 +1,4 @@
+unset GETENV_ARG
+setenv GETENV_ARG $GETENV_ARG1
+
+( exit $GETENV_ARG )

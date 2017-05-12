@@ -1,0 +1,38 @@
+{
+   "abstract" : "Simple Call LIBSVM ",
+   "author" : [
+      "abbypan <abbypan@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "SimpleCall-LIBSVM",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::AllUitls" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/abbypan/SimpleCall-LIBSVM.git",
+         "web" : "https://github.com/abbypan/SimpleCall-LIBSVM"
+      }
+   },
+   "version" : "0.01"
+}
+

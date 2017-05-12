@@ -1,0 +1,406 @@
+=head1 NAME
+
+Solaris::ProcessContract - Manage Solaris process contracts via libcontract
+
+=head1 VERSION
+
+1.01
+
+=head1 SYNOPSIS
+
+  use Solaris::ProcessContract qw(:flags);
+
+  my $pc = Solaris::ProcessContract->new();
+
+  # Get a template that we can use to control the contract of the next child
+  # process we create
+  my $template = $pc->get_template();
+
+  # Define how the new contract will behave
+  $template->set_parameters( CT_PR_PGRPONLY );
+
+  # Define which events to monitor in the new contract
+  $template->set_informative_events( CT_PR_EV_HWERR );
+  $template->set_fatal_events( CT_PR_EV_HWERR );
+  $template->set_critical_events( 0 );
+
+  # Activate this template, so that the next child process we create will use
+  # a brand new contract with the options in the template
+  $template->activate;
+
+  # Fork!
+  my $pid = fork();
+  
+  # Child and parent processes
+  if ( $pid == 0 )
+  {
+    # We are the child process, running in a newly created contract underneath
+    # our parent's contract
+    printf "child pid: %d\n", $$;
+
+    # Clear the template from the context of the child process, so that any
+    # children that this child happens to fork won't continue to create new
+    # contracts and just use the one we already have
+    $template->clear;
+
+    # This is running in a different contract than the parent, hooray!
+    exec( 'sleep', '999' );
+  }
+  else
+  {  
+    # We are the parent process, still running in our original contract
+    printf "parent pid: %d\n", $$;
+
+    # Get the contract that was just created for our child process
+    my $contract = $pc->get_latest_contract();
+
+    # Show information about the contract the child is living in
+    printf "child contract: %d\n", $contract->id();
+
+    # Even though the child processes has its own contract, that new contract
+    # is still underneath ours, so we need to abandon it so that it is no
+    # longer related to us at all 
+    $contract->control->abandon();
+
+    # Clear the template from the context of the parent, so that any processes
+    # we fork after this will return to the default behavior of using our
+    # contract insted of creating their own
+    $template->clear();
+  }
+
+=head1 DESCRIPTION
+
+This module allows you to use the L<libcontract(3)|http://docs.oracle.com/cd/E26505_01/html/816-5173/libcontract-3lib.html>
+facility to manage contracts for your process and any child processes you create.
+
+The process contract system on solaris allows you to group together related
+processes for monitoring and resource limiting.
+
+By default, the child processes you create will live in the same contract group
+as the parent.
+
+The solaris smf init system uses contracts to manage the processes of running
+services.  This allows it do things like restart the service if the number of
+processes in the contract that the service lives in drops to zero.
+
+This makes sense in most scenarios, like when your code is forking off copies
+of itself for parallelization, since a fault in one process probably means 
+something is wrong with your entire service.
+
+However, if your code is forking off worker processes that are unrelated to the
+parent process, having them all in the same contract is troublesome.
+
+For example, if the parent process is a daemon that forks off unrelated worker
+processes, solaris will fail to detect when the number daemon processes has
+dropped to zero and the service is unavailable.  Since the unrelated worker
+processes are in the same contract, those are counted against the "is the
+daemon still running?" checks.
+
+To solve this, you need to create a new contract group for any worker processes
+you fork, so that they have their own space for monitoring and resource
+limitations and do not affect the parent process.
+
+This is also a good practice for any code on solaris that forks off worker
+processes for long running or resource intensive jobs, as it allows for more
+accurate resource limits and better tracking of what resources are being used.
+
+See:
+
+  man libcontract
+  man contract
+  man process
+  man smf
+  man svc.startd
+  man ctrun
+
+=head1 METHODS
+
+=head2 new
+
+Arguments: C<\%opt>
+
+Returns: C<$pc>
+
+Returns a new instance of L<Solaris::ProcessContract>.
+
+  my $pc = Solaris::ProcessContract->new();
+
+The following options are available:
+
+=over
+
+=item debug
+
+Set this to true to enable debug mode, which will print information about which
+calls are being made under the hood to C<STDERR>.
+
+  my $pc = Solaris::ProcessContract->new
+  (
+    debug => 1,
+  );
+
+=back
+
+=head2 get_template
+
+Arguments: C<none>
+
+Returns: C<$template>
+
+Returns a new instance of L<Solaris::ProcessContract::Template> that can be
+used to define how contracts will be behave the next time a child process is
+forked.
+
+When the template is L<"activated"|Solaris::ProcessContract::Template/activate>,
+any processes forked afterwards will be created in a new contract with the
+options set in the template.
+
+When the template is L<"cleared"|Solaris::ProcessContract::Template/clear>, it
+will no longer use the template and return the behavior of putting child
+processes in the same contract as the parent process.
+
+  # Get a fresh template
+  my $template = $pc->get_template();
+
+  # Set some options on the template
+  $template->set_parameters( CT_PR_INHERIT );
+
+  # Use this template to create a new contract the next time a process is
+  # forked
+  $template->activate();
+
+  # Stop using this template, go back to creating new processes in our the
+  # same contract we are running in
+  $template->clear();
+
+Calls to the methods in L</"template"> are context aware.  For example, calling
+L<"clear"|Solaris::ProcessContract::Template/clear> from inside the parent
+process will only change the behavior of the parent process.  If the child
+process happens to fork of its own children, they will continue to create
+new contracts using the previously L<"activated"|Solaris::ProcessContract::Template/"activate">
+template.
+
+To stop the child process from creating its own contracts, you will need to
+call L<"clear"|Solaris::ProcessContract::Template/"clear"> in the context of
+the child process as well.
+
+  my $pid = fork();
+
+  if ( $pid == 0 )
+  {
+    # We are the child, so let's not create any more contracts ourselves if
+    # we fork our own children after this
+    $template->clear;
+  }
+  else
+  {
+    # We are the parent, let's also stop creating new contracts for any
+    # children we fork after this
+    $template->clear;
+  }
+
+=head2 get_latest_contract
+
+Arguments: C<none>
+
+Returns: C<$contract>
+
+Returns a new instance of L<Solaris::ProcessContract::Contract> for the most
+recent contract that has been created by us.
+
+This method is the most reliable way to get the contract for the last process
+you forked.  Due to how solaris handles contracts, this will only ever return
+the latest contract that is within the scope of your process.  This means you
+won't ever get a contract from an unrelated process on the system, and that it
+is safe to assume the latest contract is the one you just created when forking.
+
+  my $pid = fork();
+
+  if ( $pid == 0 )
+  {
+    # Child
+  }
+  else
+  {
+    # Get the contract that was just created for the child
+    my $contract = $pc->get_latest_contract;
+    print $contract->id();
+  }
+
+=head2 get_latest_contract_id
+
+Arguments: C<none>
+
+Returns: C<$id>
+
+Returns the id of the most recent contract that was created in the scope of
+your process.
+
+=head2 get_contract
+
+Arguments: C<$id>
+
+Returns: C<$contract>
+
+Returns a new instance of L<Solaris::ProcessContract::Contract> for a specific
+contract id.
+
+If you happen to know the id of the contract you want to monitor or control,
+you can just get it directly instead of using L</"get_latest_contract">.
+
+=head1 FLAGS
+
+The flags used by L<libcontract(3)|http://docs.oracle.com/cd/E26505_01/html/816-5173/libcontract-3lib.html>
+are available for use in this module.
+
+They are not exported by default, so you will need to export them if you need
+to use them:
+
+  # Export all flags
+  use Solaris::ProcessContract qw(:flags);
+  
+  # Export param flags only
+  use Solaris::ProcessContract qw(:param_flags);
+  
+  # Export event flags only
+  use Solaris::ProcessContract qw(:event_flags);
+
+If you still want to use the flags but don't want to import anything, you can
+still access them the hard way:
+
+  print Solaris::ProcessContract::CT_PR_NOORPHAN;
+  print Solaris::ProcessContract::CT_PR_EV_CORE;
+
+=head2 Param Flags
+
+The following flags can be used to control the behavior of a contract:
+
+=head3 CT_PR_INHERIT
+
+If set, allows this contract to be inherited if the contract above it dies.
+
+Otherwise, it will be orphaned if the contract above it dies.
+
+=head3 CT_PR_NOORPHAN
+
+If set, don't allow orphaned contracts.  If a contract is orphaned, kill all
+the processes in it.
+
+Otherwise, the contract is allowed to be orphaned.
+
+=head3 CT_PR_PGRPONLY
+
+If set, only kill the processes that share the same process group when a fatal
+event happens.
+
+Otherwise, all processes in the contract are killed when a fatal event happens.
+
+=head3 CT_PR_REGENT
+
+If set, allow this contract to inherit other contracts.
+
+Otherwise, any contracts we attempt to inherit will stay abandoned.
+
+=head3 CT_PR_ALLPARAM
+
+Shortcut for setting all param flags.
+
+=head2 Event Flags
+
+The following flags can be used to control the events that will be monitored
+for a contract:
+
+=head3 CT_PR_EV_EMPTY
+
+The number of processes in this contract has dropped to zero.
+
+=head3 CT_PR_EV_FORK
+
+A new process has been forked in to this contract.
+
+=head3 CT_PR_EV_EXIT
+
+A process in this contract exited.
+
+=head3 CT_PR_EV_CORE
+
+A process in this contract dropped core.
+
+=head3 CT_PR_EV_SIGNAL
+
+A process in this contract received a fatal signal.
+
+=head3 CT_PR_EV_HWERR
+
+A process in this contract was killed due to system hardware error.
+
+=head3 CT_PR_ALLEVENT
+
+Shortcut for setting all event flags.
+
+=head3 CT_PR_ALLFATAL
+
+Shortcut for setting the L</"CT_PR_EV_CORE">, L</"CT_PR_EV_SIGNAL"> and L</"CT_PR_EV_HWERR"> flags.
+
+=head1 EXCEPTIONS
+
+Exception handling is provided by the L<Solaris::ProcessContract::Exceptions> class.
+
+=head1 EXPORTS
+
+This module exports nothing by default.
+
+See L</"FLAGS"> for a list of available exports.
+
+=head1 INSTALLATION
+
+The L<libcontract(3)|http://docs.oracle.com/cd/E26505_01/html/816-5173/libcontract-3lib.html> 
+facility was first made available on Solaris 10, so you need to be running at
+least that to install this module.
+
+This module will fail to install if it cannot find C<libcontract> while running
+C<Makefile.PL>, but does no other checks to forcefully validate your operating
+system and version.
+
+=head1 TODO
+
+Right now, this module gives you what you need to control the contract system
+when forking processes.  That is going to be the most important need for most
+people writing daemon software in perl for solaris.
+
+Ideally, it could be expanded to be able to fully monitor and acknowledge
+contract system events.
+
+It also would be nice to have access to some of the deeper info when querying
+contracts, or maybe have a way to tie the proc filesystem in to the contract
+filesystem so that you could query both. 
+
+=head1 SEE ALSO
+
+=over
+
+=item L<Solaris::ProcessContract::Template>
+
+=item L<Solaris::ProcessContract::Contract>
+
+=item L<Solaris::ProcessContract::Exceptions>
+
+=item L<libcontract(3)|http://docs.oracle.com/cd/E26505_01/html/816-5173/libcontract-3lib.html>
+
+=item L<contract(4)|http://docs.oracle.com/cd/E26505_01/html/816-5174/contract-4.html>
+
+=item L<process(4)|http://docs.oracle.com/cd/E26505_01/html/816-5174/process-4.html>
+
+=back
+
+=head1 AUTHOR
+
+Danny Warren
+
+=head1 COPYRIGHT
+
+Copyright (c) 2013, L</"AUTHOR">.
+
+=head1 LICENSE
+
+This library is free software, you can redistribute it and/or modify it under the same terms as Perl itself.

@@ -1,0 +1,16 @@
+bin/anynotify-monitor
+bin/anynotify-monitor-read
+lib/Salvation/AnyNotify.pm
+lib/Salvation/AnyNotify/Plugin.pm
+lib/Salvation/AnyNotify/Plugin/Bus.pm
+lib/Salvation/AnyNotify/Plugin/Config.pm
+lib/Salvation/AnyNotify/Plugin/Daemon.pm
+lib/Salvation/AnyNotify/Plugin/Graphite.pm
+lib/Salvation/AnyNotify/Plugin/Graphite/Monitor.pm
+lib/Salvation/AnyNotify/Plugin/Graphite/Monitor/Discontinuity.pm
+lib/Salvation/AnyNotify/Plugin/Monitor.pm
+lib/Salvation/AnyNotify/Plugin/Server.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,31 @@
+Sane - Perl extension for the SANE (Scanner Access Now Easy) Project
+====================================================================
+
+This module allows you to access SANE-compatible scanners in a Perlish and
+object-oriented way, freeing you from the casting and memory management in C,
+yet remaining very close in spirit to original API. 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  libsane (>= 1.0.19)
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Jeffrey Ratcliffe
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.
+
+

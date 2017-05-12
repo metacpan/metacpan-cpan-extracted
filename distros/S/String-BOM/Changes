@@ -1,0 +1,17 @@
+Revision history for String-BOM
+
+0.3  Thu Aug  5 22:14:15 2010
+    - fixed the number of tests to skip() to prevent some systems from erroneously failing tests that should have been skipped
+    - added dependency on File::Slurp for tests
+    
+0.2  Thu Jul 29 22:04:20 2010
+    fixed test mis-logic
+    removed utf8 from POD to avoid corruption in display
+    changed editing to perl's in-place edit
+    Added support for preserving the original file
+    fixed odd $! behavior to preserver logic of $!
+    ran through perltidy
+    
+0.1  Mon Jul 26 21:04:47 2010
+       Initial release.
+

@@ -1,0 +1,82 @@
+Snapback2 version 0.10
+======================
+
+The snapback2 script is an enhancement of Art Mulder's original
+snapback script, which was based on Mike Rubel's research into using rsync
+as a backup method. It greatly revamps configuration, and has the 
+following features:
+
+	* Makes rsync snapshot backups on an hourly, daily, monthly,
+	  and yearly basis.
+	* Changes configuration to Apache-style plain-text configuration
+	  files.
+	* Places most functions in a Backup::Snapback module which
+	  is called by a frontend script.
+	* Can be repeatedly called and if AutoTime is set, it will only
+	  make backups when the proper amount of time has passed.
+	* Allows multiple backup destinations to split the backup
+	  over multiple disks for reliablility. Will alternate between
+	  them on a least-recently-done basis.
+
+There is documentation embedded in the script file -- it is installed
+as a man page by default.
+
+A few support scripts, snapcopy, snapback_loop, and snap_charge, are
+included.
+
+INSTALLATION
+
+To install snapback2 type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This script requires these other modules and libraries:
+
+  Config::ApacheFormat
+
+Because it is based on rsync, it requires that program. It was
+developed on rsync-2.5.7 and should work with that and all
+subsequent versions. It may work with previous versions, but that
+has not been tested.
+
+It also requires GNU "cp", "mv", and "rm". Other versions may not work
+due to use of GNU-specific options, particularly in "cp".
+
+AUTHOR
+
+Mike Heins, <snapback2@perusion.org>. Kudos, comments, suggestions,
+and complaints are invited to that address.
+
+SUPPORT
+
+This script is offered without support. The author has been known to
+answer questions, but no hand-holding will be done -- for example, if
+your message has a subject of "HELP!!!" it is automatically deleted. If
+you don't get an answer it is probably because the question was not good
+enough or is answered in the supplied documentation.
+
+See http://www.icdevgroup.org/the_authors_life.txt if you have any
+questions about this policy.
+
+CREDITS
+
+Mike Rubel, for the initial research.
+
+Art Mulder, for the original script.
+
+ICDEVGROUP (http://icdevgroup.org/), especially Jon Jensen, for support
+and build scripts.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 Mike Heins, <snapback2@perusion.org>
+Copyright (C) 2002 Art Mulder
+Copyright (C) 2002-2004 Mike Rubel <mrubel@caltech.edu>
+
+This script is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

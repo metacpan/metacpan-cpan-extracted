@@ -1,0 +1,31 @@
+---
+abstract: 'Starch storage backend using DBI.'
+author:
+  - 'Aran Deltac <bluefeet@gmail.com>'
+build_requires:
+  DBD::SQLite: '1.46'
+  JSON: '2'
+  Test::Fatal: '0'
+  Test::Simple: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Starch-Store-DBI
+requires:
+  DBI: '1.608'
+  Data::Serializer: '0.6'
+  Moo: '2'
+  Scalar::Util: '0'
+  Starch: '0.04'
+  Type::Tiny: '1.000005'
+  namespace::clean: '0.24'
+  strictures: '2'
+resources:
+  bugtracker: https://github.com/bluefeet/Starch-Store-DBI/issues
+  repository: git://github.com/bluefeet/Starch-Store-DBI.git
+version: '0.02'

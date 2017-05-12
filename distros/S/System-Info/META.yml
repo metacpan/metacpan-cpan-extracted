@@ -1,0 +1,71 @@
+--- 
+abstract: Basic information about the system
+author: 
+  - H.Merijn Brand <h.m.brand@xs4all.nl>
+  - Abe Timmerman <abeltje@cpan.org>
+build_requires: 
+  perl: '5.008'
+configure_requires: 
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: Author, CPAN::Meta::Converter version 2.150010
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: System-Info
+provides: 
+  System::Info: 
+    file: lib/System/Info.pm
+    version: '0.054'
+  System::Info::AIX: 
+    file: lib/System/Info/AIX.pm
+    version: '0.050'
+  System::Info::BSD: 
+    file: lib/System/Info/BSD.pm
+    version: '0.050'
+  System::Info::Base: 
+    file: lib/System/Info/Base.pm
+    version: '0.050'
+  System::Info::Cygwin: 
+    file: lib/System/Info/Cygwin.pm
+    version: '0.050'
+  System::Info::Darwin: 
+    file: lib/System/Info/Darwin.pm
+    version: '0.050'
+  System::Info::Generic: 
+    file: lib/System/Info/Generic.pm
+    version: '0.050'
+  System::Info::HPUX: 
+    file: lib/System/Info/HPUX.pm
+    version: '0.050'
+  System::Info::Haiku: 
+    file: lib/System/Info/Haiku.pm
+    version: '0.050'
+  System::Info::Irix: 
+    file: lib/System/Info/Irix.pm
+    version: '0.050'
+  System::Info::Linux: 
+    file: lib/System/Info/Linux.pm
+    version: '0.051'
+  System::Info::Solaris: 
+    file: lib/System/Info/Solaris.pm
+    version: '0.050'
+  System::Info::VMS: 
+    file: lib/System/Info/VMS.pm
+    version: '0.050'
+  System::Info::Windows: 
+    file: lib/System/Info/Windows.pm
+    version: '0.050'
+recommends: 
+  Test::More: '1.302078'
+requires: 
+  POSIX: 0
+  Test::More: '0.88'
+  Test::NoWarnings: 0
+  perl: '5.008003'
+resources: 
+  IRC: irc://irc.perl.org/#perl-qa
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/Tux/System-Info
+version: '0.054'

@@ -1,0 +1,28 @@
+Release history for String-Errf
+
+0.008     2016-07-04 11:37:17-04:00 America/New_York
+          - switch from JSON to JSON::MaybeXS
+
+0.007     2013-11-24 13:46:17 America/New_York
+          catch more bad input and die [rt.cpan.org #83552]
+
+          update repository and bugtracker metadata
+
+0.006     2010-10-28 22:20:42 America/New_York
+          avoid non-portable %T strftime format
+
+0.005     2010-10-23 22:18:55 America/New_York
+          require Test::More 0.96
+
+0.004     2010-10-21 17:05:54 America/New_York
+          more test fixes (Thanks, Pedro Melo!)
+
+0.003     2010-10-20 22:52:10 America/New_York
+          on non-New-York time zones, skip the non-UTC TZ tests
+
+0.002     2010-10-19 07:44:50 America/New_York
+          remove the unneeded prerequisite on perl 5.12
+
+0.001     2010-10-18 21:40:38 America/New_York
+
+          first release

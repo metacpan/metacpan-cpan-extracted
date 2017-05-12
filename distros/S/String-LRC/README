@@ -1,0 +1,101 @@
+
+Perl Module String::LRC
+by Ralph Padron <whoelse@elitedigital.net>
+
+This packages provides a perl module to generate a longitudinal 
+redundancy check byte for a string.
+
+Installation:
+   "perl Makefile.PL"
+   "make"
+   "make test"
+   "make install"
+
+Requests and notices of bugs should be sent to author's aforementioned
+email (no spam).
+
+-------------------------------------------------------------------------
+LRC - Perl interface for longitudinal redundancy check generation
+
+DESCRIPTION
+
+The Longitudinal Redundancy Check (LRC) is a one byte character,
+commonly used as a byte-field in data transmission over analog systems.
+
+Most commonly, in STX-ETX bounded strings sent in financial protocols.
+Following some previous experience with such protocols, I wrote 
+an LRC function in perl and later decided to re-write in C
+for efficiency.  The result is this module String::LRC,
+which generates this aforementioned byte.
+
+Commonly used in financial protocols as follows with ETX (ASCII 03)
+appended to LRC sum and packets after the STX (ASCII 02), payload, 
+and ETX chars.  
+
+    $outboundString = chr(02) . $outboundString . chr(03)
+			. lrc($outboundString . chr(03));
+
+A init value may also been supplied in the above example.
+
+
+ EXAMPLES
+
+    use String::LRC;
+    $lrc = lrc("string to get lrc of");
+
+	# alternately you can try the LRC of a file, 
+	# if you should ever need this for some reason
+	# included following Soenke J. Peters' example for CRC32
+	
+    use String::LRC;
+    $filename = "/path/to/test.file";
+    if (-e $filename) {
+      open(TESTFILE, $filename);
+      $filelrc = lrc(*TESTFILE);
+      close(TESTFILE);
+    }
+
+
+-------------------------------------------------------------------------
+AUTHOR
+
+Ralph Padron <whoelse@elitedigital.net>
+
+If you have any requests or bugs, send email to the above address (no spam please).
+
+-------------------------------------------------------------------------
+COPYRIGHT
+
+License to use this module/library and make use of in derivative works is is 
+granted to all, freely, provided that this module is identified as "derived 
+from R Padron" and notice of other contributors be provided in any material 
+referencing or mentioning this module.  The author makes no representations of 
+possessing full or partial copyright to the LRC code nor the algorythyms used 
+in this module, as said is either public knowledge or inspired by multiple sources.
+
+LRC algorithms taken from combination of sources:
+	1. Public Specifications, EIS 1081, San Francisco, CA: 
+	   Visa, 1999
+
+	2. QWEST Communications, Inc. Tech Publication 77359, 
+	   Module 5, Issue 1, October 2001. pg 36.
+
+	3. Tanenbaum, A. S., Computer Networks,  3rd ed.  
+	   pp. 186-190Amsterdam, The Netherlands: Vrije Univ., 1996.
+
+The module is inspired by the previous uses the author has had for 
+the LRC generation algorythm; Inspiration for and partial code snippets 
+for initial value and lrc generation of file data provided from 
+Soenke J. Peters' String::CRC32.
+
+The author makes no representations concerning either the merchantability of this 
+software or the suitability of this software for any particular purpose.  It is 
+provided "as is" without express or implied warranty of any kind.
+
+These notices must be retained in any copies of any part of this documentation 
+and/or software.
+
+-------------------------------------------------------------------------
+SEE ALSO OR RELATED
+    
+B<String::CRC>, B<String::CRC32>, L<Device::SerialPort>, L<Device::Modem>.

@@ -1,0 +1,16 @@
+NAME
+    Software::License::DWTFYWWI - The "Do Whatever The Fuck You Want With
+    It" license
+
+DESCRIPTION
+    The DWTFYWWI license is a way to effectively place your software into
+    the public domain, but in a humorous way.
+
+    If you want something with more legal backing you might want to use the
+    "public domain"-like CC0 license instead, or maybe The MIT (X11)
+    License.
+
+AUTHOR
+    The author of this package and of the DWTFYWWI license itself is Ævar
+    Arnfjörð Bjarmason <avar@cpan.org>
+

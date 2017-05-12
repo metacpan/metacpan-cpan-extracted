@@ -1,0 +1,4 @@
+do{ my $x = {
+       'SVN-TeamTools-Indexer-0.002' => 1
+     };
+$x; }

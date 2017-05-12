@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<Jobs>
+    <Job name='Job1' command='succeed.pl'>
+        <params>3</params>
+        <dependencies>second</dependencies>
+    </Job>
+    <Job name='Job2' command='succeed.pl'>
+        <params>3</params>
+        <group>second</group>
+    </Job>
+    <Job name='Job3' command='succeed.pl 5'>
+        <params>3</params>
+        <group>second</group>
+        <prerequisites>Job2</prerequisites>
+    </Job>
+    <Job name='Job4' command='succeed.pl 5'>
+        <params>3</params>
+        <group>second</group>
+        <prerequisites>Job2</prerequisites>
+    </Job>
+    <Job name='Job5' command='succeed.pl 5'>
+        <group>second</group>
+        <prerequisites>Job2</prerequisites>
+    </Job>
+</Jobs>

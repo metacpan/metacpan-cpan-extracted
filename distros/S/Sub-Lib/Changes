@@ -1,0 +1,11 @@
+0.01 -> 0.02
+
+  * Added void(), curry(), o(), y()
+  * Updated documentation to reflect new methods
+  * Updated synopsis for clarity
+
+0.00 -> 0.01
+
+  * Added has() method
+  * Updated documentation
+  * Populated README

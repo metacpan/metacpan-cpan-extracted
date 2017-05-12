@@ -1,0 +1,166 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-bugs: <http://ontologi.es/doap-bugs#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Spreadsheet-Wright/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-bugs:issue      <http://purl.org/NET/cpan-uri/rt/ticket/62737>, <http://purl.org/NET/cpan-uri/rt/ticket/74559>;
+	doap-deps:runtime-recommendation [ doap-deps:on "Archive::Zip"^^doap-deps:CpanId ], [ doap-deps:on "DateTime"^^doap-deps:CpanId ], [
+		doap-deps:on "HTML::HTML5::Writer"^^doap-deps:CpanId;
+	], [ doap-deps:on "JSON"^^doap-deps:CpanId ], [
+		doap-deps:on "Spreadsheet::WriteExcel"^^doap-deps:CpanId;
+	], [ doap-deps:on "XML::LibXML 1.62"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.010000"^^doap-deps:CpanId ], [ doap-deps:on "parent"^^doap-deps:CpanId ], [ doap-deps:on "Text::CSV"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.61"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Spreadsheet-Wright>;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/amaltsev>, <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:documenter      <http://purl.org/NET/cpan-uri/person/amaltsev>, <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/Spreadsheet-Wright>;
+	doap:homepage        <https://metacpan.org/release/Spreadsheet-Wright>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "Spreadsheet-Wright";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Spreadsheet-Wright/v_0-102>, <http://purl.org/NET/cpan-uri/dist/Spreadsheet-Wright/v_0-103>, <http://purl.org/NET/cpan-uri/dist/Spreadsheet-Wright/v_0-104>, <http://purl.org/NET/cpan-uri/dist/Spreadsheet-Wright/v_0-105>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-spreadsheet-wright>;
+	];
+	doap:shortdesc       "simple spreadsheet worker"@en;
+	doap:tester          <http://purl.org/NET/cpan-uri/person/tobyink>.
+
+<http://purl.org/NET/cpan-uri/dist/Spreadsheet-Wright/v_0-102>
+	a                    doap:Version;
+	rdfs:label           "Fork of Spreadsheet::Write"@en;
+	dc:identifier        "Spreadsheet-Wright-0.102"^^xsd:string;
+	dc:issued            "2010-08-03"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			rdfs:label "Split CSV and Excel outputs into separate modules"@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "HTML and XHTML output"@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "JSON output"@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "OpenDocument (OpenOffice.org) output"@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "addrows() shortcut for adding multiple rows";
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/Spreadsheet-Write/v_0-03>;
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Spreadsheet-Wright-0.102.tar.gz>;
+	doap:revision        "0.102"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Spreadsheet-Wright/v_0-103>
+	a                    doap:Version;
+	dc:identifier        "Spreadsheet-Wright-0.103"^^xsd:string;
+	dc:issued            "2011-11-04"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix, doap-changeset:Packaging;
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/62737>;
+		], [ rdfs:label "Minor cleanups."@en ], [
+			a doap-changeset:Packaging;
+			rdfs:label "Module::Package::RDF"@en;
+		], [
+			a doap-changeset:Update;
+			rdfs:label "use 5.010";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Spreadsheet-Wright-0.103.tar.gz>;
+	doap:revision        "0.103"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Spreadsheet-Wright/v_0-104>
+	a                    doap:Version;
+	dc:identifier        "Spreadsheet-Wright-0.104"^^xsd:string;
+	dc:issued            "2012-02-06"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "OpenDocument module had undeclared variable $VERSION."@en;
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/74559>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Spreadsheet-Wright-0.104.tar.gz>;
+	doap:revision        "0.104"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Spreadsheet-Wright/v_0-105>
+	a                    doap:Version;
+	dc:identifier        "Spreadsheet-Wright-0.105"^^xsd:string;
+	dc:issued            "2014-06-08"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "use Dist::Inkt.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Repository is now on GitHub.";
+		], [
+			a doap-changeset:Update;
+			rdfs:label "Use strict and warnings instead of common::sense.";
+		], [
+			a doap-changeset:Update;
+			rdfs:label "Avoid use of given/when.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Spreadsheet-Wright-0.105.tar.gz>;
+	doap:revision        "0.105"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/ANDK>
+	a                    foaf:Agent;
+	foaf:mbox            <mailto:ANDK@cpan.org>.
+
+<http://purl.org/NET/cpan-uri/person/DRAXIL>
+	a                    foaf:Agent;
+	foaf:mbox            <mailto:DRAXIL@cpan.org>.
+
+<http://purl.org/NET/cpan-uri/person/amaltsev>
+	a                    foaf:Person;
+	foaf:nick            "AMALTSEV";
+	foaf:page            <https://metacpan.org/author/AMALTSEV>.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:homepage        <http://tobyinkster.co.uk/>;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>;
+	owl:sameAs           <http://tobyinkster.co.uk/#i>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/62737>
+	a                    doap-bugs:Issue;
+	rdfs:label           "signature test broken";
+	dc:created           "2010-11-05T18:02:05Z"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/ANDK>;
+	doap-bugs:id         "62737";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=62737>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/74559>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Undeclared $VERSION in OpenDocument module";
+	dc:created           "2012-01-31T11:12:07Z"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/DRAXIL>;
+	doap-bugs:id         "74559";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=74559>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+

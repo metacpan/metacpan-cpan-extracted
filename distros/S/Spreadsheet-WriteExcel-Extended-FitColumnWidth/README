@@ -1,0 +1,54 @@
+Spreadsheet-WriteExcel-Extended-FitColumnWidth
+
+This module, as it's name indicates, extends Spreadsheet::WriteExcel
+and excellent module by John McNamara (jmcnamara @ cpan.org) and where
+possible utilises true type font metrics to determine what width a column
+should be based on the data in it.
+
+This is the first release and while it has been give some use before release
+the testing has not been extensive.
+
+In addition to providing auto column fit, there are other formatting features
+included that I found useful.  I hope you do as well
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Spreadsheet::WriteExcel::Extended::FitColumnWidth
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Spreadsheet-WriteExcel-Extended-FitColumnWidth
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Spreadsheet-WriteExcel-Extended-FitColumnWidth
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Spreadsheet-WriteExcel-Extended-FitColumnWidth
+
+    Search CPAN
+        http://search.cpan.org/dist/Spreadsheet-WriteExcel-Extended-FitColumnWidth/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012 Greg George
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

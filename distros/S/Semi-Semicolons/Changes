@@ -1,0 +1,6 @@
+0.04   Sat Sep 09 1:46 EDT 2006
+    - Refactored module to use Filter Simple. This also fixed the bug of the
+      semicolon replacement word being converted within quoted contexts.
+
+0.02   Mon Dec 20 12:26:13 EST 199
+	- Forgot to declare the Filter dependency.

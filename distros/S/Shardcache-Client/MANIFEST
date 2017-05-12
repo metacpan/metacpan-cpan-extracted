@@ -1,0 +1,10 @@
+Changes
+lib/Shardcache/Client.pm
+Makefile.PL
+MANIFEST
+README.md
+t/shardcache_client.t
+examples/shc_get.pl
+examples/shc_set.pl
+examples/shc_del.pl
+META.yml                                 Module meta-data (added by MakeMaker)

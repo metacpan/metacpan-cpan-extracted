@@ -1,0 +1,57 @@
+{
+   "abstract" : "tries to shorten hostnames while keeping them meaningful",
+   "author" : [
+      "Markus Benning <me@w3r3wolf.de>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.013, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "String-ShortenHostname",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Handle" : "0",
+            "Moose" : "0",
+            "MooseX::Getopt" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-string-shortenhostname@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=String-ShortenHostname"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/benningm/String-ShortenHostname",
+         "web" : "https://github.com/benningm/String-ShortenHostname.git"
+      }
+   },
+   "version" : "0.006"
+}
+

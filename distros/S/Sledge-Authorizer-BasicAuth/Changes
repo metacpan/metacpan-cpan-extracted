@@ -1,0 +1,24 @@
+Revision history for Perl extension Sledge::Authorizer::BasicAuth
+
+0.07
+
+    - fixed testing deps
+
+0.06
+
+    - modernized package with M::B
+
+0.04
+
+    - use Module::Install
+    - depend to Class::Component
+
+0.03  Thu Jun 22 20:46:27 JST 2006
+        - bug in empty password orz...
+        - added test cases
+
+0.02  Sun Nov 13 17:10:21 2005
+        - document bug fixed(Thanks to Tatsuhiko Miyagawa)
+
+0.01  Sun Nov 13 12:56:38 2005
+        - original version

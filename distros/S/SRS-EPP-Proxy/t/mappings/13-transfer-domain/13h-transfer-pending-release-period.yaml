@@ -1,0 +1,39 @@
+# Transfer while in pending release with period, should uncancel the domain.
+template: transfer-domain.tt
+
+stash_map:
+  13h_auth: 'auth'
+
+vars:
+  domain: 13h.co.te
+  auth: UDAjUDAj
+  period: 6
+
+
+input_assertions:
+  class: SRS::EPP::Command::Transfer::Domain
+
+SRS:
+ - assertions:
+     count:
+       - [ '//Whois', 1, 'SRS: generated Whois' ]
+       - [ '//DomainUpdate', 1, 'SRS: generated DomainUpdate' ]
+     match:
+       - [ '//DomainNameFilter', '13h.co.te', 'SRS: Updating correct domain' ]
+     attr_is:
+        - [ '//DomainUpdate', 'ConvertContactsToHandles', 1, 'Requested contacts be updated to handles' ]
+        - [ '//DomainUpdate', 'Cancel', 0, 'Cancel is set to 0' ]
+        - [ '//DomainUpdate', 'Term', 6, 'Term is set to 6' ]
+   
+output_assertions:
+  attr_is:
+    - [ '//epp:result', 'code', 1000, 'EPP: Correct response code' ]
+  match:
+    - [ '//domain:name', '13h.co.te', 'EPP: Correct domain name returned' ]
+    - [ '//domain:trStatus', 'serverApproved', 'EPP: Correct status' ]
+    - [ '//domain:reID', '100', 'EPP: Correct reID' ]
+    - [ '//domain:reDate', '/\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d:\d\d/', 'EPP: Correct reDate' ]
+    - [ '//domain:acID', '100', 'EPP: Correct acID' ]
+    - [ '//domain:acDate', '/\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d:\d\d/', 'EPP: Correct acDate' ]
+    - [ '//domain:exDate', '/\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d:\d\d/', 'EPP: Correct exDate' ]
+

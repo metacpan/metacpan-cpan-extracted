@@ -1,0 +1,848 @@
+NAME
+    SQL::Exec - Simple thread and fork safe database access with functionnal
+    and OO interface
+
+SYNOPSIS
+      use SQL::Exec ':all';
+  
+      connect('dbi:SQLite:dbname=db_file');
+  
+      execute(SQL);
+  
+      my $val = query_one_value(SQL);
+  
+      my @line = query_one_line(SQL);
+  
+      my @table = query_all_line(SQL);
+
+  Main functionnalities
+    SQL::Exec is (another) interface to the DBI which strive for simplicity.
+    Its main functionalities are:
+
+    *   DBMS independent. The module offers specific support for some DB
+        server but can work with any DBD driver;
+
+    *   Extremely simple, a query is always only one function or method
+        call;
+
+    *   Everything is as efficient: you choose the function to call based
+        only on the data that you want to get back, not on some supposed
+        performance benefit;
+
+    *   Supports both OO and functional paradigm with the same interface and
+        functionalities;
+
+    *   Hides away all DBIism, you do not need to set any options, they are
+        handled by the library with nice defaults;
+
+    *   Safe: SQL::Exec verify that what happens is what you meant;
+
+    *   Not an ORM, nor a query generator: you are controling your SQL;
+
+    *   Easy to extends to offer functionalities specific to one DB server;
+
+    *   Handles transparently network failure, fork, thread, etc;
+
+    *   Safely handle multi statement query and automatic transaction;
+
+    *   Handles prepared statements and bound parameters.
+
+    All this means that SQL::Exec is extremely beginners friendly, it can be
+    used with no advanced knowledge of Perl and code using it can be easily
+    read by people with no knowledge of Perl at all, which is interesting in
+    a mixed environment.
+
+    Also, the fact that SQL::Exec does not try to write SQL for the
+    programmer (this is a feature, not a bug), ease the migration to other
+    tools or languages if a big part of the application logic is written in
+    SQL.
+
+    Thus SQL::Exec is optimal for fast prototyping, for small applications
+    which do not need a full fledged ORM, for migrating SQL code from/to an
+    other environment, etc. It is usable (thanks to "DBIx::Connector") in a
+    CGI scripts, in a mod_perl program or in any web framework as the
+    database access layer.
+
+DESCRIPTION
+  Support of specific DB
+    The "SQL::Exec" library is mostly database agnostic. However there is
+    some support (limited at the moment) for specific database which will
+    extends the functionnalities of the library for those database.
+
+    If there is a sub-classe of "SQL::Exec" for your prefered RDBMS you
+    should use it (for both the OO and the functionnal interface of the
+    library) rather than using directly "SQL::Exec". These sub-classes will
+    provide tuned functions and method for your RDBMS, additionnal
+    functionnalities, will set specific database parameters correctly and
+    will assist you to connect to your desired database.
+
+    You will find in "Sub-classes" a list of the supported RDBMS and a link
+    to the documentation of their specific modules. If your prefered
+    database is not listed there, you can still use "SQL::Exec" directly and
+    get most of its benefits.
+
+    Do not hesitate to ask for (or propose) a module for your database of
+    choice.
+
+  Exported symbols
+    Each function of this library (that is everything described below except
+    "new" and "new_no_connect" which are only package method) may be
+    exported on request.
+
+    There is also a ':all' tag to get everything at once. Just do :
+
+      use SQL::Exec ':all';
+
+    at the beginning of your file to get all the power of "SQL::Exec" with
+    an overhead as small as possible.
+
+CONSTRUCTORS/DESTRUCTORS
+    If you want to use this library in an object oriented way (or if you
+    want to use multiple database connection at once) you will need to
+    create "SQL::Exec" object using the constructors described here. If you
+    want to use this library in a purely functionnal way then you will want
+    to take a look at the "connect" function described below which will
+    allow you to connect the library without using a single object.
+
+  new
+      my $h = SQL::Exec->new($dsn, $user, $password, %opts);
+
+    Create a new "SQL::Exec" object and connect-it to the database defined
+    by the $dsn argument, with the supplied $user and $password if
+    necessary.
+
+    The syntax of the $dsn argument is described in the manual of your "DBD"
+    driver. However, you will probably want to use one of the existing
+    sub-classes of this module to assist you in connecting to some specific
+    database.
+
+    The %opts argument is optionnal and may be given as a hash or as a hash
+    reference. If the argument is given it set accordingly the option of the
+    object being created. See the "set_options" method for a description of
+    the available options.
+
+    If your DB has a specific support in a sub-classe you must use its
+    specific constructor to get the additionnal benefits it will offer.
+
+  new_no_connect
+      my $h = SQL::Exec->new_no_connect(%opts);
+
+    This constructor creates a "SQL::Exec" object without connecting it to
+    any database. You will need to call the "connect" option on the handle
+    to connect it to a database.
+
+    The %opts argument is optionnal and is the same as for the "new"
+    constructor.
+
+  destructor
+    Whenever you have finished working with a database connection you may
+    close it (see the "disconnect" function) or you may just let go of the
+    database handle. There is a "DESTROY" method in this package which will
+    take care of closing the database connection correctly whenever your
+    handle is garbage collected.
+
+GETTER/SETTER AND OPTIONS
+    The functions and method described below are related to knowing and
+    manipulating the state of a database connection and of its options. The
+    main function to set the options of a database connection is the
+    "set_options" functions. However, you can pass a hash reference as the
+    *last* argument to any function of this library with the same syntax as
+    for the "set_options" function and the options that it describes will be
+    in effect for the duration of the function or method call.
+
+    Any invalid option given in this way to a function/method will result in
+    a 'no such option' error. If you do not die on error but are in strict
+    mode, then the called function will not be executed.
+
+  connect
+      connect($dsn, $user, $password, %opts);
+      $h->connect($dsn, $user, $password, %opts);
+
+    This function/method permits to connect a handle which is not currently
+    connected to a database (either because it was created with
+    "new_no_connect" or because "disconnect" has been called on it). It also
+    enable to connect to library to a database in a purely functionnal way
+    (without using objects). In that case you can maintain only a single
+    connection to a database. This is the connection that will be used by
+    all the function of this library when not called as an object method.
+    This connection will be refered to as the *default handle* in this
+    documentation. Its the handle that all other function will use when not
+    applied to an object.
+
+    You can perfectly mix together the two styles (OO and functionnal): that
+    is, have the library connected in a functionnal style to a database and
+    have multiple other connections openned through the OO interface (with
+    "new").
+
+    As stated above, this function accepts an optional hash reference as its
+    last argument. Note, however, that the option in this hash will be in
+    effect only for the duration of the "connect" call, while options passed
+    as the last argument of the constructors ("new" and "new_no_connect")
+    remain in effect until they are modified. This is true even if "connect"
+    is called to create a default connection for the library. You should use
+    "set_options" to set options permanently for the default database handle
+    (or any other handle after its creation).
+
+    This function will return a *true* value if the connection succeed and
+    will die or return "undef" otherwise (depending on the "die_on_error"
+    option). Not that in strict mode it is an error to try to connect a
+    handle which is already connected to a database.
+
+  disconnect
+      disconnect();
+
+    This function disconnect the default handle of the library from its
+    current connection. You can later on reconnect the library to an other
+    database (or to the same) with the "connect" function.
+
+      $h->disconnect();
+
+    This function disconnect the handle it is applied on from its database.
+    Note that the handle itself is not destroyed and can be reused later on
+    with the "connect" method.
+
+  is_connected
+      my $v = is_connected();
+      my $v = $h->is_connected();
+
+    This call returns whether the default handle of the library and/or a
+    given handle is currently connected to a database.
+
+    This function does not actually check the connection to the database. So
+    it is possible that this call returns *true* but that a later call to a
+    function which does access the database will fail if, e.g., you have
+    lost your network connection.
+
+  get_default_handle
+      my $h = get_default_handle();
+
+    Return the default handle of the library (the one used by all function
+    when not applied on an object). The returned handle is an "SQL::Exec"
+    object and may then be used as any other handles through the OO
+    interface, but it will still be used by the functionnal interface of
+    this library.
+
+  get_dbh
+      my $dbh = get_dbh();
+      my $dbh = $h->get_dbh();
+
+    Returns the internal "DBI" handle to your database. This handle may be
+    used in conjonction with other libraries which can accept a connected
+    handle.
+
+    Note that, because of the use of "DBIx::Connector", this handle may
+    change during the life of your program. If possible, you should rather
+    use the "get_conn" method (see below) to get a persistant handle.
+
+  get_conn
+      my $conn = get_conn();
+      my $conn = $h->get_conn();
+
+    Returns the internal "DBIx::Connector" handle to your database. This
+    handle may be used in conjonction with other libraries which can accept
+    such a handle (e.g. "DBIx::Lite"). This handle will not change while you
+    do not close your connection to your database.
+
+  errstr
+      my $e = errstr();
+      my $e = $c->errstr;
+
+    This function returns an error string associated with the last call to
+    the library made with a given handle (or with the default handle). This
+    function will return "undef" if the last call did not raise an error.
+
+  warnstr
+      my $e = warnstr();
+      my $e = $c->warnstr;
+
+    This function returns a warning string associated with the last call to
+    the library made with a given handle (or with the default handle). This
+    function will return "undef" if the last call did not raise a warning.
+
+    Note that a single call way raise multiple warning. In that case, only
+    the last one will we stored in this variable.
+
+  set_options
+      set_options(HASH);
+      $c->set_options(HASH);
+
+    This function sets the option of the given connection handle (or of the
+    default handle). The "HASH" describing the option may be given as a list
+    of "<option =" value>> or as a reference to a hash.
+
+    The function returns a hash with the previous value of all modified
+    options. As a special case, if the function is called without argument,
+    it will returns a hash with the value of all the options. In both cases,
+    this hash is returned as a list in list context and as a hash reference
+    in scalar context.
+
+    If an error happen (e.g. use of an invalid value for an option) the
+    function returns undef or an empty list and nothing is modified. In
+    "strict" mode it is also an error to try to set an nonexistant option.
+
+    If the options that you are setting include the "strict" option, the
+    value of the "strict" mode is not defined during the execution of this
+    function (that is, it may either be *true* or *false*).
+
+    See below for a list of the available options.
+
+  Options
+    You will find below a list of the currently available options. Each of
+    these options may be accessed through its dedicated function or with
+    either of the "set_option"/"set_options" functions.
+
+   die_on_error
+      set_options(die_on_error => val);
+      die_on_error(val);
+
+    This option (which default to *true*) specify if an error condition
+    abort the execution of your program or not. If so, the "croak" function
+    will be called (and you may trap the error with "eval"). If not, the
+    function call will still abort and return "undef" or an empty list
+    (depending on the context). When this may be a valid result for the
+    function, you may call the "errstr" function/method to get the last
+    error message or "undef" if the last call was succesful.
+
+   print_error
+      set_options(print_error => val);
+      print_error(val);
+
+    This option (which default to *true*) control whether the errors are
+    printed or not (this does not depend on the setting of the
+    "die_on_error" option). If the supplied value is *true* the errors are
+    printed to "STDERR", otherwise nothing is printed.
+
+   print_warning
+      set_options(print_warning => val);
+      print_warning(val);
+
+    This option (which default to *true*) control whether the warning are
+    printed or not. If the supplied value is *true* the warnings are printed
+    to "STDERR", otherwise nothing is printed.
+
+   print_query
+      set_options(print_query => FH);
+      print_query(FH);
+
+    This option (which default to "undef") control whether the queries are
+    printed before being executed. Unless the previous option, to set it,
+    you must pass it an open *file handle*. The queries will then be printed
+    to this handle.
+
+   strict
+      set_options(strict => val);
+      strict(val);
+
+    This option (which default to *true*) control the so-called "strict"
+    mode of the library. It has 3 possible settings. If set to a *true*
+    value, some condition are checked to ensure that the operations of the
+    library are as safe as possible (the exact condition are described in
+    the documentation of the function to which they apply). When the
+    condition are not met, an error is thrown (what happens exactly depends
+    on the "die_on_error" and "print_error" options).
+
+    If this option is set to a *defined* *false* value (such as '0'), then
+    the strict conditions are still tested, but only result in a warning
+    when they are not met.
+
+    Finally, if this option is set to "undef" then the nothing happens when
+    a strict condition is not met (and the tests will altogether be omitted
+    if they are potentially costly).
+
+   replace
+      set_option(replace => \&code);
+      replace(\&code);
+      replace($obj);
+      replace(HASH);
+      replace(undef);
+
+    This option allows to set up a procedure which get the possibility to
+    modify an SQL query before it is executed (e.g. to replace generic
+    parameter by specific name). The default (when the option is "undef") is
+    that nothing is done.
+
+    If this option is a *CODE* reference (or an anonymous sub-function),
+    then this function is called each time you supply an SQL query to this
+    library with the query in the $_ variable. The function may modify this
+    variable and the resulting value of $_ is executed. The call to this
+    function takes place before the spliting of the SQL query (if
+    "auto_split" is *true*).
+
+    You may also pass to this option a *HASH* reference. In that case, the
+    hash describes a series of replacement to be performed on the SQL query
+    (see the example below). Internally, this requires the "String::Replace"
+    library. The function will croak if you call it with a *HASH* and you do
+    not have this library installed. When using the "replace" function
+    (rather than the "set_options" function) you may give a list descibing a
+    *HASH*, rather than a *HASH* reference.
+
+    Finally, you may also give to this function any object which have a
+    "replace" method (e.g. an already built "String::Replace" object). This
+    method will then be called with your SQL queries (using arguments and
+    return values, and not the $_ variable).
+
+    Here is an example (which will work with an SQLite database):
+
+      replace(String::Replace->new(table_name => 't'));
+      execute('create table table_name (a)');
+      replace(table_name => 't');
+      execute('insert into table_name values (1)');
+      query_one_value('select * from table_name', { replace => sub { s/table_name/t/g } }) == 1
+
+   connect_options
+    Do not use this option...
+
+   auto_split
+    This option (which default to *true*) controls whether the queries are
+    split in atomic statement before being sent to the database. If it is
+    not set, your queries will be sent *as-is* to the database, with their
+    ending terminator (if any), this may result in error with some database
+    driver which do not allow for multi-statement queries. You should not
+    set this option to a *false* value unless you know what you are doing.
+
+    The spliting facility is provided by the "SQL::SplitStatement" package.
+
+   auto_transaction
+      set_options(auto_transaction => val);
+      auto_transaction(val);
+
+    This option (which default to *true*) controls whether the "execute" and
+    "execute_multiple" functions automatically start a transaction whenever
+    they execute more than one statement.
+
+   use_connector
+    Do not use this option...
+
+   stop_on_error
+      set_options(stop_on_error => val);
+      stop_on_error(val);
+
+    This option is only usefull when the "die_on_error" and "strict_error"
+    options are false and will control if the execution is interupted when
+    an error occurs during a multi-statement query. Its default value is
+    *true*.
+
+   line_separator
+      set_options(line_separator => val);
+      line_separator(val);
+
+    This option is used only by the "query_to_file" function. It specifies
+    the line separator used between different records. The default value is
+    "\n".
+
+   value_separator
+      set_options(value_separator => val);
+      line_separator(val);
+
+    This option is used only by the "query_to_file" function. It specifies
+    the value separator used between different value of a records. The
+    default value is ';'.
+
+    sub set_option { my $c = &get_handle;
+
+            return $c->set_options({$_[0] => $_[1]}) if @_ == 2;
+        
+            $c->error("Bad number of arguments in %s::set_option", ref $c);
+            return;
+    }
+
+STANDARD QUERY FUNCTIONS
+  execute
+      execute(SQL);
+      $c->execute(SQL);
+
+    This function execute the SQL code contained in its argument. The SQL is
+    first split at the boundary of each statement that it contains (except
+    if the "auto_split" option is false) and is then executed statement by
+    statement in a single transaction (meaning that if one of the statement
+    fails, nothing is changed in your database). If the "auto_transaction"
+    option is false, each of your statement will be executed atomically and
+    all modification will be recorded immediately.
+
+    Optionnaly, you may also provide a reference to an array of SQL queries
+    instead of a single SQL query. In that case, each query will be split
+    independently (if "auto_split" is true) and all the resulting queries
+    will be executed in order inside one single transaction (if
+    "auto_transaction" is true). Note that you may not pass a list of SQL
+    query, but only a reference to such a list (for compatibility with a
+    future version of the library).
+
+    The function will return a "defined" value if everything succeeded, and
+    "undef" if an error happen (and it is ignored, otherwise, the function
+    will "croak").
+
+    The returned value may or may not be the total number of lines modified
+    by your query.
+
+    Here are examples of valid call to the "execute" function:
+
+      execute('insert into t values (1)');
+      execute('insert into t values (1);insert into t values (1)');
+      execute(['insert into t values (1)', 'insert into t values (1)']);
+
+  execute_multiple
+      execute_multiple(SQL, PARAM_LIST);
+      $c->execute_multiple(SQL, PARAM_LIST);
+
+    This function executes one or multiple time an SQL query with the
+    provided parameters. The SQL query may be only a single statement
+    (although this condition is not tested if "auto_split" is false, but
+    then there is no garantee on what will happen).
+
+    The SQL query can contain placeholder ('?' characters) in place of SQL
+    values. These placeholder will be replaced during the execution by the
+    parameters that you provide. You should provide a list of parameters
+    with the same number of parameters than the number of placeholder in the
+    statement. You may provide this list as an array or an array reference.
+
+    You may also provide a list of array reference or a reference to an
+    array of array reference. In that case, the query will be executed once
+    for each element of this array (the external one), with the placeholders
+    taking the values given in the sub-arrays.
+
+    As a special case, if there is only a single placeholder in your query,
+    you may provide a simple list of parameters to execute the query
+    multiple time (each with one of the parameter).
+
+    If the "auto_transaction" option is true, then all the executions of
+    your query will be performed atomically inside a single transaction.
+    This is usefull for example to performs many insertions in a table in an
+    efficient manner.
+
+    Here are three pairs of equivalent call to "execute_multiple":
+
+      execute_multiple('insert into t values (?, ?)', 1, 2);
+      execute_multiple('insert into t values (?, ?)', [1, 2]);
+  
+      execute_multiple('insert into t values (?, ?)', [1, 2], [3, 4]);
+      execute_multiple('insert into t values (?, ?)', [[1, 2], [3, 4]]);
+  
+      execute_multiple('insert into t values (?)', 1, 2, 3);
+      execute_multiple('insert into t values (?)', [[1], [2], [3]]);
+
+  query_one_value
+      my $v = query_one_value(SQL, LIST);
+      my $v = $h->query_one_value(SQL, LIST);
+
+    This function return one scalar value corresponding to the result of the
+    SQL query provided. This query must be a data returning query (e.g.
+    "SELECT").
+
+    If "auto_split" is activated, the SQL query provided to this function
+    may not contains more than one statement (otherwise an error is thrown).
+    If the option is not set, this condition will not be tested and there is
+    no guarantee on what will happens if you try to execute more than one
+    statement with this function.
+
+    If the SQL statement has parameter placeholders, they should be provided
+    in the arguments list of the call. As this function expects a single
+    statement, the parameters should be passed directly as a list and not in
+    an array-ref.
+
+      query_one_value('select a, b from table where a = ?', 42);
+
+    The function will raise an error if nothing is returned by your query
+    (even if the SQL code itself is valid) and, if in "strict" mode, the
+    function will also fail if your query returns more than one line or one
+    column (but note that the query is still executed).
+
+    In case of an error (and if "die_on_error" is not set) the function will
+    return "undef". You must not that this value may also be returned if
+    your query returns a "NULL" value. In that case to check if an error
+    happened you must check the "errstr" function which will return "undef"
+    if there was no errors.
+
+  query_one_line
+      my @l = query_one_line(SQL,LIST);
+      my @l = $h->query_one_line(SQL,LIST);
+      my $l = query_one_line(SQL,LIST);
+      my $l = $h->query_one_line(SQL,LIST);
+
+    This function returns a list corresponding to one line of result of the
+    provided SQL query. If called in scalar context, the function will
+    return a reference to an array rather than a list. You may safely store
+    this array which will not be reused by the library.
+
+    In list context, the function will return an empty list in case of an
+    error. You may distinguish this from a query returning no columns with
+    the "errstr" function. In scalar context, the function will return
+    "undef" in case of error or a reference to an empty array for query
+    returning no columns.
+
+    An error will happen if the query returns no rows at all and, if you are
+    in "strict" mode, an error will also happen if the query returns more
+    than one rows.
+
+    The same limitation applies to this function as for the "query_one_line"
+    about the number of statement in your query and the parameter for the
+    statement placeholders.
+
+  query_all_lines
+      my @a = query_all_lines(SQL,LIST);
+      my @a = $h->query_all_lines(SQL,LIST);
+      my $a = query_all_lines(SQL,LIST);
+      my $a = $h->query_all_lines(SQL,LIST);
+
+    This function executes the given SQL and returns all the returned data
+    from this query. In list context, the fonction returns a list of all the
+    lines. Each lines is a reference to an array, even if there is only one
+    column per lines (use the query_one_column function for that). In scalar
+    context, the function returns a reference to an array containing each of
+    the array reference for each lines.
+
+    In case of errors, if "die_on_error" is not set, the function will
+    return "undef" in scalar context and an empty list in list context. This
+    could also be the correct result of a query returning no rows, use the
+    "errstr" function to distinguish between these two cases.
+
+    If there is an error during the fetching of the data and that
+    "die_on_error" is not set and you are not in "strict" mode, then all the
+    data already fetched will be returned but no tentatives will be done to
+    try to fetch any more data.
+
+    The same limitation applies to this function as for the "query_one_line"
+    about the number of statement in your query and the parameter for the
+    statement placeholders.
+
+  query_one_column
+      my @l = query_one_column(SQL,LIST);
+      my @l = $h->query_one_column(SQL,LIST);
+      my $l = query_one_column(SQL,LIST);
+      my $l = $h->query_one_column(SQL,LIST);
+
+    This function returns a list corresponding to one column of result of
+    the provided SQL query. If called in scalar context, the function will
+    return a reference to an array rather than a list. You may safely store
+    this array which will not be reused by the library.
+
+    In list context, the function will return an empty list in case of an
+    error. You may distinguish this from a query returning no lines with the
+    "errstr" function. In scalar context, the function will return "undef"
+    in case of error or a reference to an empty array for query returning no
+    lines.
+
+    An error will happen if the query returns no columns at all and, if you
+    are in "strict" mode, an error will also happen if the query returns
+    more than one columns.
+
+    The same limitation applies to this function as for the "query_one_line"
+    about the number of statement in your query and the parameter for the
+    statement placeholders.
+
+  query_to_file
+      query_to_file(SQL, file_name, LIST);
+      my $v = $h->query_one_value(SQL, file_name, LIST);
+      query_to_file(SQL, FH, LIST);
+
+    This function execute an SQL query and send its output to a file or file
+    handle.
+
+    The first argument is the query to execute (which may contain only a
+    single statement).
+
+    The second argument is the destination of the data. You may pass either
+    a file name or a reference to an *IO* or *GLOB*. If it is omitted or
+    "undef" the data will go to "STDOUT". If you pass a filename, you may
+    prefix it with "<<'">'>>> to append to the file (rather that to erase
+    it).
+
+    Changed in 0.09: The data are written with each value of a raw separated
+    by the value of the "value_separator" option (which defaults to ';') and
+    each row separated by the value of the "line_separator" option (which
+    defaults to "\n").
+
+    The same limitation applies to this function as for the "query_one_line"
+    about the number of statement in your query and the parameter for the
+    statement placeholders.
+
+  query_one_hash
+      my %h = query_one_hash(SQL,LIST);
+      my %h = $h->query_one_hash(SQL,LIST);
+      my $h = query_one_hash(SQL,LIST);
+      my $h = $h->query_one_hash(SQL,LIST);
+
+  query_all_hashes
+      my @h = query_all_hashes(SQL,LIST);
+      my @h = $h->query_all_hashes(SQL,LIST);
+      my $h = query_all_hashes(SQL,LIST);
+      my $h = $h->query_all_hashes(SQL,LIST);
+
+PREPARED STATEMENTS
+    The library offers full support for prepared statements which can be
+    executed multiple times with different parameters.
+
+  prepare
+      $st = prepare(SQL);
+      $st = $h->prepare(SQL);
+
+    All standard query functions are accessible through prepared statements,
+    except that the "execute" function behave exactly like the
+    "execute_multiple" function. Users are encouraged to use the "execute"
+    name when manipulating prepared statement.
+
+  Using a prepared statement
+      $st->execute(LIST);
+      $st->query_one_value(LIST);
+      $st->query_one_line(LIST);
+      $st->query_all_lines(LIST);
+      $st->query_one_column(LIST);
+      $st->query_to_file(FH, LIST);
+      $st->query_to_file(filename, LIST);
+      $st->query_one_hash(LIST);
+      $st->query_all_hashes(LIST);
+
+HIGH LEVEL QUERY FUNCTIONS
+    These functions (or method) provide higher level interface to the
+    database. The implemetations provided here try to be generic and
+    portable but they may not work with any database driver. If necessary,
+    these functions will be overidden in the database specific sub-classes.
+    Be sure to check the documentation for the sub-classe that you are using
+    (if any) because the arguments of these function may differ from their
+    base version.
+
+  count_lines
+      my $n = count_lines(SQL);
+      my $n = $c->count_lines(SQL);
+
+    This function takes an SQL query ("SELECT"-like), executes it and return
+    the number of lines that the query would have returned (with, e.g., the
+    "query_all_lines" functions).
+
+  table_exists
+      my $b = table_exists(table_name);
+      my $b = $c->table_exists(table_name);
+
+    This function returns a boolean value indicating if there is a table
+    with name "table_name". The default implementation may erroneously
+    returns *false* if the table exists but you do not have enough rights to
+    access it.
+
+    This function might also returns *true* when there is an object with the
+    correct name looking *like* a table (e.g. a view) in the database.
+
+  get_columns
+      my @c = get_columns(table_name);
+      my $c = $c->get_columns(table_name);
+
+  get_primary_key
+      my @c = get_primary_key(table_name);
+      my $c = $c->get_primary_key(table_name);
+
+STATEMENTS INFORMATION FUNCTIONS
+    All the functions (or methods) below can be applied either to an
+    SQL::Exec object (or to the default object) in which case they will
+    return informations about the previous query that was executed, or they
+    can be applied to a prepared statement in which case they will return
+    information about the statement currently prepared.
+
+    The only exception is that queries executed through the "execute"
+    function/method will not count as the last query for these functions.
+    This does not apply to the "execute" method of a prepared statement nor
+    to the "execute_multiple" function/method.
+
+  num_of_params
+      my $n = num_of_params();
+      my $n = $c->num_of_params();
+      my $n = $st->num_of_params();
+
+    Returns the number of
+
+  num_of_fields
+      my $n = num_of_fields();
+      my $n = $c->num_of_fields();
+      my $n = $st->num_of_fields();
+
+  get_fields
+      my @f = get_fields();
+      my $f = get_fields();
+      my @f = $st->get_fields();
+      my @f = $st->get_fields();
+
+    ########################################################################
+    ########
+    ########################################################################
+    ######## ## ## ## HIGH LEVEL HELPER FUNCTIONS ## ## ##
+    ########################################################################
+    ########
+    ########################################################################
+    ########
+
+    push @EXPORT_OK, ('split_query');
+
+    # TODO : décider de la sémantique (renvoie des statements vides ?) sub
+    split_query { my ($str) = @_; return grep {
+    $sql_split_grepper->split($_) } $sql_splitter->split($str); }
+
+SUB-CLASSING
+    The implementation of this library is as generic as possible. However
+    some specific functions can be better written for some specific database
+    server and some helper function can be easier to use if they are tuned
+    for a single database server.
+
+    This specific support is provided through sub-classse which extend both
+    the OO and the functionnal interface of this library. As stated above,
+    if there is a sub-classe for your specific database, you should use it
+    instead of this module, otherwise.
+
+  Sub-classes
+    The sub-classes currently existing are the following ones:
+
+    *   SQLite: the in-file or in memory database with DBD::SQLite;
+
+    *   Oracle: access to Oracle database server with DBD::Oracle;
+
+    *   ODBC: access to any ODBC enabled DBMS through DBD::ODBC;
+
+    *   Teradata: access to a Teradata database with the "ODBC" driver
+        (there is a "DBD::Teradata" "DBI" driver using the native driver for
+        this database ("CLI"), but its latest version is not on CPAN, so I
+        recommend using the "ODBC" interface).
+
+    If your database of choice is not yet supported, let me know it and I
+    will do my best to add a module for it (if the DBMS is freely available)
+    or help you add this support (if I cannot have access to an instance of
+    this database server).
+
+    In the meantime, "SQL::Exec" should just work with your database. If
+    that is not the case, you should report this as a bug.
+
+  How to
+    ...
+
+EXAMPLES
+    Examples would be good.
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-sql-exec@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=SQL-Exec>.
+
+SEE ALSO
+    At some point or another you will want to look at the DBI documentation,
+    mother of all database manipulation in Perl. You may also want to look
+    at the DBIx::Connector and SQL::SplitStatement modules upon which
+    SQL::Exec is based.
+
+    There is several CPAN module similar to SQL::Exec, I list here only the
+    closest (e.g. which does not impose OO upon your code), you should have
+    a look at them before deciding to use SQL::Exec: DBI::Simple,
+    DBIx::Simple, DBIx::DWIW, "DBIx::Wrapper", DBIx::SimpleGoBetween,
+    DBIx::Sunny, "SQL::Executor".
+
+    Also, SQL::Exec will try its best to enable you to run your SQL code in
+    a simple and efficiant way but it will not boil your coffee. You may be
+    interested in other packages which may be used to go beyond SQL::Exec
+    functionnalities, like SQL::Abstract, DBIx::Lite, and SQL::Translator.
+
+AUTHOR
+    Mathias Kende (mathias@cpan.org)
+
+VERSION
+    Version 0.10 (March 2013)
+
+COPYRIGHT & LICENSE
+    Copyright 2013 © Mathias Kende. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

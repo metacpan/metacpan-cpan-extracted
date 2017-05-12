@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+t/00_base.t
+t/pod-coverage.t
+t/pod.t
+Tokeniser.pm
+README
+META.json                                Module JSON meta-data (added by MakeMaker)

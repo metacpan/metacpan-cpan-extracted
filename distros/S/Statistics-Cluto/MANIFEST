@@ -1,0 +1,12 @@
+Changes
+Cluto.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/Statistics-Cluto.t
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/Statistics/Cluto.pm
+cluto.h
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,24 @@
+AIMS
+
+To be simply the best forms handling module on CPAN. To cope with the oddest situations
+
+COMING SOON
+
+1. Tests. Tons of new functionality has been added, especially as regards cloning. We need more tests in the following areas:
+  - Cloning (including logic for partial cloning)
+  - Composition
+  - Removing items
+
+IDEAS
+
+We need ideas for the following:
+
+1. TT integration.
+2. Autogeneration from DBIx::Class , particularly in how to cleanly apply constraints on top of generated forms.
+3. Inter-field validation
+4. Conditional validation
+
+Minors:
+1. ::Reset ought not to have a value
+2. Debatable whether ::{File,Image} ought to have a value (not echoed, not validated but read)
+3. Migrate Attribute helpers to Moose 0.90 at some stage where relevant

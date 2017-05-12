@@ -1,0 +1,436 @@
+Revision history for Perl extension Storable::AMF.
+
+1.23    2016-06-29
+		- Race conditions in tests
+
+1.22    2016-06-28
+		- Portability issues with 5.010 and etc
+
+1.20    2016-06-27
+        - test source cleanup
+		- rare chance memleak fixed
+		- shared state buffer 
+
+1.09-10 2016-06-27
+        - FIXING JSON::XS booleans tests
+
+1.08    2015-05-29
+        - Skipping test for Win32
+
+1.07    2015-04-25
+        - test skip for modern perl
+
+1.06    2015-02-19
+        - Better locking for store (2015-02-18)
+        - tests for lock_store (2015-02-19)
+        - prototypes for XS    (2015-02-19)
+        - code tidy            (2015-02-19)
+
+1.05    2015-02-14
+        - Fixed FreeBSD compiling issues
+
+1.04    2015-02-11: 
+        - Pod fixes thanks to github kdk    (2015-02-11)
+        - Changes                           (2015-02-11)
+        - JSON::XS, Types::Serializer fixes (2015-01-14)
+
+1.03    2014-12-25
+        - skip_bad_option (512) for (saving subs as undefs )(2014-12-25)
+        - Fix Ubuntu compiling (CCFLAG is problem)
+        - Apple compiling issue (Thanks to Alberto)
+
+1.02    2014-06-24
+        - fixed test stability over perl  above 5.19.1
+        - remove gcc warnings
+
+1.01    2011-08-19
+        - remove development notice
+        - some fix in documentaion
+
+1.00    2011-06-10
+        - speed improvement
+        - major perl version fixes ( compile for 5.10-5.14 )
+
+0.99    2011-06-03
+        - thaw0_sv for utilizing hashref
+        - small speed improvement (ecma_array)
+        - small fix of logic
+
+0.98    2011-06-03
+        - added amf_tmp_storage for thaw()
+        - New function aliases: deparse_amf0, deparse_amf3
+        - make work amf_tmp_storage for freeze
+
+0.97    2011-04-06
+        - changed memtest code from Devel::Gladiator
+        - put forgotted PUTBACK
+
+0.96	20011-04-03
+	- better freeze integer ( added test for boundary conditions )
+	- added examples 
+        - added use TARG ( about 25% speed improvement for freeze )
+        - added bench for TARG usage
+
+0.95	    2011-04-09
+	- examples change
+	- fix possible memleak with (amf_plus_marker)
+	- fix possible memleak in thaw/deparse_amf AMF3
+	- more correct creation temp structures 
+	- limit  for array size when array extend
+	- fix amf3_read_integer for big integers ( crazy typo )
+	- fix amf3_write_integer for boundary conditions
+	- added more tests for amf3 integer convertion t/08-amf3_integer.t
+	- uncomment memleak for amf3
+
+0.94	    2011-02-28  --- 2011-04-08
+	- Extend boolean test
+	- fix routine io_write_u8
+	- fix amf0 boolean format
+	- added cope of amf-plus-marker  
+	- Rewrite of error reporting
+	- ( Dev remove &io_record )
+
+0.93	    2011-02-17
+	-  New tests for roundtrip JSON::XS:Boolean and AMF::boolean
+	-  Fixed convertion from AMF::boolean -> JSON::XS::boolean
+	-  Test typo fix. Extend boolean tests
+	-  Added prefix for all amf0 functions
+	-  Added test for bigendian boolean ( darwin + IRIX )
+
+0.92	    2011-01-24
+	- added experimental TO_AMF support for AMF3 freeze
+
+0.91	    2011-01-24
+	- added more real tests for boolean support 
+	- added experimental TO_AMF support for AMF0 freeze
+
+0.90	    2011-01-24
+	- fixed typo in boolean
+	- added more test
+	- remove dependeces in JSON::XS
+
+0.89	    2011-01-20
+	- boolean support ( JSON::XS and boolean type )
+	- new option ( 'json_boolean' )
+	- thaw( AMF0_FALSE ) now is '' before it was 0
+	- thaw( AMF3_FALSE ) now is '' before it was 0
+
+0.86	       2010-10-26 23:45 +0400
+	- prefer number option added (experimental)
+
+0.85	       2010-10-25 23:40 +0400
+	- try please automated tests
+
+0.84		2010-10-24 23:50 +0400
+	- added parse_serializator_option
+	- added option "millisecond_date"
+	- revealed option "utf8_decode"
+	- revealed option "utf8_encode" (does nothing)
+	- revealed option "raise_error"
+	- revealed option "strict"
+	- added tests for 'parse_serializator_option'
+	- switched to perlish date
+	- test for "utf8_decode", "millisecond_date"
+	- remove all "skipped utf8 tests"
+
+0.83		2010-10-24 02:25 +0400
+	- Added tests -basic externalized
+	- Added basic externalized test
+	- rewrite test suit for (adding dumps) 
+	- fix typo in memtest amf3
+
+0.78	        2010-10-15 11:31 +0400
+	-  Strawberry Perl (PERL_IMPLICIT_SYS make not compile Sigsetjmp)   # undefine
+0.79	        2010-10-20 15:31 +0400
+	-  Date support for AMF0, AMF3 dates
+	-  through perl_date, new_date
+0.80	        2010-10-20 15:31 +0400
+	-  rename new_date to new_amfdate
+	-  perl_date add type check
+	-  some source refactor
+	-  add smoke tests for dates
+	-  Version check
+0.81		2010-10-22 11:25 +0400
+	- Fix Build.PL 
+	- Some regret for CPAN index problems
+	- Change some constant for buffer allocation.
+	- Convience hacks.
+0.82		2010-10-23 02:25 +0400
+	- test added and a little rewrite
+	- fix with date sigfault in 0.80(found in test)
+
+0.77	        2010-10-12 11:31 +0400
+	- Next try compile for Strawberry Perl (replace jmp_buf, setjmp, longjmp for Sigjmp_buf, Sigsetjmp, Siglongjmp)  
+
+0.76	        2010-10-07 11:00 +0400
+	- Fix for MS cl.exe && gcc distribution for WIN32 build  
+
+0.75	        2010-10-06 16:33 +0400
+	- Makefile rewrite add warnings -Wunused -Wuninitialized  
+
+0.74	        2010-10-06 16:33 +0400
+	- Typos in Some compilers fix ( STATIC_INLINE ) don't like inline 
+
+0.73	        2010-10-06 16:33 +0400
+	- Some compilers fix ( STATIC_INLINE ) don't like inline 
+	- Copyright fix
+	- Docs && Abstract fix
+
+0.72   (     ) 2010-10-03 23:25:02 +0400
+	- Code cleanup( remove some warnings )
+
+0.71   (     ) 2010-09-07 14:02:02 +0400
+	- Basic external object parsing 
+
+0.70   (     ) 2010-09-07 14:02:02 +0400
+	- improve retrive && store for speed ( for win32 specialy )
+
+0.6600 ( 1904) 2009-08-27 01:10:02 +0400 
+        - Some fixes ???
+
+0.6400 ( 1904) 2009-08-27 01:10:02 +0400 
+        - bug in thaw for empty string
+
+0.6300 ( 1766) 2009-04-10 14:48:01 +0400 
+	- change croaking for file operation 
+	- perltidy
+	- function deparse_amf 
+	- added deparse test for amf0
+	- deparse for AMF0 && AMF3
+	- added parse_amf
+
+0.6100 ( 1447) 2009-03-31 17:25:10 +0400 
+	- add proto for store and etc .. add test for these functions
+
+0.6000 ( 1445) 2009-03-31 16:31:28 +0400 
+	- allowed freeze of ref ( REF and SCALAR )
+
+0.6000 ( 1444) 2009-03-31 14:35:42 +0400 
+	- tidy
+
+0.5800 ( 1418) 2009-03-24 16:17:19 +0300 
+	- Fix BYTEORDER
+
+0.5700 ( 1414) 2009-03-20 18:55:44 +0300 
+	- Make work on windows
+	- fix for Win32 build for broken Module::Build
+
+0.5600 ( 1411) 2009-03-20 16:35:19 +0300 
+	- Cleanup code
+
+0.5500 ( 1354) 2009-03-12 15:59:44 +0300 
+	- Port to Straberry perl 5.10
+
+0.5400 ( 1306) 2009-02-25 18:57:17 +0300 
+	- added UTF8_DECODE, UTF8_ENCODE, STRICT, ERROR_RAISE 
+	- added test pod
+
+0.5300 ( 1243) 2009-02-15 13:41:29 +0300 
+	- fixed build reqs for Build.PL
+	- fix some tests
+	- Fixed some memleak for strict mode. added test
+	- rename ref_destroy to ref_clean
+	- some fixes for opts
+
+0.5200 ( 1159) 2009-02-06 12:21:15 +0300 
+	- croaking on thaw(bytearray_array) then  bytearray is UTF8_on string 
+	- added Build.PL
+
+0.5100 ( 1138) 2009-02-04 18:24:16 +0300 
+	- add feature strict to amf3
+
+0.5000 ( 1134) 2009-02-04 16:54:15 +0300 
+	- new tests for flash 9.0 bug. and fixes
+
+0.4900 ( 1103) 2009-02-02 13:18:42 +0300 
+	- fix objects bugs in AMF3
+
+0.4800 ( 1100) 2009-02-02 11:08:10 +0300 
+	- fix file_read_bug. (Win32 test bug)
+	- added test for thaw(undef)
+
+0.4700 ( 1097) 2009-01-30 19:14:39 +0300 
+	- Added strict pragma. thaw bug fix
+
+0.4600 ( 1049) 2009-01-28 12:29:00 +0300 
+	- back_port to 5.8.8
+	- Find stupid bug AMF3 add test 
+
+0.4500 ( 1038) 2009-01-27 16:36:07 +0300 
+	- Added resolve bug for Flash 9.0
+	- fix in documentation. 
+	- store and retrieve
+
+0.4400 ( 1033) 2009-01-26 18:53:38 +0300 
+	- amf3_format_integer: refactor
+	- rename read_* , write_*  to io_*
+	- some fix in store
+
+0.4200 (  999) 2009-01-22 14:45:31 +0300 
+	- fixed typos in IV to UV for Solaris (again)
+	- dublicated test remove
+        - fix test never worked
+        - reorganize tests (move rename etc)
+        - added all files (amf0 amf3 xml eval) in one pack
+0.4300 (  999) 2009-01-22 14:45:31 +0300 
+        - fixed stupid typo
+
+0.4100 (  884) 2009-01-10 18:03:20 +0300 
+	- fix IV to UV for some strict compilers 
+
+0.4000 (  882) 2009-01-10 18:03:20 +0300 
+	- Now can handle  magical strings in thawing
+
+0.3900 (  876) 2008-12-30 11:28:29 +0300 
+	- fix warnings
+	- remove stupid say from test
+	- comment out SVt_string for 5.11.0
+
+0.3800 (  870) 2008-12-29 16:18:57 +0300 
+	- some fixes for port MSWin32
+	- fix some warns. Increase compiler warn.
+
+0.3700 (  865) 2008-12-29 14:48:04 +0300 
+	- improve memleak tests
+
+0.3600 (  863) 2008-12-29 14:18:27 +0300 
+	- fixed memory leak negative for AMF3
+	- replace  direct long_jmp with io_register_error
+
+0.3500 (  861) 2008-12-29 11:13:25 +0300 
+	- fixed memory leak positive AMF3
+    - add memory leak test for negative AMF3
+
+0.3400 (  860) 2008-12-28 20:29:19 +0300 
+	- add io_destroy  memleak test for AMF0, AMF3
+    - add memory leak test for negative AMF0
+
+0.3300 (  857) 2008-12-27 17:10:34 +0300 
+	- add memory leak test for positive AMF0
+	- add memory leak test for positive AMF3
+	- REF and SCALAR option added to test
+
+0.3200 (  848) 2008-12-26 15:14:23 +0300 
+	- First port to MSWin32
+
+0.3100 (  843) 2008-12-26 12:11:33 +0300 
+	- Added dualvar behave. Document Regexp, io, error reporting
+
+0.2900 (  788) 2008-12-18 12:44:07 +0300 
+	- fprintf moved to PerlIO abstraction layer
+	- added documentation for ref_lost_memory ref_destroy.
+    - some fixes to documentation
+0.3000 (  797) 2008-12-18 15:09:08 +0300 
+	- remove magic marker numbers. 
+	- change error handle: set  setting error number and description
+	- checks for error reporting. test cleanup 
+
+0.2800 (  749) 2008-12-13 18:10:47 +0300 
+	- Solaris: delete optimize for Solaris
+
+0.2700 (  746) 2008-12-12 18:56:23 +0300 
+	- added aux function: ref_destroy ref_lost_memory for AMF0
+
+0.2600 (  718) 2008-12-09 17:57:51 +0300 
+	- added Carp for store, nstore, etc.
+
+0.2400 (  706) 2008-12-08 14:25:38 +0300 
+	- Add negative tests for trimed and extra bytes in stream (thaw). Bug with successfully parses was fixed.
+
+0.2300 (  704) 2008-12-08 11:54:41 +0300 
+	- Fixed bug behavior for freeze.
+    - Added tests for blessed or not CODEREF, etc.
+
+0.2200 (  694) 2008-12-05 12:45:20 +0300 
+	- blessed references mod to undef
+	- added more error messages. 
+    - Added tests for AMF3. 
+    - Fixed thaw_amf3 for array. 
+    - Fixed test for AMF3 XML
+
+0.2100 (  644) 2008-11-25 17:22:07 +0300 
+	- Added XMLDocument type parse(amf0)
+	- Added freeze long string. More tests
+
+0.2000 (  634) 2008-11-24 17:32:35 +0300 
+	- added lots tests for date. more date. more references.(AMF0). 
+	- Some algoritms fixed for date
+
+0.1900 (  627) 2008-11-21 14:04:41 +0300 
+	- Patch for Solaris 2.10 compile bug
+	- Fixed implicit convertion strings to numbers in some cases
+	- Improved Makefile.PL
+
+0.1800 (  615) 2008-11-18 10:39:57 +0300 
+	- Fixed stupid typo( NetBSD ).
+
+0.1701 (  613) 2008-11-17 14:31:00 +0300 
+	- Add Perl Licence. Add marker comments
+
+0.1700 (  611) 2008-11-17 13:25:30 +0300 
+	- fixed read_u* and read_s16 for big_endian machines
+
+0.1600 (  608) 2008-11-15 16:39:32 +0300 
+	- Improved  MakeFile.  Some compile error for Solaris eliminated.
+
+0.1503 (  605) 2008-11-15 11:53:53 +0300 
+	- Fixed read/write integer for BIGENDIAN machine
+
+0.1502 (  603) 2008-11-14 13:28:37 +0300 
+	- Remove Strange bug for BigEndian machine 
+	- Fixed int (I32) declaration for hv_iternextsv
+	- Upgrade ExtUtils::MakeMaker to 6.48
+	- remove warnings: empty declaration
+
+0.1500 (  599) 2008-11-13 13:28:37 +0300 
+	- implements parse bytearray, xml-doc, xml, date. Added more descriptive error codes
+	- Added TODO section 
+
+0.1500 (  593) 2008-11-12 15:13:44 +0300 
+	- fixed typos (date->data)
+	- add support of bigendian machines
+
+0.1400 (  581) 2008-11-07 11:25:31 +0300 
+	- improved docs
+	- deleted unused filex
+	- improved doc and tests
+	- remove UTF8 support
+
+0.1200 (  540) 2008-10-16 13:55:15 +0400 
+	- Tested for memory leak (mainly AMF0 and some AMF3) 
+	- Uploaded to cpan
+	- find bug report
+
+0.0200 (  533) 2008-10-10 13:34:13 +0400 
+	- begin work for AMF3
+	- amf3 numbers worked
+	- added strings for amf3
+	- added  tests for AMF3 and improve Storable::AMF3 (array && objects)
+
+0.0200 (  528) 2008-10-09 13:15:56 +0400 
+	- fixed ecma_array
+	- Create lots of real data tests 08(real-data)
+	- Add unicode support
+
+0.0200 (  523) 2008-10-08 11:11:48 +0400 
+	- fixed error with null array element
+	- added support for self referenses structures
+
+0.0200 (  487) 2008-09-26 18:30:43 +0400 
+	- Minor error fixes
+
+0.0200 (  452) 2008-09-04 12:18:11 +0400 
+	- add warnings && some code improvement && use setjmp
+	- speed up  dclone for 20% gain
+	- add prototypes
+
+0.0200 (  405) 2008-09-01 15:21:37 +0400 
+	- added documentation
+	- some error handling
+
+0.0200 (  404) 2008-09-01 13:25:47 +0400 
+	- blessed referenses added
+
+0.01  Mon Aug 25 13:04:31 2008
+	- original version; created by h2xs 1.23 with options
+		-A -n Data::AMF::XS

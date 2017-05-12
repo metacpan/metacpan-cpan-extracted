@@ -1,0 +1,23 @@
+template: poll-ack.tt
+
+vars:
+  msg_id: 12345aa
+
+input_assertions:
+  class: SRS::EPP::Command::Poll
+  match:
+
+SRS:
+ - assertions:
+     count:
+       - [ '/NZSRSRequest/*', 1, 'SRS: there is 1 srs command' ]
+     attr_is:
+       - [ '/NZSRSRequest/AckMessage', 'TransId', '5aa', 'SRS: Sensible query' ]
+   
+output_assertions:
+  match:
+    - [ '//epp:msg', '/does not exist/', 'EPP: useful error message' ]
+  attr_is:
+    - [ '//epp:result', 'code', 2002, 'EPP: Correct response code' ]
+
+

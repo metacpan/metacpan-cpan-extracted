@@ -1,0 +1,10 @@
+Revision history for Perl extension Starch::Plugin::Sereal.
+
+0.02 2015-07-21
+
+ - Fix several dependency issues.
+
+0.01 2015-07-16
+
+ - First version.
+

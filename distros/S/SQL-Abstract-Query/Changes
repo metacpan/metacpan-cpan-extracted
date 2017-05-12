@@ -1,0 +1,15 @@
+Revision history for Perl extension SQL::Abstract::Query.
+
+0.03      2011-10-04
+ - More documentation tweaks.
+ - Moved all of the dialect logic out and replaced it with SQL::Dialect.
+
+0.02      2011-09-14
+ - Moved the BUILDARGS logic to the Statement role.
+ - Renamed the Base role to Statement.
+ - Major documentation overhaul.
+ - Typo fix to the Select SYNOPSIS. (Terrence Brannon)
+
+0.01      2011-09-04
+ - First release.
+

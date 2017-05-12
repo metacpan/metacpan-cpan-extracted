@@ -1,0 +1,5 @@
+Hi,
+ You have been sucessfully unsubscribed from [% list.name %]
+
+Come back soon,
+- Siesta::Plugin::UnSubscribe

@@ -1,0 +1,364 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Glob::FileHandle
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = FileHandle.new(...);
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef::Object::Object
+
+=head1 METHODS
+
+
+=head2 autoflush
+
+FileHandle.autoflush() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 binmode
+
+FileHandle.binmode() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 call
+
+FileHandle.call() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 char
+
+FileHandle.char() -> I<Obj>
+
+Return the
+
+Aliases: I<getc>, I<read_char>
+
+=cut
+
+=head2 chars
+
+FileHandle.chars() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 close
+
+FileHandle.close() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 each
+
+FileHandle.each() -> I<Obj>
+
+Return the
+
+Aliases: I<each_line>
+
+=cut
+
+=head2 each_char
+
+FileHandle.each_char() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 eof
+
+FileHandle.eof() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 fcntl
+
+FileHandle.fcntl() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 fileno
+
+FileHandle.fileno() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 flock
+
+FileHandle.flock() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 get
+
+FileHandle.get() -> I<Obj>
+
+Return the
+
+Aliases: I<line>, I<readln>, I<read_line>, I<readline>
+
+=cut
+
+=head2 grep
+
+FileHandle.grep() -> I<Obj>
+
+Return the
+
+Aliases: I<select>
+
+=cut
+
+=head2 isatty
+
+FileHandle.isatty() -> I<Obj>
+
+Return the
+
+Aliases: I<is_on_tty>
+
+=cut
+
+=head2 iter
+
+FileHandle.iter() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 lines
+
+FileHandle.lines() -> I<Obj>
+
+Return the
+
+Aliases: I<read_lines>, I<readlines>
+
+=cut
+
+=head2 lock
+
+FileHandle.lock() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 lstat
+
+FileHandle.lstat() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 map
+
+FileHandle.map() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 parent
+
+FileHandle.parent() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 print
+
+FileHandle.print() -> I<Obj>
+
+Return the
+
+Aliases: I<spurt>, I<write>
+
+=cut
+
+=head2 printf
+
+FileHandle.printf() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 read
+
+FileHandle.read() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 say
+
+FileHandle.say() -> I<Obj>
+
+Return the
+
+Aliases: I<println>
+
+=cut
+
+=head2 seek
+
+FileHandle.seek() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 slurp
+
+FileHandle.slurp() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 stat
+
+FileHandle.stat() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 stderr
+
+FileHandle.stderr() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 stdin
+
+FileHandle.stdin() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 stdout
+
+FileHandle.stdout() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sysread
+
+FileHandle.sysread() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sysseek
+
+FileHandle.sysseek() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 syswrite
+
+FileHandle.syswrite() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 tell
+
+FileHandle.tell() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 truncate
+
+FileHandle.truncate() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 unlock
+
+FileHandle.unlock() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 words
+
+FileHandle.words() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 «
+
+I<Obj> B<«> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<E<lt>E<lt>>, I<write_from>
+
+=cut
+
+=head2 »
+
+I<Obj> B<»> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<E<gt>E<gt>>, I<read_to>
+
+=cut

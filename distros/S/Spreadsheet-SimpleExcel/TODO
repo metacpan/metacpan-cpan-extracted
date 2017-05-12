@@ -1,0 +1,6 @@
+TODO
+====
+
+ * replace IO::Scalar with IO::String
+ * Add support for xlsx (make it as a default)
+

@@ -1,0 +1,24 @@
+Revision history for Perl extension Solaris::DeviceTree.
+
+0.01  Sat Apr  5 18:16:51 2003
+	- original version; created by h2xs 1.21 with options
+		-XA -n Solaris::DeviceTree
+
+0.02
+	- did some testing. libdevinfo is available but does not work under Solaris 2.6.
+	  Solaris 7, 8, 9 on Sparc are ok. Fixed Makefile.PL
+	- made makepkg to build package for Solaris 9 using SUNWpl5u
+	- fixed network name comparison in devtree
+	- improved listing of disks to use controller sorting
+	- documentation enhancements for HTML output
+
+0.03
+	- all files have automatically generated version numbers from CVS
+	- enhanced the test cases not to fail in other environments but mine 
+	- Libdevinfo::prom_props now returns 'undef' if access to the PROM is not possible
+	- selection of attributes and properties now works (devtool -p)
+	- determination of the solaris name in 'devtree -p' is now globally available in solaris_device
+	- cleanup of POD documentation
+	- Solaris::DeviceTree is now Solaris::DeviceTree::Overlay
+	- Solaris::DeviceTree::Util no longer exists. The methods have been split up to
+	  Solaris::DeviceTree::Node and Solaris::DeviceTree::OBP

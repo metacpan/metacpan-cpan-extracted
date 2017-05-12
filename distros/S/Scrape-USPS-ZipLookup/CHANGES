@@ -1,0 +1,129 @@
+CHANGES
+
+2.6 [2012-03-17]
+
+Project is now hosted on GitHub: https://github.com/gnp/Scrape-USPS-ZipLookup
+
+  * Migrate to LWP::UserAgent from WWW::Mechanize because what we are doing really is
+    pretty simple.
+
+  * Migrate from regexp-based parsing of output to using HTML::TreeBuilder::XPath to
+    parse the HTML and XML::XPathEngine to extract 
+
+  * Add a new 'Commercial Mail Receiving Facility' attribute to Address and the parsing,
+    to match what is presently on the USPS web site.
+
+  * Copyright date updates
+
+NOTE: The support for 'firm' in addresses is looking like it really doesn't work. I've
+not deleted it but am considering doing so. I tried making a unit test that exercised
+it but was not able to get the test working in a reasonable amount of time for this
+release.
+
+
+2.5 [2006-07-04]
+
+  * Remove outdated test.html file.
+
+  * Removed dead code
+
+  * Added a test case for multiple returned addresses
+
+  * More detailed "Mailing Industry Information" parsing
+
+  * More adaptations to the USPS Zip Lookup web site.
+
+  Thanks to the following people for bug reports and code suggestions (whether
+  I used them or not): Olaf Alders <olaf@wundersolutions.com>,
+  Adam Anderson <adam@makeascene.com>, jbwaters@gmail.com,
+  James 'J.C.' Jones <jcjones@ufl.edu>, Jonathan Kamens <jik@kamens.brookline.ma.us>,
+  Jann Linder <jannlinder@gmail.com>, David Simmons <simmons@davidsimmons.com>
+  and Robert Steele <steele@andrews.edu>.
+
+
+2.4 [2005-09-20]
+
+  * Adapt to yet another round of changes to the USPS Zip Lookup
+    web site, courtesy of Eric Parker <ercparker@mac.com>.
+
+  * Copyright date updates.
+
+
+2.3 [2004-10-15]
+
+  * Be a little more flexible about zip code format, per an email
+    from Michael S. Muegel <mike@muegel.org> (although the example
+    he gave of an adress returning XXXXX-YY where XXXXX was a good
+    looking zip code but YY was some oddball text like "ND" didn't
+    work that way for me).
+
+  * Adapted to latest USPS changes, including new welcome page URL
+    and new format of results. RT ticket submitted 2004-09-28 by
+    <rayvd@bludgeon.org>, and email notice to me from:
+
+      http://rt.cpan.org/Ticket/Display.html?id=7804
+
+    Also reported by Chris Johnson <cjohnson@corp.digitalpath.net>
+    and John Baker <johnb@listbrokers.com> via personal emails on
+    2004-09-28.
+
+
+2.2 [2004-07-02]
+
+  * Updated start URL for first page fetch to match new operation of
+    USPS site.
+
+  * Updated the form ID used to refer to the form, since the site has
+    been changed to use a named form
+
+  * Now under verbose output, you get to the the result of fetching
+    the start URL.
+
+  * Copyright date updates.
+
+  * NOTE: It appears that the service is *significantly slower than
+    it used to be. This may be on purpose to dissuade you from using
+    the service inappropriately. Consider this a reminder that you
+    should not be using this module for purposes not allowed by the
+    USPS usage policy posted on their site.
+
+
+2.1 [2003-12-15]
+
+  * Fixed documentation's sample program
+
+  * Prevent a warning about a filehandle being used only once (when
+    in reality it isn't).
+
+
+2.0 [2003-12-13]
+
+  * Works with recently changed USPS web site.
+
+  * Uses WWW::Mechanize to interact with the USPS web application.
+
+  * New script/stdaddr program to demonstrate usage.
+
+  * New test.html HTML file to show minimal interaction with the USPS
+    application.
+
+
+1.1 [2002-07-13]
+
+  * Now uses usps.com instead of usps.gov.
+
+  * Fixed a documentation markup bug related to turning on debuggin.
+
+  * Fixed a documentation bug in Scrape::USPS::ZipLookup regarding
+    how to call verbose().
+
+  * Fixed Scrape::USPS::ZipLookup::Address' logic to use isa().
+
+  * Fixed one of the standardize.t tests.
+
+
+1.0
+
+  * Renamed to Scrape::USPS::ZipLookup from Data::Address::Standardize.
+    (based on version 0.003 of Data::Address::Standardize).
+

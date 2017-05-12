@@ -1,0 +1,41 @@
+#
+# Salesforce dot com Perl Module
+# Author: Byrne Reese <byrne at majordojo dot com>
+# Last Updated - Nov 2, 2004
+#
+# $Id: CHANGES.txt,v 1.1.1.1 2006/02/14 16:48:49 shimizu Exp $
+
+Aug 10, 2006
+------------
+* Fixed Japanese encoding dependencies
+  - added new option: Salesforce->new(encoding => 'foobar')
+  - fixed sfdc.cfg. Thanks John Hart.
+
+Feb 07, 2006
+------------
+* Fixed bug for Salesforce::Constants
+  - added Campaign, CampaignMember, Lead at Salesforce::Constants::TYPES
+* Enhancement create and update
+  - using xml_encode for Japanese (EUC-JP)
+
+Nov 18, 2005
+------------
+* Fixed bug under "perl -w"
+  printf (...) interpreted as function at ./test.cgi line 22, <DATA> line 846.
+  Using a hash as a reference is deprecated at /usr/lib/perl5/site_perl/5.8/
+  SalesForce.pm line 431, <DATA> line 846.
+
+Nov 2, 2004
+-----------
+* Added support for the following operations:
+  - getDeleted
+  - getUpdated
+  - describeGlobal
+  - describeSObject
+  - search
+  - retrieve
+  - resetPassword
+  - setPassword
+* Updated URL to point to 4.0 namespace
+* Added additional unit tests to more thouroughly test each
+  operation

@@ -1,0 +1,19 @@
+Revision history for Scope-Context
+
+0.03    2015-03-17 14:15 UTC
+        This is a maintenance release. The code contains no functional change.
+        Satisfied users of version 0.02 can skip this update.
+        + Doc : More POD tweaks and clarifications.
+        + Tst : Author tests are no longer bundled with this distribution.
+                They are only made available to authors in the git repository.
+
+0.02    2013-02-08 16:45 UTC
+        + Add : The methods yield(), package(), file(), line(), sub_name(),
+                sub_has_args(), gimme(), eval_text(), is_require(), hints_bits(),
+                warnings_bits() and hints_hash() were implemented.
+        + Chg : Scope::Upper 0.21 is now required.
+        + Doc : POD tweaks and clarifications.
+        + Tst : Author tests overhaul.
+
+0.01    2011-10-11 13:10 UTC
+        First version, released on an unsuspecting world.

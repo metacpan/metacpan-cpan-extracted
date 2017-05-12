@@ -1,0 +1,49 @@
+---
+name: Search-Indexer-Incremental-MD5
+version: 0.06.22
+author:
+  - 'Nadim ibn hamouda el Khemir. <nkh@cpan.org>'
+abstract: Incrementaly index your files
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  BerkeleyDB: 0
+  Digest::MD5: 0
+  File::Slurp: 0
+  File::stat: 0
+  Getopt::Long: 0
+  List::Util: 0
+  Readonly: 0
+  Search::Indexer: 0.75
+  Sub::Exporter: 0
+  Term::Bash::Completion::Generator: 0
+  Time::HiRes: 0
+  Time::localtime: 0
+build_requires:
+  Directory::Scratch::Structured: 0
+  File::Find::Rule: 0
+  Test::Block: 0
+  Test::Command: 0
+  Test::Exception: 0
+  Test::NoWarnings: 0
+  Test::Script::Run: 0
+  Test::Warn: 0
+  Text::Diff: 0
+provides:
+  Search::Indexer::Incremental::MD5:
+    file: lib/Search/Indexer/Incremental/MD5.pm
+    version: 0.06
+  Search::Indexer::Incremental::MD5::Indexer:
+    file: lib/Search/Indexer/Incremental/MD5/Indexer.pm
+    version: 0.02
+  Search::Indexer::Incremental::MD5::Language::Perl:
+    file: lib/Search/Indexer/Incremental/MD5/Language/Perl.pm
+    version: 0.03
+  Search::Indexer::Incremental::MD5::Searcher:
+    file: lib/Search/Indexer/Incremental/MD5/Searcher.pm
+    version: 0.02
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<!DOCTYPE TopicSet PUBLIC "urn:newsml:iptc.org:20001006:NewsMLv1.0.dtd:1" "NewsMLv1.0.dtd">
+<TopicSet Duid="iptc.newsitemtype" FormalName="NewsItemType">
+	<Comment xml:lang="en">The nature of content that a NewsItem carries.</Comment>
+	<Topic Duid="nit01">
+		<TopicType Scheme="IptcTopicType" FormalName="NewsItemType"/>
+		<FormalName Scheme="IptcNewsItemType">News</FormalName>
+		<Description xml:lang="en">Basic coverage of a news event, such as articles, photos, video or audio reports.</Description>
+	</Topic>
+	<Topic Duid="nit02">
+		<TopicType Scheme="IptcTopicType" FormalName="NewsItemType"/>
+		<FormalName Scheme="IptcNewsItemType">Data</FormalName>
+		<Description xml:lang="en">Non-narrative information, usually not eligible for journalistic intervention or modification, or information routed by the provider from a third party to the user. Examples are sports results and stock prices.</Description>
+	</Topic>
+	<Topic Duid="nit03">
+		<TopicType Scheme="IptcTopicType" FormalName="NewsItemType"/>
+		<FormalName Scheme="IptcNewsItemType">Advisory</FormalName>
+		<Description xml:lang="en">A non-publishable communication providing information about the existing or planned coverage of news events.</Description>
+	</Topic>
+	<Topic Duid="nit04">
+		<TopicType Scheme="IptcTopicType" FormalName="NewsItemType"/>
+		<FormalName Scheme="IptcNewsItemType">Maintenance</FormalName>
+		<Description xml:lang="en">A system-to-system message that is related to communication channels.</Description>
+	</Topic>
+	<Topic Duid="nit05">
+		<TopicType Scheme="IptcTopicType" FormalName="NewsItemType"/>
+		<FormalName Scheme="IptcNewsItemType">TopicSet</FormalName>
+		<Description xml:lang="en">A set of FormalNames and their meanings, changes to which are managed in a controlled manner.</Description>
+	</Topic>
+	<Topic Duid="nit06">
+		<TopicType Scheme="IptcTopicType" FormalName="NewsItemType"/>
+		<FormalName Scheme="IptcNewsItemType">DTD</FormalName>
+		<Description xml:lang="en">An XML Document Type Definition.</Description>
+	</Topic>
+	<Topic Duid="nit07">
+		<TopicType Scheme="IptcTopicType" FormalName="NewsItemType"/>
+		<FormalName Scheme="IptcNewsItemType">Document</FormalName>
+		<Description xml:lang="en">A non-news document.</Description>
+	</Topic>
+	<Topic Duid="nit08">
+		<TopicType Scheme="IptcTopicType" FormalName="NewsItemType"/>
+		<FormalName Scheme="IptcNewsItemType">Catalog</FormalName>
+		<Description xml:lang="en">A container for Resource and TopicUse Elements.</Description>
+	</Topic>
+</TopicSet>
+

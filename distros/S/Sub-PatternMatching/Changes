@@ -1,0 +1,26 @@
+Revision history for Perl extension Sub::PatternMatching.
+
+1.04  Mon Nov  6 09:34:11 2006
+    - More distribution upgrading: examples, spec-conformant META.yml,
+      clear licensing.
+
+1.03  Tue Oct  4 21:42:26 2005
+	- Fixed distribution problems.
+
+1.02  Thu Sep 22 21:48:55 2005
+	- Changed the Params::Validate dependency from version "0" to
+	  at least 0.69 because versions up to 0.18 didn't support
+	  validate_with() (which is used in this module) and versions
+	  prior to 0.69 leaked memory when the XS implementation was
+	  used.
+	- Added POD tests to catch up with the rapid development in
+	  testing tools availlable for QA on CPAN.
+
+1.01  Tue Mar 23 17:44:01 2004
+	- Fixed some documentation and packaging issues.
+
+1.00  Sun Mar 21 14:22:32 2004
+	- original version; created by h2xs 1.21 with options
+		-AX Sub::PatternMatching
+
+

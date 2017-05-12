@@ -1,0 +1,138 @@
+---
+abstract: 'Maintain database schemas'
+author:
+  - 'Branislav Zahradnik <happy.barney@gmail.com>'
+build_requires:
+  Attribute::Handlers: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: SQL-Admin
+provides:
+  COIN::SQL::Admin::Driver::Base::Keywords:
+    file: lib/SQL/Admin/Driver/Base/Keywords.pm
+    version: v0.5.0
+  SQL::Admin:
+    file: lib/SQL/Admin.pm
+    version: v0.5.0
+  SQL::Admin::Catalog:
+    file: lib/SQL/Admin/Catalog.pm
+    version: v0.5.0
+  SQL::Admin::Catalog::Compare:
+    file: lib/SQL/Admin/Catalog/Compare.pm
+    version: v0.5.0
+  SQL::Admin::Catalog::Index:
+    file: lib/SQL/Admin/Catalog/Index.pm
+    version: v0.5.0
+  SQL::Admin::Catalog::Object:
+    file: lib/SQL/Admin/Catalog/Object.pm
+    version: v0.5.0
+  SQL::Admin::Catalog::Schema:
+    file: lib/SQL/Admin/Catalog/Schema.pm
+    version: v0.5.0
+  SQL::Admin::Catalog::Sequence:
+    file: lib/SQL/Admin/Catalog/Sequence.pm
+    version: v0.5.0
+  SQL::Admin::Catalog::Table:
+    file: lib/SQL/Admin/Catalog/Table.pm
+    version: v0.5.0
+  SQL::Admin::Catalog::Table::Column:
+    file: lib/SQL/Admin/Catalog/Table/Column.pm
+    version: v0.5.0
+  SQL::Admin::Catalog::Table::Constraint:
+    file: lib/SQL/Admin/Catalog/Table/Constraint.pm
+    version: v0.5.0
+  SQL::Admin::Catalog::Table::ForeignKey:
+    file: lib/SQL/Admin/Catalog/Table/ForeignKey.pm
+    version: v0.5.0
+  SQL::Admin::Catalog::Table::Object:
+    file: lib/SQL/Admin/Catalog/Table/Object.pm
+    version: v0.5.0
+  SQL::Admin::Catalog::Table::PrimaryKey:
+    file: lib/SQL/Admin/Catalog/Table/PrimaryKey.pm
+    version: v0.5.0
+  SQL::Admin::Catalog::Table::Unique:
+    file: lib/SQL/Admin/Catalog/Table/Unique.pm
+    version: v0.5.0
+  SQL::Admin::Driver::Base:
+    file: lib/SQL/Admin/Driver/Base.pm
+    version: v0.5.0
+  SQL::Admin::Driver::Base::DBI:
+    file: lib/SQL/Admin/Driver/Base/DBI.pm
+    version: v0.5.0
+  SQL::Admin::Driver::Base::Decompose:
+    file: lib/SQL/Admin/Driver/Base/Decompose.pm
+    version: v0.5.0
+  SQL::Admin::Driver::Base::Evaluate:
+    file: lib/SQL/Admin/Driver/Base/Evaluate.pm
+    version: v0.5.0
+  SQL::Admin::Driver::Base::Parser:
+    file: lib/SQL/Admin/Driver/Base/Parser.pm
+    version: v0.5.0
+  SQL::Admin::Driver::Base::Producer:
+    file: lib/SQL/Admin/Driver/Base/Producer.pm
+    version: v0.5.0
+  SQL::Admin::Driver::DB2:
+    file: lib/SQL/Admin/Driver/DB2.pm
+    version: v0.5.0
+  SQL::Admin::Driver::DB2::DBI:
+    file: lib/SQL/Admin/Driver/DB2/DBI.pm
+    version: v0.5.0
+  SQL::Admin::Driver::DB2::Decompose:
+    file: lib/SQL/Admin/Driver/DB2/Decompose.pm
+    version: v0.5.0
+  SQL::Admin::Driver::DB2::Evaluate:
+    file: lib/SQL/Admin/Driver/DB2/Evaluate.pm
+    version: v0.5.0
+  SQL::Admin::Driver::DB2::Grammar:
+    file: lib/SQL/Admin/Driver/DB2/Grammar.pm
+    version: v0.5.0
+  SQL::Admin::Driver::DB2::Keywords:
+    file: lib/SQL/Admin/Driver/DB2/Keywords.pm
+    version: v0.5.0
+  SQL::Admin::Driver::DB2::Parser:
+    file: lib/SQL/Admin/Driver/DB2/Parser.pm
+    version: v0.5.0
+  SQL::Admin::Driver::DB2::Producer:
+    file: lib/SQL/Admin/Driver/DB2/Producer.pm
+    version: v0.5.0
+  SQL::Admin::Driver::Pg:
+    file: lib/SQL/Admin/Driver/Pg.pm
+    version: v0.5.0
+  SQL::Admin::Driver::Pg::DBI:
+    file: lib/SQL/Admin/Driver/Pg/DBI.pm
+    version: v0.5.0
+  SQL::Admin::Driver::Pg::Grammar:
+    file: lib/SQL/Admin/Driver/Pg/Grammar.pm
+    version: v0.5.0
+  SQL::Admin::Driver::Pg::Keywords:
+    file: lib/SQL/Admin/Driver/Pg/Keywords.pm
+    version: v0.5.0
+  SQL::Admin::Driver::Pg::Parser:
+    file: lib/SQL/Admin/Driver/Pg/Parser.pm
+    version: v0.5.0
+  SQL::Admin::Driver::Pg::Producer:
+    file: lib/SQL/Admin/Driver/Pg/Producer.pm
+    version: v0.5.0
+  SQL::Admin::Utils:
+    file: lib/SQL/Admin/Utils.pm
+    version: v0.5.0
+requires:
+  DBI: 0
+  Data::Compare: 0
+  Getopt::Long: 0
+  List::Utils: 0
+  Module::Load: 0
+  Parse::RecDescent: 0
+  Pod::Usage: 0
+  SQL::Abstract: 0
+resources:
+  bugtracker: https://github.com/happy-barney/perl-SQL-Admin/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/happy-barney/perl-SQL-Admin
+version: v0.5.0

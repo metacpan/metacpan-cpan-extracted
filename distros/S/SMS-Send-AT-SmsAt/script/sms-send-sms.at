@@ -1,0 +1,28 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use SMS::Send;
+
+if (not @ARGV or $ARGV[0] =~ /-+h(?:elp)?/) {
+    print <<"";
+Usage: sms-send number text
+Example: sms-send +4369912345678 "Hello world"
+
+    exit 1;
+}
+
+# Create a sender
+my $sender = SMS::Send->new('AT::SmsAt',
+    _login    => 'ss@atikon.com',
+    _password => 'kjr74hkf',
+);
+
+# Send a message
+my $sent = $sender->send_sms(
+    text => $ARGV[1],
+    to   => $ARGV[0],
+);
+
+exit 1 unless $sent;

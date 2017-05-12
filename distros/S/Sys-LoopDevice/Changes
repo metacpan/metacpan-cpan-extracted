@@ -1,0 +1,20 @@
+Revision history for Sys-LoopDevice
+
+0.003   2016-12-28 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Fix expressing follow-spec prereq relationship with
+	  x_spec.
+
+
+0.002   2016-08-31 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild to remove extraneous dependencies.
+
+
+0.001   2016-08-31 (PERLANCAR)
+
+        - First release.

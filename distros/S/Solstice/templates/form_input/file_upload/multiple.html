@@ -1,0 +1,25 @@
+<a href="" onfocus="Solstice.IFrame.addFocus('top', '<!-- sol_var name -->')"></a><a id="above_iframe_<!-- sol_var name -->" href="" onfocus="Solstice.IFrame.moveFocusUp(this)"></a>
+<iframe id="<!-- sol_var name -->" name="<!-- sol_var name -->" class="sol_upload_container" scrolling="no" src="javascript:void(0)"></iframe>
+<a href="" id="below_iframe_<!-- sol_var name -->" onfocus="Solstice.IFrame.moveFocusDown(this)"></a>
+<a href="" onfocus="Solstice.IFrame.addFocus('bottom', '<!-- sol_var name -->')"></a>
+<div id="<!-- sol_var name -->_inputs"></div>
+<script type="text/javascript">
+    
+    var solstice__file___uploader = new Solstice.FileUpload({
+        name          : '<!-- sol_var name -->',
+        upload_url    : '<!-- sol_var upload_url -->',
+        start_count   : <!-- sol_var start_count -->,
+        max_count     : <!-- sol_var max_count -->,
+        add_label     : '<!-- sol_var add_label -->',
+        another_label : '<!-- sol_var another_label -->',
+        remove_label  : '<!-- sol_var remove_label -->',
+        class_name    : '<!-- sol_var class_name -->',
+        disabled      : <!-- sol_var is_disabled -->
+    });
+    <!-- sol_loop onchange_handlers -->
+    solstice__file___uploader.addOnChangeEvent('<!-- sol_var event -->');<!-- /sol_loop -->
+    <!-- sol_loop onupload_handlers -->
+    solstice__file___uploader.addOnUploadEvent('<!-- sol_var event -->');<!-- /sol_loop -->
+    <!-- sol_loop onformupdate_handlers -->
+    solstice__file___uploader.addOnFormUpdateEvent('<!-- sol_var event -->');<!-- /sol_loop -->
+</script>

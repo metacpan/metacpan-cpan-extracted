@@ -1,0 +1,51 @@
+Revision history for Signals-XSIG
+
+0.14    2016-11-18
+        Improve detection of global destruction
+        Improve handling of signals with more than one mnemonic
+
+0.13    2013-01-14
+        Backport to 5.6. Incorporate new defaults for gnukfreebsd and
+        mirbsd systems.
+
+0.12    2011-07-08
+        Fix so $SIG{sig}=\&bogus, $SIG{sig}='bogus', $SIG{sig}=*bogus
+        don't crash the program when the signal is handled.
+        Doc and test for override DEFAULT behavior feature.
+
+0.11    2011-04-18
+        More test and doc tweaks.
+
+0.10    2011-02-11
+        Test tweak to help pass on OpenBSD, MSWin32.
+
+0.09    2010-11-10
+        Test changes. More tweaks to default behavior on bsd, irix systems.
+
+0.08    2010-11-07
+        Test changes -- when default test fails for some signal, run
+        spike/analyze_default_signal_behavior.pl to include the correct
+        default behavior in the test output.
+
+0.07    2010-11-05
+        Test and default signal handling fixes.
+
+0.06    2010-11-03
+        Test and doc fixes. 
+
+0.05    2010-11-02
+        Update default behavior for lots of platforms from CPAN test results.
+
+0.04    2010-10-28
+        Implement S::X::TieArray->{start} attribute to (1) save memory and
+        (2) make it easier to distinguish "pre-handlers" and "post-handlers".
+
+0.03    2010-10-24
+        Removed %REGISTRY refs.
+
+0.02    2010-10-08
+        Introduces %XSIG.
+        Added defaul signal behaviors for solaris.
+
+0.01    Tie %SIG, use signal handler registry to implement multiple
+        signal handlers.

@@ -1,0 +1,444 @@
+#!/usr/bin/perl -w 
+
+use strict;
+use Pod::Usage;
+use Getopt::Long;
+use File::Basename;
+use File::Copy;
+use File::Find;
+use File::Path;
+use File::Spec::Functions;
+use SVG::Metadata;
+
+#------------------------------------------------------------------------
+# Cmdline options
+#------------------------------------------------------------------------
+my $opt_version      = 0;
+my $opt_help         = 0;
+my $opt_man          = 0;
+my $opt_debug        = 1;
+my $opt_edit         = 0;
+my $opt_author       = '';
+my $opt_owner        = '';
+my $opt_license      = '';
+my $opt_title        = '';
+my @opt_keyword      = ();
+my $opt_delete       = 0;
+
+
+Getopt::Long::Configure ("bundling", "no_ignore_case");
+
+GetOptions(
+           "version|V"   => \$opt_version,   # Prints the version and exits
+           "help|h"      => \$opt_help,      # Prints a brief help message
+           "man"         => \$opt_man,       # Prints extended help
+	   "debug|D=i"   => \$opt_debug,     # Prints debug messages
+	   "edit|e"      => \$opt_edit,      # Edit mode
+	   "author|a=s"  => \$opt_author,
+	   "owner|o=s"   => \$opt_owner,
+	   "license|l=s" => \$opt_license,
+	   "title|t=s"   => \$opt_title,
+	   "keyword|k=s" => \@opt_keyword,
+	   "delete"      => \$opt_delete,
+           ) or pod2usage(-verbose => 1, -exitstatus => 0);
+
+if ($opt_version) {
+    print "$SVG::Metadata::VERSION\n";
+    exit 0;
+}
+
+pod2usage(-verbose => 2, -exitstatus => 0) if ($opt_man);
+pod2usage(-verbose => 1, -exitstatus => 0) if ($opt_help);
+pod2usage(-verbose => 1, -exitstatus => 0) if (@ARGV<1);
+
+if (@opt_keyword) {
+    # Convert --keywords=a,b,c into array elements ('a', 'b', 'c')
+    @opt_keyword = split(/,/, join(',', @opt_keyword));
+    print "Keywords: ", join(',', @opt_keyword), "\n";
+}
+
+my $Annote_meta;
+
+# Executes program and returns error code
+sub main {
+    $opt_author ||= 'unknown';
+    $opt_owner  ||= $opt_author;
+
+    $Annote_meta = new SVG::Metadata();
+    $Annote_meta->title($opt_title);
+    $Annote_meta->author($opt_author);
+    $Annote_meta->owner($opt_owner);
+    $Annote_meta->addKeyword(@opt_keyword);
+    $Annote_meta->license($opt_license);
+    
+    my @search_dirs = ();
+    foreach my $file (@ARGV) {
+	if (-d $file) {
+	    push(@search_dirs, $file);
+	} elsif (-f $file) {
+	    if ($opt_delete) {
+		remove_rdf($file);
+	    } elsif ($opt_edit) {
+		edit_rdf($file, $Annote_meta);
+	    } else {
+		process_file($file, $Annote_meta)
+		    or warn "Could not process $file\n";
+	    }
+	}
+    }
+
+    sub wanted {
+	if (!-d && /\.svg$/) {
+	    if ($opt_delete) {
+		remove_rdf($File::Find::name);
+
+	    } elsif ($opt_edit) {
+		edit_rdf($File::Find::name, $Annote_meta);
+	    } else {
+		process_file($File::Find::name, $Annote_meta);
+
+	    }
+	}
+    }
+    
+    if (@search_dirs) {
+	find({ wanted => \&wanted, no_chdir => 1}, @search_dirs);
+    }
+
+    return 0;
+}
+
+sub edit_rdf {
+    my $filename = shift;
+    my $new_meta = shift;
+    my $meta = new SVG::Metadata;
+
+    # Load up current RDF
+    if (!$meta->parse($filename)) {
+	warn "Could not parse metadata from '$filename'\n";
+    } elsif ($opt_debug>3) {
+	warn "Loaded up metadata from '$filename'\n";
+    }
+    # Edit it
+    if ($new_meta->title()) {
+	$meta->title($new_meta->title());
+	warn "Replacing title with ".$new_meta->title()."\n" 
+	    if $opt_debug>3;
+    }
+    if ($new_meta->author()) {
+	$meta->author($new_meta->author());
+	warn "Replacing author with ".$new_meta->author()."\n"
+	    if $opt_debug>3;
+    }
+    if ($new_meta->owner()) {
+	$meta->owner($new_meta->owner());
+	warn "Replacing owner with ".$new_meta->owner()."\n" 
+	    if $opt_debug>3;
+    }
+    if ($new_meta->keywords()) {
+	$meta->addKeyword($new_meta->keywords());
+	warn "Adding keywords with ".join(',',$new_meta->keywords())."\n" 
+	    if $opt_debug>3;
+    }
+    if ($new_meta->license()) {
+	$meta->license($new_meta->license());
+	warn "Replacing license with ".$new_meta->license()."\n" 
+	    if $opt_debug>3;
+    }
+    # Remove it
+    if (!remove_rdf($filename)) {
+	warn "Could not replace the RDF from '$filename'... aborting\n";
+    }
+    # Save it
+    process_file($filename, $meta);
+}
+
+sub process_file {
+    my $file = shift;
+    my $svgmeta = shift || die "No svgmeta object passed to process_file\n";
+
+    my $title = $svgmeta->title() || '<FILEBASE>';
+
+    warn "Processing file '$file'\n" if $opt_debug>0;
+
+    my ($fn,$dir,$ext)  = fileparse($file, '\..*?');
+
+    if ($title =~ /</) {
+	my $author    = $svgmeta->author();
+	my $owner     = $svgmeta->owner();
+	my $keywords  = join(", ", ($svgmeta->keywords()||''));
+	my $localtime = localtime();
+	my $gmtime    = gmtime();
+	$title =~ s/<FILENAME>/$file/g;
+	$title =~ s/<FILEBASE>/$fn/g;
+	$title =~ s/<FILEEXT>/$ext/g;
+	$title =~ s/<DIR>/$dir/g;
+	$title =~ s/<AUTHOR>/$author/g;
+	$title =~ s/<OWNER>/$owner/g;
+	$title =~ s/<KEYWORDS>/$keywords/g;
+	$title =~ s/<LOCALTIME>/$localtime/g;
+	$title =~ s/<GMTIME>/$gmtime/g;
+    }
+
+    my $tmpfile = $fn . ".tmp";
+
+    if (!open(OLDSVGFILE, "<$file")) {
+	warn "Could not open '$file' for reading:  $!\n";
+	return 0;
+    }
+    if (!open(NEWSVGFILE, ">$tmpfile")) {
+	warn "Could not open '$file' for writing:  $!\n";
+	return 0;
+    }
+
+    my $seen_rdf = 0;
+    while (<OLDSVGFILE>) {
+	if (m|</svg>| && ! $seen_rdf) {
+	    my $orig_title = $svgmeta->title();
+	    $svgmeta->title($title);
+	    print "Printing the rdf\n";
+	    print NEWSVGFILE $svgmeta->to_rdf();
+	    $svgmeta->title($orig_title);
+	} elsif (m|</rdf:RDF>|i or m|</rdf>|i) {
+	    $seen_rdf = 1;
+	}
+	print NEWSVGFILE $_;
+    }
+
+    close(OLDSVGFILE) or warn "Could not close '$file': $!\n";
+    close(NEWSVGFILE) or warn "Could not close '$file': $!\n";
+    if (! rename($file, "$file.orig")) {
+	warn "Could not rename $file to $file.orig: $!\n";
+	return 0;
+    }
+    if (! rename($tmpfile, $file)) {
+	warn "Could not rename $tmpfile to $file: $!\n";
+	return 0;
+    }
+
+    # TODO:  Validate the file
+#    my $newsvgmeta = new SVG::Metadata;
+
+    return 1;
+}
+
+
+sub remove_rdf {
+    my $file = shift;
+
+    warn "Removing metadata from '$file'\n" if $opt_debug>0;
+
+    my ($fn,$dir,$ext)  = fileparse($file, '\..*?');
+    my $tmpfile = $fn . ".tmp";
+
+    if (!open(OLDSVGFILE, "<$file")) {
+	warn "Could not open '$file' for reading:  $!\n";
+	return 0;
+    }
+    if (!open(NEWSVGFILE, ">$tmpfile")) {
+	warn "Could not open '$file' for writing:  $!\n";
+	return 0;
+    }
+
+    # Undef newline as line separator so the read is the whole file
+    my $tmp = $/;
+    undef $/;
+    while (<OLDSVGFILE>) {
+	$_ =~ s|<metadata.*?</metadata>||gs;
+	$_ =~ s|<rdf:RDF.*?</rdf:RDF>||gs;
+	$_ =~ s|<rdf.*?</rdf>||gs;
+	print NEWSVGFILE $_;
+    }
+    $/ = $tmp;
+
+    close(OLDSVGFILE) or warn "Could not close '$file': $!\n";
+    close(NEWSVGFILE) or warn "Could not close '$file': $!\n";
+    if (! rename($file, "$file.orig")) {
+	warn "Could not rename $file to $file.orig: $!\n";
+	return 0;
+    }
+    if (! rename($tmpfile, $file)) {
+	warn "Could not rename $tmpfile to $file: $!\n";
+	return 0;
+    }
+
+    return 1;
+}
+
+exit main();
+
+__END__
+
+=head1 NAME
+
+svg_annotate - Adds RDF metadata to an SVG file.  This script scans
+files and directories for SVG files and if they lack embedded RDF
+metadata, inserts it.
+
+=head1 SYNOPSIS
+
+svg_annotate [OPTIONS] [file1[, file2]] [subdir1[, subdir2...]]
+
+ -V, --version     Displays version info for the script
+ -h, --help        This help screen
+ -D, --debug=N     Reports debugging info (1=sparse, 3=tons)
+ -a, --author=s    Name of the author to use in the RDF
+ -o, --owner=s     Name of the owner to use in the RDF
+ -l, --license=s   License URL to use in the RDF
+ -t, --title=s     Title string to use in the RDF
+     --delete      Removes the RDF section(s) from the SVG file(s)
+
+=head1 DESCRIPTION
+
+This script uses SVG::Metadata to annotate RDF metadata to one or more
+SVG files.  It checks to be sure the file does not already contain an
+RDF section (in which case it skips the file), and if not, places an RDF
+section at the end of the file, just before the closing </svg> tag.
+
+The purpose of this script is to enable artists with large collections
+of images to quickly and easily annotate entire trees of files with
+metadata.  The main aim of this is to assist the artists of the Open 
+Clip Art Library (http://www.openclipart.org).
+
+=head1 EXAMPLES
+
+Annotate all the items in or under the current directory, with da Vinci
+as the artist.  By default, license is Public Domain, and for
+'my_file.svg', title is set to "Leonardo da Vinci - my_file":
+
+  svg_annotate -a 'Leonardo da Vinci' .
+
+Add RDF with specified author, license, and title for the SVG files in
+the current directory:
+
+  svg_annotate *.svg \
+     -a 'Leonardo da Vinci' \
+     -l 'http://creativecommons.org/licenses/GPL/2.0/' \
+     -t 'Mona Lisa (<FILENAME>)'
+
+svg_annotate allows several fill-ins to be used in the title field:
+
+    <FILENAME>  - the full filename of the file
+    <FILEBASE>  - the basename of the filename (the part before the extension)
+    <FILEEXT>   - the extension of the filename (usually always svg)
+    <DIR>       - the directory path to the file
+    <AUTHOR>    - the name of the author of the file
+    <OWNER>     - the name of the owner of the file
+    <KEYWORDS>  - the keywords for the file
+    <LOCALTIME> - the current date and time
+    <GMTIME>    - the current date and time in Coordinated Universal Time (UTC) format
+    
+
+It is also possible to delete the RDF from one or more files, using the
+C<--delete> flag.  For instance:
+
+  svg_annotate --delete  *.svg
+
+This will work recursively into any directories specified on the
+commandline, working on any *.svg files it finds in the indicated
+directory tree.  E.g.:
+
+  svg_annotate --delete  my_svg_files/
+
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-V>, B<--version>
+
+Displays the version information about the script.
+
+=item B<-h>, B<--help>
+
+Prints a brief help message with option summary.
+
+=item B<-D> I<N>, B<--debug>=I<N>
+
+Prints debug messages.  This expects a numerical argument corresponding
+to the debug message verbosity.
+
+=item B<-a> I<author>, B<--author>=I<author>
+
+Specifies the name of the author to use for the RDF.  Remember to use
+quotes if you wish to specify a multi-word name.  E.g., --author="Bryce
+W. Harrington".
+
+=item B<-o> I<owner>, B<--owner>=I<owner>
+
+The owner for the file.  Typically the same as the author.
+
+=item B<-k> I<keyword0,keyword1,...>, B<--keywords>=I<keyword,...>
+
+Sets the keyword(s) for the image.  This parameter can be used multiple
+times, such as:
+
+    svg_metadata apple.svg -k apple -k fruit -k food
+
+or can take comma delimited parameters, such as:
+
+    svg_metadata apple.svg --keywords=apple,fruit,food
+
+=item B<-l> I<license>, B<--license>=I<license>
+
+The license URL to use for the file.  See the Creative Common's site for
+typical licenses.  By default it uses the Public Domain license, 
+--license="http://web.resource.org/cc/PublicDomain".
+
+=item B<-t> I<title>, B<--title>=I<title>
+
+The title to use for all the indicated files.  Note that several fill-in
+parameters are included, for a little dynamism (see DESCRIPTION, above).
+
+=item B<--delete>
+
+Causes svg_annotate to operate in RDF-deletion mode.  Instead of adding
+RDF, the script will instead parse the SVG file and remove any metadata
+sections, as distinguished by the tags <rdf>, <rdf:RDF>, or <metadata>.
+
+=back
+
+=head1 PREREQUISITES
+
+L<Pod::Usage>,
+L<Getopt::Long>,
+L<File::Basename>,
+L<File::Copy>,
+L<File::Find>,
+L<File::Path>,
+L<File::Spec>,
+L<XML::Twig>,
+L<SVG::Metadata>
+
+=head1 COREQUISITES
+
+None
+
+=head1 SCRIPT CATEGORIES
+
+Text Processing::Filters
+Utilities
+
+=head1 BUGS
+
+For licenses other than Public Domain, it screws up the Rights section.
+
+=head1 SEE ALSO
+
+L<SVG::Metadata>, L<inkscape>, L<XML::Twig>
+
+=head1 AUTHOR
+
+Bryce Harrington E<lt>bryce@bryceharrington.orgE<gt>
+
+L<http://www.bryceharrington.org/|http://www.bryceharrington.org/>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2004 Bryce Harrington.
+All Rights Reserved.
+
+This script is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut

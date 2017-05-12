@@ -1,0 +1,133 @@
+Revision history for Perl extension Spreadsheet::SimpleExcel.
+
+1.92  2015-01-19
+
+      [MISC]
+      * fix package generation/indexing by adding "PodWeaver" in dist.ini.
+
+1.91  2015-01-19
+
+      [MISC]
+      * reformat Changes file
+      * switched to Dist::Zilla
+      * added TODO
+
+1.9   2007-07-25
+
+        Bugfix in length checking
+
+1.8   2007-07-15
+
+        Bugfix in t/97_manifest.t
+        check for length of worksheet name
+
+1.7   2007-07-13
+
+        Bugfix in sort_worksheets
+        Set the "last_sheet" in several methods
+        rename tests
+        added t/02_synopsis.t
+
+1.6   2007-07-05
+
+        Test scripts improved
+
+1.5   2006-11-21
+
+        Test scripts improved
+
+1.4   2006-11-19
+
+        Default Worksheet to several methods added to simplify life ;-)
+        
+1.3   2006-10-30
+
+        * output_to_test bug fixed: if filename is omitted and it was defined
+          for the constructor, the filename of constructor is taken.
+          
+1.2   2006-10-02
+
+        - cell values starting with '=' are no longer string values
+          the default format of Spreadsheet::WriteExcel is used
+        + Test::Pod test added
+        + Test::Pod::Coverage test added
+        + Test::CheckManifest test added
+
+1.1   2006-02-15
+
+        - one minor bug in _do_sort fixed
+
+1.0   2006-01-13
+
+        - changes in documentation
+        
+0.9   2006-01-10
+
+        - output_to_XML added
+        
+0.8   2005-12-07
+
+        - support for "big" files implemented
+        
+0.7   2005-12-03
+
+        - filter in output_to_file deleted
+        
+0.6   2005-11-15
+
+        - bug in output_to_file fixed
+        - joined sorts
+        - reset_sort added
+        
+0.5   2005-01-26
+
+        - simple format support:
+            * headers_format
+            * data_format
+            three formats allowed:
+              * 's'    string
+              * 'n'    number
+              * undef  default
+        - set_headers_format added
+        - set_data_format added
+        - bug in sort_data fixed
+
+0.4   2005-01-17
+
+        - bug in output*-methods fixed
+
+0.3   2005-01-17
+
+        - bug in output*-methods fixed
+
+0.2   2005-01-11
+
+        - new method
+                * sheets             returns a list of all worksheets
+        - breaks sheets in several parts, if number of rows is greater than <lines> (32000)
+        - bug in _make_excel() fixed
+
+0.1   2005-01-07
+
+        - new methods:
+                * errstr             returns the error message of last occured error
+                * sort_worksheets    sort worksheets in asc or desc order
+        - bug in output*-methods fixed
+        - enhanced error handling
+
+0.03  2004-11-03
+
+	- new methods:
+        	* output_as_string   returns the excel-data as a string
+                * output_to_file     prints excel-data to a file
+        - bug in set_headers() fixed
+
+0.02  2004-11-02
+
+	- bug in add_row() and set_headers() fixed.
+
+0.01  2004-10-27
+
+	- original version; created by h2xs 1.23 with options
+		-XA -n Spreadsheet::SimpleExcel
+

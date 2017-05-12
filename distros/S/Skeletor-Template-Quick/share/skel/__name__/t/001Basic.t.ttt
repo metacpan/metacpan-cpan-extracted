@@ -1,0 +1,9 @@
+use warnings;
+use strict;
+
+use Test::More;
+use [% namespace %];
+
+ok 1, "use ok";
+
+done_testing;

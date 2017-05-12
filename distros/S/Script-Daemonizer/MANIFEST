@@ -1,0 +1,13 @@
+Changes
+lib/Script/Daemonizer.pm
+lib/Script/Daemonizer.pod
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-init.t
+t/02-methods.t
+t/03-pidfile_lock.t
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

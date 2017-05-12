@@ -1,0 +1,9 @@
+read_header_block
+^Unexpected EOF line \d+
+Node-path: css/style.css
+Node-kind: file
+Node-action: add
+Prop-content-length: 87
+Text-content-length:              970
+Text-content-md5: 1f97ca311e48901bfc430d9f3e335dd0
+Content-length:             1057

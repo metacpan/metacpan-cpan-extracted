@@ -1,0 +1,13 @@
+TYPEMAP
+const char *	T_PV
+CV *	T_CVREF
+
+INPUT
+# The Perl core already has a typemap entry for CV*, but empirically the
+# one in 5.6 is broken.  This is essentially a copy of the one in 5.8,
+# which also works for 5.6.
+T_CVREF
+	if (SvROK($arg) && SvTYPE(SvRV($arg))==SVt_PVCV)
+		$var = (CV*)SvRV($arg);
+	else
+		croak(\"$var is not a code reference\")

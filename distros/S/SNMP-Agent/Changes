@@ -1,0 +1,8 @@
+Revision history for SNMP-Agent
+
+0.02    2011-05-17 12:38
+        Allow empty root OID so that an agent can register unrelated OIDs.
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

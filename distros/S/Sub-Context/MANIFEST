@@ -1,0 +1,14 @@
+Build.PL
+Changes
+lib/Sub/Context.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+SIGNATURE
+t/0-signature.t
+t/basic.t
+t/pod.t
+t/pod-coverage.t
+t/subs.t
+SIGNATURE    Added here by Module::Build

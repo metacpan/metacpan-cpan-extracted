@@ -1,0 +1,34 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Number::Complex
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = Complex.new(...);
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef::Types::Number::Number
+
+=head1 METHODS
+
+
+=head2 new
+
+Complex.new() -> I<Obj>
+
+Return the
+
+Aliases: I<call>
+
+=cut

@@ -1,0 +1,23 @@
+Revision history for Sub-QuoteX-Utils
+
+0.03      2016-12-18 07:16:46-05:00 America/New_York
+
+  [DISTRIBUTION FIX]
+
+    * distribution inadvertently contained a debug version of Sub::Quote
+    * requires Sub::Quote version 2.002002 for sanitize_identifier
+
+0.02      2016-12-16 17:23:01-05:00 America/New_York
+
+  [BUG FIX]
+
+    * quote_subs ensures that Sub::Quote::quote_sub gets the correct
+      compile context and subroutine package.
+
+  [ENHANCEMENTS]
+
+    * quote_subs can now inline syntactically incomplete code
+      snippets.
+
+0.01      2016-12-16 09:59:32-05:00 America/New_York
+    * Initial release

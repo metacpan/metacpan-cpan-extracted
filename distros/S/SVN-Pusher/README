@@ -1,0 +1,47 @@
+This is the README file for SVN::Push, a subversion repository
+distribution tool.
+
+Subversion is a version control system, you can find more information
+at http://subversion.tigris.org/.
+
+svn-pusher is a command line utility that allows one to propagate ("push")
+changesets between two repositories. SVN::Pusher is the back-end, and
+SVN::Pusher::CmdLine is its derived class, that also reports messages
+to the command line.
+
+* Installation
+
+You need subversion 0.37.0 release or newer, with perl bindings support
+to use SVN::Push.
+
+SVN::Push uses the stanard perl module install process:
+
+% perl Makefile.PL
+% make
+# make install
+
+* Configuration
+
+After install the module, see perldoc bin/svnpush and perldoc Push.pm for more
+information.
+
+* AUTHORS
+
+Shlomi Fish ( L<http://www.shlomifish.org/> )
+
+(based on SVN::Push by Gerald Richter E<lt>richter@dev.ecos.deE<gt>)
+
+* CREDITS
+
+A lot of ideas and code were taken from SVN::Mirror, which is written by
+Chia-liang Kao E<lt>clkao@clkao.orgE<gt>.
+
+* COPYRIGHT
+
+Copyright 2004 by Gerald Richter E<lt>richter@dev.ecos.deE<gt>
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+See http://www.perl.com/perl/misc/Artistic.html
+

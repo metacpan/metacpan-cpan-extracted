@@ -1,0 +1,8 @@
+Revision history for Perl extension SWIFT::Factory::Tag::Tag30T.
+
+0.01  24-Feb-2003
+	   - First beta release
+
+0.02  06-Mar-2003
+      - Added SWIFT::Factory::Tag::Tag30 to the PREREQ_PM in Makefile.PL
+

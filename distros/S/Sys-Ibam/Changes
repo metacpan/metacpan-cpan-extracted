@@ -1,0 +1,32 @@
+Revision history for Perl extension Sys::Ibam.
+
+0.05  Tue Apr  5 20:14:34 2005
+	- New ibam.{inl,hpp}.
+	- Changed implemention details of the conversion from c(++) datatypes to
+	  perl types (we now use PERL_MAGIC_ext).
+	- Added optional do_second_correction option to constructor.
+	- Integrated automatical corrections.
+
+0.04  Sat Apr  2 05:14:04 2005
+	- Updated ibam.{inl,hpp} with a pmu aware version.
+
+0.03  Sun Jan  9 13:18:07 2004
+	- Removed constant-{c,xs}.inc and related stuff.
+	- Added code to make intelligent guesses about what compiler to use to
+	  Makefile.PL. Most of it is stolen from Neil Watkiss' Inline::CPP module.
+	- Added a useful documentation.
+	- Removed load_{battery,charge} bindings.
+	- profile_filename() now takes a string as its second argument.
+	- current_profile_type() now returns a string, not a number. That's more
+	  readable and understandable. So there's no need for constants anymore.
+	- set_profile_logging() evaluates its argument correct. There's no need to
+	  pass 0 or 1 anymore. Every boolean expression will work.
+	- onBattery() was renamed to on_battery().
+
+0.02  Mon Dez 27 21:48:02 2004
+	- Make proper use of XS.
+
+0.01  Mon Jul 12 06:17:55 2004
+	- original version; created by h2xs 1.23 with options
+		-O -n Sys::Ibam
+

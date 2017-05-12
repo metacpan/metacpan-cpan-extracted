@@ -1,0 +1,26 @@
+- Wed Nov 28 11:05:08 EST 2007
+
+use 5.6 instead of requiring it; avoids 
+accidentally compiling the stuff.
+
+- Mon Nov 26 10:49:06 EST 2007
+
+No obvious way to dodge the deprecated-our bug in 5.005; 
+so, require 5.6 and be done with it. 
+
+- Wed Nov 21 11:52:44 EST 2007
+
+Repair MANIFEST.
+
+- Tue Nov 20 16:51:05 EST 2007
+
+Add minimal tests. 
+
+Testing this thing will require forking a job to 
+wait for the signal, signaling it, and watching
+for the output. Given the lack of fork on some
+systems this will not be trivial.
+
+- Tue Oct 16 20:59:07 EDT 2007
+
+Initial version

@@ -1,0 +1,6 @@
+Test for Namazu
+
+Namazu is a full-text search system intended for easy
+use.  This file is for testing.
+
+test@namazu.org

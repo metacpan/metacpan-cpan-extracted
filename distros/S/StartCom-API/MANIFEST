@@ -1,0 +1,9 @@
+lib/StartCom/API.pm
+README
+MANIFEST
+COPYING
+Makefile.PL
+StartAPI.pl
+startapi.spec
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,41 @@
+head	1.1;
+access;
+symbols
+	somebranch:1.1.0.2;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2003.07.03.15.34.10;	author clkao;	state dead;
+branches
+	1.1.2.1;
+next	;
+
+1.1.2.1
+date	2003.07.03.15.34.10;	author clkao;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.1
+log
+@file more was initially added on branch somebranch.
+@
+text
+@@
+
+
+1.1.2.1
+log
+@play with common path
+@
+text
+@a0 1
+need 3 files to trigger fast cvs up
+@
+

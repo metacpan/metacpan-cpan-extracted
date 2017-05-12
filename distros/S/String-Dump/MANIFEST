@@ -1,0 +1,18 @@
+bin/dumpstr
+Build.PL
+Changes
+INSTALL
+lib/String/Dump/Debugging.pod
+lib/String/Dump.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00-load.t
+t/functions.t
+xt/author/changes.t
+xt/author/kwalitee.t
+xt/author/pod-coverage.t
+xt/author/pod.t
+xt/author/spelling.t

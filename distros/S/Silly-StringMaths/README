@@ -1,0 +1,46 @@
+Silly::StringMaths provides support for basic integer mathematics, using
+strings rather than numbers. Upper-case letters are positive,
+lower-case letters are negative, so ABCDEF would be 6 (but
+WOMBAT would also be 6), whereas C<positive> would actually be
+-8. Mixed-case is also possible, so Compaq is actually -5.
+Most methods return a canonicalised version of the string -
+e.g. C<ampq> rather than C<Compaq> (mixed case removed,
+the result sorted alphabetically).
+
+The behaviour of other characters is as yet undefined, but be
+warned that non-alphabetical characters may be reserved for
+floating point or imaginary numbers.
+
+Actual numbers (i.e. the characters 0 to 9) will I<never> be used
+by this module.
+
+Sample code:
+
+  use Silly::StringMaths qw(add subtract multiply divide exponentiate);
+
+  # Add two positive numbers - returns ABFOOR
+  print add("FOO", "BAR");
+
+  # Add a generally positive number and a negative number
+  # - returns ot
+  print add("FNoRD", "yncft");
+
+  # Subtract several numbers from a rather large one
+  # - returns accdeiiiiloopssu
+  print subtract("Supercalifragilisticepsialidocious",
+					  "stupid", "made", "up", "word");
+
+  # Multiply two negative numbers - returns AAACCCCCCEEELLLNNN
+  print multiply("cancel", "out");
+
+  # Divide two numbers - returns AAA
+  print divide("EuropeanCommission", "France");
+
+  # Confirm Pythagorus' theorum - returns nothing
+  print subtract(exponentiate("FETLA", "PI"),
+					  exponentiate("TLA", "PI"),
+					  exponentiate("ETLA", "PI"));
+
+All comments on further applications (e.g. floating point) to
+Sam Kington, sam@illuminated.co.uk.
+

@@ -1,0 +1,65 @@
+#!/bin/sh
+
+SCRIPT_HOME=$(dirname $(readlink -s -f $(which $0)))
+SCRIPT=$(basename $0)
+
+TEMPLATES_DIR=$(perl -mFile::ShareDir -e"print File::ShareDir::dist_dir q~Spike~")
+TEMPLATES_DIR="$TEMPLATES_DIR/template"
+
+if [ ! -d "$TEMPLATES_DIR" ]; then
+    >&2 echo "Templates directory doesn't exist: $TEMPLATES_DIR"
+    exit 1
+fi
+
+SITE="$1"
+
+if [ -z "$SITE" ]; then
+    >&2 echo "Usage: $SCRIPT SITE [TEMPLATE]"
+    exit 1
+fi
+
+if [[ ! "$SITE" =~ ^[A-Za-z]([0-9A-Za-z])*$ ]]; then
+    >&2 echo "Site name isn't valid: $SITE"
+    exit 1;
+fi
+
+TEMPLATE="default"
+
+if [ -n "$2" ]; then
+    TEMPLATE="$2"
+
+    if [ ! -d "$TEMPLATES_DIR/$TEMPLATE" ]; then
+        >&2 echo "Template doesn't exist: $TEMPLATE"
+        exit 1;
+    fi
+fi
+
+CURRENT_DIR=$(pwd)
+
+cd "$TEMPLATES_DIR/$TEMPLATE"
+
+for SRC_FILE in $(find . -type f)
+do
+    TARGET_FILE=$(echo "$SRC_FILE" | sed -e "s/deadbeef/${SITE,,}/g" -e "s/Dead[Bb]eef/${SITE^}/g" -e "s/##DEADBEEF##/${SITE^^}/g")
+    TARGET_FILE=$(readlink -m "$CURRENT_DIR/${SITE^}/$TARGET_FILE")
+
+    if [ -e "$TARGET_FILE" ]; then
+        cd "$CURENT_DIR"
+
+        >&2 echo "File is exists: $TARGET_FILE"
+        exit 1
+    fi
+done
+
+for SRC_FILE in $(find . -type f)
+do
+    TARGET_FILE=$(echo "$SRC_FILE" | sed -e "s/deadbeef/${SITE,,}/g" -e "s/Dead[Bb]eef/${SITE^}/g" -e "s/##DEADBEEF##/${SITE^^}/g")
+    TARGET_FILE=$(readlink -m "$CURRENT_DIR/${SITE^}/$TARGET_FILE")
+
+    echo "$TARGET_FILE"
+
+    install -D -m 644 "$SRC_FILE" "$TARGET_FILE"
+    sed -e "s/deadbeef/${SITE,,}/g" -e "s/Dead[Bb]eef/${SITE^}/g" -e "s/DEADBEEF/${SITE^^}/g" -i "$TARGET_FILE"
+done
+
+cd "$CURENT_DIR"

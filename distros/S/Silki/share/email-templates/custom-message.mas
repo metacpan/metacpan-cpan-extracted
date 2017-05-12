@@ -1,0 +1,13 @@
+% for my $para ( split /[\r\n]{2,}/, $message ) {
+<p>
+<% $para | h %>
+</p>
+% }
+
+<%args>
+$message => undef
+</%args>
+
+<%init>
+return if string_is_empty($message);
+</%init>

@@ -1,0 +1,24 @@
+
+Revision history for perl module SocialFlow::Deploy ( see https://metacpan.org/module/CPAN::Changes::Spec )
+
+0.22      2014-11-20 20:58:22+00:00 Europe/London
+
+    - fix for changes to pathing upstream in https://metacpan.org/pod/LWP::Protocol::http::SocketUnixAlt
+
+0.21      2014-03-28 18:38:37 Europe/London
+
+    - had left out URI:: subclass from last version
+
+0.2       2014-03-28 17:03:03 Europe/London
+
+    - pod fixes, better test
+
+0.1_02    2014-03-27 21:58:07 Europe/London
+
+    - ua attribute added
+    - basic auth support
+    - inet_http_server support added.
+
+0.1_01    2014-03-27 02:38:51 Europe/London
+
+    - First release

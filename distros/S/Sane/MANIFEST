@@ -1,0 +1,17 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+Sane.xs
+examples/scanimage.pl
+examples/scanadf.pl
+lib/Sane.pm
+saneperl.h
+typemap
+t/data.t
+t/enums.t
+t/err.t
+t/non-blocking.t
+t/options.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

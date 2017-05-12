@@ -1,0 +1,205 @@
+
+=head1 NAME
+
+ SyslogScan::Daemon::BlacklistDetector - notice when a mail server has been blacklisted
+
+=head1 SYNOPSIS
+
+ plugin SyslogScan::Daemon::BlacklistDetector
+	debug		0
+
+ bld_plugin SyslogScan::Daemon::BlacklistDetector::Postfix
+	debug		0
+	rx_ourIP	127\.0\.0\.1
+	logpath		/var/log/mail.log
+
+ bld_plugin SyslogScan::Daemon::BlacklistDetector::EmailNotify
+	debug		0
+	notify		your@email.here
+	renotify_time	7200
+	forget_time	3600
+	sendfrom	root
+	clean_time	1800
+	maxkeep		100
+
+=head1 DESCRIPTION
+
+SyslogScan::Daemon::BlacklistDetector watches the mail log for
+SMTP reject messages that indicate that your mail server has been
+blacklisted by another site.
+
+SyslogScan::Daemon::BlacklistDetector is a plugin for
+L<SyslogScan::Daemon>.  The SYNOPSIS shows the configuration
+lines you might use in C</etc/syslogscand.conf> to turn on
+the blacklist detector.  
+
+=head1 CONFIGURATION PREFIX
+
+The configuration prefix for plugins for SyslogScan::Daemon::BlacklistDetector
+is C<bld_>.   Use C<bld_plugin> to load plugins.
+
+=head1 CONFIGURATION PARAMETERS
+
+SyslogScan::Daemon::BlacklistDetector defines the following configuration
+parameters which may be given in indented lines that follow
+C<plugin SyslogScan::Daemon::BlacklistDetector> or with the
+confuration prefix (C<bld_>) anywhere in the configuration file after the 
+C<plugin SyslogScan::Daemon::BlacklistDetector> line.
+
+=over 15
+
+=item debug
+
+(default 0) Turn on debugging.
+
+=back
+
+=head1 WRITING PLUGINS
+
+Plugins for SyslogScan::Daemon::BlacklistDetector should subclass
+C<SyslogScan::Daemon::BlacklistDetector::Plugin>.
+Except for C<new()> and C<preconfig()>, all of these methods
+are optional.
+
+SyslogScan::Daemon::BlacklistDetector will invoke the following
+methods on its plugins:
+
+=over 15
+
+=item new()
+
+See notes for plugins for L<SyslogScan::Daemon>.
+
+=item preconfig()
+
+See notes for plugins for L<SyslogScan::Daemon>.
+
+=item get_logs()
+
+See notes for plugins for L<SyslogScan::Daemon>.
+
+=item parse_logs()
+
+Called after one of the regular expressions returned by 
+C<get_logs()> matched a log line.  The arguments are
+the log filename where the match was found and the
+regular expression that matched.  Passed implicitly
+are the line that was matched (C<$_>) and any of the
+numbered regular expression submatches (C<$1>, C<$2>,
+etc).  
+
+The return value is a %hash of information.  The hash
+should be completely empty if the log line is not a 
+SMPT rejection.
+
+The following keys are required:
+
+=over 15
+
+=item status
+
+This should be C<deferred> for a 4XX rejection and C<bounced>
+for a 5XX rejection.
+
+=item logline
+
+This should be the whole log line (C<$_>).
+
+=item sourceip
+
+The IP address used by the MTA for sending email.  This may
+be C<unknown>.
+
+=item destdomain
+
+The domain of the recipient that bounced.
+
+=item to_address
+
+The recipient that bounced.
+
+=back
+
+The return value is the C<%info> hash passed to exactly one of the 
+following:
+C<grelisted()>, 
+C<recipient_reject()>,
+C<sender_reject()>,
+C<content_reject()>
+C<realtime_reject()>, 
+and C<blacklisted()>.
+
+=item greylisted(%info)
+
+This is called if the C<logline> returned by C<parse_logs()> 
+contatins the word C<greylisted>.  
+
+=item recipient_reject(%info)
+
+This is called if the C<logline> returned by C<parse_logs()> 
+matches a regular expression that indicates that the rejection was
+due to being sent to a particular recipient.
+
+The regular expression is hard-coded to encourage everyone to 
+share any changes with the author.
+
+=item sender_reject(%info)
+
+This is called if the C<logline> returned by C<parse_logs()> 
+matches a regular expression that indicates that the rejection was
+due to being sent from a particular sender.
+
+The regular expression is hard-coded to encourage everyone to 
+share any changes with the author.
+
+=item content_reject(%info)
+
+This is called if the C<logline> returned by C<parse_logs()> 
+matches a regular expression that indicates that the rejection was
+due to the content of the message sent.
+
+The regular expression is hard-coded to encourage everyone to 
+share any changes with the author.
+
+=item realtime_reject(%info)
+
+This is called if the C<logline> returned by C<parse_logs()> 
+matches a regular expression that indicates that the rejection was
+due to a transitory blacklist.  
+
+The regular expression is hard-coded to encourage everyone to 
+share any changes with the author.
+
+=item blacklisted(%info)
+
+This is called for lines that don't match the regular expressions
+for C<grelisted()>, C<realtime_reject()>, C<sender_reject()>,
+or C<recipient_reject()> or C<content_reject()>.
+
+=item periodic()
+
+See notes for plugins for L<SyslogScan::Daemon>.
+
+=back
+
+=head1 LICENSE
+
+Copyright (C) 2006, David Muir Sharnoff <muir@idiom.com>
+
+This module may be used and copied on the same terms as Perl
+itself.
+
+If you need help writing additional modules for BlacklistDetector.pm,
+I'm usually available to do so.  Inquire for rates.
+
+=head1 SEE ALSO
+
+The context for the blacklist detector:
+L<SyslogScan::Daemon>,
+L<Plugins>,
+L<Plugins::API>.
+
+Plugins for the blacklist detector:
+L<SyslogScan::Daemon::BlacklistDetector::Postfix>,
+L<SyslogScan::Daemon::BlacklistDetector::EmailNotify>.
+

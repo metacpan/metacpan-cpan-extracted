@@ -1,0 +1,33 @@
+Stem::Sock::Msg
+
+This cell is the primary way of interfacing external programs to the 
+Stem messaging system.  It is effectively a gateway with a standard 
+socket on the outside and a message interface on the inside.  The 
+socket side takes standard Stem socket parameters for configuration. 
+The message side has a variety of message types and options to 
+control buffering. 
+
+The socket parameters are directly passed to a Stem::Socket cell, and 
+supports both client and server modes.  Multiple instances of this 
+Stem::Sock::Msg cell are supported and can be created via socket 
+connection or acceptance.  If a connected socket is externally shut 
+down  it can optionally be reconnected automatically.
+
+When the socket is connected or disconnected, a status message can be 
+sent out.  This is used to trigger the addressed cell to be made 
+aware of the new socket status and act accordingly.  For example, in 
+an inetd emulation, the socket connected message would cause the 
+address Stem::Proc cell to start a process and logically connect it 
+to this Stem::Sock::Msg cell.  Similarly, the socket closed message 
+would cause the process to shut down and the logical connection to be 
+broken. 
+
+When data comes in from the socket, it is buffered and sent out via a 
+data message to an addressed cell.  Optionally, all incoming data can 
+be buffered and only sent out in a single message when the socket is 
+closed.  This reduces the need for some cells to do their own 
+buffering. 
+
+As with all Stem cells, various status information can be logged to 
+logical logs using the Stem logging system.  Which status is logged 
+can be controlled by the configuration of the cell.

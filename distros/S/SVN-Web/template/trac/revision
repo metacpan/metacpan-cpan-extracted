@@ -1,0 +1,98 @@
+[% PROCESS header %]
+
+[% PROCESS _action_menu %]
+[% PROCESS _log_msg %]
+
+[% class_with_action = { 'A' => 'add',
+                         'M' => 'mod',
+                         'D' => 'rem',
+                         } %]
+
+<div id="ctxtnav" class="nav">
+  <h2>[%|l%](revision navigation)[%END%]</h2>
+
+  <ul>
+    <li class="first">[% IF rev > 1 %]<a href="[% c.script %]/[% c.repos | uri %]/revision/?rev=[% rev - 1 %]">[%|l%](previous revision)[%END%]</a>[% ELSE %][%|l%](previous revision)[%END%][% END %]</li>
+    <li>[% IF rev != youngest_rev %]<a href="[% c.script %]/[% c.repos | uri %]/revision/?rev=[% rev + 1 %]">[%|l%](next revision)[%END%]</a>[% ELSE %][%|l%](next revision)[%END%][% END %]</li>
+    <li class="last">[% IF rev != youngest_rev %]<a href="[% c.script %]/[% c.repos | uri %]/revision/">[%|l%](youngest revision)[%END%]</a>[% ELSE %][%|l%](youngest revision)[%END%][% END %]</li>
+  </ul>
+</div>
+
+<div id="jumprev">
+  <form action="[% self_uri %]" method="get">
+   <div>
+    <label for="rev">[%|l%](goto revision)[%END%]</label>
+    <input type="text" id="rev" name="rev" value="[% rev %]" size="4" />
+   </div>
+  </form>
+</div>
+
+<h1>[%|l%](revision)[%END%] [% rev %]</h1>
+
+<dl id="overview">
+  <dt class="time">[%|l%](date)[%END%]:</dt>
+  <dd class="time">[% date %]</dd>
+
+  <dt class="author">[%|l%](author)[%END%]:</dt>
+  <dd class="author">[% author || '(no author)' %]</dd>
+
+  <dt class="message">[%|l%](revision log)[%END%]:</dt>
+  <dd class="message">[% log_msg(msg) %]</dd>
+
+  <dt class="files">[%|l%](files)[%END%]:</dt>
+  <dd class="files">
+    <ul>
+    [% FOREACH path = paths %]
+    <li>
+      <div class="[% class_with_action.${path.value.action} %]"></div>
+      [% IF path.value.isdir %]
+        [% IF path.value.action == 'D' %]
+          [% path.key %]
+        [% ELSE %]
+          <a href="[% c.script %]/[% c.repos | uri %]/browse[% path.key | url %]?rev=[% rev %]">[% path.key %]</a>
+          [% IF path.value.copyfrom %]([%|l%](copied from)[%END%]
+          <a href="[% c.script %]/[% c.repos | uri %]/browse[% path.value.copyfrom | url %]?rev=[% path.value.copyfromrev %]">[% path.value.copyfrom %]:[% path.value.copyfromrev %]</a>)
+          [% END %]
+        [% END %]
+      [% ELSE %]
+        [% IF path.value.action == 'D' %]
+          [% path.key %]
+        [% ELSE %]
+          <a href="[% c.script %]/[% c.repos | uri %]/view[% path.key | url %]?rev=[% rev %]">[% path.key %]</a>
+          [% IF path.value.action == 'M' AND diff AND diff_size <= max_diff_size %]
+            (<a href="#diff_[% path.key | uri | anchor %]">[%|l%](diff)[%END%]</a>)
+          [% END %]
+          [% IF path.value.action == 'A' AND diff AND diff_size <= max_diff_size %]
+            (<a href="#diff_[% path.key | uri | anchor %]">[%|l%](diff)[%END%]</a>)
+          [% END %]
+          (<a href="[% c.script %]/[% c.repos | uri %]/checkout[% path.key | url %]?rev=[% rev %]">[%|l%](checkout)[%END%]</a>)
+        [% END %]
+        [% IF path.value.copyfrom %]([%|l%](copied from)[%END%]
+          <a href="[% c.script %]/[% c.repos | uri %]/view[% path.value.copyfrom | url %]?rev=[% path.value.copyfromrev %]">[% path.value.copyfrom %]:[% path.value.copyfromrev %]</a>)
+        [% END %]
+      [% END %]
+    </li>
+    [% END %]
+    </ul>
+  </dd>
+</dl>
+
+<div class="diff">
+  <div id="legend">
+    <h3>[%|l%](legend)[%END%]:</h3>
+    <dl>
+      <dt class="add">&nbsp;</dt><dd>[%|l%](added)[%END%]</dd>
+      <dt class="rem">&nbsp;</dt><dd>[%|l%](removed)[%END%]</dd>
+      <dt class="mod">&nbsp;</dt><dd>[%|l%](modified)[%END%]</dd>
+    </dl>
+  </div>
+
+  [% FOREACH path = paths;
+       NEXT IF path.value.isdir;
+       include_diff = 1;
+     END %]
+</div>
+
+[% INCLUDE '_diff' IF diff AND include_diff %]
+
+[% PROCESS footer %]

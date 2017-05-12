@@ -1,0 +1,35 @@
+# Simple test setup for synsim
+TITLE: Quadratic function sweep
+SIMULATION : quadratic_sweep
+#DEVTYPE : OPSnode
+# extension of template files (default: .templ)
+TEMPL : .templ
+PLOTTEMPL : .gnuplot
+# the command line to run the simulation (default: perl inputfile outputfile)
+# 'inputfile' and 'outputfile' are keywords
+COMMAND : ./quadratic_sweep.py -i inputfile -o outputfile
+# extension of input file (default: .pl)
+EXT : .in
+# To filter the output of the simulation
+# To filter the output of the simulation (defaults to .*)
+OUTPUT_FILTER_PATTERN : .*
+GROUP: _A,_B;_C,_D
+# Name of the template file for the result analysis
+ANALYSIS : XYPlot
+
+# assuming the raw output comes in whitespace-separated columns
+XCOL: 1
+YCOL: 2
+
+YLABEL: Y-values
+XLABEL: X-values
+PLOTSTYLE: lines
+
+#PREPROCESSOR: show_results
+_A = 1,2,3
+_B = -10,-9,-8
+_C =  -4,-5
+_D = 1,2
+_XSTART = -10
+_XSTOP = 10
+_XSTEP = 0.5

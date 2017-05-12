@@ -1,0 +1,34 @@
+---
+abstract: 'XPath or JSONPath for Sereal'
+author:
+  - 'Ivan Kruglov <ivan.kruglov@yahoo.com>'
+build_requires:
+  Data::Dumper: '0'
+  ExtUtils::ParseXS: '2.21'
+  File::Find: '0'
+  File::Path: '0'
+  Scalar::Util: '0'
+  Sereal::Decoder: '3.00'
+  Sereal::Encoder: '3.00'
+  Test::Deep: '0'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '7.0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Sereal-Path
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  XSLoader: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/Sereal/Sereal/issues
+  repository: git://github.com/Sereal/Sereal.git
+version: '0.014'

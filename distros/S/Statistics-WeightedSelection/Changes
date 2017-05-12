@@ -1,0 +1,5 @@
+0.002     2014-07-08 02:46:31PDT-0700 America/Los_Angeles
+    - replacing // operator with defined ternary for Perl 5.8 compatibility.
+
+0.001     2014-07-05 18:56:44PDT-0700 America/Los_Angeles
+    - initial release of module

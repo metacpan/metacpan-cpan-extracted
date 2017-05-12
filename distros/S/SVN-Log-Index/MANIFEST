@@ -1,0 +1,16 @@
+bin/sli
+Build.PL
+CHANGES
+lib/SVN/Log/Index.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README
+t/01use.t
+t/02basics.t
+t/03bugs.t
+t/04commandline.t
+t/05errors.t
+TODO
+SIGNATURE    Added here by Module::Build

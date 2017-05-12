@@ -1,0 +1,149 @@
+1.36 - 29.12.2016
+     Fixed exit code in all commands
+
+1.35 - 16.11.2016
+     Fixed missing "exit 0" in status command
+
+1.34 - 14.11.2016
+     Support for grace restart implemented
+
+1.33 - 12.03.2015
+     Fixed critical issue with restart.
+
+1.32 - 13.02.2015
+     Fixed hang when process was killed while restarting.
+     
+1.31 - 09.02.2015
+     Fixed typo in description.
+     Fixet exit code handling by "start" action.
+
+1.29 - 27.12.2014
+    Fixed tests, updated manifest.
+
+1.28 - 25.12.2014 01:19
+    Fixed 1.27 release.
+
+1.27 - 24.12.2014 22:17
+    Removed shebangs from tests.
+    
+1.26
+    Added mandatory parameter: --provides. If omitted, geninitd will ask user for input.
+    Added monitoring logic by pidfile, without process_name.
+
+1.25
+
+    Added simple messages for start and stop commands.
+    Added constants for start, stop, started, stopped messages.
+    Added System::InitD::Const import in System/InitD.pm.
+
+1.24
+
+    Added newline to System::InitD messages.
+    Added new function for runner: info. Info returns more detailed output, than status.
+    
+1.23
+
+    Fixed error 
+    "Can't call method "user" on an undefined value at /usr/local/share/perl/5.14.2/System/InitD/Runner.pm line 282." When restarting while daemon is not running.
+
+1.22
+
+    Fixed "deprecated" warning, when stop called while daemon is not running.
+    Makefile.PL fixed.
+
+1.21
+    
+    Test fixed.
+
+1.20
+
+    Added manifest.
+    Added github links.
+    Makefile was improved.
+
+1.19
+    
+    Templates improved, from now for init.d scripts shebangs current interpreter
+    path will be used.
+    
+    CONFIGURE_REQUIRED section was fixed.
+
+1.18
+
+    Added pid-replacement injection protection
+
+1.17
+
+    Developers release
+
+1.16
+
+    Tests fixed
+
+1.15
+
+    POD fixed.
+    TEST_REQUIRES section of MakeMaker has been added.
+    Template files renamed from .tt to .tpl.
+
+1.14
+
+    POD fixed.
+
+1.13
+
+    Template as dependency was removed. System::InitD::Template - minimalistic template system for System::InitD
+
+1.10 - 1.12
+
+    Developers release
+
+1.09
+    Added hooks for more flexble init.d scripts tuning. Following hooks are available:
+        before_start
+        after_start
+        before_stop
+        after_stop
+
+    Tests are fixed
+ 
+1.08
+
+    Hardcode removed
+
+1.07
+
+    System::InitD::Runner fixed, old deps was removed.
+
+1.06
+
+    Restart time extremely decreazed, from now restart is blazing fast.
+
+1.05
+
+    System components namespace changed to System::InitD::GenInit::$OSname
+    Added new module for centos init.d scripts generation
+
+1.04
+
+    Fixed major bug with single quotes
+
+1.03
+
+    On-flight System::InitD modules loading
+
+1.02
+
+    Debian teplate minor fixes
+
+1.01
+
+    Template is more readable
+
+1.0
+
+    Start parameters was changed. Now parameter is string instead of hashref.
+
+0.9
+
+    System::Process integrated

@@ -1,0 +1,29 @@
+[
+	class	=>	'Stem::Console',
+],
+[
+	'class'	=>	'Stem::Hub',
+	'name'	=>	'tick_driver',
+	'args'	=>	[],
+],
+[
+	'class'	=>	'Stem::Portal',
+	'name'	=>	'tick_server',
+	'args'	=>	[
+		'server'	=> 1,
+	],
+],
+[
+	class	=>	'Stem::WorkQueue',
+	name	=>	'dbi_queue',
+	args	=>	[],
+],
+
+
+[
+	'class'	=>	'Stem::Load::Ticker',
+	'name'	=>	'tick',
+	'args'	=>	[
+		dbi_addr	=> 'dbi_queue',
+	],
+],

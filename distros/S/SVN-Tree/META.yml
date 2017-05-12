@@ -1,0 +1,319 @@
+---
+abstract: 'SVN::Fs plus Tree::Path::Class'
+author:
+  - 'Mark Gardner <mjgardner@cpan.org>'
+build_requires:
+  Carp: 0
+  English: 0
+  File::Find: 0
+  File::Temp: 0
+  Scalar::Util: 0
+  Test::More: 0.94
+  Test::Most: 0
+  Test::Requires: 0
+  perl: 5.006
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300009, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: SVN-Tree
+requires:
+  Alien::SVN: 0
+  List::MoreUtils: 0
+  Modern::Perl: 0
+  Moose: 0
+  MooseX::Has::Options: 0
+  MooseX::MarkAsMethods: 0
+  MooseX::Types: 0
+  MooseX::Types::Moose: 0
+  MooseX::Types::Path::Class: 0
+  Path::Class: 0
+  SVN::Core: 0
+  SVN::Fs: 0
+  SVN::Repos: 0
+  Tree::Path::Class: 0
+  Try::Tiny: 0
+  perl: 5.010
+  strict: 0
+  utf8: 0
+resources:
+  bugtracker: https://github.com/mjgardner/SVN-Tree/issues
+  homepage: http://metacpan.org/release/SVN-Tree/
+  repository: git://github.com/mjgardner/SVN-Tree.git
+version: 0.005
+x_Dist_Zilla:
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      name: '@Filter/GatherDir'
+      version: 4.300009
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@Filter/PruneCruft'
+      version: 4.300009
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@Filter/ManifestSkip'
+      version: 4.300009
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@Filter/MetaYAML'
+      version: 4.300009
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@Filter/License'
+      version: 4.300009
+    -
+      class: Dist::Zilla::Plugin::ExtraTests
+      name: '@Filter/ExtraTests'
+      version: 4.300009
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@Filter/ExecDir'
+      version: 4.300009
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@Filter/ShareDir'
+      version: 4.300009
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@Filter/Manifest'
+      version: 4.300009
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@Filter/TestRelease'
+      version: 4.300009
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@Filter/ConfirmRelease'
+      version: 4.300009
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@Filter/UploadToCPAN'
+      version: 4.300009
+    -
+      class: inc::SVNMakeMaker
+      name: SVNMakeMaker
+      version: ~
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: AutoPrereqs
+      version: 4.300009
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: Prereqs
+      version: 4.300009
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: develop
+          type: requires
+      name: DevelopRequires
+      version: 4.300009
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: develop
+          type: recommends
+      name: DevelopRecommends
+      version: 4.300009
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: test
+          type: recommends
+      name: TestRecommends
+      version: 4.300009
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: NextRelease
+      version: 4.300009
+    -
+      class: Dist::Zilla::Plugin::PkgDist
+      name: PkgDist
+      version: 4.300009
+    -
+      class: Dist::Zilla::Plugin::OurPkgVersion
+      name: OurPkgVersion
+      version: 0.003002
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      name: PodWeaver
+      version: 3.101641
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: MetaConfig
+      version: 4.300009
+    -
+      class: Dist::Zilla::Plugin::Test::UnusedVars
+      name: '@TestingMania/Test::UnusedVars'
+      version: 2.0.1
+    -
+      class: Dist::Zilla::Plugin::Test::Synopsis
+      name: '@TestingMania/Test::Synopsis'
+      version: 2.0.1
+    -
+      class: Dist::Zilla::Plugin::Test::Portability
+      name: '@TestingMania/Test::Portability'
+      version: 2.0.2
+    -
+      class: Dist::Zilla::Plugin::Test::Version
+      name: '@TestingMania/Test::Version'
+      version: 0.001004
+    -
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: '@TestingMania/PodCoverageTests'
+      version: 4.300009
+    -
+      class: Dist::Zilla::Plugin::Test::Perl::Critic
+      name: '@TestingMania/Test::Perl::Critic'
+      version: 2.112410
+    -
+      class: Dist::Zilla::Plugin::Test::CPAN::Changes
+      name: '@TestingMania/Test::CPAN::Changes'
+      version: 0.005
+    -
+      class: Dist::Zilla::Plugin::Test::CPAN::Meta::JSON
+      name: '@TestingMania/Test::CPAN::Meta::JSON'
+      version: 0.003
+    -
+      class: Dist::Zilla::Plugin::Test::DistManifest
+      name: '@TestingMania/Test::DistManifest'
+      version: 2.0.1
+    -
+      class: Dist::Zilla::Plugin::MetaTests
+      name: '@TestingMania/MetaTests'
+      version: 4.300009
+    -
+      class: Dist::Zilla::Plugin::Test::Compile
+      name: '@TestingMania/Test::Compile'
+      version: 1.112820
+    -
+      class: Dist::Zilla::Plugin::Test::Kwalitee
+      name: '@TestingMania/Test::Kwalitee'
+      version: 2.03
+    -
+      class: Dist::Zilla::Plugin::NoTabsTests
+      name: '@TestingMania/NoTabsTests'
+      version: 0.01
+    -
+      class: Dist::Zilla::Plugin::Test::MinimumVersion
+      name: '@TestingMania/Test::MinimumVersion'
+      version: 2.0.1
+    -
+      class: Dist::Zilla::Plugin::Test::Pod::LinkCheck
+      name: '@TestingMania/Test::Pod::LinkCheck'
+      version: 1.001
+    -
+      class: Dist::Zilla::Plugin::Test::EOL
+      name: '@TestingMania/Test::EOL'
+      version: 0.04
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@TestingMania/PodSyntaxTests'
+      version: 4.300009
+    -
+      class: Dist::Zilla::Plugin::MojibakeTests
+      name: '@TestingMania/MojibakeTests'
+      version: 0.3
+    -
+      class: Dist::Zilla::Plugin::PerlTidy
+      name: PerlTidy
+      version: 0.12
+    -
+      class: Dist::Zilla::Plugin::ReadmeAnyFromPod
+      name: ReadmeAnyFromPod
+      version: 0.120120
+    -
+      class: Dist::Zilla::Plugin::ReadmeAnyFromPod
+      name: ReadmePodInRoot
+      version: 0.120120
+    -
+      class: Dist::Zilla::Plugin::ReportVersions
+      name: ReportVersions
+      version: 1.110730
+    -
+      class: Dist::Zilla::Plugin::InstallGuide
+      name: InstallGuide
+      version: 1.101461
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: MetaJSON
+      version: 4.300009
+    -
+      class: Dist::Zilla::Plugin::Git::Check
+      name: '@Git/Check'
+      version: 1.120370
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      name: '@Git/Commit'
+      version: 1.120370
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      name: '@Git/Tag'
+      version: 1.120370
+    -
+      class: Dist::Zilla::Plugin::Git::Push
+      name: '@Git/Push'
+      version: 1.120370
+    -
+      class: Dist::Zilla::Plugin::Git::CommitBuild
+      name: Git::CommitBuild
+      version: 1.120370
+    -
+      class: Dist::Zilla::Plugin::Git::NextVersion
+      name: Git::NextVersion
+      version: 1.120370
+    -
+      class: Dist::Zilla::Plugin::GitHub::Meta
+      name: '@GitHub/GitHub::Meta'
+      version: 0.16
+    -
+      class: Dist::Zilla::Plugin::GitHub::Update
+      name: '@GitHub/GitHub::Update'
+      version: 0.16
+    -
+      class: Dist::Zilla::Plugin::InstallRelease
+      name: InstallRelease
+      version: 0.008
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: 4.300009
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: 4.300009
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: 4.300009
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: 4.300009
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: 4.300009
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: 4.300009
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: 0
+    version: 4.300009

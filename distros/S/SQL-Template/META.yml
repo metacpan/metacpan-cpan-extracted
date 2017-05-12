@@ -1,0 +1,28 @@
+---
+abstract: 'A new way to organize your database code'
+author:
+  - 'Miguel Prz <niceperl@gmail.com>'
+build_requires:
+  DBD::SQLite: 1.25
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: SQL-Template
+requires:
+  Carp: 0
+  DBI: 0
+  XML::Parser: 0
+  base: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/niceperl/SQL-Template/issues
+  homepage: https://github.com/niceperl/SQL-Template
+  repository: https://github.com/niceperl/SQL-Template
+version: 0.2.2

@@ -1,0 +1,24 @@
+[
+	class	=>	'Stem::Console',
+],
+[
+	'class'	=>	'Stem::Hub',
+	'name'	=>	'Load',
+	'args'	=>	[],
+],
+[
+	'class'	=>	'Stem::Portal',
+	'name'	=>	'load',
+	'args'	=>	[
+		'port'		=> 10001,
+	],
+],
+[
+	class	=>	'Stem::Load::Driver',
+	name	=>	'driver',
+	args	=>	[
+			'load_addr'	=> 'Echo:echo',
+			'max_loads_per_hub' => 1,
+			'max_load_msgs'	=> 100,
+	],
+],

@@ -1,0 +1,15 @@
+Changes
+Debian_CPANTS.txt
+ignore.txt
+MANIFEST
+Makefile.PL
+README
+lib/SMS/Send/Smstrade.pm
+t/00-load.t
+t/critic.t
+t/kwalittee.t
+t/manifest.t
+t/perlcriticrc
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

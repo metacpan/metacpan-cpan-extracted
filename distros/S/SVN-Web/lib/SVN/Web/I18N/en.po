@@ -1,0 +1,337 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../Template/trac/log:40 ../Template/trac/log:44
+#. (pk.value.copyfrom, pk.value.copyfromrev)
+msgid "%1:%2"
+msgstr ""
+
+#: ../Template/trac/revision:76
+msgid "(added)"
+msgstr "Added"
+
+#: ../Template/trac/log:15 ../Template/trac/revision:26
+msgid "(author)"
+msgstr "Author"
+
+#: ../Template/trac/browse:18
+msgid "(browse directory)"
+msgstr "Browse directory"
+
+#: ../Template/trac/log:6
+msgid "(changes)"
+msgstr "changes"
+
+#: ../Template/trac/log:62 ../Template/trac/revision:60 ../Template/trac/view:1
+msgid "(checkout)"
+msgstr "Checkout"
+
+#: ../Template/trac/list:3
+msgid "(choose repos)"
+msgstr "Please select a repository to browse:"
+
+#: ../Template/trac/revision:43 ../Template/trac/revision:62
+msgid "(copied from)"
+msgstr "copied from"
+
+#: ../Template/trac/log:12 ../Template/trac/revision:23
+msgid "(date)"
+msgstr "Date"
+
+#: ../Template/trac/log:16 ../Template/trac/revision:53 ../Template/trac/revision:57
+msgid "(diff)"
+msgstr "Diff"
+
+#: ../Template/trac/log:13
+msgid "(file)"
+msgstr "File"
+
+#: ../Template/trac/revision:32
+msgid "(files)"
+msgstr "Files"
+
+#: ../Template/trac/log:55 ../Template/trac/log:65
+#. (pk.value.copyfrom, pk.value.copyfromrev)
+msgid "(from %1:%2)"
+msgstr ""
+
+#: ../Template/trac/browse:7
+msgid "(goto revision)"
+msgstr "Go to:"
+
+#: ../Template/trac/browse:24
+msgid "(last change)"
+msgstr "Last Change"
+
+#: ../Template/trac/revision:74
+msgid "(legend)"
+msgstr "Legend"
+
+#: ../Template/trac/revision:78
+msgid "(modified)"
+msgstr "Modified"
+
+#: ../Template/trac/browse:21
+msgid "(name)"
+msgstr "Name"
+
+#: ../Template/trac/revision:14
+msgid "(next revision)"
+msgstr "Next Revision"
+
+#: ../Template/trac/browse:16
+msgid "(no directory entries)"
+msgstr "There are no directory entries to show"
+
+#: ../Template/trac/list:13
+msgid "(no repos)"
+msgstr "No repositories are available for browsing."
+
+#: ../Template/trac/footer:4
+msgid "(powered by)"
+msgstr "Powered by SVN::Web"
+
+#: ../Template/trac/revision:11
+msgid "(previous revision)"
+msgstr "Previous Revision"
+
+#: ../Template/trac/revision:77
+msgid "(removed)"
+msgstr "Removed"
+
+#: ../Template/trac/header:12 ../Template/trac/header:22
+msgid "(repository list)"
+msgstr "Repository List"
+
+#: ../Template/trac/browse:13 ../Template/trac/log:17 ../Template/trac/log:9 ../Template/trac/revision:29 ../Template/trac/view:1 ../Template/trac/view:3
+msgid "(revision log)"
+msgstr "Revision Log"
+
+msgid "(view revision log)"
+msgstr "View Revision Log"
+
+#: ../Template/trac/revision:7
+msgid "(revision navigation)"
+msgstr "Revision Navigation"
+
+#: ../Template/trac/browse:22 ../Template/trac/log:14 ../Template/trac/revision:20 ../Template/trac/view:6
+msgid "(revision)"
+msgstr "Revision"
+
+#: ../Template/trac/log:6
+msgid "(show last)"
+msgstr "Show last: "
+
+#: ../Template/trac/browse:23
+msgid "(size)"
+msgstr "Size"
+
+#: ../Template/trac/header:12
+msgid "(via)"
+msgstr "via"
+
+#: ../Template/trac/revision:15
+msgid "(youngest revision)"
+msgstr "Most Recent"
+
+#: ../Template/trac/log:3
+msgid "(rss)"
+msgstr "RSS Feed"
+
+msgid "(diff range)"
+msgstr "Diff between <a href=\"%1/%2/revision?rev=%3\">%3</a> and <a href=\"%1/%2/revision?rev=%4\">%4</a>"
+
+msgid "(reverse diff)"
+msgstr "Reverse Diff"
+
+msgid "(path %1 does not exist in revision %2)"
+msgstr "The path <tt>\"%1\"</tt> does not exist in the repository at "
+"revision %2.\n"
+"\n"
+"This is probably caused by a typo in the URL.  This error should never "
+"happen from a link that you have clicked within SVN::Web.  It is more likely "
+"that you have followed a link from an outside source, and that link is "
+"either broken, or refers to a file that is no longer in the repository.\n"
+"\n"
+"If you are absolutely certain that you link you are following was generated "
+"by SVN::Web (and you know that the file definitely exists in the repository "
+"at this revision) then please report this as a bug so that it can be fixed."
+
+msgid "(cannot diff nodes of different types: %1 %2 %3)"
+msgstr "The path <tt>\"%1\"</tt> is of a different type at rev %2 and "
+"rev %3.  This probably happened because you committed something as a file, "
+"deleted it, and then recreated is a directory (or vice-versa).\n"
+"\n"
+"Trying to diff a file to a directory makes no sense."
+
+msgid "(path %1 is a directory at rev %2)"
+msgstr "The path <tt>\"%1\"</tt> is a directory.  SVN::Web does not "
+"currently support generating a diff between two directories."
+
+msgid "(path %1 is not a file in revision %2)"
+msgstr "The path <tt>\"%1\"</tt> is not a file in the repository at "
+"revision %2.\n"
+"\n"
+"This is probably caused by inadvertently trying to checkout a directory. "
+"The <tt>checkout</tt> action can only be used on files."
+
+msgid "(no revision)"
+msgstr "You must provide a revision for this action to operate on."
+
+msgid "(revision %1 does not exist)"
+msgstr "Revision %1 does not exist in this repository.  Did you make "
+"a mistake entering the number?"
+
+msgid "(action %1 not supported)"
+msgstr "The action \"%1\" has not been enabled in this SVN::Web "
+"installation.\n"
+"\n"
+"For this action to work (assuming it's not a typo) it must be listed in "
+"the <tt>actions:</tt> directive in <tt>config.yaml</tt>.  See <b>Actions "
+"and action classes</b> in the SVN::Web documentation for more information."
+
+msgid "(unconfigured repository)"
+msgstr "This repository has not been configured in <tt>config.yaml</tt>. "
+"You must use either the <tt>repos</tt> or <tt>reposparent</tt> directives "
+"to do this.  Please see the SVN::Web documentation for more information."
+
+msgid "(no such repo %1 %2)"
+msgstr "The repository called <tt>%1</tt> has been configured with a path "
+"of <tt>%2</tt>.  This path does not exist, and probably indicates a typo "
+"in the configuration file."
+
+msgid "(SVN::Ra->new() failed: %1 %2)"
+msgstr "The repository at URL <tt>%1</tt> could not be opened.\n"
+"\n"
+"The error from Perl was:\n"
+"\n"
+"<tt>%2</tt>."
+
+msgid "(missing package %1 for action %2: %3)"
+msgstr "A package could not be found for the action \"%2\". The package "
+"that was looked for was <tt>%1</tt>.\n"
+"\n"
+"This may mean that the action was a typo.  If it wasn't then you "
+"need code to implement this action.  Either:\n"
+"\n"
+"a.  Install an SVN::Web::%1 package that implements it, or\n"
+"\n"
+"b.  Install another package that implements it (e.g., My::Action::%2) "
+"and then include an entry in <tt>config.yaml</tt> that maps the action "
+"name to a class, such as\n"
+"\n"
+"<pre>\n"
+"actions:\n"
+"  ...\n"
+"  %2:\n"
+"    class: My::Action::%2\n"
+"</pre>\n"
+"\n"
+"<b>Note:</b> The package <b>must</b> implement a <tt>run()</tt> method. "
+"See <b>Actions and action classes</b> in the SVN::Web documentation for "
+"more information."
+"\n"
+"The error from Perl was:\n"
+"\n"
+"<tt>%3</tt>"
+
+msgid "(can't find script in %1)"
+msgstr "The uri <tt>%1</tt> doesn't seem to contain a reference to the "
+"script.  This is one of those \"can't happen\" errors.  If you see this "
+"on a live SVN::Web installation, please report it as a bug.  When you do "
+"that, please include this message, and the contents of your "
+"<tt>config.yaml</tt> file."
+
+msgid "(opendir reposparent %1 %2)"
+msgstr "The <tt>reposparent</tt> configuration entry specifies a directory "
+"called '%1'.  This directory could not be opened.\n"
+"\n"
+"The error from Perl was:\n"
+"\n"
+"<tt>%2</tt>"
+
+msgid "(two revisions must be provided)"
+msgstr "To carry out a diff you must specify the two revisions that you "
+"want to compare.  You haven't selected any.  Please go back, and "
+"select the two revisions that you want to compare."
+
+msgid "(rev1 and rev2 must be different)"
+msgstr "To carry out a diff you must specify the two revisions that you "
+"want to compare.  You only selected one revision.  Please go back, and "
+"select the revision you want to compare against."
+
+msgid "(diff selected revisions)"
+msgstr "Show diff of selected revisions"
+
+msgid "(prop-name)"
+msgstr "Property"
+
+msgid "(prop-value)"
+msgstr "Value"
+
+msgid "(templatedir and templatedirs defined)"
+msgstr "The configuration file contains <tt>templatedir</tt> and a "
+"<tt>templatedirs</tt> (note: extra 's') directives.  These directives "
+"are mutually incompatible.\n"
+"\n"
+"You probably need to remove the <tt>templatedir</tt> directive, and "
+"include its value in the <tt>templatedirs</tt> directive."
+
+msgid "(view plain text)"
+msgstr "View Plain Text"
+
+msgid "(age)"
+msgstr "Age"
+
+msgid "(%1 second)"
+msgstr "%quant(%1, second, seconds)"
+
+msgid "(%1 minute)"
+msgstr "%quant(%1, minute, minutes)"
+
+msgid "(%1 hour)"
+msgstr "%quant(%1, hour, hours)"
+
+msgid "(%1 day)"
+msgstr "%quant(%1, day, days)"
+
+msgid "(%1 week)"
+msgstr "%quant(%1, week, weeks)"
+
+msgid "(%1 month)"
+msgstr "%quant(%1, month, months)"
+
+msgid "(%1 year)"
+msgstr "%quant(%1, year, years)"
+
+msgid "(require %1 failed: %2)"
+msgstr "<tt>%1</tt> could not be 'required' in to Perl.\n\n"
+"The error from Perl was:\n"   
+"\n"
+"<tt>%2</tt>."
+
+msgid "(next page)"
+msgstr "Next page"
+
+msgid "(all)"
+msgstr "All"
+
+msgid "(diff too large: %1 %2)"
+msgstr "<p>The diff for this change is too large to process.  The configured "
+"limit is %2 bytes, and the diff for this change is %1 bytes.</p>"
+
+msgid "(path %1 is not a directory in revision %2)"
+msgstr "<p>The path <tt>%1</tt> is not a directory at revision %2.  This "
+"action can only operate on directories.</p>"
+
+msgid "(line number)"
+msgstr "Line #"
+
+msgid "(view blame)"
+msgstr "Blame/Annotate"
+
+msgid "(view file)"
+msgstr "View File"

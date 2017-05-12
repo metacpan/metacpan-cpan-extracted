@@ -1,0 +1,54 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 566c4a39f138f573e0180135ebd5ccb65c3c0c43 Changes.pod
+SHA1 41236ad9cb13c0abf09d7dc8d8b93b9c4e215c1c MANIFEST
+SHA1 a6b58872fa78436fe38ae7417e409c52f3b6d9f7 META.yml
+SHA1 0fa9575de5e9a121ca074b68aae2d669909f3a74 Makefile.PL
+SHA1 260379dc3c27fc8aa6e64273b0b94580fda0750d README
+SHA1 f224f94e8c664df8970684fc09837d3aa4769a3a lib/Scriptalicious.pm
+SHA1 bb097482d7d16feadacaa72249cce22b24901b6b lib/Scriptalicious.pod
+SHA1 4fa577b375f1bd148f072ecf56079c5d19b6cdd0 t/01-mmmdelicious.t
+SHA1 14b11bbbc6e41cf3e018a00f99f8ae63e369c028 t/02-script.t
+SHA1 13216c981df5928b2e72034bc6cfb17964b0483f t/03-yaml.t
+SHA1 91ba3e39ceda09362a5dedff0e213818537ed03d t/04-fork.t
+SHA1 fca1712dcc759e3eb3e1033dcb5bd71f3ec8f590 t/05-prompt.t
+SHA1 25a798e881538c59b3ec548c209ba5b02f1b7130 t/06-anydump.t
+SHA1 b9d619e9eb205cc321442e9b22462f4dc92fa915 t/07-tsay.t
+SHA1 be2c3bd65c45847938219492142254b6645274a3 t/08-unit.t
+SHA1 68aff9f78699052e3a3b3b1653d6fa8fbdb0d794 t/09-noyaml.t
+SHA1 8078519cfb2b235edb7c89c33b31d29af1a6dc7f t/Util.pm
+SHA1 faaf4c3ba63c7978ba348aebbceedfc1d8b8d639 t/dump.pl
+SHA1 0923940238fc4b05b2af2b029e32ac8c67ea6e6e t/eg.conf
+SHA1 6c70d4016856ac3941c077ed9df8d2d1e98d547a t/fork.pl
+SHA1 945fe09f02d32b8d75d0ae110d48d833b443d0b9 t/loopback.pl
+SHA1 fe7c9271665cda30ced18f74c5442d4864f04075 t/missing/Pod/Constants.pm
+SHA1 dacb6cd4c86d4dda967ab60037dddc36dd0e8c68 t/missing/Template.pm
+SHA1 dacb6cd4c86d4dda967ab60037dddc36dd0e8c68 t/missing/YAML.pm
+SHA1 f70a86242836ca20d5546db52c164a9ec045f508 t/prompter.pl
+SHA1 fc3174c15673596fb885b8843da1ad22ce531d96 t/pu.pl
+SHA1 a91f4452b7d540b79df8ab2be7766c7739c62804 t/tsay.pl
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.14 (GNU/Linux)
+
+iQEcBAEBCgAGBQJTPHNlAAoJEBdtaL3wGtIoiMMH+wUOWCbLeItRvkxdqa9WHOC+
+VmDCeVHeV2kReJr5uXSsIpB8JVjlds8GnSThFW+hd8sF5Yz8UL+G1Z7QXjFwlGgr
+XFUeJkjbcIk1OFtSlJcDEXfiLZPrlxt+bho/4Z7+nDdBQpsHm+pPl1v1IByV0JiR
+Ag3UILl7NLDwYGc39q5KUxJyb/G3b4MlRcVoK/pVIU2V83BgtT4zYNf4lqtC+lhJ
+If8DFl6RhlJVUkMSJJW03tqydYFGt9VZorfW4yjFv5CsRjSTNHHVUqDolqM3MDuz
+B93xvRy+FbDh5xVKiWIsi2dM7CZH29Kr8Hr5Fv22ThshzTTDotIvfYZU36cx9R0=
+=LR+k
+-----END PGP SIGNATURE-----

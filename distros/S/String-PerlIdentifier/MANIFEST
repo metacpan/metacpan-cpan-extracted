@@ -1,0 +1,19 @@
+.gitignore
+.version_info.pl
+Changes
+lib/String/PerlIdentifier.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/01_basic.t
+t/02_specified.t
+t/03_min.t
+t/04_max.t
+t/05_default.t
+t/06_no_scores.t
+t/Auxiliary.pm
+t/eligible_chars
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

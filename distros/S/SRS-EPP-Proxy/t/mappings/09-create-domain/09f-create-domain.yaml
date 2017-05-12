@@ -1,0 +1,37 @@
+# Create a domain using hostObj for nameservers (which is not allowed)
+template: create-domain.tt
+
+vars:
+  domain: 09f.co.te
+  ns_with_ips:
+    - name: ns1.hidns.com
+      ipv4: 222.222.222.222
+      ipv6: 1080:0:0:0:8:800:200C:417A
+    - name: ns2.hidns.com
+      ipv4: 222.222.222.223
+      ipv6: 1080:0:0:0:8:800:200C:417B
+  owner: id123
+  admin: shazzam1234
+  tech: alcatraz367
+
+input_assertions:
+  class: SRS::EPP::Command::Create::Domain
+
+SRS:
+  - assertions:
+      count:
+        - [ '//NameServers/Server', 2, 'SRS: Check for three nameservers' ]
+      match:
+      match_all:
+      attr_is:
+        - [ '//NameServers/Server[1]', 'FQDN', 'ns1.hidns.com', 'SRS: First ns hostname correct' ]
+        - [ '//NameServers/Server[1]', 'IP4Addr', '222.222.222.222', 'SRS: First ns ipv4addr correct' ]
+        - [ '//NameServers/Server[1]', 'IP6Addr', '1080:0:0:0:8:800:200C:417A', 'SRS: First ns ipv6addr correct' ]
+        - [ '//NameServers/Server[2]', 'FQDN', 'ns2.hidns.com', 'SRS: Second ns hostname correct' ]
+        - [ '//NameServers/Server[2]', 'IP4Addr', '222.222.222.223', 'SRS: Second ns ipv4addr correct' ]
+        - [ '//NameServers/Server[2]', 'IP6Addr', '1080:0:0:0:8:800:200C:417B', 'SRS: Second ns ipv6addr correct' ]
+
+
+output_assertions:
+  attr_is:
+    - [ '//epp:result', 'code', '1000', 'EPP: correct response code' ]

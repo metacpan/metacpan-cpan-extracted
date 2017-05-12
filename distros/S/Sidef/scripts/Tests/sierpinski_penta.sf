@@ -1,0 +1,16 @@
+#!/usr/bin/ruby
+
+func sierpinski_penta(n) {
+    var penta = ['*'];
+    { |i|
+        var sp = (' ' * 2**i);
+        penta = (
+                penta.map {|x| sp + x + ' ' + x + sp} +
+                penta.map {|x| x + sp + ' ' + sp + x} +
+                penta.map {|x| sp*2 + ' '*(i**2) + x + ' '*(i**2) + sp*2}
+            );
+    } * n;
+    penta.join("\n");
+}
+
+say sierpinski_penta(3);

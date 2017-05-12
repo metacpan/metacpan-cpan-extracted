@@ -1,0 +1,43 @@
+2013-04-25 12:58:33 +0100 Tim Brody 
+
+	* typos s/WORK/WOK/ (HEAD, origin/master, master)
+
+2013-04-25 12:56:58 +0100 Tim Brody 
+
+	* Fix support for ISIWoK::Lite
+
+2013-02-20 15:29:27 +0000 Tim Brody 
+
+	* Utility for querying ISI WoK
+
+2013-02-20 14:12:01 +0000 Tim Brody 
+
+	* Fixed offset=0 and ->result not being defined
+
+2013-02-20 11:19:03 +0000 Tim Brody 
+
+	* WoK requires firstRecord & fix r_id_disclaimer
+
+2013-02-19 12:44:01 +0000 Tim Brody 
+
+	* Support for Authorization
+
+2013-02-19 12:24:56 +0000 Tim Brody 
+
+	* Version 3.00
+
+2013-02-19 12:18:35 +0000 Tim Brody 
+
+	* Meta info for Makefile.PL
+
+2013-02-19 12:14:42 +0000 Tim Brody 
+
+	* s/ISIWoK3/ISIWoK/
+
+2013-02-19 12:08:53 +0000 Tim Brody 
+
+	* Initial working version
+
+2013-02-18 15:22:29 +0000 Tim Brody 
+
+	* h2xs -n SOAP::ISIWoK3 -A -X -b 5.8.0 -c --skip-exporter --skip-autoloader

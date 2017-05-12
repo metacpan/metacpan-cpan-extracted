@@ -1,0 +1,56 @@
+NAME
+
+SOAP::Lite::InstanceExporter.pm
+
+
+SYNOPSIS
+
+use SOAP::Lite::InstanceExporter qw(bareword_objectname1,..,bareword_objectnameN);
+
+
+PURPOSE
+
+Allow SOAP objects to persist in the main package namespace on a SOAP server
+between client sessions
+
+
+DESCRIPTION
+
+This class is used to provide a SOAP interface wrapped around
+a reference to an object residing in a package namespace on the server.
+SOAP objects exported without this wrapper are initialized and destroyed 
+on a per session basis.  SOAP::Lite::InstanceExporter allows the server to 
+preserve the state of an object in memory across sessions.  Used in conjunction 
+with SOAP::Lite object_by_reference feature.
+
+
+INSTALLATION
+Gunzip and untar the provided archive.  In the directory you have tarred and 
+unzipped, run:
+
+perl Makefile.PL
+make install
+
+
+EXAMPLES
+
+See examples/server.pl and examples/client.pl for a trivial example of 
+SOAP::Lite::InstanceExporter use.
+
+
+LICENSE
+
+Copyright (c) 2003 Sean Meisner. All rights reserved. 
+This program is free software; you can redistribute it and/or modify it 
+under the same terms as Perl itself.
+
+
+SEE ALSO
+
+SOAP::Lite
+
+
+AUTHOR
+
+Sean Meisner
+

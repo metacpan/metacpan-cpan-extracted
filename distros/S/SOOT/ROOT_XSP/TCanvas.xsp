@@ -1,0 +1,12 @@
+%module{SOOT};
+
+class TCanvas {
+
+  void Update();
+  void ForceUpdate();
+  void Show();
+  void Flush();
+  void RaiseWindow();
+
+};
+

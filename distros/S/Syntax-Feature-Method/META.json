@@ -1,0 +1,41 @@
+{
+   "abstract" : "Provide a method keyword",
+   "author" : [
+      "Robert 'phaylon' Sedlacek <rs@474.at>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.101900, CPAN::Meta::Converter version 2.101670",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Syntax-Feature-Method",
+   "no_index" : {
+      "directory" : [
+         "t/"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "B::Hooks::EndOfScope" : "0.08",
+            "Carp" : 0,
+            "Method::Signatures::Simple" : 0,
+            "Test::Most" : "0.21",
+            "namespace::clean" : "0.13",
+            "syntax" : "0.001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.001"
+}
+

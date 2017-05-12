@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:               Sort-Key-IPv4
+version:            0.03
+abstract:           sort IP v4 addresses
+author:
+    - Salvador Fandino <sfandino@yahoo.com>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Sort::Key:  1.28
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

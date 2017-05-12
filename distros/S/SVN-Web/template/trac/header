@@ -1,0 +1,63 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+[% IF at_head %]
+[% revstr = '' %]
+[% ELSE %]
+[% revstr = "?rev=$rev" %]
+[% END %]
+
+[% IF c.path == '/'; c.path = ''; END %]
+
+<html>
+  <head>
+    <title>[% IF c.action == 'list' %][%|l%](repository list)[%END%][% ELSE %][% c.action %]: /[% c.repos %][% c.path %][% END %] ([% IF rev %]Rev: [% at_head ? 'HEAD' : rev %], [% END %][%|l%](via)[%END%] SVN::Web)</title>
+    [% IF style %]
+      <link rel="stylesheet" href="[% style %]" type="text/css" />
+    [% ELSE %]
+      <link rel="stylesheet" type="text/css" href="[% c.base_uri %]/css/trac/svnweb.css" />
+    [% END %]
+    [% IF c.action.match('^(?:browse|log|view)$') AND at_head %]
+      <link rel="alternate" type="application/rss+xml"
+        title="RSS Feed for [% c.path %]"
+        href="[% c.script %]/[% c.repos | uri %]/rss[% c.path | url %]" />
+    [% END %]
+  </head>
+  <body>
+    <div>
+      [% UNLESS nonav %]
+      <div id="navpath">
+	<h1><a class="first" href="[% c.script %]/">[%|l%](repository list)[%END%]</a> /  [% url = [c.script,c.repos,''] %]  [% url = url.join('/') %]  [% urlpath = ['',''] %]<a href="[% url %]">[% c.repos %]</a>
+            [% FOREACH p = c.navpaths %]
+              [% CALL urlpath.splice(-1, 0, p) %]
+              [% IF loop.count == loop.size %]
+                [% IF p %]
+                  <span class="sep">/</span>   [% p %]
+                [% END %]
+              [% ELSE %]
+                <span class="sep">/</span>    <a href="[% url %]browse[% urlpath.join('/') | url %][% revstr %]">[% p %]</a>
+              [% END %]
+          [% END %] @ [% at_head ? 'HEAD' : "r$rev" %]</h1>
+      </div>
+      [% END %]
+
+      <div id="language-selection">
+        <form action="[% c.self_uri | url %]">
+          <select name="lang" onchange="this.form.submit();">
+          [% FOREACH curlang IN c.languages -%]
+            <option value="[% curlang.key %]"
+            [%- IF curlang.key == c.lang %] selected="selected"[% END %]>[% curlang.value %]</option>
+          [% END %]
+          </select>
+          [% FOREACH param IN c.cgi.param %]
+            [% NEXT IF param == 'lang' %]
+            <input type="hidden" name="[% param %]" value="[% c.cgi.param(param) %]" />
+          [% END %]
+          <noscript>
+            <input type="submit" value="Go" />
+          </noscript>
+        </form>
+      </div>
+    </div>
+
+    <div id="content">

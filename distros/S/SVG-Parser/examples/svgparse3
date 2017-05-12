@@ -1,0 +1,7 @@
+#!/usr/bin/perl -w
+use strict;
+use SVG::Parser qw(SAX=XML::LibXML::Parser::SAX Expat SAX);
+
+die "Usage: $0 <file>\n" unless @ARGV;
+my $svg=SVG::Parser->new()->parsefile($ARGV[0]);
+print $svg->xmlify;

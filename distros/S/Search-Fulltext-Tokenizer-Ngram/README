@@ -1,0 +1,56 @@
+NAME
+    Search::Fulltext::Tokenizer::Ngram - Character n-gram tokenizer for
+    Search::Fulltext
+
+VERSION
+    version 0.01
+
+SYNOPSIS
+      use utf8;
+      use Search::Fulltext;
+      use Search::Fulltext::Tokenizer::Bigramm;
+  
+      my $searcher = Search::Fulltext->new(
+          docs => [
+              'ハンプティ・ダンプティ 塀の上',
+              'ハンプティ・ダンプティ 落っこちた',
+              '王様の馬みんなと 王様の家来みんなでも',
+              'ハンプティを元に 戻せなかった',
+          ],
+          tokenizer => q/perl 'Search::Fulltext::Tokenizer::Bigram::get_tokenizer'/,
+      );
+      my $hit_document_ids = $searcher->search('ハンプティ');  # [0, 1, 3]
+
+DESCRIPTION
+    This module provides character N-gram tokenizers for Search::Fulltext.
+
+    By default {1,2,3}-gram tokenzers are available.
+
+CREATING A N(> 3)-GRAM TOKENIZER
+    If you wish to use other N-grams where N > 3, you can create it by
+    inheriting "Search::Fulltext::Tokenizer::Ngram":
+
+      package My::Tokenizer::42gram;
+  
+      use parent qw/Search::Fulltext::Tokenizer::Ngram/;
+  
+      my $iterator_generator = __PACKAGE__->new(42);
+  
+      sub get_tokenizer {
+          sub { $iterator_generator->create_token_iterator(@_) };
+      }
+
+SEE ALSO
+    Search::Fulltext::Tokenizer::Unigram Search::Fulltext::Tokenizer::Bigram
+    Search::Fulltext::Tokenizer::Trigram
+
+AUTHOR
+    Koichi SATOH <sekia@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2014 by Koichi SATOH.
+
+    This is free software, licensed under:
+
+      The MIT (X11) License
+

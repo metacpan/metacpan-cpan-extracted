@@ -1,0 +1,26 @@
+SWIFT/Factory/Tag/Tag30 version 0.01
+====================================
+
+This module provides a class for the TAG30 o a SWIFT message.
+
+The class is also the base class for other classes, typically for the Tag30T and Tag30V classes.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None.
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2003, Gustav Schaffter. All rights reserved.
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

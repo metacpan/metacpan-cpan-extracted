@@ -1,0 +1,50 @@
+SugarSync-API
+=============
+
+This is an experimental though function API for the SugarSync cloud
+file storage service.
+
+Functions provided are: authorization, getting data, handling
+collections and files.
+
+An example script performs a mirror of an extrernal share, showing
+most of the basic functions.
+
+Note that the SugarSync https protocol is slow, on average 1 call per
+second. Processing a 6000 file share will take almost two hours.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc SugarSync::API
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=SugarSync-API
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/SugarSync-API
+
+    Search CPAN
+        http://search.cpan.org/dist/SugarSync-API
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 Johan Vromans
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

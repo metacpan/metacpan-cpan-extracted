@@ -1,0 +1,29 @@
+---
+abstract: 'Simple interface to spreadsheet files'
+author:
+  - 'Dylan William Hardison'
+build_requires:
+  Path::Class: 0.25
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Spreadsheet-Simple
+requires:
+  Moose: 0
+  Moose::Role: 0
+  MooseX::Types: 0
+  MooseX::Types::Moose: 0
+  MooseX::Types::Structured: 0
+  Spreadsheet::ParseExcel: 0.59
+  namespace::autoclean: 0
+  strict: 0
+  warnings: 0
+version: 1.0.0
+x_authority: cpan:DHARDISON

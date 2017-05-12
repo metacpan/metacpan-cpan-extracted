@@ -1,0 +1,266 @@
+#!/usr/bin/perl -w
+# See copyright, etc in below POD section.
+######################################################################
+
+require 5.005;
+use Getopt::Long;
+use IO::File;
+use Pod::Usage;
+use strict;
+use vars qw ($Debug %Depend %Checked $VERSION);
+
+$VERSION = '1.344';
+
+#======================================================================
+# main
+
+use vars qw ($Opt_Unlink $Opt_Mtime $Opt_Show $Opt_Verbose);
+$Debug = 0;
+$Opt_Unlink = 1;
+$Opt_Mtime = 0;
+$Opt_Show = 0;
+my @dfiles;
+if (! GetOptions (
+		  "help"	=> \&usage,
+		  "mtime!"	=> \$Opt_Mtime,
+		  "show!"	=> \$Opt_Show,
+		  "version"	=> sub { print "Version $VERSION\n"; exit(0); },
+		  # Debugging
+		  "debug"	=> \&debug,
+		  "verbose!"	=> \$Opt_Verbose,
+		  "unlink!"	=> \$Opt_Unlink,	# Debugging, suppress unlinks
+		  # Everything else
+		  "<>"		=> \&parameter,
+		  )) {
+    die "%Error: Bad usage, try 'sp_makecheck --help'\n";
+}
+
+foreach my $file (@dfiles) {
+    if (!-e $file && $file =~ /[\?\*]/) {
+	# If you "sp_makecheck *.d" and there's no .d files, don't die.
+	print "-Note: Ignoring empty wildcard expression: $file\n" if $Opt_Verbose;
+	next;
+    }
+    Dependency::dfile_read ($file);
+}
+Dependency::compute();
+Dependency::dump() if $Opt_Show;
+Dependency::unlink_out_of_date();
+
+#----------------------------------------------------------------------
+
+sub usage {
+    print "Version $VERSION\n";
+    pod2usage(-verbose=>2, -exitval=>2, -output=>\*STDOUT, -noperldoc=>1);
+    exit (1);
+}
+
+sub debug {
+    $Debug = 1;
+    $Opt_Verbose = 1;
+}
+
+sub parameter {
+    my $param = shift;
+    if ($param =~ /\.d$/) {
+	push @dfiles, $param;
+    } else {
+	die "%Error: Unknown parameter: $param\n";
+    }
+}
+
+#######################################################################
+package Dependency;
+use strict;
+use vars qw (%Depend);
+
+sub dfile_read {
+    my $filename = shift;
+    # Static: Read a .d file, and add it to the %Depend hash.
+    my $fh = IO::File->new("<$filename") or die "%Error: $! $filename\n";
+    my $line = "";
+    while (defined (my $thisline = $fh->getline())) {
+	chomp $thisline;
+	$line .= $thisline;
+	next if ($line =~ s/\\s*$/ /);
+	next if ($line =~ /^\s*$/);
+	if ($line =~ /^([^:]+):([^:]*)$/) {
+	    my $tgtl = $1;  my $depl = $2;
+	    my @tgts = ($filename);
+	    foreach my $tgt (split /\s+/,"$tgtl ") {
+		next if $tgt eq "";
+		push @tgts, $tgt;
+	    }
+	    foreach my $dep (split /\s+/,"$depl ") {
+		next if $dep eq "";
+		foreach my $tgt (@tgts) {
+		    $Depend{$tgt}{depends}{$dep} = 1;
+		    $Depend{$dep}{targets}{$tgt} = 1;
+		    print "DEP $tgt $dep\n" if $::Debug;
+		}
+	    }
+	} else {
+	    die "%Error: $filename:$.: Strange dependency line: $line\n";
+	}
+	$line = "";
+    }
+    $fh->close;
+}
+
+sub compute {
+    # Static: Compute levels and other information on the structure
+    foreach my $dep (keys %Depend) {
+	$Depend{$dep}{name} = $dep;
+	$Depend{$dep}{level} = 0;
+	$Depend{$dep}{mtime} = (stat($dep))[9] || 0;
+    }
+    foreach my $depref (values %Depend) {
+	_depend_levels_recurse($depref,0);
+    }
+    # Bottom up loop
+    foreach my $tgtref (sort {$b->{level} <=> $a->{level}}
+			(values %Depend)) {
+	foreach my $dep (keys %{$tgtref->{depends}}) {
+	    my $depref = $Depend{$dep};
+	    if ($depref->{out_of_date}) {
+		$tgtref->{out_of_date} = "Child Out-of-date $depref->{name}";
+	    }
+	    elsif (!$depref->{mtime}) {
+		$tgtref->{out_of_date} = "Missing $depref->{name}";
+	    }
+	    elsif ($depref->{mtime}
+		&& ($::Opt_Mtime && ($depref->{mtime} > $tgtref->{mtime}))) {
+		$tgtref->{out_of_date} = "Younger $depref->{name}";
+	    }
+	}
+    }
+}
+
+sub _depend_levels_recurse {
+    my $depref = shift;
+    my $level = shift;
+    $depref->{level} = $level if ($level>$depref->{level});
+    ($level<100) or die "%Error: Recursive dependency chain involving: ",$depref->{name},"\n";
+    foreach my $tgt (keys %{$depref->{depends}}) {
+	_depend_levels_recurse($Depend{$tgt},$level+1);
+    }
+}
+
+sub dump {
+    # Static: Dump the dependency information
+    foreach my $depref (values %Depend) {
+	if ($depref->{level}==0) {
+	    print "-"x70,"\n";
+	    _dump_recurse($depref);
+	}
+    }
+}
+
+sub _dump_recurse {
+    my $depref = shift;
+    printf +("\t%-10s %-4s %s%s\n"
+	     ,_time_format($depref->{mtime}),
+	     ,($depref->{out_of_date}?"old":""),
+	     ,"| "x$depref->{level}
+	     ,$depref->{name});
+    foreach my $tgt (sort (keys %{$depref->{depends}})) {
+	_dump_recurse($Depend{$tgt});
+    }
+}
+
+sub _time_format {
+    my $time = shift;
+    return "gone" if !$time;
+    my $now = time();
+    $time = $now - $time;
+    if ($time<3600) { return sprintf("%02d:%02ds ago",int($time/60),int($time%60)); }
+    return sprintf("%5.1fd ago",($time/(60*60*24)));
+}
+
+sub unlink_out_of_date {
+    # Static: Remove all out of date files
+    my %param = @_;
+    foreach my $depref (values %Depend) {
+	if ($depref->{out_of_date} && $depref->{mtime}) {
+	    print "$0: rm $depref->{name} : $depref->{out_of_date}\n" if $::Debug || $::Opt_Verbose;
+	    unlink $depref->{name} if $::Opt_Unlink;
+	}
+    }
+}
+
+#######################################################################
+__END__
+
+=pod
+
+=head1 NAME
+
+sp_makecheck - Read dependency files and check for missing dependencies
+
+=head1 SYNOPSIS
+
+  sp_makecheck *.d
+
+=head1 DESCRIPTION
+
+A common technique with make is to use GCC to generate .d dependency files
+using the -MMD switch.  This creates a files similar to foo.d:
+
+    foo.o foo.d: foo.cc foo.h
+
+The problem is if a header file is removed, then make will complain that
+there is no rule to build foo.h.  Adding a fake target is one way around
+this, but that requires additional .d's, and leaves old objects around.
+
+sp_makecheck reads the specified dependency files, and checks for the
+existence of all dependencies in the file.  If a file does not exist, it
+simply removes all of the targets.
+
+=head1 ARGUMENTS
+
+=over 4
+
+=item --help
+
+Displays this message and program version and exits.
+
+=item --mtime
+
+Consider the modification time, removing any out of date files.
+
+=item --show
+
+Show each target and the tree of required dependencies.
+
+=item --version
+
+Displays program version and exits.
+
+=back
+
+=head1 DISTRIBUTION
+
+SystemPerl is part of the L<http://www.veripool.org/> free SystemC software
+tool suite.  The latest version is available from CPAN and from
+L<http://www.veripool.org/systemperl>.
+
+Copyright 2001-2014 by Wilson Snyder.  This package is free software; you
+can redistribute it and/or modify it under the terms of either the GNU
+Lesser General Public License Version 3 or the Perl Artistic License Version 2.0.
+
+=head1 AUTHORS
+
+Wilson Snyder <wsnyder@wsnyder.org>
+
+=head1 SEE ALSO
+
+L<SystemC::Manual>
+
+L<make>
+
+=cut
+
+######################################################################
+### Local Variables:
+### compile-command: "./sp_makecheck "
+### End:

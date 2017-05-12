@@ -1,0 +1,178 @@
+Revision history for SVN-Look. -*- text -*-
+
+0.41      2014-06-13 23:50:53-03:00 America/Sao_Paulo
+
+[Fixes]
+
+- Restore support for Perl 5.8.
+
+0.40      2014-06-12 15:04:39-03:00 America/Sao_Paulo
+
+[Fixes]
+
+- Fix security issue when invoking external commands.
+
+- Support base64 encoded property values.
+
+- Don't strip trailing spaces from filenames grokked by the changed_hash
+  method.
+
+[Thanks]
+
+- Many thanks to Stephane Chazelas who reported the issues fixed in this
+  version.
+
+0.39      2013-10-20 21:31:50 America/Sao_Paulo
+
+0.38      2012-06-19 14:00:00 America/Sao_Paulo
+
+	Method "changed" now returns the entries sorted and with no
+	duplicates.
+
+0.37      2012-06-18 14:34:31 America/Sao_Paulo
+
+	Revert previous proplist fix. It wasn't really a fix.
+
+0.36      2012-06-18 14:05:44 America/Sao_Paulo
+
+	Fix proplist, which died when invoked on an artifact with no
+	properties. Now it returns an empty hash.
+
+	Improve error messages upon svnlook command failure.
+
+0.35      2012-04-21 21:13:18 America/Sao_Paulo
+
+	Moved from Google Code to GitHub.
+
+0.34      2012-03-05 11:35:50 America/Sao_Paulo
+
+	Corrects RT#75545 and RT#75546 to make it supported in
+	Windows. (Thanks Mike Brimer!)
+
+0.33      2012-02-27 20:48:45 America/Sao_Paulo
+
+	Require Perl 5.8.0.
+
+0.32      2012-02-26 18:54:21 America/Sao_Paulo
+
+	Reinsert check for svn command in Makefile.PL.
+
+0.31      2012-02-25 22:02:07 America/Sao_Paulo
+
+0.30	2011-11-02
+
+	Change the call to svnlook to use execvp directly and avoiding
+	the shell.
+
+	Moved the repository to git (http://code.google.com/p/svn-look/source).
+
+0.29    2011-10-12
+
+	Implement method 'filesize', new with Subversion 1.7.0.
+
+0.28    2011-10-10
+
+	Reimplementing methods 'repo', 'rev', and 'txn'. They are used
+	by SVN::Hooks::Notify, as I have been kindly reminded by Bill
+	Moseley. Thanks!
+
+0.27    2011-09-17
+
+	Make the arguments -r/-t optional.
+	Remove unecessary methods 'repo', 'rev', and 'txn'.
+	Implement methods 'date', 'info', and 'propget'.
+
+0.26    2011-08-27
+
+	Requiring at least svnlook version 1.4.0.
+
+0.25	2011-08-21
+
+	Method ::cat don't chomp the file contents when called in
+	scalar context anymore.
+
+	Don't append hardcoded paths to $ENV{PATH} anymore.
+
+0.24	2011-07-30
+
+	Tests grok username using svnlook to be sure.
+
+0.23	2011-07-27
+
+	Porting Makefile.PL to Windows.
+	Adding URI::file to the dependencies.
+
+0.22	2011-07-21
+
+	Avoiding dependency from File::Slurp in the tests.
+
+0.21	2011-07-20
+
+	Ported to Windows with Strawberry Perl and also with Active Perl.
+
+0.20	2010-12-12
+
+	Fix methods copied_from and copied_to.
+
+0.19	2010-12-12
+
+	Implements the method tree.
+
+0.18	2010-04-28
+
+	Being more careful during tests.
+
+0.17    2010-02-24
+
+	Minor error correction.
+
+0.16	2010-02-16
+
+	Implements the methods: youngest, uuid, and lock.
+
+	Bypasses an issue in the testing of method author.
+
+	Croaks instead of dying.
+
+0.15	2009-10-24
+
+	Drops the sub-minor version. Now it's just M.mm.
+
+	Implements the kwalitee test.
+
+	Implements the --author-tests flag to Makefile.PL, which
+	enables the pod and kwalitee tests.
+
+0.13	2008-11-06
+
+	Changing the LICENSE from GPL to Perl.
+
+0.12	2008-10-09
+
+	Removing dependency from SVN::Hooks from the tests.
+
+0.11	2008-10-04
+
+	Using File::Spec to be a little more portable.
+
+0.10	2008-09-27
+
+	Implemented the 'diff' method.
+
+0.09	2008-09-27
+	Removed dependency from Switch.pm.
+
+	Look for the svnlook command in a bunch of directories.
+
+	Now the module can be built without the svn commands but the
+	tests will check this and be skipped.
+
+	Added tests: t/pod.t and t/pod-coverage.t
+
+	Private functions got the _ prefix to avoid complaints from
+	pod-coverage.t. 
+
+0.08    2008-09-25/23:00:00
+        First version released independently of SVN::Hooks.
+
+

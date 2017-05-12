@@ -1,0 +1,47 @@
+{
+   "abstract" : "Interface to libsword Bible software API",
+   "author" : [
+      "Andrew Sterling Hanenkamp <hanenkamp@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.102341, CPAN::Meta::Converter version 2.102400",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Sword",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "XSLoader" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Sword@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Sword"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/zostay/Sword-perl.git",
+         "web" : "http://github.com/zostay/Sword-perl"
+      }
+   },
+   "version" : "0.102800"
+}
+

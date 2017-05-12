@@ -1,0 +1,101 @@
+NAME
+
+    Solaris::ProcessContract - Manage Solaris process contracts via
+    libcontract
+
+VERSION
+
+    1.01
+
+DESCRIPTION
+
+    This module allows you to use the libcontract(3) facility to manage
+    contracts for your process and any child processes you create.
+
+    The process contract system on solaris allows you to group together
+    related processes for monitoring and resource limiting.
+
+    By default, the child processes you create will live in the same
+    contract group as the parent.
+
+    The solaris smf init system uses contracts to manage the processes of
+    running services. This allows it do things like restart the service if
+    the number of processes in the contract that the service lives in drops
+    to zero.
+
+    This makes sense in most scenarios, like when your code is forking off
+    copies of itself for parallelization, since a fault in one process
+    probably means something is wrong with your entire service.
+
+    However, if your code is forking off worker processes that are unrelated
+    to the parent process, having them all in the same contract is
+    troublesome.
+
+    For example, if the parent process is a daemon that forks off unrelated
+    worker processes, solaris will fail to detect when the number daemon
+    processes has dropped to zero and the service is unavailable. Since the
+    unrelated worker processes are in the same contract, those are counted
+    against the "is the daemon still running?" checks.
+
+    To solve this, you need to create a new contract group for any worker
+    processes you fork, so that they have their own space for monitoring and
+    resource limitations and do not affect the parent process.
+
+    This is also a good practice for any code on solaris that forks off
+    worker processes for long running or resource intensive jobs, as it
+    allows for more accurate resource limits and better tracking of what
+    resources are being used.
+
+    See:
+
+      man libcontract
+      man contract
+      man process
+      man smf
+      man svc.startd
+      man ctrun
+
+INSTALLATION
+
+    The libcontract(3) facility was first made available on Solaris 10, so
+    you need to be running at least that to install this module.
+
+    This module will fail to install if it cannot find "libcontract" while
+    running "Makefile.PL", but does no other checks to forcefully validate
+    your operating system and version.
+
+TODO
+
+    Right now, this module gives you what you need to control the contract
+    system when forking processes. That is going to be the most important
+    need for most people writing daemon software in perl for solaris.
+
+    Ideally, it could be expanded to be able to fully monitor and
+    acknowledge contract system events.
+
+    It also would be nice to have access to some of the deeper info when
+    querying contracts, or maybe have a way to tie the proc filesystem in to
+    the contract filesystem so that you could query both.
+
+SEE ALSO
+
+    Solaris::ProcessContract::Template
+    Solaris::ProcessContract::Contract
+    Solaris::ProcessContract::Exceptions
+    libcontract(3)
+    contract(4)
+    process(4)
+
+AUTHOR
+
+    Danny Warren
+
+COPYRIGHT
+
+    Copyright (c) 2013, "AUTHOR".
+
+LICENSE
+
+    This library is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,83 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Scalar-Does
+Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
+Source: https://metacpan.org/release/Scalar-Does
+
+Files: t/01basic.t
+ t/02does.t
+ t/03moosey.t
+ t/04cleanliness.t
+ t/05custom.t
+ t/06constants.t
+ t/07makerole.t
+ t/08mooselike.t
+ t/09warnings.t
+ t/10underscore.t
+ t/11givenwhen.t
+ t/iod-01basic.t
+ t/iod-03filenames.t
+ t/iod-04fileuris.t
+ t/iod-05ducktype.t
+ t/iod-11ioall.t
+ t/iod-12pathclass.t
+Copyright: This software is copyright (c) 2012-2014 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: INSTALL
+ IO-Detect-Changes.txt
+ LICENSE
+ Makefile.PL
+ NEWS
+ TODO
+Copyright: Unknown
+License: Unknown
+
+Files: Changes
+ META.json
+ META.yml
+ doap.ttl
+Copyright: Copyright 2017 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: README
+ lib/IO/Detect.pm
+ lib/Scalar/Does.pm
+ lib/Scalar/Does/MooseTypes.pm
+Copyright: This software is copyright (c) 2012-2014, 2017 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
+
+Files: t/iod-02filehandles.t
+Copyright: Copyright 2014 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/iod-06asfh.t
+Copyright: This software is copyright (c) 2013-2014 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/iod-13pathtiny.t
+Copyright: This software is copyright (c) 2014 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: dist.ini
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+License: Artistic-1.0
+ This software is Copyright (c) 2017 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The Artistic License 1.0
+
+License: GPL-1.0
+ This software is Copyright (c) 2017 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The GNU General Public License, Version 1, February 1989

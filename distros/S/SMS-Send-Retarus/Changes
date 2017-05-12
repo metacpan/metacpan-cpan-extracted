@@ -1,0 +1,4 @@
+Revision history for SMS-Send-Retarus: 0.001
+
+0.001     2016-05-03 18:29:23+02:00 Europe/Vienna
+    - Initial release using the JSON REST API

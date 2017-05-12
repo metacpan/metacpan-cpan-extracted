@@ -1,0 +1,44 @@
+version 0.002; 2011-04-09
+
+  * in XS, declare "PROTOTYPES: DISABLE" to prevent automatic generation
+    of unintended prototypes
+
+  * in t/setup_pp.pl, avoid a warning that occurs if XSLoader::load()
+    is given no arguments, which is now a valid usage
+
+  * typo fix in documentation
+
+  * include META.json in distribution
+
+  * add MYMETA.json to .cvsignore
+
+version 0.001; 2010-07-29
+
+  * in documentation, correct the word "numericness" to "stringness"
+
+  * make all numeric comparisons against $] stringify it first, to avoid
+    architecture-dependent problems with floating point rounding giving
+    it an unexpected numeric value
+
+  * in XS, use PERL_NO_GET_CONTEXT for efficiency
+
+  * use simpler "parent" pragma in place of "base"
+
+  * check for required Perl version at runtime
+
+  * use full stricture in test suite
+
+  * also test POD coverage of pure Perl implementation
+
+  * in Build.PL, explicitly set needs_compiler to avoid bogus
+    auto-dependency on ExtUtils::CBuilder
+
+  * in Build.PL, explicitly declare configure-time requirements
+
+  * remove bogus "exit 0" from Build.PL
+
+  * add MYMETA.yml to .cvsignore
+
+version 0.000; 2009-03-14
+
+  * initial released version

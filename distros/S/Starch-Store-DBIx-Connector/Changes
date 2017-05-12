@@ -1,0 +1,12 @@
+Revision history for Perl extension Starch::Store::DBIx::Connector.
+
+0.02 2015-07-21
+
+ - Better Carp caller reporting.
+ - Fix Type::Tiny union constraints sometimes failing on Perl < 5.14.
+ - Fix several dependency issues.
+
+0.01 2015-07-16
+
+ - First version.
+

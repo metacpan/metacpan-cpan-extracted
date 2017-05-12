@@ -1,0 +1,48 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 33317486c4fa2cf7fec85bf92ed38ac0f64233a0 CONTRIBUTING
+SHA1 230769a588824fe72802769beef6466ce2bb86b1 COPYRIGHT
+SHA1 f37aa2421026e562f16cc0c33348e107dd6d0d7c CREDITS
+SHA1 873c78e839e29f798596aff02e370a7308e2617a Changes
+SHA1 25d72f44372d7fd692b1acc4f49d28e67e23bc80 INSTALL
+SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
+SHA1 def8e3ea643b87515e34411ff8f32cfb2728ab0c MANIFEST
+SHA1 94648c34f813457224c57ba2a2b4dfde1b88e255 META.json
+SHA1 c3cf639f0be9920622a0503bc687be3268500bc8 META.yml
+SHA1 7c14bcdb64327e9dc47ecec015e053776ff31351 Makefile.PL
+SHA1 5d5490639914afd1162838509cade1cbb38c075b README
+SHA1 c27787fc5288c33b2fbe21f0522b2a13537eb38b dist.ini
+SHA1 6cee95db3d5547ce88fb294d86a292a3d3ca9c1c doap.ttl
+SHA1 e9c2a142c056ed5484fc478393ac6bb41c7a7778 examples/calculator.pl
+SHA1 93352d4de5f9f22a16370daf0d333373434d55b7 examples/tour-de-force.pl
+SHA1 3c54c02ea3dcdf5341c793b7a59106030e55728e examples/use-syntax.pl
+SHA1 2e2200e1ecf110b8e347e769c0da22ce5d735512 lib/Smart/Dispatch.pm
+SHA1 115fbb2953fd0f36d374d9f84e80723f9871883e lib/Smart/Dispatch/Match.pm
+SHA1 ea39633fab8e4f403ac657be827aaae32a216227 lib/Smart/Dispatch/Table.pm
+SHA1 0b82522921911d5fa99d48ca765900dfa24b1a53 lib/Syntax/Feature/Dispatcher.pm
+SHA1 8843fc04330024e6443056d24d7a3004d6f7db62 t/01basic.t
+SHA1 6ac0508ef34e64b6f2ff46167e373ea8bc2b0660 t/02dispatcher.t
+SHA1 bd0a43dfa02546c608f9accec576507d19f29d1e t/03overloading.t
+SHA1 5117b0284945a16d540d3fdb69bf244e92205057 t/04exists.t
+SHA1 a7464fb63d5cae723dd5ca07506d6a0a8caeab43 t/05subclassing.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlQYgqAACgkQzr+BKGoqfTl8SwCgkjehDkklIFf79kLIuqDj58NS
+CqUAnRBzBAf0batjAmD/oofTiCYlT+5e
+=rl+g
+-----END PGP SIGNATURE-----

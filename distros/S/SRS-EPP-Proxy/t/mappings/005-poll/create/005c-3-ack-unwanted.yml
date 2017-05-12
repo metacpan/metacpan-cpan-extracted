@@ -1,0 +1,12 @@
+description: Ack create, which we don't need for the tests
+registrar: 100
+
+request: |-
+   <NZSRSRequest VerMinor="0" VerMajor="5" RegistrarId="100">
+       <AckMessage OriginatingRegistrarId="100" ActionId="[% actionid %] 1" TransId="005c-2-create.yml 1"/>
+   </NZSRSRequest>
+
+assertions:
+ - xpath_matches: [ '//Error', '0', 'No errors' ]
+
+

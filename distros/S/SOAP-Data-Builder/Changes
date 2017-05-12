@@ -1,0 +1,38 @@
+Revision history for Perl extension SOAP::Data::Builder.
+
+1.0   Wed 14 2012
+	- applied patch from Caleb Cushing to catch missing parent argument in find_elem
+
+0.09  Sun Jan 29 2006
+	- fixed Makefile.PL prerequisites
+        - added trivial tests
+
+0.8   Wed Oct 20th 2004
+        - fixed support for > 2 deep data structures
+        - improved API for adding and getting elements
+	- misc refactoring and small fixes
+
+0.7   Mon Mar 8 17:45:21 2004
+        - cleaned makefile - doesn't need 5.8.1 anymore
+	- removed trace
+        - added Todd's patch to add support for per-element type
+	- applied Todd's patch to fix perldoc
+
+
+0.5   Tues Nov 25 14:10:30 2003
+        - stopped spewing debug warnings
+        - added readable option
+
+0.4   Tues Nov 25 12:40:30 2003
+        - fixed bugs in OO functionality
+
+0.3   Mon Nov 24 15:00:00 2003
+        - refactored to be more OO, less functional
+
+
+0.02  Additional undocumented internal functionality added
+
+
+0.01  Wed Nov 12 11:35:57 2003
+	- original version; created by h2xs 1.23 with options
+		-X SOAP::Data::Builder

@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README
+lib/Search/Binary.pm
+t/00-load.t
+t/01-kwalitee.t
+t/02-changes.t
+t/10-basic.t
+t/11-lbs-compat.t
+t/12-rt52326.t
+t/lib/Search/Binary/TestUtils.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

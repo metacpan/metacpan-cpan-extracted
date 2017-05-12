@@ -1,0 +1,30 @@
+SYNOPSIS
+
+     use Software::Catalog qw(list_software get_software_info);
+     my $res = list_software();
+     $res    = get_software_info(software_id => 'wordpress');
+
+STATUS
+
+    Proof of concept. Incomplete catalog.
+
+DESCRIPTION
+
+    This module contains catalog of software.
+
+    Currently the main use for this module is to establish a common name
+    for a software and find the Debian source package name(s) (and possibly
+    others too in the future, like Fedora package, FreeBSD port, etc) for
+    it.
+
+    Eventually, if the project takes off, this will also contain
+    summary/description/URL/license for each software.
+
+FAQ
+
+SEE ALSO
+
+    Software::Release::Watch
+
+    Software::Installation::Detect
+

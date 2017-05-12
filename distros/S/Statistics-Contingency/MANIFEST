@@ -1,0 +1,13 @@
+Build.PL
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+SIGNATURE
+dist.ini
+lib/Statistics/Contingency.pm
+t/01-basic.t
+t/author-critic.t

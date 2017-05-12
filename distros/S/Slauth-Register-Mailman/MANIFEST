@@ -1,0 +1,9 @@
+bin/check-pw-wrapper.c
+Changes
+lib/Slauth/Register/Mailman.pm
+Makefile.PL
+MANIFEST
+README
+script/check-pw.pl
+t/Slauth.t
+META.yml                                 Module meta-data (added by MakeMaker)

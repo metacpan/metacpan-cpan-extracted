@@ -1,0 +1,15 @@
+1.0600 2013-09-13
+ - Added simpledb command line app, contributed by Andrew Solomon.
+
+1.0500 2010-12-16
+ - Switched to XML::Fast instead of XML::Bare. Thanks to Chad H.
+
+1.0402 2010-05-04
+ - Bug fix for SimpleDB::Class compatibility.
+
+1.0401 2010-05-04
+ - Converted to using XML::Bare, for it's 63.4 times performance boost over XML::Simple.
+
+1.0400 2010-04-07
+ - Split off as separate package from SimpleDB::Class. Used to be SimpleDB::Class::HTTP.
+ 

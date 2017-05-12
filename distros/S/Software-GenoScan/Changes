@@ -1,0 +1,20 @@
+Revision history for Perl extension GenoScan.
+
+v1.1.0 Mars 2015
+        - Cleaned away debug code and updated environment sanity check
+
+v1.0.3 Mars 2015
+        - Adjusted allowed values for -p and -l arguments to be values
+          between 0 and 1
+        - The HSS annotator module can now handle lowercase sequences
+	- Fixed a bug in the sequence segmentation function
+
+v1.0.2 October 2014
+        - Fixed a bug that prevented GenoScan from running RNAfold
+
+v1.0.1 October 2014
+        - Added HairpinExtractor.pm, which was missing in the
+          release version
+
+v1.0.0 August 2014
+        - GenoScan release version was build

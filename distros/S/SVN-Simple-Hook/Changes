@@ -1,0 +1,58 @@
+Revision history for SVN-Simple-Hook
+
+0.312     2012-03-15 12:53:58 America/New_York
+    Better documentation for inc::SVNMakeMaker and its changes to Makefile.PL
+    Support for Travis distributed build platform when developing
+    (http://travis-ci.org/)
+    Require MouseX::Types 0.06 and its support of Any::Moose
+    Lots more metadata on development requirements and dev/test
+    recommendations
+0.311     2012-03-12 15:00:32 America/New_York
+    TRIAL RELEASE: Correct eval conditionals in Makefile.PL so people without
+    Alien::SVN at all don't bug out.
+0.310     2012-03-12 13:43:44 America/New_York
+    TRIAL RELEASE: Reintroduce SVN:: prerequisites from Perl bindings
+    Require and import SVN::Core in Makefile.PL to stop more bad installs
+0.309     2012-03-11 16:35:36 America/New_York
+    Better detection of Subversion Perl bindings
+0.308     2012-03-09 17:16:53 America/New_York
+    TRIAL RELEASE: Try to detect bad SVN::Core in Makefile.PL
+0.307     2012-03-07 11:34:18 America/New_York
+    TRIAL RELEASE: More fiddling with prereqs for CPANTesters
+    Add early compile-or-bail test to check for bad SVN::Core install
+0.306     2012-02-28 10:13:11 America/New_York
+    TRIAL RELEASE: Require SVN::Core "0.0.0" as well
+0.305     2012-02-27 11:18:40 America/New_York
+    Require Alien::SVN as a prerequisite
+    Code cleanup to simplify debugging and non-Dist::Zilla patchers
+    No functional changes
+0.304     2012-02-03 17:04:49 America/New_York
+    Fall back to most recently logged type of path if it's missing from
+    transaction and revision root
+0.303     2012-02-03 14:12:41 America/New_York
+    Coerce undef rather than allow it as path attribute
+0.302     2012-02-02 17:13:58 America/New_York
+    Allow undef for an SVN::Simple::Path_Change path attribute
+0.301     2011-07-21 18:12:55 America/New_York
+    Documentation fixes
+0.300     2011-07-21 16:23:13 America/New_York
+    Performance improvements: Can now use Mouse instead of Moose via Any::Moose,
+    now uses Const::Fast instead of Readonly
+    Documentation fixes
+0.215     2011-04-28 10:32:59 America/New_York
+    add SVN::Core to prereqs, getting errors from testers
+    no code changes
+0.214     2011-04-21 15:01:36 America/New_York
+    better handle SVN::Client prerequisites
+    actually require required arguments
+0.213     2011-04-20 18:07:29 America/New_York
+    explicitly require MooseX::App::Cmd and MooseX::Types::Common
+    fix links in documentation
+0.212     2011-04-12 14:11:18 America/New_York
+    fix compile error in SVN::Simple::Path_Change
+0.211     2011-03-24 13:47:02 America/New_York
+    better handling of paths_changed for deleted files and directories
+0.210     2011-03-23 10:40:42 America/New_York
+    new paths_changed attribute for all hooks
+0.200     2011-03-22 14:17:49 America/New_York
+    initial release: factored out from internal GSI project

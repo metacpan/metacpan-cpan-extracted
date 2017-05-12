@@ -1,0 +1,3 @@
+*   filters to SYNOPSIS and docs
+*   support delete and expand opts for filters
+*   stack opt (return stack of refs to structure)

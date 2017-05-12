@@ -1,0 +1,16 @@
+<NZSRSResponse VerMajor="5" VerMinor="0">
+<Response Action="AckMessage" FeId="8" FeSeq="4779570" OrigRegistrarId="90" RecipientRegistrarId="90" TransId="brause">
+<FeTimeStamp Day="2" Hour="15" Minute="34" Month="7" Second="21" TimeZoneOffset="+12:00" Year="2010"/>
+<Error Hint="UNKNOWN_ERROR_HINT" ErrorId="MESSAGE_DOES_NOT_EXIST" Severity="err">
+<Description>
+<![CDATA[The message cannot be acked because it does not exist]]>
+</Description>
+<ErrorDetails>
+<![CDATA[90]]>
+</ErrorDetails>
+<ErrorDetails>
+<![CDATA[12345aa]]>
+</ErrorDetails>
+</Error>
+</Response>
+</NZSRSResponse>

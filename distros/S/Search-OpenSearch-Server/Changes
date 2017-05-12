@@ -1,0 +1,123 @@
+Revision history for Search-OpenSearch-Server
+
+0.301 14 Aug 2015
+ - require namespace::autoclean instead of assuming dependency from S::OS
+
+0.300 07 June 2014
+ - official Moose release in support of S::OS 0.400
+
+0.299_03 05 June 2014
+ - add missing Moose dependency to Makefile.PL
+
+0.299_02 23 April 2014
+ - add doc about BEGIN block for Catalyst::Controller extension
+ - resurrect setup_engine() method as a no-op for backwards compatability
+ - swap Catalyst Role consumption order to fix log() usage
+
+0.299_01 23 April 2014
+ - rewrite to use Moose, support SOS 0.400
+
+0.28 02 March 2014
+ - use Try::Tiny instead of eval{}
+
+0.27 13 June 2013
+ - POD tests optional per https://rt.cpan.org/Ticket/Display.html?id=86129
+
+0.26 04 Jan 2013
+ - pass request parameters to Engine REST methods
+
+0.25 18 Dec 2012
+ - support multi-value GET params properly
+
+0.24 26 Nov 2012
+ - clean up debug logging
+
+0.23 21 Nov 2012
+ - add optional 3rd param to do_rest_api() to explicitly pass in request
+   path, and use that in Catalyst server.
+
+0.22 7 Nov 2012
+ - add Search::OpenSearch::Server::Catalyst and
+   CatalystX::Controller::OpenSearch
+
+0.21 14 Oct 2012
+ - use CORE::time() instead of HiRes for default mtime.
+ - fix bug where empty 'x' param was overriding defined fields.
+
+0.20 19 Sept 2012
+ - add support for 'x' param in SOS 0.21.
+ - add support for Tiny response in SOS 0.21.
+ - clean up some edge cases in internal request param parsing.
+
+0.19 13 Sept 2012
+ - add http_allow() method so that Server and Engine can defined allowed
+   HTTP methods independently, and the intersection is enforced.
+
+0.18 11 Sept 2012
+ - use Plack::Util::Accessor instead of Rose::ObjectX::CAF.
+
+0.17 3 Sept 2012
+ - use Engine->get_allowed_http_methods instead of hardcoded list
+ - fix security hole where arbitrary Perl methods could be called via HTTP
+   like RPC.
+
+0.16 21 Aug 2012
+ - major refactor to move most code and logic into the Server base class
+   which formerly had been empty. The Plack subclass now implements only
+   those methods specific to a Plack::Component.
+ - fix some undefined object errors 
+
+0.15 20 Aug 2012
+ - add Search::OpenSearch::Result class to make REST results into objects
+
+0.14 9 Aug 2012
+ - fix JSON syntax on server error response
+
+0.13 6 Aug 2012
+ - add stats_logger support
+ - add build_time to REST methods response
+ - add better exception handling so that something use-able is returned
+
+0.12 26 July 2012
+ - use content_type from Response class
+ - switch tests to use Lucy
+ - fix mem leak introduced by logger fix in 0.11
+ - switch to Module::Install
+
+0.11 14 July 2012
+ - add log() method to Server::Plack for debugging ease
+ - fix HTTP response code for unsupported REST methods
+ - add ExtJS response support
+ - fix missing 'r' param support
+
+0.10 30 April 2012
+ - check for $req->can('logger') in addition to $req->logger
+
+0.09 22 Oct 2011
+ - use same params as Search::OpenSearch 0.15
+
+0.08 29 Sept 2011
+ - change default type to 'Lucy'
+ - add conditional logger support
+
+0.07 26 Sept 2011
+ - fix bug with setting Encoding (SWISH::Prog::Doc uses 'charset')
+
+0.06 26 Sept 2011
+ - add support for X-SOS-* HTTP headers
+
+0.05 07 Jan 2011
+ - add REST support
+
+0.04 26 June 2010
+ - add missing dep on JSON::XS to Makefile.PL
+
+0.03 22 June 2010
+ - add 'b' param support
+
+0.02 28 May 2010
+ - flesh out the SYNOPSIS
+
+0.01 27 May 2010
+ - First version, released on an unsuspecting world.
+

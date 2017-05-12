@@ -1,0 +1,30 @@
+Revision history for Perl module Spreadsheet::GenerateXLSX
+
+0.04 2017-01-05 NEILB
+    - Optional testsuite that checks whether generated spreadsheet reads ok.
+      Uses Spreadsheet::ParseXLSX, or skips if that's not installed.
+    - Changed req'd version of Perl to 5.008, to match Ref::Util
+
+0.03_02 2016-12-30 NEILB
+    - I had done a push on an arrayref, which caused some CPAN Testers fails --
+      I need to get out of that habit.
+
+0.03_01 2016-12-28 NEILB
+    - Added a testsuite which generates a spreadsheet then uses
+      Spreadsheet::ParseXLSX to check the generated file.
+      Uses Test::Needs to skip if Spreadsheet::ParseXLSX not installed.
+    - Specified min perl version of 5.010, as Ref::Util currently doesn't
+      work on older perls.
+
+0.03 2016-12-11 NEILB
+    - The github repo was wrong in the doc. Sebastien Thebert++
+    - Updated SEE ALSO entry on XLS::Simple, now I've played with it,
+      and added a link to my recent blog post.
+
+0.02 2016-11-29 NEILB
+    - Added SEE ALSO section, with a list of other spreadsheet writing modules.
+    - Changed one instance of // to ||, so it will work on older Perls.
+
+0.01 2016-11-27 NEILB
+    - First release to CPAN
+

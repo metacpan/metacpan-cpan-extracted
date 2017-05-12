@@ -1,0 +1,26 @@
+==============================================================================
+                      Release of version 2.17 of Switch
+==============================================================================
+
+
+NAME
+    Switch - A switch statement for Perl, do not use if you can use given/when
+
+DESCRIPTION
+
+    Switch.pm provides the syntax and semantics for an explicit case
+    mechanism for Perl. The syntax is minimal, introducing only the
+    keywords C<switch> and C<case> and conforming to the general pattern
+    of existing Perl control structures. The semantics are particularly
+    rich, allowing any one (or more) of nearly 30 forms of matching to
+    be used when comparing a switch value with its various cases.
+
+AUTHOR
+    Damian Conway (damian@conway.org)
+    Maintained by Alexandr Ciornii (alexchorny@gmail.com)
+    Previously was maintained by Rafael Garcia-Suarez and perl5 porters.
+
+COPYRIGHT
+    Copyright (c) 1997-2008, Damian Conway. All Rights Reserved.
+    This module is free software. It may be used, redistributed
+        and/or modified under the same terms as Perl itself.

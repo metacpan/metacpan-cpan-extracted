@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+Regex.pm
+t/obj.t
+t/proc.t

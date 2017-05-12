@@ -1,0 +1,18 @@
+.cvsignore
+Build.PL
+Changes
+lib/Slackware/Slackget/Network/Connection/DEBUG.pm
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00-load.t
+t/01-create_object.t
+t/02-get_file.t
+t/03-get_file_error.t
+t/04-fetch_file.t
+t/05-fetch_file_error.t
+t/06-test_server.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+Makefile.PL

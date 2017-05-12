@@ -1,0 +1,213 @@
+%RI SMOP__p6opaque__RI
+%prototype SMOP__p6opaque
+%nagc.nofree 1
+%RI.id p6opaque
+%prefix smop_p6opaque
+%include <smop/s1p.h>,<smop/lost.h>,<smop/p6opaque.h>
+%attr SMOP__Object* proto_storage
+%attr int destroying
+%has $^!whence
+%has $^!is_container
+%has %^!instance_storage
+%idconst FETCH
+%idconst continuation
+%idconst goto
+%idconst DESTROYALL
+%idconst ^!how
+%idconst ^!who
+%idconst ^!isa
+%idconst ^!does
+%idconst ^!class_storage
+%idconst ^!attributes
+%idconst ^!methods
+%idconst ^!submethods
+
+%DESTROYALL_ALL {
+static int step(SMOP__Object* interpreter,
+                SMOP__Object* obj) {
+
+  SMOP__LOST__Frame* frame = (SMOP__LOST__Frame*) obj;
+
+ SMOP__Object* invocant  = frame->user;
+
+  switch (frame->pc) {
+  case 0:
+    frame->pc++;
+    SMOP_DISPATCH(interpreter,SMOP_RI(frame->user),SMOP__ID__DESTROYALL,
+      SMOP__NATIVE__capture_create(interpreter,
+        (SMOP__Object*[]) {SMOP_REFERENCE(interpreter,frame->user),NULL},
+        (SMOP__Object*[]) {NULL}));
+    
+    break;
+  case 1:
+    frame->pc++;
+
+    smop_p6opaque_struct* obj = (smop_p6opaque_struct*)frame->user;
+    SMOP__Object* proto_storage = obj->proto_storage;
+    obj->proto_storage = NULL;
+    SMOP_RELEASE(interpreter,proto_storage);
+
+    %%ATTRS%%
+    break;
+  case 2:
+    frame->pc++;
+    smop_nagc_free((SMOP__NAGC__Object*)invocant);
+    return 0;
+  };
+  return 1;
+}
+
+static void destr(SMOP__Object* interpreter,
+                 SMOP__Object* frame) {
+}
+static void DESTROYALL(SMOP__Object* interpreter,
+                              SMOP__Object* object) {
+
+  SMOP__Object* continuation = SMOP_DISPATCH(interpreter, SMOP_RI(interpreter),
+    SMOP__ID__continuation,
+    SMOP__NATIVE__capture_create(interpreter,
+      (SMOP__Object*[]) {SMOP_REFERENCE(interpreter,interpreter),NULL},
+      (SMOP__Object*[]) {NULL}));
+  SMOP__Object* frame = SMOP__LOST__Frame_create(interpreter,continuation,object,step,destr);
+
+  SMOP_DISPATCH(interpreter, SMOP_RI(interpreter), SMOP__ID__goto,SMOP__NATIVE__capture_create(interpreter,(SMOP__Object*[]) {SMOP_REFERENCE(interpreter,interpreter), frame, NULL}, (SMOP__Object*[]) {NULL}));
+
+}
+
+%}
+
+%method ^!CREATE
+  ret = smop_nagc_alloc(sizeof(smop_p6opaque_struct));
+  ret->RI = (SMOP__ResponderInterface*)SMOP__p6opaque__RI;
+
+
+%{
+
+static int is_p6opaque_container(SMOP__Object* interpreter,
+                                 SMOP__Object* invocant) {
+
+  if (invocant == SMOP__p6opaque__RI) {
+    return 0;
+  }
+  smop_nagc_rdlock((SMOP__NAGC__Object*)invocant);
+  SMOP__Object* is_container = ((smop_p6opaque_struct*)invocant)->CaretBangis_container;
+  smop_nagc_unlock((SMOP__NAGC__Object*)invocant);
+  if (!is_container ||
+      SMOP__S1P__Scalar_FETCH(is_container) == SMOP__NATIVE__bool_false) {
+    return 0;
+  } else {
+    return 1;
+  }
+}
+
+static SMOP__Object* p6opaque_message_DISPATCH(SMOP__Object* interpreter,
+                                               SMOP__ResponderInterface* self,
+                                               SMOP__Object* identifier,
+                                               SMOP__Object* capture) {
+  SMOP__Object* ret = SMOP__NATIVE__bool_true;
+  SMOP__Object* continuation = SMOP_DISPATCH(interpreter, SMOP_RI(interpreter),
+    SMOP__ID__continuation,
+    SMOP__NATIVE__capture_create(interpreter,
+      (SMOP__Object*[]) {SMOP_REFERENCE(interpreter,interpreter),NULL},
+      (SMOP__Object*[]) {NULL}));
+
+  SMOP__Object* frame = SMOP__Yeast__Frame_create(interpreter,SMOP_REFERENCE(interpreter,dispatch_mold));
+  yeast_reg_set(interpreter,frame,0,SMOP_REFERENCE(interpreter,interpreter));
+  yeast_reg_set(interpreter,frame,2,SMOP_REFERENCE(interpreter,self));
+  yeast_reg_set(interpreter,frame,3,SMOP_REFERENCE(interpreter,identifier));
+  yeast_reg_set(interpreter,frame,4,SMOP_REFERENCE(interpreter,capture));
+  yeast_reg_set(interpreter,frame,5,continuation);
+
+  SMOP_DISPATCH(interpreter, SMOP_RI(interpreter), SMOP__ID__goto,SMOP__NATIVE__capture_create(interpreter,(SMOP__Object*[]) {SMOP_REFERENCE(interpreter,interpreter), frame, NULL}, (SMOP__Object*[]) {NULL}));
+
+  return ret;
+}
+
+%}
+
+%inmessage{
+   if (identifier == SMOP__ID__FETCH && 
+      !is_p6opaque_container(interpreter,invocant)) {
+    ___VALUE_FETCH___;
+   } else if (identifier == SMOP__ID__CaretBanghow ||
+             identifier == SMOP__ID__CaretBangwho ||
+             identifier == SMOP__ID__CaretBangisa ||
+             identifier == SMOP__ID__CaretBangdoes ||
+             identifier == SMOP__ID__CaretBangclass_storage ||
+             identifier == SMOP__ID__CaretBangattributes ||
+             identifier == SMOP__ID__CaretBangmethods ||
+             identifier == SMOP__ID__CaretBangsubmethods) {
+
+    if (! invocant) {
+      fprintf(stderr,"[smop p6opaque] REPR method called without invocant\n");
+    } else if (SMOP_RI(invocant) != (SMOP__ResponderInterface*)SMOP__p6opaque__RI) {
+      fprintf(stderr,"[smop p6opaque] REPR method called with non p6opaque invocant\n");
+    } else if (invocant == SMOP__p6opaque__RI) {
+      fprintf(stderr,"[smop p6opaque] REPR method called with p6opaque RI\n");
+      abort();
+    } else {
+
+      smop_nagc_rdlock((SMOP__NAGC__Object*)invocant);
+      SMOP__Object* proto_storage = ((smop_p6opaque_struct*)invocant)->proto_storage;
+      smop_nagc_unlock((SMOP__NAGC__Object*)invocant);
+
+      if (!proto_storage) {
+        smop_nagc_wrlock((SMOP__NAGC__Object*)invocant);
+        ((smop_p6opaque_struct*)invocant)->proto_storage = smop_p6opaque_proto_storage_create(interpreter);
+        proto_storage = ((smop_p6opaque_struct*)invocant)->proto_storage;
+        smop_nagc_unlock((SMOP__NAGC__Object*)invocant);
+      }
+
+      ret = SMOP_DISPATCH(interpreter,SMOP_RI(proto_storage),identifier,
+                          SMOP__NATIVE__capture_create(interpreter,
+                                                       (SMOP__Object*[]){SMOP_REFERENCE(interpreter,proto_storage),
+                                                        NULL},(SMOP__Object*[]){NULL}));
+    }
+  } else if (identifier) {
+    ret = p6opaque_message_DISPATCH(interpreter, self, identifier, capture);
+  } else
+%}
+
+%yeast dispatch_mold
+  my $interpreter;
+  my $invocant;
+  my $responder;
+  my $identifier;
+  my $capture;
+  my $back;
+  my $continuation = $interpreter."continuation"();
+  my $void = $continuation."set_back"($back);
+
+  $invocant = $capture."positional"(0);
+  my $how_s = $invocant."^!how"();
+  my $how = $how_s."FETCH"();
+  my $result = $how."dispatch"($invocant, $identifier, $capture);
+  my $void = $back."setr"($result);
+  $void = $interpreter."goto"($back);
+
+%yeast destroyall_mold
+  my $interpreter;
+  my $invocant;
+  my $responder;
+  my $identifier;
+  my $capture;
+  my $back;
+  $invocant = $capture."positional"(0);
+  my $how_s = $invocant."^!how"();
+  my $how = $how_s."FETCH"();
+  my $void = $how."dispatch"($responder, $identifier, $capture);
+  $void = $invocant."^!DESTROY"();
+  $void = $interpreter."goto"($back);
+
+
+%init {
+  smop_p6opaque_default_how_init(interpreter);
+  smop_p6opaque_proto_storage_init(interpreter);
+  smop_s1p_lexical_prelude_insert(interpreter,"p6opaque",SMOP_REFERENCE(interpreter,SMOP__p6opaque));
+%}
+
+%destr {
+  smop_p6opaque_default_how_destr(interpreter);
+  smop_p6opaque_proto_storage_destr(interpreter);
+  smop_s1p_lexical_prelude_insert(interpreter,"p6opaque",SMOP__NATIVE__bool_false);
+%}

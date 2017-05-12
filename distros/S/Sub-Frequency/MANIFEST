@@ -1,0 +1,15 @@
+Changes
+lib/Sub/Frequency.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/01-can.t
+t/02-coerce.t
+t/03-with_probability.t
+t/04-chained.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

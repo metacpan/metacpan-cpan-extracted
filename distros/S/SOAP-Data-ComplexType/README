@@ -1,0 +1,26 @@
+SOAP::Data::ComplexType - Complex SOAP::Data object class interface.
+
+DESCRIPTION
+
+See "perldoc SOAP::Data::ComplexType" (or "perldoc ComplexType.pm") for details.
+
+
+PREREQUISITES
+
+SOAP::Data::ComplexType requires the following perl modules:
+
+- SOAP::Data::Builder
+
+INSTALLING
+
+perl Makefile.PL
+make
+make test
+make install
+
+
+LICENSE
+
+This library is free software, you can distribute it under the same 
+terms as perl itself.
+

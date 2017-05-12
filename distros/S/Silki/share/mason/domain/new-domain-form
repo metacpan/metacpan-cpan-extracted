@@ -1,0 +1,5 @@
+<& /lib/forms/domain.mas &>
+
+<%method title>
+<% loc('Create a New Domain') %>
+</%method>

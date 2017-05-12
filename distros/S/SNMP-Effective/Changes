@@ -1,0 +1,79 @@
+Revision history for SNMP-Effective
+
+1.1103   2016-05-18
+       * Update issue tracker to GitHub
+
+1.1102   2016-05-14
+       * Point release to fix MANIFEST
+
+1.1101   Tue Oct  1 12:30:15 2013
+       * Add repository to Makefile.PL
+
+1.11     Tue Jun  4 12:37:44 2013
+       * Fix typo: "args" to "arg"
+
+1.10     Fri Jun 15 00:21:43 2012
+       * Fix RT77805: Typo in SNMP::Effective
+         Contributor: Matt W
+
+1.09     Sun Feb 19 18:45:34 2012
+       * Fix RT72440: per-host arguments
+         Contributor: Sebastian Hyrwall
+
+1.08_02  Wed Apr 20 11:31:43 CEST 2011
+       * Add experimental feature for pre and post callbacks which is
+         called on the $host object from dispatch()
+
+1.0801   Fri Nov 19 16:20:17 CET 2010
+       * Fix RT61579: SNMP Effective Hangs when returned datatype is NULL
+         Contributor: medved
+
+1.08     Mon Nov  1 12:11:20 CET 2010
+       * Fix rename attribute in SNMP::Effective::Host: sesssion != session
+       * Change locking. Use pipe(...) with a single byte-read instead of flock()
+         - flock() did not work, since it was the same process!
+       * Remove perlcritic test
+       * Remove SNMP::Effective::Logger is replaced with SNMP_EFFECTIVE_DEBUG
+         and warn()
+       * Reformatted code and add more documentation
+       * Add heap can be set on SNMP:Effective object and passed on to
+         new $host objects
+
+1.07     Sat Jun 19 14:09:52 CEST 2010
+       * Clean up 1.06_02 (not a dev release)
+       * Clean up repository
+
+1.06     Thu, 17 Apr 2008 16:00:00 +0100
+       * Added new locking mechanism
+       * You don't need Log::Log4perl, though it is highly suggested
+
+1.05     Thu, 11 Oct 2007 20:15:00 +0200
+       * Fixed typo which makes it difficult to install the module:
+         Log::Log4Perl = Log::Log4perl
+
+1.04     Sat, 29 Sep 2007 15:20:00 +0200
+       * IMPORTANT! Renamed getnext to walk
+       * Added getnext, the way it's expected to behave
+       * Renamed more ::Host methods
+       * Fixed bug in BEGIN blocks: You can now set values that is "" or 0
+       * Split the namespaces into each seperate file and added more POD
+       * added heap() to ::Host, read the POD for more info
+
+1.03     Mon, 24 Sep 2007 23:14:00 +0200
+       * Renamed methods to follow an uniform standard:
+         * make_name_oid
+         * make_numeric_oid
+         * match_oid
+       * Added support for Log4perl. The old DEBUG is deprecated
+       * t/*tests* works for the first time
+
+1.02     Fri, 21 Sep 2007 16:24:00 +0100
+         <oliver.gorwits@oucs.ox.ac.uk>
+       * Improve alarm handling in SNMP::Effective::new
+       * PUSH in SNMP::Effective::VarList must take a list
+       * Fix version number in POD
+       * Improve documentation
+
+1.01    Sun, 16 Sep 2007 13:30:58 +0200
+       * First version, after pulling together what thought to be lost.
+

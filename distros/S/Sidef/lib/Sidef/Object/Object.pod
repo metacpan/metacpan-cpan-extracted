@@ -1,0 +1,241 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Object::Object
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = Object.new(...);
+
+=head1 METHODS
+
+
+=head2 !~
+
+I<Obj> B<!~> I<Obj> -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 &&
+
+I<Obj> B<&&> I<Obj> -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 \\
+
+I<Obj> B<\\> I<Obj> -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ^
+
+I<Obj> B<^> I<Obj> -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 alias_method
+
+Object.alias_method() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 bless
+
+Object.bless() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 class
+
+Object.class() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 clone
+
+Object.clone() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 dclone
+
+Object.dclone() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 def_method
+
+Object.def_method() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 dump
+
+Object.dump() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 interpolate
+
+Object.interpolate() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_a
+
+Object.is_a() -> I<Obj>
+
+Return the
+
+Aliases: I<is_an>, I<kind_of>
+
+=cut
+
+=head2 lazy
+
+Object.lazy() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 method
+
+Object.method() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 methods
+
+Object.methods() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 new
+
+Object.new() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 parent_classes
+
+Object.parent_classes() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 print
+
+Object.print() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ref
+
+Object.ref() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 refaddr
+
+Object.refaddr() -> I<Obj>
+
+Return the
+
+Aliases: I<object_id>
+
+=cut
+
+=head2 reftype
+
+Object.reftype() -> I<Obj>
+
+Return the
+
+Aliases: I<object_type>
+
+=cut
+
+=head2 respond_to
+
+Object.respond_to() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 say
+
+Object.say() -> I<Obj>
+
+Return the
+
+Aliases: I<println>
+
+=cut
+
+=head2 undef_method
+
+Object.undef_method() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ||
+
+I<Obj> B<||> I<Obj> -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ~~
+
+I<Obj> B<~~> I<Obj> -> I<Obj>
+
+Return the
+
+=cut

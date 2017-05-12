@@ -1,0 +1,2675 @@
+#!/usr/bin/env perl
+
+# DATE
+# VERSION
+
+use 5.010;
+use strict;
+use warnings FATAL => 'all';
+use FindBin '$Bin';
+
+use vars qw($VERSION);
+use Data::Clone;
+use Data::Dump::OneLine qw(dump1);
+use File::Slurp::Tiny qw(read_file write_file);
+use JSON;
+
+my $json = JSON->new->allow_nonref->pretty(1)->canonical(1);
+
+unless (defined $VERSION) {
+    my $dist = read_file "$Bin/../dist.ini";
+    $dist =~ /^\s*version\s*=\s*(.+)/m and $VERSION = $1;
+}
+
+our ($Type, $Clause);
+
+# describe literal
+sub _l {
+    my $d = shift;
+    return "undefined value" if !defined($d);
+    return $d unless ref($d);
+    return dump1($d);
+}
+
+sub gen_type_check_tests {
+    my %args = @_;
+    my @res;
+
+    for (@{ $args{accept} }) {
+        push @res, {
+            name   => "type check: must accept "._l($_),
+            input  => $_,
+            schema => $Type,
+            valid  => 1,
+        };
+    }
+    for (@{ $args{reject} }) {
+        push @res, {
+            name   => "type check: must reject "._l($_),
+            input  => $_,
+            schema => $Type,
+            valid  => 0,
+        };
+    }
+
+    @res;
+}
+
+# req, forbidden, default
+#
+# args:
+#
+# - value -> used to test 'forbidden'. must be a valid value.
+#
+# - ok_defaults -> used to test 'default' and that default values are still
+# validated, min 1 value
+#
+# - nok_defaults -> see above
+#
+# - ok_clauses -> used to test 'clause' and 'clset'. minimal 2 values, clauses
+# must be different
+#
+# - nok_clauses -> see above.
+#
+sub gen_BaseType_tests {
+    my %args = @_;
+    my @res;
+
+    push @res, {
+        name   => "must accept undefined value",
+        schema => $Type,
+        input  => undef,
+        valid  => 1,
+    };
+
+    # defhash_v
+    push @res, {
+        name   => "defhash_v",
+        schema => [$Type, defhash_v=>1],
+        input  => undef,
+        valid  => 1,
+        tags   => ['clause:defhash_v'],
+    };
+
+    # v
+    push @res, {
+        name   => "v",
+        schema => [$Type, v=>1],
+        input  => undef,
+        valid  => 1,
+        tags   => ['clause:v'],
+    };
+
+    # schema_v & base_v is tested in 02-schema_versioning.json
+
+    # c
+    push @res, {
+        name   => "c",
+        schema => [$Type, "c.foo.bar"=>1],
+        input  => undef,
+        valid  => 1,
+        tags   => ['clause:c'],
+    };
+
+    # XXX test actual c.perl.OPT, c.js.OPT
+
+    # default_lang
+    push @res, {
+        name   => "default_lang",
+        schema => [$Type, "default_lang"=>"id_ID"],
+        input  => undef,
+        valid  => 1,
+        tags   => ['clause:default_lang'],
+    };
+
+    # XXX test actual output of human/error message
+
+    # name
+    push @res, {
+        name   => "name",
+        schema => [$Type, "name"=>"some name"],
+        input  => undef,
+        valid  => 1,
+        tags   => ['clause:name'],
+    };
+
+    # summary
+    push @res, {
+        name   => "summary",
+        schema => [$Type, "summary"=>"some summary"],
+        input  => undef,
+        valid  => 1,
+        tags   => ['clause:summary'],
+    };
+
+    # description
+    push @res, {
+        name   => "description",
+        schema => [$Type, "description"=>"some description and `markdown`"],
+        input  => undef,
+        valid  => 1,
+        tags   => ['clause:description'],
+    };
+
+    # description
+    push @res, {
+        name   => "tags",
+        schema => [$Type, "tags"=>["some", "tags"]],
+        input  => undef,
+        valid  => 1,
+        tags   => ['clause:tags'],
+    };
+
+    # req
+    push @res, {
+        name   => "req=0 must accept undefined value",
+        schema => [$Type, req=>0],
+        input  => undef,
+        valid  => 1,
+        tags   => ['clause:req'],
+    };
+    push @res, {
+        name   => "req=1 must reject undefined value",
+        schema => [$Type, req=>1],
+        input  => undef,
+        valid  => 0,
+        tags   => ['clause:req'],
+    };
+
+    # forbidden
+    push @res, {
+        name   => "forbidden=0 must accept defined value",
+        schema => [$Type, forbidden=>0],
+        input  => $args{value},
+        valid  => 1,
+        tags   => ['clause:forbidden'],
+    };
+    push @res, {
+        name   => "forbidden=1 must reject defined value",
+        schema => [$Type, forbidden=>1],
+        input  => $args{value},
+        valid  => 0,
+        tags   => ['clause:forbidden'],
+    };
+
+    # default
+    for (@{ $args{ok_defaults} }) {
+        push @res, {
+            name   => "default: must accept valid default "._l($_),
+            input  => undef,
+            schema => ["$Type*", default=>$_],
+            valid  => 1,
+            tags   => ['clause:default'],
+        };
+    }
+    for (@{ $args{nok_defaults} }) {
+        push @res, {
+            name   => "default: must reject invalid default "._l($_),
+            input  => undef,
+            schema => ["$Type*", default=>$_],
+            valid  => 0,
+            tags   => ['clause:default'],
+        };
+    }
+
+    # clause
+    push @res, {
+        name   => "clause (dies, unknown clause)",
+        input  => $args{value},
+        schema => ["$Type*", clause=>[foo => 1]],
+        dies   => 1,
+        tags   => ['clause:clause'],
+    };
+    push @res, {
+        name   => "clause (ok)",
+        input  => $args{value},
+        schema => ["$Type*", clause=>$args{ok_clauses}[0]],
+        valid  => 1,
+        tags   => ['clause:clause'],
+    } if $args{ok_clauses};
+    # to test that the existence of clause does not override clauses outside it
+    push @res, {
+        name   => "clause (ok) + clause nok = nok",
+        input  => $args{value},
+        schema => [
+            "$Type*",
+            clause=>$args{ok_clauses}[0],
+            $args{nok_clauses}[1][0] => $args{nok_clauses}[1][1],
+        ],
+        valid  => 0,
+        tags   => ['clause:clause'],
+    } if $args{ok_clauses};
+    push @res, {
+        name   => "clause (nok)",
+        input  => $args{value},
+        schema => ["$Type*", clause=>$args{nok_clauses}[0]],
+        valid  => 0,
+        errors => 1,
+        tags   => ['clause:clause'],
+    } if $args{ok_clauses};
+
+    # XXX clause 'clause' + .op and/or/none
+
+    # clset
+    push @res, {
+        name   => "clset (dies, unknown clause)",
+        input  => $args{value},
+        schema => ["$Type*", clset=>{foo=>1}],
+        dies   => 1,
+        tags   => ['clause:clset'],
+    };
+    push @res, {
+        name   => "clset (dies, unknown attr)",
+        input  => $args{value},
+        schema => ["$Type*", clset=>{min_len=>1, "min_len.foo"=>1}],
+        dies   => 1,
+        tags   => ['clause:clset'],
+    };
+    push @res, {
+        name   => "clset (empty = ok)",
+        input  => $args{value},
+        schema => ["$Type*", clset=>{}],
+        valid  => 1,
+    };
+    push @res, {
+        name   => "clset (ignored clause/attr = ok)",
+        input  => $args{value},
+        schema => ["$Type*", clset=>{_foo=>1, "foo._bar"=>2}],
+        valid  => 1,
+        tags   => ['clause:clset'],
+    };
+    push @res, {
+        name   => "clset (ok + ok = ok)",
+        input  => $args{value},
+        schema => ["$Type*", clset=>{
+            $args{ok_clauses}[0][0] => $args{ok_clauses}[0][1],
+            $args{ok_clauses}[1][0] => $args{ok_clauses}[1][1],
+        }],
+        valid  => 1,
+        tags   => ['clause:clset'],
+    } if $args{ok_clauses};
+    # to test that the existence of clset does not override clauses outside it
+    push @res, {
+        name   => "clset (ok) + clause nok = nok",
+        input  => $args{value},
+        schema => [
+            "$Type*",
+            clset=>{
+                $args{ok_clauses}[0][0] => $args{ok_clauses}[0][1],
+            },
+            $args{nok_clauses}[1][0] => $args{nok_clauses}[1][1],
+        ],
+        valid  => 0,
+        tags   => ['clause:clset'],
+    } if $args{ok_clauses};
+    push @res, {
+        name   => "clset (ok + nok = nok)",
+        input  => $args{value},
+        schema => ["$Type*", clset=>{
+            $args{ok_clauses}[0][0]  => $args{ok_clauses}[0][1],
+            $args{nok_clauses}[1][0] => $args{nok_clauses}[1][1],
+        }],
+        valid  => 0,
+        tags   => ['clause:clset'],
+    } if $args{ok_clauses};
+    push @res, {
+        name   => "clset (nok + ok = nok)",
+        input  => $args{value},
+        schema => ["$Type*", clset=>{
+            $args{nok_clauses}[0][0] => $args{nok_clauses}[0][1],
+            $args{ok_clauses}[1][0]  => $args{ok_clauses}[1][1],
+        }],
+        valid  => 0,
+        tags   => ['clause:clset'],
+    } if $args{ok_clauses};
+    push @res, {
+        name   => "clset (nok + nok = nok)",
+        input  => $args{value},
+        schema => ["$Type*", clset=>{
+            $args{nok_clauses}[0][0] => $args{nok_clauses}[0][1],
+            $args{nok_clauses}[1][0] => $args{nok_clauses}[1][1],
+        }],
+        valid  => 0,
+        tags   => ['clause:clset'],
+    } if $args{ok_clauses};
+
+    # XXX clause 'clset' + .op and/or/none
+
+    # prefilters is tested in 20-clause-prefilters.json
+
+    # ok
+    push @res, (
+        {
+            name   => "ok",
+            schema => [$Type, {ok => 1}],
+            input  => undef,
+            valid  => 1,
+            tags   => ["clause:ok"],
+        },
+    );
+    push @res, (
+        {
+            name   => "ok + op not (nok)",
+            schema => [$Type, {"!ok" => 1}],
+            input  => undef,
+            valid  => 0,
+            tags   => ["clause:ok", "op", "op:not"],
+        },
+    );
+
+    # check is tested in 20-clause-check.json
+
+    # prop is tested in 20-clause-prop.json
+
+    # check_prop is tested in 20-clause-check_prop.json
+
+    # if is tested in 20-clause-if.json
+
+    # postfilters is tested in 20-clause-prefilters.json
+
+    @res;
+}
+
+sub gen_op_attr_tests {
+    my %args = @_;
+    my @res;
+
+    die "BUG: Need at least 2 values for ok_values"
+        unless @{$args{ok_values}}>1;
+    die "BUG: Need at least 2 values for nok_values"
+        unless @{$args{nok_values}}>1;
+
+    push @res, {
+        name   => "!$Clause (nok)",
+        input  => $args{input},
+        schema => [$Type, "!$Clause" => $args{ok_values}[0]],
+        valid  => 0,
+        tags   => ["clause:$Clause", "op", "op:not", "opshortcut"],
+    };
+    push @res, {
+        name   => "!$Clause (ok)",
+        input  => $args{input},
+        schema => [$Type, "!$Clause" => $args{nok_values}[0]],
+        valid  => 1,
+        tags   => ["clause:$Clause", "op", "op:not", "opshortcut"],
+    };
+
+    push @res, {
+        name   => "$Clause.op=not (nok)",
+        input  => $args{input},
+        schema => [$Type, $Clause=>$args{ok_values}[0], "$Clause.op"=>"not"],
+        valid  => 0,
+        tags   => ["clause:$Clause", "op", "op:not"],
+    };
+    push @res, {
+        name   => "$Clause.op=not (ok)",
+        input  => $args{input},
+        schema => [$Type, $Clause=>$args{nok_values}[0], "$Clause.op"=>"not"],
+        valid  => 1,
+        tags   => ["clause:$Clause", "op", "op:not"],
+    };
+
+    push @res, {
+        name   => "$Clause& (no items)",
+        input  => $args{input},
+        schema => [$Type, "$Clause&" => []],
+        valid  => 1,
+        tags   => ["clause:$Clause", "op", "op:and", "opshortcut"],
+    };
+    push @res, {
+        name   => "$Clause& (ok)",
+        input  => $args{input},
+        schema => [$Type,
+                   "$Clause&" => $args{ok_values}],
+        valid  => 1,
+        tags   => ["clause:$Clause", "op", "op:and", "opshortcut"],
+    };
+    push @res, {
+        name   => "$Clause& (nok + ok)",
+        input  => $args{input},
+        schema => [$Type,
+                   "$Clause&" => [$args{nok_values}[0], $args{ok_values}[0]]],
+        valid  => 0,
+        errors => 1,
+        tags   => ["clause:$Clause", "op", "op:and", "opshortcut"],
+    };
+    push @res, {
+        name   => "$Clause& (ok + nok)",
+        input  => $args{input},
+        schema => [$Type,
+                   "$Clause&" => [$args{ok_values}[0], $args{nok_values}[0]]],
+        valid  => 0,
+        errors => 1,
+        tags   => ["clause:$Clause", "op", "op:and", "opshortcut"],
+    };
+    push @res, {
+        name   => "$Clause& (nok + nok)",
+        input  => $args{input},
+        schema => [$Type,
+                   "$Clause&" => [$args{nok_values}[0], $args{nok_values}[1]]],
+        valid  => 0,
+        errors => 1,
+        tags   => ["clause:$Clause", "op", "op:and", "opshortcut"],
+    };
+
+    push @res, {
+        name   => "$Clause.op=and (no items)",
+        input  => $args{input},
+        schema => [$Type, $Clause=>[], "$Clause.op"=>"and"],
+        valid  => 1,
+    };
+    push @res, {
+        name   => "$Clause.op=and (ok)",
+        input  => $args{input},
+        schema => [$Type, $Clause=>$args{ok_values}, "$Clause.op"=>"and"],
+        valid  => 1,
+        tags   => ["clause:$Clause", "op", "op:and"],
+    };
+    push @res, {
+        name   => "$Clause.op=and (nok + ok)",
+        input  => $args{input},
+        schema => [$Type,
+                   $Clause=>[$args{nok_values}[0], $args{ok_values}[0]],
+                   "$Clause.op"=>"and",
+               ],
+        valid  => 0,
+        errors => 1,
+        tags   => ["clause:$Clause", "op", "op:and"],
+    };
+    push @res, {
+        name   => "$Clause.op=and (ok + nok)",
+        input  => $args{input},
+        schema => [$Type,
+                   $Clause=>[$args{ok_values}[0], $args{nok_values}[0]],
+                   "$Clause.op"=>"and",
+               ],
+        valid  => 0,
+        errors => 1,
+        tags   => ["clause:$Clause", "op", "op:and"],
+    };
+    push @res, {
+        name   => "$Clause.op=and (nok + nok)",
+        input  => $args{input},
+        schema => [$Type,
+                   $Clause=>[$args{nok_values}[0], $args{nok_values}[1]],
+                   "$Clause.op"=>"and",
+               ],
+        valid  => 0,
+        errors => 1,
+        tags   => ["clause:$Clause", "op", "op:and"],
+    };
+
+    push @res, {
+        name   => "$Clause| (no items)",
+        input  => $args{input},
+        schema => [$Type, "$Clause|" => []],
+        valid  => 1,
+        tags   => ["clause:$Clause", "op", "op:or", "opshortcut"],
+    };
+    push @res, {
+        name   => "$Clause| (ok)",
+        input  => $args{input},
+        schema => [$Type, "$Clause|" => $args{ok_values}],
+        valid  => 1,
+        tags   => ["clause:$Clause", "op", "op:or", "opshortcut"],
+    };
+    push @res, {
+        name   => "$Clause| (nok + ok)",
+        input  => $args{input},
+        schema => [$Type,
+                   "$Clause|" => [$args{nok_values}[0], $args{ok_values}[0]]],
+        valid  => 1,
+        tags   => ["clause:$Clause", "op", "op:or", "opshortcut"],
+    };
+    push @res, {
+        name   => "$Clause| (ok + nok)",
+        input  => $args{input},
+        schema => [$Type,
+                   "$Clause|" => [$args{ok_values}[0], $args{nok_values}[0]]],
+        valid  => 1,
+        tags   => ["clause:$Clause", "op", "op:or", "opshortcut"],
+    };
+    push @res, {
+        name   => "$Clause| (nok + nok)",
+        input  => $args{input},
+        schema => [$Type,
+                   "$Clause|" => [$args{nok_values}[0], $args{nok_values}[1]]],
+        valid  => 0,
+        errors => 1,
+        tags   => ["clause:$Clause", "op", "op:or", "opshortcut"],
+    };
+
+    push @res, {
+        name   => "$Clause.op=or (no items)",
+        input  => $args{input},
+        schema => [$Type, $Clause => [], "$Clause.op"=>"or"],
+        valid  => 1,
+        tags   => ["clause:$Clause", "op", "op:or"],
+    };
+    push @res, {
+        name   => "$Clause.op=or (ok)",
+        input  => $args{input},
+        schema => [$Type, $Clause=>$args{ok_values}, "$Clause.op"=>"or"],
+        valid  => 1,
+        tags   => ["clause:$Clause", "op", "op:or"],
+    };
+    push @res, {
+        name   => "$Clause.op=or (nok + ok)",
+        input  => $args{input},
+        schema => [$Type,
+                   $Clause=>[$args{nok_values}[0], $args{ok_values}[0]],
+                   "$Clause.op"=>"or",
+               ],
+        valid  => 1,
+        tags   => ["clause:$Clause", "op", "op:or"],
+    };
+    push @res, {
+        name   => "$Clause.op=or (ok + nok)",
+        input  => $args{input},
+        schema => [$Type,
+                   $Clause=>[$args{ok_values}[0], $args{nok_values}[0]],
+                   "$Clause.op"=>"or",
+               ],
+        valid  => 1,
+        tags   => ["clause:$Clause", "op", "op:or"],
+    };
+    push @res, {
+        name   => "$Clause.op=or (nok + nok)",
+        input  => $args{input},
+        schema => [$Type,
+                   $Clause=>[$args{nok_values}[0], $args{nok_values}[1]],
+                   "$Clause.op"=>"or",
+               ],
+        valid  => 0,
+        errors => 1,
+        tags   => ["clause:$Clause", "op", "op:or"],
+    };
+
+    push @res, {
+        name   => "$Clause.op=none (empty items)",
+        input  => $args{input},
+        schema => [$Type, $Clause=>[], "$Clause.op"=>"none"],
+        valid  => 1,
+        tags   => ["clause:$Clause", "op", "op:none"],
+    };
+    push @res, {
+        name   => "$Clause.op=none (nok + nok)",
+        input  => $args{input},
+        schema => [$Type,
+                   $Clause=>[$args{nok_values}[0], $args{nok_values}[1]],
+                   "$Clause.op"=>"none"],
+        valid  => 1,
+        tags   => ["clause:$Clause", "op", "op:none"],
+    };
+    push @res, {
+        name   => "$Clause.op=none (nok + ok)",
+        input  => $args{input},
+        schema => [$Type,
+                   $Clause=>[$args{nok_values}[0], $args{ok_values}[0]],
+                   "$Clause.op"=>"none"],
+        valid  => 0,
+        errors => 1,
+        tags   => ["clause:$Clause", "op", "op:none"],
+    };
+    push @res, {
+        name   => "$Clause.op=none (ok + nok)",
+        input  => $args{input},
+        schema => [$Type,
+                   $Clause=>[$args{ok_values}[0], $args{nok_values}[0]],
+                   "$Clause.op"=>"none"],
+        valid  => 0,
+        errors => 1,
+        tags   => ["clause:$Clause", "op", "op:none"],
+    };
+    push @res, {
+        name   => "$Clause.op=none (ok + ok)",
+        input  => $args{input},
+        schema => [$Type, $Clause=>$args{ok_values}, "$Clause.op"=>"none"],
+        valid  => 0,
+        errors => 1,
+        tags   => ["clause:$Clause", "op", "op:none"],
+    };
+
+    @res;
+}
+
+sub gen_err_level_tests {
+    my %args = @_;
+    (
+        {
+            name   => ".err_level=error (clause=$args{clause}, ok)",
+            input  => $args{ok_value},
+            schema => [$Type, $args{clause} => $args{cval}],
+            valid  => 1,
+            tags   => ['attr', 'attr:err_level'],
+        },
+        {
+            name   => ".err_level=error (clause=$args{clause}, nok)",
+            input  => $args{nok_value},
+            schema => [$Type, $args{clause} => $args{cval}],
+            valid  => 0,
+            tags   => ['attr', 'attr:err_level'],
+        },
+        {
+            name   => ".err_level=warn (clause=$args{clause}, ok)",
+            input  => $args{ok_value},
+            schema => [$Type, $args{clause} => $args{cval},
+                       "$args{clause}.err_level"=>"warn"],
+            valid  => 1,
+            tags   => ['attr', 'attr:err_level'],
+        },
+        {
+            name   => ".err_level=warn (clause=$args{clause}, nok)",
+            input  => $args{nok_value},
+            schema => ["$Type*", $args{clause} => $args{cval},
+                       "$args{clause}.err_level"=>"warn"],
+            valid  => 1,
+            warnings => 1,
+            tags   => ['attr', 'attr:err_level'],
+        },
+    );
+    # XXX .err_level=fatal (needs two clauses)
+}
+
+sub gen_Comparable_tests {
+    my %args = @_;
+    my @res;
+
+    my $v  = $args{values}[0];
+    my $v2 = $args{values}[1];
+
+    # is
+    push @res, {
+        name   => "is: must accept same value",
+        schema => [$Type, is=>$v],
+        input  => $v,
+        valid  => 1,
+        tags   => ['clause:is'],
+    };
+    push @res, {
+        name   => "is: must reject different value",
+        schema => [$Type, is=>$v2],
+        input  => $v,
+        valid  => 0,
+        tags   => ['clause:is'],
+    };
+    local $Clause = "is";
+    push @res, gen_op_attr_tests(
+        input      => $v,
+        ok_values  => [$v, $v],
+        nok_values => [$v2, $v2],
+    );
+
+    # in
+    push @res, {
+        name   => "in: must accept valid choices",
+        schema => [$Type, in=>$args{values}],
+        input  => $v,
+        valid  => 1,
+        tags   => ['clause:in'],
+    };
+    push @res, {
+        name   => "in: must reject empty choices",
+        schema => [$Type, in=>[]],
+        input  => $v,
+        valid  => 0,
+        tags   => ['clause:in'],
+    };
+    local $Clause = "in";
+    push @res, gen_op_attr_tests(
+        input      => $v,
+        ok_values  => [$args{values}, clone($args{values})],
+        nok_values => [[], []],
+    );
+
+    @res;
+}
+
+sub gen_Sortable_tests {
+    my %args = @_;
+    my @res;
+
+    die "BUG: Please supply 3 values" unless @{ $args{values} } == 3;
+
+    # $v2 must be > $v1, and $v3 must be >= $v2
+    my ($v1, $v2, $v3) = @{ $args{values} };
+
+    push @res, (
+
+        {
+            name   => "min: "._l($v2)." "._l($v1),
+            input  => $v2,
+            schema => [$Type, min => $v1],
+            valid  => 1,
+            tags   => ['clause:min'],
+        },
+        {
+            name   => "min: "._l($v2)." "._l($v2),
+            input  => $v2,
+            schema => [$Type, min => $v2],
+            valid  => 1,
+            tags   => ['clause:min'],
+        },
+        {
+            name   => "min: "._l($v1)." "._l($v2).' -> fail',
+            input  => $v1,
+            schema => [$Type, min => $v2],
+            valid  => 0,
+            tags   => ['clause:min'],
+        },
+
+        {
+            name   => "xmin: "._l($v2)." "._l($v1),
+            input  => $v2,
+            schema => [$Type, xmin => $v1],
+            valid  => 1,
+            tags   => ['clause:xmin'],
+        },
+        {
+            name   => "xmin: "._l($v2)." "._l($v2).' -> fail',
+            input  => $v2,
+            schema => [$Type, xmin => $v2],
+            valid  => 0,
+            tags   => ['clause:xmin'],
+        },
+        {
+            name   => "xmin: "._l($v1)." "._l($v2).' -> fail',
+            input  => $v1,
+            schema => [$Type, xmin => $v2],
+            valid  => 0,
+            tags   => ['clause:xmin'],
+        },
+
+        {
+            name   => "max: "._l($v2)." "._l($v1).' -> fail',
+            input  => $v2,
+            schema => [$Type, max => $v1],
+            valid  => 0,
+            tags   => ['clause:max'],
+        },
+        {
+            name   => "max: "._l($v2)." "._l($v2),
+            input  => $v2,
+            schema => [$Type, max => $v2],
+            valid  => 1,
+            tags   => ['clause:max'],
+        },
+        {
+            name   => "max: "._l($v1)." "._l($v2),
+            input  => $v1,
+            schema => [$Type, max => $v2],
+            valid  => 1,
+            tags   => ['clause:max'],
+        },
+
+        {
+            name   => "xmax: "._l($v2)." "._l($v1).' -> fail',
+            input  => $v2,
+            schema => [$Type, xmax => $v1],
+            valid  => 0,
+            tags   => ['clause:xmax'],
+        },
+        {
+            name   => "xmax: "._l($v2)." "._l($v2).' -> fail',
+            input  => $v2,
+            schema => [$Type, xmax => $v2],
+            valid  => 0,
+            tags   => ['clause:xmax'],
+        },
+        {
+            name   => "xmax: "._l($v1)." "._l($v2),
+            input  => $v1,
+            schema => [$Type, xmax => $v2],
+            valid  => 1,
+            tags   => ['clause:xmax'],
+        },
+
+        {
+            name   => "between: "._l($v2)." "._l($v1)." & "._l($v3),
+            input  => $v2,
+            schema => [$Type, between => [$v1, $v3]],
+            valid  => 1,
+            tags   => ['clause:between'],
+        },
+        {
+            name   => "between: "._l($v2)." "._l($v1)." & "._l($v2),
+            input  => $v2,
+            schema => [$Type, between => [$v1, $v2]],
+            valid  => 1,
+            tags   => ['clause:between'],
+        },
+        {
+            name   => "between: "._l($v2)." "._l($v2)." & "._l($v2),
+            input  => $v2,
+            schema => [$Type, between => [$v2, clone($v2)]],
+            valid  => 1,
+            tags   => ['clause:between'],
+        },
+        {
+            name   => "between: "._l($v1)." "._l($v2)." & "._l($v3).' -> fail',
+            input  => $v1,
+            schema => [$Type, between => [$v2, $v3]],
+            valid  => 0,
+            tags   => ['clause:between'],
+        },
+
+        {
+            name   => "xbetween: "._l($v2)." "._l($v1)." & "._l($v3),
+            input  => $v2,
+            schema => [$Type, xbetween => [$v1, $v3]],
+            valid  => $v3 eq $v2 ? 0:1,
+            tags   => ['clause:xbetween'],
+        },
+        {
+            name   => "xbetween: "._l($v2)." "._l($v1)." & "._l($v2).' -> fail',
+            input  => $v2,
+            schema => [$Type, xbetween => [$v1, $v2]],
+            valid  => 0,
+            tags   => ['clause:xbetween'],
+        },
+        {
+            name   => "xbetween: "._l($v2)." "._l($v2)." & "._l($v2).' -> fail',
+            input  => $v2,
+            schema => [$Type, xbetween => [$v2, clone($v2)]],
+            valid  => 0,
+            tags   => ['clause:xbetween'],
+        },
+        {
+            name   => "xbetween: "._l($v1)." "._l($v2)." & "._l($v3).' -> fail',
+            input  => $v1,
+            schema => [$Type, xbetween => [$v2, $v3]],
+            valid  => 0,
+            tags   => ['clause:xbetween'],
+        },
+
+    );
+
+    local $Clause = "between";
+    push @res, gen_op_attr_tests(
+        input      => $v1,
+        # i know, lame, it's because bool only has two possible values
+        ok_values  => [[$v1, clone($v1)], [$v1, clone($v1)]],
+        nok_values => [[$v2, clone($v2)], [$v2, clone($v2)]],
+    );
+
+    # XXX op attr for xbetween
+
+    @res;
+}
+
+sub gen_HasElems_tests {
+    my %args = @_;
+    my @res;
+
+    die "BUG: Please supply two values" unless @{$args{values}} == 2;
+
+    my $v1 = $args{values}[0][0];
+    my $l1 = $args{values}[0][1];
+    my $v2 = $args{values}[1][0];
+    my $l2 = $args{values}[1][1];
+
+    die "BUG: First value's length must be less than second value's"
+        unless $l1 < $l2;
+
+    push @res, (
+        {
+            name   => "len (ok)",
+            input  => $v1,
+            schema => [$Type, len => $l1],
+            valid  => 1,
+            tags   => ['clause:len'],
+        },
+        {
+            name   => "len (nok)",
+            input  => $v1,
+            schema => [$Type, len => $l2],
+            valid  => 0,
+            tags   => ['clause:len'],
+        },
+        {
+            name   => "min_len (ok)",
+            input  => $v1,
+            schema => [$Type, min_len => $l1],
+            valid  => 1,
+            tags   => ['clause:min_len'],
+        },
+        {
+            name   => "min_len (nok)",
+            input  => $v1,
+            schema => [$Type, min_len => $l2],
+            valid  => 0,
+            tags   => ['clause:min_len'],
+        },
+        {
+            name   => "max_len (ok)",
+            input  => $v1,
+            schema => [$Type, min_len => $l1],
+            valid  => 1,
+            tags   => ['clause:max_len'],
+        },
+        {
+            name   => "max_len (nok)",
+            input  => $v2,
+            schema => [$Type, max_len => $l1],
+            valid  => 0,
+            tags   => ['clause:max_len'],
+        },
+        {
+            name   => "len_between (ok)",
+            input  => $v1,
+            schema => [$Type, len_between => [$l1, $l2]],
+            valid  => 1,
+            tags   => ['clause:len_between'],
+        },
+        {
+            name   => "len_between (nok)",
+            input  => $v2,
+            schema => [$Type, len_between => [$l1, $l1]],
+            valid  => 0,
+            tags   => ['clause:len_between'],
+        },
+    );
+
+    for my $cl ("each_index", @{ $args{aliases_for_each_index} // [] }) {
+        push @res, (
+            {
+                name   => "$cl (ok)",
+                input  => $v2,
+                schema => [$Type, $cl => $args{ok_each_index}],
+                valid  => 1,
+                tags   => ["clause:$cl"],
+            },
+            {
+                name   => "$cl (nok)",
+                input  => $v2,
+                schema => [$Type, $cl => $args{nok_each_index}],
+                valid  => 0,
+                tags   => ["clause:$cl"],
+            },
+        );
+    }
+    for my $cl ("each_elem", @{ $args{aliases_for_each_elem} // [] }) {
+        push @res, (
+            {
+                name   => "$cl (ok)",
+                input  => $v2,
+                schema => [$Type, $cl => $args{ok_each_elem}],
+                valid  => 1,
+                tags   => ["clause:$cl"],
+            },
+            {
+                name   => "$cl (nok)",
+                input  => $v2,
+                schema => [$Type, $cl => $args{nok_each_elem}],
+                valid  => 0,
+                tags   => ["clause:$cl"],
+            },
+        );
+    }
+
+    for my $cl ("check_each_index", @{ $args{aliases_for_check_each_index} // [] }) {
+        push @res, (
+            {
+                name           => "$cl",
+                schema         => [$Type => $cl => $args{check_each_index_value}],
+                valid_inputs   => $args{check_each_index_valid_inputs}   // [],
+                invalid_inputs => $args{check_each_index_invalid_inputs} // [],
+                tags           => ["clause:$cl"],
+            },
+        ) if exists($args{check_each_index_value});
+    }
+
+    for my $cl ("check_each_elem", @{ $args{aliases_for_check_each_elem} // [] }) {
+        push @res, (
+            {
+                name           => "$cl",
+                schema         => [$Type => $cl => $args{check_each_elem_value}],
+                valid_inputs   => $args{check_each_elem_valid_inputs}   // [],
+                invalid_inputs => $args{check_each_elem_invalid_inputs} // [],
+                tags           => ["clause:$cl"],
+            },
+        ) if exists($args{check_each_elem_value});
+    }
+
+    push @res, (
+        {
+            name           => 'uniq=1',
+            schema         => [$Type => uniq => 1],
+            valid_inputs   => $args{uniq_inputs}    // [],
+            invalid_inputs => $args{nonuniq_inputs} // [],
+            tags           => ['clause:uniq'],
+        },
+        {
+            name           => 'uniq=0',
+            schema         => [$Type => uniq => 0],
+            valid_inputs   => $args{nonuniq_inputs} // [],
+            invalid_inputs => $args{uniq_inputs}    // [],
+            tags           => ['clause:uniq'],
+        },
+        {
+            name           => '!uniq=1',
+            schema         => [$Type => "!uniq" => 1],
+            valid_inputs   => $args{nonuniq_inputs} // [],
+            invalid_inputs => $args{uniq_inputs}    // [],
+            tags           => ['clause:uniq', 'op', 'op:not', 'opshortcut'],
+        },
+    ) if $args{uniq_inputs};
+
+    push @res, (
+        {
+            name           => 'exists',
+            schema         => $args{exists_value},
+            valid_inputs   => $args{exists_valid_inputs}   // [],
+            invalid_inputs => $args{exists_invalid_inputs} // [],
+            tags           => ['clause:exists'],
+        },
+    ) if $args{exists_value};
+
+    if ($args{elems_test}) {
+        for ($args{elems_test}) {
+            push @res, (
+                {
+                    name   => 'elems (ok)',
+                    input  => $_->{value},
+                    schema => [$Type, elems => $_->{ok}],
+                    valid  => 1,
+                    tags   => ['clause:elems'],
+                },
+                {
+                    name   => 'elems (nok)',
+                    input  => $_->{value},
+                    schema => [$Type, elems => $_->{nok}],
+                    valid  => 0,
+                    tags   => ['clause:elems'],
+                },
+            );
+        }
+    }
+
+    push @res, (
+        {
+            name           => 'has',
+            schema         => [$Type => has => $args{has_values}[0]],
+            valid_inputs   => $args{has_valid_inputs}   // [],
+            invalid_inputs => $args{has_invalid_inputs} // [],
+            tags           => ['clause:has'],
+        },
+        {
+            name           => 'has + op.not',
+            schema         => [$Type => "!has" => $args{has_values}[0]],
+            valid_inputs   => $args{has_invalid_inputs} // [],
+            invalid_inputs => $args{has_valid_inputs}   // [],
+            tags           => ['clause:has', 'op', 'op:not', 'opshortcut'],
+        },
+        {
+            name           => 'has + op.or',
+            schema         => [$Type => "has|" => $args{has_values}],
+            valid_inputs   => $args{has_valid_inputs}   // [],
+            invalid_inputs => $args{has_invalid_inputs} // [],
+            tags           => ['clause:has', 'op', 'op:or', 'opshortcut'],
+        },
+        {
+            name           => 'has + op.and',
+            schema         => [$Type => "has&" => $args{has_values}],
+            valid_inputs   => [$args{has_valid_inputs}[0]],
+            invalid_inputs => [$args{has_valid_inputs}[1], @{ $args{has_invalid_inputs} }],
+            tags           => ['clause:has', 'op', 'op:and', 'opshortcut'],
+        },
+        # XXX has + op.none
+    ) if $args{has_values};
+
+    # XXX multi vals for all clauses that haven't the tests for yet
+
+    push @res, (
+        {
+            name           => 'prop:len',
+            schema         => [$Type => prop => [len => $args{prop_len_schema}]],
+            valid_inputs   => $args{prop_len_valid_inputs}   // [],
+            invalid_inputs => $args{prop_len_invalid_inputs} // [],
+            tags           => ['prop:len'],
+        },
+    ) if $args{prop_len_schema};
+
+    for my $pr ("indices", @{ $args{aliases_for_indices} // [] }) {
+        push @res, (
+            {
+                name           => "prop:$pr",
+                schema         => [$Type => prop => [$pr => $args{prop_indices_schema}]],
+                valid_inputs   => $args{prop_indices_valid_inputs}   // [],
+                invalid_inputs => $args{prop_indices_invalid_inputs} // [],
+                tags           => ["prop:$pr"],
+            },
+        ) if $args{prop_indices_schema};
+    }
+
+    for my $pr ("elems", @{ $args{aliases_for_elems} // [] }) {
+        push @res, (
+            {
+                name           => "prop:$pr",
+                schema         => [$Type => prop => [$pr => $args{prop_elems_schema}]],
+                valid_inputs   => $args{prop_elems_valid_inputs}   // [],
+                invalid_inputs => $args{prop_elems_invalid_inputs} // [],
+                tags           => ["prop:$pr"],
+            },
+        ) if $args{prop_elems_schema};
+    }
+
+    @res;
+}
+
+sub postprocess {
+    my $res = shift;
+
+    my $id = 1;
+
+    for (@$res) {
+        # add type tags
+        $_->{tags} //= [];
+        unshift @{ $_->{tags} }, 'type', "type:$Type";
+
+        # add ID
+        $_->{name} = sprintf("%s%04d: %s", $Type, $id, $_->{name});
+
+        $id++;
+    }
+}
+
+sub gen_undef_tests {
+    my %args = @_;
+    my @res;
+
+    local $Type = "undef";
+
+    push @res, (
+        {
+            name   => 'ok',
+            input  => undef,
+            schema => ['undef'],
+            valid  => 1,
+            tags   => [],
+        },
+        {
+            name   => 'nok',
+            input  => 0,
+            schema => ['undef'],
+            valid  => 0,
+            tags   => [],
+        },
+    );
+
+    postprocess(\@res);
+    @res;
+}
+
+sub gen_int_tests {
+    my %args = @_;
+    my @res;
+
+    local $Type = "int";
+
+    push @res, (
+        gen_type_check_tests(
+            accept => [-1, 0, 1],
+            reject => [1.1, "a", [], {}], # XXX -Inf, NaN, Inf
+        ),
+        gen_BaseType_tests(
+            value => 2,
+            ok_defaults  => [1],
+            nok_defaults => [[]],
+            ok_clauses   => [[min=>1], [max=>2]],
+            nok_clauses  => [[min=>3], [xmax=>2]],
+        ),
+        gen_err_level_tests(
+            clause    => 'div_by',
+            cval      => 3,
+            ok_value  => 9,
+            nok_value => 8,
+        ),
+        gen_Comparable_tests(
+            values => [1, 2],
+        ),
+        gen_Sortable_tests(
+            values => [-3, 2, 4],
+        ),
+
+        {
+            name   => 'mod: (nok)',
+            input  => 10,
+            schema => [int => mod => [3, 2]],
+            valid  => 0,
+            tags   => ['clause:mod'],
+        },
+        {
+            name   => 'mod: (ok)',
+            input  => 11,
+            schema => [int => mod => [3, 2]],
+            valid  => 1,
+            tags   => ['clause:mod'],
+        },
+
+        {
+            name   => 'div_by: (nok)',
+            input  => 7,
+            schema => [int => div_by => 3],
+            valid  => 0,
+            tags   => ['clause:div_by'],
+        },
+        {
+            name   => 'div_by: (ok)',
+            input  => 6,
+            schema => [int => div_by => 3],
+            valid  => 1,
+            tags   => ['clause:div_by'],
+        },
+
+    );
+
+    # XXX op attr for mod
+    # XXX op attr for div_by
+    # XXX div_by 0
+
+    postprocess(\@res);
+    @res;
+}
+
+# XXX currently we treat num and float as the same because we don't do
+# float-specific like is_{nan,inf,pos_inf,neg_inf} due to json doesn't support
+# serializing Inf/NaN.
+sub _gen_float_or_num_tests {
+    my ($which, %args) = @_;
+    my @res;
+
+    local $Type = $which;
+
+    push @res, (
+        gen_type_check_tests(
+            accept => [-1.1, -1, 0, 1, 1.1], # XXX -Inf, NaN, Inf
+            reject => ["a", [], {}],
+        ),
+        gen_BaseType_tests(
+            value => 1.1,
+            ok_defaults  => [1.1],
+            nok_defaults => [[]],
+            ok_clauses   => [[min=>1], [max=>1.1]],
+            nok_clauses  => [[min=>2], [max=>1]],
+        ),
+        gen_err_level_tests(
+            clause    => 'min',
+            cval      => 0,
+            ok_value  =>  0.1,
+            nok_value => -0.1,
+        ),
+        gen_Comparable_tests(
+            values => [1.1, 1.2],
+        ),
+        gen_Sortable_tests(
+            values => [-3.1, 2.1, 4.1],
+        ),
+
+        # is_{nan,inf,pos_inf,neg_inf} is currently tested in perl compiler
+    );
+
+    postprocess(\@res);
+    @res;
+}
+
+sub gen_num_tests { _gen_float_or_num_tests('num', @_) }
+
+sub gen_float_tests { _gen_float_or_num_tests('float', @_) }
+
+sub gen_array_tests {
+    my %args = @_;
+    my @res;
+
+    local $Type = "array";
+
+    push @res, (
+        gen_type_check_tests(
+            accept => [[], [1, "a"], [[]]],
+            reject => [1, "a", {}],
+        ),
+        gen_BaseType_tests(
+            value => [1],
+            ok_defaults  => [[]],
+            nok_defaults => ["a"],
+            ok_clauses   => [[min_len=>0], [max_len=>1]],
+            nok_clauses  => [[min_len=>2], [max_len=>0]],
+        ),
+        gen_err_level_tests(
+            clause    => 'is',
+            cval      => [],
+            ok_value  => [],
+            nok_value => [0],
+        ),
+        gen_Comparable_tests(
+            values => [[1], [2]],
+        ),
+
+        gen_HasElems_tests(
+            # two values, each value is [VAL, LEN].
+            values => [ [[1], 1], [[1, 1.2], 2] ],
+
+            # will be tested on the second value
+            ok_each_index  => [int =>  max => 1],
+            nok_each_index => [int => xmax => 1],
+            ok_each_elem   => "float",
+            nok_each_elem  => "int",
+            # 'elems' is actually not part of HasElems currently, but we stick
+            # it in here for the moment. str might get 'elems' too.
+            elems_test     => {value=>[1, 1.2], ok=>["int","float"], nok=>["int","int"]},
+
+            check_each_index_value          => '$_ <= 2',
+            check_each_index_valid_inputs   => [[], [1], [1,1], [1,1,1]],
+            check_each_index_invalid_inputs => [[1,1,1,1]],
+
+            check_each_elem_value           => '$_ >= 2',
+            check_each_elem_valid_inputs    => [[], [3], [3, 2]],
+            check_each_elem_invalid_inputs  => [[1], [2, 1]],
+
+            uniq_inputs    => [[], [1], [1,2]],
+            nonuniq_inputs => [[1,1]],
+
+            exists_value          => [int => max => 2],
+            exists_valid_inputs   => [[1], [3, 1]],
+            exists_invalid_inputs => [[], [3]],
+
+            # has_values should be 2 elements, has_valid_inputs should be 2
+            # elements where the first one has both has_values and the second
+            # only the first. has_invalid_inputs must not have any values in
+            # has_values.
+            has_values         => [1, 2],
+            has_valid_inputs   => [[1, 2, 3], [1, 3]],
+            has_invalid_inputs => [[], [3]],
+
+            prop_len_schema             => [int => is => 2],
+            prop_len_valid_inputs       => [[1, 1], [1, 2]],
+            prop_len_invalid_inputs     => [[], [1]],
+
+            prop_indices_schema         => [array => has => 2],
+            prop_indices_valid_inputs   => [[1, 1, 1]],
+            prop_indices_invalid_inputs => [[], [1], [1, 1]],
+
+            prop_elems_schema           => [array => has => "a"],
+            prop_elems_valid_inputs     => [["a", "b"]],
+            prop_elems_invalid_inputs   => [[], ["b"]],
+
+            aliases_for_each_elem => ['of'],
+        ),
+    );
+
+    # this is to test implementation that uses nested loop variable (e.g. $_ in
+    # perl). we want to make sure that they work.
+    my $sch  = [array => of => [array => of => "int"]];
+    push @res, (
+        {
+            name           => "array[array[int]] (test nested loop variable in implementation)",
+            schema         => $sch,
+            valid_inputs   => [ [], [[1,2], [3,4]] ],
+            invalid_inputs => [ [[1,2], [[],4]] ],
+            tags           => ['clause:of'],
+        },
+    );
+
+    # elems
+    $sch = [array => {elems => ["int*", ["float", default=>2]]}];
+    push @res, (
+        {
+            name   => 'elems (nok, first elem required)',
+            input  => [undef, 1],
+            schema => $sch,
+            valid  => 0,
+            tags   => ['clause:elems'],
+        },
+        {
+            name   => 'elems (ok, missing elem set to undef)',
+            input  => [1],
+            schema => $sch,
+            valid  => 1,
+            tags   => ['clause:elems'],
+        },
+        {
+            name   => 'elems (ok, second elem optional)',
+            input  => [1, undef],
+            schema => $sch,
+            valid  => 1,
+            tags   => ['clause:elems'],
+        },
+        {
+            name   => 'elems (ok 2)',
+            input  => [1, 1.1],
+            schema => $sch,
+            valid  => 1,
+            tags   => ['clause:elems'],
+        },
+        {
+            name   => 'elems (ok, extra elems ignored)',
+            input  => [1, 1.1, undef],
+            schema => $sch,
+            valid  => 1,
+            tags   => ['clause:elems'],
+        },
+        {
+            name   => 'elems (ok, extra elems ignored 2)',
+            input  => [1, 1.1, "foo"],
+            schema => $sch,
+            valid  => 1,
+            tags   => ['clause:elems'],
+        },
+    );
+
+    $sch = [array => {elems => ["int", ["int", default=>2]],
+                      "elems.create_default"=>0}];
+    push @res, (
+        {
+            name   => 'elems (ok, create_default=0)',
+            input  => [1],
+            schema => $sch,
+            valid  => 1,
+            output => [1],
+            tags   => ['clause:elems'],
+        },
+        {
+            name   => 'elems (ok 2, create_default=0)',
+            input  => [1, undef],
+            schema => $sch,
+            valid  => 1,
+            output => [1, 2],
+            tags   => ['clause:elems'],
+        },
+    );
+
+    postprocess(\@res);
+    @res;
+}
+
+# XXX currently buf is treated the same as str, because js/json/we don't do
+# binary stuff yet.
+sub _gen_str_or_cistr_or_buf_tests {
+    my ($which, %args) = @_;
+    my @res;
+
+    my $ci = $which =~ /ci/;
+
+    local $Type = $which;
+
+    push @res, (
+        gen_type_check_tests(
+            accept => [0, 1.1, "", "str\n"],
+            reject => [[], {}],
+        ),
+        gen_BaseType_tests(
+            value => "a",
+            ok_defaults  => ["a"],
+            nok_defaults => [[]],
+            ok_clauses   => [[match=>"a"], [len=>1]],
+            nok_clauses  => [[match=>"b"], [len=>2]],
+        ),
+        gen_err_level_tests(
+            clause    => 'is',
+            cval      => "a",
+            ok_value  => "a",
+            nok_value => "a\n",
+        ),
+        gen_Comparable_tests(
+            values => $ci ? ["a", "B"] : ["a", "b"],
+        ),
+
+        gen_Sortable_tests(
+            values => $ci ? ["", "a", "Ab"] : ["", "a", "ab"],
+        ),
+
+        gen_HasElems_tests(
+            # two values, each value is [VAL, LEN]
+            values => [ ["a", 1], ["abc", 3] ],
+            # will be tested on the second value
+            ok_each_index  => [int =>  max => 2],
+            nok_each_index => [int => xmax => 2],
+            ok_each_elem   => $which,
+            nok_each_elem  => "float",
+            # currently only array has 'elems' clause, and it's not part of
+            # HasElems role
+            #elems_test     => {value=>"abc", ok=>[$which,$which,$which], nok=>[$which,$which,[$which=>is=>"d"]]},
+
+            check_each_index_value          => '$_ <= 2',
+            check_each_index_valid_inputs   => ["", "a", "aa", "aaa"],
+            check_each_index_invalid_inputs => ["aaaa"],
+
+            check_each_elem_value           => '$_ eq "a"',
+            check_each_elem_valid_inputs    => $ci ? [[], ["a", "A"]] : [[], ["a"]],
+            check_each_elem_invalid_inputs  => $ci ? [["a", "b"]] : [["A"], ["a", "b"]],
+
+            uniq_inputs    => $ci ? ["", "a", "ab"] : ["", "a", "ab", "Aab"],
+            nonuniq_inputs => $ci ? ["Aa"] : ["aa"],
+
+            exists_value          => [str => is => "a"],
+            exists_valid_inputs   => $ci ? ["a", "ba", "bA"] : ["a", "ba"],
+            exists_invalid_inputs => $ci ? ["", "bc"] : ["", "bc", "A"],
+
+            # has_values should be 2 elements, has_valid_inputs should be 2
+            # elements where the first one has both has_values and the second
+            # only the first. has_invalid_inputs must not have any values in
+            # has_values.
+            has_values         => ["a", "b"],
+            has_valid_inputs   => $ci ? ["abc", "Ac"] : ["abc", "ac"],
+            has_invalid_inputs => $ci ? ["", "c"] : ["", "A", "c"],
+
+            prop_len_schema             => [int => is => 2],
+            prop_len_valid_inputs       => ["aa"],
+            prop_len_invalid_inputs     => ["", "a"],
+
+            prop_indices_schema         => [array => has => 2],
+            prop_indices_valid_inputs   => ["aaa"],
+            prop_indices_invalid_inputs => ["", "a", "aa"],
+
+            prop_elems_schema           => [array => has => "a"],
+            prop_elems_valid_inputs     => $ci ? ["Ab"] : ["ab"],
+            prop_elems_invalid_inputs   => $ci ? ["", "b"] : ["", "Ab"],
+        ),
+
+        {
+            name   => 'encoding: (ok)',
+            input  => "a",
+            schema => [$which => encoding => "utf8"],
+            valid  => 1,
+            tags   => ['clause:encoding'],
+        },
+
+        # XXX test invalid utf8 string, but how to represent this in JSON?
+
+        {
+            name   => 'encoding: (dies, unknown encoding)',
+            input  => "a",
+            schema => [$which => encoding => "foo"],
+            dies   => 1,
+            tags   => ['clause:encoding'],
+        },
+
+        {
+            name   => 'match: (ok)',
+            input  => $ci ? "A" : "a",
+            schema => [$which => match => "[abc]"],
+            valid  => 1,
+            tags   => ['clause:match'],
+        },
+        {
+            name   => 'match: (nok)',
+            input  => $ci ? "z" : "A",
+            schema => [$which => match => "[abc]"],
+            valid  => 0,
+            tags   => ['clause:match'],
+        },
+        {
+            name   => 'match: (dies, invalid regex)',
+            input  => "a",
+            schema => [$which => match => "("],
+            dies   => 1,
+            tags   => ['clause:match'],
+        },
+
+        {
+            name   => 'is_re: 1 (ok)',
+            input  => "a",
+            schema => [$which => is_re => 1],
+            valid  => 1,
+            tags   => ['clause:is_re'],
+        },
+        {
+            name   => 'is_re: 1 (nok)',
+            input  => "a(",
+            schema => [$which => is_re => 1],
+            valid  => 0,
+            tags   => ['clause:is_re'],
+        },
+        {
+            name   => 'is_re: 0 (ok)',
+            input  => "a(",
+            schema => [$which => is_re => 0],
+            valid  => 1,
+            tags   => ['clause:is_re'],
+        },
+        {
+            name   => 'is_re: 0 (nok)',
+            input  => "a",
+            schema => [$which => is_re => 0],
+            valid  => 0,
+            tags   => ['clause:is_re'],
+        },
+
+    );
+
+    postprocess(\@res);
+    @res;
+}
+
+sub gen_str_tests { _gen_str_or_cistr_or_buf_tests("str", @_) }
+
+sub gen_cistr_tests { _gen_str_or_cistr_or_buf_tests("cistr", @_) }
+
+sub gen_buf_tests { _gen_str_or_cistr_or_buf_tests("buf", @_) }
+
+# currently only tests the minimum and doesn't currently test valid inputs,
+# because js/json doesn't differentiate hash & object. in Data::Sah, a test for
+# perl compiler is provided.
+sub gen_obj_tests {
+    my %args = @_;
+    my @res;
+
+    local $Type = "obj";
+
+    push @res, (
+        {
+            name           => 'can (nok)',
+            schema         => [$Type => {can => "foo"}],
+            input          => 1,
+            valid          => 0,
+            tags           => ["clause:can"],
+        },
+        {
+            name           => 'isa (nok)',
+            schema         => [$Type => {isa => "foo"}],
+            input          => 1,
+            valid          => 0,
+            tags           => ["clause:isa"],
+        },
+
+        {
+            name           => 'prop:meths (nok)',
+            schema         => [$Type => prop => [meths => ['array']]],
+            input          => 1,
+            valid          => 0,
+            tags           => ['prop:meths'],
+        },
+        {
+            name           => 'prop:attrs (nok)',
+            schema         => [$Type => prop => [attrs => ['array']]],
+            input          => 1,
+            valid          => 0,
+            tags           => ['prop:attrs'],
+        },
+    );
+
+    postprocess(\@res);
+    @res;
+}
+
+sub gen_hash_tests {
+    my %args = @_;
+    my @res;
+    my ($sch, $sch2);
+
+    local $Type = "hash";
+
+    push @res, (
+        gen_type_check_tests(
+            accept => [{}, {a=>1}, {""=>[]}],
+            reject => [1, "a", []],
+        ),
+        gen_BaseType_tests(
+            value => {a=>1},
+            ok_defaults  => [{}],
+            nok_defaults => ["a"],
+            ok_clauses   => [[min_len=>1], [max_len=>1]],
+            nok_clauses  => [[min_len=>2], [max_len=>0]],
+        ),
+        gen_err_level_tests(
+            clause    => 'is',
+            cval      => {a=>0},
+            ok_value  => {a=>0},
+            nok_value => {a=>1},
+        ),
+        gen_Comparable_tests(
+            values => [{}, {a=>1}],
+        ),
+
+        gen_HasElems_tests(
+            # two values, each value is [VAL, LEN].
+            values => [ [{a=>1}, 1], [{a=>1, b=>1.1}, 2] ],
+            # will be tested on the second value
+            ok_each_index  => [str => len=>1],
+            nok_each_index => [str => len=>2],
+            ok_each_elem   => "float",
+            nok_each_elem  => "int",
+            # currently only array has 'elems' clause, and it's not part of
+            # HasElems role
+
+            check_each_index_value          => '$_ eq "a"',
+            check_each_index_valid_inputs   => [{}, {a=>1}],
+            check_each_index_invalid_inputs => [{a=>1, b=>2}, {1=>"a"}],
+
+            check_each_elem_value           => '$_ eq "a"',
+            check_each_elem_valid_inputs    => [{}, {1=>"a"}],
+            check_each_elem_invalid_inputs  => [{1=>"a", 2=>"b"}, {a=>1}],
+
+            uniq_inputs    => [{}, {a=>1, b=>2}],
+            nonuniq_inputs => [{a=>1, b=>1}],
+
+            exists_value          => [str => max => "a"],
+            exists_valid_inputs   => [{1=>"a"}, {2=>"b", 1=>"a"}],
+            exists_invalid_inputs => [{}, {2=>"b"}],
+
+            # has_values should be 2 elements, has_valid_inputs should be 2
+            # elements where the first one has both has_values and the second
+            # only the first. has_invalid_inputs must not have any values in
+            # has_values.
+            has_values         => ["a", "b"],
+            has_valid_inputs   => [{1=>"a", 2=>"b", 3=>"c"}, {1=>"a", 3=>"c"}],
+            has_invalid_inputs => [{}, {3=>"c"}],
+
+            prop_len_schema             => [int => is => 2],
+            prop_len_valid_inputs       => [{a=>1, b=>2}],
+            prop_len_invalid_inputs     => [{}, {a=>1}],
+
+            prop_indices_schema         => [array => has => "a"],
+            prop_indices_valid_inputs   => [{a=>1}, {a=>1, b=>2}],
+            prop_indices_invalid_inputs => [{}, {b=>2}, {1=>"a"}],
+
+            prop_elems_schema           => [array => has => "a"],
+            prop_elems_valid_inputs     => [{1=>"a"}, {1=>"a", 2=>"b"}],
+            prop_elems_invalid_inputs   => [{}, {a=>1}, {b=>2}],
+
+            aliases_for_each_index        => ['each_key'],
+            aliases_for_each_elem         => ['of', 'each_value'],
+            aliases_for_check_each_index  => ['check_each_key'],
+            aliases_for_check_each_elem   => ['check_each_value'],
+            aliases_for_indices           => ['keys'],
+            aliases_for_elems             => ['values'],
+        )
+    );
+
+    $sch  = [hash => {keys => {a=>"int", b=>"float*"}}];
+    $sch2 = [hash => {keys => {a=>"int", b=>"float*"}}];
+
+    push @res, (
+        {
+            name   => 'keys: (ok, empty)',
+            input  => {},
+            schema => $sch,
+            valid  => 1,
+            tags   => ['clause:keys'],
+        },
+        {
+            name   => 'keys: (ok, only a, a valid 1)',
+            input  => {a=>undef},
+            schema => $sch,
+            valid  => 1,
+            tags   => ['clause:keys'],
+        },
+        {
+            name   => 'keys: (ok, only a, a valid 2)',
+            input  => {a=>1},
+            schema => $sch,
+            valid  => 1,
+            tags   => ['clause:keys'],
+        },
+        {
+            name   => 'keys: (nok, only a, a invalid)',
+            input  => {a=>1.1},
+            schema => $sch,
+            valid  => 0,
+            tags   => ['clause:keys'],
+        },
+        {
+            name   => 'keys: (ok, only a, valid 2)',
+            input  => {a=>1},
+            schema => $sch,
+            valid  => 1,
+            tags   => ['clause:keys'],
+        },
+        {
+            name   => 'keys: (ok, a & b, valid)',
+            input  => {a=>1, b=>1.1},
+            schema => $sch,
+            valid  => 1,
+            tags   => ['clause:keys'],
+        },
+        {
+            name   => 'keys: (nok, a & b, b invalid)',
+            input  => {a=>1, b=>undef},
+            schema => $sch,
+            valid  => 0,
+            tags   => ['clause:keys'],
+        },
+        {
+            name   => 'keys: (nok, a & b, a invalid)',
+            input  => {a=>1.1, b=>1.1},
+            schema => $sch,
+            valid  => 0,
+            tags   => ['clause:keys'],
+        },
+        {
+            name   => 'keys: (nok, a & b, a & b invalid)',
+            input  => {a=>1.1, b=>undef},
+            schema => $sch,
+            valid  => 0,
+            tags   => ['clause:keys'],
+        },
+        {
+            name   => 'keys: (nok, extra)',
+            input  => {a=>1, b=>1.1, c=>1},
+            schema => $sch,
+            valid  => 0,
+            tags   => ['clause:keys'],
+        },
+        {
+            name   => 'keys: (ok, extra, restrict=0)',
+            input  => {a=>1, b=>1.1, c=>1},
+            schema => $sch,
+            valid  => 0,
+            tags   => ['clause:keys'],
+        },
+    );
+
+
+    $sch = [hash => {keys => {a=>"int", b=>["int", default=>2]}}];
+    push @res, (
+        {
+            name   => 'keys (create_default=1) 1',
+            input  => {},
+            schema => $sch,
+            valid  => 1,
+            output => {b=>2},
+            tags   => ['clause:keys'],
+        },
+        {
+            name   => 'keys (create_default=1) 2',
+            input  => {b=>undef},
+            schema => $sch,
+            valid  => 1,
+            output => {b=>2},
+            tags   => ['clause:keys'],
+        },
+    );
+    $sch = [hash => {keys => {a=>"int", b=>["int", default=>2]},
+                     "keys.create_default" => 0}];
+    push @res, (
+        {
+            name   => 'keys (create_default=0) 1',
+            input  => {},
+            schema => $sch,
+            valid  => 1,
+            output => {},
+            tags   => ['clause:keys'],
+        },
+        {
+            name   => 'keys (create_default=0) 2',
+            input  => {b=>undef},
+            schema => $sch,
+            valid  => 1,
+            output => {b=>2},
+            tags   => ['clause:keys'],
+        },
+    );
+
+    $sch  = [hash => {re_keys => {'[ab]' => "int"}}];
+    push @res, (
+        {
+            name           => "re_keys",
+            schema         => $sch,
+            valid_inputs   => [{}, {a=>1}, {b=>1}],
+            invalid_inputs => [{a=>"x"}, {b=>"x"}, {c=>1}],
+            tags           => ['clause:re_keys'],
+        },
+    );
+    $sch  = [hash => {re_keys => {'[ab]' => "int"}, "re_keys.restrict"=>0}];
+    push @res, (
+        {
+            name           => "re_keys (restrict=0)",
+            schema         => $sch,
+            valid_inputs   => [{}, {a=>1}, {b=>1}, {c=>"x"}],
+            invalid_inputs => [{a=>"x"}, {b=>"x"}],
+            tags           => ['clause:re_keys'],
+        },
+    );
+
+    # this is to test implementation that uses nested loop variable (e.g. $_ in
+    # perl). we want to make sure that they work.
+    $sch  = [hash => {re_keys => {'[ab]' => [array => {of=>"int"}]}}];
+    push @res, (
+        {
+            name           => "re_keys + array[of] (test nested loop variable in implementation)",
+            schema         => $sch,
+            valid_inputs   => [{}, {a=>[]}, {a=>[1]}],
+            invalid_inputs => [{a=>1}, {a=>["b"]}],
+            tags           => ['clause:re_keys'],
+        },
+    );
+
+    for my $cl ("req_keys", "req_all_keys", "req_all") {
+        $sch  = [hash => {$cl => []}];
+        $sch2 = [hash => {$cl => [qw/a b/]}];
+        push @res, (
+            {
+                name   => "$cl: (ok, empty $cl, empty keys in input)",
+                input  => {},
+                schema => $sch,
+                valid  => 1,
+                tags   => ["clause:$cl"],
+            },
+            {
+                name   => "$cl: (ok, empty $cl, extra keys in input)",
+                input  => {a=>1},
+                schema => $sch,
+                valid  => 1,
+                tags   => ["clause:$cl"],
+            },
+            {
+                name   => "$cl: (ok)",
+                input  => {a=>1, b=>1},
+                schema => $sch2,
+                valid  => 1,
+                tags   => ["clause:$cl"],
+            },
+            {
+                name   => "$cl: (ok, extra keys in input)",
+                input  => {a=>1, b=>1, c=>1},
+                schema => $sch2,
+                valid  => 1,
+                tags   => ["clause:$cl"],
+            },
+            {
+                name   => "$cl: (nok, missing req keys in input)",
+                input  => {b=>1, c=>1},
+                schema => $sch2,
+                valid  => 0,
+                tags   => ["clause:$cl"],
+            },
+        );
+    }
+
+    $sch = [hash => {allowed_keys => [qw/a b c/]}];
+    push @res, (
+        {
+            name   => 'allowed_keys: (ok, empty keys in input)',
+            input  => {},
+            schema => $sch,
+            valid  => 1,
+            tags   => ['clause:allowed_keys'],
+        },
+        {
+            name   => 'allowed_keys: (ok)',
+            input  => {a=>1, b=>undef},
+            schema => $sch,
+            valid  => 1,
+            tags   => ['clause:allowed_keys'],
+        },
+        {
+            name   => 'allowed_keys: (nok, keys outside allowed list)',
+            input  => {a=>1, d=>undef},
+            schema => $sch,
+            valid  => 0,
+            tags   => ['clause:allowed_keys'],
+        },
+    );
+
+    $sch = [hash => {allowed_keys_re => '^(a|b|c)$'}];
+    push @res, (
+        {
+            name   => 'allowed_keys_re: (ok, empty keys in input)',
+            input  => {},
+            schema => $sch,
+            valid  => 1,
+            tags   => ['clause:allowed_keys_re'],
+        },
+        {
+            name   => 'allowed_keys_re: (ok)',
+            input  => {a=>1, b=>undef},
+            schema => $sch,
+            valid  => 1,
+            tags   => ['clause:allowed_keys_re'],
+        },
+        {
+            name   => 'allowed_keys_re: (nok, keys outside allowed regex)',
+            input  => {a=>1, d=>undef},
+            schema => $sch,
+            valid  => 0,
+            tags   => ['clause:allowed_keys_re'],
+        },
+    );
+
+    $sch = [hash => {forbidden_keys => [qw/a b c/]}];
+    push @res, (
+        {
+            name   => 'forbidden_keys: (ok, empty keys in input)',
+            input  => {},
+            schema => $sch,
+            valid  => 1,
+            tags   => ['clause:forbidden_keys'],
+        },
+        {
+            name   => 'forbidden_keys: (ok)',
+            input  => {d=>1, e=>undef},
+            schema => $sch,
+            valid  => 1,
+            tags   => ['clause:forbidden_keys'],
+        },
+        {
+            name   => 'forbidden_keys: (nok, keys in forbidden list)',
+            input  => {a=>1, d=>undef},
+            schema => $sch,
+            valid  => 0,
+            tags   => ['clause:forbidden_keys'],
+        },
+    );
+
+    $sch = [hash => {forbidden_keys_re => '^(a|b|c)$'}];
+    push @res, (
+        {
+            name   => 'forbidden_keys_re: (ok, empty keys in input)',
+            input  => {},
+            schema => $sch,
+            valid  => 1,
+            tags   => ['clause:forbidden_keys_re'],
+        },
+        {
+            name   => 'forbidden_keys_re: (ok)',
+            input  => {d=>1, e=>undef},
+            schema => $sch,
+            valid  => 1,
+            tags   => ['clause:forbidden_keys_re'],
+        },
+        {
+            name   => 'forbidden_keys_re: (nok, keys in forbidden regex)',
+            input  => {a=>1, d=>undef},
+            schema => $sch,
+            valid  => 0,
+            tags   => ['clause:forbidden_keys_re'],
+        },
+    );
+
+    for my $cl ("choose_one_key", "choose_one") {
+        $sch = [hash => {$cl=>[qw/a b/]}];
+        push @res, (
+            {
+                name   => "$cl: (ok, empty)",
+                input  => {},
+                schema => $sch,
+                valid  => 1,
+                tags   => ["clause:$cl"],
+            },
+            {
+                name   => "$cl: (ok, a)",
+                input  => {a=>0},
+                schema => $sch,
+                valid  => 1,
+                tags   => ["clause:$cl"],
+            },
+            {
+                name   => "$cl: (ok, a+d)",
+                input  => {a=>0, d=>0},
+                schema => $sch,
+                valid  => 1,
+                tags   => ["clause:$cl"],
+            },
+            {
+                name   => "$cl: (ok, b)",
+                input  => {b=>0},
+                schema => $sch,
+                valid  => 1,
+                tags   => ["clause:$cl"],
+            },
+            {
+                name   => "$cl: (ok, b+d)",
+                input  => {b=>0, d=>0},
+                schema => $sch,
+                valid  => 1,
+                tags   => ["clause:$cl"],
+            },
+            {
+                name   => "$cl: (nok, a+b)",
+                input  => {a=>0, b=>0},
+                schema => $sch,
+                valid  => 0,
+                tags   => ["clause:$cl"],
+            },
+        );
+    }
+
+    # TODO: choose_some_keys
+
+    for my $cl ("choose_all_keys", "choose_all") {
+        # this means, if either a/b/c is specified then all must be specified
+        $sch = [hash => {$cl=>[qw/a b/]}];
+        push @res, (
+            {
+                name   => "$cl: (ok, empty)",
+                input  => {},
+                schema => $sch,
+                valid  => 1,
+                tags   => ["clause:$cl"],
+            },
+            {
+                name   => "$cl: (ok, d)",
+                input  => {d=>0},
+                schema => $sch,
+                valid  => 1,
+                tags   => ["clause:$cl"],
+            },
+            {
+                name   => "$cl: (ok, a+b)",
+                input  => {a=>0, b=>0},
+                schema => $sch,
+                valid  => 1,
+                tags   => ["clause:$cl"],
+            },
+            {
+                name   => "$cl: (ok, a+b+d)",
+                input  => {a=>0, b=>0, d=>0},
+                schema => $sch,
+                valid  => 1,
+                tags   => ["clause:$cl"],
+            },
+            {
+                name   => "$cl: (nok, a)",
+                input  => {a=>0},
+                schema => $sch,
+                valid  => 0,
+                tags   => ["clause:$cl"],
+            },
+            {
+                name   => "$cl: (nok, b)",
+                input  => {b=>0},
+                schema => $sch,
+                valid  => 0,
+                tags   => ["clause:$cl"],
+            },
+        );
+    }
+
+    for my $cl ("req_one_key", "req_one") {
+        $sch = [hash => {$cl=>[qw/a b/]}];
+        push @res, (
+            {
+                name   => "$cl: (nok, empty)",
+                input  => {},
+                schema => $sch,
+                valid  => 0,
+                tags   => ["clause:$cl"],
+            },
+            {
+                name   => "$cl: (ok, a)",
+                input  => {a=>0},
+                schema => $sch,
+                valid  => 1,
+                tags   => ["clause:$cl"],
+            },
+            {
+                name   => "$cl: (ok, b)",
+                input  => {b=>0},
+                schema => $sch,
+                valid  => 1,
+                tags   => ["clause:$cl"],
+            },
+            {
+                name   => "$cl: (nok, a+b)",
+                input  => {a=>0, b=>0},
+                schema => $sch,
+                valid  => 0,
+                tags   => ["clause:$cl"],
+            },
+        );
+    }
+
+    for my $cl (qw/req_some_keys req_some/) {
+        $sch = [hash => {$cl => [1, 2, [qw/a b c/]]}];
+        push @res, (
+            {
+                name   => "$cl: (nok, empty)",
+                input  => {},
+                schema => $sch,
+                valid  => 0,
+                tags   => ["clause:$cl"],
+            },
+            {
+                name   => "$cl: (nok, d)",
+                input  => {d=>0},
+                schema => $sch,
+                valid  => 0,
+                tags   => ["clause:$cl"],
+            },
+            {
+                name   => "$cl: (ok, a)",
+                input  => {a=>0},
+                schema => $sch,
+                valid  => 1,
+                tags   => ["clause:$cl"],
+            },
+            {
+                name   => "$cl: (ok, a+d)",
+                input  => {a=>0, d=>0},
+                schema => $sch,
+                valid  => 1,
+                tags   => ["clause:$cl"],
+            },
+            {
+                name   => "$cl: (ok, b)",
+                input  => {b=>0},
+                schema => $sch,
+                valid  => 1,
+                tags   => ["clause:$cl"],
+            },
+            {
+                name   => "$cl: (ok, c)",
+                input  => {b=>0},
+                schema => $sch,
+                valid  => 1,
+                tags   => ["clause:$cl"],
+            },
+            {
+                name   => "$cl: (ok, a+b)",
+                input  => {a=>0, b=>0},
+                schema => $sch,
+                valid  => 1,
+                tags   => ["clause:$cl"],
+            },
+            {
+                name   => "$cl: (ok, a+c)",
+                input  => {a=>0, c=>0},
+                schema => $sch,
+                valid  => 1,
+                tags   => ["clause:$cl"],
+            },
+            {
+                name   => "$cl: (ok, b+c)",
+                input  => {b=>0, c=>0},
+                schema => $sch,
+                valid  => 1,
+                tags   => ["clause:$cl"],
+            },
+            {
+                name   => "$cl: (nok, a+b+c)",
+                input  => {a=>0, b=>0, c=>0},
+                schema => $sch,
+                valid  => 0,
+                tags   => ["clause:$cl"],
+            },
+        );
+    } # cl: req_some_keys
+
+    $sch = [hash => {dep_any=>["a", [qw/d1 d2/]]}];
+    push @res, (
+        {
+            name   => 'dep_any: (ok, empty)',
+            input  => {},
+            schema => $sch,
+            valid  => 1,
+        },
+        {
+            name   => 'dep_any: (nok, a specified without d1/d2)',
+            input  => {a=>0},
+            schema => $sch,
+            valid  => 0,
+        },
+        {
+            name   => 'dep_any: (ok, a specified with d1)',
+            input  => {a=>0, d1=>0},
+            schema => $sch,
+            valid  => 1,
+        },
+        {
+            name   => 'dep_any: (ok, a specified with d2)',
+            input  => {a=>0, d2=>0},
+            schema => $sch,
+            valid  => 1,
+        },
+        {
+            name   => 'dep_any: (ok, a specified with d1 & d2)',
+            input  => {a=>0, d1=>0, d2=>0},
+            schema => $sch,
+            valid  => 1,
+        },
+        {
+            name   => 'dep_any: (ok, no a with d1 & d2)',
+            input  => {d1=>0, d2=>0},
+            schema => $sch,
+            valid  => 1,
+        },
+    );
+    # TODO: dep_any with first argument an array [a,b]
+
+    $sch = [hash => {dep_all=>["a", [qw/d1 d2/]]}];
+    push @res, (
+        {
+            name   => 'dep_all: (ok, empty)',
+            input  => {},
+            schema => $sch,
+            valid  => 1,
+        },
+        {
+            name   => 'dep_all: (nok, a specified without d1/d2)',
+            input  => {a=>0},
+            schema => $sch,
+            valid  => 0,
+        },
+        {
+            name   => 'dep_all: (nok, a specified with d1)',
+            input  => {a=>0, d1=>0},
+            schema => $sch,
+            valid  => 0,
+        },
+        {
+            name   => 'dep_all: (ok, a specified with d2)',
+            input  => {a=>0, d2=>0},
+            schema => $sch,
+            valid  => 0,
+        },
+        {
+            name   => 'dep_all: (ok, a specified with d1 & d2)',
+            input  => {a=>0, d1=>0, d2=>0},
+            schema => $sch,
+            valid  => 1,
+        },
+        {
+            name   => 'dep_all: (ok, no a with d1 & d2)',
+            input  => {d1=>0, d2=>0},
+            schema => $sch,
+            valid  => 1,
+        },
+    );
+    # TODO: dep_all with first argument an array [a,b]
+
+    $sch = [hash => {req_dep_any=>["a", [qw/d1 d2/]]}];
+    push @res, (
+        {
+            name   => 'req_dep_any: (ok, empty)',
+            input  => {},
+            schema => $sch,
+            valid  => 1,
+        },
+        {
+            name   => 'req_dep_any: (ok, a specified without d1/d2)',
+            input  => {a=>0},
+            schema => $sch,
+            valid  => 1,
+        },
+        {
+            name   => 'req_dep_any: (ok, a specified with d1)',
+            input  => {a=>0, d1=>0},
+            schema => $sch,
+            valid  => 1,
+        },
+        {
+            name   => 'req_dep_any: (ok, a specified with d2)',
+            input  => {a=>0, d2=>0},
+            schema => $sch,
+            valid  => 1,
+        },
+        {
+            name   => 'req_dep_any: (ok, a specified with d1 & d2)',
+            input  => {a=>0, d1=>0, d2=>0},
+            schema => $sch,
+            valid  => 1,
+        },
+        {
+            name   => 'req_dep_any: (ok, no a with d1)',
+            input  => {d1=>0},
+            schema => $sch,
+            valid  => 0,
+        },
+        {
+            name   => 'req_dep_any: (ok, no a with d2)',
+            input  => {d2=>0},
+            schema => $sch,
+            valid  => 0,
+        },
+        {
+            name   => 'req_dep_any: (ok, no a with d1 & d2)',
+            input  => {d1=>0, d2=>0},
+            schema => $sch,
+            valid  => 0,
+        },
+    );
+    # TODO: req_dep_any with first argument an array [a,b]
+
+    $sch = [hash => {req_dep_all=>["a", [qw/d1 d2/]]}];
+    push @res, (
+        {
+            name   => 'req_dep_all: (ok, empty)',
+            input  => {},
+            schema => $sch,
+            valid  => 1,
+        },
+        {
+            name   => 'req_dep_all: (ok, a specified without d1/d2)',
+            input  => {a=>0},
+            schema => $sch,
+            valid  => 1,
+        },
+        {
+            name   => 'req_dep_all: (ok, a specified with d1)',
+            input  => {a=>0, d1=>0},
+            schema => $sch,
+            valid  => 1,
+        },
+        {
+            name   => 'req_dep_all: (ok, a specified with d2)',
+            input  => {a=>0, d2=>0},
+            schema => $sch,
+            valid  => 1,
+        },
+        {
+            name   => 'req_dep_all: (ok, a specified with d1 & d2)',
+            input  => {a=>0, d1=>0, d2=>0},
+            schema => $sch,
+            valid  => 1,
+        },
+        {
+            name   => 'req_dep_all: (ok, no a with d1)',
+            input  => {d1=>0},
+            schema => $sch,
+            valid  => 1,
+        },
+        {
+            name   => 'req_dep_all: (ok, no a with d2)',
+            input  => {d2=>0},
+            schema => $sch,
+            valid  => 1,
+        },
+        {
+            name   => 'req_dep_all: (nok, no a with d1 & d2)',
+            input  => {d1=>0, d2=>0},
+            schema => $sch,
+            valid  => 0,
+        },
+    );
+    # TODO: req_dep_all with first argument an array [a,b]
+
+    # prop: keys
+    push @res, (
+        {
+            name           => 'prop:keys',
+            schema         => [hash => prop => [keys => [array => has => "x"]]],
+            valid_inputs   => [{x=>1}, {x=>1, y=>1}],
+            invalid_inputs => [{}, {y=>"x"}],
+            tags           => ['prop:keys'],
+        },
+    );
+
+    # prop: values
+    push @res, (
+        {
+            name           => 'prop:values',
+            schema         => [hash => prop => [values => [array => has => "x"]]],
+            valid_inputs   => [{k=>"x"}, {k=>"x", k2=>"y"}],
+            invalid_inputs => [{}, {x=>"y"}],
+            tags           => ['prop:values'],
+        },
+    );
+
+    postprocess(\@res);
+    @res;
+}
+
+sub gen_bool_tests {
+    my %args = @_;
+    my @res;
+
+    local $Type = "bool";
+
+    push @res, (
+        gen_type_check_tests(
+            accept => [0, 1],
+            reject => [[], {}], # in perl, "a", -2, 3.4 are ok
+        ),
+        gen_BaseType_tests(
+            value => 1,
+            ok_defaults  => [1],
+            nok_defaults => [[]],
+            # perl-specific, no real bool value
+            #ok_clauses   => [[is_true=>1], [is=>1]],
+            #nok_clauses  => [[is_true=>0], [is=>0]],
+        ),
+        gen_err_level_tests(
+            clause    => 'is',
+            cval      => 1,
+            ok_value  => 1,
+            nok_value => 0,
+        ),
+        gen_Comparable_tests(
+            values => [0, 1],
+        ),
+        gen_Sortable_tests(
+            values => [0, 1, 1],
+        ),
+
+        {
+            name   => 'is_true: 1 (ok)',
+            input  => 1,
+            schema => [$Type => is_true => 1],
+            valid  => 1,
+            tags   => ['clause:is_true'],
+        },
+        {
+            name   => 'is_true: 1 (nok)',
+            input  => 0,
+            schema => [$Type => is_true => 1],
+            valid  => 0,
+            tags   => ['clause:is_true'],
+        },
+        {
+            name   => 'is_true: 0 (ok)',
+            input  => 0,
+            schema => [$Type => is_true => 0],
+            valid  => 1,
+            tags   => ['clause:is_true'],
+        },
+        {
+            name   => 'is_true: 0 (nok)',
+            input  => 1,
+            schema => [$Type => is_true => 0],
+            valid  => 0,
+            tags   => ['clause:is_true'],
+        },
+        {
+            name   => 'is_true: undef (ok 1)',
+            input  => 0,
+            schema => [$Type => is_true => undef],
+            valid  => 1,
+            tags   => ['clause:is_true'],
+        },
+        {
+            name   => 'is_true: undef (ok 2)',
+            input  => 1,
+            schema => [$Type => is_true => undef],
+            valid  => 1,
+            tags   => ['clause:is_true'],
+        },
+    );
+
+    postprocess(\@res);
+    @res;
+}
+
+sub gen_any_tests {
+    my %args = @_;
+    my @res;
+
+    local $Type = "any";
+
+    push @res, (
+        {
+            name   => 'of (nok + nok)',
+            input  => 3,
+            schema => [$Type => of => [[int => div_by=>2], [int => div_by=>5]]],
+            valid  => 0,
+        },
+        {
+            name   => 'of (nok + nok 2)',
+            input  => [[]],
+            schema => [$Type => of => ["str", [array => of => "str"]]],
+            valid  => 0,
+            errors => 2,
+        },
+        {
+            name   => 'of (ok + nok)',
+            input  => 2,
+            schema => [$Type => of => [[int => div_by=>2], [int => div_by=>5]]],
+            valid  => 1,
+        },
+        {
+            name   => 'of (nok + ok)',
+            input  => 5,
+            schema => [$Type => of => [[int => div_by=>2], [int => div_by=>5]]],
+            valid  => 1,
+        },
+        {
+            name   => 'of (ok + ok)',
+            input  => 10,
+            schema => [$Type => of => [[int => div_by=>2], [int => div_by=>5]]],
+            valid  => 1,
+        },
+    );
+
+    postprocess(\@res);
+    @res;
+}
+
+sub gen_all_tests {
+    my %args = @_;
+    my @res;
+
+    local $Type = "all";
+
+    push @res, (
+        {
+            name   => 'of (nok + nok)',
+            input  => 3,
+            schema => [$Type => of => [[int => div_by=>2], [int => div_by=>5]]],
+            valid  => 0,
+        },
+        {
+            name   => 'of (ok + nok)',
+            input  => 2,
+            schema => [$Type => of => [[int => div_by=>2], [int => div_by=>5]]],
+            valid  => 0,
+        },
+        {
+            name   => 'of (nok + ok)',
+            input  => 5,
+            schema => [$Type => of => [[int => div_by=>2], [int => div_by=>5]]],
+            valid  => 0,
+        },
+        {
+            name   => 'of (ok + ok)',
+            input  => 10,
+            schema => [$Type => of => [[int => div_by=>2], [int => div_by=>5]]],
+            valid  => 1,
+        },
+    );
+
+    postprocess(\@res);
+    @res;
+}
+
+{
+    my $now = localtime();
+    for my $type (qw(undef num int float array str buf cistr hash bool any all
+                      obj)) {
+        my $v = "v$VERSION (generated by $0 on $now)",
+        my $f = "gen_${type}_tests";
+        no strict 'refs';
+        write_file(
+            "$Bin/../share/spectest/10-type-$type.json",
+            $json->encode({version => $v, tests => [$f->()]}),
+        );
+    }
+}

@@ -1,0 +1,33 @@
+Revision history for Perl extension SWISH::HiLiter.
+
+0.08 01 Feb 2016
+ - tidychangelog
+ - RELEASE_TESTING env var required for t/pod* tests
+
+0.07 19 Nov 2009
+ - fix (similar to HTML::HiLiter 0.15) for newest Rose::ObjectX::CAF
+
+0.06 30 Sept 2009
+ - fix tests skip count for SWISH::API not installed.
+
+0.05 26 Sep 2009
+ - complete rewrite to use Search::Tools
+ - The API has changed. Read the docs, esp the SYNOPSIS.
+
+0.04 2006-02-23T09:24:10Z
+ - fixed bug with calling setq() multiple times with single HiLiter object
+   (thanks to sylvain.amrani@gendarmerie.org for reporting).
+ - ran HiLiter.pm through perltidy for general hygiene
+ - added t/loop.t to test for bug
+ - added dependencies in Makefile.PL
+
+0.03 2005-08-11T22:30:48Z
+ - SWISH::API version 0.04 required for stem() to really work.
+ - misc fixes for substr() when snipping.
+
+0.02 2004-11-12T10:44:51Z
+ - fixed escape=>0 to really work as advertised
+
+0.01 2004-11-05
+ - first release
+

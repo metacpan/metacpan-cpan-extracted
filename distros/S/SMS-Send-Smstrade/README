@@ -1,0 +1,67 @@
+SMS-Send-Smstrade
+
+NAME
+
+	SMS::Send::Smstrade - An SMS::Send driver for the smstrade.de service
+
+DESCRIPTION
+
+	SMS::Send::Smstrade is an international SMS::Send driver for
+	the smstrade service. It is a paid service which offers very competitive
+	prices.
+	
+  Preparing to use this driver
+	
+	You need to sign-up on <http://www.smstrade.eu> and get an API key.
+	
+	This API key is used instead of a username and password to authenticate yourself.
+	
+  Disclaimer
+	
+	The authors of this driver take no responibility for any cost accured on your bill
+	by using this module.
+	
+	Using this driver will cost you money. YOU HAVE BEEN WARNED
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc SMS::Send::Smstrade
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=SMS-Send-Smstrade
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/SMS-Send-Smstrade
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/SMS-Send-Smstrade
+
+    Search CPAN
+        http://search.cpan.org/dist/SMS-Send-Smstrade/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2012 Dominik Schulz
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

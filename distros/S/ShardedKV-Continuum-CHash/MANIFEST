@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/ShardedKV/Continuum/CHash.pm
+t/00load.t
+t/01basic.t
+t/02extend.t
+t/lib/ShardedKV/Test/CHash.pm
+t/release-pod-syntax.t
+weaver.ini

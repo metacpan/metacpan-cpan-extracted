@@ -1,0 +1,25 @@
+
+I don't yet have a good name for this package.  String::Amharic::Simplify
+might be more immediately understandable.  However, "simplification" is
+generally considered a good thing, something desirable, but this would
+give quite the wrong impression.  String::Amharic::Pencanonicalize was a
+working name for a while, now its String::Amharic::Downgrade which seems
+to have the best tone.
+
+Under the "three levels of Amharic spelling" theory, this package will
+take a canonical word (level 1) and generate level two words (the level
+of popular use).  Hence "pencanonical", though think spherically and the
+"pen" part of it spans the breadth of level two.  Its a little easier to
+think of a simple "downgrade" vs debating the width of "pen".
+
+The package is useful for some problems, it will produce orthographically
+"legal" simplification and avoids improbable naive simplifications.
+Text::Metaphone::Amharic of course over simplifies as it addresses a
+different problem.  So while not to promote level 2 orthographies, for some
+instances it is useful to generate level 2 renderings given a canonical
+form.  The package is intended to be a labor saving device and is by no
+means perfect.
+
+You *must* start with the canonical spelling of a word as only downgrades
+can occur.  Starting with a near canonical form and downgrading will generate
+a shorter word list than you would have starting from the top.

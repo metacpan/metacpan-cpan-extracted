@@ -1,0 +1,13 @@
+Node-path: tags/Net-Proxy-0.01/Build.PL
+Node-kind: file
+Node-action: delete
+
+Node-path: tags/Net-Proxy-0.01/Build.PL
+Node-kind: file
+Node-action: add
+Node-copyfrom-rev: 23
+Node-copyfrom-path: trunk/Build.PL
+
+
+
+

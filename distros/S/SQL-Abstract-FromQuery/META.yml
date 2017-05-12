@@ -1,0 +1,40 @@
+---
+abstract: 'Translating an HTTP Query into SQL::Abstract structure'
+author:
+  - 'Laurent Dami <laurent.dami AT justice.ge.ch>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SQL-Abstract-FromQuery
+provides:
+  SQL::Abstract::FromQuery:
+    file: lib/SQL/Abstract/FromQuery.pm
+    version: '0.10'
+  SQL::Abstract::FromQuery::Contains:
+    file: lib/SQL/Abstract/FromQuery/Contains.pm
+  SQL::Abstract::FromQuery::FR:
+    file: lib/SQL/Abstract/FromQuery/FR.pm
+  SQL::Abstract::FromQuery::Oracle:
+    file: lib/SQL/Abstract/FromQuery/Oracle.pm
+requires:
+  Digest::MD5: '0'
+  List::MoreUtils: '0'
+  Module::Load: '0'
+  Params::Validate: '0'
+  Regexp::Grammars: '1.038'
+  Scalar::Util: '0'
+  UNIVERSAL::DOES: '0'
+  namespace::clean: '0'
+  parent: '0'
+  perl: '5.01'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/damil/SQL-Abstract-FromQuery
+version: '0.10'

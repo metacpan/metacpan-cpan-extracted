@@ -1,0 +1,65 @@
+SVN::Pusher changelog:
+
+0.09        2015-12-06
+    - Change old E-mail address.
+
+0.08        2014-04-10
+    - Add minimum perl version (CPANTS).
+
+0.07        2014-01-31
+    - Add strict and warnings to all modules.
+    - Add the LICENSE file.
+    - Add t/cpan-changes.t and t/style-trailing-space.t .
+    - Add t/pod.t .
+
+0.06        2007-10-22
+    - Added the --version/version flag to svn-pusher to display the
+    version number
+    - Added more POD to SVN::Pusher with links to various resources including
+    the Subversion repository.
+
+0.05        2007-10-12
+    - Added the --verbose flag to be less verbose by default (thanks to
+    DEXTER). Resolving:
+        - http://rt.cpan.org/Public/Bug/Display.html?id=29838
+    - Fixed http://rt.cpan.org/Ticket/Display.html?id=29916 - "Verbatim
+    option is broken for svn:// repos. This was due to a possible undefined
+    value that was not handled correctly. (thanks to DEXTER).
+
+0.04      2007-10-06
+    - Added the --savedate flag. (thanks to DEXTER)
+    - Added the --verbatim flag. (thanks to DEXTER)
+    - Removed '\t''s from lib/SVN/Pusher.pm and replaced them with
+    space. (SHLOMIF)
+
+0.03001 2006-06-08
+    - Fixed a printing of an object variable that was eliminated, that
+    caused a warning under "use warnings;".
+    - Added use warnings and use strict to the top of the code.
+    - Added a rudimentary 00-load.t test file.
+
+0.03    2006-01-12
+    - Removed an svn-pusher remnant that caused problems when specifying paths
+    in the middle of the repositories (instead of the repos root). Now
+    one cannot specify the startrev as HEAD (whatever that means).
+
+0.02    2006-01-04
+    - Fixed a POD problem pointed to by rajeev@tigr.org
+    - Made the program throw an exception if the revision field is
+      incorrect.
+    - Fixes http://rt.cpan.org/NoAuth/Bug.html?id=16779
+
+0.01    2005-08-02
+    - Placed Pusher.pm in lib/SVN/Pusher.pm
+    - Removed the redundant stuff from lib/SVN/Pusher.pm which remained
+    there from SVN::Push.
+    - Created the $sp->report() method for a derived class to perform a
+    print. Moved the print() themselves to SVN::Pusher::CmdLine. That way,
+    the main module has no side effects.
+    - Removed the create option in init()/cmdline/etc.
+    - Adapted the documentation to the new version.
+
+0.00_03     2005-08-02
+    - forked from SVN-Push, converted the functionality to work
+    with a modern SVN, and with what we wanted to do (just changeset
+    propagation - nothing more, nothing less).

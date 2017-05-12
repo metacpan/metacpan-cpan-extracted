@@ -1,0 +1,8 @@
+0.02  Tue, 11 Nov 2008 18:55:49 +0100
+  * Require perl 5.8.1.
+    The default typemap on 5.6 doesn't make any sense for CVs. In case it turns
+    out to be necessary to support 5.6, this can be done by duplicating some
+    code from a recent ExtUtils/typemap.
+
+0.01  Sun, 09 Nov 2008 06:39:36 +0100
+  * Initial release.

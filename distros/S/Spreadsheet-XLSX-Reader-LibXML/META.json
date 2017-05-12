@@ -1,0 +1,238 @@
+{
+   "abstract" : "Read xlsx spreadsheet files DEPRECATED",
+   "author" : [
+      "Jed Lund <jandrew@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Spreadsheet-XLSX-Reader-LibXML",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Alien::LibXML" : "0.003",
+            "ExtUtils::MakeMaker" : "7.04"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Archive::Zip" : "0",
+            "Capture::Tiny" : "0",
+            "Carp" : "0",
+            "Clone" : "0",
+            "Data::Dumper" : "0",
+            "DateTime" : "0",
+            "DateTime::Format::Flexible" : "0",
+            "DateTimeX::Format::Excel" : "0.012",
+            "Devel::StackTrace" : "0",
+            "Encode" : "0",
+            "File::Temp" : "0",
+            "IO::File" : "0",
+            "List::Util" : "1.33",
+            "Modern::Perl" : "0",
+            "Moose" : "2.1213",
+            "Moose::Role" : "0",
+            "MooseX::HasDefaults::RO" : "0",
+            "MooseX::ShortCut::BuildInstance" : "1.032",
+            "MooseX::StrictConstructor" : "0",
+            "Try::Tiny" : "0",
+            "Type::Coercion" : "0",
+            "Type::Library" : "1.000",
+            "Type::Tiny" : "1.000",
+            "Type::Utils" : "0",
+            "Types::Standard" : "0",
+            "XML::LibXML" : "0",
+            "XML::LibXML::Reader" : "0",
+            "lib" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "version" : "0.77",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Archive::Zip" : "0",
+            "Carp" : "0",
+            "Clone" : "0",
+            "DateTime::Format::Flexible" : "0",
+            "DateTimeX::Format::Excel" : "0.012",
+            "ExtUtils::MakeMaker" : "7.04",
+            "IO::File" : "0",
+            "List::Util" : "1.33",
+            "Moose" : "2.1213",
+            "Moose::Role" : "0",
+            "MooseX::HasDefaults::RO" : "0",
+            "MooseX::ShortCut::BuildInstance" : "1.032",
+            "MooseX::StrictConstructor" : "0",
+            "Spreadsheet::ParseExcel" : "0",
+            "Sub::Exporter::ForMethods" : "0.100052",
+            "Test::Moose" : "0",
+            "Test::Most" : "0",
+            "Test::TypeTiny" : "0",
+            "Text::Diff" : "0",
+            "Type::Tiny" : "1.000",
+            "XML::LibXML" : "0",
+            "XML::LibXML::Reader" : "0",
+            "perl" : "5.010",
+            "version" : "0.77"
+         }
+      }
+   },
+   "provides" : {
+      "Spreadsheet::XLSX::Reader::LibXML" : {
+         "file" : "lib/Spreadsheet/XLSX/Reader/LibXML.pm",
+         "version" : "v0.44.6"
+      },
+      "Spreadsheet::XLSX::Reader::LibXML::Cell" : {
+         "file" : "lib/Spreadsheet/XLSX/Reader/LibXML/Cell.pm",
+         "version" : "v0.44.6"
+      },
+      "Spreadsheet::XLSX::Reader::LibXML::CellToColumnRow" : {
+         "file" : "lib/Spreadsheet/XLSX/Reader/LibXML/CellToColumnRow.pm",
+         "version" : "v0.44.6"
+      },
+      "Spreadsheet::XLSX::Reader::LibXML::Chartsheet" : {
+         "file" : "lib/Spreadsheet/XLSX/Reader/LibXML/Chartsheet.pm",
+         "version" : "v0.44.6"
+      },
+      "Spreadsheet::XLSX::Reader::LibXML::Error" : {
+         "file" : "lib/Spreadsheet/XLSX/Reader/LibXML/Error.pm",
+         "version" : "v0.44.6"
+      },
+      "Spreadsheet::XLSX::Reader::LibXML::FmtDefault" : {
+         "file" : "lib/Spreadsheet/XLSX/Reader/LibXML/FmtDefault.pm",
+         "version" : "v0.44.6"
+      },
+      "Spreadsheet::XLSX::Reader::LibXML::FormatInterface" : {
+         "file" : "lib/Spreadsheet/XLSX/Reader/LibXML/FormatInterface.pm",
+         "version" : "v0.44.6"
+      },
+      "Spreadsheet::XLSX::Reader::LibXML::ParseExcelFormatStrings" : {
+         "file" : "lib/Spreadsheet/XLSX/Reader/LibXML/ParseExcelFormatStrings.pm",
+         "version" : "v0.44.6"
+      },
+      "Spreadsheet::XLSX::Reader::LibXML::Row" : {
+         "file" : "lib/Spreadsheet/XLSX/Reader/LibXML/Row.pm",
+         "version" : "v0.44.6"
+      },
+      "Spreadsheet::XLSX::Reader::LibXML::SharedStrings" : {
+         "file" : "lib/Spreadsheet/XLSX/Reader/LibXML/SharedStrings.pm",
+         "version" : "v0.44.6"
+      },
+      "Spreadsheet::XLSX::Reader::LibXML::Styles" : {
+         "file" : "lib/Spreadsheet/XLSX/Reader/LibXML/Styles.pm",
+         "version" : "v0.44.6"
+      },
+      "Spreadsheet::XLSX::Reader::LibXML::Types" : {
+         "file" : "lib/Spreadsheet/XLSX/Reader/LibXML/Types.pm",
+         "version" : "v0.44.6"
+      },
+      "Spreadsheet::XLSX::Reader::LibXML::WorkbookFileInterface" : {
+         "file" : "lib/Spreadsheet/XLSX/Reader/LibXML/WorkbookFileInterface.pm",
+         "version" : "v0.44.6"
+      },
+      "Spreadsheet::XLSX::Reader::LibXML::WorkbookMetaInterface" : {
+         "file" : "lib/Spreadsheet/XLSX/Reader/LibXML/WorkbookMetaInterface.pm",
+         "version" : "v0.44.6"
+      },
+      "Spreadsheet::XLSX::Reader::LibXML::WorkbookPropsInterface" : {
+         "file" : "lib/Spreadsheet/XLSX/Reader/LibXML/WorkbookPropsInterface.pm",
+         "version" : "v0.44.6"
+      },
+      "Spreadsheet::XLSX::Reader::LibXML::WorkbookRelsInterface" : {
+         "file" : "lib/Spreadsheet/XLSX/Reader/LibXML/WorkbookRelsInterface.pm",
+         "version" : "v0.44.6"
+      },
+      "Spreadsheet::XLSX::Reader::LibXML::Worksheet" : {
+         "file" : "lib/Spreadsheet/XLSX/Reader/LibXML/Worksheet.pm",
+         "version" : "v0.44.6"
+      },
+      "Spreadsheet::XLSX::Reader::LibXML::WorksheetToRow" : {
+         "file" : "lib/Spreadsheet/XLSX/Reader/LibXML/WorksheetToRow.pm",
+         "version" : "v0.44.6"
+      },
+      "Spreadsheet::XLSX::Reader::LibXML::XMLReader" : {
+         "file" : "lib/Spreadsheet/XLSX/Reader/LibXML/XMLReader.pm",
+         "version" : "v0.44.6"
+      },
+      "Spreadsheet::XLSX::Reader::LibXML::XMLReader::ExtractFile" : {
+         "file" : "lib/Spreadsheet/XLSX/Reader/LibXML/XMLReader/ExtractFile.pm",
+         "version" : "v0.44.6"
+      },
+      "Spreadsheet::XLSX::Reader::LibXML::XMLReader::NamedSharedStrings" : {
+         "file" : "lib/Spreadsheet/XLSX/Reader/LibXML/XMLReader/NamedSharedStrings.pm",
+         "version" : "v0.44.6"
+      },
+      "Spreadsheet::XLSX::Reader::LibXML::XMLReader::NamedStyles" : {
+         "file" : "lib/Spreadsheet/XLSX/Reader/LibXML/XMLReader/NamedStyles.pm",
+         "version" : "v0.44.6"
+      },
+      "Spreadsheet::XLSX::Reader::LibXML::XMLReader::PositionSharedStrings" : {
+         "file" : "lib/Spreadsheet/XLSX/Reader/LibXML/XMLReader/PositionSharedStrings.pm",
+         "version" : "v0.44.6"
+      },
+      "Spreadsheet::XLSX::Reader::LibXML::XMLReader::PositionStyles" : {
+         "file" : "lib/Spreadsheet/XLSX/Reader/LibXML/XMLReader/PositionStyles.pm",
+         "version" : "v0.44.6"
+      },
+      "Spreadsheet::XLSX::Reader::LibXML::XMLReader::WorkbookMeta" : {
+         "file" : "lib/Spreadsheet/XLSX/Reader/LibXML/XMLReader/WorkbookMeta.pm",
+         "version" : "v0.44.6"
+      },
+      "Spreadsheet::XLSX::Reader::LibXML::XMLReader::WorkbookRels" : {
+         "file" : "lib/Spreadsheet/XLSX/Reader/LibXML/XMLReader/WorkbookRels.pm",
+         "version" : "v0.44.6"
+      },
+      "Spreadsheet::XLSX::Reader::LibXML::XMLReader::Worksheet" : {
+         "file" : "lib/Spreadsheet/XLSX/Reader/LibXML/XMLReader/Worksheet.pm",
+         "version" : "v0.44.6"
+      },
+      "Spreadsheet::XLSX::Reader::LibXML::XMLToPerlData" : {
+         "file" : "lib/Spreadsheet/XLSX/Reader/LibXML/XMLToPerlData.pm",
+         "version" : "v0.44.6"
+      },
+      "Spreadsheet::XLSX::Reader::LibXML::ZipReader" : {
+         "file" : "lib/Spreadsheet/XLSX/Reader/LibXML/ZipReader.pm",
+         "version" : "v0.44.6"
+      },
+      "Spreadsheet::XLSX::Reader::LibXML::ZipReader::ExtractFile" : {
+         "file" : "lib/Spreadsheet/XLSX/Reader/LibXML/ZipReader/ExtractFile.pm",
+         "version" : "v0.44.6"
+      },
+      "Spreadsheet::XLSX::Reader::LibXML::ZipReader::WorkbookMeta" : {
+         "file" : "lib/Spreadsheet/XLSX/Reader/LibXML/ZipReader/WorkbookMeta.pm",
+         "version" : "v0.44.6"
+      },
+      "Spreadsheet::XLSX::Reader::LibXML::ZipReader::WorkbookRels" : {
+         "file" : "lib/Spreadsheet/XLSX/Reader/LibXML/ZipReader/WorkbookRels.pm",
+         "version" : "v0.44.6"
+      },
+      "Spreadsheet::XLSX::Reader::LibXML::ZipReader::Worksheet" : {
+         "file" : "lib/Spreadsheet/XLSX/Reader/LibXML/ZipReader/Worksheet.pm",
+         "version" : "v0.44.6"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jandrew/Spreadsheet-XLSX-Reader-LibXML/issues"
+      },
+      "homepage" : "https://github.com/jandrew/Spreadsheet-XLSX-Reader-LibXML",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jandrew/Spreadsheet-XLSX-Reader-LibXML.git",
+         "web" : "https://github.com/jandrew/Spreadsheet-XLSX-Reader-LibXML"
+      }
+   },
+   "version" : "v0.44.6",
+   "x_authority" : "cpan:JANDREW",
+   "x_deprecated" : 1
+}
+

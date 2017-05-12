@@ -1,0 +1,10 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Sort/Hash/Values.pm
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+t/values.t

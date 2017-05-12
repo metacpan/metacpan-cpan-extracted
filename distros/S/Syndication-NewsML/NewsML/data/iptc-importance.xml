@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE TopicSet PUBLIC "urn:newsml:iptc.org:20001006:NewsMLv1.0.dtd:1" "NewsMLv1.0.dtd">
+<TopicSet Duid="iptc.importance" FormalName="Importance">
+	<Comment xml:lang="en">Relative significance of the metadata applied to a NewsComponent.</Comment>
+	<Topic Duid="imp1">
+		<TopicType Scheme="IptcTopicType" FormalName="Importance"/>
+		<FormalName Scheme="IptcImportance">High</FormalName>
+		<Description xml:lang="en">The metadata is very important.</Description>
+	</Topic>
+	<Topic Duid="imp2">
+		<TopicType Scheme="IptcTopicType" FormalName="Importance"/>
+		<FormalName Scheme="IptcImportance">Medium</FormalName>
+		<Description xml:lang="en">The metadata is quite important.</Description>
+	</Topic>
+	<Topic Duid="imp3">
+		<TopicType Scheme="IptcTopicType" FormalName="Importance"/>
+		<FormalName Scheme="IptcImportance">Low</FormalName>
+		<Description xml:lang="en">The metadata is of low importance.</Description>
+	</Topic>
+</TopicSet>
+

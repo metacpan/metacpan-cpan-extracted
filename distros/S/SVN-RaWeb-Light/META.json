@@ -1,0 +1,72 @@
+{
+   "abstract" : "Lightweight and Fast Browser for a URLed Subversion",
+   "author" : [
+      "Shlomi Fish"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "keywords" : [
+      "browser",
+      "light",
+      "subversion",
+      "vcs",
+      "web",
+      "www"
+   ],
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "SVN-RaWeb-Light",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0",
+            "base" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "Module::Build" : "0.36",
+            "lib" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI" : "0",
+            "Class::Accessor" : "0",
+            "IO::Scalar" : "0",
+            "SVN::Core" : "0",
+            "SVN::Ra" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "SVN::RaWeb::Light" : {
+         "file" : "lib/SVN/RaWeb/Light.pm",
+         "version" : "0.60005"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://web-cpan.shlomifish.org/modules/SVN-RaWeb-Light/",
+      "license" : [
+         "http://www.opensource.org/licenses/mit-license.php"
+      ],
+      "repository" : {
+         "url" : "https://bitbucket.org/shlomif/perl-svn-raweb-light"
+      }
+   },
+   "version" : "0.60005",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

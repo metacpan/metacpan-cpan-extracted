@@ -1,0 +1,42 @@
+[% PROCESS admin/blocks/add_blocks.tt %]
+[% IF message == 'saved' %]
+<div class="alert alert-success">
+<button class="close" data-dismiss="alert" type="button">x</button>
+<strong>Content saved!</strong>
+</div>
+[% END %]
+<div class="row span12">
+    <h1 class="span1">[% label %]</h1>
+</div>
+[% IF backlink %]
+<div class="row span12 backlink">
+    <a href="[% backlink %]" class="btn-small btn-inverse">Back</a>
+</div>
+[% END %]
+[% IF entity_conf.custom_snippet_add_position == 'left' %]
+[% IF custom_snippet %]
+<div class="span[% 12 - entity_conf.add_main_column_span %]">
+    [% custom_snippet %]
+</div>
+[% END %]
+[% END %]
+
+<div class="row content wine span[% entity_conf.add_main_column_span %]">
+    <div>
+    [% form %]
+    </div>
+</div>
+[% IF entity_conf.custom_snippet_add_position == 'right' %]
+[% IF custom_snippet %]
+<div class="span[% 12 - entity_conf.add_main_column_span %]">
+    [% custom_snippet %]
+</div>
+[% END %]
+[% END %]
+[% IF backlink %]
+<div class="row span12 backlink">
+    <a href="[% backlink %]" class="btn-small btn-inverse">Back</a>
+</div>
+[% END %]
+[% INCLUDE addpagejs %]
+

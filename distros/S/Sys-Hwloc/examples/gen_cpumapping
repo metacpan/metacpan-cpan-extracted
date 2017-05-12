@@ -1,0 +1,597 @@
+#!/usr/bin/perl -w
+################################################################################
+#
+#  Copyright 2010 Zuse Institute Berlin
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation or under the same terms as perl itself.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+#  Please send comments to kallies@zib.de
+#
+################################################################################
+#
+# Determine optimal CPU mapping on this machine for MPI task placement.
+#
+################################################################################
+# $Id: gen_cpumapping,v 1.3 2011/01/11 10:49:39 bzbkalli Exp $
+################################################################################
+
+use strict;
+
+use lib qw(
+	   blib/lib
+	   blib/arch
+	  );
+
+use Getopt::Long;
+use Pod::Usage;
+use Sys::Hwloc 0.09;
+
+# -------------------------------------------------------------------------------
+# We need hwloc-1.0 or later
+# -------------------------------------------------------------------------------
+
+BEGIN {
+  die "This script needs HWLOC_API_VERSION >= 0x00010000\n" unless
+    HWLOC_XSAPI_VERSION() >= 0x00010000;
+}
+
+# -------------------------------------------------------------------------------
+# Gobal variables
+# -------------------------------------------------------------------------------
+
+my @objs = ();
+my %map  = ();
+my $obj  = undef;
+
+# -------------------------------------------------------------------------------
+# Program options
+# -------------------------------------------------------------------------------
+
+my %options = (
+	       -verbose    => undef,       # be verbose
+	       -relative   => 0,           # report CPU numbers relative to cpuset
+	       -physical   => 0,           # 0: don't include logical (SMT) PUs
+	       -scenario   => 'scatter',   # scatter, bunch, linear
+	       -delimiter  => ' ',         # CPU list delimiter
+	      );
+
+GetOptions(
+	   "verbose"      => \$options{-verbose},
+	   "physical!"    => \$options{-physical},
+	   "delimiter=s"  => \$options{-delimiter},
+	   "scenario=s"   => \$options{-scenario},
+	   "zero!"        => \$options{-relative},
+	   "help|?"       => sub { usage() },
+	   "man"          => sub { manPage() },
+	  ) or usage();
+
+if($options{-scenario} !~ /^(scatter|bunch|linear)$/i) {
+  warn "Unknown scenario: $options{-scenario}\n";
+  usage();
+}
+$options{-scenario} = lc $options{-scenario};
+
+# -------------------------------------------------------------------------------
+# Init topology, set flags, load
+# -------------------------------------------------------------------------------
+
+my $t = Sys::Hwloc::Topology->init;
+die "Failed to init topology context!\n" unless $t;
+die "Failed to load topology!\n" if $t->load;
+
+# -------------------------------------------------------------------------------
+# Collect processor objects
+# -------------------------------------------------------------------------------
+
+if($options{-physical}) {
+
+  while($obj = $t->get_next_obj_by_type(HWLOC_OBJ_CORE, $obj)) {
+    my $pu = $t->get_obj_inside_cpuset_by_type($obj->cpuset, HWLOC_OBJ_PU, 0);
+    push @objs, $pu if $pu;
+  }
+
+} else {
+
+  while($obj = $t->get_next_obj_by_type(HWLOC_OBJ_PU, $obj)) {
+    push @objs, $obj;
+  }
+
+}
+
+xDebug("System contains %d %s CPUs on %d socket(s).",
+       scalar @objs,
+       $options{-physical} ? "physical" : "logical",
+       $t->get_nbobjs_by_type(HWLOC_OBJ_SOCKET),
+      );
+
+die "Found no CPUs!\n" unless @objs;
+
+# -------------------------------------------------------------------------------
+# Load mapping of PU os_index to relative index in cpuset.
+# Needed to translate os_index when -relative.
+# -------------------------------------------------------------------------------
+
+$obj = $t->root;
+die "Failed to detect topology root object!\n" unless $obj;
+{
+  my $lastOsIndex = $objs[$#objs]->os_index;
+  my $i = 0;
+  foreach my $id ($obj->cpuset->ids) {
+    next if $id > $lastOsIndex;
+    $map{$id} = $i++;
+  }
+  die "Failed to detect CPU os_index mapping!\n" unless ((scalar @objs) == (scalar keys %map));
+}
+
+if($options{-relative}) {
+  xDebug("CPU numbers will be reported as relative numbers within the cpuset.");
+} else {
+  xDebug("CPU numbers will be reported as absolute numbers in the system.");
+}
+
+# -------------------------------------------------------------------------------
+# Sort @objs depending on $options{-scenario}
+# -------------------------------------------------------------------------------
+
+xDebug("Determine mapping for scenario \"%s\"", $options{-scenario});
+
+CASE: {
+
+  # linear: sort by logical_index (usually @objs is already sorted by this)
+  $options{-scenario} eq 'linear' && do {
+    @objs = sort { $a->logical_index <=> $b->logical_index } @objs;
+    last CASE;
+  };
+
+  # scatter: sort by max. distance
+  $options{-scenario} eq 'scatter' && do {
+    scatter_objs();
+    last CASE;
+  };
+
+  # bunch: sort by min. distance (the same like linear, but SMT PUs go to the end)
+  $options{-scenario} eq 'bunch' && do {
+    bunch_objs();
+    last CASE;
+  };
+
+}
+
+# -------------------------------------------------------------------------------
+# Output sorted @objs
+# -------------------------------------------------------------------------------
+
+if($options{-relative}) {
+  printf "%s\n", join($options{-delimiter}, map { $map{$_->os_index} } @objs);
+} else {
+  printf "%s\n", join($options{-delimiter}, map { $_->os_index } @objs);
+}
+
+# -------------------------------------------------------------------------------
+# Done
+# -------------------------------------------------------------------------------
+
+$t->destroy;
+
+exit 0;
+
+# -------------------------------------------------------------------------------
+# Sort @objs via scatter
+# -------------------------------------------------------------------------------
+
+sub scatter_objs {
+
+  # Local variables
+
+  my @pdist = ();             # cumulative distances
+  my $nobjs = scalar @objs;   # number of objects
+  my $ip    = $nobjs;         # index in @objs where sorted objects start
+  my $s     = -1;             # current sibling_rank
+  my $j     = 0;              # loop variable
+
+  # Sort SMT PUs to the end
+
+  @objs = sort { ($a->sibling_rank == $b->sibling_rank) ?
+		   $a->os_index - $b->os_index :
+		     $a->sibling_rank - $b->sibling_rank } @objs;
+
+  # Loop
+
+  while($ip > 0) {
+
+    # If new group of SMT processors starts, zero distances
+
+    if($s != $objs[0]->sibling_rank) {
+      $s = $objs[0]->sibling_rank;
+      for($j = 0; $j < $ip; $j++) {
+	$pdist[$j] = 0;
+      }
+    }
+
+    # Determine obj that has max. distance to all already stored objs.
+    # Consider only groups of SMT procs with same sibling_rank.
+
+    my $maxd = 0;
+    my $jp   = 0;
+    for($j = 0; $j < $ip; $j++) {
+      last if ($j && ($objs[$j-1]->sibling_rank != $objs[$j]->sibling_rank));
+      if($pdist[$j] > $maxd) {
+	$maxd = $pdist[$j];
+	$jp   = $j;
+      }
+    }
+
+    # Rotate found object to the end of the list,
+    # Map out found object from distances.
+
+    my $obj = $objs[$jp];
+    for($j = $jp; $j < $nobjs - 1; $j++) {
+      $objs[$j]  = $objs[$j+1];
+      $pdist[$j] = $pdist[$j+1];
+    }
+    $objs[$j] = $obj;
+    $ip--;
+
+    # Update cumulative distances of all remaining objects
+    # with new stored one.
+
+    for($j = 0; $j < $ip; $j++) {
+      my $a = $obj->common_ancestor($objs[$j]);
+      die("Failed to determine common parent of PUs %d and %d", $obj->os_index, $objs[$j]->os_index) unless $a;
+      my $d = $objs[$j]->depth + $obj->depth - 2 * $a->depth;
+      $pdist[$j] += $d * $d;
+    }
+
+  }
+
+}
+
+# -------------------------------------------------------------------------------
+# Sort @objs via bunch
+# -------------------------------------------------------------------------------
+
+sub bunch_objs {
+
+  # Local variables
+
+  my @pdist = ();             # cumulative distances
+  my $nobjs = scalar @objs;   # number of objects
+  my $ip    = $nobjs;         # index in @objs where sorted objects start
+  my $s     = -1;             # current sibling_rank
+  my $j     = 0;              # loop variable
+
+  # Sort SMT PUs to the end
+
+  @objs = sort { ($a->sibling_rank == $b->sibling_rank) ?
+		   $a->os_index - $b->os_index :
+		     $a->sibling_rank - $b->sibling_rank } @objs;
+
+  # Loop
+
+  while($ip > 0) {
+
+    # If new group of SMT processors starts, zero distances
+
+    if($s != $objs[0]->sibling_rank) {
+      $s = $objs[0]->sibling_rank;
+      for($j = 0; $j < $ip; $j++) {
+	$pdist[$j] = 0;
+      }
+    }
+
+    # Determine obj that has min. distance to all already stored objs.
+    # Consider only groups of SMT procs with same sibling_rank.
+
+    my $mind = 0xffffffff;
+    my $jp   = 0;
+    for($j = 0; $j < $ip; $j++) {
+      last if ($j && ($objs[$j-1]->sibling_rank != $objs[$j]->sibling_rank));
+      if($pdist[$j] < $mind) {
+	$mind = $pdist[$j];
+	$jp   = $j;
+      }
+    }
+
+    # Rotate found object to the end of the list,
+    # Map out found object from distances.
+
+    my $obj = $objs[$jp];
+    for($j = $jp; $j < $nobjs - 1; $j++) {
+      $objs[$j]  = $objs[$j+1];
+      $pdist[$j] = $pdist[$j+1];
+    }
+    $objs[$j] = $obj;
+    $ip--;
+
+    # Update cumulative distances of all remaining objects
+    # with new stored one.
+
+    for($j = 0; $j < $ip; $j++) {
+      my $a = $obj->common_ancestor($objs[$j]);
+      die("Failed to determine common parent of PUs %d and %d", $obj->os_index, $objs[$j]->os_index) unless $a;
+      my $d = $objs[$j]->depth + $obj->depth - 2 * $a->depth;
+      $pdist[$j] += $d * $d;
+    }
+
+  }
+
+}
+
+# -------------------------------------------------------------------------------
+# Usage message
+# -------------------------------------------------------------------------------
+
+sub usage {
+  pod2usage(
+            -verbose   => 0,
+            -exitval   => 0,
+            -noperldoc => 1,
+           );
+}
+
+# ------------------------------------------------------------------------------
+# Display man page
+# ------------------------------------------------------------------------------
+
+sub manPage {
+  if ($< == 0) { # Cannot invoke perldoc as root
+    my $id = eval { getpwnam("nobody") };
+    $id    = eval { getpwnam("nouser") } unless defined $id;
+    $id    = -2 unless defined $id;
+    $< = $id;
+  }
+  $> = $<; # Disengage setuid
+  $ENV{PATH} = "/bin:/usr/bin"; # Untaint PATH
+  delete @ENV{ 'IFS', 'CDPATH', 'ENV', 'BASH_ENV' };
+  if ($0 =~ /^([-\/\w\.]+)$/) {
+    $0 = $1; # Untaint $0
+  } else {
+    die "Illegal characters were found in \$0 ($0)\n";
+  }
+  pod2usage(
+            -verbose => 2,
+            -exitval => 0,
+           );
+}
+
+
+# -------------------------------------------------------------------------------
+# Verbose print
+# -------------------------------------------------------------------------------
+
+sub xDebug {
+  my $fmt  = shift;
+  my @args = @_;
+  return unless $options{-verbose};
+  chomp $fmt;
+  printf STDERR "$fmt\n", @args;
+}
+
+__END__
+
+=head1 NAME
+
+gen_cpumapping - determine optimal CPU mapping on this machine for MPI task placement
+
+=head1 SYNOPSIS
+
+gen_cpumapping {--help|-?|--man}
+
+gen_cpumapping [ --scenario=scatter|bunch|linear ] [ --(no)zero ] [ --(no)physical ] [ --delimiter=<char> ] [ --verbose ]
+
+=head1 DESCRIPTION
+
+On modern multi-core architectures with NUMA properties or shared caches the correct placement of
+tasks or threads of parallel programs has a more or less high impact on performance.
+
+Modern MPI libraries allow the user to specify task-to-CPU mapping via environment variables, and
+are able to bind tasks to the specified CPUs.
+
+However, the setting of these environment variables require the knowledge of the
+used architecture details (cache levels, CPU and NUMA node numberings, simultaneous multithreading supported or not, ...).
+
+The Portable Hardware Locality (I<hwloc>) software package helps to retrieve this information.
+See L<http://www.open-mpi.org/projects/hwloc> for additional details.
+
+The B<gen_cpumapping> script uses I<hwloc> to figure out the architecture topology of the machine where it is started.
+Based on that, it sorts the IDs of the available processor elements according to different approaches, and
+prints the result to STDOUT.
+
+The output can be fed into environment variables that determine the placement scheme of MPI tasks or OpenMP threads
+before a parallel executable is started.
+
+There is support for mapping out logical SMT CPUs, and CPU numberings that are relative within a cpuset.
+
+The sorting algorithms used by B<gen_cpumapping> were also implemented in recent MVAPICH2,
+see L<http://mvapich.cse.ohio-state.edu/overview/mvapich2/>.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--scenario=scatter|bunch|linear>
+
+Selects the sorting algorithm. The default is I<scatter>.
+
+=over 4
+
+=item I<scatter>
+
+Sorts CPU IDs by a maximum distance approach. Additional logical SMT CPUs are sorted after the first logical CPUs.
+
+This scenario ensures that tasks do not share caches, or share memory bandwidth to local memory to the
+maximum possible extent. It is most useful for usual MPI applications, when fewer tasks are started 
+than there are physical CPUs on a machine.
+
+=item I<bunch>
+
+Sorts CPU IDs by a minimum distance approach. Additional logical SMT CPUs are sorted after the first logical CPUs.
+
+This scenario ensures that tasks or threads are mapped to CPUs as close as possible. It is most useful for
+threaded applications that share data in a global address space. This scenario is often the default in usual
+MPI libraries that support CPU affinity.
+
+=item I<linear>
+
+Prints CPU IDs in topology ordering. This is the ordering also seen in e.g. B<lstopo> outputs.
+
+=back
+
+=item B<--(no)zero>
+
+With B<--nozero> the machine-global CPU IDs are printed, as determined by the BIOS. This is the default.
+
+With B<--zero> the printed CPU IDs always start with 0. This is helpful when the script is started
+under control of a cpuset, which restricts it to a subset of CPUs of a large SMP machine, and when
+in addition the application that uses its output relies on relative CPU numbers. This is e.g. the
+case for the Message Passing Toolkit of Silicon Graphics, Inc.
+
+=item B<--(no)physical>
+
+With B<--(no)physical> all (logical) CPUs that are available to the script are contained in the output. This is the default.
+
+With B<--physical> additional logical CPUs are mapped out. When the current machine does not support
+several hardware threads, then there is no difference between B<--physical> and B<--nophysical>.
+
+=item B<--delimiter=E<lt>charE<gt>>
+
+Specifies a different list delimiter. The default is ' ' (space).
+
+=item B<--verbose>
+
+When specified, verbose information is printed to STDERR.
+
+=item B<--man>
+
+Shows the man-page that you are currently reading.
+
+=item B<--help|-?>
+
+Shows a usage message and exits.
+
+=back
+
+=head1 EXAMPLES
+
+=over 4
+
+=item 1. Print CPU IDs
+
+The command line
+
+  gen_cpumapping -v -s linear -p
+
+shows the CPU IDs in system ordering without additional SMT CPUs.
+
+=item 2. Combine it with MPI
+
+Assuming that an MPI executable a.out is bound with an MPI library, that supports
+CPU affinity handling, and that implements the environment variable MPI_CPU_MAPPING
+to specify the task-to-CPU mapping as comma-separated list, one may set the
+content of this variable as follows (Bourne Shell and related:
+
+  export MPI_CPU_MAPPING=$(gen_cpumapping -s scatter -d ,)
+  echo $MPI_CPU_MAPPING
+  mpiexec a.out
+
+=back
+
+=head1 EXAMPLE SCATTER OUTPUTS
+
+=over 4
+
+=item a) Intel Xeon Harpertown
+
+Assume a system that contains two Intel Xeon Harpertown sockets with four cores, each.
+The System CPU numbering and topology shortcut is
+
+  (((0,2),(4,6)),((1,3),(5,7)))
+
+That means: even CPU IDs on first socket, odd CPU IDs on second socket ("legacy numbering").
+
+This processor is characterized by shared L2 caches.
+Core pairs 0+2, 4+6, 1+3, 5+7 share a common L2 cache.
+
+The command B<gen_cpumapping> with default option settings will print:
+
+  0 1 4 5 2 3 6 7
+
+An MPI application that underlies this CPU mapping will run as follows:
+
+  1st task on 1st socket 1st core
+  2nd task on 2nd socket 1st core
+  3rd task on 1st socket 3rd core
+  4th task on 2nd socket 3rd core
+  5th task on 1st socket 2nd core
+  6th task on 2nd socket 2nd core
+  7th task on 1st socket 4th core
+  8th task on 2nd socket 4th core
+
+Thus, if the application would start 4 tasks or less, only, it is ensured that
+every task does not share an L2 cache with another task. If the application would start 8 tasks,
+there is no difference to other pinning schemes.
+
+=item b) Intel Xeon Nehalem-EP
+
+Assume a system that contains two Intel Xeon Nehalem-EP sockets with four cores, each.
+SMT is switched on via BIOS settings, thus there are two hardware threads per physical core.
+The System CPU numbering and topology shortcut is
+
+  (((0,8),(1,9),(2,10),(3,11)),((4,12),(5,13),(6,14),(7,15)))
+
+That means: CPUs are numbered in sequence, CPUs 0-3 on 1st socket, CPUs 4-7 on 2nd socket ("common numbering").
+SMT CPUs have numbers 8-15. The logical CPUs 0+8, 1+9, ... run on the same physical core.
+
+This architecture is characterized by connecting the two sockets via the Intel QPI, which
+results in one NUMA node per socket. All cores of a socket share a common L3 cache, but
+have an L2 cache of their own.
+
+The command B<gen_cpumapping> with default option settings will print:
+
+  0 4 1 5 2 6 3 7 8 12 9 13 10 14 11 15
+
+An MPI application that underlies this CPU mapping will run as follows:
+
+  1st task on 1st socket 1st core 1st hardware thread
+  2nd task on 2nd socket 1st core 1st hardware thread
+  3rd task on 1st socket 2nd core 1st hardware thread
+  4th task on 2nd socket 2nd core 1st hardware thread
+  5th task on 1st socket 3rd core 1st hardware thread
+  6th task on 2nd socket 3rd core 1st hardware thread
+  7th task on 1st socket 4th core 1st hardware thread
+  8th task on 2nd socket 4th core 1st hardware thread
+  9th task on 1st socket 1st core 2nd hardware thread
+  ...
+
+Thus, if the application would start 2 tasks, only, it is ensured that
+they do not share a common NUMA node, thus getting the maximum memory bandwidth.
+The effect is retained when starting up to 6 tasks. If the application starts
+up to 8 tasks, it is ensured that each task runs on its own physical core.
+
+=back
+
+=head1 AUTHOR
+
+Bernd Kallies, E<lt>kallies@zib.deE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011 Zuse Institute Berlin
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation.
+
+=cut
+

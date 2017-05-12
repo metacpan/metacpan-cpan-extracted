@@ -1,0 +1,86 @@
+{
+   "abstract" : "AnyEvent HTTP/2 (RFC 7540) Server for PSGI",
+   "author" : [
+      "Vladimir Lettiev <thecrux@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.4.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Shuvgey",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "Net::SSLeay" : "1.56",
+            "Plack" : "1.0037",
+            "Protocol::HTTP2" : "1.03",
+            "Scalar::Util" : "0",
+            "Sys::Hostname" : "0",
+            "URI::Escape" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Plack::Handler::Shuvgey" : {
+         "file" : "lib/Plack/Handler/Shuvgey.pm"
+      },
+      "Shuvgey" : {
+         "file" : "lib/Shuvgey.pm",
+         "version" : "0.09"
+      },
+      "Shuvgey::Server" : {
+         "file" : "lib/Shuvgey/Server.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/vlet/Shuvgey/issues"
+      },
+      "homepage" : "https://github.com/vlet/Shuvgey",
+      "repository" : {
+         "url" : "git://github.com/vlet/Shuvgey.git",
+         "web" : "https://github.com/vlet/Shuvgey"
+      }
+   },
+   "version" : "0.09",
+   "x_authority" : "cpan:CRUX"
+}

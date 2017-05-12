@@ -1,0 +1,42 @@
+Statistics-Distributions-Ancova version 0.32.2
+
+    A perl implementation of One-Way Analysis of Covariance for Independent Samples. As with paired t-test and repeated-measures ANOVA this test
+    removes the obscuring effects of pre-existing individual differences among subjects. In cases where a substantial portion of the variability 
+    that occurs within each of the set of a dependent variable Y is actually covariance with another concomitant variable X measures, this test
+    removes the covariance with X from Y thus removing a portion of the irrelevant variability of individual differences. 
+
+    See http://en.wikipedia.org/wiki/Analysis_of_covariance for more info.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+    'version'                   => 0, 
+    'Statistics::Distributions' => '1.02',
+    'Math::Cephes'              => '0.47', 
+    'Carp'                      => '1.08', 
+    'Perl6::Form'               => '0.04',
+    'Contextual::Return'        => '0.2.1',
+    'List::Util'                => '1.19', 
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009, Daniel S. T. Hughes
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -1,0 +1,14 @@
+0.05  Tue Dec  9 13:10:10 CET 2014
+        - make it work on 32bit systems (where no siphash64() is available)
+0.04  Tue Dec  2 15:46:54 CET 2014
+        - Updated the protocol implementation to include the magic number
+        - index and multi commands implemented
+0.03  Thu Jan  9 16:24:50 CET 2014
+        - Updated to the last shardcache protocol spec (changed in libshardcache 0.9.3)
+        - Various fixes and cleanings
+0.02  Fri Jan  3 15:20:28 CET 2014
+        - fixes to Makefile.PL + LICENSE
+
+0.01  Fri Nov 22 12:56:10 2013
+	- original version
+

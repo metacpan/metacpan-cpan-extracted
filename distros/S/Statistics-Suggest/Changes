@@ -1,0 +1,6 @@
+Revision history for Perl extension Statistics::Suggest.
+
+0.01  Tue Apr 24 14:21:47 2007
+	- original version; created by h2xs 1.23 with options
+		-x -n Statistics::Suggest suggest-1.0-linux/suggest.h -lsuggest
+

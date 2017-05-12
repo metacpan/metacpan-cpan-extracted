@@ -1,0 +1,75 @@
+{
+   "abstract" : "DWIM syntax extensions",
+   "author" : [
+      "Robert 'phaylon' Sedlacek <rs@474.at>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200015, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Syntax-Feature-Simple",
+   "no_index" : {
+      "directory" : [
+         "t/"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "Sub::Install" : "0.925",
+            "Syntax::Feature::Function" : "0.001",
+            "Syntax::Feature::Method" : "0.001",
+            "Syntax::Feature::Sugar::Callbacks" : "0.002",
+            "parent" : 0,
+            "strictures" : "1",
+            "syntax" : "0.003"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Fatal" : "0.003",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Syntax::Feature::Simple" : {
+         "file" : "lib/Syntax/Feature/Simple.pm",
+         "version" : "0.002"
+      },
+      "Syntax::Feature::Simple::V1" : {
+         "file" : "lib/Syntax/Feature/Simple/V1.pm",
+         "version" : "0.002"
+      },
+      "Syntax::Feature::Simple::V2" : {
+         "file" : "lib/Syntax/Feature/Simple/V2.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Syntax-Feature-Simple"
+      },
+      "homepage" : "https://github.com/phaylon/Syntax-Feature-Simple/wiki",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/phaylon/Syntax-Feature-Simple.git",
+         "web" : "http://github.com/phaylon/Syntax-Feature-Simple"
+      }
+   },
+   "version" : "0.002",
+   "x_authority" : "cpan:PHAYLON"
+}
+

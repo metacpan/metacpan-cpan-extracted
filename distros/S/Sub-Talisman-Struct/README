@@ -1,0 +1,63 @@
+NAME
+    Sub::Talisman::Struct - the spawn of MooX-Struct and Sub-Talisman
+
+SYNOPSIS
+            package Local::MyExample;
+        
+            use Sub::Talisman:::Struct
+                    Provenance => [qw( $creator $date )],
+                    Tested     => [qw( $status! )],
+            ;
+        
+            sub myfunc :Provenance("Joe Bloggs","2012-10-19") :Tested("ok")
+            {
+                    ...;
+            }
+        
+            my $prov = Sub::Talisman::Struct
+                    ->get_attribute_parameters(\&myfunc, 'Provenance');
+        
+            say $prov->creator;  # says "Joe Bloggs"
+            say $prov->date;     # says "2012-10-19"
+
+DESCRIPTION
+    MooX::Struct creates light-weight objects which can have required
+    attributes, type constraints, etc. Sub::Talisman allows you to associate
+    data with subs. This module is a bit of glue between MooX::Struct and
+    Sub::Talisman.
+
+    The import routine uses the same syntax as MooX::Struct, but instead of
+    creating struct-like classes for you to use, it creates struct-like
+    classes for Sub::Talisman to bless attribute parameters into.
+
+    Sub::Talisman::Struct itself is a subclass of Sub::Talisman, so inherits
+    the `get_attributes`, `get_attribute_parameters`, `get_subs` and
+    `setup_for` methods as documented.
+
+    Note that the term "attribute" is incredibly overloaded, applying both to
+    the tags like `:Provenance` applied to the subs, and also to the members
+    of Moo classes, so in depth discussions of this module will tend to
+    descend into chaos. So I'll leave it at that for the documentation. If you
+    need any further clarification, take a peek at the bundled test suite.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Sub-Talisman-Struct>.
+
+SEE ALSO
+    Sub::Talisman, MooX::Struct.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

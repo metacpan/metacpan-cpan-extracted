@@ -1,0 +1,27 @@
+SVGGraph
+========
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+    - or perl Makefile.PL PREFIX=/install/wherever/you/want LIB=/your/preferred/lib/directory
+   make
+   make test
+   make install
+   
+If that is all too much trouble or you just want to test this module,
+place it in the same directory as your perl script and add to the
+first line of that script "-I.", without the quotes. This will add
+the current path to your library path.
+
+DEPENDENCIES
+
+SVGGraph uses 'use utf8;' which might only work on perl 5.6 or higher.
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2002 Teun van Eijsden. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.

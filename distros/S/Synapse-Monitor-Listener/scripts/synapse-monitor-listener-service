@@ -1,0 +1,48 @@
+#!/usr/bin/perl
+use Daemon::Generic;
+use Synapse::CLI::Config;
+use Synapse::Monitor::Listener;
+use Synapse::Monitor::Listener::Action;
+use Synapse::Monitor::Listener::State;
+use warnings;
+use strict;
+
+$Synapse::CLI::Config::BASE_DIR          = "/etc/synapse/monitor/listener";
+$Synapse::CLI::Config::ALIAS->{type}     = 'Synapse::CLI::Config::Type';
+$Synapse::CLI::Config::ALIAS->{action}   = 'Synapse::Monitor::Listener::Action';
+$Synapse::CLI::Config::ALIAS->{state}    = 'Synapse::Monitor::Listener::State';
+$Synapse::CLI::Config::ALIAS->{listener} = 'Synapse::Monitor::Listener';
+
+$Synapse::CLI::Config::BASE_DIR = "/etc/synapse/monitor/listener";
+our $SERVICE_NAME  = 'synapse-monitor-listener';
+
+
+our %BAN = ();
+my $sleeptime = 1;
+newdaemon(
+    progname   => $SERVICE_NAME,
+    pidfile    => "/var/run/$SERVICE_NAME.pid",
+);
+
+
+# dynamic config is nice
+sub gd_preconfig {
+    my ($self) = @_;
+    return ();
+}
+
+
+sub gd_run {
+    eval {
+        while (1) {
+            sleep(1);
+            Synapse::Monitor::Listener->runonce();
+        }
+    }
+}
+
+
+1;
+
+
+__END__

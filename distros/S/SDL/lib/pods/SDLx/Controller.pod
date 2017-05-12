@@ -1,0 +1,277 @@
+
+=head1 NAME
+
+SDLx::Controller - Handles the loops for events, movement and rendering
+
+=head1 CATEGORY
+
+Extension, Controller
+
+=head1 SYNOPSIS
+
+ use SDLx::Controller;
+
+ # create our controller object
+ my $app = SDLx::Controller->new;
+ 
+ # we could also do:
+ my $app = SDLx::App->new;
+ # because App is also a controller
+
+ # register some callbacks
+ $app->add_event_handler( \&on_event );
+ $app->add_move_handler( \&on_move );
+ $app->add_show_handler( \&on_show );
+
+ # run our game loop
+ $app->run;
+
+=head2 DESCRIPTION
+
+The core of an SDL application/game is the main loop, where you handle events
+and display your elements on the screen until something signals the end of
+the program. This usually goes in the form of:
+
+  while (1) {
+      ...
+  }
+
+The problem most developers face, besides the repetitive work, is to ensure
+the screen update is independent of the frame rate. Otherwise, your game will
+run at different speeds on different machines and this is never good (old
+MS-DOS games, anyone?).
+
+One way to circumvent this is by capping the frame rate so it's the same no
+matter what, but this is not the right way to do it as it penalizes better
+hardware.
+
+This module provides an industry-proven standard for frame independent
+movement. It calls the movement handlers based on time (hi-res seconds) rather
+than frame rate. You can add/remove handlers and control your main loop with
+ease.
+
+=head1 METHODS
+
+=head2 new
+
+ SDLx::Controller->new(
+     dt    => 0.5,
+     min_t => 0,
+     event => $event_object,
+ );
+
+The C<dt> parameter specifies the length, in seconds, of a full movement step, and defaults to 0.1.
+The C<dt> can  be anything and the game can still look the same.
+It is only when you change the C<dt> without changing all the things in the movement step that are being multiplied by the first move argument that it will make a difference.
+If you lower the C<dt>, everything will move faster than it did with it set higher, and vice-versa.
+This is useful to add slo-mo and fast-forward features to the game, all you would have to do is change the C<dt>.
+
+C<min_t> specifies the minimum time, in seconds, that has to accumulate before any move or show handlers are called, and defaults to 1 / 60.
+Having the C<min_t> at 1 / 60 ensures that the controller can update the screen at a maximum of 60 times per second.
+A "V-Sync" such as this is necessary to prevent video "tear", which occurs when the app is updating faster than the monitor can display.
+Setting it to 0, as seen above, will let the app run as fast as it possibly can.
+
+C<delay> specifies a loop delay in millisecs to place on the controller loop. B<NOTE:> Picking a good delay based on the needs can help reduce CPU load and pressure.
+
+C<event> is a SDL::Event object that events going to the event callbacks are polled in to. It defaults to C<< SDL::Event->new() >>.
+
+All parameters are optional.
+
+Returns the new object.
+
+=head2 run
+
+After creating and setting up your handlers (see below), call this method to
+activate the main loop. The main loop will run until C<stop> is called.
+
+All hooked functions will be called during the main loop, in this order:
+
+=over 4
+
+=item 1. Events
+
+=item 2. Movements
+
+=item 3. Displaying
+
+=back
+
+Please refer to each handler below for information on received arguments.
+Note that the second argument every callback receives is the C<SDLx::Controller> object.
+
+=head2 stop
+
+Returns from the C<run> loop.
+
+=head2 pause
+
+Attempts to pause the application with a call to C<SDL::Events::wait_event>. See L<SDL::Events>.
+
+Takes 1 argument which is a callback. The application waits for the next event with C<wait_event>.
+When one is received, it is passed to the callback as the first argument, along with the C<SDLx::Controller> object as the second argument.
+If the callback then returns a true value, C<pause> will return.
+If the callback returns a false value, C<pause> will repeat the process.
+
+This can be used to easily implement a pause when the app loses focus:
+
+ sub window {
+     my ($e, $app) = @_;
+     if($e->type == SDL_QUIT) {
+         $app->stop;
+         # quit handling is here so that the app
+         # can be stopped while paused
+     }
+     elsif($e->type == SDL_ACTIVEEVENT) {
+         if($e->active_state & SDL_APPINPUTFOCUS) {
+             if($e->active_gain) {
+                 return 1;
+             }
+             else {
+                 $app->pause(\&window);
+                 # recursive, but only once since the window
+                 # can't lose focus again without gaining it first
+             }
+         }
+     }
+     return 0;
+ }
+
+Note: if you implement your own pause function, remember to update C<current_time> to the current time when the application unpauses.
+This should be done with C<Time::HiRes::time>.
+Otherwise, time will accumulate while the application is paused, and many movement steps will be called all at once when it unpauses.
+
+Note 2: a pause will be potentially dangerous to the C<run> cycle (even if you implement your own) unless called by an C<event> callback.
+
+=head2 paused
+
+Returns 1 if the app is paused, undef otherwise.
+This is only useful when used within code that will be run by C<pause>:
+
+ sub pause {
+     # press P to toggle pause
+     
+     my ($e, $app) = @_;
+     if($e->type == SDL_QUIT) {
+         $app->stop;
+         # quit handling is here so that the app
+         # can be stopped while paused
+     }
+     elsif($e->type == SDL_KEYDOWN) {
+         if($e->key_sym == SDLK_p) {
+             # We're paused, so end pause
+             return 1 if $app->paused;
+             
+             # We're not paused, so pause
+             $app->pause(\&pause);
+         }
+     }
+     return 0;
+ }
+
+=head2 add_event_handler
+
+Register a callback to handle events. You can add as many subs as you need.
+Whenever a SDL::Event occurs, all registered callbacks will be triggered in
+order. Returns the order queue number of the added callback.
+
+The first argument passed to registered callbacks is the L<< SDL::Event >> object.
+The second is the C<SDLx::Controller> object.
+
+ sub stop {
+    my ($event, $app) = @_;
+    if($event->type == SDL_QUIT) {
+        $app->stop;
+    }
+ }
+ $app->add_event_handler(\&stop);
+
+=head2 add_move_handler
+
+Register a callback to update your objects. You can add as many subs as
+you need. Returns the order queue number of the added callback.
+
+All registered callbacks will be triggered in order for as many C<dt> as have happened between calls,
+and once more for any remaining time less than C<dt>.
+The first argument passed to the callbacks is the portion of the step, which will be 1 for a full step, and less than 1 for a partial step.
+Movement values should be multiplied by this value.
+The full steps correspond to the amount of C<dt> passed between calls, and the partial step corresponds to the call with the remaining time less than C<dt>.
+The argument can be 0 if no time has passed since the last cycle. If you need to protect against this, set a C<min_t>, or put a C<< return unless $_[0] >> at the start of every move handler.
+
+The second argument passed to the callbacks is the C<SDLx::Controller> object.
+The third is the total amount of time passed since the call of C<run>.
+
+You should use these handlers to update your in-game objects, check collisions, etc.
+so you can check and/or update it as necessary.
+
+ sub move_ball {
+     my ($step, $app, $t) = @_;
+     $ball->move_x( $ball->x_vel * $step );
+     $ball->move_y( $ball->y_vel * $step );
+ }
+
+=head2 add_show_handler
+
+Register a callback to render objects. You can add as many subs as you need.
+Returns the order queue number of the added callback.
+All registered callbacks will be triggered in order, once per run of the C<run> loop.
+
+The first argument passed is the time, in seconds, since the previous call.
+The second is the C<SDLx::Controller> object.
+
+ sub show_ball {
+     my ($delta, $app) = @_;
+     $app->draw_rect(
+         [ $ball->x, $ball->y, $ball->size, $ball->size ],
+         $ball->colour
+     );
+ }
+
+=head2 remove_move_handler( $index )
+
+=head2 remove_event_handler( $index )
+
+=head2 remove_show_handler( $index )
+
+Removes the handler with the given index from the respective calling queue.
+
+You can also pass a coderef.
+The first coderef in the handler list that this matches will be removed.
+
+Returns the removed handler.
+
+=head2 remove_all_move_handlers
+
+=head2 remove_all_event_handlers
+
+=head2 remove_all_show_handlers
+
+Removes all handlers from the respective calling queue.
+
+=head2 remove_all_handlers
+
+Quick access to removing all handlers at once.
+
+=head2 dt
+
+=head2 min_t
+
+=head2 current_time
+
+If an argument is passed, modifies the corresponding value to the argument.
+C<dt> and C<min_t> will keep their old value until the beginning of the next C<run> cycle.
+
+Returns the corresponding value.
+
+=head1 AUTHORS
+
+See L<SDL/AUTHORS>.
+
+=head2 ACKNOWLEDGEMENTS
+
+The idea and base for this module comes from Lazy Foo's L<< Frame Independent
+Movement|http://www.lazyfoo.net/SDL_tutorials/lesson32/index.php >> tutorial,
+and Glenn Fiedler's L<< Fix Your Timestep|http://gafferongames.com/game-physics/fix-your-timestep/ >> article on timing.
+
+
+
+

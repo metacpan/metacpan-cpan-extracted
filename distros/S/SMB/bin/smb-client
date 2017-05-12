@@ -1,0 +1,203 @@
+#!/usr/bin/perl
+
+# Copyright (C) 2014 Mikhael Goikhman <migo@freeshell.org>
+
+use strict;
+use warnings;
+use sigtrap qw(die untrapped normal-signals  stack-trace any error-signals);
+
+use Getopt::Long qw(:config no_ignore_case bundling);
+use POSIX qw(strftime);
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use SMB::Client;
+
+my $verbose = 0;
+my $username = $ENV{USER} || $ENV{LOGNAME} || 'guest';
+
+sub show_usage (;$) {
+	my $is_error = shift || 0;
+	my $out = $is_error ? \*STDERR : \*STDOUT;
+	my $usage = qq{
+		Usage: $0 [OPTIONS] //server/share
+		Start a simple SMB client
+
+		Options:
+			-h --help            show this usage
+			-v --verbose         print more messages
+			-U --username u[%p]  SMB username and password (prompted if absent)
+	};
+	$usage =~ s/^\n//; $usage =~ s/^\t\t?//mg;
+	print $out $usage;
+	exit $is_error;
+}
+
+GetOptions(
+	'h|help'       => sub { show_usage(0) },
+	'v|verbose+'   => \$verbose,
+	'U|username=s' => \$username,
+) or show_usage(1);
+
+my $share_uri = shift || '//localhost/users';
+
+use Term::ReadLine;
+my $term = Term::ReadLine->new('smb-client');
+$term->MinLine(undef);  # no autohistory
+my $OUT = $term->OUT || \*STDOUT;
+my $history_filename = '.smb-client-history';
+eval { $term->ReadHistory($history_filename) };
+END { eval { $term->WriteHistory($history_filename) }; }
+$Term::ReadLine::Gnu::Attribs{term_set} = [ "\033[1;36m", "\033[m", "\033[1;31m", "\033[m" ]
+	if %Term::ReadLine::Gnu::Attribs;
+@Term::ReadLine::TermCap::rl_term_set = ("\033[1;36m", "\033[m", "\033[1;31m", "\033[m")
+	if @Term::ReadLine::TermCap::rl_term_set;
+
+my @args;
+sub prompt ($;$$) {
+	my $message = shift;
+	my $n_args = shift || 0;
+	my $is_secret = shift;
+
+	return shift @args if @args;
+
+	$message .= ': ' unless $message =~ /[:>.]\s*$/;
+	my $answer = $term->readline($message, '');
+	print $OUT "\n";
+	return unless defined $answer;
+	$answer =~ s/^\s+|\s+$//g;
+	$answer =~ s/\s+/ /g;
+	$term->addhistory($answer) if $answer ne '' && !$is_secret;
+
+	my @words = split(' ', $answer);
+	if (@words > 1) {
+		$answer = shift @words;
+		push @args, shift @words while @words && $n_args--;
+		warn "Extraneous words in input (@words) skipped\n" if @words;
+	}
+
+	return $answer;
+}
+
+my $password = $username =~ s/%(.*)$// ? $1 : undef;
+$password //= prompt("Enter password for user '$username'", 0, 1);
+
+my $client = SMB::Client->new(
+	$share_uri,
+	username => $username,
+	password => $password,
+	verbose  => $verbose,
+);
+
+my $tree = $client->connect_tree
+	or die "Failed to connect to $share_uri, aborting\n";
+
+sub check_tree() {
+	return 1 if $tree;
+	print "No current working tree\n";
+	return 0;
+}
+
+sub format_cwd () {
+	my $connection = $client->get_curr_connection || return "[not-connected]";
+	my $addr = $connection->addr;
+	my $path = $tree ? "/" . $tree->share . $tree->cwd : '[no-tree-connected]';
+	$path = substr($path, 0, 48) . ".." if length($path) > 50;
+
+	return "$addr$path";
+}
+
+my %commands = (
+	status => sub {
+		while (my ($addr, $connection) = each %{$client->connections}) {
+			print "Connection $addr\n";
+			for my $tree ($connection->tree) {
+				print "\tShare $tree->{share}\n";
+			}
+		}
+	},
+	cd => sub {
+		return unless check_tree();
+		$tree->chdir(prompt("Directory to change to"));
+	},
+	dir => sub {
+		return unless check_tree();
+		for my $file (@{$tree->find(@args ? shift @args : '*') || []}) {
+			printf "%-40s %s\n", $file->name, $file->mtime_string;
+		}
+	},
+	get => sub {
+		return unless check_tree();
+		$tree->dnload(prompt("File to get"), shift @args);
+	},
+	put => sub {
+		return unless check_tree();
+		$tree->upload(prompt("File to put"), shift @args);
+	},
+	copy => sub {
+		return unless check_tree();
+		$tree->copy(prompt("File to copy"), prompt("New file name"));
+	},
+	del => sub {
+		return unless check_tree();
+		$tree->remove(prompt("File to remove"));
+	},
+	rmdir => sub {
+		return unless check_tree();
+		$tree->remove(prompt("File to remove"), 1);
+	},
+	rename => sub {
+		return unless check_tree();
+		$tree->rename(prompt("File to rename"), prompt("New file name"));
+	},
+	help => sub {
+		my $help = qq{
+			Operations available:
+
+			connect ADDR  connect to server, ADDR is host[:port]
+			disconnect    disconnect of the current connection
+			tree-connect  connect to share, argument syntax //host[:port]/share
+			tree-disconn  disconnect from the current share
+
+			status        show connections and shares
+			switch [IDX]  change the current tree or connection (see "status")
+
+			cd DIR        change working directory
+			dir [MASK]    list all or matching files
+			get SRC [DST] download remote file SRC from server
+			put SRC [DST] upload local file SRC file to server
+			del FILE      remove file
+			rmdir DIR     remove dir
+			rename F1 F2  rename file
+
+			quit          exit the client (close all connections)
+		};
+		$help =~ s/^\n//; $help =~ s/^\t{2}\t?//mg;
+		print $help;
+	},
+);
+
+my %aliases = (
+	chdir => 'cd',
+	find => 'dir',
+	download => 'get',
+	upload => 'put',
+	rm => 'del',
+	exit => 'quit',
+);
+
+print "Connected to $share_uri. Enter 'help' to list commands.\n";
+
+while (1) {
+	my $dir = format_cwd();
+	my $cmd = prompt("smb:$dir> ", 2) // last;
+	$cmd = $aliases{$cmd} if $aliases{$cmd};
+	last if $cmd eq 'quit';
+	my $func = $commands{$cmd};
+	if ($func) {
+		$func->();
+	} else {
+		print "Invalid command, try 'help'\n";
+	}
+}
+

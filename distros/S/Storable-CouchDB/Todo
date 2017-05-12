@@ -1,0 +1,3 @@
+TODO list for Perl module Storable::CouchDB
+
+  - Figure out how to get blessed objects to work

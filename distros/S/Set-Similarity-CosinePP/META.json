@@ -1,0 +1,69 @@
+{
+   "abstract" : "Cosine similarity for sets pure Perl vector implementation",
+   "author" : [
+      "Helmut Wollmersdorfer, <helmut.wollmersdorfer@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.034, Dist::Milla version v1.0.14, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Set-Similarity-CosinePP",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.039"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.14",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Set::Similarity" : "0.022",
+            "parent" : "0",
+            "perl" : "5.006000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/wollmers/Set-Similarity-CosinePP/issues"
+      },
+      "homepage" : "https://github.com/wollmers/Set-Similarity-CosinePP",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/wollmers/Set-Similarity-CosinePP.git",
+         "web" : "https://github.com/wollmers/Set-Similarity-CosinePP"
+      }
+   },
+   "version" : "0.015",
+   "x_contributors" : [
+      "Helmut Wollmersdorfer <helmut@wollmersdorfer.at>",
+      "Helmut Wollmersdorfer <helmut.wollmersdorfer@fixpunkt.de>"
+   ]
+}
+

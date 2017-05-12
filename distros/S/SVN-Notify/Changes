@@ -1,0 +1,658 @@
+Revision history for Perl extension SVN::Notify
+
+2.86
+      - Add version to SVN::Notify::SMTP to make PAUSE happy.
+
+2.85  2016-03-29T23:29:11Z
+      - Fixed a typo, thanks to gregor herrmann of the Debian project.
+      - Eliminated "Unescaped left brace in regex is deprecated" warnings on
+        Perl 5.21.
+      - Fixed test failures triggered by an improvement to the encoding of
+        headers by the Encode module. Thanks to Pali for the fix!
+      - Improved the encoding of the "From", "To", and "Reply-To" headers so
+        that only the phrase part is encoded, not the address itself. Thanks
+        to Pali for the corrections.
+      - Now require Email::Address to handle the proper parsing of addresses
+        for encoding into headers.
+
+2.84  2013-08-13T14:25:21Z
+      - Added `--smtp-tls` to the output of `man svnnotify`.
+      - Removed `--smtp-authtype` from the output of `man svnnotify`.
+      - Added `--diff-content-type` option. Defaults to "text/plain" for
+        backward compatibility. Patch by Daniel P. Wright.
+      - Renamed `Filter.pm` to `Filter.pod`, since it's just documentation.
+      - Removed the pod tests from the distribution.
+      - Changed the CSS for message `<pre>` blocks to use `white-space:
+        pre-line`, so that long lines will be wrapped, but newlines are still
+        respected as usual. Thanks to Dave Abrahams for the patch (and the
+        persistence).
+      - Changed C<to_regex_map> to allow it to match any path in the
+        repository, including files, rather than just directories. Patch from
+        mscherer.
+      - Fixed error when the first line of the commit message is less than 10
+        characters long (issue #2).
+      - Fixed the "From" and "To" headers so that they are properly encoded as
+        MIME headers (issue #6).
+      - Removed the Makefile.PL, which was just passing through to
+        Module::Build. That pattern is now deprecated, and Module::Build is
+        required for configuration.
+
+2.83  2011-10-29T00:19:07Z
+      - Added the `smtp_port` parameter and accompanying `--smtp-port` option.
+        Patch from Gustavo Leite de Mendonça Chaves.
+      - Switched from Net::SMTP and Net::SMTP_auth to Net::SMTP::TLS, which
+        handles TLS and non TLS and auth and non-auth in any combintation.
+        Based on patches from Dawood Sangameshwari and Marino Miculan (RT #
+        40188).
+      - Added `--smtp-tls` option to enable TLS. Based on patch from Marino
+        Miculan.
+      - Deprecated `--smtp-authtype`, which is now a no-op. Net::SMTP::TLS
+        determines the auth type to use by asking the SMTP server.
+
+2.82  2011-06-26T05:12:04
+      - Moved the repository to
+        [GitHub](https://github.com/theory/svn-notify/). Yes, I'm aware of the
+        irony.
+
+2.81  2011-02-19T03:09:43
+      - Removed deprecated use of `qw(...)` as parentheses.
+      - Fixed test failures due to a change in the opration of MIME-Q
+        encoding.
+
+2.80  2010-01-16T04:40:00
+      - Fixed the regular expression for detecting JIRA keys. Thanks to David
+        Ferguson for the report (RT#51620).
+      - Fixed test failure on Perl 5.11.2.
+      - Switched to improved URL links with link text in the documentation.
+
+2.79  2009-04-03T00:36:29
+      - Removed a superfluous colon from the dashed line under "Ticket Links"
+        in the plain-text rendition of the message. Repored by Dirk Olmes.
+      - Fixed a bug in the subject handling code where it could truncate a
+        subject to very few characters if it has a dot (.) near the beginning.
+        Now it skips 10 characters before looking for a dot at which to
+        truncate text for the subject. Reported by Martijn van Beers, who
+        noticed a comment in the source indicating that it should have been
+        this way all along.
+      - Fixed a test so that `svn dirs-changed` returns all of the modified
+        directories for a given test. This has no effect on the SVN::Notify
+        code, but it means that the test behavior is more correct. Rerpoted by
+        Martijn van Beers.
+      - Fixed a bug in SVN::Notify::SMTP where `printf` wasn't working
+        properly, resulting in plain text email bodies with a number instead
+        of a ticket link (Bug #43823). Thanks to Dirk Olmes for the report and
+        the debugging.
+      - Fixed `--revision-url` to recognize revision link that just use "r"
+        followed by a number, such as "r1234". Previously, it had to be "rev
+        1234" or "revision 1234".
+
+2.78   2008-09-24T04:41:27
+      - When searching for an executable to run, SVN::Notify now also looks in
+        the "installbin" and "installscript" directories, as specified by the
+        Config module. Patch from John Peacock to improve the finding of apps
+        on Strawberry Perl.
+      - Documented --to-email-map in `svnnotify`. It was already documented in
+        SVN::Notify, but I'd forgoten to include it in the command-line
+        script. Reported by Grégory Joseph (Bug #22620).
+      - Fixed a bug in the test suite where an unexpected exception was thrown
+        on platforms where `sendmail` was not available. Reported by David
+        Golden via CPAN-Testers.
+
+2.77  2008-07-18T21:24:44
+      - Fixed a typo in a Getopt::Long specification string that reveals
+        itself only with Getopt::Long 2.3702 (which is a development release).
+        Reported by Andreas Koenig via cpan-testers.
+
+2.76  2008-07-17T19:55:09
+      - svnnotify will now throw an exception for any invalid options
+        passed to it. Suggested by Ben Tilly.
+      - SVN::Notify->get_options() is now aware of SVN::Notify::Alternative,
+        and when it is used, will load the alternatives so that they can
+        properly register their command-line options and have them processed.
+        Reported by Ben Tilly.
+      - The error thrown when there is no 'to', to_regex_map', or
+        'to_email_app' attributes now waits until after the "pre_prepare"
+        filter has been run, so that filters have a chance to set one or more
+        of those values. Reported by Jeffrey Borlik.
+      - Removed redundant option validation from `svnnotify`. Reported by
+        Jeffrey Borlik.
+      - Fixed the output triggered by the '--help' and '--man' options.
+      - Adjusted missing parameter exceptions to call Pod::Usage::pod2usage()
+        when things are run by svnnotify.
+
+2.75  2008-05-18T03:38:11
+      - Removed the spelling test from the distribution, since it can
+        fail on systems without a spell program or using a different locale.
+      - All string command-line options are now decoded from whatever encoding
+        is specified by the C<--encoding> option, defaulting to UTF-8. All
+        string options are thus properly decoded, excepting those that define
+        encodings and languages (which should alwyas be ASCII) and those that
+        are specified as hashes (if someone runs into that bug, let me know).
+        This fix includes all string options specified by subclasses and
+        filters. Reported by Matthew Romaine (Bug #35884).
+
+2.74  2008-05-15T03:29:11
+      - Updated copyright.
+      - Changed the list example in the Trac sample output to use Greeking so
+        that the indentation of wrapping lines can be seen in the output.
+      - Improved the CSS for lists in the log message output by
+        SVN::notify::HTML (and subclasses) so that bullets are properly
+        hangling indents.
+      - Removed a bit of redundant CSS from SVN::Notify::HTML.
+      - Added a spelling test. This has the benefit of reducing the number of
+        annoying spelling errors in the documentation.
+
+2.73  2008-05-04T02:02:21
+      - Fixed another lame-ass test failure under Perl 5.6.2. Reported by
+        David Cantrell via cpan-testers.
+
+2.72  2008-04-29T17:17:29
+      - Fixed misdocumentation of the short version of the --set-sender option
+        in C<svnnotify --help>: it's -E, not -S. Reported by Larry Shatzer,
+        Jr.
+      - Fixed encoding issue on Windows. Patch to fix a stupid oversight
+        graciously provided by David Golden.
+      - Added four new filter callbacks, "pre_prepare", "post_prepare",
+        "pre_execute", and "post_execute". These are called at the begining
+        and end of the execution of the prepare() and execute() methods.
+        Suggestion and initial patch from Larry Shatzer.
+      - Reorganized the table listing the types of filters in
+        SVN::Notify::Filter so that they are listed in the order in which they
+        execute.
+
+2.71  2008-04-17T18:53:27
+      - Fixed test failure in t/filter.t when HTML::Entities is not installed.
+        Reported by David Cantrell via CPAN-Testers.
+      - Bumped version number for recommended module Text::Trac up to 0.10,
+        since that version fixes the last of the bugs I found with its HTML
+        output.
+      - Adjusted the running of filters against log messages in
+        SVN::Notify::HTML so that any linkizing (--linkize), revision URL
+        parsing (--revision-url), and ticket reference parsing (--ticket-map)
+        is run after the content has been filtered. In 2.70, none of those
+        things happened if the message was filtered, even though they did if a
+        log message was filtered by SVN::Notify (plain text).
+      - Added references to SVN::Notify::Filter::Markdown, now on CPAN.
+      - Attributes registered by a filter were not being properly registered
+        and processing the command-line arguments when the filter was loaded
+        by the --filter option to `svnnotify`. Thanks to Larry Shatzer, Jr.
+        for the spot!
+
+2.70  2008-02-29T17:03:26
+      - See http://justatheory.com/computers/programming/perl/modules/svnnotify-2.70.html
+        for an announcement of this release.
+      - Fixed issues with character encoding handling, starting from a patch
+        submitted by Toshikazu Kinkoh, and with a lot of experimentation and
+        testing by Toshikazu, Martin Lindhe, and myself. Hopefully these
+        changes will help solve the various encoding problems that continue to
+        crop up:
+        + Removed --io-layer, which, it seems, never actually worked.
+        + Changed --charset to --encoding, although the former is still
+          supported for backwards compatibility.
+        + Added --svn-encoding, which identifies the encoding in which data
+          is stored in SVN. It defaults to the value of --encoding.
+        + Added --diff-encoding, which identifies the encoding in which files
+          are stored in SVN. This is useful for the case when log messages
+          are written in one encoding and files stored in another. Defaults
+          to the value of --svn-encoding.
+        + The --language option is now used to set the C<$LANG> environment
+          variable for the execution of `svnlook` as well as `sendmail`,
+          although not `svnlook diff`, which always runs under the "C" locale.
+        + Now only setting the $LANG environment variable for the execution of
+          `svnlook` and `sendmail` if it is not already set. This allows the
+          existing usages such as `LANG=ja_JP svnnotify ...` to keep working.
+        + Fixed character encoding when sending messages via SMTP.
+      - Added extensive documentation on how to deal with character encodings
+        under "Character Encoding Support" in the SVN::Notify docs.
+      - Added support for output filtering. This allows users to easily
+        modify content before it's output.
+      - Added SVN::Notify::Filter, which fully documents the interface for
+        filtering (it's really easy!).
+      - Added SVN::Notify::Filter:Trac, which parses log messages from the
+        Trac wiki syntax to HTML. Useful for use with SVN::Notify::HTML
+        and SVN::Notify::HTML::ColorDiff, and as a nice example of filtering.
+      - Split up the output of the HTML <head> section and the <body> section
+        into two methods in SVN::Notify::HTML in order to simplify filtering.
+      - The CSS output by SVN::Notify::HTML is now output inside the <body>
+        tags, rather than inside the <head> tags. This isn't valid, but will
+        hopefully it will allow messages to display better in Web mail clients
+        such as Gmail.
+      - Eliminated locale warnings during tests.
+      - Tweaked the CSS emitted by SVN::Notify::HTML to support a lot of HTML
+        in the log message, since such formatting can come from the use of
+        SVN::Notify::Filter::Trac and, potentially, other output filters.
+      - Fixed issue running tests with a Perl other than /usr/bin/perl without
+        running `./Build`. If you just did `./Build test`, it could fail with
+        a lot of errors, but no more.
+      - Fixed use of the SMTP feature under Perl 5.6. Reported by CPAN testers
+        David Cantrell and Slaven Rezic.
+      - Fixed the formatting and display of the log message when using the
+        --wrap-log option with SVN::Notify::HTML.
+      - Eliminated a bogus empty paragraph when using the --wrap-log option
+        with SVN::Notify::HTML.
+      - Fixed the encoding of the subject line so that Unicode characters
+        show up properly. Reported by Ian Anderson (Ticket # 24138).
+      - Switched from using `crypt` to using a simple random string algorithm
+        for generating email part boundaries, since `crypt` was choking on
+        multibyte characters from message subjects. Reported by Toshikazu
+        Kinkoh.
+      - Added a link to SVN::Notify's Subversion repository.
+
+2.67 2008-02-06T20:15:13
+      - Fixed bug where a directory with a valid regular expression character
+        could be incorrectly truncated. Patch from Wayne Davison.
+      - Fixed a bug where a directory name could be truncated too much if
+        there are directory names with common roots. Patch from Wayne Davison.
+      - Added the "configure_requires" parameter to Build.PL.
+      - Fixed SVN::Notify::HTML::ColorDiff so that it respects
+        --max-diff-length.
+      - The SVN::Notify::HTML --wrap-log option now wraps individual
+        paragraphs as identified by blank lines (with optional spaces), rather
+        than wrapping the entire message in a single set of paragraph tags.
+
+2.66  2007-06-17T05:08:29
+      - Added some examples complements of Matt Doar.
+      - Fixed the specification of recipients passed to the SMTP server so
+        that comma-separated email addresses are properly split apart.
+        Reported by Michael Plump.
+      - Fixed a bug with --to-regex-map where certain entries in it could
+        be skipped altogether. Reported by John Peacock.
+
+2.65  2007-03-27T07:01:09
+      - Another patch from Martijn van Beers, this one generalizing the
+        execution of --ticket-map parageters (Ticket # 21633).
+      - Added note and link for HookStart for Windows users who run into
+        asynchronous execution issues. Reported by Eric Lemes.
+      - Added the --wrap-log option to SVN::Notify::HTML. When passed a true
+        value, the log message will be put into a `p` tag instead of a `pre`
+        tag, thus allowing it to wrap to the width of the mailer window.
+        Needless to say, this means that any whitespace formatting in the log
+        message itself will be lost. Suggested by Ian Anderson (Ticket
+        #24138).
+      - Restored checking for "%s" in the JIRA, RT, Butzilla, and GNATS
+        URLs. Reported by Matt Doar.
+      - Fixed some spelling errors, thanks to Matt Doar.
+      - Added note that verbose output goes to STDOUT.
+      - Added support for specifying the location of the revision number via
+        an "%d" temlate in the --subject-prefix option. Patch from Jerry
+        Veldhuis (Ticket #24309).
+      - The --max-diff-length option now works properly in HTML output, as
+        well. Reported by Rob Moore (Ticket #25070)
+      - Added the --to-email-map option as the inverse of --to-regex-map. That
+        is, it maps regular expressions to email addresses, rather than the
+        other way around.
+
+2.64  2006-09-28T18:39:47
+      - Added notes about Net::SMPT and Net::SMTP_auth to the README file.
+        Reported by Nacho Barrientos Arias.
+      - The regular expresson for RT ticket numbers now also
+        case-insensitively matches "RT" in addtion to "Ticket". Suggested by
+        Ask Bjørn Hansen.
+      - Now skipping all tests in 't/alt.t' if HTML::Entities is not
+        installed. Reported by Marshall Roch.
+      - Added a new option, '--ticket-map', to map regular expressions
+        that match ticket references to the URLs to create links for those
+        references. This allows users to specify any number of ticketing
+        systems for which to scan for references in the log message.
+      - Deprecated '--ticket-regex' and '--ticket-url' in favor of the new
+        '--ticket-map' option.
+      - Converted the support for explicit ticketing systems (RT, JIRA,
+        GnatsWeb, and Bugzilla) to internally use the 'ticket_map' attribute.
+        This change eliminates quite a bit of redundant code. Based on a patch
+        from Martijn van Beers (Ticket # 21633).
+      - Unified the internal ticket system regular expressions so that
+        SVN::Notify::HTML can reference and use exactly the same regexen that
+        SVN::Notify uses. Inspired by a patch from Martijn van Beers.
+
+2.63  2006-08-02T18:11:36
+      - The tests in t/options.t no longer fail when HTML::Entities is not
+        installed. Thanks to Ricardo Signes for the spot! Ticket #20267.
+      - The email subject is now encoded in the MIME-Q encoding, in compliance
+        with RFC 2047. Patch from Éric Cholet.
+      - Now properly setting the binmode on file handles in Win32 when
+        running under Perl 5.8.
+      - Added the --add-header option to add headers to the outgoing email.
+        Useful for things like auto-approval for MLMs. Patch (with tests!)
+        from Ricardo Signes.
+      - Documented the --language option in the svnnotify script.
+      - Before executing 'sendmail', SVN::Notify now sets the $LANG
+        environment variable with the contents of the language and charset
+        options if language is set. Ticket #16050.
+
+2.62  2006-06-30T18:03:21
+      - Changed to() accessor to return the first value in the array in scalar
+        context, and all of the items as a list in list context. This makes
+        its behavior more consistent with versions of SVN::Notify priort to
+        2.61.
+      - Added strip_cx_regex() accessor. It also returns the first value in
+        scalar context, and the full list in list context, for consistency
+        with to().
+
+2.61  2006-06-28T23:07:40
+      - Removed unused patch file from the distribution. It was temporary, and
+        never supposed to be there, anyway.
+      - Added an "Errors-To" header to the outgoing email, using the same
+        email address as is used for the "From" header.
+      - Added the --set-sender option to specify the envelope sender to the
+        same value as is used for the From: header when sending via sendmail.
+      - The --to option may now be specified multiple times (or passed as an
+        array reference to the constructor) to specify multiple recipients.
+        This change allows multiple recipients to be used when sending
+        notifications via SMTP. Ticket # 20121. Reported by John Colton.
+
+2.60  2006-06-16T22:42:48
+      - HTML output now creates a link from a directory name to its place in
+        the diff if the type of diff for the directory is a property change.
+        Patch from Lamar Goddard.
+      - Added --author-url option. Based on a patch from Lamar Goddard.
+      - Deprecated --svnweb-url and --viewcvs-url in favor of the new, more
+        general --revision-url. Inspired by a patch from Lamar Goddard.
+      - Added --diff-switches option. This can be used to specify switches to
+        pass through to 'svnlook diff'. Inspired by a patch from Lamar
+        Goddard.
+
+2.59  2006-05-11T17:23:12
+      - Fixed a few typos, with thanks to Marshall "Eagle Eyes" Roch.
+      - Now throw an exception if 'sendmail' is not specified or cannot be
+        found and 'smtp' is not specified. Reported by Eric Lemes.
+      - Fixed processing of commad-line arguments under Windows. Reported by
+        Eric Lemes. This means that SVN::Notify has now been confirmed to
+        actually *work* on Windows.
+      - An exception will now be thrown if a Net::SMTP object cannot be
+        created. Reported by Eric Lemes.
+      - Added note for Windows users about setting environment variables
+        required by SVN::Notify. Thanks to Eric Lemes <ericlemes@gmail.com>
+        for figuring these things out!
+      - Added link to Eric Lemes's tutorial for installing Apache, Subversion,
+        and SVN::Notify on Windows.
+
+2.58  2006-05-05T20:44:05
+      - Improved documentation of '--ticket-regex', since it seemed to confuse
+        people using it with SVN::Notify::HTML. Thanks to Dominic Giampaolo
+        for the push.
+      - SVN::Notify::HTML now allows '--ticket-regex' to capture only one
+        string, in which case it will be used both for the link text and for
+        the ticket number passed to the '--ticket-url' format string.
+      - Added support for SMTP authentication using Net::SMTP_auth. Use the
+        '--smtp-user', '--smtp-pass', and '--smtp-authtype' options to take
+        advantage of this feature. Patch from Eric Lemes.
+      - Specifying '--verbose' two or more times now turns on SMTP debugging.
+
+2.57  2006-04-06T22:36:18
+      - Finally ported to Win32. It was actually a simple matter of changing
+        how command pipes are created.
+      - Added 'smtp' option to enable sending messages to an SMTP server
+        rather than to the local 'sendmail' application. This is essential for
+        Windows support.
+      - Added --io-layer to the usage statement in 'svnnotify'.
+      - Fixed single-dash arguments in documentation so that they're all
+        documented with a single dash in SVN::Notify.
+
+2.56  2006-04-04T23:16:37
+      - Abstracted creation of the diff file handle into the new diff_handle()
+        method.
+      - Documented use of diff_handle() in the output() method.
+      - Added optional second argument to output() to optionally suppress the
+        output of the email headers. This argument is used by the new
+        Alternative subclass.
+      - Added SVN::Notify::Alternative, which allows multiple versions of a
+        commit email to be sent, such as text/plain plus HTML. The multiple
+        versions are assembled into a single email message using the
+        multipart/alternative media type. For those who want HTML messages but
+        must support users that can only read plain text or rely on archives
+        that ignore HTML messages, this can be very useful. Based on an
+        implementation by Jukka Zitting.
+      - Fixed use_ok() tests that weren't running at all.
+      - Added an extra newline to separate the file list from an inline diff
+        in the plain text format where '--with-diff' has been specified.
+      - Moved the "multipart/mixed" content-type header generation from
+        output_headers() to output_content_type(), not only because this makes
+        more sense, but also because it makes attachments behave better when
+        using SVN::Notify::Alternative.
+      - Documented accessors in SVN::Notify::HTML.
+
+2.55  2006-04-03T23:11:11
+      - Added the 'io-layer' option to specify an alternate IO layer. Will be
+        most useful for those with repositories containing text in multiple
+        encodings, where it should be set to "raw".
+      - Fixed the context output in the subject for the '--subject-cx' option
+        so that it's smarter about determining the longest common path.
+        Reported by Max Horn.
+      - No longer modifying the values of the 'to_regex_map' hash, so as not
+        to mess with folks who might be passing it as a hash to more than one
+        call to new(). Reported by Darby Felton.
+      - Added a 'meta http-equiv="content-type"' tag to HTML output that
+        includes the character set to help some clients in the proper display
+        of the characters in an HTML email. I'm not sure if any clients
+        actually need this help, but it certainly can't hurt!
+      - Added the '--css-url' option to specify an alternate style sheet for
+        HTML emails. SVN::Notify::HTML's own CSS is left in the email, as
+        well, so the specified style sheet can just override the default,
+        rather than have to style everything itself. Yes, it takes advantage
+        of the "cascading" feature of cascading style sheets! Based on a
+        suggestion by Steve James.
+
+2.54  2006-03-06T00:33:42
+      - Added "/usr/bin" to the list of paths searched for executables.
+        Suggested by Nacho Barrientos.
+      - Added '--max-diff-length' option. Patch from David Burley/SourceForge.
+
+2.53  2006-02-24T21:30:48
+      - Added 'header' and 'footer' attributes and command-line options to
+        specify text to be put at the head and foot of each message. For HTML
+        messages, the text will be escaped, unless it starts with "<", in
+        which case it will be assumed to be valid HTML and will therefore not
+        be escaped. Either way, it will be output between <div> tags with the
+        IDs "header" or "footer" as appropriate. Based on a patch from David
+        Burley/SourceForge.
+      - Fixed the executable-searching algorithm added in 2.52 to add ".exe"
+        to the name of the executable being searched for if $^O eq 'MSWin32'.
+      - Fixed encoding issues so that, under Perl 5.8 and later, the IO layer
+        is set on file handles so as to encode input and decode output in the
+        character set specified by the 'charset' attribute. CPAN # 16050,
+        reported by Michael Zehrer.
+      - Added a second argument to all calls to encode_entities() in
+        SVN::Notify::HTML and SVN::Notify::HTML::ColorDiff so that only '>'.
+        '<', '&', and '"' are escaped.
+      - Fixed a bug in the _find_exe() function that was attempting to modify
+        a constant variable. Patch from John Peacock.
+      - Turned the _find_exe() function into the find_exe() class method,
+        since subclasses (such as SVN::Notify::Mirror) might want to use it.
+
+2.52  2006-02-19T18:50:24
+      - Now uses File::Spec->path to search for a validate sendmail or svnlook
+        when they're not specified via their respective command-line options
+        or environment variables. Suggested by Andreas Koenig. Not that they
+        should probably be explicitly set anyway, as the PATH environment
+        variable tends to be non-existent when running under Apache.
+
+2.51  2006-01-02T23:28:11
+      - Fixed ColorDiff HTML to once again be valid XHTML 1.1.
+
+2.50  2005-11-10T23:27:22
+      - Added "ticket-url" and "ticket-regex" options to be used by those who
+        want to match ticket identifers for systems other than RT, Bugzilla,
+        GNATS, and JIRA. Based on a patch from Andrew O'Brien.
+      - Removed bogus 'use lib' line put into Makefile.PL by a prerelease
+        version of Module::Build.
+      - Fixed HTML tests to match either "'" or "&#39;", since HTML::Entities
+        can be configured differently on different systems.
+
+2.49  2005-09-29T17:26:14
+      - Now require Getopt::Long 2.34 so that the --to-regex-map option works
+        correctly when it is used only once on the command-line.
+
+2.48  2005-09-06T19:14:35
+      - Swiched from <span class="add"> and <span class="rem"> to <ins> and
+        <del> elements in SVN::Notify::HTML::ColorDiff in order to make the
+        markup more semantic.
+
+2.47  2005-09-03T18:54:43
+      - Fixed options tests to work correctly with older versions of
+        Getopt::Long. Reported by Craig McElroy.
+      - Slick new CSS treatment used for the HTML and HTML::ColorDiff emails.
+        Based on a patch from Bill Lynch.
+      - Added "svnweb_url" option. Based on a patch from Ricardo Signes.
+
+2.46  2005-05-05T05:22:54
+      - Added support for "Copied" files to HTML::ColorDiff so that they
+        display properly.
+
+2.45  2005-05-04T20:38:18
+      - Added support for links to the GNATS bug tracking system.
+        Patch from Nathan Walp.
+
+2.44  2005-03-18T06:10:01
+      - Fixed Name in POD so that SVN::Notify's POD gets indexed by
+        search.cpan.org. Reported by Ricardo Signes.
+
+2.43  2004-11-24T18:49:40
+      - Added "--strip-cx-regex" option to strip out parts of the
+        context from the subject. Useful for removing parts of the
+        file names you might not be interested in seeing in every
+        commit message.      
+      - Added "--no-first-line" option to omit the first sentence or
+        line of the log message from the subject. Useful in combination
+        with the "--subject-cx" option.
+
+2.42  2004-11-19T18:47:20
+      - Changed "Files" to "Paths" in hash returned by "file_label_map()"
+        since directories can be listed as well as files.
+      - Fixed SVN::Notify::HTML so that directories listed among the
+        changed paths are not links.
+      - Requiring Module::Build 0.26 to make sure that the installation
+        works properly. Reported by Robert Spier.
+
+2.41  2004-10-21T20:33:25
+      - Added missing newline between the commit metadata and the log
+        message in SVN::Notify.
+
+2.40  2004-10-21T19:49:40
+      - Fixed accessor generation so that accessors created for the
+        attributes passed to "register_attributes()" but a subclass are
+        created in the subclass' package instead of in SVN::Notify.
+      - Changed parsing for JIRA keys to use any set of capital letters
+        followed by a dash and then a number, rather than the literal
+        string "JIRA-" followed by a number. Reported by Garrett Rooney.
+      - Modified the regular expression patterns for the RT, Bugzilla,
+        RT, and ViewCVS links to properly match on word boundaries, so
+        that strings like "humbug 12" don't match.
+      - Modified the ViewCVS link regular expression pattern so that it
+        matches strings like "rev 12" as well as "revision 12".
+      - Modified the RT link regular expression pattern so that it
+        matches strings like "RT-Ticket: 23" as well as "Ticket 1234".
+        Suggested by Jesse Vincent.
+      - Added complicated example to try to show off all of the major
+        features. I will keep this up-to-date going forward in order to
+        post sample output on the Web.
+      - Fixed the parsing of log messages so that empty lines are no
+        longer eliminated.
+      - HTML::ColorDiff now properly handles the listing of binary files
+        in the diff, marking them with a new class, "binary", and using
+        the same CSS as is used for the "propset" class.
+      - In HTML::ColorDiff, Fixed CSS for the "delfile" class to properly
+        wrap it in a border like the other files in the diff.
+      - Added labels to the HTML::ColorDiff diff file sections to indicate
+        the type of change ("Modified", "Added", "Deleted", or "Property
+        changes").
+      - Moved the "rt_url", "bugzilla_url", and "jira_url" parameters from
+        SVN::Notify::HTML to SVN::Notify, where they are used to add URLs
+        to the text version of log messages.
+
+2.30  2004-10-19T05:20:02
+      - Added "register_attributes()" class method so that subclasses can
+        easily specify their own attributes and the corresponding command-
+        line options. This method will also create accessors for such
+        attributes.
+      - Moved the command-line option parsing to the new "get_options()"
+        class method, so options specified via the "register_attributes()"
+        class method can centrally be parsed from the command-line.
+      - Removed the deprecated "format" option and parameter to new().
+      - Added the "language" attribute to specify the language of the
+        message, file names, and file contents.
+      - Added the "linkize" attribute to SVN::Notify::HTML. When this
+        attribute is set to a true value, URLs and email addresses in the
+        log message will be turned into links.
+      - Added new "bugzilla_url", "jira_url", and "rt_url" attributes to
+        SVN::Notify. If present, these URLs will be used to create
+        links from certain strings in the log message.
+      - Changed the "viewcvs_url" attribute to require an "%s" format
+        for the placement of the revision number to match the way the
+        new URL attributes work. As an interim measure, SVN::Notify will
+        append what it has always appended and emit a warning if there is
+        no "%s" in the "viewcvs_url" string.
+      - Fixed SVN::Notify::HTML::ColorDiff so that it does not output two
+        separate sections for a single file that was both modified (or
+        added or deleted) and had properties set.
+
+2.22  2004-10-15T06:12:46
+      - Fixed diff parsing in SVN::Notitfy::HTML and
+        SVN::Notitfy::HTML::ColoDiff to recognize added and deleted files.
+      - Added links to files for which properties were set down into
+        their place in the diff in SVN::Notitfy::HTML and
+        SVN::Notitfy::HTML::ColoDiff.
+      - Changed the class for each file in the diff output by
+        SVN::Notitfy::HTML::ColoDiff to be specific to whether the file
+        was modified, added, deleted, or just had its properties set.
+
+2.21  2004-10-09T22:37:34
+      - Tweaked HTML to make it all XHTML 1.1 compliant.
+      - Switched to using attribute accessors instead of direct hash
+        access in the subclasses to serve as a better example for others.
+      - Changed the diff output methods to accept the diff input file
+        handle as the second argument, so that it is created in only
+        one place.
+
+2.20  2004-10-09T20:01:28
+      - Subclassing Module::Build in Build.PL to move and set the shebang
+        line in test scripts during "./Build" instead of simply changing
+        the shebang line in-place during "perl Build.PL".
+      - Split the "start_message()" method into two methods, the second
+        one called "output_metadata()", to separate starting the message
+        and outputting content.
+      - Added "output_css()" method to SVN::Notify::HTML, called by its
+        "start_message()" method to output CSS for the HTML email.
+      - Added CSS to the email in SVN::Notify::HTML.
+      - Added links from the changed file list in HTML email to the
+        included diff.
+      - Added SVN::Notify::HTML::ColorDiff, a new subclass that colorizes
+        the diff when it is included in the HTML email message.
+
+2.10  2004-10-07T06:18:59
+      - Added many new methods to break up the various activities of
+        assembling a notification message. This will make subclassing
+        easier.
+      - Moved all HTML notification functionality into a new subclass,
+        SVN::Notify::HTML.
+      - Added new "handler" parameter to new() and "--handler" option to
+        svnnotify to specify what subclass should handle sending the
+        notification. Just specify the name of a subclass, such as "HTML"
+        for SVN::Notify::HTML. This replaces the "format" parameter, which
+        is now deprecated.
+      - Added code to Build.PL to set the shebang line in the test
+        scripts. Reported by Robert Spier.
+      - Changed name of attached diff file to be named for the revision
+        and the committer, rather than the committer and the date.
+        Suggested by Robert Spier.
+      - Added Author, Date, and Revision information to the top of each
+        message.
+      - The ViewCVS URL is no longer output for each file. A single link
+        for the entire revision number is put at the top of the email,
+        instead. ViewCVS Revision URL syntax pointed out by Peter
+        Valdemar Morch.
+      - Changed the C<send()> method to C<execute()> to better reflect
+        its generalized use as the method that executes actions in
+        response to Subversion activity.
+      - The tests no longer require HTML::Entities to run. The HTML
+        email tests will be skipped if it is not installed.
+      - Added accessor methods for the attributes of SVN::Notify.
+
+2.00  2004-10-04T05:09:17
+      - First release, ported from activitymail 1.11, but completely
+        rewritten, with a new script interface and a separate class
+        that manages everything.
+      - Added "to_cx_regex" parameter to control the recipients based
+        on how regular expressions match directory names.
+      - Added "charset" parameter.
+      - Added "user_domain" parameter.
+      - Added "sendmail" parameter.

@@ -1,0 +1,54 @@
+Revision history for SMS-Send-SMSGlobal-HTTP
+
+0.01    19th May 2011
+        [Initial release.]
+
+0.02    20th May 2011
+        [A couple of tweaks based on inital CPAN testers results.]
+        - Took out spurious dependency and require of Crypt::SSLeay
+        - Tweaked build of http_params - was passing through undefined
+          values under perl 5.8.x
+
+0.03    22nd May 2011
+        - Took out _get option
+        - Fixed _transport option
+
+0.04    27th May 2011
+        - Direct _verbose output to STDERR not STDOUT.
+        - object.t: Replace LWP::UserAgent with Test::MockObject object,
+          to avoid failures in some build environments
+        - send_sms.t - avoid local ($some_hash{$key}) idiom in tests
+          to (hopefully) pass smoke tests for perl 5.6.1 
+
+0.05    30th May 2011
+        - Also mock LWP::UserAgent in send_sms.t
+        - Set perl version to 5.6.0
+
+0.06    3rd June 2011
+        - Handle alphanumeric caller-IDs
+        - Allow list of recipents numbers; driver level only
+
+0.07    6th June 2011
+        - Treat LWP request failure as fatal error.
+        - Save individual response codes in __responses attribute.
+
+0.08     8th July 2011
+        - POD Tweaks
+
+0.09     27th Janaury 2012
+        - Introduced Try::Tiny for error handling:
+          -- replaced eval() with try {...} catch{...}
+        - Installation and Testing:
+          -- Picked up latest Module::Install (1.04)
+          -- Replaced Test::Exception with Test::Fatal (based on Try::Tiny)
+
+0.10     21st October 2012
+         - Upgraded Module::Install from 1.04 to 1.06. See:
+           http://weblog.bulknews.net/post/33907905561/do-not-ship-modules-with-module-install-1-04
+
+0.11     28th November 2103
+         RT #87477 Changed Gateway address to http://www.smsglobal.com/http-api.php
+         ken_yap++
+
+0.12     29th November 2103
+         ...pod

@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 33317486c4fa2cf7fec85bf92ed38ac0f64233a0 CONTRIBUTING
+SHA1 e16b86b2dcc6a00c28610f7a5e00e6c6074c9e1b COPYRIGHT
+SHA1 40045996374f3ca76027caf97cc1cd643dffaedb CREDITS
+SHA1 6a931011fbe846344d9891736c3efc8b62f766d3 Changes
+SHA1 2c98397d4d19a03c0b011dff930238b904782788 INSTALL
+SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
+SHA1 45ebe812552e0c17b938034edfd6ce00c494687b MANIFEST
+SHA1 8f542c1f43e55446eaf3f24d19da153e6113e7f1 META.json
+SHA1 d25370dd5d470ea747fdc53978445effd76854a3 META.yml
+SHA1 d6496fd62f51811030b279c3ff3670a88d9f1d0d Makefile.PL
+SHA1 76c687dcb964fe727b85bf068376515ef360402c README
+SHA1 189a926183b73e91df90d55597b24ab219feeb23 dist.ini
+SHA1 0708197ea3917c3138073c0d5593f1e4b729fb74 doap.ttl
+SHA1 6532c54fb651885528ad48492480eb3cdf756e42 examples/example1.pl
+SHA1 da34fc955a2f275ff69fe5cde0b78c7febdf9603 lib/Spreadsheet/Wright.pm
+SHA1 a84c2a02f9677287f649791de1eff61c26bd012a lib/Spreadsheet/Wright/CSV.pm
+SHA1 fd21c129b6438080abc8ecc65f5ea3895cd56034 lib/Spreadsheet/Wright/Excel.pm
+SHA1 be41bb969e5d795533e13b782396aaba293cbc76 lib/Spreadsheet/Wright/HTML.pm
+SHA1 1a0f05bbc0a84e9fecc14a5e60a67c84217e2c93 lib/Spreadsheet/Wright/JSON.pm
+SHA1 2cbae6ecd4c7039d169529e5c81da6d119805f03 lib/Spreadsheet/Wright/OpenDocument.pm
+SHA1 737d9130f24d6f033af5a9fa7076767b54994883 lib/Spreadsheet/Wright/OpenDocumentXML.pm
+SHA1 fd68317aa81b757fd9f2cac738079605269ccaae lib/Spreadsheet/Wright/XHTML.pm
+SHA1 387b5acf4cadb1eae0aac03458685a16449232c5 t/01basic.t
+SHA1 ab8928b0bdad3159d9d0ec63646d91d6ccf2a161 t/02csv.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlOUGfgACgkQzr+BKGoqfTndgACggVEr2lsGUrrQT8heZ12uRGEW
+6loAniP9KjZEumemIs9JSoFpGj4JmsK5
+=jy73
+-----END PGP SIGNATURE-----

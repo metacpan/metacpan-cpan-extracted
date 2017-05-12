@@ -1,0 +1,31 @@
+%module{SOOT};
+
+class TClass {
+
+  AV* _soot_method_complete_internal(const char* methodname_start, int what, bool exact = false)
+    %code{%
+      RETVAL = newAV();
+      sv_2mortal((SV*)RETVAL);
+
+      size_t methodname_start_len = strlen(methodname_start);
+
+      TIter next(THIS->GetListOfAllPublicMethods());
+      TFunction* meth;
+      while ((meth = (TFunction*)next())) {
+        const char* methname = meth->GetName();
+        const size_t this_name_len = strlen(methname);
+        char* mut_methname = savepvn(methname, this_name_len);
+        if (this_name_len >= methodname_start_len) {
+          if (!exact)
+            mut_methname[methodname_start_len] ='\0';
+          if (strEQ(methodname_start, mut_methname)) {
+            const char* rvstr = what == 0 ? meth->GetPrototype() : meth->GetName();
+            av_push(RETVAL, newSVpv(rvstr, strlen(rvstr)));
+          }
+        }
+        Safefree(mut_methname);
+      }
+    %};
+
+};
+

@@ -1,0 +1,9 @@
+1.0.1     2017-03-24 17:56:55+00:00 Europe/London
+ - fix list headers:
+   * list headers are structured, should never be encoded
+   * they can have comments
+   * each header can have multiple values
+   * 'post' can be set to a false value to indicate a no-post list
+
+1.0.0     2017-03-16 17:45:48+00:00 Europe/London
+ - first release

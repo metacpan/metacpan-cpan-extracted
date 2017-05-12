@@ -1,0 +1,6 @@
+Revision history for Perl extension Solaris::Sysconf.
+
+0.01  Fri Nov 30 10:23:35 2001
+	- original version; created by h2xs 1.21 with options
+		-nSolaris::Sysconf -v0.01 -ssysconf /usr/include/sys/unistd.h
+

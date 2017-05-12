@@ -1,0 +1,28 @@
+2016-03-13  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Fix Statistics::Frequency link.
+
+	* Whitespace fixing.
+
+	* Release as version 0.03.
+
+2015-08-24  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Regenerate distro with a modern MakeMaker
+	  (using perl 5.18.2)
+
+	* Add README.
+
+	* Use the recommended copyright and license wording.
+
+	* Bump the copyright years.
+
+	* Add the copyright and license also to the README.
+
+	* Require Statistics::Frequence 0.04.
+
+	* Release as version 0.02.
+
+Sat Sep  7 20:22:56 2002  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Release 0.01.

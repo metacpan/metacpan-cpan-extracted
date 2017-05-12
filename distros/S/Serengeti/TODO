@@ -1,0 +1,10 @@
+Native
+------
+
++ Add support for HTMLIsIndexElement
++ Add support for HTMLStyleElement
+
++ form.enctype should check if there's a file input and then
+  set the correct enctype
+
++ implement window object

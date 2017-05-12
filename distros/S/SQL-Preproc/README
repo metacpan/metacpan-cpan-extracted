@@ -1,0 +1,60 @@
+NAME
+  SQL::Preproc - Source Filter supporting embedded SQL for Perl.
+
+INSTALLATION
+  Unzip and untar the archive, cd to the distribution
+  directory and enter the following commands:
+
+  For *nix:
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+  For Win32:
+    perl Makefile.PL
+    nmake
+    nmake test
+    nmake install
+
+USAGE
+  just add "use SQL::Preproc;" to your perl script,
+  embed some SQL, and have fun!
+  
+  Be sure to read the included Preproc.pod for all the
+  nitty gritty details.
+
+DEPENDENCIES
+  Requires 
+  	- Perl 5.8
+  	- Filter::Simple 0.78
+  	- Text::Balanced 1.65
+  	- DBI 1.42
+  	- a DBI driver for your target DBMS
+	- (optional) DBD::CSV for baseline testing
+	- (optional) DBD::Teradata for advanced testing
+  	- (optional) DBIx::Chart 0.02, DBD::Chart 0.81 to test subclasses
+  	- (optional) a synrax extension module for your target DBMS
+
+AUTHOR
+  Dean Arnold, Presicient Corp. <darnold@presicient.com>
+  http://www.presicient.com/sqlpp
+
+COPYRIGHT AND LICENSE
+	Copyright(C) 2004, 2005, Presicient Corp., USA.
+	All rights reserved.
+	
+ Permission is granted to use this software according to the terms of the
+ Artistic License, as specified in the Perl README file,
+ with the exception that commercial redistribution, either 
+ electronic or via physical media, as either a standalone package, 
+ or incorporated into a third party product, requires prior 
+ written approval of the author.
+
+ This software is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+ Presicient Corp. reserves the right to provide support for this software
+ to individual sites under a separate (possibly fee-based)
+ agreement.

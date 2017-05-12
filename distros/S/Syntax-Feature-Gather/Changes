@@ -1,0 +1,21 @@
+Revision history for Syntax-Feature-Gather
+
+1.002001  2013-08-08 19:50:07 CST6CDT
+   - Add missing dep (Sub::Exporter)
+   - Abandon RT
+   - Put MetaYAML back in dist
+
+1.002000  2012-08-04 22:24:29 America/Chicago
+   - Split Syntax::Feature::Gather away from Syntax::Keyword::Gather so we
+     don't need to dep on syntax.pm
+
+1.001001  2012-07-29 16:50:36 America/Chicago
+   - Use Sub::Exporter::Progressive
+
+1.001000  2010-11-06 22:23:35 CST6CDT
+   - Stop using RJBS-versions
+   - Add support for syntax.pm
+
+0.093420 Mon Dec 07 2009 11:24:00
+   - Initial fork of Perl6::Gather
+

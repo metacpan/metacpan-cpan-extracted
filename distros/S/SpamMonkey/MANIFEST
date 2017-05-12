@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/SpamMonkey.t
+lib/SpamMonkey/Test/check_uridnsbl.pm
+lib/SpamMonkey/Config.pm
+lib/SpamMonkey/Result.pm
+lib/SpamMonkey/Utils.pm
+lib/SpamMonkey.pm
+META.yml                                 Module meta-data (added by MakeMaker)

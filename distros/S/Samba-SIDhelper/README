@@ -1,0 +1,56 @@
+Samba-SIDhelper
+
+A simple automated system for choosing SIDs from posix G/UIDs.
+
+    use Samba::SIDhelper;
+
+    my $sidhelper = Samba::SIDhelper->new({sid=>'S-1-5-21-1234-56789-10111213'});
+
+    my $sid=$sidhelper->uid2sid('1002');
+    if ($sidhelper){
+        print "Error!\n";
+    }
+
+    $sid=$sidhelper->gid2sid('1002');
+    if ($sidhelper){
+        print "Error!\n";
+    }
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Samba::SIDhelper
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Samba-SIDhelper
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Samba-SIDhelper
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Samba-SIDhelper
+
+    Search CPAN
+        http://search.cpan.org/dist/Samba-SIDhelper/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Zane C. Bowers
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

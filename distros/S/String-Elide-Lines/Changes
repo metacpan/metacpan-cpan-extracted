@@ -1,0 +1,14 @@
+0.003   2017-01-29 (PERLANCAR)
+
+	- [Bugfix] Fix algorithm which caused result to be shorter than
+	  $len.
+
+
+0.002   2017-01-28 (PERLANCAR)
+
+	- Add option: default_prio.
+
+
+0.001   2017-01-28 (PERLANCAR)
+
+        - First release.

@@ -1,0 +1,2 @@
+# We need to run the tests in the future or the registrars won't exist (because of the way the model db is setup)
+forward: 15 days

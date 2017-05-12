@@ -1,0 +1,663 @@
+=head1 NAME
+
+SIAM::Documentation::DataModel - SIAM data model in details
+
+
+=head1 INTRODUCTION
+
+SIAM (Service Inventory Abstraction Model) is intended as a common API
+that would connect to enterprise-specific service inventory systems and
+present the inventory data in a uniform format. The purpose of this
+universal API is to reduce the integration costs for such software
+systems as network monitoring, CRM, Customer self-service portals, etc.
+
+
+=head1 DATA MODEL
+
+=head2 Conventions
+
+Each object is defined by a set of attributes. Some attributes are mandatory
+for a particular object class.
+
+Each pair of objects may or may not be in contained/container
+relationship. Any single object may only be contained in one container.
+
+Visibility of attributes and their values is defined by Access Scope
+associated with a particular client user.
+
+Attribute names starting with the prefix siam.* are reserved solely for
+SIAM use.
+
+In boolean attributes, numerical zero is interpreted as "false", and numerical
+nonzero is treated as "true". Usually numerical 1 indicates a true value.
+
+Some attributes contain identifiers of other objects. The string value I<NIL>
+is reserved to indicate an undefined identifier.
+
+Attribute values are strings in UTF-8 encoding. The client software
+should treat UTF-8 correctly, especially where it deals with names and
+addresses.
+
+Some objects may also define I<computables>. A computable is a special
+attribute which requires substantial CPU time to derive its
+value. Computables are not retrieved automatically among other
+attributes, and are only delivered via explicit method calls. In case if
+the underlying driver does not support a particular computable, it
+should return an empty string.
+
+The driver may define I<conditions> for some objects. A condition is a
+(key, value) pair that the SIAM client application sends towards the
+driver. This is a one-way communication: there is no direct access to
+the condition value, and the driver is free to do anything with it or
+ignore it. Usually drivers update some internal state databases upin
+receiveing a new condition.
+
+In this document, XYZ refers to the enterprise name.
+
+=head2 SIAM::Object
+
+All SIAM object classes (including the root-level C<SIAM> class) are
+derived from C<SIAM::Object> class. The following attributes are
+mandatory for every object:
+
+=over 4
+
+=item * siam.object.id
+
+The attribute defines a unique identifier for the object. Client
+applications must not set any assumptions on the ID values or their
+structure. The back-end drivers generate the ID values, and these values
+are only meaningful within the driver data model.  Maximum length: 1024
+bytes. The identifiers starting with the string I<SIAM.> are reserved to
+the SIAM internals and must not be used by the drivers.
+
+=item * siam.object.class
+
+The full Perl package name of the object, such as I<SIAM::ServiceUnit>.
+The back-end drivers should rely on these values in their internal
+logics.  The drivers should be flexible enough to accept new object
+classes without breaking the logics.
+
+=item * siam.object.complete
+
+The attribute should return true value when it's completely ready to
+use. For example, a Service Data Element object may not be ready to
+deliver the data because the underlying system has not yet prepared
+it. In this case, this attribute would return false value. If the driver
+does not deliver a value for this attribute, SIAM::Object sets it to
+true.
+
+=item * siam.object.container
+
+The attribute refers to the containing object's ID or is set to NIL.
+
+=item * siam.object.has_reports
+
+This attribute returns a true value if one or more reports is associated
+with it. Reports are usually performed on the underlying contained
+objects. If the driver does not deliver a value for this attribute,
+SIAM::Object sets it to false.
+
+=back
+
+
+The following object IDs are predefined by SIAM and are not queried via
+the driver:
+
+=over 4
+
+=item * SIAM.ROOT
+
+The root-level object.
+
+=item * SIAM.SCOPE.ALL.CONTRACTS
+
+The access scope with the name I<AllContracts>. All contract objects are
+implicitly included in it.
+
+=item * SIAM.SCOPE.ALL.ATTRIBUTES
+
+The access scope with the name I<AllAttributes>. All attribute names are
+implicitly in it.
+
+=back
+
+
+
+=head2 Root object
+
+The root object of class C<SIAM> is the only object in the hierarchy that is
+not retrieved from the back-end driver. The root object has no attributes.
+
+
+
+=head2 SIAM::Contract
+
+The enterprise billing system would usually work with
+contracts. Contracts consist of services.
+
+Mandatory attributes:
+
+=over 4
+
+=item * siam.contract.inventory_id
+
+Contract identifier in external inventory. This should refer to the
+contract number as seen in the enterprise billing system.
+
+=item * siam.contract.customer_name
+
+String identifying the contract holder name
+
+=item * siam.contract.customer_id
+
+Contract holder ID in the external inventory
+
+=back
+
+Computables:
+
+=over 4
+
+=item * siam.contract.content_md5hash
+
+Returns a hex string representing the MD5 hash of all the objects
+related to this contract. The client application may use this value as
+an indicator if it has to refresh its internal cache. 
+
+=back
+
+Attribute examples:
+
+=over 4
+
+=item * xyz.is_suspended, xyz.billing_ok, xyz.reseller_id
+
+These define the internal logic which is specific to particular SIAM use.
+
+=back
+
+
+
+=head2 SIAM::Service
+
+A Service is a billing unit within the enterprise. It consists of Service
+Units.
+
+For example, a WAN connectivity service would consist of one Service
+object, consisting of a Service Unit object per location, and one or two
+Service Component objects per Unit for single and redundant physical
+links.
+
+
+Mandatory attributes:
+
+=over 4
+
+=item * siam.svc.product_name
+
+A name from the enterprise's product catalog.
+
+=item * siam.svc.type
+
+A string from a limited dictionary of predefined service types. It
+refers to a service template which identifies the attributes which are
+required for each service type.
+
+=item * siam.svc.inventory_id
+
+Service ID in external inventory, such as the billing system.
+
+=back
+
+Attribute examples:
+
+=over 4
+
+=item * xyz.svc.city, xyz.svc.zip, xyz.svc.street
+
+Location information for a service.
+
+=back
+
+
+
+=head2 SIAM::ServiceUnit
+
+Service Unit is an elementary logical entity that builds up a
+service. For example, for a redundant WAN connection, a Service Unit
+would correspond to one WAN location, and it would consist of two
+Service Components for each link.
+
+A ServiceUnit consists of service options, such as access speed, hosting
+disk size, etc. The corresponding Service Component has implementation
+attributes, such as link identifier, access port, rack number, etc.
+
+Service options are usually visible to the customer and are defined in
+their contract.
+
+Implementation attributes are internal Service Provider's properties
+that document the technical details of the installation.
+
+Mandatory attributes:
+
+=over 4
+
+=item * siam.svcunit.name
+
+Service Unit name as displayed to the user.
+
+=item * siam.svcunit.type
+
+A string from a limited dictionary of predefined service unit types. It
+refers to a service template which identifies the attributes which are
+required for each unit type.
+
+=item * siam.svcunit.inventory_id
+
+Service Unit ID in external inventory.
+
+=back
+
+
+
+
+=head2 SIAM::ServiceComponent
+
+A Service Unit consists of one or more physical or logical components,
+and each component is typically associated with physical device
+component. For example, a WAN connection may consist of several physical
+links, and each link would be identified as a Service Component.
+
+Each Service Component object represents a single management entity,
+such as network port on a device.
+
+Mandatory attributes:
+
+=over 4
+
+=item * siam.svcc.name
+
+Service Component name as displayed to the user.
+
+=item * siam.svcc.type
+
+A string from a limited dictionary of predefined service component types. It
+refers to a service template which identifies the attributes which are
+required for each component type.
+
+=item * siam.svcc.inventory_id
+
+Service Component ID in external inventory.
+
+=item * siam.svcc.devc_id
+
+Identifier of an associated SIAM::DeviceComponent object or NIL.
+
+
+=back
+
+
+
+
+=head2 SIAM::Device
+
+Device objects describe physical or virtual devices. A device is usually
+a single point of management, such as IP address and SNMP access
+credentials.
+
+Device objects are contained in the root object.
+
+Mandatory attributes:
+
+=over 4
+
+=item * siam.device.inventory_id
+
+Reference to the device identifier in an external inventory system. This
+may or may not be the same as hostname.
+
+=item * siam.device.name
+
+Device name.
+
+=back
+
+Conditions:
+
+=over 4
+
+=item * siam.device.set_components
+
+The value of this condition is a JSON array of hashes, and each has
+represents a Device Component object and its attributes. The driver
+implementation should automatically delete all device components which
+are not defined in this array.
+
+=back
+
+
+
+=head2 SIAM::DeviceComponent
+
+Device Component objects describe physical or virtual parts of a device
+which can be assigned to a Service Component. 
+
+Device Component objects are contained in Device objects.
+
+Certain types of devices allow only one servcie to be associated with a
+device. In this case, a Device object has only one Device Component.
+
+Mandatory attributes:
+
+=over 4
+
+=item * siam.devc.inventory_id
+
+Reference to an identifier in an external inventory system.
+
+=item * siam.devc.type
+
+Type of the component. Known values are: C<IFMIB.Port>, C<Power.PDU>,
+C<HOST>, ...
+
+=item * siam.devc.name
+
+Name of the component, such as network port name.
+
+=item * siam.devc.full_name
+
+A string which represents the device component. It is supposed to be
+composed from the containing device's name and the component name.
+
+=item * siam.devc.description
+
+Component description, such as the port description configured by the
+network administrator.
+
+=back
+
+Optional attributes:
+
+=over 4
+
+=item * siam.devc.is_attached
+
+If the attribute is not defined, false value is assumed. If the value is
+set to true, the attribute "siam.devc.attached_to" is mandatory, and it
+indicates that this device component is attached to another device
+component.
+
+=item * siam.devc.attached_to
+
+If "siam.devc.is_attached" returns true, this attrubute must contain the
+object ID of another device component within the same device. This
+defines the hierarchy of device components within a device (for example,
+a MEF EVC is attached to a physical port).
+
+=back
+
+
+
+=head2 SIAM::AccessScope
+
+Access Scope determines the subset of contracts and other objects that
+are visible to particular users.  The default security model provides
+the means for limiting access to Contracts and individual attribute
+names.
+
+Two scope names are reserved, and corresponding objects always belong to
+them: I<AllContracts>, I<AllAttributes>.
+
+Access Scope objects are contained within the root SIAM object. Each
+Access Scope object contains one or more Scope Member objects.
+
+Mandatory attributes:
+
+=over 4
+
+=item * siam.scope.name
+
+Unique name of Access Scope. It has usually a mnemonic value, such as
+I<AllContracts>, I<Contract.123456>, I<Wholesale.654321>.
+
+=item * siam.scope.applies_to
+
+Class of objects that this scope covers. Known values: I<SIAM::Contract>,
+I<SIAM::Attribute>.
+
+=back
+
+
+=head2 SIAM::ScopeMember
+
+Scope Member object points to the object at which the corresponding
+privileges apply.
+
+Scope Members are contained within Access Scope objects.
+
+Mandatory attribute:
+
+=over 4
+
+=item * siam.scmember.object_id
+
+ID of a corresponding Contract or Attribute object which comprises the
+given Scope.
+
+=back
+
+
+
+=head2 SIAM::User
+
+User is usually associated with a physical person that accesses the
+system. SIAM is not responsible for authenticating the users, although
+it may carry the information required for authentication.
+
+User objects may contain any of the RFC4519 (LDAP User Schema)
+attributes. It depends on the local interpretation which of them are
+available, and also the meaning of these attributes.
+
+User objects are contained within the root C<SIAM> object.
+
+Mandatory attributes:
+
+=over 4
+
+=item * siam.user.uid
+
+Unique user ID that is known through some authentication mechanism.
+
+=back
+
+
+Optional attributes which may be supported by the driver and the
+front-end application:
+
+=over 4
+
+=item * user.cn
+
+Common Name attribute in an LDAP database.
+
+=item * user.auth.method
+
+One of two values are expected: C<inline>, C<ldap>
+
+=item * user.auth.password
+
+If method is set to "inline", this attributes delivers the password as
+specified in LDAP standards. Example:
+I<{SHA}NWE5MDg0MWU0ODY3Y2VjMTQ2NzU0NjNhOWEzZDFmMjI4MTFiZDQ2YnNhbHQ=>
+
+=item * user.ldap.host
+
+LDAP hostname or URL
+
+=item * user.ldap.binddn
+
+Bind DN
+
+=back
+
+
+
+
+=head2 SIAM::Privilege
+
+Privilege is a binding object between Users and Access Scopes. The
+relation between users and their privileges is maintained by
+enterprise-specific SIAM drivers, and may be based, for example, on LDAP
+group membership.
+
+Privilege objects are contained in C<SIAM::User> objects.
+
+Mandatory attributes:
+
+=over 4
+
+=item * siam.privilege.access_scope_id
+
+Reference to the corresponding C<SIAM::AccessScope> object ID.
+
+=item * siam.privilege.type
+
+String from a limited dictionary of known privilege types. Examples:
+I<ViewContract>, I<ViewAttribute>, I<SuspendContract>
+
+=back
+
+
+
+=head2 SIAM::Attribute
+
+Attribute objects are only used for their relation to Access
+Scopes. This relation is usually static and stored directly in SIAM
+configuration.
+
+For example, some Implementation Attributes, such as 
+I<access.port.name>, I<rack.number>, would be associated with the scope
+I<ImplementarionAttributes>, and only the ISP personnel users would be
+able to see their values.
+
+C<SIAM::Attribute> objects are contained within the root object.
+
+Mandatory attributes:
+
+=over 4
+
+=item * siam.attribute.name
+
+Name of the attribute.
+
+=back
+
+
+
+
+=head2 SIAM::Report
+
+A Report object can be contained in any of other valid objects, except
+for another SIAM::Report. The correspondinig container should return
+true value for the C<siam.object.has_reports> attribute.
+
+A Report object does not contain any objects. The contents of the report
+are retrieved via the C<siam.report.content> computable.
+
+The SIAM driver acts as a storage for report contents, and also it
+defines the list of reports for particular inventory objects. An
+external report generation program, such as Torrus SIAM plugin,
+generates the reports and pushes them back to the driver by setting the
+corresponding conditions.
+
+Mandatory attributes:
+
+=over 4
+
+=item * siam.report.name
+
+The report name as displayed to the user.
+
+=item * siam.report.description
+
+A couple of sentences which describe the details of the report.
+
+=item * siam.report.object_class
+
+Class of objects that are returned by this report. Usually this is
+"SIAM::ServiceUnit".
+
+=item * siam.report.type
+
+A string from a limited dictionary of predefined report types. The
+report type defines behavior of the report generating program. Examples:
+"torrus.traffic.top", "torrus.bwusage.top".
+
+=item * siam.report.last_updated
+
+Returns the timestamp of the latest report generation in ISO format.
+
+=back
+
+Additional attributes depend on the report type, and are specific to
+that type. The report generation program should document all relevant
+attributes.
+
+The following conditions are defined for the reports. They are used by
+the report generation program to store the results in the driver:
+
+=over 4
+
+=item * siam.report.set_items
+
+This condition is set to tell the driver to reset the contents and add
+new items to the report. The value of the condition is a JSON-encoded
+array consisted of hashes. Each hash must have a mandatory item with the
+key C<siam.report.item_id> and an object ID in the value. The rest of
+the keys and values is defined by the report type and should be
+documented in the reporting program.
+
+=back
+
+The computable C<siam.report.content> returns a JSON array that is
+comprised of the report items as specified in C<siam.report.set_items>
+condition.
+
+
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2011-2013 Stanislav Sinyagin.
+
+This program is distributed under the MIT (X11) License:
+L<http://www.opensource.org/licenses/mit-license.php>
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+
+=cut
+
+# Local Variables:
+# mode: cperl
+# End:

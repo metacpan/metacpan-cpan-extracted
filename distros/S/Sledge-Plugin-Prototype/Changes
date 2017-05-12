@@ -1,0 +1,12 @@
+Revision history for Perl extension Sledge::Plugin::Prototype
+0.03  Mon Apr 24 13:50:54 2006
+    - Now template parameter "prototype" is set 
+      even if Template Class is subclass of Sledge::Template::TT
+
+0.02  Tue Nov 01 22:14:09 2005
+    - add "show_prototype_js" method.
+      This method returns a prototype.js source code.
+     (Thanks to Kan Fushihara.)
+
+0.01  Mon May  9 09:30:51 2005
+	- original version

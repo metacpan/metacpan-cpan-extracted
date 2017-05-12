@@ -1,0 +1,13 @@
+From: 555123456789
+From_TOA: 91 international, ISDN/telephone
+From_SMSC: 555987654321
+Sent: 09-01-08 17:35:25
+Received: 09-01-08 17:35:39
+Subject: GSM1
+IMSI: 555987654321234
+Report: no
+Alphabet: ISO
+UDH: false
+
+This is my test sms text
+on two lines.

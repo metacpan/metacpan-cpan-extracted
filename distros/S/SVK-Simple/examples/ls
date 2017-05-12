@@ -1,0 +1,8 @@
+#!/usr/bin/env perl
+
+use SVK::Simple;
+my $svk = SVK::Simple->new();
+
+# List your default loca depo path.
+$svk->ls("//");
+

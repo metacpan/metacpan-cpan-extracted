@@ -1,0 +1,6 @@
+Makefile.PL
+MANIFEST
+README
+t/Scope-local_OnExit.t
+lib/Scope/local_OnExit.pm
+META.yml                                 Module meta-data (added by MakeMaker)

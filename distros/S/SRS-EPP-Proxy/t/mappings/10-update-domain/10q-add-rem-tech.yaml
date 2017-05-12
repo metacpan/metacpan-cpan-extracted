@@ -1,0 +1,33 @@
+# Update domain, add and remove tech contact
+template: update-domain.tt
+
+vars:
+  domain: updatable.co.te
+  tech: 10d
+  tech_old: registrant-001
+
+input_assertions:
+  class: SRS::EPP::Command::Update::Domain
+
+SRS:
+  - assertions:
+      count:
+      match:
+        - [ '//DomainNameFilter', 'updatable.co.te', 'Check for the domain name' ]
+      match_all:
+      attr_is:
+        - [ '//FieldList', 'TechnicalContact', '1', 'Technical contact requested in DDQ field list' ]
+  - assertions:
+      count:
+      match:
+        - [ '//DomainNameFilter', 'updatable.co.te', 'Check for the domain name' ]
+      match_all:
+      attr_is:
+        - [ '//TechnicalContact', 'HandleId', '10d', 'Check for the tech contact' ]
+
+
+output_assertions:
+  count:
+    - [ '//epp:result', 1, 'Check for one result' ]
+  attr_is:
+    - [ '//epp:result', 'code', 1000, 'Check for correct result code' ]

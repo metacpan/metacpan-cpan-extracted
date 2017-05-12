@@ -1,0 +1,59 @@
+TYPEMAP
+const char *                T_PV
+pid_t                       T_IV
+hwloc_obj_type_t            T_IV
+hwloc_topology_t            O_TOPOLOGY
+hwloc_obj_t                 O_OBJ
+hwloc_cpuset_t              O_CPUSET
+hwloc_nodeset_t             O_NODESET
+hwloc_bitmap_t              O_BITMAP
+
+
+INPUT
+O_TOPOLOGY
+  if(sv_isobject($arg) && sv_derived_from($arg, \"Sys::Hwloc::Topology\"))
+    $var = INT2PTR($type, SvIV((SV*)SvRV($arg)));
+  else
+    croak(\"${Package}::$func_name() -- $var is not a \\\"Sys::Hwloc::Topology\\\" object\");
+
+O_OBJ
+  if(sv_isobject($arg) && sv_derived_from($arg, \"Sys::Hwloc::Obj\"))
+    $var = INT2PTR($type, SvIV((SV*)SvRV($arg)));
+  else
+    croak(\"${Package}::$func_name() -- $var is not a \\\"Sys::Hwloc::Obj\\\" object\");
+
+O_CPUSET
+  if(sv_isobject($arg) && sv_derived_from($arg, \"Sys::Hwloc::Cpuset\"))
+    $var = INT2PTR($type, SvIV((SV*)SvRV($arg)));
+  else
+    croak(\"${Package}::$func_name() -- $var is not a \\\"Sys::Hwloc::Cpuset\\\" object\");
+
+O_NODESET
+  if(sv_isobject($arg) && sv_derived_from($arg, \"Sys::Hwloc::Nodeset\"))
+    $var = INT2PTR($type, SvIV((SV*)SvRV($arg)));
+  else
+    croak(\"${Package}::$func_name() -- $var is not a \\\"Sys::Hwloc::Nodeset\\\" object\");
+
+O_BITMAP
+  if(sv_isobject($arg) && sv_derived_from($arg, \"Sys::Hwloc::Bitmap\"))
+    $var = INT2PTR($type, SvIV((SV*)SvRV($arg)));
+  else
+    croak(\"${Package}::$func_name() -- $var is not a \\\"Sys::Hwloc::Bitmap\\\" object\");
+
+
+OUTPUT
+O_TOPOLOGY
+  sv_setref_pv($arg, "Sys::Hwloc::Topology", (void *)$var);
+
+O_OBJ
+  sv_setref_pv($arg, "Sys::Hwloc::Obj", (void *)$var);
+
+O_CPUSET
+  sv_setref_pv($arg, "Sys::Hwloc::Cpuset", (void *)$var);
+
+O_NODESET
+  sv_setref_pv($arg, "Sys::Hwloc::Nodeset", (void *)$var);
+
+O_BITMAP
+  sv_setref_pv($arg, "Sys::Hwloc::Bitmap", (void *)$var);
+

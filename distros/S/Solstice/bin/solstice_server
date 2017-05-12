@@ -1,0 +1,78 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Getopt::Std;
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+
+my %options;
+
+getopt('cup', \%options);
+
+my $port = $options{'p'} || 8080;
+my $user = $options{'u'};
+my $config_path = $options{'c'};
+
+if (defined $user) {
+    print "Running as $user\n";
+}
+
+my $server = Solstice::Server::HTTP->new($port);
+$server->host('localhost');
+$server->run();
+
+
+package Solstice::Server::HTTP;
+
+use base qw(HTTP::Server::Simple::CGI);
+use Solstice::Dispatch;
+use Solstice::Server::SimpleCGI;
+
+sub handle_request {
+    my $self = shift;
+
+    $ENV{'QUERY_STRING'} = $self->method('query_string');
+    $ENV{'REQUEST_METHOD'} = $self->method('method');
+    if (defined $user) {
+        $ENV{'REMOTE_USER'} = $user;
+    }
+    if (defined $config_path) {
+        if ($config_path !~ m|^/|) {
+            my $pwd = `pwd`;
+            chomp $pwd;
+            $config_path = $pwd.'/'.$config_path;
+        }
+        $ENV{'SOLSTICE_CONFIG_PATH'} = $config_path;
+    }
+
+    $ENV{'SERVER_PORT'} = $self->method('localport');
+    $ENV{'REQUEST_URI'} = $self->method('request_uri');
+    $ENV{'HTTP_HOST'} = $ENV{'SERVER_NAME'} = $self->method('localname');
+
+    my $server = Solstice::Server::SimpleCGI->new();
+    Solstice::Dispatch::dispatch();
+}
+
+sub setup {
+    my $self = shift;
+    my %values = @_;
+
+   foreach my $key (keys %values) {
+        my $value = $values{$key};
+        $self->method($key, $value);
+    }
+}
+
+sub method {
+    my $self = shift;
+    my ($key, $value) = @_;
+
+    if (defined $value) {
+        $self->{"_$key"} = $value;
+    }
+    return $self->{"_$key"};
+}
+
+1;

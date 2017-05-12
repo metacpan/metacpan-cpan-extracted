@@ -1,0 +1,63 @@
+Revision history for Sys-Config-Manage
+
+0.3.1	 2012-05-26/05:45
+		 -Add Term::CallEditor as a dependency.
+		 -Correct the POD for Sys::Config::Manage::Remove.
+
+0.3.0	 2011-11-26/18:00
+		 -Make scripts editable and addable via cli.
+		 -Minor bug and documentation fixes.
+		 -Add the scripts below.
+		 	  bin/scm-scripts-add
+		 	  bin/scm-scripts-edit
+		
+
+0.2.2	 2011-11-20/2:50
+		 -Minor correction to "bin/scm-missing".
+
+0.2.1	 2011-11-03/05:20
+		 -Add a missing dependency.
+
+0.2.0	 2011-11-02/13:30
+		 -Fix some boolean login in regards to
+		 	  the error checking in "Sys::Config::Manage".
+		 -Add the modules below.
+		 	  Sys::Config::Manage::Remove
+			  Sys::Config::Manage::Scripts
+		 -Add the scripts below.
+		 	  bin/scm-scripts-list
+			  bin/scm-scripts-run
+			  bin/scm-own-down
+			  bin/scm-own-get
+			  bin/scm-own-list
+			  bin/scm-own-up
+			  bin/scm-getcd
+			  bin/scm-missing
+
+
+0.1.1	 2011-08-13/11:30
+		 -Convert the hostname to lowercase.
+		 -Add 'Error::Helper' to the required module list.
+
+0.1.0	 2011-08-13/09:20
+		 -Add the scripts below.
+		 	  bin/scm-perms-get
+			  bin/scm-perms-up
+			  bin/scm-perms-down
+			  bin/scm-perms-list
+			  bin/scm-own-down
+			  bin/scm-own-get
+			  bin/scm-own-list
+			  bin/scm-own-up
+		 -POD updates.
+		 -Misc cleanups.
+		 -Add the modules below.
+		 	  Sys::Config::Manage::Perms
+			  Sys::Config::Manage::Ownership
+
+0.0.1	 2011-08-04/14:20
+		 -Correct various issues with listing tracked files.
+		 -Minor POD changes.
+
+0.0.0	 2011-07-31/09:30
+		 -Initial release.

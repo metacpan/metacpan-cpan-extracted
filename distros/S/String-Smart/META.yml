@@ -1,0 +1,20 @@
+---
+name: String-Smart
+version: 0.4
+author:
+  - 'Andy Armstrong <andy@hexten.net>'
+abstract: Strings that know how to escape themselves.
+license: perl
+resources:
+  license: ~
+requires:
+  Scalar::Util: 0
+  Test::More: 0
+provides:
+  String::Smart:
+    file: lib/String/Smart.pm
+    version: 0.4
+generated_by: Module::Build version 0.31012
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

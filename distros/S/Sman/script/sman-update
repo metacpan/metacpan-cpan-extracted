@@ -1,0 +1,291 @@
+#!/usr/bin/perl -w
+# $Id$
+# man indexing SWISH-E prog 
+
+# Copyright (c) Josh Rabinowitz 2004-2016
+
+# A descendent of the example in the Linux Journal 
+# article "How To Index Anything".
+
+use strict;
+use warnings;
+use bytes; # NOTE: swish-e won't understand UTF8 nor multi-byte chars 
+use Getopt::Long qw(:config no_ignore_case); 
+use Carp;
+
+use Sman::Util; # for $VERSION
+use Sman::Config;
+use Sman::Swishe;
+use Sman::Man::Find;
+use Sman::Man::Convert;
+use Sman::Autoconfig;
+use Sman::IndexVersion;
+
+#use Data::Dumper;
+use vars qw( $swisheconfigfile );    
+    # if this is defined, we created this tmp file
+
+BEGIN { 
+    $swisheconfigfile = "";
+    $|++;
+    $ENV{PATH} = "/bin:/usr/bin:/usr/local/bin:/sw/bin";
+} 
+
+my $configfile = "";
+# these will overwrite corresponding config settings 
+# if set by GetOptions() 
+
+# if no $config, we try /etc/sman.conf, then /usr/local/etc/sman.conf, then
+# $FindBin::Bin/sman.conf
+
+#################################################
+main();
+#################################################
+
+sub main {
+    my $help = 0;
+    my $verbose;
+    my $dryrun = 0; 
+    my $warn;
+    my $debug;
+    my $debugxml;
+    my $rman = "";
+    my $zcat = "";
+    my $swishe = "";
+    my $testfile = ""; 
+    my $index; 
+    my $showversion = ""; 
+    my $clearcache = 0;
+    my $max = 0;    # set to non-zero for testing that many files
+    my $progress = 0;   # like rsync, kind of
+
+    GetOptions( "help"        => \$help, 
+                    "configfile"  => \$configfile,
+                    "n"           => \$dryrun,
+                    "dryrun"      => \$dryrun,
+                    "clearcache"      => \$clearcache,
+                    "verbose!"     => \$verbose,
+                    "VERSION"     => \$showversion,
+                    "warn!"        => \$warn,
+                    "debug!"       => \$debug,
+                    "debugxml!"    => \$debugxml,
+                    "index=s"     => \$index,
+                    "rman=s"      => \$rman,
+                    "zcat=s"      => \$zcat,
+                    "swishe=s"      => \$swishe,
+                    "testfile=s"  => \$testfile,    # run just this file through. 
+                    "max=i"      => \$max,
+                    "progress!"      => \$progress,
+    ) || die Usage(); 
+
+    if ($help) {
+        die Usage();
+    } 
+
+    $SIG{__DIE__} = sub { Carp::confess $_[0] };
+
+    my $versionok = Sman::Util::CheckSwisheVersion();
+    die "sman-update: swish-e not in PATH, /usr/local/lib not in ldconfig, or need newer version?: $!" unless $versionok;
+
+    my $smanconfig = new Sman::Config(); 
+    if ($configfile) { 
+        #@configfiles = ($self->FindDefaultConfigFile(), $configfile);
+        $smanconfig->ReadSingleConfigFile($configfile);
+    } else {    # otherwise use all the configfiles we find (see FindConfigFiles()) 
+        $smanconfig->ReadDefaultConfigFile($verbose);
+    }
+    if ($showversion) {
+        $|++;
+        my $str = Sman::Util::GetVersionString(
+            "sman-update",
+            $smanconfig->GetConfigData("SWISHECMD") || 'swish-e');
+        print "$str\n";
+        print Sman::Util::GetIndexDescriptionString( 
+            $smanconfig->GetConfigData("SWISHE_IndexFile")
+         );
+        exit(0);
+    }
+
+    # overwrite settings with command line values if present
+    if ($rman) {            $smanconfig->SetConfigData( "RMANCMD",          $rman); }
+    if ($zcat) {            $smanconfig->SetConfigData( "ZCATCMD",          $zcat); }
+    if ($swishe) {          $smanconfig->SetConfigData( "SWISHECMD",      $swishe); }
+    if (defined($verbose)) { $smanconfig->SetConfigData( "VERBOSE",          $verbose); }
+    if (defined($warn)) {    $smanconfig->SetConfigData( "WARN",             $warn); }
+    if (defined($debug)) {   $smanconfig->SetConfigData( "DEBUG",            $debug); }
+    if (defined($debugxml)){ $smanconfig->SetConfigData( "DEBUGXML",         $debugxml); }
+    if (defined($index)) {   $smanconfig->SetConfigData( "SWISHE_IndexFile", $index); }
+
+    my (@files) = ($testfile || Sman::Man::Find::FindManFiles());
+
+    if ($smanconfig->GetConfigData("MANCMD") =~ /(^AUTOCONFIG$)|(^$)/) {
+        print "sman-update: Autoconfiguring MANCMD...\n" if $smanconfig->GetConfigData("VERBOSE"); 
+        my $newmancmd = Sman::Autoconfig::GetBestManCommand($smanconfig, \@files);
+        print "sman-update: MANCMD autoconfigured to '$newmancmd'\n" if $smanconfig->GetConfigData("VERBOSE");
+        $smanconfig->SetConfigData("MANCMD", $newmancmd);
+    }
+
+    print $smanconfig->Dump() if $smanconfig->GetConfigData("VERBOSE");
+
+    # set environment variables. Affects children from here forward.
+    my @envs_set = $smanconfig->SetEnvironmentVariablesFromConfig();
+
+    my $converter = new Sman::Man::Convert($smanconfig);
+    if ($clearcache) {   
+        print "sman-update: Clearing Sman cache...\n";
+        $converter->ClearCache();
+        exit(0);
+    }
+
+    my $smanswishe = new Sman::Swishe($smanconfig);
+
+    $swisheconfigfile = $smanswishe->WriteConfigFile();
+
+    if ($verbose) {
+        print "sman-update: SWISHE CONFIG FILE:\n";
+        print "=======================\n";
+        print Sman::Util::ReadFile($swisheconfigfile);
+        print "=======================\n";
+    }
+
+
+    my $swishecmd = $smanconfig->GetConfigData("SWISHECMD");
+    my $cmd = "| $swishecmd -S prog -c $swisheconfigfile -i stdin";
+    print "Running '$cmd'\n" if $debug;
+
+    unless($dryrun) {
+        open(SWISHE, $cmd) || die "sman-update: couldn't open '$cmd'"; 
+    }
+    print "sman-update: " . scalar @files . " man pages to index...\n" if $verbose || $progress; 
+    for (my $i=0; $i < scalar(@files) && ($max==0 || $i < $max); $i++) {
+        my $f = $files[$i];
+        print "** processing $i\n" if ($progress && $i % 500 == 0) ;
+        print "** working on $f\n" if $debug;
+        my ($type, $outputref) = 
+            $converter->ConvertManfile($f); 
+
+        # next two lines are from swish-e 2.4.0's 'spider.pl':
+        # 'ugly and maybe expensive, but perhaps more portable than "use bytes"'
+        #my $bytecount = length pack 'C0a*', $$outputref;
+
+        # this fails on Redhat 9 and ES3 if LANG is not C (or LC_ALL is not C)
+        my $bytecount = length $$outputref;
+
+        unless($dryrun) {
+            print SWISHE "Path-Name: $f\n",
+                "Document-Type: $type\n",
+                "Content-Length: $bytecount\n\n", $$outputref;
+        }
+        if($smanconfig->GetConfigData("DEBUGXML")) {
+            print "**==== BEGIN XML of $f =========\n" . 
+                    $$outputref .
+                    " **====  END  XML of $f =========\n\n";
+        }
+    } 
+    unless ($dryrun) {
+        close(SWISHE) || die "sman-update: Failure closing pipe to $swishe";
+
+        # update the sman.index.version file
+        my $index_versions = new Sman::IndexVersion( $smanconfig );
+        $index_versions->set_versions( 
+            { VERSION=> $Sman::Util::VERSION, SMAN_DATA_VERSION=>$Sman::Util::SMAN_DATA_VERSION }
+        );
+        
+    }
+    # note that the swisheconfig file is in Sman::Swishe for now
+    #unlink($swisheconfigfile) || warn "sman-update: Couldn't delete $swisheconfigfile: $!";
+    $swisheconfigfile = ""; 
+}
+sub Usage {
+    return "sman-update: [--help] [--config=s] [--rman=s] [--zcat=s] [--col=s]\n" .
+             "             [--(no)verbose] [--(no)warn] [--(no)debug] [--index=s]\n" .
+             "             [--clearcache]\n" .
+             "Builds index for sman.\n" .  
+             "  --config=/file/sman.conf     config file to read\n" .
+             "  --man='/path/to/man -opt'    path to prog like 'man'\n" . 
+             "  --zcat='/path/to/zcat -f'    path to prog like 'zcat -f'\n" .
+             "  --col='/path/to/col -b'      path to prog like 'col -b'\n" .
+             "  --rman='/path/to/rman -opt'  path to prog like 'rman -f XML'\n" .
+             "  --verbose/--noverbose        verbosity, default off\n" . 
+             "  --warn   /--nowarn           warnings from children, default off\n" . 
+             "  --debug  /--nodebug          debug output, default off\n" . 
+             "  --clearcache                 clear the cache of converted pages\n" . 
+             "  --testfile                   just one file, for testing\n" . 
+             "  --dryrun  (or -n)            don't write anything to the index.\n" .
+             "  --help: this text. For more info, see 'perldoc sman-update'\n"; 
+}
+END {   
+    if ($swisheconfigfile && -e $swisheconfigfile) {
+        unlink($swisheconfigfile) || warn "sman-update: Couldn't delete $swisheconfigfile: $!";
+        $swisheconfigfile = "";
+    }
+}
+
+__END__
+
+=head1 NAME
+
+sman-update - Perl program to index man pages (for searching with sman program)
+
+=head1 SYNOPSIS
+
+  % sman-update --conf=/my/dir/sman.conf --verbose
+
+or just
+
+  % sman-update
+
+=head1 ABSTRACT
+
+ sman-update: [--help] [--config=s] [--rman=s] [--zcat=s] [--col=s]
+              [--(no)verbose] [--(no)warn] [--(no)debug] [--index=s]
+              [--clearcache]
+
+ Builds index for sman.
+  --config=/file/sman.conf     config file to read
+  --man='/path/to/man -opt'    path to prog like 'man'
+  --zcat='/path/to/zcat -f'    path to prog like 'zcat -f'
+  --col='/path/to/col -b'      path to prog like 'col -b'
+  --rman='/path/to/rman -opt'  path to prog like 'rman -f XML'
+  --verbose/--noverbose        verbosity, default off
+  --warn   /--nowarn           warnings from children, default off
+  --debug  /--nodebug          debug output, default off
+  --clearcache                 clear the cache of converted pages 
+  --testfile                   just one file, for testing
+  --dryrun  (or -n)            don't write anything to the index.
+  --help: this text. For more info, see 'perldoc sman-update'
+
+=head1 DESCRIPTION
+
+Sman-update creates the index of man pages for the sman program,
+which searches on that index.
+By default the index is stored in /var/lib/sman.
+
+Sman-update should be run periodically to keep your sman index in sync
+with your system's man pages.
+
+Both sman and sman-update search for the first configuration file 
+named sman.conf in /etc, /usr/local/etc/, $HOME, and the directory 
+with sman. If no sman.conf file is found, (or specified through 
+sman or sman-update's -conf option), then the default configuration in 
+/usr/local/etc/sman-defaults.conf will be used.
+
+In all cases command line options take precedence over directives read from
+configuration files.
+
+=head1 SECURITY
+
+For increased security, sman-update can be run as a non-priveleged user. To
+do so, chown the directory /var/lib/sman and its contents to the 
+appropriate user.
+
+=head1 AUTHOR
+
+Josh Rabinowitz <joshr>
+
+=head1 SEE ALSO
+
+L<sman>, L<sman-update>, L<sman.conf>
+
+=cut
+

@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Speech-Swift-Simple.t
+lib/Speech/Swift/Simple.pm
+lib/Speech/Swift/Simple/Wav.pm
+META.yml                                 Module meta-data (added by MakeMaker)

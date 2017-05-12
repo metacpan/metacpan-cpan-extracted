@@ -1,0 +1,50 @@
+---
+abstract: 'Perl client for the SilverGoldBull(https://silvergoldbull.com/) web service'
+author:
+  - 'Denis Boyun <denis.boyun@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 0
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SilverGoldBull-API
+provides:
+  SilverGoldBull::API:
+    file: lib/SilverGoldBull/API.pm
+    version: '0.08'
+  SilverGoldBull::API::AddressRole:
+    file: lib/SilverGoldBull/API/AddressRole.pm
+  SilverGoldBull::API::BillingAddress:
+    file: lib/SilverGoldBull/API/BillingAddress.pm
+  SilverGoldBull::API::CommonMethodsRole:
+    file: lib/SilverGoldBull/API/CommonMethodsRole.pm
+  SilverGoldBull::API::Item:
+    file: lib/SilverGoldBull/API/Item.pm
+  SilverGoldBull::API::Order:
+    file: lib/SilverGoldBull/API/Order.pm
+  SilverGoldBull::API::OrderRole:
+    file: lib/SilverGoldBull/API/OrderRole.pm
+  SilverGoldBull::API::Quote:
+    file: lib/SilverGoldBull/API/Quote.pm
+  SilverGoldBull::API::Response:
+    file: lib/SilverGoldBull/API/Response.pm
+  SilverGoldBull::API::ShippingAddress:
+    file: lib/SilverGoldBull/API/ShippingAddress.pm
+requires:
+  HTTP::Headers: '6.11'
+  HTTP::Request: '6.11'
+  IO::Socket::SSL: '2.039'
+  JSON::XS: '3.02'
+  LWP::UserAgent: '6.15'
+  Mouse: '0'
+  Test::Deep: '1.124'
+  URI: '1.71'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.08'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

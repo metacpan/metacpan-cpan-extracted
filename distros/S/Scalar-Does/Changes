@@ -1,0 +1,179 @@
+Scalar-Does
+===========
+
+Created:      2012-08-01
+Home page:    <https://metacpan.org/release/Scalar-Does>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Scalar-Does>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.203	2017-01-31
+
+ [ Bug Fixes ]
+ - Make t/09warnings.t work with recent Test::Builder.
+   Fixes RT#119030.
+   <https://rt.cpan.org/Ticket/Display.html?id=119030>
+   <https://rt.cpan.org/Ticket/Display.html?id=119030>
+
+0.202	2014-04-05
+
+ [ Bug Fixes ]
+ - Make t/iod-02filehandles.t clean up after itself.
+   Fixes RT#91497.
+   Jon Jensen++
+   Piers Cawley++
+   <https://rt.cpan.org/Ticket/Display.html?id=91497>
+   <https://github.com/tobyink/p5-scalar-does/pull/1>
+
+0.201	2013-09-30
+
+ [ Packaging ]
+ - Use Dist::Inkt.
+
+ [ Other ]
+ - Updated: Use Exporter::Tiny instead of Exporter::TypeTiny.
+
+0.200	2013-05-24
+
+ [ Documentation ]
+ - Document relationship with Type::Tiny.
+
+ [ Packaging ]
+ - Skip tests involving given/when, smart match, and lexical $_ in Perl >=
+   5.17.
+
+ [ Other ]
+ - Updated: Deprecate Scalar::Does::MooseTypes.
+ - Updated: Use Exporter::TypeTiny instead of Sub::Exporter.
+ - Updated: Use Type::Tiny and Types::Standard to perform type checking for
+   built-in Scalar::Does roles, and also Scalar::Does::MooseTypes roles.
+
+0.102	2013-03-10
+
+ [ Bug Fixes ]
+ - Scalar::Util version in lib/Scalar/Does.pm and meta/makefile.pret should
+   match.
+
+0.101	2013-03-08
+
+ [ Documentation ]
+ - Show how IO::Detect's constants can be used with Scalar::Does's does()
+   function.
+
+ [ Other ]
+ - IO::Detect now performs the same namespace::clean trickery as
+   Scalar::Does to fake lexical subs.
+ - Improve test suite cleanliness; use Test::Requires, etc.
+ - does($class, $overloaded_operation) no longer returns true.
+   does($instance, $overloaded_operation) still works of course!
+ - use lexical::underscore instead of directly mucking around with
+   PadWalker.
+
+0.100	2013-03-07
+
+ [ Packaging ]
+ - Merge IO-Detect distribution into Scalar-Does.
+ - The IO-Detect-Changes.txt file lists changes to the IO-Detect
+   distribution prior to merge.
+
+ [ Other ]
+ - Updated: New test case for IO::Detect/Path::Tiny interaction.
+
+0.012	2013-01-11
+
+ [ Documentation ]
+ - Copyright 2013.
+
+0.011_01	2012-12-15
+
+ [ Bug Fixes ]
+ - Attempt to fix some problems CPAN smoke tests are reporting in
+   09warnings.t.
+
+0.010	2012-12-05
+
+ [ Documentation ]
+ - Add documentation for test suite.
+
+ [ Other ]
+ - Updated: Perl 5.17 has changed the behaviour of UNIVERSAL::can($pkg,
+   'can'), so that it is no longer useful for detecting whether a package
+   is loaded. Changed Scalar::Does::MooseLike to avoid this idiom.
+   Fixes RT#81622.
+   DAMI++
+   <https://rt.cpan.org/Ticket/Display.html?id=81622>
+
+0.009	2012-11-05	Gunpowder, treason and plot
+
+ [ Bug Fixes ]
+ - Skip test '10underscore.t' on Perl 5.008 as it doesn't support lexical
+   $_.
+ - use if $] < 5.010, 'UNIVERSAL::DOES'.
+
+ [ Packaging ]
+ - Requires UNIVERSAL::DOES in Perl < 5.010.
+
+0.008	2012-10-27
+
+ [ Documentation ]
+ - Remove references to Object-DOES in documentation.
+ - Revise documentation about Role::Tiny/Moo::Role's lack of DOES; it is
+   now implemented.
+
+ [ Other ]
+ - INCOMPATIBLE CHANGE: single-argument does($role) and overloads($role)
+   now check $_.
+   DAMI++
+   <http://purl.org/NET/cpan-uri/rt/ticket/80434>
+
+0.007	2012-10-23	Skyfall
+
+ [ Bug Fixes ]
+ - Fix warning on does(undef, $role) when $^W is true.
+   Fixes RT#80121.
+   DAMI++
+   <https://rt.cpan.org/Ticket/Display.html?id=80121>
+
+0.006	2012-10-07
+
+ [ Packaging ]
+ - Fix failing test case in Perl 5.8.
+
+0.005	2012-10-05
+
+ [ Documentation ]
+ - Correct inaccurate information about Moo type constraints.
+
+0.004	2012-10-03
+
+ [ Documentation ]
+ - Better document interaction with Role::Tiny and Moo.
+
+ [ Other ]
+ - Added: Scalar::Does::MooseTypes.
+ - Added: make_role function for creating anonymous roles.
+
+0.003	2012-09-19
+
+ [ Bug Fixes ]
+ - Ensure t/99smartmatch.t is skipped properly on Perl < 5.10.1.
+
+0.002	2012-09-19
+
+ [ Bug Fixes ]
+ - Correctly determine Regexp role.
+
+ [ Documentation ]
+ - Better documentation for interaction with Moose roles and type
+   constraints.
+ - Clarify that does($thing, '0+') is not the same as looks_like_number.
+ - Document relationship with Object::DOES.
+ - Minor improvements.
+
+ [ Packaging ]
+ - Improved test suite with 100% Devel::Cover coverage.
+
+ [ Other ]
+ - Added: Export constants for pre-defined roles.
+ - Added: Export looks_like_number.
+
+0.001	2012-09-02	Initial release

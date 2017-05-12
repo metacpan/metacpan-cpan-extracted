@@ -1,0 +1,447 @@
+Revision history for Spreadsheet-XLSX-Reader-LibXML
+
+Uses the change tracking convention
++ New feature.
+- Removed/deprecated feature.
+! Bug fix.
+* Place holder
+
+NOTE: This software is designated as beta quality until this notice is removed.  The goal is to 
+be method matched to Spreadsheet::ParseExcel prior to the 1.0 release.
+
+v0.44.6   2016-06-29 09:03:46-07:00 America/Los_Angeles
+	
+	! Additional marking of deprication based on
+		http://neilb.org/2015/01/17/deprecated-metadata.html
+
+v0.44.4   2016-05-11 11:43:36-07:00 America/Los_Angeles
+
+	! Typos cleanup and an additional acknowledgement
+
+v0.44.2   2016-05-11 11:01:41-07:00 America/Los_Angeles
+
+	! Fix an embedded requirement for Spreadsheet::XLSX::Reader::LibXML::XMLReader::Styles
+	! Fix an embedded requirement for Spreadsheet::XLSX::Reader::LibXML::XMLReader::SharedStrings
+	! Fix an embedded requirement for Spreadsheet::XLSX::Reader::LibXML::XMLReader::CalcChain v0.38.22.
+		closes #99 in github
+		
+v0.42.2   2016-05-10 17:22:03-07:00 America/Los_Angeles
+
+	! Deprecation of this package (Spreadsheet::XLSX::Reader::LibXML) The new choice is Spreadsheet::Reader::ExcelXML
+	!! This used to contain a bad release list.  If forgot to clear it. My appologies.
+
+v0.38.22  2015-10-10 20:11:56-07:00 America/Los_Angeles
+
+	! Silence the deep recursion warning for sheets with 100+ sequential empty rows
+		closes #86 in github
+
+v0.38.20  2015-10-10 06:28:21-07:00 America/Los_Angeles
+	
+	+ Added an Attribute that allows control of whether the errors get Carp's longmess
+	+ Added better handling of double digit text years in conversion to a date
+		This assumes that the year is no more than 20 years in the future or 80 years 
+		in the past of the process time
+	+ Added an attribute 'european_first' to the formatter that prioritizes the DD-MM-YY 
+		style of date string parsing over MM-DD-YY
+	+ Re-wrote the worksheet parser to have a 'fast-forward' mode.  
+		This reduces the intermediate processing (time) spent on advancing through the worksheet 
+		when you don't want the values, closes #83 in github
+	! Added a test for bad worksheet dimension values in a worksheet, closes #79 in github
+	! Added a test for missing row span attributes in a row node, closes #78 in github
+	+ Aligned dist.ini a bit with the other packages I maintain
+
+v0.38.18  2015-09-24 10:52:42-07:00 America/Los_Angeles
+	
+	! Several tests added in the background (Not part of the package yet) to ensure a safer release
+		The (future) goal is to create tests small enough to fit with the package for the same failure modes
+	! Fixes #82 in github as well as removing the fail for negative decimal rounding numbers inferred from scientific notiation
+	! Addresses #81 in github with safer string searching
+	! Addresses #80 in github by Manually building this package on my system aclearnd then running the Spreadsheet::Read (master)
+		tests after.  Long term I would like to import more of that testing to this package.
+	! Addresses #79 in github with by allowing for EOF flags to add this and only use the value where available
+		Still needs a test added to the test suit
+	! Addresses #78 in github with by substituting the values from the sheet where no row span is provided
+		Still needs a test added to the test suit
+
+v0.38.16  2015-09-20 19:21:30-07:00 America/Los_Angeles
+	
+	! Closes issue #72 in github (hopefully) with safer testing of length in a variable
+	! Closes issue #75 in github with safer setup of cell instances with empty cell_coercion attributes
+	! Closes issue #74 in github with safer testing for the apple date flag
+	! Closes issue #73 in github with safer coercion assesment of date coercions
+	+ Added caching for the styles sub-file which should noticibly speed up parsing
+	+ Added a :debug flag tgit hat turns should_warn on.  This is mostly useful to get warns on 
+		build fails since the warnings can be turned on after build as desired.
+	+ Added "5.22"(back) and added "dev" and "5.10.1" to the TravisCI testing
+	! Closes #71 in github with updates to the import statement
+	+ fetchrow_array and fetchrow_arrayref no longer report undef for the positions representing
+		the remaining empty cells in a row ( the list just ends )
+	+ Treat stored empty stings -''- as empty cells for the 'values_only' attribute
+		This will still skip the empty string cells even if 'empty_return_type' is set to empty_string 
+	+ Rewrote XMLToPerlData and moved it up one file layer since it is more reader agnostic
+		This is a first step to integrating a file type agnostic XMLReader #4 (milestone v0.40.2)
+		with improved XMLtoPerl conversions.  This might break implementations that are built on the guts of this thing.
+		Contact me with questions or concerns.  Top level API implementations should be unaffected.
+		I also moved the test file to reflect this change
+	+ Changed the name of the Worksheet class to WorksheetToRow as a first step in moving this to a role
+		sometime in the future to eliminate inheritance as much as possible. (See the worksheet interface change below)
+		I changed the name of the test to match
+	+ Changed the name of the GetCell role to Worksheet with the intent of treating it as an interface
+		I moved it up one layer in the folder structure
+		I removed the worksheet pod (now in the same folder) since the documentation was duplicated there
+		I moved the test and changed the name to reflect this change
+	+ Re-wrote the worksheet parser to parse whole rows at a time rather than one cell at a time
+		This unkinks some of the cruft created when adding tracking of hidden_columns (v0.38.12)
+	+ Added a Row Class to hold and process cell data within a row
+	+ Added support for .xlsm files closes #68 in github
+		This does not include any reading or handling of 'vbaProject.bin'
+		It should be safe even with viruses if the reader doesn't mess with it
+	! Changed the %ENV test to a caller test run in BUILDARGS ( during ->new )
+		This should handle all useage by Spreadsheet::Read (enforces the :like_ParseExcel flag)
+
+v0.38.14  2015-08-24 16:49:04-07:00 America/Los_Angeles
+
+	! re-closes #52 in github with the addtional testing suggested
+	! Fixed a bug with 'is_hidden' reporting at the cell level tested by 07-losing_is_hidden_bug.t
+	! Changed the %INC test to an %ENV test and turn on the like_ParseExcel flag with
+		$ENV{SPREADSHEET_READ_XLSX} == "Spreadsheet::XLSX::Reader::LibXML"
+		This is a more accurate flag test for use by Spreadsheet::Read
+
+v0.38.12  2015-08-19 05:19:28-07:00 America/Los_Angeles
+
+	+ Fix yet another bug in the hidden formatting (hopefully)
+	+ Make the decimal vs scientific choice for hidden formatting more robust( issue #65 on github )
+	+ Adding tests for hidden tabs rows columns and cells in the worksheet and cell
+	+ Adding the method 'get_merged_areas' to match ~::ParseExcel
+	+ For compatability purposes this package will now test (during import) to see if it's being 
+		used in Spreadsheet::Read (potential future) and automatically push the :like_ParseExcel 
+		tag on the end of the tag list so that it will behave consistently to ParseExcel for a common 
+		reader. (This is a beta feature and not guaranteed to remain)
+	+ This package now supports stacked flags (not that there exists so many already)
+		The purpose of this is as I run into additional use cases the intersection of 
+		the flags I support and the flags that are desired by the user may require some juggling.
+		Where flags disagree in their defaults the last flag passed will be used.  This should allow 
+		for the proliferation of flags for specialty cases without having to explicitly build one 
+		for each use case. (At some point though you may just want to use the attributes).
+		The test for this is t/Spreadsheet/XLSX/Reader/06-stacked_flags.t
+
+v0.38.10  2015-08-10 21:43:11-07:00 America/Los_Angeles
+
+	! Fix TravisCI build fail on test 60-hidden_format_strings.t
+	! Closes #60 in github
+	! Exclude text to sprintf number test bug
+	! Added a return the 'xml_value' only option to the 'group_return_type' attribute
+
+v0.38.9   2015-08-06 13:45:36-07:00 America/Los_Angeles
+
+	! Closes #57 in github missing LICENSE file
+
+v0.38.8   2015-08-05 11:15:01-07:00 America/Los_Angeles
+	
+	! Re-Dist::Zilla build with the version badge corrected
+	! Closes #51 in github
+		This includes autoformatting of scientific numbers to the least significant digit in 9 positions
+		scientific number autoformatting is an excel application function that occurs even in the absence of applied formats
+		This includes some exclusion of scientific number like strings
+	+ Added the cell_xml_value attribute and methods to give access to the base scientific notiation data where
+		Excel would mangle it or make it potentially less precise even in an unformtted raw value thanks @Tux for the test case
+	+ Added support for the old(old) Excel style single quote in the formula bar representing left justification
+	! Closes #49 in github
+	+ Expanded the file type allowance to include capitalized file extentions
+
+v0.38.6   2015-06-30 06:13:36-07:00 America/Los_Angeles
+	
+	! Some general documentation updates for the FmtDefault class that were not done correctly for the last release
+		Doh!
+	+ Added the possibility of passing a closure to the set_headers for header value scrubbing
+	+ Adjusted the :just_the_data flag
+		cache_positions   => 1, (documented as added but not added last commit)
+		from_the_edge     => 0,
+
+v0.38.4   2015-06-29 17:17:07-07:00 America/Los_Angeles
+
+	! The first Alien::LibXML change failed - trying again
+
+v0.38.2   2015-06-29 16:45:47-07:00 America/Los_Angeles
+
+	+ Added a cache_positions flag to the Workbook level
+		For now this only populates to cache built number conversions and the shared strings file
+	+ 'set_custom_formats' now has built in coercion to change Excel strings to coercion objects
+		This allows for you to define custom excel column formatting (Not already defined in the file)
+		using excel strings without building an intermediate coersion before loading it to the worksheet.
+	+ I changed the custom_formats attribute to _custom_formats in order to indicate that it 
+		should be set via the 'set_custom_formats' method
+	+ The worksheet class now accepts Excel format strings rather than requireing that the custom coercions be pre-built
+		(This is worksheet level functionality not workbook level functionality - still)
+	+ added the ability to only return portions of a node with a specific tag name to Spreadsheet::XLSX::Reader::LibXML::XMLReader::XMLToPerlData
+		This should be activated for the SharedStrings file whenever the workbook attribute 'group_return_type' is set to 'unformatted' or 'value'
+		The goal for this is to see a speed boost
+		Closes #47 in github
+	+ Added a cache_positions flag to the SharedStrings class
+		The goal is to see a speed boost for sheets with a large number of text strings
+			Like perl hash keys, shared strings are not ordered by cell
+			This means for files with lots of stored text each shared strings position is only read once instead of rewinding and re-searching
+		The new behaviour is managed by the SharedStrings class attribute 'cache_positions' (default on)
+			Setting cache_positions => 0 should return the old behaviour
+			If there is only text in the position then the cache only stores the text to minimize RAM impact
+		Additionally as a trade off for the increased RAM usage the sharedStrings file is closed after it has been completely read once
+		I will only read as far into shared strings as you ask (reading one value and then closing the sheet will only read to that value)
+		It will slow the first values out down but overall speed the reading of lots of values
+		Sheets with only numbers will not be affected
+		Closes #46 in github
+	+ Changed the cell formatter from a Role to a Class to match Spreadsheet::ParseExcel 
+		THIS IS A REALLY BIG CHANGE
+		The target is to integrate better with Spreadsheet::Read
+		Closes #45 in github
+	+ Reduced the implementation of Alien::LibXML in dist.ini to see if that affects the CPAN Testers takeup rate
+		
+v0.36.28  2015-06-24 14:41:34-07:00 America/Los_Angeles
+
+	+ Surpressed a misleading error when value coercion is not succesful
+
+v0.36.26  2015-06-23 19:01:21-07:00 America/Los_Angeles
+
+	! Closed #42 in github
+
+v0.36.24  2015-06-10 19:44:32-07:00 America/Los_Angeles
+
+	! Attempting to solve the deep recursion from TravisCI in the new bugfix
+	+ Added perl 5.22 to TravisCI testing
+	! Fixed the failing TravisCI build
+
+v0.36.22  2015-06-10 17:11:39-07:00 America/Los_Angeles
+	
+	! Closed #40 in github thanks @wdbaker54
+
+v0.36.20  2015-04-21 14:30:58-07:00 America/Los_Angeles
+
+	! Fixed the "this version" badge
+	! fixed some uninitialized values thrown by travis-ci
+
+v0.36.18  2015-04-05 21:44:26-07:00 America/Los_Angeles
+
+	! Giving up on the javascript if statement (github strips 'script' tags and content)
+
+v0.36_17  2015-04-03 23:37:22-07:00 America/Los_Angeles
+
+	! Test of the javascript changes to see if I can get it to be included
+
+v0.36.16  2015-04-03 22:27:06-07:00 America/Los_Angeles
+
+	+ Added some javascript to the badges html to distinguish from a cpan domain so 
+		versions only show on github
+
+v0.36.14  2015-04-02 13:22:11-07:00 America/Los_Angeles
+
+	+ moved the current version to a badge and tweaked the badges to see what happens
+
+v0.36.12  2015-04-02 11:45:08-07:00 America/Los_Angeles
+
+	! Updated the documentation in preparation for a push all the way to CPAN since
+		TravisCI builds are passing.
+	! Changed the MakeMaker call from setting CFLAGS to setting CCFLAGS
+
+v0.36.10  2015-04-02 11:02:47-07:00 America/Los_Angeles
+
+	! Moved the Alien::LibXML requirement to the configure stage to try and pass a TavisCI build
+
+v0.36.8   2015-04-02 10:58:17-07:00 America/Los_Angeles
+
+	! Rewrote the dist.ini so that Makefile.PL should implement Alien::LibXML correctly
+
+v0.36.6   2015-03-31 19:48:28-07:00 America/Los_Angeles
+
+	+ Added a version header to the primary pod
+	+ Added the cpan version badge and a badge header
+
+v0.36.2   2015-03-31 08:13:56-07:00 America/Los_Angeles
+	
+	+ Added badges (Thanks @GARU)
+	+ Added Alien::LibXML as a requirement in MakeFile.PL to see if there was any impact
+	! Removed TODO #6 (I already did it)
+
+v0.34.6   2015-03-13 22:44:41-07:00 America/Los_Angeles
+
+	! Closed #6 in github by writing POD for Spreadsheet::XLSX::Reader::LibXML::XMLReader
+	! Closed #7 in github by writing POD for Spreadsheet::XLSX::Reader::LibXML::XMLReader::SharedStrings
+	! Closed #8 in github by writing POD for Spreadsheet::XLSX::Reader::LibXML::XMLReader::Worksheet
+	! Closed #9 in github by writing POD for Spreadsheet::XLSX::Reader::LibXML::XMLReader::XMLToPerlData
+	+ added an 'alt_default' flag so that behaviour different than the Spreadsheet::ParseExcel would be easy
+		and closed #31 in github
+
+v0.34.4   2015-02-20 09:41:28-08:00 America/Los_Angeles
+
+	! Closed #32 in github by creating a separation of chartsheet reading from worksheet
+		reading.  I also found a read sheets more than once bug and fixed it along the way (thanks @morungos) 
+	! Wrote POD for Types.pm module and closed #5 in github
+
+v0.34.2   2015-02-14 08:28:33-08:00 America/Los_Angeles
+
+	! Scrubbed exising pod for cruft and closed #13 issue in github
+	! Improved the contributors section
+	! Re-orderd the changes section from bottom to top rather than top to bottom
+	! Moved the 'next' row function for empty requests for fetchrow_arrayref to 
+		Spreadsheet::XLSX::Reader::LibXML::XMLReader::Worksheet from ~LibXML::GetCell 
+	+ moved the xml_reader attribute from ~XMLReader to private and changed the 
+		file_name attribute to coerce to a file handle and then build the xml_reader 
+		in the background 
+	+ Closed #27 in github by removing some cruft in the worksheet build (Thank you Frank Maas)
+	+ Closed #26 in github by manageing the variable out rather that messing with the variable in
+		This includes adding a possible test for the old failure in 10-get_cell.t (Thank you Frank Maas)
+	+ Added test 04-no_pivot_bug.t in response to issue #24 (pull request)
+		This test actually uncovered two issues with the simple implementation and both are fixed
+		The second issue is with a Styles sheet with no number formats listed
+		The third issue is with worksheet ranges that only have one cell. (Thank you Frank Maas)
+	! Fixed the bug where there are no shared strings in the excel file (Thank you Frank Maas)
+	! Closed #29 in github with a substantial rework of XMLToPerlData.pm  (Thank you Frank Maas)
+		The module API and target results didn't change
+	+ Closed #30 in github by adding the 'values_only' attribute
+		documentation is found in the top level README
+	! Cleaned up a few more bugs found along the way
+	! Wrote POD for Styles.pod module and closed #12 in github
+	! Wrote POD for SharedStrings.pod module and closed #11 in github
+	! Wrote POD for XMLReader::Styles.pm module and closed #10 in github
+		
+v0.34.0   2014-12-29 08:49:14-08:00 America/Los_Angeles
+
+	! Closed #22 issue in github by adding the requirement for Type::Tiny 1.000 (vs 0.046)
+		to implement make_immutable in the type library
+	+ Scrubbed Spreadsheet::XLSX::Reader::LibXML POD to comply better with updates
+
+v0.32.2   2014-12-26 16:25:30-08:00 America/Los_Angeles
+
+	! Closed #21 issue in github with error objects vs error strings - solved with a type coercion
+
+v0.30.2   2014-12-25 21:25:32-08:00 America/Los_Angeles
+
+	! Closed #20 in github (pull request for undef FileType message specificity)
+	+ Closed #3 in github Move Temp::Dir methods to Archive::Zip in github
+		This is a big change since it changes some of the extensibility API's
+		It also changes the way the initial file is locked.  It used to unzip the file to a 
+		temporory directory and then unlock the file.  Now it holds a lock on the file during the whole read.
+	! Closed #18 in github.  The temp dir management is very different
+		The failing solo SciTE GUI test 03-temp_dir_bug.t now passes.
+
+v0.30.0   2014-12-15 12:51:23-08:00 America/Los_Angeles
+
+	+ Closed #16 in github by moving the role Spreadsheet::XLSX::Reader::LibXML::LogSpace to Log::Shiras::LogSpace
+		and moving all the attribute callouts behind ###LogSD comments
+	+ Closed #19 in github by expanding the allowed width of the match data reference pointer when checking the 
+		answer for specific errors
+
+v0.28.2   2014-12-13 20:30:26-08:00 America/Los_Angeles
+
+	! Fixed #15 issue in github (Return precedence error)
+	- Closed #2 issue in github (Remove the OLE::Storage_lite dependancy)
+	! Closes #17 in github (Allow parse to accept either a file name or a file handle)
+		+ Added a file_handle attribute to support passing either file handles or file names
+		+ Improved the test file 01-types.t to include coercions and error message checking
+
+v0.26.2   2014-12-11 08:57:26-08:00 America/Los_Angeles
+
+	! Fixed the 'requires missing role' bug (github issue -> missing role?)
+
+v0.24.2   2014-12-09 05:18:13-08:00 America/Los_Angeles
+
+	+ added the empty_return_type attribute so that this package will emulate ParseExcel
+		You can still choose to return undef by setting this attribute to 'undef_string'
+	! added another fix in the cleanup since it forced a fail when fails weren't needed
+
+v0.22.2   2014-12-04 15:46:15-08:00 America/Los_Angeles
+
+	! Fixed a bug in the error reporting for the value method in the cell
+	! Fixed a bug where the sheet position wasn't set correctly when calling for worksheet generation by name
+		added a test file for this case
+	! Improved temp dir cleanup in error situations - with less code
+		this inclues a new explicit DEMOLISH at the cell level
+
+v0.20.4   2014-12-03 13:27:23-08:00 America/Los_Angeles
+
+	+ A round of POD scrubbing for POD completed to this point
+
+v0.20.2   2014-12-02 12:56:46-08:00 America/Los_Angeles
+
+	+ Finished the POD for ParseExcelFormatStrings.pm
+	+ Merged UtilFunctions with ParseExcelFormatStrings since there was no reason 
+		for them to be separate
+	+ Improved the POD for GetCell.pm
+	+ made the methods for clearing the row reading start and end column definitions public
+
+v0.18.2   2014-11-30 13:54:00-08:00 America/Los_Angeles
+
+	! Although the last update had more passes on CPAN testers this is another update 
+		attempting to reach 100% pass rate
+
+v0.16.2   2014-11-29 16:43:29-08:00 America/Los_Angeles
+
+	+ Some tweaks to the LibXML POD
+	! Another re-write of the ParseExcelFormatStrings.pm to try and fix CPAN Testers fails
+
+v0.14.2   2014-11-26 21:52:22-08:00 America/Los_Angeles
+
+	! Fixed a 32bit precision issue
+
+v0.12.4   2014-11-26 06:45:17-08:00 America/Los_Angeles
+
+	! Removed the regex match within a regex test to pass older perls in test
+
+v0.12.2   2014-11-26 06:06:30-08:00 America/Los_Angeles
+
+	+ Improved the FmtDefault POD
+	+ Improved the LibXML POD
+	+ Extracted several elements of cruft from Types
+	+ Reworked the ParseExcelFormatStrings to run on Dispatch Tables for improved consistency
+		and to hopefully address CPAN testers fails
+	+ moved the change_output_encoding out of ParseExcelFormatStrings an into the cell and value
+
+v0.10.6   2014-11-18 16:46:07-08:00 America/Los_Angeles
+
+	! Fixed several errors in the CellToColumnRow POD
+	+ Improved the Error POD
+	+ More tweaks to the LibXML POD
+	! Fixed a precision bug in ParseExcelFormatStrings 
+		calls for more universal implementation.
+
+v0.10.4   2014-11-16 09:35:36-08:00 America/Los_Angeles
+
+	+ Improved CellToColumnRow POD
+	+ Improved the top level POD
+	+ Improved the Worksheet POD
+	! Removed the SVPerlTalk.odp from the package (as bloat)
+		Look in the github repository if you want to review it
+	+ Added a new POD file for the SharedStrings class (to be universal across Reader and DOM)
+	+ Added a new POD file for the Styles class (to be universal across Reader and DOM)
+	+ Added a new POD file for the CalcChain class (to be universal across Reader and DOM)
+
+v0.10.2   2014-11-13 10:29:27-08:00 America/Los_Angeles
+
+	+ Fixed and updated the POD based on a MetaCPAN read
+
+v0.10.1   2014-11-13 05:37:32-08:00 America/Los_Angeles
+
+	+ Finished the Worksheet POD
+	+ Completed the Cell POD
+	+ Completed the Error POD
+	+ Completed the CellToColumnRow POD
+	+ Another (but not final0 proofread of the Spreadsheet::XLSX::Reader::LibXML POD
+	+ Release with a Beta rev to try and Index on MetaCPAN
+
+v0.7_1    2014-11-12 07:41:39-08:00 America/Los_Angeles
+
+	+ POD for the main module complete
+	+ Improved POD for the worksheet module
+
+v0.5_1    2014-11-07 08:23:08-08:00 America/Los_Angeles
+
+	+ Initial near CPAN ready release with a full test suit for cross platform testing
+	+ Changed the Cell class to be just an encapulated data holder
+	! Fixed the resources links in the META files
+	+ Used type support from Type::Coercions to allow for data transformation definitions
+	! The documentation is all wrong.  Next release I promise!
+	! Reader parsing support only
+		- DOM parsing contract dependant or some (possibly distant) time in the future
+
+v0.1_1 2014-06-06 10:06:00-07:00 America/Los_Angeles
+
+	+ Initial (non-functional) github release
+	

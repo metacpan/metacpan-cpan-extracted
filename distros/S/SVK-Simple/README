@@ -1,0 +1,17 @@
+SVK::Simple - Easy SVK object loader
+
+Please notice that the 01.basic.t test will use *YOUR* ~/.svk
+path as test path. But it'll not add / remove any file from it.
+It just require your repository to exist to test the loader.
+
+Normally the test will be all skiped unless it's invoked like this:
+
+  perl -Ilib t/01.basic.t RUN
+
+It requires $ARGV[0] to indicate that you really want to run the tests.
+If it's not given that all tests are skiped.
+Play this at your own risk.
+
+Cheers,
+Kang-min Liu
+

@@ -1,0 +1,22 @@
+Revision history for perl module Statistics::Sequences::Pot
+
+0.12 2013-07-24
+    - Changes to this file: thanks to Neil Bowers for re-formatting and comments
+    - Changes to POD: remove references to "cached data": No results of function calls are cached in the class object, unlike in previous versions, or as in other Perl Statistics modules.
+
+0.11 2013-07-18
+    - Misc POD revisions and dist issues
+
+0.10 2013-06-17
+    - NOT compatible with earlier versions
+    - add discrete methods for descriptives - observed, expected, variance, obsdev, stdev
+    - add stats_hash() method, conforming with other Statistics::Sequences modules
+    - add specfic call for returning zscore
+    - add support for giving data as a referenced list to each descriptive method rather than requiring their prior load()
+    - no more "perform_pot_test" alias to "test"
+    - no more "full" arg to test()
+    - no caching of descriptives within class object
+    - less cumbrous "dump"
+
+[See Statistics::Sequences for earlier changes]
+

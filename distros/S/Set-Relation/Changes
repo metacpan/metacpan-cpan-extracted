@@ -1,0 +1,1009 @@
+                               Set::Relation
+                                  Changes
+---------------------------------------------------------------------------
+
+2016-06-26
+
+    * Set::Relation version 0.13.1 for Perl 5 is released on CPAN as
+    Set-Relation-0.13.1.tar.gz.
+
+    * The main purpose of this release is to excise Set::Relation's last
+    runtime dependency on a non-Perl-core module, which is List::MoreUtils.
+    As of this release, each of the 2 Set::Relation classes requires only
+    the Perl core or core modules to run, and nothing else.  Or at least
+    that is the case if that Perl is version 5.25.1 (5.26 when stable) or
+    newer; otherwise, they also depend on just the 1 dual-life CPAN module
+    List::Util version 1.45 or newer.  As of version 1.33 or Perl 5.20.0,
+    List::Util provided 3 of the 4 List::MoreUtils functions we use ("any",
+    "all", "notall"), and if it was just that, then Perl 5.20.0+ with no
+    further CPAN modules would have sufficed.  However, List::Util didn't
+    gain the 4th function we use ("uniqstr" nee "uniq") until version 1.45.
+
+    * Updated all code files (3 lib/*.pm plus 3 t/*.t) with
+    "use warnings FATAL => 'all';" to instead have "use warnings;".
+    Starting with the 2015 release of Perl 5.22.0 it has been officially
+    documented that using "FATAL => 'all'" is a bad practice especially
+    in a CPAN module.  Since Set::Relation has no particularly strong
+    reason to do this (it was just thought to be a good practice before),
+    it no longer will.  See also for more context
+    http://search.cpan.org/dist/perl/lib/warnings.pm#Fatal_Warnings .
+
+    * (V1.pm)  Added a documentation note under "DESCRIPTION" -> "Matters
+    of Performance" that the independently developed design feature to use
+    hashing for performance also had prior art, called a "hash join".
+
+    * (README)  Indicate that this distribution now only has 1 public Git
+    repository, on GitHub.com; the older one on utsl.gen.nz appears to have
+    been retired.  Also indicate that the host domain pugscode.org of the
+    Perl 6 Pugs project that bundled the Perl 6 version has since expired.
+    Made a few other smaller documentation changes.
+
+    * Incremented all copyright year range-ends to 2016.
+
+2015-01-01
+
+    * Set::Relation version 0.13.0 for Perl 5 is released on CPAN as
+    Set-Relation-0.13.0.tar.gz.
+
+    * The main purpose of this release is making Set::Relation
+    substantially lighter in its external dependencies, so that it can be
+    installed and used with a relative minimum of overhead.  This release
+    focuses on the low hanging fruit in that regard, namely the elimination
+    of the Moose and namespace::autoclean dependencies, which are very
+    large trees and didn't really bring much to the table.  As of this
+    release, each of the 2 Set::Relation classes require only the Perl core
+    or core modules to run, plus just the 1 CPAN module List::MoreUtils.
+    If you already have List::MoreUtils installed, you can use either V1 or
+    V2 as simply as copying the respective single file into a Perl lib dir.
+    If there is a user desire, the used functionality of List::MoreUtils
+    could be inlined as well, thus making Set::Relation only require core.
+
+    * This distribution has excised its direct external dependencies on the
+    modules Moose, Moose::Role, Class::MOP and namespace::autoclean.
+
+    * Updated explicit dependencies on Perl core modules to reduce the
+    required minimum version numbers to be the same as those bundled with
+    Perl 5.8.1, the minimum declared Perl version.  If it turns out we
+    actually need newer versions of any of these, they can be increased as
+    needed.  Meanwhile, in practice users would have much newer versions
+    anyway when their Perls are newer.  So minimum Carp is now 1.01
+    (previously no explicit dependency), ExtUtils::MakeMaker is now 6.17
+    (was 6.48), Scalar::Util is now 1.13 (was 1.21), Test::More is now 0.47
+    (was 0.92).  Requiring newer versions than these would require CPAN
+    installation or a newer Perl version.
+
+    * Updated explicit dependencies on Perl modules that are not bundled
+    with any version of Perl and must be installed from CPAN:  The minimum
+    List::MoreUtils was raised to 0.28 as versions before 0.25_02 fail on
+    Perl 5.10.1+.  The minimum Carp::Always (used only by the test suite)
+    was reduced to 0.01, its first version; this can be raised later if it
+    needs to be.  The minimum Test::Deep (used only by the test suite) was
+    left unchanged at 0.106, as versions below (0.104) fail on Perl 5.10.1+.
+
+    * (Relation.pm, V2.pm, V1.pm)  Demoted the packages Set::Relation and
+    Set::Relation::Mutable from being actual abstract roles to just being
+    placeholder namespaces for the distribution or for documentation
+    purposes.  Each of the 2 files V2.pm and V1.pm is now self-contained
+    and no longer has a hard dependency on Relation.pm; the latter now just
+    exists as common documentation, illustrating roles that the classes in
+    the former conceptually must compose, where this is unenforced by code.
+    As such, Relation.pm doesn't actually have to be installed.
+    Related to this, V2 and V1 now each declare their own does() method,
+    which hard-codes that they compose Set::Relation/::Mutable, in case one
+    wants to use it like the one Moose had provided.
+    Calling isa() on V2 or V1 will continue to work as it did before,
+    including that it returns false for Set::Relation/::Mutable.
+
+    * (Relation.pm, V2.pm, V1.pm)  Relation.pm no longer uses Moose::Role
+    and V2.pm plus V1.pm no longer use Moose; the latter 2 now explicitly
+    use Carp::confess() and Scalar::Util::blessed() instead.  Now V2 and V1
+    each have an explicitly defined new() submethod to replace what Moose
+    had provided, and each also now has a complement of explicitly defined
+    attribute private or public accessor methods, for the same reason.
+    Other parts of those modules now test for "can('does')" rather than
+    "isa('Moose::Object')" and besides this no other changes were needed
+    for the code to work as it did in the previous release.
+
+    * (Relation.pm, README, TODO)  Replaced any references in this distro
+    to the obsolete Muldis Rosetta with its replacement Muldis::D::RefEng.
+    Muldis::D::RefEng is still under development and has no CPAN release
+    yet, which will be the case until it has a certain mainimum level of
+    functionality; meanwhile, what has been written can be seen on GitHub.
+
+    * Note that the changes of this release were partly inspired by Ralf
+    Peine having just released the new module PQL::Cache, which has no
+    non-Perl-core dependencies and can install with a simple file copy.
+    (It was intended all along that my newer Muldis D implementations would
+    similarly eschew non-Perl-core dependencies, particularly Moose et al,
+    but what was new is I was inspired to change Set::Relation likewise.)
+
+    * Incremented all copyright year range-ends to 2015.
+
+2015-01-01
+
+    * Set::Relation version 0.12.8 for Perl 5 is released on CPAN as
+    Set-Relation-0.12.8.tar.gz.
+
+    * The sole purpose of this release is to publish on CPAN the various
+    minor updates made to Set::Relation up through the middle of 2011, but
+    that any dependency version increases were excluded / reverted.
+
+    * Note that if you are running Perl 5.10.1+ then your List::MoreUtils
+    must be v0.25_02+ rather than the actual hard dependency of v0.22+.
+
+    * (Relation.pm)  Updated the *.pm file that declares
+    multiple Perl packages, so that now every single package separately
+    declares its (identical) package $VERSION, rather than just the first
+    package in the file declaring said, implicitly applied to the others.
+
+    * (Relation.pm, V2.pm, V1.pm)  Updated all 1 role and 2 classes that
+    compose roles so that they
+    now specify what version numbers of said roles they require.  Moose had
+    added support for declaring/enforcing this in its v1.03 (2010-05-06).
+    Note that Set::Relation's hard dependency on Moose has not been
+    increased from v0.92+; it has not been tested if using a version before
+    v1.03 will actually fail or not.
+
+    * (Relation.pm, README)  Updated the list of email forums focusing on
+    Muldis D and its implementations, first to add a 4th list
+    muldis-d-language, and second to update all 4 lists' descriptions.
+    (This change made near 2010-06-20.)
+
+    * (Relation.pm, README, Makefile.PL)  Updated any instances of
+    "http://mm.DarrenDuncan.net/mailman/listinfo" so that they are fully
+    lower-cased, because the mixed case version doesn't work with some web
+    browsers; browsers that don't automatically convert it to lowercase get
+    a "There currently are no publically-advertised mailman lists" message.
+    (This change made near 2010-05-17.)
+
+    * (Relation.pm)  Now spell author personal name "Chris Date (C.J.
+    Date)" rather than "Christopher J. Date".
+    (This change made near 2010-10-08.)
+
+    * (Relation.pm)  Following a Muldis D v0.110.0 spec change, updated the
+    also-known-as notes for 5 functional methods.
+    (This change made near 2010-03-01.)
+
+    * (Relation.pm)  Following one or more Muldis D spec changes between
+    v0.111.0 and v0.148.0 inclusive, updated the also-known-as notes for 11
+    more functional methods, and possibly the same 5 as for v0.110.0.
+
+    * There were also a few other minor documentation changes in the files.
+
+    * Incremented all copyright year range-ends to 2011.
+
+2009-11-03
+
+    * Set::Relation version 0.12.7 for Perl 5 is released on CPAN as
+    Set-Relation-0.12.7.tar.gz.
+
+    * (V1.pm)  Fixed two instances of a bug, one in the private method
+    "_group" that manifests in all 4 public methods "[|cmpl_]group",
+    "[|outer_]join_with_group", and one in the "summary" public method.
+    There were no corresponding bugs in V2.pm.  Thanks to Todd Hepler for
+    spotting the bug in "_group" and providing a patch.
+
+    * (Set_Relation_51_Database_in_Depth_Example.t)  Added another test
+    block which exercises the "group" method, which previously had no
+    tests; this test exposed the "_group" bug.  Thanks to Todd Hepler who
+    authored and contributed the new tests.
+
+    * Updated all author references to change Darren Duncan's stated email
+    address from "perl@DarrenDuncan.net" to "darren@DarrenDuncan.net".
+
+2009-10-29
+
+    * Set::Relation version 0.12.6 for Perl 5 is released on CPAN as
+    Set-Relation-0.12.6.tar.gz.
+
+    * More small Makefile.PL enhancements.  Reverted part of the 0.12.5
+    change, in that the Makefile.PL now starts with use 5.8 rather than 5.6
+    but kept the 0.12.5 change in that warnings is still not fatal.  This
+    was done since apparently there is no better way, under MakeMaker or
+    otherwise, to be more graceful about required perl version than what
+    results from the plain use-5.8 at the top of Makefile.PL.  As the
+    0.12.5 Makefile.PL was, a Perl 5.6.2 was simply having errors at the
+    "make test" stage due to that requiring 5.8, rather than at the
+    Makefile.PL stage where it should have.  Also in Makefile.PL, updated
+    the 'requires' item 'perl' to use X.00Y00Z format rather than X.Y.Z
+    since the upcoming META.yml spec would be stricter about the format.
+
+2009-10-26
+
+    * Set::Relation version 0.12.5 for Perl 5 is released on CPAN as
+    Set-Relation-0.12.5.tar.gz.
+
+    * Updated the distro's Makefile.PL so it will now run under older Perls
+    than the distro's payload modules would, so that users are informed
+    more gracefully about their need to upgrade.  Rather than having the
+    same boilerplate use 5.8/utf8/strict/warningsFatal as the modules, the
+    Makefile.PL now has a more liberal 5.6/strict/warnings.  Also added
+    explicit 'perl' requires-item to force mentioning of the Perl version
+    in the generated META.yml, since MIN_PERL_VERSION doesn't cause this.
+
+2009-10-26
+
+    * Set::Relation version 0.12.4 for Perl 5 is released on CPAN as
+    Set-Relation-0.12.4.tar.gz.
+
+    * Oops, the previous release 0.12.3 shipped with code all declared as
+    version 0.012002 rather than 0.012003; the metadata was correct though.
+
+    * Updated the README file to indicate that this distribution now has 2
+    public Git repositories, one on GitHub.com and one on utsl.gen.nz.
+
+    * Updated external dependencies: Moose/etc to version 0.92, Class::MOP
+    to version 0.94.
+
+    * (Relation.pm)  Fixed a doc typo; the wrong param was referenced.
+
+    * (Relation.pm)  Following a Muldis D v0.95.0 spec change, updated the
+    also-known-as notes for 2 functional methods.
+
+    * Updated the README file to mention the new Muldis-D-Manual distro.
+
+    * (Makefile.PL, V2.pm, V1.pm)  Added explicit dependency on
+    Scalar::Util in both the Makefile.PL and in the "DEPENDENCIES" pod,
+    because it is a best practice to name all direct dependencies
+    regardless of whether any of them are normally bundled with Perl.
+
+    * Major update to the Makefile.PL (and META.yml) to make its format
+    more modern, in particular by distinguishing between dependencies that
+    are needed to use the Set::Relation modules and those needed only for
+    testing them or for configuring the distribution; previously, the
+    dependencies needed only for testing were treated as if necessary to
+    use Set::Relation itself; also added a list of "resources" urls.
+
+2009-09-15
+
+    * Set::Relation version 0.12.3 for Perl 5 is released on CPAN as
+    Set-Relation-0.12.3.tar.gz.
+
+    * Updated external dependencies: namespace::autoclean to version 0.09,
+    Moose/etc to version 0.90, Class::MOP to version 0.93.
+
+    * (V2.pm, V1.pm)  Internals update to remain compatible with the latest
+    Moose/Class::MOP, which has deprecated the ability for one to say
+    "$obj->new(...)", which we had been doing internally rather than
+    "ClassName->new(...)" so that we still work when we're subclassed; so
+    now we use "(blessed $obj)->new(...)" to make new objects instead.
+
+    * (Relation.pm)  In accordance with the Muldis D spec v0.87.0+, updated
+    the descriptions of the 10 functional methods that do
+    rename/projection/wrap/group/etc to update notes about alternate names
+    that each function or its operation are known as.
+
+2009-08-29
+
+    * Set::Relation version 0.12.2 for Perl 5 is released on CPAN as
+    Set-Relation-0.12.2.tar.gz.
+
+    * Updated external dependency on Test::More to version 0.92, which is
+    the version bundled with Perl 5.10.1.
+
+    * Updated external dependency on Test::Deep to version 0.106, which
+    currently is only used by the 1 test file
+    Set_Relation_51_Database_in_Depth_Example.t, because earlier versions
+    of Test::Deep (0.104) fail their tests under Perl 5.10.1.
+
+    * Updated external dependencies: Moose/etc to version 0.89, Class::MOP
+    to version 0.92.
+
+    * (Relation.pm)  Other minor docs updates.
+
+2009-08-08
+
+    * Set::Relation version 0.12.1 for Perl 5 is released on CPAN as
+    Set-Relation-0.12.1.tar.gz.
+
+    * This distribution has excised its direct external dependency on the
+    "version" module (bundled with Perl versions 5.10.0+), which was used
+    in all .pm files and a .t file.  And so, the modules in this
+    distribution now declare floating point version numbers of format
+    X.00Y00Z in their code (0.012001 for example); however, all module
+    documentation, and the distribution itself, still uses 3-part version
+    numbers of format X.Y.Z (0.12.1 for example) as before.  The main
+    reason for this change is to gain simplicity and reduce possible bugs.
+
+2009-08-03
+
+    * Set::Relation version 0.12.0 for Perl 5 is released on CPAN as
+    Set-Relation-0.12.0.tar.gz.
+
+    * Updated external dependencies: Moose/etc to version 0.88, Class::MOP
+    to version 0.91.
+
+    * This release features a number of functional method updates in
+    accordance with the latest Muldis D spec (v0.82.0).
+
+    * (Relation.pm, V2.pm, V1.pm)  WARNING: INCOMPATIBLE CHANGE:  Updated
+    each of the 3 public functional methods "[|cmpl_]wrap", "unwrap" to
+    swap the canonical order of its 2 "outer", "[|cmpl_]inner" parameters
+    so that the one applying to the method's result appears first / on the
+    left. Likewise with each of the 5 public functional methods
+    "[|cmpl_|un|[cardinality|count]_per_]group" and its 2
+    "[outer|count_attr_name]", "[inner|group_per]" parameters.  Also
+    updated the 1 "rename" public functional method's "map" parameter to
+    swap the Hash keys and values so that the Hash keys now represent the
+    "new" names and the Hash values now represent the "old" names.
+
+    * (Set_Relation_51_Database_in_Depth_Example.t)  Updated the tests of
+    the "rename" method to conform to its updated API.
+
+    * (Relation.pm)  Updated the descriptions of 10 functional methods to
+    add notes about alternate names that the function or its operation are
+    known as.  The alternate names are symbolic and use combinations of
+    these: '{', '}', '<-', '@'.  Used for rename/projection/wrap/group/etc.
+
+2009-07-21
+
+    * Set::Relation version 0.11.3 for Perl 5 is released on CPAN as
+    Set-Relation-0.11.3.tar.gz.
+
+    * Updated external dependency on Test::More to version 0.88, which
+    currently is only used by the 3 test files, same as what used previous
+    versions.  While earlier versions of Test::More are bundled with Perl
+    5, only the impending Perl 5.10.1 will bundle a version not earlier
+    than 0.88, so meanwhile you must update Test::More from CPAN.  The test
+    files were updated to no longer declare a planned number of tests at
+    the start, but instead to declare "done_testing()" at the finish.  This
+    change should help make further simultaneous development and merging by
+    multiple developers less error prone.
+
+2009-07-08
+
+    * Set::Relation version 0.11.2 for Perl 5 is released on CPAN as
+    Set-Relation-0.11.2.tar.gz.
+
+    * As of this release, Set::Relation for Perl 5 uses the
+    namespace::autoclean pragma instead of the namespace::clean pragma,
+    because it is easier to use and not so contrived in how it works and is
+    a generally recommended upgrade by savvy people.  Note that the newer
+    dependency has a larger not-bundled dependency chain, including
+    Class::MOP, but this isn't a problem because Set::Relation for Perl 5
+    already uses Moose anyway.
+
+    * This distribution has gained a new direct external dependency on the
+    Carp::Always module, which currently is only used by the 3 test files.
+
+    * Updated external dependencies: Moose/etc to version 0.87, Class::MOP
+    to version 0.89.
+
+    * (Relation.pm)  Minor docs fix.
+
+2009-06-08
+
+    * Set::Relation version 0.11.1 for Perl 5 is released on CPAN as
+    Set-Relation-0.11.1.tar.gz.
+
+    * Updated external dependencies: Moose/etc to version 0.81, Class::MOP
+    to version 0.85.
+
+    * (Relation.pm)  In accordance with the latest Muldis D spec (v0.77.0),
+    the Muldis D concept or type a Set::Relation object represents is now
+    simply called "relation", which was renamed from "quasi-relation" in
+    the spec.  Accordingly, removed the DESCRIPTION paragraph saying that a
+    Set::Relation isn't quite a relational model relation; rather I am now
+    claiming that it is exactly the same, though it is most like the less
+    strict version where it is like every relation attribute may have a
+    declared type of the universal set of values.  There are no actual code
+    changes in the Set::Relation distro associated with this update.
+
+2009-06-01
+
+    * Set::Relation version 0.11.0 for Perl 5 is released on CPAN as
+    Set-Relation-0.11.0.tar.gz.
+
+    * Updated external dependencies: Moose/etc to version 0.79, Class::MOP
+    to version 0.84.
+
+    * This release features a number of functional method updates or
+    additions in accordance with the latest Muldis D spec (v0.75.0).
+
+    * (Relation.pm, V2.pm, V1.pm)  WARNING: INCOMPATIBLE CHANGE:  Updated
+    each of the 2 "is[|_proper]_subset" public functional methods so that
+    the canonical sequence of its invocant and parameter is reversed, so
+    the method's name, used infix as normal for OO, would read correctly;
+    also renamed said 2 inputs so that "look_for" is now "topic" and
+    "look_in" is now "other".  This change is silently incompatible and old
+    user code will continue to run without changes, but would give the
+    wrong answers; any old code like "$foo->is_subset($bar)" will need to
+    be changed to "$bar->is_subset($foo)" to keep its semantics, or
+    alternately be changed to "$foo->is_superset($bar)" (see next chg itm).
+
+    * (Relation.pm, V2.pm, V1.pm)  Added the 2 public functional methods
+    (in the Set::Relation role) "is[|_proper]_superset", where each is an
+    alias for another function, "is[|_proper]_subset", save that its
+    invocant and argument are transposed.
+
+    * (Relation.pm, V2.pm, V1.pm)  Renamed the public functional method
+    "is_member" to "has_member" so that the methods's name, used infix as
+    normal for OO, reads correctly.
+
+    * (Relation.pm, V2.pm, V1.pm)  Renamed these 8 public functional
+    methods to terser versions of themselves mainly for the purpose of
+    making them easier to type: "cmpl_projection" -> "cmpl_proj",
+    "transitive_closure" -> "tclose", "restriction_and_cmpl" ->
+    "restr_and_cmpl", "cmpl_restriction" -> "cmpl_restr",
+    "static_extension" -> "static_exten", "[|semi]difference" ->
+    "[|semi]diff", "static_substitution" -> "static_subst".
+
+    * (Relation.pm, V2.pm, V1.pm)  Added the 4 public functional methods
+    (in the Set::Relation role) "count", "count_per_group",
+    "symmetric_diff", "antijoin", where each is a simple alias for another
+    functional method, "cardinality", "cardinality_per_group", "exclusion",
+    "semidiff".
+
+    * (Relation.pm, V2.pm, V1.pm)  Minor docs update to reflect that the
+    Muldis D dialect HDMD_Perl5_Tiny was renamed to HDMD_Perl5_STD.
+
+    * (Relation.pm)  Some POD reformatting:  Updated every method signature
+    having a param "FooType $bar_param" with a linebreak between the paired
+    type name and param name so that each pair is entirely on one line.
+
+    * (Relation.pm)  Updated the docs for all 14 functional methods that
+    have one or more parameters whose declared Perl 6 type was "Code", so
+    that the more modern Perl 6 type name of "Callable" is used instead.
+
+    * (Relation.pm)  Updated the docs on 3 functional methods to use more
+    correct terminology with respect to symmetric dyadic functions, so that
+    it now calls each a "symmetric function" rather than a "function with 2
+    mutually commutative main parameters": "is_identical", "is_disjoint",
+    "composition".
+
+    * (Relation.pm)  Annotated the docs on 3 of the functional methods that
+    previously were directly described with "commutative and associative"
+    to now also say "idempotent" when the main inputs were supplied
+    conceptually as a set argument and not a bag: "union", "intersection",
+    "join".  Now "product" is also idempotent, but its description just
+    says "like join".  The only N-adic functional method that isn't
+    idempotent is "exclusion".
+
+    * (Relation.pm)  Updated the descriptions of 16 functional methods to
+    add or update notes about alternate names that the function or its
+    operation are known as, in particular adding the various math/etc
+    symbols they represent.
+
+2009-04-21
+
+    * Set::Relation version 0.10.0 for Perl 5 is released on CPAN as
+    Set-Relation-0.10.0.tar.gz.
+
+    * Updated external dependencies: namespace::clean to version 0.11,
+    Moose/etc to version 0.75, Class::MOP to version 0.82.
+
+    * This release features a number of functional method updates or
+    additions in accordance with the latest Muldis D spec (v0.64.0).
+
+    * (Relation.pm, V2.pm, V1.pm)  Added, to the Set::Relation role and its
+    composing classes, 2 new functional methods
+    "[rank|limit]_by_attr_names", which are like "rank|limit" but that
+    rather than taking a closure function to determine relative ordering of
+    each pair of tuples, it takes an array of attribute names to order by;
+    the new methods are more specialized versions of the old ones, and are
+    recommended for use where they are applicable.  It is significant to
+    note that these are the first Set::Relation routines that make use of
+    the implementation technique of generating and evaling Perl code to do
+    the actual work, which allows us to unroll what would otherwise be
+    loops iterating over the attributes being ordered by; this should
+    further yield better performance; both V2 and V1 have done this.
+
+    * (Relation.pm, V2.pm, V1.pm)  Changed the "summary" functional method
+    by renaming its "result_attr_names" parameter to "summ_attr_names" and
+    redefining its functionality more in terms of "extension" rather than
+    "map"; the function given to "summ_func" must now just result in a
+    tuple with attributes to add to a result which now already has all the
+    attributes named by "group_per", rather than resulting in all
+    attributes for the result.  The new version of "summary" should be much
+    easier to use as presumably users always want to keep the attributes
+    they are grouping per, and they now don't have to spell them out every
+    time.  For the rare case where you want the old behaviour, now you have
+    to do it manually with an explicit "cmpl_group" plus "map".
+
+    * (Relation.pm, V2.pm, V1.pm)  Added, to the Set::Relation role and its
+    composing classes, new functional method "cardinality_per_group" which
+    is like "summary" but shorthands the common case where people just want
+    a count of tuples per group and not any other information.
+
+2009-03-24
+
+    * Set::Relation version 0.9.0 for Perl 5 is released on CPAN as
+    Set-Relation-0.9.0.tar.gz.
+
+    * (Relation.pm, V2.pm, V1.pm)  Added new functional method
+    "classification" which is sort of a cross between "restriction" and
+    "group"; it uses a Perl subroutine argument to partition a relation's
+    tuples into an arbitrary number of groups.  It is named after Perl 6's
+    "classify" operator, and is like List::MoreUtil's "part" function.
+
+    * (Relation.pm)  Updated the Set::Relation role in several closely
+    related ways.  Added new named parameter to 'new' named 'keys' which
+    lets one define candidate keys for the new relation which the 'members'
+    argument must satisfy for 'new' to succeed; a variety of format
+    examples were included in the documentation.  Also updated the accessor
+    method 'export_for_new' and added the accessor method 'keys' which take
+    care of dumping the list of candidate keys that the relation object is
+    known to satisfy.  Also added new functional method 'has_key' which
+    tests whether the invocant relation has a certain candidate key; if it
+    does, this method also has the side effect of remembering the fact for
+    'keys' to return later.  It was also documented in a few places that
+    these 'keys' are not constraints against future object mutations, and
+    so they might be invalidated by 'insert' later for mutable objects.
+    The ::Mutable role inherits all these changes.
+
+    * (V2.pm)  Updated the Set::Relation::V2 class to implement the new
+    features required by the above change item.  This is a fairly simple
+    first draft of of the 'keys' feature and isn't very integrated yet, not
+    any more than with V1; it currently doesn't have any positive impact on
+    performance and it currently just provides an extra kind of constraint
+    on new objects or an extra kind of validation on existing ones.
+
+    * (V1.pm)  Updated the Set::Relation::V1 class to implement the new
+    features required by the above change item.  The current implementation
+    also is such that while 'insert' is smart enough to clear a candidate
+    key iff it becomes violated, 'delete' will not restore or add any
+    candidate key; you must invoke 'has_key' later to do that.  Also, like
+    with indexes, all new relations derived from others such as by 'clone'
+    or 'new' or relational operations will start out with no 'keys' for
+    simplicity; presumably an upcoming V2 will be different.
+
+2009-03-23
+
+    * Set::Relation version 0.8.0 for Perl 5 is released on CPAN as
+    Set-Relation-0.8.0.tar.gz.
+
+    * This release features the addition of a second bundled implementation
+    of the Set::Relation role, called V2, which should have different (and
+    hopefully better) performance characteristics than V1.  This release
+    doesn't change the S::R public API in any particularly substantial way.
+
+    * Updated external dependencies: Moose/etc to version 0.72, Class::MOP
+    to version 0.78.
+
+    * (Set_Relation_5[0_Synopsis|1_Database_in_Depth_Example].t,
+    Relation.pm)  Updated the test suite and the SYNOPSIS docs and the
+    'new' submethod docs to avoid the repetition of the
+    Set::Relation-implementing class name by creating a one-liner-per-file
+    wrapper function over 'new' named 'relation' which is now used for all
+    methodless S::R object creation.
+
+    * (Set_Relation_5[0_Synopsis|1_Database_in_Depth_Example].t)  Updated
+    the test suite internals to make them more modular; in each test file,
+    refactored all the actual tests into a subroutine, so the set can be
+    defined once and reinvoked for each bundled Set::Relation-doing class,
+    when more than one of those (others besides V1.pm) come to exist.
+
+    * (Relation.pm)  Updated all 10 methods of the Set::Relation role that
+    had a "Array|Str"-typed parameter named "[|\w+_]attrs" and renamed said
+    parameter to "[|\w+_]attr_names"; any similarly named parameters that
+    were of some other type, such as "Hash", kept their old names.  This
+    change should make the parameters more self-documenting, since "attrs"
+    names now tend to have both attribute names and values, where as
+    "attr_names" have just names.  The changed 10 methods were: "slice",
+    "has_attrs", "[|cmpl_]projection", "extension", "map", "summary",
+    "substitution", "subst_in_[restr|semijoin]".  Note that, since all of
+    the methods' parameters are positional (rather than named), the change
+    is completely backwards compatible.
+
+    * (V1.pm)  Updated the Set::Relation::V1 class to rename some of its
+    public method parameters as per the previous change item.
+
+    * (Relation.pm)  Added new performance-enhancing feature to the
+    Set::Relation role, in the form of a new optional boolean parameter
+    "allow_dup_tuples" for each of 17 methods.  Each Set::Relation-doing
+    class has the option of honoring a true argument for that parameter by
+    avoiding work involved in eliminating duplicate tuples and thereby
+    having possibly different results or side-effects on said method
+    invocations, due to what are partially multiset semantics being used
+    instead of set semantics.  So users can explicitly request, on a
+    case-by-case basis, to get possibly less accurate but "good enough"
+    results in exchange for better performance.  Also added new
+    documentation sub-section "Matters of Correctness" under the
+    DESCRIPTION main section, that explains the feature.  The changed 17
+    methods were: "export_for_new", "members", "body", "slice", "attr",
+    "cardinality", "[|cmpl_]restriction", "restriction_and_cmpl",
+    "extension", "map", "summary", "substitution"
+    "[|static_]subst_in_restr", "subst_in_semijoin",
+    "outer_join_with_exten".
+
+    * (V1.pm)  Updated the Set::Relation::V1 class to add some public
+    method parameters as per the previous change item.  However, this
+    change is a no-op since the parameters are ignored in every case, with
+    the semantics being the same as if they were never given arguments.
+
+    * (Relation.pm, V1.pm)  Various other small updates and fixes.
+
+    * Added new file lib/Set/Relation/V2.pm which is now the bundled second
+    implementation of the Set::Relation role, and updated all the other
+    relevant distribution files concerning it.  The new V2.pm initially
+    started as a clone of V1.pm following all of the above change items,
+    and then differentiated in 2 main ways:  The first is that V2 provides
+    immutable objects (doesn't do ::Mutable) while V1 provides mutable
+    objects.  The second is that V2 is lazy and will defer any tests for
+    duplicate tuples as late as possible, while V1 is eager and will test
+    for duplicate tuples as early as possible; V2 will also respect true
+    "allow_dup_tuples" arguments, while V1 will ignore them.  Besides those
+    2 matters and their associated large differences in performance
+    profiles, V2 is essentially the same as V1, including that relation
+    tuples are internally represented by Perl Hashes.  Also V2 just has a
+    short DESCRIPTION pod section to start out, while V1's is longer.
+
+2009-02-13
+
+    * Set::Relation version 0.7.0 for Perl 5 is released on CPAN as
+    Set-Relation-0.7.0.tar.gz.
+
+    * Updated external dependencies: Moose/etc to version 0.69.
+
+    * Split up Relation.pm into itself and the new file
+    lib/Set/Relation/V1.pm; Relation.pm now declares a role rather than a
+    class, and V1.pm is a class doing that role.  Relation.pm now declares
+    the Set::Relation API and keeps nearly all the old module
+    documentation, and V1.pm has nearly all of the old code.  Moreover,
+    Relation.pm now declares not one but 2 roles, Set::Relation and
+    Set::Relation::Mutable, where the latter consumes the former and
+    Set::Relation::V1 consumes the latter; the former role promises that
+    its composing class' objects are immutable unless they also compose the
+    latter.  The ::Mutable role got the 6 public methods ['clone',
+    'has_frozen_identity', 'freeze_identity', 'evacuate', 'insert',
+    'delete'] plus the 'has_frozen_identity' optional parameter of the
+    'new' constructor, and the parent role got all the other public things.
+    Also updated the test suite, and the SYNOPSIS pod, to account for this
+    split, and they now invoke the ::V1 class directly rather than the
+    shorter package name that is now a role.  The new class has exactly the
+    same API as the old class.
+
+    * Updated the TODO file to outline plans for a near future ::V2 class
+    which represents tuples using Perl Array rather than Perl Hash.
+
+2009-02-09
+
+    * Set::Relation version 0.6.0 for Perl 5 is released on CPAN as
+    Set-Relation-0.6.0.tar.gz.
+
+    * As of this release, Set::Relation for Perl 5 directly uses the
+    List::MoreUtils module to handle some of its detail work; this
+    distribution has now gained a direct external dependency on the Perl 5
+    module 'List::MoreUtils', which is not bundled with any version of Perl
+    and will need to be installed from CPAN.  That said, List::MoreUtils
+    was already a dependency of Set::Relation's existing Moose dependency,
+    so the whole dependency tree has not enlarged.
+
+    * (Relation.pm)  Added these 14 object methods: "wrap", "cmpl_wrap",
+    "unwrap", "group", "cmpl_group", "ungroup", "summary",
+    "join_with_group", "rank", "limit", "outer_join_with_group",
+    "outer_join_with_undefs", "outer_join_with_static_exten",
+    "outer_join_with_exten".  As of now, all of the pre-documented and
+    TODO-marked object methods have been implemented.
+
+    * (Relation.pm)  Replaced all instances of "__PACKAGE__->new(...)" with
+    "$self->new(...)" etc, to help avoid potential future problems when
+    someone tries to subclass the module.
+
+    * (Relation.pm)  Various bug fixes and other small changes.
+
+    * As of this release, Set::Relation is officially in alpha development
+    status (was pre-alpha).  All of the initially planned functionality is
+    now implemented, so it is feature complete, which is why it was moved
+    out of pre-alpha status.  However most of the functionality has not
+    been tested and so is not proven to actually work without error.  Once
+    the module has a thorough test suite which passes, Set::Relation can be
+    moved to beta or released status.
+
+2009-02-09
+
+    Record update in the PAUSE modules database:
+
+           modid: [Set::Relation]
+           statd: [a] was [c]
+           stats: [m]
+           statl: [p]
+           stati: [O]
+           statp: [l]
+     description: [Relation data type for Perl]
+          userid: [DUNCAND]
+       chapterid: [6]
+        mlstatus: [list]
+
+2009-02-06
+
+    * Set::Relation version 0.5.0 for Perl 5 is released on CPAN as
+    Set-Relation-0.5.0.tar.gz.
+
+    * (Relation.pm)  Added these 8 object methods (still 14 to go):
+    "restriction_and_cmpl", "semijoin_and_diff", "substitution",
+    "static_substitution", "subst_in_restr", "static_subst_in_restr",
+    "subst_in_semijoin", "static_subst_in_semijoin".
+
+    * (Relation.pm)  Other minor updates and fixes.
+
+2009-02-05
+
+    * Set::Relation version 0.4.0 for Perl 5 is released on CPAN as
+    Set-Relation-0.4.0.tar.gz.
+
+    * Updated external dependencies: Moose/etc to version 0.68.
+
+    * As of this release, Set::Relation for Perl 5 uses the
+    namespace::clean pragma for good hygiene; this distribution has now
+    gained an external dependency on the Perl 5 module 'namespace::clean',
+    which is not bundled with any version of Perl and will need to be
+    installed from CPAN; namespace::clean also has a few not-bundled
+    dependencies of its own.
+
+    * (Relation.pm)  Added "use namespace::clean" statements inside the
+    package declaration following any other "use" statements, so their
+    exports into our package doesn't also become part of our own public API
+    as a side-effect; the only exception is the "meta" method that Moose
+    adds, which is kept.
+
+    * (Relation.pm)  Added new documentation sub-section under
+    "DESCRIPTION" named "Appropriate Uses For Set::Relation", which should
+    hopefully answer some FAQs, such as why does the module exist, and
+    pointing out some strengths and weaknesses.
+
+    * (Relation.pm)  Corrected a forgetful oversight in the module
+    documentation concerning Set::Relation's "has_frozen_identity" object
+    attribute; this attribute had an auto-generated read-only public
+    accessor method plus is automatically initialized from a same-named
+    constructor method; added "has_frozen_identity" to the accessor method
+    list, and updated the "new" constructor submethod signature.
+
+    * (Relation.pm, Set_Relation_50_Synopsis.t,
+    Set_Relation_51_Database_in_Depth_Example.t)  Updated the "new"
+    constructor submethod so that it now accepts a single positional
+    argument as an invocation option, where before it just accepted named
+    arguments (and it still does); a single positional argument to "new" is
+    treated the same as a single "members" named argument.  This change
+    means that the majority of current or anticipated future use cases of
+    Set::Relation are now terser by about 9-11 characters ("members => ")
+    per "new" invocation.  (This new feature was implemented mainly by
+    adding a simple BUILDARGS method to Relation.pm.)  Updated all the
+    examples and tests to use the new terser format.
+
+    * (Relation.pm)  As a consequence of the previous change, the "new"
+    constructor has also been updated so that the "members" argument is no
+    longer allowed to be a Perl Hash (because a lone Hash positional
+    argument is one of the standard Moose format options to supply named
+    arguments) so any invocations of "new" which gave a Hash argument will
+    have to become 2 characters ("[]") more verbose, wrapping it in an
+    Array.  Removed the example using a Hash.
+
+    * (Relation.pm)  Added the Moose concerning recommended practice
+    "__PACKAGE__->meta()->make_immutable();" line to the end of the module,
+    which should help performance regarding Moose-generated stuff; this
+    would've been done before release 0.0.0 but was forgotten at the time.
+
+    * (Relation.pm)  Updated the "LICENSE AND COPYRIGHT" documentation
+    section to change the Copyright declaration from "Darren Duncan" to
+    "Muldis Data Systems, Inc." (which is wholly owned by Darren Duncan).
+
+2009-02-02
+
+    * Set::Relation version 0.3.0 for Perl 5 is released on CPAN as
+    Set-Relation-0.3.0.tar.gz.
+
+    * (Relation.pm)  Added these 5 object methods (still 20 to go):
+    "slice", "attr", "has_attrs", "attr_names", "transitive_closure".
+
+    * (Relation.pm)  Other minor updates and fixes.
+
+2009-02-01
+
+    * Set::Relation version 0.2.0 for Perl 5 is released on CPAN as
+    Set-Relation-0.2.0.tar.gz.
+
+    * (Relation.pm)  Added full documentation for the remaining 25 object
+    methods that Set::Relation expects to have implemented prior to being
+    moved to alpha development status; each is marked TODO in its title;
+    this change item doesn't have a list of said methods, but when they are
+    implemented in the next 1-3 releases, the change log will mention them
+    simply as being new, same as if they hadn't been pre-documented now
+    (and the TODO marker on their docs will be silently removed).
+
+    * (Relation.pm)  Added placeholder code for said 25 TODO methods, each
+    of which will die with an "unimplemented" message if invoked.
+
+    * (Relation.pm)  Other minor code updates.
+
+2009-01-31
+
+    * Set::Relation version 0.1.0 for Perl 5 is released on CPAN as
+    Set-Relation-0.1.0.tar.gz.
+
+    * This release features a few API changes, some significant feature
+    additions, and bug fixes to existing routines, but no public facing
+    routines have been added or removed.  New routines should feature in
+    the next 0.Y.0 release.
+
+    * (Relation.pm)  Updated each of the 5 functional methods ["union",
+    "exclusion", "intersection", "join", "product"] so it is now an N-adic
+    operator rather than a dyadic operator.  Each method's "other"
+    parameter was renamed to "others" and now takes either a single
+    Set::Relation object as before or an Array of 0..N Set::Relation
+    objects which is new.  With this change, these operators are now at
+    feature parity with the Muldis D functions they are based on, except
+    that they never handle the niladic option; being object methods, there
+    is always at least one operand which is the invocant.
+
+    * (Relation.pm)  Updated each of the 4 functional methods
+    ["[|cmpl_]restriction", "extension", "map"] to remove its optional
+    "assuming" parameter.  This parameter was a fossil left over from the
+    original Muldis D versions of these operators that the Perl version was
+    ported from; the parameter was necessary in Muldis D to have reasonable
+    flexibility due to Muldis D lacking certain other features that Perl
+    has, which make this parameter unnecessary in Perl.  The removal was to
+    keep the Perl simpler; it also sets the stage for the next change item.
+
+    * (Relation.pm, Set_Relation_51_Database_in_Depth_Example.t)  Updated
+    each of the 4 functional methods ["[|cmpl_]restriction", "extension",
+    "map"] so that the Perl routine supplied as its "func" argument is now
+    assumed to have zero parameters rather than one, and the Perl routine
+    is now supplied its input tuple/Hash in $_, same as how Perl's built-in
+    map/grep operators work, rather than as a first/only argument.  Thanks
+    to Todd Hepler for proposing that design change to "restriction" to
+    make it more DWIM.
+
+    * (Relation.pm, Set_Relation_51_Database_in_Depth_Example.t)  Updated
+    each of the 4 functional methods ["[|cmpl_]projection", "extension",
+    "map"] so that the "[|result_]attrs" parameter can also take a Str
+    argument rather than just an Array of Str argument.  Thanks to Todd
+    Hepler for proposing that design change to "projection" to make it more
+    DWIM.  Also updated the Set::Relation constructor submethod similarly,
+    so its "members" parameter may also take a Str argument; this would
+    produce a relation object with 1 attribute and zero tuples.
+
+    * (Relation.pm)  Fixed an "insert" mutator method bug so it detects
+    and blocks attempts to insert the invocant Set::Relation object into
+    itself as a value-typed component, which would have had the side-effect
+    of freezing the invocant, or would have conceptually been an infinite
+    recursive deep copy operation; also fixed the "delete" mutator with
+    the same detector since it would have had the same freezing problem.
+
+    * (Relation.pm)  Updated all routines that take tuple-representing Hash
+    values from the user, either directly or as tuple-valued attrs, either
+    as a routine argument or a closure return value, so that each Hash is
+    tested for circular references between itself or its value-typed
+    components; this update fixes a general bug where the module could
+    infinitely recurse when processing that input, since tuple-representing
+    input from the user is deep-copied.
+
+    * (Relation.pm)  Some POD reformatting:  Took what used to be the 5
+    level-2 headings under the INTERFACE level-1 heading and changed said 5
+    into level-1 headings, but did not uppercase their text.  Then
+    converted the routine lists from being "=over/=item <routine>/=back" to
+    each routine having its own level-2 heading.  For each routine, the new
+    heading is just the short name of the routine, and the full signature
+    of the routine displays just as its own paragraph.  All these changes
+    combined should look visually like we are faking 3 levels of headings,
+    with top and middle being upcased and mixed case "=head1" respectively.
+
+    * (Relation.pm)  Minor code and POD updates and fixes.
+
+2009-01-26
+
+    * Set::Relation version 0.0.2 for Perl 5 is released on CPAN as
+    Set-Relation-0.0.2.tar.gz.
+
+    * (Relation.pm)  Fixed two instances of a bug in the "rename" method.
+    Thanks to Todd Hepler for spotting the bug and providing a patch.
+
+    * Added new test file "t/Set_Relation_51_Database_in_Depth_Example.t",
+    which exercises more than a half-dozen Set::Relation methods that
+    previously had no tests; the "rename" bugs were exposed when writing
+    this.  Thanks to Todd Hepler who authored and contributed this file.
+
+    * This distribution has gained a new direct external dependency on the
+    Test::Deep module, which currently is only used by the new test file.
+
+    * (Relation.pm)  Minor code comment fixes and POD updates.
+
+2009-01-21
+
+    * Set::Relation version 0.0.1 for Perl 5 is released on CPAN as
+    Set-Relation-0.0.1.tar.gz.
+
+    * (Relation.pm)  Fixed a bug in the "quotient" method, and further
+    updated it with some special-case shortcuts.
+
+    * (Relation.pm)  Other minor updates.
+
+    * (README, Relation.pm)  Previously the FORUMS pod section of
+    Relation.pm and 3 parts of the README file lacked content, and now they
+    have it; added documentation about where the Set::Relation version
+    control and support forums are.
+
+2009-01-19
+
+    * Set::Relation version 0.0.0 for Perl 5 is released on CPAN as
+    Set-Relation-0.0.0.tar.gz.
+
+    * It constitutes a rewrite of Set::Relation for Perl 6 that had been
+    made in 2006 but was never functional; the large body of work going
+    into the Muldis D language and Muldis Rosetta framework during the
+    intervening period also fed into this new Set::Relation module; it is
+    expected that this new Set::Relation for Perl 5 will be ported to Perl
+    6 in the near future and so upgrade that 2006 version; meanwhile, this
+    Changes entry refers only to the Perl 5 version.
+
+    * This is the first release of the Perl 5 Set::Relation distribution,
+    and the first release of any distribution to contain a Perl 5 module
+    named Set::Relation.
+
+    * This is the initial file manifest:
+
+        Changes
+        INSTALL
+        lib/Set/Relation.pm
+        LICENSE/GPL
+        LICENSE/LGPL
+        Makefile.PL
+        MANIFEST
+        MANIFEST.SKIP
+        README
+        t/Set_Relation_00_Compile.t
+        t/Set_Relation_50_Synopsis.t
+        TODO
+
+    * As of this release, Set::Relation is officially in pre-alpha
+    development status.
+
+    * This is the initial complement of routines; besides the "new"
+    constructor submethod, there are these 40 object methods: "clone",
+    "export_for_new", "freeze_identity", "which", "members", "heading",
+    "body", "evacuate", "insert", "delete", "degree", "is_nullary",
+    "cardinality", "is_empty", "is_member", "empty", "insertion",
+    "deletion", "rename", "projection", "cmpl_projection", "restriction",
+    "cmpl_restriction", "extension", "static_extension", "map",
+    "is_identical", "is_subset", "is_proper_subset", "is_disjoint",
+    "union", "exclusion", "intersection", "difference", "semidifference",
+    "semijoin", "join", "product", "quotient", "composition".
+
+2009-01-04
+
+    The next version of the Module List will list the following module:
+
+      modid:       Set::Relation
+      DSLIP:       cmpOl
+      description: Relation data type for Perl
+      userid:      DUNCAND (Darren Duncan)
+      chapterid:   6 (Data_Type_Utilities)
+      enteredby:   BDFOY (brian d foy)
+      enteredon:   Mon Jan  5 06:12:12 2009 GMT
+
+    The resulting entry will be:
+
+    Set::
+    ::Relation   cmpOl Relation data type for Perl                  DUNCAND
+
+2006-04-14 thru 2006-11-22
+
+    * A Perl 6 project named "Relation" is started (complementary to the
+    earlier existing to-be-named Muldis Rosetta project) which was intended
+    to provide native tuple and relation data types for ordinary use in
+    Perl 6 programs like other built-in collection types.  The first commit
+    was Pugs SVN rev 9938, on 2006-04-14, and Pugs 6.2.12 (2006-06-26)
+    included it.  Hence 2006 is the start of the declared copyright date
+    range for Set::Relation.
+
+    * On 2006-07-04, renamed this Perl 6 project to "Set-Relation", which
+    it remains to this day.  Pugs 6.2.13 and later included this.
+
+    * The Perl 6 Set-Relation received various small updates thru
+    2007-02-03 (Pugs SVN rev 15168), but is now stagnant; it will likely
+    get un-stuck after the initially newer Perl 5 version is made to work.
+
+2005-12-05
+
+    * Darren Duncan is introduced by David Wheeler to the truly relational
+    model of data, in a posting on the Bricolage development list in the
+    "Re: [6977] New branch for maintenance of Bricolage 1.10.x." thread.
+
+    * David said that Darren's expressed thought, that compound data types
+    in table fields was a violation of first normal form, was in fact a
+    misconception about the relational model.  David then referenced a
+    recent interview with C.J. Date.
+
+    * This set off a chain of events which was the largest paradigm shift
+    to ever affect what evolved into the Muldis Rosetta project, and also
+    resulted in the genesis of the Set::Relation module.

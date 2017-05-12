@@ -1,0 +1,29 @@
+---
+name: Scalar-Cycle-Manual
+version: 0.03.6
+author:
+  - 'Khemir Nadim ibn Hamouda. <nadim@khemir.net>'
+abstract: "Manualy cycle through a list of values\n"
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Data::Compare: 0
+  Data::TreeDumper: 0
+  Readonly: 0
+  Sub::Exporter: 0
+  version: 0.5
+build_requires:
+  Test::Block: 0
+  Test::Exception: 0
+  Test::NoWarnings: 0
+  Test::Warn: 0
+  Text::Diff: 0
+provides:
+  Scalar::Cycle::Manual:
+    file: lib/Scalar/Cycle/Manual.pm
+    version: 0.03
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

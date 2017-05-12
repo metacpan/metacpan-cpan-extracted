@@ -1,0 +1,52 @@
+---
+abstract: 'argument validation for you'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
+build_requires:
+  Moose::Util::TypeConstraints: '0'
+  MooseX::Types::Moose: '0'
+  MouseX::Types: '0'
+  MouseX::Types::Mouse: '0'
+  Test::Builder::Module: '0'
+  Test::More: '0.96'
+  Test::Requires: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.2, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Smart-Args
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Smart::Args:
+    file: lib/Smart/Args.pm
+    version: '0.14'
+requires:
+  Exporter: '5.63'
+  Mouse: '0.92'
+  Mouse::Util::TypeConstraints: '0'
+  PadWalker: '1.92'
+  Scalar::Util: '1.21'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/tokuhirom/Smart-Args/issues
+  homepage: https://github.com/tokuhirom/Smart-Args
+  repository: git://github.com/tokuhirom/Smart-Args.git
+version: '0.14'
+x_contributors:
+  - 'Fuji, Goro <gfuji@cpan.org>'
+  - 'Neil Bowers <neil@bowers.com>'
+  - 'aereal <aereal@aereal.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

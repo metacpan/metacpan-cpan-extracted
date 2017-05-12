@@ -1,0 +1,32 @@
+---
+name: SVK-Log-Filter-Mndrix
+version: !!perl/hash:Module::Build::Version
+  original: 0.0.3
+  qv: 1
+  version:
+    - 0
+    - 0
+    - 3
+author:
+  - 'Michael Hendricks  <michael@ndrix.org>'
+abstract: my pretty-ish output format
+license: mit
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+requires:
+  POSIX: 0
+  Perl6::Form: 0
+  SVK: 1.99
+  Term::ReadKey: 0
+  Text::Autoformat: 0
+  Time::Local: 0
+build_requires:
+  Test::More: 0
+provides:
+  SVK::Log::Filter::Mndrix:
+    file: lib/SVK/Log/Filter/Mndrix.pm
+    version: 0.0.3
+generated_by: Module::Build version 0.2804
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

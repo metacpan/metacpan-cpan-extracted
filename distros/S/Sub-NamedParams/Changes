@@ -1,0 +1,15 @@
+Revision history for Perl extension Sub::NamedParams.
+
+1.02  2005-10-06
+        - Pod tests and clean up distribution
+        - Convert to Module::Build
+
+1.01  Mon Apr 29 2002
+        - minor bugfix with global scalar sometimes being overwritten.
+          Thanks to chromatic <chromatic@wgz.org>.  Also a tiny documentation
+          change
+
+1.00  Sat Apr 27 09:41:10 2002
+	- original version; created by h2xs 1.21 with options
+		-AX -n Sub::NamedParams
+

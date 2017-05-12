@@ -1,0 +1,31 @@
+---
+abstract: 'Flexible Perl Process Scheduler'
+author:
+  - 'Tony Edwardson <tony@edwardson.co.uk>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Pod: '1.14'
+  Test::Pod::Coverage: '1.04'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.02, CPAN::Meta::Converter version 2.143240'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Schedule-Pluggable
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Moose: '0'
+  MooseX::Object::Pluggable: '0'
+  MooseX::Workers: '0'
+  Template: '0'
+  Test::More: '0'
+  Try::Tiny: '0'
+  XML::Simple: '0'
+  version: '0'
+version: v0.0.7

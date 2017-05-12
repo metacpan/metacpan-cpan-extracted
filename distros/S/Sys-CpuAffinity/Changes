@@ -1,0 +1,95 @@
+Revision history for Sys-CpuAffinity
+
+1.12	2017-01-13
+	Sanity checks on Math::BigInt (RT #118730/Debian #844141)
+
+1.11	2016-11-28
+	(Untested) support for older solaris (<11.2) with processor_bind(2)
+	Linux sched_getaffinity fixes (RT #118730/Debian #844141)
+	Refactor XS code for FreeBSD
+
+1.10	2016-08-12
+	Support Multi-CPU Binding through processor_affinity(2) in solaris 11.2
+	Improved support for linux with >64 cpus
+
+1.09	2016-07-29
+	Improved support for solaris, including binding to arbitrary
+	subsets of all cores with pbind(1M)
+	Prefer  Math::BigInt->new(2)**$n  to  1<<$n  to support >64 cores.
+	Improved support for aix
+
+1.08	2016-07-22
+	RT #94560-even more improved support for Linux systems with >32 cpus
+
+1.07	2016-07-22
+	Improved support for systems with >32 cpus
+	Workaround for overzealous Ubuntu build log filter
+
+1.06	2013-02-01
+	Prealloc mask strings to avoid buffer overflow in Win32::API calls.
+
+1.05	2011-11-08
+	Fix issue in t/11 when there is only one processor.
+	_getNumCpus_from_dmesg_bsd now handles duplicate msgs in dmesg output
+
+1.04	2011-09-29
+	Tweaks to linux XS code which may or may not reduce mysterious
+	segfaults.
+
+1.03	2011-08-30
+	Implemented IsWow64 detection in Windows.
+	Using taskset in linux to count CPUs.
+
+1.02	2011-06-17
+	Removed trivial hello.xs code snippet on the theory that it results
+	in segfaults on linux.
+
+1.01	2011-04-21
+	XS fixes for FreeBSD.
+	Improved several techniques for counting CPUs.
+	Refactoring of some MSWin32 techniques.
+
+1.00	2011-04-13
+	Fix for setting affinity of MSWin32 child processes.
+	XS support for NetBSD, get/set affinity of calling process.
+	Untested XS support for Irix with sysmp() library function.
+	Abort CPAN tests on systems with a single processor.
+
+0.99	2010-11-29
+	Cygwin fix.
+	Can now get num cpus on OpenBSD (thanks, devio.us!)
+
+0.98	2010-10-17
+	Fix bug finding external programs in OpenBSD. Test improvements.
+	Better use of Win32 XS in Cygwin. Fix compile error and other typos
+	in solaris XS code.
+
+0.97	2010-10-11
+	Cygwin::pid_to_winpid hack for Perl < v5.10.
+	Disable Win32 GetActiveProcessorCount call, which always either
+	fails quietly or fails noisily.
+
+0.96	2010-05-06
+	Test fix for solaris. Fix parsing negative which output on
+	some platforms.
+
+0.95	2010-05-04
+	XS files for Win32.
+	Can call Test::Smoke::SysInfo to detect num cpus.
+	Borrowed code from Test::Smoke::SysInfo for Darwin and Irix.
+
+0.94	2010-04-24
+	Bug fix in _configExternalProgram's poor man's which.
+	XS support for Windows/Cygwin if Win32::XXX modules aren't available.
+
+0.93	2010-04-21
+	Fix infinite loop in t/11 for single-processor systems.
+
+0.91	2010-04-20
+	Removed _configInlineCode calls, will use XS from now on.
+	Bug fix setting affinity for systems with exactly 32 processors.
+	Stub for IRIX support.
+
+0.90	2010-04-11 Initial release
+	Good support for Windows, Cygwin, Linux
+	Basic support for Solaris, FreeBSD, maybe other BSDs

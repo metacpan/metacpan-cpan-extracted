@@ -1,0 +1,4 @@
+use Apache2::ServerUtil;
+my $s = Apache2::ServerUtil->server;
+$s->error_log2stderr();
+1;

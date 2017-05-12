@@ -1,0 +1,12 @@
+Changes
+lib/String/ProperCase/Surname.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+t/001_use.t
+t/002_require.t
+t/003_hash.t
+Todo
+perl-String-ProperCase-Surname.spec
+META.yml                                 Module meta-data (added by MakeMaker)

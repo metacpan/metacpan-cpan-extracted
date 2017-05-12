@@ -1,0 +1,51 @@
+Revision history for Perl extension SQL::Format
+
+0.16 2014-07-24T14:56:45Z
+    - Added -and special key
+
+0.15 2013-06-11T10:21:26Z
+    - Added validation for limit and offset value
+    - Fixed priority formula
+
+0.14 2013-05-21T11:02:59Z
+    - repackageing
+
+0.13 2013-04-17T08:41:52Z
+    - re packaging
+
+0.12 2013-04-08T14:39:18Z
+    - added -where option for join condition
+
+0.11  Thu Feb 28 15:53:04 2013
+    - added new syntax for columns
+
+0.10  Thu Dec 13 15:29:35 2012
+    - fixed test (because hash order confusion)
+
+0.09  Wed Dec 12 00:42:54 2012
+    - repacking (no code changes)
+
+0.08  Wed Dec 12 00:23:30 2012
+    - added insert_on_duplicate() method (taken from SQL::Maker)
+
+0.07  Wed Jun  6 01:44:10 2012
+    - Add missing NAME section in lib/SQL/Format/Spec.pod (dolmen++)
+
+0.06  Tue Jun  5 22:06:54 2012
+    - when specify empty array or hash, returned SQL is broken
+
+0.05  Tue Jun  5 16:53:32 2012
+    - added { -or => xxx } syntax for where cluase
+
+0.04  Wed May 30 00:44:06 2012
+    - support multiple where clause (suggested by riywo++)
+
+0.03  Wed May 16 01:02:58 2012
+    - added insert_multi() method
+
+0.02  Sat May  5 03:26:13 2012
+    - added ESCAPE clause at LIKE
+    - added LIKE BINARY clause
+
+0.01  Wed May  2 06:12:54 2012
+    - original version

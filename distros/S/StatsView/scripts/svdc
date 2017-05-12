@@ -1,0 +1,157 @@
+#!/usr/local/bin/perl -w
+################################################################################
+# StatsView data collector
+# Exit codes:
+#   0 - OK
+#   1 - canncelled by interrupt
+#   2 - argument error
+#   3 - subprocess error
+################################################################################
+
+use strict;
+use IO::File;
+use POSIX qw(uname strftime setsid);
+use vars qw(%Pids $Verbose $OSVer);
+
+################################################################################
+
+sub harikari($@)
+{
+my ($status, @msg) = @_;
+print("@msg\n") if (@msg);
+foreach my $pid (keys(%Pids)) { kill(-15, $pid); waitpid($pid, 0); }
+exit($status);
+}
+
+################################################################################
+
+sub writeheader($$)
+{
+my ($file, $hdr) = @_;
+my $fh = IO::File->new($file, "w") || harikari(3, "Can't write to $file: $!");
+$fh->print($hdr);
+$fh->close();
+}
+
+################################################################################
+
+sub forkproc($)
+{
+my ($cmd) = @_;
+my $pid;
+
+# Parent
+print("$cmd\n") if ($Verbose);
+if ($pid = fork())
+   {
+   $Pids{$pid} = $cmd;
+   return($pid);
+   }
+# Child
+elsif (defined($pid))
+   {
+   setsid();   # So that one signal can be used to kill the entire pipeline
+   exec($cmd) || harikari(3, "Can't exec \"$cmd\": $!");
+   }
+# Error
+else
+   {
+   harikari(3, "Can't fork \"$cmd\": $!");
+   }
+}
+
+################################################################################
+# Main
+
+# Fettle arguments
+harikari(2, "Insufficient arguments") if (@ARGV < 4);
+if ($ARGV[0] eq '-v') { $Verbose = 1; shift(@ARGV); }
+my $output   = shift(@ARGV);
+my $interval = shift(@ARGV);
+my $count    = shift(@ARGV);
+my %monitors;
+foreach my $opt (@ARGV)
+   {
+   my ($mon, @args) = split(/[:,]/, $opt);
+   $monitors{$mon} = [ @args ];
+   }
+harikari(2, "No monitors specified") if (! keys(%monitors));
+
+# Get OS version
+$OSVer = (POSIX::uname())[2];
+
+# Figure out if mapdev is installed
+my $mapdev = "";
+foreach my $p (split(/:/, $ENV{PATH}))
+   { if (-x "$p/mapdev") { $mapdev = "| mapdev"; last; } }
+
+# Trap interrupts
+$SIG{INT}  = sub { harikari(1, "received SIGINT"); };
+$SIG{HUP}  = sub { harikari(1, "received SIGHUP"); };
+$SIG{TERM} = sub { harikari(1, "received SIGTERM"); };
+my $hdr = strftime("Start: %d/%m/%y %T Interval: $interval\n\n", localtime());
+
+# iostat
+if (defined($monitors{iostat}))
+   {
+   writeheader("$output.iostat", $hdr);
+   forkproc("iostat -x $interval $count $mapdev >> $output.iostat");
+   }
+
+# iost+
+if (defined($monitors{"iost+"}))
+   {
+   forkproc("iost+ $interval $count > $output.iost+");
+   }
+
+# mpstat
+if (defined($monitors{"mpstat"}))
+   {
+   writeheader("$output.mpstat", $hdr);
+   forkproc("mpstat $interval $count >> $output.mpstat");
+   }
+
+# sar
+if (defined($monitors{sar}))
+   {
+   forkproc("sar -A $interval $count $mapdev > $output.sar");
+   }
+
+# vmstat
+if (defined($monitors{vmstat}))
+   {
+   writeheader("$output.vmstat", $hdr);
+   forkproc("vmstat $interval $count >> $output.vmstat");
+   }
+
+# vxstat
+if (defined($monitors{vxstat}) &&
+    ((system("pkginfo -q SUNWvxvm") / 256 == 0) ||
+     (system("pkginfo -q VRTSvxvm") / 256 == 0)))
+   {
+   foreach my $dg (@{$monitors{vxstat}})
+      {
+      forkproc("vxstat -g $dg -i $interval -c $count > $output.vxstat.$dg");
+      }
+   }
+
+# oracle
+if (defined($monitors{oar})
+    && (defined($ENV{ORACLE_HOME}) || defined($ENV{TWO_TASK})))
+   {
+   my ($login, @stats) = @{$monitors{oar}};
+   forkproc("oar -O $output.oar -L $login -I $interval -C $count @stats");
+   }
+
+# Wait for them all to finish - stop early if any fails
+while ((my $pid = wait()) != -1)
+   {
+   my $cmd = delete($Pids{$pid});
+
+   # mpstat returns duff exit codes on 2.5.1.  Sigh.
+   if (! ($cmd =~ /mpstat/ && $OSVer eq "5.5.1"))
+      { harikari(3, "\"$cmd\" failed") if ($?); }
+   }
+exit(0);
+
+################################################################################

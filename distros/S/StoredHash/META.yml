@@ -1,0 +1,26 @@
+---
+abstract: 'Easy Insert, Update, Load and Delete of a DB (DBI) Stored Hash'
+author:
+  - 'Olli Hollmen'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.120351'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: StoredHash
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DBI: 1.4
+  Data::Dumper: 2.121
+  Scalar::Util: 0
+  Storable: 0
+  Test::More: 0
+version: 0.031

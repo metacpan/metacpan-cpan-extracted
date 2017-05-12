@@ -1,0 +1,57 @@
+---
+abstract: 'Service Inventory Abstraction Model'
+author:
+  - 'Stanislav Sinyagin <ssinyagin@k-open.com>'
+build_requires:
+  Digest::MD5: 0
+  Test::More: 0
+  YAML: 0.71
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: SIAM
+provides:
+  SIAM:
+    file: lib/SIAM.pm
+    version: 1.01
+  SIAM::AccessScope:
+    file: lib/SIAM/AccessScope.pm
+  SIAM::Attribute:
+    file: lib/SIAM/Attribute.pm
+  SIAM::Contract:
+    file: lib/SIAM/Contract.pm
+  SIAM::Device:
+    file: lib/SIAM/Device.pm
+  SIAM::DeviceComponent:
+    file: lib/SIAM/DeviceComponent.pm
+  SIAM::Driver::Simple:
+    file: lib/SIAM/Driver/Simple.pm
+  SIAM::Object:
+    file: lib/SIAM/Object.pm
+  SIAM::Privilege:
+    file: lib/SIAM/Privilege.pm
+  SIAM::Report:
+    file: lib/SIAM/Report.pm
+  SIAM::ScopeMember:
+    file: lib/SIAM/ScopeMember.pm
+  SIAM::Service:
+    file: lib/SIAM/Service.pm
+  SIAM::ServiceComponent:
+    file: lib/SIAM/ServiceComponent.pm
+  SIAM::ServiceUnit:
+    file: lib/SIAM/ServiceUnit.pm
+  SIAM::User:
+    file: lib/SIAM/User.pm
+recommends:
+  Digest::MD5: 0
+  YAML: 0.71
+requires:
+  JSON: 0
+  Log::Handler: 0
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+version: 1.01

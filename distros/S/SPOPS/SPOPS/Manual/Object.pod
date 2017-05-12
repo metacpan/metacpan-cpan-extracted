@@ -1,0 +1,549 @@
+=head1 NAME
+
+SPOPS::Manual::Object - Shows how you interact with SPOPS objects.
+
+=head1 DESCRIPTION
+
+This section of the SPOPS manual should be of interest to users and
+developers, since it describes how SPOPS objects are used. Note that
+all examples here assume the SPOPS class has already been created --
+for more on this see
+L<SPOPS::Manual::Configuration|SPOPS::Manual::Configuration> and
+L<SPOPS::Manual::CodeGeneration|SPOPS::Manual::CodeGeneration> for
+more information about that process.
+
+=head2 A Simple Example
+
+How better to start off than a simple example. Here we get values from
+CGI.pm, set the values into a new SPOPS object and save it:
+
+  1: my $q = new CGI;
+  2: my $obj = MyUserClass->new();
+  3: foreach my $field ( qw( f_name l_name birthdate ) ) {
+  4:     $obj->{ $field } = $q->param( $field );
+  5: }
+  6: my $object_id = eval { $obj->save };
+  7: if ( $@ ) {
+  8:     ... report error information ...
+  9: }
+ 10: else {
+ 11:     warn " Object saved with ID: $obj->{object_id}\n";
+ 12: }
+
+You can then display this object's information from a later request:
+
+  1: my $q = new CGI;
+  2: my $object_id = $q->param( 'object_id' );
+  3: my $obj = MyUserClass->fetch( $object_id );
+  4: print "First Name: $obj->{f_name}\n",
+  5:       "Last Name:  $obj->{l_name}\n",
+  6:       "Birthday:   $obj->{birthdate}\n";
+
+To display other information from the same object, like related
+objects:
+
+  1: my $user_group = $obj->group;
+  2: print "Group Name: $user_group->{name}\n";
+
+And you can fetch batches of objects at once based on arbitrary
+criteria:
+
+  1: my $q = new CGI;
+  2: my $last_name = $q->param( 'last_name' );
+  3: my $user_list = MyUserClass->fetch_group({ where => 'l_name LIKE ?',
+  4:                                            value => [ "%$last_name%" ],
+  5:                                            order => 'birthdate' });
+  6: print "Users with last name having: $last_name\n";
+  7: foreach my $user ( @{ $user_list } ) {
+  8:     print " $user->{f_name} $user->{l_name} -- $user->{birthdate}\n";
+  9: }
+
+=head2 Tie Interface
+
+This version of SPOPS uses a L<tie|tie> interface to get and set the
+individual data values. You can also use the more traditional OO
+C<get> and C<set> operators, but most people will likely find the
+hashref interface easier to deal with. It also means you can
+interpolate data into strings: bonus!
+
+The tie interface allows the most common operations -- fetch data and
+put it into a data structure for later use -- to be done very
+easily. It also hides much of the complexity behind the object for you
+so that most of the time you are dealing with a simple hashref.
+
+However, the tie interface also allows us to give behaviors to the
+SPOPS object that are executed transparently with every get or set of
+a value. For instance, if you use strict field checking (example
+below), we can catch any property name misspellings or wrong names
+being used for properties. We can also track property state as
+necessary so we can know whether an object has changed or not since it
+was created or fetched. Property values can also be lazy-loaded.
+
+=head2 Automatically Created Accessors and Mutators
+
+In addition to getting the data for an object through the hashref
+method, you can also get to the data with accessors named after the
+fields.
+
+For example, given the fields:
+
+ $user->{f_name}
+ $user->{l_name}
+ $user->{birthday}
+
+You can call the following to retrieve the data:
+
+ $user->f_name();
+ $user->l_name();
+ $user->birthday();
+
+And to the following to modify the data:
+
+ $user->f_name( 'Ferris' );
+ $user->l_name( 'Bueller' );
+ $user->birthday( '1970-02-14' );
+
+Since the accessor and mutator share a method the mutator needs to
+know whether to do its job. It does this by testing the first
+parameter passed in for definedness. Most of the time this is fine,
+but what happens when you want to clear out a value like this?
+
+ $user->m_name( undef );
+
+This won't do what you think -- since the first parameter is undefined
+it will simply act as an accessor.
+
+To clear a value, call instead the '_clear' method associated with a
+fieldname:
+
+ $user->m_name_clear;
+
+This explicitly sets the value to undef.
+
+SPOPS accomplishes this using AUTOLOAD, and after the first call it
+automatically creates a subroutine in the namespace of your class to
+catch successive calls. If you require you can modify how these two
+methods get created by overriding
+C<_internal_create_field_methods()>. This takes three arguments: the
+object being modified, the class to install the routines into, and the
+fieldname used to create the methods. Don't implement this unless you
+know what you're doing -- check out the implementation in
+L<SPOPS|SPOPS> before proceeding down this path, since doing it wrong
+could create some nasty side-effects.
+
+=head2 Tracking State Changes
+
+The object tracks whether any changes have been made since it was
+instantiated and keeps an internal toggle switch. You can query the
+toggle or set it manually.
+
+ $obj->changed();
+
+Returns 1 if there has been change, undef if not.
+
+ $obj->has_change();
+
+Sets the toggle to true.
+
+ $obj->clear_change();
+
+Sets the toggle to false.
+
+Example:
+
+ if ( $obj->changed() ) {
+     my $rv = $obj->save();
+ }
+
+Note that this can (and should) be implemented within the subclass, so
+you as a user can simply call:
+
+ $obj->save();
+
+And not worry about whether it has been changed or not. If there has
+been any modification, the system will save it, otherwise it will not.
+
+=head2 Multiple-Field ID Fields
+
+As of SPOPS 0.53, L<SPOPS::DBI|SPOPS::DBI> supports multi-field
+primary keys. To use it, you just use an arrayref to represent the ID
+field in the C<id()> method rather than a string. (Wisenheimers who
+use an arrayref with one element may be shocked that SPOPS finds this
+attempt to trick it and sets the value to the single element.)
+
+When using C<fetch()>, you need to represent the ID as a
+comma-separated string similar to that returned by C<id()> in scalar
+context (see below). For example:
+
+ # Configuration
+ myclass => {
+     class => 'My::Customer',
+     id    => [ 'entno', 'custno' ],
+     ...
+ },
+
+ # Fetch object
+ my $cust = My::Customer->fetch( "$entno,$custno" );
+
+On finding multiple ID fields,
+L<SPOPS::ClassFactory::DBI|SPOPS::ClassFactory::DBI> creates new
+methods for C<id()>, C<id_field> and C<id_clause>. Both C<id()> and
+C<id_field()> are context-sensitive, and C<id_clause()> returns a
+clause with multiple atoms.
+
+One at a time:
+
+B<id( [ $id_value ] )>
+
+In list context, returns the values for the ID fields in order. In
+scalar context, returns the ID values joined by a comma. (This may be
+configurable in the future.)
+
+ my ( $id_val1, $id_val2 ) = $object->id();
+ my $id_string = $object->id();
+ $object->id( [ 'value1', 'value2' ] );
+
+B<id_field()>
+
+In list context, returns an n-element list with the ID fieldnames. In
+scalar context, returns the fieldnames joined by a comma. (This may be
+configurable in the future.)
+
+ my ( $field1, $field2 ) = $object->id_field();
+ my $field_string = $object->id_field();
+
+B<id_clause()>
+
+Returns a full WHERE clause to find this particular record -- used in
+UPDATE and DELETE statements. If you're using as a class method, you
+need to pass in the ID values as an arrayref or as a comma-separated
+string as returned by C<id()> in scalar context.
+
+ my $where = $obj->id_clause();
+ my $sql = "SELECT * FROM foo WHERE $where";
+
+ my $where = $obj_class->id_clause( [ $id_val1, $id_val2 ] );
+ my $sql = "SELECT * FROM foo WHERE $where";
+
+ my $where = $obj_class->id_clause( "$id_val1,$id_val2" );
+ my $sql = "SELECT * FROM foo WHERE $where";
+
+=head2 Lazy Loading
+
+As of version 0.40, SPOPS supports lazy loading of objects. This means
+you do not have to load the entire object at once.
+
+To use lazy loading, you need to specify one or more 'column groups',
+each of which is a logical grouping of properties to fetch. Further,
+you need to specify which group of properties to fetch when you run a
+'fetch' or 'fetch_group' command. SPOPS will fetch only those fields
+and, as long as your implementing class has a subroutine for
+performing lazy loads, will load the other fields only on demand.
+
+For example, say we have an object representing an HTML page. One of
+the most frequent uses of the object is to participate in a listing --
+search results, navigation, etc. When we fetch the object for listing,
+we do not want to retrieve the entire page -- it is hard on the
+database and takes up quite a bit of memory.
+
+So when we define our object, we define a column group called
+'listing' which contains the fields we display when listing the
+objects:
+
+  1: $spops = {
+  2:      html_page => {
+  3:          class        => 'My::HTMLPage',
+  4:          isa          => [ qw/ SPOPS::DBI::Pg SPOPS::DBI / ],
+  5:          field        => [ qw/ page_id location title author content / ],
+  6:          column_group => { listing => [ qw/ location title author / ] },
+  7:          ...
+  8:     },
+  9: };
+
+And when we retrieve the objects for listing, we pass the column group
+name we want to use:
+
+  1: my $page_list = My::HTMLPage->fetch_group({ order        => 'location',
+  2:                                             column_group => 'listing' });
+
+Now each object in C<\@page_list> has the fields 'page_id',
+'location', 'title' and 'author' filled in, but not 'content', even
+though 'content' is defined as a field in the object. The first time
+we try to retrieve the 'content' field, SPOPS will load the value for
+that field into the object behind the scenes.
+
+  1: 
+  2: foreach my $page ( @{ $page_list } ) {
+  3: 
+  4:     # These properties are in the fetched object and are not
+  5:     # lazy-loaded
+  6: 
+  7:     print "Title: $page->{title}\n",
+  8:           "Author: $page->{author}\n";
+  9: 
+ 10:     # When we access lazy-loaded properties like 'content', SPOPS goes
+ 11:     # and retrieves the value for each object property as it's
+ 12:     # requested.
+ 13: 
+ 14:     if ( $title =~ /^OpenInteract/ ) {
+ 15:         print "Content\n\n$page->{content}\n";
+ 16:     }
+ 17: }
+
+Obviously, you want to make sure you use this wisely, otherwise you
+will put more strain on your database than if you were not using lazy
+loading. The example above, for instance, is a good use since we might
+be using the 'content' property for a few objects. But it would be a
+poor use if we did not have the C<if> statement or if B<every> 'title'
+began with 'OpenInteract' since the 'content' property would be
+retrieved anyway.
+
+See L<SPOPS::Manual::Serialization|SPOPS::Manual::Serialization> for
+how to implement lazy loading for your objects.
+
+=head2 Field Mapping
+
+As of version 0.50, SPOPS has the ability to make an object look like
+another object, or to put a prettier face on existing data.
+
+In your configuration, just specify:
+
+ field_map => { new_name => 'existing_name', ... }
+
+For example, you might need to make your user objects stored in an
+LDAP directory look like user objects stored in a DBI database. You
+could say:
+
+  1: field_map    => { 'last_name'  => 'sn',
+  2:                   'first_name' => 'givenname',
+  3:                   'password'   => 'userpassword',
+  4:                   'login_name' => 'uid',
+  5:                   'email'      => 'mail',
+  6:                   'user_id'    => 'cn'  }
+
+So, despite having entirely different schemas, the following would
+print out equivalent information:
+
+  1: sub display_user_data {
+  2:     my ( $user ) = @_;
+  3:     return <<INFO;
+  4:   ID:     $user->{user_id}
+  5:   Name:   $user->{first_name} $user->{last_name}
+  6:   Login:  $user->{login_name}
+  7:   Email:  $user->{email}
+  8: INFO
+  9: }
+ 10: 
+ 11: print display_user_data( $my_ldap_user );
+ 12: print display_user_data( $my_dbi_user );
+
+Another use might be to represent properties in a different language.
+
+Note that you can have more than one new field pointing to the same
+old field.
+
+=head2 Field Value Altering
+
+In some implementations (notably L<SPOPS::DBI|SPOPS::DBI>), you can
+alter the value of a field before it gets set in the object. This can
+be a useful (if sometimes non-portable) way of doing transparent data
+formatting for all objects. And this method is usually faster than
+just using Perl, which is an added bonus.
+
+For instance, maybe you're using MySQL and you want to take advantage
+of its date-formatting capabilities. You can tell SPOPS to use them in
+one of two ways.
+
+First, you can specify the information in your object configuration:
+
+  1: my $config = {
+  2:     myobject => {
+  3:           class       => 'My::SPOPS',
+  4:           field       => [ qw/ my_id my_name my_date / ],
+  5:           field_alter => { my_date => "DATE_FORMAT( my_date, '%Y/%m/%d %I:%i %p' )" },
+  6:           ...,
+  7:     },
+  8: };
+
+Second, you can pass the information in on a per-object basis:
+
+  1: my $alter = { my_date => "DATE_FORMAT( my_date, '%Y/%m/%d %I:%i %p' )" };
+  2: my $object = My::SPOPS->fetch( $object_id, { field_alter => $alter } );
+
+Both will have exactly the same effect.
+
+So, how would you do this in Perl and SPOPS?  You would likely create
+a post_fetch rule that did whatever data manipulation you wanted:
+
+  1: sub ruleset_add {
+  2:     my ( $class, $rs_table ) = @_;
+  3:     push @{ $rs_table->{post_fetch_action} }, \&manipulate_date;
+  4:     return ref $class || $class;
+  5: }
+  6: 
+  7: sub manipulate_date {
+  8:     my ( $self, $p ) = @_;
+  9:     return 1 unless ( $self->{start_date} );
+ 10:     my $start_date_object = Class::Date->new( $self->{start_date} );
+ 11:     local $Class::Date::DATE_FORMAT = '%Y/%m/%d %I:%M %p';
+ 12:     $self->{start_date} = "$start_date_object";
+ 13: }
+
+See L<SPOPS::Manual::ObjectRules|SPOPS::Manual::ObjectRules> for more
+info on creating rulesets and what you can do with them.
+
+=head2 Multivalued Fields
+
+Some data storage backends -- like LDAP -- can store multiple values
+for a single field. As of version 0.50, SPOPS can do the same.
+
+All you need to do is specify in your configuration which fields
+should be multivalued:
+
+  1:  multivalue => [ 'field1', 'field2' ]
+
+Thereafter you can access them as below (more examples in
+L<SPOPS::Tie|SPOPS::Tie>):
+
+  1: my $object = My::Object->new;
+  2: 
+  3: # Set field1 to [ 'a', 'b' ]
+  4: $object->{field1} = [ 'a', 'b' ];
+  5: 
+  6: # Replace the value of 'a' with 'z'
+  7: $object->{field1} = { replace => { a => 'z' } };
+  8: 
+  9: # Add the value 'c'
+ 10: $object->{field1} = 'c';
+ 11: 
+ 12: # Find only the ones I want
+ 13: my @ones = grep { that_i_want( $_ ) } @{ $object->{field1} };
+
+Note that the value returned from a field access to a multivalue field
+is always an array reference. If there are no values, the reference is
+empty.
+
+=head2 Strict Fields
+
+If you ask, SPOPS will ensure that all get and set accesses are
+checked against the fields the object should have. You ask by setting
+the configuration option 'strict_field'. For instance:
+
+  1: $spops = {
+  2:       user => {
+  3:           class        => 'My::User',
+  4:           isa          => [ qw/ SPOPS::DBI::Pg SPOPS::DBI / ],
+  5:           field        => [ qw/ first_name last_name login / ],
+  6:           strict_field => 1,
+  7:           ...
+  8:      },
+  9: };
+ 10: ...
+ 11: my $user = My::User->new;
+ 12: $user->{firstname} = 'Chucky';
+ 
+would result in a message to STDERR, something like:
+
+  1: Error setting value for field (firstname): it is not a valid field
+  2: at my_tie.pl line 9
+
+since you have misspelled the property. Note that SPOPS will continue
+working and will not 'die' on such an error, just issue a warning.
+
+=head2 More Examples
+
+  1: # Retrieve all themes and print a description
+  2: 
+  3: my $themes = eval { $theme_class->fetch_group( { order => 'title' } ) };
+  4: if ( $@ ) { ... report error ... }
+  5: else {
+  6:     foreach my $thm ( @{ $themes } ) {
+  7:         print "Theme: $thm->{title}\n",
+  8:               "Description: $thm->{description}\n";
+  9:     }
+ 10: }
+
+  1: # Create a new user, set some values and save
+  2: 
+  3: my $user = $user_class->new;
+  4: $user->{email}      = 'mymail@user.com';
+  5: $user->{first_name} = 'My';
+  6: $user->{last_name}  = 'User';
+  7: my $user_id = eval { $user->save };
+  8: if ( $@ ) {
+  9:     print "There was an error: $SPOPS::Error::system_msg\n"
+ 10: }
+ 11: 
+ 12: # Retrieve that same user from the database
+ 13: 
+ 14: my $user_id = $cgi->param( 'user_id' );
+ 15: my $user = eval { $user_class->fetch( $user_id ) };
+ 16: if ( $@ ) { ... report error ... }
+ 17: else {
+ 18:     print "The user's first name is: $user->{first_name}\n";
+ 19: }
+
+  1: # Create a new object with initial values, set another value and save
+  2: 
+  3: my $data = MyClass->new({ field1 => 'value1',
+  4:                           field2 => 'value2' });
+  5: print "The value for field2 is: $data->{field2}\n";
+  6: $data->{field3} = 'value3';
+  7: eval { $data->save };
+  8: if ( $@ ) { ... report error ... }
+  9: 
+ 10: # Remove the object permanently
+ 11: 
+ 12: eval { $data->remove };
+ 13: if ( $@ ) { ... report error ... }
+ 14: 
+ 15: # Call arbitrary object methods to get other objects
+ 16: 
+ 17: my $other_obj = eval { $data->call_to_get_other_object() };
+ 18: if ( $@ ) { ... report error ... }
+ 19: 
+ 20: # Clone the object with an overridden value and save
+ 21: 
+ 22: my $new_data = $data->clone({ field1 => 'new value' });
+ 23: eval { $new_data->save };
+ 24: if ( $@ ) { ... report error ... }
+ 25: 
+ 26: # $new_data is now its own hashref of data --
+ 27: # explore the fields/values in it
+ 28: 
+ 29: while ( my ( $k, $v ) = each %{ $new_data } ) {
+ 30:     print "$k == $v\n";
+ 31: }
+ 32: 
+ 33: # Retrieve saved data
+ 34: 
+ 35: my $saved_data = eval { MyClass->fetch( $id ) };
+ 36: if ( $@ ) { ... report error ... }
+ 37: else {
+ 38:   while ( my ( $k, $v ) = each %{ $saved_data } ) {
+ 39:       print "Value for $k with ID $id is $v\n";
+ 40:   }
+ 41: }
+ 42: 
+ 43: # Retrieve lots of objects, display a value and call a
+ 44: # method on each
+ 45: 
+ 46: my $data_list = eval { MyClass->fetch_group({ 
+ 47:                                     where => "last_name like 'winter%'" }) };
+ 48: if ( $@ ) { ... report error ... }
+ 49: else {
+ 50:     foreach my $obj ( @{ $data_list } ) {
+ 51:         print "Username: $obj->{username}\n";
+ 52:         $obj->increment_login();
+ 53:     }
+ 54: }
+
+=head1 COPYRIGHT
+
+Copyright (c) 2001-2004 Chris Winters. All rights reserved.
+
+See L<SPOPS::Manual|SPOPS::Manual> for license.
+
+=head1 AUTHORS
+
+Chris Winters E<lt>chris@cwinters.comE<gt>

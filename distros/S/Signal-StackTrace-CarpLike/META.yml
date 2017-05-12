@@ -1,0 +1,25 @@
+---
+abstract: 'install signal handler to print a Carp-like stacktrace'
+author:
+  - 'Shawn M Moore <sartak@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Signal-StackTrace-CarpLike
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  perl: 5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/sartak/signal-stacktrace-carplike
+version: 0.01

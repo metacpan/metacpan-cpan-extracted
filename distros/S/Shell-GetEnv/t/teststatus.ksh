@@ -1,0 +1,3 @@
+unset GETENV_ARG
+export GETENV_ARG=$GETENV_ARG1
+( exit $GETENV_ARG )

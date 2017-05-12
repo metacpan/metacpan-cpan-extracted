@@ -1,0 +1,55 @@
+Revision history for Server-Module-Comparison
+
+0.012     2017-01-31 11:35:50+00:00 Europe/London
+
+  - Fixed problem with display of missing modules.
+
+0.011     2017-01-16 20:08:17+00:00 Europe/London
+
+  - Add [MinimumPerlFast] to build process to ensure
+    perl version required is provided (manwar).
+
+0.010     2017-01-16 16:19:06+00:00 Europe/London
+
+  - Fix issue #7 by fudging undef
+
+0.009     2017-01-05 08:52:58+00:00 Europe/London
+
+  - Added new dependency
+
+0.008     2017-01-04 15:35:04+00:00 Europe/London
+
+  - Fix #6 and compare version numbers correctly
+
+0.007     2017-01-04 10:20:18+00:00 Europe/London
+
+  - Fixed typo.
+
+0.006     2017-01-04 10:10:32+00:00 Europe/London
+
+  - Write a proper differences report #5
+  - Allow an unambiguous uri style to make identifying containers/machines easier
+
+0.005     2016-12-07 13:10:31+00:00 Europe/London
+
+  - Another release to fix pod in release.
+
+0.004     2016-12-07 12:53:31+00:00 Europe/London
+
+  - #1: Allow stdin for module list
+  - #3: Add feature to display a single servers modules
+
+0.003     2016-12-06 08:39:48+00:00 Europe/London
+
+  - Fixed goof in documentation.
+
+0.002     2016-11-29 22:57:10+00:00 Europe/London
+
+  - Fix perl 5.8 compat issue
+  - Added extra pod declaration
+  - Prevent pointless module loading on tests that skip.
+  - Try to make the error handling a bit more robust
+
+0.001     2016-11-23 12:39:10+00:00 Europe/London
+
+  - First version.

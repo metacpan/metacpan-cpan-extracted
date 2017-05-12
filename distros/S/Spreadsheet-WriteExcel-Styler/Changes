@@ -1,0 +1,11 @@
+Revision history for Spreadsheet-WriteExcel-Styler
+
+1.02 12.12.2012
+  - RT81909 : make it compatible with Excel::Writer::XLSX
+
+1.01 02.11.2012
+  - Defensive programming : croak if client invokes an unknown style
+
+1.00 18.04.2010
+  - First release
+

@@ -1,0 +1,10 @@
+SVG::Shapefile
+
+This slightly mis-named module uses Geo::Shapelib and SVG.pm to generate statustical maps from shape files and matching Excel spreadsheets. It can be used without an excel spreadsheet to plot values in the shape file's .dbf , or just to convert a shapefile to SVG. (Thus its name)
+
+Version 0.1 is rather rushed out and slim on tests, etc because it's been sitting on a hard drive since we wrote "Mapping Hacks" (http://mappinghacks.com/ ) in which it is featured...
+
+
+Authors: Jo Walsh, Schuyler Erle
+License: Same terms as perl itself.
+Updated: 2005-06-03

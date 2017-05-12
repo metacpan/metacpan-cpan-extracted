@@ -1,0 +1,14 @@
+description: update handle
+registrar: 1
+
+# Force different fe times
+sleep: 1
+
+request: |-
+ <NZSRSRequest VerMajor="4" VerMinor="4" RegistrarId="100">
+  <HandleUpdate Email="updated@example.com" HandleId="04h" Name="A Person" ActionId="[% actionid %]">
+  </HandleUpdate> 
+ </NZSRSRequest>
+
+assertions:
+ - xpath_matches: [ '//Error', '0', 'No errors' ]

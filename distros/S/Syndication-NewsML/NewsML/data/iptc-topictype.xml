@@ -1,0 +1,206 @@
+<?xml version="1.0"?>
+<!DOCTYPE TopicSet PUBLIC "urn:newsml:iptc.org:20001006:NewsMLv1.0.dtd:1" "NewsMLv1.0.dtd">
+<TopicSet Duid="newsmltopictypes" FormalName="TopicType">
+	<Comment xml:lang="en">The kind of thing that the individual thing represented by the topic can be characterized as.</Comment>
+	<Topic Duid="TopicTypes.NewsML.TopicType">
+		<TopicType FormalName="TopicType"/>
+		<FormalName Scheme="IptcTopicType">TopicType</FormalName>
+		<Description xml:lang="en">The kind of thing that the individual thing represented by the topic can be characterized as.</Description>
+	</Topic>
+	<Topic Duid="TopicTypes.NewsML.LocalVocabulary">
+		<TopicType FormalName="TopicType"/>
+		<FormalName Scheme="IptcTopicType">LocalVocabulary</FormalName>
+		<Description xml:lang="en">A NewsML TopicSet serving as a locally declared vocabulary</Description>
+	</Topic>
+	<Topic Duid="TopicTypes.NAIC.ClassOfIndustry">
+		<TopicType FormalName="TopicType"/>
+		<FormalName Scheme="IptcTopicType">ClassOfIndustry</FormalName>
+		<Description xml:lang="en">A class of industry, as defined by the North American Industry Classification System.</Description>
+	</Topic>
+	<Topic Duid="TopicTypes.NewsML.SubjectCode">
+		<Comment xml:lang="en">A code describing the editorial content of a ContentItem.</Comment>
+		<TopicType FormalName="TopicType"/>
+		<FormalName Scheme="IptcTopicType">SubjectCode</FormalName>
+		<Description xml:lang="en">.</Description>
+	</Topic>
+	<Topic Duid="TopicTypes.NewsML.Subject">
+		<TopicType FormalName="TopicType"/>
+		<FormalName Scheme="IptcTopicType">Subject</FormalName>
+		<Description xml:lang="en">Description of NewsComponent editorial content at a high level.</Description>
+	</Topic>
+	<Topic Duid="TopicTypes.NewsML.SubjectMatter">
+		<TopicType FormalName="TopicType"/>
+		<FormalName Scheme="IptcTopicType">SubjectMatter</FormalName>
+		<Description xml:lang="en">Description of NewsComponent editorial content at a more precise level.</Description>
+	</Topic>
+	<Topic Duid="TopicTypes.NewsML.SubjectDetail">
+		<TopicType FormalName="TopicType"/>
+		<FormalName Scheme="IptcTopicType">SubjectDetail</FormalName>
+		<Description xml:lang="en">Description of NewsComponent editorial content at a specific level.</Description>
+	</Topic>
+	<Topic Duid="TopicTypes.NewsML.SubjectQualifier">
+		<TopicType FormalName="TopicType"/>
+		<FormalName Scheme="IptcTopicType">SubjectQualifier</FormalName>
+		<Description xml:lang="en">A narrower context for a sports-related subject code, such as age or weight of athletes.</Description>
+	</Topic>
+	<Topic Duid="TopicTypes.NewsML.Status">
+		<TopicType FormalName="TopicType"/>
+		<FormalName Scheme="IptcTopicType">Status</FormalName>
+		<Description xml:lang="en">Current usability of a NewsItem.</Description>
+	</Topic>
+	<Topic Duid="TopicTypes.NewsML.Role">
+		<TopicType FormalName="TopicType"/>
+		<FormalName Scheme="IptcTopicType">Role</FormalName>
+		<Description xml:lang="en">The distinguishing characteristic of a NewsComponent, or its relationship to the others with which it is associated within the same containing NewsComponent.</Description>
+	</Topic>
+	<Topic Duid="TopicTypes.NewsML.NewsItemType">
+		<TopicType FormalName="TopicType"/>
+		<FormalName Scheme="IptcTopicType">NewsItemType</FormalName>
+		<Description xml:lang="en">The nature of content that a NewsItem carries.</Description>
+	</Topic>
+	<Topic Duid="TopicTypes.NewsML.MimeType">
+		<TopicType FormalName="TopicType"/>
+		<FormalName Scheme="IptcTopicType">MimeType</FormalName>
+		<Description xml:lang="en">The formal label identifying the MIME-type of a ContentItem.</Description>
+	</Topic>
+	<Topic Duid="TopicTypes.NewsML.MediaType">
+		<TopicType FormalName="TopicType"/>
+		<FormalName Scheme="IptcTopicType">MediaType</FormalName>
+		<Description xml:lang="en">The media type of a ContentItem.</Description>
+	</Topic>
+	<Topic Duid="TopicTypes.NewsML.Format">
+		<TopicType FormalName="TopicType"/>
+		<FormalName Scheme="IptcTopicType">Format</FormalName>
+		<Description xml:lang="en">The format of a ContentItem.</Description>
+	</Topic>
+	<Topic Duid="TopicTypes.NewsML.Genre">
+		<TopicType FormalName="TopicType"/>
+		<FormalName Scheme="IptcTopicType">Genre</FormalName>
+		<Description xml:lang="en">The nature or characteristics of a NewsComponent, not specifically its content.</Description>
+	</Topic>
+	<Topic Duid="TopicTypes.NewsML.LabelType">
+		<TopicType FormalName="TopicType"/>
+		<FormalName Scheme="IptcTopicType">LabelType</FormalName>
+		<Description xml:lang="en">The type of label attached to a NewsItem.</Description>
+	</Topic>
+	<Topic Duid="TopicTypes.NewsML.MetadataType">
+		<TopicType FormalName="TopicType"/>
+		<FormalName Scheme="IptcTopicType">MetadataType</FormalName>
+		<Description xml:lang="en">An additional type of Metadata attched to a NewsItem.</Description>
+	</Topic>
+	<Topic Duid="TopicTypes.NewsML.NewsLineType">
+		<TopicType FormalName="TopicType"/>
+		<FormalName Scheme="IptcTopicType">NewsLineType</FormalName>
+		<Description xml:lang="en">An additional type of NewsLine attched to a NewsComponent.</Description>
+	</Topic>
+	<Topic Duid="TopicTypes.NewsML.Notation">
+		<TopicType FormalName="TopicType"/>
+		<FormalName Scheme="IptcTopicType">Notation</FormalName>
+		<Description xml:lang="en">The notation of a ContentItem.</Description>
+	</Topic>
+	<Topic Duid="TopicTypes.NewsML.Priority">
+		<TopicType FormalName="TopicType"/>
+		<FormalName Scheme="IptcTopicType">Priority</FormalName>
+		<Description xml:lang="en">The relative importance of a NewsItem for distribution.</Description>
+	</Topic>
+	<Topic Duid="TopicTypes.NewsML.Urgency">
+		<TopicType FormalName="TopicType"/>
+		<FormalName Scheme="IptcTopicType">Urgency</FormalName>
+		<Description xml:lang="en">The relative importance of a NewsItem for editorial examination.</Description>
+	</Topic>
+	<Topic Duid="TopicTypes.NewsML.Property">
+		<TopicType FormalName="TopicType"/>
+		<FormalName Scheme="IptcTopicType">Property</FormalName>
+		<Description xml:lang="en">A named characteristic of a NewsComponent, ContentItem or Topic, whose value may be a string, a Topic, some other piece of data, or a set of further Properties.</Description>
+	</Topic>
+	<Topic Duid="TopicTypes.NewsML.OfInterestTo">
+		<TopicType FormalName="TopicType"/>
+		<FormalName Scheme="IptcTopicType">OfInterestTo</FormalName>
+		<Description xml:lang="en">The target audience for a NewsItem, based for example on demographics, geography or other groupings.</Description>
+	</Topic>
+	<Topic Duid="TopicTypes.NewsML.Relevance">
+		<TopicType FormalName="TopicType"/>
+		<FormalName Scheme="IptcTopicType">Relevance</FormalName>
+		<Description xml:lang="en">The manner in which a NewsComponent is relevant to the target audience specified by the OfInterestTo element.</Description>
+	</Topic>
+	<Topic Duid="TopicTypes.NewsML.Confidence">
+		<TopicType FormalName="TopicType"/>
+		<FormalName Scheme="IptcTopicType">Confidence</FormalName>
+		<Description xml:lang="en">The degree of certainty that data assigned are correct.</Description>
+	</Topic>
+	<Topic Duid="TopicTypes.NewsML.HowPresent">
+		<TopicType FormalName="TopicType"/>
+		<FormalName Scheme="IptcTopicType">HowPresent</FormalName>
+		<Description xml:lang="en">The way in which a topic occurs in the content of a NewsItem.</Description>
+	</Topic>
+	<Topic Duid="TopicTypes.NewsML.Importance">
+		<TopicType FormalName="TopicType"/>
+		<FormalName Scheme="IptcTopicType">Importance</FormalName>
+		<Description xml:lang="en">Relative significance of the metadata applied to a NewsComponent.</Description>
+	</Topic>
+	<Topic Duid="TopicTypes.NewsML.Provider">
+		<TopicType FormalName="TopicType"/>
+		<FormalName Scheme="IptcTopicType">Provider</FormalName>
+		<Description xml:lang="en">A company, publication or service provider registered with IPTC and assigned a unique ID by IPTC.</Description>
+	</Topic>
+	<Topic Duid="TopicTypes.ISO.Country">
+		<TopicType FormalName="TopicType"/>
+		<FormalName Scheme="IptcTopicType">Country</FormalName>
+		<Description xml:lang="en">A country listed in the ISO standard for country codes.</Description>
+	</Topic>
+	<Topic Duid="TopicTypes.ISO.Currency">
+		<TopicType FormalName="TopicType"/>
+		<FormalName Scheme="IptcTopicType">Currency</FormalName>
+		<Description xml:lang="en">A currency listed in the ISO standard for currency codes.</Description>
+	</Topic>
+	<Topic Duid="TopicTypes.ISO.Language">
+		<TopicType FormalName="TopicType"/>
+		<FormalName Scheme="IptcTopicType">Language</FormalName>
+		<Description xml:lang="en">A language listed in the ISO standard for language codes.</Description>
+	</Topic>
+	<Topic Duid="TopicTypes.Company">
+		<TopicType FormalName="TopicType"/>
+		<FormalName Scheme="IptcTopicType">Company</FormalName>
+		<Description xml:lang="en">A trading company.</Description>
+	</Topic>
+	<Topic Duid="TopicTypes.Organization">
+		<TopicType FormalName="TopicType"/>
+		<FormalName Scheme="IptcTopicType">Organization</FormalName>
+		<Description xml:lang="en">A legally constituted organization.</Description>
+	</Topic>
+	<Topic Duid="TopicTypes.Person">
+		<TopicType FormalName="TopicType"/>
+		<FormalName Scheme="IptcTopicType">Person</FormalName>
+		<Description xml:lang="en">A human being.</Description>
+	</Topic>
+	<Topic Duid="TopicTypes.Town">
+		<TopicType FormalName="TopicType"/>
+		<FormalName Scheme="IptcTopicType">Town</FormalName>
+		<Description xml:lang="en">A village, town or city.</Description>
+	</Topic>
+	<Topic Duid="TopicTypes.Region">
+		<TopicType FormalName="TopicType"/>
+		<FormalName Scheme="IptcTopicType">Region</FormalName>
+		<Description xml:lang="en">A geographical area other than a country or a town.</Description>
+	</Topic>
+	<Topic Duid="TopicTypes.Location">
+		<TopicType FormalName="TopicType"/>
+		<FormalName Scheme="IptcTopicType">Location</FormalName>
+		<Description xml:lang="en">A specific geographical location within a country, region or town.</Description>
+	</Topic>
+	<Topic Duid="TopicTypes.Job">
+		<TopicType FormalName="TopicType"/>
+		<FormalName Scheme="IptcTopicType">Job</FormalName>
+		<Description xml:lang="en">A professional function performed by a person.</Description>
+	</Topic>
+	<Topic Duid="TopicTypes.Event">
+		<TopicType FormalName="TopicType"/>
+		<FormalName Scheme="IptcTopicType">Event</FormalName>
+		<Description xml:lang="en">A named occurrence, taking place at a specific time or over a period of time.</Description>
+	</Topic>
+	<Topic Duid="TopicTypes.Product">
+		<TopicType FormalName="TopicType"/>
+		<FormalName Scheme="IptcTopicType">Product</FormalName>
+		<Description xml:lang="en">A branded item of hardware, software or service.</Description>
+	</Topic>
+</TopicSet>

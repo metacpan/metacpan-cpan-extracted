@@ -1,0 +1,15 @@
+Build.PL
+MANIFEST
+Changes
+Makefile.PL
+META.yml
+lib/Sub/Compose.pm
+t/000_basic.t
+t/001_branches.t
+t/002_same_code.t
+t/003_no_return.t
+t/004_closures.t
+t/005_closures_that_modify.t
+t/006_context.t
+t/998_pod.t
+t/999_pod_coverage.t

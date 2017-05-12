@@ -1,0 +1,10 @@
+Revision history for Perl extension Stringify::Deep.
+
+0.02  Wed Jan 11 2012
+    - use a recursive approach to avoid inefficiencies where an object's
+    subobjects are collapsed one by one before the parent object is
+    stringified.
+
+0.01  Tue Jan 10 2012
+    - original version
+

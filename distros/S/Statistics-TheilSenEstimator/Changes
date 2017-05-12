@@ -1,0 +1,15 @@
+Revision history for Statistics-TheilSenEstimator
+
+0.06    2014-03-05/09:49
+        minor fixes
+
+0.05    2014-01-09/16:20
+        Updated dependencies in Makefile.PL
+
+0.04    20140108/07:07
+        Changed name from TheilSen to TheilSenEstimator, which is what
+        is actually registered!
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

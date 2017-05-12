@@ -1,0 +1,14 @@
+name: Spork-S5
+version: 0.05
+abstract: Write S5 slide with Spork syntax.
+author: Kang-min Liu <gugod@gugod.org>
+license: perl
+distribution_type: module
+build_requires:
+  Test::More: 0
+requires:
+  Spork: 0.20
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.37

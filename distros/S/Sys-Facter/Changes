@@ -1,0 +1,8 @@
+Revision history for Sys::Facter
+
+1.01    Sun Apr 13 21:41:37 CEST 2014
+        Maintenance update: change "name" field in META.yml
+
+1.00    Mon Sep 24 15:23:19 CEST 2012
+        Initial version.
+

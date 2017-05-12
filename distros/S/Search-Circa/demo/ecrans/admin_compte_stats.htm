@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><!-- #BeginTemplate "/Templates/circa.dwt" -->
+<head>
+<!-- #BeginEditable "doctitle" --> 
+<title>Simple interface d'administration de Circa</title>
+<!-- #EndEditable --> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<style type="text/css">
+<!--
+body {
+  font-family: sans-serif;
+  color: black;
+  background: white;
+  margin-left : 0;
+  margin-top : 0;
+}
+th, td { /* ns 4 */
+  font-family: sans-serif;
+}
+a {font: bold; color:Navy;} 
+h1 { text-align: center }
+h2, h3, h4, h5, h6 { text-align: left }
+h1, h2, h3 { color: #005A9C; }
+h1 { font: bold 100% }
+h2 { margin:1em; font: bold 95% }
+h3 { font: 90%  }
+h4 { font: bold 85% }
+h5 { font: italic 85%  }
+h6 { text-align: right }
+ul,p { font: 80%;}
+p { text-align:justify; margin:1em;}
+.p-liens {text-align:right;}
+TH {background :  #008080; color :  White;}
+TD {}
+.td-bord {background :  Navy; color :  White;}
+.small {font:70%; }
+.h2-sans-marge {margin:0; text-align:center;}
+.without-margin {margin:0,0,0,0;}
+-->
+</style>
+</head>
+
+<body bgcolor="#FFFFFF">
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr> 
+    <td width="8%" class="td-bord" align="left">&nbsp;</td>
+    <td width="22%"><img src="/circa/images/circa_logo1.gif" width="70" height="70"><img src="/circa/images/circa_logo2.gif" width="110" height="50">
+    </td>
+    <td width="62%"><!-- #BeginEditable "titre" -->
+      <h1>Administration de votre compte</h1>
+      <h2 class="h2-sans-marge">Statistiques</h2>
+      <!-- #EndEditable --></td>
+    <td width="8%" class="td-bord">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td width="8%" class="td-bord">&nbsp;</td>
+    <td colspan="2">&nbsp;</td>
+    <td width="8%" class="td-bord">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td width="8%" class="td-bord">&nbsp;</td>
+    <td colspan="2"><!-- #BeginEditable "corps" --> 
+      <? $sommaire ?>
+<h2>Statistiques</h2>
+      <p>Nombre de requ&ecirc;tes d&eacute;j&agrave; effectu&eacute;es : <? $nb_requetes ?></p>
+      <p>Nombre de requ&ecirc;tes par jour :<? $nb_request_per_day ?></p>
+      <p>10 mots les plus recherch&eacute;s :<? $mots_plus_recherche ?></p>
+      <p>10 mots les plus souvent trouv&eacute;s sur votre site :<? $mots_plus_frequent ?></p>
+      <!-- #EndEditable --></td>
+    <td width="8%" class="td-bord">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td width="8%" class="td-bord">&nbsp;</td>
+    <td colspan="2"><!-- #BeginEditable "bas_page" --><!-- #EndEditable --></td>
+    <td width="8%" class="td-bord">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td width="8%" class="td-bord">&nbsp;</td>
+    <td colspan="2"> 
+      <h6>&nbsp;</h6>
+      <h6> Powered by <a href="http://www.alianwebserver.com/circa" target="_blank">AlianWebServer</a> 
+      </h6>
+    </td>
+    <td width="8%" class="td-bord">&nbsp;</td>
+  </tr>
+</table>
+</body>
+<!-- #EndTemplate --></html>

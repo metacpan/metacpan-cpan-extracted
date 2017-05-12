@@ -1,0 +1,29 @@
+NAME
+    Search::Elasticsearch::Client::1_0 - Thin client with full support for
+    Elasticsearch 1.x APIs
+
+VERSION
+    version 5.02
+
+DESCRIPTION
+    The Search::Elasticsearch::Client::1_0 package provides a client
+    compatible with Elasticsearch 1.x. It should be used in conjunction with
+    Search::Elasticsearch as follows:
+
+        $e = Search::Elasticsearch->new(
+            client => "1_0::Direct"
+        );
+
+    See Search::Elasticsearch::Client::1_0::Direct for documentation about
+    how to use the client itself.
+
+AUTHOR
+    Clinton Gormley <drtech@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2017 by Elasticsearch BV.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

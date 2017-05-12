@@ -1,0 +1,49 @@
+SMS-Send-SMSGlobal-HTTP
+
+SMS::Send::SMSGlobal::HTTP is an SMS::Send driver that delivers messages
+via HTTP or HTTPS through the www.smsglobal.com/http-api.php gateway.
+
+You will need to create a trial  account at http://smsglobal.com before
+using this driver.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc SMS::Send::SMSGlobal::HTTP
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=SMS-Send-SMSGlobal-HTTP
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/SMS-Send-SMSGlobal-HTTP
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/SMS-Send-SMSGlobal-HTTP
+
+    Search CPAN
+        http://search.cpan.org/dist/SMS-Send-SMSGlobal-HTTP/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011-2012 David Warring
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

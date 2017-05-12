@@ -1,0 +1,60 @@
+Sys::Facter
+
+Collect information (facts) about the operating system.
+
+This module is a wrapper over Pfacter CPAN module, which in turns mimics
+behaviour of Facter Ruby tool
+(http://puppetlabs.com/puppet/related-projects/facter/)
+
+The idea is to have a set of modules that detect various things about the host
+operating system, but also to easily extend this set by new, possibly
+user-written, modules. This is achieved through defining an API for additional
+plugins.
+
+Pfacter already does this, but it's quite troublesome to use directly in your
+own scripts. Pfacter also lacks a POD documentation, so you would need to dig
+through its code to write your own plugin. Sys::Facter solves both of these,
+while preserving compatibility with Pfacter.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Sys::Facter
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Sys-Facter
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Sys-Facter
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Sys-Facter
+
+    Search CPAN
+        http://search.cpan.org/dist/Sys-Facter/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2012 Stanislaw Klekot
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

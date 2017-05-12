@@ -1,0 +1,28 @@
+0.08 2011-08-04
+  - use the updated Squatting API
+
+0.07 2009-09-11
+  - no change;  lightning talk assist
+
+0.06 2009-09-11
+  - no change; just helping miyagawa out w/ his YAPC::Asia 2009
+    lightning talk on App::CPAN::Fresh.
+
+0.05 2009-09-10
+  - made it so the colorful boxes form can't be submitted
+  - minor pod updates
+
+0.04 2009-09-08
+  - trying to sort out Module::Install madness.
+  - added a disgusting hack to make Tenjin cooperate.
+
+0.03 2009-09-08
+  - added a more compelling demo, I hope.
+    Try doing `stardust.pl --demo` and see if you like it.
+
+0.02 2009-09-02
+  - added inc directory to dist
+
+0.01 2009-08-27
+  - first release.
+

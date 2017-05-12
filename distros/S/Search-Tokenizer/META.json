@@ -1,0 +1,50 @@
+{
+   "abstract" : "Decompose a string into tokens (words)",
+   "author" : [
+      "Laurent Dami <lau......da..@justice.ge.ch>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Search-Tokenizer",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Text::Transliterator::Unaccent" : "0",
+            "Unicode::CaseFold" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Search::Tokenizer" : {
+         "file" : "lib/Search/Tokenizer.pm",
+         "version" : "1.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/damil/Search-Tokenizer"
+      }
+   },
+   "version" : "1.01"
+}

@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                Sort-External
+version:             0.18
+abstract:            Sort huge lists.
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.33
+distribution_type:   module
+requires:     
+    File::Temp:                    0.14
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Marvin Humphrey <marvin at rectangular dot com>

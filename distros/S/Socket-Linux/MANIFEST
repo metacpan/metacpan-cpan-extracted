@@ -1,0 +1,11 @@
+Changes
+lib/Socket/Linux.pm
+Linux.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+samples/keepalive.pl
+t/Socket-Linux.t
+t/pods.t
+META.yml                                 Module meta-data (added by MakeMaker)

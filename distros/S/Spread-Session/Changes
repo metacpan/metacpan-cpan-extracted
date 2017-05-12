@@ -1,0 +1,34 @@
+gRevision history for Perl extension Spread::Session
+
+0.4   13 Aug 2002
+
+	* t/: 01sendreceive.t, 02oneway.t, 03onewayevent.t: disable
+	logging, to avoid polluting 'make test' output
+
+	* Session.pm: Changed the callback function signature to take a
+	hashref containing all the spread message parameters.  Old callback
+	format still works but is deprecated and will be removed soon-ish.
+	
+	New-style callbacks must be specified in the constructor.
+	
+	Added default TIMEOUT override parameter to constructor.
+
+	* t/04sendrcvnewcbk.t: test case for new callback style
+
+	* 0-second timeout is not the same thing as undefined
+	* logging.xml and LOG_CHANNEL_CONFIG
+
+0.3   05 Apr 2002
+
+	* Makefile.PL, Session.pm: removed dependency on Log::Channel, but
+	use it if available.  Thanks Joshua Goodall joshua@roughtrade.net
+	* t/03onewayevent.t: converted to Test::More; skip if Event.pm not
+	installed
+
+0.2   24 Mar 2002
+	test cases
+	added simple examples
+	changed default admin handler output
+
+0.1   02 Feb 2002
+	- Initial version

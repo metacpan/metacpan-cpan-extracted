@@ -1,0 +1,21 @@
+
+ * get feedback from developers (that's YOU!) on what they need most
+
+Otherwise,
+
+ * bugs
+  ** doesn't handle non-SGML chars
+  ** RPM spec doesn't work with Perl 5.004 MakeMaker
+
+ * functionality
+  ** record ends are carriage returns
+  ** create test suite
+  ** options for features like comments, SData, etc. to build simpler
+     groves
+
+ * SP
+  ** no events for undefined entities in XML
+  ** not recognizing <.../> empty elements, nesting instead (use jade1_0?)
+
+ * projects
+  ** Unicode

@@ -1,0 +1,132 @@
+# This document is written in pod.  To read it without the funny
+# formatting use perldoc HACKING
+
+=head1 NAME
+
+HACKING - a quick guide to coding on Siesta
+
+=head1 DESCRIPTION
+
+So you want to contribute to Siesta?  Excellent, step this way.
+
+=head1 Getting Started
+
+The first things you'll want to do are to subscribe to our mailing
+lists, get a copy of the code from the subversion repository, read
+that code, and the rest of this document.
+
+=head2 Subscribe to the mailing lists.
+
+There are currently two lists dedicated to the development of Siesta.
+
+=over
+
+=item siesta-dev
+
+Where the coordination of the main development happens.
+
+=item siesta-commit
+
+Where commit messages go.  This is worth reading to see in what
+direction the code is moving.
+
+=back
+
+To subscribe to any of these send email to
+C<I<listname>-sub@siesta.unixbeard.net> and follow the instructions
+you get back.
+
+=head2 Get a copy of the latest sources
+
+ svn co https://siesta.unixbeard.net/svn/trunk/siesta
+
+If you can't deal with subversion yet (and we really recommend it),
+Nicholas Clark has come to the rescue with snapshot generation.  At
+4am and 4pm daily snapshots are generated here:
+
+ http://siesta.unixbeard.net/releases/snapshot/?C=M&O=D
+
+=head2 Read the sources
+
+XXX explain the structure of the code layout a little
+
+=head2 Read the rest of this document
+
+I know you're impatient to get going, but please follow through this
+through first.
+
+=head1 Important conventions
+
+These are only important because not keeping to them annoys richardc,
+and when that happens things tend to get defenestrated.  We like to
+keep that to a minimum.
+
+=head2 do TODO list items first
+
+XXX
+
+=head2 Code layout
+
+Since the dawn of time this argument has been running.  Thankfully
+these years of fighting have allowed a solution to evolve -
+L<perltidy.|http://perltidy.sf.net/>
+
+The mandated set of arguments to perltidy are encoded in the script
+C<bin/run_perltidy>, so now and again run
+
+ bin/run_perltidy
+
+And no-one gets hurt.
+
+Note: Actually sometimes we just ignore perltidy, it really loses the
+plot when we chain method calls, just be prepared to have your code
+remangled.
+
+=head2 Testing
+
+Tests will put hair on your chest and 20 years on your life, or maybe
+that was Ready-Brek.  Either way we have a test suite, and it is
+expected that your new contributions will bolster and not break any
+existing tests.
+
+ ./Build test
+
+Also it'd be nice if you can bear in mind test coverage.  We have a
+target that runs the testsuite using L<Devel::Cover>, so install that
+and periodically run:
+
+ ./Build cover
+
+=head2 patch format
+
+Unified diffs are preferred, unified diffs produced from the top of a
+working directory doubly so.  To produce these simply run this command
+in the top level directory.
+
+  svn diff -u
+
+
+=head1 NEW, UNRELEASED MODULES (that aren't Siesta itself :)
+
+Being hip kids on the bleading edge we're using new modules, and
+sometimes finding bugs in them.  As much as is possible we'll update
+the Build.PL to track the latest working release from CPAN, but there
+are times when that's not quite new enough.
+
+These are the are the exceptions where you'll need to grab something
+from CVS (and/or urls of patches you should apply to the CPAN release)
+(version numbers are predicted fixed releases):
+
+None at current time
+
+=head1 AUTHOR
+
+Richard Clamp <richardc@unixbeard.net>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2002, 2003 Richard Clamp. All Rights Reserved.  This
+module is free software. It may be used, redistributed and/or modified
+under the same terms as Perl itself.
+
+=cut

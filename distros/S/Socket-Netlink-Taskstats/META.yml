@@ -1,0 +1,34 @@
+---
+abstract: "interface to Linux's C<Taskstats> generic\nnetlink socket protocol"
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  ExtUtils::CChecker: 0.02
+  ExtUtils::H2PM: 0.06
+  Module::Build: 0
+  Module::Build::Compat: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::CChecker: 0.02
+  Module::Build: 0
+  Module::Build::Compat: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Socket-Netlink-Taskstats
+provides:
+  IO::Socket::Netlink::Taskstats:
+    file: lib/IO/Socket/Netlink/Taskstats.pm
+    version: 0.03
+  Socket::Netlink::Taskstats:
+    file: lib/Socket/Netlink/Taskstats.pm
+    version: 0.03
+requires:
+  Exporter: 5.57
+  Socket::Netlink: 0.04
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.03

@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Spreadsheet-ParseExcel-Simple
+version:      1.04
+version_from: lib/Spreadsheet/ParseExcel/Simple.pm
+installdirs:  site
+requires:
+    Spreadsheet::ParseExcel:       0.18
+    Test::More:                    0.01
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.21

@@ -1,0 +1,13 @@
+\.bak$
+~$
+Makefile$
+^\.git
+^blib/
+^debian/
+-stamp$
+perltidy.pl
+\.perltidyrc
+\.tar
+pm_to_blib
+SRS-EPP-Proxy-
+\.(old|orig|rej)$

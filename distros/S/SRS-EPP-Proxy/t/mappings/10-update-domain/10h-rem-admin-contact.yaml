@@ -1,0 +1,32 @@
+# Update domain, remove admin contact
+template: update-domain.tt
+
+vars:
+  domain: updatable.co.te
+  admin_old: registrant-001
+
+input_assertions:
+  class: SRS::EPP::Command::Update::Domain
+
+SRS:
+  - assertions:
+      count:
+      match:
+        - [ '//DomainNameFilter', 'updatable.co.te', 'Check for the domain name' ]
+      match_all:
+      attr_is:
+        - [ '//FieldList', 'AdminContact', '1', 'Admin contact requested in DDQ field list' ]
+  - assertions:
+      count:
+      match:
+        - [ '//DomainNameFilter', 'updatable.co.te', 'Check for the domain name' ]
+      match_all:
+      attr_is:
+        - [ '//AdminContact', 'HandleId', ~, 'Check for the admin contact' ]
+
+
+output_assertions:
+  count:
+    - [ '//epp:result', 1, 'Check for one result' ]
+  attr_is:
+    - [ '//epp:result', 'code', 1000, 'Check for correct result code' ]

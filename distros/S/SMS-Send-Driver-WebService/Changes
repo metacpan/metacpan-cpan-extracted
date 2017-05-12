@@ -1,0 +1,13 @@
+Revision history for Perl module SMS::Send::Driver::Webservice
+
+0.04 2016-01-09
+  - Dropped author tests from distribution
+
+0.03 2015-12-02
+  - Updated test to pass on Win32 and other Unix-like systems
+
+0.02 2015-11-29
+  - Updated Documentation and examples
+
+0.01 2015-10-20
+  - original version; forked from SMS::Send::TextPower

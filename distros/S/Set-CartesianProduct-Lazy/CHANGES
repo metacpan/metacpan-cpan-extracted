@@ -1,0 +1,91 @@
+==================================================
+Changes from 2011-06-10 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.002 at 2012-06-09 14:53:14 +0000
+------------------------------------------
+
+  Change: 2b103abf0f29df81d811be64d1001a6dbffc796f
+  Author: Stephen R. Scaffidi <stephen@scaffidi.net>
+  Date : 2012-06-09 10:53:09 +0000
+
+    new release 
+
+  Change: ae0f6af37da3b9d079be65d6ee7dae51b56e5578
+  Author: Stephen R. Scaffidi <stephen@scaffidi.net>
+  Date : 2012-06-09 10:52:12 +0000
+
+    new release 
+
+  Change: 0fbb0342125899def5d640f9c0290825a3de9a0f
+  Author: Stephen R. Scaffidi <stephen@scaffidi.net>
+  Date : 2012-06-09 07:34:59 +0000
+
+    Merge pull request #1 from helluin912/master
+
+    Tests for Set-CartesianProduct-Lazy 
+
+  Change: 5108abe5ffbbd8e9879ea65ff10b71aac5161f20
+  Author: Erin Moy <erinamoy@gmail.com>
+  Date : 2012-06-07 21:50:47 +0000
+
+    tests for Set::CartesianProduct::Lazy 
+
+  Change: e2a0992a12da0ca00c581e75c91d70afa1d3c34e
+  Author: Erin Moy <erinamoy@gmail.com>
+  Date : 2012-06-07 21:19:56 +0000
+
+    tests for Set::CartesianProduct::Lazy 
+
+  Change: 1c776982958eb6e05c5bb5c1635b43ae313adb23
+  Author: Stephen R. Scaffidi <sscaffid@akamai.com>
+  Date : 2012-04-03 13:22:05 +0000
+
+    added arg check to get method 
+
+  Change: ab3882b23d529e84f8f9bb232515a01eeec45f0c
+  Author: Stephen R. Scaffidi <sscaffid@akamai.com>
+  Date : 2012-04-03 09:46:24 +0000
+
+    updated readme 
+
+  Change: 8861409d2b5a4ebff8bc9ac482bfcf84f7fe97c5
+  Author: Stephen R. Scaffidi <sscaffid@akamai.com>
+  Date : 2012-04-03 09:45:25 +0000
+
+    finally filled out the generation sub 
+
+  Change: 0f6d1a331cff23e957930663004e633e7a906c69
+  Author: Stephen R. Scaffidi <sscaffid@akamai.com>
+  Date : 2012-03-31 15:19:52 +0000
+
+    little tweaks to the docs 
+
+  Change: 32b367309c6cf9b2d7204f6d79cb064eb26acaf8
+  Author: Stephen R. Scaffidi <sscaffid@akamai.com>
+  Date : 2012-03-31 09:18:44 +0000
+
+    readme for github 
+
+  Change: 6c306452150a658f7a3717dc29b1950a1df7b966
+  Author: Stephen R. Scaffidi <sscaffid@akamai.com>
+  Date : 2012-03-31 09:16:28 +0000
+
+    renamed to Cartesian product 'cause that's more better 
+
+  Change: a44b7ba1fb0d44b3c76d6f37fc186075c5ba2dcb
+  Author: Stephen R. Scaffidi <sscaffid@akamai.com>
+  Date : 2012-03-30 17:54:17 +0000
+
+    started to fill out Lazy.pm 
+
+  Change: b0dac65c1c5ad378aa9cbab5c9a342163a54322e
+  Author: Stephen R. Scaffidi <sscaffid@akamai.com>
+  Date : 2012-03-30 16:03:07 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

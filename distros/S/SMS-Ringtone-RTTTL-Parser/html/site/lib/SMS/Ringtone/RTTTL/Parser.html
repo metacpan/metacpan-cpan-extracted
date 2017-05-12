@@ -1,0 +1,284 @@
+<HTML>
+<HEAD>
+<TITLE>SMS::Ringtone::RTTTL::Parser - parse and validate RTTTL strings.</TITLE>
+<LINK REL="stylesheet" HREF="../../../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;SMS::Ringtone::RTTTL::Parser - parse and validate RTTTL strings.</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#class methods">CLASS METHODS</A></LI>
+	<LI><A HREF="#object methods">OBJECT METHODS</A></LI>
+	<LI><A HREF="#functions">FUNCTIONS</A></LI>
+	<LI><A HREF="#history">HISTORY</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#acknowledgments">ACKNOWLEDGMENTS</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>SMS::Ringtone::RTTTL::Parser - parse and validate RTTTL strings.</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ use SMS::Ringtone::RTTTL::Parser;</PRE>
+<PRE>
+ my $rtttl = 'Flntstn:d=4,o=5,b=200:g#,c#,8p,c#6,8a#,g#,c#,' .
+             '8p,g#,8f#,8f,8f,8f#,8g#,c#,d#,2f,2p,g#,c#,8p,' .
+             'c#6,8a#,g#,c#,8p,g#,8f#,8f,8f,8f#,8g#,c#,d#,2c#';</PRE>
+<PRE>
+ my $r = new SMS::Ringtone::RTTTL::Parser($rtttl);
+ ....or....
+ my $r = new SMS::Ringtone::RTTTL::Parser($rtttl,{'STRICT_NOTE_PART_ORDER' =&gt; 0});</PRE>
+<PRE>
+ # Check for errors
+ if ($r-&gt;has_errors()) {
+  print &quot;The following RTTTL errors were found:\n&quot;;
+  foreach (@{$r-&gt;get_errors()}) {
+   print &quot;$_\n&quot;;
+  }
+  exit;
+ }</PRE>
+<PRE>
+ # Dump parse results to STDOUT
+ $r-&gt;puke();</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>SMS::Ringtone::RTTTL::Parser is a RTTTL string parser and validator.
+See <A HREF="http://members.tripod.lycos.nl/jupp/linux/soft/rtttl_player/EBNF.txt">http://members.tripod.lycos.nl/jupp/linux/soft/rtttl_player/EBNF.txt</A> for
+RTTTL syntax in BNF.</P>
+<P>
+<HR>
+<H1><A NAME="class methods">CLASS METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new">new ($rtttl_string,$hash_ref_of_options)</A></STRONG><BR>
+<DD>
+Returns a new SMS::Ringtone::RTTTL::Parser object. The 1st parameter
+passed must be a a RTTTL string. The RTTTL string is parsed and validated
+by this constructor. The second parameter is optional and must be a hash
+ref. The only currently supported option is STRICT_NOTE_PART_ORDER of
+which the default value is true (1). Setting this option to false (0), will
+allow RTTTL::Parser to accept RTTTL strings in which the notes have a
+format of ``&lt;note&gt; := [&lt;duration&gt;] &lt;note&gt; [&lt;special-duration&gt;] [&lt;scale&gt;] &lt;delimiter&gt;''
+instead of ``&lt;note&gt; := [&lt;duration&gt;] &lt;note&gt; [&lt;scale&gt;] [&lt;special-duration&gt;] &lt;delimiter&gt;''.
+This option was added because some RTTTL generators don't follow the
+smart messaging specifications strictly.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="object methods">OBJECT METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_get_bpm"><CODE>get_bpm()</CODE></A></STRONG><BR>
+<DD>
+Returns the effective BPM setting.
+<P></P>
+<DT><STRONG><A NAME="item_get_part_defaults"><CODE>get_part_defaults()</CODE></A></STRONG><BR>
+<DD>
+Returns defaults part of RTTTL string.
+<P></P>
+<DT><STRONG><A NAME="item_get_part_name"><CODE>get_part_name()</CODE></A></STRONG><BR>
+<DD>
+Returns name part of RTTTL string.
+<P></P>
+<DT><STRONG><A NAME="item_get_part_notes"><CODE>get_part_notes()</CODE></A></STRONG><BR>
+<DD>
+Returns notes part of RTTTL string.
+<P></P>
+<DT><STRONG><A NAME="item_get_errors"><CODE>get_errors()</CODE></A></STRONG><BR>
+<DD>
+Returns (a reference to) an array of parse errors. See <A HREF="#item_has_errors"><CODE>has_errors</CODE></A>.
+<P></P>
+<DT><STRONG><A NAME="item_get_note_count"><CODE>get_note_count()</CODE></A></STRONG><BR>
+<DD>
+Returns number of notes in RTTTL string.
+<P></P>
+<DT><STRONG><A NAME="item_get_notes"><CODE>get_notes()</CODE></A></STRONG><BR>
+<DD>
+Returns (a reference to) an array of array references, each containing the 4
+elements: duration, note, octave, dots.
+<PRE>
+ duration is the effective note duration.
+ note is the note letter and optional sharp symbol (examples: F# C B P G#).
+ octave is the effective octave.
+ dots is the number of dots.</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_get_repeat"><CODE>get_repeat()</CODE></A></STRONG><BR>
+<DD>
+Returns the effective repeat length setting.
+<P></P>
+<DT><STRONG><A NAME="item_get_rtttl"><CODE>get_rtttl()</CODE></A></STRONG><BR>
+<DD>
+Recontructs and returns an optimized version of the RTTTL string.
+<P></P>
+<DT><STRONG><A NAME="item_get_style"><CODE>get_style()</CODE></A></STRONG><BR>
+<DD>
+Returns the effective style setting.
+<P></P>
+<DT><STRONG><A NAME="item_get_volume"><CODE>get_volume()</CODE></A></STRONG><BR>
+<DD>
+Returns the effective volume setting.
+<P></P>
+<DT><STRONG><A NAME="item_get_warnings"><CODE>get_warnings()</CODE></A></STRONG><BR>
+<DD>
+Returns (a reference to) an array of parse warnings. See <A HREF="#item_has_warnings"><CODE>has_warnings</CODE></A>.
+<P></P>
+<DT><STRONG><A NAME="item_has_errors"><CODE>has_errors()</CODE></A></STRONG><BR>
+<DD>
+Returns 0 if no parsing errors occured, else the number of errors.
+See <A HREF="#item_get_errors"><CODE>get_errors</CODE></A>.
+<P></P>
+<DT><STRONG><A NAME="item_has_warnings"><CODE>has_warnings()</CODE></A></STRONG><BR>
+<DD>
+Returns 0 if no parsing warnings occured, else the number of warnings.
+Warnings occur whenever a RTTTL string does not strictly follow the RTTTL
+syntax specifications, but nevertheless is likely to be parseable by a SMS
+gateway or mobile phone. Warnings often occur due to incorrect BPM settings
+or name lengths that exceed 10 characters. See <A HREF="#item_get_warnings"><CODE>get_warnings</CODE></A>.
+<P></P>
+<DT><STRONG><A NAME="item_is_name_valid"><CODE>is_name_valid()</CODE></A></STRONG><BR>
+<DD>
+Indicates if name part of RTTTL string is valid.
+<P></P>
+<DT><STRONG><A NAME="item_is_defaults_valid"><CODE>is_defaults_valid()</CODE></A></STRONG><BR>
+<DD>
+Indicates if defaults part of RTTTL string is valid.
+<P></P>
+<DT><STRONG><A NAME="item_is_notes_valid"><CODE>is_notes_valid()</CODE></A></STRONG><BR>
+<DD>
+Indicates if notes part of RTTTL string is valid.
+<P></P>
+<DT><STRONG><A NAME="item_puke"><CODE>puke()</CODE></A></STRONG><BR>
+<DD>
+Dumps parse results to STDOUT. Useful for debugging.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="functions">FUNCTIONS</A></H1>
+<P>These are subroutines that aren't methods and don't affect anything (i.e.,
+don't have ``side effects'') -- they just take input and/or give output.</P>
+<DL>
+<DT><STRONG><A NAME="item_is_valid_bpm"><CODE>is_valid_bpm($bpm)</CODE></A></STRONG><BR>
+<DD>
+Returns a boolean indicating if the $bpm parameter is a valid RTTTL BPM value.
+<P></P>
+<DT><STRONG><A NAME="item_is_valid_duration"><CODE>is_valid_duration($dur)</CODE></A></STRONG><BR>
+<DD>
+Returns a boolean indicating if the $dur parameter is a valid RTTTL duration value.
+<P></P>
+<DT><STRONG><A NAME="item_is_valid_octave"><CODE>is_valid_octave($octave)</CODE></A></STRONG><BR>
+<DD>
+Returns a boolean indicating if the $octave parameter is a valid RTTTL octave value.
+<P></P>
+<DT><STRONG><A NAME="item_is_valid_repeat"><CODE>is_valid_repeat($len)</CODE></A></STRONG><BR>
+<DD>
+Returns a boolean indicating if the $len parameter is a valid RTTTL repeat length value.
+<P></P>
+<DT><STRONG><A NAME="item_is_valid_volume"><CODE>is_valid_volume($volume)</CODE></A></STRONG><BR>
+<DD>
+Returns a boolean indicating if the $volume parameter is a valid RTTTL volume value.
+<P></P>
+<DT><STRONG><A NAME="item_nearest_bpm"><CODE>nearest_bpm($bpm)</CODE></A></STRONG><BR>
+<DD>
+Returns the nearest valid RTTTL BPM setting to the parameter $bpm.
+<P></P>
+<DT><STRONG><A NAME="item_nearest_duration"><CODE>nearest_duration($dur)</CODE></A></STRONG><BR>
+<DD>
+Returns the nearest valid RTTTL duration setting to the parameter $dur.
+<P></P>
+<DT><STRONG><A NAME="item_nearest_octave"><CODE>nearest_octave($octave)</CODE></A></STRONG><BR>
+<DD>
+Returns the nearest valid RTTTL octave setting to the parameter $octave.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="history">HISTORY</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_Version_0%2E01_2001%2D11%2D03">Version 0.01  2001-11-03</A></STRONG><BR>
+<DD>
+Initial version.
+<P></P>
+<DT><STRONG><A NAME="item_Version_0%2E02_2001%2D11%2D05">Version 0.02  2001-11-05</A></STRONG><BR>
+<DD>
+Fixed minor bugs in error messages.
+<P></P>
+<DT><STRONG><A NAME="item_Version_0%2E03_2001%2D11%2D06">Version 0.03  2001-11-06</A></STRONG><BR>
+<DD>
+<A HREF="#item_get_rtttl"><CODE>get_rtttl()</CODE></A> now returns RTTTL with valid defaults part if original RTTTL
+defaults part contains invalid values. Name part is also limited to length
+of 20 characters.
+<P></P>
+<DT><STRONG><A NAME="item_Version_0%2E04_2001%2D12%2D26">Version 0.04  2001-12-26</A></STRONG><BR>
+<DD>
+Maximum name length is now 15 instead of 10. Larger lengths only create
+warnings and not errors.
+Added support for RTTTL 1.1.
+Added <A HREF="#item_get_repeat"><CODE>get_repeat()</CODE></A>, <A HREF="#item_get_style"><CODE>get_style()</CODE></A>, and <A HREF="#item_get_volume"><CODE>get_volume()</CODE></A> methods.
+Notes parsing follows specs more strictly.
+<A HREF="#item_get_rtttl"><CODE>get_rtttl()</CODE></A> now returns a reconstructed and optimized RTTTL string.
+<P></P>
+<DT><STRONG><A NAME="item_Version_0%2E05_2002%2D01%2D02">Version 0.05  2002-01-02</A></STRONG><BR>
+<DD>
+Fixed CRLF bug in test script.
+Warnings about whitespace in defaults section removed. Any whitespace
+found there or in notes section now results in an error.
+<P></P>
+<DT><STRONG><A NAME="item_Version_0%2E06_2002%2D03%2D21">Version 0.06  2002-03-21</A></STRONG><BR>
+<DD>
+Patched by Igor Ivoilov. Added support for <A HREF="#item_new"><CODE>new()</CODE></A> constructor option
+STRICT_NOTE_PART_ORDER because there are a lot of RTTTL generators that
+generate rtttl that doesn't strictly follow the specification but have a
+note form like:
+ &lt;note&gt; := [&lt;duration&gt;] &lt;note&gt; [&lt;special-duration&gt;] [&lt;scale&gt;] &lt;delimiter&gt;
+instead of:
+ &lt;note&gt; := [&lt;duration&gt;] &lt;note&gt; [&lt;scale&gt;] [&lt;special-duration&gt;] &lt;delimiter&gt;
+<P></P>
+<DT><STRONG><A NAME="item_Version_0%2E07_2002%2D08%2D01">Version 0.07  2002-08-01</A></STRONG><BR>
+<DD>
+Fixed <CODE>length($4)</CODE> check in <CODE>_parse_notes()</CODE> so that undefined values don't
+emmit warnings anymore.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<PRE>
+ Craig Manley   c.manley@skybound.nl</PRE>
+<P>
+<HR>
+<H1><A NAME="acknowledgments">ACKNOWLEDGMENTS</A></H1>
+<P>Thanks to the following for finding bugs and/or offering suggestions:</P>
+<PRE>
+ Igor Ivoilov   igor@francoudi.com</PRE>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright (C) 2001 Craig Manley &lt;<A HREF="mailto:c.manley@skybound.nl">c.manley@skybound.nl</A>&gt;.  All rights reserved.
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. There is NO warranty;
+not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;SMS::Ringtone::RTTTL::Parser - parse and validate RTTTL strings.</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

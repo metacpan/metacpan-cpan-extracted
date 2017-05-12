@@ -1,0 +1,10 @@
+Revision history for Perl extension Store::Opaque.
+
+0.03  Tue Nov  8 11:01:00 2011
+  - Add dependency on recentish Test::More.
+
+0.02  Tue Nov  8 07:52:00 2011
+  - Remove dependency on XS::Object::Magic.
+
+0.01  Sun Nov  6 13:41:52 2011
+  - original version

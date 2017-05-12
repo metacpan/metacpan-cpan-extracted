@@ -1,0 +1,285 @@
+=encoding utf8
+
+=head1 NAME
+
+report - 计算机仿真实验报告
+
+=head1 AUTHOR
+
+章亦春 E<lt>agentzh@gmail.comE<gt>
+
+计算机科学与通信工程学院 江苏大学
+
+=head1 VERSION
+
+   Maintainer: Agent Zhang <agentzh@gmail.com>
+   Date: 23 Dec 2006
+   Last Modified: 23 Dec 2006
+   Version: 0.01
+
+=head1 DESCRIPTION
+
+在这篇报告中，我将描述我为计算机仿真课程开发的超市服务台仿真
+系统。
+
+老师制定的该系统的要求如下：
+
+=over
+
+=item 排队规则
+
+先到先服务
+
+=item 要求
+
+建立仿真模型，确实系统的平均排队时间。顾客总选择最短的队列排队。
+
+=back
+
+我的系统实现了上述所有要求，并有以下亮点：
+
+=over
+
+=item *
+
+开发了一个通用目的的基于事件调度的仿真引擎库 Sim.
+
+关于 Sim 库的更多信息，请参阅 Sim 库中各个类的文档。
+
+=item *
+
+使用了我从前编写的 Tesla 系统（即通用目的数字逻辑电路仿真系统）对 Sim
+库进行了比较彻底的单元测试和综合测试。
+
+=item *
+
+使用我的 Sim 库作为仿真引擎，实现了 G/G/m 多服务台排队仿真类库 SuperMarket (SM)。
+而该类库自身只有 100 多行代码。
+
+G/G/m 意味着不仅是多服务台，且顾客到达间隔和服务时间都允许用户指定任意的随机分布
+函数或者固定取值。
+
+有关 SuperMarket 类库的更多细节，请参阅 SuperMarket 库中各个类的文档。
+
+=item *
+
+基于 SM 库，开发了 M/M/m 仿真程序。当 m 取 1 时，该程序亦实现了 M/M/1 排队模型。
+
+使用下面的动态网页对我的 M/M/1 系统的仿真行为进行简单评估：
+
+L<http://staff.um.edu.mt/jskl1/simweb/simmm1.html>
+
+当到达率为 1.0, 服务率为 2.0 时，理论上的统计结果如下：
+
+    Customers in system (Ls)     1
+    Customers in queue (Lq)      0.5
+    Time in system (Ws)          1
+    Time in queue (Wq)           0.5
+
+运行我的 M/M/1 仿真程序得到的典型结果如下：
+
+  $ script/MMm.pl --servers 1 --arrival-rate 1.0 --service-rate 2.0 --duration 10000 | script/stats.pl
+  <Server 0>
+    Customers in system: 1.02794950226181
+    Customers in queue: 0.53571203835544
+  Total
+    Customers in system: 1.02794950226181
+    Customers in queue: 0.53571203835544
+    Time in system: 1.03843772326681
+    Time in queue: 0.541177935504031
+    Service time: 0.497259787762777
+
+我们看到，统计结果与理论值非常接近。
+
+当到达率为 2.0, 服务率为 3.0 时，理论上的统计结果如下：
+
+    Customers in system (Ls)     1.9999999999999998
+    Customers in queue (Lq)      1.333333333333333
+    Time in system (Ws)          1
+    Time in queue (Wq)           0.6666666666666666
+
+运行我的 M/M/1 仿真程序得到的典型输出如下：
+
+  $ script/MMm.pl --servers 1 --arrival-rate 2.0 --service-rate 3.0 --duration 10000 | script/stats.pl
+  <Server 0>
+    Customers in system: 2.09386974690431
+    Customers in queue: 1.41764277489404
+  Total
+    Customers in system: 2.09386974690431
+    Customers in queue: 1.41764277489404
+    Time in system: 1.04126000641718
+    Time in queue: 0.704979250531617
+    Service time: 0.336280755885562
+
+同时，我使用下面的 Mathworks 公司的 Simlink 教程中关于 M/M/m 排队模型的仿真和理论
+结果对我的 M/M/m 系统的仿真行为进行了简单评估：
+
+L<http://www.mathworks.com/access/helpdesk/help/toolbox/simevents/ug/index.html?/access/helpdesk/help/toolbox/simevents/ug/bqhtldv.html&>
+
+该网页中的示例为 M/M/5, 到达率为 1/2, 服务率为 1/5. 理论上得到的顾客在系统中的平均滞留时间
+(Time in system) 为 5.26.
+
+运行我的 M/M/m 仿真程序得到的一次典型输出如下：
+
+  $ script/MMm.pl --servers 5 --arrival-rate 0.5 --service-rate 0.2 --duration 100000 | script/stats.pl
+  <Server 0>
+    Customers in system: 0.881863476971515
+    Customers in queue: 0.129042495647583
+  <Server 1>
+    Customers in system: 0.705254839874987
+    Customers in queue: 0.0706424768835602
+  <Server 2>
+    Customers in system: 0.547579115143208
+    Customers in queue: 0.0375359592039925
+  <Server 3>
+    Customers in system: 0.384430970742194
+    Customers in queue: 0.0203471250551609
+  <Server 4>
+    Customers in system: 0.238368972369843
+    Customers in queue: 0.00918000216203186
+  Total
+    Customers in system: 0.551499475020349
+    Customers in queue: 0.0533496117904658
+    Time in system: 5.55423698384582
+    Time in queue: 0.537193554133421
+    Service time: 5.01698932186263
+
+我们看到在 0 ~ 100000 的时间间隔内的统计结果为 5.55, 与 5.26 是很接近的。
+
+=item *
+
+在事件注册上使用了计算机科学中先进的 Continuation 技术。
+
+简要言之，便是使用Continuation 来实现每当一个顾客到来时，才“计划”下一个顾客的到
+来时刻的惰性行为。比如下面的代码片段：
+
+    my $server = new SM::Server(sub { rand(1) });
+    my $handle;
+    $handle = sub {
+        $server->join_queue(new SM::Client);
+        SM::Simulator->schedule(
+            SM::Simulator->now + rand(2) => $handle
+        );
+    };
+    SM::Simulator->schedule( rand(2) => $handle );
+    SM::Simulator->run(duration => 25.0);
+
+这儿的 rand(1) 产生服务时间，而 rand(2) 产生到达间隔。此处的 Continuation 是利用
+Perl 的闭包来实现的。注意 $handle 是如何递归地向仿真台注册 $handle 自身的。
+
+类似地，每当服务台开始服务下一个顾客的时候，才真正“计划”它服务完
+该顾客所需的时间。比如 SM::Server 类的 _serve_next 方法：
+
+    sub _serve_next {
+        my $self = shift;
+        my $queue = $self->_queue;
+        if ($self->busy and @$queue) {
+            my $client = shift @$queue;
+            $self->log("==> Client $client");
+        }
+        if (@$queue) {
+            $self->{busy} = 1;
+            $self->log("serves Client $queue->[0].");
+            my $service_time = $self->gen_service_time();
+            my $now = SM::Simulator->now;
+            SM::Simulator->schedule(
+                $now + $service_time,
+                =>
+                sub { $self->_serve_next }
+            );
+        } else {
+            $self->{busy} = 0;
+        }
+    }
+
+注意此处 _serve_next 是如何通过 schedule 方法递归地注册 _serve_next 自身的。值
+得指出的是，这们并非一般意义上的函数递归调用，因为 _serve_next 仅是内层 _serve_next
+调用的“注册者”，或者说“计划者”，而非“调用者(caller)”。
+
+Continuation 的好处在于无需人为地推动这个惰性的传播链条，而实现自动的控制权传递。
+这给仿真终止条件的确定带来极大的灵活性，同时也通过惰性行为显著地改善了仿真系统
+的空间和时间效率。
+
+=item *
+
+使用“去随机性”的方法来对仿真器的行为进行综合测试。
+
+虽然我们可以借助 M/M/1 和 M/M/m 排队模型的理论计算结果对我们的实际仿真结果进行某种
+意义上的“检验”，但是鉴于随机行为固有的不确定性，即便是大量实验的统计行为也无法达到
+与理论值的完全吻合。所以，为了测试仿真器自身的行为，必须去随机性，采用精确的顾客到达
+间隔和服务台服务时间，以便能对仿真结果进行精确地预期。
+
+=item *
+
+将仿真逻辑与仿真结果的统计分离
+
+对于一个仿真系统而言，仿真结果的统计可能是整个系统中最为复杂的部分。为了使仿真器的
+源代码保持整洁，同时方便分别对仿真器和统计量计算部件进行单元测试，我在 SM 项目中
+将二者的实现分离。
+
+我的同学何杉就曾问过我应该把与统计相关的变量放在仿真实体所对应的 C++ 类的外边，还
+是该放置在类的内部作为成员。我的回答是，既不放在类的里，也不放在类外，那就是根本不
+放在仿真程序中，而是单独地放在一个专门的统计程序中；由该统计程序来处理仿真程序产生
+的原始的仿真日志。
+
+基本的仿真器运行过程如下：首先运行仿真器（比如 MMm.pl，将仿真结果以基本的事件日志的形
+式输出到 stdout（或者重定向到管道和磁盘文件）。然后再将该输出作为输入喂给统计量计算程序
+（比如 stats.pl），计算出所需的均排队时间、平均队长等一系统统计量。
+
+=item *
+
+使用我开发的 CPAN 模块 C<UML::Class::Simple> 自动通过运行 SM 和 Sim 类库绘制出整个仿真系统
+的 UML 类图（经过缩略）：
+
+=begin html
+
+<center>
+    <img src="class.png" width="700">
+</center>
+
+=end html
+
+100% 尺寸的原图可以从下面的位置下载：
+
+L<http://svn.berlios.de/svnroot/repos/unisimu/Simulation/SuperMarket/doc/class.png>
+
+使用 XXX 开发的 CPAN 模块 C<UML::Sequence> 自动通过运行 G/G/m 仿真代码绘制出仿真系统的
+UML 序列图 (UML Sequence Diagram)：
+
+=begin html
+
+<center>
+    <img src="seq.png" height="1000">
+</center>
+
+=end html
+
+100% 尺寸的原图可以从下面的位置下载：
+
+L<http://svn.berlios.de/svnroot/repos/unisimu/Simulation/SuperMarket/doc/seq.png>
+
+=back
+
+=head1 如何获取源代码
+
+SM 库及相关脚本，如 MMm.pl 和 stats.pl，可以从我的 SVN 仓库得到：
+
+L<http://svn.berlios.de/svnroot/repos/unisimu/Simulation/SuperMarket>
+
+推荐使用像 TortoiseSVN 这样的 SVN 客户端进行下载。
+
+只外，SuperMarket 依赖我的 Sim 仿真库。目前它是我的数字电路仿真系统的一部分：
+
+L<http://svn.berlios.de/svnroot/repos/unisimu/Perl/Tesla>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2006 by Agent Zhang (章亦春). All rights reserved.
+
+This library is free software; you can redistribute it and/or modify it under the same
+terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Sim::Dispatcher>, L<Sim::Clock>, L<SM>, L<SM::Client>, L<SM::Server>,
+L<SM::Simulator>.

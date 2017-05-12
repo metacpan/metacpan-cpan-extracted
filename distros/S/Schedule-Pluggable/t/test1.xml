@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<Jobs>
+    <Job name='Job1' command='succeed.pl'>
+        <dependencies>second</dependencies>
+    </Job>
+    <Job name='Job2' command='fail.pl'>
+        <group>second</group>
+    </Job>
+</Jobs>
+

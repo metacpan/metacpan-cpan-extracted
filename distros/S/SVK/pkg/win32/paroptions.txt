@@ -1,0 +1,42 @@
+# ask for verboseness
+-vvv
+# don't build the .exe, stop at the par
+-o build/SVK.par 
+-B 
+-p
+# include the svk build library
+# NOTE: This is done on the pp command line
+#-I ../../blib/lib
+# add in the icon
+-i svk.ico
+# create a log
+-L pp.log
+# include some missed modules
+-M Log::Log4perl::Appender::Screen
+-M Encode::TW
+-M Encode::JP
+-M Encode::KR
+-M Encode::CN
+-M POSIX
+# exclude some not-needed dependencies
+-X ExtUtils::CBuilder
+-X LWP::Authen::Ntlm
+-X LWP::Protocol::GHTTP
+-X LWP::Protocol::mailto
+-X LWP::Protocol::https
+-X LWP::Protocol::https10
+-X Module::Build::Cookbook
+-X SVN::Mirror::VCP
+-X URI::urn::isbn
+-X Net::FTP
+-X CPAN
+-X Thread
+# The following actions are now done as a secondary option file to pp
+# See the builddist.bat file for details
+# do this to bring in the help pod's
+#-a "../../blib/lib/SVK/Help;lib/SVK/Help"
+# do this to bring in the I18N
+#-a "../../blib/lib/SVK/I18N;lib/SVK/I18N"
+# do this to fix the missing POSIX files
+#-a "../../../../perl/lib/auto/POSIX;lib/auto/POSIX"
+

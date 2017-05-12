@@ -1,0 +1,13 @@
+<SOFTPKG NAME="Statistics-Data" VERSION="0.11">
+    <ABSTRACT>Load, access, update one or more data lists for statistical analysis</ABSTRACT>
+    <AUTHOR>Roderick Garton &lt;rgarton@cpan.org&gt;</AUTHOR>
+    <IMPLEMENTATION>
+        <REQUIRE NAME="Scalar::Util" VERSION="1.41" />
+        <REQUIRE NAME="Number::Misc" VERSION="1.2" />
+        <REQUIRE NAME="Text::SimpleTable" VERSION="2.03" />
+        <REQUIRE NAME="Clone::" VERSION="0.38" />
+        <REQUIRE NAME="List::AllUtils" VERSION="0.09" />
+        <REQUIRE NAME="String::Util" VERSION="1.24" />
+        <CODEBASE HREF="PPM-Statistics-Data-0.11.tar.gz" />
+    </IMPLEMENTATION>
+</SOFTPKG>

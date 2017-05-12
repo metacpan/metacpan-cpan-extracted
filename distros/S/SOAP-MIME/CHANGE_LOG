@@ -1,0 +1,34 @@
+#
+# Change log for SOAP::MIME
+#
+
+SOAP-MIME-0.55-7 (16-April-2003)
+* Relaxed parsing of the start parameter located inside the
+  Content-type header.
+* Fixed bug around an overlooked unqualified package name.
+* Added CHANGE_LOG and INSTALL files to distro.
+
+SOAP-MIME-0.55-6 (18-March-2003)
+* Added support for server side attachment support. Where 
+  before only client side parsing was supported, this release 
+  allows users to return MIME::Entities along with SOAP::Data
+  element in their responses. SOAP::MIME will automagically 
+  serialize those parts into a properly mime formatted message.
+
+SOAP-MIME-0.55-5 (26-July-2002)
+* Reworked the parsing of the response to return an array
+  of MIME::Entity objects which enables to user to more fully
+  utilize the functionality contained within that module
+
+SOAP-MIME-0.55-4 (15-July-2002)
+* Ability to process attachments on the server side has not 
+  yet been tested.
+
+SOAP-MIME-0.55-3 (?)
+* Documentation updates.
+
+SOAP-MIME-0.55-2 (?)
+* Small bug fixes.
+
+SOAP-MIME-0.55-1 (12-June-2002)
+* Need to add ability to compose and send attachments.

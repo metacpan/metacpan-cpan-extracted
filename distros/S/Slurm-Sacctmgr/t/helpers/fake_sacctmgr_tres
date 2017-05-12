@@ -1,0 +1,380 @@
+#!/bin/sh
+#
+#Fake sacctmgr show tres results for testing
+
+#Only supports (Slurm 15.x.y) and later
+#USe env var FAKE_SLURM_VERSION to set this
+#Also accepts --version and format= arguments
+
+#Order of fields is now controllable via format option
+#Below is the default if no format given
+FORMAT_FIELDS="type name id"
+
+verbose_flag=
+
+print_version()
+{	version=$1
+	cat - <<EOF
+slurm $version
+EOF
+	exit 0
+}
+
+print_header()
+{
+    if [ "x$verbose_flag" = "xyes" ]; then
+	tmptext=
+	for fld in $FORMAT_FIELDS
+	do
+		case $fld in
+		    type)
+			tmptext="${tmptext}Type"
+			;;
+		    name)
+			tmptext="${tmptext}Name"
+			;;
+		    id)
+			tmptext="${tmptext}Id"
+			;;
+
+		#-----	ERROR
+		    *)
+			echo >&2 "Unrecognized field name $fld in format string, aborting"
+			exit 1;
+			;;
+		esac
+		tmptext="${tmptext}|"
+	done
+	echo $tmptext
+	#Print at most once
+	verbose_flag=
+    fi
+}
+
+
+print_tres()
+{	
+	#Clear values
+	tmp_type=
+	tmp_name=
+	tmp_id=
+
+
+	#Set values
+	while [ $# -gt 0 ]
+	do
+		key=$1
+		val=$1
+		shift
+		key=`echo $key | sed -e 's/=.*$//'`
+		val=`echo $val | sed -e 's/^[^=]*=//'`
+		#echo >&2 "$key = $val"
+
+		case $key in
+		    type)
+			tmp_type=$val
+			;;
+		    name)
+			tmp_name=$val
+			;;
+		    id)
+			tmp_id=$val
+			;;
+
+		#----	ERROR
+		    *)
+			echo >&2 "Unrecognized parm $key, aborting"
+			exit 1
+			;;
+		esac
+	done
+		    
+	#Print values
+	tmptext=
+	for fld in $FORMAT_FIELDS
+	do
+		case $fld in
+		    type)
+			tmptext="${tmptext}${tmp_type}"
+			;;
+		    name)
+			tmptext="${tmptext}${tmp_name}"
+			;;
+		    id)
+			tmptext="${tmptext}${tmp_id}"
+			;;
+
+		#----	ERROR
+		    *)
+			echo >&2 "Unrecognized field name $fld in format string, aborting"
+			exit 1;
+			;;
+		esac
+		tmptext="${tmptext}|"
+	done
+	echo $tmptext
+
+
+}
+
+print_cpu()
+{	print_header
+	print_tres type=cpu id=1
+}
+
+print_mem()
+{	print_header
+	print_tres type=mem id=2
+}
+
+print_energy()
+{	print_header
+	print_tres type=energy id=3
+}
+
+print_node()
+{	print_header
+	print_tres type=node id=4
+}
+
+print_gres_gpu()
+{	print_header
+	print_tres type=gres name=gpu id=5
+}
+
+print_gres_phi()
+{	print_header
+	print_tres type=gres name=phi id=6
+}
+
+
+print_all()
+{	print_header
+	print_cpu
+	print_mem
+	print_energy
+	print_node
+	print_gres_gpu
+	print_gres_phi
+}
+
+print_none()
+{	print_header
+}
+
+#Parse options
+type_flag=
+name_flag=
+id_flag=
+
+while [ $# -gt 0 ]
+do
+	arg=$1
+	shift
+
+	case $arg in
+	    --version)
+		#Print version and exit
+		if [ "x$FAKE_SLURM_VERSION" = "x" ]; then
+			print_version 14
+		else
+			print_version $FAKE_SLURM_VERSION
+		fi
+		exit 0
+		;;
+	    format=*)
+		#Set our format string
+		tmp=`echo $arg | sed -e 's/^format=//' -e "s/'//g" -e 's/"//g' -e 's/,/ /g'`
+		FORMAT_FIELDS=$tmp
+		;;
+	    type=*)
+		tmp=`echo $arg | sed -e 's/^type=//' -e "s/'//g" -e 's/"//g' `
+		type_flag=$tmp
+		;;
+	    name=*)
+		tmp=`echo $arg | sed -e 's/^name=//' -e "s/'//g" -e 's/"//g' `
+		name_flag=$tmp
+		;;
+	    id=* )
+		tmp=`echo $arg | sed -e 's/^id=//' -e "s/'//g" -e 's/"//g' `
+		id_flag=$tmp
+		;;
+	     -v|--verbose)
+		verbose_flag=yes
+		;;
+	esac
+done
+
+if [ "x${id_flag}" != "x" ]; then
+	#Specified an id
+	case $id_flag in
+	   1)
+		if [ "x${type_flag}" = "x" -o "x${type_flag}" = "cpu" ]; then
+			if [ "x$name_flag" = "x" ]; then
+				print_cpu
+			else
+				print_none
+			fi
+		else
+			print_none
+		fi
+		;;
+
+	   2)
+		if [ "x${type_flag}" = "x" -o "x${type_flag}" = "mem" ]; then
+			if [ "x$name_flag" = "x" ]; then
+				print_mem
+			else
+				print_none
+			fi
+		else
+			print_none
+		fi
+		;;
+
+	   3)
+		if [ "x${type_flag}" = "x" -o "x${type_flag}" = "energy" ]; then
+			if [ "x$name_flag" = "x" ]; then
+				print_energy
+			else
+				print_none
+			fi
+		else
+			print_none
+		fi
+		;;
+
+	   4)
+		if [ "x${type_flag}" = "x" -o "x${type_flag}" = "node" ]; then
+			if [ "x$name_flag" = "x" ]; then
+				print_node
+			else
+				print_none
+			fi
+		else
+			print_none
+		fi
+		;;
+
+	   5)
+		if [ "x${type_flag}" = "x" -o "x${type_flag}" = "gres" ]; then
+			if [ "x$name_flag" = "x" -o "x$name_flag" = "gpu" ]; then
+				print_gres_gpu
+			else
+				print_none
+			fi
+		else
+			print_none
+		fi
+		;;
+
+	   6)
+		if [ "x${type_flag}" = "x" -o "x${type_flag}" = "gres" ]; then
+			if [ "x$name_flag" = "x" -o "x$name_flag" = "phi" ]; then
+				print_gres_phi
+			else
+				print_none
+			fi
+		else
+			print_none
+		fi
+		;;
+
+	   *)
+		print_none
+		;;
+	esac
+
+elif [ "x${type_flag}" != "x" ]; then
+	#id NOT specified,m type specified, and maybe name
+	case $type_flag in
+	   cpu)
+		if [ "x${name_flag} != "x" ]; then
+			#Specified a name, print nothing
+			print_none
+		else
+			print_cpu
+		fi
+		;;
+
+	   mem)
+		if [ "x${name_flag} != "x" ]; then
+			#Specified a name, print nothing
+			print_none
+		else
+			print_mem
+		fi
+		;;
+
+	   energy)
+		if [ "x${name_flag} != "x" ]; then
+			#Specified a name, print nothing
+			print_none
+		else
+			print_energy
+		fi
+		;;
+
+	   node)
+		if [ "x${name_flag} != "x" ]; then
+			#Specified a name, print nothing
+			print_none
+		else
+			print_node
+		fi
+		;;
+
+	   gres)
+		if [ "x${name_flag}" != "x" ]; then
+			#Specified a name
+			case $name_flag in
+			   gpu)
+				if [ "x${id_flag}=x" -o "x${id_flag}=x5" ]; then
+					print_gres_gpu
+				else
+					#Specified invalid id
+					print_none
+				fi
+				;;
+			   phi)
+				if [ "x${id_flag}=x" -o "x${id_flag}=x6" ]; then
+					print_gres_phi
+				else
+					#Specified invalid id
+					print_none
+				fi
+				;;
+			   *)
+				print_none
+				;;
+			esac
+		else
+			print_gres_gpu
+			print_gres_phi
+		fi
+		;;
+
+
+	   *)
+		print_none
+		;;
+	esac
+
+elif [ "x${name_flag}" != "x" ]; then
+	#only name flag specified
+	case $name_flag in
+	   gpu)
+		print_gres_gpu
+		;;
+	   phi)
+		print_gres_phi
+		;;
+	   *)
+		print_none
+		;;
+	esac
+else
+	#Nothing specified, print everythinh
+	print_all
+fi
+

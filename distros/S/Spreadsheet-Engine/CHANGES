@@ -1,0 +1,271 @@
+
+Spreadsheet::Engine is a Modified Version of SocialCalc 1.1.0, which in
+turn started as modifications to the wikiCalc(R) program, version 1.0.
+
+wikiCalc 1.0 was written by Software Garden, Inc.
+
+Portions (c) Copyright 2007, 2008 Tony Bowden
+Portions (c) Copyright 2007 Socialtext, Inc.
+Portions (c) Copyright 2005, 2006, 2007 Software Garden, Inc.
+
+Numerous tests are adapted from the Open Formula specification.
+Copyright (c) 2006 OASIS 2006. All Rights Reserved.
+
+Changes from the Standard Version (SocialCalc 1.1.0) are detailed below.
+
+== v0.14 ==   (January 22, 2008)
+
+Summary: Better testing, more extraction
+
+ - Tests
+   -- Only do numeric comparisons if we want and *got* a number
+      (this silences warnings when we want a number but don't get one)
+   -- Add accurate tests for TODAY() and NOW() based on time 
+      (Open Formula spec can't do this)
+
+ - Functions
+   -- Extracted functions TODAY(), NOW()
+   -- Extract and simplify MATCH(), VLOOKUP(), HLOOKUP()
+
+== v0.13 ==   (January 21, 2008)
+
+Summary: Restructuring
+
+ - Functions
+   -- Moved base classes from Function/ to Fn/
+       Function/ is now just for packages that are spreadsheet functions
+       and Fn/ for helper classes (including base classes)
+   -- Extracted logical.pm baseclass
+   -- Extracted functions IF(), AND(), OR(), NOT(), EXACT(), CHOOSE(),
+      IRR()
+     -- Simplify EXACT() by pre-sorting operands by type
+     -- Simplify IF() into a trivial ternary
+   -- Rewrite depreciation functions
+   -- Extracted Fn/Approximator for Newton-Raphson approximations
+   -- Added temporary(?) top_of_stack method to base.pm
+   -- Removed ability for 'series' functions to return a listref
+
+== v0.12 ==   (January 19, 2008)
+
+Summary: Harmonise operand handling in Functions
+
+   -- Promote string arg handling to standard 'signature' method
+   -- Replace math arg handing with new signature approach
+   -- Allow functions to declare a maximum number of args
+   -- optype() doubles up a single argument if required
+   -- Miscellaneous tidying of other arg handling code
+   -- Corrected LEFT() and RIGHT() to take exactly 2 args 
+   -- Corrected investment functions to require at least 3 args 
+
+ - Function/*.pm
+   -- next_operand_as_text now automatically upgrades to utf8
+   -- Extracted (and simplified) ROUND() function
+   -- Extracted LOG() function
+     -- Corrected LOG() to default to base 10 (was natural log)
+   -- math2.pm is now a subclass of math.pm
+   -- remove no longer necessary dates.pm 
+
+== v0.11 ==   (January 17, 2008)
+
+Summary: Value objects
+
+ - Created Value, Error, and Operand classes (and rewrite to use them)
+
+ - Function/*.pm
+   -- Extracted depreciation.pm and investment.pm baseclass
+   -- Extracted functions N(), T(), VALUE(), DDB(), SLN(), SYD(),
+      FV(), NPER(), PMT(), PV(), RATE(), NPV()
+
+ - Function/base.pm
+   -- Added optype() method (and rewrite other methods to use it)
+
+== v0.10 ==   (January 16, 2008)
+
+Summary: Pluggable date and time functions
+
+ - Function/*.pm
+   -- Extracted hms.pm, ymd.pm and dates.pm baseclasses
+   -- Extracted functions DAY(), MONTH(), YEAR(), WEEKDAY(), DATE(),
+      HOUR(), MINUTE(), SECOND(), TIME()
+   -- More refactoring of error handling (several functions now give
+      generic 'invalid arguments' errors rather than function specific 
+      errors)
+
+== v0.09 ==   (January 15, 2008)
+
+Summary: Further abstraction of functions
+
+ - Function/base.pm
+   -- Abstract execute() up and delegate to result() in subclasses
+   -- Add next_operand / next_operand_as_text/number
+     -- rewrite other classes to use these
+
+ - Function/*.pm
+   -- Extracted is.pm baseclass
+   -- Extracted functions ERRCELL(), FALSE(), ISBLANK(), ISERR(), 
+      ISERROR(), ISLOGICAL(), ISNA(), ISNONTEXT(), ISNUMBER(), ISTEXT(), 
+      NA(), PI(), TRUE()
+
+ - Functions.pm
+   -- simplify function delegation list
+
+ - Tests
+   -- add t/fn_args.t (and fix math/math2 argument checking)
+
+== v0.08 ==   (January 6, 2008)
+
+Summary: Pluggable math functions
+
+ - Function/*.pm
+   -- Extracted math.pm and math2.pm baseclasses
+   -- Extracted functions ABS(), ACOS(), ASIN(), ATAN(), COS(),
+      DEGREES(), EVEN(), EXP(), FACT(), INT(), LN(), LOG10(), ODD(),
+      RADIANS(), SIN(), SQRT(), TAN() 
+   -- Extracted functions ATAN2(), MOD(), POWER(), TRUNC()
+   -- Extracted functions FIND(), LEFT(), LEN(), MID(), PROPER(),
+      REPLACE(), REPT(), RIGHT(), SUBSTITUTE(), TRIM()
+   -- Allowed MID() to accept a zero length per OpenFormula spec
+
+ - Spreadsheet::Engine::Sheet
+   -- Removed straggling reference to obsolete definitions file
+
+ - Tests
+   -- POD coverage test now uses CountParents
+   -- removed t/stringfn2.t (obsoleted by OF tests)
+
+ - General
+   -- Style tweaking per perlcritic
+
+== v0.07 ==   (January 1, 2008)
+
+Summary: Open Formula test cases
+
+ - Tests
+   -- Set up t/data/openformula-testsuite.txt from Open Formula spec
+   -- Create t/lib/SheetTest.pm helper and rewrite tests to use it
+   -- Replace t/dsum.t with t/of-criteria.t
+   -- Add t/of-autonum.t, t/of-colrows.t, t/of-conversions.t,
+      t/of-count.t, t/of-database.t, t/of-datetime.t, t/of-errors.t,
+      t/of-financial.t, t/of-is.t, t/of-limits.t, t/of-logical.t,
+      t/of-lookup.t, t/of-math.t, t/of-names.t, t/of-numbers.t,
+      t/of-operators.t, t/of-params.t, t/of-references.t, t/of-rounding.t,
+      t/of-stats.t t/of-strings.t, t/of-value.t t/of-whitespace.t
+   -- Add test coverage summary as coverage.txt
+
+ - Spreadsheet::Engine::Sheet
+   -- Silence $fractionvalue warnings in format_number_with_format_string
+   -- Silence $oldrate warnings in interest_functions and irr_function
+   -- Silence $offsetvalue and $previousOK warnings in lookup_functions
+   -- Silence $rawvalue warnings in determine_value_type
+   -- Silence $tostype warnings in evaluate_parsed_formula
+
+ - Spreadsheet::Engine::Functions
+   -- Silence warnings from substr() when given weird paramaters
+
+== v0.06 ==   (December 23, 2007)
+
+Summary: Pluggable series functions 
+
+ - Function/*.pm
+   -- Extracted base.pm root baseclass
+   -- Extracted series.pm and counter.pm baseclasses
+   -- Extracted functions COUNT(), COUNTA(), COUNTBLANK()
+   -- Extracted functions SUM(), MIN(), MAX(), AVERAGE()
+   -- Extracted functions VAR(), VARP(), STDEV(), STDEVP()
+
+ - Tests
+   -- Add series.t
+
+== v0.05 ==   (December 18, 2007)
+
+Summary: Pluggable text functions 
+
+ - Spreadsheet::Engine::Functions
+   -- Document new way of adding UDFs
+
+ - Function/*.pm
+   -- Extracted text.pm baseclass
+   -- Extracted functions UPPER, LOWER, LEN
+
+ - Tests
+   -- Add stringfn2.t
+
+== v0.04 ==   (December 14, 2007)
+
+Summary: Fix cpantesters problems
+
+ - General
+   -- Set minimum perl version to be 5.7.3 (this is the first perl version
+      with suitable unicode support. In theory this could work with earlier
+      perl versions if sheet data was restricted to ascii. YMMV)
+
+ - Spreadsheet::Engine::Sheet
+   -- Fix hash slice syntax that no longer works in 5.10 (Slaven Rezik)
+
+ - Spreadsheet::Engine::Functions
+   -- use Encode::encode/decode rather than utf::encode/decode
+
+ - Tests
+   -- Rename formatting.t to fmt_date.t
+   -- Add fmt_num.t
+
+== v0.03 ==   (December 13, 2007)
+
+Summary: provide basic interface via Engine.pm
+
+ - Engine.pm
+   -- Add new(), exeute(), ecalc(), raw(), load_data()
+
+ - Spreadsheet::Engine::Storage::SocialCalc
+   -- Created from SocialCalc::DataFiles
+
+ - Tests
+   -- Rewrite tests to use new Engine interface
+   -- Add stringfns.t
+
+== v0.02 ==   (December 12, 2007)
+
+Summary: silence warnings exposed by test suite
+
+ - Sheet.pm
+   -- Rename special_chars() to html_escape()
+   -- Ensure values are initialised in format_number_with_format_string()
+   -- Silence warnings from format_value_for_display(),
+       step_through_range_down(), execute_sheet_command() 
+       parse_sheet_save()
+   -- Tidy parse_header_save(), recalc_sheet()
+   -- Shortcircuit empty commands in execute_sheet_command() 
+   -- Shortcircuit empty lines in parse_sheet_save()
+   -- Remove unnecessary use of Time::Local
+
+ - Functions.pm
+   -- Silence warnings from dseries_functions(), countif_sumif_functions()
+
+ - Tests
+   -- Add tests circular.t, cutpaste.t, dsum.t, header.t
+   -- Add SUMIF() test to commands.t
+
+== v0.01 ==   (December 11, 2007)
+
+Summary: Created from SocialCalc 1.1.0
+
+ - General
+   -- Renamed and rearranged files 
+   -- Reformatted code 
+   -- Turned comments into POD
+   -- Created all test files
+   -- Inlined all strings and formats from Strings.pm 
+      (i18n and l10n be damned, for now anyway)
+
+ - Functions.pm
+   -- Removed WKCHTTP() function
+   -- Renamed WKCERRCELL() to ERRCELL()
+   -- Renamed WKCHTML() to HTML()
+   -- Renamed WKCTEXT() to PLAINTEXT()
+   -- Made %Functions::function_list our() rather than my() for easier
+      extensibility
+
+ - Sheet.pm
+   -- Removed display functionality
+   -- Remove wikitext formatting
+   -- Remove ability to fetch related sheets over HTTP

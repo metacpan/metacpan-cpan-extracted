@@ -1,0 +1,29 @@
+Revision history for Syntax-Highlight-HTML
+
+0.04    2005.04.03
+        [TESTS] Corrected t/01api.t
+        [TESTS] Removed embedded Test::More
+        [DOC] Added direct RT link.
+
+0.03    2004.10.16
+        [BUGFIX] RT#7986 (Allen Day): <pre></pre> output even when disabled
+        [NEW] Minor code change in new().
+        [TESTS] Added t/distchk.t (Test::Distribution).
+        [DOC] Improved documentation. 
+
+0.02_03 2004.07.31
+        [DOC] Minor documentation update.
+
+0.02_02 2004.07.30
+        [TESTS] Added some tests in t/01basic.t
+
+0.02_01 2004.07.28
+        [DOC] Minor documentation update.
+
+0.02    2004.07.28
+        [DOC] Corrected some errors in the documentation.
+        [NEW] Added style for line numbers.
+
+0.01    2004.07.28
+        First version, released on an unsuspecting world.
+

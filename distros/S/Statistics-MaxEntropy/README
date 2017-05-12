@@ -1,0 +1,332 @@
+NAME
+    MaxEntropy - Perl5 module for Maximum Entropy Modeling and
+    Feature Induction
+
+SYNOPSIS
+      use Statistics::MaxEntropy;
+
+      # debugging messages; default 0
+      $Statistics::MaxEntropy::debug = 0;
+
+      # maximum number of iterations for IIS; default 100
+      $Statistics::MaxEntropy::NEWTON_max_it = 100;
+
+      # minimal distance between new and old x for Newton's method; 
+      # default 0.001
+      $Statistics::MaxEntropy::NEWTON_min = 0.001;
+
+      # maximum number of iterations for Newton's method; default 100
+      $Statistics::MaxEntropy::KL_max_it = 100;
+
+      # minimal distance between new and old x; default 0.001
+      $Statistics::MaxEntropy::KL_min = 0.001;
+
+      # the size of Monte Carlo samples; default 1000
+      $Statistics::MaxEntropy::SAMPLE_size = 1000;
+
+      # creation of a new event space from an events file
+      $events = Statistics::MaxEntropy::new($vectype, $file);
+
+      # Generalised Iterative Scaling, "corpus" means no sampling
+      $events->scale("corpus", "gis");
+
+      # Improved Iterative Scaling, "mc" means Monte Carlo sampling
+      $events->scale("mc", "iis");
+
+      # Feature Induction algorithm, also see Statistics::Candidates POD
+      $candidates = Statistics::Candidates->new($candidates_file);
+      $events->fi("iis", $candidates, $nr_to_add, "mc");
+
+      # writing new events, candidates, and parameters files
+      $events->write($some_other_file);
+      $events->write_parameters($file);
+      $events->write_parameters_with_names($file);
+
+      # dump/undump the event space to/from a file
+      $events->dump($file);
+      $events->undump($file);
+
+DESCRIPTION
+    This module is an implementation of the Generalised and Improved
+    Iterative Scaling (GIS, IIS) algorithms and the Feature
+    Induction (FI) algorithm as defined in (Darroch and Ratcliff
+    1972) and (Della Pietra et al. 1997). The purpose of the scaling
+    algorithms is to find the maximum entropy distribution given a
+    set of events and (optionally) an initial distribution. Also a
+    set of candidate features may be specified; then the FI
+    algorithm may be applied to find and add the candidate
+    feature(s) that give the largest `gain' in terms of Kullback
+    Leibler divergence when it is added to the current set of
+    features.
+
+    Events are specified in terms of a set of feature functions
+    (properties) f_1...f_k that map each event to {0,1} or to the
+    natural numbers: an event is a string of bits. In addition, the
+    frequency of each event is given. We assume the event space to
+    have a probability distribution that can be described by
+
+    p(x) = 1/Z e^{sum_i alpha_i f_i(x)}
+
+    If you have a Perl earlier than 5.005, then you need
+    `Data::Dumper' module by Gurusamy Sarathy. It can be obtained
+    from CPAN just like this module.
+
+  CONFIGURATION VARIABLES
+
+    `$Statistics::MaxEntropy::debug'
+        If set to `1', lots of debug information, and intermediate
+        results will be output. Default: `0'
+
+    `$Statistics::MaxEntropy::NEWTON_max_it'
+        Sets the maximum number of iterations in Newton's method.
+        Newton's method is applied to find the new parameters
+        \alpha_i of the features `f_i'. Default: `100'.
+
+    `$Statistics::MaxEntropy::NEWTON_min'
+        Sets the minimum difference between x' and x in Newton's
+        method (used for computing parameter updates in IIS); if
+        either the maximum number of iterations is reached or the
+        difference between x' and x is small enough, the iteration
+        is stopped. Default: `0.001'. Sometimes features have
+        Infinity or -Infinity as a solution; these features are
+        excluded from future iterations.
+
+    `$Statistics::MaxEntropy::KL_max_it'
+        Sets the maximum number of iterations applied in the IIS
+        algorithm. Default: `100'.
+
+    `$Statistics::MaxEntropy::KL_min'
+        Sets the minimum difference between KL divergences of two
+        distributions in the IIS algorithm; if either the maximum
+        number of iterations is reached or the difference between
+        the divergences is enough, the iteration is stopped.
+        Default: `0.001'.
+
+    `$Statistics::MaxEntropy::SAMPLE_size'
+        Determines the number of (unique) events a sample should
+        contain. Only makes sense if for sampling "mc" is selected
+        (see below). Its default is `1000'.
+
+  METHODS
+
+    `new'
+         $vectype = "binary"; # or "integer"
+         $events = Statistics::MaxEntropy::new($vectype, $events_file);
+
+        A new event space is created, and the events are read from
+        `$file'. The events file is not required. The syntax of
+        events files is described in the section on "FILE SYNTAX".
+        The `$vectype' parameter specifies how nonzero feature
+        values should be interpreted as binary values or not.
+
+    `write'
+         $events->write($file);
+
+        Writes the events to a file. Its syntax is described in the
+        section on "FILE SYNTAX".
+
+    `scale'
+         $events->scale($sample, $scaler);
+
+        If `$scaler' equals `"gis"', the Generalised Iterative
+        Scaling algorithm (Darroch and Ratcliff 1972) is applied on
+        the event space; `$scaler' equals `"iis"', the Improved
+        Iterative Scaling Algorithm (Della Pietra et al. 1997) is
+        used. If `$sample' is `"corpus"', there is no sampling done
+        to re-estimate the parameters (the events previously read
+        are considered a good sample); if it equals `"mc"' Monte
+        Carlo (Metropolis-Hastings) sampling is performed to obtain
+        a random sample; if `$sample' is `"enum"' the complete event
+        space is enumerated.
+
+    `fi'
+         fi($scaler, $candidates, $nr_to_add, $sampling);
+
+        Calls the Feature Induction algorithm. The parameter
+        `$nr_to_add' is for the number of candidates it should add.
+        If this number is greater than the number of candidates, all
+        candidates are added. Meaningfull values for `$scaler' are
+        `"gis"' and `"iis"'; default is `"gis"' (see previous item).
+        `$sampling' should be one of `"corpus"', `"mc"', `"enum"'.
+        `$candidates' should be in the `Statistics::Candidates'
+        class:
+
+         $candidates = Statistics::Candidates->new($file);
+
+        See the Statistics::Candidates manpage.
+
+    `write_parameters'
+         $events->write_parameters($file);
+
+    `write_parameters_with_names'
+         $events->write_parameters_with_names($file);
+
+    `dump'
+         $events->dump($file);
+
+        `$events' is written to `$file' using `Data::Dumper'.
+
+    `undump'
+         $events = Statistics::MaxEntropy->undump($file);
+
+        The contents of file `$file' is read and eval'ed into
+        `$events'.
+
+FILE SYNTAX
+    Lines that start with a `#' and empty lines are ignored.
+
+    Below we give the syntax of in and output files.
+
+  EVENTS FILE (input/output)
+
+    Syntax of the event file (`n' features, and `m' events); the
+    following holds for features:
+
+    *   each line is an event;
+
+    *   each column represents a feature function; the co-domain of a
+        feature function is N;
+
+    *   constant features (i.e. columns that are completely 0 or 1) are
+        forbidden;
+
+    *   2 or more events should be specified (this is in fact a
+        consequence of the previous requirement;
+
+    The frequency of each event precedes the feature columns.
+    Features are indexed from right to left. Each `f_ij' and each
+    `freq_i' is an integer:
+
+        name_1 <tab> name_2 ... name_n-1 <tab> name_n <cr>
+        freq_1 <white> f_11 <white> f12 ... f_1n-1 <white> f_1n <cr>
+          .                          .
+          .                          .
+          .                          .
+        freq_i <white> f_i1 <white> fi2 ... f_in-1 <white> f_in <cr>
+          .                          .
+          .                          .
+          .                          .
+        freq_m <white> f_m1 <white> fm2 ... f_mn-1 <white> f_mn
+
+    (`m' events, `n' features) The feature names are separated by
+    tabs, not white space. The line containing the feature names
+    will be split on tabs; this implies that (non-tab) white space
+    may be part of the feature names. The distinction between binary
+    and integer feature functions is a matter of interpretation. If
+    vector type `"binary"' is used, nonzero values are interpreted
+    as 1.
+
+  PARAMETERS FILE (input/output)
+
+    Syntax of the initial parameters file; one parameter per line:
+
+        par_1 <cr>
+         .
+         .
+         .
+        par_i <cr>
+         .
+         .
+         .
+        par_n
+
+    The syntax of the output distribution is the same. The
+    alternative procedure for saving parameters to a file
+    `write_parameters_with_names' writes files that have the
+    following syntax
+
+        n <cr>
+        name_1 <tab> par_1 <cr>
+         .
+         .
+         .
+        name_i <tab> par_i <cr>
+         .
+         .
+         .
+        name_n <tab> par_n <cr>
+        bitmask
+
+    where bitmask can be used to tell other programs what features
+    to use in computing probabilities. Features that were ignored
+    during scaling or because they are constant functions, receive a
+    `0' bit.
+
+  DUMP FILE (input/output)
+
+    A dump file contains the event space (which is a hash blessed
+    into class `Statistics::MaxEntropy') as a Perl expression that
+    can be evaluated with eval.
+
+BUGS
+    It's slow.
+
+SEE ALSO
+    the perl(1) manpage, the Statistics::Candidates manpage, the
+    Statistics::SparseVector manpage, the POSIX manpage, the Carp
+    manpage.
+
+DIAGNOSTICS
+    The module dies with an appropriate message if
+
+    *   it cannot open a specified events file;
+
+    *   if you specified a constant feature function (in the events file
+        or the candidates file);
+
+    *   If the events file, candidates file, or the parameters file is
+        not consistent. Possible causes are (a.o.):
+
+    *       insufficient or too many features for some event;
+
+    *       inconsistent candidate lines;
+
+    *       insufficient, or to many event lines in the candidates file.
+
+    *   it is tried to do feature induction with integer feature
+        functions.
+
+    The module captures `SIGQUIT' and `SIGINT'. On a `SIGINT'
+    (typically <CONTROL-C> it will dump the current event space(s)
+    and die. If a `SIGQUIT' (<CONTROL-BACKSLASH>) occurs it dumps
+    the current event space as soon as possible after the first
+    iteration it finishes.
+
+REFERENCES
+    (Abney 1997)
+        Steven P. Abney, Stochastic Attribute Value Grammar,
+        Computational Linguistics 23(4).
+
+    (Darroch and Ratcliff 1972)
+        J. Darroch and D. Ratcliff, Generalised Iterative Scaling
+        for log-linear models, Ann. Math. Statist., 43, 1470-1480,
+        1972.
+
+    (Jaynes 1983)
+        E.T. Jaynes, Papers on probability, statistics, and
+        statistical physics. Ed.: R.D. Rosenkrantz. Kluwer Academic
+        Publishers, 1983.
+
+    (Jaynes 1997)
+        E.T. Jaynes, Probability theory: the logic of science, 1997,
+        unpublished manuscript.
+        `URL:http://omega.math.albany.edu:8008/JaynesBook.html'
+
+    (Della Pietra et al. 1997)
+        Stephen Della Pietra, Vincent Della Pietra, and John
+        Lafferty, Inducing features of random fields, In:
+        Transactions Pattern Analysis and Machine Intelligence,
+        19(4), April 1997.
+
+VERSION
+    Version 1.0.
+
+AUTHOR
+Hugo WL ter Doest, terdoest@cs.utwente.nl
+
+COPYRIGHT
+    `Statistics::MaxEntropy' comes with ABSOLUTELY NO WARRANTY and
+    may be copied only under the terms of the GNU Library General
+    Public License (version 2, or later), which may be found in the
+    distribution.
+

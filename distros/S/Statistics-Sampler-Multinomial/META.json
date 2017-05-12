@@ -1,0 +1,67 @@
+{
+   "abstract" : "Generate multinomial samples using the conditional binomial method.",
+   "author" : [
+      "Shawn Laffan <shawnlaffan@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Statistics-Sampler-Multinomial",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "List::MoreUtils" : "0",
+            "List::Util" : "0",
+            "Math::Random::MT::Auto" : "0",
+            "Ref::Util" : "0",
+            "Scalar::Util" : "0",
+            "parent" : "0",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Devel::Symdump" : "0",
+            "Test::More" : "0",
+            "Test::Most" : "0",
+            "rlib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/shawnlaffan/perl-statistics-sampler-multinomial/issues/"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/shawnlaffan/perl-statistics-sampler-multinomial.git",
+         "web" : "https://github.com/shawnlaffan/perl-statistics-sampler-multinomial"
+      }
+   },
+   "version" : "0.7",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

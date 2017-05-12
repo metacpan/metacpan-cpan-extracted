@@ -1,0 +1,41 @@
+<div class="span12">
+    <h1>Articles</h1>
+</div>
+<div class="content article span9">
+    <div>
+    [% form %]
+    </div>
+</div>
+<div  class="thumbnail span3">
+    <img id="image_preview" src="/strehler/images/no-image.png" />
+</div>
+<script>
+    function manage_preview() { 
+           var image = $("#image_selector").val(); 
+           if(image)
+           {
+                var request = $.ajax({
+                    url: "/admin/image/src/"+image,
+                    dataType: 'text',
+                });
+                request.done(function(msg) {
+                    $('#image_preview').attr('src', msg);
+                });
+           }   
+           else
+           {
+                $('#image_preview').attr('src', '/strehler/images/no-image.png');
+           }
+    }
+    
+    $(document).ready(function() {
+        manage_preview();
+        $("#date_of_pub").datepicker({ format: "dd/mm/yyyy" });
+        $("#image_selector").on("change", manage_preview);
+        $("#last").on("click", get_last_chapter);
+        item_type = 'article';
+        category_commander();
+        tags_init([% id %]);
+    });
+</script>
+

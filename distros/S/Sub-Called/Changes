@@ -1,0 +1,19 @@
+Revision history for Sub::Called
+
+0.03    2008-07-23
+        + already_called and not_called provided by Curtis "Ovid" Poe
+        + more tests
+        + more documentation
+
+0.02    2008-07-22
+        - bugfixes: 
+            * when script do not use strict "with_ampersand" always returns 0
+            * with_ampersand checked always first subroutine call for each line. 
+              This is a bug as you can call more than one subroutine per line.
+              Thanks to "betterworld"
+        + more documentation
+        + added more tests
+
+0.01    2008-07-21
+        First release
+

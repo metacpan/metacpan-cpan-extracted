@@ -1,0 +1,31 @@
+Changes
+disableXS
+enableXS
+Makefile.PL
+MANIFEST		MANIFEST for No-XSUB
+MANIFEST.XS		MANIFEST for XSUB
+MapUTF.pm		.pm for No-XSUB
+MapUTF.pmX		.pm for XSUB
+MapUTF.pod		POD
+MapUTF/Japanese.pod
+MapUTF/Supplements.pm
+MapUTF.xsX		.xs for XSUB
+META.yml
+mkheader
+README
+scmuni.h
+t/t01simp.t
+t/t02null.t
+t/t03byte.t
+t/t04xncr.t
+t/t05surr.t
+t/t06hivu.t
+t/t07supl.t
+t/t08illeg.t
+t/t09illfb.t
+t/t10heavy.t
+t/t11grade.t
+t/t12trail.t
+t/t13gaiji.t
+t/t14undef.t
+t/t15fall.t

@@ -1,0 +1,17 @@
+COPYING
+ChangeLog
+MANIFEST
+Makefile.PL
+README
+doc/TODO
+lib/SVG/Metadata.pm
+scripts/cleanup_clipart
+scripts/package_clipart
+scripts/retrieve_clipart
+scripts/svg_annotate
+scripts/svg_validate
+scripts/test_it
+scripts/unpack_clipart
+t/0.use.t
+t/1.keywords.t
+META.yml                                 Module meta-data (added by MakeMaker)

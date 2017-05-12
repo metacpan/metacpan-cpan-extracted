@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//SoftQuad//DTD HTML 3.2 + extensions for HoTMetaL PRO 3.0(U) 19961211//EN"
+ "hmpro3.dtd">
+<HTML>
+<HEAD>
+<TITLE>Enhanced SQL Wildcards</TITLE></HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<DIV ALIGN="center">
+<H1>
+Enhanced SQL Wildcards</H1></DIV>
+<HR WIDTH="80%" SIZE="4" ALIGN="CENTER" NOSHADE="NOSHADE">
+<P>Enhanced SQL wildcards are characters that can substitute for one or
+more characters when searching a relational database.
+The wildcards are:</P>
+<UL>
+<LI>'<B>%</B>' -- a substitute for 0 or more characters (like '<B>*</B>' in
+DOS filenames);</LI>
+<LI>'<B>_</B>' -- a substitute for exactly one character (like '<B>?</B>' in
+DOS filenames);</LI>
+<LI>'<B>^</B>' -- when at the start of a search string, force the match to
+occur at the start of the strings being searched; and</LI>
+<LI>'<B>$</B>' -- at the end of the search string, force the match to end at
+the end of the strings being searched.</LI></UL>
+<P>Some examples:</P>
+<TABLE BORDER="BORDER">
+<TR>
+<TH>Search String</TH>
+<TH>Search Type</TH></TR>
+<TR>
+<TD VALIGN="TOP" NOWRAP="NOWRAP"><B>dms</B></TD>
+<TD>Documents with <B>dms</B> somewhere in their description</TD></TR>
+<TR>
+<TD VALIGN="TOP" NOWRAP="NOWRAP"><B>^dms</B></TD>
+<TD>Documents whose name starts with <B>dms</B></TD></TR>
+<TR>
+<TD VALIGN="TOP" NOWRAP="NOWRAP"><B>Guide$</B></TD>
+<TD>Documents whose description ends with <B>Guide</B></TD></TR>
+<TR>
+<TD VALIGN="TOP" NOWRAP="NOWRAP"><B>^dms%Guide$</B></TD>
+<TD>Documents whose description starts with <B>dms</B> and ends with <B>Guide</B></TD></TR>
+<TR>
+<TD VALIGN="TOP" NOWRAP="NOWRAP"><B>^PS_$</B></TD>
+<TD>3-letter document names that start with '<B>PS</B>' -- this will turn up '<B>PSD</B>',
+'<B>PS4</B>', '<B>PSx</B>', etc., but not '<B>PS</B>' (not enough characters
+to match) or '<B>PSD001</B>' (too many characters to match)</TD></TR>
+<TR>
+<TD VALIGN="TOP" NOWRAP="NOWRAP"><B>^C_PS$</B></TD>
+<TD>4-letter document names that start with '<B>C</B>' and end with '<B>PS</B>'</TD></TR>
+<TR>
+<TD VALIGN="TOP" NOWRAP="NOWRAP"><B>^PS_</B></TD>
+<TD>Documents that start with '<B>PS</B>' and have at least 3 letters-- this
+will turn up '<B>PSD</B>', '<B>PS4</B>', '<B>PSx</B>', etc., but not '<B>PS</B>'
+(not enough characters to match)</TD></TR>
+<TR>
+<TD VALIGN="TOP" NOWRAP="NOWRAP"><B>^C_PS</B></TD>
+<TD>4 or more letter document names that start with '<B>C</B>' and end with '<B>PS</B>'</TD></TR>
+<TR>
+<TD VALIGN="TOP" NOWRAP="NOWRAP"><B>dms%Guide</B></TD>
+<TD>Documents whose description has '<B>dms</B>' followed by '<B>Guide</B>'</TD></TR>
+<TR>
+<TD VALIGN="TOP"><B>\^%dms</B></TD>
+<TD>Documents containing a '<B>^</B>' followed later by <B>dms</B>
+(demonstrates how to turn off the special meaning of '<B>^</B>')</TD></TR>
+<TR>
+<TD VALIGN="TOP"><B>dms%\$</B></TD>
+<TD>Documents containing <B>dms</B>  followed later by a '<B>$</B>'
+(demonstrates how to turn off the special meaning of '<B>$</B>')</TD></TR></TABLE>
+<HR>
+<P><I>Last updated March 19, 2000.</I></P>
+</BODY></HTML>

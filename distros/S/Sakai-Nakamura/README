@@ -1,0 +1,46 @@
+Sakai-Nakamura version 0.13
+===========================
+
+Welcome to the Sakai Nakamura library for perl. This library sets out to make it
+simple to interact with the sakai nakamura web framework from a perl application,
+thus making it easier to harness the power of sakai and perl simultaneously!
+
+Sakai Nakamura is built upon Apache Sling. Apache Sling is a web framework that
+uses a Java Content Repository, such as Apache Jackrabbit, to store and manage
+content.
+
+Sakai OAE, built upon Sakai Nakamura, is an open-source platform that promotes
+collaboration and sharing between users and interoperability between systems.
+It embraces a new vision for academic collaboration informed by the needs of
+learners, teachers and researchers.
+
+Academic networking capabilities encourage people to connect and participate
+actively in communities that span beyond the traditional boundaries of
+classroom and institution. Powerful capabilities around content . creation,
+authoring, reuse, presentation, and commenting . permit mash-ups and remixable
+experiences of ideas, connectivity, dialog and media. Enhanced search
+capabilities aid discovery of people and content. A widget-based architecture
+simplifies both development and integration with external systems.
+
+See: http://sakaiproject.org for more information about Sakai.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Apache::Sling
+
+COPYRIGHT AND LICENCE
+
+COPYRIGHT: (c) 2012 Daniel David Parry <perl@ddp.me.uk>
+
+LICENSE: http://dev.perl.org/licenses/artistic.html

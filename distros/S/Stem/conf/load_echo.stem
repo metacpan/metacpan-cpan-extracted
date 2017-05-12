@@ -1,0 +1,15 @@
+[
+	class	=>	'Stem::Console',
+],
+[
+	class	=>	'Stem::Load::Driver',
+	name	=>	'driver',
+	args	=>	[
+		load_addr	=> 'echo',
+	],
+],
+[
+	class	=>	'Stem::Test::Echo',
+	name	=>	'echo',
+	args	=>	[],
+],

@@ -1,0 +1,51 @@
+#! /usr/bin/perl
+
+# $Id: tokeninf,v 1.5 1999/01/07 19:21:39 carrigad Exp $
+
+# Copyright (C), 1998, 1999 Enbridge Inc.
+
+use strict;
+use SecurID::ACEdb qw(:basic ListSerialByLogin ListTokenInfo);
+
+ApiInit() or die "Can't init ACE API: " . Result();
+
+my $username = shift;
+
+die "usage: $0 login\n" unless defined $username;
+
+my $serial= ListSerialByLogin($username);
+
+die "ListSerialByLogin failed: " . Result()
+  unless defined $serial;
+
+die "Could not locate token for user $username\n" unless @{$serial};
+
+my $token = $serial->[0];
+
+my $ti = ListTokenInfo($token)
+  or die "ListTokenInfo failed: " . Result();
+
+printf "Token Serial Number:  %s\n", $ti->{serialNum};
+printf "Lifespan of token:    %s %s - %s %s UCT\n", 
+  $ti->{dateBirth}, fmttod($ti->{todBirth}),
+  $ti->{dateDeath}, fmttod($ti->{todDeath});
+printf "PIN Changed:          %s %2d:%02d UCT\n",
+  $ti->{datePIN}, fmttod($ti->{todPIN});
+printf "Date enabled:         %s %s UCT\n",
+  $ti->{dateEnabled}, fmttod($ti->{todEnabled});
+printf "Last login:           %s %s UCT\n", 
+  $ti->{dateLastLogin}, fmttod($ti->{todLastLogin});
+printf "Counts last modified: %s %s UCT\n", 
+  $ti->{dateCountsLastModified}, fmttod($ti->{todCountsLastModified});
+printf "Bad token codes/PINs: %d / %d\n", map {$ti->{$_}} qw(badTokenCodes badPINs);
+printf "Enabled:              %s\n", $ti->{enabled}? "yes" : "no";
+printf "New PIN mode:         %s\n", $ti->{newPINMode}? "yes" : "no";
+printf "Next token mode:      %s\n", $ti->{nextTCodeStatus}? "yes" : "no";
+
+sub fmttod {
+  my $tod = shift;
+  my $hr = int($tod / 60 / 60);
+  my $min = int(($tod - $hr*60*60) / 60);
+  my $sec = $tod % 60;
+  sprintf("%2d:%02d", $hr,$min);
+}

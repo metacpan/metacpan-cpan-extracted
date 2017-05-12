@@ -1,0 +1,63 @@
+
+			 Stem Environment Notes
+
+The global hash %Stem::Vars::Env is used to store environment values for
+the local Hub. These values can be set in a variety of ways:
+
+	Shell environment variables of the form STEM_* are located and
+	the STEM_ prefix is removed and the rest of the name is lower
+	cased. This name is set to the value of the shell variable.
+
+	The command line of run_stem is parsed for name=value tokens. The
+	name/value pair is set in the Stem environment.
+
+	The Stem::TtyMsg module parses its input lines for name=value
+	lines (only if the line doesn't contain a leading Cell address).
+	White space is allowed around each part and surrounding white
+	space is stripped from the value. The name/value pair is set in
+	the local Stem environment.
+
+	The Stem::Vars Class Cell (aliased to 'var') can take a
+	'set_env' command message. The data field is parse for
+	name=value just like Stem::TtyMsg does. This can be used from
+	the terminal of any Hub running Stem::TtyMsg to set environment
+	variables in any Hub.
+
+The environment values are accessable in several ways:
+
+	A Stem module can import %Stem::Vars::Env via a use Stem::Vars
+	statement. The %Env hash can be directly used.
+
+	The Stem::Vars Class Cell supports a 'get_env' command message
+	which uses the data field and the environment variable name. It
+	returns its value via the normal command/response message
+	mechanism.
+
+	The Stem::Vars Class Cell supports a 'status' command message
+	which returns a printout of the entire Stem environment for this
+	Hub. It returns that via the normal command/response message
+	mechanism.
+
+Here are some of the places and ways Stem Environment variables are
+used:
+
+	An attribute description can specify an environment variable
+	name (via the 'env' option). If this environment variable is
+	found it will be used as a default value for this attribute
+	overriding the default option value if it was supplied
+	too. A passed in value will set the attribute regardless of the
+	environment.
+
+	Logical Logs use environment variables to test whether a Log
+	Entry is filtered. The value of the variable is compared to the
+	Entry severity level with any one of the normal numerical
+	boolean tests and it sets the filter flag accordingly.
+
+	The Debug/Trace subsystem uses environment variables in a way
+	similar to the Log subsystem. When a Debug routine is created,
+	an enviroment name can be set and its value is used as a boolean
+	to determine if this call to the Debug sub will happen.
+
+Stem environment values are (and will be) used in many places. If you
+use them in configurations or in code, be sure that the names used are
+unique.

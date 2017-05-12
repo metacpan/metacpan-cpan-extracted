@@ -1,0 +1,14 @@
+Build.PL
+Changes
+lib/Sys/Cmd.pm
+lib/Sys/Cmd/Template.pm
+MANIFEST			This list of files
+t/info.pl
+t/Sys/Cmd.t
+t/Sys/Cmd/Template.t
+TODO
+Makefile.PL
+README
+LICENSE
+META.yml
+META.json

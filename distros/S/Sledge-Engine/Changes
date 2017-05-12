@@ -1,0 +1,14 @@
+Revision history for Sledge-Engine
+
+0.04    2011-08-19
+        Sledge::Engine::Apache::MP13 return response OK
+
+0.03    2006-11-16
+        fixed mk_classdata confusion problems.
+
+0.02    2006-11-16
+        handle static files, porting from Sledge::Dispatcher.
+
+0.01    2006-11-01
+        First version, released on an unsuspecting world.
+

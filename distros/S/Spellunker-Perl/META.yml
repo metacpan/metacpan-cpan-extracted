@@ -1,0 +1,48 @@
+---
+abstract: 'Spelling checker for Perl script'
+author:
+  - 'tokuhirom <tokuhirom@gmail.com>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.7.5, CPAN::Meta::Converter version 2.132510'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Spellunker-Perl
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Spellunker::CLI::Perl:
+    file: lib/Spellunker/CLI/Perl.pm
+    version: v0.3.2
+  Spellunker::Perl:
+    file: lib/Spellunker/Perl.pm
+    version: v0.3.2
+requires:
+  Getopt::Long: 0
+  Mouse: 0
+  PPI: 0
+  Spellunker: 0
+  Term::ANSIColor: 0
+  perl: 5.010001
+resources:
+  bugtracker: https://github.com/tokuhirom/Spellunker-Perl/issues
+  homepage: https://github.com/tokuhirom/Spellunker-Perl
+  repository: git://github.com/tokuhirom/Spellunker-Perl.git
+version: v0.3.2
+x_contributors:
+  - 'Syohei YOSHIDA <syohex@gmail.com>'

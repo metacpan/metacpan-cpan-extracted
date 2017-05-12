@@ -1,0 +1,8 @@
+Revision history for Perl extension SDLx::Controller::Coro
+
+0.03 - 2010.10.05
+* Rename to SDLx::Controller::Coro
+
+0.01 - 2010.04.09
+* Initial version (get something released!)
+

@@ -1,0 +1,539 @@
+# vim: se tw=80 ts=4 et:
+
+=head1 NAME
+
+Script::Daemonizer - Daemonize; handle signals, logs, pidfile and locks.
+
+=head1 VERSION
+
+Version 1.01.01
+
+Interface changed from procedural to OO across 0.92-0.93 transition.
+
+
+=head1 SYNOPSIS
+
+    # Want a quickstart? Do this:
+
+    use Script::Daemonizer;
+    ...
+    Script::Daemonizer->new()->daemonize();
+
+
+=head1 DESCRIPTION
+
+This module turns your script into a UNIX daemon by requiring as little
+modification as possible, thus letting you concentrate on solving
+your problem, rather than on writing a daemon.
+
+This module also provides some facilities to manage logging, restarting (on
+SIGHUP by default) and preventing multiple instances to run at once (by locking
+a pidfile).
+
+Default and optional steps can be customized by passing arguments to new() (see
+L</ADVANCED USAGE> for details).
+
+
+daemonize() is the main routine of this module. What it does, out-of-the-box,
+is:
+
+=over 4
+
+=item 1.* it sets umask() to 0. You must then set explicitly file and
+directory permissions upon creating them, restore umask() after initialization,
+or specify I<umask> option (see L</ADVANCED USAGE> for details).
+
+=item 2.* it calls fork(), then the parent exits;
+
+=item 3.* it calls POSIX::setsid() (see L<POSIX::setsid()>), so the process becomes session leader;
+
+=item 4.* it calls fork() again, then the parent exits;
+
+=item 5.* it changes its working directory to "/";
+
+=item 6.* NO LONGER IMPLEMENTED (since 0.93.00) - closing file descriptors.
+It's practically impossible, so this step has been removed.
+
+=item 7.* it ties STDOUT and STDERR to Syslog using  C<Tie::Syslog> (if
+available, otherwise it reopens them on /dev/null) so that all output is
+logged to syslog (see L<Tie::Syslog>); open STDIN on /dev/null.
+
+=back
+
+Steps marked by * are configurable; some additional steps are also available if
+explicitly requested; see L</ADVANCED USAGE> for details.
+
+
+
+=head1 SUPPORTED PLATFORMS
+
+All UNIX and UNIX-like operating systems (or so should be). Please open a BUG
+if you find it's not so.
+
+
+
+=head1 ADVANCED USAGE
+
+I strive to make this module support "standard" daemon features
+out-of-the-box (for some definition of "standard"). Some of these features can
+be configured, and some other are enabled only if configured.
+
+=head2 ADVANCED SYNOPSYS
+
+Advanced configuration syntax is the following:
+
+    use Script::Daemonizer;
+
+    my $daemon = new Script::Daemonizer (
+        name            => "My wonderful new daemon",  # tag for logging
+        umask           => $my_umask,                  # set umask to $my_umask
+        working_dir     => "/var/ftp",                 # try to chdir here
+        drop_privileges => {                           # call drop_privileges()
+            uid  => $to_uid,
+            gid  => $to_gid,
+            # and others, see drop_privileges() method description
+        },
+        setsid          => 'SKIP',                     # skip POSIX::setsid() call
+        fork            => 2,                          # for # number of times (0, 1 or 2)
+        pidfile         => '/var/run/mydaemon.pid',    # write and lock this pidfile
+        output_file     => '/var/log/mydaemon.log',    # redirect stdout/stderr here
+        restart_on      => [ 'HUP', 'QUIT' ],          # restart on these signals
+    );
+
+    # To make stdout/stderr go to different places, use these:
+    my $daemon = new Script::Daemonizer (
+        ...
+        stdout_file     => '/log/mydaemon.log',
+        stderr_file     => '/log/mydaemon.err',
+    );
+
+
+    # if you did not specify drop_privileges in configuration, you can still
+    # do it afterwards:
+    $daemon->drop_privileges(
+        uid  => $to_uid,
+        gid  => $to_gid,
+    );
+
+    ###########################################################################
+
+    # IMPORT TAGS
+
+    # Will skip chdir(), unless you pass 'working_dir' to new()
+    use Script::Daemonizer qw(:NOCHDIR);
+
+    # Will skip umask(), unless you pass 'umask' to new()
+    use Script::Daemonizer qw(:NOUMASK);
+
+
+=head2 OPTIONAL ACTIONS
+
+Some options have no default and thus corresponding actions are skipped if not
+configured. These are:
+
+=over 4
+
+=item * Step 0.0 - privileges dropping
+
+It happens before anything else. This simply calls drop_privileges() internally.
+
+=item * Step 4.5 - pidfile creation (and locking)
+
+This implicitly provides a method to ensure that only one copy of your daemon
+is running at once, because pidfile is locked.
+
+=item * Handling of SIGHUP (and maybe other signals) as a restart() trigger
+
+See B<< restart_on >> parameter.
+
+=back
+
+
+=head2 IMPORT TAGS
+
+Starting from 0.93.4, you can suppress some default actions by importing
+Script::Daemonizer with the corresponding tag:
+
+=over 4
+
+=item :NOCHDIR - will skip the chdir to '/'
+
+=item :NOUMASK - will skip setting umask to 0
+
+=back
+
+
+=head1 METHODS
+
+=head2 new()
+
+Creates a new instance of a Script::Daemonizer object. If you just want to start
+with defaults, just call it with no args:
+
+    # A new daemon
+    my $daemon = Script::Daemonizer->new();
+
+To customize your daemon see L</ADVANCED USAGE>.
+
+
+=head2 daemonize()
+
+It runs through all the steps required to send your program to background as a
+daemon. Its behavior varies depending on options specified to L</new>.
+
+=head2 drop_privileges()
+
+    # Just drop effective user/group id:
+    $daemon->drop_privileges(
+        euid => $to_euid,
+        egid => $to_egid,
+        # or by name
+        euser  => $to_euser,
+        egroup => $to_egroup,
+    );
+
+    # Drop both effective and real ids:
+    $daemon->drop_privileges(
+        uid  => $to_uid,
+        gid  => $to_gid,
+        # or by name
+        user  => $to_user,
+        group => $to_group,
+    );
+
+Tries to drop privileges to given EUID/EGID or UID/GID (single (e)uid/(e)gid
+allowed). Since 1.00 also names are allowed.
+See L<perldoc perlvar> for details on IDs.
+
+daemonize() will automatically call drop_privileges() if configured to do so
+(guess what? See L</ADVANCED USAGE> for details) but this will happen
+B<before> anything else (think of this as step 0). If you need to drop
+privileges at a later moment, do not pass the C<< drop_privileges >> parameter
+to new() and use the drop_privileges() method, otherwise it's probably
+safer to do so while daemonize()-ing.
+
+=head2 restart()
+
+restart() is there to let you restart completely the daemon. A simple way to
+handle SIGHUP might be restarting, for example (see
+L<perlipc|http://perldoc.perl.org/perlipc.html#Handling-the-SIGHUP-Signal-in-Daemons>
+for details).
+
+    # Restart upon sighup - use a closure to call restart()
+    $SIG{HUP} = sub {
+        $daemon->restart;
+    };
+
+Please B<< NOTE >> that with the B<< restart_on >> parameter this setup is done
+automatically.
+
+B<pidfile> (see L</ADVANCED USAGE> for details) is kept open
+upon restart (if configured), but on some platforms (see L</Concerning locks>
+for details) the lock is not preserved, so a race condition may still happen.
+
+You can pass command line args to restart() to modify command line on-the-fly:
+
+    use Script::Daemonizer;
+    ...
+    unless( some_condition_on(@ARGV) ) {
+        # Do some mangling on @ARGV
+        ...
+        $daemon->restart(@my_modified_argv);
+    }
+
+The defaul is to use a copy of @ARGV taken at compile-time (before any
+command-line-parsing modifies @ARGV, for example).
+
+=head2 sigunmask()
+
+    $daemon->sigunmask( @signals );
+
+Strictly related to restart(), sigunmask() is there to let you unmask signals
+without pain. See L<http://docstore.mik.ua/orelly/perl4/cook/ch17_19.htm>
+for details on why you should unmask signals. In short: inside a signal handler
+the signal that triggered the handler is blocked. If inside a signal handler you
+re-exec() yourself, the new process inherits the blocked signal. That is why
+you'll want to unmask that signal after a new start.
+
+B<SGIHUP is unmasked by default>, just by saying C<use Script::Daemonizer>.
+
+If you use restart() with other signals, remember to unmask them:
+
+    # Restart on SIGHUP, SIGQUIT and SIGUSR1
+    for my $nal in (qw/HUP QUIT USR1/) {
+        $SIG{$nal} = sub {
+            $daemon->restart;
+        }
+    }
+
+    # Just in case we came from another instance of ourselves via an exec()
+    # (no need to bother for SIGHUP since we unmask it by default, anyway
+    # listing it here is harmless):
+
+    $daemon->sigunmask(qw{QUIT USR1});
+
+B<< or use C<< restart_on >> to handle this automatically>>.
+
+
+
+=head1 ADVANCED OPTIONS
+
+These are all parameter you can pass to new(). Advanced options are the
+following:
+
+
+=head2 B<name>
+
+Sets the name of the daemon. This is used for logging.
+
+I<default>: script name, got from $0, split on system path separator;
+
+=head2 B<fork>
+
+How many times do you want to fork?
+
+=over 4
+
+=item -) 0 - perform no fork()
+
+=item -) 1 - do it just once
+
+=item -) 2 - fork twice
+
+=item -) * any other value will result in a fork()-twice
+
+=back
+
+I<default>: fork() twice.
+
+
+=head2 B<output_file>
+
+Redirect both STDOUT and STDERR on the file specified (appending by default).
+'/dev/null' will be converted to File::Spec->devnull (see L<File::Spec>);
+Tie::Syslog will be skipped completely. E.g.:
+
+    output_file => '/dev/null',
+
+
+=head2 B<pidfile>
+
+This will try to:
+
+=over 4
+
+=item - open named pidfile, creating it if non-existent;
+
+=item - lock it (exclusively);
+
+=back
+
+If this operation fails, daemonize() will croak(). Otherwise, PID of the process
+will be written to the named pidfile after the last fork() is done.
+
+    Script::Daemonizer::daemonize(
+        name    => 'A new daemon',
+        pidfile => '/var/run/anewdaemon.pid',
+    );
+
+This lock mechanism provides the following advantages:
+
+=over 4
+
+=item * no other instances of the same daemon will overwrite the pidfile on
+purpose;
+
+=item * the pid file will serve as a lock file, ensuring no other instances of
+the same daemon will start;
+
+=item * an C<fuser> (see L<fuser(1)>) on the pidfile will reveal the daemon's pid. If
+the daemon is not running, the pidfile will not be in use by any process
+(hopefully). A simple:
+
+    $ fuser -k $PIDFILE
+
+will end up killing the daemon (or provides an easy way to signal the daemon).
+
+=back
+
+=head2 B<restart_on>
+
+This is a ArrayRef of signal names (without the SIG- prefix) that will
+trigger the restart() method automatically. Signal masking is handled, too, so
+you'll want to use this to handle restarts. E.g.:
+
+    restart_on => [ 'HUP', 'QUIT' ],    # trigger restart() on SIGHUP and SIGQUIT
+
+
+=head2 B<setsid>
+
+The only accepted value is I<SKIP>. Set this to skip setsid().
+
+
+=head2 B<stdout_file>
+
+Redirect STDOUT on the file specified (appending by default). '/dev/null' will
+be converted to File::Spec->devnull (see L<File::Spec>); Tie::Syslog will not be
+used for STDOUT.
+
+=head2 B<stderr_file>
+
+Redirect STDERR on the file specified (appending by default). '/dev/null' will
+be converted to File::Spec->devnull (see L<File::Spec>); Tie::Syslog will not be
+used for STDERR.
+
+=head2 B<umask>
+
+Set the specified umask.
+
+default: 0
+Setting umask can be suppressed using the C<< :NOUMASK >> import tag.
+
+=head2 B<working_dir>
+
+Try to chdir() to the specified directory.
+
+default: root (/) dir.
+chdir() can be suppressed using the C<< :NOCHDIR >> import tag.
+
+=head1 LOCKING
+
+If you want to be sure no multiple instances of your daemon will be running,
+just use I<pidfile> advanced option. See L</pidfile> for details.
+
+
+=head1 CAVEATS
+
+=head2 Concerning filehandles
+
+Filehandles cannot really be closed. Following advice from Matt S. Trout I will
+skip filehandle-closing step completely.
+
+
+=head2 Concerning locks
+
+On some platforms (by now only Solaris is proven to be affected, but other
+platforms may be) the lock on the pidfile is not preserved across fork().
+
+Starting with v1.01.00 the pidfile is created and locked after the last fork(),
+this should solve the various issues with different platforms.
+
+
+
+=head1 FAQ
+
+=head2 Q: Why is there no built-in start/stop/* method?
+
+A: Because to start/stop/* a daemon you usually don't call the daemon itself,
+instead you rely on system tools that allow process control (if you need an
+S<< "init script" >> then write one) and interact with processes through signals.
+Lack of start/stop/* methods is regarded as a feature.
+B<< Tyr L<< Daemon::Control >> if you're looking for such an interface >>
+(it cal also generate init scripts).
+
+=head2 Q: Why is Tie::Syslog not listed as prerequisites?
+
+A: Because you may want to skip Syslog support and not install that
+module. Script::Daemonizer module will work nonetheless, without using
+Tie::Syslog them (and without the features it provides, of course).
+
+
+=head1 TODO
+
+Some ideas:
+
+=over 4
+
+=item * Let user set her own options for tied STDOUT/STDERR (i.e. logopt for
+syslog (see L<Sys::Syslog>), facility, priority).
+
+=item * Provide a function to automatically parse command line (via
+L<Getopt::Long|Getopt::Long>).
+
+=item * Provide a function to automatically handle configuration file (via
+L<Config::General|Config::General>).
+
+=back
+
+
+
+=head1 AUTHOR
+
+Giacomo Montagner, <kromg at entirelyunlike.net>,
+<kromg.kromg at gmail.com> >
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-script-daemonizer at
+rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Script-Daemonizer>.  I will be
+notified, and then you'll automatically be notified of progress on your bug as
+I make changes.
+
+
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Script::Daemonizer
+
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Script-Daemonizer>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Script-Daemonizer>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Script-Daemonizer>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Script-Daemonizer/>
+
+=back
+
+
+=head1 ACKNOWLEDGEMENTS
+
+=over 4
+
+=item * S<"Advanced Programming in the UNIX Environment: Second Edition">,
+S<by W. Richard Stevens, Stephen A. Rago>,
+S<Copyright 2005 Addison Wesley Professional>
+
+
+=item * Thanks to Matt S. Trout for his help in "uncrappyfying" the code. It's
+still quite crappy but maybe better than before :)
+
+=back
+
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2012-2014 Giacomo Montagner, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+
+=head1 AVAILABILITY
+
+Latest sources are available from https://github.com/kromg/Script-Daemonizer
+
+
+=cut
+
+

@@ -1,0 +1,16 @@
+#! /usr/bin/perl -w
+
+use Shell::POSIX::Select qw($Heading $Reply $Prompt);
+
+$Prompt='Menu 1';
+select my $var (1) {
+	warn "inside Outer loop\n";
+	$Prompt='Menu 2';
+	select my $var2 (qw (a b) ) {
+		warn "inside Inner loop\n";
+		print "$var$var2\n";
+		last;
+	}
+	warn "outside Inner loop\n";
+}
+warn "outside all loops\n";

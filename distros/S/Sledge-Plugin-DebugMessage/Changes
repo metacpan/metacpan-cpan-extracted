@@ -1,0 +1,13 @@
+Revision history for Perl extension Sledge::Plugin::DebugMessage
+
+0.04
+    - modernize package(no feature changes)
+
+0.03  Thu Apr 06 11:26:33 2006
+    - don't show 'Use of uninitialized value in concatenation (.) or string'
+
+0.02  Sun Mar 26 21:34:08 JST 2006
+    - html escape for 'mail' part
+
+0.01  Sun Mar 26 20:50:44 2006
+    - original version

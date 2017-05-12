@@ -1,0 +1,21 @@
+/* ====================================================================== *
+ * Sample stylesheet for Syntax::Highlight::Shell                         *
+ *                                                                        *
+ * Copyright (C)2004 Sebastien Aperghis-Tramoni, All Rights Reserved.     *
+ *                                                                        *
+ * This file is free software; you can redistribute it and/or modify      *
+ * it under the same terms as Perl itself.                                *
+ * ====================================================================== */
+
+.s-mta,                                           /* shell metacharacters */
+.s-quo,                                           /* quotes               */
+.s-key,                                           /* shell keywords       */
+.s-blt  { color: #993333; font-weight: bold;  }   /* shell builtins commands */
+/*.s-cmd  { color: #000000;                     }   /* external commands    */
+/*.s-arg  { color: #000000;                     }   /* commands arguments   */
+.s-var  { color: #6633cc;                     }   /* expanded variables   */
+.s-avr  { color: #339999;                     }   /* assigned variables   */
+.s-val  { color: #cc3399;                     }   /* values inside quotes */
+.s-cmt  { color: #338833; font-style: italic; }   /* comment              */
+
+.s-lno  { color: #aaaaaa; background: #f7f7f7;}   /* line numbers         */

@@ -1,0 +1,23 @@
+Revision history for Perl extension Search::InvertedIndex::Simple.
+
+1.04  Sat Mar 10 10:57:00 2012
+	- No code changes.
+	- Recreate distmeta files, so add META.json. This includes updating MANIFEST.SKIP with MYMETA.json.
+
+1.03  Sun Feb 21 12:56:27 2010
+	- Remove text 'All rights reserved' (for Debian licensing).
+	- Remove POD heads 'Required Modules' and 'Changes'.
+	- Replace personal doc root with /var/www.
+	- Use namespace::autoclean with Moose.
+	- Replace /usr/bin/perl with /usr/bin/env perl.
+	- Replace common::sense with use strict and use warnings, to get uninit var warnings.
+
+1.02  Wed Feb 10 13:53:01 2010
+	- Add META.yml. Update MANIFEST.SKIP. Add MANIFEST and MYMETA.yml.
+
+1.01  Fri Nov 13 13:20:00 2009
+	- Run dos2unix
+	- Rename Changes.txt to CHANGES
+
+1.00  Thu Jan  6 12:37:29 2005
+	- original version

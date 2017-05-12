@@ -1,0 +1,133 @@
+* v3.21 - April 21, 1998
+
+Balanced quotes and regex delimiters are now handled correctly within queries.
+
+Also fixed the following bugs:
+
+    * Equal signs in queries caused field values to be modified
+    * Regex metacharacters in 'write' delimiter were not being escaped
+    * One field inserts failed
+    * Mixed case SQL was ignored
+    * Failed to escape "\" when writing to a file
+    * One field records with a value of 0 were accidently ignored
+    * Values with \"" were incorrectly converted to \\"
+    * Unmatched quotes caused fatal errors
+
+As of this version, you have better control over the error messages that
+Sprite spits out. See the example for more details.
+
+* v3.2 - March 12, 1998
+
+TWO VERY IMPORTANT CHANGES:
+
+    * Columns are no longer returned as a null-delimited string,
+      but as an array reference. However, you have the option of
+      asking Sprite to return the _records_ either as an array or
+      a reference.
+
+    * A relaxed copyright notice.
+
+Fixed some major bugs in all aspects of parsing queries, especially
+in the parse_expression method. I bet it's _almost_ bug free now :-) 
+Also added the ability to specify !~ when performing queries that 
+involve regular expressions. 
+
+Added the 'add column' statement. Also added support for 8-bit
+chars. in field names and also in the database path.
+
+Added the 'set_db_dir' method, which allows you to set a default
+directory where Sprite will look for database files. Please see
+the documentation for more information. 
+
+Specifying a platform with the set_os method is optional, but
+recommended. Sprite determines the platform by looking at $^O.
+
+Modified the update method so that columns are modified (or updated) 
+in the order you specify. This allows you to pass queries like so:
+
+    update my_db
+    set AllStar = (AllStar + 1),
+        Years   = (AllStar)
+    where (Player =~ /Jordan\$/);
+
+where the second reference to 'AllStar' reflects the updated 
+(incremented) value.
+
+In prior versions, database locking wasn't implemented properly,
+causing occasional race conditions. This is fixed! In addition, 
+Sprite now creates a 'loose' locking mechanism for systems that 
+don't support flock, namely the Mac, Windows 95 and VMS. However, 
+this mechanism is NOT fully reliable, but is better than no lock 
+at all. BTW, Windows NT _does_ support flock!
+
+Sprite is approximately 25-30% faster than previous versions when 
+dealing with larger databases because the parsing and evaluation has
+been optimized.
+
+Benchmark, FWIW: Sprite processed a relatively complex query on
+a 1000 record database with 6 fields on a lightly loaded Sparc 20
+with 64 MB RAM in 2.3 seconds!
+
+... and more.
+
+* v3.1 - June 18, 1996
+          
+Added the following features:
+
+    - Update multiple fields with a single update command.
+
+    - You can now execute your scripts with 'strict' and tainting turned on.
+
+    - For records that don't contain quotes or 'escaped' strings, _split_ 
+      is used to dramatically speed up database loading.
+
+    - The set_os function will allow you to set the O/S that you're using.
+
+    - Added a 'require 5.002' as Sprite fails on versions of Perl older 
+      than 5.002 with the following error:
+
+          "Bad free() ignored at Sprite.pm..."
+
+Fixed the following bugs:
+
+    - If you call the close method with a database as an argument without 
+      opening a database first, Sprite will warn you as opposed to wiping 
+      out the database, as was the case in earlier versions of Sprite.
+
+    - Sprite no longer chops off the trailing '0' on records.
+
+    - The _drop column_ works as it should.
+
+    - You can safely escape parentheses in the update command.
+
+    - Extra spaces between field names in the select command and values 
+      in the update command no longer cause fatal errors.
+
+    - In earlier versions of Sprite, if you opened the databases that were
+      located in different directories, but with the same name, Sprite
+      incorrectly assumed that it was the same database. As a result, the 
+      second database would never be loaded.
+
+    - Can be used on the Mac OS and Windows NT.
+
+* v3.01 - March 5, 1996
+
+Fixed a bug in parse_expression method so that it recognizes the '_' 
+character as valid in field names.
+
+* v3.0 - Febraury 20, 1996
+
+Totally re-wrote parser; works reasonably well even in the worst 
+case scenarios.
+
+* v2.0 - November 23, 1995
+
+Fixed *numerous* errors in parsing, and added pod style docs.
+
+* v1.5 - September 10, 1995
+
+Created module to replace the command-line interface.
+
+* v1.0 - September 7, 1995
+
+Initial Release

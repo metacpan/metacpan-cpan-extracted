@@ -1,0 +1,5 @@
+#!/usr/bin/perl
+
+use SlideShow;
+
+SlideShow::client(view_file => "/tmp/viewfile.html");

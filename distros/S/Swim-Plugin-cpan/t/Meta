@@ -1,0 +1,17 @@
+name: Some-Module
+version: 1.2.3
+abstract: Some Modules are Bigger Than Others
+
+license: perl
+copyright: 2014-2015
+author:
+  name: Perl Hacker
+  email: japh@cpan.org
+
+devel:
+  git: https://github.com/ingydotnet/some-module-pm
+
+badge: travis
+see:
+- This
+- The::That

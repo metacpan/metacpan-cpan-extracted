@@ -1,0 +1,2 @@
+# A shipit config file for testing
+steps = FindVersion, ChangeAllVersions

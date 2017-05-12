@@ -1,0 +1,43 @@
+{
+   "abstract" : "Methods to easily read data from spreadsheets (.xls, .xlxs and .xlxm)",
+   "author" : [
+      "Greg George, IT Technology Solutions P/L, Australia, gng@cpan.org"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.78, CPAN::Meta::Converter version 2.130880",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Spreadsheet-BasicRead",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Spreadsheet::ParseExcel" : "0.26",
+            "Spreadsheet::XLSX" : "0.13",
+            "utf8" : "1.09"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.12"
+}

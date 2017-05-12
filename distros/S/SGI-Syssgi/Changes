@@ -1,0 +1,32 @@
+Revision history for Perl extension syssgi.
+
+File syntax:
+------------
++ = New feature.
+* = Modified feature.
+- = Removed feature.
+# = Announcement.
+
+
+Revision History:
+-----------------
+1.005  Sat Jan 25 14:22:20 2003
+	* Renamed module to SGI::Syssgi
+	* Ported the module to use pure XS instead of Swig.
+	* Removed the buffer_space parameter to RDNAME.
+	* Minor POD modifications.
+
+1.002  Fri Sep 07 18:13:22 2002
+	* Corrected spellingerrors in the POD regarding the namespace.
+
+1.001  Thu Sep 06 23:30:16 2002
+	# First version uploaded and distributed on CPAN.
+	+ More system calls added.
+	+ MakeMaker based installation.
+	+ POD documentation
+
+0.1.0  Wed Aug 14 03:22:13 2002
+	# original version with limited functionality. Only distributed to a few
+	  testers.
+
+

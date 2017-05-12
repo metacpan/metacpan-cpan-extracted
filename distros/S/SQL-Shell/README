@@ -1,0 +1,28 @@
+SQL::Shell v1.15
+
+(c) BBC 2006. This program is free software; you can redistribute it and/or modify it under the GNU GPL.
+Enhancements and bug-fixes (c) 2016 Miguel Gualdron under the GNU GPL.
+
+See the file COPYING in this distribution, or http://www.gnu.org/licenses/gpl.txt 
+
+QUICK START:
+
+Install SQL::Shell by unpacking the tarball and running the following
+commands in the source directory:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+    Then delete the source directory tree since it's no longer needed.
+
+To run the unit test against a database, define the following environment variables before running "make test":
+
+   UNIT_TEST_DSN (a DBI DSN)
+   UNIT_TEST_USER
+   UNIT_TEST_PASS
+
+The unit test script will trash any tables in this database (hence point at an empty database).
+
+Run 'perldoc SQL::Shell' to read the full documentation.
+

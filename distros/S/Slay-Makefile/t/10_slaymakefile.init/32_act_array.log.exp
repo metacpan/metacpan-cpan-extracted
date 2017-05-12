@@ -1,0 +1,4 @@
+Building depend1 with deps (my_prereq1, your_prereq1) and match (1)
+Building depend2 with deps (my_prereq2, your_prereq2) and match (2)
+Building depend3 with deps (my_prereq3, your_prereq3) and match (3)
+Building default with matches: 

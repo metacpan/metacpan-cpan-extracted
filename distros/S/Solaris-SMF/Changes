@@ -1,0 +1,39 @@
+Revision history for Solaris-SMF
+
+1.0.1     2015-01-25 23:50:00+00:00 Europe/Dublin
+
+ - Updated date format in this changelog.
+ - Removed RELEASE_TESTING logic from module and tests.
+ - Replaced Data::Dumper and debug statements with Log::Any and trace logging.
+ - Replaced several sets of tests with @TestingMania Dzil group.
+
+1.0.0     2015-01-24 17:24:18+00:00 Europe/Dublin
+
+ - Released as 1.0.0.
+ - Tested against Solaris 11 and Perls 5.16.3, 5.18.4, 5.20.1 and 5.21.8.
+
+0.05    2015-01-24
+
+ - Converted distribution to use Dist::Zilla.
+ - Updated tests to skip rather than fail on non-Solaris systems.
+
+0.04	2010-01-24
+
+ - Services may now be enabled and disabled, provided you are running as a user with appropriate privileges.
+
+0.03_01	2009-12-07
+
+ - Added 'maintenance' state to the tests.
+
+0.03	2009-12-02
+
+ - Radically revised - it now does what it says on the tin! Unnecessary dependencies removed as well.
+
+0.02	2009-12-01
+
+ - Updated prerequisites to add 'Readonly' support.
+
+0.01	2009-11-28
+
+ - First version, released on an unsuspecting world.
+

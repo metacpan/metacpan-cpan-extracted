@@ -1,0 +1,38 @@
+---
+abstract: 'Run same SQL in valid SQL and DBI placeholder.'
+author:
+  - 'tokuhirom <tokuhirom@gmail.com>'
+build_requires:
+  Test::Difflet: 0
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.5.3, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: SQL-TwoWay
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  SQL::TwoWay:
+    file: lib/SQL/TwoWay.pm
+    version: 0.05
+requires:
+  perl: 5.010001
+resources:
+  bugtracker: https://github.com/tokuhirom/SQL-TwoWay/issues
+  homepage: https://github.com/tokuhirom/SQL-TwoWay
+  repository: git://github.com/tokuhirom/SQL-TwoWay.git
+version: 0.05

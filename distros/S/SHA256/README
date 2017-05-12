@@ -1,0 +1,9 @@
+This module implements the SHA-256/384/512 hash algorithm developed by
+NIST. See NIST's page on it at:
+
+http://csrc.nist.gov/cryptval/shs.html
+
+The algorithm was developed as a companion to AES/Rijndael.
+
+This program is free software; you can redistribute it and/or 
+modify it under the same terms as Perl itself.  

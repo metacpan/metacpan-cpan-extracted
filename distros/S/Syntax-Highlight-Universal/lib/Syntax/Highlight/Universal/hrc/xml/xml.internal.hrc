@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hrc PUBLIC "-//Cail Lomecb//DTD Colorer HRC take5//EN" "http://colorer.sf.net/2003/hrc.dtd">
+<hrc xmlns="http://colorer.sf.net/2003/hrc" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://colorer.sf.net/2003/hrc http://colorer.sf.net/2003/hrc.xsd" version="take5">
+<!--
+  insert this define into HRC base catalog file (colorer.hrc)
+
+  <prototype name="xml" group="group" description="xml" targetNamespace="http://www.w3.org/XML/1998/namespace">
+    <location link="xml.hrc"/>
+    <filename>/\./ix</filename>
+  </prototype>
+--><type name="xml">
+<annotation>
+<documentation>
+           XSLT Generated HRC scheme for language 'xml'
+           from XML Schema with xsd2hrc.xsl version 0.9 (c) Cail Lomecb
+
+           Scheme parameters:
+             targetNamespace             : http://www.w3.org/XML/1998/namespace
+             hrctype                     : xml
+             allow-common-attr           : yes
+             allow-any-attr              : no
+             allow-unknown-elements      : no
+             allow-unknown-root-elements : no
+             force-single-root           : yes
+             default prefixes            : (?{}(?{}xml):)
+               you can change them with entity 'nsprefix'
+
+         </documentation>
+<documentation>
+          Schema documentation:
+   See http://www.w3.org/XML/1998/namespace.html and
+   http://www.w3.org/TR/REC-xml for information about this namespace.
+  </documentation>
+<contributors>None</contributors>
+</annotation>
+<import type="def"/>
+<region parent="xml:element.defined.start.name" name="element.start.name"/>
+<region parent="xml:element.defined.end.name" name="element.end.name"/>
+<region parent="xml:element.start.lt" name="element.start.lt"/>
+<region parent="xml:element.start.gt" name="element.start.gt"/>
+<region parent="xml:element.end.lt" name="element.end.lt"/>
+<region parent="xml:element.end.gt" name="element.end.gt"/>
+<region parent="element.start.name" name="element.nsprefix"/>
+<region parent="xml:element.nscolon" name="element.nscolon"/>
+<region parent="xml:Attribute.defined.name" name="Attribute.name"/>
+<region parent="xml:Attribute.nsprefix" name="Attribute.nsprefix"/>
+<region parent="xml:AttValue.defined" name="AttValue"/>
+<region parent="xml:AttValue.defined.start" name="AttValue.start"/>
+<region parent="xml:AttValue.defined.end" name="AttValue.end"/>
+<region description="Enumerated type values" parent="xml:Enumeration" name="Enumeration"/>
+<entity value="(?{}(?{}xml):)" name="ns-real-prefix"/>
+<entity value="(?{}(?{}xml):)" name="nsprefix"/>
+<scheme name="_hrc_int_elementContent">
+<block scheme="xml:elementContent2" region19="element.start.gt" region18="element.end.gt" region17="element.end.name" region16="element.nscolon" region15="element.nsprefix" region12="element.end.lt" region11="PairEnd" region07="element.start.name" region06="element.nscolon" region05="element.nsprefix" region02="element.start.lt" region01="PairStart" end="/( (&lt;\/) (\y3\b)?= ( (%xml:NCName;) (:) )? (%xml:Name;) \b \M \s* (&gt;?)                   | (\/ \M &gt;) )/x" start="/~( (&lt;) (  ((%xml:NCName;) (:) )? (%xml:Name;) ) \M &gt;?   )/x"/>
+<inherit scheme="xml:badChar"/>
+</scheme>
+<scheme name="_hrc_int_AttValue">
+<block region="AttValue" scheme="xml:AttValue.content.quot" region11="AttValue.end" region01="AttValue.start" region10="PairEnd" region00="PairStart" end="/(\y1)/" start="/(&quot;)/"/>
+<block region="AttValue" scheme="xml:AttValue.content.apos" region11="AttValue.end" region01="AttValue.start" region10="PairEnd" region00="PairStart" end="/(\y1)/" start="/(')/"/>
+</scheme>
+<scheme name="AttributeContent">
+<inherit scheme="xml:AttributeContent">
+<virtual subst-scheme="_hrc_int_AttValue" scheme="xml:AttValue"/>
+</inherit>
+</scheme>
+<scheme name="lang-attribute">
+<block region02="Attribute.name" end="/[&quot;']?#1/" start="/(\s?#1|^)(?{Attribute.nsprefix}%nsprefix;)(lang)\M([\s\=]|$)/x" scheme="xmlschema:language-AttributeContent" xmlns="http://colorer.sf.net/2003/hrc"/>
+</scheme>
+<scheme name="space-attribute">
+<block region02="Attribute.name" end="/[&quot;']?#1/" start="/(\s?#1|^)(?{Attribute.nsprefix}%nsprefix;)(space)\M([\s\=]|$)/x" scheme="_hrc_int_N1001C-AttributeContent" xmlns="http://colorer.sf.net/2003/hrc"/>
+</scheme>
+<scheme name="base-attribute">
+<block region02="Attribute.name" end="/[&quot;']?#1/" start="/(\s?#1|^)(?{Attribute.nsprefix}%nsprefix;)(base)\M([\s\=]|$)/x" scheme="xmlschema:anyURI-AttributeContent" xmlns="http://colorer.sf.net/2003/hrc"/>
+</scheme>
+<scheme name="specialAttrs-attributeGroup">
+<inherit scheme="base-attribute"/>
+<inherit scheme="lang-attribute"/>
+<inherit scheme="space-attribute"/>
+</scheme>
+<!--
+        parent: space
+-->
+<scheme name="_hrc_int_N1001C-content">
+<regexp region="Enumeration" match="/default/" xmlns="http://colorer.sf.net/2003/hrc"/>
+<regexp region="Enumeration" match="/preserve/" xmlns="http://colorer.sf.net/2003/hrc"/>
+</scheme>
+<scheme name="_hrc_int_N1001C-content-error">
+<inherit scheme="_hrc_int_N1001C-content" xmlns="http://colorer.sf.net/2003/hrc"/>
+<inherit scheme="xml:badChar" xmlns="http://colorer.sf.net/2003/hrc"/>
+</scheme>
+<scheme name="_hrc_int_N1001C-Attributes"/>
+<scheme name="_hrc_int_N1001C-AttributeContent">
+<inherit scheme="AttributeContent">
+<virtual subst-scheme="_hrc_int_N1001C-content-error" scheme="xml:AttValue.content.stream"/>
+</inherit>
+</scheme>
+
+<scheme name="xml-root">
+<annotation>
+<documentation>
+               You can replace these elements with needed single root element
+               with customizing HRC generation process.
+              </documentation>
+</annotation>
+</scheme>
+<scheme name="xml">
+<inherit scheme="xml:singleroot">
+<virtual subst-scheme="xml-root" scheme="xml:element"/>
+</inherit>
+</scheme>
+</type>
+</hrc>

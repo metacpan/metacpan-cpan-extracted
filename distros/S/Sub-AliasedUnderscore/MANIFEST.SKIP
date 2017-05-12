@@ -1,0 +1,7 @@
+.git/
+MANIFEST.bak
+Makefile$
+blib/
+pm_to_blib
+Makefile.old
+cover_db/

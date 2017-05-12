@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE NewsML PUBLIC "urn:newsml:iptc.org:20001006:NewsMLv1.0:1" "./DTD/NewsMLv1.0.dtd">
+<?xml-stylesheet type="text/xsl" href="./stylesheets/IPTCNewsML.xsl"?>
+<NewsML>
+	<Catalog Href="./catalog/mycatalog.xml"/>
+	<NewsEnvelope>
+		<DateAndTime>20001006</DateAndTime>
+	</NewsEnvelope>
+	<NewsItem>
+		<Identification>
+			<NewsIdentifier>
+				<ProviderId>iptc.org</ProviderId>
+				<DateId>20001006</DateId>
+				<NewsItemId>SportsResultSample</NewsItemId>
+				<RevisionId PreviousRevision="0" Update="N">1</RevisionId>
+				<PublicIdentifier>urn:newsml:iptc.org:20001006:SportsResultSample:1</PublicIdentifier>
+			</NewsIdentifier>
+		</Identification>
+		<NewsManagement>
+			<NewsItemType FormalName="News" Scheme="NewsItemType"/>
+			<FirstCreated>20001006</FirstCreated>
+			<ThisRevisionCreated>20001006</ThisRevisionCreated>
+			<Status FormalName="Usable" Scheme="IptcStatus"/>
+		</NewsManagement>
+		<NewsComponent>
+			<ContentItem>
+				<DataContent><![CDATA[<FootballResult><Hteam>Arsenal</Hteam><Hscore>1</Hscore><Ateam>Chelsea</Ateam><Ascore>2</Ascore></FootballResult>]]></DataContent>
+			</ContentItem>
+		</NewsComponent>
+	</NewsItem>
+</NewsML>

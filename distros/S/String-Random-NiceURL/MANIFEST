@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+COPYING
+lib/String/Random/NiceURL.pm
+t/00-load.t
+t/01-length.t
+t/02-regex.t
+META.yml                                 Module meta-data (added by MakeMaker)

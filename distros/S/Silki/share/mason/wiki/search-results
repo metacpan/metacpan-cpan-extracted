@@ -1,0 +1,50 @@
+<&| /lib/filter/skip-empty-table.mas &>
+<table class="standard-table">
+  <thead>
+    <tr>
+      <th><% loc('Title') %></th>
+      <th><% loc('Last Edited On') %></th>
+      <th><% loc('Last Edited By') %></th>
+    </tr>
+  </thead>
+% while ( my ( $page, $revision, $result ) = $search_results->next() ) {
+  <tbody>
+    <tr class="has-child-row <% $search_results->index() % 2 ? 'odd' : 'even' %>">
+      <td><a href="<% $page->uri() %>"><% $result->title_for_display( $page->title() ) | n %></a> (<% loc( 'revision %1', $revision->revision_number() ) %>)</td>
+      <td><% loc( '%datetime(%1)', $c->user()->set_time_zone_for_dt( $revision->creation_datetime() ) ) %></td>
+      <td>
+        <& /lib/user-link.mas, user => $revision->user(), wiki => $wiki &>
+      </td>
+    </tr>
+    <tr class="<% $search_results->index() % 2 ? 'odd' : 'even' %>">
+      <td colspan="3"><% $result->body_for_display() | n %></td>
+    </tr>
+  </tbody>
+% }
+</&>
+% unless ( $search_results->index() ) {
+<p>
+  <% loc('There were no matches for your search.') %>
+</p>
+% }
+
+<%doc>
+<& /lib/table/pager.mas,
+   index     => $search_results->index(),
+   pager     => $pager,
+   uri_maker => sub { $wiki->uri( view => 'search', { search => $search } ) } &>
+</%doc>
+</table>
+
+<%args>
+$search
+$search_results
+$wiki
+</%args>
+
+<%method title>
+<% loc( q{Search Results for "%1"}, $search ) %>
+<%args>
+$search
+</%args>
+</%method>

@@ -1,0 +1,32 @@
+Revision history for Perl extension Sub-CharacterProperties
+
+1.100860  2010-03-27 16:34:13 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+0.05  Thu Jul 25 15:27:43 CEST 2008 (Marcel Gruenauer <marcel@cpan.org>)
+    - Changed dist style and Changes back to standard. People didn't like it -
+      the nail that sticks out gets hammered down.
+    - Added standard test files; this will also help with CPANTS.
+
+0.04  Thu, 29 May 2008 12:07:56 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - set the version to 0.04
+    - .shipit: added Twitter step
+    - Makefile.PL: added auto_install() and process_templates()
+    - lib/*: converted to template
+    - added t/perlcriticrc
+    - updated MANIFEST
+    - moved generated documentation of interited methods to after documentation
+      of this class' methods so the manpage is more readable
+    - .shipit: fixed svk.tagpattern
+
+0.03  Fri, 09 Nov 2007 20:25:11 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - now requires perl 5.8 for charnames::vianame
+    - tags: BUGFIX
+
+0.02  Fri, 09 Nov 2007 16:16:20 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - added requirement for Class::Accessor::Complex
+    - don't subclass Data::Inherited - not needed
+    - tags: BUGFIX
+
+0.01  Fri, 09 Nov 2007 14:22:28 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - original version

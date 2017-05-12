@@ -1,0 +1,91 @@
+NAME
+    Search::Mousse - A simple and fast inverted index
+
+SYNOPSIS
+      my $mousse = Search::Mousse->new(
+        directory => $directory,
+        name      => 'recipes',
+      );
+      my $recipe = $mousse->fetch("Hearty Russian Beet Soup");
+      my @recipes = $mousse->search("crumb");
+      my @recipe_keys = $mousse->search_keys("italian soup");
+  
+DESCRIPTION
+    Search::Mousse provides a simple and fast inverted index.
+
+    It is intended for constant databases (this is why it can be fast).
+    Documents have a key, keywords (which the document can later be search
+    for with) and a value (which can be a Perl data structure or object).
+
+    Use Search::Mousse::Writer to construct a database.
+
+    The default stemmer is:
+
+      sub {
+        my $words = lc shift;
+        return uniq(split / /, $words);
+      }
+
+    Why is it called Search::Mousse? Well, in culinary terms, mousses are
+    simple to make, can include quite complicated ingredients, and are
+    inverted before presentation.
+
+CONSTRUCTOR
+  new
+    The constructor takes a few arguments: the directory to store files in,
+    and a name for the database. If you have a custom stemmer, also pass it
+    in:
+
+      my $mousse = Search::Mousse->new(
+        directory => $directory,
+        name      => 'recipes',
+      );
+  
+      my $mousse2 = Search::Mousse->new(
+        directory => $directory,
+        name      => 'photos',
+        stemmer   => \&stemmer,
+      );
+
+METHODS
+  fetch
+    Returns a value from the database, given a key:
+
+      my $recipe = $mousse->fetch("Hearty Russian Beet Soup");
+
+  fetch_related
+    If you have used Search::Mousse::Writer::Related to analyse the
+    database, the fetch_related() method returns a list of values that are
+    similar to the given key:
+
+      my @recipes = $mousse->fetch_related("Hearty Russian Beet Soup");
+
+  fetch_related_keys
+    If you have used Search::Mousse::Writer::Related to analyse the
+    database, the fetch_related_keys() method returns a list of keys that
+    are similar to the given key:
+
+      my @keys = $mousse->fetch_related_keys("Hearty Russian Beet Soup");
+  
+  search
+    Returns a list of values that have all the keywords passed:
+
+      my @recipes = $mousse->search("white bread");
+
+  search_keys
+    Returns a list of keys that have all the keywords passed:
+
+      my @recipe_keys = $mousse->search_keys("italian soup");
+
+SEE ALSO
+    Search::Mousse::Writer, Search::Mousse::Writer::Related
+
+AUTHOR
+    Leon Brocard, "<acme@astray.com>"
+
+COPYRIGHT
+    Copyright (C) 2005, Leon Brocard
+
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.
+

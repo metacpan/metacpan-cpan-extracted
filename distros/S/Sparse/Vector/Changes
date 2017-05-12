@@ -1,0 +1,7 @@
+Revision history for Perl extension Sparse::Vector.
+
+0.01  Jan 8 2004
+	original version; created by h2xs 1.22 with options -AXc Vector
+
+0.02 Jan 14 2004
+	Added methods div, binadd 

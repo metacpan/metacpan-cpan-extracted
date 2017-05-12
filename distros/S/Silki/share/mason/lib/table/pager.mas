@@ -1,0 +1,27 @@
+% if ( $pager->total_entries() > $pager->entries_per_page() ) {
+  <tfoot id="pager">
+    <tr class="<% ( $index + 1 ) % 2 ? 'odd' : 'even' %>">
+      <td colspan="4">
+        <% loc('Page:') %>
+%   for my $page_num ( $pager->navigations() ) {
+%      if ( $page_num == 0 ) {
+        ...
+%      } else {
+%        if ( $page_num == $pager->current_page() ) {
+        <strong><% $page_num %></strong>
+%        } else {
+        <a href="<% $uri_maker->( $page_num > 1 ? ( query => { page => $page_num } ) : () ) %>"
+           title="<% loc( 'Page %1 of history', $page_num ) %>"><% $page_num %></a>
+%        }
+%      }
+%   }
+      </td>
+    </tr>
+  </tfoot>
+% }
+
+<%args>
+$index
+$pager
+$uri_maker
+</%args>

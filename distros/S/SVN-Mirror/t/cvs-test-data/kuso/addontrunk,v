@@ -1,0 +1,98 @@
+head	1.2;
+access;
+symbols
+	so=this/is/another:1.1
+	bad=tag/looks-like_this:1.2.0.4
+	cleanup:1.1.2.2.0.2
+	weirdbranch:1.1.0.6
+	newtag:1.2.2.1
+	newbranch:1.2.0.2
+	funnytag:1.1.2.1
+	sometag:1.1
+	anotherbranch:1.1.0.4
+	somebranch:1.1.0.2;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2003.06.26.02.18.22;	author xclkao;	state Exp;
+branches
+	1.2.2.1;
+next	1.1;
+
+1.1
+date	2003.06.12.05.43.36;	author xclkao;	state Exp;
+branches
+	1.1.2.1;
+next	;
+
+1.1.2.1
+date	2003.06.12.14.18.35;	author xclkao;	state Exp;
+branches;
+next	1.1.2.2;
+
+1.1.2.2
+date	2003.06.26.02.18.54;	author xclkao;	state Exp;
+branches;
+next	;
+
+1.2.2.1
+date	2003.06.30.16.40.11;	author xclkao;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@incremental test on trunk
+@
+text
+@this is added on trunk after branch
+try some incremental updates
+@
+
+
+1.2.2.1
+log
+@on a new branch: modify and then tag
+@
+text
+@a2 1
+modified on newbranch
+@
+
+
+1.1
+log
+@newfile
+@
+text
+@d2 1
+@
+
+
+1.1.2.1
+log
+@test incremental
+@
+text
+@a1 1
+update on branch
+@
+
+
+1.1.2.2
+log
+@incremental test on branch
+@
+text
+@a2 1
+incremental update on branch
+@
+
+

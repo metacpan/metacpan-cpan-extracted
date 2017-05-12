@@ -1,0 +1,106 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Sub-Talisman/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-requirement [ doap-deps:on "Sub::Name"^^doap-deps:CpanId ], [
+		doap-deps:on "Attribute::Handlers 0.79"^^doap-deps:CpanId;
+	], [ doap-deps:on "namespace::clean"^^doap-deps:CpanId ], [ doap-deps:on "Scalar::Does 0.002"^^doap-deps:CpanId ], [ doap-deps:on "Sub::Identify"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.61"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Sub-Talisman>;
+	doap:created         "2012-10-18"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/Sub-Talisman>;
+	doap:homepage        <https://metacpan.org/release/Sub-Talisman>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "Sub-Talisman";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Sub-Talisman/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Sub-Talisman/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Sub-Talisman/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Sub-Talisman/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Sub-Talisman/v_0-005>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-sub-talisman>;
+	];
+	doap:shortdesc       "use attributes to tag or classify subs".
+
+<http://purl.org/NET/cpan-uri/dist/Sub-Talisman/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "Sub-Talisman-0.001"^^xsd:string;
+	dc:issued            "2012-10-19"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-Talisman-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Sub-Talisman/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "Sub-Talisman-0.002"^^xsd:string;
+	dc:issued            "2012-10-19"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Drop elliptical statements (yada-yada op) from test cases, as this will fail in Perl < 5.12.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-Talisman-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Sub-Talisman/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "Sub-Talisman-0.003"^^xsd:string;
+	dc:issued            "2012-10-20"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix lvalue sub in test cases in Perl < 5.16.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-Talisman-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Sub-Talisman/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "Sub-Talisman-0.004"^^xsd:string;
+	dc:issued            "2012-12-15"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Depend on version 0.79 of Attribute::Handlers because the versions included in Perl 5.8 core fail tests.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-Talisman-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Sub-Talisman/v_0-005>
+	a                    doap:Version;
+	dc:identifier        "Sub-Talisman-0.005"^^xsd:string;
+	dc:issued            "2014-09-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Switch to Dist::Inkt.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-Talisman-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

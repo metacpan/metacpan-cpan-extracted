@@ -1,0 +1,84 @@
+<&| /lib/filter/form.mas &>
+<form action="<% $wiki->uri( view => 'members' ) %>" method="post" />
+  <input type="hidden" name="x-tunneled-method" value="PUT" />
+
+  <fieldset>
+    <legend><% loc('Existing Members') %></legend>
+
+% while ( my ( $user, $role ) = $members->next() ) {
+    <div class="form-item">
+      <label for="role-for-<% $user->user_id() %>" class="for-field">
+        <% $user->best_name() %>
+      </label>
+%   if ( $user->user_id() == $c->user()->user_id() ) {
+      <div><% loc('You cannot remove yourself as an admin.') %></div>
+%   } else {
+      <input type="hidden" name="members" value="<% $user->user_id() %>" />
+      <select id="role-for-<% $user->user_id() %>" name="role_for_<% $user->user_id() %>">
+        <option value="<% $admin->role_id() %>"
+                <% $role->role_id() == $admin->role_id() ? q{selected="selected"} : q{} | n %>
+          ><% loc( $admin->name() ) %></option>
+        <option value="<% $member->role_id() %>"
+                <% $role->role_id() == $member->role_id() ? q{selected="selected"} : q{} | n %>
+          ><% loc( $member->name() ) %></option>
+        <option value="0"><% loc( 'Remove this member' ) %></option>
+      </select>
+
+      <div class="help-text">
+        <p>
+          <% $user->email_address() %>
+%   if ( $user->requires_activation() ) {
+          - this account has not yet been activated
+%   }
+        </p>
+      </div>
+%   }
+    </div>
+% }
+  </fieldset>
+
+  <fieldset>
+    <legend><% loc('New Members') %></legend>
+
+    <div class="form-item">
+      <label for="new-members" class="for-field"><% loc('Email addresses') %></label>
+      <textarea id="new-members" name="new_members" class="medium"></textarea>
+      <div class="help-text">
+        <p>
+          <% loc('Enter email addresses for each new member, one per line.') %>
+        </p>
+      </div>
+    </div>
+
+    <div class="form-item">
+      <label for="message" class="for-field"><% loc('Personal message') %></label>
+      <textarea id="message" name="message" class="medium"></textarea>
+      <div class="help-text">
+        <p>
+          <% loc('You can include a personal message for the users invited to join the wiki.') %>
+        </p>
+      </div>
+    </div>
+
+    <input class="submit" type="submit" value="Submit" />
+
+  </fieldset>
+</form>
+</&>
+
+<%args>
+$wiki
+$members
+</%args>
+
+<%init>
+my $admin = Silki::Schema::Role->Admin();
+my $member = Silki::Schema::Role->Member();
+</%init>
+
+<%method title>
+<% loc( 'Members in %1', $wiki->title() ) %>
+<%args>
+$wiki
+</%args>
+</%method>

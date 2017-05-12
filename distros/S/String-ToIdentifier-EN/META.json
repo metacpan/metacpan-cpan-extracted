@@ -1,0 +1,74 @@
+{
+   "abstract" : "Convert Strings to English Program Identifiers",
+   "author" : [
+      "Rafael Kitover <rkitover@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300036, CPAN::Meta::Converter version 2.131560",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "String-ToIdentifier-EN",
+   "no_index" : {
+      "directory" : [
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "Lingua::EN::Inflect::Phrase" : "0",
+            "Text::Unidecode" : "0",
+            "Unicode::UCD" : "0",
+            "base" : "0",
+            "namespace::clean" : "0",
+            "perl" : "5.008001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0",
+            "lib" : "0",
+            "utf8" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-String-ToIdentifier-EN@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=String-ToIdentifier-EN"
+      },
+      "homepage" : "http://metacpan.org/release/String-ToIdentifier-EN",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/rkitover/string-toidentifier-en.git",
+         "web" : "http://github.com/rkitover/string-toidentifier-en"
+      }
+   },
+   "version" : "0.11",
+   "x_authority" : "cpan:RKITOVER"
+}
+

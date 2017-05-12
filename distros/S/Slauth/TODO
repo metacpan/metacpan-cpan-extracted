@@ -1,0 +1,40 @@
+Slauth To-Do list
+-----------------
+
+Near term:
+
+* web interface:
+  * add method for users to change their own passwords!!!!
+  * add plugin for unknown users to apply for access
+  * add user/group/ACL/session administration menus
+  * add optional use of Perl Template Toolkit for web page generation
+* command-line interface:
+  * add user/group/ACL/session administration tools
+* back-end:
+  * split Slauth::Storage::* modules as follows:
+    Slauth::Storage          - core module for storage method plugins
+    Slauth::Storage::DB      - descendent of cueent Berkeley DB storage back-end
+                               (can become its own separate plugin package)
+    Slauth::Storage::DBI     - Perl DBI SQL storage back-end
+                               (should be its own separate plugin package)
+    Slauth::Storage::LDAP    - Open LDAP storage back-end
+                               (should be its own separate plugin package)
+    Slauth::Data::User       - from current Slauth::Storage::User_DB w/o DB
+    Slauth::Data::Session    - from current Slauth::Storage::Session_DB w/o DB
+    Slauth::Data::Confirm    - from current Slauth::Storage::Confirm_DB w/o DB
+    Slauth::Data::Group      - separate group/role data management from User
+  * allow use of multiple storage plugins in a single configuration
+
+Requires more study:
+
+* front-end:
+  * make an interface for Slauth to do authentication and storage for Jabber2d
+  * manage authentication for XACML (XML Access Control Markup Language) and
+    SAML (Security Assertions Marckup Language) environments
+
+Future vision:
+
+* Provide a centralized administration and storage mechanism for
+  authentication for other Open Source systems that we use.  If Slauth
+  is accepted by others, then they can also look into how it can integrate
+  authentication with their applications.

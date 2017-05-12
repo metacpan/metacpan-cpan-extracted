@@ -1,0 +1,10 @@
+<dl>
+  <dt>Status</dt>
+  <dd><: $game.status :></dd>
+  <dt>Current Move</dt>
+  <dd><: $game.current_move || 'N/a' :></dd>
+  <dt>Who's Turn</dt>
+  <dd><: $game.whos_turn || 'N/a' :></dd>
+  <dt>Current Layout</dt>
+  <dd><: include '_board.tx' :></dd>
+</dl>

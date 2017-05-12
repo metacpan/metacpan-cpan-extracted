@@ -1,0 +1,35 @@
+---
+abstract: 'Sphinx search engine API Perl client'
+author:
+  - 'Jon Schutz <jon@jschutz.net>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.142060'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Sphinx-Search
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Class::Accessor::Fast: '0'
+  Config: '0'
+  DBI: '0'
+  Data::Dumper: '0'
+  Encode: '0'
+  Errno: '0'
+  Fcntl: '0'
+  File::SearchPath: '0'
+  List::MoreUtils: '0'
+  Math::BigInt: '0'
+  Path::Class: '0'
+  Socket: '0'
+  Test::More: '0'
+version: '0.29'

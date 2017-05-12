@@ -1,0 +1,6 @@
+name = "SQL-Concat"
+# badges = ["travis"]
+authority="cpan:HKOBA"
+
+module_maker="ModuleBuildTiny"
+

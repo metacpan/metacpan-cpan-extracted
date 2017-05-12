@@ -1,0 +1,1266 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Simulation::Automate - A Simulation Automation Tool</title>
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#requirements">REQUIREMENTS</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#installation">INSTALLATION</a></li>
+	<ul>
+
+		<li><a href="#1__download_and_extract_the_archive">1. Download and extract the archive</a></li>
+		<li><a href="#2__simple_local_installation">2. Simple local installation</a></li>
+		<li><a href="#3__perlstyle_installation">3. Perl-style installation</a></li>
+		<li><a href="#4__archive_structure">4. Archive structure</a></li>
+	</ul>
+
+	<li><a href="#configuration">CONFIGURATION</a></li>
+	<ul>
+
+		<li><a href="#synsim_project_directory_structure">SynSim project directory structure</a></li>
+		<li><a href="#template_files">Template files</a></li>
+		<li><a href="#datafile">Datafile</a></li>
+		<li><a href="#postprocessing_and_preprocessing__optional_">Postprocessing and Preprocessing (optional)</a></li>
+		<li><a href="#dictionary__optional_">Dictionary (optional)</a></li>
+	</ul>
+
+	<li><a href="#datafile_description">DATAFILE DESCRIPTION</a></li>
+	<ul>
+
+		<li><a href="#syntax">Syntax</a></li>
+		<li><a href="#simulation_variables">Simulation variables</a></li>
+		<li><a href="#configuration_variables">Configuration variables</a></li>
+		<li><a href="#expressions">Expressions</a></li>
+	</ul>
+
+	<li><a href="#running_synsim">RUNNING SYNSIM</a></li>
+	<li><a href="#postprocessing">POSTPROCESSING</a></li>
+	<ul>
+
+		<li><a href="#generic_postprocessors">Generic Postprocessors</a></li>
+		<li><a href="#preprocessing_the_raw_results">Preprocessing the raw results</a></li>
+	</ul>
+
+	<li><a href="#dictionary">DICTIONARY</a></li>
+	<li><a href="#output_files">OUTPUT FILES</a></li>
+	<li><a href="#writing_postprocessing_routines">WRITING POSTPROCESSING ROUTINES</a></li>
+	<ul>
+
+		<li><a href="#postproclib">PostProcLib</a></li>
+		<li><a href="#statistical_analysis">Statistical analysis</a></li>
+	</ul>
+
+	<li><a href="#examples">EXAMPLES</a></li>
+	<ul>
+
+		<li><a href="#1__typical_spice_simulator">1. Typical SPICE simulator</a></li>
+		<li><a href="#2__simulator_with_commandline_input_and_fixed_output_file">2. Simulator with command-line input and fixed output file</a></li>
+		<li><a href="#3__simulator_without_input_file__configured_at_compile_time">3. Simulator without input file, configured at compile time</a></li>
+		<li><a href="#4__circuit_simulator_which_produces_binary_files_">4. Circuit simulator which produces binary files.</a></li>
+	</ul>
+
+	<li><a href="#wrappers">WRAPPERS</a></li>
+	<ul>
+
+		<li><a href="#1__no_is_wrapper_required_if_the_simulator_takes_input_from_a_file_with_an_arbitrary_name_and_sends_output_in_any_way_to_a_file_with_an_arbitrary_name_">1. No is wrapper required if the simulator takes input from a file with an arbitrary name and sends output in any way to a file with an arbitrary name:</a></li>
+		<li><a href="#2__simulators_with_fixed_input_file_name_">2. Simulators with fixed input file name:</a></li>
+		<li><a href="#3__simulator_with_a_fixed_output_file_name_">3. Simulator with a fixed output file name:</a></li>
+		<li><a href="#4__simulator_takes_input_file_from_a_subdirectory">4. Simulator takes input file from a subdirectory</a></li>
+		<li><a href="#5__simulator_produces_output_in_a_subdirectory">5. Simulator produces output in a subdirectory</a></li>
+		<li><a href="#6__simulator_with_commandline_input_and_fixed_output_file">6. Simulator with command-line input and fixed output file</a></li>
+		<li><a href="#7__simulator_requires_multiple_input_files">7. Simulator requires multiple input files</a></li>
+	</ul>
+
+	<li><a href="#to_do">TO DO</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#copyright">COPYRIGHT</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Simulation::Automate - A Simulation Automation Tool</p>
+<p>The set of modules is called <strong>Simulation::Automate</strong>.</p>
+<p>The tool itself is called <strong>SynSim</strong>, the command <code>synsim</code>.</p>
+<p>
+</p>
+<hr />
+<h1><a name="requirements">REQUIREMENTS</a></h1>
+<ul>
+<li><strong><a name="item_a_unix_2dlike_system">a unix-like system</a></strong><br />
+</li>
+<li><strong><a name="item_perl">perl 5</a></strong><br />
+</li>
+<li><strong><a name="item_postprocessing">gnuplot for postprocessing (optional)</a></strong><br />
+</li>
+</ul>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+       use Simulation::Automate;</pre>
+<pre>
+       &amp;synsim();</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>SynSim is a generic template-driven simulation automation tool. It works with any simulator that accepts text input files and generates text output (and even those that don't. See <a href="#examples">EXAMPLES</a> for special cases). It executes thousands of simulations with different input files automatically, and processes the results. Postprocessing facilities include basic statistical analysis and automatic generation of PostScript plots with Gnuplot. SynSim is entirely modular, making it easy to add your own analysis and postprocessing routines.</p>
+<p>
+</p>
+<hr />
+<h1><a name="installation">INSTALLATION</a></h1>
+<p>
+</p>
+<h2><a name="1__download_and_extract_the_archive">1. Download and extract the archive</a></h2>
+<ol>
+<li><strong><a name="item_download_the_gzipped_tar_file_f_3csimulation_2daut">Download the gzipped tar file <em>Simulation-Automate-0.9.5.tar.gz</em></a></strong><br />
+</li>
+<li><strong><a name="item_extract_the_archive_3a">Extract the archive:</a></strong><br />
+</li>
+<pre>
+        tar -zxvf Simulation-Automate-0.9.5.tar.gz</pre>
+</ol>
+<p>
+</p>
+<h2><a name="2__simple_local_installation">2. Simple local installation</a></h2>
+<p>This installation procedure will install the Simulation::Automate modules in a directory of your choice, and create a template directory structure for your SynSim project.</p>
+<ol>
+<li><strong><a name="item_run_the_local_install_script_3a">Run the local install script:</a></strong><br />
+</li>
+In the main directory of the distribution (i.e. the directory which contains the file <code>local_install.pl</code>), type:
+<pre>
+   perl local_install.pl</pre>
+<p></p>
+<li><strong><a name="item_enter_the_installation_directory">Enter the installation directory</a></strong><br />
+</li>
+The install script asks for the name of the directory in which it will put SynSim:
+<pre>
+   Local SinSym directory? [/local/home/wim/SynSim]:</pre>
+<p>If you enter just a name, the installer assumes that the directory is in your home directory. If you want to install SynSim outside your home directory, enter a full path.</p>
+<p></p>
+<li><strong><a name="item_enter_the_project_directory_name">Enter the project directory name</a></strong><br />
+</li>
+The install script asks for the name of directory where you will run SynSim:
+<pre>
+    Simulation project directory? [SynSimProject]:</pre>
+<p>This directory is a subdirectory of the local SynSim directory.</p>
+<p></p></ol>
+<p>That's it. Now you can go to your project directory and run the synsim script as a test:</p>
+<pre>
+    ./synsim</pre>
+<p>This will run a simple test. If the installation was succesful, it will display the follwing message:</p>
+<pre>
+    SynSim Installation Test
+ 
+    Simulation::Automate version 0.9.6
+ 
+    installed locally in /home/wim/SynSim/Test
+ 
+    Finished SynSim run</pre>
+<p>
+</p>
+<h2><a name="3__perlstyle_installation">3. Perl-style installation</a></h2>
+<p>This is the typical Makefile.PL-driven installation procedure. It is only required for system-wide installation, but it works for local installation as well.</p>
+<ol>
+<li><strong><a name="item_create_the_makefile_3a">Create the Makefile:</a></strong><br />
+</li>
+<pre>
+        cd Simulation-Automate-0.9.5
+        perl Makefile.PL</pre>
+<li><strong><a name="item_make_simulation_3a_3aautomate_3a">Make Simulation::Automate:</a></strong><br />
+</li>
+<pre>
+        make</pre>
+<li><strong><a name="item_test_simulation_3a_3aautomate_3a">Test Simulation::Automate:</a></strong><br />
+</li>
+<pre>
+        make test</pre>
+<li><strong><a name="item_install_simulation_3a_3aautomate_3a">Install Simulation::Automate:</a></strong><br />
+</li>
+This requires you to be root:
+<pre>
+        su
+        make install</pre>
+<p>or</p>
+<pre>
+        sudo make install</pre>
+<p></p>
+<li><strong><a name="item_for_a_local_installation">For a local installation</a></strong><br />
+</li>
+This does not require you to be root:
+<pre>
+        make localinstall</pre>
+<p>or</p>
+<pre>
+        perl -e &quot;use Simulation::Automate;
+                 &amp;Simulation::Automate::localinstall();&quot;</pre>
+<p></p>
+<li><strong><a name="item_project">Setup your local SynSim project (</a></strong><br />
+</li>
+SynSim is the name for the tool contained in Simulation::Automate. This step creates the directory structure for your simulations:
+<pre>
+        make setup
+or</pre>
+<pre>
+        perl -e &quot;use Simulation::Automate;
+                 &amp;Simulation::Automate::setup();&quot;</pre>
+<p></p></ol>
+<p>
+</p>
+<h2><a name="4__archive_structure">4. Archive structure</a></h2>
+<p>The archive structure is as follows:</p>
+<pre>
+        README    
+        Makefile.PL       
+        Automate.pm
+        local_install.pl
+        Automate/
+                Remote.pm
+                PostProcLib.pm
+                Analysis.pm
+                Dictionary.pm
+                PostProcessors.pm</pre>
+<pre>
+        eg/
+                synsim  
+                synsim.data
+                ErrorFlags.data
+                Histogram.data
+                SweepVar.data
+                Expressions.data
+                gnuplot.data
+                SOURCES/
+                        bufsim3.cc
+                        MersenneTwister.h
+                TEMPLATES/              
+                        test.templ
+                        DEVTYPES/
+                        SIMTYPES/
+                                bufsim3.templ
+                PLUGINS/</pre>
+<p>
+</p>
+<hr />
+<h1><a name="configuration">CONFIGURATION</a></h1>
+<p>To configure SynSim for use with your simulator, you must create a set of files in your SynSim project directory structure. This paragraph gives an overview of the different types of files and their place in the SynSim project directory structure.</p>
+<p>
+</p>
+<h2><a name="synsim_project_directory_structure">SynSim project directory structure</a></h2>
+<p>You can create a SynSim directory structure with <code>perl local_install.pl</code> or <code>make setup</code> (see <a href="#installation">INSTALLATION</a> for details). If you already have an existing project, you can do this:</p>
+<ul>
+<li><strong><a name="item_create_a_new_project_directory_3a">Create a new project directory:</a></strong><br />
+</li>
+<pre>
+        mkdir NewProject</pre>
+<li><strong><a name="item_copy_the_c_3csynsim_3e_script_from_the_old_project">Copy the <code>synsim</code> script from the old project:</a></strong><br />
+</li>
+<pre>
+        cp oldProject/synsim NewProject</pre>
+<li><strong><a name="item_go_to_the_c_3cnewproject_3e_directory_and_run_c_3c">Go to the <code>NewProject</code> directory and run <code>synsim</code> with the <code>-D</code> option:</a></strong><br />
+</li>
+<pre>
+        cd NewProject
+        ./synsim -D</pre>
+</ul>
+<p>If you want to create it manually, this is the structure. Directories between square brackets are optional.</p>
+<pre>
+        YourProject/
+                        synsim  
+                        YourDataFile.data
+                        [SOURCES/]
+                        TEMPLATES/              
+                                 YourSimTempl.templ
+                                 [DEVTYPES/]
+                                 [SIMTYPES/]
+                                 [PLUGINS/]
+        [Simulation/SynSim/]
+                                [Dictionary.pm]
+                                [PostProcessors.pm]</pre>
+<p>The <code>synsim</code> script is the actual script that runs the DOE. It contains the 2 lines from the <a href="#synopsis">SYNOPSIS</a>.  
+The local Simulation/Automate modules are only required if you want to customize the postprocessing. 
+</p>
+<pre>
+
+=head2 Source files</pre>
+<p>The directory <em>SOURCES/</em> is optional. It should contain all files which are required ``read-only'' by your simulator (e.g. header files, library files, wrappers).</p>
+<p>
+</p>
+<h2><a name="template_files">Template files</a></h2>
+<p>Template files are files in which simulation variables will be substituted by their values to create the input file for your simulator. They must be stored in the <em>TEMPLATES/</em> directory, and have by convention the extension <code>.templ</code>.</p>
+<p><strong>SynSim variable format</strong></p>
+<p>The template file format is free, but the variables to be substituted by SynSim <em>must</em> be in uppercase and start with an underscore:</p>
+<p>Examples:</p>
+<pre>
+        _VAR1
+        _LONG_VARIABLE_NAME</pre>
+<p>To create a template file, start from an existing input file for your simulator. Replace the values of the variables to be modified by SynSim by a SynSim variable name (e.g. 
+var1 = 2.5 =&gt; var1 = _VAR1). Put the template files in <em>TEMPLATES</em>.</p>
+<p><strong>Note:</strong> Relative paths to source files</p>
+<p>SynSim creates a run directory ath the same level as the SOURCES and TEMPLATES directories. All commands (compilations etc.) are executed in that directory. As a consequence, paths to source files (e.g. header files) should be ``<code>../SOURCES/</code><em>sourcefilename</em>''.</p>
+<p><strong>Note:</strong> The <em>DEVTYPES/</em> and <em>SIMTYPES/</em> subdirectories</p>
+<p>SynSim can create an input file by combining two different template files, generally called device templates and simulation templates. This is useful in case you want to run different types of simulations on different devices, e.g. DC analysis, transient simulations, small-signal and noise analysis  on 4 different types of operational amplifiers. In total, this requires 16 different input files, but only 8 different template files (4 for the simulation type, 4 for the device types). If you want to use this approach, device templates should go in <em>TEMPLATES/DEVTYPES/</em> and simulation templates in  <em>TEMPLATES/SIMTYPES/</em>. 
+SynSim will check both directories for files as defined in the datafile. If a matching file is found in <em>DEVTYPES</em>, it will be prepended to the simulation template from <em>SIMTYPES</em>.</p>
+<p>
+</p>
+<h2><a name="datafile">Datafile</a></h2>
+<p>The datafile is the input file for <code>synsim</code>. It contains the list of simulation variables and their values to be substituted in the template files, as well as a number of configuration variables. See <a href="#datafile_description">DATAFILE DESCRIPTION</a> for more information.</p>
+<p>
+</p>
+<h2><a name="postprocessing_and_preprocessing__optional_">Postprocessing and Preprocessing (optional)</a></h2>
+<p>The <em>PostProcessing.pm</em> module contains routines to perform postprocessing on the simulation results (e.g. plotting, statistical analysis, etc). A number of generic routines are provided, as well as a library of functions to make it easier to develop your own postprocessing routines. See <a href="#postprocessing">POSTPROCESSING</a> for a full description).</p>
+<p>Before the raw data are sent to the postprocessor, it is possible (and very easy) to preprocess the raw data.  See <a href="#prerocessing">PREROCESSING</a> for more details.</p>
+<p>Custom postprocessing and preprocessing routines can either be stored in the <em>PLUGINS/</em> directory (preferred) or directly in the local <em>PostProcessing.pm</em> module (more intended for modified versions of the generic routines).</p>
+<p>
+</p>
+<h2><a name="dictionary__optional_">Dictionary (optional)</a></h2>
+<p>The <em>Dictionary.pm</em> module contains descriptions of the parameters used in the simulation. These descriptions are used by the postprocessing routines to make the simulation results more readable. See <a href="#dictionary">DICTIONARY</a> for a full description).</p>
+<p>
+</p>
+<hr />
+<h1><a name="datafile_description">DATAFILE DESCRIPTION</a></h1>
+<p>The datafile defines which simulations to run, with which parameter values to use, and how to run the simulation. By convention, it has the extension <code>.data</code>.</p>
+<p>
+</p>
+<h2><a name="syntax">Syntax</a></h2>
+<p>The datafile is a case-sensitive text file with following syntax:</p>
+<dl>
+<dt><strong><a name="item_comments_and_blanks">Comments and blanks</a></strong><br />
+</dt>
+<dd>
+Comments are preceded by '#'. 
+Comments, blanks and empty lines are ignored
+</dd>
+<p></p>
+<dt><strong><a name="item_parameters">Parameters</a></strong><br />
+</dt>
+<dd>
+Parameters (simulation variables) are in UPPERCASE with a leading '_', and must be separated from their values with a '='.
+</dd>
+<p></p>
+<dt><strong><a name="item_keywords">Keywords</a></strong><br />
+</dt>
+<dd>
+Keywords (configuration variables) are in UPPERCASE, and must be separated from their values with a ':'.
+</dd>
+<p></p>
+<dt><strong><a name="item_lists_of_values">Lists of values</a></strong><br />
+</dt>
+<dd>
+Lists of values have one or more items. The list separator is a comma ','.
+</dd>
+<dd>
+<p>Example:</p>
+</dd>
+<dd>
+<pre>
+        _PAR1 = 1,1,2,3,5,8,13</pre>
+</dd>
+<dd>
+<p>If a list has 3 elements START,STOP,STEP, then if possible this list will be expanded as a for-loop from START to STOP with step STEP.</p>
+</dd>
+<dd>
+<p>Example:</p>
+</dd>
+<dd>
+<pre>
+       _NBUFS = 16,64,8 #  from 16 to 64 in steps if 8: 16,24,32,40,48,56,64</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_types">Section headers for multiple simulation types (optional)</a></strong><br />
+</dt>
+<dd>
+These must be lines containing only the simulation type
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="simulation_variables">Simulation variables</a></h2>
+<p>The main purpose of the datafile is to provide a list of all variables and their values to be substituted in the template files.</p>
+<dl>
+<dt><strong><a name="item_default_behaviour_3a_combine_values">Default behaviour: combine values</a></strong><br />
+</dt>
+<dd>
+A simulation will be performed for every possible combination of the values for all parameters.
+</dd>
+<dd>
+<p>Example:</p>
+</dd>
+<dd>
+<pre>
+        _PAR1 = 1,2
+        _PAR2 = 3,4,5</pre>
+</dd>
+<dd>
+<p>defines 6 simulations: (_PAR1,_PAR2)=(1,3),(1,4),(1,5),(2,3),(2,4),(2,5)</p>
+</dd>
+<dd>
+<p>Simulation results for all values in ','-separated list are stored in a separate files.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_alternative_behaviour_3a_group_values">Alternative behaviour: group values</a></strong><br />
+</dt>
+<dd>
+It is possible (See the keyword <strong>GROUP</strong> under <a href="#configuration_variables">Configuration variables</a>) to define groups of variables. For every parameter in a group, the value list must have the same number of items. The values of all variables at the same position in the list will be used.
+</dd>
+<dd>
+<p>Example:</p>
+</dd>
+<dd>
+<pre>
+        GROUP: _PAR1,_PAR2</pre>
+</dd>
+<dd>
+<pre>
+        _PAR1 = 0;1;2;4
+        _PAR2 = 3;4;5;6</pre>
+</dd>
+<dd>
+<p>defines 4 simulations: (_PAR1,_PAR2)=(0,3);(1,4);(2,5);(4,6)</p>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="configuration_variables">Configuration variables</a></h2>
+<p>A number of configuration variables (``keywordsw) are provided to configure SynSim's behaviour. There is no mandatory order, but they must appear before the simulation variable. For the default order, see the <a href="#examples">EXAMPLES</a>. 
+In alphabetical order, they are:</p>
+<dl>
+<dt><strong><a name="item_analysis">ANALYSIS</a></strong><br />
+</dt>
+<dd>
+<strong>Alternative names:</strong> ANALYSIS_TEMPLATE, ANATEMPL
+</dd>
+<dd>
+<p>Name of the routine to be used for the result analysis (postprocessing). This routine must be defined in PostProcessors.pm or in a file in the <em>PLUGINS/</em> directory. A number of generic routines are provided, see <a href="#postprocessing">POSTPROCESSING</a>.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_command">COMMAND</a></strong><br />
+</dt>
+<dd>
+The command line for the program that runs the input file, i.e. the simulator command (default: perl). SynSim looks for the words <strong>INPUTFILE</strong> and &lt;OUTPUTFILE&gt; and substitutes them with the actual file names.
+</dd>
+<dd>
+<p>Examples:</p>
+</dd>
+<dd>
+<pre>
+        yoursim1 -i INPUTFILE -o OUTPUTFILE
+        yoursim2 INPUTFILE &gt; OUTPUTFILE</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_devtype">DEVTYPE (optional)</a></strong><br />
+</dt>
+<dd>
+The name of the device on which to perform the simulation. If defined, SynSim will look in TEMPLATES/DEVTYPES for a file with TEMPL and DEVTYPE, and prepend this file to the simulation template before parsing. This keyword can take a list of values
+</dd>
+<p></p>
+<dt><strong><a name="item_ext">EXT</a></strong><br />
+</dt>
+<dd>
+Extension of input file (default: .pl)
+</dd>
+<dd>
+<p>Some simulators expect a particular extension for the input file. This can be specified with the keyword <strong>EXT</strong>.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_group">GROUP (optional)</a></strong><br />
+</dt>
+<dd>
+This keyword can be used to change the default behaviour of creating nested loops for every parameter.
+It takes as argument a list of parameters. The behaviour for grouped parameters is to change at the same time. All parameter lists in the group must have the same number of values. More than one group can be created.
+</dd>
+<dd>
+<p>Example:</p>
+</dd>
+<dd>
+<pre>
+        # First group: 2 parameters, each 4 values
+        GROUP: _PAR_A1,_PAR_A2
+        # Second group: 3 parameters, each 3 values
+        GROUP: _PAR_B1,_PAR_B2,_PAR_B3
+        # SynSim will run 4*3 simulations (default without groups would be 16*27)</pre>
+</dd>
+<dd>
+<pre>
+        _PAR_A1 = 0;1;2;4
+        _PAR_A2 = 3;4;5;6</pre>
+</dd>
+<dd>
+<pre>
+        _PAR_B1 = -1;1;2
+        _PAR_B2 = 3;4;7
+        _PAR_B3 = 3;6;15</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_include">INCLUDE (optional)</a></strong><br />
+</dt>
+<dd>
+If the value of INCLUDE is an exisiting filename, this datafile will be included on the spot.
+</dd>
+<p></p>
+<dt><strong><a name="item_normvar">NORMVAR (optional)</a></strong><br />
+</dt>
+<dd>
+The name of the variable to normalise the results with. The results will be divided by the corresponding value of the variable.
+</dd>
+<p></p>
+<dt><strong><a name="item_nruns">NRUNS (optional)</a></strong><br />
+</dt>
+<dt><strong><a name="item_output_filter_pattern">OUTPUT_FILTER_PATTERN (optional)</a></strong><br />
+</dt>
+<dd>
+A Perl regular expression to filter the output of the simulation (default : .*). Tis is very usefull for very verbose simulators. The results file will only contain the filtered output.
+</dd>
+<p></p>
+<dt><strong><a name="item_preprocessor">PREPROCESSOR (optional)</a></strong><br />
+</dt>
+<dd>
+The name of a function which modifies <code>@results</code> before the actual postprocessing. Very usefull to ``streamline'' the raw results for postprocessing.
+</dd>
+<p></p>
+<dt><strong><a name="item_template">TEMPLATE</a></strong><br />
+</dt>
+<dd>
+<strong>Alternative names:</strong> SIMULATION, SIMTEMPL, SIMTYPE
+</dd>
+<dd>
+<p>The name of the template file, with or without extension. By convention, this is the same as the type of simulation to be performed. If no extension is given, SynSIm checks for a <strong>TEMPLEXT</strong> keyword; if this is not defined, the extenstion defaults to <code>.templ</code>. SynSim will look for the template file in <em>TEMPLATES/</em> and <em>TEMPLATES/SIMTYPES/</em>.</p>
+</dd>
+<dd>
+<p><strong>Note:</strong> Multiple simulation types</p>
+</dd>
+<dd>
+<p>The value of SIMULATION can be a ','-separated list. In this case, SynSim will use the datafile for multiple types of simulations. Every item in the list can be used as a section header, demarkating a section with variables particular to that specific simulation.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_templext">TEMPLEXT (optional)</a></strong><br />
+</dt>
+<dd>
+Extension of template files (default: <code>.templ</code>)
+</dd>
+<p></p>
+<dt><strong><a name="item_title">TITLE</a></strong><br />
+</dt>
+<dd>
+The title of the DOE. This title is used on the plots, but typically it is the first line of the datafile and describes the DOE.
+</dd>
+<p></p>
+<dt><strong><a name="item_xvar">XVAR (optional)</a></strong><br />
+</dt>
+<dd>
+<strong>Alternative name:</strong> SWEEPVAR
+</dd>
+<dd>
+<p>The name of the variable to be sweeped. Mandatory if the postprocessing routine is XYPlot.</p>
+</dd>
+<dd>
+<p>The number of times the simulation has to be performed. For statistical work.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_xcol">XCOL (optional)</a></strong><br />
+</dt>
+<dd>
+The column in the output file which contains the X-values.
+</dd>
+<p></p>
+<dt><strong><a name="item_ycol">YCOL (optional)</a></strong><br />
+</dt>
+<dd>
+<strong>Alternative name:</strong> DATACOL
+</dd>
+<dd>
+<p>The column in the output file which contains the simulation results (default: 2). Mandatory if using any of the generic postprocessing routines.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_ystop">XLABEL, YLABEL, LOGSCALE, PLOTSTYLE, XTICS, YTICS, XSTART, XSTOP, YSTART, YSTOP (optional)</a></strong><br />
+</dt>
+<dd>
+Variables to allow more flexibility in the customization of the plots. They are identical to the corresponding (lowercase) <code>gnuplot</code> keywords, see the gnuplot documentation for details. The most commonly used, XLABEL and YLABEL are the X and Y axis labels. LOGSCALE is either X, Y or XY, and results in a logarithmic scale for the chosen axis.
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="expressions">Expressions</a></h2>
+<p>The SynSim datafile has support for expressions, i.e. it is possible to express the value list of a variable in terms of the values of other variables.</p>
+<p>Example:</p>
+<pre>
+    # average packet length for IP dist 
+    _MEANPL = ((_AGGREGATE==0)?2784:9120)
+    # average gap width 
+    _MEANGW= int(_MEANPL*(1/_LOAD-1)) 
+    # average load
+    _LOAD = 0.1;0.2;0.3;0.4;0.5;0.6;0.7;0.8;0.9
+    # aggregate 
+    _AGGREGATE =  0,12000</pre>
+<p>The variables used in the expressions must be defined in the datafile, although not upfront. Using circular references will not work.
+The expression syntax is Perl syntax, so any Perl function can be used. Due to the binding rules, it is necessary to enclose expressions using the ternary operator ?: with brackets (see example).</p>
+<p>
+</p>
+<hr />
+<h1><a name="running_synsim">RUNNING SYNSIM</a></h1>
+<p>The SynSim script must be executed in a subdirectory of the SynSim
+directory which contains the TEMPLATES subdir and the datafile (like the Example directory in the distribution).</p>
+<p>The command line is as follows:</p>
+<pre>
+        ./synsim [-h -D -i -p -P -v -N ] [datafile] [remote hostname]</pre>
+<p>The <code>synsim</code> script supports following command line options:</p>
+<pre>
+        none: defaults to -f synsim.data
+         -D : Create an empty SynSim directory structure in the current directory.
+         -v : 'verbose'. Sends simulator output to STDOUT
+         -i : interactive. Calls gv or ggv to display a plot of the results.
+              Implies -p -v.  
+         -p : plot. This enables generation of postscript plots via gnuplot. 
+              A postprocessing routine is required to generate the plots.
+         -P : Plot. This option can be used to display plots created with -p.
+         -w : 'warnings'. Show warnings about undefined variables.
+         -N : 'No simulations'. Performs only postprocessing.
+         -h, -? : short help message</pre>
+<p>If [remote hostname] is provided, SynSim will try to run the simulation on the remote host.</p>
+<p>The current implementation requires:</p>
+<p>-ssh access to remote host</p>
+<p>-scp access to remote host</p>
+<p>-rsync server on the local host</p>
+<p>-or,alternatively, an NFS mounted home directory</p>
+<p>-as such, it will (probably) only work on Linux and similar systems</p>
+<p>
+</p>
+<hr />
+<h1><a name="postprocessing">POSTPROCESSING</a></h1>
+<p>Postprocessing of the simulation results is handled by routines in the <code>PostProcessors.pm</code> module. This module uses the <code>PostProcLib.pm</code> and optionally <code>Dictionary.pm</code> and <code>Analysis.pm</code>.</p>
+<p>
+</p>
+<h2><a name="generic_postprocessors">Generic Postprocessors</a></h2>
+<p>SynSim comes with a number of generic postprocessing routines.</p>
+<dl>
+<dt><strong><a name="item_xyplot">XYPlot</a></strong><br />
+</dt>
+<dd>
+Required configuration variables: <a href="#item_xvar"><code>XVAR</code></a>
+</dd>
+<dd>
+<p>Creates a plot using <a href="#item_xvar"><code>XVAR</code></a> as X-axis and all other variables as parameters. This routine is completely generic.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_condxyplot">CondXYPlot</a></strong><br />
+</dt>
+<dd>
+Required configuration variables: <a href="#item_xvar"><code>XVAR</code></a>,<code>CONDVAR</code> and <code>CONDITION</code>.
+</dd>
+<dd>
+<p>Creates a plot using <code>SETVAR</code> as X-axis; <a href="#item_xvar"><code>XVAR</code></a> is checked against the condition <code>COND</code> (or <code>CONDITION</code>). The first value of <code>CONDVAR</code> that meets the condition is plotted. All other variables are parameters. This routine is completely generic.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_xyploterrorbars">XYPlotErrorBars</a></strong><br />
+</dt>
+<dd>
+Required configuration variables: <a href="#item_xvar"><code>XVAR</code></a>, <a href="#item_nruns"><code>NRUNS</code></a>
+</dd>
+<dd>
+<p>Optional configuration variables: <code>NSIGMAS</code></p>
+</dd>
+<dd>
+<p>Creates a plot using <a href="#item_xvar"><code>XVAR</code></a> as X-axis and all other variables as paramters. Calculates average and 95% confidence intervals for <a href="#item_nruns"><code>NRUNS</code></a> simulation runs and plots error flags. This routine is fully generic, the confidence interval (95% by default) can be set with NSIGMAS. See eg/ErrorFlags.data for an example datafile.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_histogram">Histogram</a></strong><br />
+</dt>
+<dd>
+Required configuration variables: <code>NBINS</code>
+</dd>
+<dd>
+<p>Optional configuration variables: <code>BINWIDTH</code>, <code>MIN</code>, <code>MAX</code></p>
+</dd>
+<dd>
+<p>Creates a histogram of the simulation results. This requires the simulator to produce raw data for the histograms in a tabular format. When specifying logscale X or XY for the plot, the histogram bins will be logarithmic. See eg/Histogram.data for an example. 
+The number of bins in the histogram must be specified via <code>NBINS</code>. The width of the bins can be set with <code>BINWIDTH</code>, in which case  <code>MIN</code> and <code>MAX</code> will be calculated. When  <code>MIN</code> or <code>MAX</code> are set, <code>BINWIDTH</code> is calculated. It is possible to specify either <code>MIN</code> or <code>MAX</code>, the undefine value will be calculated.</p>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="preprocessing_the_raw_results">Preprocessing the raw results</a></h2>
+<p>All of the above routines have hooks for simple functions that modify the <code>@results</code> array. To call these functions, include them in the datafile with the <a href="#item_preprocessor"><code>PREPROCESSOR</code></a> variable. e.g:</p>
+<pre>
+  PREPROCESSOR : modify_results</pre>
+<pre>
+  All functions must be put in the PLUGINS folder or in the PostProcessors.pm module, and the template could be like this:</pre>
+<pre>
+  sub modify_results {
+  foreach my $results_line (@results) {
+          #Do whatever is required
+  }
+  
+  } # End of modify_results</pre>
+<p>
+</p>
+<hr />
+<h1><a name="dictionary">DICTIONARY</a></h1>
+<p>The <em>Dictionary.pm</em> module contains descriptions of the parameters used in the simulation. These descriptions are used by the postprocessing routines to make the simulation results more readable. The dictionary is stored in an associative array called <code>make_nice</code>. The description of the variable is stored in a field called 'title'; Descriptions of values are stored in fields indexed by the values.</p>
+<p>Following example illustrates the syntax:</p>
+<pre>
+        # Translate the parameter names and values into something meaningful
+        %Dictionary::make_nice=(
+        
+        _BUFTYPE =&gt; {
+        title=&gt;'Buffer type',
+                     0=&gt;'Adjustable',
+                     1=&gt;'Fixed-length',
+                     2=&gt;'Multi-exit',
+                    },
+        _YOURVAR1 =&gt; {
+        title=&gt;'Your description for variable 1',
+        },
+        
+        _YOURVAR2 =&gt; {
+        title=&gt;'Your description for variable 2',
+'val1' =&gt; 'First value of _YOURVAR2',
+'val3' =&gt; 'Second value of _YOURVAR2',
+        },</pre>
+<pre>
+        );</pre>
+<p>
+</p>
+<hr />
+<h1><a name="output_files">OUTPUT FILES</a></h1>
+<p>SynSim creates a run directory <code>{SIMTYPE}-</code><em>[datafile without .data]</em>. It copies all necessary template files and source files to this directory; all output files are generated in this directory.</p>
+<p>SynSim generates following files:</p>
+<ul>
+<li></li>
+Output files for all simulation runs.
+<p>The names of these files are are <code>{SIMTYPE}_C</code><em>[counter]_[simulation number]</em><code>.out</code></p>
+<p><em>counter</em> is increased with every new combination of variables except for <a href="#item_xvar"><code>XVAR</code></a>.</p>
+<p><em>simulation number</em> is the position of the value in the <a href="#item_xvar"><code>XVAR</code></a>- list.</p>
+<p></p>
+<li></li>
+Combined output file for all values in a ';'-separated list.
+<p>The names of these files are are <code>{SIMTYPE}_C</code><em>[counter]</em><code>_.out</code></p>
+<p><em>counter</em> is increased with every new combination of variables in ','-separated lists.</p>
+<p>Only the lines matching <code>/OUTPUT_FILTER_PATTERN/</code> (treated as a Perl regular expression) are put in this file.</p>
+<p></p>
+<li></li>
+Combined output file for all values in a ';'-separated list, with a header detailing all values for all variables.
+<p>The names of these files are are <code>{SIMTYPE}_C</code><em>[counter]</em><code>.res</code>,</p>
+<p><em>counter</em> is increased with every new combination of variables in ','-separated lists.</p>
+<p>Only the lines in the <code>.out</code> files matching <code>/OUTPUT_FILTER_PATTERN/</code> (treated as a Perl regular expression) are put in this file.</p>
+<p></p>
+<li></li>
+Separate input files for every item in a ';'-separated list.
+<p>The names of these files are are <code>{SIMTYPE}_</code><em>[simulation number]</em><code>.{EXT}</code></p>
+<p><em>simulation number</em> is the position of the value in the list.</p>
+<p>These files are overwritten for every combination of variables in ','-separated lists.</p>
+<p></p></ul>
+<p>
+</p>
+<hr />
+<h1><a name="writing_postprocessing_routines">WRITING POSTPROCESSING ROUTINES</a></h1>
+<p>In a lot of cases you will want to create your own postprocessing routines. First of all, it is important to understand the SynSim output, so make sure you have read <a href="#output_files">OUTPUT FILES</a>. Apart from that, there is a very simple API.</p>
+<p>
+</p>
+<h2><a name="postproclib">PostProcLib</a></h2>
+<ul>
+<li><strong><a name="item_all_variables_from_the_datafile_are_exported_in_a_">All variables from the datafile are exported in a hash called <code>%simdata</code></a></strong><br />
+</li>
+The value list for every variable is a Perl list. This means that you can access the values like this:
+<pre>
+        my @importantvars = @{$simdata{_VAR1}}</pre>
+<p>or</p>
+<pre>
+        my $importantvar = $simdata{_VAR1}[0]</pre>
+<p>The same holds for configuration variables, but in general they only have a single value, so:</p>
+<pre>
+        my $x_variable = $simdata{XVAR}</pre>
+<p></p>
+<li><strong><a name="item_easy_2dtyping_names">Easy-typing names</a></strong><br />
+</li>
+Furthermore, every variable can be accessed using a short name. Instead of
+<pre>
+        $simdata{_VAR}</pre>
+<p>you can use</p>
+<pre>
+        $_var</pre>
+<p>This is especially handy for configuration variables, e.g.</p>
+<pre>
+        $plotstyle</pre>
+<p>instead of</p>
+<pre>
+        $simdata{PLOTSTYLE}</pre>
+<p></p>
+<li><strong><a name="item_current_set_of_values_for_the_doe">Current set of values for the DOE</a></strong><br />
+</li>
+The current set of values for the DOE is available in the hash <code>%current_set_vals</code>. The keys are the variable names, the values the current value for the variable.
+<p>Example: A simple DOE with 2 variables.</p>
+<pre>
+        _VAR1=1,2,3
+        _VAR2=3,4</pre>
+<p>This DOE has 6 sets. After the fourth run, the values of the set will be:</p>
+<pre>
+        $current_set_vals{_VAR1}==2
+        $current_set_vals{_VAR1}==4</pre>
+<p>The current set is also available in string format through <code>$current_set_str</code>:</p>
+<pre>
+        $current_set_str eq '_VAR1-2-_VAR2-4'</pre>
+<p>This is useful because this string is part of the name of the  results file.</p>
+<p>If the configuration variable <code>SETVAR</code> is defined, there is an additional string <code>$current_set_except_setvar_str</code>, which contains the current set except the <code>SETVAR</code>. This is usefull for conditional postprocessing, see e.g. CondXYPlot in PostProcessors.pm.</p>
+<p></p>
+<li><strong><a name="item_raw_results">Raw results</a></strong><br />
+</li>
+The raw results of the last simulation run are available in the array <code>@results</code>. Every element in this array is identical to the corresponding line in the output file for the given simulation run.
+<p>It is also possible to access the results files: <code>$results_file_name</code> contains the filename of the current results file, and <code>@all_results_file_names</code> is a list of all results files so far.</p>
+<p></p>
+<li><strong><a name="item_deciding_when_to_call_the_postprocessor_2e">Deciding when to call the postprocessor.</a></strong><br />
+</li>
+SynSim allows to call your postprocessing routine after every run. However, postprocessing generally only makes sense at certain points in the execution of the DOE. SynSim provide two variables: <code>$last</code>, which indicates the end of a sweep, <code>$verylast</code> which indicates the end of the DOE.
+<p></p></ul>
+<p>In summary, following variables are exported:</p>
+<pre>
+                           %simdata             # contains all datafile variables 
+                                                #and their values/value lists
+                           @results             # memory image of the results file
+                           %current_set_vals    # values for the current set 
+                           $current_set_str     # same in string format 
+                           $current_set_except_setvar_str
+                           $results_file_name    
+                           @all_results_file_names
+                           $last                # indicates end of a sweep
+                           $verylast            # indicates end of the DOE</pre>
+<p>An example of how all this is used:</p>
+<pre>
+        sub YourRoutine {
+        
+        ## Define your own variables.
+        ## As every variable can have a list of values, 
+        ## $simdata{'_YOURVAR1'} is an array reference.
+        
+        my $yourvar=${$simdata{'_YOURVAR1'}}[0];
+        
+        my @sweepvarvals=@{$simdata{$sweepvar}};
+        
+        ## $verylast indicates the end of all simulations
+        if(not $verylast) {
+        
+        ## what to do for all simulations
+        
+        ## $last indicates the end of a sweep
+        if($last) {
+        # Do something at the end of every sweep  
+          } # if last
+        } else {
+         ## On the very last run, collect the results into one nice plot
+          &amp;gnuplot_combined($firstplotline,$plotlinetempl);
+        }
+        
+        } #END of YourRoutine()</pre>
+<p>
+</p>
+<h2><a name="statistical_analysis">Statistical analysis</a></h2>
+<p>A module for basic statistical analysis is also available (<code>Analysis.pm</code>). Currently, the module provides 2 routines:</p>
+<dl>
+<dt><strong><a name="item_calc_statistics">calc_statistics():</a></strong><br />
+</dt>
+<dd>
+To calculate average, standard deviation, min. and max. of a set of values.
+</dd>
+<dd>
+<p>Arguments:</p>
+</dd>
+<dd>
+<p><code>$file</code>: name of the results file. The routine requires the data to be in whitespace-separated columns.</p>
+</dd>
+<dd>
+<p><code>$par</code>: Determines if the data will be differentiated before processing ($par='DIFF') or not (any other value for $par). 
+              Differentiation is defined as subtracting the previous value in the 
+              array form the current value. A '0' is prepended to the array to avoid 
+              an undefined first point.</p>
+</dd>
+<dd>
+<p><code>$datacol</code>: column to use for data</p>
+</dd>
+<dd>
+<p><code>$title</code>: optional, a title for the histogram</p>
+</dd>
+<dd>
+<p><code>$log</code>: optional, log of values before calculating histogram or not ('LOG' or '')</p>
+</dd>
+<dd>
+<p><table cellspacing="0" cellpadding="0"><tr><td>Use:
+<tr><td><td>my $file=``your_results_file.res'';
+<tr><td><td>my $par='YOURPAR';
+<tr><td><td>my $datacol=2;
+<tr><td><td>my %stats=%{&amp;calc_statistics($file,[$par, $datacol])};</table></p>
+</dd>
+<dd>
+<pre>
+        my $avg=$stats{$par}{AVG}; # average
+        my $stdev=$stats{$par}{STDEV}; # standard deviation
+        my $min=$stats{$par}{MIN}; # min. value in set
+        my $max=$stats{$par}{MAX}; # max. value in set</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_build_histograms">build_histograms():</a></strong><br />
+</dt>
+<dd>
+To build histograms. There are 3 extra arguments:
+</dd>
+<dd>
+<pre>
+        $nbins: number of bins in the histogram
+        $min: force the value of the smallest bin (optional)
+        $max: force the value of the largest bin (optional)</pre>
+</dd>
+<dd>
+<p>use:
+	my $par='DATA';
+	my %hists=%{&amp;build_histograms(``your_results_file.res'',
+                  [$par,$datacol],$title,$log,$nbins,$min,$max)};</p>
+</dd>
+<dd>
+<p>NOTE: Because the extra arguments are last, the $title and $log arguments can not be omitted. If not needed, supply ''.</p>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="examples">EXAMPLES</a></h1>
+<p>Here are some examples of how to use SynSim for different types of simulators.</p>
+<p>
+</p>
+<h2><a name="1__typical_spice_simulator">1. Typical SPICE simulator</a></h2>
+<p>Normal use: spice -b circuit.sp &gt; circuit.out</p>
+<p>With SynSim:</p>
+<ol>
+<li><strong><a name="item_create_a_template_file">Create a template file</a></strong><br />
+</li>
+Copy circuit.sp to TEMPLATES/SIMTYPE/circuit.templ
+Replace all variable values with SynSim variable names.
+<p>e.g. a MOS device line in SPICE:</p>
+<pre>
+  M1 VD VG VS VB nch w=10u l=10u</pre>
+<p>becomes</p>
+<pre>
+  M1 VD VG VS VB _MODEL w=_WIDTH l=_LENGTH</pre>
+<p></p>
+<li><strong><a name="item_file">Create a data file (e.g. circuit.data)</a></strong><br />
+</li>
+<pre>
+  TITLE: MOS drain current vs. length
+  SIMTYPE : circuit
+  COMMAND : spice -b inputfile &gt; outputfile</pre>
+<pre>
+  # Required for postprocessing 
+  OUTPUT_FILTER_PATTERN : Id # keep only the drain current on the output file
+  ANALYSIS_TEMPLATE : SweepVar # default template for simple sweep
+  SWEEPVAR : _L # we sweep the length, the other variables are parameters
+  DATACOL: 2 # first col is the name</pre>
+<pre>
+  _L = 1u,2u,5u,10u,20u,50u
+  _W = 10u,100u
+  _MODEL = nch</pre>
+<p>There are more possible keywords, cf. <a href="#datafile_description">DATAFILE DESCRIPTION</a>.</p>
+<li><strong><a name="item_now_run_synsim">Now run synsim</a></strong><br />
+</li>
+<pre>
+  ./synsim -p -i -v -f IDvsL.data</pre>
+<pre>
+  -p to create plots
+  -i means interactive, so the plots are displayed during simulation
+  -v for verbose output
+  -f because the filename is not the default name</pre>
+<p>SynSim will run 12 SPICE simulations and produce 1 plot with all results.</p>
+<li><strong><a name="item_results">Results</a></strong><br />
+</li>
+All results are stored in the run directory, in this case:
+<pre>
+  circuit-IDvsL</pre>
+<p></p></ol>
+<p>
+</p>
+<h2><a name="2__simulator_with_commandline_input_and_fixed_output_file">2. Simulator with command-line input and fixed output file</a></h2>
+<p>Normal use: simplesim -a50 -b100 -c0.7</p>
+<p>Output is saved in out.txt.</p>
+<p>With SynSim:</p>
+<ol>
+<li><strong>Create a template file</strong><br />
+</li>
+As simplesim does not take an input file, we create a wrapper simplesim.templ in TEMPLATES/SIMTYPE.
+This file is actually a template for a simple perl script:
+<pre>
+ system(&quot;simplesim -a_VAR1 -b_VAR2 -c_VAR3&quot;);
+ system(&quot;cp out.txt $ARGV[0]&quot;);</pre>
+<p></p>
+<li><strong>Create a data file (e.g. test.data)</strong><br />
+</li>
+<pre>
+  TITLE: simplesim test
+  SIMTYPE : simplesim
+  COMMAND : perl inputfile outputfile</pre>
+<li><strong>Now run synsim</strong><br />
+</li>
+<pre>
+  ./synsim -f test.data</pre>
+<p>SynSim will run without any messages and produce no plots.</p>
+<li><strong>Results</strong><br />
+</li>
+All results are stored in the run directory, in this case:
+<pre>
+  simplesim-test</pre>
+<p></p></ol>
+<p>
+</p>
+<h2><a name="3__simulator_without_input_file__configured_at_compile_time">3. Simulator without input file, configured at compile time</a></h2>
+<p>Normal use: Modify values for #if and #ifdef constants in the header file; then compile and run.</p>
+<p>e.g.:</p>
+<pre>
+  vi bufsim3.h
+  g++ -o bufsim3 bufsim3.cc
+  ./bufsim3 &gt; outputfile</pre>
+<p>With SynSim:</p>
+<ol>
+<li><strong><a name="item_code">Put the source code (bufsim3.cc) in SOURCES</a></strong><br />
+</li>
+<li><strong>Create a template file</strong><br />
+</li>
+As bufsim3 does not take an input file, we create a wrapper bufsim3.templ in TEMPLATES/SIMTYPE.
+This file is actually a template for a perl script that writes the header file, compiles and runs the code:
+<pre>
+  open(HEADER,&quot;&gt;bufsim3.h&quot;);
+  print HEADER &lt;&lt;&quot;ENDH&quot;;
+  #define NBUFS _NBUFS
+  #define NPACKETS _NPACK
+  #AGGREGATE _AGGREGATE
+  ENDH
+  close HEADER;</pre>
+<pre>
+  system(&quot;g++ -o bufsim3 bufsim3.cc&quot;);
+  system(&quot;./bufsim3 $ARGV[0]&quot;);</pre>
+<p></p>
+<li><strong><a name="item_datafile">Create a datafile (e.g. Aggregate.data)</a></strong><br />
+</li>
+<pre>
+  TITLE: bufsim3 test (_NBUFS, _NPACK) # will be substituted by the values
+  SIMTYPE : bufsim3
+  COMMAND : perl inputfile outputfile</pre>
+<li><strong><a name="item_run_synsim">Run synsim</a></strong><br />
+</li>
+<pre>
+  ./synsim -w -v -f Aggregate.data</pre>
+<p>SynSim will run verbose and flag all variables not defined in the datafile.</p>
+<li><strong>Results</strong><br />
+</li>
+All results are stored in the run directory, in this case:
+<pre>
+  bufsim3-Aggregate</pre>
+<p></p></ol>
+<p>
+</p>
+<h2><a name="4__circuit_simulator_which_produces_binary_files_">4. Circuit simulator which produces binary files.</a></h2>
+<p>Normal use: spectre circuit.scs -raw circuit.raw</p>
+<p>With SynSim:</p>
+<ol>
+<li><strong>Create a template file</strong><br />
+</li>
+Copy circuit.scs to TEMPLATES/SIMTYPE/circuit.templ
+Replace all variable values with SynSim variable names.
+<p></p>
+<li><strong><a name="item_create_a_data_file">Create a data file</a></strong><br />
+</li>
+The .raw file is a binary file, so it should not be touched. SynSim creates output files with extension .out, and combines these with the headers etc. (cf. <a href="#output_files">OUTPUT FILES</a>). By keeping the extension .raw, the simulator output files will not be touched.
+<p>In the datafile:</p>
+<pre>
+  TITLE: Spectre simulation with SPF output
+  EXT: .scs
+  COMMAND: spectre inputfile -raw outputfile.raw &gt; outputfile</pre>
+<p></p>
+<li><strong>Run synsim</strong><br />
+</li>
+SynSim will process <code>outputfile</code>, but not <code>outputfile.raw</code>.
+<p></p>
+<li><strong><a name="item_postprocessing">Postprocessing</a></strong><br />
+</li>
+To access the binary files, you will have to write your own postprocessing routines. Most likely they will rely on an external tool to process the binary data. The files will be found in the run directory, and have names as described in <a href="#output_files">OUTPUT FILES</a>, with the extra extension .raw.
+<p></p></ol>
+<p>
+</p>
+<hr />
+<h1><a name="wrappers">WRAPPERS</a></h1>
+<p>If the simulator command line does not follow the format required by SynSim, a simple shell or perl wrapper is enough to make SynSim understand it.
+The wrapper script must be stored under <em>SOURCES/</em>; it should be written such that all relative paths are correct when it is executed under <em>SOURCES/</em>. That is because SynSim runs in a subdirectory fo the project directory. This means that, if the command line contains relative paths to a subdirectory, these paths must be prepended with '../'.</p>
+<p>
+</p>
+<h2><a name="1__no_is_wrapper_required_if_the_simulator_takes_input_from_a_file_with_an_arbitrary_name_and_sends_output_in_any_way_to_a_file_with_an_arbitrary_name_">1. No is wrapper required if the simulator takes input from a file with an arbitrary name and sends output in any way to a file with an arbitrary name:</a></h2>
+<pre>
+        $ simulator INPUTFILE OUTPUTFILE
+        $ simulator --o OUTPUTFILE INPUTFILE 
+        $ simulator -i INPUTFILE &gt; OUTPUTFILE
+        $ simulator &lt; INPUTFILE &gt; OUTPUTFILE</pre>
+<p>
+</p>
+<h2><a name="2__simulators_with_fixed_input_file_name_">2. Simulators with fixed input file name:</a></h2>
+<p>Example:</p>
+<pre>
+        $ simulator sim.conf &gt; sim.out</pre>
+<p>Wrapper:</p>
+<pre>
+        $ simulator_wrapper.sh INPUTFILE &gt; OUTPUTFILE</pre>
+<p>The file <code>simulator_wrapper.sh</code> contains 2 lines:
+</p>
+<pre>
+
+        mv $1 sim.conf
+        simulator sim.conf</pre>
+<p>
+</p>
+<h2><a name="3__simulator_with_a_fixed_output_file_name_">3. Simulator with a fixed output file name:</a></h2>
+<p>Example:</p>
+<pre>
+        $ simulator INPUTFILE</pre>
+<p>The outputfile is called <code>output.txt</code>.</p>
+<p>Wrapper:</p>
+<pre>
+        $ simulator_wrapper.sh INPUTFILE OUTPUTFILE</pre>
+<p>The file <code>simulator_wrapper.sh</code> contains 2 lines:
+</p>
+<pre>
+
+        simulator $1
+        mv output.txt $2</pre>
+<p>
+</p>
+<h2><a name="4__simulator_takes_input_file_from_a_subdirectory">4. Simulator takes input file from a subdirectory</a></h2>
+<p>Example:</p>
+<pre>
+        $ simulator ../Config/INPUTFILE &gt; OUTPUTFILE</pre>
+<p>The <em>Config</em> directory is in this case at the same level of project directory.</p>
+<p>Wrapper: 
+</p>
+<pre>
+
+        $ simulator_wrapper.sh INPUTFILE &gt; OUTPUTFILE</pre>
+<p>The file <code>simulator_wrapper.sh</code> contains 2 lines. Note the '../' prepended to the paths:
+</p>
+<pre>
+
+        cp $1 ../../Config
+        simulator ../../Config/INPUTFILE</pre>
+<p>
+</p>
+<h2><a name="5__simulator_produces_output_in_a_subdirectory">5. Simulator produces output in a subdirectory</a></h2>
+<p>Example:</p>
+<pre>
+        $ simulator INPUTFILE OUTPUTFILE</pre>
+<p>The <code>OUTPUTFILE</code> is generated in the <em>Results</em> subdirectory.</p>
+<p>Wrapper:</p>
+<pre>
+        $ simulator_wrapper.sh INPUTFILE OUTPUTFILE</pre>
+<p>The file <code>simulator_wrapper.sh</code> contains 2 lines. Note the '../' prepended to the path:
+</p>
+<pre>
+
+        simulator $1 $2
+        cp ../Results/$2 .</pre>
+<p>
+</p>
+<h2><a name="6__simulator_with_commandline_input_and_fixed_output_file">6. Simulator with command-line input and fixed output file</a></h2>
+<pre>
+        $ simulator -a50 -b100 -c0.7</pre>
+<p>Output is saved in out.txt.</p>
+<p>In this case, there is no actual wrapper script. We will create a simple shell script simulator.templ in TEMPLATES/. This script will act as the input file.</p>
+<p>Wrapper:</p>
+<pre>
+        $ bash INPUTFILE OUTPUTFILE</pre>
+<p>We need the explicit call to bash because the INPUTFILE does not have the -x flag set.</p>
+<p>The file simulator.templ in TEMPLATES/ contains 2 lines:
+</p>
+<pre>
+
+        simulator -a_VAR1 -b_VAR2 -c_VAR3
+        cp out.txt $1</pre>
+<p>SynSim will create simulator.sh from this template file, and then will call bash to execute this shell script.</p>
+<p>
+</p>
+<h2><a name="7__simulator_requires_multiple_input_files">7. Simulator requires multiple input files</a></h2>
+<p>Example:</p>
+<pre>
+        $ simulator config.in topo.in &gt; out.res</pre>
+<p>Wrapper:</p>
+<pre>
+        $ perl INPUTFILE OUTPUTFILE</pre>
+<p>Again, there is no actual wrapper script. The <code>INPUTFILE</code> template is in this case a perl script which contains itself templates for both input files. The script will create both input files, then run the simulator.</p>
+<p>A possible implementation of simulator.templ:</p>
+<pre>
+        #!/usr/bin/perl
+        #Template for simulator with multiple input files
+        my $config_templ=&lt;&lt;&quot;ENDCONF&quot;;
+        /* This is the config.in template */
+        int var1 = _VAR1;</pre>
+<pre>
+        ...</pre>
+<pre>
+        ENDCONF</pre>
+<pre>
+        my $topo_templ=&lt;&lt;&quot;ENDTOPO&quot;;
+        ;;This is the topo.in template
+        var2 = _VAR2</pre>
+<pre>
+        ...</pre>
+<pre>
+        ENDTOPO</pre>
+<pre>
+        open CONF,&quot;&gt;config.in&quot;;
+        print CONF $config_templ;
+        close CONF;</pre>
+<pre>
+        open TOPO, &quot;&gt;topo.in&quot;;
+        print TOPO $topo_templ;
+        close TOPO;</pre>
+<pre>
+        system(&quot;simulator config.in topo.in &gt; $ARGV[0]&quot;);
+ 
+        #END of simulator.templ</pre>
+<p>SynSim will create <code>simulator.pl</code> and then will call <a href="#item_perl"><code>perl</code></a> to run the script</p>
+<p>
+</p>
+<hr />
+<h1><a name="to_do">TO DO</a></h1>
+<p>This module is still Alpha, a lot of work remains to be done to make it more user-friendly. The main tasks is to add a GUI. A prototype can be found on my web site, it is already useful but too early to include here. The next version will also make it easier to create your own postprocessing routines.
+
+</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Wim Vanderbauwhede &lt;wim\x40motherearth.org&gt;
+
+</p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright">COPYRIGHT</a></h1>
+<p>Copyright (c) 2000,2002-2003 Wim Vanderbauwhede. All rights reserved. This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>gnuplot <a href="http://www.ucc.ie/gnuplot/gnuplot.html">http://www.ucc.ie/gnuplot/gnuplot.html</a>
+
+</p>
+
+</body>
+
+</html>

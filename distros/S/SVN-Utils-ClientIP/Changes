@@ -1,0 +1,11 @@
+######################################################################
+Revision history for Perl extension SVN::Utils::ClientIP
+
+0.02  2010/06/27
+    (ms) ssh_client_ip() now returns the IP without the pid and port
+         number in scalar context.
+    (ms) ssh_client_ip() now returns only the IP in scalar context, and
+         IP, pid, and port in list context.
+
+0.01  2010/06/26
+    (ms) Where it all began.

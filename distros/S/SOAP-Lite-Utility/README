@@ -1,0 +1,19 @@
+
+This is the README file for SOAP::Lite::Utility, a collection of
+convenient functions for using SOAP::Lite. 
+
+For more information on how to use the script, see the
+man page via `man SOAP::Lite::Utility`.
+
+For instructions on how to install the script, see the
+file INSTALL.
+
+Problems, questions, etc. may be sent to bryce@bryceharrington.org
+
+SOAP::Lite::Utility is Copyright (c) 2005, by Bryce Harrington. 
+All rights reserved. You may distribute this code under the terms 
+of either the GNU General Public License or the Artistic License, 
+as specified in the Perl README file.
+
+
+

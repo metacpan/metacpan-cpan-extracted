@@ -1,0 +1,115 @@
+Revision history for Perl extension SWF::Builder.
+
+0.16 Wed Mar 21 00:19:31 2007
+	- Fixed typo in SWF::B::Character. (Thanks to YOSHITAKE Ryo)
+
+0.15 Sat Oct 29 00:00:00 2006
+	- Fixed compiling GetURL function. (Thanks to Igor Semenov)
+	- Fixed typo in SWF::B::C::Bitmap.pm. (Thanks to Gordon McCreight)
+	- Fixed package name SWF::B::C::Bitmap::Imported.
+
+0.14 Mon Oct 10 14:35:19 2005
+	- Fixed $movie->new_font broken on ver.0.13.
+	- Fixed TrueType collection support by SWF::B::C::Font::FreeType.
+	- ActionScript compiler failed to compile unary '-'. Fixed.
+	- Deleted odd POD of SWF::B::ActionScript.
+
+0.13 Sun Oct  2 15:45:15 2005
+	- Fixed $etext->align('center' / 'justify') properly in SWF::B::C::EditText.
+	- Fixed some method in SWF::B::C::EditText to return $self properly.
+	- Indirect font is now available without Font::TTF and Font::FreeType.
+
+0.12 Sun Sep 18 02:10:50 2005
+	- Fixed unicode string literals' escaping in ActionScript compiler. (Thanks to Nachi Ueno)
+	- Support an escape sequence represents a byte specified in octal in ActionScript compiler.
+	- Fixed indirect font support broken on ver.0.11.
+
+0.11 Thu Aug 18 23:09:00 2005
+	- Fixed packing imported characters when import_asset is used in a movieclip.
+                                                                 (Thanks to keclik)
+	- Support OTF and PostScript fonts using Font::FreeType.
+	  Pureperl Font::TTF support (for only TTF) also remains.
+	- Font::TTF and Math::Bezier::Convert are deleted from PREREQ_PM in Makefile.PL
+	  to be able to install without them. See PREREQUISITES section of README.
+
+0.10 Sat Jul 30 23:38:00 2005
+	- Imported character wrongly deleted if the character be reffered only by ActionScript. Fixed.
+	- GD bitmap is now converted by reading GD binary data directly (Experimental).
+	  To use the older version (to convert pixel by pixel), $m->new_bitmap($gd, 'GDPixel');
+	- Fixed embedding composite glyphs. (Thanks to Herbert Volkmann)
+
+0.09 Sun Jun 12 01:23:45 2005
+	- ActionScript compiler now supports 'set' statement.
+	- $movie->use_namespace($ns) prepares ActionScript namespace.
+	- 'init_action' for the _root movie is supported.
+	- Characters and display instances are named automatically by default.
+	  $movie->no_namer cancels this feature.
+	- $as->gotoAndPlay/gotoAndStop jumped to a wrong frame. Fixed.
+	- Debug print for $as->tellTarget was removed. (Thanks to Jon Orwant) 
+	- $as->tellTarget got a wrong target path if you gave a display instance.
+	  You must give a target path in string now.
+	- ActionScript compiler wrongly optimized constant expressions. Fixed.
+	   Limitation: It can optimize only the constant terms that queued up
+	   from the head sequentially, i.e. 2*2*a is optimized into 4*a,
+	   but a*2*2 isn't.
+	- Fixed synopsis of SWF::Builder::Character::Bitmap POD.
+                                           (Thanks to Merijn van den Kroonenberg)
+	- SWF::Builder::Character::Text is rewritten with new SWF::Element::TEXTRECORD.
+	   SWF::File (SWF::Element) ver.0.41 is required.
+
+0.08 Sat Feb  5 22:27:33 2005
+	- Support MP3 sound. (Referred to MPEG::Audio::Frame. Thanks to Yuval Kogman)
+	- Change the arguments of 'new_bitmap' method (Incompatiple with 0.07 and before)
+	- Fixed ActionScript compiler/assembler bugs. (Thanks to Peter Suschlik)
+
+0.07 Mon Oct  4 23:43:27 2004
+ 	- Fixed many ActionScript compiler bugs and warnings. (Thanks to Peter Suschlik)
+		- An array literal was initialized in reversed order.
+		- A string literal ended with escaped quotation mark was parsed wrongly.
+		- Labels did not quote properly when switch statement was compiled.
+		- Expression statement did not check its terminator ';'.
+		- 'with' did not compiled correctly.
+	- Added many drawing methods for shapes.
+		- Cubic Bezier curve
+		- Rounded rectangle
+		- Circle, ellipse, and arc
+		- Star shape
+		- SVG-compatible path drawing
+
+0.06 Thu Sep 10 00:00:30 2004
+	- Fixed @SWF::Builder::Character::Bitmap::JPEG::ISA. (Thanks to Jos.ANi Venceslau)
+	- Support SWF version control (6 or later).
+	- Fixed many ActionScript compiler bugs.
+	- Changed optimization option of AS compiler.
+	- Support register optimization by AS compiler.
+	- Improved compile speed.
+
+0.05 Sat Jul 10 23:24:25 2004
+	- Changed some module pathes.
+	- Support dynamic texts.
+	- Support export and import assets.
+	- Support init actions for movie clips.
+	- Support mask.
+	- Support drawing text in the shape objects.
+	- $font->add_glyph can take start and end characters.
+	- Fixed to handle fullcolor GD objects.
+
+0.04 Sat Mar 13 20:00:00 2004
+	- UTF8 flag is properly cleared now.
+ 	- Fixed wrong calculation of a shape boundary box. (Thanks to Jon Orwant)
+	- Fixed converting a lossless bitmap with alpha map.
+
+0.03 Tue Dec 23 22:05:00 2003
+	- Converting TTF font more precisely.
+	- SWF character ID now starts with 1.
+	- Support to control font embedding and text kerning.
+	- Some modifications to work with perl 5.6.1 (but not recommended). 
+
+0.02 Wed Dec 17 20:30:00 2003
+	- Fixed ActionScript compiler to handle 'infinity' and 'NaN' properly.
+						(Thanks to Peter Sergeant)
+
+0.01 Mon Dec 15 22:45:00 2003
+	- First release.
+	  Shape, embedded TTF font, static text, JPEG and lossless bitmap,
+	  movie clip, and actionscript compiler are supported.

@@ -1,0 +1,19 @@
+NAME
+    Excel2Text - a module for save Excelfile as Textfile
+
+SYNOPSIS
+      use warnings;
+      use strict;
+      use Spreadsheet::Excel2Text qw( XlsSaveToText );
+
+      XlsSaveToText("C:\\Excel.xls", "C:\\Excel.txt");
+
+ABSTRACT
+    Test
+
+DESCRIPTION
+    ...
+
+AUTHOR AND LICENSE
+    copyright 2009 (c) Gernot Havranek
+

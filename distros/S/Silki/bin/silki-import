@@ -1,0 +1,8 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Silki::CLI::Import;
+
+Silki::CLI::Import->new_with_options()->run();

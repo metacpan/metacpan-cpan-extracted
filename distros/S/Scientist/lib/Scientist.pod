@@ -1,0 +1,233 @@
+
+=encoding UTF-8
+
+=for Pod::Coverage BUILD
+
+=head1 NAME
+
+Scientist - Test new code against old.
+
+=for HTML
+<a href=https://travis-ci.org/lancew/Scientist><img src=https://api.travis-ci.org/lancew/Scientist.svg?branch=master></a>
+<a href=https://coveralls.io/github/lancew/Scientist><img src=https://coveralls.io/repos/lancew/Scientist/badge.svg?branch=master></a>
+<a href=https://metacpan.org/pod/Scientist><img src="https://badge.fury.io/pl/Scientist.svg"></a>
+<a href=https://github.com/lancew/Scientist/issues><img src=https://img.shields.io/github/issues/lancew/Scientist.svg></a>
+
+=head1 DESCRIPTION
+
+Perl module inspired by https://github.com/github/scientist ( http://githubengineering.com/scientist/ )
+
+=head1 SYNOPSIS
+
+  use feature qw(say);
+  use Scientist;
+
+  sub old_code {
+    return 10;
+  }
+
+  sub new_code {
+    return 20;
+  }
+
+  my $experiment = Scientist->new(
+    experiment => 'MyTest',
+    use => \&old_code,
+    try => \&new_code,
+  );
+
+  my $answer = $experiment->run;
+
+  say "The number ten is $answer";
+  warn 'There was a mismatch between control and candidate'
+    if $experiment->result->{'mismatched'};
+
+  say 'Timings:';
+  say 'Control code:   ', $experiment->result->{control}{duration}, ' microseconds';
+  say 'Candidate code: ', $experiment->result->{candidate}{duration}, ' microseconds';
+
+=head1 Introduction
+
+This module is inspired by the Scientist ruby code released by GitHub under the MIT license in 2015/2016.
+
+In February 2016, I started writing this Perl module to bring similar ideas to Perl.
+
+Please get involved with this module. Contact lancew@cpan.org with ideas, suggestions; support, etc.
+
+This code is also released under the MIT license to match the original Ruby implementation.
+
+=head1 Methods / Attributes
+
+=over
+
+=item context(<HASHREF>)
+
+Provide contextual information for the experiment; will be returned in the result set.
+
+Should be a hashref.
+
+=item enabled(<TRUE>|<FALSE>)
+
+DEFAULT : TRUE
+
+Boolean switch to enable or disable the experiment. If disabled the experiment will only return
+the control code (use) result. The candidate code (try) will NOT be executed. The results set will
+not be populated.
+
+=item experiment(<STRING>)
+
+DEFAULT : C<name()>'s output
+
+Simply the name of the experiment included in the result set.
+
+=item publish
+
+Publish is a method called by C<-E<gt>run()>.
+
+Scientist is designed so that you create your own personalised My::Scientist module and extend C<publish> to do what you want/need.
+For example, to push timing and mismatch information to StatsD.
+
+=item use(<CODEREF>)
+
+Control code to be included in the experiment.
+
+This code will be executed and returned when the experiment is run.
+
+NB: This code is run and returned even if the experiment's C<enabled=false>.
+
+=item result()
+
+Result contains the result of the experiment after it is run.
+
+Will contain data only AFTER C<-E<gt>run()> has been called.
+
+Observation is included in the result, this includes matched/mismatched. If
+there was a mismatch, then a diagnostic will be made available. This will
+display what was expected (from the control) and what we got instead (from the
+candidate).
+
+=item run()
+
+This method executes the control (use) code. If the experiment is C<enabled>, will also run the candidate (try)
+code. The control and candidate code is run in random order.
+
+=item try(<CODEREF>)
+
+Candidate code to be included in the experiment.
+
+This code will be executed and discarded when the experiment is run.
+
+=back
+
+=head1 Functions
+
+=over
+
+=item name(<STRING>)
+
+DEFAULT : 'experiment'
+
+The default string name of the experiment. Intended to be optionally overriden in a subclass.
+
+=back
+
+=head1 Extending Publish
+
+You can create your own Scientist module and use it to create a custom publishing methodology.
+
+Below is a small example that pushes mismatch info and timings to StatsD:
+
+=head2 My/Scientist.pm
+
+  package My::Scientist;
+  use parent 'Scientist';
+
+  use Net::Statsd;
+
+  sub publish {
+    my $self = shift;
+
+    my $experiment = $self->result->{experiment};
+    # Increment counter for every match or mismatch
+    Net::Statsd::increment("$experiment.mismatch") if $self->result->{mismatched};
+    Net::Statsd::increment("$experiment.match") unless $self->result->{mismatched};
+
+    # Log timings (converting Scientist microsends to StatsD miliseconds)
+    # Note: This implementation rounds down the duration.
+    Net::Statsd::timing("$experiment.control",   int $self->result->{control}{duration} * 1_000);
+    Net::Statsd::timing("$experiment.candidate", int $self->result->{candidate}{duration} * 1_000);
+  }
+
+  1;
+
+=head2 SomePerlScript.pl
+
+  use strict;
+  use warnings;
+
+  use My::Scientist;
+
+  my $experiment = My::Scientist->new(
+    experiment => 'MyTest',
+    use        => \&old_code,
+    try        => \&new_code,
+  );
+
+  my $result = $experiment->run;
+
+=head1 AUTHOR
+
+Lance Wicks <lancew@cpan.org>
+
+=head1 CONTRIBUTORS
+
+James Raspass
+
+Joshua Keroes
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Lance Wicks.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+The MIT License
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the Software
+without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to
+whom the Software is furnished to do so, subject to the
+following conditions:
+
+The above copyright notice and this permission notice shall
+be included in all copies or substantial portions of the
+Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT
+WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+=head1 SEE ALSO
+
+http://www.infoq.com/news/2016/02/github-scientist-refactoring
+
+http://githubengineering.com/scientist/
+
+https://news.ycombinator.com/item?id=11104781
+
+https://github.com/ziyasal/scientist.js
+
+http://tech-blog.cv-library.co.uk/2016/03/03/introducing-scientist/

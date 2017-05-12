@@ -1,0 +1,22 @@
+srvrmgr> list sessions
+
+SV_NAME    |CC_ALIAS                 |CG_ALIAS      |TK_TASKID|TK_PID|TK_DISP_RUNSTATE|TK_IDLE_STATE|TK_PING_TIME|TK_HUNG_STATE|DB_SESSION_ID                                      |OM_LOGIN                |OM_BUSSVC|OM_VIEW|OM_APPLET|OM_BUSCOMP|
+-----------  -------------------------  --------------  ---------  ------  ----------------  -------------  ------------  -------------  ---------------------------------------------------  ------------------------  ---------  -------  ---------  ----------  
+foobar_0002|ServerMgr                |System        |58720258 |      |Running         |FALSE        |            |             |                                                   |                        |         |       |         |          |
+foobar_0002|ServerMgr                |System        |57671682 |      |Finished        |FALSE        |            |             |                                                   |                        |         |       |         |          |
+foobar_0002|eCommunicationsObjMgr_esn|Communications|36700217 |      |Running         |FALSE        |            |             |Shared Connection Id:                              |EELENO                  |         |       |         |          |
+foobar_0002|eCommunicationsObjMgr_esn|Communications|36700205 |      |Running         |FALSE        |            |             |Shared Connection Id: , Transaction Connection Id: |AADMIN                  |         |       |         |          |
+foobar_0002|eCommunicationsObjMgr_esn|Communications|36700202 |      |Running         |FALSE        |            |             |Shared Connection Id:                              |GZURITA                 |         |       |         |          |
+foobar_0002|eCommunicationsObjMgr_esn|Communications|36700199 |      |Running         |FALSE        |            |             |Shared Connection Id:                              |sadmin                  |         |       |         |          |
+foobar_0002|eCommunicationsObjMgr_esn|Communications|36700196 |      |Finished        |FALSE        |            |             |Shared Connection Id:                              |sblanon                 |         |       |         |          |
+foobar_0002|EAIObjMgr_esn            |EAI           |26214494 |      |Running         |FALSE        |            |             |Shared Connection Id:                              |INT_USER                |         |       |         |          |
+foobar_0002|EAIObjMgr_esn            |EAI           |26214491 |      |Finished        |FALSE        |            |             |Shared Connection Id:                              |INT_USER                |         |       |         |          |
+foobar_0002|SRProc                   |SystemAux     |5242885  |      |Running         |FALSE        |            |             |                                                   |Forwarding Task         |         |       |         |          |
+foobar_0002|SRBroker                 |System        |2097184  |      |Running         |FALSE        |            |             |                                                   |COMP:FSMSrvr            |         |       |         |          |
+foobar_0002|SRBroker                 |System        |2097161  |      |Running         |FALSE        |            |             |                                                   |Response task           |         |       |         |          |
+foobar_0002|SRBroker                 |System        |2097160  |      |Running         |FALSE        |            |             |                                                   |Task creation task      |         |       |         |          |
+foobar_0002|SRBroker                 |System        |2097159  |      |Running         |FALSE        |            |             |                                                   |Store task              |         |       |         |          |
+foobar_0002|SRBroker                 |System        |2097157  |      |Running         |FALSE        |            |             |                                                   |Information caching task|         |       |         |          |
+
+15 rows returned.
+

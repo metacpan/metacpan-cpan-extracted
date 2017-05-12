@@ -1,0 +1,125 @@
+Revision history for Syntax-Construct
+
+0.29    2017-01-28
+
+        - UTF-8 delimiters within substitution
+
+0.28    2016-08-16
+
+        - versions represented as strings instead of floats
+
+0.27    2016-07-15
+
+        - fix drand48 test failure on OpenBSD
+        - warn if $Config{randfunc} ne 'Perl_drand48'
+
+0.25    2016-07-14
+
+        - add srand-return
+        - add author test to check Changes
+
+0.24    2016-06-26
+
+        - \v and \h added.
+        - while-each added.
+
+0.23    2016-05-10
+
+        - Links to perldelta hopefully fixed.
+
+0.22    2016-05-10
+
+        - perl 5.24 released
+        - lexical $_ added to 5.10 (removed in 5.24)
+
+0.21    2016-02-12
+
+        - links fixed (after 5.22.1 release)
+
+0.20    2015-11-05
+
+        - fixed test for fileno-dir: not supported on MSWin, skip the
+          test if cwd can't be opened
+
+0.19    2015-09-02
+
+        - "deprecation" renamed to "removal"
+
+0.18    2015-09-01
+
+        - No construct starts with a colon, they are reserved for tags.
+
+0.17    2015-08-28
+
+        - Support for deprecated constructs.
+        - Documentation improved.
+        - Minor fixes (\b{}).
+
+0.16    2015-06-02
+
+        - Perl 5.22 added.
+        - Lexical subs removed (they're a feature).
+        - Better test counting.
+
+0.15    2015-04-29
+
+        - package-block added.
+
+0.14    2015-01-29
+
+        - while (readdir) added.
+
+0.13    2014-09-16
+
+        - perldelta moved to perl5200delta
+
+0.12    2014-08-25
+
+        - license name fixed
+
+0.11    2014-08-25
+
+        - No PAX headers in the tar file.
+
+0.10    2014-08-16
+
+        - Link to github repo.
+
+0.09    2014-08-16
+
+        - Perl 5.20 supported.
+        - Links simplified to work both in cpan.org and metacpan.org.
+
+0.08    2014-05-02
+
+        - Fixing links.
+
+0.07    2014-04-29
+
+        - Documenting 5.14.
+        - Some links are still wrong.
+
+0.06    2014-04-28
+
+        - Documenting 5.10.
+
+0.05    2014-04-23
+
+        - Documenting 5.12.
+
+0.04    2014-04-23
+
+        - Links to perldelta for 5.18.	
+
+0.03    2014-01-18
+
+        - Removed %vd from sprintf, no v-strings.
+        - Completness test added.
+
+0.02    2014-01-17
+
+        - Fixed synopsis, more constructs.
+
+0.01    2013-12-23
+
+        - First version, published for comments.

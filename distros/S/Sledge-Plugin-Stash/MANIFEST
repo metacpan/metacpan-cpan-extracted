@@ -1,0 +1,21 @@
+.gitignore
+Build.PL
+Changes
+lib/Sledge/Plugin/Stash.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00.load.t
+t/01.base.t
+t/TestPages.pm
+xt/01_podspell.t
+xt/02_perlcritic.t
+xt/03_pod.t
+xt/04_minimum_version.t
+xt/05_cpan_meta.t
+xt/06_meta_author.t
+xt/pod-coverage.t
+xt/pod.t
+xt/spelling.t

@@ -1,0 +1,5 @@
+Use the hiliter.patch against the search.cgi skeleton script
+that comes with SWISH-E.
+
+The swishhiliter.cgi script is a full example, but an *example* only.
+

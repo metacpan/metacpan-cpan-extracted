@@ -1,0 +1,8 @@
+Revision history for Samba-Smbstatus
+
+0.01    16Aug2014 8:10am
+        Changed version number for release.
+
+0.00_01 10Aug2014 7:00pm
+        Created module framework.  Extracting from existing codebase.
+

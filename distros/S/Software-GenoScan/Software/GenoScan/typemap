@@ -1,0 +1,27 @@
+int *	intArray
+
+INPUT
+
+intArray
+	AV* array;
+	I32 arrayLen;
+	I32 tIndex;
+	SV** tempSV;
+	int* intArray;
+	int flag;
+	if(!SvROK($arg) || SvTYPE(SvRV($arg)) != SVt_PVAV)
+	    Perl_croak(aTHX_ \"Error: First argument to segmentize is not an array reference\");
+	array = (AV*) SvRV($arg);
+	arrayLen = av_len(array)+1;
+	intArray = (int*) malloc((arrayLen) * sizeof(int));
+	for(tIndex = 0; tIndex < arrayLen; tIndex++){
+		tempSV = av_fetch(array, tIndex, 0);
+		if(tempSV == NULL)
+			Perl_croak(aTHX_ \"Error: Invalid value in array reference to segmentize\");
+		if(!SvIOK(*tempSV))
+			Perl_croak(aTHX_ \"Error: Invalid value in array reference to segmentize\");
+		flag = SvIV(*tempSV);
+		intArray[tIndex] = flag;
+	}
+	$var = intArray;
+

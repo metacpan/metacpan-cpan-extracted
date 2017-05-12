@@ -1,0 +1,221 @@
+<html>
+<head>
+  <META http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Phonetic Symbol Downgrades of Amharic</title>
+</head>
+<body bgcolor="#fffffh">
+
+<h1>Phonetic Symbol Downgrades in Amharic</h1>
+
+<p align="justify">Downgrades of some letters occur "vertically", that is
+the conversion occurs in a single direction and is not reversibly:</p>
+
+<dir>
+<table style="border: 1px solid #888888; background: #eeeeee; color: black;" border="0" cellpadding=1" cellspacing="0"><tr><td
+><strong>Vertical Only</strong><br>
+<table border="0" cellpadding="10">
+<tr align="center" valign="top">
+  <td>[#ፀ#]<br>⇓<br>[#ጸ#]</td>
+  <td>[#ሠ#]<br>⇓<br>[#ሰ#]</td>
+  <td>[ዑዒዔዖ]<br>⇓<br>[አኡኢኦ]</td>
+  <td>ሗ<br>↓<br>ኋ</td>
+  <td>ኧ<br>↓<br>እ</td>
+  <td>ቍ<br>↓<br>ቁ</td>
+  <td>ኵ<br>↓<br>ኩ</td>
+  <td>ጕ<br>↓<br>ጉ</td>
+</tr>
+</table
+></td></tr>
+</table>
+</dir>
+
+
+<p align="justify">We can represent these rules with the following collection
+of translierations:</p>
+<dir>
+<code>
+tr/ፀ-ፆ/ጸ-ጾ/;<br>
+tr/ሠ-ሧ/ሰ-ሷ/;<br>
+tr/ዑዒዔዖ/ኡኢኤኦ/;<br>
+tr/ሗቍኵጕኧ/ኋቁኩጉእ/;<br>
+</code>
+</dir>
+
+<p align="justify">These transliterations in turn can be combined into a
+single representation:</p>
+<dir>
+<code>
+tr/ሗሠ-ሧቍኵጕኧዑዒዔዖፀ-ፆ/ኋሰ-ሷቁኩጉእኡኢኤኦጸ-ጾ/;
+</code>
+</dir>
+
+
+<p align="justify">Lateral downgrades occur in a number of cases.  Lateral
+conversions are bidirectional and may occur in either direction:</p>
+<dir>
+<table style="border: 1px solid #888888; background: #eeeeee; color: black;" border="0" cellpadding=1" cellspacing="0"><tr><td
+><strong>Lateral Only</strong><br>
+<table border="0" cellpadding="10">
+<tr align="center">
+  <td>ዕ&nbsp;⇄&nbsp;እ</td>
+  <td>ቈ&nbsp;⇄&nbsp;ቆ</td>
+  <td>ኰ&nbsp;⇄&nbsp;ኮ</td>
+  <td>ጐ&nbsp;⇄&nbsp;ጎ</td>
+</tr>
+</table
+></td></tr>
+</table>
+</dir>
+
+<p align="justify">Note that care must be taken not to retransliterate characters already transliterated (e.g. "ዕ" converted into "እ" should not be converted again into "ዕ").  We update our transliteration to include these additions:</p>
+
+<dir>
+<code>
+tr/ሗሠ-ሧኧቍኵጕቈኰጐቆኮጎእዑዒዔዕዖፀ-ፆኹኺኼኽኾ/ኋሰ-ሷእቁኩጉቆኮጎቈኰጐዕኡኢኤእኦጸ-ጾሁሂሄህሆ/;
+</code>
+</dir>
+
+<p align="justify">"እ" as the first character of a word is more stable and
+less likely to be substituted for "ዕ".  To reduce the number of generated
+improbable word renderings, "እ" is not converted at the start of a word.</p>
+
+
+<p align="justify">The downgrade rules of the "[=#ሀ#=]" and "[=#አ#=]" families
+are more complex, both vertical and lateral downgrades apply.  Note that
+two conversions of a single character are possible when both a vertical
+and lateral conversion apply: The decay of "ኍ" is more complex than other
+forms as its target may further decay:</p>
+
+<dir>
+<table style="border: 1px solid #888888; background: #eeeeee; color: black;" border="0" cellpadding=1" cellspacing="0"><tr><td
+><strong>Lateral and Vertical</strong><br>
+<table border="0" cellpadding="10">
+<tr align="center" valign="bottom">
+  <td><div align="left">&nbsp;ኍ<br>&nbsp;↓</div
+     >[ኁኂኄኅኆ]&nbsp;⇄&nbsp;[ሑሒሔሕሖ]&nbsp;&nbsp;&nbsp;[ኹኺኼኽኾ]<br
+     >⇘&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⇓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⇙&nbsp;&nbsp;&nbsp;&nbsp;<br
+     >[ሁሂሄህሆ]</td>
+  <td>&nbsp;</td>
+  <td>ዓ&nbsp;⇄&nbsp;ዐ&nbsp;&nbsp;&nbsp;ኣ<br>&nbsp;↘&nbsp;↓&nbsp;↙&nbsp;<br>አ</td>
+</tr>
+</table
+></td></tr>
+</table>
+</dir>
+
+<p align="justify">It is uncertain if any canonical renderings exist with the set [ኹኺኼኽኾ], they have been added for completeness.</p>
+
+<p align="justify">We update our transliteration for ኣ and ኹኺኼኽኾ only:</p>
+<dir>
+<code>
+tr/ሗሠ-ሧኣእኧቍኵጕቈኰጐቆኮጎዑዒዔዕዖፀ-ፆኹኺኼኽኾ/ኋሰ-ሷአእቁኩጉቆኮጎቈኰጐዕኡኢኤእኦጸ-ጾሁሂሄህሆ/;
+</code>
+</dir>
+
+<p align="justify">For clarity we will now represent the other
+downgrades in new transliteration and substitution operations:</p>
+
+<dir>
+<code>
+tr/ኁኂኄኅኆ/ሑሒሔሕሖ/;<br>
+tr/ሑሒሔሕሖ/ኁኂኄኅኆ/;<br>
+tr/ሑሒሔሕሖኁኂኄኅኆ/ሁሂሄህሆሁሂሄህሆ/;<br>
+s/[ዓዐ]/አ/;<br>
+tr/ዓዐ/ዐዓ/;<br>
+s/ኍ/ኁ/;<br>
+s/ኍ/ሁ/;<br>
+s/ኍ/ሑ/; <em>(note: this seems a hair unlikely)</em>
+</code>
+</dir>
+
+<p align="justify">Note that where two target conversions occur the string
+operated on is duplicated and a single target conversion applied to each.
+For example, the string "ዓለም" converts to the two new strings "ዐለም" and "አለም".
+Future conversions will be applied to both outcome strings identically.</p>
+
+<p align="justify">The most complex downgrade occurs for letters in [=ሃ=] which
+occur multi-lateral and multi-vertical targets.  Each node in the path of the
+diagram is a valid alternative from a given starting point.
+"ሐ" and "ኃ" are shown at opposite extremes as the conversion of one into the
+other is less likely than those in closer proximity.  Though certainly may be
+found, for example "ሐምሌ" vs "ኃምሌ":</p>
+
+<dir>
+<table style="border: 1px solid #888888; background: #eeeeee; color: black;" border="0" cellpadding=1" cellspacing="0"><tr><td
+><strong>Lateral and Vertical in [=ሃ=]</strong><br>
+<table border="0" cellpadding="10">
+<tr align="center">
+  <td>ሐ&nbsp;⇄&nbsp;ኀ&nbsp;⇄&nbsp;ኃ<br>&nbsp;↘&nbsp;↙&nbsp;↘&nbsp;↙&nbsp;<br>&nbsp;&nbsp;ሀ&nbsp;⇄&nbsp;ሃ&nbsp;&nbsp;</td>
+</tr>
+</table
+></td></tr>
+</table>
+</dir>
+
+<p align="justify">We update or transliteration operation for the
+lateral transformation of "ሀ" and "ሃ" only which have single targets:</p>
+
+<dir>
+<code>
+tr/ሀሃሗሠ-ሧኣእኧቍኵጕቈኰጐቆኮጎዑዒዔዕዖፀ-ፆኹኺኼኽኾ/ሃሀኋሰ-ሷአእቁኩጉቆኮጎቈኰጐዕኡኢኤእኦጸ-ጾሁሂሄህሆ/;
+</code>
+</dir>
+
+<p align="justify">Conversions that occur for the other members in "[=ሃ=]" will
+be as follows, not that a new word is generated for each applicable conversion:</p>
+
+<dir>
+<code>
+s/[ሐኀኃ]/ሀ/;<br>
+s/[ሐኀኃ]/ሃ/;<br>
+s/[ሐኀ]/ኃ/;<br>
+s/[ኀኃ]/ሐ/;<br>
+s/[ሐኃ]/ኀ/;
+</code>
+</dir>
+
+
+<p align="justify">No canonical renderings are known for "ሓ" and "ኻ", they
+are added here for completeness and should be handled by software. "አ" at the
+start of a few special words ("ኃገር", "ሀገር", "ሃገር" with "አገር") may become an
+alternative rendering for words starting in "[=ሃ=]".  It is uncertain as to
+which rendering (starting with "አ" or "[=ሃ=]") is in fact the canonical, thus
+the arrows shown may be bidirectional and the relation then lateral.  However,
+as the words for this occurs are very few given the whole of words staring
+in either "አ" or "[=ሃ=]", software should <em>not</em> attempt to generate
+these renderings as the outcome will almost always be invalid.  "አ" is presented
+in the follow for academic interest:</p>
+
+<dir>
+<table style="border: 1px solid #888888; background: #eeeeee; color: black;" border="0" cellpadding=1" cellspacing="0"><tr><td
+><strong>Lateral and Vertical[=ሃ=] Revised</strong><br>
+<table border="0" cellpadding="10">
+<tr align="center">
+  <td><div align="left" style="color:blue;">ሓ<br
+     >↓</div
+     >ሐ&nbsp;⇄&nbsp;ኀ&nbsp;⇄&nbsp;ኃ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br
+     >&nbsp;↘&nbsp;↙&nbsp;↘&nbsp;↙&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br
+     >&nbsp;&nbsp;&nbsp;&nbsp;ሀ&nbsp;⇄&nbsp;ሃ&nbsp;&nbsp;<span style="color:blue">←&nbsp;&nbsp;ኻ</span><br
+     ><span style="color:red">↘&nbsp;↙&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br
+     >አ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td>
+</tr>
+</table
+></td></tr>
+</table>
+</dir>
+
+<p align="justify">Our last collection of conversions in "[=ሃ=]" are updated accordingly:</p>
+
+<dir>
+<code>
+s/[ሐኀኃኻሓ]/ሀ/;<br>
+s/[ሐኀኃኻሓ]/ሃ/;<br>
+s/[ሐኀሓ]/ኃ/;<br>
+s/[ኀኃሓ]/ሐ/;<br>
+s/[ሐኃሓ]/ኀ/;
+</code>
+</dir>
+
+<hr size="2">
+</body>
+</html>

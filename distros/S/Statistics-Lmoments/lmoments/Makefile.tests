@@ -1,0 +1,38 @@
+F77= g77
+
+OBJS= cdfexp.o  cluagg.o  lmrglo.o  pelglo.o  quaglo.o  samlmr.o \
+cdfgam.o  cluinf.o  lmrgno.o  pelgno.o  quagno.o  samlmu.o \
+cdfgev.o  clukm.o   lmrgpa.o  pelgpa.o  quagpa.o  sampwm.o \
+cdfglo.o  derf.o    lmrgum.o  pelgum.o  quagum.o  sort.o \
+cdfgno.o  digamd.o  lmrkap.o  pelkap.o  quakap.o  xclust.o \
+cdfgpa.o  dlgama.o  lmrnor.o  pelnor.o  quanor.o  xfit.o \
+cdfgum.o  durand.o  lmrpe3.o  pelpe3.o  quape3.o  xsim.o \
+cdfkap.o  gamind.o  lmrwak.o  pelwak.o  quastn.o  xtest.o \
+cdfnor.o  lmrexp.o  pelexp.o  quaexp.o  quawak.o \
+cdfpe3.o  lmrgam.o  pelgam.o  quagam.o  reglmr.o \
+cdfwak.o  lmrgev.o  pelgev.o  quagev.o  regtst.o
+
+.f.o:
+	$(F77) -c $< -o $@
+
+all: $(OBJS) xclust xfit xsim xtest
+
+xclust: $(OBJS)
+	$(F77) -o xclust xclust.o cluagg.o cluinf.o clukm.o
+
+xfit:
+	$(F77) -o xfit xfit.o sort.o samlmr.o reglmr.o pelwak.o quawak.o
+
+xsim:
+	$(F77) -o xsim xsim.o pelgno.o quagno.o quastn.o durand.o sort.o samlmr.o
+
+xtest:
+	$(F77) -o xtest xtest.o regtst.o samlmr.o pelgev.o dlgama.o pelgno.o pelpe3.o pelgpa.o pelwak.o quaglo.o quagev.o quagno.o quastn.o quape3.o quagam.o gamind.o quagpa.o quawak.o sort.o pelkap.o digamd.o pelglo.o durand.o quakap.o
+
+test:
+	./xclust
+	cp maxwind.dat fort.7
+	./xfit >maxwind.myout
+	./xsim >xsim.myout
+	cp cascades.dat fort.7
+	./xtest >cascades.myout

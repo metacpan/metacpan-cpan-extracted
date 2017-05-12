@@ -1,0 +1,19 @@
+SYNOPSIS
+
+     use Software::Release::Watch qw(
+         list_software
+         list_software_releases
+     );
+    
+     my $res;
+     $res = list_software();
+     $res = list_software_releases(software_id=>'wordpress');
+
+FAQ
+
+SEE ALSO
+
+    Software::Catalog
+
+    Software::Release::Watch::* modules.
+

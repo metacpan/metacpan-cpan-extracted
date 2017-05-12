@@ -1,0 +1,17 @@
+---
+name: Spoon-Template-Mason
+version: 0.05
+author:
+  - Dave Rolsky <autarch@urth.org>
+abstract: A Spoon template module that uses Mason
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  HTML::Mason: 1.1
+  Spoon: 0.23
+provides:
+  Spoon::Template::Mason:
+    file: lib/Spoon/Template/Mason.pm
+    version: 0.05
+generated_by: Module::Build version 0.2703

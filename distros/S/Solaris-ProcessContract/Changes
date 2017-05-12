@@ -1,0 +1,22 @@
+Revision history for Solaris::ProcessContract
+
+
+1.01  2013.04.08
+
+* tests:
+  * new exception tests
+  * new method availability tests
+* perldoc:
+  * added INSTALLATION section to perldoc
+  * updated links to solaris man pages hosted on oracle's site, since those
+    are not available using CPAN's built in unix man pages search facility
+* meta:
+  * fixed typos in makefile that were causing the repository and author
+    sections to be broken
+  * added proper README
+
+
+1.00  2013.04.08
+  
+* initial release
+

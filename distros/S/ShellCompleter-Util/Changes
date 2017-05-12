@@ -1,0 +1,13 @@
+Revision history for ShellCompleter-Util
+
+0.02    2016-10-21 (PERLANCAR)
+
+	- Allow script that uses us to be dumped by Getopt::Long::Dumped.
+
+	- Add notice about the new Shell::Completer which will the
+	  replacement eventually.
+
+
+0.01    2015-08-11 (PERLANCAR)
+
+        - First release.

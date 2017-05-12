@@ -1,0 +1,5 @@
+TODO list for Perl module SeeAlso::Identifier::ISSN
+
+- yield URI objects instead of strings as result of canonical and friends
+
+

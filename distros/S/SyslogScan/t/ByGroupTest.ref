@@ -1,0 +1,460 @@
+$gByGroup = SyslogScan::ByGroup=HASH
+   'cvmvax.gov' => SyslogScan::Group=HASH
+      'byAddress' => HASH
+         'unique3%sswmbx%fdaoc@mr.cvmvax.gov' => SyslogScan::Usage=ARRAY
+            0  SyslogScan::Volume=ARRAY
+               0  2
+               1  1038
+            1  SyslogScan::Volume=ARRAY
+               0  0
+               1  0
+            2  SyslogScan::Volume=ARRAY
+               0  1
+               1  519
+      'groupUsage' => SyslogScan::Usage=ARRAY
+         0  SyslogScan::Volume=ARRAY
+            0  2
+            1  1038
+         1  SyslogScan::Volume=ARRAY
+            0  0
+            1  0
+         2  SyslogScan::Volume=ARRAY
+            0  1
+            1  519
+   'foo.org' => SyslogScan::Group=HASH
+      'byAddress' => HASH
+         'unitwo@ok.foo.org' => SyslogScan::Usage=ARRAY
+            0  SyslogScan::Volume=ARRAY
+               0  0
+               1  0
+            1  SyslogScan::Volume=ARRAY
+               0  1
+               1  214
+            2  SyslogScan::Volume=ARRAY
+               0  0
+               1  0
+      'groupUsage' => SyslogScan::Usage=ARRAY
+         0  SyslogScan::Volume=ARRAY
+            0  0
+            1  0
+         1  SyslogScan::Volume=ARRAY
+            0  1
+            1  214
+         2  SyslogScan::Volume=ARRAY
+            0  0
+            1  0
+   'harvard.edu' => SyslogScan::Group=HASH
+      'byAddress' => HASH
+         'coumfuller@warren.med.harvard.edu' => SyslogScan::Usage=ARRAY
+            0  SyslogScan::Volume=ARRAY
+               0  1
+               1  1477
+            1  SyslogScan::Volume=ARRAY
+               0  0
+               1  0
+            2  SyslogScan::Volume=ARRAY
+               0  1
+               1  1477
+      'groupUsage' => SyslogScan::Usage=ARRAY
+         0  SyslogScan::Volume=ARRAY
+            0  1
+            1  1477
+         1  SyslogScan::Volume=ARRAY
+            0  0
+            1  0
+         2  SyslogScan::Volume=ARRAY
+            0  1
+            1  1477
+   'healthnet.org' => SyslogScan::Group=HASH
+      'byAddress' => HASH
+         'count11@ok.healthnet.org' => SyslogScan::Usage=ARRAY
+            0  SyslogScan::Volume=ARRAY
+               0  0
+               1  0
+            1  SyslogScan::Volume=ARRAY
+               0  1
+               1  8471
+            2  SyslogScan::Volume=ARRAY
+               0  0
+               1  0
+         'count1@prev.healthnet.org' => SyslogScan::Usage=ARRAY
+            0  SyslogScan::Volume=ARRAY
+               0  0
+               1  0
+            1  SyslogScan::Volume=ARRAY
+               0  1
+               1  1477
+            2  SyslogScan::Volume=ARRAY
+               0  0
+               1  0
+         'helkaire@ok.healthnet.org' => SyslogScan::Usage=ARRAY
+            0  SyslogScan::Volume=ARRAY
+               0  0
+               1  0
+            1  SyslogScan::Volume=ARRAY
+               0  1
+               1  7000
+            2  SyslogScan::Volume=ARRAY
+               0  0
+               1  0
+         'joil_gupta@ok.healthnet.org' => SyslogScan::Usage=ARRAY
+            0  SyslogScan::Volume=ARRAY
+               0  0
+               1  0
+            1  SyslogScan::Volume=ARRAY
+               0  1
+               1  5357
+            2  SyslogScan::Volume=ARRAY
+               0  0
+               1  0
+         'unione@ok.healthnet.org' => SyslogScan::Usage=ARRAY
+            0  SyslogScan::Volume=ARRAY
+               0  0
+               1  0
+            1  SyslogScan::Volume=ARRAY
+               0  1
+               1  214
+            2  SyslogScan::Volume=ARRAY
+               0  0
+               1  0
+         'unique1@usa.healthnet.org' => SyslogScan::Usage=ARRAY
+            0  SyslogScan::Volume=ARRAY
+               0  2
+               1  428
+            1  SyslogScan::Volume=ARRAY
+               0  0
+               1  0
+            2  SyslogScan::Volume=ARRAY
+               0  1
+               1  214
+         'unique2@usa.healthnet.org' => SyslogScan::Usage=ARRAY
+            0  SyslogScan::Volume=ARRAY
+               0  2
+               1  3062
+            1  SyslogScan::Volume=ARRAY
+               0  0
+               1  0
+            2  SyslogScan::Volume=ARRAY
+               0  1
+               1  1531
+         'unitwo@ok.healthnet.org' => SyslogScan::Usage=ARRAY
+            0  SyslogScan::Volume=ARRAY
+               0  0
+               1  0
+            1  SyslogScan::Volume=ARRAY
+               0  1
+               1  1531
+            2  SyslogScan::Volume=ARRAY
+               0  0
+               1  0
+         'unizney@ok.healthnet.org' => SyslogScan::Usage=ARRAY
+            0  SyslogScan::Volume=ARRAY
+               0  0
+               1  0
+            1  SyslogScan::Volume=ARRAY
+               0  1
+               1  1531
+            2  SyslogScan::Volume=ARRAY
+               0  0
+               1  0
+      'groupUsage' => SyslogScan::Usage=ARRAY
+         0  SyslogScan::Volume=ARRAY
+            0  4
+            1  3490
+         1  SyslogScan::Volume=ARRAY
+            0  7
+            1  25581
+         2  SyslogScan::Volume=ARRAY
+            0  2
+            1  1745
+   'hello.org' => SyslogScan::Group=HASH
+      'byAddress' => HASH
+         'unilo@ok.hello.org' => SyslogScan::Usage=ARRAY
+            0  SyslogScan::Volume=ARRAY
+               0  0
+               1  0
+            1  SyslogScan::Volume=ARRAY
+               0  1
+               1  1531
+            2  SyslogScan::Volume=ARRAY
+               0  0
+               1  0
+      'groupUsage' => SyslogScan::Usage=ARRAY
+         0  SyslogScan::Volume=ARRAY
+            0  0
+            1  0
+         1  SyslogScan::Volume=ARRAY
+            0  1
+            1  1531
+         2  SyslogScan::Volume=ARRAY
+            0  0
+            1  0
+   'iastate.edu' => SyslogScan::Group=HASH
+      'byAddress' => HASH
+         'cougithendu@iastate.edu' => SyslogScan::Usage=ARRAY
+            0  SyslogScan::Volume=ARRAY
+               0  1
+               1  8471
+            1  SyslogScan::Volume=ARRAY
+               0  0
+               1  0
+            2  SyslogScan::Volume=ARRAY
+               0  1
+               1  8471
+      'groupUsage' => SyslogScan::Usage=ARRAY
+         0  SyslogScan::Volume=ARRAY
+            0  1
+            1  8471
+         1  SyslogScan::Volume=ARRAY
+            0  0
+            1  0
+         2  SyslogScan::Volume=ARRAY
+            0  1
+            1  8471
+   'localhost' => SyslogScan::Group=HASH
+      'byAddress' => HASH
+         'antiquity' => SyslogScan::Usage=ARRAY
+            0  SyslogScan::Volume=ARRAY
+               0  1
+               1  0
+            1  SyslogScan::Volume=ARRAY
+               0  0
+               1  0
+            2  SyslogScan::Volume=ARRAY
+               0  1
+               1  0
+      'groupUsage' => SyslogScan::Usage=ARRAY
+         0  SyslogScan::Volume=ARRAY
+            0  1
+            1  0
+         1  SyslogScan::Volume=ARRAY
+            0  0
+            1  0
+         2  SyslogScan::Volume=ARRAY
+            0  1
+            1  0
+   'ok.com' => SyslogScan::Group=HASH
+      'byAddress' => HASH
+         '"<uni>|ifs=" " && exec /usr/local/bin/procmail -f- || exit 75 #phil"@ok.com' => SyslogScan::Usage=ARRAY
+            0  SyslogScan::Volume=ARRAY
+               0  0
+               1  0
+            1  SyslogScan::Volume=ARRAY
+               0  1
+               1  519
+            2  SyslogScan::Volume=ARRAY
+               0  0
+               1  0
+      'groupUsage' => SyslogScan::Usage=ARRAY
+         0  SyslogScan::Volume=ARRAY
+            0  0
+            1  0
+         1  SyslogScan::Volume=ARRAY
+            0  1
+            1  519
+         2  SyslogScan::Volume=ARRAY
+            0  0
+            1  0
+   'ok.edu' => SyslogScan::Group=HASH
+      'byAddress' => HASH
+         'uniman@ok.edu' => SyslogScan::Usage=ARRAY
+            0  SyslogScan::Volume=ARRAY
+               0  0
+               1  0
+            1  SyslogScan::Volume=ARRAY
+               0  1
+               1  519
+            2  SyslogScan::Volume=ARRAY
+               0  0
+               1  0
+      'groupUsage' => SyslogScan::Usage=ARRAY
+         0  SyslogScan::Volume=ARRAY
+            0  0
+            1  0
+         1  SyslogScan::Volume=ARRAY
+            0  1
+            1  519
+         2  SyslogScan::Volume=ARRAY
+            0  0
+            1  0
+   'pitt.edu' => SyslogScan::Group=HASH
+      'byAddress' => HASH
+         'joinkids@foo.phyast.pitt.edu' => SyslogScan::Usage=ARRAY
+            0  SyslogScan::Volume=ARRAY
+               0  1
+               1  5357
+            1  SyslogScan::Volume=ARRAY
+               0  0
+               1  0
+            2  SyslogScan::Volume=ARRAY
+               0  1
+               1  5357
+      'groupUsage' => SyslogScan::Usage=ARRAY
+         0  SyslogScan::Volume=ARRAY
+            0  1
+            1  5357
+         1  SyslogScan::Volume=ARRAY
+            0  0
+            1  0
+         2  SyslogScan::Volume=ARRAY
+            0  1
+            1  5357
+   'temple.edu' => SyslogScan::Group=HASH
+      'byAddress' => HASH
+         'help-net@bar.temple.edu' => SyslogScan::Usage=ARRAY
+            0  SyslogScan::Volume=ARRAY
+               0  1
+               1  7000
+            1  SyslogScan::Volume=ARRAY
+               0  0
+               1  0
+            2  SyslogScan::Volume=ARRAY
+               0  1
+               1  7000
+         'unique3@vm.temple.edu' => SyslogScan::Usage=ARRAY
+            0  SyslogScan::Volume=ARRAY
+               0  2
+               1  3062
+            1  SyslogScan::Volume=ARRAY
+               0  0
+               1  0
+            2  SyslogScan::Volume=ARRAY
+               0  1
+               1  1531
+      'groupUsage' => SyslogScan::Usage=ARRAY
+         0  SyslogScan::Volume=ARRAY
+            0  3
+            1  10062
+         1  SyslogScan::Volume=ARRAY
+            0  0
+            1  0
+         2  SyslogScan::Volume=ARRAY
+            0  2
+            1  8531
+   'utmem.edu' => SyslogScan::Group=HASH
+      'byAddress' => HASH
+         'antcount1@ant.utmem.edu' => SyslogScan::Usage=ARRAY
+            0  SyslogScan::Volume=ARRAY
+               0  0
+               1  0
+            1  SyslogScan::Volume=ARRAY
+               0  1
+               1  0
+            2  SyslogScan::Volume=ARRAY
+               0  0
+               1  0
+      'groupUsage' => SyslogScan::Usage=ARRAY
+         0  SyslogScan::Volume=ARRAY
+            0  0
+            1  0
+         1  SyslogScan::Volume=ARRAY
+            0  1
+            1  0
+         2  SyslogScan::Volume=ARRAY
+            0  0
+            1  0
+   'yorkhospital.edu' => SyslogScan::Group=HASH
+      'byAddress' => HASH
+         'unione@ok.wpgate.galaxy.dnet.yorkhospital.edu' => SyslogScan::Usage=ARRAY
+            0  SyslogScan::Volume=ARRAY
+               0  0
+               1  0
+            1  SyslogScan::Volume=ARRAY
+               0  1
+               1  1531
+            2  SyslogScan::Volume=ARRAY
+               0  0
+               1  0
+      'groupUsage' => SyslogScan::Usage=ARRAY
+         0  SyslogScan::Volume=ARRAY
+            0  0
+            1  0
+         1  SyslogScan::Volume=ARRAY
+            0  1
+            1  1531
+         2  SyslogScan::Volume=ARRAY
+            0  0
+            1  0
+cvmvax.gov TOTAL:
+		1,519		2,1038		0,0
+unique3%sswmbx%fdaoc@mr.cvmvax.gov:
+		1,519		2,1038		0,0
+
+foo.org TOTAL:
+		0,0		0,0		1,214
+unitwo@ok.foo.org:
+		0,0		0,0		1,214
+
+harvard.edu TOTAL:
+		1,1477		1,1477		0,0
+coumfuller@warren.med.harvard.edu:
+		1,1477		1,1477		0,0
+
+healthnet.org TOTAL:
+		2,1745		4,3490		7,25581
+count11@ok.healthnet.org:
+		0,0		0,0		1,8471
+count1@prev.healthnet.org:
+		0,0		0,0		1,1477
+helkaire@ok.healthnet.org:
+		0,0		0,0		1,7000
+joil_gupta@ok.healthnet.org:
+		0,0		0,0		1,5357
+unione@ok.healthnet.org:
+		0,0		0,0		1,214
+unique1@usa.healthnet.org:
+		1,214		2,428		0,0
+unique2@usa.healthnet.org:
+		1,1531		2,3062		0,0
+unitwo@ok.healthnet.org:
+		0,0		0,0		1,1531
+unizney@ok.healthnet.org:
+		0,0		0,0		1,1531
+
+hello.org TOTAL:
+		0,0		0,0		1,1531
+unilo@ok.hello.org:
+		0,0		0,0		1,1531
+
+iastate.edu TOTAL:
+		1,8471		1,8471		0,0
+cougithendu@iastate.edu:
+		1,8471		1,8471		0,0
+
+localhost TOTAL:
+		1,0		1,0		0,0
+antiquity:
+		1,0		1,0		0,0
+
+ok.com TOTAL:
+		0,0		0,0		1,519
+"<uni>|ifs=" " && exec /usr/local/bin/procmail -f- || exit 75 #phil"@ok.com:
+		0,0		0,0		1,519
+
+ok.edu TOTAL:
+		0,0		0,0		1,519
+uniman@ok.edu:
+		0,0		0,0		1,519
+
+pitt.edu TOTAL:
+		1,5357		1,5357		0,0
+joinkids@foo.phyast.pitt.edu:
+		1,5357		1,5357		0,0
+
+temple.edu TOTAL:
+		2,8531		3,10062		0,0
+help-net@bar.temple.edu:
+		1,7000		1,7000		0,0
+unique3@vm.temple.edu:
+		1,1531		2,3062		0,0
+
+utmem.edu TOTAL:
+		0,0		0,0		1,0
+antcount1@ant.utmem.edu:
+		0,0		0,0		1,0
+
+yorkhospital.edu TOTAL:
+		0,0		0,0		1,1531
+unione@ok.wpgate.galaxy.dnet.yorkhospital.edu:
+		0,0		0,0		1,1531
+

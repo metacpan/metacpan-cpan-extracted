@@ -1,0 +1,27 @@
+<p>
+<% loc( 'Hi,') %>
+</p>
+
+% if ($wiki) {
+<& invitation-text.mas, user => $user, wiki => $wiki &>
+% } else {
+<p>
+<% loc( q{You have created a user account on the %1 server. You must <a href="%html(%2)">activate your user account</a> before you can log in.}, $domain->web_hostname(), $user->confirmation_uri( with_host => 1, host => $domain->web_hostname() ) ) %>
+</p>
+% }
+
+<& custom-message.mas, message => $message &>
+
+% if ( $sender->user_id() != $user->user_id() && ! $sender->is_system_user()) {
+<p>
+Sent by <% $sender->best_name() %>
+</p>
+% }
+
+<%args>
+$user
+$wiki => undef
+$domain
+$sender
+$message => undef
+</%args>

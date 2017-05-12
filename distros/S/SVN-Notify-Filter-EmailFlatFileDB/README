@@ -1,0 +1,56 @@
+SVN-Notify-Filter-EmailFlatFileDB
+
+SVN::Notify::Filter::EmailFlatFileDB converts Subversion account
+names into email addresses, within the context of SVN::Notify.
+The svnnotify script is often used within Subversion repository
+post-commit hooks, to inform a development team via email about
+changes to their source code.
+
+This module is a filter for SVN::Notify, which will translate user
+account names (e.g. "user1") into email addresses.  It does this
+based on a colon-separated file, like a UNIX passwd file (or more
+usefully) the AuthUserFile used by Apache.  The file path is specified
+via the --account_file option to the svnnotify script, and the index
+of the email field is specified via the --account_field option.
+
+Thanks to David Wheeler for SVN::Notify.  (Obviously, this
+module depends upon that.)
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc SVN::Notify::Filter::EmailFlatFileDB
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=SVN-Notify-Filter-EmailFlatFileDB
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/SVN-Notify-Filter-EmailFlatFileDB
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/SVN-Notify-Filter-EmailFlatFileDB
+
+    Search CPAN
+        http://search.cpan.org/dist/SVN-Notify-Filter-EmailFlatFileDB
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Jeffrey Borlik
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

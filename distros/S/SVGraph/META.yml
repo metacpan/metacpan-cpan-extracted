@@ -1,0 +1,38 @@
+---
+name: SVGraph
+version: 0.02
+author:
+  - 'Roman Fordinal <comsultia@cpan.org>'
+abstract: Library that generates cool SVG graphs
+license: lgpl
+resources:
+  license: http://opensource.org/licenses/lgpl-license.php
+build_requires:
+  SVG: 0
+  Test::More: 0
+provides:
+  SVGraph:
+    file: lib/SVGraph.pm
+    version: 0.02
+  SVGraph::2D:
+    file: lib/SVGraph/2D.pm
+  SVGraph::2D::columns:
+    file: lib/SVGraph/2D/columns.pm
+  SVGraph::2D::lines:
+    file: lib/SVGraph/2D/lines.pm
+  SVGraph::2D::map:
+    file: lib/SVGraph/2D/map.pm
+  SVGraph::2D::ring:
+    file: lib/SVGraph/2D/ring.pm
+  SVGraph::Core:
+    file: lib/SVGraph/Core.pm
+  SVGraph::colors:
+    file: lib/SVGraph/colors.pm
+  SVGraph::columns:
+    file: lib/SVGraph/columns.pm
+  SVGraph::world:
+    file: lib/SVGraph/world.pm
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

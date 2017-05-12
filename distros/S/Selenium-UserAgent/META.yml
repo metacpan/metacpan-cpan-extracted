@@ -1,0 +1,34 @@
+---
+abstract: 'Emulate mobile devices by setting user agents when using webdriver'
+author:
+  - 'Daniel Gempesaw <gempesaw@gmail.com>'
+build_requires:
+  IO::Socket::INET: '0'
+  LWP::UserAgent: '0'
+  Net::SSL: '0'
+  Selenium::Remote::Driver: '0.2102'
+  Test::More: '0'
+  Test::Spec: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.143240'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Selenium-UserAgent
+requires:
+  Carp: '0'
+  Cwd: '0'
+  JSON: '0'
+  List::Util: '1.33'
+  Moo: '0'
+  Selenium::Firefox::Profile: '0'
+resources:
+  bugtracker: https://github.com/gempesaw/Selenium-UserAgent/issues
+  homepage: https://github.com/gempesaw/Selenium-UserAgent
+  repository: https://github.com/gempesaw/Selenium-UserAgent.git
+version: '0.10'

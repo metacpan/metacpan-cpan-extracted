@@ -1,0 +1,252 @@
+
+
+		 Demonstration of Chat Server Emulation
+
+These two demonstration scripts emulate a very simple chat server with 4
+connected users.  They showcase the Stem modules Stem::Switch (which
+multiplexes Stem Messages) and Stem::SockMsg (a socket to message
+gateway). chat_demo and chat2_demo behave the same but the former runs
+as a single Stem Hub (process) and the latter as two Hubs (which can be
+on separate systems - see below to experiment with that).  Just like
+with real chat, a user can type into their terminal and their text will
+appear on the windows of other users.  The Stem::Switch Cell (configured
+as 'sw') acts as the chat server and it controls which users will see
+the text from other users. You can change that user to user map by
+issuing command messages to the 'sw' Cell (see DEMO for more on entering
+command messages from the terminal). The two demo scripts are described
+in detail below with sections on running, using, configuring and
+experimenting with them.
+
+Running chat_demo
+
+The single Hub chat demonstration is called chat_demo and it uses the
+chat.stem configuration file (found in conf/ and also where you
+installed the demo Stem configurations). It is run with the simple
+command:
+
+chat_demo
+
+To exit, just enter 'quit' in the chat_demo script window itself. It will
+kill all the other windows and then exit. This will also happen if you
+interrupt the demo script with ^C.
+
+If the -s option is used, then all the windows will use ssfe (split
+screen front end which you can install from the Stem distribution) which
+provides a command line edit and history window section and an output
+section. A single Hub window will be created and then 4 smaller telnet
+windows which will be connected to listen sockets in the Stem Hub. These
+telnet windows are the chat users and they can type data and other users
+will see the output. The telnet windows are named A, B, C and D.
+
+Using chat_demo
+
+Now type a line of text into A's window and hit return. Notice how all 4
+windows see that text. Now do the same for D. Only C will see its
+text. This is controlled by the map in the Stem::Switch Cell named
+'sw'. You can print out that map by sending a status command message to
+that Cell. In the Hub window (named Stem) type this command:
+
+sw status
+
+You will see this printout:
+
+	Status of switch: sw
+
+	In Map:
+
+		a -> a b c d
+		b -> a
+		c -> b d
+		d -> c
+
+	Out Map:
+
+		a -> A
+		b -> B
+		c -> C
+		d -> D
+
+This shows that a data message that came in with the Message target 'a'
+will have its data copied to all 4 users and that 'd' will only send
+text to 'c'. The Message target name is used as a key to index into the
+In Map which gets a list of keys to the Out Map.  The Out Map is then
+indexed and a list of Cell addresses is found. Those addresses are sent
+a copy of the data message. Now you should be able to predict what will
+happend to text entered on B or C.  Note that the internal keys are not
+related to any other namespaces and are private to this Cell. The Switch
+Cell's maps can be changed by command messages sent to this Cell.
+
+Also run this command in the Hub window:
+
+reg status
+
+This sends a status message to the Class Cell Stem::Route which has the
+alias 'reg'. It returns a listing of all registered Cells with their
+Cloned Cell names or Class Cell Aliases. You can run this command in any
+Hub window to find the list of registered Cells.  Most of the Class
+Cells support and some Object Cells support status commands which can be
+sent from the console.
+
+
+Configuring chat_demo
+
+Look at the file conf/chat.stem. That is the configuration file used by
+chat_demo. It is very simple and easy to understand. It is a Perl list
+of lists structure with key/value pairs. Read the config_notes for more
+on this.
+
+The first Cell configured is Stem::TtyMsg which supports typing in and
+sending command messages. This Cell is used in all the demo
+configurations. You can use it for any Stem application where you might
+want to enter command messages by hand.
+
+	[
+		class	=>	'Stem::TtyMsg',
+		args	=>	[],
+	],
+
+Then come four Stem::SockMsg Cells named A, B, C and D. Each has a
+single server socket listening on its own port. Also they are configured
+(via the 'data_addr' attribute) to send their data to the same 'sw' Cell
+but with the target addresse a, b, c, or d. These Cells allow
+the user telnets to connect to this Hub. 
+
+[
+	class	=>	'Stem::SockMsg',
+	name	=>	'A',
+	args	=>	[
+		port		=> 6666,
+		server		=> 1,
+		cell_attr	=> [
+			'data_addr'	=> ':sw:a'
+		],
+	],
+],
+
+Finally we have the Stem::Switch Cell named 'sw' which controls the
+mapping of users to users. It is just like the output from the first
+status command we did above. It sets the input maps to the list of
+internal target names and the output map is set to Cell addresses that
+redirect the incoming messages.
+
+[
+	class	=>	'Stem::Switch',
+	name	=>	'sw',
+	args	=>	[
+
+		in_map => [
+
+			a => [ qw( a b c d ) ],
+			b => 'a',
+			c => [ qw( b d ) ],
+			d => 'c',
+		],
+
+		out_map => [
+
+			a => 'A',
+			b => 'B',
+			c => 'C',
+			d => 'D',
+		],
+	],
+],
+
+Experimenting with chat_demo
+
+Now try to send a map command message to the 'sw' Cell. Enter this in
+the Hub window:
+
+sw map b b c d
+
+and then type something into B. You should see it print on B, C, and D's
+windows. You can change any of the maps. The 'map' token is the command
+(as was 'status') and b is the input map name you are changing. The rest
+of the tokens are the internal keys to output map. You can always print
+out the map with the status command (as shown above) and verify your
+changes.
+
+Running chat2_demo
+
+You run chat2_demo also by just typing the script name and its basic
+behavior is just like chat_demo. The main difference is that it runs two
+Stem Hubs and the four users are split with two connecting to each
+Hub. So there are two configuration files named chat_server.stem and
+chat_client.stem and they are in conf/ directory.  When you run
+chat2_demo, two Hub windows will be created with the names Chat1 and
+Chat2.  The two Stem Hubs are called 'server' and 'client' and those
+names only reflect how they initially connect via sockets. Once they are
+properly connected, they communicate in a peer to peer fashion.
+
+Using chat2_demo
+
+You can interact with chat2_demo just as you did with chat_demo. The
+same user to user mapping is in effect and you can enter user text the
+same way and also change the map. In fact you can enter and send all the
+same command messages you did before in either Hub window and you will
+see similar output. The major difference is that 2 of the output map
+Cell addresses have Hub values.
+
+First enter the 'reg status' command in each Hub window. Notice how the
+'server' Hub (window named Chat1) has the C and D Stem::SockMsg Cells
+and the Stem::Switch Cell named 'sw'. The 'client' Hub (window named
+Chat2) has only the A and B Stem::SockMsg Cells. This means that the
+users connected to the 'client' Hub have to 
+
+Now enter this command in each of the two Hub windows:
+
+port status
+
+That sends a 'status' command to the Class Cell Stem::Portal of the Hub.
+
+The 'server' Hub will print:
+
+Portal Status for Hub 'server'
+        client          => Stem::Portal=HASH(0xd2978)
+
+This shows that this Hub can send messages to another Hub named 'client'
+And the 'client' Hub will print:
+
+Portal Status for Hub 'client'
+        DEFAULT         => Stem::Portal=HASH(0xd0930)
+        server          => Stem::Portal=HASH(0xd0930)
+
+This shows that this Hub can send messages to another Hub named 'server'
+and to one named 'DEFAULT' which is the same portal as 'server'. When a
+message doesn't have a Hub name in its 'to' address and it can't be
+delivered locally, it is sent to a Portal named DEFAULT if it can be
+found. This is similar to the default route in IP networks.
+
+How chat2_demo is Configured
+
+Look at the files conf/chat_server.stem and conf/chat_client.stem. They
+are the configuration files used by chat2_demo. They are basically
+copies of chat.stem with support for two hubs and the Stem::SockMsg
+Cells split between them. The new Cell addition to both is Stem::Portal
+which supports send messages between Hubs. The 'server' Hub has this:
+
+[
+	class	=>	'Stem::Portal',
+	args	=>	['server' => 1 ],
+],
+
+That makes this Hub a server which listen for connections from other
+Stem Hubs. The default port number is 10,000 (though this will change
+soon). There is no 'host' attribute in that Stem::Portal Cell so it uses
+the localhost interface by default. The 'client' Hub doesn't have a
+server attribute so it is a client and it connects by default to
+localhost and the port 10,000.
+
+[
+	class	=>	'Stem::Portal',
+	args	=>	[],
+],
+
+Then come four Stem::SockMsg Cells with A and B in stem_client.stem and
+C and D in stem_server.stem. And finally the Stem::Switch Cell named
+'sw' which is only in stem_server.stem. Note that the output map for 'a'
+and 'b' have the Hub name 'client' in their Cell addresses. This is
+because the A and B users are connecting to the 'client' Hub and this
+Stem::Switch Cell needs to know that so it can send them data. In a more
+realistic chat system, these switch maps would be controlled by end user
+commands and not by entering command messages.

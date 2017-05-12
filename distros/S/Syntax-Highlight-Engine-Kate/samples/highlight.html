@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Tk::CodeText - a TextUndo widget with syntax highlighting capabilities</title>
+<link rev="made" href="mailto:feedback@suse.de" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#options">OPTIONS</a></li>
+	<li><a href="#methods">METHODS</a></li>
+	<li><a href="#syntax_highlighting">SYNTAX HIGHLIGHTING</a></li>
+	<li><a href="#writing_plugins">WRITING PLUGINS</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#bugs">BUGS</a></li>
+	<li><a href="#todo">TODO</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Tk::CodeText - a TextUndo widget with syntax highlighting capabilities</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+ use Tk;
+ require Tk::CodeText;</pre>
+<pre>
+ my $m = new MainWindow;</pre>
+<pre>
+ my $e = $m-&gt;Scrolled('CodeText',
+        -disablemenu =&gt; 1,
+        -syntax =&gt; 'Perl',
+        -scrollbars =&gt; 'se',
+ )-&gt;pack(-expand =&gt; 1, -fill =&gt; 'both');</pre>
+<pre>
+ $m-&gt;configure(-menu =&gt; $e-&gt;menu);
+ $m-&gt;MainLoop;</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>Tk::CodeText inherits Tk::TextUndo and all its options and methods. Besides
+syntax highlighting, methods are provided for commenting and uncommenting
+as well as indenting and unindenting a selected area, matching pairs of braces, brackets and
+brackets and curlies and automatic indenting of new lines.</p>
+<p>Syntax highlighting is done through a plugin approach. Currently there is
+support for <strong>Perl</strong>, <strong>Pod</strong>,  <strong>HTML</strong> and <strong>Xresources</strong>. Adding languages 
+is a matter of writing plugin modules. Theoretically this is not limited to programming languages. 
+The plugin approach could also provide the possibility for grammar or spell checking in spoken 
+languages.</p>
+<p>
+</p>
+<hr />
+<h1><a name="options">OPTIONS</a></h1>
+<dl>
+<dt><strong><a name="item_name%3a_autoindent">Name: <strong>autoindent</strong></a></strong><br />
+</dt>
+<dt><strong><a name="item_class%3a_autoindent">Class: <strong>Autoindent</strong></a></strong><br />
+</dt>
+<dt><strong><a name="item_switch%3a_%2dautoindent">Switch: <strong>-autoindent</strong></a></strong><br />
+</dt>
+<dd>
+Boolean, when you press the enter button, should the next line begin at the
+same position as the current line or not. By default <strong>false</strong>.
+</dd>
+<p></p>
+<dt><strong><a name="item_name%3a_commentchar">Name: <strong>commentchar</strong></a></strong><br />
+</dt>
+<dt><strong><a name="item_class%3a_commentchar">Class: <strong>Commentchar</strong></a></strong><br />
+</dt>
+<dt><strong><a name="item_switch%3a_%2dcommentchar">Switch: <strong>-commentchar</strong></a></strong><br />
+</dt>
+<dd>
+By default ``#''.
+</dd>
+
+</body>
+
+</html>

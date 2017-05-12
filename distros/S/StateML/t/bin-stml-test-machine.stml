@@ -1,0 +1,10 @@
+<!-- This machine is used by t/bin-stml.t -->
+
+<machine
+  id="m0"
+  xmlns="http://slaysys.com/StateML/1.0"
+>
+  <event   id="e0"/>
+  <state   id="s0"><arc event-id="e0"/></state>
+  <state id="s1" mode="C"><arc event-id="e0"/></state>
+</machine>

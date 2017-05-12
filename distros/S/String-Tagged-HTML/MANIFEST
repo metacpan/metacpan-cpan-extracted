@@ -1,0 +1,12 @@
+Build.PL
+lib/String/Tagged/HTML.pm
+MANIFEST			This list of files
+t/00use.t
+t/01plain.t
+t/02format.t
+t/03link.t
+t/99pod.t
+Makefile.PL
+README
+LICENSE
+META.yml

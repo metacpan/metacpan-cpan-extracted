@@ -1,0 +1,114 @@
+NAME
+    System::Wrapper - Class-wrapped system calls and qx operator
+
+VERSION
+    This document describes System::Wrapper version 0.0.2
+
+SYNOPSIS
+        use System::Wrapper;
+
+        my $command = System::Wrapper->new();
+
+        $command->interpreter( 'perl');
+        $command->executable( 'program.pl');
+        $command->arguments( [ 'first', {second_a => 2, second_b => 2}, {third => [1,2,3]} ] );
+        $command->input( \@ARGV );
+        $command->output( { '--output' => 'file'}, q{>} => 'file2' );
+        $command->path( [$command->path, q{.}] );
+        $command->capture = 1;
+        $command->verbose = 1;
+        print $command->command;
+        $command->run;
+
+DESCRIPTION
+     This module wraps perl's C<system> call and c<qx> operator in an object-oriented
+     interface. It provides utility methods for accomplishing things that are not very
+     simple in C<system> and C<qx>. This includes in-situ I/O and call success via
+     temporary filenames, C<system> call progress estimation, finding whether the
+     executable and-or interpreter are on the path, validating filenames, cross-platform
+     output operators and argument type specification.
+
+     This module can be used as a generic wrapper around C<system> and C<qx>, or as
+     a base class for building interfaces to utilities not available to C<perl> itself.
+
+INTERFACE
+  CLASS METHODS
+    new(%args)
+            my %args = (
+                interpreter => undef, # optional: string
+                executable  => undef, # required: string
+                arguments   => undef, # optional: any nested structure of hashes,
+                                      # arrays or scalar references
+                input       => undef, # optional: scalar or array reference
+                output      => undef, # optional: hash reference of form { spec => file }
+                                      # eg:   { '>' => 'out' } or { '--output' => 'out' }
+                capture     => undef, # optional: return stdout, instead of exit code,
+                                      # via $self->run
+                path        => [ grep $_, File::Spec->path, q{.} ]
+                                      # required: path of directories on which to look for
+                                      # interpreter and executable programs
+            );
+
+            my $command = System::Wrapper->new(%args);
+
+  SELECTOR METHODS
+     new
+     interpreter
+     executable
+     arguments
+     input
+     output
+     path
+     capture
+     command
+     run
+
+INSTALLATION
+    To install this module type the following:
+
+       perl Build.PL
+       Build
+       Build test
+       Build install
+
+    or
+
+       perl Makefile.PL
+       make
+       make test
+       make install
+
+CONFIGURATION AND ENVIRONMENT
+    System::Wrapper requires no configuration files or environment
+    variables.
+
+INCOMPATIBILITIES
+    None reported.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests to
+    "bug-system-wrapper@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org>.
+
+AUTHOR
+    Pedro Silva "<psilva+pause@pedrosilva.pt>"
+
+LICENCE AND COPYRIGHT
+    Copyright (c) 2010, Pedro Silva "<psilva+pause@pedrosilva.pt>". All
+    rights reserved.
+
+    This program is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+    Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program. If not, see <http://www.gnu.org/licenses/>.
+

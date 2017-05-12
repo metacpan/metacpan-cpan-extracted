@@ -1,0 +1,9 @@
+#########################################################################
+Before every release, spellcheck the documents:
+
+   for i in `find lib -type f -name \*.pod` ;do
+      pod2text $i > $i.txt
+      ispell -p internal/module.isp $i.txt
+      rm -f $i.txt $i.txt.bak
+   done
+

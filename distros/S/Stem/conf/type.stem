@@ -1,0 +1,104 @@
+--- #YAML:1.0
+# -
+#  class: Stem::Test::ConfTypes
+#  name: boolean
+#  args:
+#     bool_attr: yes
+# -
+#  class: Stem::Test::ConfTypes
+#  name: scalar
+#  args:
+#     list_attr: scalar_val
+# -
+#  class: Stem::Test::ConfTypes
+#  name: list
+#  args:
+#     list_attr: [ list, of, three ]
+# -
+#  class: Stem::Test::ConfTypes
+#  name: hash_to_list
+#  args:
+#     list_attr: 
+# 	hash: of
+# 	key: value
+# -
+#  class: Stem::Test::ConfTypes
+#  name: hash
+#  args:
+#     hash_attr:
+#       foo: bar
+# -
+#  class: Stem::Test::ConfTypes
+#  name: list_to_hash
+#  args:
+#     hash_attr:
+#       - foo
+#       - bar
+# -
+#  class: Stem::Test::ConfTypes
+#  name: lol_to_lol
+#  args:
+#     lol_attr:
+#       - [ 1, 2 ]
+#       - [ 3, 4 ]
+# -
+#  class: Stem::Test::ConfTypes
+#  name: loh_to_lol
+#  args:
+#     lol_attr:
+#       - 
+#         foo: 1
+#       -
+# 	bar: 2
+# -
+#  class: Stem::Test::ConfTypes
+#  name: hol_to_lol
+#  args:
+#     lol_attr:
+#       foo: [ 1, 2 ]
+#       bar: 3
+-
+ class: Stem::Test::ConfTypes
+ name: hoh_to_lol
+ args:
+    lol_attr:
+      foo: [ 1, 2 ]
+      bar: 3
+-
+ class: Stem::Test::ConfTypes
+ name: hoh_to_hol
+ args:
+    hol_attr:
+      foo: [ 1, 2 ]
+      bar: 3
+-
+ class: Stem::Test::ConfTypes
+ name: lol_to_hol
+ args:
+    hol_attr:
+      - foo
+      - [ 1, 2 ]
+      - bar
+      - 3
+-
+ class: Stem::Test::ConfTypes
+ name: lolh_to_loh
+ args:
+    loh_attr:
+      - 
+       foo: faaa
+      - [ 1, 2 ]
+      -
+       bar: jejej
+      - [ 3, 5, 4, 0 ]
+-
+ class: Stem::Test::ConfTypes
+ name: lolh_to_hol
+ args:
+    hol_attr:
+      - 
+       foo: faaa
+      - [ 1, 2 ]
+      -
+       bar: jejej
+      - [ 3, 5, 4, 0 ]

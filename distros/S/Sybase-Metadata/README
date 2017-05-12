@@ -1,0 +1,806 @@
+Sybase-Metadata version 0.01
+============================
+
+The README is used to introduce the module and provide instructions on
+how to install the module, any machine dependencies it may have (for
+example C compilers and installed libraries) and any other information
+that should be provided before the module is installed.
+
+A README file is required for CPAN modules since CPAN extracts the
+README file from a module distribution so that people browsing the
+archive can use it get an idea of the modules uses. It is usually a
+good idea to provide version information here so that people can
+decide whether fixes for the module are worth downloading.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+DBI
+DBD:Sybase
+
+Examples -
+
+
+ NB: You MUST have DBI and DBD:Sybase insatlled to use this module!
+
+####################################################################
+#
+#  new
+#   + Construct object and return handle
+#
+#   + Input:  None
+#
+#   + Output: Object handle/pointer
+#
+####################################################################
+Example:
+
+my $mdHandle = Sybase::Metadata->new();
+
+####################################################################
+# 
+#  Initialize
+#   + Initialize desired db connection and return global handle
+#   NB: You MUST have DBI and DBD:Sybase insatlled to use this module!
+#
+#    + Input:  Pointer to hash of DB properties containing:
+#                 - Server
+#                 - User
+#                 - Password
+#                 - Database
+#
+#    + Output: None but initializes db handle to be used internally
+#
+####################################################################
+Example:
+
+my %dbHash = ( SERVER    => 'BIGDB_SERVER',
+               USER      => 'SOME_USER',
+               PASSWORD  => 'changeme',
+               DATABASE  => 'BIGDB_DEV');
+
+my $hashPtr = \%dbHash;
+
+my $mdHandle = Sybase::Metadata->new();
+
+$mdHandle->Initialize($hashPtr);
+
+
+####################################################################
+# 
+#  GetDatabases
+#   + Get a list of all databases and their space usage info
+#   + Input  : None
+#   + Output : Ref to array of hashes containing:
+#        DBName
+#        DBID
+#        Owner
+#        CreateDate
+# 
+#
+####################################################################
+Example:
+
+print "Testing GetDatabases ... \n";
+
+my $dbListRef = $mdHandle->GetDatabases();
+
+foreach ( @{$dbListRef}) {
+  print "DBName = $_->{DBName}, DBID = $_->{DBID}, Owner = $_->{Owner}, CreateDate = $_->{CreateDate} \n";
+}
+
+
+####################################################################
+# 
+#  GetTables
+#   + Get a list of tables in present database, Useful for drill
+#     down to table details
+#   + Input  : None
+#   + Output : Ref to array of hashes containing:
+#               Name (name of table)
+#               TableOID
+#               Owner
+#               CreateDate
+# 
+#
+####################################################################
+Example:
+
+print "\n Testing GetTables ... \n";
+
+my $dbListRef = $mdHandle->GetTables();
+
+foreach ( @{$dbListRef}) {
+  print "Name = $_->{Name}, TableOID = $_->{TableOID}, Owner = $_->{Owner}, CreateDate = $_->{CreateDate} \n";
+}
+
+
+####################################################################
+# 
+#  GetProcs
+#   + Get a list of tables in present database, Useful for drill
+#     down to table details
+#   + Input  : None
+#   + Output : Ref to array of hashes containing:
+#               Name (name of proc)
+#               ProcOID
+#               Owner
+#               CreateDate
+#
+####################################################################
+Example:
+
+print "\n Testing GetProcs ... \n";
+
+my $dbListRef = $mdHandle->GetProcs();
+
+foreach ( @{$dbListRef}) {
+  print "Name = $_->{Name}, ProcOID = $_->{ProcOID}, Owner = $_->{Owner}, CreateDate = $_->{CreateDate}  \n";
+}
+
+
+####################################################################
+# 
+#  GetViews
+#   + Get a list of views in present database, Useful for drill
+#     down to view details
+#   + Input  : None
+#   + Output : Ref to array of hashes containing:
+#               Name (name of view)
+#               ViewOID
+#               Owner
+#               CreateDate
+#
+####################################################################
+Example:
+
+print "\n Testing GetViews ... \n";
+
+my $dbListRef = $mdHandle->GetViews();
+
+foreach ( @{$dbListRef}) {
+  print "Name = $_->{Name}, ViewOID = $_->{ViewOID}, Owner = $_->{Owner}, CreateDate = $_->{CreateDate} \n";
+}
+
+
+####################################################################
+# 
+#  GetTriggers
+#   + Get a list of views in present database, Useful for drill
+#     down to view details
+#   + Input  : None
+#   + Output : Ref to array of hashes containing:
+#               TriggerName
+#               TriggerOID
+#               TableName
+#               TableOID
+#
+####################################################################
+Example:
+
+print "\n Testing GetTriggers ... \n";
+
+my $dbListRef = $mdHandle->GetTriggers();
+
+foreach ( @{$dbListRef}) {
+  print "TriggerName = $_->{TriggerName}, TriggerOID = $_->{TriggerOID}, TableName = $_->{TableName}, TableOID = $_->{TableOID} \n";
+}
+
+
+####################################################################
+#
+#  GetRIs
+#   + Get a list of referential integrities in present database
+#   + Input  : None
+#   + Output : Ref to array of hashes containing:
+#               Name (name of referential inegtrity)
+#               RIOID
+#               FromTable
+#               FromTableOID
+#               ToTable
+#               ToTableOID
+#
+####################################################################
+Example:
+
+print "\n Testing GetRIs ... \n";
+
+my $dbListRef = $mdHandle->GetRIs();
+
+foreach ( @{$dbListRef}) {
+  print "Name = $_->{Name}, RIOID = $_->{RIOID}, FromTable = $_->{FromTable}, FromTableOID = $_->{FromTableOID}, ToTable = $_->{ToTable}, ToTableOID = $_->{ToTableOID}  \n";
+}
+
+
+####################################################################
+#
+#  GetIndexes
+#   + Get a list of indexes in present database
+#   + Input  : None
+#   + Output : Ref to array of hashes containing:
+#               Name (name of index)
+#               OnTable
+#               CreateDate
+#
+####################################################################
+Example:
+
+print "\n Testing GetIndexes ... \n";
+
+my $dbListRef = $mdHandle->GetIndexes();
+
+foreach ( @{$dbListRef}) {
+  print "Name = $_->{Name}, OnTable = $_->{OnTable}, CreateDate = $_->{CreateDate} \n";
+}
+
+
+####################################################################
+# 
+#  DescribeTable
+#   + Get table details including column names, types, null/not null
+#   + Input  : Table Name
+#   + Output : Ref to array of hashes containing:
+#               Name (of column)
+#               Type
+#               NullType (NULL/NOT NULL)
+#
+####################################################################
+Example:
+
+print "\n Testing DescribeTable ... \n";
+
+my $dbListRef = $mdHandle->DescribeTable("MkEqTrade");
+
+foreach ( @{$dbListRef}) {
+  print "Name -> $_->{Name}, Type = $_->{Type}, NullType = $_->{NullType} \n";
+}
+
+
+####################################################################
+# 
+#  DescribeProc
+#   + Get stored proc text excluding create statements, etc
+#   + Input  : Proc Name
+#   + Output : Ref to array containing lines of text
+#
+####################################################################
+Example:
+
+print "\n Testing DescribeProc ... \n";
+
+my $dbListRef = $mdHandle->DescribeProc("MkGetEqProduct");
+
+foreach ( @{$dbListRef}) {
+  print "$_ ";
+}
+
+
+####################################################################
+# 
+#  DescribeTrigger
+#   + Get trigger text excluding create statements, etc
+#   + Input  : Trigger Name
+#   + Output : Ref to array containing lines of text
+#
+####################################################################
+Example:
+
+print "\n Testing DescribeTrigger ... \n";
+
+my $dbListRef = $mdHandle->DescribeTrigger("trigEqProdUpd");
+
+foreach ( @{$dbListRef}) {
+  print "$_ ";
+}
+
+
+####################################################################
+# 
+#  DescribeView
+#   + Get view text excluding create statements, etc
+#   + Input  : ViewName
+#   + Output : Ref to array containing lines of text
+#
+####################################################################
+Example:
+
+print "\n Testing DescribeView ... \n";
+
+my $dbListRef = $mdHandle->DescribeView("vEqHeaders");
+
+foreach ( @{$dbListRef}) {
+  print "$_ ";
+}
+
+
+####################################################################
+# 
+#  GetUsers
+#   + Get names/groups of all users in this database
+#   + Input  : None
+#   + Output : Ref to array of hashes containing:
+#                 UserName
+#                 UserID
+#                 GroupName
+#                 GroupID
+# 
+#
+####################################################################
+Example:
+
+print "\n Testing GetUsers ... \n";
+
+my $dbListRef = $mdHandle->GetUsers();
+
+foreach ( @{$dbListRef}) {
+  print "UserName = $_->{UserName}, UserID = $_->{UserID}, GroupName = $_->{GroupName}, GroupID = $_->{GroupID} \n";
+}
+
+
+####################################################################
+# 
+#  GetLogins
+#   + Get names of all server level logins
+#   + Input  : None
+#   + Output : Ref to hash containing:
+#                 LoginName
+#                 LoginID
+#                 DefaultDB
+#
+####################################################################
+Example:
+
+print "\n Testing GetLogins ... \n";
+
+my $dbListRef = $mdHandle->GetLogins();
+
+foreach ( @{$dbListRef}) {
+  print "LoginName = $_->{LoginName}, LoginID = $_->{LoginID}, DefaultDB = $_->{DefaultDB} \n";
+}
+
+
+####################################################################
+# 
+#  GetGroups
+#   + Get names of all groups in present database
+#   + Input  : None
+#   + Output : Ref to hash containing:
+#                 GroupName
+#                 GroupID
+#
+####################################################################
+Example:
+
+print "\n Testing GetGroups ... \n";
+
+my $dbListRef = $mdHandle->GetGroups();
+
+foreach ( @{$dbListRef}) {
+  print "GroupName = $_->{GroupName}, GroupID = $_->{GroupID} \n";
+}
+
+
+####################################################################
+# 
+#  GetGroupMembers
+#   + Get list of all members of a given group
+#   + Input  : GroupName
+#   + Output : Ref to hash containing:
+#               UserName
+#               UserID
+#
+####################################################################
+Example:
+
+print "\n Testing GetGroupMembers ... \n";
+
+my $dbListRef = $mdHandle->GetGroupMembers("app_group");
+
+foreach ( @{$dbListRef}) {
+  print "UserName = $_->{UserName}, UserID = $_->{UserID}  \n";
+}
+
+
+####################################################################
+# 
+#  ExtractTableSQL
+#   + Get entire stored proc with drop/create statements
+#   + Input  : Table Name
+#   + Output : Ref to array containing text
+#
+####################################################################
+Example:
+
+
+print "\n Testing ExtractTableSQL ... \n";
+
+my $dbListRef = $mdHandle->ExtractTableSQL("MkEqProductLog");
+
+foreach ( @{$dbListRef}) {
+  print "$_ ";
+}
+
+
+####################################################################
+# 
+#  ExtractViewSQL
+#   + Get entire view with drop/create statements
+#   + Input  : View Name or View OID
+#   + Output : Ref to array containing text
+#
+####################################################################
+Example:
+
+print "\n Testing ExtractViewSQL ... \n";
+
+my $dbListRef = $mdHandle->ExtractViewSQL("vEqHeaders");
+
+foreach ( @{$dbListRef}) {
+  print "$_ ";
+}
+
+
+####################################################################
+# 
+#  ExtractProcSQL
+#   + Get entire stored procedure with drop/create statements
+#   + Input  : Proc Name or Proc OID
+#   + Output : Ref to array containing text
+#
+####################################################################
+Example:
+
+print "\n Testing ExtractProcSQL ... \n";
+
+my $dbListRef = $mdHandle->ExtractProcSQL("MkGetEqProduct");
+
+foreach ( @{$dbListRef}) {
+  print "$_ ";
+}
+
+
+####################################################################
+# 
+#  ExtractTriggerSQL
+#   + Get entire trigger with drop/create statements
+#   + Input  : Trigger Name or Trigger OID
+#   + Output : Ref to array containing text
+#
+####################################################################
+Example:
+
+print "\n Testing ExtractTriggerSQL ... \n";
+
+my $dbListRef = $mdHandle->ExtractTriggerSQL("trigEqProdUpd");
+
+foreach ( @{$dbListRef}) {
+  print "$_ ";
+}
+
+
+####################################################################
+# 
+#  ExtractRISQL
+#   + Get entire referential integrity with drop/create statements
+#   + Input  : RI Name
+#   + Output : Ref to array containing text
+#
+####################################################################
+Example:
+
+
+print "\n Testing ExtractRISQL ... \n";
+
+my $dbListRef = $mdHandle->ExtractRISQL("FK_EQTRDATTR_TRDID");
+
+foreach ( @{$dbListRef}) {
+  print "$_ ";
+}
+
+
+####################################################################
+# 
+#  SearchProcNames
+#   + Search proc names for a given text pattern or sybase
+#     regular expression. Will validate regular expression first.
+#   + Input  : Pattern (string with Sybase Reg Ex optional)
+#   + Output : Ref To Array of hashes containing:
+#               ProcName
+#               ProcOID
+#
+####################################################################
+Example:
+
+print "\n Testing SearchProcNames ... \n";
+
+my $dbListRef = $mdHandle->SearchProcNames("%Get%");
+
+foreach ( @{$dbListRef}) {
+  print "ProcName = $_->{ProcName}, ProcOID = $_->{ProcOID}  \n";
+}
+
+
+####################################################################
+# 
+#  SearchProcText
+#   + Search proc text for a given text pattern or sybase
+#     regular expression. Will validate regular expression first.
+#    + Input  : Pattern (string with Sybase Reg Ex optional)
+#    + Output : Ref To Array of hashes containing:
+#               ProcName
+#               ProcOID
+#               Snippett (text within proc containing pattern)
+#
+####################################################################
+Example:
+
+print "\n Testing SearchProcText ... \n";
+
+my $dbListRef = $mdHandle->SearchProcText("%select%");
+
+foreach ( @{$dbListRef}) {
+  print "ProcName = $_->{ProcName}, ProcOID = $_->{ProcOID}, Snippett = $_->{Snippett}  \n";
+}
+
+
+####################################################################
+# 
+#  SearchTriggerNames
+#   + Search trigger names for a given text pattern or sybase
+#     regular expression. Will validate regular expression first.
+#   + Input  : Pattern (string with Sybase Reg Ex optional)
+#   + Output : Ref To Array of hashes containing:
+#               TriggerName
+#               TriggerOID
+#               TableName
+#               TableOID
+#
+####################################################################
+Example:
+
+print "\n Testing SearchTriggerNames ... \n";
+
+my $dbListRef = $mdHandle->SearchTriggerNames("%[Uu]pd%");
+
+foreach ( @{$dbListRef}) {
+  print "TriggerName = $_->{TriggerName}, TriggerOID = $_->{TriggerOID}, TableName = $_->{TableName}, TableOID = $_->{TableOID}  \n";
+}
+
+
+####################################################################
+# 
+#  SearchTriggerText
+#   + Search trigger text for a given text pattern or sybase
+#     regular expression. Will validate regular expression first.
+#   + Input  : Pattern (string with Sybase Reg Ex optional)
+#   + Output : Ref To Array of hashes containing:
+#               TriggerName
+#               TriggerOID
+#               TableName
+#               TableOID
+#               Snippett (piece of code containing pattern)
+#
+####################################################################
+Example:
+
+print "\n Testing SearchTriggerText ... \n";
+
+my $dbListRef = $mdHandle->SearchTriggerText("%ISIN%");
+
+foreach ( @{$dbListRef}) {
+  print "TriggerName = $_->{TriggerName}, TriggerOID = $_->{TriggerOID}, TableName = $_->{TableName}, TableOID = $_->{TableOID}, Snippett = $_->{Snippett}  \n";
+}
+
+
+####################################################################
+# 
+#  SearchColumns
+#   + Search column names for a given text pattern or sybase
+#     regular expression. Will validate regular expression first.
+#   + Input  : Pattern (string with Sybase Reg Ex optional)
+#   + Output : Ref To Array of hashes containing:
+#               ColumnName
+#               TableName
+#               TableOID
+#
+####################################################################
+Example:
+
+print "\n Testing SearchColumns ... \n";
+
+my $dbListRef = $mdHandle->SearchColumns("%Product%");
+
+foreach ( @{$dbListRef}) {
+  print "ColumnName = $_->{ColumnName}, TableName = $_->{TableName}, TableOID = $_->{TableOID} \n";
+}
+
+
+####################################################################
+# 
+#  SearchTableNames
+#   + Search table names for a given text pattern or sybase
+#     regular expression. Will validate regular expression first.
+#   + Input  : Pattern (string with Sybase Reg Ex optional)
+#   + Output : Ref To Array of hashes containing:
+#               TableName
+#               TableOID
+#
+####################################################################
+Example:
+
+print "\n Testing SearchTableNames ... \n";
+
+my $dbListRef = $mdHandle->SearchTableNames("%Product%");
+
+foreach ( @{$dbListRef}) {
+  print " TableName = $_->{TableName}, TableOID = $_->{TableOID} \n";
+}
+
+
+####################################################################
+# 
+#  SearchViewNames
+#   + Search view names for a given text pattern or sybase
+#     regular expression. Will validate regular expression first.
+#   + Input  : Pattern (string with Sybase Reg Ex optional)
+#   + Output : Ref To Array of hashes containing:
+#               ViewName
+#               ViewOID
+#
+####################################################################
+Example:
+
+print "\n Testing SearchViewNames ... \n";
+
+my $dbListRef = $mdHandle->SearchViewNames("%Eq%");
+
+foreach ( @{$dbListRef}) {
+  print " ViewName = $_->{ViewName}, ViewOID = $_->{ViewOID} \n";
+}
+
+
+####################################################################
+# 
+#  SearchViewText
+#   + Search view names for a given text pattern or sybase
+#     regular expression. Will validate regular expression first.
+#   + Input  : Pattern (string with Sybase Reg Ex optional)
+#   + Output : Ref To Array of hashes containing:
+#               ViewName
+#               ViewOID
+#               Snippett (bit of view containing pattern)
+#
+####################################################################
+Example:
+
+print "\n Testing SearchViewText ... \n";
+
+my $dbListRef = $mdHandle->SearchViewText("%[Ss]elect%");
+
+foreach ( @{$dbListRef}) {
+  print " ViewName = $_->{ViewName}, ViewOID = $_->{ViewOID}, Snippett = $_->{Snippett}  \n";
+}
+
+
+####################################################################
+# 
+#  SearchIndexNames
+#   + Search index names for a given text pattern or sybase
+#     regular expression. Will validate regular expression first.
+#   + Input  : Pattern (string with Sybase Reg Ex optional)
+#   + Output : Ref To Array of hashes containing:
+#               IndexName
+#               TableName
+#               TableOID
+#
+####################################################################
+Example:
+
+print "\n Testing SearchIndexNames ... \n";
+
+my $dbListRef = $mdHandle->SearchIndexNames("%EQ%");
+
+foreach ( @{$dbListRef}) {
+  print " IndexName = $_->{IndexName}, TableName = $_->{TableName}, TableOID = $_->{TableOID} \n";
+}
+
+
+####################################################################
+# 
+#  SearchUsers
+#   + Search user names for a given text pattern or sybase
+#     regular expression. Will validate regular expression first.
+#   + Input  : Pattern (string with Sybase Reg Ex optional)
+#   + Output : Ref To Array of hashes containing:
+#               UserName
+#               UserID
+#
+####################################################################
+Example:
+
+print "\n Testing SearchUsers ... \n";
+
+my $dbListRef = $mdHandle->SearchUsers("%app%");
+
+foreach ( @{$dbListRef}) {
+  print " UserName = $_->{UserName}, UserID = $_->{UserID}  \n";
+}
+
+
+####################################################################
+# 
+#  SearchGroups
+#   + Search group names for a given text pattern or sybase
+#     regular expression. Will validate regular expression first.
+#   + Input  : Pattern (string with Sybase Reg Ex optional)
+#   + Output : Ref To Array of hashes containing:
+#               GroupName
+#               GroupID
+#
+####################################################################
+Example:
+
+print "\n Testing SearchGroups ... \n";
+
+my $dbListRef = $mdHandle->SearchGroups("%app%");
+
+foreach ( @{$dbListRef}) {
+  print " GroupName = $_->{GroupName}, GroupID = $_->{GroupID}  \n";
+}
+
+
+####################################################################
+#
+#  CloseConnection
+#   + Clean up and close DB handle
+#   + Input: None needed
+#
+####################################################################
+Example:
+
+$mdHandle->CloseConnection();
+
+
+=head1 SEE ALSO
+
+For more information on this and other modules written by the author see
+the website - http://www.bmobrien.net or email to mikeob723@gmail.com
+
+=head1 AUTHOR
+
+Mike O\'Brien, E<lt>mikeob723@gmail.com<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2009 by Mike O\'Brien
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+=cut
+
+
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2010 by Mike O\'Brien
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

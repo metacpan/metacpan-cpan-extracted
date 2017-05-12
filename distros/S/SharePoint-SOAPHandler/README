@@ -1,0 +1,112 @@
+SharePoint-SOAPHandler version 0.0013
+================================
+
+This module provides a new [sic.] contructor and necessary subclass methods for CopyTree::VendorProof in order to deal with remote Sharepoint file operations.
+
+What?
+
+Oh, yes.  You've probabaly stumbled across this module because you wanted to copy something recursively.  Did you want to move some files into or off your SharePoint file server?  Did you buy Opentext's Livelink EWS and wish to automate some file transfers?  Well, this is kinda the right place, but it gets righter. Check out the documentation on my CopyTree::VendorProof module, where I have a priceless drill and screw analogy for how these modules all work together.  The information on this page is a tad too technical if all you're trying to decide is whether this is the module you need.
+
+
+ IMPORTANT NOTICE: Your Implementation might not work unless you read the following!
+
+Currenly, you need to install Authen::NTLM version 1.09 or greater for this module to work.  With my v1.09 tweak to Authen::NTLM on CPAN, this module should just work.  If you actually use Authen::NTLM directly for some reason, remember to set
+
+ntlmv2('sp');
+
+prior to using SharePoint::SOAPHandler.  You did remember to export ntlmv2, no?
+
+use Authen::NTLM qw(ntlmv2);
+
+For those of you with earlier versions of Authen::NTLM, see the historic segment below.
+ 
+Also, if your Sharepoint connects through https, but does not go through a proxy server, even though all your OTHER http/ https traffic does, you must:
+
+delete $ENV{'https_proxy'}
+
+Specifying the domain on no_proxy will not do the trick, because oddly, no_proxy only works for 'no http' and not 'no https'.  These are just some annoying things I discovered.  Your milage may vary.
+
+The subclass methods provided in this connector objects include:
+	new
+	fdls				
+	is_fd
+	read_info_memory
+	write_from_memory
+	copy_local_files
+	cust_mkdir
+	cust_rmdir
+	cust_rmfile
+
+The functionality of these methods are described in 
+perldoc CopyTree::VendorProof 
+
+Under the section "Object specific instance methods for the base class CopyTree::VendorProof"
+
+To create a SharePoint::SOAPHandler connector instance:
+	my $soaphandler_inst = SharePoint::SOAPHandler ->new;
+
+	#set up connection parameters
+	#IMPORTANT sp_creds_domain should not have the protocol (http or https://)
+	$soaphandler_inst ->sp_creds_domain('www.sharepointsite.org:443');
+	$soaphandler_inst ->sp_creds_user('DOMAIN_in_CAPs\username');
+	$soaphandler_inst ->sp_creds_password('domain_password');
+	$soaphandler_inst ->sp_authorizedroot('https://www.sharepointsite.org:443/some_dirs/the_dir_just_above_the_Shared_Documents_dir_that_you_are_allowed_to_edit');
+
+
+To add a source or destination item to a CopyTree::VendorProof instance:
+	my $ctvp_inst = CopyTree::VendorProof ->new;
+	$ctvp_inst ->src ('some_source_path_of_local_file_system', $soaphandler_inst);
+	$ctvp_inst ->dst ('some_destination_path_of_local_file_system', $soaphandler_inst);
+	$ctvp_inst ->cp;
+
+SharePoint::SOAPHandler, in adition to providing a connector instance to CopyTree::VendorProof, also provides some getlist funcions for sharepoint.  These functions are not extensively tested and are not recommended for use.
+
+----historic----
+
+Please note that as of July 2011, there is an NTLM bug that needs to be hacked for the sharepoint connector SharePoint::SPCOPY to work.  Basically, LWP automatically negotiates NTLM protocols, and calls its LWP::Authen::Ntlm to in turn call Authen::NTLM to authenticate against windows domains.  The problem is, sharepoint prefers an authentication between ntlmv2 and ntlmv1 that's offered by the Authen::NTLM package.  LWP::Authen::Ntlm does not specify any version.  This causes authentication to fail on sharepoint.  The web community offers a quick fix to 'patch' Authen::NTLM, which involves finding the Authen::NTLM module (perhaps in /usr/local/share/perl/5.10.1/Authen/NTLM.pm) and changing around line 289, where 
+
+$domain =substr($challenge, $c_info->{domain}{offset}, $c_info->{domain}{len});
+
+is to be changed to 
+
+$domain = &unicode("domain");
+
+This is CRITICALLY IMPORTANT if you want SharePoint::SOAPHandler to work.  I have created a patch that is a varient of this solution, but does not break backwards compatibility.  You can find this patch at 
+
+https://rt.cpan.org/Ticket/Display.html?id=70703
+
+Remember, either of these fixes must be applied for this module to work.  If the above instructions are unclear, please google http://shareperl.blogspot.com/2010/01/sharepoint-perl-connection.html. 
+
+----end historic----
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+CopyTree::VendorProof => 0.0011, 
+Authen::NTLM =>1.09,
+SOAP::Lite =>0.712,
+MIME::Base64=>3.01, 
+File::Basename=> 2.72, 
+Data::Dumper=> 2.121, 
+Carp=>1.02,
+Term::ReadKey =>0 #only needed for test suite
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 by dbmolester
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

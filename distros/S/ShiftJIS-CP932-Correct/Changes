@@ -1,0 +1,21 @@
+Revision history for Perl extension ShiftJIS::CP932::Correct.
+
+0.06  Sun Aug  7 21:13:32 2011
+    - fix the tarball with world writable files.
+    - added CAVEAT.
+
+0.05  Sun Apr 14 23:02:15 2002
+    - some doc fix.
+
+0.04  Sat Sep 08 08:06:21 2001
+    - fix: avoid warning on Perl 5.003.
+    - add is_cp932 and is_corrected_cp932
+
+0.03  Mon Jun 18 19:58:25 2001
+    - change document
+
+0.02  Sun Jun 17 21:25:15 2001
+    - change README
+
+0.01  Sun Jun 17 10:24:01 2001
+    - original version; created by h2xs 1.19

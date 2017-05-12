@@ -1,0 +1,130 @@
+#!/usr/bin/env perl
+#
+# sms77send - a perl script to send sms via sms77.de
+# Copyright: Markus Benning <me@w3r3wolf.de>
+
+use strict;
+use warnings;
+
+use SMS::SMS77;
+use SMS::SMS77::Message;
+
+use POSIX qw(setlocale LC_ALL);
+use Getopt::Long;
+use Time::Piece;
+
+# this script is not localized
+setlocale(LC_ALL, 'C');
+
+# {{{ POD Documentaion
+=head1 NAME
+
+sms77send - send a sms message via sms77.de
+
+=head1 SYNOPSIS
+
+sms77send [--user     <user>]
+        [--password <password>]
+        [--type     <type of sms> (basicplus,quality,...)
+        [--from     <sender>
+        [--to       <receipt>] [--to <second receipt>] ...
+        [--status]  request a status report
+        [--debug]
+        [--help]
+
+Messagebody is read from stdin.
+
+
+=head1 DESCRIPTION
+
+This script is mainly a commandline wrapper for the classes of the
+SMS::SMS77 package.
+
+=cut
+# }}}
+
+sub usage {
+    print STDERR "usage: ".$0."\n";
+    print STDERR "        [--user     <user>]\n";
+    print STDERR "        [--password <password>]\n";
+    print STDERR "        [--type     <type of sms> (basicplus,quality,...)]\n";
+    print STDERR "        [--from     <sender>\n";
+    print STDERR "        [--to       <receipt>] [--to <second receipt>] ...\n";
+    print STDERR "        [--status]  request a status report\n";
+    print STDERR "        [--debug]\n";
+    print STDERR "        [--help]\n\n";
+    print STDERR "        Messagebody is read from stdin.\n";
+    exit(1);
+}
+
+sub main {
+    my $help = 0;
+    my $opts = {
+        'user' => undef,
+        'password' => undef,
+        'type' => undef,
+        'status' => undef,
+        'from' => undef,
+        'to' => [],
+        'debug' => 0,
+    };
+	my $text;
+	my $line;
+
+	if(!GetOptions(
+            "user|u=s" => \$opts->{'user'},
+            "password|p=s" => \$opts->{'password'},
+            "type|y=s" => \$opts->{'type'},
+            "status|s" => \$opts->{'status'},
+            "from|f=s" => \$opts->{'from'},
+            "to|t=s" => $opts->{'to'},
+            "debug|d" => \$opts->{'debug'},
+            "help|h" => \$help )) {
+        usage();
+    }
+    if($help) {
+        usage();
+    }
+
+	while($line = readline(STDIN)) {
+		$text .= $line;
+	}
+	
+	my $service = SMS::SMS77->new(
+		user => $opts->{'user'},
+		password => $opts->{'password'},
+		debug => $opts->{'debug'}
+	);
+
+	my $message = SMS::SMS77::Message->new(
+		to => $opts->{'to'},
+		from => $opts->{'from'},
+		type => $opts->{'type'},
+		text => $text,
+		status => $opts->{'status'},
+	);
+
+	print $service->send($message)."\n";
+
+}
+main();
+
+=head1 see also
+
+SMS::SMS77
+
+=head1 AUTHOR
+
+Markus Benning, C<< <me at w3r3wolf.de> >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2007 Markus Benning, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+
+# vim:ts=4:
+# vim600:foldmethod=marker:

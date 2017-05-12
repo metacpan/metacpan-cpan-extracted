@@ -1,0 +1,13 @@
+
+# config file describing the font's properties
+
+[Font]
+file = data/courier.bmp
+chars = 224
+chars_per_line = 16
+char_width = 11
+char_height = 21
+zoom_x = 0.8
+zoom_y = 0.60
+transparent = 0.9
+color = 0.8, 0.8, 1

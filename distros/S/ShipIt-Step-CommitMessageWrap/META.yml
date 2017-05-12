@@ -1,0 +1,15 @@
+abstract: commit message wrapping format to shipit version control
+author: Kazuhiro Osawa <ko@yappo.ne.jp>
+build_requires: 
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: ShipIt-Step-CommitMessageWrap
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  ShipIt: 0
+version: 0.04

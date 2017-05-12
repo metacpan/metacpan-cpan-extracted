@@ -1,0 +1,141 @@
+Revision history for SWISH::3, libswish3 Perl bindings.
+
+1.000015 01 April 2017
+ - segfault fix in libswish3.c via https://github.com/karpet/libswish3/pull/1
+ - fix Perl test failures related to null-termination of re-used char* pointer in SV*.
+
+1.000014 30 Oct 2015
+ - maintenance only. Removes MYMETA.* files from distribution per
+   https://rt.cpan.org/Ticket/Display.html?id=108145
+
+1.000013 21 Aug 2014
+ - fix for setlocale with LC_NUMERIC. See 
+   https://rt.perl.org/Public/Bug/Display.html?id=122105
+
+1.000012 20 Aug 2014
+ - now includes SWISH::3::Headers
+
+1.000011 19 Aug 2014
+ - parse_fh() method now works. You can parse from an open filehandle
+   pointing at a file that uses the SWISH::3 headers API. Calls
+   swish_parse_fh() C function.
+ - improved documentation
+ - default tokenizer regex now matches Apache Lucy rather than KinoSearch
+
+1.000010 31 July 2014
+ - add TO_JSON and FREEZE hooks to xml2Hash, PropertyHash and MetaNameHash classes.
+ - add hashref overloading to MetaName and Property classes.
+
+1.000009 15 April 2014
+ - add hashref overloading to xml2Hash, PropertyHash and MetaNameHash classes.
+
+1.000008 11 April 2014
+ - expose file extension and mime type detection functions
+   as SWISH::3 methods.
+
+1.000007 18 May 2013
+ - detect Win32 at build time and abort cleanly
+
+1.000006 12 Feb 2013
+ - support r3293, UndefinedMetaTags not triggered for TagAliases
+ - support r3294, UndefinedMetaTags value 'autoall'
+
+1.000005 09 Oct 2012
+ - support r3242, nested noindex/index comments.
+
+1.000004 08 Oct 2012
+ - support r3239 and r3238, including noindex/index comment feature.
+
+1.000003 05 Sept 2012
+ - support r3228 TagAlias support for DOM hierarchies
+
+1.000002 22 Aug 2012
+ - fix some ambiguous method signatures, always returning SV* not AV*
+ - include r3213 (TXT parser uses filename as title)
+
+1.000001 19 Feb 2012
+ - add mapping for swishdescription id
+
+1.000000 06 Sep 2011
+ - release 1.000000 supporting libswish3 1.0.0
+
+0.11 02 Jan 2011
+ - support r3104 for libswish3 (UndefinedMetaTags and
+   UndefinedXMLAttributes)
+
+0.10 03 Nov 2010
+ - support r3081 for libswish3
+
+0.09 23 Oct 2010
+ - change Locale test to allow for "utf8" or "UTF-8"
+ - official release with cumulative fixes in the 0.08_xx series.
+
+0.08_08 20 Oct 2010
+ - bumped required Perl to 5.8.9 as PL_use_safe_putenv did not appear till
+   5.8.6 and sv_usepvn_flags() did not appear till 5.8.9.
+ - dropped err.h from libswish3.c as Solaris (for one) does not seem to
+   have it.
+ - added alloca.h to libswish3.c as Solaris (for one) seems to need it.
+
+0.08_07 11 Oct 2010
+ - fix (finally, I hope) the mysterious segfaults on freebsd tests. The
+   problem was Perl's my_setenv() interfering with the native setenv().
+ - fix "Bad realloc() ignored" error on freebsd by using sv_usepvn_flags()
+   instead of sv_usepvn_mg().
+
+0.08_06 08 Oct 2010
+ - tweek tests to allow for any locale with UTF-8 encoding
+ - dump %Config to try and trace freebsd setenv/putenv/malloc issue (more
+   of same issue addressed in 0.08_05)
+
+0.08_05 13 Sept 2010
+ - revert debugging from 0.08_04
+ - check for USE_MYMALLOC in %Config and abort Makefile.PL
+
+0.08_04 1 June 2010
+ - add some debugging on stderr for cpantesters only.
+
+0.08_03 19 May 2010
+ - put locale support detection directly into Makefile.PL to avoid even
+   attempting to build without UTF-8 locale present.
+
+0.08_02 17 May 2010
+ - more debugging of missing locales.
+
+0.08_01 12 May 2010
+ - fix duplicate constant definitions in XS/Constants.xs.
+ - setlocale() explicitly to en_US.UTF-8 to see if that fixes cpantesters. 
+
+0.07 10 May 2010
+ - rework build config so that libswish3.c is not #include'd in 3.xs but
+   instead compiled and then linked as .o file.
+ - fix REGEXP stuff for Perl 5.12
+
+0.06 08 May 2010
+ - add missing constants doc to pod.
+ - change implementation of slurp() to transparently gunzip any filenames
+   ending with .gz.
+ - libswish3 src now included instead of being dynamically linked.
+ - changed license to be GPL instead of Perl now that we include source.
+
+0.05 01 Feb 2010
+ - add SWISH::3::Property->presort accessor.
+ - return undef for NULL values in alias_for() accessor for MetaName and
+   Property
+ - add SWISH_DOC_PROP_MAP constant
+ - return undef for NULL values in Doc accesssors.
+
+0.04 02 Jan 2010
+ - add tests for leaks
+ - fix mem leak with SWISH::3::Stash internal objects.
+ - fix mem leaks in SWISH::3::Data class.
+
+0.03 12 Dec 2009
+ - refactor how Makefile.PL builds the ::Constants class.
+
+0.02 29 Nov 2009
+ - add get_stash() method to SWISH::3
+
+0.01 20 Nov 2009
+ - released to CPAN after 4 years in development.
+

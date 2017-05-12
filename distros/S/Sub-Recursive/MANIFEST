@@ -1,0 +1,11 @@
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README
+lib/Sub/Recursive.pm
+misc/bench.pl
+t/01basic.t
+t/02mutually.t
+t/90other.t
+META.yml                                 Module meta-data (added by MakeMaker)

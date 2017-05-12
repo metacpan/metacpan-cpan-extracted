@@ -1,0 +1,11 @@
+Revision history for Schema-RackTables
+
+1.01 / 2016-05-16 / SAPER
+
+  [Distribution]
+  - Don't include Build.PL, as it doesn't seem to copy versions.json
+
+1.00 / 2016-05-13 / SAPER
+
+  First release.
+

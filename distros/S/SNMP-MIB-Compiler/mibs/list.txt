@@ -1,0 +1,394 @@
+- rfc1065.txt: RFC1065-SMI
+- rfc1066.txt: RFC1066-MIB
+- rfc1067.txt: RFC1067-SNMP
+- rfc1098.txt: RFC1098-SNMP
++ rfc1155.txt: RFC1155-SMI
++ rfc1156.txt: RFC1156-MIB
++ rfc1157.txt: RFC1157-SNMP
++ rfc1158.txt: RFC1158-MIB
++ rfc1162.txt: CLNS-MIB
++ rfc1212.txt: RFC-1212
++ rfc1213.txt: RFC1213-MIB
++ rfc1215.txt: RFC-1215
+- rfc1224.txt: RFC1224-MIB
+- rfc1227.txt: SMUX-MIB
+- rfc1229.txt: RFC1229-MIB
+- rfc1230.txt: RFC1230-MIB
+- rfc1231.txt: RFC1231-MIB
+- rfc1232.txt: RFC1232-MIB
+- rfc1233.txt: RFC1233-MIB
+- rfc1238.txt: CLNS-MIB
+- rfc1243.txt: RFC1243-MIB
+- rfc1248.txt: RFC1248-MIB
+- rfc1252.txt: RFC1252-MIB
+- rfc1253.txt: RFC1253-MIB
+- rfc1269.txt: RFC1269-MIB
+- rfc1271.txt: RFC1271-MIB
+- rfc1284.txt: RFC1284-MIB
+- rfc1285.txt: RFC1285-MIB
+- rfc1286.txt: RFC1286-MIB
+- rfc1289.txt: RFC1289-phivMIB
+- rfc1298.txt: RFC1298-MIB
+- rfc1303.txt: RFC-1303
+- rfc1304.txt: RFC1304-MIB
+- rfc1315.txt: RFC1315-MIB
+- rfc1316.txt: RFC1316-MIB
+- rfc1317.txt: RFC1317-MIB
+- rfc1318.txt: RFC1318-MIB
+- rfc1353.txt: RFC1353-MIB
+- rfc1354.txt: RFC1354-MIB
+- rfc1368.txt: SNMP-REPEATER-MIB
+- rfc1381.txt: RFC1381-MIB
+- rfc1382.txt: RFC1382-MIB
+- rfc1389.txt: RFC1389-MIB
+- rfc1398.txt: RFC1398-MIB
+- rfc1406.txt: RFC1406-MIB
+- rfc1407.txt: RFC1407-MIB
+- rfc1414.txt: RFC1414-MIB
+- rfc1442.txt: SNMPv2-SMI
+- rfc1443.txt: SNMPv2-TC
+- rfc1444.txt: SNMPv2-CONF
+- rfc1447.txt: SNMPv2-PARTY-MIB
+- rfc1448.txt: SNMPv2-PDU
+- rfc1449.txt: SNMPv2-TM
+- rfc1450.txt: SNMPv2-MIB
+- rfc1451.txt: SNMPv2-M2M-MIB
+- rfc1461.txt: MIOX25-MIB
+- rfc1471.txt: PPP-LCP-MIB
+- rfc1472.txt: PPP-SEC-MIB
+- rfc1473.txt: PPP-IP-NCP-MIB
+- rfc1474.txt: PPP-BRIDGE-NCP-MIB
+- rfc1493.txt: BRIDGE-MIB
+- rfc1494.txt: MIME-MHS-MAPPINGS
+- rfc1495.txt: MIME-MHS
+- rfc1507.txt: GSSAPI
+- rfc1508.txt: GSS-API
+- rfc1512.txt: FDDI-SMT73-MIB
+- rfc1513.txt: TOKEN-RING-RMON-MIB
+- rfc1514.txt: HOST-RESOURCES-MIB
+- rfc1515.txt: MAU-MIB
+- rfc1516.txt: SNMP-REPEATER-MIB
+- rfc1525.txt: SOURCE-ROUTING-MIB
+- rfc1559.txt: DECNET-PHIV-MIB
+- rfc1565.txt: APPLICATION-MIB
+- rfc1566.txt: MTA-MIB
+- rfc1567.txt: DSA-MIB
++ rfc1573.txt: IANAifType-MIB
+- rfc1573.txt: IF-MIB
+- rfc1592.txt: DPI20-MIB
+- rfc1593.txt: IBM-6611-APPN-MIB
+- rfc1595.txt: SONET-MIB
+- rfc1596.txt: FRNETSERV-MIB
+- rfc1604.txt: FRNETSERV-MIB
+- rfc1611.txt: DNS-SERVER-MIB
+- rfc1612.txt: DNS-RESOLVER-MIB
+- rfc1623.txt: EtherLike-MIB
+- rfc1628.txt: UPS-MIB
+- rfc1643.txt: EtherLike-MIB
+- rfc1650.txt: EtherLike-MIB
+- rfc1657.txt: BGP4-MIB
+- rfc1658.txt: CHARACTER-MIB
+- rfc1659.txt: RS-232-MIB
+- rfc1660.txt: PARALLEL-MIB
+- rfc1665.txt: SNA-NAU-MIB
+- rfc1666.txt: SNA-NAU-MIB
+- rfc1694.txt: SIP-MIB
+- rfc1695.txt: ATM-MIB
+- rfc1696.txt: Modem-MIB
+- rfc1697.txt: RDBMS-MIB
+- rfc1724.txt: RIPv2-MIB
++ rfc1742.txt: APPLETALK-MIB
+- rfc1743.txt: TOKENRING-MIB
+- rfc1747.txt: SNA-SDLC-MIB
+- rfc1748.txt: TOKENRING-MIB
+- rfc1749.txt: TOKENRING-STATION-SR-MIB
+- rfc1757.txt: RMON-MIB
+- rfc1759.txt: Printer-MIB
+- rfc1792.txt: TCPIPX-MIB
+- rfc1850.txt: OSPF-MIB
+- rfc1850.txt: OSPF-TRAP-MIB
+- rfc1901.txt: COMMUNITY-BASED-SNMPv2
+o rfc1902.txt: SNMPv2-SMI
+o rfc1903.txt: SNMPv2-TC
+o rfc1904.txt: SNMPv2-CONF
++ rfc1905.txt: SNMPv2-PDU
++ rfc1906.txt: SNMPv2-TM
++ rfc1907.txt: SNMPv2-MIB
+- rfc1910.txt: SNMPv2-USEC-MIB
+- rfc2006.txt: MIP-MIB
+- rfc2011.txt: IP-MIB
+- rfc2012.txt: TCP-MIB
+- rfc2013.txt: UDP-MIB
+- rfc2020.txt: DOT12-IF-MIB
+- rfc2021.txt: RMON2-MIB
+- rfc2024.txt: DLSW-MIB
+- rfc2037.txt: ENTITY-MIB
+- rfc2051.txt: APPC-MIB
+- rfc2064.txt: FLOW-METER-MIBQ
+- rfc2078.txt: GSS-API
+- rfc2096.txt: IP-FORWARD-MIB
+- rfc2108.txt: SNMP-REPEATER-MIB
+- rfc2115.txt: FRAME-RELAY-DTE-MIB
+- rfc2127.txt: ISDN-MIB
+- rfc2128.txt: DIAL-CONTROL-MIB
+- rfc2155.txt: APPN-MIB
+- rfc2206.txt: RSVP-MIB
+- rfc2213.txt: INTEGRATED-SERVICES-MIB
+- rfc2214.txt: INTEGRATED-SERVICES-GUARANTEED-MIB
+- rfc2232.txt: APPN-DLUR-MIB
++ rfc2233.txt: IF-MIB
+- rfc2238.txt: HPR-MIB
+- rfc2239.txt: MAU-MIB
+- rfc2248.txt: NETWORK-SERVICES-MIB
+- rfc2249.txt: MTA-MIB
+- rfc2261.txt: SNMP-FRAMEWORK-MIB
+- rfc2262.txt: SNMP-MPD-MIB
+- rfc2263.txt: SNMP-TARGET-MIB
+- rfc2263.txt: SNMP-NOTIFICATION-MIB
+- rfc2263.txt: SNMP-PROXY-MIB
+- rfc2264.txt: SNMP-USER-BASED-SM-MIB
+- rfc2265.txt: SNMP-VIEW-BASED-ACM-MIB
+- rfc2266.txt: DOT12-RPTR-MIB
+- rfc2271.txt: SNMP-FRAMEWORK-MIB
+- rfc2272.txt: SNMP-MPD-MIB
+- rfc2273.txt: SNMP-TARGET-MIB
+- rfc2273.txt: SNMP-NOTIFICATION-MIB
+- rfc2273.txt: SNMP-PROXY-MIB
+- rfc2274.txt: SNMP-USER-BASED-SM-MIB
+- rfc2275.txt: SNMP-VIEW-BASED-ACM-MIB
+- rfc2287.txt: SYSAPPL-MIB
+- rfc2320.txt: IPOA-MIB
+- rfc2325.txt: COFFEE-POT-MIB
+- rfc2358.txt: EtherLike-MIB
+- rfc2366.txt: IPATM-IPMC-MIB
+- rfc2417.txt: IPATM-IPMC-MIB
+- rfc2452.txt: IPV6-TCP-MIB
+- rfc2454.txt: IPV6-UDP-MIB
+- rfc2455.txt: APPN-MIB
+- rfc2456.txt: APPN-TRAP-MIB
+- rfc2457.txt: EBN-MIB
+- rfc2465.txt: IPV6-TC
+- rfc2465.txt: IPV6-MIB
+- rfc2466.txt: IPV6-ICMP-MIB
+- rfc2493.txt: PerfHist-TC-MIB
+- rfc2494.txt: DS0-MIB
+- rfc2494.txt: DS0BUNDLE-MIB
+- rfc2495.txt: DS1-MIB
+- rfc2496.txt: DS3-MIB
+- rfc2512.txt: ATM-ACCOUNTING-INFORMATION-MIB
+- rfc2513.txt: ACCOUNTING-CONTROL-MIB
+- rfc2514.txt: ATM-TC-MIB
+- rfc2515.txt: ATM-MIB
+- rfc2558.txt: SONET-MIB
+- rfc2561.txt: TN3270E-MIB
+- rfc2562.txt: TN3270E-RT-MIB
++ rfc2578.txt: SNMPv2-SMI
++ rfc2579.txt: SNMPv2-TC
++ rfc2580.txt: SNMPv2-CONF
+
+
+
+Standards Summary
+
+Please consult the latest version of Internet Official Protocol Standards.
+As of this writing, the latest version is RFC 2400.
+
+SMIv1 Data Definition Language
+
+Full Standards:
+
+      RFC 1155 - Structure of Management Information
+      RFC 1212 - Concise MIB Definitions
+
+Informational:
+
+      RFC 1215 - A Convention for Defining Traps
+
+SMIv2 Data Definition Language
+
+Draft Standards:
+
+      RFC 1902 - Structure of Management Information
+      RFC 1903 - Textual Conventions
+      RFC 1904 - Conformance Statements
+
+SNMPv1 Protocol
+
+Full Standards:
+
+      RFC 1157 - Simple Network Management Protocol
+
+Proposed Standards:
+
+      RFC 1418 - SNMP over OSI
+      RFC 1419 - SNMP over AppleTalk
+      RFC 1420 - SNMP over IPX
+
+SNMPv2 Protocol
+
+Draft Standards:
+
+      RFC 1905 - Protocol Operations for SNMPv2
+      RFC 1906 - Transport Mappings for SNMPv2
+      RFC 1907 - MIB for SNMPv2
+      RFC 1908 - Coexistence between SNMPv1 and SNMPv2
+
+Experimental:
+
+      RFC 1901 - Community-based SNMPv2
+      RFC 1909 - Administrative Infrastructure
+      RFC 1910 - User-based Security Model
+
+SNMPv3 Protocol
+
+Draft Standards:
+
+      RFC 1905 - Protocol Operations for SNMPv2
+      RFC 1906 - Transport Mappings for SNMPv2
+      RFC 1907 - MIB for SNMPv2
+
+Proposed Standards:
+
+      RFC 2271 - Architecture for Describing SNMP Management Frameworks
+      RFC 2272 - Message Processing and Dispatching
+      RFC 2273 - SNMPv3 Applications
+      RFC 2274 - User-based Security Model
+      RFC 2275 - View-based Access Control Model
+
+SNMP Agent Extensibility
+
+Proposed Standards:
+
+      RFC 2257 - AgentX Protocol Version 1
+
+SMIv1 MIB Modules
+
+Full Standards:
+
+      RFC 1213 - Management Information Base II
+      RFC 1643 - Ethernet-Like Interface Types MIB
+
+Draft Standards:
+
+      RFC 1493 - Bridge MIB
+      RFC 1559 - DECnet phase IV MIB
+      RFC 1757 - Remote Network Monitoring MIB
+
+Proposed Standards:
+
+      RFC 1285 - FDDI Interface Type (SMT 6.2) MIB
+      RFC 1381 - X.25 LAPB MIB
+      RFC 1382 - X.25 Packet Layer MIB
+      RFC 1414 - Identification MIB
+      RFC 1461 - X.25 Multiprotocol Interconnect MIB
+      RFC 1471 - PPP Link Control Protocol MIB
+      RFC 1472 - PPP Security Protocols MIB
+      RFC 1473 - PPP IP NCP MIB
+      RFC 1474 - PPP Bridge NCP MIB
+      RFC 1512 - FDDI Interface Type (SMT 7.3) MIB
+      RFC 1513 - RMON Token Ring Extensions MIB
+      RFC 1514 - Host Resources MIB
+      RFC 1515 - IEEE 802.3 MAU MIB
+      RFC 1525 - Source Routing Bridge MIB
+      RFC 1742 - AppleTalk MIB
+
+SMIv2 MIB Modules
+
+Draft Standards:
+
+      RFC 1657 - BGP version 4 MIB
+      RFC 1658 - Character Device MIB
+      RFC 1659 - RS-232 Interface Type MIB
+      RFC 1660 - Parallel Printer Interface Type MIB
+      RFC 1694 - SMDS Interface Type MIB
+      RFC 1724 - RIP version 2 MIB
+      RFC 1748 - IEEE 802.5 Interface Type MIB
+      RFC 1850 - OSPF version 2 MIB
+      RFC 1907 - SNMPv2 MIB
+      RFC 2115 - Frame Relay DTE Interface Type MIB
+
+Proposed Standards:
+
+      RFC 1567 - X.500 Directory Monitoring MIB
+      RFC 1604 - Frame Relay Service MIB
+      RFC 1611 - DNS Server MIB
+      RFC 1612 - DNS Resolver MIB
+      RFC 1628 - Uninterruptible Power Supply MIB
+      RFC 1666 - SNA NAU MIB
+      RFC 1696 - Modem MIB
+      RFC 1697 - RDBMS MIB
+      RFC 1747 - SNA Data Link Control MIB
+      RFC 1749 - 802.5 Station Source Routing MIB
+      RFC 1759 - Printer MIB
+      RFC 2006 - Internet Protocol Mobility MIB
+      RFC 2011 - Internet Protocol MIB
+      RFC 2012 - Transmission Control Protocol MIB
+      RFC 2013 - User Datagram Protocol MIB
+      RFC 2020 - IEEE 802.12 Interfaces MIB
+      RFC 2021 - RMON Version 2 MIB
+      RFC 2024 - Data Link Switching MIB
+      RFC 2037 - Entity MIB
+      RFC 2051 - APPC MIB
+      RFC 2074 - RMON Protocol Identifier
+      RFC 2096 - IP Forwarding Table MIB
+      RFC 2108 - IEEE 802.3 Repeater MIB
+      RFC 2127 - ISDN MIB
+      RFC 2128 - Dial Control MIB
+      RFC 2206 - Resource Reservation Protocol MIB
+      RFC 2213 - Integrated Services MIB
+      RFC 2214 - Guaranteed Service MIB
+      RFC 2232 - Dependent LU Requester MIB
+      RFC 2233 - Interfaces Group MIB
+      RFC 2238 - High Performance Routing MIB
+      RFC 2239 - IEEE 802.3 MAU MIB
+      RFC 2248 - Network Services Monitoring MIB
+      RFC 2249 - Mail Monitoring MIB
+      RFC 2266 - IEEE 802.12 Repeater MIB
+      RFC 2271 - SNMP Framework MIB
+      RFC 2272 - SNMPv3 MPD MIB
+      RFC 2273 - SNMP Applications MIB
+      RFC 2274 - SNMPv3 USM MIB
+      RFC 2275 - SNMP VACM MIB
+      RFC 2287 - System-Level Application Mgmt MIB
+      RFC 2320 - Classical IP and ARP over ATM MIB
+      RFC 2358 - Ethernet-Like Interface Types MIB
+      RFC 2366 - Multicast over UNI 3.0/3.1 / ATM MIB
+      RFC 2452 - IPv6 UDP MIB
+      RFC 2454 - IPv6 TCP MIB
+      RFC 2455 - APPN MIB
+      RFC 2456 - APPN Trap MIB
+      RFC 2457 - APPN Extended Border Node MIB
+      RFC 2465 - IPv6 Textual Conventions and MIB
+      RFC 2466 - ICMPv6 MIB
+      RFC 2493 - 15 Minute Performance History TCs
+      RFC 2494 - DS0, DS0 Bundle Interface Type MIB
+      RFC 2495 - DS1, E1, DS2, E2 Interface Type MIB
+      RFC 2496 - DS3/E3 Interface Type MIB
+      RFC 2512 - Accounting MIB for ATM Networks
+      RFC 2513 - Accounting Control MIB
+      RFC 2514 - ATM Textual Conventions and OIDs
+      RFC 2515 - ATM MIB
+      RFC 2558 - SONET/SDH Interface Type MIB
+
+IANA Maintained MIB Modules
+
+      Interface Type Textual Convention (IANAifType) ftp://ftp.iana.org/mib/ianaiftype.mib
+
+Related Documents
+
+Informational:
+
+      RFC 1270 - SNMP Communication Services
+      RFC 1321 - MD5 Message-Digest Algorithm
+      RFC 1470 - Network Management Tool Catalog
+      RFC 2039 - Applicability of Standard MIBs to WWW Server Management
+      RFC 2089 - Mapping SNMPv2 onto SNMPv1 within a bi-lingual SNMP agent
+
+Experimental:
+
+      RFC 1187 - Bulk Table Retrieval with the SNMP
+      RFC 1224 - Techniques for Managing Asynchronously Generated Alerts
+      RFC 1238 - CLNS MIB
+      RFC 1592 - SNMP Distributed Program Interface
+      RFC 1792 - TCP/IPX Connection MIB Specification
+      RFC 2064 - Traffic Flow Measurement: Meter MIB

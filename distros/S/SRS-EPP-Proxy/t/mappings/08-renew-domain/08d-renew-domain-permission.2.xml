@@ -1,0 +1,13 @@
+<NZSRSResponse VerMajor="5" VerMinor="2">
+  <Response Action="DomainUpdate" FeId="9" FeSeq="2122" OrigRegistrarId="100" RecipientRegistrarId="100" TransId="1280362254">
+  <FeTimeStamp Day="29" Hour="12" Minute="10" Month="7" Second="56" TimeZoneOffset="+12:00" Year="2010"/>
+    <Error Hint="INVALID_REQUEST_ERROR" ErrorId="MISSING_MANDATORY_FIELD" Severity="err">
+      <Description>
+        <![CDATA[Mandatory Field missing from Transaction]]>
+      </Description>
+      <ErrorDetails>
+        <![CDATA[UDAI]]>
+      </ErrorDetails>
+    </Error>
+  </Response>
+</NZSRSResponse>

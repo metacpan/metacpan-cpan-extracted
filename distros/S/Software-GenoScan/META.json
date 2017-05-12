@@ -1,0 +1,79 @@
+{
+   "abstract" : "Software for computational discovery of miRNAs in genomic sequneces",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "unrestricted"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Software-GenoScan",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Exporter" : "0",
+            "ExtUtils::CBuilder" : "0.21",
+            "Module::Build" : "0.42",
+            "XSLoader" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      }
+   },
+   "provides" : {
+      "Software::GenoScan" : {
+         "file" : "lib/Software/GenoScan.pm",
+         "version" : "v1.0.4"
+      },
+      "Software::GenoScan::CommandProcessor" : {
+         "file" : "lib/Software/GenoScan/CommandProcessor.pm",
+         "version" : "v1.0.4"
+      },
+      "Software::GenoScan::FoldVisualizer" : {
+         "file" : "lib/Software/GenoScan/FoldVisualizer.pm",
+         "version" : "v1.0.4"
+      },
+      "Software::GenoScan::HSS_Annotator" : {
+         "file" : "lib/Software/GenoScan/HSS_Annotator.pm",
+         "version" : "v1.0.4"
+      },
+      "Software::GenoScan::HairpinClassifier" : {
+         "file" : "lib/Software/GenoScan/HairpinClassifier.pm",
+         "version" : "v1.0.4"
+      },
+      "Software::GenoScan::HairpinExtractor" : {
+         "file" : "lib/Software/GenoScan/HairpinExtractor.pm",
+         "version" : "v1.0.4"
+      },
+      "Software::GenoScan::InputProcessor" : {
+         "file" : "lib/Software/GenoScan/InputProcessor.pm",
+         "version" : "v1.0.4"
+      },
+      "Software::GenoScan::OutputProcessor" : {
+         "file" : "lib/Software/GenoScan/OutputProcessor.pm",
+         "version" : "v1.0.4"
+      },
+      "Software::GenoScan::Regression" : {
+         "file" : "lib/Software/GenoScan/Regression.pm",
+         "version" : "v1.0.4"
+      },
+      "Software::GenoScan::Segmentor" : {
+         "file" : "lib/Software/GenoScan/Segmentor.pm",
+         "version" : "v1.0.4"
+      },
+      "Software::GenoScan::SeqAnnotator" : {
+         "file" : "lib/Software/GenoScan/SeqAnnotator.pm",
+         "version" : "v1.0.4"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v1.0.4"
+}

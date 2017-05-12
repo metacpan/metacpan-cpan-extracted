@@ -1,0 +1,72 @@
+#!/usr/bin/perl
+
+# Send a selection command to a host that is running an rrdselect process
+# and collect its details. You can then send this to whatever..
+# Hey its and example OK!
+
+# rrdcommand -s 4803@hostname 'routername:ping:MAX:-s:-5443200'
+
+use Spread::Message;
+use Data::Dumper;
+use Getopt::Std;
+
+use vars qw/$opt_s $opt_m $opt_t/;   # spread, manager, timeout
+unless(getopts('s:m:t:'))
+{
+	print "rrdcommand [-s spread] [-t timeout]\n";
+	exit 1;
+}
+
+my $spread  = $opt_s || '4803@localhost';
+my $timeout = $opt_t || 3;
+
+my $command = "@ARGV";
+unless($command)
+{
+	print "rrdcommand [-s spread] [-t timeout] command\n";
+	exit 1;
+}
+
+my $Got_message = 0;
+my $Timedout = 0;
+
+my $Sent = 0;     # Have we sent our command
+my $name = "rrdc$$";
+my $mbox = Spread::Message->new(
+	name        => $name,
+	spread_name => $spread,
+	group       => ['selecting-rrd'],
+#	debug       => 1,
+	member_sub  => \&control,
+	message_sub => \&message,
+	error_sub   => \&message,
+	timeout_sub => \&bye,
+);
+$mbox->connect() || die "Can't connect to Spread Daemon";
+
+
+$mbox->send('selecting-rrd',$command);
+while(1){ $mbox->rx(1); last if $Timedout > 3;}
+
+exit;
+
+sub control
+{
+	my $mbox = shift;
+}
+
+sub message
+{
+	my $mbox = shift;
+	if($mbox->aimed_at_me && $mbox->new_msg)
+	{
+		print $mbox->msg;
+		$Timedout = 4;
+	}
+}
+
+sub bye
+{
+	exit if $Got_message;
+	$Timedout++;
+}

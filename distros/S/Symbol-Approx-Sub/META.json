@@ -1,0 +1,86 @@
+{
+   "abstract" : "Perl module for calling subroutines by approximate names!",
+   "author" : [
+      "Dave Cross <dave@dave.org.uk>",
+      "With lots of help from Leon Brocard <leon@astray.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Symbol-Approx-Sub",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "String::Approx" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Text::Metaphone" : "0",
+            "Text::Soundex" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "String::Approx" : "0",
+            "Text::Metaphone" : "0",
+            "Text::Soundex" : "0"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "Devel::Symdump" : "0",
+            "Exception::Class" : "0",
+            "Module::Load" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Symbol::Approx::Sub" : {
+         "file" : "lib/Symbol/Approx/Sub.pm",
+         "version" : "v3.0.2"
+      },
+      "Symbol::Approx::Sub::Random" : {
+         "file" : "lib/Symbol/Approx/Sub/Random.pm",
+         "version" : "v3.0.2"
+      },
+      "Symbol::Approx::Sub::String::Approx" : {
+         "file" : "lib/Symbol/Approx/Sub/String/Approx.pm",
+         "version" : "v3.0.2"
+      },
+      "Symbol::Approx::Sub::String::Equal" : {
+         "file" : "lib/Symbol/Approx/Sub/String/Equal.pm",
+         "version" : "v3.0.2"
+      },
+      "Symbol::Approx::Sub::Text::Metaphone" : {
+         "file" : "lib/Symbol/Approx/Sub/Text/Metaphone.pm",
+         "version" : "v3.0.2"
+      },
+      "Symbol::Approx::Sub::Text::Soundex" : {
+         "file" : "lib/Symbol/Approx/Sub/Text/Soundex.pm",
+         "version" : "v3.0.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/davorg/symbol-approx-sub.git",
+         "web" : "https://github.com/davorg/symbol-approx-sub"
+      }
+   },
+   "version" : "v3.0.2",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

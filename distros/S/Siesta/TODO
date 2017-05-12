@@ -1,0 +1,92 @@
+=head2 per-subscription nomail
+
+Currently this happens per users, which is too coarse.
+
+
+=head2 configure/install
+
+=head3 asking questions
+
+perl Build.PL needs to grab more answers out of the existing
+Siesta::Config and from the user to put into the new one (generated
+from Config.pm.in)
+
+=head3 listening to the answers
+
+=head2 Web interface
+
+=head3 setting prefs - constrained input based on type field
+
+=head2 Integration with Mariachi
+
+password-protected archives should be easy via the mod_perl handler
+
+
+=head2 Plugin::NNTP
+
+one side effect of moving from Mail::Internet is that the NNTP send
+code will have to grow a few extra lines to invoke Net::NNTP directly.
+
+This and the need for a nntp->siesta gateway[0] has made me split this
+out into a seperate distribution.
+
+[0] http://london.pm.org/pipermail/london.pm/Week-of-Mon-20030324/017970.html
+
+
+=head2 List control
+
+Only allow list.owner to modify a list - only Siesta::Web enforces this.
+
+In future it may be an idea to allow multiple owners per list
+
+=head2 Tests for bandito
+
+This will need a dummy Mailman config.db to test against.
+
+=head2  Import utilities
+
+Extend I<bandito> to also steal configs from ...
+ 
+	* majordomo
+	* ezmlm
+
+
+=head2  Domo plugin - remote adminstration tasks
+
+Do a plugin that emulates the Majordomo command set.
+
+http://pr.erau.edu/~whetten/classes/references/listserve-info.html
+http://web.greens.org/about/mjdom-cmds.html
+
+
+=head2 Digests
+
+One plan is this:
+
+http://siesta.unixbeard.net/siesta/archive/siesta-dev/2003/06/09/4c4e9713.html
+
+
+=head2 Revisit bounce handling (VERP stuff)
+
+Nicholas Clark wants to look at this
+
+
+=head2 Archiving
+
+Archive.pm should also embed optionally embed a url where the 
+message is archived.
+
+
+=head2 Better install
+
+Maybe. This might just mean providing .debs/.rpms/ports etc etc
+
+
+=head2 hook into Exim
+
+Like wot Mailman does
+
+
+=head2 tequila daemon
+
+A long running tequila process

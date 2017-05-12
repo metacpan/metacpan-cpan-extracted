@@ -1,0 +1,103 @@
+# dmidecode 2.9
+SMBIOS 2.4 present.
+10 structures occupying 228 bytes.
+Table at 0x000FB56F.
+
+Handle 0x0000, DMI type 0, 24 bytes
+BIOS Information
+	Vendor: QEMU
+	Version: QEMU
+	Release Date: 01/01/2007
+	Address: 0xE8000
+	Runtime Size: 96 kB
+	ROM Size: 64 kB
+	Characteristics:
+	BIOS Revision: 1.0
+
+Handle 0x0100, DMI type 1, 27 bytes
+System Information
+	Manufacturer: Not Specified
+	Product Name: Not Specified
+	Version: Not Specified
+	Serial Number: Not Specified
+	UUID: 68584D56-6858-4D56-1300-000058560000
+	Wake-up Type: Power Switch
+	SKU Number: Not Specified
+	Family: Not Specified
+
+Handle 0x0300, DMI type 3, 20 bytes
+Chassis Information
+	Manufacturer: Not Specified
+	Type: Other
+	Lock: Not Present
+	Version: Not Specified
+	Serial Number: Not Specified
+	Asset Tag: Not Specified
+	Boot-up State: Safe
+	Power Supply State: Safe
+	Thermal State: Safe
+	Security Status: Unknown
+	OEM Information: 0x00000000
+
+Handle 0x0401, DMI type 4, 26 bytes
+Processor Information
+	Socket Designation: CPU 1
+	Type: Central Processor
+	Family: Other
+	Manufacturer: Not Specified
+	ID: 23 06 00 00 FD FB 8B 07
+	Version: Not Specified
+	Voltage: Unknown
+	External Clock: Unknown
+	Max Speed: Unknown
+	Current Speed: Unknown
+	Status: Populated, Enabled
+	Upgrade: Other
+
+Handle 0x1000, DMI type 16, 15 bytes
+Physical Memory Array
+	Location: Other
+	Use: System Memory
+	Error Correction Type: Other
+	Maximum Capacity: 256 MB
+	Error Information Handle: Not Provided
+	Number Of Devices: 1
+
+Handle 0x1100, DMI type 17, 21 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: 0x0000
+	Total Width: 64 bits
+	Data Width: 64 bits
+	Size: 256 MB
+	Form Factor: DIMM
+	Set: None
+	Locator: DIMM 1
+	Bank Locator: Not Specified
+	Type: RAM
+	Type Detail: None
+
+Handle 0x1300, DMI type 19, 15 bytes
+Memory Array Mapped Address
+	Starting Address: 0x00000000000
+	Ending Address: 0x0000FF003FF
+	Range Size: 261121 kB
+	Physical Array Handle: 0x1000
+	Partition Width: 0
+
+Handle 0x1400, DMI type 20, 19 bytes
+Memory Device Mapped Address
+	Starting Address: 0x00000000000
+	Ending Address: 0x0000FF003FF
+	Range Size: 261121 kB
+	Physical Device Handle: 0x1100
+	Memory Array Mapped Address Handle: 0x1300
+	Partition Row Position: 1
+
+Handle 0x2000, DMI type 32, 11 bytes
+System Boot Information
+	Status: No errors detected
+
+Handle 0x7F00, DMI type 127, 4 bytes
+End Of Table
+

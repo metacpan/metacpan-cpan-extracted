@@ -1,0 +1,54 @@
+{
+   "abstract" : "Strings with deferred interpolation",
+   "author" : [
+      "Ben Morrow <ben@morrow.me.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "String-Defer",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Exception" : "0.31",
+            "Test::Exports" : "1",
+            "Test::More" : "0.65"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "5.57"
+         }
+      }
+   },
+   "provides" : {
+      "String::Defer" : {
+         "file" : "lib/String/Defer.pm",
+         "version" : "3"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=String-Defer"
+      },
+      "license" : [
+         "http://opensource.org/licenses/bsd-license.php"
+      ],
+      "repository" : {
+         "url" : "http://github.com/mauzo/String-Defer"
+      }
+   },
+   "version" : "3"
+}

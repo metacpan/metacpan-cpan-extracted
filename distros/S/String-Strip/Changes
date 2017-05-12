@@ -1,0 +1,14 @@
+Revision history for Perl extension String::Strip
+
+1.02  Tue Feb 14 2012
+    - new maintainer PHRED
+    - fix for 64 bit systems - https://rt.cpan.org/Public/Bug/Display.html?id=70028 [chrishammond]
+
+1.01  Wed Mar 22 08:22:04 2000
+	- renamed to String::Strip from String::StringLib
+	- fixed a couple of little core-dumping bugs :(
+
+1.00  Thu Jul 28 21:53:01 1999
+	- original version; created by h2xs 1.18 (String::StringLib)
+
+

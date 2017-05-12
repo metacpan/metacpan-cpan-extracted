@@ -1,0 +1,26 @@
+# monitor.stem
+#
+[
+	class	=>	'Stem::Console',
+],
+[
+	'class'	=>	'Stem::Hub',
+	'name'	=>	'monitor',
+	'args'	=>	[],
+],
+[
+	class	=>	'Stem::Portal',
+	args	=>	[
+	],
+],
+[
+	'class'	=>	'Stem::Log::Tail',
+	'name'	=>	'foo',
+	'args'	=>	[
+		'path'		=> 'tail/foo.log',
+		'interval'	=> 3,
+		'delay' 	=> 0,
+		'data_log'	=> 'archive:bar',
+		'status_log'	=> 'archive:bar_status',
+	],
+],

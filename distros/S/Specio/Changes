@@ -1,0 +1,315 @@
+0.36     2017-02-19
+
+- Inlined coercions would attempt to coerce for every type which matched the
+  value given, instead of stopping after the first type. Fixed by Graham Knop
+  (GH #11).
+
+- Inlined coercions did not include the inline environment variables needed by
+  the type from which the coercion was being performed. Fixed by Graham Knop
+  (GH #8).
+
+- When you use the same type repeatedly as coderef (for example, as a
+  constraint with Moo), it will only generated its subified form once, rather
+  than regenerating it each time it is de-referenced.
+
+- Added an API to Specio::Subs to allow you to combine type libraries and
+  helper subs in one package for exporting. See the Specio::Exporter docs for
+  more details.
+
+
+0.35     2017-02-12
+
+- Added Specio::Subs, a module which allows you to turn one or more library's
+  types into subroutines like is_Int() and to_Int().
+
+- Added an inline_coercion method to Specio constraints.
+
+
+0.34     2017-01-29
+
+- Packages with Specio::Exporter as their parent can now specify additional
+  arbitrary subs to exporter. See the Specio::Exporter docs for details.
+
+- Importing the same library twice in a given package would throw an
+  exception. The second attempt to import is now ignored.
+
+- Added an alpha implementation of structured types. See
+  Specio::Library::Structured for details.
+
+
+0.33     2017-01-24
+
+- Fixed a mistake in the SYNOPSIS for Specio::Declare. The example for the
+  *_isa_type helpers was not correct.
+
+- Removed the alpha warning from the docs. This is being used by enough of my
+  modules on CPAN that I don't plan on doing any big breaking changes without
+  a deprecation first.
+
+
+0.32     2017-01-12
+
+- Fixed a bug in the inlining for types create by any_can_type() and
+  object_can_type(). This inlining mostly worked by accident because of some
+  List::Util XS magic, but this broke under the debugger. Reported by
+  Christian Walde (GH #6) and Chan Wilson
+  (https://github.com/houseabsolute/DateTime.pm/issues/49).
+
+
+0.31     2016-11-05
+
+- The stack trace contained by Specio::Exception objects no longer includes a
+  stack frames for the Specio::Exception package.
+
+- Made the inline_environment() and description() methods public on type and
+  coercion objects.
+
+
+0.30     2016-10-15
+
+- Fix a bug with the Sub::Quoted sub returned by $type->coercion_sub. If a
+  type had more than one coercion, the generated sub could end up coercing the
+  value to undef some of the time. Depending on hash key ordering, this could
+  end up being a heisenbug that only occured some of the time.
+
+
+0.29     2016-10-09
+
+- Doc Specio::PartialDump because you may want to use it as part of the
+  failure message generation code for a type.
+
+
+0.28     2016-10-02
+
+- Added a Test::Specio module to provide helpers for testing Specio libraries.
+
+- Fixed another bug with a subtype of special types and inlining.
+
+
+0.27     2016-10-01
+
+- Cloning a type with coercions defined on it would cause an exception.
+
+- Creating a subtype of a special type created by *_isa_type, *_can_type, or
+  *_does_type, or enum would die when trying to inline the type constraint.
+
+- Removed the never-documented Any type.
+
+- Added documentation for each type in Specio::Library::Builtins.
+
+
+0.26     2016-09-24
+
+- Require Role::Tiny 1.003003. This should fix the test failures some
+  CPANTesters reported with this error:
+
+    Can't resolve method "???" overloading "&{}" in package
+    "Specio::Constraint::Simple" at Specio::Constraint::Simple->new line 35.
+
+
+0.25     2016-09-04
+
+- Calling {any,object}_{isa,does}_type repeatedly in a package with the same
+  class or role name would die. These subs are now special-cased to simply
+  return an existing type for the given name when they receive a single
+  argument (the name of the class or role). This could come up if you had two
+  attributes both of which required an object of the same type.
+
+
+0.24     2016-06-20
+
+- Fix a bizarre failure on Perl before 5.14. AFAICT this was a test problem,
+  not a library problem.
+
+
+0.23     2016-06-20
+
+- Added intersection types.
+
+
+0.22     2016-06-18
+
+- Require version.pm 0.83. I know 0.77 doesn't work but I'm not sure exactly
+  which version fixed the problem, since I cannot install older
+  versions. Reported by Slaven Rezic. RT #115418.
+
+
+0.21     2016-06-18
+
+- Don't load Sub::Quote, but use it if it's already loaded. Since Moo uses it,
+  this should make Specio constraints just work with Moo.
+
+
+0.20     2016-06-18
+
+- Removed test dependency on namespace::autoclean.
+
+
+0.19     2016-06-17
+
+- Removed dependency on Devel::PartialDump by making a copy of just the bits
+  we need. Gross but effective.
+
+
+0.18     2016-06-15
+
+- Added union types.
+
+- If a subtype's parent could be inlined and the subtype itself did not
+  specify any additional constraints (inlinable or not), then the subtype was
+  not being inlined, even though it could be.
+
+- This distro now works with Perl 5.8 (though it was only tested with 5.8.8).
+
+
+0.17     2016-06-01
+
+- Change "use v5.10" to "use 5.010". The former appears to cause warnings on
+  older Perls.
+
+
+0.16     2016-05-30
+
+- Remove use of Class::Load and Module::Runtime.
+
+
+0.15     2016-05-30
+
+- The Num and Int type now accepts numbers in scientific notation such as 1e10
+  or -1.2e-5.
+
+- Removed various prereqs that weren't really needed.
+
+- Added three new libraries, Specio::Library::String, ::Numeric, and
+  ::Perl. These provide additional commonly used string and numeric types, as
+  well as some types related to Perl syntax.
+
+
+0.14     2016-05-22
+
+- Added an inline_assert method for constraint objects. This makes certain
+  types of inlining tasks easier.
+
+- Parameterized constraint objects now have a default name based on the parent
+  type and contained type.
+
+- Rewrote the code used for inlined types so that the generated inline code is
+  optimized to check the most common cases first.
+
+- Fixed a bug where two enum types could not be inlined together in the same
+  sub.
+
+
+0.13     2016-05-15
+
+- Parameterizing a type which generated inline parameterized constraints (like
+  the ArrayRef and HashRef builtins) now dies if given a parameter which
+  cannot itself be inlined. Mixing inlinable and non-inlinable constraints
+  previously caused very confusing errors.
+
+
+0.12     2015-12-19
+
+- Fixed tests that failed if Moose wasn't installed. Reported by Karen
+  Etheridge. RT #109247.
+
+
+0.11     2014-05-27
+
+- Remove a Perl 5.14-ism.
+
+
+0.10     2014-05-26
+
+- Added Class::Method::Modifiers to prereqs.
+
+- Made Specio classes faster by inlining all accessors and constructors.
+
+- Added support for Moo. Specio constraints now overloading sub-ification so
+  you can pass them as "isa" values for Moo attributes. Also added a new
+  $type->coercion_sub() method which returns a sub ref suitable for the
+  "coerce" value. These all use Sub::Quote so that the returned sub refs can
+  be inlined.
+
+
+0.09     2014-05-25
+
+- Reimplemented entirely without Moose. This module now implements its own
+  half-assed (really, more like eighth-assed) OO system.
+
+* TODO: Integrate cleanly with Moo and Moose.
+
+* TODO: Improve the internal OO system to do some eighth-assed inlining so
+  creating type objects is faster.
+
+
+0.08     2013-06-08
+
+- Removed the use of the encoding pragma from the tests. This pragma is
+  deprecated in 5.18.
+
+
+0.07     2013-03-03
+
+- Disabled the tests that rely on an as-yet-unreleased Moose. These were
+  mostly disabled but some cpan testers boxes were set up in a way that made
+  them run.
+
+
+0.06     2013-03-02
+
+- Renamed Type to Specio.
+
+
+0.05     2012-10-14
+
+- This module didn't really need XS. It turns out that 5.10 added
+  re::is_regexp() so we can use that instead. Thanks to Jesse Luehrs for
+  pointing this out.
+
+
+0.04     2012-09-30
+
+- Added any_does_type and object_does_type declaration helpers. These check
+  whether a class and/or object does a given role. They work with Moose,
+  Mouse, and Role::Tiny.
+
+- Fixed implementation of any_isa_type and object_isa_type to match docs. If
+  given more than one argument, the docs said they expected named parameters
+  but internally the code expected positional parameters.
+
+
+0.03     2012-09-30
+
+- Various hacks to make Specio::Constraint objects play nice with Moose. Needs
+  changes to Moose to work properly, however.
+
+- The message generator sub is no longer called as a method. It is called as a
+  sub so it doesn't receive the type as an argument.
+
+- The inline environment variable names used for each type are now
+  unique. This means that types will not step on each other if you want to
+  inline more than one type check in the same scope.
+
+- Non-inlined type coercions were completely broken.
+
+- Added $type->is_same_type_as and $type->is_a_type_of methods.
+
+- The Maybe type was a subtype of Ref in the code, which is wrong. It is now a
+  subtype of Item.
+
+- This module now explicitly requires Perl 5.10.
+
+
+0.02     2012-05-14
+
+- Now with lots more documentation, but this is still very alpha. Feedback
+  from potential users is welcome.
+
+
+0.01     2012-05-13
+
+- First release upon an unsuspecting world. This is very alpha and subject to
+  change. I'm mostly releasing it to get some feedback on the design. Do not
+  use this in your code yet, unless you promise not to complain about the lack
+  of docs or the fact that the next release breaks your code.

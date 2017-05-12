@@ -1,0 +1,79 @@
+Sub::QuoteX::Utils
+
+Sub::QuoteX::Utils provides a simplified interface to the process of
+combining Sub::Quote compatible code references with new code.
+
+Sub::Quote provides a number of routines to make code more performant by
+inlining syntactically complete chunks of code into a single compiled
+subroutine.
+
+When a chunk of code is compiled into a subroutine by
+"Sub::Quote::quote_sub()", Sub::Quote keeps track of the code and any
+captured variables used to construct that subroutine, so that new code
+can be added to the original code and the results compiled into a new
+subroutine.
+
+Sub::QuoteX::Utils makes that latter process a little easier.
+
+  Captures
+
+Sub::Quote keeps track of captured variables in hashes, *copying* the
+values. For example,
+
+ use Sub::Quote;
+ 
+ my $sound = 'woof';
+ 
+ my $emit = quote_sub( q{ print "$sound\n" }, { '$sound' => \$sound } );
+ 
+ &$emit; # woof
+ 
+ $sound = 'meow';
+ 
+ &$emit; # woof
+
+When combining chunks of inlined code, each chunk has it's own set of
+captured values which must be kept distinct.
+
+"quote_subs" manages this for the caller, but when using the low level
+routines ( "inlinify_coderef", "inlinify_method", "inlinify_code" ) the
+caller must manage the captures. These routines store per-chunk captures
+in their "\%global_capture" argument. The calling routine optionally may
+provide a mnemonic (but unique!) string which will be part of the key
+for the chunk.
+
+The %global_capture hash should be passed to "quote_sub" in Sub::Quote,
+when the final subroutine is compiled. For example,
+
+  my %global_capture;
+  my $code = inlinify_coderef( \%global_capture, $coderef, %options );
+
+  # add more code to $code [...]
+
+  $new_coderef = Sub::Quote::quote_sub( $code, \%global_capture );
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Smithsonian Astrophysical
+Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007

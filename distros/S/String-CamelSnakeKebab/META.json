@@ -1,0 +1,79 @@
+{
+   "abstract" : "word case conversion",
+   "author" : [
+      "Eric Johnson (kablamo)"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.2.0",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "String-CamelSnakeKebab",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Sub::Exporter" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Printer" : "0",
+            "Test::Most" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "String::CamelSnakeKebab" : {
+         "file" : "lib/String/CamelSnakeKebab.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kablamo/perl-string-camelsnakekebab/issues"
+      },
+      "homepage" : "https://github.com/kablamo/perl-string-camelsnakekebab",
+      "repository" : {
+         "url" : "git://github.com/kablamo/perl-string-camelsnakekebab.git",
+         "web" : "https://github.com/kablamo/perl-string-camelsnakekebab"
+      }
+   },
+   "version" : "0.05",
+   "x_contributors" : [
+      "Aaron Crane <arc@cpan.org>",
+      "Eric Johnson <eric.git@iijo.org>",
+      "Lance Wicks <lw@judocoach.com>",
+      "Eric Johnson <github@iijo.org>"
+   ]
+}

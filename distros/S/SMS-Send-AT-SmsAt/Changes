@@ -1,0 +1,8 @@
+Revision history for SMS-Send-AT-SmsAt
+
+0.0.5  Fri Sep  9 10:10:00 2016
+       Run perlcritic test only on demand
+
+0.0.1  Wed Aug  1 15:19:04 2007
+       Initial release.
+

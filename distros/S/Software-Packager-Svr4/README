@@ -1,0 +1,35 @@
+This is the README file for Software::Packager::SVR4.
+
+This module comes with NO WARRANTY.
+
+INSTALLATION
+
+Software::Packager::SVR4 uses the standard perl module install process
+It requires Software::Packager
+
+perl Makefile.PL
+make
+make test [TEST_VERBOSE=1] (optional but recommended)
+make install
+
+DESCRIPTION
+
+Software::Packager::SVR4 is based on Software::Packager::Solaris,
+but does not depend on any native pkg* commands.  It is meant to
+create SVR4 packages for any SVR4 platform (e.g. SCO, Solaris),
+but has only been tested on Solaris.  Currently it can only
+create dir-format packages.  The stream-based (*.pkg) format SVR4
+packages should be supported shortly.
+
+For more details see the documentation on Software::Packager
+
+AUTHOR
+Mark A. Hershberger <mah@everybody.org>
+R Bernard Davison <rbdavison@cpan.org> (author of
+Software::Packager and Software::Packager::Solaris).
+
+COPYRIGHT
+Copyright (c) 2003 Mark A. Hershberger
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+

@@ -1,0 +1,42 @@
+0.56	2008/03/27
+
+Postfix queue identifiers can be more than 11 characters long
+-- regex fixed.
+
+0.55	2007/05/02
+
+It turns out that bogofilter doesn't always know the IP address
+
+0.54	2007/05/01
+
+Added a bogofilter output recognizer.
+
+0.53	2007/03/16
+
+Fix example program for generating rbldnsd blocklist.
+
+0.52	2007/02/22
+
+Document how to turn the blocklist into a regular
+DNS-based RBL.
+
+0.51	2007/01/23
+
+The regular epxression solution for SpamAssassin didn't work.
+Add new Filter module as a replacement solution.
+
+0.43	2007/01/21
+
+Document regular expression matching as a solution to the
+SpamAssassin problem.
+
+0.42	2007/01/07
+
+Changed example program for generating log entries for
+SpamSink.pm: will no longer generate an entry for postmaster 
+bounces.
+
+0.41	2007/01/03
+
+Bugfix: delete old spam recevied rows in BlockList.pm
+

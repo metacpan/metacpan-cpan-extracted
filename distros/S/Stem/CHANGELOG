@@ -1,0 +1,189 @@
+Stem Version 0.11
+=================
+Fri Dec  1 03:50:58 EST 2006
+
+
+* The Stem event loop is layered and can easily wrap other event
+  loops. Supported event loops include Event.pm, perl/tk and wxperl and
+  a pure Perl event Loop. See Stem::Event.pm and Stem::Event::EventPM.pm
+  for more.  Other event loops that need wrapping include POE, Gtk and Qt.
+
+* There is a pure Perl event Loop so Stem now runs on windows or on any
+  system where Event.pm isn't installed. 
+
+* Full support for SSL on all socket related objects and cells.
+  Converting from a plain socket to an SSL socket just requires adding
+  the SSL arguments to the Stem::Socket contruction. All Stem modules
+  that use sockets use Stem::Socket which in turn uses IO::Socket::SSL
+  (and that needs openssl). If that module is not installed, its test
+  will be skipped.
+
+* There is a Stem::UDPMsg cell that provides a UDP socket client and/or
+  server.
+
+* The new Stem::Cell::Flow module provides a way for Stem cells to
+  handle a mix of sync/async (local/remote) method calls. You can create
+  a logic flow with if/else/while command in a simple mini-language.
+  This allows a cell to do complex operations such as accessing a DB
+  (via Stem::DBI) or fetching web pages and mix that with local method
+  calls that crunch the data. Normally this would entail a complex state
+  machine or having each method know the next one to call but
+  Stem::Cell::Flow allows you to convert that to a much simpler logic
+  flow. See the test script t/cell/flow.t and the lib/Stem/Test/Flow.pm
+  module for more on this. It requires Parse::RecDescent to be installed
+  (the test will be skipped if it is not found).
+
+* A bunch of new tests were added:
+
+	Event loops
+	Sockets (both with and without SSL)
+	Stem::Cell::Flow
+
+* There is a brand new install based on Module::Build. A Makefile.PL is
+  provided but it is a wrapper around the Module::Build installer. Stem
+  can now be installed with CPAN.pm
+
+* There is more pod (and more is needed). All contructor attributes are
+  now automatically updated to pod by the stem2pod utility. That script
+  also inserts pod templates for all methods. This will make it easier
+  to add pod and keep it up to date.
+
+* Cleaned up the INSTALL, README and other top level documents.
+
+* Many more changes than I have room to write in this file.
+
+Stem Version 0.10
+=================
+Nov-11-2002
+
+* The version number has been bumped to 0.10 because of the large number
+  of changes and the major improvements in reliability and speed.
+
+* Renamed Stem::TtyMsg to Stem::Console. Now it doesn't need any
+  arguments to be initialized. A Stem envioronment variable can be set
+  which will disable it. All the configuration files and demo scripts
+  have been updated to use it. The old TtyMsg module has been deleted.
+
+* Added Stem::Test::Echo.pm and Stem::Load::Driver.pm. They support
+  benchmarking of basic message passing in multiple modes.
+
+* Stem::Msg now only accepts the string format of message
+  addresses. This speeds up message creation and simplifies message
+  handling and delivery.
+
+* Stem::Class now supports attribute type checking and
+  conversion. Supported types include boolean, list, hash, LoL (and
+  friends), object and handle.
+
+* Stem::Conf has better error reporting. The Cell name and class are now
+  printed with the error.
+
+* Added the reply_type field to messages. This is used to make simple
+  state machines with messages (used in the work sequencing system).
+
+* Stem::Portal has been improved and now use the Stem::Packet module to
+  handle its buffering.
+
+* Added Stem::Packet and Stem::Codec::*. These modules support
+  serializing (marshalling) Stem data for use in pipes and files. The
+  codec to be used can be selected in the configuration file. This is
+  now used in Stem::Portal and all worker mode operations. Current codec
+  include Perl (Data::Dumper/eval), YAML, and Storable.
+
+* Split Log.pm into Log.pm and Log/Entry.pm. Moved Stem::LogTail.pm to 
+  Stem::Log::Tail.pm. Added Stem::Log::File which handles physical log
+  files including rotation and archiving.
+
+* Added Stem::Trace.pm which gives modules a simple way to inject log
+  entries during program execution. It allows for creation of customized
+  Trace functions which can have defaults and different calling styles.
+
+* Split Stem::Cell.pm into multiple files to make it easier to
+  maintain. These include Stem::Cell::Sequence.pm, Stem::Cell::Clone.pm,
+  Stem::Cell::Pipe.pm and Stem::Cell::Work.pm 
+
+* Added the Stem::DBI module which is a Stem message based front end to
+  DBI. This Cell can be configured with the all the SQL needed for your
+  application which is shared by all the Cells that use it. It can be
+  run in its own Stem Hub (process) thereby providing non-blocking
+  access to the DB from other Hubs. A farm of these proxies can be
+  created and managed by a WorkQueue Cell which will support parallel DB
+  access from one or more Hubs.
+
+* Added work sequencing support in Stem::Cell. This allows any Cell to
+  call local or remote methods and to manage their flow control. This is
+  an interim version that will be superseded by a new mini-language that
+  will be easier to code and will support more complex flow
+  (e.g. if/else/while). This is a very powerful feature that simplifies
+  complex state operations to simple flow control statements.
+
+* Added the Stem::WorkQueue module which allows a set of work request
+  messages to be distributed to a set of worker Cells. Modified
+  Stem::Cell to support a cell to request a new work message.
+
+* Created worker mode where an object (or data structure) gets
+  sent to a Cell via a message. The Cell can then write the object to a
+  socket or process or crunch it. The Cell then gets back the object
+  (presumably modified) and sends it back to the originator of the work
+  request. This is done in Stem::Cell and used in Stem::Proc,
+  Stem::Sock::Msg and Stem::DBI. 
+
+* Created worker ready mode where a Cell can send out a message stating
+  it can receive a work message. Typically this will go to a WorkQueue
+  Cell. This message is sent out when the Cell starts up or after it
+  completes a previous work request.
+
+* Added Stem::Boot.pm which will run a set of external programs and
+  monitor them. Their output can be logged and they can be
+  restarted. Other options (for each program) include setting the
+  initial directory and which host to run it on (via ssh if desired).
+  The set of programs and options are loaded via a configuration file
+  specific to this module.
+
+* Added Stem::Inject.pm which has one method which will connect to
+  a Stem Hub and send it a single message. Then it will read back a
+  single message and return its data. This is meant to be used in Perl
+  programs that are not Stem driven and want to communicate with Stem
+  cells.
+
+* Updated the Stem Cell cookbook with more examples. It now shows how to
+  create class and object cells and also how to create cloneable Cells.
+
+Stem Version 0.06
+=================
+Feb-26-2002
+
+* Stem is now released under the GPL. If you want to use Stem in a
+  product that will be sold, contact us about acquiring a commercial
+  license.
+	
+* A simple and easy to use installation script is now included.  The
+  installation script allows you to have a Stem environment up and
+  running in a matter of minutes. Read the INSTALL document to learn how
+  to run this script.
+
+* There is a new set of cookbook documents with examples.  These show
+  you how to develop new Stem Cells.
+
+* Complete documentation is now included for all demonstration
+  scripts included with Stem.
+
+* Stem Message Addresses can now be in a string form as well as the hash
+  form. This simplifies creating addresses in Stem configurations. All
+  the installed configurations now use this format. See the Address
+  design notes for more on this.
+
+* The Stem::Cell module has been added. It supports generic functionality for
+  Stem Cells, including cloning, asynchronous I/O, and pipes. It
+  currently is used by the Stem::Proc and Stem::SockMsg modules. All
+  future Cells that need those services can use this module.
+
+* The modules Stem::Proc and Stem::SockMsg have been rewritten to use
+  Stem::Cell.  They are much shorter and simpler now that the common
+  Cell functions are handled by Stem::Cell.
+
+* A new module, Stem::Gather, has been added. It allows you to
+  synchronize multiple asynchronous events. It triggers a callback when
+  all of its required tokens have been 'gathered'.
+
+* Bug fixes and general system improvements.

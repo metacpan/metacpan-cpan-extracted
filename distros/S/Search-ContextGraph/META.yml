@@ -1,0 +1,11 @@
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Search-ContextGraph
+version:      0.15
+version_from: ContextGraph.pm
+installdirs:  site
+requires:
+    MLDBM:                         0.1
+    Test::More:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.12

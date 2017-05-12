@@ -1,0 +1,174 @@
+
+		       Stem Demonstration Scripts
+
+Stem comes with several demonstration scripts and example configuration
+files which are used by them. You can optionally install the executable
+demonstrations and their configuration files.  Note that the actual
+demonstration scripts don't do anything special to Stem, they just
+create windows and execute run_stem inside them with selected
+configuration files. They also create telnet connections inside other
+windows which you can use to interact with Stem. You can manually create
+the windows and do the same commands, these scripts are just
+conveniences. In fact, a good way to learn more about Stem is to copy
+and modify the configuration files used in the demonstrations and run
+them yourself.
+
+When you run any of the demo scripts, the commands used to fork off an
+xterm are printed. You can manually run those commands in your own
+terminal windows if you want to experiment with or explore the Stem
+configurations. If you kill the script (e.g. with ^C), all the created
+xterm windows will be killed off leaving you with a cleaned up desktop.
+
+There are 4 demonstration scripts that come with Stem. They are briefly
+described here and in more detail in other files. They all have some
+common features which are also described in detail below.
+
+	chat_demo and chat2_demo demonstrate a simple 4 user chat
+	server. chat_demo runs with a single Stem Hub and chat2_demo
+	uses 2 Hubs. Both bring up an xterm for each Stem Hub and 4 more
+	for the telnet sessions. Read DEMO_CHAT for the full details on
+	how to use this demo.
+
+	inetd_demo emulates the inetd Unix super-daemon. It runs a
+	single Stem Hub in an xterm and 4 telnet sessions each in their
+	own xterm. The server process it runs is proc_serv in the bin
+	directory. You can run it directly from the command to see how
+	it behaves (it is a simple command/response program).  Read
+	DEMO_INETD for the full details on how to use this demo.
+
+	tail_demo monitors a typical log file and copies any new data it
+	finds there to a Stem Logical Log which writes it to a file and
+	optionally to other destinations. The status of the source file
+	is also sent to a Logical Log.  Read DEMO_TAIL for the full
+	details on how to use this demo.
+
+Using the console Cell Stem::TtyMsg
+
+All of the demo configurations include the Stem::TtyMsg module which
+allows you to enter command messages from the keyboard to a running Stem
+Hub (process). This module is not required to run Stem but it is in the
+demo configurations so you can interact with Stem and learn more about
+it.
+
+It reads lines from STDIN (using the Stem::AsyncIO module so the rest of
+the Stem Hub continues to run), parses them and sends out a command
+messages based on the lines. It also can set key/values in the local
+Hub's environment (%Stem::Vars::Env) which is used to control many Stem
+operations.
+
+Command messages can generate response messages which will be sent back
+to the TtyMsg Cell. These responses will be printed to STDOUT (again,
+using the Stem::AsyncIO module). Any Cell can just send a data message
+to the TtyMsg Cell (which is also registered with the class Cell name
+tty) and its data will get printed.
+
+The rules for parsing lines input to TtyMsg are very simple. There are
+three kinds of command lines:
+
+	Direct commands
+
+		The only direct command is 'help' which has to be the
+		only token on the line. It causes the help text to be
+		printed.
+
+	Setting a Stem environment variable
+
+		Key/values in the local Hub's environment can be set
+		with lines of the form:
+
+			name=value
+
+		Token has to be only word characters ([a-zA-Z0-9_]) and
+		the string after the = is the value (stripped of
+		surrounding white space). The Hub environment variable
+		with the name token is set to the parsed value. The
+		token and value are printed.
+
+		You can also set any environment variable in any remote
+		Hub with the command message:
+
+			hub:var set_env name=value 
+
+		Note that 'hub' must be the real name of that Stem Hub,
+		and var is already the registered class name of the
+		Stem::Vars class Cell.
+
+		See below for more on entering command messages and the
+		env_notes document in /Design.
+
+	Sending a Command Message
+
+		A command message line starts with a Cell address and
+		then must have a command token. The rest of the line is
+		optional data for the command message.  A minimal Cell
+		address is just a Cell name. It can have an optional Hub
+		name prefix. Also a target name can be suffixed after a
+		trailing :. So the only legal Cell addresses look like
+		this:
+
+			cell
+			hub:cell
+			:cell:target
+			hub:cell:target
+
+		If the Hub is missing the message is destined for the
+		local Hub and if the Cell doesn't exist here, it is
+		routed to the DEFAULT Hub. Read the Cell and Message
+		technical note for more on this.
+
+		The next token on a message command line is the command
+		name and it is required. It will be the value of the
+		'cmd' field in the message. The rest of the line is used
+		as the data field of the message.
+
+		Some uses of command line messages are getting the
+		status of various Class Cells since almost all of them
+		have a status command. By listing all the registered
+		Cells you can see which ones you can send messages to.
+
+		This will print all of the Cells in this hub. The
+		listing shows all object Cell and Class Cells with their
+		aliases. Command line messages should use the aliases
+		for the Cell name as the class names have colons in
+		them.
+
+		This will print all of the Cells in the local hub.
+
+			reg status
+
+		This will print all of the Cells in the hub named remote.
+
+			remote:reg status
+
+		This will print all of the Portals in this hub. You can
+		use their hub names to send command messages to those
+		hubs.
+
+			port status
+
+		If you are running either chat demo you can change the
+		Switch maps which control which user get sent chat
+		messages. Here are some examples. The Switch Cell is
+		named sw, and the two Hubs in chat2_demo are named
+		chat_client and chat_server. Note that the 'sw' Cell is
+		only in the server Hub in chat2_demo, but since no 'sw'
+		Cell exists in the client Hub, any message sent to 'sw'
+		will still go to the server hub. So all of these map
+		commands can be issued from either Hub input and they
+		will work. The 'map' or 'status' token is the command
+		and the tokens after 'map' are data to the map
+		command. The first data token is the input map you are
+		setting and the rest of the tokens are the output maps
+		to send chat messages to.
+
+		Print the current maps.
+
+			sw status
+
+		Change the a map to just b.
+
+			sw map a b
+
+		Change the d map to all users.
+
+			sw map d a b c d

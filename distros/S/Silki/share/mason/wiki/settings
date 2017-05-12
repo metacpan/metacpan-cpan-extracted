@@ -1,0 +1,23 @@
+<ul>
+  <li>
+    <a href="<% $wiki->uri( view => 'permissions_form' ) %>"><strong><% loc('Permissions') %></strong></a>
+    <br />
+    <% loc( 'This wiki is currently <strong>%1</strong>.', lc loc( $wiki->permissions_name() ) ) | n %>
+  </li>
+  <li>
+    <a href="<% $wiki->uri( view => 'members_form' ) %>"><strong><% loc('Members') %></strong></a>
+    <br />
+    <% loc('Remove existing members, invite new ones, and give members management privileges.') %>
+  </li>
+</ul>
+
+<%args>
+$wiki
+</%args>
+
+<%method title>
+<% loc( 'Settings for %1', $wiki->title() ) %>
+<%args>
+$wiki
+</%args>
+</%method>

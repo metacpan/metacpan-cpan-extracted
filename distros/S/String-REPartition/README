@@ -1,0 +1,51 @@
+README for String::REPartition
+
+			    String::REPartition
+
+String::REPartition exports a function for generating regular expressions
+used to partition data sets
+
+PREREQUISITES
+
+This module requires Perl 5; I've only used it under Perl 5.005, so for
+anything lower, you're on your own.
+
+String::REPartition doesn't use any nonstandard modules.
+
+INSTALLATION
+
+You install String::REPartition, as you would install any perl module
+library, by running these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you want to install a private copy of String::REPartition in your home
+directory, then you should try to produce the initial Makefile with
+something like this command:
+
+  perl Makefile.PL PREFIX=~/perl
+
+DOCUMENTATION
+
+POD-format documentation is included in REPartition.pm.  POD is readable
+with the 'perldoc' utility.
+
+SUPPORT
+
+Questions, bug reports, useful code bits, and suggestions for
+String::REPartition should just be sent to me at avi@finkel.org
+
+AVAILABILITY
+
+The latest version of String::REPartition is available from the
+Comprehensive Perl Archive Network (CPAN).  Visit
+<http://www.perl.com/CPAN/> to find a CPAN site near you.
+
+COPYRIGHT
+
+Copyright 2007, Avi Finkel <avi@finkel.org>, all rights
+reserved.  This program is free software; you can redistribute it and/or 
+modify it under the same terms as Perl itself.

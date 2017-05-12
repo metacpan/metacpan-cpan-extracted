@@ -1,0 +1,14 @@
+<input type="text" name="<!-- sol_var date_name -->" id="<!-- sol_var date_name -->" value="<!-- sol_var date_value -->" size="12" maxlength="12"<!-- sol_if client_actions --> onchange="<!-- sol_loop client_actions --><!-- sol_var action -->;<!-- /sol_loop -->"<!-- /sol_if -->/>
+<!-- sol_var calendar -->
+<!-- sol_if display_time -->
+&nbsp;&nbsp;
+<select id="<!-- sol_var hour_name -->" name="<!-- sol_var hour_name -->"<!-- sol_if readonly_time --> disabled="disabled"<!-- /sol_if --><!-- sol_if client_actions --> onchange="<!-- sol_loop client_actions --><!-- sol_var action -->;<!-- /sol_loop -->"<!-- /sol_if -->>
+  <!-- sol_loop hour_select -->
+  <option value="<!-- sol_var value -->"<!-- sol_if selected --> selected="selected"<!-- /sol_if -->><!-- sol_var label --></option><!-- /sol_loop -->
+</select>
+<span id="<!-- sol_var hour_name -->_divider" style="font-weight: bold;">:</span>
+<select id="<!-- sol_var minute_name -->" name="<!-- sol_var minute_name -->"<!-- sol_if readonly_time --> disabled="disabled"<!-- /sol_if --><!-- sol_if client_actions --> onchange="<!-- sol_loop client_actions --><!-- sol_var action -->;<!-- /sol_loop -->"<!-- /sol_if -->>
+  <!-- sol_loop minute_select -->
+  <option value="<!-- sol_var value -->"<!-- sol_if selected --> selected="selected"<!-- /sol_if -->><!-- sol_var label --></option><!-- /sol_loop -->
+</select><!-- /sol_if -->
+<!-- sol_var err_date_name -->

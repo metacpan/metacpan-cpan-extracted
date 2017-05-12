@@ -1,0 +1,14 @@
+Changes
+eff_ci.c
+eff_ci.h
+eff_math_fun.c
+eff_math_fun.h
+EfficiencyCI.xs
+lib/Statistics/EfficiencyCI.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+ppport.h
+README
+t/Statistics-EfficiencyCI.t
+META.yml                                 Module meta-data (added by MakeMaker)

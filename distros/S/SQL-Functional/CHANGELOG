@@ -1,0 +1,21 @@
+Revision history for perl module SQL::Functional
+
+0.3 2016-12-01
+
+- Implement string literal clauses
+- ::Clause->get_params() recurses into subclauses by default
+- Add COUNT(...) clause
+
+0.2 2016-10-17
+
+- Remove v5.14 dependency
+- Fix undeclared deps
+- Autogenerate META.yml
+- Add new clauses: LIMIT, TRUNCATE, DISTINCT
+- Allow subqueries in FROM clause
+- Add function calls
+- Implement all standard join types
+
+0.1 2016-07-30
+
+- Initial release

@@ -1,0 +1,68 @@
+Sash version 1.01
+=================
+
+Sash is a tool to access common data sources. It was inspired by the many
+character based database tools so that you could work with the Salesforce.com
+API in the same manner as say MySQL. It supports a variety of data sources via
+plugins that are readily available on CPAN.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make install
+   
+To some it might seem odd to not have to run make test but there really is nothing
+to test.  Sash by itself only provides a framework for connecting and communicating
+with various data sources.  You need install the appropriate plugin to work with
+your data source of interest.
+
+DEPENDENCIES
+
+This module requires these other modules which are also readily available on CPAN:
+
+Term::ShellUI 0.85
+Data::Table 1.50
+Text::ASCIITable 0.18
+Term::ReadKey 2.30
+Time::HiRes 1.86
+
+DOCUMENTATION
+
+Standard perldoc is available after you install sash or on the project website and CPAN.
+
+PLUGINS
+
+As of this release there are 2 plugins available:
+
+Salesforce.com API (http://www.salesforce.com/developer)
+VerticalResponse.com API (http://www.verticalresponse.com/api)
+
+Read the documentation for information on availability and installation.  It
+also has information on how to develop a plugin.
+
+WEBSITE
+
+The project is hosted by SourceForge so take a look at:
+
+http://sash.sourceforge.net
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Wesley H. Bailey, VerticalResponse Inc.
+
+Sash is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+Sash is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+

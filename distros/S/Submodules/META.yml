@@ -1,0 +1,30 @@
+---
+abstract: Efficient way to load or handle all submodules for a specific package.
+author:
+- Francisco Zarabozo <zarabozo@cpan.org>
+build_requires:
+  File::Basename: '0'
+  File::Find: '0'
+  File::Spec: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150001
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Submodules
+no_index:
+  directory:
+  - t
+  - inc
+  - fakelib
+  - fakelib2
+requires:
+  File::Basename: '0'
+  File::Find: '0'
+  File::Spec: '0'
+  perl: '5.006'
+version: '1.0014'

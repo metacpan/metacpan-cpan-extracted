@@ -1,0 +1,14 @@
+#!/usr/bin/perl
+
+use lib './';
+
+use SlideShow;
+
+my $dir = "/home/httpd/cgi-bin";
+
+new SlideShow
+    (master_cgi  => "http://127.0.0.1/cgi-bin/master",
+     start_title => "My SlideShow",
+     url_list    => [qw(http://www.perl.com http://www.infobot.org)],
+     )->run;
+

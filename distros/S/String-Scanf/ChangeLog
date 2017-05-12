@@ -1,0 +1,18 @@
+2004-05-07  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Release 2.1:
+
+	  Fix a bug reported by Julio Garvía Honrad: if a scan pattern
+	  contained a literal 't', it was matched as a '\t'.  Duh.
+
+2002-09-01  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Release 2.0:
+
+	The 2.0 release of String::Scanf introduces an object-oriented
+	interface (works only for Perl release 5.005 and up) that should
+	speed up repetitive sscanf() operations.
+
+	Note that for the 2.0 release the old compatibility setting interface
+	set_compat() has been removed since there is no need to be able to be
+	backward compatible with the old release 1 bugs.

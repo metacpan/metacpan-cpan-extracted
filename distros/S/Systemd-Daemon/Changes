@@ -1,0 +1,76 @@
+Revision history for perl-Systemd-Daemon
+
+0.07 @ 2015-11-12 13:35 UTC
+
+    -   Inline C code moved to `Systemd::Daemon::XS`. `Systemd::Daemon::Stub` introduced.
+        `Systemd::Daemon` loads XS code, in case of trouble can fall back to stub.
+
+    -   **Incompatible change:** Constants are reimplemented, now they are read-only variables
+        created with `Readonly` module.
+
+    -   `notify` function: `FDSTORE` argument normalized.
+
+    -   If `systemd` library is not found on target system, installation aborts.
+
+    -   Required Perl version lowered by dropping `use feature 'state';` and `/r` regexp modifier.
+
+    -   Test `05-notify.t` skipped if `systemctl` program is not found in `PATH`.
+
+    -   Test `05-notify.t` is skipped if `systemd` is older than 217: `systemd` reads user units
+        from `$XDG_RUNTIME_DIR/systemd/user` directory starting from version 217.
+
+    -   POD reworked not to use full function declaration in section headings. Now headings are
+        just function names, while full function declarations are in the section body.
+
+    -   Short license notice used in documentation.
+
+0.06 @ 2015-04-05
+
+    -   `Inline::Module` is used instead of plain `Inline`. It reduces runtime dependencies:
+        `Inline` is required at build time, and not required at runtime.
+
+    -   Documentation fixed: added working links to `systemd` man pages.
+
+0.05 @ 2015-04-03
+
+    -   Few tests to check `META.{json,yml}` added.
+
+    -   In distro package, `bin/` directory renamed to `tools/`. Traditionally, `bin/`
+        directory contains Perl scripts to install, while I used it for storing scripts used in
+        development process and not intended to be installed.
+
+    -   `lib/Systemd/Daemon.pm` is included into the distro package. This is not real source
+        file, it is generated from `lib/Systemd/Daemon.pm.in`, but lack of the module breaks CPAN.
+
+    -   Tests are renamed to run functionality tests first, then run author/release tests.
+
+    -   Being run in author/release mode, a test fails if required module (e. g. `Test::Pod` is not
+        available).
+
+0.04 @ 2015-03-31
+
+    -   `perl-Systemd-Daemon.spec.in` now uses placeholders `@BUILD_REQUIRES@` and `@RUN_REQUIRES@`
+        to use requirements specified in `Makefile.PL`.
+
+    -   Generating files reworked, `MANIFEST.SKIP` now is not a special case. Also, every generated
+        file depends on its source in `Makefile`.
+
+    -   `META.json` contains proper abstract, but cpan.org still takes abstract from `Daemon.pm.in`
+        and shows abstract `@ABSTRACT@`. Attempt to exclude `*.in` files from indexing.
+
+0.03 @ 2015-03-30
+
+    -   metacpan.org treats `Makefile.PL` as a documentation file. Fixed.
+
+    -   `PM_FILTER` is not used. `PL_FILES` used instead, `Makefile.PL` generates `Daemon.pm`,
+        `perl-Systemd-Daemon.spec`, and `MANIFEST.SKIP`. It should help to show proper
+        documentation in cpan.org and metacpan.org. Before that, these sites used non-yet-filtered
+        `Daemon.pm` and shown version as `__VERSION__`.
+
+0.02 @ 2015-03-25
+
+    -   `make install` fails. Fixed.
+
+0.01 @ 2015-03-24
+
+    -   First version, released on an unsuspecting world.

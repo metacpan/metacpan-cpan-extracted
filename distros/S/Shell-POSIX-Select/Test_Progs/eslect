@@ -1,0 +1,9 @@
+#! /usr/bin/perl -w
+
+use Shell::POSIX::Select qw($Heading);
+
+BEGIN { @ARGV or @ARGV=qw(A B C)  ; }
+# eslect $var[2] ( ) { print "$var[2]\n" }
+
+$Heading='MENU CITY';
+select $var (@ARGV) { print "$var\n"; }

@@ -1,0 +1,84 @@
+ 
+/**************************************************
+ *   Standard tags
+ *************************************************/
+
+body {
+	font-family: 		Tahoma, Arial, Helvetica;
+	font-size: 		smaller;
+	color: 			black;
+	background-color:	white;
+	margin: 		0;
+}
+
+
+/**************************************************
+ *   Custom classes
+ *************************************************/
+
+
+/***********   Page header classes  ***************/
+
+.clsPageTitle {
+	font-size: 		large;
+	text-decoration: 	none;
+}
+.clsBreadcrumbs{
+	color:			white;
+	text-decoration: 	none;
+}
+.clsAuthStatus{
+	text-decoration: 	none;
+	font-weight: 		bold;
+}
+.clsAuthEmail{
+	text-decoration: 	none;
+}
+.clsLoginBox{
+	width: 			100px;
+	border: 		2px solid #4c4c4c;
+}
+.clsLoginText{
+	font-weight: 		bold;
+}
+
+
+
+/***********   Navigation classes  ***************/
+
+.clsNavFirst {
+	text-decoration: 	none;
+	font-weight: 		bold;
+	font-size: 			smallest;
+	color:				white;
+}
+.clsNavSecond{
+	text-decoration: 	none;
+	font-size: 			smallest;
+	color:				white;
+}
+.clsNavThird{
+	font-size: 			smallest;
+	text-decoration:	none;
+	color:				white;
+}
+
+
+
+/***********   Page body classes  *****************/
+
+.clsParagraphTitle {
+	font-size: large;
+}
+.clsSmall {
+	font-size: smaller;
+	text-decoration: none;
+}
+
+/*********** Plugin page classes ****************/
+
+.clsPluginTitle{
+	font-size: 14pt;
+	text-decoration: none;
+}
+

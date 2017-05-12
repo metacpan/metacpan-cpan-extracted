@@ -1,0 +1,49 @@
+Revision history for perl module Statistics::Zed
+
+0.10 2014-01-15
+    - Statistics::Data used as base so that "series testing" can be relegated to that module;
+        so the module's own series_XXX() methods are gone; see the POD for support
+    - Math::Cephes used for normal probability functions for greater precision. See p_value() description in the POD.
+    - p_value() method can, if given the same args as zscore(), calculate the zscore itself and return only the p-value, rather than having to be given the z-value.
+    - p_value() return value corrected for the case when zvalue = 0 and tails is optionally set to 1. Would return 1 (appropriate for the default 2-tailed setting), but now correctly returns 0.5 in this case.
+    - 'pvalue' is now an alias for calling p_value()
+    - values returned from zscore() and p_value() are no longer cached within the class object (was probably only useful for "series testing", which is now handled as above).
+    - ccorr() method added to read or return default value used for ccorr on all tests if none is given within them (default is still 0).
+    - 'ccorr' option no longer just accepts a boolean value: its actual value is implemented; it is no longer just assumed to equal 1 if defined. See OPTIONS in the POD.
+    - tails() method added to read or return default value used for tails on all tests if none is given within them (default is still 2).
+    - dump() method now works just like zscore() and (as now revised) p_value(): given observed, expected and variance values, will calculate the z-score and p-value itself, ahead of printing them to STDOUT. Previously it relied on the cached values from a previous call to the former methods, which is no longer useful.
+    - result_string() method added: this returns what is printed by dump() but without the terminal newline character.
+
+0.072 2013-02-15
+    - cope with dist probs
+    - always use "variance" - never "stdev"
+
+0.06 2012-10-01
+    - lack of a variance value does not throw a croak but returns zero.
+    - removed ztest method - send, e.g., stdev divided by sqrt(N) to zscore instead;
+	- series_test() returns same values and accepts same args as basic test,
+	- $z_value = $zed->p2z($p) - don't have to use named args here, as already in 'z2p'
+	- can send just a single value to series_update(), unkeyed, too
+	- no argument "error" recognized - use "variance" or "stdev"
+
+0.05 2010-09-30
+	- clean-up error messages to prevent "undef" error
+
+0.04 2010-09-13
+    - more distribution issues
+
+0.032 2010-09-13
+	- solving distribution issues
+	- removed statistics conversion methods: z2r, r2z, chi2z, z2chi
+
+0.02 2009 March-May 
+	- uses Math::Cephes instead of Statistics::Distributions of z2p
+	- p2z function, using Math::Cephes (hence the above change)
+	- z2chi algorithm with df
+	- aliases for functions, removing underscores
+	- s_precision and p_precision params are now naamed precision_s and precision_p to conform with other modules
+
+0.01 2006-12-02
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -n Statistics::Zed
+

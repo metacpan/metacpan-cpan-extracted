@@ -1,0 +1,26 @@
+String-MFN
+
+This module provides an mechanism for normalizing a string, which
+briefly means converting the string to something which resembles a
+sane UNIX filename containing no special characters, while attempting
+to maintain information carried by the original formatting.
+
+Also included is a script, mfn, which recursively renames files to a
+nice UNIX-y standard format.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003-2005 Shawn Boyette
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -1,0 +1,16 @@
+abstract: Blue Theme for Spork::S5
+author: Florian Merges <fmerges@cpan.org>
+build_requires: 
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Spork-S5ThemeBlue
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Spork::S5: 0
+  Spork::S5Theme: 0
+version: 0.03

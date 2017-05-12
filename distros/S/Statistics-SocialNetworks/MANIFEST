@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Statistics-SocialNetworks.t
+lib/Statistics/SocialNetworks.pm
+META.yml                                 Module meta-data (added by MakeMaker)

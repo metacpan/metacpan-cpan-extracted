@@ -1,0 +1,34 @@
+This is the README file for SVN::Simple, a simple interface to
+subversion's editor interface.
+
+Subversion is a version control system, you can find more information
+at http://subversion.tigris.org/.
+
+The editor interface is for describing delta between trees.
+
+* Installation
+
+You need subversion 0.31 release or newer, with perl bindings support
+to use SVN::Simple.
+
+SVN::Simple uses the stanard perl module install process:
+
+% perl Makefile.PL
+% make
+% make test
+# make install
+
+* Latest version
+
+The latest SVN::Simple could be found at:
+http://svn.elixus.org/svnweb/repos/browse/member/clkao/SVN-Simple/
+
+
+* Copyright
+
+Copyright 2003-2004 by Chia-liang Kao clkao@clkao.org.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+See <http://www.perl.com/perl/misc/Artistic.html>.

@@ -1,0 +1,104 @@
+Revision history for Shell-Config-Generate
+
+0.26      2017-01-31 19:02:25 -0500
+  - Improved escaping on windows (brad++)
+  - Added cmd_escape_path function (brad++)
+  - Added powershell_escape_path function (brad++)
+
+0.25      2016-05-05 18:43:37 -0400
+  - Add support for MSYS
+
+0.24      2015-08-20 12:32:24 -0400
+  - Remove dependency on Test::Differences
+
+0.23      2015-08-06 16:16:59 -0400
+  - Switch to ExtUtils::MakeMaker since we aren't using any
+    customizations in the installer
+
+0.22      2015-06-18 17:57:29 -0400
+  - No longer use autodie for generate_file.
+    This is to cleanly support Perl 5.8.1
+    The exception thrown is now a string exception
+    instead of a autodie exception.
+
+0.21      2015-02-21 07:51:16 -0500
+  - Skip PS1 tests on ActiveState build
+
+0.20      2015-02-19 18:53:28 -0500
+  - Attempt to verify that we can execute Power Shell scripts before
+    trying to execute Power Shell scripts in test.
+
+0.19      2015-01-12 08:06:27 -0500
+  - Update test suite to skip testing "fish" (not a shell) that
+    comes with Perl Power Tools.  Still test fish (when a shell)
+    if it is found.
+
+0.18      2015-01-10 18:17:07 -0500
+  - do not test against jsh (FreeBSD "job" shell) unless it
+    can be determined to really be that shell.
+
+0.17      2014-05-28 20:25:10 -0400
+  - add set_path_sep method
+
+0.16      2014-05-28 05:55:04 -0400
+  - fix win32_space_be_gone on MSWin32
+
+0.15      2014-05-27 19:44:57 -0400
+  - make win32_space_be_gone a little less aggressive
+    don't modify long paths (non 8.3) that don't have spaces
+
+0.14      2014-05-27 19:22:19 -0400
+  - added win32_space_be_gone function
+
+0.12      2014-04-08 17:45:06 -0400
+  - use -f option with tcsh/csh in testing
+    In case you have another Perl configured in your .tcsh/.cshrc
+
+0.11      2014-03-19 13:42:31 -0400
+  - support for Perl 5.8
+
+0.10      2014-03-18 12:27:31 -0400
+  - fix for test hang on OpenBSD (GH#7)
+
+0.09      2014-01-07 09:25:01 -0500
+  - New set_alias method for defining simple aliases
+  - Support for Windows PowerShell (tests on cygwin + MSWin32)
+  - Support for fish shell (tech preview)
+
+0.08      2013-05-31 06:58:49 America/New_York
+  - promote to production
+
+0.07_01   2013-05-08 08:31:22 EST5EDT
+  - also test against 'bsd-csh' if found
+
+0.07      2013-02-22 21:39:20 America/New_York
+  - support for testing against cmd.exe and command.com under cygwin
+
+0.06_03   2013-02-22 09:25:02 America/New_York
+  - tone down diagnostic, display all shells found
+
+0.06_02   2013-02-22 09:07:24 America/New_York
+  - use test in place of [ for csh
+
+0.06_01   2013-02-18 15:47:36 America/New_York
+  - documentation update
+  - search for [ during test
+
+0.06      2012-11-29 11:47:51 America/New_York
+  - fix for settting environment variables in traditional bourne shell
+
+0.05      2012-11-14 12:43:28 America/New_York
+  - escape [ in append and prepend magic so that csh on Solaris is happy.
+
+0.04      2012-11-13 02:41:59 EST5EDT
+  - test against 44bsd-csh, if found in PATH, non "t" csh on FreeBSD
+  - fix warnings on older Perls
+
+0.03      2012-10-28 07:44:41 EST5EDT
+  - fix doco to remove bashism when referring to bourne shell.
+
+0.02      2012-10-26 07:53:58 EST5EDT
+  - use [ $?X = instead of [ $?X == because GNU [ works differently
+
+0.01      2012-10-25 15:30:44 America/New_York
+  - initial version

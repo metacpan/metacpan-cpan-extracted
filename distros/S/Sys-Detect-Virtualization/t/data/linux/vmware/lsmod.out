@@ -1,0 +1,64 @@
+Module                  Size  Used by
+vsock                  37768  0 
+vmmemctl               12032  0 
+acpiphp                19380  0 
+ip6t_REJECT             4256  2 
+ip6t_LOG                6276  1 
+ip6table_filter         3200  1 
+ip6_tables             12144  2 ip6t_LOG,ip6table_filter
+ipv6                  235876  238 ip6t_REJECT
+ipt_REJECT              3552  2 
+xt_state                2784  13 
+xt_tcpudp               3584  17 
+iptable_filter          3392  1 
+ipt_REDIRECT            2528  2 
+iptable_nat             5448  1 
+nf_nat                 16344  2 ipt_REDIRECT,iptable_nat
+nf_conntrack_ipv4      13036  16 iptable_nat,nf_nat
+nf_conntrack           56276  4 xt_state,iptable_nat,nf_nat,nf_conntrack_ipv4
+ip_tables              10928  2 iptable_filter,iptable_nat
+x_tables               14052  9 ip6t_REJECT,ip6t_LOG,ip6_tables,ipt_REJECT,xt_state,xt_tcpudp,ipt_REDIRECT,iptable_nat,ip_tables
+dm_snapshot            15108  0 
+dm_mirror              15872  0 
+dm_log                  9220  1 dm_mirror
+dm_mod                 46952  3 dm_snapshot,dm_mirror,dm_log
+e1000                 103808  0 
+ext2                   55208  0 
+sr_mod                 14084  0 
+ide_disk               11264  0 
+parport_pc             23396  0 
+parport                31756  1 parport_pc
+psmouse                33104  0 
+serio_raw               5508  0 
+pcspkr                  3200  0 
+vmci                   30336  1 vsock
+button                  6864  0 
+container               4224  0 
+i2c_piix4               8016  0 
+ac                      4964  0 
+shpchp                 26360  0 
+intel_agp              23268  1 
+i2c_core               20596  1 i2c_piix4
+pci_hotplug            24228  2 acpiphp,shpchp
+agpgart                29576  1 intel_agp
+evdev                   8768  0 
+ext3                  106280  1 
+jbd                    40212  1 ext3
+mbcache                 7876  2 ext2,ext3
+ide_cd_mod             28420  0 
+cdrom                  30944  2 sr_mod,ide_cd_mod
+ide_pci_generic         4676  0 [permanent]
+floppy                 48516  0 
+piix                    7336  0 [permanent]
+ide_core               97000  4 ide_disk,ide_cd_mod,ide_pci_generic,piix
+ata_generic             5444  0 
+libata                141248  1 ata_generic
+dock                    9072  2 acpiphp,libata
+sd_mod                 22968  3 
+thermal                15996  0 
+processor              33536  1 thermal
+fan                     4932  0 
+thermal_sys            11624  3 thermal,processor,fan
+pvscsi                 14868  2 
+scsi_mod              130124  4 sr_mod,libata,sd_mod,pvscsi
+vmxnet3                30192  0 

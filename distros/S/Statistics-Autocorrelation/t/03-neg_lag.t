@@ -1,0 +1,35 @@
+use strict;
+use warnings;
+use Test::More tests => 6;
+use constant EPS => 1e-2;
+
+# Test return of accurate coefficients using negative lags according to coeffs drawn from NIST docs:
+
+# example data and output from
+# http://www.itl.nist.gov/div898/handbook/eda/section3/eda35c.htm
+# and
+# http://www.itl.nist.gov/div898/handbook/eda/section4/eda4251.htm
+
+BEGIN { use_ok('Statistics::Autocorrelation') };
+
+my $acorr = Statistics::Autocorrelation->new();
+
+my @data = (-213,-564,-35,-15,141,115,-420,-360,203,-338,-431,194,-220,-513,154,-125,-559,92,-21,-579,-52,99,-543,-175,162,-457,-346,204,-300,-474,164,-107,-572,-8,83,-541,-224,180,-420,-374,201,-236,-531,83,27,-564,-112,131,-507,-254,199,-311,-495,143,-46,-579,-90,136,-472,-338,202,-287,-477,169,-124,-568,17,48,-568,-135,162,-430,-422,172,-74,-577,-13,92,-534,-243,194,-355,-465,156,-81,-578,-64,139,-449,-384,193,-198,-538,110,-44,-577,-6,66,-552,-164,161,-460,-344,205,-281,-504,134,-28,-576,-118,156,-437,-381,200,-220,-540,83,11,-568,-160,172,-414,-408,188,-125,-572,-32,139,-492,-321,205,-262,-504,142,-83,-574,0,48,-571,-106,137,-501,-266,190,-391,-406,194,-186,-553,83,-13,-577,-49,103,-515,-280,201,300,-506,131,-45,-578,-80,138,-462,-361,201,-211,-554,32,74,-533,-235,187,-372,-442,182,-147,-566,25,68,-535,-244,194,-351,-463,174,-125,-570,15,72,-550,-190,172,-424,-385,198,-218,-536,96);
+
+my @coeffs = (1.00,-0.31,-0.74,0.77,0.21,-0.90,);
+
+my $coeff;
+
+foreach my $k(1 .. 5) {
+    my $cref = $coeffs[$k];
+    $k *= -1;
+    $coeff = $acorr->coefficient(data => \@data, lag => $k, exact => 0, unbias => 0, circular => 0);
+    ok( about_equal($coeff, $cref), "Coefficient lag $k: $coeff = $cref");
+}
+
+sub about_equal {
+    return 0 if ! defined $_[0] || ! defined $_[1];
+    return 1 if $_[0] + EPS > $_[1] and $_[0] - EPS < $_[1];
+    return 0;
+}
+1;

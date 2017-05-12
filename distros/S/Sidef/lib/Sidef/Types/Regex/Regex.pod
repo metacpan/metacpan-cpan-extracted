@@ -1,0 +1,71 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Regex::Regex
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = Regex.new(...);
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef::Object::Object
+	* Sidef::Convert::Convert
+
+=head1 METHODS
+
+
+=head2 =~
+
+I<Obj> B<=~> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<match>
+
+=cut
+
+=head2 call
+
+Regex.call() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 gmatch
+
+Regex.gmatch() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 to_re
+
+Regex.to_re() -> I<Obj>
+
+Return the
+
+Aliases: I<to_regex>
+
+=cut
+
+=head2 to_s
+
+Regex.to_s() -> I<Obj>
+
+Return the
+
+Aliases: I<dump>
+
+=cut

@@ -1,0 +1,100 @@
+ShiftJIS::CP932::MapUTF version 1.03
+================
+
+NAME
+
+ShiftJIS::CP932::MapUTF - transcode between Microsoft CP932 and Unicode
+
+SYNOPSIS
+
+    use ShiftJIS::CP932::MapUTF;
+
+    $utf8_string  = cp932_to_utf8($cp932_string);
+    $cp932_string = utf8_to_cp932($utf8_string);
+
+DESCRIPTION
+
+This module provides the following functions:
+
+    cp932_to_utf8()    converts CP932 to UTF-8.
+    cp932_to_utf16le() converts CP932 to UTF-16LE (little endian).
+    cp932_to_utf16be() converts CP932 to UTF-16BE (big endian).
+    cp932_to_utf32le() converts CP932 to UTF-32LE (little endian).
+    cp932_to_utf32be() converts CP932 to UTF-32BE (big endian).
+
+    utf8_to_cp932()    converts UTF-8    to CP932.
+    utf16le_to_cp932() converts UTF-16LE to CP932.
+    utf16be_to_cp932() converts UTF-16BE to CP932.
+    utf32le_to_cp932() converts UTF-32LE to CP932.
+    utf32be_to_cp932() converts UTF-32BE to CP932.
+
+    utf16_to_cp932()   converts UTF-16   to CP932.
+    utf32_to_cp932()   converts UTF-32   to CP932.
+
+In addition, the XSUB edition supports the following functions
+(REQUIRES Perl 5.6.1 or later).
+
+    cp932_to_unicode() converts CP932 to Unicode [*].
+    unicode_to_cp932() converts Unicode [*] to CP932.
+
+    [*] .. Perl's internal format. see perlunicode.pod in Perl 5.6.1 or later.
+
+
+DEPENDENCIES
+
+XSUB edition:   Perl 5.6.1 or later
+
+Non-XS edition: Perl 5.003 or later
+               (Perl 5.005 or later Recommended)
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If Perl 5.6.1 or later, XSUB will be installed.
+If you don't have a C compiler, try to install pure Perl as below.
+
+If Perl 5.6.0 or before, XSUB will be automatically disabled
+and pure Perl will be installed.
+
+If you have a C compiler and want to use XSUB edition,
+type the following (!! "enableXS" must run before "Makefile.PL" !!):
+
+   perl enableXS
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you decide to install pure Perl (i.e. non-XS) edition after trying
+to build XSUB, type the following:
+
+   make clean
+   perl disableXS
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Note:
+
+(1) The file MapUTF.pmN is required to build XSUB.
+    Don't delete it before the install completes.
+
+(2) Pure Perl edition, MapUTF.pmN, may work without any other file
+    in this distribution (it must be renamed MapUTF.pm, though)
+  * Tests (in t/*.t files) require MapUTF/Supplements.pm, too.
+
+COPYRIGHT AND LICENSE
+
+SADAHIRO Tomoyuki <SADAHIRO@cpan.org>
+
+Copyright(C) 2001-2007, SADAHIRO Tomoyuki. Japan. All rights reserved.
+
+This module is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

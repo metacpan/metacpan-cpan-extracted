@@ -1,0 +1,32 @@
+
+=pod
+
+=head1 NAME
+
+SDL::Credits - Authors and contributors of the SDL Perl project
+
+=head1 CATEGORY
+
+Core
+
+=head1 The SDL Perl 2010 Development Team
+
+=head2 Core Developers
+
+See the L<impact graph|https://github.com/PerlGameDev/SDL/graphs/impact> on our github repository.
+
+Also see L<SDL/AUTHORS>.
+
+=head2 Maintenance
+
+Please contact the following individuals regarding questions and problems with SDL Perl.
+
+	Nick: FROGGS
+	Name: Tobias Leich
+
+	Nick: kthakore
+	Name: Kartik Thakore
+
+They can be reached on the sdl-devel@perl.org mailing list and the #sdl channel on the irc.perl.org network.
+
+=cut

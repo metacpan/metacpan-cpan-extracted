@@ -1,0 +1,17 @@
+TYPEMAP
+Sword_Key *			O_OBJECT
+Sword_Manager *			O_OBJECT
+Sword_Module *			O_OBJECT
+
+INPUT
+O_OBJECT
+	if (sv_derived_from($arg, \"${(my $ntt=$ntype)=~s/_/::/g;$ntt=~s/Ptr$//;\$ntt}\")) {
+		IV tmp = SvIV((SV*)SvRV($arg));
+		$var = INT2PTR($type, tmp);
+	}
+	else
+		croak(\"$var is not of type ${(my $ntt=$ntype)=~s/_/::/g;$ntt=~s/Ptr$//;\$ntt}\")
+
+OUTPUT
+O_OBJECT
+	sv_setref_pv($arg, \"${(my $ntt=$ntype)=~s/_/::/g;$ntt=~s/Ptr$//;\$ntt}\", (void*)$var);

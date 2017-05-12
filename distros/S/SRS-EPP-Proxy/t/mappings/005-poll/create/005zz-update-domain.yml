@@ -1,0 +1,14 @@
+description: update a domain - not needed for tests, but message should be ignored by EPP
+registrar: 100
+
+
+request: |-
+ <NZSRSRequest VerMajor="4" VerMinor="4" RegistrarId="100">
+  <DomainUpdate Delegate="0" ActionId="[% actionid %] 1">
+  	<DomainNameFilter>mustard.co.te</DomainNameFilter>
+  </DomainUpdate>
+ </NZSRSRequest>
+
+
+assertions:
+ - xpath_matches: [ '//Error', '0', 'No errors' ]

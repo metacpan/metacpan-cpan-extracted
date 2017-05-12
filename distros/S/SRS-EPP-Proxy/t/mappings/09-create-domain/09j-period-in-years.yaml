@@ -1,0 +1,27 @@
+# Create a domain using a period in years
+template: create-domain.tt
+
+vars:
+  domain: 09j.co.te
+  owner: id123
+  period: 2
+  period_unit: y
+
+input_assertions:
+  class: SRS::EPP::Command::Create::Domain
+
+SRS:
+  - assertions:
+      count:
+      match:
+      match_all:
+      attr_is:
+        - [ '//DomainCreate', 'Term', '24', 'SRS: Check the term is correct' ]
+
+output_assertions:
+  count:
+    - [ '//domain:creData', 1, 'SRS: Check for one creData' ]
+  match:
+    - [ '//domain:name', '09j.co.te', 'SRS: Check domain name' ]
+  attr_is:
+    - [ '//epp:result', 'code', '1000', 'SRS: Check result code' ]

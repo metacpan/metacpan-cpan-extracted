@@ -1,0 +1,77 @@
+#!perl
+use strict;
+use warnings;
+use SVN::Churn;
+use Getopt::Declare;
+use Pod::Usage;
+our $VERSION = $SVN::Churn::VERSION;
+
+=head1 NAME
+
+svn-churn - a code churn monitor
+
+=head1 SYNOPSIS
+
+ svn-churn init
+ svn-churn update
+
+=head1 DESCRIPTION
+
+=head1 COMMANDS
+
+=head2 init - set up a churn monitor
+
+file url skip period
+
+=cut
+
+my $command = shift or pod2usage;
+my $sub = main->can($command) or pod2usage;
+$0 = "svn-command $command";
+$sub->();
+
+
+sub init {
+    my $args = Getopt::Declare->new(qq{
+        --path <path>\t\tpath to subversion repository [required]
+        --file <file>\t\tfile to store state in [required]
+        --skip <skip:+i>\tskip to revision
+        });
+
+    my $churn = SVN::Churn->new;
+    $churn->path( $args->{'--path'} );
+    $churn->database( $args->{'--file'} );
+    $churn->skip_to($args->{'--skip'}) if $args->{'--skip'};
+    $churn->save;
+    print "Created churn monitor\n";
+}
+
+=head2 update - update a churn monitor
+
+=cut
+
+sub update {
+    my $args = Getopt::Declare->new(qq{
+        --file <file>\t\tfile to update [required]
+        --image <image>\t\tfilename of the output png (will be derived
+                           from <file> if absent)
+        --granularity <granularity:+i>\thow many seconds to clump things by
+        });
+
+    my $churn = SVN::Churn->load( $args->{'--file'} );
+    $churn->update;
+    $churn->save;
+    my $image = $args->{'--image'};
+    unless ($image) {
+        ($image = $args->{'--file'}) =~ s/\..*?$//;
+        $image .= ".png";
+    }
+    $churn->graph( $image );
+}
+
+=head1 SEE ALSO
+
+svn
+
+=cut
+

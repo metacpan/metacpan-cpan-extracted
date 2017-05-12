@@ -1,0 +1,39 @@
+%prefix smop_idconst_message
+%{
+  static SMOP__Object* empty_idconst;
+%}
+%method FETCH
+    ___VALUE_FETCH___;
+%method Str
+    ___VALUE_FETCH___;
+%method STORE
+    ___VALUE_STORE___;
+%method true
+    if (invocant != empty_idconst) ret = SMOP__NATIVE__bool_true;
+%method perl
+    int len;
+    char *s = SMOP__NATIVE__idconst_fetch(invocant,&len);
+    int i;
+    int escapes = 0;
+    for (i=0;i<len;i++) {
+      if (s[i] == '\\' || s[i] == '\'') escapes++;
+    }
+    int j=0;
+    char *str = malloc(sizeof(char) * (len+escapes+2));
+    str[j++] = '\'';
+    for (i=0;i<len;i++) {
+      if (s[i] == '\\' || s[i] == '\'') str[j++] = '\\';
+      str[j++] = s[i];
+    }
+    str[j++] = '\'';
+    return SMOP__NATIVE__idconst_createn(str,len+escapes+2);
+
+%method bytes
+    int len;
+    SMOP__NATIVE__idconst_fetch(invocant,&len);
+    ret = SMOP__NATIVE__int_create(len);
+
+%init {
+  SMOP__ID__FETCH->RI->MESSAGE = ((SMOP__ResponderInterface*)RI)->MESSAGE;
+  empty_idconst = SMOP__NATIVE__idconst_create("");
+%}

@@ -1,0 +1,104 @@
+Sub::Usage version 0.03
+$Revision: 1.2 $
+$Date: 2002/02/26 00:29:35 $
+=====================================================================
+
+**************************************************************************
+WARNING: This module was named Usage::Sub, but Sub is the more appropriate
+         root namespace so it's now Sub::Usage.
+**************************************************************************
+
+
+NAME
+    Sub::Usage - Issue subroutine/method usage
+
+
+SYNOPSIS
+      use Sub::Usage;
+
+      sub turn_on {
+          @_ >= 2 or usage 'NAME, COLOR [, INTENSITY]';
+          # sub continues
+      }
+
+
+DESCRIPTION
+    Sub::Usage provides functions to display usage of subroutines or methods
+    from inside the stub. Some people like to check the parameters of the
+    routine. For example,
+
+      # turn_on(NAME, COLOR [, INTENSITY])
+      sub turn_on {
+          @_ >= 2 or die "usage: turn_on(NAME, COLOR [, INTENSITY])\n";
+          # the process goes on
+      }
+
+    With the "usage" function (exported by default), you can achieve the
+    same results (and more) without having to remember the subroutine name.
+
+      use Sub::Usage;
+
+      sub turn_on {
+          @_ >= 2 or usage 'NAME, COLOR [, INTENSITY]';
+          # process goes on
+      }
+
+    Please take a look at the POD for more detail. Just do 'man Sub::Usage'
+    or 'perldoc Sub::Usage' after installation. Or, just 'perldoc Usage.pm'
+    in the distribution tree.
+
+
+INSTALLATION
+
+    To install this module type the following:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+
+BUGS
+    The "usage" function and friends should not be called from anywhere
+    outside subroutines or methods, such as the main space. It will die when
+    it detects such situation. For example:
+
+      #!perl
+      usage();
+
+    This will result in an error message such as:
+
+      Sub::Usage::usage() must be called from a method or subroutine
+
+    Unfortunately, the underlying function relies too much on caller(1) to
+    return the fourth element as subroutine name. But this is not the
+    situation in eval context, as documented in "perldoc -f caller". This
+    causes the "usage" and friends behave unexpectedly.
+
+    The workaround is simply don't call them outside of subroutines or
+    methods. This is utility for the subs, after all :-)
+
+
+AUTHOR
+    Hasanuddin Tamir <hasant@trabas.com>
+
+    More comments and suggestions are welcome.
+
+
+COPYRIGHT
+    Copyright (C) 2002 Trabas. All rights reserved.
+
+    This program is free software. You may freely use it, modify and/or
+    distribute it under the same term as Perl itself.
+
+
+THANKS
+    I'd like to thank Matthew Sachs <matthewg@zevils.com> for his patch on
+    the POD and suggestion on renaming to Sub::Usage.
+
+
+AVAILABILITY
+
+    - http://san.port5.com/0/perl/modules/Sub-Usage-x.xx.tar.gz
+    - any CPAN mirror, for example,
+      http://www.cpan.org/modules/by-module/Sub/Sub-Usage-x.xx.tar.gz

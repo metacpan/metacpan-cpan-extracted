@@ -1,0 +1,83 @@
+NAME
+    Server::Control -- Flexible apachectl style control for servers
+
+VERSION
+    version 0.20
+
+SYNOPSIS
+        use Server::Control::Apache;
+
+        my $apache = Server::Control::Apache->new(
+            conf_file => '/my/apache/dir/conf/httpd.conf'
+        );
+        if ( !$apache->is_running() ) {
+            $apache->start();
+        }
+
+DESCRIPTION
+    `Server::Control' allows you to control servers in the spirit of
+    apachectl, where a server is any background process which listens to a
+    port and has a pid file. It is designed to be subclassed for different
+    types of servers.
+
+    The original motivation was to eliminate all those little annoyances
+    that can occur when starting and stopping a server doesn't quite go
+    right.
+
+FEATURES
+    *   Checks server status in multiple ways (looking for an active
+        process, contacting the server's port)
+
+    *   Detects and handles corrupt or out-of-date pid files
+
+    *   Tails the error log when server fails to start
+
+    *   Uses sudo by default when using restricted (< 1024) port
+
+    *   Reports what is listening to a port when it is busy (with
+        Unix::Lsof)
+
+AVAILABLE SUBCLASSES
+    The following subclasses are currently available as part of this
+    distribution:
+
+    *   Server::Control::Apache - For Apache httpd
+
+    *   Server::Control::Nginx - For Nginx
+
+    *   Server::Control::Starman - For Starman
+
+    *   Server::Control::HTTPServerSimple - For HTTP::Server::Simple
+
+    *   Server::Control::NetServer - For Net::Server
+
+    There may be other subclasses available on CPAN.
+
+RELATED MODULES
+    *   App::Control - Same basic idea for any application with a pid file.
+        No features specific to a server listening on a port, and not easily
+        subclassable, as all commands are handled in a single case
+        statement.
+
+    *   MooseX::Control - A Moose role for controlling applications with a
+        pid file. Nice extendability. No features specific to a server
+        listening on a port, and assumes server starts via a command-line
+        (unlike pure-Perl servers, say). May end up using this role.
+
+    *   Nginx::Control, Sphinx::Control, Lighttpd::Control - Modules which
+        use MooseX::Control
+
+ACKNOWLEDGMENTS
+    This module was developed for the Digital Media group of the Hearst
+    Corporation, a diversified media company based in New York City. Many
+    thanks to Hearst management for agreeing to this open source release.
+
+SEE ALSO
+    serverctlp, Server::Control::Apache
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Jonathan Swartz.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

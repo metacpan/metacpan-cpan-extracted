@@ -1,0 +1,75 @@
+#!/bin/sh
+#
+#For show command, delegate to fake_sacctmgr_ENTITY
+#Otherwise, just echo the cmdline, unless there is a --version argument
+#(Do --version locally, using FAKE_SLURM_VERSION)
+
+CMDLINE=
+ECHO_CMDNAME=echo_cmdline
+
+print_version()
+{	version=$1
+	if [ "x$FAKE_SLURM_VERSION" = "x" ]; then
+		FAKE_SLURM_VERSION=14
+	fi
+	cat - <<EOF
+slurm $FAKE_SLURM_VERSION
+EOF
+	exit 0
+}
+
+
+#Find the directory this script is in
+bindir=`dirname $0`
+	
+#Quick parse of arguments
+entity_next=no
+
+for arg in "$@"
+do
+
+	if [ "x$entity_next" = "xyes" ]; then
+		#Previous arg was show/list
+		#So we pass buck to appropriate fake_sacctmgr_* script
+		entity="$arg"
+		case $entity in
+		  account)
+			ent=acct
+			;;
+		  association)
+			ent=assoc
+			;;
+		  *)
+			ent="$entity"
+			;;
+		esac 
+		fake_sa="${bindir}/fake_sacctmgr_$ent"
+
+		$fake_sa "$@"
+		exit $?
+	fi
+
+	#Add to CMDLINE string
+	#	Append space if needed
+	if [ "x$CMDLINE" != "x" ]; then
+		CMDLINE="$CMDLINE "
+	fi
+	CMDLINE="$CMDLINE$arg"
+
+	
+	case $arg in
+	    --version)
+		print_version
+		exit 0
+		;;
+	    show|list)
+		entity_next=yes
+		;;
+	esac
+done
+
+#If we get here, just echo cmdline
+	    
+echo "Slurm test: $ECHO_CMDNAME"
+echo $CMDLINE
+

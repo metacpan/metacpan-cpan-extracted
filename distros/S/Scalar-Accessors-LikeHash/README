@@ -1,0 +1,93 @@
+NAME
+    Scalar::Accessors::LikeHash - access a JSON/Sereal/etc scalar string in a
+    hash-like manner
+
+SYNOPSIS
+       {
+          package Acme::Storable::Accessors;
+      
+          use Storable qw/ freeze thaw /;
+      
+          use Role::Tiny::With;
+          with 'Scalar::Accessors::LikeHash';
+      
+          sub _to_hash {
+             my ($ref) = @_;
+             thaw($$ref);
+          }
+      
+          sub _from_hash {
+             my ($ref, $hash) = @_;
+             $$ref = freeze($hash);
+          }
+       }
+   
+       my $string = File::Slurp::slurp("some-data.storable");
+       my $object = Acme::Storable::Accessors->new(\$string);
+   
+       $object->store(some_key => 42) unless $object->exists('some_key');
+       $object->fetch('some_key');
+       $object->delete('some_key');
+
+DESCRIPTION
+    The idea of this is to treat a reference to a string as if it were a hash.
+    You can store key-values pairs; fetch values using keys; delete keys; etc.
+    This is slow and quite silly.
+
+    This module is a role. Concrete implementations of the role need to
+    provide `_from_hash` and `_to_hash` methods to serialize and deserialize a
+    hashref to/from a scalarref.
+
+    This role provides the following methods:
+
+    `new(\$scalar)`
+        Yes, this role provides a constructor. Consumers can overide it.
+
+    `fetch($key)`
+    `store($key, $value)`
+    `exists($key)`
+    `delete($key)`
+    `clear()`
+        Delete for each key.
+
+    `keys()`
+    `values()`
+
+    These can be called as methods on a blessed scalar reference:
+
+            my $string = "{}";
+            bless \$string, "Scalar::Accessors::LikeHash::JSON";
+            $string->store(foo => 42);
+
+    Or as class methods passing the scalar reference as an extra first
+    argument:
+
+            my $string = "{}";
+            Scalar::Accessors::LikeHash::JSON->store(\$string, foo => 42);
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Scalar-Accessors-LikeHash>.
+
+SEE ALSO
+    For a more usable interface, see Tie::Hash::SerializedString.
+
+    For concrete implementations, see Scalar::Accessors::LikeHash::JSON and
+    Scalar::Accessors::LikeHash::Sereal.
+
+    For an insane usage of this concept, see Acme::MooseX::JSON.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2013 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

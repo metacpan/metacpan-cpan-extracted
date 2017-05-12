@@ -1,0 +1,21 @@
+attributes:
+    class: well 
+elements:
+    - type: File
+      name: photo
+      label: Image
+      attributes: 
+        class: span5
+    - type: File
+      name: thumbnail
+      label: thumbnail
+      attributes: 
+        class: span5
+    - type: "+Strehler::FormFu::Element::Category"
+    - type: "+Strehler::FormFu::Element::Tags"
+    - type: "+Strehler::FormFu::Element::SubmitBlockMulti"
+      actions:
+        - submit-go
+        - submit-continue
+
+  

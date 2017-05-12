@@ -1,0 +1,117 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Range::RangeString
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = RangeString.new(...);
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef::Types::Range::Range
+	* Sidef::Object::Object
+
+=head1 METHODS
+
+
+=head2 call
+
+RangeString.call() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 contain
+
+RangeString.contain() -> I<Obj>
+
+Return the
+
+Aliases: I<include>, I<contains>, I<includes>
+
+=cut
+
+=head2 dump
+
+RangeString.dump() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 from
+
+RangeString.from() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 iter
+
+RangeString.iter() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 max
+
+RangeString.max() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 min
+
+RangeString.min() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 new
+
+RangeString.new() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 pick
+
+RangeString.pick() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 rand
+
+RangeString.rand() -> I<Obj>
+
+Return the
+
+Aliases: I<sample>
+
+=cut
+
+=head2 to
+
+RangeString.to() -> I<Obj>
+
+Return the
+
+=cut

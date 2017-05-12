@@ -1,0 +1,28 @@
+CHANGES for vcp - Version CoPy
+
+0.08 Thu Dec 09 11:01:29 CST 2010
+   - Fixed checking to account for change in perl 5.13 to the
+     stringification of regular expressions
+
+0.07 Mon Aug 31 14:51:54 CDT 2009
+   - Fixed to work with recent Test::Harness
+
+0.06 Wed Nov 12 13:43:31 CST 2008
+   - Fixed to work with recent Test::More
+
+0.05 Tue Jun 10 16:23:13 CDT 2008
+   - One more attempt to fix the regression suite for newer perls
+
+0.04 Wed Oct 03 15:52:22 CDT 2007
+   - Hopefully fixed regression suite for perl 5.6.2.
+
+0.03 Wed Sep 19 13:14:16 CDT 2007
+   - Made regression test script compatible with Windows (thanks to 
+     Slaven Rezik for help!).
+   - Added README and CHANGES files
+
+0.02 Fri Aug 10 10:25:35 CDT 2007
+   - Fixed expects for some systems
+
+0.01 Wed Aug 08 14:17:02 CDT 2007
+   - Initial release

@@ -1,0 +1,32 @@
+description: set up domain
+registrar: 1
+
+
+request: |-
+ <NZSRSRequest VerMajor="4" VerMinor="4" RegistrarId="100">
+  <DomainCreate Delegate="1" DomainName="cheese.co.te" Term="1" ActionId="[% actionid %]">
+    <RegistrantContact Email="e@xample.com" Name="Mr Ben">
+      <PostalAddress Address1="52 Festive Rd" Address2="Putney" City="London" CountryCode="NZ"/>
+      <Phone AreaCode="207" CountryCode="44" LocalNumber="000000"/>
+    </RegistrantContact>
+    <AdminContact Email="e@xample.com" Name="Mr Ben">
+      <PostalAddress Address1="52 Festive Rd" Address2="Putney" City="London" CountryCode="NZ" PostalCode="6021"/>
+      <Phone AreaCode="207" CountryCode="44" LocalNumber="000000"/>
+    </AdminContact>
+    <TechnicalContact Email="e@xample.com" Name="Mr Ben">
+      <PostalAddress Address1="52 Festive Rd" Address2="Putney" City="London" CountryCode="NZ" PostalCode="6021"/>
+      <Phone AreaCode="207" CountryCode="44" LocalNumber="000000"/>
+    </TechnicalContact>
+    <NameServers>
+      <Server FQDN="ns1.everydns.net"/>
+      <Server FQDN="ns2.everydns.net"/>
+      <Server FQDN="ns3.everydns.net"/>
+      <Server FQDN="ns4.everydns.net"/>
+    </NameServers>
+    <AuditText><![CDATA[Domain Agent Update]]></AuditText>
+  </DomainCreate>
+ </NZSRSRequest>
+
+
+assertions:
+ - xpath_matches: [ '//Error', '0', 'No errors' ]

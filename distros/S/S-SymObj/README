@@ -1,0 +1,127 @@
+S-SymObj
+========
+
+:Author:    Steffen (Daode) Nurpmeso
+:Contact:   steffen@sdaoden.eu
+:Date:      2010 - 2012, 2016
+:Copyright: All rights reserved under the terms of the ISC license.
+:Status:    Have fun.
+
+.. _`perl(1)`: http://www.perl.org
+
+SymObj.pm provides an easy way to create and construct symbol-tables
+and objects.  With a simple hash one defines the fields an object
+should have.  An automatically instantiated constructor can then be
+used to create the object, and the generated accessor subs implement
+a *feed in and forget* approach when they are about to manage arrays
+or hashes, trying to handle all kinds of arguments; this is also true
+for the constructor.
+
+If debug was enabled upon creation time a constructor which does a lot
+of argument checking and more is used, which is pretty useful in times
+when the interface is unstable.  Otherwise a different constructor is
+used which implements no checking at all; and if the object in question
+is the head of a "clean" object tree, one that is entirely managed by
+S-SymObj, then indeed a super-fast super-lean constructor implementation
+is used that'll rock your house.
+
+The SymObj module is available on CPAN.  The S-SymObj project is located
+at https://www.sdaoden.eu/code.html.  It is developed using a git(1)
+repository, which is located at https://git.sdaoden.eu/scm/s-symobj.git
+(browse it at https://git.sdaoden.eu/git/s-symobj.git).
+
+Installation
+------------
+
+Since v0.6.0 [S-]SymObj is available on CPAN as SymObj.  Please see
+the standard ``$ man 1 cpan`` (and maybe ``$ man 1 perlmodinstall``)
+manual(s) for how to perform a regular installation from CPAN.
+In short: ``$ cpan SymObj``.
+
+But In general SymObj.pm is a Perl module and therefore needs to be
+in ``@INC`` if scripts should be able to find it easily.  This can be
+accomplished by placing the SymObj.pm somewhere and either specifying
+the path via the ``-I`` command line option, or, and that is maybe the
+easiest and most flexible solution, by placing it in the ``PERL5LIB``
+environment variable.  Here is how to do that in a Bourne/Korn/POSIX
+shell: ::
+
+   $ PERL5LIB=/PATH/TO/SymObj.pm PERL5OPT=-C
+   $ export PERL5LIB PERL5OPT
+
+Usage
+-----
+
+The complete and up-to-date documentation is part of the S-SymObj
+module itself -- if that has been regularly installed via CPAN as shown
+above, then the manual should show up by typing ``$ man SymObj``,
+otherwise the ``pod2XY`` family of programs can be used directly upon
+SymObj.pm, as in ``$ pod2text SymObj.pm``.  The POD example as of
+2016-10-24: ::
+
+   use diagnostics -verbose;
+   use strict;
+   use warnings;
+   # You need to require it in a BEGIN{}..; $Debug may be one of 0/1/2
+   BEGIN{ require SymObj; $SymObj::Debug = 2 }
+
+   # Accessor subs return references for hashes and arrays (but shallow
+   # clones in wantarray context), scalars are returned "as-is"
+   {package X1;
+      SymObj::sym_create(SymObj::NONE, { # (NONE is 0..)
+         _name => '', _array => [qw(Is Easy)],
+         _hash => {To => 'hv1', Use => 'hv2'},
+         boing => undef}) # <- $SymObj::Debug will complain!  FAILS!
+   }
+   my $o = X1->new(name => 'SymObj');
+   print $o->name, ' ';
+   print join(' ', @{$o->array}), ' ';
+   print join(' ', keys %{$o->hash}), "\n";
+
+   # Unknown arguments are detected when DEBUG/VERBOSE is enabled.
+   {package X2;
+      our @ISA = ('X1');
+      SymObj::sym_create(0, {}) # <- adds no fields on its own
+   }
+   # (Clean hierarchy has optimized constructor which is used, then)
+   if($SymObj::Debug != 0){
+      $o = X2->new(name => 'It detects some misuses (if $Debug > 0)',
+         'un' => 'known argument catched')
+   }else{
+      $o = X2->new(name => 'It detects some misuses (if $Debug > 0)')
+   }
+   print $o->name, "\n";
+
+   # Fields which mirror fieldnames of superclasses define overrides.
+   {package X3;
+      our @ISA = ('X2');
+      SymObj::sym_create(0, {'_name' => 'Auto superclass-ovw'},
+         sub{ my $self = shift; print "X3 usr ctor\n" })
+   }
+   $o = X3->new();
+   print $o->name, "\n";
+
+   # One may enforce creation of array/hash accessors even for undef
+   # values by using the @/% type modifiers; the objects themselves
+   # are lazy-created as necessary, then...
+   {package X4;
+      our @ISA = ('X3');
+      SymObj::sym_create(0, {'%_hash2'=>undef, '@_array2'=>undef});
+      sub __ctor{ my $self = shift; print "X4 usr ctor\n" }
+   }
+   $o = X4->new(name => 'A X4');
+   die 'Lazy-allocation failed'
+      if !defined $o->hash2 || !defined $o->array2;
+   print join(' ', keys %{$o->hash2(Allocation=>1, Lazy=>1)}), ' ';
+   print join(' ', @{$o->array2(qw(Can Be Used))}), "\n";
+
+   %{$o->hash2} = ();
+   $o->hash2(HashAndArray => 'easy');
+   $o->hash2(qw(Accessors development));
+   $o->hash2('Really', 'is');
+   $o->hash2(['Swallow', 'possible']);
+   $o->hash2({ Anything => 'here' });
+   print join(' ', keys %{$o->hash2}), "\n"
+   # P.S.: this is also true for the constructor(s)
+
+.. vim:set ft=rst:s-ts-mode

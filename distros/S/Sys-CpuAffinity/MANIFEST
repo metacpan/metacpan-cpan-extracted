@@ -1,0 +1,31 @@
+Build.PL
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+contrib/contrib.doc
+contrib/cpusetGetCPUCount.xs
+contrib/fortytwo.xs
+contrib/freebsd_cpuset.xs
+contrib/irix_sysmp.xs
+contrib/linux-sched_getaffinity.xs
+contrib/linux-sched_setaffinity.xs
+contrib/pthread_affinity_np.xs
+contrib/solaris_processor_affinity.xs
+contrib/solaris_processor_bind.xs
+contrib/win32_processaffinity.xs
+contrib/win32_system_info.xs
+contrib/win32_system_info_alt.xs
+contrib/win32_threadaffinity.xs
+contrib/ok/foo				# placeholder for contrib/ok dir
+contrib/fail/foo			# placeholder for contrib/fail dir
+lib/xs/foo				# placeholder for lib/xs dir
+lib/Sys/CpuAffinity.pm
+t/00-load.t
+t/02-available.t
+t/10-exercise.t
+t/11-exercise-all.t
+t/12-32cpus.t
+META.yml
+META.json

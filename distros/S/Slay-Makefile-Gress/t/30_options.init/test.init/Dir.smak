@@ -1,0 +1,4 @@
+tests: washington.ok adams.ok
+
+%.ok:
+        touch $TARGET

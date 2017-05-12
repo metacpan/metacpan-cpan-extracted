@@ -1,0 +1,45 @@
+Changes
+lib/SQL/OOP.pm
+lib/SQL/OOP/Array.pm
+lib/SQL/OOP/Base.pm
+lib/SQL/OOP/Command.pm
+lib/SQL/OOP/Dataset.pm
+lib/SQL/OOP/Delete.pm
+lib/SQL/OOP/ID.pm
+lib/SQL/OOP/IDArray.pm
+lib/SQL/OOP/Insert.pm
+lib/SQL/OOP/Join.pm
+lib/SQL/OOP/Order.pm
+lib/SQL/OOP/Select.pm
+lib/SQL/OOP/Update.pm
+lib/SQL/OOP/Where.pm
+Makefile.PL
+MANIFEST			This list of files
+README.pod
+t/SQL_OOP_ComprehensiveTest.t
+t/SQL_OOP_ComprehensiveTest2.t
+t/SQL_OOP_Dataset.t
+t/SQL_OOP_Dataset2.t
+t/SQL_OOP_Dataset3.t
+t/SQL_OOP_Delete.t
+t/SQL_OOP_IdentifierTest.t
+t/SQL_OOP_InsertTest.t
+t/SQL_OOP_Join.t
+t/SQL_OOP_OrderTest.t
+t/SQL_OOP_practical_insert.t
+t/SQL_OOP_practical_select.t
+t/SQL_OOP_practical_update.t
+t/SQL_OOP_SelectTest.t
+t/SQL_OOP_Sql.t
+t/SQL_OOP_to_string_twice.t
+t/SQL_OOP_Update.t
+t/SQL_OOP_Update2.t
+t/SQL_OOP_WhereTest.t
+xt/00_load.t
+xt/99_pod.t
+xt/99_podcoverage.t
+xt/perlcritic.t
+xt/perlcriticrc
+xt/podspell.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

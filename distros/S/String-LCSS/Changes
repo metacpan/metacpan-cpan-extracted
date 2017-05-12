@@ -1,0 +1,21 @@
+1.00  Dec 31 2015 [GSULLIVAN]
+    - Gene Sullivan becomes a co-maintainer.  Previous versions by DYACOB.
+    - Fixed RT bug #32036
+    - Fixed RT bug #62175
+    - Enabled lexical warnings
+    - Minor POD changes
+    - Added tests
+
+0.12 Thu Apr 10 11:58:45 EDT 2003
+    - when used in an array context lcss now returns the
+      indexi of the match position of the two args.
+    - the lcss function is exportable.
+    - another algorithm tweak.
+
+0.11 Wed Apr  9 17:55:10 EDT 2003
+    - fixed algorithm for major flaw.
+    - added "the quick brown fox" tests.
+
+0.10 Tue Apr  8 18:54:02 EDT 2003
+    - initial release.
+

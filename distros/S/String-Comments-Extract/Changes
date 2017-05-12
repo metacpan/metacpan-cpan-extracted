@@ -1,0 +1,18 @@
+0.023 Thursday December 23 15:34:48 PST 2010:
+    - Added Path::Class testing requirement
+
+0.022 Sunday December 19 11:58:20 PST 2010:
+    - Fixed XSLoader prerequisite (thanks DOUGDUDE)
+
+0.021 Saturday December 18 18:33:48 PST 2010:
+	- Added regular expression parsing support
+
+0.020 Wednesday August 13 17:21:06 PDT 2008:
+	- Refactored to use slash-star naming convention
+	- Incorrect repository entry in META.yml
+	- Documentation tweaks
+	- Changed ::CPPCJS -> ::SlashStar
+	- "Added" Java support
+
+0.010 Wednesday August 13 13:47:02 PDT 2008:
+	- Initial release

@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Sys-Syslog-OO.t
+lib/Sys/Syslog/OO.pm

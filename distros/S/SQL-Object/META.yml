@@ -1,0 +1,25 @@
+---
+abstract: 'Yet another SQL condition builder'
+author:
+  - 'Atsushi Kobayashi <nekokak _at_ gmail _dot_ com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.94
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.02'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: SQL-Object
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/nekokak/p5-SQL-Object.git
+version: 0.01

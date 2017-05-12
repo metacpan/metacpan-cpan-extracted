@@ -1,0 +1,6 @@
+include common.smakh
+
+default:   depend0 { map "depend$_",
+             1..3 } \
+           depend4
+	{ trace(@_) }

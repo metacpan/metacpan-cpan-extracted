@@ -1,0 +1,11 @@
+Changes
+LICENSE
+Makefile.PL
+MANIFEST
+README
+lib/Statistics/SPC.pm
+t/outofcontrol.t
+t/pfail.t
+t/Rfail.t
+t/Statistics-SPC.t
+t/Xfail.t

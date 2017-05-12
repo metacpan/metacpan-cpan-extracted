@@ -1,0 +1,37 @@
+Release history for SQL-Interpol
+
+1.103 Mon 12 Oct 2015
+	- Reinstated strictures (forgotten during Perl version drop)
+	- Fix for some perl 5.8.9/5.10.1 failures
+
+1.102 Sun 11 Oct 2015
+	- Minimum Perl version requirement drop
+
+1.100 Sat 10 Oct 2015
+	- Naked hashref value intercept
+	 (Such values are never valid but were accepted, producing malformed SQL.
+	  This could turn insufficient validation of data in the caller into an exposed vulnerability.)
+
+1.004 Sat 10 Jan 2015
+	- No functional changes
+	- No longer contains INSTALL file with install-as-root instructions
+
+1.003 Tue 30 Dec 2014
+	- Split DBIx::Simple::Interpol into a separate distribution
+
+1.002 Mon 29 Dec 2014
+	- Large test suite refactoring
+
+1.001 Sat 27 Dec 2014
+	- Simplified code and removed lots of method call overhead
+	- Made some generated SQL slightly prettier
+
+1.000 Fri 26 Dec 2014
+	- FORKED FROM SQL::Interp 1.22
+	- Removed DBIx::Interp and its supporting sql_type() feature
+	- Removed strict mode
+	- Removed STDERR debug output; please use DBI tracing instead
+	- Removed lots of left-over SQL::Interpolate vestiges
+	- Cleaned up test suite, now uses Test::Differences
+	- Massive refactoring of the parser, now sane and clean
+	- Added DBIx::Simple::Interpol monkey-patcher to hook into DBIS SQLI support

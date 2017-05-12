@@ -1,0 +1,169 @@
+NAME
+    Sub::Monkey - Dynamically and neatly monkey patch a module
+
+DESCRIPTION
+    In some cases, rare cases, you may need to temporarily patch a module
+    on-the-go. Sub::Monkey can help you achieve this by providing a set of
+    methods to create, override and add hook modifiers, similar to Moose,
+    but can apply them to remote modules (Not the current one). This type of
+    monkey patching is reasonably safe because you can plainly see what
+    changes are being made to what modules. Obviously monkey patching isn't
+    always the best alternative, but sometimes you may have no other choice.
+    Sub::Monkey also provides the ability to undo any patching you made with
+    "unpatch".
+
+SYNOPSIS
+        use Sub::Monkey qw<Some::Package>;
+
+        method 'needThisMethod' => sub {
+            ...
+        },
+        qw<Some::Package>;
+
+    We just created a brand new method in the Some::Package class. If you
+    attempt to override an existing method using "method", then Sub::Monkey
+    will raise an error, because really you should be using "override"
+    instead. Remember, to patch a module with Sub::Monkey, you need to
+    explicitly tell it you want to modify a class by importing it when you
+    "use Sub::Monkey". To do this for multiple modules just add them all
+    into an array.
+
+        use Sub::Monkey qw<Some::Package Foo::Bar Another::One>;
+
+METHODS
+  instance
+    Patch an instance method instead of an entire class
+
+        # Pig.pm
+        package Pig;
+        sub new { return bless {}, shift; }
+        sub says { print "Oink!\n"; }
+
+        # test.pl
+        package main;
+        use Sub::Monkey qw<Pig>;
+
+        my $pig  = Pig->new;
+        my $pig2 = Pig->new;
+        instance 'says' => sub {
+            print "Meow\n";
+        },
+        $pig2;
+
+        # only $pig2 will have its says method overridden
+
+  original
+    If you want to run the original version of a patched method, but not
+    unpatch it right away you can use "original" to do so. It will run the
+    old method before it was patched with any arguments you specify, but the
+    actual method will still remain patched.
+
+        after 'someMethod' => sub {
+            print "Blah\n"
+        },
+        qw<Foo>;
+
+        original('Foo', 'someMethod', qw<these are my args>);
+
+    OR if you prefer, you can just call
+    Sub::Monkey::PatchedClassName::method->(@args)
+
+        Sub::Monkey::Foo->someMethod('these', 'are', 'my', 'args);
+
+  override
+    Overrides an already existing method. If the target method doesn't exist
+    then Sub::Monkey will throw an error.
+
+        override 'foo' => sub {
+            return "foo bar";
+        },
+        qw<Some::Module>;
+
+  method
+    Creates a brand new method in the target module. It will NOT allow you
+    to override an existing one using this, and will throw an error.
+
+        method 'active_customers' => sub {
+            my $self = shift;
+            return $self->search({ status => 'active' });
+        },
+        qw<Schema::ResultSet::Customer>;
+
+  before
+    Simply adds code to the target method before the original code is ran
+
+        # Foo.pm
+        package Foo;
+    
+        sub new { return bless {}, __PACKAGE__; }
+        sub hello { print "Hello, $self->{name}; }
+        1;
+
+        # test.pl
+        use Sub::Monkey qw<Foo>;
+   
+        my $foo = Foo->new; 
+        before 'hello' => {
+            my $self = shift;
+            $self->{name} = 'World';
+        },
+        qw<Foo>;
+
+        print $foo->hello . "\n";
+
+  after
+    Basically the same as "before", but appends the code specified to the
+    END of the original
+
+  around
+    Around gives the user a bit more control over the subroutine. When you
+    create an around method the first argument will be the original method,
+    the second is $self and the third is any arguments passed to the
+    original subroutine. In a away this allows you to control the flow of
+    the entire subroutine.
+
+        package MyFoo;
+
+        sub greet {
+            my ($self, $name) = @_;
+
+            print "Hello, $name!\n";
+        }
+
+        1;
+
+        # test.pl
+
+        use Sub::Monkey qw<MyFoo>;
+
+        # only call greet if any arguments were passed to MyFoo->greet()
+        around 'greet' => sub {
+            my $method = shift;
+            my $self = shift;
+
+            $self->$method(@_)
+                if @_;
+        },
+        qw<MyFoo>;
+
+  unpatch
+    Undoes any modifications made to patched methods, restoring it to its
+    original state.
+
+        override 'this' => sub { print "Blah\n"; }, qw<FooClass>;
+  
+        unpatch 'this' => 'FooClass';
+
+AUTHOR
+    Brad Haywood <brad@geeksware.net>
+
+LICENSE
+    You may distribute this code under the same terms as Perl itself.
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 15:
+        Deleting unknown formatting code M<>
+

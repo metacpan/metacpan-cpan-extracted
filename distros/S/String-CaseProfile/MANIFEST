@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/00_load.t
+t/01_pod_valid.t
+t/02_pod_coverage.t
+t/03_caseprofile.t
+t/04_caseprofile_options.t
+t/05_other_alphabets.t
+lib/String/CaseProfile.pm
+META.yml                                 Module meta-data (added by MakeMaker)

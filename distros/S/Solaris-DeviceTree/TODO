@@ -1,0 +1,103 @@
+TODO
+====
+
+BUGS
+----
+
+* Does Perl 5.6.1 have Test::More installed as default? -> No
+  Check and print warning
+
+FEATURE ENHANCEMENTS
+--------------------
+
+* Add methods to convert between OBP and Solaris pathes
+  Fix Util::__solaris_path to solaris_path
+
+* Generate instance numbers for filesystem minor nodes
+
+* Implement ::Util is_tape_node, tape_nodes
+* Add tape support to solaris_device
+
+* Change is_block_* to is_disk_*
+* Implement ::Filesystem is_disk_*
+  use /etc/name_to_major for major->drivername and utilize ::Node is_disk_*
+
+* Enhance devtree with useful functionality
+  - Shellscript compatible output
+  - identify controllers for scsi, fc, ide
+    o controller numbers
+    o hardware pathes
+  - identify disks
+    o disktree printing
+    o ctds
+    o hardware pathes
+    o compare current and historical information
+  - identify tapes
+    o compare current and historical information
+  - print bus mappings
+    o include networks, controllers, disks, tapes
+
+* As an additional feature access to the libcfgadm should be included.
+
+* Selection of data source (libdevinfo, path_to_inst, /devices)
+
+* Use semantics for devtree implied in the different data sources (pti=historical, etc.)
+
+* Check methods of Solaris::DeviceTree (nodeid was missing)
+  -> implement is_pseudo_node, etc.
+
+* Fix MinorNode::spectype, some return $S_IFCHR, some 'raw'
+  -> all return 'raw', documentation is wrong.
+     This seems to be a bad idea. Return the int all the time.
+
+* Verify that all published interfaces are tested
+
+* Improve devtree bootdevices with more fault detection
+
+* Sanity checks for unifying hashes and arrays
+
+INTERNAL BEAUTYFICATION
+-----------------------
+
+* Solaris::DeviceTree::Node should have a constructor and should be used
+  as a base class for all devicetrees.
+
+* Add major_minor like TCT for splitting devts in major/minor
+
+* Test Taint-Mode (see Test::Tutorial)
+
+* makepkg
+   - integrate makepkg into Makefile.PL
+   - add solperlgcc to makepkg
+   - check if Perl 5.6.1 in Solaris 9 has Test::More
+     -> No, skip tests if Test::More is not available
+
+* Rework foreign function interface
+* Test FFI for Libdevinfo::Impl
+
+COSMETIC
+--------
+
+* Use Perl-mode from vim with tab 4 for source, Changelog
+
+* POD
+   - Better document info merging in Solaris::DevinfoTree::Overlay
+   - More examples to Solaris::DeviceTree
+
+
+DONE
+----
+
+* POD
+  Add CVS header to all files
+
+* POD for Solaris::DeviceTree::Libdevinfo::Impl is missing
+  (see http://search.cpan.org/dist/Solaris-DeviceTree/)
+
+* Put solaris_device into Solaris::DeviceTree
+  -> now in Solaris::DeviceTree::Node
+
+* The methods in ::Util might better be moved to ::Node
+
+* Update and verify Exporter and VERSION interface to Perl 5.6.1 style
+  (see perlmod.1 for example)

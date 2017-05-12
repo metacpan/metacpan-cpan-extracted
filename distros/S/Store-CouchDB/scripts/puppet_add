@@ -1,0 +1,21 @@
+#!/bin/sh
+#
+# script to add a perl module to puppet
+#
+
+MODULE=$1
+
+[[ -z "${MODULE}" ]] && exit 1
+
+PWD=$(pwd)
+MODULE_PATH='modules/perl_modules/files'
+PUPPET_HOME="src/ideegeo/puppet"
+PUPPET_PATH="${PUPPET_HOME}/${MODULE_PATH}"
+MODULE_WO_VERSION=$(echo ${MODULE} | sed 's/[0-9]//g' | sed 's/-\.\.tar.gz/.tgz/')
+mv ${MODULE} "${HOME}/${PUPPET_PATH}/${MODULE_WO_VERSION}"
+cd "${HOME}/${PUPPET_HOME}"
+git add "${MODULE_PATH}/${MODULE_WO_VERSION}"
+git commit -m "auto added module with Dist::Zilla"
+git pull --rebase
+git push
+cd ${PWD}

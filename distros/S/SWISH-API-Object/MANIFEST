@@ -1,0 +1,16 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/SWISH-API-Object.t
+t/01new.t
+t/02json.t
+t/03stemming.t
+t/test.html
+t/json.html
+t/yaml.html
+t/conf
+lib/SWISH/API/Object.pm
+lib/SWISH/API/Object/Results.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

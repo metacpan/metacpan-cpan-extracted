@@ -1,0 +1,47 @@
+% if ($page_count) {
+<table class="standard-table">
+  <thead>
+    <tr>
+      <th><% loc('Title') %></th>
+      <th><% loc('Latest Revision') %></th>
+      <th><% loc('Last Revised') %></th>
+      <th><% loc('Last Revised By') %></th>
+    </tr>
+  </thead>
+%   while ( my ( $page, $revision ) = $pages->next() ) {
+  <tbody>
+    <tr class="<% $pages->index() % 2 ? 'odd' : 'even' %>">
+      <td><a href="<% $page->uri() %>"><% $page->title() %></td>
+      <td>
+        <% $revision->revision_number() %>
+      </td>
+      <td>
+        <% loc( '%datetime(%1)', $c->user()->set_time_zone_for_dt( $revision->creation_datetime() ) ) %>
+      </td>
+      <td>
+        <a href="<% $wiki->uri( view => 'user/' . $revision->user()->user_id() ) %>"
+           ><% $revision->user()->best_name() %></a>
+      </td>
+    </tr>
+  </tbody>
+%   }
+</table>
+% } else {
+<p>
+<% loc( 'There are no pages tagged with "%1" in this wiki.', $tag ) %>
+</p>
+% }
+
+<%args>
+$pages => undef
+$page_count
+$tag
+$wiki
+</%args>
+
+<%method title>
+<% loc( q{Pages Tagged With "%1"}, $tag ) %>
+<%args>
+$tag
+</%args>
+</%method>

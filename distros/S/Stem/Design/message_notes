@@ -1,0 +1,98 @@
+		       Stem Message Design Notes
+
+Stem Messages are how Cells communicate with each other. Messages are
+simple data structures with two major sections: the address and the
+content. The address contains the Cell name the message is directed to and
+which Cell to send replies to. The content has the message type, command
+and data. These sections are described below in further detail.
+
+The Message address section has multiple addresses called types. The two
+supported types correspond to the common email headers and are called
+'to' and 'from'. The 'to' address designates which Cell will get this
+message and the 'from' address says which Cell sent this message. Other
+address types which may be supported are 'reply' (which overrides the
+'from' address for replies) and 'orig' which is the address of the
+original Cell which created this message (useful when messages get
+forwarded).  Each address type contains the standard Stem Cell address
+triplet of Hub/Cell/Target which are called the address parts. The Cell
+name is required and the Hub and Target are optional.
+
+The Message content has information about this message and any data
+being sent to the destination Cell. The primary attribute is 'type'
+which can be set to any string, but common types are 'data', 'cmd',
+'response' and 'status'. Stem modules and Cells can create any Message
+types they want. If the Message is a 'cmd' type, then the 'cmd'
+attribute must be set to the command. A status type Message requires the
+'status' attribute be set and the 'data' or 'response' types has the
+'data' attribute set (though any message type can send data). There is
+also a special flag attribute called 'ack_req' which forces a 'msg_ack'
+type to be sent back to the 'from' address after this message is
+delivered. One important note about the 'data' attribute, it is always a
+reference and never a simple Perl scalar value. You can send a scalar
+value but only by setting the 'data' attribute to its reference.
+
+Messages are constructed with the 'new' method of the Stem::Msg
+class. Any of the message attributes can be specified in that call or
+accessed/modified with the accessor methods. When a Message is completed
+and ready to be sent, the dispatch method is called and the message is
+queued for delivery. For convenience, the Message address types and part
+can be combined into one attribute name in both the constructor and
+accessors. So the Cell the message is directed at can be set with
+'to_cell' and the Hub it came from can be accessed with 'from_hub'. The
+entire address triplet of an address type can be set or accessed just
+with its type name, so the 'to' address is set or accessed with the 'to'
+attribute or method. It takes or returns a hash of the address parts and
+their values.
+
+Messages are delivered only after the current callback is finished
+executing (remember all code in Stem are called as callbacks). Stem
+Message delivery is the heart of Stem operations and is described in
+detail here. Delivery take place in three phases, the first determining
+which Hub the Message is sent to, the second, which Cell in that Hub
+gets it, and the third, which method in that Cell to call for delivery.
+
+If the Message has a 'to_hub' address, then that Hub name is looked up
+in the Portal (which are Cells which connect Hubs together) registry. If
+a Portal is found, the Message is delivered to it to be sent to the
+destination Hub for local delivery. A Message can be forwarded across
+several Hubs before it gets delivered to its destination Cell. If the
+Hub name is the same as the current Hub or there is no Hub name in the
+address, the Message is delivered to a Cell in the current Hub. In the
+special case where there is no Hub name and the Cell name isn't
+registered in the current Hub, the Message is sent to the Portal with an
+alias of DEFAULT. This is just like the default route in IP routing
+tables. If there is a Hub name and the Cell is not found, then there is
+an addressing error and that is logged and the Message is discarded.
+
+Once a Message's destination Hub is reached, it must be delivered to a
+local Cell. The 'to_cell' and 'to_target' attributes are accessed from
+the message and that pair is searched for in this Hub's Cell registry.
+If there is no Target name in the address, it defaults to the null
+string.  If there is a Target and the Cell is not found, the search is
+repeated with no Target name (the Target name will be used by the
+destination Cell). If the Cell still is not found, an addressing error
+will be logged (with the message address) and the Message is discarded.
+
+When the destination Cell of a Message is determined, the method to call
+for delivery must be chosen. The rules for this are simple. If a Message
+is a 'cmd' type, then the method name is made by taking the 'cmd' name
+from that attribute and appending '_cmd' to it. So a 'foo' command
+message will have its type set to 'cmd', the 'cmd' set to 'foo' and it
+will be delivered to the 'foo_cmd' method. If the Message is any other
+type than 'cmd' the method name is created by taking its type name and
+appending '_in' to it. So a 'foo' type Message is delivered to the
+method 'foo_in'. If the delivery method doesn't exist, the default
+method 'msg_in' is used. If no delivery method is found, then an error
+is logged and the Message is discarded.
+
+Command Messages have a useful feature where they can automatically
+generate 'response' messages. When a 'cmd' delivery method is called and
+it returns a defined value, a 'response' type Message is created using
+the 'reply' Message method. This uses the 'reply' or 'from' address in
+'cmd' Message as the 'to' address in the 'response' Message. Its data
+field is set from the data returned from the command delivery
+method. This reduces the work of common command methods to just having
+to return a data value. Many Cells use this technique, e.g.  the
+status_cmd method in a Cell just returns the status text of it. The
+delivery mechanism takes that text and creates and dispatches a
+'response' method with the status text as its 'data' payload.

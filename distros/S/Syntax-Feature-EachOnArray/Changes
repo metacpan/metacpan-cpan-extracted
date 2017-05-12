@@ -1,0 +1,20 @@
+Revision history for Syntax-Feature-EachOnArray
+
+0.04    2013-04-19 (SHARYANTO)
+
+        - Fix failures on 5.8 & 5.10 [RT#84728]
+
+
+0.03    2012-07-28 (SHARYANTO)
+
+        No functional release. Mention Array::Each::Override.
+
+
+0.02    2012-07-27 (SHARYANTO)
+
+        - Rename from feature::* to Syntax::Feature::* (thanks, mst.)
+
+
+0.01    2012-07-27 (SHARYANTO)
+
+        - First release.

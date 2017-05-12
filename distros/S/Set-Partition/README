@@ -1,0 +1,194 @@
+The file is the README for Set::Partition version 0.03
+
+INSTALLATION
+
+perl Makefile.PL
+make
+make test
+make install
+
+TESTING
+
+This module requires the following modules for thorough testing:
+
+    Test::More
+    Test::Pod
+    Test::Pod::Coverage
+
+It can also make use of Devel::Cover if available.
+
+UNINSTALLATION
+
+This is a pure-Perl module. The following one-liner should print
+out the canonical path of the file:
+
+  perl -MSet::Partition -le 'print $INC{"Set/Partition.pm"}'
+
+Just delete this file. There is also the question of the man page.
+Finding that is left as an exercise to the reader.
+
+USAGE
+
+use Set::Partition;
+
+my $s = Set::Partition->new(
+    list      => [1..20],
+    partition => [6, 5, 3, 3, 3],
+);
+
+while (my $p = $s->next) {
+    print join( ' ', map { "(@$_)" } @$p ), $/;
+}
+
+IMPLEMENTATION
+
+The partitioning algorithm works as follows:
+
+A state array maintains the information necessary
+to store which elements belong to which
+partition. Each time a new partition is called for,
+with next(), the state array is perturbed to generate
+a new partition arrangement, until all arrangements
+have been returned.
+
+Consider a list of five elements qw(a e i o u), to
+be partitioned as sets of 2, 1 and 2. The first
+time next() is called, there is no state array.
+The state array is therefore generated, to describe
+the following state of affairs:
+
+The first two elements (a e) are stored in the
+first partition. The second two elements (i o)
+are stored in the second partition. The final
+element (u) is stored in the last partition.
+
+Therefore, the state array looks as follows
+
+  [0 0 1 1 2]
+
+It is then a simple matter of stepping down the
+list of given values, and the state array to
+produce the output:
+  
+  [0 0 1 1 2]
+  [a e i o u]
+
+The following structure is generated:
+
+  [
+    [a e], # 0
+    [i o], # 1
+    [u],   # 2
+  ]
+
+The following call to next() generates a new
+arrangement as follow: the list is scanned from
+right to left, starting at the second rightmost
+element. If it is smaller than the element to
+the right, these elements are swapped.
+
+  [0 0 1 1 2]
+         ^    (swap with the 2 to the right)
+  [0 0 1 2 1]
+
+This gives the following result:
+
+  [0 0 1 2 1]
+  [a e i o u]
+
+  [
+    [a e], # 0
+    [i u], # 1
+    [o],   # 2
+  ]
+
+The next result is achieved as follows:
+
+  [0 0 1 2 1]
+         ^    (2 is greater than 1, no swap)
+  [0 0 1 2 1]
+       ^      (1 is greater than 2, swap)
+  [0 0 2 1 1]
+  [a e i o u]
+
+gives
+
+  [
+    [a e], # 0
+    [o u], # 1
+    [i],   # 2
+  ]
+
+The next arrangement requires more care.
+
+  [0 0 2 1 1]
+         ^
+  [0 0 2 1 1]
+       ^
+  [0 0 2 1 1]
+     ^
+
+At this point, the 0 and 2 need to be swapped, however,
+the difference of 2-0 is greater than 1, so the 0 is
+swapped with the rightmost smallest number larger
+than itself (1):
+
+  [0 0 2 1 1]
+     ^     ^  (swap)
+  [0 1 2 1 0]
+           ^  (swap)
+
+And then the rightmost numbers beyond the first number
+used in the swap are reversed
+
+  [0 1 2 1 0]
+       ^ ^ ^  (reverse)
+  [0 1 0 1 2]
+  [a e i o u]
+
+which gives
+
+  [
+    [a i], # 0
+    [e o], # 1
+    [u],   # 2
+  ]
+
+The process continues in this manner until the final
+arrangement is obtained
+
+  [2 1 1 0 0]
+  [a e i o u]
+
+which gives
+
+  [
+    [o u], # 0
+    [e i], # 1
+    [a],   # 2
+  ]
+
+At this point, no number to the right is larger than
+any number to the left, and the process is complete.
+
+The reset() function simply deletes the state array.
+The subsequent call to next() will initialise it to
+the start arrangement.
+
+STATUS
+
+This module is under active development.
+
+AUTHOR
+
+David Landgren
+
+COPYRIGHT
+
+This module is copyright (C) David Landgren 2006.
+All rights reserved.
+
+LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

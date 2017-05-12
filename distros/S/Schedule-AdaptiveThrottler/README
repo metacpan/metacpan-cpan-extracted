@@ -1,0 +1,61 @@
+Schedule::AdaptiveThrottler
+
+This module is a simple and rather generic throttler that can be used to allow
+or deny anything based on a set threshold of arbitrary criteria.  Although it
+is not very clear, the POD will make more sense when you have a look at it. In
+short, it was designed to prevent DoS attacks on web services and brute-force
+password cracking in web forms, but it can do a lot, lot more.  There is only
+one prerequisite: the storage works with a memcached instance, but could work
+with pretty much any key/value store, provided the get() and set() calls work
+the same way as the memcached modules implement it.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+To test properly you can use a real memcached server. On a Unix box, it can be
+as simple as running:
+    
+    memcached -d
+    MEMCACHED_SERVERS=localhost:11211 make test
+
+But you can also use the built-in mock memcached object, that relies on an
+in-memory DB_File. This is the default 'make test' behaviour.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Schedule::AdaptiveThrottler
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Schedule::AdaptiveThrottler
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Schedule::AdaptiveThrottler
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Schedule::AdaptiveThrottler
+
+    Search CPAN
+        http://search.cpan.org/dist/Schedule::AdaptiveThrottler/
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 David Morel
+Copyright (C) 2010 Booking.com
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

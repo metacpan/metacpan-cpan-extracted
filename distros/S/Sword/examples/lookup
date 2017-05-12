@@ -1,0 +1,19 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Sword;
+
+my $library = Sword::Manager->new;
+
+my $name = shift;
+my $key = join ' ', @ARGV;
+
+my $module = $library->get_module($name);
+if (not $module) {
+    my $modules = join ', ', sort map { $_->name } @{ $library->modules };
+    die "Module $name not found. These modules are available: $modules\n";
+}
+
+$module->set_key($key);
+print $module->render_text, "\n";

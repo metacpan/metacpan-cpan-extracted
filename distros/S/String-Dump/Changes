@@ -1,0 +1,42 @@
+Revision history for Perl module String::Dump
+
+0.09 2013-02-06
+ - Reinstated automatic exporting of functions because this module is primarily
+   used for testing and debugging
+
+0.08 2012-10-24
+ - Added dump_codes()
+ - Removed functions from automatic exports after deprecating in 0.06
+ - Converted this file from YAML to the standard CPAN Changes format
+ - Improved docs
+
+0.07 2012-03-04
+ - Simplify and optimize algorithms
+ - Minor documentation updates
+
+0.06 2012-02-19
+ - Removed dumpstr() and dump_string()
+ - NOTE: Deprecated implicit exporting of functions
+
+0.05 2011-12-27
+ - Added dump_hex(), dump_dec(), dump_oct(), dump_bin(), dump_names() functions
+ - Added dumpstr cammand-line tool
+ - Moved POD tips to String::Dump::Debugging
+ - NOTE: dumpstr() and dump_string() will be removed in the next release
+ - APOLOGY: Sorry for all the recent design changes :P
+
+0.04 2011-12-14
+ - Replaced unknown Unicode names in names mode with '?'
+ - Added parameter validations
+ - Removed dump_string from automatic exports
+
+0.03 2011-12-12
+ - Renamed dump_string() to dumpstr()
+ - Added dump_string() as an alias of dumpstr()
+ - NOTE: Automatic dump_string() exporting will be removed in the next release
+
+0.02 2011-12-12
+ - Improved POD, Build.PL, and INSTALL
+
+0.01 2011-12-10
+ - First release

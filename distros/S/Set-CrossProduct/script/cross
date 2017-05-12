@@ -1,0 +1,74 @@
+#!perl -s
+use vars qw($g);
+
+use Set::CrossProduct;
+
+return unless @ARGV > 1;
+
+$g = " " unless defined $g;
+
+my $sets = [
+	map [ split /\s*,\s*/ ], @ARGV
+	];
+	
+my $iterator =  Set::CrossProduct->new( $sets );
+
+while( my $tuple = $iterator->get )
+	{
+	print join $g, @$tuple;
+	print "\n";
+	}
+	
+
+=encoding UTF-8
+
+=head1 NAME
+
+cross - output the cross product of two or more sets
+
+=head1 SYNOPSIS
+
+	cross [-g gluestring] "item,item,item" "item,item,item" ...
+
+	prompt> cross "a,b,c" "1,2,3"
+	a 1
+	a 2
+	a 3
+	b 1
+	...
+
+	prompt> cross "a,b,c" "1,2,3" "x,y,z"
+	a 1 x
+	a 1 y
+	a 1 z
+	a 2 x
+	...
+
+	# specify your own separator with -g
+	prompt> cross -g="," "a,b,c" "1,2,3"
+	a,1
+	a,2
+
+=head1 SOURCE AVAILABILITY
+
+This is part of the Perl module C<Set::CrossProduct>.
+
+This source is in Github:
+
+	http://github.com/briandfoy/Set-CrossProduct
+
+If, for some reason, I disappear from the world, one of the other
+members of the project can shepherd this module appropriately.
+
+=head1 AUTHOR
+
+brian d foy, C<< <bdfoy@cpan.org> >>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright © 2007-2015, brian d foy <bdfoy@cpan.org>. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

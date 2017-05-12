@@ -1,0 +1,9 @@
+Revision history for Perl extension String::KeyboardDistance.
+
+1.00  Wed Jun 13 16:46:27 EDT 2001
+	- initial release
+
+0.01  Wed Jun 13 11:59:32 2001
+	- original version; created by h2xs 1.20 with options
+		-X -n String::KeyboardDistance
+

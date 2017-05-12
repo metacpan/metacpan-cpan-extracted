@@ -1,0 +1,56 @@
+{
+   "abstract" : "Extract variable names from interpolated strings.",
+   "author" : [
+      "Guillaume Aubert <aubertg@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "String-InterpolatedVariables",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Deep" : "0",
+            "Test::FailWarnings" : "0",
+            "Test::More" : "0.94"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Readonly" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "String::InterpolatedVariables" : {
+         "file" : "lib/String/InterpolatedVariables.pm",
+         "version" : "v1.1.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/guillaumeaubert/String-InterpolatedVariables/issues"
+      },
+      "homepage" : "https://metacpan.org/release/String-InterpolatedVariables",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/guillaumeaubert/String-InterpolatedVariables"
+      }
+   },
+   "version" : "v1.1.0"
+}

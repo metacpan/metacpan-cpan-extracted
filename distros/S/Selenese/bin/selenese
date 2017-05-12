@@ -1,0 +1,248 @@
+#!/usr/bin/perl
+
+# Copyright 2016, Paul Johnson (paul@pjcj.net) http://www.pjcj.net
+
+# This software is free.  It is licensed under the same terms as Perl itself.
+
+use 5.18.2;
+use warnings;
+
+use Data::Dumper;
+use Getopt::Long;
+use HTML::TreeBuilder;
+use Path::Tiny;
+
+my $Indent = 1;
+
+my $Defaults = {
+    debug         => 0,
+    driver        => "PhantomJS",
+    prove_options => "",
+    run           => 1,
+    test_file     => "./test.pl",
+    verbose       => 0,
+};
+
+$Data::Dumper::Indent   = 1;
+$Data::Dumper::Purity   = 1;
+$Data::Dumper::Sortkeys = 1;
+$Data::Dumper::Deparse  = 1;
+
+our $O = {};
+sub get_options {
+    my $o = {};
+    die "Bad option" unless
+        GetOptions($o, qw(
+            conf=s
+            debug!
+            driver=s
+            prove_options=s
+            run!
+            test_file=s
+            verbose!
+        ));
+
+    our $CONF = {};
+    if (my $file = $o->{conf}) {
+        unless (my $ret = do $file) {
+            warn "couldn't parse $file: $@" if $@;
+            warn "couldn't do $file: $!"    unless defined $ret;
+            warn "couldn't run $file"       unless $ret;
+        }
+    }
+    %$O = (%$Defaults, %$CONF, %$o);
+    $O->{begin}->() if $O->{begin};
+    print "Options: ", Dumper $O if $O->{verbose};
+}
+
+sub fh {
+    state $fh;
+    state $fn = $O->{test_file};
+    unless ($fh) {
+        open $fh, ">", $fn or die "Can't open $fn: $!";
+    }
+    $fh
+}
+
+sub write_header {
+    my $o = Data::Dumper->Dump([$O], ["O"]);
+    $o =~ s/^/    /mg;
+    print { fh } <<"EOH";
+#!/usr/bin/perl
+
+use 5.18.2;
+use warnings;
+
+use Selenese;
+use Test::More;
+
+my \$O;
+
+sub main {
+$o
+    my \$s = Selenese->new(
+        \%\$O
+    );
+
+EOH
+}
+
+sub write_footer {
+    print { fh } <<'EOH';
+    $s->run_command("quit");
+
+    done_testing;
+
+    0
+}
+
+main
+EOH
+}
+
+sub write_line {
+    my ($str) = @_;
+    print { fh } (" " x ($Indent * 4)), $str, "\n";
+}
+
+sub tree {
+    my ($file) = @_;
+    my $tree = HTML::TreeBuilder->new;
+    $tree->parse_file($file);
+    $tree
+}
+
+sub commands {
+    my ($file) = @_;
+
+    say "Generating sub-tests from $file" if $O->{verbose};
+    my $tree = tree($file);
+
+    my $tbody = $tree->find("tbody") or return;
+    my @cmds;
+    for my $tr ($tbody->find("tr", "~comment")) {
+        my @cmd = map $_->[0], grep defined, map $_->content, $tr->find("td");
+        push @cmds, \@cmd;
+    }
+
+    @cmds
+}
+
+sub quote_params {
+    my (@params) = @_;
+    join ", ", map "q{$_}", map s/\\/\\\\/gr, @params
+}
+
+my $Cmds = {
+    while => sub {
+        my ($expr) = @_;
+        write_line("while (\$s->run_command(_eval => " .
+                    quote_params($expr) .
+                    ")) {");
+        $Indent++;
+    },
+    endWhile => sub {
+        $Indent--;
+        write_line("}");
+    },
+};
+
+sub write_suite {
+    my ($file) = @_;
+
+    say "Generating tests from $file" if $O->{verbose};
+    my $tree = tree($file);
+
+    my $tbody = $tree->find("tbody") or return;
+    my $base_dir = path($file)->parent;
+
+    my @test_files =
+        map path($base_dir, $_->attr("href"))->realpath->stringify,
+        grep defined,
+        map $_->find("td")->find("a"),
+        $tbody->find("tr");
+
+    for my $test_file (@test_files) {
+        my $test = $test_file =~ s/.*\///r;
+        write_line(qq(subtest "$test" => sub {));
+        $Indent++;
+
+        for my $command (commands($test_file)) {
+            $command = $O->{map}->($test, $command) if $O->{map};
+            next unless $command;
+            my ($cmd, @params) = @$command;
+            my $sub = $Cmds->{$cmd};
+            if ($sub) {
+                $sub->(@params);
+            } else {
+                @params = ("") unless @params;
+                write_line("\$s->run_command($cmd => " .
+                        quote_params(@params) .
+                        ");");
+            }
+        }
+
+        $Indent--;
+        write_line("};\n");
+    }
+}
+
+sub main {
+    get_options;
+
+    write_header;
+    for my $suite (@ARGV) {
+        write_suite($suite);
+    }
+    write_footer;
+
+    system "prove $O->{prove_options} $O->{test_file}" if $O->{run};
+
+    0
+}
+
+main
+
+__END__
+
+=head1 NAME
+
+selenese - Run Selenium IDE tests without the IDE
+
+=head1 SYNOPSIS
+
+ selenese
+
+=head1 DESCRIPTION
+
+Run Selenium IDE tests without the IDE.
+
+=head1 OPTIONS
+
+The following command line options are supported:
+
+ -h -help              - show help
+ -i -info              - show documentation
+ -v -version           - show version
+
+=head1 DETAILS
+
+=head1 EXIT STATUS
+
+The following exit values are returned:
+
+0   All operations were completed successfully.
+
+>0  An error occurred.
+
+=head1 SEE ALSO
+
+=head1 BUGS
+
+=head1 LICENCE
+
+Copyright 2016, Paul Johnson (paul@pjcj.net) http://www.pjcj.net
+
+This software is free.  It is licensed under the same terms as Perl itself.
+
+=cut

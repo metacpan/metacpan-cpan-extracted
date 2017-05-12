@@ -1,0 +1,7 @@
+ChangeLog
+Makefile.PL
+MANIFEST
+lib/Statistics/DEA.pm
+t/00new.t
+t/01single.t
+t/02double.t

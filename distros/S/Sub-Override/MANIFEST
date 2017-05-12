@@ -1,0 +1,11 @@
+Changes
+lib/Sub/Override.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+README.md
+t/override.t
+xt/pod-coverage.t
+xt/pod.t
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,35 @@
+<NZSRSResponse VerMajor="5" VerMinor="0">
+<Response Action="GetMessages" FeId="8" FeSeq="4993802" MoreRowsAvailable="1" OrigRegistrarId="90" RecipientRegistrarId="90" Rows="1">
+<FeTimeStamp Day="7" Hour="09" Minute="45" Month="7" Second="37" TimeZoneOffset="+12:00" Year="2010"/>
+<Message Remaining="5">
+<Response Action="DomainCreate" FeId="8" FeSeq="4861516" OrigRegistrarId="1" RecipientRegistrarId="922" TransId="srsrps-1_476">
+<FeTimeStamp Day="21" Hour="16" Minute="15" Month="7" Second="41" TimeZoneOffset="+12:00" Year="2010"/>
+<Domain Delegate="1" DomainName="eppregistrar2.co.nz" RegistrarId="922" Status="Active" Term="1" UDAI="9GS97hDz">
+<RegistrantContact Name="registrant" Email="a@test.co.nz">
+<PostalAddress Address1="address 1" City="city" CountryCode="NZ"/>
+<Phone AreaCode="34" CountryCode="1" LocalNumber="5678"/>
+</RegistrantContact>
+<AdminContact Name="registrant" Email="a@test.co.nz">
+<PostalAddress Address1="address 1" City="city" CountryCode="NZ"/>
+<Phone AreaCode="34" CountryCode="1" LocalNumber="5678"/>
+</AdminContact>
+<TechnicalContact Name="Default Tech" Email="tech@testregistrar.co.nz">
+<PostalAddress Address1="123 EPP street" City="Testcity" CountryCode="NZ"/>
+<Phone AreaCode="4" CountryCode="64" LocalNumber="123456"/>
+<Fax AreaCode="4" CountryCode="64" LocalNumber="123457"/>
+</TechnicalContact>
+<BilledUntil Day="21" Hour="16" Minute="15" Month="8" Second="41" TimeZoneOffset="+12:00" Year="2010"/>
+<RegisteredDate Day="21" Hour="16" Minute="15" Month="7" Second="41" TimeZoneOffset="+12:00" Year="2010"/>
+<AuditDetails ActionId="srsrps-1_476" RegistrarId="1">
+<AuditTime>
+<From Day="21" Hour="16" Minute="15" Month="7" Second="41" TimeZoneOffset="+12:00" Year="2010"/>
+</AuditTime>
+<AuditText>
+<![CDATA[User Id: manuela]]>
+</AuditText>
+</AuditDetails>
+</Domain>
+</Response>
+</Message>
+</Response>
+</NZSRSResponse>

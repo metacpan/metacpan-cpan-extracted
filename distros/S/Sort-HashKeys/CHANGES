@@ -1,0 +1,114 @@
+==================================================
+Changes from 2016-04-27 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.007 at 2017-04-27 10:05:37 +0000
+------------------------------------------
+
+  Change: 76fb89fa3fc79fed2d4022cd728b8c53b057a339
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-04-27 12:02:45 +0000
+
+    Avoid undefined behavior on odd length arglist
+
+    ST(X) assumes that the argument list is already > X big. XPUSHs will
+    extend the argument list should this prove necessary. 
+
+  Change: bfbf31864b8b0aad889b1a9b0313390ea9e389c6
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-04-27 12:00:26 +0000
+
+    Add benchmark results from using hash slices
+
+    Hash slices were added to benchmark.pl by @ap in #1 
+
+  Change: ab7bb260382ff701534336d80a22a1404e6f9a42
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-04-27 11:13:11 +0000
+
+    Merge pull request #1 from ap/patch-2
+
+    Add more pure-Perl idioms to the benchmark 
+
+  Change: bf9f7746cba64c91001a6b9a714d431d915ae75e
+  Author: Aristotle Pagaltzis <pagaltzis@gmx.de>
+  Date : 2017-03-20 15:02:21 +0000
+
+    Added more pure-Perl idioms to benchmark.pl 
+
+------------------------------------------
+version 0.006 at 2017-03-28 08:23:02 +0000
+------------------------------------------
+
+  Change: dac9490162f69c3d9d456c8173e3cd650a8f8b5d
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-03-28 10:23:02 +0000
+
+    No longer using qsort_r on non-FreeBSD BSDs
+
+    Only macOS and FreeBSD + GNU systems now 
+
+------------------------------------------
+version 0.005 at 2017-03-19 23:51:52 +0000
+------------------------------------------
+
+  Change: 143fdc667236506990122757af9882e7107fcdf0
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-03-20 00:51:52 +0000
+
+    Fixed argument order for glibc 
+
+------------------------------------------
+version 0.004 at 2017-03-19 23:09:20 +0000
+------------------------------------------
+
+  Change: 30993c491617c875e9b9df8de40fca4581a027e1
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-03-20 00:09:20 +0000
+
+    Improved throughbout by using qsort_r on GNU & BSD 
+
+------------------------------------------
+version 0.003 at 2017-03-11 21:29:05 +0000
+------------------------------------------
+
+  Change: 720f07685696aad15071f1cb27dd68df3ed05c14
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-03-11 22:29:05 +0000
+
+    Now operating off the argument stack and UTF-8/use bytes aware 
+
+  Change: 891f3688ad60f766b5f1250384a25f7f7bb6a01a
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-03-11 21:38:35 +0000
+
+    Now retaining size information, which improves performance a bit
+
+    $ perl benchmark.pl
+
+    Rate perl_sort xs_sort perl_sort 1843/s -- -28% xs_sort 2561/s 39% -- 
+
+------------------------------------------
+version 0.002 at 2017-03-11 18:06:42 +0000
+------------------------------------------
+
+  Change: 090f3475b70d2bfe247ec3dfe988ae6bc8f0a0ad
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-03-11 19:06:42 +0000
+
+    Formatting 
+
+------------------------------------------
+version 0.001 at 2017-03-11 17:53:47 +0000
+------------------------------------------
+
+  Change: 5d2553dce9faafcd99c34061b4aae24262455a5e
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-03-11 18:53:47 +0000
+
+    In 
+
+================
+End of releases.
+================

@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         SWF-Builder
+version:      0.16
+version_from: lib/SWF/Builder.pm
+installdirs:  site
+requires:
+    Compress::Zlib:                0
+    SWF::BinStream:                0
+    SWF::Element:                  0.41
+    SWF::File:                     0
+    SWF::Parser:                   0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

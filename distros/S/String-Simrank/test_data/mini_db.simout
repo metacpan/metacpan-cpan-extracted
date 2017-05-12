@@ -1,0 +1,6 @@
+stringM	stringM:100.00	StringW:100.00	stringF:90.00
+StringW	stringM:100.00	StringW:100.00	stringF:84.38
+stringF	stringF:100.00	stringM:90.00	StringW:84.38
+stringA	stringA:100.00	stringA2:100.00	stringC:90.00
+stringA2	stringA:100.00	stringA2:100.00	stringC:90.00
+stringC	stringC:100.00	stringA:90.00	stringA2:90.00

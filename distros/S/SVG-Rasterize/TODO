@@ -1,0 +1,124 @@
+Roadmap
+-------
+The roadmap is in the main docu now. I do not want to maintain a
+redundant version here.
+
+TODO
+----
+The following list contains some things I don't want to
+forget. It mainly contains small stuff and specificly no big feature
+plans.
+
+- fix rendering of grouping elements on intermediate canvas
+- support for relative units -> make special versions of map_length,
+  e.g. map_length_font_size, or...hm...maybe, we can keep
+  map_length, but a reference length has to be provided explicitly,
+  otherwise we keep on complaining about relative units
+- also relative font-sizes (larger, smaller), -weights (bolder,
+  lighter), and -stretches (wider, narrower)
+- merge engine_args
+- allow user to change Regexes: do I really want to do that?
+
+- before_flush_hook
+- before_process_hook?
+- before_engine_hook
+- start reading files
+- css?
+- local die signal handlers in all evals?
+- allow for a full set of default attributes, not only color
+- work carefully through Changes section of SVG spec (maybe wait
+  until it becomes a recommendation)
+- make sure really all attributes used so far are validated with
+  regexes in Specification; it is the goal that each used attribute
+  has to pass a non-trivial regex check at this stage
+  - stroke, fill
+    update: They actually do pass a non-trivial check. I don't know
+    	    what happens if an invalid color name is given
+- spec: check per callback that fixed value has that value
+- docu error messages
+- complete docu of SVG::Rasterize::Cairo, then remove sparseness
+  remark in SVG::Rasterize docu
+- more elaborate DESCRIPTION for SVG::Rasterize::State::Text
+- Cairo docu: Exceptions and Warnings
+- more text attributes
+  - now
+  - soon
+    - sort out if ligatures etc. can be treated without too big
+      effort
+    - text-decoration 
+    - kerning?
+    - letter-spacing
+    - word-spacing?
+    - textLength
+    - lengthAdjust
+    - font?
+  - some time
+    - writing-mode
+    - glyph-orientation-vertical
+    - glyph-orientation-horizontal
+    - sort out new block in
+      SVG::Rasterize::State::Text::_process_node_extra based on
+      glyph orientation
+    - direction
+    - unicode-bidi
+    - dominant-baseline
+    - alignment-baseline
+    - baseline-shift
+    - fontsize-adjust
+
+- overhaul Exceptions
+  - more classes?
+  - more elaborate descriptions?
+- support other output types than png
+- idea: provide a simple GD backend, just as proof of concept for
+  different backends
+- wild idea: provide a plotter backend which could be used e.g. by
+  robot drawing with a pen
+- how can I handle defer in preserveAspectRatio?
+- Can an element have an attribute which a child does not have, but
+  a grandchild is supposed to inherit? Check and fix accordingly.
+- medium_font_size, font_size_scale dependent on font-family, set
+  and get should be transparent.... - what did I mean with this?
+  - I think I was referring to the CSS specification which allows
+  different font size tables for different font families.
+- test all regexes
+- move the non-regex stuff out of t/010_regexes
+- reach 100% in Devel::Cover
+- let in_error somehow leave a mark on the exception object
+  What did I mean with that? Is this fixed?
+- check if the numbers in viewBox should be non-negative
+- wild idea: Create font from my handwriting
+
+done (excerpt, containing what I might look at again)
+-----------------------------------------------------
+- document which DOM functions have to be provided by an input
+  object
+- homogenize interface docu of methods
+- consequent assignments in interface docu of methods with return
+  value
+- property validation with dedicated %PROP_VAL? - not for now
+  -> specific for xsl / css
+  -> apply to whole hash after setting of defaults?
+  -> element specific?
+- clamp color values only at presentation time
+- document all regexes
+- validation possible for those attributes that still have type
+  CDATA? - Some stuff will have to (further) validated in State or
+  Rasterize. However, the engine should get clean stuff.
+- explicit return in all methods
+- Exception::Class classes, which?
+- throw InError class from in_error
+- validate_with with calling in_error
+- replace carps by warns.
+- make information available for in_error
+- consequently use in_error where required
+- remove explicit parameter state to hooks? - No. There might be a
+  situation where one wants to give a different state object to the
+  hook (see in_error_hook)
+- Params::Validate consequently
+- fix or document character limitations in XML regexes
+- ID and NMTOKEN in %ATTR_VAL
+- initial param validation in rasterize: No. This would just throw
+  an exception instead of the standard Perl error message. I cannot
+  avoid the feeling that I would like to avoid any Perl error, but
+  the question is if there is really a good reason for this.

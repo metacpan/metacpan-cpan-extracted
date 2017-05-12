@@ -1,0 +1,62 @@
+Revision history for perl module Statistics-Data
+
+0.10-0.11 2017-01-28
+    - get_hoa_numonly_across: handle case where vars are of unequal lengths (n elements) and within the longest var there is one or more values invalid for numeracy (all that's checked for now) within the indices ranging over the increment in length it has relative to other vars. This threw a "splice overflow" error previously, given that the longest length var's indices were checked first for all vars. Now checks each var for length within this loop. The value of "purged" for this var is also increased for the number of invalid values in this range.
+    - handling a call to access, unload, or all_numeric for data that have not been loaded: does nothing (for unload), or returns undef (from access or all_numeric) -- rather than croaking because internal method _index_by_args() could not work with an undefined index.
+    - 'name' or 'label' only as argument across routines rather than also 'lab'; documentation reflects, hack to handle both implemented.
+    - methods getting reference to loaded array by its index must point to an existing index; otherwise, the first, if any, is taken (in _index_by_args).
+    - removed *_from_file *_to_file and idx_* methods as feature-creep: read-in/save data by own methods.
+    - carp (warn) thrown if, with any load/add, empty string given for "data"
+    - *by_lab removed from method names; still supported as (undocumented) aliases for now.
+
+0.09 2015-13-02
+    - added methods all_pos() and all_counts()
+    - added methods to retrieve data purged of non-numeric (incl. empty) values
+    - changed all_proportions() to return false if any values fail "nocontent" AND "looks_like_number"
+    - copy() now uses Clone.pm to work; re-named clone() - copy() is an alias.
+    - ensure version check in 00-useok.t
+    - added aliases 'save_to_path' and 'load_from_path'
+    - removed legacy aliases 'open', 'list,' etc., except 'read' for now.
+
+0.08 2013-08-07
+    - validity methods expanded: all_full(), all_numeric() and all_proportions() can now be called in list context to return not just a scalar boolean, but the data that they would accept (as "full", numeric and proportions), as an aref, followed by the boolean.
+    - removed '__PACKAGE__' prefix to all (not just some) croaks
+    - misc. POD manual revisions
+
+0.07 2013-08-06
+    - cleanup some code re access()
+    - remove errant print() check statement
+    - attempt solve test issues under cygwin (no hash bangs to perl)
+    - rewrote abstract and synopsis
+
+0.06 2013-08-04
+    - extended check for hash of arefs passed to load/add, from simply checking that $args[1] is aref - _isa_hash_of_arefs() called by _init_data() via add()
+    - clarified _init_data() logics by further subroutining
+    - extended POD manual to better describe accepted data structures for load() and add(), + other misc. POD revisions
+    - misc. "best practice" code revisions, passing all level >= 4 severities via Perl::Critic
+
+0.05 2013-08-03
+    - all_numeric() and all_proportions() now check that all values are defined and have content as per String::Util hascontent()
+    - all_proportions() changed so that it does not accept strings that look like (some) proportions, incl. removing prior custom regex
+
+0.04 2013-08-02
+    - added all_full() method - checking data values are defined and have content as per String::Util hascontent()
+    - added methods ndata(), share(), all_numeric() and all_proportions() (previously documented but not fully implemented)
+    - read() method renamed access() to avoid any builtin fn conflict; 'read' still supported as an alias for the time being
+    - list() method renamed dump_list(); 'list' still supported as an alias for the time being
+    - dump_line() method renamed dump_vals() because it is not always a line; aliased as for legacy support for now
+    - save() method renamed save_to_file(), and open() renamed load_from_file(), for clarity and avoid builtin fn conflict; prior names supported as undocumented aliases for now
+    - args relevant to saving & loading to/from file now to be given only within save_to_file() and load_from_file() - not in new(), as Data::Serializer is now only 'required' within these subroutines, not 'used' from begin
+    - removed freeze() and thaw() methods as feature-creep; maybe 'slurp' or load_from_file() and access() after save_to_file() instead
+    - import() added as alias for share()
+    - misc. POD manual and "best practice" code revisions
+
+0.03 2013-04-13
+    - Handle install issues
+
+0.02 2013-04-01
+    - First www release
+    
+0.01 2009-10-03
+    - First developer version
+

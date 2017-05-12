@@ -1,0 +1,40 @@
+#!/usr/local/bin/perl
+#
+# walk
+#
+# Author: Wayne Marquette - 12/14/96
+#
+# Command line interface for PERL snmp->get funcion
+#
+
+use SNMP::Util;
+$ENV{'MAX_LOG_LEVEL'} = 'status';
+
+if (@ARGV < 1){
+   print "Usage: \n";
+   print "       walk <IP> <community string> <oid_list>\n";
+   print "\n";
+   print "       IP = IP address or Switch name\n";
+   print "       comm = defaults to hostname\n";
+   print "       oid_list = list of oids or names\n";
+   exit;
+}
+
+$IP = $ARGV[0];
+$Comm_string = $ARGV[1];
+#Look for command line arguements
+for ($i = 2; $i <= $#ARGV; $i ++){
+       push @oid_list,$ARGV[$i];
+}
+
+$snmp = new SNMP::Util(-device     => $IP,
+                       -community => $Comm_string);
+
+$snmp->walk(-format => 'ontvef',
+	            -oids => \@oid_list,
+	            -print => 'on',
+		    );
+
+$error = $snmp->error;
+print "error = $error\n";
+

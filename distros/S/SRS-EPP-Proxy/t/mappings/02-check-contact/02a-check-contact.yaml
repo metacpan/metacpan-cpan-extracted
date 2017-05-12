@@ -1,0 +1,58 @@
+# <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+# <epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+#   <command>
+#     <check>
+#       <contact:check xmlns:contact="urn:ietf:params:xml:ns:contact-1.0">
+#         <contact:id>one</contact:id>
+#         <contact:id>foo</contact:id>
+#         <contact:id>bar</contact:id>
+#         <contact:id>deadbeef</contact:id>
+#       </contact:check>
+#     </check>
+#     <clTRID>brause</clTRID>
+#   </command>
+# </epp>
+
+# <NZSRSRequest VerMajor='5' VerMinor='0'>
+#    <HandleDetailsQry>
+#        <HandleIdFilter>one</HandleIdFilter>
+#        <HandleIdFilter>foo</HandleIdFilter>
+#        <HandleIdFilter>bar</HandleIdFilter>
+#        <HandleIdFilter>deadbeef</HandleIdFilter>
+#    </HandleDetailsQry>
+# </NZSRSRequest>
+
+template: check-contact.tt
+
+vars:
+  contact_ids:
+    - one
+    - cafe
+    - babe
+    - deadbeef
+
+input_assertions:
+  class: SRS::EPP::Command::Check::Contact
+  count:
+    - [ '//contact:id', 4, 'Initial EPP: Four contacts to check' ]
+
+SRS:
+  - assertions:
+      count:
+        - [ '//HandleIdFilter', 4, 'SRS: Check that there were 4 HandleIdFilters' ]
+        - [ '/NZSRSRequest/*', 1, 'SRS: Check there is only 1 command' ]
+      match:
+        - [ '//HandleIdFilter[1]', 'one', 'SRS: Check one is the first check' ]
+        - [ '//HandleIdFilter[4]', 'deadbeef', 'SRS: Check deadbeef is the last check' ]
+      match_all:
+      attr_is: []
+
+output_assertions:
+  count:
+   - [ '//contact:cd', '4', 'Four contact containers' ]
+   - [ '//contact:id', 4, 'Check there are 4 ids' ]
+  match:
+   - [ '//contact:cd[1]/contact:id', 'one', 'Check one is first' ]
+  match_all:
+    - [ '//contact:id/@avail', '1', 'EPP: check all contacts are available' ]
+  attr_is:

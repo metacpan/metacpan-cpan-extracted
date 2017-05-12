@@ -1,0 +1,301 @@
+NAME
+    Scalar::Does - like ref() but useful
+
+SYNOPSIS
+      use Scalar::Does qw( -constants );
+  
+      my $object = bless {}, 'Some::Class';
+  
+      does($object, 'Some::Class');   # true
+      does($object, '%{}');           # true
+      does($object, HASH);            # true
+      does($object, ARRAY);           # false
+
+DESCRIPTION
+    It has long been noted that Perl would benefit from a `does()` built-in. A
+    check that `ref($thing) eq 'ARRAY'` doesn't allow you to accept an object
+    that uses overloading to provide an array-like interface.
+
+  Functions
+    `does($scalar, $role)`
+        Checks if a scalar is capable of performing the given role. The
+        following (case-sensitive) roles are predefined:
+
+        *   SCALAR or ${}
+
+            Checks if the scalar can be used as a scalar reference.
+
+            Note: this role does not check whether a scalar is a scalar (which
+            is obviously true) but whether it is a reference to another
+            scalar.
+
+        *   ARRAY or @{}
+
+            Checks if the scalar can be used as an array reference.
+
+        *   HASH or %{}
+
+            Checks if the scalar can be used as a hash reference.
+
+        *   CODE or &{}
+
+            Checks if the scalar can be used as a code reference.
+
+        *   GLOB or *{}
+
+            Checks if the scalar can be used as a glob reference.
+
+        *   REF
+
+            Checks if the scalar can be used as a ref reference (i.e. a
+            reference to another reference).
+
+        *   LVALUE
+
+            Checks if the scalar is a reference to a special lvalue (e.g. the
+            result of `substr` or `splice`).
+
+        *   IO or <>
+
+            Uses IO::Detect to check if the scalar is a filehandle or
+            file-handle-like object.
+
+            (The `<>` check is slightly looser, allowing objects which
+            overload `<>`, though overloading `<>` well can be a little
+            tricky.)
+
+        *   VSTRING
+
+            Checks if the scalar is a vstring reference.
+
+        *   FORMAT
+
+            Checks if the scalar is a format reference.
+
+        *   Regexp or qr
+
+            Checks if the scalar can be used as a quoted regular expression.
+
+        *   bool
+
+            Checks if the scalar can be used as a boolean. (It's pretty rare
+            for this to not be true.)
+
+        *   ""
+
+            Checks if the scalar can be used as a string. (It's pretty rare
+            for this to not be true.)
+
+        *   0+
+
+            Checks if the scalar can be used as a number. (It's pretty rare
+            for this to not be true.)
+
+            Note that this is far looser than `looks_like_number` from
+            Scalar::Util. For example, an unblessed arrayref can be used as a
+            number (it numifies to its reference address); the string "Hello
+            World" can be used as a number (it numifies to 0).
+
+        *   ~~
+
+            Checks if the scalar can be used on the right hand side of a smart
+            match.
+
+        If the given *role* is blessed, and provides a `check` method, then
+        `does` delegates to that.
+
+        Otherwise, if the scalar being tested is blessed, then
+        `$scalar->DOES($role)` is called, and `does` returns true if the
+        method call returned true.
+
+        If the scalar being tested looks like a Perl class name, then
+        `$scalar->DOES($role)` is also called, and the string "0E0" is
+        returned for success, which evaluates to 0 in a numeric context but
+        true in a boolean context.
+
+    `does($role)`
+        Called with a single argument, tests $_. Yes, this works with lexical
+        $_.
+
+          given ($object) {
+             when(does ARRAY)  { ... }
+             when(does HASH)   { ... }
+          }
+
+        Note: in Scalar::Does 0.007 and below the single-argument form of
+        `does` returned a curried coderef. This was changed in Scalar::Does
+        0.008.
+
+    `overloads($scalar, $role)`
+        A function `overloads` (which just checks overloading) is also
+        available.
+
+    `overloads($role)`
+        Called with a single argument, tests $_. Yes, this works with lexical
+        $_.
+
+        Note: in Scalar::Does 0.007 and below the single-argument form of
+        `overloads` returned a curried coderef. This was changed in
+        Scalar::Does 0.008.
+
+    `blessed($scalar)`, `reftype($scalar)`, `looks_like_number($scalar)`
+        For convenience, this module can also re-export these functions from
+        Scalar::Util. `looks_like_number` is generally more useful than
+        `does($scalar, q[0+])`.
+
+    `make_role $name, where { BLOCK }`
+        Returns an anonymous role object which can be used as a parameter to
+        `does`. The block is arbitrary code which should check whether $_[0]
+        does the role.
+
+    `where { BLOCK }`
+        Syntactic sugar for `make_role`. Compatible with the `where` function
+        from Moose::Util::TypeConstraints, so don't worry about conflicts.
+
+  Constants
+    The following constants may be exported for convenience:
+
+    `SCALAR`
+    `ARRAY`
+    `HASH`
+    `CODE`
+    `GLOB`
+    `REF`
+    `LVALUE`
+    `IO`
+    `VSTRING`
+    `FORMAT`
+    `REGEXP`
+    `BOOLEAN`
+    `STRING`
+    `NUMBER`
+    `SMARTMATCH`
+
+  Export
+    By default, only `does` is exported. This module uses Exporter::Tiny, so
+    functions can be renamed:
+
+      use Scalar::Does does => { -as => 'performs_role' };
+
+    Scalar::Does also plays some tricks with namespace::clean to ensure that
+    any functions it exports to your namespace are cleaned up when you're
+    finished with them. This ensures that if you're writing object-oriented
+    code `does` and `overloads` will not be left hanging around as methods of
+    your classes. Moose::Object provides a `does` method, and you should be
+    able to use Scalar::Does without interfering with that.
+
+    You can import the constants (plus `does`) using:
+
+      use Scalar::Does -constants;
+
+    The `make_role` and `where` functions can be exported like this:
+
+      use Scalar::Does -make;
+
+    Or list specific functions/constants that you wish to import:
+
+      use Scalar::Does qw( does ARRAY HASH STRING NUMBER );
+
+  Custom Role Checks
+      use Scalar::Does
+        custom => { -as => 'does_array', -role => 'ARRAY' },
+        custom => { -as => 'does_hash',  -role => 'HASH'  };
+  
+      does_array($thing);
+      does_hash($thing);
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Scalar-Does>.
+
+SEE ALSO
+    Scalar::Util.
+
+    <http://perldoc.perl.org/5.10.0/perltodo.html#A-does()-built-in>.
+
+  Relationship to Moose roles
+    Scalar::Does is not dependent on Moose, and its role-checking is not
+    specific to Moose's idea of roles, but it does work well with Moose roles.
+
+    Moose::Object overrides `DOES`, so Moose objects and Moose roles should
+    "just work" with Scalar::Does.
+
+      {
+        package Transport;
+        use Moose::Role;
+      }
+  
+      {
+        package Train;
+        use Moose;
+        with qw(Transport);
+      }
+  
+      my $thomas = Train->new;
+      does($thomas, 'Train');          # true
+      does($thomas, 'Transport');      # true
+      does($thomas, Transport->meta);  # not yet supported!
+
+    Mouse::Object should be compatible enough to work as well.
+
+    See also: Moose::Role, Moose::Object, UNIVERSAL.
+
+  Relationship to Moose type constraints
+    Moose::Meta::TypeConstraint objects, plus the constants exported by
+    MooseX::Types libraries all provide a `check` method, so again, should
+    "just work" with Scalar::Does. Type constraint strings are not supported
+    however.
+
+      use Moose::Util::TypeConstraints qw(find_type_constraint);
+      use MooseX::Types qw(Int);
+      use Scalar::Does qw(does);
+  
+      my $int = find_type_constraint("Int");
+  
+      does( "123", $int );     # true
+      does( "123", Int );      # true
+      does( "123", "Int" );    # false
+
+    Mouse::Meta::TypeConstraints and MouseX::Types should be compatible enough
+    to work as well.
+
+    See also: Moose::Meta::TypeConstraint, Moose::Util::TypeConstraints,
+    MooseX::Types, Scalar::Does::MooseTypes.
+
+  Relationship to Type::Tiny type constraints
+    Types built with Type::Tiny and Type::Library can be used exactly as Moose
+    type constraint objects above.
+
+      use Types::Standard qw(Int);
+      use Scalar::Does qw(does);
+  
+      does(123, Int);   # true
+
+    In fact, Type::Tiny and related libraries are used extensively in the
+    internals of Scalar::Does 0.200+.
+
+    See also: Type::Tiny, Types::Standard.
+
+  Relationship to Role::Tiny and Moo roles
+    Roles using Role::Tiny 1.002000 and above provide a `DOES` method, so
+    should work with Scalar::Does just like Moose roles. Prior to that
+    release, Role::Tiny did not provide `DOES`.
+
+    Moo's role system is based on Role::Tiny.
+
+    See also: Role::Tiny, Moo::Role.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012-2014, 2017 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

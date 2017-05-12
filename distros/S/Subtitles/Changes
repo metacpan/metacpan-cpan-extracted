@@ -1,0 +1,27 @@
+Revision history for Perl extension Subtitles.
+
+0.01  Thu May 20 19:30:15 2004
+	- original version; created by h2xs 1.22 with options
+		-X Subtitles
+
+0.02  
+	- More correct parsing of .smi subs
+	- fix time_parse
+	- fix corner cases of split
+
+0.03
+	- fix smi timing
+	- s/sub/mdvd/
+	- fix time2(s)hms
+
+1.01
+	- many small changes
+
+1.02	Dec 3 2008
+	- recognize dot in srt codec
+
+1.03    Apr 1 2010
+	- read u16 text
+
+1.04    Feb 15 2010
+	- read utf8 text

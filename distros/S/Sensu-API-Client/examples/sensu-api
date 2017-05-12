@@ -1,0 +1,95 @@
+#!/usr/bin/env perl
+
+use 5.010;
+use strict;
+use warnings;
+
+use JSON;
+use Try::Tiny;
+use Getopt::Long;
+use Sensu::API::Client;
+
+my %opts = (
+    url => $ENV{SENSU_API_URL},
+    cmd => 'list',
+);
+
+GetOptions(
+    'url=s'     => \$opts{url},
+    'path=s'    => \$opts{path},
+    'content=s' => \$opts{content},
+) or die "Error in command line arguments\n";
+die "URL is required\n" unless $opts{url};
+
+$opts{cmd} = shift @ARGV if @ARGV;
+
+my %dispatch = (
+    list            => \&cmd_list,
+    'create-stash'  => \&cmd_create_stash,
+    'delete-stash'  => \&cmd_delete_stash,
+    events          => \&cmd_list_events,
+    resolve         => \&cmd_delete_event,
+    clients         => \&cmd_list_clients,
+);
+
+my $sub = $dispatch{$opts{cmd}};
+die "Uknown command '$opts{cmd}'\n" unless $sub;
+
+print_result($sub->(\%opts));
+
+exit 0;
+
+sub cmd_list_clients {
+    api()->clients;
+}
+
+sub cmd_list_events {
+    api()->events;
+}
+
+sub cmd_delete_event {
+    api()->resolve(@ARGV);
+}
+
+sub cmd_list {
+    my $opts = shift;
+    if ($opts{path}) {
+        try   { api()->stash($opts{path}); }
+        catch { die clean_exception($_) };
+    } else {
+        api()->stashes;
+    }
+}
+
+sub cmd_create_stash {
+    my $opts = shift;
+    require JSON;
+    die "Path and content required\n" unless ($opts{path} and $opts{content});
+    my $decoded;
+    try {
+        $decoded = JSON::decode_json($opts{content});
+    } catch {
+        die 'Invalid JSON content: ' . clean_exception($_);
+    };
+    api()->create_stash(
+        path    => $opts{path},
+        expire  => $opts{expire},
+        content => $decoded,
+    );
+}
+
+sub cmd_delete_stash {
+    my $opts = shift;
+    die "Path required\n" unless $opts{path};
+    api()->delete_stash($opts{path});
+}
+
+sub api { Sensu::API::Client->new(url => $opts{url}) }
+
+sub print_result { say JSON->new->utf8->pretty(1)->encode(shift) }
+
+sub clean_exception {
+    my $e = shift;
+    $e =~ s/([^,]) at .* line \d+\./$1/;
+    return $e;
+}

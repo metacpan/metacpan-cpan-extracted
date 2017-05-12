@@ -1,0 +1,32 @@
+#!/usr/bin/perl
+
+my $cmd = shift;
+$cmd =~ s#^./##;
+$cmd =~ s/.pm$//;
+
+my $mod = "SVK::Command::$cmd";
+eval "require $mod";
+use Data::Dumper;
+my %options = "SVK::Command::$cmd"->options();
+
+$out =  "=head1 OPTIONS\n\n";
+foreach my $key (keys %options) {
+
+$key =~ s/^/-/;
+$key =~ s/\|([\w-]+)/ [--$1]/g;
+
+$key =~ s/=[si]/ arg/g;
+
+$out .= "  $key:\tNeeds description\n";
+
+}
+
+$out .= "\n";
+
+
+`perl -pi.bak -e"s/=head1 AUTHOR/$out=head1 AUTHOR/gism" "$cmd.pm"`;
+
+print $out;
+
+
+

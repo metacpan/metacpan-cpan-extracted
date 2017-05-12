@@ -1,0 +1,16 @@
+Changes
+Current.xs
+lib/Sub/Current.pm
+Makefile.PL
+MANIFEST
+META.yml
+t/01basic.t
+t/02specialblocks.t
+t/03autoload.t
+t/04maincv.t
+t/05proto.t
+t/06eval.t
+t/07recurse.t
+t/08anon.t
+t/50pod.t
+META.json                                Module JSON meta-data (added by MakeMaker)

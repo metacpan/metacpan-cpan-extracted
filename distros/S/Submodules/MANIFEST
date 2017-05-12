@@ -1,0 +1,25 @@
+Changes
+lib/Submodules.pm
+lib/Submodules/Result.pm
+t/fakelib/Some.pm
+t/fakelib/Some/Modules.pm
+t/fakelib/Some/More.pm
+t/fakelib/Some/Xtras.pm
+t/fakelib/Some/Modules/Functions.pm
+t/fakelib/Some/Modules/Methods.pm
+t/fakelib2/Some.pm
+t/fakelib2/Some/Modules.pm
+t/fakelib2/Some/More.pm
+t/fakelib2/Some/Xtras.pm
+t/fakelib2/Some/Modules/Functions.pm
+t/fakelib2/Some/Modules/Methods.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-run.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,11 @@
+MANIFEST
+Makefile.PL
+README
+doc/index.html
+examples/downgrade.pl
+examples/functional.pl
+lib/String/Equivalence/Amharic.pm
+t/01downgrade.t
+t/02inflate.t
+
+META.yml                                 Module meta-data (added by MakeMaker)

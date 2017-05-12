@@ -1,0 +1,12 @@
+Revision history for SNMP-ToolBox
+
+0.03    2012.11.14
+        [BUGFIX] CPAN-RT #72315: Avoid a warning in _by_oid_classical (Elizabeth Cholet).
+        [BUGFIX] CPAN-RT #72015: Last OID not returned by find_next_oid() (Pascal Beringuie).
+
+0.02    2011.08.12
+        [BUGFIX] Avoid a warning in find_next_oid().
+
+0.01    2011.08.11
+        First version.
+

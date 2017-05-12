@@ -1,0 +1,21 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01_load.t
+t/02_basic.t
+t/03_transport.t
+t/04_content.t
+t/05_messaging.t
+t/99_pod.t
+lib/Spread/Messaging.pm
+lib/Spread/Messaging/Content.pm
+lib/Spread/Messaging/Transport.pm
+lib/Spread/Messaging/Exception.pm
+examples/example1.pl
+examples/example2.pl
+examples/example3.pl
+examples/example4.pl
+examples/example5.pl
+examples/example6.pl
+META.yml                                 Module meta-data (added by MakeMaker)

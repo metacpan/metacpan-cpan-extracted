@@ -1,0 +1,45 @@
+==================================================
+Changes from 2013-07-21 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.010 at 2014-07-21 16:58:13 +0000
+------------------------------------------
+
+  Change: adb901faef7e2c248cf40eed6b33b812af80e955
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2014-07-21 09:58:04 +0000
+
+    Bump Version 
+
+  Change: 4387bfc1fcfbbe4cfae2adb4b6ce321d8f7dc45f
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2014-07-18 18:05:23 +0000
+
+    Merge pull request #7 from throughnothing/sighandler
+
+    Handle kill signals gracefully 
+
+  Change: d37f60e06664588c020d88a545ab6deac559ad67
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2014-07-18 18:01:35 +0000
+
+    Handle kill signals gracefully 
+
+  Change: 78d2ea684ae15a964e0a400c4d97e761b179331b
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2014-07-18 17:40:41 +0000
+
+    Merge pull request #6 from throughnothing/logger
+
+    Add injectable logging 
+
+  Change: 345f733a845dec76f5a7c8274c446e9e53139cf4
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2014-07-18 14:22:59 +0000
+
+    Add injectable logging 
+
+=================================================
+Plus 10 releases after 2013-07-21 00:00:00 +0000.
+=================================================

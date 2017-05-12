@@ -1,0 +1,57 @@
+---
+abstract: 'This is a perl module helping to create slack bot with Real Time Messaging(RTM) API.'
+author:
+  - 'Shunsuke Maeda'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.143240'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Slack-RTM-Bot
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Slack::RTM::Bot:
+    file: lib/Slack/RTM/Bot.pm
+    version: '1.04'
+  Slack::RTM::Bot::Client:
+    file: lib/Slack/RTM/Bot/Client.pm
+  Slack::RTM::Bot::Information:
+    file: lib/Slack/RTM/Bot/Information.pm
+  Slack::RTM::Bot::Response:
+    file: lib/Slack/RTM/Bot/Response.pm
+requires:
+  Data::Dumper: '0'
+  Encode: '0'
+  HTTP::Request::Common: '0'
+  IO::Socket::SSL: '0'
+  JSON: '0'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '0'
+  Protocol::WebSocket::Client: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/duck8823/Slack-RTM-Bot/issues
+  homepage: https://github.com/duck8823/Slack-RTM-Bot
+  repository: git://github.com/duck8823/Slack-RTM-Bot.git
+version: '1.04'
+x_contributors:
+  - 'shmaeda <shmaeda@nig.ac.jp>'
+  - 'makamaka <makamaka.donzoko@gmail.com>'
+  - 'Paulo Bu <pbu_98@yahoo.com>'
+  - 'Shunsuke Maeda <duck8823@gmail.com>'
+x_static_install: 1

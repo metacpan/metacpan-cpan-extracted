@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding='Windows-1251'?>
+<!DOCTYPE hrc PUBLIC "-//Cail Lomecb//DTD Colorer HRC take5//EN"
+  "http://colorer.sf.net/2003/hrc.dtd">
+<hrc version="take5" xmlns="http://colorer.sf.net/2003/hrc"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://colorer.sf.net/2003/hrc http://colorer.sf.net/2003/hrc.xsd">
+
+  <type name="makefile">
+    <annotation><documentation>
+     Make Files Syntax
+    </documentation><contributors><![CDATA[
+     Vincent GUIGNOT <vguignot@ingenico.fr>
+     Timur Safin <timur@lanit.ru> CBuilder project stuff
+     Eugene Efremov <4mirror@mail.ru>
+    ]]></contributors>
+    <appinfo>
+     <prototype name="makefile" group="scripts" description="makefile">
+       <location link="scripts/makefile.hrc"/>
+       <filename>/(makefile | tools\.ini) | \.(mak|ds(p|w)|bp(k|r|g)$)/ix</filename>
+       <firstline>/Microsoft Developer Studio Project File/i</firstline>
+       <firstline>/^\!if/i</firstline>
+       <firstline>/makefile/s</firstline>
+     </prototype>
+     <require/> <!-- no module required -->
+    </appinfo>
+    </annotation>
+
+      <import type="def"/>
+      <import type="config"/>
+
+      <region name="RuleOutline" parent="def:Outlined"/>
+      <region name="IncludeOutline" parent="def:Outlined"/>
+
+      <region name="MakVars" parent="def:Var"/>
+      <region name="MakParams" parent="def:KeywordStrong"/>
+      <region name="MakRule" parent="def:Parameter"/>
+      <region name="MakGoal" parent="def:Label"/>
+      <region name="MakVarValue" parent="def:VarStrong"/>
+      <region name="MakVarName" parent="def:Var"/>
+
+      <scheme name="MakVars">
+         <regexp match="/(\$\l?\()([\@&lt;\*\^\?]?[\w\*\.\=\:]+)(\))/"
+          region0="StringEdge" region1="PairStart"
+          region2="MakVars" region3="PairEnd"
+         />
+         <regexp match="/\$[\@\%&lt;\?\^\+\*]/" region0="StringEdge"/>
+      </scheme>
+
+      <scheme name="MakString">
+         <inherit scheme="MakVars"/>
+      </scheme>
+
+      <scheme name="MakCommon">
+<!-- Linear Comments -->
+<!-- regexp match="/^(\#.*$)/"  region0="Comments" -->
+         <block start="/(\^?~1)\#/" end="/$/" scheme="Comment" region="Comment"/>
+         <regexp match="/\/\/.*$/" region0="Comment"/>
+<!-- Strings -->
+         <block start="/\'/" end="/\'/" scheme="MakString" region="String"/>
+         <block start="/\&#34;/" end="/\&#34;/" scheme="MakString" region="String"/>
+<!--Block start="/\%/" end="/\%/" scheme="MakString" region0="String"-->
+         <regexp match="/\\$/" region0="def:StringContent"/>
+<!-- Numbers -->
+         <regexp match="/\b0[xX][\da-fA-F]+\b/" region0="Number"/>
+         <regexp match="/\b[0-9]+\b/" region0="Number"/>
+<!-- Variables -->
+         <inherit scheme="MakVars"/>
+<!-- ECHOed Strings -->
+<!--regexp match="/(append\s+)(\S*)(.*$)/" region1="Keywords" region2="Default" region3="Strings"-->
+         <block start="/(echo)\M[\s\W]/" end="/$/" scheme="MakString" region="String" region00="Keyword"/>
+         <keywords region="Symbol">
+            <symb name=";"/>
+            <symb name="="/>
+            <symb name="+"/>
+            <symb name="-"/>
+            <symb name="/"/>
+            <symb name="*"/>
+            <symb name="&amp;"/>
+            <symb name="|"/>
+            <symb name="^"/>
+            <symb name="("/>
+            <symb name=")"/>
+            <symb name="["/>
+            <symb name="]"/>
+            <symb name=","/>
+            <symb name="."/>
+            <symb name=":"/>
+            <symb name="!"/>
+            <symb name="~"/>
+            <symb name="&lt;"/>
+            <symb name="&gt;"/>
+            <symb name="%"/>
+            <symb name="{"/>
+            <symb name="}"/>
+            <symb name="?"/>
+            <symb name="@"/>
+         </keywords>
+      </scheme>
+
+      <scheme name="MakInlineFiles">
+<!-- nmake version -->
+         <block start="/.\m(&lt;&lt;)/" end="/^(&lt;&lt;)((NO)?KEEP)?/" region="Insertion" region01="Directive" region11="Directive" region12="Keyword" region00="PairStart" region10="PairEnd" scheme="MakEx"/>
+<!-- borland make -->
+         <block start="/(&amp;&amp;)([^\s\#\\])/" end="/^(\y2)/" region="Insertion" region01="Directive" region02="Directive" region11="Directive" region00="PairStart" region10="PairEnd" scheme="MakEx"/>
+      </scheme>
+
+      <scheme name="MakIf">
+         <inherit scheme="MakCommon"/>
+         <regexp match="/\b (ERROR) (.*)/ix" region0="Keyword" region2="String"/>
+         <regexp match="/\b (MESSAGE) (.*)/ix" region0="Keyword" region2="String"/>
+         <block start="/\b (exist) \s* (\()?=/x" end="/(\))?#1 | $/x" region="String" region01="Keyword" scheme="MakString"/>
+         <block start="/&lt;/" end="/\&gt;/" scheme="MakString" region="String" region00="PairStart" region10="PairEnd"/>
+         <keywords ignorecase="yes" region="Keyword">
+            <word name="CMDSWITCHES"/>
+            <word name="define"/>
+            <word name="defined"/>
+            <word name="else"/>
+            <word name="elseif"/>
+            <word name="endif"/>
+            <word name="exist"/>
+            <word name="if"/>
+            <word name="ifdef"/>
+            <word name="ifeq"/>
+            <word name="ifndef"/>
+            <word name="ifneq"/>
+            <word name="include"/>
+            <word name="pragma"/>
+            <word name="undef"/>
+         </keywords>
+      </scheme>
+
+      <scheme name="MakRule">
+         <inherit scheme="MakInlineFiles"/>
+         <block start="/^\M(?{RuleOutline}[^\s\#][^\=\:]+)\:/" end="/(::?)/"
+          scheme="MakGoal" region="MakGoal"
+         />
+         <inherit scheme="MakCommon"/>
+      </scheme>
+
+      <scheme name="MakGoal">
+         <inherit scheme="MakCommon"/>
+      </scheme>
+
+      <scheme name="makefile">
+         <block start="/^((\!\s*ifdef) IDEOPTIONS)/" end="/^(\!endif)/"
+          scheme="config" region="String"
+          region01="MakParams" region02="Keyword" region11="Keyword"
+          region00="PairStart" region10="PairEnd"
+         />
+         <block start="/^(\!)/" end="/$/"
+          scheme="MakIf" region="MakParams" region01="Keyword"
+         />
+         <regexp match="/^\Minclude \s+ (?{IncludeOutline}.+)$/x"/>
+
+         <keywords region="Keyword">
+            <word name="include"/>
+            <word name="%append"/>
+            <word name="%create"/>
+            <word name="%null"/>
+            <word name="%quit"/>
+            <word name="%stop"/>
+            <word name="%write"/>
+            <word name=".AFTER"/>
+            <word name=".AUTODEPEND"/>
+            <word name=".BEFORE"/>
+            <word name=".BLOCK"/>
+            <word name=".CONTINUE"/>
+            <word name=".DEFAULT"/>
+            <word name=".ERASE"/>
+            <word name=".ERROR"/>
+            <word name=".EXTENSIONS"/>
+            <word name=".HOLD"/>
+            <word name=".IGNORE"/>
+            <word name=".NOCHECK"/>
+            <word name=".OPTIMIZE"/>
+            <word name=".PATH"/>
+            <word name=".PRECIOUS"/>
+            <word name=".SILENT"/>
+            <word name=".SILENT"/>
+            <word name=".SUFFIXES"/>
+            <word name=".SYMBOLIC"/>
+            <word name="FAMILY"/>
+            <word name="INC_VERSION"/>
+            <word name="LANGUAGE"/>
+            <word name="loaddll"/>
+            <word name="VERSION"/>
+         </keywords>
+         <block start="/(\w+)\s*(\=)\s*/" end="/\\?~1$/"
+          scheme="MakCommon" region="MakVarValue"
+          region01="MakVarName" region02="def:SymbolStrong"
+         />
+
+         <block start="/^\M\S/" end="/(^ | [^\\]?#1) $/x"
+          scheme="MakRule" region="MakRule"/>
+         <block start="/^\M(\s+|\t)/" end="/$/"
+          scheme="MakEx" region="MakParams"
+         />
+         <regexp match="/^(\x20{2})+/" region='Error'/>
+      </scheme>
+
+      <scheme name="MakEx">
+         <inherit scheme="MakInlineFiles"/>
+         <inherit scheme="MakCommon"/>
+      </scheme>
+
+   </type>
+</hrc>
+<!-- ***** BEGIN LICENSE BLOCK *****
+   - Version: MPL 1.1/GPL 2.0/LGPL 2.1
+   -
+   - The contents of this file are subject to the Mozilla Public License Version
+   - 1.1 (the "License"); you may not use this file except in compliance with
+   - the License. You may obtain a copy of the License at
+   - http://www.mozilla.org/MPL/
+   -
+   - Software distributed under the License is distributed on an "AS IS" basis,
+   - WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+   - for the specific language governing rights and limitations under the
+   - License.
+   -
+   - The Original Code is the Colorer Library.
+   -
+   - The Initial Developer of the Original Code is
+   - Cail Lomecb <cail@nm.ru>.
+   - Portions created by the Initial Developer are Copyright (C) 1999-2003
+   - the Initial Developer. All Rights Reserved.
+   -
+   - Contributor(s):
+   -  Eugene Efremov <4mirror@mail.ru>
+   -  Timur Safin <timur@lanit.ru>
+   -  Vincent GUIGNOT <vguignot@ingenico.fr>
+   -
+   - Alternatively, the contents of this file may be used under the terms of
+   - either the GNU General Public License Version 2 or later (the "GPL"), or
+   - the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
+   - in which case the provisions of the GPL or the LGPL are applicable instead
+   - of those above. If you wish to allow use of your version of this file only
+   - under the terms of either the GPL or the LGPL, and not to allow others to
+   - use your version of this file under the terms of the MPL, indicate your
+   - decision by deleting the provisions above and replace them with the notice
+   - and other provisions required by the LGPL or the GPL. If you do not delete
+   - the provisions above, a recipient may use your version of this file under
+   - the terms of any one of the MPL, the GPL or the LGPL.
+   -
+   - ***** END LICENSE BLOCK ***** -->

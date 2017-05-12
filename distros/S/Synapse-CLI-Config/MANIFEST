@@ -1,0 +1,15 @@
+Changes
+lib/Synapse/CLI/Config.pm
+lib/Synapse/CLI/Config/Object.pm
+lib/Synapse/CLI/Config/Type.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-base.t
+t/01-type.t
+t/02-object.t
+t/data/CLI-Config-Object/test2.conf
+t/data/CLI-Config-Object/test3.conf
+t/data/Synapse-CLI-Config-Object/test2.conf
+t/data/Synapse-CLI-Config-Object/test3.conf
+META.yml                                 Module meta-data (added by MakeMaker)

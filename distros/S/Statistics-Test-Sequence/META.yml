@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Statistics-Test-Sequence
+version:             0.01
+abstract:            Sequence correlation test for random numbers
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
+    Math::BigFloat:                0
+    Memoize:                       0
+    Params::Util:                  0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Steffen Mueller <smueller@cpan.org>

@@ -1,0 +1,21 @@
+Revision history for Signal-Unsafe
+
+0.006     2014-08-28 14:51:59+02:00 Europe/Amsterdam
+          Export sigaction optionally
+
+0.005     2014-08-25 13:55:49+03:00 Europe/Sofia
+          Check for ROK-ness
+
+0.004     2014-08-24 11:44:15+03:00 Europe/Sofia
+          Fix compile issue on < 5.16
+
+0.003     2014-08-22 15:34:17+03:00 Europe/Sofia
+          Fix leak when removing handler
+          Generate correct mask on perl < 5.16
+          Disable fd entry on OpenBSD
+
+0.002     2014-08-20 00:26:52+02:00 Europe/Amsterdam
+          Fix various portability issues
+
+0.001     2014-08-16 14:17:36+02:00 Europe/Amsterdam
+          - Initial release

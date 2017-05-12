@@ -1,0 +1,49 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Socialtext::EditPage;
+use Socialtext::Resting::Getopt qw/get_rester rester_usage/;
+use Getopt::Long;
+
+my %opts = ( rester => get_rester() );
+my %edit_opts = (tags => []);
+GetOptions(
+    'pull-includes'=> \$opts{pull_includes},
+    'latest-tag=s' => \$opts{latest_tag},
+    'o|output=s'   => \$edit_opts{output},
+    'template=s'   => \$edit_opts{template},
+    'tag=s@'       => \$edit_opts{tags},
+) or usage();
+
+my $page = shift;
+my $edit = Socialtext::EditPage->new(%opts);
+if ($page) {
+    $edit->edit_page( page => $page, %edit_opts );
+}
+elsif ($opts{latest_tag}) {
+    $edit->edit_last_page( tag => $opts{latest_tag}, %edit_opts );
+}
+else {
+    usage();
+}
+
+exit;
+
+
+sub usage {
+    my $rester_usage = rester_usage();
+    die <<EOT;
+$0 page_name
+
+Wikedit options:
+ --pull-includes Inline content from {include} wafls in the 
+                 page and then extraclude it when saving
+ --latest-tag    Opens the newest page tagged with <tag>
+ --template=foo  Uses content from page 'foo' as a template
+                 for new pages.
+
+$rester_usage
+EOT
+}
+
+

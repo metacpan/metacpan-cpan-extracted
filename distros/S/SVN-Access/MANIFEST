@@ -1,0 +1,12 @@
+examples/svnaclmgr.pl
+bin/.exists
+Makefile.PL
+MANIFEST
+lib/SVN/Access/Group.pm
+lib/SVN/Access/Resource.pm
+lib/SVN/Access.pm
+t/SVN-Access.t
+Changes
+README
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

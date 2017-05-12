@@ -1,0 +1,33 @@
+SYNOPSIS
+
+     use SQL::AlterTable::SQLite qw(gen_sql_alter_table);
+    
+     my $sql_stmts = gen_sql_alter_table(
+         dbh            => $dbh,
+         table          => 't',
+         delete_columns => ['b'],
+         modify_columns => ['a', 'INT NOT NULL'],
+         rename_columns => ['a', 'a2'],
+         add_columns    => ['c', 'TEXT'],
+         rename_table   => 't2',
+     );
+
+    The result:
+
+     [
+         'CREATE TABLE "_t_tmp" ("a2" INT NOT NULL)',
+         'INSERT INTO "_t_tmp" ("a2") SELECT "a" FROM "t"',
+         'DROP TABLE "t"',
+         'ALTER TABLE "_t_tmp" RENAME TO "t2"',
+         'ALTER TABLE "t2" ADD COLUMN "c" TEXT',
+     ]
+
+DESCRIPTION
+
+SEE ALSO
+
+      * SQL::Schema::Versioned
+
+      You can feed the result of gen_sql_alter_table() to
+      SQL::Schema::Versioned's create_or_update_db_schema.
+

@@ -1,0 +1,72 @@
+Revision history for Perl extension SAS::Parser.
+
+0.85  Thu Jun 6 10:06:47 1999
+   - original version
+
+0.86  10 Jun 1999 10:16:56
+   - added eof(), includes() methods; parse_include() now returns the 
+     resolved name of the included file.
+   - added an output() method as the way to change output processing.
+   - added doincludes option to control whether %include files are
+     processed.
+
+0.87  14 Jun 1999 13:47:11
+   - Added Header.pm and sashead script
+   - defined various useful parse_type() methods as NOOPs, so they may
+     be overridden in sub classes.
+
+0.88  16 Jun 1999 12:10:12
+   - Revised box() in Header.pm to allow frame characters and indent
+     to be controlled.
+   - Fixed some patterns in Parser.pm which were not case-insensitive.
+   - Find and store names of IML modules in Parser.pm.
+   - Re-wrote _protect_semi to fix bug parsing ';' inside of quoted strings.
+   - Added get_doc() method to Header.pm.
+   - Modified the list accessors: procs(), macros(), macdefs(), datasets()
+     and includes() to return a blank-separated string if called in a
+     scalar context, to avoid the need to use join(' ', @list) all the time.
+   - Put the sample scripts in a bin/ directory.
+   - Added a simple rebox() to Header.pm
+
+0.89  18 Jun 1999 14:17:53
+   - Header.pm: Added parse_mdef(), macdescribe() and margs() to parse the
+     argument list to a macro, and create a descriptive comment.
+   - Fixed lots of small buglets.
+
+0.90  20 Jun 1999 13:22:15
+   - Header.pm: fixed bugs in macdescribe()
+
+0.91  22 Jun 1999 10:41:47
+   - Header.pm: Re-wrote macdescribe() to generalize the format of a macro
+     description.
+   - Now provide styles 'plain' and 'pod'.  sashead accepts a -style=
+     argument.
+   - Parser.pm: fixed small problem with %eval and %str being seen as
+     macro calls.
+   - Fixed problem with embedded %do ... %end inside a statement.  Now
+     swallow all in current statement.
+   - Fixed problem with label: not being recognized.
+
+0.92  12 Jul 1999 09:10:23
+   - Makefile.PL: check for Text:Balanced.pm during installation.
+  - Header.pm: Generalized makeheader() to allow the keys and their
+     order to be set from a caller.
+   - Added 'html' style for macro descriptions.
+   - Fixed nesting problem in output with several macros in one file.
+   - Parser.pm: Added parse_module() NOOP stub for IML modules.
+   - Fixed problem with 'cards = 4;' being treated as 'cards;'
+   - Generalized handling of \n and path separator characters for
+     various operating systems.  Should now work on other than Unix,
+     but untested.
+
+0.93  8 March 2006
+   - Added SAS::Index.pm, bin/sasindx
+   - Revised documentation and Makefile.PL for public release to CPAN
+
+
+
+
+
+
+
+

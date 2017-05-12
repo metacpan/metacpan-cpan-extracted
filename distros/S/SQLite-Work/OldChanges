@@ -1,0 +1,318 @@
+Revision history for SQLite-Work
+================================
+
+0.1002 Sun 30 November 2008
+---------------------------
+
+  * (2008-11-30) * fixes to Build.PL
+  * (2008-11-30) * corrected call to perl in test
+  * (2008-11-30) *Meta.yml is generated, so should not be under revision control.
+  * (2007-12-17) Make svk ignore generated files.
+  * (2007-12-16) revamped depot
+
+0.1001 Tue 26 June 2007
+-----------------------
+
+  * (26 Jun 2007) fix makefile
+  	Fixed bug with Makefile.PL by changing Build.PL options.
+
+0.10 Thu 21 June 2007
+---------------------
+
+  * (21 Jun 2007) force_show_cols
+  	New option, force_show_cols, which overrides the default setting
+  that if a column has appeared in a header, it won't appear in a row.
+  This can be useful if one has a header which is just the first letter
+  of a column value, and one still wants the full column value later.
+
+  * (29 Sep 2006) bug fixes
+  - the SQLite::Work::Mail module had the wrong usage for the templating
+  - the edit.cgi and show.cgi examples had error in the InitArgs.
+
+0.09 Sat 09 September 2006
+--------------------------
+
+  * (9 Sep 2006) link_suffix
+  	Added the --link_suffix argument, to change the suffix used
+  in multi-page reports.
+
+0.08 Mon 21 August 2006
+-----------------------
+
+  * (21 Aug 2006) renaming template module
+  	Changed Text::SwiftTemplate to Text::NeatTemplate.
+
+0.07 Sat 19 August 2006
+-----------------------
+
+  * (19 Aug 2006) independent template
+  	Moved SQLite::Work::Template out and made it a separate module
+  called Text::SwiftTemplate.
+
+0.06 Mon 15 May 2006
+--------------------
+
+  * (15 May 2006) improved HTML
+  - improved HTML encoding of ampersands (which had upset XSLT processor)
+  - enabled sqlreport to use the index_template option
+
+0.0502 Mon 17 April 2006
+------------------------
+
+  * (17 Apr 2006) documentation fix
+  	Had "CLASS METHODS" twice in SQLite::Work::CGI.
+
+0.0501 Mon 10 April 2006
+------------------------
+
+  * (10 Apr 2006) outfile fix
+  	My previous enhancements broke normal output in CGI!  Ooops.
+
+  * (5 Apr 2006) tweak nbsp
+  	To make things easier for some post-processors, I removed the
+  &nbsp; from the prev-next links bit.
+
+0.05 Sat 01 April 2006
+----------------------
+
+  * (1 Apr 2006) working with Embperl
+  	Made various changes to make the SQLite::Work::CGI module
+  play nicely with Embperl, such as being able to pass back strings
+  rather than impatiently print things out itself.
+
+  * (11 Sep 2005) edit tweaks
+  	Added an "Add Row" button to the main edit form.
+
+0.04 Fri 09 September 2005
+--------------------------
+
+  * (9 Sep 2005) call function in template
+  	Added ability to call a function from a template, with the
+  {&funcname(args...)} construct.  If using a function from another
+  package, use the 'use_package' argument to use that package.
+
+  * (7 Sep 2005) tweaks to formatting
+  	Titles now include "An" as well as "A" and "The".
+  	Removed _underline_ formatting in the 'html' format style
+  because it's too easy to mess up filenames with it.
+
+  * (7 Sep 2005) table_header
+  	Added the ability to customize the thead of the table when
+  doing a report with a table layout.  It's up to the user to make
+  sure that it matches the row_template being used.
+
+0.03 Sun 04 September 2005
+--------------------------
+
+  * (4 Sep 2005) removed old import script
+
+  * (3 Sep 2005) distinct
+  	Added the 'distinct' option, which adds the DISTINCT keyword
+  to the selection.  This is active in the sqlreport script, but haven't
+  added it to the CGI selection form.
+
+  * (3 Sep 2005) LIKE to GLOB
+  	Change LIKE to GLOB in the search stuff; this means that
+  wildcards are now '*' and '?' not '%' and '_'.  Also now case-sensitive.
+  	Also did a quick tweak of some import stuff.
+
+  * (31 Aug 2005) import script
+
+0.0202 Mon 29 August 2005
+-------------------------
+
+  * (29 Aug 2005) manifest bug
+  	Left out some files from the MANIFEST, oops
+
+0.0201 Mon 29 August 2005
+-------------------------
+
+  * (29 Aug 2005) fix bug with editing
+  	An oops moment; forgot to integrate the template stuff
+  for make_edit_table in SQLite::Work::CGI.
+
+0.02 Mon 29 August 2005
+-----------------------
+
+  * (25 Aug 2005) mail
+  	Added SQLite::Work::Mail and sqlw_mail to send templated mail
+  sourced from the database.  This does NOT use a Perl mail module,
+  but a selection of a couple of external programs, because I wanted
+  to be able to use mutt for the mail.
+
+  * (25 Aug 2005) restructure
+  	Moved out some common things (making selections, constructing
+  "nice" column names) into separate methods.
+
+  * (17 Aug 2005) new total option
+  	Added a --total option to sqlreport; it prints out the
+  total number of matching rows and exits.
+
+  * (17 Aug 2005) tweak
+  	fine-tuning template stuff
+
+  * (17 Aug 2005) split out the template stuff into separate module
+
+  * (16 Aug 2005) renamed the module
+
+  * (16 Aug 2005) tweak for edit
+  	Now only shows tables rather than views in edit.cgi
+
+  * (16 Aug 2005) prev-next links for multi-page reports
+
+  * (16 Aug 2005) some tweaks
+  	- made the WHERE stuff use NULL for nulls
+  	- better quoting for edit stuff
+
+0.01 Tue 16 August 2005
+-----------------------
+
+  * (16 Aug 2005) actually documented stuff
+
+  * (14 Aug 2005) fixed bug with sort-reversed
+
+  * (14 Aug 2005) even more stuff
+  	- month format
+  	- nth format
+  	- check if a page would produce no output in multi-page
+
+  * (14 Aug 2005) more improvements
+  	- groups option: enable a group of values to be clustered with
+  a header, and be printed only when it is (but not as part of the header)
+  	- headers (and groups) as files, similar to how the report_template
+  and the row_template can be either a string or a file
+  	- page: added a '_page' value which can be used in templates
+  which is the current page number (useful for headers in multi-page reports)
+
+  * (13 Aug 2005) tweaking index
+  	Some improvements to the index-page for split reports.
+
+  * (13 Aug 2005) input field vary
+  	Now enable one to define the type of input field for editing
+  (well, it enables textarea and text anyway).
+
+  * (13 Aug 2005) alpha-split
+  	Now can also split by a given column with just the first (few letters)
+  of the value, instead of the whole value.
+
+  * (13 Aug 2005) split by column
+  	New method do_split_report, and new option 'split_col'
+  to make multi-page reports split by the value of the given column.
+
+  * (13 Aug 2005) added 'namedalpha' to convert_value
+
+  * (13 Aug 2005) revamp of layout/style options
+  	Got rid of 'bulk' and 'section_style' options, because they names
+  were too confusing.  Replaced them with 'report_style' and 'layout',
+  and added fine-tune params 'table_border' and 'truncate_colnames'.
+
+  * (12 Aug 2005) multi-page reports
+  	The --all_pages option to sqlreport generates all matching pages
+  (if the limit is not zero and a real outfile is given)
+  	The --title option enables one to give one's own title for the pages.
+
+  * (12 Aug 2005) duh! added tests to MANIFEST
+
+  * (12 Aug 2005) bix fixes and tests
+  	Yes, some big huge tests!  (Well with a largish database)
+  Also a few tweaks/fixes to a few things, like title formatting.
+  Also added a Delete_Row button to the edit CGI (in addition
+  to the original Delete-from-the-single-row-page button).
+
+  * (12 Aug 2005) default format
+  	Added a default_format, a format-defintion by table+column
+  which is used as the format when using a generated row_template.
+
+  * (11 Aug 2005) fieldval section_style
+  	Added a 'fieldval' section style, which is similar to the 'none'
+  style for the row_template-generated-in-the-absence-of-a-passed-in
+  row_template, except that, rather than have just the values one per
+  line, it has Field:Value (where "Field" is the column name).
+
+  * (11 Aug 2005) nicecols tweak
+
+  * (11 Aug 2005) tweaking the bulk stuff
+  	Fixed a bug or so with the CGI, and made more difference
+  between 'compact' and 'large'.
+
+  * (11 Aug 2005) non-HTML reports with bulkiness
+  	Added a 'none' section_style which gives no section formatting
+  at all, and a default row_template of each value on a line alone.
+  	Added a 'bulk' option which is basically how compact or verbose
+  the given report will be. This replaces the 'verbose', 'hide_thead'
+  and 'short_colnames' options; there are three levels of 'bulk':
+  small, compact and large.  Large gives tables with full table headers,
+  and the query and "m rows out of n" bits at the start and end of
+  the report. The 'compact' option is the same, but it gives short
+  column names.  The 'small' option gives table with no border,
+  and no extra bits.
+  	Therefore, one can make a non-HTML report with --bulk small
+  and --section_style none plus replacing the --report_template
+  so that it just contains "<!--sqlr_contents-->".
+
+  * (11 Aug 2005) template formatting
+  	Tried out Text::FillIn and Text::Template and found that
+  rolling my own, very simpler, templating made for quicker processing.
+  	Took a leaf out of other formatters; formatting directives
+  are part of the column-value id.
+  	Instead of using the full power of HTML::TextToHTML, this does
+  extremely simple HTML formatting.  We shall see if it breaks, later.
+
+  * (10 Aug 2005) more row-template stuff
+  	Extended the conditional so that it can (a) check any col and
+  (b) include more than one col-value.  This is probably even slower.
+  	Also allowed that the row-template could be a file.
+
+  * (10 Aug 2005) more row-template stuff
+  	Made a make_row_template method.
+
+  * (10 Aug 2005) get_total_matching
+  	Extracted out the get-the-total stuff from do_report and made
+  it a separate method (in anticipation of multi-page report generation)
+
+  * (10 Aug 2005) templating with conditionals, part 1
+  	Now the template stuff is more sophisticated (though not as
+  sophisticated as Text::FillIn) as follows:
+  	- {$colname} gives the value of that column in the current row
+  	- {? stuff [$colname] more stuff} gives "stuff VALUE more stuff"
+  if the column has a value VALUE
+  	- {? stuff [$colname] more stuff!!otherstuff} gives as above
+  if the column has a value, or "otherstuff" if it doesn't (useful for giving
+  &nbsp; in table section_style).
+  	Note that these are not recursive, and doesn't give escapes
+  for the {} characters, so you just can't use them.  As I said, it's
+  not that sophisticated.
+  	This is probably going to be slower than before.
+
+  * (10 Aug 2005) varied display, part 1
+  	Added table/para/row "section_style" and simple row templates.
+  The CGI stuff just uses the default row-template.
+
+  * (8 Aug 2005) efficiency tweaks
+
+  * (8 Aug 2005) removed Text::Template use
+  	Removed the dependency on Text::Template; realized this
+  didn't need something that high-powered.  Now this just does simple
+  substitution.
+
+  * (8 Aug 2005) more on the header stuff
+
+  * (8 Aug 2005) sqlreport checking existance of some params
+
+  * (8 Aug 2005) detect header fields from header templates
+
+  * (8 Aug 2005) some fixes with update/add values
+
+  * (7 Aug 2005) customizable headers
+  	Rather than the headers being limited to just one field,
+  now they can be customized with multiple fields and any other stuff
+  you want, by providing a template for each header.
+  	The downside is that you have to provide a template for
+  each header, instead of headers being automatic.  But I figure that
+  if you already know what you're sorting by, you already know what
+  you want in your headers.  And it's a lot less clunky than the old
+  GenRepAr way of doing headers.  One has just split it into two:
+  first say what fields are in the header, then provide a separate
+  header template.
+
+  * (7 Aug 2005) initial checkin

@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Syntax-Highlight-Mason.t
+lib/Syntax/Highlight/Mason.pm
+eg/view_source.html

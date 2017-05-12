@@ -1,0 +1,21 @@
+---
+abstract: 'Scheduler configurable by using plugins'
+author:
+  - '[ Tony Edwardson <tony@edwardson.co.uk>i ]'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Schedule-Pluggable
+requires:
+  Moose: '0'
+  MooseX::Object::Pluggable: '0'
+  MooseX::Workers: '0'
+  Test::More: '0'
+  version: '0'
+version: '0.07'

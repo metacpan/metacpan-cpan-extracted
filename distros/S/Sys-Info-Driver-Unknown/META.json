@@ -1,0 +1,76 @@
+{
+   "abstract" : "Compatibility layer for Sys::Info",
+   "author" : [
+      "Burak Gursoy <burak@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Sys-Info-Driver-Unknown",
+   "no_index" : {
+      "directory" : [
+         "monolithic_version",
+         "builder",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.40",
+            "Test::Sys::Info" : "0.20"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Unix::Processors" : 0
+         },
+         "requires" : {
+            "Sys::Info::Base" : "0.78"
+         }
+      }
+   },
+   "provides" : {
+      "Sys::Info::Driver::Unknown" : {
+         "file" : "lib/Sys/Info/Driver/Unknown.pm",
+         "version" : "0.78"
+      },
+      "Sys::Info::Driver::Unknown::Device" : {
+         "file" : "lib/Sys/Info/Driver/Unknown/Device.pm",
+         "version" : "0.78"
+      },
+      "Sys::Info::Driver::Unknown::Device::CPU" : {
+         "file" : "lib/Sys/Info/Driver/Unknown/Device/CPU.pm",
+         "version" : "0.78"
+      },
+      "Sys::Info::Driver::Unknown::Device::CPU::Env" : {
+         "file" : "lib/Sys/Info/Driver/Unknown/Device/CPU/Env.pm",
+         "version" : "0.78"
+      },
+      "Sys::Info::Driver::Unknown::OS" : {
+         "file" : "lib/Sys/Info/Driver/Unknown/OS.pm",
+         "version" : "0.78"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://bitbucket.org/burak/cpan-sys-info-driver-unknown/"
+      }
+   },
+   "version" : "0.78"
+}

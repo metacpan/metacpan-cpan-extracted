@@ -1,0 +1,53 @@
+#!/usr/local/bin/perl -w
+
+use strict ;
+
+use IO::Socket ;
+use Data::Dumper ;
+
+use Stem::Packet ;
+
+$| = 1 ;
+
+my $host = 'localhost' ;
+
+my $port = shift || 8888 ;
+
+my $sock = IO::Socket::INET->new( "$host:$port" ) ;
+$sock or die "can't connect to $host:$port\n" ;
+
+#my $packet = Stem::Packet->new( codec => 'YAML' ) ;
+my $packet = Stem::Packet->new() ;
+
+print "type 'help' for help\n\n" ;
+
+while( 1 ) {
+
+	print "CLI > " ;
+
+	chomp( my $line = <> ) ;
+	next unless $line =~ /\S/ ;
+
+#my $line = "foo bar bazz" ;
+
+	my %data ;
+	@data{ qw( op key value ) } = split( ' ', $line, 3 ) ;
+
+	my $write_buf = $packet->to_packet( \%data) ;
+#print "WRITE [$$write_buf]\n" ;
+
+	syswrite( $sock, "${$write_buf}"  ) ;
+
+# this should be a proper non-blocking read loop but it is fine for this 
+# demo.
+
+	my $bytes_read = sysread( $sock, my $read_buf, 8192 ) ;
+	last unless defined $bytes_read and $bytes_read > 0 ;
+
+	my $result = $packet->to_data( \$read_buf ) ;
+
+#	print "RESULT [$$result]\n" ;
+	print Dumper $result ;
+
+#exit ;
+}

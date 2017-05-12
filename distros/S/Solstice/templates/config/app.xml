@@ -1,0 +1,60 @@
+<?xml version="1.0" ?>
+<app_config>
+
+    <keys><!-- sol_loop keys -->
+        <key name="<!-- sol_var name -->"><!-- sol_var value --></key><!-- /sol_loop -->
+    </keys>
+
+    <application_url><!-- sol_var application_url --></application_url>
+    <db_name><!-- sol_var db_name --></db_name>
+
+    <config_namespace><!-- sol_var config_namespace --></config_namespace>
+    <error_handler><!-- sol_var error_handler --></error_handler>
+
+    <urls><!-- sol_loop urls -->
+        <url
+            virtual_path        = "<!-- sol_var virtual_path        -->"
+            url_is_prefix       = "<!-- sol_var url_is_prefix       -->"
+            pageflow            = "<!-- sol_var pageflow            -->"
+            initial_state       = "<!-- sol_var initial_state       -->"
+            requires_auth       = "<!-- sol_var requires_auth       -->"
+            disable_back_button = "<!-- sol_var disable_back_button -->"
+            escape_frames       = "<!-- sol_var escape_frames       -->"
+            debug_level         = "<!-- sol_var debug_level         -->"
+            view_top_nav        = "<!-- sol_var view_top_nav        -->"
+            title               = "<!-- sol_var title               -->"
+            boilerplate_view    = "<!-- sol_var boilerplate_view    -->"
+            require_session     = "<!-- sol_var require_session     -->"
+            /><!-- /sol_loop -->
+    </urls>
+
+    <webservices><!-- sol_loop webservices -->
+        <resource
+            virtual_path        = "<!-- sol_var virtual_path        -->"
+            url_is_prefix       = "<!-- sol_var url_is_prefix       -->"
+            controller          = "<!-- sol_var controller -->"
+            requires_auth       = "<!-- sol_var requires_auth       -->"
+            /><!-- /sol_loop -->
+    </webservices>
+
+    <remotes><!-- sol_loop remotes -->
+        <remote name="<!-- sol_var name -->"><!-- sol_var controller --></remote><!-- /sol_loop -->
+    </remotes>
+
+    <css_files><!-- sol_loop css_files -->
+        <css_file><!-- sol_var file --></css_file><!-- /sol_loop -->
+    </css_files>
+
+    <js_files><!-- sol_loop js_files -->
+        <js_file><!-- sol_var file --></js_file><!-- /sol_loop -->
+    </js_files>
+
+    <statics><!-- sol_loop statics -->
+        <static<!-- sol_if virtual_path--> virtual_path="<!-- sol_var virtual_path-->"<!-- /sol_if -->><!-- sol_var filesys_path --></static><!-- /sol_loop -->
+    </statics>
+    
+    <cgis><!-- sol_loop cgis -->
+        <cgi<!-- sol_if virtual_path--> virtual_path="<!-- sol_var virtual_path-->"<!-- /sol_if --> requires_auth="<!-- sol_var requires_auth-->" url_is_prefix="<!-- sol_var url_is_prefix -->"><!-- sol_var filesys_path --></cgi><!-- /sol_loop -->
+    </cgis>
+    
+</app_config>

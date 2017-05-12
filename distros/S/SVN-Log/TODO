@@ -1,0 +1,7 @@
+# $Id: TODO 596 2004-07-04 13:45:19Z rooneg $
+
+* Devel::Cover says we need tests for:
+  * alternate arg types for retrieve
+  * use 'revision' instead of 'start' in args
+  * error when no repos and rev
+  * 'Changed paths' parsing?

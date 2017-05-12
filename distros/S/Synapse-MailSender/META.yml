@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:               Synapse-MailSender
+version:            1.4
+abstract:           ~
+author:  []
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    MIME::Lite:           3
+    MIME::Type::FileName:  1
+    Petal::Tiny:          1.03
+    Synapse::Logger:      0.1
+    XML::Parser::REX:     1.01
+    YAML::XS:             0.38
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

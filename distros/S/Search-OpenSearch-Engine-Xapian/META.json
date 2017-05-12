@@ -1,0 +1,57 @@
+{
+   "abstract" : "Xapian engine for OpenSearch results",
+   "author" : [
+      "Peter Karman <karman@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.132510",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Search-OpenSearch-Engine-Xapian",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "SWISH::Prog" : "0.54",
+            "SWISH::Prog::Xapian" : "0.08",
+            "Search::OpenSearch" : "0.15",
+            "Test::More" : "0",
+            "perl" : "5.008003"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Search-OpenSearch-Engine-Xapian"
+      },
+      "homepage" : "https://github.com/karpet/search-opensearch-engine-xapian-perl",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/karpet/search-opensearch-engine-xapian-perl.git"
+      }
+   },
+   "version" : "0.05"
+}

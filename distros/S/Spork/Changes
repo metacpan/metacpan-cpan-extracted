@@ -1,0 +1,108 @@
+---
+version: 0.21
+date:    Sat Jun 11 02:15:10 EST 2011
+changes:
+- Add Kwiki::Cache to prereqs - rt-15037
+---
+version: 0.20
+date:    Mon Apr  4 07:38:17 PDT 2005
+changes:
+- remove use_class
+- the plugin base class
+- add hooks_class into config so we have hooks
+- Kwid Formatter for Spork
+- Some convienent methods... 
+- now handles 'spork -compress' as 'kwiki -compress'
+- unbreak global config (~/.sporkrc/config.yaml)
+- now handles 'spork -compress' as 'kwiki -compress'
+- Also pass down sub_num. So plugins can distinguish wheather it's the
+  first of sub-slides or not.
+- work-around of 'cannot call unhook on a undef ref' error.
+- somehow Spoon::Hooked objects are destroyed before Spoon::Hub, which
+  doesn't make much sense.
+- make plugins file
+- plugins file works
+- Make installer better
+- add plugin.pm
+- Make tests pass when we have .sporkrc
+---
+version: 0.19
+date:    Sun Jan 23 16:40:16 PST 2005
+changes:
+- Make Spork up to date with latest Spoon stuff.
+---
+version: 0.18
+date:    Mon Jun 21 09:20:53 PDT 2004
+changes:
+- Integrate Kwiki Formatter now that Kwiki is released
+---
+version: 0.17
+date:    Tue Jun  1 14:06:46 PDT 2004
+changes:
+- Accomodate Spoon::Formatter changes
+- Option to turn off mouse controls
+---
+version: 0.16
+date:    Thu May 20 13:23:33 PDT 2004
+changes:
+- Upgraded Formatter to latest Kwiki style
+- Include WAFL
+---
+version: 0.15
+date:    Fri May  7 02:19:20 PDT 2004
+changes:
+- Added =cut to Spork::Config
+- Integrated my Kwiki
+---
+version: 0.14
+date:    Wed Mar 31 23:02:59 CST 2004
+changes:
+- 0.13 was the unlucky release. Had a couple bugs.
+---
+version: 0.14
+date:    Wed Mar 31 23:02:59 CST 2004
+changes:
+- 0.13 was the unlucky release. Had a couple bugs.
+---
+version: 0.13
+date:    Wed Mar 31 11:39:28 CST 2004
+changes:
+- Documentation for 'spork' was borked
+- Refactored loose ends
+- Added messages for spork commands
+---
+version: 0.12
+date:    Wed Mar 31 00:07:36 CST 2004
+changes:
+- Add a config, anywhere a slide could be.
+- Support ~/.sporkrc/config.yaml
+- Expand templates on |spork -make| unless template directory exists
+- Change to image<...>
+- Add auto_scrolldown
+- Javascript controls
+- Accesskey controls
+- Make control_links an option
+- Make title be a link to start
+- Add download_method: wget (lwp, curl)
+- Spoon::Config->add_config($hash_ref)
+- Upgrade documentation
+- Upgrade sample slideshow
+- Remove '#' from start and index slide
+- Change 'template' to 'template/tt2'
+- i18n-ize
+- Add character_encoding
+----
+== Crazy Ideas
+* Generate a Wiki when slides are made
+** Auto signin for audience
+** Take audience questions through the wiki
+---
+version: 0.11
+date:    Tue Mar 23 00:23:46 PST 2004
+changes:
+- Fixed typo reported by clkao
+---
+version: 0.10
+date:    Sun Mar 21 16:36:17 PST 2004
+changes:
+- Initial release.

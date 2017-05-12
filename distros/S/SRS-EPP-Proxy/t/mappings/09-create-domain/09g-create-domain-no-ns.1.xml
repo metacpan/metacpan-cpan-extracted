@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NZSRSResponse VerMajor="5" VerMinor="2" RegistrarId="100">
+  <Response Action="DomainCreate" FeId="8" FeSeq="4959871" OrigRegistrarId="1" RecipientRegistrarId="100" TransId="brause 1281576993.184229">
+    <FeTimeStamp Day="12" Hour="13" Minute="36" Month="8" Second="33" TimeZoneOffset="+12:00" Year="2010" />
+    <Domain Delegate="1" DomainName="09g.co.nz" RegistrarId="100" Status="Active" Term="1" UDAI="XuHmKpkC">
+      <RegistrantContact HandleId="handle1" Name="handle1" Email="update@email.com" ActionId="brause 1281484423.62137">
+        <PostalAddress Address1="updated street1" Address2="updated street2" City="updated city" CountryCode="AU" PostalCode="4444" Province="new state" />
+        <Phone CountryCode="64" LocalNumber="1234567" />
+        <Fax CountryCode="64" LocalNumber="1234567" />
+      </RegistrantContact>
+      <AdminContact HandleId="handle1" Name="handle1" Email="update@email.com" ActionId="brause 1281484423.62137">
+        <PostalAddress Address1="updated street1" Address2="updated street2" City="updated city" CountryCode="AU" PostalCode="4444" Province="new state" />
+        <Phone CountryCode="64" LocalNumber="1234567" />
+        <Fax CountryCode="64" LocalNumber="1234567" />
+      </AdminContact>
+      <TechnicalContact Name="Domainz" Email="4service@domainz.net.nz">
+        <PostalAddress Address1="Private Bag 1810" City="Wellington" CountryCode="NZ" />
+        <Phone AreaCode="4" CountryCode="64" LocalNumber="918-1740" />
+        <Fax AreaCode="4" CountryCode="64" LocalNumber="918-1719" />
+      </TechnicalContact>
+      <BilledUntil Day="12" Hour="13" Minute="36" Month="9" Second="33" TimeZoneOffset="+12:00" Year="2010" />
+      <RegisteredDate Day="12" Hour="13" Minute="36" Month="8" Second="33" TimeZoneOffset="+12:00" Year="2010" />
+      <AuditDetails ActionId="brause 1281576993.184229" RegistrarId="1">
+        <AuditTime>
+          <From Day="12" Hour="13" Minute="36" Month="8" Second="33" TimeZoneOffset="+12:00" Year="2010" />
+        </AuditTime>
+        <AuditText />
+      </AuditDetails>
+    </Domain>
+  </Response>
+</NZSRSResponse>

@@ -1,0 +1,48 @@
+__section__
+default
+__description__
+
+__title__
+
+__page__
+gallery
+__lang__
+en_US
+__name__
+list
+__template__
+[% mytitle = BLOCK %][% FILTER strip_literal %]
+[% Slash.getData('header') %][% IF group.name %]: [% group.name; END %]
+[% END; END; INCLUDE titlebar title => mytitle %]
+
+[%
+   next = form.next || 0;
+   count = 0;
+   curr  = 0;
+   cols  = 5;
+   rows  = 10;
+   max   = cols * rows;
+%]<TABLE BORDER="0" WIDTH="99%"><TR>[%
+
+   FOREACH picture = pictures.values.sort('date');
+      count = count + 1;
+      NEXT IF count < next;
+      IF curr >= max;
+%]</TR><TR><TD>
+<A HREF="[% constants.rootdir %]/gallery.pl?op=list&amp;next=[% count %][% IF group.id %]&amp;group_id=[% group.id; END %]">Next</A>
+</TD>[%
+         LAST;
+      END;
+      UNLESS curr % cols;
+%]</TR><TR>[%
+      END;
+
+%]<TD VALIGN="top"><SMALL><IMG SRC="[% constants.rootdir %]/gallery.pl?op=view&amp;size=thumb&amp;pic_id=[% picture.id %]">
+<BR CLEAR="ALL"><B>[% picture.name | strip_literal %]</B><BR>[% Slash.timeCalc(picture.date) %]
+<BR>[% PROCESS picture_menu pic_id => picture.id %]</SMALL></TD>[%
+      curr = curr + 1;
+   END;
+%]</TR></TABLE>
+
+__seclev__
+500

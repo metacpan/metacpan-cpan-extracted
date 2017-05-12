@@ -1,0 +1,42 @@
+README for Spectrum-CLI
+-----------------------
+
+Spectrum::CLI - wrapper class for the Spectrum Command Line Interface
+
+Overview
+--------
+
+   Spectrum::CLI is perl class/module which intends to provide a
+   convenient way to invoke the various CLI commands of Spectrum
+   Enterprise Manager from within perl scripts.
+
+   This package is freely-available under the GPL (GNU Public License,
+   which is not the same as "public domain" - I retain copyright).
+
+Availability
+------------
+
+   My "main" site for Spectrum::CLI is here:
+
+      http://net.doit.wisc.edu/~plonka/Spectrum-CLI/
+
+Installation
+------------
+
+   This package extracts, builds, installs in the usual fashion, i.e.:
+
+      $ gunzip -c <Package-version>.tar.gz |tar xf -
+      $ cd <Package-version>
+      $ perl Makefile.PL
+      $ make
+      $ make test
+      # make install
+
+Requirements
+------------
+
+   * perl version 5
+   * Spectrum 5.0.1 (or greater)
+
+-- 
+plonka@doit.wisc.edu  http://net.doit.wisc.edu/~plonka  ARS:N9HZF  Madison, WI

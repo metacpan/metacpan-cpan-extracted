@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:s0="http://www.tc.cornell.edu/~heber/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" targetNamespace="http://www.tc.cornell.edu/~heber/" xmlns="http://schemas.xmlsoap.org/wsdl/">
+  <types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://www.tc.cornell.edu/~heber/">
+      <s:element name="GetStatus">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GUID" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetStatusResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetStatusResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetSurfaceMesh">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GUID" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetSurfaceMeshResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetSurfaceMeshResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="Kill">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GUID" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="KillResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="KillResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="Release">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GUID" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReleaseResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ReleaseResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="string" nillable="true" type="s:string" />
+    </s:schema>
+  </types>
+  <message name="GetStatusSoapIn">
+    <part name="parameters" element="s0:GetStatus" />
+  </message>
+  <message name="GetStatusSoapOut">
+    <part name="parameters" element="s0:GetStatusResponse" />
+  </message>
+  <message name="GetSurfaceMeshSoapIn">
+    <part name="parameters" element="s0:GetSurfaceMesh" />
+  </message>
+  <message name="GetSurfaceMeshSoapOut">
+    <part name="parameters" element="s0:GetSurfaceMeshResponse" />
+  </message>
+  <message name="KillSoapIn">
+    <part name="parameters" element="s0:Kill" />
+  </message>
+  <message name="KillSoapOut">
+    <part name="parameters" element="s0:KillResponse" />
+  </message>
+  <message name="ReleaseSoapIn">
+    <part name="parameters" element="s0:Release" />
+  </message>
+  <message name="ReleaseSoapOut">
+    <part name="parameters" element="s0:ReleaseResponse" />
+  </message>
+  <message name="GetStatusHttpGetIn">
+    <part name="GUID" type="s:string" />
+  </message>
+  <message name="GetStatusHttpGetOut">
+    <part name="Body" element="s0:string" />
+  </message>
+  <message name="GetSurfaceMeshHttpGetIn">
+    <part name="GUID" type="s:string" />
+  </message>
+  <message name="GetSurfaceMeshHttpGetOut">
+    <part name="Body" element="s0:string" />
+  </message>
+  <message name="KillHttpGetIn">
+    <part name="GUID" type="s:string" />
+  </message>
+  <message name="KillHttpGetOut">
+    <part name="Body" element="s0:string" />
+  </message>
+  <message name="ReleaseHttpGetIn">
+    <part name="GUID" type="s:string" />
+  </message>
+  <message name="ReleaseHttpGetOut">
+    <part name="Body" element="s0:string" />
+  </message>
+  <message name="GetStatusHttpPostIn">
+    <part name="GUID" type="s:string" />
+  </message>
+  <message name="GetStatusHttpPostOut">
+    <part name="Body" element="s0:string" />
+  </message>
+  <message name="GetSurfaceMeshHttpPostIn">
+    <part name="GUID" type="s:string" />
+  </message>
+  <message name="GetSurfaceMeshHttpPostOut">
+    <part name="Body" element="s0:string" />
+  </message>
+  <message name="KillHttpPostIn">
+    <part name="GUID" type="s:string" />
+  </message>
+  <message name="KillHttpPostOut">
+    <part name="Body" element="s0:string" />
+  </message>
+  <message name="ReleaseHttpPostIn">
+    <part name="GUID" type="s:string" />
+  </message>
+  <message name="ReleaseHttpPostOut">
+    <part name="Body" element="s0:string" />
+  </message>
+  <portType name="JmeshWSSoap">
+    <operation name="GetStatus">
+      <input message="s0:GetStatusSoapIn" />
+      <output message="s0:GetStatusSoapOut" />
+    </operation>
+    <operation name="GetSurfaceMesh">
+      <input message="s0:GetSurfaceMeshSoapIn" />
+      <output message="s0:GetSurfaceMeshSoapOut" />
+    </operation>
+    <operation name="Kill">
+      <input message="s0:KillSoapIn" />
+      <output message="s0:KillSoapOut" />
+    </operation>
+    <operation name="Release">
+      <input message="s0:ReleaseSoapIn" />
+      <output message="s0:ReleaseSoapOut" />
+    </operation>
+  </portType>
+  <portType name="JmeshWSHttpGet">
+    <operation name="GetStatus">
+      <input message="s0:GetStatusHttpGetIn" />
+      <output message="s0:GetStatusHttpGetOut" />
+    </operation>
+    <operation name="GetSurfaceMesh">
+      <input message="s0:GetSurfaceMeshHttpGetIn" />
+      <output message="s0:GetSurfaceMeshHttpGetOut" />
+    </operation>
+    <operation name="Kill">
+      <input message="s0:KillHttpGetIn" />
+      <output message="s0:KillHttpGetOut" />
+    </operation>
+    <operation name="Release">
+      <input message="s0:ReleaseHttpGetIn" />
+      <output message="s0:ReleaseHttpGetOut" />
+    </operation>
+  </portType>
+  <portType name="JmeshWSHttpPost">
+    <operation name="GetStatus">
+      <input message="s0:GetStatusHttpPostIn" />
+      <output message="s0:GetStatusHttpPostOut" />
+    </operation>
+    <operation name="GetSurfaceMesh">
+      <input message="s0:GetSurfaceMeshHttpPostIn" />
+      <output message="s0:GetSurfaceMeshHttpPostOut" />
+    </operation>
+    <operation name="Kill">
+      <input message="s0:KillHttpPostIn" />
+      <output message="s0:KillHttpPostOut" />
+    </operation>
+    <operation name="Release">
+      <input message="s0:ReleaseHttpPostIn" />
+      <output message="s0:ReleaseHttpPostOut" />
+    </operation>
+  </portType>
+  <binding name="JmeshWSSoap" type="s0:JmeshWSSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document" />
+    <operation name="GetStatus">
+      <soap:operation soapAction="http://www.tc.cornell.edu/~heber/GetStatus" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="GetSurfaceMesh">
+      <soap:operation soapAction="http://www.tc.cornell.edu/~heber/GetSurfaceMesh" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="Kill">
+      <soap:operation soapAction="http://www.tc.cornell.edu/~heber/Kill" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="Release">
+      <soap:operation soapAction="http://www.tc.cornell.edu/~heber/Release" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+  </binding>
+  <binding name="JmeshWSHttpGet" type="s0:JmeshWSHttpGet">
+    <http:binding verb="GET" />
+    <operation name="GetStatus">
+      <http:operation location="/GetStatus" />
+      <input>
+        <http:urlEncoded />
+      </input>
+      <output>
+        <mime:mimeXml part="Body" />
+      </output>
+    </operation>
+    <operation name="GetSurfaceMesh">
+      <http:operation location="/GetSurfaceMesh" />
+      <input>
+        <http:urlEncoded />
+      </input>
+      <output>
+        <mime:mimeXml part="Body" />
+      </output>
+    </operation>
+    <operation name="Kill">
+      <http:operation location="/Kill" />
+      <input>
+        <http:urlEncoded />
+      </input>
+      <output>
+        <mime:mimeXml part="Body" />
+      </output>
+    </operation>
+    <operation name="Release">
+      <http:operation location="/Release" />
+      <input>
+        <http:urlEncoded />
+      </input>
+      <output>
+        <mime:mimeXml part="Body" />
+      </output>
+    </operation>
+  </binding>
+  <binding name="JmeshWSHttpPost" type="s0:JmeshWSHttpPost">
+    <http:binding verb="POST" />
+    <operation name="GetStatus">
+      <http:operation location="/GetStatus" />
+      <input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </input>
+      <output>
+        <mime:mimeXml part="Body" />
+      </output>
+    </operation>
+    <operation name="GetSurfaceMesh">
+      <http:operation location="/GetSurfaceMesh" />
+      <input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </input>
+      <output>
+        <mime:mimeXml part="Body" />
+      </output>
+    </operation>
+    <operation name="Kill">
+      <http:operation location="/Kill" />
+      <input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </input>
+      <output>
+        <mime:mimeXml part="Body" />
+      </output>
+    </operation>
+    <operation name="Release">
+      <http:operation location="/Release" />
+      <input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </input>
+      <output>
+        <mime:mimeXml part="Body" />
+      </output>
+    </operation>
+  </binding>
+  <service name="JmeshWS">
+    <documentation>Web service interface for the Jmesh mesh generator.</documentation>
+    <port name="JmeshWSSoap" binding="s0:JmeshWSSoap">
+      <soap:address location="http://ctcstager.tc.cornell.edu/Users/heber/JmeshWS/default.asmx" />
+    </port>
+    <port name="JmeshWSHttpGet" binding="s0:JmeshWSHttpGet">
+      <http:address location="http://ctcstager.tc.cornell.edu/Users/heber/JmeshWS/default.asmx" />
+    </port>
+    <port name="JmeshWSHttpPost" binding="s0:JmeshWSHttpPost">
+      <http:address location="http://ctcstager.tc.cornell.edu/Users/heber/JmeshWS/default.asmx" />
+    </port>
+  </service>
+</definitions>

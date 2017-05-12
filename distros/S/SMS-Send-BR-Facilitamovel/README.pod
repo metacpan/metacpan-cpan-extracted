@@ -1,0 +1,51 @@
+
+=head1 NAME
+
+SMS::Send::BR::Facilitamovel - L<SMS::Send|https://metacpan.org/pod/SMS::Send> driver for the Facilitamovel service
+
+=head1 SYNOPSIS
+
+  use SMS::Send;
+  my $sender = SMS::Send->new('BR::Facilitamovel',
+      _login    => 'foo',
+      _password => 'bar',
+  );
+
+  my $sent = $sender->send_sms(
+      'text'    => 'This is a test message',
+      'to'      => '19991913030',
+  );
+
+  # Did the send succeed.
+  if ( $sent ) {
+      print "Message sent ok\n";
+  } else {
+      print "Failed to send message\n";
+  }
+
+=head1 INSTALLATION
+
+To install this module type the following:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+=head1 DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Carp
+  HTTP::Tiny
+  URI::Escape
+  SMS::Send::Driver
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (C) CPqD 2016 by Mario Celso Teixeira
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.18.1 or,
+at your option, any later version of Perl 5 you may have available.
+

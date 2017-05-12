@@ -1,0 +1,28 @@
+SAL version 3.01
+================
+
+SAL - A Sub Application Layer for Perl.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  DBD::SQLite, GD::Graph
+
+OPTIONAL DEPENDANCIES
+  DBD::mysql, DBD::odbc, GD::Graph3d
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Scott Elcomb <psema4@gmail.com>
+
+See the file LICENSE for licensing information

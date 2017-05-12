@@ -1,0 +1,232 @@
+=pod
+
+=head1 NAME
+
+Simulation::DiscreteEvent::Cookbook::Callcenter - modelling call center
+
+=head1 MODELLING CALL CENTER
+
+=head2 Model Description
+
+We will assume that call center has I<N> channels. When client calls to center
+he takes one of the available channels in random way. The channel stays busy
+till client disconnected. All channels are equal, so we have to trace only the
+number of busy channels, but not which channels are used. If all channels are
+busy when client calling, he gets rejected. We assume that intervals between
+incoming calls are exponentially distributed with pdf 
+I<< f(t)=lambda*exp(-lambda*t), t>0 >>. The I<lambda> is the number of incoming
+calls in a unit of time. We assume that call duration times are lognormally
+distributed with pdf
+I<< f(t)=(1/(t*sigma*sqrt(2*pi)))*exp(-(ln(t)-mu)^2/(2*sigma^2)), t>0 >>.
+Average call duration is I<< exp(mu + sigma^2/2) >>.
+
+=head2 Building a Model
+
+In L<Simulation::DiscreteEvent::Cookbook::MM10> we used one server class. Now
+let's split system onto three parts -- generator, call center, and sink.
+Generator will generate new call events. Call center will handle calls. And
+sink will receive and count served and rejected calls. So the flow will be as
+follows:
+
+    Generator --> Call center --> Sink
+
+=head2 Generator
+
+Generator should generate "new_call" events for call center in random moments
+of time. Every time it sends "new_call" to call center it generates random
+interval and schedules for itself event when it will send next call to call
+center. Here's the code:
+
+    package Simulation::DiscreteEvent::CB::Generator;
+
+    use Moose;
+    BEGIN { extends 'Simulation::DiscreteEvent::Server' }
+
+    use Math::Random qw(random_exponential);
+
+    has rate => ( is => 'rw', isa => 'Num', default => 1 );
+    has dest => ( is => 'rw', isa => 'Simulation::DiscreteEvent::Server' );
+
+    sub next : Event {
+        my $self = shift;
+        $self->model->send( $self->dest, 'new_call' );
+        my $next_time = $self->model->time 
+            + random_exponential( 1, 1 / $self->rate );
+        $self->model->schedule( $next_time, $self, 'next' );
+    }
+
+    no Moose;
+    __PACKAGE__->meta->make_immutable;
+
+Doesn't that look like a pretty typical task? That's right, and there's
+L<Simulation::DiscreteEvent::Generator> module for this.
+
+=head2 Call Center
+
+Call center serves incoming calls. When new call received we should check if
+there's free channel, increase number of busy channels, and schedule event when
+we finish serving this call. After call is served, or if it is rejected because
+all channels are busy, we're sending it to the sink object.
+
+In M/M/1/0 simulation we just counted numbers of served and rejected calls, but
+now we also want to get average load of the call center, i.e. average number of
+busy channels. For this purpose we will use
+L<Simulation::DiscreteEvent::NumericState> role.
+
+Here's the Callcenter's code:
+
+    package Simulation::DiscreteEvent::CB::Callcenter;
+    use Moose;
+    BEGIN { extends 'Simulation::DiscreteEvent::Server' }
+    with 'Simulation::DiscreteEvent::NumericState';
+    use Math::Random qw(random_normal);
+    
+    has mu       => ( is => 'rw', isa => 'Num', default => 3 );
+    has sigma    => ( is => 'rw', isa => 'Num', default => 1 );
+    has channels => ( is => 'rw', isa => 'Int', default => 10 );
+    has dest => (
+        is  => 'rw',
+        isa => 'Simulation::DiscreteEvent::Server'
+    );
+    
+    # generate random call duration
+    sub _call_duration {
+        my $self = shift;
+        my $n = random_normal( 1, 0, 1 );
+        exp( $self->mu + $self->sigma * $n );
+    }
+    
+    sub new_call : Event {
+        my $self = shift;
+    
+        # if there's a free channel serve the call
+        if ( $self->state < $self->channels ) {
+            $self->state_inc;
+            my $finish_time = $self->model->time + $self->_call_duration;
+            $self->model->schedule( $finish_time, $self, 'served' );
+        }
+    
+        # otherwise reject call
+        else {
+            $self->model->send( $self->dest, 'rejected' );
+        }
+    }
+    
+    sub served : Event {
+        my $self = shift;
+        $self->state_dec;
+        $self->model->send( $self->dest, 'served' );
+    }
+    
+    no Moose;
+    __PACKAGE__->meta->make_immutable;
+
+Note B<< $self->state >> method. It is provided by NumericState role. It may be
+used for any server which state is described by a number. B<< state >> method
+allows you to get or set current state (the number of busy channels for
+Callcenter), and B<< state_inc >>, B<< state_dec >> methods increase or
+decrease number of busy channels. NumericState role automatically collects all
+state changes and is able to compute some general parameters from collected
+data.
+
+=head2 Sink
+
+This object receives all calls after they were served or rejected. The only
+purpose of this object is to count numbers of served and rejected calls. We
+could do it in Callcenter object, but using separate object will allow us to
+demonstrate using of L<Simulation::DiscreteEvent::Recorder> role. This role
+automatically records all events received by object and provides you with some
+functions to access collected data. The Sink class is quite simple:
+
+    package Simulation::DiscreteEvent::CB::Sink;
+    
+    use Moose;
+    BEGIN { extends 'Simulation::DiscreteEvent::Server' }
+    with 'Simulation::DiscreteEvent::Recorder';
+    
+    sub served : Event {}
+    sub rejected : Event {}
+    
+    no Moose;
+    __PACKAGE__->meta->make_immutable;
+
+As you may see the only thing we need to do here is to define allowed events.
+
+=head2 Combining All Pieces
+
+And now let's combine all these modules together:
+
+    use Simulation::DiscreteEvent;
+    
+    my $model = Simulation::DiscreteEvent->new;
+
+    # add servers to model
+    my $gen   = $model->add('Simulation::DiscreteEvent::CB::Generator');
+    my $cc    = $model->add(
+        'Simulation::DiscreteEvent::CB::Callcenter',
+        mu       => 3.5,
+        sigma    => 1,
+        channels => 50,
+    );
+    my $sink = $model->add('Simulation::DiscreteEvent::CB::Sink');
+    
+    # connect servers
+    $gen->dest($cc);
+    $cc->dest($sink);
+    
+    # run simulation
+    $model->send( $gen, 'next' );
+    $model->run(1000);
+    
+    # these functions are provided by S::DE::Recorder
+    my $served   = $sink->get_number_of('served');
+    my $rejected = $sink->get_number_of('rejected');
+
+    # output results
+    print "Model time:   ", $model->time, "\n";
+    print "Calls total:  ", $served + $rejected, "\n";
+    print "Served:       $served\n";
+    print "Rejected:     $rejected\n";
+    print "Average load: ", $cc->average_load, "\n";
+
+And here's the example output from the script:
+
+    Model time:   1000
+    Calls total:  959
+    Served:       886
+    Rejected:     73
+    Average load: 43.2777190672934
+
+Note using of B<get_number_of> method to get number of recorded "served" and
+"rejected" events. This method is provided by
+L<Simulation::DiscreteEvent::Recorder> role, and returns how many times object
+has received specified event. Also, note using of B<average_load> method to get
+average number of busy channels. This method is provided by
+L<Simulation::DiscreteEvent::NumericState> role.
+
+=head1 AUTHOR
+
+Pavel Shaydo, C<< <zwon at cpan.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-simulation-discreteevent at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Simulation-DiscreteEvent>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 SEE ALSO
+
+L<Simulation::DiscreteEvent>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2010 Pavel Shaydo.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut
+

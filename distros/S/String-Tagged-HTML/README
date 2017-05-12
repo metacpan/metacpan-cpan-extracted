@@ -1,0 +1,90 @@
+NAME
+    "String::Tagged::HTML" - format HTML output using "String::Tagged"
+
+SYNOPSIS
+     use String::Tagged::HTML;
+
+     my $st = String::Tagged::HTML->new( "An important message" );
+
+     $st->apply_tag( 3, 9, b => 1 );
+
+     print $st->as_html( "h1" );
+
+DESCRIPTION
+    This subclass of String::Tagged provides a method, "as_html", for
+    rendering the string as an HTML fragment, using the tags to provide
+    formatting. For example, the SYNOPSIS example will produce the output
+
+     <h1>An <b>important</b> message</h1>
+
+    With the exception of tags named "raw", a tag applied to an extent of
+    the "String::Tagged::HTML" will be rendered using start and end HTML
+    tags of the same name. If the tag's value is a "HASH" reference, then
+    this hash will be used to provide additional attributes for the HTML
+    element.
+
+     my $str = String::Tagged::HTML->new( "click here" );
+     $str->apply_tag( 6, 4, a => { href => "/see/other.html" } );
+
+     print $str->as_html( "p" );
+
+
+
+     <p>click <a href="/see/other.html">here</a></p>
+
+    If it is not a "HASH" reference, then its value ought to be a simple
+    boolean true value, such as 1.
+
+    The special tag named "raw" disables HTML entity escaping over its
+    extent.
+
+     my $str = String::Tagged::HTML->new( "This <content> is escaped" );
+
+     my $br = String::Tagged::HTML->new( "<br/>" );
+     $br->apply_tag( 0, $br->length, raw => 1 );
+
+     print +( $str . $br )->as_html( "p" );
+
+
+
+     <p>This &lt;content&gt; is escaped<br/></p>
+
+  Tag Nesting
+    Because of the arbitrary way that "String::Tagged" tags may be applied,
+    as compared to the strict nesting requirements in HTML, the "as_html"
+    method may have to break a single "String::Tagged" tag into multiple
+    regions. In the following example, the "i" tag has been split in two to
+    allow it to overlap correctly with "b".
+
+     my $str = String::Tagged::HTML->new( "bbb b+i iii" );
+     $str->apply_tag( 0, 7, b => 1 );
+     $str->apply_tag( 4, 7, i => 1 );
+
+     print $str->as_html
+
+
+
+     <b>bbb <i>b+i</i></b><i> iii</i>
+
+CONSTRUCTORS
+    As well as the standard "new" and "new_tagged" constructors provided by
+    String::Tagged, the following is provided.
+
+  $st = String::Tagged::HTML->new_raw( $str )
+    Returns a new "String::Tagged::HTML" instance with the "raw" tag applied
+    over its entire length. This convenience is provided for creating
+    objects containing already-rendered HTML fragments.
+
+METHODS
+    The following methods are provided in addition to those provided by
+    String::Tagged.
+
+  $html = $st->as_html( $element )
+    Returns a string containing an HTML rendering of the current contents of
+    the object. If $element is provided, the output will be wrapped in an
+    element of the given name. If not defined, no outer wrapping will be
+    performed.
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

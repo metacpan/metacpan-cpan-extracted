@@ -1,0 +1,46 @@
+Sculptor::Date
+
+This module converts between ISO dates and Sculptor 4GL day numbers. It has
+been tested with dates from Sculptor Release 2.5b.
+
+For more information on Sculptor, you can visit http://www.sculptor.co.uk/
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Sculptor::Date
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Sculptor-Date
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Sculptor-Date
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Sculptor-Date
+
+    Search CPAN
+        http://search.cpan.org/dist/Sculptor-Date/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 Damon Allen Davison
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

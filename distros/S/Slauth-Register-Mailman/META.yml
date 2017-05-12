@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Slauth-Register-Mailman
+version:      0.01
+version_from: lib/Slauth/Register/Mailman.pm
+installdirs:  site
+requires:
+    CGI:                           3
+    CGI::Carp:                     1.28
+    IO::Pipe:                      1.123
+    Slauth:                        0.01
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

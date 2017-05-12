@@ -1,0 +1,11 @@
+inc/Devel/CheckLib.pm
+Changes
+Makefile.PL
+MANIFEST
+README
+XScreenSaver.xs
+t/00_useok.t
+t/01_window_id.t
+lib/SDLx/XScreenSaver.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

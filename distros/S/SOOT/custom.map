@@ -1,0 +1,47 @@
+SOOT*	O_OBJECT
+ClassIterator*	O_OBJECT
+std::vector< double >*	T_VECTORDOUBLE
+std::istream*		T_ISTREAM
+const double		T_NV
+
+INPUT
+
+T_ISTREAM
+	$var = new std::istringstream(SvPV_nolen($arg));
+
+O_TOBJECT
+	$var =($type)SOOT::LobotomizeObject(aTHX_ $arg);
+
+T_VECTORDOUBLE
+	if (SvROK($arg) && SvTYPE(SvRV($arg))==SVt_PVAV) {                                                                              
+	  AV* av = (AV*)SvRV($arg);                                                                                                  
+	  const unsigned int len = av_len(av)+1;                                                                                      
+	  $var = new std::vector<double>(len);                                                                                        
+	  for (unsigned int i = 0; i < len; i++) {                                                                                    
+	    SV** elem;                                                                                                              
+	    elem = av_fetch(av, i, 0);                                                                                              
+	    if (elem != NULL)
+	      (*$var)[i] = SvNV(*elem);
+	    else
+	      (*$var)[i] = 0.;
+	  }
+	}
+	else
+	  Perl_croak(aTHX_ \"%s: %s is not an array reference\",
+	             ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+	             \"$var\");
+
+OUTPUT
+
+O_TOBJECT
+	$arg = SOOT::RegisterObject(aTHX_ (TObject*)$var, "${my $t=$type; $t=~s/^\s*const\b\s*//;$t=~s/\s*[*&]*\s*$//;\$t}");
+
+T_VECTORDOUBLE
+	AV* av = newAV();
+	$arg = newRV_noinc((SV*)av);
+	const unsigned int len = $var->size();
+	av_extend(av, len-1);
+	for (unsigned int i = 0; i < len; i++) {
+	  av_store(av, i, newSVnv((*$var)[i]));
+	}
+

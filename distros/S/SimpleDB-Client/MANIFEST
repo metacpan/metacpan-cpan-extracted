@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+author.t/01.HTTP.t
+bin/simpledb
+dist.ini
+lib/SimpleDB/Client.pm
+lib/SimpleDB/Client/Exception.pm
+t/01.HTTP.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

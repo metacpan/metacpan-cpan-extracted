@@ -1,0 +1,326 @@
+## no critic (ValuesAndExpressions::RequireNumberSeparators)
+# BEWARE: This module is mostly auto-generated!
+#    The source repository contains a template!
+package Sys::Info::Driver::Windows::Constants;
+use strict;
+use warnings;
+use base qw( Exporter );
+use constant CF_MMX => 0x00800000;
+use constant CF_MMXPLUS => 0x00400000;
+use constant CF_SSE => 0x02000000;
+use constant CF_SSE2 => 0x04000000;
+use constant CF_SSE3 => 0x00000001;
+use constant CF_SSSE3 => 0x00000200;
+use constant CF_SSE41 => 0x00080000;
+use constant CF_SSE42 => 0x00100000;
+use constant CF_SSE4A => 0x00000040;
+use constant CF_SSE5 => 0x00000800;
+use constant CF_A3DNOW => 0x80000000;
+use constant CF_A3DNOWEXT => 0x40000000;
+use constant KF_V86_VIS => 0x00000001;
+use constant KF_RDTSC => 0x00000002;
+use constant KF_CR4 => 0x00000004;
+use constant KF_CMOV => 0x00000008;
+use constant KF_GLOBAL_PAGE => 0x00000010;
+use constant KF_LARGE_PAGE => 0x00000020;
+use constant KF_MTRR => 0x00000040;
+use constant KF_CMPXCHG8B => 0x00000080;
+use constant KF_MMX => 0x00000100;
+use constant KF_WORKING_PTE => 0x00000200;
+use constant KF_PAT => 0x00000400;
+use constant KF_FXSR => 0x00000800;
+use constant KF_FAST_SYSCALL => 0x00001000;
+use constant KF_XMMI => 0x00002000;
+use constant KF_3DNOW => 0x00004000;
+use constant KF_AMDK6MTRR => 0x00008000;
+use constant KF_XMMI64 => 0x00010000;
+use constant KF_DTS => 0x00020000;
+use constant KF_NX_BIT => 0x20000000;
+use constant KF_NX_DISABLED => 0x40000000;
+use constant KF_NX_ENABLED => 0x80000000;
+use constant FT_X87_FPU_ON_CHIP => 0x00000001;
+use constant FT_VIRTUAL_8086_MODE_ENHANCEMENT => 0x00000002;
+use constant FT_DEBUGGING_EXTENSIONS => 0x00000004;
+use constant FT_PAGE_SIZE_EXTENSIONS => 0x00000008;
+use constant FT_TIME_STAMP_COUNTER => 0x00000010;
+use constant FT_RDMSR_AND_WRMSR_SUPPORT => 0x00000020;
+use constant FT_PHYSICAL_ADDRESS_EXTENSIONS => 0x00000040;
+use constant FT_MACHINE_CHECK_EXCEPTION => 0x00000080;
+use constant FT_CMPXCHG8B_INSTRUCTION => 0x00000100;
+use constant FT_APIC_ON_CHIP => 0x00000200;
+use constant FT_UNKNOWN1 => 0x00000400;
+use constant FT_SYSENTER_AND_SYSEXIT => 0x00000800;
+use constant FT_MEMORY_TYPE_RANGE_REGISTERS => 0x00001000;
+use constant FT_PTE_GLOBAL_BIT => 0x00002000;
+use constant FT_MACHINE_CHECK_ARCHITECTURE => 0x00004000;
+use constant FT_CONDITIONAL_MOVE_COMPARE_INSTRUCTION => 0x00008000;
+use constant FT_PAGE_ATTRIBUTE_TABLE => 0x00010000;
+use constant FT_PAGE_SIZE_EXTENSION => 0x00020000;
+use constant FT_PROCESSOR_SERIAL_NUMBER => 0x00040000;
+use constant FT_CFLUSH_EXTENSION => 0x00080000;
+use constant FT_UNKNOWN2 => 0x00100000;
+use constant FT_DEBUG_STORE => 0x00200000;
+use constant FT_THERMAL_MONITOR_AND_CLOCK_CTRL => 0x00400000;
+use constant FT_MMX_TECHNOLOGY => 0x00800000;
+use constant FT_FXSAVE_FXRSTOR => 0x01000000;
+use constant FT_SSE_EXTENSIONS => 0x02000000;
+use constant FT_SSE2_EXTENSIONS => 0x04000000;
+use constant FT_SELF_SNOOP => 0x08000000;
+use constant FT_HYPER_THREADING_TECHNOLOGY => 0x10000000;
+use constant FT_THERMAL_MONITOR => 0x20000000;
+use constant FT_UNKNOWN4 => 0x40000000;
+use constant FT_PEND_BRK_EN => 0x80000000;
+
+
+our $VERSION = '0.78';
+our @EXPORT;
+our @EXPORT_OK;
+our %EXPORT_TAGS;
+
+$EXPORT_TAGS{cpu} = [qw(
+CF_MMX
+CF_MMXPLUS
+CF_SSE
+CF_SSE2
+CF_SSE3
+CF_SSSE3
+CF_SSE41
+CF_SSE42
+CF_SSE4A
+CF_SSE5
+CF_A3DNOW
+CF_A3DNOWEXT
+KF_V86_VIS
+KF_RDTSC
+KF_CR4
+KF_CMOV
+KF_GLOBAL_PAGE
+KF_LARGE_PAGE
+KF_MTRR
+KF_CMPXCHG8B
+KF_MMX
+KF_WORKING_PTE
+KF_PAT
+KF_FXSR
+KF_FAST_SYSCALL
+KF_XMMI
+KF_3DNOW
+KF_AMDK6MTRR
+KF_XMMI64
+KF_DTS
+KF_NX_BIT
+KF_NX_DISABLED
+KF_NX_ENABLED
+FT_X87_FPU_ON_CHIP
+FT_VIRTUAL_8086_MODE_ENHANCEMENT
+FT_DEBUGGING_EXTENSIONS
+FT_PAGE_SIZE_EXTENSIONS
+FT_TIME_STAMP_COUNTER
+FT_RDMSR_AND_WRMSR_SUPPORT
+FT_PHYSICAL_ADDRESS_EXTENSIONS
+FT_MACHINE_CHECK_EXCEPTION
+FT_CMPXCHG8B_INSTRUCTION
+FT_APIC_ON_CHIP
+FT_UNKNOWN1
+FT_SYSENTER_AND_SYSEXIT
+FT_MEMORY_TYPE_RANGE_REGISTERS
+FT_PTE_GLOBAL_BIT
+FT_MACHINE_CHECK_ARCHITECTURE
+FT_CONDITIONAL_MOVE_COMPARE_INSTRUCTION
+FT_PAGE_ATTRIBUTE_TABLE
+FT_PAGE_SIZE_EXTENSION
+FT_PROCESSOR_SERIAL_NUMBER
+FT_CFLUSH_EXTENSION
+FT_UNKNOWN2
+FT_DEBUG_STORE
+FT_THERMAL_MONITOR_AND_CLOCK_CTRL
+FT_MMX_TECHNOLOGY
+FT_FXSAVE_FXRSTOR
+FT_SSE_EXTENSIONS
+FT_SSE2_EXTENSIONS
+FT_SELF_SNOOP
+FT_HYPER_THREADING_TECHNOLOGY
+FT_THERMAL_MONITOR
+FT_UNKNOWN4
+FT_PEND_BRK_EN
+
+)];
+
+@EXPORT_OK        = map { @{ $EXPORT_TAGS{$_} } } keys %EXPORT_TAGS;
+$EXPORT_TAGS{all} = \@EXPORT_OK;
+
+1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Sys::Info::Driver::Windows::Constants - Constants
+
+=head1 SYNOPSIS
+
+-
+
+=head1 DESCRIPTION
+
+This document describes version C<0.78> of C<Sys::Info::Driver::Windows::Constants>
+released on C<17 April 2011>.
+
+-
+
+=head1 METHODS
+
+None.
+
+=head1 CONSTANTS
+
+=head2 CF_MMX
+
+=head2 CF_MMXPLUS
+
+=head2 CF_SSE
+
+=head2 CF_SSE2
+
+=head2 CF_SSE3
+
+=head2 CF_SSSE3
+
+=head2 CF_SSE41
+
+=head2 CF_SSE42
+
+=head2 CF_SSE4A
+
+=head2 CF_SSE5
+
+=head2 CF_A3DNOW
+
+=head2 CF_A3DNOWEXT
+
+=head2 KF_V86_VIS
+
+=head2 KF_RDTSC
+
+=head2 KF_CR4
+
+=head2 KF_CMOV
+
+=head2 KF_GLOBAL_PAGE
+
+=head2 KF_LARGE_PAGE
+
+=head2 KF_MTRR
+
+=head2 KF_CMPXCHG8B
+
+=head2 KF_MMX
+
+=head2 KF_WORKING_PTE
+
+=head2 KF_PAT
+
+=head2 KF_FXSR
+
+=head2 KF_FAST_SYSCALL
+
+=head2 KF_XMMI
+
+=head2 KF_3DNOW
+
+=head2 KF_AMDK6MTRR
+
+=head2 KF_XMMI64
+
+=head2 KF_DTS
+
+=head2 KF_NX_BIT
+
+=head2 KF_NX_DISABLED
+
+=head2 KF_NX_ENABLED
+
+=head2 FT_X87_FPU_ON_CHIP
+
+=head2 FT_VIRTUAL_8086_MODE_ENHANCEMENT
+
+=head2 FT_DEBUGGING_EXTENSIONS
+
+=head2 FT_PAGE_SIZE_EXTENSIONS
+
+=head2 FT_TIME_STAMP_COUNTER
+
+=head2 FT_RDMSR_AND_WRMSR_SUPPORT
+
+=head2 FT_PHYSICAL_ADDRESS_EXTENSIONS
+
+=head2 FT_MACHINE_CHECK_EXCEPTION
+
+=head2 FT_CMPXCHG8B_INSTRUCTION
+
+=head2 FT_APIC_ON_CHIP
+
+=head2 FT_UNKNOWN1
+
+=head2 FT_SYSENTER_AND_SYSEXIT
+
+=head2 FT_MEMORY_TYPE_RANGE_REGISTERS
+
+=head2 FT_PTE_GLOBAL_BIT
+
+=head2 FT_MACHINE_CHECK_ARCHITECTURE
+
+=head2 FT_CONDITIONAL_MOVE_COMPARE_INSTRUCTION
+
+=head2 FT_PAGE_ATTRIBUTE_TABLE
+
+=head2 FT_PAGE_SIZE_EXTENSION
+
+=head2 FT_PROCESSOR_SERIAL_NUMBER
+
+=head2 FT_CFLUSH_EXTENSION
+
+=head2 FT_UNKNOWN2
+
+=head2 FT_DEBUG_STORE
+
+=head2 FT_THERMAL_MONITOR_AND_CLOCK_CTRL
+
+=head2 FT_MMX_TECHNOLOGY
+
+=head2 FT_FXSAVE_FXRSTOR
+
+=head2 FT_SSE_EXTENSIONS
+
+=head2 FT_SSE2_EXTENSIONS
+
+=head2 FT_SELF_SNOOP
+
+=head2 FT_HYPER_THREADING_TECHNOLOGY
+
+=head2 FT_THERMAL_MONITOR
+
+=head2 FT_UNKNOWN4
+
+=head2 FT_PEND_BRK_EN
+
+
+
+
+=head1 AUTHOR
+
+Burak Gursoy <burak@cpan.org>.
+
+=head1 COPYRIGHT
+
+Copyright 2006 - 2011 Burak Gursoy. All rights reserved.
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify 
+it under the same terms as Perl itself, either Perl version 5.12.2 or, 
+at your option, any later version of Perl 5 you may have available.
+
+=cut

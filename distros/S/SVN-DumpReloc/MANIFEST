@@ -1,0 +1,8 @@
+bin/svn-dump-reloc
+Changes
+lib/SVN/DumpReloc.pm
+Makefile.PL
+MANIFEST
+README
+t/SVN-DumpReloc.t
+META.yml                                 Module meta-data (added by MakeMaker)

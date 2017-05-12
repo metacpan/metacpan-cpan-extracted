@@ -1,0 +1,18 @@
+.gitignore
+Build.PL
+Changes
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/Scalar/Construct.pm
+lib/Scalar/Construct.xs
+t/aliasobj.t
+t/aliasref.t
+t/constant.t
+t/pod_cvg.t
+t/pod_syn.t
+t/short_names.t
+t/variable.t
+SIGNATURE    Added here by Module::Build

@@ -1,0 +1,48 @@
+Sub::Installer version 0.0.3
+
+This module provides two universal methods that any package/class can
+use to install subroutines in its own namespace.
+
+For example, you can write:
+
+    $ref = $PackageName->install_sub({ $sub_name => $sub_ref });
+
+instead of writing the less-maintainable:
+
+    $ref = do {
+        no strict 'refs';
+        *{$PackageName.'::'.$subname} = $sub_ref;
+    }
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+
+DEPENDENCIES
+
+None.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005, Damian Conway
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -1,0 +1,13 @@
+Revision history for Perl module SerealX::Store 
+
+0.003 2014-04-22T15:43:41Z
+  * Avoid leaving an empty file behind if encode croaks
+
+0.002 2014-04-20T07:17:03Z
+  * Added constructor mechanism to pass encoder and decoder options
+  * Updated cpanfile requires
+  * Updated documentation
+  * Updated tests
+
+0.001 2014-04-19T10:18:25Z
+  * Initial release

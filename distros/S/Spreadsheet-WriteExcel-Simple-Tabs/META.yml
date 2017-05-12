@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Spreadsheet-WriteExcel-Simple-Tabs
+version:             0.10
+abstract:            Simple Interface to the Spreadsheet::WriteExcel Package
+license:             ~
+author:              
+    - Michael R. Davis (domain=>michaelrdavis,tld=>com,account=>perl)
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    IO::Scalar:                    0
+    Spreadsheet::WriteExcel:       0
+    Test::Simple:                  0.44
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

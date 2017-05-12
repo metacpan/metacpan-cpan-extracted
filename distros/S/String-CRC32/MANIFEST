@@ -1,0 +1,10 @@
+README
+Makefile.PL
+t/crc.t		# some tests
+t/testfile	# a file to check during tests
+CRC32.xs	# the heart of the module	
+CRC32.pm
+CRC32.pod	# documentation
+MANIFEST
+crcgen.c	# use this to rebuild your crc table
+typemap		# my typemap for a correct mapping from C types to perl

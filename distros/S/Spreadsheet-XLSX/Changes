@@ -1,0 +1,75 @@
+Revision history for Perl extension Spreadsheet::XLSX.
+
+0.15
+
+	- revert a numeric formatting change which caused isssues with Spreadsheet::Read.
+
+0.14  
+
+	- change default date format to yyyy-mm-dd.  This matches Spreadsheet::ParseExcel.
+	- handle xml tag attributes in varying order (RT #86667, et.al.)
+
+0.13  Sun May 16 13:08:12 MSD 2010
+
+	- ability to read xlsx from filehandle (RT #57483, thanks Sergey Pushkin)
+
+0.12  Tue Oct  6 10:04:37 MSD 2009
+
+	- sheets are now detected by relations (xl/_rels/workbook.xml.rels), not numbers (RT #50236, thanks Pat Mariani)
+
+0.11  Mon Oct  5 19:03:46 MSD 2009
+
+	- sheets numbering fixed (RT #50211, thanks endacoe)
+
+0.1   Wed Mar 25 18:19:46 MSK 2009
+
+	- bypassing empty sheets (thanks Lukasz Wilun for an example with diagrams);
+	- rich text within a cell (by Rob Polocz);
+
+0.09  Mon Jan 26 09:57:04 MSK 2009
+
+	- fixed using of $1 after unsuccessful m// (thanks HMBRAND);
+
+0.08  Mon Jan  5 18:07:57 MSK 2009
+
+	- Perl version requirement lowered (thanks HMBRAND)
+
+0.07  Thu Dec 18 09:46:18 MSK 2008	
+
+	- "Use of uninitialized value ..." warnings suppressed (thanks Gregor Herrmann)
+	
+0.04  Fri Nov 14 09:25:47 MSK 2008
+
+	- RE fixed for the case of opening <t ...> with attributes (thanks Loreyna Yeung)
+
+0.06  Tue Dec 16 18:06:17 MSK 2008
+
+	- files missed from MANIFEST and, therefore, from .tar.gz :-( Sorry, everybody!
+
+0.05  Fri Dec 12 17:28:23 MSK 2008
+	
+	- a lot of fixes by Rob Polocz (dependency on Spreadsheet::ParseExcel introduced): 
+	
+	-- Added support for styles and formatted strings; 
+	-- create and use ParseExcel Workbook, Spreadsheet, and Cell objects; 
+	-- 1904 date convention support; 
+	-- empty tag support; 
+	-- received permission from the Spreadsheet::ParseExcel guys to leverage the formatting classes and check them in to this project.
+
+0.03  Tue May 20 05:18:41 UTC 2008
+
+	- fixed the incorrect mapping for columns > AA (thanks JMELTZER http://rt.cpan.org/Public/Bug/Display.html?id=36013)
+	- added support for r:id attribute (Ibid)
+
+0.02  Mon May 12 07:02:31 UTC 2008
+
+	- fixed a bug with 1st dictionnary string (thanks SSIMMS: http://rt.cpan.org/Public/Bug/Display.html?id=35489)
+	- prereq relaxed (thanx SSIMMS: http://rt.cpan.org/Public/Bug/Display.html?id=35490)
+
+0.01  Thu Mar 13 09:41:52 2008
+
+	- original version; created by h2xs 1.23 with options
+		-A -X -n Spreadsheet::XLSC --skip-exporter --skip-autoloader
+
+
+	

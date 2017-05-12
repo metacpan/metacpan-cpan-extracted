@@ -1,0 +1,11 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Spreadsheet-TieExcel
+version:      0.75
+version_from: TieExcel.pm
+installdirs:  site
+requires:
+    Win32::OLE:                    
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

@@ -1,0 +1,35 @@
+---
+abstract: 'Web Interface for OurNet::BBS'
+author:
+  - 'Chia-Liang Kao <clkao@clkao.org>,'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Slash-OurNet
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Date::Format: 0
+  Date::Parse: 0
+  Devel::Hints: 0.02
+  HTML::FromANSI: 0
+  HTML::FromText: 0
+  Lingua::ZH::Wrap: 0.02
+  Locale::Maketext::Lexicon: 0.32
+  OurNet::BBS: 1.64
+  PerlIO::via::trap: 0.09
+  Template: 0
+  if: 0.03
+  perl: 5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.41

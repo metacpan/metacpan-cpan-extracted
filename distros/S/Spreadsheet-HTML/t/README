@@ -1,0 +1,7 @@
+For more unit tests, see:
+
+  https://github.com/jeffa/Spreadsheet-HTML/tree/master/t/unit
+
+These tests are not included with the distro because i believe
+that they only serve development and regression acceptance and
+they will not report installation errors.

@@ -1,0 +1,324 @@
+0.29  2011-09-19
+
+- Added missing prereq on Catalyst::Plugin::StackTrace.
+
+
+0.28  2011-09-17
+
+- Remove File::Next from test code. This dependency wasn't declared.
+
+- Fix some possible failures in the tests when trying to find files in the
+  distro.
+
+
+0.27  2011-03-06
+
+- Really added support for ssl database connections, including a --db-ssl
+  parameter to the Build.PL.
+
+- All foreign key columns in the schema are now indexed.
+
+- The previous release appeared to have some bad mock data for the
+  schema. This release should fix that.
+
+- Switch from Test::Exception to Test::Fatal, and add the later as a prereq.
+
+
+0.26  2010-11-30
+
+- Removed a bogus prereq on Apache2::ServerUtil.
+
+
+0.25  2010-11-30
+
+- Added a purge user feature. This will remove a user as well as everything
+  they've ever contributed to the wiki, including pages, page revisions, and
+  files. This is intended to make it trivially easy to remove "contributions"
+  from spammers.
+
+- Deleting all of a page's revisions now deletes the page.
+
+
+0.24  2010-10-31
+
+- Added missing test prereq for Test::Differences.
+
+- Pages with many links to other pages ended up doing a lot of SQL queries
+  (one per link). This has been refactored so that the pages for all links are
+  fetched in one query, which should speed up HTML generation for pages with
+  many links.
+
+- External links in wikis which only allow members to post no longer include a
+  rel="nofollow" attribute, since these wikis are presumably secure from spam.
+
+
+0.23  2010-09-28
+
+- Whenever Silki generate URIs for email or redirects, it now makes sure to
+  use the domain of the current request, rather than the default domain.
+
+
+0.22  2010-09-28
+
+- Added a config option, mod_rewrite_hack, to work around brain damage in
+  Apache's mod_rewrite. Turn this on if some pages cannot be resolved when
+  running with Apache+mod_rewrite as a frontend proxy.
+
+
+0.21  2010-09-28
+
+- Fixed the spam checking so it displays a useful error message to the
+  submitter.
+
+- Allow a wiki admin to skip spam checking when submitting a page.
+
+- Improved formatting of preformatted text in a page.
+
+- All external links now include a rel="nofollow" attribute to discourage
+  spam.
+
+- Make sure the temp dir exists before trying to use it.
+
+
+0.20  2010-09-17
+
+- Added a "forgot my password" feature.
+
+- Restyled forms so that labels are above fields, rather than to the left.
+
+
+0.19  2010-09-12
+
+- Errors during an import were not detected properly.
+
+- Import broke if any of the users being imported had an openid_uri.
+
+- Fix bad image URIs for import & export page.
+
+
+0.18  2010-09-12
+
+- Purging a revision sometimes failed with a SQL error. Now this always works
+  (but is slower, sigh.)
+
+
+0.17  2010-09-12
+
+- When editing a page, there is now a live preview shown below the edit form.
+
+
+0.16  2010-09-07
+
+- More layout changes. When viewing a page, tags and incoming links are on the
+  far right, rather than in their own column. Search has been moved to the top
+  of the page.
+
+- The list of active users on the wiki dashboard is now sorted by the most
+  recent edit of each user, and it displays the datetime of their most recent
+  edit as well.
+
+
+0.15  2010-09-05
+
+- The 0.13 and 0.14 releases were missing a prereq on Archive::Tar::Wrapper.
+
+
+0.14  2010-09-05
+
+- Added a hackaround for the fact that DBD::Pg doesn't handle UTF8 data
+  entirely correctly (basically, a column with a user-defined type is never
+  treated as UTF8, even if the type is text-based). See
+  https://rt.cpan.org/Ticket/Display.html?id=40199 in the DBD::Pg queue for
+  discussion.
+
+- Fixed some bugs in the conversion of HTML tables to wikitext. This code
+  isn't used by Silki itself (yet), but is used by SilkiX::Converter::Kwiki.
+
+- Some style tweaks. In particular, the upper right global nav should no
+  longer interfere with the tabs in the header.
+
+
+0.13  2010-09-04
+
+- Renamed a number of files in bin, and moved some of them to dev-bin.
+
+- Added export and import features, along with silki-export and silki-import
+  scripts. This feature is also available to site admins via the web UI.
+
+- Searching for a word with leading or trailing space caused a SQL error.
+
+- Moved some of the wiki subnav items to the dashboard (all attachments,
+  orphans, & wanted pages), since they're not all that important.
+
+- The display of pages recently edited in their profile was broken.
+
+- Added a revision purge feature available to wiki admins. This destroys a
+  revision completely, renumbering any subsequent revisions. This is useful
+  for removing spam and other bogus changes.
+
+
+0.12  2010-07-22
+
+- The mason cache directory will be deleted when Silki is installed, to ensure
+  that templates are re-read.
+
+- Several pages that linked to users did not show the user's image. Now all
+  links to a user should include the user's image.
+
+- Small improvement to diff display.
+
+- When a search didn't find any results, the search page did not make this
+  clear.
+
+
+0.11  2010-07-22
+
+- The PSGI feature did not list Plack::Middleware::ReverseProxy as a prereq.
+
+- Improved the example ubuntu init script. It no longer runs as root, and the
+  pid is stored in a directory under /var/run owned by the $USER in the init
+  script (www-data).
+
+- When a user without edit permission viewed a page with no tags, the tags box
+  was just empty, which looks weird.
+
+- You can now pass --hostname to the Build.PL to pick the default web hostname
+  for your Silki installation.
+
+- Editing a user's preferences set their is_admin flag to false if the user
+  doing the editing was also an admin.
+
+- The list of all users (/users) was broken.
+
+
+0.10  2010-07-20
+
+- Silki::Manual::Admin now describes deploying Silki with Apache 2 & Starman,
+  a setup I've actually been able to make work. I thought I had mod_fastcgid
+  working, but I didn't.
+
+- Added bin/silki.psgi
+
+- Added a sample init script (which works on Ubuntu 10.04) at
+  eg/ubuntu-init.d/silki.
+
+- Attempting to log in with a non-existent username caused a server error. Now
+  it simply returns a sane error to the user.
+
+- Improved the layout wherever user image thumbnails are used, and added a
+  default user icon to make the UI more consistent.
+
+0.09  2010-07-16
+
+- The migrations in previous releases were buggy. If you've migrated a schema,
+  the inc/migations/fixup.sql file contains the SQL statements necessary to
+  fix your schema. If you're just playing with Silki, and don't have any data
+  you need to save, it might be easier to simply drop the existing schema and
+  re-install.
+
+- Added the ability for each user to upload an image for their profile. This
+  is used in their profile, and in various places that refer to users (recent
+  changes, page history, etc.)
+
+
+0.08  2010-06-08
+
+- Any page with more than two headers will now have an table of contents at
+  the top of the page view.
+
+- Added style for tables in page content (but they still overflow their parent
+  container and mess up the page layout).
+
+- We need to call TO_TSQUERY on full text queries in order to get stemming
+  (and probably other tweaks) on the search terms.
+
+- In-memory file handles were not handling unicode data correctly, which could
+  lead to warnings and bad output, particularly when rendering a page's
+  content.
+
+
+0.07  2010-06-05
+
+- Fixed a stupid bug that prevented logging in.
+
+- Add a "restore this revision" button when viewing an older revision.
+
+- Added various revision-related links at the bottom of each page
+  (compare/view previous/next).
+
+
+0.06  2010-06-04
+
+- *WARNING* - Lots of database changes. Many varchar columns are now text or
+  citext. What's citext? It's contrib data type for case-insensitive text,
+  which means that sorts and equality are case-insensitive. Postgres 8.4 ships
+  citext, but 8.3 does not. If you are running 8.3 and install citext manually
+  into your contrib dir, this should work. Patches to make this all smoother
+  are welcome.
+
+  Did I mention that Silki is still alpha?
+
+* The search code blew up on multi-word searches. Now a multi-word search is
+  interpreted as requiring all the words.
+
+* Fixed links to user profiles inside a wiki so they point to the per-wiki
+  profile.
+
+* Per-wiki user profiles now show some information about the user that is
+  specific to the wiki.
+
+* When formatting a page link to another wiki's page, the links were leaking
+  information by showing whether or not the page existed. Now such links
+  simply show up as "Inacessible page" in the HTML output.
+
+
+0.05  2010-06-03
+
+- The attachments list for a wiki is now paged, with 50 files shown per page.
+
+- Added paging to the orphan and wanted pages lists.
+
+- Show the attachment count next to the Attachments link when viewing a page.
+
+- Paging for application-wide user, wiki, and domain lists was broken.
+
+- The wiki dashboard's active users box now just looks for activity in the
+  past month. Otherwise, it has to look at all revision of all pages, which
+  can be very slow.
+
+- The site's "all users" list now defaults to showing only active users, but
+  offers an option to show disabled users as well.
+
+
+0.04  2010-06-01
+
+- *WARNING* - this release contains the first database migration for Silki. If
+  by some chance you actually have real data in Silki (did you not see the
+  alpha warning in the docs?), make a backup first.
+
+- Files are now attached to a page, not the wiki. This makes more sense, since
+  you may want to associate a set of files with a page, yet not link to all of
+  them directly from the page.
+
+- Implemented page renaming, at both the API and UI levels.
+
+- The revision created when adding a file to a page now has a comment, and is
+  created by the system user, not the user which uploaded the file.
+
+- Page history now shows a revision's comment, if it has one.
+
+
+0.03   2010-05-31
+
+- Doc and packaging fixes so this looks a little nicer on search.cpan.org.
+
+
+0.02   2010-05-31
+
+- Fixes a PAUSE indexing issue. I left a monkey patch in a state that was
+  visible to PAUSE.
+
+
+0.01   2010-05-31
+
+- First release, still very much an alpha.

@@ -1,0 +1,12 @@
+SIGNATURE
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+README
+lib/SVK/Log/Filter/Babelfish.pm
+t/0-signature.t
+t/00-load.t
+t/pod.t
+Makefile.PL
+SIGNATURE    Added here by Module::Build

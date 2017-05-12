@@ -1,0 +1,12 @@
+#!/usr/local/bin/perl
+
+use Log::Log4perl qw(:easy);
+Log::Log4perl->easy_init({level => $DEBUG, layout => '%F %L: %m%n'});
+use Sysadm::Install qw(download hammer untar cd sysrun);
+
+download "http://www.perl.com/CPAN/src/stable.tar.gz";
+untar "stable.tar.gz";
+cd "stable";
+print `pwd`, "\n";
+hammer("./Configure", "-d", "-D", "prefix=/home/mschilli/PERL-test");
+sysrun("make install");

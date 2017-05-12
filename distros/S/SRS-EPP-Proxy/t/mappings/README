@@ -1,0 +1,11 @@
+These files are run by both t/mappings.t and t/integration.t. The former is a
+unit test, and applies all assertions, the latter is a full integration test,
+requires a properly configured EPP proxy talking to a properly configured
+SRS, and only applies the output assertions.
+
+For the integration tests, certain data is assumed to be setup already.
+Also, the SRS is assumed to be handling the .te cctld.  The data to be
+setup (if any) is in a sub directory called 'create', in a format handled
+by RegistrarTests (not part of this distribution!). There is also an
+optional 'cleanup' dir, which contains any SRS requests that should be
+fired after the test is run. 

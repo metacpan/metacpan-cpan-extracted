@@ -1,0 +1,28 @@
+#!/usr/bin/ruby
+
+# Static and constant initialization
+
+var counter = 0;
+
+func test(type){
+    say "#{type} call";
+    if (counter++ > 3) {
+        die "ERROR!";
+    }
+    return "...";
+}
+
+func init() {
+    static a = test('static');  # called only once
+    const  b = test('const');   # called dynamically each time
+
+    a := test("static :=");     # should not change if defined
+
+    say "#{a} #{b}";
+}
+
+init();
+init();
+init();
+
+say "** Test passed!";

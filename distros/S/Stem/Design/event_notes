@@ -1,0 +1,38 @@
+
+Events
+
+The low-level core of a Stem hub is an event-loop engine.  This 
+engine provides support for the common events needed in a networking 
+system, including reading and writing, socket connection and 
+acceptance, and timers.  The Stem::Event system provides a high-level 
+API to these services to the rest of the hub while it, in turn, 
+relies on a lower-level event system which is currently Event.pm, 
+which is available on CPAN.  This design isolates the actual event 
+engine used from the cells which need its services.  There are plans 
+to support other event engines including Perl/Tk, and creating one 
+that runs on NT/Win2K. 
+
+Stem::Event uses the standard Stem callback style which requires 
+parameters designating the object and method to call when an event 
+has been triggered.  In typical Stem fashion, the method names have 
+useful defaults so a Stem::Event call is made with very few 
+parameters. 
+
+Read and write Stem events take a required object and filehandle as 
+parameters, and an optional timeout value.  If the I/O is not 
+completed before the timeout occurs, the timeout method is called 
+instead of the normal I/O completion method.  The connect and accept 
+events also require an object and the appropriate socket parameters. 
+The connect event can take an optional timeout which behaves 
+similarly to the read/write timeout.  A timer event can be created 
+which will be triggered after a given delay and optionally repeated 
+at a specified interval.  As you would expect in an event system, 
+multiple instances of all these events can be active at the same 
+time. 
+
+Most cells will never directly use the Stem::Event interface as there 
+are higher level cells that perform commonly needed services for 
+them.  These include Stem::AsynchIO, Stem::Socket, and Stem::Cron. 
+However, this does not stop any cell from directly calling these if 
+it needs finer control over its events. 
+

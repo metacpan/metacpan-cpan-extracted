@@ -1,0 +1,166 @@
+NAME
+    Set::String - Strings as objects with lots of handy methods (including
+    set comparisons) and support for method chaining.
+
+SYNOPSIS
+    "my $s1 = Set::String->new("Hello");"
+
+    "my $s2 = Set::String->new("World!\n");"
+
+    "$s1->length->print; # prints 5"
+
+    "$s1->ord->join->print; # prints 72,101,108,108,111"
+
+    "$s2->chop(3)->print; # prints 'Worl'"
+
+PREREQUISITES
+    Perl 5.6 or later
+
+    Set::Array (also by me). Available on CPAN.
+
+    The 'Want' module by Robin Houston. Available on CPAN.
+
+DESCRIPTION
+    Set::String allows you to create strings as objects and use OO-style
+    methods on them. Many convenient methods are provided here that appear
+    in the FAQ's, the Perl Cookbook or posts from comp.lang.perl.misc. In
+    addition, there are Set methods with corresponding (overloaded)
+    operators for the purpose of Set comparison, i.e. +, ==, etc.
+
+    The purpose is to provide built-in methods for operations that people
+    are always asking how to do, and which already exist in languages like
+    Ruby. This should (hopefully) improve code readability and/or
+    maintainability. The other advantage to this module is method-chaining
+    by which any number of methods may be called on a single object in a
+    single statement.
+
+    Note that Set::String is a subclass of Set::Array, and your string
+    objects are really just treated as an array of characters, ala C. All
+    methods available in Set::Array are available to you.
+
+OBJECT BEHAVIOR
+    The exact behavior of the methods depends largely on the calling
+    context.
+
+    Here are the rules:
+
+    * If a method is called in void context, the object itself is modified.
+
+    * If the method called is not the last method in a chain (i.e. it's
+    called in object context), the object itself is modified by that method
+    regardless of the 'final' context or method call.
+
+    * If a method is called in list or scalar context, a list or list
+    refererence is returned, respectively. The object itself is NOT
+    modified.
+
+    Here is a quick example:
+
+    "my $so = Set::String->new("Hello");"
+
+    "my @uniq = $so->unique(); # Object unmodified."
+
+    "$so->unique(); # Object modified, now contains 'Helo'"
+
+    Here are the exceptions:
+
+    * Methods that report a value, such as boolean methods like *defined()*,
+    never modify the object.
+
+BOOLEAN METHODS
+    defined() - Returns 1 if the string is defined. Otherwise a 0 is
+    returned.
+
+STANDARD METHODS
+    chomp(*?int?*) - Deletes the last character of the string that
+    corresponds to $/, or the newline by default. Optionally you may pass an
+    integer to this method to indicate the number of times you want the
+    string chomped. In list context, a list of chomped values is returned.
+    In scalar context, the number of chomped values is returned.
+
+    chop(*?int?*) - Deletes the last character of the string. Optionally you
+    may pass an integer to this method to indicate the number of times you
+    want the string chopped. In list context, a list of chopped values is
+    returned. In scalar context, the number of chopped values is returned.
+
+    crypt(*salt*) - Encrypts the string, converting it into a 13-character
+    string, with the first two characters as the *salt*. Unlike Perl's
+    builtin *crypt* function, you CAN decrypt the object to get the original
+    string using the *decrypt()* method.
+
+    decrypt - Decrypts an encrypted string. Attempting to decrypt an
+    unencrypted string will generate a warning. Returns the decrypted string
+    in either list or scalar context.
+
+    eval - Evaluates the string and returns the result.
+
+    index(*substring*) - Returns the position of the first occurrence of
+    *substring* within the string. If the index is not found, a -1 is
+    returned instead.
+
+    lc(*?int?*) - Lower case the string. Optionally, you may pass an integer
+    value to this method, in which case only that number of characters will
+    be lower cased (left to right), instead of the entire string.
+
+    lcfirst - Lower case the first character of the string.
+
+    ord(*?int?*) - Converts the string to a list of ord values, one per
+    character. Alternatively, you may provide an optional integer argument,
+    in which case only that number of characters will be converted to ord
+    values. An array or array ref of ord values is returned in list or
+    scalar context, respectively.
+
+    pack(*template*) - Packs the string according to the template provided
+
+    pos(*pattern*) - Returns the location in your string where the last
+    global search left off. If more than one location is found, it will
+    return an array of integers (or an array ref in scalar context).
+
+    substr(*offset*,*?length?*) - Returns a substring of the object string,
+    starting at *offset* (with 0 as the first char) and continuing until
+    *length*, or the end of the string if the length is not specified. If
+    the offset is negative, then it will start at the end of the string.
+
+    Returns the substring in either list or scalar context.
+
+    uc(*?int?*) - Upper case the string. Otherwise identical to the 'lc()'
+    method, above.
+
+    unpack(*template*) - Unpacks the string according to the template.
+    Probably best used when *not* part of a chain, as your result will
+    always be concatenated into one big string otherwise.
+
+FAQ
+    *How can you decrypt an encrypted string? How are you doing this?*
+
+    When the *crypt()* method is called, a copy of the original string is
+    placed in a lexical variable within the package. Since there's no way to
+    access that variable *except* through the object (as far as I know),
+    your string is secure.
+
+    Note that I wouldn't rely on *crypt()* to provide true encryption. For
+    that, you ought to be using one of the more modern cryptographic
+    modules.
+
+KNOWN BUGS
+    None. Please let me know if you find any.
+
+FUTURE PLANS
+    Add the 'vec' method
+
+    Allow arguments to be passed to the 'eval()' method. I am not sure what
+    the behavior should be at that point, however. Should it replace the
+    string object? Should the results of that evaluation be appended to the
+    original string? Ideas welcome.
+
+    Add character ranges to some of the methods
+
+    How about a boolean method 'palindrome'? Perhaps a subclass of
+    Set::String, called Set::String::Grammar. It could have a series of
+    boolean methods like 'verb()', 'adjective()', etc.
+
+AUTHOR
+    Daniel Berger
+
+    djberg96@hotmail.com
+

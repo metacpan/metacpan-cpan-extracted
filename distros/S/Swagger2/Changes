@@ -1,0 +1,399 @@
+Revision history for perl distribution Swagger2
+
+0.89 2017-03-02T23:03:38+0100
+ - Deprecated for real
+
+0.88 2016-12-24T14:35:48+0100
+ - Bump required JSON::Validator version to 0.90
+ - Add deprecation warning to Mojolicious::Plugin::Swagger2
+ - Deleted guides, since this dist will be deprecated
+
+0.87 2016-12-11T11:39:23+0100
+ - Compatible with JSON::Validator 0.90
+
+0.86 2016-09-19T18:55:09+0200
+ - Deprecated distribution
+
+0.85 2016-08-09T12:48:13+0200
+ - Fix finding all $ref occurances in JSON::Validator #95
+
+0.84 2016-08-08T10:04:28+0200
+ - Fix recurring requests with same path part #93
+
+0.83 2016-07-02T15:03:38+0200
+ - Bump JSON::Validator dependency to 0.75
+ - Change JSON::Validator will pass on uploads as Mojo::Upload objects
+
+0.82 2016-06-22T19:27:24+0200
+ - Deprecating Swagger2::SchemaValidator in favor of JSON::Validator::OpenAPI
+ - Fix Swagger2::Client formData parameters #87
+   Contributor: A.J. Lucas
+
+0.81 2016-06-10T19:29:45-0700
+ - Fix Swagger2::POD looping over "x-" HTTP methods
+ - Change Swagger2::Client to set Content-Type on faked error responses #84
+   Contributor: A.J. Lucas
+
+0.80 2016-06-07T15:29:56-0500
+ - Fix validating required "file" in formData
+ - Add support for "discriminator" #72
+
+0.79 2016-05-23T19:15:25+0200
+ - Fix collectionFormat "multi"
+
+0.78 2016-05-19T18:39:42+0200
+ - Add EXPERIMENTAL .html and .pod handling for "spec_path" rendering
+
+0.77 2016-04-12T08:32:56+0200
+ - Add Swagger2->find_operations() method
+ - Add support for plain WebSocket object passed to ws() in swagger2-client.js
+ - Add http() to swagger2-client.js
+ - Add load() to swagger2-client.js
+ - Change ws() to be a setter and getter in swagger2-client.js
+ - Mark "swagger_route_added" as DEPRECATED
+ - Remove fresh() and cache features from swagger2-client.js
+
+0.76 2016-04-09T09:52:34+0200
+ - Fix new($file)->expand->validate #80
+   Contributors: Tina Müller and Daniel Böhmer
+ - Add EXPERIMENTAL support for SWAGGER2_IO_LOGGING=debug
+ - Documented different response types #78 #79
+ - Removed deprecated methods specification() and tree()
+
+0.75 2016-02-22T09:02:43+0000
+ - Fix indentation of JSONSchemaSupport guide
+
+0.74 2016-02-19T11:28:52+0000
+ - Add x-json-schema support
+   Contributor: Martin Renvoize
+
+0.73 2016-02-15T14:04:15+0100
+ - Fix "0" as placeholder value #74
+   Contributor: Le Garff Yoann
+
+0.72 2016-02-12T11:30:05+0100
+ - Fix rendering Swagger spec cannot contain "id" and "x-mojo-xxx"
+ - Fix rendering Swagger spec with requested host in response.
+ - Made the code less confusing by removing the /o regex modifier #71
+   Contributor: Daniel Böhmer
+
+0.71 2016-02-08T21:29:57+0100
+ - Bundle EXPERIMENTAL swagger2-client.js
+ - Fix spelling error #70
+   Contributor: Lucas Kanashiro
+
+0.70 2016-01-29T10:50:57+0100
+ - Documentation fixes
+   Contributor: Bernhard Graf
+ - Remove outdated warning #69
+   Contributor: Denny de la Haye
+
+0.69 2016-01-14T22:01:15+0100
+ - Allow blocking Swagger2::Client requests to return on failure #67
+
+0.68 2016-01-13T16:36:28+0100
+ - Can serve specification from basePath
+ - Fix skipping tests on MSWin32 #66
+   Contributor: Paul Durden
+
+0.67 2016-01-12T14:36:24+0100
+ - Add "basePath" to "Add route ..." debug message #64
+ - Can pass Swagger2->new to Swagger2::Client #63
+ - Fix new(url => Mojo::URL->new(...));
+ - Fix expand() will not clear url()
+
+0.66 2015-12-29T11:52:06+0100
+ - Will not add non-existing input keys to $args #52
+   Contributor: Scott Wiersdorf
+ - Use $c->match instead of $c->stash to get placeholder data
+ - Add "From" to list of ignored words in SKIP_OP_RE #54
+ - Allow more complex method name detection from operationId #55
+ - Skipping editor test on Win32 #56
+ - Boolean in headers will be the strings "true" and "false" #58
+
+0.65 2015-12-03T12:51:51+0100
+ - Swagger2::Client will generate both camel- and snake case methods
+ - Swagger2::Client pass $err as a string to callback
+ - Swagger2::Editor can save specification back to disk on POST
+
+0.64 2015-11-28T08:18:45+0100
+ - YAML::Tiny is no longer supported by JSON::Validator
+ - Bump JSON::Validator dependency to 0.63
+
+0.63 2015-11-19T09:22:44+0100
+ - Add validation of output headers, fixes #41
+ - Add support for "readOnly" in object properties #49
+
+0.62 2015-11-04T12:42:32+0000
+ - Trying to authorise release
+
+0.61 2015-11-03T20:22:55+0000
+ - Fix handling of empty collectionFormat value
+ - Fix handling of arrays in request body
+ - Add validation for 204 No Content response
+
+0.60 2015-10-14T23:25:14+0200
+ - Fix pass on $app to WebSocket controller
+ - Fix support for "collectionFormat" for both "parameters" and "items"
+ - Add support for "collectionFormat" "multi"
+
+0.59 2015-10-11T13:22:31+0200
+ - Fix validating required body
+ - Add resource to download full API spec
+ - Add before_render hook to make sure we reply with JSON
+ - Add EXPERIMENTAL dispatch_to_swagger()
+
+0.58 2015-10-06T11:36:29+0200
+ - Add support for using operationId instead of x-mojo-controller #36 #37
+ - Add "swagger_route_added" event #27
+ - Remove "valid" from standard error structure since it was redundant
+ - Documented how to include http://git.io/vcKD4
+
+0.57 2015-09-30T11:48:22+0200
+ - Require JSON::Validator 0.56 for YAML validation
+ - Add support for passing "coerce" to M::P::Swagger2::register()
+
+0.56 2015-09-29T20:23:07+0200
+ - Add Mojolicious::Plugin::Swagger2 will validate spec on load
+
+0.55 2015-09-27T16:53:08+0200
+ - Split Mojolicious::Plugin::Swagger2 into guides
+ - Remove EXPERIMENTAL from "x-mojo-around-action"
+
+0.54 2015-09-27T13:37:06+0200
+ - Compatible with JSON::Validator 0.54
+ - Compatible with Mojolicious 6.22
+ - Rename index.html.ep to list.html.ep in blog example #28
+   Contributor: Stephan Jauernick
+ - Paths are sorted from the most specific to least specific #35
+   Contributor: Olli-Antti Kivilahti
+
+0.53 2015-09-13T15:55:54+0200
+ - Add EXPERIMENTAL naming of swagger routes #27
+ - Add "swagger_operation_spec" to route defaults #30
+ - Allow x-mojo-around-action to be inherited #30
+ - Allow x-mojo-controller to be inherited
+ - Swagger2::SchemaValidator is back because JSON::Validator cannot be Swagger specific
+
+0.52 2015-09-13T10:53:14+0200
+ - Fix validate(): Need to expand, as well as depend on fixes in JSON::Validator
+ - Will also log the operationId not implemented
+ - Deprecated tree() in favor of api_spec()
+ - Deprecated specification()
+
+0.51 2015-09-03T12:22:20+0200
+ - Fix dumper() in Command::swagger2
+ - Add /editor to example blog application
+ - Add slides for YAPC::EU 2015 t/blog/2015-yapc-eu-slides.pdf
+
+0.50 2015-08-24T16:28:42+0200
+ - Should not use Swagger2::SchemaValidator #25
+
+0.49 2015-08-23T15:16:09+0200
+ - Remove naming or routes to fix unique problem #23
+
+0.48 2015-08-23T15:09:58+0200
+ - Core validation functionality is moved to JSON::Validator #25
+
+0.47 2015-08-11T18:16:54+0200
+ - Add "swagger" as default stash() value
+
+0.46 2015-08-11T16:35:04+0200
+ - Add support for giving an Swagger2 object to the plugin
+ - Add support for "collectionFormat" (PARTIAL) #17
+ - Deprecated passing "controller" as argument to plugin
+ - Remove warning about helpers defined twice #21
+
+0.45 2015-08-11T14:32:05+0200
+ - Add support for x-mojo-around-action (EXPERIMENTAL)
+
+0.44 2015-08-10T23:13:15+0200
+ - Updated schema.json
+   https://twitter.com/SwaggerApi/status/627128354827862016
+
+0.43 2015-07-14T17:36:07+0200
+ - Fix loading swagger spec from editor on Windows
+
+0.42 2015-07-11T22:02:27+0200
+ - Fix parsing formData
+ - Add support for no content in response
+
+0.41 2015-07-11T12:25:55+0200
+ - Fix loading swagger spec from editor on Windows (failed)
+ - Bump Mojolicous requirement to 6.00
+
+0.40 2015-07-08T10:47:39+0200
+ - Fix "&Digest::MD5::md5_hex function called with reference argument"
+
+0.39 2015-07-08T10:33:02+0200
+ - Allow negative integers in query string
+
+0.38 2015-07-07T09:48:13+0200
+ - Will use "basePath" in root API route
+ - Swagger2::Editor can load specifications over HTTP
+
+0.37 2015-07-06T23:27:17+0200
+ - Bundle http://json-schema.org/draft-04/schema
+ - Bundle http://swagger.io/v2/schema.json
+
+0.36 2015-07-06T21:07:30+0200
+ - Remove EXPERIMENTAL from main Swagger2 module
+ - Fix POST JSON data with Swagger2::Client
+ - Updated swagger2 schema.json: Allow empty arrays for parameters
+ - Add example blog app
+
+0.35 2015-06-24T08:17:43+0200
+ - Add "mojo swagger2 client" command
+ - Add EXPERIMENTAL "coerce" attribute to Swagger2::SchemaValidator
+
+0.34 2015-06-22T10:13:44+0200
+ - Change order of YAML modules
+
+0.33 2015-06-19T22:04:15+0200
+ - Add Swagger2::Client #8
+ - Fixed Mojolicious::Plugin::Swagger2 can use default values from schema #18
+ - Started deprecating "controller" as plugin config
+
+0.32 2015-06-17T15:34:32+0200
+ - Allowing {n,no,false,off} as boolean false, #15
+
+0.31 2015-05-13T12:42:39+0200
+ - Change required Mojolicious verision to 5.54 #14
+
+0.30 2015-04-21T20:33:43+0200
+ - Fix failing test with YAML 1.15 #12
+
+0.29 2015-04-09T09:52:40Z
+ - Fix _schema_to_string_dispatch() can only be called with reference
+ - Add support for raw text/binary data #6
+ - Add POD rendering of anyOf, allOf and oneOf #7 Contributor: Julian
+   Maurice
+
+0.28 2015-03-01T18:02:20Z
+ - Allow setting specification_file when constructing Swagger2::Editor
+ - Mojolicious::Routes::Route::bridge is DEPRECATED
+
+0.27 2015-01-22T19:52:37Z
+ - Fix validating "required" on a property
+ - Fix validating output
+ - Fix "path" in errors response when posting JSON or form data
+
+0.26 2015-01-21T14:05:44Z
+ - Fix validating body and form data
+ - Add support for custom placeholder types
+
+0.25 2015-01-20T12:26:23Z
+ - Fix rendering "not implemented"
+ - Fix parsing true/false in URL
+ - Fix validating against empty rule set
+ - Fix validating against "body"
+ - Fix rendering "body" parameters in POD #5
+ - Documented custom route for Swagger2 Mojolicious plugin
+
+0.24 2015-01-19T14:05:08Z
+ - Add support for x-mojo-controller in swagger spec
+ - HTTP method is not used in method name looked any more
+
+0.23 2015-01-12T09:42:19Z
+ - Fix scrolling to the right position after rendering POD
+ - Fix loading ace.js from relative url
+ - Will include description in POD, instead of just "required"
+ - Remove editor shortcut CTRL+L
+ - Add editor shortcut CTRL+F (find)
+ - Can load API from same domain, using "#/path/to/api.json" fragment
+
+0.22 2015-01-09T19:37:46Z
+ - Allow "number" type when generating POD
+ - Editor will also render "Table of contents"
+
+0.21 2015-01-05T12:26:46Z
+ - Fix order of headings in generated POD
+ - Fix response codes are rendered with "=head4"
+ - Made text in editor easier to read
+
+0.20 2015-01-03T17:11:06Z
+ - Fix loading $SWAGGER_API_FILE on Windows in Swagger2::Editor #4
+   Contributor: Andreas Koenig
+
+0.19 2015-01-03T15:16:15Z
+ - Move editor code from Mojolicious::Command::swagger2 to Swagger2::Editor
+
+0.18 2015-01-03T14:16:31Z
+ - Fix bodytest.t: YAML is not a required dependency
+
+0.17 2015-01-03T10:30:29Z
+ - Fix failing Windows test where the Mojo::URL path part is invalid
+
+0.16 2015-01-02T12:44:33Z
+ - Tried to fix failing Windows test where c:\path\to\spec is converted
+   into a URL with scheme "c", #4
+
+0.15 2014-12-19T13:26:24Z
+ - Fix parse() will set tree() attribute
+ - Allow editor to start without file
+
+0.14 2014-12-18T16:06:02Z
+ - Add both "summary" and "description" to POD
+ - Add print styling for editor
+ - Can resize editor area
+ - Fix detecting yaml/json mode in editor
+
+0.13 2014-12-18T14:06:26Z
+ - Fix "not" logic in SchemaValidator
+
+0.12 2014-12-16T11:30:34Z
+ - Add missing Swagger2::POD::_schema_boolean_to_string() method
+ - Add Swagger2::parse() method
+ - Add "mojo swagger2 edit" command
+ - Fix printing "Resource URL" when generating POD
+ - Fix parameter references
+ - Fix expanding bare $ref and $ref inside refs
+
+0.11 2014-12-15T09:29:27Z
+ - Add "mojo swagger2 pod" command
+ - Add "mojo swagger2 perldoc" command
+ - Add "mojo swagger2 validate" command
+ - Change POD output to follow standard formatting
+
+0.10 2014-12-15T07:27:51Z
+ - Disable "int64" format test if Perl does not support 64 bit
+
+0.09 2014-12-13T12:46:39Z
+ - Fix adding parameter to route #1
+ - Fix "Resource URL" in generated POD
+ - Add "Type" to "Parameters" POD table
+
+0.08 2014-12-11T11:08:05Z
+ - Change "floats" and "double" formats are not tested
+ - Add support for "byte" format
+
+0.07 2014-12-10T14:58:15Z
+ - Fix test for negative integers
+ - Add more formats: date, double, float, int32 and int64
+
+0.06 2014-12-10T12:19:40Z
+ - Fix t/jv-formats.t: Label not found for "last SKIP"
+
+0.05 2014-12-09T22:01:31Z
+ - Fix "Not an ARRAY reference at lib/Swagger2.pm line 356."
+
+0.04 2014-12-09T21:02:43Z
+ - Add "formats" to Swagger2::SchemaValidator
+
+0.03 2014-12-09T15:36:04Z
+ - Add Swagger2::validate()
+ - Add Swagger 2.0 schema
+ - Fix circular $ref when expanding a document
+ - Rewrote Swagger2::SchemaValidator to support draft 4
+
+0.02 2014-12-05T10:01:34Z
+ - Add Swagger2::SchemaValidator
+ - Add Swagger2::expand()
+ - Add Mojolicious::Plugin::Swagger2
+
+0.01 2014-12-04T14:01:27Z
+ - Add load()
+ - Add pod() and Swagger2::POD
+ - Add to_string($format)
+ - Started project
+

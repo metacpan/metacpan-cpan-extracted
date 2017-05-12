@@ -1,0 +1,16 @@
+[	class	=>	'Stem::Log',
+	args	=>	[
+
+		name	=>	'stdout',
+		filters =>	[
+			'stdout'	=> 1,
+		],
+	],
+],
+[
+	class	=>	'Stem::Boot',
+	name	=>	'test',
+	args	=>	[
+		boot_file	=> 'test/test.boot',
+	]
+],

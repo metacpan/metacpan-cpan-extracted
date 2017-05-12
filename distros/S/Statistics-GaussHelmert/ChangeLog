@@ -1,0 +1,29 @@
+2002-04-18  Stephan Heuel  <heuel@ipb.uni-bonn.de>
+
+	* GaussHelmert.pm: version 0.041 wasn't recognized by cpan, so I
+	try it with 0.05
+
+2002-04-17  Stephan Heuel  <heuel@ipb.uni-bonn.de>
+
+	* t/line_estimation.t: set the random seed so that tests are
+	reproducible (this was unfortunately commented)
+
+	* GaussHelmert.pm: version 0.04 is the release version, no
+	further changes applied
+
+2002-03-11  Stephan Heuel  <heuel@ipb.uni-bonn.de>
+
+	* GaussHelmert.pm: verbose() can now take a filename as argument
+	for the logfile.
+
+	* example/line2d-estimation.pl: added some comments
+
+2002-03-01  Stephan Heuel  <perl@heuel.org>
+
+	* GaussHelmert.pm: remove "number of contradictions/constraints"
+	as parameters.  I can get this from the size of the vectors in $y
+	and $b. Tested succesfully with Math::UncertainGeometry.
+
+0.02  Thu Sep 20 15:04:51 2001
+	- original version; created by h2xs 1.20 with options
+		-X -n Statistics::GaussHelmert

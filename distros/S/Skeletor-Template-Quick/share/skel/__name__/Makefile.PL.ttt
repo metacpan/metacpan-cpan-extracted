@@ -1,0 +1,18 @@
+use ExtUtils::MakeMaker;
+
+my $meta_merge = {
+    META_MERGE => {
+        resources => {
+            repository  => 'https://github.com/GITHUBID/[% name_lc %].git',
+        },
+    }
+};
+
+WriteMakefile(
+    'NAME'         => '[% namespace %]',
+    'VERSION_FROM' => 'lib/[% project_fullpath %].pm', # finds $VERSION
+    'PREREQ_PM'    => {}, # e.g., Module::Name => 1.1
+    ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
+      (ABSTRACT_FROM => 'lib/[% project_fullpath %].pm',
+       AUTHOR     => '[% author %]') : ()),
+);

@@ -1,0 +1,45 @@
+Revision history for Perl extension OS2::SOM.
+
+0.01  Fri Oct 22 20:05:13 1999
+	- original version; created by h2xs 1.20 with options
+		-A -fn OS2::SOM -v 0.01
+
+??!!	Calling non-existing SOM method is a fatal error?!
+	Only primitive types of parameters and return value are supported.
+	Only in-parameters are supported.
+	No memory management is done at all.
+	Exception is not analysed.
+	SOM Objects have type SOMObjectPtr, SOM Classes have type SOMClassPtr.
+	Methods may be dispatched only when a signature is explicitely
+	 described.
+	Only local SOM is supported.
+	Tested with SOMObjects 2.0 on OS/2 with EMX only.
+	Renamed to SOM.
+
+	Give TOOLKIT=p:/ath/to/toolkit option to MakeMaker.
+
+0.02
+	Support DSOM.
+	Environment supported (to some extent).
+
+0.03
+	Calling non-existing SOM method supported now.
+	Separate DSOM part and Repository part into a separate .xs files.
+	Remove -fomit-frame-pointer flag if present (probably gcc2.8.1 bug).
+	Better docs.
+
+0.04
+	tk_objref supported (not in `any', on input no check on subclass).
+	Constants for SOMD specific $^E errors.
+	SOMObject::IDL class added; has all the SOMObject methods which do not
+	  take va_list (basically, without *Dispatch).
+	Startup of DSOM much more reliable (in tests).
+	Include animals.dll and ORXSMP.IR for testing purposes.
+	Autodeduce location of the toolkit if URE is installed in the
+	  toolkit, or ObjectUtility is registered.
+
+0.05	???
+0.06	Better auto-detection of the toolkit location, add PERL_POLLUTE.
+	t/animal.t and t/wrong_method.t put a dir on SOMIR instead of a file.
+0.0601  Do not shutdown servers during tests unless $ENV{PERLTEST_SHUTDOWN_SERVERS};
+	Change DIST_DEFAULT to zipdist.

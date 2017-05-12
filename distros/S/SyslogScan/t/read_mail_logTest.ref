@@ -1,0 +1,78 @@
+count11@ok.healthnet.org: 0 msgs/0 bytes bcast, 1 msgs/8471 bytes rcvd
+count1@prev.healthnet.org: 0 msgs/0 bytes bcast, 1 msgs/0 bytes rcvd
+helkaire@ok.healthnet.org: 0 msgs/0 bytes bcast, 1 msgs/7000 bytes rcvd
+joil_gupta@ok.healthnet.org: 0 msgs/0 bytes bcast, 1 msgs/5357 bytes rcvd
+shoko@time.healthnet.org: 0 msgs/0 bytes bcast, 1 msgs/954 bytes rcvd
+unione@ok.healthnet.org: 0 msgs/0 bytes bcast, 1 msgs/214 bytes rcvd
+unique1@usa.healthnet.org: 1 msgs/214 bytes bcast, 0 msgs/0 bytes rcvd
+unique2@usa.healthnet.org: 1 msgs/1531 bytes bcast, 0 msgs/0 bytes rcvd
+unitwo@ok.healthnet.org: 0 msgs/0 bytes bcast, 1 msgs/1531 bytes rcvd
+unizney@ok.healthnet.org: 0 msgs/0 bytes bcast, 1 msgs/1531 bytes rcvd
+healthnet.org TOTAL: 3 msgs/1961 bytes bcast, 8 msgs/26535 bytes rcvd
+count11@ok.healthnet.org: 0 msgs/0 bytes bcast, 1 msgs/8471 bytes rcvd
+count1@prev.healthnet.org: 0 msgs/0 bytes bcast, 1 msgs/1477 bytes rcvd
+countdomo-owner@usa.healthnet.org: 1 msgs/216 bytes bcast, 0 msgs/0 bytes rcvd
+helkaire@ok.healthnet.org: 0 msgs/0 bytes bcast, 1 msgs/7000 bytes rcvd
+joil_gupta@ok.healthnet.org: 0 msgs/0 bytes bcast, 1 msgs/5357 bytes rcvd
+shoko@time.healthnet.org: 0 msgs/0 bytes bcast, 1 msgs/954 bytes rcvd
+unione@ok.healthnet.org: 0 msgs/0 bytes bcast, 1 msgs/214 bytes rcvd
+unique1@usa.healthnet.org: 1 msgs/214 bytes bcast, 0 msgs/0 bytes rcvd
+unique2@usa.healthnet.org: 1 msgs/1531 bytes bcast, 0 msgs/0 bytes rcvd
+unitwo@ok.healthnet.org: 0 msgs/0 bytes bcast, 1 msgs/1531 bytes rcvd
+unizney@ok.healthnet.org: 0 msgs/0 bytes bcast, 1 msgs/1531 bytes rcvd
+
+229 bytes from coumajordomo-owner@usa.healthnet.org to count1@ptime.healthnet.org
+954 bytes from shookway@fs1.ho.man.ac.uk to shoko@time.healthnet.org
+0 bytes from antiquity to antcount1@ant.utmem.edu
+5357 bytes from joinkids@foo.phyast.pitt.edu to joil_gupta@ok.healthnet.org
+7000 bytes from help-net@bar.temple.edu to helkaire@ok.healthnet.org
+519 bytes from unique3%sswmbx%fdaoc@mr.cvmvax.gov to uniman@ok.edu
+519 bytes from unique3%sswmbx%fdaoc@mr.cvmvax.gov to "<uni>|ifs=" " && exec /usr/local/bin/procmail -f- || exit 75 #phil"@ok.com
+1531 bytes from unique3@vm.temple.edu to unizney@ok.healthnet.org
+1531 bytes from unique3@vm.temple.edu to unilo@ok.hello.org
+214 bytes from unique1@usa.healthnet.org to unione@ok.healthnet.org
+214 bytes from unique1@usa.healthnet.org to unitwo@ok.foo.org
+1531 bytes from unique2@usa.healthnet.org to unione@ok.wpgate.galaxy.dnet.yorkhospital.edu unitwo@ok.healthnet.org
+8471 bytes from cougithendu@iastate.edu to count11@ok.healthnet.org
+1477 bytes from coumfuller@warren.med.harvard.edu to count1@prev.healthnet.org
+216 bytes from countdomo-owner@usa.healthnet.org to count2@time
+954 bytes from shookway@fs1.ho.man.ac.uk to shoko@time.healthnet.org
+0 bytes from antiquity to antcount1@ant.utmem.edu
+5357 bytes from joinkids@foo.phyast.pitt.edu to joil_gupta@ok.healthnet.org
+7000 bytes from help-net@bar.temple.edu to helkaire@ok.healthnet.org
+519 bytes from unique3%sswmbx%fdaoc@mr.cvmvax.gov to uniman@ok.edu
+519 bytes from unique3%sswmbx%fdaoc@mr.cvmvax.gov to "<uni>|ifs=" " && exec /usr/local/bin/procmail -f- || exit 75 #phil"@ok.com
+1531 bytes from unique3@vm.temple.edu to unizney@ok.healthnet.org
+1531 bytes from unique3@vm.temple.edu to unilo@ok.hello.org
+214 bytes from unique1@usa.healthnet.org to unione@ok.healthnet.org
+214 bytes from unique1@usa.healthnet.org to unitwo@ok.foo.org
+1531 bytes from unique2@usa.healthnet.org to unione@ok.wpgate.galaxy.dnet.yorkhospital.edu unitwo@ok.healthnet.org
+8471 bytes from cougithendu@iastate.edu to count11@ok.healthnet.org
+1477 bytes from coumfuller@warren.med.harvard.edu to count1@prev.healthnet.org
+216 bytes from countdomo-owner@usa.healthnet.org to count2@time
+"<uni>|ifs=" " && exec /usr/local/bin/procmail -f- || exit 75 #phil"@ok.com: 0 msgs/0 bytes bcast, 1 msgs/519 bytes rcvd
+antcount1@ant.utmem.edu: 0 msgs/0 bytes bcast, 1 msgs/0 bytes rcvd
+antiquity: 1 msgs/0 bytes bcast, 0 msgs/0 bytes rcvd
+cougithendu@iastate.edu: 1 msgs/8471 bytes bcast, 0 msgs/0 bytes rcvd
+coumfuller@warren.med.harvard.edu: 1 msgs/1477 bytes bcast, 0 msgs/0 bytes rcvd
+count11@ok.healthnet.org: 0 msgs/0 bytes bcast, 1 msgs/8471 bytes rcvd
+count1@prev.healthnet.org: 0 msgs/0 bytes bcast, 1 msgs/1477 bytes rcvd
+count2@time: 0 msgs/0 bytes bcast, 1 msgs/216 bytes rcvd
+countdomo-owner@usa.healthnet.org: 1 msgs/216 bytes bcast, 0 msgs/0 bytes rcvd
+helkaire@ok.healthnet.org: 0 msgs/0 bytes bcast, 1 msgs/7000 bytes rcvd
+help-net@bar.temple.edu: 1 msgs/7000 bytes bcast, 0 msgs/0 bytes rcvd
+joil_gupta@ok.healthnet.org: 0 msgs/0 bytes bcast, 1 msgs/5357 bytes rcvd
+joinkids@foo.phyast.pitt.edu: 1 msgs/5357 bytes bcast, 0 msgs/0 bytes rcvd
+shoko@time.healthnet.org: 0 msgs/0 bytes bcast, 1 msgs/954 bytes rcvd
+shookway@fs1.ho.man.ac.uk: 1 msgs/954 bytes bcast, 0 msgs/0 bytes rcvd
+unilo@ok.hello.org: 0 msgs/0 bytes bcast, 1 msgs/1531 bytes rcvd
+uniman@ok.edu: 0 msgs/0 bytes bcast, 1 msgs/519 bytes rcvd
+unione@ok.healthnet.org: 0 msgs/0 bytes bcast, 1 msgs/214 bytes rcvd
+unione@ok.wpgate.galaxy.dnet.yorkhospital.edu: 0 msgs/0 bytes bcast, 1 msgs/1531 bytes rcvd
+unique1@usa.healthnet.org: 1 msgs/214 bytes bcast, 0 msgs/0 bytes rcvd
+unique2@usa.healthnet.org: 1 msgs/1531 bytes bcast, 0 msgs/0 bytes rcvd
+unique3%sswmbx%fdaoc@mr.cvmvax.gov: 1 msgs/519 bytes bcast, 0 msgs/0 bytes rcvd
+unique3@vm.temple.edu: 1 msgs/1531 bytes bcast, 0 msgs/0 bytes rcvd
+unitwo@ok.foo.org: 0 msgs/0 bytes bcast, 1 msgs/214 bytes rcvd
+unitwo@ok.healthnet.org: 0 msgs/0 bytes bcast, 1 msgs/1531 bytes rcvd
+unizney@ok.healthnet.org: 0 msgs/0 bytes bcast, 1 msgs/1531 bytes rcvd

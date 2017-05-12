@@ -1,0 +1,6 @@
+Revision history for Perl extension Statistics::RVector.
+
+0.1  Sat Dec 15 2011
+	- original version, created Makefile.PL and tests using h2xs.
+	- Provides very base vector math capabilities and some R-style 
+	  statistical functions.

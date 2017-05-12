@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title>Resultat sur Circa</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" href="http://www.alianwebserver.com/styles/vert.css">
+<link rev="made" href="mailto:alian@alianwebserver.com">
+<style type="text/css">
+<!--
+.item {margin-top:1em;   }
+.copyright { text-align: right; }
+-->
+</style>
+</head>
+<body>
+<h1><? $titre ?></h1>
+<div class="main">
+<img align="left" src="/circa/images/circa_logo1.gif" width="70" height="70">
+<img align="left" src="/circa/images/circa_logo2.gif" width="110" height="50">
+<h2><? $nb ?> sur <? $words ?></h2>
+<table>
+<tr>
+	<td><? $categories1 ?></td>
+	<td><? $categories2 ?></td>
+</tr>
+</table>
+<ul><? $resultat ?></ul>
+<hr>
+
+<form method="GET" enctype="application/x-www-form-urlencoded" action="/cgi-bin/circa/search.cgi">
+<table align=center cellpadding="0" cellspacing="0" border="0">
+<tr>
+<td><h2 class="h2-sans-marge">Nouvelle recherche</h2>
+    <input type="text" name="word" value="<? $words ?>">
+    <input type="hidden" name="id" value="<? $id ?>">
+    <input type="hidden" name="categorie" >
+    <input type="submit" name=".submit" value="go"><br>
+ <select name="categorie">
+ <option value="<? $categorie ?>">Dans cette catégorie</option>
+ <option value="0">Dans tout le site</option>
+ </select>
+</td>
+<td><div class="liens"><? $listeLiensSuivPrec ?></div></td></tr>
+</table>
+</form>
+<div class="copyright">
+Powered by <a href="http://www.alianwebserver.com/circa" target="_blank">AlianWebServer</a>
+</div>
+</div>
+</body>
+</html>

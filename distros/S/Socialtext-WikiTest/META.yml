@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                Socialtext-WikiTest
+version:             0.07
+abstract:            ~
+license:             ~
+author:              
+    - Luke Closs <cpan@5thplane.com>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    mocked:                        0
+    Socialtext::Resting:           0
+    Socialtext::Resting::Utils:    0.04
+    Test::Exception:               0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

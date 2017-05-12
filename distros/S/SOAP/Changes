@@ -1,0 +1,48 @@
+Revision history for Perl extension SOAP.
+
+0.10  Sun Oct  3 02:07:18 1999
+	- original version; created by h2xs 1.19
+
+0.12  Sun  Oct 9  03:56:50 1999
+	- added support for parsing SOAP bars where SerializedStream
+	  element is missing
+	- added interactive initialization of SOAP::Config
+	- added a live test (downloads CDL and makes a SOAP call)
+	- added a Win32 friendly package (a zipped version)
+
+0.20  Thu  Dec 29  08:52:49 1999
+	- Complete rewrite - first beta release striving for compliance
+          with SOAP v1.0
+
+0.21  Thu  Dec 29  18:47:57 1999
+	- Added SOAP::Transport::HTTP::CGI to get IIS/Win32 developers
+          under the tent as well
+
+0.22  Fri  Dec 30  18:46:13 1999
+        - First version made available via CPAN
+	- Added SOAP.pm and README, and cleaned up some of the documentation
+          in preparation for uploading to CPAN
+
+0.23  Tue  Jan 10  00:08:00 2000
+	- Added support for passing top-level scalars in SOAP headers
+	- Changed xsi namespace to include "/instance" trailer
+
+0.24  Tue  Aug 14  03:23:15 2000
+	- Updated to support SOAP 1.1 (no array support yet, sorry)
+        - NOTE NOTE NOTE: the following "public" interfaces have changed:
+          * SOAP::Transport::HTTP::Client->send_receive
+0.25  Thu  Aug 16  15:49:57 2000
+	- Added SOAP::Struct and SOAP::StructSerializer to allow
+          deterministic order of serialization of elements.
+	- Changed "rootWithId" attribute to "root"
+        - Deprecated SOAP::SimpleTypeWrapper; found a cleaner solution
+        - Updated documentation
+0.26  Wed  Aug 29  09:32:25 2000
+	- Fixed id and href to be unqualified names
+	- Removed some leftover debugging output to Apache log (whoops)
+0.27  Sat  Sep 1  14:48:50 2000
+	- Removed Perl fields useage due to complaints about compatibility
+          with Perl 5.005
+0.28  Wed  Sep 5  10:41:27 2000
+	- Fixed really lame bug in Struct.pm where I was taking the
+          reference of @_ and holding it after the method returned

@@ -1,0 +1,42 @@
+2008-09-11 13:23  cvs
+
+	* bin/fsid: polished documentation in clis
+
+2008-09-11 13:14  cvs
+
+	* lib/Sys/Filesystem/ID.pm, t/00.t: skipping tests unless user is
+	  root
+
+2008-09-07 13:57  cvs
+
+	* bin/fsid: touched up documentation in cli
+
+2008-09-07 13:52  cvs
+
+	* bin/fsid: added version to fsid
+
+2008-09-07 13:44  cvs
+
+	* Changes: added changes file
+
+2008-09-06 18:53  cvs
+
+	* lib/Sys/Filesystem/ID.pm: added some documentation, some
+	  description in module a well.
+
+2008-06-30 13:36  cvs
+
+	* bin/fsid, lib/Sys/Filesystem/ID.pm, t/00.t: added a test added
+	  fsid -A (make sure all wanted fs formats have an id) added some
+	  documentation so user can reprogram id generation etc
+
+2008-06-30 12:24  cvs
+
+	* MANIFEST, Makefile.PL, bin/fsid, bin/fsidgen,
+	  lib/Sys/Filesystem/ID.pm: Initial revision
+
+2008-06-30 12:24  cvs
+
+	* MANIFEST, Makefile.PL, bin/fsid, bin/fsidgen,
+	  lib/Sys/Filesystem/ID.pm: init import
+

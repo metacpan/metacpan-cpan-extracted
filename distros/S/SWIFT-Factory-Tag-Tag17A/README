@@ -1,0 +1,28 @@
+SWIFT/Factory/Tag/Tag17A
+========================
+
+This class provides the TAG17A for a SWIFT message.
+
+TAG17A is used as a "Buy (Sell) Indicator".
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+SWIFT::Factory::Tag::Tag17.pm
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2003, BIKER. All rights reserved.
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

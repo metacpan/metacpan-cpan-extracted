@@ -1,0 +1,19 @@
+Changes
+README
+MANIFEST
+Makefile.PL
+INSTALL
+etc/bb.vim
+etc/ctags
+etc/tests.bb
+t/biblio.t
+t/bibliosim.t
+t/lib/DBD/Mock.pm
+lib/SQL/Bibliosoph.pm
+lib/SQL/Bibliosoph/Sims.pm
+lib/SQL/Bibliosoph/CatalogFile.pm
+lib/SQL/Bibliosoph/Query.pm
+lib/SQL/Bibliosoph/Dummy.pm
+lib/SQL/Bibliosoph/Exceptions.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

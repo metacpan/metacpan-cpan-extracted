@@ -1,0 +1,20 @@
+Changes
+COPYING
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+lib/SQL/Shell.pm
+lib/SQL/Shell/Manual.pm
+bin/sqlsh
+t/SQL-Shell.t
+t/data/commands.tsv
+t/data/commands2.tsv
+t/data/sqlsh-commands.txt
+t/data/sqlsh-expected.xml
+t/data/sqlsh-expected-dump.tsv
+t/data/sqlsh-expected-log.sql
+t/pod.t
+t/pod_coverage.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

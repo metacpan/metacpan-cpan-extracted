@@ -1,0 +1,45 @@
+---
+abstract: 'An SMS::Send driver for the apistore.co.kr SMS service'
+author:
+  - '김도형 - Keedi Kim <keedi@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  Test::More: '0'
+  perl: '5.008'
+configure_requires:
+  perl: '5.008'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SMS-Send-KR-APIStore
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  SMS::Send::KR::APIStore:
+    file: lib/SMS/Send/KR/APIStore.pm
+    version: '0.003'
+requires:
+  HTTP::Tiny: '0'
+  JSON: '0'
+  SMS::Send: '0'
+  parent: '0'
+  perl: '5.008'
+  utf8: '0'
+resources:
+  bugtracker: https://github.com/keedi/SMS-Send-KR-APIStore/issues
+  homepage: https://github.com/keedi/SMS-Send-KR-APIStore
+  repository: https://github.com/keedi/SMS-Send-KR-APIStore.git
+version: '0.003'
+x_authority: cpan:KEEDI
+x_contributors:
+  - 'Hyungsuk Hong <aanoaa@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.64'

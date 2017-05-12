@@ -1,0 +1,79 @@
+{
+   "abstract" : "a coderef for use in Moose triggers that will lock hashrefs and arrayrefs",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.016, CPAN::Meta::Converter version 2.140640",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Sub-Trigger-Lock",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Inkt" : "0.001"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter::Tiny" : "0",
+            "Scope::Guard" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Moo" : "1.003000",
+            "Moose" : "2.0600"
+         },
+         "requires" : {
+            "Test::Fatal" : "0",
+            "Test::More" : "0.96",
+            "Test::Requires" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Sub::Trigger::Lock" : {
+         "file" : "lib/Sub/Trigger/Lock.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/Sub-Trigger-Lock/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=Sub-Trigger-Lock"
+      },
+      "homepage" : "https://metacpan.org/release/Sub-Trigger-Lock",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-sub-trigger-lock.git",
+         "web" : "https://github.com/tobyink/p5-sub-trigger-lock"
+      }
+   },
+   "version" : "0.002"
+}

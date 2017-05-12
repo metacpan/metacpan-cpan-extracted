@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/SMS-Send-TW-Socket2Air.t
+lib/SMS/Send/TW/Socket2Air.pm
+META.yml                                 Module meta-data (added by MakeMaker)

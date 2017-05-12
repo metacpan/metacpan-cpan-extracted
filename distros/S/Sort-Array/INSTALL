@@ -1,0 +1,16 @@
+Requirements:
+~~~~~~~~~~~~~
+
+	Needs Perl version 5.003_03
+
+To install:
+~~~~~~~~~~~
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Copyright (c) 2001 Michael Diekmann <michael.diekmann@undef.de>. All rights
+reserved. This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

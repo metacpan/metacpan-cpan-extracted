@@ -1,0 +1,381 @@
+==================================================
+Changes from 1740-09-22 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.102 at 2014-07-07 05:51:25 +0000
+------------------------------------------
+
+  Change: b0ba32ca4ea5d122cd578b0d955777c81cbf7a2f
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-07-07 07:50:06 +0000
+
+    Added missing requirement 
+
+  Change: 5b2b7ba52cbf9fb116f04a5d214ef31b671133d9
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-07-05 21:25:24 +0000
+
+    Changes for new version of plugin bundle 
+
+  Change: 776c2531668224036d4a2c16f6485a1da1b842e4
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-07-05 20:05:49 +0000
+
+    Still WIP but tests are now at least not failing (so travis active
+    again) 
+
+  Change: fc3f23639d15f7a790bf06d19b529ad537b29c35
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-07-05 19:28:49 +0000
+
+    Removed with_errors of labelhtml, made html label html attributes
+    configurable 
+
+  Change: d9f9e58b49b2abe2e4176853e0f4eb4750cc3458
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-07-05 19:21:17 +0000
+
+    WIP (updated load test with new roles) 
+
+  Change: 542d965ef384fd8dc8e1d955e4a0d4d9a28dc465
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-07-05 19:18:31 +0000
+
+    WIP 
+
+  Change: fc519adf09cef4d63b39efdd58b5f16a54271b95
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-07-05 18:34:29 +0000
+
+    Fixed load and syform formhtml tests after changes 
+
+  Change: 6226fc4b50531888372f9e914d206deee93d3d0b
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-07-05 18:20:18 +0000
+
+    HTML now working fine, lets get on bootstrap 
+
+  Change: aabca8f468ed946434adb000b437b74e81931e59
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-07-03 07:41:38 +0000
+
+    WIP 
+
+  Change: 8d4fcd6fdf519135414375806324eb8e6c3f66fc
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-06-28 05:56:57 +0000
+
+    SyForm::HTML and SyForm::Field::InputHTML for managing the attributes 
+
+  Change: 88bdf5af29a598abbd03e9e5ee122f3fe1da57e7
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-06-28 03:48:28 +0000
+
+    Tuning of html util tests 
+
+  Change: c26ec3bc484754c1b4dab7c8f6c353ad822ca911
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-06-28 03:46:17 +0000
+
+    Hups, Clone is more clever than i thought huehue 
+
+  Change: 2288273016c932a270fb88867e7cde3d4717f3cf
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-06-28 03:36:07 +0000
+
+    Added Util::HTML functions to better handle HTML::Declare
+    modifications 
+
+  Change: 8cffddd931ec00274711045ee45c3e567a151030
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-06-28 01:58:11 +0000
+
+    Fixed default 
+
+  Change: dacc1cc579825df6e0e398a821b8a876ccac0ece
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-06-28 01:46:43 +0000
+
+    Readded bool overload for view and results success roles 
+
+  Change: 62eec09653474ba12041b38d8cef39fd5072626f
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-06-18 22:06:33 +0000
+
+    Verify works again... next... 
+
+  Change: b2c11158e4dde60dd89a2a14ba9f5c132ace3636
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-06-16 04:21:30 +0000
+
+    Removed requirement by mistake 
+
+  Change: f465326bc3c0d6dc35f6a4c75656f975a8dbc9b3
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-06-16 04:20:08 +0000
+
+    Total refactoring, Moose to Moo, and simplification, removing the
+    role concept a bit, still trying to split up 
+
+  Change: 1d849f64824f3b0cc30200f3ee1e0d01891e3527
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-06-05 00:20:42 +0000
+
+    WIP 
+
+  Change: 8fe6f930cd3c1f58cd76e3255949a70fc05f87cb
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-06-03 16:00:02 +0000
+
+    WIP 
+
+  Change: 1ce0754537a2a6351a183d1f2902b2e345675003
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-26 23:09:47 +0000
+
+    Added new possibilities for giving syccess parameter for more
+    customization 
+
+  Change: 55e3f8d1c9a66f44e4efadf5d61dfafcaf9899e3
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-25 20:54:57 +0000
+
+    More fixing!! yeah! 
+
+  Change: efdf0a8a72aa2fce05c6a23ce410eef9fa682dc3
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-25 20:43:19 +0000
+
+    Fixed tests 
+
+  Change: cdce837485d6f4b86b9a7ed09567f21992b2bc77
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-25 20:38:24 +0000
+
+    HUPS! 
+
+  Change: 86470c7fe1d51c495364c66f67246f80a75681b8
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-25 20:13:53 +0000
+
+    Hups, thats debugging 
+
+  Change: b50b7a2b25f4ca4360eefd704940f3c8d2d3695e
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-25 20:13:09 +0000
+
+    Using HTML::Declare for making the HTML, adding Bootstrap stuff,
+    seems all fine now... so far.... 
+
+  Change: 3cc170c4e8c51611f76b0f814f274fe290085f4c
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-24 22:36:23 +0000
+
+    Ok verify is fixed again, and in the next episode you will see me
+    fixing the html output! <crowdcheers> 
+
+  Change: da2d8e6dcd7dcea4a3c5e4e89a6c37eeaf19e5b6
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-24 22:15:30 +0000
+
+    Adding last modifications, rechecking the plan... 
+
+  Change: 43c2c8b4e792258faa1fc776bfec0b84dc206d07
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-10 00:48:05 +0000
+
+    placeholder attribute on field, fixed some rw (wtf...) 
+
+  Change: 08dd7df2ee094a6a73c3b33d7e0186fd4a164c32
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-10 00:37:46 +0000
+
+    Removed latest exception again, is not really required, must be
+    verify or success feature 
+
+  Change: e4390a61dbe8c17fbedb3e2ee80e8591fcd93a04
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-10 00:19:03 +0000
+
+    New exception, i love exceptions... somehow... i dont know yet fully,
+    but its ok ;9 
+
+  Change: 33704a83f0f6f5aef506c05a692dc3f062b5938f
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-09 23:49:41 +0000
+
+    Added submit button (yeah, finally \o/), more cleanup of html for
+    better bootstrap integration 
+
+  Change: 04d1ba70399a832f2fe81c581dd3dda33bf1d636
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-09 23:20:32 +0000
+
+    A bit reorganisation, more clean design already coming into head
+    ;).... the show goes on 
+
+  Change: af2b3fb4c0bd60655c7870a7513e39e550ae0ad1
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-09 22:23:50 +0000
+
+    Added Bootstrap capabilities 
+
+  Change: caf4c5305f5b55a831d434f5334b6dc7c112fa70
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-09 19:22:35 +0000
+
+    Added HTML functionlity 
+
+  Change: ef2ceee2796ce894ddba331712685e8bc4741728
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-05 15:22:03 +0000
+
+    Overload bool functionality via the ::Success roles 
+
+  Change: fe2e252bf3fb71f43d202ce6ef37ea57fbca697a
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-05 06:17:26 +0000
+
+    More tests for object 
+
+  Change: 5bcaa6c450269c30ddda6d420d3d7a0aa585b2cd
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-05 06:10:54 +0000
+
+    Fixing object functionality and making adding roles to results and
+    view easier with central form roles 
+
+  Change: 6fece344ee232415bdf940db73f01b76ff9cfb1e
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-05 05:48:11 +0000
+
+    Updated load test 
+
+  Change: 32eeaf1e78c32cc91da194a8050d6156dcf9082d
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-05 05:47:21 +0000
+
+    Object functionality and a lot of cleanup 
+
+  Change: 651daaaa7a6cba40a2035d3c55db63f3c8c58591
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-05 03:50:12 +0000
+
+    More fixes, deactivating overloading again, more abstracts 
+
+  Change: a682b0c1607d6bd487a1f2ee8b5bc5d716dbb0d3
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-05 03:32:58 +0000
+
+    Switched to Validation::Class, added overloading for bool at least
+    (hashref and array still are making problems), switched to
+    namespace::clean 
+
+  Change: 706b3db29b622a7801a3b8b8705d6492d1797ef7
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-04 11:32:34 +0000
+
+    So.... moving the parts out of process into the classes, so that
+    SyForm::Values produces SyForm::Results that produces SyForm::View,
+    that way roles dont need to be stacked on SyForm::Process 
+
+  Change: af17905d860c42f79dd09b6a89a2b6d394c9d377
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-04 06:29:29 +0000
+
+    Much smoother view field handling, fixed a lot of troubles around
+    defaults and verify, starting to use verify filters result if verify
+    is in use 
+
+  Change: 5aadd04a32f93a79f26560a87ce0648e31f987a0
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-04 03:30:06 +0000
+
+    doc fixes 
+
+  Change: 1fef2b2d6e360da866907b9d83f136676928b3ad
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-04 03:18:56 +0000
+
+    Documentation! Documentation! Documentation! Documentation! 
+
+  Change: 207784ad8fbb542efeaa7d763340f4ef37fbeb5c
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-04 03:01:42 +0000
+
+    Small fixes on the exceptions 
+
+  Change: fd1cee2f5f5ccc39e94b67d7e72f2a17ba4219dc
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-04 02:56:22 +0000
+
+    Ok now the view code really works, and defaults... hurray! 
+
+  Change: 10738cb89b4ab765fe9770587adfbd17a307be7a
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-03 15:55:54 +0000
+
+    Adding of view layer, more clean splitting and roles now can be
+    automatically added to form BEFORE creation via field args, generally
+    all roles are now given by the previous step to even make it
+    dynamical 
+
+  Change: 7e2ea946122074fae3b98c2477daca350640e2c8
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-03 00:37:08 +0000
+
+    New exceptions with tests 
+
+  Change: 855c9e6fbff389a8a36a40efe65b57a37cea2b8b
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-02 12:19:53 +0000
+
+    More speaking own anon class names, remake of load test 
+
+  Change: 512d2d3a33628b1d1b110548ef3e6724eff0c019
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-02 11:54:44 +0000
+
+    details, Details, DETAILS!!! 
+
+  Change: 9f46e237d8eaa970b67f439c019bde6204504540
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-02 11:46:21 +0000
+
+    Extreme tuning of the exception concept. Little changes. 
+
+  Change: d97275afa2b0493d3105d53783204ab14525e071
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-02 07:28:59 +0000
+
+    Added original error exception role, added process_args on process
+    exception 
+
+  Change: dfe5f01c843e8dac8762ca0d068ebc4d39a1d2aa
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-02 07:21:50 +0000
+
+    Next gen.... now everything readonly 
+
+  Change: 18c53f1a9fa827a7be5d84080b4a5268f0dfb5e1
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-01 05:18:38 +0000
+
+    Added travis.yml 
+
+  Change: 180e288bfc46ee2b087c09bf58f5e4dde4eedf5b
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-01 05:12:19 +0000
+
+    First release, some base functionality, looks really neat... 
+
+  Change: 8c3526e8a889bea6839584b7c557a704324a7dd6
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-04-30 21:52:08 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

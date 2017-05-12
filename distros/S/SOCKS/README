@@ -1,0 +1,30 @@
+
+Introduction
+------------
+This is a SOCKS client module that can communicate with SOCKS v4 and
+v5 servers.  It currently allows you to make outgoing and incoming 
+TCP connections.  UDP is not yet supported and is first on the TODO
+list.  Included in this distribution is a sample program called
+"example" to show you how to use this module.  Net::SOCKS
+documentation is available on your system by doing a
+"perldoc Net::SOCKS".
+
+Resources on the Internet
+-------------------------
+The latest Net::SOCKS module can be found at:
+http://www.perl.com/CPAN/modules/by-module/Net/
+
+General SOCKS information:
+http://www.socks.nec.com/
+
+Installing
+----------
+To install, do the usual "perl Makefile.PL ; make ; make test ; make install".
+
+Cheers,
+Clinton Wong
+clintdw@netcom.com
+http://postmaster.net/~clintdw/
+
+May 19, 1998
+

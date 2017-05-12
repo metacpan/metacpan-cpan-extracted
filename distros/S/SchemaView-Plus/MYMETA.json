@@ -1,0 +1,50 @@
+{
+   "abstract" : "Retrieve, drawing and printing database schema",
+   "author" : [
+      "Milan Sorm (sorm@milansorm.cz)"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 6.86, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "SchemaView-Plus",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBI" : "1.12",
+            "Data::CompactDump" : "0",
+            "FindBin" : "0",
+            "Math::Project" : "0",
+            "Tk" : "800.014",
+            "Tk::FontDialog" : "0",
+            "Tk::MListbox" : "0",
+            "Tk::ProgressBar" : "0",
+            "XML::Dumper" : "0.4",
+            "XML::Parser" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.17"
+}

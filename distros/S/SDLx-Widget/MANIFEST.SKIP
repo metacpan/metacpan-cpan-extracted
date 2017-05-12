@@ -1,0 +1,9 @@
+.bak
+.bat
+.tar.gz
+.git
+^Build$
+blib/
+_build/
+^MYMETA\.yml$
+^MYMETA\.json$

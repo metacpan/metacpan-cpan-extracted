@@ -1,0 +1,18 @@
+# Dump of OAI-ORE Resource Map model as N3
+<http://arxiv.org/abs/0801.2244v1> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchives.org/ore/terms/AggregatedResource>.
+<http://arxiv.org/abs/0801.2244v1> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <info:eu-repo/semantics/humanStartPage>.
+<http://arxiv.org/pdf/0801.2244v1> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://purl.org/dc/dcmitype/Text>.
+<http://arxiv.org/pdf/0801.2244v1> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchives.org/ore/terms/AggregatedResource>.
+<http://arxiv.org/rem/0801.2244v1#aggregation> <http://www.openarchives.org/ore/terms/aggregates> <http://arxiv.org/abs/0801.2244v1>.
+<http://arxiv.org/rem/0801.2244v1#aggregation> <http://www.openarchives.org/ore/terms/aggregates> <http://arxiv.org/pdf/0801.2244v1>.
+<http://arxiv.org/rem/0801.2244v1#aggregation> <http://www.openarchives.org/ore/terms/alsoInResourceMap> <http://arxiv.org/rem/0801.2244>.
+<http://arxiv.org/rem/0801.2244v1#aggregation> <http://www.openarchives.org/ore/terms/analogousTo> <info:doi/10.1103/PhysRevD.72.095016>.
+<http://arxiv.org/rem/0801.2244v1#aggregation> <http://www.openarchives.org/ore/terms/isAggregatedBy> <http://arxiv.org/rem/0801.2244#aggregation>.
+<http://arxiv.org/rem/0801.2244v1#aggregation> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://purl.org/eprint/type/JournalArticle>.
+<http://arxiv.org/rem/0801.2244v1#aggregation> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchives.org/ore/terms/Aggregation>.
+<http://arxiv.org/rem/0801.2244v1> <http://purl.org/dc/elements/1.1/rights> <http://creativecommons.org/licenses/publicdomain/>.
+<http://arxiv.org/rem/0801.2244v1> <http://purl.org/dc/terms/created> "2008-01-15T10:01:19Z".
+<http://arxiv.org/rem/0801.2244v1> <http://purl.org/dc/terms/creator> <http://arxiv.org/>.
+<http://arxiv.org/rem/0801.2244v1> <http://purl.org/dc/terms/modified> "2008-01-15T10:01:19Z".
+<http://arxiv.org/rem/0801.2244v1> <http://www.openarchives.org/ore/terms/describes> <http://arxiv.org/rem/0801.2244v1#aggregation>.
+<http://arxiv.org/rem/0801.2244v1> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchives.org/ore/terms/ResourceMap>.

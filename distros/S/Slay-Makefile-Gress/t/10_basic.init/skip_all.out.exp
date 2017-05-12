@@ -1,0 +1,3 @@
+1..0 # SKIP I don't wanna
+# Compilation failed in require at skip.pl line 1.
+# BEGIN failed--compilation aborted at skip.pl line 1.

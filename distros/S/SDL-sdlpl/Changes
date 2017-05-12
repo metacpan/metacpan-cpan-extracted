@@ -1,0 +1,14 @@
+Revision history for Perl extension sdlpl.
+
+
+Fri May 26 11:27:46 EDT 2000
+
+Added SFont support.		Version 1.01
+
+	David J. Goehrig
+
+Mon May 22 15:20:28 EDT 2000
+
+Finished the first release
+
+	David J. Goehrig

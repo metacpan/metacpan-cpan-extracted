@@ -1,0 +1,217 @@
+NAME
+    Search::Elasticsearch::Cxn::NetCurl - A Cxn implementation which uses
+    libcurl via Net::Curl
+
+VERSION
+    version 5.02
+
+DESCRIPTION
+    Provides an HTTP Cxn class based on Net::Curl. The "NetCurl" Cxn class
+    is very fast and uses persistent connections but requires XS and
+    "libcurl".
+
+    This class does Search::Elasticsearch::Role::Cxn, whose documentation
+    provides more information.
+
+CONFIGURATION
+  "connect_timeout"
+    Unlike most HTTP backends, Net::Curl accepts a separate
+    "connect_timeout" parameter, which defaults to 2 seconds but can be
+    reduced in an environment with low network latency.
+
+  Inherited configuration
+    From Search::Elasticsearch::Role::Cxn
+
+    *   node
+
+    *   max_content_length
+
+    *   deflate
+
+    *   deflate
+
+    *   request_timeout
+
+    *   ping_timeout
+
+    *   dead_timeout
+
+    *   max_dead_timeout
+
+    *   sniff_request_timeout
+
+    *   sniff_timeout
+
+    *   handle_args
+
+    *   handle_args
+
+SSL/TLS
+    Search::Elasticsearch::Cxn::NetCurl does no validation of remote hosts
+    by default.
+
+    This behaviour can be changed by passing the "ssl_options" parameter
+    with any options accepted by Net::Curl (see
+    <http://curl.haxx.se/libcurl/c/curl_easy_setopt.html>).
+
+    For instance, to check that the remote host has a trusted certificate,
+    and to avoid man-in-the-middle attacks, you could do the following:
+
+        use Search::Elasticsearch;
+        use Net::Curl::Easy qw(
+            CURLOPT_CAINFO
+        );
+
+        my $es = Search::Elasticsearch->new(
+            cxn   => 'NetCurl',
+            nodes => [
+                "https://node1.mydomain.com:9200",
+                "https://node2.mydomain.com:9200",
+            ],
+            ssl_options => {
+                CURLOPT_CAINFO()  => '/path/to/cacert.pem'
+            }
+        );
+
+    If the remote server cannot be verified, an Search::Elasticsearch::Error
+    will be thrown.
+
+    If you want your client to present its own certificate to the remote
+    server, then use:
+
+        use Net::Curl::Easy qw(
+            CURLOPT_CAINFO
+            CURLOPT_SSLCERT
+            CURLOPT_SSLKEY
+        );
+
+        my $es = Search::Elasticsearch->new(
+            cxn   => 'NetCurl',
+            nodes => [
+                "https://node1.mydomain.com:9200",
+                "https://node2.mydomain.com:9200",
+            ],
+            ssl_options => {
+                CURLOPT_CAINFO()      => '/path/to/cacert.pem'
+                CURLOPT_SSLCERT()     => '/path/to/client.pem',
+                CURLOPT_SSLKEY()      => '/path/to/client.pem',
+            }
+        );
+
+METHODS
+  "perform_request()"
+        ($status,$body) = $self->perform_request({
+            # required
+            method      => 'GET|HEAD|POST|PUT|DELETE',
+            path        => '/path/of/request',
+            qs          => \%query_string_params,
+
+            # optional
+            data        => $body_as_string,
+            mime_type   => 'application/json',
+            timeout     => $timeout
+        });
+
+    Sends the request to the associated Elasticsearch node and returns a
+    $status code and the decoded response $body, or throws an error if the
+    request failed.
+
+  Inherited methods
+    From Search::Elasticsearch::Role::Cxn
+
+    *   scheme()
+
+    *   is_https()
+
+    *   userinfo()
+
+    *   default_headers()
+
+    *   max_content_length()
+
+    *   build_uri()
+
+    *   host()
+
+    *   port()
+
+    *   uri()
+
+    *   is_dead()
+
+    *   is_live()
+
+    *   next_ping()
+
+    *   ping_failures()
+
+    *   mark_dead()
+
+    *   mark_live()
+
+    *   force_ping()
+
+    *   pings_ok()
+
+    *   sniff()
+
+    *   process_response()
+
+SEE ALSO
+    *   Search::Elasticsearch::Role::Cxn
+
+    *   Search::Elasticsearch::Cxn::Hijk
+
+    *   Search::Elasticsearch::Cxn::LWP
+
+    *   Search::Elasticsearch::Cxn::HTTPTiny
+
+BUGS
+    This is a stable API but this implemenation is new. Watch this space for
+    new releases.
+
+    If you have any suggestions for improvements, or find any bugs, please
+    report them to
+    <http://github.com/elasticsearch/elasticsearch-perl/issues>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Search::Elasticsearch::Cxn::NetCurl
+
+    You can also look for information at:
+
+    *   GitHub
+
+        <http://github.com/elasticsearch/elasticsearch-perl>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Search::Elasticsearch::Cxn::NetCurl>
+
+    *   Search MetaCPAN
+
+        <https://metacpan.org/module/Search::Elasticsearch::Cxn::NetCurl>
+
+    *   IRC
+
+        The #elasticsearch <irc://irc.freenode.net/elasticsearch> channel on
+        "irc.freenode.net".
+
+    *   Mailing list
+
+        The main Elasticsearch mailing list
+        <http://www.elastic.co/community>.
+
+AUTHOR
+    Clinton Gormley <drtech@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2017 by Elasticsearch BV.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

@@ -1,0 +1,128 @@
+
+<AnyChar> 
+you notice certain characters are colored red.
+</AnyChar>
+
+<DetectChar>
+/home/[user]/
+</DetectChar>
+
+<Detect2Chars>
+Test in i n
+</Detect2Chars>
+
+<Float>
+32.56 matches.
+this does45.43not match
+this(23.88matches
+this 87.778 matches
+this matches 1009.6666
+</Float>
+
+<HlCHex>
+0-f should match 0x0123456789abcdefg 
+this should not0x0123456789abcdefg
+</HlCHex>
+
+<HlCOct>
+0-7 should match 012345678 
+this should not012345678
+</HlCOct>
+
+<HlCStringChar> \n \045 \xfa</HlCStringChar>
+
+<IncludeRules>
+#including comment works => IncludeRules works
+</IncludeRules>
+
+<Int>
+32 matches.
+this does45not match
+this(23matches
+this 87 matches
+this matches 1009
+</Int>
+
+<keyword>
+Test he is not she or her or his and ; && .and. for.now
+
+</keyword>
+
+<LineContinue>
+Test \\\\
+</LineContinue>
+
+<RangeDetect>
+Test after dawn
+</RangeDetect>
+
+<RegExpr>
+Test <66>
+<over> only at linestart 
+case insensitive <out> <OUT>
+</RegExpr>
+
+<StringDetect>
+Test der
+</StringDetect>
+
+<IncludeModule>
+ it works
+</IncludeModule>
+
+<Column>
+Character on 
+the fifth column
+of every line is matched
+</Column>
+
+<FirstNonSpace>
+	each character that is not a spatial
+ on every line
+is matched
+</FirstNonSpace>
+
+<ChildRule>
+(123s) matches.
+only integer part matches (123t).
+</ChildRule>
+
+<DynReg>
+#if matches are found => lookAhead also works
+<switch>
+</DynReg>
+
+<DynString>
+#if matches are found => lookAhead also works
+<switch2>
+</DynString>
+
+<DynChar>
+#if matches are found => lookAhead also works
+4 matches
+</DynChar>
+
+<Dyn2Chars>
+#if matches are found => lookAhead also works
+45  matches
+4 does not
+</Dyn2Chars>
+
+<DynExtra>
+~kkdkd~
+</DynExtra>
+
+
+<Capt>
+"match"nomatch
+</Capt>
+
+<Minimal>
+"match"nomatch"
+</Minimal>
+
+<Compat1>
+ \~ matches
+</Compat1>
+
+

@@ -1,0 +1,200 @@
+Revision history for Perl extension Socket::Class.
+
+version 2.258
+    - optimized pointer cascading
+    - fixed cleanup in forked environment
+    - fixed installation with argument --openssl-dir on Win32
+
+version 2.257
+    - RT#74148 Patch to enable successfull build on Win32 strawberry perl (thx to KMX)
+    - few cosmetics in SSL module
+
+version 2.256
+    - fixed broken build
+
+version 2.255
+    - fixed constructor in SSL module
+    - fixed ctx handling in SSL module
+    - fixed readline(), read_packet() and starttls() in SSL module
+
+version 2.254
+    - updated documentation
+
+version 2.253
+    - updated documentation for starttls()
+
+version 2.252
+    - fixed broken SSL module
+
+version 2.251
+    - fixed incomplete distribution
+
+version 2.25
+    - added support for shared context in SSL module
+    - global errors are stored in the $@ variable too
+
+version 2.24
+    - added function read_packet()
+    - updated readline() to support self defined line separators
+
+version 2.23
+    - fixed starttls() to get it working on server side.
+
+version 2.22
+    - added functions set_ssl_method(), set_cipher_list() to SSL module
+    - changed SSL module to version 1.3
+
+version 2.21
+    - changed Makefile.PL in SSL module to get build on Activestate
+
+version 2.20
+    - added function starttls() to SSL module
+    - updated source to get build on Activestate
+
+version 2.17
+    - fixed missplaced _WIN32 switch for snprintf
+
+version 2.16
+    - updated source again to get build on Activestate
+
+version 2.15
+    - upload of 2.14 failed
+
+version 2.14
+    - updated source to get build with VC++ 6.0
+
+version 2.13
+    - repaired dirty build
+
+version 2.12
+    - For Windows: OpenSSL will build from source when "--openssl-dir=DIR"
+      hasn't specified. Hopefully it will build on Activestate now.
+
+version 2.11
+    - updated SSL module for better compatibility with older OpenSSL
+      installations
+    - updated Const module for better compatibility with older Windows
+      installations
+
+version 2.10
+    - Socket::Class::SSL is now a part of this module
+    - fixed broken read in the SSL module
+    - completely removed the use of global error variable $! via errno
+    - updated documentation
+
+version 2.02
+    - fixed version number in Socket::Class::Const to get indexed on CPAN
+
+version 2.01
+    - repaired dirty build
+
+version 2.0
+    - added support for freebsd
+
+version 1.99_11
+    - fixed bug #43862 (thx to SZBALINT for detailed report)
+    - updated documentation
+    - removed Const2.pm and Asynch.pm from distribution
+    - updated xs/c api for the first extension
+    - fixed various things
+
+version 1.99_10 (toward 2.0 release)
+    - added a XS / C module interface
+    - changed perl type of the class from scalar to hashref (for sub classing)
+      .. key field '_sc_' is used to identify the class internally
+    - moved the constant module to XS
+    - constants can now be exported as const sub, or as variables like before
+    - incompatibility changes in socket state constants
+      .. renamed state constants from SOS_* to SC_STATE_*
+
+version 1.24 (unreleased)
+    - fixed call of getaddrinfo with AI_PASSIVE and empty port on aix
+    - added AI_ALL to getaddrinfo as default flag on OS390
+
+version 1.23
+    - added "traceroute.pl" to examples
+    - changed storage of internal data
+    - fixed error handling in new()
+    - fixed test script "t/4_threads.t"
+    - fixed functions "get_hostname" and "get_hostaddr"
+
+version 1.22
+    - added function "available"
+    - changed prototype of function "write"
+    - fixed mortallity of classes created by "accept"
+    - fixed value of constant $AF_INET6 on aix
+    - fixed functions "read", "write", "readline" and "writeline"
+    - fixed wrong ip4 and ip6 notations
+    - fixed htons and ntohs on sparc solaris and z/os
+    - fixed detection of new network functions on windows
+
+version 1.21
+    - added support for sun solaris 10
+    - fixed function "get_option"
+    - changed cascading from 10 to 32 places
+
+version 1.20
+    - added functions "getaddrinfo", "getnameinfo"
+    - added garbage method again. auto destruction should work now
+    - linking to crt on windows is static now
+    - fixed return value of get_hostname() on failure
+    - changed comments in source code for compatibility with
+      the ibm cc_r compiler on aix (thanks to c. keil)
+
+version 1.13
+    - bug on windows fixed
+    - fixed wrong use of h_addr in hostent structure
+
+version 1.12
+    - version style changed
+    - "new()" now sets correct error code on failure
+    - added "listen" to the documentation.. sorry :)
+    - fixed test scripts on darwin
+
+version 1.1.1
+    - added cascading to internal resource storage for better performance on
+      higher number of used sockets
+    - fixed inet6 on older versions of win32
+
+version 1.1.0
+    - added function "get_hostaddr"
+    - function "readline" now returns new line characters also
+    - !!! removed socket by reference destruction when using threads,
+      !!! it wont work right in some cases. it is safer to free the socket
+      !!! explictly.
+    - added detection of "new standard network functions" on win32
+    - improved return parameters in xs functions
+    - added support for perl5.6.2
+
+version 1.0.7
+    - fixed snprintf on win32
+    - fixed socket by reference destruction when using with threads
+
+version 1.0.6
+    - documentation updated
+    - fixed socket settings for parameters 'local_path' and 'remote_path'
+      in constructor function new()
+
+version 1.0.5
+    - fixed testscript for inet6
+    - changed internal file structure
+
+version 1.0.4
+    - added function "select"
+    - added examples to examples/*
+    - fixed broken internal mutex handling
+    - fixed internal error handling
+
+version 1.0.3
+    - bug on Windows Vista is fixed
+
+version 1.0.2
+    - fixed internal memory allocation macro "Newxz"
+
+version 1.0.1
+    - added timeout parameter to connect function
+    - fixed format of socket option SO_SNDTIMEO and SO_RCVTIMEO on win32
+    - fixed various test scripts
+
+version 1.0.0
+    - initial version

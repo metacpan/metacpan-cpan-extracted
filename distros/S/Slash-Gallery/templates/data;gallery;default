@@ -1,0 +1,40 @@
+__section__
+default
+__description__
+
+__title__
+
+__page__
+gallery
+__lang__
+en_US
+__name__
+data
+__template__
+[% SWITCH value %]
+
+[% CASE 'header' %]
+[% constants.sitename %] Picture Gallery
+
+[% CASE 'galleryhead' %]
+[% Slash.createMenu('gallery') %]
+
+[% CASE 'galleryfoot' %]
+[% IF !user.state.gallery_admin %]
+<BLOCKQUOTE><EM><SMALL>To save bandwidth on this site, you can only download
+[% constants.max_galleryview_viewings %] pictures
+every [% constants.formkey_timeframe / (60*60) %] hours.
+You can view as many thumbnails and small pictures (the ones
+on the display page) as you like.</SMALL></EM>
+
+<P><EM><SMALL>If you would like to access larger pictures, or other picture
+groups that you don't currently have access to, please contact
+<A HREF="mailto:[% constants.adminmail | strip_attribute %]"
+>[% constants.siteadmin %]</A>.</SMALL></EM>
+</BLOCKQUOTE>
+[% END %]
+
+
+[% END %]
+__seclev__
+500

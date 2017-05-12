@@ -1,0 +1,8 @@
+.git
+_build
+^Build$
+blib
+MANIFEST.bak
+.perltidyrc
+
+^MYMETA.yml$

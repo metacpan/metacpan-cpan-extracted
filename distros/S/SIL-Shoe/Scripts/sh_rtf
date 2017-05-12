@@ -1,0 +1,325 @@
+#! /usr/bin/perl
+require 'getopts.pl';
+use SIL::Shoe::Settings;
+# use Encode::Registry;
+use Encode qw(_utf8_on);
+
+$VERSION = "1.35";   # MJPH  21-JAN-2005     Fix Unicode support for Perl 5.8
+#$VERSION = "1.34";   # MJPH  22-JAN-2002     Add unicode support
+# $VERSION = "1.3";   # MJPH  20-JAN-2002     Add charset support and \020 escaping
+# $VERSION = "1.2";   # MJPH  29-MAY-2001     Add Unicode support
+# $VERSION = "1.1";   # MJPH  17-APR-2001     Add support for |xx{} inline marking. No nesting.
+# $VERSION = "1.012";
+
+Getopts("c:d:p:s:");
+
+if (!defined $opt_s || !defined $ARGV[1])
+{
+    die <<'EOT';
+    SH_RTF [-c width] [-d file] [-p dir] -s dir <infile> <outfile>
+Converts a Shoebox file to RTF using the same principles as used in Shoebox
+itself, plus the extras needed to handle interlinear text. Currently does not
+emulate SDF.
+
+  -c width  Multicolumn hack sets free translation column width (inch) [2]
+  -d file   Document template to attach to the output file
+  -p dir    Shoebox program directory (for locating rendering DLLs)
+  -s dir    Shoebox settings dir (compulsory)
+EOT
+};
+
+$opt_p .= "\\" if defined $opt_p;
+
+$rtf_only = "_RTFONLY_";
+
+$set = SIL::Shoe::Settings->new("$opt_s");
+
+open(INFILE, "$ARGV[0]") || die "Unable to open $ARGV[0]";
+open(OUTFILE, ">$ARGV[1]") || die "Unable to open $ARGV[1]";
+
+$_ = <INFILE>;
+if (m/^\\_SH\s+(v[0-9]\.[0-9]+)\s+([0-9]+)\s+(.*?)\s*$/oi)
+{ $type = $3; }
+else
+{ die "Input file has no SH line to identify type"; }
+
+$t = $set->type("$type") || die "Can't find settings for $type";
+
+$fcount = 0;
+%fonts = ();
+
+$l = $set->lang("Default");
+$defstring = font_rtf($l, 0) if defined $l;
+
+select OUTFILE;
+make_rtf_hdr($t);
+convert_rtf($t);
+
+close(OUTFILE);
+close(INFILE);
+
+sub make_rtf_hdr
+{
+    my ($t) = @_;
+    my ($ref);
+    my ($fnum, $fstring, $scount);
+
+    $scount = 10;
+    foreach $mk (sort keys %{$t->{'mkr'}})
+    {
+        $ref = $t->{'mkr'}{$mk};
+        next if $ref->{'nam'} eq $rtf_only;
+
+        if (defined $opt_c)
+        {
+            if ($ref->{'nam'} =~ m/^Free Translation$/oi)
+            {
+                $ref->{'col'} = "2";
+                $ref->{'totalcols'} = "2";
+                $ref->{'colwidths'} = sprintf("%f,%f", 7 - $opt_c, $opt_c);
+            } elsif ($ref->{'nam'} =~ m/^Interlinear Block$/oi)
+            {
+                $ref->{'col'} = "1";
+                $ref->{'totalcols'} = "2";
+                $ref->{'colwidths'} = sprintf("%f,%f", 7 - $opt_c, $opt_c);
+            }
+        }
+        
+        if (defined $ref->{'desc'})
+        {
+            my ($temp) = $ref->{'desc'};
+            while ($temp =~ s/^\s*([^\s=]+)\s*=\s*\"((?:\\.|[^"])+)\"//om)  #"
+            { $ref->{$1} = $2; }
+        }
+            
+        if (defined $ref->{'fnt'})
+        {
+            $fstring = font_rtf($ref->{'fnt'}, defined $ref->{'CharStyle'});
+        } elsif (defined $ref->{'lng'})
+        {
+            $l = $set->lang($ref->{'lng'});
+            $fstring = font_rtf($l, defined $ref->{'CharStyle'});
+        }
+        $ref->{'_rtfstr'} = (defined $ref->{'CharStyle'} ? "\\*\\cs" : "\\s") . $scount . $fstring;
+        $ref->{'_rtfnum'} = $scount++;
+        $l = $set->lang($ref->{'lng'});
+        $ref->{'lng'} = $l;
+        if (defined $l->{'RenTable'})
+        {
+            require Win32::API;
+            unless ($l->{'RenDLL'} ne $init_dll)
+            {
+                $init_proc = Win32::API("$opt_p$l->{'RenDLL'}", "iInit", [P], I);
+                die <<"EOT" unless defined $init_proc;
+Unable to find $l->{'RenDLL'}. This may be due to a wrongly specified -p
+option. Please re-run specifying the -p option, or copy $l->{'RenDLL'} to your
+Windows or Windows\\System directory.
+EOT
+                $init_dll = $l->{'RenDLL'};
+            }
+            $l->{' rendll'} = $init_proc->Call("$l->{'RenTable'}");
+            $l->{' renproc'} = Win32::API("$opt_p$l->{'RenDLL'}", "iEncode", [I, P, I, P], I);
+        }
+        if ($l->{'desc'})
+        {
+            my ($temp) = $l->{'desc'};
+            while ($temp =~ s/^\s*\\?\s*([^\s=]+)\s*=\s*(?:\"((?:\\.|[^"])+)\"|(\S+))//om) #"
+            { $l->{$1} = $2 || $3; }
+        }
+    }
+
+    print '{\rtf1\ansi\deff0\deflang1033\\uc0{\fonttbl';
+    foreach $f (sort keys %fonts)
+    { print "\n{\\f$fonts{$f}$fontstrs{$f} $f;}"; }
+    print "}{\\stylesheet\n";
+    print "{$defstring Normal;}\n";
+    
+    foreach $mk (sort keys %{$t->{'mkr'}})
+    {
+        $ref = $t->{'mkr'}{$mk};
+        next if $ref->{'nam'} eq $rtf_only;
+        print "{" . $ref->{'_rtfstr'};
+        if (defined $ref->{'CharStyle'})
+        { print "\\additive"; }
+        else
+        { print "\\sbasedon0"; }
+        print " $ref->{'nam'};}\n";
+    }
+    
+    print '}\paperw12240\paperh15840\margl1080\margr1080\margt1080\margb1800';
+    print '\facingp\ftnbj\ftnnalc';
+    print "\n";
+    if (defined $opt_d)
+    {
+        $opt_d =~ s|[/\\]|\\\\|oi;
+        print '{\*\template ' . $opt_d . '}\linkstyles' . "\n";
+    }
+}
+
+
+sub font_rtf
+{
+    my ($ref, $ischar) = @_;
+    my ($fnum, $fstring, $i);
+
+    $fonts{$ref->{'Name'}} = $fcount++ if (!defined $fonts{$ref->{'Name'}});
+    $fnum = $fonts{$ref->{'Name'}};
+    $fstring = "\\f$fnum";
+    $i = $fonts{$ref->{'Size'}};
+    if ($i != 0)
+    { $fstring .= "\\fs" . ($i << 1); }
+    elsif (!ischar)
+    { $fstring .= "\\fs20"; }
+    $fstring .= '\b1' if (defined $ref->{'Bold'});
+    $fstring .= '\i1' if (defined $ref->{'Italic'});
+    $fstring .= "\\ul1" if (defined $ref->{'Underline'});
+    $fstring .= "\\strike1" if (defined $ref->{'StrikeOut'});
+    if (defined $ref->{'charset'})
+    {
+        my ($temp) = hex($ref->{'charset'});
+        $fontstrs{$ref->{'Name'}} = "\\fcharset$temp";
+        $fstring .= "\\fcs$temp";
+    }
+    $fstring;
+}
+
+sub convert_rtf
+{
+    my ($t) = @_;
+    my ($closeStyle, $noconv, $cellno);
+    
+    while (<INFILE>)
+    {
+        chomp;
+        next if (m/^\\_sh\s+/oi);
+        next if (m/^\s*$/oi);
+        if (m/^\\(\S+)(\s+|$)/oi)
+        {
+            $mk = $1;
+            $rest = $'; #'
+            $ref = $t->{'mkr'}{$mk};
+            if (!defined $ref)
+            {
+                print STDERR "warning: undefined marker $mk at line $.\n";
+                print convert($t, $_, $noconv, undef);
+            }
+            if ($ref->{'nam'} eq $rtf_only)
+            {
+                $noconv = 1;
+                print $closeStyle;
+                print $rest;
+                $closeStyle = "";
+            } elsif (defined $ref->{'CharStyle'})
+            {
+                $noconv = 0;
+                print $closeStyle . "{" . $ref->{'_rtfstr'} . " ";
+                $closeStyle = "}";
+                print convert($t, $rest, 0, $ref->{'lng'});
+            } else
+            {
+                $noconv = 0;
+                print "$closeStyle" . ($cellno ? '\intbl' : '') . "\\par\n";
+                if ($cellno != 0)
+                {
+                    if ($ref->{'col'} <= $cellno)
+                    {
+                        print '\cell\row';
+                        $cellno = 0;
+                    } else
+                    { print '\cell'; }
+                }
+                if ($ref->{'col'} != 0)
+                {
+                    if ($cellno == 0)
+                    {
+                        print '\trowd\trgaph108';
+                        $i = 0;
+                        foreach $n (split(',', $ref->{'colwidths'}))
+                        {
+                            $i += int($n * 1440);
+                            print "\\cellx$i";
+                        }
+                    }
+                    for ($i = $cellno + 1; $i < $ref->{'col'}; $i++)
+                    { print '\pard\par\intbl\cell'; }
+                    $cellno = $ref->{'col'};
+                }
+                print "\\pard$ref->{'_rtfstr'} ";
+                $closeStyle = "\\par\n";
+                print convert($t, $rest, 0, $ref->{'lng'});
+            }
+        } else
+        {
+            s/^\s*//oig; 
+            print " ", convert($t, $_, $noconv, $ref->{'lng'});
+        }
+    }
+    print "$closeStyle" . ($cellno ? '\intbl' : '') . "\\par\n";
+    if ($cellno != 0)
+    { print '\row'; }
+    print "}";
+}
+
+
+# very simplistic at the moment. No support for SDF. This to follow,
+# thus thickening API interface to convert().
+sub convert
+{
+    my ($t, $in, $noconv, $lang) = @_;
+    my ($res);
+
+    return $in if $noconv;
+    while ($in =~ s/(.*?)\|(\S+)\{((?:\\.|[^}])+)\}//o)  # {
+    {
+        my ($pre, $mk, $dat) = ($1, $2, $3);
+        my ($ref);
+
+        $res .= simple_conv($pre, $lang);
+        if ($ref = $t->{'mkr'}{$mk} && $ref->{'CharStyle'})
+        {
+            $res .= "{$ref->{'_rtfstr'} " . simple_conv($dat, $ref->{'lng'}) . "}";
+        }
+        else
+        {
+            $res .= simple_conv("|$mk\{$dat\}", $lang);
+        }
+    }
+    $res .= simple_conv($in, $lang);
+    return $res;
+}
+
+sub simple_conv
+{
+    my ($in, $lang) = @_;
+    my ($out);
+        
+    if (defined $lang->{' rendll'})
+    {
+        $in .= "\000";
+        $out = " " x (length($in) << 1);    # unlikely to grow by a factor of 2
+        $lang->{' renproc'}->Call($lang->{' rendll'}, $in, length($out), $out);
+        $in = substr($out, 0, index($out, "\000"));
+    }
+    if (defined $lang->{'RightToLeft'})
+    { $in = reverse($in); }
+    $in =~ s/\\~/ /og;
+    $in =~ s/(?<!\020)([\\{}])/\\$1/og;          # assuming we don't have to do \'hh
+    $in =~ s/\020//og;
+    if (defined $lang->{'UnicodeLang'})
+    {
+#        use bytes;
+        
+#        s/([\xc0-\xff][\x80-\xbf]+)/"\\u" . signed($1) . " "/oge;
+        _utf8_on($in);
+        $in = join('', map {"\\u" . ($_ > 32676 ? $_ - 65536 : $_)} unpack('U*', $in)); 
+    }
+    return $in;
+}
+
+sub signed
+{
+    my ($str) = @_;
+    my ($num) = (unpack('U', $str));
+    $num -= 65536 if ($num > 32767);
+    $num;
+}

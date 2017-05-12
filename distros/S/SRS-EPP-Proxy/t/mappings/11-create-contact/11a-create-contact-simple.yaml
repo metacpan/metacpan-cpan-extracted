@@ -1,0 +1,28 @@
+# Successful create
+template: create-contact.tt
+
+vars:
+  name: Albert Einstein
+  street: electric avenue
+  city: Anywhere
+  ccode: NZ
+  phone: +64.44798699
+  email: a@smartarse.co.te
+  contact_id: simple1
+
+input_assertions:
+  class: SRS::EPP::Command::Create::Contact
+  match:
+
+SRS:
+ - assertions:
+     attr_is:
+       - [ '/NZSRSRequest/HandleCreate', 'HandleId', 'simple1', 'SRS: create handle' ]
+output_assertions:
+  match:
+    - [ '//contact:id', 'simple1', 'SRS: Check handle id' ]
+    - [ '//contact:crDate', '/\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d:\d\d/', 'SRS: Check crDate' ]
+  attr_is:
+    - [ '//epp:result', 'code', 1000, 'EPP: Correct response code' ]
+
+

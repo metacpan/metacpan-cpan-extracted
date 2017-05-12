@@ -1,0 +1,112 @@
+Set::IntSpan::Island - adds island, hole and cover functionality to Set::IntSpan
+
+PREAMBLE
+
+This document is a brief introduction to Set::IntSpan::Island. This is
+not the full documentation - see the module's POD for a complete
+manual.
+
+BACKGROUND
+
+Set::IntSpan (by Steven McDougall) models spans of integers. The
+simplest span is a contiguous run of one or more integers, such as
+
+  1
+  1-5
+  1-10
+  10-15
+
+A Set::IntSpan span can be composed of one or more such simple spans, thereby modeling ranges such as
+
+  1
+  1-5
+  1-5,10-15
+  1,3-5,10-15
+
+PURPOSE
+
+Set::IntSpan::Island adds utility functions to Set::IntSpan that
+manipulate islands (contiguous spans within a span object), holes
+(integers between contiguous spans) and covers (overlapping
+spans). The relationship between a span, its islands and holes is shown below.
+
+    span  012-4--789
+ islands  012 4  789
+ holes       3 56
+
+Functions are implemented to manage and manipulate islands and holes,
+such as removing short islands or filling in small holes.
+
+Covers are helpful when needing to overlap multiple spans, while
+keeping track of which spans provide coverage for a given region.
+
+    span1  012-4--789
+    span2  --234--789
+    span3  ------67--
+    span4  01--------
+
+   covers  01          span1, span4
+             2         span1, span2
+              3        span2
+               4       span1, span2
+                 6     span3
+                  7    span1, span2, span3
+                   89  span1, span2
+ 
+MOTIVATION
+
+This module comes into its own when the data represented by your sets
+correspond to coordinates of coverage elements for which overlap
+(i.e. overlapping spans - this is not a union since individuality of
+spans is preserved) is an important behaviour.
+
+Modelling coverage elements in genomics (the field I work in)
+inevitably means storing, retrieving and manipulating coordinates of
+elements such as sequence contigs or alignments. For alignments, for
+example, it is useful to be able to fill in holes or remove small
+islands. 
+
+When multiple alignments are considered (e.g. sequence reads) it is
+common to ask how these elements overlap (e.g. exhaustively enumerate
+all intersections and determine the number of coverage elements in
+each intersection). Generating such a report of covers, given a list
+of sets, is one of the most useful features in
+Set::IntSpan::Island.
+
+ For example, given the following spans as identified
+
+  a  10-15,21-22
+  b  12,25
+  c  14-20
+  d  25
+
+this module will provide you with all set covers and their members.
+
+  10-11 a
+  12    a b
+  13    a
+  14-15 a c
+  16-20 c
+  21-22 a
+  23-24 -
+  25    b d
+
+HOW TO BUILD AND INSTALL
+
+perl Makefile.PL
+make
+make test
+make install
+
+AUTHOR
+
+Martin Krzywinski
+Genome Sciences Center
+http://mkweb.bcgsc.ca
+martink@bcgsc.ca
+
+COPYRIGHT
+
+Copyright (c) 2007-2010 by Martin Krzywinski. This module is free
+software; you can redistribute it and/or modify it under the same
+terms as Perl itself.

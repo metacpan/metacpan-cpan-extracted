@@ -1,0 +1,53 @@
+Revision history for Search-Query-Dialect-Lucy
+
+0.202  31 Aug 2015
+ - add more example code to SYNOPSIS
+ - switch namespace::autoclean for namespace::sweep https://rt.cpan.org/Ticket/Display.html?id=106747
+
+0.201  01 Sept 2014
+ - bump deps for Lucy 0.4.0
+
+0.200  21 April 2014
+ - official Moo release to support S::Q 0.300
+
+0.190_02 18 April 2014
+ - fix Makefile.PL to list Moo explicitly, bump to S::Q 0.300
+
+0.190_01 08 April 2014
+ - switch to Moo in support of latest Search::Query
+
+0.10 25 June 2013
+ - fix NOT foo:NULL case
+ - fix serialization of double negative NOT foo!:bar
+
+0.09 08 June 2013
+ - add support for null_term feature of Search::Query::Parser >= 0.22
+
+0.08 23 May 2013
+ - add *_query_class methods to Dialect, to support custom Lucy query
+   classes.
+ - fix phrase negation bug (NOT "foo bar")
+
+0.07 21 Aug 2012
+ - add support for StopFilter analyzer
+
+0.06 25 July 2012
+ - fix README and some meta changes in Makefile.PL
+
+0.05 23 June 2012
+ - allow parent Parser->default_field to be a string, not an arrayref
+
+0.04 29 Sept 2011
+ - debug mode verbosity conditional on debug level.
+
+0.03 21 June 2011
+ - fix detection of stemmer class name.  SnowballStemmer in Lucy (was
+   Stemmer under KinoSearch)
+
+0.02 21 June 2011
+ - Clean up some missed name changes from 0.01.
+ - Yank out Wildcard classes and fork them into LucyX::Search::Wildcard.
+
+0.01 19 June 2011
+ - First version, ported from KSx for name change.
+

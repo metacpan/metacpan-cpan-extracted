@@ -1,0 +1,618 @@
+From an e-mail to the Openinteract Dev list ...
+<http://www.geocrawler.com/archives/3/8393/2001/7/0/6095774/>
+
+From:    Ray Zimmerman <rz10@cornell.edu>
+Subject: SPOPS enhanced HAS-A semantics (long)
+Date:    July 3, 2001 11:12:44 AM EDT
+To:      openinteract-dev@lists.sourceforge.net
+
+Hi Chris and others,
+
+As I mentioned in an earlier e-mail to this list, we're looking into 
+using SPOPS to implement a generalized Perl object persistence 
+framework which can automatically handle inheritance and cascading 
+fetches/saves/removes, etc.
+
+For example, from the model included with my earlier e-mail, we may 
+want to think of an Anchor object as being an attribute of a Boat 
+object, where fetching, saving or removing a Boat object 
+automatically fetches, saves or removes the corresponding Anchor 
+object.
+
+This sort of functionality can be implemented on a case by case basis 
+by defining the appropriate (pre|post)_(save|fetch|remove)_action 
+methods in the Boat class. However, if this functionality is needed 
+for many classes there would be a lot of duplication of code. To get 
+around this I've worked on the definition of a new has-a 
+configuration syntax which would allow one to specify the desired 
+cascading behavior in the configuration for the class.
+
+This new syntax also would replace the current SPOPS 'links_to' 
+syntax. It does this by making the rows of the linking table into 
+just another SPOPS object with two 'has_a' fields which link one 
+object to another. This is a bit more general than the current 
+'links_to' since it allows one to add other attributes to the linking 
+object. E.g. If a ClubMembership is what links a Person and a Club, 
+the ClubMembership could also have an effective date and expiration 
+date.
+
+So, I would like to propose the following as a starting point for an 
+enhanced 'has_a' functionality for SPOPS.
+
+<snipped a few questions to Chris Winters>
+
+  Ray Zimmerman  / e-mail: <EMAIL: PROTECTED> / 428-B Phillips Hall
+   Sr Research  /   phone: (607) 255-9645  /  Cornell University
+    Associate  /      FAX: (815) 377-3932 /   Ithaca, NY  14853
+
+
+
+=================================
+===    New Has-A Semantics    ===
+=================================
+
+Assuming ...
+
+    X has-a A, and
+    X has-a B (that is, X links A to B)
+
+We want to allow the 'has_a' configuration for 'X has-a A' to define the
+following options for ...
+
+... fetch behavior:
+    (1) all manual fetches & saves (default)
+    (2) fetch X auto-fetches A & save X auto-saves A
+    (3) fetch X lazy-fetches A & save X auto-saves A
+    (4) fetch A auto-fetches X's into $a->{'list_of_Xs'} & save A auto-saves X's
+    (5) fetch A lazy-fetches X's into $a->{'list_of_Xs'} & save A auto-saves X's
+    (6) fetch A auto-fetches B's into $a->{'linked_Bs'} (no auto-saving)
+    (7) fetch A lazy-fetches B's into $a->{'linked_Bs'} (no auto-saving)
+
+... remove behavior:
+    (1) all manual removes (default)
+    (2) remove X auto-removes A
+    (3) remove A auto-sets to NULL has_a field in X's
+    (4) remove A auto-removes X's
+        (if 'X has_a B' is configured to auto-remove B, then
+         removing A will auto-remove corresponding X's and B's)
+
+
+======================
+ Configuration Syntax
+======================
+
+$CONF = {
+    X_alias => {
+        class       => 'X',
+        field       => [ qw/ x_id x_data myA myB / ],
+        has_a       => {    
+            myA =>  {
+                class       => 'A',
+                fetch       => {
+                    type    =>  'manual|auto|lazy|manual_by|auto_by|lazy_by',
+                    name    => 'someA',
+                    list_field  =>  'list_of_Xs',
+                },
+                link        => {
+                    type    =>  'manual|auto|lazy',
+                    field   =>  'myB'
+                    name    =>  'someB',
+                    list_field  =>  'linked_Bs',
+                },
+                remove      => {
+                    type    =>
+                        'manual|auto|manual_by|auto_by|manual_null|auto_null'
+                    name    =>  'removeSomeA',
+                    list_field  =>  'list_of_Xs',
+                }
+            },
+            myB =>  {
+                class       => 'B',
+                fetch       => {
+                    type    =>  'manual|auto|lazy|auto_by|lazy_by',
+                    name    => 'someB',
+                    list_field  =>  'linked_Bs',
+                },
+                link        => {
+                    type    =>  'manual|auto|lazy',
+                    field   =>  'myA'
+                    name    =>  'someA',
+                    list_field  =>  'list_of_As',
+                },
+                remove      => {
+                    type    =>
+                        'manual|auto|manual_by|auto_by|manual_null|auto_null'
+                    name    =>  'removeSomeB',
+                    list_field  =>  'list_of_Xs',
+                }
+            },
+        }
+    },
+    A_alias => {
+        class       => 'A',
+        field       => [ qw/ a_id a_data / ],
+        list_field  => { X => ['list_of_Xs'],
+                         B => ['linked_Bs'] }
+    },
+    B_alias => {
+        class       => 'B',
+        field       => [ qw/ b_id b_data / ],
+    },
+}
+
+
+==========
+ Overview
+==========
+
+For the sake of clarity in the discussion, assume that X has-a A and X
+has-a B, namely fields myA and myB, respectively, and we're examining
+the meaning of the has_a data corresponding to the myA field.
+
+The new 'has_a' config data is a hashref where the keys are the names of
+fields in the table containing IDs of other objects (foreign keys).
+These can be names of fields in inherited classes with certain
+restrictions. Each value in the hash is another hashref with the
+following possible keys ...
+
+    class
+    fetch
+    link
+    remove
+
+The value for 'class' is the name of the class of objects being linked
+by this field. If this field is defined in a parent class (as opposed to
+the current class) then the class specified here must be a sub-class of
+the one specified in the has_a config of the parent class. (E.g. if a
+Team has-a Coach, it's fine to override the has_a specification for the
+coach field in Team to say that SoccerTeam has-a SoccerCoach, but not
+that SoccerTeam has-a TeamCaptain.)
+
+The values for 'fetch', 'remove' and 'link' are each hashrefs, with
+possible keys as follows:
+
+    fetch       remove      link
+    -----       ------      ----
+    name        name        name
+    type        type        type
+    list_field  list_field  list_field
+                            field
+
+The 'fetch' parameters specify what methods will be automatically
+created for fetching one object from the other (methods in X to fetch
+the A or in A to fetch the X's) and when they are called.
+
+The 'remove' parameters specify what methods will be automatically
+created for removing one object from the other (methods in X to remove
+the A or in A to remove the X's) and when they are called.
+
+If the 'link' key is present it means that this class (X) serves to link
+two other objects together via this field (myA) and another has-a field
+(myB). The 'link' parameters specify what methods will be automatically
+created in the foreign object (A) for adding and removing links
+(instances of X) to the other object (B) and for accessing the linked
+objects, and when these methods are called.
+
+
+=======
+ Fetch
+=======
+
+The fetch specification allows for 3 types of fetch operations for the
+has-a relationship in question, manual, automatic and lazy, either in
+the forward direction (given an X, fetch its A) or in the reverse
+direction (given an A, fetch its list of X's). The types 'manual',
+'auto' and 'lazy' indicate a forward direction and 'manual_by',
+'auto_by' and 'lazy_by' indicate a reverse direction (that the
+corresponding X's will be fetched BY an A). In the case of the forward
+direction, we'll call X the primary object and A the secondary object.
+For the reverse direction, A will be primary and X secondary. Using that
+terminology, manual means that secondary object are only fetched in
+response to an explicit request to fetch them. Auto means they are
+fetched automatically when the primary object is fetched (and they are
+stashed in the primary object), and lazy means they are fetched (and
+stashed) by the primary object only at the moment an access to the
+secondary object is attempted.
+
+The methods that are created are always created in the primary object
+for fetching the secondary object(s).
+
+The forward direction specifies that a method be created in X for
+fetching the corresponding A. If the 'name' parameter is present, it
+gives the name of the method to create. If it is not present, it will
+use the default name 'fetch_<field_name>' (in this example 'fetch_myA').
+This method accepts only a hashref of parameters (db handle, etc) as
+input args and returns the secondary object.
+
+The reverse direction specifies that a method be created in A for
+fetching the list of corresponding X's. If the 'name' parameter is
+present, it gives the name of the method to create, otherwise it will
+use the default name 'fetch_<list_field>' (in this example
+'fetch_list_of_Xs'). This method accepts only a hashref of parameters
+(db handle, etc) as input args and returns an arrayref of the secondary
+objects.
+
+The 'list_field' parameter, which is mandatory for reverse direction,
+must match a list_field defined for this class in the primary object's
+configuration (i.e. the list_field specification in class A's config).
+
+If the fetch type is set to 'auto', assuming default naming of methods,
+then doing ...
+
+    $x = X->fetch($x_id);
+
+... automatically does ...
+
+    $x->{myA} = $x->fetch_myA;
+
+... during the post_fetch stage. If the fetch type is set to 'lazy', the
+second operation happens whenever $x->{myA} is accessed the first time.
+In all forward direction fetch configurations (manual, auto and lazy),
+if $x->{myA} contains a reference to an A object when $x is saved, it
+will save the A object during the pre_save stage before saving $x with
+the updated id of the A object. If $x->{myA} contains an id only,
+nothing special is done when $x is saved.
+
+If the fetch type is set to 'auto_by', assuming default method naming,
+then doing ...
+
+    $a = A->fetch($a_id);
+
+... automatically does ...
+
+    $a->{'list_of_Xs'} = $a->fetch_list_of_Xs;
+
+... during the post_fetch stage. If the fetch type is set to 'lazy_by',
+the second operation happens whenever $a->{'list_of_Xs'} is accessed the
+first time. In all reverse direction fetch configurations (manual_by,
+auto_by and lazy_by), if $a->{'list_of_Xs'} contains an arrayref of X
+objects when $a is saved, it will save each X during the post_save stage
+after updating the myA field in each X with the new id of $a.
+
+For auto_by and lazy_by, two additional methods are created in A, one
+for adding objects to its list of X's and one for removing objects from
+it. These can only be used after the A object has been saved. Their
+primary purpose is to keep the list in memory in sync with what's in the
+database, so when using auto_by or lazy_by it's a good idea to use only
+these methods to add or remove corresponding X's. If the 'name'
+parameter is present, the methods are named add_<name> and
+remove_<name>. If the 'name' parameter is not present they are named
+add_to_<list_field> and remove_from_<list_field>. The method to add X's
+takes an X object or an arrayref of X objects as inputs and returns the
+same object or arrayref to the objects after saving them. The method to
+remove X's takes an id or arrayref of ids and returns the number of X's
+successfuly removed.
+
+
+========
+ Remove
+========
+
+The remove specification allows for 6 types of remove operations for the
+has-a relationship in question, 'manual', 'auto', 'manual_by',
+'auto_by', 'manual_null' and 'auto_null'. The types 'manual' and 'auto'
+specify a forward direction (given an X, remove its A) and 'manual_by'
+and 'auto_by' specify a reverse direction (given an A, remove it's list
+of X's). The types 'manual_null' and 'auto_null' also specify a reverse
+direction, but instead of removing the list of X's corresponding to a
+given A, they set the linking field (myA, in the example) to NULL in
+each of the X's.
+
+For the forward direction ('manual' and 'auto'), a method is created in
+X to remove the corresponding A. If the 'name' parameter is present, it
+gives the name of the method to create. If it is not present, it will
+use the default name remove_<field_name> (in this example 'remove_myA').
+This method accepts only a hashref of parameters (db handle, etc) as
+input args and returns a true value if the remove was successful. If the
+type is 'auto', this method will be called automatically in the
+pre-remove phase whenever X is removed. That is ...
+
+    $x->remove;
+
+... automatically does ...
+
+    $x->remove_myA;
+
+... during the pre_remove stage.
+
+The reverse direction ('manual_by' and 'auto_by') specifies that a
+method be created in A for removing the corresponding X's. If the 'name'
+parameter is present, it gives the name of the method to create,
+otherwise it will use the default name 'remove_<list_field>' (in this
+example 'remove_list_of_Xs'). This method accepts only a hashref of
+parameters (db handle, etc) as input args and returns the number of
+objects removed.
+
+The 'list_field' parameter, which is mandatory for reverse direction,
+must match a list_field defined for this class in the primary object's
+configuration (i.e. the list_field specification in class A's config).
+
+If the remove type is set to 'auto_by', assuming default method naming,
+then doing ...
+
+    $a->remove;
+
+... automatically does ...
+
+    $a->remove_list_of_Xs;
+
+... during the pre_remove stage.
+
+If the remove type is set to 'manual_null' or 'auto_null' a method is
+created in A for setting the field in each of the X's corresponding to
+that A to NULL. If the 'name' parameter is present, it gives the name of
+the method to create, otherwise it will use the default name
+'null_<list_field>' (in this example 'null_list_of_Xs').
+
+If the remove type is 'auto_null', assuming default method naming, then
+doing ...
+
+    $a->remove;
+
+... automatically does ...
+
+    $a->null_list_of_Xs;
+
+... during the pre_remove stage.
+    
+
+======
+ Link
+======
+
+The link specification, is used to indicate that the class (X) is used
+to link two objects together via this field (myA) and another has-a
+field. The 'field' parameter specifies the name of the other has-a field
+(myB in this example). A method will be created in A to allow an object
+of type A to fetch all of the objects of type B which are linked to that
+A via the corresponding X's. If the 'name' parameter is present, it
+gives the name of the method to create, otherwise it will use the
+default name 'fetch_<list_field>' (in this example 'fetch_linked_Bs').
+This method accepts only a hashref of parameters (db handle, etc) as
+input args and returns an arrayref of the linked objects.
+
+There are two other methods which are defined which allow an A to easily
+create and remove links (objects of class X) to B's. If the 'name'
+parameter is present, they will be called 'add_link_<name>' and
+'remove_link_<name>', otherwise the default names,
+'add_link_<list_field>' and 'remove_link_<list_field>', are used. Both
+methods take an id or an arrayref of ids of B objects as inputs and
+return the number of links added or removed respectively.
+
+If the link type is set to 'auto', assuming default method naming, then
+doing ...
+
+    $a = A->fetch($a_id);
+
+... automatically does ...
+
+    $a->{'linked_Bs'} = $a->fetch_linked_Bs;
+
+... during the post_fetch stage. If the link type is set to 'lazy', the
+second operation happens whenever $a->{'linked_Bs'} is accessed the
+first time.
+
+For all links (manual, auto and lazy), whether or not $a->{'linked_Bs'}
+contains anything when $a is saved, it will NOT automatically save any
+X's or B's.
+
+
+============
+ Misc Notes
+============
+
+- If X links A and B, then when adding a link via
+$a->add_link_linked_Bs(), how would other fields in X (besides myA and
+myB) be specified?
+
+- Maybe the add_link_<link_field> and remove_link_<link_field> methods
+are unecessarily asking for trouble and we should only allow links (X
+objects) to be created and removed directly via methods in X (not via
+A). These methods were an attempt to duplicate the current SPOPS
+links_to functionality by making the linking table correspond to just
+another SPOPS object. This also allows for a bit more generality in that
+the linking table can also add other attributes to the linking table
+(e.g. an effective date on a club membership).
+
+- We must avoid has_a cycles (e.g. Boat has_a anchor and Anchor has_a
+Boat, both set up to auto-remove/fetch the other).
+
+
+==========
+ Examples
+==========
+
+All Manual
+----------
+    $CONF = {
+        X_alias => {
+            class   => 'X',
+            field   => [ qw/ x_id myA / ],
+            has_a   => {
+                myA     => {
+                    class   =>  'A',
+                    fetch   =>  { type  => 'manual' },
+                    remove  =>  { type  => 'manual' }
+                }
+            }
+        },
+        A_alias => {
+            class   => 'A',
+            field   => [ qw/ a_id a_data / ]
+        },
+    };
+
+    $x    = X->new              # create a new X
+    $a    = A->new              # create its A
+    $a_id = $a->save;           # save the A
+    $x->{myA} = $a_id;          # put the A's id in the X
+    $x_id = $x->save;           # save the X
+    $x    = X->fetch($x_id);    # fetch an X
+    $a_id = $x->myA;            # get the id of its A
+    $a    = $x->fetch_myA;      # fetch the A object
+    $a->remove;                 # remove the A
+    $x->remove;                 # remove the X
+
+
+
+Auto | Lazy (think X=Boat has-a A=Anchor)
+-----------
+    $CONF = {
+        X_alias => {
+            class   => 'X',
+            field   => [ qw/ x_id myA / ],
+            has_a   => {
+                myA     => {
+                    class   =>  'A',
+                    fetch   =>  { type => 'auto' }, # or 'lazy'
+                    remove  =>  { type => 'auto' }
+                }
+            }
+        },
+        A_alias => {
+            class   => 'A',
+            field   => [ qw/ a_id a_data / ]
+        },
+    };
+
+    $x    = X->new({myA => A->new});    # create a new X and its new A
+    $x_id = $x->save;           # save the X and its A
+    $x    = X->fetch($x_id);    # fetch an X and its A
+    $a    = $x->myA;            # get the A out of the X
+    $x->remove;                 # remove the X and its A
+    
+
+
+Auto | Lazy By  (think X=Slip has-a A=Boatyard)
+--------------
+    $CONF = {
+        X_alias => {
+            class   => 'X',
+            field   => [ qw/ x_id myA / ],
+            has_a   => {
+                myA     => {
+                    class   =>  'A',
+                    fetch   =>  { type          => 'auto_by',   # or 'lazy_by'
+                                  list_field    => 'list_of_Xs'
+                                },
+                    remove  =>  { type => 'auto_by' }
+                }
+            }
+        },
+        A_alias => {
+            class       => 'A',
+            field       => [ qw/ a_id a_data / ]
+            list_field  => { X => ['list_of_Xs']    }
+        },
+    };
+
+    $a    = A->new;             # create new A
+    $a->add_to_list_of_Xs( [X->new, X->new] );  # add some new X's
+    $a_id = $a->save;           # save the A and all of its X's
+    $a    = A->fetch($a_id);    # fetch the A and all of its X's
+    $x1 = $a->{list_of_Xs}->[1];# access a particular X
+    $a->remove;                 # remove the A and all of its X's
+    
+
+Auto | Lazy Link    (think X=BoatyardSlipLink has-a A=Boatyard, B=Slip)
+----------------
+    $CONF = {
+        X_alias => {
+            class   => 'X',
+            field   => [ qw/ x_id myA myB / ],
+            has_a   => {
+                myA     => {
+                    class   =>  'A',
+                    link    =>  { type  => 'auto',
+                                  field => 'myB',
+                                  list_field => 'linked_Bs',
+                                },
+                    remove  =>  { type => 'auto_by' }
+                },
+                myB     => {
+                    class   =>  'B',
+                    fetch   =>  { type => 'lazy' },
+                    remove  =>  { type => 'auto' }
+                }
+            }
+        },
+        A_alias => {
+            class       => 'A',
+            field       => [ qw/ a_id a_data / ]
+            list_field  => { X => ['linked_Bs'] }
+        },
+        B_alias => {
+            class       => 'B',
+            field       => [ qw/ b_id b_data / ]
+        },
+    };
+
+    $a    = A->new;             # create new A
+    $a_id = $a->save            # save the A
+    $b1_id = B->new->save;      # create and save some B's
+    $b2_id = B->new->save;
+    $b3_id = B->new->save;
+    $a->add_link_linked_Bs($b1_id); # create & save X which links $a to $b1
+    $a->add_link_linked_Bs([$b2_id,$b3_id]);    # and $b2 and $b3
+    $a->remove_link_linked_Bs($b2_id);  # remove X which links $a to $b2
+                                        # (the X also auto-removes $b2)
+    $a    = A->fetch($a_id);    # fetch the A and all of its linked B's
+    $a->remove;                 # remove the A and all of its X's (& linked B's)
+    
+
+Manual Link (think X=ClubMembership has-a A=Club, B=Person)
+-----------
+    $CONF = {
+        X_alias => {
+            class   => 'X',
+            field   => [ qw/ x_id myA myB / ],
+            fetch_by=> [ qw/ myA myB /]
+            has_a   => {
+                myA     => {
+                    class   =>  'A',
+                    link    =>  { type  => 'manual',
+                                  field => 'myB',
+                                  list_field => 'linked_Bs',
+                                },
+                    remove  =>  { type => 'auto_by' }
+                },
+                myB     => {
+                    class   =>  'B',
+                    link    =>  { type  => 'manual',
+                                  field => 'myA',
+                                  list_field => 'linked_As',
+                                },
+                    remove  =>  { type => 'auto_null' }
+                }
+            }
+        },
+        A_alias => {
+            class       => 'A',
+            field       => [ qw/ a_id a_data / ]
+            list_field  =>  'linked_Bs',
+        },
+        B_alias => {
+            class       => 'B',
+            field       => [ qw/ b_id b_data / ]
+            list_field  =>  'linked_As',
+        },
+    };
+
+    $a1   = A->new;             # create some new A's ...
+    $a2   = A->new;
+    $b1   = B->new;             # ... and some new B's ...
+    $b2   = B->new;
+    $b3   = B->new;
+    $a1_id = $a1->save;         # ... and save them
+    $a2_id = $a2->save;
+    $b1_id = $b1->save;
+    $b2_id = $b2->save;
+    $b3_id = $b3->save;
+    $a1->add_link_linked_Bs([$b1_id, $b2_id]);  # create some linking X's via A
+    $b3->add_link_linked_As([$a1_id, $a2_id]);  # create some linking X's via B
+    $x4 = X->new({myA=>$a2_id,myB=>$b1_id})->save;  # create linking X directly
+    [$b1, $b2, $b3] = $a1->fetch_linked_Bs;     # fetch B's linked to a given A
+    [$x1, $x2, $x3] = X->fetch_by_myA($a1_id);  # fetch X's for a given A
+    $a2->remove;    # remove an A and it's corresponding X's (but not the B's)
+    $a1->remove_link_linked_Bs([$b1_id]);       # remove linking X
+    $b2->remove;            # remove a B and set field in linking X's to NULL

@@ -1,0 +1,42 @@
+Revision history for Statistics-Sampler-Multinomial
+
+0.7 20170219
+  - See if we can avoid more test failures on some systems,
+    this time due to planning twice errors.
+
+0.6 20170218
+  - Test changes only
+  - Check $Config{ivsize} to determine if we should skip.
+    The archname tests missed too many cases.
+
+0.5 20170217
+  - Skip most tests on x86 architectures, as Math::Random::MT::Auto
+    generates different PRNG streams for a given seed compared with x64
+    (unless it is an x86 long int build).
+
+0.4 20170216
+  - No functional changes from the 0.3_00x dev releases
+  - Document that Alias method results will differ between
+    double and long double builds
+
+0.3_004 20170214
+  - Skip some tests on long double builds
+
+0.3_003 20170214
+  - Shift to a tolerance based test (avoid sprintf)
+
+0.3_002 20170214
+  - Set minimum perl version to 5.014
+
+0.3_001 20170214
+  - See if we can get more insight into cpan testers fails
+  - Add explicit return to cuckoo packages
+  - Add checks for PRNG sequences
+
+0.2  20170214
+  - Fix typo in abstract
+  - No functional changes
+
+0.1  20170214
+  - Initial release.
+

@@ -1,0 +1,82 @@
+Sorauta-Capture-ScreenShot version 0.02
+============================
+
+The README is used to introduce the module and provide instructions on
+how to install the module, any machine dependencies it may have (for
+example C compilers and installed libraries) and any other information
+that should be provided before the module is installed.
+
+A README file is required for CPAN modules since CPAN extracts the
+README file from a module distribution so that people browsing the
+archive can use it get an idea of the modules uses. It is usually a
+good idea to provide version information here so that people can
+decide whether fixes for the module are worth downloading.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+HOW TO USE
+
+basic use:
+  use Sorauta::Capture::ScreenShot;
+
+  my $OS = "Mac"; # or Win(but not implement now)
+  my $CAPTURE_FILE_PATH = "/Users/yuki/Desktop/capture.jpg";
+  my $INTERVAL_TIME = 0; # if you want to interval, set this var over 0
+  my $DEBUG = 0;
+  my $API_URL = "http://api_url/path/to";
+  my $API_ATTRS = {
+    file_name     => [$CAPTURE_FILE_PATH],
+    test          => 'fugapiyo',
+  };
+
+  # capture test
+  {
+    Sorauta::Capture::ScreenShot->new({
+        os                    => $OS,
+        capture_file_path     => $CAPTURE_FILE_PATH,
+        interval_time         => $INTERVAL_TIME,
+        debug                 => $DEBUG,
+    })->execute;
+  }
+
+  # capture and send api test
+  {
+    Sorauta::Capture::ScreenShot->new({
+        os                    => $OS,
+        capture_file_path     => $CAPTURE_FILE_PATH,
+        interval_time         => $INTERVAL_TIME,
+        debug                 => $DEBUG,
+        api_url               => $API_URL,
+        api_attr              => $API_ATTRS,
+     })->execute;
+  }
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+CGI::Carp
+Data::Dumper
+LWP::UserAgent
+HTTP::Request::Common
+File::Basename
+Sorauta::Utility
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2012 by Yuki ANAI
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.12.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

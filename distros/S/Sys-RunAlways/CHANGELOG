@@ -1,0 +1,16 @@
+0.05	1 April 2012
+	Some more code esthetics tweaks.  Added "silent" parameter.  Made
+	sure it works with 5.14.2 threaded and unthreaded.
+
+0.04    15 November 2006
+        Brought up to BPB standards.  Made the error message if no DATA handle
+        found, hopefully more understandable.
+
+0.03    11 June 2006
+        Added caveat of scripts being edited.
+
+0.02	11 July 2005
+	Fixed problem with display of time when started
+
+0.01    11 July 2005
+	First public version of Sys/RunAlways.pm, inspired by Sys/RunAlone.pm.

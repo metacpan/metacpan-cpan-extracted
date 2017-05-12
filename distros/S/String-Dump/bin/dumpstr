@@ -1,0 +1,76 @@
+#!/usr/bin/perl
+use strict;
+no strict 'refs';
+use warnings;
+use Encode qw( decode );
+use Getopt::Lucid qw( Param );
+use String::Dump qw( :all );
+
+my $opt = Getopt::Lucid->getopt([
+    Param('mode|m')->default('hex')->valid(qr{ ^ (?:
+        hex |
+        dec |
+        oct |
+        bin |
+        names |
+        codes
+    ) $ }x),
+]);
+
+my $mode = $opt->get_mode;
+
+# join remaining args and treat as UTF-8, or empty string on decoding error
+my $string = eval { decode('UTF-8', join(' ', @ARGV)) } || '';
+
+print &{"dump_$mode"}($string), "\n";
+
+exit 0;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+dumpstr - Dump strings of characters on the command line
+
+=head1 VERSION
+
+This document describes C<dumpstr> version 0.09.
+
+=head1 SYNOPSIS
+
+    dumpstr 'Ĝis! ☺'                # hex mode by default
+    dumpstr -m hex 'Ĝis! ☺'         # explicit hex mode
+    dumpstr --mode=hex 'Ĝis! ☺'     # same thing, long-form
+    dumpstr -m names 'Ĝis! ☺'       # Unicode names mode
+    dumpstr -m names Ĝis! ☺         # or leave off the quotes
+
+=head1 DESCRIPTION
+
+C<dumpstr> is the command-line interface to L<String::Dump>.  It’s pronounced
+like I<dumpster>. ☺
+
+=head1 OPTIONS
+
+=over
+
+=item -m, --mode
+
+Sets the mode, defaulting to C<hex>.  Valid modes are C<hex>, C<dec>, C<oct>,
+C<bin>, C<names>, and C<codes>.
+
+=back
+
+=head1 AUTHOR
+
+Nick Patch <patch@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+© 2011–2012 Nick Patch
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut

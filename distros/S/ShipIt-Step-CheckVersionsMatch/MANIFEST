@@ -1,0 +1,11 @@
+Build.PL
+Changes
+lib/ShipIt/Step/CheckVersionsMatch.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00-load.t
+t/kwalitee.t
+t/pod.t
+SIGNATURE    Added here by Module::Build

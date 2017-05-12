@@ -1,0 +1,123 @@
+$Id: README,v 1.2 1998/01/18 00:21:15 ken Exp $
+
+
+                             SGML::Grove
+
+		  A Perl 5 module for accessing and
+		    manipulating loaded SGML, XML,
+		     and HTML document instances
+
+
+                             Ken MacLeod
+                         ken@bitsko.slc.ut.us
+
+INTRODUCTION
+
+    SGML::Grove provides an interface for accessing and manipulating
+    SGML, XML, HTML, and other document instances loaded by a parsing
+    or grove building module.  Grove uses the Iterator and Visitor
+    design patterns for accessing the grove and also comes with a
+    module for performing simple rule-based transformations to Perl
+    objects.
+
+    See the file Changes for user-visible changes.  See the `examples'
+    directory for examples of using groves.  `DOM' relates SGML::Grove
+    to the World Wide Web Consortium's Document Object Model.
+
+    Newer versions of this module can be found at
+    <ftp://ftp.uu.net/vendor/bitsko/gdo/>.  Grove shares a mailing
+    list with Quilt.  To subscribe to the Quilt mailing list, send a
+    message with the word `subscribe' in the Subject: field to
+    <quilt-request@bitsko.slc.ut.us>.
+
+    Copyright (C) 1997 Ken MacLeod
+    Pod::GroveBuilder is distributed under the same terms as Perl.
+    See the file COPYING for distribution terms.
+
+OVERVIEW
+
+    Groves are generally created by calling a parser or grove building
+    module that returns an SGML::Grove object.  The SGML::Grove object
+    then contains the root element of the document and may contain
+    errors generated during the parsing or building, entities and
+    notations used within the document, or other parser or grove
+    builder specific information.
+
+    Grove building modules include SGML::SPGroveBuilder and
+    Pod::GroveBuilder.
+
+    Elements of the document are SGML::Element objects.  Elements
+    have a generic identifier (or name), attributes, and the contents
+    of the element.  Attributes are stored as a Perl hash, with the
+    values as an array of scalars and SGML::SData objects.  The
+    contents of an element may be more Elements, scalars, SData
+    objects, processing instruction (PI) objects, or Entities.
+
+    SGML::SData objects are replacements for character entity
+    references within the document.  The Text::EntityMap perl module
+    can be used to map SData replacements from common character entity
+    sets to common output formats.
+
+<ftp://ftp.uu.net/vendor/bitsko/entity-map/>
+
+    SGML::PI objects are processing instructions contained within the
+    document.
+
+    SGML::Entity, SGML::ExtEntity, and SGML::SubDocEntity are entity
+    references.
+
+    SGML::Notation objects define a notation used for entities and in
+    attributes.
+
+    SGML::Writer outputs all or part of a grove to a file or scalar.
+
+    SGML::Simple::Spec, SGML::Simple::SpecBuilder, and
+    SGML::Simple::BuilderBuilder work together to implement a simple
+    rule-based transformer for transforming document instances to Perl
+    objects.  SpecBuilder takes a spec grove conforming to the
+    ``Grove Simple Spec'' DTD and creates a specification object
+    that can be given to BuilderBuilder to create a Visitor package
+    that can be used to transform other groves to Perl objects.
+
+    Visitors and Builders are explained thoroughly in ``Design
+    Patterns: Elements of Reusable Object-Oriented Software'' by
+    Gamma, Helm, Johnson, and Vlissides, published by Addison-Wesley
+    (ISBN 0-201-63361-2).
+
+<http://st-www.cs.uiuc.edu/users/patterns/patterns.html>
+
+DIFFERENCES FROM SGML::SPGrove
+
+    SGML::SPGrove was split into SGML::SPGroveBuilder (the module that
+    compiles and links with SP to build groves) and SGML::Grove (the
+    module that implements the grove objects).  The module name was
+    changed from SGML::SPGrove to SGML::Grove.
+
+    Although this entails very little change to SGML::Grove
+    implementation, I expect grove builders to use more or less
+    SGML::Grove objects to suit the documents being parsed.  For
+    example, a minimal XML parser may produce only an SGML::Grove and
+    SGML::Element objects, an HTML parser may also produce SGML::SData
+    objects.
+
+    See ToDo for other upcoming possibilities.  Let me know if you
+    have a priority for anything in particular.
+
+INSTALLATION
+
+    SGML::Grove requires Perl 5 and the Perl modules Class-Eroot and
+    Class-Visitor.
+
+<http://www.perl.com/>
+<http://www.perl.com/CPAN/modules/by-module/Class/>
+
+    The extra Perl modules are also available at SGML::Grove's source site.
+
+<ftp://ftp.uu.net/vendor/bitsko/gdo/>
+
+    SGML::Grove installs as a standard Perl module
+
+            perl Makefile.PL
+            make
+            make test
+            make install

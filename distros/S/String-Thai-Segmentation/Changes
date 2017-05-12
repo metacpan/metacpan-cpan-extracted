@@ -1,0 +1,6 @@
+Revision history for Perl extension String::Thai::Segmentation.
+
+0.01  Mon Jan 20 07:36:55 2003
+	- original version; created by h2xs 1.22 with options
+		-A -n String::Thai::Segmentation -b 5.5.3
+

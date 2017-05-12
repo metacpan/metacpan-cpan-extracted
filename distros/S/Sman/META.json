@@ -1,0 +1,54 @@
+{
+   "abstract" : "Tool for searching and indexing man pages",
+   "author" : [
+      "Josh Rabinowitz"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.2, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Sman",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cache::Cache" : "0",
+            "Cache::FileCache" : "0",
+            "Compress::Zlib" : "0",
+            "Digest::MD5" : "0",
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "FindBin" : "0",
+            "FreezeThaw" : "0",
+            "IPC::Run" : "0",
+            "POSIX" : "0",
+            "SWISH::API" : "0.03",
+            "Storable" : "0",
+            "Term::Size" : "0",
+            "version" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.04"
+}

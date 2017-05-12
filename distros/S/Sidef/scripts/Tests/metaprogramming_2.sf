@@ -1,0 +1,28 @@
+#!/usr/bin/ruby
+
+# http://en.wikipedia.org/wiki/Ruby_(programming_language)#Metaprogramming
+
+var colors = Hash(
+               'black'   => "000",
+               'red'     => "f00",
+               'green'   => "0f0",
+               'yellow'  => "ff0",
+               'blue'    => "00f",
+               'magenta' => "f0f",
+               'cyan'    => "0ff",
+               'white'   => "fff",
+             );
+
+for color,code in colors {
+    String.def_method("in_#{color}", func (self) {
+        %Q<<span style="color: ##{code}">#{self}</span>>
+    })
+}
+
+say "blue".in_blue;
+say "red".in_red;
+say "white".in_white;
+
+assert_eq("blue".in_blue, %q(<span style="color: #00f">blue</span>))
+assert_eq("red".in_red, %q(<span style="color: #f00">red</span>))
+assert_eq("white".in_white, %q(<span style="color: #fff">white</span>))

@@ -1,0 +1,89 @@
+#!/usr/local/bin/perl
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use Smolder::Conf;
+use File::Spec::Functions qw(catdir);
+
+=head1 NAME 
+
+smolder - Web Smoke Test Aggregator
+
+=head1 SYNOPSIS
+
+  smolder --conf /path/to/smolder.conf
+
+  smolder --daemon 
+
+=head1 DESCRIPTION
+
+Run the Smolder server.
+
+=head1 OPTIONS
+
+=over
+
+=item --daemon (-d)
+
+Run the server in the background as a daemon process.
+
+=item --conf (-c)
+
+Specify a smolder.conf config file.
+
+=item --port (-p)
+
+Specify the port from which Smolder will server requests. Defaults to 8080
+
+=item --host (-h)
+
+The hostname that Smolder will use when running. Defaults to localhost@localdomain
+
+=item --data_dir
+
+The data directory that Smolder will use. Defaults to $HOME/.smolder (or equivalent)
+
+=item --share_dir
+
+The shared directory that Smolder will use for read-only things like templates, css, images and sql files
+
+=item --log_file
+
+The log file used by Smolder.
+
+=item --help
+
+Show the help screen.
+
+=back
+
+=cut
+
+my ($conf, $daemon, $help, $port, $host, $data_dir, $share_dir, $log_file);
+GetOptions(
+    'conf|c=s'    => \$conf,
+    'daemon|d'    => \$daemon,
+    'port|p=s'    => \$port,
+    'host|h=s'    => \$host,
+    'data_dir=s'  => \$data_dir,
+    'share_dir=s' => \$share_dir,
+    'log_file=s'  => \$log_file,
+    'help'        => \$help,
+) or exit 1;
+pod2usage(1) if $help;
+
+my %conf_values;
+$conf_values{Port}     = $port     if $port;
+$conf_values{HostName} = $host     if $host;
+$conf_values{DataDir}  = $data_dir if $data_dir;
+$conf_values{LogFile}  = $log_file if $log_file;
+if ($share_dir) {
+    $conf_values{TemplateDir} = catdir($share_dir, 'templates');
+    $conf_values{SQLDir}      = catdir($share_dir, 'sql');
+    $conf_values{HtdocsDir}   = catdir($share_dir, 'htdocs');
+}
+Smolder::Conf->init_from_file($conf) if $conf;
+Smolder::Conf->init(%conf_values)    if %conf_values;
+require Smolder::Server;
+Smolder::Server->new(daemon => $daemon)->start();

@@ -1,0 +1,65 @@
+Revision history for Stash-REST
+
+0.11  2017-03-23 15:43:47 BRT
+    - Fixed: Unescaped left brace in regex is illegal in regex Issue #2
+
+0.10  2016-02-05 09:40:10 BRST
+    - Fixed one bug created with last version!
+    - Added allow_get_with_body to allow GET/HEAD to have body and params if you want to.
+
+0.09  2016-02-03 17:21:02 BRST
+    - TWO BUGS FIXED! MISSING TESTS AGAIN
+    - Fix automatic_load_item => 0 # the if was working, but the else worked too!
+    - Fix 2 greps. Used '"' when '/' was needed. Always returned true!
+
+0.08  2015-11-29 15:00:40 BRST
+    - added options to pass automatic_load_item => 0 for not loading item when POST returns 201 with Location.
+    - process_request, process_response, process_response_success, response_decoded,
+      item_loaded    , stash_added   and list_loaded now can be an option for rest_* in addition to the Class::Trigger
+
+      eg: (when you want check reponse verification by yourself AND want to have $res to better error messages):
+        my ($obj, $res, $req);
+        $obj = $stash_rest_obj->rest_post(
+            'customer',
+            data                => ['key', 'value'],
+            params              => {api_key => '123'},
+            skip_response_tests => 1,
+            process_response => sub {
+                $res = $_[0]->{res};
+                $req = $_[0]->{req};
+            },
+        );
+        if (!$res->is_success) { do verification by yourself }
+
+0.07  2015-08-24 14:31:15 BRT
+    - remove warning "DELETE does not allow body"
+
+0.06  2015-02-05 17:58:02 BRST
+        - Fix bug on params options. When it had more than one key, it was turn next keys values of the first.
+        - Now params accept HASHREF or ARRAYREF.
+
+0.058  2015-01-22 16:27:37 BRST
+        - option skip_response_tests added to skip code and is_fail verification.
+
+0.056  2015-01-14 21:24:26 BRST
+        - Remove wrong but harmless "ARRAY[XXXXXX]: " header on rest_reload and rest_reload_list... my fault!
+        - minor docs revision.
+
+0.052  2015-01-14 11:48:35 BRST
+        - NOT POST or PUT should transforms data into params, even if params is an empty arrayref
+
+0.05  2015-01-14 11:37:14 BRST
+        - conf {params} added to make possible send data on BODY different from application/x-www-form-urlencoded
+        - a little code refactory
+        - WARNING: Class::Trigger callbacks now get 1 HAHSREF params instead of N [SCALAR|ARRAY]REF.
+            - this will make easy add more params without breaking everything!
+
+0.04  2015-01-13 09:20:36 BRST
+        - decode_response added on ->new() and it's required
+
+0.03  2015-01-12 19:40:52 BRST
+        - Fixed missing @headers on rest_reload and rest_reload_list
+        - Test added for that not occur again.
+
+0.02  2015-01-12 18:49:36 BRST
+        - Initial release

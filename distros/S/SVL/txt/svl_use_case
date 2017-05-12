@@ -1,0 +1,30 @@
+
+
+svl discover
+svl show "clkao"
+svl mirror clkao/path /localpath/
+
+
+
+svl link clkao/path /local/path/
+
+svk co /local/path/
+
+hack hack
+
+svk commit /local/path/
+
+svl share /local/path/
+
+
+svl branch list
+
+svl branch sync sky/path
+
+svl status sky/path
+
+svl sync -a my/path
+
+
+
+

@@ -1,0 +1,8 @@
+Revision history for SMS-Send-Smstrade
+
+0.02    2012-07-31
+        Declare dependency on SMS::Send.
+
+0.01    2012-07-30
+        First version, released on an unsuspecting world.
+

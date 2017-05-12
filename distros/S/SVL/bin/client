@@ -1,0 +1,17 @@
+#!/usr/bin/perl
+use strict;
+use Net::DNS 0.49.03;
+use Net::Rendezvous;
+
+my $res = Net::Rendezvous->new('svl');
+$res->discover();
+foreach my $entry ($res->entries) {
+  my $name = $entry->name;
+  $name =~ s/\\(0\d\d)/chr($1)/eg;
+  printf "%s (%s:%s)\n", $name, $entry->address, $entry->port;
+  my %attr = $entry->all_attrs;
+  foreach my $attr (keys %attr) {
+    my $equal = $attr{$attr} ? '=' : '';
+    printf "\t %s%s%s\n", $attr, $equal, $attr{$attr};
+  }
+}

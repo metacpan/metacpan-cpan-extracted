@@ -1,0 +1,57 @@
+#!/usr/bin/perl -w
+# $Id: svndump_checkfilter 278 2007-01-13 12:37:13Z martin $
+# Copyright (C) 2006 by Martin Scharrer <martin@scharrer-online.de>
+# This is free software under the GPL.
+
+use strict;
+use Digest::MD5 qw(md5_hex);
+use SVN::Dumpfilter;
+
+my $revision = 0;
+my $delrev = 38;
+my $deleting = 0;
+
+my $dumpfile = shift @ARGV;
+my $outfile  = shift @ARGV;
+
+my $nerrors = 0;
+sub checkfilter (\%;$);
+
+$nerrors += Dumpfilter($dumpfile, $outfile, \&checkfilter);
+
+if ($nerrors)
+ {
+   print STDERR "Found $nerrors errors!\n";
+   exit (1);
+ }
+
+exit(0);
+
+sub checkfilter (\%;$)
+ {
+   my $href = shift;
+   my $recalc = shift || 0; # we don't change anything so default is 0
+   my $header = $href->{'header'};
+   #my $prop   = $href->{'properties'};
+
+   return unless exists $header->{'Text-content-md5'};
+   # Now check MD5 sum
+   my $md5 = lc(md5_hex(${$href->{'content'}}));
+   if ( lc($header->{'Text-content-md5'}) ne $md5)
+    {
+      print STDERR 
+        "File '", $header->{'Node-path'}, "' at input line $. doesn't match it's ",
+        "MD5 Checksum!\n", "Is '$md5' but should be '",
+        $header->{'Text-content-md5'}, "'.\n";
+      $nerrors++;
+    }
+   
+   
+   if ($recalc) # just if we have to, not needed by this 'filter'.
+    {
+     svn_recalc_prop_header(%$href);        # call if you changed properties
+     svn_recalc_textcontent_header(%$href); # call if you modified text content
+    }
+ }
+
+__END__

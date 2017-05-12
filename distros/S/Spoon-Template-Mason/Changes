@@ -1,0 +1,29 @@
+0.05  2005-12-30
+
+- Make it work with latest Spoon versions (0.23), and require that
+version.
+
+- Add some real tests that this works.
+
+
+0.04  2004-07-05
+
+- Remove a debugging warn statements left in the code.
+
+- Add a dependency on HTML::Mason.
+
+
+0.03  2004-07-04
+
+- The Spoon::Template->get_include_path method is now simply path, and
+this broke the render method.
+
+
+0.02  2004-04-25
+
+- Added SIGNATURE to MANIFEST.
+
+
+0.01  2004-04-23
+
+- First release.

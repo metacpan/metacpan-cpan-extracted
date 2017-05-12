@@ -1,0 +1,41 @@
+#!/usr/bin/perl -w
+
+# Copyright 2012 Jan Pokorny <jpokorny at redhat dot com>.
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of either: the GNU General Public License as published
+# by the Free Software Foundation; or the Artistic License.
+
+use strict;
+
+use Syntax::Highlight::Engine::Kate::Convert::ToolKit;
+
+my $toolkit = new Syntax::Highlight::Engine::Kate::Convert::ToolKit();
+
+# TODO: optionally redefine bare output to respective files?
+# $toolkit->outcmd = sub { ... };
+
+for (@ARGV) {
+	my $hlfile = $_;
+	my $outfile = $toolkit->register($hlfile);
+        print "### ${outfile} ### ";  # comment out the "loading" message
+	$toolkit->pmGenerate($outfile);
+}
+
+__END__
+
+=head1 NAME
+
+hl-kate-convert - generates highlight definitions from Kate's originals
+
+=head1 DESCRIPTION
+
+C<hl-kate-convert> is a script to convert native highlight definitions
+of Kate to the ones used by Syntax::Highlight::Engine::Kate.
+
+=head1 SYNOPSIS
+
+hl-kate-convert <kate-xml-hl-def> [...]
+
+Example:
+
+    hl-kate-convert /some/path/some-lang.xml > SomeLang.pm

@@ -1,0 +1,388 @@
+---
+abstract: "REPRESENT SOAR PRODUCTIONS\r"
+author:
+  - 'Nathan Glenn <garfieldnate@gmail.com>'
+build_requires:
+  Data::Diver: 0
+  File::Find: 0
+  File::Spec: 0
+  File::Spec::Functions: 0
+  File::Temp: 0
+  FindBin: 0
+  Module::Build: 0.3601
+  Path::Tiny: 0
+  Test::Base: 0
+  Test::Base::Filter: 0
+  Test::Deep: 0
+  Test::Exception: 0
+  Test::LongString: 0
+  Test::More: 0.88
+  Test::Warn: 0
+  utf8: 0
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Soar-Production
+no_index:
+  directory:
+    - 'inc t xt examples share eg mylib'
+provides:
+  Soar::Production:
+    file: lib/Soar/Production.pm
+    version: 0.03
+  Soar::Production::Parser:
+    file: lib/Soar/Production/Parser.pm
+    version: 0.03
+  Soar::Production::Parser::PRDGrammar:
+    file: lib/Soar/Production/Parser/PRDGrammar.pm
+    version: 0.03
+  Soar::Production::Printer:
+    file: lib/Soar/Production/Printer.pm
+    version: 0.03
+requires:
+  Carp: 0
+  Data::Dumper: 0
+  Exporter::Easy: 0
+  Parse::RecDescent: 0
+  perl: 5.010
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Soar-Production
+  homepage: https://github.com/garfieldnate/Soar-Production
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/garfieldnate/Soar-Production.git
+version: 0.03
+x_BuiltWith:
+  modules:
+    Carp: 1.26
+    Data::Diver: 1.0101
+    Data::Dumper: 2.145
+    Exporter::Easy: 0.16
+    File::Find: 1.20
+    File::Spec: 3.40
+    File::Spec::Functions: 3.40
+    File::Temp: 0.22
+    FindBin: 1.51
+    Module::Build: 0.4002
+    Parse::RecDescent: 1.967009
+    Path::Tiny: 0.015
+    Pod::Coverage::TrustPod: 0.100002
+    Test::Base: 0.60
+    Test::Base::Filter: NA(undef)
+    Test::CPAN::Meta: 0.23
+    Test::Deep: 0.11
+    Test::Exception: 0.31
+    Test::LongString: 0.15
+    Test::More: 0.98
+    Test::Pod: 1.45
+    Test::Pod::Coverage: 1.08
+    Test::Warn: 0.24
+    perl: 'NA(skipped: perl)'
+    strict: 1.07
+    utf8: 1.09
+    version: 0.9901
+    warnings: 1.13
+  perl:
+    original: v5.16.1
+    qv: 1
+    version:
+      - 5
+      - 16
+      - 1
+  platform: MSWin32
+x_Dist_Zilla:
+  perl:
+    version: 5.016001
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::ReportPhase
+      name: Phase_Begins
+      version: 0.00
+    -
+      class: Dist::Zilla::Plugin::Git::NextVersion
+      name: Git::NextVersion
+      version: 2.013
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      name: GatherDir
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: PruneCruft
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: AutoPrereqs
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::GenerateFile
+      name: MANIFEST.SKIP
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: ManifestSkip
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::ReportVersions::Tiny
+      name: ReportVersions::Tiny
+      version: 1.08
+    -
+      class: Dist::Zilla::Plugin::Test::Compile
+      name: Test::Compile
+      version: 2.001
+    -
+      class: Dist::Zilla::Plugin::Test::Perl::Critic
+      name: Test::Perl::Critic
+      version: 2.112410
+    -
+      class: Dist::Zilla::Plugin::Test::DistManifest
+      name: Test::DistManifest
+      version: 2.000002
+    -
+      class: Dist::Zilla::Plugin::Test::Version
+      name: Test::Version
+      version: 0.002004
+    -
+      class: Dist::Zilla::Plugin::MetaTests
+      name: MetaTests
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::Test::CPAN::Meta::JSON
+      name: Test::CPAN::Meta::JSON
+      version: 0.003
+    -
+      class: Dist::Zilla::Plugin::Test::MinimumVersion
+      name: Test::MinimumVersion
+      version: 2.000003
+    -
+      class: Dist::Zilla::Plugin::MojibakeTests
+      name: MojibakeTests
+      version: 0.5
+    -
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: PodCoverageTests
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: PodSyntaxTests
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::Test::Portability
+      name: Test::Portability
+      version: 2.000003
+    -
+      class: Dist::Zilla::Plugin::Test::Synopsis
+      name: Test::Synopsis
+      version: 2.000002
+    -
+      class: Dist::Zilla::Plugin::Test::UnusedVars
+      name: Test::UnusedVars
+      version: 2.000003
+    -
+      class: Dist::Zilla::Plugin::Test::Pod::LinkCheck
+      name: Test::Pod::LinkCheck
+      version: 1.001
+    -
+      class: Dist::Zilla::Plugin::Test::CPAN::Changes
+      name: Test::CPAN::Changes
+      version: 0.005
+    -
+      class: Dist::Zilla::Plugin::Test::Kwalitee
+      name: Test::Kwalitee
+      version: 2.03
+    -
+      class: Dist::Zilla::Plugin::Prepender
+      name: Prepender
+      version: 1.112280
+    -
+      class: Dist::Zilla::Plugin::OurPkgVersion
+      name: OurPkgVersion
+      version: 0.004000
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      name: PodWeaver
+      version: 3.101641
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: NextRelease
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: ExecDir
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: ShareDir
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::MinimumPerl
+      name: MinimumPerl
+      version: 1.003
+    -
+      class: Dist::Zilla::Plugin::Bugtracker
+      name: Bugtracker
+      version: 1.111080
+    -
+      class: Dist::Zilla::Plugin::Homepage
+      name: Homepage
+      version: 1.101420
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: MetaConfig
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::MetaData::BuiltWith
+      config:
+        Dist::Zilla::Plugin::MetaData::BuiltWith:
+          _stash_key: x_BuiltWith
+          show_config: 0
+          show_uname: 0
+      name: MetaData::BuiltWith
+      version: 0.03000100
+    -
+      class: Dist::Zilla::Plugin::Repository
+      name: Repository
+      version: 0.19
+    -
+      class: Dist::Zilla::Plugin::MetaResources
+      name: MetaResources
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::MetaNoIndex
+      name: MetaNoIndex
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      name: MetaProvides::Package
+      version: 1.14000001
+    -
+      class: Dist::Zilla::Plugin::License
+      name: License
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      name: MakeMaker
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::ModuleBuild
+      name: ModuleBuild
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::DualBuilders
+      name: DualBuilders
+      version: 1.001
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: MetaYAML
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::GithubMeta
+      name: GithubMeta
+      version: 0.28
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: MetaJSON
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::ReadmeFromPod
+      name: ReadmeFromPod
+      version: 0.18
+    -
+      class: Dist::Zilla::Plugin::ReadmeAnyFromPod
+      name: ReadmeAnyFromPod
+      version: 0.120120
+    -
+      class: Dist::Zilla::Plugin::InstallGuide
+      name: InstallGuide
+      version: 1.200000
+    -
+      class: Dist::Zilla::Plugin::Signature
+      name: Signature
+      version: 1.100930
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: Manifest
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::CheckChangesHasContent
+      name: CheckChangesHasContent
+      version: 0.006
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: TestRelease
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::CheckPrereqsIndexed
+      name: CheckPrereqsIndexed
+      version: 0.008
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: ConfirmRelease
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::RunExtraTests
+      name: RunExtraTests
+      version: 0.007
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: UploadToCPAN
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::ArchiveRelease
+      name: ArchiveRelease
+      version: 4.00
+    -
+      class: Dist::Zilla::Plugin::Clean
+      name: Clean
+      version: 0.07
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      name: Git::Commit
+      version: 2.013
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      name: Git::Tag
+      version: 2.013
+    -
+      class: Dist::Zilla::Plugin::Git::Push
+      name: Git::Push
+      version: 2.013
+    -
+      class: Dist::Zilla::Plugin::ReportPhase
+      name: Phase_Ends
+      version: 0.00
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: 4.300034
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: 0
+    version: 4.300034

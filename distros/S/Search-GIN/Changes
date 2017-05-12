@@ -1,0 +1,42 @@
+Revision history for Search-GIN
+
+0.11      2015-03-03 01:19:29Z
+        - switched from deprecated Test::TempDir to Test::TempDir::Tiny
+
+0.10      2015-03-01 22:00:45Z
+        - fix bunk ABSTRACTs, for better display on metacpan
+        - other misc pod cleanup
+
+0.09      2014-07-15 00:09:54Z
+        - Fix arg unpacking in Query::Manual::consistent (Robert Norris,
+          RT#94858)
+        - fixed mangled links in pod (RT#93490)
+
+0.08    2011-01-31
+        - Fix dup release on CPAN
+
+0.07    2010-12-10
+        - Adds support for Set queries
+        - Renaming excludes to -excludes, requiring Moose >= 0.89
+        - Removing special deprecated usage of qw (now complies with 5.13.5)
+
+0.06    2010-09-11
+        - Whoops, missed a debug output
+
+0.05    2010-09-11
+        - Adding a bit more docs
+        - Moved to Dist::Zilla
+        - Fixing SIGNATURE file (sorry sorry sorry)
+
+0.04    2010-03-04
+        - Safer attribute extraction
+        - Multiplex extraction now works
+        - Documentation for query modules
+        - Fixed bug in manual query returning empty list
+        - Updated copyright
+
+0.03    2008-10-31
+
+0.02    2008-10-11
+
+0.01    2008-10-11

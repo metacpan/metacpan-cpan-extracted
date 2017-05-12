@@ -1,0 +1,222 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+L<SimpleCall::ChartDirector>
+
+=head1 Require
+ 
+- 需要安装 ChartDirector 库
+
+- 需要把字体文件放到chart_director的fonts目录下，例如msyh.ttf/msyhbd.ttf
+
+=head1 FUNCTION
+
+=begin html
+
+实例参考<a href="xt/">xt子文件夹</a>
+
+=end html
+
+=head2 chart_bar 柱状图
+
+    chart_bar([1, 2, 3], 
+        file=> '01.chart_bar.png', 
+        title => '测试一二', 
+        label => [ '测试', '一二', '事情'] , 
+        width => 800, 
+        height => 330, 
+        plot_area => [ 75, 70, 600, 200 ], 
+        title_font_size => 12, 
+        color => [ qw/Yellow Green Red1/ ], 
+        # is_horizontal => 1,  #条形图
+    );
+
+=begin html
+
+<img src="xt/01.chart_bar.png"></img>
+
+<img src="xt/02.chart_bar_horizontal.png"></img>
+
+=end html
+
+
+=head2  chart_pyramid 金字塔图
+
+    参数同 chart_bar
+
+=begin html
+
+<img src="xt/03.chart_pyramid.png"></img>
+
+=end html
+
+=head2  chart_pie 饼图
+
+    chart_pie([1, 2, 3], 
+        file=> '04.chart_pie.png', 
+        title => '测试一二', 
+        label => [ '测试', '一二', '事情'] , 
+        width => 700, 
+        height => 500, 
+        pie_size =>  [ 350, 290, 180 ],
+        title_font_size => 12, 
+        color => [ qw/Yellow Green Red1/ ], 
+
+        #图例
+        with_legend => 1, 
+        legend_pos_x => 265, 
+        legend_pos_y => 55, 
+        legend_is_vertical => 0, 
+
+        #旋转角度
+        start_angle => 30,  
+
+        #饼图各部分的标签
+        label_format => "{label}\n{value}, {percent}%", 
+        label_pos => 20, 
+
+        #拉出一条线指向一块饼
+        label_side_layout => 1, 
+    );
+
+=begin html
+
+<img src="xt/04.chart_pie.png"></img>
+
+=end html
+
+=head2 chart_line 折线图
+
+    chart_line([[5, 6, 7, 8], [1, 2, 6, 9], [3, 9, 2, 4], ], 
+        file=> '06.chart_line.png', 
+        title => '测试一二', 
+        label => [ 'day1', 'day3', 'day5', 'day7'] , 
+        legend => [ 'aa','bb','cc'] , 
+        width => 1000, 
+        height => 320, 
+        plot_area => [ 75, 70, 800, 200 ],
+        title_font_size => 12, 
+        color => [ qw/Yellow Green Red1/ ], 
+
+        #图例
+        with_legend => 1, 
+        legend_pos_x => 320, 
+        legend_pos_y => 35, 
+        legend_is_vertical => 0, 
+
+        #描点加上不同形状
+        with_data_symbol => 1, 
+
+        #描点加上数值标签
+        with_data_label => 1, 
+
+        #Y轴格式,例如'{value}%',
+        #y_label_format => '{value}', 
+
+        #Y轴坐标刻度
+        #y_tick_density => 1, 
+
+        #Y轴取值范围
+        #y_axis_lower_limit => 0, 
+        #y_axis_upper_limit => 10, 
+    );
+
+=begin html
+
+<img src="xt/05.chart_line.png"></img>
+
+=end html
+
+
+=head2 chart_spline 平滑曲线图
+    
+    参数同 chart_line
+
+=begin html
+
+<img src="xt/06.chart_spline.png"></img>
+
+=end html
+
+=head2 chart_stacked_bar 累积柱状图
+    
+    参数同 chart_line
+
+    with_aggregate_data_label => 1,  #显示多个legend的数值总和
+
+=begin html
+
+<img src="xt/07.chart_stacked_bar.png"></img>
+
+=end html
+
+=head2 chart_stacked_area 面积图
+
+    参数同 chart_line
+
+=begin html
+
+<img src="xt/08.chart_stacked_area.png"></img>
+
+=end html
+
+
+=head2 chart_multi_bar 多柱图
+
+    参数同 chart_line
+
+    # is_horizontal => 1,  #条形图
+    # with_bar_shape => 1, #不同legend对应不同形状的柱子
+    # layer_3d_depth => 4,  #图层内 3d 形状深度
+
+=begin html
+
+<img src="xt/09.chart_multi_bar.png"></img>
+
+=end html
+
+=head2 chart_scatter 散点图
+
+    参数基本同 chart_line，区别是data多一层嵌套
+
+    $data = [
+        [
+        [ 10,  15,  6,  12,  14,  8,   13,  13,  16,  12,  10.5 ],
+        [ 130, 150, 80, 110, 110, 105, 130, 115, 170, 125, 125 ],
+        ],
+        [
+        [ 6,  12, 4,  3.5, 7,  8,  9,  10, 12,  11,  8 ],
+        [ 65, 80, 40, 45,  70, 80, 80, 90, 100, 105, 60 ],
+        ],
+    ];
+
+=begin html
+
+<img src="xt/10.chart_scatter.png"></img>
+
+=end html
+
+=head2 chart_percentage_bar 累积百分比柱状图
+    
+    参数同 chart_stacked_bar
+
+=begin html
+
+<img src="xt/11.chart_percentage_bar.png"></img>
+
+=end html
+
+=head2 chart_percentage_area 百分比面积图
+    
+    参数同 chart_stacked_area
+
+=begin html
+
+<img src="xt/12.chart_percentage_area.png"></img>
+
+=end html
+
+=cut

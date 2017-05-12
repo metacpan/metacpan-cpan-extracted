@@ -1,0 +1,11 @@
+--- #YAML:1.0
+name: Set-Light
+version: 0.03
+version_from: lib/Set/Light.pm
+license: perl
+distribution_type: module
+generated_by: Set-Light version 0.03
+installdirs: site
+requires:
+  Array::RefElem: 1
+  Test::Simple: 0.47

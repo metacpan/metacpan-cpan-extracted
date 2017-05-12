@@ -1,0 +1,90 @@
+#!/usr/bin/perl
+use v5.14;
+use warnings;
+
+use Getopt::Long;
+use SVG::SpriteMaker;
+
+my $prefix = 'sprite';
+my $out;
+
+GetOptions(
+	'prefix|p=s' => \$prefix,
+	'output|out|o=s' => \$out,
+);
+
+my $sprite = make_sprite $prefix, @ARGV;
+if ($out) {
+	open my $fh, '>', $out;
+	select $fh;
+}
+say $sprite->xmlify;
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+svg-spritemaker - Combine several SVG images into a single SVG sprite
+
+=head1 SYNOPSIS
+
+  svg-spritemaker [-o OUTPUT] [-p PREFIX] FILE...
+
+  svg-spritemaker a.svg b.svg > sprite.svg                 # Standard usage
+  svg-spritemaker -p img a.svg b.svg > sprite.svg          # Custom prefix
+  svg-spritemaker -o sprite.svg dir/*.svg                  # Output file
+  svg-spritemaker --prefix=logo --output=logos.svg logos/* # Long options
+
+=head1 DESCRIPTION
+
+svg-spritemaker takes several SVG images and combines them into a
+single SVG sprite. See L<SVG::SpriteMaker> for more information about
+SVG sprites.
+
+=head1 OPTIONS
+
+=over
+
+=item B<-o> I<file>, B<--out>=I<file>, B<--output>=I<file>
+
+Write the sprite into the following file, overwriting it if necessary.
+By default the sprite is written on STDOUT.
+
+=item B<-p> I<prefix>, B<--prefix>=I<prefix>
+
+Sets the prefix for the fragment identifiers. Default is C<sprite>
+(which results in identifiers C<sprite-a>, C<sprite-b> for the first
+example in the SYNOPSIS).
+
+=back
+
+If an ID is shared between two or more input files, this program will
+try to rename each occurence except for the first one. This operation
+might have false positives (attributes/cdatas that are mistakenly
+identified to contain the ID-to-be-renamed) and false negatives
+(attributes/cdatas that actually contain the ID-to-be-renamed but this
+is missed by the module), and as such svg-spritemaker will warn if
+duplicate IDs are detected. You can suppress this warning by setting
+the C<SVG_SPRITEMAKER_NO_DUPLICATE_WARNINGS> environment variable to a
+true value.
+
+=head1 SEE ALSO
+
+L<SVG::SpriteMaker>, L<https://css-tricks.com/svg-fragment-identifiers-work/>
+
+=head1 AUTHOR
+
+Marius Gavrilescu, E<lt>marius@ieval.roE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2015-2017 by Marius Gavrilescu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.20.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+=cut

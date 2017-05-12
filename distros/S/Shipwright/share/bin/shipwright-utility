@@ -1,0 +1,220 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Getopt::Long;
+use YAML::Tiny;
+use List::MoreUtils qw/uniq firstidx/;
+use Carp;
+
+my %args;
+@ARGV = '--help' unless @ARGV;
+
+confess "unknown option"
+  unless GetOptions( \%args, 'update-order', 'keep-requires=s',
+    'keep-recommends=s', 'keep-build-requires=s', 'for-dists=s', 'help',
+	'generate-tar-file=s',
+	);
+
+my $USAGE = <<'END'
+run: ./bin/shipwright-utility
+
+options: 
+
+help: print this usage
+
+update-order: regenerate install order.
+    sub options:
+        keep-requires: keep dists with requires dep type. default is true.
+        keep-recommends: keep dists with recommends dep type. default is true.
+        keep-build-requires: keep dists with build-requires dep type. default is true.
+        for-dists: make order only for these dists, seperated by comma.
+        default is for all the dists in the source.
+
+    e.g. --update-order --keep-recommends 0 --for-dists Jifty-DBI,Jifty
+
+generate-tar-file: generate a self executable tar file
+    e.g. --generate-tar-file /tmp/foo
+
+END
+  ;
+
+if ( $args{'help'} ) {
+    print $USAGE;
+    exit 0;
+}
+if ( $args{'update-order'} ) {
+    for ( 'keep-requires', 'keep-recommends', 'keep-build-requires' ) {
+        $args{$_} = 1 unless defined $args{$_};
+    }
+
+    my @dists = split /,\s*/, $args{'for-dists'} || '';
+    unless (@dists) {
+        my $out = `ls scripts`;
+        my $sep = $/;
+        @dists = split /$sep/, $out;
+        chomp @dists;
+        s{/$}{} for @dists;
+    }
+
+    my $require = {};
+
+    for (@dists) {
+
+        # bloody hack, cpan-Module-Build have recommends that will
+        # cause circular deps
+        if ( $_ eq 'cpan-Module-Build' ) {
+            $require->{'cpan-Module-Build'} = [];
+        }
+        else {
+            fill_deps( %args, require => $require, name => $_ );
+        }
+    }
+
+    require Algorithm::Dependency::Ordered;
+    require Algorithm::Dependency::Source::HoA;
+
+    my $source = Algorithm::Dependency::Source::HoA->new($require);
+    $source->load();
+    my $dep = Algorithm::Dependency::Ordered->new( source => $source, )
+      or confess $@;
+    my $order = $dep->schedule_all();
+
+    DumpFile( 'shipwright/order.yml', $order );
+	print "successfully updated order\n";
+}
+elsif ( $args{'generate-tar-file'} ) {
+	require File::Spec;
+	require Cwd;
+	my $cwd = Cwd::getcwd();
+	my @dirs = File::Spec->splitdir( $cwd );
+	my $name = pop @dirs;
+	my $parent_dir = File::Spec->catdir( @dirs );
+    my $to = $args{'generate-tar-file'};
+    my $tar_out;
+    if ( $to eq '-' ) {
+        $tar_out = *STDOUT;
+    }
+    else {
+	    $to = Cwd::abs_path( $to );
+	    open $tar_out, '>', $to or die $!;
+	    chmod 0755, $to; ## no critic
+    }
+
+	chdir $parent_dir;
+	print $tar_out <<'EOF';
+#!/usr/bin/env perl 
+use strict;
+use warnings;
+use File::Spec::Functions;
+use Config;
+use Cwd;
+use File::Temp;
+my $bin_quote = $^O =~ /MSWin/ ? q{"} : q{'};
+my $bin_ext = $Config{_exe};
+
+
+my $cwd = getcwd;
+my $dir = File::Temp->newdir( CLEANUP => 1, TMPDIR => 1 );
+chdir $dir;
+my $tar_cmd = which('tar');
+if ( $^O =~ /MSWin/ || ! $tar_cmd ) {
+    open my $fh, '>', 'fs.tar.gz' or die $!;
+    binmode $fh;
+    while (<DATA>) {
+        print $fh $_;
+    }
+    close $fh;
+
+    require Archive::Extract;
+    my $ae = Archive::Extract->new( archive => 'fs.tar.gz' );
+    $ae->extract();
+}
+else {
+# the reason we perfer tar cmd here is we don't need to save the .tar.gz
+# file in disk, and Archive::Extract is not in core until 5.9.5.
+    open my $tar, '|-', "$tar_cmd xz";
+
+    while (<DATA>) {
+        print $tar $_;
+    }
+    close $tar;
+}
+
+opendir my $dh, '.' or die $!;
+my ( $tarpath ) = grep { $_ && $_ !~ /^\./ && $_ !~ /\.tar\.gz$/} readdir $dh;
+chdir $tarpath or die $!;
+
+if ( system( $^X, catfile( 'bin', 'shipwright-builder' ), @ARGV ) ) {
+    # error happens
+    $dir->unlink_on_destroy(0);
+    die "error occurred: the repository dir $dir is not cleaned up";
+}
+
+chdir $cwd;
+
+sub which {
+    my $name = shift;
+
+    my $path;
+
+  LINE:
+    for my $dir ( path() ) {
+        my $p = catfile( $dir, $name );
+
+        # XXX  any other names need to try?
+        my @try = grep { -x } ( $p, $p . $bin_ext );
+        for my $try (@try) {
+            $path = $try;
+            last LINE;
+        }
+    }
+
+    return unless $path;
+    if ( $path =~ /\s/ && $path !~ /^$bin_quote/ ) {
+        $path = $bin_quote . $path . $bin_quote;
+    }
+
+    return $path;
+}
+
+__DATA__
+EOF
+	open my $tar_in, '-|', "tar cz $name" or die $!;
+	while ( <$tar_in> ) {
+		print $tar_out $_;
+	}
+	chdir $cwd;
+	print "successfully generated\n" unless $to eq '-';
+}
+
+sub fill_deps {
+    my %args    = @_;
+    my $require = $args{require};
+    my $name    = $args{name};
+
+    my $string;
+    my $req = YAML::Tiny::LoadFile("scripts/$name/require.yml");
+
+    if ( $req->{requires} ) {
+        for (qw/requires recommends build_requires/) {
+            my $arg = "keep-$_";
+            $arg =~ s/_/-/g;
+            push @{ $require->{$name} }, keys %{ $req->{$_} }
+              if $args{$arg};
+        }
+    }
+    else {
+
+        #for back compatbility
+        push @{ $require->{$name} }, keys %$req;
+    }
+
+    @{ $require->{$name} } = uniq @{ $require->{$name} };
+
+    for my $dep ( @{ $require->{$name} } ) {
+        next if $require->{$dep};
+        fill_deps( %args, name => $dep );
+    }
+}
+

@@ -1,0 +1,31 @@
+# Remove all dnssec records
+template: update-domain.tt
+
+vars:
+  domain: 10-dnssec.co.te
+  dnssec:
+    remove_all: 1
+
+input_assertions:
+  class: SRS::EPP::Command::Update::Domain
+
+SRS:
+    -
+        assertions: 
+           count:
+               - [ '//DomainDetailsQry', 1, 'DDQ generated']
+           match:
+               - [ '//DomainNameFilter', '10-dnssec.co.te', 'SRS[1] - Domain name filter correct' ]
+           attr_is:
+               - [ '//FieldList', 'DNSSEC', '1', 'SRS[1] - DNSSEC info requested in field list' ]
+    -
+        assertions:
+           count:
+               - [ '//DS', 0, 'SRS[2] - 0 ds records' ]
+               - [ '//DNSSEC', 1, 'SRS[2] - dns sec element still present, so all cleared' ]
+
+output_assertions:
+  count:
+    - [ '//epp:result', 1, 'SRS: Check for one result' ]
+  attr_is:
+    - [ '//epp:result', 'code', 1000, 'SRS: Check for correct result code' ]

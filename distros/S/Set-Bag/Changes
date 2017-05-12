@@ -1,0 +1,21 @@
+Revision history for Perl module Set::Bag
+
+1.012 2013-04-10
+  - Clarified the LICENSE section in POD (GPL and Artistic, same as Perl itself)
+
+1.011 2013-04-09
+  - First pass on modernizing Makefile.PL
+  - Typos corrected in SYNOPSIS section of POD.
+
+1.010 2013-04-08
+  - Maintenance release by David Oswald
+  - Unless otherwise noted, future releases are by David Oswald.
+  - Restored Set::Bag to CPAN (It had been deleted).
+
+1.009 2005-01-09
+  - Jarkko Hietaniemi  <jhi@iki.fi>
+  - Test::More-ify t/bag.t (from Bruce W. Lowther)
+
+1.008 2002-11-20
+  - Jarkko Hietaniemi  <jhi@iki.fi>
+  - elements() could return the magic "over delete" key.

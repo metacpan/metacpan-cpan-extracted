@@ -1,0 +1,72 @@
+1.09 2017-02-19
+ - Increase MAX_EXCEPTION_VALUE to 4096 (thanks Michael Wiencek)
+ - Using Time::Piece (thanks Ryutaro Mizokami)
+
+1.08 2016-08-05
+ - Fixing perl 5.8 compatibility
+
+1.07 2016-08-04
+ - Adding environment context parameter (thanks William Travis Holton)
+
+1.06 2016-07-06
+ - Adding release context parameter (thanks Slobodan Mišković)
+
+1.05 2016-05-25
+ - Fixing stack frame context (thanks Steve Wooster)
+
+1.04 2016-05-10
+ - Adding event fingerprinting (thanks Steve Wooster)
+
+1.03 2016-04-15
+ - Regain ability to set encoding (thanks Stuart Skelton)
+
+1.02 2016-01-12
+ - Move project to getsentry github repo
+ - Change parameter reporting (thanks dakkar)
+
+1.01 2015-08-20
+ - Clean up encoding error in Sentry
+
+1.00 2015-07-13
+ - Major release
+ - using stacktrace abs_path and filename correctly
+
+0.09 2015-01-20
+ - Reuse TCP connections when possible
+ - Use LWP's built-in gzip compression
+
+0.08 2014-09-22
+ - Trimming fields to avoid 413 Request Entity Too Large response
+ - Fixing Http interface documentation for data field
+
+0.07 2014-08-11
+ - Use IO::Compress::Gzip to compress http posts
+
+0.06 2014-07-14
+ - Report post errors in capture_errors
+ - Added travis config
+
+0.05 2014-06-12
+ - Windows test fixes
+
+0.04 2014-06-11
+ - Event processor support
+ - Stacktrace context now accepts Devel::StackTrace objects
+ - Improving error handler behavior and documentation
+ - Better context usability for extra and tags
+
+0.03 2014-05-29
+ - Context decorators
+ - Post users (sentry interface type)
+ - Post queries (sentry interface type)
+ - Modified api for capture_exception
+
+0.02 2014-05-23
+ - Override event defaults in the constructor
+ - Automatically post stack traces with the error handler
+ - Post stack traces (sentry interface type)
+ - Post http requests (sentry interface type)
+ - Package improvements
+
+0.01 2014-05-07
+ - Initial release

@@ -1,0 +1,144 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Syntax-Collector/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.006001"^^doap-deps:CpanId ], [ doap-deps:on "Module::Runtime"^^doap-deps:CpanId ], [ doap-deps:on "Exporter::Tiny"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.61"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Syntax-Collector>;
+	doap:created         "2012-02-15"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/Syntax-Collector>;
+	doap:homepage        <https://metacpan.org/release/Syntax-Collector>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "Syntax-Collector";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Syntax-Collector/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Syntax-Collector/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Syntax-Collector/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Syntax-Collector/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Syntax-Collector/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Syntax-Collector/v_0-006>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-syntax-collector>;
+	];
+	doap:shortdesc       "collect a bundle of modules into one".
+
+<http://purl.org/NET/cpan-uri/dist/Syntax-Collector/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "Syntax-Collector-0.001"^^xsd:string;
+	dc:issued            "2012-02-16"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Syntax-Collector-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Syntax-Collector/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "Syntax-Collector-0.002"^^xsd:string;
+	dc:issued            "2012-02-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			rdfs:label "Cope better with modules that inherit their import routine."@en;
+		], [
+			rdfs:label "Make Sub::Uplevel more aggressive."@en;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Syntax-Collector-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Syntax-Collector/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "Syntax-Collector-0.003"^^xsd:string;
+	dc:issued            "2012-05-11"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			rdfs:label "Borrow caller-fooling technique from Import::Into, so we no longer need uplevel."@en;
+		], [
+			rdfs:label "IMPORT methods now get passed @_ from import."@en;
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Drop Sub::Uplevel dependency."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Support an 'into' parameter."@en;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Syntax-Collector-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Syntax-Collector/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "Syntax-Collector-0.004"^^xsd:string;
+	dc:issued            "2012-09-07"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Clean up documentation."@en;
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Drop PerlX::Maybe dependency."@en;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Syntax-Collector-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Syntax-Collector/v_0-005>
+	a                    doap:Version;
+	dc:identifier        "Syntax-Collector-0.005"^^xsd:string;
+	dc:issued            "2013-11-20"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:BackCompat;
+			rdfs:label "Almost complete rewrite, subclassing Exporter::Tiny."@en;
+		], [
+			a doap-changeset:BackCompat;
+			rdfs:label "The IMPORT method no longer gets passed @_ from import, and is now undocumented."@en;
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Drop syntax.pm dependency."@en;
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Drop Test::Warn dependency."@en;
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Drop Test::Exception dependency."@en;
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Drop Sub::Name dependency."@en;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Syntax-Collector-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Syntax-Collector/v_0-006>
+	a                    doap:Version;
+	dc:identifier        "Syntax-Collector-0.006"^^xsd:string;
+	dc:issued            "2013-11-20"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Improve the bundled examples."@en;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Syntax-Collector-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

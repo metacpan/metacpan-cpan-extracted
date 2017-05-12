@@ -1,0 +1,11 @@
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Set/Jaccard/SimilarityCoefficient.pm
+t/00basic.t
+t/01calc.t
+xt/release/minimum-version.t

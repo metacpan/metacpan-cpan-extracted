@@ -1,0 +1,6 @@
+{
+    my ($makefile) = @_;
+    $makefile->parse("common.smakh");
+}
+
+default:        commonrule

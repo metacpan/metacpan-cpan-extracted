@@ -1,0 +1,96 @@
+Revision history for Perl extension SQL::OrderBy.
+
+0.01  Mon Feb  3 14:11:20 2003
+	- original version; created by h2xs 1.22 with options
+		-X -n SQL::OrderBy
+
+0.02  Mon Feb  3 2003
+    - Documentation fixes and enhancement.
+
+0.03  Mon Feb  3 2003
+    - Ack!  My synopsis!
+
+0.04  Fri Feb 21 2003
+    - Renamed the resort() function to toggle_resort().
+    - Enhanced documentation.
+
+0.05  Fri Feb 21 2003
+    - Allowed toggle_resort() to accept an array reference as well as
+      a string clause.
+    - Added scalar/array context sensitivity to toggle_resort().
+    - Fixd/enhanced documentation.
+
+0.06  Fri Feb 21 2003
+    - Ugh.  Fixed my documentation again.
+
+0.06.1  Mon Feb 24 2003
+    - Corrected the version number and author email.
+    - Oops!  Only require an interpreter of 5.005.
+    - Documented the test a bit.
+
+0.06.2  Mon Feb 24 2003
+    - Fixed documentation again.
+    - Rearranged distribution files.
+
+0.07  Tue Feb 25 2003
+    - Added a function to fetch column names and directions.
+    - Added a function to render a column "name direction" list.
+    - Added a function to convert a numeric direction list to
+      asc/desc format.
+    - Added binary flags for returning different formats.
+
+0.07.1  Tue Feb 25 2003
+    - Oof!  Fixed asc/desc case visibility.
+    - Turned the asc exposure default to "off" (0).
+    - Fixed the test cases and synopsis.
+    - Cleaned up the docs a bit, of course...
+
+0.08  Thu Feb 27 2003
+    - Reformed distribution files for CPAN.
+    - Renamed the num2asc_desc() function to to_asc_desc().
+    - Removed the unnecessary _set_defaults() function.
+    - Made the to_asc_desc() function accept named arguments.
+    - Allowed persistent case for a direction name that is passed in.
+    - Fixed/enhanced documentation.
+
+0.08.1  Sun Mar  2 2003
+    - Made sure the code can silently handle both empty order lists
+      and clauses.
+    - Added tests for empty order lists and clauses.
+    - Cleaned up test output messages.
+    - Cleaned up documentation.
+
+0.08.2  Mon Mar  3 2003
+    - Whoops!  Set selected column name direction too.
+    - Add test cases for selecting an unseen column name with
+      direction.
+
+0.08.3  Mon Mar  3 2003
+    - Updated documentation for get_columns().
+    - Added a test for the enhanced get_columns() functionality.
+    - "Lord, am I done with this ultra-simple module yet?"
+
+0.08.4  Mon Mar  3 2003
+    - Ack.  I forgot to make Test::More know how many tests it should
+      run.
+
+0.08.5  Mon Mar  3 2003
+    - Okay.  Maybe I'm typographically obsessive-compulsive.
+
+0.08.6  Wed May 21 2003
+    - Pruned and rearranged documentation.
+
+0.08.7  Fri Jul 11 2003
+    - Excised the unnecessary =head1 ABSTRACT section.
+
+0.0808  Sun Sep 27 2003
+    - Made the $VERSION a real number and put it on it's own line.
+      This should help the CPAN indexing.
+
+0.09  Sun Aug 22 2004
+    *** THIS MODULE NO LONGER EXPORTS ANYTHING BY DEFAULT ***
+    - Got rid of the dependency on Exporter by just exporting nothing.
+    - ..and fixed the tests accordingly.
+    - Got rid of the editor code fold markers.
+    - Cleaned and enhanced POD bigtime.
+    - Got rid of potential uninitialized warning in toggle_resort.

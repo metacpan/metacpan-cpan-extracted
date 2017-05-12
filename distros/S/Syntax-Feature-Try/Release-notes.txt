@@ -1,0 +1,19 @@
+
+Release notes
+-------------
+
+    - update version everywhere (dist.ini, Try.pm)
+    - update changelog
+
+    dzil clean
+    dzil build
+    dzil test
+    dzil release
+
+    # commit changes to git
+    git commit -a
+    git push
+
+    # tag new relese
+    git tag vX.XXX
+    git push --tags

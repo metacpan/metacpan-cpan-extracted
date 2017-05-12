@@ -1,0 +1,8 @@
+Revision history for Perl extension SVG::Graph.
+
+0.01  Sat Jun 21 19:25:42 2003
+	- original version; created by h2xs 1.21 with options
+		-X SVG::Graph
+
+0.02 June 11, 2008
+	- Updated License to Artistic 2.0.  See README file.

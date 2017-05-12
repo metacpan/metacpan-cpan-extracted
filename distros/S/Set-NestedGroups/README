@@ -1,0 +1,161 @@
+Copyright (c) 1998 Alan Barclay. All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+Please send questions or bug reports to me rather than posting them to
+a newsgroup since I may miss them there.
+
+INSTALLATION
+
+To install, just type
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+TESTS
+
+By default, the dbi tests are not performed. You need to edit the
+t/dbi.t file and set up the correct database & driver.
+
+
+Here is the documentation for the module, directly from the pod
+
+NAME
+    Set::NestedGroups - grouped data eg ACL's, city/state/country etc
+
+SYNOPSIS
+      use Set::NestedGroups;
+      $nested = new Set::NestedGroups;
+      $nested->add('user','group');
+      $nested->add('group','parentgroup');
+      do_something() if($nested->member('user','parentgroup'));
+
+DESCRIPTION
+    Set::NestedGroups gives an implementation of nested groups, access
+    control lists (ACLs) would be one example of nested groups.
+
+    For example, if Joe is a Manager, and Managers have access to payroll,
+    you can create an ACL which implements these rules, then ask the ACL if
+    Joe has access to payroll.
+
+    Another example, you may wish to track which city, state and country
+    people are in, by adding people to cities, cities to states, and states
+    to countries.
+
+CONSTRUTORS
+    new()
+        creates a new Set::NestedGroups object.
+
+    new( fh )
+        creates a new Set::NestedGroups object, the object will be
+        initialized using data read from this handle. For details on the
+        format, see the save() method
+
+    new( $sth )
+        creates a new Set::NestedGroups object, the object will be
+        initialized using data read using this this DBI statement handle.
+        For details on the format, see the save() method
+
+METHODS
+    add ( $member, $group)
+        adds a member to a group. The group will be created if it doesn't
+        already exist.
+
+    remove ( $member, $group )
+        removes a member from a group. If this was the last member in this
+        group, then the group will be deleted. If the member was only in
+        this group, then they will be deleted.
+
+    save(FILEHANDLE)
+        Outputs the object to the given filehandle, which must be already
+        open in write mode.
+
+        The format is compatable with the format used by CGI, and can be
+        used with new to initialize a new object;
+
+        Returns true if successfully wrote the data, or false if something
+        went wrong (usually that meant that the handle wasn't already open
+        in write mode).
+
+    save($sth)
+        Saves the object to a DBI database. This can be used with new to
+        initialize a new object. The $sth should be expecting 2 values, in
+        this fashion:
+
+          $sth = $dbh->prepare('insert into acl values (?,?)')
+          $acl->save($dbh);
+          $sth->finish();
+
+          $sth = $dbh->prepare('select * from acl');
+          $newacl=new ACL($sth);
+
+        Returns true if successfully wrote the data, or false if something
+        went wrong.
+
+    member ( $member, $group )
+        Returns true if $member is a member of $group.
+
+    member ( $member )
+        returns true if $member exists in any group.
+
+    group ( $group )
+        returns true if $group exists
+
+    groups ( $member, %options )
+        Returns the groups that $member belongs to. Options are explained
+        below.
+
+    members ( $group , %options )
+        Returns the members of $group. Keep on reading for the options
+
+    list(%options)
+        Returns a Set::NestedGroups::Member object that will output an list
+        of the members & groups. This could be considered a calling of
+        groups() on each member, except this is more efficent.
+
+        The object can be used as follows.
+
+          $list=$nested->list();
+          for(my $i=0;$i<$list->rows();$i++){
+            my ($member,$group)=$list->next();
+            print "$member=$group\n";   
+          }
+
+  options
+
+        By default, the above methods give every valid combination. However
+        you might not always want that. Therefore there are options which
+        can prevent return of certain values.
+
+        All of these examples presume that 'joe' is a member of 'managers',
+        and 'managers' is a member of payroll, and that you are using only
+        one of these options. You can use all 3, but that gets complicated
+        to explain.
+
+        -norecurse=>1
+
+        No Recursion is performed, method would ignore payroll, and return
+        only managers.
+
+        -nomiddles=>1
+
+        Doesn't returns groups 'in the middle', method would ignore mangers,
+        and return only payroll.
+
+        -nogroups=>1
+
+        Doesn't return members that are groups. This only applies to the
+        list() method, in which case it acts like nomiddles, except on the
+        member instead of the group. list would ignore managers and return
+        joe => managers , joe => payroll.
+
+    This sounds a lot more confusing than it actually is, once you try it
+    once or twice you'll get the idea.
+
+AUTHOR
+    Alan R. Barclay, gorilla@elaine.drink.com
+
+SEE ALSO
+    perl(1), CGI, DBI.
+

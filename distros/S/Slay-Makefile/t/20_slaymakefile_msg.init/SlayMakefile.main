@@ -1,0 +1,49 @@
+#  -*- makefile -*-
+{
+    use strict;
+
+    use vars qw(@OKS);
+
+    my @exps = <*.log.exp>;
+    @OKS = @exps;
+    s((.*)\.log\.exp\z)($1.ok) foreach @OKS;
+}
+
+test:	{ @OKS }
+
+# Fault grading
+%.ok:	%.log
+	diff $DEP0.exp $DEP0 > $TARGET 2>&1
+
+# Test execution
+%.log:	%.smak
+	{
+	    my ($maker, $target, $deps, $matches) = @_;
+	    my $sm = Slay::Makefile->new();
+	    my $errs = eval { $sm->parse($deps->[0]) };
+	    open T, ">$target";
+	    if ($errs) {
+		s/(SlayMakefile\.main line )\d+/${1}314159/ foreach @$errs;
+		print T @$errs;
+	    }
+	    print T $@ if $@;
+	    close T;
+	}
+
+no_targets.log:  no_targets.smak
+	{
+	    my ($maker, $target, $deps, $matches) = @_;
+	    my $sm = Slay::Makefile->new();
+	    my @errs;
+	    my $errs = eval { $sm->parse($deps->[0]) };
+	    push @errs, @$errs if $errs;
+	    push @errs, $@ if $@;
+	    eval { $sm->make } ;
+	    push @errs, $@ if $@;
+	    open T, ">$target";
+	    if (@errs) {
+		s/(SlayMakefile\.main line )\d+/${1}314159/ foreach @errs;
+		print T @errs;
+	    }
+	    close T;
+	}

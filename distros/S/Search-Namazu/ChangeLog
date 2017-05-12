@@ -1,0 +1,4084 @@
+2006-06-09  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* Namazu.xs: Fixed segfault bug on perl 5.005_03.
+	  (Patched by Tadamasa Teranishi, thank you)
+
+	* Version 0.96.
+
+2006-06-06  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* Namazu.xs: Defined SvPV_nolen if it is not defined.
+
+	* Version 0.95.
+
+2006-05-30  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* Namazu.xs: Added workaround for perl 5.6.0
+
+	* Released as 0.94.
+
+2006-04-03  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* Namazu.xs: Added 5 methods in ResultXS:
+	 score(), rank(), date(), docid(), idxid().
+
+2006-03-30  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* Namazu.pm (Search): Added "sortField" method.
+	  //Fixed constants. - reverted
+	  Changed value check.
+
+	* Namazu.xs (call_search_main): Fixed half of results bug.
+	  (Reported by Tadamasa Teranishi, thank you)
+
+2006-03-29  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* Namazu.{xs,pm}: Added "fields" parameter.
+	  Added default fields "score", "date" and "rank" in ResultXS.
+
+2006-03-28  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* Namazu.{xs,pm}: Added maxget parameter.
+	  Added a new class: Search::Namazu::ResultXS.
+
+2006-03-27  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* Namazu.pm (Search): Add a new parameter 'returnas'.
+
+	* Namazu.xs: Fixed prototype.
+	  Splitted common code from call_search_main.
+	  (call_search_main_ref): New native function to return 
+	  an array as a reference.
+
+2006-03-24  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* Namazu.{xs,pm}: Removed errono.
+	  Added a global variable "status".
+	  Added nmz_getstatus() func.
+
+2006-03-23  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* Namazu.{xs,pm} : Added errno check.
+
+2006-03-16  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* t/01-mkindex.t: Removed some environment variables.
+
+	* Namazu.pm (Search): Fixed default order.
+	  Reported by Tadamasa Terasnishi, thanks.
+
+	* Namazu.xs: Fixed wrong array access.
+	  Reported by Tadamasa Teranishi, thanks.
+
+2006-03-14  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* Namazu.{xs,pm} : Added size attribute.
+	  Added maxhit paramater.
+
+	* Namazu.pm: Added more error status.
+
+2003-03-10  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* Version 0.93.
+
+	* Namazu.xs: Fixed bad sorting orders.
+	(Reported by Yo[u]ichi ISOZAKI, thank you.)
+
+2002-06-19  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* Version 0.92.
+
+	* Namazu.pm: Applied title, author and summary support patch.
+	(Contributed by Jun Kuriyama, thank you.)
+
+	* Namazu.pod.ja: Ditto.
+
+	* Namazu.xs: Ditto.
+
+2002-02-19  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* Version 0.91.
+
+	* Makefile.PL: Changed to use nmz-config.
+	
+	* Namazu.xs: Changed include path of libnmz header files.
+
+	* Version 0.90.
+
+	* Namazu.xs (call_search_main): Added perl version check on
+	workaround routine.
+
+	* Makefile.PL: Added clean target.
+
+	* t/02-search.t: Added lang paramater.
+	Added more test.
+
+2002-02-18  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* t/0[1-2]-*.t: Added 2 test scripts.
+
+	* Fixed copyright.
+
+	* t/*: Added some data for test suite.
+
+2001-08-01  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* Namazu.xs: s/na/PL_na/
+
+2001-04-25  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* Namazu.xs: Defined na and sv_undef for new perl.
+
+2001-01-19  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* Namazu.pm: Version 0.13.
+	0.12 was not fixed no-result return bug.
+
+2001-01-17  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* Namazu.pm: Version 0.12.
+
+	* Namazu.xs: Fixed no-result return bug when query hits only
+	one staff.
+
+2000-11-06  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* Namazu.pm : Fixed bad example code.
+
+2000-08-24  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* Namazu.pm (Search): Removed checking return value of 
+	nmz_setlang().
+
+2000-05-25  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* Version 0.11.
+
+	* Added Namazu.pod.ja.
+
+	* Changed default order of results (descending -> ascending).
+
+2000-01-31  Ryuji Abe  <raeva@t3.rim.or.jp>
+
+	* nmz/util.[ch] (nmz_commas): Moved to src/result.c as commas.
+	(nmz_subst): Moved to src/form.c as subst.
+
+	* src/result.c (commas): Be static.
+
+	* src/form.c (subst): Likewise.
+
+2000-01-29  Kenji Suzuki  <kenji@po.ganseki.ne.jp>
+
+	* filter/hnf.pl: s/SUMMARY_LENGTH/MAX_FIELD_LENGTH/
+
+2000-01-29  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* src/namazu-cmd.c (main): Fix default index bug. 
+	[namazu-dev 1398]
+
+	* src/namazu-cgi.c (main): Ditto.
+
+	* conf/namazurc-sample: Modify comments.
+
+	* src/namazu-cgi.c (main): Fix load_rcfiles() timing bug.
+
+	* src/rcfile.c (process_rc_lang): It workd only if LANG is not
+	set. 
+
+	* nmz/i18n.c (nmz_set_lang): Set enviromental variables for
+	gettext() only if LANG is not set. 
+
+	* src/rcfile.c (show_config): Modify display formats.
+
+	* src/output.c (get_emphasis_tag_start): New function.
+	(get_emphasis_tag_end): Ditto.
+
+	* nmz/replace.c (nmz_show_replaces): Abolished.
+	(nmz_get_replaces): New function.
+
+	* nmz/alias.c (nmz_show_aliases): Abolished.
+
+	* nmz/replace.c (nmz_get_replaces): New function.
+
+	* src/rcfile.c (add_loaded_rcfile): New function.
+
+	* scripts/mknmz.pl.in (load_rcfiles): Renamed to be same name in
+	used in namazu command.
+
+	* src/rcfile.c (set_namazurc): Be void.
+
+	* src/namazu-cgi.c (conjuct_pathname): New function derived from
+	set_pathname in rcfile.c.
+
+	* src/rcfile.c (show_config): Renamed from show_rcfile and modified.
+	(set_pathname): Abolished.
+	
+	* src/namazu-cmd.c (main): Change timing of loding rcfile.
+
+	* src/namazu-cgi.c (main): Ditto.
+
+	* nmz/util.c (nmz_is_file_exists): New function.
+
+	* src/rcfile.c (getenv_namazurc): Change behaviour.
+	(load_rcfile): Change behaviour.
+	(load_rcfiles): New function derived from open_rcfile.
+	(open_rcfile): Abolished.
+
+	* scripts/mknmz.pl.in (show_usage): Gettextized.
+
+	* pl/usage.pl: Gettextized.
+
+	* scripts/mknmz.pl.in (parse_options): Abolish --lang option.
+
+	* src/namazu-cmd.c (parse_options): Abolish --lang option.
+
+	* src/usage.c (show_usage): Ditto.
+
+2000-01-29  Ryuji Abe  <raeva@t3.rim.or.jp>
+
+	* acinclude.m4 (AM_PATH_LISPDIR): Do not AC_SUBST(emacsdir).
+
+	* scripts/Makefile.am: Revert to verbose configuration process.
+	(TAGS_DEPENDENCIES): Set $(SCRIPTS).
+
+	* lisp/Makefile.am (lisp_LISP): Comment out.
+
+	* configure.in (AM_PATH_LISPDIR): Likewise.
+
+	* templade/Makefile.am (EXTRA_DIST): Fixed wrong entries.
+
+	* src/rcfile.c: Include <errno.h>.
+
+2000-01-28  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* pl/Makefile.am (perllib_DATA): Remove find.pl.
+	(EXTRA_DIST): Simplified.
+
+	* scripts/mknmz.pl.in (put_log): Getteztized.
+	s/Files/Documents/g.
+
+	* pl/gettext.pl.in (N_): New function.
+
+	* scripts/mknmz.pl.in (find_target): Change a message.
+	(load_modules): Do not require find.pl.
+
+	* pl/find.pl: Removed.
+
+	* scripts/mknmz.pl.in (find_target): Use File::Find's find()
+	instead of one in pl/find.pl.
+	(wanted): Abolished and transformed to $wanted_closure in
+	find_target().
+
+	* template/Makefile.am (template_DATA): Add
+	NMZ.result.{normal,short}.ja 
+	(EXTRA_DIST): Simplified.
+
+	* configure.in (COPYRIGHT): Add "Copyright (C) 1997-1999 Satoru
+	Takabayashi All rights reserved.\n"
+
+	* pl/var.pl.in: Make $COPYRIGHT double-quoted string.
+
+	* src/output.c (print_hlist): Fix a bug.
+
+	* template/NMZ.result.normal.ja: New file.
+
+	* template/NMZ.result.short.ja: Ditto.
+
+	* src/output.c (load_nmz_result): New function.
+	(load_nmz_result): Handle lang suffix such as ".ja".
+
+	* configure.in: Fix OPT_ADMIN_EMAIL handling bug.
+
+	* scripts/mknmz.pl.in (init): Overwrite $TEMPLATEDIR if
+	../template/NMZ.head exists. This is for executing mknmz in
+	scripts directory.
+
+	* configure.in: Aboslish --with-admin=EMAIL option.
+
+	* pl/var.pl.in: Fix $MAILING_ADDRESS quotation bug.
+
+	* scripts/mknmz.pl.in (make_headfoot): Handle <!-- ADDRESS -->.
+
+	* template/NMZ.foot.ja.in: Add <!-- ADDRESS --> marks.
+
+	* template/NMZ.foot.in: Ditto.
+
+	* pl/conf.pl.in: Add $ADDRESS and change commenting style.
+
+	* conf/namazurc-sample: Add comments for Template directive.
+
+	* src/rcfile.c (process_rc_template): New function.
+
+	* src/namazu.c (get_templatedir): New function.
+	(set_templatedir): Ditto.
+	(make_fullpathname_msg): Use templatedir.
+
+	* src/result.c (compose_result): Be const 3rd parameter.
+
+	* src/namazu.c (namazu_core): Abolish 3rd parameter. All callers
+	changed. 
+	* src/usage.c (show_usage): Use MAILING_ADDRESS macro.
+
+	* pl/var.pl.in: Define $MAILING_ADDRESS.
+
+	* pl/usage.pl: Use $var::MAILING_ADDRESS.
+
+	* configure.in: Define MAILING_ADDRESS.
+
+	* acconfig.h: Add MAILING_ADDRESS.
+
+	* configure.in (OPT_NMZ_URI): Change URI of Namazu Website.
+
+2000-01-28  Ryuji Abe  <raeva@t3.rim.or.jp>
+
+	* src/Makefile.am (noinst_PROGRAMS): Changed libexec_PROGRAMS.
+
+2000-01-27  Ryuji Abe  <raeva@t3.rim.or.jp>
+
+	* lib/alloca.c: New file (taken from GNU grep-2.4).
+
+	* lib/Makefile.am (EXTRA_DIST): Added alloca.c.
+
+	* nmz/Makefile.am (libnmz_la_LDFLAGS): Set -version-info to 2:0:0.
+
+2000-01-27  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* pl/var.pl.in: Set $COPYRIGHT to "@COPYRIGHT@".
+
+	* src/usage.c (show_version): Use COPYRIGHT macro.
+
+	* configure.in: Define COPYRIGHT.
+
+	* acconfig.h: Add #undef COPYRIGHT
+
+	* src/output.c (set_emphasis_tags): New function.
+
+	* src/rcfile.c (process_rc_emphasistags): New function.
+
+	* conf/namazurc-sample: Comments modified.
+
+	* src/em.h: Removed.
+
+	* src/output.h: Import enum from em.h.
+
+	* src/rcfile.c (process_rc_base): Abolished.
+
+	* src/cgi.c (get_query_string): Remove unnecessary cast.
+
+	* src/rcfile.c: Gettextized.
+
+	* src/usage.c (show_usage): Simplfied.
+
+	* src/cgi.c (get_query_string): Abolish POST method support.
+
+	* src/cgi.c (apply_cgifunc): Simplfy calling a pointed function. 
+
+	* src/rcfile.c (apply_rc): Simplfy calling a pointed function. 
+
+	* pl/util.pl (cp): Abolished.
+
+	* scripts/mknmz.pl.in: Use File::Copy's copy instead of
+	util::cp. All callers changed.
+
+	* src/namazu-cmd.c (main): Print a help message if invoked as CGI.
+	[namazu-dev 1339]
+
+	* src/Makefile.am (namazu_cgi_SOURCES): Add cgi.c and cgi.h.
+	(common_SOURCES): Remove cgi.c and cgi.h.
+
+	* src/output.c (is_cgimode): Be static.
+
+	* src/rcfile.c: Make directive_tab static.
+
+	* src/Makefile.am (common_SOURCES): Renamed from namazu_SOURCES
+	(namazu_SOURCES): Use $(common_SOURCES) and namazu-cmd.c
+	(namazu_cgi_SOURCES): Use $(common_SOURCES) and namazu-cgi.c
+
+	* src/namazu-cmd.c: New file derived from namazu.c
+
+	* src/namazu-cgi.c: Ditto.
+
+	* src/namazui.c (suicide): Removed.
+	(main): Ditto.
+	(parse_options): Ditto.
+	(ck_atoi): Ditto.
+	(stdio2file): Ditto.
+
+	* src/namazu.c (main): Change position of calling nmz_set_lang()
+	and load_rcfile().
+
+  	* configure.in (AM_INIT_AUTOMAKE): Bumped version number to 1.9.14.
+
+2000-01-26  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+  	* Namazu: Version 1.9.13 released.
+
+	* src/rcfile.c (process_rc_lang): Call nmz_set_lang() in anytime
+	for workaround. (temporary change)
+
+	* src/namazu.c (main): Fix a security hole in CGI mode which
+	allows malicious person to put a garbage file on a Web server's
+	directory such as /tmp. -- reported by Motoyuki Kasahara
+	<m-kasahr@sra.co.jp>
+
+	* src/form.c (replace_query_value): Use html_print() to print the
+	query instead of print(). 
+
+	* pl/codeconv.pl (toeuc): Fix codeconv bug. [namazu 1316]
+
+2000-01-25  Ryuji Abe  <raeva@t3.rim.or.jp>
+
+	* nmz/util.h: (nmz_iskanji): Moved to wakati.c as iskanji.
+	(iskanji1st): Moved to codeconv.c.
+	(iskanji2nd): Likewise.
+
+	* nmz/util.c: Removed #include "message.h".
+	(nmz_strerror): Replaced MSG_TOO_LONG_QUERY -> "Too long query".
+
+	* nmz/codeconv.[ch] (nmz_iskatakana): Moved to wakati.c as
+	iskatakana.
+	(nmz_ishiragana): Moved to wakati.c as ishiragana.
+
+	* nmz/wakati.c (iskatakana): Private function.
+	(ishiragana): Likewise.
+
+2000-01-23  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* src/rcfile.c (process_rc_lang): Call nmz_set_lang only if
+	environmental variable LANG is not set. [namazu-dev 1277]
+
+	* src/rcfile.c (show_rcfile): Follow Fujiwara's sugesstion.
+	[namazu-dev 1298]
+
+2000-01-22  Masao Takaku  <masao@ulis.ac.jp>
+
+	* nmz/search.c (parse_access): Fix a bug [namazu-dev 1290].
+	Keep nmz_perm to use it later.
+
+2000-01-21  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* TODO: Edit it.
+
+2000-01-20  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* src/namazu.c (namazu_core): Use nmz_free_internal() instead of
+	calling nmz_free_idxnames(), nmz_free_aliases() and
+	nmz_free_replaces() respectively.
+
+	* nmz/libnamazu.c (nmz_free_internal): New function.
+
+	* scripts/mknmz.pl.in (load_modules): Modify textdomain calling.
+
+	* pl/gettext.pl.in (choose_catalog): New function.
+	(textdomain): Take the second parameter LANG.
+
+	* scripts/mknmz.pl.in (show_mini_usage): gettextized.
+
+	* pl/usage.pl: Remove $USAGE_MINI.
+
+	* scripts/mknmz.pl.in (muda): Add $var::USE_NKF_MODULE.
+
+	* configure.in: Fix --with-pmdir handling.
+
+	* nmz/query.c (nmz_make_query): Call nmz_codeconv_query().
+
+	* src/namazu.c (namazu_core): Do not call nmz_codeconv_query().
+
+	* src/rcfile.ch (set_namazurc): Remove prefix "nmz_" and all
+	callers changed.
+	(load_rcfile): Ditto.
+	(show_rcfile): Ditto.
+
+	* src/rcfile.c: Moved from ../nmz directory.
+
+	* src/rcfile.h: Ditto.
+	
+	* nmz/Makefile.am (libnmz_la_SOURCES): Remove rcfile.c and rcfile.h.
+
+	* src/Makefile.am (namazu_SOURCES): Add rcfile.c and rcfile.h.
+
+2000-01-20  Ryuji Abe  <raeva@t3.rim.or.jp>
+
+	* Makefile.am (COMMON_DIRS): New Variable.
+	(install-data-local): Handled $(COMMON_DIRS), never tknamazu.
+
+2000-01-19  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+  	* configure.in (AM_INIT_AUTOMAKE): Bumped version number to 1.9.13.
+  
+  	* Namazu: Version 1.9.12 released.
+
+	* src/usage.c (show_usage): s/no-encode-uri/no-decode-uri/
+
+	* src/namazu.c (parse_options): Insert set_uridecode(0) at proper
+	positions.
+	(main): Ditto.
+	long_options[]: s/no-encode-uri/no-decode-uri/
+
+	* src/result.c (replace_field): Fix the bug [namazu-dev 1250].
+	Change the default value of uridecode.
+
+2000-01-18  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* configure.in: Restore AC_SUBST(OPT_NMZ_URI).
+
+	* nmz/search.c (nmz_search): Fix a serious bug. [namazu-dev 1233]
+
+	* src/namazu.c (namazu_core): Change a little.
+
+2000-01-16  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* scripts/mknmz.pl.in (write_message): Do not convert character
+	encoding. (Fix the bug reported in [namazu-dev 1209])
+	(make_headfoot): Ditto.
+
+2000-01-16  Ryuji Abe  <raeva@t3.rim.or.jp>
+
+	* configure.in: Use BUILD_TKNAMAZU conditional instead of 
+	AC_SUBST(TKNAMAZU).
+
+	* Makefile.am: Likewise.
+	(BUILT_TKNAMAZU): Set tknamazu if BUILD_TKNAMAZU.
+	(DIST_TKNAMAZU): Set tknamazu if not BUILD_TKNAMAZU.
+	(SUBDIRS): Use $(BUILT_NAMAZU) instead of tknamazu.
+	(DIST_SUBDIRS): Likewise. Forgotten scripts has added.
+	(EXTRA_DIST): Remove pxgettext.
+	(EXTRA_DIRS): Removed template and added $(DIST_TKNAMAZU).
+	(dist-hook): Remove .cvsignore and autogen.sh if exist.
+
+2000-01-14  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* pl/find.pl : More gettextize.
+
+2000-01-14  Ryuji Abe  <raeva@t3.rim.or.jp>
+
+	* lib/Makefile.am (EXTRA_DIST): Added forgotten easy-vsnprintf.c.
+
+	[Removed unnessesary includes, here is the list.]
+
+	* nmz/field.c: src/result.h.
+
+	* nmz/libnamazu.c: lib/getopt.h, src/cgi.h, src/form.h, src/output.h,
+	and src/usage.h.
+
+	* nmz/search.c: src/output.h and src/result.h.
+
+	* nmz/wakati.c: src/message.h and src/output.h.
+
+2000-01-13  Kenji Suzuki  <kenji@po.ganseki.ne.jp>
+
+        * filter/hnf.pl: New file.
+
+2000-01-13  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* configure.in: Abolish --with-scoring option.
+
+	* nmz/hlist.c (nmz_get_hlist): Modify the way to handle tfidf.
+
+	* nmz/search.c (nmz_do_searching): Abolish tfidf handling in the func.
+
+	* nmz/idxname.c (nmz_set_defaultidx): New function.
+	(nmz_get_defaultidx): Ditto.
+
+	* nmz/rcfile.c (namazurcdir): Move from var.c.
+
+	* nmz/search.c (nmz_set_tfidfmode): New function.
+	(nmz_is_tfidfmode): Ditto.
+	(nmz_search_sub): Do not check nmz_is_tfidfmode() to call
+	nmz_set_docnum(). 
+
+	* nmz/var.c (TfIdf): Abolished. All users changed.
+	(CONFDIR): Abolished. All users changed.
+	(BASE_URI): Abolished. All users changed.
+	(DEFAULT_INDEX): Abolished. All users changed.
+
+	* src/output.c (set_template): Make parameter(s) be const.
+
+2000-01-12  Ryuji Abe  <raeva@t3.rim.or.jp>
+
+	* po/POTFILES.in: Added scripts/mknmz.pl.in.
+
+2000-01-12  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* scripts/mknmz.pl.in (load_modules): Modified to call textdomain().
+
+	* pl/gettext.pl.in (mo_format_value): Modified to use private 
+	variables.
+
+2000-01-12  Ryuji Abe  <raeva@t3.rim.or.jp>
+
+	* configure.in(AC_CHECK_FUNCS): Checking for __vsnprintf.
+
+	* lib/easy-vsnprintf: Derived from gnome-libs support file.
+
+	* nmz/util.h: Removed HAVE__VSNPRINTF conditional.
+
+2000-01-11  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* nmz/libnamazu.h (nmz_set_dyingmsg): Use __PRETTY_FUNCTION__ if
+	#ifdef __GNUC__.
+
+	* configure.in: Fix a message.
+
+2000-01-11  Ryuji Abe  <raeva@t3.rim.or.jp>
+
+	* nmz/util.h: Added prefix macro difinitions.
+	s/iseuc/nmz_iseuc/g.
+	s/iskanji/nmz_iskanji/g.
+	(ischoon): Removed unused macro.
+
+	* nmz/codeconv.c: Likewise.
+
+	* nmz/search.c: Likewise.
+
+	* nmz/util.c: Likewise.
+
+	* nmz/wakati.c: Likewise.
+
+2000-01-10  Ryuji Abe  <raeva@t3.rim.or.jp>
+
+	* configure.in: Many Changes. Abolished --with-COMMAND=PATH style
+	options except --with-emacs and --with-perl5.
+	(AC_CHECK_SIZEOF): New macro. checking for int, long, long long.
+	(--with-included-file-mmagic): Use instead of --without-file-mmagic.
+	(AM_CONDITIONAL): New Macro.
+	(--without-tknamazu): Revert to --with-tknamazu, but changed not to
+	be built by default.
+
+	* Makefile.am (SUBDIRS): Added template. if BUILD_FILE_MMAGIC defined,
+	File-MMagic will be built.
+	(DIST_SUBDIRS): Added template.
+	(DISTCLEANFILES): Removed.
+	(DISTCLEANDIRS): LIkewise.
+	(pkgdatadir): Likewise.
+
+2000-01-10  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* nmz/rcfile.c (parse_rcfile): Fix memory leak bug.
+
+	* nmz/idxname.c: Inclued "util.h".
+
+	* nmz/rcfile.h: Inclued "util.h".
+
+	* nmz/search.c (open_index_files): Cleaned up.
+	(is_locked): Renamed from check_lockfile().
+
+	* src/output.c (print): New function derived from nmz_print().
+
+	* nmz/util.c (nmz_print): Abolished.
+
+	* nmz/re.c (nmz_regex_grep): prefix nmz added.
+
+	* nmz/hlist.c (struct str_num): Abolished.
+
+	* nmz/libnamazu.h (enum nmz_searchmethod): Renamed from enum
+	nmz_searchmethod. 
+
+	* nmz/rcfile.c (get_rc_args): Be static.
+
+	* nmz/util.h (struct nmz_strlist): Moved from libnamazh.h
+
+	* src/namazu.c (parse_options): Call nmz_load_rcfile() in 'f' option.
+
+	* nmz/search.c (nmz_search): Fix error state handling.
+	(do_prefix_match_search): Fix serious bug. (cannot catch too much
+	match). 
+
+	* nmz/rcfile.c (nmz_load_rcfile): Handle a line ending with `\' to
+	concatenate the next line.
+	(parse_rcfile): Fix bug.
+
+	* nmz/parser.c (factor): Use temporary variable to simplify codes.
+	(andop): Ditto.
+	(orop): Ditto.
+
+	* nmz/idxname.c (nmz_add_index): Add warning message.
+
+	* nmz/parser.c (factor): Handle an invalid query as error.
+
+	* nmz/rcfile.c (process_rc_blank): New function.
+	(process_rc_comment): Ditto.
+	(process_rc_debug): Ditto.
+	(process_rc_index): Ditto.
+	(process_rc_base): Ditto.
+	(process_rc_alias): Ditto.
+	(process_rc_replace): Ditto.
+	(process_rc_logging): Ditto.
+	(process_rc_scoring): Ditto.
+	(process_rc_lang): Ditto.
+	(is_valid_argnum): Abolished.
+	(parse_rcfile): Modified.
+	(apply_rc): Ditto.
+
+	* src/cgi.c (apply_cgifunc): Remove unused variable i.
+
+	* nmz/util.c (free_strlist): New function.
+	(push_strlist): New function.
+
+	* nmz/libnamazu.h (struct nmz_strlist): New data structure.
+
+	* src/namazu.c (main): Remove debug codes.
+	(main): Change parse_options() calling position.
+
+2000-01-09  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* configure.in (ALL_LINGUAS): Remove ja_JP.ISO-2022-JP.
+	(AC_OUTPUT): Remove po/make_iso-2022-jp_po.
+
+	* nmz/Makefile.am: Move add-prefix to maintMakefile
+
+	* nmz/maintMakefile: New file.
+
+	* nmz/re.h (ALLOC_N): Use nmz_xmalloc() instead of xmalloc()
+	(ALLOC): Ditto.
+	
+	* nmz/util.c: Changed function names.
+	s/xrealloc/nmz_xrealloc/g
+	s/xmalloc)/nmz_xmalloc/g
+	s/scan_hex/nmz_scan_hex/g
+	s/scan_oct/nmz_scan_oct/g
+
+	* nmz/regex.[ch]: Generated from Ruby 1.4.3's regex.[ch].
+	Add prefix to all extern functions. All callers	changed. 
+	
+	* nmz/hlist.[ch]: Changed function names.
+	s/andmerge/nmz_andmerge/g
+	s/notmerge/nmz_notmerge/g
+	s/ormerge/nmz_ormerge/g
+	s/malloc_hlist/nmz_malloc_hlist/g
+	s/realloc_hlist/nmz_realloc_hlist/g
+	s/free_hlist/nmz_free_hlist/g
+	s/copy_hlist/nmz_copy_hlist/g
+	s/set_idxid_hlist/nmz_set_idxid_hlist/g
+	s/merge_hlist/nmz_merge_hlist/g
+	s/do_date_processing/nmz_do_date_processing/g
+	s/get_hlist/nmz_get_hlist/g
+	s/sort_hlist/nmz_sort_hlist/g
+	s/reverse_hlist/nmz_reverse_hlist/g
+	s/set_docnum/nmz_set_docnum/g
+	s/set_sortfield/nmz_set_sortfield/g
+	s/get_sortfield	/nmz_get_sortfield/g
+
+	* nmz/i18n.[ch]: Changed function names.
+	s/is_lang_ja/nmz_is_lang_ja/g
+	s/set_lang/nmz_set_lang/g
+	s/get_lang/nmz_get_lang/g
+	s/choose_msgfile_suffix/nmz_choose_msgfile_suffix/g
+
+	* nmz/parser.[ch]: Changed function names.
+	s/init_parser/nmz_init_parser/g
+	s/expr/nmz_expr/g
+	s/isop/nmz_is_query_op/g
+
+	* nmz/wakati.[ch]: Changed function names.
+	s/wakati/nmz_wakati/g
+
+	* nmz/field.[ch]: Changed function names.
+	s/isfield/nmz_isfield/g
+	s/get_field_name/nmz_get_field_name/g
+	s/get_field_data/nmz_get_field_data/g
+
+	* nmz/query.[ch]: Changed function names.
+	s/make_query/nmz_make_query/g
+	s/get_querytokennum/nmz_get_querytokennum/g
+	s/get_querytoken/nmz_get_querytoken/g
+
+	* nmz/rcfile.[ch]: Changed function names.
+	s/set_namazurc/nmz_set_namazurc/g
+	s/load_rcfile/nmz_load_rcfile/g
+	s/show_rcfile/nmz_show_rcfile/g
+
+	* nmz/codeconv.[ch]: Changed function names.
+	s/conv_ja_any_to_eucjp/nmz_conv_ja_any_to_eucjp/g
+	s/zen2han/nmz_zen2han/g
+	s/ishiragana/nmz_ishiragana/g
+	s/iskatakana/nmz_iskatakana/g
+	s/conv_ext/nmz_conv_ext/g
+
+	* nmz/alias.[ch]: Changed function names.
+	s/add_alias/nmz_add_alias/g
+	s/get_aliases/nmz_get_aliases/g
+	s/show_aliases/nmz_show_aliases/g
+
+	* nmz/replace.[ch]: Changed function names.
+	s/replace_uri/nmz_replace_uri/g
+	s/add_replace/nmz_add_replace/g
+	s/show_replaces/nmz_show_replaces/g
+
+	* nmz/idxname.[ch]: Changed function names.
+	s/add_index/nmz_add_index/g
+	s/get_idxnum/nmz_get_idxnum/g
+	s/uniq_idxnames/nmz_uniq_idxnames/g
+	s/expand_idxname_aliases/nmz_expand_idxname_aliases/g
+	s/complete_idxnames/nmz_complete_idxnames/g
+	s/get_idxname/nmz_get_idxname/g
+	s/get_idx_totalhitnum/nmz_get_idx_totalhitnum/g
+	s/set_idx_totalhitnum/nmz_set_idx_totalhitnum/g
+	s/get_idx_hitnumlist/nmz_get_idx_hitnumlist/g
+	s/set_idx_hitnumlist/nmz_set_idx_hitnumlist/g
+
+	* nmz/searc.[ch]: Changed function names. 
+	s/free_hitnums/nmz_free_hitnums/g
+	s/binsearch/nmz_binsearch/g
+	s/do_search/nmz_do_searching/g
+
+	* nmz/hlist.c (sort_hlist): Change a parameter name.
+
+	* nmz/libnamazu.h (enum nmz_sortmethod): Renamed.
+	(enum nmz_sortorder): Renamed.
+
+	* nmz/libnamazu.[ch]: Changed function names. 
+	s/free_aliases/nmz_free_aliases/g
+	s/free_replaces/nmz_free_replaces/g
+	s/codeconv_query/nmz_codeconv_query/g
+	s/set_sortmethod/nmz_set_sortmethod/g
+	s/set_sortorder/nmz_set_sortorder/g
+	s/set_debugmode/nmz_set_debugmode/g
+	s/is_debugmode/nmz_is_debugmode/g
+	s/set_loggingmode/nmz_set_loggingmode/g
+	s/get_sortorder/nmz_get_sortorder/g
+	s/get_sortmethod/nmz_get_sortmethod/g
+
+	* src/usage.c (show_mini_usage): Use fputs() instead of printf()
+	to avoid mojibake in LANG=ja_JP.ISO-2022-JP.
+
+2000-01-09  Ryuji Abe <raeva@t3.rim.or.jp>
+
+	* po/make_iso-2022-jp_po.in: Quit replace % -> %%.
+
+2000-01-08  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* nmz/rcfile.c (load_rcfile): Fix bug.
+	(is_valid_argnum): Handle unknown directive as an error.
+
+	* nmz/libnamazu.h (nmz_set_dyingmsg): New macro.
+	
+	* nmz/libnamazu.c (nmz_get_dyingmsg): Renamed from get_dyingmsg.
+	(nmz_set_dyingmsg_func_sub): Derived from set_dyingmsg.
+	(nmz_msg): New function.
+
+	* src/namazu.c (die): New function.
+	All callers changes to use die() instead of nmz_die().
+	
+	* nmz/util.c (nmz_die): Abolished.
+
+	* src/form.c (replace_query_value): Use strerror().
+
+	* src/output.c (print_hlist): Use strerror().
+
+	* src/namazu.h (main): Abolish unused enums DIE_ERROR and
+	DIE_NOERROR.
+
+	* nmz/util.c (nmz_strerror): Renamed from nmz_get_errnmsg().
+	(nmz_strerror): Use assert().
+	All callers changed.	
+	(nmz_die): Modified a bit.
+
+	* nmz/rcfile.c (is_valid_argnum): Use assert(0) instead of 
+	MUST_NOT_BE_HERE() macro. 
+	
+	* nmz/libnamazu.h: Abolish MUST_NOT_BE_HERE macro().
+
+2000-01-07  Ryuji Abe <raeva@t3.rim.or.jp>
+
+	* nmz/util.c (nmz_strlower): Modified commentations.
+
+2000-01-07  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* nmz/codeconv.c: Include <errno.h>
+
+	* nmz/hlist.c (realloc_hlist): Use strerror().
+
+	* nmz/search.c (normalize_idxnames): Make it not call nmz_die().
+	(nmz_search): Check a return value of normalize_idxnames().
+
+	* src/namazu.c (stdio2file): Die if freopen() failed.
+
+	* nmz/rcfile.c (is_valid_argnum): Use nmz_die() instead of
+	set_dyingmsg();
+
+	* nmz/hlist.c (field_sort): Use strerror().
+
+	* nmz/codeconv.c: Use strerror().
+	(conv_ext): Ditto.
+
+	* nmz/field.c (get_field_data): Use nmz_warn_printf() instead of
+	nmz_debug_printf() and use strerror().
+	Include <errno.h>
+	Add copyright notice.
+
+	* nmz/search.c (do_logging): Use strerror().
+	Include <errno.h>
+	(do_regex_search): Use nmz_warn_printf() instead of
+	nmz_debug_printf() and use strerror().
+
+	* src/output.c (print_errmsg): Prepare prototype.
+
+	* nmz/search.c (normalize_idxnames): Prepare prototype.
+
+	* nmz/query.c: Include "query.h"
+
+	* nmz/var.h: Remove prototypes of unused variable.
+
+	* nmz/search.c (open_phrase_index_files): Use strerror().
+	Include <errno.h>
+
+	* src/output.c (print_msgfile): Use strerror().
+	Include <errno.h>
+	Add copyright notice.
+
+	* src/form.c (read_headfoot): Use strerrnor().
+	Include <errno.h>
+
+	* src/namazu.c (stdio2file): Use strerror().
+	Include <errno.h>
+
+	* nmz/hlist.c (do_date_processing): Use strerror().
+	(malloc_hlist): Use strerror().
+	Include <errno.h>
+
+	* nmz/idxname.c (expand_idxname_aliases): Use strerror().
+	(complete_idxnames): Ditto.
+	(push_hitnum): Ditto.
+	Include <errno.h>
+	
+	* nmz/search.c (cmp_phrase_hash): Use strerror().
+	Include <errno.h>
+
+	* nmz/replace.c (add_replace): Use strerror().
+	Include <errno.h>
+
+	* nmz/alias.c (add_alias): Use strerror().
+	Include <string.h>
+	Include <errno.h>
+
+	* configure.in (AC_REPLACE_FUNCS): Add strerror.
+
+	* lib/strerror.c: Imported from NDTPD-2.3.6.
+	<http://www.sra.co.jp/people/m-kasahr/ndtpd/>
+	
+	* nmz/util.c (nmz_cat): Abolished.
+	Include <errno.h>
+	(nmz_readfile): Use strerror().
+
+	* src/output.c (print_listing): Return error status.
+	(print_hlist): Ditto.
+	(print_errmsg): New function.
+
+	* nmz/util.c (nmz_get_errmsg): Handle 
+	ERR_CANNOT_OPEN_RESULT_FORMAT_ FILE. 
+	
+	* nmz/libnamazu.h (enum nmz_stat): Add
+	ERR_CANNOT_OPEN_RESULT_FORMAT_ FILE. 
+
+	* src/namazu.c (main): Do not call expand_idxname_aliases(),
+	complete_idxnames() and uniq_idxnames(). They are called in
+	normalize_idxnames(). 
+
+	* nmz/search.c (normalize_idxnames): New function.
+	(nmz_search): Use normalize_idxnames().
+
+	* nmz/field.c (get_field_name): Change interface. All callers
+	changed. 
+
+	* nmz/util.c (nmz_get_errmsg): Handle ERR_FIELD_SEARCH_FAILED.
+
+	* nmz/search.c (do_field_search): Use ERR_CANNOT_OPEN_INDEX.
+
+	* nmz/libnamazu.h (enum nmz_stat): Add ERR_FIELD_SEARCH_FAILED.
+
+2000-01-07  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* pl/find.pl (find,finddir): Fixed `(-d _)' expression.
+
+	* pl/{util,wakati,find}.pl: Gettextized.
+
+	* pl/conf.pl.in: Modified some comments refering to 
+	required software version.
+
+2000-01-06  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* scripts/mknmz.pl.in: Moved location of requiring gettext.pl.
+
+2000-01-06  Ryuji Abe <raeva@t3.rim.or.jp>
+
+	* acinclude.m4: Removed libtool related macros.
+
+2000-01-06  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* src/form.c (read_headfoot): Fix a memory leak bug.
+
+	* src/output.c (print_msgfile): Ditto.
+
+	* **/*.c, **/*.pl{,in}: Change copyright notice: 
+	1997-1999 -> 1997-2000
+	
+	* pl/usage.pl ($VERSION_INFO): Use $var::COPYRIGHT.
+
+	* nmz/query.c: Use static struct nmz_query query = {0}
+	instead of Query.
+
+	* nmz/var.c (struct nmz_query Query): Removed.
+
+	* nmz/parser.c: Use get_querytoken() and get_querytokennum()
+	instead of accessing Query.tab[] directly.
+	nmz/query.c: Ditto.
+	nmz/search.c: Ditto.
+	src/output.c: Ditto.
+	src/result.c: Ditto.
+
+	* nmz/query.c: New file.
+	(make_query): Derive from split_query() in wakati.c.
+	(set_phrase_trick): Moved from wakati.c
+	(set_regex_trick): Moved from wakati.c
+	(get_querytokennum): New function.
+	(get_querytoken): New function.
+
+	* nmz/query.h: New file.
+
+	* nmz/search.c (do_search): Turn tf idf off if query contains only
+	one keyword.
+
+	* nmz/hlist.c (get_hlist): Change array opperations.
+
+	* nmz/parser.c (andop): Change a condition style.
+
+	* nmz/libnamazu.h (struct nmz_query): Add new member: int num.
+
+	* nmz/search.c (do_search): Fix wakati bug.
+
+	* nmz/wakati.c (split_query): Abolished.
+
+	* nmz/Makefile.am (pkginclude_HEADERS): Change order.
+	(libnmz_la_SOURCES): Add query.c and query.h
+
+	* nmz/codeconv.c: Remove #include <namazu.h>
+	nmz/field.c: Ditto.
+	nmz/hlist.c: Ditto.
+	nmz/i18n.c: Ditto.
+	nmz/idxname.c: Ditto.
+	nmz/libnamazu.c: Ditto.
+	nmz/parser.c: Ditto.
+	nmz/rcfile.c: Ditto.
+	nmz/re.c: Ditto.
+	nmz/util.c: Ditto.
+	nmz/var.c: Ditto.
+	nmz/wakati.c: Ditto.
+
+	* Makefile.am (EXTRA_DIST): Add INSTALL-ja.
+
+	* INSTALL-ja: New file.
+	<http://www.sra.co.jp/people/m-kasahr/install/INSTALL-ja>
+
+	* nmz/libnamazu.h (struct nmz_indices): Change member names.
+
+	* nmz/idxname.c: Use static struct nmz_indices indices = {0}
+	instead of Idx.
+
+	* nmz/var.c (struct nmz_indices Idx): Removed.
+
+	* nmz/search.c (do_phrase_search): Use get_idx_hitnumlist() and
+	set_idx_hitnumlist(). 
+	(nmz_search): Ditto.
+	(do_search): Ditto.
+
+	* nmz/idxname.c (free_idxnames): Moved from libnamazu.c
+	(uniq_idxnames): Ditto.
+	(expand_idxname_aliases): Ditto.
+	(complete_idxnames): Ditto.
+	(get_idxnum): Renamed from getidxnum.
+	(set_idx_totalhitnum): New function.
+	(get_idx_totalhitnum): New function.
+	(get_idx_hitnumlist): New function.
+	(push_hitnum): Moved from search.c and change parameter order.
+
+	* src/namazu.c (main): Call set_refprint(1). bug fix.
+
+	* nmz/libnamazu.h (struct nmz_hitnumlist): Renamed from nmz_hitnum
+
+	* nmz/util.c (nmz_decode_uri): Chage a parameter name.
+	(nmz_chomp): Ditto.
+	(nmz_print): Ditto.
+	(nmz_getidxptr): Ditto.
+
+	* nmz/search.c (lrget): Remove a unused paramter.
+	(get_regex_part): Renamed from get_expr.
+	(do_prefix_match_search): Make parameter(s) be const.
+	(prefix_match): Ditto.
+	(detect_search_mode): Ditto.
+	(do_field_search): Ditto.
+	(do_regex_search): Ditto.
+	(get_file_size): Ditto.
+	(do_word_search): Ditto.
+	(hash): Ditto.
+
+	* nmz/field.c (get_field_name): Make parameter(s) be const.
+	(get_field_data): Ditto.
+
+	* src/output.c (print_result): Make parameter(s) be const.
+	(fputs_without_html_tag): Ditto.
+
+	* src/namazu.c (stdio2file): Make parameter(s) be const.
+
+	* src/form.c (check_checkbox): Change a parameter name.
+
+2000-01-05  Ryuji Abe <raeva@t3.rim.or.jp>
+
+	* configure.in (AC_OUTPUT): Added template/Makefile.
+
+	* template/Makefile.am: New file.
+
+	* template/NMZ.body.ja: EUC-JP encoded. Replaced from ja_JP.JIS7 file.
+
+	* template/NMZ.foot.ja.in: Likewise.
+
+	* template/NMZ.head.ja.in: Likewise.
+
+	* template/NMZ.tips.ja: Likewise.
+
+2000-01-05  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* nmz/util.c (nmz_subst): Make parameter(s) be const.
+
+	* nmz/search.c (do_search): Make parameter(s) be const.
+	(nmz_search): Ditto.
+	(binsearch): Ditto.
+	(do_logging): Ditto.
+	(push_hitnum): Ditto.
+
+	* nmz/rcfile.c (set_namazurc): Make parameter(s) be const.
+	(load_rcfile): Ditto.
+	(set_pathname): Ditto.
+	(open_rcfile): Ditto.
+	(get_rc_arg): Ditto.
+	(get_rc_args): Ditto.
+	(parse_rcfile): Ditto.
+
+	* nmz/re.c (regex_grep): Make parameter(s) be const.
+
+	* nmz/libnamazu.c (set_dyingmsg): Make parameter(s) be const.
+
+	* nmz/parser.c (isop): Make parameter(s) be const.p
+
+	* nmz/idxname.c (add_index): Make parameter(s) be const.
+
+	* nmz/hlist.c (set_sortfield): Make parameter(s) be const.
+
+	* nmz/i18n.c (set_lang): Make parameter(s) be const.
+
+	* nmz/field.c (get_field_data): Make parameter(s) be const.
+	* nmz/field.c (isfield): Ditto.
+
+	* nmz/replace.c (add_replace): Make parameter(s) be const.
+
+	* nmz/alias.c (add_alias): Make parameter(s) be const.
+
+	* src/result.c (replace_field): Make parameter(s) be const.
+
+	* src/output.c (html_print): Make parameter(s) be const.
+
+	* src/cgi.c (validate_idxname): Make parameter(s) be const.
+	(add_cgivar): Ditto.
+	(apply_cgifunc): Ditto.
+
+	* src/cgi.c (remove_ending_slashes): New function.
+	
+	* {src,nmz}/*.c: Change comment styles.
+	
+	* nmz/codeconv.c: Fix ja_JP.JIS7 bug.
+
+	* template/NMZ.*.ja_JP.JIS7: Renamed to NMZ.*.ja
+	and converted its character encoding to EUC-JP.
+	
+	* src/namazu.c (main): Modify set_htmlmode(), set_pageindex(),
+	set_formprint() callings.
+
+	* src/output.c: Set 0 to pageindex, formprint, refprint as default.
+
+	* nmz/util.c (nmz_die): Use get_dyingmsg().
+	(nmz_die_with_msg): Abolished.	All callers changed.
+
+	* nmz/util.c (nmz_strprefixcasecmp): Make parameter(s) be const.
+	(nmz_strprefixcmp): Ditto.
+	(nmz_strsuffixcmp): Ditto.
+	(nmz_readfile): Ditto.
+	(nmz_cat): Ditto.
+	(nmz_getenv): Ditto.
+
+	* src/form.c (replace_query_value): Make parameter(s) be const.
+	(cmp_element): Ditto.
+	(print_headfoot): Ditto.
+	(read_headfoot): Ditto.
+	(get_value): Ditto.
+	(get_select_name): Ditto.
+	(select_option): Ditto.
+
+	* nmz/codeconv.c (iskatakana): Make parameter(s) be const.
+	(ishiragana): Ditto.
+
+	* nmz/codeconv.c (conv_ext): Returun a pointer of converted string.
+	All callers changed.
+
+	* src/output.c: Use choose_msgfile_suffix.
+
+	* nmz/i18n.c (choose_msgfile_suffix): Derived from choose_msgfile.
+	(choose_msgfile): Removed.
+
+	* nmz/util.c (nmz_pathcat): Make a first parameter be const.
+
+	* conf/namazurc-sample: New file.
+
+	* conf/namazurc: Removed.
+	
+	* conf/Makefile.am: s/namazurc/namazurc-sample/g,
+	s/mknmzrc/mknmzrc-sample/g
+
+	* po/ja_JP.ISO-2022-JP.po, po/make_iso-2022-jp_po,
+	po/make_iso-2022-jp_po.in: New files.
+
+	* po/ja_JP.JIS7.po, po/make_jis7_po, po/make_jis7_po.in:
+	Removed.
+	
+	* configure.in (AC_OUTPUT): s/(NMZ\.(head|foot))\.ja_JP\.JIS7/$1.ja/g
+	(AC_OUTPUT): s/make_jis7_po/make_iso-2022-jp_po/
+	(ALL_LINGUAS): s/ja_JP.JIS7/ja_JP.ISO-2022-JP/
+
+	* scripts/mailutime.in: Fix Y2K bug. (handling 00)
+
+2000-01-05  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* scripts/mknmz.pl.in : Gettextized.
+
+2000-01-04  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* filter/man.pl (filter): Make groff output one paragraph per one
+	 line.  Thanks to Tatsuo SEKINE <tsekine@isoternet.org> for
+	 his suggestion.
+	 (filter): Fix jgroff/groff condition bug.
+
+	* maintMakefile (cxref-latex2e): New rule.
+
+	* acinclude.m4 (AM_WITH_CCMALLOC): Add "-ldl" to LIBS.
+
+2000-01-04  Ryuji Abe <raeva@t3.rim.or.jp>
+
+	* configure.in (AM_MAINTAINER_MODE): Enabled maintainer mode.
+
+	* maintMakefile: New file. Some targets (snapshot, cxref, 
+	global, HTAGS, and GTAGS) moved from Makefile.
+
+	* Makefile.am (EXTRA_DIST): Added maintMakefile.
+
+2000-01-04  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* {nmz,src}/*.c: Change C style (function definition).
+
+2000-01-03  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* pl/Makefile.am (gettext.pl): Remove "chmod +x $@"
+
+2000-01-03  Ryuji Abe <raeva@t3.rim.or.jp>
+
+	* acinclude.m4 (AM_WITH_CCMALLOC): Tiny Fix.
+	(AM_PATH_LISPDIR): s/lookup/namazu/g.
+
+	* nmz/Makefile.am (AUTOMAKE_OPTIONS): Set 1.4.
+	(libnmz_la_LDFLAGS): Set -version-info 1:0:0 for 
+	backward conpatibility.
+
+	* pl/Makefile.am (localedir): Set $(datadir)/locale.
+	(gettext.pl): Generated when make all.
+	(perllib_DATA): Added gettext.pl.
+	(EXTRA_DIST): Added gettext.pl.in.
+
+	* pl/gettext/pl.in: Changed $(localedir) from 
+	@prefix@/share/locale to %LOCALEDIR%.
+
+2000-01-03  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* pl/gettext.pl.in: Added new file.
+
+1999-12-31  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* scripts/mknmz.pl.in (setup_magic): Fix a regex pattern. 
+	[namazu-dev 1086]
+
+	* nmz/i18n.c: Include "i18n.h"
+
+	* filter/tex.pl (filter): Use \title{foo}, \author{bar},
+	\begin{abstract} ... \end{abstract} information if available.
+
+	* scripts/mknmz.pl.in (put_field_index): Use MAX_FIELD_LENGTH to
+	limit a field string.
+	(make_summary): Ditto.
+
+	* pl/conf.pl.in: s/SUMMARY_LENGTH/MAX_FIELD_LENGTH/
+	Add comments on MAX_FIELD_LENGTH.
+
+	* scripts/mknmz.pl.in (load_modules): Use ../filter/*.pl if
+	exists. (for developing use)
+	(load_modules): Allow `-' in a filter file name.
+	(load_modules): Restore unshift @INC, "../filter".
+
+	* HACKING-ja: Attach [namazu-dev 1077] patch.
+
+	* Makefile.am (snapshot): New rule for making snapshot.
+
+	* man/Makefile.am (update-man): Fix mknmz's pathname.
+	Replace " FSF$$" with "Namazu" in man files.
+
+1999-12-30  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* pl/conf.pl.in: Add ".*\.tex" to $ALLOW_REGEX.
+
+	* scripts/mknmz.pl.in (load_modules): Remove:
+	unshift @INC, "../filter"; Because it's useless.
+
+	* filter/Makefile.am (filter_DATA): Add tex.pl
+
+	* filter/tex.pl: New file. (derivated from pdf.pl)
+
+	* scripts/mknmz.pl.in (setup_magic): Add settings for TeX .
+
+
+1999-12-30  Ryuji Abe  <raeva@t3.rim.or.jp>
+
+	* nmz-config.in (--cflags): Revert to set @includedir@
+	instead of @pkgincludedir@.
+
+	* pl/Makefile.am (perllib_DATA): Fixed typo.
+	(EXTRA_DIST): Likewise.
+
+1999-12-29  Ryuji Abe  <raeva@t3.rim.or.jp>
+
+	* filter/Makefile.am (AUTOMAKE_OPTIONS): 1.4.
+	(ETAGS_ARGS): Handling perl scripts.
+
+	* pl/Makefile.am: Likewise.
+	(COMMONDATA): Removed.
+
+1999-12-28  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* pl/wakati.pl (wakatize_japanese_sub): Apply Makoto Fujiwara's
+	patch. [namazu-dev 1070]
+
+
+1999-12-27  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* scripts/mknmz.pl.in: Set autoflush(1) to STDERR.
+	(main): Add debug messaging.
+
+	* filter/man.pl (man_filter): Modify a regex to avoid exponential
+	backtracking.
+
+1999-12-24  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* nmz/search.c (do_prefix_match_search): Fix a bug occured when no
+	documents are hit.
+
+	* scripts/bnamazu.in (main): Fix space-containing-argument bug.
+	(cannot treat a phrase search query)
+
+1999-12-24  Ryuji Abe <raeva@t3.rim.or.jp>
+
+	* acinclude.m4 (AM_WITH_CCMALLOC): New Macro.
+
+	* configure.in: add AM_WITH_CCMALLOC.
+
+1999-12-23  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* nmz/libnamazu.h: Change QUERY_TOKEN_MAX: 16 -> 32.
+
+1999-12-21  Makoto Fujiwara  <makoto@ki.nu>
+
+	* po/Makefile.in.in: Add $(srcdir)/ to let BSD make work.
+
+1999-12-21  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* nmz/util.c (nmz_tolower): New function. substitute for tolower(3).
+	(nmz_strlower): Use nmz_tolower instead of tolower(3) because of
+	some system's poor implementation. maybe locale problem?
+	[namazu-dev 1058] 
+
+1999-12-20  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* scripts/bnamazu.in (unlink_previous_netscape_tmpfile): New function.
+	Since it is not good to remove a tmpfile immediately after
+	invoking netscape (netscape requires the tmpfile to go back to
+	it). we should remove a previous tmpfile at next bnamazu execution.
+	(main): Use unlink_previous_netscape_tmpfile.
+
+1999-12-20  Ryuji Abe  <raeva@t3.rim.or.jp>
+
+	* scripts/Makefile.am (ETAGS_ARGS): Handling perl scripts.
+	(tags): Removed.
+
+1999-12-19  Ryuji Abe  <raeva@t3.rim.or.jp>
+
+	* Makefile.am: Removed unnessesary `@SET_MAKE@'.
+
+	* src/Makefile.am (templatedir): Removed.
+
+	* scripts/Makefile.am (tags): Currently, target inserted as comment.
+
+1999-12-19  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* configure.in (AC_OUTPUT): Add bnamazu.
+
+	* scripts/Makefile.am (bin_SCRIPTS): Add bnamazu.
+
+	* scripts/bnamazu.in: New file. Actually, it is revival.
+
+	* src/output.c (print_hitnum_all_idx): Fix a bug which occuered
+	only if -h option is specified and multiple indices are specified.
+
+	* src/result.c (is_urireplace): Prepare its prototype declaration.
+	(is_uridecode): Prepare its prototype declaration.
+	
+	* Makefile.am (SUBDIRS): Add scripts.
+
+	* configure.in (AC_OUTPUT): Adjust to src/scripts exchanging.
+
+	* scripts/Makefile.am: New file for generating perl scripts.
+	(noinst_SCRIPTS): Bring gtnmz from bin_SCRIPTS to here because
+	gtnmz is a tool for mainly debugging.
+
+	* src/Makefile.am: Exclude perl scripts related codes.
+
+	* scripts/gcnmz.pl.in,gtnmz.in,kwnmz.pl.in,mailutime.in,
+	mknmz.pl.in,nmzgrep.in vfnmz.in: Moved from src.
+
+	* scripts: New directory for containig mainly perl scripts.
+	
+1999-12-19  Makoto Fujiwara <makoto@ki.nu>
+	
+	* src/mknmz.pl.in (find_target): $Scanned to count total # of files.
+	(read_config) Neat output when -V is said.
+	(prep): Check lock2 before find_target (new function check_lock).
+	(parse_option): Add --mtime to give the similar func. as find(1).
+	(wanted): Warn filename if $name contains \n\r.
+	
+	* pl/usage.pl: add --mtime string.
+	 
+	* src/mknmz.pl.in (find_target): Add to show Elapsed time,
+	If -V, print start and end time.
+	
+	* AUTHORS: Add my address
+	
+1999-12-18  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* src/mknmz.pl.in (parse_options): Do not call read_config() when
+	--config option is specified.
+
+	* conf/namazurc: Rewrited.
+
+	* src/mknmz.pl.in (require_modules): Require Text::ChaSen instead
+	of Text::ChaSen1. 
+
+	* configure.in: Detect Text::ChaSen instead of Text::ChaSen1.
+	
+
+1999-12-17  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* src/mknmz.pl.in (wanted): Skip a file name containing LF/CR chars.
+	(wanted): Fix a potential hazard. (Don't use $_ as default)
+
+1999-12-16  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* src/mknmz.pl.in (read_config): Remove "mknmz.conf";
+	(read_config): Modify a message slightly.
+
+	* filter/gfilter.pl (show_filter_debug_info): Fix a warning.
+	"Use of uninitialized value at ../filter/gfilter.pl line 30"
+
+	* src/mknmz.pl.in (namazu_core): Use util::assert().
+	(set_target_files()): Use util::assert().
+
+	* pl/util.pl (assert): New function like assert(3);
+
+	* src/mknmz.pl.in (find_target): Uniq @flist. [namazu-dev 1020]
+	(find_target): Fix a syntax mistake.
+	(check_file): Fix "is 0 size! skipped." condition. [namazu-dev 1023]
+
+1999-12-15  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* nmz/Makefile.am (libnmz_la_LDFLAGS): Set -version-info to 0:1:0
+
+	* src/message.h (MSG_MIME_HEADER): Reindented to column 1.
+
+	* src/mknmz.pl.in: Apply Fujiwara-san's patch. [namazu-dev 1016]
+
+	* src/Makefile.am (noinst_PROGRAMS): New variable: namazu.cgi
+	(namazu_cgi_SOURCES): New variable: $(namazu_SOURCES)
+	(namazu_cgi_LDFLAGS): New variable defining: -static
+	for supporting to make a static-linked namazu.cgi executable.
+
+	* nmz/util.h: Include libnamazu.h for resolving "enum nmz_stat".
+
+	* template/NMZ.head{,.ja_JP.JIS7}.in: s/field:title/field:subject/g
+
+1999-12-14  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* nmz/search.c (do_phrase_search): Don't interrupt main loop
+	halfway for storing hitnums of all words consist the phrase.
+
+	* src/output.c: Set pageindex to 1 as default. [namazu-dev 1001]
+
+	* configure.in (OPT_WAKATI_DEFAULT): Set default to
+	"none". [namazu-dev 997] 
+
+1999-12-13  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* configure.in (AM_INIT_AUTOMAKE): Bumped version number to 1.9.12.
+
+	* pl/usage.pl: Use $var::VERSION in version info.
+
+1999-12-12  Ryuji Abe <raeva@t3.rim.or.jp>
+
+	* util.[ch] : Changed function names.
+	s/strcasestr/nmz_strcasestr/g
+	s/strlower/nmz_strlower/g
+	s/strprefixcasecmp/nmz_strprefixcasecmp/g
+	s/strprefixcmp/nmz_strprefixcmp/g
+	s/strsuffixcmp/nmz_strsuffixcmp/g
+	s/isnumstr/nmz_isnumstr/g
+	s/issymbol/nmz_issymbol/g
+	s/safe_getenv/nmz_getenv/g
+	s/commas/nmz_commas/g
+	s/freadx/nmz_fread/g
+	s/getidxptr/nmz_getidxptr/g
+	s/decode_uri/nmz_decode_uri/g
+	s/print/nmz_print/g
+
+	* nmz/field.c: Likewise.
+
+	* nmz/hlist.c: Likewise.
+	
+	* nmz/i18n.c: Likewise.
+	
+	* nmz/rcfile.c: Likewise.
+	
+	* nmz/re.c: Likewise.
+	
+	* nmz/search.c: Likewise.
+	
+	* src/cgi.c: Likewise.
+	
+	* src/form.c: Likewise.
+	
+	* src/namazu.c: Likewise.
+	
+	* src/output.c: Likewise.
+	
+	* src/result.c: Likewise.
+	
+
+1999-12-11  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* src/nmzgrep: Put /dev/null to egrep's argument.
+
+	* src/Makefile.am (bin_SCRIPTS): Add nmzgrep
+
+1999-12-10  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* Namazu: Version 1.9.11 released.
+	
+	* configure.in (AM_INIT_AUTOMAKE): Bumped version number to 1.9.11.
+
+	* src/cgi.h: Remove #ifdef __STDC__ related codes.
+	src/output.h: Remove #ifdef __STDC__ related codes.
+	src/result.h: Remove #ifdef __STDC__ related codes.
+	nmz/alias.h: Remove #ifdef __STDC__ related codes.
+	nmz/field.h: Remove #ifdef __STDC__ related codes.
+	nmz/hlist.h: Remove #ifdef __STDC__ related codes.
+	nmz/libnamazu.h: Remove #ifdef __STDC__ related codes.
+	nmz/rcfile.h: Remove #ifdef __STDC__ related codes.
+	nmz/regex.h: Remove #ifdef __STDC__ related codes.
+	nmz/replace.h: Remove #ifdef __STDC__ related codes.
+	nmz/search.h: Remove #ifdef __STDC__ related codes.
+	nmz/util.h: Remove #ifdef __STDC__ related codes.
+
+	* configure.in (AC_OUTPUT): Add nmzgrep.in handling.
+
+	* src/nmzgrep.in: New file.
+
+	* src/mailutime.in: Modify comments.
+
+	* nmz/hlist.h: Remove badly made prototypes.
+
+	* configure.in (AM_INIT_AUTOMAKE): Change a version number to 1.9.10.
+
+	* src/cgi.c (process_cgi_var_sort): Fix a serious CGI bug.
+
+	* nmz/hlist.c (set_sortfield): Renamed from set_sort_field.
+	(get_sortfield): Renamed from get_sort_field.
+
+	* src/output.c (print_hlist): Fix --list mode bug.
+
+1999-12-09  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* nmz/Makefile.am (libnmz_la_SOURCES): Add seed.h
+
+	* configure.in (AM_INIT_AUTOMAKE): Change a version number to 1.9.9.
+
+	* src/mknmz.pl.in (make_summary): Fix a bug [namazu-dev 965]
+
+	* nmz/search.c (nmz_search): Modify error state handling.
+
+	* nmz/hlist.c (merge_hlist): Set vallue.stat to SUCCESS.
+
+	* src/output.c (print_result): Use nmz_get_errmsg().
+	(print_hitnum_each): Use nmz_get_errmsg().
+
+	* nmz/util.c (nmz_get_errmsg): New function.
+
+	* nmz/search.c (nmz_search_sub): Renamed from search_sub().
+
+	* nmz/search.c (search_sub): Modify access permission handling.
+
+	* src/util.c: Abolish lastc();
+
+	* nmz/re.c, nmz/search.c, nmz/util.c, src/result.c: Abolish using
+	lastc().
+
+	* nmz/util.c (nmz_debug_printf): Renamed from nmz_dprintf. (undo)
+	(nmz_warn_printf): Renamed from nmz_wprintf. (undo) [namazu-dev 963]
+
+	* nmz/search.c (binsearch): Chomp term.
+	(show_status): Chomp buf.
+
+	* nmz/util.c (nmz_drintf): Renamed from nmz_debug_printf.
+	(nmz_wprintf): Renamed from nmz_warn_printf.
+	(nmz_die): Modify LF treatment.
+	(nmz_wprintf): Modify LF treatment.
+	(nmz_dprintf): Modify LF treatment.
+	(nmz_die_with_msg): Modify LF treatment.
+
+	* nmz/hlist.c: Renamed variables: DocNum -> document_number.
+	Field -> field_for_sort.
+	
+	* src/cgi.[ch]: Untypedef: CGIARG, CGIVAR and CGIVAR_FUNC.
+
+	* nmz/replace.c (struct nmz_replace *replaces): Be private.
+
+	* src/output.c (is_countmode): Be private.
+	(is_listmode): Be private.
+	(is_quietmode): Be private.
+	(is_refprint): Be private.
+	(print_hitnum): Be private.
+	(print_hitnum_all_idx): Be private.
+	(print_listing): Be private.
+	(print_msgfile): Be private.
+	(print_range): Be private.
+
+	* nmz/rcfile.c (load_rcfile): Fix a bug occurred when no rcfile exists.
+
+	* nmz/search.c (check_access): Renamed from is_access_ok. (undo)
+
+	* src/output.c (print_default_page): New function.
+
+	* src/output.c (print_result): New function.
+
+	* src/namazu.c (namazu_core): Move all output processings to 
+	output.c's print_result().
+	
+	* src/output.c: Rename functions:
+		s/put_query/print_query/
+		s/put_page_index/print_page_index/
+		s/put_query/print_query/
+		s/put_current_range/print_current_range/
+		s/put_page_index/print_page_index/
+
+	* Makefile.am (cxref): Change a dependency: stamp-h -> src/namazu
+	(GTAGS): Change a dependency: stamp-h -> src/namazu
+
+	* src/result.c (is_urireplace): Be private.
+	(is_uridecode): Be private.
+
+	* src/output.c (is_allresult): Be private.
+	(is_pageindex): Be private.
+	(print_hlist): Be private.
+	(put_current_range): Be private.
+	(put_page_index): Be private.
+	(put_query): Be private.
+
+	* nmz/field.c (apply_field_alias): Be private.
+
+	* nmz/seed.h: New file.
+
+	* nmz/seed.c (nmz_seed): Renamed from Seed.
+
+	* nmz/util.c (decode_uri): Moved from cgi.c.
+	(decode_uri_sub): Moved from cgi.c.
+
+	* src/output.c (print_hlist): Modify is_listmode handling.
+
+	* src/result.c (is_urireplace): Moved from output.c
+	(set_urireplace): Moved from output.c
+	(is_uridecode): Moved from output.c
+	(set_uridecode): Moved from output.c
+	
+	* src/output.c (make_fullpathname_result): Moved from result.c.
+
+	* nmz/field.c (get_field_data): Call decode_uri() if necessary.
+
+	* nmz/search.c (is_access_ok): Renamed from check_accessfile.
+	(enum nmz_perm): Add tag "nmz_perm".
+	(parse_access): Be nmz_perm type instead of void.
+
+	* nmz/var.h: Remove "extern char NAMAZURC[]".
+
+
+1999-12-08  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* Makefile.am (cxref): New command for using cxref.
+	<http://www.gedanken.demon.co.uk/cxref/>
+	(global): New command for using global.
+	<http://www.tamacom.com/global/>
+	(cxref): A tiny fix.
+	(cxref): Use -warn-xref instead of -warn-all
+
+	* nmz/search.h: Add #include "namazu.h" for NmzResult type.
+
+	* nmz/parser.h: Add #include "namazu.h" for NmzResult type.
+
+	* nmz/util.c: Add comments.
+
+1999-12-08  Ryuji Abe  <raeva@t3.rim.or.jp>
+
+	* nmz/util.[ch] (wprint): Removed.
+	(delete_backslashes): Likewise.
+	(strsuffixcasecmp): Likewise.
+	(nmz_pathcat): s/pathcat/nmz_pathcat/g.
+	(nmz_tr): s/tr/nmz_tr/g.
+	(nmz_chomp): s/chomp/nmz_chomp/g.
+	(nmz_cat): s/cat/nmz_cat/g.
+	(nmz_subst): s/subst/nmz_subst/g.
+	(nmz_readfile): s/readfile/nmz_readfile/g.
+	
+	* nmz/search.c (nmz_pathcat): Likewise.
+	(nmz_chomp): Likewise.
+	
+	* nmz/field.c (nmz_pathcat): Likewise.
+	(nmz_chomp): Likewise.
+	
+	* nmz/hlist.c (nmz_chomp): Likewise.
+	
+	* nmz/rcfile.c (nmz_chomp): Likewise.
+	
+	* nmz/re.c (nmz_chomp): Likewise.
+	
+	* nmz/wakati.c (nmz_chomp): Likewise.
+	
+	* src/form.c (nmz_chomp): Likewise.
+	(nmz_subst): Likewise.
+	(nmz_readfile): Likewise.
+	
+	* src/output.c (nmz_cat): Likewise.
+	(nmz_readfile): Likewise.
+	
+	* src/result.c (nmz_pathcat): Likewise.
+	(nmz_tr): Likewise.
+
+1999-12-07  Ryuji Abe  <raeva@t3.rim.or.jp>
+
+	* util.[ch] (nmz_debug_printf): s/debug_printf/nmz_debug_printf/g.
+	(nmz_warn_printf): s/warnf/nmz_warn_printf/g.
+	(nmz_get_unpackw): s/get_unpackw/nmz_get_unpackw/g.
+	(nmz_read_unpackw): s/read_unpackw/nmz_read_unpackw/g.
+	(nmz_die): s/die/nmz_die/g.
+	(nmz_die_with_msg): s/diewithmsg/nmz_die_with_msg/g.
+
+	* nmz/search.c (nmz_debug_printf): Likewise.
+	(nmz_warn_printf): Likewise.
+	(nmz_get_unpackw): Likewise.
+	(nmz_read_unpackw): Likewise.
+	
+	* nmz/i18n.c (nmz_debug_printf): Likewise.
+	
+	* nmz/field.c (nmz_debug_printf): Likewise.
+	
+	* nmz/hlist.c (nmz_debug_printf): Likewise.
+	(nmz_get_unpackw): Likewise.
+	(nmz_read_unpackw): Likewise.
+	
+	* nmz/re.c (nmz_debug_printf): Likewise.
+	
+	* nmz/wakati.c (nmz_debug_printf): Likewise.
+
+	* src/namazu.c (nmz_die): Likewise.
+	(nmz_die_with_msg): Likewise.
+
+	* src/cgi.c (nmz_warn_printf): Likewise.
+
+1999-12-07  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* src/namazu.c: s/debug_printf/nmz_debug_printf/g.
+
+	* nmz/search.c (nmz_search): Renamed from search_main.
+
+	* nmz/rcfile.c (getenv_namazurc): Moved from libnamazu.c.
+	(load_conf): Remove unnecessary codes: BASE_URI[0] = '\0';
+	(open_conf_file): Call getenv_namazurc at the first.
+	(set_namazurc): Moved from libnamazu.c.
+	(rcfile_is_loaded): Renamed from ConfLoaded.
+	(show_rcfile): Renamed from show_conf.
+	(load_rcfile): Renamed from load_conf.
+	(open_rcfile): Renamed from open_conf_file.
+	(get_rc_args): Renamed from get_conf_args.
+	(get_rc_arg): Renamed from get_conf_arg.
+	(parse_rcfile): Renamed from parse_conf.
+	(apply_rc): Renamed from apply_conf.
+
+	* nmz/Makefile.am: s/conf.([ch])/rcfile.$1/g;
+
+	* nmz/rcfile.c: Renamed from conf.c
+
+	* nmz/rcfile.h: Renamed from conf.h
+
+	* nmz/var.c: Remove a variable: char NAMAZURC[BUFSIZE] = "";
+
+	* src/namazu.c (main): Remove getenv_namazurc() calling.
+
+	* src/namazu.c (make_fullpathname_msg): Moved from libnamazu.c
+
+1999-12-06  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* nmz/search.c (hash): Fix a 8 bit char handling bug.
+
+	* nmz/util.c (issymbol): Fix a 8 bit char handling bug.
+
+	* src/output.c (print_hitnum_each): Add phrase handling.
+
+	* nmz/search.c (push_hitnum): Add phrase handling.
+	(free_hitnums): Add phrase handling.
+	cur_idxnum: Renamed from CurrentIndexNumber.
+	(do_phrase_search): Add phrase handling.
+
+	* nmz/libnamazu.h (nmz_hitnum): Add new member:
+	struct nmz_hitnum *phrase for a result of a phrase search.
+
+	* nmz/libnamazu.h (nmz_indices): Abolish a useless member: 
+	int phrasehit[INDEX_MAX + 1]; 
+
+	* src/output.c (print_hitnum_each): Renamed from
+	print_word_hit_count.
+	(print_hitnum_all_idx): Renamed from print_hit_count.
+
+	* nmz/hlist.c, nmz/idxname.c, nmz/libnamazu.c, nmz/search.c,
+	nmz/util.c, src/cgi.c: Remove unnecessary casts for malloc().
+
+	* src/cgi.c (init_cgi): Modify usage of add_index().
+	(process_cgi_var_idxname): Modify usage of add_index().
+
+	* src/namazu.c (main): Modify usage of add_index().
+
+	* nmz/idxname.c (add_index): Change a return value and its type.
+
+	* nmz/idxname.h: Abolish enums:  ERR_INDEX_MAX, ERR_MALLOC.
+
+1999-12-04  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* nmz/Makefile.am (libnmz_la_SOURCES): Add {alias,replace}.[ch].
+	
+	* nmz/replace.[ch]: New file.
+
+	* nmz/alias.[ch]: New file.
+	
+	* nmz/conf.c (is_valid_argnum): Renamed from check_argnum.
+
+	* nmz/libnamazu.h (enum nmz_sort_mode): Add tag.
+	(enum nmz_sort_order): Add tag.
+	(enum nmz_search_method): Add tag.
+	(enum nmz_stat): Add tag.
+	
+	* nmz/libnamazu.h (struct nmz_result): Renamed from hlist.
+
+	* nmz/libnamazu.h (struct nmz_data): Renamed from hlist_data.
+
+	* nmz/var.h: Remove useless variable declarations.
+
+	* nmz/search.c (push_hitnum): Renamed from push_phraseres.
+	(free_hitnums): Renamed from free_phraseres.
+	
+	* nmz/libnamazu.h (struct nmz_hitnum): Renamed from phraseres.
+
+	* nmz/search.c (do_word_search): set SUCCESS to val.stat.
+
+	* src/output.c (print_hit_count): Abolish special treatments for
+	phrase search. 
+
+	* nmz/libnamazu.h (struct indices): Abolish a "mode" member;
+
+	* nmz/search.c (do_phrase_search): Don't call push_phraseres.
+	(do_search): Call push_phraseres anytime.
+
+	* nmz/libnamazu.h (enum search_mode): Unset ERROR_MODE.
+
+	* nmz/search.c (push_phraseres): Take `stat' parameter.
+	(search_main): 	Remove "if (tmp[i].stat != SUCCESS) { ... }"
+	
+	* nmz/libnamazu.h: Rearrange enum definitions.
+	
+	* nmz/hlist.c (malloc_hlist): Set hlist->stat = SUCCESS.
+
+	* src/output.c (print_hit_count): Use pr->stat instead of hitnum.
+
+	* nmz/libnamazu.h (struct hlist): Change names of member: 
+	n -> num
+	d -> data
+
+1999-12-03  Masao Takaku  <masao@ulis.ac.jp>
+
+	* src/namazu.c: Don't print a form element at non-cgimode.
+
+	* nmz/parser.[ch], src/result.c (emphasize): Don't emphasize
+	with operator strings (&,|,!,and,or,not).
+
+1999-12-02  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* src/mknmz.pl.in (parse_options): Modify "config=s" handling.
+	(main): Change a position of calling read_config(). [namazu-dev 910]
+	
+1999-11-29  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* pl/*.gmo: Removed. [namazu-dev 903]
+	
+	* lib/Makefile.am (EXTRA_DIST): Add system.h
+
+1999-11-24  Ryuji Abe  <raeva@t3.rim.or.jp>
+
+	* pxgettext: New file derived from gimp-perl.
+	
+	* Makefile.am (EXTRA_DIST): Added pxgettext.
+
+1999-11-24  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* nmz/util.c (reverse_byte_order): Be type-independent.
+
+1999-11-23  Ken-ichi Hirose  <kenzo-@tama.or.jp>
+
+	* src/mknmz.pl.in: Modify make_summary function.
+
+	* pl/util.pl: Fix islang function bug.
+
+	* filter/pdf.pl: Add $fields->{'title'} before 
+        gfilter::show_filter_debug_info.
+
+1999-11-23  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* {src,nmz}/*.c: Modify error handling code with `stat' info.
+	
+	* nmz/libnamazu.h (HLIST): Add a new member `stat'.
+	(HLIST_DATA): Add a new member `stat'.
+	
+	* **/*.c: Use EXIT_FAILURE or EXIT_SUCCESS for an argument of exit();
+
+	* lib/system.h: New file.
+	Define EXIT_FAILURE, EXIT_SUCCESS if neccessary.
+	
+	* nmz/hlist.c (init_data): Abolished.
+
+	* nmz/magic.h: Abolished.  (integrated to libnamazu.h)
+
+	* src/namazu.h: Import some named constans from libnamazu.h.
+	    PAGE_MAX,RESULT_MAX,CGI_QUERY_MAX,CGI_INDEX_NAME_MAX
+	    CGI_RESULT_NAME_MAX,SUICIDE_TIME
+
+	* nmz/critical.h: Abolished. (integrated to libnamazu.h)
+	
+	* nmz/libnamazu.h: Modify notations for struct ... typedef.
+
+	* src/namazu.c: Use ck_atoi() for -n and -w option.
+	
+	* nmz/util.c (die): Be independent from diewithmsg.
+
+	* {src,nmz}/*.[ch]: Clean up global variables. (to be continued...)
+	
+	* nmz/libnamazu.c: Introduce new functions:
+		get_namazurc, set_sortmethod, get_sortmethod,
+		set_sortorder, get_sortorder, set_debugmode,
+		is_debugmode, set_loggingmode, is_loggingmode,
+		set_dyingmsg, get_dyingmsg
+
+	* src/output.c: Introduce new functions:
+		set_htmlmode, is_htmlmode, set_cgimode,
+		is_cgimode, set_quietmode, is_quietmode, 
+		is_countmode, set_countmode, set_listmode, 
+		is_listmode, set_allresult, is_allresult, 
+		set_pageindex, is_pageindex, set_formpr,
+		is_formprint, set_refprint, is_refprint,
+		set_urireplace, is_urireplace, set_uridecode, 
+		is_uridecode, set_maxresult, get_maxresult, 
+		set_listwhence, get_listwhence, set_template, 
+		get_template 
+	
+	* nmz/mode.[ch]: Abolished. (Integrated to libnamazu.[ch])
+
+	* nmz/util.c (diemsg): Abolished.
+
+	* nmz/search.c (search_sub): Abolish cgimode condition for
+	check_accessfile();
+	(check_accessfile): Add condition for searching from remote.
+
+	* nmz/util.c (diewithmsg): Abolish cgimode and htmlmode condition.
+
+1999-11-23  Ryuji Abe  <raeva@t3.rim.or.jp>
+
+	* man/Makefile.am (EXTRA_DIST): Man pages are now available.
+	
+	* nmz/util.c (is_little_endian): Removed.
+	(freadx): Filled #ifndef WORDS_BIGENDIAN...#endif. 
+
+1999-11-22  Ken-ichi Hirose  <kenzo-@tama.or.jp>
+
+	* src/mknmz.pl.in: Add ole option and load_olemodule function.
+
+	* pl/util.pl: Fix checkcmd function problem for Win32 and OS2.
+
+	* File-MMagic/MMagic.pm: Fix new function problem. 
+    Added binmode($fh) for Win32 and OS2.
+
+1999-11-19  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* nmz/var.c: Abolish global values:
+	SortMethod, SortOrder, HtmlOutput, Debug, Quiet
+	
+	* nmz/libnamazu.c (set_sortbydate): Abolished.
+	(set_sortbyscore): Abolished.
+	(set_sortbyfield): Abolished.
+	(set_sort_descending): Abolished.
+	(set_sort_ascending): Abolished.
+	(set_debug): Abolished.
+
+	* nmz/mode.[ch]: New files.
+	
+	* nmz/codeconv.c (ishiragana): Be simple.
+	(iskatakana): Be simple.
+	
+	* pl/usage.pl (USAGE_MINI): s/options/information/.
+
+	* **/*.c: Include "config.h" by themselves.
+	Avoid nesting include files.
+
+	* lib/i18n.h: Define gettext related macros.
+	
+	* src/namazu.h: Be empty to avoid nesting include files
+
+	* **/*.[ch]: Abolish hairy lines for comments like:
+	/******************************************************
+
+	* pl/usage.pl: Modify usage messages.
+
+	* src/usage.c (show_usage): Renamed from show_long_usage()
+	(show_usage): Add a message "Report bugs to <bug-namazu@namazu.org>."
+	(show_version): Reformated.
+
+	* src/message.h: Remove "COPYRIGHT" macro.
+
+	* man/Makefile.am (update-man): s/-N/--no-info/g for clarity.
+
+1999-11-18  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* man/Makefile.am: Remove clean: command.
+
+	* man/mknmz.1: New file.
+
+	* man/namazu.1: New file.
+
+	* man/Makefile.am: New file.
+
+	* configure.in (AC_OUTPUT): Add man/Makefile
+
+	* Makefile.am (SUBDIRS): Add 'man'.
+
+	* pl/usage.pl ($USAGE_JA, $USAGE_EN): Reindented.
+	
+	* pl/usage.pl: s/<target(s)>/<target>.../g.
+
+	* src/mknmz.pl.in (load_modules): Add "../pl" and "../filter" into
+	@INC. 
+	
+	* src/mknmz.pl.in: s/show_long_usage/show_usage/g.
+
+	* src/mknmz.pl.in (show_version): New function.
+
+	* pl/usage.pl ($VERSION_INFO): Description for --version.
+
+	* src/mknmz.pl.in ($LANG): Be gloabl.
+
+	* src/mknmz.pl.in (parse_options): Change exit status for
+	$opt_help, $opt_version, $opt_show_config.
+
+	* src/namazu.c (parse_options): Treat 'v' with show_version().
+	
+	* src/usage.c (show_version): New function.
+
+	* acinclude.m4 (AC_PROG_LD): Fix 'ld' problem. [namazu-dev 859]
+	
+	* {src,nmz}/*.h: Add 'extern' keyword for all public functions.
+	
+	* nmz/util.c (reverse_byte_order): Be type dependent.
+	(freadx): Be type dependent.
+
+	* nmz/libnamazu.h: Add #include <stdio.h> for FILE struct used in
+	this file.
+
+	* src/namazu.h: Remove #include <stdio.h>
+
+	* nmz/search.c (binsearch): Compare in unsigned.
+
+	* nmz/codeconv.[ch]: s/char/uchar/ adjustment.
+
+	* **/*.c: s/uchar/char/g;
+
+	* configure.in: Set -pedantic if cc is gcc.
+
+	* Makefile.am (SUBDIRS): Change order: 'lisp' last.
+
+	* configure.in (AM_INIT_AUTOMAKE): Change a version number to 1.9.8.
+
+	* configure.in (AM_INIT_AUTOMAKE): Change a version number to 1.9.8.
+
+1999-11-17  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* nmz/search.c (cmp_phrase_hash): Fix a memory leak.
+
+	* nmz/Makefile.am (libnmz_la_SOURCES): Fix misspelling.
+
+1999-11-17  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* nmz/hlist.c ({and,not,or}merge): Fixed memory leak.
+
+1999-11-16  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* lib/Makefile.am, nmz/Makefile.am: Moved regex.{c,h} to 
+	nmz/ directory.
+
+1999-11-16  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* src/namazu.c (stdio2file): reimplemented with
+	freopen(). Good-bye open(), close() and dup(). :-)
+
+
+1999-11-15  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* File-MMagic/* : New upstream version.
+
+	* nmz/util.h: Added a workaround for compiling perl XSUB.
+
+1999-11-15  Ken-ichi Hirose  <kenzo-@tama.or.jp>
+
+	* src/cgi.c nmz/{util.h util.c search.c hlist.c}:
+	rename function wprintf to warnf. because it collide win32api.
+
+	* src/namazu.c : implentation alarm function for win32.
+
+	* mknmz.pl.in : fixed to ENV{'HOME'} for Windows.
+
+1999-11-14  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* nmz/search.c (search_main): Handle errors occured at search_sub().
+
+	* nmz/magic.h (ERR_*): make them all nagative value.
+
+	* src/output.c (print_word_hit_count): Handle
+	ERR_CANNOT_OPEN_INDEX and ERR_NO_PERMISSION. 
+
+	* nmz/magic.h: Add ERR_CANNOT_OPEN_INDEX and ERR_NO_PERMISSION.
+
+	* src/output.[ch] (priint_result1): Abolished.
+
+	* nmz/search.c (search_sub): Use print() instead of diemsg().
+
+	* src/namazu.c (namazu_core): Call free_aliases() and
+	free_replaces() at *query == '\0'.
+
+	* src/Makefile.am (LDADD): Change order to fix a problem on make.
+	[namazu-dev 822]
+
+	* src/cgi.c: Entirely rewritten.
+	
+
+1999-11-13  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* src/cgi.c (decode_uri): Moved from nmz/util.[ch].
+	
+	* nmz/util.[ch] (decode_uri): Moved to src/cgi.[ch].
+
+	* nmz/idxname.c (add_index): Reindented.
+
+	* nmz/var.h: Abolish *ScriptName, *QueryString, *ContentLength.
+
+1999-11-12  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* acinclude.m4: Fix lispdir related codes to handle $prefix correctly.
+
+1999-11-12  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* Search-Namazu/Namazu.xs: Fixed to work.
+
+	* nmz/util.h: Added #ifndef condition to iskanji definition
+	for jperl.
+
+1999-11-11  Masao Takaku  <masao@ulis.ac.jp>
+
+	* nmz/regex.[ch]: Removed.
+
+1999-11-10  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* Search-Namazu/Namazu.xs : Fixed to return array.
+
+	* Search-Namazu/* : Implemented (work but very unstable).
+
+1999-11-09  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* src/i18n.{c,h} : Moved to nmz/ directory.
+
+	* Search-Namazu/ : Implemented some functions (currentry not work).
+
+1999-11-08  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* nmz/Makefile.am (INCLUDES): Add -I../nmz
+
+	* po/POTFILES.in: Re-list all.
+
+1999-11-08  Ryuji Abe  <raeva@t3.rim.or.jp>
+
+	* nmz/Makefile.am (DEFS): Same as src/Makefile.am.
+
+1999-11-08  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* src/namazu.h : Modified to include libnamazu.h.
+
+	* nmz/libnamazu.h, src/namazu.h: Moved some definitions from 
+	namazu.h to libnamazu.h.
+
+	* nmz/util.h: Removed including namazu.h.
+
+	* src/Makefile.am: Fixed conflicts.
+
+1999-11-06  Ryuji Abe  <raeva@t3.rim.or.jp>
+
+	* nmz-config.in (--cflags): Always output @pkgincludedir@.
+	* src/Makefile.am: Cleaned up.
+	(indexdir): New variable.
+	(DEFS): Set OPT_CONFDIR=$(confdir), and OPT_INDEXDIR=$(indexdir). 
+
+1999-11-05  Ryuji Abe  <raeva@t3.rim.or.jp>
+
+	* nmz-config.in: Changed @includedir@ to @pkgincludedir@
+ 
+1999-11-05  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* src/{codeconv.c codeconv.h conf.c 
+	conf.h critical.h field.c field.h hlist.c hlist.h 
+	idxname.c idxname.h magic.h parser.c perser.h re.c re.h 
+	regex.c regex.h search.c search.h seed.c util.c util.h 
+	var.c var.h wakati.c wakati.h} : Moved to nmz/ directory.
+	
+	* nmz/Makefile.am: Changed `include_HEADERS' to `pkginclude_HEADERS'.
+
+1999-11-05  Masao Takaku  <masao@ulis.ac.jp>
+
+	* src/mknmz.pl.in: Move $EXCLUDE_REGEX related codes from
+	isexcluded() to wanted().
+
+1999-11-04  Masao Takaku  <masao@ulis.ac.jp>
+
+	* src/mknmz.pl.in (parse_options): Fix a bug: can't update
+	NMZ.status at '--update' option specified.
+
+1999-11-04  Ryuji Abe  <raeva@t3.rim.or.jp>
+
+	* nmz-config.in: New File.
+	* Makefile.am (bin_SCRIPTS): Entry nmz-config.
+	* configure.in: Removed OPT_INDEXDIR and OPT_CONFDIR related code.
+	(AC_OUTPUT): Added nmz-config.
+	* acconfig.h: Removed OPT_INDEXDIR and OPT_CONFDIR.
+	* src/Makefile.am (DEFS): Defined -DOPT_INDEXDIR and -DOPT_CONFDIR. 
+
+1999-11-03  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* namazu.spec.in: Add /usr/var/namazu/*, /usr/etc/namazu/*, 
+	/usr/include/*, /usr/lib/* at the end.
+
+	* Makefile.am (install-data-local): 
+	$(mkinstalldirs) ${localstatedir}/${PACKAGE}/index
+
+	* configure.in (OPT_INDEXDIR): Use ${localstatedir}/${PACKAGE}/index.
+
+	* src/mknmz.pl.in (init): Implement $LNAG handling.
+
+	* src/mknmz.pl.in, pl/codeconv.pl: Use util::islang().
+
+	* pl/util.pl (islang): New subroutine.
+
+	* pl/conf.pl.in: Set $LANGUAGE to "C".
+
+	* configure.in: Abolish --with-japanese and --with-lang=LANG.
+	Change order of --with-* options and reindent.
+
+	* acconfig.h: Remove OPT_LANGUAGE.
+
+	* configure.in (File::MMagic detection codes): Use 
+	"use lib '$PMDIR';".
+
+	* acinclude.m4: Modify --with-emacs=EMACS, --with-lispdir=DIR
+	related codes to exclude unsuitable AC_MSG_ERR and messages.
+
+1999-11-03  Rei FURUKAWA  <furukawa@tcp-ip.or.jp>
+
+	* nmzidx.pl: Fixed lockfile related code.  
+	Thanks to Mr. Hiroshi KOMATSU. [namazu-dev 706]
+
+1999-11-02  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* configure.in: Add codes to prevent to remove Makefile when 
+	doing 'make clean'. [namazu-dev 375]
+
+	* nmz/Makefile.am (INCLUDES): Add "-I../intl" and remove "-I.".
+
+	* acinclude.m4: Import AM_PATH_LISPDIR macro from Lookup
+	<http://openlab.ring.gr.jp/lookup/>
+	And modify a message a little bit.
+
+	* configure.in: Add --with-pmdir=DIR option. [namazu-dev 582]
+
+1999-11-02  Ryuji Abe  <raeva@t3.rim.or.jp>
+
+	* acinclude.m4: Added libtool related macros from kakasi-2.3.1.
+
+	* nmz/Makefile.am (include_HEADERS): Entry libnamazu.h.
+	(libnmz_la_LDFLAGS): Set version-info to 0:0:0. Each libtool 
+	library should be started with version infomation of `0:0:0'.
+
+	* src/Makefile.am (LDADD): Linked libtool library (libnmz.la) 
+	instead of real library (libnmz.a).
+
+1999-11-01  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* src/conf.[ch], src/var.c: Introduce CONFDIR and abolish
+	NAMAZU_CONF.
+	
+	* src/mknmz.pl.in: Use mknmzrc instead of mknmz.conf.
+	
+	* src/Makefile.am (confdir): Use $(sysconfdir)/$(PACKAGE).
+
+	* conf/Makefile.am: Modify to handle namazurc and mknmzrc instead
+	of namazu.conf-dist and mknmz.conf-dist
+	
+	* conf/namazurc: New file.
+
+	* conf/namazu.conf-dist: Removed.
+	
+	* configure.in: Abolish --with-confdir. Use --sysconfdir instead
+	for setting a config files directory.
+
+	* **/*.[ch]: 's/namazuconf/namazurc/g'
+	
+	* src/*.[ch]: s/hlist_data/HLIST_DATA/g
+
+	* configure.in: Fix --with-scoring=METHOD option.
+
+	* configure.in: Add AC_SUBST(CONFDIR)
+	Modify message for --with-confdir.
+
+	* conf/Makefile.am (confdir): Use @CONFDIR@.
+
+	* Makefile.am (DISTCLEANDIRS): Remove meaningless "conf/conf".
+
+	* src/Makefile.am (confdir): Use @CONFDIR@.
+	
+	* configure.in (AM_INIT_AUTOMAKE): Change a version number to 1.9.7.
+	Add --with-confdir_DIR option.
+	Fix --with-scoring=METHOD option.
+
+1999-11-01  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* ltconfig, ltmain.sh, config.guess, config.sub: Added.
+
+	* nmz/Makefile.am: Fixed unnecessary macro.
+
+	* nmz/*: Added new directory and moved libnamazu.* files from 
+	src/ directory.
+
+1999-10-29  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* Seacrh-Namazu/*: Added new module.
+
+1999-10-28  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* pl/wakati.pl (wakatize_japanese): s/Okurigana/okurigana/,
+	s/Hiragana/hiragana/, s/Morph/morph/
+
+1999-10-27  Rei FURUKAWA  <furukawa@tcp-ip.or.jp>
+
+	* nmzidx.pl: Fixed lockfile related code
+
+1999-10-27  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* src/usage.c (show_mini_usage): s/more options/more information/
+
+1999-10-27  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* File-MMagic/Makefile.PL: Added AUTOHR and ABSTRACT paramaters.
+
+1999-10-26  Rei FURUKAWA  <furukawa@tcp-ip.or.up>
+
+	* pl/nmzidx.pl, src/gcnmz.pl.in: Close unused file handles.
+
+1999-10-25  Ken-ichi Hirose <kenzo-@tama.or.jp>
+
+	* configure.in: Added --without-file-mmagic option.
+
+	* configure.in: change --with-tknamazu option 
+      to --without-tknamazu.
+
+	* src/usage.c: erase euctosjis(buf) for _WIN32 and __EMX__.
+
+1999-10-22  Ryuji Abe <raeva@t3.rim.or.jp>
+
+	* src/util.h [HAVE__VSNPRINTF]: Fixed macro definition.
+
+1999-10-21  Ryuji Abe <raeva@t3.rim.or.jp>
+
+	* configure.in (LIBOBJS): vsnprintf.o was added when neither 
+	  vsnprintf nor _vsnprintf was found.
+	[EMXOS2]: Fixed CFLAGS and LDFLAGS.
+	(AC_OUTPUT): Deleted entry macros/Makefile.
+
+	* src/util.h [HAVE__VSNPRINTF]: Defined vsnprintf as _vsnprintf.
+
+1999-10-19  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* src/libnamazu.{c,h}: Added some setting functions.
+
+	* src/namazu.c: Moved set_redirect_stdout_to_file function.
+
+1999-10-14  Ryuji Abe <raeva@t3.rim.or.jp>
+
+	* acinclude.m4: Moved all macros previously defined 
+	  macros/gettext.m4, macros/lcmessage.m4, and progtest.m4.
+	
+	* macros: Removed directory and all files.
+	
+	* Makefile.am(SUBDIRS): Removed macros.
+	
+	* configure.in: Added missing netscape configuration routine.
+	(AM_ACLOCAL_INCLUDE): Removed.
+	
+1999-10-14  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* src/util.c (is_little_endian): Use WORDS_BIGENDIAN macro for
+	determinig an endian type.
+	
+	* configure.in: Add AC_C_BIGENDIAN.
+
+	* po/ja.po: Modify the usage message a bit.
+
+	* src/usage.c (show_long_usage): Modify the usage message a bit.
+
+1999-10-13  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* src/util.[ch]: Introduce is_little_endian() function.
+	And use it in freadx().
+
+	* src/search.[ch]: Abolish check_byte_order() function.
+
+	* src/var.[ch]: Abolish OppositeEndian variable.
+
+
+1999-10-13  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* src/idxname.{c,h}: Added.
+
+1999-10-12  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* src/namazu.c : Moved some functions to libnamazu.c.
+
+	* src/libnamazu.{c,h}: Created new files.
+
+1999-10-11  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* configure.in (AM_INIT_AUTOMAKE): Change a version number to 1.9.6.
+
+1999-10-07  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* src/{result.c, search.c}: Move output functions to output.c.
+
+	* src/wakati.c: Remove some exit() functions.
+
+1999-10-03  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* src/mknmz.pl.in (complete_field_info): Add filename_to_title()
+	calling. 
+	
+	* filter/{html,mailnews,man,msword,pdf,rfc}.pl: Remove
+	filename_to_title() calling.
+
+	* configure.in: Modify a message.
+	
+	* namazu.spec: Add "/usr/share/locale/*" at the end.
+
+	* src/mknmz.pl.in (load_document): Fix typo: s/!=/!~/
+
+1999-10-01  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* src/mknmz.pl.in (load_document): Fixed misrecognizing text/html
+	type file.
+
+1999-09-30  Ryuji Abe <raeva@t3.rim.or.jp>
+
+	* configure.in(AM_ACLOCAL_INCLUDE): New Macros.
+	(AM_PATH_LISPDIR): New Macros.
+	(AC_OUTPUT): Added filter/Makefile, lisp/Makefile, macros/Makefile, pl/Makefile.
+	
+	* Makefile.am(ACLOCAL_AMFLAGS): Removed.
+	(SUBDIRS): Added filter lisp macros pl.
+	(EXTRA_DIRS): Removed filter lisp macros pl conf.
+	
+	* conf/Makefile.am: Modified standard automake style.
+	
+	* filter/Makefile.am: New File.
+	
+	* macros/Makefile.am, pl/Makefile.am: Likewise.
+	
+	* macros/aclocal-include.m4: New File that derived from gnome-libs-1.0.16.
+	
+	* macros/lcmessage.m4: New File that derived from sh-utils-2.0.
+	
+	* macros/progtest.m4: Likewise.
+	
+1999-09-29  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* src/Makefile.am (INCLUDES): Add ../lib
+
+	* po/Makefiel.in.in (update-po): Fix a subtle bug.
+	
+	* po/make_jis7_po.in: New file.
+
+	* po/make_sjis_po: Fix a subtle bug by s/sjis/SJIS/.
+
+1999-09-29  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* src/namazu.h: Change INDICES structure (add total, modes, pr,
+	phrasehit members).
+	
+	* src/search.c (search_sub): Move some output process to 
+	print_hit_count() function.
+
+1999-09-28  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* src/codeconv.c (conv_ext): Add ja_JP.JIS7 handing.
+	(zen2han): Add `static' on Z2H.
+
+	* src/form.c (replace_query_value): Add conv_ext() calling.
+
+	* conf/namazu.conf-dist (LANG): ja_JP.iso-2022-jp -> ja_JP.JIS7
+
+	* src/util.c (strcasestr): Implement EUC handling.
+
+	* src/{util,search}.c: Remove a duplicated define statement:
+	#define iseuc(c)  ((c) >= 0xa1 && (c) <= 0xfe)
+
+	* Makefile.am (install-data-local): Add the line:
+	rm -f $(pkgdatadir)/template/*.in 
+
+	* po/(*)sjis()*: Renamed -> ${1}SJIS${2}
+
+	* po/(*)iso-2022-jp()*: Renamed -> ${1}JIS7${2}
+	
+	* template/NMZ.(*).ja_JP.iso-2022-jp: Renamed -> NMZ.${1}.ja_JP.JIS7
+
+	* configure.in (AC_OUTPT): s/make_iso_2022_jp_po/make_jis7_po/;
+	s/iso-2022-jp/JIS7/
+
+	* po/make_sjis_po.in: s/sjis/SJIS/;
+
+	* po/make_jis7_po.in: s/iso-2022-jp/JIS7/;
+
+	* po/make_jis7_po.in: New file. (make_iso_2022_jp)
+
+	* po/make_iso_2022_jp_po.in: Removed.
+	
+	* po/Makefile.in.in: Comment out codes for creating ja_JP.EUC and
+	ja_JP.ujis. And do s/sjis/SJIS/; s/iso-2022-jp/JIS7/.
+	
+	* configure.in (ALL_LINGUAS): Add ja_JP.JIS7, ja_JP.SJIS.
+
+	* configure.in (ALL_LINGUAS): Remove ja_JP.EUC, ja_JP.ujis,
+	ja_JP.iso-2022-jp, ja_JP.sjis
+
+1999-09-28  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* src/namazu.c (parse_options): Remove some exit() functions.
+
+	* src/var.{c,h}: Add PhraseResult variable and PHRASERES type.
+
+	* src/{search.c, namazu.c}: Devide hit count printing routine.
+
+1999-09-27  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* src/codeconv.c (conv_ext): Add ja_JP.SJIS handling.
+
+	* src/mknmz.pl.in (setup_magic): Modify a regex for RFC.
+
+	* src/util.c (isnumstr): Add cast: (int)
+
+	* src/util.c (diemsg): Remove #ifdef HAVE_VSPRINTF ...
+
+	* configure.in (Add AC_REPLACE_FUNCS): Remove some functions.
+
+	* configure.in: Add AC_REPLACE_FUNCS macro.
+	
+	* Makefile.am (SUBDIRS): Add lib.
+
+	* lib/Makefile.am: New file.
+
+	* lib/vsnprintf.c: New file imported from 
+	gnome-1.0.40/gnome-libs-1.0.40/support.
+	
+	* lib/{memmove,strcasecmp,strstr,memset,strcspn,
+	memcmp,strncasecmp}.c: New files imported from gettext-0.10.35/lib.
+	
+	* lib/{regex.[ch],getopt{,1}.[ch]}: Moved from src.
+	
+	* src/Makefile.am (namazu_SOURCES): Remove regex.[ch],
+	getopt.[ch], getopt1.c
+	
+	* src/util.[ch]: Remove memmove();
+	
+	* src/i18n.c: Add putenv/setenv handling. 
+
+	* src/i18n.c: Include <locale.h> if available.
+	
+	* configure.in (AC_CHECK_FUNCS): Add setenv.
+	
+	* conf/Makefile.am (mknmz.conf-dist): s!lib/!pl/!
+	
+	* src/Makefile.am (.pl): Replace libdir with  perllibdir.
+	
+	* src/Makefile.am (perllibdir): = $(pkgdatadir)/pl
+
+	* src/Makefile.am (libdir): Rename to perllibdir
+	
+	* Makefile.am (EXTRA_DIRS): Replace lib with pl.
+
+	* pl/*.pl, pl/*.in: New files. (moved from lib)
+	
+	* lib/*.pl, lib/*.in: Removed. (moved to pl)
+	
+	* src/mknmz.pl.in (make_headfoot): Abolish evaling.
+
+	* lib/conf.pl.in: Remove a variable: $ADMIN. 
+
+	* lib/var.pl.in: Remove a variable: $NMZ_URI.
+
+	* configure.in: Add OPT_NMZ_URI="http://openlab.ring.gr.jp/namazu/".
+
+	* configure.in (AC_OUTPUT): Add the following files.
+	   template/NMZ.head
+	   template/NMZ.foot
+	   template/NMZ.head.ja_JP.iso-2022-jp
+	   template/NMZ.foot.ja_JP.iso-2022-jp
+
+	* template/{NMZ.head,NMZ.foot,NMZ.head.ja_JP.iso-2022-jp,
+	NMZ.foot.ja_JP.iso-2022-jp}: Renamed: -> *.in
+
+	* src/mknmz.pl.in: Add `use lib "@ADDITIONAL_INC@"' at the upper part.
+	
+	* configure.in: Modify File-MMagic related codes. [namazu-dev 523]
+
+1999-09-27  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* src/{search.c, namazu.c}: Move output process from search.c to
+	namazu.c.
+
+	* src/mknmz.pl.in (setup_magic): Change rfc detection entry.
+
+	* src/mknmz.pl.in: Add some conditions to call checktype_magic().
+
+1999-09-26  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* template/NMZ.*.ja_JP.iso-2022-jp: Covert encoding: EUC-JP ->
+	ISO-2022-JP 
+	
+	* src/mknmz.pl.in (write_body_msg, write_tips_msg,
+	make_headfoot_pages): Get target files list with glob.
+	
+	* src/mknmz.pl.in: Abolish --enable-test related codes.
+	
+	* configure.in: Abolish --enable-test.
+	
+	* lib/find.pl: Restore fncmp().
+	
+	* po/Makefile.in.in (DISTFILES): Add ADDITIONAL_FILES.
+
+	* po/Makefile.in.in: Add new macro: ADDITIONAL_FILES.
+
+	* src/{usage,i18n}.c: Insert a header describing copyright.
+	
+	* src/*.c: Remove a statement "* This file must be encoded in
+	EUC-JP encoding.".
+	
+	* src/codeconv.c: Remove EUC-JP characters.
+	
+	* src/output.c (print_msgfile): Use choose_msgfile();
+
+	* src/form.c (read_headfoot): Use choose_msgfile();
+	
+	* src/i18n.[ch]: Introduce New function: choose_msgfile();
+	
+	* conf/namazu.conf-dist: Modify a description on LANG.
+	
+	* po/POTFILES.in: Remove message.c.
+	
+	* template/NMZ.{body,foot,head,tips}.en: Remove suffix.
+
+	* template/NMZ.{body,foot,head,tips}.ja: Change suffix: ja ->
+	ja_JP.iso-2022-jp.
+	
+	* src/util.c (debug_printf, wprintf, wprint): Do fflush(stdout) 
+	at each calling.
+	
+	* src/var.c (NMZ_NAMES NMZ): Remove ending `.' from NMZ.head,
+	NMZ.foot and NMZ.body.
+
+	* src/message.h: Define some messages with #define.
+	
+	* src/message.c: Removed.
+	
+	* src/*.c: Add `static' specifier for all private functions.
+	
+	* src/wakati.[ch]: Refine detect_char_type() related codes by
+	using enum.
+	
+	* src/search.[ch]: Refine detect_search_mode() related codes by
+	using enum.
+	
+	* src/{cgi,codeconv,conf,form,message,namazu,re,search}.c:
+	Add one line: #include "i18n.h"
+
+	* src/{cgi,critical}.h: Move CGI-related critical values from
+	cgi.h to critical.h. And decrease those values for safe.
+	
+	* src/{form,result,search}.c: Use codnv_ext() for converting
+	internal encoding to external one before outputting messages.
+	
+	* src/codeconv.c: Introduce new functions: conv_ext() and euctojis()
+
+	* src/codeconv.c: Rename function: codeconv() -> conv_ja_any_to_eucjp()
+	
+	* src/Makefile.am: Add i18n.[ch] to namazu_SOURCES.
+
+	* src/i18.[ch]: New files.
+	
+	* src/namazu.c (main): Add setlocale() calling;
+	
+	* po/*.{po,pot}: Release MSG_MIME_HEADER from gettext().
+	(make update-po && make)
+	
+	* src/{cgi,namazu,util}.c: Release MSG_MIME_HEADER from gettext().
+
+1999-09-26  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* src/*.c: Remove all die() functions.
+
+1999-09-25  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* src/util.c (diemsg): Surround vsnprintf() with #ifdef HAVE_VSPRINTF
+	and #ifdef HAVE_VSNPRINTF for system having no vsnprintf().
+	
+	* configure.in: AC_FUNC_VPRINTF.
+
+	* src/*.[ch]: s/fputx/html_print/g
+	
+	* src/output.c: Rename a function:  fputx() -> html_print().
+	
+	* src/*.c: Use print() and wprint();
+	
+	* src/util.[ch]: Introduce new functions: print() and wprint();
+	
+	* src/output.c: Introduce new functions: emprint();
+
+	* src/output.c: Abolish euctojisput() and fputs_with_codeconv();
+	
+	* src/{cgi.form,namazu,output,result,search,wakati}.c:
+	Abolish fputx's second argument (fp).
+
+	* src/util.c (diemsg): Fix stdarg related bug: Surround vsnprintf()
+	with va_start and va_end.
+
+	* src/utilc: Fix an unterminated comment.
+	
+	* configure.in (AC_CHECK_FUNCS): Add getcwd, getwd, putenv, 
+	strdup, strcspn, strspn, strstr. 
+	
+	* configure.in (AC_CHECK_HEADERS): Add limits.h and malloc.h.
+
+	* configure.in: Add macros: AC_PROG_RANLIB, AC_C_INLINE,
+	AC_FUNC_MMAP 
+
+1999-09-25  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* search.c, parser.c, hlist.c: Remove die() function.
+
+	* src/conf.{c,h}, namazu.c: Remove die() function.
+
+	* src/util.{c,h}: Add diewithmsg() function.
+
+	* src/magic.h: Add error code enum.
+
+1999-09-24  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* src/utils.{c,h}: Add new function diemsg().
+
+	* src/var.{c,h}: Add new variable Dyingmessage.
+
+1999-09-23  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* po/make_iso_2022_jp.po: New file
+	
+	* po/make_sjis_po: charset=shift-jis -> charset=Shift_JIS
+	
+	* po/ja.po:  charset=euc-jp -> charset=EUC-JP
+	
+	* po/Makefile.in.in (update-po): Add a routine to create
+	ja_JP.iso-2022-jp.po, ja_JP.EUC.po, ja_JP.ujis.po.
+	
+	* configure.in (ALL_LINGUAS): Add ja_JP.iso-2022-jp, ja_JP.EUC,
+	ja_JP.ujis 
+	
+	* configure.in (AC_OUTPUT): Add po/make_iso_2022_jp_po.
+
+1999-09-22  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* src/util.c (debug_printf, wprintf): Do fflush(stderr) at each 
+	calling.
+	
+	* src/usage.c (show_mini_usage): Use fputs() instead of printf()
+	because it doesn't use any printf format such as %s.
+	
+	* src/output.c (fputs_without_html_tag): Implement ISO-2022-JP
+	handling. 
+	
+	* Makefile.am (ACLOCAL_AMFLAGS): Fix a typo: -l -> -I.
+
+	* macros/gettext.m4: Imported reliable one from sh-utils-2.0/m4.
+	
+	* src/form.c (print_headfoot): \x1b -> \033
+
+1999-09-21  Ryuji Abe <raeva@t3.rim.or.jp>
+
+	* configure.in(ALL_LINGUAS): Added ja_JP.sjis.
+	
+	* Makefile.am(ACLOCAL_AMFLAGS): Specified -l macros.
+	(EXTRA_DIRS): Added macros.
+
+	* po/Makefile.in.in: Derived from Akira Higuchi's mgedit snapshot.
+	
+	* po/make_sjis_po: New File. Derived from Akira Higuchi's mgedit snapshot.
+	
+	* po/ja_JP.sjis: New File.
+
+	* macros: New Directory.
+
+	* macros/gettext.m4: New File.
+
+	* src/Makefile.am: More simplified make rules for perl scripts.
+
+1999-09-21  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* acloca.m4: Fix a subtle problem relating to libintl.a reported
+	in [namazu-dev 488] by refering sh-utils-2.0's aclocal.m4
+
+1999-09-20  Ryuji Abe <raeva@t3.rim.or.jp>
+
+	* configure.in: Added AC_ISC_POSIX.
+
+	* Makefile.am(AUTOMAKE_OPTIONS): Added 1.4.
+
+	* src/Makefile.am: Likewise.
+
+	* src/Makefile.am(LDADD): Use instead of namazu_LDADD.
+
+1999-09-20  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* src/*.[ch]: Rename a function name: dprintf -> debug_printf
+	due to the former causes a conflict with system library. 
+	[namazu-dev 474]
+	
+	* src/*.c: Extract almost MSG_foobar into sources.
+	
+	* src/*.c: Rename variables:
+	MSG_TOO_LONG_KEY     -> MSG_TOO_LONG_QUERY
+	
+	* src/re.c (regex_grep): Do re_free_pattern at the end.
+	
+	* src/cgi.c (get_cgi_vars): Fix PATH_INFO related codes.
+	
+	* src/*.c: Use wprintf() for warning and use dprintf() for debug
+	messages. And eliminate wasteful if (Debug) { ... } statements.
+	
+	* src/util.c: Add new functions: wprintf() and dprintf().
+	
+	* src/wakati.c: Abolish using strlen2() but use strcspn() instead.
+	
+	* src/util.c: Abolish strlen2().
+	
+	* src/util.c: Abolish setprogname() but use PACKAGE macro instead.
+
+1999-09-20  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* src/namazu.c: Fixed merge conflict.
+
+1999-09-19  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* configure.in: Arrange indent.
+	
+	* src/*.c: Gettextized.
+	
+	* po/ja.po: Japanese messages prepared.
+	
+	* po/namazu.pot: Collect messages.
+
+	* src/message.c: Gettextized.
+	
+	* src/magic.h: Separate enum declarations.
+	
+	* src/output.c (put_page_index): Fix enviromental variable related
+	bugs by using safe_getenv().
+	
+	* src/{search,util}.c: Move safe_getenv() from search.c to util.c
+	
+	* src/Makefile.am (namazu_LIBS): Abolished.
+	
+	* po/ChangeLog: New file.
+	
+	* Makefile.am (DIST_SUBDIRS): add $(SUBDIRS)
+
+	* po/en.po: Removed
+	
+	* configure.in (ALL_LINGUAS): Remove `en'
+	
+	* src/Makefile (CLEANDIRS): Renamed -> DISTCLEANDIRS
+
+	* src/Makefile (CLEANFILES): Renamed -> DISTCLEANFILES
+	
+	* ABOUT-NLS: Replace this with latest one.
+	<ftp://ring.asahi-net.or.jp/pub/GNU/ABOUT-NLS>
+
+	* aclocal.m4: Import AC_ISC_POSIX related codes from aclocal.m4 of
+	GNU sh-utils-2.0 for avoiding autoheader's complaints like:
+	configure.in:375: AC_TRY_COMPILE was called before AC_ISC_POSIX
+
+	* po/namazu.pot: New file.
+	
+	* acconfig.h: Prepare the following undefs
+	ENABLE_NLS, HAVE_CATGETS, HAVE_GETTEXT, HAVE_LC_MESSAGES, HAVE_STPCPY
+	
+	* configure.in: Add AC_PREREQ(2.13) at the head.
+
+	* configure.in: Add ALL_LINGUAS and AM_GNU_GETTEXT macros.
+
+	* configure.in (AC_OUTPUT): intl/Makefile, po/Makefile.in
+
+	* src/Makefile.am (always_built_SUBDIRS): Abolish this because
+	autoreconf complains:
+	AM_GNU_GETTEXT in configure.in but `po' not in SUBDIRS
+	AM_GNU_GETTEXT in configure.in but `intl' not in SUBDIRS
+
+	* src/Makefile.am (DEFS): New entry.
+
+	* src/Makefile.am (localedir): New entry.
+
+	* src/Makefile.am (INCLUDES): New entry.
+
+	* src/Makefile.am (namazu_LDADD): New entry.
+	
+	* src/{mailutime,vfnmz,gtnmz,kwnmz.pl,gcnmz.pl}.in: Add
+	"-*- Perl -*-" string for convenience with Emacs.
+
+	* po/{ja.po,en.po,POTFILES.in}: New files.
+	
+	* src/{kwnmz,gcnmz}.pl.in: Add RCS Id at the head and chmod -x.
+	
+	* aclocal.m4: Adding contents of gettext.m4,  lcmessage.m4 and
+	progtest.m4.
+
+	* ABOUT-NLS: New file created by gettextize(1).
+	
+	* intl/{ChangeLog,dcgettext.c,gettext.h,libgettext.h,po2tbl.sed.in,
+	Makefile.in,dgettext.c,gettextP.h,linux-msg.sed,textdomain.c, 
+	VERSION,explodename.c,hash-string.h,loadinfo.h,xopen-msg.sed,
+	bindtextdom.c,finddomain.c,intl-compat.c,loadmsgcat.c,
+	cat-compat.c,gettext.c,l10nflist.c,localealias.c}:
+	New files created by gettextize(1).	
+	
+	* po/Makefile.in.in: New files created by gettextize(1).
+	
+	* Makefile.am (always_built_SUBDIRS): Add intl and po
+	
+	* configure.in (AM_INIT_AUTOMAKE): Change a version number to 1.9.5.
+
+1999-09-19  Rei FURUKAWA  <furukawa@tcp-ip.or.up>
+
+	* lib/nmzidx.pl: Replace nmzdb -> nmzidx,
+
+	* src/kwnmz.pl.in: Replace nmzdb -> nmzidx,
+ 	Add --help option for usage.
+
+	* src/gcnmz.in: Removed. (Renamed: gcnmz.in -> gcnmz.pl.in)
+
+	* src/gcnmz.pl.in: New File. (Renamed: gcnmz.in -> gcnmz.pl.in)
+	Replace nmzdb -> nmzidx
+
+	* src/Makefile.am: add src/gcnmz.pl.in
+
+	* configure.in: Renamed: gcnmz.in -> gcnmz.pl.in
+
+1999-09-18  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* src/regex.[ch]: Imported from source codes of Ruby 1.4.2.
+
+	* src/search.c (search_sub): Modify to only do check_access() at
+	a CGI mode.
+	
+	* src/search.c (search_main): Modify not to print NMZ.tips.* at
+	a command line mode
+	
+	* src/Makefile.am (CLEANFILES): Restore kwnmz.
+	(I misunderstood)
+
+	* configure.in: Modify codes for getting a version number of
+	included File::MMagic for a cygwin environment. [namazu 998]
+
+1999-09-17  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* src/Makefile.am (noinst_HEADERS): Integrated to namazu_SOURCES.
+
+	* src/Makefile.am (LIBS): Renamed: -> namazu_LIBS.
+	
+	* src/Makefile.am (CLEANFILES): Remove kwnmz.
+	
+	* configure.in: Modfy check codes related to perl.
+
+1999-09-16  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* template/NMZ.body.{en,ja}: Commented out Tkanamazu and namazu.el
+	related descriptions.
+
+1999-09-15  Masao Takaku  <masao@ulis.ac.jp>
+
+	* src/{message.c,message.h,namazu.h,search.c,var.c}: Add a access
+	control feature by hostname and IP address. (NMZ.access)
+
+1999-09-15  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* doc/ja/nmz.html: Add a description for NMZ.access
+	
+	* src/{result,search,var}.c, src/var.h: Rename a variable name. 
+	s/MoreShortFormat/ListFormat/
+
+	* src/{namazu,cgi,var}.c, src/var.h: Abolish ShortFormat variable.
+	
+	* src/search.c (check_accessfile): Modify `rhost' handling.
+
+	* src/search.c: Rename a function: s/get_env_safely/safe_getenv/
+	
+	* Makefile.am (EXTRA_DIST): s/ChangeLog.old.1.gz/ChangeLog.1/
+	
+	* src/{search,namazu,message}.c: Modify them to print
+	NMZ.tips.{en,ja} when no documents found.
+	
+	* lib/{namazu,usage}.c: Move cat() from namazu.c to usage.c.
+	
+	* src/mknmz.pl.in, lib/var.pl.in: Add codes to create
+	NMZ.tips.{en,ja} 
+
+	* template/NMZ.tips.{en,ja}: New files.
+	
+	* src/mknmz.pl.in, lib/usage.pl: Add --mhonarc option.
+	(same as --media-type='text/html; x-type=mhonarc')
+	
+	* ChangeLog.1: New file. (ChangeLog.old.1)
+	
+	* ChangeLog.old.1.gz: Removed.
+	
+	* doc/ja/nmz.html: New file. (htmlized version of nmz_files.txt)
+	
+	* doc/ja/nmz_files.txt: Removed.
+	
+	* lib/find.pl: Restore fncmp().
+	(cvs update -j 1.8 -j 1.7 find.pl)
+	
+	* lib/nmzidx.pl: New file. (Renamed: nmzdb.pl -> nmzidx.pl)
+
+	* lib/nmzdb.pl: Removed. (Renamed: nmzdb.pl -> nmzidx.pl)
+
+	* src/kwnmz.pl (kwnmz): Modify not to convert a charcode.
+	And translate some comments into English.
+	
+	* template/NMZ.result.normal: Modify a little bit.
+	
+	* src/search.c (search_sub): Modify a way to display idxnames at
+	results.
+
+1999-09-15  Rei FURUKAWA  <furukawa@tcp-ip.or.jp>
+
+	* src/kwnmz.pl.in, lib/nmzdb.pl: New files.
+
+	* src/Makefile.am, configure.in: Add src/kwnmz.
+
+1999-09-14  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* template/NMZ.head.{en,ja}: Remove unnecessary
+	<input type="hidden" name="whence" value="0">.
+
+	* src/form.c (check_checkbox): Fix a subtle bug: put "checked"
+	accidentally.
+	
+	* src/regex.[ch]: Imported from source codes of Ruby 1.4.
+	
+	* template/NMZ.{head,body}.{en,ja}: Use CSS1 for decoration.
+
+1999-09-13  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* src/{conf.c,namazu.h,re.c,re.h,util.c,util.h,var.c,var.h}:
+	Rearrange REPLACE related codes.
+
+	* src/mknmz.pl.in (load_document): Modify the way to masure text
+	size. [namazu-dev 417]
+
+1999-09-13  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* New File::MMagic module.
+
+	* Add setup_magic function.
+
+1999-09-11  Masao Takaku <masao@ulis.ac.jp>
+
+	* src/mknmz.pl.in (load_document): Add kanji contained check for
+	$weighted_str.
+	
+	* src/mknmz.pl.in (put_field_index): Fix a bug with too long field
+	texts.
+
+1999-09-11  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* src/mknmz.pl.in (write_message): Fix a bug: can't parepare
+	NMZ.body.{en,ja}.
+	
+	* template/NMZ.body.ja: Rewrite a little.
+
+	* template/NMZ.body.en: Rewrite all descriptions.
+
+	* tknamazu/configure.in (AC_OUTPUT): Add tknamazu.spec.
+	
+	* configure.in: Suppress useless messages.
+
+1999-09-11  Ryuji Abe <raeva@t3.rim.or.jp>
+
+	* configure.in: export $bindir/namazu and $bindir/mknmz in config.cache.
+
+1999-09-10  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* Makefile.am (dist-hook): Handle CLEANFILES and CLEANDIRS well.
+
+	* Makefile.am (CLEANDIRS): conf/conf File-MMagic/CVS.
+
+	* Makefile.am (CLEANFILES): Add lib/var.pl lib/conf.pl.
+
+	* Makefile.am (EXTRA_DIRS): Add `conf'.
+	
+	* src/mknmz.pl.in: Add --meta option for meta tag handling. 
+
+	* src/conf.pl.in: Add $META_TAGS variable for specifying meta tags
+	which you want to do field-specified search with.
+	
+	* filter/html.pl (get_meta_tags): Implement a feature to handle
+	meta tags. Thanks to <eschmid@s.netic.de> for the good idea.
+	
+	* re.c (regex_grep): Fix a bug in no matching case.
+
+1999-09-09  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* template/NMZ.body.ja: Rewrite descriptions.
+	
+	* configure.in: Avoid runnning tknamazu/configure when lynx or
+	wish are not exist. [namazu-dev 402]
+	
+	* configure.in (AC_OUTPUT): Add src/vfnmz.
+
+	* src/Makefile.am (bin_SCRIPTS): Add vfnmz.
+
+	* src/vfnmz.in: New file.
+
+1999-09-08  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* configure.in (AM_INIT_AUTOMAKE): Change a version number to 1.9.4.
+
+	* template/NMZ.head.{en,ja}: Add a comment:
+	<!-- <input type="hidden" name="idxname" value="foobar"> -->
+
+	* src/mknmz.pl.in, lib/usage.pl: Add -h, --mailnews option for
+	limitting target files to mail/news. (identical with
+	--media-type=message/rfc822 )
+	
+	* src/mknmz.pl.in, lib/usage.pl: Add --media-type=type option for
+	skipping media type guessing with File::MMagic.
+	
+	* lib/find.pl: Abolish fncmp().
+
+1999-09-08  NOKUBI Takatsugu <knok@daionet.gr.jp>
+
+	* Update File::MMagic.
+
+	* Optimized filetype checking routine.
+
+1999-09-07  Ryuji Abe <raeva@t3.rim.or.jp>
+
+	* configure.in: Using AC_CONFIG_SUBDIRS macro for tknamazu configuration.
+
+	* src/Makefile.am(CLEANFILES): Only mknmz.
+
+	* tknamazu/README.tknamazu: Renamed README.
+
+	* tknamazu/ChangeLog: New File.
+
+	* tknamazu/AUTHORS, COPYING, ChangeLog, INSTALL, NEWS: New Files. 
+
+	* tknamazu/aclocal.m4, configure.in, configure: New Files.
+
+	* tknamazu/Makefile.am: See tknamazu/ChangeLog.
+
+	* tknamazu/tknamazu.tcl.in: See tknamazu/ChangeLog.
+
+1999-09-07  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* configure.in (AM_INIT_AUTOMAKE): Change a version number to 1.9.3.
+
+	* src/mknmz.pl.in (wordcount_sub): Improve efficiency a bit.
+	
+	* src/mknmz.pl.in: s/fid/docid/g
+
+	* src/mknmz.pl.in: 'grep !/^$/, @words' -> 'grep {$_ ne ""} @words'
+
+	* lib/seed.pl, src/mknmz.pl.in: Change @Seed handling.
+	accesing @seed::Seed is slower than accessing @Seed directly.
+	
+	* Makefile.am (CLEANFILES): Remove lib/var.pl lib/conf.pl entries.
+
+1999-09-07  NOKUBI Takatsugu <knok@daionet.gr.jp>
+
+	* src/mknmz.pl.in: Changed to create File::MMagic object once.
+
+1999-09-06  Ryuji Abe <raeva@t3.rim.or.jp>
+
+	* configure.in: Fixed incorrect warnings.
+
+	* src/Makefile.am: Removed $(bin_SCRIPTS) at CLEANFILES.
+
+	* tknamazu/Makefile.am: Likewise.
+
+1999-09-06  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* form.c (replace_action): Replace {cgi} with suitable namazu.cgi
+	location on the fly.
+
+	* src/util.c (subst): New function.
+
+	* templates/NMZ.head.{ja,en}: Abolish $conf::CGI_ACTION but
+	introduce {cgi} instead. And add [Help] link next to Search! button.
+	
+	* configure.in: Remove cgi-location related codes.
+
+	* lib/conf.pl.in: Abolish $CGI_ACTION.
+
+	* **/*.pl{,.in}, src/*.[ch]: Translate all comments into English.
+	
+	* src/namazu.h, src/*.[ch]: Rename names of hlist_data members.
+	
+	* template/NMZ.head.{ja,en}, src/{cgi,form}.c: Rename a CGI
+	variable: key -> query
+	
+	* src/namazu.c: Rename option: --no-replace-uri -> --no-replace
+
+	* src/message.c, lib/usage.pl: Rewrite Englisu usages.
+
+1999-09-05  masao@ulis.ac.jp (Masao Takaku)
+
+	* lib/usage.pl,src/message.c: Fix a typo and obsolete messages.
+
+1999-09-05  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* configure.in, src/Makefile: Remove lex related codes.
+	
+	* **/*.pl{,.in}: Change all notations for representing hash value:
+	key string must be single-quoted. e.g., $NMZ{log} -> NMZ{'log'}
+	
+	* lib/var.pl.in: Replace $NMZ{log} with $NMZ{'log'} 
+	[namazu-dev 346]
+	
+	* src/field.c (get_field_data): Implement a simple cache
+	mechanism.
+
+	* src/result.c (replace_field): Fix a bug: don't call
+	encode_entity() if HtmlOutput == 0; (it should always be called)
+
+	* src/result.c: Rewrite a scanner for NMZ.result without lex.
+	
+	* src/result.c: New files.
+	
+	* src/result.l: Removed.
+	
+	* src/cgi.c (get_cgi_vars): Fix a bug: can't sort by score at CGI.
+
+1999-09-04  masao@ulis.ac.jp (Masao Takaku)
+
+	* src/mknmz.pl.in: Fix syntax error in perl5.004.
+
+	* src/mknmz.pl.in: Fix flist_ptr bug (for checkpoint).
+
+1999-09-04  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* tknamazu/Makefile.am (tknamazudir):
+	s/@pkgdatadir@/$(pkgdatadir)$/ [namazu-dev 340]
+	
+	* src/mknmz.pl.in (put_log_to_logfile): Replace
+	$var::NMZ{log} with $var::NMZ{'log'} [namazu-dev 339]
+	
+	* src/namazu.c: Fix lacks of *short_options bug.
+
+	* Makefile.am (dist-hook): Remove "cp namazu.spec $(distdir)"
+	
+	* src/namazu.c: Change a timing of calling load_conf() for calling
+	the function only once.
+	
+	* src/var.[ch], src/conf.c: Change the scope of ConfLoaded to
+	static global in  conf.c.
+	
+	* configure.in (AM_INIT_AUTOMAKE): Change a version number to 1.9.1.
+	
+	* template/namazu.conf-dist: Modify a bit.
+
+	* src/conf.c: Abolish $HOME substitution.
+	
+	* template/namazu.conf-dist: Rewrite descriptions.
+	
+	* src/conf.c: Rewrite an analizer for .namazurc or namazu.conf overall.
+	
+	* src/namazu.c: Fix --config option bug.
+	
+	* src/form.c: Modify to handle new type <form> ... </form>
+	
+	* src/cgi.c: Rename CGI variables. And Change a way to specify
+	"sort=" variable.
+
+	* template/NMZ.head.ja: Use Kanji in descriptions for "option".
+	
+	* src/*.[chl]: Change condition styles: 
+	    "!strXXcmp()" -> "strXXcmp() == 0"
+	
+	* src/field.[ch]: Define FIELD_SAFE_CHARS in field.h and use it in
+	field.c (is_field_safe_char).
+	
+	* src/*.[chl]: s/SortDirection/SortOrder/g;
+	
+	* src/cgi.c: Use strprefixcasecmp() instead of strncmp().
+
+1999-09-03  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* src/hlist.c: Introduce set_rank() for STABLE sorting.
+
+	* src/hlist.c: Abolish nmz_mergesort() and introduce qsort(3) for
+	sorting. 
+	
+	* src/namazu.h, src/hlist.c: Change data structure of HLIST to
+	better one.
+	
+	* src/mknmz.pl.in (append_index): Fix a bug: Can't update index
+	correctly. [namazu-dev 322]
+	
+	* src/mknmz.pl.in (complete_field_info): Fix a bug: condition for
+	setting "(unknown)" to $fields->{'from'} .
+
+	* src/mknmz.pl.in: Rename: make_field_index -> complete_field_info
+
+	* src/mknmz.pl.in (check_present_index): Fix a bug. [namazu-dev 322]
+	
+	* src/mknmz.pl.in: Replace get_unpackw() with readw() which is
+	used in gcnmz.in by <furukawa@tcp-ip.or.jp>.
+	
+	* src/gcnmz.in: New gcnmz was contributed by <furukawa@tcp-ip.or.jp>.
+	
+	* src/hlist.c (prep_field_sort): Aply reverse_hlist() at first. 
+	
+	* src/search.c (search_main) : Don't re-sort if SortMethod ==
+	SORT_BY_DATE.
+
+1999-09-02  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* src/result.l: Fix --list option bug.
+
+	* src/output.c: Modify a little bit.
+
+	* src/*.[chl]: Improve efficiency of field-specified sorting.
+	
+	* src/{namazu,message}.c: Change a option name: 
+	--reverse -> --ascending
+	
+	* src/*.[chl]: Implement namazu --sort=field:title option.
+	
+	* src/util.[ch]: Implement the following functions:
+		int strprefixcmp(uchar *, uchar *);
+		int strsuffixcmp(uchar *, uchar *);
+		int strprefixcasecmp(uchar *, uchar *);
+		int strsuffixcasecmp(uchar *, uchar *);
+	
+	* src/{cgi,form}.c: Make all string comparisons case insensitive.
+	
+	* template/*, src/*.c: s/dbname/idxname/g
+	
+	* lib/mhonarc.pl: Implement detection codes for MHonArc's index
+	files such as maillist.hml or threads.html.
+
+1999-09-01  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* acconfg.h: Rename several macro definiions for C program.
+	(I edited config.h.in a few minutes ago but it's meaningless)
+
+	* configure.in, config.h.in, src/{var,message.c}:
+	Rename several macro definiions for C program.
+	
+	* src/*.[ch]: s/DEFAULT_DIR/DEFAULT_INDEX/g
+	
+	* src/namazu.c: s/dbnames/idxnames/g
+	
+	* src/hlist.c (malloc_hlist): Set hlist->n = n; at the ending.
+	
+	* src/{usage,message}.c: Modify namazu's usages.
+	
+	* src/conf.c (show_conf): Modify messages.
+
+	* src/mknmz.pl.in, lib/var.pl.in: Rename an variable:
+	%conf::Supported -> %var::Supported 
+	
+	* src/mknmz.pl.in: Add --show-config option and implement
+	show_config() function. 
+
+	* src/mknmz.pl.in (put_log): Modify loggin messages a bit.
+	
+	* tknamazu/Makefile.am (CLEANFILES): Add $(bin_SCRIPTS).
+	
+	* template/NMZ.head.{en,ja}: Abolish using "format={short,long}" 
+	but use "result=ext" instead.
+	
+	* src/cgi.[ch]: Implemented codes to handle result=ext in CGI
+	query.
+	
+	* src/{namazu,usage}.c: Add --result=ext option for specifying
+	NMZ.result.ext.
+
+	* src/{namazu,usage}.c: Change identifiers of  sevaral command
+	line options.
+	
+	* src/namazu.c (parse_options): Be effective -s option.
+	
+	* src/result.l (print_hlist): Support choicing a correct
+	NMZ.result.foobar file.
+	
+	* src/mknmz.pl.in (write_result_file): Support making multiple
+	NMZ.result.* files.
+
+	* template/NMZ.result.{normal,short}: New files.
+
+	* template/NMZ.result: Removed
+	
+	* src/mknmz.pl.in, lib/var.pl.in, src/{hlist,search}.c:
+	Implement codes to integrate NMZ.i and NMZ.w. [namazu-dev 294]
+
+	* lib/util.pl (remove_tmpfiles): Add a condition to return if
+	$var::Opt{debug} in the beginning of the function;
+	
+	* src/search.c: s/forward_match/prefix_match/g;
+	s/backward_match/suffix_match/g;
+	
+	* src/mknmz.pl.in (load_document): Fix stupid bugs which I made
+	yesterday. (I forgot preceding `$' mark for ref values)
+
+ 	* tknamazu/{Makefile.am,README.tknamazu}:
+	s/tknamazu.xpm/tknamazu.ppm/g
+	
+	* tknamazu/tknamazu.tcl.in: Use .ppm instead of .xpm
+
+	* tknamazu/tknamazu.ppm: New file.
+	
+	* tknamazu/tknamazu.xpm: Removed.
+
+1999-09-01  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* filter/gzip.pl: Fix opposite condition in status() function.
+	
+	* ChangeLog: Reorder log.
+
+	* Makefile.am: Remove necessary files in CLEANFILES.
+
+	* src/mknmz.pl.in: Exclude gfilter.pl from filters/*.pl in 
+	load_mocules() functions.
+
+1999-08-31  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* lib/wakati.pm: Fix `tmpname' function name typo.
+
+	* lib/var.pl, src/mknmz.pl.in: Add %REQUIRE_CODECONV variable.
+
+	* filter/*.pl: Add codeconv() function.
+
+	* filter/man.pl: Add codeconv::toeuc() before man_filter().
+
+	* filter/pdf.pl: Add `-q' option with $pdfconvpath program.
+
+	* lib/util.pl: Add filesize() function.
+
+	* src/mknmz.pl.in: Add filesize check before reading file.
+
+	* src/mknmz.pl.in: Add %Supported check.
+
+	* filter/*.pl, src/mknmz.pl.in: Add return value on filter::filter()
+	functions.
+
+1999-08-31  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* src/mknmz.pl.in (load_document): Move some codes from the bottom
+	to "if (defined $var::REQUIRE_CODECONV{$mtype}) {}" block.
+	
+	* filter/mailnews.pl (filter): Add mailnews_citation_filter()
+	process. (this fix an awful bug...)
+	
+	* conf/Makefile.am (mknmz.conf-dist): Modify regex for perl to
+	treat %, @ prefixes as well as $.
+	
+	* Makefile.am (EXTRA_DIST): Add namazu.spec.
+	
+	* Makefile.am (DIST_SUBDIRS): Remove File-MMagic because it causes
+	error at "make dist" time.
+	
+	* lib/var.pl.in: Remove serveal media types from
+	%REQUIRE_CODECONV. (undo)
+
+	* src/result.l (get_field_data): Insert commas if given filed is a
+	numeric string.
+	
+	* src/util.c: Add isnumstr() and commas() functions.
+	
+	* tknamazu/{Makefile.am,README.tknamazu}:
+	s/tknamazu.gif/tknamazu.xpm/g
+	
+	* tknamazu/tknamazu.tcl.in: Use .xpm instead of .gif
+
+	* tknamazu/tknamazu.xpm: New file.
+	
+	* tknamazu/tknamazu.gif: Removed.
+	
+	* lib/var.pl: Add serveal media types into %REQUIRE_CODECONV.
+	
+	* src/mknmz.pl.in (generate_uri): Modify a way of applying eval.
+	
+	* src/mknmz.pl.in, lib/usage.pl: Add --update=s and implement
+	its codes.
+
+	* src/mknmz.pl.in, lib/usage.pl: Add --deny=s --exclude=s and
+	implement their codes.
+	
+	* src/mknmz.pl.in: Modify it to be able to take multiple targets
+	as command line arguments.
+	
+	* lib/util.pl: Modify cdie() to use `exit' instead of `die'
+	because `die' cause a annoying message for ordinary users. :-)
+	
+	* src/mknmz.pl.in, lib/usage.pl: Add --replace=s option for
+	transforming URI. And abolish a PREFIX argument in command line.
+	
+	* filter/gfliter.pl, filter/mailnews.pl: Move uuencode_filter()
+	from gfilter.pl to mailnews.pl.
+	
+	* filter/html.pl: s/url/uri/g;
+	
+	* lib/conf.pl.in: Change $DEFAULT_FILE: _default -> index.html
+
+1999-08-31  Ryuji Abe <raeva@t3.rim.or.jp>
+
+	* Makefile.am: If configured, tknamazu will be built. Changed to 
+	  use dist-hook section to distribute namazu.spec.
+
+	* configure.in: Bumped version to 1.90. Added tknamazu configuration.
+
+	* namazu.spec.in: Deleted COMMITTERS at %files.
+
+	* src/Makefile.am: Cleaned up.
+
+	* tknamazu/README: Renamed README.tknamazu.
+
+	* tknamazu/Makefile.am: New file.
+
+	* tknamazu/Makefile.in: Likewise.
+
+	* tknamazu/tknamazu.tcl: Renamed tknamazu.tcl.in with autoconfize.
+
+	* tknamazu/Makefile: Removed.
+
+	* tknamazu/Makefile.W32: Likewise.
+
+	* tknamazu/tknamazu.sample: Likewise.
+
+	* tknamazu/tknamazu.bat.sample: Likewise.
+
+1999-08-30  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* lib/codeconv.pl: Fix `tmpname' function name typo.
+
+	* Makefile.am: Ignore test command return value on 
+	  install-data-local target.
+
+1999-08-30  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* Makefile.am (install-data-local): Remove codes creating
+	namazu.conf and mknmz.conf.
+	
+	* src/mknmz.pl.in lib/util.pl: Move remove_tmpfiles from
+	src/mknmz.pl.in to lib/util.pl. And modify it.
+	
+	* lib/util.pl: Add `cdie()' function to remove temporary files
+	before mknmz die. mknmz MUST always dies with this function.
+	
+	* src/mknmz.pl.in (read_config): Use `do' instead of `require' for
+	multiple calling of read_config().
+	
+	* lib/conf.pl: New file for containing default values which may
+	overriden by mknmz.conf or ~/.mknmzrc
+	
+	* conf/mknmz.conf-dist.in: Removed
+	
+	* conf/Makefile.am : New file for creating mknmz.conf-dist at make
+	time.
+	
+	* src/Makefile.am (install-data-local): Add codes to Removed
+	`Makefile*' in the install directory. (for `conf' directory)
+
+	* conf/mknmz.conf-dist.in: Append "|.*\.pdf|.*\.doc" regex into
+	$ALLOW_REGEX for handling pdf and msword documents by default.
+	And remove `_default' target.
+	
+	* src/mknmz.pl.in, conf/mknmz.conf: Abolish $FILE_SIZE_LIMIT but
+	introduce $TEXT_SIZE_MAX instead for handling binary files such as
+	pdf and msword.
+
+	* src/mknmz.pl.in, lib/usage.pl: Abolish the following options and
+	  remove their codes.
+	    -R, --no-regex-index
+	    -W, --no-date-index
+	    -X, --no-field-index
+	    -M, --no-mhonarc
+	    -L, --no-line-adjust
+	    -h, --rfc822   (dummy option alives)
+	    -u, --uuencode (dummy option alives)
+	    -r, --man
+
+	* src/mknmz.pl.in, lib/usage.pl: Change the option letter for 
+	`--lang=s': `-l' -> `-L'
+
+	* filter/*.pl: s/ unless \$var::Opt{NoLineAd};/;/
+	
+	* **/*.pl{,.in}: Lower all keys of %var::Opt.
+	
+	* src/mknmz.pl.in: Remove all codes like "while (<$fh>)"
+	because of its deanger. ($_ is a global value)
+	
+	* src/mknmz.pl.in, lib/var.pl: Abolish NMZ.{total,keys} and
+	instead introduce NMZ.status for their values.
+	
+	* src/mknmz.pl.in (put_registry): Fix a variable name typo.
+	
+	* filter/*.pl: Change timing of dosing util::tmpnam()
+
+	* lib/util.pl (tmpnam): Name file name with $var::OUTPUT_DIR
+	
+	* src/mknmz.pl.in, lib/var.pl: Change all NMZ.* file name
+	representations using %var::NMZ instead of %var::File. 
+
+	* src/mknmz.pl.in (make_headfoot): Fix $templatedir2.
+	
+	* src/{namazu,message}.c: Rename options: s/--hit-count/--count/
+	s/output-file/output/
+	
+	* lib/util.pl: Remove useless codes from dprint and vprint.
+
+1999-08-29  masao@ulis.ac.jp (Masao Takaku)
+
+	* src/search.c: Ignore TOO_MUCH_HIT word in phrase query.
+
+1999-08-29  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* src/mknmz.pl.in (make_field_index): Add codes to set '(unknown)'
+	to $fields->{'from'} when it's not set.
+	
+	* src/Makefile.am: Fix lacks of noinst_HEADERS
+	
+	* lib/util.pl (readfile): Comment out $conf::FILE_SIZE_LIMIT
+	condition codes.
+	
+	* src/mknmz.pl.in: Abolish use of $size argument and modify size
+	handling to treat a binary file well such as .gz, .pdf, .doc. 
+
+	* filter/*.pl: Abolisu use of $size argument.
+
+	* src/mknmz.pl.in: Abolish use of $ctrl in check_file() and
+	load_document().
+
+	* lib/util.pl (checkcmd): Fix a typo.
+	
+	* filter/mhonarc.pl (mediatype): Fix typos.
+
+	* filter/*.pl: s/\$contents/\$contref/g
+	
+	* src/mknmz.pl.in: Change timing of code conversion.
+	
+	* lib/codeconv.pl: Add eucto() function.
+
+	* src/mknmz.pl.in: Remove codeconv() function.
+	
+	* filter/rfc.pl (rfc_filter): Fix bad use of
+	html::encode_entity()
+	
+	* src/mknmz.pl.in: Remove istext() function.
+
+	* src/mknmz.pl.in (load_document): Use File::check_binary()
+	instead of istext().
+	
+	* filter/html.pl (get_title): Fix.
+
+	* src/mknmz.pl.in (namazu_core): Remove $url.
+
+1999-08-28  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* src/mknmz.pl.in: Add istext() and codeconv() functions.
+	
+	* src/mknmz.pl.in (load_document): Move a place of codes of code
+	conversion because its timing was bad.
+
+	* filter/gfilter.pl: New file.
+	
+	* filter/*.pl: s/filter ($$$$$$$)/filter ($$$$$$)/
+
+	* src/mknmz.pl.in: s/checktype_content/checktype_contents/
+	
+	* src/mknmz.pl.in: Add global variable $TestMode for testing.
+	
+	* configure.in: Add --enable-test option for testing.
+	
+	* src/search.c (hash): Modify "j % 4" -> "j & 03"
+
+	* src/mknmz.pl.in (hash): Modify "$i % 4" -> "$i & 03"
+
+	* lib/seed.pl: New file (rename <- seed.pl)
+
+	* lib/hash.pl: Remove   (rename -> seed.pl)
+	
+	* src/mknmz.pl.in: Add `readconf()' function.
+	
+	* lib/util.pl: Modify `dprint' and `vprint' to print prefix
+	characters everytime.
+	
+	* src/mknmz.pl.in: Print a mediatype at processing time by
+	default.
+	
+	* filter/*.pl: Modify them to use `vprint()' to print verbose
+	messages. 
+
+	* filter/*.pl: Fix typos.
+
+	* lib/util.pl: Add funtion called 'vprint()' for printing verbose
+	messaegs. 
+	
+	* filter/supported.pl: Removed
+	
+	* Makefile.am (EXTRA_DIST): Add ChangeLog.old.1.gz
+	
+	* ChangeLog.old.gz: Old ChangeLog (separated)
+	
+	* ChangeLog: Separate.
+	
+	* lib/usage.pl: Convert ISO-2022-JP -> EUC-JP
+
+	* filter/pdf.pf: Remove @PDFTOTEXT_PATH@.
+
+	* filter/gzip.pl: Remove @GZIP_PATH@.
+	
+	* ChangeLog: Change order to place a latest log on the top. 
+	
+	* Makefile.am (install-data-local): Add codes to creat configs
+	file if no config files exist. 
+
+	* src/{mknmz.pl.in,Makefile.am}: Add codes to handle CONFDIR.
+
+	* **/*.pl{,.in}: Move non-config variables from conf:: to var::.
+
+	* lib/conf.pl.in: Removed
+
+	* **/*.pl{,.in}: s/foreach /for /g;
+
+	* conf/mknmz.conf-dist.in: New file.
+
+	* configure.in: Modify AC_OUTPUT.
+
+	* lib/var.pl.in: New file.
+
+	* lib/namazu.conf-dist: Remove.
+
+	* configure.in: Remove filter command detection codes.
+
+	* filter/rfc.pl.in: Fix rfc_filter();
+
+	* filter/msword.pl.in: Fix status();
+
+	* filter/mailnews.pl: Fix mailnews_filter arguments.
+
+	* filter/html.pl: Fix html_filter() arguments.
+
+	* filter/mhonarc.pl: Fix a typo.
+
+	* **/*.pl{,.in}: Restore prefix `util::'
+
+	* src/*.[ch]: Rename HLIST_MAXMAX -> RESULT_MAX.
+
+1999-08-27  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* lib/util.pl: Add checkcmd function.
+
+	* filter/*.pl, src/mknmz.pl.in: Implement dynamic command ditection.
+
+	* lib/conf.pl.in: Add %supported variable.
+
+1999-08-27  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* src/mknmz.pl.in: Silence warnings.
+	
+	* src/*.[ch]: Rearrange many codes.
+
+	* src/{var.c,var.h,em.h,magic.h,critical.h}: New files.
+
+	* src/{type.h,values.c,variable.h,enum.h}: Remove.
+
+	* lib/html.pl: Remove.
+
+	* Makefile.am: Add AUTOMAKE_OPTIONS = no-dependencies
+
+	* src/*.[ch]: Rename variables for NMZ.* files.
+
+	* mknmz, namazu: Change behavior when no arguments are given to
+	show simple messages like "Try `namazu --help' for more options."
+	by using show_mini_usage().
+
+	* src/mknmz.pl.in: Add show_mini_usage();
+
+	* src/mknmz.pl.in, filter/*, lib/*: s/util:://g
+
+	* lib/util.pl: Remove `package util'
+
+	* lib/util.pl: Rename some functions
+
+	* src/mknmz.pl: Rename some functions
+
+	* Makefile.am, src/Makefile.am: Change packagedir (omit @VERSION@)
+	[namazu-dev 192]
+
+1999-08-26  Ryuji Abe <raeva@t3.rim.or.jp>
+
+	* Makefile.am: Added namazu.spec to EXTRA_DIST and removed rpm target.
+        
+	* configure.in: Added AC_OBJEXT macro.
+        
+	* namazu.spec.in: See %changelog section.
+
+1999-08-26  NOKUBI Takatsugu  <knok@daionet.gr.jp>
+
+	* filter/*, lib/filter.pl, src/mknmz.pl.in: Fix $title probrem.
+
+1999-08-26  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* src/configure.in: Add codes to make filter/supported.pl.
+	[namazu-dev 199]
+
+	* configure.in: Add codes to detect Compress::Zlib module.
+	
+	* src/Makefile.am: Add "libdir" macro.
+
+	* Makefile.am: Change dist-hook: to remove CVS directories.
+
+	* configure.in: Add codes to chedk "File::MMagic" module.
+
+	* Makefile.am: Add "@FILE_MMAGIC@" into SUBDIRS
+
+	* Makefile.am: Add "File-MMagic" into EXTRA_DIST
+
+	* Makefile.am: Add CLEANDIRS entry (additional macro)
+
+	* Makefile.am: Add "supported.pl" into CLEANFILES.
+
+	* filter/supported.pl: New file.
+
+	* src/configure.in, filter/{man.pl,compress.pl}: Substitute
+	@{GROFF,ZCAT}_PATH@ for @OPT_HELPER_{GROFF,ZCAT}@.
+
+	* src/util.c (die): Print program name in error message.
+
+	* src/message.[ch]: Change a variable MSG_MIME_HEADER to macro.
+
+	* src/values.c: Set HtmlOutout to 0.
+
+	* Makefile.am: Modify install-data-local and dist-hook.
+
+	* configure.in: Modify AC_OUTPUT according to removed files.
+
+	* src/Makefile.am: Add an CLEANFILES entry.
+
+	* src/{clnmz.in,rvnmz.in,vfnmz.in}: Removed files.
+
+	* Makefile.am: Add an CLEANFILES entry.
+
+1999-08-25  Satoru Takabayashi  <satoru-t@is.aist-nara.ac.jp>
+
+	* Makefile.am, src/Makefile.am: Change a directory structure for
+	installing.
+
+	* src/mknmz.pl.in: Fix conflicted parts. (temporary)
+
+	* template/NMZ.*: New files.
+
+	* lib/NMZ.*: Remove files.
+
+	* src/{re.c,usage.c,message.c,field.c}: New files.
+
+	* src/{cgi.h,field.h,hlist.h,parser.h,result.h,codeconv.h,form.h,
+	message.h,re.h,search.h,variable.h,conf.h,type.h,wakati.h,enum.h,
+	output.h,usage.h}: New files.
+
+	* src/*.[ch]: Rerrange C coding styles.
+
+	* configure.in, src/Makefile.am, src/wdnmz.in:
+	Remove wdnmz.in
+
+1999-08-25 NOKUBI Takatsugu <knok@daionet.gr.jp>
+
+	* ChangeLog: merge conflicted parts.
+
+1999-08-24 NOKUBI Takatsugu <knok@daionet.gr.jp>
+
+	* lib/conf.pl.in, lib/filter.pl, lib/util.pl, src/mknmz.pl.in:
+	  merge with knok-filter-1.
+
+1999-08-23  Satoru Takabayashi <satoru-t@is.aist-nara.ac.jp>
+
+	* src/namazu.c: Implement a suicide code.
+
+	* src/mknmz.pl.in: Implement a signal handler for SIGINT (mknmz)
+
+	* src/{hlist.c,result.l,output.c}, lib/NMZ.result: Implement a
+	keyword emphasizing in HTML mode. (rough implementation)
+
+	* src/form.c: Modified not to display ugly '<>' in a title of
+	  HTML.
+
+1999-08-23 NOKUBI Takatsugu <knok@daionet.gr.jp>
+
+	* Makefile.am, configure.in: merge with knok-filter-1.
+	* lib/util.pl: merge and add tnpnam function.
+
+1999-08-13  Satoru Takabayashi <satoru-t@is.aist-nara.ac.jp>
+
+	* src/mknmz.pl.in: Change index formats of NMZ.[ip] to compress
+	them.
+
+	* src/search.c, src/hlist.c: Support new formats.
+	  - NOTE: an old index format is no longer supported.
+
+	* lib/NMZ.result: Modify a little bit.
+
+	* src/conf.c, src/namazu.c: Modify LIST implementations a bit.
+
+1999-08-12  masao@ulis.ac.jp (Masao Takaku)
+
+	* src/search.c: Fix TfIdf scoring bug.
+
+	* src/namazu.h, src/values.c: Delete NMZ.{f,fi} related code.
+	
+1999-07-22  Satoru Takabayashi <satoru-t@is.aist-nara.ac.jp>
+
+	* configure.in: Add a feature to determine admin's email address
+	automatically: imported the code from Apache's buildinfo.sh
+
+1999-07-09  masao@ulis.ac.jp (Masao Takaku)
+
+	* mknmz.pl.in: Fix field_indices bug occurred at re-exec
+
+	* mknmz.pl.in: Fix -k and -c options bug
+
+	* src/Makefile.am: Added getopt.c, getopt1.c, getotp.h entries 
+
+1999-07-06  masao@ulis.ac.jp (Masao Takaku)
+
+	* mknmz.pl: Fix --checkpoint, --include, --target-list
+	related bugs.
+
+	* Makefile.am, src/Makefile.am: Fix lib directory and
+	add getopt.[ch]
+	
+1999-06-12  Satoru Takabayashi <satoru-t@is.aist-nara.ac.jp>
+
+	* src/result.l: New file. formatter for search results 
+	made by using lex
+
+	* src/result.c: New file. made by lex automatically
+
+	* src/{messages,search,form}.c: lower all HTML elements
+
+	* lib/NMZ.*.{en,ja}: lower all HTML elements
+
+	* lib/NMZ.results: New file. a template file for search results
+
+	* src/regex.[ch]: Reimported sources from Ruby v1.2.5
+	
+1999-05-30  Satoru Takabayashi <satoru-t@is.aist-nara.ac.jp>
+
+	* src/namazu.c: Modified it to use GNU getopt.c for parsing
+	command line options and to support long-name options.
+
+	* src/getopt.[ch], src/getopt1.c: GNU getopt.c added.
+	
+1999-05-29  Satoru Takabayashi <satoru-t@is.aist-nara.ac.jp>
+
+	* lib/conf.pl.in: Modified a usage message in Japanese vastly.
+
+	* src/mknmz.pl: Modified command line option parsing codes
+	using Getopt::Long module.
+
+	* src/cgi.c: Fixed validate_dbname() bug and
+	  - [MAEDA Atusi <maeda@is.uec.ac.jp>] - patch
+
+	* src/hlist.c: Fixed put_hlist bug
+	  - [MAEDA Atusi <maeda@is.uec.ac.jp>] - report
+
+	* src/namazu.c: Modified command line option parsing codes
+	
+1999-05-14  Satoru Takabayashi <satoru-t@is.aist-nara.ac.jp>
+
+	* src/mknmz.pl: Fixed lockfile related code (subtle problem)
+
+	* lib/html.pl: Modified parse_robots_txt a little bit
+
+1999-05-07  Satoru Takabayashi <satoru-t@is.aist-nara.ac.jp>
+
+	* src/mknmz.pl.in: Fixed -F & -s option bug [namazu 647]
+	  - [SHIOZAKI Takehiko <takehi-s@ascii.co.jp>] - report

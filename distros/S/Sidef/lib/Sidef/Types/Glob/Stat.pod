@@ -1,0 +1,160 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Glob::Stat
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = Stat.new(...);
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef::Object::Object
+
+=head1 METHODS
+
+
+=head2 all
+
+Stat.all() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 atime
+
+Stat.atime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 blksize
+
+Stat.blksize() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 blocks
+
+Stat.blocks() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ctime
+
+Stat.ctime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 dev
+
+Stat.dev() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 gid
+
+Stat.gid() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ino
+
+Stat.ino() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 lstat
+
+Stat.lstat() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 mode
+
+Stat.mode() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 mtime
+
+Stat.mtime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 nlink
+
+Stat.nlink() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 parent
+
+Stat.parent() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 rdev
+
+Stat.rdev() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 size
+
+Stat.size() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 stat
+
+Stat.stat() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 uid
+
+Stat.uid() -> I<Obj>
+
+Return the
+
+=cut

@@ -1,0 +1,8 @@
+Revision history for Perl extension Set::IntSpan::Partition.
+
+0.02 November 2013
+  - Improved version that keeps track of splits and uses a heap
+    for O(n log n)-ish rather than O(n^2)-ish performance.
+
+0.01  Thu Feb 12 08:50:37 2009
+	- original version; created by h2xs 1.23

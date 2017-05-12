@@ -1,0 +1,38 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.61.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 64ccc0a52d408a485f68c4cf27f74f3b59b9ab16 Build.PL
+SHA1 3f95629b7c8dd8087e416e5c10a9ea8cf2fce899 Changes
+SHA1 e409c6eef568d35cca94d701a2d1b6ea19193ce9 LICENSE
+SHA1 728615d82017d20334ee49d14f6a3c94e7256216 MANIFEST
+SHA1 77c83f8fd6bf4bfd3a7f5d98ee0bbe7745754d58 META.yml
+SHA1 32b4d7397b53e3997cad1bcba2349b1cd2d63c94 Makefile.PL
+SHA1 c7fa81c850d852efcbb4fe462e58dba2032a31de README
+SHA1 a2e1d18a207ab558f0eea8ef6c7783dbf144e4e4 lib/Scalar/Andand.pm
+SHA1 6ff9dab2b0637ca8743cf3f2603795afd0150aaa lib/Scalar/Andand/Scalar.pm
+SHA1 c2b72d5cea0607f4ee7518962d63953d29c8cc4d lib/Scalar/Andand/Undef.pm
+SHA1 5a84b484c962fc55c52968fe06b0545a4d816f48 t/00-load.t
+SHA1 fd9a4ef4ae61b093bc52fdba2b436fd5c594674e t/10-basics.t
+SHA1 af239b97890132da6c4589361f27f1aa8c99661c t/11-class_methods.t
+SHA1 bb2b644df3a55263d6851956c8cab3dc89d06532 t/pod-coverage.t
+SHA1 640935336dc1123c0069bcf5432bcaedc2cf22d3 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAkwHxeIACgkQTd+EWiaICwqfUwCbBTc5DcrbpRMfnzKDusuwC/nH
+GuIAmwWD6l4c17+hK+xpHMd0pbQZUjVE
+=9xzF
+-----END PGP SIGNATURE-----

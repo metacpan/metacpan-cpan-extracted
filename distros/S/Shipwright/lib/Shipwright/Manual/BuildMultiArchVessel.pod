@@ -1,0 +1,75 @@
+=head1 NAME
+
+Shipwright::Manual::BuildMultiArchVessel - Build a vessel with multi-arch support
+
+=head1 SYNOPSIS
+
+In this tutorial, we'll build a vessel with multi-arch support, a.k.a
+the vessel that I can use on multiple systems, e.g. Mac and Ubuntu.
+
+=head1 DESCRIPTION
+
+Shipwright starts to have multi-arch vessel support since 2.3.0.
+Since then, all installed bin dirs and lib will live in as/$arch_name, instead of top dir.
+
+=head2 create
+
+the vessel source is exactly the same as normal one.
+The only different part is the way we build vessel with I<bin/shipwright-builder>
+We need to build the vessel on both Mac and Ubuntu.
+
+Let's do this on Mac first:
+
+    $ ./bin/shipwright-builder --install-base /tmp/foo --as Mac
+
+if we don't specify --as, the default name is the system's uname.
+e.g. the name is Darwin on Mac.
+
+after we built it on Mac, we need to transfer both shipyard and vessel to
+ubuntu, then build it again, to let it build to the same vessel dir.
+
+    $ ./bin/shipwright-builder --install-base /tmp/foo --as Ubuntu
+
+ditto. if we don't specify --as, the as name will be Linux
+
+Then we're done, the built vessel can run on both Mac and Ubuntu systems now.
+
+=head2 fiddle
+
+most CPAN modules are written in Perl, so is cross-platform, this will results
+in not less redundance in vessel, we can use shipwright-filter to squeeze it:
+
+    $ ./bin/shipwright-filter --squeeze
+
+This will remove redundant files and link to the left files.
+
+e.g. as/Mac/lib/perl5/App/SD.pm and as/Ubuntu/lib/perl5/App/SD.pm have the
+same content, after the above cmd, the latter one will be deleted and (hard)
+linked to the former one.
+
+=head2 use
+
+the multi-arch vessel can't auto-switch between the systems for us, so we need
+to run a cmd to tell it to, e.g.
+
+    $ cd /tmp/foo
+    # on Mac, we switch to Mac
+    $ ./tools/shipwright-utility --switch Mac
+    # on Ubuntu, we switch to Ubuntu
+    $ ./tools/shipwright-utility --switch Ubuntu
+
+=head1 SEE ALSO
+
+L<Shipwright>, L<Shipwright::Manual>
+
+=head1 AUTHORS
+
+sunnavy  C<< <sunnavy@bestpractical.com> >>
+
+=head1 LICENCE AND COPYRIGHT
+
+Shipwright is Copyright 2007-2015 Best Practical Solutions, LLC.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

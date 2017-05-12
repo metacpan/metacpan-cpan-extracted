@@ -1,0 +1,54 @@
+Statistics-ROC version 0.04
+===========================
+
+ROC.pm - A Perl module implementing receiver-operator-characteristic (ROC)
+           curves with nonparametric confidence bounds
+
+  This code implements a method for constructing nonparametric confidence
+  for ROC curves described in     
+        R.A. Hilgers, Distribution-Free Confidence Bounds for ROC Curves, 
+        Meth Inform Med 1991; 30:96-101
+  Additionally some auxilliary functions were ported (and corrected) from 
+  Fortran (Applied Statistics, ACM).
+  
+  A graphical userinterface for drawing and printing these ROC curves is 
+  supplied with the module (roc_ui.pl).
+  Start with:
+	perl roc_ui.pl
+  For a user interface test load "ss_7pkt.dat".
+  
+The module has not changed (apart from the email address update) in comparison to previous versions. The user interface has though (works now with Tk804).
+ 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+The user interface requires these other modules and libraries:
+
+  Tk
+  Tk::DialogBox
+
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Hans A. Kestler
+
+Bugs, comments, suggestions to: 
+              Hans A. Kestler <hans.kestler@uni-ulm.de>
+                              <h.kestler@ieee.org>
+
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

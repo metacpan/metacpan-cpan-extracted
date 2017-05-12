@@ -1,0 +1,119 @@
+Revision history for Socialtext-Utils
+
+0.21 - Tue Jan 12 19:54:04 PST 2010
+  - Add dependency on Crypt::DES
+
+0.20 - Tue Apr 21 13:46:23 PDT 2009
+  - Add ability to use an NLW-user cookie instead of user/pass.
+  - Bugfixes to better work with and without Crypt::CBC
+
+0.19 - Mon Apr 20 11:22:58 PDT 2009
+  - s/localtime/gmtime/ when posting pages
+
+0.18 - Fri Apr 17 15:44:03 PDT 2009
+  - Added stu-tagged-pages utility
+  - stu-most-wanted won't update the page if it didn't change.
+  - Added order() to the mock rester
+  - create a default ~/.wikeditrc if it doesn't exist
+  - stu-local-copy accepts multiple tags
+  - have DefaultRester use CBC::Crypt (if available) to crypt up the password
+  - add an edit summary callback method to Socialtext::EditPage
+
+0.17 - Tue Oct  9 10:03:23 PDT 2007
+  - added extralink wafl
+  - improved/tweaked stu-most-wanted output to link to non-existent pages
+  - added stu-local-copy tool for moving content between a workspace and local
+    disk
+  - made it so that a $pagename.sav file is always written to before the code
+    dies --kevinj
+  - don't add the tag template to pages when creating them from an actual
+    template --kevinj
+  - limited stu-most-wanted to only show the first 100 most wanted pages
+
+0.16 - Wed Aug  8 14:37:47 PDT 2007
+  - fixed bug when PUTting pages with a '/' in the name
+  - Added a WikiObject to return a .pre block on a page
+  - refactored YAML WikiObject to use PreBlock package
+  - Added a WikiObject for parsing two column tables into a hash
+  - removed Socialtext::EditBlog
+
+0.15 - Thu Jun 21 15:40:45 PDT 2007
+  - fixed typo in .wikeditrc docs
+
+0.14 - Thu May 31 10:24:37 PDT 2007
+  - Added --tag to wikedit
+  - fixed bug when editing pages that have a '/'
+  - Updated MANIFEST, so stu-most-wanted is actually packaged :)
+
+0.13 - Thu May 24 12:39:46 PDT 2007
+  - Add stu-most-wanted which produces 'Most Wanted Pages' page
+  - Socialtext::Resting::Getopt doesn't set pass_through globally
+  - Socialtext::EditPage names the tempfiles more meaningfully
+  - Added a .wiki extension to the tempfiles.
+  - Made system() calls in EditPage take LIST form, rather than STRING.
+  - added get_pages() to the mock rester
+
+0.12 - Wed Mar 21 21:40:29 PDT 2007
+  - Refactor Socialtext::Resting::Mock's tag and page handling
+    - It's now more like an in-memory Socialtext::Rester
+  - Added a primative Socialtext::EditBlog
+  - Add stu-save-pages
+  - Use /usr/bin/vim if no $EDITOR
+
+0.11 - Sun Feb 25 10:54:55 PST 2007
+  - YAML wiki object only looks for yaml in the first .pre block
+  - Use Test::Mock::HTTP::Response in Socialtext::Rester::Mock
+
+0.10 - Tue Feb 20 10:46:05 PST 2007
+  - Copy tags from template pages when they're used
+  - Add Socialtext::Resting::Getopt to handle command line args
+  - Fix Mock Rester to match real library's get_pagetags()
+  - Added Socialtext::WikiObject::YAML class
+  - Added Socialtext::WikiObject::Factory which reads magic tags
+    to find the class to create the WikiObject as.
+
+0.09 - Wed Feb 14 17:03:59 PST 2007
+  - Fixed t/wikedit.t when a ~/.wikeditrc isn't there
+
+0.08 - Sun Feb 11 11:18:28 PST 2007
+  - Add edit_last_page(), which opens the most recently
+    edited page tagged with the given tag.
+  - Add --template switch to edit new pages from a template
+  - Add response() method to mock rester
+
+0.07 - Thu Jan 25 11:20:12 PST 2007
+  - Include DefaultRester.pm in the MANIFEST and a unit test
+  - bump version dependencies
+
+0.06 - Tue Jan 23 21:05:35 PST 2007
+  - Added --pull-includes feature
+  - Added extraclude support
+  - Added collision detection when PUTting edits
+  - all unit tests now use Socialtext::Resting::Mock
+  - Added --output option to wikedit
+  - Introduced Socialtext::Resting::DefaultRester class
+    to handle storing user/pass/server/workspace info in one place
+
+0.05 - Tue Jan  9 17:31:52 PST 2007
+  - fixed typo in usage
+
+0.04 - Tue Jan  9 15:58:50 PST 2007
+ - Added Socialtext::Resting::Mock for faking the interface by reading from
+   a file
+ - wikedit now uses .wiki extension for temp files
+
+0.03 - Fri Dec 29 17:10:18 PST 2006
+ - added simple table support
+ - refactored code
+
+0.02 - Sat Dec  9 21:25:05 PST 2006
+ - Removed dependency on Test::Exception
+ - Fixed infinite loop when a smaller heading (^^^^) is seen before a bigger
+   heading (^^)
+ - Fixed handling of mixed list/text in a section
+
+0.01 - Sat Dec  2 19:49:17 PST 2006
+ - wikedit - Edit a wiki page with $EDITOR
+ - Socaltext::EditPage
+   - added callback for further munging
+   - added tag list

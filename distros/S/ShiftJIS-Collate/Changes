@@ -1,0 +1,42 @@
+Revision history for Perl extension ShiftJIS::Collate.
+
+1.10  Sun Aug  7 20:38:33 2011
+    - fix the tarball with world writable files.
+    - rename JAPANESE to Collate/Japanese.pod.
+
+1.03  Sun Jan 14 15:48:21 2007
+    - Bug fix: the order between 0x8157 (U+4EDD) and 0x8158 (U+3005)
+      was reverse. Correctly 0x8157 < 0x8158.
+    - added class.t and nonkanji.t.
+    - added META.yml.
+    - POD in Japanese is renamed as JAPANESE.
+
+1.02  Sat Oct 18 21:05:21 2003
+    - some POD modification
+    - added link to JISC in SEE ALSO in POD.
+
+1.01  Sun Aug 17 22:12:24 2003
+    - English POD (.pod) separated from .pm
+      (CPAN indexer maybe prefers .pod.jp to .pm)
+
+1.00  Sun Aug 17 12:35:01 2003
+    - added Japanese POD (where original terms in JIS are used.)
+
+0.05  Tue Sep 17 22:35:04 2002
+    - doc tweak; especially,
+      about "Yomi-shoki hyogo" and "kan'i-daihyo-yomi shogo".
+    - added some tests.
+
+0.04  Sun May 05 10:36:02 2002
+    - added some tests for index().
+    - modified docs.
+
+0.03  Sat Dec 15 18:02:12 2001
+    - <overrideCJK> is obsolete (see the L<tounicode> parameter).
+    - modified internal.
+
+0.02  Sun Sep 02 21:09:14 2001
+    - added "eq" etc. methods.
+
+0.01  Tue Aug 28 23:14:00 2001
+    - original version; created by h2xs 1.19

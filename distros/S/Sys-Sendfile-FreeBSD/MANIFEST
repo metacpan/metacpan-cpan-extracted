@@ -1,0 +1,9 @@
+CHANGES
+MANIFEST
+Makefile.PL
+README
+FreeBSD.xs
+typemap
+t/01-sendfile.t
+lib/Sys/Sendfile/FreeBSD.pm
+META.yml                                 Module meta-data (added by MakeMaker)

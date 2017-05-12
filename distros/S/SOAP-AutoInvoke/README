@@ -1,0 +1,94 @@
+
+
+Highlights
+==========
+
+    *  Use remote classes "as is" - without any special modification.
+    *  "new" method is called before invoking method, your args are passed.
+    *  Set "new" method name, or use none at all.
+    *  Set dispatchers on a per-class basis
+
+
+Overview
+========
+
+SOAP-AutoInvoke (previously SOAP-Autoload) was my learning exercise for
+getting familiar with SOAP.  The objective of the "SOAP::AutoInvoke" and
+"SOAP::Transport::HTTP::AutoInvoke::" classes are to allow you to use Perl
+classes as you normal would  and not think (much) about the classes actually
+being located elsewhere.
+
+SOAP::Autoloader uses Autoloader to setup the remote method call.  Arguments
+are passed into the SOAP struct with the simple names "ARG0", "ARG1", ...
+"ARGn" that SOAP::Transport::HTTP::AutoInvoke::Server knows to look for and unpack.
+SOAP::Transport::HTTP::AutoInvoke returns the response from the method call
+in the same way.
+
+The actual details of setting up the call are hidden from you and you would
+use the remote class in the usual way (as if it were local).
+
+The approach works well with simple data types but is limited to what
+the SOAP package can serialize.  SOAP::Transport::HTTP::AutoInvoke::Client
+will try and send an array of data using Data::Dumper which is also a required
+package.
+
+The remote class does NOT need any special modification to work with SOAP::
+AutoInvoke -- unless you require the passing of data types that SOAP can
+not yet serialize.
+
+You may also now pass arguments to the "new" method of the remote class,
+the new method will be invoked each time before calling the method you've
+passed.  You may also specify an alternative method name to instantiated your
+object.
+
+
+Demo Scripts & Setup
+====================
+
+Installing SOAP-AutoInvoke will replace your existing
+SOAP::Transport::HTTP::Apache class with a very slightly modified extension
+to the version SOAP-0.28 provided version.  The adjustment allows you to pass
+an optional_dispatcher that is specific to a class.  You do not need to use
+the update version of the "Apache" class, but then AutoInvoke will want to
+work with all "safe_classes" that you pass to the handler (instead just those
+you tell it to).
+
+
+Install the server/Calculator.pm and SOAP/Transport/HTTP/AutoInvoke.pm on your
+server side, and make modifications in your mod_perl handler similar to the
+following:
+
+-------------------------------8<------------------------------------------
+package Apache::SoapServer;
+use strict;
+use SOAP::Transport::HTTP::Apache;             # must be the provided Apache.pm!
+use SOAP::Transport::HTTP::AutoInvoke::Server; # import "auto_invoke" dispatcher
+
+sub handler {
+        my $safe_classes   ={
+                ClassA     => undef,           # uses default   dispatcher
+                ClassB     => undef,           # uses default   dispatcher
+                Calculator => \&auto_invoke,   # uses specified dispatcher
+                ClassC     => undef,           # uses default   dispatcher
+                ClassD     => \&myDispatcher,  # uses specified dispatcher
+        };
+        SOAP::Transport::HTTP::Apache->handler($safe_classes);
+}
+
+1;
+__END__
+------------------------------->8------------------------------------------
+~
+
+The demonstration scripts client/calculator.pl demonstrates the method call to
+the server and client/hello-calculator.pl demonstrates the method call
+where by the remote "new" method is specified and arguments passed.  Check
+your Apache error log files to see that "hello" method is being called
+instead of "new".
+
+
+Comments and suggestions are of course appreciated.
+
+
+Daniel
+yacob@rcn.com

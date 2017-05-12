@@ -1,0 +1,191 @@
+NAME
+
+    Swim - See What I Mean?!
+
+VERSION
+
+    This document describes Swim version 0.1.46.
+
+SYNOPSIS
+
+        > swim --to=pod doc/MyModule.swim > MyModule.pod
+    
+        my $pod = Swim->new(file => "doc/MyModule.swim")->to_pod;
+
+DESCRIPTION
+
+    Swim is a plain text markup language that converts to many formats:
+
+      * HTML
+
+	* Rich - Lots of classes and annotations
+
+	* Sparse - Just the tags and content
+
+	* Custom - HTML the way you want it
+
+      * MarkDown
+
+	* GitHub Flavored Markdown
+
+      * Pod
+
+      * Formatted Plain Text
+
+      * LaTeX
+
+      * DocBook
+
+      * Manpage
+
+      * AsciiDoc
+
+      * MediaWiki
+
+    The Swim framework is easily extensible, so adding new outputs is easy.
+
+ What Makes Swim Different
+
+    There are already a lot of text-to-html languages in the world. How is
+    Swim different?
+
+    Here are a few points:
+
+      * Very rich capabilities:
+
+      Swim aims to be a feature superset of the other markups since it
+      converts to all of them.
+
+      Most of the other markups don't support things like multiple
+      paragraphs in a bullet point (like you are reading right now!).
+
+      * Simple, consistent markup:
+
+      Even though Swim intends to be very rich, it will use a simple set of
+      syntax idioms to accomplish its tasks. One of my favorite sayings
+      comes from Larry Wall of Perl fame: "Make simple things simple and
+      hard things possible". Swim does just that (hopefully without looking
+      too much like Perl ;).
+
+      * Extensible:
+
+      Swim is easy to extend at many levels. You can add new backend
+      formats. You can also define your own markup syntaxes. You can even
+      define sections that parse using a different syntax grammar. For
+      instance, you could inline a markdown section like this:
+
+          <<< markdown
+          This is [Markdown](http://daringfireball.net/projects/markdown/) text.
+          >>>
+
+      * Multiple Implementations:
+
+      Swim is written using the Pegex parser framework. This provides 2
+      very powerful concepts. Firstly, that Swim language is defined in a
+      very simple PEG topdown grammar. That means it is easy to grok,
+      maintain and extend. Second, Pegex parsers work in many languages.
+      That means that you can use Pegex natively in languages like Ruby,
+      JavaScript, Perl, Python and many others.
+
+      * Comments and blank lines:
+
+      Most markups don't support comments and eat extra blank lines. These
+      things are useful. Swim not only supports comments, they are part of
+      the data model. ie They get rendered as HTML (or comments in other
+      target languages that support comments). Swim also support throwaway
+      comments, for times when you want to hide part of a document.
+
+ Syntax Concepts
+
+    Before diving into the actual markup syntax, let's discuss the concepts
+    that drive the decisions that Swim makes.
+
+    Most documents are just plain language using letters and numbers and a
+    few punctuation chars like comma, dash, apostrophe, parentheses and
+    colon. Also endings: period, exclamation point and question mark. We
+    leave those alone (at least in the normal prose context).
+
+    This leaves a bunch of punctuation characters that we can do special
+    things with. Namely: @#$%^&*_=+|/~[]<>{}. Sometimes context matters.
+    For instance it is very rare for a prose line to start with a period,
+    so we can use that as a markup.
+
+    The important thing in all this is that we be able to reverse the
+    meaning for edge cases. ie We need a way to make markup characters be
+    viewed as regular characters. Swim uses a backslash before a character
+    to make it not be seen as markup. For instance this text "*not bold*"
+    is not bold because it was written like this: "\*not bold\*".
+
+    Swim has a document model that views things as blocks and phrases. This
+    is very similar to HTML's DIV and SPAN concepts. Swim views a document
+    as a sequence of top level blocks. Blocks are further subdivided into
+    either a sequence of blocks or a sequence of phrases. Phrases can only
+    be subdivided into more phrases.
+
+    Consider this example document:
+
+        A paragraph *is* a block. It gets divided into phrases like 'pure text' and
+        *bold text*. A bold phrase can be divided: *all bold /some italic/*.
+    
+        * Lists are blocks.
+        * Each item is a block.
+          * A sublist is a block.
+          * The text within in contains *phrases*.
+
+    Common blocks and phrases have an implicit (DWIM) syntax, that reads
+    very natural. For instance a paragraph is just left justified text that
+    is terminated by a blank line. There is also an explicit syntax for
+    blocks and phrases. Every implicit syntax can be written explicitly.
+    For instance, here is an implicit syntax example followed by its
+    explicit equivalent:
+
+        A paragraph with some *bold text* in it.
+    
+        <<< para
+        A paragraph with some <bold bold text> in it.
+        >>>
+
+  Two Space Indent
+
+    Swim uses a 2 space indentation and it is very instrumental to its
+    design. It allows for a very nice and natural embedding of blocks
+    within blocks. Consider this list:
+
+        * Point one has
+          text on 2 lines
+          * Subpoint a
+        * Point two
+    
+          A paragraph for point 2 followed by some preformatted text:
+            # Code example
+        * Point three
+
+    As you can see, 2 space indent is very natural here and allows for
+    putting blocks inside blocks in a way that is not available in most
+    markups.
+
+ Swim Syntax
+
+    There are 4 sets of syntax to define: block/implicit, phrase/implicit,
+    block/explicit and phrase/explicit. There are also escaping mechanisms.
+
+  Block/Implicit Syntaxes
+
+    A paragraph is a contiguous set of plain text lines. It is terminated
+    by a blank line or by another block syntax at that level.
+
+    To be continued
+
+AUTHOR
+
+    Ingy döt Net <ingy@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    Copyright 2014-2017. Ingy döt Net.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://www.perl.com/perl/misc/Artistic.html
+

@@ -1,0 +1,94 @@
+#!/usr/bin/ruby
+
+# Liniar ecuations solver - Cramer's rule.
+
+# Example:
+# | 2x - 3y +  z =  4
+# |  x - 2y - 2z = -6
+# | 3x - 4y +  z =  5
+
+func det(a) {
+    a = a.map{.map{_}}
+    var sign = +1
+    var pivot = 1
+
+    for k in ^a {
+      var r = (k+1 .. a.end)
+      var previous_pivot = pivot
+
+      if ((pivot = a[k][k])==0) {
+        a.swap(r.first_by { |i|
+            a[i][k] != 0
+        } \\ (return 0), k)
+        pivot = a[k][k]
+        sign = -sign
+      }
+
+      for i,j in (r ~X r) {
+        a[i][j]              ->
+          *= pivot           ->
+          -= a[i][k]*a[k][j] ->
+          /= previous_pivot
+      }
+    }
+    sign * pivot
+}
+
+func cramers_rule(A, terms) {
+    gather {
+        for i in ^A {
+            var Ai = A.map{.map{_}}
+            for j in ^terms {
+                Ai[j][i] = terms[j]
+            }
+            take(det(Ai))
+        }
+    } »/» det(A)
+}
+
+var matrix = [
+    [2, -3,  1],
+    [1, -2, -2],
+    [3, -4,  1],
+]
+
+var free_terms = [4, -6, 5]
+var (x, y, z) = cramers_rule(matrix, free_terms)...
+
+say "x = #{x}"
+say "y = #{y}"
+say "z = #{z}"
+
+assert_eq(x, 2)
+assert_eq(y, 1)
+assert_eq(z, 3)
+
+# Another example:
+# | 3x +   2y -  z =  1
+# | 2x -   2y + 4z = -2
+# | -x + 1/2y -  z =  0
+
+var m2 = [
+    [3, 2, -1],
+    [2, -2, 4],
+    [-1, 1/2, -1],
+]
+
+var f2 = [1, -2, 0]
+assert_eq(cramers_rule(m2, f2), [1, -2, -2])
+
+# Yet another example:
+# | 2w -  x + 5y +  z =  -3
+# | 3w + 2x + 2y - 6z = -32
+# |  w + 3x + 3y -  z = -47
+# | 5w - 2x - 3y + 3z =  49
+
+var m3 = [
+    [2, -1,  5,  1],
+    [3,  2,  2, -6],
+    [1,  3,  3, -1],
+    [5, -2, -3,  3],
+]
+
+var f3 = [-3, -32, -47, 49]
+assert_eq(cramers_rule(m3, f3), [2, -12, -4, 1])

@@ -1,0 +1,36 @@
+---
+abstract: 'An effective SNMP-information-gathering module'
+author:
+  - 'Jan Henning Thorsen, C<< <pm at flodhest.net> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: SNMP-Effective
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+  examples:
+    - 0
+recommends:
+  Log::Log4perl: 0
+requires:
+  POSIX: 0
+  SNMP: 0
+  Tie::Array: 0
+  Time::HiRes: 0
+resources:
+  bugtracker: https://github.com/jhthorsen/snmp-effective/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/jhthorsen/snmp-effective.git
+version: '1.1103'

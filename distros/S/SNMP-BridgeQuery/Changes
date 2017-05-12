@@ -1,0 +1,41 @@
+Revision history for Perl extension SNMP::BridgeQuery.
+
+0.60  Little fixes to satisfy the Perl Testers...
+
+0.59  Fixed problem where some mac addresses were being
+      'translated' into ASCII equivs
+
+0.57  Added 'queryat' to be able to get information 
+      the Address Translation Table of layer 3 switches
+
+0.56  Changed namespace to SNMP::BridgeQuery
+
+0.55  Added better error handling for devices that
+      do not respond.  The hash it returns has a 
+      single value (error => true) which can be tested 
+      for.  Previously had problems with web pages 
+      failing if BridgeQuery generated an error.  
+      (This supercedes v0.53)
+
+0.54  Changed arguments passed to BridgeQuery from
+      list format to hash format.  Also added a 
+      subroutine to do the connecting for all other 
+      functions (&connect).  Community name now
+      defaults to 'public' if none is specified.
+
+0.53  Added some error checking for invalid IP, 
+      community string or device does not support
+      this function
+
+0.52  Fixed problem where there was always one result
+      that had a 'port' but no MAC address associated 
+
+0.51  Added optional functions (querymacs & queryports)
+      to just return 'MIB => MAC' or 'MIB => Port'
+
+0.50  All the wonderful things that go into creating a
+      module that led up to this 'original' version
+
+0.01  Wed Apr 25 12:42:17 2001
+	- original version; created by h2xs 1.19
+

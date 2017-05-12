@@ -1,0 +1,22 @@
+Revision history for SQL-KeywordSearch
+
+1.13 Mon Apr  6 14:54:07 EDT 2009
+    [INTERNAL]	
+    - remove Makefile.PL to simplify things. All modern tools now support Build.PL.	
+
+   [DOCUMENTATION]
+    - fix "colum" typo in documentation
+
+1.12 Mon Apr  6 14:35:55 EDT 2009
+    [INTERNALS]
+    - Add Params::Validate requirement to Build.PL to fix test failures
+
+   [DOCUMENTATION]
+    - Update docs to recommend SQL::Interp, not SQL::Interpolate.
+
+1.11
+    - Documentation improvements (Greg Sabino Mullane, Jonathan Leffler)
+
+1.1   Wed Jun 21 22:52:43 EDT 2006
+        First version, released on an unsuspecting world.
+

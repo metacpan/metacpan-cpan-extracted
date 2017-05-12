@@ -1,0 +1,217 @@
+=head1 NAME
+
+SQLite::Work - report on and update an SQLite database.
+
+=head1 SYNOPSIS
+
+    use SQLite::Work;
+
+    my $rep = SQLite::Work->new(%new_args);
+
+    if ($rep->do_connect())
+    {
+	if ($simple_report)
+	{
+	    $rep->do_report(%report_args);
+	}
+	elsif ($multi_page_report)
+	{
+	    $rep->do_multi_page_report(%report_args);
+	}
+	elsif ($split_report)
+	{
+	    $rep->do_split_report(%report_args);
+	}
+	$rep->do_disconnect();
+    }
+
+=head1 DESCRIPTION
+
+SQLite::Work is a perl module for interfacing with an SQLite database.
+It can be used to:
+
+=over
+
+=item *
+
+generate I<nice> HTML (and non-HTML) reports, which
+
+=over
+
+=item *
+
+have nested headers
+
+=item *
+
+have grouped data which clusters under the headers
+
+=item *
+
+can be sorted on multiple columns
+
+=item *
+
+can be customized with templates (both headers and body) which include
+some simple formatting for column values, for example:
+
+    simple HTMLize
+    titles (Title,The becomes The Title)
+    names (Nurk,Fred becomes Fred Nurk)
+    month names
+    truncation
+
+(see L<Text::NeatTemplate>)
+
+=item *
+
+one can select the columns and their order even if one isn't using templates
+
+=item *
+
+default templates can be selected which present the data in tables,
+in paragraphs (Column:Value) or in lists.
+
+=item *
+
+can be split into multiple HTML pages, with automatic index-page
+generation; the split can be on the values of a given column, and/or by
+number of rows
+
+=back
+
+=item *
+
+use a generic search CGI script ("show.cgi" using SQLite::Work::CGI) which
+
+=over
+ 
+=item *
+
+can search on all the fields in a table without having to hardcode the
+column names (it just gets them from the table information)
+
+=item *
+
+uses most of the power of the report engine to give I<nice> search
+results
+
+=back
+
+=item *
+
+update the database with a CGI script ("edit.cgi" using SQLite::Work::CGI)
+
+=item *
+
+be able to mail reports to general addresses (such as a mailing list)
+or to specific addresses (such as sending notifications to individuals
+whose address is in the database). (using the sqlw_mail script)
+
+=back
+
+This generates HTML (and non-HTML) reports from an SQLite database,
+taking care of the query-building and the report formatting.  This also
+has methods for adding and updating the database.
+
+The L<SQLite::Work::CGI> module has extra methods which deal with CGI using
+the CGI module; the included "show.cgi" and "edit.cgi" are demonstration
+CGI scripts which use the SQLite::Work::CGI module.  There is also the
+"show.epl" demonstration Embperl script which has the necessary alterations
+for using this with Embperl.
+
+The L<sqlreport> script uses SQLite::Work to generate reports from the
+command-line.
+
+The L<sqlw_mail> script uses SQLite::Work::Mail to email reports.
+
+=head2 Limitations
+
+This only deals with single tables and views, and simple one-field,
+two-table joins.  More complex joins should be dealt with by making
+a view.
+
+This only deals with one database at a time.
+
+=head1 REQUIRES
+
+    DBI
+    DBD::SQLite
+    POSIX
+
+    Test::More
+
+    The CGI module requires:
+
+    CGI
+
+    Scripts require:
+
+    Getopt::Long
+    Pod::Usage
+    Getopt::ArgvFile
+
+=head1 INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+Or, if you're on a platform (like DOS or Windows) that doesn't like the
+"./" notation, you can do this:
+
+   perl Build.PL
+   perl Build
+   perl Build test
+   perl Build install
+
+In order to install somewhere other than the default, such as
+in a directory under your home directory, like "/home/fred/perl"
+go
+
+   perl Build.PL --install_base /home/fred/perl
+
+as the first step instead.
+
+This will install the files underneath /home/fred/perl.
+
+You will then need to make sure that you alter the PERL5LIB variable to
+find the modules, and the PATH variable to find the script.
+
+Therefore you will need to change:
+your path, to include /home/fred/perl/script (where the script will be)
+
+	PATH=/home/fred/perl/script:${PATH}
+
+the PERL5LIB variable to add /home/fred/perl/lib
+
+	PERL5LIB=/home/fred/perl/lib:${PERL5LIB}
+
+
+=head1 SEE ALSO
+
+perl(1).
+DBI
+DBD::SQLite
+
+=head1 BUGS
+
+Please report any bugs or feature requests to the author.
+
+=head1 AUTHOR
+
+    Kathryn Andersen (RUBYKAT)
+    perlkat AT katspace dot com
+    http://www.katspace.com
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (c) 2005 by Kathryn Andersen
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

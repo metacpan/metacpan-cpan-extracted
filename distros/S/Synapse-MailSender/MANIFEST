@@ -1,0 +1,10 @@
+Changes
+lib/Synapse/MailSender.pm
+Makefile.PL
+MANIFEST
+README
+scripts/synapse-mailsender
+t/00-base.t
+t/example.xml
+t/example.yml
+META.yml                                 Module meta-data (added by MakeMaker)

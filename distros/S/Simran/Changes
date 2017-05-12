@@ -1,0 +1,6 @@
+Revision history for Perl extension Simran.
+
+0.01  Wed Dec  4 13:42:51 2002
+	- original version; created by h2xs 1.22 with options
+		-A -X -n Simran
+

@@ -1,0 +1,471 @@
+#!perl
+
+# recursively seek and normalize files named by dipshits
+#
+# $Id: mfn 32 2005-12-09 04:32:10Z mdxi $
+  $ver = '$Rev: 32 $';
+
+# Copyright (c) 2003-2005 Shawn Boyette <mdxi@cpan.org>
+# All rights reserved.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the same terms as Perl itself.
+
+use String::MFN;
+use Config::YAML;
+use File::Find;
+use Getopt::Long;
+    $Getopt::Long::ignorecase = 0;
+
+$i    = 0; # files renamed
+$j    = 0; # files noclobbered
+$k    = 0; # total files seen
+$m    = 0; # failed renames
+$date = `date +%Y%m%dT%H%M%S`; chomp $date;
+$notindot = 1; # invoked from inside a dotdir?
+
+init();
+if ($c->{undo}) {
+    undo($undofile);
+} else {
+    $notindot = 0 if ($tree =~ m|/\.| or $tree =~ m/^\./);
+    finddepth(\&mogrify, $tree);
+}
+report();
+
+#---------------------------------------------------------------
+
+sub mogrify {
+    if ($c->{nodirs}) {
+	return unless ( -f );
+    } else {
+	$orig_filename = $_;
+	if ($c->{monly}) {
+	    $ismedia = 0;
+	    foreach $ext (@{$c->{media}}) {
+		$ismedia = 1 if (/\.$ext$/i);
+	    }
+	    return unless $ismedia;
+	}
+    }
+
+    # never touch .
+    return if ($_ eq ".");
+    # don't touch anything starting with a dot unless told to
+    unless ($c->{dotfiles}) {
+        return if (($File::Find::dir =~ m|/\.| or $_ =~ m/^\./) and $notindot);
+    }
+
+    $k++;
+
+    # here's where the magic happens
+    $sane = mfn($_);
+
+    mv($File::Find::name,($File::Find::dir."/".$sane),$orig_filename) if ($orig_filename ne $sane);
+}
+
+sub mv {
+    if (-e $_[1]) {
+	unless ($c->{clobber}) {
+	    print "N ",$_[0]," (",$sane,")\n" unless $c->{nolog};
+	    $j++;
+	    return;
+	}
+    }
+
+    unless ($c->{debug}) {
+	$rc = rename($_[0], $_[1]);
+	if (! $rc) {
+	    print "F ",$_[0],"\n" unless $c->{nolog};
+	    $m++;
+	    if ($c->{fatal}) {
+		print "- RUN TERMINATED; FAILED TO MOVE FILE\n";
+		exit;
+	    }
+	    next;
+	}
+    }
+    print "R ",$_[0],"\n  ",$_[1],"\n" unless $c->{nolog};
+    $i++;
+}
+
+sub undo {
+    @undos = log_list($_[0],'R');
+    foreach (reverse(0..@undos - 1)) {
+	$rc = mv($undos[$_]{from}, $undos[$_]{to}) unless $c->{debug};
+	die "F Could not undo move of $undos[$_]{from}\n" if ($c->{fatal} && !$rc);
+	print "U ",$undos[$_]{from},"\n  ",$undos[$_]{from},"\n" unless $c->{nolog};
+    }
+    unlink $_[0] unless $c->{debug};
+}
+
+sub report {
+    close(LOG);
+    select STDOUT;
+	print sprintf("SEEN: %d   RENAME: %d   NOCLOB: %d   FAILED: %d\n", $k, $i, $j, $m) unless ($c->{silent});
+    if ((! $c->{nolog}) && ($i || $j || $m)) {
+	print "LOGFILE: ",$c->{logfile},"\n" unless $c->{silent};
+    } else {
+        unlink $c->{logfile};
+	print "No logfile written for this run.\n" unless $c->{silent};
+    }
+}
+
+#---------------------------------------------------------------
+
+sub init {
+    $progdir = $ENV{HOME} . "/.mfn";
+    $progrc  = $progdir . "/mfnrc";
+    mkdir($progdir,0700) if (! -e $progdir);
+    system("touch $progrc") if (! -e $progrc);
+
+    # Create config object
+    $c = Config::YAML->new( config   => "$progdir/mfnrc",
+                            clean    => 0,
+                            clobber  => 0,
+                            debug    => 0,
+                            dotfiles => 0,
+                            dumpconf => 0,
+                            logfile  => "$progdir/$date",
+                            nolog    => 0,
+                            media    => [ qw(mp\d ogg mpe?g mov avi wmv asf qt gif jpe?g png) ],
+                            monly    => 0,
+                            nodirs   => 0,
+                            silent   => 0,
+                            undo     => 0,
+                          );
+
+    # and get command-line values
+    @usermedia = ();
+    $rc = GetOptions( $c,
+		      'clean',
+		      'clobber|c!',
+		      'debug!',
+		      'dotfiles|D!',
+		      'dumpconf',
+		      'fatal|f!',
+		      'help|h',
+		      'media-list|M=s' => \$usermedia,
+		      'monly|media-only|m!',
+		      'nodirs|no-dirs|d!',
+		      'nolog|no-log|l!',
+		      'silent|S',
+		      'undo|u=s' => \$undofile,
+		      'version|v'
+		    );
+    exit 1 if (! $rc);
+
+    $c->{undo} = 1 if ($undofile);
+    if ($usermedia) {
+	$c->{media} = ();
+	$c->{media} = [ split(/,/,$usermedia) ];
+    }
+
+    if ($c->{version})  { print version($ver); exit }
+    if ($c->{help})     { help(); exit }
+
+    if ($c->{clean})    { clean_logs($c->{logdir}); exit }
+    if ($c->{dumpconf}) { 
+        delete $c->{dumpconf}; 
+        delete $c->{logfile}; 
+        $c->write; 
+        exit; 
+    }
+
+    if (@ARGV) {
+	$tree = shift @ARGV;
+	die "Specified directory tree '$tree' doesn't exist.\n"	if (! -d $tree);
+	chdir $tree or die "Can't chdir to $tree\n";
+    }
+    $tree = `pwd`;
+    chomp $tree;
+
+    unless ($c->{nolog}) {
+	open(LOG,">> $c->{logfile}") or
+	    die "Can't open logfile $c->{logfile}\n";
+	select LOG;
+    }
+}
+
+sub log_list {
+    my $logfile = $_[0];
+    my $logtype = $_[1];
+
+    my $k = 0;
+    my ($to, $from) = '';
+    my @logs = ();
+
+    $logfile = $progdir . '/' . $logfile;
+    open(LOG,$logfile) or die
+	"Can't open logfile $logfile for undo.\n";
+
+    while (<LOG>) {
+	if (/^$logtype/) {
+	    $to = substr($_,2,-1);
+	    $_ = <LOG>;
+	    $from = substr($_,2,-1);
+	    $logs[$k]{to} = $to;
+	    $logs[$k]{from} = $from;
+	    print STDOUT "$logs[$k]{from}\n";
+	    $k++;
+	}
+    }
+    close(LOG);
+    return @logs;
+}
+
+sub clean_logs {
+    my @logs = <$progdir/2*>;
+    foreach my $i (@logs) {
+	unlink $i;
+    }
+}
+
+sub help {
+    $helpmedia = join(',',@{$c->{media}});
+    print <<HELP;
+Usage: mfn [options] [<tree>]
+  Where <tree> is the directory to use as the top of the recursive
+  search. If <tree> is not given, the current directory will be used.
+  (!) indicates a reversible option.
+Options:
+  -c --clobber     Overwrite files with the same names (!)
+  -d --no-dirs     Don\'t rename directories (!)
+  -D --dotfiles    Don\'t exclude dotfiles (!)
+  -f --fatal       Failure to rename a file terminates run (!)
+  -L --no-log      Don\'t write a log for this run (!)
+  -m --media-only  Only rename media files
+  -M --media-list  Comma separated list of media extensions
+                   ($helpmedia)
+  -S --silent      Don\'t print anything to STDOUT
+  -u --undo <arg>  Using logfile <arg>, undo a set of changes
+
+     --clean       Unlink accumulated logfiles
+     --debug       Do everything but rename files (!)
+     --dumpconf    Dump present options to config file
+  -v --version     Show version
+  -h --help        Brief help (see manpage for full help)
+HELP
+}
+
+sub version {
+    $_[0] =~ s/[\$:]//g;
+    my $ver = "This is mfn $_[0](of String::MFN $String::MFN::VERSION)\n";
+    return $ver;
+}
+
+
+=head1 NAME
+
+mfn - The Moronic Filename Normalizer
+
+=head1 SYNOPSIS
+
+    mfn [option]... [<tree>]
+
+    mdxi@fornax:~/tmp/JPEGZ4$ mfn
+    SEEN:589 RENAME:298 NOCLOB:1 FAILED:0
+    LOGFILE:/home/mdxi/.mfn/20050210T074901
+    mdxi@fornax:~/tmp/JPEGZ4$ cat /home/mdxi/.mfn/20050210T074901 | grep ^N
+    N /home/mdxi/tmp/JPEGZ4/hay guys.jpg (hay_guys.jpg)
+    mdxi@fornax:~/tmp/JPEGZ4$ display hay_guys.jpg 
+    mdxi@fornax:~/tmp/JPEGZ4$ mv hay\ guys.jpg hay_guys2.jpg 
+
+=head1 DESCRIPTION
+
+Applies a set of rules (via C<String::MFN>) to normalize
+filenames. Normalization occurs recursively, depth-first, from
+directory C<tree>. If C<tree> is not given, the current working
+directory is used.
+
+    WARNING: This utility is, by its nature, dangerous. Please read
+    the documentation completely and think carefully before using it.
+
+=head1 OPTIONS
+
+Options specified as (reversible) can have "no" prepended to their
+long forms to negate their values (e.g. --noclobber). This is useful
+when you have a default set in your config file and wish to override
+it for a single run.
+
+=over
+
+=item -c, --clobber (reversible)
+
+By default, when a file's normalized name is the same as an existing
+file's name, both files are left untouched. If this option is
+specified, the existing file will be overwritten.
+
+=item -d, --no-dirs (reversible)
+
+By default, any subdirectories of [DIR] will be normalized. If this
+option is specified, directories will be ignored
+
+=item -D, --dotfiles (reversible)
+
+By default, dotfiles are not normalized. If this option is specified,
+they will be normalized as well
+
+=item -f, --fatal (reversible)
+
+By default, failure to rename a file simply prints a warning to STDOUT
+and a failure notice to the logfile (if logging is enabled). When this
+is specified, failure to rename a file becomes a fatal error and mfn
+terminates.
+
+=item -l, --no-log (reversible)
+
+Prevents a logfile from being written for this run
+
+=item -m, --media-only (reversible)
+
+This instructs mfn to only normalize files with certain
+extensions. The default extensions list can be seen by running 'mfn
+--help'
+
+=item -M, --media-list <list>
+
+Allows the user to specify a comma-separated list of extensions
+(e.g. '-M foo,bar,baz' '--media-list=foo,bar,baz') which override the
+default list
+
+=item -S, --silent
+
+Supresses the printing of the end-of-run summary on STDOUT
+
+=item -u, --undo <logfile>
+
+Reverses the set of changes listed in a logfile. <logfile> should be
+just the name of the desired log, not the complete path. <logfile>
+will be deleted at the end of the run unless --debug is also
+specified.
+
+=item --clean
+
+Delete all logfiles.
+
+=item --debug (reversible)
+
+Dry run. Everything happens except that no files are actually renamed.
+
+=item --dumpconf
+
+Dumps current options as a YAML-formatted configuration file.
+
+=item --version
+
+Prints the current revision of mfn to STDOUT.
+
+=item -h, --help
+
+Prints a short usage guide to STDOUT.
+
+=back
+
+=head1 FILES
+
+=head2 Configuration File
+
+mfn has a YAML configuration file which lives at "~/.mfn/mfnrc". The
+values in this file override mfn's hardcoded defaults, and are in turn
+overridden by values given on the command line. Sensical values for
+the config file (and their command line counterparts, where they
+differ) are as follows:
+
+=over
+
+=item
+
+clobber [0.1]
+
+=item
+
+debug [0,1]
+
+=item
+
+dotfiles [0,1]
+
+=item
+
+fatal [0,1]
+
+=item
+
+media-list [List]
+
+=item
+
+monly [0,1] (--media-only)
+
+=item
+
+nodirs [0,1] (--no-dirs)
+
+=item
+
+nolog [0,1] (--no-log)
+
+=item
+
+silent [0,1]
+
+=item
+
+verbose [0,1]
+
+=back
+
+=head2 Logfiles
+
+Any run of mfn which results in filesystem changes generates a logfile
+with a name in the format YYYYMMDDTHHMMSS, residing in the directory
+"~/.mfn". The format for these files is:
+
+=over
+
+=item 1
+
+The character 'R', 'N', or 'F' followed by a single space
+
+=item 2
+
+In the case of N (indicating noclobber) or F (indicating a failure),
+the space will be followed by the full path of the file in question.
+In the case of N, the filepath will then be followed by the mogrified
+form of the filename in parentheses.
+
+=item 3
+
+In the case of R (successfully renamed), the space will be followed by
+the full path of the file. Then, on the next line will be two spaces
+and the full path of the renamed file.
+
+=back
+
+=head1 BUGS
+
+=over
+
+=item 
+
+Logfile names have a granularity of one second. If a user manages to
+complete two or more runs within one second, all changes will appear
+in one logfile.
+
+=item
+
+The current log cleaning code breaks in the year 3000.
+
+=item
+
+You can make some pretty stupid things happen by specifying a retarded
+combination of options along with "--dumpconf".
+
+=back
+
+=head1 AUTHOR
+
+Copyright 2003,2004 by Shawn Boyette <mdxi@cpan.org>
+
+=cut

@@ -1,0 +1,17 @@
+# Update domain, add an admin contact, which fails since you can't add an admin contact if one already exists
+template: update-domain.tt
+
+vars:
+  domain: updatable.co.te
+  admin: 10c
+
+input_assertions:
+  class: SRS::EPP::Command::Update::Domain
+
+output_assertions:
+  count:
+    - [ '//epp:result', 1, 'EPP: Check for one result' ]
+  attr_is:
+    - [ '//epp:result', 'code', 2306, 'EPP: Check for correct result code' ]
+  match: 
+    - [ '//epp:reason', 'Only one admin contact per domain supported', 'EPP: Correct reason' ]

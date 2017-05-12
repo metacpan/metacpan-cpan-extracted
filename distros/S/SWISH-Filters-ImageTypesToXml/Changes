@@ -1,0 +1,19 @@
+Revision history for SWISH-Filters-ImageTypesToXml
+
+0.01    12/17/2011
+        Initial Release
+
+0.02    12/21/2011
+        Updated documentation and supported mimetypes.
+
+0.03    12/26/2011
+        Updated documentation, now filters XML, supports optional histogram
+        parameter.
+
+0.04    12/27/2011
+        Updated documentation to include configuration options. Fixed the
+        configurations for the Makefile.PL to get the correct abstract.
+
+0.05    12/27/2011
+        Fixed broken unit test by included needed dependency: SWISH::Filters
+

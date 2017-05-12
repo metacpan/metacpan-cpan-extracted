@@ -1,0 +1,16 @@
+#!/bin/sh
+#
+# Set $SVKDIFF to this script to use FileMerge for viewing diffs
+#
+
+TMPDIR="/tmp/svkopendiff_$$"
+FILE1="$TMPDIR/$2"
+FILE2="$TMPDIR/$5"
+trap 'rm -rf "$TMPDIR"' EXIT SIGHUP SIGINT
+mkdir -p "`dirname "$FILE1"`"
+mkdir -p "`dirname "$FILE2"`"
+cp -p "$3" "$FILE1"
+cp -p "$6" "$FILE2"
+
+opendiff "$FILE1" "$FILE2"
+osascript -e 'tell application "FileMerge" to activate'

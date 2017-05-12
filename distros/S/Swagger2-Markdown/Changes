@@ -1,0 +1,41 @@
+Revision history for Swagger2-Markdown
+
+0.12     2017-03-08
+        - Fix t/010_api_blueprint.t with SKIP due to breaking changes in Swagger2
+        - Add documentation regarding deprecation of Swagger2
+
+0.11     2016-08-10
+        - Fix API Blueprint output for multiple types
+
+0.10     2016-06-14
+        - Fix tests for recent versions of Swagger2
+
+0.09     2016-06-14
+        - Add query params to URLs to fix aglio warnings
+
+0.08     2016-05-17
+        - Transfer repo from G3S to Humanstate (again...)
+
+0.07     2016-05-17
+        - Transfer repo from G3S to Humanstate
+
+0.06     2015-10-21
+        - Move github repo to G3S org
+
+0.05     2015-09-27
+        - Update min required version of Swagger2
+        - Move SYNOPSIS to before DESCRIPTION in pod
+        - Remove EXPERIMENTAL notice from pod
+
+0.04     2015-09-25
+        - Add basic markdown output (GH #1)
+
+0.03     2015-08-31
+        - Fix GH #2 - quote param/attribute examples
+        - Fix GH #3 - boolean examples show as true/false
+
+0.02     2015-08-24
+        - Add swagger2apiblueprint script
+
+0.01     2015-08-24
+        - First release

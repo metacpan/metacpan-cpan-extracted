@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Statistics/Robust.pm
+lib/Statistics/Robust/Scale.pm
+lib/Statistics/Robust/Location.pm
+lib/Statistics/Robust/Density.pm
+lib/Statistics/Robust/Bootstrap.pm
+t/00-load.t
+t/09-location.t
+t/10-scale.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,27 @@
+--- #YAML:1.0
+name:               ShiftJIS-X0213-MapUTF
+version:            0.40
+abstract:           conversion between Shift_JIS-2004/Shift_JISX0213 and Unicode
+author:
+    - SADAHIRO Tomoyuki <SADAHIRO@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    bytes:       0
+    Carp:        0
+    DynaLoader:  0
+    Exporter:    0
+    strict:      0
+    vars:        0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

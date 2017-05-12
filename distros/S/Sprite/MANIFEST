@@ -1,0 +1,10 @@
+MANIFEST                        This File
+HISTORY                         Version History
+INSTALL                         Installation
+README                          The README File
+TIPS                            Notes and Tips
+Sprite.pm                       Sprite Database Module
+Makefile.PL                     Makefile Generator
+examples/test.db                Sample test database
+examples/all                    Simple example
+

@@ -1,0 +1,836 @@
+<html lang="en">
+<head>
+<title>SEPIA: Simple Emacs Perl Integration</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="SEPIA: Simple Emacs Perl Integration">
+<meta name="generator" content="makeinfo 4.8">
+<link title="Top" rel="top" href="#Top">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 2005-2010 Sean O'Rourke.  All rights reserved,
+some wrongs reversed.  This module is distributed under the same terms
+as Perl.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+</head>
+<body>
+<h1 class="settitle">SEPIA: Simple Emacs Perl Integration</h1>
+<a name="Top"></a>
+
+   <div class="block-image"><img src="Sepia.jpg" alt="Sepia.jpg"></div>
+
+   <p>Sepia is a set of Perl development tools for Emacs supporting code
+navigation and interactive evaluation.
+
+<!-- ============================================================ -->
+<p><a name="Introduction"></a>
+
+<h2 class="chapter">1 Introduction</h2>
+
+<p>Sepia is a set of tools for Perl development in Emacs.  Its goal is to
+extend CPerl mode to support fast code navigation and interactive
+development.  It is inspired by Emacs' current support for a number of
+other languages, including Lisp, Python, and Emacs Lisp.
+
+<p><a name="Getting-Started"></a>
+
+<h3 class="section">1.1 Getting Started</h3>
+
+<p>To install Sepia, its Emacs Lisp files must be in Emacs'
+<code>load-path</code>, and the <samp><span class="file">lib</span></samp> directory must be in Perl's
+<code>@INC</code>.  Assuming that Sepia has been unpacked in
+<samp><span class="file">~/sepia</span></samp>, it can be installed by adding the following lines to
+<samp><span class="file">~/.emacs</span></samp>:
+
+<pre class="example">     (add-to-list 'load-path "~/sepia")
+     (setq sepia-perl5lib (list (expand-file-name "~/sepia/lib")))
+     (defalias 'perl-mode 'sepia-mode)
+     (require 'sepia)
+</pre>
+   <p>Then to bring up the interactive Perl prompt, type <kbd>M-x sepia-repl</kbd>.
+
+<p><a name="Philosophy"></a>
+
+<h3 class="section">1.2 Philosophy</h3>
+
+<p>A development environment should support three activities: code
+spelunking, interaction, and customization.  Emacs as an environment for
+developing Emacs Lisp thoroughly supports all of them: It has commands
+to visit individual functions' code and documentation, commands to
+evaluate or step through expressions, and an architecture that
+encourages customization in Emacs Lisp.  As an environment for Perl,
+however, it is lacking: there is limited interactivity with the Perl
+debugger, and reasonable documentation browsing, but no support for
+navigating, editing, and re-evaluating code.  Sepia attempts to remedy
+the situation.
+
+   <p>Modern IDEs also support these three activities, but do so awkwardly. 
+Rather than having functions to visit definitions (<kbd>find-function</kbd>)
+and search for functions (<kbd>apropos</kbd>), they clutter the screen with
+class and file trees.  Rather than supporting interactive evaluation of
+small pieces of code, they perform background semantic checking on whole
+projects and highlight errors.  Rather than allowing minor
+customizations to grow organically into features, they support limited
+configuration files and baroque plug-in APIs<a rel="footnote" href="#fn-1" name="fnd-1"><sup>1</sup></a>.  Sepia tries to adhere to the apparent Emacs philosophy that
+rich semantic information should be unobtrusive, and that the best way
+to build working code is to start by experimenting with small pieces.
+
+   <p>Language support packages for Emacs vary widely in the degree to which
+they make use of or replace existing Emacs features.  Minimal modes
+provide keyword-based syntax highlighting and an unadorned comint buffer
+as an interpreter.  Others provide their own specialized equivalents of
+comint, eldoc, completion, and other Emacs features.  Sepia takes a
+third approach by trying to do as much as possible with existing Emacs
+features, even when they are not optimal for Perl.  For example, it uses
+comint to communicate with the subprocess, eldoc to display
+documentation, and grep to list source locations.
+
+   <p>This approach has three advantages: First, it maximizes the number of
+features that can be supported with limited development time.  Second,
+it respects users' settings.  A seasoned Emacs user may have changed
+hundreds of settings, so a mode that reimplements features will have to
+support equivalent settings, and will force the user to re-specify them. 
+Finally, this approach respects decades of development spent, as Neal
+Stephenson put it, &ldquo;focused with maniacal intensity on the deceptively
+simple-seeming problem of editing text.&rdquo;  Many non-obvious choices go
+into making a polished interface, and while a reimplementation gets rid
+of accumulated cruft, it must rediscover these hidden trade-offs.
+
+   <p>Anyways, I hope you enjoy using Sepia.  Its development style is strange
+for someone used Perl's typical mix of one-liners and edit-save-run, but
+once you are accustomed to it, you may find it very effective.
+
+<p><a name="Related-Work"></a>
+
+<!-- node-name,  next,  previous,  up -->
+<h3 class="section">1.3 Related Work</h3>
+
+<p>A number of more-or-less related Emacs extensions are currently under
+development.  Here is a list of the ones I have heard about, along with
+my brief impression of how they differ from Sepia.  Since I use none of
+them regularly, these impressions should be taken with a grain of salt.
+
+     <dl>
+<dt><cite>Emacs::PDE</cite><dd>
+PDE is similar to Sepia in offering an interactive Lisp-like development
+environment interfacing with a long-running Perl process.  It seems more
+ambitious, and therefore a bit more invasive.
+
+     <p><a href="http://search.cpan.org/dist/Emacs-PDE/">http://search.cpan.org/dist/Emacs-PDE/</a>
+
+     <br><dt><cite>Devel::PerlySense</cite><dd>
+Devel::PerlySense offers a more Eclipse-like development environment,
+with offline code analysis via <acronym>PPI</acronym>.
+
+     <p><a href="http://search.cpan.org/dist/Devel-PerlySense/">http://search.cpan.org/dist/Devel-PerlySense/</a>
+
+     <br><dt><cite>Emacs::EPL</cite><dd>
+Emacs::EPL is a low-level IPC interface between Emacs and Perl.  Sepia
+was originally based on Emacs::EPL, but the current
+<samp><span class="command">comint</span></samp>-based implementation proved more maintainable.
+
+     <p><a href="http://search.cpan.org/dist/Emacs-EPL/">http://search.cpan.org/dist/Emacs-EPL/</a>
+
+     <br><dt><cite>Stylish</cite><dd>
+Stylish is a similar effort with a very different implementation
+philosophy, requiring maximal rather than minimal dependencies in both
+Perl and Emacs, and reimplementing <samp><span class="command">comint</span></samp> in Emacs.
+
+     <p><a href="http://github.com/jrockway/stylish.git">http://github.com/jrockway/stylish.git</a>
+
+   </dl>
+
+<!-- ============================================================ -->
+<p><a name="Editing"></a>
+
+<h2 class="chapter">2 Editing</h2>
+
+<p><a name="index-sepia_002dmode-1"></a>
+Sepia's first contribution is a set of commands to explore a Perl
+codebase.  These include commands to browse and display documentation,
+to find function definitions, and to query a cross-reference database of
+function and variable uses.  Sepia also provides intelligent symbol
+completion.
+
+<p><a name="Completion"></a>
+
+<h3 class="section">2.1 Completion</h3>
+
+<p>Sepia implements partial-word completion that communicates with the
+inferior Perl process.  For example, `<samp><span class="samp">%S:X:v_u</span></samp>' completes to
+`<samp><span class="samp">%Sepia::Xref::var_use</span></samp>' when Sepia is loaded.  This completion only
+operates on functions and global variables known to the Perl
+interpreter, so it works best when code and interpreter are in sync.
+
+   <p>More precisely, completion examines the text before point and tries each
+of the following in turn, using the first successful approach:
+
+     <ol type=1 start=1>
+<li>If the text looks like a method call (e.g. `<samp><span class="samp">$object-&gt;f</span></samp>' or
+`<samp><span class="samp">Class-&gt;f</span></samp>'), complete on methods.
+
+     <li>If it looks like a variable (e.g. `<samp><span class="samp">%hash</span></samp>' or `<samp><span class="samp">$scalar</span></samp>'),
+complete first on lexical, then global variables.
+
+     <li>Complete on modules and functions.
+
+     <li>Otherwise, complete on Perl built-in operators.
+        </ol>
+
+   <p>For each of the first three cases, completions candidates are first
+generated by splitting the text on characters <code>[:_]</code> and matching
+the resulting word parts.  For example, `<samp><span class="samp">X:a_b</span></samp>' will complete to
+all symbols matching `<samp><span class="samp">^X[^:]*:+a[^:_]*_b</span></samp>' such as
+`<samp><span class="samp">Xref::a_bug</span></samp>' and `<samp><span class="samp">X::always_bites_me</span></samp>'.  If the module parts
+of the input match a module exactly and completions exist, they are not
+expanded.  For example, `<samp><span class="samp">X:a</span></samp>' will expand only to `<samp><span class="samp">X::aa</span></samp>' when
+`<samp><span class="samp">X::aa</span></samp>' and `<samp><span class="samp">Xx::aa</span></samp>' exist.  If no matches result, the text is
+treated as an acronym.  For example, `<samp><span class="samp">dry</span></samp>' will complete to
+`<samp><span class="samp">dont_repeat_yourself</span></samp>'.  <em>Note: partial-word completion is not
+currently supported for lexicals.</em>
+
+   <p>Completion is performed by the following commands:
+     <dl>
+<dt><kbd>M-x sepia-complete-symbol</kbd><dd><a name="index-sepia_002dcomplete_002dsymbol-2"></a>Complete the symbol before point as described above.  This is always
+case-sensitive, independent of <code>completion-ignore-case</code>.
+
+     <br><dt><kbd>TAB</kbd><dt><kbd>M-x sepia-indent-or-complete</kbd><dd><a name="index-sepia_002dindent_002dor_002dcomplete-3"></a>First try to reindent the current line.  If its indentation does not
+change, then try to expand an abbrev at point (unless
+<code>sepia-indent-expand-abbrev</code> is <code>nil</code>).  If no abbrev is
+expanded, then call <code>sepia-complete-symbol</code>.
+
+   </dl>
+
+<p><a name="Navigation"></a>
+
+<h3 class="section">2.2 Navigation</h3>
+
+<p>Sepia provides several commands for navigating program source.  All of
+them rely on information from the inferior Perl process, so it is
+important both that it be running, and that its internal representation
+of the program match the program source.  The commands marked (Xref)
+below also rely on a cross-reference database, which must be explicitly
+rebuilt by calling <code>xref-rebuild</code> when the program changes.
+
+   <p>There are two basic kinds of navigation commands.  The first kind jumps
+directly to the first matching location when possible, prompting only if
+no such location is found.  These commands find only a single location.
+
+<!-- direct-jump commands -->
+<dl>
+<dt><kbd>M-. M-.</kbd><dt><kbd>M-x sepia-dwim</kbd><dd><a name="index-sepia_002ddwim-4"></a>Guess what kind of identifier is at point, and try to do the right
+thing: for a function, find its definition(s); for a variable, find its
+uses; for a module, view its documentation; otherwise, prompt for the
+name of a function to visit.  <code>sepia-dwim</code> automatically goes to
+the first function definition or variable use found.
+
+     <br><dt><kbd>M-. d</kbd><dt><kbd>M-x sepia-location</kbd><dd><a name="index-sepia_002dlocation-5"></a>Jump directly to the definition of the function at point, prompting if
+point is not on a known function.  If multiple definitions are found,
+choose one arbitrarily.  This function is similar to <code>sepia-defs</code>,
+and the two should probably be merged.
+
+     <br><dt><kbd>M-. j</kbd><dt><kbd>M-x sepia-jump-to-symbol</kbd><dd><a name="index-sepia_002djump_002dto_002dsymbol-6"></a>Navigate to a function using &ldquo;ido&rdquo; interactive completion.  Within
+interactive completion, press &lt;:&gt; to descend into a package,
+&lt;DEL&gt; to ascend to a parent package, and &lt;RET&gt; to go to the
+currently-selected function.
+
+     <br><dt><kbd>M-. l</kbd><dt><kbd>M-x sepia-pod-follow-link-at-point</kbd><dd><a name="index-sepia_002dpod_002dfollow_002dlink_002dat_002dpoint-7"></a>Follow the POD link (<code>L&lt;...&gt;</code>) at point, or prompt for a link if
+there is none.  Go to the appropriate location in the document source
+or, with a prefix argument, in the rendered documentation.  This can be
+especially useful when writing links in your own documentation.
+
+   </dl>
+
+   <p>The second kind of navigation commands always prompts the user &ndash; though
+usually with a sensible default value &ndash; and finds multiple locations. 
+When called with a prefix argument, these commands present their results
+in a <code>grep-mode</code> buffer.  When called <em>without</em> a prefix
+argument, they place all results on the found-location ring and jump
+directly to the first.  The remaining locations can be cycled through by
+calls to <code>sepia-next</code>.
+
+<!-- prompt-and-go commands -->
+<dl>
+<dt><kbd>M-. f </kbd><var>name</var><kbd> &lt;RET&gt;</kbd><dt><kbd>M-x sepia-defs</kbd><dd><a name="index-sepia_002ddefs-8"></a>Find definition(s) of function <var>name</var>.
+
+     <br><dt><kbd>M-. m </kbd><var>name</var><kbd> &lt;RET&gt;</kbd><dt><kbd>M-x sepia-module-find </kbd><var>name</var><kbd> &lt;RET&gt;</kbd><dd><a name="index-sepia_002dmodule_002dfind-9"></a>Find the source of module <var>name</var>.
+
+     <br><dt><kbd>M-. a </kbd><var>regexp</var><kbd> &lt;RET&gt;</kbd><dt><kbd>M-x sepia-apropos </kbd><var>regexp</var><kbd> &lt;RET&gt;</kbd><dd><a name="index-sepia_002dapropos-10"></a>Find definitions of all functions whose names match <var>regexp</var>.
+
+     <br><dt><kbd>M-x sepia-apropos-module </kbd><var>regexp</var><kbd> &lt;RET&gt;</kbd><dd><a name="index-sepia_002dapropos_002dmodule-11"></a>Find all installed modules matching <var>regexp</var>.  This function may be
+slow the first time it is called, because it has to build a list of
+installed modules.
+
+     <br><dt><kbd>M-. c </kbd><var>name</var><kbd> &lt;RET&gt;</kbd><dt><kbd>M-x sepia-callers </kbd><var>name</var><kbd> &lt;RET&gt;</kbd><dd><a name="index-sepia_002dcallers-12"></a>(Xref) Find calls to function <var>name</var>.
+
+     <br><dt><kbd>M-. C </kbd><var>name</var><kbd> &lt;RET&gt;</kbd><dt><kbd>M-x sepia-callees </kbd><var>name</var><kbd> &lt;RET&gt;</kbd><dd><a name="index-sepia_002dcallees-13"></a>(Xref) Find the definitions of functions called by <var>name</var>.
+
+     <br><dt><kbd>M-. v </kbd><var>name</var><kbd> &lt;RET&gt;</kbd><dt><kbd>M-x sepia-var-uses </kbd><var>name</var><kbd> &lt;RET&gt;</kbd><dd><a name="index-sepia_002dvar_002duses-14"></a>(Xref) Find uses of the global variable <var>name</var>.
+
+     <br><dt><kbd>M-. V </kbd><var>name</var><kbd> &lt;RET&gt;</kbd><dt><kbd>M-x sepia-var-defs </kbd><var>name</var><kbd> &lt;RET&gt;</kbd><dd><a name="index-sepia_002dvar_002ddefs-15"></a>(Xref) Find definitions of global variable <var>name</var>.  Since Perl's
+global variables are not declared, this is rarely useful
+
+     <!-- XXX: broken, so don't mention it. -->
+<!-- @item M-. A @var{regexp} @key{RET} -->
+<!-- @itemx M-x sepia-var-apropos -->
+<!-- @findex sepia-var-apropos -->
+<!-- Find definitions of all variables whose names match @var{regexp}.  Since -->
+<!-- this function does not handle lexical variables, and since Perl's global -->
+<!-- variables are not declared, this is rarely useful. -->
+</dl>
+
+   <p>Finally, there are several other navigation-related commands that do not
+fit into either of the above categories.
+
+<!-- other commands -->
+<dl>
+<dt><kbd>M-,</kbd><dt><kbd>M-x sepia-next</kbd><dd><a name="index-sepia_002dnext-16"></a>Cycle through the definitions found by the previous &lt;M-.&gt; search.
+
+     <br><dt><kbd>M-. r</kbd><dt><kbd>M-x sepia-rebuild</kbd><dd><a name="index-sepia_002drebuild-17"></a>Rebuild the cross-reference database by walking the op-tree and
+stashes.
+
+     <br><dt><kbd>M-. t</kbd><dt><kbd>M-x find-tag</kbd><dd>Execute the <code>find-tag</code> command typically bound to &lt;M-.&gt;.
+
+   </dl>
+
+<p><a name="Documentation"></a>
+
+<h3 class="section">2.3 Documentation</h3>
+
+<p>Sepia can be used to browse installed modules' documentation, to format
+and display the current buffer's POD, and to browse the list of modules
+installed on the system.
+
+     <dl>
+<dt><kbd>M-. p </kbd><var>name</var><kbd> &lt;RET&gt;</kbd><dt><kbd>M-x sepia-perldoc-this</kbd><dd><a name="index-sepia_002dperldoc_002dthis-18"></a>View documentation for module <var>name</var> or Perl manual page <var>name</var>.
+
+     <br><dt><kbd>C-c C-d</kbd><dt><kbd>M-x sepia-view-pod</kbd><dd><a name="index-sepia_002dview_002dpod-19"></a>Format and view the current buffer's documentation.
+
+     <br><dt><kbd>sepia-package-list</kbd><dd><a name="index-sepia_002dpackage_002dlist-20"></a>Browse a tree of installed packages.  This lists only the top-level
+packages from installed distributions, so if package <code>My::Stuff</code>
+also provides <code>My::Stuff::Details</code>, it will not be displayed.  When
+Emacs-w3m is available, each module is linked to its documentation.
+
+     <br><dt><kbd>sepia-module-list</kbd><dd><a name="index-sepia_002dmodule_002dlist-21"></a>Browse a tree of both top-level and internal packages, like
+<code>sepia-package-list</code>.
+
+   </dl>
+
+   <p><a name="index-sepia_002dinstall_002deldoc-22"></a>Sepia also integrates with eldoc (at least in GNU Emacs &gt;= 22). 
+Documentation for Perl operators and control structures is taken from
+CPerl mode.  Sepia will also display documentation for user-defined
+functions if their POD is formatted in the standard way, with functions
+described in a &ldquo;=head2&rdquo; or &ldquo;=item&rdquo; entry.  To load user
+documentation, visit the relevant file and type <kbd>M-x
+sepia-doc-update</kbd>.
+
+   <p>If <code>Module::CoreList</code> is available, Sepia's eldoc function will
+also display the first version of Perl with which a module was shipped. 
+This is intended to give the programmer a sense of when he is creating
+external dependencies.
+
+<p><a name="Other-commands"></a>
+
+<h3 class="section">2.4 Other commands</h3>
+
+     <dl>
+<dt><kbd>M-x sepia-rename-lexical</kbd><dd><a name="index-sepia_002drename_002dlexical-23"></a>Rename a variable in the function at point, querying for each
+replacement when called with a prefix argument.  Currently, this is only
+a thin wrapper around <code>query-replace</code>. 
+</dl>
+
+<!-- ============================================================ -->
+<p><a name="Interactive-Perl"></a>
+
+<h2 class="chapter">3 Interactive Perl</h2>
+
+<p><a name="index-sepia_002drepl-24"></a>Sepia's second main contribution is an interactive interface (REPL) to
+an inferior Perl process.  The interface is based on GUD mode, and
+inherits many of its bindings; this chapter discusses only the Sepia
+extensions.  To start or switch to the repl, type <kbd>M-x sepia-repl</kbd>. 
+As in Sepia mode, &lt;TAB&gt; in the REPL performs partial-word completion
+with <code>sepia-complete-symbol</code>.
+
+<!-- == REPL behavior == -->
+<!--  $_/@_ -->
+<!--  RET & eval/newline -->
+<!--  eval context -->
+<p>Sepia also provides a number of other ways to evaluate pieces of code in
+Perl, and commands to process buffer text using the inferior process.
+
+   <p>Finally, Sepia comes with the <kbd>sepl</kbd> program, a standalone REPL that
+can be run from the command-line, and provides many features of the
+Emacs-based REPL.
+
+<p><a name="Shortcuts"></a>
+
+<h3 class="section">3.1 Shortcuts</h3>
+
+<p>&ldquo;Shortcuts&rdquo; are commands handled specially by the REPL rather than
+being evaluated as Perl code.  They either communicate with the REPL
+function, or provide a convenient interface to Sepia variables and
+functions.  Shortcuts are prefixed by a comma (&lt;,&gt;), and may be
+abbreviated to the shortest unique prefix.  The debugger defines
+additional shortcuts (See <a href="#Debugger">Debugger</a>.).
+
+     <dl>
+<dt><kbd>break </kbd><var>file</var><kbd>:</kbd><var>line</var><kbd> [</kbd><var>expr</var><kbd>]</kbd><dd>Set a breakpoint in <var>file</var> at <var>line</var>.  If <var>expr</var> is
+supplied, stop only if it evaluates to true.
+
+     <br><dt><kbd>cd </kbd><var>dir</var><dd>Change Perl's current directory to <var>dir</var>.
+
+     <br><dt><kbd>debug [</kbd><var>val</var><kbd>]</kbd><dd>Turn Sepia debugger hook on or off, or toggle if <var>val</var> is missing.
+
+     <br><dt><kbd>define </kbd><var>name</var><kbd> ['</kbd><var>doc</var><kbd>'] </kbd><var>body...</var><dd>Define <var>name</var> as a shortcut for Perl code <var>body</var>, with optional
+documentation <var>doc</var>, surrounded by single quotes.  <var>body</var> is
+passed the raw command-line text as its first argument.
+
+     <br><dt><kbd>format </kbd><var>type</var><dd>Set the output format to <var>type</var>, either &ldquo;dumper&rdquo; (using
+<code>Data::Dumper</code>), &ldquo;dump&rdquo; (<code>Data::Dump</code>), &ldquo;yaml&rdquo;
+(<code>YAML</code>), &ldquo;peek&rdquo; (<code>Devel::Peek</code>), &ldquo;dumpvar&rdquo;
+(<code>dumpvar.pl</code>, somewhat rough), or &ldquo;plain&rdquo; (stringification). 
+Default: &ldquo;dumper&rdquo;.
+
+     <p>Note that this setting is independent of <code>$COLUMNATE</code> and
+<code>$STRINGIFY</code>.
+
+     <br><dt><kbd>help</kbd><dd>Display a list of shortcuts.
+
+     <br><dt><kbd>load [</kbd><var>file</var><kbd>]</kbd><dd>Reload saved variables from <var>file</var> (or <samp><span class="file">~/.sepia-save</span></samp>),
+created by <kbd>save</kbd>.
+
+     <br><dt><kbd>lsbreak</kbd><dd>List breakpoints.
+
+     <br><dt><kbd>lsmod [</kbd><var>pattern</var><kbd>]</kbd><dd>List currently-loaded modules matching optional <var>pattern</var>.
+
+     <br><dt><kbd>methods </kbd><var>name</var><kbd> [</kbd><var>regexp</var><kbd>]</kbd><dd>Display a list of functions defined in package <var>name</var> and its
+<code>ISA</code>-ancestors matching optional pattern <var>regexp</var>.
+
+     <br><dt><kbd>package </kbd><var>name</var><dd>Set the default evaluation package to <var>name</var>.
+
+     <br><dt><kbd>pwd</kbd><dd>Show the process's current working directory.
+
+     <br><dt><kbd>quit</kbd><dd>Exit the inferior Perl process.
+
+     <br><dt><kbd>reload [</kbd><var>module</var><kbd> | </kbd><var>/pattern/</var><kbd>]</kbd><dd>Reload <var>module</var> (but not its dependencies), or all modules matching
+<var>pattern</var>.
+
+     <br><dt><kbd>freload </kbd><var>module</var><dd>Reload <var>module</var> and all of its dependencies.
+
+     <br><dt><kbd>restart</kbd><dd>Reload <samp><span class="file">Sepia.pm</span></samp> and recursively invoke the REPL.  This command is
+mostly of interest when working on Sepia itself, and will fail
+catastrophically if <samp><span class="file">Sepia.pm</span></samp> fails to compile.
+
+     <br><dt><kbd>save [</kbd><var>pattern</var><kbd> [</kbd><var>file</var><kbd>]]</kbd><dd>Save variables matching <var>pattern</var> (or all variables) to <var>file</var>
+(or <samp><span class="file">~/.sepia-save</span></samp>) in <code>Storable</code> format.  Note that because
+saving magic variables can have unpredictable results, using <kbd>save</kbd>
+without a pattern argument is risky.  Sepia excludes common magic
+variables and dangerous packages, but its list is not foolproof.
+
+     <br><dt><kbd>shell [</kbd><var>command</var><kbd>]</kbd><dd>Execute shell command <var>command</var>, displaying its standard output and
+standard error.
+
+     <br><dt><kbd>size </kbd><var>package</var><kbd> [</kbd><var>regexp</var><kbd>]</kbd><br><dt><kbd>size [</kbd><var>regexp</var><kbd>]</kbd><dd>List the variables in <var>package</var> (or the current package) along with
+their total sizes.  This requires the <code>Devel::Size</code> module.  In
+strict mode, list lexical variables if no <var>package</var> is given.
+
+     <br><dt><kbd>strict [</kbd><var>val</var><kbd>]</kbd><dd>Set evaluation strictness to <var>val</var>, or toggle it if <var>val</var> is not
+given.  Note that turning strictness off and on clears the REPL's
+lexical environment.
+
+     <br><dt><kbd>test [</kbd><var>file</var><kbd>]</kbd><dd>Run tests in the current directory.  If <var>file</var> is given, only run
+test <var>file</var> or <samp><span class="file">t/</span><var>file</var></samp>
+
+     <br><dt><kbd>time [</kbd><var>val</var><kbd>]</kbd><dd>Set time display to <var>val</var>, or toggle it if <var>val</var> is not given. 
+With time display enabled, Sepia will use <code>BSD::Resource</code> and/or
+<code>Time::HiRes</code> to display wall clock time and CPU usage for the
+previous command as part of the prompt.
+
+     <br><dt><kbd>undef </kbd><var>name</var><dd>Undefine shortcut <var>name</var>.  <strong>Warning</strong>: this can equally be
+used to remove built-in shortcuts.
+
+     <br><dt><kbd>wantarray [</kbd><var>val</var><kbd>]</kbd><dd>Set the evaluation context to <var>val</var>: <code>@</code> means array, <code>$</code>
+means scalar, and anything else means void.
+
+     <br><dt><kbd>who </kbd><var>package</var><kbd> [</kbd><var>regexp</var><kbd>]</kbd><dt><kbd>who [</kbd><var>regexp</var><kbd>]</kbd><dd>List identifiers in <var>package</var> (main by default) matching optional
+<var>regexp.</var>  In strict mode, list lexical variables if no
+<var>package</var> is given.
+
+   </dl>
+
+<p><a name="Debugger"></a>
+
+<h3 class="section">3.2 Debugger</h3>
+
+<p>Sepia uses Perl's debugger hooks and GUD mode to support conditional
+breakpoints and single-stepping, and overrides Perl's <code>die()</code> to
+invoke the debugger rather than unwind the stack.  This makes it
+possible to produce a backtrace, inspect and modify global variables,
+and even continue execution when a program tries to kill itself.  If the
+PadWalker module is available, Sepia also provides functions to inspect
+and modify lexical variables.
+
+   <p>The debugger has its own set of shortcuts, also prefixed by a comma.
+
+     <dl>
+<dt><kbd>backtrace</kbd><dd>Show a backtrace.
+
+     <br><dt><kbd>delete</kbd><dd>Delete the current breakpoint.
+
+     <br><dt><kbd>down </kbd><var>n</var><dt><kbd>up </kbd><var>n</var><dd>Move the current stack frame up or down by <var>n</var> (or one) frames.
+
+     <br><dt><kbd>inspect [</kbd><var>n</var><kbd>]</kbd><dd>Inspect lexicals in the current frame or frame <var>n</var>, counting upward
+from 1.
+
+     <br><dt><kbd>next [</kbd><var>n</var><kbd>]</kbd><dd>Advance <var>n</var> (or one) lines, skipping subroutine calls.
+
+     <br><dt><kbd>quit</kbd><dt><kbd>die</kbd><dt><kbd>warn</kbd><dd>Continue as the program would have executed without debugger
+intervention, dying if the debugger was called from <code>die()</code>.
+
+     <br><dt><kbd>return </kbd><var>expr</var><dd>Continue execution as if <code>die()</code> had returned the value of
+<var>expr</var>, which is evaluated in the global environment.
+
+     <br><dt><kbd>step [</kbd><var>n</var><kbd>]</kbd><dd>Step forward <var>n</var> (or one) lines, descending into subroutines.
+
+     <br><dt><kbd>xreturn </kbd><var>sub</var> <var>expr</var><dd>Return <var>expr</var> from the innermost call to <var>sub</var>.  This is a
+somewhat dangerous and experimental feature, but is probably more useful
+than returning a value from <code>die()</code>.
+
+   </dl>
+
+<p><a name="Evaluation"></a>
+
+<h3 class="section">3.3 Evaluation</h3>
+
+<p>When interactive Perl is running, Sepia can evaluate regions of code in
+the inferior Perl process.  The following commands assume that this
+process has already been started by calling <code>sepia-repl</code>.
+
+     <dl>
+<dt><kbd>C-M-x</kbd><dt><kbd>M-x sepia-eval-defun</kbd><dd><a name="index-sepia_002deval_002ddefun-25"></a>Evaluate the function around point in the inferior Perl process.  If it
+contains errors, jump to the location of the first.
+
+     <br><dt><kbd>C-c C-l</kbd><dt><kbd>M-x sepia-load-file</kbd><dd><a name="index-sepia_002dload_002dfile-26"></a>Save the current buffer, then reload its file and if warnings or errors
+occur, display an error buffer.  With a prefix argument, also rebuild
+the cross-reference index.
+
+     <br><dt><kbd>C-c e</kbd><dt><kbd>M-x sepia-eval-expression &lt;RET&gt; </kbd><var>expr</var><kbd> &lt;RET&gt;</kbd><dd><a name="index-sepia_002deval_002dexpression-27"></a>Evaluate <var>expr</var> in scalar context and echo the result.  With a
+prefix argument, evaluate in list context.
+
+     <br><dt><kbd>C-c!</kbd><dt><kbd>sepia-set-cwd</kbd><dd><a name="index-sepia_002dset_002dcwd-28"></a>Set the REPL's working directory to the current buffer's directory.
+
+   </dl>
+
+<p><a name="Mutilation"></a>
+
+<h3 class="section">3.4 Mutilation</h3>
+
+<p>Sepia contains several functions to operate on regions of text using the
+interactive Perl process.  These functions can be used like standard
+one-liners (e.g. `<samp><span class="samp">perl -pe ...</span></samp>'), with the advantage that all of
+the functions and variables in the interactive session are available.
+
+     <dl>
+<dt><kbd>M-x sepia-perl-pe-region &lt;RET&gt; </kbd><var>code</var><kbd> &lt;RET&gt;</kbd><dd><a name="index-sepia_002dperl_002dpe_002dregion-29"></a>Evaluate <var>code</var> on each line in the region with <code>$_</code> bound to
+the line text, collecting the resulting values of <code>$_</code>.  With a
+prefix argument, replace the region with the result.
+
+     <br><dt><kbd>M-x sepia-perl-ne-region &lt;RET&gt; </kbd><var>code</var><kbd> &lt;RET&gt;</kbd><dd><a name="index-sepia_002dperl_002dne_002dregion-30"></a>Evaluate <var>code</var> as above, but collect the results instead.
+
+     <br><dt><kbd>M-x sepia-perlize-region &lt;RET&gt; </kbd><var>code</var><kbd> &lt;RET&gt;</kbd><dd><a name="index-sepia_002dperlize_002dregion-31"></a>Evaluate <var>code</var> once with <code>$_</code> bound to the entire region,
+collecting the final value of <code>$_</code>.  With a prefix argument,
+replace the region.
+
+   </dl>
+
+<p><a name="Scratchpad"></a>
+
+<h3 class="section">3.5 Scratchpad</h3>
+
+<p><a name="index-sepia_002dscratch-32"></a>Sepia also supports a scratchpad, another form of interaction inspired
+by Emacs' <code>*scratch*</code> buffer.  To create or switch to the
+scratchpad, type <kbd>M-x sepia-scratch</kbd>.  Scratchpad mode is exactly
+like Sepia mode, except &lt;C-j&gt; evaluates the current line and prints
+the result on the next line.
+
+<!-- ============================================================ -->
+<p><a name="CPAN-browsing"></a>
+
+<h2 class="chapter">4 CPAN browsing</h2>
+
+<p>Sepia has rudimentary support for browsing documentation and installing
+modules from CPAN.  Modules whose names, descriptions, or authors match
+a query are displayed in a <code>*sepia-cpan*</code> buffer, in which the
+following commands are available:
+
+     <dl>
+<dt><kbd>s</kbd><dt><kbd>M-x sepia-cpan-search &lt;RET&gt; </kbd><var>pattern</var><kbd> &lt;RET&gt;</kbd><dd><a name="index-sepia_002dcpan_002dsearch-33"></a>List modules whose names match <var>pattern</var>.
+
+     <br><dt><kbd>/</kbd><dt><kbd>M-x sepia-cpan-desc &lt;RET&gt; </kbd><var>pattern</var><kbd> &lt;RET&gt;</kbd><dd><a name="index-sepia_002dcpan_002ddesc-34"></a>List modules whose names or descriptions match <var>pattern</var>.
+
+     <br><dt><kbd>l</kbd><dt><kbd>M-x sepia-cpan-list &lt;RET&gt; </kbd><var>name</var><kbd> &lt;RET&gt;</kbd><dd><a name="index-sepia_002dcpan_002dlist-35"></a>List modules authored by <var>name</var>.
+
+     <br><dt><kbd>r</kbd><dt><kbd>M-x sepia-cpan-readme &lt;RET&gt; </kbd><var>module</var><kbd> &lt;RET&gt;</kbd><dd><a name="index-sepia_002dcpan_002dreadme-36"></a>Fetch and display <var>module</var>'s README file.
+
+     <br><dt><kbd>d</kbd><dt><kbd>M-x sepia-cpan-doc &lt;RET&gt; </kbd><var>module</var><kbd> &lt;RET&gt;</kbd><dd><a name="index-sepia_002dcpan_002ddoc-37"></a>Browse <var>module</var>'s documentation on <a href="http://search.cpan.org">http://search.cpan.org</a>.
+
+     <br><dt><kbd>i</kbd><dt><kbd>M-x sepia-cpan-install &lt;RET&gt; </kbd><var>module</var><kbd> &lt;RET&gt;</kbd><dd><a name="index-sepia_002dcpan_002dinstall-38"></a>Install <var>module</var> and its prerequisites.  This feature is not yet
+well tested.
+
+   </dl>
+
+<!-- ============================================================ -->
+<p><a name="Customization"></a>
+
+<h2 class="chapter">5 Customization</h2>
+
+<p>While Sepia can be customized in both the Perl and Emacs Lisp, most of
+the user-accessible configuration is in the latter.
+
+<p><a name="Emacs-Customization"></a>
+
+<h3 class="section">5.1 Emacs Customization</h3>
+
+<p>Since Sepia tries where possible to reuse existing Emacs functionality,
+its behavior should already be covered by existing customizations.  The
+two variables most likely to need customization are
+<kbd>sepia-program-name</kbd> and <kbd>sepia-perl5lib</kbd>.  General Sepia mode
+configuration can be done with <kbd>sepia-mode-hook</kbd>, while
+REPL-specific configuration can be done with <kbd>sepia-repl-mode-hook</kbd>.
+
+     <dl>
+<dt><kbd>sepia-complete-methods</kbd><a name="index-sepia_002dcomplete_002dmethods-39"></a><dd>If non-<code>nil</code>, <code>sepia-complete-symbol</code> will complete
+simple method calls of the form <code>$x-&gt;</code> or <code>Module-&gt;</code>.  Since
+the former requires evaluation of <code>$x</code>, this can be disabled. 
+Default: <code>t</code>.
+
+     <br><dt><kbd>sepia-eval-defun-include-decls</kbd><a name="index-sepia_002deval_002ddefun_002dinclude_002ddecls-40"></a><dd>If non-<code>nil</code>, attempt to generate a declaration list for
+<code>sepia-eval-defun</code>.  This is necessary when evaluating some code,
+such as that calling functions without parentheses, because the presence
+of declarations affects the parsing of barewords.  Default: <code>t</code>.
+
+     <br><dt><kbd>sepia-indent-expand-abbrev</kbd><a name="index-sepia_002dindent_002dexpand_002dabbrev-41"></a><dd>If non-<code>nil</code>, <code>sepia-indent-or-complete</code> will, if
+reindentation does not change the current line, expand an abbreviation
+before point rather than performing completion.  Only if no abbreviation
+is found will it perform completion.  Default: <code>t</code>.
+
+     <br><dt><kbd>sepia-module-list-function</kbd><a name="index-sepia_002dmodule_002dlist_002dfunction-42"></a><dd>The function to view a tree of installed modules.  Default:
+<code>w3m-find-file</code> if Emacs-w3m is installed, or
+<code>browse-url-of-buffer</code> otherwise.
+
+     <br><dt><kbd>sepia-perldoc-function</kbd><a name="index-sepia_002dperldoc_002dfunction-43"></a><dd>The function called to view installed modules' documentation.  Default:
+<code>w3m-perldoc</code> if Emacs-w3m is installed, or <code>cperl-perldoc</code>
+otherwise.
+
+     <br><dt><kbd>sepia-perl5lib</kbd><a name="index-sepia_002dperl5lib-44"></a><dd>A list of directories to include in <code>PERL5LIB</code> when starting
+interactive Perl.  Default: <code>nil</code>.
+
+     <br><dt><kbd>sepia-prefix-key</kbd><a name="index-sepia_002dprefix_002dkey-45"></a><dd>The prefix to use for for functions in <code>sepia-keymap</code>.  Default:
+&lt;M-.&gt;.
+
+     <br><dt><kbd>sepia-program-name</kbd><a name="index-sepia_002dprogram_002dname-46"></a><dd>The Perl program name for interactive Perl.  Default: &ldquo;perl&rdquo;.
+
+     <br><dt><kbd>sepia-use-completion</kbd><a name="index-sepia_002duse_002dcompletion-47"></a><dd>If non-<code>nil</code>, various Sepia functions will generate completion
+candidates from interactive Perl when called interactively.  This may be
+slow or undesirable in some situations.  Default: <code>t</code>.
+
+     <br><dt><kbd>sepia-view-pod-function</kbd><a name="index-sepia_002dview_002dpod_002dfunction-48"></a><dd>The function called to view the current buffer's documentation. 
+Default: <code>sepia-w3m-view-pod</code> if Emacs-w3m is available, or
+<code>sepia-perldoc-buffer</code> otherwise.
+
+   </dl>
+
+<p><a name="Perl-Customization"></a>
+
+<h3 class="section">5.2 Perl Customization</h3>
+
+<p>When Sepia starts up, it evaluates the Perl script in <samp><span class="file">~/.sepiarc</span></samp>.
+
+   <p>The following variables in the Sepia package control various aspects of
+interactive evaluation.
+
+     <dl>
+<dt><code>$PACKAGE</code><dd>The package in which user input is evaluated, determined automatically
+when code is evaluated from a buffer.  Default: <code>main</code>.
+
+     <br><dt><code>$PRINTER</code><dd>The function called to format interactive output, normally set with the
+<code>printer</code> shortcut.
+
+     <br><dt><code>$COLUMNATE</code><dd>If true, columnate simple arrays independent of the value of
+<code>$PRINTER</code>.  Default: true.
+
+     <br><dt><code>$STRINGIFY</code><dd>If true, stringify objects that overload the operation independent of
+the value of <code>$PRINTER</code>.  Default: true.
+
+     <br><dt><code>$PS1</code><dd>The trailing end of the prompt string, which should end with &ldquo;&gt; &rdquo;. 
+Default: <code>"&gt; "</code>.
+
+     <br><dt><code>$STOPDIE</code><dd>If true, calls to <code>die</code> from interactive code will invoke the Sepia
+debugger.  Default: true.
+
+     <br><dt><code>$STOPWARN</code><dd>If true, calls to <code>warn</code> from interactive code will invoke the
+Sepia debugger.  Default: false.
+
+     <br><dt><code>$WANTARRAY</code><dd>If <code>@</code>, evaluate interactive expressions in list context, if
+<code>$</code>, scalar, otherwise, void.  Default: <code>@</code>.
+
+   </dl>
+
+   <p>Additional REPL shortcuts can be defined as follows:
+
+     <dl>
+<dt><code>Sepia::define_shortcut </code><var>name</var><code>, </code><var>function</var><code> [, </code><var>shortdoc</var><code> [, </code><var>longdoc</var><code>]]</code><dd>
+Define a shortcut <var>name</var> to call <var>function</var>.  Also define a
+short usage message <var>shortdoc</var> and documentation <var>longdoc</var>.  For
+example,
+
+     <pre class="example">          
+          Sepia::define_shortcut time =&gt; sub { print scalar localtime, "\n" },
+              'time', 'Display the current time.';
+          
+     </pre>
+     <p>defines a shortcut &ldquo;time&rdquo; that displays the current time.  For more
+examples, see the function <var>define_shortcuts</var> code in
+<samp><span class="file">Sepia.pm</span></samp>.
+
+     <br><dt><code>Sepia::alias_shortcut </code><var>new</var><code>, </code><var>old</var><dd>
+Make <var>new</var> an alias for <var>old</var>.
+
+   </dl>
+
+<!-- ============================================================ -->
+<p><a name="Internals"></a>
+
+<h2 class="chapter">6 Internals</h2>
+
+<p>Many things remain unexplained except by the code itself, and some
+details mentioned above should probably be given less prominence.  For
+developer documentation, please see the POD for <code>Sepia</code> and
+<code>Sepia::Xref</code>, and the doc-strings in <samp><span class="file">sepia.el</span></samp>.
+
+<p><a name="FAQ"></a>
+
+<h2 class="chapter">7 FAQ</h2>
+
+     <dl>
+<dt>Can I use <code>Sepia</code> outside of Emacs?<dd>Sepia comes with the <samp><span class="file">sepl</span></samp> program, a command-line REPL using the
+<code>Sepia::Readline</code> module, that provides many features of the
+Emacs-based REPL.  It could be improved, though &ndash; patches welcome!
+
+     <p><samp><span class="file">sepl</span></samp> currently provides completion for <code>Term::ReadLine::Gnu</code>
+and <code>Term::ReadLine::Perl</code>.  If you have neither of these, using
+<samp><span class="file">rlwrap</span></samp> might be the best option.
+
+     <br><dt>Why is the documentation in TeXInfo format?!<dd>TeXInfo is the worst form of documentation, except for all the others. 
+TeX and LaTeX produce beautiful printed output, and Info is the best way
+to view documentation in Emacs for things that are not themselves part
+of Emacs (i.e. &ldquo;can have docstrings&rdquo;).
+
+     <p>It's awful to edit, being both verbose and redundant &ndash; just look at
+AUCTeX's <code>texinfo-every-node-update</code> for desperate placation of the
+suck, then try to figure out what's wrong when <samp><span class="file">makeinfo</span></samp> complains
+about <code>texinfo-every-node-update</code>'s output &ndash; but it's what we
+have.  At least it sucks less than <code>DocBook</code>, raw HTML, or
+<samp><span class="file">troff</span></samp>.
+
+</dl>
+
+<p><a name="Credits"></a>
+
+<h2 class="unnumbered">Credits</h2>
+
+     <dl>
+<dt>Hilko Bengen<dd>Found and motivated me to fix a bunch of bugs, created Debian packages.
+
+     <br><dt>Ævar Arnfjörð Bjarmason<dd>Miscellaneous fixes.  Tested unicode support.
+
+     <br><dt>Ye Wenbin<dd>Found and fixed numerous bugs.
+
+     <br><dt>Free Software<dd>Portions of the code were lifted from Emacs-w3m, SLIME, ido, and
+B::Xref, all of which are Free software.
+
+</dl>
+
+<!-- ============================================================ -->
+<p><a name="Function-Index"></a>
+
+<h2 class="unnumbered">Function Index</h2>
+
+<ul class="index-fn" compact>
+<li><a href="#index-sepia_002dapropos-10"><code>sepia-apropos</code></a>: <a href="#Navigation">Navigation</a></li>
+<li><a href="#index-sepia_002dapropos_002dmodule-11"><code>sepia-apropos-module</code></a>: <a href="#Navigation">Navigation</a></li>
+<li><a href="#index-sepia_002dcallees-13"><code>sepia-callees</code></a>: <a href="#Navigation">Navigation</a></li>
+<li><a href="#index-sepia_002dcallers-12"><code>sepia-callers</code></a>: <a href="#Navigation">Navigation</a></li>
+<li><a href="#index-sepia_002dcomplete_002dsymbol-2"><code>sepia-complete-symbol</code></a>: <a href="#Completion">Completion</a></li>
+<li><a href="#index-sepia_002dcpan_002ddesc-34"><code>sepia-cpan-desc</code></a>: <a href="#CPAN-browsing">CPAN browsing</a></li>
+<li><a href="#index-sepia_002dcpan_002ddoc-37"><code>sepia-cpan-doc</code></a>: <a href="#CPAN-browsing">CPAN browsing</a></li>
+<li><a href="#index-sepia_002dcpan_002dinstall-38"><code>sepia-cpan-install</code></a>: <a href="#CPAN-browsing">CPAN browsing</a></li>
+<li><a href="#index-sepia_002dcpan_002dlist-35"><code>sepia-cpan-list</code></a>: <a href="#CPAN-browsing">CPAN browsing</a></li>
+<li><a href="#index-sepia_002dcpan_002dreadme-36"><code>sepia-cpan-readme</code></a>: <a href="#CPAN-browsing">CPAN browsing</a></li>
+<li><a href="#index-sepia_002dcpan_002dsearch-33"><code>sepia-cpan-search</code></a>: <a href="#CPAN-browsing">CPAN browsing</a></li>
+<li><a href="#index-sepia_002ddefs-8"><code>sepia-defs</code></a>: <a href="#Navigation">Navigation</a></li>
+<li><a href="#index-sepia_002ddwim-4"><code>sepia-dwim</code></a>: <a href="#Navigation">Navigation</a></li>
+<li><a href="#index-sepia_002deval_002ddefun-25"><code>sepia-eval-defun</code></a>: <a href="#Evaluation">Evaluation</a></li>
+<li><a href="#index-sepia_002deval_002dexpression-27"><code>sepia-eval-expression</code></a>: <a href="#Evaluation">Evaluation</a></li>
+<li><a href="#index-sepia_002dindent_002dor_002dcomplete-3"><code>sepia-indent-or-complete</code></a>: <a href="#Completion">Completion</a></li>
+<li><a href="#index-sepia_002dinstall_002deldoc-22"><code>sepia-install-eldoc</code></a>: <a href="#Documentation">Documentation</a></li>
+<li><a href="#index-sepia_002djump_002dto_002dsymbol-6"><code>sepia-jump-to-symbol</code></a>: <a href="#Navigation">Navigation</a></li>
+<li><a href="#index-sepia_002dload_002dfile-26"><code>sepia-load-file</code></a>: <a href="#Evaluation">Evaluation</a></li>
+<li><a href="#index-sepia_002dlocation-5"><code>sepia-location</code></a>: <a href="#Navigation">Navigation</a></li>
+<li><a href="#index-sepia_002dmode-1"><code>sepia-mode</code></a>: <a href="#Editing">Editing</a></li>
+<li><a href="#index-sepia_002dmodule_002dfind-9"><code>sepia-module-find</code></a>: <a href="#Navigation">Navigation</a></li>
+<li><a href="#index-sepia_002dmodule_002dlist-21"><code>sepia-module-list</code></a>: <a href="#Documentation">Documentation</a></li>
+<li><a href="#index-sepia_002dnext-16"><code>sepia-next</code></a>: <a href="#Navigation">Navigation</a></li>
+<li><a href="#index-sepia_002dpackage_002dlist-20"><code>sepia-package-list</code></a>: <a href="#Documentation">Documentation</a></li>
+<li><a href="#index-sepia_002dperl_002dne_002dregion-30"><code>sepia-perl-ne-region</code></a>: <a href="#Mutilation">Mutilation</a></li>
+<li><a href="#index-sepia_002dperl_002dpe_002dregion-29"><code>sepia-perl-pe-region</code></a>: <a href="#Mutilation">Mutilation</a></li>
+<li><a href="#index-sepia_002dperldoc_002dthis-18"><code>sepia-perldoc-this</code></a>: <a href="#Documentation">Documentation</a></li>
+<li><a href="#index-sepia_002dperlize_002dregion-31"><code>sepia-perlize-region</code></a>: <a href="#Mutilation">Mutilation</a></li>
+<li><a href="#index-sepia_002dpod_002dfollow_002dlink_002dat_002dpoint-7"><code>sepia-pod-follow-link-at-point</code></a>: <a href="#Navigation">Navigation</a></li>
+<li><a href="#index-sepia_002drebuild-17"><code>sepia-rebuild</code></a>: <a href="#Navigation">Navigation</a></li>
+<li><a href="#index-sepia_002drename_002dlexical-23"><code>sepia-rename-lexical</code></a>: <a href="#Other-commands">Other commands</a></li>
+<li><a href="#index-sepia_002drepl-24"><code>sepia-repl</code></a>: <a href="#Interactive-Perl">Interactive Perl</a></li>
+<li><a href="#index-sepia_002dscratch-32"><code>sepia-scratch</code></a>: <a href="#Scratchpad">Scratchpad</a></li>
+<li><a href="#index-sepia_002dset_002dcwd-28"><code>sepia-set-cwd</code></a>: <a href="#Evaluation">Evaluation</a></li>
+<li><a href="#index-sepia_002dvar_002ddefs-15"><code>sepia-var-defs</code></a>: <a href="#Navigation">Navigation</a></li>
+<li><a href="#index-sepia_002dvar_002duses-14"><code>sepia-var-uses</code></a>: <a href="#Navigation">Navigation</a></li>
+<li><a href="#index-sepia_002dview_002dpod-19"><code>sepia-view-pod</code></a>: <a href="#Documentation">Documentation</a></li>
+   </ul><p><a name="Variable-Index"></a>
+
+<h2 class="unnumbered">Variable Index</h2>
+
+
+
+<ul class="index-vr" compact>
+<li><a href="#index-sepia_002dcomplete_002dmethods-39"><code>sepia-complete-methods</code></a>: <a href="#Emacs-Customization">Emacs Customization</a></li>
+<li><a href="#index-sepia_002deval_002ddefun_002dinclude_002ddecls-40"><code>sepia-eval-defun-include-decls</code></a>: <a href="#Emacs-Customization">Emacs Customization</a></li>
+<li><a href="#index-sepia_002dindent_002dexpand_002dabbrev-41"><code>sepia-indent-expand-abbrev</code></a>: <a href="#Emacs-Customization">Emacs Customization</a></li>
+<li><a href="#index-sepia_002dmodule_002dlist_002dfunction-42"><code>sepia-module-list-function</code></a>: <a href="#Emacs-Customization">Emacs Customization</a></li>
+<li><a href="#index-sepia_002dperl5lib-44"><code>sepia-perl5lib</code></a>: <a href="#Emacs-Customization">Emacs Customization</a></li>
+<li><a href="#index-sepia_002dperldoc_002dfunction-43"><code>sepia-perldoc-function</code></a>: <a href="#Emacs-Customization">Emacs Customization</a></li>
+<li><a href="#index-sepia_002dprefix_002dkey-45"><code>sepia-prefix-key</code></a>: <a href="#Emacs-Customization">Emacs Customization</a></li>
+<li><a href="#index-sepia_002dprogram_002dname-46"><code>sepia-program-name</code></a>: <a href="#Emacs-Customization">Emacs Customization</a></li>
+<li><a href="#index-sepia_002duse_002dcompletion-47"><code>sepia-use-completion</code></a>: <a href="#Emacs-Customization">Emacs Customization</a></li>
+<li><a href="#index-sepia_002dview_002dpod_002dfunction-48"><code>sepia-view-pod-function</code></a>: <a href="#Emacs-Customization">Emacs Customization</a></li>
+   </ul><div class="footnote">
+<hr>
+<a name="texinfo-footnotes-in-document"></a><h4>Footnotes</h4><p class="footnote"><small>[<a name="fn-1" href="#fnd-1">1</a>]</small> In my brief
+experience with Visual Studio, I was struck by the fact that I saw
+several toolbars, a couple of navigation windows, and a tiny view of the
+actual code.  Sometimes a tooltip would obscure part of that tiny
+window.</p>
+
+   <p><hr></div>
+
+</body></html>
+

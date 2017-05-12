@@ -1,0 +1,9 @@
+Revision history for Perl extension Speech::Rsynth
+
+0.02 Sun May 19 03:40:01 CEST 2002
+   + first relatively stable version using librsynth-2.1.4
+   + added some rudimentary documentation
+
+0.01  Tue May 14 01:24:06 2002
+   + original version; created by h2xs 1.21 with options
+     -a -x -o '[A-Z]+' -n Speech::Rsynth rsynth-xs.h -L/usr/local/lib -lrsynth

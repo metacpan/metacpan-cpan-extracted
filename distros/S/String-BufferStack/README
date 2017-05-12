@@ -1,0 +1,176 @@
+NAME
+    String::BufferStack - Nested buffers for templating systems
+
+SYNOPSIS
+      my $stack = String::BufferStack->new;
+      $stack->push( filter => sub {return uc shift} );
+      $stack->append("content");
+      $stack->flush_output;
+
+DESCRIPTION
+    "String::BufferStack" provides a framework for storing nested buffers.
+    By default, all of the buffers flow directly to the output method, but
+    individual levels of the stack can apply filters, or store their output
+    in a scalar reference.
+
+METHODS
+  new PARAMHASH
+    Creates a new buffer stack and returns it. Possible arguments include:
+
+    prealoc
+        Preallocate this many bytes in the output buffer. This can reduce
+        reallocations, and thus speed up appends.
+
+    out_method
+        The method to call when output trickles down to the bottom-most
+        buffer and is flushed via flush_output. The default "out_method"
+        prints the content to "STDOUT". This method will always be called
+        with non-undef, non-zero length content.
+
+  push PARAMHASH
+    Pushes a new frame onto the buffer stack. By default, the output from
+    this new frame connects to the input of the previous frame. There are a
+    number of possible options:
+
+    buffer
+        A string reference, into which the output from this stack frame will
+        appear. By default, this is the input buffer of the previous frame.
+
+    private
+        If a true value is passed for "private", it creates a private string
+        reference, and uses that as the buffer -- this is purely for
+        convenience. That is, the following blocks are equivilent:
+
+          my $buffer = "";
+          $stack->push( buffer => \$buffer );
+          # ...
+          $stack->pop;
+          print $buffer;
+
+          $stack->push( private => 1 );
+          # ...
+          print $stack->pop;
+
+    pre_append
+        A callback, which will be called with a reference to the
+        "String::BufferStack" object, and the arguments to append, whenever
+        this stack frame has anything appended to the input buffer, directly
+        or indirectly.
+
+        Within the context of the pre-append callback, "append",
+        "direct_append", and "set_pre_append" function on the frame the
+        pre-append is attached to, not the topmost trame. Using "append"
+        within the pre-append callback is not suggested; use "direct_append"
+        instead. "set_pre_append" can be used to alter or remove the
+        pre-append callback itself -- this is not uncommon, in the case
+        where the first append is the only one which needs be watched for,
+        for instance.
+
+    filter
+        A callback, used to process data which is appended to the stack
+        frame. By default, filters are lazy, being called only when a frame
+        is popped. They can be forced at any time by calling
+        "flush_filters", however.
+
+  depth
+    Returns the current depth of the stack. This starts at 0, when no frames
+    have been pushed, and increases by one for each frame pushed.
+
+  append STRING [, STRING, ...]
+    Appends the given strings to the input side of the topmost buffer. This
+    will call all pre-append hooks attached to it, as well. Note that if the
+    frame has a filter, the filter will not immediately run, but will be
+    delayed until the frame is "pop"'d, or "flush_filters" is called.
+
+    When called with no frames on the stack, appends the stringins directly
+    to the "output_buffer".
+
+  direct_append STRING [, STRING, ...]
+    Similar to "append", but appends the strings to the output side of the
+    frame, skipping pre-append callbacks and filters.
+
+    When called with no frames on the stack, appends the strings directly to
+    the "output_buffer".
+
+  pop
+    Removes the topmost frame on the stack, flushing the topmost filters in
+    the process. Returns the output buffer of the frame -- note that this
+    may not contain only strings appended in the current frame, but also
+    those from before, as a speed optimization. That is:
+
+       $stack->append("one");
+       $stack->push;
+       $stack->append(" two");
+       $stack->pop;   # returns "one two"
+
+    This operation is a no-op if there are no frames on the stack.
+
+  set_pre_append CALLBACK
+    Alters the pre-append callback on the topmost frame. The callback will
+    be called before text is appended to the input buffer of the frame, and
+    will be passed the "String::BufferStack" and the arguments to "append".
+
+  set_filter FILTER
+    Alters the filter on the topmost frame. Doing this flushes the filters
+    on the topmost frame.
+
+  filter
+    Filters the topmost stack frame, if it has outstanding unfiltered data.
+    This will propagate content to lower frames, possibly calling their
+    pre-append hooks.
+
+  flush
+    If there are no frames on the stack, calls "flush_output". Otherwise,
+    calls "flush_filters".
+
+  flush_filters
+    Flushes all filters. This does not flush output from the output buffer;
+    see "flush_output".
+
+  buffer
+    Returns the contents of the output buffer of the topmost frame; if there
+    are no frames, returns the output buffer.
+
+  buffer_ref
+    Returns a reference to the output buffer of the topmost frame; if there
+    are no frames, returns a reference to the output buffer. Note that
+    adjusting this skips pre-append and filter hooks.
+
+  length
+    Returns the number of characters appended to the current frame; if there
+    are no frames, returns the length of the output buffer.
+
+  flush_output
+    Flushes all filters using "flush_filters", then flushes output from the
+    output buffer, using the configured "out_method".
+
+  output_buffer
+    Returns the pending output buffer, which sits below all existing frames.
+
+  output_buffer_ref
+    Returns a reference to the pending output buffer, allowing you to modify
+    it.
+
+  clear
+    Clears *all* buffers in the stack, including the output buffer.
+
+  clear_top
+    Clears the topmost buffer in the stack; if there are no frames on the
+    stack, clears the output buffer.
+
+  out_method [CALLBACK]
+    Gets or sets the output method callback, which is given content from the
+    pending output buffer, which sits below all frames.
+
+SEE ALSO
+    Many concepts were originally taken from HTML::Mason's internal buffer
+    stack.
+
+AUTHORS
+    Alex Vandiver "alexmv@bestpractical.com"
+
+LICENSE
+    Copyright 2008-2009, Best Practical Solutions.
+
+    This package is distributed under the same terms as Perl itself.
+

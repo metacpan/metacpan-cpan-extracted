@@ -1,0 +1,4 @@
+(S1 ^foo bar ^baz boo ^link S2)
+(S2 ^faz far 
+	^boo baz
+	^fuzz buzz)

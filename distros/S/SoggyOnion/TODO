@@ -1,0 +1,8 @@
+---
+- add testing! duh
+- use XML::RSS::TimingBot instead of LWP::UserAgent
+- check for new config, manage cache
+- images doens't work with images: http://www.google.com/ -- double slash?
+- add google news plugin
+  - http://search.cpan.org/~bdwelle/WWW-Google-News-0.07/News.pm
+- set cache to use directory inside cachedir

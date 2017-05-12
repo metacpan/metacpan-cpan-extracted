@@ -1,0 +1,74 @@
+NAME
+    Sys::Prctl - Give access to prctl system call from Perl
+
+DESCRIPTION
+    This is simple module that wraps the prctl system call. Currently only
+    the PR_SET_NAME and PR_GET_NAME are implemented.
+
+    This can be use to change the process name as reported by "ps -A" and be
+    killable will killall.
+
+SYNOPSIS
+      use Sys::Prctl(prctl_name);
+  
+      #
+      # Use with functions
+      # 
+
+      # Process name is now "My long process name"
+      my $oldname = prctl_name();
+      prctl_name("My long process name");
+
+      #
+      # Use as an object
+      #
+  
+      my $process = new Sys::Prctl();
+
+      # Process name is now "Short name"
+      my $oldname = $process->name();
+      $process->name('Short name');
+
+      #
+      # Real world use
+      #
+
+      # instead of "perl helloworld.pl"
+      $0 = "helloworld"
+      prctl_name("helloworld");
+
+      print "Hello World\n";
+      sleep 100;
+
+      # Process can now be killed with "killall helloworld"
+
+METHODS
+    new()
+        Creates a new Sys::Prctl object.
+
+    name([$string])
+        Set or get the process name.
+
+    prctl_name([$string])
+        Set or get the process name.
+
+        $string can only be 15 chars long on Linux.
+
+        Returns undef on error.
+
+    prctl($option, $arg2, $arg3, $arg4, $arg5)
+        Direct wrapper for prctl call
+
+NOTES
+    Currently only 32bit Linux has been tested. So test reports and patches
+    are wellcome.
+
+AUTHOR
+    Troels Liebe Bentsen <tlb@rapanden.dk>
+
+COPYRIGHT
+    Copyright(C) 2005-2007 Troels Liebe Bentsen
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

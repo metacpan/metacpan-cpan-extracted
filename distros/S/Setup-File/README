@@ -1,0 +1,16 @@
+FAQ
+
+ Why not allowing coderef in 'check_content_func' and 'gen_content_func'
+ argument?
+
+    Because transactional function needs to store its argument in database
+    (currently in JSON), coderefs are not representable in JSON.
+
+SEE ALSO
+
+    Setup
+
+    Setup::File::Dir
+
+    Setup::File::Symlink
+

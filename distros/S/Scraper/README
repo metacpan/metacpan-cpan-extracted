@@ -1,0 +1,64 @@
+
+CHANGES: See <A href='http://search.cpan.org/doc/GLENNWOOD/Scraper-2.13/CHANGES'>CHANGES</A>
+
+WWW::Search::Scraper
+WWW::Search::Sherlock
+WWW::Search::Scraper::*
+WWW::Search::Scraper::Request
+WWW::Search::Scraper::Response
+
+DEPENDENCIES -
+	WWW::Search
+	Tie::Persistent
+	Storable
+
+These modules scrape data from search engines on the WWW (much like Apple's 
+Sherlock, but these are more capable, complete, and accurate.)
+
+Version 2.00 is a major departure from versions 1.xx
+
+1. Search engies are classified by type
+   a. Job
+   b. Apartments
+   c. Auction
+   d. etc.
+2. Queries are translated from a single canonical form to each search engine
+   by that engine's Scraper module. For example,
+   a. A single location property is translated to the numerous coding and taxonomy
+      systems of the various engines.
+   b. A single price (or range) is matched to the closest price (range) of each search engine.
+3. Post-filtering base on the results page, and on detail pages, via Perl coding.
+4. Retains ease of framing the results page, and extends that to framing the detail page.
+5. Backward compatible.
+   
+Complete documentation can be found in WWW::Search::Scraper and 
+WWW::Search::Scraper::Sherlock.
+
+Special options for each type of search engine are documented in their respective modules.
+
+Examples include:
+
+1. SearchApartments - illustrates how to easily set up and use one search engine.
+2. Sherlock    - illustrates the ease of adapting any Sherlock plugin.
+3. Scraper     - illustrates how SearchResult sub-classing can be used to build
+                 a more generalized search engine scraper. You can see how this
+		 can be extended to build a multi-engine scraper.
+		 
+
+If you want to write new Scraper modules to access new search engines, see
+Brainpower.pm for the current "best practices".
+
+Happy Hunting!
+
+
+AUTHOR: Glenn Wood, glenwood@alumni.caltech.edu
+
+#---------------------------------------------------------------------#
+$VERSION = '2.27'
+
+See "Changes" file for history of changes.
+
+KNOWN PROBLEMS
+
+theWorksUSA.pm more often than not goes into a loop.
+techies.pm keeps saying "Please enable your cookies", so it doesn't work at all.

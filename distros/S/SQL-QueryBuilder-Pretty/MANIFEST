@@ -1,0 +1,27 @@
+README
+Makefile.PL
+Makefile
+MANIFEST
+t/pod-coverage.t
+t/pod.t
+t/00-load.t
+t/boilerplate.t
+lib/SQL/QueryBuilder/Pretty/Handler/DBI/db.pm
+lib/SQL/QueryBuilder/Pretty/Handler/DBI/db/mysql.pm
+lib/SQL/QueryBuilder/Pretty/Rule.pm
+lib/SQL/QueryBuilder/Pretty/Database/ANSI/Punctuation.pm
+lib/SQL/QueryBuilder/Pretty/Database/ANSI/Operator.pm
+lib/SQL/QueryBuilder/Pretty/Database/ANSI/Comment.pm
+lib/SQL/QueryBuilder/Pretty/Database/ANSI/LogicOperator.pm
+lib/SQL/QueryBuilder/Pretty/Database/ANSI/Identifier.pm
+lib/SQL/QueryBuilder/Pretty/Database/ANSI/Clause.pm
+lib/SQL/QueryBuilder/Pretty/Database/ANSI/Space.pm
+lib/SQL/QueryBuilder/Pretty/Database/ANSI/Function.pm
+lib/SQL/QueryBuilder/Pretty/Database/ANSI/Statement.pm
+lib/SQL/QueryBuilder/Pretty/Database/ANSI/Quote.pm
+lib/SQL/QueryBuilder/Pretty/Database/MySQL.pm
+lib/SQL/QueryBuilder/Pretty/Database/MySQL/Clause.pm
+lib/SQL/QueryBuilder/Pretty/Print.pm
+lib/SQL/QueryBuilder/Pretty.pm
+Changes
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,31 @@
+---
+abstract: 'descriptives, deviation and combinatorial tests of Wald-Wolfowitz runs'
+author:
+  - 'Roderick Garton <rgarton@cpan.org>'
+build_requires:
+  Array::Compare: '2.11'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.4210'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Statistics-Sequences-Runs
+provides:
+  Statistics::Sequences::Runs:
+    file: lib/Statistics/Sequences/Runs.pm
+    version: '0.22'
+requires:
+  List::AllUtils: '0.09'
+  Number::Misc: '1.2'
+  Statistics::Sequences: '0.15'
+  Statistics::Zed: '0.10'
+  String::Numeric: '0.9'
+  perl: '5.006'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.22'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

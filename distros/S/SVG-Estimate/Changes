@@ -1,0 +1,56 @@
+1.0107 2017-01-23
+ * Prevent SVG lengths from having units, for now.
+
+1.0106 2016-10-03
+ * Update default and required parameters for SVG shapes
+
+1.0105 2016-10-02
+ * Fix end point of SVG Paths.
+
+1.0104 2016-09-04
+ * Document the required versions of Image::SVG::{Path,Transform}
+
+1.0103 2016-09-02
+ * Add summarizing of the transformation stack
+
+1.0102 2016-08-22
+ * No significant changes in this release
+
+1.0101 2016-08-22
+ * Added summarize option to dump out copious debugging output
+ * Fixed a bug in overestimating moveto travel lenghs in paths.
+
+1.0100 2016-08-02
+ * Added width and height outputs to estimatesvg CLI program.
+ * Fixed interface for SVG Path Arc elements
+ * Separate move and shape lengths for Path elements
+
+1.0008 2016-06-16
+ * Handle the case where an element only has a single child.
+
+1.0007 2016-06-16
+ * Upped the requirements for Image::SVG::Transform to 0.03
+
+1.0006 2016-06-15
+ * Bug fixes in the CLI.
+
+1.0005 2016-06-15
+ * Fix the name of a method referenced in the pod. Thanks to Jeremy Leader.
+ * Previously forgot to commit the changes file.
+
+1.0004 2016-06-14
+ * Removed the experimental keys on scalar so that it works properly on Perl 5.24.
+
+1.0003 2016-06-13
+ * Switch out smart match for List::MoreUtils any.
+
+1.0002 2016-06-12
+ * Forgot to add Image::SVG::Transform dependency. 
+
+1.0001 2016-06-12
+ * Some quick POD fixes.
+ * Forgot to add version number to modules.
+
+1.0000 2016-06-12
+ * Initial public release.
+

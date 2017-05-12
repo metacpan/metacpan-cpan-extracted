@@ -1,0 +1,89 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+1.000003
+
+1.000002 2015-08-16T08:09:03Z
+
+1.000001 2015-08-16T08:00:25Z
+
+1.000000 2015-08-16T07:38:09Z
+ [Added / configure requires]
+ - ExtUtils::MakeMaker
+ - perl 5.006
+
+ [Added / test requires]
+ - ExtUtils::MakeMaker
+ - File::Spec
+ - perl 5.006
+
+ [Changed / test requires]
+ - Test::More 0.98 → 0.96
+
+ [Removed / build requires]
+ - Module::Build 0.4004
+
+ [Removed / configure requires]
+ - Module::Build 0.4004
+
+ [Removed / test requires]
+ - File::Find
+ - File::Temp
+
+0.01060817 2013-04-10T06:25:04Z
+ [Changed / build requires]
+ - Module::Build 0.3601 → 0.4004
+
+ [Changed / configure requires]
+ - Module::Build 0.3601 → 0.4004
+
+ [Changed / test requires]
+ - Test::More 0.96 → 0.98
+
+0.01060816 2012-03-13T06:22:02Z
+ [Added / runtime requires]
+ - perl 5.006
+ - strict
+ - warnings
+
+ [Removed / test requires]
+ - English
+
+0.01060815 2011-04-14T03:32:21Z
+ [Added / build requires]
+ - Module::Build 0.3601
+
+ [Added / configure requires]
+ - Module::Build 0.3601
+
+ [Added / runtime requires]
+ - Moose::Role 0.90
+ - Search::GIN::Extract
+ - Search::GIN::Extract::Attributes
+ - Search::GIN::Extract::Callback
+
+ [Added / test requires]
+ - English
+ - File::Find
+ - File::Temp
+ - Test::More 0.96
+
+ [Changed / runtime requires]
+ - MooseX::Types 0.19 → 0
+ - MooseX::Types::Moose 0.19 → 0
+ - aliased 0.30 → 0
+ - namespace::autoclean 0.08 → 0
+
+ [Removed / runtime requires]
+ - Search::GIN 0.03
+ - Test::More 0.92
+
+0.01002312 2009-09-18T00:54:27Z
+ [Changed / runtime requires]
+ - Moose 0.89 → 0.90
+
+ [Removed / runtime requires]
+ - MooseX::AttributeHelpers 0.21
+
+0.01001206 2009-09-06T18:00:57Z
+ [Added / runtime requires]
+ - aliased 0.30

@@ -1,0 +1,28 @@
+---
+name: SSH-RPC
+version: 1.201
+author: []
+abstract: A secure way of running Perl methods on a remote server over SSH.
+license: perl
+resources:
+  license: ~
+requires:
+  Class::InsideOut: 1.06
+  JSON: 2.12
+  Net::OpenSSH: 0.39
+  perl: 5.8.8
+dynamic_config: 0
+provides:
+  SSH::RPC::Client:
+    file: lib/SSH/RPC/Client.pm
+    version: 1.201
+  SSH::RPC::Result:
+    file: lib/SSH/RPC/Result.pm
+    version: 1.201
+  SSH::RPC::Shell:
+    file: lib/SSH/RPC/Shell.pm
+    version: 1.201
+generated_by: Module::Build version 0.31012
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

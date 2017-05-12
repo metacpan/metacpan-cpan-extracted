@@ -1,0 +1,7 @@
+ Support for:
+ - UDP associate
+ - Challenge Handshake Authentication (CHAP) Protocol
+ - Generic Security Service (GSS) API
+ - Extensible Authentication Protocol (EAP) Authentication
+ - Multi-authentication Framework Method (MAF)
+ - SOCKS5 multicast extension

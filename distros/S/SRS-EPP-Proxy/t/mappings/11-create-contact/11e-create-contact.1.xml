@@ -1,0 +1,16 @@
+<NZSRSResponse VerMajor="5" VerMinor="0" RegistrarId="90">
+<Response Action="HandleCreate" FeId="8" FeSeq="4761525" OrigRegistrarId="1" RecipientRegistrarId="90" Rows="1" TransId="1">
+<FeTimeStamp Day="28" Hour="15" Minute="55" Month="6" Second="41" TimeZoneOffset="+12:00" Year="2010"/>
+<Handle HandleId="simple2" Name="Albert Einstein" Email="a@smartarse.co.te" RegistrarId="90">
+<PostalAddress Address1="electric avenue" City="Anywhere" CountryCode="NZ" PostalCode="300000" Province="Everywhere"/>
+<Phone CountryCode="64" LocalNumber="44798699"/>
+<Fax CountryCode="64" LocalNumber="44798699"/>
+<AuditDetails ActionId="20100628 1" RegistrarId="1">
+<AuditTime>
+<From Day="28" Hour="15" Minute="55" Month="6" Second="41" TimeZoneOffset="+12:00" Year="2010"/>
+</AuditTime>
+<AuditText/>
+</AuditDetails>
+</Handle>
+</Response>
+</NZSRSResponse>

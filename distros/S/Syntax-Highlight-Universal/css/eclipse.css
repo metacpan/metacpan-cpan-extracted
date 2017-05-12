@@ -1,0 +1,98 @@
+/* Generated with hrd2css.pl from eclipse.hrd */
+
+.def_HorzCross {
+	color: #000000;
+	background-color: #e1ebe0;
+}
+
+.def_VertCross {
+	color: #000000;
+	background-color: #e1ebe0;
+}
+
+.def_String {
+	color: #2a00ff;
+}
+
+.def_Comment {
+	color: #3F7F59;
+}
+
+.def_CommentContent {
+	color: #7F9FBF;
+	font-weight: bold;
+}
+
+.def_CommentDoc {
+	color: #3F5FBF;
+}
+
+.def_Keyword {
+	color: #7F0055;
+	font-weight: bold;
+}
+
+.def_Directive {
+	color: #7F0055;
+}
+
+.def_Tag {
+	color: #7F0055;
+}
+
+.def_OpenTag {
+	color: #7F0055;
+}
+
+.def_CloseTag {
+	color: #7F0055;
+}
+
+.def_Insertion {
+	color: #000000;
+	background-color: #ffffe8;
+}
+
+.def_InsertionStart {
+	color: #800000;
+	background-color: #ffffa4;
+}
+
+.def_InsertionEnd {
+	color: #800000;
+	background-color: #ffffa4;
+}
+
+.def_Error {
+	color: #ffffff;
+	background-color: #dd0000;
+	font-weight: bold;
+	font-style: italic;
+}
+
+.def_ErrorText {
+	color: #ee00ee;
+}
+
+.def_TODO {
+	color: #ffffff;
+	background-color: #808000;
+}
+
+.def_Debug {
+	color: #80abfd;
+	background-color: #007084;
+}
+
+.def_URI {
+	color: #3f3fbf;
+}
+
+.def_PairStart {
+	color: #a0a0a0;
+}
+
+.def_PairEnd {
+	color: #a0a0a0;
+}
+

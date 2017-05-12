@@ -1,0 +1,87 @@
+==================================================
+Changes from 2014-08-31 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.002 at 2015-08-31 11:35:40 +0000
+------------------------------------------
+
+  Change: 9f9fb462016d2256350a6c8910145ed8509cc240
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2015-08-31 12:35:28 +0000
+
+    Doc fixes. Points to github issues 
+
+  Change: 84bfb7a14d09f847f3c79b8a6a52315cc5072390
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2015-08-27 17:59:16 +0000
+
+    Changed author email 
+
+------------------------------------------
+version 0.001 at 2015-08-27 16:58:24 +0000
+------------------------------------------
+
+  Change: ce92908f3648c6ec3032a15d754a5b0030cb4bba
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2015-08-27 17:58:24 +0000
+
+    Updated readme 
+
+  Change: a63298bf1087e0bd2d9540692695513e5a368236
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2015-08-27 17:55:51 +0000
+
+    Fixed travis 
+
+  Change: 2a1df9d298da0955e46a8af2eab90e0878f3a23b
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2015-08-27 17:51:26 +0000
+
+    Added build picture 
+
+  Change: 76cbbfdf26656df21c0d3bfb92b1a1f70c878558
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2015-08-27 17:49:06 +0000
+
+    Added travis 
+
+  Change: d1a2224e97a4611c0cddc3c7ea97e872235d5ec3
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2015-08-27 17:47:14 +0000
+
+    Build README.md from the main package 
+
+  Change: 2a98ae9e826a01828164e90569cceb22393339d3
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2015-08-27 17:44:08 +0000
+
+    Git ignore more stuff 
+
+  Change: 2659bcee154c2cd5b43e9d0d7e3977f379424de8
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2015-08-27 17:40:43 +0000
+
+    Options and multiline work 
+
+  Change: 178170b7fbbd9798f6f5be143bacadb597a8dc88
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2015-08-27 17:17:35 +0000
+
+    Introduce configurable regex 
+
+  Change: 75ea12d4380c3d83aceb69f2695bbc0e5ae884dc
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2015-08-27 17:13:02 +0000
+
+    Basic tests pass 
+
+  Change: d8f6ad86abefce038d0e42e2910271bd3f6d1efb
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2015-08-27 16:17:51 +0000
+
+    Inception 
+
+================
+End of releases.
+================

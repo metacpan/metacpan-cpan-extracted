@@ -1,0 +1,264 @@
+NAME
+    `Socket::Packet' - interface to Linux's `PF_PACKET' socket family
+
+SYNOPSIS
+     use Socket qw( SOCK_RAW );
+     use Socket::Packet qw(
+        PF_PACKET
+        ETH_P_ALL
+        pack_sockaddr_ll unpack_sockaddr_ll
+     );
+ 
+     socket( my $sock, PF_PACKET, SOCK_RAW, 0 )
+        or die "Cannot socket() - $!\n";
+ 
+     bind( $sock, pack_sockaddr_ll( ETH_P_ALL, 0, 0, 0, "" ) )
+        or die "Cannot bind() - $!\n";
+ 
+     while( my $addr = recv( $sock, my $packet, 8192, 0 ) ) {
+        my ( $proto, $ifindex, $hatype, $pkttype, $addr )
+           = unpack_sockaddr_ll( $addr );
+
+        ...
+     }
+
+DESCRIPTION
+    To quote `packet(7)':
+
+     Packet sockets are used to receive or send raw packets at the device driver
+     (OSI Layer 2) level. They allow the user to implement protocol modules in
+     user space on top of the physical layer.
+
+    Sockets in the `PF_PACKET' family get direct link-level access to the
+    underlying hardware (i.e. Ethernet or similar). They are usually used to
+    implement packet capturing, or sending of specially-constructed packets
+    or to implement protocols the underlying kernel does not recognise.
+
+    The use of `PF_PACKET' sockets is usually restricted to privileged users
+    only.
+
+    This module also provides various other support functions which wrap
+    `ioctl()'s or socket options. This includes support for
+    `PACKET_RX_RING', the high-performance zero-copy packet receive
+    buffering, if the underlying platform supports it.
+
+CONSTANTS
+    The following constants are exported
+
+    PF_PACKET
+            The packet family (for `socket()' calls)
+
+    AF_PACKET
+            The address family
+
+    PACKET_HOST
+            This packet is inbound unicast for this host.
+
+    PACKET_BROADCAST
+            This packet is inbound broadcast.
+
+    PACKET_MULTICAST
+            This packet is inbound multicast.
+
+    PACKET_OTHERHOST
+            This packet is inbound unicast for another host.
+
+    PACKET_OUTGOING
+            This packet is outbound.
+
+    ETH_P_ALL
+            Pseudo-protocol number to capture all protocols.
+
+    SOL_PACKET
+            Socket option level for `getsockopt' and `setsockopt'.
+
+SOCKET OPTIONS
+    The following constants define socket options
+
+    PACKET_STATISTICS (get; struct tpacket_stats)
+            Packet received and drop counters.
+
+    PACKET_ORIGDEV (get or set; int)
+            Received packets will indicate the originally-received device,
+            rather than the apparent one. This mainly relates to Ethernet
+            bonding or VLANs.
+
+            This socket option is optional, and may not be provided on all
+            platforms.
+
+    PACKET_ADD_MEMBERSHIP (set; struct packet_mreq)
+    PACKET_DROP_MEMBERSHIP (set; struct packet_mreq)
+            Membership of multicast or broadcast groups, or set promiscuous
+            mode.
+
+            The `packet_mreq' `type' field should be one of the following:
+
+            PACKET_MR_MULTICAST
+                A multicast group
+
+            PACKET_MR_PROMISC
+                Set or clear the promiscuous flag; the address is ignored
+
+            PACKET_MR_ALLMULTI
+                Set or clear the allmulti flag; the address is ignored
+
+FUNCTIONS
+    The following pair of functions operate on `AF_PACKET' address
+    structures. The meanings of the parameters are:
+
+    protocol
+            An ethertype protocol number. When using an address with
+            `bind()', the constant `ETH_P_ALL' can be used instead, to
+            capture any protocol. The `pack_sockaddr_ll()' and
+            `unpack_sockaddr_ll()' functions byte-swap this value to or from
+            network endian order.
+
+    ifindex The index number of the interface on which the packet was sent
+            or received. When using an address with `bind()', the value `0'
+            can be used instead, to watch all interfaces.
+
+    hatype  The hardware ARP type of hardware address.
+
+    pkttype The type of the packet; indicates if it was sent or received.
+            Will be one of the `PACKET_*' values.
+
+    addr    The underlying hardware address, in the type given by `hatype'.
+
+  $a = pack_sockaddr_ll( $protocol, $ifindex, $hatype, $pkttype, $addr )
+    Returns a `sockaddr_ll' structure with the fields packed into it.
+
+  ( $protocol, $ifindex, $hatype, $pkttype, $addr ) = unpack_sockaddr_ll( $a )
+    Takes a `sockaddr_ll' structure and returns the unpacked fields from it.
+
+  $mreq = pack_packet_mreq( $ifindex, $type, $addr )
+    Returns a `packet_mreq' structure with the fields packed into it.
+
+  ( $ifindex, $type, $addr ) = unpack_packet_mreq( $mreq )
+    Takes a `packet_mreq' structure and returns the unpacked fields from it.
+
+  ( $packets, $drops ) = unpack_tpacket_stats( $stats )
+    Takes a `tpacket_stats' structure from the `PACKET_STATISTICS' sockopt
+    and returns the unpacked fields from it.
+
+  $time = siocgstamp( $sock )
+  ( $sec, $usec ) = siocgstamp( $sock )
+    Returns the timestamp of the last received packet on the socket (as
+    obtained by the `SIOCGSTAMP' `ioctl'). In scalar context, returns a
+    single floating-point value in UNIX epoch seconds. In list context,
+    returns the number of seconds, and the number of microseconds.
+
+  $time = siocgstampns( $sock )
+  ( $sec, $nsec ) = siocgstampns( $sock )
+    Returns the nanosecond-precise timestamp of the last received packet on
+    the socket (as obtained by the `SIOCGSTAMPNS' `ioctl'). In scalar
+    context, returns a single floating-point value in UNIX epoch seconds. In
+    list context, returns the number of seconds, and the number of
+    nanoseconds.
+
+  $ifindex = siocgifindex( $sock, $ifname )
+    Returns the `ifindex' of the interface with the given name if one
+    exists, or `undef' if not. `$sock' does not need to be a `PF_PACKET'
+    socket, any socket handle will do.
+
+  $ifname = siocgifname( $sock, $ifindex )
+    Returns the `ifname' of the interface at the given index if one exists,
+    or `undef' if not. `$sock' does not need to be a `PF_PACKET' socket, any
+    socket handle will do.
+
+  ( $addr, $len ) = recv_len( $sock, $buffer, $maxlen, $flags )
+    Similar to Perl's `recv' builtin, except it returns the packet length as
+    an explict return value. This may be useful if `$flags' contains the
+    `MSG_TRUNC' flag, obtaining the true length of the packet on the wire,
+    even if this is longer than the data written in the buffer.
+
+RING-BUFFER FUNCTIONS
+    The following functions operate on the high-performance memory-mapped
+    buffer feature of `PF_PACKET', allowing efficient packet-capture
+    applications to share a buffer with the kernel directly, avoiding the
+    need for per-packet system calls to `recv()' (and possibly `ioctl()' to
+    obtain the timestamp).
+
+    The ring-buffer is optional, and may not be implemented on all
+    platforms. If it is not implemented, then all the following functions
+    will die with an error message.
+
+  $size = setup_rx_ring( $sock, $frame_size, $frame_nr, $block_size )
+    Sets up the ring-buffer on the socket. The buffer will store `$frame_nr'
+    frames of up to `$frame_size' bytes each (including metadata headers),
+    and will be split in the kernel in blocks of `$block_size' bytes.
+    `$block_size' should be a power of 2, at minimum, 4KiB.
+
+    If successful, the overall size of the buffer in bytes is returned. If
+    not, `undef' is returned, and `$!' will hold the error value.
+
+  $status = get_ring_frame_status( $sock )
+    Returns the frame status of the next frame in the ring.
+
+    The following constants are defined for the status:
+
+    TP_STATUS_KERNEL
+            This frame belongs to the kernel and userland should not touch
+            it.
+
+    TP_STATUS_USER
+            This frame belongs to userland and the kernel will not modify
+            it.
+
+    TP_STATUS_LOSING
+            Bitwise-or'ed with the status if packet loss has occurred since
+            the previous frame.
+
+  $len = get_ring_frame( $sock, $buffer, \%info )
+    If the next frame is ready for userland, fills in keys of the `%info'
+    hash with its metadata, sets `$buffer' to its contents, and return the
+    length of the data. The `$buffer' variable has its string backing buffer
+    aliased, rather than the buffer copied into, for performance. The caller
+    should not modify the variable, nor attempt to access it after the
+    socket has been closed.
+
+    If the frame is not yet ready, this function returns undef.
+
+    The following fields are returned:
+
+    tp_status
+            The status of the frame; see `get_ring_frame_status()'
+
+    tp_len  The length of the packet on the wire, in bytes
+
+    tp_snaplen
+            The length of the packet captured and stored in the buffer, in
+            bytes. This may be shorter than `tp_len' if, for example, a
+            filter is set on the socket that truncated the packet.
+
+    tp_sec
+    tp_nsec The seconds and nanoseconds fields of the timestamp. If the
+            underlying platform does not support `TPACKET_V2', then this
+            field will only have a resolution of microseconds; i.e. it will
+            be a whole multiple of 1000.
+
+    tp_vlan_tci
+            VLAN information about the packet, if the underlying platform
+            supports `TPACKET_V2'. If this is not supported, the key will
+            not be present in the hash
+
+    sll_protocol
+    sll_ifindex
+    sll_hatype
+    sll_pkttype
+    sll_addr
+            Fields from the `struct sockaddr_ll'; see above for more detail
+
+  clear_ring_frame( $sock )
+    Clears the status of current frame to hand it back to the kernel and
+    moves on to the next.
+
+SEE ALSO
+    *   IO::Socket::Packet - Object interface to `AF_PACKET' domain sockets
+
+    *   Linux::SocketFilter - interface to Linux's socket packet filtering
+
+    *   `packet(7)' - packet, AF_PACKET - packet interface on device level
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

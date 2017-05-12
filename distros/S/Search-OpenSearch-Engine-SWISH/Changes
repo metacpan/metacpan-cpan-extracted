@@ -1,0 +1,14 @@
+Revision history for Search-OpenSearch-Engine-SWISH
+
+0.04  2 Nov 2013
+ - no POD tests on CPAN
+
+0.03 22 Oct 2011
+ - fix documentation
+
+0.02 28 Feb 2010
+ - fix test to check for SWISH::API::Object first.
+
+0.01 01 Feb 2010
+ - First version, released on an unsuspecting world.
+

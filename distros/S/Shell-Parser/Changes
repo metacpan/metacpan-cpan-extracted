@@ -1,0 +1,21 @@
+Revision history for Shell-Parser
+
+0.04    2005.04.08
+        [FIX] Applied patch from Sergey Skvortsov to avoid warnings.
+        [DOC] Added diagnostics section.
+
+0.03    2005.04.03
+        [TESTS] Corrected t/01api.t
+        [DOC] Added direct RT link.
+
+0.02    2004.10.16
+        [BUGFIX] RT#7981 (Allen Day): Example does not work
+        [BUGFIX] Corrected some bugs in parse().
+        [DOC] Improved the documentation.
+        [TESTS] Improved t/01api.t
+        [TESTS] Added t/10handlers.t, t/11syntax.t and t/12parse.t 
+        [DOC] Added licenses texts.
+
+0.01    2004.10.11
+        First version, released on an unsuspecting world.
+

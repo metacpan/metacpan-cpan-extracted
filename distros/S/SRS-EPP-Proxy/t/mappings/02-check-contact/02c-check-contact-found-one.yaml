@@ -1,0 +1,29 @@
+template: check-contact.tt
+
+vars:
+  contact_ids:
+    - find-me
+
+input_assertions:
+  count:
+    - [ '//contact:id', 1, 'Initial EPP: Four contacts to check' ]
+
+SRS:
+  - assertions:
+      count:
+        - [ '//HandleIdFilter', 1, 'SRS: Check that there were 4 HandleIdFilters' ]
+        - [ '/NZSRSRequest/*', 1, 'SRS: Check there is only 1 command' ]
+      match:
+        - [ '//HandleIdFilter[1]', 'find-me', 'SRS: Check first contact is correct' ]
+      match_all:
+      attr_is: []
+
+output_assertions:
+  count:
+   - [ '//contact:cd', '1', 'Container' ]
+   - [ '//contact:id', 1, 'Check there is 1 id' ]
+  match:
+   - [ '//contact:id[1]', 'find-me', 'Check one is first' ]
+  match_all:
+    - [ '//contact:id/@avail', '0', 'EPP: check all contacts are available' ]
+  attr_is:

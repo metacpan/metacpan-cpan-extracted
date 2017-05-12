@@ -1,0 +1,12 @@
+Changes
+README
+Makefile.PL
+MANIFEST			This list of files
+
+Shell.pm
+t/Shell.t
+t/01_use.t
+t/99_pod.t
+
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

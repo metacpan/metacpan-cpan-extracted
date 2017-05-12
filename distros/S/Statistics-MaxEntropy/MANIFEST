@@ -1,0 +1,22 @@
+Changes
+MANIFEST
+README
+INSTALL.txt
+MaxEntropy.pm
+Candidates.pm
+SparseVector.pm		module for representing/manipulating sparse bitvectors
+ME.wrapper.pl		wrapper around MaxEntropy.pm and Candidates.pm
+Makefile.PL
+GNU_GPL.txt
+GNU_LGPL.txt
+data/events.txt		events described by binary functions
+data/candidates.txt
+TeX/root.tex
+TeX/makedoc
+TeX/makeREADME
+t/00____scaling.t	test the scaling algorithms
+t/01__induction.t	test the feature induction algorithm
+t/02_____sparse.t	test SparseVector.pm
+t/03___classify.t	test classification routine
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

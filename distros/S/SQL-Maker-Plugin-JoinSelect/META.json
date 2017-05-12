@@ -1,0 +1,71 @@
+{
+   "abstract" : "Plugin of SQL::Maker for making SQL contained `JOIN`",
+   "author" : [
+      "Masayuki Matsuki <y.songmu@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.5.3",
+   "license" : "perl_5",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "SQL-Maker-Plugin-JoinSelect",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "SQL::Maker" : "1.12",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "SQL::Maker::Plugin::JoinSelect" : {
+         "file" : "lib/SQL/Maker/Plugin/JoinSelect.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Songmu/p5-SQL-Maker-Plugin-JoinSelect/issues"
+      },
+      "homepage" : "https://github.com/Songmu/p5-SQL-Maker-Plugin-JoinSelect",
+      "repository" : {
+         "url" : "git://github.com/Songmu/p5-SQL-Maker-Plugin-JoinSelect.git",
+         "web" : "https://github.com/Songmu/p5-SQL-Maker-Plugin-JoinSelect"
+      }
+   },
+   "version" : "0.03"
+}

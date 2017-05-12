@@ -1,0 +1,78 @@
+{
+   "abstract" : "Reserved SQL words by ANSI/ISO",
+   "author" : [
+      "Christian Hansen C<chansen@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4, CPAN::Meta::Converter version 2.113640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "SQL-ReservedWords",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Sub::Exporter" : 0
+         }
+      }
+   },
+   "provides" : {
+      "SQL::ReservedWords" : {
+         "file" : "lib/SQL/ReservedWords.pm",
+         "version" : "0.8"
+      },
+      "SQL::ReservedWords::DB2" : {
+         "file" : "lib/SQL/ReservedWords/DB2.pm",
+         "version" : "0.8"
+      },
+      "SQL::ReservedWords::MySQL" : {
+         "file" : "lib/SQL/ReservedWords/MySQL.pm",
+         "version" : "0.8"
+      },
+      "SQL::ReservedWords::ODBC" : {
+         "file" : "lib/SQL/ReservedWords/ODBC.pm",
+         "version" : "0.8"
+      },
+      "SQL::ReservedWords::Oracle" : {
+         "file" : "lib/SQL/ReservedWords/Oracle.pm",
+         "version" : "0.8"
+      },
+      "SQL::ReservedWords::PostgreSQL" : {
+         "file" : "lib/SQL/ReservedWords/PostgreSQL.pm",
+         "version" : "0.8"
+      },
+      "SQL::ReservedWords::SQLServer" : {
+         "file" : "lib/SQL/ReservedWords/SQLServer.pm",
+         "version" : "0.8"
+      },
+      "SQL::ReservedWords::SQLite" : {
+         "file" : "lib/SQL/ReservedWords/SQLite.pm",
+         "version" : "0.8"
+      },
+      "SQL::ReservedWords::Sybase" : {
+         "file" : "lib/SQL/ReservedWords/Sybase.pm",
+         "version" : "0.8"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.8"
+}

@@ -1,0 +1,78 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Glob::Pipe
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = Pipe.new(...);
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef::Object::Object
+
+=head1 METHODS
+
+
+=head2 command
+
+Pipe.command() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 dump
+
+Pipe.dump() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 new
+
+Pipe.new() -> I<Obj>
+
+Return the
+
+Aliases: I<call>
+
+=cut
+
+=head2 open
+
+Pipe.open() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 open_r
+
+Pipe.open_r() -> I<Obj>
+
+Return the
+
+Aliases: I<open_read>
+
+=cut
+
+=head2 open_w
+
+Pipe.open_w() -> I<Obj>
+
+Return the
+
+Aliases: I<open_write>
+
+=cut

@@ -1,0 +1,84 @@
+
+#!start included /usr/lib/perl5/5.10/ExtUtils/MANIFEST.SKIP
+# Avoid version control files.
+\bRCS\b
+\bCVS\b
+\bSCCS\b
+,v$
+\B\.svn\b
+\B\.git\b
+\B\.gitignore\b
+\b_darcs\b
+
+# Avoid Makemaker generated and utility files.
+\bMANIFEST\.bak
+\bMakefile$
+\bblib/
+\bMakeMaker-\d
+\bpm_to_blib\.ts$
+\bpm_to_blib$
+\bblibdirs\.ts$         # 6.18 through 6.25 generated this
+
+# Avoid Module::Build generated and utility files.
+\bBuild$
+\b_build/
+
+# Avoid temp and backup files.
+~$
+\.old$
+\#$
+\b\.#
+\.bak$
+
+# Avoid Devel::Cover files.
+\bcover_db\b
+#!end included /usr/lib/perl5/5.10/ExtUtils/MANIFEST.SKIP
+
+^extlib
+^Su-.+\.tar\.gz$
+^work
+^tmp
+.*flymake.*
+\bTAGS$
+^MYMETA.yml$
+
+\bSu-[\d\.\_]+
+
+\bt_util/
+
+.shipit
+.shipit*
+
+Debian_CPANTS.txt
+\blib/Su/Procs/.*
+
+.*_flymake.*
+.gitattributes
+
+pod2htmd.tmp
+pod2htmi.tmp
+
+lib/Su/Procs/CheckModuleMethod.pm
+lib/Su/Procs/DBFindHashProc.pm
+lib/Su/Procs/DBFindProc.pm
+
+t/test18/Pkg/TestProc.pm
+perl.exe.stackdump
+bash.exe.stackdump
+
+
+develMemo.html
+develMemo.md
+
+
+lib/Su/Guides/Generating.pod
+
+t/test171/Defs/Defs.pm
+t/test171/Pkg/FooModel.pm
+t/test171/Pkg/FooProc.pm
+t/test171/Pkg/FooProc2.pm
+t/test171/Pkg/FooProc2Model.pm
+t/test171/Pkg/FooProc3.pm
+t/test171/Pkg/FooProc3Model.pm
+
+

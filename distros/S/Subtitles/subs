@@ -1,0 +1,605 @@
+#!/usr/bin/perl -w
+# $Id: subs,v 1.16 2008/03/07 22:24:49 dk Exp $
+use strict;
+use Subtitles;
+
+my @in;
+my $out  = 'out.sub';
+my $jtime = 2;
+my $a;
+my $b;
+my $d;
+my @eval;
+my $split;
+my $separate;
+my $verbose;
+my $codec;
+my $rate;
+my @points;
+my @q = (0, 'end');
+my $do_q;
+my $zip;
+my $inplace;
+
+sub usage
+{
+	my @codecs = map { s/Subtitles::Codec:://; $_} codecs;
+	print <<USAGE;
+subs: convert, join, split, and re-time subtitles
+
+format:
+   subs [options] subfile [ subfile ... ]
+
+options:
+   -a coeff, - a and b coefficients in linear transformation
+   -b time     u=at+b, where t and u are src and dest times
+               ( default(identity transform) is [a=1,b=0] ).
+	       -a can be set as ratio, f.ex. 23.9/25 
+   -c codec  - use codec to write file ( one of: '@codecs' )
+   -d        - try to prolong duration of quickly disappearing text
+   -e code   - run perl code for each line of text in file. On each
+               run, the text and time variables are initialized, and 
+	       new values, if any, written to the file. The variables
+	       are used for:
+	       \$_ - subtitle text line
+	       \$b - cue beginning
+	       \$e - cue end
+	       \$i - line number
+	       \$n - number of lines
+	       \%p - persistent data between runs
+	       The -e option can be specified several times
+   -h        - display this text
+   -i        - edit files in place ( makes backup in .bak files )
+   -j sec    - time interval between joins, seconds (default 2)
+   -o file   - file to save processed subtitles (default out.sub)
+   -O        - separate overlapped lines
+   -p t1 t2  - set a control point, where t1 is time of a phrase
+               spoken in the film and t2 is time when the same 
+	       phrase as appears in the subtitle. Two points are 
+	       required for deducing -a and -b coefficients; if 
+	       only one point is specified, it is assumed that
+	       the other one is [0,0]. Times can be relative, f.ex. 
+	       -p 01:00 +3.5 -p -20 1:00:00 
+   -P t2 t1    same as -p but reversed arguments ( use if -p was 
+               given in wrong order )
+   -r rate   - force frame-per-second rate for frame-based subs.
+               Useful numbers are 23.976, 24, 25.
+   -s time   - split in two parts by time
+   -q t1 t2  - restrict changes, if any, in time span t1-t2. Word
+               'end' can be used as an alias to the end of the 
+	       file. Default values are '0' and 'end'.
+   -v        - be verbose
+   -z file2  - zip subtitle files so time information is read from
+               file2, while text information is read from input file
+
+time format is either [[HH:]MM:]SS[.MSEC] or subtitle format-specific
+
+(bugs to <dmitry\@karasik.eu.org>)
+
+USAGE
+	exit(0);
+}
+
+
+# getopt
+{
+	my ( $i, $do, $ddash, $set_o);
+	sub nextarg
+	{
+		my $arg = $ARGV[++$i];
+		die "Option `-$1' requires more parameters\n" unless defined $arg;
+		$arg;
+	}
+	for ( $i = 0; $i < @ARGV; $i++) {
+		if ( !$ddash && $ARGV[$i] =~ /^-(.*)$/) {
+			if ( $1 eq 'h') {
+				usage();
+			} elsif ( $1 eq 'i') {
+				$inplace = 1;
+			} elsif ( $1 eq 'v') {
+				$verbose = 1;
+			} elsif ( $1 eq '-') {
+				$ddash = 1;
+			} elsif ( $1 eq 'o') {
+				$out	= nextarg;
+				$set_o = 1;
+			} elsif ( $1 eq 'O') {
+				$separate = 1;
+				$do = 1;
+			} elsif ( $1 eq 'j') {
+				$jtime = nextarg;
+				die "Invalid -j parameter\n"
+					unless $jtime =~ /^[-+]?\d+(\.\d+)?/;
+			} elsif ( $1 eq 'd') {
+				$d = 1;
+				$do = 1;
+			} elsif ( $1 eq 'e') {
+				push @eval, nextarg;
+				$do = 1;
+			} elsif ( $1 eq 'a') {
+				$a = nextarg;
+				$do = 1;
+				die "Invalid -a parameter `$a'\n"
+					unless $a =~ /^(\-?\d+(?:\.\d+)?)(?:\/(\d+(?:\.\d+)?))?/;
+				if ( defined $2) {
+					die "Divizion by zero\n" if $2 == 0;
+					$a = $1/$2;
+				}
+			} elsif ( $1 eq 'c') {
+				$codec = nextarg;
+				my @c = map { s/Subtitles::Codec:://; $_ } codecs;
+				my %c = map { $_ => 1 } @c;
+				die "Invalid codec name `$codec'; valid are: @c\n"
+					unless exists $c{$codec};
+				$do = 1;
+			} elsif ( $1 eq 'b') {
+				$b = nextarg;
+				$do = 1;
+			} elsif ( $1 eq 'p' or $1 eq 'P') {
+				die "Too many control points\n" if 2 == @points;
+				my @x = (nextarg, nextarg);
+				@x = reverse @x if $1 eq 'P';
+				push @points, \@x;
+				$do = 1;
+			} elsif ( $1 eq 'q') {
+				die "Too many brackets\n" if $do_q;
+				@q = (nextarg, nextarg);
+				$do_q = 1;
+			} elsif ( $1 eq 'r') {
+				$rate = nextarg;
+				die "Invalid rate `$rate'\n"
+					unless $rate =~ /^\d+(\.\d+)?$/;
+			} elsif ( $1 eq 's') {
+				$split = nextarg;
+				$do = 1;
+			} elsif ( $1 eq 'z') {
+				$zip = nextarg;
+				$do = 1;
+			} else {
+				die "Unknown option `-$1'\n";
+			}
+		} else {
+			push @in, $ARGV[$i];
+		}
+	}
+	usage() unless @in;
+	$do = 1 if 1 < @in;
+	die "Nothing to do!\n" unless $do;
+	if ( $inplace) {
+		die "-i and -o options are mutually exclusive\n" if $set_o;
+		die "Cannot edit in place for more than one input file\n" if 1 < @in;
+		die "Cannot edit in place for stdin input\n" if $in[0] eq '-';
+		$out = $in[0];
+	}
+}
+
+# read files
+my $dest;
+my @entries;
+for my $fn ( grep { defined } ( @in, $zip)) {
+	my $entry = Subtitles->new();
+	$entry-> rate( $rate) if $rate;
+	my $ret;
+	if ( $fn eq '-') {
+		$ret = $entry-> load(\*STDIN);
+		$fn = 'stdin';
+	} else {
+		open F, "< $fn" or die "Error: cannot open $_:$!\n";
+		$ret = $entry-> load(\*F);
+		close F;
+		$fn = "'$fn'";
+	}
+	die "Error loading $fn:$@\n" unless $ret;
+	if ( $verbose) {
+		my ( $c, $l) = ( $entry-> codec, $entry-> lines);
+		$c =~ s/Subtitles::Codec:://;
+		warn "read $l line(s) from $fn, codec=$c\n" if $verbose;
+	}
+	push @entries, $entry;
+}
+$zip = pop @entries if $zip;
+$dest = shift @entries;
+
+# validate time-based parameters
+if ( defined $split) {
+	my $s = $dest-> parse_time( $split);
+	die "Cannot parse time `$split'\n" unless defined $s;
+	die "`$split' is negative\n" if $s < 0;
+	$split = $s;
+	warn "split by ". time2str($s) . "\n" if $verbose;
+}
+
+
+# points
+for (@points) {
+	my ( $p1, $p2) = @$_;
+	my ( $s1, $s2);
+	$s1 = (($p1 =~ s/^([-+])//) ? $1 : '');
+	$s2 = (($p2 =~ s/^([-+])//) ? $1 : '');
+	my $t = $dest-> parse_time( $p1);
+	die "Cannot parse time `$s1$p1'\n" unless defined $t;
+	$p1 = $t;
+	$t = $dest-> parse_time( $p2);
+	die "Cannot parse time `$s2$p2'\n" unless defined $t;
+	$p2 = $t;
+	die "Both times in control point [$s1$p1,$s2$p2] are relative\n"
+		if length $s1 and length $s2;
+	if ( length $s1) { # $p1 is relative
+		$p1 = $p2 + $p1 * (( $s1 eq '-') ? -1 : 1);
+	} elsif ( length $s2) { # $p2 is relative
+		$p2 = $p1 + $p2 * (( $s2 eq '-') ? -1 : 1);
+	}
+	$_ = [$p1,$p2];
+}
+
+unshift @points, [0,0] if 1 == @points;
+
+if ( 2 == @points) {
+	my ( $t1, $u1) = @{$points[0]};
+	my ( $t2, $u2) = @{$points[1]};
+	die "-p option conflicts with -a and -b\n" if defined($a) || defined($b);
+	my ( $dt, $du) = ( $t2 - $t1, $u2 - $u1);
+	die "Point sets refers to the same time\n" if $dt == 0 || $du == 0;
+# 
+# 
+#    |u(subtitles)
+#    |
+# u2 |             *
+# u1 |	  *		
+#    |                      t(speech)
+#    ----------------------
+#	 t1       t2	  
+#
+	$a = $dt / $du;
+	$b = $t1 - $u1 * $a;
+
+	warn "control points [", time2str($t1), ",", time2str($u1), "], [",
+		 time2str($t2), ",", time2str($u2),
+		"]\n" if $verbose;
+	$b = time2str( $b);
+}
+
+# a & b
+$a = 1 unless defined $a;
+if ( defined $b) {
+	my $bb = $dest-> parse_time( $b);
+	die "Cannot parse time `$b'\n" unless defined $bb;
+	$b = $bb;
+	warn "a=$a,b='". time2str($b) . "'\n" if $verbose;
+} else {
+	$b = 0;
+	warn "a=$a,b=$b\n" if $verbose;
+}
+
+# process
+$dest-> join( $_, $jtime) for @entries; # join
+
+# zip
+if ( $zip) {
+	my $f1 = $zip->{from};
+	my $t1 = $zip->{to};
+	my $f2 = $dest->{from};
+	my $t2 = $dest->{to};
+	my $x2 = $dest->{text};
+	my $n1 = @$f1;
+	my $n2 = @$f2;
+	if ( $n2 > $n1) {
+		warn "zip: $n1 timeslices available while $n2 found in input -- ".
+		  "timeframes after ". time2str( $f2->[$n1] ).
+		  ", #$n1, will be left unchanged\n"
+	} elsif ( $n2 < $n1) {
+		warn "zip: $n2 timeslices available while only $n1 found in input -- " .
+		"padding with empty lines\n";
+		for ( my $i = $n2; $i < $n1; $i++) {
+			push @$f2, $$f1[$i];
+			push @$t2, $$t1[$i];
+			push @$x2, '';
+		}
+		$n1 = $n2;
+	}
+	for ( my $i = 0; $i < $n1; $i++) {
+		 ($$f2[$i], $$t2[$i]) = ( $$f1[$i], $$t1[$i]);
+	}		
+}
+
+# brackets and transform
+my $vv_q = "brackets [ ";
+for ( @q) {
+	if ( $_ eq 'end') {
+		$_ = $dest-> length;
+	} else {
+		my $q = $dest-> parse_time( $_);
+		die "Cannot parse time `$_'\n" unless defined $q;
+		$_ = $q;
+	}
+	$vv_q .= time2str($_) . ' ';
+}
+warn "$vv_q ]\n" if $verbose;
+$dest-> transform( $a, $b, @q);
+
+# prolong timing
+if ( $d) {
+	my $i = 0;
+	my $from = $dest->{from};
+	my $to	= $dest->{to};
+	my $text = $dest->{text};
+	my $n = @$from;
+	my $c = 0;
+	my ($qfrom, $qto) = @q;
+	$qfrom = 0 unless defined $qfrom;
+	$qto	 = $$to[-1] unless defined $qto;
+	for ( $i = 0; $i < $n; $i++) {
+		my @clob = split("\n", $$text[$i]);
+		my $min = 0.8 * @clob;
+		next if $$to[$i] - $$from[$i] > $min;
+		next if $$from[$i] > $qto || $$to[$i] < $qfrom;
+		if ( $i < $n - 1 && $$to[$i] + $min > $$from[$i+1]) {
+			$$to[$i] = $$from[$i+1] - 0.01;
+		} else {
+			$$to[$i] = $$from[$i] + $min;
+		}
+		$c++;
+	}
+	warn "$c lines prolonged\n";
+}
+
+# -O
+if ( $separate) {
+	my $from = $dest->{from};
+	my $to	= $dest->{to};
+	my $text = $dest->{text};
+	my $n = @$from;
+	my $c = 0;
+	my ($qfrom, $qto) = @q;
+	$qfrom = 0 unless defined $qfrom;
+	$qto	 = $$to[-1] unless defined $qto;
+	for ( my $i = 0; $i < $n - 1; $i++) {
+		next if $$from[$i] > $qto || $$to[$i + 1] < $qfrom;
+		my $d = $$to[$i] - $$from[$i + 1];
+		next if $d < 0;
+		$d = 0.002 if $d < 0.002;
+		$d /= 2.0;
+		$$to[$i]		 -= $d;
+		$$from[$i+1] += $d + 0.001;
+		$c++;
+	}
+	warn "$c overlapped lines separated\n";
+}
+
+# -e
+if ( @eval) {
+	my $i = 0;
+	my $from = $dest->{from};
+	my $to	= $dest->{to};
+	my $text = $dest->{text};
+	my $n = @$from;
+	my ($qfrom, $qto) = @q;
+	$qfrom = 0 unless defined $qfrom;
+	$qto	 = $$to[-1] unless defined $qto;
+	my %p;
+	
+	for my $eval ( @eval) {
+		for ( $i = 0; $i < $n; $i++) {
+			local $_ = $$text[$i];
+			my $b = $$from[$i];
+			my $e = $$to[$i];
+			next if $b > $qto || $e < $qfrom;
+			eval $eval;
+			die "error in '$eval': $@" if $@;
+			$$text[$i] = $_;
+			$$from[$i] = $b;
+			$$to[$i] = $e;
+		}
+	}
+}
+
+$dest-> codec( "Subtitles::Codec::$codec") if defined $codec;
+my @write;
+
+if ( defined $split) {
+# split & save
+# no inplace logic - original file is never overwritten
+	my ( $s1, $s2) = $dest-> split( $split);
+	my $root = $out;
+	$root =~ s/(\.[^\.]*)$//;
+	my $tail = defined($1) ? $1 : '';
+	warn "write ".$s1->lines." line(s) in '$root.1$tail'\n" if $verbose;
+	open F, "> $root.1$tail" or die "Cannot open $root.1$tail:$!\n";
+	$s1-> save(\*F) or die "Error saving $root.2$tail:$@\n";
+	close F;
+	warn "write ".$s2->lines." line(s) in '$root.2$tail'\n" if $verbose;
+	open F, "> $root.2$tail" or die "Cannot open $root.2$tail:$!\n";
+	$s2-> save(\*F) or die "Error saving $root.2$tail:$@\n"; 
+	close F;
+} else {
+# just save
+	warn "write ".$dest->lines." line(s) in '$out'\n" if $verbose;
+	my $rename = $inplace or -f $out;
+	if ( $rename) {
+		rename $out, "$out.bak" or die "Cannot rename $out to $out.bak:$!\n";
+	}
+	eval {
+		open F, "> $out" or die "Cannot open $out:$!\n";
+		$dest-> save(\*F) or die "Error saving $out:$@\n";
+		close F;
+	};
+	if ( $@) {
+		rename "$out.bak", $out if $rename;
+		die $@;
+	}
+}
+# done
+exit(0);
+
+
+__DATA__
+
+=pod
+
+=head1 NAME
+
+subs - convert, join, split, and re-time subtitles
+
+=head1 FORMAT
+
+	subs [options] subfile [ subfile ... ]
+
+=head1 OPTIONS
+
+=over
+
+=item -a coeff, -b time
+
+a and b coefficients in linear transformation u=at+b, where t and u are src and
+dest times ( default(identity transform) is [a=1,b=0] ).  -a can be set as
+ratio, f.ex. 23.9/25 
+
+=item -c codec  
+
+Use codec to write file. Run 'subs -h' for list of installed codecs.
+
+=item -d
+	
+Try to prolong duration of quickly disappearing text.
+'Quickly' is less than 0.8 second per line of text.
+
+=item -e command
+
+Run perl code for each line of text in file. On each run, the text and time
+variables are initialized, and new values, if any, written to the file. The
+variables are used for:
+
+=over
+
+=item $_
+
+subtitle text line
+
+=item $b
+
+cue beginning
+
+=item $e
+
+cue end
+
+=item $i
+
+line number
+
+=item $n
+
+number of lines
+
+=item %p
+
+persistent data between runs
+
+=back
+
+The -e option can be specified several times
+
+=item -h
+
+Display help
+
+=item -i
+
+Edit files in place ( makes backup in .bak files )
+
+=item -j sec
+
+Time interval between joins, seconds (default 2)
+
+=item -o file
+
+File to save processed subtitles (default out.sub)
+
+=item -O
+
+Separate overlapped lines
+
+=item -p t1 t2 or -P t2 t1
+
+Set a control point, where t1 is time of a phrase spoken in the film and t2 is
+time when the same phrase as appears in the subtitle. Two points are required
+for deducing -a and -b coefficients; if only one point is specified, it is
+assumed that the other one is [0,0].
+
+Times can be relative, f.ex. -p 01:00 +3.5 -p -20 1:00:00
+
+Options -P and -p are the same except the argument sequence is reversed.  -P is
+to be used when arguments to -p were typed manually and in wrong order.
+
+=item -q t1 t2
+
+Restrict changes, if any, in time span t1-t2. Word 'end' can be used as an
+alias to the end of the file. Default values are '0' and 'end'.
+
+=item -r rate
+
+Force frame-per-second rate for frame-based subs
+
+=item -s time
+
+Split in two parts by time
+
+=item -v
+
+Be verbose
+
+=item -z file.sub
+   
+Zip subtitle files so time information is read from file.sub, while text
+information is read from the input file(s).
+
+=back
+
+=head1 NOTES
+
+The time format is either [[HH:]MM:]SS[.MSEC] or subtitle format-specific
+
+=head1 EXAMPLES
+
+Warning: -i is a great feature, but use it with certain caution.
+
+If subtitles are shown too early ( 5 seconds):
+
+  subs -i -b 5 file.sub
+
+If subtitles are for a movie in 25 fps, need to be for 24
+( actual for frame-based formats only ).
+
+  subs -i -a 24/25 file.sub
+
+If subtitles start ok, but in 1 hour are late in 7 seconds:
+
+  subs -i -p 0 0 -p 1:00:00 +7 file.sub
+
+Join two parts with 15-second gap
+  
+  subs -o joined.sub -j 15 part1.sub part2.sub 
+
+Split in two after 50 minutes and half a second ( makes basename.1.sub
+and basename.2.sub ).
+
+  subs -o basename.sub -s 50:00.5 toobig.sub
+
+Remove closed caption-specific comments such as '[Sneezing]' or '[Music playing]'
+
+  subs -e 's/[\s-]*\[.*\]\s*\n*//gs' sub.sub
+
+=head1 BUGS
+
+Subtitles written as C<.smi> format may differ from
+original.
+
+=head1 SEE ALSO
+
+L<Subtitles> - backend module for this program
+
+=head1 AUTHOR
+
+Dmitry Karasik, E<lt>dmitry@karasik.eu.orgE<gt>.
+
+=cut

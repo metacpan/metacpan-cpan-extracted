@@ -1,0 +1,8 @@
+Revision history for Perl extension Sys::GNU::ldconfig.
+
+0.02  Mon Feb 25, 2013
+    - All CPAN testers failed me :-(
+      Attempt to get tests to pass
+
+0.01  Thu Feb 21, 2013
+	- First release to the CPAN

@@ -1,0 +1,30 @@
+Revision history for Sub::Delete
+
+1.00002  18 April, 2010
+         delete_sub no longer leaks messages into $@.
+
+1.00001  21 February, 2010
+         A workaround for a %^H scoping bug in perl 5.10.0:  this was
+         triggered by  Sub::Delete,  affecting  other  modules,  like
+         constant::lexical.
+
+1.00000  15 November, 2009
+         The only new feature in this release is that the version num-
+         ber no longer begin with a zero.
+
+0.03     7 September, 2009
+       • Deleting a subroutine whose glob contains only that subroutine
+         now deletes the glob  as  well,  so  ‘delete_sub 'clext'’  now
+         fully undoes what ‘sub clext;’ does.
+       • Deleting a subroutine that shared a glob with other  variables
+         used to do an effective  ‘use vars’  on those variables.  This
+         has been fixed.
+
+0.02     2 September, 2008
+         One bug fix: If you call delete_sub with a fully-qualified sub
+         name (e.g., "Acme::Soap::wash"),  and there is another slot in
+         use in the same glob  (e.g.,  @Acme::Soap::wash),  the  latter
+         doesn’t get deleted anymore.
+
+0.01     24 July, 2008
+         First release

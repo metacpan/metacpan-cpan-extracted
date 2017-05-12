@@ -1,0 +1,42 @@
+Revision history for Perl extension SVN::Access:
+
+0.01  Wed May 23 13:42:14 2007
+	- original version
+
+0.02
+    - fixed bug in svnaclmgr.pl when dealing with resources in empty / just initialized
+      acl files.
+    - fixed documentation bugs
+    - fixed several bugs having mostly to do with groups w/ no members and resources w/ 
+      no authorized users.
+    - fixed readme file.
+
+0.03
+    - reorganized module, moved the svnaclmgr.pl script to examples/ from bin/
+    - cleaned up documentation
+
+0.04
+    - added verify_acl functionality, changed write_acl and write_pretty to utilize 
+      new functionality
+
+0.05
+    - implemented in-order ACL writing
+
+0.06
+    - updated the resource regex to allow paths with spaces
+    - always print groups at the top to support legacy implementations of Subversion
+
+0.08
+    - implemented code that passes Trent's tests (line continuations)
+
+0.10
+    - merged Trent's patch, contained new resolve() method and docs
+    - added a 'pedantic' option
+    - improved checking for poorly formatted AuthZ files
+
+0.11
+    - merged Trent's patch, enhanced error detection and validity testing including
+      fixes for infinite recursion, undefined groups, and out-of-order group 
+      definitions (https://github.com/mgregoro/SVN-Access/pull/2).
+    - fixed hashref-based resource adding; been broken since Tie::IxHash was 
+      introduced in version 0.05

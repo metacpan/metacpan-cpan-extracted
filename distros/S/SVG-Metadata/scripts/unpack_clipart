@@ -1,0 +1,72 @@
+#!/usr/bin/perl -w
+
+# This script unpacks tarballs and zip files, and uncompresses .svgz files
+
+use strict;
+use File::Basename;
+use File::Find;
+use File::Path;
+use File::Spec::Functions;
+
+my $opt_debug = 1;
+
+# Executes program and returns error code
+sub main {
+    my @search_dirs = ();
+
+    foreach my $file (@ARGV) {
+	if (-d $file) {
+	    push(@search_dirs, $file);
+	} elsif (-f $file) {
+	    process_file($file)
+		or warn "Could not process $file\n";
+	}
+    }
+
+    sub wanted {
+	if (!-d) {
+	    return process_file($File::Find::name);
+	}
+    }
+
+    if (@search_dirs) {
+	find({ wanted => \&wanted, no_chdir => 0}, @search_dirs);
+    }
+
+    return 0;
+}
+
+sub process_file {
+    my $filename = shift;
+    my ($basename,$dir,$ext)  = fileparse($filename, '\..*?');
+    $ext =~ s/^\.//;
+    $filename = "$basename.$ext";
+
+    if (! -e $filename) {
+	warn "File '$filename' does not appear to exist\n";
+    } elsif ($filename =~ /\.svgz$/) {
+	print `gunzip -S svgz $filename`;
+
+    } elsif ($filename =~ /\.tgz$/i or /\.tar.gz/i) {
+	print `tar xzf $filename`;
+
+    } elsif ($filename =~ /\.zip$/i) {
+	eval { mkpath($basename, 1, 0755) };
+	if ($@ or ! -d $basename) {
+	    warn "Could not create directory '$basename': $@ - skipping '$filename'\n";
+	} else {
+	    print `unzip -d $basename $filename`;
+	}
+
+    } elsif ($filename =~ /\.tar.bz2$/i) {
+	print `bunzip2 $filename`;
+	print `tar xf $basename`;
+
+    } else {
+	warn "Skipping unknown file $filename\n"
+	    if $opt_debug>2;
+    }
+}
+
+exit main();
+

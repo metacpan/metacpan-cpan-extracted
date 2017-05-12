@@ -1,0 +1,512 @@
+SVN-fs-dump-format-version: 2
+
+UUID: 01f5a4d4-d608-0410-877d-81f61bdc79cb
+
+Revision-number: 0
+Prop-content-length: 56
+Content-length: 56
+
+K 8
+svn:date
+V 27
+2005-12-26T17:38:10.447180Z
+PROPS-END
+
+Revision-number: 1
+Prop-content-length: 136
+Content-length: 136
+
+K 7
+svn:log
+V 33
+create structure for two projects
+K 10
+svn:author
+V 8
+jpeacock
+K 8
+svn:date
+V 27
+2005-12-26T17:38:11.261127Z
+PROPS-END
+
+Node-path: project1
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: project1/branches
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: project1/tags
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: project1/trunk
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: project2
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: project2/branches
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: project2/tags
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: project2/trunk
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Revision-number: 2
+Prop-content-length: 130
+Content-length: 130
+
+K 7
+svn:log
+V 27
+start work on first project
+K 10
+svn:author
+V 8
+jpeacock
+K 8
+svn:date
+V 27
+2005-12-26T17:38:12.168538Z
+PROPS-END
+
+Node-path: project1/trunk/dir1
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: project1/trunk/dir1/file2
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 6
+Text-content-md5: 3d709e89c8ce201e3c928eb917989aef
+Content-length: 16
+
+PROPS-END
+file2
+
+
+Node-path: project1/trunk/file1
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 6
+Text-content-md5: 5149d403009a139c7e085405ef762e1a
+Content-length: 16
+
+PROPS-END
+file1
+
+
+Revision-number: 3
+Prop-content-length: 129
+Content-length: 129
+
+K 7
+svn:log
+V 26
+tag trunk before branching
+K 10
+svn:author
+V 8
+jpeacock
+K 8
+svn:date
+V 27
+2005-12-26T17:38:13.138755Z
+PROPS-END
+
+Node-path: project1/tags/TRUNK-1135534439
+Node-kind: dir
+Node-action: add
+Node-copyfrom-rev: 2
+Node-copyfrom-path: project1/trunk
+
+
+Revision-number: 4
+Prop-content-length: 131
+Content-length: 131
+
+K 7
+svn:log
+V 28
+branch trunk for development
+K 10
+svn:author
+V 8
+jpeacock
+K 8
+svn:date
+V 27
+2005-12-26T17:38:13.212676Z
+PROPS-END
+
+Node-path: project1/branches/branch1
+Node-kind: dir
+Node-action: add
+Node-copyfrom-rev: 3
+Node-copyfrom-path: project1/trunk
+
+
+Revision-number: 5
+Prop-content-length: 130
+Content-length: 130
+
+K 7
+svn:log
+V 27
+simulate branch development
+K 10
+svn:author
+V 8
+jpeacock
+K 8
+svn:date
+V 27
+2005-12-26T17:38:14.173773Z
+PROPS-END
+
+Node-path: project1/branches/branch1/dir2
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: project1/branches/branch1/dir2/file4
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 6
+Text-content-md5: 857c6673d7149465c8ced446769b523c
+Content-length: 16
+
+PROPS-END
+file4
+
+
+Node-path: project1/branches/branch1/file3
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 6
+Text-content-md5: 60b91f1875424d3b4322b0fdd0529d5d
+Content-length: 16
+
+PROPS-END
+file3
+
+
+Revision-number: 6
+Prop-content-length: 121
+Content-length: 121
+
+K 7
+svn:log
+V 18
+merge from branch1
+K 10
+svn:author
+V 8
+jpeacock
+K 8
+svn:date
+V 27
+2005-12-26T17:38:15.206890Z
+PROPS-END
+
+Node-path: project1/trunk/dir2
+Node-kind: dir
+Node-action: add
+Node-copyfrom-rev: 5
+Node-copyfrom-path: project1/branches/branch1/dir2
+
+
+Node-path: project1/trunk/file3
+Node-kind: file
+Node-action: add
+Node-copyfrom-rev: 5
+Node-copyfrom-path: project1/branches/branch1/file3
+
+
+Revision-number: 7
+Prop-content-length: 138
+Content-length: 138
+
+K 7
+svn:log
+V 35
+tag trunk after merging from branch
+K 10
+svn:author
+V 8
+jpeacock
+K 8
+svn:date
+V 27
+2005-12-26T17:38:16.135251Z
+PROPS-END
+
+Node-path: project1/tags/TRUNK-1135538253
+Node-kind: dir
+Node-action: add
+Node-copyfrom-rev: 6
+Node-copyfrom-path: project1/trunk
+
+
+Revision-number: 8
+Prop-content-length: 131
+Content-length: 131
+
+K 7
+svn:log
+V 28
+begin work on second project
+K 10
+svn:author
+V 8
+jpeacock
+K 8
+svn:date
+V 27
+2005-12-26T17:38:16.258746Z
+PROPS-END
+
+Node-path: project2/trunk/dir3
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: project2/trunk/dir3/file6
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 6
+Text-content-md5: 7dec9b529c0261ecbf1f32f21f0438d9
+Content-length: 16
+
+PROPS-END
+file6
+
+
+Node-path: project2/trunk/dir4
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: project2/trunk/dir4/file7
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 6
+Text-content-md5: badc2e9ea90821b51e7624168b50b9b5
+Content-length: 16
+
+PROPS-END
+file7
+
+
+Node-path: project2/trunk/dir4/file8
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 6
+Text-content-md5: cde9257d7ea4d74c45b3755b4e5e9b46
+Content-length: 16
+
+PROPS-END
+file8
+
+
+Node-path: project2/trunk/file5
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 6
+Text-content-md5: f1ad8dddbf5c5f61ce4cb6fd502f4625
+Content-length: 16
+
+PROPS-END
+file5
+
+
+Revision-number: 9
+Prop-content-length: 129
+Content-length: 129
+
+K 7
+svn:log
+V 26
+tag trunk before branching
+K 10
+svn:author
+V 8
+jpeacock
+K 8
+svn:date
+V 27
+2005-12-26T17:38:17.138369Z
+PROPS-END
+
+Node-path: project2/tags/TRUNK-1135538991
+Node-kind: dir
+Node-action: add
+Node-copyfrom-rev: 8
+Node-copyfrom-path: project2/trunk
+
+
+Revision-number: 10
+Prop-content-length: 131
+Content-length: 131
+
+K 7
+svn:log
+V 28
+branch trunk for development
+K 10
+svn:author
+V 8
+jpeacock
+K 8
+svn:date
+V 27
+2005-12-26T17:38:17.207859Z
+PROPS-END
+
+Node-path: project2/branches/branch2
+Node-kind: dir
+Node-action: add
+Node-copyfrom-rev: 9
+Node-copyfrom-path: project2/trunk
+
+
+Revision-number: 11
+Prop-content-length: 127
+Content-length: 127
+
+K 7
+svn:log
+V 24
+restructure branch files
+K 10
+svn:author
+V 8
+jpeacock
+K 8
+svn:date
+V 27
+2005-12-26T17:38:20.145368Z
+PROPS-END
+
+Node-path: project2/branches/branch2/dir5
+Node-kind: dir
+Node-action: add
+Node-copyfrom-rev: 10
+Node-copyfrom-path: project2/branches/branch2/dir3
+
+
+Node-path: project2/branches/branch2/file5.new
+Node-kind: file
+Node-action: add
+Node-copyfrom-rev: 10
+Node-copyfrom-path: project2/branches/branch2/file5
+
+
+Node-path: project2/branches/branch2/file5
+Node-action: delete
+
+
+Node-path: project2/branches/branch2/dir3
+Node-action: delete
+
+
+Revision-number: 12
+Prop-content-length: 138
+Content-length: 138
+
+K 7
+svn:log
+V 35
+tag trunk after merging from branch
+K 10
+svn:author
+V 8
+jpeacock
+K 8
+svn:date
+V 27
+2005-12-26T17:38:22.198966Z
+PROPS-END
+
+Node-path: project2/tags/TRUNK-1135539568
+Node-kind: dir
+Node-action: add
+Node-copyfrom-rev: 11
+Node-copyfrom-path: project2/trunk
+
+

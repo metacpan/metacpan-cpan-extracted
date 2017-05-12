@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/String-StringLight.t
+lib/String/StringLight.pm
+META.yml                                 Module meta-data (added by MakeMaker)

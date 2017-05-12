@@ -1,0 +1,22 @@
+# Create with dns sec max sig life, which is not supported
+template: create-domain.tt
+
+vars:
+  domain: 09n.co.te
+  owner: id123
+  dnssec:
+    -
+        keytag: 1
+        alg: 5
+        digest_type: 1
+        digest: 1234abcd11111111111111111111111111111111
+  dnssec_max_sig_life: 100000
+
+input_assertions:
+  class: SRS::EPP::Command::Create::Domain
+
+output_assertions:
+  count:
+  match:
+  attr_is:
+    - [ '//epp:result', 'code', '2306', 'SRS: Check result code' ]

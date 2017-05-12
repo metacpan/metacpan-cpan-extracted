@@ -1,0 +1,22 @@
+<swish>
+ <SomeDirective>true</SomeDirective>
+ <PropertyNames>
+  <foobar />
+  <bar alias_for="foobar" />
+  <date />
+  <timestamp />
+  <title alias_for="swishtitle" />
+  <lastmod alias_for="swishlastmodified" />
+ </PropertyNames>
+ <MetaNames>
+  <date bias="10" />
+  <timestamp />
+  <foobar /><!-- NO alias bar -->
+  <time alias_for="timestamp" />
+  <swishlastmodified />
+ </MetaNames>
+ <TagAlias>
+  <swishdescription>foo</swishdescription>
+ </TagAlias>
+ <UndefinedMetaTags>auto</UndefinedMetaTags>
+</swish>

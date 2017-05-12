@@ -1,0 +1,34 @@
+name    = [% name %]
+author  = [% author %]
+license = Perl_5
+copyright_holder = [% author %]
+copyright_year   = [% year %]
+abstract = Demo Application
+version = 0.001
+
+[@Basic]
+
+[Prereqs]
+Catalyst = 5.90085
+Catalyst::Plugin::RedirectTo = 0.001
+Catalyst::Model::DBIC::Schema = 0.65
+Catalyst::Plugin::ConfigLoader = 0.34
+Catalyst::View::Xslate = 0.00002
+Catalyst::View::JSON = 0.35
+Catalyst::Model::Adaptor = 0.10
+Catalyst::Action::RenderView = 0.16
+Term::Size::Any = 0.002
+HTML::FormHandler = 0.40057
+DBD::SQLite = 1.46
+DBIx::Class = 0.082810
+DBIx::Class::Helpers = 2.024001
+DBIx::Class::TimeStamp = 0.14
+HTTP::Exception = 0.04006
+Test::DBIx::Class = 0.43
+JSON::MaybeXS = 0
+
+[Prereqs / TestRequires]
+Test::Most = 0.31
+Test::DBIx::Class = 0.43
+HTTP::Request::Common = 0
+JSON::MaybeXS = 0

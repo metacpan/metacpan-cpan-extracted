@@ -1,0 +1,6 @@
+Makefile$
+.svn
+bin/soggyonion$
+bin/soggyonion-install$
+blib
+pm_to_blib

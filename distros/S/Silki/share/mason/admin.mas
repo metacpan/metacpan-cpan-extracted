@@ -1,0 +1,21 @@
+% if ($sidebar) {
+<div class="sidebar-box">
+% }
+  <h2><% loc('Site Admin Tools') %></h2>
+
+  <ul>
+    <li><a href="/users"><% loc('All users') %></li>
+    <li><a href="/wikis"><% loc('All wikis') %></li>
+    <li><a href="/wikis/new_wiki_form"><% loc('Create a New Wiki') %></li>
+    <li><a href="/wikis/import_wiki_form"><% loc('Import a Wiki') %></li>
+    <li><a href="/domains"><% loc('All Domains') %></li>
+    <li><a href="/new_domain_form"><% loc('Create a New Domain') %></li>
+    <li><a href="/logs"><% loc('System Logs') %></li>
+  </ul>
+% if ($sidebar) {
+</div>
+% }
+
+<%args>
+$sidebar => 0
+</%args>

@@ -1,0 +1,5 @@
+name = "Shuvgey"
+module_maker="ModuleBuildTiny"
+# badges = ["travis"]
+authority="cpan:CRUX"
+

@@ -1,0 +1,21 @@
+Easy
+========
+2) Move inline CSS to style sheets
+4) Add good documentation for configuration
+
+Medium
+========
+8) Get /static urls outputting better HTTP headers to improve browser caching
+9) Handle SKIP ALL better (showing more information rather than just "No tests run"
+
+Hard
+========
+13) Design Plugin Architecture
+  + adding and overriding templates and htdocs
+  + adding sql tables
+  + adding code
+14) Create a full search system of smoke reports, not just a listing
+  by most recent. This would allow for searching based on project,
+  status, category, etc
+15) Import/Export of projects so you can move them around different Smolder installs
+

@@ -1,0 +1,47 @@
+{
+   "abstract" : "A simple string tokenizer.",
+   "author" : [
+      "Stevan Little <stevan@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "String-Tokenizer",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "constant" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/stevan/String-Tokenizer",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/stevan/String-Tokenizer.git",
+         "web" : "https://github.com/stevan/String-Tokenizer"
+      }
+   },
+   "version" : "0.06"
+}
+

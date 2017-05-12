@@ -1,0 +1,34 @@
+=== Travis badge
+--- swim
+<badge-travis ingydotnet/swim-pm>
+--- markdown
+[![Travis build status](https://travis-ci.org/ingydotnet/swim-pm.png?branch=master)](https://travis-ci.org/ingydotnet/swim-pm)
+--- pod
+=for html
+<a href="https://travis-ci.org/ingydotnet/swim-pm"><img src="https://travis-ci.org/ingydotnet/swim-pm.png" alt="swim-pm"></a>
+
+\
+
+=== Coveralls badge
+--- swim
+<badge-coveralls ingydotnet/swim-pm>
+--- markdown
+[![Coverage Status](https://coveralls.io/repos/ingydotnet/swim-pm/badge.png?branch=master)](https://coveralls.io/r/ingydotnet/swim-pm?branch=master)
+--- pod
+=for html
+<a href="https://coveralls.io/r/ingydotnet/swim-pm?branch=master"><img src="https://coveralls.io/repos/ingydotnet/swim-pm/badge.png" alt="swim-pm"></a>
+
+\
+
+=== Multiple Badges
+--- swim
+<badge travis coveralls ingydotnet/swim-pm>
+--- markdown
+[![Travis build status](https://travis-ci.org/ingydotnet/swim-pm.png?branch=master)](https://travis-ci.org/ingydotnet/swim-pm)
+[![Coverage Status](https://coveralls.io/repos/ingydotnet/swim-pm/badge.png?branch=master)](https://coveralls.io/r/ingydotnet/swim-pm?branch=master)
+--- pod
+=for html
+<a href="https://travis-ci.org/ingydotnet/swim-pm"><img src="https://travis-ci.org/ingydotnet/swim-pm.png" alt="swim-pm"></a>
+<a href="https://coveralls.io/r/ingydotnet/swim-pm?branch=master"><img src="https://coveralls.io/repos/ingydotnet/swim-pm/badge.png" alt="swim-pm"></a>
+
+\

@@ -1,0 +1,43 @@
+
+========== version history of String::Print
+
+version 0.15: Fri Mar 14 09:06:18 CET 2014
+
+	Fixes:
+	- t/11modif.t regression test, where float may get ',' under
+	  some locales [cpantesters]
+
+version 0.14: Mon Mar 10 16:11:30 CET 2014
+
+	Improvements:
+	- changed documentation style
+
+version 0.13: Sun Jan  5 16:51:09 CET 2014
+
+	Improvements:
+	- docs: fune-tuning
+	- serializer for SCALAR
+	- accept blanks around names of interpolated variable names
+	- accept digits in variable names, not as first character.
+
+version 0.12: Mon Apr 29 09:16:23 CEST 2013
+
+	Changes:
+	- %c --> %S [Amsterdam Perl Mongers]
+
+	Improvements:
+	- docs: correct syntax for links to alternative modules.
+	- docs: PND -> GBP [H.Merijn Brand]
+
+version 0.11: Tue Apr 16 12:27:54 CEST 2013
+
+	Fixes:
+	- require perl 5.10 for '//' operator [cpantesters]
+	- fix tests to use gmtime, not localtime [cpantesters]
+	- some documentation layout improvements [search.cpan.org]
+	- in examples: strftime "%TT%FZ" --> "%FT%TZ", of course
+	- in tests: Windows doesn't support %T nor %F, expand format
+	- any format with strings must be transformed into utf8
+
+version 0.10: Mon Apr 15 12:06:32 CEST 2013
+	- implementation, documentation and regression tests.

@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<!DOCTYPE NZSRSResponse SYSTEM "protocol.dtd">
+<NZSRSResponse VerMajor="5" VerMinor="2">
+<Error Hint="INVALID_REQUEST_ERROR" ErrorId="MADE_UP_ERROR" Severity="err">
+<Description><![CDATA[This error doesn't really exist]]></Description>
+</Error></NZSRSResponse>

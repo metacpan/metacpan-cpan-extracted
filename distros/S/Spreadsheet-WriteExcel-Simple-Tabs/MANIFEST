@@ -1,0 +1,11 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/Spreadsheet/WriteExcel/Simple/Tabs.pm
+t/001_load.t
+scripts/Spreadsheet-WriteExcel-Simple-Tabs-example.cgi
+perl-Spreadsheet-WriteExcel-Simple-Tabs.spec
+META.yml                                 Module meta-data (added by MakeMaker)

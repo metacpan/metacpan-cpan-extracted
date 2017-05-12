@@ -1,0 +1,765 @@
+
+=head1 NAME
+
+SOOT::Examples::Graph - SOOT Examples for Graph
+
+=head1 DESCRIPTION
+
+This is a listing of all SOOT examples for Graph.
+
+=head1 EXAMPLES
+
+
+=head2 approx.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  
+  sub DrawSmooth;
+  sub _approx;
+  
+  my $vC1;
+  my ($grxy, $grin, $grout);
+  my @obj;
+  
+  # Macro to test interpolation function Approx()
+  
+  # test data (square)
+  use constant n => 11;
+  my $x = [1,2,3,4,5,6,6,6,8,9,10];
+  my $y = [1,4,9,16,25,25,36,49,64,81,100];
+  $grxy = TGraph->new(n, $x, $y);
+  
+  # x values, for which y values should be interpolated
+  my $xout = [1.2,1.7,2.5,3.2,4.4,5.2,5.7,6.5,7.6,8.3,9.7,10.4,11.3,13];
+  
+  # create Canvas
+  $vC1 = TCanvas->new("vC1","square",200,10,700,700);
+  $vC1->Divide(2,2);
+  
+  # initialize graph with data
+  $grin = TGraph->new(n,$x,$y);
+  
+  # interpolate at equidistant points (use mean for tied x-values)
+  my $gs = TGraphSmooth->new("normal");
+  $grout = $gs->Approx($grin,"linear");
+  DrawSmooth(1,"Approx: ties = mean","X-axis","Y-axis");
+  
+  # re-initialize graph with data (since graph points were set to unique vales)
+  $grin = TGraph->new(n,$x,$y);
+  
+  # interpolate at given points xout
+  $grout = $gs->Approx($grin,"linear", scalar(@$xout), $xout, 0, 130);
+  DrawSmooth(2,"Approx: ties = mean","","");
+  
+  # print output variables for given values xout
+  my $vNout = $grout->GetN();
+  
+  #   Double_t vXout, vYout;
+  #   for (Int_t k=0;k<vNout;k++) {
+  #      $grout->GetPoint(k, vXout, vYout);
+  #      cout << "k= " << k << "  vXout[k]= " << vXout
+  #           << "  vYout[k]= " << vYout << endl;
+  #   }
+  
+  # re-initialize graph with data
+  $grin = TGraph->new(n,$x,$y);
+  
+  # interpolate at equidistant points (use min for tied x-values)
+  #   grout = $gs->Approx(grin,"linear", 50, 0, 0, 0, 1, 0, "min");
+  $grout = $gs->Approx($grin,"constant", 50, [0.0], 0.0, 0.0, 1, 0.5, "min");
+  
+  DrawSmooth(3,"Approx: ties = min","","");
+  
+  # re-initialize graph with data
+  $grin = TGraph->new(n,$x,$y);
+  
+  # interpolate at equidistant points (use max for tied x-values)
+  $grout = $gs->Approx($grin,"linear", scalar(@$xout), $xout, 0, 0, 2, 0, "max");
+  DrawSmooth(4,"Approx: ties = max","","");
+  
+  $gApplication->Run;
+  
+  sub DrawSmooth {
+     my ($pad, $title, $xt, $yt) = @_;
+     $vC1->cd($pad);
+     my $vFrame = $vC1->DrawFrame(0,0,15,150);
+     $vFrame->SetTitle($title);
+     $vFrame->SetTitleSize(0.2);
+     $vFrame->SetXTitle($xt);
+     $vFrame->SetYTitle($yt);
+     $grxy->SetMarkerColor(kBlue);
+     $grxy->SetMarkerStyle(21);
+     $grxy->SetMarkerSize(0.5);
+     $grxy->Draw("P");
+     $grin->SetMarkerColor(kRed);
+     $grin->SetMarkerStyle(5);
+     $grin->SetMarkerSize(0.7);
+     $grin->Draw("P");
+     $grout->DrawClone("LP");
+     push @obj, $vFrame; # hack to keep it alive until I fix the object ownership issue
+  }
+  
+
+
+
+=head2 bent.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  
+  $gROOT->Reset();
+  
+  my $n = 10;
+  my $x    = [-0.22, 0.05, 0.25, 0.35, 0.5, 0.61,0.7,0.85,0.89,0.95];
+  my $y    = [1.,2.9,5.6,7.4,9,9.6,8.7,6.3,4.5,1];
+  my $exl  = [.05,.1,.07,.07,.04,.05,.06,.07,.08,.05];
+  my $eyl  = [.8,.7,.6,.5,.4,.4,.5,.6,.7,.8];
+  my $exh  = [.02,.08,.05,.05,.03,.03,.04,.05,.06,.03];
+  my $eyh  = [.6,.5,.4,.3,.2,.2,.3,.4,.5,.6];
+  my $exld = [.0,.0,.0,.0,.0,.0,.0,.0,.0,.0];
+  my $eyld = [.0,.0,.05,.0,.0,.0,.0,.0,.0,.0];
+  my $exhd = [.0,.0,.0,.0,.0,.0,.0,.0,.0,.0];
+  my $eyhd = [.0,.0,.0,.0,.0,.0,.0,.0,.05,.0];
+  my $gr = TGraphBentErrors->new($n,$x,$y,$exl,$exh,$eyl,$eyh,$exld,$exhd,$eyld,$eyhd);
+  $gr->SetTitle("TGraphBentErrors Example");
+  $gr->SetMarkerColor(4);
+  $gr->SetMarkerStyle(21);
+  $gr->Draw("ALP");
+  $gApplication->Run;
+  
+
+
+
+=head2 exclusiongraph.pl
+
+  #!/usr/bin/env perl
+  use strict;
+  use warnings;
+  use SOOT qw/:all/;
+  
+  my $cv = exclusiongraph();
+  $gApplication->Run();
+  
+  sub exclusiongraph {
+       # Draw three graphs with an exclusion zone.
+       #Author: Olivier Couet
+       
+       my $c1 = TCanvas->new("c1","Exclusion graphs examples",200,10,600,400);
+       $c1->SetGrid;
+  
+       my $mg = TMultiGraph->new->keep;
+       $mg->SetTitle("Exclusion graphs");
+  
+       my $n = 35;
+       my (@x1, @x2, @x3, @y1, @y2, @y3);
+       foreach my $i (0..$n-1) {
+           $x1[$i] = $i*0.1;
+           $x2[$i] = $x1[$i];
+           $x3[$i] = $x1[$i]+.5;
+           $y1[$i] = 10.*sin($x1[$i]||1e-12);
+           $y2[$i] = 10.*cos($x1[$i])+1e-12;
+           $y3[$i] = 10.*sin($x1[$i])-2.+1e-12;
+       }
+  
+       my $gr1 = TGraph->new($n,\@x1,\@y1)->keep;
+       $gr1->SetLineColor(2);
+       $gr1->SetLineWidth(1504);
+       $gr1->SetFillStyle(3005);
+  
+       my $gr2 = TGraph->new($n,\@x2,\@y2)->keep;
+       $gr2->SetLineColor(4);
+       $gr2->SetLineWidth(-2002);
+       $gr2->SetFillStyle(3004);
+       $gr2->SetFillColor(9);
+  
+       my $gr3 = TGraph->new($n,\@x3,\@y3)->keep;
+       $gr3->SetLineColor(5);
+       $gr3->SetLineWidth(-802);
+       $gr3->SetFillStyle(3002);
+       $gr3->SetFillColor(2);
+  
+       $mg->Add($gr1);
+       $mg->Add($gr2);
+       $mg->Add($gr3);
+       $mg->Draw("AC");
+  
+       return $c1;
+  }
+
+
+
+=head2 exclusiongraph2.pl
+
+  #!/usr/bin/env perl
+  use strict;
+  use warnings;
+  use SOOT qw/:all/;
+  
+  exclusiongraph2();
+  $gApplication->Run();
+  
+  sub exclusiongraph2 {
+      # Draw several graphs with an exclusion zones.
+      #Author: Olivier Couet
+      
+      my $c = TCanvas->new("c",
+          "Charged Higgs L300 Contour",0,0,700,700)->keep;
+      $c->SetTickx;
+      $c->SetTicky;
+      $c->SetGridx;
+      $c->SetGridy;
+  
+      my $frame = TH1F->new("frame","",1000,50,500)->keep;
+      $frame->SetMinimum(1);
+      $frame->SetMaximum(50);
+      $frame->SetDirectory(0);
+      $frame->SetStats(0);
+      $frame->GetXaxis->SetTitle("m_{A} (GeV)");
+      $frame->GetXaxis->SetTickLength(0.02);
+      $frame->GetXaxis->SetLabelSize(0.03);
+      $frame->GetYaxis->SetTitle("tan#beta");
+      $frame->GetYaxis->SetMoreLogLabels();
+      $frame->GetYaxis->SetLabelSize(0.03);
+      $frame->Draw(" ");
+      $c->SetLogy;
+  
+      my $gr1 = TGraph->new(10)->keep;
+      $gr1->SetFillColor(6);
+      $gr1->SetFillStyle(3005);
+      $gr1->SetLineColor(6);
+      $gr1->SetLineWidth(603);
+      $gr1->SetPoint(0,140,0.5);
+      $gr1->SetPoint(1,130,2.9);
+      $gr1->SetPoint(2,124.677,3.83726);
+      $gr1->SetPoint(3,113.362,6.06903);
+      $gr1->SetPoint(4,108.513,8.00221);
+      $gr1->SetPoint(5,111.746,10.0272);
+      $gr1->SetPoint(6,119.828,12.8419);
+      $gr1->SetPoint(7,135.991,30.0872);
+      $gr1->SetPoint(8,140,40);
+      $gr1->SetPoint(9,135,60);
+      $gr1->Draw("C");
+      my $tex = TLatex->new(140.841,37.9762,
+          "#leftarrow t #rightarrow bH^{+}, H^{+} #rightarrow #tau#nu")->keep;
+      $tex->SetTextColor(6);
+      $tex->Draw;
+  
+      my $gr2 = TGraph->new(15)->keep;
+      $gr2->SetName("Graph");
+      $gr2->SetTitle("Graph");
+      $gr2->SetFillColor(1);
+      $gr2->SetFillStyle(3005);
+      $gr2->SetLineWidth(3);
+      $gr2->SetPoint(0,499.192,3.02622);
+      $gr2->SetPoint(1,427.748,3.06233);
+      $gr2->SetPoint(2,358.244,3.10722);
+      $gr2->SetPoint(3,305.711,3.24589);
+      $gr2->SetPoint(4,244.289,3.36617);
+      $gr2->SetPoint(5,206.304,3.7544);
+      $gr2->SetPoint(6,178.017,4.50347);
+      $gr2->SetPoint(7,148.114,6.20297);
+      $gr2->SetPoint(8,131.142,8.00221);
+      $gr2->SetPoint(9,111.746,8.48188);
+      $gr2->SetPoint(10,102.047,9.52921);
+      $gr2->SetPoint(11,96.3901,13.2212);
+      $gr2->SetPoint(12,92.3491,19.0232);
+      $gr2->SetPoint(13,90.7328,26.3935);
+      $gr2->SetPoint(14,93.1573,50.4385);
+      $gr2->Draw("L");
+      $tex = TLatex->new(346.929,6.62281,"ATLAS")->keep;
+      $tex->SetLineWidth(2);
+      $tex->Draw;
+      $tex = TLatex->new(328.341,5.24703,"#intLdt = 300 fb^{-1}")->keep;
+      $tex->SetTextSize(0.0297619);
+      $tex->SetLineWidth(2);
+      $tex->Draw;
+      $tex = TLatex->new(340.463,4.1874,"Maximal mixing")->keep;
+      $tex->SetTextSize(0.0297619);
+      $tex->SetLineWidth(2);
+      $tex->Draw;
+      $tex = TLatex->new(413.2,2.51608,"LEP 2000")->keep;
+      $tex->SetTextSize(0.0297619);
+      $tex->SetLineWidth(2);
+      $tex->Draw;
+  
+      my $gr3 = TGraph->new(10)->keep;
+      $gr3->SetName("Graph");
+      $gr3->SetTitle("Graph");
+      $gr3->SetFillColor(2);
+      $gr3->SetFillStyle(3004);
+      $gr3->SetLineColor(2);
+      $gr3->SetLineWidth(603);
+      $gr3->SetPoint(0,176.84,10.7499);
+      $gr3->SetPoint(1,190.575,11.9912);
+      $gr3->SetPoint(2,211.58,12.7108);
+      $gr3->SetPoint(3,243.088,12.3457);
+      $gr3->SetPoint(4,279.443,12.6185);
+      $gr3->SetPoint(5,302.065,12.9916);
+      $gr3->SetPoint(6,331.957,13.7713);
+      $gr3->SetPoint(7,369.928,14.2821);
+      $gr3->SetPoint(8,425.673,16.1651);
+      $gr3->SetPoint(9,499.192,18.1635);
+      $gr3->Draw("C");
+      $tex = TLatex->new(188.151,9.36035,
+          "gb #rightarrow tH^{+}, H^{+} #rightarrow #tau#nu")->keep;
+      $tex->SetTextColor(2);
+      $tex->Draw;
+  
+      my $gr4 = TGraph->new(10)->keep;
+      $gr4->SetName("Graph");
+      $gr4->SetTitle("Graph");
+      $gr4->SetFillColor(4);
+      $gr4->SetFillStyle(3004);
+      $gr4->SetLineColor(4);
+      $gr4->SetLineWidth(-603);
+      $gr4->SetPoint(0,178.456,2.91797);
+      $gr4->SetPoint(1,200.269,3.40033);
+      $gr4->SetPoint(2,229.354,3.96243);
+      $gr4->SetPoint(3,249.551,4.07959);
+      $gr4->SetPoint(4,269.749,3.71097);
+      $gr4->SetPoint(5,298.025,3.09308);
+      $gr4->SetPoint(6,341.652,2.89679);
+      $gr4->SetPoint(7,378.007,2.57808);
+      $gr4->SetPoint(8,441.023,2.16454);
+      $gr4->SetPoint(9,499.677,1.76145);
+      $gr4->Draw("C");
+      $tex = TLatex->new(165.,1.15498,
+          "gb #rightarrow tH^{+}, H^{+} #rightarrow tb")->keep;
+      $tex->SetTextColor(4);
+      $tex->Draw;
+  
+      my $gr5 = TGraph->new(10)->keep;
+      $gr5->SetName("Graph");
+      $gr5->SetTitle("Graph");
+      $gr5->SetFillColor(4);
+      $gr5->SetFillStyle(3004);
+      $gr5->SetLineColor(4);
+      $gr5->SetLineWidth(603);
+      $gr5->SetPoint(0,152.603,23.0996);
+      $gr5->SetPoint(1,188.151,18.8373);
+      $gr5->SetPoint(2,239.048,15.2499);
+      $gr5->SetPoint(3,264.901,15.8156);
+      $gr5->SetPoint(4,299.641,18.8373);
+      $gr5->SetPoint(5,334.381,20.7085);
+      $gr5->SetPoint(6,360.233,22.4362);
+      $gr5->SetPoint(7,396.589,24.4859);
+      $gr5->SetPoint(8,433.752,25.7669);
+      $gr5->SetPoint(9,499.192,27.3132);
+      $gr5->Draw("C");
+  }
+
+
+
+=head2 graphApply.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  
+  my $npoints = 3;
+  my $xaxis  = [1.,2.,3.];
+  my $yaxis  = [10.,20.,30.];
+  my $errorx = [0.5,0.5,0.5];
+  my $errory = [5.,5.,5.];
+  my $exl    = [0.5,0.5,0.5];
+  my $exh    = [0.5,0.5,0.5];
+  my $eyl    = [5.,5.,5.];
+  my $eyh    = [5.,5.,5.];
+  
+  my $gr1 = TGraph->new($npoints,$xaxis,$yaxis);
+  my $gr2 = TGraphErrors->new($npoints,$xaxis,$yaxis,$errorx,$errory);
+  my $gr3 = TGraphAsymmErrors->new($npoints,$xaxis,$yaxis,$exl,$exh,$eyl,$eyh);
+  my $ff  = TF2->new("ff","-1./y");
+  
+  my $c1 = TCanvas->new("c1","c1");
+  $c1->Divide(2,3);
+  # TGraph
+  $c1->cd(1);
+  $gr1->DrawClone("A*");
+  $c1->cd(2);
+  $gr1->Apply($ff);
+  $gr1->Draw("A*");
+  
+  # TGraphErrors
+  $c1->cd(3);
+  $gr2->DrawClone("A*");
+  $c1->cd(4);
+  $gr2->Apply($ff);
+  $gr2->Draw("A*");
+  
+  # TGraphAsymmErrors
+  $c1->cd(5);
+  $gr3->DrawClone("A*");
+  $c1->cd(6);
+  $gr3->Apply($ff);
+  $gr3->Draw("A*");
+  
+  $c1->Update;
+  
+  $gApplication->Run;
+  
+
+
+
+=head2 gtime.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  
+  my @xa;
+  my @ya;
+  
+  my $c1 = TCanvas->new("c1");
+  
+  my $ng = 100;
+  my $kNMAX = 10000;
+  
+  my $cursor = $kNMAX;
+  my $g = TGraph->new($ng);
+  $g->SetMarkerStyle(21);
+  $g->SetMarkerColor(4);
+  my $x = 0.0;
+  
+  while (1) {
+    $c1->Clear();
+    if ($cursor > $kNMAX-$ng) {
+       foreach (0..$ng-1) {
+         push @xa, $x;
+         push @ya, sin($x);
+         $x   += 0.1;
+       }
+       $g->Draw("alp");
+       $cursor = 0;
+    } 
+    else {
+      $x += 0.1;
+      push @xa, $x;
+      push @ya, sin($x);
+      $cursor++;
+      
+      my @nxa;
+      my @nya;
+      for my $i ($cursor..$cursor+$ng-1) {
+        push @nxa, $xa[$i];
+        push @nya, $ya[$i];
+      }
+      $g->DrawGraph($ng, \@nxa, \@nya, "alp");
+    }
+    $c1->Update();
+    $gSystem->ProcessEvents();
+    $gSystem->Sleep(10);
+  }
+  
+
+
+
+=head2 markerwarning.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  
+  # This script illustrates the danger of using asymmetric symbols
+  # Non-symmetric symbols should be used carefully in plotting. 
+  # These two graphs show how misleading a careless use of symbols can be. 
+  # The two plots represent the same data sets but because of a bad symbol choice,
+  # the two plots on the top appear further apart than for the bottom example.
+  $gROOT->Reset;
+  $gStyle->SetOptStat(0);
+  
+  my $Nph = 14;
+  my $np_ph  = [353.4,300.2,254.3,215.2,181.0,151.3,125.2,102.7, 83.3, 66.7, 52.5, 40.2, 30.2, 22.0];
+  my $nc_ph  = [3.890,3.734,3.592,3.453,3.342,3.247,3.151,3.047,2.965,2.858,2.701,2.599,2.486,2.328];
+  my $npe_ph = [10.068,9.004,8.086,7.304,6.620,6.026,5.504,5.054,4.666,4.334,4.050,3.804,3.604,3.440];
+  my $nce_ph = [0.235,0.217,0.210,0.206,0.213,0.223,0.239,0.260,0.283,0.318,0.356,0.405,0.465,0.545];
+  
+  my $Nbr = 6;
+  my $np_br  = [357.0,306.0,239.0,168.0,114.0, 73.0];
+  my $nc_br  = [3.501,3.275,3.155,3.060,3.053,3.014];
+  my $npe_br = [8.000,11.000,10.000,9.000,9.000,8.000];
+  my $nce_br = [0.318,0.311,0.306,0.319,0.370,0.429];
+  
+  my $phUP = TGraphErrors->new($Nph,$np_ph,$nc_ph,$npe_ph,$nce_ph);
+  my $phDN = TGraphErrors->new($Nph,$np_ph,$nc_ph,$npe_ph,$nce_ph);
+  my $brUP = TGraphErrors->new($Nbr,$np_br,$nc_br,$npe_br,$nce_br);
+  my $brDN = TGraphErrors->new($Nbr,$np_br,$nc_br,$npe_br,$nce_br);
+  
+  my $Top_margin        = 0.;
+  my $Left_margin       = 0.025;
+  my $Right_margin      = 0.005;
+  my $maxPlotPart       = 395;
+  my $Marker_Size       = 1.3;
+  my $Marker_Style      = 8;
+  
+  my $Et_200_Min        = 0.71;
+  my $Et_200_Max        = 3.80;
+  my $Et_130_Min        = 1.21;
+  my $Et_130_Max        = 3.29;
+  
+  my $Nc_200_Min        = 1.31;
+  my $Nc_200_Max        = 4.30;
+  my $Nc_130_Min        = 1.51;
+  my $Nc_130_Max        = 3.89;
+  
+  
+  my $canvasNc = TCanvas->new("canvasNc", "Multiplicity",630,10,600,500);
+  $canvasNc->SetFillColor(10);
+  $canvasNc->SetBorderSize(0);
+  $canvasNc->SetLeftMargin(0.02);
+  $canvasNc->SetRightMargin(0.02);
+  $canvasNc->SetTopMargin(0.02);
+  $canvasNc->SetBottomMargin(0.02);
+  
+  
+  # ------------>Primitives in Nc200 pad
+  my $padNcUP = TPad->new("padNcUP","200 GeV",0.07,0.60,1.,1.00);
+  $padNcUP->Draw();
+  $padNcUP->cd();
+  $padNcUP->SetFillColor(10);
+  $padNcUP->SetFrameFillColor(10);
+  $padNcUP->SetBorderSize(0);
+  $padNcUP->SetLeftMargin($Left_margin);
+  $padNcUP->SetRightMargin($Right_margin);
+  $padNcUP->SetTopMargin($Top_margin+0.005);
+  $padNcUP->SetBottomMargin(0.00);
+  
+  my $frameNcUP = TH1F->new("frameNcUP","",100,0,$maxPlotPart);
+  $frameNcUP->GetYaxis()->SetLabelOffset(0.005);
+  $frameNcUP->GetYaxis()->SetLabelSize(0.12);
+  $frameNcUP->SetMinimum($Nc_200_Min);
+  $frameNcUP->SetMaximum($Nc_200_Max);
+  $frameNcUP->SetNdivisions(505,"Y");
+  $frameNcUP->SetNdivisions(505,"X");
+  $frameNcUP->Draw();
+  
+  $brUP->SetMarkerStyle(22);
+  $brUP->SetMarkerSize (2.0);
+  $brUP->Draw("P");                    
+  
+  $phDN->SetMarkerStyle(23);
+  $phDN->SetMarkerSize (2);
+  $phDN->Draw("P");
+  
+  $padNcUP->Modified();
+  $canvasNc->cd();
+  
+  # ------------>Primitives in Nc130 pad
+  my $padNcDN = TPad->new("padNcDN","130 GeV",0.07,0.02,1.,0.60);
+  $padNcDN->Draw();
+  $padNcDN->cd();
+  $padNcDN->SetFillColor(10);
+  $padNcDN->SetFrameFillColor(10);
+  $padNcDN->SetBorderSize(0);
+  $padNcDN->SetLeftMargin($Left_margin);
+  $padNcDN->SetRightMargin($Right_margin);
+  $padNcDN->SetTopMargin($Top_margin+0.005);
+  $padNcDN->SetBottomMargin(0.30);
+  
+  my $frameNcDN = TH1F->new("frameNcDN","",100,0,$maxPlotPart);
+  $frameNcDN->GetYaxis()->SetLabelOffset(0.005);
+  $frameNcDN->GetYaxis()->SetLabelSize(0.07);
+  $frameNcDN->GetXaxis()->SetLabelOffset(0.005);
+  $frameNcDN->GetXaxis()->SetLabelSize(0.07);
+  $frameNcDN->SetMinimum($Nc_200_Min);
+  $frameNcDN->SetMaximum($Nc_200_Max);
+  $frameNcDN->SetNdivisions(505,"Y");
+  $frameNcDN->SetNdivisions(505,"X");
+  $frameNcDN->Draw();
+  
+  $brDN->SetMarkerStyle(23);
+  $brDN->SetMarkerSize (2.0);
+  $brDN->Draw("P");                    
+             
+  $phUP->SetMarkerStyle(22);
+  $phUP->SetMarkerSize (2);
+  $phUP->Draw("P");
+  
+  my $t1 = TLatex->new();
+  $t1->SetTextFont(12); 
+  $t1->SetTextSize(0.0525);
+  $t1->DrawLatex(-5,0.6,"Non-symmetric symbols should be used carefully in plotting. These two graphs show how misleading");
+  $t1->DrawLatex(-5,0.4,"a careless use of symbols can be. The two plots represent the same data sets but because of a bad");
+  $t1->DrawLatex(-5,0.2,"symbol choice, the two plots on the top appear further apart than for the bottom example.");
+  
+  $padNcDN->Modified();
+  $canvasNc->cd();
+  
+  $canvasNc->Modified();
+  $canvasNc->cd();
+  
+  $gApplication->Run;
+  
+
+
+
+=head2 motorcycle.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  use File::Spec;
+  
+  # Macro to test scatterplot smoothers: ksmooth, lowess, supsmu
+  # as described in:
+  #    Modern Applied Statistics with S-Plus, 3rd Edition
+  #    W.N. Venables and B.D. Ripley
+  #    Chapter 9: Smooth Regression, Figure 9.1 
+  #
+  # Example is a set of data on 133 observations of acceleration against time
+  # for a simulated motorcycle accident, taken from Silverman (1985).
+  
+  # data taken from R library MASS: mcycle.txt
+  my $rootlib = Alien::ROOT->new->libdir;
+  my $inFile = shift
+               || File::Spec->catfile($rootlib, '..', '..',
+                                      qw(share doc root tutorials graphs motorcycle.dat));
+  
+  # read file and add to fit object
+  my $x = [];
+  my $y = [];
+  
+  my ($vX, $vY);
+  my $vNData = 0;
+  
+  open INPUT, "$inFile" or die "Could not open $inFile"; 
+  while (<INPUT>) {
+    ($vX,$vY) = split;
+    push @$x, $vX*1.;
+    push @$y, $vY*1.;
+    $vNData++;
+  }
+  close INPUT;
+  
+  my $grin = TGraph->new($vNData,$x,$y);
+  
+  # draw graph
+  my $can = TCanvas->new("can","Smooth Regression",200,10,900,700);
+  $can->Divide(2,3);
+  
+  # Kernel Smoother
+  # create new kernel smoother and smooth data with bandwidth = 2.0
+  my $gs = TGraphSmooth->new("normal");
+  my $grout = $gs->SmoothKern($grin,"normal",2.0);
+  DrawSmooth($can, $grin, $grout, 1, "Kernel Smoother: bandwidth = 2.0", "times", "accel");
+  
+  # redraw ksmooth with bandwidth = 5.0
+  $grout = $gs->SmoothKern($grin,"normal",5.0);
+  DrawSmooth($can,$grin,$grout,2,"Kernel Smoother: bandwidth = 5.0","","");
+  
+  # Lowess Smoother
+  # create new lowess smoother and smooth data with fraction f = 2/3
+  $grout = $gs->SmoothLowess($grin,"",0.67);
+  DrawSmooth($can,$grin,$grout,3,"Lowess: f = 2/3","","");
+  
+  # redraw lowess with fraction f = 0.2
+  $grout = $gs->SmoothLowess($grin,"",0.2);
+  DrawSmooth($can,$grin,$grout,4,"Lowess: f = 0.2","","");
+  
+  # Super Smoother
+  # create new super smoother and smooth data with default bass = 0 and span = 0
+  $grout = $gs->SmoothSuper($grin,"",0,0);
+  DrawSmooth($can,$grin,$grout,5,"Super Smoother: bass = 0","","");
+  
+  # redraw supsmu with bass = 3 (smoother curve)
+  $grout = $gs->SmoothSuper($grin,"",3);
+  DrawSmooth($can,$grin,$grout,6,"Super Smoother: bass = 3","","");
+  
+  sub DrawSmooth {
+     my ($can, $grin, $grout, $pad, $title, $xt, $yt) = @_;
+     $can->cd($pad);
+     my $vFrame = $can->DrawFrame(0,-130,60,70);
+     $vFrame->SetTitle($title);
+     $vFrame->SetTitleSize(0.2);
+     $vFrame->SetXTitle($xt);
+     $vFrame->SetYTitle($yt);
+     $grin->Draw("P");
+     $grout->SetMarkerColor(kRed);
+     $grout->SetMarkerStyle(21);
+     $grout->SetMarkerSize(0.5);
+     $grout->DrawClone("P");
+     $grout->DrawClone("LPX");
+     $vFrame->keep;
+  }
+  
+  $gApplication->Run;
+
+
+
+=head2 multigraph.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  
+  $gROOT->Reset;
+  $gStyle->SetOptFit;
+  my $c1 = TCanvas->new("c1","multigraph",200,10,700,500);
+  $c1->SetGrid();
+  
+  # draw a frame to define the range
+  my $mg = TMultiGraph->new();
+  
+  # create first graph
+  my $n1 = 10;
+  my $x1  = [-0.1, 0.05, 0.25, 0.35, 0.5, 0.61,0.7,0.85,0.89,0.95];
+  my $y1  = [-1.,2.9,5.6,7.4,9,9.6,8.7,6.3,4.5,1];
+  my $ex1 = [.05,.1,.07,.07,.04,.05,.06,.07,.08,.05];
+  my $ey1 = [.8,.7,.6,.5,.4,.4,.5,.6,.7,.8];
+  my $gr1 = TGraphErrors->new($n1,$x1,$y1,$ex1,$ey1);
+  $gr1->SetMarkerColor(kBlue);
+  $gr1->SetMarkerStyle(21);
+  $gr1->Fit("pol6","q");
+  $mg->Add($gr1);
+  
+  # create second graph
+  my $n2 = 10;
+  my $x2  = [-0.28, 0.005, 0.19, 0.29, 0.45, 0.56,0.65,0.80,0.90,1.01];
+  my $y2  = [2.1,3.86,7,9,10,10.55,9.64,7.26,5.42,2];
+  my $ex2 = [.04,.12,.08,.06,.05,.04,.07,.06,.08,.04];
+  my $ey2 = [.6,.8,.7,.4,.3,.3,.4,.5,.6,.7];
+  my $gr2 = TGraphErrors->new($n2,$x2,$y2,$ex2,$ey2);
+  $gr2->SetMarkerColor(kRed);
+  $gr2->SetMarkerStyle(20);
+  $gr2->Fit("pol5","q");
+  
+  $mg->Add($gr2);
+  
+  $mg->Draw("ap");
+  
+   #force drawing of canvas to generate the fit TPaveStats
+  $c1->Update();
+  my $stats1 = $gr1->GetListOfFunctions()->FindObject("stats");
+  my $stats2 = $gr2->GetListOfFunctions()->FindObject("stats");
+  $stats1->SetTextColor(kBlue); 
+  $stats2->SetTextColor(kRed); 
+  $stats1->SetX1NDC(0.12); $stats1->SetX2NDC(0.32); $stats1->SetY1NDC(0.75);
+  $stats2->SetX1NDC(0.72); $stats2->SetX2NDC(0.92); $stats2->SetY1NDC(0.78);
+  $c1->Modified();
+  
+  $gApplication->Run;
+
+
+
+
+=head1 SEE ALSO
+
+L<SOOT>
+
+=head1 AUTHOR
+
+Steffen Mueller, E<lt>smueller@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2010 by Steffen Mueller
+
+SOOT, the Perl-ROOT wrapper, is free software; you can redistribute it and/or modify
+it under the same terms as ROOT itself, that is, the GNU Lesser General Public License.
+A copy of the full license text is available from the distribution as the F<LICENSE> file.
+
+=cut
+

@@ -1,0 +1,129 @@
+NAME
+    String::Format - sprintf-like string formatting capabilities with
+    arbitrary format definitions
+
+ABSTRACT
+    String::Format allows for sprintf-style formatting capabilities with
+    arbitrary format definitions
+
+SYNOPSIS
+      use String::Format;
+
+      my %fruit = (
+            'a' => "apples",
+            'b' => "bannanas",
+            'g' => "grapefruits",
+            'm' => "melons",
+            'w' => "watermelons",
+      );
+
+      my $format = "I like %a, %b, and %g, but not %m or %w.";
+
+      print stringf($format, %fruit);
+  
+      # prints:
+      # I like apples, bannanas, and grapefruits, but not melons or watermelons.
+
+DESCRIPTION
+    String::Format lets you define arbitrary printf-like format sequences to
+    be expanded. This module would be most useful in configuration files and
+    reporting tools, where the results of a query need to be formatted in a
+    particular way. It was inspired by mutt's index_format and related
+    directives (see
+    <URL:http://www.mutt.org/doc/manual/manual-6.html#index_format>).
+
+FUNCTIONS
+  stringf
+    String::Format exports a single function called stringf. stringf takes
+    two arguments: a format string (see FORMAT STRINGS, below) and a
+    reference to a hash of name => value pairs. These name => value pairs
+    are what will be expanded in the format string.
+
+FORMAT STRINGS
+    Format strings must match the following regular expression:
+
+      qr/
+         (%             # leading '%'
+          (-)?          # left-align, rather than right
+          (\d*)?        # (optional) minimum field width
+          (?:\.(\d*))?  # (optional) maximum field width
+          ({.*?})?      # (optional) stuff inside
+          (\S)          # actual format character
+         )/x;
+
+    If the escape character specified does not exist in %args, then the
+    original string is used. The alignment, minimum width, and maximum width
+    options function identically to how they are defined in sprintf(3) (any
+    variation is a bug, and should be reported).
+
+    Note that Perl's sprintf definition is a little more liberal than the
+    above regex; the deviations were intentional, and all deal with numeric
+    formatting (the #, 0, and + leaders were specifically left out).
+
+    The value attached to the key can be a scalar value or a subroutine
+    reference; if it is a subroutine reference, then anything between the
+    '{' and '}' ($5 in the above regex) will be passed as $_[0] to the
+    subroutine reference. This allows for entries such as this:
+
+      %args = (
+          d => sub { POSIX::strftime($_[0], localtime) }, 
+      );
+
+    Which can be invoked with this format string:
+
+      "It is %{%M:%S}d right now, on %{%A, %B %e}d."
+
+    And result in (for example):
+
+      It is 17:45 right now, on Monday, February 4.
+
+    Note that since the string is passed unmolested to the subroutine
+    reference, and strftime would Do The Right Thing with this data, the
+    above format string could be written as:
+
+      "It is %{%M:%S right now, on %A, %B %e}d."
+
+    By default, the formats 'n', 't', and '%' are defined to be a newline,
+    tab, and '%', respectively, if they are not already defined in the
+    hashref of arguments that gets passed it. So we can add carriage returns
+    simply:
+
+      "It is %{%M:%S right now, on %A, %B %e}d.%n"
+
+    Because of how the string is parsed, the normal "\n" and "\t" are turned
+    into two characters each, and are not treated as a newline and tab. This
+    is a bug.
+
+FACTORY METHOD
+    String::Format also supports a class method, named stringfactory, which
+    will return reference to a "primed" subroutine. stringfatory should be
+    passed a reference to a hash of value; the returned subroutine will use
+    these values as the %args hash.
+
+      my $self = Some::Groovy::Package->new($$, $<, $^T);
+      my %formats = (
+            'i' => sub { $self->id      },
+            'd' => sub { $self->date    },
+            's' => sub { $self->subject },
+            'b' => sub { $self->body    },
+      );
+      my $index_format = String::Format->stringfactory(\%formats);
+
+      print $index_format->($format1);
+      print $index_format->($format2);
+
+    This subroutine reference can be assigned to a local symbol table entry,
+    and called normally, of course:
+
+      *reformat = String::Format->stringfactory(\%formats);
+
+      my $reformed = reformat($format_string);
+
+LICENSE
+    "String::Format" is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by the
+    Free Software Foundation; version 2.
+
+AUTHOR
+    darren chamberlain <darren@cpan.org>
+

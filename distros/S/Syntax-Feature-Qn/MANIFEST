@@ -1,0 +1,20 @@
+Changes
+lib/Syntax/Feature/Qn.pm
+lib/Syntax/Feature/Qqn.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/braces.qn.t
+t/braces.qqn.t
+t/commas.qn.t
+t/commas.qqn.t
+t/dquote.qn.t
+t/dquote.qqn.t
+t/parens.qn.t
+t/parens.qqn.t
+t/slashes.qn.t
+t/slashes.qqn.t
+t/squote.qn.t
+t/squote.qqn.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

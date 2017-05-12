@@ -1,0 +1,81 @@
+                               Set::Relation
+                                   TODO
+---------------------------------------------------------------------------
+
+Following is a summary of things that still need doing.
+
+* Update any idempotent routines such as "union" and "intersection" to
+short-cut if any 2 input relations are equal, or at least the Set::Relation
+objects are both Perl refs to the same object, so just return one of those.
+
+* Add "first_rank" param to "rank[|_by_attr_names]" as per spec v0.120.0.
+
+* Consider using Dist::Zilla for packaging.
+
+* Add code examples, tutorial, cookbook, FAQ, etc.
+
+* Make the test suite actually run all the code, not mostly just compile
+it; maybe start off with running same code examples in docs, tutorial, etc.
+
+* Consider adding support for unique key constraints, and not just
+the introspection of existing candidate keys that the API has now.
+
+* Consider adding public operators such as for comparing headings eg for
+disjointness etc, mirroring some set operators, perhaps to help users
+implement more operators?
+
+* Consider adding disjoint insertion, union operators (same as normal but
+fails on a duplicate).
+
+* With V2, consider tracking some operations in more detail so that, if it
+turns out that the result is equal to any operand, the operand is returned
+instead of a new object, same as with some of the more trivial operand
+combinations; this could make subsequent use of the operands faster.
+
+* Consider exploiting the candidate keys feature to improve performance of
+S::R objects by generally only comparing tuples for uniqueness on their
+subtuples that range over a key's attributes.  Associated with this,
+consider a more efficient variant of object internal indexes that are
+simply a hash of tuples rather than a hash of singleton-set of tuples; the
+normal index format generalizes for indexes on non-keys, and the variant
+wouldn't.
+
+* Consider support for S::R objects internally having symbolic
+representations in terms of other objects or their internals, which is even
+lazier than what we have now but requires more smarts.  For example, one
+object is defined as another but for a tuple being inserted or deleted.  Or
+perhaps more likely, Set::Relation will never do this in general but
+Muldis::D::RefEng would, probably as a side effect of its existing support
+for functional Muldis D value expression code.
+
+* On the other hand, a simple version involving making an internal relation
+body optionally a 2-element array, one element pointing to the body of
+another relation object, and the second element having new tuples that were
+added (or a 3-element, where the third having tuples that were deleted),
+S::R could realistically do that, so to make
+union/diff/insertion/deletion/etc initially faster; the first element
+would be undef if there is no other object being based on.  Hopefully
+something like this will not make other parts of S::R too complicated.
+
+* Consider adding a new class Set::Relation::V3 which is like ::V2 but
+primarily that its tuples are internally represented by Perl Arrays rather
+than Perl Hashes, and the relation heading is a Perl Array too, so each
+attribute name exists just once, in the heading, not in each tuple, and
+attribute values match with their names on common Array indices.  At the
+very least this would make 'rename' very cheap initially (only the heading
+is changed rather than every tuple), and also relation objects should
+consume much less memory.  This would likely also more closely resemble how
+non-trivial DBMSs tend to work internally since tuple storage as ordered
+arrays rather than named arrays should be a lot more efficient and more
+like how lower-level languages like C are accustomed to operate.  Or
+perhaps more likely, Set::Relation will never do this but Muldis::D::RefEng
+would for its internal relation objects.
+
+* Consider adding more mutator methods.
+
+* Improve performance in other ways.
+
+* Port this to Perl 6 again; meanwhile, a much older initial version
+pre-dating this Perl 5 rewrite already exists FYI.
+
+* Whatever else needs doing, such as, fixing bugs.

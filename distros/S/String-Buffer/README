@@ -1,0 +1,15 @@
+This is the String::Buffer module.
+
+String::Buffer provides a simple string buffer class.
+
+To install the module:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+--
+Steve McKay
+steve@colgreen.com
+

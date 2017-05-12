@@ -1,0 +1,25 @@
+Sub::Quotelike version 0.02
+===========================
+
+This module allows to define quotelike functions, that mimic the
+syntax of the builtin operators C<q()>, C<qq()>, C<qw()>, etc.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires Filter::Simple version 0.61 or higher.
+
+COPYRIGHT AND LICENCE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+Copyright (C) 2001 Rafael Garcia-Suarez

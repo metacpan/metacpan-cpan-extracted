@@ -1,0 +1,31 @@
+=head1 NAME
+
+CRC - Perl interface cyclic redundency check generation
+
+=head1 SYNOPSIS
+
+    use String::CRC;
+    
+    ($crc_low, $crc_high) = crc("some string", 64);
+    $crc_binary = crc("some string", 64);
+    ($crc_low, $crc_high) = unpack("LL", $crc_binary);
+    ($crc_small) = crc("some string", 32);
+
+=head1 DESCRIPTION
+
+The B<CRC> module calculates CRC of various lenghts.  The default
+CRC length is 32 bits.  
+
+CRCs of 32 bits and smaller will be returned as an integer.
+
+CRCs that are larger than 32 bits will be returned as two integers
+if called in list context and as a packed binary string if called
+in scalar context.
+
+=head1 COPYRIGHT
+
+Taken from Matt Dillon's Diablo distribution with permission.  
+
+The authors of this package (David Sharnoff & Matthew Dillon) disclaim
+all copyrights and release it into the public domain.
+

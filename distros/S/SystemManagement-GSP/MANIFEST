@@ -1,0 +1,15 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+DESIGN
+TODO
+CREDITS
+COPYING
+SystemManagement-GSP.spec
+t/testinfo.pm
+t/01init.t
+t/02connect.t
+t/03power.t
+lib/SystemManagement/GSP.pm
+META.yml                                 Module meta-data (added by MakeMaker)

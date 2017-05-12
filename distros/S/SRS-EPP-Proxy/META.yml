@@ -1,0 +1,31 @@
+---
+abstract: 'IETF EPP <=> SRS XML proxy software'
+author:
+  - 'Catalyst SRS Team <team-srs@catalyst.net.nz>'
+build_requires:
+  XML::Compare: 0.04
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300005, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: SRS-EPP-Proxy
+requires:
+  Crypt::Password: 0
+  Event: 0
+  Log::Dispatch: 0
+  Module::Pluggable: 0
+  Moose: 1.21
+  MooseX::Daemonize: 0
+  MooseX::Getopt: 0
+  MooseX::Log::Log4perl: 0
+  MooseX::Params::Validate: 0.16
+  MooseX::SimpleConfig: 0
+  MooseX::Singleton: 0.14
+  XML::Assert: 0.02
+  XML::EPP: 0.05
+  XML::SRS: 0.09
+version: 0.22

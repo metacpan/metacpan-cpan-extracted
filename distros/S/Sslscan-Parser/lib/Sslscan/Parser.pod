@@ -1,0 +1,209 @@
+=pod
+
+=head1 NAME
+
+Sslscan::Parser - Parse sslscan scan data with Perl
+
+=head1 VERSION
+
+This document describes Sslscan::Parser version .02
+
+=head1 SYNOPSIS
+
+ my $np = new Sslscan::Parser;
+
+ my $parser = $np->parse_file('sslscan.xml');
+    #a Sslscan::Parser Object
+
+ my $host = $parser->get_host('10.0.0.100');
+    #a Sslscan::Parser::Host Object
+
+ my @ports = $host->get_all_ports();
+    #an Array of Sslscan::Parser::Host::Port Objects
+
+ my $port = $host->get_port('80');
+    #a Sslscan::Parser::Host::Port Object
+
+ my @ciphers = $port->get_all_ciphers();
+    #an Array of Sslscan::Parser::Host::Port::Cipher Objects
+ 
+=head1 DESCRIPTION
+
+
+=head1 OVERVIEW
+
+
+ Sslscan::Parser                              -- Core parser
+ |
+ +--Sslscan::Parser::Session                  -- Sslscan scan session information
+ |  
+ +--Sslscan::Parser::Host                     -- General host information
+ |  |
+ |  |--Sslscan::Parser::Host::Port            -- Port information
+ |  |  |
+ |  |  +--Sslscan::Parser::Host::Port::Cipher -- Cipher information
+ |  |  |
+
+
+=head1 METHODS
+
+=head2 Sslscan::Parser
+
+The main idea behind the core modules is, you will first parse the scan data
+then extract the information. Therefore, you should run parse_file or
+parse_scan then the you can use any of the subroutines in this module.
+
+=over 4
+
+=item B<parse_file($xml_file)>
+
+Parse a Sslscan XML file. This subroutine will return a Sslscan::Parser object
+that contains the XML data. 
+
+XML files are generated from using the following command:
+
+ $ sslscan --xml=file.xml [hostname]
+
+=item B<parse_scan($scan_args,@ips)> 
+
+Perform a Sslscan scan with Sslscan::Parser. The results will be parsed once
+the scan is complete.  This subroutine will return a Sslscan::Parser object
+that contains the XML data.
+
+=item B<get_session()>
+
+Obtain the Sslscan::Parser::Session object which contains the session scan information.
+
+=item B<get_host($ipaddr)>
+
+Obtain the Sslscan::Parser::Host object which the host information.
+
+=item B<get_all_hosts()>
+
+Obtain an Array of Sslscan::Parser::Host objects which contain host information.
+
+=back
+
+=head2 Sslscan::Parser::Session
+
+This object contains the scan session information of the Sslscan scan.
+
+=over 4
+
+
+=item B<title()>
+
+Returns the title of the scan.
+
+=item B<web()>
+
+Returns the website.
+
+=item B<version()>
+
+Returns the version of sslscan.
+
+=back
+
+=head2 Sslscan::Parser::Host
+
+This object contains the information for a host.
+
+=over 4
+
+
+=item B<ip()>
+
+Returns a string which contains the ip of this host.
+
+=item B<get_port($port)>
+
+Obtain a Sslscan::Parser::Host::Port object which contains the port information.
+
+=item B<get_all_ports()>
+
+Obtain an Array of Sslscan::Parser::Host::Port objects which contain port information.
+
+=back
+
+=head2 Sslscan::Parser::Host::Port
+
+This object contains the information for a port.
+
+=over 4
+
+
+=item B<port()>
+
+Returns a string which contains the port number.
+
+=item B<get_all_ciphers()>
+
+Returns an Array of Sslscan::Parser::Host::Port::Cipher objects which contain information about the ciphers
+
+=back
+
+=head2 SslScan::Parser::Host::Port::Cipher
+
+This object contains the information for cipher.
+
+=over 4
+
+=item B<status()>
+
+Returns the status of the cipher. Either "accepted" or "rejected"
+
+=item B<cipher()>
+
+Returns the Cipher.
+
+=item B<bits()>
+
+Returns the number of bits of the cipher.
+
+=item B<sslversion()>
+
+Returns the SSL version.
+
+=back 
+
+=head1 EXAMPLES
+
+Here is an example of parsing an XML file using Sslscan::Parser:
+
+ my $sslpx = new Sslscan::Parser;
+
+ my $parser = $sslpx->parse_file("sslscan.xml");
+
+ foreach my $h ( $parser->get_all_hosts() ){
+     print "ip: " . $h->ip . "\n";
+     foreach my $p ( $h->get_all_ports ) {
+         print "port: " . $p->port . "\n";
+         foreach my $c ( $c->get_all_ciphers ) {
+            print "version is " . $c->sslversion . "\n";
+            print "cipher is " . $c->cipher . "\n";
+            print "bits is " . $c->bits . "\n";
+            print "status is " . $c->status . "\n";
+         }
+     }   
+     print "---\n";
+ }   
+
+=head1 SEE ALSO
+
+ sslscan, XML::LibXML and Object::InsideOut
+
+=head1 AUTHOR
+
+Joshua "Jabra" Abraham, S<E<lt>jabra AT spl0it DOT orgE<gt>>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2009 Joshua D. Abraham. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
+

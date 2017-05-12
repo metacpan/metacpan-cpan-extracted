@@ -1,0 +1,200 @@
+Revision history for SQL-SplitStatement
+
+1.00020       2011-03-26 11:05:02 Europe/Rome
+
+   * Emergency release: fixed several problems caused by the new
+     SQL::Tokenizer (0.21 and above) releases. SQL::Tokenizer 0.22 now
+     required.
+
+   * Minor doc additions and fixes.
+
+1.00009       2011-02-09 10:37:48 Europe/Rome
+
+   * Fixed a corner case where an empty statement was not removed (upon request)
+     if it was closed by a /strange/ DELIMITER-defined terminator.
+
+   * Added a test for this.
+
+   * Fixed "t/90-mysql_sakila.t" and "t/92-postgresql_pagila.t" for older Perls
+     (pre 5.8.7 it seems). Thank you CPAN Testers!
+
+   * POD formatting fixes to obtain a better (automatically generated)
+     README.mkdn
+
+1.00000       2011-02-09 01:40:58 Europe/Rome
+
+   * PL/SQL PACKAGE limitation removed: now a PACKAGE with an initialization
+     block is correctly recognized even if it lacks both the package name at the
+     END and the slash terminator.
+
+   * PL/SQL parser fully rewritten again.
+
+   * Added a new terminator: semicolon followed by a period on its own line
+     followed by a forward slash on its own line (PL/SQL).
+
+   * Extended dollar-quoted strings handling, that is strings like "$TAG$", are
+     now handled correctly (whereas before only "$$" was permitted as a
+     dollar-quote).
+
+   * Two new types of placeholders added: /dollar sign numbers/
+     ($1, $2, ..., $n) and /named parameters/ (:foo, :bar, :baz).
+
+   * PL/SQL "DECLARE CURSOR" handling;
+
+   * Fixed missing PL/SQL "END CASE" check;
+
+   * Fixed a bug with DELIMITER-defined terminators when their scope persisted
+     over multiple statements.
+
+   * Fixed a bug which caused certain DELIMITER-defined terminators not to be
+     removed in the returned statements (when "keep_terminators" was set to
+     false).
+
+   * Many further improvements and fixes.
+
+   * Added the new "slash_terminates" option (NOT a change in the default
+     behavior, but please read the docs).
+
+   * Massive test additions (the two popular Sakila and Pagila sample db now
+     included).
+
+   * Docs updates.
+
+   * Markdown README added (via Dist::Zilla::Plugin::ReadmeMarkdownFromPod).
+
+0.30000       2011-01-23 11:00:02 Europe/Rome
+
+   * Fixed a PL/SQL problem where a FUNCTION or PROCEDURE inside a PACKAGE,
+     could cause the parser to trip over the end of the package.
+
+   * Tests for this.
+
+   * keep_terminator as a keep_terminators alias fix.
+
+   * Minor doc fixes.
+
+0.20000       2011-01-21 18:53:11 Europe/Rome
+
+   * Removed the limitation on the BEGIN, DECLARE, FUNCTION and PROCEDURE
+     keywords: they can now be used even as unquoted identifiers! :-)
+
+   * Minor docs enhancements.
+
+0.10000       2011-01-20 07:00:00 Europe/Rome
+
+   * Moose dropped in favour of Class::Accessor::Fast, since some people think
+     Moose is an overkill for such a simple module.
+
+   * Command line SQL splitting utility sql-split added.
+
+   * Added GRANT support: thanks Alexander Sennhauser for the report.
+
+   * Added MySQL DELIMITER support; closes bug #60401: thanks ed.shrock.
+
+   * Private methods heavily refactored.
+
+   * Many improvements and additions on docs and tests.
+
+0.07000       2010-06-26 04:00:00 Europe/Rome
+
+   * Much improved procedural blocks handling:
+      * dollar quoted blocks handling;
+      * better "CREATE ... FUNCTION|PROCEDURE" handling.
+
+   * Minimum required SQL::Tokenizer version is now 0.20
+     (thanks Igor Sutton for this new version).
+
+   * End of deprecation cycle on the "keep_semicolon" option (has now been
+     removed for good).
+
+   * Tests and docs additions.
+
+0.05003_1     2010-06-21 08:30:00 Europe/Rome
+
+   * Fixed a bug which caused a PL/SQL package without the package name after
+     the END to not be split correctly. Kindly reported by Dan Horne: thanks!
+
+   * Tests for this.
+
+   * Updated the LIMITATIONS section in the docs to explain that we cannot
+     handle a PL/SQL PACKAGE block _with_ an initialization block inside, if the
+     package lacks _both_ its name after the END and the trailing slash.
+
+0.05003       2010-06-20 00:00:00 Europe/Rome
+
+   * A bit more robust "CREATE ... PACKAGE" handling, so that it is now
+     accepted the use of the "PACKAGE" keyword as an identifier (even unquoted).
+
+   * Tests for that.
+
+   * Better explained LIMITATIONS.
+
+   * Minor doc fixes.
+
+   * Cleaned MANIFEST up from a perl stackdump.
+
+0.05002       2010-06-17 08:00:00 Europe/Rome
+
+   * Now handles also the presence of a so-called "initialization block" inside
+     a "PACKAGE" block.
+
+   * Tests for that.
+
+0.05001       2010-06-17 06:00:00 Europe/Rome
+
+   * Now handles also the PL/SQL "CREATE ... PACKAGE" construct (thanks
+     Dan Horne for his info about that!)
+
+   * Tests for that.
+
+0.05000       2010-06-17 04:00:00 Europe/Rome
+
+   * Now handles transactions (starting either with "BEGIN" and "START")
+     correclty.
+     Closes bug #58032. Thanks Frew Schmidt.
+
+   * Now handles procedural code as well.
+     Closes bug #57971. Thanks Dan Horne (thank you Dan also for the info by
+     private mail!)
+
+   * Now handle also Oracle-style statement terminators (slash and
+     semicolon-newline-slash-newline).
+
+   * Start of deprecation cycle on the "keep_semicolon" option which has been
+     renamed to "keep_terminator" (as now different terminator tokens are
+     recognized).
+
+   * Many tests and docs additions.
+
+   * Switch from Class::Accessor to Moose.
+
+0.03000       2010-05-30 03:00:00 Europe/Rome
+
+   * "split_with_placeholders" method added.
+
+   * Tests and docs for "split_with_placeholders".
+
+   * Assorted minor code and docs enhancements.
+
+0.01002       2010-05-28 20:30:00 Europe/Rome
+
+   * Removed "use DBI" from some tests, which was left there for error (and
+     caused said tests to fail, where DBI was not installed).
+
+   * Minor docs enhancements.
+
+0.01001       2010-05-28 19:00:00 Europe/Rome
+
+   * Added the ability to discard/keep comments.
+     Really, this is a change in the API, since now comments are discarded by
+     default, while before they were returned instead.
+     I hope this won't harm any user, given the young age of this module
+     (furthermore there isn't any difference when feeding the returned
+     statements to a DBMS, the differences are just /cosmetic/).
+     Sorry anyway!
+
+   * Added tests and docs for this.
+
+0.01000       2010-05-27 08:00:00 Europe/Rome
+
+   * Initial release.

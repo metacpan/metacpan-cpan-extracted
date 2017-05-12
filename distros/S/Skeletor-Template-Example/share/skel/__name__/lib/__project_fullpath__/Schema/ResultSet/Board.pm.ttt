@@ -1,0 +1,40 @@
+use strict;
+use warnings;
+
+package [% namespace %]::Schema::ResultSet::Board;
+
+use base '[% namespace %]::Schema::ResultSet';
+
+sub last_in_game {
+  my $self = shift;
+  $self->order_by({ -desc => 'move' })->first;
+}
+
+
+1;
+
+=head1 TITLE
+
+[% namespace %]::Schema::ResultSet::Board - resultset method for Board
+
+=head1 DESCRIPTION
+
+    TBD
+
+=head1 METHODS
+
+This class defines the following methods
+
+=head2 TBD
+
+    TBD
+
+=head1 AUTHORS & COPYRIGHT
+
+See L<[% namespace %]>.
+
+=head1 LICENSE
+
+See L<[% namespace %]>.
+
+=cut

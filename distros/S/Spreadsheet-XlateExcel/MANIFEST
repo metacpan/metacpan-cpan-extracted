@@ -1,0 +1,16 @@
+Changes
+cpanfile
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/Spreadsheet/XlateExcel.pm
+t/00-load.t
+t/01-xlate.t
+t/01-xlate/sheet-01.xls
+t/ZZ-boilerplate.t
+t/ZZ-manifest.t
+t/ZZ-pod_coverage.t
+t/ZZ-pod.t
+META.yml
+META.json

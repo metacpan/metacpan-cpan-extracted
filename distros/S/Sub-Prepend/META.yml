@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Sub-Prepend
+version:      0.01
+version_from: lib/Sub/Prepend.pm
+installdirs:  site
+requires:
+    Carp:                          0
+    Scalar::Util:                  1.11
+    Symbol:                        0
+    Test::Exception:               0.26
+    Test::More:                    0.45
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

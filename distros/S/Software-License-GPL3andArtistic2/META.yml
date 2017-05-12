@@ -1,0 +1,27 @@
+---
+abstract: 'GPL 3 and Artistic 2.0 Dual License'
+author:
+  - 'Caleb Cushing <xenoterracide@gmail.com>'
+build_requires:
+  Carp: 0
+  English: 0
+  File::Find: 0
+  File::Temp: 0
+  Scalar::Util: 0
+  Test::More: 0.94
+  perl: 5.004
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.101612, CPAN::Meta::Converter version 2.101610'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Software-License-GPL3andArtistic2
+requires:
+  Software::License: 0
+  Software::License::Artistic_2_0: 0
+  Software::License::GPL_3: 0
+  parent: 0
+version: 0.07

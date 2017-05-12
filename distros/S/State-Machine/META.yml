@@ -1,0 +1,27 @@
+---
+abstract: 'Simple State Machine Implementation'
+author:
+  - 'Al Newkirk <anewkirk@ana.io>'
+build_requires:
+  perl: v5.14.0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: State-Machine
+requires:
+  Bubblegum: 0.31
+  Exporter::Tiny: 0.038
+  Function::Parameters: 1.0401
+  Throwable: 0.200011
+  perl: v5.14.0
+resources:
+  bugtracker: https://github.com/alnewkirk/State-Machine/issues
+  homepage: http://metacpan.org/release/State-Machine/
+  repository: git://github.com/alnewkirk/State-Machine.git
+version: 0.07
+x_authority: cpan:AWNCORP

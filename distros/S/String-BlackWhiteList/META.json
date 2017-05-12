@@ -1,0 +1,44 @@
+{
+   "resources" : {
+      "homepage" : "http://search.cpan.org/dist/String-BlackWhiteList/",
+      "repository" : "http://github.com/hanekomu/String-BlackWhiteList",
+      "bugtracker" : "http://rt.cpan.org/Public/Dist/Display.html?Name=String-BlackWhiteList"
+   },
+   "generated_by" : "Dist::Zilla version 1.100711",
+   "meta-spec" : {
+      "version" : 1.4,
+      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html"
+   },
+   "version" : "1.100860",
+   "name" : "String-BlackWhiteList",
+   "author" : [
+      "Marcel Gruenauer <marcel@cpan.org>"
+   ],
+   "license" : "perl",
+   "build_requires" : {},
+   "provides" : {
+      "String::BlackWhiteList" : {
+         "version" : "1.100860",
+         "file" : "lib/String/BlackWhiteList.pm"
+      }
+   },
+   "requires" : {
+      "Class::Accessor::Complex" : "0",
+      "Scalar::Util" : "0",
+      "parent" : "0",
+      "English" : "0",
+      "FindBin" : "0",
+      "constant" : "0",
+      "Exporter" : "0",
+      "Carp" : "0",
+      "Test::More" : "0.88",
+      "perl" : "5.008",
+      "File::Find" : "0",
+      "File::Temp" : "0"
+   },
+   "abstract" : "Match a string against a blacklist and a whitelist",
+   "configure_requires" : {
+      "ExtUtils::MakeMaker" : "6.11"
+   }
+}
+

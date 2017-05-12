@@ -1,0 +1,13 @@
+Revision history for Perl extension Sys::CpuLoad
+
+0.03 Mon Mar 18 15:02:33 PST 2002
+	- LC_NUMERIC patch from Victor Wagner
+	- Added cache support to remember how we got the system load
+	- Restricted getloadavg() to FreeBSD/OpenBSD for now
+
+0.02 Sun Feb 17 23:43:26 PST 2002
+	- bsd getloadavg() support with help from Dmitry Dorofeev
+
+0.01 Wed Aug 11 15:44:55 PDT 1999
+	- original version; created by h2xs 1.16
+

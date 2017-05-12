@@ -1,0 +1,18 @@
+load_extension('perlvtab.so')
+
+id|color|height|shape|weight
+1|brown|100|round|200
+2|yellow|50|square|230
+3|blue|109|round|200
+select * from pivot_table where height=50 order by id;
+id|color|height|shape|weight
+2|yellow|50|square|230
+select * from pivot_table where weight > 200;
+id|color|height|shape|weight
+2|yellow|50|square|230
+select id from pivot_table where (weight > 200 or weight < 100) and shape in ('round','yellow');
+select id from pivot_table where (weight > 200 or weight < 100) and shape in ('round','square');
+id
+2
+
+

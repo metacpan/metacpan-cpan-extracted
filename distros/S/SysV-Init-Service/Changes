@@ -1,0 +1,38 @@
+0.06 2015-10-07T23:08:33+02:00
+ - Improve SEE ALSO section in doc.
+ - Move author tests to xt/ directory.
+ - Update Module::Install to 1.16 version.
+
+0.05 2015-03-18T16:36:45+01:00
+ - Rewrite from IO::CaptureOutput to Capture::Tiny because FCGI.
+
+0.04 2015-02-05T12:48:45+01:00
+ - Add OS check (Windows doesn't supported).
+ - Add THEORY section to doc.
+ - Add tests for status() method.
+ - Fix minimal version of Perl (not depend on dependencies).
+ - Fix start(), status() and stop() methods calling.
+ - Remove check for command in commands() output. Add note to commands()
+   subroutine.
+ - Update LICENSE AND COPYRIGHT section in doc.
+ - Update Module::Install to 1.14 version.
+ - Update copyright years.
+
+0.03 2014-08-19T06:34:34+02:00
+ - Add dependency for perl (based on Error::Pure).
+ - Internal rewrite to common command and add error for status() method.
+ - Fix LICENSE file.
+ - Fix exit status.
+ - Up version for Error::Pure dependency.
+ - Update Module::Install to 1.10 version.
+
+0.02 2013-11-12
+ - Add check for services with ".sh" suffix.
+ - Add support for parsing commands from "Usage: $0 start".
+ - Add tests for command() method.
+ - Fix warnings in commands() method.
+ - Remove error and fix code in commands() method. Init.d script returns
+   default exit code greater than 0.
+
+0.01 2013-11-12
+ - First version.

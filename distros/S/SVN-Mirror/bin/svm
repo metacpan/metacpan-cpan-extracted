@@ -1,0 +1,139 @@
+#!/usr/bin/perl -w
+use strict;
+use SVN::Core '0.32';
+use SVN::Mirror;
+
+=head1 NAME
+
+svm - command line interface for remote Subversion repository mirroring
+
+=head1 SYNOPSIS
+
+    # the svn repository for svm to use
+    % setenv SVMREPOS ~/svm
+
+    # set the path mirror/svn to mirror official subversion trunk
+    % svm init mirror/svn http://svn.collab.net/repos/svn/trunk
+
+    # run the actual mirroring
+    # flatten the changesets between revision 1 thru 6000
+    % svm sync mirror/svn 6000
+
+    # merge back changes in local branch
+    % svn cp file://$SVMREPOS/mirror/svn file://$SVMREPOS/svn-local
+    # make some changes and then merge back to source repository
+    % svm mergeback mirror/svn svn-local
+
+=head1 DESCRIPTION
+
+F<svm> mirrors remote repository accissible via L<SVN::Ra> interface
+to a local repository.
+
+=head1 COMMANDS
+
+=over
+
+=item init B<path> B<url>
+
+Initialize the B<path> in svm repository to mirror from B<url>.
+
+=item sync B<path> B<[sync_to]>
+
+Invoke the synchronization of B<path> in svm repository according the
+how it is initialized.
+
+=back
+
+=cut
+
+my $repospath = $ENV{SVMREPOS} || $ENV{HOME}.'/svn/svm';
+my $auth = SVN::Core::auth_open ([SVN::Client::get_simple_provider,
+				  SVN::Client::get_ssl_server_trust_file_provider,
+				  SVN::Client::get_username_provider]);
+
+sub help {
+    require Pod::Text;
+    my $parser = Pod::Text->new (sentence => 0, width => 78);
+    $parser->parse_from_file ($0, '-' );
+}
+
+sub init {
+    die "$0 init <path> <source>" unless $#_ == 1;
+    my ($path, $source) = @_;
+    my $m = SVN::Mirror->new(target_path => $path, target => $repospath,
+			     auth => $auth,
+			     source => $source, target_create => 1);
+    $m->init;
+}
+
+sub ls {
+    my $m = SVN::Mirror->new(target => $repospath);
+
+    $m->list;
+}
+
+sub can_continue {
+    $_ = $@;
+    return 1 if
+	m/Connection reset by peer/ ||
+	m/connection timed out/;
+}
+
+
+sub sync {
+    my $path = shift;
+    my $skip_to = shift;
+    my $pool = SVN::Pool->new_default;
+    my $m = SVN::Mirror->new(target_path => $path, target => $repospath,
+			     pool => $pool, auth => $auth,
+			     get_source => 1, skip_to => $skip_to);
+
+    while (1) {
+	eval {
+	    $m->init;
+	    $m->run;
+	};
+	last unless $@;
+
+	warn $@;
+	$m->{pool} = SVN::Pool->new_default;
+	$m = SVN::Mirror->new(%$m);
+	last unless can_continue;
+	print "retry...\n";
+	sleep 5;
+    }
+
+}
+
+sub mergeback {
+    my ($path, $branch_path, $rev) = @_;
+    my $pool = SVN::Pool->new_default;
+    my $m = SVN::Mirror->new(target_path => $path, target => $repospath,
+			     pool => $pool, auth => $auth,
+			     get_source => 1);
+    $m->init;
+    $m->mergeback ($rev-1, $branch_path, $rev);
+}
+
+my $cmd = shift || 'help';
+
+die "command not recognized" unless main->can($cmd);
+
+no strict 'refs';
+
+&$cmd(@ARGV);
+
+=head1 AUTHORS
+
+Chia-liang Kao E<lt>clkao@clkao.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2003 by Chia-liang Kao E<lt>clkao@clkao.orgE<gt>.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+See L<http://www.perl.com/perl/misc/Artistic.html>
+
+=cut

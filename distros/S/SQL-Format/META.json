@@ -1,0 +1,80 @@
+{
+   "abstract" : "Yet another yet another SQL builder",
+   "author" : [
+      "xaicron <xaicron {at} cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.1.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "SQL-Format",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Requires" : "0",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Tie::IxHash" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "SQL::Format" : {
+         "file" : "lib/SQL/Format.pm",
+         "version" : "0.16"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/xaicron/p5-SQL-Format/issues"
+      },
+      "homepage" : "https://github.com/xaicron/p5-SQL-Format",
+      "repository" : {
+         "url" : "git://github.com/xaicron/p5-SQL-Format.git",
+         "web" : "https://github.com/xaicron/p5-SQL-Format"
+      }
+   },
+   "version" : "0.16",
+   "x_contributors" : [
+      "Olivier Mengué <dolmen@cpan.org>",
+      "xaicron <xaicron@gmail.com>"
+   ]
+}

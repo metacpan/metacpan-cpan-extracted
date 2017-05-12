@@ -1,0 +1,15 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Permutations
+#
+
+func permutations(callback, set, perm=[]) {
+    set.len == 0 && callback(perm);
+    for i in range(set.len) {
+        __FUNC__(callback, [set[(0 ..^ i)..., (i+1 ..^ set.len)...]], [perm..., set[i]]);
+    }
+};
+
+var list = [1,2,3];
+permutations({|set| say set.join}, list);

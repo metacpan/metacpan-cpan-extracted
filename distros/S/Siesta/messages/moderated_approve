@@ -1,0 +1,2 @@
+[% list.name %] has a message from [% mail.from %] that needs moderating
+approve [% deferred %]

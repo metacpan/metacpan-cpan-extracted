@@ -1,0 +1,33 @@
+Release history for Perl module Simple::IPInfo
+
+0.10 2017-04- ABBYPAN
+    - add iso3166 code support : country_code, area_code; and isp_code
+    - add iterate_ipinfo for large file
+    - use get_ipinfo for small file / arrayref, return arrayref but not hashref now
+    - add reserve_inet option for get_ipinfo
+    - add make_inet_from_cidr.pl / refine_inet.pl / merge_inet.pl
+    - "state -> country", "prov -> area"
+
+0.06 2014-12-?? ABBYPAN
+    - Added this Changes file
+    - Added "use 5.008", since the module uses utf8, and added the
+      requirement to the metadata as well.
+    - Added "use strict" and "use warnings", plus minor tweaks so it
+      will run without warnings.
+
+0.05 2014-09-09 ABBYPAN
+    - remove ^M
+    - ask ip loc
+    - ip loc parse script
+
+0.04 2014-08-28 ABBYPAN
+    - add asn example
+    - link to GitHub from META files (Gabor Szabo++)
+    - update read_table_ipinfo
+
+0.03 2014-08-25 ABBYPAN
+
+0.02 2014-08-14 ABBYPAN
+
+0.01 2014-04-30 ABBYPAN
+    - First release to CPAN

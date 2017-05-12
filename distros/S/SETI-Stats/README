@@ -1,0 +1,39 @@
+README for SETI::Stats 1.05
+$Id: README,v 1.6 1999/08/06 17:03:55 martin Exp $
+
+by Martin Hamilton <martinh@gnu.org>
+
+
+You install the module by running these commands:
+
+   perl Makefile.PL
+   make
+   make install
+
+
+Description:
+
+   This Perl class provides an object oriented API which lets you gather
+   SETI@home stats from one or more machines and gives you a programmatic
+   way of getting access to them.  It can cope with multiple SETI@home
+   clients which share a directory hierarchy accessible to the machine it
+   is run on, clients which each have their own private filespace (using
+   rsh, ssh or equivalent) and even works for boxes running Windows NT.
+
+   SETI::Stats borrows from Jan Rocho's perlseti.pl, but differs in
+   several ways - this is a module devoted to stats gathering rather than
+   a general purpose control program, it can be used to monitor remote
+   machines without even requiring Perl to be installed on them, and
+   it provides a generic framework for access to (both local and remote)
+   SETI@home client stats.  It could also be extended to cover stats
+   gathering from the SETI@home WWW server, though this may be better done
+   in a separate module to avoid code bloat.
+
+
+Please report any bugs/suggestions to the author
+
+Copyright (c) 1999, Martin Hamilton.  All rights reserved.
+
+This is free software; you can redistribute it and/or modify it under the
+same terms as Perl itself.
+

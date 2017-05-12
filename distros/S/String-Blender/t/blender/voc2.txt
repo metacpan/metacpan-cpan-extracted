@@ -1,0 +1,9 @@
+area
+city
+club
+dominion
+empire
+field
+land
+valley
+world

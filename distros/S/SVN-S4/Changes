@@ -1,0 +1,183 @@
+Revision history for Perl extension SVN::S4
+
+The contributors that suggested a given feature are shown in [].  [by ...]
+indicates the contributor was also the author of the fix; Thanks!
+
+* SVN::S4 1.064 2017-04-26
+
+**** Fix tests '.' for Perl 5.26.0, rt121025.  [Dan Collins]
+
+
+* SVN::S4 1.062 2016-12-03
+
+***  Fix tests with non-English locale, bug1113. [Slaven Rezic]
+
+***  Fix test warnings with Subversion 1.9.3.
+
+
+* SVN::S4 1.060 2016-11-07
+
+**   Support Subversion 1.8.
+
+***  Fix help of aliased commands. [Brian Cassell]
+
+
+* SVN::S4 1.056 2015-01-13
+
+***  Add S4_CONFIG_SITE.
+
+***  If commit-block-non-top, block commits not from the top of the checkout.  [Joe Tompkins]
+
+***  If commit-block-unversioned, block commits of ? or conflicted files.  [Joe Tompkins]
+
+**** Fix parsing parameters with negative options.  [Dan Katz]
+
+**** Fix s4 snapshot with switched files.  [Dan Katz]
+
+
+* SVN::S4 1.055 2013-03-06
+
+***  Add s4 update and s4 status --top, bug551.  [Brad Dobbie]
+
+**** Fix 's4 fixprop --no-keywords' and --no-ignores.
+
+
+* SVN::S4 1.054 2012-03-16
+
+**** Fix 's4 quick-commit' to allow multiple paths.  [Brad Dobbie]
+
+**** Add 's4 fixprop' with recursive .cvsignores.
+
+**** Add 's4 fixprop' propagating tsvn:autoprops.
+
+**** Add 's4 --orig' option, bug415.  [Brad Dobbie]
+
+**** Fix cpan-testers' tests on systems without perldoc.
+
+
+* SVN::S4 1.053 2011-04-20
+
+**** Support URL@REV format with viewspecs.  [Brian Hunter]
+
+**** Print error when do merging of viewed area.  See 's4' documentation.
+
+**** Fix 's4 update' with viewspec ignoring --quiet. [Dan Katz]
+
+
+* SVN::S4 1.052 2011-03-17
+
+**   Viewspecs may live in existing trees, which will be checked out completely,
+     instead of non-recursively as in previous versions.
+
+***  Viewspecs may specify wildcard URLs.  [Joseph DErrico] [Brad Dobbie]
+
+***  Viewspecs may have URL@PEGREV as an alternative to "rev PEGREV"
+     to match what svn switch supports. [Brad Dobbie]
+
+***  Fix 's4 update -r' with viewspec causing error.  [Jeff Schroeder]
+
+**** On 's4 update' ignore viewspecs in sub-directories of other viewspecs.
+
+**** Fix some viewspecs ignoring multiple "unview"s. [Brad Dobbie]
+
+**** Fix 's4 snapshot' unused warning on new properties. [John Sweeney]
+
+**** Fix 's4 snapshot' with newlines in properties. [John Sweeney]
+
+
+* SVN::S4 1.051 2011-01-02
+
+***  s4 info-switches now supports URL format for viewspecs.
+
+**** Fix 's4 scrub' underneath viewspecs.  [Joseph DErrico]
+
+**** Fix 's4 update {symlink}' with viewspec not updating.
+
+**** With 'co-under-co=no' disallow nested checkouts.  [Brian Hunter]
+
+**** Standardize internal debug messages.
+
+
+* SVN::S4 1.050 2010-10-04
+
+***  's4 add' no longer does fixprop by default.  Use a configuration file
+     to enable this behavior.
+
+
+* SVN::S4 1.040 2010-09-30
+
+**   Add 's4 workpropdel, workpropget, workpropset, workproplist'.
+
+***  Viewspecs now allow ^ to refer to repo root.
+
+
+* SVN::S4 1.034 2010-07-09
+
+**   Support SVN 1.6.6.
+
+
+* SVN::S4 1.033 2010-02-25
+
+**** Fix Pod::Usage dependency, rt51024.
+
+
+* SVN::S4 1.032 2009-05-08
+
+**   This package is now licensed under LGPL v3 and/or Artistic v2.0.
+
+***  Add 's4 cat-or-mods'.
+
+
+* SVN::S4 1.031 2008-09-29
+
+***  Add verbose messages to 's4 scrub'.  [Brian Cassell]
+
+***  Recognize .gitignore files similar to .cvsignore files.
+
+
+* SVN::S4 1.030 2008-03-10
+
+**   Update to support Subversion 1.4 clients.
+
+**** Fix s4 update of symlinks without directory names. [Mahesh Kumashikar]
+
+
+* SVN::S4 1.022 2008-01-10
+
+**   Added s4 quick-checkin command.
+
+
+* SVN::S4 1.021 2007-12-05
+
+**** Backed out some unintended experimental changes in 1.020.
+
+
+* SVN::S4 1.020 2007-12-03
+
+**   First major release to CPAN.
+
+
+* SVN::S4 1.010 2007-03-08
+
+**   First external alpha release.
+
+
+* SVN::S4 1.000 2006-09-12
+
+**   First code written.
+
+----------------------------------------------------------------------
+DESCRIPTION: Documentation on change history for this package
+----------------------------------------------------------------------
+
+This uses outline mode in Emacs.  See C-h m [M-x describe-mode].
+
+Copyright 2006-2017 by Bryce Denney and Wilson Snyder.  This program is
+free software; you can redistribute it and/or modify it under the terms of
+either the GNU General Public License Version 3 or the Perl Artistic
+License Version 2.0.
+
+Local variables:
+mode: outline
+paragraph-separate: "[ 	\f\n]*$"
+end:

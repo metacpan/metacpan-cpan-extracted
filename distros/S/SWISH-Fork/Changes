@@ -1,0 +1,24 @@
+Revision history for Perl extension SWISH::Fork.
+
+0.01  Thu Sep 14 14:18:41 2000
+	- original version; created by h2xs 1.20 with options
+		-X -n SWISH::Fork
+
+
+0.07  Thu Oct 05, 2000
+        - fixed autoload closure that prevented destroy
+
+0.08  Mon Jan 15, 2001
+        - Fixed signal handler that went out of scope
+        - Prepared for SWISH-E 2.2.  Namely, made the results
+          callback method ($hit->property) use the (at this time)
+          standard names for the fields, and provide access to all
+          data (swish internal data such as rank, title, file name, and
+          properties) through method calls on the $hit object.
+        - test.pl updated, and tested against 1.2.4, 1.3.2, 2.0.4.
+
+0.13  Sat Nov  1 22:47:45 UTC 2003
+
+	- Updated the way the version is parsed.
+        - Depreciated this module -- see README
+

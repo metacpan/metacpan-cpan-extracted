@@ -1,0 +1,1190 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+sysync - command-line interface for sysync
+
+=head1 SYNOPSIS 
+
+ usage: ./bin/sysync [--interactive] [command]
+ Commands:
+    --help (show this)
+    --mkpasswd (return password via stdout)
+    --passwd=[user] (set a user's password)
+    --usersetpassword=[user] allow a user to set their own password
+    --usersetpasswordauthkeys returns authorized_keys file for all users to set their password
+    --cmd=[host,host2] [command]
+    --config=/path/to/config
+    --refresh (alias for --push-auth)
+    --push-auth (push auth files to every host)
+    --push-files (push controlled files, not auth files, to every host)
+ Administrative Commands (using Sysync::File):
+    --adduser=[user]
+    --edituser=[user]
+    --deluser=[user]
+    --addgroup=[group]
+    --editgroup=[group]
+    --delgroup=[group]
+    --addhost=[host]
+    --edithost=[host]
+    --delhost=[host]
+    --edithosts (edit hosts.conf file)
+    --import-host=[hostname] (returns YAML dump of data from remote host)
+
+=head1 TUTORIAL
+
+=head2 Introduction to Sysync
+
+Sysync is a tool to manage users/groups and configuration files across multiple hosts.
+
+=head2 Add a user
+
+To get started, first you'll want to create a user account for yourself.
+
+ $ sudo sysync --adduser=yourusername --interactive and you'll see:
+
+ username: elmo
+ uid: 1009
+ fullname: elmo
+ homedir: /home/elmo
+ shell: /bin/bash
+ disabled: 0
+ #gid: (defaults to uid)
+ #ssh_keys:
+ #   - "SSH1 key here"
+ #   - "SSH2 key here"
+ #   - "SSH3 key here"
+
+Edit the information as you'd like, you can also put multiple ssh keys here per-user.
+
+Now, set the user's initial password:
+
+ $ sudo sysync --passwd=elmo
+
+Next, you'll want to add a group for your user.
+
+=head2 Add a group
+
+ $ sudo EDITOR=emacs sysync --addgroup=slackers2 --interactive 
+ (in this example, I'm forcing the use of the emacs text editor)
+
+ groupname: slackers2
+ gid: 1011
+ users:
+    - elmo
+    - elmosbrother
+
+Next, you'll want to setup your default host configuration.
+
+=head2 Configure default host
+
+Simply run sysync --edithost=default
+
+You'll see something akin to this in your favorite text editor:
+
+ users:
+    -  uid: 0
+      username: root
+      homedir: /root
+      shell: /bin/bash
+      password: ''
+      ssh_keys:
+          - "ssh-rsa 1XXX"
+          - "ssh-rsa 2XXX"
+          - "ssh-rsa 3XXX"
+    - { uid: 1, username: daemon, homedir: /usr/sbin, shell: /bin/sh }
+    - { uid: 2, username: bin, homedir: /bin, shell: /bin/sh }
+    - { uid: 3, username: sys, homedir: /dev, shell: /bin/sh }
+    - { uid: 8, username: mail, homedir: /var/mail, shell: /bin/sh }
+    - { uid: 10, username: uucp, homedir: /var/spool/uucp, shell: /bin/sh }
+    - { uid: 33, username: www-data, homedir: /var/www, shell: /bin/sh }
+    - { uid: 34, username: backup, homedir: /var/backups, shell: /bin/sh }
+    - { uid: 65534, username: nobody, homedir: /nonexistent, shell: /bin/sh }
+    - { uid: 100, gid: 101,  username: libuuid, homedir: /var/lib/libuuid, shell: /bin/sh }
+    - { uid: 101, gid: 103, username: syslog, homedir: /home/syslgo, shell: /bin/false }
+    - { uid: 102, username: sshd, homedir: /var/run/sshd, shell: /usr/sbin/nologin }
+    - { uid: 103, username: ntpd, homedir: /var/run/openntpd, shell: /bin/false }
+    - { uid: 104, username: 'Debian-exim', gid: 109, homedir: /var/spool/exim4, shell: /bin/false }
+ groups:
+    - { gid: 4, groupname: adm }
+    - { gid: 5, groupname: tty }
+    - { gid: 6, groupname: disk }
+    - { gid: 7, groupname: lp }
+    - { gid: 15, groupname: kmem }
+    - { gid: 24, groupname: cdrom }
+    - { gid: 25, groupname: floppy }
+    - { gid: 30, groupname: dip }
+    - { gid: 37, groupname: operator }
+    - { gid: 40, groupname: src }
+    - { gid: 42, groupname: shadow }
+    - { gid: 43, groupname: utmp }
+    - { gid: 44, groupname: video }
+    - { gid: 45, groupname: sasl }
+    - { gid: 46, groupname: plugdev }
+    - { gid: 50, groupname: staff }
+    - { gid: 100, groupname: users }
+    - { gid: 101, groupname: libuuid }
+    - { gid: 103, groupname: crontab }
+    - { gid: 104, groupname: ssh }
+    - { gid: 106, groupname: mlocate }
+    - { gid: 107, groupname: landscape }
+    - { gid: 109, groupname: 'Debian-exim' }
+    - { gid: 65534, groupname: nogroup }
+ # only import users from the follow groups
+ # use all for all users
+ user_groups:
+    - all
+
+You'll want to set your default root password, along with any ssh keys you'd like
+propagated to the machine.
+
+You'll notice the "user_groups" config, which by default is set to "all". This setting
+specifies which groups of users should be allowed on the host.  'all' is a special group
+which imports all users.
+
+=head2 Add a host configuration
+
+ You may be interested in generating your host configuration files initially with the --import-host command (see below).
+
+ $ sudo sysync --addhost=spam --interactive
+
+You'll see:
+
+ #users:
+ #   - uid: 0
+ #     username: root
+ #     homedir: /root
+ #     shell: /bin/bash
+ #     password: '$6$928b679b70731fc7$OjB.vI0hI4PWC9ObsudW3ITZMBjo7Rfs6Dd5vQ80XZM0A6NU6EQqIVQAI3T90T5Bz3K9Vfha0cp176IAHaNQQ.'
+ #     ssh_keys:
+ #        - here
+ # only import users from the following groups
+ # use all for all users
+ user_groups:
+    - all
+
+You can add system users and override users, referenced by the default host image, in this file.
+For example, you could set a different root password on every host configuration.
+
+Example:
+
+ users:
+    - uid: 0
+      username: root
+      homedir: /root
+      shell: /bin/bash
+      password: '$6$928b679b70731fc7$OjB.vI0hI4PWC9ObsudW3ITZMBjo7Rfs6Dd5vQ80XZM0A6NU6EQqIVQAI3T90T5Bz3K9Vfha0cp176IAHaNQQ.'
+      ssh_keys:
+         - here
+ # only import users from the following groups
+ # use all for all users
+ user_groups:
+    - sysadmin
+
+In the above example, we're overriding the default password and ssh keys for the root user.  
+We're also only importing members of the sysadmin group.
+
+=head2 Import an existing host
+
+Sysync can also create host configurations from existing hosts with the --import-host command.
+
+ $ sudo sysync --import-host=foo.waffle.savannah.gnu.org > host_config.conf
+
+=head2 Mapping hosts to hosts
+
+To edit the host mapping:
+ 
+ $ sudo sysync --edithosts
+ 
+ hosts:
+   spam:
+      - spam01p.savannah.gnu.org
+      - spam02p.savannah.gnu.org
+   otherhost:
+      - otherhostwouldgohere
+ 
+Multple physical hosts can be mapped to one host configuration, as seen in the above example.
+
+=head2 Controlling files via config
+
+A host configuration file may have a files component, specified as such:
+
+ files:
+    - file:  /etc/foo.txt
+      owner: root
+      group: root
+      mode:  600
+      data: |
+         Here is the data.
+         It is so awesome.
+    - file:   /etc/bar.txt
+      owner:  root
+      group:  root
+      mode:   600
+      # uses sysdir, by default /var/sysync/ as base directory if leading slash is omitted.
+      source: files/moo.txt
+    - { import: host, host: waffle }
+    - { import: config, config: files/waffle.conf }
+
+If you import a config, ensure the config is in the following format (the same as if it were in a host file):
+
+ files:
+    - file:  /etc/foo.txt
+      owner: root
+      group: root
+      mode:  600
+      data: |
+         Here is the data.
+         It is so awesome.
+
+To push changes to files, issue a --push-files command.
+
+=head2 SSH keys
+
+Sysync pushes ssh keys under /etc/ssh/authorized_keys/${USERNAME}, if you
+want to use sysync to manage ssh keys, you'll want to configure sshd_config
+to use that path:
+ 
+ AuthorizedKeysFile      /etc/ssh/authorized_keys/%u
+
+=head2 Remote password changes
+
+The host running sysync may permit for remote password changes for users.
+ 
+In this case, we're going to assume this sysync host is not controlling it's own
+users with sysync.
+ 
+To configure this:
+
+ 1) Setup a user on the sysync host, let's say 'sysync'
+ 
+ 2) Add user to suders:
+ sysync ALL=(ALL)NOPASSWD:/usr/sbin/sysync
+ 
+ 3) Setup cron to build authorized_keys file for login:
+ 
+ $ cat /etc/cron.hourly/sysync-keys
+ #!/bin/bash
+ 
+ /usr/sbin/sysync --usersetpasswordauthkeys > /home/sysync/.ssh/authorized_keys
+ 
+ 4) This generates a file like this:
+ 
+ command="sudo /usr/sbin/sysync --usersetpassword=elmo" ssh-rsa elmosshkeyhere
+ command="sudo /usr/sbin/sysync --usersetpassword=elmo" ssh-rsa elmosothershkeyhere
+ 
+ 5) If a user changes their password, sysync pushes it to the relevant hosts.
+ 
+=cut
+
+use strict;
+
+use File::Copy;
+use Digest::MD5 qw(md5_hex);
+use Time::HiRes 'usleep';
+use POSIX ":sys_wait_h";
+
+use Sysync;
+use IPC::Open3;
+use YAML;
+
+my $default_sleep = 1800;
+my $max_workers   = 10;
+my $editor = $ENV{EDITOR} || 'vi';
+
+die "sysync may only be ran as root\n" unless $< == 0;
+
+my $current_workers = 0;
+
+my @TRAILING_ARGS;
+
+my $sysdir; 
+my $stagedir;
+my $sysync;
+
+sub main
+{
+    # grab options
+    my $options = _parse_options();
+    my $config  =
+        Load(Sysync->read_file_contents($options->{config} || '/var/sysync/sysync.conf'));
+
+    my $backend_module = $config->{module};
+
+    eval("use $backend_module");
+
+    if ($@)
+    {
+        die "Could not load $backend_module\n";
+    }
+
+    $sysync = $backend_module->new($config);
+
+    $sysdir   = $sysync->sysdir;
+    $stagedir = $sysync->stagedir;
+
+    if ((my $username = $options->{adduser}) and ref $sysync eq 'Sysync::File')
+    {
+        die "Username must be specified\n" if $username eq '1';
+        die "User $username already exists\n" if -e "$sysdir/users/$username.conf";
+        slock();
+        my $uid = getnextuid();
+        incrementuid();
+        _write_new_user_template($username, $uid);
+
+        edit_yaml_file("$sysdir/users/$username.conf") if $options->{interactive};
+        print "User $username added\n";
+        sunlock();
+        $sysync->must_refresh(1);
+    }
+    elsif ((my $username = $options->{edituser}) and ref $sysync eq 'Sysync::File')
+    {
+        die "Username must be specified\n" if $username eq '1';
+        die "User $username does not exists\n" unless -e "$sysdir/users/$username.conf";
+        slock();
+        &_edit_yaml_keyed_file("$sysdir/users/$username.conf", 'users', 'username');
+        sunlock();
+        $sysync->must_refresh(1);
+    }
+    elsif ((my $username = $options->{deluser}) and ref $sysync eq 'Sysync::File')
+    {
+        die "Username must be specified\n" if $username eq '1';
+        die "User $username does not exists\n" unless -e "$sysdir/users/$username.conf";
+        slock();
+        unlink("$sysdir/users/$username.conf");
+        print "$username deleted\n";
+        sunlock();
+        $sysync->must_refresh(1);
+    }
+    elsif ((my $group = $options->{addgroup}) and ref $sysync eq 'Sysync::File')
+    {
+        die "Group must be specified\n" if $group eq '1';
+        die "'all' is an invalid group name\n" if $group eq 'all';
+        die "Group $group already exists\n" if -e "$sysdir/groups/$group.conf";
+        slock();
+        my $gid = getnextuid();
+        incrementuid();
+        _write_new_group_template($group, $gid);
+
+        edit_yaml_file("$sysdir/groups/$group.conf") if $options->{interactive};
+        print "Group $group added\n";
+        sunlock();
+        $sysync->must_refresh(1);
+    }
+    elsif ((my $group = $options->{editgroup}) and ref $sysync eq 'Sysync::File')
+    {
+        die "Group must be specified\n" if $group eq '1';
+        die "Group $group does not exists\n" unless -e "$sysdir/groups/$group.conf";
+        slock();
+        &_edit_yaml_keyed_file("$sysdir/groups/$group.conf", 'groups', 'groupname');
+        sunlock();
+        $sysync->must_refresh(1);
+    }
+    elsif ((my $group = $options->{delgroup}) and ref $sysync eq 'Sysync::File')
+    {
+        die "Group must be specified\n" if $group eq '1';
+        die "Group $group does not exists\n" unless -e "$sysdir/groups/$group.conf";
+        slock();
+        unlink("$sysdir/groups/$group.conf");
+        print "$group deleted\n";
+        sunlock();
+        $sysync->must_refresh(1);
+    }
+    elsif ((my $host = $options->{addhost}) and ref $sysync eq 'Sysync::File')
+    {
+        die "Host must be specified\n" if $host eq '1';
+        die "Host $host already exists\n" if -e "$sysdir/hosts/$host.conf";
+        slock();
+
+        _write_new_host_template($host);
+
+        edit_yaml_file("$sysdir/hosts/$host.conf") if $options->{interactive};
+        print "Host $host added\n";
+        sunlock();
+        $sysync->must_refresh(1);
+    }
+    elsif ((my $host = $options->{edithost}) and ref $sysync eq 'Sysync::File')
+    {
+        die "Host must be specified\n" if $host eq '1';
+        die "Host $host does not exists\n" unless -e "$sysdir/hosts/$host.conf";
+        slock();
+        edit_yaml_file("$sysdir/hosts/$host.conf");
+        sunlock();
+        $sysync->must_refresh(1);
+    }
+    elsif ((my $host = $options->{delhost}) and ref $sysync eq 'Sysync::File')
+    {
+        die "Host must be specified\n" if $host eq '1';
+        die "Host $host does not exists\n" unless -e "$sysdir/hosts/$host.conf";
+        slock();
+        unlink("$sysdir/hosts/$host.conf");
+        print "$host deleted\n";
+        sunlock();
+        $sysync->must_refresh(1);
+    }
+    elsif (($options->{edithosts}) and ref $sysync eq 'Sysync::File')
+    {
+        slock();
+        edit_yaml_file("$sysdir/hosts.conf");
+        sunlock();
+        $sysync->must_refresh(1);
+    }
+    elsif ($options->{'refresh'} or $options->{'push-auth'})
+    {
+        $sysync->must_refresh(1);
+        print "Refresh auth data requested.\n";
+    }
+    elsif ($options->{'push-files'})
+    {
+        $sysync->must_refresh_files(1);
+        print "Refresh files requested.\n";
+    }
+    elsif ($options->{mkpasswd})
+    {
+        print _prompt_for_password() . "\n";
+    }
+    elsif (my $username = $options->{passwd})
+    {
+        if ($options->{passwd} eq '1')
+        {
+            die "Please specify a username\n";
+        }
+        else
+        {
+            die "user does not exist\n" unless -e "$sysdir/users/$username.conf";
+
+            my $passwd = _prompt_for_password();
+            $sysync->set_user_password($username, $passwd);
+
+            print "Successfully updated password for $username\n";
+            $sysync->must_refresh(1);
+        }
+    }
+    elsif (my $username = $options->{usersetpassword})
+    {
+        die "user does not exist\n" unless -e "$sysdir/users/$username.conf";
+
+        print "Hello $username!\n\n";
+
+        print "Please enter your password: ";
+
+        system('stty','-echo');
+        chomp(my $password = <STDIN>);
+        system('stty','echo');
+
+        print "\n";
+        my $current_pw = $sysync->read_file_contents("$sysdir/users/$username.passwd");
+
+        if (crypt($password, $current_pw) eq $current_pw)
+        {
+            my $passwd = _prompt_for_password();
+            $sysync->set_user_password($username, $passwd);
+            $sysync->must_refresh(1);
+        }
+        else
+        {
+            die "Incorrect password\n";
+        }
+    }
+    elsif ($options->{usersetpasswordauthkeys})
+    {
+        my $out = '';
+
+        for my $username ($sysync->get_all_users)
+        {
+            my $user = $sysync->get_user($username);
+
+            for my $key (@{ $user->{ssh_keys} || [] })
+            {
+                $out .= qq[command="sudo /usr/sbin/sysync --usersetpassword=$username" $key\n];
+            }
+        }
+
+        print $out;
+    }
+    elsif (my $host_list = $options->{cmd})
+    {
+        die "need to specify host\n" if $host eq '1';
+
+        my $hosts = $sysync->get_all_hosts;
+        my %pids;
+
+        # make 'all' hosts directive work
+        $host_list = join(',', keys(%{$hosts->{hosts} || {}}))
+            if $host_list eq 'all' and $hosts->{hosts};
+
+        for my $host (split(',', $host_list))
+        {
+            die "host does not exist\n" unless $sysync->is_valid_host($host);
+            die "host $host not mapped to addresses\n" unless $hosts->{hosts}{$host};
+        }
+
+        for my $host (split(',', $host_list))
+        {
+            while ($current_workers >= $max_workers) { usleep(2000) };
+
+            for my $h (@{ $hosts->{hosts}{$host} || [] })
+            {
+                my $s = join(' ', @TRAILING_ARGS);
+
+                # give pause
+                while ($current_workers >= $max_workers) { usleep(2000) };
+
+                if (my $pid = fork())
+                {
+                    $pids{$pid} = 1;
+                    $current_workers++;
+                    print STDOUT "starting: [pid: $pid][$host => $h] $s\n";
+                }
+                else
+                {
+                    $0 = "sysync-cmd [$host => $h] $s";
+                    my $r = _system('ssh', '-F', '/var/sysync/ssh.conf', "root\@${h}",
+                                    @TRAILING_ARGS);
+
+                    print STDOUT "completed: [pid: $$][$host => $h] $s\n";
+                    print STDOUT "===STDOUT===\n" if $r->{stdout};
+                    print STDOUT $r->{stdout};
+                    print STDOUT "===STDERR===\n" if $r->{stderr};
+                    print STDOUT $r->{stderr};
+                    print STDOUT "===END===\n";
+
+                    exit(0);
+                }
+            }
+        }
+
+        while (keys %pids)
+        {
+            for my $pid (keys %pids)
+            {
+                delete $pids{$pid}
+                    if waitpid($pid, WNOHANG);
+            }
+            usleep(2000);
+        }
+    }
+    elsif (my $host = $options->{'import-host'} and ref $sysync eq 'Sysync::File')
+    {
+        die "Host must be specified\n" if $host eq '1';
+
+        my $r;
+        
+        $r = _system('ssh', '-F', '/var/sysync/ssh.conf', "root\@${host}", 'hostname');
+
+        if ($r->{stdout} =~ /^Permission denied/)
+        {
+            die "Cannot access $host\n";
+        }
+
+        $r = _system('ssh', '-F', '/var/sysync/ssh.conf', "root\@${host}", 'cat /etc/passwd');
+        my $passwd = $r->{stdout};
+
+        $r = _system('ssh', '-F', '/var/sysync/ssh.conf', "root\@${host}", 'cat /etc/shadow');
+        my $shadow = $r->{stdout};
+
+        $r = _system('ssh', '-F', '/var/sysync/ssh.conf', "root\@${host}", 'cat /etc/group');
+        my $group = $r->{stdout};
+
+        my $ent_data = _process_ent_files(
+            passwd => $passwd,
+            shadow => $shadow,
+            group  => $group,
+        );
+
+        print _custom_yaml_end_dump($ent_data);
+    }
+    elsif (my $hostpackage = $options->{'diff'} and ref $sysync eq 'Sysync::File')
+    {
+        die "Host must be specified\n" if $hostpackage eq '1';
+
+        my $host = $options->{'remote-host'};
+        die "Remote host must be specified\n" if not $host or $host eq '1';
+
+        die "Invalid host: $hostpackage\n"
+            unless $sysync->is_valid_host($hostpackage);
+
+        my $r;
+        
+        $r = _system('ssh', '-F', '/var/sysync/ssh.conf', "root\@${host}", 'hostname');
+
+        if ($r->{stdout} =~ /^Permission denied/)
+        {
+            die "Cannot access $host\n";
+        }
+
+        $r = _system('ssh', '-F', '/var/sysync/ssh.conf', "root\@${host}", 'cat /etc/passwd');
+        my $passwd = $r->{stdout};
+
+        $r = _system('ssh', '-F', '/var/sysync/ssh.conf', "root\@${host}", 'cat /etc/shadow');
+        my $shadow = $r->{stdout};
+
+        $r = _system('ssh', '-F', '/var/sysync/ssh.conf', "root\@${host}", 'cat /etc/group');
+        my $group = $r->{stdout};
+
+        my $ent_data = _process_ent_files(
+            passwd => $passwd,
+            shadow => $shadow,
+            group  => $group,
+        );
+
+        my $warnings = '';
+        my %new_ent_info;
+
+        my $existing_host_ent = $sysync->get_host_users_groups($hostpackage);
+
+        for my $user (@{ $ent_data->{users} || [ ] })
+        {
+            my ($existing) = grep { $_->{username} eq $user->{username} }
+                @{ $existing_host_ent->{users} || [ ] };
+    
+            if ($existing and
+                $existing->{uid} != $user->{uid})
+            {
+                $warnings .= "UID change for user $user->{username} from uid $existing->{uid} to $user->{uid}\n";
+            }
+
+            unless ($existing)
+            {
+                $new_ent_info{users} = [] unless defined $new_ent_info{users};
+                push @{$new_ent_info{users}}, $user;
+            }
+        }
+
+        for my $group (@{ $ent_data->{groups} || [ ] })
+        {
+            my ($existing) = grep { $_->{groupname} eq $group->{groupname} }
+                @{ $existing_host_ent->{groups} || [ ] };
+    
+            if ($existing and
+                $existing->{gid} != $group->{gid})
+            {
+                $warnings .= "GID change for group $group->{groupname} from uid $existing->{gid} to $group->{gid}\n";
+            }
+
+            unless ($existing)
+            {
+                $new_ent_info{groups} = [] unless defined $new_ent_info{groups};
+                push @{$new_ent_info{groups}}, $group;
+            }
+        }
+
+        print $warnings;
+
+        if (%new_ent_info)
+        {
+            print _custom_yaml_end_dump(\%new_ent_info, { new => 1 });
+        }
+    }
+    elsif ($options->{help})
+    {
+        usage();
+    }
+    else
+    {
+        usage();
+    }
+
+    return 0;
+}
+
+sub _custom_yaml_end_dump
+{
+    my ($config, $params) = @_;
+
+    my $out = ($params->{new} ? "new users:\n" : "users:\n");
+
+    @{$config->{users}} = sort {
+        ($a->{password} && $a->{uid} != 0)
+            <=>
+        ($b->{password} && $b->{uid} != 0)
+    } @{$config->{users}};
+
+    for my $user (@{$config->{users}})
+    {
+        if ($user->{password})
+        {
+            if ($user->{uid} > 0)
+            {
+                $out .= "    # THIS USER SHOULD PROBABLY NOT BE HERE, ADD THEM AS A SYSYNC USER! \n";
+            }
+
+            $out .= "    - username: $user->{username}\n";
+            $out .= "      uid: $user->{uid}\n";
+            $out .= "      gid: $user->{gid}\n";
+            $out .= "      homedir: '$user->{homedir}'\n";
+            $out .= "      shell: '$user->{shell}'\n";
+            $out .= "      password: '$user->{password}'\n"
+                if $user->{password};
+        }
+        else
+        {
+            $out .= "    - { username: $user->{username}, uid: $user->{uid}, gid: $user->{gid}, homedir: '$user->{homedir}', shell: '$user->{shell}' }\n";
+        }
+    }
+
+    $out .= ($params->{new} ? "new groups:\n" : "groups:\n");
+    for my $group (@{$config->{groups}})
+    {
+        if ($group->{users})
+        {
+            $out .= "    - groupname: $group->{groupname}\n";
+            $out .= "      gid: $group->{gid}\n";
+            $out .= "      users:\n";
+            
+            for my $user (@{$group->{users}})
+            {
+                $out .= "        - $user\n";
+            }
+        }
+        else
+        {
+            $out .= "    - { groupname: $group->{groupname}, gid: $group->{gid} }\n";
+        }
+    }
+
+
+    return $out;
+}
+
+sub _process_ent_files
+{
+    my %params = @_;
+
+    my %ent_data = (
+        groups => [],
+        users  => [],
+    );
+
+    my %groups;
+
+    my $line = 0;
+    for my $group_line (split("\n", $params{group}))
+    {
+        $line++;
+
+        my ($name, undef, $gid, $user_line) = split(':', $group_line);
+        my @users = split(',', $user_line);
+
+        die "malformed group file at line $line\n"
+            unless $name and defined $gid;
+
+        my %g = (
+            groupname => $name,
+            gid       => $gid,
+        );
+        $g{users} = \@users if @users;
+
+        push @{$ent_data{groups}}, \%g;
+    }
+
+    $line = 0;
+    my %shadow_map;
+    for my $shadow_line (split("\n", $params{shadow}))
+    {
+        $line++;
+
+        my ($name, $passwd) = split(':', $shadow_line);
+
+        die "malformed shadow file at line $line\n"
+            unless $name;
+
+        $shadow_map{$name} = $passwd
+            if $passwd and $passwd ne '*' and $passwd ne '!';
+    }
+
+    $line = 0;
+    for my $passwd_line (split("\n", $params{passwd}))
+    {
+        $line++;
+
+        my ($name, undef, $uid, $gid, $user_info, $homedir, $shell) = split(':', $passwd_line);
+        my ($fullname) = split(',', $user_info);
+
+        die "malformed user file at line $line\n"
+            unless $name and defined $gid;
+
+        my %u = (
+            username  => $name,
+            uid       => $uid,
+            gid       => $gid,
+            shell     => $shell,
+            homedir   => $homedir,
+        );
+        $u{password} = $shadow_map{$name}
+            if $shadow_map{$name};
+
+        push @{$ent_data{users}}, \%u;
+    }
+
+    return \%ent_data;
+
+}
+
+sub _system
+{
+    my @command = @_;
+    my($wtr, $rdr, $err);
+    my $pid = open3($wtr, $rdr, $err, @command);
+    close($wtr);
+    waitpid( $pid, 0 );
+
+    my $out = '';
+    $out .= $_ while (<$rdr>);
+
+    my $error = '';
+    $error .= $_ while (<$err>);
+
+    if ($ENV{VERBOSE})
+    {
+        my $s = join(' ', @command);
+        warn "=== executing: $s ===\n";
+        warn "=== stdout ==\n";
+        warn "$out\n";
+        warn "=== error ==\n";
+        warn "$error\n";
+        warn "=== end execution ===\n";
+    }
+
+    return {
+        status => $?,
+        stderr => $error,
+        stdout => $out,
+    };
+}
+
+$SIG{CHLD} = \&REAPER;
+
+sub REAPER
+{
+    my $kid;
+
+    while (($kid = waitpid(-1, &WNOHANG)) > 0)
+    { 
+
+    }
+    $current_workers--;
+    $SIG{CHLD} = \&REAPER;
+}
+
+
+sub _write_new_user_template
+{
+    my ($username, $uid) = @_;
+
+    open(F, ">$sysdir/users/$username.conf");
+    print F qq{username: $username
+uid: $uid
+fullname: $username
+homedir: /home/$username
+shell: /bin/bash
+disabled: 0
+#gid: (defaults to uid)
+#ssh_keys:
+#   - "SSH key here"
+};
+    close(F);
+
+}
+
+sub _write_new_host_template
+{
+    my ($host) = @_;
+
+    open(F, ">$sysdir/hosts/$host.conf");
+    print F q{
+#users:
+#   - uid: 0
+#     username: root
+#     homedir: /root
+#     shell: /bin/bash
+#     password: '$6$928b679b70731fc7$OjB.vI0hI4PWC9ObsudW3ITZMBjo7Rfs6Dd5vQ80XZM0A6NU6EQqIVQAI3T90T5Bz3K9Vfha0cp176IAHaNQQ.'
+#     ssh_keys:
+#        - here
+# only import users from the following groups
+# use all for all users
+user_groups:
+   - all
+};
+    close(F);
+
+}
+
+sub _write_new_group_template
+{
+    my ($groupname, $gid) = @_;
+
+    open(F, ">$sysdir/groups/$groupname.conf");
+    print F qq{groupname: $groupname
+gid: $gid
+#users:
+#   - userhere
+};
+    close(F);
+
+}
+
+sub getnextuid { $sysync->read_file_contents("$sysdir/.maxuid") || 1001 }
+
+sub incrementuid
+{
+    my $next = getnextuid() + 1;
+
+    open(F, ">$sysdir/.maxuid");
+    print F $next;
+    close(F);
+}
+
+sub slock { die "lock file exists $sysdir/.lock" if -e "$sysdir/.lock"; `touch $sysdir/.lock` }
+sub sunlock { unlink("$sysdir/.lock") } 
+
+# quick and dirty
+sub _parse_options
+{
+    my %options;
+
+    my @acceptable_options = qw(
+        init adduser edituser interactive
+        deluser
+        help
+        config
+        addgroup editgroup
+        delgroup
+        addhost edithost
+        delhost
+        edithosts
+        mkpasswd
+        passwd
+        usersetpassword
+        usersetpasswordauthkeys
+        cmd
+        refresh
+        push-files
+        push-auth
+        import-host
+        remote-host
+        diff
+    );
+
+    my @OPTS = @ARGV;
+    while (@OPTS)
+    {
+        my $arg = shift @OPTS;
+
+        # cleanse all parameters of all unrighteousness
+        #   `--` & `-` any parameter shall be removed
+        $arg =~ s/^--//;
+        $arg =~ s/^-//;
+
+        # does this carry an assignment?
+        if ($arg =~ /=/)
+        {
+            my ($key, $value) = split('=', $arg);
+
+            $options{$key} = $value;
+
+            if ($arg =~ /^cmd\=/)
+            {
+                @TRAILING_ARGS = @OPTS;
+                last;
+            }
+        }
+        else
+        {
+            $options{$arg} = 1;
+        }
+    }
+
+    for my $option (keys %options)
+    {
+        die("[$0] `$option` is an invalid option\n")
+            unless (grep { $_ eq $option } @acceptable_options);
+    }
+
+    return \%options;
+}
+
+$SIG{CHLD} = \&REAPER;
+
+sub REAPER
+{
+    my $kid;
+
+    while (($kid = waitpid(-1, &WNOHANG)) > 0)
+    { 
+
+    }
+    $current_workers--;
+    $SIG{CHLD} = \&REAPER;
+}
+
+sub _prompt_for_password
+{
+    print "Type new password: ";
+
+    system('stty','-echo');
+    chomp(my $password = <STDIN>);
+    system('stty','echo');
+
+    print "\n";
+
+    print "Type new password again: ";
+
+    system('stty','-echo');
+    chomp(my $password_confirm = <STDIN>);
+    system('stty','echo');
+
+    print "\n";
+
+    if ($password eq $password_confirm)
+    {
+        my $salt = rand() . $$ . rand();
+        $salt =~ s/\.//g;
+        my $salt_prefix = $sysync->{salt_prefix};
+        $salt = $salt_prefix . md5_hex($salt);
+
+        return crypt($password, $salt);
+    }
+    else
+    {
+        warn "Passwords do not match\n";
+        exit(2);
+    }
+}
+
+sub usage
+{
+    warn "usage: $0 [--interactive] [command]\n";
+    warn "Commands:\n";
+    warn "   --help (show this)\n";
+    warn "   --mkpasswd (return password via stdout)\n";
+    warn "   --passwd=[user] (set a user's password)\n";
+    warn "   --usersetpassword=[user] allow a user to set their own password\n";
+    warn "   --usersetpasswordauthkeys returns authorized_keys file for all users to set their password\n";
+    warn "   --cmd=[host,host2] [command]\n";
+    warn "   --config=/path/to/config\n";
+    warn "   --refresh (alias for --push-auth)\n";
+    warn "   --push-auth (push auth files to every host)\n";
+    warn "   --push-files (push controlled files, not auth files, to every host)\n";
+
+    if (ref $sysync eq 'Sysync::File')
+    {
+        warn "Administrative Commands (using Sysync::File):\n";
+        warn "   --adduser=[user]\n";
+        warn "   --edituser=[user]\n";
+        warn "   --deluser=[user]\n";
+        warn "   --addgroup=[group]\n";
+        warn "   --editgroup=[group]\n";
+        warn "   --delgroup=[group]\n";
+        warn "   --addhost=[host]\n";
+        warn "   --edithost=[host]\n";
+        warn "   --delhost=[host]\n";
+        warn "   --edithosts (edit hosts.conf file)\n";
+        warn "   --import-host=[hostname] (returns YAML dump of data from remote host)\n";
+        warn "   --diff=[host] --remote-host=[remote address]\n";
+    }
+
+}
+
+sub edit_yaml_file
+{
+    my ($file) = @_;
+    my $tmp_file = md5_hex(rand() . $$ . rand());
+    copy($file, "/tmp/$tmp_file");
+    system($editor, "/tmp/$tmp_file");
+
+    do {
+        eval { Load($sysync->read_file_contents("/tmp/$tmp_file")) };
+        if ($@)
+        {
+            print "Unable to parse file contents, please re-edit: $@\n";
+            print "Want to edit? [Y/n] ";
+            chomp(my $r = <STDIN>);
+
+            if ($r =~ /y/i)
+            {
+                system($editor, "/tmp/$tmp_file");
+            }
+            else
+            {
+                unlink("/tmp/$tmp_file");
+                sunlock();
+                die "Aborted\n";
+            }
+        }
+    } while $@;
+
+    move("/tmp/$tmp_file", $file);
+}
+
+sub _edit_yaml_keyed_file
+{
+    my ($file, $path, $key) = @_;
+    my $tmp_file = md5_hex(rand() . $$ . rand());
+    copy($file, "/tmp/$tmp_file");
+    system($editor, "/tmp/$tmp_file");
+
+    my $old_config   = Load($sysync->read_file_contents($file));
+
+    my $new_config;
+    do {
+        eval { $new_config = Load($sysync->read_file_contents("/tmp/$tmp_file")) };
+        if ($@)
+        {
+            print "Unable to parse file contents, please re-edit: $@\n";
+            print "Want to edit? [Y/n] ";
+            chomp(my $r = <STDIN>);
+
+            if ($r =~ /y/i)
+            {
+                system($editor, "/tmp/$tmp_file");
+            }
+            else
+            {
+                unlink("/tmp/$tmp_file");
+                sunlock();
+                die "Aborted\n";
+            }
+        }
+    } while $@;
+
+    move("/tmp/$tmp_file", $file);
+
+    if ($old_config->{$key} ne $new_config->{$key})
+    {
+        move($file, "$sysdir/$path/$new_config->{$key}.conf");
+    }
+}
+
+
+exit __PACKAGE__->main;
+
+=head1 COPYRIGHT
+
+L<Bizowie|http://bizowie.com/> L<cloud erp|http://bizowie.com/solutions/>
+
+=head1 LICENSE
+
+ Copyright (C) 2012, 2013 Bizowie
+
+ This file is part of Sysync.
+ 
+ Sysync is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as
+ published by the Free Software Foundation, either version 3 of the
+ License, or (at your option) any later version.
+ 
+ Sysync is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+ 
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+=head1 AUTHOR
+
+Michael J. Flickinger, C<< <mjflick@gnu.org> >>
+
+=cut
+

@@ -1,0 +1,331 @@
+chapter: Hello world!
+name: A Stem Cell Cookbook
+
+title: A few questions about a simple sub
+
+*: What can you do with this sub?
+*: Can it be networked?
+*: Can it receive messages? 
+*: Can it send messages? 
+
+code:
+package World1;
+
+sub world_cmd {
+
+	return "Hello world!\n";
+}
+
+PAGE_END
+
+title: A few questions about a simple sub: Answers
+
+*: It can be networked under Stem
+*: It can receive Stem messages
+*: It can send Stem messages
+*: No coding changes need to be made
+
+code:
+package World1;
+
+sub world_cmd {
+
+	return "Hello world!\n";
+}
+
+PAGE_END
+
+title: Loading World1 into Stem
+
+*: Stem configuration files load modules and register Cells
+*: This configuration loads the console module and the World1 module
+*: This is YAML (yaml.org) format and other formats are supported
+*: Start it with: run_stem worlds.stem
+
+code:
+--- #YAML:1.0
+-
+ class: Stem::Console
+-
+ class: World1
+
+PAGE_END
+
+title: Stem overview
+
+*: Stem is a message passing, event driven system
+*: Stem Cells are Perl objects that are registered
+*: Cells can be Perl classes or instantiated objects
+*: Cells can send and receive messages.
+*: Cell classes are loaded and Cells are created via Stem configuration files
+*: Stem Hubs (processes) can support many active Cells
+*: Stem Hubs can be connected in networks on one or more systems
+*: Any Cell can send a message to any other reachable Cell
+
+PAGE_END
+
+title: Stem message delivery
+
+*: Messages are objects with address, content and related fields
+*: The 'to' address of a message is used to identify the destination
+   Cell (Perl object)
+*: The destination Cell is invoked by a method and the message is
+   its only argument
+*: The method to be called is determined by the message type and command
+*: A 'foo' command message is delivered to method 'foo_cmd'
+*: A 'bar' type message is delivered to method 'bar_in'
+*: Command methods can optionaly return data which is sent back in in
+   reply to the sender.
+
+PAGE_END
+
+title: Stem addresses
+
+*: Stem Addresses are name triplets: Hub, Cell, Target
+*: The Hub is the name of Stem process
+*: The Cell is the registered name of the Stem object or class
+*: The target is the unique address of a cloned Cell
+*: The Cell part of an address is required and the Hub and Target are optional
+*: Addresses are written in string form in Stem configuration or from
+   the console.
+
+code:
+	cell
+	hub:cell
+	:cell:target
+	hub:cell:target
+
+PAGE_END
+
+title: Adding class level data
+
+*: We add class level data and a method to change it
+*: The file lexical variable $name stores the planet's name
+*: The method 'name_cmd' can set that name from the data in a message
+*: A 'name' command message can be sent from the console or anywhere
+*: The configuration file doesn't change other except for the name of the
+   class it loads
+
+code:
+<blue>
+package World2;
+use strict ;
+my $name = 'UNKNOWN' ;
+</font>
+sub world_cmd {
+	<blue>return "Hello world from $name\n";</font>
+}
+<blue>
+sub name_cmd {
+
+	my( $class, $msg ) = @_ ;
+
+	my $data = $msg->data() ;
+
+	return unless $data ;
+
+	$name = ${$data} ;
+
+	return ;
+}
+</font>
+PAGE_END
+
+title: A basic object level Cell
+
+*: This module has an attribute specification so we can construct an object
+*: If no planet name is passed to the constructor, it will be named 'X'
+*: It also has a constructor method new() that is called from the configuration
+*: The hello_cmd method now returns the object data in the planet attribute
+
+code:
+package World3;
+
+use strict ;
+
+<blue>my $attr_spec = [
+	{
+		'name'		=> 'planet',
+		'default'	=> 'X',
+	},
+] ;
+
+sub new {
+	my ( $class ) = shift ;
+	my $self = Stem::Class::parse_args( $attr_spec, @_ ) ;
+	return ( $self );
+}</font>
+
+sub hello_cmd {
+
+	<blue>my( $self ) = @_ ;
+
+    	return "Hello world from $self->{'planet'}\n" ;</font>
+}
+
+PAGE_END
+
+title: Configuration for object level cells
+
+*: We add a 'name' field which is the cell part of the address for this
+   object Cell
+*: We add an 'args' field whose values are passed to the new() method
+*: The object is constructed and registered with the selected 'name'
+*: The initial value of the planet name can be set in the arguments
+*: We created two object cells here using the same class but the first
+   uses the default planet name of 'X' and the second is named 'venus'
+
+code:
+--- #YAML:1.0
+-
+ class: Stem::Console
+-
+<blue> class: World3
+ name: planet1
+ args: []
+-
+ class: World3
+<blue> name: planet2
+ args:
+  planet: venus</font>
+
+PAGE_END
+
+title: Changing object data
+
+*: All that is needed is a name_cmd method very similar to the one in World2
+*: It just changes the value in the cell itself
+*: The configuration file needs to only change the class and cell names
+
+code:
+package World4 ;
+
+use strict ;
+
+my $attr_spec = [
+	{
+		'name'		=> 'planet',
+		'default'	=> 'X',
+	},
+] ;
+
+sub new {
+	my ( $class ) = shift ;
+	my $self = Stem::Class::parse_args( $attr_spec, @_ ) ;
+	return ( $self );
+}
+
+sub hello_cmd {
+
+	my( $self ) = @_ ;
+
+    	return "Hello world from $self->{'planet'}\n" ;
+}
+<blue>
+sub name_cmd {
+
+	my ( $self, $msg ) = @_ ;
+
+	my $data = $msg->data() ;
+
+	return unless $data ;
+
+	$self->{'planet'} = ${$data} ;
+
+	return ;
+}
+
+</font>
+
+
+PAGE_END
+
+title: Cloning object cells
+
+*: Cloned Cells are similar to sessions or state objects but are much
+   simpler to create and manage
+*: Object Cells that use the cloning services of Stem::Cell are called
+   parent Cells
+*: All cloned Cells are owned by the Parent cell
+*: When a parent Cell is triggered (via a message or internal call), it
+   copies and registers the clone with a unique target address
+*: The Stem::Cell module is inherited and it handles the 'cell_trigger'
+   command message
+*: The specification must include a Stem::Cell class attribute
+
+   Note that it has its own default
+*: A callback to the 'triggered_cell' method is made in a newly cloned cell 
+
+code:
+package World5 ;
+
+<blue>use base 'Stem::Cell' ;</font>
+
+use strict ;
+
+my $attr_spec = [
+	{
+		'name'		=> 'planet',
+		'default'	=> 'X',
+	},
+	<blue>{
+		'name'		=> 'cell_attr',
+		'class'		=> 'Stem::Cell',
+	},</font>
+] ;
+
+sub new {
+	my ( $class ) = shift ;
+	my $self = Stem::Class::parse_args( $attr_spec, @_ ) ;
+	return ( $self );
+}
+
+sub hello_cmd {
+
+	my( $self ) = @_ ;
+
+    	return "Hello world from $self->{'planet'}\n" ;
+}
+<blue>
+sub triggered_cell {
+
+	my( $self ) = @_ ;
+
+	$self->{'planet'} = $self->cell_get_args( 'planet' ) || 'pluto' ;
+
+	return;
+}
+</font>
+
+sub name_cmd {
+
+	my ( $self, $msg ) = @_ ;
+
+	my $data = $msg->data() ;
+
+	return unless $data ;
+
+	$self->{'planet'} = ${$data} ;
+
+	return ;
+}
+
+PAGE_END
+
+title: Cloning cell configuration
+
+*: This is the similar to the World4 configuration but we added the
+   'cell_attr' attribute and set its 'cloneable' flag to true
+
+code:
+
+-
+ class: World5
+ name: planet5
+ args:
+  planet: jupiter
+  <blue>cell_attr:
+   cloneable: 1
+</font>
+
+PAGE_END

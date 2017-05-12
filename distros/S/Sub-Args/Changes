@@ -1,0 +1,38 @@
+Revision history for Perl extension Sub::Args
+
+0.08
+   2011-02-16
+        - fix object case.(thanks hirobanex)
+
+0.07
+   2011-01-05
+        - add args_pos method.
+
+0.06
+   2010-12-22
+        - check invocant.
+        - more documents.
+
+0.05
+   2010-12-22
+        - use Internals::SvREADONLY.
+        - fixed Makefile.PL
+
+0.04
+   2010-12-16
+        - args can receives hash or hashref argument.
+
+0.03
+   2010-11-01
+        - oops version fixed.
+
+0.02
+   2010-11-01
+        - more fast. (thanks hirobanex)
+        - [INCOMPATIBLE CHANGE] When the parameter not defined existed, it changed like doing die.
+        - change die message.
+
+0.01
+   2010-10-28
+        - first release.
+

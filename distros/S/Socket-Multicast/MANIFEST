@@ -1,0 +1,10 @@
+Changes
+lib/Socket/Multicast.pm
+Makefile.PL
+MANIFEST
+Multicast.xs
+ppport.h
+README
+t/00-Socket-Multicast.t
+t/10-base.t
+META.yml                                 Module meta-data (added by MakeMaker)

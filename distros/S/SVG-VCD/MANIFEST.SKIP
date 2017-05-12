@@ -1,0 +1,7 @@
+.git
+debian
+examples/bifurcation/bifurcation.svg
+examples/pbj/pbj.svg
+lib/VCD/Format.html
+lib/VCD/pod2htmd.tmp
+lib/VCD/pod2htmi.tmp

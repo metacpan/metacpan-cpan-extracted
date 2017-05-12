@@ -1,0 +1,30 @@
+       BridgeQuery polls a device which respond to SNMP Bridge
+       Table queries and generates a hash reference with each
+       polled MAC address as the key and the associated port as
+       the value.  The specific MIBs that are polled are
+       described in RFC1493.
+
+       SNMP::BridgeQuery requires Net::SNMP in order to function.
+
+       Devices can be switches, bridges, or most anything that
+       responds as a OSI Layer 2 component.  Layer 3 devices do
+       not generally respond and will cause an error.  If an
+       error is generated, it will return a hash reference with a
+       single element ('error') which can be tested for.
+
+       Two other functions (querymacs & queryports) can be
+       explicitly exported.  They work the same way as queryfdb,
+       but they return MAC addresses or ports (respectively) with
+       the SNMP MIB as the hash key.
+
+       A newly added function (queryat) can be used on layer 3
+       switches to poll the Address Translation Tables.  This is
+       similar to the data returned by the 'queryfdb' function,
+       but it returns the IP address of the device and the
+       associated interface (separated by a pipe '|') with the
+       MAC address as the key.  On a layer 3 switch, this
+       interface probably does not correspond to a physical port,
+       but more likely referrs to a vlan ID.  Using this function
+       on a layer 2 device will generate a 'trapped' error.
+
+

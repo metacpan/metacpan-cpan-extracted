@@ -1,0 +1,31 @@
+Features TBD:
+
+* 0.05    generate (random var with $self's distribution)
+* 0.05    total_abs_error, mean_abs_error - think more
+* 0.07    data inspection tools - allow user to look at real bin counts
+* 0.07    framework for sophisticated algorithms over data
+* 0.08    add multipoint interpolation to sum_of/mean_of
+* 0.08    write script for studying how mean etc converge with smaller bases
+* 0.08    add infinity abs threshold to disregard BIG values
+* 0.08    add abs($x - mean)**power (who needs it?)
+* 0.08    TST metatest: i.e. analyze several samples, compare results to past.
+* 0.08    discarding unrepresentative data (small bin counts, far from others)
+* 0.08    add antialiasing to histogram
+
+Cleanup:
+
+* more detailed docs on methods
+* rationale
+
+Features for discussion:
+
+* better mode algorithm
+* Additional module with smooth data model (more CPU, more precision, exact mean)
+* how to find the bulk of a distribution
+* C++/XS library
+* analysis tools (like: Your sample looks like 45% normal (100, 15) + 35% exp (100) + 20% utter rubbish)
+
+Multidimentional S::D::LogScale:
+* linear/log storage
+* correlation for 2D
+* all other stuff

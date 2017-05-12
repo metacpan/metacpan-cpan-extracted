@@ -1,0 +1,6 @@
+dbd         mysql
+dsn         test
+usename     myuser
+password    mypassword
+table       spopstest
+sql

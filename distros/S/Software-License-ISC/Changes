@@ -1,0 +1,15 @@
+Revision history for Software-License-ISC
+
+0.004 2015-04-14
+ - enhance build process
+
+0.003 2014-11-24
+ - use GithubMeta plugin
+
+0.002 2014-11-22
+ - add version to pm and pod files and bump to next version
+
+0.001 2014-11-22
+ - fill out the module
+ - ignore distdir/distfile(s)
+

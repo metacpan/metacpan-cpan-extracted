@@ -1,0 +1,14 @@
+Revision history for Perl extension String::Compare::Length.
+
+0.05 Adding README file
+
+0.04 Adding MetaJSON file
+
+0.03 Really adding git repo info this time!
+
+0.02 Adding git repo
+
+0.01  Mon Nov 16 13:23:30 2009
+	- original version; created by h2xs 1.23 with options
+		-AXc -n String::Compare::Length
+

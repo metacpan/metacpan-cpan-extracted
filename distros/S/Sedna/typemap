@@ -1,0 +1,21 @@
+TYPEMAP
+SednaConnection*		SEDNA_CONN
+
+OUTPUT
+
+SEDNA_CONN
+	sv_setref_pv( $arg, "Sedna", (void*)$var );
+
+
+INPUT
+
+SEDNA_CONN
+	if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG) ) {
+           $var = (struct SednaConnection*)(SvIV((SV*)SvRV( $arg )));
+        } else if ($arg == 0) {
+           XSRETURN(0);
+        } else {
+           XSRETURN_UNDEF;
+        }
+
+

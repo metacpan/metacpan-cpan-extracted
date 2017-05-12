@@ -1,0 +1,33 @@
+Revision history for Signal-Mask
+
+0.008     2014-08-02 02:16:19+02:00 Europe/Amsterdam
+          Fix return values of block/unblock_signals
+          Make dependency on Thread::SigMask optional
+
+0.007     2014-03-07 00:48:17CET+0100 Europe/Amsterdam
+          Drop dependency on Const::Fast
+          Fix error message in Signal::Pending
+          Fix descriptions
+
+0.006     2011-08-02 16:58:23 Europe/Amsterdam
+          Deal with previously masked signals in tests
+
+0.005     2011-01-24 00:21:18 Europe/Amsterdam
+         BACKWARDS COMPATIBILTIY BREAK: changed exported hashes to global hashes
+
+0.004    25-09-2010
+         Fixed up MANIFEST
+
+0.003    24-09-2010
+         Added Signal::Pending
+         Made scalar values of the tied hashed more meaningful
+
+0.002    07-09-2010
+         Don't export anything by default
+         Use thread specific signal masks
+         Include the last signal number
+         Give a proper NA on Windows
+
+0.001    31-08-2010
+         First version, released on an unsuspecting world.
+

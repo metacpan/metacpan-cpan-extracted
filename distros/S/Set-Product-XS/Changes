@@ -1,0 +1,17 @@
+Revision history for Set-Product-XS
+
+0.03  Tue Nov 10 18:38:48 UTC 2015
+    - Fixed a memory leak resulting from the multicall api not calling the
+      code block in it's own scope; performance now decreased by 10%.
+
+0.02  Fri Sep 18 06:52:02 UTC 2015
+    - No changes; promoted developer version to stable.
+
+0.01_02  Wed Sep  2 18:58:21 UTC 2015
+    - Defined cvinc for compatibility with Perl < 5.12.
+
+0.01_01  Wed Sep  2 03:51:00 UTC 2015
+    - Switched to the multicall API for improved performance.
+
+0.01  Sat Aug 22 16:53:50 UTC 2015
+    - Initial distribution.

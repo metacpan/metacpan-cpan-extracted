@@ -1,0 +1,56 @@
+SVG/Graph version 0.02
+======================
+
+SVG::Graph - Visualize your data in Scalable Vector Graphics (SVG) format.
+
+SVG::Graph is a suite of perl modules for plotting data.  SVG::Graph
+currently supports plots of one-, two- and three-dimensional data, as well
+as N-ary rooted trees.  Data may be represented as:
+
+ Glyph Name	Dimensionality supported
+          	1d	2d	3d	tree
+ --------------------------------------------------------
+ Axis				x
+ Bar Graph		x
+ Bubble Plot			x
+ Heatmap Graph			x
+ Line Graph		x
+ Pie Graph	x
+ Scatter Plot		x
+ Spline Graph		x
+ Tree					x
+
+SVG::Graph 0.02 is a pre-alpha release. Keep in mind that many of the
+glyphs are not very robust. 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  SVG
+  Statistics::Descriptive
+  Tree::DAG_Node
+  Math::Spline
+  Math::Derivative
+
+FEEDBACK
+
+Send an email to the svg-graph-developers list.  For more info,
+visit the project page at http://www.sf.net/projects/svg-graph
+
+COPYRIGHT AND LICENCE
+
+License: Artistic 2.0
+
+Copyright: 2002-2007 Allen Day <allenday@ucla.edu>, Chris To
+<crsto@ucla.edu>
+

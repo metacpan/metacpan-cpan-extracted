@@ -1,0 +1,28 @@
+Revision history for Perl extension Scope::Guard.
+
+0.21 Sun 19 Jul 22:14:54 2015
+    - remove useless use of UNIVERSAL::isa (#RT105948)
+      (Karen Etheridge)
+
+0.20 Sun May 16 08:50:59 2010
+    - raise exception if guards are created anonymously (void context)
+      (thanks Tim Bunce and Graham Knop)
+
+0.12 Fri Mar 26 19:12:11 2010
+    - fix link in README (thanks Franck Joncourt)
+
+0.11 Thu Mar 25 22:08:05 2010
+    - doc tweak
+
+0.10 Thu Mar 25 20:14:25 2010
+    - add guard() and scope_guard() (thanks Tim Bunce)
+
+0.03 Sun Jan  7 19:19:17 2007
+    - POD fix (thanks Craig Manley)
+    - added test suite
+
+0.02 Tue Apr 12 02:12:04 2005
+    - POD fixlet
+
+0.01 Tue Apr 12 00:32:52 2005
+    - original version; created by h2xs 1.23 with options -X -v 0.01 -n Scope::Guard

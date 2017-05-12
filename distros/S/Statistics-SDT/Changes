@@ -1,0 +1,25 @@
+Revision history for Perl extension Statistics::SDT.
+
+0.05
+    Some more error control.
+	Solving distribution issues.
+
+0.04 
+	Solving distribution issues.
+	Couple more aliases.
+
+0.03 
+	Substantial changes to interface and method calls: Function-oriented interface completely gone; OO only. All sensitivity and bias measures accessed by generic methods. 
+	Added rate method. 
+	Added 'alexander' forced-choice method (in addition to 'smith').
+	Added criterion method.
+	Added "backward" estimation of hr and far.
+
+0.02  
+	Aliases for sensitivity functions introduced.
+
+0.01  Mon Jul 24 10:54:20 2006
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -n Statistics::SDT
+
+

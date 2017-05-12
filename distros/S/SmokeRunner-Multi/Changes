@@ -1,0 +1,69 @@
+Revision history for SmokeRunner-Multi
+
+0.21 2015-11-11
+  - One test was comparing potentially unsorted data.
+
+  [ STATISTICS ]
+    - code churn: 2 files changed, 61 insertions(+), 60 deletions(-)
+
+0.20 2015-11-08
+  - Remove MYMETA* files. (RT#108555)
+
+  [ BUG FIXES ]
+    - Fix old tests by switching Class::Singleton to MooX::Singleton.
+
+  [ STATISTICS ]
+    - code churn: 8 files changed, 100 insertions(+), 116 deletions(-)
+
+0.19 2013-04-29
+  [ ENHANCEMENTS ]
+    - Don't install on MSWin32 machines.
+
+  [ STATISTICS ]
+    - code churn: 4 files changed, 52 insertions(+), 51 deletions(-)
+
+0.18 2012-09-16
+  - Use File::HomeDir for maximal cross-platformability.
+
+  [ STATISTICS ]
+    - code churn: 23 files changed, 59 insertions(+), 774 deletions(-)
+
+0.17 2012-09-15
+  - Fix smokerrunner-multi test so that it uses the right perl. [RT79665]
+  - Fix Config.t in the case the user already has SR::M installed [RT65954] 
+
+0.16 2008-05-09
+  - Even more test fixes to try to work with various versions of prove.
+
+0.15 2008-05-09
+  - More test fixes to work with even newer versions of prove.
+  - Only run pod tests when making distro, not when installing.
+
+0.14 2008-08-05
+  - Test fixes to work with the latest Test::Harness. Now requires
+    Test::Harness 3.0+. Failure reported by Zrusilla. RT #38152.
+
+0.13 2007-06-02
+  - Changed the tests so that none of them rely on the existence of
+    external programs. Also removed the fake executables in t/bin in favor
+    of mocking subroutines for testing.
+  - The TestSet::SVN constructor no longer checks for an svn executable,
+    and the Reporter::Smolder constructor no longer checks for
+    smolder_smoke_signal. This check will be done when the programs are
+    needed. This simplifies testing.
+
+0.12 2007-06-02
+  - Enabled recursive test files in Build.PL so that all the tests are run.
+  - Many of the tests failed when prove was not in your path during the
+    test runs. Thanks to David Cantrell for the test report.
+  - Fixed the Runner/Smolder.t test.
+  - Shut up warnings from Runner::Smolder when running the Runner/Smolder.t
+    tests.
+
+0.11 2007-06-01
+  - This release only contains doc changes. The docs referred to a
+    nonexistent Runner class, TAPModel, in a bunch of places. This was the
+    predecessor to the Smolder Runner.
+
+0.10 2007-06-01
+  - Initial release

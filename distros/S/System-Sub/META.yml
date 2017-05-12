@@ -1,0 +1,36 @@
+---
+abstract: 'Wrap external command with a DWIM sub'
+author:
+  - 'Olivier Mengué <dolmen@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  blib: '1.01'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: System-Sub
+requires:
+  Carp: '0'
+  File::Which: '0'
+  IPC::Run: '0'
+  Scalar::Util: '1.11'
+  Sub::Name: '0'
+  Symbol: '0'
+  constant: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/dolmen/p5-System-Sub
+  repository: https://github.com/dolmen/p5-System-Sub.git
+version: '0.162800'

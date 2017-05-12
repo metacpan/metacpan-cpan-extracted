@@ -1,0 +1,19 @@
+---
+name: Sub-Starter
+version: v1.0.6
+author:
+  - 'Shawn H Corey <SHCOREY@cpan.org>'
+abstract: Creates a skeletal framework for Perl sub's.
+license: gpl
+resources:
+  license: http://www.opensource.org/licenses/gpl-license.php
+build_requires:
+  Test::More: 0
+provides:
+  Sub::Starter:
+    file: lib/Sub/Starter.pm
+    version: v1.0.6
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

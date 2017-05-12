@@ -1,0 +1,60 @@
+# inetd.stem
+#
+# Emulate an inetd daemon
+#
+#
+# Load the consols module so we can enter commands to stem
+[
+	class	=>	'Stem::Console',
+],
+
+# these two cells are both SockMsg's. they are servers listening for
+# connections on different ports. they have different Cell addresses (A,
+# B). Both use the Stem::Cell attributes to handle cloning upon
+# connection and the logical pipe to the Stem::Proc cell. Note that B
+# has the pipe_args option which sends extra arguments to the other side
+# of the pipe. this enables line numbering in the output of the
+# proc_serv script.
+
+[
+	class	=>	'Stem::SockMsg',
+	name	=>	'A',
+	args	=>	[
+		port		=> 6666,
+		server		=> 1,
+		cell_attr	=> [
+			'cloneable'	=> 1,
+# this name maps to the cell name of the Stem::Proc below
+			'pipe_addr'	=> 'quote',
+		],
+	],
+],
+[
+	class	=>	'Stem::SockMsg',
+	name	=>	'B',
+	args	=>	[
+		port		=> 6667,
+		server		=> 1,
+		cell_attr	=> [
+			'cloneable'	=> 1,
+# this name maps to the cell name of the Stem::Proc below
+			'pipe_addr'	=> 'quote',
+			'pipe_args'	=> '-n',
+		],
+	],
+],
+
+# this is the Stem::Proc cell actually forks the program. its name is
+# refered to by the SockMsg cells. 
+
+[
+	class	=>	'Stem::Proc',
+	name	=>	'quote',
+	args	=>	[
+		path		=> 'quote_serve',
+		use_stderr	=> 1,
+		cell_attr	=> [
+			'cloneable'	=> 1,
+		],
+	],
+],

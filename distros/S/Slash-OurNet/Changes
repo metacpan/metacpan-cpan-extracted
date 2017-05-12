@@ -1,0 +1,304 @@
+[Changes for 1.41 - 2011-11-16]
+
+* Modernize the build process again to the latest Module::Install release.
+
+* Add this notice to README:
+
+    (Currently, this project exists mainly for historical/archival purposes,
+    not for active development.)
+
+----
+
+Change 10250 on 2004/03/01 by autrijus@autribsd
+
+	* this be 1.4...
+
+Change 8467 on 2003/10/18 by autrijus@autribsd
+
+	* we officially only support 5.008 now.
+
+Change 8466 on 2003/10/18 by autrijus@autribsd
+
+	* be entirely optional.
+
+Change 8465 on 2003/10/18 by autrijus@autribsd
+
+	* modernise the building structure
+
+Change 5066 on 2003/03/31 by clkao@clvmbsd
+
+	don't try to look for related articles in articles of archives
+
+Change 5040 on 2003/03/30 by autrijus@autribsd
+
+	* a new poem.
+
+Change 4357 on 2003/02/19 by autrijus@autrinor
+
+	* attempt to kluge.
+
+Change 4048 on 2003/01/30 by autrijus@autrim543
+
+	* etc.
+
+Change 4047 on 2003/01/30 by autrijus@autribsd
+
+	* roxytom: don't trap unwary sigils.
+
+Change 4028 on 2003/01/29 by autrijus@autribsd
+
+	* update requirement
+
+Change 4027 on 2003/01/29 by autrijus@autribsd
+
+	* no longer need open.diff with a patched ::trap.
+
+Change 4006 on 2003/01/29 by autrijus@autribsd
+
+	* eliminate empty groups.
+
+Change 4005 on 2003/01/29 by autrijus@autribsd
+
+	* update manifest.
+
+Change 4003 on 2003/01/29 by autrijus@autribsd
+
+	* now supporting (provisional) utf8 by converting it back to big5.
+
+Change 3994 on 2003/01/28 by autrijus@autribsd
+
+	* make it a proper patch and to -unicode we go!
+
+Change 3993 on 2003/01/28 by autrijus@autrim543
+
+	* finito.
+
+Change 3992 on 2003/01/28 by autrijus@autribsd
+
+	* finito.
+
+Change 3991 on 2003/01/28 by autrijus@autribsd
+
+	* two core patches are needed for this to work.
+
+Change 3990 on 2003/01/28 by autrijus@autribsd
+
+	* full trapping implemented.
+
+Change 3989 on 2003/01/28 by autrijus@autribsd
+
+	* finished trap.
+
+Change 3988 on 2003/01/28 by autrijus@autribsd
+
+	* use clkao's trapping interface.
+
+Change 3987 on 2003/01/28 by autrijus@autribsd
+
+	* minor open tweaks.
+
+Change 3982 on 2003/01/28 by autrijus@autrim543
+
+	* various very dark kluges
+
+Change 3981 on 2003/01/28 by autrijus@autrim543
+
+	* see if it works.
+
+Change 3980 on 2003/01/28 by autrijus@autribsd
+
+	* some more error checking
+
+Change 3979 on 2003/01/28 by autrijus@autribsd
+
+	* omg.
+
+Change 3976 on 2003/01/28 by autrijus@autrim543
+
+	* the new config.
+
+Change 3975 on 2003/01/28 by autrijus@autribsd
+
+	* again.
+
+Change 3974 on 2003/01/28 by autrijus@autribsd
+
+	* secrecy.
+
+Change 3973 on 2003/01/28 by autrijus@autribsd
+
+	* further shaft.
+
+Change 3971 on 2003/01/28 by autrijus@autribsd
+
+	* let's see how it works on field.
+
+Change 3969 on 2003/01/28 by autrijus@autribsd
+
+	* kluges galore!
+
+Change 3968 on 2003/01/28 by autrijus@autrim543
+
+	* some more images.
+
+Change 3961 on 2003/01/28 by autrijus@autribsd
+
+	* first cut at a sane group / l10n / whatever semantic.
+
+Change 3874 on 2003/01/26 by autrijus@autrim543
+
+	* misauth.
+
+Change 3869 on 2003/01/26 by autrijus@autribsd
+
+	* much ado.
+
+Change 3868 on 2003/01/26 by autrijus@autribsd
+
+	* opl.
+
+Change 3867 on 2003/01/26 by autrijus@autribsd
+
+	* the m5 config.
+
+Change 3859 on 2003/01/26 by autrijus@autribsd
+
+	* EITWORKSFORME.
+
+Change 3847 on 2003/01/25 by autrijus@autribsd
+
+	* the m5 conf.
+
+Change 3846 on 2003/01/25 by autrijus@autribsd
+
+	* branch out for m5-specific config
+
+Change 3845 on 2003/01/25 by autrijus@autribsd
+
+	* posting works! cleanup time.
+
+Change 3843 on 2003/01/25 by autrijus@autribsd
+
+	* fornt page cookie now rocks.
+
+Change 3842 on 2003/01/25 by autrijus@autribsd
+
+	* fix login. now just make sure posting works.
+
+Change 3841 on 2003/01/25 by autrijus@autribsd
+
+	* ok, templates mostly work now.
+
+Change 3838 on 2003/01/25 by autrijus@autribsd
+
+	* another round of template cleanups
+
+Change 3836 on 2003/01/25 by autrijus@autribsd
+
+	* the music543 template set.
+
+Change 3813 on 2003/01/25 by autrijus@autribsd
+
+	* everything works on modperl now!
+
+Change 3811 on 2003/01/24 by autrijus@autribsd
+
+	* it runs! ship it!
+
+Change 3806 on 2003/01/24 by autrijus@autribsd
+
+	* bunch of cleanups
+
+Change 3802 on 2003/01/24 by autrijus@autribsd
+
+	* zh lexicons
+
+Change 3799 on 2003/01/24 by autrijus@autribsd
+
+	* Msgcat sucks.
+
+Change 3798 on 2003/01/24 by autrijus@autribsd
+
+	* new manifest.
+
+Change 3797 on 2003/01/24 by autrijus@autribsd
+
+	* oops, wrong file.  
+
+Change 3796 on 2003/01/24 by autrijus@autribsd
+
+	* the modernization quest continues
+
+Change 3795 on 2003/01/24 by autrijus@autribsd
+
+	* more accurate prereqs, thanks to scandeps.pl.
+
+Change 2008 on 2002/11/05 by autrijus@autribsd
+
+	* some more utf8.
+
+Change 1999 on 2002/11/05 by autrijus@autribsd
+
+	* this, too.
+
+Change 1980 on 2002/11/05 by autrijus@autribsd
+
+	* updates info.
+
+Change 1979 on 2002/11/05 by autrijus@autribsd
+
+	* new OurNet slash metalist-2.2.6.
+
+Change 876 on 2002/09/11 by werther@hc_laptop
+
+	<transfer metacode from big5 to utf8>
+
+Change 805 on 2002/08/28 by autrijus@autribsd
+
+	* m543 templates.
+
+Change 773 on 2002/08/25 by autrijus@autribsd
+
+	* make apache2 runnable.
+
+Change 631 on 2002/08/14 by autrijus@autribsd
+
+	* signatures.
+
+Change 630 on 2002/08/14 by autrijus@autribsd
+
+	* release 1.3 of Slash-OurNet, now with Maketext.
+
+Change 582 on 2002/08/05 by clkao@cl543
+
+	respect output layered by modperl.
+
+Change 581 on 2002/08/05 by clkao@cl543
+
+	jump to referer after login.
+
+Change 580 on 2002/08/05 by clkao@cl543
+
+	perlapp support dated.
+
+Change 579 on 2002/08/05 by clkao@cl543
+
+	init alias for ALLBBS earlier so it works under modperl alone.
+
+Change 578 on 2002/08/05 by clkao@cl543
+
+	* issue cookies nicely.
+	* spawn ournet connection for auth check if none exists.
+
+Change 14 on 2002/06/13 by clkao@claptop
+
+	make slash::ournet happy with new group access model
+
+Change 2 on 2002/06/11 by autrijus@autriegb
+
+	* the missing links.
+
+Change 1 on 2002/06/11 by autrijus@autriegb
+
+	* The p4.elixus.org depot, Borne Again.
+

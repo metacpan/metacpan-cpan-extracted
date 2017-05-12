@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         SMS-Send-TW-ShareSMS
+version:      0.02
+version_from: lib/SMS/Send/TW/ShareSMS.pm
+installdirs:  site
+requires:
+    LWP::UserAgent:                2
+    SMS::Send:                     0.03
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

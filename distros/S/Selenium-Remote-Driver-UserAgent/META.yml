@@ -1,0 +1,30 @@
+---
+abstract: '(DEPRECATED) Use Selenium::UserAgent instead'
+author:
+  - 'Daniel Gempesaw <gempesaw@gmail.com>'
+build_requires:
+  IO::Socket::INET: '0'
+  Selenium::Remote::Driver: '0.2102'
+  Test::More: '0'
+  Test::ParallelSubtest: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.014, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Selenium-Remote-Driver-UserAgent
+requires:
+  Carp: '0'
+  Cwd: '0'
+  JSON: '0'
+  Moo: '0'
+  Selenium::Remote::Driver::Firefox::Profile: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/gempesaw/Selenium-Remote-Driver-UserAgent/issues
+  repository: git://github.com/gempesaw/Selenium-Remote-Driver-UserAgent.git
+version: '0.0301'

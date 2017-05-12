@@ -1,0 +1,8 @@
+1..3
+ok 1 # skip I don't wanna
+# Compilation failed in require at monroe.no line 1.
+# BEGIN failed--compilation aborted at monroe.no line 1.
+ok 2 - adams.ok
+ok 3 # skip I don't wanna
+# Compilation failed in require at jackson.no line 1.
+# BEGIN failed--compilation aborted at jackson.no line 1.

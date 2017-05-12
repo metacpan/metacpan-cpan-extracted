@@ -1,0 +1,43 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+# PODNAME: template_to_spreadsheet
+# ABSTRACT: render a template into a spreadsheet
+
+use Spreadsheet::Template;
+
+my $template = Spreadsheet::Template->new;
+my $in = do { local $/; <> };
+my $out = $template->render($in);
+open my $fh, '>', 'out.xlsx';
+binmode $fh;
+$fh->print($out);
+$fh->close;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+template_to_spreadsheet - render a template into a spreadsheet
+
+=head1 VERSION
+
+version 0.05
+
+=head1 AUTHOR
+
+Jesse Luehrs <doy@tozt.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2015 by Jesse Luehrs.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

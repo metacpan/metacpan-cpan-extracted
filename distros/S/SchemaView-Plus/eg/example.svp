@@ -1,0 +1,324 @@
+<?xml version="1.0"?>
+<schemaviewplus version="0.10">
+<perldata>
+ <hash>
+  <item key="sc_types">
+   <array>
+    <item key="0">
+     <hash>
+      <item key="name">VIEW</item>
+      <item key="value">2</item>
+     </hash>
+    </item>
+    <item key="1">
+     <hash>
+      <item key="name">UNKNOWN</item>
+      <item key="value">0</item>
+     </hash>
+    </item>
+    <item key="2">
+     <hash>
+      <item key="name">TABLE</item>
+      <item key="value">1</item>
+     </hash>
+    </item>
+   </array>
+  </item>
+  <item key="tables">
+   <array>
+    <item key="0">
+     <hash>
+      <item key="x">151</item>
+      <item key="columns">
+       <array>
+        <item key="0">ID</item>
+        <item key="1">NAME</item>
+       </array>
+      </item>
+      <item key="schema">SORM</item>
+      <item key="name">TAB1</item>
+      <item key="y">204</item>
+      <item key="placed">yes</item>
+      <item key="type">1</item>
+     </hash>
+    </item>
+    <item key="1">
+     <hash>
+      <item key="x">353</item>
+      <item key="columns">
+       <array>
+        <item key="0">ID</item>
+        <item key="1">ITEM</item>
+        <item key="2">REFER</item>
+       </array>
+      </item>
+      <item key="pk">
+       <array>
+        <item key="0">ID</item>
+       </array>
+      </item>
+      <item key="schema">SORM</item>
+      <item key="name">TAB2</item>
+      <item key="placed">yes</item>
+      <item key="y">133</item>
+      <item key="type">1</item>
+     </hash>
+    </item>
+    <item key="2">
+     <hash>
+      <item key="x">185</item>
+      <item key="y">52</item>
+      <item key="placed">yes</item>
+      <item key="columns">
+       <array>
+        <item key="0">ID</item>
+        <item key="1">ITEM</item>
+        <item key="2">REFER1</item>
+        <item key="3">REFER2</item>
+       </array>
+      </item>
+      <item key="schema">SORM</item>
+      <item key="name">TAB3</item>
+      <item key="type">1</item>
+     </hash>
+    </item>
+   </array>
+  </item>
+  <item key="environment">
+   <hash>
+    <item key="windows">
+     <hash>
+      <item key="repository">
+       <hash>
+        <item key="showed">1</item>
+       </hash>
+      </item>
+      <item key="hints">
+       <hash>
+        <item key="showed">1</item>
+       </hash>
+      </item>
+     </hash>
+    </item>
+    <item key="canvas">
+     <hash>
+      <item key="all">
+       <hash>
+        <item key="top">0</item>
+        <item key="left">0</item>
+        <item key="bottom">4000</item>
+        <item key="right">4000</item>
+       </hash>
+      </item>
+      <item key="offset">
+       <hash>
+        <item key="x">-1</item>
+        <item key="y">-1</item>
+       </hash>
+      </item>
+     </hash>
+    </item>
+   </hash>
+  </item>
+  <item key="relationships">
+   <array>
+    <item key="0">
+     <hash>
+      <item key="connection">coords</item>
+      <item key="name">SYS_C001219</item>
+      <item key="schema">SORM</item>
+      <item key="to_columns">
+       <array>
+        <item key="0">
+         <hash>
+          <item key="table">TAB1</item>
+          <item key="column">ID</item>
+         </hash>
+        </item>
+       </array>
+      </item>
+      <item key="from_columns">
+       <array>
+        <item key="0">
+         <hash>
+          <item key="table">TAB2</item>
+          <item key="column">REFER</item>
+         </hash>
+        </item>
+       </array>
+      </item>
+      <item key="to_side">right</item>
+      <item key="from_side">left</item>
+      <item key="placed">yes</item>
+      <item key="smooth">1</item>
+      <item key="coords">
+       <array>
+        <item key="0">
+         <array>
+          <item key="0">275.5</item>
+          <item key="1">191</item>
+         </array>
+        </item>
+        <item key="1">
+         <array>
+          <item key="0">313</item>
+          <item key="1">244</item>
+         </array>
+        </item>
+        <item key="2">
+         <array>
+          <item key="0">374</item>
+          <item key="1">263</item>
+         </array>
+        </item>
+        <item key="3">
+         <array>
+          <item key="0">337</item>
+          <item key="1">315</item>
+         </array>
+        </item>
+        <item key="4">
+         <array>
+          <item key="0">272</item>
+          <item key="1">257</item>
+         </array>
+        </item>
+        <item key="5">
+         <array>
+          <item key="0">231</item>
+          <item key="1">309</item>
+         </array>
+        </item>
+       </array>
+      </item>
+      <item key="to_table">TAB1</item>
+      <item key="from_table">TAB2</item>
+     </hash>
+    </item>
+    <item key="1">
+     <hash>
+      <item key="connection">coords</item>
+      <item key="name">SYS_C001222</item>
+      <item key="schema">SORM</item>
+      <item key="to_columns">
+       <array>
+        <item key="0">
+         <hash>
+          <item key="table">TAB1</item>
+          <item key="column">ID</item>
+         </hash>
+        </item>
+       </array>
+      </item>
+      <item key="from_columns">
+       <array>
+        <item key="0">
+         <hash>
+          <item key="table">TAB3</item>
+          <item key="column">REFER1</item>
+         </hash>
+        </item>
+       </array>
+      </item>
+      <item key="to_side">left</item>
+      <item key="from_side">left</item>
+      <item key="placed">yes</item>
+      <item key="smooth">1</item>
+      <item key="coords">
+       <array>
+        <item key="0">
+         <array>
+          <item key="0">125</item>
+          <item key="1">113</item>
+         </array>
+        </item>
+        <item key="1">
+         <array>
+          <item key="0">143</item>
+          <item key="1">170</item>
+         </array>
+        </item>
+        <item key="2">
+         <array>
+          <item key="0">44</item>
+          <item key="1">199</item>
+         </array>
+        </item>
+        <item key="3">
+         <array>
+          <item key="0">87</item>
+          <item key="1">240</item>
+         </array>
+        </item>
+        <item key="4">
+         <array>
+          <item key="0">120</item>
+          <item key="1">198</item>
+         </array>
+        </item>
+       </array>
+      </item>
+      <item key="to_table">TAB1</item>
+      <item key="from_table">TAB3</item>
+     </hash>
+    </item>
+    <item key="2">
+     <hash>
+      <item key="connection">coords</item>
+      <item key="name">SYS_C001223</item>
+      <item key="schema">SORM</item>
+      <item key="to_columns">
+       <array>
+        <item key="0">
+         <hash>
+          <item key="table">TAB2</item>
+          <item key="column">ID</item>
+         </hash>
+        </item>
+       </array>
+      </item>
+      <item key="from_columns">
+       <array>
+        <item key="0">
+         <hash>
+          <item key="table">TAB3</item>
+          <item key="column">REFER2</item>
+         </hash>
+        </item>
+       </array>
+      </item>
+      <item key="to_side">left</item>
+      <item key="from_side">right</item>
+      <item key="placed">yes</item>
+      <item key="smooth">1</item>
+      <item key="coords">
+       <array>
+        <item key="0">
+         <array>
+          <item key="0">311</item>
+          <item key="1">67</item>
+         </array>
+        </item>
+        <item key="1">
+         <array>
+          <item key="0">364</item>
+          <item key="1">105</item>
+         </array>
+        </item>
+        <item key="2">
+         <array>
+          <item key="0">275</item>
+          <item key="1">137</item>
+         </array>
+        </item>
+       </array>
+      </item>
+      <item key="to_table">TAB2</item>
+      <item key="from_table">TAB3</item>
+     </hash>
+    </item>
+   </array>
+  </item>
+ </hash>
+</perldata>
+</schemaviewplus>

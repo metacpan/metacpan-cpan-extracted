@@ -1,0 +1,53 @@
+PORTABILITY
+
+This version uses a wrap file, suffix_tree_wrap.c, that was generated
+for usage under Linux (we tested it only on Mandrake 9).
+
+If you are using some other platform, you might want to generate your
+own wrap file.
+
+You need to have SWIG installed (get it from: http://www.swig.org/).
+
+Now do ONE of the following (1 or 2):
+
+
+[1]
+---------------------------------------------------------------------
+To generate a wrap file use the following commands from the directory
+where the suffix tree source files (suffix_tree.h suffix_tree.c) are:
+
+    cp SuffixTree.pm bak.SuffixTree
+    swig -perl -module SuffixTree suffix_tree.h
+    rm SuffixTree.pm
+    mv bak.SuffixTree SuffixTree.pm
+
+Now you need to do something that SWIG forgot, and that is to add the
+following line somewhere in the beginning of the newly created wrap
+file, suffix_tree_wrap.c
+
+    #include "suffix_tree.h"
+---------------------------------------------------------------------
+
+-OR-
+
+[2]
+---------------------------------------------------------------------
+Run the following script:
+    We will do this someday...
+---------------------------------------------------------------------
+
+INSTALLATION
+
+To install (once your wrap file is compatible with your system), read
+the instructions in the INSTALL file.
+
+FURTHER INFORMATION
+
+    perldoc SuffixTree
+
+COPYRIGHT
+
+Copyright (c) 2002, 2003 Shlomo Yona. All rights reserved.
+
+This library is free software. 
+You can redistribute it and/or modify it under the same terms as Perl itself.  

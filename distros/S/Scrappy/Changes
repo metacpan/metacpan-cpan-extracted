@@ -1,0 +1,12 @@
+Sun May  8 07:50:07 UTC 2011	New version Scrappy-0.94111280
+				Fixed a major bug in the download action
+				Added first, last and each methods to parser
+Fri May  6 01:10:37 UTC 2011	New version Scrappy-0.94111260
+				Changed project creation script in Scrappy::Action::Generate
+				Added native Data::Dumper::Dumper() support via the dumper() method
+				Parser no longer croaks on "no html source" and simply returns an empty arrayref
+Thu May  5 02:54:09 UTC 2011	New version Scrappy-0.93111250
+				Added action to allow the scrappy cli to download webpages
+				Added Tiny::Try support to all get/post function so not to crash the calling app
+				Fixed bug in the back() function
+				Fixed bug download and store content saving functions

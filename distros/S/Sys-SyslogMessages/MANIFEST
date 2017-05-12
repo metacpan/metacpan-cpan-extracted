@@ -1,0 +1,6 @@
+t/01.syslogmessages.t
+lib/Sys/SyslogMessages.pm
+MANIFEST
+Makefile.PL
+Changes
+README

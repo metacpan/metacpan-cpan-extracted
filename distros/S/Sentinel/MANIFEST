@@ -1,0 +1,19 @@
+Build.PL
+Changes
+lib/Sentinel.pm
+lib/Sentinel.xs
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00use.t
+t/01value.t
+t/02get.t
+t/03set.t
+t/04obj.t
+t/10lvalue.t
+t/11accessor.t
+t/12funcargs.t
+t/99pod.t

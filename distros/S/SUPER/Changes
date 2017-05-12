@@ -1,0 +1,56 @@
+Revision history for Perl extension SUPER.
+
+1.20141117 2014-11-17 09:12:01-08:00 America/Los_Angeles
+    - improved export mechanism
+    - removed useless Exporter tests
+    - improved docs (RT #79681)
+
+1.20141116 2014-11-16 14:07:18-08:00 America/Los_Angeles
+    - resolved Test::More changes (RT #97939)
+
+1.20120705 2012-07-05 14:46:44 America/Los_Angeles
+    - resolved PAUSE packaging nit (Oliver Mengué, RT #77110)
+    - converted to dzil
+
+1.16
+    Wed Apr  4 05:54:23 UTC 2007 ($Rev: 154 $, $Author: chromatic $)
+    - avoid deep recursion problem on deep hierarchies (RT #24795, Paul Talacko)
+
+1.15
+    Sat Sep 30 20:34:51 UTC 2006 (Rev: 2941, Author: chromatic)
+    - allow weird class names (RT #21491, Joshua ben Jore, with some caveats)
+    - added documentation for weird class names and caveats
+    - fixed deep recursion on can() error (RT #21644, Joshua ben Jore again)
+    - prevent indexing UNIVERSAL and DB
+
+1.14 Mon May 15 23:47:24 UTC 2006
+    - removed nearly-dead code that made another nasty loop (bugfix)
+
+1.13 Sun May 14 01:05:31 UTC 2006 (Rev: 16687, Author: chromatic)
+    - fixed SUPER() calls when inheriting the method being called (yow!)
+    - fixed a few documentation formatting nits
+
+1.12 Fri Apr 21 00:51:12 UTC 2006 (Rev: 15993, Author: chromatic)
+    - look for parents better in case of a proxy or mock object
+    - added developer test goodness to make life easier for installers
+
+1.11 Sun Nov 13 00:59:29 UTC 2005 (Rev: 9748, Author: chromatic)
+    - cleaned up documentation
+    - added POD testing tests
+    - fixed failing 1.t test -- due to Test::More changes
+
+1.10 Sat Apr 16 05:52:13 UTC 2005
+    - added SUPER() method and tests
+    - ported to Module::Build
+    - added Build.PL
+    - first release with new maintainership
+
+1.01 Tuesday 2nd March, 2004
+    Fix the case expressed by t/keep_going.t
+
+1.00 Saturday 18th January, 2004
+    Initial CPAN Release.
+
+0.01  Sat Jan 18 14:57:52 2003
+    - original version; created by h2xs 1.22 with options
+        -b 5.6.0 -AX -n SUPER

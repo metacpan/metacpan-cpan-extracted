@@ -1,0 +1,60 @@
+NAME
+    Sys::FS - filesystem interaction tools
+
+SYNOPSIS
+        use Sys::FS;
+        use Log::Tree;
+        my $FS = Sys::FS::->new({
+            'logger'        => Log::Tree::->new();
+        });
+        my $filename = $FS->filename('/tmp', qw(a list of subdirs));
+        $FS->makedir($filename);
+        my ($gb, $percent) = $FS->spaceleft($filename);
+
+ATTRIBUTES
+  sys
+    An instance of Linux::System
+
+METHODS
+  filename
+    Construct a filename out of an array of directories.
+
+  fsck
+    Run fsck on the given device.
+
+  get_mounted_device
+    Find the device mounted on the given directory.
+
+  is_mounted
+    Tests if a given device is currently mounted.
+
+  makedir
+    Create a directory stucture and return the created directory
+
+  mount
+    Mount a device on a mount point.
+
+  mounts
+    Return a hashref containing all mounted devices.
+
+  spaceleft
+    Return the amount of free space on the given device in GB.
+
+  switch
+    Reliably switch two files.
+
+  umount
+    Unmount a given device.
+
+NAME
+    Sys::FS - Misc. Filesystem interaction methods
+
+AUTHOR
+    Dominik Schulz <tex@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Dominik Schulz.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

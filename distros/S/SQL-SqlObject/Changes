@@ -1,0 +1,8 @@
+Revision history for Perl extension SqlObject.
+
+0.01  San Oct  8 06:15:00 2003
+       - version incremented to 0.02 for inital CPAN release
+
+0.01  Wed Jan  8 10:08:13 2003
+	- original version; created by h2xs 1.21 with options
+		-X SqlObject

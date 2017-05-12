@@ -1,0 +1,3 @@
+rm -f always_succ_1 always_succ_2 always_succ_3
+TESTDIR/bin/always_succ       #OPTS retry 4 check TESTDIR/bin/check_always_succ
+TESTDIR/bin/succ

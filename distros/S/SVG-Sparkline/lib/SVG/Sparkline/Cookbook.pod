@@ -1,0 +1,547 @@
+=head1 NAME
+
+SVG::Sparkline::Cookbook - Performing specific tasks with SVG::Sparklines
+
+=head1 VERSION
+
+This document describes L<SVG::Sparkline> version 0.34.
+
+=head1 INTRODUCTION
+
+This Cookbook was conceived as a way to make usage of the L<SVG::Sparkline>
+module somewhat easier even if you do not spend a lot of time learning it.
+
+The first thing to realize about this module is that it is not intended to
+be a full mapping/charting/graphing tool. If you need fancy markers, lots of
+data sets, 3D effects, and so on, you should look for a more general graphing
+module. Searching CPAN for I<Chart> or I<Graph> should expose several likely
+modules.
+
+=head1 ON SPARKLINES
+
+The sparklines concept is described in Edward Tufte's book I<Beautiful Evidence>.
+An excerpt of the book relating to sparklines can be found on his website
+L<http://www.edwardtufte.com/>.
+
+The important portions of Tufte's explanation are that a sparkline is
+
+=over 4
+
+=item *
+
+Intense
+
+=item *
+
+Simple
+
+=item *
+
+Word-sized
+
+=back
+
+To the extent possible, I have used these principles to guide me in the 
+features I decide to include or exclude from the module.
+
+Starting at the bottom, sparklines should be I<word-sized>. We are talking
+about something that can easily be embedded in text or a table. Sparklines
+are not about page-sized graphics with lots of detail.
+
+This size issue leads to the I<simple> aspect. It is hard to get hundreds of
+individual data points into a word-sized graphic. Likewise a small graphic
+containing 20 different datasets is likely to be overly complex. Part of the
+effect of the sparkline is that it is simple enough that you can grasp it
+quickly without need for extended study. This is only possible if the graphic
+is as simple as possible.
+
+Finally, Tufte says a sparkline should be intense. The data being displayed
+should be dynamic enough that it shows important characteristics even after
+simplifying the graphic and making it word sized.
+
+A horizontal line, or bar graph with minimal variation is probably not going to
+be very intense. Likewise a graphic with too much variation will overwhelm the
+eye and lose the effect.
+
+=head1 RECIPES
+
+=head2 Basic Configuration
+
+There are a few configuration items that apply to all sparkline types.
+
+=head2 How to choose a Sparkline Type
+
+Choosing the sparkline type is a judgement call based on the data you need to
+display and the look you want to convey. The following suggestions may help
+you decide which type is right for your circumstance.
+
+=head3 Binary outcomes
+
+The I<Whisker> sparkline type easily displays a series of binary outcomes, such
+as wins/losses on a game or coin flips (heads/tails).
+
+=head3 Discrete data
+
+The I<Bar> sparkline type displays discrete data well. When attempting to
+compare a number of values, I<Bar> displays work well. When continuous data
+has been aggregated into a small number of categories, (e.g. rainfall amount
+per month for twelve months), a I<Bar> sparkline also works well.
+
+If the discrete data describes a range of high and low values (two values for
+each data point), then the I<RangeBar> sparkline type is more appropriate.
+
+=head3 Time-series data
+
+When attempting to display continuously changing data or time-series data,
+the I<Line> and I<Area> sparkline types are most appropriate.
+
+If the continuous data describes a range of high and low values (two values
+for each data point), then the I<RangeArea> sparkline type is more
+appropriate.
+
+=head2 Creating basic sparklines
+
+=head3 I want to create a sparkline for time-series data.
+
+Let's say you have a set of data points that represent regular samples of
+a time-series data set in the array C<@samples>. To create a simple
+sparkline, you would do the following:
+
+   my $sl = SVG::Sparkline->new( Line => { values => \@samples } );
+
+If the line isn't dramatic enough, you could do an I<Area> sparkline, as follows:
+
+   my $sl = SVG::Sparkline->new( Area => { values => \@samples } );
+
+=head3 I want to create a sparkline for discrete data.
+
+Let's say you have a set of data points that represent a discrete data set
+in the array C<@samples>. To create a simple sparkline, you would do the
+following:
+
+   my $sl = SVG::Sparkline->new( Bar => { values => \@samples } );
+
+=head3 I want to create a sparkline for wins and losses for sports team.
+
+Some data doesn't really have a range of values beyond a binary choice:
+high/low, win/loss, heads/tails, etc. The appropriate choice for this is
+the I<Whisker> sparkline type.
+
+If you had a teams win/loss record in an array of '+' and '-' characters
+called @games, you could build the sparkline like this:
+
+   my $sl = SVG::Sparkline->new( Whisker => { values => @games } );
+
+=head3 I want to plot two related time series data streams (highs/lows).
+
+The I<RangeArea> sparkline type is just what you need. First, you need to
+get the data into the proper form. The I<RangeArea> type expects data as
+an arrayref of arrayrefs containing pairs of numeric data.
+
+=head2 Changing the display
+
+Once you have sparkline type, you may need to customize the sparkline.
+
+=head3 How do I make the sparkline taller/shorter?
+
+The L<SVG::Sparkline> constructor supports an optional I<height> parameter that
+controls the pixel height of the sparkline. Since the data is automatically
+scaled to fit the height, this attribute also helps determine the resolution that
+is displayed.
+
+   my $sl = SVG::Sparkline->new( Line => { values =>\@samples, height=>18 } );
+
+The above code generates a sparkline 1.5x as tall as the default. Although SVG
+supports (practically) infinitely scalable graphics, You should tend to make
+your sparklines close to the height of the text you are embedding it within.
+
+If you need graphs substantially larger than that, another graphing library with
+more customizability is probably a better choice.
+
+=head3 How do I extend/reduce the sparkline horizontally?
+
+The L<SVG::Sparkline> constructor supports an optional I<width> parameter that
+specifies the width of the sparkline in pixels. L<SVG::Sparkline> uses this
+parameter to scale the sparkline horizontally. For I<Line> and I<Area> sparklines
+this changes the horizontal resolution of the data. For I<Bar> and I<Whisker>
+sparklines this changes the width of the bar or whisker.
+
+   my $sl => SVG::Sparkline->new( Bar => { values=>\@rainfall, width=>60 } );
+
+Assuming that we have one rainfall entry per month in the C<@rainfall> array, this
+would give us a 60 pixel wide sparkline, with each bar being 5 pixels wide.
+
+=head3 How do I change the color of the sparkline?
+
+The L<SVG::Sparkline> constructor supports an optional I<color> parameter that
+specifies the color of the display element. The value of this parameter must be
+in a format that SVG understands.
+
+   my $sl = SVG::Sparkline->new( Area => { values=>\@depth, color=>'#0000ff' } );
+
+This would make an area graph with the filled area being blue. See the recipe
+L</"How do I specify a color for the data, background, or marks?"> for legal color formats.
+
+=head3 How do I change the color of the background?
+
+The L<SVG::Sparkline> constructor supports an optional I<bgcolor> parameter that
+specifies the color of the background. The value of this parameter must be
+in a format that SVG understands.
+
+   my $sl = SVG::Sparkline->new( Line => { values=>\@depth, bgcolor=>'silver' } );
+
+This would make a line graph on a light gray background. See the recipe
+L</"How do I specify a color for the data, background, or marks?"> for legal color formats.
+
+By default, the background should be transparent.
+
+=head3 How do I specify a color for the data, background, or marks?
+
+Colors are specified using the color definitions defined for SVG. These formats include
+
+=over 4
+
+=item 6 digit rgb hex
+
+This is the normal HTML colors you may already be used to. C<#88ff88> would be a
+light green.
+
+=item 3 digit rgb hex
+
+This is a short form of the normal hex string C<#f00> would be red. To convert the
+3 digit form into the 6 digit form, just double each digit (C<#f00> becomes C<#ff0000>
+and C<#123> becomes C<#112233>).
+
+=item rgb() functional notation
+
+This form takes three number between 0 and 255. So, C<rgb(255,0,127)> is equivalent
+to C<#ff007f>.
+
+=item rgb() percentage functional notation
+
+This is like the previous form, but uses percentages instead. (e.g. C<rgb(100%,50%,75%)>).
+
+=item color names
+
+The SVG specification has an extended list of color names that can be used to
+name colors. This includes the normal colors of I<red>, I<green>, I<blue>, I<white>,
+I<black>, I<yellow>, I<magenta>, I<cyan>, I<gray>, I<silver>, etc.
+
+=back
+
+=head3 I need to mark a specific data point on the sparkline.
+
+It is often useful to be able to mark specific data points on a sparkline so
+that you can refer to them elsewhere. You mark a specific data point with the
+C<mark> parameter. For example,
+
+  my $sl = SVG::Sparkline->new(
+        Line=>{ values=>\@rainfall, mark=>[14=>'blue'] }
+  );
+
+This would show our rainfall line graph with a blue dot on the data for
+the 15th (14 0-based).
+
+The C<mark> attribute takes pairs of values. The first item of each pair is an
+index (or one of four special terms: first, last, high, and low). The second item
+is a SVG-supported color as described in
+L</"How do I specify a color for the data, background, or marks?">.
+
+If you need more than one mark, simply add more pairs to the anonymous array.
+
+=head3 I need to mark the high and low values on a sparkline.
+
+So, you can mark a particular index, but what if you don't want to figure out
+the index for the high and low values (especially, if you are generating this
+sparkline multiple times). The special index terms C<high> and C<low> come to
+the rescue.
+
+  my $sl = SVG::Sparkline->new(
+        `Line=>{ values=>\@rainfall, mark=>[high=>'green', low=>'red'] }
+  );
+
+This will generate two dots on the sparkline: a green one at the high value
+and a red one at the low value.
+
+=head3 I want a little more space above/below the data in the sparkline.
+
+The C<pady> parameter specifies the amount of padding between the displayed
+data and the top/bottom of the sparkline in pixels. The default value of
+C<pady> is 1 pixel if none is specified.
+
+  my $sl = SVG::Sparkline->new(
+        Line=>{ values=>\@rainfall, pady=>3 }
+  );
+
+This adds 2 more pixels of spacing between the highest and lowest values of
+the data and the top and bottom of the sparkline graphic. To add paddin to the
+left and right, see the next recipe.
+
+=head3 I want a little more space to the left/right of the data in the sparkline.
+
+The C<padx> parameter specifies the amount of padding between the displayed
+data and the left and right of the sparkline in pixels. The default value of
+C<padx> is 0 pixels if none is specified.
+
+  my $sl = SVG::Sparkline->new(
+        Line=>{ values=>\@rainfall, padx=>2 }
+  );
+
+This adds 2 more pixels of spacing between the data and the left and right of
+the sparkline graphic. To add padding to the top and bottom, see the previous
+recipe.
+
+=head2 Area Sparklines
+
+=head3 My Area sparkline is too spiky, how can I spread it out?
+
+There are two ways to change the spacing between data points on an I<Area>
+sparkline: setting the I<width> and setting the x-scaling.
+
+If you have a fixed width in mind (say 100 pixels), you can set the width of
+the area graph as follows:
+
+   my $sl = SVG::Sparkline->new(
+        Area => { values=>\@temps, width=>100 }
+   );
+
+On the other hand, if you don't have a fixed width in mind, but you still want
+the data points farther apart, the I<xscale> parameter specifies the number of
+pixels between individual data points. The default scale is 2 pixels. If you
+wanted to double the spacing, you would do this:
+
+   my $sl = SVG::Sparkline->new(
+        Area => { values=>\@temps, xscale=>4 }
+   );
+
+=head2 Bar Sparklines
+
+=head3 I want the bars to be wider/narrower on my Bar sparkline.
+
+There are two ways to change the width of the bars on a I<Bar> sparkline.
+The L<SVG::Sparkline> constructor supports an optional I<thick> parameter that
+specifies the bar thickness (in pixels) on a I<Bar> sparkline. For example,
+
+  my $sl = SVG::Sparkline->new( Bar=>{ values=>\@rainfall, thick=>6 } );
+
+generates bars that are 6 pixels wide, instead of the default 3.
+
+Specifying a I<width> different than the default also changes the bar size. The
+bar size defaults to the I<width> divided by the number of data points.
+
+  my $sl = SVG::Sparkline->new( Bar=>{ values=>\@rainfall, width=>120 } );
+
+If we assume 12 months of data in C<@rainfall>, the bars are drawn 10 pixels wide.
+
+=head3 I want spacing between my bars on my Bar sparkline.
+
+The default I<Bar> sparkline has no spacing between the bars for the maximum use
+of space. (After all, sparklines are supposed to be small.) You can change the
+spacing through the use of the I<gap> parameter. For example, if you want two
+pixels of spacing between the bars, you would do the following:
+
+  my $sl = SVG::Sparkline->new( Bar=>{ values=>\@rainfall, gap=>2 } );
+
+=head2 Line Sparklines
+
+=head3 I want to change the thickness of the line.
+
+The thickness of the line on the I<Line> sparkline is controlled by the optional
+I<thick> parameter to the constructor. This parameter specifies the stroke width
+of the line in pixels.
+
+  my $sl = SVG::Sparkline->new( Line=>{ values=>\@highs, thick=>2 } );
+
+generates a line 2 pixels wide instead of the default 1 pixel line.
+
+=head3 My Line sparkline is too spiky, how can I spread it out?
+
+See L</"My Area sparkline is too spiky, how can I spread it out?">. The same approach
+works with a I<Line> sparkline.
+
+=head2 RangeArea Sparklines
+
+=head3 I want to spread out the sparkline so it's not spiky.
+
+See L</"My Area sparkline is too spiky, how can I spread it out?">. The same approach
+works with a I<RangeArea> sparkline.
+
+=head2 RangeBar Sparklines
+
+=head3 I want the bars to be wider/narrower on my RangeBar sparkline.
+
+See L</"I want the bars to be wider/narrower on my Bar sparkline."> The same
+technique works for I<RangeBar>.
+
+=head3 I want spacing between my bars on my RangeBar sparkline.
+
+See L</"I want spacing between my bars on my Bar sparkline."> The same
+technique works for I<RangeBar>.
+
+=head2 Whisker Sparklines
+
+=head3 I want the Whiskers to be thicker/thinner.
+
+There are two ways to change the thickness of the whiskers on a I<Whisker>
+sparkline. The L<SVG::Sparkline> constructor supports an optional I<thick>
+parameter that specifies the whisker thickness (in pixels) on a I<Whisker>
+sparkline. For example,
+
+  my $sl = SVG::Sparkline->new( Whisker=>{ values=>\@tosses, thick=>2 } );
+
+generates whiskers that are 2 pixels wide, instead of the default 1.
+
+Specifying a I<width> different than the default also changes the
+whisker size. The whisker size defaults to 1/3 the I<width> divided by the
+number of data points.
+
+  my $sl = SVG::Sparkline->new( Whisker=>{ values=>\@tosses, width=>120 } );
+
+If there are 10 values in C<@tosses>, the whiskers are drawn 4 pixels wide.
+
+=head3 I want to change the spacing between the whiskers on my sparkline.
+
+The distance between the whiskers can be changed either by modifying the
+width of the sparkline or through the use of the I<gap> parameter.
+
+By default, the I<gap> is twice the I<thick>ness of the whiskers. To change that,
+specify a value in pixels as shown below:
+
+   my $sl = SVG::Sparkline->new( Whisker=>{ values=\@tosses, gap=>5 } );
+
+=head2 Using the generated sparklines
+
+=head3 I want to write the sparkline to a file.
+
+Use the C<print> global function to write to a file. The C<SVG::Sparkline>
+is converted to a string using the C<SVG::Sparkline::to_string> method,
+automatically. For example,
+
+    my $sl = SVG::Sparkline->new( Bar=>{ values=>\@rainfall } );
+    open( my $fh, '>', 'rainfall_sparkline.svg' )
+        or die "Unable to create rainfall_sparkline.svg.\n";
+    print $fh $sl;
+    close( $fh );
+
+This will result in an SVG file on disk containing the sparkline.
+
+You can also covert a sparkline to a string my calling the
+C<SVG::Sparkline::to_string> method directly.
+
+=head3 I want to embed the sparkline in an HTML file.
+
+Eventually, most browsers will support mixed-namespace documents, and you will be
+able to write the SVG directly into your XHTML document. Until then, the most
+robust solution is to write out the file and reference it from your document.
+
+There are several approaches, including the C<iframe> tag, the C<img> tag, the
+C<object> tag, and the C<embed> tag. At present, the C<iframe> seems to be the
+simplest and most robust solution.
+
+Given a sparkline in the file F<rainfall_sparkline.svg>, put the following in your
+HTML to include the sparkline:
+
+   <iframe height="12" width="36" src="rainfall_sparkline.svg"
+       style="border:0;" alt="Rainfall amounts"></iframe>
+
+Of course, you may need to adjust the height and width to match your sparkline.
+
+=head3 I want to embed the sparkline in an XHTML(+xml) file.
+
+You should be able to copy the SVG from the sparkline directly into the XHTML file
+where you would like it to appear. Browsers that support <em>complex documents</em>
+should display the SVG along with everything else.
+
+=head3 I want to embed the sparkline in an SVG file.
+
+You can copy the SVG directly from the sparkline into the SVG file. However, you
+will need to make a minor change to the result. You either need to modify the
+sparkline to position it in the SVG. There are basically 3 ways to accomplish this:
+
+=over 4
+
+=item Modify the sparkline C<svg> tag to have C<x> and C<y> attributes.
+
+The C<x> and C<y> attributes are used to position a nested C<svg> tag within the
+area of the outer C<svg> tag. By default, the sparkline's C<svg> tag would be
+positioned at (0,0).
+
+=item Modify the sparkline C<svg> tag to have a C<transform> attribute.
+
+The C<transform> attribute can position a tag using the C<translate(x,y)>
+function.  This would have the same effect as positioning the sparkline with
+the C<x> and C<y> attributes. The only real reason for positioning this way is
+if you wanted to provide scaling or rotation as well.
+
+=item Surround the sparkline in a C<g> tag and position the group.
+
+This approach has the advantage that you don't actually have to change the
+sparkline.  Put the content of the sparkline inside a C<g> tag and use the
+C<transform> attribute to place it.
+
+   <g transform="translate(100,250)"><svg/></g>
+
+where the C<< E<lt>svg/> >> is replaced with your actual sparkline.
+
+=back
+
+=head2 Decorations
+
+=head3 How do I add a box around the sparkline?
+
+As Tuft explains in I<Beautiful Evidence> this kind of decoration overwhelms the
+actual data being displayed. That defeats the purpose of the sparkline. For this
+reason, L<SVG::Sparkline> does not provide an automatic way to put a border
+around the sparkline.
+
+If you want to have a border despite Tuft's advice, you can use the border
+attribute on the container you use for the SVG. For example, if you used the
+C<iframe> approach from L</"I want to embed the sparkline in an HTML file.">
+
+   <iframe height="12" width="36" src="rainfall_sparkline.svg"
+       style="border:1 solid black;" alt="Rainfall amounts"></iframe>
+
+Changing the border style should have the effect you want.
+
+=head3 How do I add a grid under the sparkline?
+
+The L<SVG::Sparkline> does not currently support grids. I am concerned that
+adding a grid might also violate Tufte's intent for the sparkline.
+
+At present, the best solution would be to generate a grid of the appropriate
+dimensions and overlay it with the sparkline. This only works if the sparkline
+has no background color, which leaves the background transparent.
+
+=head1 AUTHOR
+
+G. Wade Johnson  C<< <gwadej@cpan.org> >>
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2015, G. Wade Johnson C<< <gwadej@cpan.org> >>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl 5.8.0. See L<perlartistic>.
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.

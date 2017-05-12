@@ -1,0 +1,239 @@
+Statistics::Gap(3)    User Contributed Perl Documentation   Statistics::Gap(3)
+
+
+
+NNAAMMEE
+        Statistics::Gap - An adaptation of the "Gap Statistic"
+
+SSYYNNOOPPSSIISS
+        use Statistics::Gap;
+        $predictedk = &gap("prefix", "vec", INPUTMATRIX, "rbr", "h2", 30, 10, rep, 90, 4);
+
+        OR
+
+        use Statistics::Gap;
+        $predictedk = &gap("prefix", "vec", INPUTMATRIX, "rbr", "h2", 30, 10, rep, 90, 4, 7);
+
+IINNPPUUTTSS
+       1. Prefix: The string that should be used to as a prefix while naming
+       the intermediate files and the .dat files (plot files).
+
+       2. Space: Specifies the space in which the clustering should be per-
+       formed.  Valid parameter values:
+                  vec  -  vector space
+                  sim  -  similarity space
+
+       3. InputMatrix: Path to input matrix file. (More details about the
+       input file-format below.)
+
+       4. ClusteringMethod: Specifies the clustering method to be used. (Learn
+       more about this at:
+       http://glaros.dtc.umn.edu/gkhome/cluto/cluto/overview)
+
+           Valid parameter values:
+                  rb - Repeated Bisections
+                  rbr - Repeated Bisections for by k-way refinement
+                  direct - Direct k-way clustering
+                  agglo  - Agglomerative clustering
+                  bagglo - Partitional biased Agglomerative clustering
+                  NOTE: bagglo can be used only if space=vec
+
+       5. Crfun: Specifies the criterion function to be used for finding clus-
+       tering solutions.  (Learn more about this at:
+       http://glaros.dtc.umn.edu/gkhome/cluto/cluto/overview)
+
+           Valid parameter values:
+                  i1      -  I1  Criterion function
+                  i2      -  I2  Criterion function
+                  e1      -  E1  Criterion function
+                  h1      -  H1  Criterion function
+                  h2      -  H2  Criterion function
+
+       6. K: This is an approximate upper bound for the number of clusters
+       that may be present in the dataset.
+
+       7. B: The number of replicates/references to be generated.
+
+       8. TypeRef: Specifies whether to generate B replicates from a reference
+       or to generate B references.
+
+           Valid parameter values:
+                  rep - replicates
+                  ref - references
+
+       9. Percentage: Specifies the percentage confidence to be reported in
+       the log file.  Since Statistics::Gap uses parametric bootstrap method
+       for reference distribution generation, it is critical to understand the
+       interval around the sample mean that could contain the population
+       ("true") mean and with what certainty.
+
+       10. Precision: Specifies the precision to be used while generating the
+       reference distribution.
+
+       11. Seed: The seed to be used with the random number generator.  (This
+       is an optional parameter. By default no seed is set.)
+
+       DDeettaaiillss aabboouutt tthhee iinnppuutt mmaattrriixx ffoorrmmaatt::
+
+       The input matrix can be in either dense or sparse format. The cell val-
+       ues can be integer or real. Depending upon the value specified for the
+       space parameter the header in the input file (first line) changes.
+
+       Example of input matrix in dense format when space=vec:
+        The first line specifies the dimensions - #rows #cols
+        From the second line the actual matrix follows.
+
+        6 5
+        1.3       2       0       0       3
+        2.1       0       4       2.7     0
+        1.3       2       0       0       3
+        2.1       0       4       2.7     0
+        1.3       2       0       0       3
+        2.1       0       4       2.7     0
+
+       Example of input matrix in dense format when space=sim:
+        The matrix, when in similarity space, is square and symmetric.
+        The first line specifies the dimensions - #rows/#cols
+        From the second line the actual matrix follows.
+
+        5
+        1.0000   0.3179   0.5544   0.2541   0.4431
+        0.3179   1.0000   0.1386   0.4599   0.5413
+        0.5544   0.1386   1.0000   0.5143   0.2186
+        0.2541   0.4599   0.5143   1.0000   0.5148
+        0.4431   0.5413   0.2186   0.5148   1.0000
+
+       Example of input matrix in sparse format when space=vec:
+        The first line specifies the dimensions & number of non-zero elements
+       - #rows #cols #nonzeroElem
+
+       From the second line the matrix contents follow. Only non-zero elements
+       are specified. Thus the elements are specified as pairs of - #col elem.
+       The row number is implied by the (line number-1).
+
+        8 10 41
+        1 3 4 2 8 2 10 1
+        1 1 2 5 3 1 5 2 7 1 9 2
+        1 3 4 2 8 2 10 1
+        1 1 2 5 3 1 5 2 7 1 9 2
+        1 3 4 2 8 2 10 1
+        1 1 2 5 3 1 5 2 7 1 9 2
+        2 4 3 1 4 2 5 5 7 1 9 1
+        2 4 3 1 4 2 5 5 7 1 9 1
+
+       Example of input matrix in sparse format when space=sim:
+        The first line specifies the dimensions & number of non-zero elements
+       - #rows/#cols #nonzeroElem
+        The matrix format is same as explained above.
+
+        5 15
+        1 1.0000 3 0.5544 5 0.4431
+        2 1.0000 3 0.1386 4 0.4599 5 0.5413
+        1 0.5544 2 0.1386 3 1.0000
+        2 0.4599 4 1.0000
+        1 0.4431 2 0.5413 5 1.0000
+
+OOUUTTPPUUTT
+       1. A single integer number at STDOUT which is the Gap Statistic's esti-
+       mate of number of clusters present in the input dataset.
+
+       2. The prefix.gap.log file contains the log of various values at dif-
+       ferent K values.  The first table in the file gives values like Gap(k),
+       obs(crfun(k)) etc. for every k value experimented with.
+
+       3. The prefix.*.dat files are provided to facilitate generation of
+       plots of the observed distribution, expected distribution and gap(k),
+       if desired.
+
+DDEESSCCRRIIPPTTIIOONN
+       Given a dataset how does one automatically find the optimal number of
+       clusters that the dataset should be grouped into? - is one of the pre-
+       vailing problems. Statisticians Robert Tibshirani, Guenther Walther and
+       Trevor Hastie  propose a solution for this problem in a Techinal Report
+       named - "Estimating the number of clusters in a dataset via the Gap
+       Statistic". This perl module implements an adaptation of the approach
+       proposed in the above paper.
+
+       If one tries to cluster a dataset (i.e. numerous observations described
+       in terms of a feature space) into n groups/clusters and if we plot the
+       graph of within cluster disimilarity (error) or similarity along Y-axis
+       and Number of clusters along X-axis then this graph generally takes a
+       form of a elbow/knee depending upon the measure on the Y-axis. The Gap
+       Statistic seeks to locate this elbow/knee because the value on the
+       X-axis at this elbow is the optimal number of clusters for the
+       data.
+
+       To locate this elbow Gap Statistic standardizes the graph of error by
+       comparing it with the expected graph under appropriate null reference
+       distribution. The adopted null model is the case of single cluster
+       (k=1) which is rejected in favor of k (k>1) if sufficient evidence is
+       present.  The predicted k is the k value for which the error graph
+       falls the farthest below the reference graph.
+
+       As we have seen above, the Gap Statistic uses the within cluster dis-
+       persion (error) measure to find the elbow/knee. In this adaptation, we
+       use clustering criterion functions (crfun) instead of within cluster
+       dispersion measure. The crfun are used by the clustering methods to
+       obtain an optimal clustering solution for a given data and number of
+       clusters.
+
+       We provide two types of reference generation methods:
+
+       1. One can choose to generate a random dataset over the observed dis-
+       tribution by holding the row and the column marginals fixed and then
+       generating B replicates from this random dataset using Monte Carlo sam-
+       pling.
+
+       2. Or to generate B random datasets over the observed distribution by
+       holding the row and the column marginals fixed.
+
+       Please refer to http://search.cpan.org/dist/Algorithm-RandomMatrixGen-
+       eration/ to learn more about generating random dataset over the
+       observed distribution by holding the row and the column marginals
+       fixed.
+
+       EEXXPPOORRTT
+
+       "gap" function by default.
+
+PPRREE--RREEQQUUIISSIITTEESS
+       1. This module uses suite of C programs called CLUTO for clustering
+       purposes. Thus CLUTO needs to be installed for this module to be func-
+       tional. CLUTO can be downloaded from
+       http://www-users.cs.umn.edu/~karypis/cluto/
+
+       2. Following Perl Modules
+        Math::BigFloat (http://search.cpan.org/dist/Math-BigInt-1.77/)
+        Algorithm::RandomMatrixGeneration (http://search.cpan.org/dist/Algo-
+       rithm-RandomMatrixGeneration/)
+
+SSEEEE AALLSSOO
+           http://citeseer.ist.psu.edu/tibshirani00estimating.html
+           http://www-users.cs.umn.edu/~karypis/cluto/
+           http://search.cpan.org/dist/Algorithm-RandomMatrixGeneration/
+
+AAUUTTHHOORR
+           Anagha Kulkarni, University of Minnesota, Duluth
+           kulka020 <at> d.umn.edu
+
+           Ted Pedersen, University of Minnesota, Duluth
+           tpederse <at> d.umn.edu
+
+CCOOPPYYRRIIGGHHTT AANNDD LLIICCEENNSSEE
+       Copyright (C) 2006-2008, Anagha Kulkarni and Ted Pedersen
+
+       This program is free software; you can redistribute it and/or modify it
+       under the terms of the GNU General Public License as published by the
+       Free Software Foundation; either version 2 of the License, or (at your
+       option) any later version.  This program is distributed in the hope
+       that it will be useful, but WITHOUT ANY WARRANTY; without even the
+       implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PUR-
+       POSE.  See the GNU General Public License for more details.
+
+       You should have received a copy of the GNU General Public License along
+       with this program; if not, write to the Free Software Foundation, Inc.,
+       59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+
+
+perl v5.8.5                       2006-04-28                Statistics::Gap(3)

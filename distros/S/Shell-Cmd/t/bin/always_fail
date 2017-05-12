@@ -1,0 +1,30 @@
+#!/usr/bin/perl
+$| = 1;
+
+if ( ! -f "always_fail_1" ) {
+   print "Running first time\n";
+   open(OUT, ">always_fail_1");
+   close(OUT);
+   warn  "Failing first time\n";
+   exit 30;
+}
+
+if ( ! -f "always_fail_2" ) {
+   print "Running second time\n";
+   open(OUT, ">always_fail_2");
+   close(OUT);
+   warn "Failing second time\n";
+   exit 31;
+}
+
+if ( ! -f "always_fail_3" ) {
+   print "Running third time\n";
+   open(OUT, ">always_fail_3");
+   close(OUT);
+   warn "Failing third time\n";
+   exit 32;
+}
+
+print "Running fourth time\n";
+unlink ("always_fail_1","always_fail_2","always_fail_3");
+exit 33;

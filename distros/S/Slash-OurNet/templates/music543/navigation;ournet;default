@@ -1,0 +1,107 @@
+__section__
+default
+__description__
+The navigation bar
+
+* mailbox = whether if the user has access to mailbox
+* newid = the link to acquire a new id
+* login = the login url
+* mailbox = the mailbox url
+* topclass = the 'Top' class. ignore it.
+
+__title__
+
+__page__
+ournet
+__lang__
+zh_TW
+__name__
+navigation
+__template__
+
+<!-- Navigation開始 -->
+
+[% IF user == 'guest' %]
+    [% IF newid %]
+	[% IF slash_user %]
+◎ <a href='users.pl'>[% newid %]</a>
+	[% ELSE %]
+◎ <a href='[% script %]/?newid'>[% newid %]</a>
+	[% END %]
+    [% END %]
+    [% IF login %]
+	[% IF slash_user %]
+◎ <a href='users.pl?op=userlogin'>[% login %]</a>
+	[% ELSE %]
+◎ <a href='[% script %]/?login'>[% login %]</a>
+	[% END %]
+    [% END %]
+[%# ELSIF mailbox 
+#◎ <a href='[% script %]/?mail'>[% mailbox %]</a>
+#[% END 
+#◎ [% customize %]
+
+        <hr border="1" width="90%>
+        </td>
+        </tr>
+
+
+        <tr>
+        <td class="text" align=center>
+        <FORM action='[% script %]' method='POST'>
+        <INPUT type='hidden' name='op' value='board'>
+        <INPUT type='hidden' name='group' value='[% topclass %]'>
+        <INPUT type='hidden' name='child' value='articles'>
+[% loc('Select board') %]
+        <INPUT type='text' name='board' size=8 maxlength=20 style="font-size:10pt;color:666666;background-color:ffffff;border:1 dotted #000000;width:100px" value="輸入板名" onFocus="if (value == '輸入板名') {value =''}" onBlur="if (value == '') {value='輸入板名'}">
+        <INPUT style="font-size:12pt" type='submit' value='[% loc('Go') %]'>
+        </FORM>
+<br>
+        </td>
+        </tr>
+
+
+<!--
+        <tr>
+        <td align="center" class="text">
+        <form method=POST action="[% script %]">
+        <INPUT TYPE="HIDDEN" NAME="op" VALUE="search">
+[% loc('Search:') %]
+        <input size=8 name="query" style="font-size:10pt;color:666666;background-color:ffffff;border:1 dotted #000000;width:100px" value="輸入字串" onFocus="if (value == '輸入字串') {value =''}" onBlur="if (value == '') {value='輸入字串'}">
+        <input type=button style="font-size:12pt" value="[% loc('Go') %]">
+        </form>
+<br>
+        </td>
+        </tr>
+-->
+
+<!-- Navigation結束 -->
+
+        </table>
+
+<br><a href="http://music543.com/i_want/CashSanQuentin.htm" target="_blank"><img src="[% imagedir %]/cash_sq.gif" border="0"></a><p>
+
+      </td>
+      </tr>
+      </table>
+
+    </td>
+
+<!-- 左欄結束 -->
+
+
+
+<!-- 右欄開始 -->
+
+    <td width=560 align="right">
+
+      <table width="99%" cellspacing="0" cellpadding="0" border="0">
+
+      <tr valign="top">
+      <td align="center">
+
+
+
+__seclev__
+10000
+

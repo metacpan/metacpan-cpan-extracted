@@ -1,0 +1,21 @@
+---
+abstract: 'get information about how the subroutine is called'
+author:
+  - 'Renee Baecker <module@renee-baecker.de>'
+build_requires:
+  B        : 1.17
+  Exporter : 5.58
+generated_by: 'h2xs version 1.23'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+name: Sub-Called
+provides:
+  Sub::Called:
+    file: /lib/Sub/Called.pm
+    version: 0.03
+resources:
+  license: http://dev.perl.org/licenses
+version: 0.03
+

@@ -1,0 +1,26 @@
+.*~$
+.*\.(bak|old)$
+\.git/.*
+\.gitignore
+
+^Makefile$
+
+^blib/
+^pm_to_blib$
+
+Struct-Flatten-Template-.*\.tar\.gz
+Struct-Flatten-Template-v\d+\.\d+\.\d+/
+
+^MYMETA\.*
+
+# QA tests not needed for distribution
+
+^xt/
+
+# Travis-CI
+
+\.travis\.yml
+
+# Distzilla etc
+
+\.build/

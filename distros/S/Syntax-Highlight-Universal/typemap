@@ -1,0 +1,19 @@
+const char* T_PV
+Region* T_PKGIV
+Scheme* T_PKGIV
+
+INPUT
+
+T_PKGIV
+  /* @{[$tt = $type, $tt =~ s/\W//g]} */
+  if (sv_isa($arg, PKG($tt)))
+    $var = ($type)SvIV((SV*)SvRV($arg));
+  else
+    croak(\"$var is not a \" PKG($tt) \" object\");
+
+OUTPUT
+
+T_PKGIV
+  /* @{[$tt = $type, $tt =~ s/\W//g]} */
+  if ($var)
+    sv_setref_iv($arg, PKG($tt), (IV)$var);

@@ -1,0 +1,73 @@
+Revision history for SVN-Dump
+
+0.06 Fri May 31 2013
+        [ENHANCEMENTS]
+        - speed optimization when reading a dump (thanks to Andrew Sayers)
+        [DOCUMENTATION]
+        - a few documentation tweaks (thanks to David Landgren)
+        - imoproved inter-documentation links
+
+0.05 Sat Feb 19 03:51:57 CET 2011
+        [ENHANCEMENTS]
+        - Add support for Text-content-sha1 node property
+        - Don't create text or property blocks if they don't exist in
+          a dump. (Rocco Caputo)
+        - Add a digest() method to SVN::Dump::Text
+          (Inspired by a patch by Scott MacPhee, RT #56868)
+        - Add support for Text-content-sha1 / Text-copy-source-sha1
+          (RT #60207)
+        - New option check_digest that will, when reading a non-delta
+          dump, ensure that the content digest are valid
+        - Properly ignore blank lines between records (RT #25467, #28645)
+
+0.04 Thu Jun 12 16:48:23 CEST 2008
+        [ENHANCEMENTS]
+        - doesn't lose the PerlIO layers when given a filehandle
+          (e.g. after a binmode( $fh, ':gzip' ) call)
+
+0.03 Tue Nov 21 01:14:43 CET 2006
+        [ENHANCEMENTS]
+        - Allow the use of '_' for '-' for header names in SVN::Dump::Headers
+        - SVN::Dump::new() now accepts parameters 'version' and 'uuid'
+        - SVN::Dump::format() is an alias for SVN::Dump::version()
+        - SVN::Dump::Record::update_headers() will recompute the record
+          headers after a text or properties modification
+        - SVN::Dump::Property::delete() can remove property keys
+        - SVN::Dump::Record::delete_property() does the same
+        - SVN::Dump::Headers::new() can initialise the headers with a hashref
+
+0.02 Sat Nov  4 01:34:08 CET 2006
+
+        *** WARNING: INCOMPATIBLES API CHANGES FROM VERSION 0.01 ***
+
+        [ENHANCEMENTS]
+        - SVN::Dump->new() now also accepts a filehandle (fh)
+          (thanks to clkao, RT ticket #22429)
+        - Renamed the record manipulation methods of SVN::Dump::Record to
+          set_headers_block()  / get_headers_block(),
+          set_property_block() / get_property_block(),
+          set_text_block()     / get_text_block(),
+          set_included_bloc()  / get_included_block.
+        - Added new methods to SVN::Dump::Record to handle the blocks' data:
+          set_header()   / get_header(),
+          set_property() / get_property(),
+          set_text()     / get_text().
+        - new helper methods: property_length() and text_length()
+        [TESTS]
+        - 100% coverage for SVN::Dump too
+        [EXAMPLES]
+        - eg/svndump_replace_author.pl - replace an author by another in a dump
+
+        *** WARNING: INCOMPATIBLES API CHANGES FROM VERSION 0.01 ***
+
+0.01 Wed Oct 18 18:25:31 CEST 2006
+        [FEATURES]
+        - SVN::Dump is able to read dumps in version 2 and 3
+          and output an identical dump
+        [TESTS]
+        - 100% coverage for SVN::Dump::Headers, SVN::Dump::Property,
+          SVN::Dump::Reader, SVN::Dump::Record, SVN::Dump::Text
+        [EXAMPLES]
+        - eg/svndump_identidy.pl - read a dump and prints it out
+        - eg/svndump_stats.pl    - produces a set of statistic about a dump
+

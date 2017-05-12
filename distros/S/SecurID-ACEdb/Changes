@@ -1,0 +1,16 @@
+Revision history for Perl extension SecurID::ACEdb.
+
+0.01  Mon Mar 30 15:01:30 1998
+	- original version; created by h2xs
+
+0.70  Mon May 11 14:11:48 MDT 1998
+	- first version ready to actually install
+
+0.90  Tue Dec 29 14:33:02 MST 1998
+	- wrote some docs and made the test program more portable, in
+	  preparation for release to CPAN
+
+
+
+
+

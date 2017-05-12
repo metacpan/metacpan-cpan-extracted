@@ -1,0 +1,30 @@
+# Remove a ns when other nameservers have IP addresses
+template: update-domain.tt
+
+vars:
+  domain: 10zf.co.te
+  nslist_old:
+    - NS1.BLAH.COM
+
+SRS:
+    -
+        assertions: 
+           count:
+               - [ '//DomainDetailsQry', 1, 'DDQ generated']
+    -
+        assertions:
+           count:
+               - [ '//DomainUpdate', 1, 'DomUpdate generated']
+               - [ '//Server', 3, '3 Nameservers in update' ]
+           attr_is:          
+               - [ '//Server[@FQDN = "ns2.10ze.co.te"]', 'IP4Addr', '200.200.200.200', 'correct ipv4 addr on ns2']
+               - [ '//Server[@FQDN = "ns3.10ze.co.te"]', 'IP6Addr', '1080:0:0:0:8:800:200C:417A', 'correct ipv6 addr on ns3']
+               - [ '//Server[@FQDN = "ns4.10ze.co.te"]', 'IP4Addr', '200.200.200.201', 'correct ipv4 addr on ns4']
+               - [ '//Server[@FQDN = "ns4.10ze.co.te"]', 'IP6Addr', '1080:0:0:0:8:800:200C:417B', 'correct ipv6 addr on ns4']
+
+
+output_assertions:
+  attr_is:
+    - [ '//epp:result', 'code', 1000, 'SRS: Check for correct result code' ]
+
+

@@ -1,0 +1,58 @@
+NAME
+    Scalar::Readonly - functions for controlling whether any scalar variable
+    is read-only
+
+SYNOPSIS
+      use Scalar::Readonly ':all';
+      my $foo = "foo";
+      readonly_on($foo);
+      $foo = "bar";  #ERROR!
+  
+      if (readonly($foo)) {
+        readonly_off($foo);
+      }
+  
+      readonly_off($]);
+      $] = "6.0";
+  
+      print "This is Perl v$]";
+
+DESCRIPTION
+    This simple module can make scalars read-only. Useful to protect
+    configuration variables, for example.
+
+    This module can also be used to subvert Perl's many read-only variables
+    to potential evil trickery.
+
+  readonly
+    Ths function takes a scalar variable and tells you whether it is
+    read-only. It returns 0 if the scalar isn't read-only, and a positive
+    number if it is.
+
+  readonly_on
+    Makes the passed scalar variable read-only. If you try and modify a
+    read-only scalar, your code will die with the following error message:
+
+      Modification of a read-only value attempted at
+
+  readonly_off
+    Makes the passed scalar variable read-write. You can even do this to
+    read-only special variables, though you almost certainly don't want to
+    do that.
+
+  EXPORT
+    ':all' => readonly, readonly_on, readonly_off
+
+SEE ALSO
+    Scalar::Util, Attribute::Constant, Const::Fast.
+
+AUTHOR
+    Philippe M. Chiasson, <gozer@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2004 by Philippe M. Chiasson
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.3 or, at
+    your option, any later version of Perl 5 you may have available.
+

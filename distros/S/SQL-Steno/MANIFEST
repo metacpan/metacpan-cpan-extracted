@@ -1,0 +1,10 @@
+README
+META.yml
+Makefile.PL
+lib/SQL/Steno.pm		The engine
+t/convert.t			Test various aspects
+t/db.t
+t/render.t
+t/shell.t
+ChangeLog
+MANIFEST			This list of files

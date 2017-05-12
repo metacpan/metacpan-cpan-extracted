@@ -1,0 +1,53 @@
+Revision history for Perl extension SVN::RaWeb::Light.
+
+0.60006 2015-12-28
+    - Update E-mail address.
+
+0.60004 2015-05-30
+    - Add resources/keywords to META.yml.
+
+0.60003 2014-01-31
+    - Minimum version of perl is 5.8.x (CPANTS).
+    - Fix the generation of ::Help.
+    - Add t/cpan-changes.t and t/style-trailing-space.t - fix their problems.
+    - Remove Makefile.PL - it was old and broken.
+    - Move the Mocks and Tests under ./t/lib .
+
+0.60002 2011-06-04
+    - Add more modules to the dependencies, including SVN::Core
+        - http://www.cpantesters.org/cpan/report/d85c4718-8c70-11e0-92a5-c348c9b7ec30
+    - Fix the POD coverage by making _escape private.
+
+0.60001 2006-10-10
+    - Added the Build.PL file and got it to build.
+    - Added "use strict" and "use warnings" to all files.
+    - Added t/pod.t and t/pod-coverage.t and made sure we have full POD
+    coverage.
+
+0.6.0   2005-07-07
+    - There's now a full test coverage.
+    - Added the URL translations. (with all relevant CGI parameters)
+    - Added the Help Screen.
+    - Added a link to showing the control panel.
+
+0.4.0   2005-04-12
+    - Added a test suite.
+    - Did some code cleanup.
+    - Fixed a bug where accessing the script without a leading / in the
+    path_info did not redirect to the same URL only with a /.
+
+0.2.2   2004-11-15
+    - Added an AUTHORS file
+    - Updated the README and the POD document to make the intention of
+    the module clearer.
+
+0.2.1   2004-11-11
+    - Fixed the bug with the ?rev=${HEAD} leading to a non-rev= URL and the one
+    with the rev=0 being ignored.
+    - Fix the bug with the .. directory listed in the top directory of the
+    CGI script.
+
+0.2.0   2004-11-09
+    First Stable Release.
+    Browse a single repository using a URL parameter.
+    The rev parameter.

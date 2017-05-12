@@ -1,0 +1,15 @@
+Changes
+examples/example1.pl
+lib/Simple/SAX/Serializer.pm
+lib/Simple/SAX/Serializer/Element.pm
+lib/Simple/SAX/Serializer/Handler.pm
+lib/Simple/SAX/Serializer/Parser.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/pod.t
+t/pod_coverage.t
+t/xml/handler.t
+t/xml/test.xml
+t/xml/xml.t

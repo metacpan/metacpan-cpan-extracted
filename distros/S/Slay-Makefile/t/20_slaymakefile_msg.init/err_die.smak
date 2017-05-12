@@ -1,0 +1,6 @@
+# Test the error message if a subroutine doesn't compile
+
+{
+   BEGIN { die "I don't wanna" }
+}
+

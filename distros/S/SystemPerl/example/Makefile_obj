@@ -1,0 +1,77 @@
+# -*- Makefile -*-
+# DESCRIPTION: SystemPerl: Example makefile
+#
+# This is executed in the "test_dir", not in this directory
+#
+# Copyright 2001-2014 by Wilson Snyder.  This program is free software; you
+# can redistribute it and/or modify it under the terms of either the GNU
+# Lesser General Public License Version 3 or the Perl Artistic License
+# Version 2.0.
+#
+
+# Sigh... SystemC should provide a program to determine this
+ifeq ($(SYSTEMC_ARCH),)
+  SYSTEMC_ARCH = linux
+endif
+
+SYSTEMPERL = ..
+SYSTEMPERL_INCLUDE ?= $(SYSTEMPERL)/src
+SYSTEMC_INCLUDE ?= $(SYSTEMC)/include
+SYSTEMC_LIBDIR ?= $(SYSTEMC)/lib-$(SYSTEMC_ARCH)
+
+CC = g++
+INCDIR += -I. -I$(SYSTEMPERL_INCLUDE) -I$(SYSTEMC_INCLUDE) -I../example
+LIBDIR += -L. -L$(SYSTEMPERL_INCLUDE) -L$(SYSTEMC_LIBDIR)
+VPATH += ../example $(SYSTEMPERL_INCLUDE)
+MAKEFILES += ../example/Makefile_obj
+
+SC_LIBS = -lsystemc $(SYSTEMC_LIBS)
+ifneq ($(wildcard $(SYSTEMC_LIBDIR)/*numeric_bit*),)
+  # Systemc 1.2.1beta
+  SC_LIBS   += -lnumeric_bit -lqt
+endif
+
+LIBS   =  $(SC_LIBS) -lm $(EXTRA_LIBS)
+
+SP_SP = $(wildcard ../example/*.sp)
+# /*AUTOTRACE*/ Looks for this
+CFLAGS += -DWAVES -DSP_COVERAGE -Wno-deprecated
+
+ifeq ($(VERILATOR_AUTHOR_SITE),1)	# Local... Else don't burden users
+CFLAGS += -g -Wall -Wno-char-subscripts -Werror $(SYSTEMC_CXX_FLAGS)
+endif
+
+# List Objects in bottom-up order, that way lower modules get errors first
+OBJS = $(SP_OBJS) ExMain.o Sp.o
+
+default:
+	@echo "Use 'make preproc' or 'make compile'"
+	false
+
+######################################################################
+
+SP_SP_BASE := $(basename $(notdir $(SP_SP)))
+SP_H   := $(addsuffix .h,$(SP_SP_BASE))
+SP_CPP := $(notdir $(wildcard *.cpp))
+SP_OBJS   := $(addsuffix .o,$(basename $(SP_CPP)))
+
+SPPREPROC_FLAGS = -M sp_preproc.d --tree ex.tree --preproc
+
+# Setup as a "always" rule; we don't check for enough sp_preproc dependencies
+# In a user example where you weren't editing sp_preproc, you could have:
+#preproc $(SP_CPP) $(SP_H): $(SP_SP)
+preproc:
+	perl ../sp_preproc $(INCDIR) $(SPPREPROC_FLAGS) $(SP_SP)
+
+compile: ex_main
+ex_main:	$(OBJS)
+	$(CC) $(CFLAGS) $(INCDIR) $(LIBDIR) -o $@ $^ $(LIBS) 2>&1 | c++filt
+
+run:	ex_main
+	./ex_main
+
+# Generic wildcard rules
+
+.cpp.o:
+	$(CC) $(CFLAGS) $(INCDIR) -c $<
+

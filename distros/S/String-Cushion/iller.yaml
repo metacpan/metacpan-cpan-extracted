@@ -1,0 +1,29 @@
+---
+doctype: dist
+
+header:
+  name: String-Cushion
+
+prereqs:
+  runtime:
+    requires:
+      - perl: 5.010001
+      - Sub::Exporter::Progressive
+  develop:
+    requires:
+       - perl: 5.014000
+
+plugins:
+ - +config: Author::CSSON
+
+ - +add_plugin: TravisYML
+   +before: Git::Tag
+   perl_version: 5.14 5.20
+
+---
+doctype: weaver
+
+plugins:
+  - +config: Author::CSSON
+
+  - +remove_plugin: Splint

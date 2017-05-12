@@ -1,0 +1,89 @@
+[Changes for 2.2.3 - 21 Mar, 2010]
+
+  Fix META.yml.
+
+[Changes for 2.2.2 - 10 Mar, 2010]
+
+  Subversion 1.6.x compatiblity fixes.
+
+[Changes for 2.2.1 - 22 Oct, 2008]
+
+  Fix the incorrect version information in META.yml
+
+  Mirror subsystem
+    * Fix memory leak for bootstrapping mirrors.
+
+[Changes for 2.2.0 - 17 Sep, 2008]
+
+  New features
+    * Branch support as 'svk branch' subcommand
+    * SVKBATCHMODE environment variable
+
+  Dependency
+    * Require Time::Progress
+
+  Mirror subsystem
+    * New bootstrap option to initialize a mirror from an svn dump
+      file, which can be an URL stored on the svk:dump-url property on
+      the server
+    * When committing or merging to a mirror, avoid roundtripping
+      the latest revision (requires Subversion 1.5)
+    * Fix a bug when mirroring a copy revision with unnormalized
+      revision outside mirror anchor and newer th an anchor head
+    * Fix URI escape issues for pushing changes to mirrors
+    * Support mirroring a source that was renamed from somewhere else
+    * Fix svk sync where a copy is made from revisions condensed with
+      snapshot made by previous sync --skipto
+
+  Merge subsystem
+    * Bugfixes for opened file handle passed to editor under win32,
+      causing file to be opened as read-only
+    * Fix a problem that merge-ticket might be reverted on mirror
+      in some cases
+    * Fix a bug when merging a copy with modification to the copied
+      source, it might cause checksum error
+    * Addition of equality check for merge tickets
+    * Better conflict handling that remembers the type of conflict,
+      handling of data from the merge editor
+
+  Tests
+
+    * Test coverage for offlining existing branches (both offline and
+      online)
+    * TODO tests for renaming of an intermediate branch tracking
+    * Test coverage for pulling into a branch from a local branch
+    * Test coverage for checking out to a path from svk br --checkout 
+    * Test coverage for modifying property changes (including conflicts)
+    * Fixed tests for baseless smerge
+    * Test coverage for switching a branch and proper handling of
+      merge tickets
+
+  General 
+    * General Documentation cleanup
+    * Documentation for SVK::Info properly matches expected output
+    * Conversion to use SVK::Log (and Log::Log4perl) for output
+    * Add an option of '0' to select "No project" if there is not a
+      project to use while mirroring a new URI
+    * svk will not set property status as modified when a path is added or 
+      replaced
+    * svk now stores known conflict types (provided by merge editor) in 
+      .conflict property
+    * General usability for working with files no longer exists in HEAD
+     
+  svk commit
+    * A property may have a conflict when the node is ok, so combine
+      them in the target list
+
+  svk merge
+    * Don't write to the log if it is a check run, regardless of -l option
+  
+  svk resolved
+    * svk resolved will resolve all conflicts in a checkout path
+
+  svk update
+    * Add custom svk:merge property resolver handler to handle merging
+      of merge tickets properly
+
+  Internal
+    * svk will not clobber upstream Log::Log4perl configurations
+

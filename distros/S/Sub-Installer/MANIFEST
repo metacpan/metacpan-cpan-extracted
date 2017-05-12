@@ -1,0 +1,14 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Sub/Installer.pm
+t/00.load.t
+t/eval_install.t
+t/install.t
+t/multiinstall.t
+t/pod-coverage.t
+t/pod.t
+t/reinstall.t

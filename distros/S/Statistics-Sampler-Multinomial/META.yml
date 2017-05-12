@@ -1,0 +1,37 @@
+---
+abstract: 'Generate multinomial samples using the conditional binomial method.'
+author:
+  - 'Shawn Laffan <shawnlaffan@gmail.com>'
+build_requires:
+  Devel::Symdump: '0'
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+  Test::Most: '0'
+  rlib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Statistics-Sampler-Multinomial
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  List::MoreUtils: '0'
+  List::Util: '0'
+  Math::Random::MT::Auto: '0'
+  Ref::Util: '0'
+  Scalar::Util: '0'
+  parent: '0'
+  perl: '5.014'
+resources:
+  bugtracker: https://github.com/shawnlaffan/perl-statistics-sampler-multinomial/issues/
+  repository: https://github.com/shawnlaffan/perl-statistics-sampler-multinomial.git
+version: '0.7'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,93 @@
+SYNOPSIS
+
+     use SyntaxHighlight::Any qw(highlight_string detect_language);
+    
+     my $str = <<'EOT';
+     while (<>) {
+         $lines++;
+         $nonblanks++ if  /\S/;
+         $blanks++ unless /\S/;
+     }
+     EOT
+     say highlight_string($str, {lang=>"perl"});
+     my @lang = detect_language($str); # => ("perl")
+
+DESCRIPTION
+
+    CAVEAT: EARLY DEVELOPMENT MODULE. SOME FUNCTIONS NOT YET IMPLEMENTED.
+    HELP ON ADDING BACKENDS APPRECIATED.
+
+    This module provides a common interface for syntax highlighting and
+    detecting programming language in code.
+
+FUNCTIONS
+
+ detect_language($code, \%opts) => LIST
+
+    CURRENTLY NOT YET IMPLEMENTED.
+
+    Attempt to detect programming language of $code and return zero or more
+    possible candidates. Return empty list if cannot detect. Die on error
+    (e.g. no backends available or unexpected output from backend).
+
+    %opts is optional. Known options:
+
+ highlight_string($code, \%opts) => STR
+
+    Syntax-highlight $code and return the highlighted string. Will choose
+    an appropriate and available backend which is capable of formatting
+    code in the specified/detected language and to the specified output.
+    Die on error (e.g. unexpected output from backend).
+
+    Will return $code as-is if no backends are available (a warning is
+    produced via Log::Any though).
+
+    By default try to detect whether to output HTML code or ANSI codes (see
+    output option). By default try to detect language of $code.
+
+    Backends: currently in general tries GNU Source-highlight (via
+    Syntax::SourceHighlight, or binary if module not available), then
+    Pygments (binary). Patches for detecting/using other backends are
+    welcome.
+
+    %opts is optional. Known options:
+
+      * lang => STR
+
+      Tell the function what programming language $code should be regarded
+      as. The list of known languages can be retrieved using
+      list_languages().
+
+      If unspecified, the function will perform the following. For backends
+      which can detect the language, this function will just give $code to
+      the backend for it to figure out the language. For backends which
+      cannot detect the language, this function will first call
+      detect_language().
+
+      NOTE: SINCE detect_language() is not implemented yet, please specify
+      this.>
+
+      * output => STR
+
+      Either ansi, in which syntax-highlighting is done with ANSI escape
+      color codes, or html. If not specified, will try to detect whether
+      program is running under terminal (in which case ansi is chosen) or
+      web environment e.g. under CGI/FastCGI, mod_perl, or Plack (in which
+      case html is chosen). If detection fails, ansi is chosen.
+
+ list_languages() => LIST
+
+    List known languages.
+
+BACKENDS
+
+    Currently, the distribution does not pull the backends as dependencies.
+    Please make sure you install desired backends.
+
+SEE ALSO
+
+    For syntax-highlighting (as well as encoding/formatting) to JSON,
+    there's JSON::Color or Syntax::Highlight::JSON (despite the module
+    name, the latter is an encoder, not strictly a string syntax
+    highlighter). For YAML there's YAML::Tiny::Color.
+

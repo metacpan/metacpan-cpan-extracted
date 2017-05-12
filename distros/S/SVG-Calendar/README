@@ -1,0 +1,70 @@
+SVG-Calendar version 0.1.2
+===========================
+
+This module is used to create calendars in standards compliant format.
+Currently only monthly pages or whole years ie 12 individual months can be
+created. You can create calendars with the supplied svgcal.pl program see:
+
+$ svgcal.pl --help
+or
+$ svgcal.pl --man
+
+For more information.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc [% module %]
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=[% package %]
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/[% package %]
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/[% package %]
+
+    Search CPAN
+        http://search.cpan.org/dist/[% package %]/
+
+    Source Code
+        git://github.com/ivanwills/[% package %].git
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  SVG
+  Math::Trig
+  Template
+  Template::Provider::FromDATA
+  Image::ExifTool
+  Class::Date
+  Clone
+  Readonly
+  version
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2006-2009 Ivan Wills (14 Mullion Close, Hornsby Heights, NSW Australia 2077)
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

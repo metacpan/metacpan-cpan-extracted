@@ -1,0 +1,28 @@
+#!/usr/bin/shebanml
+
+xml{
+
+a\bar{}
+a\.bar[thing=deal]
+a\foo.bar[thing=deal]
+a\.foo.bar[thing=deal]
+foo.bar[thing=deal]
+.foo_bar[=id @class :name thing=deal]
+.foo:bar[thing=deal stuff="all that jazz" and="also::this"]
+
+multi.line[
+  problem=none
+  yay="this is fun"
+]thing[=stuff]
+
+.this{}
+.that[=q]{stuff stuff stuff} thing thing thing
+
+# ack ] oh man we're doomed!
+
+bah[:whatever mess=""]
+bah[:whatever mess="\""]
+Here you see why 'keepend' isn't working
+bah[:whatever thing mess=" \" ] "] blah blah[this=" "]
+
+}#xml;

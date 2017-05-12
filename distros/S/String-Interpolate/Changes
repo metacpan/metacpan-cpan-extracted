@@ -1,0 +1,27 @@
+Revision history for Perl module String::Interpolate
+
+0.32 2015-06-28 NEILB
+    - Added SEE ALSO section. SWEETKID++
+    - Got rid of indirect method notation in the doc. SWEETKID++
+
+0.31 2015-06-07 NEILB
+    - Switched to Dist::Zilla
+    - Fixed RT#95320 - removed space character from function prototype
+    - Added copyright and author section
+    - Fixed 2 minor pod errors
+    - Reformatted this file as per CPAN::Changes::Spec
+
+0.3 2004-05-07 NOBULL
+    - suppress error in exec() when $_ undefined in safe_underscore mode
+    - propagate arguments from safe() constructor to new() constructor
+    - Safe::Hole in opcode-restoring mode if $Safe::Hole::VERSION > 0.09
+    - Spelling corrections in POD
+    - Thanks to Paul Kulchenko for bug report
+
+0.2 2003-11-14 NOBULL
+    - bugfix in exec
+    - experimental support for lexicals
+
+0.1 2002-04-17 NOBULL
+    - original version;
+

@@ -1,0 +1,20 @@
+README
+Changes
+lib/SWF/File.pm
+lib/SWF/Element.pm
+lib/SWF/Element.pod
+lib/SWF/BinStream.pm
+lib/SWF/Parser.pm
+lib/SWF/BinStream/File.pm
+lib/SWF/BinStream/Codec.pod
+lib/SWF/BinStream/Codec/Zlib.pm
+Makefile.PL
+MANIFEST
+test.pl
+dumpswf.plx
+samples/readme.txt
+samples/sample.plx
+samples/jpg2swf.plx
+samples/img2swf.plx
+samples/linkext.plx
+META.yml                                 Module meta-data (added by MakeMaker)

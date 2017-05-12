@@ -1,0 +1,6 @@
+Revision history for Perl extension Statistics::CalinskiHarabasz.
+
+0.01  Thu Jul 14 16:32:52 2005
+	- original version; created by h2xs 1.23 with options
+		-X -n Statistics::CalinskiHarabasz
+

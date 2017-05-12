@@ -1,0 +1,774 @@
+NAME
+    Shell::Base - A generic class to build line-oriented command
+    interpreters.
+
+SYNOPSIS
+      package My::Shell;
+
+      use Shell::Base;
+      use base qw(Shell::Base);
+
+      sub do_greeting {
+          return "Hello!"
+      }
+
+DESCRIPTION
+    Shell::Base is a base class designed for building command line programs.
+    It defines a number of useful defaults, simplifies adding commands and
+    help, and integrates well with Term::ReadLine.
+
+    After writing several REP (Read-Eval-Print) loops in Perl, I found
+    myself wishing for something a little more convenient than starting
+    with:
+
+      while(1) {
+          my $line = <STDIN>;
+          last unless defined $line;
+
+          chomp $line;
+          if ($line =~ /^...
+
+  Features
+    Shell::Base provides simple access to many of the things I always write
+    into my REP's, as well as support for many thing that I always intend
+    to, but never find time for:
+
+    readline support
+        Shell::Base provides simple access to the readline library via
+        Term::ReadLine, including built-in tab-completion and easy
+        integration with the history file features.
+
+        If a subclass does want or need Term::ReadLine support, then it can
+        be replaced in subclasses by overriding a few methods. See "Using
+        Shell::Base Without readline", below.
+
+    Trivial to add commands
+        Adding commands to your shell is as simple as creating methods: the
+        command "foo" is dispatched to "do_foo". In addition, there are
+        hooks for unknown commands and for when the user just hits <Return>,
+        both of which a subclass can override.
+
+    Integrated help system
+        Shell::Base makes it simple to integrate online help within
+        alongside your command methods. Help for a command "foo" can be
+        retrieved with "help foo", with the addition of one method. In
+        addition, a general "help" command lists all possible help commands;
+        this list is generated at run time, so there's no possibility of
+        forgetting to add help methods to the list of available topics.
+
+    Pager integration
+        Output can be sent through the user's default pager (as defined by
+        $ENV{'PAGER'}, with a reasonable default) or dumped directly to
+        STDOUT.
+
+    Customizable output stream(s)
+        Printing is handled through a print() method, which can be
+        overridden in a subclass to send output anywhere.
+
+    Pre- and post-processing methods
+        Input received from readline() can be processed before it is parsed,
+        and output from command methods can be post-processed before it is
+        sent to print().
+
+    Automatic support for RC files
+        A simple RC-file parser is built in, which handles name = value type
+        configuration files. This parser handles comments, whitespace,
+        multiline definitions, boolean and (name, value) option types, and
+        multiple files (e.g., /etc/foorc, $HOME/.foorc).
+
+    Shell::Base was originally based, conceptually, on Python's "cmd.Cmd"
+    class, though it has expanded far beyond what "Cmd" offers.
+
+METHODS
+    There are two basic types of methods: methods that control how a
+    Shell::Base-derived object behaves, and methods that add command to the
+    shell.
+
+    All aspects of a Shell::Base-derived object are available via accessors,
+    from the Term::ReadLine instance to data members, to make life easier
+    for subclass implementors.
+
+    *NB:* The following list isn't really in any order!
+
+    new The constructor is called "new", and should be inherited from
+        Shell::Base (and not overridden). "new" should be called with a
+        reference to a hash of name => value parameters:
+
+          my %options = (HISTFILE => glob("~/.myshell_history"),
+                         OPTION_1 => $one,
+                         OPTION_2 => $two);
+
+          my $shell = My::Shell->new(\%options);
+
+        "new" calls a number of initializing methods, each of which will be
+        called with a reference to the passed in hash of parameters as the
+        only argument:
+
+        init_rl(\%args)
+            "init_rl" initializes the Term::ReadLine instance. If a subclass
+            does not intend to use Term::ReadLine, this method can be
+            overridden. (There are other methods that need to be overridden
+            to eliminate readline completely; see "Using Shell::Base Without
+            readline" for more details.)
+
+            The completion method, "complete", is set here, though the list
+            of possible completions is generated in the "init_completions"
+            method.
+
+            If a HISTFILE parameter is passed to "init_rl", then the
+            internal Term::ReadLine instance will attempt to use that file
+            for history functions. See "History Functions" in
+            Term::ReadLine::Gnu for more details.
+
+        init_rcfiles(\%args)
+            "init_rcfiles" treats each element in the RCFILES array (passed
+            into the contructor) as a configuration file, and attempts to
+            read and parse it. See "RC Files", below.
+
+        init_help(\%args)
+            "init_help" generates the list of available help topics, which
+            is all methods that match the pattern "^help_", by default. Once
+            this list is generated, it is stored using the "helps" method
+            (see "helps").
+
+        init_completions(\%args)
+            "init_completions" creates the list of methods that are
+            tab-completable, and sets them using the "completions" method.
+            By default, it finds all methods that begin with "^do_" in the
+            current class and superclass(es).
+
+            The default completion method, "complete", chooses completions
+            from this list based on the line and word being completed. See
+            "complete".
+
+        init(\%args)
+            A general purpose "init" method, designed to be overridden by
+            subclasses. The default "init" method in Shell::Base does
+            nothing.
+
+            In general, subclass-specific initializations should go in this
+            method.
+
+        A subclass's "init" method should be carful about deleting from the
+        hash that they get as a parameter -- items removed from the hash are
+        really gone. At the same time, items can be added to the hash, and
+        will persist. The original parameters can be retrieved at run time
+        using the "args" method.
+
+        Similarly, configuration data parsed from RCFILES can be retrieved
+        using the "config" method.
+
+    run The main "loop" of the program is a method called "run" -- all other
+        methods are called in preparation for the call to "run", or are
+        called from within "run". "run" takes no parameters, and does not
+        return.
+
+          $shell = My::Shell->new();
+          $shell->run();
+
+        At the top of the loop, "run" prints the value of $self->intro, if
+        it is defined:
+
+          my $intro = $self->intro();
+          $self->print("$intro\n")
+              if defined $intro;
+
+        "run" does several things for each iteration of the REP loop that
+        are worth noting:
+
+        *   Reads a line of input using $self->readline(), passing the value
+            of $self->prompt():
+
+              $line = $self->readline($self->prompt);
+
+        *   Passes that line through $self->precmd(), for possible
+            manipulation:
+
+              $line = $self->precmd($line);
+
+        *   Parses the line:
+
+              ($cmd, $env, @args) = $self->parseline($line);
+
+            See "parseline" for details about "parseline", and what $cmd,
+            $env, and @args are.
+
+        *   Update environment variables with entries from %$env, for the
+            command $cmd only.
+
+        *   Checks the contents of $cmd; there are a few special cases:
+
+            *   If $cmd matches $Shell::Base::RE_QUIT, the method "quit" is
+                invoked:
+
+                  $output = $self->quit();
+
+                $RE_QUIT is "^(?i)\s*(quit|exit|logout)" by default
+
+            *   Otherwise, if $cmd matches $Shell::Base::RE_HELP, the method
+                "help" is invoked, with @args as parameters:
+
+                  $output = $self->help(@args);
+
+                $RE_HELP is "^(?i)\s*(help|\?)" by default.
+
+            *   Otherwise, if $cmd matches $Shell::Base::RE_SHEBANG, the
+                method "do_shell" is invoked, with @args as parameters:
+
+                  $output = $self->do_shell(@args);
+
+                $RE_SHEBANG is "^\s*!\s*$" by default.
+
+            *   Otherwise, the command "do_$cmd" is invoked, with @args as
+                parameters:
+
+                  my $method = "do_$cmd";
+                  $output = $self->$method(@args);
+
+        *   $output is passed to $self->postcmd() for postprocessing:
+
+              $output = $self->postcmd($output);
+
+        *   Finally, if $output is not "undef", it is passed to
+            $self->print(), with a newline appended:
+
+              $self->print("$output\n")
+                  if defined $output;
+
+        When the main loop ends, usually through the "exit" or "quit"
+        commands, or when the user issues CTRL-D, "run" calls the "quit"
+        method.
+
+    args([$what])
+        The original hash of arguments passed into the constructor is stored
+        in the instance, and can be retrieved using the args method, which
+        is an accessor only (though the hash returned by "args" is live, and
+        changes will propogate).
+
+        If "args" is passed a value, then the value associated with that key
+        will be returned. An example:
+
+          my $shell = My::Shell->new(FOO => "foo", BAR => "bar");
+
+          my $foo = $shell->args("FOO");  # $foo contains "foo"
+          my $bar = $shell->args("BAR");  # $bar contains "bar"
+          my $baz = $shell->args("BAZ");  # $baz is undefined
+          my $args = $shell->args();      # $args is a ref to the whole hash
+
+        As a convenience, if a specified argument is not found, it is
+        uppercased, and then tried again, so:
+
+          my $foo = $shell->args("FOO");
+
+        and
+
+          my $foo = $shell->args("foo");
+
+        are identical if there is a "FOO" arg and no "foo" arg.
+
+    config([$what])
+        Configuration data gleaned from RCFILES can be retrieved using the
+        "config" method. "config" behaves similarly to the "args" method.
+
+    helps
+        When called without arguments, "helps" returns a list of all the
+        available help_foo methods, as a list.
+
+        When called with arguments, "helps" uses these arguments to set the
+        current list of help methods.
+
+        This is the method called by "init_help" to fill in the list of
+        available help methods, and "help" when it needs to figure out the
+        available help topics.
+
+    completions
+        Similar to "helps", except that completions returns or sets the list
+        of completions possible when the user hits <tab>.
+
+    print
+        The "print" method, well, prints its data. "print" is a method so
+        that subclasses can override it; here is a small example class,
+        "Tied::Shell", that wraps around a Tie::File instance, in which all
+        data is printed to the Tie::File instance, as well as to the normal
+        place. This makes it ideal for (e.g.) logging sessions:
+
+          package Tied::Shell;
+
+          use Shell::Base;
+          use Tie::File;
+
+          use strict;
+          use base qw(Shell::Base);
+
+          sub init {
+              my ($self, $args) = @_;
+              my @file;
+
+              tie @file, 'Tie::File', $args->{ FILENAME };
+
+              $self->{ TIEFILE } = \@file;
+          }
+
+          # Append to self, then call SUPER::print
+          sub print {
+              my ($self, @lines) = @_;
+              push @{ $self->{ TIEFILE } }, @lines;
+
+              return $self->SUPER::print(@lines);
+          }
+
+          sub quit {
+              my $self = shift;
+              untie @{ $self->{ TIEFILE } };
+              $self->SUPER::quit(@_);
+          }
+
+        (See Tie::File for the appropriate details.)
+
+    readline
+        The "readline" method is a wrapper for $self->term->readline; it is
+        called at the top of the REP loop within "run" to get the next line
+        of input. "readline" is it's own method so that subclasses which do
+        not use Term::ReadLine can override it specifically. A very basic,
+        non-readline "readline" could look like:
+
+          sub readline {
+              my ($self, $prompt) = @_;
+              my $line;
+
+              print $prompt;
+              chomp($line = <STDIN>);
+
+              return $line;
+          }
+
+        As implied by the example, "readline" will be passed the prompt to
+        be displayed, which should be a string (it will be treated like
+        one).
+
+        A good example of when this might be overridden would be on systems
+        that prefer to use "editline" instead of GNU readline, using the
+        "Term::EditLine" module (e.g., NetBSD):
+
+          # Initialize Term::EditLine
+          sub init_rl {
+              my ($self, $args) = @_;
+
+              require Term::EditLine;
+              $self->{ TERM } = Term::EditLine->new(ref $self);
+
+              return $self;
+          }
+
+          # Return the Term::EditLine instance
+          sub term {
+              my $self = shift;
+              return $self->{ TERM };
+          }
+
+          # Get a line of input
+          sub readline {
+              my ($self, $prompt) = @_;
+              my $line;
+              my $term = $self->term;
+
+              $term->set_prompt($prompt);
+              $line = $term->gets();
+              $term->history_enter($line);
+
+              return $line;
+          }
+
+    default
+        When an unknown command is received, the "default" method is
+        invoked, with ($cmd, @args) as the arguments. The default "default"
+        method simply returns an error string, but this can of course be
+        overridden in a subclass:
+
+          sub default {
+              my ($self, @cmd) = @_;
+              my $output = `@cmd`;
+              chomp $output;  # everything is printed with an extra "\n"
+              return $output;
+          }
+
+    precmd
+        "precmd" is called after a line of input is read, but before it is
+        parsed. "precmd" will be called with $line as the sole argument, and
+        it is expected to return a string suitable for splitting with
+        "parseline". Any amount of massaging can be done to $line, of
+        course.
+
+        The default "precmd" method does nothing:
+
+          sub precmd {
+              my ($self, $line) = @_;
+              return $line;
+          }
+
+        This would be a good place to handle things tilde-expansion:
+
+          sub precmd {
+              my ($self, $line) = @_;
+              $line =~ s{~([\w\d_-]*)}
+                        { $1 ? (getpwnam($1))[7] : $ENV{HOME} }e;
+              return $line;
+          }
+
+    postcmd
+        "postcmd" is called immediately before any output is printed.
+        "postcmd" will be passed a scalar containing the output of whatever
+        command "run" invoked. "postcmd" is expected to return a string
+        suitable for printing; if the return of "postcmd" is undef, then
+        nothing will be printed.
+
+        The default "postcmd" method does nothing:
+
+          sub postcmd {
+              my ($self, $output) = @_;
+              return $output;
+          }
+
+        You can do fun output filtering here:
+
+          use Text::Bastardize;
+          my $bastard = Text::Bastardize->new;
+          sub postcmd {
+              my ($self, $output) = @_;
+
+              $bastard->charge($output);
+
+              return $bastard->k3wlt0k()
+          }
+
+        Or translation:
+
+          use Text::Iconv;
+          my $converter;
+          sub postcmd {
+              my ($self, $output) = @_;
+
+              unless (defined $converter) {
+                  # Read these values from the config files
+                  my $from_lang = $self->config("from_lang");
+                  my $to_lang = $self->config("to_lang");
+
+                  $converter = Text::Iconv->new($from_lang, $to_lang);
+
+                  # Return undef on error, don't croak
+                  $converter->raise_error(0);
+              }
+
+              # Fall back to unconverted output, not croak
+              return $completer->convert($output) || $output;
+          }
+
+        Or put the tildes back in:
+
+          sub postcmd {
+              my ($self, $line) = @_;
+              $line =~ s{(/home/([^/ ]+))}
+                        { -d $1 ? "~$2" : $1 }ge;
+              return $line;
+          }
+
+    pager
+        The "pager" method attempts to determine what the user's preferred
+        pager is, and return it. This can be used within an overridden
+        "print" method, for example, to send everything through a pager:
+
+          sub print {
+              my ($self, @stuff) = @_;
+              my $pager = $self->pager;
+
+              open my $P, "|$pager" or carp "Can't open $pager: $!";
+              CORE::print $P @stuff;
+              close $P;
+          }
+
+        Note the explicit use of CORE::print, to prevent infinite recursion.
+
+    parseline
+        A line is divided into ($command, %env, @args) using
+        $self->parseline(). A command "foo" is dispatched to a method
+        "do_foo", with @args passed as an array, and with %ENV updated to
+        include %env.
+
+        If there is no "do_foo" method for a command "foo", then the method
+        "default" will be called. Subclasses can override the "default"
+        method.
+
+        %ENV is localized and updated with the contents of %env for the
+        current command. %env is populated in a similar fashion to how
+        /bin/sh does; the command:
+
+            FOO=bar baz
+
+        Invokes the "do_baz" method with $ENV{'FOO'} = "bar".
+
+        Shell::Base doesn't (currently) do anything interesting with
+        pipelines; the command:
+
+          foo | bar
+
+        will be parsed by parseline() as:
+
+          ("foo", {}, "|", "bar")
+
+        rather than as two separate connected commands. Support for
+        pipelines in on the TODO list.
+
+    prompt
+        Gets or sets the current prompt. The default prompt is:
+
+          sprintf "(%s) \$ ", __PACKAGE__;
+
+        The prompt method can be overridden, of course, possibly using
+        something like "String::Format":
+
+          use Cwd;
+          use File::Basename qw(basename);
+          use Net::Domain qw(hostfqdn);
+          use String::Format qw(stringf);
+          use Sys::Hostname qw(hostname);
+
+          sub prompt {
+              my $self = shift;
+              my $fmt = $self->{ PROMPT_FMT };
+              return stringf $fmt => {
+                  '$' => $$,
+                  'w' => cwd,
+                  'W' => basename(cwd),
+                  '0' => $self->progname,
+                  '!' => $self->prompt_no,
+                  'u' => scalar getpwuid($<),
+                  'g' => scalar getgrgid($(),
+                  'c' => ref($self),
+                  'h' => hostname,
+                  'H' => hostfqdn,
+              };
+          }
+
+        Then $self->{ PROMPT_FMT } can be set to, for example, "%u@%h %w
+        %%", which might yield a prompt like:
+
+          darren@tumbleweed /tmp/Shell-Base %
+
+        (See String::Format for the appropriate details.)
+
+        The value passed to "prompt" can be a code ref; if so, it is invoked
+        with $self and any additional arguments passed to "prompt" as the
+        arguments:
+
+            $self->prompt(\&func, @stuff);
+
+        Will call:
+
+            &$func($self, @stuff);
+
+        and use the return value as the prompt string.
+
+    intro / outro
+        Text that is displayed when control enters "run" ("intro") and
+        "quit" ("outro"). If the method returns a non-undef result, it will
+        be passed to $self->print().
+
+    quit
+        The "quit" method currently handles closing the history file; if it
+        is overridden, $self->SUPER::quit() should be called, so that the
+        history file will be written out.
+
+        The results of $self->outro() will be passed to $self->print() as
+        well.
+
+  Methods That Add Commands
+    Any command that run() doesn't recognize will be treated as a command; a
+    method named "do_$command" will be invoked, in an eval block. Remember
+    that a line is parsed into ($command, %env, @args); "do_$command" will
+    be invoked with @args as @_, and %ENV updated to include the contents of
+    %env. The effect is similar to:
+
+      my ($command, $env, @args) = $self->parseline($line);
+      my $method = "do_$command";
+      local %ENV = (%ENV, %$env);
+
+      my $output = $self->$method(@args);
+
+    $output will be passed to $self->print() if it is defined.
+
+    Here is method that implements the "env" command:
+
+      sub do_env {
+          my ($self, @args) = @_;
+          my @output;
+
+          for (keys %ENV) {
+              push @output, "$_=$ENV{$_}";
+          }
+
+          return join "\n", @output;
+      }
+
+    And here is an "rm" command:
+
+      sub do_rm {
+          my ($self, @files) = @_;
+          my ($file, @errors);
+
+          for $file (@files) {
+              unlink $file
+                  or push @errors, $file;
+          }
+
+          if (@errors) {
+              return "Couldn't delete " . join ", ", @errors;
+          }
+
+          return;
+      }
+
+MISCELLANEOUS
+  Quick Imports
+    If Shell::Base, or any Shell::Base subclass that does not does implement
+    an "import" method, is invoked as:
+
+      use My::Shell qw(shell);
+
+    a function named "shell" is installed in the calling package. This
+    "shell" function is very simple, and turns this:
+
+      shell(%args);
+
+    into this:
+
+      My::Shell->new(%args)->run();
+
+    This is most useful for one-liners:
+
+      $ perl -MMy::Shell=shell -e shell
+
+  RC Files
+    The rcfile parser is simple, and parses (name, value) tuples from config
+    files, according to these rules:
+
+    Definitions
+        Most definitions are in name = value format:
+
+          foo = bar
+          baz = quux
+
+        Boolean defitions in the form
+
+          wiffle
+
+        are allowed, and define "wiffle" as 1. Any definition without an =
+        is considered a boolean definition. Boolean definitions in the form
+        "*no*wiffle" define "wiffle" as 0:
+
+          nowiffle
+
+    Comments
+        Everything after a # is considered a comment, and is stripped from
+        the line immediately
+
+    Whitespace
+        Whitespace is (mostly) ignored. The following are equivalent:
+
+          foo=bar
+          foo    =    bar
+
+        Whitespace after the beginning of the value is *not* ignored:
+
+          foo =    bar baz  quux
+
+        "foo" contains "bar baz quux".
+
+    Line continuations
+        Lines ending with \ are continued on the next line:
+
+          form_letter = Dear %s,\
+          How are you today? \
+          Love, \
+          %s
+  
+  Using Shell::Base Without readline
+    The appropriate methods to override in this case are:
+
+    init_rl
+        The readline initialization method.
+
+    term
+        Returns the Term::ReadLine instance; primarily used by the other
+        methods listed in this section.
+
+    readline
+        Returns the next line of input. Will be passed 1 argument, the
+        prompt to display. See "readline" for an example of overriding
+        "readline".
+
+    print
+        Called with the data to be printed. By default, this method prints
+        to $self->term->OUT, but subclasses that aren't using Term::ReadLine
+        will want to provide a useful alternative. One possibily might be:
+
+          sub print {
+              my ($self, @print_me) = @_;
+              CORE::print(@print_me);
+          }
+
+        Another good example was given above, in "pager":
+
+          sub print {
+              my ($self, @stuff) = @_;
+              my $pager = $self->pager;
+
+              open my $P, "|$pager" or carp "Can't open $pager: $!";
+              CORE::print $P @stuff;
+              close $P;
+          }
+
+NOTES
+    Some parts of this API will likely change in the future. In an upcoming
+    version, "do_$foo" methods will mostly likely be expected to return a
+    ($status, $output) pair rather than simply $output. Any API changes that
+    are likely to break existing applications will be noted.
+
+TODO
+    abbreviations
+        Add abbreviation support, by default via Text::Abbrev, but
+        overriddable, so that a shell can have (for example), \x type
+        commands, or /x type commands. This can currently be done by
+        overriding the precmd() method or parseline() methods; for example,
+        this parseline() method strips a leading "/", for IRC-like commands
+        ("/foo", "/bar")
+
+          sub parseline {
+              my ($self, $line) = @_;
+              my ($cmd, $env, @args) = $self->SUPER::parseline($line);
+
+              $cmd =~ s:^/::;
+              return ($cmd, $env, @args);
+          }
+
+        Another way to implement abbreviations would be to override the
+        "complete" method.
+
+    command pipelines
+        I have some ideas about how to implement pipelines, but, since I
+        have yet to look at the code in any existing shells, I might be
+        completely insane and totally on the wrong track. I therefore
+        reserve the right to not implement this feature now, until I've
+        looked at how some proper shells implement pipelines.
+
+AUTHOR
+    darren chamberlain <darren@cpan.org>
+
+REVISION
+    This documentation describes "Shell::Base", $Revision: 1.5 $.
+
+COPYRIGHT
+    Copyright (C) 2003 darren chamberlain. All Rights Reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

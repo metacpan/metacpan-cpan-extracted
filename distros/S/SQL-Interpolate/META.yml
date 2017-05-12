@@ -1,0 +1,57 @@
+---
+name: SQL-Interpolate
+version: 0.32
+author:
+  - David Manura (http://math2.org/david/contact)
+abstract: Simplified interpolation of Perl variables into SQL statements
+license: perl
+recommends:
+  Filter::Simple: 0
+  Text::Balanced: >= 1.87
+provides:
+  DBIx::Interpolate:
+    file: lib/DBIx/Interpolate.pm
+    version: 0.32
+  DBIx::Interpolate::STX:
+    file: lib/DBIx/Interpolate.pm
+    version: 0.32
+  SQL::Interpolate:
+    file: lib/SQL/Interpolate.pm
+    version: 0.32
+  SQL::Interpolate::And:
+    file: lib/SQL/Interpolate/Macro.pm
+    version: 0.32
+  SQL::Interpolate::Filter:
+    file: lib/SQL/Interpolate/Filter.pm
+    version: 0.32
+  SQL::Interpolate::If:
+    file: lib/SQL/Interpolate/Macro.pm
+    version: 0.32
+  SQL::Interpolate::Link:
+    file: lib/SQL/Interpolate/Macro.pm
+    version: 0.32
+  SQL::Interpolate::Macro:
+    file: lib/SQL/Interpolate/Macro.pm
+    version: 0.32
+  SQL::Interpolate::Or:
+    file: lib/SQL/Interpolate/Macro.pm
+    version: 0.32
+  SQL::Interpolate::Paren:
+    file: lib/SQL/Interpolate/Macro.pm
+    version: 0.32
+  SQL::Interpolate::Rel:
+    file: lib/SQL/Interpolate/Macro.pm
+    version: 0.32
+  SQL::Interpolate::RelProcessor:
+    file: lib/SQL/Interpolate/Macro.pm
+    version: 0.32
+  SQL::Interpolate::SQL:
+    file: lib/SQL/Interpolate.pm
+    version: 0.32
+  SQL::Interpolate::SQLFilter:
+    file: lib/SQL/Interpolate/Macro.pm
+    version: 0.32
+  SQL::Interpolate::Variable:
+    file: lib/SQL/Interpolate.pm
+    version: 0.32
+generated_by: Module::Build version 0.2611

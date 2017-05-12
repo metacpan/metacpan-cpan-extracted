@@ -1,0 +1,117 @@
+<h1><& SELF:title, %ARGS &></h1>
+
+<div id="page-content">
+  <% $html | n %>
+</div>
+
+% unless ($is_current_revision) {
+<p>
+  <a href="<% $page->uri() %>"><% loc('Back to current revision') %></a>
+</p>
+
+<form action="<% $page->uri() %>" method="post" class="flush-left">
+  <input type="hidden" name="x-tunneled-method" value="PUT" />
+  <input type="hidden" name="content" value="<% $revision->content() %>" />
+  <input type="hidden" name="is_restoration_of_revision_number" value="<% $revision->revision_number() %>" />
+  <input type="hidden" name="comment" value="<% loc( 'Restoring revisoin %1', $revision->revision_number() ) %>" />
+  <input class="submit" type="submit" value="<% loc('Restore this revision') %>" />
+</form>
+% }
+
+<div id="attribution">
+% if ( $revision->revision_number() > 1 ) {
+%   if ($is_current_revision) {
+  <p>
+    <& /lib/user-image.mas, user => $revision->user() &>
+    <% loc( 'Last edited by <a href="%html(%1)">%html(%2)</a> %on_datetime(%3).',
+            $wiki->uri_for_member( $revision->user() ),
+            $revision->user()->best_name(),
+            $c->user->set_time_zone_for_dt( $revision->creation_datetime() ) ) | n %>
+  </p>
+%   } else {
+  <p>
+    <& /lib/user-image.mas, user => $revision->user() &>
+    <% loc( 'This revision was created by <a href="%html(%1)">%html(%2)</a> %on_datetime(%3).',
+            $wiki->uri_for_member( $revision->user() ),
+            $revision->user()->best_name(),
+           $c->user->set_time_zone_for_dt( $revision->creation_datetime() ) ) | n %>
+%   }
+  </p>
+% }
+  <p>
+% if ( $revision->revision_number() == 1 || $revision->user_id() != $page->user_id() ) {
+    <& /lib/user-image.mas, user => $page->user() &>
+% }
+    <% loc( 'Page created by <a href="%html(%1)">%html(%2)</a> %on_datetime(%3).',
+            $wiki->uri_for_member( $page->user() ),
+            $page->user()->best_name(),
+            $c->user->set_time_zone_for_dt( $page->creation_datetime() ) ) | n %>
+  </p>
+</div>
+
+% if ( $c->request()->params()->{debug} ) {
+<pre>
+<% $revision->content() %>
+</pre>
+% }
+
+<div id="revision-controls">
+% if ( $page->revision_count() > 1 ) {
+  <h2><% loc('Revisions') %></h2>
+
+  <p>
+    <% loc( 'This page has %1 revisions.', $page->revision_count() ) %>
+  </p>
+%   if ( $revision->revision_number() > 1 ) {
+  <p>
+    <a href="<% $page->uri( view => 'diff', query => { revision1 => $revision->revision_number() - 1, revision2 => $revision->revision_number() } ) %>"><% loc( 'Compare to previous revision') %></a>
+%     if ( $revision->revision_number() != $page->revision_count() ) {
+    |
+    <a href="<% $page->uri( view => 'diff', query => { revision1 => $revision->revision_number(), revision2 => $revision->revision_number() + 1 } ) %>"><% loc( 'Compare to next revision') %></a>
+%     }
+  </p>
+  <p>
+    <a href="<% $page->uri( view => 'revision/' . ( $revision->revision_number() - 1 ) ) %>"><% loc( 'View previous revision') %></a>
+%     if ( $revision->revision_number() != $page->revision_count() ) {
+    |
+    <a href="<% $page->uri( view => 'revision/' . ( $revision->revision_number() + 1 ) ) %>"><% loc( 'View next revision') %></a>
+%     }
+  </p>
+%   }
+% }
+
+% if ( $c->user()->has_permission_in_wiki( wiki => $wiki, permission => Silki::Schema::Permission->Manage() ) ) {
+  <p>
+    <a href="<% $revision->uri( view => 'delete_confirmation' ) %>"><% loc('Purge this revision') %></a>
+  </p>
+% }
+
+</div>
+
+<%args>
+$page
+$revision
+$is_current_revision
+$html
+</%args>
+
+<%init>
+my $wiki = $page->wiki();
+</%init>
+
+<%attr>
+show_title => 0
+sidebar => [ 'page/tags', 'page/incoming-links', 'recently-viewed' ]
+</%attr>
+
+<%method title>
+<% $page->title() %>
+% unless ($is_current_revision) {
+(<% loc( 'Revision %1 of %2', $revision->revision_number(), $page->most_recent_revision()->revision_number() ) %>)
+% }
+<%args>
+$page
+$revision
+$is_current_revision
+</%args>
+</%method>

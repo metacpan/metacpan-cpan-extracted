@@ -1,0 +1,24 @@
+html{
+  # this is a comment
+  head{
+    title{whatever}
+  }
+body{
+  p{some random text and junk}
+  p{and more text
+    # not sure if it matters that comments leave newline artifacts
+    # I don't have much interest in having inline comments though
+    # blah blah blah blah
+    # me:   Maybe I should just write my blog here?
+    # self: In your sample data comments!  Would anyone read it?
+    # me:   Does anyone read it now anyway?
+    # self: Well, you could write in it more often maybe.
+    # me:   Yeah, but I'm busy writing silly sample data.
+  }#p;
+  #{
+    and then we have multiline comments
+    like this and stuff
+  #}
+  # and this is just a comment too
+}
+}#html;

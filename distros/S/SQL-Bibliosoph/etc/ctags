@@ -1,0 +1,24 @@
+--exclude=.svn 
+--exclude=build
+--exclude=blib
+--exclude=buildp
+--exclude=OBSOLETE
+--exclude=OLD
+--langdef=sql_bibliosoph
+--langdef=html_template
+--langdef=perl2
+--langdef=mysql_routines
+--langmap=sql_bibliosoph:.bb,html_template:.tmpl,perl2:.pl:.pm:.t,mysql_routines:.sql
+--regex-sql_bibliosoph=/^--\[\s*(.*)\]/\1/d,definition/i
+--regex-sql_bibliosoph=/^--\[\s*(.*)\]/row_\1/d,definition/i
+--regex-sql_bibliosoph=/^--\[\s*(.*)\]/h_\1/d,definition/i
+--regex-sql_bibliosoph=/^--\[\s*(.*)\]/rowh_\1/d,definition/i
+--regex-html_template=/<tmpl_var\s+([a-zA-Z0-9_]+)>/\1/d,definition/i
+--regex-html_template=/<tmpl_loop\s+([a-zA-Z0-9_]+)>/\1/d,definition/i
+--regex-html_template=/<tmpl_if\s+([a-zA-Z0-9_]+)>/\1/d,definition/i
+--regex-perl=/sub\s+([a-zA-Z0-9_]+)/\1/d,definition/i
+--regex-perl=/package\s+([a-zA-Z0-9_:]+)/\1/d,definition/i
+--regex-mysql_routines=/CREATE FUNCTION\s*(.*)\s*$/\1/d,definition/i
+--regex-mysql_routines=/CREATE PROCEDURE\s*(.*)\s*$/\1/d,definition/i
+--totals=yes
+

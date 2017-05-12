@@ -1,0 +1,23 @@
+[% PROCESS header %]
+
+[% PROCESS _action_menu %]
+[% PROCESS _log_msg %]
+
+<table id="info" summary="[%|l%](revision log)[%END%]">
+  <tr>
+    <th scope="row">
+[%|l%](revision)[%END%] <a href="[% c.script %]/[% c.repos | uri %]/revision?rev=[% rev %]">[% rev %]</a> (by [% author || '(no author)' %], [% date %])</th>
+    <td class="message">[% log_msg(msg) %]</td>
+  </tr>
+</table>
+
+<div id="preview">
+  [% IF mimetype.match('^text/') %]
+    <pre class="code-block">[% file | html %]</pre>
+  [% ELSIF mimetype.match('^image/') %]
+    <img src="[% c.script %]/[% c.repos | uri %]/checkout[% c.path | url%]" />
+  [% ELSE %]
+<p>This file can not be displayed in the browser.  You can <a href="[% c.script %]/[% c.repos | uri %]/checkout[% c.path | url %]">download it</a>.</p>
+  [% END %]
+</div>
+[% PROCESS footer %]

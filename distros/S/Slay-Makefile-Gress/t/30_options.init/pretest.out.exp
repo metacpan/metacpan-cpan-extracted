@@ -1,0 +1,8 @@
+1..2
+ok 1 - washington.ok
+not ok 2 - adams.ok
+#   Failed test 'adams.ok'
+#          got: 'Bad
+# '
+#     expected: ''
+# Looks like you failed 1 test of 2.

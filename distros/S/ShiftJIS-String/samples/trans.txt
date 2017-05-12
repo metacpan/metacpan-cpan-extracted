@@ -1,0 +1,30 @@
+#!perl
+#
+# some examples of transliteration lists.
+#
+use ShiftJIS::String qw(:tr);
+
+$digitZ2H = trclosure('ÇO-ÇX', '0-9');
+$upperZ2H = trclosure('Ç`-Çy', 'A-Z');
+$lowerZ2H = trclosure('ÇÅ-Çö', 'a-z');
+$alphaZ2H = trclosure('Ç`-ÇyÇÅ-Çö',      'A-Za-z');
+$alnumZ2H = trclosure('ÇO-ÇXÇ`-ÇyÇÅ-Çö', '0-9A-Za-z');
+
+$digitH2Z = trclosure('0-9', 'ÇO-ÇX');
+$upperH2Z = trclosure('A-Z', 'Ç`-Çy');
+$lowerH2Z = trclosure('a-z', 'ÇÅ-Çö');
+$alphaH2Z = trclosure('A-Za-z',    'Ç`-ÇyÇÅ-Çö');
+$alnumH2Z = trclosure('0-9A-Za-z', 'ÇO-ÇXÇ`-ÇyÇÅ-Çö');
+
+$ascii_toupper     = trclosure('a-z',   'A-Z'  );
+$fullwidth_toupper = trclosure('ÇÅ-Çö', 'Ç`-Çy');
+$greek_toupper     = trclosure('Éø-É÷', 'Éü-É∂');
+$cyrillic_toupper  = trclosure('Ñp-Ñë', 'Ñ@-Ñ`');
+
+$ascii_tolower     = trclosure('A-Z',   'a-z'  );
+$fullwidth_tolower = trclosure('Ç`-Çy', 'ÇÅ-Çö');
+$greek_tolower     = trclosure('Éü-É∂', 'Éø-É÷');
+$cyrillic_tolower  = trclosure('Ñ@-Ñ`', 'Ñp-Ñë');
+
+$j_tokatakana      = trclosure('Çü-ÇÒ', 'É@-Éì');
+$j_tohiragana      = trclosure('É@-Éì', 'Çü-ÇÒ');

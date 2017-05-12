@@ -1,0 +1,53 @@
+SWF modules are manipulating FLASH(R) movie (SWF) files.
+This package contains:
+
+  SWF::Parser          - parsing and splitting SWF files into header and tags.
+  SWF::BinStream       - binary stream class for SWF.
+  SWF::Binstream::File - binary file stream for SWF.
+  SWF::BinStream::Codec::Zlib
+                       - zlib compress/decompress codec for SWF::BinStream.
+  SWF::Element         - representing each SWF tag and other sub element.
+  SWF::File            - making SWF file.
+
+See each POD for further information.
+
+NOTE
+
+SWF::File 0.20 or higher is not compatible with the previous version.
+See CHANGES and Element.pod. 
+It is recommended to see SWF file format specifications version 6 
+available from Macromedia site,
+http://www.macromedia.com/software/flash/open/licensing/fileformat/
+
+PREREQUISITE
+
+perl 5.6 or higher
+
+Data::TemporaryBag
+http://search.cpan.org/search?dist=Data-TemporaryBag
+
+INSTALLATION
+
+You install SWF modules by the usual method:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+The test script is too simple now.  Please try 'dumpswf.plx' and its output
+for various SWF files.
+
+SAMPLE SCRIPT
+
+dumpswf.plx parses a SWF file and converts it to a perl script
+that outputs the same SWF file.
+There are some samples in samples directory.
+
+COPYRIGHT
+    Copyright 2000-2004, Yasuhiro Sasama (ySas), <ysas@nmt.ne.jp>
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+

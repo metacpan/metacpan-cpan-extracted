@@ -1,0 +1,253 @@
+# Vertebral Column Description (VCD)
+# Describes bifurcation in various sauropods
+
+*width: 360
+*height: 880
+*background: white
+*taxon-height: 20
+*cervico-dorsal-offset: 300
+*cervical-width: 15
+*cervical-height: 15
+*dorsal-width: 15
+*dorsal-height: 12
+*dorsal-height-gradient: -3
+*box-color: rgb(192,192,192)
+
+*font-family: Helvetica
+*font-size: 12
+*text-y-offset: 0
+
+*state-X-color: rgb(0,193,252)
+*state---color: grey
+
+*state-X-polygon: 0,1 0,0 1,0 1,1
+*state---polygon: 0.1,0.5 0.1,0.6 0.9,0.6 0.9,0.5
+
+Taxon: Pterosauria
+Data: |---
+
+Taxon: Ornithischia
+Data: |---
+
+Taxon: Theropoda
+Data: |XX-
+
+Taxon: /Basal sauropodomorphs
+Data: |---
+
+Taxon: Mamenchisaurus
+Data: |---
+
+Taxon: "Bothriospondylus"
+Specimen: NHM 2599
+Citation: Mannion 2010
+Data: |X--
+# proximal
+
+Taxon: Haplocanthosaurus
+Specimen: CM 879
+Citation: pers. Obs.
+Data: |X--
+# 1
+
+Taxon: /Neosauropoda incertae sedis
+Specimen: PMU R263
+Citation: Upchurch & Mannion 2009
+Data: |X--
+# proximal
+
+Taxon: /Rebbachisauridae incertae sedis
+Specimen: MIWG 5384
+Citation: Mannion (2010)
+Data: |X--
+# proximal
+
+Taxon: Limaysaurus
+Specimen: MUCPv 205
+Citation: Mannion (2010)
+Data: |X--
+# proximal
+
+Taxon: Demandasaurus
+Specimen: MPS-RV II-15
+Citation: Torcida Fernández-Baldor et al. 2011
+Data: |X--
+# proximal
+
+Taxon: Dicraeosaurus
+Data: |---
+
+Taxon: Apatosaurus
+Specimen: AMNH 222
+Citation: Osborn (1898)	
+Data: |X--
+# proximal
+
+Taxon: Apatosaurus
+Specimen: AMNH 460
+Citation: Riggs (1903: 188)
+Data: |X--
+# 5
+
+Taxon: Apatosaurus
+Specimen: CM 3018
+Citation: pers. obs.
+Data: |X--
+# 3
+
+Taxon: Apatosaurus
+Specimen: FMNH P25112
+Citation: Riggs (1903: 189)
+Data: |X--
+# 5
+
+Taxon: Apatosaurus
+Specimen: OMNH 1436
+Citation: pers. obs.
+Data: |X--
+# proximal
+
+Taxon: Apatosaurus
+Specimen: YPM 1980
+Citation: pers. obs.
+Data: |XX-
+# 13
+
+Taxon: ?Apatosaurus
+Specimen: AMNH 860
+Citation: pers. obs.
+Data: |X--
+# proximal
+
+Taxon: Supersaurus
+Specimen: WDC DMJ-021
+Citation: Lovelace et al. (2008)
+Data: |X--
+# proximal
+
+Taxon: Dinheirosaurus
+Specimen: ML 414
+Citation: Mannion et al. (2011)
+Data: |X--
+# proximal
+
+Taxon: Tornieria
+Specimen: MB.R.2956.13
+Citation: Remes (2006)
+Data: |XX-
+# middle
+
+Taxon: Barosaurus
+Specimen: AMNH 6341
+Citation: pers. obs.
+Data: |XX-
+# 14
+
+Taxon: Diplodocus
+Specimen: AMNH 223
+Citation: Osborn (1899)
+Data: |XX-
+# 18
+
+Taxon: Diplodocus
+Specimen: DMNH 1494
+Citation: pers. obs.
+Data: |XX-
+# 16
+
+Taxon: Diplodocus
+Specimen: USNM 10865
+Citation: Gilmore (1932)
+Data: |XX-
+# 19
+
+Taxon: Camarasaurus
+Data: |---
+
+Taxon: Giraffatitan
+Specimen: MB.R.5000
+Citation: pers. obs.
+Data: |XXX
+# 24
+
+Taxon: Giraffatitan
+Specimen: MB.R.2921
+Citation: pers. obs.
+Data: |X--
+# 2
+
+Taxon: Giraffatitan
+Specimen: MB.R.3736
+Citation: pers. obs.
+Data: |X--
+# 2
+
+Taxon: Cedarosaurus
+Specimen: DMNH 39045
+Citation: Tidwell et al. (1999)	
+Data: |X--
+# proximal
+
+Taxon: Venenosaurus
+Specimen: DMNH 40932
+Citation: Tidwell et al. (2001)
+Data: |XX-
+# middle
+
+Taxon: Malawisaurus
+Specimen: MAL-200
+Citation: Wedel (2009)
+Data: |X--
+# proximal
+
+Taxon: Trigonosaurus
+Specimen: MCT 1719-R
+Citation: Campos et al. (2005)
+Data: |X--
+# ?2
+
+Taxon: Xianshanosaurus
+Specimen: KLR-07-62-6
+Citation: Lu et al. (2009)
+Data: |X--
+# proximal
+
+Taxon: Gondwanatitan
+Specimen: MN 4111-V
+Citation: Kellner and Azevedo (1999)
+Data: |X--
+# ?3
+
+Taxon: Aeolosaurus
+Specimen: UNPSJB PV 959
+Citation: Casal et al. (2007)
+Data: |X--
+# proximal
+
+Taxon: Alamosaurus
+# Specimen unknown
+Citation: Fronimos (2011)
+Data: |X--
+# proximal
+
+Taxon: Opisthocoelicaudia
+Data: |---
+
+Taxon: Neuquensaurus
+Specimen: MCS-5
+Citation: Cerda et al. (2012)
+Data: |XX-
+# middle
+
+Taxon: Rocasaurus
+Specimen: MPCV-Pv 58
+Citation: Cerda et al. (2012)
+Data: |XX-
+# middle
+
+Taxon: Saltasaurus
+Specimen: PVL 4017-28
+Citation: Cerda et al. (2012)
+Data: |XXX
+# distal
+

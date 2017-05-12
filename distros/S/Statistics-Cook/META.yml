@@ -1,0 +1,32 @@
+---
+abstract: 'Statistics::Cook - calculate cook distance of Least squares line fit'
+author:
+  - 'Yan Xueqing <yanxueqing621@163.com>'
+build_requires:
+  Module::Build: 0.28
+  Test::More: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 1.00
+configure_requires:
+  Module::Build: 0.28
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Statistics-Cook
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+requires:
+  Carp: 0
+  Data::Dumper: 0
+  List::Util: 0
+  Modern::Perl: 0
+  Moo: 0
+  Types::Standard: 0
+version: 0.0.6

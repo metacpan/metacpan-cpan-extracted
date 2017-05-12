@@ -1,0 +1,57 @@
+GenoScan version v1.0.3
+============================
+
+This Perl module is the implementation of the GenoScan software for genome-scale miRNA discovery. It is
+composed of a set of Perl pm files accompanied by a C library. The module has been tested to install and run
+in Linux Ubuntu and Mac OS X. See the online documentation at CPAN for more detailed information about
+how to use GenoScan.
+
+INSTALLATION
+
+To install this module in Ubuntu, navigate to this folder in a
+terminal and type the following:
+
+   perl Build.PL
+   ./Build
+   sudo ./Build install
+
+DEPENDENCIES
+
+This module requires the following Perl modules to be installed:
+-Module::Build
+-ExtUtils::CBuilder
+-XSLoader
+-Exporter
+-POSIX
+
+In addition, a GNU C compiler is required for module installation.
+
+The following third-party program is also required: RNAfold
+
+To run GenoScan in classify and benchmark modes (see documentation), R is needed
+
+RUNNING GENOSCAN
+
+The quickest way to test the algorithm is to use the run_genoscan.pl script in the t/ folder. After the
+module is installed, navigate the the t/ folder and type the following:
+
+perl genoscan.pl -d fake_genome -o output
+
+For a description of command line arguments, input and output files, please see the CPAN documentation.
+
+SUPPLEMENTARY DATA
+
+The distribution contains the datasets used for benchmarking in [1]. These are located in the datasets
+directory. Each dataset has a hairpin version containing only hairpins, and a window version with
+200 nt windows containing the hairpins.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2014 by Benjamin Ulfenborg
+
+This module is free to use, modify and redistribute at will.
+
+REFERENCE
+
+[1] Ulfenborg B, Klinga-Levan K, Olsson B (2014) GenoScan: Genomic Scanner for Putative miRNA Precursors.
+    Bioinformatics Research and Applications, LNBI 8492, pp. 266-277.

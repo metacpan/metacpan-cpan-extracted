@@ -1,0 +1,31 @@
+{
+   "abstract" : "Object(ish) Interface to UTMP files.",
+   "author" : [
+      "Jonathan Stowe <jns@gellyfish.co.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Sys-Utmp",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jonathanstowe/Sys-Utmp.git",
+         "web" : "https://github.com/jonathanstowe/Sys-Utmp"
+      }
+   },
+   "version" : "1.7"
+}

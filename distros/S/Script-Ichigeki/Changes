@@ -1,0 +1,14 @@
+Revision history for Perl extension Script::Ichigeki
+
+0.04 2014-06-07T07:51:19Z
+        - Migrate to Minilla
+
+0.03    Fri Dec 14 02:18:00 2012
+        - add dialog_message feature
+        - fix some broken English
+
+0.02    Thu Dec 13 13:13:00 2012
+        - fix awful English.
+
+0.01    Thu Dec 13 11:52:00 2012
+        - original version

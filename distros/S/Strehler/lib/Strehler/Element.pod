@@ -1,0 +1,264 @@
+=encoding utf8
+
+=head1 NAME
+
+Strehler::Element - Base class for Strehler entities management
+
+=head1 DESCRIPTION
+
+Articles, images and every entity you decide to manage in Strehler have to be Strehler::Element subclasses. Strehler::Element is the collection of methods that you can call to (mainly) retrieve the data inserted in the CMS and make it available in your business logic.
+
+=head1 SYNOPSIS
+
+Below, a code example to display an archive (with pagination) with all the articles about a certain category.
+
+    get '/romanzo' => sub {
+        my $entries_per_page = 20;
+        my $page = params->{page} || 1;
+        my $order = params->{order} || 'desc';
+        my $elements = Strehler::Element::Article->get_list({ 
+            page => $page, 
+            entries_per_page => $entries_per_page, 
+            category => 'EXAMPLE_CATEGORY', 
+            language => 'en', 
+            ext => 1, 
+            published => 1, 
+            order => $order});
+        template "archive", { 
+            page_title => 'Archive',
+            articles => $elements->{'to_view'}, 
+            page => $page, 
+            order => $order, 
+            last_page => $elements->{'last_page'} };
+
+    };
+
+=head1 METHODS TO RETRIEVE INFORMATIONS ABOUT AN ENTITY
+
+=over 4
+
+=item exists
+
+Return Value: $exists
+
+Return 1 if the element is linked to a real row on the database, 0 otherwise.
+
+=item check_role
+
+Arguments: $user_role
+
+Return Value: $access
+
+Return 1 if user, considering his $user_role, has rights to access the entity.
+
+
+=item get_attr
+
+Arguments: $attr, $bare
+
+Return Value: $attr_value
+
+Return the value for the attribute (the database column) named $attr.
+
+If $bare is true (1) database value is given back ignoring possible hook for the attribute.
+
+=item get_attr_multilang
+
+Arguments: $attr, $lang, $bare
+
+Return Value: $attr_value
+
+Return the value for the multilanguage attribute named $attr in the language $lang
+
+If $bare is true (1) database value is given back ignoring possible hook for the attribute.
+
+=item has_language
+
+Arguments: $lang
+
+Return Value: $has_language
+
+Return 1 if the Element has multilang attributes for language $lang
+
+=item get_category_name
+
+Return Value: $category
+
+Return the name of the category of the element in the format $parent/$category is category has two levels.
+
+=item get_tags
+
+Return Value: $tags
+
+Return a string composed with all the tags related to the element, separated with commas.
+
+=item get_basic_data
+
+Return Value %data;
+
+Return all the data about the element, except for multilang attributes.
+
+=item get_ext_data
+
+Arguments: $lang
+
+Return Value %data;
+
+Return all the data about the element as C<get_basic_data>, adding all the multilang attributes in the language $lang.
+
+=item main_title
+
+Return Value: $main_title
+
+Return the main title for the element. The standard implementation try for an attribute named B<title> or B<name>. If these attributes are not available return just B<id>.
+
+In Articles and Images it returns the title attribute in the default language.
+
+=item fields_list
+
+Return Value: $list_of_fields
+
+Return a pointer to an array used by list views to configure the header (and just the header) of the table of contents. Every element of the list is a pointer to an hash. Hash attributes are the following:
+
+    label: The label that will be displayed
+    id: used only if the field is ordinable, the db column user to order objects
+    ordinable: true if the column can be used to order elements
+
+About id consider notes about order_by field in the get_list method.
+
+=back
+
+=head1 METHODS TO MANIPULATE ENTITIES
+
+These methods are used by Strehler backend, so use them carefully.
+
+=over 4
+
+=item delete
+
+Delete the element and all the multilang attributes linked to it.
+
+=item publish
+
+Publish a publishable element
+
+=item unpublish
+
+Unpublish a publishable element
+
+=back
+
+=head1 METHODS TO RETRIEVE ELEMENTS
+
+The most important methods. Some of them are class method. They're wrappers for the queries needed to retrieve data.
+
+=over 4
+
+=item get_list
+
+Arguments: \%query_params
+
+Return Values: \%elements
+
+Main class method to retrieve elements. There're many query_params you can use.
+
+    order => desc|asc # The order of the results. Default is desc
+    order_by => $order_by # The field to order by. Default is id. 
+                          # Accept array_ref for multiple ordering.
+    entries_per_page => $entries # How many results retrieve. Default is 20.
+                                 # -1 makes the method return ALL results
+    page => $page. Default is 1
+    language => $lang # The language for multilanguage attributes. 
+                      # Default is Strehler configured default language
+    published => $pub # Retrieve only published elements (for publishable elements)
+    tag => $tag # Retrieve elements with a certain tag
+    category => $category # Retrieve elements with a certain category
+                          # Category can be written in the form $parent/$cat
+    category_id => $category_id # Retrieve elements with the category with that id
+    ext => 1 # Return elements with all data (get_ext_data is invoked)
+    join => $tables #Tables to join for search purpose. Can be an array reference or a single element.
+    ancestor => $category_id # Similar to $category_id, but a query with this parameter will retrieve 
+                             # from considered category and all its subcategories
+                             
+            
+
+order_by attribute can be written as a field of the multilanguage children table. For example articles can be ordered using contents.title. In this case contents table will be filtered on language field, using only the considered language in the query. It's not necessary to specify contents table in the join parameter. Tables pointed out in the order by field will be joined automatically.
+
+All the parameters can be combined together.
+
+The method return a pointer to an hash composed by:
+
+    to_view => \@to_view # A pointer to an array of hashes. Every hash contain the data about an element 
+                         # as in get_basic_data or get_ext_data
+    last_page => last available page, to make easy paging logic.    
+
+=item next_in_category_by_order/prev_in_category_by_order
+
+Arguments: $language
+
+Return Value: $element
+
+Retrieve the next/previous element of the same category of the element used to call it using the display_order as ordering field.
+Language is needed because a element could exists in a language but not in another.
+Returns a Strehler::Element.
+You can use this only on elements with a display_order field (like articles). Configure the entity as ordered.
+
+=item next_in_category_by_date/prev_in_category_by_date
+
+Arguments: $language
+
+Return Value: $element
+
+Same as previous method, but using the publish_date to order elements.
+You can use this only on elements with a publish_date field (like articles). Configure the entity as dated.
+
+=item get_first_by_order/get_last_by_order
+
+Arguments: $category, $language
+
+Return Value: $element
+
+Class method. Retrieve the last/first element in the category with category name $category (child categories must be written as parent/child). Order using display_order.
+Language considered as in the previous methods.
+Returns a Strehler::Element.
+You can use this only on elements with a display_order field (like articles). Configure the entity as ordered.
+
+=item get_first_by_date/get_last_by_date
+
+Arguments: $category, $language
+
+Return Value: $element
+
+Same as get_first_by_order/get_last_by_order, using publish_date to order elements.
+You can use this only on elements with a publish_date field (like articles). Configure the entity as dated.
+
+=item get_last_pubunpub
+
+Arguments: $category, $language, $order
+
+Return Value: ($element, $element)
+
+This method is used by dashboard. It retrieves a couple of elements, the most recent unpublished one and the most recent published one. 
+Refer to L<Strehler::Dancer2::EX::Plugin> latest keyword to understand the logic.
+
+=item error_message
+
+Arguments: $action, $code
+
+Return Value: $message
+
+This method is used to customized error messages that can appear after an action that went wrong. Considered actions in the standard backend are add, edit, delete, publish, unpublish.
+
+We expect that the entity method related to add/edit (save_form) return the id of the submitted entity. Any value returned that is minus to zero is considered an error and error_message is used to find the message to display.
+
+We expect that publish/unpublish and delete return 0 as OK or any othe number as error. Again, error_message is called to retrieve the message.
+
+Designing new entities you can reimplement error_message to display custom message on errors you like to manage.
+
+=back
+
+=head1 SEE ALSO
+
+L<Strehler::Element::Role::Configured> for Element functions related to its configuration.
+
+=cut

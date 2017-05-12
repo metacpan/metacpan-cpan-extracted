@@ -1,0 +1,39 @@
+=head1 NAME
+
+seis - Seis interpreter
+
+=head1 SYNOPSIS
+
+    % seis foo.pl
+
+=head1 DESCRIPTION
+
+C<seis> is a incomplete perl6 interpreter.
+
+=head1 MODES
+
+=over 4
+
+=item C<-e>
+
+    % seis -e 'say 4'
+
+Evluate the code from the command line option.
+
+=item Read from file
+
+    % seis foo.pl
+
+seis reads the file and evaluate it.
+
+=item REPL
+
+    % seis
+
+If you runs seis without arguments, seis enter the REPL mode.
+
+=back
+
+=head1 SEE ALSO
+
+L<Seis>

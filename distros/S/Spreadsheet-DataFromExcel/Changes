@@ -1,0 +1,21 @@
+Revision history for Spreadsheet-DataFromExcel
+
+1.001003 2014-01-25
+        - Same as below, except this time I actually edited the correct
+          file :)
+
+1.001002 2014-01-25
+        - Changed the preferred bug tracker and added bug tracker/repo
+          links in the POD
+
+1.001001 2014-01-25
+        - Converted to dzil
+        - Moved author tests to xt/
+        - Fixed RT#92436 (make some valid tests)
+
+0.0102  2013-10-30
+        - Minor fixes to comply with specs and Kwalitee game
+
+0.0101  2009-07-29
+        - First version, released on an unsuspecting world.
+

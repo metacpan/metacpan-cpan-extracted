@@ -1,0 +1,88 @@
+SQL/Snippet version 0.03
+========================
+
+NAME
+    SQL::Snippet - Constraint-based OO Interface to RDBMS
+
+SYNOPSIS
+    use SQL::Snippet::ExampleRepository;
+
+    my $snippet = SQL::Snippet::ExampleRepository->new( @args );
+
+    # auto-instantiate the population and limit it
+    $snippet->pop->pop_name->lim->new( 'lim_name' );
+
+    # assign select clause
+    $snippet->pop_name->select( $select_clause );
+
+    # get sql statement suitable for handing off to DBI
+    my $sql = $snippet->pop->pop_name->query;
+
+DESCRIPTION
+    SQL::Snippet has two major benefits:
+
+    1) Ease of system maintenence:  all SQL is removed from
+       individual perl scripts and boiled down into unique
+       elements.  These elements are named after the real-world
+       objects they represent and are stored in one central
+       repository/module.  When SQL adjustments or additions
+       are needed, all changes are made in this one central
+       repository, instead of within many individual scripts.
+
+    2) Ease of data access:  In response to requests made in
+       easy OO syntax, SQL::Snippet combines snippets from the
+       repository on the fly to create canonical SQL.  Thus
+       programmers need not be concerned about tables and joins
+       and other RDBMS complexities when writing a script
+       requiring database interaction.  Further, creating
+       ad-hoc drill-down reports for end users becomes a simple
+       exercise.
+
+ONE EXAMPLE
+    use DBI;
+    use Term::Interact;
+    use SQL::Snippet::ExampleRepository;
+    ...
+
+    # set up SELECT clause to count total customers
+    $snippet->pop->customer->select( 'SELECT count(*)' );
+
+    # set a limit on the customer population to include
+    # only those within a particular range of zip_codes.
+    $snippet->pop->customer-lim->zip_range->value( '10000-20000' );
+
+    # get the canonical SQL
+    my $sql_customers = $snippet->pop->customer->query;
+
+    # create the DBI statement handle
+    my $sth = $dbh->prepare( $sql_customers );
+
+    ...
+
+DOCUMENTATION
+    For more examples and full documentation, see
+    perldoc SQL::Snippet as well as the source for
+    ./Snippet/ExampleRepository.pm.
+
+INSTALLATION
+    To install this module type the following:
+      perl Makefile.PL
+      make
+      make test
+      make install
+
+DEPENDENCIES
+    This module requires these other modules:
+      DBI
+      Term::Interact
+
+COPYRIGHT AND LICENCE
+    Copyright (C) 2002 Phil R Lawrence.  All rights reserved.
+
+    This module is free software; you can redistribute it
+    and/or modify it under the same terms as Perl itself.
+
+
+
+
+

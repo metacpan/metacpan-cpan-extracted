@@ -1,0 +1,48 @@
+# Successful update of all fields
+template: update-contact.tt
+
+vars:
+  name: updated name
+  contact_id: full1
+  street: updated street1
+  street2: updated street2
+  city: updated city
+  state: new state
+  pcode: 4444
+  ccode: AU
+  phone: +64.1234567
+  fax: +64.1234568
+  email: update@email.com
+
+input_assertions:
+  class: SRS::EPP::Command::Update::Contact
+
+
+SRS:
+ - assertions:
+     attr_is:
+       - [ '/NZSRSRequest/HandleUpdate', 'HandleId', 'full1', 'SRS: handle id correct on request' ]
+       - [ '/NZSRSRequest/HandleUpdate', 'Name', 'updated name', 'SRS: name correct on request' ]
+       - [ '/NZSRSRequest/HandleUpdate', 'Email', 'update@email.com', 'SRS: email correct on request' ]
+       - [ '/NZSRSRequest/HandleUpdate/PostalAddress', 'Address1', 'updated street1', 'SRS: address1 correct on request' ]
+       - [ '/NZSRSRequest/HandleUpdate/PostalAddress', 'Address2', 'updated street2', 'SRS: address2 correct on request' ]
+       - [ '/NZSRSRequest/HandleUpdate/PostalAddress', 'PostalCode', '4444', 'SRS: postalcode correct on request' ]
+       - [ '/NZSRSRequest/HandleUpdate/PostalAddress', 'Province', 'new state', 'SRS: province correct on request' ]
+       - [ '/NZSRSRequest/HandleUpdate/PostalAddress', 'City', 'updated city', 'SRS: city correct on request' ]
+       - [ '/NZSRSRequest/HandleUpdate/PostalAddress', 'CountryCode', 'AU', 'SRS: country code correct on request' ]
+       
+       - [ '/NZSRSRequest/HandleUpdate/Phone', 'LocalNumber', '1234567', 'SRS: phone local number correct on request' ]
+       - [ '/NZSRSRequest/HandleUpdate/Phone', 'CountryCode', '64', 'SRS: phone country code correct on request' ]
+       - [ '/NZSRSRequest/HandleUpdate/Phone', 'AreaCode', '', 'SRS: phone area code correct on request' ]
+
+       - [ '/NZSRSRequest/HandleUpdate/Fax', 'LocalNumber', '1234568', 'SRS: fax local number correct on request' ]
+       - [ '/NZSRSRequest/HandleUpdate/Fax', 'CountryCode', '64', 'SRS: fax country code correct on request' ]
+       - [ '/NZSRSRequest/HandleUpdate/Fax', 'AreaCode', '', 'SRS: fax area  code correct on request' ]
+
+output_assertions:
+  count: 
+    - [ '//epp:resData', 0, "No res data returned"]
+  attr_is:
+    - [ '//epp:result', 'code', 1000, 'EPP: Correct response code' ]
+
+

@@ -1,0 +1,36 @@
+read_record
+^md5 checksum mismatch: got 60262fd14bd1b59416820cc37e4ee982, expected 6772871c2cf5bcf281c5ee148135a2db
+Node-path: trunk/loremipsum.txt
+Node-kind: file
+Node-action: add
+Prop-content-length: 40
+Text-content-length: 1090
+Text-content-md5: 6772871c2cf5bcf281c5ee148135a2db
+Content-length: 1130
+
+K 13
+svn:eol-style
+V 6
+native
+PROPS-END
+quo fugiat quos quam voluptate nostrum perferendis eum animi fugit unde
+nam accusantium laboriosam quaerat asperiores assumenda praesentium
+iure eaque dicta explicabo autem vero voluptates sed itaque repellat
+dignissimos quia laudantium temporibus consequuntur beatae dolore eligendi
+doloremque quas recusandae proident sapiente mollit aliqua veniam culpa
+cillum voluptatem tempore exercitationem ullamco nobis nihil corrupti
+anim dolores soluta reiciendis
+
+necessitatibus sequi officia do dolorum a nisi consectetur quisquam illum
+amet delectus minim porro provident error dolorem repudiandae pariatur
+occaecat rem aspernatur
+
+tempora excepturi ab similique repellendus voluptatum neque totam aliquip
+adipisicing cum vitae eveniet minus placeat nemo quibusdam laborum velit
+saepe aute fuga reprehenderit eius ratione magnam aperiam sit mollitia
+lorem facilis debitis distinctio non facere natus maiores alias iste
+aliquid rerum ullam sunt possimus minima qui nostrud nesciunt at et
+deleniti tempor hic corporis suscipit commodo odio quis quae harum
+molestiae exercitation inventore cumque
+
+

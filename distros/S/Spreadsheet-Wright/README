@@ -1,0 +1,202 @@
+NAME
+    Spreadsheet::Wright - simple spreadsheet worker
+
+SYNOPSIS
+      # EXCEL spreadsheet
+  
+      use Spreadsheet::Wright;
+  
+      my $s = Spreadsheet::Wright->new(
+        file    => 'spreadsheet.xls',
+        format  => 'xls',
+        sheet   => 'Products',
+        styles  => {
+          money   => '($#,##0_);($#,##0)',
+          },
+        );
+  
+      $s->addrow('foo',{
+          content         => 'bar',
+          type            => 'number',
+          style           => 'money',
+          font_weight     => 'bold',
+          font_color      => 42,
+          font_face       => 'Times New Roman',
+          font_size       => 20,
+          align           => 'center',
+          valign          => 'vcenter',
+          font_decoration => 'strikeout',
+          font_style      => 'italic',
+          });
+      $s->addrow('foo2','bar2');
+      $s->freeze(1, 0);
+
+      # CSV file
+  
+      use Spreadsheet::Wright;
+  
+      my $s = Spreadsheet::Wright->new(
+        file        => 'file.csv',
+        encoding    => 'iso8859',
+        );
+      die $s->error if $s->error;
+      $s->addrow('foo', 'bar');
+
+DESCRIPTION
+    `Spreadsheet::Wright` is a fork of Spreadsheet::Write and may be used as a
+    drop-in replacement.
+
+    `Spreadsheet::Wright` writes files in CSV, Microsoft Excel, HTML and
+    OpenDocument formats. It is especially suitable for building various dumps
+    and reports where rows are built in sequence, one after another.
+
+    It is not especially suitable for modifying existing files.
+
+    The name is a not just pun on "write" - the word "wright" means worker or
+    crafter, and `Spreadsheet::Wright` does a lot of the work of spreadsheet
+    output for you!
+
+  Constructor
+    `Spreadsheet::Wright->new(%args)`
+          $spreadsheet = Spreadsheet::Wright->new(
+            file       => 'table.xls',
+            styles     => {
+              mynumber   => '#,##0.00',
+              },
+            );
+
+        Creates a new spreadsheet object. It takes a list of options. The
+        following are valid:
+
+        *   file - filename of the new spreadsheet (mandatory)
+
+        *   encoding - encoding of output file (optional, csv format only)
+
+        *   format - format of spreadsheet - 'csv', 'xls', 'html', 'xhtml',
+            'xml', 'ods', 'json' or 'auto' (default).
+
+        *   sheet - first sheet name (optional, not supported by some formats)
+
+        *   styles - defines cell formatting shortcuts (optional)
+
+        *   failsafe - boolean - if true, falls back to CSV in emergencies
+
+        If file format is 'auto' (or omitted), the format is guessed from the
+        filename extension, defaulting to 'csv'.
+
+  Methods
+    `addrow($cell_1, $cell_2, ...)`
+        Adds a row into the spreadsheet. Takes arbitrary number of arguments.
+        Arguments represent cell values and may be strings or hash references.
+        If an argument is a hash reference, it takes the following structure:
+
+            content         value to put into cell
+            style           formatting style, as defined in new()
+            type            type of the content (defaults to 'auto')
+            format          number format (see Spreadsheet::WriteExcel for details)
+            font_weight     weight of font. Only valid value is 'bold'
+            font_style      style of font. Only valid value is 'italic'
+            font_decoration 'underline' or 'strikeout' (or both, space separated)
+            font_face       font of column; default is 'Arial'
+            font_color      color of font (see Spreadsheet::WriteExcel for color values)
+            font_size       size of font
+            align           alignment
+            valign          vertical alignment
+            width           column width, excel units (only makes sense once per column)
+            header          boolean; is this cell a header?
+
+        Styles can be used to assign default values for any of these
+        formatting parameters thus allowing easy global changes. Other
+        parameters specified override style definitions.
+
+        Example:
+
+          my $sp = Spreadsheet::Wright->new(
+            file      => 'employees.xls',
+            styles    => {
+              important => { font_weight => 'bold' },
+              },
+            );
+          $sp->addrow(
+            { content => 'First Name', font_weight => 'bold' },
+            { content => 'Last Name',  font_weight => 'bold' },
+            { content => 'Age',        style => 'important' },
+            );
+          $sp->addrow("John", "Doe", 34);
+          $sp->addrow("Susan", "Smith", 28);
+
+        Note that in this example all header cells will have identical
+        formatting even though some use direct formats and one uses style.
+
+        If you want to store text that looks like a number you might want to
+        use { type => 'string', format => '@' } arguments. By default the type
+        detection is automatic, as done by for instance
+        Spreadsheet::WriteExcel write() method.
+
+        It is also possible to supply an array reference in the 'content'
+        parameter of the extended format. It means to use the same formatting
+        for as many cells as there are elements in this array. Useful for
+        creating header rows. For instance, the above example can be rewritten
+        as:
+
+          $sp->addrow({
+            style   => 'important',
+            content => ['First Name', 'Last Name', 'Age'],
+            });
+
+        Not all styling options are supported in all formats.
+
+    `addrows(\@row_1, \@row_2, ...)`
+        Shortcut for adding multiple rows.
+
+        Each argument is an arrayref representing a row.
+
+        Any argument that is not a reference (i.e. a scalar) is taken to be
+        the title of a new worksheet.
+
+    `addsheet($name)`
+        Adds a new sheet into the document and makes it active. Subsequent
+        addrow() calls will add rows to that new sheet.
+
+        For CSV format this call is NOT ignored, but produces a fatal error
+        currently.
+
+    `freeze($row, $col, $top_row, $left_col)`
+        Sets a freeze-pane at the given position, equivalent to
+        Spreadsheet::WriteExcel->freeze_panes(). Only implemented for Excel
+        spreadsheets so far.
+
+    `close`
+        Saves the spreadsheet to disk (some of the modules save incrementally
+        anyway) and closes the file. Calling this explicitly is usually
+        un-necessary, as the Perl garbage collector will do the job eventually
+        anyway. Once a spreadsheet is closed, calls to addrow() will fail.
+
+    `error`
+        Returns the latest recoverable error.
+
+BUGS
+    Please report any bugs to <http://rt.cpan.org/>.
+
+SEE ALSO
+    Spreadsheet::Write.
+
+AUTHORS
+    Toby Inkster <tobyink@cpan.org>.
+
+    Excel and CSV output based almost entirely on work by Nick Eremeev
+    <nick.eremeev@gmail.com> <http://ejelta.com/>.
+
+COPYRIGHT AND LICENCE
+    Copyright 2007 Nick Eremeev.
+
+    Copyright 2010-2011 Toby Inkster.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

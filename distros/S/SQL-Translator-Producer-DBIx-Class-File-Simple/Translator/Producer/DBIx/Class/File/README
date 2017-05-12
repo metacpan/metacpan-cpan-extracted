@@ -1,0 +1,12 @@
+This is a simple module for Producing Schema File from DBI.
+
+I just copied code from SQL::Translator::Producer::DBIx::Class::File,
+and maked some changes,such as adding the usage of parameter "no-comments",
+changing Module-Name produced(example:Table name is "user_agent",prefix is "My::Schema",
+then the module produced is "My::Schema::UserAgent" instead of "My::Schema::user_agent").
+
+It is easy to install this module,just copy it into right place.
+It is easy to use this module too,for instance:
+sqlt -f DBI --dsn $dsn --db-user $user --db-password $pass -t DBIx::Class::File::Simple --no-comments --prefix=$prefix > $tofile
+
+Remember that you need to install SQL::Translator & DBIx::Class first.

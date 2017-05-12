@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Sew-Color.t
+lib/Sew/Color.pm

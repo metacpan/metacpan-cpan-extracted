@@ -1,0 +1,34 @@
+---
+doctype: dist
+
+header:
+  name: String-Nudge
+
+prereqs:
+  runtime:
+    requires:
+      - perl: 5.010000
+      - Exporter: 5.67
+
+  test:
+    requires:
+     - syntax
+     - Syntax::Feature::Qi: 0.2004
+
+plugins:
+ - +config: Author::CSSON
+
+---
+doctype: weaver
+
+plugins:
+ - +config: Author::CSSON
+
+---
+doctype: cpanfile
+
+---
+doctype: gitignore
+config: Author::CSSON
+always:
+ - /String-Nudge-*

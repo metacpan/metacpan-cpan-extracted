@@ -1,0 +1,20 @@
+0.8 Tue Nov 25 16:35:20 CET 2014
+  - Allow disabling backoff logic
+0.7 Thu Mar 20 10:28:43 CET 2014
+  - Add backoff logic to avoid continually hitting a dead replica
+0.6 Fri Mar  7 10:47:13 CET 2014
+  - Added read and connect timeouts
+0.5 Wed Feb  5 14:53:51 CET 2014
+  - fixed a bug showing on perl 5.18 and due to the way
+    moose initializes the declared properties at construction time
+0.4 Tue Dec 24 12:55:01 CET 2013
+  - switched from Net::HTTP to Hijk
+  - some minor cleanings and fixes
+0.3 Tue Dec  3 00:22:07 CET 2013
+  - support for replicated backend
+  - fixed to avoid warnings on more recent perls
+0.2  Wed Nov 20 02:32:26 CET 2013
+  - be more careful in trying to reuse the http socket
+  - tests
+0.1  Tue Nov 19 11:57:38 CET 2013
+  - original version

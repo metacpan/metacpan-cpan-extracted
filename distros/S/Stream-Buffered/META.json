@@ -1,0 +1,59 @@
+{
+   "abstract" : "temporary buffer to save bytes",
+   "author" : [
+      "Tatsuhiko Miyagawa"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.4, Dist::Zilla version 5.014, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Stream-Buffered",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::File" : "1.14",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/plack/Stream-Buffered/issues"
+      },
+      "homepage" : "https://github.com/plack/Stream-Buffered",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/plack/Stream-Buffered.git",
+         "web" : "https://github.com/plack/Stream-Buffered"
+      }
+   },
+   "version" : "0.03",
+   "x_authority" : "cpan:MIYAGAWA"
+}
+

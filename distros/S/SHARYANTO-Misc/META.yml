@@ -1,0 +1,297 @@
+---
+abstract: "SHARYANTO's temporary, random collection of modules"
+author:
+  - 'Steven Haryanto <stevenharyanto@gmail.com>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SHARYANTO-Misc
+requires:
+  List::MoreUtils: '0'
+  Moo: '0'
+  namespace::clean: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=SHARYANTO-Misc
+  homepage: https://metacpan.org/release/SHARYANTO-Misc
+  repository: git://github.com/sharyanto/perl-SHARYANTO-Misc.git
+version: '0.01'
+x_Dist_Zilla:
+  perl:
+    version: '5.018001'
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      name: '@Author::SHARYANTO/@Filter/GatherDir'
+      version: '5.015'
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@Author::SHARYANTO/@Filter/PruneCruft'
+      version: '5.015'
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@Author::SHARYANTO/@Filter/ManifestSkip'
+      version: '5.015'
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@Author::SHARYANTO/@Filter/MetaYAML'
+      version: '5.015'
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@Author::SHARYANTO/@Filter/License'
+      version: '5.015'
+    -
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: '@Author::SHARYANTO/@Filter/PodCoverageTests'
+      version: '5.015'
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@Author::SHARYANTO/@Filter/PodSyntaxTests'
+      version: '5.015'
+    -
+      class: Dist::Zilla::Plugin::ExtraTests
+      name: '@Author::SHARYANTO/@Filter/ExtraTests'
+      version: '5.015'
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@Author::SHARYANTO/@Filter/ExecDir'
+      version: '5.015'
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@Author::SHARYANTO/@Filter/ShareDir'
+      version: '5.015'
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 1
+      name: '@Author::SHARYANTO/@Filter/MakeMaker'
+      version: '5.015'
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@Author::SHARYANTO/@Filter/Manifest'
+      version: '5.015'
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@Author::SHARYANTO/@Filter/ConfirmRelease'
+      version: '5.015'
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@Author::SHARYANTO/@Filter/UploadToCPAN'
+      version: '5.015'
+    -
+      class: Dist::Zilla::Plugin::Author::SHARYANTO::MetaResources
+      name: '@Author::SHARYANTO/Author::SHARYANTO::MetaResources'
+      version: '0.01'
+    -
+      class: Dist::Zilla::Plugin::CheckChangeLog
+      name: '@Author::SHARYANTO/CheckChangeLog'
+      version: '0.01'
+    -
+      class: Dist::Zilla::Plugin::CheckMetaResources
+      name: '@Author::SHARYANTO/CheckMetaResources'
+      version: '0.001'
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@Author::SHARYANTO/MetaJSON'
+      version: '5.015'
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@Author::SHARYANTO/MetaConfig'
+      version: '5.015'
+    -
+      class: Dist::Zilla::Plugin::OurDate
+      name: '@Author::SHARYANTO/OurDate'
+      version: '0.01'
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      config:
+        Dist::Zilla::Plugin::PodWeaver:
+          finder:
+            - ':InstallModules'
+            - ':ExecFiles'
+          plugins:
+            -
+              class: Pod::Weaver::Plugin::EnsurePod5
+              name: '@CorePrep/EnsurePod5'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Plugin::H1Nester
+              name: '@CorePrep/H1Nester'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Name
+              name: '@Author::SHARYANTO/Name'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Version
+              name: '@Author::SHARYANTO/Version'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::ReleaseDate
+              name: '@Author::SHARYANTO/ReleaseDate'
+              version: '0.01'
+            -
+              class: Pod::Weaver::Section::Region
+              name: '@Author::SHARYANTO/prelude'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: SYNOPSIS
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: DESCRIPTION
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: OVERVIEW
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: ATTRIBUTES
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: METHODS
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: FUNCTIONS
+              version: '4.006'
+            -
+              class: Pod::Weaver::Plugin::Perinci
+              name: '@Author::SHARYANTO/Perinci'
+              version: '0.14'
+            -
+              class: Pod::Weaver::Section::Leftovers
+              name: '@Author::SHARYANTO/Leftovers'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Region
+              name: '@Author::SHARYANTO/postlude'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Homepage::DefaultCPAN
+              name: '@Author::SHARYANTO/Homepage::DefaultCPAN'
+              version: '0.02'
+            -
+              class: Pod::Weaver::Section::Source::DefaultGitHub
+              name: '@Author::SHARYANTO/Source::DefaultGitHub'
+              version: '0.04'
+            -
+              class: Pod::Weaver::Section::Bugs::DefaultRT
+              name: '@Author::SHARYANTO/Bugs::DefaultRT'
+              version: '0.03'
+            -
+              class: Pod::Weaver::Section::Authors
+              name: '@Author::SHARYANTO/Authors'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Legal
+              name: '@Author::SHARYANTO/Legal'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Plugin::EnsureUniqueSections
+              name: '@Author::SHARYANTO/EnsureUniqueSections'
+              version: '0.121550'
+            -
+              class: Pod::Weaver::Plugin::SingleEncoding
+              name: '@Author::SHARYANTO/SingleEncoding'
+              version: '4.006'
+      name: '@Author::SHARYANTO/PodWeaver'
+      version: '4.005'
+    -
+      class: Dist::Zilla::Plugin::PruneFiles
+      name: '@Author::SHARYANTO/PruneFiles'
+      version: '5.015'
+    -
+      class: Dist::Zilla::Plugin::ReadmeFromPod
+      name: '@Author::SHARYANTO/ReadmeFromPod'
+      version: '0.21'
+    -
+      class: Dist::Zilla::Plugin::Rinci::Validate
+      name: '@Author::SHARYANTO/Rinci::Validate'
+      version: '0.12'
+    -
+      class: Dist::Zilla::Plugin::SHARYANTO::OurPkgVersion
+      name: '@Author::SHARYANTO/SHARYANTO::OurPkgVersion'
+      version: '0.02'
+    -
+      class: Dist::Zilla::Plugin::Test::Compile
+      config:
+        Dist::Zilla::Plugin::Test::Compile:
+          filename: t/00-compile.t
+          module_finder:
+            - ':InstallModules'
+          script_finder:
+            - ':ExecFiles'
+      name: '@Author::SHARYANTO/Test::Compile'
+      version: '2.039'
+    -
+      class: Dist::Zilla::Plugin::Test::Rinci
+      name: '@Author::SHARYANTO/Test::Rinci'
+      version: '0.01'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: test
+          type: requires
+      name: TestRequires
+      version: '5.015'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: Prereqs
+      version: '5.015'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: '5.015'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: '5.015'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: '5.015'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: '5.015'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: '5.015'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: '5.015'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':AllFiles'
+      version: '5.015'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':NoFiles'
+      version: '5.015'
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: '0'
+    version: '5.015'

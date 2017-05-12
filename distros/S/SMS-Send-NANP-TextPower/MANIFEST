@@ -1,0 +1,16 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/SMS/Send/NANP/TextPower.pm
+perl-SMS-Send-NANP-TextPower.spec
+t/001_load.t
+t/pod-coverage.t
+t/pod-spell.t
+t/pod.t
+t/kwalitee.t
+t/changes.t
+
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,18 @@
+test: checking test debug1
+test: deps: washington.ok, adams.ok
+washington.ok: checking (?-xism:^(.*)\.ok$) debug1
+washington.ok: required ( !exists )
+adams.ok: checking (?-xism:^(.*)\.ok$) debug1
+adams.ok: required ( !exists )
+test: required ( !exists, !deps )
+1..2
+washington.ok: checking (?-xism:^(.*)\.ok$) debug1
+washington.ok: required ( !exists )
+washington.ok: in exec() for (?-xism:^(.*)\.ok$), debug1
+washington.ok: execing '        touch $TARGET' 
+ok 1 - washington.ok
+adams.ok: checking (?-xism:^(.*)\.ok$) debug1
+adams.ok: required ( !exists )
+adams.ok: in exec() for (?-xism:^(.*)\.ok$), debug1
+adams.ok: execing '        touch $TARGET' 
+ok 2 - adams.ok

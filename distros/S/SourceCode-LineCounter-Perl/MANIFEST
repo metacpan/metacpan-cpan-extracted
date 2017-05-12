@@ -1,0 +1,21 @@
+Changes
+corpus/hello.pl
+examples/loc
+lib/SourceCode/LineCounter/Perl.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/blank.t
+t/code.t
+t/comment.t
+t/count.t
+t/load.t
+t/pod.t
+t/pod_coverage.t
+t/pod_line.t
+t/test_manifest
+t/total.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

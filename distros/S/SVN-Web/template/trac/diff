@@ -1,0 +1,7 @@
+[% PROCESS header %]
+
+[% PROCESS _action_menu %]
+
+[% INCLUDE '_diff' %]
+
+[% PROCESS footer %]

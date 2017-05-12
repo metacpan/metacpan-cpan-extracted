@@ -1,0 +1,99 @@
+INTRODUCTION
+
+Spreading activation search is a useful way of getting something called "expanded recall", where you can type in a keyword query and get back relevant  results that may contain an exact keyword match, as if by magic.    The magic in this case is very straightforward, but you don't have to tell your boss that.
+
+Most keyword search engines work by building some kind of a lookup table, in many cases a reverse index of words to documents.  This module behaves a little differently, cr
+
+
+This module is an implementation of a search technique called 'contextual
+network search', or 'spreading activation search'.
+
+The idea is to represent a document collection as a set of document and term
+nodes in a bipartite graph.  How you generate the term list is up to you - our
+own approach is to extract all nouns and noun phrases using a part-of-speech
+tagger (see L<Lingua::EN::Tagger>).
+
+Documents and terms are connected by weighted edges.  Weights on the edges are a
+function of your choice of weighting algorithm.   The only restriction is that
+weights must not exceed 1.
+
+We search the graph by energizing a query node with an arbitrary starting energy
+E.  We then distribute that energy among the neighbor nodes, according to the
+following formula.  First, divide the energy by the number of neighbor nodes -
+call this new value S.   For example, if the starting energy is 10,000, and our
+node has five neighbors, S = 2000 units.   Next, determine whether S exceeds our
+arbitrary threshold.    If S is less than the threshold, we stop propagating.
+If S exceeds the threshold, we assign energies to all the neighbor nodes, and
+recurse down.
+
+The energy assigned to each neighbor node will depend on the weight of the edge
+connecting it to the starting node.  Since this weight is guaranteed to fall
+between 0 and 1, the maximum energy a neighbor node can receive is S.
+
+The module uses a pure Perl implementation, or a compiled C implementation.  The
+principal difference between the two is memory requirements - the C version is about half 
+the size of the Perl one for a given document collection.   You can select the
+C version by passing a parameter to the constructor:
+
+	my $cg = Search::ContextGraph->new( 'xs' => 1 );
+
+Further details are available in the module documentation.
+
+INPUT FORMAT
+
+The module can take either a hash of document titles and term lists, or a term-
+document matrix (TDM) file.  The first format looks like this
+
+	{ 
+		TITLE => { 
+					WORD => COUNT,
+			   		WORD => COUNT,
+			   		...
+			  	 },
+		...
+	}
+	
+The TDM input format is useful for very large collections.  The TDM file is a plain text file with the following format:
+
+Arbitrary text
+Arbitrary text
+TERMS DOCS
+Arbitrary text
+A B C B C B C
+....
+
+The first two lines are filler, the third line contains the number of unique terms and unique docs, the fourth line is filler.
+
+The format for subsequent lines is as follows:
+
+A is the number of keywords in the document
+B is a unique identifier for the keyword
+C is the weight to assign the edge between keyword and document
+
+So a line like:
+
+2 12 0.233 23 0.91
+
+Would mean the document contains two keywords, with identifiers 12 and 23, and 
+that the edges in the graph should be set to 0.233 and 0.91 respectively.
+
+You may be wondering where the unique identifier for the document is.  The answer is - the program determines it based on the position in the file.  
+So the first data line corresponds to document 0, the second line is document 1, etc.
+
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Maciej Ceglowski, Schuyler Erle
+
+This is free software.  See LICENSE for details.
+

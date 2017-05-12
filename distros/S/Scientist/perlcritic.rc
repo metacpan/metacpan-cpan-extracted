@@ -1,0 +1,10 @@
+severity = 3
+
+# show critic policy module, too.
+verbose = 9
+
+# unit tests aren't modules.
+program-extensions = .t
+
+[RegularExpressions::RequireExtendedFormatting]
+minimum_regex_length_to_complain_about = 20

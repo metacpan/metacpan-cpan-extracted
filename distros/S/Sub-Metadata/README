@@ -1,0 +1,29 @@
+NAME
+
+Sub::Metadata - read and write subroutine metadata
+
+DESCRIPTION
+
+This module contains functions that examine and modify data that Perl
+attaches to subroutines.
+
+INSTALLATION
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+AUTHOR
+
+Andrew Main (Zefram) <zefram@fysh.org>
+
+COPYRIGHT
+
+Copyright (C) 2009, 2010, 2011, 2013, 2015
+Andrew Main (Zefram) <zefram@fysh.org>
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

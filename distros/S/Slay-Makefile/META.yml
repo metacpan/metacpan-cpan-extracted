@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Slay-Makefile
+version:             0.12
+abstract:            Wrapper to Slay::Maker that reads the rules from a file
+license:             ~
+author:              
+    - Mark Nodine <mnodine@alum.mit.edu>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    File::Copy::Recursive:         0
+    File::Path:                    0
+    Slay::Maker:                   0.04
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

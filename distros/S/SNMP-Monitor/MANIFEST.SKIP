@@ -1,0 +1,10 @@
+^blib/
+~$
+^html/
+^Makefile$ 
+^Makefile(\.old)?$
+^configuration$
+^pm_to_blib$
+^snmpmon$
+^snmpmonRep$
+\bCVS\b

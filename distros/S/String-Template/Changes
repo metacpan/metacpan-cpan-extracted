@@ -1,0 +1,59 @@
+Revision history for Perl extension String-Template
+
+0.19      2015-12-10 06:45:23 -0500
+  - Migrate to EUMM
+
+0.18      2015-04-14 05:09:31 -0400
+  - Time::Piece is only a test requirement on MSWin32 again
+    (for 0.17 it was set as a test requirement everywhere)
+
+0.17      2015-04-13 13:49:24 -0400
+  - Documentation tweaks
+  - Migrate to Dist::Zilla
+  - All tests use string and warnings
+  - Require Perl 5.8.1
+
+0.16      2015-02-08
+  - Remove DateTime::Format::Strptime as a prereq
+    as it is not being used.
+
+0.15      2015-02-06
+  - Specify Perl 5.6.0 as a prereq
+
+0.14      2015-02-02
+  - Documentation fixes
+
+0.12      2014-10-13 
+  - Fix time zone related test failures on Windows Perl
+
+0.11      2012-10-03 08:03:19 -0400
+  - fix tests in other time zones
+ 
+0.10      2012-10-02 11:35:04 -0400
+  - cleanup for public release
+
+0.09      2012-09-07 14:58:46 -0400
+  - expand_stringi now supports special chars
+
+0.08      2012-09-07 13:13:19 -0400
+  - added expand_stringi
+
+0.07      2009-10-13 11:31:55 -0400
+  - Added expand_hash() function
+
+0.05      2009-03-02 16:45:09 -0400
+  - Added '!' special for date/times from UTC
+
+0.04      2008-09-03 08:50:11 -0400
+  - Added $undef_flag to control handling of undefined fields
+
+0.03      2008-08-15 07:58:45 -0400
+  - Added '#' special for expanding with substr
+  - Remove untemplate()
+
+0.02      2008-06-02 07:57:06 -0400
+  - If fields are undefined, just replace with ''
+  - Added more test cases
+
+0.01      2008-03-07 10:49:14 -0400
+  - original version

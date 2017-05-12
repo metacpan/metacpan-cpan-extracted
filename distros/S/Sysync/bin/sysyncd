@@ -1,0 +1,464 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+sysyncd - daemon for sysync
+
+=head1 SYNOPSIS
+
+ usage: /usr/sbin/sysyncd
+ Commands:
+    --config=/var/sysync/sysync.conf
+
+=cut
+ 
+use strict;
+
+use File::Copy;
+use Digest::MD5 qw(md5_hex);
+use Time::HiRes 'usleep';
+use POSIX ":sys_wait_h";
+
+use IPC::Open3;
+use YAML;
+use Sysync;
+
+my $default_sleep = 1800;
+my $max_workers   = 10;
+my $sysdir;
+my $stagedir;
+my $stagefilesdir;
+my $sysync;
+
+my $editor = $ENV{EDITOR} || 'vi';
+
+die "sysync may only be ran as root\n" unless $< == 0;
+
+my $current_workers = 0;
+
+my @TRAILING_ARGS;
+open(LOG, ">/dev/null");
+*LOG = *STDERR if $ENV{DEBUG};
+
+my $no_passwd_control = 0;
+
+my $config = {};
+
+sub main
+{
+    # grab options
+    my $options = _parse_options();
+    
+    $config  =
+        Load(Sysync->read_file_contents($options->{config} || '/var/sysync/sysync.conf'));
+
+    $no_passwd_control = 1
+        if $config->{no_passwd_control};
+
+    $default_sleep = $config->{sleep}
+        if $config->{sleep} and $config->{sleep} > 0;
+
+    $max_workers = $config->{max_workers}
+        if $config->{max_workers} and $config->{max_workers} > 0;
+
+    my $backend_module = $config->{module};
+
+    eval("use $backend_module");
+
+    if ($@)
+    {
+        die "Could not load $backend_module\n";
+    }
+
+    $config->{log} = *LOG;
+
+    $sysync = $backend_module->new($config);
+
+    $sysdir        = $sysync->sysdir;
+    $stagedir      = $sysync->stagedir;
+    $stagefilesdir = $sysync->stagefilesdir;
+
+    if ($options->{help})
+    {
+        usage();
+    }
+    else
+    {
+        daemon();
+    }
+
+    return 0;
+}
+
+sub _log { $sysync->log($_[0]) }
+
+sub _sync_host
+{
+    my ($host, $address, $dir, $what) = @_;
+
+    my $extra_ssh_params = '';
+
+    # default to root
+    my $sync_as_user = $config->{sync_as_user} || 'root';
+
+    my @extra_params;
+    if ($sync_as_user and $sync_as_user ne 'root')
+    {
+        push @extra_params, '--rsync-path', 'sudo rsync';
+    }
+
+    my @rsync = ('rsync', '-zva', '--copy-unsafe-links', '--omit-dir-times', '--numeric-ids',
+                 '-e', "ssh -F /var/sysync/ssh.conf", @extra_params);
+    push @rsync, "$dir/$host/";
+    push @rsync, "$sync_as_user\@$address:/";
+
+    my $r = _system(@rsync);
+
+    if ($r->{status} and $r->{status} > 0)
+    {
+        _log("$host => $address fail:\n");
+        _log($r->{stderr});
+    }
+    else
+    {
+        my @lines = split("\n", $r->{stdout});
+
+        my @out_lines;
+        for (@lines)
+        {
+            $_ =~ s/[\n\r]//g;
+            next if $_ =~ /^sending /;
+            next if $_ =~ /^sent /;
+            next if $_ =~ /^total /;
+            next if $_ =~ /^Warning: Permanently added/;
+            
+            push @out_lines, "$address: $_" if $_;
+            last if $_ =~ /^Permission denied/;
+        }
+
+        @out_lines = grep { $_ } @out_lines;
+
+        if (@out_lines)
+        {
+            my $files = join("\n", @out_lines);
+            _log("rsyncing $what [$host => $address]\n$files");
+        }
+    }
+}
+
+sub _system
+{
+    my @command = @_;
+    my($wtr, $rdr, $err);
+    my $pid = open3($wtr, $rdr, $err, @command);
+    close($wtr);
+    waitpid( $pid, 0 );
+
+    my $out = '';
+    $out .= $_ while (<$rdr>);
+
+    my $error = '';
+    $error .= $_ while (<$err>);
+
+    if ($ENV{VERBOSE})
+    {
+        my $s = join(' ', @command);
+        warn "=== executing: $s ===\n";
+        warn "=== stdout ==\n";
+        warn "$out\n";
+        warn "=== error ==\n";
+        warn "$error\n";
+        warn "=== end execution ===\n";
+    }
+
+    return {
+        status => $?,
+        stderr => $error,
+        stdout => $out,
+    };
+}
+
+$SIG{CHLD} = \&REAPER;
+
+sub REAPER
+{
+    my $kid;
+
+    while (($kid = waitpid(-1, &WNOHANG)) > 0)
+    { 
+
+    }
+    $current_workers--;
+    $SIG{CHLD} = \&REAPER;
+}
+
+sub daemon
+{
+    unless ($ENV{DEBUG})
+    {
+        if (my $pid = fork())
+        {
+            warn "sysync-daemon started\n";
+            $sysync->write_file_contents("/var/run/sysync.pid", $pid);
+            exit(0);
+        }
+        else
+        {
+            # do nothing
+        }
+    }
+
+    open(LOG, ">>/var/log/sysync.log") unless $ENV{DEBUG};
+    *STDERR = *LOG unless $ENV{DEBUG};
+
+    _log("Starting sysync daemon.");
+
+    $0 = 'sysyncd';
+
+    $sysync->must_refresh(1);
+    $sysync->must_refresh_files(1);
+
+    while (1)
+    {
+        sleep(1);
+
+        if ($sysync->must_refresh and not $no_passwd_control)
+        {
+            $sysync->must_refresh(0);
+            my $hosts = $sysync->get_all_hosts;
+
+            $sysync->update_all_hosts($hosts);
+
+            &sync_hosts($hosts, $stagedir, 'auth');
+        }
+
+        if ($sysync->must_refresh_files)
+        {
+            $sysync->must_refresh_files(0);
+            my $hosts = $sysync->get_all_hosts;
+
+            # these updates can be massive, so fork!
+            unless (fork())
+            {
+                &sync_hosts_files($hosts, $stagefilesdir, 'files');
+
+                exit(0);
+            }
+        }
+    }
+}
+
+my %pids;
+sub sync_hosts_files
+{
+    my ($hosts, $dir, $what) = @_;
+
+    my @hosts = keys %{ $hosts->{hosts} || {} };
+
+    for my $host (@hosts)
+    {
+        while ($current_workers >= $max_workers) { usleep(2000) };
+
+        if (my $pid = fork())
+        {
+            $pids{$pid} = 1;
+            $current_workers++;
+        }
+        else
+        {
+            $0 = "sysyncd files refresh $host [building]";
+
+            eval { $sysync->update_host_files($host) };
+
+            if ($@)
+            {
+                _log($@);
+            }
+            exit(0);
+        }
+    }
+
+    # wait for children to finish
+    while (keys %pids)
+    {
+        for my $pid (keys %pids)
+        {
+            delete $pids{$pid}
+                if waitpid($pid, WNOHANG);
+        }
+        usleep(2000);
+    }
+
+    for my $host (@hosts)
+    {        
+        my @host_addresses;
+
+        for my $address (@{ $hosts->{hosts}{$host} || [] })
+        {
+            push @host_addresses, { 
+                host    => $host,
+                address => $address,
+            };
+        }
+
+        for my $h (@host_addresses)
+        {
+            while ($current_workers >= $max_workers) { usleep(2000) };
+
+            if (my $pid = fork())
+            {
+                $current_workers++;
+                $pids{$pid} = 1;
+            }
+            else
+            {
+                $0 = "sysyncd files refresh [$h->{host} => $h->{address}]";
+                eval { _sync_host($h->{host}, $h->{address}, $dir, 'files') };
+                if ($@)
+                {
+                    _log($@);
+                }
+                exit(0);
+            }
+        }
+    }
+
+    # wait for children to finish
+    while (keys %pids)
+    {
+        for my $pid (keys %pids)
+        {
+            delete $pids{$pid}
+                if waitpid($pid, WNOHANG);
+        }
+        usleep(2000);
+    }
+}
+
+sub sync_hosts
+{
+    my ($hosts, $dir, $what) = @_;
+
+    my @hosts = keys %{ $hosts->{hosts} || {} };
+
+    # map hosts to addresses
+    my @host_addresses;
+
+    for my $host (@hosts)
+    {
+        for my $address (@{ $hosts->{hosts}{$host} || [] })
+        {
+            push @host_addresses, { 
+                host    => $host,
+                address => $address,
+            };
+        }
+    }
+
+    for my $h (@host_addresses)
+    {
+        while ($current_workers >= $max_workers) { usleep(2000) };
+
+        if (fork())
+        {
+            $current_workers++;
+        }
+        else
+        {
+            $0 = "sysyncd $what refresh [$h->{host} => $h->{address}]";
+            eval { _sync_host($h->{host}, $h->{address}, $dir, $what) };
+            if ($@)
+            {
+                _log($@);
+            }
+            exit(0);
+        }
+    }
+}
+
+sub usage
+{
+    warn "usage: $0\n";
+    warn "Commands:\n";
+    warn "   --config=/var/sysync/sysync.conf\n";
+}
+
+# quick and dirty
+sub _parse_options
+{
+    my %options;
+
+    my @acceptable_options = qw(
+        config help
+    );
+
+    my @OPTS = @ARGV;
+    while (@OPTS)
+    {
+        my $arg = shift @OPTS;
+
+        # cleanse all parameters of all unrighteousness
+        #   `--` & `-` any parameter shall be removed
+        $arg =~ s/^--//;
+        $arg =~ s/^-//;
+
+        # does this carry an assignment?
+        if ($arg =~ /=/)
+        {
+            my ($key, $value) = split('=', $arg);
+
+            $options{$key} = $value;
+
+            if ($arg =~ /^cmd\=/)
+            {
+                @TRAILING_ARGS = @OPTS;
+                last;
+            }
+        }
+        else
+        {
+            $options{$arg} = 1;
+        }
+    }
+
+    for my $option (keys %options)
+    {
+        die("[$0] `$option` is an invalid option\n")
+            unless (grep { $_ eq $option } @acceptable_options);
+    }
+
+    return \%options;
+}
+
+exit __PACKAGE__->main;
+
+
+=head1 COPYRIGHT
+
+L<Bizowie|http://bizowie.com/> L<cloud erp|http://bizowie.com/solutions/>
+
+=head1 LICENSE
+
+ Copyright (C) 2012, 2013 Bizowie
+
+ This file is part of Sysync.
+ 
+ Sysync is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as
+ published by the Free Software Foundation, either version 3 of the
+ License, or (at your option) any later version.
+ 
+ Sysync is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+ 
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+=head1 AUTHOR
+
+Michael J. Flickinger, C<< <mjflick@gnu.org> >>
+
+=cut
+

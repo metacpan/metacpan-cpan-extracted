@@ -1,0 +1,6 @@
+[% list.name %] has a deferred message from [% mail.from %]
+
+http://siesta.unixbeard.net/siesta/resume.tt2?id=[% deferred.id %]
+
+Will set it back on its way
+

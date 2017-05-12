@@ -1,0 +1,984 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+cpanest - generate an Hyper Estraier index for CPAN
+
+=head1 SYNOPSIS
+
+B<cpanest>
+[B<-clean>] [B<-noclean>]
+[B<-cpan> I<url or directory>]
+[B<-node> I<node_uri>]
+[B<-force>] [B<-noforce>]
+[B<-keep> I<directory>]
+[B<-match> I<regexp>]
+[B<-test> I<level>]
+[B<-trust_mtime>] [B<-notrust_mtime>]
+
+=head1 DESCRIPTION
+
+This is a port of C<cpanwait> from L<WAIT> perl search engine to node API of
+Hyper Estraier.
+
+All the hard work was done by Ulrich Pfeifer who wrote all parsers and
+formatters. I just added support for Hyper Estraier back-end after.
+
+B<This documentation is somewhat incomplete and off-the-sync with code.>
+
+=head1 OPTIONS
+
+=over 5
+
+=item B<-clean> / B<-noclean>
+
+Clean the table befor indexing. Default is B<off>.
+
+=item B<-cpan> I<url or directory>
+
+Default directory or URL for indexing. If an URL is given, there
+currently must be a file F<indices/find-ls.gz> relative to it which
+contains the output of C<find . -ls | gzip>.
+Default is F<ftp://ftp.rz.ruhr-uni-bochum.de/pub/CPAN>.
+
+
+=item B<-node> I<http://localhost:1978/node/cpan>
+
+Specify node URI
+
+=item B<-force>
+
+Force reindexing, even if B<cpan> thinks files are up to date.
+Default is B<off>
+
+=item B<-keep> I<directory>
+
+If fetching from a remote server, keep files in I<directory>. Default is
+F</app/unido-i06/src/share/lang/perl/96a/CPAN/sources>.
+
+=item B<-match> I<regexp>
+
+Limit to patches matching I<regexp>. Default is F<authors/id/>.
+
+=item B<-test> I<level>
+
+Set test level, were B<0> means normal operation, B<1> means, don't
+really index and B<2> means, don't even get archives and examine them.
+
+=item B<-trust_mtime> / B<-notrust_mtime>
+
+If B<on>, the files mtimes are used to decide, which version of an
+archive is the newest. If b<off>, the version extracted is used
+(beware, there are far more version numbering schemes than B<cpan> can
+parse).
+
+=back
+
+=head1 AUTHORS
+
+Ulrich Pfeifer E<lt>F<pfeifer@ls6.informatik.uni-dortumund.de>E<gt>
+
+Dobrica Pavlinusic E<lt>F<dpavlin@rot13.org>E<gt>
+
+=head1 COPYRIGHT
+
+Copyright (c) 1996-1997, Ulrich Pfeifer
+
+Copyright (c) 2005, Dobrica Pavlinusic
+
+=cut
+
+use strict;
+
+use File::Path;
+use Getopt::Long;
+use File::Find;
+use File::Basename;
+use IO::File;
+use IO::Zlib;
+use POSIX qw/strftime/;
+
+use lib '/data/wait/lib';
+
+use WAIT::Parse::Base;
+use WAIT::Parse::Pod;
+use WAIT::Document::Tar;
+use WAIT::Document::Find;
+
+sub fname($);
+
+# maximum number of archives to index (set to -1 for unlimited)
+my $max = -1;
+
+my %OPT = (
+	node	=> 'http://localhost:1978/node/cpan',
+	clean	=> 0,
+	remove	=> [],
+	force	=> 0,
+#	cpan	=> '/usr/src/perl/CPAN/sources',
+	cpan	=> '/rest/cpan/CPAN/',
+	trust_mtime => 1,
+	match	=> 'authors/id/',
+	test	=> 0,
+#	cpan	=> 'ftp://ftp.rz.ruhr-uni-bochum.de/pub/CPAN',
+#	cpan	=> 'ftp://ftp.uni-hamburg.de:/pub/soft/lang/perl/CPAN',
+	keep	=> '/tmp/CPAN/',
+);
+
+GetOptions(\%OPT,
+           'node=s',
+           'cpan=s',
+           'keep=s',
+           'match=s',
+           'clean!',
+           'test=i',            # test level 0: normal
+                                #            1: don't change db
+                                #            2: don't look at archives even
+
+           'remove=s@',
+           'force!',            # force indexing even if seen
+           'trust_mtime!',      # use mtime instead of version number
+	   'max=i',
+	   'debug!',
+          ) || die "Usage: ...\n";
+
+if ($OPT{max}) {
+	$max = $OPT{max};
+	print STDERR "processing just first $max modules\n";
+}
+
+# FIXME
+#clean_node(
+#               node => $OPT{node},
+#              ) if $OPT{clean};
+
+my $tb = new HyperEstraier::WAIT::Table(
+	uri	=> $OPT{node},
+	attr	=> ['docid', 'headline', 'source', 'size', 'parent', 'version'],
+	key	=> 'docid',
+	invindex => [ qw/name synopsis bugs description text environment example author/ ],
+	debug	=> $OPT{debug},
+) or die "Could not open node '$OPT{node}'";
+
+my $layout= new WAIT::Parse::Pod;
+
+# Map e.g. '.../latest' to 'perl'. Used in wanted(). Effects version
+# considerations. Value *must* match common prefix. Aliasing should be
+# used if CPAN contains serveral distributions with different name but
+# same root directory.
+# We still have a problem if there are different root directories!
+
+my %ALIAS = (# tar name                  real (root) name
+        'Games-Scrabble'        => 'Games',
+        'HTML-ParseBrowser'     => 'HTML',
+        'iodbc_ext'     => 'iodbc-ext-0.1',
+        'sol-inst'      => 'Solaris',
+        'WebService-Validator-CSS-223C' => 'WebService-Validator-CSS-W3C-0.02',
+        'MPEG-ID3212Tag'        => 'MPEG-ID3v2Tag-0.36',
+        'WebService-GoogleHack' => 'WebService',
+        'Db-Mediasurface-ReadConfig'    => 'ReadConfig',
+        'Tie-Array-RestrictUpdates'     => 'Tie',
+        'HTML-Lister'   => 'HTML',
+        'Net-253950-AsyncZ'     => 'Net-Z3950-AsyncZ-0.08',
+        'ChildExit_0'   => 'ChildExit-0.1',
+        'Tie-TieConstant'       => 'TieConstant.pm',
+        'Crypt-OpenSSL-23509'   => 'Crypt-OpenSSL-X509-0.2',
+        'subclustv'     => 'blib',
+        'finance-yahooquote'    => 'Finance-YahooQuote-0.20',
+        'HPUX-FS'       => 'FS',
+        'Business-DE-Konto'     => 'Business',
+        'Digest-MD5-124p'       => 'Digest-MD5-M4p-0.01',
+        'AKDB_Okewo_de' => 'AKDB',
+        'ExtUtils-0577' => 'ExtUtils-F77-1.14',
+        'LispFmt'       => 'Lisp::Fmt-0.00',
+        'Acme-Stegano'  => 'Acme',
+        'Acme-RTB'      => 'Acme',
+        'WWW-Search-PRWire'     => 'work',
+        'Video-Capture-214l'    => 'Video-Capture-V4l-0.224',
+        'Tie-DirHandle' => 'Tie',
+        'DB2'   => 'DBD-DB2-0.71a',
+        'Tie-Scalar-RestrictUpdates'    => 'Tie',
+        'Math-MVPoly'   => 'MVPoly',
+        'PlugIn'        => 'PlugIn.pm',
+        'Lingua-ID-Nums2Words'  => 'Nums2Words-0.01',
+        'chronos-1.'    => 'Chronos',
+        'jp_beta'       => 'jperl_beta_r1',
+        'Bundle-223C-Validator' => 'Bundle-W3C-Validator-0.6.5',
+        'Text-199'      => 'Text-T9-1.0',
+        'Games-Literati'        => 'Games',
+        'VMS-IndexedFile'       => 'VMS',
+        'authen-rbac'   => 'Authen',
+        'Graphics-EPS'  => 'EPS.pm',
+        'new.spirit-2.' => 'new.spirit',
+        'Tk-MListbox'   => 'MListbox-1.11',
+        'DBD-SQLrelay'  => 'SQLRelay.pm',
+        'Tie-RDBM-Cached'       => 'RDBM',
+        'PDL_IO_HDF'    => 'HDF',
+        'HPUX-LVM'      => 'LVM',
+        'Parse-Nibbler' => 'Parse',
+        'Digest-Perl-MD4'       => 'MD4',
+        'Crypt-Imail'   => 'Imail',
+        'ubertext'      => 'Text-UberText-0.95',
+        'MP3-123U'      => 'M3U',
+        'Qmail-Control' => 'Qmail',
+        'T-LXS' => 'Text-LevenshteinXS-0.02',
+        'HTML-Paginator'        => 'HTML',
+        'swig'  => 'SWIG1.1p5',
+        'MIDI-Realtime' => 'MIDI',
+        'sparky-public' => 'Sparky-Public-1.06',
+        'Chemistry-MolecularMass'       => 'Chemistry',
+        'Net-253950-SimpleServer'       => 'Net-Z3950-SimpleServer-0.08',
+        'NewsClipper-OpenSource'        => 'NewsClipper-1.32-OpenSource',
+        'Win32API-Resources'    => 'Resources.pm',
+        'Unicode-Collate-Standard-2131_1'       => 'Unicode-Collate-Standard-V3_1_1-0.1',
+        'Net-026Term'   => 'Net-C6Term-0.11',
+        'BitArray1'     => 'BitArray',
+        'Audio-Radio-214L'      => 'Audio-Radio-V4L-0.01',
+        'Devel-AutoProfiler'    => 'Devel',
+        'Brasil-Checar-CGC'     => 'Brasil',
+        'AI-NeuralNet-SOM'      => 'SOM.pm',
+        'Net-BitTorrent-File-fix'       => 'Net-BitTorrent-File-1.01',
+        'VMS-FindFile'  => 'VMS',
+        'LoadHtml.'     => 'README',
+        'Time-Compare'  => 'Time',
+        'ShiftJIS-230213-MapUTF'        => 'ShiftJIS-X0213-MapUTF-0.21',
+        'Image-WMF'     => 'Image',
+        'sdf-2.0.eta'   => 'sdf-2.001beta1',
+        'Math-Expr-LATEST'      => 'Math-Expr-0.4',
+        'MP3-Player-PktConcert' => 'MP3',
+        'Apache-OWA'    => 'OWA',
+        'Audio-Gramofile'       => 'Audio',
+        'DBIx-Copy'     => 'Copy',
+        'P4-024'        => 'P4-C4-2.021',
+        'Disassemble-2386'      => 'Disassemble-X86-0.13',
+        'Proc-Swarm'    => 'Swarm-0.5',
+        'Smil'  => 'perlysmil',
+        'Net-SSH-2232Perl'      => 'Net-SSH-W32Perl-0.05',
+        'Win32-SerialPort'      => 'SerialPort-0.19',
+        'Lingua-ID-Words2Nums'  => 'Words2Nums-0.01',
+        'Parse-Text'    => 'Text',
+        'DBIx-HTMLView-LATEST'  => 'DBIx-HTMLView-0.9',
+        'Apache-NNTPGateway'    => 'NNTPGateway-0.9',
+        'XPathToXML'    => 'XPathToXML.pm',
+        'XML-WMM-ASX'   => 'XML',
+        'CGISession'    => 'CGI',
+        'Net-SMS-142'   => 'Net-SMS-O2-0.019',
+        'Search-253950' => 'Search-Z3950-0.05',
+        'Date-Christmas'        => 'Christmas',
+        'Win32-InternetExplorer-Window' => 'Win32',
+        'Apache-WAP-MailPeek'   => 'MailPeek',
+        'Statistics-Table-F'    => 'Statistics',
+        'BerkeleyDB_Locks'      => 'BerkeleyDB-Locks-0_2',
+        'HookPrePostCall'       => 'PrePostCall-1.2',
+        'Oak-AAS-Service-DBI_13_PAM'    => 'Oak-AAS-Service-DBI_N_PAM-1.8',
+        'Math-Vector'   => 'Vector.pm',
+        'Audio-124pDecrypt'     => 'Audio-M4pDecrypt-0.04',
+        'libao-perl_0.03'       => 'libao-perl-0.03',
+        'CGI-EZForm'    => 'EZForm',
+        'Data-Locations-fixed'  => 'Data-Locations-5.2-fixed',
+        'HTML-Template-Filter-Dreamweaver'      => 'Dreamweaver',
+        'LineByLine'    => 'LineByLine.pm',
+        'Geo-0400'      => 'Geo-E00-0.05',
+        'WebService-Validator-HTML-223C'        => 'WebService-Validator-HTML-W3C-0.03',
+        'DateTime-Format-223CDTF'       => 'DateTime-Format-W3CDTF-0.04',
+        'DBD_SQLFLEX'   => 'DBD-Sqlflex',
+        'Text-Number'   => 'Number',
+        'DBIx-DataLookup'       => 'DBIx',
+        'MP3-ID3211Tag' => 'MP3-ID3v1Tag-1.11',
+        'Text-Striphigh'        => 'Striphigh-0.02',
+        'Tie-SortHash'  => 'SortHash',
+        'Apache-AccessAbuse'    => 'AccessAbuse',
+        'MP3-123U-Parser'       => 'MP3-M3U-Parser',
+        'Net-253950'    => 'Net-Z3950-0.44',
+        'Net-RBLClient' => 'RBLCLient-0.2',
+        'CGI-EasyCGI'   => 'CGI',
+        'http-handle'   => 'HTTP::Handle',
+        'JPEG-Comment'  => 'JPEG',
+        'router-lg'     => 'Router',
+        'Db-Mediasurface'       => 'Mediasurface',
+        'Text-BarGraph' => 'bargraph',
+        'TL'    => 'Text-Levenshtein-0.04',
+        'Config-Vars'   => 'Config-0.01',
+        'Tie-PerfectHash'       => 'Tie',
+        'DNS-TinyDNS'   => 'DNS',
+        'DesignPattern-Factory' => 'Factory',
+        'WWW-01_Rail'   => 'WWW-B_Rail-0.01',
+        'Win32-Exchange'        => 'blib',
+        'Math-RPN'      => 'Math',
+        'Db-Mediasurface-Cache' => 'Cache',
+        'perl_archie.'  => 'Archie.pm',
+        'Acme-PGPSign'  => 'Acme',
+        'HTML-Widget-sideBar'   => 'HTML-Widget-SideBar-1.00',
+        'log'   => 'Games',
+        'File-List'     => 'File',
+        'Schedule-Cronchik'     => 'Schedule',
+        'Curses-Devkit' => 'Cdk',
+        'Pod-PalmDoc'   => 'Pod',
+        'Easy-WML'      => 'Easy WML 0.1',
+        'Interval.'     => 'Date',
+        'Brasil-Checar-CPF'     => 'Brasil',
+        'Apache-WAP-AutoIndex'  => 'AutoIndex',
+
+        'SOM.pm'        => 'SOM.pm',
+        'PlugIn.pm'     => 'PlugIn.pm',
+        'XPathToXML.pm' => 'XPathToXML.pm',
+        'Vector.pm'     => 'Vector.pm',
+        'LineByLine.pm' => 'LineByLine.pm',
+        'Archie.pm'     => 'Archie.pm',
+        'TieConstant.pm'        => 'TieConstant.pm',
+        'EPS.pm'        => 'EPS.pm',
+        'SQLRelay.pm'   => 'SQLRelay.pm',
+        'Resources.pm'  => 'Resources.pm',
+        'README'        => 'README',
+
+        );
+my %NEW_ALIAS;                             # found in this pass
+
+# Map module names to pathes. Generated by wanted() doing alisaing.
+my %ARCHIVE;
+
+# Map module names to latest version. Generated by wanted()
+my %VERSION;
+
+
+# Mapping for modules with common root not matching modules name that
+# are not aliased. This is just for prefix stripping and not strictly
+# necessary.  Takes effect after version considerations.
+my %TR = (# tar name                root to strip
+          'Net_SSLeay.pm'        => 'SSLeay/',
+          'EventDrivenServer'    => 'Server/',
+          'bio_lib.pl.'          => '',
+          'AlarmCall'            => 'Sys/',
+          'Cdk-ext'              => 'Cdk/',
+          'Sx'                   => '\d.\d/',
+          'DumpStack'            => 'Devel/',
+          'StatisticsDescriptive'=> 'Statistics/',
+          'Term-Gnuplot'         => 'Gnuplot/',
+          'iodbc_ext'            => 'iodbc-ext-\d.\d/',
+          'UNIVERSAL'            => '',
+          'Term-Query'           => 'Query/',
+          'SelfStubber'          => 'Devel/',
+          'CallerItem'           => 'Devel/',
+         );
+
+my $LWP;
+
+# FIXME
+my $DIR = '/rest/estseek/cpan/';
+my $DATA = $DIR . '/data';
+
+
+if (@{$OPT{remove}}) {
+  my $pod;
+  for $pod (@{$OPT{remove}}) {
+    unless (-e $pod) {
+      $pod = "$DIR/$pod";
+    }
+    index_pod(file => $pod, remove => 1) if -f $pod;
+    unlink $pod or warn "Could not unlink '$pod': $!\n";
+  }
+  exit;
+}
+
+# Now get the beef
+if ($OPT{cpan} =~ /^(http|ftp):/) {
+  $LWP = 1;
+  require LWP::Simple;
+  LWP::Simple->import();
+
+  mkpath($DATA,1,0755) or
+    die "Could not generate '$DATA/': $!"
+      unless -d $DATA;
+
+  if (! -f "$DATA/find-ls.gz" or -M "$DATA/find-ls.gz" > 0.5) {
+    my $status = mirror("$OPT{cpan}/indices/find-ls.gz", "$DATA/find-ls.gz");
+    if ($status != &RC_OK and $status != &RC_NOT_MODIFIED) {
+      # we could use Net:FTP here ...
+      die "Was unable to mirror '$OPT{cpan}/indices/find-ls.gz'\n";
+    }
+  }
+  my $fh = new IO::File "gzip -cd $DATA/find-ls.gz |";
+  die "Could not open 'gzip -cd $DATA/find-ls.gz': !$\n" unless $fh;
+
+  my $line;
+  while (defined ($line = <$fh>)) {
+    chomp($line);
+    my ($mon, $mday, $time, $file, $is_link) = (split ' ', $line)[7..11];
+
+    next if defined $is_link;
+    my $mtime = mtime($mon, $mday, $time);
+
+    $file             =~ s:^\./::;
+    ($_)              =  fileparse($file);
+    $File::Find::name = $file;
+    wanted($mtime);
+  }
+} else {
+  find(sub {&wanted((stat($_))[9])}, $OPT{cpan});
+}
+
+ARCHIVE:
+for my $tar (sort keys %ARCHIVE) {
+  next if $OPT{match} and $ARCHIVE{$tar} !~ /$OPT{match}/o;
+  my $base = (split /\//, $ARCHIVE{$tar})[-1];
+  my $parent;
+
+  my %attr;
+
+  # logging
+  if ($OPT{trust_mtime}) {
+    $attr{'@mdate'} = strftime('%Y-%m-%dT%H:%M:%S+00:00', gmtime($VERSION{$tar}));
+    $parent->{'@mdate'} = $attr{'@mdate'};
+    printf "%-20s %10s %s\t", $tar, $attr{'@mdate'}, $base;
+  } else {
+    $attr{'version'} = $VERSION{$tar};
+    printf "%-20s %10.5f %s\t", $tar, $attr{'version'}, $base;
+  }
+
+  # Remember the archive
+  # We should have an extra table for the tar file data ...
+  if (!$OPT{force} and $tb->have(docid => $base)) {
+    print "skipping\n";
+    next ARCHIVE;
+  } else {
+    $parent->{_id} = $tb->insert(docid    => $base,
+                          headline => $ARCHIVE{$tar},
+			  %attr
+    ) unless $OPT{test};
+    print "indexing\n";
+  }
+
+  next ARCHIVE if $OPT{test} > 1;
+
+  my $TAR = myget($tar);
+
+  next ARCHIVE unless $TAR;                # not able to fetch it
+
+  my %tar;
+  tie (%tar,
+       'WAIT::Document::Tar',
+       sub { $_[0] =~ /\.(pm|pod|PL)$/i or $_[0] =~ /readme/i},
+       #sub { $_[0] !~ m:/$: },
+       $TAR)
+    or warn "Could not tie '$TAR'\n";
+
+  my $sloppy;
+  my ($key, $val);
+
+ FILE:
+  while (($key, $val) = each %tar) {
+    my $file = fname($key);
+
+    # don't index directories
+    next if $file =~ /\/$/;
+
+    # is it a POD file?
+    next FILE unless $file =~ /readme/i or $val =~ /\n=head/;
+
+    # remove directory prefix
+    unless ($sloppy                        # no common root
+            or $file =~ s:^\Q$tar\E[^/]*/::    # common root, maybe alias
+            or ($TR{$tar}                  # common root, not aliased
+                and $file =~ s:^\Q$TR{$tar}\E::)
+           ) {
+      # try to determine an alias
+      warn "Bad directory prefix: '$file'\n";
+      my ($prefix) = split /\//, $file;
+
+      while ($key = (tied %tar)->NEXTKEY) {
+        my $file = fname($key);
+
+        next if $file =~ /\/$/;
+        unless ($file =~ m:^$prefix/: or $file eq $prefix) {
+          warn "Archive contains different prefixes: $prefix,$file\n";
+          $prefix = '';
+          last;
+        }
+      }
+      if ($prefix) {
+        print "Please alias '$tar' to '$prefix' next time!\n";
+        print "See alias table later.\n";
+        $NEW_ALIAS{$tar} = $prefix;
+        $tb->delete_by_key($parent->{_id});
+        next ARCHIVE;
+      } else {
+        print "Assuming that tar file name $tar is a valid prefix\n";
+        $sloppy = 1;
+
+        # We may reset too much here! But that this is not exact
+        # science anyway. Maybe we should ignore using 'next ARCHIVE'.
+
+        $key = (tied %tar)->FIRSTKEY;
+        redo FILE;
+      }
+    }
+
+    # remove /lib prefix
+    $file =~ s:^lib/::;
+
+    # generate new path
+    my $path = "$DATA/$tar/$file";
+
+    my ($sbase, $sdir) = fileparse($path);
+    my $fh;
+
+    unless ($OPT{test}) {
+      if (-f $path) {
+        index_pod(file => $path, remove => 1);
+        unlink $path or warn "Could not unlink '$path' $!\n";
+      } elsif (!-d $sdir) {
+        mkpath($sdir,1,0755) or die "Could not mkpath($sdir): $!\n";
+      }
+#      $fh = new IO::File "> $path";
+      $fh = new IO::Zlib "$path.gz","wb";
+      die "Could not write '$path': $!\n" unless $fh;
+    }
+
+    if ($file =~ /readme|install/i) {   # make READMEs verbatim pods
+      $val =~ s/\n/\n /g;
+      $val = "=head1 NAME\n\n$tar $file\n\n=head1 DESCRIPTION\n\n $val"
+         unless $val =~ /^=head/m;
+    } else {                    # remove non-pod stuff
+      my $nval    = $val; $val = '';
+      my $cutting = 1;
+
+      for (split /\n/, $nval) {
+        if (/^=cut|!NO!SUBS!/) {
+          $cutting = 1;
+        } elsif ($cutting and /^=head/) {
+          $cutting = 0;
+        }
+        unless ($cutting) {
+          $val .= $_ . "\n";
+        }
+      }
+    }
+    unless ($OPT{test}) {
+      $fh->print($val);
+      index_pod(file => $path, parent => $parent,
+                text => $val,  source => $ARCHIVE{$tar},
+      );
+    }
+  }
+
+  if ($LWP and !$OPT{keep}) {
+    unlink $TAR or warn
+      "Could not unlink '$TAR': $!\n";
+  }
+}
+
+if (%NEW_ALIAS) {
+  print "\%ALIAS = (\n";
+  for (keys %NEW_ALIAS) {
+    print "\t'$_'\t=> '$NEW_ALIAS{$_}',\n";
+  }
+  print "\t);\n";
+}
+
+exit;
+
+sub fname ($) {
+  my $key = shift;
+  my ($ntar, $file) = split $;, $key;
+
+  # remove leading './' - shudder
+  $file =~ s/^\.\///;
+
+  return($file);
+}
+
+sub myget {
+  my $tar = shift;
+  my $TAR;
+  
+  if ($LWP) {                   # fetch the archive
+    if ($OPT{keep}) {
+      $TAR = "$OPT{keep}/$ARCHIVE{$tar}";
+      print "Keeping in '$TAR'\n" unless -e $TAR;
+      my ($base, $path) = fileparse($TAR);
+      unless (-d $path) {
+        mkpath($path,1,0755) or
+          die "Could not mkpath($path)\n";
+      }
+    } else {
+      $TAR = "/tmp/$tar.tar.gz";
+    }
+    unless (-e $TAR) {          # lwp mirror seems to fetch ftp: in any case?
+      print "Fetching $OPT{cpan}/$ARCHIVE{$tar}\n";
+      my  $status = mirror("$OPT{cpan}/$ARCHIVE{$tar}", $TAR);
+      if ($status != &RC_OK and $status != &RC_NOT_MODIFIED) {
+        warn "Was unable to mirror '$ARCHIVE{$tar}, skipping'\n";
+        return;
+      }
+    }
+  } else {
+        $TAR = $ARCHIVE{$tar};
+  }
+  $TAR;
+}
+
+sub index_pod {
+  my %parm = @_;
+  my $did = $parm{file};
+  my $rel_did = $did;
+  my $abs_did = $did;
+
+  if ($rel_did =~ s:$DIR/::) {
+    $abs_did = "$DIR/$rel_did";
+  }
+
+  undef $did;
+
+  # check for both variants
+  if ($tb->have('docid' => $rel_did)) {
+    $did = $rel_did;
+  } elsif ($tb->have('docid' => $abs_did)) {
+    $did = $abs_did;
+  }
+  if ($did) {                   # have it version
+    if (!$parm{remove} and !$OPT{force}) {
+      warn "duplicate: $did\n";
+      return;
+    }
+  } else {                      # not seen yet
+    $did = $rel_did;
+    if ($parm{remove}) {
+      print "missing: $did\n";
+      return;
+    }
+  }
+
+  $parm{'text'} ||= WAIT::Document::Find->FETCH($abs_did);
+
+  unless (defined $parm{'text'}) {
+    print "unavailable: $did\n";
+    return;
+  }
+
+  my $record      =  $layout->split($parm{'text'});
+
+  if (! $record) {
+	print "empty pod: $did\n";
+	return;
+  }
+
+  $record->{size} =  length($parm{'text'});
+  my $headline    =  $record->{name} || $did;
+
+  # additional fields for Hyper Estraier
+  $record->{'@mdate'} = $parm{'mdate'} if ($parm{'mdate'});
+
+  $headline =~ s/^$DATA//o;     # $did
+  $headline =~ s/\s+/ /g; $headline =~ s/^\s+//;
+
+  printf "%s %s\n", ($parm{remove})?'-':'+', substr($headline,0,70);
+  if ($parm{remove}) {
+    $tb->delete('docid'  => $did,
+                headline => $headline,
+                %{$record});
+  } else {
+    foreach (keys %{$parm{parent}}) {
+    	next if (/^_/);
+	$record->{$_} = $parm{parent}->{$_} if ($parm{parent}->{$_});
+    }
+    $tb->insert('docid'  => $did,
+                headline => $headline,
+                source   => $parm{source},
+                parent   => $parm{parent}->{_id},
+                %{$record});
+  }
+}
+
+# This *must* remove the version in *any* case. It should compute a
+# resonable version number - but usually mtimes should be used.
+sub version {
+  local ($_) = @_;
+
+  # remove alpha/beta postfix
+  s/([-_\d])(a|b|alpha|beta|src)$/$1/;
+
+  # jperl1.3@4.019.tar.gz
+  s/@\d.\d+//;
+
+  # oraperl-v2.4-gk.tar.gz
+  s/-v(\d)/$1/;
+
+  # lettered versions - shudder
+  s/([-_\d\.])([a-z])([\d\._])/sprintf "$1%02d$3", ord(lc $2) - ord('a') /ei;
+  s/([-_\d\.])([a-z])$/sprintf "$1%02d", ord(lc $2) - ord('a') /ei;
+
+  # thanks libwww-5b12 ;-)
+  s/(\d+)b/($1-1).'.'/e;
+  s/(\d+)a/($1-2).'.'/e;
+
+  # replace '-pre' by '0.'
+  s/-pre([\.\d])/-0.$1/;
+  s/\.\././g;
+  s/(\d)_(\d)/$1$2/g;
+
+  # chop '[-.]' and thelike
+  s/\W$//;
+
+  # ram's versions Storable-0.4@p
+   s/\@/./;
+
+  if (s/[-_]?(\d+)\.(0\d+)\.(\d+)$//) {
+    return($_, $1 + "0.$2" + $3 / 1000000);
+  } elsif (s/[-_]?(\d+)\.(\d+)\.(\d+)$//) {
+    return($_, $1 + $2/1000 + $3 / 1000000);
+  } elsif (s/[-_]?(\d+\.[\d_]+)$//) {
+    return($_, $1);
+  } elsif (s/[-_]?([\d_]+)$//) {
+    return($_, $1);
+  } elsif (s/-(\d+.\d+)-/-/) {  # perl-4.019-ref-guide
+    return($_, $1);
+  } else {
+    if ($_ =~ /\d/) {           # smells like an unknown scheme
+      warn "Odd version Numbering: '$File::Find::name'\n";
+      return($_, undef);
+    } else {                    # assume version 0
+      warn "No  version Numbering: '$File::Find::name'\n";
+      return($_, 0);
+    }
+
+  }
+}
+
+sub wanted {
+  my $mtime = shift;            # called by parse_file_ls();
+
+  return if (! $max);
+  $max--;
+
+  return unless /^(.*)\.(tar\.(gz|Z)|tgz)$/;
+
+  my ($archive, $version) = version($1);
+  
+  unless (defined $version) {
+    warn "Skipping $1\n";
+    return;
+  }
+  
+  # Check for file alias
+  $archive = $ALIAS{$archive} if $ALIAS{$archive};
+  
+  # Check for path alias.
+  if ($File::Find::name =~ m(/CPAN/(?:source/)?(.*\Q$archive\E))) {
+    if ($ALIAS{$1}) {
+      $archive = $ALIAS{$1};
+    }
+  }
+
+  if ($OPT{trust_mtime}) {
+    $version = $mtime;
+  } else {
+    $version =~ s/(\d)_/$1/;
+    $version ||= $mtime;   # mtime
+  }
+
+  if (!exists $ARCHIVE{$archive}
+      or $VERSION{$archive} < $version) {
+    $ARCHIVE{$archive} = $File::Find::name;
+    $VERSION{$archive} = $version;
+  }
+}
+
+my %MON;
+my $YEAR;
+
+BEGIN {
+  my $i = 1;
+  for (qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec)) {
+    $MON{$_} = $i++;
+  }
+  $YEAR = (localtime(time))[5];
+}
+
+# We could/should use Date::GetDate here
+use Time::Local;
+sub mtime {
+  my ($mon, $mday, $time) = @_;
+  my ($hour, $min, $year, $monn) = (0,0);
+
+  if ($time =~ /(\d+):(\d+)/) {
+    ($hour, $min) = ($1, $2);
+    $year = $YEAR;
+  } else {
+    $year = $time;
+  }
+  $monn = $MON{$mon} || $MON{ucfirst lc $mon} || warn "Unknown month: '$mon'";
+  my $guess = timelocal(0,$min,$hour,$mday,$monn-1,$year);
+  if ($guess > time) {
+    $guess = timelocal(0,$min,$hour,$mday,$monn-1,$year-1);
+  }
+  $guess;
+}
+
+package HyperEstraier::WAIT::Table;
+
+use Search::Estraier;
+use Text::Iconv;
+
+=head1 NAME
+
+HyperEstraier::WAIT::Table
+
+=head1 DESCRIPTION
+
+This is a mode that emulates C<WAIT::Table> functionality somewhat.
+
+There are some limitations and only one key attribute is supported (and used
+for C<@uri>).
+
+=head2 Porting from WAIT to this module.
+
+Since only one key is supported (and used as C<@uri> attribute), 
+use first parametar of C<keyset> as C<key>.
+
+Full text index is specified as C<invindex>, but you need just name of fields.
+
+You will probably need to add
+
+ use WAIT::Parse::Base;
+
+to your code after you remove C<WAIT::Config> and C<WAIT::Database>.
+
+=head1 METHODS
+
+=head2 new
+
+  my $tb = new HyperEstraier::WAIT::Table(
+  	uri	=> 'http://localhost:1978/node/cpan',
+	attr	=> qw/docid headline source size parent/,
+	key	=> 'docid',
+	invindex => qw/name synopsis bugs description text environment example author/,
+  );
+
+=cut
+
+sub new {
+        my $class = shift;
+        my $self = {@_};
+	bless($self, $class);
+
+	foreach my $p (qw/uri attr key invindex/) {
+		die "need $p" unless ($self->{$p});
+	}
+
+	$self->{'iso2utf'} = Text::Iconv->new('ISO-8859-1','UTF-8');
+
+	my $node = Search::Estraier::Node->new(
+		url => $self->{'uri'},
+		user => 'admin',
+		passwd => 'admin',
+		create => 1,
+	);
+
+	$self->{'node'} = $node;
+
+	$self ? return $self : return undef;
+}
+
+=head2 have
+
+  if ( $tb->have(docid => $something) ) ...
+
+=cut
+
+sub have {
+	my $self = shift;
+	my $args = {@_};
+	my $key = $self->{'key'} || die "no key in object";
+	my $key_v = $args->{$key} || die "no key $key in data";
+
+	my $id = $self->{'node'}->uri_to_id('file://' . $key_v);
+
+	return unless($id);
+
+	return ($id == -1 ? undef : $id);
+}
+
+=head2 insert
+
+  my $key = $tb->insert(
+  	docid	=> $base,
+	headline => 'Something',
+	...
+  );
+
+=cut
+
+sub insert {
+	my $self = shift;
+	my $args = {@_};
+
+	my $uri = 'file://';
+	$uri .= $args->{'docid'} or die "no docid";
+
+	my $doc = Search::Estraier::Document->new;
+
+	$doc->add_attr('@uri', $uri);
+	$doc->add_attr('@title', $args->{'headline'}) if ($args->{'headline'});
+	$doc->add_attr('@size', $args->{'size'}) if ($args->{'size'});
+
+	my @attr = $self->{'attr'} || die "no attr in object";
+	my @invindex = $self->{'invindex'} || die "no invindex in object";
+
+	foreach my $attr (keys %{$args}) {
+		if (grep(/^$attr$/, @{ $self->{'attr'} }) or $attr =~ m/^@/o) {
+			$doc->add_attr($attr, $args->{$attr});
+		}
+		if (grep(/^$attr$/, @{ $self->{'invindex'} })) {
+			$doc->add_text($args->{$attr});
+		}
+	}
+
+	print STDERR $doc->dump_draft if ($self->{'debug'});
+
+	my $id;
+	unless ($self->{'node'}->put_doc($doc)) {
+		printf STDERR "ERROR: %d\n", $self->{'node'}->status;
+	} else {
+		$id = $self->{'node'}->uri_to_id( $uri );
+		if ($id != -1) {
+			print STDERR "id: $id\n" if ($self->{'debug'})
+		} else {
+			print STDERR "ERROR: can't find id for newly insrted document $uri\n";
+		}
+	}
+
+	return $id;
+}
+
+=head2 delete_by_key
+
+  $tb->delete_by_key($key);
+
+=cut
+
+sub delete_by_key {
+	my $self = shift;
+	my $key_v = shift || die "no key?";
+
+	unless ($self->{'node'}->out_doc_by_uri( 'file://' . $key_v )) {
+		print STDERR "WARNING: can't delete document $key_v\n";
+	}
+}
+
+=head2 delete
+
+  $tb->delete( docid => $did, ... );
+
+=cut
+
+sub delete {
+	my $self = shift;
+	my $args = {@_};
+
+	my $key = $self->{'key'} || die "no key in object";
+
+	die "no $key in data" unless (my $key_v = $args->{$key});
+
+	$self->delete_by_key($key_v);
+
+}

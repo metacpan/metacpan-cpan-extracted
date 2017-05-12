@@ -1,0 +1,22 @@
+attributes:
+    class: well
+elements:
+    - name: image
+      label: Image
+      type: "+Strehler::FormFu::Element::EntitySelect"
+      element: Strehler::Element::Image
+      attributes: 
+        id: image_selector
+        class: span8
+    - type: "+Strehler::FormFu::Element::Category"
+    - type: "+Strehler::FormFu::Element::Tags"
+    - type: "+Strehler::FormFu::Element::DisplayOrder"
+    - type: "+Strehler::FormFu::Element::PublishDate"
+    - type: "+Strehler::FormFu::Element::SubmitBlockMulti"
+      actions:
+        - submit-go
+        - submit-continue
+        - submit-publish 
+
+
+   

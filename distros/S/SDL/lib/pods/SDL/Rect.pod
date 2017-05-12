@@ -1,0 +1,75 @@
+
+=pod
+
+=head1 NAME
+
+SDL::Rect - Defines a rectangular area
+
+=head2 CATEGORY
+
+Core, Video, Structure
+
+=head1 SYNOPSIS
+
+ my $rect = SDL::Rect->new(0, 0, 50, 4);
+ $rect->x(1);
+ $rect->y(2);
+ $rect->w(3);
+ my $x = $rect->x; # 1
+ my $y = $rect->y; # 2
+ my $w = $rect->w; # 3
+ my $h = $rect->h; # 4
+
+=head1 DESCRIPTION
+
+An C<SDL_Rect> defines a rectangular area of pixels.
+
+=head1 METHODS
+
+=head2 new
+
+ my $rect = SDL::Rect->new( $x, $y, $w, $h );
+
+The constructor creates a new rectangle with the specified x, y, width and height values.
+
+=head2 x
+
+ my $x = $rect->x;
+ $rect->x(128);
+
+If passed a value, this method sets the x component of the rectangle;
+if not, it returns the x component of the rectangle.
+
+=head2 y
+
+ my $y = $rect->y;
+ $rect->y(128);
+
+If passed a value, this method sets the y component of the rectangle;
+if not, it returns the y component of the rectangle.
+
+=head2 w
+
+ my $w = $rect->w;
+ $rect->w(128);
+
+If passed a value, this method sets the w component of the rectangle;
+if not, it returns the w component of the rectangle.
+
+=head2 h
+
+ my $h = $rect->h;
+ $rect->h(128);
+
+If passed a value, this method sets the h component of the rectangle;
+if not, it returns the h component of the rectangle.
+
+=head1 SEE ALSO
+
+L<SDL::Surface>
+
+=head1 AUTHORS
+
+See L<SDL/AUTHORS>.
+
+=cut

@@ -1,0 +1,12 @@
+# Remove a contact with an empty contact id when the domain doesn't exist (or belongs to another reg)
+template: update-domain.tt
+
+vars:
+  domain: 10ze.co.te
+  admin: blah
+  admin_old: ''
+
+output_assertions:
+  attr_is:
+    - [ '//epp:result', 'code', 2303, 'SRS: Check for correct result code' ]
+

@@ -1,0 +1,165 @@
+[%- SET project = report.project -%]
+[%- USE Number.Format -%]
+[%- odd_even.reset() -%]
+<table class="properties boxed">
+<thead>
+<tr>
+  <th colspan="2">
+    Properties
+    [% UNLESS email %]<a style="float:right; padding-top: 5px;" onclick="$('properties_body').toggle();"><img src="/images/new.png" style="border: 0" /></a>[% END %]
+  </th>
+</tr>
+</thead>
+<tbody id="properties_body" [% UNLESS email %]style="display:none"[% END %]>
+[%- IF report.duration -%]
+<tr class="[% odd_even %]">
+  <th>Duration</th>
+  <td>[% report.duration | format_time %]</td>
+</tr>
+[%- END -%]
+[%- IF report.tags -%]
+<tr class="[% odd_even %]">
+  <th>Tags</th>
+  <td>[% report.tags.join(', ') | html | html_line_break %]</td>
+</tr>
+[%- END -%]
+[%- IF report.comments -%]
+<tr class="[% odd_even %]">
+  <th>Comments</th>
+  <td>[% report.comments | html | html_line_break %]</td>
+</tr>
+[%- END -%]
+<tr class="[% odd_even %]">
+  <th>Uploaded</th>
+  <td>[% report.added.strftime('%B %e %Y, %l:%M %p') %]</td>
+</tr>
+<tr class="[% odd_even %]">
+  <th>User</th>
+  <td>[% report.developer.username | html %]</td>
+</tr>
+[%- IF report.platform -%]
+<tr class="[% odd_even %]">
+  <th>Platform</th>
+  <td>[% report.platform | html | html_line_break %]</td>
+</tr>
+[%- END -%]
+[%- IF report.architecture -%]
+<tr class="[% odd_even %]">
+  <th>Architecture</th>
+  <td>[% report.architecture | html | html_line_break %]</td>
+</tr>
+[%- END -%]
+[%- IF report.revision -%]
+<tr class="[% odd_even %]">
+  <th>Revision</th>
+  <td>[% report.revision | html %]</td>
+</tr>
+[%- END -%]
+[% FOREACH k IN extra_properties.keys.sort %]
+<tr class="[% odd_even %]">
+  <th>[% k | html %]</th>
+  <td>[% extra_properties.$k | html %]</td>
+</tr>
+[%- END -%]
+[%- UNLESS email -%]
+<tr class="[% odd_even %]">
+  <th>Download</th>
+  <td>
+    <a href="[% url_prefix %]/app/projects/tap_archive/[% report.id %]">
+        [% url_prefix %]/app/projects/tap_archive/[% report.id %]
+    </a>
+</tr>
+[%- END -%]
+</tbody>
+</table>
+
+[%- UNLESS email -%]
+<form method="post" action="" id="testfile_actions">
+<input type="hidden" name="days" value="">
+[%- END -%]
+
+[%- UNLESS email -%]
+<div id="controls" style="clear:both">
+  <div style="float: left; display:none" id="mute_controls">
+    <div class="button_menu">
+      <input type="button" class="button menu disabled" value="Mute &#x25bc;" onclick="false" disabled="disabled" />
+      <ul>
+        <li><a href="javascript:mute_testfiles(1)">until tomorrow</a></li>
+        <li><a href="javascript:mute_testfiles(2)">for 2 days</a></li>
+        <li><a href="javascript:mute_testfiles(3)">for 3 days</a></li>
+        <li><a href="javascript:mute_testfiles(7)">for 7 days</a></li>
+        <li><a href="javascript:mute_testfiles(14)">for 14 days</a></li>
+        <li><a href="javascript:mute_testfiles(30)">for 30 days</a></li>
+        <li><a href="javascript:mute_testfiles(0)">unmute</a></li>
+      </ul>
+      <img id="testfile_action_indicator" src="[% url_prefix %]/images/indicator.gif" style="display:none" />
+    </div>
+  </div>
+  <div style="float: right; margin-right: 14px;">
+    Only show failures
+    <input type="checkbox" id="toggle_tests_trigger" name="toggle_tests" />
+  </div>
+</div>
+[%- END -%]
+<table summary="[% report.summary | html %]" class="boxed matrix">
+  <thead>
+    <tr>
+      [%- UNLESS email -%]<th class="small">&#x2713;</th>[%- END -%]
+      <th class="small">#</th>
+      <th>Test file</th>
+      <th class="small">%</th>
+    </tr>
+  </thead>
+  [%- SET found_first_failure = 0 -%]
+  [%- FOREACH test IN results -%]
+  <tbody id="test_[% loop.index %]" class="results [% odd_even %] [% UNLESS test.failed %]passed[% END %]">
+    <tr>
+      [%- UNLESS email -%]
+      <td width="5%"><input type="checkbox" name="testfiles" value="[% test.test_file %]" onchange="toggle_testfile_menu(this)"></td>
+      [%- END -%]
+      <td width="5%">[% test.file_index  + 1 %]</td>
+      <td class="filename">
+        <span style="float: right">
+          <img src="[% url_prefix %]/images/indicator.gif" style="visibility:hidden; border: none" id="indicator_[% loop.index %]" />
+        </span>
+        [%- IF !found_first_failure && test.failed %]<a name="first_failure"></a>[% found_first_failure = 1 -%]
+        [%- END -%]
+        <a class="testfile_label" href="[% url_prefix %]/app/projects/test_file_history/[% project.id %]/[% test.test_file %]">
+          <span class="filename[% IF test.failed %] fail[% END %]">[% test.label | html %]</span>
+        </a>
+        [% IF test.is_muted %]<small><em>(muted until [% test.mute_until %])</em></small>[% END %]
+      </td>
+      <td width="8%" class="x [% IF test.all_skipped %]skip[% ELSIF test.failed %]fail[% ELSE %]ok[% END %]">
+        <a 
+          href="[% url_prefix %]/app/projects/[% IF email %]tap_stream/[% report.id %]/[% test.file_index %][% ELSE %]test_file_report_details/[% report.id %]/[% test.file_index %][% END %]" 
+            id="for_testfile_details_[% test.file_index %]"
+            class="details_trigger show_indicator_[% test.file_index %]">[% test.percent %]%</a>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="[% IF email %]3[% ELSE %]4[% END %]">
+        <div id="testfile_details_[% test.file_index %]" class="testfile_details" style="display:none"></div>
+        <div id="testfile_details_[% test.file_index %]_tap_stream" class="testfile_tap_stream" style="display:none; text-align: right">
+          <a href="[% url_prefix %]/app/projects/tap_stream/[% report.id %]/[% test.file_index %]" target="_blank">TAP &#187;</a>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+  [%- END %]
+  <tfoot>
+    <tr class="[% odd_even %]">
+      <td colspan="[% IF email %]2[% ELSE %]3[% END %]">[%- report.test_files||0 | format_number %] files - [%- report.total||0 | format_number %] test cases</td>
+      <td class="x [% IF report.failed %]fail[% ELSE %]pass[% END %]">[% report.total_percentage %]%</td>
+    </tr>
+    <tr class="[% odd_even %]">
+      <td colspan="[% IF email %]3[% ELSE %]4[% END %]">
+          [% report.pass||0      | format_number %] ok, 
+          [% report.fail||0      | format_number %] failed, 
+          [% report.todo||0      | format_number %] todo, 
+          [% report.skip||0      | format_number %] skipped and 
+          [% report.todo_pass||0 | format_number %] unexpectedly succeeded
+      </td>
+    </tr>
+  </tfoot>
+</table>
+</form>

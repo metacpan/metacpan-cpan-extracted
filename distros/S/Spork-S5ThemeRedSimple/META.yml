@@ -1,0 +1,14 @@
+name: Spork-S5ThemeRedSimple
+version: 0.01
+abstract: A Simplistic Red Theme For Spork-S5
+author: Kang-min Liu <gugod@gugod.org>
+license: perl
+distribution_type: module
+build_requires:
+  Test::More: 0
+requires:
+  Spork::S5: 0
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.36

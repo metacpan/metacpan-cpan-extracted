@@ -1,0 +1,25 @@
+Build.PL
+Changes
+lib/IO/Socket/Netlink.pm
+lib/IO/Socket/Netlink/Generic.pm
+lib/Socket/Netlink.pm
+lib/Socket/Netlink.xs
+lib/Socket/Netlink/Generic.pm
+lib/Socket/Netlink/Generic_const.pm.PL
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00use.t
+t/01constant.t
+t/02sockaddr.t
+t/10io-socket-netlink.t
+t/11netlink-message.t
+t/12netlink-message-header.t
+t/13netlink-message-attrs.t
+t/14netlink-message-error.t
+t/15netlink-message-typesubclass.t
+t/20io-socket-netlink-generic.t
+t/99pod.t

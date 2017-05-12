@@ -1,0 +1,54 @@
+Search-Tools 
+===========================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Class::XSAccessor
+  Search::Query
+  Encode
+  Carp
+  
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Search::Tools
+
+The home page is:
+
+    http://perl.peknet.com/wiki/SearchTools
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Search-Tools
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Search-Tools
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Search-Tools
+
+    Search CPAN
+        http://search.cpan.org/dist/Search-Tools/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006-2009 by Peter Karman
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

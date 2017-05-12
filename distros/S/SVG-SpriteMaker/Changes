@@ -1,0 +1,7 @@
+Revision history for Perl extension SVG::SpriteMaker.
+
+0.002 2017-02-24T00:41+00:00
+ - Try to rename IDs when they are not unique across input files
+
+0.001 2015-04-25T18:25+03:00
+ - Initial release

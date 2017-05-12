@@ -1,0 +1,53 @@
+Change log:
+
+0.12 Tue Nov 11 16:59:12 CST 2008
+   - Fixed a problem with slaymake when a command-line variable
+     assignment has a trailing backslash
+   - Fixed a problem with slaymake when a command-line variable has a
+     null assignment
+
+0.11 Mon Mar 24 01:29:23 CDT 2008
+   - Try to fix failed regression test caused by void grep warning
+   - Added documentation of how action perl blocks are called
+   - Added (and documented) argument $makefile to calling sequence for
+     main perl blocks
+   - Added ability for an "include" line to use a variable for the
+     name of the file to include
+
+0.10 Wed Sep 19 13:34:34 CDT 2007
+   - Fixed the PREREQ_PM in Makefile.PM to include new modules upon
+     which it is dependent.
+
+0.09 Wed Sep 19 10:04:55 CDT 2007
+   - Made regression test script compatible with Windows (thanks to 
+     Slaven Rezic for the patch!).
+
+0.08 Tue Sep 18 14:06:48 CDT 2007
+   - Fixed bad -e test to use an error message common to all versions
+     of perl.
+
+0.07 Tue Sep 18 12:53:05 CDT 2007
+   - Modified slaymake script to allow customization on the command
+     line either by "-e <perl-code>" flags or by "VAR=<value>"
+     arguments similar to make.
+
+0.06 Tue Aug 08 16:22:50 CDT 2007
+   - Added support for HEREIS strings within perl dependencies/actions.
+
+0.05 Tue Jul 31 10:43:29 CDT 2007
+   - Changed regression test so it's less shell-dependent.
+
+0.04 Fri Jul 27 10:55:09 CDT 2007
+   - Fixed a bug where shell actions had expressions in brackets
+     compressed but not re-expanded.   
+
+0.03 Thu Jun 29 10:33:41 CDT 2007
+   - Updated Makefile.PL to require Slay::Maker 0.4.
+
+0.02 Tue Jun 27 17:32:28 CDT 2007
+   - Updated to use (and require) Slay::Maker 0.4.
+   - Added the "strict" option.
+   - Added an error message if there's an unmatched left brace.
+
+0.01 Fri Apr 20 12:00:00 CDT 2007
+   - Initial public release.

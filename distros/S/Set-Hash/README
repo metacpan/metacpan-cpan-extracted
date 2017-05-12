@@ -1,0 +1,175 @@
+NAME
+    Set::Hash - Hashes as objects with lots of handy methods (including set
+    comparisons) and support for method chaining.
+
+SYNOPSIS
+    "use Set::Hash;"
+
+    "my $sh1 = Set::Hash->new(name=>"dan",age=>33);"
+
+    "my $sh2 = Set::Hash->new(qw/weight 185 height 72/);"
+
+    "$sh1->length->print; # 2"
+
+    "$sh1->push($sh2); # $sh1 now has weight=>185 and height=>72"
+
+    "$sh1->length->print; # 4"
+
+    "$sh2->values->join(",")->print(1); # 185, 72"
+
+PREREQUISITES
+    Perl 5.6 or later
+
+    Set::Array .10 or later, by me. Available on CPAN.
+
+    Want .05 or later, by Robin Houston. Available on CPAN.
+
+DESCRIPTION
+    Set::Hash allows you to create strings as objects and use OO-style
+    methods on them. Many convenient methods are provided here that appear
+    in the FAQ's, the Perl Cookbook or posts from comp.lang.perl.misc. In
+    addition, there are Set methods with corresponding (overloaded)
+    operators for the purpose of Set comparison, i.e. +, ==, etc.
+
+    The purpose is to provide built-in methods for operations that people
+    are always asking how to do, and which already exist in languages like
+    Ruby. This should (hopefully) improve code readability and/or
+    maintainability. The other advantage to this module is method-chaining
+    by which any number of methods may be called on a single object in a
+    single statement.
+
+    Note that Set::Hash is a subclass of Set::Array, although most of the
+    methods of Set::Array have been overloaded, so you'll want to check the
+    documentation for what each method does exactly.
+
+  OBJECT BEHAVIOR
+    The exact behavior of the methods depends largely on the calling
+    context.
+
+    Here are the rules:
+
+    * If a method is called in void context, the object itself is modified.
+
+    * If the method called is not the last method in a chain (i.e. it's
+    called in object context), the object itself is modified by that method
+    regardless of the 'final' context or method call.
+
+    * If a method is called in list or scalar context, a list or list
+    refererence is returned, respectively. The object itself is NOT
+    modified.
+
+    Here are the exceptions:
+
+    * Methods that report a value, such as boolean methods like *exists()*
+    or other methods such as *equals()* or *not_equals()*, never modify the
+    object.
+
+    * The methods *clear()* and *delete()* will always modify the object. It
+    seemed much too counterintuitive to call these methods in any context
+    without actually deleting/clearing/substituting the items!
+
+    * The methods *shift()* and *pop()* will modify the object AND return
+    the key/value pair that was shifted or popped from the hash. Again, it
+    seemed much too counterintuitive for something like "$val = $sh->shift"
+    to return a value while leaving the object's list unchanged.
+
+  INSTANCE METHODS
+    delete(*keys*) - Deletes the specified *keys* from the hash. This method
+    violates our normal context rules, in that it modifies the receiver,
+    regardless of context.
+
+    Returns an array or array reference of *values* that were deleted (not
+    keys), in list or scalar context, respectively.
+
+    exists(*keys*) - Returns 1 (true) if the specified key(s) exist, even if
+    the corresponding value is undefined. Otherwise 0 (false) is returned.
+    If multiple keys are specified, it returns true only if allkeys exist.
+
+    keys - Returns an array of keys for the hash, or an array reference in
+    scalar context.
+
+    length - Returns the length of the hash, i.e. the number of pairs (not
+    total elements).
+
+    pop - An alias for *shift()*. This will change when support for ordered
+    hashes is added.
+
+    push(*args*) - Pushes a key/value pair onto the hash. If an odd number
+    of elements is pushed, then the value for the odd key will be set to
+    undef.
+
+    Optionally, you may pass another *Set::Hash* object as the argument.
+
+    reverse - Turns keys into values and values into keys. Returns a hash in
+    list context, or a hash reference in scalar context.
+
+    shift - Shifts a key/value pair off the hash. Returns a 2 element list
+    in list context, or a hash reference in scalar context. You cannot
+    predict the key/value pair that you will get in an unordered hash.
+
+    Note that this rule violates our normal context rules. It always
+    modifies the receiver, regardless of context.
+
+    unshift - An alias for *push()*. This will change when support for
+    ordered hashes is added.
+
+    values - Returns an array of values for the hash, or an array reference
+    in scalar context.
+
+  OVERLOADED OPERATORS
+    == or is_equal - Tests to see if the hashes have the same keys and the
+    same values for those keys. Internal ordering is irrelevant for this
+    test.
+
+    Returns 0 on failure, 1 on success.
+
+    != or not_equal - Opposite of *is_equal()*.
+
+    Returns 0 on failure, 1 on success.
+
+    - or difference(*object*) - Returns all the key/value pairs on the right
+    side that aren't on the left side as a hash or hash reference, in list
+    or scalar context, respectively.
+
+    e.g.
+
+    "my $sh1 = Set::Hash->new(qw/name dan age 33/);"
+
+    "my $sh2 = Set::Hash->new(qw/name dan age 33 weight 185/);"
+
+    "my $diff = $sh1->difference($sh2); # {weight => 185}"
+
+    Note that both keys and values are used for this calcuation so {age=>33}
+    is not the same as {age=>32}, for example.
+
+    * or intersection(*object*) - Returns all they key/value pairs that are
+    common to both hash objects. Returns a hash or hash reference in list or
+    scalar context, respectively.
+
+    + or union(*object*) - Returns the union of both sets. Since keys must
+    be unique, keys of the right object will overwrite those on the left if
+    they're identical.
+
+    This is really an alias for the *push()* method.
+
+KNOWN BUGS
+    There is currently a bug in Want-0.05 that prevents use of most of the
+    overloaded operators. However, the named version of those operators
+    should work fine, e.g. "difference()" vs "-".
+
+    Also, "==" and "!=" work fine.
+
+FUTURE PLANS
+    Optional ordered hash, using *Tie::IxHash*
+
+    each()
+
+    symmetric_difference()
+
+    flatten()
+
+    to_a()
+
+AUTHOR
+    Daniel J. Berger djberg96 at yahoo dot com
+

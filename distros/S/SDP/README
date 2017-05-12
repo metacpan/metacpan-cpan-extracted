@@ -1,0 +1,26 @@
+SDP - Simplified Database Platform
+
+SDP is part of what will later be a suite of utilities to make database
+access even less intensive of a process than it is today.  Currently it
+provides automatic database connectivity on use and returning (hopefully)
+useful data structures rather than object handles.  It aims to make the
+database work with your data the way you work, not the other way around.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2003-2005 David Bialac
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

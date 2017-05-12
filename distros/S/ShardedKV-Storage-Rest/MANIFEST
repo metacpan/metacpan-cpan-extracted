@@ -1,0 +1,9 @@
+Changes
+lib/ShardedKV/Storage/Rest.pm
+lib/ShardedKV/Storage/ReplicatedRest.pm
+Makefile.PL
+MANIFEST
+README.md
+t/rest.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

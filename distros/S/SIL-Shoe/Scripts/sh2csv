@@ -1,0 +1,67 @@
+#!/usr/bin/perl
+
+use SIL::Shoe::Data;
+use Getopt::Std;
+use Pod::Usage;
+
+$VERSION='0.1';     #   MJPH    20-JUN-2006     original
+
+getopts("f:hk:o:u");
+
+unless (defined $ARGV[0] && defined $opt_f)
+{
+    pod2usage( -verbose => 2);
+    exit;
+}
+
+$sh = SIL::Shoe::Data->new($ARGV[0], $opt_k, unicode => $opt_u) || die "Can't open database $ARGV[0]";
+
+@fs = split(/[,;\s]+/, $opt_f);
+
+if ($opt_o)
+{
+    open(OUT, "> $opt_o") || die "Can't open $opt_o for output";
+    binmode(OUT, ":utf8") if ($opt_u);
+    select OUT;
+}
+
+print as_csv(@fs) if ($opt_h);
+
+while ($sh->readrecord)
+{
+    print as_csv(@{$sh}{@fs});
+}
+
+sub as_csv
+{
+    my (@data) = @_;
+    my ($res) = join(',', map {s/"/""/og; "\"$_\""} @data) . "\n"; #"
+    return $res;
+}
+
+__END__
+
+=head1 NAME
+
+sh2csv - converts Shoebox databases into Comma Separated Variables
+
+=head1 SYNOPSIS
+
+  sh2csv -f sfm,field;markers [-h] [-k sfm] [-o file] [-u] infile.db
+
+  -f fields     sfms in output column order separated by space, comma or ;
+  -h            Output column headers
+  -k sfm        Optionally specify key field marker
+  -o file       Output file
+  -u            Data is all in Unicode
+
+=head1 DESCRIPTION
+
+sh2csv converts Shoebox/Toolbox into Comma Separated Variables for importing
+into a spreadsheet. Since CSV is a relatively simple format, this program
+doesn't do anything very clever. It simply takes the first occurrence of each
+field specified and outputs it in the corresponding column of the output.
+
+Fields in the -f command line option may be separated by any number of space,
+comma or semicolon. If you want to use spaces remember to input the list inside
+quotes.

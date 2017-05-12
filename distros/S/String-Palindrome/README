@@ -1,0 +1,178 @@
+NAME
+    String::Palindrome - Determine if a string is a palindrome
+
+VERSION
+    version 2.000001
+
+SYNOPSIS
+        use String::Palindrome qw/ is_palindrome /;
+
+
+        #  Simple strings
+
+        my $is     = 'abccba';
+        my $is_not = 'abcdef';
+
+        is_palindrome( $is      );  # 1
+
+        is_palindrome( $is_not  );  # 0
+
+        is_palindrome( {a => 1} );  # undef
+        is_palindrome(          );  # undef
+
+
+
+        #  Arrays
+
+        my @is     = qw/ a ab cc ab a /;
+        my @is_not = qw/ a ab cc a ba /;
+
+        is_palindrome(  @is     );  # 1
+        is_palindrome( \@is     );  # 1
+
+        is_palindrome(  @is_not );  # 0
+        is_palindrome( \@is_not );  # 0
+
+        is_palindrome( []       );  # undef
+
+EXPORTS
+    *   is_palindrome
+
+FUNCTIONS
+  is_palindrome
+    Returns true if the string, array, or array_ref is a palindrome. If more
+    than one parameter is passed to the function, then it will blindly
+    assume that you want to treat them as an array to be tested. This means
+    that you could, theoretically, pass in a palindrome of array_refs and it
+    would still pass.
+
+    If only one arg is passed, then it is first checked to see if it is an
+    array ref. If it is an array ref it is treated as a normal array. If it
+    is a simple scalar, then it is treated as a string. If it is any other
+    type of ref, then undef is returned. Additionally, a blank array ref
+    also returns undef.
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+AUTHOR
+    Adam Lesperance <lespea@gmail.com>
+
+SUPPORT
+  Perldoc
+    You can find documentation for this module with the perldoc command.
+
+      perldoc String::Palindrome
+
+  Websites
+    The following websites have more information about this module, and may
+    be of help to you. As always, in addition to those websites please use
+    your favorite search engine to discover more resources.
+
+    *   Search CPAN
+
+        The default CPAN search engine, useful to view POD in HTML format.
+
+        <http://search.cpan.org/dist/String-Palindrome>
+
+    *   RT: CPAN's Bug Tracker
+
+        The RT ( Request Tracker ) website is the default bug/issue tracking
+        system for CPAN.
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=String-Palindrome>
+
+    *   AnnoCPAN
+
+        The AnnoCPAN is a website that allows community annonations of Perl
+        module documentation.
+
+        <http://annocpan.org/dist/String-Palindrome>
+
+    *   CPAN Ratings
+
+        The CPAN Ratings is a website that allows community ratings and
+        reviews of Perl modules.
+
+        <http://cpanratings.perl.org/d/String-Palindrome>
+
+    *   CPAN Forum
+
+        The CPAN Forum is a web forum for discussing Perl modules.
+
+        <http://cpanforum.com/dist/String-Palindrome>
+
+    *   CPANTS
+
+        The CPANTS is a website that analyzes the Kwalitee ( code metrics )
+        of a distribution.
+
+        <http://cpants.perl.org/dist/overview/String-Palindrome>
+
+    *   CPAN Testers
+
+        The CPAN Testers is a network of smokers who run automated tests on
+        uploaded CPAN distributions.
+
+        <http://www.cpantesters.org/distro/S/String-Palindrome>
+
+    *   CPAN Testers Matrix
+
+        The CPAN Testers Matrix is a website that provides a visual way to
+        determine what Perls/platforms PASSed for a distribution.
+
+        <http://matrix.cpantesters.org/?dist=String-Palindrome>
+
+    *   CPAN Testers Dependencies
+
+        The CPAN Testers Dependencies is a website that shows a chart of the
+        test results of all dependencies for a distribution.
+
+        <http://deps.cpantesters.org/?module=String::Palindrome>
+
+  Bugs / Feature Requests
+    Please report any bugs or feature requests by email to
+    "bug-string-palindrome at rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=String-Palindrome>. You
+    will be automatically notified of any progress on the request by the
+    system.
+
+  Source Code
+    The code is open to the world, and available for you to hack on. Please
+    feel free to browse it and play with it, or whatever. If you want to
+    contribute patches, please send me a diff or prod me to pull from your
+    repository :)
+
+    <https://github.com/lespea/string-palindrome>
+
+      git clone git://github.com/lespea/string-palindrome.git
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Adam Lesperance.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTY
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

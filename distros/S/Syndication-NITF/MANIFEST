@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+Makefile.PL
+NITF.pm
+README
+TODO
+bin/dist
+doc/Changes.pod
+doc/README.pod
+doc/TODO.pod
+examples/NITFParser.pl
+t/1_loadme.t
+t/2_simple.t
+t/test_data/README
+t/test_data/nitf-fishing.xml

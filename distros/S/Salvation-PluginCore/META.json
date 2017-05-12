@@ -1,0 +1,51 @@
+{
+   "abstract" : "A little plugin framework",
+   "author" : [
+      "Gennadiy Filatov <gfilatov@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Salvation-PluginCore",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Salvation::Method::Signatures" : "0.02",
+            "Salvation::TC" : "0.11",
+            "String::CamelCase" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/kainwinterheart/salvation-plugincore.git",
+         "web" : "https://github.com/kainwinterheart/salvation-plugincore",
+         "x_bugtracker" : "https://github.com/kainwinterheart/salvation-plugincore/issues"
+      }
+   },
+   "version" : "0.01"
+}

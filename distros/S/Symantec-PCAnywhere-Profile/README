@@ -1,0 +1,35 @@
+Symantec-PCAnywhere-Profile version 0.01
+=========================================
+
+This module acts as a base class for classes that work with profile
+files for Symantec's pcAnywhere program. See Symantec::PCAnywhere::Profile::CHF
+for an example of a usable descendant of this class; see the module pod for
+more information.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Carp
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Darren Kulp
+
+Contains code placed in the public domain 2002 by Stephen Friedl
+
+"Symantec" and "pcAnywhere" are trademarks of Symantec Corp.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+

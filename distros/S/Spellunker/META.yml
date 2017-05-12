@@ -1,0 +1,64 @@
+---
+abstract: 'Pure perl spelling checker implementation'
+author:
+  - 'tokuhirom <tokuhirom@gmail.com>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.8.1, CPAN::Meta::Converter version 2.132510'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Spellunker
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Spellunker:
+    file: lib/Spellunker.pm
+    version: v0.4.0
+  Spellunker::CLI:
+    file: lib/Spellunker/CLI.pm
+  Spellunker::CLI::Pod:
+    file: lib/Spellunker/CLI/Pod.pm
+    version: v0.4.0
+  Spellunker::Pod:
+    file: lib/Spellunker/Pod.pm
+  Spellunker::Pod::Parser:
+    file: lib/Spellunker/Pod/Parser.pm
+  Test::Spellunker:
+    file: lib/Test/Spellunker.pm
+    version: v0.4.0
+requires:
+  File::ShareDir: 0
+  Getopt::Long: 0
+  Pod::Simple: 3.26
+  Regexp::Common: 0
+  Test::Builder: 0
+  parent: 0
+  perl: 5.008001
+  version: 0
+resources:
+  bugtracker: https://github.com/tokuhirom/Spellunker/issues
+  homepage: https://github.com/tokuhirom/Spellunker
+  repository: git://github.com/tokuhirom/Spellunker.git
+version: v0.4.0
+x_contributors:
+  - 'David Steinbrunner <dsteinbrunner@pobox.com>'
+  - 'Kentaro Kuribayashi <kentarok@gmail.com>'
+  - 'Fuji, Goro <g.psy.va@gmail.com>'
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+  - 'Toby Inkster <mail@tobyinkster.co.uk>'
+  - 'moznion <moznion@gmail.com>'

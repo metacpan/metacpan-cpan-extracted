@@ -1,0 +1,1216 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Array::Array
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = Array.new(...);
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef::Object::Object
+
+=head1 METHODS
+
+
+=head2 !=
+
+I<Obj> B<!=> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<ne>
+
+=cut
+
+=head2 &
+
+I<Obj> B<&> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<and>
+
+=cut
+
+=head2 *
+
+I<Obj> B<*> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<mul>
+
+=cut
+
+=head2 +
+
+I<Obj> B<+> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<add>, I<concat>
+
+=cut
+
+=head2 ++
+
+I<Obj> B<++> I<Obj> -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 -
+
+I<Obj> B<-> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<sub>
+
+=cut
+
+=head2 --
+
+I<Obj> B<--> I<Obj> -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ...
+
+I<Obj> B<...> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<to_list>
+
+=cut
+
+=head2 /
+
+I<Obj> B</> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<div>
+
+=cut
+
+=head2 :
+
+I<Obj> B<:> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<pair_with>
+
+=cut
+
+=head2 <=>
+
+I<Obj> B<E<lt>=E<gt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<cmp>
+
+=cut
+
+=head2 ==
+
+I<Obj> B<==> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<eq>
+
+=cut
+
+=head2 ^
+
+I<Obj> B<^> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<xor>
+
+=cut
+
+=head2 abbrev
+
+Array.abbrev() -> I<Obj>
+
+Return the
+
+Aliases: I<abbreviations>
+
+=cut
+
+=head2 all
+
+Array.all() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 any
+
+Array.any() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 bindex
+
+Array.bindex() -> I<Obj>
+
+Return the
+
+Aliases: I<bindex_by>
+
+=cut
+
+=head2 binsert
+
+Array.binsert() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 bshuffle
+
+Array.bshuffle() -> I<Obj>
+
+Return the
+
+Aliases: I<best_shuffle>
+
+=cut
+
+=head2 cartesian
+
+Array.cartesian() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 change_to
+
+Array.change_to() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 collapse
+
+Array.collapse() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 compact
+
+Array.compact() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 cons
+
+Array.cons() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 contain
+
+Array.contain() -> I<Obj>
+
+Return the
+
+Aliases: I<include>, I<contains>, I<includes>
+
+=cut
+
+=head2 contains_all
+
+Array.contains_all() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 contains_any
+
+Array.contains_any() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 contains_type
+
+Array.contains_type() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 copy
+
+Array.copy() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 count
+
+Array.count() -> I<Obj>
+
+Return the
+
+Aliases: I<count_by>
+
+=cut
+
+=head2 cross_operator
+
+Array.cross_operator() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 decode
+
+Array.decode() -> I<Obj>
+
+Return the
+
+Aliases: I<encode>, I<join_bytes>
+
+=cut
+
+=head2 defined
+
+Array.defined() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 delete
+
+Array.delete() -> I<Obj>
+
+Return the
+
+Aliases: I<remove>
+
+=cut
+
+=head2 delete_first
+
+Array.delete_first() -> I<Obj>
+
+Return the
+
+Aliases: I<remove_first>
+
+=cut
+
+=head2 delete_first_if
+
+Array.delete_first_if() -> I<Obj>
+
+Return the
+
+Aliases: I<remove_first_if>
+
+=cut
+
+=head2 delete_if
+
+Array.delete_if() -> I<Obj>
+
+Return the
+
+Aliases: I<remove_if>
+
+=cut
+
+=head2 delete_last
+
+Array.delete_last() -> I<Obj>
+
+Return the
+
+Aliases: I<remove_last>
+
+=cut
+
+=head2 delete_last_if
+
+Array.delete_last_if() -> I<Obj>
+
+Return the
+
+Aliases: I<remove_last_if>
+
+=cut
+
+=head2 diff
+
+Array.diff() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 dig
+
+Array.dig() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 each_comb
+
+Array.each_comb() -> I<Obj>
+
+Return the
+
+Aliases: I<combinations>
+
+=cut
+
+=head2 each_cons
+
+Array.each_cons() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 each_key
+
+Array.each_key() -> I<Obj>
+
+Return the
+
+Aliases: I<each_index>
+
+=cut
+
+=head2 each_kv
+
+Array.each_kv() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 each_slice
+
+Array.each_slice() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 end
+
+Array.end() -> I<Obj>
+
+Return the
+
+Aliases: I<offset>
+
+=cut
+
+=head2 exists
+
+Array.exists() -> I<Obj>
+
+Return the
+
+Aliases: I<has_index>
+
+=cut
+
+=head2 fetch
+
+Array.fetch() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 find
+
+Array.find() -> I<Obj>
+
+Return the
+
+Aliases: I<first_by>
+
+=cut
+
+=head2 first
+
+Array.first() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 flat
+
+Array.flat() -> I<Obj>
+
+Return the
+
+Aliases: I<flatten>
+
+=cut
+
+=head2 flat_map
+
+Array.flat_map() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 flip
+
+Array.flip() -> I<Obj>
+
+Return the
+
+Aliases: I<reverse>
+
+=cut
+
+=head2 for
+
+Array.for() -> I<Obj>
+
+Return the
+
+Aliases: I<each>, I<foreach>
+
+=cut
+
+=head2 freq
+
+Array.freq() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 freq_by
+
+Array.freq_by() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ft
+
+Array.ft() -> I<Obj>
+
+Return the
+
+Aliases: I<slice>
+
+=cut
+
+=head2 getopt
+
+Array.getopt() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 grep
+
+Array.grep() -> I<Obj>
+
+Return the
+
+Aliases: I<select>
+
+=cut
+
+=head2 grep_kv
+
+Array.grep_kv() -> I<Obj>
+
+Return the
+
+Aliases: I<select_kv>
+
+=cut
+
+=head2 group_by
+
+Array.group_by() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 index
+
+Array.index() -> I<Obj>
+
+Return the
+
+Aliases: I<index_by>, I<first_index>
+
+=cut
+
+=head2 inject
+
+Array.inject() -> I<Obj>
+
+Return the
+
+Aliases: I<reduce>
+
+=cut
+
+=head2 insert
+
+Array.insert() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_empty
+
+Array.is_empty() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 item
+
+Array.item() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 items
+
+Array.items() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 iter
+
+Array.iter() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 jaro_distance
+
+Array.jaro_distance() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 join
+
+Array.join() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 join_insert
+
+Array.join_insert() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 keys
+
+Array.keys() -> I<Obj>
+
+Return the
+
+Aliases: I<indices>
+
+=cut
+
+=head2 kv
+
+Array.kv() -> I<Obj>
+
+Return the
+
+Aliases: I<pairs>
+
+=cut
+
+=head2 last
+
+Array.last() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 last_by
+
+Array.last_by() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 last_uniq
+
+Array.last_uniq() -> I<Obj>
+
+Return the
+
+Aliases: I<last_unique>
+
+=cut
+
+=head2 last_uniq_by
+
+Array.last_uniq_by() -> I<Obj>
+
+Return the
+
+Aliases: I<last_unique_by>
+
+=cut
+
+=head2 len
+
+Array.len() -> I<Obj>
+
+Return the
+
+Aliases: I<size>, I<length>
+
+=cut
+
+=head2 lev
+
+Array.lev() -> I<Obj>
+
+Return the
+
+Aliases: I<leven>, I<levenshtein>
+
+=cut
+
+=head2 make
+
+Array.make() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 map
+
+Array.map() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 map_kv
+
+Array.map_kv() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 map_operator
+
+Array.map_operator() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 match
+
+Array.match() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 max
+
+Array.max() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 max_by
+
+Array.max_by() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 min
+
+Array.min() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 min_by
+
+Array.min_by() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 minmax
+
+Array.minmax() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 mzip
+
+Array.mzip() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 new
+
+Array.new() -> I<Obj>
+
+Return the
+
+Aliases: I<call>
+
+=cut
+
+=head2 pack
+
+Array.pack() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 pairmap
+
+Array.pairmap() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 pam_operator
+
+Array.pam_operator() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 part
+
+Array.part() -> I<Obj>
+
+Return the
+
+Aliases: I<partition>
+
+=cut
+
+=head2 permute
+
+Array.permute() -> I<Obj>
+
+Return the
+
+Aliases: I<each_perm>, I<permutation>, I<permutations>
+
+=cut
+
+=head2 pick
+
+Array.pick() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 pop
+
+Array.pop() -> I<Obj>
+
+Return the
+
+Aliases: I<drop_last>, I<drop_right>
+
+=cut
+
+=head2 pop_at
+
+Array.pop_at() -> I<Obj>
+
+Return the
+
+Aliases: I<delete_at>, I<delete_index>
+
+=cut
+
+=head2 pop_rand
+
+Array.pop_rand() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 prepend
+
+Array.prepend() -> I<Obj>
+
+Return the
+
+Aliases: I<unshift>
+
+=cut
+
+=head2 prod
+
+Array.prod() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 prod_by
+
+Array.prod_by() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 rand
+
+Array.rand() -> I<Obj>
+
+Return the
+
+Aliases: I<sample>
+
+=cut
+
+=head2 range
+
+Array.range() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 reduce_operator
+
+Array.reduce_operator() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 resize
+
+Array.resize() -> I<Obj>
+
+Return the
+
+Aliases: I<resize_to>
+
+=cut
+
+=head2 rindex
+
+Array.rindex() -> I<Obj>
+
+Return the
+
+Aliases: I<rindex_by>, I<last_index>
+
+=cut
+
+=head2 rotate
+
+Array.rotate() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 shift
+
+Array.shift() -> I<Obj>
+
+Return the
+
+Aliases: I<drop_left>, I<drop_first>
+
+=cut
+
+=head2 shuffle
+
+Array.shuffle() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 slice_after
+
+Array.slice_after() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 slice_before
+
+Array.slice_before() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 slices
+
+Array.slices() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sort
+
+Array.sort() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sort_by
+
+Array.sort_by() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 splice
+
+Array.splice() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sum
+
+Array.sum() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sum_by
+
+Array.sum_by() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 swap
+
+Array.swap() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 take_left
+
+Array.take_left() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 take_right
+
+Array.take_right() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 to_a
+
+Array.to_a() -> I<Obj>
+
+Return the
+
+Aliases: I<to_array>
+
+=cut
+
+=head2 to_h
+
+Array.to_h() -> I<Obj>
+
+Return the
+
+Aliases: I<to_hash>
+
+=cut
+
+=head2 to_s
+
+Array.to_s() -> I<Obj>
+
+Return the
+
+Aliases: I<dump>
+
+=cut
+
+=head2 uniq
+
+Array.uniq() -> I<Obj>
+
+Return the
+
+Aliases: I<unique>, I<distinct>
+
+=cut
+
+=head2 uniq_by
+
+Array.uniq_by() -> I<Obj>
+
+Return the
+
+Aliases: I<unique_by>
+
+=cut
+
+=head2 unroll_operator
+
+Array.unroll_operator() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 zip
+
+Array.zip() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 zip_operator
+
+Array.zip_operator() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 |
+
+I<Obj> B<|> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<or>
+
+=cut
+
+=head2 «
+
+I<Obj> B<«> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<E<lt>E<lt>>, I<push>, I<append>
+
+=cut
+
+=head2 »
+
+I<Obj> B<»> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<E<gt>E<gt>>, I<assign_to>
+
+=cut

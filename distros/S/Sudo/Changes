@@ -1,0 +1,34 @@
+Revision history for Perl extension Sudo.
+0.33	Wed Apr 17 11:17:00 2013
+	- fixed hashref assignment to list bug
+0.32  Tue Jun 12 00:20:00 2007
+	- fixed what I broke.
+	- added in test skipping in test more so it doesn't look like
+ 	  this module fails all tests when people run an interactive
+	  module test in a non-interactive test environment .....
+	- remote is still broken ... thinking about how to fix it.
+0.31  Wed May 23 22:57:00 2007
+	- remove remote execution for the moment ... it is broken
+0.30  Mon May 21 21:29:00 2007
+	- added remote capability via ssh.  Use hostname/username attributes to 
+	  force module to ssh to remote host before running sudo.
+0.21  Fri May 27 11:18:00 2005
+	- added tests for windows and cygwin.  This module will not work
+	  under either OS.  It might be possible with Cygwin, but this would
+	  require too much additional work to make Sudo work correctly
+	  under Cygwin.
+	  Windows is not (and will not be) supported. It has a very different
+	  permissions model than Unix/Linux, and the purpose of this module
+	  is to exploit the Sudo command in Unix/Linux to enable execution of
+	  a command as another user.  There is no equivalent method in windows,
+	  as you need to adjust ACLs.  That is beyond the scope of this 
+	  module.  In unix, the ACLs are adjusted through the visudo command.
+0.20  Mon May 23 00:20:00 2005
+	- fixed "=" bug
+	- added additional checks against sudo binary
+	- added then removed sudo shell bits.  Will create another 
+	  module for this
+        - updated documentation	  
+0.10  Mon Apr 19 17:02:49 2004
+	- original version; created by h2xs 1.23 with options
+		-AX -n Sudo

@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README
+dist.ini
+lib/Serabi.pm
+t/00-compile.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

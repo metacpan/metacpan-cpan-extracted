@@ -1,0 +1,280 @@
+SemMed-Interface
+    A suite of Perl modules that utilize path information present in the
+    Semantic Medline Database in order to calculate the semantic association
+    between two concepts in the UMLS.
+
+TESTING PLATFORMS
+    SemMed-Interface has been developed and tested on Linux primarily using
+    Perl and the Bash shell.
+
+REQUIREMENTS
+    SemMed-Interface REQUIRES that the following software be installed. More
+    details on how to obtain and install appear below.
+
+    --Programming Languages Perl (version 5.8.5 or better)
+
+    --CPAN modules Heap::Priority UMLS::Association DBI
+
+PROGRAMMING LANGUAGES
+  Perl (version 5.8.5 or better)
+    Perl is freely available at:
+
+    <http://www.perl.org>
+
+    It is very likely that you will already have Perl installed if you are
+    using a Unix/Linux based system.
+
+CPAN MODULES
+  SemMed-Interface
+    Please see the SemMed-Interface documentation.
+
+MODULE INSTALLATION
+    If you have supervisor access, or have configured MCPAN for local
+    install, you can install via:
+
+     perl -MCPAN -e shell
+     > install SemMed-Interface
+
+    If not, you can, "manually" install by downloading the *.tar.gz file,
+    unpacking, and executing the following commands.
+
+                    perl Makefile.PL PREFIX=/home/programs LIB=/home/lib
+                    make
+                    make test
+                    make install
+
+    Note that the PREFIX and LIB settings are just examples to help you
+    create a local install, if you do not have supervisor (su) access.
+
+    You must include /home/lib in your PERL5LIB environment variable to
+    access this module when running.
+
+    If you have the super-user access, then you can install SemMed-Interface
+    into system directories via : perl Makefile.PL make make install make
+    clean
+
+    The exact location of where SemMed-Interface will be installed depends
+    on your system configuration. A message will be printed out after 'make
+    install' telling your exactly where it was installed.
+
+UMLS::ASSOCIATION
+    In order to utilize the SemMed::Interface, you must have access to the
+    association scores present inside the UMLS::Association PERL module.
+    Download and install this module along with its associated databases
+    through cpan (http://search.cpan.org/dist/UMLS-Association/)
+
+DATABASE INSTALLATION
+    The SemMed::Interface utilizes the Semantic Medline Database's path
+    information to calculate association scores for medical terms. This
+    means you must install the Semantic Medline Database onto your favorite
+    database engine - we however cannot guarantee functionality on any
+    database engine other than MySQL.
+
+    1. Download the Semantic Medline Database located at
+    https://skr3.nlm.nih.gov/SemMed/index.html . You may need to apply for a
+    free license in order to complete the download. (A very large zip file
+    will be downloaded).
+
+    2. Extract the .sql file located inside of the zip file utilizing your
+    favorite archiving program.
+
+    3. While logged into your MySQL engine, create a database named
+    'SemMedDB'.
+
+    4. Inside of the database/scheme named 'SemMedDB', run the .sql file you
+    extracted in step 2. THIS WILL TAKE A FEW DAYS TO COMPLETE.
+
+    5. Once the .sql file has finished execution, you should see 8 tables
+    inside of your 'SemMedDB' database.
+
+    **THE FOLLOWING STEPS WILL TAKE SEVERAL DAYS TO COMPLETE** The following
+    steps will optomize the Semantic Medline Database and allow for faster
+    path information retrieval.
+
+    6. We will need to index the PREDICATION_AGGREGATE table by the s_cui
+    column. Run the following command in MySQL to do so.
+
+            ALTER TABLE SemMedDB.PREDICATION_AGGREGATE ADD INDEX(s_cui);
+
+    7. Once the indexing query has completed, run the following query to
+    generate an auxilary table containing a redundency free view of the
+    Medline path network.
+
+            CREATE TABLE IF NOT EXISTS DISTINCT_PREDICATION_AGGREGATE LIKE PREDICATION_AGGREGATE;
+
+            INSERT INTO SemMedDB.DISTINCT_PREDICATION_AGGREGATE(s_cui,s_name,o_cui,o_name,predicate)
+            SELECT DISTINCT s_cui, s_name, o_cui, o_name, predicate
+            FROM SemMedDB.PREDICATION_AGGREGATE;
+
+    8. Remove un-needed columns from this new table with the following
+    query:
+
+            ALTER TABLE `SemMedDB`.`DISTINCT_PREDICATION_AGGREGATE` 
+            DROP COLUMN `o_novel`,
+            DROP COLUMN `o_type`,
+            DROP COLUMN `s_novel`,
+            DROP COLUMN `s_type`,
+            DROP COLUMN `PMID`,
+            DROP COLUMN `PNUMBER`,
+            DROP COLUMN `SID`,
+            DROP COLUMN `PID`,
+            DROP INDEX `pmid_index_btree2` ,
+            DROP PRIMARY KEY;
+
+    9. Let out a sigh of relief - that was a lot of waiting.
+
+CONTACT US
+    If you have any trouble installing and using SemMed-Interface, please
+    contact us via the users mailing list :
+
+    <mailing list name>
+
+    You can join this group by going to:
+
+    <mailing list website>
+
+    You may also contact us directly if you prefer :
+
+     Bridget T. McInnes: btmcinnes at vcu.edu
+     Andriy  Y. Mulyar:  aymulyar  at vcu.edu
+
+SemMed-Interface
+    A suite of Perl modules that utilize path information present in the
+    Semantic Medline Database in order to calculate the semantic association
+    between two concepts in the UMLS.
+
+TESTING PLATFORMS
+    SemMed-Interface has been developed and tested on Linux primarily using
+    Perl and the Bash shell.
+
+REQUIREMENTS
+    SemMed-Interface REQUIRES that the following software be installed. More
+    details on how to obtain and install appear below.
+
+    --Programming Languages Perl (version 5.8.5 or better)
+
+    --CPAN modules Heap::Priority UMLS::Association DBI
+
+PROGRAMMING LANGUAGES
+  Perl (version 5.8.5 or better)
+    Perl is freely available at:
+
+    <http://www.perl.org>
+
+    It is very likely that you will already have Perl installed if you are
+    using a Unix/Linux based system.
+
+CPAN MODULES
+  SemMed-Interface
+    Please see the SemMed-Interface documentation.
+
+MODULE INSTALLATION
+    If you have supervisor access, or have configured MCPAN for local
+    install, you can install via:
+
+     perl -MCPAN -e shell
+     > install SemMed-Interface
+
+    If not, you can, "manually" install by downloading the *.tar.gz file,
+    unpacking, and executing the following commands.
+
+                    perl Makefile.PL PREFIX=/home/programs LIB=/home/lib
+                    make
+                    make test
+                    make install
+
+    Note that the PREFIX and LIB settings are just examples to help you
+    create a local install, if you do not have supervisor (su) access.
+
+    You must include /home/lib in your PERL5LIB environment variable to
+    access this module when running.
+
+    If you have the super-user access, then you can install SemMed-Interface
+    into system directories via : perl Makefile.PL make make install make
+    clean
+
+    The exact location of where SemMed-Interface will be installed depends
+    on your system configuration. A message will be printed out after 'make
+    install' telling your exactly where it was installed.
+
+UMLS::ASSOCIATION
+    In order to utilize the SemMed::Interface, you must have access to the
+    association scores present inside the UMLS::Association PERL module.
+    Download and install this module along with its associated databases
+    through cpan (http://search.cpan.org/dist/UMLS-Association/)
+
+DATABASE INSTALLATION
+    The SemMed::Interface utilizes the Semantic Medline Database's path
+    information to calculate association scores for medical terms. This
+    means you must install the Semantic Medline Database onto your favorite
+    database engine - we however cannot guarantee functionality on any
+    database engine other than MySQL.
+
+    1. Download the Semantic Medline Database located at
+    https://skr3.nlm.nih.gov/SemMed/index.html . You may need to apply for a
+    free license in order to complete the download. (A very large zip file
+    will be downloaded).
+
+    2. Extract the .sql file located inside of the zip file utilizing your
+    favorite archiving program.
+
+    3. While logged into your MySQL engine, create a database named
+    'SemMedDB'.
+
+    4. Inside of the database/scheme named 'SemMedDB', run the .sql file you
+    extracted in step 2. THIS WILL TAKE A FEW DAYS TO COMPLETE.
+
+    5. Once the .sql file has finished execution, you should see 8 tables
+    inside of your 'SemMedDB' database.
+
+    **THE FOLLOWING STEPS WILL TAKE SEVERAL DAYS TO COMPLETE** The following
+    steps will optomize the Semantic Medline Database and allow for faster
+    path information retrieval.
+
+    6. We will need to index the PREDICATION_AGGREGATE table by the s_cui
+    column. Run the following command in MySQL to do so.
+
+            ALTER TABLE SemMedDB.PREDICATION_AGGREGATE ADD INDEX(s_cui);
+
+    7. Once the indexing query has completed, run the following query to
+    generate an auxilary table containing a redundency free view of the
+    Medline path network.
+
+            CREATE TABLE IF NOT EXISTS DISTINCT_PREDICATION_AGGREGATE LIKE PREDICATION_AGGREGATE;
+
+            INSERT INTO SemMedDB.DISTINCT_PREDICATION_AGGREGATE(s_cui,s_name,o_cui,o_name,predicate)
+            SELECT DISTINCT s_cui, s_name, o_cui, o_name, predicate
+            FROM SemMedDB.PREDICATION_AGGREGATE;
+
+    8. Remove un-needed columns from this new table with the following
+    query:
+
+            ALTER TABLE `SemMedDB`.`DISTINCT_PREDICATION_AGGREGATE` 
+            DROP COLUMN `o_novel`,
+            DROP COLUMN `o_type`,
+            DROP COLUMN `s_novel`,
+            DROP COLUMN `s_type`,
+            DROP COLUMN `PMID`,
+            DROP COLUMN `PNUMBER`,
+            DROP COLUMN `SID`,
+            DROP COLUMN `PID`,
+            DROP INDEX `pmid_index_btree2` ,
+            DROP PRIMARY KEY;
+
+    9. Let out a sigh of relief - that was a lot of waiting.
+
+CONTACT US
+    If you have any trouble installing and using SemMed-Interface, please
+    contact us via the users mailing list :
+
+    <mailing list name>
+
+    You can join this group by going to:
+
+    <mailing list website>
+
+    You may also contact us directly if you prefer :
+
+     Bridget T. McInnes: btmcinnes at vcu.edu
+     Andriy  Y. Mulyar:  aymulyar  at vcu.edu
+

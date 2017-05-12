@@ -1,0 +1,34 @@
+head	1.1;
+access;
+symbols
+	so=this/is/another:1.1
+	bad=tag/looks-like_this:1.1.0.12
+	cleanup:1.1.0.10
+	weirdbranch:1.1.0.8
+	newtag:1.1
+	newbranch:1.1.0.6
+	funnytag:1.1
+	sometag:1.1
+	anotherbranch:1.1.0.4
+	somebranch:1.1.0.2;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2003.05.12.05.42.33;	author xclkao;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.1
+log
+@init
+@
+text
+@this is static
+@

@@ -1,0 +1,39 @@
+
+If the perl CPAN module is installed and working, you can install
+Statistics::LineFit using:
+
+perl -MCPAN -e "install Statistics::LineFit"
+
+Otherwise, download the tar file from CPAN (see search.cpan.org) and proceed
+as follows:
+
+UNIX / LINUX / CYGWIN
+
+Unbundle the tar file using a command like:
+
+gunzip -c Statistics-LineFit-0.01.tar.gz | tar xvf -
+
+Then cd to the Statistics-LineFit-0.01 directory and do:
+
+perl Makefile.PL
+make
+make test
+make install
+
+If you want to install the module in a directory other than the default
+location, use something like:
+
+perl Makefile.PL PREFIX=/home/mydir/perl LIB=/home/mydir/perl/lib 
+
+WINDOWS
+
+The above commands will also work from within a Cygwin window on Windows.
+Otherwise, unbundle the tar file using a freeware archive program like
+PowerArchiver and use 'nmake' rather than 'make'.
+
+MACINTOSH, OS 370, VMS, etc.
+
+If Perl is installed you will be able to install this module, but I'm not
+sure of the exact commands needed.  The installation steps will be similar 
+to the above sequence.
+

@@ -1,0 +1,29 @@
+Greetings Perlfolk,
+
+** SYNOPSIS
+
+	use System::Index;
+	my $cpu_load = cpu_index();    # Averages 0.120 on my system, 'light' load
+	my $mem_load = mem_index();    # Averages 0.88 on my system, 'light' load
+	my $hd_load = hd_index();      # Averages 0.250 on my system, 'light' load
+	
+** VERSION
+
+This is Version 0.1 ($Id: System::Index.pm, v0.1 2000/04/09 12:27:05 josiah Exp $).
+
+** DESCRIPTION
+
+This is a simple load-measure for memory, CPU, and hard-disk access. It requires
+Benchmark and Export. It measures the load with a simple timethis() benchmark loop
+with a few stat functions thrown in for good measure. 
+	
+** CLOSING 
+
+Regards,
+
+        ~ Josiah Bryan, <jdb@wcoil.com>
+
+Latest Version:
+
+        http://www.josiah.countystart.com/modules/get.pl?sysidx:README
+

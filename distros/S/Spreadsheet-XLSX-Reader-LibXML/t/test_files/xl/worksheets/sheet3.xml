@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+    <dimension ref="A2"/>
+    <sheetViews>
+        <sheetView tabSelected="1" workbookViewId="0">
+            <selection activeCell="E14" sqref="E14"/>
+        </sheetView>
+    </sheetViews>
+    <sheetFormatPr defaultRowHeight="15"/>
+    <cols>
+        <col min="1" max="1" width="9.5703125" bestFit="1" customWidth="1"/>
+        <col min="3" max="4" width="0" hidden="1" customWidth="1"/>
+        <col min="5" max="5" width="9.7109375" bestFit="1" customWidth="1"/>
+    </cols>
+    <sheetData>
+        <row r="2">
+            <c r="A2" t="e">
+                <v>Hello</v>
+            </c>
+            <c r="D2" t="s">
+                <v>2</v>
+            </c>
+        </row>
+        <row r="4" spans="1:6" ht="18.75">
+            <c r="C4" s="7" t="s">
+                <v>1</v>
+            </c>
+        </row>
+        <row r="6" spans="1:6" ht="26.25">
+            <c r="A6" s="11" t="s">
+                <v>15</v>
+            </c>
+            <c r="B6" s="11"/>
+        </row>
+        <row r="7" spans="1:6" hidden="1">
+            <c r="B7">
+                <v>69</v>
+            </c>
+        </row>
+        <row r="8" spans="1:6" hidden="1">
+            <c r="B8">
+                <v>27</v>
+            </c>
+            <c r="E8" s="2">
+                <v>37145</v>
+            </c>
+        </row>
+        <row r="9" spans="1:6" hidden="1">
+            <c r="B9">
+                <f>B7-B8</f>
+                <v>42</v>
+            </c>
+        </row>
+        <row r="10" hidden="1">
+            <c r="D10" s="1" t="s">
+                <v>3</v>
+            </c>
+            <c r="E10" s="6" t="s">
+                <v>14</v>
+            </c>
+            <c r="F10" s="2" t="s">
+                <v>14</v>
+            </c>
+        </row>
+        <row r="11" spans="1:6" hidden="1">
+            <c r="A11" s="8">
+                <v>2.1345678901</v>
+            </c>
+        </row>
+        <row r="12" spans="1:6">
+            <c r="B12" t="str">
+                <f>IF(B11&gt;0,"Hello","")</f>
+                <v/>
+            </c>
+            <c r="D12" s="10">
+                <f>DATEVALUE(E10)</f>
+                <v>39118</v>
+            </c>
+            <c r="E12" s="10"/>
+        </row>
+        <row r="14" spans="1:6">
+            <c r="C14" t="s">
+                <v>3</v>
+            </c>
+            <c r="D14" s="9">
+                <f>D12</f>
+                <v>39118</v>
+            </c>
+            <c r="E14" s="2">
+                <f>D14</f>
+                <v>39118</v>
+            </c>
+        </row>
+    </sheetData>
+    <mergeCells count="2">
+        <mergeCell ref="D12:E12"/>
+        <mergeCell ref="A6:B6"/>
+    </mergeCells>
+    <pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/>
+    <pageSetup orientation="portrait" verticalDpi="4" r:id="rId1"/>
+</worksheet>

@@ -1,0 +1,7 @@
+Hi,
+[% list.owner.email %] has set this list to have a maximum .sig length
+of [% maxlines %] lines, hence your mail has been rejected,
+
+Have a nice day,
+- Siesta::Plugin::SimpleSig
+END

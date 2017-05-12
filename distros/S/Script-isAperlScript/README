@@ -1,0 +1,46 @@
+Script-isAperlScript
+
+Does some simple testing to check if a string or file is a perl
+script.
+
+The reason to use this instead of file is will recognize some things
+that can't securely be regarded as a Perl file.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Script::isAperlScript
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Script-isAperlScript
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Script-isAperlScript
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Script-isAperlScript
+
+    Search CPAN
+        http://search.cpan.org/dist/Script-isAperlScript/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 Zane C. Bowers
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

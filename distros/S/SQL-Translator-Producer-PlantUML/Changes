@@ -1,0 +1,20 @@
+Revision history for Perl extension SQL-Translator-Producer-PlantUML
+
+0.05 2016-03-07T04:07:30Z
+
+0.05 2016-03-07T04:07:15Z
+
+    - fix readme
+
+0.03 2014-11-06T09:53:55Z
+
+    - fix cpanfile for test
+
+0.02 2014-11-03T13:40:18Z
+
+    - fix cpanfile
+
+0.01 2014-11-03T13:34:40Z
+
+    - original version
+

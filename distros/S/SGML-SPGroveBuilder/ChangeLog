@@ -1,0 +1,14 @@
+Sun Feb  1 16:39:17 1998  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* 2.01 released
+
+Thu Jan 29 17:46:02 1998  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* SGML-SPGroveBuilder.spec (%setup): use SPLIBDIR env
+	(%files) use wildcard for Perl version
+
+Sat Jan 17 17:54:08 1998  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* SGML-SPGroveBuilder.spec (%files): removed DOM
+	change Perl from 5.003 to 5.00404
+

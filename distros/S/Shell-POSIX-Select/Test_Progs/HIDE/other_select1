@@ -1,0 +1,20 @@
+#! /usr/bin/perl -w
+
+use Shell::POSIX::Select;
+
+# Make sure that filehandle version of select doesn't get parsed as loopy one
+
+# select ('^d to exit') { }
+
+$old_fh = select (STDERR); $|=1; select ($old_fh);
+
+# select ('^d to exit') { }
+
+print STDOUT "STDOUT\n";
+
+# Found during testing that I can't actually print output to both channels
+# and know the order in which the words will appear!  Linux differs
+# from Solaris! 
+
+# print STDERR "STDERR\n";
+

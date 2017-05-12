@@ -1,0 +1,51 @@
+NAME
+    SPOPSx::Tool::DateTime - SPOPS extension for arbitrarily formatted
+    DateTime fields
+
+SYNOPSIS
+      %conf = (
+          table_alias => {
+              # ...
+              datetime_format => {
+                  atime => 'DateTime::Format::MySQL',
+                  mtime => 'DateTime::Format::Baby',
+                  ctime => DateTime::Format::Strptime->new(pattern => '%D %T'),
+              },
+              # ...
+          }
+      );
+
+DESCRIPTION
+    This module allows for DateTime objects to be stored to and loaded from
+    a database field. This module differs from the SPOPS::Tool::DateConvert
+    tool that is distributed with SPOPS in that it allows for the use of
+    arbitrary DateTime format objects. (See <http://datetime.perl.org/> for
+    details on DateTime and formatting.)
+
+INSTALLATION
+    Typical:
+
+      perl Build.PL
+      ./Build
+      ./Build test
+      ./Build install
+
+    or:
+
+      perl Makefile.PL
+      make
+      make test
+      make install
+
+SEE ALSO
+    SPOPS, DateTime, <http://datetime.perl.org/>, SPOPS::Tool::DateConvert
+
+AUTHOR
+    Andrew Sterling Hanenkamp, <hanenkamp@users.sourceforge.net>
+
+COPYRIGHT AND LICENSE
+    Copyright 2005 Andrew Sterling Hanenkamp. All Rights Reserved.
+
+    This library is distributed and licensed under the same terms as Perl
+    itself.
+

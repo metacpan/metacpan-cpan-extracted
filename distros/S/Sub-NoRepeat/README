@@ -1,0 +1,52 @@
+SYNOPSIS
+
+     use Sub::NoRepeat qw(norepeat);
+    
+     # run coderef
+     norepeat(code => \&sub1);
+    
+     # won't run the same coderef again, noop
+     norepeat(code => \&sub1);
+    
+     # run coderef because this one is different
+     norepeat(code => sub { ... });
+    
+     # won't repeat because we use sub1 as key
+     norepeat(code => sub { ... }, key => \&sub1);
+    
+     # run external command instead of coderef, die on non-zero exit code
+     norepeat(command => ['somecmd', '--cmdopt', ...]);
+    
+     # will repeat after 24 hours
+     norepeat(period => '24h', ...);
+    
+     # will repeat after change of day (equals to once daily):
+     norepeat(period => 'daily', ...);
+    
+     # allows twice daily
+     norepeat(period => 'daily', num=>2, ...);
+
+DESCRIPTION
+
+    This module is a generalization of the concept of App::norepeat and
+    possibly will supersede it in the future.
+
+DATA FILE
+
+    Data file is a line-oriented text file, using labeled tab-separated
+    value format (http://ltsv.org/). Each row contains these labels: time
+    (a timestamp either in the format of UTC ISO8601YYYY-MM-DDTHH:MM:SSZ,
+    local ISO8601 YYYY-MM-DDTHH:MM:SS, or Unix timestamp), key (tabs and
+    newlines will be converted to spaces).
+
+    The rows are assumed to be sorted chronologically (increasing time).
+
+SEE ALSO
+
+    App::norepeat, the CLI version.
+
+    Unix cron facility for periodic/scheduling of execution.
+
+    Related: modules to limit the number of program instances that can run
+    at a single time: Proc::Govern, Sys::RunAlone.
+

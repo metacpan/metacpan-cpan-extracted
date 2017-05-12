@@ -1,0 +1,42 @@
+NAME
+    Socket::AcceptFilter - Set sockopt httpready/dataready on FreeBSD and
+    Linux
+
+VERSION
+    Version 0.03
+
+SYNOPSIS
+        use Socket::AcceptFilter;
+
+        my $socket = ...;
+        listen($socket);
+        accept_filter($socket,'httpready'); # FreeBSD only
+        # or
+        accept_filter($socket,'dataready'); # FreeBSD/Linux
+
+FUNCTIONS
+  accept_filter ($sock, $name)
+AUTHOR
+    Mons Anderson, "<mons at cpan.org>"
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Socket::AcceptFilter
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Socket-AcceptFilter>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Socket-AcceptFilter/>
+
+COPYRIGHT & LICENSE
+    Copyright 2009 Mons Anderson, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

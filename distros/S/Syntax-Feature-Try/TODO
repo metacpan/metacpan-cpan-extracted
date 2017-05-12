@@ -1,0 +1,13 @@
+ - check/fix problems inside try/catch/finally block
+    - loop ops: next,last,redo
+    - fix @_ inside blocks
+
+ - update stacktrace / caller ?
+
+ - test usage in different module that it is used
+
+ - rewrite documentation to English ;)
+ - check TODOs in source-code
+
+ - set ( %Carp::Internal /  %Carp::CarpInternal ) to skip try/catch blocks
+

@@ -1,0 +1,53 @@
+Name               DSLIP Description                                  Info
+------------------ ----- -------------------------------------------  --------
+String
+::Nysiis           Rdpfp Nysiis Phonetic Encoding                     KRBURTON
+
+
+Nysiis (NNew York State Identification and Intelligence System)
+phonetic encoding algorithm.  Similar in nature to the Soundex, 
+Metahpone, and DoubleMetaphone algorithms.
+
+
+
+
+
+
+NAME
+    String::Nysiis - NYSIIS Phonetic Encoding
+
+SYNOPSIS
+      use String::Nysiis qw(nysiis);
+      my $enc = nysiis($string);
+
+      print nysiis('Larry'),"\n"; # should print LARY
+
+DESCRIPTION
+    New York State Identification and Intelligence System (NYSIIS) algorithm
+    for phonetic encoding of names.
+
+  EXPORT
+
+    None by default.
+
+AUTHOR
+    This module is based on a NYSIIS implementation by Ben Kennedy
+    <bkennedy@hmsonline.com>. It is currently being maintained by:
+
+     Kyle R. Burton 
+     krburton@cpan.org
+     kburton@hmsonline.com
+     HMS
+     625 Ridge Pike
+     Building E
+     Suite 400
+     Conshohocken, PA 19428
+ 
+SEE ALSO
+     Atack, J., and F. Bateman. 1992.  
+      "Matchmaker, matchmaker, make me a match" : a general personal 
+        computer-based matching program for historical research. 
+        Historical Methods 25: 53-65.
+
+    perl(1). Text::DoubleMetaphone. Text::Soundex.
+

@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 f1ccba6c6e1ab2f9738ce10ff7de462b36d498b2 Build.PL
+SHA1 6df4f01f583a8d040fe2e8afbc1c15cbc7229d5c Changes
+SHA1 2c86a5bb69f53b0cedd3a95835cac68e80fda98a MANIFEST
+SHA1 783ab4e2a4532a58f1570550683277431106f1cc META.json
+SHA1 fd6859c7e911d73c1de51754b7460e97e85837f2 META.yml
+SHA1 d1236e3a0810251735dbf7f7896d295988eae732 Makefile.PL
+SHA1 c940496daf66f64a6eca453bb5d3f00c72c788d4 README
+SHA1 df9b34d5f09e4b97a0a2e9292ec1493f12c200c0 bin/mibProxy
+SHA1 fe11a9605538d67defc450f5c3d86e328b05febf etc/mibProxy.conf
+SHA1 3eb33e877462f1003ca8408a3318343bbe90ef67 lib/SNMP/MibProxy.pm
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 log/mibProxy.log
+SHA1 de14ebe606383171555cda72dace8213924a32d5 t/00-load.t
+SHA1 ab0a163239b0a9014d5226839f17a7ae07c21d9a t/01-load.t
+SHA1 6dc5686b81d9a44f774891fcaaf1a3bd7ff7191e t/boilerplate.t
+SHA1 afc41cf24d367295a4caf0927b07fd657557d265 t/mibProxy.t
+SHA1 6da39b48ce64b584e4c3274bff96fc76ff484820 t/pod-coverage.t
+SHA1 0190346d7072d458c8a10a45c19f86db641dcc48 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (Darwin)
+
+iQEcBAEBAgAGBQJSKfr2AAoJEB/AXZb+uytNTtQIAJ9yhL07fbIPc+x5db854QMp
+L2KedYg45vpRDKj8/2W2cen07WgD8XFj/Ue4v8qG5GkS4/qZ59wPXCBQ9Jg3RizB
+c/3qjh4/cZE/czhgMgPTrrACv91jjo9+TAUNHgfq1rBrHfT16qSWon272BSxa41V
+hxdxanLiqXETKyc3gNCf7Opyv8Yl+Djz6dNAQVG1fOoFbiXB6LBmWR6gK+1E7FuV
+qED7r1EB672QZ6xiwXcvKT/pjNWqT1n3ZpCK+LR9j8IVqEZzKlGen/nCJEYaPeTz
+BnEzpNhMVFhKeh05uRGdCjRtnveB7JFgOuvBA9fGmuVfryRnK2RjD3GZw/mTntE=
+=c4E7
+-----END PGP SIGNATURE-----

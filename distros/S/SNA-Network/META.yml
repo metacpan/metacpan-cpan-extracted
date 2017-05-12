@@ -1,0 +1,63 @@
+---
+abstract: 'A toolkit for Social Network Analysis'
+author:
+  - 'Darko Obradovic <dobradovic@gmx.de>'
+build_requires:
+  Carp: '0'
+  List::MoreUtils: '0'
+  List::Util: '0'
+  Module::List::Pluggable: '0'
+  Object::Tiny::XS: '0'
+  Test::Memory::Cycle: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4216, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SNA-Network
+provides:
+  SNA::Network:
+    file: lib/SNA/Network.pm
+    version: '0.21'
+  SNA::Network::Algorithm::Betweenness:
+    file: lib/SNA/Network/Algorithm/Betweenness.pm
+  SNA::Network::Algorithm::Connectivity:
+    file: lib/SNA/Network/Algorithm/Connectivity.pm
+  SNA::Network::Algorithm::Cores:
+    file: lib/SNA/Network/Algorithm/Cores.pm
+  SNA::Network::Algorithm::HITS:
+    file: lib/SNA/Network/Algorithm/HITS.pm
+  SNA::Network::Algorithm::Louvain:
+    file: lib/SNA/Network/Algorithm/Louvain.pm
+  SNA::Network::Algorithm::PageRank:
+    file: lib/SNA/Network/Algorithm/PageRank.pm
+  SNA::Network::Community:
+    file: lib/SNA/Network/Community.pm
+  SNA::Network::CommunityStructure:
+    file: lib/SNA/Network/CommunityStructure.pm
+  SNA::Network::Edge:
+    file: lib/SNA/Network/Edge.pm
+  SNA::Network::Filter::Guess:
+    file: lib/SNA/Network/Filter/Guess.pm
+  SNA::Network::Filter::Pajek:
+    file: lib/SNA/Network/Filter/Pajek.pm
+  SNA::Network::Generator::ByDensity:
+    file: lib/SNA/Network/Generator/ByDensity.pm
+  SNA::Network::Generator::ConfigurationModel:
+    file: lib/SNA/Network/Generator/ConfigurationModel.pm
+  SNA::Network::Generator::MCMC:
+    file: lib/SNA/Network/Generator/MCMC.pm
+  SNA::Network::Node:
+    file: lib/SNA/Network/Node.pm
+  SNA::Network::Node::Plugin::Test:
+    file: lib/SNA/Network/Node/Plugin/Test.pm
+  SNA::Network::Plugin::Test:
+    file: lib/SNA/Network/Plugin/Test.pm
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.21'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

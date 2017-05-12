@@ -1,0 +1,151 @@
+=head1 NAME
+
+SPOPS::Manual::Intro - Introduction and overview of SPOPS
+
+=head1 DESCRIPTION
+
+This document aims to answer the questions:
+
+=over 4
+
+=item *
+
+What needs does SPOPS fill?
+
+=item *
+
+Why would I use SPOPS?
+
+=item *
+
+How does everything broadly fit together?
+
+=back
+
+=head1 CLASS HIERARCHY
+
+SPOPS (Simple Perl Object Persistence with Security) provides a
+framework to make your application objects persistent (meaning, you
+can store them somewhere, e.g., in a relational database), and to
+control access to them (the usual user/group access rights stuff). You
+will usually just configure SPOPS by means of configuration files, and
+SPOPS will create the necessary classes and objects for your
+application on the fly. You can of course have your own code implement
+your objects - extending the default SPOPS object behavior with your
+methods. However, if SPOPS shall know about your classes and objects,
+you will have to tell it -- by configuring it.
+
+The typical class hierarchy for an SPOPS object looks like this:
+
+     --------------------------
+    |SPOPS                     |
+     --------------------------
+                ^
+                |
+     --------------------------
+    |SPOPS::MyStorageTechnology|
+     --------------------------
+                ^
+                |
+     --------------------------
+    |SPOPS::MyApplicationClass |
+     --------------------------
+
+=over 4
+
+=item *
+
+SPOPS
+
+Abstract base class, provides persistency and security framework
+(fetch, save, remove)
+
+Example: You are reading it now!
+
+=item *
+
+SPOPS::MyStorageTechnology
+
+Concrete base class, provides technical implementation of framework
+for a particular storage technology (e.g., Filesystem, RDBMS, LDAP,
+... )
+
+Example: SPOPS::DBI, SPOPS::GDBM, ...
+
+=item *
+
+SPOPS::MyApplicationClass
+
+User class, provides semantic implementation of framework
+(configuration of parent class, e.g., database connection strings,
+field mappings, ... )
+
+Example: MyApplication::User, MyApplication::Document, ...
+
+=back
+
+=head2 SPOPS Object States
+
+Basically, each SPOPS object is always in one of two states:
+
+=over 4
+
+=item *
+
+Runtime State
+
+=item *
+
+Persistent State
+
+=back
+
+In Runtime State, the object representation is based on a hash of
+attributes. The object gets notified about any changes to it through
+the L<tie|tie> mechanism.
+
+In Persistent State, the object exists in some more permanent form --
+saved in a database, in the filesystem, in a directory, etc.
+
+You can control what happens to the object when it gets written to its
+persistent form, or when it is deleted, or fetched from its storage
+form, by implementing a simple API: C<fetch()>, C<save()>,
+C<remove()>. (The C<save()> method encompasses both 'create' and
+'update' actions.)
+
+     -------------         save, remove         ----------------
+    |Runtime State|     ------------------->   |Persistent State|
+     -------------      <------------------     ----------------
+                              fetch
+
+Around the C<fetch()>, C<save()>, and C<remove()> calls, you can
+execute helper functions (rules in one or more of the following
+stages: pre_fetch, post_fetch, pre_save, post_save, pre_remove,
+post_remove), in case you need to prepare anything or clean up
+something, according to needs of your storage technology.  These are
+pushed on a queue based on a search of C<@ISA>, and executed front to
+end of the queue. If any of the calls in a given queue returns a false
+value, the whole action (save, remove, fetch) is short-circuited (that
+is, a failing method bombs out of the action). See
+L<SPOPS::Manual::ObjectRules|SPOPS::Manual::ObjectRules> for details
+on the process and how to implement your own.
+
+It's important to note that you have to tell an SPOPS object to
+persist itself -- it will not happen automatically. A call to C<new()>
+will not create an entry in your datastore, only C<save()> will. For
+instance:
+
+ my $film = Film->new();          # Object exists in memory
+ $film->{name} = 'The Matrix';    #   |
+ $film->{year} = '1999';          #   |
+ $film->save;                     # Object exists in datastore
+
+=head1 COPYRIGHT
+
+Copyright (c) 2001-2004 Chris Winters. All rights reserved.
+
+See L<SPOPS::Manual|SPOPS::Manual> for license.
+
+=head1 AUTHORS
+
+Chris Winters E<lt>chris@cwinters.comE<gt>

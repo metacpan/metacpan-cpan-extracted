@@ -1,0 +1,31 @@
+Spork::S5ThemeBlue version 0.03
+=======================================
+
+Spork S5 Theme
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Perl modules:
+
+  Spork::S5
+  Spork::S5Theme
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Florian Merges <fmerges@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.
+

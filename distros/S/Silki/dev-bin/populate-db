@@ -1,0 +1,45 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use lib './lib';
+
+use Silki::Schema::Page;
+use Silki::Schema::User;
+
+my $user_id = Silki::Schema::User->GuestUser()->user_id();
+
+for my $p ( 1 .. 100 ) {
+    my $title = 'Page ' . $p;
+
+    print "$title\n";
+
+    my $page = Silki::Schema::Page->insert_with_content(
+        title   => $title,
+        content => 'Contents of page ' . $p,
+        wiki_id => 1,
+        user_id => $user_id,
+    );
+
+    for my $pr ( 2 .. 51 ) {
+        $page->add_revision(
+            content => 'This is revision ' . $pr,
+            user_id => $user_id,
+        );
+    }
+}
+
+# Mixed up the revision order so that some pages have interleaved revision
+# creation datetimes. This is more useful for testing recent changes views.
+for my $p ( 1 .. 10 ) {
+    my $page = Silki::Schema::Page->new(
+        title   => 'Page ' . $p,
+        wiki_id => 1,
+    );
+
+    $page->add_revision(
+        content => 'One last revision',
+        user_id => $user_id,
+    );
+}

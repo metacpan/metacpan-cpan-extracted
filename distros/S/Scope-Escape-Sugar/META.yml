@@ -1,0 +1,43 @@
+---
+abstract: 'whizzy syntax for non-local control transfer'
+author:
+  - 'Andrew Main (Zefram) <zefram@fysh.org>'
+build_requires:
+  Devel::CallChecker: 0.003
+  Devel::CallParser: 0.001
+  ExtUtils::CBuilder: 0.15
+  Module::Build: 0
+  Test::More: 0
+  perl: 5.011002
+  strict: 0
+  warnings: 0
+configure_requires:
+  Module::Build: 0
+  perl: 5.011002
+  strict: 0
+  warnings: 0
+dynamic_config: 0
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Scope-Escape-Sugar
+provides:
+  Scope::Escape::Sugar:
+    file: lib/Scope/Escape/Sugar.pm
+    version: 0.002
+requires:
+  B::Hooks::EndOfScope: 0.05
+  Devel::CallChecker: 0.003
+  Devel::CallParser: 0.001
+  Exporter: 0
+  Scope::Escape: 0.004
+  XSLoader: 0
+  parent: 0
+  perl: 5.011002
+  strict: 0
+  warnings: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.002

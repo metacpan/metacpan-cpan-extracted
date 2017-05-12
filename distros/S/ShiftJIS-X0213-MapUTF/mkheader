@@ -1,0 +1,221 @@
+#!perl
+#
+# This mkheader script makes two C header files, "fmsj0213.h" and "tosj0213.h".
+# These files are used to build ShiftJIS::X0213::MapUTF.
+#
+use 5.006;
+use Carp;
+use strict;
+
+do "sjis0213.map";
+
+my $mc = 'U16';
+my $wc = 'UV';
+
+my(%sbcs, %dbcs, %ucs, %maxlen);
+use vars qw(%SJIS0213_UNI %UNI_SJIS0213 @ADDED2004);
+
+sub UNICODE_MAX () { 0x10FFFF }
+sub splitcomp { $_[0] <= UNICODE_MAX ? $_[0] : ($_[0] >> 16, $_[0] & 0xFFFF) }
+
+sub _u8len {
+    my $uv = shift;
+    return $uv < 0x80 ? 1 : $uv < 0x800 ? 2 :
+	$uv < 0x10000 ? 3 : $uv < 0x200000 ? 4 :
+        croak sprintf("_u8len(0x%x)\n", $uv);
+}
+sub u8len {
+    my @uv = splitcomp(shift);
+    my $len = 0;
+    $len += _u8len($_) for @uv;
+    return $len;
+}
+
+sub u16len { ($_[0] > 0xFFFF)   ? 4 : 2 }
+sub u32len { ($_[0] > UNICODE_MAX) ? 8 : 4 }
+sub unilen { use bytes; return length(pack 'U*', splitcomp(shift)) }
+sub floor  { int($_[0]) + ($_[0] <=> int($_[0])); }
+
+die "no \%SJIS0213_UNI!" unless %SJIS0213_UNI; # avoid "once used"
+
+$maxlen{ToUni} = 1;
+$maxlen{ToU8}  = 1;
+$maxlen{ToU16} = 1;
+$maxlen{ToU32} = 1;
+
+while (my($e,$u) = each %SJIS0213_UNI) {
+    my $enccur = $e < 0x100 ? 1 : 2;
+    if ($e < 0x100) {
+	$sbcs{$e} = $u;
+    } else {
+	my ($le,$tr) = unpack('CC', pack 'n', $e);
+	$dbcs{ $le }{ $tr } = $u;
+    }
+    my $unimax = floor(unilen($u)/$enccur);
+    my $u8max  = floor(u8len ($u)/$enccur);
+    my $u16max = floor(u16len($u)/$enccur);
+    my $u32max = floor(u32len($u)/$enccur);
+    $maxlen{ToUni} = $unimax if $unimax > $maxlen{ToUni};
+    $maxlen{ToU8 } = $u8max  if $u8max  > $maxlen{ToU8 };
+    $maxlen{ToU16} = $u16max if $u16max > $maxlen{ToU16};
+    $maxlen{ToU32} = $u32max if $u32max > $maxlen{ToU32};
+}
+
+open FH, ">fmsj0213.h" or die "fmsj0213.h $!";
+binmode FH;
+select FH;
+
+printf "#define MaxLenToUni (%d)\n", $maxlen{ToUni};
+printf "#define MaxLenToU8  (%d)\n", $maxlen{ToU8 };
+printf "#define MaxLenToU16 (%d)\n", $maxlen{ToU16};
+printf "#define MaxLenToU32 (%d)\n", $maxlen{ToU32};
+print "\n";
+
+print "bool isADDED2004 (UV uv)\n{\nreturn\n\t";
+{
+    my @temp = sort { $a <=> $b } @ADDED2004;
+    while (@temp) {
+	my $cur = shift @temp;
+	printf "uv == 0x%04X", $cur;
+	print "  ||\n\t" if @temp;
+    }
+    print "\n\t? TRUE : FALSE;\n}\n\n";
+}
+
+print "struct leading { $wc sbc; $wc* tbl; };\n\n";
+
+foreach my $le (sort { $a <=> $b } keys %dbcs) {
+    print "$wc fmsjis0213_$le [256] = {\n";
+    for (my $i = 0; $i < 256; $i++) {
+	printf "\t%d", defined $dbcs{$le}{$i} ? $dbcs{$le}{$i} : 0;
+	print ','  if $i != 255;
+	print "\n" if $i % 8 == 7;
+    }
+    print "};\n\n";
+}
+
+{
+    print "struct leading fmsjis0213_tbl [] = {\n";
+    for (my $i = 0; $i < 256; $i++) {
+	printf "\t{ %5d, %s }",
+	    defined $sbcs{$i} ? $sbcs{$i} : 0,
+	    defined $dbcs{$i} ? "fmsjis0213_$i" : "NULL";
+	print ','  if $i != 255;
+	print "\n";
+    }
+    print "};\n\n";
+}
+
+close FH;
+
+die "no \%UNI_SJIS0213!" unless %UNI_SJIS0213; # avoid "once used"
+
+$maxlen{FmUni} = 1;
+$maxlen{FmU8 } = 1;
+$maxlen{FmU16} = 1;
+$maxlen{FmU32} = 1;
+
+while (my($u,$e) = each %UNI_SJIS0213) {
+    my $enccur = $e < 0x100 ? 1 : 2;
+    my $unimax = floor($enccur/unilen($u));
+    my $u8max  = floor($enccur/u8len ($u));
+    my $u16max = floor($enccur/u16len($u));
+    my $u32max = floor($enccur/u32len($u));
+    $maxlen{FmUni} = $unimax if $unimax > $maxlen{FmUni};
+    $maxlen{FmU8 } = $u8max  if $u8max  > $maxlen{FmU8 };
+    $maxlen{FmU16} = $u16max if $u16max > $maxlen{FmU16};
+    $maxlen{FmU32} = $u32max if $u32max > $maxlen{FmU32};
+}
+
+open FH, ">tosj0213.h" or die "tosj0213.h $!";
+binmode FH; select FH;
+
+printf "#define MaxLenFmUni (%d)\n", $maxlen{FmUni};
+printf "#define MaxLenFmU8  (%d)\n", $maxlen{FmU8 };
+printf "#define MaxLenFmU16 (%d)\n", $maxlen{FmU16};
+printf "#define MaxLenFmU32 (%d)\n", $maxlen{FmU32};
+print "\n";
+
+{
+    my $head = "tosjis0213_tbl";
+    my $hash = \%UNI_SJIS0213;
+    my $null = 0;
+
+    my (%val, %bases, %composites);
+
+    foreach my $uv (keys %$hash) {
+	if ($uv > UNICODE_MAX) {
+	    my $b = $uv >> 16;
+	    my $c = $uv & 0xFFFF;
+	    push @{ $composites{$c} }, [ $b, $hash->{$uv} ];
+	    $bases{$b} = 1;
+	    next;
+	}
+	my @c = unpack 'CCCC', pack 'N', $uv;
+	$val{ $c[1] }{ $c[2] }{ $c[3] } = $hash->{$uv};
+    }
+
+  # composite
+    print "bool\nisbase (UV uv)\n{\nreturn\n",
+	join(" ||\n",
+	    map sprintf("    (uv == 0x%04X)", $_),
+		sort {$a <=> $b} keys %bases),
+	";\n}\n\n";
+
+    print "UV\ngetcomposite (UV base, UV combin)\n{\n",
+	"    switch (combin) {\n";
+    for my $c (keys %composites) {
+	print "\tcase $c :\n";
+	print "\t    switch (base) {\n";
+	for my $comp (@{ $composites{$c} }) {
+	    print "\t\tcase $comp->[0] : return $comp->[1];\n";
+	}
+	print "\t\tdefault : return 0;\n";
+	print "\t    }\n";
+    }
+    print "\tdefault : return 0;\n";
+    print "    }\n";
+    print "}\n\n";
+  # end composite
+
+    foreach my $p (sort { $a <=> $b } keys %val) {
+	next if ! $val{ $p };
+	for (my $r = 0; $r < 256; $r++) {
+	    next if ! $val{ $p }{ $r };
+	    printf "$mc ${head}_%02x_%02x [256] = {\n", $p, $r;
+	    for (my $c = 0; $c < 256; $c++) {
+		print "\t", defined $val{$p}{$r}{$c}
+		    ? $val{$p}{$r}{$c}
+		    : $null;
+		print ','  if $c != 255;
+		print "\n" if $c % 8 == 7;
+	    }
+	    print "};\n\n";
+	}
+    }
+    foreach my $p (sort { $a <=> $b } keys %val) {
+	next if ! $val{ $p };
+	printf "$mc* ${head}_%02x [256] = {\n", $p;
+	for (my $r = 0; $r < 256; $r++) {
+	    print $val{ $p }{ $r }
+		? sprintf("${head}_%02x_%02x", $p, $r)
+		: "NULL";
+	    print ','  if $r != 255;
+	    print "\n" if $val{ $p }{ $r } || ($r+1) % 8 == 0;
+	}
+	print "};\n\n";
+    }
+    print "$mc** $head [] = {\n";
+    for (my $p = 0; $p <= 0x10; $p++) {
+	print $val{ $p } ? sprintf("${head}_%02x", $p) : "NULL";
+	print ','  if $p != 0x10;
+	print "\n";
+    }
+    print "};\n\n";
+    close FH;
+}
+
+close FH;
+
+1;
+__END__

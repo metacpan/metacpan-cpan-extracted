@@ -1,0 +1,518 @@
+Revision history for perl module Sys::Virt
+
+3.3.0 2017-05-08
+
+ - Add VIR_DOMAIN_JOB_OPERATION* constants
+
+3.2.0 2017-04-03
+
+ - Add PERF_PARAM_CPU_CLOCK constant
+ - Add PERF_PARAM_TASK_CLOCK constant
+ - Add PERF_PARAM_PAGE_FAULTS constant
+ - Add PERF_PARAM_CONTEXT_SWITCHES constant
+ - Add PERF_PARAM_CPU_MIGRATIONS constant
+ - Add PERF_PARAM_PAGE_FAULTS_MIN constant
+ - Add PERF_PARAM_PAGE_FAULTS_MAJ constant
+ - Add PERF_PARAM_ALIGNMENT_FAULTS constant
+ - Add PERF_PARAM_EMULATION_FAULTS constant
+ - Add block threshold event
+ - Add virDomainSetBlockThreshold API
+ - Add VIR_MIGRATE_TLS constant
+
+3.1.0 2017-03-03
+
+ - Add VIR_CONNECT_LIST_STORAGE_POOLS_VSTORAGE constant
+ - Add VIR_CONNECT_LIST_NODE_DEVICES_CAP_DRM constant
+ - Add virDomainSetVcpu API
+
+3.0.0 2017-01-19
+
+ - Add group_name for block iotune
+ - Add new branch instructions perf event
+ - Add PERF_PARAM_BRANCH_MISSES constant
+ - Add PERF_PARAM_BUS_CYCLES constant
+ - Add PERF_PARAM_STALLED_CYCLES_FRONTEND constant
+ - Add PERF_PARAM_STALLED_CYCLES_BACKEND constant
+ - Add PERF_PARAM_REF_CPU_CYCLES constant
+ - Add virStorageVolGetInfoFlags & associated constants
+ - Add domain metdata change event
+ - Add secret event APIs
+
+2.5.0 2016-12-05
+
+ - Add VIR_ERR_LIBSSH and VIR_FROM_LIBSSH constants
+
+2.4.0 2016-11-02
+
+ - Add VIR_DOMAIN_VCPU_HOTPLUGGABLE constant
+ - Add constants for the new block iotune parameters for length
+
+2.3.0 2016-10-06
+
+ - Add PERF_PARAM_CACHE_MISSES, PERF_PARAM_CACHE_REFERENCES,
+   PERF_PARAM_CPU_CYCLES, PERF_PARAM_INSTRUCTIONS constants
+ - Add USAGE_TYPE_TLS
+ - Add ERR_AGENT_UNSYNCED
+ - Add VIR_DOMAIN_UNDEFINE_KEEP_NVRAM constant
+
+2.2.0 2016-09-05
+
+ - Add virConnectNodeDeviceEventRegisterAny and
+   virConnectNodeDeviceEventDeregisterAny and associated
+   constants
+ - Add new I/O thread tuning constants
+ - Add VIR_NODE_DEVICE_EVENT_ID_UPDATE constant
+
+2.1.0 2016-08-02
+
+ - Add VIR_DOMAIN_MEMORY_STAT_USABLE and
+   VIR_DOMAIN_MEMORY_STAT_LAST_UPDATE constants
+ - Fix handling of VIR_DOMAIN_AFFECT_LIVE |
+   VIR_DOMAIN_AFFECT_CONFIG with setter methods
+
+2.0.0 2016-07-01
+
+ - Add VIR_MIGRATE_PARAM_AUTO_CONVERGE_INITIAL and
+   VIR_MIGRATE_PARAM_AUTO_CONVERGE_INCREMENT constants
+ - Add VIR_DOMAIN_JOB_AUTO_CONVERGE_THROTTLE constant
+ - Add virConnectStoragePoolEventRegisterAny and
+   virConnectStoragePoolEventDeregisterAny and associated
+   constants
+ - Add virDomainGetGuestVcpus and virDomainSetGuestVcpus APIs
+
+1.3.5 2016-06-06
+
+ - Add VIR_ERR_NO_CLIENT constant
+ - Add PERF_PARAM_MBML and PERF_PARAM_MBMT constants
+ - Fix handling of 'rss' key for memory stats
+
+1.3.4 2016-05-05
+
+ - Fix POD error in Domain.pm
+ - Add VIR_DOMAIN_EVENT_ID_DEVICE_REMOVAL_FAILED constant
+ - Reuse VIR_DOMAIN_EVENT_ID_DEVICE callbacks
+ - Add VIR_STORAGE_VOL_PLOOP constant
+ - Add VIR_MIGRATE_PARAM_COMPRESSION* constants
+ - Add VIR_MIGRATE_PARAM_PERSIST_XML constant
+
+1.3.3 2016-04-07
+
+ - Add VIR_ERR_AUTH_UNAVAILABLE constant
+ - Add VIR_DOMAIN_SCHEDULER_GLOBAL_PERIOD, VIR_DOMAIN_SCHEDULER_GLOBAL_QUOTA,
+   VIR_DOMAIN_TUNABLE_CPU_GLOBAL_PERIOD & VIR_DOMAIN_TUNABLE_CPU_GLOBAL_QUOTA
+   constants
+ - Add VIR_DOMAIN_EVENT_ID_JOB_COMPLETED constant and callback
+ - Add VIR_ERR_NO_SERVER constant
+ - Add VIR_DOMAIN_EVENT_DEFINED_FROM_SNAPSHOT constant
+ - Add VIR_MIGRATE_PARAM_DISKS_PORT constant
+ - Add virDomainMigrateStartPostCopy API support
+ - Add constants related to post-copy migration
+ - Add APIS & constants for new perf event support
+
+1.3.2 2016-03-01
+
+ - Add VIR_STORAGE_VOL_WIPE_ALG_TRIM constant
+ - Add VIR_FROM_XENXL constant
+ - Add VIR_DOMAIN_EVENT_ID_MIGRATION_ITERATION event
+   handling callback
+
+1.3.1 2016-01-20
+
+ - Add VIR_STORAGE_POOL_CREATE_NORMAL, VIR_STORAGE_POOL_CREATE_WITH_BUILD,
+   VIR_STORAGE_POOL_CREATE_WITH_BUILD_OVERWRITE and
+   VIR_STORAGE_POOL_CREATE_WITH_BUILD_NO_OVERWRITE constants
+ - Add new domain job memory constants
+
+1.3.0 2015-12-10
+
+ - Add VIR_FROM_LOGGING constant
+
+1.2.21 2015-11-11
+
+ - Add VIR_STORAGE_VOL_DELETE_WITH_SNAPSHOTS constant
+
+1.2.19 2015-09-03
+
+ - Add VIR_DOMAIN_BANDWIDTH_IN_FLOOR constant
+ - Add virDomainRename method
+ - Add domain event constants for rename reason
+
+1.2.18 2015-08-03
+
+ - Add VIR_ERR_MIGRATE_FINISH_OK constant
+
+1.2.17 2015-07-17
+
+ - Add VIR_FROM_ADMIN constant
+ - Add VIR_MIGRATE_PARAM_MIGRATE_DISKS constant
+ - Fix docs typos in migrate_to_uri method
+ - Add VIR_DOMAIN_EVENT_WATCHDOG_INJECTNMI constant
+
+1.2.16 2015-06-01
+
+ - Add support for virDomainSetUserPassword
+
+1.2.15 2015-05-05
+
+ - Add support for VIR_DOMAIN_EVENT_ID_DEVICE_ADDED
+   event callback & constants.
+ - Add JOB_DOWNTIME_NET constant
+ - Add JOB_TIME_ELAPSED_NET constant
+ - Add virDomainAddIOThread and virDomainDelIOThread API bindings
+
+1.2.14 2015-04-09
+
+ - Add VIR_CONNECT_BASELINE_CPU_MIGRATABLE constant
+ - Add VIR_DOMAIN_CONTROL_ERROR_* constants
+ - Add virDomainGetIOThreads and virDomainPinIOThread API bindings
+ - Update the vcpuinfo.pl example to use unpack
+ - Add VIR_DOMAIN_TUNABLE_CPU_IOTHREADSPIN constant
+ - Add virDomainInterfaceAddress function & constants
+ - Add VIR_DOMAIN_PAUSED_STARTING_UP constant
+ - Adapt to rename of virDomainIOThreadsInfoFree to virDomainIOThreadInfoFree
+ - Adapt to rename of virDomainGetIOThreadsInfo to virDomainGetIOThreadInfo
+ - Add VIR_FROM_THREAD constant
+
+1.2.13 2015-03-05
+
+ - Add VIR_STORAGE_VOL_CREATE_REFLINK constant
+
+1.2.12 2015-01-27
+
+ - Add VIR_CONNECT_GET_ALL_DOMAINS_STATS_BACKING constant
+ - Add virDomainDefineXMLFlags API binding
+ - Add VIR_DOMAIN_DEFINE_VALIDATE, VIR_DOMAIN_START_VALIDATE
+   and VIR_ERR_INVALID_SCHEMA constants
+
+1.2.11 2014-12-15
+
+ - Add virDomainGetFSInfo API binding
+ - Add missed VIR_NODE_MEMORY_SHARED_MERGE_ACROSS_NODES constant
+ - Add new VIR_DOMAIN_TUNABLE_BLKDEV* constants
+ - Add new VIR_DOMAIN_BLOCK_IOTUNE* constants
+ - Add support for VIR_CONNECT_DOMAIN_EVENT_ID_AGENT_LIFECYCLE
+   event callbacks & constants
+ - Fix docs for Sys::Virt::Domain::get_time method
+ - Demo agent lifecycle events in example program
+
+1.2.9 2014-10-02
+
+ - Add VIR_DOMAIN_*_BANDWIDTH_BYTES constants
+ - Add VIR_DOMAIN_BLOCK_REBASE_COPY_DEV constant
+ - Add VIR_DOMAIN_JOB_STATS_COMPLETED constant
+ - Add VIR_DOMAIN_UNDEFINE_NVRAM constant
+ - Add VIR_FROM_POLKIT constant
+ - Add more VIR_DOMAIN_STATS_* constants
+ - Add more VIR_DOMAIN_JOB_* constants
+ - Add virConnectDomainEventTunable event callback & constants
+ - Add virNodeAllocPages API & constants
+ - Add VIR_MIGRATE_RDMA_PIN_ALL constant
+
+1.2.8 2014-09-05
+
+ - Add virConnectGetDomainCapabilities API
+ - Add VIR_DOMAIN_BLOCK_REBASE_RELATIVE and
+   VIR_DOMAIN_BLOCK_COMMIT_RELATIVE constants
+ - Add VIR_CONNECT_LIST_STORAGE_POOLS_ZFS constant
+ - Add virDomainOpenGraphicsFD API
+ - Add virDomainBlockCopy and related constants
+ - Add virConnectGetAllDomainStats API & constants
+
+1.2.6 2014-07-02
+
+ - Add VIR_DOMAIN_BLOCK_JOB_TYPE_ACTIVE_COMMIT and
+   VIR_DOMAIN_BLOCK_COMMIT_ACTIVE constants
+ - Add VIR_DOMAIN_EVENT_ID_BLOCK_JOB_2 constant
+ - Add virNodeGetFreePages method
+ - Add VIR_CONNECT_COMPARE_CPU_FAIL_INCOMPATIBLE
+   and VIR_ERR_CPU_INCOMPATIBLE constants
+ - Add virNetworkGetDHCPLeases and constants
+
+1.2.5 2014-06-02
+
+ - Add VIR_DOMAIN_{REBOOT,SHUTDOWN}_PARAVIRT constants
+ - Add virDomainFSFreeze/virDomainFSThaw APIs
+ - Add virDomainSetTime/virDomainGetTime APIs
+
+1.2.4 2014-05-06
+
+ - Add VIR_FROM_FIREWALL error constant
+
+1.2.3 2014-04-07
+
+ - Add VIR_FROM_CRYPTO error constant
+ - Add VIR_MIGRATE_AUTO_CONVERGE migration constant
+ - Add virDomainCoreDumpWithFormat and its constants
+
+1.2.2 2014-03-03
+
+ - Add new domain blk I/O constants
+ - Add BHyve error code
+
+1.2.1 2014-01-21
+
+ - Add new network event APIs from libvirt 1.2.1
+ - Add new constants in libvirt 1.2.1
+
+1.2.0 2013-12-02
+
+ - Add all new constants in libvirt 1.2.0
+ - Fix reversed args for virNodeDeviceLookupSCSIHostByWWN
+
+1.1.4 2013-11-05
+
+ - Add all new constants in libvirt 1.1.4
+ - Fix impl of "list_secrets" API (RT #82072)
+
+1.1.3 2013-10-02
+
+ - Add all new APIs in libvirt 1.1.3
+
+1.1.2 2013-09-27
+
+ - Add all new constants in libvirt 1.1.2
+
+1.1.1 2013-07-30
+
+ - Add all new constants/apis in libvirt 1.1.1
+
+1.1.0 2013-07-29
+
+ - Add support for v3 of migration APIs
+ - Add all new constants in libvirt 1.1.0
+ - Fix handling of sparse typed parameters
+ - Fix misc typos in docs
+
+1.0.5 2013-05-14
+
+ - Add all new APIs in libvirt 1.0.4 and 1.0.5
+
+1.0.3 2013-03-05
+
+ - Add all new APIs in libvirt 1.0.3
+
+1.0.2 2013-02-27
+
+ - Add all new APIs in libvirt 1.0.2
+
+1.0.1 2013-02-26
+
+ - Add all new APIs and constants in libvirt 1.0.1
+ - Fix typo preventing listing of NWFilters
+ - Add more testing of object list APIs
+ - Fix some incorrect error handling tests in binding
+ - Remove bogus compare < 0 for size_t variables
+ - Fix const-ness of functions for populating constants
+ - Add option to turn on more GCC warning flags
+ - Fix typos in POD docs
+
+1.0.0 2012-11-16
+
+ - Add all new APIs and constants in libvirt 1.0.0
+ - Fix inconsistent usage of 'uri' in Sys::Virt POD docs
+ - Fix typos in POD docs
+ - Don't explicitly set VIR_TYPED_PARAM_STRING_OKAY flag
+ - Fix hash key field lengths
+ - Add tests for object list APIs
+ - Fix default values for flags parameters
+ - Fix setting of node memory parameters
+
+0.10.2 2012-09-26
+
+ - Add all new APIs and constants in libvirt 0.10.2
+ - Add some constants for macros in libvirt.h related
+   to memory/block/cpu/scheduler parametes
+ - Fix warnings building on Perl with 64 int types
+ - Disable unreliable hostname test case
+
+0.10.0 2012-09-17
+
+ - Add all new APIs and constants in libvirt 0.10.0
+ - Add example program showing use of event callbacks
+ - Fix crash when registering event callback with 'undef'
+   for the domain parameter
+ - Fix typos in the definition of some docs
+
+0.9.13 2012-07-02
+
+ - Add all new APIs and constants in libvirt 0.9.13
+
+0.9.12 2012-05-21
+
+ - Add all new constants in libvirt 0.9.12
+
+0.9.11 2012-04-16
+
+ - Add all new APIs in libvirt 0.9.11
+ - Add test case to validate API coverage
+ - Fix misc POD docs bugs
+ - Fix reference handling in block stats
+ - Add handling of VIR_TYPED_PARAM_STRING
+
+0.9.10 2012-02-12
+
+ - Add all new APIs in libvirt 0.9.10
+ - Add some constants missing from previous releases
+ - Clarify docs for shutdown/destroy APIs (rt #73908)
+
+0.9.9 2012-01-09
+
+ - Add all new APIs in libvirt 0.9.9
+ - Fix crash in get_hostname
+ - Fix docs typos & nesting screwups
+ - Add example for calculating CPU utilization of host
+ - Update META.yml with correct license info
+ - Add missing dep on Time::HiRes
+ - Convert CHANGES file to Changes & format to comply
+   with Test::CPAN::Changes
+
+0.9.8 2012-01-03
+
+ - Add all new APIs in libvirt 0.9.8
+ - Simplify XS level error reporting code
+ - Cleanup code handling typed parameters
+
+0.9.7 2011-11-08
+
+ - Add all new APIs in libvirt 0.9.7
+ - Add binding for virDomainOpenConsole
+ - Fix missing $flags in documentation
+ - Added example integrating Sys::Virt::Domain->open_graphics
+   GTK3 and GTK-VNC
+
+0.9.5 2011-09-28
+
+ - Add all new APIs in libvirt 0.9.5
+ - Add missing snapshot creation/lookup methods
+ - Fix typo in method listing snapshots
+ - Add missing snapshot constant
+ - Add example for save/restore usage
+ - Re-add abort job binding accidentally deleted
+
+0.9.4 2011-08-03
+
+ - Add all new APIs in libvirt 0.9.4
+ - Requires libvirt >= 0.9.4
+ - Add missing VIR_DUMP_* and VIR_MIGRATE_* constants
+   from previous releases
+
+0.9.3 2011-07-12
+
+ - Add all new APIs in libvirt 0.9.3
+ - Requires libvirt >= 0.9.3
+
+0.9.2 2011-07-08
+
+ - Changed version numbering to track the corresponding
+   minimum required libvirt releases
+ - Add all new APIs in libvirt 0.9.2
+ - Requires libvirt >= 0.9.2
+
+0.2.8 2011-06-29
+
+ - Add all new APIs in libvirt 0.9.0
+ - Add examples for different ways of using stream
+   APIs to download/upload storage volumes
+ - Requires libvirt >= 0.9.0
+
+0.2.7 2011-06-29
+
+ - Honour flags parameter when dumping XML
+ - Use thread local error APIs exclusively
+ - Fix bogus extra URI parameter in migrate_to_uri function
+ - Implement all virStream APIs in Sys::Virt::Stream
+ - Impement virDomainGetSysinfo binding
+ - Call virInitialize when loading module
+ - Add all missing error constants
+ - Update example RPM spec to match Fedora
+ - Requires libvirt >= 0.8.8
+
+0.2.6 2011-02-16
+
+ - Fix build with 0.8.7 libvirt by removing reference to
+   non-existant constant only introduced in libvirt > 0.8.7
+ - Fix test script when hostname is undefined
+
+0.2.5 2011-02-04
+
+ - Add all APIs + constants from 0.8.2, 0.8.5 and 0.8.7
+   releases, with exception of virDomainOpenConsole
+ - Add missing dep on XML::XPath
+ - Requires libvirt >= 0.8.7
+
+0.2.4 2010-05-19
+
+ - Add all APIs + constants from 0.7.7, 0.8.0 & 0.8.1 releases
+ - Requires libvirt >= 0.8.1
+
+0.2.3 2010-01-15
+
+ - New virSecretPtr APIs
+ - Fix authentication callback handling of NULLs
+ - Document flags parameters to many methods
+ - Add virDomainMigrateToURI and virConnectGetLibVersion
+ - Add virConnectCPUCompare and virDomainMemoryStats
+ - Add vir*IsActive vir*IsPersistent
+ - Add virConnectIsSecure & virConnectIsEncrypted
+ - Add new error codes
+ - Require libvirt >= 0.7.5
+
+0.2.2 2009-09-14
+
+ - Add all new APIs upto libvirt 0.7.0 APIs (listing defined
+   network interfaces)
+ - Add missing APIs for looking up storage volumes based
+   on path and key
+ - Fix lookup of network interfaces based on MAC address
+ - Add missing APIs for defining network interfaces and
+   starting defined interfaces
+
+0.2.1 2009-08-25
+
+ - Add all new APIs upto libvirt 0.6.4 (network interfaces,
+   storage volume cloning and node device create/delete)
+ - Fix off-by-1 in UUID stringification
+ - Set default values for optional params.
+ - Use SvOK check for potentially undefined string params
+ - Export all the virError related constants
+ - Fix some memory leaks in C layer
+ - Remove bogus module imports from test suite
+
+0.2.0 2009-03-25
+
+ - Implement storage, node device, event APIs
+ - Full covereage of all APIs in 0.6.1 release of libvirt
+ - Full documentation coverage
+ - Ability to authenticate when openning connections
+
+0.1.2 2008-02-23
+
+ - Added manual written META.yml
+ - Added networking APIs
+ - Added APIs for host capabilities
+ - Added APIs for inactive domains
+ - Switch licensse to GPLv2+ or Artistic for CPAN compatability
+ - Fix return values for reboot/shutdown/undefine/create APIs
+ - Expanded documentation coverage
+
+0.1.1 2006-06-22
+
+ - Fixed POD documentation names
+ - Make Sys::Virt::Error use 'strict' and 'warnings' pragmas
+ - Remove duplicated DESTROY sub in Domain.pm since its already
+   provided in the XS backend
+ - Fixed typo in Makefile.PL
+ - Allow connection URI to be passed to example programs
+ - Minimum required libvirt version is now 0.1.1
+ - Make Makefile.PL exit if minimum required libvirt is not
+   found by pkg-config
+ - Added bindings for newly introduced APIs in libvirt 0.1.1
+
+0.1.0 2006-04-25
+
+ - Added Sys::Virt->get_node_info mapping to virNodeGetInfo
+ - Exposed the constants for domain state in Sys::Virt::Domain
+ - Added binding for virDomainReboot
+ - Change get_uuid to return raw UUID string
+ - Add get_uuid_string to return a printable version
+ - More example programs

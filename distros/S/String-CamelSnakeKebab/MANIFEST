@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+cpanfile.snapshot
+lib/String/CamelSnakeKebab.pm
+minil.toml
+t/convert_case.t
+t/http_header_case.t
+t/issues/issue_02.t
+t/word_separator.t
+META.yml
+MANIFEST

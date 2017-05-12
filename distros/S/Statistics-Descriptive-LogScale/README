@@ -1,0 +1,48 @@
+Statistics-Descriptive-LogScale
+
+Statistics::Descriptive::LogScale - approximate statistical distribution class
+using logarithmic buckets to store data. It allows to study various 
+distribution properties while only using very little memory, at the cost of
+some precision loss.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Statistics::Descriptive::LogScale
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Statistics-Descriptive-LogScale
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Statistics-Descriptive-LogScale
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Statistics-Descriptive-LogScale
+
+    Search CPAN
+        http://search.cpan.org/dist/Statistics-Descriptive-LogScale/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2013 Konstantin S. Uvarin
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

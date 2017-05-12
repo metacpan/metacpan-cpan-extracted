@@ -1,0 +1,31 @@
+Revision history for Sport-Analytics-SimpleRanking
+
+0.21    2011/04/23
+        On the basis of this discussion: https://ece.uwaterloo.ca/~dwharder/NumericalAnalysis/11Optimization/golden/
+        simplifying the implementation of the golden section search.
+0.20    2011/04/22
+        Added pythag() method. More cleaning up POD. # bumped because of interface change.
+0.14    2011/04/21
+        Fixing POD, fixing tests as test results come in.
+0.12    2011/04/20
+        Cleaned up POD.
+0.10    2011/04/19
+	Two pass check added. Two pass check tested.
+0.08    2011/04/17
+        Rewrote method interfaces to conform to Perl conventions and then rewrote tests to accommodate the new method names.
+        e.g. loadData is now load_data, and so forth.
+        Continued adding tests, added a test suite for add_data. Realized that if I did a two pass check with add_data,
+        I could eliminate the "busted data" bug with add_data now.
+0.06    2011/04/17
+        Found and killed a "multi-load" bug (failed loadData followed by a successful loadData were messing up stats).
+        This will be an issue with addData method which we will not be able to remedy.
+        Typo in WinMargin fixed.
+        Fixed bug(typo) in getAvgScore.
+        Fixed undef bugs in getTeamStats.
+0.05    2011/04/17
+        Added a bunch of accessors. The testing for these will be tedious.
+0.02    2011/04/17
+        Bug Fixes. Ongoing setup of the test harness for this module. Killed bug causing 2 mov values for each one present.
+0.01    2011/04/17
+        Copied algorithm from my blog: http://codeandfootball.wordpress.com. Converted to objects as per
+        GrandFather at Perl Monk's suggestion.

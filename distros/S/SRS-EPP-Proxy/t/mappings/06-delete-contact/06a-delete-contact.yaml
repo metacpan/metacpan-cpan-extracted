@@ -1,0 +1,22 @@
+template: delete-contact.tt
+
+vars:
+  contact_id: c_id1
+
+input_assertions:
+  class: SRS::EPP::Command::Delete::Contact
+  match:
+    - [ '//contact:id', 'c_id1', 'Contact correctly included in XML' ]
+
+SRS:
+  - assertions:
+      attr_is:
+        - [ '/NZSRSRequest/HandleUpdate', 'HandleId', 'c_id1', 'SRS: Update correct handle2' ]
+        - [ '/NZSRSRequest/HandleUpdate', 'Delete', '1', 'SRS: Cancel the handle' ]
+
+output_assertions:
+  count:
+    - [ '//epp:resData', 0, 'EPP: No resData in the response' ]
+  match:
+  attr_is:
+    - [ '//epp:result', 'code', 1000, 'EPP: Successful response code' ]

@@ -1,0 +1,428 @@
+#!/bin/sh
+#
+#Fake sacctmgr show event results for testing
+#
+#Order of fields is now controllable via format option
+#Below is the default if no format given
+FORMAT_FIELDS="cluster nodename start end state reason user"
+
+verbose_flag=
+
+print_version()
+{	version=$1
+	cat - <<EOF
+slurm $version
+EOF
+	exit 0
+}
+
+print_header()
+{
+	tmptext=
+	for fld in $FORMAT_FIELDS
+	do
+		case $fld in
+		#-----	Common
+		#Note: version <15 clusternodes and nodename are different.
+		# Version >=15 they are equivalent??
+		    cluster)
+			tmptext="${tmptext}Cluster"
+			;;
+		    clusternodes)
+			tmptext="${tmptext}Cluster Nodes"
+			;;
+		    duration)
+			tmptext="${tmptext}Duration"
+			;;
+		    end)
+			tmptext="${tmptext}End"
+			;;
+		    event)
+			tmptext="${tmptext}Event"
+			;;
+		    eventraw)
+			tmptext="${tmptext}EventRaw"
+			;;
+		    nodename)
+			tmptext="${tmptext}Node Name"
+			;;
+		    reason)
+			tmptext="${tmptext}Reason"
+			;;
+		    start)
+			tmptext="${tmptext}Start"
+			;;
+		    state)
+			tmptext="${tmptext}State"
+			;;
+		    stateraw)
+			tmptext="${tmptext}StateRaw"
+			;;
+		    user)
+			tmptext="${tmptext}User"
+			;;
+
+		#-----	preTRES stuff
+		    cpus)
+			tmptext="${tmptext}CPUs"
+			;;
+
+		#-----	postTRES stuff
+		    tres)
+			tmptext="${tmptext}TRES"
+			;;
+
+		#-----	ERROR
+		    *)
+			echo >&2 "Unrecognized field name $fld in format string, aborting"
+			exit 1;
+			;;
+		esac
+		tmptext="${tmptext}|"
+	done
+	echo $tmptext
+}
+
+
+print_event()
+{	
+	#Clear values
+	#-----	Common
+	#Note: version <15 clusternodes and nodename are different.
+	# Version >=15 they are equivalent??
+	tmp_cluster=
+	tmp_clusternodes=
+	tmp_duration=
+	tmp_end=
+	tmp_event=
+	tmp_eventraw=
+	tmp_nodename=
+	tmp_reason=
+	tmp_start=
+	tmp_state=
+	tmp_stateraw=
+	tmp_user=
+
+	#-----	preTRES stuff
+	tmp_cpus=
+
+	#-----	postTRES stuff
+	tmp_tres=
+
+	#Set values
+	while [ $# -gt 0 ]
+	do
+		key=$1
+		val=$1
+		shift
+		key=`echo $key | sed -e 's/=.*$//'`
+		val=`echo $val | sed -e 's/^[^=]*=//'`
+		#echo >&2 "$key = $val"
+
+		case $key in
+		#----	Common fields
+		    cluster)
+			tmp_cluster=$val
+			;;
+		    clusternodes)
+			tmp_clusternodes=$val
+			;;
+		    duration)
+			tmp_duration=$val
+			;;
+		    end)
+			tmp_end=$val
+			;;
+		    event)
+			tmp_event=$val
+			;;
+		    eventraw)
+			tmp_eventraw=$val
+			;;
+		    nodename)
+			tmp_nodename=$val
+			;;
+		    reason)
+			tmp_reason=$val
+			;;
+		    start)
+			tmp_start=$val
+			;;
+		    state)
+			tmp_state=$val
+			;;
+		    stateraw)
+			tmp_stateraw=$val
+			;;
+		    user)
+			tmp_user=$val
+			;;
+
+		#----	preTRES fields
+		    cpus)
+			tmp_cpus=$val
+			;;
+
+		#----	postTRES fields
+		    tres)
+			tmp_tres=$val
+			;;
+
+		#----	ERROR
+		    *)
+			echo >&2 "Unrecognized parm $key, aborting"
+			exit 1
+			;;
+		esac
+	done
+		    
+	#Print values
+	tmptext=
+	for fld in $FORMAT_FIELDS
+	do
+		case $fld in
+		#----	common fields
+		    cluster)
+			tmptext="${tmptext}${tmp_cluster}"
+			;;
+		    clusternodes)
+			tmptext="${tmptext}${tmp_clusternodes}"
+			;;
+		    duration)
+			tmptext="${tmptext}${tmp_duration}"
+			;;
+		    end)
+			tmptext="${tmptext}${tmp_end}"
+			;;
+		    event)
+			tmptext="${tmptext}${tmp_event}"
+			;;
+		    eventraw)
+			tmptext="${tmptext}${tmp_eventraw}"
+			;;
+		    nodename)
+			tmptext="${tmptext}${tmp_nodename}"
+			;;
+		    reason)
+			tmptext="${tmptext}${tmp_reason}"
+			;;
+		    start)
+			tmptext="${tmptext}${tmp_start}"
+			;;
+		    state)
+			tmptext="${tmptext}${tmp_state}"
+			;;
+		    stateraw)
+			tmptext="${tmptext}${tmp_stateraw}"
+			;;
+		    user)
+			tmptext="${tmptext}${tmp_user}"
+			;;
+
+		#----	preTRES fields
+		    cpus)
+			tmptext="${tmptext}${tmp_cpus}"
+			;;
+
+		#----	preTRES fields
+		    tres)
+			tmptext="${tmptext}${tmp_tres}"
+			;;
+
+		#----	ERROR
+		    *)
+			echo >&2 "Unrecognized field name $fld in format string, aborting"
+			exit 1;
+			;;
+		esac
+		tmptext="${tmptext}|"
+	done
+	echo $tmptext
+
+
+}
+
+print_event_1()
+{	print_event \
+		cluster='yottascale'  \
+		clusternodes='compute-0'  nodename='compute-0.umd.edu' \
+		cpus=20 tres="cpu=20,node=1,mem=120000" \
+		event='Node'  eventraw=2  state='DRAIN'  stateraw=514 \
+		start='2016-01-01T00:00:00'  end='2016-01-01T18:00:00'  duration='18:00:00' \
+		user='payerle'  reason='bad powersupply' 
+}
+
+print_event_2()
+{	print_event \
+		cluster='yottascale' \
+		clusternodes='compute-[11-20]'  \
+		cpus=200  tres="cpu=200,node=10,mem=1280000" \
+		event='Cluster'  eventraw=1  state='DRAIN'  stateraw=514 \
+		start='2016-01-05T00:00:00'  end='2016-01-05T19:00:00'  duration='19:00:00' \
+		user='root'  reason='bad nw card in switch' 
+}
+
+print_event_3()
+{	print_event \
+		cluster='test1'  \
+		clusternodes='test-0'  nodename='test-0' \
+		cpus=2  tres="cpu=2,node=1,mem=32000" \
+		event='Node'  eventraw=2  state='DRAIN'  stateraw=514 \
+		start='2016-02-05T00:00:00'  end='2016-02-05T13:00:00'  duration='13:00:00' \
+		user='payerle'  reason='no reason' 
+}
+
+
+print_specified_event()
+{	eid=$1
+
+	case $eid in
+	   1)
+		print_event_1
+		;;
+	   2)
+		print_event_2
+		;;
+	   3)
+		print_event_3
+		;;
+	   *)
+		x=x
+		;;
+	esac
+}
+
+print_events()
+{	#We always have --noheader
+	if [ "x$verbose_flag" = "xyes" ]; then
+		print_header
+	fi
+	while [ $# -gt 0 ]
+	do
+		eid=$1
+		shift
+		print_specified_event $eid
+	done
+}
+
+print_all_events()
+{	#Must do alphabetically
+	print_events 1 2 3 
+}
+
+
+print_ys_events()
+{	#Print all events with account=root
+	print_events 1 2
+}
+
+print_test1_events()
+{	#Print all events with account=abc124
+	print_events 3 
+}
+
+print_root_user_events()
+{	#Print all events with user=root
+	print_events  2
+}
+
+print_payerle_events()
+{	#Print all events with user=payerle
+	print_events  1 3
+}
+
+print_ys_root_events()
+{	#Print all events with account=root, user=root
+	print_events 2
+}
+
+print_ys_payerle_events()
+{	#Print all events with account=abc124, user=payerle
+	print_events 1
+}
+
+print_test1_payerle_events()
+{	#Print all events with account=abc124, user=payerle
+	print_events 3
+}
+
+print_no_events()
+{	print_events 'no-such-event'
+}
+
+#Parse options
+cluster_flag=
+user_flag=
+
+while [ $# -gt 0 ]
+do
+	arg=$1
+	shift
+
+	case $arg in
+	    --version)
+		#Print version and exit
+		if [ "x$FAKE_SLURM_VERSION" = "x" ]; then
+			print_version 14
+		else
+			print_version $FAKE_SLURM_VERSION
+		fi
+		exit 0
+		;;
+	    format=*)
+		#Set our format string
+		tmp=`echo $arg | sed -e 's/^format=//' -e "s/'//g" -e 's/"//g' -e 's/,/ /g'`
+		FORMAT_FIELDS=$tmp
+		;;
+	    cluster=* )
+		tmp=`echo $arg | sed -e 's/^cluster=//' -e "s/'//g" -e 's/"//g' `
+		cluster_flag=$tmp
+		;;
+	    user=* )
+		tmp=`echo $arg | sed -e 's/^user=//' -e "s/'//g" -e 's/"//g' `
+		user_flag=$tmp
+		;;
+	    -v|--verbose)
+		verbose_flag=yes
+		;;
+	esac
+done
+
+if [ "x${cluster_flag}" != "x" ]; then
+	#cluster requested, possibly with user
+	if [ "x${user_flag}" = "x" ]; then
+		if [ "x${cluster_flag}" = "xyottascale" ]; then
+			print_ys_events
+		elif [ "x${cluster_flag}" = "xtest1" ]; then
+			print_test1_events
+		else
+			print_no_events
+		fi
+	elif [ "x${user_flag}" = "xroot" ]; then
+		if [ "x${cluster_flag}" = "xyottascale" ]; then
+			print_ys_root_events
+		else
+			print_no_events
+		fi
+	elif [ "x${user_flag}" = "xpayerle" ]; then
+		if [ "x${cluster_flag}" = "xyottascale" ]; then
+			print_ys_payerle_events
+		elif [ "x${cluster_flag}" = "xtest1" ]; then
+			print_test1_payerle_events
+		else
+			print_no_events
+		fi
+	else
+		print_no_events
+	fi
+elif [ "x${user_flag}" = "xroot" ]; then
+	print_root_user_events
+elif [ "x${user_flag}" = "xpayerle" ]; then
+	print_payerle_events
+elif [ "x${user_flag}" != "x" ]; then
+	print_no_events
+else
+	#No flags, print all accounts
+	print_all_events
+fi
+

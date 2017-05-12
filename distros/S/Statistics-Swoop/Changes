@@ -1,0 +1,10 @@
+Revision history for Perl extension Statistics::Swoop
+
+0.03    Tue Sep 15 09:16:07 JST 2015
+        - add swoop command
+
+0.02    Sun Jun  9 19:54:47 JST 2013
+        - getting 30% fast
+
+0.01    Sun Jun  9 18:18:00 JST 2013
+        - original version

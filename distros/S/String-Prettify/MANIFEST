@@ -1,0 +1,7 @@
+MANIFEST
+Makefile.PL
+lib/String/Prettify.pm
+t/00.t
+t/01.t
+t/02_filename.t
+META.yml                                 Module meta-data (added by MakeMaker)

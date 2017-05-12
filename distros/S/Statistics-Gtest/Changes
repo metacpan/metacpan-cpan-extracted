@@ -1,0 +1,24 @@
+Revision history for Perl extension Statistics::Gtest.
+
+0.07  Sat May 31 08:29:07 2008
+	- additional modifications for 'make test'
+	- documentation fix
+
+0.06  Sun May 18 21:43:13 2007
+	- fixes to 'make test'
+
+0.05  Mon Sep  3 17:21:03 2007
+	- add getDFstate()
+	- add getHypothesis()
+	- add getExpected()
+	- add getObserved()
+	- use Carp.pm
+
+0.04  Thu Aug 16 07:48:07 2007
+	- documentation fix
+	- fixes to 'make test'
+
+0.03  Sun Aug 12 16:57:30 2007
+	- original version; created by h2xs 1.23 with options
+		-A -X --skip-exporter --skip-autoloader -v 0.03 Statistics::Gtest
+

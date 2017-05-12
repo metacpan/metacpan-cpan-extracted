@@ -1,0 +1,7 @@
+1.01 - Mon Feb 11 13:40:29 2013
+	* First upload of a module to compare HTML entity encoding
+	speeds. It compares HTML::Escape and HTML::Entities.
+
+1.02 - Fri Jan  3 12:24:41 2014
+	* Get rid of MYMETA
+

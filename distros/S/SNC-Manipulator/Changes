@@ -1,0 +1,14 @@
+Revision history for Perl extension SNC::Manipulator.
+
+0.10  Tue Jun 21 15:13:00 2005
+	- original beta version; basic functionality only
+
+0.20  Tue Jun 21 20:31:00 2005
+	- filled in snapshot function stub
+        - added pattern matching to moveRelative()
+        - results from a sucessful inquiry() now longer are quoted.
+        - some typos fixed in documentation
+
+0.30  Thu Jun 23 00:00:00 2005
+	- added in capture(), captureStream(), captureStreamToFile()
+        - fixed typo in "Changes"

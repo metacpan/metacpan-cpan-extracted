@@ -1,0 +1,34 @@
+Syntax::Highlight::Shell
+========================
+
+DESCRIPTION
+
+    This module is designed to take shell scripts and highlight them in HTML 
+    with meaningful colours using CSS. The resulting HTML output is ready for 
+    inclusion in a web page. 
+
+
+INSTALLATION
+
+    To install this module, run the following commands:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+    Alternatively, to install with Module::Build, you can use the 
+    following commands:
+
+        perl Build.PL
+        ./Build
+        ./Build test
+        ./Build install
+
+
+COPYRIGHT AND LICENCE
+
+    Copyright (C) 2004 Sébastien Aperghis-Tramoni
+
+    This library is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself.

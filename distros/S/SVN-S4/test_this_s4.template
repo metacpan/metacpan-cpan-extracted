@@ -1,0 +1,5 @@
+#!/usr/bin/perl
+$S4TOP="__S4TOP__";
+$ENV{PERL5LIB}="$S4TOP/lib:$ENV{PERL5LIB}";
+$SVNTOP="$S4TOP/svn130branch";
+system ("$S4TOP/s4","--svn=$SVNTOP/subversion/clients/cmdline/svn",@ARGV);

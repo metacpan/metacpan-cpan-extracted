@@ -1,0 +1,32 @@
+---
+abstract: 'Sub::Spy is subref wrapper that records arguments, return value, and exception thrown.'
+author:
+  - 'Naosuke Yokoe <yokoe.naosuke@dena.jp>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Scope::Guard: 0
+  Test::More: 0.88
+  Test::Requires: 0.06
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Sub::Spy
+name: Sub-Spy
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Class::Accessor::Fast: 0
+  Hash::FieldHash: 0
+  List::MoreUtils: 0
+  perl: 5.12.0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/zentooo/p5-sub-spy.git
+version: 0.04

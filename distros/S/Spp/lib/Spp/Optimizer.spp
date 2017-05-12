@@ -1,0 +1,301 @@
+(context Optimizer)
+
+(def opt-atom($atom)
+  (return true if ($atom == '{}'))
+  (my ($name $value) $atom)
+  (if (is-array $name)
+    (my $opt-atoms (opt-atoms $atom))
+    (return (add-exprs $opt-atoms)))
+  (case $name
+    (when :sym     (opt-sym $value))
+    (when :char    (opt-char $value))
+    (when :Str     (opt-str $value))
+    (when :Keyword (opt-str $value))
+    (when :String  (opt-string $value))
+    (when :List    (opt-list $value))
+    (when :Array   (opt-array $value))
+    (when :Hash    (opt-hash $value))
+    (when :Pair    (opt-atoms $value))
+    (when :Rule    (opt-rule $value))
+    (when :Group   (opt-group $value))
+    (when :Strs    (opt-strs $value))
+    (when :Chclass (opt-chclass $value))
+    (when :Action  (opt-atom $value))
+    (when :Alias   (opt-alias $value))
+    (when :chars   ([:str, $value]))
+    (when :dot     ([:dot]))
+    (when :any     ([:any]))
+    (when :chars   ([:str, $value]))
+    (when :int     ([:int, (to-i $value)]))
+    (when :ctoken  ([:ctoken, $value]))
+    (when :rtoken  ([:rtoken, $value]))
+    (when :gtoken  ([:gtoken, $value]))
+    (when :assert  ([:assert, $value]))
+    (when :cclass  ([:cclass, $value]))
+    (when :inter   ([:str, $value]))
+    (else (error "Unknown type to optimizer: {$name}"))))
+
+(def opt-exprs($atoms)
+  (my @atoms-opt)
+  (for $atom in $atoms
+    (@atoms-opt << (opt-atom $atom)))
+  (return (add-exprs @atoms)))
+
+(def opt-sym(name)
+  (case name
+    (when :nil   ([:nil]))
+    (when :true  ([:true]))
+    (when :false ([:false]))
+    (else        ([:sym, name]))))
+
+(def opt-str-char($value)
+  (my $char (value $value))
+  (case $char
+    (when :n (return "\n"))
+    (when :r (return "\r"))
+    (when :t (return "\t"))
+    (else (return $char))))
+
+(def opt-char($char)
+  (return [:char, (opt-str-char $char)]))
+
+(def opt-sarray($ast)
+  (my $strs [])
+  (my $str '')
+  (for $node in $ast
+    (my ($name, $value) $ast)
+    (case $name
+      (when :cstr ($str = ($str + $value)))
+      (when :char ($str = ($str + (opt-str-char $value))))
+      (when :blank (
+        ($strs << [:str $str] if ((len $str> > 0)))
+        ($str = '')))
+      (else (error "Unknown Sarray node name: { $name }"))))
+  ($strs << [:str $str] if ((len $str) > 0))
+  (return ['array' $strs]))
+
+(def opt-str(ast)
+  (return [:str ''] if ($ast == "''"))
+  (my chars [])
+  (for node in ast
+    (my (name value) node)
+    (if (name == :char)
+      (chars << (opt-str-char value))
+      else
+      (chars << value)))
+  (my str (join chars))
+  (return [:str str]))
+
+(def opt-string($ast)
+  (return [:str ''] if ($ast == '""'))
+  (my $nodes [])
+  (for $node in $ast
+    (my ($name $value) $node)
+    (case $name
+      (when :char
+        (my $char-str (opt-str-char $value))
+        ($nodes << [:str $char_str]))
+      (when :dstr
+        ($nodes << [:str $value]))
+      (else ($nodes << (opt-atom $node)))))
+  (my $string_nodes (combin-str-nodes $nodes))
+  (if (((len $string-nodes) == 1) && (is_str $nodes))
+    (return (first $nodes)))
+  (return [:string, $string-nodes]))
+
+(def combin-str-nodes($nodes)
+  (my $string-nodes [])
+  (my ($strs $str-mode) ['', 0])
+  (for $node in $nodes
+    (if (is-str $node)
+      ($str = ($str + (last $node)))
+      ($str-mode = 1)
+    else
+      ($string-nodes << [:str $str] if ($str-mode == 1))
+      ($string-nodes << $node)
+      (($str, $str-mode) = ['', 0])))
+  ($string-nodes << [:str $str] if ($str-mode == 1))
+  (return $string-nodes))
+
+(def opt-hash(pairs)
+  (return [:hash []] if ($pairs == '{}'))
+  (my pairs-opt [])
+  (for pair in pairs
+    (if ((type pair) == :Pair)
+      (my $pair-value (last pair))
+    (pairs-opt << (opt-atoms $pair-value))))
+  (return [:hash pairs-opt]))
+
+(def opt-atoms($atoms)
+  (my $atoms-opt [])
+  (for $atom in $atoms
+    ($atoms-opt << (opt-atom $atom)))
+  (return $atoms-opt))
+
+(def opt-list(atoms)
+  (my atoms-opt (opt-pair atoms))
+  (return [:list atoms-opt]))
+
+(def opt-array(atoms)
+  (my atoms-opt (opt-pair atoms))
+  (return [:array atoms-opt]))
+
+(def opt-rule(atoms)
+  (my rule-value (opt-token atoms))
+  (return [:rule rule-value]))
+
+(def opt-group(ast)
+  (my atoms (opt-token-atoms ast))
+  (if ((first atoms) in [:branch :lbranch])
+     (return atoms))
+  (return [:group atoms]))
+
+(def opt-token(ast)
+  (my atoms (opt-token-atoms ast))
+  (if ((first atoms) in [:branch :lbranch])
+    (return atoms))
+  (return (first atoms) if ((len atoms) == 1))
+  (return [:token atoms]))
+
+
+(def opt-token-atoms(ast)
+  (ast = (delete-branch ast))
+  (check-rept ast)
+  (my b-flag [:lbranch :|])
+  (if (b-flag in ast)
+    (my branch (gather-branch ast b-flag))
+    (return (opt-lbranch branch)))
+  (my b-flag [:branch :||])
+  (if (b-flag in ast)
+    (my branch (gather-branch ast b-flag))
+    (return (opt-branch branch)))
+  (my (pos atoms) [0, []])
+  (while (pos < (len ast))
+    (my look (next-atom-is-look ast pos))
+    (my rept (next-atom-is-rept ast pos))
+    (if look
+      (atoms << look)
+      (pos += 3)
+    elsif rept
+      (atoms << rept)
+      (pos += 2)
+    else
+      (my atom (ast pos))
+      (atoms << (opt-atom atom))
+      (pos += 1)))
+  (return atoms))
+
+(def delete-branch(ast)
+  (my ast-len (len ast))
+  (my (pos flag-pass atoms) [0, 0, []])
+  (while (pos < ast-len)
+    (my atom (ast index))
+    (pos += 1)
+    (if ((first atom) in [:lbranch, :branch])
+      (next if (flag-pass == 0))
+      (next if (pos == ast-len))
+      (flag-pass = 0)
+     else
+      (flag-pass = 1))
+    (atoms << atom))
+  (return atoms))
+
+(def check-rept(ast)
+  (my ast-len (len ast))
+  (my (pos flag-pass) [0, 0])
+  (while (pos < ast-len)
+    (my atom (ast pos))
+    (pos += 1)
+    (if ((first atom) in [:look :rept])
+      (if (flag-pass == 0)
+        (error "rule syntax error: {atom}"))
+      (if (and (pos == ast-len) ((first atom) == :look))
+        (error "rule syntax error: {atom}"))
+      (flag-pass = 0))
+    elsif ((first atom) in [:lbranch :branch])
+      (flag-pass = 0)
+    else
+      (flag-pass = 1)))
+
+(def gather-branch(atoms, atom)
+  (if (atom in atoms)
+    (my pos (index atoms atom))
+    (my begin-atoms (get atoms 0 -> (pos - 1)))
+    (my last-atoms (atoms (pos + 1) -1))
+    (if (atom in last-atoms)
+      (my gather-last-atoms (gather-branch last-atoms atom))
+      (return ([begin-atoms] + gather-last-atoms))
+     else
+      (return [begin-atoms last-atoms])))
+  (return atoms))
+
+
+(def opt-lbranch(ast)
+  (my atoms [])
+  (for branch in ast
+    (atoms << (opt-regex branch)))
+  (return [:lbranch, atoms]))
+
+(def opt-branch(ast)
+  (my atoms [])
+  (for branch in ast
+    (atoms << (opt-regex branch)))
+  (return [:branch, atoms]))
+
+(def next-atom-is-rept(atoms pos)
+  (return false if (pos >= (- (len atoms) 1)))
+  (my next-atom (atoms (pos + 1)))
+  (return false if (:rept != (first next-atom)))
+  (my atom (atoms pos))
+  (my atom-opt (opt-atom atom))
+  (my rept-opt (opt-rept (next-atom 1)))
+  (return [:rept [atom-opt rept-opt]]))
+
+(def next-atom-is-look(atoms pos)
+  (return false if (pos >= (- (len atoms) 2)))
+  (my next-atom (atoms (pos + 1)))
+  (return false if (:look != (first next-atom)))
+  (my first-atom (atoms pos))
+  (my look-atom (atoms (pos + 2)))
+  (my atom-opt (opt-atom first-atom))
+  (my rept-opt (opt-rept (get next-atom 1)))
+  (my look-opt (opt-atom look-atom))
+  (return [:look [atom-opt rept-opt look-opt]]))
+
+(def opt-alias(ast)
+  (my alias-name (get ast [0, 1]))
+  (my alias-atom (opt-atom (get ast 1)))
+  (return [:alias [alias-name alias-atom]]))
+
+(def opt-strs(ast)
+  (my str-list [])
+  (for node in ast
+     (str-list << (node 1) if (:str == (get node 0))))
+  (return [:strs, str-list]))
+
+(def opt-rept(str)
+  (case str
+    (when :?  (return [0,  1, str]))
+    (when :*  (return [0, -1, str]))
+    (when :+  (return [1, -1, str]))
+    (when :*? (return [0, -1, str]))
+    (when :+? (return [1, -1, str]))
+    (else (error "Unknown rept str {str}"))))
+
+(def opt-chclass(ast)
+  (my atoms [])
+  (for node in ast
+    (atoms << (opt-chclass-node node)))
+  (return [:chclass atoms]))
+
+(def opt-chclass-node(node)
+  (my (name value) node)
+  (case name
+    (when :flip   (return [:flip]))
+    (when :cchar  (return [:char value]))
+    (when :char   (return [:char value]))
+    (when :cclass (return [:cclass value]))
+    (when :range  (return [:range (first value) (last value)]))
+    (else (error "Unknown regex class node {name}"))))
+
+(end Optimizer)

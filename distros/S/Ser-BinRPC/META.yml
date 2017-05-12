@@ -1,0 +1,13 @@
+--- #YAML:1.0
+name:                Ser-BinRPC
+version:             0.01
+abstract:            Perl extension for Ser SIP router controlling via BinRPC protocol
+license:             ~
+author:              
+    - Tomas Mandys <tomas.mandys@2p.cz>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

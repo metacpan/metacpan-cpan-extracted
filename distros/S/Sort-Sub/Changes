@@ -1,0 +1,74 @@
+Revision history for Sort-Sub
+
+0.10    2016-12-18 (PERLANCAR)
+
+	- [Incompatible change] Rename modules to by_* to be consistent
+	  with the convention.
+
+
+0.09    2016-12-18 (PERLANCAR)
+
+	- Merge dist Sort-Sub-num_in_text (there's no reason why it should
+	  be a separate dist, no other deps).
+
+
+0.08    2016-12-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Use Pod::Weaver plugin Sort::Sub to generate Synopsis etc
+	  section.
+
+
+0.07    2016-12-16 (PERLANCAR)
+
+	- sort_sub_ok(): Make testing of normal/i/r/ir optional depending
+	  on whether the corresponding expected output is specified.
+
+	- [doc] Fix typo in Synopsis.
+
+
+0.06    2016-04-06 (PERLANCAR)
+
+	- [Bugfix] naturally: Use string comparison when either argument is
+	  a non-number.
+
+
+0.05    2016-02-27 (PERLANCAR)
+
+	- All sort sub should use (a,b) argument in addition to checking
+	  for caller's $a and $b.
+
+	- Better diagnostics for Test::Sort::Sub.
+
+
+0.04    2016-02-25 (PERLANCAR)
+
+	- No functional changes.
+
+	- Move t/lib/Local/TestLib to lib/Test/Sort/Sub.pm so it can be
+	  used from other dists.
+
+	- Add module: Sub::Sort to catch common typo.
+
+
+0.03    2015-10-07 (PERLANCAR)
+
+	- Add sorters: ascii_then_num, num_then_ascii.
+
+	- [Bugfix] make the sortsubs work when used from package other than
+	  'main'.
+
+        - [Refactor] Refactor tests (extract into test routine/library).
+
+
+0.02    2015-09-27 (PERLANCAR)
+
+        - No functional changes.
+
+        - Fix a couple of typos in POD.
+
+
+0.01    2015-09-27 (PERLANCAR)
+
+        - First release.

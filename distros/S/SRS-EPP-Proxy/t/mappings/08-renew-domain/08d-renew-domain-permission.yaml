@@ -1,0 +1,33 @@
+template: renew-domain.tt
+
+vars:
+  domain: chedder.co.te
+  expDate: 2010-01-01
+  period: 12
+
+input_assertions:
+  class: SRS::EPP::Command::Renew::Domain
+  match:
+    - [ '//domain:name', 'chedder.co.te', 'Domain correctly included in XML' ]
+
+SRS:
+ - assertions:
+       # The initial EPP action should be a whois for the domain we are trying to renew
+       count:
+       match: []
+       match_all:
+       attr_is:
+         - [ '/NZSRSRequest/Whois', 'DomainName', 'chedder.co.te', 'SRS: find correct domain' ]
+
+ - assertions:
+       # then, we want to generate a DomainUpdate txn
+       count:
+       attr_is:
+         - [ '//DomainUpdate', 'Term', '12', 'EPP->SRS: Correct Term for renewal' ]
+         - [ '//DomainUpdate', 'Renew', '1', 'EPP->SRS: Domain being renewed' ]
+
+
+output_assertions:
+  attr_is:
+      - [ '//epp:result', 'code', 2306, 'EPP: correct response code' ]
+

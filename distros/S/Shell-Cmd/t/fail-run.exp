@@ -1,0 +1,12 @@
+This is the 'succ' command
+It will succeed
+This is the 'fail' command
+It will fail
+
+###STDERR
+It will give a warning
+It will give an error
+
+###EXIT
+10
+

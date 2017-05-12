@@ -1,0 +1,76 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 ec82cc0b8f93c324d303b9a584c4c504bd2911a3 CHANGES
+SHA1 23c6496c048b90a0a7b1cd1d1d24108b64ec8390 MANIFEST
+SHA1 57a6e6bee6c0d169821b14793735f69100cc82b7 META.yml
+SHA1 e1b2bf2afe79e66250bc382e4ce41709bb870506 Makefile.PL
+SHA1 b39cfebf1c1d8e353e5c0a2628b94bd91d96ad66 README
+SHA1 76b454f5cd08b3d7e032640e071d4562ee58cf46 TODO
+SHA1 c483e9167721533601692a97dff2f50043e321c6 bin/svm
+SHA1 5b52cbdabc56a44e4c0a90a3f5a5609a90d26f84 inc/ExtUtils/AutoInstall.pm
+SHA1 603bb9de29fb8cba7f13409c546750972eff645d inc/Module/AutoInstall.pm
+SHA1 5c9e093b0facca46d50e3c69d5569aa7a98db0b8 inc/Module/Install.pm
+SHA1 866c0e03f2c87659bb47cb5d0aa37e978b0f2ab3 inc/Module/Install/AutoInstall.pm
+SHA1 465acb50b9006ce61f58a7bd02d0bb029ddceaa6 inc/Module/Install/Base.pm
+SHA1 8356d82167fc00550b4a3ceea8bd852a374d7509 inc/Module/Install/Can.pm
+SHA1 b47ce07fa6d6e38e3daa6cfc752b23f59a64754c inc/Module/Install/Fetch.pm
+SHA1 3863d11bd88e40811755e20e680795ad2be974c8 inc/Module/Install/Include.pm
+SHA1 887d57ea5621a69c00d95405b5d4fe0c8385c4bb inc/Module/Install/Makefile.pm
+SHA1 6e784c260134906a27629ed77c9215fb917a5ffc inc/Module/Install/Metadata.pm
+SHA1 d7529d795a1304c88253b26a9089913edf31ae5e inc/Module/Install/Win32.pm
+SHA1 2a74aba5a78e7ab2776382e42106ebe941c2ac28 inc/Module/Install/WriteAll.pm
+SHA1 06dd56742c69ebd8baa0a733ca97cf45afcd7020 lib/SVN/Mirror.pm
+SHA1 449ca0a583d96fbd9f4ee34433ce1f9baf1748bd lib/SVN/Mirror/Git.pm
+SHA1 b47c112b94461efac327080c1701c74e15fd7f90 lib/SVN/Mirror/Ra.pm
+SHA1 31fc19f899164b467869bd5ddd46ffc6d94d6873 lib/SVN/Mirror/VCP.pm
+SHA1 0e2288e4ba90514fdb4838d4326d5af191422982 t/1use.t
+SHA1 7930c0f022affd4c787ce80175e363050f7750cf t/2basic.t
+SHA1 0f24e0ed704f49a59f34036ac21dc8acc4fa55a4 t/3vcp-cvs.t
+SHA1 735f0d6a2fc4307ab6d58afb59febbe122fe4497 t/4vcp-p4.t
+SHA1 f00b8d3bcc213866cd0b60ba74219206af0e26c3 t/5upgrade.t
+SHA1 d6e90d73a9f33c22b7e2f9ec1ed3a53253e88963 t/6relay.t
+SHA1 42c5d17f88444e8e1172dd3b1fb89942f09588a7 t/7copy.t
+SHA1 9ebd0975f018a03d881f9440307615eacd7aeae0 t/8skipto-torev.t
+SHA1 47ab3b87a1d35eed54cf82cc5abbaa9a6383cbf3 t/9overlapping.t
+SHA1 7826a9aaaf8d9772d7bc3c72861f353c2b643cab t/copy.dump
+SHA1 ceac0d43bb5fcc858fb433856d0b05eae7bf9f35 t/cvs-test-data/CVSROOT/README
+SHA1 ebf8401475314cdb855e901e28cf13ca8bdbfe1f t/cvs-test-data/CVSROOT/val-tags
+SHA1 7bb8ca8923245ef572a5c2f1c355bb2b977d97a5 t/cvs-test-data/kuso/Attic/blah.pm,v
+SHA1 cb8e30fd37db0b9756e27b0aaa873387d1ff18ec t/cvs-test-data/kuso/Attic/moreonbranch,v
+SHA1 afdec8be1289abae0fb2556bf9dba84f9cfc4a3f t/cvs-test-data/kuso/Attic/two_on_branch,v
+SHA1 a5c626e0fe3da90226b601bfa13f8191808f1a04 t/cvs-test-data/kuso/addontrunk,v
+SHA1 ce56af59d52a4a75e7c753d3a095a3b9e8609ca2 t/cvs-test-data/kuso/blah/Attic/a,v
+SHA1 bbbc6994fa0e25e4c9b8617d9ed929fa2a746fa0 t/cvs-test-data/kuso/blah/Attic/b,v
+SHA1 717e656595769fe8d1b5c5687eca46b03214fa8e t/cvs-test-data/kuso/blah/Attic/c,v
+SHA1 a1fe2803dc0b977fd9854016b9b1941f7c80fdf4 t/cvs-test-data/kuso/blah/Attic/d,v
+SHA1 649b970ac8ae9022c27e1eabe699e44d00472c62 t/cvs-test-data/kuso/blah/Attic/e,v
+SHA1 6d1a54b6015f2f417b221a551198117a479966ac t/cvs-test-data/kuso/blah/Attic/f,v
+SHA1 dc6e9be6047abe8a71a223a59b8bb1e3f397fc56 t/cvs-test-data/kuso/blah/Attic/g,v
+SHA1 f56063180842f02122501531c4450dbe908068c4 t/cvs-test-data/kuso/blah/Attic/more,v
+SHA1 513a6984705f54a3d3583d431b82b316258b880a t/cvs-test-data/kuso/blah/Attic/more2,v
+SHA1 ba58dcd964b6c209e6deb66187b7bd0580ac701e t/cvs-test-data/kuso/blah/Attic/zzzz,v
+SHA1 cb50adce4bd924942c1c0fea1466f52524bedd6d t/cvs-test-data/kuso/oldfile,v
+SHA1 03dcc4ebab3f6c864d588dd1301ec998eb337a39 t/cvs-test-data/kuso/staticfile,v
+SHA1 68545ba8db766551dce491f9c3f5e87f4b8a8d84 t/test_old.dump
+SHA1 ffc0ea18761dd17120116ebf5cdadb18d0db3555 t/test_repo.dump
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.7 (Darwin)
+
+iD8DBQFIypfmk1XldlEkA5YRAl7UAJ4jrNeK17/tGSa9k+Hpdcz9s1DRBACdFSmd
+SFCwHGgvrk+WJaH6aP4Pbao=
+=ypyf
+-----END PGP SIGNATURE-----

@@ -1,0 +1,38 @@
+#!/bin/sh
+if [ -z `which readlink` ] || [ "`which readlink | grep 'no readlink in'`" ]; then  
+    # if we don't have readlink, we're on some pitiful platform like solaris
+    test -h $0 && LINK=`ls -l $0 | awk -F\>  '{print $NF}' | sed -e 's/^ //'`
+else
+    LINK=`readlink $0`
+fi
+if [ "$LINK" = '' ] || [ $LINK = '../etc/shipwright-script-wrapper' ] || [ $LINK = '../../etc/shipwright-script-wrapper' ]; then
+    BASE=$0
+    BASE_DIR=`dirname "$BASE"`
+    BASE_DIR=` (cd "$BASE_DIR"; pwd) `
+    FILENAME=`basename "$BASE"`
+    WRAPPED_DIR=`basename "$BASE_DIR"`
+    AS=`cat $BASE_DIR/../__as 2>/dev/null`;
+    if [ "$AS" = '' ]; then
+        AS=`cat $BASE_DIR/../../__as 2>/dev/null`;
+    fi
+    if [ "$LINK" = '../../etc/shipwright-script-wrapper' ]; then
+        PARENT_BASE_DIR=` (cd "$BASE_DIR/.."; pwd) `
+        PARENT_WRAPPED_DIR=`basename "$PARENT_BASE_DIR"`
+        WRAPPED_DIR="$PARENT_WRAPPED_DIR/$WRAPPED_DIR"
+        PATH=${BASE_DIR}/../../sbin:${BASE_DIR}/../../bin:${BASE_DIR}/../sbin:${BASE_DIR}/../bin:$PATH 
+        PERL5LIB=${BASE_DIR}/../../lib/perl5/site_perl:${BASE_DIR}/../../lib/perl5:${PERL5LIB}
+        LD_LIBRARY_PATH=${BASE_DIR}/../../lib:${LD_LIBRARY_PATH}
+        DYLD_LIBRARY_PATH=${BASE_DIR}/../../lib:${DYLD_LIBRARY_PATH}
+        export PATH PERL5LIB LD_LIBRARY_PATH DYLD_LIBRARY_PATH
+        exec ${BASE_DIR}/../../as/$AS/${WRAPPED_DIR}/${FILENAME}  "$@"
+    else
+        PATH=${BASE_DIR}/../sbin:${BASE_DIR}/../bin:${BASE_DIR}/../usr/sbin:${BASE_DIR}/../usr/bin:$PATH
+        PERL5LIB=${BASE_DIR}/../lib/perl5/site_perl:${BASE_DIR}/../lib/perl5:${PERL5LIB}
+        LD_LIBRARY_PATH=${BASE_DIR}/../lib:${LD_LIBRARY_PATH}
+        DYLD_LIBRARY_PATH=${BASE_DIR}/../lib:${DYLD_LIBRARY_PATH}
+        export PATH PERL5LIB LD_LIBRARY_PATH DYLD_LIBRARY_PATH
+        exec ${BASE_DIR}/../as/$AS/${WRAPPED_DIR}/${FILENAME}  "$@"
+    fi
+else
+    exec $LINK "$@"
+fi

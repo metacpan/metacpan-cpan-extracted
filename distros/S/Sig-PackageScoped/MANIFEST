@@ -1,0 +1,15 @@
+Build.PL
+Changes
+lib/Sig/PackageScoped.pm
+lib/Sig/PackageScoped/Paranoid.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/01-basic.t
+t/02-paranoid.t
+t/perlcritic.t
+t/pod-coverage.t
+t/pod.t
+SIGNATURE    Added here by Module::Build

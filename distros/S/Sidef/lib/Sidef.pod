@@ -1,0 +1,184 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef - The Sidef programming language.
+
+=head1 DESCRIPTION
+
+Sidef is a modern, high-level, general-purpose programming language, inspired by Ruby, Perl 6 and Go.
+
+
+                **   **         ****   *           *********   *********
+              * * ** * *        ****   **          ** ** **    ** ** **
+               **   **          ****   ***         *********   *  *  *
+      **        **        **    ****   *  *        ******      ******
+    * * *     * * *     * * *   ****   ** **       ** **       ** **
+     **        **        **     ****   ******      ******      *  *
+           **   **              ****   *  *  *     *********   ***
+         * * ** * *             ****   ** ** **    ** ** **    **
+          **   **               ****   *********   *********   *
+
+
+The main features of Sidef include:
+
+=over 2
+
+=item * object-oriented programming,
+
+=item * functional programming,
+
+=item * functional pattern matching,
+
+=item * optional lazy evaluation,
+
+=item * multiple dispatch,
+
+=item * lexical closures,
+
+=item * lexical scoping,
+
+=item * keyword arguments,
+
+=item * regular expressions,
+
+=item * support for metaprogramming,
+
+=item * support for using Perl modules,
+
+=item * optional dynamic type checking,
+
+=item * and a reasonable number of built-in types.
+
+=back
+
+=head1 SYNOPSIS
+
+    use Sidef;
+
+    my $sidef = Sidef->new(
+                           name       => 'test',   # name of the program
+                           opt        => {},       # command-line options
+                           parser_opt => {},       # parser options
+                          );
+
+    # Sidef code
+    my $code = 'say "1 + 2 = #{1 + 2}"';
+
+    # Execute the code
+    $sidef->execute_code($code);
+
+    # Compile the code to Perl
+    my $perl = $sidef->compile_code($code, 'Perl');
+
+    # Parse the Sidef code into an AST
+    my $ast = $sidef->parse_code($code);
+
+    # Optimize the AST by performing constant-folding
+    my $oast = $sidef->optimize_ast($ast);
+
+    # Compile the AST back into Sidef code
+    print $sidef->compile_ast($oast, 'Sidef');
+
+
+=head1 SUBROUTINES/METHODS
+
+=head2 new
+
+    my $s = Sidef->new(name => '...');
+
+Creates a new Sidef object and returns it.
+
+=head2 parse_code
+
+    my $ast = $s->parse_code($code);
+
+Parses a given Sidef code and returns the AST.
+
+=head2 optimize_ast
+
+    my $oast = $s->optimize_ast($ast);
+
+Performs constant-folding and some other optimizations on a given AST.
+Returns a new optimized AST.
+
+=head2 compile_ast
+
+    my $ccode = $s->compile_ast($ast, $backend);
+
+Compiles the AST into code and returns it.
+
+Valid values for the backend are: C<'Sidef'>, C<'Perl'>.
+
+=head2 compile_code
+
+    my $ccode = $s->compile_code($code, $backend)
+
+Parses and compiles the given Sidef code into target code and
+returns it.
+
+Valid values for the backend are: C<'Sidef'>, C<'Perl'>.
+
+=head2 execute_code
+
+    my $result = $s->execute_code($code);
+
+Parses, compiles and executes a given Sidef code and returns
+the result of the last statement.
+
+=head1 WWW
+
+You can find more info about Sidef, by clicking on the following links:
+
+=over 2
+
+=item * Gitbook: L<http://trizen.gitbooks.io/sidef-lang/content/>
+
+=item * Tutorial: L<https://github.com/trizen/sidef/wiki>
+
+=item * RosettaCode: L<http://rosettacode.org/wiki/Sidef>
+
+=back
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2013-2017 Daniel Șuteu, Ioana Fălcușan
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the B<Artistic License (2.0)>. You may obtain a copy
+of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Any use, modification, and distribution of the Standard or Modified
+Versions is governed by this Artistic License. By using, modifying or
+distributing the Package, you accept this license. Do not use, modify,
+or distribute the Package, if you do not accept this license.
+
+If your Modified Version has been derived from a Modified Version made
+by someone other than you, you are nevertheless required to ensure that
+your Modified Version complies with the requirements of this license.
+
+This license does not grant you the right to use any trademark, service
+mark, tradename, or logo of the Copyright Holder.
+
+This license includes the non-exclusive, worldwide, free-of-charge
+patent license to make, have made, use, offer to sell, sell, import and
+otherwise transfer the Package with respect to any patent claims
+licensable by the Copyright Holder that are necessarily infringed by the
+Package. If you institute patent litigation (including a cross-claim or
+counterclaim) against any party alleging that the Package constitutes
+direct or contributory patent infringement, then this Artistic License
+to you shall terminate on the date that such litigation is filed.
+
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=cut

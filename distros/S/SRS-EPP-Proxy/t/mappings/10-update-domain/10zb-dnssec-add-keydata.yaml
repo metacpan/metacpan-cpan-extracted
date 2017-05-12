@@ -1,0 +1,20 @@
+# Add keydata, which is not supported
+template: update-domain.tt
+
+vars:
+  domain: 10-dnssec.co.te
+  dnssec:
+    add:
+      -
+        is_key_data: 1
+        flags: 1
+        alg: 5
+        protocol: 1
+        pub_key: 1234abcd11111111111111111111111111111111
+
+output_assertions:
+  count:
+    - [ '//epp:result', 1, 'SRS: Check for one result' ]
+  attr_is:
+    - [ '//epp:result', 'code', 2306, 'SRS: Check for correct result code' ]
+

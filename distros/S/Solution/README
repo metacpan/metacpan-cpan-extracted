@@ -1,0 +1,169 @@
+NAME
+    Solution - A Simple, Stateless Template System
+
+Synopsis
+        use Solution;
+        my $template = Solution::Template->new();
+        $template->parse(    # See Solution::Tag for more examples
+              '{% for x in (1..3) reversed %}{{ x }}, {% endfor %}{{ some.text }}'
+        );
+        print $template->render({some => {text => 'Contact!'}}); # 3, 2, 1, Contact!
+
+Description
+    Solution is a template engine based on Liquid. The Liquid template
+    engine was crafted for very specific requirements:
+
+    *   It has to have simple markup and beautiful results. Template engines
+        which don't produce good looking results are no fun to use.
+
+    *   It needs to be non-evaling and secure. Liquid templates are made so
+        that users can edit them. You don't want to run code on your server
+        which your users wrote.
+
+    *   It has to be stateless. The compile and render steps have to be
+        separate, so that the expensive parsing and compiling can be done
+        once; later on, you can just render it by passing in a hash with
+        local variables and objects.
+
+    *   It needs to be able to style emails as well as HTML.
+
+Getting Started
+    It's very simple to get started with Solution. Just as in Liquid,
+    templates are built and used in two steps: Parse and Render.
+
+        my $sol = Solution::Template->new();  # Create a Solution::Template object
+        $sol->parse('Hi, {{name}}!');         # Parse and compile the template
+        $sol->render({name => 'Sanko'});      # Render the output => "Hi, Sanko!"
+
+        # Or if you're in a hurry...
+        Solution::Template->parse('Hi, {{name}}!')->render({name => 'Sanko'});
+
+    The "parse" step creates a fully compiled template which can be re-used
+    as often as you like. You can store it in memory or in a cache for
+    faster rendering later.
+
+    All parameters you want Solution to work with have to be passed as
+    parameters to the "render" method. Solution is a closed ecosystem; it
+    does not know about your local, instance, global, or environment
+    variables.
+
+    For an expanded overview of the Liquid/Solution syntax, please see
+    Solution::Tag and read Liquid for Designers
+    <http://wiki.github.com/tobi/liquid/liquid-for-designers>.
+
+Extending Solution
+    Extending the Solution template engine for your needs is almost too
+    simple. Keep reading.
+
+  Custom Filters
+    Filters are simple subs called when needed. They are not passed any
+    state data by design and must return the modified content.
+
+    TODO: I need to write Solution::Filter which will be POD with all sorts
+    of info in it. Yeah.
+
+   "Solution->register_filter( ... )"
+    This registers a package which Solution will assume contains one or more
+    filters.
+
+        # Register a package as a filter
+        Solution->register_filter( 'SolutionX::Filter::Amalgamut' );
+
+        # Or simply say...
+        Solution->register_filter( );
+        # ...and Solution will assume the filters are in the calling package
+
+   "Solution->filters( )"
+    Returns a list containing all the tags currently loaded for
+    informational purposes.
+
+  Custom Tags
+    See the section entitled Extending Solution with Custom Tags in
+    Solution::Tag for more information.
+
+    To assist with custom tag creation, Solution provides several basic tag
+    types for subclassing and exposes the following methods:
+
+   "Solution->register_tag( ... )"
+    This registers a package which must contain (directly or through
+    inheritance) both a "parse" and "render" method.
+
+        # Register a new tag which Solution will look for in the given package
+        Solution->register_tag( 'newtag', 'SolutionX::Tag::You're::It' );
+
+        # Or simply say...
+        Solution->register_tag( 'newtag' );
+        # ...and Solution will assume the new tag is in the calling package
+
+    Pre-existing tags are replaced when new tags are registered with the
+    same name. You may want to do this to override some functionality.
+
+   "Solution->tags( )"
+    Returns a hashref containing all the tags currently loaded for
+    informational purposes.
+
+Why should I use Solution?
+    *   You want to allow your users to edit the appearance of your
+        application, but don't want them to run insecure code on your
+        server.
+
+    *   You want to render templates directly from the database.
+
+    *   You like Smarty-style template engines.
+
+    *   You need a template engine which does HTML just as well as email.
+
+    *   You don't like the markup language of your current template engine.
+
+    *   You wasted three days reinventing this wheel when you could have
+        been doing something productive like volunteering or catching up on
+        past seasons of *Doctor Who*.
+
+Why shouldn't I use Solution?
+    *   You've found or written a template engine which fills your needs
+        better than Liquid or Solution ever could.
+
+    *   You are uncomfortable with text that you didn't copy and paste
+        yourself. Everyone knows computers cannot be trusted.
+
+'Solution to what?' or 'Ugh! Why a new Top Level Namespace?'
+    I really don't have a good reason for claiming a new top level namespace
+    and I promise to put myself in timeout as punishment.
+
+    As I understand it, the original project's name, Liquid, is a reference
+    to the classical states of matter (the engine itself being stateless). I
+    settled on Solution <http://en.wikipedia.org/wiki/Solution> because it's
+    Liquid but... with... bits of other stuff floating in it. Pretend you
+    majored in chemistry instead of mathematics or computer science and
+    you'll know what I mean.
+
+    This 'solution' is not the answer to all your problems and obviously not
+    the only solution for your templating troubles. It's simply *a*
+    solution.
+
+Author
+    Sanko Robinson <sanko@cpan.org> - http://sankorobinson.com/
+
+    CPAN ID: SANKO
+
+    The original Liquid template system was developed by jadedPixel
+    <http://jadedpixel.com/> and Tobias L𴫥 <http://blog.leetsoft.com/>.
+
+License and Legal
+    Copyright (C) 2009,2010 by Sanko Robinson <sanko@cpan.org>
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of The Artistic License 2.0
+    <http://www.perlfoundation.org/artistic_license_2_0>. See the LICENSE
+    file included with this distribution or notes on the Artistic License
+    2.0 <http://www.perlfoundation.org/artistic_2_0_notes> for
+    clarification.
+
+    When separated from the distribution, all original POD documentation is
+    covered by the Creative Commons Attribution-Share Alike 3.0 License
+    <http://creativecommons.org/licenses/by-sa/3.0/us/legalcode>. See the
+    clarification of the CCA-SA3.0
+    <http://creativecommons.org/licenses/by-sa/3.0/us/>.
+
+RCS
+    $Id: README 83462f5 2010-09-20 02:44:08Z sanko@cpan.org $

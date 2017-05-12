@@ -1,0 +1,28 @@
+%module{SOOT};
+
+class TF1 {
+  TFormulaFloatArray GetParErrors();
+
+// GetRandom optimization
+%{
+
+void
+GetRandom(self, ...)
+    SV* self;
+  PPCODE:
+    dXSTARG;
+    TF1* fun = (TF1*)SOOT::LobotomizeObject(aTHX_ self); // note: could check classname...
+    if (items == 1) {
+      PUSHn(fun->GetRandom());
+    }
+    else if (items == 3) {
+      PUSHn(fun->GetRandom(SvNV(ST(1)), SvNV(ST(2))));
+    }
+    else {
+      croak("TF1::GetRandom takes either two or no arguments");
+    }
+
+%}
+
+};
+

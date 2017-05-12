@@ -1,0 +1,11 @@
+Revision history for Sys-Dev-LDAP-Populate
+
+0.1.1	2010-05-26/07:30
+		-Correct how Net::LDAP::AutoDNs is called and requires "0.2.1".
+		-Fix manifest.
+
+0.1.0	2010-05-23/17:00
+		-Provide rcNG scripts.
+
+0.0.0	2010-04-02/17:20
+		-Initial release.

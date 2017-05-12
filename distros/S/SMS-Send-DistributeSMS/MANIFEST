@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/SMS/Send/DistributeSMS.pm
+t/00-load.t
+t/02_basic.t
+META.yml                                 Module meta-data (added by MakeMaker)

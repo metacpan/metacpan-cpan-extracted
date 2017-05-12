@@ -1,0 +1,32 @@
+<h4><span>Show</span> Javascript</h4>
+<pre id="js" style="display: none">
+  jQuery.ev.loop($base+'/channel/colorful_boxes/stream/'+clientId, {
+    ColorBox: function(m){
+      try {
+        console.log(m.toSource());
+      }
+      catch(e){ }
+      jQuery('#'+m.id).css({ backgroundColor: m.color }); }
+  });
+  jQuery('td.box').mouseover(function(ev){
+    var color = jQuery('#color-picker input').val() || '#ccf';
+    jQuery.post($base+'/demo/colorful_boxes', { id: this.id, color: color }, function(response){ });
+  })
+</pre>
+<form id="color-picker">
+<h2>Colorful Boxes <input type="text" name="color" value="#ccf" /></h2>
+</form>
+<table id="boxes" width="100%">
+<?pl for my $i (0 .. $boxes->rows) { ?>
+  <tr>
+<?pl
+      for my $j (0 .. $boxes->columns) { 
+        my $id = "box-$j-$i";
+        # my $box = $boxes->map->[$j]->[$i];
+?>
+    <td class="box" id="[== $id =]" style="background-color: #dea;">&nbsp;</td>
+<?pl   } ?>
+  </tr>
+<?pl } ?>
+</table>
+

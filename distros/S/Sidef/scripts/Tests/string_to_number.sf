@@ -1,0 +1,13 @@
+#!/usr/bin/ruby
+
+var dec = '0123459';
+var hex = 'abcf123';
+var oct = '7651';
+var bin = '101011001';
+
+assert_eq(   123459, dec.num);
+assert_eq(180154659, hex.hex);
+assert_eq(     4009, oct.oct);
+assert_eq(      345, bin.bin);
+
+say "** Test passed!";

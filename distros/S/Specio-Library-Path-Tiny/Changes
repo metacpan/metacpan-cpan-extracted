@@ -1,0 +1,24 @@
+0.04     2016-10-15
+
+- More path tweaks for tests to try to make Windows and OSX happy. Tests pass
+  on Windows according to AppVeyor.
+
+- Added message generators for all types to produce better error messages when
+  validation fails.
+
+
+0.03     2016-10-04
+
+- Updated paths used in tests to try to make Windows happy.
+
+
+0.02     2016-10-02
+
+- Fix code for Perl 5.8.8
+
+- Require Path::Tiny 0.087+ to ensure that tests pass.
+
+
+0.01     2016-10-02
+
+- First release upon an unsuspecting world.

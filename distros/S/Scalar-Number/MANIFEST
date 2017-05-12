@@ -1,0 +1,25 @@
+.cvsignore
+Build.PL
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Scalar/.cvsignore
+lib/Scalar/Number.pm
+lib/Scalar/Number.xs
+t/class.t
+t/class_pp.t
+t/id_cmp.t
+t/id_cmp_pp.t
+t/num_forms.pl
+t/part.t
+t/part_pp.t
+t/pod_cvg.t
+t/pod_cvg_pp.t
+t/pod_syn.t
+t/setup_pp.pl
+t/values.data
+t/val_cmp.at
+t/val_cmp_pp.at
+SIGNATURE    Added here by Module::Build

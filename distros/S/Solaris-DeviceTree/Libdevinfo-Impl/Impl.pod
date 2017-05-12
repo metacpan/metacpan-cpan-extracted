@@ -1,0 +1,42 @@
+#
+# $Header: /cvsroot/devicetool/Solaris-DeviceTree/Libdevinfo-Impl/Impl.pod,v 1.1 2003/12/08 21:14:38 honkbude Exp $
+#
+
+=pod
+
+=head1 NAME
+
+Solaris::DeviceTree::Libdevinfo::Impl - Foreign function interface to the Solaris
+libdevinfo library
+
+
+=head1 DESCRIPTION
+
+This module
+
+The library should not be accessed directly.
+Instead use L<Solaris::DeviceTree::Libdevinfo> to access the library.
+
+
+=head1 IMPLEMENTATION NOTES
+
+The FFI has been implemented with SWIG. All necessary functions have
+been made available directly to Perl. The translation between the
+function interface from libdevinfo and the object-style interface
+is done in L<Solaris::DeviceTree::Libdevinfo>, so the C part is
+as short as possible.
+
+
+=head1 AUTHOR
+
+Copyright 1999-2003 Dagobert Michelsen.
+
+
+=head1 SEE ALSO
+
+The SWIG documentation,
+L<Solaris::DeviceTree::Libdevinfo>.
+
+=cut
+
+1;

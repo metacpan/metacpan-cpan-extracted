@@ -1,0 +1,55 @@
+{
+   "abstract" : "SockJS perl implementation",
+   "author" : [
+      "Viacheslav Tykhanovskyi <vti@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "SockJS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {}
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "Carp" : "0",
+            "Digest::MD5" : "0",
+            "JSON" : "0",
+            "Plack" : "0",
+            "Protocol::WebSocket" : "0.10",
+            "Scalar::Util" : "0",
+            "Test::Class" : "0",
+            "Test::More" : "0",
+            "perl" : "5.008007"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/vti/sockjs-perl"
+      }
+   },
+   "version" : "0.01"
+}

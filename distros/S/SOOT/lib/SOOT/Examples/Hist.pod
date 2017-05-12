@@ -1,0 +1,1068 @@
+
+=head1 NAME
+
+SOOT::Examples::Hist - SOOT Examples for Hist
+
+=head1 DESCRIPTION
+
+This is a listing of all SOOT examples for Hist.
+
+=head1 EXAMPLES
+
+
+=head2 ContourList.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  
+  # Getting Contours From TH2D
+  # Author: Josh de Bever
+  #         CSI Medical Physics Group
+  #         The University of Western Ontario
+  #         London, Ontario, Canada
+  #   Date: Oct. 22, 2004
+  #   Modified by O.Couet (Nov. 26, 2004)
+  #   Converted to Perl by S. Mueller (Jul 22, 2011)
+  
+  ContourList();
+  $gApplication->Run();
+  
+  sub SawTooth {
+    # This function is specific to a sawtooth function with period
+    # WaveLen, symmetric about x = 0, and with amplitude = 1. Each segment
+    # is 1/4 of the wavelength.
+    #
+    #           |
+    #      /\   |
+    #     /  \  |
+    #    /    \ |
+    #   /      \
+    #  /--------\--------/------------
+    #           |\      /
+    #           | \    /
+    #           |  \  /
+    #           |   \/
+    #
+    my ($x, $WaveLen) = @_;
+    my $wl2 = 0.5*$WaveLen;
+    my $wl4 = 0.25*$WaveLen;
+    return -99999999 if $x < -$wl2 or $x > $wl2; # Error X out of bounds
+    if ($x <= -$wl4) {
+      return $x + 2.;
+    } elsif ($x > -$wl4 and $x <= $wl4) {
+      return -$x;
+    } elsif ($x > $wl4 and $x <= $wl2) {
+      return $x - 2.;
+    }
+    die "Should not be reached";
+  }
+  
+  use constant PI => TMath::Pi();
+  sub ContourList {
+    my $c = TCanvas->new("c","Contour List",0,0,600,600)->keep;
+    $c->SetRightMargin(0.15);
+    $c->SetTopMargin(0.15);
+  
+    my ($i, $j);
+  
+    my $nZsamples   = 80;
+    my $nPhiSamples = 80;
+  
+    my $HofZwavelength = 4.0;       # 4 meters
+    my $dZ             =  $HofZwavelength/($nZsamples - 1.);
+    my $dPhi           = 2*PI()/($nPhiSamples - 1.);
+  
+    my (@z, @HofZ, @phi, @FofPhi);
+  
+    # Discretized Z and Phi Values
+    foreach my $i (0 .. $nZsamples) {
+      $z[$i]    = $i*$dZ - $HofZwavelength/2.;
+      $HofZ[$i] = SawTooth($z[$i], $HofZwavelength)
+    }
+  
+    foreach my $i (0.. $nPhiSamples) {
+      $phi[$i]    = $i*$dPhi;
+      $FofPhi[$i] = sin($phi[$i]);
+    }
+     
+    # Create Histogram
+    my $HistStreamFn = TH2D->new(
+      "HstreamFn",
+      "#splitline{Histogram with negative and positive contents. Six contours are defined.}{It is plotted with options CONT LIST to retrieve the contours points in TGraphs}",
+      $nZsamples, $z[0], $z[$#z],
+      $nPhiSamples, $phi[0], $phi[$#phi]
+    )->keep;
+  
+    # Load Histogram Data
+    foreach my $i (0 .. $nZsamples) {
+      foreach my $j (0 .. $nPhiSamples) {
+        $HistStreamFn->SetBinContent($i, $j, $HofZ[$i] * $FofPhi[$j]);
+      }
+    }
+  
+    $gStyle->SetPalette(1);
+    $gStyle->SetOptStat(0);
+    $gStyle->SetTitleW(0.99);
+    $gStyle->SetTitleH(0.08);
+  
+    my @contours = (-.7, -.5, -.1, .1, .4, .8);
+    $HistStreamFn->SetContour(6, \@contours);
+    # Draw contours as filled regions, and Save points
+    $HistStreamFn->Draw("CONT Z LIST");
+    $c->Update(); # Needed to force the plotting and retrieve the contours in TGraphs
+  
+    # Get Contours
+    #my $sp = $gROOT->GetListOfSpecials();
+    my $conts = $gROOT->FindObject("contours");
+  
+    my $nGraphs    = 0;
+    my $TotalConts = 0;
+    
+    if (not defined($conts)) {
+      printf("*** No Contours Were Extracted!\n");
+      return;
+    } else {
+      $TotalConts = $conts->GetSize();
+    }
+  
+    printf("TotalConts = %d\n", $TotalConts);
+  
+    foreach my $i (0 .. $TotalConts-1) {
+      my $contLevel =$conts->At($i);
+      printf("Contour %d has %d Graphs\n", $i, $contLevel->GetSize());
+      $nGraphs += $contLevel->GetSize();
+    }
+  
+    $nGraphs = 0;
+  
+    my $c1 = TCanvas->new("c1","Contour List",610,0,600,600)->keep;
+    $c1->SetTopMargin(0.15);
+    my $hr = TH2F->new("hr",
+      "#splitline{Negative contours are returned first (highest to lowest). Positive contours are returned from}{lowest to highest. On this plot Negative contours are drawn in red and positive contours in blue.}",
+      2, -2., 2., 2, 0., 6.5
+    );
+  
+    $hr->Draw();
+    my $l = TLatex->new;
+    $l->SetTextSize(0.03);
+  
+    foreach my $i (0 .. $TotalConts-1) {
+      my $contLevel = $conts->At($i);
+      my $z0;
+      if ($i<3) { $z0 = $contours[2-$i]; }
+      else      { $z0 = $contours[$i]; }
+      printf("Z-Level Passed in as:  Z = %f\n", $z0);
+  
+      # Get first graph from list on curves on this level
+      my $curv = $contLevel->First();
+      foreach my $j (0 .. $contLevel->GetSize()-1) {
+        my $x0 = $curv->GetX()->[0];
+        my $y0 = $curv->GetY()->[0];
+        if ($z0<0) { $curv->SetLineColor(kRed); }
+        if ($z0>0) { $curv->SetLineColor(kBlue); }
+        $nGraphs++;
+        printf("\tGraph: %d  -- %d Elements\n", $nGraphs, $curv->GetN());
+  
+        # Draw clones of the graphs to avoid deletions in case the 1st
+        # pad is redrawn.
+        my $gc = $curv->Clone()->keep;
+        $gc->Draw("C");
+  
+        my $val = sprintf("%g",$z0);
+           $l->DrawLatex($x0,$y0,$val);
+           $curv = $contLevel->After($curv); # Get Next graph
+        }
+     }
+     $c1->Update();
+     printf("\n\n\tExtracted %d Contours and %d Graphs \n", $TotalConts, $nGraphs );
+     $gStyle->SetTitleW(0.);
+     $gStyle->SetTitleH(0.);
+  }
+
+
+
+=head2 DynamicSlice.pl
+
+  #!/usr/bin/env perl
+  use strict;
+  use warnings;
+  use SOOT qw/:all/;
+  SOOT::Init(0);
+  SOOT::Load('TGX11TTF');
+  
+  DynamicSlice();
+  $gApplication->Run();
+  
+  sub DynamicExec {
+    # Example of function called when a mouse event occurs in a pad.
+    # When moving the mouse in the canvas, a second canvas shows the
+    # projection along X of the bin corresponding to the Y position
+    # of the mouse. The resulting histogram is fitted with a gaussian.
+    # A "dynamic" line shows the current bin position in Y.
+    # This more elaborated example can be used as a starting point
+    # to develop more powerful interactive applications exploiting CINT
+    # as a development engine.
+    #
+    # Author:  Rene Brun
+     
+    my $select = $gPad->GetSelected();
+    return if !defined $select;
+    $gPad->SetUniqueID(0), return if !$select->InheritsFrom(TH2::Class());
+    my $h = $select->as('TH2');
+    $gPad->GetCanvas()->FeedbackMode(kTRUE);
+  
+    # erase old position and draw a line at current position
+    my $pyold = $gPad->GetUniqueID();
+    my $px = $gPad->GetEventX();
+    my $py = $gPad->GetEventY();
+    my $uxmin = $gPad->GetUxmin();
+    my $uxmax = $gPad->GetUxmax();
+    my $pxmin = $gPad->XtoAbsPixel($uxmin);
+    my $pxmax = $gPad->XtoAbsPixel($uxmax);
+    if ($pyold) {
+      $gVirtualX->DrawLine($pxmin, $pyold, $pxmax, $pyold);
+    }
+    $gVirtualX->DrawLine($pxmin, $py, $pxmax, $py);
+    $gPad->SetUniqueID($py);
+    my $upy = $gPad->AbsPixeltoY($py);
+    my $y = $gPad->PadtoY($upy);
+  
+    # create or set the new canvas c2
+    my $padsav = $gPad;
+    my $c2 = $gROOT->FindObject("c2");
+    if (defined $c2) {
+      #$c2->GetPrimitive("Projection")->delete;
+    }
+    else {
+      $c2 = TCanvas->new("c2","Projection Canvas",710,10,700,500);
+    }
+    $c2->SetGrid();
+    $c2->cd();
+  
+    # draw slice corresponding to mouse position
+    my $biny = $h->GetYaxis()->FindBin($y);
+    my $hp = $h->ProjectionX("", $biny, $biny);
+    $hp->SetFillColor(38);
+    my $title = sprintf("Projection of biny=%d", $biny);
+    $hp->SetName("Projection");
+    $hp->SetTitle($title);
+    $hp->Fit("gaus", "ql");
+    $hp->GetFunction("gaus")->SetLineColor(kRed);
+    $hp->GetFunction("gaus")->SetLineWidth(6);
+    $c2->Update();
+    $padsav->cd();
+  }
+  
+  # Show the slice of a TH2 following the mouse position
+  sub DynamicSlice {
+    # Create a new canvas.
+    my $c1 = TCanvas->new("c1","Dynamic Slice Example",10,10,700,500)->keep;
+    $c1->SetFillColor(42);
+    $c1->SetFrameFillColor(33);
+    
+    # create a 2-d histogram, fill and draw it
+    my $hpxpy = TH2F->new("hpxpy","py vs px",40,-4,4,40,-4,4)->keep;
+    $hpxpy->SetStats(0);
+    foreach (1..50000) {
+      my ($px, $py) = $gRandom->Rannor();
+      $hpxpy->Fill($px, $py);
+    }
+    $hpxpy->Draw("col");
+     
+    # Add a TExec object to the canvas
+    $c1->AddExec("dynamic", sub {DynamicExec()});
+  }
+  
+
+
+
+=head2 draw2dopt.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  
+  # display the various 2-d drawing options
+  $gROOT->Reset();
+  $gStyle->SetOptStat(0);
+  $gStyle->SetPalette(1);
+  $gStyle->SetCanvasColor(33);
+  $gStyle->SetFrameFillColor(18);
+  
+  my $pl = TPaveLabel->new();
+  
+  my $f2 = TF2->new("f2","xygaus + xygaus(5) + xylandau(10)",-4,4,-4,4);
+  my @params = (130,-1.4,1.8,1.5,1, 150,2,0.5,-2,0.5, 3600,-2,0.7,-3,0.3);
+  for (my $i = 0; $i < scalar @params; $i++) {
+   $f2->SetParameter($i, $params[$i]);
+  }
+  my $h2 = TH2F->new("h2","xygaus + xygaus(5) + xylandau(10)",20,-4,4,20,-4,4);
+  $h2->SetFillColor(46);
+  $h2->FillRandom("f2",40000);
+  
+  # basic 2-d options
+  my $x1 = 0.67; 
+  my $y1 = 0.875; 
+  my $x2 = 0.85; 
+  my $y2 = 0.95;
+  my $cancolor = 17;
+  
+  my $c2h = TCanvas->new("c2h","2-d options",10,10,800,600);
+  $c2h->Divide(2,2);
+  $c2h->SetFillColor($cancolor);
+  $c2h->cd(1);
+  $h2->Draw();       
+  $pl->DrawPaveLabel($x1,$y1,$x2,$y2,"SCAT","brNDC");
+  $c2h->cd(2);
+  $h2->Draw("box");  
+  $pl->DrawPaveLabel($x1,$y1,$x2,$y2,"BOX","brNDC");
+  $c2h->cd(3);
+  $h2->Draw("arr");  
+  $pl->DrawPaveLabel($x1,$y1,$x2,$y2,"ARR","brNDC");
+  $c2h->cd(4);
+  $h2->Draw("colz"); 
+  $pl->DrawPaveLabel($x1,$y1,$x2,$y2,"COLZ","brNDC");
+  $c2h->Update();
+  
+  # text option
+  my $ctext = TCanvas->new("ctext","text option",50,50,800,600);
+  $gPad->SetGrid();
+  $ctext->SetFillColor($cancolor);
+  $ctext->SetGrid();
+  $h2->Draw("text"); 
+  $pl->DrawPaveLabel($x1,$y1,$x2,$y2,"TEXT","brNDC");
+  $ctext->Update();
+  
+  # contour options
+  my $cont = TCanvas->new("contours","contours",100,100,800,600);
+  $cont->Divide(2,2);
+  $gPad->SetGrid();
+  $cont->SetFillColor($cancolor);
+  $cont->cd(1);
+  $h2->Draw("contz"); 
+  $pl->DrawPaveLabel($x1,$y1,$x2,$y2,"CONTZ","brNDC");
+  $cont->cd(2);
+  $gPad->SetGrid();
+  $h2->Draw("cont1"); 
+  $pl->DrawPaveLabel($x1,$y1,$x2,$y2,"CONT1","brNDC");
+  $cont->cd(3);
+  $gPad->SetGrid();
+  $h2->Draw("cont2"); 
+  $pl->DrawPaveLabel($x1,$y1,$x2,$y2,"CONT2","brNDC");
+  $cont->cd(4);
+  $gPad->SetGrid();
+  $h2->Draw("cont3"); 
+  $pl->DrawPaveLabel($x1,$y1,$x2,$y2,"CONT3","brNDC");
+  $cont->Update();
+  
+  #lego options
+  my $lego = TCanvas->new("lego","lego options",150,150,800,600);
+  $lego->Divide(2,2);
+  $lego->SetFillColor($cancolor);
+  $lego->cd(1);
+  $h2->Draw("lego");     
+  $pl->DrawPaveLabel($x1,$y1,$x2,$y2,"LEGO","brNDC");
+  $lego->cd(2);
+  $h2->Draw("lego1");    
+  $pl->DrawPaveLabel($x1,$y1,$x2,$y2,"LEGO1","brNDC");
+  $lego->cd(3);
+  $gPad->SetTheta(61); 
+  $gPad->SetPhi(-82);
+  $h2->Draw("surf1pol"); 
+  $pl->DrawPaveLabel($x1,$y1,$x2+0.05,$y2,"SURF1POL","brNDC");
+  $lego->cd(4);
+  $gPad->SetTheta(21); 
+  $gPad->SetPhi(-90);
+  $h2->Draw("surf1cyl"); 
+  $pl->DrawPaveLabel($x1,$y1,$x2+0.05,$y2,"SURF1CYL","brNDC");
+  $lego->Update();
+  
+  # surface options
+  my $surf = TCanvas->new("surfaces","surface options",200,200,800,600);
+  $surf->Divide(2,2);
+  $surf->SetFillColor($cancolor);
+  $surf->cd(1);
+  $h2->Draw("surf1");   
+  $pl->DrawPaveLabel($x1,$y1,$x2,$y2,"SURF1","brNDC");
+  $surf->cd(2);
+  $h2->Draw("surf2z");  
+  $pl->DrawPaveLabel($x1,$y1,$x2,$y2,"SURF2Z","brNDC");
+  $surf->cd(3);
+  $h2->Draw("surf3");   
+  $pl->DrawPaveLabel($x1,$y1,$x2,$y2,"SURF3","brNDC");
+  $surf->cd(4);
+  $h2->Draw("surf4");   
+  $pl->DrawPaveLabel($x1,$y1,$x2,$y2,"SURF4","brNDC");
+  $surf->Update();
+  
+  $gApplication->Run;
+
+
+
+=head2 earth.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  use File::Spec;
+  
+  $gROOT->Reset;
+  $gStyle->SetPalette(1);
+  $gStyle->SetOptTitle(1);
+  $gStyle->SetOptStat(0);
+  
+  my $c1 = TCanvas->new("c1","earth_projections",1000,800);
+  $c1->Divide(2,2);
+  
+  my $h1 = TH2F->new("h1","Aitoff",    180, -180, 180, 179, -89.5, 89.5);
+  my $h2 = TH2F->new("h2","Mercator",  180, -180, 180, 161, -80.5, 80.5);
+  my $h3 = TH2F->new("h3","Sinusoidal",180, -180, 180, 181, -90.5, 90.5);
+  my $h4 = TH2F->new("h4","Parabolic", 180, -180, 180, 181, -90.5, 90.5);
+  
+  my $inFile = File::Spec->catfile($ENV{ROOTSYS}, qw(share doc root tutorials graphics earth.dat));
+  open my $fh, "<", $inFile or die "Cannot open $inFile: $!";
+  while (<$fh>) {
+    chomp;
+    my ($x, $y) = split /\s+/, $_;
+    $x *= 1.;
+    $y *= 1.;
+    $h1->Fill($x, $y, 1);
+    $h2->Fill($x, $y, 1);
+    $h3->Fill($x, $y, 1);
+    $h4->Fill($x, $y, 1);
+  }
+  close $fh;
+  
+  $c1->cd(1);
+  $h1->Draw("z aitoff");
+  
+  $c1->cd(2);
+  $h2->Draw("z mercator");
+  
+  $c1->cd(3);
+  $h3->Draw("z sinusoidal");
+  
+  $c1->cd(4);
+  $h4->Draw("z parabolic");
+  
+  $c1->Update();
+  
+  $gApplication->Run;
+  
+
+
+
+=head2 fillrandom.pl
+
+  #!/usr/bin/env perl
+  use strict;
+  use warnings;
+  use SOOT qw/:all/;
+  
+  fillrandom();
+  $gApplication->Run();
+  
+  sub fillrandom {
+    #Fill a 1-D histogram from a parametric function
+    # To see the output of this macro, click begin_html <a href="gif/fillrandom.gif">here</a>. end_html
+    #Author: Rene Brun
+     
+    my $c1 = TCanvas->new("c1","The FillRandom example",200,10,700,900)->keep;
+    $c1->SetFillColor(18);
+  
+    my $pad1 = TPad->new("pad1","The pad with the function",0.05,0.50,0.95,0.95,21.)->keep;
+    my $pad2 = TPad->new("pad2","The pad with the histogram",0.05,0.05,0.95,0.45,21.)->keep;
+    $pad1->Draw();
+    $pad2->Draw();
+    $pad1->cd();
+  
+    $gBenchmark->Start("fillrandom");
+    #
+    # A function (any dimension) or a formula may reference
+    # an already defined formula
+    #
+    my $form1 = TFormula->new("form1","abs(sin(x)/x)")->keep;
+    my $sqroot = TF1->new("sqroot","x*gaus(0) + [3]*form1",0,10)->keep;
+    $sqroot->SetParameters(10,4,1,20);
+    $pad1->SetGridx();
+    $pad1->SetGridy();
+    $pad1->GetFrame()->SetFillColor(42);
+    $pad1->GetFrame()->SetBorderMode(-1);
+    $pad1->GetFrame()->SetBorderSize(5);
+    $sqroot->SetLineColor(4);
+    $sqroot->SetLineWidth(6);
+    $sqroot->Draw();
+    my $lfunction = TPaveLabel->new(5,39,9.8,46,"The sqroot function")->keep;
+    $lfunction->SetFillColor(41);
+    $lfunction->Draw();
+    $c1->Update();
+  
+    #
+    # Create a one dimensional histogram (one float per bin)
+    # and fill it following the distribution in function sqroot.
+    #
+    $pad2->cd();
+    $pad2->GetFrame()->SetFillColor(42);
+    $pad2->GetFrame()->SetBorderMode(-1);
+    $pad2->GetFrame()->SetBorderSize(5);
+    my $h1f = TH1F->new("h1f","Test random numbers",200,0,10)->keep;
+    $h1f->SetFillColor(45);
+    $h1f->FillRandom("sqroot",10000);
+    $h1f->Draw();
+    $c1->Update();
+    #
+    # Open a ROOT file and save the formula, function and histogram
+    #
+    my $myfile = TFile->new("fillrandom.root","RECREATE");
+    $form1->Write();
+    $sqroot->Write();
+    $h1f->Write();
+    $gBenchmark->Show("fillrandom");
+  }
+
+
+
+=head2 hksimple.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  use constant kUPDATE => 10;
+  
+  # *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+  # *-*
+  # *-*  This script illustrates the advantages of a TH1K histogram
+  # *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+  
+  # Create a new canvas.
+  my $c1 = TCanvas->new("c1","Dynamic Filling Example",200,10,600,900);
+  $c1->SetFillColor(42);
+  
+  # Create a normal histogram and two TH1K histograms
+  my @hpx;
+  $hpx[0] = TH1F->new("hp0","Normal histogram",1000,-4,4);
+  $hpx[1] = TH1K->new("hk1","Nearest Neighboor of order 3",1000,-4,4);
+  $hpx[2] = TH1K->new("hk2","Nearest Neighboor of order 16",1000,-4,4,16);
+  $c1->Divide(1,3);
+  for my $j (0..2) {
+     $c1->cd($j+1); 
+     $gPad->SetFrameFillColor(33);
+     $hpx[$j]->SetFillColor(48);
+     $hpx[$j]->Draw();
+  }
+  
+  # Fill histograms randomly
+  $gRandom->SetSeed();
+  foreach (0..299) {
+    my $px = $gRandom->Gaus(0.0,1.0);
+    $hpx[$_]->Fill($px) for 0..2;
+    padRefresh($c1) if $_ and $_ % kUPDATE == 0;
+  }
+  
+  $hpx[$_]->Fit("gaus","","") for 0..2;
+  
+  padRefresh($c1);
+  
+  sub padRefresh {
+    my $pad = shift;
+    my $flag = shift || 0;
+  
+    return if not defined $pad;
+    $pad->Modified();
+    $pad->Update();
+    my $tl = $pad->GetListOfPrimitives();
+    return if not defined $tl;
+    for (my $i = 0; $i < $tl->GetSize(); $i++) {
+      my $obj = $tl->At($i);
+      padRefresh($obj, 1) if $obj->isa("TPad");
+    }
+    return if ($flag);
+    $gSystem->ProcessEvents();
+  }
+  
+  
+  $gApplication->Run;
+  
+
+
+
+=head2 hstack.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  
+  $gROOT->Reset();
+  $gBenchmark->Start('hstack');
+     
+  my $hs = THStack->new("hs","test stacked histograms");
+  
+  # create three 1-d histograms
+  my $h1 = TH1F->new("h1","test hstack",100,-4,4);
+  $h1->FillRandom("gaus",20000);
+  $h1->SetFillColor(kRed);
+  $h1->SetMarkerStyle(21);
+  $h1->SetMarkerColor(kRed);
+  $hs->Add($h1);
+  
+  my $h2 = TH1F->new("h2","test hstack",100,-4,4);
+  $h2->FillRandom("gaus",15000);
+  $h2->SetFillColor(kBlue);
+  $h2->SetMarkerStyle(21);
+  $h2->SetMarkerColor(kBlue);
+  $hs->Add($h2);
+  
+  my $h3 = TH1F->new("h3","test hstack",100,-4,4);
+  $h3->FillRandom("gaus",10000);
+  $h3->SetFillColor(kGreen);
+  $h3->SetMarkerStyle(21);
+  $h3->SetMarkerColor(kGreen);
+  $hs->Add($h3);
+  
+  my $c1 = TCanvas->new("c1","stacked hists",10,10,1000,800);
+  $c1->SetFillColor(41);
+  $c1->Divide(2,2);
+  
+  # in top left pad, draw the stack with defaults
+  $c1->cd(1);
+  $hs->Draw();
+  
+  # in top right pad, draw the stack in non-stack mode and errors option
+  $c1->cd(2);
+  $gPad->SetGrid();
+  $hs->Draw("nostack,e1p");
+  
+  # in bottom left, draw in stack mode with "lego1" option
+  $c1->cd(3);
+  $gPad->SetFrameFillColor(17);
+  $gPad->SetTheta(3.77);
+  $gPad->SetPhi(2.9);
+  $hs->Draw("lego1");
+  
+  $c1->cd(4);
+  
+  #create two 2-D histograms and draw them in stack mode
+  $gPad->SetFrameFillColor(17);
+  
+  my $a = THStack->new("a","test legos");
+  my $f1 = TF2->new("f1","xygaus + xygaus(5) + xylandau(10)",-4,4,-4,4);
+  $f1->SetParameters([130.,-1.4,1.8,1.5,1, 150,2,0.5,-2,0.5, 3600,-2,0.7,-3,0.3]);
+  
+  my $h2a = TH2F->new("h2a","h2a",20,-4,4,20,-4,4);
+  $h2a->SetFillColor(38);
+  $h2a->FillRandom("f1",4000);
+  
+  my $f2 = TF2->new("f2","xygaus + xygaus(5)",-4,4,-4,4);
+  $f2->SetParameters([100.,-1.4,1.9,1.1,2, 80,2,0.7,-2,0.5]);
+  
+  my $h2b = TH2F->new("h2b","h2b",20,-4,4,20,-4,4);
+  $h2b->SetFillColor(46);
+  $h2b->FillRandom("f2",3000);
+  
+  $a->Add($h2a);
+  $a->Add($h2b);
+  $a->Draw();
+  
+  $gBenchmark->Show('hstack');
+  
+  $gApplication->Run;
+  
+
+
+
+=head2 hsum.pl
+
+  #!/usr/bin/env perl
+  use strict;
+  use warnings;
+  use SOOT qw/:all/;
+  
+  hsum();
+  $gApplication->Run();
+  
+  # histograms filled and drawn in a loop
+  use constant kUPDATE => 500;
+  sub hsum {
+  #
+  # To see the output of this macro, click begin_html <a href="gif/hsum.gif" >here</a> end_html
+  #    Simple example illustrating how to use the C++ interpreter	
+  #    to fill histograms in a loop and show the graphics results
+  #Author: Rene Brun
+  
+    my $c1 = TCanvas->new("c1","The HSUM example",200,10,600,400)->keep;
+    $c1->SetGrid();
+  
+    $gBenchmark->Start("hsum");
+  
+    # Create some histograms.
+    my $total  = TH1F->new("total","This is the total distribution",100,-4,4)->keep;
+    my $main   = TH1F->new("main","Main contributor",100,-4,4)->keep;
+    my $s1     = TH1F->new("s1","This is the first signal",100,-4,4)->keep;
+    my $s2     = TH1F->new("s2","This is the second signal",100,-4,4)->keep;
+    $total->Sumw2(); # store the sum of squares of weights
+    $total->SetMarkerStyle(21);
+    $total->SetMarkerSize(0.7);
+    $main->SetFillColor(16);
+    $s1->SetFillColor(42);
+    $s2->SetFillColor(46);
+    my $slider;
+  
+    # Fill histograms randomly
+    $gRandom->SetSeed();
+    my ($xs1, $xs2, $xmain);
+    foreach my $i (0..9999) {
+       $xmain = $gRandom->Gaus(-1,1.5);
+       $xs1   = $gRandom->Gaus(-0.5,0.5);
+       $xs2   = $gRandom->Landau(1,0.15);
+       $main->Fill($xmain);
+       $s1->Fill($xs1, 0.3);
+       $s2->Fill($xs2, 0.2);
+       $total->Fill($xmain);
+       $total->Fill($xs1,0.3);
+       $total->Fill($xs2,0.2);
+       if ($i && ($i % kUPDATE()) == 0) {
+          if ($i == kUPDATE) {
+             $total->Draw("e1p");
+             $main->Draw("same");
+             $s1->Draw("same");
+             $s2->Draw("same");
+             $c1->Update();
+             $slider = TSlider->new("slider",
+                "test",4.2,0,4.6,$total->GetMaximum(),38);
+             $slider->SetFillColor(46);
+          }
+          $slider->SetRange(0., $i/10000.) if $slider;
+          $c1->Modified();
+          $c1->Update();
+       }
+    }
+    $slider->SetRange(0, 1);
+    $total->Draw("sameaxis");# to redraw axis hidden by the fill area
+    $c1->Modified();
+    $gBenchmark->Show("hsum");
+  }
+
+
+
+=head2 multicolor.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  use constant NBINS => 20;
+  
+  my $stack = shift;
+  my $c1 = TCanvas->new;
+  
+  my $hs = THStack->new("hs","three plots")->keep;
+  my @colors = (kBlue, kRed, kYellow);
+  my @names  = qw(h1 h2 h3);
+  my @h = map {
+    my $h = TH2F->new(($names[$_]) x 2, NBINS,-4,4, NBINS,-4,4);
+    $h->keep;
+    $h->SetFillColor($colors[$_]);
+    $hs->Add($h);
+    $h
+  } 0..$#names;
+  
+  my $r = TRandom->new;
+  
+  $h[0]->Fill($r->Gaus(), $r->Gaus()) for 1..20000; 
+  
+  foreach (1..200) {
+    my $ix = int($r->Uniform(0, NBINS));
+    my $iy = int($r->Uniform(0, NBINS));
+    my $bin = $h[0]->GetBin($ix, $iy);
+    my $val = $h[0]->GetBinContent($bin);
+    next if $val <= 0;
+    $h[0]->SetBinContent($bin,0) if not $stack;
+    if ($r->Rndm() > 0.5) {
+      $h[1]->SetBinContent($bin, 0) if not $stack;
+      $h[2]->SetBinContent($bin, $val);
+    } 
+    else {
+      $h[2]->SetBinContent($bin, 0) if not $stack;
+      $h[1]->SetBinContent($bin, $val);
+    }
+  }
+  $hs->Draw("lego1");
+  
+  $gApplication->Run;      
+  
+
+
+
+=head2 quantiles.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  
+  use constant NQ => 100;
+  use constant NSHOTS => 10;
+  
+  # demo for quantiles
+  # Author; Rene Brun
+  my $xq = [map {$_/NQ} 1..NQ]; # position where to compute the quantiles in [0,1]
+  my $yq = [(0.) x NQ]; # array to contain the quantiles
+  
+  my $gr70 = TGraph->new(NSHOTS);
+  my $gr90 = TGraph->new(NSHOTS);
+  my $gr98 = TGraph->new(NSHOTS);
+  my $h = TH1F->new("h", "demo quantiles", 50, -3, 3);
+  
+  for my $shot (0..NSHOTS-1) {
+    $h->FillRandom("gaus", 50);
+    $h->GetQuantiles(NQ, $yq, $xq);
+    $gr70->SetPoint($shot, $shot+1, $yq->[70]*1.0);
+    $gr90->SetPoint($shot, $shot+1, $yq->[90]*1.0);
+    $gr98->SetPoint($shot, $shot+1, $yq->[98]*1.0);
+  }
+  
+  # show the original histogram in the top pad
+  my $c1 = TCanvas->new("c1", "demo quantiles", 10, 10, 600, 900);
+  $c1->SetFillColor(41);
+  $c1->Divide(1, 3);
+  $c1->cd(1);
+  $h->SetFillColor(38);
+  $h->Draw();
+  
+  # show the final quantiles in the middle pad
+  $c1->cd(2);
+  $gPad->SetFrameFillColor(33);
+  $gPad->SetGrid();
+  my $gr = TGraph->new(NQ, $xq, $yq);
+  $gr->SetTitle("final quantiles");
+  $gr->SetMarkerStyle(21);
+  $gr->SetMarkerColor(kRed);
+  $gr->SetMarkerSize(0.3);
+  $gr->Draw("ap");
+  
+  # show the evolution of some  quantiles in the bottom pad
+  $c1->cd(3);
+  $gPad->SetFrameFillColor(17);
+  $gPad->DrawFrame(0, 0, NSHOTS+1, 3.2);
+  $gPad->SetGrid();
+  $gr98->SetMarkerStyle(22);
+  $gr98->SetMarkerColor(kRed);
+  $gr98->Draw("lp");
+  $gr90->SetMarkerStyle(21);
+  $gr90->SetMarkerColor(kBlue);
+  $gr90->Draw("lp");
+  $gr70->SetMarkerStyle(20);
+  $gr70->SetMarkerColor(kMagenta);
+  $gr70->Draw("lp");
+  
+  # add a legend
+  my $legend = TLegend->new(0.85, 0.74, 0.95, 0.95);
+  $legend->SetTextFont(72);
+  $legend->SetTextSize(0.05);
+  $legend->AddEntry($gr98," q98","lp");
+  $legend->AddEntry($gr90," q90","lp");
+  $legend->AddEntry($gr70," q70","lp");
+  $legend->Draw();
+  
+  $gApplication->Run;
+
+
+
+=head2 seism.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  use threads;
+  use Time::HiRes 'usleep';
+  
+  my $sw = TStopwatch->new(); 
+  $sw->Start();
+  
+  # set time offset
+  #my $dtime = TDatime->new(); # FIXME TDatime not wrapped (not a TObject), but utterly superseded by Perl-tools
+  $gStyle->SetTimeOffset(time()); # We could be more elaborate. Check out DateTime.pm
+  
+  my $c1 = TCanvas->new("c1","Time on axis",10,10,1000,500);
+  $c1->SetFillColor(42);
+  $c1->SetFrameFillColor(33);
+  $c1->SetGrid();
+     
+  my $bintime = 1; # one bin = 1 second. change it to set the time scale
+  my $ht = TH1F->new("ht","The ROOT seism",10,0,10*$bintime);
+  my $signal = 1000.0;
+  
+  $ht->SetMaximum($signal);
+  $ht->SetMinimum(-$signal);
+  $ht->SetStats(0);
+  $ht->SetLineColor(2);
+  $ht->GetXaxis()->SetTimeDisplay(1);
+  $ht->GetYaxis()->SetNdivisions(520);
+  $ht->Draw();
+     
+  my $thr = threads->new(sub {$gApplication->Run()}); #canvas can be edited during the loop
+  usleep(5000); # FIXME find better way to fix this
+  $gApplication->SetReturnFromRun(1);
+  
+  for my $i (1..2299) {
+    #======= Build a signal : noisy damped sine ======
+    my $noise = $gRandom->Gaus(0,120);
+    $noise += $signal*sin(($i-700.)*6.28/30)*exp((700.-$i)/300.) if $i > 700;
+    $ht->SetBinContent($i,$noise);
+    $c1->Modified();
+    $c1->Update();
+  }
+  print sprintf("Real Time = %8.3fs, Cpu Time = %8.3fs\n",$sw->RealTime(),$sw->CpuTime());
+  
+  $gApplication->Terminate();
+  $thr->join();
+  
+
+
+
+=head2 transpad.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  
+  # Example of a canvas showing two histograms with different scales.
+  # The second histogram is drawn in a transparent pad
+  my $c1 = TCanvas->new("c1","transparent pad",200,10,700,500);
+  my $pad1 = TPad->new("pad1","",0,0,1,1);
+  my $pad2 = TPad->new("pad2","",0,0,1,1);
+  $pad2->SetFillStyle(4000); # will be transparent
+  $pad1->Draw();
+  $pad1->cd();
+  
+  my $h1 = TH1F->new("h1","h1",100,-3,3);
+  my $h2 = TH1F->new("h2","h2",100,-3,3);
+  my $r = TRandom->new;
+  
+  my $nloop = 100000;
+  for my $i (0..$nloop-1) {
+    if ($i < 1000) {
+      my $x1 = $r->Gaus(-1,0.5);
+      $h1->Fill($x1);
+    }
+    my $x2 = $r->Gaus(1,1.5);
+    $h2->Fill($x2);
+  }
+  
+  $h1->Draw();
+  $pad1->Update(); #this will force the generation of the "stats" box
+  my $ps1 = $h1->GetListOfFunctions()->FindObject("stats");
+  $ps1->SetX1NDC(0.4); 
+  $ps1->SetX2NDC(0.6);
+  $pad1->Modified();
+  $c1->cd();
+   
+  #compute the pad range with suitable margins
+  my $ymin = 0;
+  my $ymax = 2000;
+  my $dy = ($ymax-$ymin)/0.8; # 10 per cent margins top and bottom
+  my $xmin = -3;
+  my $xmax = 3;
+  my $dx = ($xmax-$xmin)/0.8; # 10 per cent margins left and right
+  $pad2->Range($xmin-0.1*$dx,$ymin-0.1*$dy,$xmax+0.1*$dx,$ymax+0.1*$dy);
+  $pad2->Draw();
+  $pad2->cd();
+  $h2->SetLineColor(kRed);
+  $h2->Draw("sames");
+  $pad2->Update();
+  
+  my $ps2 = $h2->GetListOfFunctions()->FindObject("stats");
+  $ps2->SetX1NDC(0.65); 
+  $ps2->SetX2NDC(0.85);
+  $ps2->SetTextColor(kRed);
+  
+  # draw axis on the right side of the pad
+  my $axis = TGaxis->new($xmax,$ymin,$xmax,$ymax,$ymin,$ymax,50510,"+L");
+  $axis->SetLabelColor(kRed);
+  $axis->Draw();
+  
+  $gApplication->Run;
+
+
+
+=head2 zones.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  
+  $gROOT->Reset();
+  my $c1 = TCanvas->new('c1','The Ntuple canvas',200,10,700,780);
+  $gStyle->SetPadBorderMode(0);
+  $gStyle->SetOptStat(0);
+  $c1->Divide(2,2,0,0);
+  
+  my $pad1 = TPad->new('pad1','This is pad1',0.02,0.52,0.48,0.98,21);
+  my $pad2 = TPad->new('pad2','This is pad2',0.52,0.52,0.98,0.98,21);
+  my $pad3 = TPad->new('pad3','This is pad3',0.02,0.02,0.48,0.48,21);
+  my $pad4 = TPad->new('pad4','This is pad4',0.52,0.02,0.98,0.48,1);
+  
+  $pad1->Draw();
+  $pad2->Draw();
+  $pad3->Draw();
+  $pad4->Draw();
+  
+  my $h1 = TH2F->new("h1","test1",10,0,1,20,0,20);
+  my $h2 = TH2F->new("h2","test2",10,0,1,20,0,100);
+  my $h3 = TH2F->new("h3","test3",10,0,1,20,-1,1);
+  my $h4 = TH2F->new("h4","test4",10,0,1,20,0,1000);
+  $h1->FillRandom("gaus", 100000);
+  $h2->FillRandom("gaus", 100000);
+  $h3->FillRandom("gaus", 100000);
+  $h4->FillRandom("gaus", 100000);
+  
+  $pad1->cd();
+  $pad1->SetBottomMargin(0);
+  $pad1->SetRightMargin(0);
+  $pad1->SetTickx(2);
+  $h1->Draw();
+  
+  $pad2->cd();
+  $pad2->SetLeftMargin(0);
+  $pad2->SetBottomMargin(0);
+  $pad2->SetTickx(2);
+  $pad2->SetTicky(2);
+  $h2->GetYaxis()->SetLabelOffset(0.01);
+  $h2->Draw();
+  
+  $pad3->cd();
+  $pad3->SetTopMargin(0);
+  $pad3->SetRightMargin(0);
+  $h3->Draw();
+  
+  $pad4->cd();
+  $pad4->SetLeftMargin(0);
+  $pad4->SetTopMargin(0);
+  $pad4->SetTicky(2);
+  $h4->Draw();
+  
+  $c1->Update();
+  
+  $gApplication->Run;
+  
+
+
+
+
+=head1 SEE ALSO
+
+L<SOOT>
+
+=head1 AUTHOR
+
+Steffen Mueller, E<lt>smueller@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2010 by Steffen Mueller
+
+SOOT, the Perl-ROOT wrapper, is free software; you can redistribute it and/or modify
+it under the same terms as ROOT itself, that is, the GNU Lesser General Public License.
+A copy of the full license text is available from the distribution as the F<LICENSE> file.
+
+=cut
+

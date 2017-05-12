@@ -1,0 +1,18 @@
+  * Implement mangle option:
+    + Regex for mangling source content.
+    + Repeated use of the option is merged together.
+  * Implement id resolving:
+    + For defined authors, us email address, URL, or full string as key.
+    + Use fc when Unicode::CaseFold is available, else lc.
+  * Implement merge-author option:
+    + no: Disable id resolving altogether
+    + yes (default): same as titlecase.
+    + force: same as lowercase.
+    + fail: die on author id referencing varying full strings.
+    + titlecase: Merge id's varying only in case, Favoring titlecase
+      over other mixed-case, lowercase, or uppercase (in that order).
+    + lowercase: Merge id's always, lowercasing varying content.
+  * Use Log::Any:
+    + Emit warning when author id's refer to varying full strings.
+  * Implement alias option:
+    + Hash of arrays of id's to be merged with id used as key.

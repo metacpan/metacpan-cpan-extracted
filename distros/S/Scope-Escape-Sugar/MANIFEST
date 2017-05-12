@@ -1,0 +1,18 @@
+.cvsignore
+Build.PL
+Changes
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/Scope/Escape/.cvsignore
+lib/Scope/Escape/Sugar.pm
+lib/Scope/Escape/Sugar.xs
+t/block.t
+t/catch.t
+t/leximport.t
+t/pod_cvg.t
+t/pod_syn.t
+t/with_escape.t
+SIGNATURE    Added here by Module::Build

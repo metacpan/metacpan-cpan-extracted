@@ -1,0 +1,29 @@
+Revision history for Perl extension SQL-TwoWay
+
+0.05 2013-06-17T10:06:08Z
+
+    - Suppress warnings
+      (reported by sugyan++)
+
+0.04 2013-04-08T04:35:11Z
+
+    - Fixed string literal scanner.
+      (tokuhirom)
+
+0.03 2013-04-05T09:20:35Z
+
+    - [INCOMPATIBLE CHANGE] s/two_way/two_way_sql/
+      (tokuhirom)
+    - Support /* $var */(1,2,3)
+      (tokuhirom)
+    - Support escaping string literal
+      (tokuhirom)
+
+0.02 2013-04-05T07:27:02Z
+
+    - Tiny pod fix(tokuhirom)
+
+0.01 2013-04-05T07:22:15Z
+
+    - original version
+

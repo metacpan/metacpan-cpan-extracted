@@ -1,0 +1,2 @@
+COMMAND	DESCRIPTION
+load data	Loads data with optional charset recoding (e.g. of a UTF-8 value such as this curly quote >>“<<)

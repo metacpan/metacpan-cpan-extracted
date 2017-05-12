@@ -1,0 +1,103 @@
+==================================================
+Changes from 2015-04-08 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.004 at 2016-04-07 23:28:40 +0000
+------------------------------------------
+
+  Change: 466ccc0b49126fe489f26e15c9594594c36e87ba
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2016-04-07 20:28:40 +0000
+
+    Improvements for Kwalitee Added a developer test for Perl::Critic
+    validations 
+
+  Change: f255ee2ae2f4ef5121d08b2c9ead12fcb7642f92
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2015-11-06 22:40:06 +0000
+
+    Fixed bugs on real_server.t Small additions to Pod 
+
+  Change: 750e1a1c15e909265a6c8d47e5a07c704aed4040
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2015-11-05 01:15:25 +0000
+
+    Bug fixes Fixing the tests check_fault method was not being used at
+    all 
+
+  Change: 62a3c66a1568a4922be01d9b52928bc13e7ef007
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2015-11-04 10:53:51 +0000
+
+    Fixed author tests Added a new plugin to execute author tests with
+    Dist::Zilla 
+
+  Change: 41d25c27f09c7923e99e2566531610ef451f2e19
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2015-11-03 22:45:41 +0000
+
+    Moved author tests to the correct place Added a test to validate
+    interaction with a real server (yet to be validated) 
+
+  Change: 551a1f31771016cf043e5446b16cfd39a6853cb5
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2015-11-03 22:08:04 +0000
+
+    Fixed permissions on test files 
+
+  Change: ebe948929506ca85e24bbe49412c941214dfa7c5
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2015-11-03 19:44:41 +0000
+
+    Fixed errors with Pod Coverage Also applied some recomendations from
+    PerlCritic 
+
+  Change: 259063cdc14c43c1971159b5ebef893e7f17b8b7
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2015-11-03 13:00:23 +0000
+
+    Removed duplicated steps from dist.ini Those tasks were already being
+    executed by global config.ini 
+
+  Change: 18e345f3279c54d94491cffe9db4954e69b70080
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2015-11-03 12:53:59 +0000
+
+    Release for CPAN Added Pod Added tests for Pod Fixed small issues
+    with Dist::Zilla 
+
+  Change: 3f07189eaeced950002dad8e558bd65ccd316100
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2015-11-01 01:52:59 +0000
+
+    Including Pod 
+
+  Change: 556bc249e80da09218aec6f48f03477c9b356960
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2015-10-31 00:59:22 +0000
+
+    Merge branch 'master' of github.com:glasswalk3r/siebel-soap-auth 
+
+  Change: dfa69775bac5086e43ed95d376f570e835beaabf
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2015-10-31 00:58:37 +0000
+
+    Initial Release Included Dist::Zilla configuration and tests 
+
+  Change: 0fec4704c3da67839c82739f699fb492b20f111d
+  Author: Alceu Rodrigues de Freitas Junior
+  <alcjunio@localhost.localdomain>
+  Date : 2015-10-31 00:56:07 +0000
+
+    Initial Release Included Dist::Zilla configuration and tests 
+
+  Change: 9f4748f339e62f92506274c23402736a06ba4253
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2015-10-31 00:09:37 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

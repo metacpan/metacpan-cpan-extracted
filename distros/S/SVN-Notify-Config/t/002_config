@@ -1,0 +1,15 @@
+#!/usr/bin/perl -w
+# We have to go through this roundabout method because
+# SVN::Notify::Config->import() won't run with -I on the
+# command line and because it calls exit at the end
+BEGIN {
+    unshift @INC, "blib/lib", "blib/arch", "t/lib";
+}
+
+my ($repos_path, $rev) = (shift, shift);
+
+require SVN::Notify::Config;
+push @ARGV, $repos_path, $rev;
+SVN::Notify::Config->import(
+	"t/testconfig"
+);

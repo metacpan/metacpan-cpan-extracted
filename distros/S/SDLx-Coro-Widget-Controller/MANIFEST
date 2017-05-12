@@ -1,0 +1,7 @@
+Changes
+lib/SDLx/Coro/Widget/Controller.pm
+Makefile.PL
+MANIFEST
+README
+t/SDLx-Coro-Widget-Controller.t
+META.yml                                 Module meta-data (added by MakeMaker)

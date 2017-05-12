@@ -1,0 +1,47 @@
+#! /usr/bin/perl
+
+# $Id: clrnext,v 1.5 1999/01/07 19:21:39 carrigad Exp $
+
+# Copyright (C), 1998, 1999 Enbridge Inc.
+
+# Takes the specified user's card out of Next PIN mode.
+
+use strict;
+use SecurID::ACEdb qw(:all);
+
+my $username = shift;
+
+die "usage: $0 login\n" unless defined $username;
+
+die "ApiInit failed: " . Result()
+  unless ApiInit();
+
+my $serial= ListSerialByLogin($username);
+
+die "ListSerialByLogin failed: " . Result()
+  unless defined $serial;
+
+die "Could not locate token for user $username\n" unless @{$serial};
+
+my $token = $serial->[0];
+
+my $ti = ListTokenInfo($token) 
+  or die "ListTokenInfo failed: " . Result();
+
+die "Cannot clear next PIN mode for user $username because token is administratively disabled.\n"
+  unless $ti->{enabled};
+
+die "Cannot clear next PIN mode for user $username because token is not in next PIN mode.\n"
+  unless $ti->{nextTCodeStatus};
+
+print "Resetting token $token for user $username\n";
+die "ResetToken failed: " . Result()
+  unless ResetToken($token);
+
+$ti = ListTokenInfo($token) 
+  or die "ListTokenInfo failed: " . Result();
+
+Commit();
+ApiEnd();
+
+exit(0);

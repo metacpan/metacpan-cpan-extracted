@@ -1,0 +1,159 @@
+#!/usr/bin/perl
+use Algorithm::Diff (traverse_sequences);
+use Getopt::Std;
+use File::Spec;
+use IO::File;
+use SIL::FS;
+
+@rules = (
+    ['text', 'make_patch_str']
+    );
+
+getopts('m:');
+
+unless (defined $ARGV[1])
+{
+    die <<'EOT';
+zipdiff [-m manifest] basefile newfile
+
+Creates a normal difference that updates basefile to newfile. Notice that
+basefile and newfile may be directories or .zip files. .zip files are treated
+as zipped directories.
+
+ -m manifest  Specifies a manifest file containing a list of files to process
+              file type [-option value [-option value [...]]]
+              types are: MIME types e.g. text/application
+EOT
+}
+
+if ($ARGV[1] =~ m/\.zip$/oi)
+{ $fs2 = SIL::FS::Zip->new($ARGV[1], -manfile => $opt_m); }
+else
+{
+    $fs2 = SIL::FS::File->new($ARGV[1], -manfile => $opt_m);
+    $fs2->remove_list(File::Spec->rel2abs($ARGV[0])) if ($ARGV[0] =~ m/\.zip$/oi);
+}
+
+if ($ARGV[0] =~ m/\.zip$/oi)
+{ $fs1 = SIL::FS::Zip->new($ARGV[0], -manifest => $opt_m ? $fs2->{'manifest'} : undef); }
+else
+{
+    $fs1 = SIL::FS::File->new($ARGV[0], -manifest => $opt_m ? $fs2->{'manifest'} : undef);
+    $fs1->remove_list(File::Spec->rel2abs($ARGV[1])) if ($ARGV[1] =~ m/\.zip$/oi);
+}
+
+
+traverse_sequences($fs1->{'filelist'}, $fs2->{'filelist'},
+    {'MATCH' => sub { make_patch($fs1, $fs2, $fs1->{'filelist'}[$_[0]], $fs2->{'filelist'}[$_[1]]); },
+     'DISCARD_A' => sub { make_patch($fs1, $fs2, $fs1->{'filelist'}[$_[0]], undef); },
+     'DISCARD_B' => sub { make_patch($fs1, $fs2, undef, $fs2->{'filelist'}[$_[1]]); }});
+
+sub make_patch
+{
+    my ($fsa, $fsb, $filea, $fileb) = @_;
+    my ($type, $r, $found, $opts);
+    
+    if ($filea)
+    { ($type, $opts) = @{$fsa->{'manifest'}{$filea}}; }
+    elsif ($fileb)
+    { ($type, $opts) = @{$fsb->{'manifest'}{$fileb}}; }
+    
+    foreach $r (@rules)
+    {
+        if ($type =~ /$r->[0]/)
+        {
+            &{$r->[1]}(@_, %{$opts});
+            $found = 1;
+            last;
+        }
+    }
+    make_patch_str(@_) unless $found;
+}
+
+sub make_patch_str
+{
+    my ($fsa, $fsb, $filea, $fileb, %opts) = @_;
+    my (@lista, @listb);
+    my ($off) = 0;
+    
+    if ($filea)
+    {
+        @lista = $fsa->get_lines($filea);
+        $head = $filea;
+    }
+    
+    if ($fileb)
+    {
+        if (!$opts{-pure} && !$fsb->exists($fileb))
+        {
+            print "\nDELETE---: $fileb\n";
+            return if ($opts{-nodelete});
+        }
+        @listb = $fsb->get_lines($fileb);
+        $head = $fileb;
+    }
+    
+	my @d = Algorithm::Diff::diff(\@lista, \@listb);
+	
+	if (@d)
+	{
+	    print "\n--- $head\n";
+    	print join '',map {diff_hunk("\n", \$off, @$_)} @d;
+    }
+}
+
+sub diff_hunk 
+{
+	my $sep = shift;
+	my $r_line_offset = shift;
+	
+	my @ins;
+	my ($ins_firstline,$ins_lastline) = (0,0);
+	my @del;
+	my ($del_firstline,$del_lastline) = (0,0);
+	my $op;
+
+	for (@_) {
+		my ($typ,$lno,$txt) = @$_;
+		$lno++;
+		if ($typ eq '+') {
+			push @ins,$txt;
+			$ins_firstline ||= $lno;
+			$ins_lastline = $lno;
+		} else {
+			push @del,$txt;
+			$del_firstline ||= $lno;
+			$del_lastline = $lno;
+		}
+	}
+	
+	if (!@del) {
+		$op = 'a';
+		$del_firstline = $ins_firstline - $$r_line_offset - 1;
+	} elsif (!@ins) {
+		$op = 'd';
+		$ins_firstline = $del_firstline + $$r_line_offset - 1;
+	} else {
+		$op = 'c';
+	}
+	
+	$$r_line_offset += @ins - @del;
+	
+	$ins_lastline ||= $ins_firstline;
+	$del_lastline ||= $del_firstline;
+	
+	my $outstr = "$del_firstline,$del_lastline$op$ins_firstline,$ins_lastline\n";
+	$outstr =~ s/(^|\D)(\d+),\2(?=\D|$)/$1$2/g;
+	for (@del) {
+		$outstr .= '< ' . $_ . $sep;
+	}
+	
+	$outstr .= "---\n" if @ins && @del;
+	
+	for (@ins) {
+		$outstr .= '> ' . $_ . $sep;
+	}
+
+	$outstr;
+}
+

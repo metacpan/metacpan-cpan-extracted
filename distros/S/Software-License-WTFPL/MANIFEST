@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Software/License/WTFPL_2.pm
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+t/v2.t

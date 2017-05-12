@@ -1,0 +1,15 @@
+Changes
+Collate.pm
+Collate.pod
+Collate/Japanese.pod
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/class.t
+t/func.t
+t/index.t
+t/nonkanji.t
+t/test.t
+sample/daihyo.txt
+sample/yomi.txt

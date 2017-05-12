@@ -1,0 +1,31 @@
+---
+abstract: 'Search and Retrieval by URL'
+author:
+  - 'Ed Summers <ehs@pobox.com>'
+  - 'Brian Cassidy <bricas@cpan.org>'
+  - 'Jakob Voß <voss@gbv.de>'
+build_requires:
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: SRU
+requires:
+  CQL::Parser: 1.12
+  Carp: 0
+  Class::Accessor: 0
+  URI: 0
+  XML::LibXML: 0
+  XML::Simple: 0
+  perl: v5.10.1
+resources:
+  bugtracker: https://github.com/bricas/sru-perl/issues
+  homepage: https://github.com/bricas/sru-perl
+  repository: https://github.com/bricas/sru-perl.git
+version: 1.01

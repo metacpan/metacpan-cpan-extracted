@@ -1,0 +1,36 @@
+Here are some answers to questions I frequently get asked about StatsView
+
+Q1.  What packages do I need to use it?
+
+A.   Perl 5.005_03
+     Gnuplot 3.7
+     Perl Tk version 800.014
+     Perl Tk::GBARR version 1.0401
+
+Q2.  I have this vmstat/mpstat/iostat file I captured earlier, but StatsView
+     doesn't seem to recognise it.  How do I view it with StatsView?
+
+A.   These data files have no timestamp information in them, so StatsView
+     doesn't know the interval between samples, or indeed when the sampling
+     started.  It's therefore necessary to add a simple header to the data file
+     before viewing it with StatsView.  This line should be the first line in
+     the file, and should be in the format:
+
+        Start: DD/MM/YYYY hh:mm:ss Interval: sss
+
+     where "Start" is the time that the sampling started, and "Interval" is the
+     time between samples in seconds.
+
+Q3.  I have a binary sar file I captured on system X, but I can't view it on
+     system Y.  Why?
+
+A.   This has nothing to do with StatsView per se.  The format of binary sar
+     files is both architecture and OS release dependent.  StatsView just uses
+     "sar -A -f" to convert the binary file to ASCII before processing it.  If
+     the file was captured on a machine with a different architecture, or with
+     a different OS reease it probably won't work.  As a workaround you can
+     transfer the binary file to a compatible machine, run
+     "sar -A -f sar.dat > sar.txt", transfer the text file to the machine with
+     StatsView on and pass the text file to StatsView.  A better solution is
+     not to capture binary sar files in the first place - they are both
+     non-portable and significantly bigger than the text versions.

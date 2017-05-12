@@ -1,0 +1,65 @@
+---
+abstract: 'a superdaemon for hot-deploying server programs'
+author:
+  - 'Kazuho Oku'
+build_requires:
+  IO::Socket::IP: '0'
+  Net::EmptyPort: '0'
+  Test::Requires: '0'
+  Test::SharedFork: '0'
+  Test::TCP: '2.08'
+configure_requires:
+  Module::Build: '0.4005'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.6, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Server-Starter
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Server::Starter:
+    file: lib/Server/Starter.pm
+    version: '0.33'
+  Server::Starter::Guard:
+    file: lib/Server/Starter/Guard.pm
+requires:
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/kazuho/p5-Server-Starter/issues
+  homepage: https://github.com/kazuho/p5-Server-Starter
+  repository: git://github.com/kazuho/p5-Server-Starter.git
+version: '0.33'
+x_contributors:
+  - 'kazuho <kazuho@d0d07461-0603-4401-acd4-de1884942a52>'
+  - 'yappo <yappo@d0d07461-0603-4401-acd4-de1884942a52>'
+  - 'Robert Buels <rmb32@cornell.edu>'
+  - 'chromatic <chromatic@wgz.org>'
+  - 'Chia-liang Kao <clkao@clkao.org>'
+  - 'Masahiro Nagano <kazeburo@gmail.com>'
+  - 'Tomoya Kabe <kabe.tomoya@O-02586-MAC.local>'
+  - 'Haruka Iwao <haruka@fout.jp>'
+  - 'Kazuho Oku <kazuho@natadeco.co>'
+  - 'Karen Etheridge <ether@cpan.org>'
+  - 'Bugdebugger <bugdebugger@users.noreply.github.com>'
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+  - 'Alexandr Ciornii <alexchorny@gmail.com>'
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
+  - 'Andy Jones <andy@broadbean.com>'
+  - "Arthur Axel 'fREW' Schmidt <frioux@gmail.com>"
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+  - 'Slaven Rezic <slaven.rezic@idealo.de>'
+  - 'Mikhail Ivanov <m.ivanych@gmail.com>'
+  - 'Xuanzhong Wei <azrlew@gmail.com>'
+  - 'Kazuho Oku <kazuhooku@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

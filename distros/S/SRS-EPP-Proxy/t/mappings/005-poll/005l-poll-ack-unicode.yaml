@@ -1,0 +1,16 @@
+template: poll-ack.tt
+
+vars:
+  msg_id: 0050DeleteUnusedHandles-2011-02-02 12:25:00-täst-001
+
+input_assertions:
+  class: SRS::EPP::Command::Poll
+  match:
+
+SRS:
+ - assertions:
+     count:
+     attr_is:
+output_assertions:
+  attr_is:
+    - [ '//epp:result', 'code', 2002, 'EPP: response code' ]

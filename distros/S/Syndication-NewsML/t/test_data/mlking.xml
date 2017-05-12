@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE NewsML SYSTEM "./DTD/NewsMLv1.0.dtd">
+<?xml-stylesheet type="text/xsl" href="./stylesheets/IPTCNewsML.xsl"?>
+<NewsML>
+	<Catalog>
+		<!--Start of IPTC vocabularies-->
+		<Resource>
+			<Urn>urn:newsml:iptc.org:20001006:topicset.iptc-confidence:1</Urn>
+			<Url>./topicsets/iptc-confidence.xml</Url>
+			<DefaultVocabularyFor Scheme="IptcConfidence" Context="@Confidence"/>
+		</Resource>
+		<Resource>
+			<Urn>urn:newsml:iptc.org:20001006:topicset.iptc-format:1</Urn>
+			<Url>./topicsets/iptc-format.xml</Url>
+			<DefaultVocabularyFor Scheme="IptcFormat" Context="Format"/>
+		</Resource>
+		<Resource>
+			<Urn>urn:newsml:iptc.org:20001006:topicset.iptc-genre:1</Urn>
+			<Url>./topicsets/iptc-genre.xml</Url>
+			<DefaultVocabularyFor Scheme="IptcGenre" Context="Genre"/>
+		</Resource>
+		<Resource>
+			<Urn>urn:newsml:iptc.org:20001006:topicset.iptc-howpresent:1</Urn>
+			<Url>./topicsets/iptc-howpresent.xml</Url>
+			<DefaultVocabularyFor Scheme="IptcHowPresent" Context="@HowPresent"/>
+		</Resource>
+		<Resource>
+			<Urn>urn:newsml:iptc.org:20001006:topicset.iptc-importance:1</Urn>
+			<Url>./topicsets/iptc-importance.xml</Url>
+			<DefaultVocabularyFor Scheme="IptcImportance" Context="@Importance"/>
+		</Resource>
+		<Resource>
+			<Urn>urn:newsml:iptc.org:20001006:topicset.iptc-labeltype:1</Urn>
+			<Url>./topicsets/iptc-labeltype.xml</Url>
+			<DefaultVocabularyFor Scheme="IptcLabelTypes" Context="LabelType"/>
+		</Resource>
+		<Resource>
+			<Urn>urn:newsml:iptc.org:20001006:topicset.iptc-mediatype:1</Urn>
+			<Url>./topicsets/iptc-mediatype.xml</Url>
+			<DefaultVocabularyFor Scheme="IptcMediaTypes" Context="MediaType"/>
+		</Resource>
+		<Resource>
+			<Urn>urn:newsml:iptc.org:20001006:topicset.iptc-metadatatype:1</Urn>
+			<Url>./topicsets/iptc-metadatatype.xml</Url>
+			<DefaultVocabularyFor Scheme="IptcMetadataTypes" Context="MetadataType"/>
+		</Resource>
+		<Resource>
+			<Urn>urn:newsml:iptc.org:20001006:topicset.iptc-mimetype:1</Urn>
+			<Url>./topicsets/iptc-mimetype.xml</Url>
+			<DefaultVocabularyFor Scheme="IptcMimeTypes" Context="MimeType"/>
+		</Resource>
+		<Resource>
+			<Urn>urn:newsml:iptc.org:20001006:topicset.iptc-newsitemtype:1</Urn>
+			<Url>./topicsets/iptc-newsitemtype.xml</Url>
+			<DefaultVocabularyFor Scheme="IptcNewsItemType" Context="NewsItemType"/>
+		</Resource>
+		<Resource>
+			<Urn>urn:newsml:iptc.org:20001006:topicset.iptc-notation:1</Urn>
+			<Url>./topicsets/iptc-notation.xml</Url>
+			<DefaultVocabularyFor Scheme="IptcNotation" Context="Notation"/>
+			<DefaultVocabularyFor Scheme="IptcNotation" Context="@Notation"/>
+		</Resource>
+		<Resource>
+			<Urn>urn:newsml:iptc.org:20001006:topicset.iptc-ofinterestto:1</Urn>
+			<Url>./topicsets/iptc-ofinterestto.xml</Url>
+			<DefaultVocabularyFor Scheme="IptcOfIterestTo" Context="OfInterestTo"/>
+		</Resource>
+		<Resource>
+			<Urn>urn:newsml:iptc.org:20001006:topicset.iptc-priority:1</Urn>
+			<Url>./topicsets/iptc-priority.xml</Url>
+			<DefaultVocabularyFor Scheme="IptcPriority" Context="Priority"/>
+		</Resource>
+		<Resource>
+			<Urn>urn:newsml:iptc.org:20001006:topicset.iptc-property:1</Urn>
+			<Url>./topicsets/iptc-property.xml</Url>
+			<DefaultVocabularyFor Scheme="IptcProperty" Context="Property"/>
+		</Resource>
+		<Resource>
+			<Urn>urn:newsml:iptc.org:20001006:topicset.iptc-provider:1</Urn>
+			<Url>./topicsets/iptc-provider.xml</Url>
+			<DefaultVocabularyFor Scheme="IptcProvider" Context="Provider"/>
+		</Resource>
+		<Resource>
+			<Urn>urn:newsml:iptc.org:20001006:topicset.iptc-relevance:1</Urn>
+			<Url>./topicsets/iptc-relevance.xml</Url>
+			<DefaultVocabularyFor Scheme="IptcRelevance" Context="Relevance"/>
+		</Resource>
+		<Resource>
+			<Urn>urn:newsml:iptc.org:20001006:topicset.iptc-role:1</Urn>
+			<Url>./topicsets/iptc-role.xml</Url>
+			<DefaultVocabularyFor Scheme="IptcRole" Context="Role"/>
+		</Resource>
+		<Resource>
+			<Urn>urn:newsml:iptc.org:20001006:topicset.iptc-status:1</Urn>
+			<Url>./topicsets/iptc-status.xml</Url>
+			<DefaultVocabularyFor Scheme="IptcStatus" Context="Status"/>
+			<DefaultVocabularyFor Scheme="IptcStatus" Context="FutureStatus"/>
+		</Resource>
+		<Resource>
+			<Urn>urn:newsml:iptc.org:20001006:topicset.iptc-subjectcode:1</Urn>
+			<Url>./topicsets/iptc-subjectcode.xml</Url>
+			<DefaultVocabularyFor Scheme="IptcSubjectCodes" Context="Subject"/>
+			<DefaultVocabularyFor Scheme="IptcSubjectCodes" Context="SubjectMatter"/>
+			<DefaultVocabularyFor Scheme="IptcSubjectCodes" Context="SubjectDetail"/>
+		</Resource>
+		<Resource>
+			<Urn>urn:newsml:iptc.org:20001006:topicset.iptc-subjectqualifier:1</Urn>
+			<Url>./topicsets/iptc-subjectqualifier.xml</Url>
+			<DefaultVocabularyFor Scheme="IptcSubjectQualifiers" Context="SubjectQualifier"/>
+		</Resource>
+		<Resource>
+			<Urn>urn:newsml:iptc.org:20001006:topicset.iptc-topictype:1</Urn>
+			<Url>./topicsets/iptc-topictype.xml</Url>
+			<DefaultVocabularyFor Scheme="IptcTopicType" Context="TopicType"/>
+			<DefaultVocabularyFor Scheme="IptcTopicType" Context="TopicSet"/>
+		</Resource>
+		<Resource>
+			<Urn>urn:newsml:iptc.org:20001006:topicset.iptc-urgency:1</Urn>
+			<Url>./topicsets/iptc-urgency.xml</Url>
+			<DefaultVocabularyFor Scheme="IptcUrgency" Context="Urgency"/>
+		</Resource>
+		<!--End of IPTC vocabularies-->
+		<!--The following non-IPTC vocabularies are provided as useful resources but are not declared in this Catalog as default vocabularies.-->
+		<!--Start of ISO vocabularies-->
+		<Resource>
+			<Urn>urn:newsml:iptc.org:20001006:topicset.iso-country:1</Urn>
+			<Url>./topicsets/iso-country.xml</Url>
+		</Resource>
+		<Resource>
+			<Urn>urn:newsml:iptc.org:20001006:topicset.iso-currency:1</Urn>
+			<Url>./topicsets/iso-currency.xml</Url>
+		</Resource>
+		<Resource>
+			<Urn>urn:newsml:iptc.org:20001006:topicset.iso-language:1</Urn>
+			<Url>./topicsets/iso-language.xml</Url>
+		</Resource>
+		<!--End of ISO vocabularies-->
+		<!--Start of NAICS vocabularies-->
+		<Resource>
+			<Urn>urn:newsml:iptc.org:20001006:topicset.naics-classofindustry:1</Urn>
+			<Url>./topicsets/naics-classofindustry.xml</Url>
+		</Resource>
+		<!--End of NAICS vocabularies-->
+		<!--Start of NASDAQ vocabularies-->
+		<Resource>
+			<Urn>urn:newsml:iptc.org:20001006:topicset.nasdaq-company:1</Urn>
+			<Url>./topicsets/nasdaq-company.xml</Url>
+		</Resource>
+		<!--End of NASDAQ vocabularies-->
+	</Catalog>
+	<TopicSet Duid="iptc.status" FormalName="Status">
+		<Comment xml:lang="en">The current usability of a NewsItem.</Comment>
+		<Topic Duid="stat1">
+			<TopicType Scheme="IptcTopicType" FormalName="Status"/>
+			<FormalName Scheme="IptcStatus">Usable</FormalName>
+			<Description xml:lang="en">The NewsItem and its content may be published without restriction.</Description>
+		</Topic>
+		<Topic Duid="stat2">
+			<TopicType Scheme="IptcTopicType" FormalName="Status"/>
+			<FormalName Scheme="IptcStatus">Embargoed</FormalName>
+			<Description xml:lang="en">Neither the NewsItem nor its content may be published until released for publication by the provider.</Description>
+		</Topic>
+		<Topic Duid="stat3">
+			<TopicType Scheme="IptcTopicType" FormalName="Status"/>
+			<FormalName Scheme="IptcStatus">Withheld</FormalName>
+			<Description xml:lang="en">Neither the NewsItem nor its content may be published until further notice.</Description>
+		</Topic>
+		<Topic Duid="stat4">
+			<TopicType Scheme="IptcTopicType" FormalName="Status"/>
+			<FormalName Scheme="IptcStatus">Canceled</FormalName>
+			<Description xml:lang="en">Neither the NewsItem nor its content may be used under any circumstances. If the NewsItemor its content has been published the publisher must take immediate action to withdraw or retract it, as may be legally necessary.</Description>
+		</Topic>
+	</TopicSet>
+	<NewsEnvelope>
+		<DateAndTime>20000717T160000</DateAndTime>
+	</NewsEnvelope>
+	<NewsItem Duid="Crts">
+		<Identification>
+			<NewsIdentifier>
+				<ProviderId>iptc.org</ProviderId>
+				<DateId>20000717</DateId>
+				<NewsItemId>LutherKing</NewsItemId>
+				<RevisionId PreviousRevision="0" Update="N">1</RevisionId>
+				<PublicIdentifier>urn:newsml:iptc.org:20000717:LutherKing:1</PublicIdentifier>
+			</NewsIdentifier>
+		</Identification>
+		<NewsManagement>
+			<NewsItemType FormalName="News" Scheme="IptcNewsItemType"/>
+			<FirstCreated>20000720T100000</FirstCreated>
+			<ThisRevisionCreated>20000720T100000</ThisRevisionCreated>
+			<Status FormalName="Usable" Vocabulary="#iptc.status" Scheme="IptcStatus"/>
+		</NewsManagement>
+		<NewsComponent Duid="Mlkc1">
+			<Catalog>
+				<Resource>
+					<Urn>iptc.subject</Urn>
+					<Url>./topicsets/iptc-subjectcode.xml</Url>
+					<DefaultVocabularyFor Context="SubjectMatter"/>
+				</Resource>
+			</Catalog>
+			<Role FormalName="Main" Scheme="IptcRole"/>
+			<NewsLines>
+				<HeadLine>Civil Rights</HeadLine>
+			</NewsLines>
+			<DescriptiveMetadata>
+				<SubjectCode>
+					<SubjectMatter Scheme="IptcSubjectCodes" FormalName="11007000"/>
+					<SubjectMatter Scheme="IptcSubjectCodes" FormalName="14014000"/>
+					<SubjectMatter Scheme="IptcSubjectCodes" FormalName="12002000"/>
+					<SubjectMatter Scheme="IptcSubjectCodes" FormalName="16003000"/>
+				</SubjectCode>
+			</DescriptiveMetadata>
+			<NewsComponent Duid="Compa">
+				<Role FormalName="Supporting" Scheme="IptcRole"/>
+				<ContentItem Href="../examples/civilrt.xml">
+					<Comment>Intro</Comment>
+					<MimeType FormalName="text/xml" Scheme="IptcMimeTypes"/>
+				</ContentItem>
+			</NewsComponent>
+			<NewsComponent Duid="Compb">
+				<Role FormalName="Supporting" Scheme="IptcRole"/>
+				<ContentItem Href="../examples/mlking.jpg">
+					<Comment>Photo</Comment>
+					<MimeType FormalName="image/jpeg" Scheme="IptcMimeTypes"/>
+				</ContentItem>
+			</NewsComponent>
+			<NewsComponent Duid="Compc" EquivalentsList="yes">
+				<Role FormalName="Supporting" Scheme="IptcRole"/>
+				<BasisForChoice>MediaType</BasisForChoice>
+				<ContentItem Href="../examples/ihada.xml">
+					<Comment>Speech text</Comment>
+					<MediaType FormalName="Text" Scheme="IptcMediaTypes"/>
+					<MimeType FormalName="text/xml" Scheme="IptcMimeTypes"/>
+				</ContentItem>
+				<ContentItem Href="../examples/luther.wav">
+					<Comment>Sound recording</Comment>
+					<MediaType FormalName="Audio" Scheme="IptcMediaTypes"/>
+					<MimeType FormalName="audio/x-wav" Scheme="IptcMimeTypes"/>
+				</ContentItem>
+			</NewsComponent>
+			<NewsComponent Duid="Compd">
+				<Role FormalName="Supplementary" Scheme="IptcRole"/>
+				<NewsItemRef NewsItem="../topicsets/topicset.iptc-genre.xml">
+					<Comment>An example TopicSet</Comment>
+				</NewsItemRef>
+			</NewsComponent>
+		</NewsComponent>
+	</NewsItem>
+</NewsML>

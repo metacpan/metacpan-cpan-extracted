@@ -1,0 +1,84 @@
+#$Id$
+
+		TODO LIST for SMAN
+		Josh Rabinowitz, 2005-2007  <joshr>
+
+
+
+FIXES
+  * Fix bs from CPAN in Sman::Util::CheckSwisheVersion() (see code)
+  * *** Make sure we find /usr/local/bin/swish-e, even if /usr/local/bin isn't in path! (?)
+  * test that %V in sman-defaults.conf's SWISHE_IndexPointer is set right
+  * code cleanup & rewrite
+
+OUTPUT
+  * group identical/related man pages ala 'whatis' 
+  * check commands such as man, col, & gunzip exist before using 
+  * make XML 'most cannonical' 
+
+BUILD AND INSTALL
+  * Write Bundle::Sman 
+    to install or upgrade Swish-e, SWISH::API, and other pre-reqs
+    but only at the user's request
+  * improve install:: routine in Makefile.PL to respect user's choices:
+    like where to install sman and sman-update 
+  * deal with issue of adding /usr/local/lib to /etc/ld.config 
+    or equivalent for  Swish-e's shared libs
+  * suggest (install?)  cronjob to run sman-update
+
+TESTS
+  * build a small index and search on it
+    (stuffing in canned XML, and by converting man pages)
+  * converting one or more very, very common manpages (if found)
+  * fix --testfile option on sman-update
+  * cleanup CheckForSwisheVersion() for PAUSE indexer
+
+RUNTIME
+  * Autoprobe for arcane features of man (ie, will 'man n wm' work on OSX?)
+  * runlock to avoid 2 sman-updates at once
+  * catch possible 'err: Severe index error in header' error from Swish-e
+    (this occurs if the sman index was created by an older version of 
+     Swish-e than is currently installed)
+
+
+DOCUMENTATION 
+  * write an FAQ
+  * write up user's guide to searching: how to search on parts, 
+    query syntax, and what a word is (that mod_perl, Time::HiRes, and 
+    named.conf are all words!)
+  * arrange to have create/installer create complete html, ps, and pdf 
+    docfiles (if possible) on the build system
+  
+SECURITY
+  * allow admin to configure user sman-update runs as:
+    add USER and GROUP directives for sman-update settings
+  * document running as low-priv user more fully
+  * make taint-clean? use Safe.pm?
+  * watch what we pass to the shell more carefully
+
+PARSING AND LANGUAGES
+  * get manpages to wrap lines at 256 chars on OSX
+  * autoprobe for weird man abilities: Q: will this work? 'man n xxx'
+    A: On more modern OS's, yes, but not in Days Of Yore (on some systems) 
+  * why do we get man pages in section '0p' on FC4?
+  * parse non-english, non-multibyte, non-utf8 man pages...
+    such as those in  /usr/share/man/(cs|de|es|rt|ru)/
+  * perhaps make a separate index for each language 
+  * adjust for possible SETENV LANG C type needs for UTF systems
+  * make man page parser better. 
+    * rewrite wacky ASCII manpage parser to something of beauty
+    * get 'man' to wrap lines at more than 80 chars
+    * recognize aliases and manpages containing, i.e.: ".so /file/this"
+  * parse XML::Simple::FAQ correctly on FC1
+  * we need input from groff and manpage experts
+    on what makes sense on particular systems 
+ 
+INDEXING AND SEARCHING
+  * do hiliting for searches like 'Cache::*' correctly
+  * preserve configuration settings (perhaps the whole configuration file used) 
+    in the index, or somewhere for later inspection, perhaps .../[indexname].conf
+  * Consider handling .gz/.bz2 files ourselves,
+    perhaps with 'preprocess' and 'postprocess' steps
+  * make sure tmp sman-swish-conf... files get 
+    deleted if sman-update is interrupted 
+

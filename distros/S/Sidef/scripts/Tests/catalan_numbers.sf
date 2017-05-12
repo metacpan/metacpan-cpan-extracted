@@ -1,0 +1,8 @@
+#!/usr/bin/ruby
+
+func f(i) { i.is_zero ? 1 : (i * f(i-1)) };
+func c(n) { f(2*n) / f(n) / f(n+1) };
+
+for i in (0..15) {
+    say "#{i}\t#{c(i)}";
+}

@@ -1,0 +1,44 @@
+Sun Mar  8 21:23:31 1998  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* release 2.03
+
+Tue Feb 24 22:09:10 1998  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* Simple/BuilderBuilder.pm (new): accept iterator as parent and
+ 	create an iterator for children
+
+Mon Feb  9 20:00:17 1998  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* release 2.02
+
+Sat Feb  7 17:23:19 1998  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* examples/my-html.pl: typo in `use SGML::SPGroveBuilder'
+	(visit_gi_PERL): remove carriage returns from Perl code
+
+Sun Feb  1 16:37:53 1998  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* 2.01 released
+
+Thu Jan 29 21:51:33 1998  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* SGML-Grove.spec (install): install docs, examples, and entities
+	(files): doc directory and entities
+	(files): missing man pages
+	
+Fri Jan 16 17:56:22 1998  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* Simple/BuilderBuilder.pm (new): copy ID as string
+
+Sun Jan  4 17:06:28 1998  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* Grove.pm: rename SPGrove to Grove throughout
+	remove autoloader stub
+
+	* SGML-SPGrove.spec: renamed to SGML-Grove.spec
+
+	* SPGrove.pm: renamed to Grove.pm
+
+	* SPGrove.xs, SPGroveNew.cc: removed
+
+	* Makefile.PL: remove SPGrove stuff

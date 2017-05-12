@@ -1,0 +1,53 @@
+{
+   "abstract" : "function to generate XLSX spreadsheet from array ref(s)",
+   "author" : [
+      "Neil Bowers <neilb@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Spreadsheet-GenerateXLSX",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Excel::Writer::XLSX" : "0",
+            "Exporter" : "0",
+            "Ref::Util" : "0",
+            "parent" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::Needs" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilb/Spreadsheet-GenerateXLSX",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilb/Spreadsheet-GenerateXLSX.git",
+         "web" : "https://github.com/neilb/Spreadsheet-GenerateXLSX"
+      }
+   },
+   "version" : "0.04",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

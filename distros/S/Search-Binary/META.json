@@ -1,0 +1,63 @@
+{
+   "abstract" : "generic binary search (DEPRECATED)",
+   "author" : [
+      "Erik Rantapaa <rantapaa@uswest.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.92, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Search-Binary",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "lib" : "0",
+            "parent" : "0",
+            "perl" : "5.006000",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96",
+            "Test::Warnings" : "0.012"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Dist/Display.html?Name=Search-Binary"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Xaerxess/Search-Binary.git",
+         "web" : "https://github.com/Xaerxess/Search-Binary"
+      }
+   },
+   "version" : "0.99"
+}

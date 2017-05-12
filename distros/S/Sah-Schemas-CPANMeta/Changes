@@ -1,0 +1,16 @@
+0.003   2017-01-08 (PERLANCAR)
+
+	- [compliance] Allow x_* relationship and phases in prereqs.
+
+	- [doc] Mention CPAN::Meta, CPAN::Meta::Validator,
+	  validate-cpan-meta-with-sah, Sah::Schemas::CPAN.
+
+
+0.002   2016-07-22 (PERLANCAR)
+
+        - [build] Rebuild to generate Sah::SchemaR::* modules.
+
+
+0.001   2016-07-22 (PERLANCAR)
+
+        - First release.

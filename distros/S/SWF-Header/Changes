@@ -1,0 +1,17 @@
+Revision history for Perl extension SWF::Header.
+
+0.04 Mon Dec 7 2005
+     * now reads stage background color too, thanks to vlanis@mail.ru
+
+0.03 Mon June 21 2004
+     * test.swf unnacountably missing from v0.02, so tests fail, all woe. fixed.
+
+0.02 Thurs June 3 2004
+     * stream-creation logic tweaked to work better with a 
+       supplied stream
+     * YSAS gives nod to publication
+
+0.01 Thurs
+     * Extracted and simplified from YSAS's SWF::Parser
+     * Given simple OOP interface for one-shot or repeated use
+

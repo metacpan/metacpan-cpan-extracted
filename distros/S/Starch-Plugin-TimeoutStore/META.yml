@@ -1,0 +1,27 @@
+---
+abstract: 'Throw an exception if store access surpass a timeout.'
+author:
+  - 'Aran Deltac <bluefeet@gmail.com>'
+build_requires:
+  Test::Fatal: '0'
+  Test::Simple: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Starch-Plugin-TimeoutStore
+requires:
+  Moo: '2'
+  Starch: '0.06'
+  Sys::SigAction: '0.2'
+  Type::Tiny: '1.000005'
+  namespace::clean: '0.24'
+  strictures: '2'
+resources:
+  bugtracker: https://github.com/bluefeet/Starch-Plugin-TimeoutStore/issues
+  repository: git://github.com/bluefeet/Starch-Plugin-TimeoutStore.git
+version: '0.06'

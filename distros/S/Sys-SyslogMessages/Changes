@@ -1,0 +1,6 @@
+* 2006-17-02
+Version 0.01.
+
+* 2006-21-02
+Add option to tail by an amount of time.  New dependency module 
+'DateTime'.  Also, fixed parsing for *.info.

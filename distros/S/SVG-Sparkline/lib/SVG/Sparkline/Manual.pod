@@ -1,0 +1,562 @@
+=encoding utf8
+
+=head1 NAME
+
+SVG::Sparkline::Manual - Documentation for the SVG::Sparkline module
+
+=head1 VERSION
+
+This document describes SVG::Sparkline version 0.34
+
+=head1 SYNOPSIS
+
+    use SVG::Sparkline;
+
+    my $sl1 = SVG::Sparkline->new( Whisker => { values=>\@values, color=>'#eee', height=>12 } );
+    print $sl1->to_string();
+
+    my $sl2 = SVG::Sparkline->new( Line => { values=>\@values, color=>'blue', height=>12 } );
+    print $sl2->to_string();
+
+    my $sl3 = SVG::Sparkline->new( Area => { values=>\@values, color=>'green', height=>10 } );
+    print $sl3->to_string();
+
+    my $sl4 = SVG::Sparkline->new( Bar => { values=>\@values, color=>'#66f', height=>10 } );
+    print $sl4->to_string();
+  
+    my $sl5 = SVG::Sparkline->new( RangeBar => { values=>\@value_pairs, color=>'#66f', height=>10 } );
+    print $sl5->to_string();
+  
+=head1 DESCRIPTION
+
+In the book I<Beautiful Evidence>, Edward Tufte describes sparklines as
+I<small, high-resolution, graphics embedded in a context of words, numbers, images>. 
+
+This module provides a relatively easy interface for creating different
+kinds of sparklines. This class is not intended to be used to build large,
+complex graphs (there are other modules much more suited to that job). The
+focus here is on the kinds of data well-suited to the sparklines concept.
+
+Although the basics are there, this module is not yet feature complete.
+
+=head1 LIBRARY INTERFACE 
+
+=head2 SVG::Sparkline->new( $type, $args_hr )
+
+Create a new L<SVG::Sparkline> object of the specified type, using the
+parameters in the C<$args_hr> hash reference. There are two groups of
+parameters. Parameters that start with a B<-> character control the
+L<SVG::Sparkline> object. Parameters that do not start with B<-> are used
+in attributes in the sparkline itself.
+
+=head3 Configuration Parameters
+
+Configuration parameters are independent of the type of sparkline being
+generated. The parameters are generally discussed below, but see the section
+L</SPARKLINE TYPES> for a full description of the parameters as they apply to
+each type.
+
+=over 4
+
+=item -allns
+
+The value of this parameter is a boolean that specifies whether to supply
+all potential namespace attributes relating to SVG.
+
+If the value of the parameter is 0 or the parameter is not supplied, only
+the default SVG namespace is included in the sparkline.
+
+If the value of the parameter is 1, a namespace is supplied for the prefix
+I<svg> and the prefix I<xlink>.
+
+=item -sized
+
+The value of this parameter is a boolean that specifies whether the generated
+sparkline should contain C<width> and C<height> attributes on the root element.
+
+A value of 1 causes them to be added, while 0 leaves them off. The default
+value of this parameter is 1. (Although that may change in future versions.
+Add the parameter if you want to be future-proof.)
+
+=item bgcolor
+
+The value of this parameter is an SVG-supported color string which specifies
+a color for the background of the sparkline. In general, this parameter should
+not be supplied or should be very subtle to avoid taking attention away from
+the actual data displayed.
+
+=item padx
+
+The value of this parameter is the number of pixels of padding inside the
+sparkline, but to the left of the first data point and right of the last
+data point. 
+
+=item pady
+
+The value of this parameter is the number of pixels of padding inside the
+sparkline, but above the highest data point and below the lowest data point.
+
+=back
+
+=head3 Attribute Parameters
+
+The attribute parameters passed in C<$args_hr> depend somewhat on the
+C<$type>. However, some are common.
+
+=over 4
+
+=item height
+
+This optional parameter specifies the height of the Sparkline in pixels.
+The data for the sparkline is scaled to fit this height. If not specified,
+the default height is 10 pixels.
+
+=item width
+
+This parameter specifies the width of the Sparkline in pixels. All data is
+scaled to fit this width. The default value of the I<width> parameter depends
+on the sparkline type.
+
+=item values
+
+This parameter specifies the data to be displayed by the sparkline. The actual
+form of this data is determined by the sparkline type.
+
+=item color
+
+This optional parameter specifies the color for the displayed data as an
+SVG supported color string. Each sparkline type uses this color slightly
+differently.
+
+=item mark
+
+There are times when certain points on the sparkline need to be highlighted
+in some way. For instance, you might want to highlight the lowest and highest
+value of a data set. The C<mark> attribute supports this functionality.
+
+The appearance of the mark is mostly determined by the sparkline type. However,
+you may select different colors for each mark.
+
+The value of the C<mark> attribute is a reference to an array of pairs, where
+each pair consists of an index and a color. The index is either an integer
+specifying which point in the C<values> is to be marked or a string that
+describes a particular point. The supported index strings are
+
+=over 4
+
+=item first
+
+This index string represents the first data point. It is synonymous with a
+numeric index of 0.
+
+=item last
+
+This index string represents the last data point. It is equal to one less than
+the number of C<values>.
+
+=item high
+
+This index string repesents the highest value in the data set. If there is more
+than one point with the highest value, the first index with this value is
+selected.
+
+=item low
+
+This index string repesents the lowest value in the data set. If there is more
+than one point with the lowest value, the first index with this value is
+selected.
+
+=back
+
+The following would be examples of marks:
+
+=over 4
+
+=item Single Indexed Mark
+
+   mark => [ 3 => 'blue' ]
+
+=item High and Low Marks
+
+  mark => [ low => 'red', high => 'green' ]
+
+=back
+
+=back
+
+=head1 SPARKLINE TYPES
+
+The supported graph types are: B<Area>, B<Bar>, B<Line>, B<RangeArea>,
+B<RangeBar>, and B<Whisker>. Each type is described below with any
+parameters specific to that type.
+
+=head2 Area
+
+An C<Area> sparkline is a basic line graph shaded between the line and
+the x axis. The supplied I<color> attribute determines the shading. Area
+graphs do particularly well for continuous data. If you would prefer to just
+have the line without filling the area, see the I<Line> type.
+
+=over 4
+
+=item values
+
+The value of this parameter is a reference to an array. This array is either
+an array of numeric values representing the y-values of the data to be plotted,
+or an array of anonymous arrays, each containing an x-value and a y-value.
+
+=item width
+
+This parameter is optional for the I<Area> sparkline type. The value is the width
+of the sparkline in pixels. The default value for this parameter is the number of
+items in the I<values> parameter.
+
+=item color
+
+This optional parameter specifies the color of the filled area between the
+data line and the x-axis as a SVG supported color string. The default value
+for this parameter is I<#000> (black).
+
+=item mark
+
+The mark for an Area is a vertical line of the specified color. The line moves
+from a value of zero up to the value.
+
+=item xscale
+
+This parameter determines the distance between data points. The C<width>
+parameter overrides the C<xscale> parameter. If no C<width> or C<xscale>
+are supplied, the default value is 2.
+
+=back
+
+=head2 Bar
+
+The I<Bar> sparkline type is a simple bar graph. This sparkline type does not
+require any I<x> values. Bar graphs see to be particularly useful for
+non-continuous data.
+
+=over 4
+
+=item values
+
+The I<values> parameter is required for the I<Bar> sparkline type. The
+value must be a reference to an array of numeric values, specifying the
+height of the corresponding bar.
+
+=item thick
+
+This optional parameter specifies the thickness of the individual bars on the
+bar graph. This parameter is ignored if the I<width> parameter is specified.
+If neither I<width> or I<thick> are specified, the default value of I<thick>
+is 3.
+
+=item gap
+
+This optional parameter specifies a gap to appear between individual bars on
+the bar graph. If the I<gap> is not specified, the default value is 0.
+
+=item width
+
+This optional parameter specifies the width of the sparkline in pixels. If
+the I<width> is not specified, the width of the sparkline is the value of
+I<thick> C<+> I<gap> times the number of I<values>.
+
+=item color
+
+This optional parameter specifies the color of the filled area between the
+data line and the x-axis as a SVG supported color string. The default value
+for this parameter is I<#000> (black).
+
+=item mark
+
+The mark for Bar replaces the bar in question with one of the specified color.
+
+=back
+
+=head2 Line
+
+The I<Line> sparkline type is a simple line graph. Both I<x> and I<y> values
+are required for I<Line> sparklines. Area graphs do particularly well for
+continuous data. If you would prefer to have the area under the line filled,
+see the I<Area> type.
+
+=over 4
+
+=item values
+
+The value of this parameter is a reference to an array. This array is either
+an array of numeric values representing the y-values of the data to be plotted,
+or an array of anonymous arrays, each containing an x-value and a y-value.
+
+=item width
+
+This parameter is optional for the I<Area> sparkline type. The value is the width
+of the sparkline in pixels. The default value for this parameter is the number of
+items in the I<values> parameter.
+
+=item thick
+
+This optional parameter specifies the thickness of the data line in pixels.
+If not specified, the default value is 1 pixel.
+
+=item color
+
+This optional parameter specifies the color of the data line as a SVG supported
+color string. The default value for this parameter is I<#000> (black).
+
+=item mark
+
+The mark for Line is a dot of the specified color at the chosen location. The
+radius of the dot is the same as the width of the line, specified by the
+C<thick> parameter.
+
+=item xscale
+
+This parameter determines the distance between data points. The C<width>
+parameter overrides the C<xscale> parameter. If no C<width> or C<xscale>
+are supplied, the default value is 2.
+
+=back
+
+=head2 RangeArea
+
+An C<RangeArea> sparkline type shows high/low continuous values by displaying
+shading the area between two lines of continuous data. The supplied I<color>
+attribute determines the shading. Area graphs do particularly well for
+continuous data.
+
+If you would prefer to just have a single line shaded to the x-axis, see the
+I<Area> type. If you would prefer a single continuous line with no shading see
+the I<Line> type.
+
+=over 4
+
+=item values
+
+The value of this parameter is a reference to an array. This array is either
+an array of numeric values representing the y-values of the data to be plotted,
+or an array of anonymous arrays, each containing an x-value and a y-value.
+
+=item width
+
+This parameter is optional for the I<RangeArea> sparkline type. The value is
+the width of the sparkline in pixels. The default value for this parameter is
+the number of items in the I<values> parameter.
+
+=item color
+
+This optional parameter specifies the color of the filled area between the
+data line and the x-axis as a SVG supported color string. The default value
+for this parameter is I<#000> (black).
+
+=item mark
+
+The mark for a I<RangeArea> is a vertical line of the specified color. The line moves
+from the low value to the high value at the specified position.
+
+There is one difference between the mark index values for I<RangeArea> and for other
+sparkline types. Since there are two values for each index, the I<high> and I<low>
+indexes need further explanation.
+
+The index I<high> chooses the highest of the high values. The index I<low> chooses
+the lowest of the low values.
+
+=item xscale
+
+This parameter determines the distance between data points. The C<width>
+parameter overrides the C<xscale> parameter. If no C<width> or C<xscale>
+are supplied, the default value is 2.
+
+=back
+
+=head2 RangeBar
+
+The I<RangeBar> sparkline type shows high/low pairs of related values that define
+a range at each of the supplied data points. Each data point is displayed as a
+bar (like the bar graph) that ranges from the low value to the high value.
+
+The I<RangeBar> type is very good for displaying two related values of a discrete
+data set. For example, high and low values of some data aggregated each month.
+
+=over 4
+
+=item values
+
+This parameter is slightly more complicated than the other sparkline types. Its value
+is a reference to an array of array references. Each of these internal array references
+contains two numbers: a low value followed by a high value. These numbers are used to
+calculate the height of the bar and its placement veritcally on the sparkline.
+
+=item thick
+
+This optional parameter specifies the thickness of the individual bars on the
+bar graph. This parameter is ignored if the I<width> parameter is specified.
+If neither I<width> or I<thick> are specified, the default value of I<thick>
+is 3.
+
+=item gap
+
+This optional parameter specifies a gap to appear between individual bars on
+the bar graph. If the I<gap> is not specified, the default value is 0.
+
+=item width
+
+This optional parameter specifies the width of the sparkline in pixels. If
+the I<width> is not specified, the width of the sparkline is the value of
+I<thick> C<+> I<gap> times the number of I<values>.
+
+=item color
+
+This optional parameter specifies the color of the filled area between the
+data line and the x-axis as a SVG supported color string. The default value
+for this parameter is I<#000> (black).
+
+=item mark
+
+The mark for RangeBar replaces the bar in question with one of the specified color.
+
+There is one difference between the mark index values for RangeBar and for other
+sparkline types. Since there are two values for each index, the I<high> and I<low>
+indexes need further explanation.
+
+The index I<high> chooses the highest of the high values. The index I<low> chooses
+the lowest of the low values.
+
+=back
+
+=head2 Whisker
+
+The I<Whisker> sparkline type shows a sequence of events that can have one
+of two outcomes (e.g. win/loss). A short line upwards is one of the outcomes
+and a short line downward is the other outcome. There is also a third possible
+where no tick is displayed.
+
+=over 4
+
+=item values
+
+The I<values> parameter is required for the I<Whisker> sparkline type.
+The value can be one of three things:
+
+=over 4
+
+=item string of '+', '-', or '0'
+
+Where '+' means an uptick, '-' is a down tick, and 0 is no tick.
+
+=item string of '1' or '0'.
+
+Where '1' means an uptick, and '0' means a downtick.
+
+=item reference to an array of numbers
+
+Where any positive number is an uptick, any negative number is a downtick,
+and zero is no tick.
+
+=back
+
+=item width
+
+This optional parameter specifies the width of the sparkline in pixels. If
+the I<width> is not specified, the width of the sparkline is the value of
+I<thick> times 3 times the number of I<values>.
+
+=item thick
+
+This optional parameter specifies the thickness of the individual whiskers
+on the whisker chart. The gaps between the whiskers is twice the value of
+I<thick>. This parameter is ignored if the I<width> parameter is specified.
+If neither I<width> or I<thick> are specified, the default value of I<thick>
+is 1.
+
+=item gap
+
+This optional parameter specifies a gap to appear between individual whiskers
+on the whisker chart. If the I<gap> is not specified, the default value is
+twice the I<thick> value for the whiskers.
+
+=item color
+
+This optional parameter specifies the color of the individual whiskers as a
+SVG supported color string. The default value for this parameter is I<#000>
+(black).
+
+=item mark
+
+The mark for Whisker replaces the whisker in question with one of the
+specified color.
+
+=back
+
+=head1 PUBLIC METHODS
+
+The following public methods are provided on the C<SVG::Sparkline> object.
+
+=head2 get_height
+
+Returns in height in pixels of the completed sparkline.
+
+=head2 get_width
+
+Returns in width in pixels of the completed sparkline.
+
+=head2 to_string
+
+Convert the L<SVG::Sparkline> object to an XML string. This is the method that
+is used by the stringification overload.
+
+=head1 PROGRAMS
+
+The library also supplies two programs that simplies the creation of sparklines
+without programming. The command-line tool C<sparkline.pl> is documented in
+the program itself. The documentation is displayed when executing the program
+with the C<--help> parameter.
+
+The CGI script is documented in L<SVG::Sparkline::Manual::CGI>.
+
+=head1 ACKNOWLEDGEMENTS
+
+This module has been greatly improved by suggestions and corrections supplied
+but Robert Boone, Debbie Campbell, and Joshua Keroes.
+
+Thanks to Helder Magalhães for the suggestion to remove the I<height> and
+I<width> attributes from the root I<svg> element. This lead to the definition
+of the I<-sized> parameter.
+
+Thanks to Jeff Schiller for the idea of the sparklines.cgi script. Honestly,
+I would not have thought to provide it (since it's not hard to build).
+
+=head1 AUTHOR
+
+G. Wade Johnson  C<< <gwadej@cpan.org> >>
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2015, G. Wade Johnson C<< <gwadej@cpan.org> >>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl 5.8.0. See L<perlartistic>.
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.

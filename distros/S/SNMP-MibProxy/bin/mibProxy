@@ -1,0 +1,622 @@
+#!/usr/bin/perl
+#
+# $Id: mibProxy,v 1.9 2006/08/16 07:09:39 nito Exp $
+#
+# Simple perl program used to be a pass_persist executable for the snmpd
+# daemon.
+#
+# It uses the snmptranslate command to get the name of the OID that should
+# be fetched from the configuration file.
+#
+#
+# Nito@Qindel.ES
+use strict;
+use warnings;
+
+use Data::Dumper;
+use Pod::Usage;
+use Getopt::Std;
+use Config::Properties::Simple;
+use Config::Properties;
+use Log::Log4perl;
+use SNMP;
+
+# global vars
+local our $logger;
+
+# prototypes
+sub get_command_line_options();
+sub getProperties($);
+sub OIDCompare($$);
+sub returnResponseForOid($$$$);
+sub getNextOid($$);
+
+# Constants
+use constant AUTHOR => 'Nito@Qindel.ES';
+use constant VERSION => '$Id: mibProxy,v 1.9 2006/08/16 07:09:39 nito Exp $ ';
+use constant LOG_TAG => 'mibProxy.Default';
+use constant CONFIGFILE => '/etc/mibProxy/mibProxy.conf';
+use constant PROPERTIESFILE => '/var/lib/logparser/logparser.properties';
+use constant OPERATION_PING => 'PING';
+use constant OPERATION_GET => 'get';
+use constant OPERATION_SET => 'set';
+use constant OPERATION_GETNEXT => 'getnext';
+use constant RESPONSE_PONG => 'PONG';
+use constant RESPONSE_NONE => 'NONE';
+use constant UPDATE_STATS_INTERVAL => 300;
+# main
+my ($cfg, $propertiesFile, $updateInterval) = get_command_line_options();
+$| = 1;
+Log::Log4perl->init($cfg->file_name());
+$logger = Log::Log4perl->get_logger(LOG_TAG);
+$logger->info("$0 has started");
+
+# Load all the MIBS
+$logger->debug("Loading the mibs");
+SNMP::initMib();
+
+# First we need to get the properties file, do the translations
+# of the variables to OIDs and viceversa (this is for the
+# getnext operation).
+my ($properties,$sortedOid_ref)=getProperties($propertiesFile);
+my $lastUpdateTime = time;
+#
+my $operation=undef;
+while (<>) {
+
+  # Check if the properties file should be reloaded
+  if ((time - $lastUpdateTime) > $updateInterval) {
+    ($properties,$sortedOid_ref)=getProperties($propertiesFile);
+    $logger->debug("Updated the propertiesFile $propertiesFile");
+    $lastUpdateTime = time;
+  }
+  chomp;
+  $logger->debug("Received message: $_");
+  if ($_ eq OPERATION_PING) {
+    # PING
+    print RESPONSE_PONG."\n";
+    $logger->debug("Sent message: PONG");
+    $operation=undef;
+  } elsif (/^get$/) {
+    # GET operation
+    $operation=OPERATION_GET;;
+  } elsif (/^getnext$/) {
+    # GETNEXT operation
+    $operation=OPERATION_GETNEXT;
+  } elsif (/^set$/) {
+    # GETNEXT operation
+    # $operation=OPERATION_SET;
+  } elsif (/^((\.\d+)+)$/) {
+    # For sets the value would be for example:
+    # integer 100
+    # OID
+    my $oid = $1;
+    returnResponseForOid($operation,$oid, $properties, $sortedOid_ref);
+    $operation=undef;
+  } else {
+    # ERROR
+    print "NONE\n";
+    $logger->error("Sent message: NONE. Error message for <$_>: Non recognized command");
+    $operation=undef;
+  }
+}
+
+$logger->info("$0 has ended");
+
+# Subroutines
+# get_command_line_options
+# Checks the commandline options and the configuration file
+# to verify to set the configuration file options
+# Input:
+# implicitly the commandline options
+# Output:
+# An array with the following elements:
+# - Configuration object
+# - The properties file where the info is stored
+sub get_command_line_options() {
+  my ($globalsavespace_ref) = @_;
+
+  our ($opt_f, $opt_p, $opt_s, $opt_h, $opt_v, $opt_d, $opt_i);
+  getopts('f:s:i:hv') or pod2usage(2);
+
+  if ($opt_v) {
+    print $0." version ".VERSION." ".AUTHOR."\n";
+    exit 0;
+  }
+
+  if ($opt_h) {
+    pod2usage({'-verbose'=>2, '-exitval'=>0});
+    exit 0;
+  }
+  my $file = defined($opt_f) ? $opt_f : CONFIGFILE;
+  my $cfg = Config::Properties::Simple->new(file => $file);
+  my $propertiesFile = defined($opt_s) ? $opt_s : $cfg->requireProperty('propertiesFile', PROPERTIESFILE);
+  my $updateInterval = defined($opt_i) ? $opt_i : $cfg->requireProperty('updateInterval', UPDATE_STATS_INTERVAL);
+
+  return ($cfg, $propertiesFile, $updateInterval);
+}
+
+
+# getProperties
+# Input:
+# A file where the properties are stored
+# Output:
+# Returns an array with two elements:
+# - The first element is the properties object
+# - The second element is an array of two elements. The first element
+#   is a hash where the keys are all the OIDs that are
+#   provided and the value is an index to a given element of the sorted
+#   array. The second element is a sorted array of all the oids.
+
+sub getProperties($) {
+  my ($file) = @_;
+  open FILE, "$file"
+    or $logger->error_die("Cannot open properties file $file: $!");
+  my $properties = new Config::Properties();
+  $properties->load(*FILE);
+  $logger->info("Loaded property file $file");
+  $logger->debug("The properties are:".Dumper($properties));
+  close(FILE);
+
+  $logger->info("Generating list of OIDs for file $file");
+  my @oids;
+  my %nextOid;
+  my ($name, $oid);
+
+  foreach $name ($properties->propertyNames) {
+    $oid = SNMP::translateObj($name);
+    if (defined($oid)) {
+      push @oids, $oid;
+    } else {
+      $logger->error("No translation for name <$name> was found. Variable will be skipped");
+    }
+  }
+
+  my @sortedOids = sort OIDCompare @oids;
+  $logger->debug("The OIDs handled are: ".Dumper(map {$_ => SNMP::translateObj($_)} @sortedOids)) if ($logger->is_debug());
+  my %referenceOids;
+  for (my $i = 0; $i <= $#sortedOids; ++ $i) {
+    $referenceOids{$sortedOids[$i]} = $i;
+  }
+  return ($properties, [\%referenceOids, \@sortedOids]);
+}
+
+# OIDCompare
+# Compares two OIDs
+# and returns 0, 1 or -1
+sub OIDCompare($$) {
+  my ($firstOid,$secondOid) = @_;
+  my @firstArray = split /\./, $firstOid;
+  my @secondArray = split /\./, $secondOid;
+  # Remove the two first elements (.1.3.1) => The first element becomes "".
+  shift @firstArray;
+  shift @secondArray;
+
+  my ($return, $firstElement, $secondElement);
+  foreach $firstElement (@firstArray) {
+    # Lexigraphic the same prefix but firstArray has more elements
+    return 1 if ($#secondArray < 0);
+
+    $secondElement = shift @secondArray;
+    return -1 if ($firstElement < $secondElement);
+    return 1 if ($firstElement > $secondElement);
+    # Same prefix continue with the next element
+  }
+  # Lexigraphic the same prefix but secondArray has more elements
+  return -1 if ($#secondArray >= 0);
+
+  # They are the same...
+  return 0;
+}
+
+# getNextOid
+#
+# We try to match an OID in the hash, if not we need to do a linear
+# scan...
+#
+# Input:
+# - A reference to the sorted OID hash and array
+# - A OID
+# Output:
+# - String with the next oid higher than the one passed. If not undef is returned
+sub getNextOid($$) {
+  my ($sortedOids_ref, $oid) = @_;
+  my ($sortedOidsHash_ref, $sortedOidsArray_ref) = @$sortedOids_ref;
+  my $startIndex = 0;
+  if (exists($$sortedOidsHash_ref{$oid})) {
+    $startIndex = $$sortedOidsHash_ref{$oid};
+  }
+  for (my $i = $startIndex; $i <= $#$sortedOidsArray_ref; $i ++) {
+    $_ = $$sortedOidsArray_ref[$i];
+    #    $logger->debug("cmp $oid, :".OIDCompare($oid,$_));
+    return $_ if (OIDCompare($oid, $_) < 0);
+  }
+  return undef;
+}
+# returnResponseForOid
+# Input:
+# - The operation
+# - The Numeric OID
+# - The properties file where the values are stored
+# - An oid ordered array
+# Output:
+# If the oid is found then it returns the triple
+# OID,Type,Value (separated by newlines)
+# If some error condition appears then NONE is returned.
+sub returnResponseForOid($$$$) {
+  my ($operation, $oid, $properties, $sortedOID_ref) = @_;
+  my $requestOid = $oid;
+  my ($name, $value, $type, $nextOid);
+
+  # Check for a valid operation
+  if (defined($operation) && $operation eq OPERATION_GET) {
+    $name=SNMP::translateObj($oid);
+  } elsif (defined($operation) && $operation eq OPERATION_GETNEXT) {
+    # We don't mind if it exists and is undef ;-)
+    $nextOid = getNextOid($sortedOID_ref, $oid);
+    if (!defined($nextOid)) {
+      print RESPONSE_NONE."\n";
+      $logger->debug("Sent message: NONE. End of MIB for OID $oid");
+      return;
+    }
+    $oid=$nextOid;
+    $name=SNMP::translateObj($oid);
+  } else {
+    print RESPONSE_NONE."\n";
+    $logger->error("Sent message: NONE. Internal error. Unknown operation:".Dumper($operation));
+    return;
+  }
+
+  # Check if we can translate the OID to a MIB name
+  if (!defined($name)) {
+    print RESPONSE_NONE."\n";
+    $logger->error("Sent message: NONE. The MIB Translation for OID $oid is not found. Operation: $operation");
+    return;
+  }
+
+  #Check for type
+  $type = SNMP::getType($oid);
+  if (!defined($type)) {
+    print RESPONSE_NONE."\n";
+    $logger->error("Sent message: NONE. Unknown type for OID $oid");
+    return;
+  }
+  # The default IPaddress type is returned as IPADDR instead of ipaddress
+  $type = 'ipaddress' if ($type =~ /^IPADDR/i);
+  # Check if we have a value for the MIB name
+  $value = $properties->getProperty($name, undef);;
+  if (!defined($value)) {
+    print RESPONSE_NONE."\n";
+    $logger->error("Sent message: NONE. The Property doesn't exist for OID $oid->$name. Operation: $operation");
+    return;
+  }
+
+  #hack
+  $type = 'string' if ($type eq 'OCTETSTR');
+
+  print "$oid\n$type\n$value\n";
+  $logger->debug("Sent message: $oid,$type,$value");
+}
+
+1;
+__END__
+
+=head1 NAME
+
+B<mibProxy>
+
+=head1
+
+B<mibProxy> [-f configtFile] [-p propertiesFile] [-i updateInterval]
+
+Uses the protocol specified in the option B<pass_persist> in B<snmpd.conf>
+
+B<mibProxy> -h
+
+Shows the help man page
+
+B<mibProxy> -v
+
+shows the version
+
+=head1 DESCRIPTION
+
+The mibProxy is a utility script used as a pass_persist entry for the
+snmp daemon of NETSNMP.
+
+The main operation is the following:
+
+1) It receives a query of the form via stdin (see pass_persist in
+snmpd.conf). Alternatively it can also receive a "PING" which is
+answered by a "PONG". Any unknown request will be answered by a "NONE"
+
+get
+
+.1.3.6.1.4
+
+2) It then tries to translate with the command "snmptranslate" the OID
+into string format. That is from ".1.3.6.1.4" to "private"
+
+3) It then tries to find the property "private" in the properties
+specified. Assume that the following line exists in the config file
+
+private=4
+
+4) It then returns the following via stdout
+The main configuration comes from the configuration file (see the B<-f>
+switch in the B<OPTIONS> seciont).
+
+.1.3.6.1.4
+
+integer
+
+4
+
+
+=head1 OPTIONS
+
+All the command line options override the options in the configuration file.
+
+=head2 COMMAND LINE OPTIONS
+
+=over 8
+
+=item B<-f configuration file>
+
+Indicates the configuration file.
+There is no corresponding configuration file option.
+The default value is ".logParser", "../etc/logParser.conf",
+"../conf/logParser.conf", "/etc/logParser.conf"
+
+See B<Config::Find> for the exact rules.
+
+=item B<-p propertiesFile>
+
+Indicates in which file the properties of the values are stored for retrieval.
+
+The corresponding configuration option is "propertiesFile"
+
+=item B<-i updateInterval>
+
+Indicates with which frequency (in seconds) should the propertiesFile be reloaded.
+This only happens if a request is received. That is if no requests were received
+for the last 10 minutes and the updateInterval is 30 seconds then the file
+will be uploaded before the next request.
+
+The corresponding configuration option is "updateInterval"
+
+=item B<-h>
+
+Shows this help page
+
+=item B<-v>
+
+Shows the version of the script.
+
+=back
+
+=head2 CONFIG FILE OPTIONS
+
+The configuration tag used is "mibProxy::Default"
+
+=over 8
+
+=item B<log4perl>
+
+This option specifies the log4perl settings for logs.
+See the B<Log::Log4perl> documentation.
+
+=back
+
+=head1 REQUIREMENTS and LIMITATIONS
+
+Currently not known...
+
+=head1 EXAMPLE
+
+This is a simple example to implement a MIB of one counter and table with two entries.
+
+The steps are:
+
+=over 8
+
+=item # Create the MIB
+
+=item # Put the MIB in a place where SNMP can find it
+
+=item # Copy the script to the target machine
+
+=item # Edit snmpd.conf and add a MIB file
+
+=item # Add the statistic file
+
+=item # Test it
+
+=back
+
+=head2 Create the MIB
+
+the example MIB that we will use is a subset of the qindel-antivirus MIB:
+
+ QINDEL-ANTIVIRUS DEFINITIONS ::= BEGIN
+	IMPORTS
+                OBJECT-TYPE
+                        FROM RFC-1212
+                TRAP-TYPE
+                        FROM RFC-1215
+                DisplayString
+                        FROM RFC1213-MIB
+                TimeTicks, Counter, Gauge
+                        FROM RFC1155-SMI
+		qindel, project, antispam
+			FROM QINDEL;
+	antivirus	OBJECT IDENTIFIER ::= { antispam 3 }
+ 
+ infectedMessages OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	    "The number of messages infected"
+    ::= { antivirus 1 }
+ 
+ virusFoundTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF virusFoundEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+            "A list of virus found.  The number of
+            entries is given by the value of differentVirusFound."
+    ::= { antivirus 4 }
+ 
+ virusFoundEntry OBJECT-TYPE
+    SYNTAX  VirusFoundEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+            "An virus entry containing the number of times
+	    that a particular virus has been found."
+    INDEX   { virusFoundIndex }
+    ::= { virusFoundTable 1 }
+ 
+ AntispamMethodFrequencyEntry ::=
+    SEQUENCE {
+        virusFoundIndex   INTEGER,
+        virusFoundDescr   DisplayString,
+        virusFoundCounter Counter
+    }
+ 
+ virusFoundIndex  OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "A unique value for each method.  Its value
+            ranges between 1 and the value of 
+            differentVirusFound. "
+    ::= { virusFoundEntry 1 }
+ 
+ virusFoundDescr  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "A textual string containing information about the
+            virus, as it appears in the MailScanner log."
+    ::= { virusFoundEntry 2 }
+ 
+ virusFoundCounter  OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "The total number of messages which have
+             been identified cointaining the virus
+             specified."
+    ::= { virusFoundEntry 3 }
+ 
+ END
+
+
+=head2 Put the MIB in a place where SNMP can find it
+
+This is usually /usr/share/snmp/mibs/ but it will depend on where your NET-SNMP is installed
+
+=head2 Copy the script to the target machine
+
+If you copy the script to /usr/local/bin/mibProxy be aware that the likely place to store
+the configuration file mibProxy.conf is /usr/local/etc/mibProxy
+
+The configuration file could be something like:
+
+ log4perl.logger.mibProxy.Default= DEBUG, A1
+ #log4perl.appender.A1=Log::Log4perl::Appender::File
+ log4perl.appender.A1=Log::Dispatch::FileRotate
+ log4perl.appender.A1.filename=/usr/local/cricket2/var/log/mibProxy.log
+ log4perl.appender.A1.DatePattern=yyyy-MM-dd-HH
+ log4perl.appender.A1.mode=append
+ log4perl.appender.A1.layout=Log::Log4perl::Layout::PatternLayout
+ log4perl.appender.A1.layout.ConversionPattern=%d [%c] %m %n
+ 
+ # propertiesFile
+ # Indicates which file should be used to save %savespace hash
+ # By default it is /var/lib/logparser/logParser.store
+ # propertiesFile=/var/lib/logparser/logparser.properties
+ propertiesFile=/var/lib/logparser/logparser.properties
+
+=head2 Edit snmpd.conf and add a MIB file
+
+Add the following line to snmpd.conf:
+
+pass_persist .1.3.6.1.4.1.17171 /usr/local/bin/mibProxy
+
+=head2 Add the statistic file
+
+In the /var/lib/logparser/logparser.properties file add the following:
+
+ infectedMessages=37
+ virusFoundIndex.1=1
+ virusFoundDescr.1="My simple test"
+ virusFoundCounter.1=38
+ virusFoundIndex.2=2
+ virusFoundDescr.2="My simple test2"
+ virusFoundCounter.2=39
+
+
+=head2 Test it
+
+Restart your SNMP agent and run an snmpwalk against it and see what happens...
+
+=head1 INSTALLATION
+
+B<Required Perl packages>
+
+The perl packages installed for this script are:
+
+=over 8
+
+=item * File-Temp-0.14
+
+=item * File-HomeDir-0.05
+
+=item * File-Which-0.05
+
+=item * Config-Properties-Simple-0.09
+
+=item * SNMP (from NET-SNMP)
+
+=back
+
+=head1 BUGS
+
+=head1 TODO
+
+=over 8
+
+=item * At the moment it only supports integers
+
+=back
+
+=head1 SEE ALSO
+
+
+=over 8
+
+=item B<snmpd.conf(5)> man page for snmpd,
+
+=back
+
+=head1 AUTHOR
+
+Nito Martinez <Nito at Qindel dot ES>
+
+5/5/2005
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2007 by Qindel Formacion y Servicios SL, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

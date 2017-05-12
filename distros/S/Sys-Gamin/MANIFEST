@@ -1,0 +1,12 @@
+CHANGES
+Gamin.xs
+lib/Sys/Gamin.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml			Module meta-data (added by MakeMaker)
+monitor
+README
+t/gamin.t
+TODO
+typemap

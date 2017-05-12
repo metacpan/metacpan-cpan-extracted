@@ -1,0 +1,11 @@
+Changes
+LICENSE
+README
+MANIFEST
+META.yml
+Makefile.PL
+lib/SVG/GD.pm
+examples/svg_gd_simple_1.pl
+t/01-all.t
+t/99_test_pod_coverage.t
+t/98_all_pod.t

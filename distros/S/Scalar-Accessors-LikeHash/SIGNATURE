@@ -1,0 +1,46 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 33317486c4fa2cf7fec85bf92ed38ac0f64233a0 CONTRIBUTING
+SHA1 4c1ca2f35eb0fe90d5dfb2592294d70af60092c8 COPYRIGHT
+SHA1 6bd7b17d81be63d08d4efa6cb80106e72887842c CREDITS
+SHA1 f47417d5ad217f6a4dfc53288771bb9bd530f6f2 Changes
+SHA1 56b42a97ed8057ebbfaecfaa5ce3e2d72f31622b INSTALL
+SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
+SHA1 4a8d0b9fdbb710f84e54cb0fc04aeb1603b72252 MANIFEST
+SHA1 3ed6cf90afe522ec10b3c018fdfe1e0c473fb9ea META.json
+SHA1 6b32514f4e5220332fdee479d57415d4827486a7 META.yml
+SHA1 f36cc1f7ce2793e24be92cf852e002c586406a1b Makefile.PL
+SHA1 7e83d6b4129fa02c4439a74dba996c969c19c0a9 README
+SHA1 02e80d00583315d540fd46d760b8d278eeb0305c dist.ini
+SHA1 448654eacb2c655a88a595770991bf8430018cca doap.ttl
+SHA1 20b7c8f4501e04daddd36be8ab426b8aa3437694 lib/Acme/MooseX/JSON.pm
+SHA1 d1df25995756195caa8ead6904bd1d743302501d lib/Scalar/Accessors/LikeHash.pm
+SHA1 2dd0d22994558e0e5a4345edc9d4a1f1e7bf09e6 lib/Scalar/Accessors/LikeHash/JSON.pm
+SHA1 63249e15a248b8be65057a400d7ad0ccc90a7241 lib/Scalar/Accessors/LikeHash/Sereal.pm
+SHA1 c100563f47ccfe12d01d160b7803e2a1b7d2c6ca lib/Tie/Hash/SerializedString.pm
+SHA1 eb8594276dac9284790c418ced998bc86b8ef5bd t/01json.t
+SHA1 6d02a6397a4d36993a90a1fa751a6473c9dd964a t/02sereal.t
+SHA1 a726b9575c54d467e274dfe53e95b7a1ecbee96a t/03moosex.t
+SHA1 1300b3d5723f2eaaeabb631aa719baac2dd143bd t/04tie.t
+SHA1 f4632c678291f7ebd5e2ebd8ccc7f996b1dfeb8a t/Accessors.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlQQ184ACgkQzr+BKGoqfTlutQCfffp+2X8JgX1jKa9ywuQKG8/a
+4PIAn24HfiPrBX7rfe3yWvFjm+mDsUuP
+=OGIA
+-----END PGP SIGNATURE-----

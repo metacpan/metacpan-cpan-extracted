@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Stash/Manip.pm
+t/000-load.t
+t/001-basic.t
+t/002-extension.t
+t/003-io.t
+t/004-get.t
+t/005-isa.t
+t/010-synopsis.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

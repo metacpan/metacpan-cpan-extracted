@@ -1,0 +1,11 @@
+Revision history for Sys-Group-GIDhelper
+
+0.0.2	2009-09-02/11:30
+		-Properly set the minimum instead of always using the default.
+
+0.0.1	2008-12-09/10:00
+		-Fix User being used in the place of Group in some places.
+
+0.0.0   2008-09-30/0:00
+        First version, released on an unsuspecting world.
+

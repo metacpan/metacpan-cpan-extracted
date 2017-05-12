@@ -1,0 +1,24 @@
+# Test adding the clientHold status (turn on delegate)
+template: update-domain.tt
+
+vars:
+  domain: cheese.co.te
+  status_list: 
+    - name: clientHold
+      value: Payment overdue.
+
+input_assertions:
+  class: SRS::EPP::Command::Update::Domain
+
+SRS:
+  - assertions:
+     attr_is:
+        - [ '//DomainUpdate', 'Delegate', 0, 'SRS: Delegate flag turned on' ]
+
+output_assertions:
+  count:
+    - [ '//epp:result', 1, 'SRS: Check for one result' ]
+  match:
+  match_all:
+  attr_is:
+    - [ '//epp:result', 'code', 1000, 'SRS: Check for correct result code' ]

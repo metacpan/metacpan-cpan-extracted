@@ -1,0 +1,10 @@
+Revision history for Perl extension SVN::SVNLook.
+
+0.01  Wed Sep 15 10:48:31 2004
+	- original version; created by h2xs 1.23 with options
+		-A -X SVN::SVNLook
+0.02	Wed	Apr	27 14:30:00 2005
+	- Updating code to reflact changes made my Kevin Semande
+
+0.03	Thursday Dec 29 09:15:00 2005
+	- Added Transaction support via named params

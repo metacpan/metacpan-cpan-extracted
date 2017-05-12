@@ -1,0 +1,44 @@
+Release history for SMS::Send::KR::CoolSMS
+
+1.003       2014-11-21 18:50:34 Asia/Seoul
+    - fix send_sms bug: fix typo
+
+1.002       2014-11-18 11:43:55 Asia/Seoul
+    - update document
+
+1.001       2014-11-17 22:47:40 Asia/Seoul
+    - support CoolSMS REST API 1.1
+    - add API: balance()
+
+1.000       2014-10-06 16:23:40 Asia/Seoul
+    - use REST API rather than old API
+    - support LMS
+
+0.008       2013-03-08 20:20:19 Asia/Seoul
+    - support overriding `_from` when sending SMS
+
+0.007       2013-03-06 16:03:01 Asia/Seoul
+    - force die when object creation is failed
+
+0.006       2013-03-05 18:00:05 Asia/Seoul
+    - force remove IO::Socket::SSL module dependency
+      to prevent dist zilla setting it automatically
+
+0.005       2013-03-05 17:32:08 Asia/Seoul
+    - fix mis-packaging
+
+0.004       2013-03-05 16:20:00 Asia/Seoul
+    - remove IO::Socket::SSL module dependency
+      and loads it when user really want to use ssl
+
+0.003       2013-02-26 16:04:49 Asia/Seoul
+    - fix user not found bug due to omitting password
+
+0.002       2013-02-26 11:26:09 Asia/Seoul
+    - support reserve sms using epoch
+    - adjust country code and destination number to support international sms
+    - support password encryption using md5
+    - support to change coolsms api server URL as parameter
+
+0.001       2013-02-23 03:13:26 Asia/Seoul
+    - implement sending sms type

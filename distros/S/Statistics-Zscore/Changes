@@ -1,0 +1,8 @@
+Revision history for Perl extension Statistics::Zscore
+
+0.00002  2008/08/16
+     - bug fix ( decimal option of combine method )
+     - correct a mistake of POD
+
+0.00001  2008/08/15
+     - change the name space ( from 'Zscore' to 'Statistics::Zscore' ) 

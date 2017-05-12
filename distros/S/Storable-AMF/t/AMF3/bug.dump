@@ -1,0 +1,70 @@
+$VAR1 = bless( {
+                 'messageId' => '721B768A-F30A-D1B4-C702-34A100084C4A',
+                 'headers' => {},
+                 'clientId' => 'CAD7DCFA-C4F3-11DF-B72C-CE083AC7A529',
+                 'correlationId' => 'CAD7DF20-C4F3-11DF-9DD3-BD0C6764C0B1',
+                 'destination' => undef,
+                 'timeToLive' => '0',
+                 'body' => bless( {
+                                    'externalizedData' => [
+                                                  bless( {
+                                                           'review' => 'Kritik: “Alice im Wunderland” ist ein Genuss an Farben, Ideen, Phantasie und Animationskunst. Tim Burton hat die Geschichten von Lewis Carroll, "Alice im Wunderland" und "Alice hinter den Spiegeln", zu seiner eigenen Geschichte verwoben. Aber die eigentliche Story ist ja auch schon wie für ihn gemacht. In Unterland (Alice hatte sich vor 13 Jahren wohl verhört und versehentlich ein Wunderland daraus gemacht) ist nach der Machtergreifung der Roten Königin Tristesse eingekehrt. Die phantastische Umgebung von „Charlie und die Schokoladenfabrik“ wurde wunderbar mit der dunkel-gruseligen Landschaft von „Sleepy Hollow“ gepaart und daraus eine neue, skuriele „Unterwelt“ geschaffen. Sämtliche Rollen hat Burton prominent besetzt, etwa mit "Little Britain"-Darsteller Matt Lucas als die Zwillinge Diedeldum und Diedeldei oder Anne Hathaway und Helena Bonham Carter als Weiße und Rote Königin und natürlich, hervorragend wie immer, dem verrückten Hutmacher Johnny Depp. Ein echter Burton-Film! [eq]',
+                                                           'movieId' => '9208205928594604496',
+                                                           'ratingAsInt' => 12,
+                                                           'rating' => 'ab 12',
+                                                           'publishedUntil' => '1287691140000',
+                                                           'countries' => bless( {
+                                                                                   'externalizedData' => [
+                                                                                                 'USA'
+                                                                                               ]
+                                                                                 }, 'flex.messaging.io.ArrayCollection' ),
+                                                           'actors' => bless( {
+                                                                                'externalizedData' => []
+                                                                              }, 'flex.messaging.io.ArrayCollection' ),
+                                                           'rentalPeriod' => 24,
+                                                           'imdbId' => 'http://www.imdb.de/title/tt1014759/',
+                                                           'serialtitle' => '',
+                                                           'language' => 'deutsch',
+                                                           'directors' => bless( {
+                                                                                   'externalizedData' => []
+                                                                                 }, 'flex.messaging.io.ArrayCollection' ),
+                                                           'hd' => 1,
+                                                           'episodenumber' => '',
+                                                           'duration' => 108,
+                                                           'categories' => bless( {
+                                                                                    'externalizedData' => [
+                                                                                                  'Filme/Alle Filme A-Z/A-C',
+                                                                                                  'High Definition (HD)/HD-Highlights',
+                                                                                                  'High Definition (HD)/HD-Filme/Alle HD-Filme A-Z/A-C',
+                                                                                                  'High Definition (HD)/HD-Filme/Familie',
+                                                                                                  'High Definition (HD)/HD-Filme/Weitere Genres/Fantasy',
+                                                                                                  'Filme/Highlights',
+                                                                                                  'Filme/High Definition (HD)',
+                                                                                                  'Filme/Familie/Highlights',
+                                                                                                  'Filme/Familie/High Definition (HD)',
+                                                                                                  'Filme/Familie/Alle Familienfilme A-Z/A-C',
+                                                                                                  'Filme/Weitere Genres/Fantasy/Highlights',
+                                                                                                  'Filme/Weitere Genres/Fantasy/High Definition (HD)',
+                                                                                                  'Filme/Weitere Genres/Fantasy/Alle Fantasyfilme A-Z/A-C',
+                                                                                                  'Top 20 der Woche'
+                                                                                                ]
+                                                                                  }, 'flex.messaging.io.ArrayCollection' ),
+                                                           'description' => 'Abgelenkt durch ein weißes Kaninchen verlässt Alice ihre überraschende Verlobung mit dem langweiligen Hamish und fällt durch ein Loch – wieder einmal direkt ins Wunderland Unterland. Doch sie erinnert sich nicht mehr, dass sie schon mal hier war. Das erschwert ihren Auftrag immens, soll sie doch diesmal diese phantastische Welt vor der grausamen Herrschaft der Roten Königin retten.',
+                                                           'genre' => 'Fantasy',
+                                                           'shortDescription' => 'Alice kehrt nach 13 Jahren zurück in ihr Wunderland, um es vor der Roten Königin zu retten.',
+                                                           'rentPrice' => bless( {
+                                                                                   'unit' => '€',
+                                                                                   'euros' => '2',
+                                                                                   'prefix' => 'ab',
+                                                                                   'cents' => '99'
+                                                                                 }, 'net.tonline.webepg.flex.data.MoviePriceFx' ),
+                                                           'title' => 'Alice im Wunderland',
+                                                           'posterUrl' => 'http://dlart.t-online.de/WUCATHosting01/images/disney/9221438342940505011x4901x920x057d271ex7066/634176502998154478_200x287_ti_alice_im_wunder.jpg',
+                                                           'type' => 'Kinofilm',
+                                                           'urcId' => '9208205928594604496',
+                                                           'year' => '2010'
+                                                         }, 'net.tonline.webepg.flex.data.MovieFx' )
+                                                ]
+                                  }, 'flex.messaging.io.ArrayCollection' ),
+                 'timestamp' => '1285013720483'
+               }, 'flex.messaging.messages.AcknowledgeMessage' );

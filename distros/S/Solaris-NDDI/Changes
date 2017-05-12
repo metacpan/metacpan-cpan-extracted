@@ -1,0 +1,6 @@
+Revision history for Perl extension Solaris::NDDI.
+
+0.01  Wed Oct 10 14:59:14 2001
+	- original version; created by h2xs 1.21 with options
+		-nSolaris::NDDI -v0.01 -f
+

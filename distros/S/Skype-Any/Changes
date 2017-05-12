@@ -1,0 +1,27 @@
+Revision history for Perl extension Skype::Any
+
+0.06 2013-12-03T10:16:34Z
+
+    - fix dependency module (again)
+    - fix indexing
+
+0.05 2013-11-29T22:31:58Z
+
+    - fix dependency module
+
+0.04 2013-11-27T12:01:59Z
+
+    - fix dependency module
+    - add Skype::Any::Declare
+    - some refactoring and improved documentation
+
+0.03
+    - docs
+    - remove cache feature
+    - remove blocking reply flag
+
+0.02
+    - minor bug fixes
+
+0.01
+    - original version

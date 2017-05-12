@@ -1,0 +1,12 @@
+Revision history for Set-Intersection
+
+0.01    2009-03-16
+        First version.
+
+0.02    2009-03-17
+        changed exporting style to avoid compilation error by old Exporter.
+        modified POD (trivial).
+
+0.03/0.04    2015-03-02
+        RT#101984: Improve documentation; add descriptions for tests (jkeenan)
+

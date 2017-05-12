@@ -1,0 +1,117 @@
+#!/usr/bin/perl -w
+
+use 5.010;
+use strict;
+use SRS::EPP::Proxy;
+
+my $daemon = SRS::EPP::Proxy->new_with_options();
+
+my ($command) = @{$daemon->extra_argv};
+defined $command || die "No command specified";
+
+$daemon->start   if $command eq 'start';
+$daemon->status  if $command eq 'status';
+$daemon->restart if $command eq 'restart';
+$daemon->stop    if $command eq 'stop';
+
+warn($daemon->status_message)
+	if $daemon->status_message;
+exit($daemon->exit_code//0);
+
+=head1 NAME
+
+srs-epp-proxy - start and stop an SRS EPP Proxy instance
+
+=head1 SYNOPSIS
+
+ srs-epp-proxy [options] { start | status | restart | stop }
+
+=head1 DESCRIPTION
+
+This program starts an instance of the SRS EPP Proxy.  See
+L<SRS::EPP::Proxy> for an introduction to what that is.
+
+This is a L<MooseX::Daemonize>'d program, using L<MooseX::Getopt>.
+Additionally, L<MooseX::SimpleConfig> is used which allows for
+configuration of the proxy via a F<.yml> file (other options are
+available).
+
+=head1 CONFIGURATION OPTIONS
+
+These may be specified on the command-line using the gnu-style
+convention for simple options;
+
+  srs-epp-proxy --listen srsrps-fe \
+      --backend http://srsrps-fe.srs.net.nz/srs/summary
+
+For options that take a list, the option may be specified multiple
+times.
+
+=over
+
+=item B<ssl_key_file>
+
+=item B<ssl_cert_file>
+
+=item B<ssl_cert_dir>
+
+=item B<ssl_crl_file>
+
+The EPP protocol specifically requires use of SSL, so you need to
+specify these options.
+
+=item B<listen>
+
+Specify a listen address, may be specified multiple times.  The
+default is to listen on all local interfaces via IPv4, or IPv6 if
+available.
+
+=item B<gpg_dir>
+
+Specify where the GPG-like keyring and secure keyring files can be
+found.  This is equivalent to setting the GNUPGHOME environment
+variable.
+
+=item B<backend>
+
+Specify the back-end URL of the SRS system.
+
+=item B<pidfile>
+
+Actually all of the options listed on L<MooseX::Daemonize> are
+supported, but I just thought I'd point this one out.  Specifies where
+the PID file goes, and will default to F</var/run/srs-epp-proxy.pid>
+=item B<foreground>
+
+Another option inherited from L<MooseX::Daemonize>; this option will
+stop the program from daemonizing.
+
+=item B<logging>
+
+This option can customize the L<Log::Log4perl> system.  This system is
+used for its support for flexible, per-component log levels.
+
+You can specify a log level such as FATAL, ERROR, WARN, INFO, DEBUG,
+or TRACE, the proxy will only log messages that high or higher.  The
+default is INFO.
+
+If you specified C<--foreground>, then all logging will be set to go
+to standard error.  Otherwise, it will end up in the C<daemon> syslog
+category.
+
+If you specify a filename here, it will be used as the Log::Log4perl
+configuration file.  If you are configuring via the F<.yml> file, you
+can pass in the detailed configuration directly; eg
+
+  logging:
+     rootLogger: ERROR, LOGFILE
+     appender.LOGFILE: Log::Log4perl::Appender::File
+     appender.LOGFILE.filename: /var/log/myerrs.log
+     appender.LOGFILE.mode: append
+     appender.LOGFILE.layout: PatternLayout
+     appender.LOGFILE.layout.ConversionPattern: "[%r] %F %L %c - %m%n"
+
+=back
+
+=cut
+

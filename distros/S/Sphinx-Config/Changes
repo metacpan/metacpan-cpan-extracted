@@ -1,0 +1,33 @@
+Revision history for Sphinx-Config
+
+0.01    2007-09-13
+        First release
+
+0.02	2009-08-03
+	Added array support for case of multiple identical keys (rt.cpan.org #48358)
+	Added preserve_inheritance().
+
+0.03	2009-08-03
+	Added documentation related to previous changes.
+
+0.04	2009-08-04
+	Added delete capability to set().
+
+0.05	2009-08-04
+	Fixed problem with block deletion.
+
+0.06    2010-12-08
+        [rt.cpan.org #63549] Round-trip safe.  Incorporated patch contributed by Philip Gwyn.
+
+0.07	2010-12-09   
+	Added missing test files to distribution
+
+0.08	2010-12-11
+	Minor fixes.
+
+0.09    2011-03-23
+        Fixed issue where configs not created from file would fail on save.
+
+0.10    2015-03-26
+        Added support for new 'common' block
+

@@ -1,0 +1,17 @@
+Makefile
+Makefile.old
+*.tar.gz
+pm_to_blib
+blib/
+.releaserc
+Sniffer-HTTP-*
+*.bak
+pm_to_blib.ts
+*.old
+*.bak
+*.tar.gz
+*.tar
+.lwpcookies
+.releaserc
+blibdirs.ts
+MYMETA.*

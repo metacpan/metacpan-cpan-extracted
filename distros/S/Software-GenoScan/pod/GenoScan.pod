@@ -1,0 +1,267 @@
+=head1 NAME
+
+Software::GenoScan - Software for pre-miRNA discovery in genomic sequences
+
+=head1 SYNOPSIS
+
+  use Software::GenoScan qw(runGenoScan);
+
+=head1 DESCRIPTION
+
+=head2 BACKGROUND
+
+This module is the implementation of GenoScan, a computational method for prediction of
+pre-miRNAs in genomic DNA. MicroRNAs (miRNAs) are small non-protein-coding RNAs that act
+as post-transciprional regulators of gene expression. They are initially transcribed from
+intergenic or intronic DNA as primary miRNAs with a characteristic hairpin secondary
+structure, which are processed into shorter precursor miRNAs (pre-miRNAs). The precursors
+are exported to the cytoplasm and cleaved to liberate the mature miRNA, which is incorporated
+into the RNA-induced silencing complex (RISC). The RISC molecule then binds to specific
+target mRNAs by complementary base-pairing between the mature miRNA and the 3' UTR of the
+mRNA. This either prevents mRNA translation to protein or mediates mRNA degradation.
+
+=head2 OUTLINE
+
+GenoScan takes genomic DNA as input, and optional sequence annotation used for filtering.
+Sequences that pass the filters are segmentized into 200 nt windows with 20 nt overlaps 
+and folded with RNAfold. Hairpins are then extracted from the folded sequences based on a 
+a number of sequence and structure criteria. Finally, the extracted hairpins are classified
+as miRNAs or non-miRNAs using a logistic regression model trained on human datasets. See
+the publication for a detailed description of the algorithm and its evaluation. The
+publication reference can be found in L</"SEE ALSO">.
+
+=head2 ARGUMENTS
+
+Following installation, GenoScan can be run from the terminal using the genoscan.pl script
+supplied in the t/ folder. The command should be in this form
+
+C<perl genoscan.pl [Options]>
+
+GenoScan can be run in four different modes. Depending on the mode, different command line
+arguments must be given. The next section gives general options that apply to several or all
+modes, while the following sections give options specific to each mode.
+
+=head3 GENERAL OPTIONS
+
+=over 4
+
+=item C<-m value>
+
+Specifies the GenoScan running mode. Possible values are C<genome>, C<classify>, C<benchmark>
+and C<retrain>. The default mode is C<genome>, which is used to scan a whole genome or part
+thereof for pre-miRNAs. GenoScan can also be used to classify a set of hairpins as miRNAs
+or non-miRNAs, without first extracting hairpins from a genome. This is done in C<classify>
+mode. To facilitate comparison with other methods, the C<benchmark> mode enables leave-one-out
+cross valdiation on datasets containing positive, negative and genomic hairpins. This generates
+a table with performance measures similar to those in the publication. Finally, the C<retrain>
+mode is used to retrain the regression model on custom datasets.
+
+=item C<-t value>
+
+The probability threshold used for hairpin classification. When the regression model evaluates
+the hairpins, it calculates a probability that the hairpin is a miRNA. By setting a threshold
+for this probablity, it is possible to adjust the stringency of classification. The value should
+be between 0 and 1 (default: 0.5). Only hairpins with a probability greater or equal to the threshold
+will qualify as miRNA candidates by GenoScan. According to the evaluation in the publication,
+performance peaks around probability treshold 0.5-0.6. Higher stringency will give higher specificity,
+but lower sensitivity.
+
+=item C<-r value>
+
+A file containing regression model coefficients to use instead of the default ones. The value should
+be the file name including path. The format of the file is as follows:
+
+	(Intercept) 10.5280777518279
+	stem_len    0.0500355477383941
+	loop_size   0.320050551436161
+	mfe_nor     -6.61410292089138
+	prop_gap    -17.1624469004961
+	prop_bulge  4.80460097209541
+	prop_wobble -3.18891064122477
+	gc_content  -8.89487058546057
+	PPP         -4.61085343984701
+	UUU         -9.76065756139253
+	UUP         -26.0725578749436
+	PPU         -27.0092130076774
+	PUP         -11.7589439172359
+	UPP         23.1858571677642
+
+The coefficient name appears at the beginning of each row, followed by a tab and the value.
+
+=item C<-o value>
+
+The output directory to which the results of GenoScan will be written. This option is mandatory.
+
+=item C<-s value>
+
+Species abbreviation, which determines the parameters used for extraction and classification.
+The initial version of GenoScan has only been trained on human, so the only possible value
+is C<hsa>. Training on multiple species is planned as a future development.
+
+=item C<-l value>
+
+In addition to filter predictions by probability, GenoScan also supports filtering by low sequence
+complexity. A sequence with low complexity has long streches of the same nucleotide, or repeats
+of a nucleotide segment. For this to work, low-complexity regions need to be masked by lower case
+letters. Two possibilities are to downloaded masked genomic sequences from NCBI RefSeq database, or
+mask custom sequences with RepeatMasker. To filter GenoScan predictions by low complexity, a value
+between 0 and 1 should be specified to the C<-l> option, indicating the percentage of nucleotides
+that are allowed to be masked. Only sequences with a percentage less than or equal to this value
+will pass (1 mean 100 %). The default is 1, which allows the entire hairpin sequence to be masked.
+
+=item C<-v>
+
+This option specifies if GenoScan should be verbose, i.e. continuously report on its progress during
+a run.
+
+=item C<-h>
+
+This option causes argument documentation to be printed to the terminal.
+
+=back
+
+=head3 GENOME MODE ONLY
+
+=over 4
+
+=item C<-d value>
+
+Directory where genomic sequences in FASTA format are located, in which to search for miRNAs. The value
+should be the path to the folder, including the folder name.
+
+=item C<-e value>
+
+Directory where genomic annotation files in GBS format are located. This argument is optional and will
+tell GenoScan to ignore annotated regions (except miRNAs) when searching for miRNAs.
+
+=item C<-i value>
+
+Name of a file containing regions to include when searching for miRNAs. Regions outside of those
+specified will not be searched. The format of the file should be as follows:
+
+	chr1:1000000-2000000
+	chr3:1500000-1700000
+	chr9:500000-1500000
+
+=item C<-f value>
+
+A file containing hairpin extraction parameters to use instead of the default ones. The value should
+be the file name including path. The format of the file is as follows:
+
+	SEQ_LEN_MIN    = 40
+	CG_COMP_MIN    = 0.2
+	CG_COMP_MAX    = 0.8
+	TR_SIG_MAX     = 5
+	STEM_LEN_MIN   = 20
+	LOOP_LEN_MAX   = 20
+	STEM_BP_PR_MIN = 0.5
+	UP_STR_NOR_MAX = 0.35
+	UP_LEN_NOR_MAX = 0.35
+
+=item C<-j value>
+
+Indicates that GenoScan should start processing at a given step. The value should be between 2 and 5
+and allows the run to start working on existing data, rather than starting from the beginning. The
+steps of genoscan include (1) read annotation filters, (2) seqmentize and fold input sequences,
+(3) extract hairpins, (4) classify harirpins and (5) write miRNA candidates to output file.
+
+=back
+
+=head3 CLASSIFY MODE ONLY
+
+=over 4
+
+=item C<-c value>
+
+File in FASTA format containing hairpins to classify as miRNAs or non-miRNAs. The C<classify> mode
+allows hairpins to be classified directly, without first extracting them from genomic sequences.
+
+=back
+
+=head3 BENCHMARK AND RETRAIN MODE ONLY
+
+=over 4
+
+=item C<-p value>
+
+File containing the positive dataset, which consists of known miRNAs in FASTA format.
+
+=item C<-n value>
+
+File containing the negative dataset, which consists of pseudo-hairpins in FASTA format.
+
+=item C<-g value>
+
+File containing the genomic dataset, which consists of extracted genomic hairpins in FASTA format.
+This dataset is only used during benchmarking.
+
+=item C<-a value>
+
+Custum path to R script used for benchmarking or retraining. The scripts are part of the GenoScan distribution
+and are located in the scripts/ directory. If GenoScan is run from the t/ directory, the C<-a> option need not
+be set.
+
+=back
+
+=head2 OUTPUT
+
+The output generated by GenoScan depends on the mode specified. For C<genome> and C<classify>,
+GenoScan generates two final output files (in step 5): a list of pre-miRNA candidates in FASTA format
+and a log file with a summary of the run. The header of each miRNA candiadate starts with the hairpin ID,
+followed by species abbreviation and the loci in the genome where the hairpin is located. The hairpins
+appearing in this file are the final list of candidates that pass the probability threshold and
+low-complexity filtering.
+
+In C<benchmark> mode, the list of candidates is replaced by a table indicating the performance of the
+regression model for different values of the probability threshold. The performance measures included
+are sensitivity (SN, ratio of positive hairpins classified as miRNAs), specificity (SP, ratio of negative
+hairpins classified as non-miRNAs), Matthews correlation coefficient (MCC), false discovery rate (FDR,
+ratio of miRNA predictions that are negative hairpins) and genome prediction rate (GPR, fraction of hairpins
+in a genome classified as miRNAs). Output from this mode is written to the benchmark folder instead of step_5.
+
+For C<retrain> mode, a new regression model file is created, containing the coefficients of the model fit
+to the training datasets. This model can be used to classify hairpins by supplying the file to the C<-r> option.
+Output from this mode is written to the retrain folder instead of step_5.
+
+=head2 EXAMPLE
+
+To test GenoScan following installation, navigate to the t/ folder and type
+
+C<perl genoscan.pl -v -d fake_genome -o output>
+
+This will run GenoScan in genome mode on a fake genome sequence, composed of random sequences concatenated with
+sequences from the positive and negative datasets. The result files are written to the output folder and
+organized into five sub-folders. The first folder (step_1) contains inclusion and exclusion filters, based on
+the sequence annotation supplied (if any). The second folder contains sequence windows derived from the genomic
+sequence. These are located in the chunk folder and are organized into chunks, with 50 000 windows per file (maximum).
+The windows are folded with RNAfold and the folds are placed in the folded directory. In step 3, hairpins are extracted
+from the folded windows and written to step_3 in the output folder. Extracted hairpins are then refolded, visualized
+in ASCII format and annotated based on their secondary structure. The annotated hairpins are used by the logistic
+regression model to classify the hairpins, and the result from the model is written to the log_reg_model_report file
+in the step_4 folder. Finally, hairpins that pass the probability and low-complexity thresholds qualify as miRNA
+candidates and are written to the miRNA_candidates.fasta file in step_5. In addition, a summary of the Genoscan run is
+written to the genoscan_log file.
+
+=head1 SEE ALSO
+
+Ulfenborg B, Klinga-Levan K, Olsson B (2014) GenoScan: Genomic Scanner for Putative miRNA Precursors.
+Bioinformatics Research and Applications, LNBI 8492, pp. 266-277.
+
+The publication can be found by this link:
+L<http://link.springer.com/chapter/10.1007%2F978-3-319-08171-7_24>
+
+=head1 EXPORT
+
+None by default. The runGenoScan subroutine is exported on request.
+
+=head1 AUTHOR
+
+Benjamin Ulfenborg, E<lt>wolftower85@gmail.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2014 by Benjamin Ulfenborg
+
+This module is free to use, modify and redistribute at will.
+
+=cut

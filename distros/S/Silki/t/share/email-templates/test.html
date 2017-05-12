@@ -1,0 +1,13 @@
+<p>
+Some random content goes here.
+</p>
+
+% if ($uri) {
+<p>
+The user can pass a <a href="<% $uri | h %>">uri</a>.
+</p>
+% }
+
+<%args>
+$uri => undef
+</%args>

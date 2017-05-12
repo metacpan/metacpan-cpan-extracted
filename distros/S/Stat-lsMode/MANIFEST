@@ -1,0 +1,5 @@
+README
+MANIFEST
+lsMode.pm
+Makefile.PL
+t/t.t

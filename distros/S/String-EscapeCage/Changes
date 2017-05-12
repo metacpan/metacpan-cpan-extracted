@@ -1,0 +1,11 @@
+Revision history for Perl module String::EscapeCage
+
+0.01 Mon Jun 25 15:04:59 2007
+    - original version; created by ExtUtils::ModuleMaker 0.47
+    - a proof of concept
+
+0.02 Sun Jul 15 21:27:27 2007
+    - added a couple tests, especially for the "re" method.
+    - various comments/POD
+    - clean up of depedencies (Thanks to Jim Keenan)
+    - corrected RT link

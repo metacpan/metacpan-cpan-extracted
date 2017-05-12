@@ -1,0 +1,16 @@
+# Simple::Trie
+
+Simple::Trie is a simple implementation of the Trie tree algorithm outlined on Wikipedia. It is in no way something that has ever been tested or even suitable for a production environment. This was created mainly for my own personal satisfaction. Do with it what you please.
+
+
+    $t = Simple::Trie->new(words => [ qw(foo bar food) ] );
+
+    if (  $t->find('foo') ) {
+        say "We found foo!";
+    }
+
+    if ( my @results = $t->smart_find(fo) ) {
+        for my $word ( @results ) {
+            say $word;
+        }
+    }

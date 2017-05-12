@@ -1,0 +1,30 @@
+---
+abstract: "a perl client for Supervisord's XMLRPC."
+author:
+  - 'Samuel Kaufman <samuel.c.kaufman@gmail.com>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Supervisord-Client
+requires:
+  Carp: '0'
+  Config::INI::Reader: '0'
+  LWP::Protocol::http::SocketUnixAlt: '0.0204'
+  Moo::Lax: '0'
+  RPC::XML::Client: '0'
+  Safe::Isa: '0'
+  URI: '0'
+resources:
+  bugtracker: https://github.com/ediblenergy/Supervisord-Client/issues
+  repository: https://github.com/ediblenergy/Supervisord-Client.git
+version: '0.22'

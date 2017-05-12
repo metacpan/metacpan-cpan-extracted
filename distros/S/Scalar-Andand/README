@@ -1,0 +1,48 @@
+Scalar-Andand
+
+Scalar::andand lets us write:
+
+ $phone = Location->find(:first, name => 'Johnson' )->andand->phone
+
+And get a guarded method invocation or safe navigation method. This snippet performs a ->find on the Location class, then sends .phone to the result if the result is defined. If the result is not defined, then the expression returns false without throwing an exception. 
+
+This module contains more magic than what is responsible, don't be surprised by weird bugs. I've warned you!
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Scalar::Andand
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Scalar-Andand
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Scalar-Andand
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Scalar-Andand
+
+    Search CPAN
+        http://search.cpan.org/dist/Scalar-Andand
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Leon Timmermans
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

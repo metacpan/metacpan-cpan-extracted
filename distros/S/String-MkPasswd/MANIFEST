@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+bin/mkpasswd.pl
+dist.ini
+lib/String/MkPasswd.pm
+t/01use.t
+t/02length.t
+t/03count.t
+t/04fatal.t
+t/05ambiguous.t

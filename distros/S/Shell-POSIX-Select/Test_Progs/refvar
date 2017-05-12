@@ -1,0 +1,9 @@
+#! /usr/bin/perl -w
+
+use Shell::POSIX::Select ;
+
+$var = '$loopvar';
+
+select $$var (1,2) { print "$$var\n"; last; }
+
+print "After loop, loopvar contains: $$var\n";

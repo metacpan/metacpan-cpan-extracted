@@ -1,0 +1,78 @@
+<div id="form-and-preview">
+  <div id="form">
+
+    <div id="toolbar" style="display: none">
+      <ul>
+        <li>
+          <a href="#" id="h2-button" title="<% loc('Insert a second level heading') %>"><img src="/images/icons/text_heading_2.png" height="16" width="16" /></a>
+        </li>
+        <li>
+          <a href="#" id="h3-button" title="<% loc('Insert a third level heading') %>"><img src="/images/icons/text_heading_3.png" height="16" width="16" /></a>
+        </li>
+        <li>
+          <a href="#" id="italic-button" title="<% loc('Make text italic') %>"><img src="/images/icons/text_italic.png" height="16" width="16" /></a>
+        </li>
+        <li>
+          <a href="#" id="bold-button" title="<% loc('Make text bold') %>"><img src="/images/icons/text_bold.png" height="16" width="16" /></a>
+        </li>
+        <li>
+          <a href="#" id="bullet-list-button" title="<% loc('Insert a bullet list') %>"><img src="/images/icons/text_list_bullets.png" height="16" width="16" /></a>
+        </li>
+        <li>
+          <a href="#" id="number-list-button" title="<% loc('Insert a numbered list') %>"><img src="/images/icons/text_list_numbers.png" height="16" width="16" /></a>
+        </li>
+        <li>
+          <a href="#" id="wiki-link-button" title="<% loc('Insert a link to a wiki page') %>"><img src="/images/icons/link.png" height="16" width="16" /></a>
+        </li>
+        <li>
+          <a href="#" id="web-link--button" title="<% loc('Insert a link to a web page') %>"><img src="/images/icons/world_link.png" height="16" width="16" /></a>
+        </li>
+        <li>
+          <a href="#" id="image-button" title="<% loc('Insert an image') %>"><img src="/images/icons/picture.png" height="16" width="16" /></a>
+        </li>
+        <li>
+          <a href="#" id="attachment-button" title="<% loc('Insert a link to an attachment') %>"><img src="/images/icons/attach.png" height="16" width="16" /></a>
+        </li>
+      </ul>
+    </div>
+
+   <&| /lib/filter/form.mas, objects => [ $page ? $page : () ] &>
+    <form id="edit-form" class="flush-left" action="<% $action %>" method="post">
+% if ($page) {
+      <input type="hidden" name="x-tunneled-method" value="PUT" />
+% } else {
+      <input type="hidden" name="title" value="<% $title %>" />
+% }
+
+      <textarea id="page-content" name="content"><% $page ? $page->content() : q{} %></textarea>
+
+% if ( $c->user()->has_permission_in_wiki( wiki => $wiki, permission => Silki::Schema::Permission->Manage() ) ) {
+      <div class="form-item">
+        <label class="for-checkbox" for="skip_spam_check"><% loc('Skip spam check') %></label>
+        <input class="checkbox" type="checkbox" name="skip_spam_check" id="skip_spam_check" value="1" />
+      </div>
+% }
+
+      <input class="submit" type="submit" value="<% loc('Submit') %>" />
+    </form>
+    </&>
+  </div>
+
+  <h3>Preview</h3>
+
+  <div id="preview">
+    <% $preview | n %>
+  </div>
+
+</div>
+
+<%args>
+$page => undef
+$title => undef
+$preview
+$wiki
+</%args>
+
+<%init>
+my $action = $page ? $page->uri() : $wiki->uri( view => 'pages' );
+</%init>

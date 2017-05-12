@@ -1,0 +1,4 @@
+[% list.name %] is a moderated list - your message "[% mail.subject %]" is awaiting approval
+
+
+

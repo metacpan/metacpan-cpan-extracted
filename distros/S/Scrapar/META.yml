@@ -1,0 +1,45 @@
+---
+author:
+  - 'Yung-chung Lin <henearkrxern@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: Perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Scrapar
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  DBI: 0
+  Date::Format: 0
+  Email::Find: 0
+  Exporter::Lite: 0
+  File::Find::Rule: 0.30
+  Getopt::Std: 0
+  HTML::Query: 0
+  HTML::SimpleLinkExtor: 0
+  HTML::TableExtract: 0
+  HTML::TreeBuilder: 0
+  List::MoreUtils: 0
+  List::Util: 1.21
+  List::Util::PP: 1.21
+  Locale::Country: 0
+  Log::Handler: 0
+  Regexp::Common: 0
+  Scalar::Util::PP: 1.21
+  Sys::MemInfo: 0
+  Text::Table: 0
+  UNIVERSAL::require: 0.13
+  URI::Escape: 0
+  WWW::Mechanize::Cached: 0
+  XML::RSS: 0
+  XML::XPath: 0
+  XML::XPath::XMLParser: 0
+version: 0.0.1

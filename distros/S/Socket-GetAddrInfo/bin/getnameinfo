@@ -1,0 +1,131 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Socket::GetAddrInfo qw(
+   getaddrinfo getnameinfo
+   AI_NUMERICHOST AI_NUMERICSERV
+   NI_DGRAM
+);
+
+sub usage
+{
+   my ( $exitcode ) = @_;
+
+   my $basename = $0;
+   $basename =~ m{/([^/]+?)$} and $basename = $1;
+
+   print STDERR <<"EOF";
+Performs a getnameinfo(3) lookup and prints the returned names
+
+Usage:
+  $basename [ADDRESS] [PORT] [options...]
+
+Options:
+
+  --address, -A ADDRESS Address to look up
+  --port, -P PORT       Port number to look up
+
+  --dgram               Set the NI_DGRAM flag; looks up a SOCK_DGRAM (udp)
+                        rather than SOCK_STREAM (tcp) port
+
+  --help                Display this help and exit
+
+EOF
+
+   exit $exitcode;
+}
+
+my $addr;
+my $port;
+my $flags = 0;
+
+GetOptions(
+   'address|A=s' => \$addr,
+   'port|P=i'    => \$port,
+
+   'dgram' => sub { $flags |= NI_DGRAM },
+
+   'help|h' => sub { usage( 0 ) },
+) or usage( 1 );
+
+$addr = shift @ARGV if @ARGV and !defined $addr;
+$port = shift @ARGV if @ARGV and !defined $port;
+
+defined $addr or defined $port or
+   usage( 1 );
+
+# Need this in an address form first; we'll have to getaddrinfo() it
+my ( $err, $sockaddr ) = getaddrinfo( $addr, $port, { flags => AI_NUMERICHOST|AI_NUMERICSERV } );
+
+die "Unrecognised address or port format - $err\n" if $err;
+
+( $err, my $host, my $service ) = getnameinfo( $sockaddr->{addr}, $flags );
+
+die "Unable to resolve address - $err\n" if $err;
+
+if( defined $addr and defined $port ) {
+   print "Resolved address '$addr', port '$port'\n";
+   print "\n";
+   print "  $host $service\n";
+}
+elsif( defined $addr ) {
+   print "Resolved address '$addr'\n";
+   print "\n";
+   print "  $host\n";
+}
+elsif( defined $port ) {
+   print "Resolved port '$port'\n";
+   print "\n";
+   print "  $service\n";
+}
+
+__END__
+
+=head1 NAME
+
+C<getnameinfo> - command-line tool to C<getnameinfo(3)> resolver
+
+=head1 SYNOPSIS
+
+B<getnameinfo> [I<options...>] I<address> I<port>
+
+=head1 DESCRIPTION
+
+This tool provides a convenient command-line wrapper around the
+C<getnameinfo(3)> resolver function. It will perform a single reverse lookup
+to convert an address and port number into its host and service names. This is
+mainly useful when debugging names resolution problems, because it allows
+inspection of the C<getnameinfo(3)> behaviour itself, outside of any real
+program that is trying to use it.
+
+=head1 OPTIONS
+
+=over 8
+
+=item --address, -A ADDR
+
+Numerical form of address to look up. If not supplied, will use the first
+positional argument.
+
+=item --port, -P PORT
+
+Port number to look up. If not supplied, will use the second positional
+argument.
+
+=item --dgram 
+
+Sets the C<NI_DGRAM> flag; looks up a C<SOCK_DGRAM> (udp) port allocation
+rather than C<SOCK_STREAM> (tcp).
+
+=item --help
+
+Display a help summary and exit
+
+=back
+
+=head1 AUTHOR
+
+Paul Evans <leonerd@leonerd.org.uk>

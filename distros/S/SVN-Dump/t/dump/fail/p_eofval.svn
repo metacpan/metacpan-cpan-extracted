@@ -1,0 +1,8 @@
+read_property_block
+^Unexpected EOF line \d+
+K 7
+svn:log
+V 20
+standard directories
+K 10
+svn:author

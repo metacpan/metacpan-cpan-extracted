@@ -1,0 +1,37 @@
+			Stem Architecture Notes
+
+Stem is a network application development toolkit and a suite of network
+applications. Its goal is to transform common network tasks from
+programming to configuration and to make solving difficult network tasks
+much easier.
+
+A running Stem system on a network consists of one or more
+interconnected Stem daemons which are called Hubs.  Each Hub contains a
+collection of modules and objects which are called Cells. Stem Cells are
+capable of sending and receiving messages to any other Cell in the Stem
+system. Modules and Cells are loaded or created in a Hub by using
+configuration files. Configurations can be loaded and sent to any
+connected Hub where they will be executed.
+
+Stem's core set of modules provide all of the common operations needed
+including message passing, interprocess communication, asynchronous
+buffered I/O, socket connections and timers.  Other modules which can be
+loaded and configured, perform such tasks as process creation and
+management, log file management, gateways, protocol support, message
+switching, etc...
+
+Configuring Stem Cells has been designed for simplicity and
+flexibilty. All Cells use a common style of attribute/value pair
+arguments with well chosen default values which make common situations
+easier to configure. Many example configuration files come with Stem as
+well as demonstration scripts which run working applications such as
+inetd emulation, log file transferring and chat servers.
+
+Stem Messages are how Cells communicate with each other. Their names
+are an ordered triplet:  Hub, Cell and Target. Each Cell registers itself with
+a unique name and optional Target name in its Hub. All Hub names in a
+Stem system must be unique too, which makes the address triplet
+sufficient for any Message to be directed to any Cell.
+
+For more detailed information on the architecture and design of Stem,
+read the other technical notes.

@@ -1,0 +1,46 @@
+{
+   "abstract" : "Create/Read/Update files in CentOS and Red Hat sysconfig directory",
+   "author" : [
+      "Joe Landman <landman@scalableinformatics.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "SysConf",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Switch" : "2.15"
+         }
+      }
+   },
+   "provides" : {
+      "SysConf" : {
+         "file" : "lib/SysConf.pm",
+         "version" : "0.14"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/gpl-license.php"
+      ]
+   },
+   "version" : "0.14"
+}

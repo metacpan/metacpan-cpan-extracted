@@ -1,0 +1,29 @@
+# Update fails, as handle doesn't exist
+template: update-contact.tt
+
+vars:
+  email: update@email.com
+  contact_id: no_exist
+  city: blah
+  ccode: NZ
+  street: street1
+
+input_assertions:
+  class: SRS::EPP::Command::Update::Contact
+  match:
+
+SRS:
+ - assertions:
+     attr_is:
+       - [ '/NZSRSRequest/HandleUpdate', 'HandleId', 'no_exist', 'SRS: handle id correct on request' ]
+       - [ '/NZSRSRequest/HandleUpdate', 'Email', 'update@email.com', 'SRS: email correct on request' ]
+output_assertions:
+  count: 
+    - [ '//epp:resData', 0, "No res data returned"]
+  attr_is:
+    - [ '//epp:result', 'code', 2303, 'EPP: Correct response code' ]
+  match: 
+    - [ '//epp:value', 'no_exist', 'EPP: Correct value returned in reason' ]
+
+
+

@@ -1,0 +1,88 @@
+=head1 NAME
+
+C<String::Tagged::Formatting> - an API specification for simple formatted strings
+
+=head1 DESCRIPTION
+
+A primary use case of L<String::Tagged> is to allow storage of a text string
+with associated formatting data. As there are a growing number of subclasses
+on CPAN that attempt to do this, a common specification is emerging to allow
+interoperability between them. This will allow interchange between formats
+from different sources, display or rendering, and so on.
+
+Primarily this specification consists of the names and meanings of a set of
+tags that a conforming string should supply, though it also suggests a pair of
+methods useful for converting between different types of object and the
+standard formatting. Specific implementations may not be able to represent all
+of the tags of course; this specification only gives the suggested way to
+represent those formatting styles that the implementation actually
+understands.
+
+=head1 TAGS
+
+=head2 bold, under, italic, strike, blink, monospace
+
+Tags with boolean values indicating bold, underline, italic, strikethrough,
+blinking and monospaced font.
+
+=head2 reverse
+
+Tag with boolean value indicating reverse video; i.e. the effect of swapping
+foreground and background colours. This effect is common on terminal-based
+string systems, but is unlikely to be found elsewhere.
+
+=head2 fg, bg
+
+Tags with L<Convert::Color> instances giving foreground and background
+colours. The use of a C<Convert::Color> instance allows specific
+implementations to be able to represent their own colour space, while still
+supporting an easy conversion to the colour spaces used by others.
+
+=head1 METHODS
+
+The following methods should be provided on conforming implementations, to
+indicate their support of this specification and to allow easy conversion from
+and to it.
+
+=head2 as_formatting
+
+  $fmt = $st->as_formatting
+
+Called on an existing instance of the class, returns a C<String::Tagged>
+instance (or some subclass thereof) containing only the tags and values
+defined by this specification. This method may simply return the original
+instance if the tags natively used by it already fit this specification, or it
+may return a newly-constructed instance by converting its own tag formats.
+
+Use of the C<clone> method with C<only_tags> and possibly a C<convert_tags>
+map should be able to implement this in most cases.
+
+=head2 new_from_formatting
+
+  $st = String::Tagged::Subclass->new_from_formatting( $fmt )
+
+Called as a class method on the target class type, returns a new instance of
+that class constructed to represent the formatting contained in the C<$fmt>
+instance, which should contain only the tags given in this specification. If
+the class natively uses tags as per this specification, this can be a trivial
+clone, otherwise some conversion will need to be performed.
+
+Use of the C<clone> method with C<only_tags> and possibly a C<convert_tags>
+map should be able to implement this in most cases.
+
+=head1 KNOWN IMPLEMENTATIONS
+
+=over 4
+
+=item * C<String::Tagged::IRC>
+
+=item * C<Net::Async::Matrix::Utils>
+
+Contains a pair of functions to convert a formatted I<Matrix> message body to
+and from this format.
+
+=back
+
+=head1 AUTHOR
+
+Paul Evans <leonerd@leonerd.org.uk>

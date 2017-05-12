@@ -1,0 +1,28 @@
+---
+abstract: 'A raw quote operator for Perl'
+author:
+  - 'Andrew Rodland <arodland@cpan.org>'
+build_requires: {}
+configure_requires:
+  Module::Build::Tiny: '0.036'
+  XSLoader: '0'
+  perl: '5.012'
+dynamic_config: 0
+generated_by: 'App::ModuleBuildTiny version 0.018, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Syntax-Keyword-RawQuote
+provides:
+  Syntax::Feature::RawQuote:
+    file: lib/Syntax/Feature/RawQuote.pm
+    version: '0.03'
+  Syntax::Keyword::RawQuote:
+    file: lib/Syntax/Keyword/RawQuote.pm
+    version: '0.03'
+requires:
+  XSLoader: '0'
+  perl: '5.012'
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

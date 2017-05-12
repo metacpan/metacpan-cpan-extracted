@@ -1,0 +1,25 @@
+# cron.stem
+#
+[
+	class	=>	'Stem::Console',
+],
+[
+	class	=>	'Stem::Demo::Cmd',
+	name	=>	'cmd',
+],
+[
+	class	=>	'Stem::Cron',
+	name	=>	'cron',
+	args	=>	[
+
+		'hours'		=> [ 0 .. 8 ],
+		'month_days'	=> [ '11-15' ],
+		'months'	=> [ '12' ],
+
+		'msg'	=> [
+
+			'to_cell'	=> 'console',
+			'data'		=> "foo\n",
+		]
+	],
+],

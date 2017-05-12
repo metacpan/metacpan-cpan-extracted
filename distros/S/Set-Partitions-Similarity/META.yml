@@ -1,0 +1,24 @@
+---
+abstract: 'Routines to measure similarity of partitions.'
+author:
+  - 'Jeff Kubina (jeff.kubina@gmail.com)'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.59, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Set-Partitions-Similarity
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::Dump: 1.19
+  List::MoreUtils: 0.33
+  Text::CSV: 1.21
+version: 0.54

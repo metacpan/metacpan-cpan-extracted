@@ -1,0 +1,63 @@
+{
+   "abstract" : "try/catch/finally statement for exception handling",
+   "author" : [
+      "Tomas Pokorny <tnt@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Syntax-Feature-Try",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Scalar::Util" : "0",
+            "XSLoader" : "0",
+            "perl" : "5.014",
+            "strict" : "0",
+            "syntax" : "0.004",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Exception::Class" : "0",
+            "Exporter" : "0",
+            "FindBin" : "0",
+            "Moose" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "Test::Exception" : "0",
+            "Test::LeakTrace" : "0",
+            "Test::More" : "0",
+            "Test::NoWarnings" : "0",
+            "Test::Spec" : "0",
+            "Test::Warn" : "0",
+            "Throwable" : "0",
+            "base" : "0",
+            "lib" : "0",
+            "syntax" : "0.004"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.005"
+}
+

@@ -1,0 +1,77 @@
+{
+   "abstract" : "Simplified way of creating data structures for SOAP::Lite",
+   "author" : [
+      "Michael Jemmeson <mjemmeson@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.031, Dist::Milla version v1.0.14, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "SOAP-Data-Builder-Simple",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.039"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.14",
+            "Dist::Zilla::Plugin::MetaProvides" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::Util" : "1.29",
+            "SOAP::Lite" : "0",
+            "Safe::Isa" : "0",
+            "base" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "SOAP::Data::Builder" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "SOAP::Data::Builder::Simple" : {
+         "file" : "lib/SOAP/Data/Builder/Simple.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mjemmeson/SOAP-Data-Builder-Simple/issues"
+      },
+      "homepage" : "https://github.com/mjemmeson/SOAP-Data-Builder-Simple",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mjemmeson/SOAP-Data-Builder-Simple.git",
+         "web" : "https://github.com/mjemmeson/SOAP-Data-Builder-Simple"
+      }
+   },
+   "version" : "0.04"
+}
+

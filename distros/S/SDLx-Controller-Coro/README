@@ -1,0 +1,12 @@
+NAME
+    SDLx::Controller::Coro - Event loop with Coro yummyness
+
+SYNOPSIS
+      use SDLx::Controller::Coro;
+
+      # More info coming soon!
+
+DESCRIPTION
+    This module builds off of SDLx::Controller, bringing Coro into the event
+    loop so that async events and routines will be processed.
+

@@ -1,0 +1,11 @@
+Build.PL
+Debian_CPANTS.txt
+lib/SOAP/Transport/FTP.pm
+MANIFEST			This list of files
+README
+t/096_characters.t
+t/097_kwalitee.t
+t/098_pod.t
+t/099_pod_coverage.t
+Makefile.PL
+META.yml

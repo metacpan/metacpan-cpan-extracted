@@ -1,0 +1,32 @@
+---
+abstract: 'Perl interface to the UNIX syslog(3) calls'
+author:
+  - 'Sebastien Aperghis-Tramoni <sebastien@aperghis.net>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Sys-Syslog
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Fcntl: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  POSIX: '0'
+  Socket: '0'
+  Test::More: '0'
+  XSLoader: '0'
+resources:
+  repository: https://github.com/maddingue/Sys-Syslog.git
+version: '0.35'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

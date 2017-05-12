@@ -1,0 +1,22 @@
+#!/usr/bin/perl
+$| = 1;
+
+if ( ! -f "fail_twice_1" ) {
+   print "Running first time\n";
+   open(OUT, ">fail_twice_1");
+   close(OUT);
+   warn  "Failing first time\n";
+   exit 20;
+}
+
+if ( ! -f "fail_twice_2" ) {
+   print "Running second time\n";
+   open(OUT, ">fail_twice_2");
+   close(OUT);
+   warn "Failing second time\n";
+   exit 21;
+}
+
+print "Running third time\n";
+unlink ("fail_twice_1","fail_twice_2");
+exit 0;

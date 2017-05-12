@@ -1,0 +1,17 @@
+1.201 2009-11-02
+
+- Finally got around to fixing the broken version from the previous release.
+- Fixed #49541.
+- Added a time-shell.readme file to provide some instruction on how to use the example.
+- Added this change log.
+
+
+1.200 2009-03-24
+
+- The initial release to CPAN. Rushed it out the door early because I needed to show MadMongers how to upload a module to CPAN. Unfortunately, it wasn't ready for prime time so it wasn't useful to anybody.
+
+
+1.x
+
+- Internal releases only.
+

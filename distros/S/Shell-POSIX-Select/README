@@ -1,0 +1,159 @@
+                Shell/POSIX/Select version 0.06
+                ===============================
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make test
+    make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    File::Spec::Functions
+    Text::Balanced
+    Filter::Simple
+
+==================================================================
+
+NAME
+
+    Shell::POSIX::Select - The POSIX Shell's "select" loop for Perl
+
+PURPOSE
+
+    This module implements the "select" loop of the "POSIX" shells
+    (Bash, Korn, and derivatives) for Perl.  That loop is unique in
+    two ways: it's by far the friendliest feature of any UNIX shell,
+    and it's the *only* UNIX shell loop that's missing from the Perl
+    language.  Until now!
+
+SYNOPSIS
+
+    NOTE: In the following, the enclosing square brackets (not
+    typed) identify optional elements, and vertical bars indicate
+    mutually-exclusive choices:
+
+    select [[my|local|our<]> scalar_var] ( [LIST] ) { [CODE] }
+
+    The required elements are the keyword "select", the *parentheses*,
+    and the *curly braces*.  See "SYNTAX" for details.
+
+ELEMENTARY EXAMPLE
+
+  ship2me2.plx
+
+    use Shell::POSIX::Select qw($Heading $Prompt);
+
+    $Heading='Select a Shipper' ;
+    $Prompt='Enter Vendor Number: ' ;
+
+    select $shipper ( 'UPS', 'FedEx' ) {
+        print "\nYou chose: $shipper\n";
+        last;
+    }
+    ship ($shipper, $ARGV[0]);      # prints confirmation message
+
+
+  OUTPUT
+
+    ship2me2.plx '42 hemp toothbrushes'
+
+    *Select a Shipper*
+
+    1) UPS  2) FedEx
+
+    Enter Vendor Number: 2
+    You chose: FedEx
+
+    Your order has been processed.  Thanks for your business!
+
+BENEFITS
+
+    What's so great about this loop? It automates the generation of a
+    numbered menu of choices, prompts for a choice, proofreads that
+    choice and complains if it's invalid (at least in this enhanced
+    implementation), and executes a code-block with a variable set to
+    the chosen value.  That saves a lot of coding for interactive
+    programs -- especially if the menu consists of many values!
+
+    The benefit of bringing this loop to Perl is that it obviates the
+    need for future programmers to reinvent the *Choose-From-A-Menu*
+    wheel.
+
+EXPORTS: Default
+
+    $Reply
+
+    This variable is "local"ized to each "select" loop, and provides
+    the menu-number of the most recent valid selection.
+
+EXPORTS: Optional
+
+     $Heading
+     $Prompt
+     $Eof
+
+SCRIPTS
+
+    browse_images
+    browse_jpeg
+    browse_records
+    delete_file
+    lc_filename
+    long_listem
+    menu_ls
+    order
+    perl_man
+    pick
+    pick_file
+
+AUTHOR
+
+    Tim Maher
+
+MAINTAINER
+
+    Martin Thurn
+    mthurn@cpan.org
+
+ACKNOWLEDGEMENTS
+
+    I probably never would have even attempted to write this module if
+    it weren't for the provision of Filter::Simple by Damian Conway,
+    which I ruthlessly exploited to make a hard job easy.
+
+    *The Damian* also gave useful tips during the module's
+    development, for which I'm grateful.
+
+    I *definitely* wouldn't have ever written this module, if I hadn't
+    found myself writing a chapter on *Looping* for my upcoming
+    Manning Publications book, and once again lamenting the fact that
+    the most friendly Shell loop was missing from Perl.  In a fit of
+    zeal, I decided to rectify that oversight! 8-}
+
+    For more examples of how this loop can be used in Perl programs,
+    watch for my upcoming book, *Minimal Perl: for Shell Users and
+    Programmers* (see <http://teachmeperl.com/mp4sh.html>) in early
+    fall, 2003.
+
+SEE ALSO
+
+    man ksh        # on UNIX or UNIX-like systems
+
+    man bash       # on UNIX or UNIX-like systems
+
+DON'T SEE ALSO
+
+    perldoc -f select, which has nothing to do with this module (the
+    names just happen to match up).
+
+LICENSE
+
+    Copyright (C) 2002-2003, Timothy F. Maher.  All rights reserved.
+
+    This module is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.

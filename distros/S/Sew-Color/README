@@ -1,0 +1,36 @@
+Sew-Color version 1.05 
+======================
+
+This module Sew::Color provides some routines for converting between Brother and Madeira and others embroidery threads
+and the rgb color values. See the man page. It allows you to search color spaces to select a thread from 
+an rgb value, and to create certain custom searches. Its easily extensible to other manufacturers. 
+
+One bug has been corrected since 1.04 affectig the sat function, no new threads have been added. 
+
+Changes Since Version 1.00
+==========================
+
+The brother colors and codes have been overhauled and now seem to be correct. 
+Other manufacturers have been added but little testing has been done of the correct ness of the data. 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012 by mark winder
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,6 @@
+MANIFEST
+Makefile.PL
+TieExcel.pm
+TieExcel.pod
+test.pl
+META.yml                                 Module meta-data (added by MakeMaker)

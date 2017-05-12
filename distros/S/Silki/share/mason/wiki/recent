@@ -1,0 +1,43 @@
+<table class="standard-table">
+  <thead>
+    <tr>
+      <th><% loc('Title') %></th>
+      <th><% loc('When') %></th>
+      <th><% loc('Who') %></th>
+      <th></th>
+    </tr>
+  </thead>
+% while ( my ( $page, $revision ) = $pages->next() ) {
+  <tbody>
+    <tr class="<% $pages->index() % 2 ? 'odd' : 'even' %>">
+      <td><a href="<% $page->uri() %>"><% $page->title() %></a> (<% loc( 'revision %1', $revision->revision_number() ) %>)</td>
+      <td><% loc( '%datetime(%1)', $c->user()->set_time_zone_for_dt( $revision->creation_datetime() ) ) %></td>
+      <td>
+        <& /lib/user-link.mas, user => $revision->user(), wiki => $wiki &>
+      </td>
+      <td>
+%   if ( $revision->revision_number() > 1 ) {
+        <a href="<% $page->uri( view => 'diff', query => { revision1 => $revision->revision_number() - 1, revision2 => $revision->revision_number() } ) %>"><% loc('see changes') %></a>
+%   }
+      </td>
+    </tr>
+  </tbody>
+% }
+<& /lib/table/pager.mas,
+   index     => $pages->index(),
+   pager     => $pager,
+   uri_maker => sub { $wiki->uri( view => 'recent', @_ ) } &>
+</table>
+
+<%args>
+$pager
+$pages
+$wiki
+</%args>
+
+<%method title>
+<% loc( 'Recent Changes in %1', $wiki->title() ) %>
+<%args>
+$wiki
+</%args>
+</%method>

@@ -1,0 +1,51 @@
+{
+   "abstract" : "Keep a mirrored working copy of a repository path",
+   "author" : [
+      "John Peacock <jpeacock@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "SVN-Notify-Mirror",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Module::Build" : "0.38",
+            "SVN::Notify" : "2.83",
+            "YAML" : "0.81"
+         }
+      }
+   },
+   "provides" : {
+      "SVN::Notify::Mirror" : {
+         "file" : "lib/SVN/Notify/Mirror.pm",
+         "version" : "0.040"
+      },
+      "SVN::Notify::Mirror::Rsync" : {
+         "file" : "lib/SVN/Notify/Mirror/Rsync.pm",
+         "version" : "0.040"
+      },
+      "SVN::Notify::Mirror::SSH" : {
+         "file" : "lib/SVN/Notify/Mirror/SSH.pm",
+         "version" : "0.040"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.040"
+}

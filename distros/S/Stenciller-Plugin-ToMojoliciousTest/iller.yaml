@@ -1,0 +1,46 @@
+---
+doctype: dist
+
+header:
+  name: Stenciller-Plugin-ToMojoliciousTest
+
+prereqs:
+  runtime:
+    requires:
+      - perl: 5.010000
+      - Stenciller: 0.1400
+      - Moose
+      - Path::Tiny
+      - Types::Path::Tiny
+  test:
+    requires:
+      - File::Temp
+      - Test::More
+      - Test::Differences
+      - Test::Mojo::Trim
+      - Mojolicious: 6.00
+      - IPC::System::Simple
+      - String::Cushion
+      - syntax
+      - Syntax::Feature::Qi
+
+plugins:
+  - +config: Author::CSSON
+
+---
+doctype: weaver
+
+plugins:
+  - +config: Author::CSSON
+
+  - +extend_plugin: Splint
+    type_libraries: Types::Stenciller=Stencil,Stenciller
+
+---
+doctype: cpanfile
+
+---
+doctype: gitignore
+config: Author::CSSON
+always:
+ - Stenciller-Plugin-ToMojoliciousTest-*

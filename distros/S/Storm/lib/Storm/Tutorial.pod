@@ -1,0 +1,616 @@
+=pod
+
+=head1 NAME
+
+Storm::Tutorial - Getting started with L<Storm>
+
+=head1 DESCRIPTION
+
+L<Storm> is a L<Moose> based library for storing and retrieving Moose based objects
+using a L<DBI> connection.
+
+
+=head1 CONNECTING
+
+L<Storm> connects to databases using the uqiquitous L<DBI> module. Database
+handles are spawned using a L<Storm::Source> object which holds connection
+information. In the example below, the L<Storm::Source> object is coerced from
+the arguments passed to the L<Storm> constructor. 
+
+ use Storm;
+
+ $storm->new(
+    source => ['DBI:mysql:timsdev:10.0.1.11:3306', 'user', 'pass']
+ );
+
+
+=head1 BUILDING
+
+L<Storm> is for storing Moose based objects. It is required that the objects
+have the L<Storm> roles and meta-roles applied.
+
+L<Storm::Object> is an extension of L<Moose> which applies the appropriate roles
+and meta-roles, as well as providing some sugar for defining relationships.
+
+=head2 Simple example
+
+
+ package Person;
+ use Storm::Object;
+ storm_table( 'Person' );
+
+ has 'id' => (
+     is => 'rw',
+     traits => [qw(PrimaryKey AutoIncrement)],
+ );
+
+ has 'name' => (
+     is => 'rw',
+ );
+
+ has 'dob' => (
+     is => 'rw',
+     column => 'birth_date',
+ );
+
+
+This is a very simple example, but demonstrates a few key concepts:
+
+=over 4
+
+=item
+
+Every class definition must have a meta-table defined. L<Storm> uses this
+information to determine what table to store the object to in the database.
+
+=item
+
+It is recomended that every class provide a primary key (via the PrimaryKey
+attribute trait.) If you do not provide a primary key, you will not be able to
+use lookup queries to restore objects, nor will any other L<Storm> enabled
+object be able to store references to it.
+
+=item
+
+L<Storm> avoids requiring a separate schema by defining elements of a schema in
+the object definition. By default, object attributes are assigned a table column
+with the same name as the attribute.  The default behavior can be changed by
+setting the column option.
+
+=back
+
+=head2 Circular references
+
+ package Person;
+ use Storm::Object;
+ storm_table( 'People' );
+
+ has 'id' => (
+     is => 'rw',
+     traits => [qw(PrimaryKey AutoIncrement)],
+ );
+
+ has 'spouse' => (
+     is => 'rw',
+     isa => 'Person',
+     weak_ref => 1,
+ );
+ 
+=over 4
+
+=item
+
+References to other L<Storm> enabled classes are serialized automatically using
+the primary key. This is accomplished by setting the C<isa> option to a L<Storm>
+enabled class (type).
+
+=item
+
+In a scenario such as this, where two objects will reference each other in a
+circular structure, it is necessary to set the weak_ref option to avoid memory
+leaks. When constructing and using objects with circular references, it is
+necessary to manage the C<scope>. The scope stops objects from being garbage
+collected to early (i.e. when the only references to them are weak.)
+
+=back
+
+=head1 RELATIONSHIPS
+
+Relationships are devised in two ways. We demonstrated one manner in the example
+above by setting an attributes C<isa> option to a L<Storm> enabled class. This
+allows you to referance a singular object. Here we will demonstrate making
+C<one-to-many> and C<many-to-many> relationships using the C<has_many>
+keyword.
+
+=head2 One-to-many
+
+ package Person;
+ use Storm::Object;
+ storm_table( 'People' );
+
+ has 'id' => (
+     is => 'rw',
+     traits => [qw(PrimaryKey AutoIncrement)],
+ );
+
+ one_to_many 'pokemon' => (
+    foreign_class => 'Pokemon',
+    match_on => 'master',
+    handles => {
+        pokemon => 'iter',
+    }
+ );
+
+ package Pokemon;
+ use Storm::Object;
+ storm_->table( 'Pokemon' ); 
+
+ has 'id' => (
+     is => 'rw',
+     traits => [qw(PrimaryKey AutoIncrement)],
+ );
+
+ has 'master' => (
+     is => 'rw',
+     isa => 'Person',
+     weak_ref => 1,
+ );
+
+Here, we define the components of a relationship between the Person class and
+the Pokemon class uing the C<one_to_many> keyword.
+
+=over 4
+
+=item
+
+The C<foreign_key =E<gt> master> denotes that the relationship is made by
+matching the primary key of the Person with the c<master> attribute of the
+Pokemon.
+
+=item
+
+Using the C<handles> option, we create the C<pokemon> method for Person. This
+method returns a Person's Pokemon in the form of a
+L<Storm::Query::Select::Iterator> object.
+
+=item
+
+To add another Pokemon to a Person, create a new Pokemon and set the C<master>
+attribute to a C<$person>.
+
+=back
+
+=head2 Many-to-many
+
+ package Person;
+ use Storm::Object;
+ storm_table( 'People' );
+
+ has 'id' => (
+     is => 'rw',
+     traits => [qw(PrimaryKey AutoIncrement)],
+ );
+
+ many_to_many 'pets' => (
+     foreign_class => 'Pets',
+     junction_table => 'PeoplesPets',
+     local_match => 'person',
+     foreign_match => 'pet',
+     handles => {
+         parents => 'iter',
+         add_pet => 'add',
+         remove_pet => 'remove',
+     }
+ )
+
+ package Pet;
+ use Storm::Object;
+ storm_table( 'Pets' );
+
+ has 'id' => (
+     is => 'rw',
+     traits => [qw(PrimaryKey AutoIncrement)],
+ );
+
+ many_to_many 'care_takers' => (
+     foreign_class => 'Pets',
+     junction_table => 'PeoplesPets',
+     local_match => 'person',
+     foreign_match => 'pets',
+     handles => {
+         care_takers => 'iter',
+         add_care_taker => 'add',
+         remove_care_taker => 'remove',
+     }
+ )
+
+=over 4
+
+=item
+
+In a I<many-to-many> relationship, a I<junction_table> is required to form the
+relationship. This is specified as an option to the C<many_to_many> keyword.
+
+=item
+
+We also need to define the columns in the I<junction_table> that will be used to
+identify the components of the relationship. This is done with I<local_match>
+and I<foreign_match> options. I<local_match> is the column in the junction table
+to match with the primary key of defining class, while I<foreign_match> is the
+the column to match with the primary key of the foregin class.
+
+=item
+
+Using the C<handles> option, we create methods for retrieving a
+L<Storm::Query::Select::Iterator>, as well as methods for adding and removing
+pets/caretakers. C<< $pet-E<gt>add_care_taker( $person ) >> is synanamous with
+C<< $person-E<gt>add_pet( $pet ) >> and C<< $pet-E<gt>remove_care_taker( $person ) >>
+is synanamous with C<< $person-E<gt>remove_pet( $pet ) >>.
+
+=back
+
+=item
+
+As of version 0.05, L<Storm> will automatically fill in the C<junction_table>,
+C<local_match>, and forerign match if you do not supply them.
+
+ package Person;
+ use Storm::Object;
+ storm_table( 'People' );
+
+ has 'id' => (
+     is => 'rw',
+     traits => [qw(PrimaryKey AutoIncrement)],
+ );
+
+ many_to_many 'pets' => (
+     foreign_class => 'Pets',
+     handles => {
+         parents => 'iter',
+         add_pet => 'add',
+         remove_pet => 'remove',
+     }
+ )
+
+ package Pet;
+ use Storm::Object;
+ storm_table( 'Pets' );
+
+ has 'id' => (
+     is => 'rw',
+     traits => [qw(PrimaryKey AutoIncrement)],
+ );
+
+ many_to_many 'care_takers' => (
+     foreign_class => 'Pets',
+     handles => {
+         care_takers => 'iter',
+         add_care_taker => 'add',
+         remove_care_taker => 'remove',
+     }
+ )
+ 
+=back
+
+=head1 CRUD
+
+L<Storm> provides queries for the four basic data operations Create, Read,
+Update, and Delete (CRUD) as well as a C<select> query for searching.
+
+=head2 Insert
+
+ $storm->insert( @objects );
+
+Inserts @objects into the database. Objects may onle be inserted if they do not
+already exist in the database. An error will be thrown if you try to insert an
+object that already exists. An error will also be thrown if the object has a
+primary key and it is I<undef> (unless using the AutoIncrement trait.)
+
+=head2 Lookup
+
+ $storm->lookup( $class, @object_ids );
+ 
+Retrieves object from the database by primary key. The C<$class> attribute is
+required so L<Storm> knows where to find and how to inflate the objects. If any
+of the object's attributes reference other L<Storm> enabled objects, they will
+be looked up and inflated as well. This will continue until all dependent
+object have been retrieved and inflated.
+
+=head2 Update
+
+ $storm->update( @objects );
+ 
+Updates the state of the @objects in the database. If you try to call C<update>
+on an object that is not already in the database, an error will be thrown. Only
+the @objects passed to C<update> will be affected, any L<Storm> enabled objects
+they reference will not updated in the database. You must call C<update> on them
+yourself.
+
+=head2 Delete
+
+ $storm->delete( @objects );
+ 
+Deletes the @objects from the database. The local references to them will still
+exists until you destroy them or they go out of scope.
+
+
+=head1 SELECT
+
+Searching is possible using a select query. The select query is a little more
+complex than it's counterparts.
+
+=head2 Iterators
+
+ $query = $storm->select( 'Person' );
+ $iter = $query->results;
+
+ while ( $object = $iter->next ) {
+
+    ... do stuff with $object ...
+
+ }
+ 
+Calling the C<results> method on a select query returns a
+L<Storm::Query::Select::Iterator> for iterating over the result set.
+
+=head2 Where
+
+ $query = $storm->select( 'Person' );
+ $query->where( '.last_name', '=', 'Simpson' );
+ $query->where( '.age', '>', 10 );
+ $iter = $query->results;
+ 
+Use L<Storm::Query::Select>'s C<where> method to select specific objects.
+
+=over 4
+
+=item
+
+The following comparisons are supported: =, <>, <, <=, =>, IN, NOT IN, BETWEEN,
+LIKE, NOT LIKE
+
+=item
+
+It is possible to use attributes in a comparison with the C<.attribute>
+notation (to distinguish them from regular strings.)
+
+ $query->where( '.spouse.first_name', '=', 'Marge' );
+ 
+If the attribute is also a L<Storm> enabled object you can can reference
+it's attributes in the comparison as well.
+
+=back
+
+=head2 Placeholders
+
+ $query->where( '.age', '>', '?' );
+ $iter = $query->results( 10 );
+    
+You can use a C<?> as placeholder. Supply the arguments to replace the
+placeholders when calling the C<results> method.
+
+=head2 Order-by
+
+ $query->order_by( '.lastname', '.age DESC' );
+
+Use the C<order_by> method to sort the results.
+
+=head1 SCOPE
+
+The scope ensures that objects aren't garbage collected to early. As objects are
+inflated from the database, the are pushed onto the live object scope,
+increasing their reference count.
+
+Let's define out person class to use as an example.
+
+ package Person;
+ use Storm::Object;
+
+ has 'id' => (
+     is => 'rw',
+     traits => [qw(PrimaryKey AutoIncrement)],
+ );
+
+ has 'name' => (
+     is => 'rw',
+ );
+
+ has 'spouse' => (
+     is => 'rw',
+     isa => 'Person',
+     weak_ref => 1,
+ );
+ 
+Now, insert some objects into the database.
+
+     $storm->insert(
+        Person->new( name = 'Homer' ),
+        Person->new( name = 'Marge' )
+     );
+
+And then we can link them together:
+
+ {
+     my $scope = $storm->new_scope;
+
+     my ( $homer, $marge ) = $storm->lookup( $homer_id, $marge_id );
+     $homer->spouse( $marge );
+     $marge->spouse( $homer );
+     $storm->update( $homer, $marge );
+ }
+
+
+Now we can we can load the objects from the database like this:
+
+ {
+     my $scope = $storm->new_scope;
+
+     my $homer = $storm->lookup( $homer_id );
+
+     print $homer->spouse->name; # Marge
+ }
+
+ {
+     my $scope = $storm->new_scope;
+
+     my $marge = $storm->lookup( $marge_id ); 
+
+     print $marge->spouse->name; # Homer Simpson
+
+     refaddr( $marge ) == refaddr( $marge->spouse->spouse ); # true
+ }
+
+When the initial object is loaded, all the objects that the initial object
+depends on will be loaded. This will continue until all dependent objects have
+been inflated from the database.
+
+If we did not use a scope, by the time $homer his spouse attribute would have
+been cleared because there is no other reference to Marge. Here is a code
+snippet that demonstrates why:
+
+ sub get_homer {
+     my $homer = Person->new( name => 'Homer' );
+     my $marge = Person->new( name => 'Marge' ); 
+
+     $homer->spouse( $marge );
+     $marge->spouse( $homer );
+
+     return $homer;
+
+    # at this point $homer and $marge go out of scope
+    # $homer has a refcount of 1 because it's the return value
+    # $marge has a refcount of 0, and gets destroyed
+    # the weak reference in $homer->spouse is cleared
+ }
+
+ my $homer = get_homer();
+
+ $homer->spouse; # this returns undef
+
+
+By using this idiom:
+
+ {
+    my $scope = Storm->new_scope;
+
+    ... do all Storm work in here ...
+ }
+
+You are ensuring that the objects live at least as long as necessary.
+
+In a web application context, you usually create one new scope per request.
+
+=head2 Credit
+
+The live object scope was largely inspired by the L<KiokuDB> module. Some of the
+code and documentation for this functionality was taken directly from the
+L<KiokuDB> source (and possibly modified.)
+
+=head1 TRANSACTIONS
+
+When using a supporting databse, you can use the C<do_transaction> method to
+execute a code block and commit the transaction.
+
+ eval {
+    $storm->do_transaction( sub {
+
+        ... do work on $storm ...
+
+    });
+ }
+
+ print $@ if $@; # prints error
+ 
+The transaction will only be committed if they block executes successfully. If
+any exceptions are thrown, the transaction will be rolled back. It is
+recommended that you execute the transaction inside an eval block to trap any
+errors that are thrown. Alternatively, you can use a module like L<TryCatch> or
+L<Try::Tiny> to trap errors.
+
+=head1 POLICY
+
+The policy is used to determine what data type is used by the DBMS to store a
+value. The policy also determines how different types of values are
+inflated/deflated.
+
+ package My::Policy;
+ use Storm::Policy;
+
+ define 'DateTime', 'DATETIME';
+
+ transform 'DateTime',
+    inflate { DateTime::Form::SQLite->parse_datetime( $_ ) },
+    deflate { DateTime::Form::SQLite->format_datetime( $_ ) };
+
+
+ package main;
+ use Storm;
+
+ $storm->new( source => ..., policy => 'My::Policy' );
+
+=over 4
+
+=item C<define>
+
+Use the C<define> keyword to determine what data type the DBMS should used to
+store a value of the given type. In this case we want L<DateTime> objects to be
+stored in the database using the C<DATETIME> data type.
+ 
+=item C<transform>
+
+Use the C<transform> keyword for setting a custom inflator/deflator for
+a type.
+
+The inflator is defined using the C<inflate> keyword. The C<$_> special
+variable will be set to the value to be inflated. The inflator is expected to
+return the inflated value.
+
+The deflator is defined using the C<deflate> keyword. The C<$_> special
+variable will be set to the value to be deflated. The deflator is expected to
+return the deflated value.
+
+=back
+
+=head2 Credit
+
+The policy was inspired by the L<Fey::ORM> module. Some of the code this
+functionality was taken directly from theL<Fey::ORM> source (and possibly
+modified.)
+
+=head1 AEOLUS
+
+Aeolus is the greek god of the wind.  Aeolus helps manage your database
+installation. With Aeolus you can easily install and remove the tables your
+classes need to store their data.
+
+ $storm->aeolus->install_class( 'Person' );
+
+See L<Storm::Aeolus> for more information.
+
+=head1 AUTHORS
+
+Jeffrey Ray Hallock E<lt>jeffrey.hallock at gmail dot comE<gt>
+
+Dave Rolsky <autarch@urth.org>
+
+Yuval Kogman <nothingmuch@woobling.org>
+
+=head1 COPYRIGHT
+
+    Copyright (c) 2010-2011 Jeffrey Ray Hallock.
+
+    Copyright (c) 2010-2011 Dave Rolsky.
+
+    Copyright (c) 2008, 2009 Yuval Kogman, Infinity Interactive.
+
+    All rights reserved. This program is free software; you can redistribute it
+    and/or modify it under the same terms as Perl itself.
+
+=cut
+
+
+
+
+
+
+

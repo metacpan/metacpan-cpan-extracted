@@ -1,0 +1,33 @@
+# Create with no admin or tech contacts (which is allowed)
+template: create-domain.tt
+
+vars:
+  domain: 09i.co.te
+  owner: id123
+
+input_assertions:
+  class: SRS::EPP::Command::Create::Domain
+
+SRS:
+  - assertions:
+      count:
+        - [ '//RegistrantContact', 1, 'SRS: Check for only one RegistrantContact' ]
+        - [ '//AdminContact', 0, 'SRS: Check AdminContact not supplied' ]
+        - [ '//TechnicalContact', 0, 'SRS: Check TechnicalContact not supplied' ]
+        - [ '//NameServers/Server', 0, 'SRS: Check nameservers not supplied' ]
+      match:
+      match_all:
+      attr_is:
+        - [ '//DomainCreate', 'DomainName', '09i.co.te', 'SRS: Check the domain name to be registered' ]
+        - [ '//RegistrantContact', 'HandleId', 'id123', 'SRS: RegistrantContact handle' ]
+
+
+output_assertions:
+  count:
+    - [ '//domain:creData', 1, 'SRS: Check for one creData' ]
+  match:
+    - [ '//domain:name', '09i.co.te', 'SRS: Check domain name' ]
+    - [ '//domain:crDate', '/\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d:\d\d/', 'SRS: Check crDate' ]
+    - [ '//domain:exDate', '/\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d:\d\d/', 'SRS: Check exDate' ]
+  attr_is:
+    - [ '//epp:result', 'code', '1000', 'SRS: Check result code' ]

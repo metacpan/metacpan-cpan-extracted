@@ -1,0 +1,114 @@
+Revision history for Perl extension Set::FA.
+
+2.01  2016-09-20T12:29:00
+	- Stop using Test::Stream. Use Test::More shipped in the Test::Simple distro.
+	- Adopt new repo structure. For details, see
+		http://savage.net.au/Ron/html/My.Workflow.for.Building.Distros.html.
+		This involves changing the licence from Artistic to Perl.
+	- Update .gitignore and MANIFEST.SKIP.
+	- Move various modules to TEST_REQUIRES within Makefile.PL.
+	- Update version #s in pre-reqs.
+
+2.00  2015-02-21T11:23:00
+	- Add github repo https://github.com/ronsavage/Set-FA.
+	- Switch from Hash::FieldHash to Moo. This means no more method chaining.
+	- Switch from Test::More to Test::Stream.
+	- Add repo to Makefile.PL and docs.
+	- Update pre-reqs in Makefie.PL.
+	- Move t/pod.t into xt/author/.
+	- Add Set::FA::Element.maxlevel() and Set::FA::Element.minlevel().
+	- Remove Set::FA.clone() and Set::FA::Element.clone().
+	- Remove Set::FA::Element.verbose().
+	- Set default logger to Log::Handler. Also, re-write log() so that default messages no longer
+		have the prefix of "$level: ".
+	- Add 'use strict;' and 'use warnings;' to t/*.t.
+	- Extract Set::FA's synopsis as scripts/synopsis.1.pl and Set::FA::Element's as
+		scripts/synopsis.2.pl.
+	- Delete Build.PL.
+	- Update MANIFEST.
+	- Update MANIFEST.SKIP.
+	- Rename CHANGES to Changes as per CPAN::Spec::Changes
+	- Reformat dates in this file from 'Sun Jul 17 12:40:00 2011' to '2011-07-17T12:40:00'.
+	- Reformat *.pm and this file to have lines no more than 100 chars wide.
+
+1.08  2011-07-17T12:40:00
+	- Document the Set::FA::Element::report() method. Patch t/report.t to match.
+
+1.07  2011-06-29T11:55:00
+	- No code changes.
+	- Update the docs to properly reflect the change to the log() method done in V 1.06.
+
+1.06  2011-06-27T11:50:00
+	- When stuck in a loop, log the next 5 chars - if any - in hex before dying.
+	- Change the log() method in Set::FA::Element to always call die when level is 'error', and
+		not just when there is no logger. This allows us to pass in a logger and get (debug) output
+		even when the code dies.
+
+1.05  2011-06-23T13:48:00
+	- Change the type of the log message (Stepped from old_state to new_state...) in step_state()
+		from warning to info. This transition is just a statement of fact, not something that you
+		need to be warned about.
+	- Change the log() method in Set::FA::Element. It used to call
+		$self -> logger -> log($level => $message),
+		and now calls $self -> logger -> $level($message). I feel the original way was a mistake,
+		since it forced the caller's logger to have a log() method.
+	- Patch various parts of the POD to reflect this change in logging.
+
+1.04  2011-05-29T13:33:00
+	- Allow the actions parameter to Set::FA::Element.new() to have values which are arrayrefs,
+		so you can pass in something like entry => [\&fn, 'fn_name']. The 2nd element is printed by
+		report().
+
+1.03  2011-05-29T12:52:00
+	- Add next state to the output of report().
+
+1.02  2011-05-29T12:35:00
+	- Fix bug in Set::FA::Element.report(). Code called $self -> logger($level => $message)
+		instead of $self -> logger -> log($level => $message).
+
+1.01  2011-05-29T11:17:00
+	- Add Mark Rogaski's name to the Author section, not just the Credit section, of each POD.
+	- Change Set::FA::Element's report() to output at log level info, rather than debug.
+		The first line of output, 'Entered report()', is still at level debug, the same as all
+		other method entry messages. It's just the body of the report at level info.
+		This means you can now get the report without triggering all debug messages.
+		Patch t/report.t to match.
+
+1.00  2011-05-24T14:02:00
+	- Co-maint is now with Ron Savage, who will do all future development, starting with this version.
+	- Rewrite Set::FA::Element to use getters/setters via Hash::FieldHash, rather than use direct
+		access to the underlying hash.
+	- Change some parameters to Set::FA::Element.new(). See docs for details:
+		o accept is now called accepting, since accept() is a method.
+		o die_on_loop is a new option.
+		o logger is a log object of some sort. I prefer Log::Handler. Log::Agent is not supported.
+		o start is a new option.
+		o states is not supported. The list of states in the transitions parameter is used instead.
+		o Add (within the code) parentheses to the regexp parameter in the transitions option, if
+			it's not a coderef, to support the match() method.
+		o verbose is a new option.
+	- New methods for Set::FA::Element:
+		o build_stt.
+		o current().
+		o data().
+		o die_on_loop().
+		o id().
+		o log().
+		o logger().
+		o match().
+		o report().
+		o start().
+		o validate().
+		o verbose().
+	- Set::FA got a fresh paint job, too, but since it's parent is Set::Object, Hash::FieldHash was not
+		used.
+	- Rewrite the documentation.
+	- Add Build.PL.
+	- Clean up Makefile.PL.
+
+0.91  2002-03-22T12:00:00
+	- Added unified representation for transition rules.
+	- Rewrote clone() with a recursive deep copy.
+
+0.90  2002-03-18T12:00:00
+	- Initial release.

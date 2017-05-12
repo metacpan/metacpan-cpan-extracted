@@ -1,0 +1,633 @@
+Revision history for Perl extension SystemC::Netlist
+
+The contributors that suggested a given feature are shown in [].
+
+* SystemPerl 1.344 2014/11/05
+
+****	Fix trace overflow on huge arrays, bug834. [Geoff Barrett]
+
+
+* SystemPerl 1.342 2014/06/08
+
+****	Fix string corruption, bug780. [Derek Lockhart]
+
+
+* SystemPerl 1.341 2013/02/10
+
+***	Fix cpan-testers' tests on systems without perldoc.
+
+***	Fix cppcheck warning.
+
+
+* SystemPerl 1.340 2012/01/19
+
+***	Support SystemC 2.3.0 prerelease.
+
+***	Support SYSTEMC_INCLUDE and SYSTEMC_LIBDIR environment variables.
+
+***	Fix --help output to go to stderr, not stdout.  [R. Diez]
+
+
+* SystemPerl 1.338 2011/07/28
+
+****	Support compiling SpCoverage without rest of SystemPerl.
+
+****	Fix warnings with Bison 2.5.
+
+
+* SystemPerl 1.337 2011/07/15
+
+****	Support vluint64_t in Verilator 3.814, bug368.  [Chandan Egbert]
+
+
+* SystemPerl 1.336 2010/11/03
+
+****	Fix support for Verilog-Perl 3.305; removing defines, bug300.
+
+
+* SystemPerl 1.335 2010/05/24
+
+****	Fix make parallel builds, bug255. [Petr Pisar]
+
+****	Fix Pod::Usage dependency, rt51024.  [Andreas Koenig]
+
+****	Fix trace files with empty modules crashing some viewers.
+
+
+* SystemPerl 1.334 2010/02/05
+
+****	Add tracing doubles and floats to SpTraceVcdC.
+
+****	Fix MSVC++ 2008 compile issues, bug209.  [Amir Gonnen]
+
+
+* SystemPerl 1.333 2010/01/12
+
+****	Fix expanding modules called from AUTOINOUTMODULEs, broke in 1.330.
+
+
+* SystemPerl 1.332 2009/10/22
+
+****	Fix tracing of little endian [0:15] bit vectors.
+
+
+* SystemPerl 1.331 2009/09/10
+
+***	Traces are opened with O_NONBLOCK for faster writes. [Rodney Sinclair]
+
+****	Fix compilation and installation on MacOS 10.4. [Robert Guenzel]
+
+****	Fix link error in SpTraceVcd on Cadence Incisive. [Avner Fish]
+
+
+* SystemPerl 1.330 2009/07/14
+
+**	Patching SystemC is no longer required to trace sc_bvs.
+	Note patching is still required if using Verilator before 3.712.
+
+***	Add sp_preproc -Mdir option to change output directory.
+
+****	Fix test warnings on 32-bit Perls.
+
+****	Fix missing uint32_t definition on Fedora, bug100. [Lane Brooks]
+
+
+* SystemPerl 1.321 2009/06/04
+
+****	Work around compiler warning when using flex 2.5.35. [Jonathan Kimmitt]
+
+****	SP_COVERGROUP timing windows can now have options/illegal/ignore/limit
+	like other coverpoints.
+
+****	Fix test failure on 32-bit systems.  [Brennan Ashton]
+
+
+* SystemPerl 1.320 2009/05/19
+
+**	This package is now licensed under LGPL v3 and/or Artistic v2.0.
+
+**	Verilog-Perl 3.200 or newer is required to run this version.
+
+***	Add signal and direction regexp to AUTOINOUT_MODULE.  [Brian Cassell]
+
+***	Include list of "use"d files in .sp_tree report.
+
+***	Fix tracing Verilog escaped identifiers with dots getting mis-scoped.
+
+****	Respect #sp ifdef's in coverage groups.
+
+****	Fix warning about README on git installs.  [Brian Small]
+
+
+* SystemPerl 1.311 2009/03/28
+
+**	Created SYSTEMPERL_INCLUDE which if set allows relocating the
+	src directory.
+
+***	The systemc-mode.el provided now just calls c++-mode.  This solves
+	many Emacs 22 incompatibilities, and does enough for now.
+
+****	The README was converted into pod format to create SystemC::Manual.
+
+****	Added SpCoverage::write data can now be filtered by a string.
+
+****	Fix compile error with Bison 2.4.1.  [Chitlesh Goorah]
+
+
+* SystemPerl 1.310 2009/01/22
+
+**	Further refinements of coverage.  [by Robert Woods-Corwin]
+
+**	SP_COVER_INSERT now only accepts char* keys and values.
+	This prevents GCC 4.2.1 from running out of memory.
+
+***	Support new CovVise coverage system.
+
+****	SpCoverage dumps are now written in the faster binary format.
+
+****	Fix parsing comments at end of "#sp ifelse" lines.  [Brian Cassell]
+
+****	Fix parsing sp_ui as basic type.  [Prabhat Gupta]
+
+
+* SystemPerl 1.300 2008/10/01
+
+**	Many improvements to coverage, including coverage groups and automatic
+	binning - see the documentation for details.  [by Robert Woods-Corwin]
+
+**	The SP_COVERAGE define must now be set when doing coverage.
+	This accelerates compilation and run-time when not using coverage.
+
+**	Coverage across multiple hierarchies is now compressed together,
+	as per the SystemVerilog standard.  Use SP_COVER_INSERT(...,
+	per_instance,1) to override this behavior.
+
+***	Added "#sp slow" directive for splitting up large files into
+	portions that can be compiled with less aggressive optimization.
+
+****	Support more arguments to SP_COVER_INSERT.  [by Robert Woods-Corwin]
+
+****	Fix string.h compile error.  [Rodney Sinclair]
+
+****	Fix tracing signals with negative lsbs.  [Stephane Laurent]
+
+****	Fix cpan-testers mis-reporting FAIL when no flex installed.
+
+
+* SystemPerl 1.284 2008/8/21
+
+***	Support Verilog-Perl 3.041+'s Logger-based error handling.
+
+
+* SystemPerl 1.283 2008/8/14
+
+***	Support SystemC 2.2.0 20070314 without warnings.
+
+****	Report tracer write problems as fatal errors. [Ed Spittles]
+
+****	Fix systemc-mode.el to support GNU Emacs 22.
+
+
+* SystemPerl 1.282 2008/1/2
+
+***	Allow AUTOINOUT_MODULE to read Verilog pins.
+
+***	Added AUTOTIEOFF to create zero assignments for all outputs.
+
+****	Patches to support MSVC++. [John Stroebel]
+
+
+* SystemPerl 1.281 2007/8/16
+
+***	Support wave timestamps using uint64_t.  [John Stroebel]
+
+****	Support wave files over 4GB using 32 bit compilers. [Brian Cassell]
+	This requires gcc with -D_GNU_SOURCE or -D_LARGEFILE_SOURCE.
+
+
+* SystemPerl 1.280 2007/4/30
+
+***	Add vcoverage --unlink option.
+
+****	Fix systemc-mode.el Emacs highlighting.  [Brian Cassell]
+
+****	Fix --help to use Pod::Usage instead of depreciated pod2text.
+
+****	Fix timescale problems in trace files.
+
+
+* SystemPerl 1.272 2006/10/3
+
+***	Support SystemPerl 2.2.05jun06 (via GreenSocs release).
+
+****	Report error on close if sp_log file fills disk. [Greg Waters]
+
+
+* SystemPerl 1.271 2006/7/12
+
+*****	Fix missing install of SystemC::Coverage::Item, bug111.
+
+
+* SystemPerl 1.270 2006/7/11
+
+**	Support SystemPerl 2.1.v1.  [Oleg Petlin]
+
+****	Fix SpTraceVcdC to allow multiple top modules. [Robert Woods-Corwin]
+
+
+* SystemPerl 1.261 2006/5/19
+
+***	Cleanup SpCoverage memory at exit for leak checkers.  [Prabhat Gupta]
+
+****	Fix AUTOENUM iterator begin() ignoring zero elements.  [James Kilham]
+
+
+* SystemPerl 1.260 2006/3/13
+
+**	Added iterators to AUTOENUM structures.  [Nijan Datar]
+
+**	Added SP_AUTO_COVER_CMT_IF for conditional coverage.  [Dale Bertrand]
+
+***	Added faster file format for SystemC::Coverage data.
+
+
+* SystemPerl 1.250 2006/1/16
+
+***	Improved trace-file performance.
+
+****	Fix GCC 4.0 compile problems.  [Allan Cochrane]
+
+****	Fix nested "#sp else".  [Nijan Datar]
+
+****	Fix extra trace dump transitions in Verilated files.
+
+****	Fix 32-bit trace timestamps (again). [Andy Meier]
+
+
+* SystemPerl 1.240 2005/11/2
+
+**	Added SP_AUTO_METHOD for declaring methods and sensitivities.
+
+**	AUTOCTOR is renamed AUTOINIT to avoid confusion with SP_AUTO_CTOR.
+
+**	Added sp_ui<#,#> magic data type.
+
+**	Added #sp ifdef/ifndef/else/endif.
+
+***	Added SP_AUTO_COVER_CMT. [Bobby Woods-Corwin]
+
+****	Warn users if misconnects and missing AUTOINST.  [Vasu Arasanipalai]
+
+****	Fix truncation of timescales in vcd files.  [Prabhat Gupta]
+
+****	Fix SP_TEMPLATE with ${#} replacements.  [Bryce Denney]
+
+
+* SystemPerl 1.230 2005/9/20
+
+**	Rewrote the coverage analysis classes to allow cross products.
+	Note this may break tools that used the lower level coverage classes.
+
+***	Vcoverage may now report multiple coverage items per line.
+	This occurs when multiple items were declared on the same line.
+
+
+* SystemPerl 1.220 2005/8/12
+
+**	SP_TEMPLATE can now apply to specified pin types, for example 'sc_in's.
+
+****	Fix virtual public class parsing.  [Bobby Woods-Corwin]
+
+****	Fix missing Class.pm file.  [Marek R]
+
+
+* SystemPerl 1.210 2005/7/27
+
+**	Parse SP_TRACED inside classes used inside sp_in/outs.  [Matt Reilly]
+
+***	Add SP_MODULE_CONTINUED for huge Verilated files.
+
+
+* SystemPerl 1.201 2005/5/30
+
+****	Support SystemPerl 2.1 Beta. [Fuat Keceli]
+
+
+* SystemPerl 1.200 2005/5/23
+
+***	Parse pinouts from ncshell (ncsc_foreign_modules).
+
+****	Warn if second AUTOINST declared for same cell.  [Matt Reilly]
+
+****	Fix tracing of signals that change in less than one time-unit.
+
+****	Fix systemc-mode.el missing require statements.  [Andrew Scott]
+
+****	Fix C++ Comments [Merijn Brand]
+
+
+* SystemPerl 1.190 2005/3/21
+
+**	Add AUTOINIT for constructing port names in SC_CTORs.
+
+
+* SystemPerl 1.180 2005/3/14
+
+**	Add SP_TEMPLATE for wildcarding AUTOINST signals.  [Bryce Denney]
+
+***	Add support for Cadence NC-SystemC.
+
+
+* SystemPerl 1.171 2005/3/2
+
+***	Fix tracing at time scales other than ns.  [Matt Reilly]
+
+****	Fix make test no matching function compile error.  [Thomas Dodd]
+
+
+* SystemPerl 1.170 2005/3/1
+
+**	NEWS is now renamed Changes, to support CPAN indexing. [Offer Kaye]
+
+**	SystemC 1.170 requires Verilog-Perl 2.310 or newer.
+
+***	Add Doxygen comments to C++ sources.
+
+***	Fix sc_in<sc_clock> vs. sc_in_clk SystemPerl 2.0.1 difference.
+
+***	Fix tracing of uint64_t. [Bryce Denney]
+
+***	Fix declaring pins not directly under cells.  [Matt Reilly]
+
+***	Fix make test "0" is not a reference error.  [Thomas Dodd]
+
+
+* SystemPerl 1.163 2004/11/18
+
+****	Fix sc_lite.cpp compile error on GCC 3.3.3. [Hans van Antwerpen]
+
+
+* SystemPerl 1.162 2004/10/26
+
+****	Allow any filename to be a coverage file.  [Dawn Campanelli]
+
+
+* SystemPerl 1.161 2004/8/26
+
+***	Support macro calls in enumeration values.
+
+****	Fixed sp_log_file empty file creation on GCC 3.
+
+****	Fixed cygwin test error.  [John Brownlee]
+
+****	Fix pod documentation errors. [Offer Kaye]
+
+
+* SystemPerl 1.160 2004/8/12
+
+**	Added vcoverage, SystemC::Coverage, and related coverage examples.
+	Functions named sp_coverage_* have been changed to SpCoverage::*
+
+***	Added uint64 tracing and structure support for Verilator 3.240.
+
+
+* SystemPerl 1.150 2004/6/16
+
+***	Trace file code now supports standalone C code.
+
+****	More reliable detection of existing patches.
+
+
+* SystemPerl 1.149 2004/3/10
+
+***	Patch process fixes for Solaris.
+
+
+* SystemPerl 1.148 2004/1/27
+
+****	Documentation fixes
+
+
+* SystemPerl 1.147 2003/12/5
+
+****	Support Verilator Modules
+
+
+* SystemPerl 1.146 2003/10/28
+
+****	Support Verilator PVT cell names
+
+
+* SystemPerl 1.145 2003/8/19
+
+****	Fix rare array-out-of-bounds crash with tracing array signal
+
+****	More Redhat 9 and GCC 3.2.2 fixes
+
+
+* SystemPerl 1.144 2003/8/12
+
+****	Redhat 9 and GCC 3.2.2 fixes
+
+
+* SystemPerl 1.143 2003/7/30
+
+****	Redhat 9 installation fixes
+
+
+* SystemPerl 1.142 2003/7/16
+
+****	Support tracing of uint8_t's
+
+
+* SystemPerl 1.141 2003/7/15
+
+***	Allow "sp use .cell.subcell.subsubcell" to include entire paths.
+
+****	Fix whitespace in sp preprocessor directives, "# sp use ...".
+
+****	Fix some RedHat 9.0 warnings
+
+
+* SystemPerl 1.140 2003/4/6
+
+***	Allow "sp use DEFINE" where DEFINE is a symbol like ALIAS_CELL
+	that should be replaced with the definition value of ALIAS_CELL.
+
+***	Support tracing AUTOENUM types. [Greg Waters]
+
+****	Report warning if SP_TRACED variables aren't traced. [Greg Waters]
+
+****	Allow enum values to initialize to symbolic constants. [Greg Waters]
+
+****	Use low level I/O routines to improve tracing by 30%.
+
+****	Have AUTOTRACE use values from the module that generates the signal
+	rather than the top level.  With Verilator, tracing is 10% faster.
+
+****	Support bison 1.75
+
+
+* SystemPerl 1.130 2002/11/3
+
+**	Support SystemPerl version 2.0.1.  A patch is required for tracing
+	input signals and sc_bv types, see the the README file.
+
+***	Add example of SP_COVER statement.
+
+
+* SystemPerl 1.122 2002/8/29
+
+***	Put AUTOINOUT signals under that label, so they can be public
+	while AUTOSIGNALs can be private.  [Greg Waters]
+
+***	Support signals in inherited sc_modules. [Navit Fedida]
+
+
+* SystemPerl 1.120 2002/8/19
+
+***	Support modules declared as inherited from sc_module. [Navit Fedida]
+
+
+* SystemPerl 1.110 2002/8/8
+
+****	Allow traced modules to determine if they might have any activity.
+	Used for Verilator3 to improve trace speed by about 60%.
+
+
+* SystemPerl 1.100 2002/3/11
+
+**	Added Emacs mode in systemc-mode.el
+
+**	Added #sp use "filename", for determining link objects automatically.
+
+***	Allow modules not specified on the command line to be found
+	automatically by using the search path (ala Verilog.)
+
+****	SystemC::Parser now emits a separate text() callback for the text
+	of a AUTO.  This allows programs to more easily replace the text inline.
+
+****	Improve tracing to allow smaller files, rollover, inlining child traces.
+
+
+* SystemPerl 1.000 2001/11/16
+
+**	Moved Netlist guts into Verilog package,
+	made SystemPerl a derived class.  This allows mixed-mode netlists.
+
+**	$SYSTEMPERL should now point to the root of this package,
+	not the root/src directory.
+
+***	Include header guards in .cpp file so that multiple CONCAT
+	inclusions with sp_includer work OK.
+
+***	Allow tracing of sc_bv<>'s
+
+****	Addition of experimental sclite library
+	for testing package without SystemPerl installed.
+
+
+* SystemPerl 0.430 2001/9/26
+
+**	Added #sp include directive.  [Experimental, some crashes]
+
+**	AUTOMETHODS is the new name for AUTODECLS
+	AUTOMETHODS will create a SC_CTOR(__MODULE__); if there is not
+	already one in the class interface.
+
+**	AUTOTRACE uses a internal library to trace ports.
+	AUTOTRACE should work on all clocks, ports, arrays, etc, and
+	any simple types marked with SP_TRACED.
+	AUTOTRACE requires AUTOMETHODS to be used in the class interface.
+
+**	The #include systemperl.h at the top of all .h files has been removed.
+	It must be included manually.  This allows systemperl to be used in
+	non-systemc applications.
+
+***	AUTOENUM ascii() method implementations are now put in the .cpp
+	rather than the .h file.  This is indicated by a AUTOIMPLEMENTATION
+	section, which is inserted automatically at the bottom of the .cpp
+	file if not elsewhere in the file.
+
+***	Detect and report unterminated strings, automodes, comment blocks.
+
+***	Handle character constants ('a', '\0').  Handle octal and hex
+	escape sequences in strings and char-constants.
+
+***	Handle nested typenames (e.g. sc_out<ClassFoo::EnumBar>).
+
+
+* SystemPerl 0.420 2001/6/27
+
+**	Added AUTOSUBCELL_INCLUDE and AUTOSUBCELL_CLASS
+
+**	Extracted SystemC::Template for other programs needing #line'd files.
+
+**	Comments are now properly extracted for signals & ports.
+	Note such comments must begin on the same line as the declaration.
+
+***	Fixed extra #line statements in output files.
+
+***	Added directional comment to /*AUTOINST*/ created pins.
+
+***	Fixed bug with recognizing sc_inouts.  [Amir Sahar]
+
+
+* SystemPerl 0.410 2001/5/21
+
+**	Added AUTOTRACE for creating trace statements for all signals.
+
+**	Added sp_includer and sp_makecheck for faster SystemPerl compiles.
+
+***	Added sp_preproc --libcell for cells that are not to be expanded.
+	This is useful for hierarchical sp_preproc'essing.
+
+
+* SystemPerl 0.400 2001/5/4
+
+**	Added AUTOENUM_* for ascii displays of enum values.
+
+**	Added SP_CTOR_IMP for constructors outside of the class decl.
+
+**	Added SP_CELL_DECL, and allowed arrayed cell declarations.
+
+**	Added SP_CELL_FORM for printf formatting of cell name.
+
+**	Fixed class x {enum y}, class z {enum y} problem.
+
+***	Fixed test on Solaris Linux.
+
+****	The debugging dump methods are now ->dump, not ->print.
+
+
+* SystemPerl 0.300 2001/4/3
+
+**	sc_clocks are now recognized as signal declarations.
+
+**	sc_main is considered similar to a SC_MODULE(sc_main)
+
+****	Support Perl 5.005_003 and non-GCC
+
+****	Many, Many bug fixes.
+
+
+* SystemPerl 0.1 2001/3/31
+
+****	Package Created
+
+
+----------------------------------------------------------------------
+DESCRIPTION: Documentation on change history for this package
+----------------------------------------------------------------------
+
+This uses outline mode in Emacs.  See C-h m [M-x describe-mode].
+
+Copyright 2001-2014 by Wilson Snyder.  This program is free software; you
+can redistribute it and/or modify it under the terms of either the GNU
+Lesser General Public License Version 3 or the Perl Artistic License
+Version 2.0.
+
+Local variables:
+mode: outline
+paragraph-separate: "[ 	\f\n]*$"
+end:

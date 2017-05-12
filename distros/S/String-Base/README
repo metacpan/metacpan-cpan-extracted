@@ -1,0 +1,38 @@
+NAME
+
+String::Base - string index offseting
+
+DESCRIPTION
+
+This module implements automatic offsetting of string indices.  In normal
+Perl, the first character of a string has index 0, the second character 
+has index 1, and so on.  This module allows string indexes to start at
+some other value.  Most commonly it is used to give the first character 
+of a string the index 1 (and the second 2, and so on), to imitate the
+indexing behaviour of FORTRAN and many other languages.  It is usually
+considered poor style to do this.
+
+The string index offset is controlled at compile time, in a
+lexically-scoped manner.  Each block of code, therefore, is subject to
+a fixed offset.  It is expected that the affected code is written with
+knowledge of what that offset is.
+
+INSTALLATION
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+AUTHOR
+
+Andrew Main (Zefram) <zefram@fysh.org>
+
+COPYRIGHT
+
+Copyright (C) 2011, 2012 Andrew Main (Zefram) <zefram@fysh.org>
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

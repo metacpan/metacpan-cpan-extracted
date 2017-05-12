@@ -1,0 +1,6 @@
+lib/Syntax/Highlight/JSON.pm
+t/01-use.t
+Makefile.PL
+Makefile.old
+MANIFEST
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,128 @@
+NAME
+    Syntax::Feature::Simple - DWIM syntax extensions
+
+VERSION
+    version 0.002
+
+DESCRIPTION
+    This is a more of a syntax extension package than a simple extension by
+    itself. It will detect what kind of package it is imported into, and
+    setup appropriate syntax extensions depending on the type.
+
+  Moose Classes and Roles
+    If a Moose class or role is detected, this extension will setup a "fun"
+    keyword for function declarations, a "method" keyword, and one keyword
+    each for "before", "after" and "around".
+
+    The modifiers behave exactly like normal method declarations, except for
+    "around" which will provide the original method in a lexical named
+    $orig.
+
+        package MyProject::MooseClassOrRole;
+        use Moose;
+        # or use Moose::Role
+        # or use MooseX::Role::Parameterized,
+        #    but with body inside role { ... }
+        use syntax qw( simple/v2 );
+
+        fun foo ($x) { ... }
+        my $anon_f = fun ($x) { ... };
+
+        method bar ($x) { $self->say($x) }
+        my $anon_m = method ($x) { $self->say($x) };
+
+        before baz ($x) { $self->say($x) }
+        after  baz ($x) { $self->say($x) }
+        around baz ($x) { $self->say($self->$orig($x)) }
+
+        1;
+
+    In case of a parameterizable role the right callback will be called, but
+    compatibility with anonymous method declarations will be preserved:
+
+        package MyProject::ParamRole;
+        use MooseX::Role::Parameterized;
+        use syntax qw( simple/v2 );
+
+        parameter method_name => (is => 'ro');
+
+        # defaults to $parameter
+        role ($param) {
+            my $name = $param->method_name;
+            method "$name" ($n) { $self->say($n) }
+            my $anon = method ($n) { $self->say($n) };
+        }
+
+        1;
+
+    As of version 2 you will also get sugar for the "role" body that allows
+    you to specify a signature. By default, the parameter object will be
+    available in a variable named $parameter.
+
+  Plain Packages
+    By default, if no other kind of package type is detected, "simple/v1"
+    will only setup the function syntax, while "simple/v2" will setup the
+    function and the method extension.
+
+        package MyProject::Util;
+        use strictures 1;
+        use syntax qw( simple/v2 );
+
+        fun foo ($x) { ... }
+        my $anon_f = fun ($x) { ... };
+
+        method bar ($class: $x, $y) { ... }
+        my $anon_m = method ($x) { ... };
+
+        1;
+
+FUTURE CANDIDATES
+  "simple/v*" (basic set)
+    *   "no indirect"
+
+    *   "use true"
+
+    *   Try::Tiny
+
+  "simple/x*" (extended set)
+    *   Smart::Match if a valid Perl version was declared
+
+SEE ALSO
+    Syntax::Feature::Simple::V1
+        Version 1 of the extension set.
+
+    Syntax::Feature::Simple::V2
+        Version 2 of the extension set.
+
+    syntax
+        The syntax dispatching module.
+
+    Syntax::Feature::Simple
+        Contains general information about this extension.
+
+    Syntax::Feature::Method
+        Specifics about the "method" and modifier keywords.
+
+    Syntax::Feature::Function
+        Specifics about the "fun" function keyword.
+
+    Moose
+        Post-modern object-orientation.
+
+    MooseX::Role::Parameterized
+        Parameterizable roles for Moose.
+
+BUGS
+    Please report any bugs or feature requests to
+    bug-syntax-feature-simple@rt.cpan.org or through the web interface at:
+    http://rt.cpan.org/Public/Dist/Display.html?Name=Syntax-Feature-Simple
+
+AUTHOR
+    Robert 'phaylon' Sedlacek <rs@474.at>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Robert 'phaylon' Sedlacek.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

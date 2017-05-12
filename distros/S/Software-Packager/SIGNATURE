@@ -1,0 +1,36 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.21.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 25df655e3f454c68cab8eb127e34c7e62e729029 Changes
+SHA1 6585a6053fc6fa167271e47ce8d8f58c9d0f58e1 LICENSE
+SHA1 b7ac0553ada0ef5a0eb0516affdb5ff7cbb7a360 MANIFEST
+SHA1 a11c5dd1afab64c5b7fd37110794523160df5a4c Makefile.PL
+SHA1 8e47581b1c2cb4a2a7339272cbd8dcecaf8f4867 README
+SHA1 c07e8acc4a3a5bf67291a26f004909c2f050d5e6 TODO
+SHA1 d44c631cc5d8653d3d6161e1ab16fe0e097c9f8b example/example.pl
+SHA1 b9d41827db37dc4ecf7d15bec02148f919e4011e lib/Software/Packager.pm
+SHA1 db6075f3babd5673755236e30e25dc614530090f lib/Software/Packager/Object.pm
+SHA1 c37e465b9d4fef2bd77010dabf662328f583f4a2 lib/Software/Packager/Tar.pm
+SHA1 6bf667bc66b35d6456a994b5636335c21db4957d t/00_signature.t
+SHA1 89a2c647eb383a84dd38e0dc82ddb051c12e5be5 t/01_initialise.t
+SHA1 0b054cf7b497bb74964c2c03598b9cf34c43da8f t/02_tar.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.0.7 (Darwin)
+
+iD8DBQE+VDlYkdale0dK2vIRArgrAJ93J+W+tW+Zb8wyKYegMRU6/Ah6VgCfdvXe
+XcLGqh6UjoQTzPOQ/VJGnU4=
+=7Aed
+-----END PGP SIGNATURE-----

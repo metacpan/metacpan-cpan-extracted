@@ -1,0 +1,9 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+bin/histogram
+dist.ini
+lib/Statistics/Histogram.pm
+weaver.ini

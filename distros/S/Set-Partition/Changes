@@ -1,0 +1,17 @@
+Revision history for Perl extension Set::Partition
+
+0.03 2006-10-11 08:19:06 UTC
+    - Clarified the license in Makefile.PL. (Requires a modern
+      version of ExtUtils::MakeMaker).
+
+0.02 2006-06-05 16:48:00 UTC
+    - Allow hash references to be used as sets, as well as array
+      refs. Acknowledgements to Ken Williams for this suggestion.
+    - Examples added to the documentation, and corrected the example
+      given in the synopsis.
+    - Performance boost: store an array [0 1 2 ... n], which
+      is cheaper than constructing 0..$#$list in next().
+
+0.01  2006-05-22 07:31:26 UTC
+    - original version; created by genpm v1.1
+

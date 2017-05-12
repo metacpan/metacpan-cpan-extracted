@@ -1,0 +1,107 @@
+Revision history for ShardedKV: 0.20
+
+0.20      2014-06-14 16:54:36UTC+0000 UTC
+
+  - In addition to reconnecting if we get a MySQL error matching
+    "MySQL server has gone away" we now also reconnect if the error
+    matches "Lost connection to MySQL server during query".
+
+0.19      2014-03-19 11:46:23UTC+0000 UTC
+
+  - This module is *no longer* considered experimental. It's been used
+    in production at Booking.com for a long time now without much
+    issue.
+
+  - Several minor bugfixes like "use"-ing a module that might be used
+    for exceptions, fixing some exception logic.
+
+  - Try to deal with Redis clients that have gone away for whatever
+    reason (likely due to errors) by resetting the Redis connection on
+    errors.
+
+0.18      2013-05-28 17:35:01 Europe/Amsterdam
+
+  - Auto-reconnect options for Redis storage backend.
+
+0.17      2013-02-28 15:23:34 Europe/Amsterdam
+
+  - Correctly capture exception messages so they proprogated
+  - Add a new exception type DeleteFail (this was uncovered before)
+
+0.16      2013-01-28 17:16:09 Europe/Amsterdam
+  
+  - Implement reset_connection($key) at the top level
+  - Add tests for reset_connection() functionality
+  - Fix some POD retardedness
+  - Fix a bug in MySQL storage reset_connection
+
+0.15      2013-01-22 12:42:24 Europe/Amsterdam
+
+  - Ugh. Forgot the damn Throwable dep
+
+0.14      2013-01-21 14:43:33 Europe/Amsterdam
+
+  - API CHANGE FOR THE SHIPPED STORAGE BACKENDS
+  - Add error classes and throw exceptions when needed
+  - Add some additional documentation
+  - Remove all references to "master" connections
+    (we'll add that feature at a later date if needed
+
+0.13      2012-06-21 15:42:42 Europe/Berlin
+
+  - More documentation
+  - Require Algorithm::ConsistentHash::Ketama 0.00008
+
+0.12      2012-05-18 10:24:36 Europe/Berlin
+
+  - MySQL storage order of initialization bug fix.
+  - MySQL storage support for auto_increment PK
+  - Ketama continuum: guard against bad specs
+  - Introducing the HasLogger role, adding logging
+    to various bits of code.
+
+0.11      2012-05-11 11:20:36 Europe/Berlin
+
+  - Minor MySQL storage fixup
+
+0.10      2012-05-08 09:43:54 Europe/Berlin
+
+  - MySQL storage: more documentation and minor
+                   method renaming.
+
+0.09      2012-05-08 09:15:17 Europe/Berlin
+
+  - MySQL storage: reconnect logic (with exp. backoff)
+
+0.08      2012-04-26 16:52:51 Europe/Berlin
+
+  - Ooops, lose the Redis cfg that will make tests fail.
+
+0.07      2012-04-26 16:07:08 Europe/Berlin
+
+  - POD fixes.
+  - Optional jitter added to Redis expiration time.
+
+0.05      2012-04-26 08:03:10 Europe/Berlin
+
+  - Allow any number of value columns in MySQL storage backend.
+
+0.04      2012-04-25 10:22:37 Europe/Berlin
+
+  - delete() now handles migrations correctly.
+  - Prototype StaticMapping sharding strategy
+
+0.03      2012-04-22 20:20:17 Europe/Berlin
+
+  - Tests for the Redis string storage.
+  - Tests for the Redis hash storage.
+  - Fixed return value for ::Storage::Redis::Hash->get
+
+0.02      2012-04-22 11:33:31 Europe/Berlin
+
+  - Fix missing dependencies
+  - Start using Pod::Weaver
+
+0.01  Sat Apr 21 12:00:00 2012
+  - original version
+

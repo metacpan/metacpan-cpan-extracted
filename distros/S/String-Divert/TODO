@@ -1,0 +1,8 @@
+
+ TODO
+ ====
+
+ o resurrect TIE mechanism for assignment operator once Perl 
+   is no longer buggy (see "BUGS" in "perldoc overload") and
+   no longer looses the overloading after STORE.
+

@@ -1,0 +1,84 @@
+<machine
+  id="foo"
+  xmlns="http://slaysys.com/StateML/1.0"
+>
+
+  <preamble>
+#include "stdio.h"
+  </preamble>
+
+  <event id="reset_event"         type="ui">
+    <description>When the &lt;foo&gt; is reset.</description>
+    <api>reset_event( int value )</api>
+  </event>
+  <event id="init_event"         type="ui">
+    <description>When the &lt;foo&gt; is initialized.</description>
+    <api>init_event( int value )</api>
+  </event>
+  <event id="main_event"         type="other">
+    <description>The main event!</description>
+    <api>main_event( int value )</api>
+  </event>
+  <event id="all_loop_event"      type="ui">
+    <description>something can happen in all states.</description>
+    <api>all_loopback_event(int value)</api>
+    <pre-handler>all_loop_pre_event_handler( value )</pre-handler>
+    <handler>
+       if ( value ) {
+           all_loop_event_handler( value );
+       }
+       else {
+           value = value;
+       }
+    </handler>
+    <post-handler>all_loop_post_event_handler( value )</post-handler>
+  </event>
+
+  <state id="#ALL">
+    <description>A state that represents things that apply to all states.</description>
+    <arc event-id="all_loop_event">
+      <description>Do something in every state for this event.</description>
+      <handler>all_loop_arc_handler(value)</handler>
+    </arc>
+    <arc event-id="reset_event" goto="init">
+      <description>Reset the machine from any event.</description>
+      <handler>all_reset_arc_handler(value)</handler>
+    </arc>
+    <entry-handler>all_state_entry_handler(value)</entry-handler>
+    <exit-handler>>all_state_exit_handler(value)</exit-handler>
+  </state>
+
+
+  <state id="init" is-first="1">
+    <description>Initialize &lt;foo&gt;.</description>
+    <arc event-id="init_event" goto="main">
+      <description>When initialization is complete, run normally.</description>
+    </arc>
+    <entry-handler>init_entry_handler(value)</entry-handler>
+    <exit-handler>init_exit_handler(value)</exit-handler>
+    <description>line 1
+line 2
+</description>
+  </state>
+
+  <state id="main">
+    <description>Normal running state.</description>
+    <arc event-id="main_event" guard="some condition">
+      <description>Handle the main events when some condition is true.</description>
+      <handler>main_main_event_arc_handler(value)</handler>
+    </arc>
+    <arc event-id="main_event" guard="some other condition">
+      <description>Handle the main events when some other condition is true.</description>
+      <handler>main_main_event_arc_handler(value)</handler>
+    </arc>
+    <entry-handler>main_entry_handler(value)</entry-handler>
+    <exit-handler>main_exit_handler(value)</exit-handler>
+    <arc event-id="all_loop_event">
+      <description>Do something addional for the all_loop_event.</description>
+      <handler>main_all_loop_arc_handler(value)</handler>
+    </arc>
+    <state id="sub">
+    </state>
+  </state>
+
+</machine>

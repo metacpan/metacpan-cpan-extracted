@@ -1,0 +1,60 @@
+__section__
+default
+__description__
+The navigation bar
+
+* mailbox = whether if the user has access to mailbox
+* newid = the link to acquire a new id
+* login = the login url
+* mailbox = the mailbox url
+* topclass = the 'Top' class. ignore it.
+
+__title__
+
+__page__
+ournet
+__lang__
+zh_TW
+__name__
+navigation
+__template__
+<table width="100%" border=0 cellpadding=3 cellspacing=0><tr>
+<td width="50%">
+[
+[% IF user == 'guest' %]
+    [% IF newid %]
+	[% IF slash_user %]
+<a href='users.pl'>[% newid %]</a>
+	[% ELSE %]
+<a href='[% script %]/?newid'>[% newid %]</a>
+	[% END %]
+|
+    [% END %]
+    [% IF login %]
+	[% IF slash_user %]
+<a href='users.pl?op=userlogin'>[% login %]</a>
+	[% ELSE %]
+<a href='[% script %]/?login'>[% login %]</a>
+	[% END %]
+|
+    [% END %]
+[% ELSIF mailbox %]
+<a href='[% script %]/?mail'>[% mailbox %]</a>
+|
+[% END %]
+[% bugreport %]
+|
+[% customize %]
+]
+</td><td width="50%" align="right">
+<FORM action='[% script %]' method='POST'>
+[% loc('Select board') %]
+<INPUT type='hidden' name='op' value='board'>
+<INPUT type='hidden' name='group' value='[% topclass %]'>
+<INPUT type='hidden' name='child' value='articles'>
+<INPUT type='text'   name='board' size=15 maxlength=20>
+<INPUT type='submit' value='[% loc('Go_Page') %]'>
+</FORM>
+</td></tr></table><hr>
+__seclev__
+10000

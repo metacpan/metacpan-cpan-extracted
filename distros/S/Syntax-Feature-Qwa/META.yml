@@ -1,0 +1,43 @@
+---
+abstract: 'qwa(), qwh() and qwk() quote-like operators to create arrayrefs and hashrefs'
+author:
+  - 'Toby Inkster <tobyink@cpan.org>'
+  - 'TOBYINK <tobyink@cpan.org>'
+build_requires:
+  Test::More: '0.61'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Moose::Meta::Class::__ANON__::SERIAL::6 version , CPAN::Meta::Converter version 2.140640'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Syntax-Feature-Qwa
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Syntax::Feature::Qwa:
+    file: lib/Syntax/Feature/Qwa.pm
+    version: '0.002'
+requires:
+  B::Hooks::EndOfScope: '0'
+  Devel::Declare: '0'
+  Devel::Declare::Context::Simple: '0'
+  Sub::Install: '0'
+  namespace::clean: '0'
+  strict: '0'
+resources:
+  X_identifier: http://purl.org/NET/cpan-uri/dist/Syntax-Feature-Qwa/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Syntax-Feature-Qwa
+  homepage: https://metacpan.org/release/Syntax-Feature-Qwa
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-syntax-feature-qwa.git
+version: '0.002'

@@ -1,0 +1,37 @@
+#  -*- makefile -*-
+{
+    use strict;
+
+    use vars qw(@OKS @OUTPUT);
+
+    my @exps = <*.log.exp>;
+    @OKS = @exps;
+    s((.*)\.log\.exp\z)($1.ok) foreach @OKS;
+}
+
+test:	{ @OKS }
+
+# Fault grading
+%.ok:	%.log
+	diff $DEP0.exp $DEP0 > $TARGET 2>&1
+
+# Test execution
+%.log:	%.smak
+	{
+	    my ($maker, $target, $deps, $matches) = @_;
+	    my %options;
+	    $options{debug} = 1 if $ENV{DEBUG};
+	    my $sm = Slay::Makefile->new(\%options );
+	    @OUTPUT = ();
+	    eval { $sm->parse($deps->[0]); };
+	    push @OUTPUT, $@ if $@;
+	    if ($@ =~ /requires explicit package name/) {
+		$options{strict} = 0;
+		$sm = Slay::Makefile->new( \%options );
+		$sm->parse($deps->[0]);
+	    }
+	    $sm->make;
+	    open T, ">$target";
+	    print T @OUTPUT;
+	    close T;
+	}

@@ -1,0 +1,4 @@
+# Test the action "Extraneous input" warning
+
+target:
+	{ 'depend' }ghi

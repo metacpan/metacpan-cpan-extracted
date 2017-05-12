@@ -1,0 +1,20 @@
+String::Pattern - create / identify strings by pattern
+
+Copyright (c) 2000 Ivo Zdravkov. All rights reserved.  This program is
+free software; you can redistribute it and/or modify it under the same terms
+as Perl itself.
+
+DESCRIPTION
+    This module is designed to deal whith non atomic data strings
+    representations whith fixed number of items on it - such as addresses,
+    business cards, product descriptors etc. It simplificies string creation
+    based on preliminary defined human readable patterns ( templates ) and
+    identifying that any given string has format, "described" in the same
+    pattern.
+
+INSTALLING
+  # perl Makefile.PL
+  # make
+  # make install
+
+

@@ -1,0 +1,132 @@
+package Scrappy::Plugin;
+
+BEGIN {
+    $Scrappy::Plugin::VERSION = '0.94112090';
+}
+
+# load OO System
+use Moose;
+
+# load other libraries
+use File::Find::Rule;
+
+# a hash list of installed plugins
+has registry => (
+    is      => 'ro',
+    isa     => 'HashRef',
+    default => sub {
+
+        # map plugins
+        my $plugins = {};
+        my @plugins = @{shift->plugins};
+        foreach my $plugin (@plugins) {
+            $plugins->{$plugin} = $plugin;
+            $plugins->{lc($plugin)} = $plugin;
+        }
+        return $plugins;
+    }
+);
+
+# return a list of installed plugins
+has plugins => (
+    is      => 'ro',
+    isa     => 'Any',
+    default => sub {
+
+        my @plugins = ();
+
+        # fix for bug found by Patrick Woo
+
+#Can't stat /etc/perl/Scrappy/Plugin: No such file or directory
+#at /usr/share/perl5/File/Find/Rule.pm line 595
+#Can't stat /usr/local/lib/perl/5.10.1/Scrappy/Plugin: No such file or directory
+#at /usr/share/perl5/File/Find/Rule.pm line 595
+#Can't stat /usr/lib/perl5/Scrappy/Plugin: No such file or directory
+#at /usr/share/perl5/File/Find/Rule.pm line 595
+#Can't stat /usr/share/perl5/Scrappy/Plugin: No such file or directory
+#at /usr/share/perl5/File/Find/Rule.pm line 595
+#Can't stat /usr/lib/perl/5.10/Scrappy/Plugin: No such file or directory
+#at /usr/share/perl5/File/Find/Rule.pm line 595
+#Can't stat /usr/share/perl/5.10/Scrappy/Plugin: No such file or directory
+#at /usr/share/perl5/File/Find/Rule.pm line 595
+#Can't stat /usr/local/lib/site_perl/Scrappy/Plugin: No such file or directory
+#at /usr/share/perl5/File/Find/Rule.pm line 595
+#Can't stat ./Scrappy/Plugin: No such file or directory
+#at /usr/share/perl5/File/Find/Rule.pm line 595
+
+        # ... (IMO) due to analyzing @INC assuming each path has Scrappy in it
+
+        my $library;
+
+        foreach my $dir (@INC) {
+            if (-d "$dir/Scrappy/Plugin") {
+                $library = "$dir/Scrappy/Plugin";
+                last;
+            }
+        }
+
+        return [] unless $library;
+
+        my @files = File::Find::Rule->file()->name('*.pm')->in($library);
+
+        my %plugins =
+          map { $_ => 1 }
+          map { s/.*(Scrappy[\\\/]Plugin[\\\/].*\.pm)/$1/; $_ }
+          @files;    #uniquenes
+
+        for my $plugin (keys %plugins) {
+
+            my ($plug) = $plugin =~ /(Scrappy\/Plugin\/.*)\.pm/;
+
+            if ($plug) {
+                $plug =~ s/\//::/g;
+                push @plugins, $plug;
+            }
+
+        }
+
+        return [@plugins];
+    }
+);
+
+sub load_plugin {
+    my $self    = shift;
+    my @plugins = @_;
+    my @returns = ();
+
+    foreach my $plugin (@plugins) {
+
+        unless ($plugin =~ /^Scrappy::Plugin::/) {
+
+            # make fully-quaified plugin name
+            $plugin = ucfirst $plugin;
+
+            $plugin = join("::", map(ucfirst, split '-', $plugin))
+              if $plugin =~ /\-/;
+            $plugin = join("", map(ucfirst, split '_', $plugin))
+              if $plugin =~ /\_/;
+
+            $plugin = "Scrappy::Plugin::$plugin";
+        }
+
+        # check for a direct match
+        if ($self->registry->{$plugin}) {
+            with $self->registry->{$plugin};
+            push @returns, $self->registry->{$plugin};
+        }
+
+        # last resort seek
+        elsif ($self->registry->{lc($plugin)}) {
+            with $self->registry->{lc($plugin)};
+            push @returns, $self->registry->{lc($plugin)};
+        }
+        else {
+            die(    "Error loading the plugin $plugin, "
+                  . "please check that it has been installed");
+        }
+    }
+
+    return @returns;
+}
+
+1;

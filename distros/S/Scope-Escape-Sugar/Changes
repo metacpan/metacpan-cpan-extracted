@@ -1,0 +1,55 @@
+version 0.002; 2011-09-05
+
+  * port to Perl 5.15.1: pad_findmy_sv() is in the API, replacing the
+    provisional API pad_findmy()
+
+version 0.001; 2011-07-12
+
+  * incompatible change: tie parser magic to subroutine objects, exported
+    to the importer's package namespace, rather than to keywords per se,
+    which were activated in the importer's lexical namespace
+
+  * incompatible change: deprecate relying on whether the catch tag with
+    a block is evaluated inside or outside the block
+
+  * bugfix: require bugfixed version of Scope::Escape (for return value
+    lifetime and context stack handling)
+
+  * on Perl 5.13.8 and above, make use of the new parser API functions
+    to remove most use of source rewriting
+
+  * port to Perl 5.13.10, where the value of PAD_MAX has changed
+
+  * in documentation and comments, refer to "operators" rather than
+    "keywords"
+
+  * in documentation, note that return context doesn't affect evaluation
+    of return values
+
+  * use Devel::CallParser to trigger custom parsing where required
+
+  * use Devel::CallChecker to trigger check-time op rewriting where
+    required
+
+  * in XS, use PERL_NO_GET_CONTEXT for efficiency
+
+  * don't use workaround for perl bug #74006 on perl 5.13.0 or later,
+    where it has been fixed (it's actually fixed in 5.12.1 also, but
+    relying on that would break 5.12.0<->5.12.1 binary compatibility)
+
+  * in XS, declare "PROTOTYPES: DISABLE" to prevent automatic generation
+    of unintended prototypes
+
+  * jump through a hoop to avoid a compiler warning
+
+  * use full stricture in test suite
+
+  * in Build.PL, complete declaration of configure-time requirements
+
+  * include META.json in distribution
+
+  * add MYMETA.json to .cvsignore
+
+version 0.000; 2010-04-05
+
+  * initial released version

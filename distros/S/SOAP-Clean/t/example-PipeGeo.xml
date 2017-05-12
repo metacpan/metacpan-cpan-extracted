@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:s0="http://www.tc.cornell.edu/~heber" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" targetNamespace="http://www.tc.cornell.edu/~heber" xmlns="http://schemas.xmlsoap.org/wsdl/">
+  <types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://www.tc.cornell.edu/~heber">
+      <s:import namespace="http://www.w3.org/2001/XMLSchema" />
+      <s:element name="Get">
+        <s:complexType />
+      </s:element>
+      <s:element name="GetResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:element ref="s:schema" />
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="DataSet" nillable="true">
+        <s:complexType>
+          <s:sequence>
+            <s:element ref="s:schema" />
+            <s:any />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+    </s:schema>
+  </types>
+  <message name="GetSoapIn">
+    <part name="parameters" element="s0:Get" />
+  </message>
+  <message name="GetSoapOut">
+    <part name="parameters" element="s0:GetResponse" />
+  </message>
+  <message name="GetHttpGetIn" />
+  <message name="GetHttpGetOut">
+    <part name="Body" element="s0:DataSet" />
+  </message>
+  <message name="GetHttpPostIn" />
+  <message name="GetHttpPostOut">
+    <part name="Body" element="s0:DataSet" />
+  </message>
+  <portType name="PipeGeoSoap">
+    <operation name="Get">
+      <input message="s0:GetSoapIn" />
+      <output message="s0:GetSoapOut" />
+    </operation>
+  </portType>
+  <portType name="PipeGeoHttpGet">
+    <operation name="Get">
+      <input message="s0:GetHttpGetIn" />
+      <output message="s0:GetHttpGetOut" />
+    </operation>
+  </portType>
+  <portType name="PipeGeoHttpPost">
+    <operation name="Get">
+      <input message="s0:GetHttpPostIn" />
+      <output message="s0:GetHttpPostOut" />
+    </operation>
+  </portType>
+  <binding name="PipeGeoSoap" type="s0:PipeGeoSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document" />
+    <operation name="Get">
+      <soap:operation soapAction="http://www.tc.cornell.edu/~heber/Get" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+  </binding>
+  <binding name="PipeGeoHttpGet" type="s0:PipeGeoHttpGet">
+    <http:binding verb="GET" />
+    <operation name="Get">
+      <http:operation location="/Get" />
+      <input>
+        <http:urlEncoded />
+      </input>
+      <output>
+        <mime:mimeXml part="Body" />
+      </output>
+    </operation>
+  </binding>
+  <binding name="PipeGeoHttpPost" type="s0:PipeGeoHttpPost">
+    <http:binding verb="POST" />
+    <operation name="Get">
+      <http:operation location="/Get" />
+      <input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </input>
+      <output>
+        <mime:mimeXml part="Body" />
+      </output>
+    </operation>
+  </binding>
+  <service name="PipeGeo">
+    <port name="PipeGeoSoap" binding="s0:PipeGeoSoap">
+      <soap:address location="http://ctcstager.tc.cornell.edu/Users/heber/PipeGeo/default.asmx" />
+    </port>
+    <port name="PipeGeoHttpGet" binding="s0:PipeGeoHttpGet">
+      <http:address location="http://ctcstager.tc.cornell.edu/Users/heber/PipeGeo/default.asmx" />
+    </port>
+    <port name="PipeGeoHttpPost" binding="s0:PipeGeoHttpPost">
+      <http:address location="http://ctcstager.tc.cornell.edu/Users/heber/PipeGeo/default.asmx" />
+    </port>
+  </service>
+</definitions>

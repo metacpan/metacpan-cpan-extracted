@@ -1,0 +1,19 @@
+* Unified file system information
+    - Add a database to ::Base to query fs meta data
+    - Return FS information for all available partitions.
+* Add new devices
+    - BIOS -> Easy on Windows through WMI
+    - Optical
+    - PCI
+    - VGA
+    - Other?
+* Can there be improvements on the current user detection?
+* CPU flags on non-Linux OS
+    - Windows & BSD are currently lacking this. BSD seem to have /proc support
+        but not intalled by default. So, unreliable.
+* Improve BSD driver
+    - I'm testing this on DesktopBSD. Needs to be tested on others as well.
+* CPU
+    - bitness() not implemented in BSD & Unknown
+* OS
+    - bitness() not implemented in BSD & Unknown

@@ -1,0 +1,11 @@
+geoname_id,locale_code,continent_code,continent_name,country_iso_code,country_name,subdivision_1_iso_code,subdivision_1_name,subdivision_2_iso_code,subdivision_2_name,city_name,metro_code,time_zone
+2077456,zh-CN,OC,"大洋洲",AU,"澳大利亚",,,,,,,
+1279708,zh-CN,AS,"亚洲",CN,"中国",53,"云南",,,,,Asia/Shanghai
+1279715,zh-CN,AS,"亚洲",CN,"中国",54,"西藏自治区",,,"日喀则市",,Asia/Urumqi
+1279945,zh-CN,AS,"亚洲",CN,"中国",62,"甘肃",,,"酒泉市",,Asia/Shanghai
+1279987,zh-CN,AS,"亚洲",CN,"中国",65,"新疆",,,"疏勒",,Asia/Shanghai
+1280013,zh-CN,AS,"亚洲",CN,"中国",53,"云南",,,"升平",,Asia/Shanghai
+1814991,zh-CN,AS,"亚洲",CN,"中国",,,,,,,
+2157410,zh-CN,OC,"大洋洲",AU,"澳大利亚",VIC,,,,,,Australia/Melbourne
+2152593,zh-CN,OC,"大洋洲",AU,"澳大利亚",VIC,,,,,,Australia/Melbourne
+2158177,zh-CN,OC,"大洋洲",AU,"澳大利亚",VIC,,,,"墨尔本",,Australia/Melbourne

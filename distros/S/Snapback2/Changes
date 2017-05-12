@@ -1,0 +1,88 @@
+Revision history for Snapback2.
+
+0.01  Thu Jan  1 14:35:59 EST 2004
+	- original version
+
+0.02  Thu Jan  1 15:30:00 EST 2004
+	- first CPAN release
+	- adds DestinationList for multiple backup destinations
+
+0.03  Thu Jan  2 01:22:03 EST 2004
+	- second CPAN release
+	- cleanup of README and other docs
+	- add snap_charge script.
+	
+0.04 -- Fri Jan  2 13:23:11 EST 2004
+	- third CPAN release
+	- cleanup of README and other docs
+	- enhance snapback_loop to retain rsync logs
+	- add rsync --link-dest capability as RetainPermissions
+	- add John Pelan's directory move suggestion as ManyFiles
+	- fix broken Exclude option
+	- Add Compress option to allow turning off -z
+	- Add RsyncShell option to allow same-machine or NFS copies without rsync
+
+0.05 -- 
+	- Modularize most functions
+	- Change <BackupDirectory ...> to <Directory ...>
+	- Enhance charge file to add total size, xfer rate, etc.
+	- regularize logging/debug
+
+0.07 --
+	- Allow use of rsync urls, i.e. system::tag/dir, to back up
+	- Fix status code display
+
+0.08 --
+	- Add snapcopy command to allow efficient copy.
+	- snapcopy includes POD docs.
+	- Add Before and After directives to constrain backup to
+	  certain times.
+	- Add IgnoreVanished directive to ignore the "file has vanished"
+	  error from rsync which causes most of the error emails. This
+	  typically happens when a PID or other transient file goes
+	  away.
+
+0.09 --
+	- Repeat to yourself -- proper testing includes a try at
+	  "make install".
+
+0.11 --
+    - Add PingCommand directive that specifies command to run
+	  to check connection to target system before backup.
+	- Use help from David Stoergel <lorax_at_lorax_dot_org>
+	  to finish IgnoreVanished.
+
+0.12 --
+    - Add Timestamp to debug output
+    - Matthias Pfafferodt contributed change to weekly/monthly backup so
+      it is done if more than 7 days or 30 days have elapsed. Before, it
+      would not work unless it was run on first day of week or month,
+      and that could cause a problem when the target system was down on
+      that day. Thanks to Matthias (Matthias.Pfafferodt at the excellent
+      domain mapfa.de).
+
+0.912 --
+    - Silly me, ran afoul of CPAN's numbering restrictions.
+
+0.913 --
+    - Didn't know they checked contained modules too, sigh.
+
+0.914
+	- Add patches from Jurgen Walch <jwalch@plumsoft.de> to allow Hourlies 0,
+	  and no email (even with AlwaysEmail) if no backup done.
+	- Improve snapcopy to allow transfer of only one snapshot type, along with
+	  transferring that via SSH.
+0.915
+	- Add patch suggested by Matthew S. Warren <msw@buelba.com>. It checks for
+	  hourly.0 (or daily.0 as case may be) and moves next highest hourly there
+	  to prevent retransfer in case of lost connection.
+0.916
+	- Fix tests to only try real backup if GNU cp is present.
+	- Give big warning if GNU cp is not present. Still build, to avoid CPAN::Tester
+	  failures. Will also warn people who might want to use it.
+1.001
+	- Allow specification of "RsyncShell rsync" on a different port. If
+	  hostname is host:NNN, then will make it be rsync://host:NNN/dir/
+	  instead of host:NNN::dir/, which won't work.
+	- It's been around long enough to give it a 1.001 version, don't
+	  you think?

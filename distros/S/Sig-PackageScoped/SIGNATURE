@@ -1,0 +1,37 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 7af7168417ed3d21fea88cf4bf9ef2d463eb96c2 Build.PL
+SHA1 8d618644e838ab547aa99e3dfb0a1c48ede1f0c7 Changes
+SHA1 f235ba4160673bcb7c9d58c2f09dbc7fc0efadea LICENSE
+SHA1 7901141bc6328f0f0aabacab096bce256dcb09f4 MANIFEST
+SHA1 753e0108aa545d2a3c8c5ec91a3aacb98c6f9222 META.yml
+SHA1 cd14ada78fb37a0d926edd86eddcdf7f939de582 Makefile.PL
+SHA1 b6eb56dcb96f33b7aac603bfb1d56b0f2a628f21 README
+SHA1 196046d841014a29c39818d0406b2beb7f73c0cc lib/Sig/PackageScoped.pm
+SHA1 1c1c20f74c8f25501915018dbee88f4a6313be9d lib/Sig/PackageScoped/Paranoid.pm
+SHA1 e5297b5007d2691a61f9b1af92d632ffe45f286a t/01-basic.t
+SHA1 bda008d9cbed27ebebf47ce9de2cc828cd538db6 t/02-paranoid.t
+SHA1 98c875c39bedc57bc3c52b583ddc866c6d184d0a t/perlcritic.t
+SHA1 28a931f3b0c075d8d6c4ce47d5e89c3fdb19ed0f t/pod-coverage.t
+SHA1 cec881e89926d320475f9de2b7fad02c2169f510 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+
+iD8DBQFHKLio3Or3ZzQuifMRAop8AJ9xsRWKFYQOMhMq//I/d5vuz+tmxwCg9RFo
+9Mw1/CQ9BJKV4RMO6I+E1B0=
+=miSz
+-----END PGP SIGNATURE-----

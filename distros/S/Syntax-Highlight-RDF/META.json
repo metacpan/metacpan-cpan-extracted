@@ -1,0 +1,117 @@
+{
+   "abstract" : "syntax highlighting for various RDF-related formats",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Moose::Meta::Class::__ANON__::SERIAL::7 version , CPAN::Meta::Converter version 2.140640",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Syntax-Highlight-RDF",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "JSON" : "2.00",
+            "RDF::Trine" : "1.000",
+            "RDF::TrineX::Serializer::MockTurtleSoup" : "0.001"
+         },
+         "requires" : {
+            "HTML::HTML5::Entities" : "0.001",
+            "IO::Detect" : "0.001",
+            "Moo" : "1.001000",
+            "MooX::Struct" : "0.001",
+            "Throwable::Factory" : "0.001",
+            "URI" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::LongString" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Syntax::Highlight::JSON2" : {
+         "file" : "lib/Syntax/Highlight/JSON2.pm",
+         "version" : "0.003"
+      },
+      "Syntax::Highlight::RDF" : {
+         "file" : "lib/Syntax/Highlight/RDF.pm",
+         "version" : "0.003"
+      },
+      "Syntax::Highlight::RDF::NQuads" : {
+         "file" : "lib/Syntax/Highlight/RDF.pm",
+         "version" : "0.003"
+      },
+      "Syntax::Highlight::RDF::NTriples" : {
+         "file" : "lib/Syntax/Highlight/RDF.pm",
+         "version" : "0.003"
+      },
+      "Syntax::Highlight::RDF::Notation_3" : {
+         "file" : "lib/Syntax/Highlight/RDF.pm",
+         "version" : "0.003"
+      },
+      "Syntax::Highlight::RDF::Pretdsl" : {
+         "file" : "lib/Syntax/Highlight/RDF.pm",
+         "version" : "0.003"
+      },
+      "Syntax::Highlight::RDF::SPARQL_Query" : {
+         "file" : "lib/Syntax/Highlight/RDF.pm",
+         "version" : "0.003"
+      },
+      "Syntax::Highlight::RDF::SPARQL_Update" : {
+         "file" : "lib/Syntax/Highlight/RDF.pm",
+         "version" : "0.003"
+      },
+      "Syntax::Highlight::RDF::TriG" : {
+         "file" : "lib/Syntax/Highlight/RDF.pm",
+         "version" : "0.003"
+      },
+      "Syntax::Highlight::RDF::Turtle" : {
+         "file" : "lib/Syntax/Highlight/RDF.pm",
+         "version" : "0.003"
+      },
+      "Syntax::Highlight::XML" : {
+         "file" : "lib/Syntax/Highlight/XML.pm",
+         "version" : "0.003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/Syntax-Highlight-RDF/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=Syntax-Highlight-RDF"
+      },
+      "homepage" : "https://metacpan.org/release/Syntax-Highlight-RDF",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-syntax-highlight-rdf.git",
+         "web" : "https://github.com/tobyink/p5-syntax-highlight-rdf"
+      }
+   },
+   "version" : "0.003"
+}

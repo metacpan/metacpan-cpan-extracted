@@ -1,0 +1,10 @@
+Stuff we should do really:
+
+PULL
+Update PULL to use OpenDHT
+
+CHECKOUT
+co should be an alias
+
+Error finding server: Error fetching http://appmanager.berkeley.intel-research.net/plcontrol/apps.php?appid=1001&GROUP=ANY&BUILD=ANY&CSTATUS=STATUS-3&RSTATUS=STATUS-3&GO=GO at /Library/Perl/5.8.6/Net/OpenDHT.pm line 39.
+

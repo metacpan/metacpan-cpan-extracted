@@ -1,0 +1,32 @@
+
+############################################################################## 
+SDL::App::FPS:
+
+* freeze_time() destroys time warp ramping, it should save it and
+  unfreeze_time() should restore it
+* the time per frame currently (on my system) sways wildly from 11 to 47 ms
+  when trying to draw at most 60 fps. This probably accounts for the jerky
+  movement in the demo application. Not sure if this is a kernel-timer problem
+  or something in my code. I guess I need somehow sub-ms delay or at least an
+  delay routine that does not suddenly delay for 10 or 20 ms longer than it
+  should...(Hm, disabling xmms and any background app still does not help...)
+  Update: Ksysgaurd (KDE applet monitoring CPU and memory) is causing the
+  jerky delays, since it does need quite some time every 2 seconds. However,
+  since optimisations took place the problem is no longer as apparent as it
+  used to be (read: when the delay caused by KSysGuard plus time to draw a
+  frame falls under a certain threshold, my eyes no longer see jerky stops.
+  Raise the delay by a couple ms, and it is very noticable...funny human
+  sensor equipment...)
+  However, since we can't sleep much under 5 ms, and sometimes sleep much
+  longer than planned, either a better Delay() or some better tracking of
+  the sleep times is neccessary. Currently the fps cap stops working at about
+  300 FPS, where we will start burnign 100% CPU to achive as much FPS as
+  possible, which we wanted to avoid. However, capping at 300 FPS already is
+  overkill....120 FPS or less (monitor refresh!) is much more usefull...
+* there seems to be a bug with the FPS monitoring, it often goes to 6-digit
+  FPS figures and stops to display the real FPS under 10 FPS.
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

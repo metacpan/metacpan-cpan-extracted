@@ -1,0 +1,24 @@
+Changes
+examples/follow
+lib/Shell/Tools.pm
+lib/Shell/Tools/Extra.pm
+Makefile.PL
+MANIFEST
+README
+t/00_smoke.t
+t/01_report_extra.t
+t/02_smoke_extra.t
+t/11_exclude.t
+t/20_warn_strict_findbin.t
+t/21_funcs.t
+t/22_opts_usage.t
+t/30_extra_funcs.t
+t/31_ipc_run3_shell.t
+t/90_author_critic.t
+t/91_author_pod.t
+t/92_author_examples.t
+t/perlcriticrc
+t/Shell_Tools_Testlib.pm
+t/test_opts_usage.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,83 @@
+NAME
+    Sys::FreezeThaw - stop and start all user processes on a machine
+
+SYNOPSIS
+      use Sys::FreezeThaw;
+
+      Sys::FreezeThaw::freezethaw {
+         # run code while system is frozen
+      };
+
+      my $token = Sys::FreezeThaw::freeze;
+      ... do something ...
+      Sys::FreezeThaw::thaw $token;
+
+DESCRIPTION
+    Operating Systems/Kernels current supported: Linux-2.6/3.0 with /proc.
+
+    This module implements a very specific feature: stopping(freezing and
+    thawing/continuing all userspace processes on the machine. It works by
+    sending SIGSTOP to all processes, parent-process first, so that the wait
+    syscall will not trigger on stopped children. Restarting is done in
+    reverse order.
+
+    Using the combined function Sys::FreezeThaw::freezethaw is recommended
+    as it will catch runtime errors, but stopping and restarting can be dine
+    via separate function calls.
+
+  What could it possibly be sueful for??
+    Possible uses include: doing atomic file system operations (such as
+    replacing files while they are guaranteed not to be in use), or quieting
+    down a system to investigate suspicious behaviour.
+
+    Sys::FreezeThaw::freezethaw { BLOCK }
+        First tries to stop all processes. If successful, runs the given
+        code block (or code reference), then restarts all processes again.
+        As the system is basically frozen during the code block execution,
+        it should be as fast as possible.
+
+        Runtime errors will be caught with "eval". If an exception occurs it
+        will be re-thrown after processes are restarted. If processes cannot
+        be frozen or restarted, this function will throw an exception.
+
+        Signal handlers for SIGINT, SIGTERM, SIGPIPE, SIGHUP, SIGALRM,
+        SIGUSR1 and SIGUSR2 will be installed temporarily, so if you want to
+        catch these, you have to do so yourself within the executed code
+        block.
+
+        Try to do as few things as possible. For example, outputting text
+        might cause a deadlock, as the terminal emulator on the other side
+        of STDOUT might be stopped, logging to syslog might not work and so
+        on.
+
+        The return value of the code block is ignored right now, and the
+        function doesn't yet return anything sensible.
+
+    $token = Sys::FreezeThaw::freeze
+        Send SIGSTOP to all processes, and return a token that allows them
+        to be thawed again.
+
+        If an error occurs, an exception will be thrown and all stopped
+        processes will automatically be thawed.
+
+    Sys::FreezeThaw::thaw $token
+        Take a token returned by Sys::FreezeThaw::freeze and send all
+        processes a "CONT" signal, in the order required for them not to
+        receive child STOP notifications.
+
+    $Sys::FreezeThaw::PARTIAL_OK
+        A boolean that tells "freeze" whether it is an error if a process
+        cannot be stopped. If false (the default), then "freeze" will fail
+        if there is an unstoppable process. If it is true, then "freeze"
+        will pretend it the process stopped.
+
+BUGS
+    SIGCONT is not unnoticed by processes. Some programs (such as
+    irssi-text) respond by flickering (IMHO a bug in irssi-text). Other
+    programs might have other problems, but actual problems should be rare.
+    However, one shouldn't overuse this module.
+
+AUTHOR
+       Marc Lehmann <schmorp@schmorp.de>
+       http://home.schmorp.de/
+

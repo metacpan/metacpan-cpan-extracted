@@ -1,0 +1,182 @@
+Revision history for CPAN distribution Sys-Filesystem
+
+1.406 2014-05-13
+    - always use global kernel mount table (/proc/mounts), not the process
+      mirror
+    - add support for getting canonical device path
+    - add support for package wide settings to tune Sys::Filesystem even
+      when used indirectly
+
+1.405 2013-10-28
+    - Fix Mswin32 mounted/unmounted support (thanks to Christian "Mithaldu"
+      Walde for remote testing support)
+    - skip format test in case of unmounted device (unmounted devices might
+      or might not know in before the fstype)
+    - clean up basic tests and BAIL_OUT when unsupported environment
+      encountered
+
+1.404 2013-10-26
+    - move to Makefile.PL in favour of developer reqs
+    - change required perl version to 5.8.1
+    - rewrite core routines of Sys::Filesystem
+    - don't search for Darwin tools in path, rely on some
+      well known paths
+    - general, minor code cleanup
+
+1.403 2013-10-23
+    - Honor PATH_FSTAB in the environment on a NetBSD system if present
+      (Thanks to dholland@NetBSD.org)
+    - try improve error handling on Darwin to avoid smoke errors
+    - be noisy about where we're running on during tests
+    - remove runtime recommends for author tests
+    - bump required version of Module::Pluggable to avoid blead whining
+    - include p5-toolchain gang recommended way to declare developer
+      dependencies
+    - use proper indenting for Changes
+
+1.402 2013-09-24
+    - remove Makefile.PL passthrough
+    - don't prove whether Win32 is supported - we know it (should fix
+      RT#88901 - thanks Michiel Beijen)
+    - try to improve supported control
+    - put Win32::DriveInfo into feature "Win32" (I'd like to get feedback
+      whether it helps)
+
+1.401 2013-09-08
+    - Fix MacOS X / Darwin without diskutil
+    - Changes reformatted as per CPAN::Changes::Spec
+
+1.400 2013-09-03
+    - Moving to GitHub for easier contributing
+    - Pod typo / encoding fixes (rt#85898, rt#77699), thanks to Slaven
+      Rezić, Andreas J. König and Gregor Herrmann
+    - Fix MacOS X 10.8 (diskutil vs. disktool)
+    - Update requirements / recommendations
+    - Fix AIX (rt#79188) - thanks to David Lee
+    - Fix Solaris debug leftover (rt#72717) - thanks to Kenneth Ölwing
+    - Fix Tests (rt#62248) - thanks to Daphne Pfister
+    - Fix configure_requires (rt#62249) - thanks to Daphne Pfister
+
+1.30 2010-07-15
+    - Fixing MSWin32
+
+1.29 2010-07-02
+    - Fixing MacOS X
+
+1.28 2010-05-14
+    - Adding more special file systems for Linux (looks in Linux soon
+      everything is a file system), Fixes RT#55059 (Thanks to Reed Loden)
+    - Improving documentation about selections in filesystems method,
+    - Fixes RT#55058 (Thanks to Reed Loden)
+    - Fixes RT#65504 (Thanks to Brett Gersekowski)
+    - Improve MSWin32 support
+
+1.27 2010-02-20
+    - Fixing RT#54406 (patch from Robert Bohne with some modifications)
+    - Fixing RT#54599 (patch from Jonathan Yu)
+    - Fixing wrong dependencies detection on Windows
+    - Fixing generic fstab/mnttab reading
+
+1.26 2010-02-12
+    - Adding more special file systems for Linux
+    - Prefer /proc/self/mounts over /etc/mtab (when available), fixes RT
+      #51151 (Thanks Tyler MacDonald)
+    - Fix some tests to skip when no regular file systems could be found
+    - Some Win32 fixes
+    - Switch to Module::Pluggable to load OS-plugins
+
+1.25 2009-10-30
+    - Fixed support for FreeBSD and generalize BSD support
+    - Fixed support for AIX
+    - Fixed aliased attribute support for Sys::Filesystem->filesystems
+    - Fix "Sys::Filesystem->filesystems ()" and "Sys::Filesystem::filesystems"
+      (reported by H.Merijn Brand) by using Params::Util
+    - Add keyword "Id" to be used/expanded by svn
+    - Explain how restrictions on method filesystem works in Sys::Filesystem
+    - Add a version method to all fs plugins
+    - Update documentation
+    - Correct t/03test.t to use format instead of type (recommended)
+
+1.24 2009-10-17
+    - Added support for NetBSD (Jens Rehsack)
+    - Added support for HP-UX (H.Merijn Brand)
+    - Fixed POD a little
+    - Add a simple test to see whether it's working or not - Increased
+      required perl version (suggested by H.Merijn Brand)
+
+1.23 2009-05-10
+    - Fixed Aix.pm (RT #34577), patches from LEMBARK, REHSACK
+    - Fixed failing on OS X (RT #7958, RT #43681), patch from Dirk Langer
+    - Taking Co-Maintainership (Jens Rehsack, CPAN Id: REHSACK)
+    - Changing debug environment flag from DEBUG to SYS_FILESYSTEM_DEBUG
+
+1.22 2006-06-01
+    - Added CREDITS.
+    - Fixed logic in Filesystem.pm:filesystems() where the inversion of the
+      'regaular' and 'special' paramaters was not being handled correctly,
+      causing an incorrect selection of filesystems to be returned sometimes.
+    - Added fd ctfs devfs objfs and procfs as special filesystem types in
+      Solaris.pm.
+    - Added procfs as a special filesyetem type to Aix.pm.
+    - Changed Aix.pm to extract the filesystem type from the vfs field in
+      /etc/filesystems.
+    - Added note in main POD warning people not to confuse "type" and "vfs"
+      when querying values under AIX.
+    - Altered unit tests to be more reliable over different setups.
+
+1.21 2006-05-23
+    - Typo in Build.PL. Changed "build_requires" to be "recommends".
+
+1.20 2006-05-23
+    - Fixed POD to reflect functionality that existed but wasn't documented,
+      or that was documented incorrectly.
+
+1.19 2006-05-23
+    - Changed license to Apache 2.0 http://www.apache.org/licenses/LICENSE-2.0
+    - Fixed a couple of module file names.
+    - Added additional unit tests.
+    - Fixed loading of failover modules.
+    - A few small bug fixes in parsing of some tab files.
+
+1.18 2005-12-29
+    - Modified Makefile.PL to submit information to perlgirl.org.uk if the
+      user agrees. Tweaked the POD slightly.
+
+1.16 2005-12-08
+    - Modified POD
+
+1.15 2005-12-02
+    - Updated for revision number and email address
+
+1.14 2005-01-30
+    - Added some new filesystem property aliases and reference to AIX helper
+      module
+
+1.13 2005-01-26
+    - Added extra documentation and the device option for the filesystems
+      method.
+
+1.12 2005-01-13
+    - Updated POD
+
+1.11 2004-10-06
+
+1.10 2004-10-06
+    - Fix from Win32 to MSWin32
+
+1.09 2004-10-05
+    - Updated Linux.pm to properly detect some more special fs types
+
+1.08 2004-09-30
+    - Added regular_filesystems() method
+    - Added autofs and mntfs as special filesystems for Solaris
+
+1.07 2004-09-30
+    - Added solaris mnttab support
+    - Fixed an AUTOLOAD and DESTROY issue
+
+1.06 2004-09-29
+    - Added alias support and more POD docs
+
+1.04 2004-09-29
+    - Initial release to get the code out there

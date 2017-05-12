@@ -1,0 +1,9 @@
+<Backup jean.heins.net>
+	DestinationList /space
+	Hourlies 2
+	Directory /home/langanjl/
+	<Directory /var/mail/>
+		Hourlies 4
+	</Directory>
+</Backup>
+

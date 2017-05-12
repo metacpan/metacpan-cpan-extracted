@@ -1,0 +1,18 @@
+---
+name: Sub-Context
+version: 1.00
+author: ~
+abstract: |-
+  Perl extension to dispatch subroutines based on their calling
+  context
+license: perl
+requires:
+  Scalar::Util: ''
+build_requires:
+  Test::Exception: ''
+  Test::More: 0.30
+provides:
+  Sub::Context:
+    file: lib/Sub/Context.pm
+    version: 1.00
+generated_by: Module::Build version 0.2611

@@ -1,0 +1,16 @@
+README
+Changes
+Todo
+MANIFEST
+Makefile.PL
+test.pl
+test1.pl
+Generator.pm
+Generator/Argument.pm
+Generator/Command.pm
+Generator/Lang/MYSQL.pm
+t/01_argument.t
+t/02_command.t
+t/03_dialect_MYSQL.t
+t/04_cmd_insert.t
+t/04_cmd_select.t

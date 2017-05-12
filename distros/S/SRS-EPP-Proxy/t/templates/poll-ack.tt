@@ -1,0 +1,2 @@
+<poll op="ack" msgID="[% msg_id %]">
+</poll>

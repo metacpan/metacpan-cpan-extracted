@@ -1,0 +1,85 @@
+{
+   "abstract" : "RSS management using Strehler",
+   "author" : [
+      "Simone Fare' <cymon@tiscali.it>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Strehler-RSS",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cwd" : "0",
+            "DBIx::Class::Core" : "0",
+            "Dancer2" : "0.160000",
+            "File::Copy" : "0",
+            "Moo" : "0",
+            "Strehler" : "v1.6.4",
+            "Strehler::Element" : "0",
+            "Strehler::Element::Role::Maintainer" : "0",
+            "Strehler::Element::Role::Slugged" : "0",
+            "Strehler::Helpers" : "0",
+            "XML::Feed" : "0",
+            "XML::Feed::Entry" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBIx::Class::Schema" : "0",
+            "Dancer2::Plugin::DBIC" : "0",
+            "FindBin" : "0",
+            "HTTP::Request" : "0",
+            "HTTP::Request::Common" : "0",
+            "JSON" : "0",
+            "Plack::Builder" : "0",
+            "Plack::Test" : "0",
+            "Strehler::API" : "0",
+            "Strehler::Admin" : "0",
+            "Strehler::Dancer2::Plugin::EX" : "0",
+            "Strehler::Meta::Category" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Strehler::Element::RSS::RSSChannel" : {
+         "file" : "lib/Strehler/Element/RSS/RSSChannel.pm",
+         "version" : "v1.1.2"
+      },
+      "Strehler::RSS" : {
+         "file" : "lib/Strehler/RSS.pm",
+         "version" : "v1.1.2"
+      },
+      "Strehler::Schema::RSS::Result::Rsschannel" : {
+         "file" : "lib/Strehler/Schema/RSS/Result/Rsschannel.pm",
+         "version" : "v1.1.2"
+      },
+      "Strehler::Schema::RSS::Result::RsschannelHeader" : {
+         "file" : "lib/Strehler/Schema/RSS/Result/RsschannelHeader.pm",
+         "version" : "v1.1.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://www.strehler-cms.org/other-projects",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/cym0n/Strehler-RSS.git",
+         "web" : "https://github.com/cym0n/Strehler-RSS"
+      }
+   },
+   "version" : "1.1.2"
+}
+

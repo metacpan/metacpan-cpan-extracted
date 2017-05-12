@@ -1,0 +1,98 @@
+=head1 NAME
+
+Solaris::ProcessContract::Contract::Control - Control a Solaris process contract instance via libcontract
+
+=head1 SYNOPSIS
+
+  # Abandon the process contract
+  $contract->control->abandon();
+
+  # Adopt the process contract
+  $contract->control->adopt();
+
+  # Reset the control insance
+  $contract->control->reset();
+
+=head1 DESCRIPTION
+
+This class allows you to control a process contract using the libcontract control interface.
+
+=head1 METHODS
+
+=head2 new
+
+Use the L<Solaris::ProcessContract::Contract/"control"> to access this object
+instead of creating one yourself.
+
+  # Access the control object the easy way
+  $contract->control->abandon();
+
+  # Access the control object by reference
+  my $control = $contract->control();
+  $control->abandon();
+
+=head2 abandon
+
+Arguments: C<none>
+
+Returns: C<undef>
+
+Abandon the contract so that it no longer is in the same contract group as the
+parent.
+
+  $contract->control->abandon();
+
+Even when creating new contracts for child processes, those contracts are still
+underneath the parent's contract in the contract hierarchy.
+
+By abandoning the contract, you will be placing it at the top of it's own 
+hierarchy, and any monitoring, event triggers or resource limitations from
+processes in the contract will no longer affect your own.
+
+=head2 adopt
+
+Arguments: C<none>
+
+Returns: C<undef>
+
+Adopt the contract so that it is returned to your contract group.
+
+  $contract->control->adopt();
+
+This is the opposite of L</"abandon">, in that it will bring an abandoned
+contract back in to your contract hierarchy.
+
+=head2 reset
+
+Arguments: C<none>
+
+Returns: C<undef>
+
+Reset the contract control object, if needed.  This will make the control object
+close and then open back up the file descriptor for the contract control
+instance.
+
+  $contract->control->reset()
+
+=head1 SEE ALSO
+
+=over
+
+=item L<Solaris::ProcessContract>
+
+=item L<Solaris::ProcessContract::Contract>
+
+=item L<Solaris::ProcessContract::Exceptions>
+
+=item L<libcontract(3)|http://docs.oracle.com/cd/E26505_01/html/816-5173/libcontract-3lib.html>
+
+=item L<contract(4)|http://docs.oracle.com/cd/E26505_01/html/816-5174/contract-4.html>
+
+=item L<process(4)|http://docs.oracle.com/cd/E26505_01/html/816-5174/process-4.html>
+
+=back
+
+=head1 AUTHOR
+
+Danny Warren
+

@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                String-Tests
+version:             0.05
+abstract:            run a series of tests on a string
+license:             ~
+author:              
+    - Shaun Fryer <pause.cpan.org@sourcery.ca>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Carp:                          0
+    Test::Exception:               0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

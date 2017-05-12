@@ -1,0 +1,20 @@
+lib/Sort/Naturally/XS.pm
+src/Makefile.PL
+src/nsort.c
+src/nsort.h
+t/Sort-Naturally-XS.t
+t/Sort-Naturally-XS-ncmp.t
+t/Sort-Naturally-XS-nsort.t
+t/Sort-Naturally-XS-sorted.t
+Changes
+const-c.inc
+const-xs.inc
+Makefile.PL
+MANIFEST
+ppport.h
+README
+README.md
+typemap
+XS.xs
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

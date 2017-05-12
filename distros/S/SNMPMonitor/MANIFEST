@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+install.pl
+t/SNMPMonitor.t
+lib/SNMPMonitor.pm
+lib/SNMPMonitor/Plugin.pm
+lib/SNMPMonitor/Plugin/PluginTemplate.pm
+lib/SNMPMonitor/Plugin/TestPlugin.pm
+META.yml                                 Module meta-data (added by MakeMaker)

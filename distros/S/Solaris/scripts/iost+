@@ -1,0 +1,281 @@
+#!/usr/local/bin/perl -w
+
+use strict;
+use Solaris::MapDev qw(inst_to_dev);
+use Solaris::Kstat;
+use POSIX qw(uname strftime);
+
+################################################################################
+
+sub ns($$)
+{
+my ($val, $width) = @_;
+my $prec = $width - length(int($val)) - 1;
+return(sprintf("%*.*f ", $width, $prec, $val));
+}
+
+################################################################################
+# Main
+
+my ($interval, $count) = @ARGV;
+$interval = 5 if (! defined($interval) || $interval < 1);
+$count = -1 if (! $count);
+
+$SIG{INT} = $SIG{QUIT} = $SIG{HUP} = sub { $count = 0; };
+
+my @modules = qw(sd ssd nfs dad atapicd st fd);
+my ($mod, $inst, $kstats, $modinst, $dev, $then, $now, %stats, %totals, $io);
+my $ks = Solaris::Kstat->new();
+
+# Save initial stats values
+print("iost+ started on ", strftime("%d/%m/%Y %T", localtime()),
+      " on ", (uname())[1], ", sample interval $interval seconds\n\n");
+foreach $mod (@modules)
+   {
+   $kstats = $ks->{$mod};
+   foreach $inst (keys(%{$kstats}))
+      {
+      $modinst = "$mod$inst";
+      next if (! exists($kstats->{$inst}{$modinst}));
+      $dev = inst_to_dev($modinst) || $modinst;
+      %{$then->{$dev}} = %{$kstats->{$inst}{$modinst}};
+      }
+   }
+
+# Loop the required number of times
+while ($count == -1 || $count-- > 0)
+   {
+   # Wait for a bit, then update the stats
+   sleep($interval);
+   $ks->update();
+   my $ts = strftime("%T", localtime());
+
+   # Copy the new stats values
+   foreach $mod (@modules)
+      {
+      $kstats = $ks->{$mod};
+      foreach $inst (keys(%{$kstats}))
+         {
+         $modinst = "$mod$inst";
+         next if (! exists($kstats->{$inst}{$modinst}));
+         $dev = inst_to_dev($modinst) || $modinst;
+         %{$now->{$dev}} = %{$kstats->{$inst}{$modinst}};
+         }
+      }
+
+   # Calculate the delta stats
+   %stats = ();
+   %totals = ();
+   $io = 0;
+   foreach $dev (keys(%{$then}))
+      {
+      my $t = $then->{$dev};
+      my $n = $now->{$dev};
+
+      # Skip unless we have both sets of stats
+      next if (! $t || ! $n);
+
+      # Work out some frequently-used values
+      my $delta = $n->{snaptime} - $t->{snaptime};
+      my $deltaw = $n->{wlastupdate} - $t->{wlastupdate};
+      my $deltar = $n->{rlastupdate} - $t->{rlastupdate};
+      my $reads = $deltar ? ($n->{reads} - $t->{reads}) / $deltar : 0;
+      my $writes = $deltaw ? ($n->{writes} - $t->{writes}) / $deltaw : 0;
+      my $rw = $reads + $writes;
+
+      # Skip unless some I/O has actually taken place
+      next if ($rw == 0);
+      
+      # Calculate a few more stats
+      my $kreads = ($n->{nread} - $t->{nread}) / 1024 / $deltar;
+      my $kwrites = ($n->{nwritten} - $t->{nwritten}) / 1204 / $deltaw;
+
+      # Store the individual stats
+      $stats{$dev} = {};
+      my $st = $stats{$dev};
+      $st->{reads} = $reads;
+      $st->{writes} = $writes;
+      $st->{kreads} = $kreads;
+      $st->{kwrites} = $kwrites;
+      $st->{avg_wait} = ($n->{wlentime} - $t->{wlentime}) / $deltaw;
+      $st->{avg_run} = ($n->{rlentime} - $t->{rlentime}) / $deltar;
+      $st->{avg_wait_time} = $st->{avg_wait} * 1000 / $rw;
+      $st->{avg_serv_time} = $st->{avg_run} * 1000 / $rw;
+      $st->{wait_percent} = ($n->{wtime} - $t->{wtime}) * 100 / $deltaw;
+      $st->{run_percent} = ($n->{rtime} - $t->{rtime}) * 100 / $deltar;
+      $st->{wait_resp_time} = $st->{wait_percent} * 10 / $rw;
+      $st->{run_resp_time} = $st->{run_percent} * 10 / $rw;
+
+      # Add on to the running totals
+      my $class = $n->{class};
+      $totals{$class}{reads} += $reads;
+      $totals{$class}{writes} += $writes;
+      $totals{$class}{kreads} += $kreads;
+      $totals{$class}{kwrites} += $kwrites;
+      $io += $rw;
+      }
+
+   # Display the stats
+   if ($io)
+      {
+      print("$ts --throughput-- -----wait queue----- ",
+               "----active queue----\n",
+            " r/s  w/s   Kr/s   Kw/s qlen res_t svc_t \%ut qlen res_t ",
+               "svc_t \%ut device\n");
+      foreach $dev (sort(keys(%stats)))
+         {
+         my $st = $stats{$dev};
+         print(ns($st->{reads}, 4), ns($st->{writes}, 4),
+               ns($st->{kreads}, 6), ns($st->{kwrites}, 6),
+               ns($st->{avg_wait}, 4), ns($st->{avg_wait_time}, 5),
+               ns($st->{wait_resp_time}, 5), ns($st->{wait_percent}, 3),
+               ns($st->{avg_run}, 4), ns($st->{avg_serv_time}, 5),
+               ns($st->{run_resp_time}, 5), ns($st->{run_percent}, 3),
+               $dev, "\n");
+         }
+      # Display the totals
+      foreach my $class (sort(keys(%totals)))
+         {
+         my $t = $totals{$class};
+         next if ($t->{reads} + $t->{writes} == 0);
+         print(ns($t->{reads}, 4), ns($t->{writes}, 4), ns($t->{kreads}, 6),
+               ns($t->{kwrites}, 6),
+               "                                          TOTAL ",
+               uc($class), "\n");
+         }
+      print("\n");
+      }
+
+   # Save the new stats
+   $then = $now;
+   $now = {};
+   }
+print("iost+ finished at ", strftime("%d/%m/%Y %T", localtime()),
+      " on ", (uname())[1], "\n\n");
+
+################################################################################
+__END__
+
+=head1 NAME
+
+iost+ - Extended version of iostat
+
+=head1 SYNOPSIS
+
+iost+ [ interval [ count ] ]
+
+=head1 DESCRIPTION
+
+iost+ is an extended version of iostat, written in perl using the
+Solaris::MapDev and Solaris::Kstat modules.  By default the kernel statistics
+are sampled every 5 seconds.  If a single parameter is given it is used as the
+sample interval. If a second parameter is given it is used as the number of samples to display.
+
+=head1 OPERANDS
+
+The following operands are supported:
+
+=over 4
+
+=item interval
+
+The time between each sucessive sample, in seconds
+
+=item count
+
+The number of samples to display
+
+=back
+
+=head1 EXAMPLES
+
+ $ iost+ 5 3
+ iost+ started on 19/11/1998 15:51:30 1998 on fubar
+
+ 15:51:35 --throughput-- -----wait queue----- ----active queue----
+  r/s  w/s   Kr/s   Kw/s qlen res_t svc_t %ut qlen res_t svc_t %ut device
+   49    0     38      0  0.0   0.0   0.0   0  0.9  18.6  18.5  90 nfssvr:/fs1
+    0    4      0     25  0.0   0.0   0.0   0  0.5 128.5   9.7   4 c0t0d0
+    0   75      0    571  0.0   0.0   0.0   0  8.5 112.6  11.8  89 c0t10d0
+    0   75      0    568  0.0   0.0   0.0   0  9.3 125.0  13.1  98 c0t9d0
+   11    0    112      0  0.0   0.0   0.0   0  1.0  88.7  88.7  99 mt1
+    0  154      0   1164                                           TOTAL DISK
+   49    0     38      0                                           TOTAL NFS
+   11    0    112      0                                           TOTAL TAPE
+ 
+ 15:51:40 --throughput-- -----wait queue----- ----active queue----
+  r/s  w/s   Kr/s   Kw/s qlen res_t svc_t %ut qlen res_t svc_t %ut device
+   51    0     39      0  0.0   0.0   0.0   0  0.9  17.5  17.4  89 nfssvr:/fs1
+    0    1      0      8  0.0   0.0   0.0   0  0.0  28.2   9.1   1 c0t0d0
+    0   70      0    525  0.0   0.0   0.0   0 10.7 152.8  13.4  94 c0t10d0
+    0   71      0    528  0.0   0.0   0.0   0 11.4 160.6  13.4  95 c0t9d0
+   11    0    113      0  0.0   0.0   0.0   0  1.0  87.9  87.9  99 mt1
+    0  142      0   1061                                           TOTAL DISK
+   51    0     39      0                                           TOTAL NFS
+   11    0    113      0                                           TOTAL TAPE
+ 
+ 15:51:45 --throughput-- -----wait queue----- ----active queue----
+  r/s  w/s   Kr/s   Kw/s qlen res_t svc_t %ut qlen res_t svc_t %ut device
+   53    0     51      0  0.0   0.0   0.0   0  0.9  17.0  17.0  89 nfssvr:/fs1
+    0   75      0    563  0.0   0.0   0.0   0 13.7 183.6  12.4  92 c0t10d0
+    0   75      0    564  0.0   0.0   0.0   0 13.9 186.2  12.8  96 c0t9d0
+   11    0    111      0  0.0   0.0   0.0   0  1.0  89.4  89.4  99 mt1
+    0  149      0   1127                                           TOTAL DISK
+   53    0     51      0                                           TOTAL NFS
+   11    0    111      0                                           TOTAL TAPE
+ 
+ iost+ finished at 19/11/1998 15:51:45 1998 on fubar
+ $ 
+
+Note that statistics for devices are only displayed when there is some activity
+on the device, and that disk, nfs and tape statistics are shown.  The total
+throughput for each class of device is shown at the bottom of each set of
+statistics.
+
+The statistics for each device are split into three logical groupings:
+
+=over 4
+
+=item Throughput
+
+This is the basic I/O performance of the device, expressed in physical reads
+and writes per second as well as kilobytes read and written per second.
+
+=item Wait Queue
+
+Solaris measures two sets of I/O statistics.  The wait queue values are the
+performance statistics for the device driver.
+
+=item Active Queue
+
+The active queue values are the performance statistics of the physical device.
+
+=back
+
+The meaning of the individual columns is as follows:
+
+    r/s     reads per second
+    w/s     writes per second
+    Kr/s    kilobytes read per second
+    Kw/s    kilobytes written per second
+    qlen    average queue length
+    res_t   average response time per request
+    svc_t   average service time per request
+    %ut     percent utilisation
+
+=head1 AUTHOR
+
+Alan Burlison, <Alan.Burlison@uk.sun.com>
+
+=head1 SEE ALSO
+
+L<iostat(1M)>
+
+"Sun Performance And Tuning - Java And The Internet" 2nd ed. by Adrian Cockroft
+and Richard Pettit - ISBN 0-13-095249-4.
+
+iost+ is a reimplementation of the siostat.se script in perl, with a few
+cosmetic differences.  Refer to pages 194-198 of the book for a full
+explanation of the statistics and how they are calculated.
+
+=cut

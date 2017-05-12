@@ -1,0 +1,56 @@
+Version History for String-Range-Expand
+Mithun Ayachit
+
+
+
+1.0.1
+
+
+-   Bump version to allow change in version number strategy
+
+
+
+0.4.1
+
+
+-   No functional changes. Use semver and move bugtracker to
+    github-issues
+
+
+
+0.04
+
+
+-   Added expand_expr that acts against comma (or space) separated
+    ranges
+
+
+
+0.03
+
+
+-   Fix a condition where ranges were being gobbled up
+-   Fix how an expression is parsed into bits without loosing characters
+-   Use a pre-compiled range pattern
+-   Remove support for _space_ in a range pattern
+-   Silence perlcritic by using 'x' in matches
+-   Stop using pre/match/post global variables that slows down the regex
+    engine
+-   Force sort the expanded list that is returned
+-   Try to use a more comprehensive test case
+
+
+
+0.02
+
+
+-   [minor] POD Updates
+
+
+
+0.01
+
+
+-   Initial Release
+
+------------------------------------------------------------------------

@@ -1,0 +1,17 @@
+MANIFEST
+CHANGELOG
+README
+Makefile.PL
+lib/String/Lookup.pm
+lib/String/Lookup/AsyncDBI.pm
+lib/String/Lookup/DBI.pm
+lib/String/Lookup/FlatFile.pm
+lib/String/Lookup/PurePerl.pm
+t/01basic.t
+t/02init.t
+t/03flush.t
+t/04offset.t
+t/05flatfile.t
+t/06words.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

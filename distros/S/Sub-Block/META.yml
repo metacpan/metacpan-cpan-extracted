@@ -1,0 +1,42 @@
+---
+abstract: 'manipulate blocks of code to assemble them into subs'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test::More: 0.96
+  Test::Warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.17
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.013, CPAN::Meta::Converter version 2.120921'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Sub-Block
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Sub::Block:
+    file: lib/Sub/Block.pm
+    version: 0.002
+requires:
+  Exporter::Tiny: 0.026
+  Moo: 1.000000
+  PadWalker: 0
+  Sub::Quote: 0
+  namespace::clean: 0
+resources:
+  X_identifier: http://purl.org/NET/cpan-uri/dist/Sub-Block/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Sub-Block
+  homepage: https://metacpan.org/release/Sub-Block
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/tobyink/p5-sub-block
+version: 0.002

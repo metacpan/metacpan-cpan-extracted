@@ -1,0 +1,13 @@
+This directory contains some examples of services based on the SeeAlso-Module.
+
+You can directly run the scripts if SeeAlso is installed in your PERL library 
+path (@INC) or if the 'lib' directory of SeeAlso is a subdirectory of this
+example directory (on Unix just create a symlink with "ln -s ../lib/ lib").
+
+
+cgi-test.pl
+    simple CGI SeeAlso webservice for testing
+
+yahoo.pl
+    simple wrapper for Yahoo Search Suggest
+

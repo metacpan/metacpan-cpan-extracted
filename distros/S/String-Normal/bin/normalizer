@@ -1,0 +1,218 @@
+#!/usr/bin/env perl 
+
+use strict;
+use warnings;
+
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+use String::Normal;
+
+use Safe;
+use Pod::Usage;
+use Getopt::Long;
+
+GetOptions (
+    'file|f=s'      => \my $file,
+    'value|v=s'     => \my $value,
+    'type|t=s'      => \my $type,
+    'config|c=s'    => \my %config,
+    'help|h'        => \my $help,
+    'man'           => \my $man,
+    'version'       => \my $version,
+);
+pod2usage( -verbose => 0 ) if defined $help;
+pod2usage( -verbose => 2 ) if $man;
+
+if ($version) {
+    print "$_\n" for 
+        "      String::Normal path: " . $INC{'String/Normal.pm'},
+        "   String::Normal version: $String::Normal::VERSION",
+    ;
+    exit;
+}
+
+unless (defined( $value ) or defined( $file )) {
+    pod2usage({ -message => '--value or --file is required', -exitval => 1, -verbose => 0 });
+}
+
+# check for custom config and override %config with values found
+my %ini;
+my $ini = "$ENV{HOME}/.normalizer.ini";
+if (-f $ini) {
+    my $fh;
+    if (open $fh, $ini) {
+        %ini = String::Normal::Config::_slurp( $fh ); 
+    } else {
+        warn "Can't read config file $ini: $!\n";
+    }
+}
+%config = ( %config, %ini );
+
+my $normalizer = String::Normal->new(
+    type                => $type,
+    business_stem       => $config{business_stem},
+    business_stop       => $config{business_stop},
+    business_compress   => $config{business_compress},
+    address_stem        => $config{address_stem},
+    address_stop        => $config{address_stop},
+    title_stem          => $config{title_stem},
+    title_stop          => $config{title_stop},
+    area_codes          => $config{area_codes},
+);
+
+if ($file) {
+    open my $fh, $file or die "Cannot open $file: $!\n";
+    print $normalizer->transform( $_ ), "\n" while <$fh>;
+} else {
+    print $normalizer->transform( $value ), "\n";
+}
+
+__END__
+=head1 NAME
+
+normalizer - transform strings into a normal form
+
+=head1 SYNOPSIS
+
+normalizer [options]
+
+ Options:
+   --file       file
+   --value      value
+   --type       business, address, city, state, zip, phone or title
+   --config     business_stem, address_stop, etc.
+   --help       list usage for methods and parameters
+   --man        print man page
+   --version    show module path and version
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--value>
+
+The value to transform.
+
+  --value="The The"
+  -v "The "the"
+
+=item B<--file>
+
+Text file containing one value per line.
+
+  --file=values.txt
+  -f values.txt
+
+=item B<--type>
+
+The type of value: business, address, city, state, zip, phone or title. Defaults to business.
+
+  --type=address
+  -t address
+
+=item B<--config>
+
+Multiple key=value pairs. Override data found in Config types by specifying your own paths:
+
+  --config business_stem=/path/to/my_stem.txt --config address_stop=/path/to/my_stop.txt
+  -c business_stem=/path/to/my_stem.txt -c address_stop=/path/to/my_stop.txt
+
+Overrides any values found in custom config file: C<$ENV{HOME}/.normalizer.ini>
+
+See L<String::Normal> for full list of config keys.
+
+=item B<--help>
+
+Shows synopsis and exits.
+
+=item B<--man>
+
+Prints the manual page and exits.
+
+=item B<--version>
+
+Prints the versions of the core modules used.
+
+=back
+
+=head1 CONFIG
+
+This tool will check for the presence of a config file with the location/name
+C<$ENV{HOME}/.normalizer.ini> Here you may specify the paths to your custom data
+files which will override data found in Config classes, one pair per line:
+
+  business_stem /path/to/my_business_stem.txt
+  business_stop /path/to/my_business_stop.txt
+  # etc.
+
+These values will be checked first, and any C<--config> command line args will
+override them.
+
+See L<String::Normal> for full list of config keys.
+
+=head1 EXAMPLES
+
+  normalizer --value="Jones's & Sons Bakeries" --type=business
+
+  # business is the default type
+  normalizer --value="Jones's & Sons Bakeries"
+
+  normalizer --value="123 Main Street" --type=address
+
+  ls -1 | normalizer --type=title --file=-
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<String::Normal>
+
+The engine behind this script.
+
+=back
+
+=head1 AUTHOR
+
+Jeff Anderson, C<< <jeffa at cpan.org> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2017 Jeff Anderson.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Any use, modification, and distribution of the Standard or Modified
+Versions is governed by this Artistic License. By using, modifying or
+distributing the Package, you accept this license. Do not use, modify,
+or distribute the Package, if you do not accept this license.
+
+If your Modified Version has been derived from a Modified Version made
+by someone other than you, you are nevertheless required to ensure that
+your Modified Version complies with the requirements of this license.
+
+This license does not grant you the right to use any trademark, service
+mark, tradename, or logo of the Copyright Holder.
+
+This license includes the non-exclusive, worldwide, free-of-charge
+patent license to make, have made, use, offer to sell, sell, import and
+otherwise transfer the Package with respect to any patent claims
+licensable by the Copyright Holder that are necessarily infringed by the
+Package. If you institute patent litigation (including a cross-claim or
+counterclaim) against any party alleging that the Package constitutes
+direct or contributory patent infringement, then this Artistic License
+to you shall terminate on the date that such litigation is filed.
+
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=cut

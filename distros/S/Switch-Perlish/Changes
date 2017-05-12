@@ -1,0 +1,30 @@
+
+Wed Jun 14 15:41:53 BST 2006 - 1.0.5
+  * Changed email address.
+  * Changed UNIVERSAL::isa()s to $thing->isa().
+  * Miscellaneous documentation and comment tidying.
+
+Thu May 26 15:02:21 GMTST 2005 - 1.0.4
+
+  * Added support for blockless cases to mimic the C switch syntax
+  * Fixed bug where using C style continuted to fall through after a default
+  * Fixed depth bug in _called_by (not deep enough)
+
+Wed May 25 16:25:18 GMTST 2005 - 1.0.3
+
+  * Updated and corrected docs for Perlish.pm and Smatch.pm
+
+Tue May 24 12:53:06 GMTST 2005 - 1.0.2
+
+  * Changed docs to say 'stop' not 'end' (as it was originally named)
+  * Added Changes (was missing from MANIFEST)
+
+Tue May 24 12:13:30 GMTST 2005 - 1.0.1
+
+  * Added C-style switch behaviour
+  * Updated and added to lib/Switch/Perlish.pm docs
+  * Started using subversion
+ 
+Thu May 19 21:05:04 GMTST 2005 - 1.0.0
+
+  * Initial release

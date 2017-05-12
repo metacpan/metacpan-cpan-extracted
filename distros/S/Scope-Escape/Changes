@@ -1,0 +1,74 @@
+version 0.004; 2011-04-27
+
+  * bugfix: create extra mortal reference to return values, to avoid
+    premature death if the return value is a lexical variable
+
+  * port to Windows OSes, defining C macro NO_XSLOCKS to get working
+    versions of setjmp() and longjmp()
+
+  * in documentation for S::E::Continuation, explicate (in yet another
+    place) that the blessed objects are in fact Perl functions and can
+    be called directly
+
+  * in t/die.t and t/multi.t, use Scope::Cleanup instead of Scope::Upper
+
+  * include META.json in distribution
+
+  * add MYMETA.json to .cvsignore
+
+version 0.003; 2010-10-24
+
+  * bugfix: for Perls that use the ghost context frame but don't put
+    cxinc() in the API (mainly 5.8.9 and 5.10), provide a reserve
+    definition of cxinc()
+
+  * bugfix: for Perl 5.13.1+, don't assert anything about the ghost
+    context frame that was significant on earlier Perl versions
+
+  * in XS, use gv_stashpvs() wherever appropriate
+
+  * in XS, use PERL_NO_GET_CONTEXT for efficiency
+
+  * in XS, declare "PROTOTYPES: DISABLE" to prevent automatic generation
+    of unintended prototypes
+
+  * in documentation, mention Scope::Escape::Sugar in the first paragraph
+    of the description
+
+  * jump through hoops to avoid compiler warnings
+
+  * use full stricture in test suite
+
+  * in Build.PL, complete declaration of configure-time requirements
+
+  * remove commented-out debugging code
+
+version 0.002; 2010-05-23
+
+  * update for new PL_restartjmpenv unwinding mechanism in perl 5.13.1
+    and above
+
+  * remove from documentation most of the discussion about stack
+    unwinding, which has moved to the documentation of Scope::Cleanup
+
+  * in documentation, add Scope::Cleanup and Scope::Escape::Sugar to
+    "see also" list
+
+  * in t/die.t and t/multi.t, require Scope::Upper version 0.08 or later
+    if Scope::Upper is to be used, due to earlier versions corrupting
+    the stack when reap() is used and thus causing false test failures
+
+version 0.001; 2010-03-30
+
+  * make current_escape_{function,continuation} operators compile
+    correctly when imported lexically via Lexical::Import
+
+  * new S::E::Continuation methods as_{function,continuation} to
+    provide access to a continuation in both unblessed and blessed forms
+    regardless of the form in which it was created
+
+  * include parent in dependency list
+
+version 0.000; 2010-03-23
+
+  * initial released version

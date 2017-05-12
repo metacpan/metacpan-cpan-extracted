@@ -1,0 +1,10 @@
+Revision history for Sah-Schemas-YouTube
+
+0.002   2016-07-22 (PERLANCAR)
+
+        - [build] Rebuild to generate Sah::SchemaR::* modules.
+
+
+0.001   2016-07-22 (PERLANCAR)
+
+        - First release.

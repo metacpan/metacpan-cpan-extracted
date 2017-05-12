@@ -1,0 +1,50 @@
+Spreadsheet-DataToExcel
+
+L<Spreadsheet::WriteExcel> is a marvelous module; however, I would always
+find myself digging through the huge doc, not something I enjoy when
+all I ever want to do is simply dump my rows/columns centering first
+row as well as setting the sizes of columns to just be large enough
+to fit all the data. This is where C<Spreadsheet::DataToExcel> comes
+in.
+
+If you're looking for any more functionality than
+C<Spreadsheet::DataToExcel> offers, please see L<Spreadsheet::WriteExcel>.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Spreadsheet::DataToExcel
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Spreadsheet-DataToExcel
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Spreadsheet-DataToExcel
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Spreadsheet-DataToExcel
+
+    Search CPAN
+        http://search.cpan.org/dist/Spreadsheet-DataToExcel/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 'Zoffix
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

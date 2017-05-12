@@ -1,0 +1,25 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Repository.pm
+inc/Module/Install/WriteAll.pm
+lib/ShipIt/Step/ChangeAllVersions.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/00_load.t
+t/01_basic.t
+t/02_collect_files.t
+t/test/.shipit
+t/test/Bar.pm
+t/test/Baz.pod
+t/test/lib/Foo.pm
+t/test/Makefile.PL
+t/test/script/intentionally_empty
+t/test/script/qux
+xt/01_podspell.t
+xt/02_pod.t

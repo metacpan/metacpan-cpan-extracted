@@ -1,0 +1,14 @@
+Revision history for SMS-Server-Tools
+
+0.02    2015-02-18
+        Updating Links and Changes
+
+0.012   2013-05-06
+        Adding Support for multiline in SMS Text (by Christophe Kyvrakidis)
+
+0.011   2009-08-13
+        Improve for cpan/cpanreports only.
+
+0.01    2009-08-09
+        Initial checkin version.
+

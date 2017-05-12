@@ -1,0 +1,27 @@
+#!/usr/bin/perl -w
+# $Id: svndump_delrevifilter2 278 2007-01-13 12:37:13Z martin $
+# Copyright (C) 2006 by Martin Scharrer <martin@scharrer-online.de>
+# This is free software under the GPL.
+
+use strict;
+use SVN::Dumpfilter;
+
+my $dumpfile = shift @ARGV;
+my $outfile  = shift @ARGV;
+
+sub delrevifilter2 (\%;$);
+
+Dumpfilter($dumpfile, $outfile, \&delrevifilter2);
+exit(0);
+
+sub delrevifilter2 (\%;$)
+ {
+   my $href = shift;
+
+   return if (exists $href->{'header'}->{'Revision-number'});
+  
+   # Delete entries
+   %$href = ();
+ }
+
+__END__

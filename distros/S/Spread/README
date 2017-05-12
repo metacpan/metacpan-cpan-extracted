@@ -1,0 +1,78 @@
+Spread-3.17.4.4
+=====================
+
+DESCRIPTION
+-----------
+
+Spread-3.17.4.4 is a Perl module that conveniently wraps the Spread C
+libraries provided with the Spread 3.17.4 distribution.  Spread is available at
+http://www.spread.org/.  Spread is a local/wide area group communication
+toolkit that runs on most modern operating systems.  It allows convenient
+mechanisms for reliable multicasting information between applications as well
+as providing many more complicate assurances.
+
+CHANGES
+-------
+
+Version 3.17.4.4 fixes documentation about $sperrno and a possible short
+copy of group name in multigroup multicast. Add processing of SPLIB_LIB
+and SPLIB_INCLUDE environment variables to ease makefile generation.  Fixed
+a few compiler warnings.
+
+Version 3.17.4.3 fixes an unsafe pass of the spread version string as a
+printf format string.  Thanks Jerome Quelin.
+
+Version 3.17.4.2 fix typo in receive that prevented receiving messages
+spent to more than 64 groups.  Also adds REJECT_AUTH error code.
+Thanks Martin.
+
+Version 3.17.4.1 add REJECT_MESS, remove _ from version.
+
+Version 3.17.3_108 fix version to make MakeMaker happier.
+
+Version 3.17.3-1.07 fix man pages and exports.
+
+Version 3.17.3-1.06 differentiate between select timeout and other failures.
+Thanks to Matt Sergeant.
+
+Version 3.17.1-1.05 fixes a service_type error (uninitialized variable)
+
+Version 3.15.2-1.04 adds a MANFIEST, dist to Makefile.PL, and several spelling
+corrections.  The only used code change was the spelling correction of CAUSAL.
+
+Version 3.15.2-1.03 updgrades the xs code to use the 3.15.2 Spread client
+libraries.
+
+Version 3.14-1.03 fixes a long standing mortilzation bug that caused an abusive
+memory leak on systesm with many message.  The leak was in SP_receive. It also
+adds this "changes" section.
+
+PREREQUISITES
+-------------
+
+Spread-3.17.4.1 requires the Spread group communication toolkit daemon and
+client C libraries (with headers) to be installed (or compiled) on the system.
+
+It will often not work correctly if there is an older libsp installed on the
+system.
+
+It also requires Perl 5.
+
+INSTALLATION
+------------
+
+1.  Edit the Makefile.PL and change the -L and -I paths to reflect your
+	installation of Spread if necessary.
+2.  perl Makefile.PL
+3.  make install
+
+COPYRIGHT AND DISCLAIMER
+------------------------
+
+Copyright (c) 2000-2006,2008 Theo Schlossnagle <jesus@lethargy.org>
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+This code is provided with no warranty of any kind, and is used entirely at
+your own risk.

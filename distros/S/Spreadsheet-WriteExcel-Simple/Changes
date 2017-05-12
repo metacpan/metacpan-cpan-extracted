@@ -1,0 +1,27 @@
+Revision history for Perl extension Spreadsheet::WriteExcel::Simple.
+
+1.04  Mon Jan 16 11:17:02 UTC 2006
+	- Doc tweaks
+
+1.03  Sat Sep  3 20:36:47 UTC 2005
+	- Use binmode when save()-ing file (Ken Prows)
+
+1.02  Dec 27 2004
+	- Reintegrate bizarrely unreleased 1.00 code
+
+1.01  Dec 27 2004
+	- Added save() method [Terrence Brannon]
+
+1.00  Tue Oct 15 2002
+  - Fixed tests to skip all if we don't have ParseExcel
+
+0.03  Sun Sep 22 2002
+	- Moved row counter to object data so that multiple executions would
+	  run more smoothly. (thanks to Drew Taylor)
+
+0.02  Sat Aug 11 2001
+	- added tests using Spreadsheet::ParseExcel
+
+0.01  Tue Aug  7 2001
+	- original version
+

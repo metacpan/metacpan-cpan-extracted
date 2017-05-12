@@ -1,0 +1,47 @@
+Shell-Perl version 0.004
+===========================
+
+This is the implementation of a simple command-line interpreter 
+for Perl. After installing the module, you invoke it like this
+
+    $ pirl
+    Welcome to the Perl shell. Type ':help' for more information
+
+    pirl @>
+
+or in Windows 
+
+    > pirl
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Term:ReadLine
+    Data::Dumper
+    YAML or YAML::Syck
+    Data::Dump
+    Class::Accessor
+
+and recommends
+
+    Test::Pod 1.18
+    Test::Pod::Coverage 1.04
+    Test::Script
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007-2017 by Adriano R. Ferreira
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

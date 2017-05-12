@@ -1,0 +1,15 @@
+To install the module execute the following steps:
+
+   perl Makefile.PL
+   make
+   make test
+
+"make test" do some tests. If you get error messages then you shouldn't install the module.
+Take a look into the README to the TECHNICAL NOTE section for a description and send me a
+bug report please. Otherwise your last step is:
+
+   make install
+
+and have a lot of fun with Sys::Statistics::Linux.
+
+Don't forget to take a look into the "examples" diretory. :-)

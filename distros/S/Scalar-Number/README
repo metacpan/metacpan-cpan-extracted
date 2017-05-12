@@ -1,0 +1,40 @@
+NAME
+
+Scalar::Number - numeric aspects of scalars
+
+DESCRIPTION
+
+This module is about the numeric part of plain (string) Perl scalars.
+A scalar has a numeric value, which may be expressed in either the
+native integer type or the native floating point type.  Many values
+are expressible both ways, in which case the exact representation is
+insignificant.  To fully understand Perl arithmetic it is necessary to
+know about both of these representations, and the differing behaviours
+of numbers according to which way they are expressible.
+
+This module provides functions to extract the numeric part of a scalar,
+classify a number by expressibility, and compare numbers across
+representations.
+
+This module is implemented in XS, with a pure Perl backup version for
+systems that can't handle XS.
+
+INSTALLATION
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+AUTHOR
+
+Andrew Main (Zefram) <zefram@fysh.org>
+
+COPYRIGHT
+
+Copyright (C) 2007, 2009, 2010 Andrew Main (Zefram) <zefram@fysh.org>
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

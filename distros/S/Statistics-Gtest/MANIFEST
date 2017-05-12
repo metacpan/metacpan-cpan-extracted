@@ -1,0 +1,14 @@
+Changes
+Makefile.PL
+MANIFEST
+LICENSE
+README
+t/1x4int.txt
+t/2x3int.txt
+t/baddata.txt
+t/file_input.t
+t/glob_input.t
+t/io_input.t
+t/variable_input.t
+lib/Statistics/Gtest.pm
+META.yml                                 Module meta-data (added by MakeMaker)

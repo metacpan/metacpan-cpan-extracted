@@ -1,0 +1,51 @@
+{
+   "abstract" : "Daemon plugin for Salvation::AnyNotify",
+   "author" : [
+      "Gennadiy Filatov <gfilatov@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Salvation-AnyNotify-Plugin-Daemon",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Salvation::AnyNotify" : "0.01",
+            "Salvation::DaemonDecl" : "0",
+            "Salvation::Method::Signatures" : "0.02"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/kainwinterheart/salvation-anynotify-daemon.git",
+         "web" : "https://github.com/kainwinterheart/salvation-anynotify-daemon",
+         "x_bugtracker" : "https://github.com/kainwinterheart/salvation-anynotify-daemon/issues"
+      }
+   },
+   "version" : "0.02"
+}

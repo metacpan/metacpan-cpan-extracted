@@ -1,0 +1,9 @@
+Software::Packager::Aix
+	Test script may need improving.
+	Improve POD
+        Implement prerequsites.
+        Update to Standard at http://www.rs6000.ibm.com/doc_link/en_US/a_doc_lib/aixprggd/genprogc/pkging_sw4_install.htm
+
+Software::Packager::Object::Aix
+	This module needs to be finished
+	Improve POD

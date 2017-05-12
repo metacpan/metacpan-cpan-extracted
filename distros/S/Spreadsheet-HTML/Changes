@@ -1,0 +1,320 @@
+Revision history for Spreadsheet-HTML
+
+1.20
+    - update copyright
+    - require HTML::AutoTag v1.06
+
+1.19
+    - conway() warns if wechsler specified by module is not installed
+    - fixed minor bug in calendar() when 'today' is actually today
+    - removed animate() method/preset
+
+1.18
+    - added pad param for conway (used with wechsler)
+
+1.17
+    - added wechsler param for conway
+
+1.16
+    - require HTML::AutoTag v1.04
+    - fixed JSON file load bug in Beadwork
+    - update copyright date
+    - minor refactor of _tag() to improve readability
+
+1.15
+    - worksheet param now selects specified image from animated PNG/GIF files
+    - downloaded temp files are unlinked
+
+1.14
+    - file param now accepts URIs
+    - alpha param more robust: can be lower cased and have "#" prepended to it
+    - conway() now supplies alpha param (off param reverts to normal)
+
+1.13
+    - conway() can preload images now (TODO: guess "off" value)
+    - off param now available when loading images
+    - can override table param when loading images
+
+1.12
+    - data param now works with loaded image files
+    - block param now can be 1 (previous minimum was 2)
+    - added blend param (used in conjunction with block param)
+
+1.11
+    - can now load GIF, JPEG and PNG images
+    - added block param for tweaking image2table output
+    - remove bugtracker from Makefile (issues should go to rt.cpan)
+    - trying to render invalid datastructures gracefully fails
+    - require HTML::AutoTag v1.04
+
+1.10
+    - moved select() and list() tests out of distro
+
+1.09
+    - renamed some params for select() (see docs)
+    - mktable help option can now inform about methods and parameters
+    - select() option attr properly handles code refs & default items
+    - enabled headless param for list() and select()
+    - select() is no longer exported
+
+1.08
+    - added select() for generating <select> lists
+    - removed empty (&nbsp;) from <ol> and <ul> lists
+    - fixed bug in benchmark-spreadsheet-html (cannot use array ref for tr param)
+    - require HTML::AutoTag v1.03
+
+1.07
+    - added encoding and empty to list()
+
+1.06
+    - added list() preset (for making HTML lists)
+    - removed unecessary 'use Spreadsheet::HTML::Presets' from presets
+
+1.05
+    - !! animate is now deprectated, use scroll instead (animate will return ...) !!
+    - you may safely encode ampersand and still have &nbsp; work
+    - added encode param (boolean) to augment encodes param (string of chars to encode)
+    - encoding now takes place within _process instead of delegating to HTML::AutoTag
+    - require HTML::AutoTag v1.02
+    - mktable: added sep to list of skipped params (is this safe?)
+
+1.04
+    - Spreadsheet::Read options now available via ::File::Loader
+
+1.03
+    - init HTML::TableExtract with ( decode => 0 )
+    - make SH::Engine method "private"
+    - correct SH::Engine and SH::Presets POD
+    - require HTML::AutoTag v1.01
+
+1.02
+    - broken, do not use
+
+1.01
+    - require HTML::AutoTag v1.00
+
+1.00
+    - ensure presets are customizable
+
+0.43
+    - added new preset tictactoe()
+    - moved chess sub into its package
+
+0.42
+    - added worksheet param (for multiple data tables)
+    - added thead.tr and tfoot.tr tag params
+    - added benchmark tool
+    - refactor td/th decision (slight speed increase)
+    - removed Clone and Math::Matrix dependencies
+
+0.41
+    - added today param to calendar()
+    - can override beadwork() colors with -N params
+    - corrected checkerboard() alternating colors
+    - added beadwork() presets: apple, cartman and homer
+    - require HTML::AutoTag v0.09 (keeping up-to-date)
+    - added Spreadsheet::Engine support via new param 'apply'
+    - calendar() cells aligned to right
+    - banner() alerts user to errors
+
+0.40
+    - corrected mktable params
+    - sudoku() alerts user when no solutions found
+    - sudoku() alerts user to install dependency
+
+0.39
+    - added sorted_attrs literal param
+
+0.38
+    - require HTML::AutoTag v0.07 (unsorted attributes)
+    - added mario preset for beadwork()
+    - no wantarray check for animate()
+
+0.37
+    - removed dk and shroom methods (now args to beadwork)
+    - added beadwork (no useful API - simple refactor for now)
+    - added mktable CLI tool
+    - able to pass some custom args along to Handsontable JS
+    - presets check for wantarray (client can get table w/out js)
+    - added github hints to Makefile
+
+0.36
+    - fixed animate bug introduced at commit cba507b (v0.34)
+    - added handson() preset
+    - restructure of preset modules that use JS
+    - added _auto internal param
+
+0.35
+    - added sudoku() preset
+    - no thead or tfoot for matrix (only tbody)
+    - can now emit multiple colgroup tags
+    - added preserve attr for preserving attrs from loaded files
+    - require HTML::AutoTag v0.06
+    - chess and checkers have moving pieces
+    - animate() no longer forces fx = 1
+
+0.34
+    - !API change: 
+        -rowX is now -rX
+        -colX is now -cX
+        -rowXcolX is now -rXcX
+    - refactored _process() (slight speed increase)
+    - can style calendar by day
+    - animate background and/or foreground
+    - added wrap literal param
+    - better handling of empty datas
+
+0.33
+    - added maze()
+    - added calendar()
+    - banner() does not wrap
+
+0.32
+    - added banner()
+    - now using Spreadsheet::Read for csv,xls files
+    - better data generation for checkers/chess
+    - animate now copies cell styles across
+
+0.31
+    - updated docs example tables
+    - added animate literal parameter
+
+0.30
+    - added animate
+    - added timer for conway
+
+0.29
+    - new param for checkerboard: extra
+    - conway impacts th tags now
+    - better fade for conway
+    - better overrides for presets
+
+0.28
+    - updated/corrected docs
+
+0.27
+    - Tag and Dynamic Parameters merge hash attrs now
+    - updated docs
+    - more correct calculator implementation
+
+0.26
+    - added calculator
+    - minify javascripts
+    - conway accepts jquery and fade params
+
+0.25
+    - fixed checkerboard bug
+    - fixed use presets by method bug
+    - added (very simple) tests for presets
+
+0.24
+    - corrected ownership typo
+    - added licenses to auxilary mods
+
+0.23
+    - added shroom and conway to Presets
+    - fill can now easily pad data via items below:
+    - added _max_cols and _max_rows
+    - refactored _args to allow stray array refs among named args
+
+0.22
+    - removed deprecated methods
+    - added chess, checkers, and checkerboard to Presets
+    - moved layout to Presets
+    - added Spreadsheet::HTML::Presets
+
+0.21
+    - added fill parameter
+    - fixed hidden bug: headings incorrectly clobbered th attrs
+
+0.20
+    - tgroup only uses <tfoot> section when its value > 1
+    - td and th parameters now accept code refs
+    - -rowX overrides -colX and -colX now impacts headings
+    - added level parameter (for indentation)
+    - pinhead now consistent with thetas -90 and 180
+
+0.19
+    - added pinhead attr to produce sensible rotations
+    - -rowX and -colX accepts array ref to
+        allow subs and hashes (no longer either/or)
+    - layout is now a method
+
+0.18
+    - added north(), east(), west() and south()
+    - deprecated transpose, flip, mirror, reverse, earthquake and tsunami
+    - renamed -row_X and -col_X to -rowX and -colX
+    - added theta and flip arguments
+    - all front end generating methods call generate() now
+    - refactored _args() to allow any named args
+
+0.17
+    - -col_X works as it should with matrix now
+    - fixed EXPORT issues (using EXPORT_OK now)
+    - more consistent file parsing error handling
+    - added support for .xlsx extensions
+
+0.16
+    - fixed broken test
+
+0.15
+    - very close to feature complete (BETA)
+    - implemented row and column configuration
+    - implemented support for colgroup and col tags
+    - implemented support for caption tag
+
+0.14
+    - now using HTML::AutoTag to generate HTML
+
+0.13
+    - replaced file loading modules with Spreadsheet::HTML::File::Loader
+    - fixed 'layout' (was overriding client values)
+
+0.12
+    - added 'tgroup' attribute (new tags!)
+    - added 'layout' attribute
+
+0.11
+    - added 'empty' attribute
+    - added 'headings' attribute
+    - added XLS loading
+
+0.10
+    - using HTML::Element in process now()
+    - caching working
+    - lots of refactoring
+    - fixed more "breaks the dist" tests
+
+0.09
+    - fixed manifest (left out test data dir)
+    - finished Spreadsheet:HTML::CSV
+
+0.08
+    - added flip and mirror
+    - added data caching
+    - using Clone to prevent data from being clobbered
+    - major refactor of internals (interface unchanged)
+    - more modular and flexible
+
+0.07
+    - added matrix attr (plain headings)
+    - added portrait and landscape aliases
+    - encode attr correctly accepts undef now
+      (allows HTML::Element to encode all unsafe chars)
+
+0.06    
+    - using HTML::Element
+    - H::E handles encoding and indention
+    - refactored arg handling
+    - added table attrs
+    - corrected license ref
+    - TODO: make th and td attrs non-global 
+
+0.05    Corrected build and unit testing
+
+0.04    Temporarily allowing DBIx::HTML to subclass.
+
+0.03    Major refactoring, able to transpose.
+
+0.02    First version, released on an unsuspecting world.
+

@@ -1,0 +1,34 @@
+use strict;
+use warnings;
+
+package [% namespace %]:Schema::DefaultRS;
+
+use base '[% namespace %]::Schema::ResultSet';
+
+1;
+
+=head1 NAME
+
+[% namespace %]::Schema::DefaultRS - Default Result Class
+
+=head1 SYNOPSIS
+
+    TBD
+
+=head1 DESCRIPTION
+
+What you get if you do not define a custom resultset
+
+=head1 METHODS
+
+This class defines the following methods
+
+=head1 AUTHORS & COPYRIGHT
+
+See L<[% namespace %]>.
+
+=head1 LICENSE
+
+See L<[% namespace %]>.
+
+=cut

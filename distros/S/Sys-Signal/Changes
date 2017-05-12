@@ -1,0 +1,13 @@
+Revision history for Perl extension Sys::Signal.
+
+0.02 - March 21, 2000
+
+get rid of PL_siggv usage for Perl 5.6
+
+fix "use of uninitialized value", thanks to Bill Moseley for the spot
+
+plug memory leak [Radu Greab <radu@busy.netsoft.ro>]
+
+0.01  Wed Feb 24 11:43:07 1999
+	- original version; created by h2xs 1.18
+

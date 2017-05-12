@@ -1,0 +1,11 @@
+Revision history for SMS-Send-KR-APIStore
+
+0.003     2017-01-20 12:18:49+09:00 Asia/Seoul
+    - Apply v2.3 user guide (GH #2)
+        - add cid() method to get/set caller id information
+
+0.002     2016-10-31 21:12:58+09:00 Asia/Seoul
+    - Change domain from api.openapi.io to api.apistore.co.kr (GH #1)
+
+0.001     2015-06-17 14:37:59+09:00 Asia/Seoul
+    - first release

@@ -1,0 +1,6 @@
+Revision history for Perl extension SVN::Dumpfilter.
+
+0.01  Mon Jul 31 12:36:48 2006
+	- original version; created by h2xs 1.23 with options
+		-b 5.6.1 -AX SVN::Dumpfilter
+

@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                Sys-Signals-Block
+version:             0.10
+abstract:            Simple interface to block delivery of signals
+license:             ~
+author:              
+    - Michael Schout <mschout@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Class::Accessor:               0
+    POSIX:                         0
+    Test::Exception:               0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

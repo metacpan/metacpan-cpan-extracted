@@ -1,0 +1,19 @@
+Revision history for Perl extension Spica
+
+0.04 2013-11-12T12:50:03Z
+    - fixed issues #20
+
+0.03 2013-10-22T11:43:53Z
+
+    - to change the specifications of the trigger
+    - added module Spica::Event
+    - was deprecated in the add_trigger
+
+0.02 2013-10-19T10:46:24Z
+
+    - fixed bugs
+
+0.01 2013-10-09T13:58:35Z
+
+    - original version
+

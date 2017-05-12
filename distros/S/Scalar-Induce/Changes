@@ -1,0 +1,19 @@
+Revision history for Scalar-Induce
+
+0.05      2013-04-25 15:30:22 Europe/Amsterdam
+          Switch to using --pureperl-only
+
+0.04      2012-04-09 19:34:13 Europe/Amsterdam
+          Restored pure-perl support
+
+0.03      2011-12-11 17:38:50 Europe/Amsterdam
+          Removed pure-perl support
+          Modernize XS loading and exporting a bit
+          Remove multicall
+          Fix license
+
+0.02    2009-01-27
+        Hopefull fixed pure-perl version for perl 5.6.
+
+0.01    2009-01-26
+        First version, released on an unsuspecting world.

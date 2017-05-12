@@ -1,0 +1,54 @@
+NAME
+    Scalar::Random::PP - Scalar::Random in Pure Perl
+
+SYNOPSIS
+        use Scalar::Random::PP 'randomize';
+
+        my $random;
+        my $MAX_RANDOM = 100;
+
+        randomize( $random, $MAX_RANDOM );
+
+        print $random, "\n"; # '42'
+        print $random, "\n"; # '17'
+        print $random, "\n"; # '88'
+        print $random, "\n"; # '4'
+        print $random, "\n"; # '50'
+
+DESCRIPTION
+    This module is intended to be a pure Perl replacement for
+    Scalar::Random.
+
+    Please see Scalar::Random for full details.
+
+NOTES
+    This module was written as a pair programming excerise between Webster
+    Montego and Ingy döt Net.
+
+    The module passes all the same tests as Scalar::Random, even though we
+    felt there could be more exhaustive testing. Perhaps we'll add the tests
+    we'd like to see, so that Alfie John can backport them. :)
+
+    We also thought it would be nice if randomize took a lower limit, but we
+    decided not to change the API unless Alfie did so first, so that the PP
+    module would be an exact replacement.
+
+    We used the speedy and zero-dep Mousse module for OO goodness, and
+    packaged it all up with the lovely Module::Install and friends.
+
+RESOURCES
+    GitHub: <http://github.com/websteris/scalar-random-pp-pm>
+
+AUTHORS
+    Webster Montego <websteris@cpan.org>
+
+    Ingy döt Net <ingy@cpan.org>
+
+COPYRIGHT
+    Copyright (c) 2010. Webster Montego and Ingy döt Net
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://www.perl.com/perl/misc/Artistic.html>
+

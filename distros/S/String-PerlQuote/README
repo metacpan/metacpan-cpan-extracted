@@ -1,0 +1,30 @@
+FUNCTIONS
+
+ double_quote($str) => STR
+
+    Quote or encode $str to the Perl double quote (") literal
+    representation of the string. Example:
+
+     say double_quote("a");        # => "a"     (with the quotes)
+     say double_quote("a\n");      # => "a\n"
+     say double_quote('"');        # => "\""
+     say double_quote('$foo');     # => "\$foo"
+
+    This code is taken from quote() in Data::Dump. Maybe I didn't look more
+    closely, but I couldn't a module that provides a function to do
+    something like this. String::Escape, for example, provides qqbackslash
+    but it does not escape $.
+
+ single_quote($str) => STR
+
+    Like double_quote but will produce a Perl single quote literal
+    representation instead of the double quote ones. In single quotes, only
+    literal backslash \ and single quote character ' are escaped, the rest
+    are displayed as-is, so the result might span multiple lines or contain
+    other non-printable characters.
+
+     say single_quote("Mom's");    # => 'Mom\'s' (with the quotes)
+     say single_quote("a\\");      # => 'a\\"
+     say single_quote('"');        # => '"'
+     say single_quote("\$foo");    # => '$foo'
+

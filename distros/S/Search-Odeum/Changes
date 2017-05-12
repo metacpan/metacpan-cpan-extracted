@@ -1,0 +1,10 @@
+Revision history for Perl extension Search::Odeum.
+
+0.02  Wed Apr 11 11:56:42 JST 2007
+      - added odquery method which is a wrapper of odquery
+      - added set of boolean operations. 
+        odpairsand, odpairsor, odpairsnotand
+
+0.01  Fri Apr  6 11:52:53 2007
+      - original version
+

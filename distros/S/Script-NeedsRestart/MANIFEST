@@ -1,0 +1,13 @@
+Build.PL
+Changes
+lib/Script/NeedsRestart.pm
+MANIFEST
+META.json
+META.yml
+README
+t/01_Script-NeedsRestart.t
+xt/01_podspell.t
+xt/02_perlcritic.t
+xt/03_pod.t
+xt/04_distribution.t
+xt/perlcriticrc

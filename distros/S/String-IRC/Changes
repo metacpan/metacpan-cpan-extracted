@@ -1,0 +1,15 @@
+Revision history for String-IRC
+
+0.04  2008-11-13
+  * always using two-digit color codes.
+    http://rt.cpan.org/Ticket/Display.html?id=40736
+
+0.03  2008-10-18
+  * typo fixed.
+    http://rt.cpan.org/Public/Bug/Display.html?id=40039
+
+0.02  2007-02-23
+  * build require Test::Base.
+
+0.01  2007-02-15
+  * Initial release.

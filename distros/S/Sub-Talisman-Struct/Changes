@@ -1,0 +1,35 @@
+Sub-Talisman-Struct
+===================
+
+Created:      2012-10-19
+Home page:    <https://metacpan.org/release/Sub-Talisman-Struct>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Sub-Talisman-Struct>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.005	2014-09-10
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.004	2012-12-16
+
+ [ Packaging ]
+ - Require Perl 5.12; it just wasn't working in older versions. Patches for
+   older versions of Perl are welcome, but I'm not going to waste any more
+   time figuring this out.
+
+0.003	2012-10-20
+
+ [ Bug Fixes ]
+ - Fix lvalue sub in test cases in Perl < 5.16.
+
+ [ Packaging ]
+ - Add build dep on Test::NoWarnings.
+
+0.002	2012-10-19
+
+ [ Bug Fixes ]
+ - Drop elliptical statements (yada-yada op) from test cases, as this will
+   fail in Perl < 5.12.
+
+0.001	2012-10-19	Initial release

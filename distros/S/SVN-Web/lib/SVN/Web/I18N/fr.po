@@ -1,0 +1,140 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../Template/trac/log:40 ../Template/trac/log:44
+#. (pk.value.copyfrom, pk.value.copyfromrev)
+msgid "%1:%2"
+msgstr "%1:%2"
+
+#: ../Template/trac/revision:76
+msgid "(added)"
+msgstr "Ajouté"
+
+#: ../Template/trac/log:15 ../Template/trac/revision:26
+msgid "(author)"
+msgstr "Auteur"
+
+#: ../Template/trac/browse:18
+msgid "(browse listing)"
+msgstr "Liste des fichiers et répertoires"
+
+#: ../Template/trac/log:6
+msgid "(changes)"
+msgstr "modifications"
+
+#: ../Template/trac/log:62 ../Template/trac/revision:60 ../Template/trac/view:1
+msgid "(checkout)"
+msgstr "Téléchargement"
+
+#: ../Template/trac/list:3
+msgid "(choose repos)"
+msgstr "Veuillez sélectionner le dépôt à parcourir&nbsp;:"
+
+#: ../Template/trac/revision:43 ../Template/trac/revision:62
+msgid "(copied from)"
+msgstr "Copié depuis"
+
+#: ../Template/trac/log:12 ../Template/trac/revision:23
+msgid "(date)"
+msgstr "Date"
+
+#: ../Template/trac/log:16 ../Template/trac/revision:53 ../Template/trac/revision:57
+msgid "(diff)"
+msgstr "Diff"
+
+#: ../Template/trac/log:13
+msgid "(file)"
+msgstr "Fichier"
+
+#: ../Template/trac/revision:32
+msgid "(files)"
+msgstr "Fichiers"
+
+#: ../Template/trac/log:55 ../Template/trac/log:65
+#. (pk.value.copyfrom, pk.value.copyfromrev)
+msgid "(from %1:%2)"
+msgstr "(Depuis %1:%2)"
+
+#: ../Template/trac/browse:7
+msgid "(goto revision)"
+msgstr "Voir la révision&nbsp;:"
+
+#: ../Template/trac/browse:24
+msgid "(last change)"
+msgstr "Dernière modification"
+
+#: ../Template/trac/revision:74
+msgid "(legend)"
+msgstr "Légende"
+
+#: ../Template/trac/revision:78
+msgid "(modified)"
+msgstr "Modifié"
+
+#: ../Template/trac/browse:21
+msgid "(name)"
+msgstr "Nom"
+
+#: ../Template/trac/revision:14
+msgid "(next revision)"
+msgstr "Révision suivante"
+
+#: ../Template/trac/browse:16
+msgid "(no directory entries)"
+msgstr "Il n'y a aucun répertoire à afficher"
+
+#: ../Template/trac/list:13
+msgid "(no repos)"
+msgstr "Vous ne pouvez parcourir aucun dépôt"
+
+#: ../Template/trac/footer:4
+msgid "(powered by)"
+msgstr "Propulsé par SVN::Web"
+
+#: ../Template/trac/revision:11
+msgid "(previous revision)"
+msgstr "Révision précédente"
+
+#: ../Template/trac/revision:77
+msgid "(removed)"
+msgstr "Supprimé"
+
+#: ../Template/trac/header:12 ../Template/trac/header:22
+msgid "(repository list)"
+msgstr "Liste des dépôts"
+
+#: ../Template/trac/browse:13 ../Template/trac/log:17 ../Template/trac/log:9 ../Template/trac/revision:29 ../Template/trac/view:1 ../Template/trac/view:3
+# fuzzy
+msgid "(revision log)"
+msgstr "Revision log"
+
+#: ../Template/trac/revision:7
+msgid "(revision navigation)"
+msgstr "Navigation dans les révisions"
+
+#: ../Template/trac/browse:22 ../Template/trac/log:14 ../Template/trac/revision:20 ../Template/trac/view:6
+msgid "(revision)"
+msgstr "Révision"
+
+#: ../Template/trac/log:6
+msgid "(show last)"
+msgstr "Afficher les dernières"
+
+#: ../Template/trac/browse:23
+msgid "(size)"
+msgstr "Taille"
+
+#: ../Template/trac/header:12
+msgid "(via)"
+msgstr "via"
+
+#: ../Template/trac/revision:15
+msgid "(youngest revision)"
+msgstr "Révision la plus récente"
+
+#: ../Template/trac/log:3
+msgid "RSS"
+msgstr "RSS"

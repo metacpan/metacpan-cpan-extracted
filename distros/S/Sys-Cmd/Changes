@@ -1,0 +1,179 @@
+0.85.4 (2016-06-06)
+
+    Enhancements:
+        - Restore Makefile.PL support via Module::Build::Compat.
+
+    Bug Fixes:
+        - Do not execute commands in current directory (unless found in
+          PATH)
+
+0.85.2 (2016-03-11)
+
+    Enhancements:
+        - Minor documentation and distribution meta data fixes
+
+0.85.1_1 (2016-03-03)
+
+    API / Behaviour Changes:
+        - Convert from Module-Install ("Makefile.PL") to Module-Build
+          ("Build.PL")
+            - Done by Shlomi Fish ( http://www.shlomifish.org/ ) as part
+            of the CPAN Pull Request Challenge.
+
+    New Features:
+        - None.
+
+    Enhancements:
+        - 'warn' any stderr output recieved in the run() function
+
+    Bug Fixes:
+        - Pass undefined environment variables more cleanly
+
+    Dependencies:
+        - None.
+
+0.84.0 (2015-08-29)
+
+    Enhancements:
+        - Minor formatting change in debug message.
+        - Clean up this Changes file
+
+0.83.1_2 (2015-08-14)
+
+    Bug Fixes:
+        - Move Sys::Cmd::Mo back to start of Cmd.pm.
+
+0.83.1_1 (2015-08-14)
+
+    Enhancements:
+        - Use Proc::FastSpawn for everything except CODErefs on POSIX
+        - Small efficiency changes & code refactoring
+
+    Bug Fixes:
+        - None.
+
+0.82.0 (2015-01-29)
+
+    API / Behaviour Changes:
+        - No longer set $SIG{CHLD} for any reason - leave it to calling
+          code to define such global behaviour.
+
+    Enhancements:
+        - Removed empty sections from (this) Changes file
+        - Removed a dependency on the POSIX module
+        - Optimized & clarified the internal fork/spawn functions
+        - Minor code cleanups
+
+    Bug Fixes:
+        - Removed invalid coderef test that wasn't testing anything
+
+0.81.8 (2014-10-31)
+
+    New Features:
+        - New Win32 support based on Proc::FastSpawn
+
+    Enhancements:
+        - Be verbose for unexpected test failures
+        - Move POD back into .pm files
+
+0.81.6 (2014-03-24)
+
+    Enhancements:
+        - Updated to Mo 0.38.
+
+    Bug Fixes:
+        - Add missing argument to _exit() call.
+
+0.81.4 (2014-02-14)
+
+    Enhancements:
+        - Better detection & tests for non-executable target
+        - Use POSIX::_exit after calling CODEref to prevent DESTROY
+          actions
+        - Remove unecessary warnings during DESTROY/END blocks
+
+    Bug Fixes:
+        - Prevent child process from reaping itself
+        - Do not attempt to close handles on DESTROY
+
+0.81.2 (2013-12-23)
+
+    Bug Fixes:
+        - Don't index Sys::Cmd::Mo.
+        - 0.81.0 was released with a Sys::Cmd::VERSION of 0.80.3
+        - Run author tests from xt/ when an author
+
+0.81.0 (2013-12-23)
+
+    New Features:
+        - Accept CODErefs as arguments
+
+    Enhancements:
+        - Switch to a leaner Mo
+        - Various test refactoring
+
+0.80.2 (2013-02-24)
+
+    Enhancements:
+        - Switch to Semantic Versioning: http://semver.org
+        - Switch to a leaner Exporter::Tidy
+        - Various test and documentation updates
+
+    Bug Fixes:
+        - Properly test for UTF-8 values in environment variables:
+           https://rt.cpan.org/Ticket/Display.html?id=81834
+
+0.08 (2012-04-21)
+
+    API Changes:
+        - Split wait_child() out of close().
+
+    New Features:
+        - SIGCHLD handler and "on_exit" subref support
+
+    Enhancements:
+        - More informative debugging output
+
+    Bug Fixes:
+        - Filehandle fixes from inherited code as described here:
+            https://rt.cpan.org/Public/Bug/Display.html?id=73614
+
+0.05 (2011-09-20)
+
+    API Changes:
+        - Renamed from Sys::Command to Sys::Cmd.
+        - In doing the above rename the following functionality changes
+          also took place: "Sys::Command::Process" became "Sys::Cmd".
+          "Sys::Command" became "Sys::Cmd::Template".
+        - Split wait_child() out of close().
+
+    New Features:
+        - SIGCHLD handler and "on_exit" subref support
+
+    Enhancements:
+        - Borrowed some tests from System::Command.
+        - Confess on command not found.
+
+    Bug Fixes:
+        - Add missing dependency on File::Which plus various
+          test_requires modules.
+
+0.04 (2011-06-09)
+
+    Enhancements:
+        - Hopefully fix failing tests due to not finding 'perl'
+
+0.03 (2011-06-07)
+
+    Bug Fixes:
+        - Make Makefile.PL (and META.yml) point to correct repository.
+        - Add missing Sub::Exporter dependency
+
+0.02 (2011-06-06)
+
+    Bug Fixes:
+        - Fixed README and Sys::Command::Process Documentation errors.
+
+0.01 (2011-06-06)
+
+    Initial Release

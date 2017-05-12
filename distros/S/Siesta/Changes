@@ -1,0 +1,54 @@
+0.66    2003-10-17
+        Made Siesta::Test a released file (will help with testing third party
+        Plugins)
+
+        Documentation fixes.
+
+        Security fix for Siesta::Send::Sendmail
+
+        Quick hack around an issue in Siesta::Config
+
+        Now we depend on perl 5.6 or newer.  Hacking around 5.005 was
+        getting painful.
+
+
+0.65    2003-09-01 (#1383)
+        Stealth dependency on YAML made clear.  spotted by Nick Cleaton
+
+        bandito no longer tries to import a users nomail attribute (it's a
+        TODO to have this a property of subscription)
+
+
+0.64    2003-09-01 (#1376)
+        nacho {show,resume,delete}-deferred
+
+        Siesta::Plugin::Archive now allows you to configure its output path
+
+        Colobus HOWTO
+
+        Challenge/Subscribe plugins now auto-generate passwords correctly
+
+        Fixes to Personal Plugin handling in List->set_plugins
+
+        Changes to the behaviour of Siesta::Message->reply so that it's
+        not a sticky about it's state
+
+
+0.63    2003-08-09 (#1298)
+        improvements to Siesta::UserGuide
+        big bug in List->set_plugins fixed (thanks Jody)
+        -f switch
+        many many more
+
+0.62    2003-07-28
+        fixed a syntax error in Siesta::Web (I be slack)
+
+0.61    2003-07-28
+        Fix MANIFEST, ship Siesta::Build
+        Have Siesta::Web point within Config('root')/web-frontend
+
+0.6     2003-07-24
+        Initial release
+
+for full change history consult the siesta-commit archives:
+http://siesta.unixbeard.net/siesta/archive/siesta-commit/

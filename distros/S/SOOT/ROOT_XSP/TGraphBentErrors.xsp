@@ -1,0 +1,13 @@
+%module{SOOT};
+
+class TGraphBentErrors {
+  TGraphFloatArray GetEXhigh();
+  TGraphFloatArray GetEXhighd();
+  TGraphFloatArray GetEXlow();
+  TGraphFloatArray GetEXlowd();
+  TGraphFloatArray GetEYhigh();
+  TGraphFloatArray GetEYhighd();
+  TGraphFloatArray GetEYlow();
+  TGraphFloatArray GetEYlowd();
+};
+

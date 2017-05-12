@@ -1,0 +1,6 @@
+<!DOCTYPE NZSRSResponse SYSTEM "protocol.dtd"><NZSRSResponse VerMajor="5" VerMinor="2">
+ <Response Action="HandleUpdate" FeId="9" FeSeq="1407" OrigRegistrarId="100" RecipientRegistrarId="100" TransId="1280720420">
+ <FeTimeStamp Day="2" Hour="15" Minute="40" Month="8" Second="21" TimeZoneOffset="+12:00" Year="2010"/>
+ <Error Hint="UNKNOWN_ERROR_HINT" ErrorId="HANDLE_IN_USE" Severity="err">
+ <Description><![CDATA[Handles cannot be deleted when they are associated by with a domain or registrar contact]]></Description></Error></Response>
+ </NZSRSResponse>

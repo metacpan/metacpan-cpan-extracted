@@ -1,0 +1,36 @@
+Spread-Messaging version 0.03
+=============================
+
+The Spread::Messaging module aims to make usage of a Spread network relatively
+painless. It does not impose any preconceived notion on how logging, error
+handling or message processing should be handled. It strives for maximum
+flexibility. 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Spread.pm
+   Spread::Messaging::Content
+   Spread::Messaging::Transport
+   Spread::Messaging::Exception
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2007 by Kevin L. Esteb
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.
+

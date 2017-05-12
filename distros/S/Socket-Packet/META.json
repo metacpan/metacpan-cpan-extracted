@@ -1,0 +1,57 @@
+{
+   "abstract" : "interface to Linux's C<PF_PACKET> socket family",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4202",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Socket-Packet",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0",
+            "ExtUtils::CChecker" : "0",
+            "IO::Socket::INET" : "0",
+            "Module::Build" : "0",
+            "Module::Build::Compat" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::CChecker" : "0.04",
+            "Module::Build" : "0",
+            "Module::Build::Compat" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "5.57"
+         }
+      }
+   },
+   "provides" : {
+      "IO::Socket::Packet" : {
+         "file" : "lib/IO/Socket/Packet.pm",
+         "version" : "0.10"
+      },
+      "Socket::Packet" : {
+         "file" : "lib/Socket/Packet.pm",
+         "version" : "0.10"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.10"
+}

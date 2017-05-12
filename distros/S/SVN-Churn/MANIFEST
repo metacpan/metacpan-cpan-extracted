@@ -1,0 +1,10 @@
+Makefile.PL
+Build.PL
+META.yml
+MANIFEST
+MANIFEST.SKIP
+Changes
+bin/svn-churn
+lib/SVN/Churn.pm
+t/compile.t
+t/simple.t

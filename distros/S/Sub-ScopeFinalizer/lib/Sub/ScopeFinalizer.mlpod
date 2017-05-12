@@ -1,0 +1,205 @@
+=encoding utf8
+
+=head1 NAME
+
+Sub::ScopeFinalizer - execute a code on exiting scope.
+J<< ja;Sub::ScopeFinalizer - スコープ終了時にコードを実行 >>
+
+=head1 VERSION
+
+Version 0.02
+
+=head1 SYNOPSIS
+
+ use Sub::ScopeFinalizer qw(scope_finalizer);
+ 
+ {
+   my $anchor = scope_finalizer { print "put clean up code here.\n"; };
+   print "running block.\n";
+ }
+ 
+=head1 DESCRIPTION
+
+Sub::ScopeFinalizer invoke BLOCK, triggered by leaving a scope.
+It is similar to destructor or finally clause.
+J<< ja;
+Sub::ScopeFinalizer は, スコープを抜けるのに合わせて BLOCK の
+実行を行います. これはデストラクタや例外機構での finally 節と
+似ています. 
+>>
+
+=head1 EXPORT
+
+This module exports one function, C<scope_finalizer>.
+J<< ja;
+このモジュールは関数を１つ, C<scope_finalizer> をエクスポートします.
+>>
+
+=head1 FUNCTION
+
+=head2 scope_finalizer
+
+ $o = scope_finalizer BLOCK;
+ $o = scope_finalizer BLOCK { args =>[...] };
+
+Create a finalizer object.
+This is shortcut to invoke C<< Sub::ScopeFinalizer->new(...) >>.
+J<<<< ja;
+後始末オブジェクトを生成します. これは C<< Sub::ScopeFinalizer->new(...) >>
+と同じです. 
+>>>>
+
+BLOCK will be executed when object is destroyed.
+In other words, process just exits a scope which object is binded on.
+J<< ja;
+BLOCK はオブジェクトが破棄されたときに実行されます. 
+つまり, コードの実行がオブジェクトのバインドされている
+スコープを抜けたその時に実行されます. 
+>>
+
+Second argument is optional hashref. 
+$opts->{args} can contain argument for BLOCK as ARRAYref.
+J<< ja;
+２番目の引数として任意でハッシュリファレンスを渡せます. 
+$opts->{args} に BLOCK を実行するときの引数を配列のリファレンス
+として渡せれます. 
+>>
+
+If you only call this function without bind, BLOCK is executed
+immediately because object is destroyed as soon as return from function.
+Don't forget to bind.
+J<< ja;
+もしこの関数の復帰値をバインドせず単に呼び出したときには, 
+オブジェクトは関数から戻るとすぐに破棄されるため BLOCK も
+すぐに起動されてしまいます. バインドは忘れずに. 
+>>
+
+=head1 CONSTRUCTOR
+
+=head2 $pkg->new(CODEref);
+
+=head2 $pkg->new(CODEref, HASHref);
+
+Create a finalizer object.
+You must bind it with variable on scope.
+J<< ja;
+後始末オブジェクトの生成. 
+復帰値をスコープ内の変数にバインドするのを忘れずに. 
+>>
+
+See L</scope_finalizer>.
+J<< ja;
+詳細は L</scope_finalizer> を参照. 
+>>
+
+=head1 METHODS
+
+=head2 $obj->raise();
+
+ $obj->raise();
+ $obj->raise({args=>[...]});
+
+Invoke finalizer before it run automatically.
+This method disables default invokation on scope leaving.
+J<< ja;
+自動的に呼ばれるのより前に後始末コードを起動します. 
+このメソッドを呼ぶとスコープを抜けたときの起動は無効に
+なります. 
+>>
+
+This method takes one argument as optional hashref. 
+$opts->{args} can contain argument for BLOCK as ARRAYref.
+if $opts->{args} is passed, args parameter on constructor 
+is ignored.
+J<< ja;
+引数として任意でハッシュリファレンスを渡せます. 
+$opts->{args} に BLOCK を実行するときの引数を配列のリファレンス
+として渡せれます. $opts->{args} を渡したときはコンストラクタの
+args パラメータは無視されます. 
+>>
+
+=head2 $obj->disable();
+
+ $obj->disable();
+ $obj->disable($flag);
+
+Turn off BLOCK invoking.
+If optional argument $flag is passwd and it is false, 
+cancel disabling, that is, enable invoking.
+J<< ja;
+BLOCK の起動を無効にします. 
+引数 $flag に偽を渡すと無効化を解除, つまり
+呼び出しを再度有効にします. 
+>>
+
+=head1 AUTHOR
+
+YAMASHINA Hio, C<< <hio at cpan.org> >>
+J<< ja;
+山科 氷魚 (YAMASHINA Hio), C<< <hio at cpan.org> >>
+>>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to
+C<bug-sub-scopescope_finalizer at rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Sub-ScopeFinalizer>.
+I will be notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
+J<< ja;
+バグや要望は C<bug-sub-scopescope_finalizer at rt.cpan.org> 宛に
+報告してください. 若しくは
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Sub-ScopeFinalizer>.
+にある web インターフェースからでもかまいません.
+そこから私に通知され, そして私が変更を行うことで報告頂いたバグの進捗を
+自動的にあなたに伝えるでしょう.
+>>
+
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+J<< ja;
+このモジュールのドキュメントは perldoc コマンドで見ることが出来ます.
+>>
+
+    perldoc Sub::ScopeFinalizer
+
+You can also look for information at:
+J<< ja;
+また, 以下の場所でも見ることが出来ます:
+>>
+
+=over 4
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Sub-ScopeFinalizer>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Sub-ScopeFinalizer>
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Sub-ScopeFinalizer>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Sub-ScopeFinalizer>
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2006 YAMASHINA Hio, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+J<< ja;
+このプログラムはフリーソフトウェアです。あなたは Perl と同じ
+ライセンスの 元で再配布及び変更を行うことが出来ます.
+>>
+

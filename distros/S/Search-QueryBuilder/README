@@ -1,0 +1,33 @@
+Search-QueryBuilder version 0.01
+=========================
+
+QueryBuilder is a very simple tokeniser, designed to decode a query string into something you can create a database query from
+(into SQL, Cheshire, that sort of thing). It tries to do a little sanity checking, but is still in active development so expect changes. The creation of queries from the resulting string does not currently take place within the module, but expect this interface to change.
+
+QueryBuilder is used as part of IRS (the Intute Repository Search).
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module has no dependancies. 
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2006 by E Tonkin 
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.
+
+

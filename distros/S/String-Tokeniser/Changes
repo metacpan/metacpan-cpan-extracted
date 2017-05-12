@@ -1,0 +1,20 @@
+Revision history for Perl extension String::Tokeniser.
+
+0.05  Fri Aug 19 21:57 2011
+        - Add abstract to META
+
+0.04  Thu Mar 31 15:32 2005
+	- Added README file;
+
+0.03  Fri Nov 12 22:20 2004
+	- Added pod.t and pod-coverage.t;
+	- Corrected pod;
+
+0.02  Fri Nov 12 22:15 2004
+	- More than five years later, a new version;
+	- Corrected bugs with undefined values;
+	- Moved test for independent directory;
+
+0.01  Mon Jul 12 22:15 1999
+	- original version; created by h2xs 1.19
+

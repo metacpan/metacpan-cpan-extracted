@@ -1,0 +1,32 @@
+#!/usr/bin/ruby
+
+#
+## Block recursion via __BLOCK__
+#
+
+{ |n|
+    n > 1 ? (__BLOCK__(n-1) * n)
+          : 1;
+}(5).to_s.say;
+
+
+#
+## Function recursion via __FUNC__
+#
+
+func (n) {
+    n > 1 ? (__FUNC__(n-2) + __FUNC__(n-1))
+          : (n);
+}(8).to_s.say;
+
+
+__END__
+
+#
+## Infinite block recursion
+#
+
+{
+    "Hello world!".say;
+    __BLOCK__.run;
+}.run;

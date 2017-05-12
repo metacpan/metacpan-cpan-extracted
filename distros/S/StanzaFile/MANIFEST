@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+StanzaFile/Grub.pm
+StanzaFile/Lilo.pm
+StanzaFile/Makefile.PL
+Stanza.pm
+StanzaFile.pm
+t/use.t

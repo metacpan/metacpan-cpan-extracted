@@ -1,0 +1,23 @@
+This directory contains three useful scripts
+
+activity
+
+  Lists all activity associated with a user's token. Takes one mandatory
+  parameter (the userid of the user in question), and one optional
+  parameter (the number of days of activity to list). This parameter
+  defaults to one day.
+
+clrnext
+
+  Takes a token out of "Next Pin Mode". This is useful at our site where
+  all authentication transactions are stateless (done via dialup and
+  RADIUS), and the client is not able to respond to and enter a second
+  PIN. It takes a single parameter: the userid whose token is in next
+  PIN mode.
+
+tokeninf
+
+  Takes a userid as a parameter, and displays all information about that 
+  user's token.
+
+  

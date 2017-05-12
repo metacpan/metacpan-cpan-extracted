@@ -1,0 +1,82 @@
+SVN-Deploy version 0.1
+=======================
+
+SVN::Deploy implements an interface to handle release data held within
+a separate SVN repository. You can define categorized products where
+each product consists of multiple sources (SVN repositories and
+directories or files from a filesystem) and multiple destinations
+(filesystem directories).
+
+It was designed for situations where the build and deploy steps should
+not be performed by the developers of a product but by operators with
+only read access to the developers repository, while the developers
+have no access to the deploy repository.
+
+The overall outline looks like this:
+
+  (dev:developers, op:operating, usr:users/testers):
+
+    - (dev) define a product
+            (location of sources from the devel repo and/or files,
+            providing build procedures, etc)
+    - (op)  define the product in the deploy repository
+    - (dev) order a new release (give source revision numbers to op)
+    - (op)  build the release
+            (resulting in a new revision in the deploy repo)
+    - (op)  deploy the new release to QA environment giving
+            release revision info to testers
+    - (usr) approve/reject the release
+    - (op)  on approval deploy the new release to
+            production environment
+
+All information and the build/deploy history is held in the deploy
+repository and can be easily exported for auditing purposes.
+
+The deploy repository will look like this:
+
+    repo_root
+      \-- Category1
+      \-- Category2
+        \-- Product1
+          \-- 0
+            \-- subdir1
+              \-- file1
+              \-- file2
+            \--file1
+        \-- Product2
+          \-- 0
+          \-- 1
+          \-- 2
+      ...
+
+For further information please use the module's documentation.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    SVN::Client
+    File::Copy::Recursive
+
+    SVN::Ra (only for running the tests)
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2008 by Thomas Kratz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

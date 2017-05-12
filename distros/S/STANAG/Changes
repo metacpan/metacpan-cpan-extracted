@@ -1,0 +1,6 @@
+Revision history for Perl extension STANAG.
+
+0.01  Wed Jun 10 09:05:16 2009
+	- original version; created by h2xs 1.23 with options
+		-X -n STANAG
+

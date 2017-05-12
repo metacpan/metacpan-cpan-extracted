@@ -1,0 +1,30 @@
+NAME
+    SQL::Admin - Maintain database schemas
+
+SYNOPSIS
+       use SQL::Admin;
+
+       # Merge multiple SQL files
+       my $catalog = SQL::Admin
+          ->get_catalog
+          ->load ('DB2', { file => [ 'create-schema.sql', 'update-001.sql' ] })
+          ->save ('Pg', { file  => [ 'output.sql' ] });
+
+       # ... deploy catalog
+       $catalog->save ('Pg::DBI', { dbdsn  => ... });
+
+       # Sync SQL files and db
+       my $src = SQL::Admin->get_catalog;
+          ->load ('Pg::DBI', { dbdsn => ... });
+
+       my $dst = SQL::Admin->get_catalog;
+          ->load ('Pg', { file => [ 'create-schema.sql' ] });
+
+       my $diff = SQL::Admin->compare ($src, $dst);
+
+       if ($diff->is_difference) {
+           $diff->save ('Pg');
+           $diff->save ('Pg::DBI', { dbdsn => ... });
+       }
+
+DESCRIPTION

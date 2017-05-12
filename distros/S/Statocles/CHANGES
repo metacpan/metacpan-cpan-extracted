@@ -1,0 +1,1262 @@
+Changelog for Statocles
+
+0.083     2017-01-31 16:44:17-06:00 America/Chicago
+
+    [Added]
+
+    - The new `statocles status` command shows you a quick status of
+      your site, including the last time it was deployed and what date
+      it was deployed up to (if different from the last date it was
+      deployed). We will be adding more things to this later, so let us
+      know if there are any statistics you'd like to know about your
+      site! Thanks @perlancar [Github #516]
+
+    - The `include` helper now accepts a `-raw` flag to disable the
+      template renderer. This allows you to easily include Perl code and
+      not have it mistaken for a template. Thanks justinQuiring on IRC
+      for the bug report [Github #529]
+
+      This isn't the end of this: We will likely fix the heuristics to
+      ignore file types (extensions) that do not look like templates.
+      This will be a breaking change, sorry.
+
+0.082     2017-01-18 23:17:36-06:00 America/Chicago
+
+    [Added]
+
+    - The `highlight` plugin now accepts a `-style` option to override
+      what stylesheet is used for the current highlighting block. This
+      makes it easier for me to demonstrate the various highlighting
+      stylesheets we have available in the documentation.
+
+    - The new documentation is released on
+      http://preaction.me/statocles/docs. They are not yet
+      fully-complete, but they are a lot friendlier than the previous
+      docs (which are at http://preaction.me/statocles/pod).
+
+    [Fixed]
+
+    - The `HTMLLint` plugin now appropriately adds the filename to every
+      single lint message. It also uses the HTML::Lint API correctly to
+      avoid any future warnings about using it incorrectly. Thanks
+      @petdance for explaining the proper use of the API.
+
+0.081     2016-10-26 23:17:58-05:00 America/Chicago
+
+    [Added]
+
+    - Blog posts now have "Older" and "Newer" links so a reader can read
+      a blog from start to finish, navigating through blog posts without
+      having to return to the index page. Thanks @kbucheli! [Github
+      #517]
+
+      This is a theme change, so you will need to update your theme to
+      see the older/newer links. See the Statocles default themes for
+      examples.
+
+0.080     2016-10-20 15:11:57-05:00 America/Chicago
+
+    [Fixed]
+
+    - Blog slugs (folder path) are now a bit neater: Apostriphes do not
+      turn into dashes, and leading and trailing dashes are removed. So,
+      where the blog post "It's good!" would have previously looked like
+      "/2016/06/02/it-s-good-/", it will now look like
+      "/2016/06/02/its-good/". Thanks @Ferki! [Github #507] [Github
+      #508]
+
+0.079     2016-10-14 20:49:24-05:00 America/Chicago
+
+    [Other]
+
+    - Now that Pod::Weaver 4.015 has shipped with fixes, recommend
+      upgrading to 4.015 if the user has 4.014.
+
+0.078     2016-10-12 14:30:18-05:00 America/Chicago
+
+    [Fixed]
+
+    - Multiple blog posts on the same day are now ordered by their
+      `date` attribute. This makes the ordering predictable and
+      changable, instead of being ordered alphabetically [Github #512].
+      There will likely be some configuration additions here in the
+      future to make the date formatting fit the blog's post frequency
+      and groupings.
+
+    [Other]
+
+    - Ignore Pod::Weaver version 4.014. This version shipped with a bug
+      that causes our tests to fail, likely causes weaving in the
+      Perldoc app to throw a fatal error. You should downgrade to
+      Pod::Weaver 4.013 (`cpanm Pod::Weaver 4.013`) or upgrade to
+      Pod::Weaver 4.015 when that is released. [Github #513]
+
+0.077 2016-08-06T01:24:56
+ - fix new warning making test fail
+ - fix tests for Mojolicious 7.0
+ - add trim function
+ - add more info about helpers to content guide
+ - add some about content templates to content guide
+ - add more markdown and commands to content doc
+ - warn user when git deploy can't push
+ - rename private subs that work with git repos
+ - add quick-start to content guide
+ - add meta author to all default themes
+ - test atom feed for site author
+ - fix type coercion on Perl <5.14
+ - add notes about highlight color styles
+ - add more sections to the config guide
+ - allow more variants in link configuration
+ - add link tree object
+ - add google analytics to default themes
+ - allow for multiple sites in default theme check
+ - refactor common layout tests into subroutine
+ - fix theme test checking for incorrect file
+ - update site theme from responsive default
+ - make default blog theme more responsive
+ - remove "Fork it" banner
+ - fix newer/older button being links with no href
+ - add more config docs for site objects
+ - allow .markdown and .md in index path
+ - escape special chars in tags
+ - fix tag case to stop two tags with different case
+ - add data attributes sections to config guide
+ - fix tags label appearing in feed item without tags
+ - fix section 2 link in feed with only one section
+ - add index docs to new config guide
+ - add basic yaml tutorial to config guide
+ - add a global feed author to blog atom feeds
+ - add default author attribute to site
+ - add author attribute to all pages
+ - auto-create person object for document author
+ - add plugin docs to new develop guide
+ - start filling in the develop guide
+ - stringify person objects into the name
+ - add type and coercions for Person object
+ - add person class to hold author information
+ - fix deprecation warnings in statocles site
+ - add release v0.076 announcement
+
+0.076 2016-05-28T04:13:14Z
+ - fix index links with full urls being rewritten
+ - move default post info to app attribute
+ - fix --clean destroying all content in git repo
+ - unify existing deprecation messages
+ - add deprecation warning utility
+ - remove code line from deprecation message
+ - add outline for new develop guide
+ - add release v0.075 announcement
+
+0.075 2016-05-23T03:13:28Z
+ - allow indexes to the sections method
+ - move date parsing into document class
+ - fix relative links on index page getting broken
+ - add tests for relative links on index page
+ - move default layout to layout directory
+ - allow overriding the layout for the entire site
+ - add sections for template overrides to config guide
+ - allow template overrides in the site object
+ - ignore hidden files in theme test
+ - show the page list when count is wrong in tests
+ - fill in links in new documentation
+ - add initial config and install guides
+ - warn about links with empty href destination
+ - fill in more of the content guide
+ - clarify the safety of HTML escaping in theme guide
+ - fix more in the new theme docs
+ - fix doc example for begin/end
+ - edit the theme guide to be clearer and such
+ - use the full-width layout for doc pages
+ - start filling in more of the content guide
+ - fix linkcheck plugin marking all ".." as broken
+ - finish the new theme guide
+ - pass-through the document data attr to the page
+ - bundle theme to site theme directory only
+ - allow bundling of specific files from a theme
+ - add demonstration of syntax highlighter to guide
+ - remove highlighting from yaml block
+ - fix template directive example escaping
+ - add better embedded perl examples
+ - more progress on theme guide
+ - start layout section of documentation
+ - add start of managing content docs
+ - add initial draft of theme tutorial
+ - deprecate document data attrs that are not hashes
+ - move content sections to page object
+ - update statocles site templates from default theme
+ - add full-width layout template to remove sidebar
+ - fix old content sections being shown in templates
+ - move sidebar to layout
+ - clone the template state when merging for safety
+ - add template object to default theme tests
+ - pass content sections between templates in pages
+ - add merge_state method to templates
+ - add content sections to template helper
+ - add release v0.074 announcement
+
+0.074 2016-03-26T04:51:19Z
+ - wrap all errors from Pod::Weaver with more detail
+ - add better error message when weaver.ini is missing
+ - use local time zone everywhere
+ - fix blog posts not appearing in certain time zones
+ - fix page role abstract to declare it a role
+ - add release v0.073 announcement
+
+0.073 2016-03-07T22:44:58Z
+ - fix Mojo::Template deprecations
+ - always push the git deploy
+ - add release v0.072 announcement
+
+0.072 2016-03-04T16:30:37Z
+ - update Path::Tiny version
+ - deprecate Statocles::Test::test_pages
+ - copy test_pages from Statocles::Test to t/lib/My/Test.pm
+ - Deprecate Statocles::Test::test_constructor
+ - Copy test_constructor to lib/My/Test.pm
+ - Reimplement test_constructor in TB Calls preparing for deprecation
+ - Rewrite test_pages in Test::Builder calls preparing for deprecation
+ - Inject README.mdkn exclusively in the source tree
+ - Replace ReadmeMarkdownFromPod with ReadmeAnyFromPod
+ - Munge README.mkdn in SRC after copying, instead of in CPAN before
+   copying
+ - Replace ReadmeFromPod With Readme::Brief
+ - Remove instructions to copy CPAN/README to SRC/README
+ - Remove DZP:Readme from basic bundle
+ - Add -SingleEncoding to weaver.ini
+ - update site theme from statocles default
+ - add release v0.071 announcement
+ - release v0.071
+ - upgrade Beam::Wire dependency to fix bug
+ - Add META.json to release
+ - Rewrite tests to use Test::Lib + My::Test
+ - Add a library "My/Test" in t/lib that replaces Statocles::Base 'Test'
+ - Deprecate Statocles::Base 'Test'
+ - Fix Git->deploy(--clean) broken sprintf
+
+0.071 2016-02-29T03:22:55Z
+ - upgrade Beam::Wire dependency to fix bug
+ - upgrade Beam::Wire dependency
+ - fix line reporting for code coverage
+ - speed up index tag sorting by 30%
+ - add better error message for document type checks
+ - make document parse errors more uniform
+ - give better error message with invalid date
+ - update Beam::Wire to fix bug in YAML::XS
+ - add release v0.070 announcement
+
+0.070 2016-02-22T04:36:34Z
+ - add site pages cache
+ - plugin docs including template helper example
+ - add tzoffset shim method
+ - switch to DateTime::Moonpig for date/time functions
+ - rename moniker to template_dir and make explicit
+ - allow templates to be overridden for each app
+ - Add new collect_pages event, your last chance to change the page list.
+   Split from my original commit.
+ - add release v0.069 announcement
+
+0.069 2016-02-14T03:04:48Z
+ - remove useless test line
+ - fix store warning when given no content
+ - fix yaml remedy checks for YAML::Syck
+ - fix test failure with missing Text::Diff module
+ - add test for template comments
+ - Specify UTF-8 encoding in site layout
+ - add release v0.068 announcement
+
+0.068 2016-02-10T15:15:00Z
+ - fix travis always having certain prereqs installed
+ - fix use of private object data when adding links
+ - allow adding multiple links to a page at once
+ - add missing List::UtilsBy dependency
+ - Add standard frontmatter overrides (author layout status tags template)
+   to blog command
+ - Add data hash to Image
+ - add release v0.067 announcement
+
+0.067 2016-02-08T04:25:05Z
+ - sort broken links in link check plugin
+ - add debug message when rendering a page
+ - fix page render error when document title is undef
+ - add test for stylesheet, script, and favicon links
+ - show load error if failed to load Pod::Weaver
+ - fix missing attribute in site object error message
+ - Revert "add failing test"
+ - add style and script links to site object
+ - fix coersion for links in page object
+ - fix nested lists getting smaller and smaller font
+ - fix default font to something more readable
+ - Add status attribute in preparation to its use, and test for the default
+   value when writing a document.
+ - add failing test
+ - remove static app from the config guide
+ - add shortcut icon to default themes
+ - add images attribute to site object
+ - add experiment directory to gitignore
+ - add release v0.066 announcement
+
+0.066 2016-01-10T02:02:37Z
+ - fix duplicate links showing up in pages
+ - add uniq_by util to filter items based on a sub
+ - add child page scripts and styles to the list page
+ - fix bad =back in main module documentation
+ - add better error message when include not found
+ - add parent dir to includes when rendering document
+ - add store object to the document as its read
+ - refactor store document test
+ - add include_stores to template for added includes
+ - add links to default template helpers
+ - fix too much space on the top of highlight blocks
+ - add release v0.065 announcement
+
+0.065 2016-01-06T06:00:22Z
+ - fix list of bundled plugins
+ - add recent features to the feature list
+ - fix atom feed updated time to be more accurate
+ - fix list page date to be max of all pages in list
+ - allow coercing Time::Piece from date/time strings
+ - fix no order in sitemap causing spurious commits
+ - update theme from statocles default
+ - fix highlight breaking with Markdown code blocks
+ - fix test not running because of misspelled module
+ - add release v0.064 announcement
+
+0.064 2016-01-04T06:44:14Z
+ - use fake site for command error tests
+ - report stdout/stderr on test failure
+ - do not test Highlight plugin compile
+ - only load Devel::Hide during test
+ - install Devel::Hide during travis build
+ - add travis build that hides optional dependencies
+ - add release v0.063 announcement
+
+0.063 2016-01-03T07:08:33Z
+ - skip highlight test if highlighter not found
+ - add release v0.062 announcement
+ - update copyright year
+
+0.062 2016-01-02T05:31:43Z
+ - update develop help guide for new plugin class
+ - fix site creator to use plugins not event handler
+ - make existing plugins consume new plugin role
+ - add plugins to main module list
+ - pass the current page into document templates
+ - add plugin docs to the help guides
+ - add highlight plugin to statocles project site
+ - fix highlight plugin to work with begin/end
+ - allow project website to be viewed on localhost
+ - add syntax highlighting plugin
+ - allow adding links to pages
+ - allow coercing link objects from strings
+ - add site plugins
+ - add custom helpers to theme object
+ - escape document title to fix special characters
+ - switch to warn that a store path doesn't exist
+ - fix doc links in default content
+ - remove unneeded reminder to update theme config
+ - add helper examples to the template documentation
+ - add content template helper
+ - add release v0.061 announcement
+ - fix homepage meta data
+
+0.061 2015-12-13T23:21:12Z
+ - fix deploy staying on branch when nothing to do
+ - add a testable log object to the test sites
+ - add logging to deploys
+ - add site object to deploy objects
+ - fix git version parsing when version isn't last
+ - speed up deploy by using copy method
+ - add help section to main web page
+ - add images to page objects
+ - add images attribute to documents
+ - add image class to hold refs to images
+ - set a default empty title to stop undef warnings
+ - add module name to page title in perldoc app
+ - check for version of HTML::Lint::Pluggable in test
+ - add release v0.060 announcement
+
+0.060 2015-11-23T10:42:25Z
+ - use path objects to make copying files faster
+ - cache rendered document sections
+ - cache the mojo template for performance
+ - cache rendered page HTML for performance
+ - add release v0.059 announcement
+
+0.059 2015-11-12T17:25:34Z
+ - skip compile check for HTMLLint plugin
+ - add release 0.058 announcement
+
+0.058 2015-11-12T01:52:49Z
+ - correctly render theme include files
+ - do not load site class for every test
+ - fix "Can't locate method new" error in create
+ - add html lint plugin
+ - add release v0.057 announcement
+
+0.057 2015-11-05T21:37:11Z
+ - also detect pure-Perl YAML error
+ - add release v0.056 announcement
+
+0.056 2015-11-05T20:38:32Z
+ - fix inner links do not work in perldoc app
+ - add better error messages for bad config files
+ - add guide to help resolve error messages
+ - update Pod::Simple required version
+ - fix problem with overriding Moo role attributes
+ - do not deploy template files with the site
+ - make Theme into an App
+ - move theme test to appropriate directory
+ - redirect users from github pages
+ - fix header images to use site base url
+ - move site to personal server
+ - add config examples for all blog attributes
+ - process Blog tag text as Markdown
+ - add markdown template helper
+ - mark plain/static apps as deprecated
+ - fix Perldoc links from new version of Statocles
+ - add release v0.055 announcement
+
+0.055 2015-09-22T05:09:12Z
+ - fix cleanup warning during global destruction
+ - add disqus setup notes to Config guide
+ - replace the Static app with the Basic app
+ - rename the Plain app to the Basic app
+ - refactor Blog app to use Store app role
+ - allow writing most page attributes
+ - skip hidden files and directories in the Plain app
+ - add static content to Plain app
+ - fix doc links to show module being linked to
+ - add custom markdown object example to config guide
+ - add disqus to statocles site
+ - update site templates from statocles default
+ - add disqus blocks to the default themes
+ - add store role for applications that use stores
+ - use run_editor helper in blog and plain apps
+ - add run_editor utility to invoke the user's editor
+ - fix new-post directory getting left behind in blog
+ - test that the interactive editor is invoked
+ - add class frontmatter for custom document classes
+ - add error if repository has no commits
+ - move daemon build inside the mojo app
+ - add --date option to build, daemon, and deploy
+ - fix daemon shutdown and cleanup to remove cycles
+ - add default site title to silence warnings
+ - add --message option to the deploy command
+ - allow plain hashrefs in test app
+ - add test for git deploy message option
+ - fix tag links in blog feeds into full urls
+ - clean up test to remove warnings from log
+ - add --clean option to statocles deploy command
+ - add clean option to file and git deploys
+ - remove ".html" from Perldoc documentation pages
+ - clarify index path missing to show possible remedy
+ - move all deprecation tests into one place
+ - deprecate write_document method return value
+ - skip deprecated module in compile test
+ - remove docs implying deploys inherit from stores
+ - move Statocles::Store::File to Statocles::Store
+ - only set version during test if no version exists
+ - fix emitter base bundle not applying
+ - add edit command to plain app
+ - add date option to build blog pages from the future
+ - add better error message when app has no commands
+ - add remove method to Store
+ - generate the site config from the template
+ - change title to text in site creator link
+ - add comments to the site creator config file
+ - add note about how to use default themes
+ - add skeleton site content during site creation
+ - add $app and $site to all templates
+ - expand document documentation to add examples
+ - fix a bunch of misspellings in the documentation
+ - remove duplicate test app
+ - add build event to apps for plugins to edit pages
+ - add release v0.054 announcement
+
+0.054 2015-08-12T02:24:41Z
+ - move includes to theme and add caching
+ - refer to templates by path for more flexibility
+ - remove README
+ - add page title to <title> tag in defaul themes
+ - allow documents to add stylesheets and scripts
+ - allow links without text
+ - move title attribute to page role
+ - fix abstracts on Statocles::Page
+ - remove Build.PL file
+ - upgrade Path::Tiny to fix mkpath warning
+ - add release v0.053 announcement
+
+0.053 2015-07-20T05:29:14Z
+ - expand the document documentation a bit more
+ - link to frontmatter options in the content guide
+ - add more examples of plain pages to content guide
+ - add meta generator information to default themes
+ - fix mojo ioloop tests when testing file events
+ - move method signature inside documentation body
+ - set '/' as the default site index
+ - silence log warnings from tests
+ - add upgrading and policy modules to help index
+ - make -v with no arguments show version information
+ - fix full urls falsely rewritten on list pages
+ - fix index to point to path
+ - update theme from statocles default
+ - add release v0.052 announcement
+
+0.052 2015-07-13T05:49:19Z
+ - enhance the docs about the site index property
+ - add deprecation policy and upgrading guide
+ - allow site to be built with no deploy dir
+ - add core prereq for Pod::Simple
+ - fix bootstrap theme missing jquery
+ - use page path for site index, not apps
+ - add release v0.051 announcement
+
+0.051 2015-07-07T03:07:38Z
+ - make find_files skip documents by default
+ - add method to check if a path is a document
+ - allow "md" and other extensions for markdown files
+ - fix test to detect bad body links in perldoc app
+ - fix links to index module in perldoc app
+ - do not add static HTML when markdown files exist
+ - fix scheme detection in LinkCheck plugin
+ - mention the File deploy in the guides
+ - make default theme closer to bootstrap theme
+ - add bootstrap theme back as an option
+ - add release v0.050 announcement
+
+0.050 2015-06-29T03:11:25Z
+ - add command docs to Blog app
+ - show how to create plain page in content guide
+ - clarify some parts of the content guide
+ - fix "/" not being rewritten with base URL
+ - add module list to Statocles::Help
+ - move test::lib to test to fix xt/ tests
+ - remove background and border from default footer
+ - add release v0.049 announcement
+
+0.049 2015-06-24T02:38:18Z
+ - add warning if app creates duplicate pages
+ - fix plain app using wrong index page
+ - update site theme from statocles default
+ - add footer styles to default theme
+ - add release v0.048 announcement
+
+0.048 2015-06-22T07:10:26Z
+ - fix vim swap files being parsed as markdown
+ - add ListItem page to wrap pages in a list page
+ - add basename and dirname to Page objects
+ - fix templated content not rendered in blog list
+ - remove Statocles::Page::Feed
+ - allow Path::Tiny objects in link href attrs
+ - fix double / when building App urls
+ - remove duplicate test
+ - make it easier to deal with one page link
+ - add type to base Page role
+ - add more basic docs to the app role
+ - link to built-in app docs in app role documentation
+ - remove unused import
+ - upgrade perl in travis config
+ - update site theme from default theme
+ - add fontawesome and icons for rel=external links
+ - fix schema-less URLs being rewritten by build
+ - add rel="external" to external perldoc links
+ - add release v0.047 announcement
+
+0.047 2015-06-04T03:27:41Z
+ - add blank link to allow for $VERSION
+ - add another of my many e-mails to mailmap
+ - move to documented Role::Tiny API
+ - upgrade Import::Base to fix test failures
+ - add some interesting methods to the Theme guide
+ - add content sections to content guide
+ - fix links to template objects in Theme guide
+ - add more documentation about writing content
+ - move site doc link directly to the guides
+ - remove dependency on List::MoreUtils
+ - remove dependency on File::Copy::Recursive
+ - fix links to the index app should be the site root
+ - fix pagination in the blog
+ - add example site gallery
+ - add data attribute to documents
+ - add release v0.046 announcement
+
+0.046 2015-05-25T01:46:58Z
+ - update statocles site theme from default theme
+ - add module crumbtrail to perldoc app
+ - add link to module source in perldoc app
+ - fix link check showing schema-less urls as broken
+ - allow additional markdown pages in blog posts
+ - use document templates to override page templates
+ - move page template coercion tests
+ - add template and layout fields to documents
+ - add tag_text property to blog app
+ - remove ModuleBuild to prevent toolchain confusion
+ - add .bare class to remove bullets from lists
+ - add data attribute to pages
+ - add a default background color to navbar
+ - adjust grid spacing to center columns
+ - use file_path attribute when copying files in apps
+ - use raw bytes when opening file pages
+ - allow using file path when copying files
+ - ensure all directory URLs end with a /
+ - redirect to directory/ in daemon
+ - add release v0.045 announcement
+
+0.045 2015-04-17T04:19:15Z
+ - allow blog post collateral in post directory
+ - fix link check plugin not finding url-encoded links
+ - allow recent posts filtering by tag
+ - add -p <port> option to specify port in daemon
+ - fix create command example on index page
+ - add latest release version to the index page
+ - use the default Statocles build dir
+ - update site theme from Statocles default theme
+ - add release v0.044 announcement
+
+0.044 2015-04-06T05:49:07Z
+ - fix tadegenban showing in contributors list twice
+ - add recent posts method to the blog
+ - add test with path field inside document
+ - allow document objects to be written via Store
+ - read documents on STDIN when adding blog posts
+ - fix warning if tags are missing
+ - change parse_document to parse_frontmatter
+ - change read_document to return the Document object
+ - add method to parse a document from a string
+ - fix blog slugs to remove nonword characters
+ - fix example plugin config for Beam::Wire changes
+ - describe using config to compose roles
+ - add exception when index app does not exist
+ - add google analytics
+ - move template tests into a folder
+ - add Release v0.043 announcement
+
+0.043 2015-03-23T05:15:00Z
+ - upgrade to Moo 2 and remove Moo::Lax
+ - add include_stores to add include dirs to Theme
+ - add source to perldoc app
+ - move url_root into Statocles::App
+ - make files less important than generated pages
+ - warn when multiple apps create the same page
+ - allow passing apps in to test setup routine
+ - add deploy to a subdir inside a git repository
+ - Just fix some old  document
+ - add release v0.042 announcement
+
+0.042 2015-03-16T07:26:25Z
+ - add markdown attribute to the Site object
+ - add ignore patterns to LinkCheck plugin
+ - add before_build_write event for site object
+ - add release v0.041 announcement
+ - update theme from default theme
+
+0.041 2015-03-09T04:13:32Z
+ - fix deprecated event handler config
+ - change $method in event handler to $sub
+ - set the base url using the site creator
+ - remove date from the default blog post
+ - change last_modified to "date"
+ - fix error when site object has a bad reference
+ - mention the "create" command where appropriate
+ - add release v0.040 announcement
+
+0.040 2015-03-02T06:01:48Z
+ - fix linkcheck synopsis for new wire config syntax
+ - add documentation for events and plugins
+ - add linkcheck plugin to Statocles website
+ - add LinkCheck plugin to the default site creator
+ - add LinkCheck plugin to check links and images
+ - add build event hook to site
+ - remove unnecessary includes in tests
+ - add '.statocles' to gitignore automatically
+ - fix blog with no pages doesn't build
+ - init the git repo when creating a git-based site
+ - upgrade to Mojolicious 6.0
+ - add note about base_url to deploy guide
+ - set a sane default base url
+ - fix base_url of / breaks links
+ - create the app store directories in create command
+ - fix create command creates wrong apps
+ - move default build dir to .statocles/build
+ - fix unknown command gives strange error
+ - remove all files from build dir before building
+ - add release v0.039 announcement
+ - add theme fixes from latest Statocles release
+
+0.039 2015-02-23T01:50:24Z
+ - normalize the default log level to warn
+ - rearrange tests into small, feature-sized chunks
+ - create new blog posts in directories
+ - allow blog posts to be directories
+ - organize core and non-core deps
+ - add create command example to website
+ - fix note about default theme using skeleton
+ - add note about create command to Setup guide
+ - add site "create" command
+ - add link to content guide
+ - reorganize guides and add Statocles::Help
+ - split the Setup guide into Config and Content
+ - fix navbar too close to main page content
+ - break parsing a frontmatter file into its own sub
+ - clarify the docs on Pages and what a Site is
+ - add example of markdown to html to website
+ - split the main doc into the Develop guide
+ - fix me showing up in the contributors list
+ - add release v0.038 announcement
+
+0.038 2015-02-15T05:49:09Z
+ - fix git-rm compatibility with 1.7.2
+ - fix error adding submodule in test
+ - upgrade git requirement to 1.7.2
+ - fix git version tests to work on Travis
+ - add extra tests for git versions
+ - add release v0.037 announcement
+
+0.037 2015-02-13T02:37:55Z
+ - possibly fix cpantesters reports about submodule
+ - add release v0.036 announcement
+
+0.036 2015-02-11T06:28:21Z
+ - fix test expecting an include that was renamed
+ - do not check include hooks in theme sanity test
+ - fix empty template includes warning about undef
+ - update statocles site theme from default theme
+ - make all default includes into templates
+ - add getting started help to the theme guide
+ - update the site theme from the default theme
+ - change page published to last_modified
+ - make sure to configure all git repos we create
+ - fix static app doesn't work with a url root
+ - do not deploy ignored files or submodule files
+ - add release v0.035 announcement
+
+0.035 2015-02-09T02:51:15Z
+ - update Mojolicious to 5.57 for improved map()
+ - fix extra blank line in robots.txt test
+ - ignore vim swap files on windows
+ - fix strftime for Windows
+ - fix test reading files without utf-8 flag
+ - make `bundle theme` copy to given directory
+ - redo the setup help for new defaults
+ - make blog pagination use directories
+ - allow list pages to consist of directories
+ - automatically remove "index.html" from URLs
+ - update Beam::Wire to fix warning on perl 5.20
+ - process document content as a template
+ - allow arguments to included templates
+ - add a theme method to build template from string
+ - do not watch built-in theme dirs for changes
+ - add deploy help documentation
+ - add remote attr to git deploy
+ - test that git deploy's path has a default
+ - set a default build dir and auto-create it
+ - make site theme default to bundled default theme
+ - make file deploy default to the current directory
+ - add test to check categories in atom feed
+ - fix categories in atom feed
+ - fix default theme list bullets on a separate line
+ - fix static app builds hidden directories like .git
+ - show an error if no theme name given to bundle
+ - allow pod from things without .pm, .pl, or .pod
+ - add missing DESCRIPTION to some modules
+ - remove spurious doc lines
+ - add release v0.034 announcement
+
+0.034 2015-01-25T06:15:51Z
+ - add dzil plugin for prereqs and compile tests
+ - add features and install instructions on home page
+ - update Statocles site for new default theme
+ - update Statocles site for new Git deploy
+ - remove deploy path from the daemon
+ - do not try to find the t directory from lib
+ - remove circular dependency creating infinite loop
+ - add see also sections for theme help
+ - add theme help file
+ - explicitly require ".ep" when including templates
+ - add deploy object to site
+ - make sure to create the directory before deploying
+ - reduce duplication between Git and File deploy
+ - add a file deploy for deploying to the filesystem
+ - add deploy class to deploy a site
+ - add base_url to Store for per-deploy base URLs
+ - make author optional
+ - rename "crosspost" to "alternate"
+ - remove all uses of document in templates
+ - change tags to Link objects
+ - change page links and tags into Link objects
+ - fix coercion for links array
+ - allow single link to be normalized into an array
+ - add nav method to get site nav links
+ - add Link object to represent <a> and <link> tags
+ - add missing sidebar example code
+ - add some padding around floated images
+ - fix sidebar different from blog list to blog post
+ - rearrange style guide to organize by usage
+ - add new default theme based on skeleton.css
+ - add data attribute to site and app
+ - fix deploy test to test deploy directory
+ - add theme to deployed site at /theme
+ - add better error message when template not found
+ - ensure index app generates a page
+ - create orphan branch when deploying
+ - add release v0.033 announcement
+
+0.033 2015-01-12T03:04:42Z
+ - fix unable to set date for blog post from command
+ - build a new temp site for each command test
+ - remove root dotfiles and root ini files from dist
+ - switch to dzil Git::GatherDir
+ - add new blog posts to store so auto-build works
+ - add v0.032 release notification
+ - "now" is easily mistaken for "not" in test diag
+
+0.032 2015-01-05T02:55:29Z
+ - fix contributors dependency
+ - add template for robots.txt
+ - use site-wide theme for sitemap.xml
+ - update statocles website for new site-wide theme
+ - move theme to site, removing it from all apps
+ - update copyright year
+ - add contributors dzil plugin for proper attribution
+ - also add stderr diag to bin/statocles test
+ - always print stderr/stdout when testing for empty
+ - add Mac::FSEvents to prereqs for OSX
+ - prevent uninitialized warnings in locale test
+ - add release announcement for v0.031
+
+0.031 2014-12-25T14:11:45Z
+ - release v0.031
+ - fix test failure because config not found
+ - fix daemon continually rebuilding the site
+ - fix tags list not appearing on blog list pages
+ - give better error when site object not found
+ - give better error when config file not found
+ - remove tests that could redefine subs
+ - fix setlocale test may fail and return current locale
+ - remove test for switching STDIN back to our tty
+ - fix RSS pubDate incorrectly using locale setting
+ - add link to home page in main documentation
+ - add release announcement for v0.030
+ - fix site.yml for renamed File store
+
+0.030 2014-12-23T12:15:40Z
+ - release v0.030
+ - cache file store's realpath to fix race condition
+ - require frontmatter to begin with '---'
+ - rename statocles site documents to .markdown
+ - rename documents from '.yml' to '.markdown'
+ - make all file stores ignore other stores' files
+ - rename Store to Store::File
+ - ignore hidden files in the static app
+ - only allow html files in the sitemap.xml
+ - reset STDIN to the tty when piping in content
+ - put the full changelog behind a click
+ - add release announcement for v0.029
+
+0.029 2014-12-22T11:09:37Z
+ - release v0.029
+ - add new home page layout
+ - add head_after include for custom <head> JS and CSS
+ - fix site altering raw file content with base URL
+ - open/write filehandles using raw bytes
+ - allow blog post content on STDIN
+ - add plain and static apps to Setup guide
+ - allow for test_pages without index test
+ - fix syntax error on 5.10. '...' was added in 5.12
+ - add Static app for tracking static files
+ - make sure find_files returns absolute paths
+ - add File page to move files between stores
+ - add open_file and write_file for filehandles
+ - add find_files method to Store
+ - add SEE ALSO about other static site tools
+ - clarify setup docs about daemon command
+ - trap date/time parsing exceptions
+ - move test yaml error document to a directory
+ - check that store path exists and is directory
+ - make sure store is always using utf-8
+ - cleanup store tests to use files
+ - remove spurious test collateral
+ - organize t/share directory better
+ - update v0.028 release with commit links
+ - add script to generate release commit lists
+ - cleanup blog tests
+ - add test_pages helper function
+ - add test_constructor helper function
+ - paginated list pages should share last_modified
+ - fix: daemon serves data with wrong charset
+ - add tagline to default theme
+ - clarify what each destination Store is used for
+ - build the site when daemon starts up
+ - add links to github, cpan, and irc to site
+ - add release announcement for v0.028
+
+0.028 2014-12-14T12:05:20Z
+ - release v0.028
+ - set the default log level to "info"
+ - fix test only emits "Watching" if we have the right module
+ - use bundles to remove extra Base modules
+ - fix new "redundant argument in sprintf warning"
+ - change all instances of print to say
+ - use Mojo::Log for logging
+ - create type library for types and coercions
+ - watch for filesystem events and rebuild the site
+ - remove index method from apps
+ - remove caching from Blog app
+ - add clear method to theme to clear template cache
+ - add method to clear document cache
+ - clean up reading documents and parsing frontmatter
+ - remove the Statocles site.yml from CPAN tarballs
+ - add release announcement for v0.027
+ - remove old site leftovers from main branch
+
+0.027 2014-12-09T04:22:24Z
+ - release v0.027
+ - try to fix bundle failure on Win32
+ - bump required Mojolicious to 5.41
+ - only ignore Statocles bundles in the root directory
+ - die if there's a git error
+
+0.026 2014-12-08T03:49:57Z
+ - release v0.026
+ - always use utf-8 when reading/writing files
+ - add initial release announcement
+ - remove test post
+ - add new index page for introduction to Statocles
+ - allow plain app to be used as site index
+ - set a last_modified date for the plain Page
+ - add github banner to Statocles site
+ - bundle the site theme so we can edit it
+ - move Statocles site and prepare gitignore file
+ - move the statocles website
+ - add plain app for making pages from plain markdown
+ - make page template optional with a default
+ - make path and document required attributes
+ - rename Page::Raw to Page::Plain
+ - add missing ABSTRACT to Page::Raw
+ - add a default weaver.ini config
+ - die with friendly error when missing Pod::Weaver
+ - only remove .ini files from the dist root
+ - add path to Pod::Weaver config file
+ - test default value for weave
+ - fix theme check for perldoc app templates
+ - make Pod::Weaver optional in Perldoc app
+ - add perldoc app to the Statocles website
+ - add default template for perldoc app
+ - fix internal links to the index module
+ - fix module searching in Perldoc app
+ - set a default last_modified for Raw pages
+ - coerce strings into paths in Perldoc app
+ - fix Perldoc app to extend Statocles::App
+ - add last_modified to Raw pages
+ - simplify pod weaving
+ - mark optional prereqs as "Recommends"
+ - weave the POD before trying to make HTML
+ - rewrite links to internal modules
+ - add initial progress on Perldoc app
+ - add page to contain raw content
+ - make sitemap.xml a template
+ - add page attrs for sitemap changefreq and priority
+ - add last_modified to the list page
+ - add last_modified to document page object
+ - add IRC channel to meta resources
+ - do not index the private MOJOAPP package
+ - handle index.html for directories in test daemon
+ - add dzil tag annotation with name, date, and changelog
+
+0.025 2014-11-30T08:32:33Z
+ - release v0.025
+ - add better dzil tag annotation
+ - fix tests for the mojolicious app used by daemon
+
+0.024 2014-11-28T10:28:35Z
+ - release v0.024
+ - support nonroot sites in the `daemon` command
+ - disable mojolicious's Net::DNS::Native support
+ - always show the right port in the daemon command
+ - support folders in base_url for non-root sites
+ - Site update
+ - build more html-like test content
+ - add/update some comments in Site
+ - add note about sitemaps to the features list
+
+0.023 2014-11-27T07:06:38Z
+ - release v0.023
+ - set up Statocles website
+ - require a store in the Theme
+ - use store instead of include_dirs to find includes
+ - add has_file method to Store
+ - use store read_file in theme
+ - add read_file method to store
+ - do not preload all theme templates
+ - fix --version to work without a method
+ - make blog usage look like pod2usage
+ - show an error and usage if no command given
+ - move unexpected errors to STDERR
+ - show an error when missing/incorrect blog command
+ - open post in editor before deciding its location
+ - we do need some stinkin badges!
+ - add a SYNOPSIS section so we get our badges
+ - add new build artifacts
+ - update dist.ini for new best practices
+ - break up Test::Most
+ - 5.8 is not supported by Statocles
+ - update travis.yml for new perl travis helpers
+
+0.022 2014-08-31T07:49:50Z
+ - release v0.022
+ - fix t/command.t dying on Win32
+
+0.021 2014-08-27T22:07:14Z
+ - release v0.021
+ - add a base zsh completion config
+ - use $^X to invoke the currently-running perl
+ - fix --help not working
+ - add =sub to weaver.ini
+ - add 'bundle theme' command
+ - add some hooks into the default theme
+ - add a standard of conduct to CONTRIBUTING
+ - fix redefine warning from include sub
+ - theme sets template include dir to theme dir
+ - add template includes
+ - have Theme use a Store instead of a raw path
+
+0.020 2014-07-15T05:01:49Z
+ - add docs about --verbose flag
+ - add --verbose flag to show some useful information
+ - make read_document take a relative path
+ - silence warning when no content in the document
+ - write_page -> write_file
+ - better reporting on YAML loading errors
+ - fix post images breaking the layout
+
+0.019 2014-07-07T03:15:50Z
+ - release v0.019
+ - allow filtering of tags on the index page
+ - require Mojolicious 4.76
+
+0.018 2014-07-06T03:38:29Z
+ - release v0.018
+ - add blog page tags to the default theme
+ - add page tags to the blog
+ - add tags to pages
+ - let someone else test blead
+ - Mojolicious requires at least 5.10
+ - no more SurgicalPodWeaver, use regular PodWeaver
+ - get podweaver before we install
+ - PodWeaver still isn't specified by SurgicalPodWeaver
+ - fix yaml syntax for travis.yml
+ - possibly fix `daemon` test by randomizing the port
+ - add travis-ci and coveralls
+
+0.017 2014-06-29T23:27:27Z
+ - release v0.017
+ - add basic daemon command
+
+0.016 2014-06-29T04:58:34Z
+ - release v0.016
+ - quiet some warnings
+ - add a simple robots.txt
+ - add sitemap.xml generation
+ - change theme source_dir -> path
+ - add coercions for Theme and Store
+ - fix pre and code wrapping
+ - blog source -> store
+ - add test prereq found by kwalitee
+ - fix pod error found by kwalitee
+
+0.015 2014-06-28T06:12:23Z
+ - release v0.015
+ - fix default layout error if no main nav
+ - add test to check default theme syntax
+ - fix exception in test template
+ - throw an exception when template fails to render
+ - add a line to help with the continue reading link
+ - fix bottom-border on post header
+ - remove crosspost links from the bottom of list
+
+0.014 2014-06-25T05:40:52Z
+ - release v0.014
+ - squelch some warnings in the new test templates
+ - add content sections to the default templates
+ - add sectioned content to document pages
+ - remove the default templates
+ - remove the custom test templates
+ - add a feature list for marketing purposes
+ - add a link to the feed page in the main doc
+
+0.013 2014-06-22T08:01:13Z
+ - release v0.013
+ - add feed titles and links to feeds in the page
+ - add RSS and Atom feeds to blog index and tag pages
+ - add generic page links hashref
+ - put self and app in all pages
+ - add site method to get a full URL for feeds
+ - cache page objects so we can modify them
+ - add feed pages
+ - ignore blog directories that aren't YYYY/MM/DD
+ - fix setup help - blog -> blog_app
+ - blog -> blog_app
+ - die with an error if we can't make a slug
+ - return the exit code from called sub
+ - fix some typos in the setup help
+
+0.012 2014-06-18T06:15:07Z
+ - release v0.012
+ - deploy now performs 'git push'
+ - add rel next/prev to pagination links
+ - better format for crosspost links
+ - put the list of guides first in the documentation
+ - we moved the core of 'render' to 'vars'
+
+0.011 2014-06-15T03:10:40Z
+ - release v0.011
+ - still show the topbar if site lacks main nav
+ - add crosspost links to the default blog templates
+ - everything used in template should have default
+ - reorganize template vars to prefer objects
+ - remove unused dump method
+ - add crosspost links to documents
+ - add last_modified attribute to documents
+ - defaults must be subref
+ - fix bad link to YAML
+
+0.010 2014-06-07T09:27:29Z
+ - release v0.010
+ - add a setup guide until we get a create command
+ - add named navs, so we can add more nav lists later
+ - add next/prev to list page render()
+ - mark html templates as such; use .ep like Mojo
+ - add paginate() constructor for paginated lists
+ - fix the pagination links in the default blog theme
+ - add pagination to the blog
+ - enforce an order on the paginated pages
+ - add optional index path to pagination
+ - do not build posts whose day has not yet come
+ - allow setting the date when creating a new post
+
+0.009 2014-06-06T20:15:15Z
+ - release v0.009
+ - add the published date to the blog pages
+ - add published date to pages
+ - add last_modified and tags to default blog post
+ - add last_modified to documents
+ - make the default templates more semantic
+
+0.008 2014-06-05T04:35:12Z
+ - release v0.008
+ - add tag navigation to the blog
+ - add tag pages to the blog
+ - avoid swp files when scanning for documents
+ - bump Path::Tiny version to 0.054
+ - remove the site/ directory from the release
+ - handle older versions of git better
+ - Git::Repository requires git 1.5 or higher
+
+0.007 2014-06-02T05:07:23Z
+ - add tags attr to document
+ - remove hard-coded document paths in test
+ - remove unused attribute
+ - add/update links in documentation
+ - migrate to Path::Tiny
+ - Set a real git config user name/email
+ - switch to Type::Tiny. thanks mst!
+ - fix link to Jekyll. Thanks buu!
+
+0.006 2014-05-29T06:01:50Z
+ - sort blog index page by post date
+ - use frontmatter format in addition to pure YAML
+ - open $EDITOR for the user creating a blog post
+ - add 'blog post' command to add new posts to a blog
+ - return the full path to the document
+ - add write_document method to Store
+ - add application command delegation
+ - add 'apps' command to list the apps in a site
+
+0.005 2014-05-26T06:29:14Z
+ - docs and pages do not need to be in any order
+ - use canon dirsep in template path
+ - doc paths are files; page paths are URLs
+ - remove warning if source_dir is undefined
+ - Moo only allows subrefs as default
+ - preset git name/email
+
+0.004 2014-05-25T06:28:44Z
+ - get themes from Statocles share dir
+ - add another caller to ignore finding template path
+ - move the pager controls to the blog index
+ - add the page path to the template
+ - add missing ABSTRACT
+
+0.003 2014-05-25T03:26:39Z
+ - release v0.003
+ - fix git commands writing to stdout
+ - always specify a template path
+ - allow regex-unsafe characters in file path
+
+0.002 2014-05-21T04:17:39Z
+ - release v0.002
+ - fix one of the dir seperator problems on Win32
+ - check for git earlier in the test
+ - add missing prereqs
+
+0.001 2014-05-20T04:41:29Z
+ - make sure only built files get committed
+ - add a basic git-based site
+ - document Statocles::Template and everything else
+ - better default theme with more example content
+ - basic site navigation array
+ - reduce duplication in site test
+ - fix default site theme for Statocles::Template
+ - add --version command-line script option
+ - switch to Mojo::Template
+ - attribute -> attr
+ - add some missing documentation to Page classes
+ - change Page to a role
+ - add a base Role class
+ - refactor test to remove some duplication
+ - add missing layout template
+ - add site title
+ - pull the render() call out of the store
+ - add additional template arguments to pages
+ - add error checking to template fill_in()
+ - site index should not duplicate an app page
+ - remove the link because POD->Markdown does bad things
+ - add some introduction documentation
+ - add initial default theme and an example site.yml
+ - fix loading theme from a relative directory
+ - fix read documents from a relative directory
+ - set the execute bit
+ - add initial command-line interface
+ - break up build and deploy stores
+ - remove destination from apps to reduce duplication
+ - add missing index page to theme test
+ - add an index page to the entire site
+ - add index page to the blog
+ - all pages need paths
+ - add initial List page, for indexes
+ - test multiple blog posts in preparation for lists
+ - better description of what the method returns
+ - File -> Store to get all docs from a dir path
+ - add site class
+ - provide a single pages() method in applications
+ - fix template not being stored with the right group
+ - throw a better error when the template is undef
+ - fix broken tests
+ - allow loading of theme templates from a directory
+ - we don't need these imports
+ - add layouts to blog application
+ - add layout to page
+ - blog app can now read source files from directory
+ - add write() method to blog app
+ - make sure to create full paths when writing pages
+ - add theme to the blog app
+ - add themes - bundles of templates
+ - initial build artifacts
+ - initial work on a blog application
+ - add documentation
+ - rename project to Statocles
+ - add some documentation
+ - add ref to File that Document is read from/writ to
+ - write pages to disk
+ - add simple page rendering
+ - add base File and Document classes

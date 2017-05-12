@@ -1,0 +1,43 @@
+ <definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+   xmlns:s="http://www.w3.org/2001/XMLSchema"
+   xmlns:s0="urn:HelloWorld"
+   targetNamespace="urn:HelloWorld"
+   xmlns="http://schemas.xmlsoap.org/wsdl/">
+   <types>
+     <s:schema targetNamespace="urn:HelloWorld">
+     </s:schema>
+   </types>
+   <message name="sayHello">
+     <part name="name" type="s:string" />
+     <part name="givenName" type="s:string" />
+   </message>
+   <message name="sayHelloResponse">
+     <part name="sayHelloResult" type="s:string" />
+   </message>
+
+   <portType name="Service1Soap">
+     <operation name="sayHello">
+       <input message="s0:sayHello" />
+       <output message="s0:sayHelloResponse" />
+     </operation>
+   </portType>
+
+   <binding name="Service1Soap" type="s0:Service1Soap">
+     <soap:binding transport="http://schemas.xmlsoap.org/soap/http"
+         style="rpc" />
+     <operation name="sayHello">
+       <soap:operation soapAction="urn:HelloWorld#sayHello"/>
+       <input>
+         <soap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+       </input>
+       <output>
+         <soap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+       </output>
+     </operation>
+   </binding>
+   <service name="HelloWorld">
+     <port name="HelloWorldSoap" binding="s0:Service1Soap">
+       <soap:address location="http://localhost:80/soap-wsdl-test/helloworld.pl" />
+     </port>
+   </service>
+  </definitions>

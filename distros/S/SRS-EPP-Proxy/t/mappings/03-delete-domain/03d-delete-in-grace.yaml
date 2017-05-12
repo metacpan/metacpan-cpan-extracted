@@ -1,0 +1,21 @@
+template: delete-domain.tt
+
+vars:
+  domain: chedder2.co.te
+
+input_assertions:
+  class: SRS::EPP::Command::Delete::Domain
+
+SRS:
+  - assertions:
+      match:
+        - [ '/NZSRSRequest/DomainUpdate/DomainNameFilter', 'chedder2.co.te', 'SRS: Update correct domain' ]
+      attr_is:
+        - [ '/NZSRSRequest/DomainUpdate', 'Cancel', '1', 'SRS: Cancel the domain' ]
+
+output_assertions:
+  count:
+    - [ '//epp:resData', 0, 'EPP: No resData in the response' ]
+  match:
+  attr_is:
+    - [ '//epp:result', 'code', 1000, 'EPP: Successful response code' ]

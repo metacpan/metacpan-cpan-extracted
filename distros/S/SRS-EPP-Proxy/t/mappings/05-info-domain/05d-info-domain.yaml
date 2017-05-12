@@ -1,0 +1,30 @@
+template: info-domain.tt
+
+vars:
+  domain_name: not-exists.co.te
+  pw:
+
+input_assertions:
+  class: SRS::EPP::Command::Info::Domain
+
+SRS:
+  - assertions:
+      count:
+        - [ '/NZSRSRequest/*', 2, 'SRS: Check that there are two requests' ]
+        - [ '//Whois', 1, 'SRS: Check for only one Whois' ]
+        - [ '//DomainNameFilter', 1, 'SRS: Check for only one DomainNameFilter' ]
+      element_is:
+        - [ '/NZSRSRequest/*[1]', 'Whois', 'SRS: The first request should be a Whois' ]
+        - [ '/NZSRSRequest/*[2]', 'DomainDetailsQry', 'SRS: The second request should be a DomainDetailsQry' ]
+      match:
+        - [ '//DomainNameFilter', 'not-exists.co.te', 'SRS: Check the domain name' ]
+      match_all:
+      attr_is:
+
+output_assertions:
+  count:
+    - [ '//epp:resData', 0, 'EPP: No resData in the response' ]
+  match:
+  match_all:
+  attr_is:
+    - [ '//epp:result', 'code', 2303, 'EPP: Failure = Object does not exist' ]

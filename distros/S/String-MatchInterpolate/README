@@ -1,0 +1,176 @@
+NAME
+    "String::MatchInterpolate" - named regexp capture and interpolation from
+    the same template.
+
+SYNOPSIS
+     use String::MatchInterpolate;
+
+     my $smi = String::MatchInterpolate->new( 'My name is ${NAME/\w+/}' );
+
+     my $vars = $smi->match( "My name is Bob" );
+     my $name = $vars->{NAME};
+
+     print $smi->interpolate( { NAME => "Jim" } ) . "\n";
+
+DESCRIPTION
+    This module provides an object class which represents a string matching
+    and interpolation pattern. It contains named-variable placeholders which
+    include a regexp pattern to match them on. An instance of this class
+    represents a single pattern, which can be matched against or
+    interpolated into.
+
+    Objects in this class are not modified once constructed; they do not
+    store any runtime state other than data derived arguments passed to the
+    constructor.
+
+  Template Format
+    The template consists of a string with named variable placeholders
+    embedded in it. It looks similar to a perl or shell string with
+    interpolation:
+
+     A string here with ${NAME/pattern/} interpolations
+
+    The embedded variable is delmited by perl-style "${ }" braces, and
+    contains a name and a pattern. The pattern is a normal perl regexp
+    fragment that will be used by the "match()" method. This regexp should
+    not contain any capture brackets "( )" as these will confuse the parsing
+    logic. If the variable is not named, it will be assigned a name based on
+    its position, starting from 1 (i.e. similar to regexp capture buffers).
+    If a variable does not provide a matching pattern but the constructor
+    was given a default with the "default_re" option, this will be used
+    instead.
+
+    Outside of the embedded variables, the string is interpreted literally;
+    i.e. not as a regexp pattern. A backslash "\" may be used to escape the
+    following character, allowing literal backslashes or dollar signs to be
+    used.
+
+    The intended use for this object class is that the template strings
+    would come from a configuration file, or some other source of "trusted"
+    input. In the current implementation, there is nothing to stop a
+    carefully-crafted string from containing arbitrary perl code, which
+    would be executed every time the "match()" or "interpolate()" methods
+    are called. (See "SECURITY" section). This fact may be changed in a
+    later version.
+
+  Suffices
+    By default, the beginning and end of the string match are both anchored.
+    If the "allow_suffix" option is passed to the constructor, then the end
+    of the string is not anchored, and instead, any suffix found by the
+    "match()" method will be returned in a hash key called "_suffix". This
+    may be useful, for example, when matching directory names, URLs, or
+    other cases of strings with unconstrained suffices. The "interpolate()"
+    method will not recognise this hash key; instead just use normal string
+    concatenation on the result.
+
+     my $userhomematch = String::MatchInterpolate->new(
+        '/home/${USER/\w+/}/',
+        allow_suffix => 1
+     );
+
+     my $vars = $userhomematch->match( "/home/fred/public_html" );
+     print "Need to fetch file $vars->{_suffix} from $vars->{USER}\n";
+
+CONSTRUCTOR
+  $smi = String::MatchInterpolate->new( $template, %opts )
+    Constructs a new "String::MatchInterpolate" object that represents the
+    given template and returns it.
+
+    $template
+            A string containing the template in the format given above
+
+    %opts   A hash containing extra options. The following options are
+            recognised:
+
+            allow_suffix => BOOL
+                A boolean flag. If true, then the end of the string will not
+                be anchored, and instead, an extra suffix will be allowed to
+                follow the matched portion. It will be returned as "_suffix"
+                by the "match()" method.
+
+            default_re => Regexp or STRING
+                A precompiled Regexp or string defining a regexp to use if a
+                variable does not provide a pattern of its own.
+
+            delimiters => ARRAY of [Regexp or STRING]
+                An array containing two precompliled Regexps or strings,
+                giving the variable openning and closing delimiters. These
+                default to "qr/\$\{/" and "qr/\}/" respectively, but by
+                passing other values, other styles of template string may be
+                parsed.
+
+                 delimiters => [ qr/\{/, qr/\}/ ]   # To match {name/pattern/}
+
+METHODS
+  @values = $smi->match( $str )
+  $vars = $smi->match( $str )
+    Attempts to match the given string against the template. In list context
+    it returns a list of the captured variables, or an empty list if the
+    match fails. In scalar context, it returns a HASH reference containing
+    all the captured variables, or undef if the match fails.
+
+  $str = $smi->interpolate( @values )
+  $str = $smi->interpolate( \%vars )
+    Interpolates the given variable values into the template and returns the
+    generated string. The values may either be given as a list of strings,
+    or in a single HASH reference containing named string values.
+
+  @vars = $smi->vars()
+    Returns the list of variable names defined / used by the template, in
+    the order in which they appear.
+
+BENCHMARKS
+    The template is compiled into a pair of strings containing perl code,
+    which implement the matching and interpolation operations using normal
+    perl regexps and string contatenation. These strings are then "eval()"ed
+    into CODE references which the object stores. This makes it faster than
+    a simple regexp that operates over the template string each time a match
+    or interpolation needs to be performed. The following output compares
+    the speed of "String::MatchInterpolate" against both direct hard-coded
+    perl, and simple regexp operations.
+
+     Comparing 'interpolate':
+ 
+                Rate   s///  S::MI native
+     s///    81938/s     --   -44%   -90%
+     S::MI  145232/s    77%     --   -82%
+     native 806800/s   885%   456%     --
+ 
+     Comparing 'match':
+ 
+                Rate    m//  S::MI native
+     m//     35354/s     --   -46%   -73%
+     S::MI   65749/s    86%     --   -50%
+     native 131885/s   273%   101%     --
+
+    (This was produced by the benchmark.pl file in the module's
+    distribution.)
+
+SECURITY CONSIDERATIONS
+    Because of the way the optimised match and interpolate functions are
+    generated, it is possible to inject arbitrary perl code via the template
+    given to the constructor. As such, this object should not be used when
+    the source of that template is considered untrusted.
+
+    Neither the "match()" nor "interpolate()" methods suffer this problem;
+    any input into these is safe from exploit in this way.
+
+SEE ALSO
+    The following may be used to provide just "interpolate()"-style
+    operations:
+
+    *   String::Interpolate - Wrapper for builtin the Perl interpolation
+        engine
+
+    *   Text::Sprintf::Named - sprintf-like function with named conversions
+
+    The following may be used to provide just "match()"-style operations:
+
+    *   Regexp::NamedCaptures - Saves capture results to your own variables
+
+    *   perlre(1) - named capture buffers in perl 5.10 (the
+        "(?<NAME>pattern)" format)
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

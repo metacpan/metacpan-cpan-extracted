@@ -1,0 +1,6 @@
+Revision history for Perl extension SQLite::More.
+
+0.10  Fri Nov  5 18:46:26 2010
+	- original version; created by h2xs 1.23 with options
+		-A -X -n SQLite::More
+

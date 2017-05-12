@@ -1,0 +1,56 @@
+--- #YAML:1.0
+# This is YAML format Stem configuration file. It load a colsole cell
+# and all the cookbook classes and registers a number of object cells
+#
+# Load and initialize the console class
+-
+ class: Stem::Console
+# Load the World1 class. We pass no arguments as this is a class level cell.
+-
+ class: World1
+# Load the World2 class. We pass no arguments as this is a class level cell.
+-
+ class: World2
+# Load the World3 class, construct an object with an empty argument list
+# and register is as a Cell with the name 'planet1'.
+# This Cell will use the default value for its name attribute
+-
+ class: World3
+ name: planet1
+ args: []
+# Construct another World3 object with an argument list and register
+# that as the Cell with the name 'planet2.
+# This Cell will use the value 'venus' for its name attribute
+-
+ class: World3
+ name: planet2
+ args:
+  planet: venus
+# Load the World4 class, construct an object with an argument list and
+# register that as the Cell with the name 'planet3.
+# This Cell will use the value 'earth' for its name attribute
+-
+ class: World4
+ name: planet3
+ args:
+  name: earth
+# Construct another World4 object with an argument list and
+# register that as the Cell with the name 'planet4.
+# This Cell will use the value 'mars' for its name attribute
+-
+ class: World4
+ name: planet4
+ args:
+  planet: mars
+# Load the World5 class, construct an object with an argument list and
+# register that as the Cell with the name 'system.
+# This Cell will use the value 'jupiter' for its name attribute and be
+# cloneable.  The value in name will be the default name for all Cells
+# cloned from this parent
+-
+ class: World5
+ name: planet5
+ args:
+  planet: jupiter
+  cell_attr:
+   cloneable: 1

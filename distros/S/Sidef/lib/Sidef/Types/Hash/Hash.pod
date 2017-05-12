@@ -1,0 +1,375 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Hash::Hash
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = Hash.new(...);
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef::Object::Object
+	* Sidef::Convert::Convert
+
+=head1 METHODS
+
+
+=head2 !=
+
+I<Obj> B<!=> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<ne>
+
+=cut
+
+=head2 +
+
+I<Obj> B<+> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<merge>, I<concat>
+
+=cut
+
+=head2 ...
+
+I<Obj> B<...> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<to_list>
+
+=cut
+
+=head2 :
+
+I<Obj> B<:> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<new>, I<call>
+
+=cut
+
+=head2 ==
+
+I<Obj> B<==> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<eq>
+
+=cut
+
+=head2 add
+
+Hash.add() -> I<Obj>
+
+Return the
+
+Aliases: I<append>
+
+=cut
+
+=head2 as_tree
+
+Hash.as_tree() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 copy
+
+Hash.copy() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 count
+
+Hash.count() -> I<Obj>
+
+Return the
+
+Aliases: I<count_by>
+
+=cut
+
+=head2 delete
+
+Hash.delete() -> I<Obj>
+
+Return the
+
+Aliases: I<remove>
+
+=cut
+
+=head2 delete_if
+
+Hash.delete_if() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 dig
+
+Hash.dig() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 dump
+
+Hash.dump() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 each
+
+Hash.each() -> I<Obj>
+
+Return the
+
+Aliases: I<each_kv>, I<each_pair>
+
+=cut
+
+=head2 each_k
+
+Hash.each_k() -> I<Obj>
+
+Return the
+
+Aliases: I<each_key>
+
+=cut
+
+=head2 each_v
+
+Hash.each_v() -> I<Obj>
+
+Return the
+
+Aliases: I<each_value>
+
+=cut
+
+=head2 exists
+
+Hash.exists() -> I<Obj>
+
+Return the
+
+Aliases: I<has_key>, I<contain>, I<include>, I<contains>, I<includes>
+
+=cut
+
+=head2 fetch
+
+Hash.fetch() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 flip
+
+Hash.flip() -> I<Obj>
+
+Return the
+
+Aliases: I<reverse>
+
+=cut
+
+=head2 get_pair
+
+Hash.get_pair() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 get_pairs
+
+Hash.get_pairs() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 grep
+
+Hash.grep() -> I<Obj>
+
+Return the
+
+Aliases: I<grep_kv>, I<select>
+
+=cut
+
+=head2 grep_v
+
+Hash.grep_v() -> I<Obj>
+
+Return the
+
+Aliases: I<grep_val>
+
+=cut
+
+=head2 item
+
+Hash.item() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 items
+
+Hash.items() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 keys
+
+Hash.keys() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 kv
+
+Hash.kv() -> I<Obj>
+
+Return the
+
+Aliases: I<to_a>, I<pairs>, I<to_array>
+
+=cut
+
+=head2 len
+
+Hash.len() -> I<Obj>
+
+Return the
+
+Aliases: I<size>, I<length>
+
+=cut
+
+=head2 map
+
+Hash.map() -> I<Obj>
+
+Return the
+
+Aliases: I<map_kv>
+
+=cut
+
+=head2 map_v
+
+Hash.map_v() -> I<Obj>
+
+Return the
+
+Aliases: I<map_val>
+
+=cut
+
+=head2 max_by
+
+Hash.max_by() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 merge_values
+
+Hash.merge_values() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 min_by
+
+Hash.min_by() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 same_keys
+
+Hash.same_keys() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 set_keys
+
+Hash.set_keys() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 slice
+
+Hash.slice() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sort
+
+Hash.sort() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sort_by
+
+Hash.sort_by() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 values
+
+Hash.values() -> I<Obj>
+
+Return the
+
+=cut

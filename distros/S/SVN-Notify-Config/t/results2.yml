@@ -1,0 +1,136 @@
+--- empty
+--- empty
+--- empty
+--- empty
+--- empty
+--- empty
+--- empty
+--- empty
+---
+- !!perl/hash:SVN::Notify::Dummy
+  files:
+    A:
+      - project2/trunk/dir3/
+      - project2/trunk/dir3/file6
+      - project2/trunk/dir4/
+      - project2/trunk/dir4/file7
+      - project2/trunk/dir4/file8
+      - project2/trunk/file5
+  from: tags@example.com
+  handle_path: project2/
+  message:
+    - begin work on second project
+  message_size: 28
+  revision: 8
+  subject: '[8] begin work on second project'
+  to:
+    - projleader@example.com
+- !!perl/hash:SVN::Notify::Dummy
+  files:
+    A:
+      - project2/trunk/dir3/
+      - project2/trunk/dir3/file6
+      - project2/trunk/dir4/
+      - project2/trunk/dir4/file7
+      - project2/trunk/dir4/file8
+      - project2/trunk/file5
+  from: tags@example.com
+  handle_path: project2/trunk
+  message:
+    - begin work on second project
+  message_size: 28
+  revision: 8
+  subject: '[8] begin work on second project'
+  to:
+    - trunk@example.com
+    - other@example.com
+---
+- !!perl/hash:SVN::Notify::Dummy
+  files:
+    A:
+      - project2/tags/TRUNK-1135538991/
+  from: tags@example.com
+  handle_path: project2/
+  message:
+    - tag trunk before branching
+  message_size: 26
+  revision: 9
+  subject: '[9] tag trunk before branching'
+  to:
+    - projleader@example.com
+- !!perl/hash:SVN::Notify::Dummy
+  files:
+    A:
+      - project2/tags/TRUNK-1135538991/
+  from: tags@example.com
+  handle_path: project2/tags
+  message:
+    - tag trunk before branching
+  message_size: 26
+  revision: 9
+  subject: '[9] tag trunk before branching'
+  to:
+    - projleader@example.com
+  to_regex_map:
+    tags@example.com: PROD_
+---
+- !!perl/hash:SVN::Notify::Dummy
+  files:
+    A:
+      - project2/branches/branch2/
+  from: tags@example.com
+  handle_path: project2/
+  message:
+    - branch trunk for development
+  message_size: 28
+  revision: 10
+  subject: '[10] branch trunk for development'
+  to:
+    - projleader@example.com
+---
+- !!perl/hash:SVN::Notify::Dummy
+  files:
+    A:
+      - project2/branches/branch2/dir5/
+      - project2/branches/branch2/file5.new
+    D:
+      - project2/branches/branch2/dir3/
+      - project2/branches/branch2/file5
+  from: tags@example.com
+  handle_path: project2/
+  message:
+    - restructure branch files
+  message_size: 24
+  revision: 11
+  subject: '[11] restructure branch files'
+  to:
+    - projleader@example.com
+---
+- !!perl/hash:SVN::Notify::Dummy
+  files:
+    A:
+      - project2/tags/TRUNK-1135539568/
+  from: tags@example.com
+  handle_path: project2/
+  message:
+    - tag trunk after merging from branch
+  message_size: 35
+  revision: 12
+  subject: '[12] tag trunk after merging from branch'
+  to:
+    - projleader@example.com
+- !!perl/hash:SVN::Notify::Dummy
+  files:
+    A:
+      - project2/tags/TRUNK-1135539568/
+  from: tags@example.com
+  handle_path: project2/tags
+  message:
+    - tag trunk after merging from branch
+  message_size: 35
+  revision: 12
+  subject: '[12] tag trunk after merging from branch'
+  to:
+    - projleader@example.com
+  to_regex_map:
+    tags@example.com: PROD_

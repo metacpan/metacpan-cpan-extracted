@@ -1,0 +1,117 @@
+Revision history for String::CaseProfile
+
+0.18  February 9, 2010
+
+    * Reorganized a bit the new doc samples and fixed a layout issue.
+
+0.17  February 9, 2010
+
+    * Added Test::Warn to the PREREQ_PM section in Makefile.PL.
+    * Changed the encoding of CaseProfile.pm, 03_caseprofile.t, and
+      04_caseprofile_options.t to UTF-8.
+    * Updated the documentation adding samples using the Armenian, Cyrillic and
+      Greek alphabets. Also added the corresponding test file.
+    
+0.16  February 7, 2010
+
+    * Changed slightly the interface of the get_profile function to add
+      a new option, strict, which can be used to consider words of unknown type
+      (ignored by default) when determining the string type.
+      The old interface still works.
+    * Improved the word regex to detect things like AT&T as "single-words".
+    * Changed the scope of $word_re and %types from package variables to
+      global variables.
+    * Updated the documentation.
+    * Renamed 04_caseprofile_exclude.t --> 04_caseprofile_options.t and added
+      more tests.
+    * Used Test::Warn to capture warnings during test run.
+    * Changed the contact e-mail address.
+    * Added the BUGS and SUPPORT boilerplate sections.
+    * Updated the license text.
+
+0.15  February 27, 2009
+
+    * Modified the word detection regular expression to cover some types of
+      acronyms.
+    * Added more tests.
+
+0.14  January 10, 2009
+
+    * Added the 'report' key to the profile hash returned by get_profile,
+      so the user can print a summary of the string profile to get the picture
+      at a glance.
+    * Updated the documentation.
+
+0.13  December 24, 2008
+
+    * Fixed a bug in get_profile to cover the case where the source string
+      only contains a single-letter word.
+    * Added some tests.
+    * Minor doc changes.
+
+0.12  November 1, 2008
+
+    * Fixed a bug in a doc sample.
+
+0.11  November 1, 2008
+
+    * Changed the name of the new 'string' key (introduced in version 0.10)
+      of the profile hash to 'fold', for clarity.
+
+0.10  November 1, 2008
+
+    * Added a 'string' key to the profile hash returned by get_profile.
+      Its value is a pattern string that can be used to process 'other' profiles.
+    * Updated the documentation.
+
+0.09  June 20, 2008
+
+    * Removed a debug statement left in update 0.07
+
+0.08  June 18, 2008
+
+    * Improved the documentation
+
+0.07  June 17, 2008
+
+    * Added functionality that allows the user to specify (input) words that
+      should not be considered when determining the profile of a string using
+      the get_profile function, to specify (output) words that should not
+      be affected by the set_profile function, and to specify both kinds of
+      excluded words in the copy_profile function
+    * Added more tests to cover this functionality
+    * Cleaned up the code
+    * Updated the documentation
+
+0.06  June 4, 2008
+
+    * Moved the $word_re compiled regex definition to the top-level (to avoid
+      compiling it every time the get_profile function is called), declaring
+      it as a global package variable
+    * Turned the %types global lexical variable into a global package variable
+
+0.05  February 3, 2008
+
+    * Added the copy_profile convenience function
+    * Updated the documentation
+
+0.04  January 29, 2008
+
+    * Removed the consonants_rx compilation, since this regex is used only once
+      in every call to _word_type
+    * Improved the synopsis and made minor changes to other sections of the
+      documentation
+
+0.03  December 24, 2007
+
+    * Added more tests
+    * Fixed some documentation errors
+
+0.02  December 22, 2007
+    
+    * Fixed some indentation problems
+
+0.01  December 22, 2007
+
+    * First version
+

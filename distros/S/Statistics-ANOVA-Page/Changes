@@ -1,0 +1,10 @@
+Revision history for Statistics-ANOVA-Page
+
+0.02    2017-02-10
+ + croak on finding unequal N, or zero within- or between-group observations, ahead of chiprob_test (avoiding divide by zero error).
+ + correcting POD for chiprob_test regarding returned values when called in list context.
+ * "repeatedly measured" rather than "dependent" variables used to describe the test in POD.
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

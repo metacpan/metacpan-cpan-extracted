@@ -1,0 +1,54 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 4befda8c472b9e0792d6f5f0d6cb4840fa306764 ChangeLog
+SHA1 b2ccb5acd416e63356a030e446143b465337d2b5 INSTALL
+SHA1 7f7f48c804dbd34389e2a6e6622f50e9f21bbbc5 LICENSE
+SHA1 70f0bb4e06d2a3f92865dbd437e057398ccea5a5 MANIFEST
+SHA1 455f770af4df258cd5a9332280feaa28219c9d13 META.yml
+SHA1 fe111cddecfb6cb5b98a70310f7208f91057700a Makefile.PL
+SHA1 39d762f97e155822c22f7bec927ace52528ceff8 README
+SHA1 18679ee88d9d8e6b49130c0f699e2441bfa19d8d dist.ini
+SHA1 35a74c6e71f2765f9413cf5fc2f803ef0fb8cd27 lib/SecondLife/DataTypes.pm
+SHA1 cf6982c33678efbe15151a9353a336c7d7845802 lib/SecondLife/Region.pm
+SHA1 cdfac2b5bf14db2968b6feaffdffbac573298fd0 lib/SecondLife/Rotation.pm
+SHA1 5f0afd1ab56b200b901b724eb4d15c05d561a6f8 lib/SecondLife/Vector.pm
+SHA1 d1afc1f598fbb7e7bf22fc39bc2cc072f96cfb85 t/datatypes.t
+SHA1 5a1066f4001296ee1265c58f8c0fbcf66587904a t/region.t
+SHA1 54ed25287b7e1c9ff328eaf126d438438c8a1d48 t/release-minimum-version.t
+SHA1 455d1dd1867212a665ad5ea4126b572411de300c t/release-no-tabs.t
+SHA1 8d931d5c7b6fc03e39a744d59522e4b7077562a1 t/release-portability.t
+SHA1 612226d447015079c046d65932f774304a4b9f20 t/release-synopsis.t
+SHA1 4d5b575c2b1681e217483a0d4fbb9b45041bf76d t/rotation.t
+SHA1 4b4e7c2e28fa09f2a1d19371f495e57a30ddc91a t/vector.t
+SHA1 4a148ff1ed4cb8514816242b05684ffd52ccdc81 weaver.ini
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iQIcBAEBAgAGBQJOll20AAoJEF6ojHedHIiFglcQANNG4/LfNjaDdrZ0zCho4Aor
+0+FQSJ47WFteltjnBiecIofDK3i+3Mvb6M7wWnh/I7Hjor+tJ6TkCP/MeUuChb8n
+8zSgZoZR72BNLCr3gFOj6aQEF6YrS2XSnm0nnuNj5JbBmdSuNaZEr9/LYPu5hSJ4
+F83gSaeD+A0tsQtzLfOPlZW85A7SIubXEyYd2U7drMI+5vp2CqxOYg+RImHCFZ9B
+7dfKg/p6Iv0+WvNQq+4aMH+t/qdaC/lMmjg8tYiFgDQOlMojaCjyt8Ln+z+F2WYf
+9kHqFAF2X3ILpg5ByZZ2dobLy/kuNDaBQRVu94ywFxk3YQkyEs09J7ODhhu45e+N
+a3RM2zxh8fG0rRfBdj0q8Zzd2CQqdTBbDnp8cx0jn73xJc0aAP1NTWVmWe+m8cdd
+3VZ9tsTRg7da9d75eusZ4ctRKi1G13j6DBbKLvFkBPrYmaZ/KRAOHVV2dDfzzWZE
+6Gsf6InTNrqWly8mrCzCyoHzkp/pFWhlb1lAeJK/E+dpQCRFmGDPKqq1s06eDXaB
+LBK/XlzqSB6LyJ1NdNB4zdDaGqwhUE8RHX7dBEYHajvJxfEibhQkPkfsJyEwhorB
+ZjbZ37uilmXSNG/oQGXQDqBAEVn1L2t+gAj738g8XCjzXQuvhhr+TeC9g6nNg95v
+vyDH13HTdimo0Q4uL3Y/
+=+XEl
+-----END PGP SIGNATURE-----

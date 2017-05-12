@@ -1,0 +1,59 @@
+DESCRIPTION
+
+    To use this module, you typically run the create_or_update_db_schema()
+    routine at the start of your program/script, e.g.:
+
+     use DBI;
+     use SQL::Schema::Versioned qw(create_or_update_db_schema);
+     my $spec = {...}; # the schema specification
+     my $dbh = DBI->connect(...);
+     my $res = create_or_update_db_schema(dbh=>$dbh, spec=>$spec);
+     die "Cannot run the application: cannot create/upgrade database schema: $res->[1]"
+         unless $res->[0] == 200;
+
+    This way, your program automatically creates/updates database schema
+    when run. Users need not know anything.
+
+FAQ
+
+ Why use this module instead of other similar solution?
+
+    Mainly simplicity. I write simple application which is often
+    self-contained in a single module/script. This module works with
+    embedded SQL statements instead of having to put SQL in separate
+    files/subdirectory.
+
+ How do I see each SQL statement as it is being executed?
+
+    Try using Log::Any::For::DBI, e.g.:
+
+     % TRACE=1 perl -MLog::Any::For::DBI -MLog::Any::App yourapp.pl ...
+
+BEST PRACTICES
+
+    It is recommended that after you create the second and subsequent
+    version (upgrade_to_v2, upgrade_to_v3, and so on) you create and keep
+    install_v1 so you can test migration from v1->v2, v2->v3, and so on.
+
+SEE ALSO
+
+    Some other database migration tools on CPAN:
+
+      * DBIx::Migration
+
+      Pretty much similar to this module, with support for downgrades. OO
+      style, SQL in separate files/subdirectory.
+
+      * Database::Migrator
+
+      Pretty much similar. OO style, SQL in separate files/subdirectory.
+      Perl scripts can also be executed for each version upgrade. Meta
+      table is configurable (default recommended is 'AppliedMigrations').
+
+      * sqitch
+
+      A more proper database change management tool with dependency
+      resolution and VCS awareness. No numbering. Command-line script and
+      Perl library provided. Looks pretty awesome and something which I
+      hope to use for more complex applications.
+

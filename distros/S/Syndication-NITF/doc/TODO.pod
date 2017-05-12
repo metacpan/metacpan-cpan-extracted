@@ -1,0 +1,58 @@
+$Id: TODO.pod,v 0.2 2001/12/19 05:27:20 brendan Exp $
+
+=for html
+<div id="content">
+<H1>
+TODO
+</H1>
+</div>
+<div id="content">
+
+=begin text
+
+TODO
+
+=over 4
+
+=item *
+Allow creation/modification of NITF documents as well as just reading them
+
+=item *
+A Syndication::NITF::Simple type module that takes the pain out of accessing all these methods.
+
+=item *
+Better error checking
+
+=item *
+Better handling of error reporting -- don't just croak() every time something goes wrong
+
+=item *
+POD docs of each class (!)
+
+=item *
+Integration with Syndication::NewsML module
+
+=item *
+Finish off test suite (need more examples!)
+
+=item *
+More support code: nitf-table handlers, ID schema helpers, etc
+
+=item *
+More useful example parser
+
+=item *
+The rest of the TODO list ;-)
+
+=back
+
+=end text
+
+=head2 Would be nice
+
+=for text
+** This file was automatically generated from **
+** doc/TODO.pod. To edit it, see there.    **
+
+
+=for html </div>

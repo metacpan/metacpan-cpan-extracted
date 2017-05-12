@@ -1,0 +1,16 @@
+Source: libsys-mknod-perl
+Section: interpreters
+Priority: optional
+Build-Depends: debhelper (>= 3.0.5), perl (>= 5.6.0-17)
+Maintainer: Sam Vilain <sam@vilain.net>
+Standards-Version: 3.5.1
+
+Package: libsys-mknod-perl
+Architecture: all
+Depends: ${perl:Depends}
+Description:  make special files
+ mknod - creates special files.  Why use system() when you can use
+ syscall()?
+ .
+ $mode is the resultant file mode, and defaults to 0666.  It does not
+ override your umask.

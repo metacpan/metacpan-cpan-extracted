@@ -1,0 +1,89 @@
+Revision history for Perl extension String::LCSS_XS.
+
+1.2 Tue Mar 2 2010 
+    - Bugfix: * Segfault when one string is undef (thanks Louis-David, closes
+                 #55147)
+                 
+1.1 Mon Feb 8 2010 
+-  Patch from ikegami (thank you so much :-) ):
+     *  Uses appropriate #defines for types rather than "int".
+     *  No longer allocates C structures to pass info from the .c to the .xs
+     *  Implements the swapping a comment said should be done.
+     *  No longer keeps track of all matches if the user only wants one.
+     *  Uses a more efficient means of extracting multiple matches from UTF8=1
+        strings.
+     *  No longer warns for bad UTF8=1 strings (I think). It used to warn
+     *  multiple times.
+     *  Uses safer utf8n_to_uvchr instead of utf8_to_uvchr
+
+1.0_10 Mon Feb 1 2010
+    - new ppport.h
+    - use perl's malloc & friends
+    - small performance improvement
+    - initial support for UTF8 (thanks Ikegami)
+
+1.0_9 Fri Jan 29 2010
+    - optional min argument
+    - spellchecking in POD
+    
+1.0  Mon Aug 18 2008
+    - perl version in Build.PL
+    - version in POD
+    - added LICENSE file
+    - added coverage code from Text::CSV_XS
+    - small performance enhancements
+
+0.7  Tue Mar 04 2008
+    - code cleanup
+    - added example
+
+0.6  Mon Dec 10 2007
+    - configure requires, CBuilder dependency (hopefully fixes failed tests)
+    - optimizations (about 30% faster)
+
+0.5  Tue Nov 27 2007
+    - t/kwalitee.t added
+    - build_requires in Build.PL
+    - dependency to Exporter and XSLoader added
+    - compilation on Win32 should work now (thanks Taro Nishino)
+
+0.4  Sat Nov 24 2007
+    - linear memory
+    - String-LCSS_XS-* in clean
+
+0.3  Wed Nov 21 2007
+    - small optimization
+    - LICENSE in Makefile.PL
+    - added Build.PL
+    - added META.yml
+    - added perlcritic and pod-coverage
+
+0.2  Wed Nov 21 2007
+    - no 256 results limit anymore
+    - fixed some memleaks
+    - prototype $$
+    - added dependency to 5.6.1
+
+0.1  Tue Nov 20 2007
+    - calloc
+    - new ppport.h
+    - wantarray
+    - lcss_all
+    - EXPORT_OK
+    
+0.03  Mon Nov 19 2007
+    - Argh, forgot 5.8.6 dependency in Makefile.PL
+    - POD
+    - code cleanup
+
+0.02  Sun Nov 19 2007
+    - POD: typos
+    - memory deallocation in lcss
+    - now really returns the first found lccs if there are multiple
+    - fixed some warnings
+    - added benchmark in POD
+    - removed 5.8.6 dependency
+
+0.01  Sun Nov 18 2007
+	- initial CPAN upload 
+

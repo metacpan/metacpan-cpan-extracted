@@ -1,0 +1,10 @@
+1.2   9 Apr 2003
+   - Added Makefile.PL and proper build/test prodecure
+   - Added 'use strict'
+   - Added tests
+
+1.1  20 Aug 1995
+   - Release 1.1
+
+1.0  28 Jul 1995
+   - Release 1.0

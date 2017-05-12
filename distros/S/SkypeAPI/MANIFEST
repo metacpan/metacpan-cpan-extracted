@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+Win.xs
+t/SkypeAPI-Win.t
+lib/SkypeAPI.pm
+lib/SkypeAPI/Command.pm
+lib/SkypeAPI/Robot.pm
+lib/SkypeAPI/Win.pm

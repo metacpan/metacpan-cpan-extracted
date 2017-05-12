@@ -1,0 +1,104 @@
+NAME
+    Search::InvertedIndex::DB::Pg - A Postgres backend for
+    Search::InvertedIndex.
+
+SYNOPSIS
+      use Search::InvertedIndex;
+      use Search::InvertedIndex::DB::Pg;
+
+      my $db = Search::InvertedIndex::DB::Pg->new(
+            -db_name    => "testdb",
+            -hostname   => "test.example.com",
+            -port       => 5432,
+            -username   => "testuser",
+            -password   => "testpass",
+            -table_name => "siindex",
+            -lock_mode  => "EX",
+      );
+
+      my $map = Search::InvertedIndex->new( -database => $db );
+
+DESCRIPTION
+    An interface allowing Search::InvertedIndex to store and retrieve data
+    from a PostgreSQL database. All the data is stored in a single table,
+    which will be created automatically if it does not exist when "new" is
+    called.
+
+METHODS
+    new
+          my $db = Search::InvertedIndex::DB::Pg->new(
+                -db_name    => "testdb",
+                -hostname   => "test.example.com",
+                -port       => 5432,
+                -username   => "testuser",
+                -password   => "testpass",
+                -table_name => "siindex",
+                -lock_mode  => "EX",
+          );
+
+        "-db_name" and "-table_name" are mandatory. "-lock_mode" defaults to
+        "EX". "-port is optional" and defaults to not being specified..
+
+    open
+          $db->open;
+
+        Opens the database in the mode specified when "new" was called.
+        Croaks on error, returns true otherwise. Trying to open a
+        nonexistent database/table combination in "SH" mode is considered to
+        be an error. Opening an already-open database/table combination
+        isn't.
+
+    lock
+          $db->lock( -lock_mode => "EX" );
+
+        The "-lock_mode" parameter is required; allowed values are "EX",
+        "SH" and "UN". Returns true on success; croaks on error.
+
+    status
+          my $opened = $db->status( "-open" );
+          my $lock_mode = $db->status( "-lock_mode" );
+
+        Allowed requests are "-open" and "-lock_mode". "-lock_mode" can only
+        be called on an open database. "-lock" is a synonym for
+        "-lock_mode". Croaks if sent an invalid request, or on error.
+
+    put
+          $db->put( -key => "foo", -value => "bar" );
+
+        Both parameters are mandatory. Any others will be silently ignored.
+        Returns true on success and false on error.
+
+    get
+          my $value = $db->get( -key => "foo" );
+
+        Croaks if no "-key" supplied.
+
+    delete
+          $db->delete( -key => "foo" );
+
+    close
+          $db->close;
+
+    clear
+          $db->clear;
+
+        Clears out *all* indexing data.
+
+AUTHOR
+    Kate L Pugh <kake@earth.li>, based on Search::InvertedIndex::DB::Mysql
+    by Michael Cramer and Search::InvertedIndex::DB::DB_File_SplitHash by
+    Benjamin Franz.
+
+COPYRIGHT
+         Copyright (C) 2003-4 Kake Pugh.  All Rights Reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+CREDITS
+    Module based on work by Michael Cramer and Benjamin Franz. Patch from
+    Cees Hek.
+
+SEE ALSO
+    Search::InvertedIndex
+

@@ -1,0 +1,58 @@
+Revision history for SQL-Tokenizer
+
+0.24
+
+    - Dramatically reduce memory usage for quote handling - Luc Lanthier
+
+0.23
+
+    - Simplified regex and fix for back slashes in the end of a string - Luc Lanthier
+
+0.22
+    - Better handling of CR+LF in comments - Devin Withers
+
+0.21
+    - Better handling of $ placeholders - Nigel Metheringham
+
+0.19
+	- Allow `` quoted strings (similar to "" and '') - Jonas Kramer
+	- Add dot to punctuation characters - Jonas Kramer
+
+0.17
+	- fixed issues with square brackets
+	- now exports a function if required
+
+0.16
+	- now supports database.schema.table dialect.
+	- required at least 5.6.2.
+
+0.15
+	- doesn't eat `@' anymore.
+
+0.14
+	- tests passes now in 5.6.2.
+
+0.13
+	- quote mark wasn't being properly tokenized (fixes DBIx::Placeholder::Named dependency).
+
+0.12
+	- fixed #34889.
+
+0.11
+	- added support for single line shell style comments as requested by Evan Harris.
+
+0.10
+	- added support for SQL operators as requested by Evan Harris.
+	- tokenize() returns an arrayref if called in scalar context, an array if called in list context as requested by Evan Harris.
+	- added remove_white_spaces parameter to tokenize() as suggested by Evan Harris.
+
+0.09
+    - removed use_ok from BEGIN block on tests (Test::More 0.74).
+
+0.07
+	- fixed C style comments.
+
+0.06
+    - first release.
+
+

@@ -1,0 +1,50 @@
+---
+abstract: 'SQL parsing and processing engine'
+author:
+  - 'Jeff Zucker <jeff@vpservices.com>, Jens Rehsack <rehsack@cpan.org>'
+build_requires:
+  Math::Base::Convert: '0'
+  Math::Complex: '1.56'
+  Test::Deep: '0'
+  Test::More: '0.90'
+  Text::Soundex: '3.04'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+conflicts:
+  DBD::AnyData: '0.09'
+  DBD::CSV: '0.29'
+  DBI: '1.611'
+  SQL::Statement: '1.20'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SQL-Statement
+no_index:
+  directory:
+    - t
+    - inc
+recommends:
+  Math::Base::Convert: '0'
+  Math::Complex: '1.56'
+  Text::Soundex: '3.04'
+requires:
+  Carp: '0'
+  Clone: '0.30'
+  Data::Dumper: '0'
+  Module::Runtime: '0'
+  Params::Util: '1.00'
+  Scalar::Util: '1.0'
+  Text::Balanced: '0'
+  perl: '5.008'
+resources:
+  IRC: irc://irc.perl.org/#dbi
+  MailingList: "mailto:dbi-dev@perl.org'"
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=SQL-Statement
+  homepage: https://metacpan.org/release/SQL-Statement
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/perl5-dbi/SQL-Statement.git
+version: '1.412'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

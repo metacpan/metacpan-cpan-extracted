@@ -1,0 +1,75 @@
+Solaris Version 0.2 alpha
+=========================
+
+DISCLAIMER & COPYRIGHT
+----------------------
+
+Copyright (c) 1998 Alan Burlison
+
+You may distribute under the terms of either the GNU General Public License
+or the Artistic License, as specified in the Perl README file, with the
+exception that it cannot be placed on a CD-ROM or similar media for commercial
+distribution without the prior approval of the author.
+
+This code is provided with no warranty of any kind, and is used entirely at
+your own risk.
+
+This code was written by the author as a private individual, and is in no way
+endorsed or warrantied by Sun Microsystems.
+
+WHAT IS IT?
+-----------
+This set of modules provides Solaris-specific functionality, mainly related to
+obtaining performance and configuration information from the Operating System.
+The following modules are provided:
+
+Solaris::MapDev
+Maps between device instance names and /dev names, e.g. "sd0" to "c0t0d0" and
+vice-versa.
+
+Solaris::Kstat
+Provides access to the kernel performance statistics via the Solaris kstat
+interface - see 'man kstat' for details.  The kernel statistics are represented
+as a set of nested perl hashes.
+
+The following modules are under development:
+
+Solaris::Kmem
+Read values from the running kernel.
+
+Solaris::MIB
+Access STREAMS network statistics
+
+Solaris::NDD
+Access network device statistics
+
+PREREQUISITES
+-------------
+1.  Perl 5.004_05 or later
+    Perl 5.004_04 has several bugs that prevent this package from working
+3.  Solaris 2.5.1 or later
+2.  A C compiler
+
+INSTALLATION
+------------
+1.  Check you have all the prequisites installed and working.
+2.  Run 'perl Makefile.PL && make test'
+3.  If successful, run 'make install'
+
+HOW TO USE
+----------
+There are man pages for all the modules - after installation try 'man
+Solaris::Kstat' and 'man Solaris::MapDev' for full details.
+
+There are also a few example scripts provided, which will be installed into the
+same directory as your perl executable.  These are:
+
+dump_kstats	Dumps the entire kstat tree to stdout
+iost+		Replacement for iostat with better statistics
+mapdev          Maps between device instances and names (eg sdNN to cNtNdN)
+show_devs	Show all disk device serial numbers & manufacturer information
+
+SUPPORT
+-------
+
+Support questions and suggestions can be directed to Alan.Burlison@uk.sun.com

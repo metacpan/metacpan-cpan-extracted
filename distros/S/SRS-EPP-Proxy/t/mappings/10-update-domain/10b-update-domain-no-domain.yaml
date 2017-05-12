@@ -1,0 +1,35 @@
+# Update a non-existant domain
+template: update-domain.tt
+
+vars:
+  domain: no-exist.co.te
+  owner: abc123
+
+input_assertions:
+  class: SRS::EPP::Command::Update::Domain
+  count:
+    - [ '//domain:name', 1, 'SRS: Check for the domain' ]
+    - [ '//domain:registrant', 1, 'SRS: Check for the registrant' ]
+  match:
+    - [ '//domain:name', 'no-exist.co.te', 'SRS: Check the domain name' ]
+    - [ '//domain:registrant', 'abc123', 'SRS: Check the registrant' ]
+
+SRS:
+  - assertions:
+      count:
+      match:
+      match_all:
+      attr_is:
+
+    fake_response: |-
+      <NZSRSResponse VerMajor="5" VerMinor="0">
+        <Response Action="DomainUpdate" FeId="8" FeSeq="4803301" OrigRegistrarId="1" RecipientRegistrarId="1" Rows="0" TransId="brause8765">
+          <FeTimeStamp Day="8" Hour="15" Minute="21" Month="7" Second="45" TimeZoneOffset="+12:00" Year="2010"/>
+        </Response>
+      </NZSRSResponse>
+
+output_assertions:
+  count:
+    - [ '//epp:result', 1, 'SRS: Check for one result' ]
+  attr_is:
+    - [ '//epp:result', 'code', 2303, 'SRS: Check for correct result code' ]

@@ -1,0 +1,23 @@
+Changes
+lib/SysTray.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+src/linux/kde_wrap.cpp
+src/linux/kde_wrap.h
+src/linux/mainwnd.cpp
+src/linux/mainwnd.h
+src/linux/mainwnd.moc.cpp
+src/linux/tray.cpp
+src/linux/tray.h
+src/linux/tray.moc.cpp
+src/osx/osx_wrap.c
+src/osx/osx_wrap.h
+src/osx/TrayMenu.c
+src/osx/TrayMenu.h
+src/win/win_wrap.c
+src/win/win_wrap.h
+SysTray.xs
+t/SysTray.t
+test_tray.pl

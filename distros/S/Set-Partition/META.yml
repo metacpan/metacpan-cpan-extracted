@@ -1,0 +1,12 @@
+--- #YAML:1.0
+name:                Set-Partition
+version:             0.03
+abstract:            Enumerate all arrangements of a set in fixed subsets
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.30_04
+author:              David Landgren
+distribution_type:   module
+requires:     
+meta-spec:
+    url: http://module-build.sourceforge.net/META-spec-new.html
+    version: 1.1

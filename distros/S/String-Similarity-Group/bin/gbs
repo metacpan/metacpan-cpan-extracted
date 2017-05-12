@@ -1,0 +1,212 @@
+#!/usr/bin/perl
+use strict;
+use vars qw($VERSION @ELEMENTS @GROUPED);
+use Getopt::Std::Strict 'gGdhvbys:';
+use String::Similarity::Group ':all';
+use Carp;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.7 $ =~ /(\d+)/g;
+
+
+$opt_d and $String::Similarity::Group::DEBUG = 1;
+$opt_s ||=0.8;
+
+
+_resolve_elements();
+_group_elements();
+
+$opt_y and print _output_yaml() and exit;
+$opt_b and print _output_bash() and exit;
+print _output_text() and exit;
+
+exit;
+
+
+
+
+
+
+sub _output_text {
+   join( "\n\n", (
+      map { join( "\n", @$_ ) } @GROUPED 
+      )
+   ) . "\n"   
+}
+
+
+sub _output_yaml {
+   debug('yaml');
+   require YAML;
+   YAML::Dump(@GROUPED);
+}
+
+sub _output_bash {
+   join( "\n", (
+      map { join( ' ', map { "'$_'"} @$_ ) } @GROUPED 
+      )
+   ) . "\n" 
+}
+
+
+
+
+sub _group_elements {
+   
+
+   @GROUPED =
+      $opt_g ? groups_lazy( $opt_s, \@ELEMENTS ) :
+      $opt_G ? groups_hard( $opt_s, \@ELEMENTS ) :
+               groups( $opt_s, \@ELEMENTS );
+
+   @GROUPED   
+      or debug('none grouped') 
+      and exit;
+   my $x = scalar @GROUPED;
+   debug("Got $x groups");
+   return;
+}
+
+
+
+sub debug { $opt_d and print STDERR " # @_\n"; 1 }
+
+INIT {
+   $opt_h and print usage() and exit;
+   $opt_v and print $VERSION and exit;
+}
+
+
+# RESOLVE ELEMENTS
+sub _resolve_elements {
+
+   if( @ARGV and scalar @ARGV  ){
+      @ELEMENTS = @ARGV;
+      debug("initial elements: ".scalar @ELEMENTS);
+      return;
+   }
+
+   my @stdin;
+   while (<>) {
+      my $line = $_;
+      chomp $line;   
+      push @stdin, $line;
+   }
+
+   if( @stdin and scalar @stdin ){
+      @ELEMENTS = @stdin;
+      debug("initial elements: ".scalar @ELEMENTS);
+      return;
+   }  
+
+   debug("initial elements: ". ( scalar @ELEMENTS or die("missing elements\n") ));
+
+   return;
+}
+
+
+sub usage { 
+   q{gbs [OPTION]... LIST...
+Group argument LIST or STDIN by similarity and print to STDOUT.
+
+   -d          debug
+   -h          help   
+   -v          version and exit
+   -s float    min similarity for truth, defaults to 0.8
+   -y          output is YAML dump
+   -b          bash type output, each group is one line, quoted and space separated
+   -g          group lazy (faster)
+   -G          group hard (slow and accurate)
+
+Try 'man gbs' for more info.
+}}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+gbs - group argument LIST or STDIN by similarity and print to STDOUT
+
+=head1 DESCRIPTION
+
+Takes stdin or a list of arguments. This is the LIST.
+We group by similarity.
+Having same list element multiple times is ignored.
+
+Elements are printed in groups separated by two carriage returns.
+Optionally, we output YAML.
+
+=head1 USAGE
+
+gbs [OPTION]... LIST...
+
+   -d          debug
+   -h          help   
+   -v          version and exit
+   -s float    min similarity for truth, defaults to 0.8
+   -y          output is YAML dump
+   -b          bash type output, each group is one line, quoted and space separated
+   -H          group hard (thorough, slow)
+
+   -g          group lazy (faster)
+   -G          group hard (slow and accurate)
+
+=head2 EXAMPLE USAGE
+
+=head3 Group from argument list
+
+   gbs these are words and if they are similar enough they will be matched and grouped
+
+=head3 Group from STDIN
+
+Group filenames by similarity!
+
+   ls ./ | gbs
+   
+   find ~/ -name "*txt" | gbs 
+
+=head3 List filenames by similarity:
+
+   [root@moonshine String-Similarity-Group]# gbs ../*
+   ../excel2txt-0.04
+   ../excel2txt-0.04.tar.gz
+
+   ../file1.pdf
+   ../file2.pdf
+   ../file3.pdf
+
+   ../DMS-WUI-Plugin-Base
+   ../DMS-WUI-Plugin-Tmpl
+   ../DMS-WUI-Plugin-User
+
+   ../temp
+   ../tmp
+
+   ../index.html?parent=747704
+   ../index.html?parent=747704;node_id=3333
+
+
+=head1 SEE ALSO
+
+L<Getopt::Std::Strict>
+
+L<String::Similarity::Group> - parent package.
+
+L<String::Similarity>
+
+=head1 AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+=head1 LICENSE
+
+This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself, i.e., under the terms of the "Artistic License" or the "GNU General Public License".
+
+=head1 DISCLAIMER
+
+This package is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+See the "GNU General Public License" for more details.
+
+=cut
+

@@ -1,0 +1,35 @@
+---
+abstract: 'Run commands and handle their output.'
+author:
+  - 'Dominik Schulz <tex@cpan.org>'
+build_requires:
+  Test::MockObject::Universal: 0
+  Test::More: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.005, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Sys-Run
+requires:
+  Carp: 0
+  File::Blarf: 0
+  File::Temp: 0
+  Log::Tree::RequiredLogger: 0
+  Moose: 0
+  Net::Domain: 0
+  Time::HiRes: 0
+  feature: 0
+  mro: 0
+  namespace::autoclean: 0
+  perl: 5.010_000
+resources:
+  bugtracker: https://github.com/gittex/Sys-Run/issues
+  repository: git://github.com/gittex/Sys-Run.git
+version: 0.16
+x_authority: cpan:TEX

@@ -1,0 +1,11 @@
+Revision history for Perl extension Scalar::Watcher.
+
+0.2.1   2014.10.31
+        Fix document.
+
+0.2     2014.10.31
+        Add method when_destroyed. Add suggestions in the document.
+
+0.1     2014.9.5
+        First version released.
+

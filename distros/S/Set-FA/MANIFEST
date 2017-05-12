@@ -1,0 +1,20 @@
+Changelog.ini
+Changes
+lib/Set/FA.pm
+lib/Set/FA/Element.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+scripts/pod2html.sh
+scripts/synopsis.1.pl
+scripts/synopsis.2.pl
+scripts/synopsis.pl
+t/element.t
+t/fa.ops.t
+t/report.t
+t/set.ops.t
+xt/author/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

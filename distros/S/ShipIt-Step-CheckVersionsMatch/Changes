@@ -1,0 +1,10 @@
+0.02   2008-10-14
+
+- Fixed casing of ShipIt in the POD.
+
+- Fixed handling of a module without a $VERSION.
+
+
+0.01   2008-09-24
+
+- First version, released on an unsuspecting world.

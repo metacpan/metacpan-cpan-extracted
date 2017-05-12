@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:               Sys-Filesystem-MountPoint
+version:            1.02
+abstract:           ~
+author:  []
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:                 1
+    Cwd:                  3
+    Exporter:             5
+    Getopt::Std::Strict:  1.01
+    Sys::Filesystem:      1.22
+    Test::Simple:         0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

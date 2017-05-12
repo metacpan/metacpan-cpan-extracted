@@ -1,0 +1,4 @@
+test: monroe.ok adams.ok jackson.ok
+
+%.ok:
+        touch $TARGET

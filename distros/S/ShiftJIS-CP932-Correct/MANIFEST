@@ -1,0 +1,9 @@
+Changes
+Correct.pm
+Correct/Japanese.pod
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/test.t
+t/whole.t

@@ -1,0 +1,17 @@
+Revision history for Perl module Sub::Quotelike.
+
+0.03  Sun Feb 17 21:25:14 2002
+	- Added doc and tests about exporting quotelike functions
+
+0.02  Sun Oct 21 21:18:27 2001
+	- Added ('') and ("") prototypes
+	- Fix precedence bug
+	- Fix forward declaration bug
+	- Check prototype mismatches
+	- Now uses Text::Balanced
+	- More tests
+
+0.01  Thu Oct 18 10:22:20 2001
+	- original version; created by h2xs 1.21 with options
+		-AX -n Sub::Quotelike
+

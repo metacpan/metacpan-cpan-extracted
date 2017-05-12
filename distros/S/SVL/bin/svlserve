@@ -1,0 +1,102 @@
+#!/usr/bin/perl -w
+use strict;
+use FindBin qw($Bin);
+use Path::Class;
+use lib dir(dir($Bin)->parent, 'lib')->stringify;
+use FindBin qw($Bin);
+use IO::Pipe;
+use POSIX 'SIGTERM';
+use Path::Class;
+use SVL;
+use Sys::HostIP;
+
+my $ua = LWP::UserAgent->new;
+$ua->timeout(5);
+$ua->env_proxy;
+
+my $on_net = $ua->get("http://www.google.com/ncr")->is_success;
+#my $on_net = 0;
+if ($on_net) {
+  print "svlserve: on internet\n";
+} else {
+  print "svlserve: not on internet\n";
+}
+
+# We don't use this for a funky AJAX frontend yet
+#if (fork == 0) {
+#  system("$^X SVL-Client/script/svl_client_server.pl --port $svl_port &");
+#  exit;
+#}
+
+system(
+"svnserve -d --listen-port $SVL::SVNSERVE_PORT --root ~/.svk/svl-share --foreground &"
+  )
+  and die $!;
+die $? if $?;
+
+# kill all processes in this group.
+$SIG{INT} = $SIG{TERM} = sub {
+  $SIG{TERM} = sub { exit };
+  warn "Interrupted\n";
+  kill(-SIGTERM(), $$);
+};
+
+
+# hate!
+$ENV{HOME} ||= ($ENV{HOMEDRIVE} ? dir(@ENV{qw( HOMEDRIVE HOMEPATH )}) : '')
+  || (getpwuid($<))[7];
+$ENV{USER} ||= ((defined &Win32::LoginName) ? Win32::LoginName() : '')
+  || $ENV{USERNAME}
+  || (getpwuid($<))[0];
+my $svkpath = $ENV{SVKROOT} || file($ENV{HOME}, ".svk");
+my $xd = SVK::XD->new(
+  giantlock => file($svkpath, 'lock'),
+  statefile => file($svkpath, 'config'),
+  svkpath   => $svkpath,
+);
+$xd->load();
+$xd->giant_unlock();
+
+my $bonjour = SVL::Bonjour->new;
+my $sharing = SVL::Sharing->new(file($svkpath, 'svl-share'), $xd);
+my $pool    = SVN::Pool->new_default;
+
+my $global_uuid = ($sharing->list)[0]->uuid;
+
+my ($beacon_host, $beacon_port, $opendht);
+if ($on_net) {
+  my $beaconclient = file(file($Bin)->parent, 'lib', 'SVL', 'BeaconClient.pm');
+  my $pipe = IO::Pipe->new;
+  $pipe->reader($^X, $beaconclient, $global_uuid);
+  my $first = <$pipe>;
+  if($first) {
+      ($beacon_host, $beacon_port) =
+	  $first =~ /Remote listening enabled (.+?):(\d+)/;
+      $opendht = SVL::OpenDHT->new();
+  } else {
+      warn "svlserve: No response from beacon";
+  }
+}
+
+
+
+while (1) {
+  $pool->clear;
+  my $i      = 0;
+  my @shares = $sharing->list;
+  my $repos;
+  my $hostip = hostip;
+  foreach my $share (@shares) {
+    $share->host($hostip);
+    $share->port($SVL::SVNSERVE_PORT);
+  }
+  $bonjour->publish(\@shares);
+
+  foreach my $share (@shares) {
+    $share->host($beacon_host);
+    $share->port($beacon_port);
+  }
+  $opendht->publish(\@shares) if $opendht;
+
+  $bonjour->step(5);
+}

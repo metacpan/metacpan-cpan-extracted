@@ -1,0 +1,19 @@
+---
+abstract: 'Get the current subroutine'
+author:
+  - 'Rafael Garcia-Suarez <rgs@consttype.org>'
+build_requires: {}
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Sub-Current
+no_index:
+  directory:
+    - t
+    - inc
+resources:
+  repository: https://github.com/rgs/p5-Sub-Current.git
+version: '0.03'

@@ -1,0 +1,29 @@
+---
+abstract: 'Framework for the daily business scripts'
+author:
+  - 'Matthias Eckardt <me@imunixx.de>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Script-Toolbox
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::Dumper: '2'
+  Fatal: '1'
+  File::stat: '1'
+  IO::Dir: '1'
+  IO::File: '1'
+  Time::ParseDate: '1'
+  UNIVERSAL: '1'
+version: '0.54'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

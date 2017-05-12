@@ -1,0 +1,43 @@
+#!/usr/bin/perl -w
+# $Id: svndump_logfilter 278 2007-01-13 12:37:13Z martin $
+# Copyright (C) 2006 by Martin Scharrer <martin@scharrer-online.de>
+# This is free software under the GPL.
+
+use strict;
+use SVN::Dumpfilter;
+
+my $dumpfile = shift @ARGV;
+my $outfile  = shift @ARGV;
+
+sub logfilter (\%;$);
+
+my $ret = Dumpfilter($dumpfile, $outfile, \&revifilter);
+
+if ($ret) { print STDERR "There were errors!\n"; }
+exit($ret ? 1 : 0);
+
+
+sub revifilter (\%;$)
+ {
+   my $href = shift;
+   my $recalc = shift || 0; # default is 0 because we use '$changed' also, s.b.
+   my $header = $href->{'header'};
+   my $prop   = $href->{'properties'};
+
+   # Just revisions, please (and just above r0, which hasn't a log message)
+   return unless exists $header->{'Revision-number'} && $header->{'Revision-number'} > 0;
+
+   my $changed = ($prop->{'svn:log'} =~ s/\n+\Z//m); # Remove trailing blank line(s)
+
+   if ($recalc || $changed)
+    {
+     svn_recalc_prop_header(%$href);        # call if you changed properties
+    }
+   if ($recalc)
+    {
+     svn_recalc_textcontent_header(%$href); # call if you modified text content
+    }
+ }
+
+
+__END__

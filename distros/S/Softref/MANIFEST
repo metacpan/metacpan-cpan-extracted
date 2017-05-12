@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+Makefile.PL
+Softref.pm
+Softref.xs
+diff_softlink_62
+t/ref.t

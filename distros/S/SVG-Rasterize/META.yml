@@ -1,0 +1,36 @@
+---
+abstract: ~
+author:
+  - 'Lutz Gehlen, C<< <perl at lutzgehlen.de> >>'
+  - 'Lutz Gehlen <perl@lutzgehlen.de>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  SVG: 2.37
+  Test::Exception: 0.27
+  Test::More: 0.80
+  Test::Warn: 0.08
+configure_requires:
+  Cairo: 1.061
+  ExtUtils::MakeMaker: 6.42
+  Pango: 1.220
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: SVG-Rasterize
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+requires:
+  Class::Accessor: 0.30
+  Exception::Class: 1.29
+  Params::Validate: 0.91
+  Scalar::Util: 1.19
+  perl: 5.8.9
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.003008

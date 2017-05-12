@@ -1,0 +1,6 @@
+Version 0.4
+===========
+* Consider making DISTINCT() implemented in a way more similar to COUNT()
+    * No special case in SELECT
+    * Becomes a FieldRole
+* Other aggregate functions

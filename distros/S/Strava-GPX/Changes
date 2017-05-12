@@ -1,0 +1,6 @@
+Revision history for Perl extension Strava-GPX.
+
+0.01  Fri Jul 20 18:00:47 2012
+	- original version; created by h2xs 1.23 with options
+		-X Strava-GPX
+

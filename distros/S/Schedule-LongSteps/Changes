@@ -1,0 +1,140 @@
+==================================================
+Changes from 2016-04-13 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.015 at 2017-04-13 16:24:19 +0000
+------------------------------------------
+
+  Change: 1732f515b9dd1d6dd4afb2409192d14cf053a657
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-04-13 17:21:48 +0000
+
+    Use strict 
+
+------------------------------------------
+version 0.014 at 2016-10-10 14:46:48 +0000
+------------------------------------------
+
+  Change: 8078089b9be76499307c00b4fe044dfcdacbb031
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-10-10 15:46:48 +0000
+
+    Added error trimming 
+
+------------------------------------------
+version 0.013 at 2016-09-30 14:09:44 +0000
+------------------------------------------
+
+  Change: 1763a2c2ff39a050b73dca62d1a83b48be4d028c
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-09-30 15:09:44 +0000
+
+    More robust run grabbing 
+
+------------------------------------------
+version 0.012 at 2016-09-29 15:20:00 +0000
+------------------------------------------
+
+  Change: 0871e571c3963d176e1892d58e19a43800811981
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-09-29 16:20:00 +0000
+
+    Make FOR UPDATE real with a transaction 
+
+------------------------------------------
+version 0.011 at 2016-09-26 17:36:38 +0000
+------------------------------------------
+
+  Change: d9fc6e7ad5b8f5364e583ba2379bf2129af67a01
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-09-26 18:36:38 +0000
+
+    Cache travis 
+
+  Change: 568798474e071c72812e056f99723ace3ca65a2f
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-09-26 18:30:37 +0000
+
+    Fixed AutoDBIx to work when a transaction is started externally on
+    the DBH 
+
+------------------------------------------
+version 0.010 at 2016-07-08 13:45:34 +0000
+------------------------------------------
+
+  Change: 3fbed5b2cfd5b5d7ef8bd40888bed5528bfbf30f
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-07-08 14:45:34 +0000
+
+    Updated README 
+
+  Change: 63e44f11b1aa328906f59f482f3def4465cd720b
+  Author: Jerome Eteve <jeteve@users.noreply.github.com>
+  Date : 2016-07-08 14:44:52 +0000
+
+    Merge pull request #6 from jeteve/issue-5
+
+    Added handling errors with a callback 
+
+  Change: c75378ce206fbba8444719d554b994dcd25b4b03
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-07-08 14:32:41 +0000
+
+    Freeze DBD::mysqld in travis for now 
+
+  Change: 69c1ada75e508af902808db615113271e341d645
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-07-08 14:20:02 +0000
+
+    Added handling errors with a callback 
+
+  Change: f4985aa0b7aace6dd3b366d2b437ee80293d32fa
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-05-25 15:34:10 +0000
+
+    Avoid perl <= 5.12 on travis 
+
+------------------------------------------
+version 0.009 at 2016-05-24 08:40:52 +0000
+------------------------------------------
+
+  Change: 888581957c3fb536a5bd68c48b8e5875a5a53002
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-05-24 09:40:52 +0000
+
+    Test::mysqld doesnt like taint mode 
+
+------------------------------------------
+version 0.008 at 2016-04-13 16:42:45 +0000
+------------------------------------------
+
+  Change: e75b8de59c7d5f3023964b9924286c3b9bea23c1
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-04-13 17:42:45 +0000
+
+    Updated README 
+
+  Change: 2f9d56c887c018bbbb8cf00c9a4c9874d347f52e
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-04-13 17:31:39 +0000
+
+    Protect run_due_processes against bad process classes 
+
+  Change: cb460bd90bb2e4a5661ef67edb0c9b878458615f
+  Author: Jerome Eteve <jeteve@users.noreply.github.com>
+  Date : 2016-02-05 17:25:26 +0000
+
+    Merge pull request #3 from mjemmeson/pod-typo-instantiate
+
+    fix typo in POD 
+
+  Change: c64683b4d2eaa56885fcf28cb0ee2b0fc1587384
+  Author: Michael Jemmeson <mjemmeson@cpan.org>
+  Date : 2016-02-05 16:36:40 +0000
+
+    fix typo in POD 
+
+================================================
+Plus 7 releases after 2016-04-13 00:00:00 +0000.
+================================================

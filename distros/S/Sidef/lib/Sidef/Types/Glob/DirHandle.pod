@@ -1,0 +1,132 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Glob::DirHandle
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = DirHandle.new(...);
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef::Object::Object
+
+=head1 METHODS
+
+
+=head2 call
+
+DirHandle.call() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 chdir
+
+DirHandle.chdir() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 close
+
+DirHandle.close() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 dir
+
+DirHandle.dir() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 each
+
+DirHandle.each() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 entries
+
+DirHandle.entries() -> I<Obj>
+
+Return the
+
+Aliases: I<read_dir>, I<readdir>, I<get_files>
+
+=cut
+
+=head2 iter
+
+DirHandle.iter() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 lstat
+
+DirHandle.lstat() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 read
+
+DirHandle.read() -> I<Obj>
+
+Return the
+
+Aliases: I<get_file>
+
+=cut
+
+=head2 rewind
+
+DirHandle.rewind() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 seek
+
+DirHandle.seek() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 stat
+
+DirHandle.stat() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 tell
+
+DirHandle.tell() -> I<Obj>
+
+Return the
+
+=cut

@@ -1,0 +1,25 @@
+Revision history for Perl extension SMS::Send::RedSMS
+
+1.06 Thu Mar 21 2013
+	- Require an env var to be set for all network-touching tests
+
+1.05 Wed Mar 13 2013
+	- Allowed 2103 Blacklisted as acceptable test response
+
+1.04 Fri Mar 8 2013
+	- Change to clean Module::Install setup
+
+1.03 Fri Mar 8 2013
+	- No user visible changes, repo cleanup work
+
+1.03 Fri Mar 8 2013
+	- Corrected error in README and perldoc
+
+1.02 Fri Mar 8 2013
+	- Fixed omissions where RedSMS -> RedOxygen renaming not applied
+
+1.01 Mon Feb 25 2013
+	- Addressed minor packaging issues
+
+1.00 Tue Feb 19 2013
+	- Completed the first implementation

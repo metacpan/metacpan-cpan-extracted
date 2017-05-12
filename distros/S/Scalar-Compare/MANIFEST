@@ -1,0 +1,7 @@
+Changes
+lib/Scalar/Compare.pm
+Makefile.PL
+MANIFEST
+README
+t/01.t
+META.yml                                 Module meta-data (added by MakeMaker)

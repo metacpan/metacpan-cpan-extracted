@@ -1,0 +1,65 @@
+ 
+TODO
+
+* Build
+    - Win32
+* Paths
+    - Bezier paths
+    - import bezier paths from Inkscape
+    - import polyline path waypoints from Tiled map editor 
+* Easing
+    - stepped retro tween easing
+* Tween Types
+    - angle from/to angle + clockwise/anti
+    - groups sequential and parallel, maybe overload + and *
+    - shake rattling tween- shakes object violently
+    - sprite animation, sprite opacity
+    - move by not move to
+    - rotate/skew/stretch with transform matrix tween
+    - one time tick tween, like timer
+    - delay tween, there just for delaying until completion event
+    - add spawner non-linear ease
+    - seeker direct target should be weak ref and add target dead event
+    - some way to get int tween to clamp when floored for sprite tweens,
+      add clamp arg to int tween and probably round arg
+* Proxy decorators    
+    - SDLx::Rect proxy for 2D paths
+    - face angle for path tweens
+    - add/remove to/from grid cell on move
+* Timeline
+    - elastic speed of time, FFW/REW, seek progress
+    - add pause/resume
+* API
+    - before/after tween delay
+    - allow speed instead of duration
+    - animated role keeps list of animations
+    - or maybe as a trait on a moose attribute, which makes it
+      tweenable
+* Demos
+    - theatrical demo with parallel and sequenced tweens
+    - shape tweening with lots of particls
+    - rain
+    - text typing demo
+    - add fading trails to easing demo
+* Safety
+    - should warn if start/stop tween with destroyed timeline?
+    - float setters should check for int targets and upgrade SV
+    - if you upgrade targets of direct proxy to string
+      (e.g. by Data::Dumpering it) you will never see
+      tween updates. Maybe Devel::Peek it and warn?
+    - solve tween tick destroying tweens issue, multiple tweeners
+      is no solution    
+* Refactor
+    - template specialization on proxies not method overloading
+    - specialize templates for FLOORED in linear tween form
+    - refactor mess in tween factory
+    - move to smart pointer
+* Performance
+    - share polyline paths
+    - pool tweens
+* Accuracy
+    - add spawner skipped waves feature
+    - throw away passing around times, instead cache tick time
+      in clock
+
+

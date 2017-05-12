@@ -1,0 +1,42 @@
+---
+abstract: 'extract the environment from a shell after executing commands'
+author:
+  - 'Diab Jerius, <djerius@cpan.org>'
+build_requires:
+  Env::Path: '0'
+  ExtUtils::MakeMaker: '6.59'
+  File::Spec::Functions: '0'
+  IO::File: '0'
+  Test::More: '0'
+  Test::TempDir::Tiny: '0'
+  Time::Out: '0'
+configure_requires:
+  CPAN::Meta: '0'
+  ExtUtils::MakeMaker: '6.59'
+dynamic_config: '0'
+generated_by: 'Module::Install version 1.16, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Shell-GetEnv
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Expect: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::File: '0'
+  Storable: '0'
+  perl: v5.8.0
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Shell-GetEnv
+  license: http://www.gnu.org/licenses/gpl-3.0.html
+  repository: https://github.com/djerius/shell-getenv
+version: '0.10'
+x_contributors:
+  - "Marty O'Brien <mob@cpan.org>"
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

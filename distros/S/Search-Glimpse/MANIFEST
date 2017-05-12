@@ -1,0 +1,13 @@
+Changes
+Build.PL
+MANIFEST
+README
+t/Search-Glimpse.t
+lib/Search/Glimpse.pm
+lib/Search/Glimpse/Server.pm
+META.yml
+t/pod-coverage.t
+t/pod.t
+META.json
+lib/Search/Glimpse/Index.pm
+t/Glimpseindex.t

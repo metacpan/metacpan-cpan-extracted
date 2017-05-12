@@ -1,0 +1,44 @@
+Revision history for Set::Toolkit
+
+0.11    2010-04-21 09:53:03
+        Fixed some documentation formatting errors.
+
+0.10    2010-04-20 12:19:19
+        I marked this a semi-major change (v0.03 => v0.10) because of the
+        amount of added functionality.  It's like a major minor release =)
+
+        Enhancements:
+          * overloaded @{} so sets can be interpreted as array refs.
+            * full array support for splice, push, pop, shift, unshift, etc.
+            * decided that using the set as an array forces is_ordered to
+              true (because an unordered array is just a set =)
+          * overloaded "" so sets can be interpreted as strings.
+          * overloaded bool so sets can be interpreted in boolean context.
+          * added methods: first, last
+          * generally optimized some of the searching and reporting for speed.
+          * added test cases for the new functionality (I think there are some
+            gaps, but I'm sure I'll come across them and fix them eventually.
+
+        Bug Fixes:
+          * ->size was ignoring is_unique, it's not now.
+          * ->elements was not always taking is_unique into account properly.
+          * fixed an issue that caused test cases not to get uploaded to 
+            cpan properly!
+          * fixed some issues that caused some tests to provide false
+            positives on broken code.
+
+0.03    2010-04-16 22:22:15
+        * Still trying to figure out how to upload to CPAN =)
+
+0.02    2010-04-16 17:30:00
+        * Changed the files and dirs so they aren't world-writable (so I can
+          upload to CPAN).
+
+0.01    2010-04-16 17:00:00
+        * Basic construction
+        * Mixed data-type sets.
+        * Support for fairly complex querying of sets through "search" and
+          "find".
+        * The ability to view sets as ordered or unordered.
+        * The ability to view sets as unique or duplicable.
+

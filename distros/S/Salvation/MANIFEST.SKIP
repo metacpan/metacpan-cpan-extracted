@@ -1,0 +1,9 @@
+^Build$
+^Makefile$
+^_build/
+^blib/
+^.travis.yml$
+^.git/
+^MYMETA.yml$
+^MYMETA.json$
+^README.md$

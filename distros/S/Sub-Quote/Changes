@@ -1,0 +1,8 @@
+Revision history for Sub::Quote
+
+2.003001 - 2016-12-09
+  - fix use of Sub::Name
+
+2.003000 - 2016-12-09
+  - Sub::Quote and Sub::Defer have been split out of Moo.
+  - For old history see: https://metacpan.org/changes/release/HAARG/Moo-2.002005

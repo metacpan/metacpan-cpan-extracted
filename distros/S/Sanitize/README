@@ -1,0 +1,35 @@
+Sanitize version 0.01
+=====================
+
+This module offers simple ways to sanitize or validate string inputs against a number of possible criteria.
+
+Example usage:
+
+use Sanitize;
+print sanitize("This is my ip: 10.0.0.1:80", ip => 1);
+print validate("invalid@email!something", email => 1);
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  none
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2014 by Patrick Lambert
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.16.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

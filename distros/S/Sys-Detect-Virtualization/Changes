@@ -1,0 +1,28 @@
+Revision history for Sys-Detect-Virtualization
+0.107   Tue, 17 Jun 2014 16:14:05 -0500 (dfs)
+	Avoid "Use of uninitizalized value" warning
+	Make virtdetect executable
+
+0.106   Tue, 12 Feb 2013 13:42:47 -0500 (dfs)
+	Add code to detect VirtualBox and LXC Guests.
+
+0.105	Wed, 05 May 2010 10:52:23 -0400 (dmo)
+	Avoid running t/linux_helpers.t if we can't invoke scripts from t/bin
+
+0.104	Wed, 14 Apr 2010 10:43:45 -0400	(dmo)
+	Hide annoying carp/warn output from Parse::DMIDecode unless in verbose
+	mode
+
+0.103	Thu, 01 Apr 2010 09:36:44 -0400 (dmo)
+	Throw away stderr from commands to avoid spewing junk to caller's stderr
+
+0.102	Mon, 29 Mar 2010 10:05:51 -0400	(dmo)
+	Ensure that we search /usr/sbin, /usr/bin, /sbin, and /bin when looking for program
+
+0.101	Tue, 09 Mar 2010 15:11:19 -0500	(dmo)
+	Add preliminary FreeBSD support without much detection ability.
+	Make Parse::DMIDecode optional and used at runtime
+
+0.100   Wed, 24 Feb 2010 13:35:35 -0500 (dmo)
+        First release
+

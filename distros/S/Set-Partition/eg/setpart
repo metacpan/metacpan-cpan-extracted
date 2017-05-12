@@ -1,0 +1,21 @@
+#! /usr/bin/perl -w
+#
+# setpart - example script from the Set-Partition distribution
+#
+# Copyright (c) 2006 David Landgren. All rights reserved.
+
+use Set::Partition;
+
+my $set  = shift || '3:2';
+my $part = [split /:/, $set];
+
+my $nr = 0; $nr += $_ for @$part;
+
+my $s = Set::Partition->new(
+    list      => ['a'..chr($nr+96)],
+    partition => $part,
+);
+
+while (my $p = $s->next) {
+    print join( ' ', map { "[@$_]" } @$p ), $/;
+}

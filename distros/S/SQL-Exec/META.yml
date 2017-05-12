@@ -1,0 +1,32 @@
+--- #YAML:1.0
+name:               SQL-Exec
+version:            0.10
+abstract:           Simple thread and fork safe database access with functionnal and OO interface
+author:
+    - Mathias Kende <mathias@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  6.3002
+build_requires:
+    DBD::SQLite:      0
+    String::Replace:  0
+    Test::Subs:       0
+requires:
+    Carp:                 0
+    DBI:                  0
+    DBI::Const::GetInfoType:  0
+    DBIx::Connector:      0
+    Exporter:             0
+    List::MoreUtils:      0
+    perl:                 5.010001
+    Scalar::Util:         0
+    SQL::SplitStatement:  0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

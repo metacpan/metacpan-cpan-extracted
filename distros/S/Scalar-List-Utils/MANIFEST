@@ -1,0 +1,43 @@
+Changes
+lib/List/Util.pm
+lib/List/Util/XS.pm
+lib/Scalar/Util.pm
+lib/Sub/Util.pm
+ListUtil.xs
+Makefile.PL
+MANIFEST			This list of files
+multicall.h
+ppport.h
+README
+t/00version.t
+t/any-all.t
+t/blessed.t
+t/dualvar.t
+t/first.t
+t/getmagic-once.t
+t/isvstring.t
+t/lln.t
+t/max.t
+t/maxstr.t
+t/min.t
+t/minstr.t
+t/openhan.t
+t/pair.t
+t/product.t
+t/prototype.t
+t/readonly.t
+t/reduce.t
+t/refaddr.t
+t/reftype.t
+t/rt-96343.t
+t/scalarutil-proto.t
+t/shuffle.t
+t/stack-corruption.t
+t/subname.t
+t/sum.t
+t/sum0.t
+t/tainted.t
+t/uniq.t
+t/weak.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

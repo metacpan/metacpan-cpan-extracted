@@ -1,0 +1,8 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+  <SOAP-ENV:Envelope SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:si="http://soapinterop.org/xsd" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="com.logicboxes.foundation.sfnb.order.DomContact">
+    <SOAP-ENV:Body>
+      <impl:addContact>
+        <name xsi:type="xsd:string" >Pavel &amp; Pupkin</name><company xsi:type="xsd:string" >Private person</company><emailAddr xsi:type="xsd:string" >boldin.pavel@gmail.com</emailAddr><address1 xsi:type="xsd:string" >Russian Federation</address1><address2 xsi:type="xsd:string" >Samara city</address2><address3 xsi:type="xsd:string" >Karla-Marksa str 500-4</address3><city xsi:type="xsd:string" >Samara</city><state xsi:type="xsd:string" >Samara</state><country xsi:type="xsd:string" >RU</country><zip xsi:type="xsd:string" >443106</zip><telNoCc xsi:type="xsd:string" >7</telNoCc><telNo xsi:type="xsd:string" >9047454821</telNo><faxNoCc xsi:type="xsd:string" ></faxNoCc><faxNo xsi:type="xsd:string" ></faxNo><customerId xsi:type="xsd:int" >4088541</customerId><type xsi:type="xsd:string" >Contact</type><extraInfo xsi:type="apachesoap:Map" ></extraInfo>
+      </impl:addContact>
+    </SOAP-ENV:Body>
+  </SOAP-ENV:Envelope>

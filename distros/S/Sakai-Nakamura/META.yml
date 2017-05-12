@@ -1,0 +1,14 @@
+--- #YAML:1.0
+ name: Sakai-Nakamura
+ abstract: Perl interface to Sakai Nakamura 
+ version: 0.13
+ author:
+   - Daniel Parry <perl@ddp.me.uk>
+ license: perl
+ distribution_type: module
+ requires:
+   Apache::Sling: 0
+ build_requires:
+   Test: 0
+ urls:
+   license: http://dev.perl.org/licenses/artistic.html

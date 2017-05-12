@@ -1,0 +1,51 @@
+SVN-Notify-Filter-Watchers
+
+This SVN::Notify filter will add recipients from a Subversion property
+value.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+DEPENDENCIES
+
+SVN::Notify:Filter::Watchers has the following dependencies:
+
+    * SVN::Notify
+        Sents Subversion activity notification messages.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc SVN::Notify::Filter::Watchers
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=SVN-Notify-Filter-Watchers
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/SVN-Notify-Filter-Watchers
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/SVN-Notify-Filter-Watchers
+
+    Search CPAN
+        http://search.cpan.org/dist/SVN-Notify-Filter-Watchers
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008-2010 Larry Shatzer, Jr.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

@@ -1,0 +1,6 @@
+Revision history for Perl extension Sys::Syslog::OO.
+
+1.00  Tue Feb 24 12:41:34 2009
+	- original version; created by h2xs 1.23 with options
+		-X Sys::Syslog::OO
+

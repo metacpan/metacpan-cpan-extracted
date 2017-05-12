@@ -1,0 +1,7 @@
+0.11 - Sat Feb  9 18:34:27 2013
+	* First release of the Surveyor::App module to run distributable
+	benchmarks.
+
+0.12 - Fri Jan  3 12:22:42 2014
+	* Get rid of MYMETA
+

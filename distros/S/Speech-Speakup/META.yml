@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec-current.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Speech-Speakup
+version:      1.05
+version_from: Speakup.pm
+installdirs:  site
+requires:
+  Term::ReadKey: 0
+  Term::ReadLine::Gnu: 0
+recommends:
+  Term::Size: 0
+license:      perl
+distribution_type: module
+generated_by: /usr/bin/vim
+

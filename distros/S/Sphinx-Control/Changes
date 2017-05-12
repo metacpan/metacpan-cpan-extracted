@@ -1,0 +1,11 @@
+Revision history for Sphinx-Control
+
+0.03    2008.10.14
+        add run_indexer
+
+0.02    2008.10.06
+        add restart reload
+
+0.01    2008.09.29
+        First version, released on an unsuspecting world.
+

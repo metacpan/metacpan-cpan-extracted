@@ -1,0 +1,50 @@
+Search-QueryParser version 1.0
+==============================
+
+This module parses a query string into a data structure to be handled
+by external search engines.  For examples of such engines, see
+File::Tabular and Search::Indexer.
+
+The query string can contain simple terms, "exact phrases", field
+names and comparison operators, '+/-' prefixes, parentheses, and
+boolean connectors.
+
+The parser can be parameterized by regular expressions for specific
+notions of "term", "field name" or "operator" ; see the "new"
+method. The parser has no support for lemmatization or other term
+transformations : these should be done externally, before passing the
+query data structure to the search engine.
+
+The data structure resulting from a parsed query is a tree of terms
+and operators, as described in the "parse" method.  The interpretation
+of the structure is up to the external search engine that will receive
+the parsed query ; the present module does not make any assumption
+about what it means to be "equal" or to "contain" a term.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None 
+
+RELATED MODULES
+
+File::Tabular (management of flat text files containg data organised
+in rows and columns) and Search::Indexer (full-text indexing)
+make use of the present module.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Laurent Dami.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+

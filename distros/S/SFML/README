@@ -1,0 +1,83 @@
+perl-sfml v0.0101 (SFML v2.0)
+==============================
+
+This project aims to provide perl bindings to the SFML library.
+
+www.sfml-dev.org/
+
+INSTALLATION
+
+This module should work on any system that SFML does, including but
+not limited to:
+	Linux
+	MacOSX
+	Windows
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Alien::SFML
+A windowing environment (the module may install without one, but you
+	do so at your own risk!)
+OpenGL/POGL (if you want to be able to render stuff using raw OpenGL)
+
+COPYRIGHT AND LICENCE
+
+See the LICENCE file
+
+ ############################################
+ # Copyright 2013 Jake Bott, Georgiy Tugai. #
+ #=>--------------------------------------<=#
+ #  All Rights Reserved. Part of perl-sfml  #
+ ############################################
+
+TODO
+
+- [HIGH] Add in EXPORT_OK stuff and related
+- [MED ] Split XS into multiple modules
+- [MED ] Add XS for audio module
+- [HIGH] Add more tests
+
+So far, only the Window and Graphics modules of SFML has been implemented.
+
+The Audio module is coming (hopefully) (maybe) pretty soonish.  Feel free to
+pester me for it if you really want it.
+
+The System and Network modules have not and *will not* be implemented
+due to their functions being pretty similar to existing perl modules
+that do the same job just as well.  If you feel the need for the use
+of one of these modules, you will need to follow these few simple steps:
+	1) Clone the project on Github
+	2) Add in the required code
+	3) Send me a pull request
+	4) Wait for the merge to be merged
+	5) Install and use the modules!
+
+RECENT CHANGES
+
+V0.01
+	Everything!
+V0.0101
+	Added in Alien::SFML to BUILD_REQUIRES so it actually works...
+V0.0102
+	Fixed the bug that V0.0101 was actually meant to fix...
+
+BUGS AND FEATURE REQUESTS
+
+Do you see bugs?  I see no bugs.
+
+https://github.com/jakeanq/perl-sfml/issues if you have better eyesight...
+
+Unless you really mean a bug in SFML itself, in which case:
+
+http://www.sfml-dev.org/
+
+The more logs, the merrier!

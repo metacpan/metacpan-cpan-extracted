@@ -1,0 +1,6 @@
+It's a Spoon templating module that uses Mason.
+
+perl Build.PL
+./Build
+./Build test
+./Build install

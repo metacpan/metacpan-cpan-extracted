@@ -1,0 +1,27 @@
+--- #YAML:1.0
+name:               Sub-Assert
+version:            1.23
+abstract:           Subroutine pre- and postconditions, etc.
+author:
+    - Steffen Mueller <smueller@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:        0
+    Exporter:    0
+    perl:        5.006
+    Test::More:  0
+resources:
+    repository:  http://svn.ali.as/cpan/trunk/Sub-Assert
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

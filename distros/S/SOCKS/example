@@ -1,0 +1,51 @@
+#!/usr/local/bin/perl -w
+
+use strict;
+
+use Net::SOCKS;
+
+print "Attempting to connect to 192.168.1.3 at port 79 using the socks\n";
+print "server at 192.168.1.3 port 1080\n";
+
+my $sock = new Net::SOCKS(socks_addr => '192.168.1.3',
+		socks_port => 1080,
+		#user_id => 'the_user',
+		#user_password => 'the_password',
+		#force_nonanonymous => 1, 
+		protocol_version => 5);
+my $f= $sock->connect(peer_addr => '192.168.1.3', peer_port => 79);
+print "connect status: ",
+	Net::SOCKS::status_message($sock->param('status_num')), "\n";
+
+if ($sock->param('status_num') == SOCKS_OKAY) {
+  print $f "clintdw\n";
+  while (<$f>) { print }
+  $sock->close();
+}
+
+print "Attempting to listen() using the server at 192.168.1.3 port 1080\n";
+
+$sock = new Net::SOCKS(socks_addr => '192.168.1.3',
+		socks_port => 1080,
+		#user_id => 'the_user',
+		#user_password => 'the_password',
+		#force_nonanonymous => 1, 
+		protocol_version => 5);
+
+my ($ip, $ip_dot_dec, $port) = $sock->bind(peer_addr => "192.168.1.3",
+			peer_port => 9999);
+print "bind status: ",
+	Net::SOCKS::status_message($sock->param('status_num')), "\n";
+
+if ($sock->param('status_num') == SOCKS_OKAY) {
+  print "Listening at the IP of ", $ip_dot_dec, " at port ", $port, "\n";
+  $f= $sock->accept();
+}
+print "accept status: ", 
+	Net::SOCKS::status_message($sock->param('status_num')), "\n";
+
+if ($sock->param('status_num') == SOCKS_OKAY) {
+  while (<$f>) { print }
+}
+$sock->close();
+

@@ -1,0 +1,46 @@
+{
+   "abstract" : "Perl tools for Starlink's AST library",
+   "author" : [
+      "Graham Bell <g.bell@jach.hawaii.edu>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Starlink-ATL",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Astro::Coords" : "0.18"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Starlink::AST" : "1.02"
+         }
+      }
+   },
+   "provides" : {
+      "Starlink::ATL::Region" : {
+         "file" : "lib/Starlink/ATL/Region.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.gnu.org/licenses/gpl-3.0.txt"
+      ]
+   },
+   "version" : "0.04"
+}

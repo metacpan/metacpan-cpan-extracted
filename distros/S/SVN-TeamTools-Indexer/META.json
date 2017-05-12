@@ -1,0 +1,97 @@
+{
+   "abstract" : "SVN::TeamTools::Indexer creates and updates a Lucy index for SubVersion repositories",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "SVN-TeamTools-Indexer",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CGI" : "0",
+            "Module::Build" : "0.40",
+            "Time::HiRes" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "DateTime" : "0",
+            "Error" : "0",
+            "Exporter" : "0",
+            "File::Path" : "0",
+            "Getopt::Long" : "0",
+            "HTML::Template" : "0",
+            "List::Util" : "0",
+            "Log::Dispatch::File" : "0",
+            "Log::Log4perl" : "0",
+            "Lucy" : "0",
+            "LucyX::Search::Filter" : "0",
+            "Module::Build" : "0",
+            "Net::SMTP" : "0",
+            "SVN::Look" : "0",
+            "URI::Escape" : "0",
+            "XML::Simple" : "0",
+            "perl" : "v5.8.8"
+         }
+      }
+   },
+   "provides" : {
+      "PrefixCompiler" : {
+         "file" : "lib/SVN/TeamTools/Index/PrefixQuery.pm",
+         "version" : 0
+      },
+      "PrefixMatcher" : {
+         "file" : "lib/SVN/TeamTools/Index/PrefixQuery.pm",
+         "version" : 0
+      },
+      "SVN::TeamTools::Index::Index" : {
+         "file" : "lib/SVN/TeamTools/Index/Index.pm",
+         "version" : "0.002"
+      },
+      "SVN::TeamTools::Index::PrefixQuery" : {
+         "file" : "lib/SVN/TeamTools/Index/PrefixQuery.pm",
+         "version" : "0.002"
+      },
+      "SVN::TeamTools::Indexer" : {
+         "file" : "lib/SVN/TeamTools/Indexer.pm",
+         "version" : "0.002"
+      },
+      "SVN::TeamTools::Plugins::Mailer" : {
+         "file" : "lib/SVN/TeamTools/Plugins/Mailer.pm",
+         "version" : "0.002"
+      },
+      "SVN::TeamTools::Store::Config" : {
+         "file" : "lib/SVN/TeamTools/Store/Config.pm",
+         "version" : "0.002"
+      },
+      "SVN::TeamTools::Store::Repo" : {
+         "file" : "lib/SVN/TeamTools/Store/Repo.pm",
+         "version" : "0.002"
+      },
+      "SVN::TeamTools::Store::SvnIndex" : {
+         "file" : "lib/SVN/TeamTools/Store/SvnIndex.pm",
+         "version" : "0.002"
+      },
+      "resultArr" : {
+         "file" : "lib/SVN/TeamTools/Index/Index.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/gpl-license.php"
+      ]
+   },
+   "version" : "0.002"
+}

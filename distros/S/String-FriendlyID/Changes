@@ -1,0 +1,29 @@
+Revision history for String-FriendlyID
+
+0.01    July 26, 2010
+        First version, released on an unsuspecting world.
+0.011   July 26, 2010
+        Modified POD errors
+0.012   July 27, 2010
+        Modified POD errors
+0.013   July 27, 2010
+        Modified POD errors
+        Added if Numerical String or Number checking
+0.014   July 28, 2010/20:21
+        Modified Description for better searchability
+        Modified this changelog 
+0.015   July 29, 2010/02:26
+        Modified Description for better searchability, seems theres a limit need to paraphrase or something
+0.016   July 30, 2010/20:12
+        Fix pod typos
+        Add tests
+0.017   Aug 9, 2010/20:00
+        Add tests 01-functionality.t
+        Forgot in MANIFEST
+0.018   Aug 20, 2010/19:38
+        Fix cpan bug #60330
+        Forgot in MANIFEST
+0.019   Oct 11, 2011/11:12
+        Switched to Mouse, made code resizing dynamic via method size
+1.000   November 7, 2016
+        Removed 'no Moose' to lose Moose Dependency

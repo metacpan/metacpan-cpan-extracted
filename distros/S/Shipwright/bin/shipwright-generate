@@ -1,0 +1,84 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Cwd;
+use File::Temp 'tempdir';
+use File::Spec::Functions 'catdir', 'catfile', 'file_name_is_absolute';
+use IPC::Run3;
+use File::Which 'which';
+my $cwd = getcwd;
+
+my $USAGE = <<'END'
+run: shipwright-generate
+
+this script actually does 3 things, i.e.
+`shipwright create`, `shipwright import` and `shipwright-utility --generate-tar-file ...`
+
+If you don't want to keep a repo and just want the tarball, this script is for you!
+
+Arguments are the same as `shipwright import` without --log... and --repository.
+It also has two extra options: --help(-h) and --output(-o) outputfile.
+-h is to show this usage, -o is to specify the file to write to.
+
+Examples:
+
+to generate an install file for Plack and all its dependencies to /tmp/plack.pl:
+    $ shipwright-generate cpan:Plack -o /tmp/plack.pl
+
+to install Jifty to current perl without all its recommendations:
+    $ shipwright-generate cpan:Jifty --skip-all-recommends | perl - --no-install-base --skip-test
+
+END
+;
+
+if ( !@ARGV || grep { /-?-h(?:elp)?/ } @ARGV ) {
+    print $USAGE;
+    exit 0;
+}
+
+my $tarfile = '-';
+
+my $found_tarfile;
+my @argv;
+for my $arg ( @ARGV ) {
+    if ( $arg =~ /-?-o(?:utput)?/ ) {
+        $found_tarfile = 1;
+        next;
+    }
+    elsif ( $found_tarfile ) {
+        $tarfile = $arg;
+        $tarfile = catfile( $cwd, $tarfile ) unless file_name_is_absolute($tarfile);
+        undef $found_tarfile;
+        next;
+    }
+    else {
+        push @argv, $arg;
+    }
+}
+
+my $parent_dir = tempdir( CLEANUP => 1, TEMPDIR => 1 );
+my $dir = catdir( $parent_dir, 'fs' );
+$ENV{SHIPWRIGHT_REPOSITORY} = "fs:$dir";
+my ( $out, $err );
+
+my $shipwright = which('shipwright')
+  or die "didn't find full path of shipwright cmd";
+run3([$^X, $shipwright, 'create'], undef, \$out, \$err );
+if ( $? ) {
+    print $out;
+    die "failed to create shipwright repo: $err";
+}
+
+run3([$^X, $shipwright, 'import', @argv], undef, \$out, \$err);
+if ( $? ) {
+    print $out;
+    die "failed to import shipwright repo: $err";
+}
+
+chdir $dir;
+$tarfile =~ s/'/\\'/g;
+system("$^X bin/shipwright-utility --generate-tar-file '$tarfile'")
+  && die "failed to generate tar file: $!";
+chdir $cwd;
+

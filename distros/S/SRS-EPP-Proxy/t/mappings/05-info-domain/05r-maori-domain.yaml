@@ -1,0 +1,16 @@
+# Test info domain on a maori.nz (which returns DomainNameUnicode attribute)
+template: info-domain.tt
+
+vars:
+  domain_name: 05p.co.te
+
+input_assertions:
+  class: SRS::EPP::Command::Info::Domain
+
+output_assertions:
+  count:
+    - [ '//epp:resData', 1, 'EPP: Check for resData' ]
+  match:
+  match_all:
+  attr_is:
+    - [ '//epp:result', 'code', 1000, 'EPP: command ok' ]

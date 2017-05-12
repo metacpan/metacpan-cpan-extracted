@@ -1,0 +1,72 @@
+This is the README file for Software::Packager, the Perl module for creation
+of software installation packages.
+This is Alpha software it may or may not do anything. The API is subject to
+change. 
+This module comes with NO WARRANTY.
+
+INSTALLATION
+Software::Packager uses the standard perl module install process
+
+perl Makefile.PL
+make
+make test [TEST_VERBOSE=1] (optional but recommended) 
+make install
+
+DESCRIPTION
+If you release software for a range of platforms then this is the module for
+you.  Software::Packager is the base module for suite of Perl modules providing
+a common interface for the creation of platform specific software installation
+packagers.
+From version 0.05 you also need to install the Software::Packager module for
+the platform you require.
+
+This module does not do the packaging of the software but is merely a wrapper
+around the various software packaging tools already provided with various
+operating systems.
+
+The file example/example.pl contains an example of how this module can be used.
+
+WHY ANOTHER PACKAGE CREATION SYSTEM?
+There so many different ways to create installation media these days. There are
+platform specific formats for all the UNIX operating systems and then there are
+different formats for different distributions of the same operating system. 
+If you take Linux for example.
+ RedHat has RPM (RedHat Package Manager)
+ Debian has dpkg (Debian Package Manager?)
+ Slackware has yet another format.
+No doubt there are more.
+Microsoft Windows is no better.
+
+So as a developer how so you create software and install in on many platforms?
+Like many companies do you could create you own installation system.
+That sounds fine. Go ahead and write one in Java, and you can create
+installation media for any platform that supports Java.
+Sounds like a good idea doesn't it? Wrong. By doing this you just make a big
+job for yourself and the world a harder place to work in for developers like you
+and me.
+
+What should you do as a developer?
+you should create you installation media in the format that the various
+operating systems use.
+This until now, ment creating scripts for every packaging system that you were
+going to release on to create the media.
+
+With Software::Packager you only need to create one script and run it on the
+various operating systems that you want to release your software on. It's as
+easy as that.
+Granted you might need to do things slightly different on each platform but
+these that is only necessary if you are doing advanced tasks.
+In time these may even be removed as Software::Packager evolves.
+
+HOMEPAGE
+
+http://bernard.gondwana.com.au
+
+AUTHOR
+R Bernard Davison <rbdavison@cpan.org>
+
+COPYRIGHT
+Copyright (c) 2001 R Bernard Davison. All rights reserved.
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+

@@ -1,0 +1,42 @@
+{
+   "abstract" : "Get IP/IPList Info (location, as number, etc)\r",
+   "author" : [
+      "Abby Pan <abbypan@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Simple-IPInfo",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Validate::IP" : "0",
+            "JSON" : "0",
+            "Net::CIDR" : "0",
+            "SimpleR::Reshape" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/abbypan/Simple-IPInfo.git",
+         "web" : "https://github.com/abbypan/Simple-IPInfo"
+      }
+   },
+   "version" : "0.11",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

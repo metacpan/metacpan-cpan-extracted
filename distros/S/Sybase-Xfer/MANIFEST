@@ -1,0 +1,9 @@
+COPYRIGHT
+LICENSE
+MANIFEST
+Makefile.PL
+ObjectInfo.pm
+README
+Xfer.pm
+sybxfer
+test.pl

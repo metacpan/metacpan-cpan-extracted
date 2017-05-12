@@ -1,0 +1,40 @@
+---
+abstract: 'The functions to limit the scope.'
+author:
+  - 'Pine Mizune'
+build_requires:
+  Test::MockObject: '1.20150527'
+  Test::More: '1.001014'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150001'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Scope-UndefSafe
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Scope::UndefSafe:
+    file: lib/Scope/UndefSafe.pm
+    version: '0.03'
+requires:
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/pine/p5-Scope-UndefSafe/issues
+  homepage: https://github.com/pine/p5-Scope-UndefSafe
+  repository: git://github.com/pine/p5-Scope-UndefSafe.git
+version: '0.03'
+x_authority: cpan:PINE
+x_contributors:
+  - 'Pine Mizune <pinemz@gmail.com>'

@@ -1,0 +1,287 @@
+=head1 NAME
+
+SPOPS::Manual::ImportExport - Moving data (and more) with SPOPS
+
+=head1 SYNOPSIS
+
+This part of the SPOPS manual describes how to get data in and out of
+SPOPS datasources, and also how to create portable database
+structures.
+
+=head1 DESCRIPTION
+
+Once you can retrofit object-oriented access and behaviors on top of
+existing datasources, the world is your oyster, right?
+
+Except...
+
+Getting data in and out of these datasources can prove an issue. One
+of the benefits of SPOPS is that databases become more transparent --
+you don't really care what the data are stored on, just that you can
+access it.
+
+Of course, one of the downsides of this transparency is that you might
+actually take advantage of it! Being able to move from MySQL to
+PostgreSQL maybe become much more important, particularly if you're
+consolidating disparate datasources to one or two.
+
+To get around this fact, SPOPS (as of 0.55) comes with importing
+and exporting capabilities. And, of course, it's fairly simple for you
+to extend these capabilities and create your own.
+
+This manual section describes the basics of getting data in and out
+(with examples) and along the way points out ways you can extend it. 
+
+=head1 IMPORTING
+
+There are two types of importing we'll talk about: data and
+structures. Currently the only structural support is for DBI database
+tables, but the framework exists for other datastores.
+
+=head2 Importing Data
+
+No better way to introduce a topic than show working code, so here's a
+simple example of a script to import data:
+
+  1: #!/usr/bin/perl
+  2: 
+  3: use strict;
+  4: use SPOPS::Import;
+  5: use SPOPS::Initialize;
+  6: 
+  7: {
+  8:     SPOPS::Initialize->process({ filename => 'spops.conf' });
+  9:     my $import = SPOPS::Import->new( 'object' )
+ 10:                               ->data_from_fh( \*DATA );
+ 11:     my $status = $import->run;
+ 12:     foreach my $item ( @{ $status } ) {
+ 13:         print "Status for $item->[1][0]: ";
+ 14:         if ( $item->[0] ) { print "OK\n" }
+ 15:         else              { print "FAILED ($item->[2])\n" }
+ 16:     }
+ 17: }
+ 18: 
+ 19: __DATA__
+ 20: $item = [
+ 21:   { spops_class => 'My::Doodad',
+ 22:     field_order => [ qw/ name description unit_cost factory created_by / ] },
+ 23:   [q{Amazing Melonhead}, q{Spits seeds}, q{100.75}, q{Saskatoon, Saskatchewan, Canada}, q{2}],
+ 24:   [q{Dipsy Doodler}, q{Who knows?}, q{5.00}, q{Chicago, Illinois, USA}, q{2}],
+ 25:   [q{Greg Kihn Band}, q{I lost on Jeopardy}, q{11.99}, q{Topeka, Kansas, USA}, q{2}]
+ 26: ];
+
+As seen here, there are three main steps to importing:
+
+=over 4
+
+=item 1.
+
+B<Create an importer object>. Instantiating the import object must
+include at least the type of import you will be performing.
+
+In the example, we set the type of import we're doing with the
+parameter 'object' passed into the C<new()> method.
+
+=item 2.
+
+B<Set properties for the importer object>. The importer object needs
+to know some basic information about what you're importing. At a
+minimum, it needs the SPOPS object class and the data you're
+importing. Different types of imports may need additional information
+as well.
+
+In the example, we read the properties for the object from a
+filehandle using the C<data_from_fh()> method.
+
+=item 3.
+
+B<Run the import>. Every import subclass includes the C<run()> method,
+which actually performs the import. Until you execute C<run()>, no
+data are written to the datasource.
+
+=back
+
+No matter what the import format, you will always need to execute
+these three steps. The first two can be combined, either explicitly as
+we did in the example or by passing the properties to the C<new()>
+method.
+
+Currently SPOPS data import options are:
+
+=over 4
+
+=item *
+
+B<object> - Define the SPOPS class and data to fill them; see L<SPOPS::Import::Object>
+
+=item *
+
+B<dbdata> - Import DBI data directly to a table; see L<SPOPS::Import::DBI::Data>
+
+=item *
+
+B<dbupdate> - Update data in a DBI table directly; see L<SPOPS::Import::DBI::Update>
+
+=item *
+
+B<dbdelete> - Delete data from a DBI table; see L<SPOPS::Import::DBI::Delete>
+
+=back
+
+=head2 Importing DBI Tables
+
+Another goal of SPOPS importing and exporting is to make the
+structures the datasources use portable as well. SPOPS has
+support for simplistic generic DBI table importing. It uses keys
+in the CREATE TABLE SQL statement and replaces them with
+database-dependent structures.
+
+One of the most common uses of this is to create a table that supports
+an 'auto-incrementing' field on different databases. Since databases
+use very different schemes for generating this value, it's abstracted
+into a key that's replaced on import.
+
+For instance, take this basic table:
+
+  1: CREATE TABLE user (
+  2:   user_id      %%INCREMENT%%,
+  3:   login_name   varchar(50) not null,
+  4:   email        varchar(75) not null,
+  5:   primary key( user_id ) 
+  6: )
+
+When we run the import the %%INCREMENT%% key gets translated to a
+database-specific expression. In MySQL it would be 'INT NOT NULL
+AUTO_INCREMENT' and in PostgreSQL it would be 'SERIAL'.
+
+You can also add your own translation behaviors. For instance, you can
+create a central datastore for datatypes in your application:
+
+  1: address     varchar(100)
+  2: email       varchar(75)
+  3: phone       varchar(25)
+  4: city        varchar(40)
+  5: postal      varchar(12)
+
+And then you'd create a custom behavior and add it to the import
+routine as in this example:
+
+  1: #!/usr/bin/perl
+  2: 
+  3: use strict;
+  4: use SPOPS::Import;
+  5: 
+  6: my %DATATYPES = initialize_datatypes();
+  7: 
+  8: {
+  9:     my $table_import = SPOPS::Import->new( 'table' );
+ 10:     $table_import->database_type( 'mysql' );
+ 11:     $table_import->print_only( 1 );
+ 12:     $table_import->transforms([ \&my_transform ]);
+ 13:     $table_import->read_table_from_file( 'ie_import_table_custom_before' );
+ 14:     $table_import->run;
+ 15: }
+ 16: 
+ 17: sub my_transform {
+ 18:     my ( $self, $sql, $importer ) = @_;
+ 19:     foreach my $datatype ( keys %DATATYPES ) {
+ 20:         $$sql =~ s/%%$datatype%%/$DATATYPES{ $datatype }/g;
+ 21:     }
+ 22: }
+ 23: 
+ 24: 
+ 25: sub initialize_datatypes {
+ 26:     my %h = ();
+ 27:     open( DT, "ie_import_table_datatypes" )
+ 28:         || die "Cannot import datatypes: $!";
+ 29:     while ( <DT> ) {
+ 30:         chomp;
+ 31:         s/^\s+//;
+ 32:         s/\s+$//;
+ 33:         my ( $datatype, $sql ) = split /\s+/, $_, 2;
+ 34:         $h{ uc $datatype } = $sql;
+ 35:     }
+ 36:     return %h;
+ 37: }
+
+So that a table definition like:
+
+  1: CREATE TABLE address (
+  2:   address_id   %%INCREMENT%%,
+  3:   company      varchar(50) null,
+  4:   address1     %%ADDRESS%% null,
+  5:   address2     %%ADDRESS%% null,
+  6:   city         %%CITY%% null,
+  7:   state        char(2) null,
+  8:   postal       %%POSTAL%% null
+  9:   email        %%EMAIL%% null,
+ 10:   main_phone   %%PHONE%% not null,
+ 11:   main_fax     %%PHONE%% null,
+ 12:   mobile_phone %%PHONE%% null,
+ 13:   primary key ( address_id )
+ 14: )
+
+would become:
+
+  1: CREATE TABLE address (
+  2:   address_id   INT NOT NULL AUTO_INCREMENT,
+  3:   company      varchar(50) null,
+  4:   address1     varchar(100) null,
+  5:   address2     varchar(100) null,
+  6:   city         varchar(40) null,
+  7:   state        char(2) null,
+  8:   postal       varchar(12) null
+  9:   email        varchar(75) null,
+ 10:   main_phone   varchar(25) not null,
+ 11:   main_fax     varchar(25) null,
+ 12:   mobile_phone varchar(25) null,
+ 13:   primary key ( address_id )
+ 14: )
+
+It's not as powerful as custom datatypes -- with inheritance and
+dynamic schema updating capabitility -- but it's still very useful to
+enforce data standards within and across applications. (Besides, how
+often do you modify the schema once something is created?)
+
+See L<SPOPS::Import::DBI::Table|SPOPS::Import::DBI::Table> for the
+currently supported keys.
+
+=head1 EXPORTING
+
+Exporting data and importing data are slightly different. With
+importing, you do everything required in the C<run()> method. With
+exporting, the parent class defines the C<run()> method but triggers
+callbacks in the process. Each callback returns content which gets
+concatendated together to form the set of exported objects.
+
+These callbacks are:
+
+B<create_header>
+
+Only called once before any records have been processed.
+
+B<create_record>
+
+Called for each record.
+
+B<create_footer>
+
+Only called once after all the records have been processed.
+
+The export implementation is free to use these how it sees fit. For
+instance, the L<SPOPS::Export::Perl|SPOPS::Export::Perl> just keeps a
+copy of every object it sees and then dumps them all with a single
+call to L<Data::Dumper|Data::Dumper> in the B<create_footer>
+callback. (Due to memory issues, you'd probably want to modify this if
+you were exporting hundreds of thousands of records. But it's just an
+example.)
+
+=head1 COPYRIGHT
+
+Copyright (c) 2001-2004 Chris Winters. All rights reserved.
+
+See L<SPOPS::Manual|SPOPS::Manual> for license.
+
+=head1 AUTHORS
+
+Chris Winters E<lt>chris@cwinters.comE<gt>

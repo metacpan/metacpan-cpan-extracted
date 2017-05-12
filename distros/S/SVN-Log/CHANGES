@@ -1,0 +1,21 @@
+[ Changes for 0.03 ]
+
+* $start and $end can now take 'HEAD' as a parameter, indicating the
+  repository's youngest revision.
+
+* Fix a bug introduced in 0.02 -- don't use SVN Core APIs when the core
+  isn't available.  Change the 'paths' key in results returned by
+  retrieve() to be agnostic of the backend.
+
+[ Changes for 0.02 - Dec 20, 2005 ]
+
+* Update to use the new svn_ra_get_log() API.
+
+* Maintainership handed to Nik Clayton.
+
+[ Changes for 0.01 - Jun 14, 2004 ]
+
+* Fixed bug in command line client log parsing that was causing us to skip
+  revisions in some cases.  Man that was stupid.
+* Extracted from SVN::Log::Index by Richard Clamp, then extensively modified 
+  by Garrett Rooney.

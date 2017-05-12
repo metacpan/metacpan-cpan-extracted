@@ -1,0 +1,24 @@
+		       Stem::AsyncIO Design Notes
+
+The Stem::AsyncIO module provides a buffered I/O interface to sockets
+and process handles. It is used by a variety of modules such as
+Stem::Proc, Stem::SockMsg, Stem::Portal::Stream to do the common
+function of doing their buffered I/O.
+
+The constructor takes an owner object and up to 3 handles: input, output
+and stderr (for processes). The input and stderr handles are monitored
+with read events and when data is available, it is read and a callback
+is made to the owner object with the data as its argument.
+
+The write handle is fully buffered and the module provides non-blocking
+asynchronous output to it. Data to be sent to the handle is passed in
+with the write method. If there is any output data buffered, a write
+event monitors the handle and triggers a callback when data can be
+written to it. The callback writes as much data as possible to the write
+handle.
+
+If the read or stderr handle is being used and it is closed (the socket
+is disconnected or the process exits), this is detected and a callback
+to the owner object is made.
+
+This module is only used internally and should not be configured.

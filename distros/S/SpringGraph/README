@@ -1,0 +1,37 @@
+SpringGraph version 0.02
+========================
+
+SpringGraph.pm is a rewrite of the springgraph.pl script, which provides 
+similar functionality to Neato and can read some/most dot files.
+ 
+The goal of this module is to provide a compatible interface to VCG
+and/or GraphViz perl modules on CPAN. This module will also provide
+some extra features to provide more flexibility and power.
+
+This module is still experimental and is moving quickly away from the
+original springgraph.pl code. It is likely to be rewritten from basic principles
+in the near future to remove some of the quirks inherent in the Autodia and
+springgraph.pl code used.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  GD
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Aaron Trevena
+Based on springgraph.pl by Darxus, original parts copyright 2003 Darxus
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms of the GNU GPL.

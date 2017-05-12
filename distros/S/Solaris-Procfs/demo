@@ -1,0 +1,101 @@
+#!/u0/perl/perl580/bin/perl -w
+
+use ExtUtils::testlib;
+use Solaris::Procfs;
+use Solaris::Procfs::Filesystem;
+use Data::Dumper;
+use lib '.';
+
+my $debuglevel = shift @ARGV;
+$Solaris::Procfs::DEBUG = defined $debuglevel ? $debuglevel : 1;
+
+use strict;
+
+$|++;
+
+#------------------------------------------------------------
+my (%funcs,@funcs);
+
+@funcs = qw(
+
+	auxv cwd fd lpsinfo lstatus lusage lwp map xmap 
+	prcred psinfo status rmap root sigact status usage
+);
+foreach (@funcs) { $funcs{$_} = 1; }
+
+
+#------------------------------------------------------------
+local($,) = ' ';
+my $helpmsg = (sprintf(<<EOM));
+
+This is a demo script for Solaris::Procfs.  Enter one of the following
+function names plus a pid to see the demo.  Enter 'h' or 'help' to 
+display this message again.  Enter 'q' or 'quit' to quit. 
+
+So, for example, enter 'cwd 250' to get the current working directory
+of process id 250.
+EOM
+
+my $prompt = (sprintf(<<EOM));
+
+@funcs
+
+Enter now ("function pid"):  
+EOM
+
+chomp($prompt);
+
+
+#------------------------------------------------------------
+print $helpmsg;
+print $prompt;
+
+my $p = new Solaris::Procfs::Filesystem;
+
+COMMAND: while (<>) {
+
+	next COMMAND unless defined($_) and $_ =~ /\S/;
+
+	exit(0) if /(quit|exit|^q)/;
+
+	if ( /(help|^h)/ ) { print $helpmsg; next; }
+
+	s/^\s*//;
+	s/\s*$//;
+	my @in = split /\s+/, $_, 2;
+
+	$in[0] = $$ if defined $in[0] and $in[0] eq '$$';
+	$in[1] = $$ if defined $in[1] and $in[1] eq '$$';
+
+	if ($in[0] =~ /TTY/) {
+
+		print Data::Dumper->Dump( [ \%Solaris::Procfs::TTYDEVS ] );
+		next COMMAND;
+	}
+
+	if (scalar @in > 2) { print $helpmsg; next; }
+
+	unless ( 
+		$in[0] =~ /^\d+$/ and defined $funcs{$in[1]} or 
+		$in[1] =~ /^\d+$/ and defined $funcs{$in[0]} 
+	) { print $helpmsg; next; }
+
+	my ($pid,$func);
+
+	if ($in[0] =~ m/^\d+$/) {
+
+		($pid,$func) = @in;
+	} else {
+		($pid,$func) = reverse @in;
+	}
+
+	print "Dumping $func($pid):\n";
+	print Data::Dumper->Dump( [ $p->{$pid}->{$func} ] );
+
+} continue {
+
+	print $prompt;
+}
+
+exit(0);
+

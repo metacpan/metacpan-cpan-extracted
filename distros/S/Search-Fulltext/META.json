@@ -1,0 +1,83 @@
+{
+   "abstract" : "Fulltext search module",
+   "author" : [
+      "Sho Nakatani <lay.sakura@gmail.com>, a.k.a. @laysakura"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.7.5",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Search-Fulltext",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "DBD::SQLite" : "1.30_01",
+            "DBI" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Search::Fulltext" : {
+         "file" : "lib/Search/Fulltext.pm",
+         "version" : "1.03"
+      },
+      "Search::Fulltext::SQLite" : {
+         "file" : "lib/Search/Fulltext/SQLite.pm"
+      },
+      "Search::Fulltext::TestSupport" : {
+         "file" : "lib/Search/Fulltext/TestSupport.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/laysakura/Search-Fulltext/issues"
+      },
+      "homepage" : "https://github.com/laysakura/Search-Fulltext",
+      "repository" : {
+         "url" : "git://github.com/laysakura/Search-Fulltext.git",
+         "web" : "https://github.com/laysakura/Search-Fulltext"
+      }
+   },
+   "version" : "1.03"
+}

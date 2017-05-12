@@ -1,0 +1,27 @@
+---
+abstract: 'Send SMS using OVH API (https://api.ovh.com/)'
+author:
+  - 'Paco Esteban <paco@onna.be>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SMS-OVH
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Moose: '0'
+  OvhApi: '0'
+  namespace::autoclean: '0'
+  perl: '5.006'
+resources:
+  repository: https://github.com/pacoesteban/SMS-OVH.git
+version: '0.03'

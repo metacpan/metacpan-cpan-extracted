@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+client/calculator.pl
+client/get_time.pl
+client/get_time_via_http.pl
+server/soap_adapter.pl
+server/soap.data
+SOAP/Transport/ActiveWorks/Client.pm
+SOAP/Transport/ActiveWorks/Defs.pm
+SOAP/Transport/ActiveWorks/Server.pm
+SOAP/Transport/ActiveWorks/HTTP/Apache.pm
+SOAP/Transport/ActiveWorks/HTTP/Proxy.pm

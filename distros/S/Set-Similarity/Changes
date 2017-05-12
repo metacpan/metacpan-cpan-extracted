@@ -1,0 +1,80 @@
+Revision history for Set::Similarity
+
+0.026  2016-11-24 12:04:49 CET
+       - travis for Perl 5.24
+
+0.025  2016-11-24 11:33:22 CET
+       - requires 'parent'
+
+0.024  2015-04-27 15:44:19 CEST
+       - improved travis configuration and badges
+
+0.023  2015-03-31 12:15:04 CEST
+       - added badges
+
+0.022  2014-10-09 14:38:46 CEST
+       - improved test coverage
+
+0.021  2014-10-09 13:36:47 CEST
+       - improved test and pod coverage
+       - improved documentation
+
+0.020  2014-08-20 20:01:02 CEST
+       - remove n-gram padding, return the unchanged word if shorter
+
+0.019  2014-08-20 09:04:46 CEST
+       - pad if length word < n-gram width
+
+0.018  2014-08-19 23:45:03 CEST
+       - remove useless code, force 1-gram if width not integer
+
+0.017  2014-08-16 23:43:23 CEST
+       - badges in pod
+
+0.016  2014-08-16 13:24:55 CEST
+       - test croak
+
+0.015  2014-08-16 07:47:26 CEST
+       - add travis
+
+0.014  2014-08-08 22:59:01 CEST
+       - remove default method and croak
+
+0.013  2014-08-04 14:26:05 CEST
+       - repair versioning
+
+0.012  2014-08-03 22:03:41 CEST
+       - improved documentation
+
+0.011  2014-08-02 11:17:41 CEST
+       - change minimal Perl version to 5.6
+
+0.010  2014-08-01 21:53:39 CEST
+       - improved documentation
+
+0.009  2014-07-27 08:16:29 CEST
+       - improved documentation
+
+0.008  2014-07-26 19:15:31 CEST
+       - improved documentation
+
+0.007  2014-07-26 18:14:04 CEST
+       - use arrayref
+
+0.006  2014-05-17 20:43:12 CEST
+       - release a trial release
+
+0.005  2014-05-17 15:32:39 CEST
+       - try trial release
+
+0.004  2014-05-17 15:05:39 CEST
+       - improve docs
+
+0.003  2014-04-30 21:59:32 CEST
+       - remove mymeta
+
+0.002  2014-04-22 22:44:52 CEST
+       - Added Set::Similarity::Cosine
+
+0.001  2014-03-18
+       - Initial release.

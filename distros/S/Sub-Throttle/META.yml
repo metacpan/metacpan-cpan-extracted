@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                Sub-Throttle
+version:             0.02
+abstract:            Throttle load of perl function
+license:             ~
+author:              
+    - Kazuho Oku
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    List::Util:                    0
+    Time::HiRes:                   0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NZSRSResponse VerMajor="5" VerMinor="2">
+  <Response Action="HandleDetailsQry" FeId="8" FeSeq="4979223" OrigRegistrarId="921" RecipientRegistrarId="921" Rows="2">
+    <FeTimeStamp Day="16" Hour="22" Minute="45" Month="8" Second="43" TimeZoneOffset="+12:00" Year="2010" />
+    <Handle HandleId="02f1" Name="Dave" Email="dave@example.com" RegistrarId="921">
+      <PostalAddress Address1="10 Fixit Close" City="WellingtonCity" CountryCode="NZ" PostalCode="6002" Province="WellingtonCity" />
+      <Phone CountryCode="64" LocalNumber="412345678" />
+      <Fax CountryCode="64" LocalNumber="412345678" />
+      <AuditDetails ActionId="srsrps-1_578" RegistrarId="921">
+        <AuditTime>
+          <From Day="16" Hour="22" Minute="44" Month="8" Second="41" TimeZoneOffset="+12:00" Year="2010" />
+        </AuditTime>
+        <AuditText>User Id: dave</AuditText>
+      </AuditDetails>
+    </Handle>
+    <Handle HandleId="02f2" Name="Dave" Email="dave@example.com" RegistrarId="921">
+      <PostalAddress Address1="10 Fixit Drive" City="Wellington" CountryCode="NZ" PostalCode="6002" Province="WellingtonCity" />
+      <Phone CountryCode="64" LocalNumber="412345678x1234" />
+      <Fax CountryCode="64" LocalNumber="412345678" />
+      <AuditDetails ActionId="srsrps-1_579" RegistrarId="1">
+        <AuditTime>
+          <From Day="16" Hour="22" Minute="45" Month="8" Second="22" TimeZoneOffset="+12:00" Year="2010" />
+        </AuditTime>
+        <AuditText>User Id: dave</AuditText>
+      </AuditDetails>
+    </Handle>    
+  </Response>
+</NZSRSResponse>

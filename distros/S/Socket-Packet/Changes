@@ -1,0 +1,55 @@
+Revision history for Socket-Packet
+
+0.10    2014/01/06 17:10:58
+        [BUGFIXES]
+         * Accept either EINVAL or ENOTTY as failure of siocgstamp() on STDIN
+           (RT85687)
+
+0.09    CHANGES:
+         * Better Linux version test in t/13recv_len.t
+
+0.08    CHANGES:
+         * Use new ability of ExtUtils::CChecker 0.04 to look harder to find
+           header files suitable for TPACKET_V2
+
+0.07    CHANGES:
+         * Support socket options:
+            + PACKET_STATISTICS
+            + PACKET_ORIGDEV
+            + PACKET_ADD_MEMBERSHIP and PACKET_DROP_MEMBERSHIP
+            + PACKET_RX_RING and related
+         * Provide proper Perl-level access to the RX ring buffer
+
+0.06    CHANGES:
+         * Implement ->recv_unpack using ->recv_len so it yields wire packet
+           length and doesn't crash with MSG_TRUNC flag
+
+        BUGFIXES:
+         * Fix recv_len() so it works on Perl 5.8
+
+0.05    CHANGES:
+         * Added recv_len() function and method
+
+0.04    CHANGES:
+         * Use XSLoader instead of DynaLoader
+         * import Exporter::import instead of @ISAing it
+         * Use ExtUtils::CChecker for build checking
+
+        BUGFIXES:
+         * Run fail tests against a pipe to hopefully avoid spurious packet-
+           related side-effects on INET sockets
+
+0.03    CHANGES:
+         * Wrap SIOCGIFINDEX and SIOCGIFNAME to provide name <=> index lookup
+         * Provided an ARP example to demonstrate packet sending
+         * Better 'OS unsupported' line if ExtUtils::CBuilder is missing
+
+0.02    CHANGES:
+         * Wrap SIOCGSTAMP and SIOCGSTAMPNS to obtain packet receive timestamp
+         * Created IO::Socket wrapping under the name IO::Socket::Packet
+
+        BUGFIXES:
+         * More robust Build.PL, includes OS capability detection
+
+0.01    First version, released on an unsuspecting world.
+

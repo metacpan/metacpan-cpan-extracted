@@ -1,0 +1,18 @@
+.cvsignore
+Changes
+lib/Search/Lemur.pm
+lib/Search/Lemur/Database.pm
+lib/Search/Lemur/Result.pm
+lib/Search/Lemur/ResultItem.pm
+Makefile.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00-load.t
+t/01-resultItem.t
+t/02-result.t
+t/03-database.t
+t/04-lemur.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t

@@ -1,0 +1,145 @@
+---
+abstract: 'Web Application Infrastructure'
+author:
+  - 'Kevin L. Esteb <kevin@kesteb.us>'
+build_requires:
+  Pod::Coverage: 0.00
+  Test::More: 0.00
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Scaffold
+provides:
+  Scaffold:
+    file: lib/Scaffold.pm
+    version: 0.10
+  Scaffold::Base:
+    file: lib/Scaffold/Base.pm
+    version: 0.01
+  Scaffold::Cache:
+    file: lib/Scaffold/Cache.pm
+    version: 0.01
+  Scaffold::Cache::FastMmap:
+    file: lib/Scaffold/Cache/FastMmap.pm
+    version: 0.01
+  Scaffold::Cache::Manager:
+    file: lib/Scaffold/Cache/Manager.pm
+    version: 0.01
+  Scaffold::Cache::Memcached:
+    file: lib/Scaffold/Cache/Memcached.pm
+    version: 0.01
+  Scaffold::Class:
+    file: lib/Scaffold/Class.pm
+  Scaffold::Constants:
+    file: lib/Scaffold/Constants.pm
+  Scaffold::Engine:
+    file: lib/Scaffold/Engine.pm
+    version: 0.01
+  Scaffold::Engine::Util:
+    file: lib/Scaffold/Engine.pm
+  Scaffold::Handler:
+    file: lib/Scaffold/Handler.pm
+    version: 0.02
+  Scaffold::Handler::Default:
+    file: lib/Scaffold/Handler/Default.pm
+    version: 0.01
+  Scaffold::Handler::ExtDirect:
+    file: lib/Scaffold/Handler/ExtDirect.pm
+    version: 0.01
+  Scaffold::Handler::ExtPoll:
+    file: lib/Scaffold/Handler/ExtPoll.pm
+    version: 0.01
+  Scaffold::Handler::Favicon:
+    file: lib/Scaffold/Handler/Favicon.pm
+    version: 0.01
+  Scaffold::Handler::Robots:
+    file: lib/Scaffold/Handler/Robots.pm
+    version: 0.01
+  Scaffold::Handler::Static:
+    file: lib/Scaffold/Handler/Static.pm
+    version: 0.01
+  Scaffold::Lockmgr:
+    file: lib/Scaffold/Lockmgr.pm
+    version: 0.01
+  Scaffold::Lockmgr::KeyedMutex:
+    file: lib/Scaffold/Lockmgr/KeyedMutex.pm
+    version: 0.01
+  Scaffold::Lockmgr::SharedMem:
+    file: lib/Scaffold/Lockmgr/SharedMem.pm
+  Scaffold::Lockmgr::UnixMutex:
+    file: lib/Scaffold/Lockmgr/UnixMutex.pm
+    version: 0.03
+  Scaffold::Plugins:
+    file: lib/Scaffold/Plugins.pm
+    version: 0.01
+  Scaffold::Render:
+    file: lib/Scaffold/Render.pm
+    version: 0.01
+  Scaffold::Render::Default:
+    file: lib/Scaffold/Render/Default.pm
+    version: 0.01
+  Scaffold::Render::TT:
+    file: lib/Scaffold/Render/TT.pm
+    version: 0.01
+  Scaffold::Routes:
+    file: lib/Scaffold/Routes.pm
+    version: 0.02
+  Scaffold::Server:
+    file: lib/Scaffold/Server.pm
+    version: 0.03
+  Scaffold::Session::Manager:
+    file: lib/Scaffold/Session/Manager.pm
+    version: 0.01
+  Scaffold::Session::Store::Cache:
+    file: lib/Scaffold/Session/Store/Cache.pm
+    version: 0.01
+  Scaffold::Stash:
+    file: lib/Scaffold/Stash.pm
+    version: 0.01
+  Scaffold::Stash::Controller:
+    file: lib/Scaffold/Stash/Controller.pm
+    version: 0.01
+  Scaffold::Stash::Cookies:
+    file: lib/Scaffold/Stash/Cookies.pm
+    version: 0.01
+  Scaffold::Stash::Manager:
+    file: lib/Scaffold/Stash/Manager.pm
+    version: 0.01
+  Scaffold::Stash::View:
+    file: lib/Scaffold/Stash/View.pm
+    version: 0.01
+  Scaffold::Uaf::Authenticate:
+    file: lib/Scaffold/Uaf/Authenticate.pm
+    version: 0.03
+  Scaffold::Uaf::Authorize:
+    file: lib/Scaffold/Uaf/Authorize.pm
+    version: 0.01
+  Scaffold::Uaf::AuthorizeFactory:
+    file: lib/Scaffold/Uaf/AuthorizeFactory.pm
+  Scaffold::Uaf::GrantAllRule:
+    file: lib/Scaffold/Uaf/GrantAllRule.pm
+  Scaffold::Uaf::Login:
+    file: lib/Scaffold/Uaf/Login.pm
+    version: 0.01
+  Scaffold::Uaf::Logout:
+    file: lib/Scaffold/Uaf/Logout.pm
+    version: 0.01
+  Scaffold::Uaf::Manager:
+    file: lib/Scaffold/Uaf/Manager.pm
+    version: 0.02
+  Scaffold::Uaf::Rule:
+    file: lib/Scaffold/Uaf/Rule.pm
+    version: 0.01
+  Scaffold::Uaf::User:
+    file: lib/Scaffold/Uaf/User.pm
+    version: 0.01
+  Scaffold::Utils:
+    file: lib/Scaffold/Utils.pm
+    version: 0.01
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.10

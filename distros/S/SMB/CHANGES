@@ -1,0 +1,31 @@
+Releases of SMB-Perl library and main changes.
+
+0.06 - 2014-08-19
+
+* Removed dependancy on Digest::HMAC_MD5 by fallback md5 implementation.
+* Added new client functionality: download, upload.
+* Added new class SMB::v2::Command::Write.
+
+0.05 - 2014-08-13
+
+* Fixed tests to pass on all platforms (Windows, OpenBSD; 32, 64 bits).
+* Added more documentation.
+* Added new client functionality: remove.
+
+0.04 - 2014-08-09
+
+* Fixed tests on some platforms and perl versions.
+* Added ability to define user passwords on server.
+* Made user authentication work using NTLM on server (LOGON_FAILURE).
+
+0.03 - 2014-08-07
+
+* Listed required modules to improve reports of CPAN Testers.
+* Added initial documentation and more tests.
+
+0.02 - 2014-08-05
+
+* Initial release on CPAN.
+* Transparent proxy functionality works.
+* Some server functionality works: returning list of files.
+* Some client functionality works: logon, getting list of files.

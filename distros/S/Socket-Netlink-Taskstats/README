@@ -1,0 +1,20 @@
+NAME
+    "Socket::Netlink::Taskstats" - interface to Linux's "Taskstats" generic
+    netlink socket protocol
+
+DESCRIPTION
+    This module contains the low-level constants and structure handling
+    functions required to use the "Taskstats" protocol of Linux's
+    "NETLINK_GENERIC" netlink socket protocol. It is suggested to use the
+    high-level object interface to this protocol instead; see
+    IO::Socket::Netlink::Taskstats.
+
+SEE ALSO
+    *   IO::Socket::Netlink::Taskstats - Object interface to "Taskstats"
+        generic netlink protocol sockets
+
+    *   Socket::Netlink - interface to Linux's "PF_NETLINK" socket family
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

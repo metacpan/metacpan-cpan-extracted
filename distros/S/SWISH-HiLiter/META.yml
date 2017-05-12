@@ -1,0 +1,32 @@
+---
+abstract: 'simple interface to SWISH::API and Search::Tools'
+author:
+  - 'Peter Karman <karman@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SWISH-HiLiter
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::Dump: '0'
+  File::Slurp: '0'
+  Rose::Object: '0'
+  Search::Tools: '0.26'
+  Test::More: '0'
+  perl: '5.008003'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=SWISH-HiLiter
+  homepage: http://perl.peknet.com/wiki/SWISHHiLiter
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.peknet.com/perl/SWISH-HiLiter
+version: '0.08'

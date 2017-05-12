@@ -1,0 +1,7 @@
+%module{SOOT};
+
+class TGraphErrors {
+  TGraphFloatArray GetEX();
+  TGraphFloatArray GetEY();
+};
+

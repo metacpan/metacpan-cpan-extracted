@@ -1,0 +1,39 @@
+# Update add nameservers and a status in same request
+template: update-domain.tt
+
+vars:
+  domain: updatable.co.te
+  nslist:
+    - ns100.everydns.net
+  status_list: 
+    - name: clientHold    
+
+input_assertions:
+  class: SRS::EPP::Command::Update::Domain
+
+SRS:
+    -
+        assertions: 
+           count:
+               - [ '//DomainDetailsQry', 1, 'DDQ generated']
+           match:
+               - [ '//DomainNameFilter', 'updatable.co.te', 'SRS[1] - Domain name filter correct' ]
+    -
+        assertions:
+           count:
+               - [ '//Server', 5, 'SRS[2] - 5 name servers' ]
+               - [ '//Server[@FQDN = "ns1.everydns.net"]', 1, 'ns2 in server list']
+               - [ '//Server[@FQDN = "ns2.everydns.net"]', 1, 'ns2 in server list']
+               - [ '//Server[@FQDN = "ns3.everydns.net"]', 1, 'ns3 in server list']
+               - [ '//Server[@FQDN = "ns4.everydns.net"]', 1, 'ns4 in server list']
+               - [ '//Server[@FQDN = "ns100.everydns.net"]', 1, 'ns100 in server list']
+           match:  
+               - [ '//DomainNameFilter', 'updatable.co.te', 'SRS[2] - Domain name filter correct' ]
+           attr_is:
+               - [ '//DomainUpdate', 'Delegate', '0',  'SRS[2] - Delegate cleared' ]
+
+output_assertions:
+  count:
+    - [ '//epp:result', 1, 'SRS: Check for one result' ]
+  attr_is:
+    - [ '//epp:result', 'code', 1000, 'SRS: Check for correct result code' ]

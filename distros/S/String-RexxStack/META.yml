@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name: String-RexxStack
+version: 0.3
+author:
+  - Ioannis Tambouras <ioannis@yahoo.com>
+abstract: implements named stacks
+license: gpl
+requires:
+  Class::MethodMaker: 0
+  Data::Dumper: 0
+  Filter::Simple: 0
+  Want: 0
+  perl: 5.6
+recommends:
+  Pod::Checker: 0
+  Test::Distribution: 1.22
+  Test::More: 0
+  Test::Pod: 1.20
+  Test::Pod::Coverage: 1.06
+provides:
+  String::RexxStack::Named:
+    file: lib/String/RexxStack/Named.pm
+    version: 0.3
+  String::TieStack:
+    file: lib/String/TieStack.pm
+generated_by: Module::Build version 0.2611

@@ -1,0 +1,38 @@
+severity = brutal
+verbose = 8
+exclude = Compatibility::PodMinimumVersion Documentation::RequirePodAtEnd Editor::RequireEmacsFileVariables Miscellanea::RequireRcsKeywords Modules::RequireExplicitInclusion Modules::RequireExplicitPackage Modules::RequirePerlVersion Tics::ProhibitLongLines CodeLayout::ProhibitHashBarewords
+
+[Lax::RequireExplicitPackage::ExceptForPragmata]
+allowed_pragmata = diagnostics feature perlversion strict warnings utf8 Modern::Perl
+
+[CodeLayout::RequireTidyCode]
+perltidyrc = xt/author/perltidy.rc
+
+[Compatibility::PerlMinimumVersionAndWhy]
+above_version = 5.010
+
+[ControlStructures::ProhibitPostfixControls]
+flowcontrol = carp cluck confess croak die exit goto warn exit
+
+[Documentation::PodSpelling]
+stop_words = API accessor bugtracker pre MooseX Perldoc perldoc annonations PASSed
+
+[Documentation::RequirePodSections]
+lib_sections = NAME | VERSION | SYNOPSIS | DESCRIPTION | SUPPORT | AUTHOR | COPYRIGHT AND LICENSE
+script_sections = NAME | USAGE | DESCRIPTION | CONFIGURATION | SUPPORT | AUTHOR | COPYRIGHT AND LICENSE
+
+[InputOutput::RequireCheckedSyscalls]
+functions = :builtins
+exclude_functions = print say
+
+[Subroutines::ProhibitCallsToUndeclaredSubs]
+exempt_subs = Any::Moose::any_moose Any::Moose::coerce Any::Moose::from Any::Moose::has Any::Moose::via Any::Moose::with Any::Moose::Dir Any::Moose::File Any::Moose::Maybe Any::Moose::PositiveInt Any::Moose::Str Path::Class::dir Path::Class::file Try::Tiny::try
+
+[Subroutines::ProhibitUnusedPrivateSubroutines]
+private_name_regex = _(?!build_)\w+
+
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = Modern::Perl
+
+[TestingAndDebugging::RequireUseWarnings]
+equivalent_modules = Modern::Perl

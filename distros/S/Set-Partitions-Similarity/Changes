@@ -1,0 +1,7 @@
+Revision history for Perl module Set::Partitions::Similarity
+
+0.50 10 May 2011
+    - version 0.50 uploaded to CPAN.
+
+0.54 23 Jan 2012
+    - added the script compareParititions.pl.

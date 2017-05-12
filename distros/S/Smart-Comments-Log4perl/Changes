@@ -1,0 +1,12 @@
+Revision history for Smart-Comments-Log4perl
+
+1.002   July 14, 2015
+        Fixed an issue with line numbers showing incorrectly in logs
+        Fixed Windows testing
+
+1.001   May 22, 2015
+        Fixed a typo in documentation, corrected tests to be cross-platform compatable
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,33 @@
+---
+abstract: 'efficient generation of subroutines via string eval'
+author:
+  - 'mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>'
+build_requires:
+  Test::Fatal: '0.003'
+  Test::More: '0.94'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Sub-Quote
+no_index:
+  directory:
+    - t
+    - xt
+recommends:
+  Sub::Name: '0.08'
+requires:
+  Scalar::Util: '0'
+  perl: '5.006'
+resources:
+  IRC: irc://irc.perl.org/#moose
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sub-Quote
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/moose/Sub-Quote.git
+version: '2.003001'
+x_authority: cpan:MSTROUT
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

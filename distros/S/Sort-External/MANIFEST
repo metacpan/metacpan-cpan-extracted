@@ -1,0 +1,21 @@
+Changes
+External.xs
+lib/Sort/External.pm
+lib/Sort/External/Cookbook.pod
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+ppport.h
+README
+t/00-load.t
+t/01-simplesort.t
+t/02-binary.t
+t/03-long_items.t
+t/04-metadata.t
+t/05-types.t
+t/06-sortsub.t
+t/07-compat.t
+t/08-internals.t
+t/pod-coverage.t
+t/pod.t
+typemap

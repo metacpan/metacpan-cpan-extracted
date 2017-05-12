@@ -1,0 +1,7 @@
+srvrmgr> list servers
+
+SBLSRVR_NAME|SBLSRVR_GROUP_NAME|HOST_NAME   |INSTALL_DIR               |SBLMGR_PID|SV_DISP_STATE|SBLSRVR_STATE|START_TIME         |END_TIME|SBLSRVR_STATUS                   |SV_SRVRID|
+------------  ------------------  ------------  --------------------------  ----------  -------------  -------------  -------------------  --------  ---------------------------------  ---------
+sieb_serv057|                  |sieb_serv057|/foobar/siebel/81/siebsrvr|1431      |Running      |Running      |2016-09-22 14:17:33|        |8.1.1.11 [23030] LANG_INDEPENDENT|1        |
+
+1 row returned.

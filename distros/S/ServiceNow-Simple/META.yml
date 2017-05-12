@@ -1,0 +1,34 @@
+---
+abstract: 'Simple yet powerful ServiceNow API interface'
+author:
+  - 'Greg George <GNG@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.78, CPAN::Meta::Converter version 2.130880'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: ServiceNow-Simple
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Crypt::SSLeay: '0'
+  File::Basename: '0'
+  HTTP::Cookies: '0'
+  HTTP::Request::Common: '0'
+  IO::Socket::SSL: '0'
+  LWP::UserAgent: '0'
+  MIME::Base64: '0'
+  MIME::Type: '0'
+  MIME::Types: '0'
+  SOAP::Lite: '1.06'
+  XML::Simple: '0'
+  perl: '5.006'
+version: '0.10'

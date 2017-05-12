@@ -1,0 +1,46 @@
+SVG-SpriteMaker version 0.002
+=============================
+
+This distribution includes:
+* SVG::SpriteMaker, a library for creating SVG sprites
+* svg-spritemaker, a simple command-line interface to the library
+
+A SVG sprite is a SVG image that contains several smaller images that
+can be referred to using fragment identifiers. For example, this HTML
+fragment:
+
+  <img src="/img/cat.svg" alt="A cat">
+  <img src="/img/dog.svg" alt="A dog">
+  <img src="/img/horse.svg" alt="A horse">
+
+Can be replaced with
+
+  <img src="/img/sprite.svg#cat" alt="A cat">
+  <img src="/img/sprite.svg#dog" alt="A dog">
+  <img src="/img/sprite.svg#horse" alt="A horse">
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+* SVG
+* SVG::Parser
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2015-2017 by Marius Gavrilescu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.20.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

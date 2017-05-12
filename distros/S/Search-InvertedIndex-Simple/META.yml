@@ -1,0 +1,27 @@
+---
+abstract: 'Build indexes for a set of search keys'
+author:
+  - 'Ron Savage <ron@savage.net.au>'
+build_requires:
+  Test::More: 0
+  Test::Pod: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4, CPAN::Meta::Converter version 2.120630'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Search-InvertedIndex-Simple
+provides:
+  Search::InvertedIndex::Simple:
+    file: lib/Search/InvertedIndex/Simple.pm
+    version: 1.04
+requires:
+  Set::Array: 0.19
+  strict: 1.03
+  warnings: 1.03
+resources:
+  license: http://opensource.org/licenses/artistic-license.php
+version: 1.04

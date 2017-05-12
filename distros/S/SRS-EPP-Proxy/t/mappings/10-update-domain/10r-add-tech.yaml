@@ -1,0 +1,16 @@
+template: update-domain.tt
+
+vars:
+  domain: cheese.co.te
+  tech: registrant-001
+
+input_assertions:
+  class: SRS::EPP::Command::Update::Domain
+
+output_assertions:
+  count:
+    - [ '//epp:result', 1, 'Check for one result' ]
+  attr_is:
+    - [ '//epp:result', 'code', 2306, 'Check for correct result code' ]
+  match:
+    - [ '//epp:reason', 'Only one tech contact per domain supported', 'Correct reason' ]

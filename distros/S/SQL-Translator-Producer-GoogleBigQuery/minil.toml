@@ -1,0 +1,6 @@
+name = "SQL-Translator-Producer-GoogleBigQuery"
+badges = ["travis", "codecov"]
+authority="cpan:KARUPA"
+
+module_maker="ModuleBuildTiny"
+

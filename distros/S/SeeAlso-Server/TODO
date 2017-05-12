@@ -1,0 +1,87 @@
+Features, that are planned to be implemented before 1.0 release include:
+
+== Next ==
+- see http://www.librarything.com/thingology/2008/02/thingisbn-adds-lccns-oclc-numbers.php
+  and http://search.cpan.org/~anirvan/WebService-LibraryThing-ThingISBN-0.503/lib/WebService/LibraryThing/ThingISBN.pm
+- Server-parameter: factory (to create id) and idtype (to create id)
+- rewrite/fix DBI and include tests
+-- bulk_insert etc.
+-- seeealso-dbi: insert, delete, create, update etc.
+- rewrite Identifier::GND
+- better support of "$enrich"
+- document RDF and other formats
+- modify SeeAlso::Response to better access (see i2w.pl)
+- move osd to SeeAlso::Source ?
+- add example of wrapper SeeAlso simple to SeeAlso full (via Client)
+- update ThingISBN and make it an example script (not a class)
+- Add multiple example parameters (see pnd2gso)
+- Print errors to error logfile in SeeAlso::Server
+- add and describe minimal server example (examples/server.pl)
+- add Wikipedia2ISBN example
+- add SeeAlso::Collection (also as SeeAlso::Source)
+    returns description() as response or list of members
+- Finish SeeAlso::Client (including tests and examples, OSDD...)
+-- Parse OSDD for SeeAlso::Client
+- check whether insert statement in DBI failed
+- add caching of config files in expand_from_config
+- DBI does not load Description settings?
+- Add showservices.xsl (multiple) in addition to showservice.xsl (for collections)
+- remove Logger
+- fix: --(Thomas Berger):
+
+openSearchDescription darf nicht callback={callback} enthalten,
+weil "callback" kein Standardparameter ist, sondern nur "extension".
+Es muesste sich reparieren lassen als
+
+callback={seealso:callback?}
+
+Implement a simple RDF2SeeAlso Wrapper, e.g.
+http://cal.aksw.org/year/Y2010
+
+== Tests ==
+- Add more Unicode tests from toJSON and fromJSON!
+- Test servers with SeeAlso::Client
+- (See L<TAP::Harness> and L<Test::Harness>)
+- Add a management class for multiple services
+-- SeeAlso::Collection
+
+= Redesign =
+- Create unAPI::Server to base on
+- Better support of OpenSearch Description (more fields), maybe with OpenSearch::Description
+-- title, description, url, date, example, example response, normalize, source
+- Rewrite SeeAlso::Source::DBI to SeeAlso::CRUD or SeeAlso::Store
+-- Better/more loading mechanism for SeeAlso::Source::DBI
+-- Names of ::Store methods: retrieve/insert/update/delete
+-- simplify ETL-examples (thingISBN and Wikipedia)
+-- detect/remove full duplicates (better database index?)
+- have a look at uri-isbn.t in L<URI> and allow wrapping
+  of any URI as SeeAlso::Identifier
+
+== Misc ==
+- Add normalization of content (SeeAlso::Response)
+- Add SeeAlso::Discovery to discover servers via OpenSearch Description 
+- Support WADL and WSDL in addition to OpenSearch Description
+- Run as a real server (on a port of your choice) : better performance?
+- Add SeeAlso::Source::Union and example (with: use threads;)
+- Add an example of a multilangual source with equal identifiers: LibraryThing?
+- More Unicode (UTF-8) testing and hints
+- restrict access of cgi server by referrer, IP, etc. (better in .htaccess ?)
+- add a REST-server that eats SeeAlso response format via 
+  HTTP POST (new), HTTP PUT (add) and HTTP DELETE (delete).
+  Response formats and status codes need to be defined for this
+- remove Date::Parse prequisite
+- clean up the code
+-- look for TODOs
+-- look for missing documentation 
+
+== Examples ==
+- Add/improve Wikipedia/LibraryThing examples
+-- rewrite, test and document ETL cycle
+- Feed2Seealso (RSS2Seealso, ATOM2Seealso)
+
+== JavaScript client ==
+- Document purpose and usage
+
+== XSLT client ==
+- Add example result check
+- Check out: IE seems to have problem with iframe and document(.) ?

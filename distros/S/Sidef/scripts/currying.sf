@@ -1,0 +1,26 @@
+#!/usr/bin/ruby
+
+#
+## Using a generic curry function:
+#
+
+func curry(f, *args1) {
+    func (*args2) {
+        f(args1..., args2...);
+    }
+}
+
+func add(a, b) {
+    a + b
+}
+
+var adder = curry(add, 1);
+say adder(3);                 #=>4
+
+
+#
+## Another way, using lazy methods:
+#
+
+var adder2 = 1.method(:add);
+say adder2(3);                #=> 4

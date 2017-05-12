@@ -1,0 +1,48 @@
+{
+   "abstract" : "Simple method to generate Excel files from 2D arrayrefs",
+   "author" : [
+      "'Zoffix <'zoffix@cpan.org'>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Spreadsheet-DataToExcel",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Data::Accessor" : "0.04004",
+            "Spreadsheet::WriteExcel" : "2.25",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Spreadsheet::DataToExcel" : {
+         "file" : "lib/Spreadsheet/DataToExcel.pm",
+         "version" : "0.0104"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.0104"
+}

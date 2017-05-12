@@ -1,0 +1,24 @@
+Revision history for Syntax-Keyword-Try
+
+0.04    2016/11/25 15:06:18
+        [CHANGES]
+         * Removed stale documentation about now-fixed warnings from
+           next/last/redo
+
+        [BUGFIXES]
+         * Fix C code for C89 compatibility (RT118950)
+         * Localise $@ around try/catch (RT118415)
+
+0.03    2016/11/24 10:27:45
+        [CHANGES]
+         * Default import of 'try' keyword
+         * Suppress 'exiting' warning around next/last/redo inside a try block
+         * Don't bother outputting a Makefile.PL
+
+0.02    2016/09/06 21:29:25
+        [BUGFIXES]
+         * Use OpSIBLING() macro for compatibility for perl 5.25.x
+         * Documentation fixes
+
+0.01    2016/09/05 22:19:33
+        First version, released on an unsuspecting world.

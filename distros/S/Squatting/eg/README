@@ -1,0 +1,127 @@
+______________________________________________________________________________
+squatting Example -p 4235
+
+  http://localhost:4235/
+
+  This is the first example app I made.
+  I tried to show a little bit of everything here.
+  For sillyness points, I used CGI.pm's HTML generating functions
+  as my templating system.
+
+______________________________________________________________________________
+squatting PODServer -p 4236
+
+  http://localhost:4236/
+
+  requires:
+    Pod::Simple
+    HTML::AsSubs
+
+  This will let you browse (almost) all the POD that's
+  installed on your system.  I wrote this before I was aware of
+  Pod::Webserver which basically does the same thing.
+  However, I may still make a separate dist out of this
+  and put it on CPAN, because its output is pretty, and
+  it has some nice little usability features.
+
+  UPDATE:  Pod::Server has been uploaded to CPAN.
+
+______________________________________________________________________________
+squatting UniCodePoints -p 4237 --config count=1024
+
+  http://localhost:4237/
+
+  requires:
+    HTML::AsSubs
+
+  This is a simple utility for displaying unicode code points.
+  You can configure the default number of codepoints to display per page
+  by passing in --config count=XXX where XXX is a positive integer.
+
+______________________________________________________________________________
+squatting Chat -p 4238
+
+  http://localhost:4238/
+
+  requires
+    selfvars
+    HTML::AsSubs
+    Coro::Event
+
+  This is a port of chat-ajax-push.pl from the Continuity examples.
+  Open this app up in 2 or more different browsers and try chatting.
+
+______________________________________________________________________________
+squatting OpenID::Consumer -p 4239
+
+  http://localhost:4239/
+
+  requires
+    HTML::AsSubs
+    Net::OpenID::Consumer
+    LWPx::ParanoidAgent
+    Cache::File
+
+  This example currently shows the bare minimum you need to implement
+  an OpenID login.  It'll be improved as time goes on.
+
+______________________________________________________________________________
+squatting MicroWiki -p 4240
+
+  http://localhost:4240/
+
+  requires
+    Text::Textile
+    IO::All
+
+  metaperl from perlmonks.org wondered if a wiki could be implemented with
+  Squatting in 20 lines or less.  MicroWiki was my 17 line response.  It has
+  since been reduced to 11 lines.
+
+  http://perlmonks.org/?node_id=704372
+
+  If you find this unreadable, run it through perltidy.
+
+    perltidy < MicroWiki.pm
+
+  There's also a microwiki.psgi file that lets you run this wiki by typing:
+
+    plackup microwiki.psgi
+
+______________________________________________________________________________
+squatting CouchWiki -p 4241
+
+  http://localhost:4241/
+
+  requires
+    Clone
+    HTML::AsSubs
+    Text::Textile
+    AnyEvent::CouchDB
+
+  I received an email from someone who wanted an example of how to use
+  AnyEvent in combination with Squatting and Continuity, so I ended up
+  creating CouchWiki.
+
+  * It started out as an unobfuscated MicroWiki.
+  * Then I switched to CouchDB for storage (instead of the filesystem).
+
+  After you've created a few pages through the browser, try doing this
+  in the shell:
+
+  $ squatting CouchWiki -C
+  > recent_changes
+  > page('Home')
+
+______________________________________________________________________________
+squatting HTTPAuth -p 4242
+
+  http://localhost:4242/
+
+  requires
+    MIME::Base64
+    HTML::AsSubs
+
+  This example shows you how to implement HTTP Basic Auth in Squatting.
+  http://en.wikipedia.org/wiki/Basic_access_authentication
+

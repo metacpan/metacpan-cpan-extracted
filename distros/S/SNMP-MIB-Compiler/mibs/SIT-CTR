@@ -1,0 +1,261 @@
+-- file: sit-ctr.mib
+--
+
+SIT-CTR DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter32,
+    Counter64, Unsigned32, Opaque, enterprises
+        FROM SNMPv2-SMI
+    DisplayString, TimeStamp
+        FROM SNMPv2-TC
+    OBJECT-GROUP, MODULE-COMPLIANCE
+        FROM SNMPv2-CONF;
+
+sitCtrModule MODULE-IDENTITY
+    LAST-UPDATED        "9806220000Z"
+    ORGANIZATION        "SNMPinfo"
+    CONTACT-INFO
+        "Email: info@snmpinfo.com"
+    DESCRIPTION
+        "This module defines objects that are used to test
+        high capacity counters. This consists of objects to set
+        the 'initial value' of counters, set the time period
+        of counter value change, and to set the size of the
+        counter increment. Each high capacity counter is
+        implemented as a pair of 32-bit counters and a 64-bit
+        counter. And additionally, there is an ASCII and
+        Opaque representation of each 64-bit counter.
+        
+        Please note that the 64-bit counters are not accessible
+        by SNMPv1 operations, and multi-lingual agents must
+        treat objects with data type of 'Counter64' as not
+        existing. The behavior of such agents is described
+        in detain in RFC 2089, 'V2ToV1 Mapping SNMPv2 onto
+        SNMPv1 within a bi-lingual SNMP agent'."
+    ::= { sitModules 2 }
+
+
+siRoot OBJECT IDENTIFIER ::= { enterprises  1194 }
+sitRoot OBJECT IDENTIFIER ::= { siRoot 2 }
+sitReg OBJECT IDENTIFIER ::= { sitRoot 1 }
+sitModules OBJECT IDENTIFIER ::= { sitReg 1 }
+sitItems OBJECT IDENTIFIER ::= { sitRoot 2 }
+
+-- root for items in the Counter MIB module
+sitCtrMIB OBJECT IDENTIFIER ::= { sitItems 1 }
+
+-- conformance area containing group and compliance specifications
+sitCtrConfs OBJECT IDENTIFIER ::= { sitCtrMIB 1 }
+  sitCtrGroups OBJECT IDENTIFIER ::= { sitCtrConfs 1 } 
+  sitCtrCompls OBJECT IDENTIFIER ::= { sitCtrConfs 2 }
+
+-- sub-tree for objects, and for each functional area
+sitCtrObjs OBJECT IDENTIFIER ::= { sitCtrMIB 2 }
+  sitCtrTest1Objs OBJECT IDENTIFIER ::= { sitCtrObjs 1 }
+
+-- sub-tree for events
+sitCtrEvents OBJECT IDENTIFIER ::= { sitCtrMIB 3 }
+  sitCtrEventsV2 OBJECT IDENTIFIER ::= { sitCtrEvents 0 }
+  
+  
+-- the test objects
+
+sitCtrDiscont OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sysUptime when the value of objects
+        sitCtrInitLow or sitCtrInitHigh are changed. The
+        value is zero if the objects have not been changed."
+    ::= { sitCtrTest1Objs 1 }
+
+sitCtrInitHigh OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The 'initial' value for the high 32 bits of the
+        counter objects. The initial value is zero. When
+        the value is changed, the value of the counters
+        is changed."
+    ::= { sitCtrTest1Objs 2 }
+
+sitCtrInitLow OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The 'initial' value for the low 32 bits of the
+        counter objects. The initial value is zero. When
+        the value is changed, the value of the counters
+        is changed."
+    ::= { sitCtrTest1Objs 3 }
+
+sitCtrPeriodLen OBJECT-TYPE
+    SYNTAX      Unsigned32(1..60)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "How often the value of counters sitCtrT1c64 and
+        sitCtrT2c64 are updated."
+    ::= { sitCtrTest1Objs 4 }
+    
+sitCtrPeriods OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of time periods that have occurred.
+        Note the length of a period may be changed."
+    ::= { sitCtrTest1Objs 5 }
+
+sitCtrIncr OBJECT-TYPE
+    SYNTAX      Unsigned32(1..'ffffffff'h)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The amount that the counter sitCtrT1c64 will be
+        incremented each time period. The 'initial' value
+        is '40000001'h, which will cause a 32-bit counter
+        to rollover every fourth period."
+    ::= { sitCtrTest1Objs 6 }
+
+sitCtrSplit1High OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The high 32-bits of a 64-bit counter, sitCtrT1c64.
+        The object sitCtrDiscont has the value of sysUptime
+        when the last discontinuity for this object occured."
+    ::= { sitCtrTest1Objs 7 }
+
+sitCtrSplit1Low OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The low 32-bits of a 64-bit counter, sitCtrT1c64.
+        The object sitCtrDiscont has the value of sysUptime
+        when the last discontinuity for this object occured."
+    ::= { sitCtrTest1Objs 8 }
+
+sitCtrT1c64 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A 64-bit counter. Every time period, the value
+        is incremented by the value of object sitCtrIncr.
+        The object sitCtrDiscont has the value of sysUptime
+        when the last discontinuity for this object occured."
+    ::= { sitCtrTest1Objs 9 }
+
+sitCtrSplit2High OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The high 32-bits of a 64-bit counter, sitCtrT2c64.
+        The object sitCtrDiscont has the value of sysUptime
+        when the last discontinuity for this object occured."
+    ::= { sitCtrTest1Objs 10 }
+
+sitCtrSplit2Low OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The low 32-bits of a 64-bit counter, sitCtrT2c64.
+        The object sitCtrDiscont has the value of sysUptime
+        when the last discontinuity for this object occured."
+    ::= { sitCtrTest1Objs 11 }
+
+sitCtrT2c64 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A 64-bit counter. Every time period, the value
+        is incremented by 2 raised to the power of the
+        value of object sitCtrPeriods mod 64. Thus, this
+        counter will roll over every 64 or 65 periods.
+
+        The object sitCtrDiscont has the value of sysUptime
+        when the last discontinuity for this object occured."
+    ::= { sitCtrTest1Objs 12 }
+
+
+sitCtrT1A OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(1..20))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value for counter sitCtrT1c64 as an ASCII string."
+    ::= { sitCtrTest1Objs 13 }
+
+sitCtrT1O OBJECT-TYPE
+    SYNTAX      Opaque(SIZE(4..12))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value for counter sitCtrT1c64 as an OPAQUE.
+        The value is the BER serialization of type
+           COUNTER64 ::= [118] IMPLICIT Counter64
+        (Note 118 is 0x76, which is 0x30 plus 0x46. Value
+        0x46 is the normal tag for Counter64.)
+        For example, the BER serialization of the value 56782 of
+        type COUNTER64 is '9f760300ddce'h. The BER serialization
+        of the value '9f760300ddce'h of type Opaque is
+        '44069f760300ddce'h."
+    ::= { sitCtrTest1Objs 14 }
+
+sitCtrT2A OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(1..20))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value for counter sitCtrT2c64 as an ASCII string."
+    ::= { sitCtrTest1Objs 15 }
+
+sitCtrT2O OBJECT-TYPE
+    SYNTAX      Opaque(SIZE(4..12))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value for counter sitCtrT2c64 as an OPAQUE.
+        The value is the BER serialization of type
+           COUNTER64 ::= [118] IMPLICIT Counter64
+        (Note 118 is 0x76, which is 0x30 plus 0x46. Value
+        0x46 is the normal tag for Counter64.)
+        For example, the BER serialization of the value 56782 of
+        type COUNTER64 is '9f760300ddce'h. The BER serialization
+        of the value '9f760300ddce'h of type Opaque is
+        '44069f760300ddce'h."
+    ::= { sitCtrTest1Objs 16 }
+
+
+-- object and event groups
+sitCtr1Group OBJECT-GROUP
+    OBJECTS     { sitCtrDiscont, sitCtrInitHigh, sitCtrInitLow,
+        sitCtrPeriodLen, sitCtrPeriods, sitCtrIncr,
+        sitCtrSplit1High, sitCtrSplit1Low, sitCtrT1c64,
+        sitCtrSplit2High, sitCtrSplit2Low, sitCtrT2c64,
+        sitCtrT1A, sitCtrT1O, sitCtrT2A, sitCtrT2O }
+    STATUS      current
+    DESCRIPTION
+        "Objects for the first test."
+    ::= { sitCtrGroups 1 }
+
+-- compliance specifications
+sitCtrComplV1 MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION "All objects are required."
+    MODULE      -- this module
+        MANDATORY-GROUPS { sitCtr1Group }
+    ::= { sitCtrCompls 1 }
+
+END

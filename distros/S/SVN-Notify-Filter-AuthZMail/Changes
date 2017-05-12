@@ -1,0 +1,8 @@
+Revision history for SVN-Notify-Filter-AuthZMail
+
+1.01    July 19, 2008
+        Fixed Makefile.PL dependencies
+
+1.00    July 10, 2008
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,31 @@
+# NAME
+
+Skeletor::Template::Example - An example template skel for Skeletor
+
+# SYNOPSIS
+
+    skeletor --template Skeletor::Template::Example \
+      --as Local::MyApp \
+      --directory ~/new_projects \
+      --author 'John Napiorkowski <jjnapiork@cpan.org>' \
+      --year 2015
+
+# DESCRIPTION
+
+This is an example [App::Skeletor](https://metacpan.org/pod/App::Skeletor) template project skel for use to learn how to
+use the tool and to build custom skeleton projects of your own.
+
+# TEMPLATE VARIABLES
+
+See [App::Skeletor](https://metacpan.org/pod/App::Skeletor)
+
+# AUTHOR
+
+John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+# COPYRIGHT & LICENSE
+
+Copyright 2015, John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

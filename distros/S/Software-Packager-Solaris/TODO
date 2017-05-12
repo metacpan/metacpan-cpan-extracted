@@ -1,0 +1,7 @@
+Software::Packager::Solaris
+	Need to fully comply with the documentation from SUN.
+	Test script may need to be improved.
+
+Software::Packager::Object::Solaris
+	Improve POD
+

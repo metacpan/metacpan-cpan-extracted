@@ -1,0 +1,385 @@
+Revision history for Search::Elasticsearch
+
+5.02    2017-04-02
+
+        * Boolean query params must be "true" or "false"
+        * Added deprecation warnings
+        * The scroll API requires a body with a named scroll_id parameter
+        * Added support for pipeline parameter to bulk API, top level and metadata level
+        * Added support for 413 HTTP status code - Request entity too large
+        * Search::Elasticsearch::TestServer now takes an es_version parameter and
+          works with 0.90, 1.0, 2.0, and 5.0
+        * Added common parameters error_trace and human to all params
+
+5.01    2016-10-19
+
+        Doc fixes
+
+5.00    2016-10-19
+
+        This version adds Elasticsearch 5.x compatibility, and makes it the default.
+        It also adds deprecation logging which logs to STDERR by default.
+
+        The Hijk backend will not work with Elasticsearch 5.x until this bug
+        is fixed: https://rt.cpan.org/Ticket/Display.html?id=118425
+
+        BREAKING CHANGES:
+        * The 0.90, 1.x, and 2.x compatible clients no longer ship by default.
+          You should install one of the following:
+              * Search::Elasticsearch::Client::2_0
+              * Search::Elasticsearch::Client::2_0::Async
+              * Search::Elasticsearch::Client::1_0
+              * Search::Elasticsearch::Client::1_0::Async
+              * Search::Elasticsearch::Client::0_90
+              * Search::Elasticsearch::Client::0_90::Async
+        * The code has been reorganised so that all client-related modules
+          are under the S::E::API_VERSION::Client namespace.
+          This includes S::E::Bulk and S::E::Scroll.
+        * Plugin authors note: the format for the API in ...Role::API has changed.
+        * S::E::Cxn::HTTP has been rolled into S::E::Cxn as Elasticsearch
+          no longer supports other protocols.
+
+2.03    2016-05-24
+
+        Added register_qs() to allow plugins to expand known query string params
+        Added api_version() to API roles so that plugins can determine which
+        API version they should load.
+
+2.02    2016-04-20
+
+        Bug fix:
+            Sniffed http addresses may or may not have the hostname/ prepended
+
+2.01    2016-04-15
+
+        Updated for Elasticsearch 2.3.0
+
+        New features:
+            * Added delete_by_query(), reindex(), and update_by_query()
+            * Added tasks.list() and tasks.cancel()
+            * Added ignore_unavailable to cat.snapshots()
+            * Added attributes and explain to indices.analyze()
+            * Added verbose to indices.segments()
+            * S::ES::Error now implements TO_JSON
+            * TestServer can now be used with forked processes
+
+
+        Bug fixes:
+            * Search::Elasticsearch::Error shouldn't be a Moo class
+            * Search::Elasticsearch::Scroll can now be used in a forked process
+            * Hijk is now optional as it doesn't work on windows
+            * cat.snapshots requires a repository
+
+2.00    2015-10-28
+
+        The default client is now '2_0::Direct', for use with Elasticsearch 2.x.
+        Specify client '1_0::Direct' if using with Elasticsearch 1.x.
+
+        Breaking:
+        * The field parameter to indices.get_field_mapping() has been renamed to fields
+
+        New features:
+        * Added fields param to Bulk helper
+        * The name parameter to indices.get_template() can accept multiple options
+        * Added indices.forcemerge() and deprecated indices.optimize()
+        * The index parameter to indices.open() and indices.close() is required
+        * Added allow_no_indices, expand_wildcards, and ignore_unavailable params
+          to indices.flush_synced()
+        * Added the timeout param to cluster.stats(), nodes.hot_threads(),
+          nodes.stats(), and nodes.info()
+        * cluster.health() can accept multiple indices
+        * Added cat.repositories() and cat.snapshots()
+        * Added detect_noop param to update()
+        * search_shards() accepts multi values for index/type
+        * delete_template() requires an id
+        * Add fork protection to Scroll and Async::Scroll
+
+        Bug fix:
+        * Added missing debug QS param
+
+1.99    2015-08-26
+
+        This release provides support for Elasticsearch 2.0.0-beta1 and above,
+        but the default client is still '1_0::Direct' and will remain so until
+        version 2.00 is released.
+
+        New features:
+        * Added default_qs_params, which will be added to every request
+        * Added max_time to the Bulk helper, to flush after a max elapsed time
+        * Added filter_path parameter to all methods which return JSON
+        * Added indices.flush_synced()
+        * Added render_search_template()
+        * Added cat.nodeattrs()
+        * Added human flag to indices.get and indices.get_settings
+        * Added rewrite flag to indices.validate_query
+        * Added rewrite flag to indices.analyze
+        * Added fields param to bulk()
+        * Added update_all_types to indices.create and indices.put_mapping
+        * Added request_cache to indices.put_warmer and indices.stats
+        * Added request to indices.clear_cache
+        * Added RequestTimeout exception for server-side timeouts
+        * Updated Plugin::Watcher with 1.0 API
+
+        Removed:
+        * Removed id and id_cache from indices.clear_cache
+        * Removed filter and filter_cache from indices.clear_cache
+        * Removed ignore_conflict from indices.put_mapping
+
+        Bugfixes:
+        * Fixed error handling in Hijk
+        * Fixed live test to non-existent IP address
+
+
+1.20    2015-05-17
+
+        Deprecated:
+        * Search::Elasticsearch::Client::Direct in favour of
+          Search::Elasticsearch::Client::1_0::Direct
+
+        New features:
+        * Added support for structured JSON exceptions in Elasticsearch 2.0
+        * Added support for plugins
+        * Added Search::Elasticsearch::Client::2_0::Direct for the upcoming
+          Elasticsearch 2.0 with these changes:
+            * removed delete_by_query()
+            * removed termvector()
+            * removed indices.delete_mapping()
+            * removed nodes.shutdown()
+            * removed indices.status()
+            * added terminate_after param to search()
+            * added dfs param to termvectors()
+            * removed filter_keys param from indices.clear_cache()
+            * removed full param from indices.flush()
+            * removed force param from indics.optmize()
+            * removed replication param from all CRUD methods
+            * removed mlt() method
+
+        Bug fix:
+        * The bulk buffer was being cleared on a NoNodes exception
+
+        Added class:
+        Added methods:
+        * field_stats()
+
+        Added params:
+        * allow_no_indices, expand_wildcards, ignore_unavailable to cluster.state()
+        * fielddata_fields to search()
+        * master_timeout to indices.get_template() and indices.exists_template()
+        * detect_noop to update()
+        * only_ancient_segments to upgrade()
+        * analyze_wildcards, analyzer, default_operator, df, lenient, lowercase_expanded_terms,
+          and q to count(), search_exists() and indices.validate_query()
+
+        Removed methods:
+        * benchmark.* - never released in Elasticsearch
+
+        Also:
+        * arrays of enum query string params are now flattened as CSV
+        * enum expand_wildcards also accepts: none, all
+        * Search::Elasticsearch is no longer a Moo class
+        * Updated elasticsearch.org URLs to use elastic.co instead
+        * the request body is retained in exceptions
+        * upgraded Hijk to 0.20
+
+1.19    2015-01-15
+        Added method:
+        * cat.segments()
+
+        Added exceptions:
+        * Unauthorized - for invalid user creds
+        * SSL - for invalid SSL certs
+
+        Renamed exception:
+        * ClusterBlock -> Forbidden
+
+        Also:
+        * Simplified SSL support for HTTP::Tiny, LWP and improved instructions
+        * Added optional tests for https/authz/authen
+
+1.17    2014-12-29
+
+        Bug fix:
+        * handle_args were not being passed to all backends,
+          meaning that (eg) cookies could not be used
+
+        Dependency bump:
+        * Log::Any 1.02 broke bwc - fixed to work with new version
+
+        Added params:
+        * op_type, version, version_type to indices.put_template
+        * version, version_type to indices.delete_template
+        * version, version_type to termvectors
+        * master_timeout, timeout to cluster.put_settings
+        * ignore_idle_threads to nodes.hot_threads
+        * terminate_after to search
+
+        Deprecated:
+        * termvector in favour of termvectors (but old method still works for now)
+
+1.16    2014-11-15
+        Added dependency on Pod::Simple, which was causing
+        installation on perl 5.8 to fail
+
+        Added params:
+        * percolate_preference and percolate_routing to percolate()
+
+        Bug fix:
+        * the index param is now required for indices.delete()
+
+1.15    2014-11-05
+        Enhancements:
+         *  All backends (except Hijk) now default to not verifying
+            SSL identities, but accept ssl_options to allow
+            backend-specific configuration
+         *  Improved Mojo exceptions
+
+        Bug fix:
+         *  is_https() didn't work
+
+        Changed:
+         *  index param to put_alias() is now required
+
+        Added methods:
+         *  index.get()
+         *  search_exists()
+         *  indices.upgrade()
+         *  indices.get_upgrade()
+         *  snapshot.verify_repository()
+
+        Added parameters:
+         *  query_cache to search(), clear_cache(), stats()
+         *  wait_if_ongoing to flush()
+         *  script_id and scripted_upsert to update()
+         *  version and version_type to put_script(), get_script(),
+            delete_script(), put_template(), get_template(), and
+            delete_template()
+         *  op_type to put_script() and put_template()
+         *  metric to cluster_reroute()
+         *  realtime to termvector() and mtermvector()
+         *  dfs to termvector()
+
+        Removed parameters:
+         *  filter_metadata from cluster_reroute()
+         *  search_query_hint from mlt()
+
+        Bumped versions:
+            JSON::XS        2.26
+            Package::Stash  0.34
+            Log::Any        0.15
+
+
+1.14    2014-07-24
+        Added support for indexed scripts and indexed templates.
+
+1.13    2014-06-13
+        Breaking change:
+            The Scroll helper used to pass the scroll ID to
+            scroll() and clear_scroll() in the query string by default,
+            with the scroll_in_body parameter to change the behaviour.
+            This was causing frequent errors with long scroll IDs, so
+            the new default behaviour is to pass the scroll ID in the
+            body, with the scroll_in_qs parameter to change that
+            behaviour.
+        All Search::Elasticsearch HTTP backends are now fork safe.
+        Added track_scores param to search()
+        Added create param to indices.put_template()
+        Removed index_templates param from cluster.state()
+        Removed indices_boost param from search()
+        Added percolate_format param to percolate()
+        Added cat.fielddata()
+
+1.12    2014-05-09
+        Fixed bug when trying to reindex from a subref
+        Added search_shards()
+        Added char_filters to indices.analyze()
+        Removed index_templates from cluster.state()
+        Added conf to TestServer for passing arbitrary config
+
+1.11    2014-04-23
+        Switched default Serializer::JSON to use JSON::MaybeXS, and added
+        Serializer backends for Cpanel::JSON::XS, JSON::XS and JSON::PP
+
+        Added scroll_in_body flag for Scroll helper
+
+        Added support for:
+          * search_template()
+          * snapshot->status()
+          * indices->recovery()
+          * benchmark()
+          * list_benchmarks()
+          * abort_benchmark()
+
+1.10    2014-03-05
+        Moved all modules to Search::Elasticsearch namespace.
+        See https://github.com/elasticsearch/elasticsearch-perl/issues/20
+
+1.05    2014-03-05
+
+        Deprecated the Elasticsearch namespace in favour of Search::Elasticsearch.
+        See https://github.com/elasticsearch/elasticsearch-perl/issues/20
+
+        Improved the Bulk->reindex() API. Now accepts a remote $es object.
+        Improved documentation.
+        Added Hijk backend.
+
+1.04    2014-02-27
+
+        Changed the default Cxn to HTTPTiny v0.043. Now provides persistent
+        connections and is a lot faster than LWP.
+
+        Changed ES::Scroll to pass the scroll_id in the URL instead of the
+        body. Better support for older versions and servers behind caching
+        proxies.
+
+1.03    2014-02-12
+        Fixed node sniffing to work across 0.90 and 1.0
+
+1.02    2014-02-11
+        Fixed bug in Elasticsearch::Scroll::next when called in scalar context
+
+1.01    2014-02-09
+        Fixed plugin loader to work with latest version of Module::Runtime
+        which complains about undefined versions
+
+1.00    2014-02-07
+        API updated to be compatible with v1.x branch of Elasticsearch.
+
+        BACKWARDS COMPATIBILITY: To use this client with versions of
+        Elasticsearch before 1.x, specify the client version as:
+
+            $es = Elasticsearch->new(
+                client => '0_90::Direct'
+            );
+
+0.76    2013-12-02
+        Added support for send_get_body_as GET/POST/source
+        Added timeout to bulk API
+
+0.75    2013-10-24
+        Fixed the sniff regex to accommodate hostnames when present
+
+0.74    2013-10-03
+        Fixed a timeout bug in LWP with persistent connections
+        and bad params when using https
+
+0.73    2013-10-02
+        Added Elasticsearch::Cxn::LWP
+        Added Elasticsearch::TestServer
+        Die with explanation if a user on a case-insensitive file system
+        loads this module instead of ElasticSearch
+
+0.72    2013-09-29
+        Added Elasticsearch::Bulk and Elasticsearch::Scroll
+        Changed `https` to `use_https` for compatibility with elasticsearch-py
+        Numerous fixes for different Perl versions, and Moo 1.003 now required
+
+0.71    2013-09-24
+        Fixed dist.ini to list dependencies correctly
+
+0.70    2013-09-24
+        Bumped version numbers because CPAN clashes
+        with ElasticSearch.pm
+
+0.04    2013-09-23
+        First release
+

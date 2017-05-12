@@ -1,0 +1,36 @@
+Build.PL
+Changes
+examples/delete_glob.pl
+lib/Symbol/Util.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/10use.t
+t/20fetch_glob.t
+t/30stash.t
+t/40delete_glob.t
+t/50delete_sub.t
+t/60list_glob_slots.t
+t/70export_glob.t
+t/80export_package.t
+t/test.pl
+xt/check_changes.t
+xt/consistent_version_numbers.t
+xt/copyright.t
+xt/cover.pl
+xt/distribution.t
+xt/kwalitee.t
+xt/minimumversion.t
+xt/perlcritic.t
+xt/perlcriticrc
+xt/pod_coverage.t
+xt/pod_spell.t
+xt/pod_spellrc
+xt/pod_syntax.t
+xt/signature.t
+Makefile.PL
+LICENSE
+META.yml
+META.json
+SIGNATURE    Added here by Module::Build
+SIGNATURE    Added here by Module::Build

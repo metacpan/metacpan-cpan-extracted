@@ -1,0 +1,146 @@
+#!/usr/bin/ruby
+
+# Author: Daniel "Trizen" Șuteu
+# License: GPLv3
+# Date: 15th October 2013
+# http://trizenx.blogspot.com
+# http://trizenx.blogspot.ro/2013/11/smart-word-wrap.html
+# Email: <echo dHJpemVueEBnbWFpbC5jb20K | base64 -d>
+
+# Smart word wrap algorithm
+# See: http://en.wikipedia.org/wiki/Word_wrap#Minimum_raggedness
+
+class SmartWordWrap {
+
+    has width = 80
+
+    # This is the ugliest method! It, recursively,
+    # prepares the words for the combine() function.
+    method prepare_words(array, depth=0, callback) {
+
+        var root = []
+        var len = 0
+        var i = -1
+
+        var limit = array.end
+        while (++i <= limit) {
+            len += (var word_len = array[i].len)
+
+            if (len > width) {
+                if (word_len > width) {
+                    len -= word_len
+                    array.splice(i, 1, array[i].split(width)...)
+                    limit = array.end
+                    --i; next
+                }
+                break
+            }
+
+            root << [
+                array.first(i+1).join(' '),
+                self.prepare_words(array.ft(i+1), depth+1, callback)
+            ]
+
+            if (depth.is_zero) {
+                callback(root[0])
+                root = []
+            }
+
+            break if (++len >= width)
+        }
+
+        root
+    }
+
+    # This function combines the
+    # the parents with the childrens.
+    method combine(root, path, callback) {
+        var key = path.shift
+        path.each { |value|
+            root << key
+            if (value.is_empty) {
+                callback(root)
+            }
+            else {
+                value.each { |item|
+                    self.combine(root, item, callback)
+                }
+            }
+            root.pop
+        }
+    }
+
+    # This is the main function of the algorithm
+    # which calls all the other functions and
+    # returns the best possible wrapped string.
+    method smart_wrap(text, width) {
+
+        self.width = width
+        var words = (text.kind_of(Array) ? text : text.words)
+
+        var best = Hash(
+            score => Inf,
+            value => [],
+        )
+
+        self.prepare_words(words, callback: { |path|
+            self.combine([], path, { |combination|
+                var score = 0
+                combination.ft(0, -2).each { |line|
+                    score += (width - line.len -> sqr)
+                }
+
+                if (score < best{:score}) {
+                    best{:score} = score
+                    best{:value} = []+combination
+                }
+            })
+        })
+
+        best{:value}.join("\n")
+    }
+}
+
+#
+## Usage examples
+#
+
+var obj = SmartWordWrap();
+
+var text = 'aaa bb cc ddddd';
+var t1 = obj.smart_wrap(text, 6);
+say t1;
+
+assert_eq(t1, <<'EOT'.chomp)
+aaa
+bb cc
+ddddd
+EOT
+
+say '-'*80;
+
+text = 'As shown in the above phases (or steps), the algorithm does many useless transformations';
+var t2 = obj.smart_wrap(text, 20);
+say t2;
+
+assert_eq(t2, <<'EOT'.chomp)
+As shown in the
+above phases
+(or steps), the
+algorithm does
+many useless
+transformations
+EOT
+
+say '-'*80;
+
+text = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
+var t3 = obj.smart_wrap(text, 20);
+say t3;
+
+assert_eq(t3, <<'EOT'.chomp)
+Lorem ipsum
+dolor sit amet,
+consectetur
+adipiscing elit.
+EOT

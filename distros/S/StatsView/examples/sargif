@@ -1,0 +1,32 @@
+#!/usr/local/bin/perl -w
+
+use strict;
+use StatsView::Graph;
+
+my $sar      = "sar.txt";
+my $cpu_idle = "sar_idle.gif";
+my $gif_busy = "sar_busy.gif";
+my $gif_blks = "sar_blks.gif";
+my $gif_rw   = "sar_rw.gif";
+
+my $graph;
+exit if (! eval { $graph = StatsView::Graph->new($sar); });
+   
+$graph->read("CPU usage");
+
+print("$sar -> $cpu_idle\n");
+$graph->define(columns => [ "%idle" ]);
+$graph->save(file => $cpu_idle, format => "gif");
+
+$graph->read("Disk IO");
+print("$sar -> $gif_busy\n");
+$graph->define(column => "%busy", instances => [ $graph->get_instances() ]);
+$graph->save(file => $gif_busy, format => "gif");
+
+print("$sar -> $gif_blks\n");
+$graph->define(column => "blks/s", instances => [ $graph->get_instances() ]);
+$graph->save(file => $gif_blks, format => "gif");
+
+print("$sar -> $gif_rw\n");
+$graph->define(column => "r+w/s", instances => [ $graph->get_instances() ]);
+$graph->save(file => $gif_rw, format => "gif");

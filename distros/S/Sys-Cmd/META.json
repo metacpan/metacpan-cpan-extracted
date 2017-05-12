@@ -1,0 +1,68 @@
+{
+   "abstract" : "run a system command or spawn a system processes",
+   "author" : [
+      "Mark Lawrence <nomad@null.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4216",
+   "keywords" : [],
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Sys-Cmd",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter::Tidy" : "0",
+            "File::Which" : "0",
+            "File::chdir" : "0",
+            "IO::Handle" : "0",
+            "Log::Any" : "0",
+            "Proc::FastSpawn" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Cwd" : "0",
+            "Data::Dumper" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Sys::Cmd" : {
+         "file" : "lib/Sys/Cmd.pm",
+         "version" : "v0.85.4"
+      },
+      "Sys::Cmd::Template" : {
+         "file" : "lib/Sys/Cmd/Template.pm",
+         "version" : "v0.85.4"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mlawren/p5-Sys-Cmd/issues"
+      },
+      "homepage" : "https://github.com/mlawren/p5-Sys-Cmd",
+      "license" : [
+         "http://www.gnu.org/licenses/gpl-3.0.txt"
+      ],
+      "repository" : {
+         "url" : "git://github.com/mlawren/p5-Sys-Cmd.git"
+      }
+   },
+   "version" : "v0.85.4"
+}

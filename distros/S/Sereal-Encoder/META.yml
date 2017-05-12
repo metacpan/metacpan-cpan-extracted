@@ -1,0 +1,35 @@
+---
+abstract: 'Fast, compact, powerful binary serialization'
+author:
+  - 'Steffen Mueller <smueller@cpan.org>, Yves Orton <yves@cpan.org>'
+build_requires:
+  Data::Dumper: '0'
+  ExtUtils::ParseXS: '2.21'
+  File::Find: '0'
+  File::Path: '0'
+  File::Spec: '0'
+  Scalar::Util: '0'
+  Sereal::Decoder: '3.00'
+  Test::LongString: '0'
+  Test::More: '0.88'
+  Test::Warn: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '7.0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Sereal-Encoder
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  XSLoader: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/Sereal/Sereal/issues
+  repository: git://github.com/Sereal/Sereal.git
+version: '3.015'

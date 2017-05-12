@@ -1,0 +1,33 @@
+Revision history for Perl extension Sub::Override.
+
+0.09  Wed Jan 16 2013
+      Switch from Test::Exception to Test::Fatal.
+      Fix two typos on the POD. Patches from Ansgar Burchardt and david.skyba.
+
+0.08  Wed Sep 21 2005
+      Remembered to update Changes file.  Grr.  I really need a
+      "lint" script which can check to see if I've forgotten
+      stupid things.
+
+0.07  Wed Sep 21 2005
+      Added dependency on Sub::Uplevel even though I don't use
+      it.  Tests keep failing for folks because of it.
+      Added pod tests.
+      Added "override" as a synonym for "replace".
+
+0.06  Fri Dec  3 2003
+    - Ensure that restore() always restores the sub to its
+      original state.  This allows a subroutine to be safely
+      overridden multiple times.
+
+0.05  Tue Aug 24 2004
+    - Removed accidental dependency on Data::Dumper::Simple
+      
+0.04  Mon Aug 23 2004
+    - Fixed bug where explicitly restoring subs whose names were
+      not fully qualified would fail.
+
+0.01  Mon May 24 09:44:31 2004
+	- original version; created by h2xs 1.23 with options
+		-AX -n Sub::Override
+

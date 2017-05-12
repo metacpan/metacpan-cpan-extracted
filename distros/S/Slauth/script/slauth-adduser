@@ -1,0 +1,35 @@
+#!/usr/bin/perl
+
+use strict;
+use Slauth::Config;
+use Slauth::Storage::User_DB;
+use Getopt::Long;
+
+my ( $domain, $user, $name, $email, $password, @groups);
+
+my $getopt_res = GetOptions(
+	"domain=s" => \$domain,
+	"user=s" => \$user,
+	"name=s" => \$name,
+	"email=s" => \$email,
+	"password=s" => \$password,
+	"group:s" => \@groups );
+
+# check args
+if (( !defined $domain )
+	or ( !defined $user )
+	or ( !defined $name )
+	or ( !defined $email )
+	or ( !defined $password ))
+{
+	die "usage: $0 --domain domain --user user --name full-name "
+		."--email addr --password pw [--group group ...]\n";
+}
+
+# create config record
+$ENV{SLAUTH_REALM} = $domain;
+my $config = Slauth::Config->new();
+
+# create the new user record
+my $user_db = Slauth::Storage::User_DB->new( $config );
+$user_db->write_record ( $user, $password, $name, $email, @groups );

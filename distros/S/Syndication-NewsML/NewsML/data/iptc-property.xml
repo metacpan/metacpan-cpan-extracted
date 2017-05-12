@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!DOCTYPE TopicSet PUBLIC "urn:newsml:iptc.org:20001006:NewsMLv1.0.dtd:1" "NewsMLv1.0.dtd">
+<TopicSet Duid="iptc.property" FormalName="Property">
+	<Comment xml:lang="en">A named characteristic of a NewsComponent, ContentItem or Topic, whose value may be a string, a Topic, some other piece of data, or a set of further Properties.</Comment>
+	<Topic Duid="sprop1">
+		<TopicType Scheme="IptcTopicType" FormalName="Property"/>
+		<FormalName Scheme="IptcProperty">FileExtension</FormalName>
+		<Description xml:lang="en">The characters appearing after the last . character in a filename.</Description>
+	</Topic>
+	<Topic Duid="sprop2">
+		<TopicType Scheme="IptcTopicType" FormalName="Property"/>
+		<FormalName Scheme="IptcProperty">StoryOrder</FormalName>
+		<Description xml:lang="en">The position of a NewsComponent in the sequence of a story.</Description>
+	</Topic>
+</TopicSet>
+

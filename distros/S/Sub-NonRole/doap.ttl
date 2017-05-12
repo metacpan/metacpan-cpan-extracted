@@ -1,0 +1,97 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Sub-NonRole/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-requirement [
+		doap-deps:on "Hook::AfterRuntime 0"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "MooX::CaptainHook 0.004"^^doap-deps:CpanId;
+	], [ doap-deps:on "Sub::Identify 0"^^doap-deps:CpanId ], [ doap-deps:on "Sub::Talisman 0"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Moo 1.000000"^^doap-deps:CpanId ], [ doap-deps:on "Moo::Role 0"^^doap-deps:CpanId ], [ doap-deps:on "Test::Requires 0"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Sub-NonRole>;
+	doap:created         "2013-01-03"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/Sub-NonRole>;
+	doap:homepage        <https://metacpan.org/release/Sub-NonRole>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "Sub-NonRole";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Sub-NonRole/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Sub-NonRole/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Sub-NonRole/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Sub-NonRole/v_0-004>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-sub-nonrole>;
+	];
+	doap:shortdesc       "prevent some subs from appearing in a role's API".
+
+<http://purl.org/NET/cpan-uri/dist/Sub-NonRole/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "Sub-NonRole-0.001"^^xsd:string;
+	dc:issued            "2013-01-03"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-NonRole-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Sub-NonRole/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "Sub-NonRole-0.002"^^xsd:string;
+	dc:issued            "2013-01-04"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Support for MooseX::Role::Parameterizable roles.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-NonRole-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Sub-NonRole/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "Sub-NonRole-0.003"^^xsd:string;
+	dc:issued            "2013-01-11"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Document issue in older Perls where packages crash if they import Sub::NonRole without applying the attibute to any subs.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Avoid triggering this issue in test suite.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-NonRole-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Sub-NonRole/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "Sub-NonRole-0.004"^^xsd:string;
+	dc:issued            "2014-09-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Switch to Dist::Inkt.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-NonRole-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

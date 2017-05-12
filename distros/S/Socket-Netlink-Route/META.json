@@ -1,0 +1,54 @@
+{
+   "abstract" : "interface to Linux's C<NETLINK_ROUTE> netlink\nsocket protocol",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Socket-Netlink-Route",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CChecker" : "0",
+            "ExtUtils::H2PM" : "0.07",
+            "Module::Build" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "5.57",
+            "Socket::Netlink" : "0.04"
+         }
+      }
+   },
+   "provides" : {
+      "IO::Socket::Netlink::Route" : {
+         "file" : "lib/IO/Socket/Netlink/Route.pm",
+         "version" : "0.05"
+      },
+      "Socket::Netlink::Route" : {
+         "file" : "lib/Socket/Netlink/Route.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.05"
+}

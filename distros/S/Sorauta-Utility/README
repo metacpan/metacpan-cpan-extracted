@@ -1,0 +1,98 @@
+Sorauta-Utility version 0.01
+============================
+
+The README is used to introduce the module and provide instructions on
+how to install the module, any machine dependencies it may have (for
+example C compilers and installed libraries) and any other information
+that should be provided before the module is installed.
+
+A README file is required for CPAN modules since CPAN extracts the
+README file from a module distribution so that people browsing the
+archive can use it get an idea of the modules uses. It is usually a
+good idea to provide version information here so that people can
+decide whether fixes for the module are worth downloading.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+HOW TO USE
+
+basic use:
+  use Sorauta::Utility;
+
+1.get_from_http
+  $url = "http://google.com/";
+
+  # HTTP::Response instance
+  my $result = get_from_http($url);
+
+2.save_file
+  my $path = "sample.txt";
+  my $content = "hoge fuga piyo";
+  # if error has occures, return 2(or 0)
+  save_file($path, $content);
+
+3.create_get_url
+  my $url = "http://google.com/";
+  my $params = { id => 1, name => "sample" };
+
+  # return "http://google.com/?name=sample&id=1&"
+  my $result = create_get_url($url, $params);
+
+4.get_timestamp
+  # return "2012/01/25 15:02:14"
+  my $result = get_timestamp(1327471334);
+
+5.get_date
+  # return { year => 1, month => 1, dat => 2, hour => 1, min => 1, sec => 1 };
+  my $data_obj = get_date();
+
+6.get_epoch_from_formated_http
+  # return 1326498561
+  my $result = get_epoch_from_formated_http("Fri, 13 Jan 2012 23:49:21 GMT");
+
+7.cat
+  my @path_list = ('/Users', 'user', 'Desktop', 'Hoge.txt');
+
+  # return "/Users/user/Desktop/Hoge.txt"
+  my $result = cat(@path_list);
+
+8.is_hidden_file
+  my $file_path = ".svn";
+
+  # return 1
+  my $result = is_hidden_file($file_path);
+
+9.is_unnecessary_copying_file
+  my $file_path = ".svn";
+
+  # return 1
+  my $result = is_unnecessary_copying_file($file_path);
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+CGI::Carp
+Data::Dumper
+LWP::UserAgent
+Time::Local
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2012 by Yuki ANAI
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.12.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

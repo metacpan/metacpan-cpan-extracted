@@ -1,0 +1,39 @@
+#!/usr/local/bin/perl -w
+
+use strict;
+# use ExtUtils::testlib;
+# use Solaris::Procfs qw(:control_codes writectl);
+use lib '.';
+
+$|++;
+
+my $pid;
+
+foreach $pid (@ARGV) {
+
+	# Open the ctl file with a flag of 1, which means write-only.  
+	#
+	unless ( sysopen FILE, "/proc/$pid/ctl", 1) {
+
+		warn "Could not open file /proc/$pid/ctl for writing: $!\n";
+		next;
+	}
+
+	# Just for fun we hardcode this constant, and avoid using
+	# Solaris::Procfs at all. 
+	#
+	my $PCSTOP   =  1;
+
+	# Pack the flags into a series of signed long integers 
+	#
+	my $flags   = pack( "l*", $PCSTOP );
+	my $length  = length $flags;
+
+	# Now use syswrite to write the flags to the ctl file. 
+	# This will stop the process.
+	#
+	syswrite(FILE,$flags,$length);
+
+	close FILE;
+}
+

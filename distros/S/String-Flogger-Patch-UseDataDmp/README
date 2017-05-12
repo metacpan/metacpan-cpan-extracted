@@ -1,0 +1,16 @@
+SYNOPSIS
+
+     % PERL5OPT=-MString::Flogger::Patch::UseDataDmp dzil build -v
+
+DESCRIPTION
+
+    I use this patch module when debugging building with Dist::Zilla
+    (dzil). By default, dzil uses Log::Dispatchouli which in turn uses
+    String::Flogger which in turn uses JSON to dump references, with all
+    its limitations. This patch improves the dumping to see data structures
+    more clearly (objects, coderefs, etc).
+
+SEE ALSO
+
+    String::Flogger::Patch::UseDataDump
+

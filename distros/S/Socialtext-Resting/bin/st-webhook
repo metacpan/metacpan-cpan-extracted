@@ -1,0 +1,92 @@
+#!/usr/bin/env perl
+# @COPYRIGHT@
+
+use strict;
+use warnings;
+use Socialtext::Resting::Getopt qw/get_rester/;
+use Getopt::Long;
+use JSON::XS;
+
+my $r = get_rester();
+usage("No rester server is specified!") unless $r->server;
+
+my %args;
+GetOptions( \%args,
+    'class=s',
+    'url=s',
+    'id=s',
+    'account-id=s',
+    'workspace-id=s',
+    'group-id=s',
+);
+
+$args{account_id}   = delete $args{'account-id'}   if $args{'account-id'};
+$args{workspace_id} = delete $args{'workspace-id'} if $args{'workspace-id'};
+$args{group_id}     = delete $args{'group-id'}     if $args{'group-id'};
+
+my $command = shift || usage();
+my %commands = (
+    create => sub {
+        usage("Must specify class and url.") unless $args{class} and $args{url};
+        my $id = $r->post_webhook( %args ) || '';
+        print "Created webhook $id\n";
+    },
+    list => sub {
+        my $hooks = $r->get_webhooks();
+        if (@$hooks) {
+            for my $h (@$hooks) {
+                next if $args{class} and $args{class} ne $h->{class};
+                dump_hook($h);
+            }
+        }
+        else {
+            print "No webhooks have been created.\n";
+        }
+    },
+    'delete' => sub {
+        usage("Must specify a hook ID to delete") unless $args{id};
+        $r->delete_webhook(%args);
+        print "Webhook $args{id} deleted.\n";
+    },
+);
+
+my $sub = $commands{$command} || usage("Sorry, $command is not a valid command.");
+$sub->();
+
+exit;
+
+sub usage {
+    my $msg = shift || '';
+    $msg .= "\n\n" if $msg;
+    die <<EOT
+${msg}USAGE: $0 COMMAND --class=foo --url=foo
+
+Where COMMAND is one of:
+  create    - create a new webhook
+  list      - list existing webhooks
+  delete    - delete a webhook
+
+Mandatory `create` arguments:
+  --class   - class of events to hook
+  --url     - URL the hook should GET when it fires
+
+Mandatory `delete` arguments:
+  --id      - Webhook ID to delete
+
+Optional Webhook filter arguments:
+  --account-id=foo
+  --workspace-id=foo
+EOT
+}
+
+sub dump_hook {
+    my $h = shift;
+    print "ID: $h->{id} - $h->{class} - $h->{url}\n";
+    print "  Creator user_id: $h->{creator_id}\n";
+    print "  Workspace filter: $h->{workspace_id}\n" if $h->{workspace_id};
+    print "  Account filter: $h->{account_id}\n" if $h->{account_id};
+    if (keys %{ $h->{details} }) {
+        print "  Hook details:\n    " . encode_json($h->{details}) . "\n";
+    }
+    print "\n";
+}

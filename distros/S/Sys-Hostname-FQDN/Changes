@@ -1,0 +1,42 @@
+Revision history for Perl extension Sys::Hostname::FQDN
+
+0.12 Mon Nov 24 08:29:23 PST 2014
+	squashed memory leak - thanks to Jiro Nishiquchi
+
+0.11  Mon Nov 15 10:38:56 PST 2010
+	Added "Artistic" licensing
+
+0.10  Sat Mar  7 17:49:24 PST 2009
+	clean up prototype mismatchs for char/uchar
+
+0.09  Mon Oct  6 13:38:16 PDT 2008
+	update socket headers from perl Socket 5.9.3
+
+0.08  Mon Oct  2 09:31:58 PDT 2006
+	incorporated header patch for build with ActiveState 
+	perl v5.8.7 built for MSWin32-x86-multi-thread
+	Thanks to Alexandr Ciornii, http://chorny.net
+
+0.07  Sat Nov 13 16:31:56 PST 2004
+	update documentation
+
+0.06  Sat Sep 20 16:06:21 PDT 2003
+	managed to release a debug version as 0.05
+	debug code removed
+
+0.05  Tue Sep 16 18:40:02 PDT 2003
+	added alt_inet_aton for OS's that don't have inet_aton
+	this resolves the problem with Solaris.
+
+0.04  Tue Aug 19 15:29:55 PDT 2003 -- this didn't work
+	include resolv.h and -lresolv
+	for solaris, remove solaris hints.
+
+0.03  Mon Aug 11 09:47:50 PDT 2003
+	include Solaris 'hints'
+
+0.02  Fri Aug  8 18:08:50 PDT 2003
+	documentation update
+
+0.01  Tue Jun 10 14:35:02 PDT 2003
+	initial release

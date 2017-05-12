@@ -1,0 +1,8 @@
+Changes
+FixedLen.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+eg/fixed
+t/00_basic.t

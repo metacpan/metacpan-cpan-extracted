@@ -1,0 +1,22 @@
+#!/usr/bin/perl -w
+
+use Scrabble::Dict;
+use strict;
+
+local $| = 1;
+
+my $dict = Scrabble::Dict->new;
+
+if (@ARGV == 1 && $ARGV[0] eq '-') {
+  while (<STDIN>) { chomp; lookup_and_output($_); }
+}
+else {
+  lookup_and_output($_) for @ARGV;
+}
+
+sub lookup_and_output {
+  my $word = shift;
+  my $def = $dict->define($word);
+  print "$def\n" if $def;
+}
+

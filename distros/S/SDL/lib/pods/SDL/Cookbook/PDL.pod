@@ -1,0 +1,90 @@
+
+=pod
+
+=head1 NAME
+
+SDL::CookBook::PDL -- CookBook for SDL + PDL
+
+PDL provides great number crunching capabilities to Perl and SDL provides game-developer quality real-time bitmapping and sound.  You can use PDL and SDL ''together'' to create real-time, responsive animations and simulations.  In this section we will go through the pleasures and pitfalls of working with both powerhouse libraries.
+
+
+=head2 CATEGORY
+
+Cookbook
+
+=head1 Creating a SDL Surface piddle
+
+PDL's core type is a piddle. Once a piddle is provided to PDL it can go do a numerous amounts of things. Please see the example in 'examples/cookbook/pdl.pl' that came with this module.
+
+=head2 Creating a simple piddle
+
+First lets get the right modules.
+
+  use PDL;
+  use SDL::Rect;
+  use SDL::Video;
+  use SDL::Surface;
+  use SDL::PixelFormat;
+
+Suppose you want a surface of size (200,400) and 32 bit (RGBA).
+
+   my ( $bytes_per_pixel, $width, $height ) = ( 4, 200, 400 );
+
+Define the $width, $height and $bytes_per_pixel. Your $bytes_per_pixel is the number of bits (in this case 32) divided by 8 bits per byte. Therefore for our 32 bpp we have 4 Bpp;
+
+   my $piddle  = zeros( byte, $bytes_per_pixel, $width, $height );
+
+Create a normal $piddle with zeros, byte format and the Bpp x width x height dimensions.
+
+   my $pointer = $piddle->get_dataref();
+
+Here is where we get the actual data the piddle is pointing to. We will have SDL create a new surface from this function.
+
+   my $surface = SDL::Surface->new_from( $pointer, $width, $height, 32,
+        $width * $bytes_per_pixel );
+
+Using the same dimensions we create the surface using new_form. The width *  Bpp is the scanline (pitch) of the surface in bytes.
+
+   warn "Made surface of $width, $height and ". $surface->format->BytesPerPixel;
+   return ( $piddle, $surface );
+
+Finally make sure that the surface actually has the correct dimensions we gave.
+
+B<NOTE:> $surface->format->BytesPerPixel must return 1,2,3,4. !!
+
+Now you can blit and use the surface as needed; and do PDL operations as required.
+
+
+=head2 Operating on the Surface safely
+
+To make sure SDL is in sync with the data. You must call SDL::Video::lock B<before> doing PDL operations on the piddle.
+
+    SDL::Video::lock_surface($surface);
+
+    $piddle->mslice( 'X', [ rand(400), rand(400), 1 ], [ rand(200), rand(200), 1 ] )
+        .= pdl( rand(225), rand(225), rand(255), 255 );
+
+After that you can unlock the surface to blit.
+
+    SDL::Video::unlock_surface($surface);
+
+=head2 Error due to BPP at blitting
+
+When blitting the new surface check for the return value to see if there has been a problem.
+
+    my $b = SDL::Video::blit_surface(
+        $surface,  SDL::Rect->new( 0, 0, $surface->w, $surface->h ),
+        $app, SDL::Rect->new(  ( $app->w - $surface->w ) / 2, ( $app->h - $surface->h ) / 2, $app->w, $app->h )
+       );
+
+    die "Could not blit: " . SDL::get_error() if ( $b == -1 );
+
+If the error message is 'Blit combination not supported' that means that the BPP is incorrect or inconsistent with the dimensions.
+After that a simple update_rect will so your new surface on the screen.
+
+=head1 AUTHORS
+
+See L<SDL/AUTHORS>.
+
+
+=cut

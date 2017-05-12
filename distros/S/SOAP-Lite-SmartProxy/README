@@ -1,0 +1,103 @@
+
+                   -=* SOAP-Lite-SmartProxy *=-
+
+
+Highlights
+==========
+
+    *  Redirect/Forward a SOAP client on a per class basis.
+    *  Redirect/Forward a SOAP request to a new SOAPAction URI.
+
+
+Overview
+========
+
+The SmartProxy package is intended for use in a multi-server setting where
+one or more servers may not be directly accessible to client side scripts.
+The SmartProxy package makes request redirection and forwarding on a per class
+basis easy.  Client scripts need not know which server is appropriate for a
+specific request and may make all requests from a single master server which
+can be relied upon to redirect clients to the server currently fulfilling a
+given request.  The relieves a maintenance burden on the client side.  The
+server may also redirect clients to a new class name or fully qualified
+action URI (methods and arguments are assumed to remain constant however).
+
+
+Setup & Demo Scripts
+====================
+
+Three servers are required for proper setup and testing.  The server that
+will be redirecting and forwarding events lets call the "Smart" or "S"
+server.  A second server, preferably behind a firewall, lets call the "F"
+server.  The third server, which should be as accessible a the M server,
+lets just call the "O" server for "Other".
+
+
+On the S Server
+---------------
+
+ 1) Install the SmartProxy package here, it should be installed on the other
+    servers as well, but this is optional.
+
+ 2) Install lib/Apache/SmartProxy.pm (edit your Apache config files
+    accordingly)
+
+ 3) Install server/SafeModules/Redirect.pm in the deployed modules directory
+    for this server, edit it for your site.
+
+
+On the F Server
+---------------
+
+ 1) Install the server/SafeModules/Hello.pm and server/SafeModules/Calculator.pm
+    files in the deployed modules directory for this server.
+
+
+On the O Server
+---------------
+
+ 1) Install the server/SafeModules/Hello.pm, server/SafeModules/Calculator.pm,
+    server/SafeModules/GoodBye.pm and server/SafeModules/NewGoodBye.pm
+    files in the deployed modules directory for this server.
+
+
+From your client machine install the SmartProxy package and run through the
+client/* scripts.  The client scripts must be edited to use your S server
+as a proxy (except for client/http-hello.pl which will use your O server
+directly).
+
+
+
+Usage
+=====
+
+The SOAP-Lite package will use the smart proxy package whenever you use
+a uri of the scheme 'httpx://'.  Which is of course highly contrived.  At
+this stage of development I was unable to find a more transparent alternative.
+With a little cutting and pasting the HTTPX.pm can be made to replace your
+HTTP.pm module and the 'httpx' requirement eliminated.  Try at your own risk :)
+
+
+Limitations
+===========
+
+The package has only been tested with simply URI redirection and not advanced.
+
+
+Future
+======
+
+In the extreme smart proxy servers could check in with each other at start up
+time to register the classes that they have available in their respective
+deployed modules directories.  Any smart proxy could then forward or redirect
+requests to the appropriate server.  This would be somewhat ORB like and
+lessens the maintenance burden of keeping the Redirect.pm module up to date.  
+
+Class name registries however convenient, open the door to a whole new world
+of headaches -consider DNS for example.
+
+
+Comments & Requests
+===================
+
+Daniel Yacob (yacob@rcn.com)

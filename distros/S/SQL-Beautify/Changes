@@ -1,0 +1,21 @@
+Revision history for SQL-Beautify
+
+0.04	2011-08-07
+		* Support for adding own keywords.
+		* Support for custom rules
+		* More keywords
+		* New option "uc_keywords"
+		* Command line script "sqlbeautify" (Gabor Szabo)
+		* Fixes
+
+0.03	2009-04-13
+		* Improved handling of (nested) parenthesis
+		* Name quotation and separation fixes (in SQL::Tokenizer)
+
+0.02	2009-03-29
+		* Fix in documentation.
+		* Line break before ORDER BY and GROUP BY.
+		
+
+0.01    2009-02-22
+        First version, released on an unsuspecting world.

@@ -1,0 +1,42 @@
+{
+   "abstract" : "Perl extension that enables the use of the SFML multimedia library.",
+   "author" : [
+      "Jake Bott <jakeanq@gmail.com>, Georgiy Tugai <georgiy.tugai@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "zlib"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "SFML",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::SFML" : "0.02",
+            "ExtUtils::CBuilder" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::SFML" : "0.02"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::SFML" : "0.02"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.0102"
+}

@@ -1,0 +1,37 @@
+---
+abstract: 'Vertically pad a string'
+author:
+  - 'Erik Carlsson <info@code301.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0.96'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: String-Cushion
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+provides:
+  String::Cushion:
+    file: lib/String/Cushion.pm
+    version: '0.0100'
+requires:
+  Sub::Exporter::Progressive: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/Csson/p5-String-Cushion/issues
+  homepage: https://metacpan.org/release/String-Cushion
+  repository: https://github.com/Csson/p5-String-Cushion.git
+version: '0.0100'

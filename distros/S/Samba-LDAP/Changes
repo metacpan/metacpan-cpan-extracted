@@ -1,0 +1,36 @@
+Revision history for Samba-LDAP
+
+0.05  Fri Mar 07 2008
+      - #33887: User's DN in User.pm's set_password is incorrectly assumed
+
+0.04  Fri Apr 14 2006
+      - Fixed Member not getting deleted from AddressAdmins
+        group, when user is deleted.
+      - Various debugging things left over and now removed
+
+0.03  Fri Apr 07 2006
+      - Better search for group members in 
+        Samba::LDAP::Group
+
+0.02  Thu Apr 06 2006
+      - Bug fix for Samba::LDAP::User
+
+0.01  Tues Mar 28 2006
+      - Bad version upload to the CPAN and might as
+        well be 0.01 now ;-)
+
+0.03_01  Mon Mar 27 2006
+         - Completed preliminary documentation. 
+           Samba::LDAP and Samba::LDAP::User still not complete.
+         - Config files are now bundled in t/
+         - Added new Machine Class
+
+0.02_01  Fri Mar 24 2006
+         - Added check for TLS connection before binding with
+           masterdn and pass, as per:
+           http://perlmonks.org/?node_id=538906
+         - Added change_pass docs
+
+0.01_01  Thu Mar 23 2006
+         - Alpha release. Not complete. You've been warned!
+

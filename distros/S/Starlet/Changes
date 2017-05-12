@@ -1,0 +1,99 @@
+Revision history for Perl extension Starlet
+
+0.31
+	- send 100-continue immediately #25 (Gregory Oschwald)
+	- expose new callback for sending informational responses #29 (Kazuho Oku)
+
+0.30
+	- add child_exit hook #26 (by azrle)
+
+0.29
+	- fix workers being killed too aggressively when spawn-interval is used #27 (by limitusus)
+
+0.28
+	- always shutdown after SIGTERM, but only after notifying the client (via connection: close or equiv.) #23
+
+0.26
+	- fix abrupt connection close when receiving SIGTERM #21 (by shogo82148)
+
+0.25
+	- support listing to unix socket wo. using Server::Starter
+	- suppress warning when receiving broken requests
+	- fix test issue with Plack >= 1.0035
+
+0.24
+	- worker processes always receive different sequence of values when calling "rand()"
+
+0.23
+	- serialize calls to select -> accept when listening to multiple ports
+
+0.22
+	- listen to multiple ports passed from Server::Starter (ttakezawa)
+
+0.21
+	- support listening to unix socket (passed by Server::Starter) (kazeburo)
+
+0.20
+	- support HTTP/1.1 (kazeburo)
+
+0.19
+	- update the dependencies now that Plack no more depends on LWP (miyagawa; https://github.com/plack/Plack/pull/408)
+	- add support for psgix.harakiri (audreyt)
+
+0.18
+	- change threshold for combining headers and body from 1024 bytes to 8192
+
+0.17_01
+	- reduce rt_sig* syscalls (kazeburo)
+
+0.16
+	- Set REMOTE_PORT environment variable (kazeburo)
+
+0.15
+	- unbundle Plack::Standalone::Server::Prefork::Server::Starter (see `perldoc Starlet` to find out how to boot Starlet using Server::Starter)
+
+0.14
+	- support for randomized reqs-per-child
+	- support for slow restart
+	- do not send Server header more than once per every response
+
+0.13
+	- test compatibilty improvement: ignore proxy setting while running tests (datamuc)
+
+0.12
+	- [bugfix] fix infinite loop when connection is closed while receiving response content (thanks to Jiro Nishiguchi-san)
+
+0.11
+	- suppress the warning "Use of "goto" to jump into a construct is deprecated"
+
+0.10
+	- switch from alarm-based polling to select-based
+	- use TCP_DEFER_ACCEPT on linux
+	- performance tweaks
+
+0.09
+	- [bugfix] enable keepalive when --max-keepalive-reqs=n (n>1) is set
+	- accept --max-workers=n option (for better interoperability w. Starman)
+
+0.08
+	- [bugfix] delay termination (when receiving first SIGTERM or SIGINT) until all HTTP requests are being processed
+
+0.07
+	- hardcode set $PSSPSS::VERSION
+
+0.06
+	- set $PSSPSS::VERSION to $Starlet::VERSION
+
+0.05
+	- rename to Starlet from Plack::Server::Standalone::Prefork::Server::Starter (is backwards compatible)
+	- no more depends on HTTP::Server::PSGI
+
+0.04
+	- follow the changes up to Plack 0.9920
+
+0.03
+	- try to find start_server from $PATH and $^X, or skip most tests (but not all) if not found
+	- require 5.008, recommend HTTP::Parser::XS
+
+0.02
+	- require Parallel::Prefork (since Plack intentionally does not require P::Prefork required by Standalone::Prefork)

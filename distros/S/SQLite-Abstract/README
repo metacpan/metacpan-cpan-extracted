@@ -1,0 +1,318 @@
+SQLite::Abstract(3)   User Contributed Perl Documentation  SQLite::Abstract(3)
+
+
+
+NNAAMMEE
+       SQLite::Abstract - Object oriented wrapper for SQLite2
+
+SSYYNNOOPPSSIISS
+        use SQLite::Abstract;
+
+        my $db = SQLite::Abstract->new("database name");
+        my $db = SQLite::Abstract->new(
+           {
+               DB => "database name",
+               DSN => "dbi:SQLite2:dbname",
+               TABLE => "tablename",
+           }
+        );
+
+        $db->create_table($tablename,<<SQ);
+             id INTEGER PRIMARY KEY,
+             name VARCHAR(255) NOT NULL,
+             password VARCHAR(255) NOT NULL,
+        SQ
+
+        $db->table("tablename");
+
+        $db->insert(\@fields, \@data);
+        $db->insert(['name', 'password'], [['user1', 'password1'], ['user2', 'password2']]);
+
+        $db->update(q/password = 'w0rdpass' where name = 'guest'/);
+
+        $db->select(q/select name, password from tablename limit 0,2/);
+        $db->select(q/* limit 0,2/);
+        $db->select(q/ALL limit 0,2/);
+        $db->select_name_password(q/limit 0,2/);
+        $db->select_name(q/limit 0,2/);
+
+        while ( $name = $db->select_name ) {
+           print "$name\n";
+        }
+
+        # slurping mode
+        for ( @names = $db->select_name ) {
+           print "name: $_\n";
+        }
+
+        while ( $row = $db->select ) {
+           print "name: $row->[1] password: $row->[2]\n";
+        }
+
+        $db->count;
+        $db->count(q/where name like 'user%'/);
+        $db->sum(q/where name like '%name'/);
+
+        $db->delete(q/where password like 'password'/);
+        $db->delete_all();
+
+        $db->drop_table;
+
+DDEESSCCRRIIPPTTIIOONN
+       SQLite::Abstract is abstract level above DBD::SQLite.  This package
+       aims at intuitional SQLite database manipulation.  It pretends to be
+       the easiest sql class.
+
+MMEETTHHOODDSS
+       "new"
+           The constructor takes database name which must be existing file.
+           The $dbh attributes can be set through 'attrs' structure with the
+           extended version of the constructor:
+
+             $sql = SQLite::Abstract->new(
+                {
+                   DB => $database,
+                   DSN => 'dbi:SQLite2:dbname',
+                   attrs => {
+                       AutoCommit => 0,
+                       PrintError => 1,
+                       RaiseError => 1,
+                }
+             );
+
+           Use either the short version (database name as scalar argument) or
+           anonymous hash with DB and DSN which are mandatory keys:
+
+            $sql = SQLite::Abstract->new($database);
+            $sql = SQLite::Abstract->new(
+               {
+                  DB => $database,
+                  DSN => 'dbi:SQLite2:dbname',
+               }
+            );
+
+           Returns object if the database connection (SQLite2 DSN by default)
+           is set successfully.
+
+       SSQQLL TTaabbllee MMeetthhooddss
+
+
+       "table"
+           Accessor and mutator for the default table.  This is the table
+           which all methods use by default.
+
+            $sql->table(); # returns the default table name
+            $sql->table($tablename); # sets and returns the default table name
+            $sq->table = $tablename;
+
+       "tables"
+           Lists the tables in the database. Returns a list with the tables or
+           true on sucess. Returns undef on failure or raises fatal error
+           exception according to $dbh "RaiseError" attribute.
+
+            @tables = $sql->tables();
+
+       "create_table"
+           Creates table.
+
+            $sql->create_table($tablename, <<QUOTE);
+
+             id INTEGER PRIMARY KEY,
+             ...
+             ...
+
+            QUOTE
+
+           which is equivalent to:
+
+            $sql->do(<<QUOTE);
+
+             CREATE TABLE tablename (
+                 id INTEGER PRIMARY KEY,
+                 ...
+                 ...
+             )
+
+            QUOTE
+
+           Returns true on success. Returns undef on failure or raises fatal
+           error exception according to $dbh "RaiseError" attribute.
+
+       "drop_table";
+           Deletes table. Like all methods works on the dafault table unless
+           explicitly given table name.
+
+            $sql->drop_table(); # drops the default table
+            $sql->drop_table($tablename);
+
+           Returns true on success. Returns undef on failure or raises fatal
+           error exception according to $dbh "RaiseError" attribute.
+
+       "create_view"
+           Creates a view which is a named select statement. Requires two
+           arguments, the view's name and a SELECT statement. View is created
+           in the object's database. It is read-only. It is removed with
+           drop_view.
+
+            $sql->create_view("view_name", q/
+                SELECT id FROM $tablename
+                 WHERE ...
+            /);
+            $sql->table = "view_name";
+            $sql->select();
+
+           Returns true on success otherwise returns undef or raises fatal
+           error exception according to $dbh "RaiseError" attribute.
+
+       "drop_view"
+           Removes a view. Requires the view's name as argument.
+
+            $sql->drop_view("view_name");
+
+           Returns true on success otherwise returns undef or raises fatal
+           error exception according to $dbh "RaiseError" attribute.
+
+       SSQQLL QQuueerryy MMeetthhooddss
+
+
+       "insert"
+           Inserts data. Takes array references, the columns and the data to
+           be inserted into these columns. The data array (which must be array
+           of array references) can be given alone in which case each element
+           is expected to refer to the same number as the columns in the
+           default sql table. Returns the number of affected rows. Returns
+           false unless inserted rows.  Returns undef on failure or raises
+           fatal error exception according to $dbh "RaiseError" attribute.
+
+            # talbe with two columns:
+            @data = (['col_r11', 'col_r12'], ['col_r21', 'col_r22'])
+
+            $sql->insert(\@cols, \@data);
+            $sql->insert(\@data);
+
+       "update"
+           Updates records. Takes sql query. Returns the number of affected
+           rows.  Returns undef on failure or raises fatal error exception
+           according to $dbh "RaiseError" attribute.
+
+            $sql->update(q/name = 'system' WHERE .../);
+            $sql->update(q/user = '...'/);
+
+       "delete"
+           Deletes records. Takes sql query. Returns the number of affected
+           rows.  Returns undef on failure or raises fatal error exception
+           according to $dbh "RaiseError" attribute.
+
+            $sql->delete(q/where id <= 100000/);
+
+       "delete_all"
+           Implements delete method on all records.
+
+             $sql->delete_all();
+             $sql->delete(q/where 1 = 1/);
+
+           Returns the number of affected rows. Returns undef on failure or
+           raises fatal error exception according to $dbh "RaiseError"
+           attribute.
+
+       "select"
+           Implements select query. Returns all results (slurping mode) or one
+           row at a time depending on the context. In list context $dbh
+           "selectall_arrayref" is called which returns array reference with
+           references to each fetched row. In scalar content $dbh
+           "fetchrow_array" is called which returns the next row. Note that
+           each query has its own statement handle. Table columns' names put
+           after the method can generate select methods with the proper sql
+           syntax.
+
+            @AoA_result = $sql->select('all limit 1,10');
+            $AR_result  = $sql->select('all limit 1,10');
+
+            @users = $sql->select_users('limit 1,10'); # all in not AoAref
+            $users = $sql->select_users('limit 1,10'); # single row
+            @AoA_users_fname_lname = $sql->select_users_fname_lname; # all in AoAref
+            @users = $sql->select('SELECT users FROM tablename LIMIT 1,10'); # also possible
+
+            # list context usage
+            for( $sql->select_username ){
+              print "username: $_ \n";
+            }
+
+            # scalar context usage
+            while( $username = $sql->select_username ){
+              print "username: $username\n";
+            }
+
+            while( $user = $sql->select_fname_lname ){
+              print "fname: $user->[0] lname: $user->[1];
+            }
+
+           Returns array containing array references to each row in list con-
+           text. In scalar context returns result as string if one column
+           selected, otherwise reference to the row fetched.  Returns undef at
+           the end while in scalar context. Raises fatal error exception on
+           failure ("local"ized RaiseError attribute is set to true).
+
+       "count"
+           Implements rows counting. Returns undef on failure or raises fatal
+           error exception according to $dbh "RaiseError" attribute.
+
+            $sql->count;
+            $sql->do(q/SELECT count(*) FROM tablename/);
+
+       "sum"
+           Implements "count" method.
+
+       "time"
+           SQLite2 datetime('now') function, identical to Perl _t_i_m_e_(_) func-
+           tion.
+
+       "localtime"
+           SQLite2 datetime('now','localtime') function. Format of the return
+           is the same as Perl _l_o_c_a_l_t_i_m_e_(_) in scalar context if positive argu-
+           ment is given, otherwise returns in the default SQLite2 format:
+           yyyy-mm-dd HH:MM:SS.
+
+            $sql->localtime(); # 2006-03-27 14:33:32
+            $sql->localtime(1); # Mon Mar 27 14:35:25 2006
+
+       "time_ahead"
+           SQLite2 datetime('now','localtime','+.. time', ...) function. Takes
+           y/m/d/H/M/S arguments.  Returns the current time plus the time
+           given in the default format: yyyy-mm-dd HH:MM:SS.
+
+            $s1->time_ahead(q/'+5 minutes','+2 seconds','+3 hours','+9 days','+9 months','+15 years'/);
+
+       "do"
+           Calls $dbh "do" method. Useful for _n_o_n-"SELECT" arbitrary state-
+           ments which will not be executed repeatedly. Returns undef on fail-
+           ure or raises fatal error exception according to $dbh "RaiseError"
+           attribute.
+
+       EErrrroorr hhaannddlliinngg mmeetthhoodd
+
+
+       "err"
+           Returns the last $dbh error message ("errstr").
+
+            $sql->do(q/some sql query/);
+            $sql->err and die $sql->err;
+
+SSEEEE AALLSSOO
+       DBI DBD::SQLite2
+
+BBUUGGSS
+       Please report any bugs or feature requests to vidul@cpan.org.
+
+AAUUTTHHOORR
+       Vidul Nikolaev Petrov, vidul@cpan.org
+
+CCOOPPYYRRIIGGHHTT AANNDD LLIICCEENNSSEE
+       Copyright 2006 by Vidul Nikolaev Petrov
+
+       This library is free software; you can redistribute it and/or modify it
+       under the same terms as Perl itself.
+
+
+
+perl v5.8.7                       2006-03-28               SQLite::Abstract(3)

@@ -1,0 +1,61 @@
+__section__
+default
+__description__
+Text that makes up the top of a page
+
+* link, an optional variable with data for the <LINK> tags
+__title__
+
+__page__
+ournet
+__lang__
+en_US
+__name__
+header
+__template__
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+<META Http-Equiv="Content-Type" Content="text/html; charset=utf-8">
+<TITLE>[% organization %]</TITLE>
+<STYLE>
+a:link { text-decoration: none }
+a:visited { text-decoration: none }
+a:hover { text-decoration: underline }
+form { margin: 0 0 0 0 }
+h3 { background: [% user.bg.1 %]; margin: 0 0 0 0 }
+</STYLE>
+</HEAD>
+<BODY BGCOLOR="[% user.bg.0 %]" TEXT="[% user.fg.1 %]" LINK="[% user.fg.2 %]" VLINK="[% user.fg.2 %]">
+<TABLE CELLSPACING=0 CELLPADDING=0 BORDER=0 WIDTH=100%>
+<tr valign=middle BGCOLOR="[% user.bg.1 %]" TEXT="[% user.fg.1 %]">
+<td>
+<a href="[% script %]"><img src="[% imagedir %]/elix.png" alt="[[% loc('Home') %]]" border=0 align=left width=48 height=48></a>
+</td>
+<td><FORM METHOD=POST ACTION="[% slash ? 'users.pl' : script %]">
+[% IF user.is_anon %]
+<INPUT TYPE="HIDDEN" NAME="op" VALUE="userlogin">
+<font size=-1>
+[% loc('Username:') %]
+<input size=8 name=unickname value="">
+[% loc('Password:') %]
+<input size=8 type=password name=upasswd>
+<input type=submit VALUE="[% loc('Login') %]">
+</font>
+[% ELSE %]
+<INPUT TYPE="HIDDEN" NAME="op" VALUE="userclose">
+<input type=submit VALUE="[% loc('Log out') %] [% user.nickname %]">
+[% END %]
+</FORM>
+</td><td align=right>
+<form method=POST action="[% script %]">
+<INPUT TYPE="HIDDEN" NAME="op" VALUE="search">
+<font size=-1>[% loc('Search:') %]</I></font>
+<input size=8 name="query">
+<input type=button value="[% loc('Go_Submit') %]">
+</form>
+</TD></TR>
+<TR><td colspan=3 valign=top>
+<HR>
+__seclev__
+10000

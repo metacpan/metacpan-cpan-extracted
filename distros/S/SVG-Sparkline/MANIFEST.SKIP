@@ -1,0 +1,11 @@
+^.git
+TODO$
+\..*\.swp$
+\.bak$
+\.old$
+Makefile$
+Build$
+MYMETA\.
+^_build
+^blib
+^pm_to_blib

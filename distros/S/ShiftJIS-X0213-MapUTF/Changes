@@ -1,0 +1,60 @@
+Revision history for Perl module ShiftJIS::X0213::MapUTF.
+
+0.40  Sat Aug  6 11:49:41 2011
+    - fix the tarball with world writable files.
+
+0.31  Mon Jun  4 22:26:05 2007
+    - mkheader, unilen() - avoid unpack('C*') on unicode.
+
+0.30  Mon Mar 21 10:14:02 2005
+    - META.yml is added.
+    - In s10heavy.t and t10heavy.t, UTF-8 strings to be compared are encoded
+      without the help of perl's "utf8" (as perl-current breaks these tests).
+
+0.21  Fri Mar 19 22:29:28 2004
+    - The encoding name will be corrected from Shift_JIS-2003
+      to Shift_JIS-2004 next month (as I have been informed).
+      (see also KAISETSU 2.12 in JIS X 0213:2004.)
+    * replaced sjis2003 by sjis2004, and Shift_JIS-2003 by Shift_JIS-2004.
+      (Function names are also corrected.)
+
+0.20  Sun Feb 29 21:00:05 2004
+    - Enhancement for JIS X 0213:2004 (Amendment 1), whose repertoire is
+      ten chracters larger than JIS X 0213:2000.
+    * New functions named sjis2003_to_u* and u*_to_sjis2003 support
+      Shift_JIS-2003 specified by JIS X 0213:2004.
+    * Old functions named sjis0213_to_u* and u*_to_sjis0213
+      continue to support Shift_JISX0213 specified by JIS X 0213:2000,
+      but mapping for SJIS 0xFC5A is fixed after JIS X 0213:2004.
+
+0.13  Sat Oct 18 12:01:25 2003
+    - pod: added link to JISC.
+
+0.12  Sat Oct 11 22:35:36 2003
+    - manipulation of illegal ShiftJIS strings: SJIS_CALLBACK coderef are
+      called with two parameters (like UNICODE_CODEREF).
+    - Reserved bytes (0x80, 0xA0, 0xFD..0xFF) are no longer
+      a single-byte character.
+    - Internal tweak in XSUB: no longer relies on a string to be
+      terminated with '\0'.
+    - added utf16_to_sjis0213() and utf32_to_sjis0213().
+      [but not yet sjis0213_to_utf16() and sjis0213_to_utf32()]
+    - modified t04xncr.t avoiding a non-character.
+
+0.11  Sun Nov 03 19:32:21 2002
+    - fix a momery leak when the process died in a callback.
+      like: eval { utf32be_to_sjis0213(sub { die }, "\x00"); };
+
+0.10  Sat Nov 02 21:12:23 2002
+    - manipulation of illegal Unicode strings: u*_to_sjis0213 functions
+      may call UNICODE_CALLBACK coderef with two parameters.
+    - UTF-8, UTF-32(BE|LE) are supported.
+    - tests are improved.
+
+0.02  Sun Jun 30 19:45:16 2002
+    - change the mapping for 0x81D4, 0x81D5, 0xFC5A in Shift_JISX0213
+      according to Shibano's JIS KANJI JITEN, the revised edition.
+    - add Supplements.pm
+
+0.01  Sun Jun 16 18:45:16 2002
+    - original version; created by h2xs 1.19

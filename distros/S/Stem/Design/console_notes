@@ -1,0 +1,15 @@
+
+		       Stem::Console Design Notes
+
+The Stem::Console is a class Cell which provides a simple command line
+interface to a Stem Hub. It parses lines typed into stdin and creates
+and dispatches command type Stem Messages from them. It also can accept
+and print response messages sent back by the command method in the
+addressed Cell.
+
+This class Cell is registered under its class name and with the
+nicknames console, cons, and tty.  It takes no configure arguments and
+it just creates an Stem::AsyncIO object to handle the console I/O.
+
+When you see the Stem> prompt, you can enter 'help' to see how to enter
+messages and commands.

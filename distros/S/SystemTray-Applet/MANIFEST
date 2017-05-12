@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/SystemTray/Applet.pm
+lib/SystemTray/Applet/CmdLine.pm
+example/eg.pl
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

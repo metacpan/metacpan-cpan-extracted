@@ -1,0 +1,19 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+SIGNATURE
+lib/String/Gsub.pm
+lib/String/Gsub/Functions.pm
+lib/String/Gsub/Functions/JA.pod
+lib/String/Gsub/JA.pod
+lib/String/Gsub/Matcher.pm
+lib/String/Gsub/Matcher/JA.pod
+t/00-load.t
+t/boilerplate.t
+t/gsub-functions.t
+t/gsub.t
+t/pod-coverage.t
+t/pod.t
+t/string-pattern.t

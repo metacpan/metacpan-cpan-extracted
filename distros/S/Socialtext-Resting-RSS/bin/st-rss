@@ -1,0 +1,32 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Socialtext::Resting::Getopt qw/get_rester/;
+use Socialtext::Resting::RSS;
+use Getopt::Long;
+
+my $r = get_rester();
+
+my %opts;
+GetOptions(
+    'output=s' => \$opts{output},
+    'outputdir=s' => \$opts{output_dir},
+) or usage();
+usage("No output file defined!") unless $opts{output} or $opts{output_dir};
+
+my $rss = Socialtext::Resting::RSS->new( rester => $r, %opts);
+print "No changes, nothing updated.\n" unless $rss->generate;
+exit;
+
+sub usage {
+    my $msg = shift || '';
+    die <<EOUSAGE;
+$msg
+
+USAGE: $0 [rester options] <--output file | --outputdir dir>
+
+Creates a RSS file containing changes to the specified workspace.
+
+Use either --output or --outputdir
+EOUSAGE
+}

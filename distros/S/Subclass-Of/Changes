@@ -1,0 +1,57 @@
+Subclass-Of
+===========
+
+Created:      2013-05-29
+Home page:    <https://metacpan.org/release/Subclass-Of>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Subclass-Of>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.003	2013-06-14
+
+ [ Packaging ]
+ - Use Dist::Inkt.
+
+ [ Other ]
+ - Updated: Use Exporter::Tiny instead of Exporter::TypeTiny.
+
+0.002	2013-06-14
+
+ - Added: Support '-has' option to add attributes to a child class.
+
+0.001	2013-06-05
+
+ [ Documentation ]
+ - Added SEE ALSO section.
+ - Minor clarifications.
+
+0.000_04	2013-06-04
+
+ [ Bug Fixes ]
+ - vstring warning in Perl 5.10.0 caused test failures.
+
+ [ Other ]
+ - Added: Added example script.
+ - Set %INC for generated classes.
+
+0.000_03	2013-05-31
+
+ [ Bug Fixes ]
+ - Mandatory 'redefine' warnings for constant subs in Perl prior to 5.16
+   caused test failures; stop allowing Perl to inline our 'constants',
+   therefore avoid these warnings.
+
+0.000_02	2013-05-31
+
+ [ Documentation ]
+ - Much documentation.
+
+ [ Packaging ]
+ - A shed-load of test cases.
+
+ [ Other ]
+ - Added: Exportable 'subclass_of' function.
+ - Added: Public 'install' method.
+ - Added: Support subclassing of Mouse classes.
+ - Lexically scope aliases.
+
+0.000_01	2013-05-29	Developer preview

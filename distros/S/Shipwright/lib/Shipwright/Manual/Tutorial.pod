@@ -1,0 +1,225 @@
+=head1 NAME
+
+Shipwright::Manual::Tutorial - Shipwright tutorial
+
+=head1 DESCRIPTION
+
+In this tutorial, we'll create a vessel to demonstrate the basic operation of
+Shipwright.
+
+=head1 TUTORIAL
+
+=head2 Introduction
+
+Shipwright ships with command line tool F<shipwright> which allows you to
+manage shipyard: L<create|/Create a new shipyard>,
+L<import sources|/Import sources>, L</update>, and so on.
+
+Let's start from a new shipyard.
+
+=head3 Create a new shipyard
+
+shipyard - the place where all source code lives.
+Shipwright supports several backends: L<SVK|Shipwright::Backend::SVK>,
+L<SVN|Shipwright::Backend::SVN>, L<Git|Shipwright::Backend::Git> and
+L<plain file system|Shipwright::Backend::FS>.
+We'll use FS in this tutorial.
+
+Let's create a new shipyard:
+
+    $ shipwright create -r fs:/tmp/foo
+
+To avoid typing I<-r fs:/tmp/foo> all the time you can use "SHIPWRIGHT_SHIPYARD"
+environment variable.
+
+    $ export SHIPWRIGHT_SHIPYARD="fs:/tmp/foo"
+
+From now on we don't need the "-r ..." for the session.
+
+=head3 Import sources
+
+Our shipyard is worthless if it doesn't contain any source, let's import some.
+
+Shipwright supports various types of sources.
+Here are some examples:
+
+=over 4
+
+=item compressed file
+
+    file:/tmp/foo.tar.gz
+    file:/home/ross/dinosaur-0.01.tar.bz2
+
+=item plain directory
+
+    dir:/tmp/foo
+    directory:/home/ross/dinosaur-0.01
+
+=item HTTP
+    
+    http://apache.mirror.phpchina.com/httpd/httpd-2.2.9.tar.gz
+    http://ftp.cuhk.edu.hk/pub/packages/perl/CPAN/authors/id/C/CL/CLKAO/SVK-v2.0.2.tar.gz
+
+=item FTP
+
+    ftp://ftp.gnupg.org/gcrypt/gnupg/gnupg-1.4.9.tar.bz2
+    ftp://ftp.cuhk.edu.hk/pub/packages/perl/CPAN/authors/id/C/CL/CLKAO/SVK-v2.0.2.tar.gz
+
+=item SVK
+    
+    svk:/test/foo
+
+=item SVN
+
+    svn:file:///tmp/repo/foo
+    svn:http://svn.example.com/foo
+
+=item Git
+
+    git:file:///tmp/foo.git
+
+=item CPAN
+
+    cpan:Jifty
+    cpan:Module::Install
+
+=item shipyard
+
+    shipyard:fs:/tmp/shipyard/foo
+    shipyard:fs:/tmp/shipyard/bar
+
+fs:/tmp/shipyard is another shipyard, 'foo' or 'bar' is the
+source name we want to import.
+
+=back
+
+We'll import apache 2.2.9, perl 5.10, mod_perl 2.0, libxml and XML::LibXML
+in this tutorial one by one.
+
+    $ shipwright import http://www.apache.org/dist/httpd/httpd-2.2.9.tar.gz --name apache
+    $ shipwright import http://www.cpan.org/authors/id/R/RG/RGARCIA/perl-5.10.0.tar.gz
+    $ shipwright import http://perl.apache.org/dist/mod_perl-2.0-current.tar.gz --name mod_perl --no-follow
+    ( use --no-follow is because run Makefile.PL will hung if we don't have
+      apache installed )
+    $ shipwright import ftp://xmlsoft.org/libxml2/libxml2-2.6.32.tar.gz --name libxml
+    $ shipwright import cpan:XML::LibXML
+
+Run I<shipwright help import> to see more options.
+
+As a side note, if we were importing from a source that doesn't use a build
+mechanism that Shipwright can automatically create a set of build instructions
+for (currently I<autoconf>, L<ExtUtils::MakeMaker>, L<Module::Install>, and 
+L<Module::Build>), we would now need to edit F<scripts/SOURCE_NAME/build> to tell
+Shipwright how to build that source.
+
+For our tutorial, e.g. perl 5.10, Shipwright doesn't know about the
+peculiarities of how to build perl, so we need to edit the build file:
+
+  configure: ./Configure -des -Dprefix=%%INSTALL_BASE%%
+  test: %%MAKE%% test
+  install: %%MAKE%% install
+
+For more information on build scripts, see L<Shipwright::Manual::CustomizeBuild>.
+
+=head3 update
+
+For dists with I<CPAN>, I<SVK>, I<SVN>, I<Git> and I<shipyard> types,
+we can simply use the I<update> command to update:
+
+    $ shipwright update cpan-XML-LibXML
+    (yeah, that's right, cpan:XML::LibXML will be named cpan-XML-LibXML)
+
+We can also specify the version we want to update to with --version argument:
+
+    $ shipwright update cpan-XML-LibXML --version 1.60
+
+For other types, Shipwright can't guess the latest version, so we have to tell
+Shipwright where it is using the I<relocate> command.
+
+e.g. apache 2.2.10 is released one day, with download link
+L<http://apache.mirror.phpchina.com/httpd/httpd-2.2.10.tar.gz>, we need to 
+set the source URL first before updating.
+
+    $ shipwright relocate apache http://www.apache.org/dist/httpd/httpd-2.2.10.tar.gz 
+    $ shipwright update apache
+
+=head3 tweak manually 
+
+You may find that I<cpan-XML-LibXML> needs I<libxml> as a dependency, but
+in F</scripts/cpan-XML-LibXML/require.yml> there's no such entry,
+because F<require.yml> is created automatically, filled with perl module dists,
+no extra dependences will be set.
+
+So we need to do it manually, e.g. use the following command to do so:
+
+    $ shipwright update cpan-XML-LibXML --add-deps libxml
+
+=head3 build
+
+We need to I<checkout> the repository into some directory first,
+then I<chdir> there, and run:
+(for FS backend, there's no need to checkout, just chdir to /tmp/foo ),
+
+$ ./bin/shipwright-builder --install-base /tmp/vessel
+
+Run I<./bin/shipwright-builder --help> to see more options and
+I<./bin/shipwright-builder --advanced-help> to see even more options.
+
+=head3 fiddle the vessel
+
+We can use F<bin/shipwright-filter> to fiddle the vessel, e.g. removing pods.
+Run I<./bin/shipwright-filter --help> to see more options
+
+=head3 ship our vessel
+
+We call the built source the I<vessel>.
+
+To ship our vessel, create an archive of the built files using an archive
+program such as I<tar>, e.g. by running I<tar czvf vessel.tar.gz
+/tmp/vessel>.
+
+Users can use our vessel by extracting the archive to a directory and then
+adding the following command to their shell's startup script
+(e.g. for bash users, edit F</home/user/.bashrc> on most systems): I<source
+/base/path/tools/etc/shipwright-source-bash> (for bash users). A source script
+is also provided for the tcsh shell. 
+
+Here is a sourcing example:
+
+  source /home/user/myapp/tools/shipwright-source-bash /home/user/myapp
+
+This example assumes the myapp vessel was extracted to /home/user/myapp.
+                                    
+After sourcing this script, users will be able to run binaries and load perl
+modules from our vessel as with normal installed programs, though they will 
+need to start a new shell or re-run their startup script.
+
+
+=head3 ship shipyard
+
+If you want to ship a shipyard instead of the vessel, you can just tar your
+shipyard( i.e. "/tmp/foo" ) and ship it, though Shipwright supplies a
+convenient way too:
+
+Let's chdir to our shipyard first, then run:
+$ ./bin/shipwright-utility --generate-tar-file /tmp/shipyard.pl
+
+The shipyard.pl is a shipyard perl script working like "shipwright-builder"
+but it's self contained, so you can build a vessel with shipyard.pl like this:
+
+$ perl /tmp/shipyard.pl --install-base /tmp/vessel
+
+=head1 SEE ALSO
+
+L<Shipwright>, L<Shipwright::Manual>
+
+=head1 AUTHORS
+
+sunnavy  C<< <sunnavy@bestpractical.com> >>
+
+=head1 LICENCE AND COPYRIGHT
+
+Shipwright is Copyright 2007-2015 Best Practical Solutions, LLC.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

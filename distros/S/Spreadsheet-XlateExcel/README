@@ -1,0 +1,60 @@
+Spreadsheet-XlateExcel
+
+This modules triggers a callback subroutine on each row of an Excel
+spreadsheet.
+
+Wrote this simple module because I was fed up from writing the same
+boilerplate code ever when I had to mine spreadsheets for data.
+
+Operates on every sheet unless a given sheet is targeted by name,
+RE inclusion or RE exclusion.
+
+Operates on every column unless targeted by column head name or
+RE (inclusion).
+
+Code is hosted on github (http://github.com/maspalio/Spreadsheet-XlateExcel).
+
+This is v0.02_02 or Spreadsheet::XlateExcel module.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Spreadsheet::XlateExcel
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Spreadsheet-XlateExcel
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Spreadsheet-XlateExcel
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Spreadsheet-XlateExcel
+
+    Search CPAN
+        http://search.cpan.org/dist/Spreadsheet-XlateExcel/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 Xavier Caron
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

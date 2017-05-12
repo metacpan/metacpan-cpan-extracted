@@ -1,0 +1,45 @@
+Spreadsheet-Wright
+==================
+
+Home page:    <https://metacpan.org/release/Spreadsheet-Wright>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Spreadsheet-Wright>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.105	2014-06-08
+
+ [ Packaging ]
+ - Repository is now on GitHub.
+ - use Dist::Inkt.
+
+ [ Other ]
+ - Updated: Avoid use of given/when.
+ - Updated: Use strict and warnings instead of common::sense.
+
+0.104	2012-02-06
+
+ [ Bug Fixes ]
+ - OpenDocument module had undeclared variable $VERSION.
+   Fixes RT#74559.
+   <https://rt.cpan.org/Public/Bug/Display.html?id=74559>
+
+0.103	2011-11-04
+
+ [ Bug Fixes ]
+ - 
+   Fixes RT#62737.
+   <https://rt.cpan.org/Public/Bug/Display.html?id=62737>
+
+ [ Packaging ]
+ - Module::Package::RDF
+
+ [ Other ]
+ - Minor cleanups.
+ - Updated: use 5.010
+
+0.102	2010-08-03	Fork of Spreadsheet::Write
+
+ - Added: HTML and XHTML output
+ - Added: JSON output
+ - Added: OpenDocument (OpenOffice.org) output
+ - Added: addrows() shortcut for adding multiple rows
+ - Split CSV and Excel outputs into separate modules

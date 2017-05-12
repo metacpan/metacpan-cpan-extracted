@@ -1,0 +1,25 @@
+---
+abstract: 'Reproducibility measurement between multiple replicate experiments'
+author:
+  - 'Jimi Wills <jimi@webu.co.uk>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.88, CPAN::Meta::Converter version 2.133380'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Statistics-Reproducibility
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Statistics::Distributions: 1.02
+  Statistics::QuickMedian: 0.03
+  Statistics::TheilSenEstimator: 0.04
+  perl: 5.006
+version: 0.09

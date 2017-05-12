@@ -1,0 +1,37 @@
+Revision history for Perl extension Sys::CPU.
+
+0.01  Wed Jun 27 16:43:58 2001
+	- original version; created by h2xs 1.20 with options -A -n Sys::CPU
+
+0.10
+        - Added cpu_type and cpu_clock functions
+        - Changed to better win32 suppport (untested)
+
+0.20
+        - Fixed linux support
+
+0.25
+        - Fixed dist tar problem
+                
+0.30
+        - Fixed win32 supprot to work with Windows 2000 (thanks Gary)
+        - Changed interface to eliminate cpu numbers
+
+0.35
+        - Fixed linux support (thanks Peter)
+
+0.40
+        - Fixed HP-UX support (thanks Brett Gersekowski)
+
+0.45
+        - Fixed Solaris support
+
+0.50
+        - Fixed Darwin/Mac Os support (Marc Koderer)
+
+0.51
+	- Fixed hidden mac os files
+
+0.52
+	- fixed bug 50933 and 25253
+        - added licence info (Fedora bug 585336)

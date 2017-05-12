@@ -1,0 +1,17 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+License
+t/Sim-OPT.t
+lib/Sim/OPT.pm
+lib/Sim/OPT/Morph.pm
+lib/Sim/OPT/Sim.pm
+lib/Sim/OPT/Report.pm
+lib/Sim/OPT/Descend.pm
+lib/Sim/OPT/Takechance.pm
+lib/Sim/OPT/Parcoord3d.pm
+lib/Sim/OPT/Modish.pm
+examples/optw.tar.gz
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

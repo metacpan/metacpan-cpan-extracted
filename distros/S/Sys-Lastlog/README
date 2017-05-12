@@ -1,0 +1,55 @@
+Sys::Lastlog
+============
+
+This module is designed to provided an Object Oriented API to the lastlog
+file found on many Unix-like systems.  Some systems do not have this file
+so this module will not be of much use on those systems.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module does require that the structure of the lastlog is defined in
+the system C header files.  By default it will look for the definition in
+utmp.h but some systems (notably Solaris) have a lastlog.h file which
+contains the definition - if compilation fails because the C compiler has
+been unable to find the definition then redo the install again but with
+the first step as:
+
+  perl Makefile.PL DEFINE='-DUSE_LASTLOG_H'
+
+and hopefully then everything will be alright.  If it isnt then please
+contact the author with as much information as might determine where
+lastlog is defined.
+
+Finally some systems may not define '_PATH_LASTLOG' in paths.h which will
+lead to a compile time error for the XS part of this module - on these
+systems you will need to supply this definition yourself :
+
+  perl Makefile.PL DEFINE='-D_PATH_LASTLOG="/var/adm/lastlog"'
+
+for example.  You will have to discover where the lastlog file on your
+system resides for yourself.
+
+It is infact highly likely that the above two circumstances will both
+arise on the same system (Solaris again :) and that the two sets of
+defines will need to be combined.
+
+  perl Makefile.PL DEFINE='-D_PATH_LASTLOG="/var/adm/lastlog" -DUSE_LASTLOG_H'
+
+COPYRIGHT AND LICENCE
+
+This software carries no warranty whatsoever.
+
+Copyright (C) 2001 - 20011 Jonathan Stowe
+
+This is free software - it may be distributed and/or modified under the same
+terms as Perl itself.
+

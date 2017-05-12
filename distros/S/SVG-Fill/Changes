@@ -1,0 +1,34 @@
+Revision history for Perl extension SVG-Fill
+
+0.09 2015-03-10T12:08:15Z
+
+    - Better Font Handling for svg-convert 
+
+0.08 2015-03-10T11:00:05Z
+
+    - New method font_fix added, removes ugly font-family-Attribute written bei Illustrator 
+
+0.07 2015-03-08T13:04:42Z
+
+    - Fix minium Mojolicious-Version to 6.0, because $element->tag was new (reported by cpantesters)
+
+0.06 2015-03-06T23:04:49Z
+
+    - Fix missing build-preqs and prereps 
+
+0.05 2015-03-06T21:17:16Z
+
+    - Fix jpeg mimetype 
+
+0.04 2015-03-06T14:36:06Z
+
+    - added dependencies 
+
+0.03 2015-03-06T14:34:38Z
+
+    - use utf8 encoding for slurp/spew
+
+0.02 2015-03-06T13:59:29Z
+
+    - original version
+

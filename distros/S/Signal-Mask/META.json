@@ -1,0 +1,74 @@
+{
+   "abstract" : "Signal masks made easy",
+   "author" : [
+      "Leon Timmermans <fawaka@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Signal-Mask",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Thread::SigMask" : "0"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "IPC::Signal" : "0",
+            "POSIX" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Signal::Mask" : {
+         "file" : "lib/Signal/Mask.pm",
+         "version" : "0.008"
+      },
+      "Signal::Pending" : {
+         "file" : "lib/Signal/Pending.pm",
+         "version" : "0.008"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-signal-mask at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Signal-Mask"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Leont/signal-mask.git",
+         "web" : "https://github.com/Leont/signal-mask"
+      }
+   },
+   "version" : "0.008"
+}
+

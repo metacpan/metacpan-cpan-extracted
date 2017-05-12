@@ -1,0 +1,195 @@
+package Scrappy::Project;
+
+BEGIN {
+    $Scrappy::Project::VERSION = '0.94112090';
+}
+
+use Carp;
+use File::Find::Rule;
+use Scrappy;
+use Moose::Role;
+
+has app => (
+    is      => 'ro',
+    isa     => 'Any',
+    default => sub {
+        my $self = shift;
+        $self->scraper(Scrappy->new);
+        my $meta = $self->meta;
+        return $meta->has_method('setup') ? $self->setup : $self;
+    }
+);
+
+has parsers => (
+    is      => 'ro',
+    isa     => 'Any',
+    default => sub {
+        my $self    = shift;
+        my $class   = ref $self;
+        my @parsers = ();
+
+        $class =~ s/::/\//g;
+
+        my @files =
+          File::Find::Rule->file()->name('*.pm')->in(map {"$_/$class"} @INC);
+
+        my %parsers =
+          map { $_ => 1 } @files;    #uniquenes
+
+        for my $parser (keys %parsers) {
+
+            my ($plug) = $parser =~ /($class\/.*)\.pm/;
+
+            if ($plug) {
+                $plug =~ s/\//::/g;
+                push @parsers, $plug;
+            }
+
+        }
+
+        return [@parsers];
+    }
+);
+
+has registry => (
+    is      => 'ro',
+    isa     => 'HashRef',
+    default => sub {
+
+        # map parsers
+        my $parsers = {};
+        my @parsers = @{shift->parsers};
+        foreach my $parser (@parsers) {
+            $parsers->{$parser} = $parser;
+            $parsers->{lc($parser)} = $parser;
+        }
+        return $parsers;
+    }
+);
+
+has records => (
+    is      => 'rw',
+    isa     => 'HashRef',
+    default => sub { {} }
+);
+
+has routes => (
+    is      => 'rw',
+    isa     => 'HashRef',
+    default => sub { {} }
+);
+
+has scraper => (
+    is  => 'rw',
+    isa => 'Scrappy'
+);
+
+sub route {
+    my $self    = shift;
+    my $options = {};
+
+    # basic definition
+    ($options->{route}, $options->{parser}) = @_ if scalar @_ == 2;
+
+    # odd definition
+    if (@_ % 2) {
+        my $route = shift;
+        $options = {@_};
+        $options->{route} = $route;
+    }
+
+    # check route and parser spec
+    die "Error defining route, must have a route and parser assignment"
+      unless $options->{route} && $options->{parser};
+
+    # covert parser from shortcut if used
+    if ($options->{parser} !~ ref($self) . "::") {
+
+        my $parser = $options->{parser};
+
+        # make fully-quaified parser name
+        $parser = ucfirst $parser;
+        $parser = join("::", map(ucfirst, split '-', $parser))
+          if $parser =~ /\-/;
+        $parser = join("", map(ucfirst, split '_', $parser))
+          if $parser =~ /\_/;
+
+        $options->{parser} = ref($self) . "::$parser";
+    }
+
+    # find action if not specified
+    #unless ( defined $options->{action} ) {
+    #    my ($action) = $options->{parser} =~ /\#(.*)$/;
+    #    $options->{parser} =~ s/\#(.*)$//;
+    #    $options->{action} = $action;
+    #}
+
+    $self->routes->{$options->{route}} = $options;
+    delete $self->routes->{$options->{route}}->{route};
+
+    return $self;
+}
+
+sub parse_document {
+    my ($self, $url) = @_;
+    my $scraper = $self->scraper;
+
+    croak("Unable to fetch document, URL is not defined") unless $url;
+    croak("Can't parse document, No routes defined")
+      unless keys %{$self->routes};
+
+    # try to match against route(s)
+    foreach my $route (keys %{$self->routes}) {
+        my $this = $scraper->page_match($route, $url);
+        if ($this) {
+            my $parser = $self->routes->{$route}->{parser};
+
+            #my  $action = $self->routes->{$route}->{action};
+
+            no warnings 'redefine';
+            no strict 'refs';
+            my $module = $parser;
+            $module =~ s/::/\//g;
+            $module = "$module.pm";
+
+            require $module;
+
+            my $new = $parser->new;
+            $new->scraper($scraper);
+
+            $self->records->{$route} = []
+              unless defined $self->records->{$route};
+
+            my $record = $new->parse($this);
+            push @{$self->records->{$route}}, $record;
+
+            return $record;
+        }
+    }
+
+    return 0;
+}
+
+sub crawl {
+    my ($class, $starting_url) = @_;
+    my $self = ref $class ? $class : $class->new;
+
+    croak("Error, can't execute without a starting url") unless $starting_url;
+
+    my $q = $self->scraper->queue;
+    $q->add($starting_url);
+
+    while (my $url = $q->next) {
+
+        # parse document data
+        $self->scraper->get($url);
+        $self->parse_document($url)
+          if $self->scraper->page_loaded
+              && $self->scraper->page_ishtml
+              && $self->scraper->page_status == 200;
+    }
+
+    return $self->records;
+}
+
+1;

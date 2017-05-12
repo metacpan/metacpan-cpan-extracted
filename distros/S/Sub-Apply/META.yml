@@ -1,0 +1,27 @@
+---
+abstract: 'apply arguments to proc.'
+author:
+  - 'Yoshihiro Sasaki <ysasaki at cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Sub-Apply
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  parent: 0
+  perl: 5.008008
+resources:
+  bugtracker: https://github.com/ysasaki/p5-sub-apply/issues
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/ysasaki/p5-sub-apply.git
+version: 0.06

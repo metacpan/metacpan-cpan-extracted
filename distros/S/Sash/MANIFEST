@@ -1,0 +1,18 @@
+MANIFEST
+README
+GPL
+Changes
+lib/Sash/Command.pm
+lib/Sash/Terminal.pm
+lib/Sash/Timer.pm
+lib/Sash/Cursor.pm
+lib/Sash/Properties.pm
+lib/Sash/ResultHistory.pm
+lib/Sash/Table.pm
+lib/Sash/Buffer.pm
+lib/Sash/Plugin/Base.pm
+lib/Sash/Plugin/Factory.pm
+lib/Sash/CommandHash.pm
+Makefile.PL
+src/sash
+META.yml                                 Module meta-data (added by MakeMaker)

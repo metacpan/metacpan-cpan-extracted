@@ -1,0 +1,479 @@
+@gDeliveryLol = (
+   0  ARRAY
+      0  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 02:31:32'
+         'Id' => 'WAA18702'
+         'Instance' => 1
+         'ReceiverList' => ARRAY
+            0  'antcount1@ant.utmem.edu'
+         'Sender' => 'antiquity'
+         'Size' => 0
+      1  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 02:38:12'
+         'Id' => 'BAA26050'
+         'Instance' => 1
+         'ReceiverList' => ARRAY
+            0  'joil_gupta@ok.healthnet.org'
+         'Sender' => 'joinkids@foo.phyast.pitt.edu'
+         'Size' => 5357
+      2  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 02:34:56'
+         'Id' => 'BAA26035'
+         'Instance' => 1
+         'ReceiverList' => ARRAY
+            0  'helkaire@ok.healthnet.org'
+         'Sender' => 'help-net@bar.temple.edu'
+         'Size' => 7000
+      3  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 02:12:01'
+         'Id' => 'CAA26881'
+         'Instance' => 1
+         'ReceiverList' => ARRAY
+            0  'uniman@ok.edu'
+         'Sender' => 'unique3%sswmbx%fdaoc@mr.cvmvax.gov'
+         'Size' => 519
+      4  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 02:12:06'
+         'Id' => 'CAA26881'
+         'Instance' => 2
+         'ReceiverList' => ARRAY
+            0  '"<uni>|ifs=" " && exec /usr/local/bin/procmail -f- || exit 75 #phil"@ok.com'
+         'Sender' => 'unique3%sswmbx%fdaoc@mr.cvmvax.gov'
+         'Size' => 519
+      5  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 03:27:44'
+         'Id' => 'DAA29007'
+         'Instance' => 1
+         'ReceiverList' => ARRAY
+            0  'unizney@ok.healthnet.org'
+         'Sender' => 'unique3@vm.temple.edu'
+         'Size' => 1531
+      6  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 03:27:44'
+         'Id' => 'DAA29008'
+         'Instance' => 2
+         'ReceiverList' => ARRAY
+            0  'unilo@ok.hello.org'
+         'Sender' => 'unique3@vm.temple.edu'
+         'Size' => 1531
+      7  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 03:27:57'
+         'Id' => 'OAA20646'
+         'Instance' => 1
+         'ReceiverList' => ARRAY
+            0  'unione@ok.healthnet.org'
+         'Sender' => 'unique1@usa.healthnet.org'
+         'Size' => 214
+      8  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 03:27:59'
+         'Id' => 'OAA20646'
+         'Instance' => 2
+         'ReceiverList' => ARRAY
+            0  'unitwo@ok.foo.org'
+         'Sender' => 'unique1@usa.healthnet.org'
+         'Size' => 214
+      9  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 06:23:53'
+         'Id' => 'GAA01612'
+         'Instance' => 1
+         'ReceiverList' => ARRAY
+            0  'unione@ok.wpgate.galaxy.dnet.yorkhospital.edu'
+            1  'unitwo@ok.healthnet.org'
+         'Sender' => 'unique2@usa.healthnet.org'
+         'Size' => 1531
+      10  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 08:31:26'
+         'Id' => 'FAA01850'
+         'Instance' => 1
+         'ReceiverList' => ARRAY
+            0  'count11@ok.healthnet.org'
+         'Sender' => 'cougithendu@iastate.edu'
+         'Size' => 8471
+      11  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 08:42:59'
+         'Id' => 'NAA20697'
+         'Instance' => 1
+         'ReceiverList' => ARRAY
+            0  'count1@prev.healthnet.org'
+         'Sender' => 'antiquity'
+         'Size' => 0
+   1  ARRAY
+      0  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 02:31:32'
+         'Id' => 'WAA18702'
+         'Instance' => 1
+         'ReceiverList' => ARRAY
+            0  'antcount1@ant.utmem.edu'
+         'Sender' => 'antiquity'
+         'Size' => 0
+      1  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 02:38:12'
+         'Id' => 'BAA26050'
+         'Instance' => 1
+         'ReceiverList' => ARRAY
+            0  'joil_gupta@ok.healthnet.org'
+         'Sender' => 'joinkids@foo.phyast.pitt.edu'
+         'Size' => 5357
+      2  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 02:34:56'
+         'Id' => 'BAA26035'
+         'Instance' => 1
+         'ReceiverList' => ARRAY
+            0  'helkaire@ok.healthnet.org'
+         'Sender' => 'help-net@bar.temple.edu'
+         'Size' => 7000
+      3  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 02:12:01'
+         'Id' => 'CAA26881'
+         'Instance' => 1
+         'ReceiverList' => ARRAY
+            0  'uniman@ok.edu'
+         'Sender' => 'unique3%sswmbx%fdaoc@mr.cvmvax.gov'
+         'Size' => 519
+      4  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 02:12:06'
+         'Id' => 'CAA26881'
+         'Instance' => 2
+         'ReceiverList' => ARRAY
+            0  '"<uni>|ifs=" " && exec /usr/local/bin/procmail -f- || exit 75 #phil"@ok.com'
+         'Sender' => 'unique3%sswmbx%fdaoc@mr.cvmvax.gov'
+         'Size' => 519
+      5  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 03:27:44'
+         'Id' => 'DAA29007'
+         'Instance' => 1
+         'ReceiverList' => ARRAY
+            0  'unizney@ok.healthnet.org'
+         'Sender' => 'unique3@vm.temple.edu'
+         'Size' => 1531
+      6  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 03:27:44'
+         'Id' => 'DAA29008'
+         'Instance' => 2
+         'ReceiverList' => ARRAY
+            0  'unilo@ok.hello.org'
+         'Sender' => 'unique3@vm.temple.edu'
+         'Size' => 1531
+      7  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 03:27:57'
+         'Id' => 'OAA20646'
+         'Instance' => 1
+         'ReceiverList' => ARRAY
+            0  'unione@ok.healthnet.org'
+         'Sender' => 'unique1@usa.healthnet.org'
+         'Size' => 214
+      8  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 03:27:59'
+         'Id' => 'OAA20646'
+         'Instance' => 2
+         'ReceiverList' => ARRAY
+            0  'unitwo@ok.foo.org'
+         'Sender' => 'unique1@usa.healthnet.org'
+         'Size' => 214
+      9  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 06:23:53'
+         'Id' => 'GAA01612'
+         'Instance' => 1
+         'ReceiverList' => ARRAY
+            0  'unione@ok.wpgate.galaxy.dnet.yorkhospital.edu'
+            1  'unitwo@ok.healthnet.org'
+         'Sender' => 'unique2@usa.healthnet.org'
+         'Size' => 1531
+      10  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 08:31:26'
+         'Id' => 'FAA01850'
+         'Instance' => 1
+         'ReceiverList' => ARRAY
+            0  'count11@ok.healthnet.org'
+         'Sender' => 'cougithendu@iastate.edu'
+         'Size' => 8471
+      11  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 08:42:59'
+         'Id' => 'NAA20697'
+         'Instance' => 1
+         'ReceiverList' => ARRAY
+            0  'count1@prev.healthnet.org'
+         'Sender' => 'antiquity'
+         'Size' => 0
+   2  ARRAY
+      0  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 02:31:32'
+         'Id' => 'WAA18702'
+         'Instance' => 1
+         'ReceiverList' => ARRAY
+            0  'antcount1@ant.utmem.edu'
+         'Sender' => 'antiquity'
+         'Size' => 0
+      1  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 02:38:12'
+         'Id' => 'BAA26050'
+         'Instance' => 1
+         'ReceiverList' => ARRAY
+            0  'joil_gupta@ok.healthnet.org'
+         'Sender' => 'joinkids@foo.phyast.pitt.edu'
+         'Size' => 5357
+      2  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 02:34:56'
+         'Id' => 'BAA26035'
+         'Instance' => 1
+         'ReceiverList' => ARRAY
+            0  'helkaire@ok.healthnet.org'
+         'Sender' => 'help-net@bar.temple.edu'
+         'Size' => 7000
+      3  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 02:12:01'
+         'Id' => 'CAA26881'
+         'Instance' => 1
+         'ReceiverList' => ARRAY
+            0  'uniman@ok.edu'
+         'Sender' => 'unique3%sswmbx%fdaoc@mr.cvmvax.gov'
+         'Size' => 519
+      4  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 02:12:06'
+         'Id' => 'CAA26881'
+         'Instance' => 2
+         'ReceiverList' => ARRAY
+            0  '"<uni>|ifs=" " && exec /usr/local/bin/procmail -f- || exit 75 #phil"@ok.com'
+         'Sender' => 'unique3%sswmbx%fdaoc@mr.cvmvax.gov'
+         'Size' => 519
+      5  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 03:27:44'
+         'Id' => 'DAA29007'
+         'Instance' => 1
+         'ReceiverList' => ARRAY
+            0  'unizney@ok.healthnet.org'
+         'Sender' => 'unique3@vm.temple.edu'
+         'Size' => 1531
+      6  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 03:27:44'
+         'Id' => 'DAA29008'
+         'Instance' => 2
+         'ReceiverList' => ARRAY
+            0  'unilo@ok.hello.org'
+         'Sender' => 'unique3@vm.temple.edu'
+         'Size' => 1531
+      7  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 03:27:57'
+         'Id' => 'OAA20646'
+         'Instance' => 1
+         'ReceiverList' => ARRAY
+            0  'unione@ok.healthnet.org'
+         'Sender' => 'unique1@usa.healthnet.org'
+         'Size' => 214
+      8  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 03:27:59'
+         'Id' => 'OAA20646'
+         'Instance' => 2
+         'ReceiverList' => ARRAY
+            0  'unitwo@ok.foo.org'
+         'Sender' => 'unique1@usa.healthnet.org'
+         'Size' => 214
+      9  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 06:23:53'
+         'Id' => 'GAA01612'
+         'Instance' => 1
+         'ReceiverList' => ARRAY
+            0  'unione@ok.wpgate.galaxy.dnet.yorkhospital.edu'
+            1  'unitwo@ok.healthnet.org'
+         'Sender' => 'unique2@usa.healthnet.org'
+         'Size' => 1531
+      10  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 08:31:26'
+         'Id' => 'FAA01850'
+         'Instance' => 1
+         'ReceiverList' => ARRAY
+            0  'count11@ok.healthnet.org'
+         'Sender' => 'cougithendu@iastate.edu'
+         'Size' => 8471
+      11  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 08:42:59'
+         'Id' => 'NAA20697'
+         'Instance' => 1
+         'ReceiverList' => ARRAY
+            0  'count1@prev.healthnet.org'
+         'Sender' => 'antiquity'
+         'Size' => 0
+   3  ARRAY
+      0  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 02:31:32'
+         'Id' => 'WAA18702'
+         'Instance' => 1
+         'ReceiverList' => ARRAY
+            0  'antcount1@ant.utmem.edu'
+         'Sender' => 'antiquity'
+         'Size' => 0
+      1  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 02:38:12'
+         'Id' => 'BAA26050'
+         'Instance' => 1
+         'ReceiverList' => ARRAY
+            0  'joil_gupta@ok.healthnet.org'
+         'Sender' => 'joinkids@foo.phyast.pitt.edu'
+         'Size' => 5357
+      2  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 02:34:56'
+         'Id' => 'BAA26035'
+         'Instance' => 1
+         'ReceiverList' => ARRAY
+            0  'helkaire@ok.healthnet.org'
+         'Sender' => 'help-net@bar.temple.edu'
+         'Size' => 7000
+      3  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 02:12:01'
+         'Id' => 'CAA26881'
+         'Instance' => 1
+         'ReceiverList' => ARRAY
+            0  'uniman@ok.edu'
+         'Sender' => 'unique3%sswmbx%fdaoc@mr.cvmvax.gov'
+         'Size' => 519
+      4  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 02:12:06'
+         'Id' => 'CAA26881'
+         'Instance' => 2
+         'ReceiverList' => ARRAY
+            0  '"<uni>|ifs=" " && exec /usr/local/bin/procmail -f- || exit 75 #phil"@ok.com'
+         'Sender' => 'unique3%sswmbx%fdaoc@mr.cvmvax.gov'
+         'Size' => 519
+      5  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 03:27:44'
+         'Id' => 'DAA29007'
+         'Instance' => 1
+         'ReceiverList' => ARRAY
+            0  'unizney@ok.healthnet.org'
+         'Sender' => 'unique3@vm.temple.edu'
+         'Size' => 1531
+      6  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 03:27:44'
+         'Id' => 'DAA29008'
+         'Instance' => 2
+         'ReceiverList' => ARRAY
+            0  'unilo@ok.hello.org'
+         'Sender' => 'unique3@vm.temple.edu'
+         'Size' => 1531
+      7  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 03:27:57'
+         'Id' => 'OAA20646'
+         'Instance' => 1
+         'ReceiverList' => ARRAY
+            0  'unione@ok.healthnet.org'
+         'Sender' => 'unique1@usa.healthnet.org'
+         'Size' => 214
+      8  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 03:27:59'
+         'Id' => 'OAA20646'
+         'Instance' => 2
+         'ReceiverList' => ARRAY
+            0  'unitwo@ok.foo.org'
+         'Sender' => 'unique1@usa.healthnet.org'
+         'Size' => 214
+      9  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 06:23:53'
+         'Id' => 'GAA01612'
+         'Instance' => 1
+         'ReceiverList' => ARRAY
+            0  'unione@ok.wpgate.galaxy.dnet.yorkhospital.edu'
+            1  'unitwo@ok.healthnet.org'
+         'Sender' => 'unique2@usa.healthnet.org'
+         'Size' => 1531
+      10  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 08:31:26'
+         'Id' => 'FAA01850'
+         'Instance' => 1
+         'ReceiverList' => ARRAY
+            0  'count11@ok.healthnet.org'
+         'Sender' => 'cougithendu@iastate.edu'
+         'Size' => 8471
+      11  SyslogScan::Delivery=HASH
+         'Date' => 'Jun 13 08:42:59'
+         'Id' => 'NAA20697'
+         'Instance' => 1
+         'ReceiverList' => ARRAY
+            0  'count1@prev.healthnet.org'
+         'Sender' => 'coumfuller@warren.med.harvard.edu'
+         'Size' => 1477
+)
+$gTestDump = '0 bytes from antiquity to antcount1@ant.utmem.edu
+ReceiverList is antcount1@ant.utmem.edu
+Sender is antiquity
+Size is 0
+Instance is 1
+Id is WAA18702
+Date is Jun 13 02:31:32
+5357 bytes from joinkids@foo.phyast.pitt.edu to joil_gupta@ok.healthnet.org
+ReceiverList is joil_gupta@ok.healthnet.org
+Sender is joinkids@foo.phyast.pitt.edu
+Size is 5357
+Instance is 1
+Id is BAA26050
+Date is Jun 13 02:38:12
+7000 bytes from help-net@bar.temple.edu to helkaire@ok.healthnet.org
+ReceiverList is helkaire@ok.healthnet.org
+Sender is help-net@bar.temple.edu
+Size is 7000
+Instance is 1
+Id is BAA26035
+Date is Jun 13 02:34:56
+519 bytes from unique3%sswmbx%fdaoc@mr.cvmvax.gov to uniman@ok.edu
+ReceiverList is uniman@ok.edu
+Sender is unique3%sswmbx%fdaoc@mr.cvmvax.gov
+Size is 519
+Instance is 1
+Id is CAA26881
+Date is Jun 13 02:12:01
+519 bytes from unique3%sswmbx%fdaoc@mr.cvmvax.gov to "<uni>|ifs=" " && exec /usr/local/bin/procmail -f- || exit 75 #phil"@ok.com
+ReceiverList is "<uni>|ifs=" " && exec /usr/local/bin/procmail -f- || exit 75 #phil"@ok.com
+Sender is unique3%sswmbx%fdaoc@mr.cvmvax.gov
+Size is 519
+Instance is 2
+Id is CAA26881
+Date is Jun 13 02:12:06
+1531 bytes from unique3@vm.temple.edu to unizney@ok.healthnet.org
+ReceiverList is unizney@ok.healthnet.org
+Sender is unique3@vm.temple.edu
+Size is 1531
+Instance is 1
+Id is DAA29007
+Date is Jun 13 03:27:44
+1531 bytes from unique3@vm.temple.edu to unilo@ok.hello.org
+ReceiverList is unilo@ok.hello.org
+Sender is unique3@vm.temple.edu
+Size is 1531
+Instance is 2
+Id is DAA29008
+Date is Jun 13 03:27:44
+214 bytes from unique1@usa.healthnet.org to unione@ok.healthnet.org
+ReceiverList is unione@ok.healthnet.org
+Sender is unique1@usa.healthnet.org
+Size is 214
+Instance is 1
+Id is OAA20646
+Date is Jun 13 03:27:57
+214 bytes from unique1@usa.healthnet.org to unitwo@ok.foo.org
+ReceiverList is unitwo@ok.foo.org
+Sender is unique1@usa.healthnet.org
+Size is 214
+Instance is 2
+Id is OAA20646
+Date is Jun 13 03:27:59
+1531 bytes from unique2@usa.healthnet.org to unione@ok.wpgate.galaxy.dnet.yorkhospital.edu unitwo@ok.healthnet.org
+ReceiverList is unione@ok.wpgate.galaxy.dnet.yorkhospital.edu unitwo@ok.healthnet.org
+Sender is unique2@usa.healthnet.org
+Size is 1531
+Instance is 1
+Id is GAA01612
+Date is Jun 13 06:23:53
+8471 bytes from cougithendu@iastate.edu to count11@ok.healthnet.org
+ReceiverList is count11@ok.healthnet.org
+Sender is cougithendu@iastate.edu
+Size is 8471
+Instance is 1
+Id is FAA01850
+Date is Jun 13 08:31:26
+1477 bytes from coumfuller@warren.med.harvard.edu to count1@prev.healthnet.org
+ReceiverList is count1@prev.healthnet.org
+Sender is coumfuller@warren.med.harvard.edu
+Size is 1477
+Instance is 1
+Id is NAA20697
+Date is Jun 13 08:42:59
+'

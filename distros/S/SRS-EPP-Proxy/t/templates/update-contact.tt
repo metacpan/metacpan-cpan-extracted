@@ -1,0 +1,33 @@
+<update>
+  <contact:update xmlns:contact="urn:ietf:params:xml:ns:contact-1.0">
+    <contact:id>[% contact_id %]</contact:id>
+    <contact:chg>
+       [% UNLESS no_addr %]
+	    <contact:postalInfo type="int">
+	      [% IF name.defined %]<contact:name>[% name %]</contact:name>[% END %]
+	      [% IF company.defined %]<contact:org>[% company %]</contact:org>[% END %]
+	      [% IF street.defined OR street2.defined OR city.defined OR state.defined OR pcode.defined OR ccode.defined %]
+	        <contact:addr>
+	          [% IF street.defined %]<contact:street>[% street %]</contact:street>[% END %]
+	          [% IF street2.defined %]<contact:street>[% street2 %]</contact:street>[% END %]
+	          [% IF city.defined %]<contact:city>[% city %]</contact:city>[% END %]
+	          [% IF state.defined %]<contact:sp>[% state %]</contact:sp>[% END %]
+	          [% IF pcode.defined %]<contact:pc>[% pcode %]</contact:pc>[% END %]
+	          [% IF ccode.defined %]<contact:cc>[% ccode %]</contact:cc>[% END %]
+	        </contact:addr>
+        [% END %]
+	    </contact:postalInfo>
+	    [% END %]
+	    [% IF phone.defined %]<contact:voice>[% phone %]</contact:voice>[% END %]
+	    <contact:fax>[% fax %]</contact:fax>
+	    [% IF email.defined %]<contact:email>[% email %]</contact:email>[% END %]
+	    <contact:authInfo>
+	      <contact:pw></contact:pw>
+	    </contact:authInfo>
+	    <contact:disclose flag="0">
+	      <contact:voice/>
+	      <contact:email/>
+	    </contact:disclose>
+  </contact:chg>
+  </contact:update>
+</update>

@@ -1,0 +1,38 @@
+--- #YAML:1.0
+name:               Serengeti
+version:            0.00
+abstract:           
+author:
+    - Claes Jakobsson <claesjac@cpan.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    accessors::ro:        0
+    File::Basename:       0
+    File::Path:           0
+    File::Slurp:          0
+    HTML::Selector::XPath:  0
+    HTML::TreeBuilder::XPath:  0
+    HTTP::Response:       0
+    JavaScript:           1.16
+    List::Util:           0
+    Module::Load:         0
+    Module::Pluggable:    0
+    Regexp::Common:       0
+    Scalar::Util:         0
+    Test::Exception:      0
+    URI:                  0
+    URI::Escape:          0
+    WWW::Curl:            4.12
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

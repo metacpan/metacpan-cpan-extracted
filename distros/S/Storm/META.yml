@@ -1,0 +1,25 @@
+---
+abstract: "Object-relational mapping\r"
+author:
+  - 'Jeffrey Ray Hallock <jeffrey.hallock@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.120921'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Storm
+requires:
+  DBD::SQLite: 0
+  DBI: 0
+  DateTime: 0
+  DateTime::Format::MySQL: 0
+  DateTime::Format::SQLite: 0
+  Moose: 0
+  MooseX::SemiAffordanceAccessor: 0
+  MooseX::StrictConstructor: 0
+  MooseX::Types: 0
+version: 0.240

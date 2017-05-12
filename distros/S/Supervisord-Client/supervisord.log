@@ -1,0 +1,52 @@
+2014-05-07 22:55:57,400 INFO RPC interface 'supervisor' initialized
+2014-05-07 22:55:57,401 INFO RPC interface 'supervisor' initialized
+2014-05-07 22:55:57,401 CRIT Server 'unix_http_server' running without any HTTP authentication checking
+2014-05-07 22:55:57,404 INFO daemonizing the supervisord process
+2014-05-07 22:55:57,404 INFO supervisord started with pid 17949
+2014-05-07 22:55:58,409 INFO spawned: 'print_and_sleep' with pid 17958
+2014-05-07 22:55:58,420 INFO exited: print_and_sleep (exit status 127; not expected)
+2014-05-07 22:55:59,424 INFO spawned: 'print_and_sleep' with pid 17959
+2014-05-07 22:55:59,435 INFO exited: print_and_sleep (exit status 127; not expected)
+2014-05-07 22:56:01,441 INFO spawned: 'print_and_sleep' with pid 17969
+2014-05-07 22:56:01,451 INFO exited: print_and_sleep (exit status 127; not expected)
+2014-05-07 22:56:04,461 INFO spawned: 'print_and_sleep' with pid 17970
+2014-05-07 22:56:04,472 INFO exited: print_and_sleep (exit status 127; not expected)
+2014-05-07 22:56:05,474 INFO gave up: print_and_sleep entered FATAL state, too many start retries too quickly
+2014-05-07 22:57:38,788 WARN received SIGTERM indicating exit request
+2014-05-07 22:57:47,700 INFO RPC interface 'supervisor' initialized
+2014-05-07 22:57:47,700 CRIT Server 'inet_http_server' running without any HTTP authentication checking
+2014-05-07 22:57:47,700 INFO RPC interface 'supervisor' initialized
+2014-05-07 22:57:47,701 CRIT Server 'unix_http_server' running without any HTTP authentication checking
+2014-05-07 22:57:47,703 INFO daemonizing the supervisord process
+2014-05-07 22:57:47,704 INFO supervisord started with pid 18214
+2014-05-07 22:57:48,709 INFO spawned: 'print_and_sleep' with pid 18223
+2014-05-07 22:57:48,720 INFO exited: print_and_sleep (exit status 127; not expected)
+2014-05-07 22:57:50,024 INFO spawned: 'print_and_sleep' with pid 18225
+2014-05-07 22:57:50,035 INFO exited: print_and_sleep (exit status 127; not expected)
+2014-05-07 22:57:52,353 INFO spawned: 'print_and_sleep' with pid 18226
+2014-05-07 22:57:52,363 INFO exited: print_and_sleep (exit status 127; not expected)
+2014-05-07 22:57:55,960 INFO spawned: 'print_and_sleep' with pid 18227
+2014-05-07 22:57:55,971 INFO exited: print_and_sleep (exit status 127; not expected)
+2014-05-07 22:57:56,182 INFO gave up: print_and_sleep entered FATAL state, too many start retries too quickly
+2014-05-07 22:58:10,469 INFO spawned: 'print_and_sleep' with pid 18228
+2014-05-07 22:58:10,482 INFO exited: print_and_sleep (exit status 0; not expected)
+2014-05-07 22:58:11,485 INFO spawned: 'print_and_sleep' with pid 18231
+2014-05-07 22:58:11,492 INFO exited: print_and_sleep (exit status 0; not expected)
+2014-05-07 22:58:13,656 INFO spawned: 'print_and_sleep' with pid 18235
+2014-05-07 22:58:13,668 INFO exited: print_and_sleep (exit status 0; not expected)
+2014-05-07 22:58:17,546 INFO spawned: 'print_and_sleep' with pid 18238
+2014-05-07 22:58:17,559 INFO exited: print_and_sleep (exit status 0; not expected)
+2014-05-07 22:58:18,562 INFO gave up: print_and_sleep entered FATAL state, too many start retries too quickly
+2014-05-07 22:58:36,848 INFO spawned: 'print_and_sleep' with pid 18242
+2014-05-07 22:58:37,943 INFO success: print_and_sleep entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2014-05-07 22:58:56,624 INFO stopped: print_and_sleep (terminated by SIGTERM)
+2014-05-07 22:58:56,633 INFO spawned: 'print_and_sleep' with pid 18303
+2014-05-07 22:58:57,649 INFO success: print_and_sleep entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2014-11-20 20:35:25,218 INFO RPC interface 'supervisor' initialized
+2014-11-20 20:35:25,230 CRIT Server 'inet_http_server' running without any HTTP authentication checking
+2014-11-20 20:35:25,533 INFO RPC interface 'supervisor' initialized
+2014-11-20 20:35:25,533 CRIT Server 'unix_http_server' running without any HTTP authentication checking
+2014-11-20 20:35:25,535 INFO daemonizing the supervisord process
+2014-11-20 20:35:25,720 INFO supervisord started with pid 15174
+2014-11-20 20:35:26,723 INFO spawned: 'print_and_sleep' with pid 15183
+2014-11-20 20:35:27,821 INFO success: print_and_sleep entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)

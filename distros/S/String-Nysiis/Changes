@@ -1,0 +1,9 @@
+Revision history for Perl extension String::Nysiis.
+
+1.00  Thu Jun 28 21:58:02 EDT 2001
+        - preparations for initial release
+
+0.01  Thu Jun 14 21:07:23 2001
+	- original version; created by h2xs 1.20 with options
+		-X -n String::Nysiis
+

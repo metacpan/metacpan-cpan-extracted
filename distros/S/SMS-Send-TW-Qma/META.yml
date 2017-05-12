@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:               SMS-Send-TW-Qma
+version:            0.01
+abstract:           SMS::Send driver for www.qma.com
+author:
+    - Tsung-Han Yeh <snowfly@yuntech.edu.tw>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Crypt::SSLeay:   0.51
+    SMS::Send:       0
+    WWW::Mechanize:  1.18
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

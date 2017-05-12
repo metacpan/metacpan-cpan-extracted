@@ -1,0 +1,160 @@
+#!perl
+#
+# This mkheader script makes two C header files, "fmcp932.h" and "tocp932.h".
+# These files are used to build ShiftJIS::CP932::MapUTF
+#
+use 5.006;
+use Carp;
+use strict;
+
+do "MapUTF.pmN";
+
+my $wc = 'U16';
+
+my(%sbcs, %dbcs, %ucs, %maxlen);
+
+use vars qw(%CP932_UNI %UNI_CP932 %Fallback);
+
+my $dummy; # to avoid "once used"...
+$dummy = %ShiftJIS::CP932::MapUTF::CP932_UNI;
+$dummy = %ShiftJIS::CP932::MapUTF::UNI_CP932;
+$dummy = %ShiftJIS::CP932::MapUTF::Fallback;
+
+*CP932_UNI = \ %ShiftJIS::CP932::MapUTF::CP932_UNI;
+*UNI_CP932 = \ %ShiftJIS::CP932::MapUTF::UNI_CP932;
+*Fallback  = \ %ShiftJIS::CP932::MapUTF::Fallback;
+
+sub u8len {
+    my $uv = shift;
+    return $uv < 0x80 ? 1 : $uv < 0x800 ? 2 :
+	$uv < 0x10000 ? 3 : $uv < 0x200000 ? 4 : 13;
+}
+sub u16len { ($_[0] > 0xFFFF) ? 4 : 2 }
+sub u32len { 4 }
+sub unilen { use bytes; return length(pack 'U', shift) }
+sub floor  { int($_[0]) + ($_[0] <=> int($_[0])); }
+
+die "no \%CP932_UNI!" unless %CP932_UNI; # avoid "once used"
+
+$maxlen{ToUni} = 1;
+$maxlen{ToU8}  = 1;
+$maxlen{ToU16} = 1;
+$maxlen{ToU32} = 1;
+
+while (my($e,$u) = each %CP932_UNI) {
+    my $enccur = length $e;
+    if ($enccur == 1) {
+	$sbcs{ord $e} = $u;
+    } else {
+	my($le,$tr) = unpack('CC', $e);
+	$dbcs{ $le }{ $tr } = $u;
+    }
+    my $unimax = floor(unilen($u)/$enccur);
+    my $u8max  = floor(u8len ($u)/$enccur);
+    my $u16max = floor(u16len($u)/$enccur);
+    my $u32max = floor(u32len($u)/$enccur);
+    $maxlen{ToUni} = $unimax if $unimax > $maxlen{ToUni};
+    $maxlen{ToU8 } = $u8max  if $u8max  > $maxlen{ToU8 };
+    $maxlen{ToU16} = $u16max if $u16max > $maxlen{ToU16};
+    $maxlen{ToU32} = $u32max if $u32max > $maxlen{ToU32};
+}
+
+open FH, ">fmcp932.h" or die "fmcp932.h $!";
+binmode FH;
+select FH;
+
+printf "#define MaxLenToUni (%d)\n", $maxlen{ToUni};
+printf "#define MaxLenToU8  (%d)\n", $maxlen{ToU8 };
+printf "#define MaxLenToU16 (%d)\n", $maxlen{ToU16};
+printf "#define MaxLenToU32 (%d)\n", $maxlen{ToU32};
+print "\n";
+
+print "struct leading { $wc sbc; $wc* tbl; };\n\n";
+
+foreach my $le (sort { $a <=> $b } keys %dbcs) {
+    print "$wc fmcp932_$le [256] = {\n";
+    for (my $i = 0; $i < 256; $i++) {
+	printf "\t%d", defined $dbcs{$le}{$i} ? $dbcs{$le}{$i} : 0;
+	print ','  if $i != 255;
+	print "\n" if $i % 8 == 7;
+    }
+    print "};\n\n";
+}
+
+{
+    print "struct leading fmcp932_tbl [] = {\n";
+    for (my $i = 0; $i < 256; $i++) {
+	printf "\t{ %5d, %s }",
+	    defined $sbcs{$i} ? $sbcs{$i} : 0,
+	    defined $dbcs{$i} ? "fmcp932_$i" : "NULL";
+	print ','  if $i != 255;
+	print "\n";
+    }
+    print "};\n\n";
+}
+
+close FH;
+
+die "no \%UNI_CP932!" unless %UNI_CP932; # avoid "once used"
+
+$maxlen{FmUni} = 1;
+$maxlen{FmU8 } = 1;
+$maxlen{FmU16} = 1;
+$maxlen{FmU32} = 1;
+
+while (my($u,$e) = each %UNI_CP932) {
+    my $enccur = length $e;
+    my ($a,$b) = unpack('CC', pack 'n', $u);
+    $ucs{$a}{$b} = $enccur == 1 ? ord $e : unpack 'n', $e;
+
+    my $unimax = floor($enccur/unilen($u));
+    my $u8max  = floor($enccur/u8len ($u));
+    my $u16max = floor($enccur/u16len($u));
+    my $u32max = floor($enccur/u32len($u));
+    $maxlen{FmUni} = $unimax if $unimax > $maxlen{FmUni};
+    $maxlen{FmU8 } = $u8max  if $u8max  > $maxlen{FmU8 };
+    $maxlen{FmU16} = $u16max if $u16max > $maxlen{FmU16};
+    $maxlen{FmU32} = $u32max if $u32max > $maxlen{FmU32};
+}
+
+open FH, ">tocp932.h" or die "tocp932.h $!";
+binmode FH; select FH;
+
+printf "#define MaxLenFmUni (%d)\n", $maxlen{FmUni};
+printf "#define MaxLenFmU8  (%d)\n", $maxlen{FmU8 };
+printf "#define MaxLenFmU16 (%d)\n", $maxlen{FmU16};
+printf "#define MaxLenFmU32 (%d)\n", $maxlen{FmU32};
+print "\n";
+
+print "U16 fb_latin1_to_cp932 [] = {\n";
+foreach (my $ch = 0xA0; $ch <= 0xFF; $ch++) {
+    print "\t0x";
+    print unpack('H*', exists $Fallback{$ch} ? $Fallback{$ch} : "\0");
+    print $ch == 0xFF ? "\n" : $ch % 8 == 7 ? ",\n" : ",";
+}
+print "};\n\n";
+
+foreach my $le (sort { $a <=> $b } keys %ucs) {
+    print "$wc tocp932_$le [256] = {\n";
+    for (my $i = 0; $i < 256; $i++) {
+	printf "\t%d", defined $ucs{$le}{$i} ? $ucs{$le}{$i} : 0;
+	print ','  if $i != 255;
+	print "\n" if $i % 8 == 7;
+    }
+    print "};\n\n";
+}
+
+{
+    print "$wc* tocp932_tbl [] = {\n";
+    for (my $i = 0; $i < 256; $i++) {
+	print "\t", defined $ucs{$i} ? "tocp932_$i" : "NULL";
+	print ','  if $i != 255;
+	print "\n";
+    }
+    print "};\n\n";
+}
+
+close FH;
+
+1;
+__END__

@@ -1,0 +1,58 @@
+Revision history for Perl extension Sort::Maker.
+
+0.06  Fri Dec 29 00:47:00 EST 2006
+	- renamed t/common.pl to t/common.pm
+	- added support for error tests in t/common.pm
+	- rewrote t/error.t to use test table and common.pm
+	- created proper README file
+	- fixed doc bug (removed 'style =>')
+		-from Mumia W.. <paduille.4060.mumia.w@earthlink.net>
+	- added t/closure.t
+		-initial code from Mumia W..
+		 <paduille.4060.mumia.w@earthlink.net>
+	- added support for closures for key extraction
+		-idea and initial code and pod from Mumia W..
+		 <paduille.4060.mumia.w@earthlink.net>
+
+0.05  Thu Apr  6 03:15:09 EDT 2006
+	- fixed parsing array ref key description
+	- added 2 tests to t/error.t
+		-from John Kent <john.kent@nrlmry.navy.mil>
+	- reordered Changes to be newer to older
+
+0.04  Wed Apr 27 01:37:00 EDT 2005
+	- fixed many doc typos and mistakes
+		-from Brad Baxter <bmb@Mail.Libs.UGA.EDU>
+	- fixed 'name' option bug, added test and docs
+		-from Damian Conway <damian@conway.org>
+	- added support for code refs as extraction code
+	  cleaned up the extraction code documentation
+		-from Damian Conway <damian@conway.org>
+
+0.03  Tue Feb  8 03:45:32 EST 2005
+	- fixed bug when using GRT and varying strings and ref_in.
+	  new test - ref_in_varying.t
+		-from Brad Baxter <bmb@Mail.Libs.UGA.EDU>
+	- fixed bug when using GRT and descending string sort with
+	  numeric data.
+	  new test - descending_grt_string.t
+		-from Brad Baxter <bmb@Mail.Libs.UGA.EDU>
+
+0.02  Fri Aug 27 00:43:25 EDT 2004
+	- fixed bug in decending integer/float GRT sorts (tests included)
+		-from Marc Prewitt <mprewitt@dmja.com>
+	- cleaned up pod regarding 'fixed' and other attributes
+		-from Marc Prewitt <mprewitt@dmja.com>
+	- fixed and cleaned up docs for init_code feature. now it is
+	  documented to work only with ST and GRT
+	- the string_data attribute for GRT now works and there is the
+	  string_data.t test for it.
+	- fixed bug with string_data mode for GRT with descending string sorts
+	  added tests for this 
+		-from  Marc Prewitt <mprewitt@dmja.com>
+	- made all appropriate tests support the -bench option
+
+0.01  Wed Mar 24 23:47:32 2004
+	- original version; created by h2xs 1.21 with options
+		-AX -n Sort::Maker
+

@@ -1,0 +1,58 @@
+NAME
+	Spreadsheet::WriteExcel::FromDB::Query - Convert a database query to an Excel spreadsheet
+
+SYNOPSIS
+	use Spreadsheet::WriteExcel::FromDB::Query;
+
+	my $dbh = DBI->connect(...);
+
+	$query = q{select user from users};
+	my $ss = Spreadsheet::WriteExcel::FromDB->read($dbh, $query);
+
+	print $ss->as_xls;
+	# or
+	  $ss->write_xls('spreadsheet.xls');
+
+DESCRIPTION
+	This module exports a database query as an Excel Spreadsheet.  It functions
+	very similar to Spreadsheet::WriteExcel::FromDB, except that it forms the
+	Excel spreadsheet from a query instead of an entire table.
+
+METHODS
+  data_query
+	Returns the query directly to Spreadsheet::WriteExcel::FromDB
+
+  _columns_in_table
+	Returns the columns from the query directly to Spreadsheet::WriteExcel::FromDB
+
+BUGS
+	The same bugs that apply to Spreadsheet::WriteExcel::FromDB also apply to 
+	Spreadsheet::WriteExcel::FromDB::Query.  Dates are handled as strings, rather than dates.
+
+AUTHOR
+	Christopher Kois, <cpkois@cpan.org>
+
+COPYRIGHT AND LICENSE
+	Copyright (C) May, 2006 Christopher Kois.
+
+	This module is Copyright (c) 2006 by Christopher Kois. http://www.christopherkois.com
+	All rights reserved.  You may distribute this module under the terms of GNU General Public 
+	License (GPL). 
+
+	The Spreadsheet::WriteExcel::FromDB::Query is a subclass derived from the 
+	Spreadsheet::WriteExcel::FromDB module, Copyright (C) 2001-2005 by Tony Bowden.  
+  
+	Module Copyrights:
+	- The Spreadsheet::WriteExcel::FromDB module is Copyright © 2001-2005, Tony Bowden.  
+	  Available at: http://search.cpan.org/~tmtm/Spreadsheet-WriteExcel-FromDB-1.00/lib/Spreadsheet/WriteExcel/FromDB.pm
+	- The Spreadsheet::WriteExcel::Simple module is Copyright © 2001-2005, Tony Bowden.  
+      Available at: http://search.cpan.org/~tmtm/Spreadsheet-WriteExcel-Simple-1.04/Simple.pm
+
+SUPPORT/WARRANTY
+	Spreadsheet::WriteExcel::FromDB::Query is free Open Source software. 
+	IT COMES WITHOUT WARRANTY OR SUPPORT OF ANY KIND.
+		
+SEE ALSO
+	Spreadsheet::WriteExcel::FromDB, Spreadsheet::WriteExcel::Simple, Spreadsheet::WriteExcel, DBI
+
+

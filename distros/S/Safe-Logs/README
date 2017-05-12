@@ -1,0 +1,50 @@
+Safe::Logs
+==========
+
+Install some default protection against attacks described in
+http://www.digitaldefense.net/labs/papers/Termulation.txt. Those
+attacks are directed towards many common terminal emulators.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Test::More
+
+SECURITY CONSIDERATIONS
+
+I have no control on the machanisms involved in the storage or
+transport of this distribution. This means that I cannot guarantee
+that the distribution you have in your hands is indeed, the same
+distribution I packed and uploaded.
+
+Along the distribution file, you should have a file with the extension
+".asc". This contains a GPG "detached signature" that makes it
+impossible for anybody to alter this distribution. If security is of
+any concern to you, by all means verify the signature of this file and
+contact the author if any discrepancy is detected.
+
+You can find more information about this at the following URL
+
+             http://mipagina.cantv.net/lem/gpg/
+
+COPYRIGHT AND LICENSE
+
+This code comes with no warranty of any kind. The author cannot be
+held liable for anything arising of the use of this code under no
+circumstances.
+
+This code is released under the same terms of Perl itself. 
+
+Copyright (C) 2003 Luis E. Muñoz <luismunoz@cpan.org>
+All rights reserved
+

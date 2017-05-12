@@ -1,0 +1,23 @@
+0.04  2004-07-04
+
+- Updated templates to match the latest TT2 templates in the Spork package.
+
+- Fixed a bug that caused rendering to throw an exception due to a
+method name change in Spoon.
+
+
+0.03  2004-04-25
+
+- Added SIGNATURE to MANIFEST.
+
+
+0.02  2004-04-23
+
+- Make this actually work with the latest version of Spork.
+
+
+0.01  2004-04-23
+
+- First release.
+
+

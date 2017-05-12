@@ -1,0 +1,40 @@
+NAME
+    String::Pad - String padding routines
+
+VERSION
+    This document describes version 0.01 of String::Pad (from Perl
+    distribution String-Pad), released on 2014-12-10.
+
+FUNCTIONS
+  pad($text, $width[, $which[, $padchar[, $truncate]]]) => STR
+    Return $text padded with $padchar to $width columns. $which is either
+    "r" or "right" for padding on the right (the default if not specified),
+    "l" or "left" for padding on the right, or "c" or "center" or "centre"
+    for left+right padding to center the text.
+
+    $padchar is whitespace if not specified. It should be string having the
+    width of 1 column.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/String-Pad>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-String-Pad>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=String-Pad>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

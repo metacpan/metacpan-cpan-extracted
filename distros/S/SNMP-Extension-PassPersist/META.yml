@@ -1,0 +1,40 @@
+---
+abstract: 'Generic pass/pass_persist extension framework'
+author:
+  - 'Sebastien Aperghis-Tramoni <sebastien@aperghis.net>'
+build_requires:
+  File::Temp: 0.14
+  IO::File: 1.05
+  IO::String: 1.00
+  Test::More: 0.45
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: SNMP-Extension-PassPersist
+provides:
+  SNMP::Extension::PassPersist:
+    file: lib/SNMP/Extension/PassPersist.pm
+    version: 0.07
+recommends:
+  Sort::Key::OID: 0.04
+requires:
+  Carp: 0
+  Class::Accessor: 0.30
+  File::Basename: 0
+  Getopt::Long: 2.04
+  IO::Handle: 1.15
+  IO::Pipe: 1.12
+  IO::Select: 1.10
+  List::MoreUtils: 0.21
+  Sys::Syslog: 0
+  parent: 0.221
+  perl: 5.006
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/maddingue/SNMP-Extension-PassPersist
+version: 0.07

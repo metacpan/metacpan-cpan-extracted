@@ -1,0 +1,147 @@
+Version history for Perl distribution Software-License-OrLaterPack:
+
+v0.10.2 @ 2016-10-10 22:17 UTC
+
+    -   The preamble and instructions are integral parts of the GNU GPL and may not be omitted.
+
+v0.10.1 @ 2015-10-22 21:45 UTC
+
+    -   `aspell.en.pws` file renamed to `aspell-en.pws` to make `Test::Portability` happy.
+
+    -   Minor fix to make `Test::Synopsis` happy.
+
+    -   Short license note used in documentation.
+
+    -   Mercurial repository moved from FedoraPeople.org to NonGNU.Savannah.org.
+
+    -   Minor change in documentation: `attribute` term is used instead of `method` for all
+        attribute readers.
+
+v0.10.0 @ 2015-10-03 09:01 UTC
+
+    -   Documentation updated. Added "DESCRIPTION" section to the manual, with two subsections
+        "Program Name" and "Short License Notice".
+
+    -   `_name` method changed: "the" article dropped from returned value. Now `_name` returns
+        "bare" license name, which is the same for "or later" license and for its base license, e.
+        g. "GNU General Public License".
+
+    -   Introduced methods: `_abbr`, `abbr`, `base`, `program`, `Program`.
+
+    -   `_version` method retired, use `->base->version` instead.
+
+    -   **Incompatible change:** `notice` method takes program name from object, not from argument.
+        Argument now is interpreted as requested notice variant. There are two variants: default
+        (no argument) and `'short'`. Short notice is similar to the notice printed by the current
+        GNU programs, e. g.:
+
+            Copyright (C) YEAR HOLDER
+            License ABBR: NAME URL
+            This is free software: you are free to change and redistribute it.
+            There is NO WARRANTY, to the extent permitted by law.
+
+    -   Required Perl version lowered to 5.006.
+
+    -   Version style switched from old decimal to new dotted-decimal.
+
+0.009 @ 2015-06-15
+
+    -   `OrLaterPack.pm` is returned to the distribution. CPAN does not handle well distributions
+        with no main module. In particular, distribution upgrade does not work.
+
+0.008 @ 2015-06-14
+
+    -   `OrLaterPack.pod` and distribution `README` now have `NAME`, `VERSION` and `AUTHOR`
+        sections.
+
+    -   `bugtracker.web` resource is changed from SourceForge to `rt.cpan.org`.
+
+    -   All the small templates eliminated, files are generated from `dist.ini`.
+
+    -   Bug reporting changed to use `Dist::Zilla`'s `log` and `log_fatal` methods — it makes error
+        messages more clear, especially error location more understandable.
+
+    -   Some more links added to documentation.
+
+0.007 @ 2015-06-11
+
+    -   Documentation moved to `doc/` directory, each chapter in separate file. The same files used
+        to generate distribution COPYING and README, OrLaterPack.pod. Source COPYING is a symlink
+        to `doc/14-copying.doc`.
+
+    -   More licenses added: GPL v1 and v2, LGPL v2.1 and 3.0.
+
+    -   All the `or_later.pm` modules now generated from the same template.
+
+    -   More test added: `MojibakeTests` (checks encoding), `CheckPrereqsIndexed` (checks all
+        dependencies are available in CPAN).
+
+    -   Functional test expanded to cover added licenses.
+
+    -   Dummy module `OrLaterPack.pm` dropped, `OrLaterPack.pod` file introduced instead.
+
+    -   `manifest.txt` now describes all the source files (even those which are not copied to
+        distribution).
+
+0.006 @ 2015-04-29
+
+    -   `_name` and `_version` methods introduced. The first returns plain license name (no
+        version) with lowercase "article "the", the second return plain license version "3".
+
+    -   `notice` method overrides parent one: (1) our method has optional parameters — program name
+        ("this program" by default), it is used in license notice text, (2) notice text is
+        formatted with `Text::Wrap::fill`.
+
+    -   `AGPL_3::or_later` delegates most of the work to `GPL_3::or_later` to avoid code
+        duplication.
+
+    -   I am studying CPAN features and polishing release process and materials. Added some info:
+        where to get *real* source, how to report bugs, etc.
+
+0.005 @ 2015-04-16
+
+    -   Minor bug in POD fixed.
+
+    -   `dist.ini` and `weaver.ini` dropped from distribution.
+
+    -   License note in sources was incorrect, fixed.
+
+    -   Source `README` added, not fully completed yet.
+
+    -   Distribution `README` is also added.
+
+    -   SourceForge project created.
+
+    -   Dist meta info provided with resources: homepage and repository.
+
+0.004 @ 2015-04-14
+
+    -   `Changes` file format changed to meet CPAN requirements.
+
+    -   "Main" module added to make CPAN happy.
+
+    -   Studying `Dist::Zilla` — adding more release tests, etc.
+
+0.003 @ 2015-04-12
+
+    -   `Software-License-GPL_3-or_later` renamed to `Software-License-OrLaterPack`.
+
+    -   `AGPL_3::or_later` license added.
+
+    -   Documentation moved to `OrLaterPack.pod` file.
+
+    -   Functional test improved and expanded and now covers both licenses.
+
+0.002 @ 2015-04-11
+
+    -   `Module::Build::Tiny` used instead of `ExtUtils::MakeMaker`.
+
+    -   Functional test added.
+
+    -   `Test::Compile` test added.
+
+    -   Documentation added.
+
+0.001 @ 2015-04-10
+
+    -   Initial revision. No documentation, no tests, but `GPL_3::or_later` works and can be used.

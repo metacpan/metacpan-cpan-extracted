@@ -1,0 +1,7 @@
+Software::Packager::Darwin
+	This module creates basic packages. The package format needs to be
+	brought up to the current format requirements. Documentation would help
+	here.
+	Test script could be improved by doing some checks on the files in the
+	package directory.
+

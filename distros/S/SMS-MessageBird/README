@@ -1,0 +1,60 @@
+SMS::MessageBird README
+
+SMS::MessageBird is a Perl module that provides a simple Perl interface to the
+MessageBird JSON API. It deals with the JSON stuff allowing you to get back
+useful Perl data structures.
+
+To use this module you'll need an account with MessageBird
+(https://www.messagebird.com/). Once you have that, you can create an API key
+on your account and feed it to this module which will authenticate with their
+API using that key.
+
+The methods implmented acceept the paramteres as named in the MessageBird API
+documentation which can be found at the MessageBird Developer Documentation
+(https://www.messagebird.com/en-gb/developers). If you're using this
+distribution you should be familiar with the API documentation.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc SMS::MessageBird
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=SMS-MessageBird
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/SMS-MessageBird
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/SMS-MessageBird
+
+    Search CPAN
+        http://search.cpan.org/dist/SMS-MessageBird/
+
+The source code is also available on GitHub:
+    https://github.com/jamesronan/SMS-MessageBird
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2016 James Ronan
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.
+

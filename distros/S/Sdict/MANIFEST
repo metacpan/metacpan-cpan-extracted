@@ -1,0 +1,17 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/0.load.t
+t/1.dct.t
+t/test.dct
+t/test.sdct
+lib/Sdict.pm
+lib/SdictUtils.pm
+lib/latin-cyrillic.pl
+bin/sdict.plx
+bin/dctinfo.plx
+bin/sdict-tools.plx
+bin/makedct.sh
+cgi/sdict.cgi
+META.yml                                 Module meta-data (added by MakeMaker)

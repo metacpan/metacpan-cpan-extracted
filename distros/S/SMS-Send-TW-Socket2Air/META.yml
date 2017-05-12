@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name:               SMS-Send-TW-Socket2Air
+version:            0.01
+abstract:           SMS::Send driver for HiNet Socket2Air 
+author:
+    - Jui-Nan Lin <jnlin@csie.nctu.edu.tw>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    LWP::UserAgent:  5.834
+    SMS::Send:       0
+    Switch:          2.14
+    Text::Iconv:     1.7
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

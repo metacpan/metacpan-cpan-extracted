@@ -1,0 +1,30 @@
+# String::Similex
+
+This module was made to compare strings that can be visually equivalent,
+i.e., when you look at a word on the screen you can make a visual mistake.
+
+Some examples of this are "Gandalf" and "Ganda1f", "morning" and "mornimg"
+
+or even cool writing "cool" and "c00l".
+If you want more robust and unabridged routines please check the SEE ALSO
+section on the documentation.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+DEPENDENCIES
+
+There are no dependencies.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Biafra
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

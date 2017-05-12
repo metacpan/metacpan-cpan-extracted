@@ -1,0 +1,59 @@
+Scalar-Array version 0.01
+=========================
+
+Scalar::Array will turn any arrayref into an iterator by simply using
+the arrayref itself. Only reading is currently implemented.
+
+SYNOPSIS
+
+  use Scalar::Array;
+
+  my $rr_ref = [ 1, 2, 3, 4, 5 ];
+
+  round_robin( $rr_ref );
+  print sa_length( $rr_ref ); # prints 5
+
+  print $rr_ref,"\n"; # prints 1
+  print $rr_ref,"\n"; # prints 2
+  print $rr_ref,"\n"; # prints 3
+  print $rr_ref,"\n"; # prints 4
+  print $rr_ref,"\n"; # prints 5
+  print $rr_ref,"\n"; # prints 1
+  print $rr_ref,"\n"; # prints 2
+  print $rr_ref,"\n"; # prints 3
+  ...
+
+  my $s_ref = [ 1, 2, 3, 4, 5 ];
+
+  shrink( $s_ref );
+  print sa_length( $s_ref ); # prints 5
+
+  print $s_ref,"\n"; # prints 1
+  print $s_ref,"\n"; # prints 2
+  print $s_ref,"\n"; # prints 3
+  print $s_ref,"\n"; # prints 4
+  print $s_ref,"\n"; # prints 5
+  print $s_ref,"\n"; # undef
+  print $s_ref,"\n"; # undef
+  print $s_ref,"\n"; # undef
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+The reliance of PERL_MAGIC_ext working as it does in 5.10
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 by Alfie John
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.

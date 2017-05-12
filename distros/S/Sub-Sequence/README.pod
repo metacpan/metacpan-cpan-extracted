@@ -1,0 +1,51 @@
+=encoding utf8
+
+
+This is Perl module B<Sub::Sequence>.
+
+=begin html
+
+<a href="http://travis-ci.org/bayashi/Sub-Sequence"><img src="https://secure.travis-ci.org/bayashi/Sub-Sequence.png"/></a>
+
+=end html
+
+
+=head1 INSTALLATION
+
+Sub::Sequence installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Sub::Sequence
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+
+=head1 DOCUMENTATION
+
+Sub::Sequence documentation is available as in POD. So you can do:
+
+    % perldoc Sub::Sequence
+
+
+=head1 REPOSITORY
+
+Sub::Sequence is hosted on github
+L<http://github.com/bayashi/Sub-Sequence>
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>

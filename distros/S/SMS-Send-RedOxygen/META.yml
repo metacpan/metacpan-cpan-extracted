@@ -1,0 +1,32 @@
+---
+abstract: "SMS::Send driver for RedOxygen.com RedSMS\r"
+author:
+  - "Craig Ringer\r"
+build_requires:
+  ExtUtils::MakeMaker: 6.6302
+  Test::More: 0.47
+configure_requires:
+  ExtUtils::MakeMaker: 6.6302
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.04'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: SMS-Send-RedOxygen
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp: 0
+  LWP: 5.69
+  SMS::Send: 1.06
+  perl: 5.10.0
+resources:
+  bugtracker: https://rt.cpan.org/Dist/Display.html?Status=Active&Queue=SMS-Send-RedOxygen
+  homepage: https://github.com/ringerc/sms-send-redsms-perl
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/ringerc/sms-send-redsms-perl.git
+version: 1.06

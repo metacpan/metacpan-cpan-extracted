@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+README.md
+cpanfile
+lib/SQL/Abstract/Plugin/InsertMulti.pm
+t/00_compile.t
+t/01_basic.t
+t/02_insert_multi.t
+xt/01_podspell.t
+xt/02_perlcritic.t
+xt/03_pod.t
+xt/perlcriticrc
+META.yml

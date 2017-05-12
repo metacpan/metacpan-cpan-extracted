@@ -1,0 +1,95 @@
+#!/usr/local/bin/perl -s
+#
+# parsesas [-lf] [-silent] [-inc] sasfile[.sas]      Parse SAS programs
+
+$usage = "Usage:
+  parsesas [options] sasfile[.sas]
+    where options are:
+    [-lf]             Print libnames/filenames
+    [-silent]         Print no statements
+    [-inc]            Follow %includes
+    [-print='types']  List of types to print; use quotes if more than 1
+";
+
+#	If you cannot install SAS::Parser in the standard lib/perl
+#  directory, uncomment next line and change to your personal 
+#  lib/perl directory
+#	unshift @INC "$ENV{HOME}/lib/perl";
+
+	use SAS::Parser;
+	
+# testing, testing...  Not a real application, just a demo...
+
+    my $file = shift @ARGV;
+	die $usage unless $file;
+	
+	# Process options (-s switch requires = sign for values)
+    my ($inc, $silent, $print);
+	%opts = defined ($silent) ? ( silent=>1) : ();
+	$opts{doincludes} = 1 if $inc;
+	$opts{print}= defined($print) ?
+		join('|', split(' ', $print)) :
+		'all';
+	
+   $p = new SAS::Parser;
+	
+   $p->parse_file($file, \%opts);
+
+#	We just demonstrate some ways of getting at the info stored in the
+#	SAS::Parser object.
+
+   print "Parsed $p->{file}\n";
+
+   my $procs = $p->procs();		# scalar context
+   my $macros = $p->macros();
+   my $macdefs = $p->macdefs();
+   my $modules = $p->modules();
+ 
+   print "  procs called:\t$procs\n" if $procs;
+   print "  macros called:\t$macros\n" if $macros;
+   print "  macros defined:\t$macdefs\n" if $macdefs;
+   print "  modules defined:\t$modules\n" if $modules;
+
+	# accessing the $p object directly: deprecated
+   print "  data sets: ", join(', ', @{$p->{datasets}}), "\n"
+      if scalar @{$p->{datasets}};
+
+	my @includes = $p->includes();	# list context
+   print "  %includes: ", join(', ', @includes), "\n" if scalar @includes;
+
+	my @stored = $p->stored();
+	my $s;
+	if (scalar @stored) {
+		print "  stored: ", scalar @stored, " statements\n";
+		foreach $s (@stored) {
+#			print join('|',  @$s ), "\n";
+		}
+	}
+
+#	if (scalar @{$p->{stored}}) {
+#		print "  stored: ", scalar @{$p->{stored}}, " statements\n";
+#		foreach $s (@{$p->{stored}}) {
+#			print join('|',  @$s ), "\n";
+#		}
+#	}
+	
+   # libnames and filenames include those defined in the .sas file
+   # and those in the autoexec.sas (if found)
+	
+   if ($lf) {
+		my %libnames = $p->libnames();
+		while (($libref,$value) = each %libnames) {
+			print "  libname: $libref=$value\n";
+      }
+   }
+   
+   if ($lf) {
+		my %filenames = $p->filenames();
+		while (($libref,$value) = each %filenames) {
+			print "  filename: $libref=$value\n";
+		}
+   }
+
+exit;
+
+ 

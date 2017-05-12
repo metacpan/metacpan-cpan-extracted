@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/SMS-Send-TW-Qma.t
+lib/SMS/Send/TW/Qma.pm
+META.yml                                 Module meta-data (added by MakeMaker)

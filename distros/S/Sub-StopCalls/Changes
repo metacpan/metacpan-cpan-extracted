@@ -1,0 +1,7 @@
+0.02 2012-08-28
+
+    * fix memory re-allocations when we need larger lists
+
+0.01 2011-02-11
+
+    * initial release

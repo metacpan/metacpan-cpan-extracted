@@ -1,0 +1,51 @@
+Revision history for Perl extension SWISH::API::Object.
+
+0.01  Thu Sep 21 08:45:22 2006
+	- original version; created by h2xs 1.23 with options
+		-XA -n SWISH::API::Object
+
+0.02
+    * subclass SWISH::API::Stat directly
+
+0.03
+    * fix POD to reflect 0.02 changes (doh!)
+
+0.04
+    * rewrite to support SWISH::API::More 0.03
+
+0.05
+    * fix bug in Result (same bug that SWISH::API::More 0.04 fixed)
+
+0.06
+    * uses YAML::Syck and JSON::Syck instead of Perl eval to deserialize()
+      property values. This should help relieve the memory leak experienced
+      with eval "$prop".
+
+0.07
+    * fix/simplify deserialize() logic wrt YAML and JSON
+   
+0.08
+    * wrap internal deserializers in eval() and croak on fatal err with
+      more helpful err message
+0.09
+    * clarify POD regarding serial_format option.
+    * added VERSION() method to satisfy some versions of MakeMaker
+
+0.10
+    * change tests to skip if no SWISH::API found
+
+0.11
+    * fix test SKIP sections to skip the correct number of tests
+
+0.12   3 Dec 2008
+    * refactor to actually support blessing into existing classes
+    * added next() alias method to Results class
+
+0.13   01 Feb 2010
+    * add more tests
+    * swish_result now passed to all Result classes.
+    * default serialization changed to JSON
+
+0.14   22 July 2015
+    * remote VERISON() sub to fix https://rt.cpan.org/Ticket/Display.html?id=105726
+

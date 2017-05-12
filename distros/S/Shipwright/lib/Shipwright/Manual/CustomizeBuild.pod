@@ -1,0 +1,98 @@
+=head1 NAME
+
+Shipwright::Manual::CustomizeBuild - Customize the build method for a source
+
+
+=head1 DESCRIPTION
+
+There are currently two ways to build a source: through a perl script
+(F<scripts/foo/build.pl>) which allows for heavy customization, or using a list
+of tagged commands (F<scripts/foo/build>), which is simpler but less
+customizable.
+
+F<scripts/foo/build.pl> has higher precedence, so if both
+F<scripts/foo/build.pl> and F<scripts/foo/build> exist, the former will be used.
+
+=head2 build.pl
+
+When executing F<build.pl> for the source I<foo>, the current working directory
+will be F<dists/foo>
+
+The script will be run with a list of arguments (the format is designed
+to be easily extracted with L<Getopt::Long>): 
+
+=over 4
+
+=item --install-base=s
+
+The base directory where the vessel is to be built to.
+
+e.g. C<--install-base '/tmp/test-xxxxxx/test'>
+
+=item --flags=s
+
+A list of flags, joined by comma. (See L<Shipwright::Manual::UsingFlags> for
+more information.)
+
+e.g. C<--flags default,mysql>
+
+=item --skip-test
+
+Whether to skip running tests or not.
+
+=item --force
+
+If any test fails, whether to go on or just die.
+
+=item --clean
+
+If run with this argument, the script should do the C<clean> work instead of
+the C<install> work.
+
+=back
+
+=head2 build
+
+This is a text file; each line should be either blank or use the format
+C<type: command>. The command will be executed line by line, and the current
+working directory for building the source I<foo> will be F<dists/foo>.
+
+In a normal build script, the following types of commands are specified:
+configure, make, install, clean, and sometimes test. Their functions should be
+self-explanatory for anyone familiar with building perl modules.
+
+Four template substitutions are available for use in the command:
+C<%%PERL%%>, C<%%PERL_ARCHNAME%%>, C<%%INSTALL_BASE%%> and C<%%MAKE%%>.
+These can be used in cases where the path to perl, the perl archname (e.g.
+'i486-linux-gnu-thread-multi'), the base install path or make command 
+are needed, since they are not known beforehand or need to choose one later.
+
+There are two special types: C<test> and C<clean>.
+
+=over 4
+
+=item test
+
+If executed with C<--skip-test>, this command won't be executed.
+If executed with C<--force>, even if this command fails the build will continue.
+
+=item clean
+
+If executed with C<--clean>, all commands will be skipped except this one.
+
+=back
+
+=head1 SEE ALSO
+
+L<Shipwright>, L<Shipwright::Manual>
+
+=head1 AUTHORS
+
+sunnavy  C<< <sunnavy@bestpractical.com> >>
+
+=head1 LICENCE AND COPYRIGHT
+
+Shipwright is Copyright 2007-2015 Best Practical Solutions, LLC.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

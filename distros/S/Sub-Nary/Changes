@@ -1,0 +1,30 @@
+Revision history for Sub-Nary
+
+0.03    2008-08-08 22:40 UTC
+        + Add : Support for grep and map.
+        + Add : More function ported to XS.
+        + Chg : Almost complete rewrite that makes the main logic way sanier.
+                Effectively, we now compute the return state and the last list
+                state for each op, recursively. Those two piece of information
+                are always returned by the inspect method.
+        + Chg : Incompatible change : from now, each branch of a test will
+                receive the same probability. This is needed in order to ensure
+                consistency between different syntaxes that gives the same logic
+                (for example, a literal if versus a function call that hides the
+                same if). Consider that each test has 50% of chance to succeed.
+        + Chg : List::Util is no longer required.
+        + Fix : returns in strange places will now usually be nicely handled.
+        + Tst : Even more of them.
+
+0.02    2008-08-05 16:20 UTC
+        + Add : Support for matches, eval, keys, values, each readline, stat,
+                localtime, gmtime, caller, get{pw,gr,host,net,proto,serv}*,
+                constant ranges.
+        + Doc : POD nits.
+        + Fix : Array assignment count.
+        + Tst : More of them, lots.
+        + Tst : All op tests now go in t/24-ops.t.
+
+0.01    2008-08-04 16:35 UTC
+        First version, released on an unsuspecting world.
+

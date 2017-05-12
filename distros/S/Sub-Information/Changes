@@ -1,0 +1,13 @@
+Revision history for Sub-Information
+
+0.10    03/02/2009
+        - Added experimenal 'file' and 'line' methods.
+
+0.02    02/05/2007
+        - Incorporated the Devel::Peek patch from Adriano Ferreira.
+        - Incorporated patch from Adriano Ferreira to make the basic importing
+          work properly.
+
+0.01    01/05/2007
+        First version of Sub::Information. 
+

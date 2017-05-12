@@ -1,0 +1,38 @@
+Revision history for Perl extension SemVer.
+
+0.6.0  2015-01-23T05:07:58Z
+      - Removed tests that fail on version.pm 0.9910 and higher due to
+        trailing decimal sign. Thanks to Andreas Koenig for the report and
+        diagnosis.
+      - Fixed vstring warning on Perl 5.8.
+      - Now skip tests that fail with version::vpp.
+      - Now skip test on version.pm 0.9911 that fails with that version.
+      - Now skip failing tests on Perl 5.8 and version.pm less than 0.9909.
+      - Removed all Pod tests from the distribution.
+
+0.5.0  2013-04-02T06:57:06Z
+      - The `new()` now throws an exception when a version string has a
+        prerelease version with no preceding dash. This is keep its
+        requirement for strictness consistent.
+      - Fixed a bug where a SemVer object passed to `new()` did not properly
+        clone the dash preceding a prerelease version.
+
+0.4.0  2012-11-20T18:59:33Z
+      - Updated the parsers to support an optional dash before the prerelease
+        version, and `normal()` to always emit a dash for the prerelease
+        version. This brings it in line with the final semver 1.0.0
+        specification.
+
+0.3.0  2011-05-26T04:54:50
+      - Made leading zeros, such as the "04" in "1.04.3" illegal when parsing
+        via `new()`.
+      - Eliminted "Use of qw(...) as parentheses is deprecated" in the tests
+        when running on Perl 5.14.
+
+0.2.0  2010-09-17T17:59:57
+      - Require Test::Pod 1.41 for testing POD because it supports
+        `L<text|url>`.
+
+0.1.0  2010-09-16T19:07:04
+      - Initial version, created with lots of help and feedback from
+        version.pm author John Peacock

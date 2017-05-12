@@ -1,0 +1,9 @@
+libsys-mknod-perl (0.01-1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Sam Vilain <sam@vilain.net>  Sat,  2 Aug 2003 03:37:46 +0100
+
+Local variables:
+mode: debian-changelog
+End:

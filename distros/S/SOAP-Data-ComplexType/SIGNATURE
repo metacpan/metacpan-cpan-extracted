@@ -1,0 +1,36 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 10d5220e0631ccc21c8f550e551b0fdd4e88abba CHANGES
+SHA1 a927c3744f5ade9037202cdc4bdb16ea7d77b870 MANIFEST
+SHA1 ab5a75e9b6a1be67ab41d8c3d3dadb6e6b8f03e6 META.yml
+SHA1 2c599e73584eb9ceaf47af33647469fb63d4ba5b Makefile.PL
+SHA1 18ffb3adb0b524fef0f4dcb429e06a8ee0fdbba2 README
+SHA1 28353209470a8e2d6f80be05e27ec35ab4570fd9 lib/SOAP/Data/ComplexType.pm
+SHA1 023802c29e3518d69c533ac0b17175be7147583d lib/SOAP/Data/ComplexType/Array.pm
+SHA1 a957cb346ccfa7a8f4d302468427de9ee59ff876 t/00signature.t
+SHA1 e379573f3df001c7ad61f2a783b6a1e7bf8774be t/01use.t
+SHA1 b966e92332098edc0609d0ff881efd8d13b6aaa7 t/02simple.t
+SHA1 7e7cce454594bb87f39d48414cdfade7e9524aa1 t/03complex.t
+SHA1 08e925ce48d79db4a0188fc53ec23b83a9348a12 t/04arrays.t
+SHA1 e0a7f971644b6d2246f0403eb181161baff34df3 t/05inheritance.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.2.1 (Cygwin)
+
+iD8DBQFFWJoeQwn7DcpJEO4RAvITAKCmWvjkhPIJFMYRiAOkwK2u8IYVLACgn5Av
+o1wAGcDRs+Xgy87HnMuBJ+Y=
+=NOE8
+-----END PGP SIGNATURE-----

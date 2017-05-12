@@ -1,0 +1,94 @@
+{
+   "abstract" : "Simple realtime output for ssh and shell commands",
+   "author" : [
+      "Eric Johnson <eric.git@iijo.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.3.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Shell-Carapace",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::MinimumVersion::Fast" : "0",
+            "Test::Pod" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Minilla" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Pty" : "0",
+            "IPC::Open3::Simple" : "0",
+            "Moo" : "0",
+            "Net::OpenSSH" : "0",
+            "String::ShellQuote" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Fatal" : "0",
+            "Test::Most" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Shell::Carapace" : {
+         "file" : "lib/Shell/Carapace.pm",
+         "version" : "0.22"
+      },
+      "Shell::Carapace::SSH" : {
+         "file" : "lib/Shell/Carapace/SSH.pm"
+      },
+      "Shell::Carapace::Shell" : {
+         "file" : "lib/Shell/Carapace/Shell.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kablamo/p5-shell-carapace/issues"
+      },
+      "homepage" : "https://github.com/kablamo/p5-shell-carapace",
+      "repository" : {
+         "url" : "git://github.com/kablamo/p5-shell-carapace.git",
+         "web" : "https://github.com/kablamo/p5-shell-carapace"
+      }
+   },
+   "version" : "0.22",
+   "x_authority" : "cpan:KABLAMO",
+   "x_contributors" : [
+      "Eric Johnson <github@iijo.org>"
+   ]
+}

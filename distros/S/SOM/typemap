@@ -1,0 +1,43 @@
+SOMObject *				T_PTROBJ
+somId					T_PTROBJ
+somToken				T_PTROBJ
+som3AssignCtrl *			T_PTROBJ
+som3InitCtrl *				T_PTROBJ
+som3DestructCtrl *			T_PTROBJ
+SOMClass  *				T_PTROBJ
+SOMClassManager  *			T_PTROBJ
+Environment  *				T_PTROBJ
+SOMDServer  *				T_PTROBJ
+SOMDObjectMgr  *			T_PTROBJ
+ObjectMgr  *				T_PTROBJ
+Contained  *				T_PTROBJ
+Container  *				T_PTROBJ
+Repository  *				T_PTROBJ
+AttributeDescription  *			T_PTROBJ
+TypeCode				T_PTROBJ
+ParameterDef *				T_PTROBJ
+OperationDef *				T_PTROBJ
+SOM__::any				T_OPAQUE_STRUCT
+boolean					T_BOOL
+octet					T_IV
+string					T_PV
+
+#############################################################################
+INPUT
+T_OPAQUE_STRUCT
+	if (sv_derived_from($arg, \"${ntype}\")) {
+	    STRLEN len;
+	    char  *s = SvPV((SV*)SvRV($arg), len);
+
+	    if (len != sizeof($var))
+		croak(\"Size %d of packed data != expected %d\",
+			len, sizeof($var));
+	    $var = *($type *)s;
+	}
+	else
+	    croak(\"$var is not of type ${ntype}\")
+#############################################################################
+OUTPUT
+T_OPAQUE_STRUCT
+	sv_setref_pvn($arg, \"${ntype}\", (char *)&$var, sizeof($var));
+

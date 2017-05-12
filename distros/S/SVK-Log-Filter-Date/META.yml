@@ -1,0 +1,29 @@
+---
+name: SVK-Log-Filter-Date
+version: !!perl/hash:Module::Build::Version
+  original: 0.0.1
+  qv: 1
+  version:
+    - 0
+    - 0
+    - 1
+author:
+  - 'Michael Hendricks <michael@ndrix.org>'
+abstract: selects revisions based on svn:date property
+license: mit
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+requires:
+  Date::PeriodParser: 0.04
+  SVK: 1.99
+  Time::Local: 0
+build_requires:
+  Test::More: 0
+provides:
+  SVK::Log::Filter::Date:
+    file: lib/SVK/Log/Filter/Date.pm
+    version: 0.0.1
+generated_by: Module::Build version 0.2804
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

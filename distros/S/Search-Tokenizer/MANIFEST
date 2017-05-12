@@ -1,0 +1,10 @@
+Build.PL
+Changes
+ignore.txt
+lib/Search/Tokenizer.pm
+MANIFEST
+META.json
+META.yml
+README
+t/00-tokenizer.t
+t/pod.t

@@ -1,0 +1,65 @@
+Revision history for Script-Daemonizer
+
+1.01.01     Wed May  7 12:13:31 CEST 2014
+            - updated this file
+
+1.01.00     Wed May  7 12:13:31 CEST 2014
+            - fixed flock() problems on Solaris 11
+
+1.00.01     Thu May  1 22:58:14 CEST 2014
+            - drop_privileges() now works with user/group names
+
+0.93.05     Mon Sep 30 13:53:58 CEST 2013
+            - Minor changes in documentation
+
+0.93.04     Mon Feb 25 14:50:15 CET 2013
+            - Introduced import tags and $global_pidfh.
+              chdir() and umask() can be suppressed by import tags;
+              thanks to $global_pidfh pidfile is locked even in short-form
+              initialization
+
+0.93.02     Fri Jan 25 16:51:35 CET 2013
+            - Added options to SKIP chdir(), setsid() and umask().
+
+0.93.01     Fri Jan 25 15:40:58 CET 2013
+            - Code cleanup
+            - Added redirect-output-to-file features
+            - Test suite performs test on single daemonizing steps one
+              by one.
+
+0.93.00     Thu Jan 24 15:48:08 CET 2013
+            - Interface change to OO
+            - fork parameter introduced
+            - POSIX::close() and all related code/configurationd dropped
+
+0.92.00     Mon Jan 21 13:51:36 CET 2013
+            - Second flock() after second fork(), to enforce pidfile locking
+              even on platforms that do not propagate lock across fork(). 
+
+0.91.02     Fri Jan 18 10:59:45 CET 2013
+            - Fixed some doc typos
+
+0.91.01     Thu Jan 17 11:52:47 CET 2013
+            - daemonize() tried to load Tie::Syslog even if both stdout and 
+              stderr were specified in keep => []; fixed this. 
+
+0.91.00     Thu Jan 17 10:56:27 CET 2013
+            - Removed experimental Log::Log4perl support.
+
+0.90.00     Wed Jan 16 16:20:43 CET 2013
+            - First release. Code is complete as I first thought it, but this all 
+              needs some testing.
+
+0.02_03     - restart(), sigunmask(), doc OK
+
+0.02_02     - sigunmask() tested, doc TBD
+
+0.02_01     - added sigunmask() - to be tested
+
+0.02_00     - implemented restart(), unmask SIGHUP
+
+0.01_02     - fixed _close_fh(); ok w/o Tie::Syslog
+
+0.01_01     - reference implementation complete
+
+

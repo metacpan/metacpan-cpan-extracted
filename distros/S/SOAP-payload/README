@@ -1,0 +1,30 @@
+SOAP::payload version 1.00
+==========================
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+The module has no set dependencies, but it has
+been written with DBI & XML::Parser in mind.
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2002
+
+All Rights Reserved
+
+E-Mail: stephen@unixtown.com
+
+Permission  to  use,  copy, and distribute is hereby granted,
+providing that the above copyright notice and this permission
+appear in all copies and in supporting documentation.
+
+
+
+

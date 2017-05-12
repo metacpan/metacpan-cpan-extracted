@@ -1,0 +1,32 @@
+--- #YAML:1.0
+name:               Socialtext-Resting
+version:            0.38
+abstract:           Simple tool to use Socialtext RESTful API
+author:
+    - Chris Dent <chris.dent@socialtext.com>, Kirsten Jones <kirsten.jones@socialtext.com>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    App::Options:     0
+    Class::Field:     0
+    HTTP::Request:    0
+    IPC::Run:         0
+    JSON::XS:         2.1
+    LWP::UserAgent:   0
+    Net::SSLeay:      0
+    Pod::Usage:       0
+    Readonly:         0
+    Test::Mock::LWP:  0.05
+    URI::Escape:      1.31
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

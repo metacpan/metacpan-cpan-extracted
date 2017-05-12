@@ -1,0 +1,32 @@
+---
+abstract: 'Self recursive tail call invocation.'
+author:
+  - 'Yuval Kogman'
+build_requires:
+  B::Hooks::OP::Check::EntersubForCV: 0
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.88
+  Test::use::ok: 0
+configure_requires:
+  B::Hooks::OP::Check::EntersubForCV: 0
+  ExtUtils::Depends: 0.302
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Sub-Call-Recur
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  B::Hooks::OP::Check::EntersubForCV: 0
+  parent: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/nothingmuch/Sub-Call-Recur.git
+version: 0.04

@@ -1,0 +1,7 @@
+%module{SOOT};
+
+%name{SOOT::API::ClassIterator} class ClassIterator {
+  ClassIterator();
+  const char* next();
+};
+

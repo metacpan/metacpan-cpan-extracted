@@ -1,0 +1,127 @@
+Revision history for Perl extension SVG::Calendar
+
+0.3.11   2016-02-28
+        Updating for release of version 0.3.11
+        Updated license date (Ivan Wills)
+        Made it possible to pass tests before being installed (Ivan Wills)
+        Added missing config files (Ivan Wills)
+        Added missing travis file (Ivan Wills)
+
+0.3.10   2015-12-05
+        Updating for release of version 0.3.10
+        Added a little more detail to synopsis (Ivan Wills)
+
+0.3.9   2015-09-02
+        Updating for release of version 0.3.9
+        Removed creation of makefile (Ivan Wills)
+
+0.3.8   2015-06-24
+        Updating for release of version 0.3.8
+        Removed unneeded tag (Ivan Wills)
+        Added specific Test::More version for the features being used (Ivan Wills)
+
+0.3.7   2015-01-02
+        Updating for release of version 0.3.7
+        Fixed MANIFEST files to templates are deployed (Ivan Wills)
+
+0.3.6   2015-01-02
+        Updating for release of version 0.3.6
+        Removed unused module (Ivan Wills)
+        Dates updated (Ivan Wills)
+        Fixed repeating "class" (Ivan Wills)
+        Moved moon inline styling to classes (Ivan Wills)
+        Removed dependency on SVG.pm (Ivan Wills)
+        Cleaned up white space around tags (Ivan Wills)
+        Cleaned up adding empty styles (Ivan Wills)
+        Getting rid of SVG.pm reliance (Ivan Wills)
+        Updated dependencies (Ivan Wills)
+        changed --show-template to use new template (Ivan Wills)
+        Started using the share dir path for templates (Ivan Wills)
+        Moved template to own file (Ivan Wills)
+        Added new TODO file (Ivan Wills)
+
+0.3.5   2014-12-24
+        Updating for release of version 0.3.5
+        Things to do (Ivan Wills)
+        Fixed date checking (Ivan Wills)
+
+0.3.4   2014-12-23
+        Updating for release of version 0.3.4
+        Updated dependencies (Ivan Wills)
+        Added new dependency (Ivan Wills)
+        Updated license (Ivan Wills)
+        Updated manifest (Ivan Wills)
+        Added warning about not specifying any dates (Ivan Wills)
+        Fixed moon at night not being a duration object (Ivan Wills)
+        Updated tests (Ivan Wills)
+
+0.3.3   2014-08-21
+        Updated manifest (Ivan Wills)
+        Cleaned up the tests (Ivan Wills)
+        Made executable (Ivan Wills)
+
+v0.3.2   2014-06-02
+    Fixed executable bit (Ivan Wills)
+    Adding tag files (Ivan Wills)
+    Added configure requires section (Ivan Wills)
+    Added new releases change log (Ivan Wills)
+
+v0.3.1 2012-07-21
+    Build updates
+    Upped version number
+    Fixed up Build.PL script
+    Got test to my latest standards
+    Updated version to 0.3, added version changes to change log
+
+v0.3.0 2011-12-09
+    Updated license text
+    Added missing new generated META.json file
+    Fixed spelling mistakes, updated list of stop words
+    Trying to make t/moon.t more stable verses moon phase calculations
+    Added missing requirement
+    Removed generated files from repo, updated ignores/skips
+    Removed some vestages of Class::Date
+    Added recommends section for moon phase calculation modules
+    Removed DateTime::Util::Astro::Moon use as it no longer appears to be on CPAN
+    More ignore sorting
+    Changed from requiring Class::Date to DateTime
+    Removed DateTime::Util::Astro::Moon option which doesn't seem to exist any more
+    Converted tabs to spaces
+    Started to implement detailed config with comments for default values
+    implemented changing the moons radius, fixed an issue when no start month supplied and started to implement export options
+    Added ignore file
+    Cleaned template
+    Added some extra logic checking
+    Added specifying images by month number, fixed POD
+
+0.2.0 2010-10-02
+    Fixed spelling test from failing when no spell command exists
+    other code cleanups
+
+0.1.3
+    Fixed perl version requirements
+    Added perl critic test
+    Changed kwalitee test to be author only
+
+0.1.2
+    Fixed missing version required module in Meta.yml
+
+0.1.1
+    - Added year display to calendar
+
+0.1.0
+    - Fixed not showing images
+    - Changed the full moon to black (unless it is the second in a month)
+    - Fixed scaling of images.
+    - Added missing params to svgcal.pl
+    - Changed Test::Kwalitee to run if possible
+
+0.0.6 Sat June 7 20:17:00 2008
+    - Added missing required module Readonly to list of required modules.
+
+0.0.5 Thu June 5 11:21:00 2008
+    - Some documentation updates
+    - Fixes for perlcritic and kwalitee
+
+0.01  Fri May  30 14:11:54 2008
+    - original version

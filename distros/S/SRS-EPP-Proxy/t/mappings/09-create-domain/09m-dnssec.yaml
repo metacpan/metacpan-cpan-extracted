@@ -1,0 +1,47 @@
+# Create with dns sec values
+template: create-domain.tt
+
+vars:
+  domain: 09m.co.te
+  owner: id123
+  ns:
+    - ns1.hidns.com
+    - ns2.hidns.com
+    - ns3.hidns.com  
+  dnssec:
+    -
+        keytag: 1
+        alg: 5
+        digest_type: 1
+        digest: 1234abcd11111111111111111111111111111111
+    -
+        keytag: 4
+        alg: 6
+        digest_type: 2
+        digest: 8888ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+
+input_assertions:
+  class: SRS::EPP::Command::Create::Domain
+
+SRS:
+  - assertions:
+      count:
+         - [ '//DNSSEC', '1', 'One DNSSEC sec in request' ]
+         - [ '//DS', '2', 'Two DS records in request' ]
+      match:
+         - [ '//DS[1]/Digest', '1234abcd11111111111111111111111111111111', 'First digest element correct' ]
+         - [ '//DS[2]/Digest', '8888ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff', 'Second digest element correct' ]
+      match_all:
+      attr_is:
+        - [ '//DS[1]', 'KeyTag', '1', 'First keytag attribute correct' ]
+        - [ '//DS[1]', 'Algorithm', '5', 'First algorithm attribute correct' ]
+        - [ '//DS[1]', 'DigestType', '1', 'First digest type attribute correct' ]
+        - [ '//DS[2]', 'KeyTag', '4', 'Second keytag attribute correct' ]
+        - [ '//DS[2]', 'Algorithm', '6', 'Second algorithm attribute correct' ]
+        - [ '//DS[2]', 'DigestType', '2', 'Second digest type attribute correct' ]
+
+output_assertions:
+  count:
+  match:
+  attr_is:
+    - [ '//epp:result', 'code', '1000', 'SRS: Check result code' ]

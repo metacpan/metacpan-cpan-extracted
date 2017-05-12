@@ -1,0 +1,28 @@
+SWISH-API-Object version 0.01
+=============================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  SWISH::API::More
+  SWISH::API::Stat
+  YAML::Syck
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Peter Karman
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+

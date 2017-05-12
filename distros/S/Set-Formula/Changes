@@ -1,0 +1,18 @@
+Revision history for Set-Formula
+
+0.01    2013/01
+        First version, released on an unsuspecting world.
+
+0.02    2013/01
+        1. Prefix "_" added to private subroutiones.
+        2. POD enhanced for all exported subroutines, that appear after =head2 now.
+        These changed have been done for conformity with Pod::Coverage, that is used in pod-coverage.t
+
+0.03    2013/01
+        Description improved
+
+0.04    2013/04
+        Description improved
+
+0.05    2013/04
+        Description improved

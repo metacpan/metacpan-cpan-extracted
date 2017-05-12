@@ -1,0 +1,11 @@
+Revision history for Perl extension Stream::Reader.
+
+0.03  Wed Mar 30 07:22:00 2005
+	- the first working version
+
+0.06  Wed Apr 20 05:31:00 2005
+	- now all functions and methods loading only on demand
+
+0.09  Sat May 07 18:23:00 2005
+	- code is some optimized
+	- documentation is updated

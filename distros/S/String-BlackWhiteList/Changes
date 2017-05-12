@@ -1,0 +1,46 @@
+Revision history for Perl extension String-BlackWhiteList
+
+1.100860  2010-03-27 16:23:02 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+0.07  Mon Oct 20 14:45:47 CEST 2008 (Marcel Gruenauer <marcel@cpan.org>)
+    - better handling of is_literal_text() with '\b' in regexes
+
+0.06  Thu Jul 25 15:27:43 CEST 2008 (Marcel Gruenauer <marcel@cpan.org>)
+    - Changed dist style and Changes back to standard. People didn't like it -
+      the nail that sticks out gets hammered down.
+    - Added standard test files; this will also help with CPANTS.
+
+0.05  Thu, 29 May 2008 12:07:45 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - set the version to 0.05
+    - added is_literal_text() and tests; refactored tests
+    - updated MANIFEST
+    - added t/02_is_literal_text.t
+    - added t/lib
+    - .shipit: fixed svk.tagpattern
+    - String::BlackWhiteList: don't wrap each blacklist or whitelist entry in
+      word-delims as that may interfere with custom regexes
+    - .shipit: fixed svk.tagpattern
+
+0.04  Wed, 21 Nov 2007 19:00:53 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - set the version to 0.04
+    - added t/perlcriticrc
+    - updated MANIFEST
+
+0.03  Mon, 19 Nov 2007 10:16:37 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - Converted Changes file to YAML style
+    - .shipit: added Twitter step
+    - Makefile.PL: added auto_install() and process_templates()
+    - lib/*: converted to template
+    - added valid_relaxed(), plus docs and tests
+    - renamed t/01all.t to t/01_strict.t
+    - added t/01_strict.t
+    - deleted t/01all.t
+    - updated MANIFEST
+    - tags: NEWFEATURE
+
+0.02  Wed, 24 Oct 2007 20:25:08 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+    - valid() now catches undef or zero-length strings without warnings
+
+0.01  Tue, 23 Oct 2007 18:03:40 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+    - original version

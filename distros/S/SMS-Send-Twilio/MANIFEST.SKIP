@@ -1,0 +1,11 @@
+#!include_default
+\B\.git\b
+^Makefile(\.old)?$
+.gitignore
+^SMS-Send-Twilio-\d
+\.bak$
+\.tmp$
+\.o$
+^MYMETA
+.mailmap
+.travis.yml

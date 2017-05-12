@@ -1,0 +1,59 @@
+Spreadsheet/BasicRead version 1.12
+==================================
+
+Provides methods for simple reading of a Excel spreadsheet row
+at a time returning the row as an array of column values.
+Properties can be set so that blank rows are skipped.
+
+There are a number of other properties that can be set.
+The aim is to make reading from Excel spreadsheets as
+easy as processing a text file
+
+As of v1.12 handles .xlxs, .xlsm files as well as .xls
+
+
+INSTALLATION
+------------
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+------------
+
+This module requires Spreadsheet::ParseExcel and optionally
+module File::Log can be used to allow simple logging of errors.
+
+Both are available from CPAN
+
+
+OTHER APPLICATIONS
+------------------
+
+Two sample applications are provided, they are:
+
+dumpSS.pl -   Which will dump each row of every sheet to stdout.
+              Each row is printed on a single line with a pipe character
+              separating each cell value (no special handling of cells that
+              contain a pipe character is provided).  Each sheet name is
+              printed on a line by itself surrounded by '***'
+
+xlsgrep.pl - Provides a perl regular expression grep function for spreadsheet
+             files.  This application will recurse from the current directory
+             looking for .xls files to check.  If the contents of a cell matches
+             the regular expression provided then the name of the file, the sheet
+             name, the row and column numbers (zero indexed) and the cell value
+             are printed.
+
+
+COPYRIGHT AND LICENCE
+---------------------
+
+Copyright (c) 1999- Greg George. All rights reserved. This
+program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

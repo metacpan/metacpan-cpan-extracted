@@ -1,0 +1,11 @@
+Revision history for Perl extension Scalar::MultiValue.
+
+0.03  2004-12-20
+      - Added access of methods through HASH key.
+
+0.02  2004-09-01
+      - Fixed a minor bug on internal value of last.
+
+0.01  2004-08-31 14:51:15
+      - original version;
+

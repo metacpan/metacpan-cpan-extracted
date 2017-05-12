@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+<xsd:simpleType name="boolType">
+  <xsd:restriction base="xsd:integer">
+    <xsd:enumeration value="0" />
+    <xsd:enumeration value="1" />
+  </xsd:restriction>
+</xsd:simpleType>
+
+<xsd:complexType name="nameType">
+  <xsd:simpleContent>
+    <xsd:extension base="xsd:string">
+      <xsd:attribute name="name" type="xsd:string" use="required"/>
+    </xsd:extension>
+  </xsd:simpleContent>
+</xsd:complexType>
+
+<xsd:element name="solstice_config">
+  <xsd:complexType>
+    <xsd:all>
+      <xsd:element name="virtual_root" type="xsd:string" />
+      <xsd:element name="webservice_rest_root" type="xsd:string" />
+      <xsd:element name="server_string" type="xsd:string" />
+      <xsd:element name="support_email" type="xsd:string" />
+      <xsd:element name="admin_email" type="xsd:string" />
+      <xsd:element name="lang" type="xsd:string" />
+      <xsd:element name="data_root" type="xsd:string" />
+      <xsd:element name="debug_level" type="xsd:string" />
+
+      <xsd:element name="db_hosts">
+          <xsd:complexType>
+              <xsd:sequence>
+                  <xsd:element name="host" minOccurs="0" maxOccurs="unbounded">
+                      <xsd:complexType>
+                          <xsd:attribute name="host_name" type="xsd:string" use="required" />
+                          <xsd:attribute name="port" type="xsd:string" use="optional" />
+                          <xsd:attribute name="user" type="xsd:string" use="required" />
+                          <xsd:attribute name="password" type="xsd:string" use="required" />
+                          <xsd:attribute name="database_name" type="xsd:string" use="required" />
+                          <xsd:attribute name="type" type="xsd:string" use="optional" />
+                      </xsd:complexType>
+                  </xsd:element>
+              </xsd:sequence>
+          </xsd:complexType>
+      </xsd:element>
+     
+      <xsd:element name="session_backend" type="xsd:string" minOccurs="0" />
+      <xsd:element name="session_db" type="xsd:string" minOccurs="0" />
+      <xsd:element name="session_cookie" type="xsd:string" minOccurs="0" />
+      <xsd:element name="smtp_server" type="xsd:string" minOccurs="0" />
+      <xsd:element name="smtp_mailname" type="xsd:string" minOccurs="0" />
+      <xsd:element name="smtp_msg_wait" type="xsd:string" minOccurs="0" />
+      <xsd:element name="smtp_use_queue" type="xsd:string" minOccurs="0" />
+      <xsd:element name="development_mode" type="boolType" minOccurs="0" />
+      <xsd:element name="require_ssl" type="boolType" minOccurs="0" />
+      <xsd:element name="slow_query_time" type="xsd:integer" minOccurs="0" />
+      <xsd:element name="compiled_view_path" type="xsd:string" minOccurs="0" />
+
+      <xsd:element name="encryption_key" type="xsd:string" />
+
+      <xsd:element name="boilerplate_view" type="xsd:string" minOccurs="0"/>
+
+      <xsd:element name="error_html" type="xsd:string" />
+     
+      <xsd:element name="css_files">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="css_file" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element> 
+      
+      <xsd:element name="memcached_servers">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="server" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+
+      <xsd:element name="log_modules">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="module" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="js_files">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="js_file" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="app_dirs">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="app_dir" type="xsd:string" minOccurs="1" maxOccurs="unbounded" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      
+      <xsd:element name="cgis">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="cgi" minOccurs="0" maxOccurs="unbounded">
+              <xsd:complexType>
+                <xsd:simpleContent>
+                  <xsd:extension base="xsd:string">
+                    <xsd:attribute name="virtual_path" type="xsd:string" use="optional" />
+                    <xsd:attribute name="requires_auth" type="xsd:string" use="required" />
+                    <xsd:attribute name="url_is_prefix" type="boolType" use="optional" />
+                  </xsd:extension>
+                </xsd:simpleContent>
+              </xsd:complexType>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="statics">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="static" minOccurs="0" maxOccurs="unbounded">
+              <xsd:complexType>
+                <xsd:simpleContent>
+                  <xsd:extension base="xsd:string">
+                    <xsd:attribute name="virtual_path" type="xsd:string" use="optional" />
+                  </xsd:extension>
+                </xsd:simpleContent>
+              </xsd:complexType>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="remotes">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="remote" type="nameType" minOccurs="0" maxOccurs="unbounded" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="keys">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="key" type="nameType" minOccurs="0" maxOccurs="unbounded" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:all>
+  </xsd:complexType>
+</xsd:element>
+
+</xsd:schema>

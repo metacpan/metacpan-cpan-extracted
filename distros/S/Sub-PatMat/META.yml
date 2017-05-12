@@ -1,0 +1,17 @@
+abstract: call a version of subroutine depending on its arguments
+author: Anton Berezin  C<< <tobez@tobez.org> >>
+build_requires: 
+  Test::More: 0.42
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: bsd
+name: Sub-PatMat
+no_index: 
+  directory: 
+    - devel
+    - inc
+    - t
+requires: 
+  B::Utils: 0
+  perl: 5.8.2
+version: 0.01

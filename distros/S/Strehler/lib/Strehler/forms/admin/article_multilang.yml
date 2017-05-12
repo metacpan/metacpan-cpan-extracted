@@ -1,0 +1,14 @@
+elements:
+    - name: title
+      label: Title
+      attributes: 
+        class: span8
+      constraints:
+        - type: Required
+          message: "Title required"
+    - type: "+Strehler::FormFu::Element::Slug"
+    - name: text
+      label: Text
+      type: Textarea
+      attributes: 
+        class: span8

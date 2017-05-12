@@ -1,0 +1,41 @@
+# This file was generated with Dist::Zilla::Plugin::Manifest::Write v0.9.5
+Build.PL                                  #                    3rd party file built by ModuleBuildTiny
+COPYING                                   # Software-License-OrLaterPack file built by GenerateFile
+Changes                                   # Software-License-OrLaterPack file added by Manifest::Read
+GPLv3                                     # Software-License-OrLaterPack file added by Manifest::Read
+MANIFEST                                  #                     metainfo file built by Manifest::Write
+META.json                                 #                     metainfo file built by MetaJSON
+META.yml                                  #                     metainfo file built by MetaYAML
+README                                    # Software-License-OrLaterPack file built by GenerateFile
+VERSION                                   # Software-License-OrLaterPack file added by Manifest::Read
+lib/Software/License/AGPL_3/or_later.pm   #                    3rd party file built by Hook::FileGatherer
+lib/Software/License/GPL_1/or_later.pm    #                    3rd party file built by Hook::FileGatherer
+lib/Software/License/GPL_2/or_later.pm    #                    3rd party file built by Hook::FileGatherer
+lib/Software/License/GPL_3/or_later.pm    #                    3rd party file built by Hook::FileGatherer
+lib/Software/License/LGPL_2_1/or_later.pm #                    3rd party file built by Hook::FileGatherer
+lib/Software/License/LGPL_3_0/or_later.pm #                    3rd party file built by Hook::FileGatherer
+lib/Software/License/OrLaterPack.pm       # Software-License-OrLaterPack file added by Manifest::Read
+t/00-compile.t                            #                    3rd party file built by Test::Compile
+t/01-test.t                               # Software-License-OrLaterPack file added by Manifest::Read
+xt/aspell-en.pws                          # Software-License-OrLaterPack file added by Manifest::Read
+xt/author/critic.t                        #                    3rd party file built by Test::Perl::Critic
+xt/author/eol.t                           #                    3rd party file built by Test::EOL
+xt/author/mojibake.t                      #                    3rd party file built by MojibakeTests
+xt/author/no-tabs.t                       #                    3rd party file built by Test::NoTabs
+xt/author/pod-coverage.t                  #                    3rd party file built by PodCoverageTests
+xt/author/pod-spell.t                     #                    3rd party file built by Test::PodSpelling
+xt/author/pod-syntax.t                    #                    3rd party file built by PodSyntaxTests
+xt/author/test-version.t                  #                    3rd party file built by Test::Version
+xt/perlcritic.ini                         # Software-License-OrLaterPack file added by Manifest::Read
+xt/release/cpan-changes.t                 #                    3rd party file built by Test::CPAN::Changes
+xt/release/dist-manifest.t                #                    3rd party file built by Test::DistManifest
+xt/release/distmeta.t                     #                    3rd party file built by MetaTests
+xt/release/fixme.t                        #                    3rd party file built by Test::Fixme
+xt/release/kwalitee.t                     #                    3rd party file built by Test::Kwalitee
+xt/release/meta-json.t                    #                    3rd party file built by Test::CPAN::Meta::JSON
+xt/release/minimum-version.t              #                    3rd party file built by Test::MinimumVersion
+xt/release/new-version.t                  #                    3rd party file built by Test::NewVersion
+xt/release/pod-linkcheck.t                #                    3rd party file built by Test::Pod::LinkCheck
+xt/release/pod-no404s.t                   #                    3rd party file built by Test::Pod::No404s
+xt/release/portability.t                  #                    3rd party file built by Test::Portability
+xt/release/synopsis.t                     #                    3rd party file built by Test::Synopsis

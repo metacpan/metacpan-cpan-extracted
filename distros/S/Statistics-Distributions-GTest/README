@@ -1,0 +1,46 @@
+Statistics-Distributions-GTest version 0.1.5
+
+The G-test of independence is an alternative to the chi-square test of independence for testing for independence in
+contingency tables. G-tests are coming into increasing use and as with the chi-square test for independence the G-test
+for independence is used when you have two nominal variables each with two or more possible values. The null hypothesis
+is that the relative proportions of one variable are independent of the second variable. This module implements two two 
+equivalent, but marginally different approaches to calculate G scores (that described in 
+http://en.wikipedia.org/wiki/G-test and that used by http://udel.edu/~mcdonald/statgtestind.html). Benchmarking 
+indicates that first approach works about a third faster than the alternative. However, this difference 
+diminishes as the categories increase. See http://en.wikipedia.org/wiki/G-test and 
+http://udel.edu/~mcdonald/statgtestind.html.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+'version'                   => 0,
+'Statistics::Distributions' => '1.02',
+'Math::Cephes'              => '0.47', 
+'Carp'                      => '1.08', 
+'Contextual::Return'        => '0.2.1',
+'List::Util'                => '1.19', 
+'Text::SimpleTable';        => '2.0',
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009, Daniel S. T. Hughes
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

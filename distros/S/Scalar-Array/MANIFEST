@@ -1,0 +1,11 @@
+Array.xs
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/Scalar-Array.t
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/Scalar/Array.pm
+META.yml                                 Module meta-data (added by MakeMaker)

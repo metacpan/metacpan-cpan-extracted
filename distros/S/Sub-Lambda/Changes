@@ -1,0 +1,8 @@
+Revision history for Sub-Lambda
+
+0.02    March 18, 2008
+        Sub::Lambda::Filter added with Haskell-style syntax
+
+0.01    March 15, 2008
+        Sub::Lambda with fn and ap
+

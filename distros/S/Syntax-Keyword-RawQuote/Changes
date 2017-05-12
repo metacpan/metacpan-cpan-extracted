@@ -1,0 +1,11 @@
+0.03    2017-02-23
+        - Declare perl version dependency
+        - Declare XSLoader dependency
+        - Build correctly on systems without memmem()
+
+0.02    2017-02-20
+        - Documentation fixes
+        - Build correctly on older perls (fixes 'SV_CATUTF8 not defined')
+
+0.01    2017-02-20
+        - Initial release

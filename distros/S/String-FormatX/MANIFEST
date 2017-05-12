@@ -1,0 +1,8 @@
+Changes
+lib/String/FormatX.pm
+Makefile.PL
+MANIFEST
+README
+t/Handler.t
+t/test.t
+META.yml                                 Module meta-data (added by MakeMaker)

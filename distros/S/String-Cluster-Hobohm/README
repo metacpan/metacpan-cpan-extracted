@@ -1,0 +1,72 @@
+NAME
+    String::Cluster::Hobohm - Cluster strings using the Hobohm algorithm
+
+VERSION
+    version 0.141020
+
+SYNOPSIS
+        use String::Cluster::Hobohm;
+
+        my @strings = qw(foo foa bar);
+
+        my $clusterer = String::Cluster::Hobohm->new( similarity => 0.62 );
+
+        my $groups = $clusterer->cluster( \@strings );
+
+        # [ [ \'foo', \'foa' ], [ \'bar' ] ];
+
+        my @reduced = map { ${ $_->[0] } } @$groups;
+
+        # [ 'foo', 'bar' ];
+
+DESCRIPTION
+    String::Cluster::Hobohm implements the Hobohm clustering algorithm [1],
+    originally devised to reduce redundancy of biological sequence data
+    sets.
+
+    As a clustering algorithm, it takes a set of sequences, and returns them
+    grouped by similarity. The latter is computed using the Levenshtein
+    distance, as implemented by the "Text::LevenshteinXS" module.
+
+ATTRIBUTES
+  similarity
+    The similarity threshold that defines whether two strings are
+    sufficiently alike to be part of the same cluster. Should be a number
+    between 0 and 1. Defaults to 0.62.
+
+METHODS
+  cluster
+        my $grouped = $hobohm->cluster( \@strings );
+
+    Takes an array reference with the sequences to cluster as argument, and
+    returns an array reference of clusters. Each cluster is depicted as a
+    list of references to the strings that define it.
+
+    For example, given the following array of strings, and a similarity of
+    0.62:
+
+        [ 'foo', 'foa', 'bar' ];
+
+    The data structure returned after clustering would be:
+
+        [ [ \'foo', \'foa' ], [ \'bar' ] ];
+
+    The reason for using references instead of the actual strings is to
+    avoid copying potentially large strings and taking up too much memory
+    (remember that the algorithm was designed with biological sequences in
+    mind).
+
+REFERENCES
+    [1] Uwe Hobohm, Michael Scharf, Reinhard Schneider and Chris Sander.
+    Selection of representative protein data sets. Protein Science (1992),
+    409-417. Cambridge University Press.
+
+AUTHOR
+    Bruno Vecchi <vecchi.b gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Bruno Vecchi.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

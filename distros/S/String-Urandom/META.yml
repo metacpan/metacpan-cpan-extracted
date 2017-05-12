@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name: String::Urandom
+abstract: Using output of /dev/urandom.  Simply convert bytes into 8-bit characters.
+version: 0.16
+author:
+  - Marc S. Brooks <mbrooks@cpan.org>
+license: perl
+distribution_type: module
+requires:
+  Params::Validate: 0
+build_requires:
+  Test::More: 0.88
+resources:
+  license: http://dev.perl.org/licenses/
+meta-spec:
+  version: 1.3
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html

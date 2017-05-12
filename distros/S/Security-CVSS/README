@@ -1,0 +1,32 @@
+CVSS version 0.3
+=================
+
+This module can be used to calculate base, temporal and environmental
+CVSS scores of a vulnerability.
+
+It is based on the formulas given at:
+https://www.first.org/cvss/cvss-guide.html
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Carp
+   Modules::Check_Args
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Periscan LLC
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

@@ -1,0 +1,43 @@
+0.07    2017-01-29 (PERLANCAR)
+
+	- [Bugfix] Fix algorithm which caused result to be shorter than
+	  $len.
+
+
+0.06    2017-01-28 (PERLANCAR)
+
+	- Add option: default_prio.
+
+
+0.05    2017-01-28 (PERLANCAR)
+
+	- No functional changes.
+
+	- [Bugfix] D'oh, mistyped mentioned module name.
+
+
+0.04    2017-01-28 (PERLANCAR)
+
+	- [doc] Mention String::ElideLines.
+
+	- Fix regex (should use /s modifier).
+
+
+0.03    2017-01-28 (PERLANCAR)
+
+	- Forgot to remove debug prints.
+
+
+0.02    2017-01-28 (PERLANCAR)
+
+        - Elide all parts that have the highest priority equally instead of
+          eliding & eliminating parts one by one. E.g. elide("aaaaa<elspan
+          prio=0>|</elspan>bbbbb", 9) now becomes "aa..|bb.." instead of
+          "aaaaa|b..".
+
+        - Support per-part marker.
+
+
+0.01    2015-01-23 (PERLANCAR)
+
+        - First release.

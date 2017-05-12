@@ -1,0 +1,89 @@
+{
+   "abstract" : "Perl's Web Services Toolkit",
+   "author" : [
+      "Pavel Kulchenko",
+      "Randy J Ray",
+      "Byrne Reese",
+      "Martin Kutter <MKUTTER@cpan.org>",
+      "Fred Moyer"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "SOAP-Lite",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Apache" : "0",
+            "DIME::Tools" : "0.03",
+            "FCGI" : "0",
+            "HTTP::Daemon" : "0",
+            "IO::File" : "0",
+            "MIME::Tools" : "0",
+            "Net::POP3" : "0"
+         },
+         "requires" : {
+            "Class::Inspector" : "0",
+            "Compress::Zlib" : "0",
+            "IO::SessionData" : "1.03",
+            "IO::Socket::SSL" : "0",
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent" : "0",
+            "MIME::Base64" : "0",
+            "Scalar::Util" : "0",
+            "Task::Weaken" : "0",
+            "URI" : "0",
+            "XML::Parser" : "2.23",
+            "constant" : "0",
+            "perl" : "v5.6.0"
+         },
+         "suggests" : {
+            "SOAP::Transport::JABBER" : "0.712",
+            "SOAP::Transport::MQ" : "0.712"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "IO::Scalar" : "2.105",
+            "Test::MockObject" : "0",
+            "Test::XML" : "0"
+         },
+         "requires" : {
+            "IO::File" : "0",
+            "Test::More" : "0",
+            "Test::Warn" : "0",
+            "XML::Parser::Lite" : "0.715"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-SOAP-Lite@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=SOAP-Lite"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "ssh://git@github.com:redhotpenguin/soaplite.git",
+         "web" : "https://github.com/redhotpenguin/soaplite"
+      }
+   },
+   "version" : "1.20"
+}
+

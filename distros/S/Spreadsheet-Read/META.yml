@@ -1,0 +1,58 @@
+--- 
+abstract: Meta-Wrapper for reading spreadsheet data
+author: 
+  - H.Merijn Brand <h.m.brand@xs4all.nl>
+configure_requires: 
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: Author, CPAN::Meta::Converter version 2.150010
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Spreadsheet-Read
+optional_features: 
+  opt_csv: 
+    description: Provides parsing of CSV streams
+    requires: 
+      Text::CSV_XS: '0.71'
+  opt_excel: 
+    description: Provides parsing of Microsoft Excel files
+    requires: 
+      Spreadsheet::ParseExcel: '0.34'
+      Spreadsheet::ParseExcel::FmtDefault: 0
+  opt_excelx: 
+    description: Provides parsing of Microsoft Excel 2007 files
+    requires: 
+      Spreadsheet::ParseExcel::FmtDefault: 0
+      Spreadsheet::ParseXLSX: '0.13'
+  opt_oo: 
+    description: Provides parsing of OpenOffice spreadsheets
+    requires: 
+      Spreadsheet::ReadSXC: '0.20'
+  opt_tools: 
+    description: Spreadsheet tools
+provides: 
+  Spreadsheet::Read: 
+    file: Read.pm
+    version: '0.70'
+recommends: 
+  Data::Peek: '0.46'
+  File::Temp: '0.2304'
+  IO::Scalar: 0
+  Test::More: '1.302078'
+requires: 
+  Carp: 0
+  Data::Dumper: 0
+  Data::Peek: 0
+  Encode: 0
+  Exporter: 0
+  File::Temp: '0.22'
+  Test::Harness: 0
+  Test::More: '0.88'
+  Test::NoWarnings: 0
+  perl: '5.008'
+resources: 
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/Tux/Spreadsheet-Read
+version: '0.70'

@@ -1,0 +1,19 @@
+#!/usr/bin/perl
+###########################################
+# taptest
+# Mike Schilli, 2004 (m@perlmeister.com)
+###########################################
+use warnings;
+use strict;
+
+use Sysadm::Install qw(:all);
+use Log::Log4perl qw(:easy);
+Log::Log4perl->easy_init($DEBUG);
+
+my($stdout, $stderr, $exit_code) = tap(qw(
+rsync --verbose --archive tmp /tmp/rsync-tmp
+));
+
+print "stdout=[$stdout]\n";
+print "stderr=[$stderr]\n";
+print "exit_code=[$exit_code]\n";

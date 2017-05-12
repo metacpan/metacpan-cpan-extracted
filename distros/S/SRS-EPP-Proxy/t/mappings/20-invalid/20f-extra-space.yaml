@@ -1,0 +1,18 @@
+template: renew-domain.tt
+
+vars:
+  domain: chedder5.co.te
+  expDate: 2010-01-01
+  period: "9 "
+  unit: y
+
+output_assertions:
+  count:
+    - [ '//epp:resData', 0, 'EPP: No resData in the response' ]
+  match:
+    # the actual xpath of the exception location is not specific
+    # enough, really; permit future PRANG versions to do better.
+    - [ '//epp:reason', '/XML Schema validation error at \S+/text\(\); bad value ''9 ''/', 'knows what happened' ]
+    - [ '//epp:msg', "Input violates XML Schema", "Message makes sense" ]
+  attr_is:
+    - [ '//epp:result', 'code', 2004, 'EPP: XML Schema invalid' ]

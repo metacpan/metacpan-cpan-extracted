@@ -1,0 +1,16 @@
+INSTALLATION
+-----------
+
+To install Statistics::MaxEntropy type
+
+	perl5 Makefile.PL PREFIX=$HOME/local
+	make install_site
+
+and make sure $HOME/local/lib/perl5/site_perl is in your $PERL5LIB.
+For using ME.wrapper.pl put $HOME/local/bin in your $path.
+
+In addition you will need
+
+	Data::Dumper
+
+-----------

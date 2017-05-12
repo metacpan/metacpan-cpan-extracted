@@ -1,0 +1,101 @@
+                               Set::Relation
+                                  README
+---------------------------------------------------------------------------
+
+by Darren Duncan <darren@DarrenDuncan.net>
+
+PREFACE
+
+This distribution features the Perl 5 or 6 (depending on which copy of this
+README file you are reading) module named Set::Relation (Relation data type
+for Perl) and its support structure.
+
+Set::Relation has 2 co-developed versions, which are written in native
+Perl 5 and Perl 6 respectively, and which are distributed separately from
+each other.  But while the 2 versions would be similar, they are explicitly
+not intended to be drop-in substitutable for each other, as each would have
+some API differences that optimizes it for its host language.  The actual
+Muldis D language specification document will be identical for both,
+though.
+
+The Perl 5 version is intended to be the primary version during the present
+time, as Perl 5 itself is stable, production-ready, and commonly used now.
+Eventually the Perl 6 version is expected to supercede it, once Perl 6
+itself has implementations that are production-ready and in common use.
+
+That all being said, development of the Perl 6 version has been temporarily
+suspended, to focus resources on the Perl 5 version, and therefore the Perl
+6 version is likely out of date by the time you read this.  In the future,
+the more-advanced Perl 5 version will be translated to Perl 6 again, either
+to re-establish their parallel development, or just to provide snapshots.
+
+Read below for how to get support or keep up to date.
+
+DOCUMENTATION READING ORDER
+
+If you want to read all the Set::Relation documentation that exists now in
+this distribution, I recommend doing so in this order:
+
+   1.       README
+   2. (opt) Changes
+   3.       lib/Set/Relation.pm
+   4.       lib/Set/Relation/V1.pm
+   5.       lib/Set/Relation/V2.pm
+   6. (opt) TODO
+
+Then you can carry on with anything else.
+
+You may prefer the nicely HTML-formatted versions of the above, which are
+available at "http://search.cpan.org/dist/Set-Relation/".
+
+KEEPING UP TO DATE
+
+My module set is constantly under development.  The canonical copies are
+all linked to through my personal website, "http://www.darrenduncan.net/",
+or through my business website, "http://www.muldis.com/".
+
+For those of you that are interested in the bleeding edge of development, I
+have all parts of the Set::Relation project in one or more public
+repositories.  The Perl 5 Set::Relation project is in a Git repository
+whose public clone url is "git://github.com/muldis/Set-Relation.git" and
+whose web information url is at "http://github.com/muldis/Set-Relation".
+The Perl 6 Set::Relation project used to be in a Subversion repository for
+the Perl 6 Pugs project but the host domain pugscode.org has since expired.
+
+You can download slightly older versions of all of my modules from the
+public CPAN archives at "http://www.cpan.org/authors/id/D/DU/DUNCAND/", or
+on my own web server at "http://www.darrenduncan.net/d/perl/".
+
+CPAN also extracts the POD from modules and maintains that documentation in
+an organized and searchable fashion.  Their main search site is at
+"http://search.cpan.org", and my own DUNCAND author page is at
+"http://search.cpan.org/search?author=DUNCAND".
+
+The main CPAN search site url for Set::Relation for Perl 5 is
+"http://search.cpan.org/dist/Set-Relation/"; that is the url you should
+link to presently if you want something to consider the "home page" of
+Set::Relation; it is best to refer people there by default.
+
+You can download my oldest tarred and gzipped distributions from BACKPAN,
+at "http://history.perl.org/backpan/authors/id/D/DU/DUNCAND/", or from my
+web server, at "http://www.darrenduncan.net/d/perl/archives/", right back
+to the libdwg 1.0, first released on 2000 July 23.
+
+SUPPORT
+
+Several public email-based forums exist whose main topic is
+the Muldis D language and its implementations, especially
+the Muldis::D::RefEng reference implementation, but also
+the Set::Relation module.  They exist so that users of Muldis D or
+Muldis::D::RefEng can help each other, or so that help coming from the
+projects' developers can be said once to many people, rather than
+necessarily to each individually.  All of these you can reach via
+"http://mm.darrenduncan.net/mailman/listinfo".
+
+Alternately, you can purchase more advanced commercial support for various
+Muldis D implementations, particularly Muldis::D::RefEng, from its author by
+way of Muldis Data Systems; see "http://www.muldis.com/" for details.
+
+FIN
+
+Share and Enjoy!

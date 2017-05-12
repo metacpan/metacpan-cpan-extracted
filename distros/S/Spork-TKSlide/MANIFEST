@@ -1,0 +1,14 @@
+bin/tkslide
+config.yaml
+lib/Spork/Config/TKSlide.pm
+lib/Spork/Formatter/TKSlide.pm
+lib/Spork/Slides/TKSlide.pm
+lib/Spork/Template/TKSlide.pm
+lib/Spork/TKSlide.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+rebuild
+Spork.slides
+t/0.use.t

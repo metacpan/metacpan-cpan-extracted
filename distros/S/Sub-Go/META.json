@@ -1,0 +1,51 @@
+{
+   "abstract" : "DWIM code blocks for smart matching",
+   "author" : [
+      "Rodrigo de Oliveira <rodrigolive@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200009, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Sub-Go",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "Exporter::Tidy" : 0,
+            "PadWalker" : 0,
+            "Scalar::Util" : 0,
+            "overload" : 0,
+            "perl" : "v5.10.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Sub-Go"
+      },
+      "homepage" : "http://search.cpan.org/perldoc?Sub-Go",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/rodrigolive/sub-go.git"
+      }
+   },
+   "version" : "0.01"
+}
+

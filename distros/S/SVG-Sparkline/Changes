@@ -1,0 +1,81 @@
+Revision history for SVG-Sparkline
+
+1.11 2015-03-03
+    - Remove --nodecl parameter from sparklines.pl that has bee deprecated for
+      almost five years.
+    - Correct uninitialized value errors if sparklines.pl is not passed a type.
+      (Thank you, Gabor Szabo).
+    - Add --help-types parameter that lists the supported Sparkline types.
+      (Thank you, Gabor Szabo).
+    - Verify required --values parameter for sparkline.pl.
+    - Verify required 'values' parameter for sparkline.cgi
+1.10 2014-09-03T21:00:00-0600
+    - Update author tests to be more complete
+    - Add Perl minimum version test.
+    - Remove support for Module::Build
+    - Update META_SPEC information in Makefile.PL
+    - Use Test::Exception for testing exception failures
+    - Cleanup test formatting.
+1.00   2013-10-24T09:00:00-0500
+    - Corrected divide-by-zero error if all input data is 0, reported by
+      Peter Robinson.
+    - Correct contact email.
+0.36   2012-09-03T19:05:55-0500
+    - Modified to remove author testing from main tests.
+    - Updated Metadata in the Makefile creation.
+0.35   2010-10-30T16:55:00-0500
+    - Corrected the CGI script to handle the stricter validation of input
+      parameters.
+0.34   2010-04-30T23:45:00-0500
+    - SVG 2.50 removed the unnecessary xml declaration. Modified module
+      and scripts to remove -nodecl flag which is no longer needed.
+    - Add stronger validation to prevent passing unrecognized parameters.
+0.33   2009-10-20T19:25:00-0500
+    - Correct documentation problems with the CGI Manual.
+0.32   2009-10-18T10:40:00-0500
+    - Added -sized parameter to enable/disable putting width/height attributes
+      on the root svg element, as suggested by Helder Magalhães.
+    - Created sparkline.pl command line script for easy creation of a
+      sparkline.
+    - Created sparkline.cgi CGI script as suggested by Jeff Schiller.
+0.31   2009-05-07T17:10:00-0500
+    - Patch release to take care of the fact that the Manual did not get
+      uploaded.
+0.30   2009-05-06T18:15:00-0500
+    - Added RangeBar and RangeArea types.
+    - Moved core documentation to the Manual.
+    - Updated the Cookbook to match the latest interface.
+    - Convert version number and perform admin cleanups for higher Kwalitee.
+0.2.7  2009-04-26T22:40:00-0500
+    - Correct Area and Bar mark handling when height of mark would have been
+      0.
+    - Add gap parameter which controls spacing of Bar and Whisker types.
+    - Improve the representation of the Bar and Whisker graphs.
+0.2.6  2009-04-20T19:30:00-0500
+    - Documentation corrections.
+    - Add accessors for height and width.
+    - Change the default x scaling for Line and Area types.
+    - Correct bug in Whisker type, ignored 'thick' parameter.
+    - Extend validation of parameters to new method.
+0.2.5  2009-04-17T23:45:00-0500
+    - Modify the Area, Bar and Line types to handle baselines better.
+    - Add support for marks
+    - Add overload support for stringifying.
+    - Add support for padding the sparkline with the padx and pady
+      parameters
+    - Removed '-' from bgcolor parameter.
+0.2.1  Not Released
+    - Added the Cookbook document to cover basic uses of SVG::Sparkline.
+0.2.0  2009-04-05T16:30:00-0500
+    - Change parameters for Line and Area to use 'values'.
+    - Correct horizontal scaling on Line and Area charts.
+    - Fail if Whisker data contains bad characters.
+    - Add support for background color.
+    - Correct handling of Bar type when values do not cross 0.
+0.1.1  2009-04-02T20:30:00-0500
+    - Documentation cleanup and minor interface changes.
+    - Whisker and Bar now have 'values' parameter instead of 'y'.
+    - Whisker input strings are now more rational.
+0.1.0  2009-04-01T20:00:00-0500
+    - Initial release.
+

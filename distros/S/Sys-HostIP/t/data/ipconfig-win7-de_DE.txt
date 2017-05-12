@@ -1,0 +1,23 @@
+
+Windows-IP-Konfiguration
+
+
+Ethernet-Adapter LAN-Verbindung:
+
+   Verbindungsspezifisches DNS-Suffix:
+   Verbindungslokale IPv6-Adresse  . : fe80::417a:e1a3:e92e:76f2%11
+   IPv4-Adresse  . . . . . . . . . . : 10.0.2.15
+   Subnetzmaske  . . . . . . . . . . : 255.255.255.0
+   Standardgateway . . . . . . . . . : 10.0.2.2
+
+Tunneladapter isatap.{3505548F-914A-4E9F-B2A8-C05189D0D45C}:
+
+   Medienstatus. . . . . . . . . . . : Medium getrennt
+   Verbindungsspezifisches DNS-Suffix:
+
+Tunneladapter LAN-Verbindung*:
+
+   Verbindungsspezifisches DNS-Suffix:
+   IPv6-Adresse. . . . . . . . . . . : 2001:0:9d38:78cf:c3f:89fb:af44:9349
+   Verbindungslokale IPv6-Adresse  . : fe80::c3f:89fb:af44:9349%13
+   Standardgateway . . . . . . . . . : ::

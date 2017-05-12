@@ -1,0 +1,49 @@
+Revision History for String::Escape
+
+- 2010-02-01 Uploaded version 2010.002 to CPAN.
+- 2010-02-01 Renamed newly created functions to *backslash() and tweaked docs.
+
+- 2010-01-30 Uploaded version 2010.001_1 to CPAN as a developer release.
+- 2010-01-30 Added tests for new functions and previous bug reports. 
+- 2010-01-29 Added new functions with support for more of the escapes used in 
+             Perl's own syntax, based on email exchange with Brad Bowman.
+- 2010-01-29 Changed unprintable to accept optional x in \xFF escapes as per
+             discussion at PerlMonks: http://perlmonks.org/?node_id=461186
+- 2010-01-29 Added META.yml as requested in RT 41226 by Alexandr Ciornii.
+- 2010-01-29 Used Module::Starter to update package skeleton and style.
+
+- 2002-01-14 Uploaded version 2002.001 to CPAN.
+- 2002-01-13 Folded in list2string/string2list functions from String::Words. 
+             Added test for String::Words functionality. Minor doc cleanup.
+- 2001-06-16 Added /s to regexes to better handle data with linebreaks.
+- 2000-12-05 Fixed handling of double-quotes in hash2list
+- 2000-11-29 Removed function prototypes from list2string/string2list.
+
+- 1998-12-04 Uploaded version 1998.1204 to CPAN.
+- 1998-12-04 Folded String::Excerpt's elide() function into this module.
+
+- 1998-12-01 Uploaded version 1998.0919 to CPAN.
+- 1998-09-19 Support function, array refs in expand_escape_spec. Updated docs.
+- 1998-09-01 Fixed return value from expand_escape_spec.
+- 1998-07-31 Rewrote (un)qprintable to just call other functions in order.
+- 1998-07-30 Expanded POD to cover use of new Makefile.PL.
+- 1998-07-23 Conventionalized POD, switched to yyyy.mm_dd version numbering.
+- 1998-07-23 Combined word-boundary and non-word-boundary elide functions.
+- 1998-06-11 Modified printable and unprintable algorithms to use hash map.
+- 1998-04-27 Anchored regexes in unprintable() to fix backslash mangling.
+- 1998-03-16 Simon: Avoid constant modification via lexical rather than $_. 
+
+- 1998-02-25 Jeremy: Moved to String:: and @EXPORT_OK for CPAN distribution
+- 1998-02-23 Fixed import syntax that was confusing Devel::PreProcessor.
+- 1997-11-13 Changed truncate's name to elide -- looks like keyword conflict?
+- 1997-10-28 Created generic by-name interface; renamed printable().
+- 1997-10-21 Altered quote_non_words regex to accept '-', '/', and '.'
+- 1997-08-25 Text::Words package created, code refactored and extended.
+- 1997-08-17 Created Escape package from functions in dictionary.pm. 
+
+- 1997-03-?? Simon: Added shortenstring() to Evo::dictionary package. 
+- 1997-01-25 Cleanup on splitwords (incl. removing single-quoting support)
+- 1997-01-24 Moved splitwords from IWAE::script to IWAE::dictionary.
+- 1997-01-13 Replaced Text::ParseWords with a local splitwords function.
+- 1996-11-?? Fixed problems in Text::ParseWords where "" read as "0".
+

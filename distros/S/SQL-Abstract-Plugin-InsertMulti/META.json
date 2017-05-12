@@ -1,0 +1,76 @@
+{
+   "abstract" : "add mysql bulk insert supports for SQL::Abstract",
+   "author" : [
+      "Toru Yamaguchi <zigorou@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.7.5",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "SQL-Abstract-Plugin-InsertMulti",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "SQL::Abstract" : "1.6",
+            "Sub::Exporter" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "SQL::Abstract::Plugin::InsertMulti" : {
+         "file" : "lib/SQL/Abstract/Plugin/InsertMulti.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/zigorou/p5-sql-abstract-plugin-insertmulti/issues"
+      },
+      "homepage" : "https://github.com/zigorou/p5-sql-abstract-plugin-insertmulti",
+      "repository" : {
+         "url" : "git://github.com/zigorou/p5-sql-abstract-plugin-insertmulti.git",
+         "web" : "https://github.com/zigorou/p5-sql-abstract-plugin-insertmulti"
+      }
+   },
+   "version" : "0.04"
+}

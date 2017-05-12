@@ -1,0 +1,20 @@
+Build.PL
+Changes
+lib/SDL/Tutorial/Tetris.pm
+lib/SDL/Tutorial/Tetris/Base.pm
+lib/SDL/Tutorial/Tetris/Controller/CPUSpinner.pm
+lib/SDL/Tutorial/Tetris/Controller/Game.pm
+lib/SDL/Tutorial/Tetris/Controller/Keyboard.pm
+lib/SDL/Tutorial/Tetris/EventManager.pm
+lib/SDL/Tutorial/Tetris/Model/Grid.pm
+lib/SDL/Tutorial/Tetris/Model/Pieces.pm
+lib/SDL/Tutorial/Tetris/View.pm
+LICENSE
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/event-manager.t
+t/grid.t
+Tetris.pl
+Todo
+META.yml

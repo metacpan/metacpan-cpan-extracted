@@ -1,0 +1,60 @@
+StupidMarkov
+
+BIG FAT NOTE: THIS IS A /REALLY/ STUPID IMPLEMENTATION! It works (for
+the most part) for me. I didn't write it to be a complete
+implementation, or even a sane one. If you're looking for something
+other than a toy, please check the SEE ALSO section for ideas, or
+search CPAN for something else. =o)
+
+StupidMarkov is a really simply and really stupid implementaiton of a
+Markov chain that I wrote in a fit of insomnia at midnight, after
+realizing I'd never understood what a Markov chain was, spending five
+minutes reading the Wikipedia entry on it, and then taking ten minutes
+to implement it. The output using the above synopsis and this
+paragraph results in output like the following:
+
+  "is a fit of insomnia at midnight, after realizing I'd never
+  understood what a really stupid implementaiton of insomnia at
+  midnight, after realizing I'd never understood what a Markov chain
+  that I wrote in a Markov chain that I wrote in a Markov chain that I
+  wrote in output like the Wikipedia entry on it, and this paragraph
+  results in a Markov chain that I wrote"
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc StupidMarkov
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=StupidMarkov
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/StupidMarkov
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/StupidMarkov
+
+    Search CPAN
+        http://search.cpan.org/dist/StupidMarkov
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 June R. Tate-Gans
+
+This program is released under the following license: GPL
+

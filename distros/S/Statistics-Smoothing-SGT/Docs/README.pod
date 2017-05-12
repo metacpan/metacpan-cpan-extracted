@@ -1,0 +1,78 @@
+=head1 NAME
+
+    README for SGT package
+
+    Last updated for version 2.10, 12 January 2007
+
+=head1 SYNOPSIS
+
+    This document provides a general introduction to the SGT
+    package.
+
+=head1 DESCRIPTION
+
+    This Perl module implements the Simple Good Turing (SGT) algorithm 
+    for smoothing of probabilistic values developed by William Gale and 
+    Geoffrey Sampson. 
+
+    The algorithm is described in detail in Sampson's Empirical Linguistics
+    (Continuum International, London and New York, 2001), chapter 7.
+    An online version of this paper is available at Geoffrey Sampson's
+    homepage under http://www.grsampson.net/AGtf.html .
+    
+    Basic usage:
+
+	use Statistics::Smoothing::SGT;
+	my $sgt = new Statistics::Smoothing::SGT($frequencyClasses, $total);
+	$sgt->calculateValues();
+  	$probabilities = $sgt->getProbabilities();
+  	$newFrequencies = $sgt->getNewFrequencies();
+  	$nBar = $sgt->getNBar();
+
+=head1 AUTHORS
+
+	Florian Doemges, florian@doemges.net
+	
+	Bjoern Wilmsmann, bjoern@wilmsmann.de
+
+=head1 BUGS
+
+=head1 SEE ALSO
+
+	Homepage: http://www.topicalizer.com/bwilmsmann/wiki/index.php/SGT
+
+=head1 COPYRIGHT
+
+    Copyright (C) 2006, Florian Doemges and Bjoern Wilmsmann,
+    Department of Linguistics, Ruhr-University, Bochum.
+    
+    Partially based on the SGT module (Copyright (C) 2004) by Andre Halama
+    (halama@linguistics.rub.de) and Tibor Kiss (tibor@linguistics.rub.de),
+    Department of Linguistics, Ruhr-University, Bochum.
+
+    This module in turn was based on the works (including an implementation
+    of the algorithm in C) by
+    Geoffrey Sampson, Department of Informatics, University of Sussex.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or (at your
+    option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+    Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to
+
+        The Free Software Foundation, Inc.,
+        59 Temple Place - Suite 330,
+        Boston, MA  02111-1307, USA.
+
+    Note: a copy of the GNU General Public License is available on the web
+    at <http://www.gnu.org/licenses/gpl.txt> and is included in this
+    distribution under the name GPL.
+
+---

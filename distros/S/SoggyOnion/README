@@ -1,0 +1,65 @@
+NAME
+    SoggyOnion - RSS and other arbitrary content aggregatron
+
+SYNOPSIS
+        $ soggyonion-install
+        $ vim/emacs config.yaml
+        $ soggyonion config.yaml
+        $ crontab -e
+
+DESCRIPTION
+    NOTE: This is a pre-release. I need to add tests, among other things.
+    Functionality is here, though.
+
+    SoggyOnion is an RSS and arbitrary content aggregator that produces
+    static pages. It was written to be easily installable and configurable
+    as well as trivial to extend. It is meant for people that want to view
+    RSS feeds and other scraped content as a web page and want minimal setup
+    and configuration.
+
+  Installation
+    The module creates two executables, soggyonion and soggyonion-install.
+    Once the SoggyOnion module is installed, do the following:
+
+    1. Change to a directory where you'd like to keep the configuration file
+    and defaults, then run the soggyonion-install command. This will extract
+    a handful of files to the current directory.
+    2. Edit the config.yaml configuration file. To get started quickly, just
+    make sure the four options in the first section are correct.
+    3. Run the soggyonion command with th
+
+  Customizing the Output
+    All sources of content are found in the config.yaml file. The main
+    template, templates/main.tt2, contains all the CSS.
+
+  Extending
+    See: SoggyOnion::Plugin
+
+  Why is it called "SoggyOnion?"
+    I purchased the domain "soggyonion.com" on complete impulse. When I
+    wrote this I finally made use of that silly domain and I kept the name.
+
+    I not longer own this domain.
+
+  Why don't I use (RSS utility here)?
+    If you like it better, please do. I welcome all suggestions and
+    constructive criticism (a.k.a. complaints), so fire away :-)
+
+    I wanted a tool where I could specify a few sources of RSS/RDF and have
+    it produce categorized, static pages for me that could be easily
+    customized through templates and CSS. I'm also not yet convinced that
+    everything should be RSS -- SoggyOnion can be used as a front-end for
+    any scraped content.
+
+SEE ALSO
+    SoggyOnion::Plugin, XML::RSS, YAML
+
+AUTHOR
+    Ian Langworth, "<ian@cpan.org>"
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2004 by Ian Langworth
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

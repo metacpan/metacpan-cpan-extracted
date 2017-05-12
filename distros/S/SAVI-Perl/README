@@ -1,0 +1,95 @@
+Introduction
+------------
+
+SAVI-Perl is a Perl module interface to the Sophos Anti-Virus engine. It
+allows you to scan files for viruses directly from Perl.
+
+
+Installation
+------------
+
+In order to successfully compile and use SAVI-Perl, you must have already
+acquired and installed the Sophos Anti-Virus software and API. Information
+about these products can be found at
+
+     http://www.sophos.com/products/software/
+
+
+If the Sophos library is not in the default search path, edit Makefile.PL
+and update the -L and -R options appropriately.
+
+After meeting the prerequisites, run the following commands to
+compile/install:
+
+     perl Makefile.PL
+     make
+     make install
+
+
+The file scan.pl in the example directory demonstrates how to use the
+module to initialize the engine, determine version information, set
+options, and scan files for viruses. The module also contains some
+documentation, accessible via either 'man SAVI' or 'perldoc SAVI' after
+installation.
+
+
+Changes
+-------
+
+0.30 - Added new method $savi->stale() to check whether
+       virus data needs to be reloaded.
+
+
+0.25 - Added support for Sun C compiler to s_comput.h in
+       Sophos include files.
+
+
+0.20 - Updated to version 4 of the SAVI API.
+
+     - Added new method $savi->load_data() to load virus data.
+       This can be used to dynamically refresh virus data when
+       updates are added.
+
+     - Added new method $savi->options() returning all valid
+       options for the virus engine in use.
+
+     - The $savi->set() method no longer requires the type of the
+       parameter being set to be passed as an argument.
+
+     - Added new method $savi->get() to return the current value of a
+       parameter.
+
+     - Added new method $savi->scan_fh() to perform a scan on an open
+       filehandle.
+
+
+0.15 - Updated sample scan.pl script to use the same syntax as
+       amavisd-new for specifying options.
+
+
+0.10 - Calling $results->viruses() if the scanned file was not infected
+       would result in a segmentation violation. While from a pedantic
+       point of view you just really shouldn't do that ;), an empty
+       list will now be returned in this case.
+
+     - Added new method $savi->error_string(code) to return a message
+       corresponding to the given error code. Updated sample script to
+       demonstrate use.
+
+     - Add simple test script to prevent complaints from
+       cpan-testers@perl.org :). 
+
+
+0.05 - First publicly released version.
+
+
+Feedback/Availability
+---------------------
+
+Please report any bugs or feature requests to <henson@acm.org>.
+
+
+The latest version of SAVI-Perl is available on CPAN, or via the URL:
+
+	http://www.csupomona.edu/~henson/www/projects/SAVI-Perl/
+

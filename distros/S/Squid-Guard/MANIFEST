@@ -1,0 +1,15 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01-Squid-Guard-Request.t
+t/02-Squid-Guard.t
+t/domains 
+t/urls 
+t/expressions 
+t/userdomains 
+lib/Squid/Guard.pm
+lib/Squid/Guard/Request.pm
+examples/basic 
+examples/luxguard 
+META.yml                                 Module meta-data (added by MakeMaker)

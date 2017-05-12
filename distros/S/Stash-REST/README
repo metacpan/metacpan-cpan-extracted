@@ -1,0 +1,419 @@
+NAME
+
+    Stash::REST - Add Requests into stash. Then, Extends with
+    Class::Trigger!
+
+SYNOPSIS
+
+        use Stash::REST;
+        use JSON;
+    
+        $obj = Stash::REST->new(
+            do_request => sub {
+                my $req = shift;
+    
+                # in case of testings
+    
+                my ($res, $c) = ctx_request($req);
+                return $res;
+    
+                # in case of using LWP
+                $req->uri($req->uri->abs( 'http://your-api.com' ));
+    
+                return LWP::UserAgent->new->request($req);
+    
+            },
+            decode_response => sub {
+                my $res = shift;
+                return decode_json($res->content);
+            }
+        );
+    
+        # you can write/read stash anytime
+        $obj->stash('foo') # returns undef
+    
+        $obj->stash->{'foo'} = 3;
+    
+        $obj->stash('foo') # returns 3
+    
+    
+        $obj->rest_post(
+            '/zuzus',
+            name  => 'add zuzu', # you can send fields for your custom on extensions.
+            list  => 1,
+            stash => 'easyname',
+            prepare_request => sub {
+                is(ref $_[0], 'HTTP::Request', 'HTTP::Request recived on prepare_request');
+                $run++;
+            },
+            [ name => 'foo', ]
+        );
+        is($run, '2', '2 executions of prepare_request');
+    
+        $obj->rest_put(
+            $obj->stash('easyname.url'),
+            name => 'update zuzu',
+            [ new_option => 'new value' ]
+        );
+    
+        $obj->rest_reload('easyname');
+    
+        $obj->stash_ctx(
+            'easyname.get',
+            sub {
+                my ($me) = @_;
+    
+                is( $me->{name}, 'AAAAAAAAA', 'name updated!' );
+            }
+        );
+    
+        # reload expecting a different code.
+        $obj->rest_reload( 'easyname', code => 404 );
+    
+        $obj->rest_reload_list('easyname');
+    
+        # HEAD return $res instead of parsed response
+        my $res = $obj->rest_head(
+            $obj->stash('easyname.url'),
+        );
+        is($res->headers->header('foo'), '1', 'header is present');
+    
+        $obj->stash->{'easyname'} # parsed response for POST /zuzus
+        $obj->stash->{'easyname.id'} # HashRef->{id} if exists, from POST response.
+        $obj->stash->{'easyname.get'} # parsed response of GET /zuzus/1 (from Location)
+        $obj->stash->{'easyname.url'} # 'zuzus/1'
+    
+        if list => 1 is passed:
+        $obj->stash->{'easyname.list'} # parsed response for GET '/zuzus'
+        $obj->stash->{'easyname.list-url'} # '/zuzus'
+    
+    
+        # this
+        $obj->stash_ctx(
+            'easyname.get',
+            sub {
+                my ($me) = @_;
+            }
+        );
+    
+        # equivalent to
+        my $me = $c->stash->{'easyname.get'};
+    
+        # can be useful for testing/context isolation
+        $obj->stash_ctx(
+            'easyname.list',
+            sub {
+                my ($me) = @_;
+    
+                ok( $me = delete $me->{zuzus}, 'zuzu list exists' );
+    
+                is( @$me, 1, '1 zuzu' );
+    
+                is( $me->[0]{name}, 'foo', 'listing ok' );
+            }
+        );
+    
+    
+        $obj->rest_delete( $obj->stash('easyname.url') );
+
+DESCRIPTION
+
+    Stash::REST helps you use HTTP::Request::Common to create requests and
+    put responses into a stash for further user.
+
+    The main objective is to encapsulate the most used HTTP methods and
+    expected response codes for future extensions and analysis by other
+    modules, using the callbacks Class::Trigger.
+
+METHODS
+
+ new
+
+        Stash::REST->new(
+            do_request => sub {
+                ...
+            },
+            decode_response => sub {
+                ...
+            }
+        );
+
+ rest_get
+
+    Similar to:
+
+        $self->rest_post(
+            $url,
+            code => 200,
+            %conf,
+            method => 'GET'
+        );
+
+ rest_put
+
+    Similar to:
+
+        $self->rest_post(
+            $url,
+            code => ( exists $conf{is_fail} ? 400 : 202 ),
+            %conf,
+            method => 'PUT',
+        );
+
+ rest_head
+
+    Similar to:
+
+        $self->rest_post(
+            $url,
+            code => 200,
+            %conf,
+            method => 'HEAD',
+        );
+
+ rest_delete
+
+    Similar to:
+
+        $self->rest_post(
+            $url,
+            code => 204,
+            %conf,
+            method => 'DELETE'
+        );
+
+ _capture_args
+
+    This is a private method. It parse and validate params for rest_post
+    and above methods.
+
+        my ($self, $url, %conf) = &_capture_args(@_);
+    
+        So, @_ must have a items like this:
+    
+            $self, # (required) self object
+            $url,  # (required) a string. If ARRAY $url will return a join '/', @$url
+            %conf, # (optional) configuration hash (AKA list). Odd number will cause problems.
+            $data  # (optional) ArrayRef, send on body as application/x-www-form-urlencoded data on POST | PUT
+    
+        # $data can be also sent as $conf{data} = [ ... ]
+
+ rest_post
+
+    This is the main method, and accept some options on %conf.
+
+  Defaults options
+
+   is_fail => 0,
+
+    This test if $res->is_success must be true or false. Die with confess
+    if not archived.
+
+   code => is_fail ? 400 : 201,
+
+    This test if $res->code equivalent to expected. Die with confess if not
+    archived.
+
+  Optional options:
+
+   stash => 'foobar'
+
+    Load parsed response on  $obj-stash->{foobar} > and some others fields
+
+     $obj-stash->{foobar.id} > if response code is 201 and parsed response
+    contains ->{id}  $obj-stash->{foobar.url} > if response code is 201 and
+    header contains Location (confess if missed)
+
+   params => []
+
+    Add query params to URI
+
+        $obj->rest_post(
+            '/foo?you_can_put_here=1',
+            list  => 1,
+            stash => 'easyname',
+            params => [ and_continue_with_other_params => 'here' ],
+            data => [ data_here_are_sent_on_body => '1' ]
+        );
+
+   headers => [],
+
+    Add headers on the main request.
+
+    You can use this to modify the default HTTP::Request::Common header for
+    $data
+
+        # POST body with JSON:
+        $obj->rest_post(
+            '/post-with-params?api_key=1',
+            stash   => 'testparams',
+            code => 200,
+            params  => [ another_key => 2 ],
+            headers => [
+                'Content-Type' => 'application/json',
+            ],
+            data => encode_json( { hello => 'json' } ),
+        );
+
+   prepare_request => sub {}
+
+    Modify secondary requests like GET /foo or GET Location after a POST
+    /foo
+
+        $obj->rest_post(
+            '/foo',
+            list  => 1,
+            stash => 'easyname',
+            prepare_request => sub {
+                is(ref $_[0], 'HTTP::Request', 'HTTP::Request recived on prepare_request');
+                $run++;
+            },
+            data => [ name => 'foo' ]
+        );
+
+   list => 1,
+
+    If true, Location header will be looked and a GET on Location will
+    occur and parsed data will be stashed on  $obj-stash->{foobar.list} >
+    and list-url on  $obj-stash->{foobar.list-url} >
+
+   skip_response_tests => 1,
+
+    If true, automatic load of Location on 201 will not be executed.
+
+   callbacks
+
+        process_request
+        process_response
+        process_response_success
+        response_decoded
+        item_loaded
+        stash_added
+        list_loaded
+
+    Can be used in addition to the Class::Trigger in a one-execution
+    callback.
+
+ stash_ctx
+
+        $obj->stash_ctx(
+            'easyname.get',
+            sub {
+                my ($me) = @_;
+            }
+        );
+    
+    
+        Get an stash-name and run a CodeRef with the stash as first @_
+
+ rest_reload
+
+    Reload the GET easyname.url and put on stash.
+
+        $obj->rest_reload( 'easyname' );
+    
+        # reload expecting a different code.
+        $obj->rest_reload( 'easyname', code => 404 );
+
+    When response is 404, some stash{easyname} is cleared.
+
+ rest_reload_list
+
+    Reload the GET easyname.list-url and put on stash.
+
+        $obj->rest_reload_list('easyname');
+
+    This response code must be 200 OK.
+
+ stash
+
+    Copy from old Catalyst.pm, but $t->stash('foo') = $t->stash->{'foo'}
+
+    Returns a hashref to the stash, which may be used to store data and
+    pass it between components during a test. You can also set hash keys by
+    passing arguments. Unlike catalyst, it's never cleared, so, it lasts
+    until object this destroy.
+
+        $t->stash->{foo} = $bar;
+        $t->stash( { moose => 'majestic', qux => 0 } );
+        $t->stash( bar => 1, gorch => 2 ); # equivalent to passing a hashref
+
+Tests Coverage
+
+    I'm always trying to improve those numbers. Improve branch number is a
+    very time-consuming task. There is a room for test all checking and
+    defaults on tests.
+
+        @ version 0.05
+        ---------------------------- ------ ------ ------ ------ ------ ------ ------
+        File                           stmt   bran   cond    sub    pod   time  total
+        ---------------------------- ------ ------ ------ ------ ------ ------ ------
+        blib/lib/Stash/REST.pm         96.4   74.5   68.4  100.0  100.0  100.0   86.7
+        Total                          96.4   74.5   68.4  100.0  100.0  100.0   86.7
+        ---------------------------- ------ ------ ------ ------ ------ ------ ------
+
+Class::Trigger names
+
+    Updated @ Stash-REST 0.05
+
+        $ grep  '$self0_05->call_trigger' lib/Stash/REST.pm  | perl -ne '$_ =~ s/^\s+//; $_ =~ s/self-/self0_04-/; print' | sort | uniq
+
+    Trigger / variables:
+
+        $self0_05->call_trigger( 'after_stash_ctx', { stash => $staname, results => \@ret });
+        $self0_05->call_trigger( 'before_rest_delete', { url => $url, conf => \%conf } );
+        $self0_05->call_trigger( 'before_rest_get', { url => $url, conf => \%conf } );
+        $self0_05->call_trigger( 'before_rest_head', { url => $url, conf => \%conf } );
+        $self0_05->call_trigger( 'before_rest_post', { url => $url, conf => \%conf } );
+        $self0_05->call_trigger( 'before_rest_put', { url => $url, conf => \%conf } );
+        $self0_05->call_trigger( 'before_stash_ctx', { stash => $staname } );
+        $self0_05->call_trigger( 'item_loaded', { stash => $stashkey, conf => \%conf });
+        $self0_05->call_trigger( 'list_loaded', { stash => $stashkey, conf => \%conf } );
+        $self0_05->call_trigger( 'process_request', {req => $req, conf => \%conf} );
+        $self0_05->call_trigger( 'process_response', {req => $req, res => $res, conf => \%conf} );
+        $self0_05->call_trigger( 'process_response_success', {req => $req, res => $res, conf => \%conf} );
+        $self0_05->call_trigger( 'response_decoded', {req => $req, res => $res, decoded => $obj, conf => \%conf} );
+        $self0_05->call_trigger( 'stash_added', { stash => $stashkey, conf => \%conf } );
+        $self0_05->call_trigger( 'stash_removed', { stash => $stashkey, conf => \%conf } );
+
+    Updated @ Stash-REST 0.04 *** PLEASE UPGRADE TO NEW VERSION ***
+
+        $ grep  '$self->call_trigger' lib/Stash/REST.pm  | perl -ne '$_ =~ s/^\s+//; $_ =~ s/self-/self0_04-/; print' | sort | uniq
+    
+        Trigger / variables:
+    
+        $self0_04->call_trigger('after_stash_ctx', $staname, \@ret);
+        $self0_04->call_trigger('before_rest_delete', \$url, \$data, \%conf);
+        $self0_04->call_trigger('before_rest_get', \$url, \$data, \%conf);
+        $self0_04->call_trigger('before_rest_head', \$url, \$data, \%conf);
+        $self0_04->call_trigger('before_rest_post', \$url, \$data, \%conf);
+        $self0_04->call_trigger('before_rest_put', \$url, \$data, \%conf);
+        $self0_04->call_trigger('before_stash_ctx', $staname);
+        $self0_04->call_trigger('item_loaded', $stashkey, \%conf);
+        $self0_04->call_trigger('list_loaded', $stashkey, \%conf);
+        $self0_04->call_trigger('process_request', \$req, \%conf);
+        $self0_04->call_trigger('process_response', \$req, \$res, \%conf);
+        $self0_04->call_trigger('process_response_success', \$req, \$res, \%conf);
+        $self0_04->call_trigger('response_decoded', \$req, \$res, \$obj, \%conf);
+        $self0_04->call_trigger('stash_added', $stashkey, \%conf);
+        $self0_04->call_trigger('stash_removed', $stashkey, \%conf);
+
+AUTHOR
+
+    Renato CRON <rentocron@cpan.org>
+
+COPYRIGHT
+
+    Copyright 2015- Renato CRON
+
+    Thanks to http://eokoe.com
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+
+    Stash::REST::TestMore, Class::Trigger
+

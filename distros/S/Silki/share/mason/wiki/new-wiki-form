@@ -1,0 +1,46 @@
+<&| /lib/filter/form.mas, data => { permissions => 'private' } &>
+<form action="<% $c->domain()->application_uri( path => '/wikis' ) %>" method="post">
+
+  <fieldset>
+    <legend><% loc('Wiki Settings') %></legend>
+
+    <div class="form-item">
+      <label for="title" class="for-field"><% loc('Wiki Title') %></label>
+      <input type="text" class="text" name="title" id="title" />
+      <div class="help-text">
+        <p>
+          <% loc('This cannot be changed after the wiki is created.') %>
+        </p>
+      </div>
+    </div>
+
+    <div class="form-item">
+      <label for="domain_id" class="for-field"><% loc('Domain') %></label>
+      <select name="domain_id" id="domain_id">
+% while ( my $domain = $domains->next() ) {
+        <option value="<% $domain->domain_id() %>">
+          <% $domain->web_hostname() %>
+        </option>
+% }
+      </select>
+    </div>
+
+  </fieldset>
+
+  <& /wiki/permissions-fieldset.mas &>
+
+</form>
+</&>
+
+<%init>
+my $domains = Silki::Schema::Domain->All();
+my $accounts = Silki::Schema::Account->All();
+</%init>
+
+<%method title>
+<% loc('Create a New Wiki') %>
+</%method>
+
+<%flags>
+inherit => '/autohandler'
+</%flags>

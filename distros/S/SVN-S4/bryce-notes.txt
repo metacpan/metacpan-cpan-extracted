@@ -1,0 +1,333 @@
+Current status:
+Working on using the S4-controlled recursion methods to implement s4 checkout,
+switch, and update.  The viewspec module will build a tree structure to describe
+the tree it wants, then a later step will read the tree and implement it.
+
+I made a new s4 test that tries to hit more of the interesting cases if switches at
+top level vs. subdirs, switches under switches, etc. That is the "view3" test in s4,
+which exposed some new bugs.
+
+
+
+- BUG: When a directory is in the repository, and it is no longer a
+  switchpoint, it must not be removed!  It should be switched back to normal
+  instead.
+
+
+- Should I make any attempt to make unviewed directories complete evaporate?
+  I think not.  If they are unviewed, it is perfectly adequate to put a
+  switchpoint to void there.  And with the anti-flipflop behavior, that means
+  we won't spend any time checking out the contents.
+
+Good progress on recursing. It recurses!
+
+Files in some directories never get checked out.  If the view contains a directory VA,
+and there is a switchpoint VA/VB underneath it, the files in the directory VA are never
+checked out!
+
+But I need to teach it how to not run so many little svn commands
+that it takes forever.
+
+Q: If user makes a switchpoint in addition to the ones that s4 makes, should
+I take care to always leave it alone?  Presently, no, the recurse functions
+makes the switches match the viewspec, whether or not it should.
+
+I am interested in making a tree-shaped data structure instead of a list.
+This will help me to figure out if I can do an update at the top, or
+a bunch of separate nonrecursive ones.  But I need to checkin before
+embarking on that project.
+
+Most s4 tests are passing, except for these.
+FAIL:  s4_tests.py 4: viewspec with rev NUM feature
+FAIL:  s4_tests.py 5: checkout view2 with with view lines reversed
+
+
+
+When a deep switchpoint disappears, it no longer removes the intermediate stages.
+s4: Remove unused switchpoint X/Y/Z/G
+
+- bug:
+  1. s4 co out a tree that has hw pointing to hw, and hw/ice9a pointing to void.
+  2. Change viewspec so that hw/ice9a is no longer mentioned.
+  3. s4 update
+  Really, s4 should change hw/ice9a to hw/ice9a, but instead it leaves it as void.
+
+- potential bug:
+  Whenever pieces of S4 call other pieces of S4, there is the danger
+  that $self->{revision} might get set more than once, if a checkin completes
+  during the execution of S4.  To avoid this, make this into a sort of atomic
+  operation, e.g. $self->default_revision() which calls which_rev() only the
+  first time, and then caches the result for all subsequent times.
+
+- s4 snap does not handle files made by "svn mv" or "svn cp" files.
+  It just runs svn diff and stores their diff.
+  It does not notice that they have been added and came from some other place
+  in the tree.
+
+- ViewSpec.pm: svn cat $fn does not have -rREV
+
+- BUG: When s4 sees a command with "-r HEAD", it must sample the rev number of HEAD
+  exactly one time, and afterward use that revision number only.  If we're doing
+  anything more involved than a single fallback command, we must do $rev=which_rev()
+  and be careful to use it everywhere.
+
+  This is the svn_unknowns bug.
+
+
+- svn diff in an area full of switches does not always traverse the switches.
+  I think you see modified files, but what about svn diff -r12345.
+  To make a diff of a tree with switches, I ended up with a nasty script
+      svn diff -N -r27893
+      dirs=$(find . -maxdepth 1 -type d | grep -v .svn | grep -v '^\.$')
+      svn diff -r27893 ${dirs}
+
+
+
+To do:
+- BUG: checking the .svn/format file after creating a switchpoint:
+  needs NFS existence check in there somewhere.
+- (IN PROGRESS, see patch.arg-parsing-nov-02)
+  It's nearly impossible s4 operations to call other s4 operations inside perl,
+  For example, in scrub I want to call update.  But it should be s4 update, not
+  svn update.
+  To fix this, make s4 pass all the %opts into S4::update().
+  Make S4::update create the raw svn command based on reading %opts.
+  Then in S4::update it never needs to call main::cmd_svn().
+  But with %opts the way it is, I can't do that.  %opts does not tell you
+  the order that things appeared on the command line.  In some commands like
+  svn copy SRC DST, the order of opts is critical.
+- s4 scrub blows away switches, even the ones created by s4 checkout.
+  But when it's modified to not blow away switches, it does not produce a pristine
+  tree anymore!
+
+
+- s4 snap cannot recreate trees with manufactured switchpoints.
+  But if I make it run "s4 switch" and do the next item on my to-do list, then it can.
+- svn switch URL PATH should work even if PATH doesn't exist.
+  We know how to do that. :)
+- Integrate rsvn
+- svn switch between views should parse the viewspec, etc.  Then maybe people
+  can migrate their old trees to a s4 view cleanly (?)
+- Try to checkout/update/switch in a way that never checks out anything that you didn't
+  ask for.  Right now, switches underneath switches cause this.
+  Recurse through subdirs until you reach a point where there are no switches
+  underneath.
+  - (DONE) Wilson improved this already. Now it should only need to redo switches
+    if the viewspec changes.
+  - Checkout algorithm is...?
+    - parse viewspec
+    - start at the top
+    - if any switchpoints below this directory, then
+      - svn up -N directory
+      - svn ls to find list of directories
+      - for each one, recurse.
+    - if no switchpoints below this directory, then
+      - svn up directory (recursive)
+- svn revert that changes Project.viewspec. Should we parse it?
+- some stuff in Viewspec.pm should really by in S4::ViewSpec package, not main S4 package.
+- Figure out the correct rules for when we can do a normal update, versus a
+  multipart viewspec update.  E.g.
+  - if viewspec file does not exist in directory, normal update
+  - if after the update -N, the viewspec has disappeared, do what?? Presently: normal update
+  - if viewspec is same as last time we did checkout/update, and the target rev
+    for every part of of tree is the same, normal update
+  - otherwise do multipart viewspec update
+- Once I really understand the correct update and checkout logic, there is a lot
+  of common code that could be combined into functions or something.
+- BUG: In general, we don't allow cmdline options to appear before the svn command.
+  Except Bryce added an exception for --message to make svn's regressions pass.
+  This can be fixed by using a simple getopt for every single option, stuffing them
+  all in a hash, and then changing SVN::S4::Getopt.pm to check that all options are
+  legal--instead of what it does now.
+- in viewspec file, remove "date" keyword, act the same as "rev"
+- cosmetic: s4 help add prints "=head2 add"
+- protect against error cases in viewspecs files
+  - (DONE) bad url
+  - (DONE) bad command
+  - target directory with absolute path!?
+  - include of nonexistent file or URL
+  - (DONE) target directory several levels down without parent
+- Add a test to subversion regressions that does an update of a filename that
+  does not exist and submit it.  This provoked a bug in s4, and it is apparently not
+  tested.
+- (DONE) Measure svn rev of HEAD and use that constant instead of HEAD, so that
+  all updates go to the same rev.
+- (DONE) Document viewspec format
+- (DONE) Include should understand URL
+- (OH WELL) SVN::S4::is_file_in_repo uses system instead of SVN::Client because I could not make
+  the error message disappear.
+- (DONE) use rsvn everywhere, work around the problems (e.g. file not appearing for 7 seconds)
+  - (DONE) remove stupid hack
+    if ($s4->{svn_binary} eq 'rsvn') { push @local_svn, "--local"; }
+    checkout of area with viewspec is a test case
+- (DONE) move guts of checkout/update into module
+- (DONE) remove chdir and pwd and make it work again
+  - it should not depend on current directory
+- (DONE) move all s4 global variables to SVN::S4
+- (DONE) BUG: from top directory, cd.. and then s4 update DIRNAME. It starts checking things
+  out in the current dir, not the target dir.
+- (DONE) all new commands should check for unknown options
+- (DONE) remove any s4 dependency on SCX environment variables
+- (DONE) BUG mys4 checkout URL PATH is broken.
+- (DONE) change file_url back
+- (DONE) how to support -rREV.  I thought
+  Getopt::Long::config("bundling_override")
+  would do it, but it doesn't.
+  Example: s4 up -r26784        #FAILS
+  Example: s4 up -r 26784       #WORKS
+- (DONE) "s4 up viewpass1" is fine, but "s4 up viewpass1/" fails
+  perl: subversion/libsvn_subr/path.c:113: svn_path_join: Assertion `is_canonical (base, blen)' failed.
+- (DONE) BUG ./update_tests.py 15     (but passes without s4 wrapper)
+    EXPECTED STDOUT:
+    D  working_copies/update_tests-15/A/D/G
+    Updated to revision 3.
+    ACTUAL STDOUT:
+    EXCEPTION: SVNLineUnequal
+    FAIL:  update_tests.py 15: another "hudson" problem: updates that delete
+  - solution:
+    - (DONE) add a check to S4::rev_on_date.
+    - (DONE) make which_rev only get called in viewspec mode
+- (DONE) BUG:
+  "s4 up -rREV" fails
+  "s4 up -r REV" is okay
+- (FIXED) BUG ./update_tests.py 22 fails  (but passes without s4 wrapper)
+  Unequal Types: one Node is a file, the other is a directory
+  EXCEPTION: SVNTreeUnequal
+  FAIL:  update_tests.py 22: update target that was added in a future rev
+- (DONE) BUG: unview caused a crash, unless you later replaced the exact path with
+  a new view command.  Fixed in 27071.
+- (DONE) performance improvement: with viewspecs, test if a single svn update
+  will suffice.  If so, it can be much faster!
+  - Md5sum of the viewspec actions list, except for the revision number.
+    If the md5sum matches the last completed update or checkout, and all the
+    target revision numbers in the whole tree are identical, do a single update
+    at the top of tree.
+- (DONE) set command should set some internal hash, not the real environment variables,
+  or you may be able to do nasty things
+- (DONE) make this use SVN::Client: is_file_in_repo
+- write regression tests for viewspec behavior
+  - (DONE) checkout with viewspec
+  - (DONE) update when viewspec changes
+  - (DONE) test all viewspec syntax
+  - you can always write more tests
+- (FIXED) BUG: svn checkout -r does not obey the -r in the top level checkout
+- (DONE) @list_actions should not need to be in order. just sort by target dir, and the
+  order no longer matters.  Add s4_test called "s4_checkout_view2_viewlines_out_of_order"
+  to regress this.
+- (DONE) Undo switches when the view line is removed from viewspec.
+  Store the previous parsed viewspec somewhere, and compare them so that we
+  can tell what switches should be switched back.
+- (DONE) document new update and checkout behavior
+- (DONE) OUCH! newer svns do not allow the "switch --relocate" trick.
+  So dammit I'm going to edit the .svn/entries file myself.  It's actually much easier
+  than the switch relocate trick anyway.
+    Make a versioned directory called A.
+    Just add the line:
+       <entry name="A" kind="dir"/>
+    and then you can svn switch A to anything you want.
+    If you don't switch it, the next update will make A get deleted.
+- (DONE) BUG: "s4 --version" fails
+  s4 --version   #fail
+  svn --version  #ok
+- (DONE) BUG: we don't allow cmdline options to appear before the svn command.
+  "s4 -m message commit file" fails
+  "s4 commit -m message file" ok
+  "s4 commit file -m message" ok
+- (DONE) when view line gives bad URL, very confusing errors result.
+  Just before doing svn switch, take the time to check if it's in the repository.
+- (DONE) BUG: Undoing switchpoints does the wrong thing if there are switchpoints underneath other
+  switchpoints.
+  mys4 up -r11; mys4 up -r12
+  cd /local/denney/svn114branch/subversion/tests/clients/cmdline/working_copies/s4_tests-7.wc2
+  It is ok to be over conservative (e.g. never remove any switchpoints)
+  but it is not okay to make things disappear when they should not.
+- (DONE) BUG: s4 does not undo void switchpoints that were created on the way to a real switchpoint.
+  Really it should.
+- (DONE) What happens if two view lines map the same switchpoint? Illegal, or one overrides the other?
+  Now, one overrides the other.
+- (DONE) if the URL is outside of the repository:
+  - (DONE) test UUID
+  - (DONE) print an error that it's not supported
+  - or, make an svn external (svn propset . and then svn co [-r] URL PATH)
+    but wait until there's a need.
+- (DONE) Integrate complete_patch as "s4 snapshot"
+- (DONE) Integrate strong_revert as "s4 scrub --force"
+
+
+
+To decide:
+- How to make a tag when the view is an important part of the tag?
+  svn cp trunk tags/1.1
+  Then you can check out the tag of trunk and you know that it's static.
+  Then if you want any views to point to the tag, you svn cp the view, edit the
+  Project.viewspec so that the URLs are different, and check in the view.
+
+  trunk
+  tags
+    1.1
+    1.2
+    1.3
+  views/
+    viewpass1/
+      Project.viewspec
+    viewpep/
+      Project.viewspec
+  branches
+    1.1.1
+
+
+- s4 update simh_2006-07-01 would ideally update that directory with knowledge
+  of what the viewspec says.  But in our current model, since you did not update
+  from the top, the viewspec would never be considered.  That seems bad.
+- what does checkout/update do with multiple arguments?  What if one of them points
+  to a directory with a viewspec but others don't?
+  Wilson suggests: if multiple files and one has a viewspec, crash. Force user to
+  do one at a time.
+- how much to display during the viewspec update?
+  - (DONE) hide any implicit commits to voids area (/dev/null)
+- try to use SVN::Client everywhere, or build svn commands and call system?
+- (DONE) how to specify URL of voids, so that tool is not specific to our repository?
+  Maybe it can find the top of repo, then add "/s4voids/NAME".
+  Walk up tree, require user to create it.
+- Where to store state? I thought something like $HOME/.s4/viewspec_state
+  and then name file based on `/bin/pwd|md5sum` so that working areas don't get
+  confused.   If it's in the working area itself, you have to change properties
+  to ignore it.
+  A: Use .svn/s4
+- How to handle "s4 update -r 20000", when the whole view area did not exist at the time?
+  One way is to use the Project.viewspec for everything.
+  Another way is to somehow request that the view stay at HEAD or whatever, while
+  the -r20000 affects only the switched areas. Hmm.
+  A:  Have a option that doesn't update the top of the tree --noupdatetop
+
+
+Testing s4:
+- how to build test environment:
+  wget http://subversion.tigris.org/tarballs/subversion-1.1.4.tar.gz
+  svn co svn+ssh://svn.sicortex.com/svn/master/software/devel/subversion/branches/denney_s4_tests
+  cd denney_s4_tests
+  ./configure LDFLAGS=-L/usr/lib64
+  make
+  cd subversion/tests/clients/cmdline
+  cp ../../../../test_bryce_s4_with_svn114 .
+  vi test_bryce_s4_with_svn114
+  # fix S4TOP to point to this area
+  vi svntest/main.py
+  # comment out line 93 and replace with
+  #   svn_binary = os.path.abspath('test_bryce_s4_with_svn114' + _exe)
+  ssh srv003   # this machine has random number generation problem fixed
+  cd to ..../subversion/tests/clients/cmdline
+  ./basic_tests.py 1
+  # if it works, you did all these steps right.
+- to run regressions, do ./run_svn_regressions
+
+-  from the svn book http://svnbook.red-bean.com/nightly/en/svn.ref.html#svn.ref.svn
+    To use the command line client, you type svn, the subcommand you wish to
+    use [49], and any switches or targets that you wish to operate on—there is no
+    specific order that the subcommand and the switches must appear in. For
+    example, all of the following are valid ways to use svn status:
+    $ svn -v status
+    $ svn status -v
+    $ svn status -v myfile
+
+- test with svn 1.2.3. on suse10

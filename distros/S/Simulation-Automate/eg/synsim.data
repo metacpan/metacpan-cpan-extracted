@@ -1,0 +1,3 @@
+TITLE: SynSim installation test
+SIMTYPE : test
+COMMAND: perl INPUTFILE OUTPUTFILE

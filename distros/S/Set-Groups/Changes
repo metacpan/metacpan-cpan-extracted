@@ -1,0 +1,22 @@
+Revision history for Set::Groups
+
+0.1    2007-04-07
+       First version, released on an unsuspecting world.
+0.2    2007-04-08
+       Documentation correction
+0.4    2007-04-20
+       Add the detection of the cyclic groups
+       New methods are setDebug, getCyclicGroups, getAcyclicGroups and isAcyclic.
+0.5    2007-04-22
+       isGroupOf is renamed isOwnGroupOf, and a new method isGroupOf is created
+       getGroupsOf is renamed getOwnGroupsOf, and a new method getGroupsOf is created
+       For coherence :
+           addSingleTo is renamed addOwnSingleTo (addSingleTo still exists, but is deprecated)
+           addGroupTo is renamed addOwnGroupTo (addGroupTo still exists, but is deprecated) 
+           removeGroupFrom is renamed removeOwnGroupFrom (removeGroupFrom still exists, but is deprecated) 
+0.6    2007-04-22
+       SVN tags update
+0.7    2007-11-06
+       Documentation complement
+0.8    2007-11-06
+       Documentation complement

@@ -1,0 +1,18 @@
+<p>
+<% loc( 'Hi,') %>
+</p>
+
+<& invitation-text.mas, user => $user, wiki => $wiki &>
+
+<& custom-message.mas, message => $message &>
+
+<p>
+Sent by <% $sender->best_name() %>
+</p>
+
+<%args>
+$user
+$wiki
+$sender
+$message => undef
+</%args>

@@ -1,0 +1,28 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use File::Which qw( which );
+
+my $xg = which 'xgettext.pl'
+    or die 'Cannot find xgettext.pl in path';
+
+for my $lang (qw( en )) {
+    print "Language: $lang\n";
+
+    system( $^X, $xg,
+        qw( -v -v
+            -D lib
+            -P perl=*
+            -D share/mason
+            -P mason=*
+            -D share/email-templates
+            -P mason=*
+            -o ),
+        "share/i18n/$lang.po"
+    );
+
+    # turn JS into JSON
+}
+

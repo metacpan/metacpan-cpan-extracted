@@ -1,0 +1,12 @@
+Changes
+Sedna.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/Sedna.t
+lib/Sedna.pm
+const-c.inc
+const-xs.inc
+typemap
+META.yml                                 Module meta-data (added by MakeMaker)

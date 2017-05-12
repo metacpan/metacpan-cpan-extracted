@@ -1,0 +1,11 @@
+load_extension('perlvtab.so')
+
+year|joe|sam
+2008|88|99
+2009|101|102
+year|joe|sam
+2008|88|99
+2009|101|102
+employee|year_2008|year_2009
+joe|88|101
+sam|99|102

@@ -1,0 +1,32 @@
+Revision history for Sentinel
+
+0.05    CHANGES:
+         * Also allow get/set callbacks to be object method names rather than
+           CODE refs
+
+0.04    CHANGES:
+         * Detect at Build.PL time whether XS is possible, don't attempt if
+           not. Also allow PP building with --pp argument
+
+0.03    CHANGES:
+         * Provide a fallback pureperl implementation using TIESCALAR if XS
+           cannot be loaded (thanks mst)
+         * More unit tests
+
+0.02    CHANGES:
+         * Non-development release
+
+0.01_004 CHANGES:
+         * Apply some evil SvFLAGS hackery on perl versions before 5.14 to
+           make lvalue context propagation work correctly
+
+0.01_003 CHANGES:
+         * Discovered that true lvalue context propagation does work on
+           perl 5.14 - document this and unit test it
+
+0.01_002 CHANGES:
+         * Support 'obj' for referent object context to callbacks
+         * Minor XS logic fixes
+
+0.01_001 First version, released on an unsuspecting world.
+

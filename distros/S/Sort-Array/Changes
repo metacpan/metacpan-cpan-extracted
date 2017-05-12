@@ -1,0 +1,25 @@
+Revision history for Perl extension Sort::Array.
+
+2001-08-25 / 0.26
+
+	File permission fixed, now anybody can extract the archive, not
+	only the user 'root'.
+
+2001-08-23 / 0.25
+
+	Changed the Discard_Duplicates() function to discard duplicates
+	and only sort the array if wished. You can set <sorting> to
+	'asending', 'desending' or let them empty to disable sorting.
+
+	Some misspelling corrected.
+
+2001-08-17 / 0.24
+
+	Error codes are no longer returned in an array (that array that
+	contains the sorted Data). $Sort::Array::error is used with the
+	code instead.
+
+
+2001-07-28 / 0.23
+
+	- First beta-release, non-public

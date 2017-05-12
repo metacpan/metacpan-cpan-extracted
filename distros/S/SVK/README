@@ -1,0 +1,89 @@
+# BEGIN BPS TAGGED BLOCK {{{
+# COPYRIGHT:
+# 
+# This software is Copyright (c) 2003-2008 Best Practical Solutions, LLC
+#                                          <clkao@bestpractical.com>
+# 
+# (Except where explicitly superseded by other copyright notices)
+# 
+# 
+# LICENSE:
+# 
+# 
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of either:
+# 
+#   a) Version 2 of the GNU General Public License.  You should have
+#      received a copy of the GNU General Public License along with this
+#      program.  If not, write to the Free Software Foundation, Inc., 51
+#      Franklin Street, Fifth Floor, Boston, MA 02110-1301 or visit
+#      their web page on the internet at
+#      http://www.gnu.org/copyleft/gpl.html.
+# 
+#   b) Version 1 of Perl's "Artistic License".  You should have received
+#      a copy of the Artistic License with this package, in the file
+#      named "ARTISTIC".  The license is also available at
+#      http://opensource.org/licenses/artistic-license.php.
+# 
+# This work is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+# 
+# CONTRIBUTION SUBMISSION POLICY:
+# 
+# (The following paragraph is not intended to limit the rights granted
+# to you to modify and distribute this software under the terms of the
+# GNU General Public License and is only of importance to you if you
+# choose to contribute your changes and enhancements to the community
+# by submitting them to Best Practical Solutions, LLC.)
+# 
+# By intentionally submitting any modifications, corrections or
+# derivatives to this work, or any other work intended for use with SVK,
+# to Best Practical Solutions, LLC, you confirm that you are the
+# copyright holder for those contributions and you grant Best Practical
+# Solutions, LLC a nonexclusive, worldwide, irrevocable, royalty-free,
+# perpetual, license to use, copy, create derivative works based on
+# those contributions, and sublicense and distribute those contributions
+# and any derivatives thereof.
+# 
+# END BPS TAGGED BLOCK }}}
+This is the README file for SVK, a decentralized version control
+system.
+
+The latest version could be found at
+
+    http://svn.bestpractical.com/svk/trunk
+
+You need Module::Install if you are not installing from release tarballs.
+
+* About
+
+While Subversion aims to take over the CVS user base, SVK attempts
+to take over the others -- including people who are already using
+other SCM systems, and people who had not started using SCM.
+
+SVK is written in Perl, using Subversion's underlying filesystem
+but provides additional features:
+
+ * Offline operations like "checkin", "log", "merge".
+ * Distributed branches.
+ * Lightweight checkout copy management (no ".svn" directories).
+ * Advanced merge algorithms, like "star-merge" and "cherry picking".
+
+For more information, please visit the web site at http://svk.bestpractical.com/.
+
+* Installation
+
+To use SVK, you need Subversion version 1.0.4 or higher, compiled with
+Perl bindings support.
+
+SVK uses the standard perl module install process:
+
+% perl Makefile.PL
+% make
+# make install
+
+* Usage
+
+You may want to start with the SVK tutorial, available on the web site.

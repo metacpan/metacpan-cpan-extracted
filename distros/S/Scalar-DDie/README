@@ -1,0 +1,21 @@
+NAME
+    Scalar::DDie - Defined or die.
+
+SYNOPSIS
+        use Scalar::DDie;
+
+        say ddie($var);
+
+DESCRIPTION
+    Scalar::DDie checks the scalar value. If the value is not defined then
+    it throw exception. Just return value otherwise.
+
+AUTHOR
+    Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>
+
+LICENSE
+    Copyright (C) Tokuhiro Matsuno
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

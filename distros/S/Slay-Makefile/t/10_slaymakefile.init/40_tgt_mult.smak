@@ -1,0 +1,10 @@
+include common.smakh
+
+default:   depend1 depend2 depend3
+	{ trace(@_) }
+
+depend1 depend2 depend3:
+	{
+	    my ($maker, $target, $deps, $matches) = @_;
+	    push @OUTPUT, "Multiple rule for building $target\n";
+	}

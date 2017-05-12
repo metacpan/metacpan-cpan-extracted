@@ -1,0 +1,29 @@
+Revision history for Perl extension Sendmail::Milter.
+
+0.18  Tue Oct  9 21:38:09 2001
+	- Patches to properly link with sendmail 8.12.1. Fixed
+	  auto_setconn to support abbreviated T= syntax. Thanks to
+	  Derek J. Balling of Yahoo, Inc.
+	- Updates to documentation to reflect sendmail 8.12.1.
+0.17  Sat Jul 29 09:55:02 2000
+	- Fixed build to properly link on Solaris. Thanks to 
+	  Claus Assmann of Sendmail, Inc.
+0.16  Mon Jul 24 05:37:59 2000
+	- Fixed bug in detecting no F= flags in auto_getconn().
+0.15  Wed Jul 19 19:15:49 2000
+	- Tested against sendmail 8.11.0 release.
+	- Updated README against released sendmail 8.11.0.
+0.14  Tue Jul 18 08:28:00 2000
+	- Now store code refs in globals to avoid sv_dup.
+	- Update README with SourceForge information.
+0.12  Thu Jul 13 11:16:17 2000
+	- Include sendmail's LICENSE file.
+0.11  Thu Jul  6 22:46:26 2000
+	- Now block for locking interpreters with condition variables.
+	- Successfully support code references and function names.
+	- Now support sendmail-8.11.0
+	- Fixed idiotic bug where all callbacks were going through
+	  one interpreter.
+
+0.10  Tue Jul  4 23:22:51 2000
+	- Never released, only for internal testing.

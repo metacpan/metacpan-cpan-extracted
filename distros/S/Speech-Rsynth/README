@@ -1,0 +1,28 @@
+    README for Speech::Rsynth version 0.01
+
+ABSTRACT
+    Speech::Rsynth is a Perl interface to the "librsynth" C library for
+    Klatt-style speech synthesis, based on Nick Ng-Simmons' "rsynth"
+    package.
+
+REQUIREMENTS
+    * librsynth version >= 2.1.4
+        Available from:
+        http://www.ling.uni-potsdam.de/~moocow/projects/spsyn
+
+INSTALLATION
+    To install this module type the following:
+
+       perl Makefile.PL
+       make
+       make test
+       make install
+
+COPYRIGHT
+    Copyright (c) 2001, Bryan Jurish. All rights reserved.
+
+    This package is free software. You may redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    marmosets, Bryan
+

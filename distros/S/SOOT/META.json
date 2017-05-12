@@ -1,0 +1,84 @@
+{
+   "abstract" : "Use ROOT from Perl",
+   "author" : [
+      "Steffen Mueller <smueller@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "SOOT",
+   "no_index" : {
+      "directory" : [
+         "buildtools",
+         "src",
+         "t",
+         "ROOT_XSP",
+         "xt",
+         "XS",
+         "inc",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : 0,
+            "ExtUtils::Constant" : 0,
+            "ExtUtils::ParseXS" : "3.02",
+            "ExtUtils::XSpp" : "0.10_02",
+            "File::Path" : 0,
+            "File::Spec" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::ROOT" : "v5.26.0.1",
+            "ExtUtils::CppGuess" : "0.01",
+            "Module::Build" : "0.3605"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "1.01",
+            "Data::Dumper" : 0,
+            "perl" : "5.008",
+            "strict" : 0,
+            "version" : 0,
+            "warnings" : 0
+         }
+      }
+   },
+   "provides" : {
+      "SOOT" : {
+         "file" : "lib/SOOT.pm",
+         "version" : "0.17"
+      },
+      "SOOT::API" : {
+         "file" : "lib/SOOT/API.pm",
+         "version" : 0
+      },
+      "SOOT::Struct" : {
+         "file" : "lib/SOOT/Struct.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=SOOT"
+      },
+      "license" : [
+         "http://www.opensource.org/licenses/gpl-2.0.php"
+      ],
+      "repository" : {
+         "url" : "git://github.com/tsee/SOOT.git"
+      }
+   },
+   "version" : "0.17"
+}

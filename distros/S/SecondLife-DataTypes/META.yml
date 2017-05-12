@@ -1,0 +1,21 @@
+---
+abstract: "Support for parsing, working with and printing Second Life's data types"
+author:
+  - 'Rebecca Turner <becca@referencethis.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300001, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: SecondLife-DataTypes
+requires:
+  Any::Moose: 0
+  Math::Quaternion: 0
+  Regexp::Common: 0
+  Sub::Exporter: 0
+resources: {}
+version: 0.900

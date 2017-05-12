@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Sub/DeferredPartial.pm
+lib/Sub/DeferredPartial/Attributes.pm
+lib/Sub/DeferredPartial/Op/Binary.pm
+lib/Sub/DeferredPartial/Op/Nullary.pm
+lib/Sub/DeferredPartial/Op/Unary.pm
+t/00use.t
+t/10misc.t

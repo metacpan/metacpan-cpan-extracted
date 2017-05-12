@@ -1,0 +1,21 @@
+set ColumnWidth true
+configure list components show SV_NAME(31) , CC_ALIAS(31) , CC_NAME(76) , CT_ALIAS(31) , CG_ALIAS(31) , CC_RUNMODE(31) , CP_DISP_RUN_STATE(61) , CP_STARTMODE(16), CP_NUM_RUN_TASKS(16) , CP_MAX_TASKS(12) , CP_ACTV_MTS_PROCS(17) , CP_MAX_MTS_PROCS(16) , CP_START_TIME(21) , CP_END_TIME(21) , CP_STATUS(251) , CC_INCARN_NO(23) , CC_DESC_TEXT(251)
+configure list tasks show SV_NAME(30), CC_ALIAS(30), TK_TASKID(11), TK_PID(11), TK_DISP_RUNSTATE(61)
+configure list comp def show CC_NAME(76), CT_NAME(76), CC_RUNMODE(31), CC_ALIAS(31), CC_DISP_ENABLE_ST(61), CC_DESC_TEXT(115), CG_NAME(76), CG_ALIAS(31), CC_INCARN_NO(23)
+configure list sessions show SV_NAME(31),CC_ALIAS(31),CG_ALIAS(31),TK_TASKID(11),TK_PID(11),TK_DISP_RUNSTATE(61),TK_IDLE_STATE(31),TK_PING_TIME(13),TK_HUNG_STATE(31),DB_SESSION_ID(76),OM_LOGIN(76),OM_BUSSVC(76),OM_VIEW(76),OM_APPLET(76),OM_BUSCOMP(76)
+configure list params show PA_ALIAS(76), PA_VALUE(256), PA_DATATYPE(31), PA_SCOPE(31), PA_SUBSYSTEM(31), PA_SETLEVEL(31), PA_DISP_SETLEVEL(61), PA_EFF_NEXT_TASK(16), PA_EFF_CMP_RSTRT(16), PA_EFF_SRVR_RSTRT(17), PA_REQ_COMP_RCFG(16), PA_NAME(76)
+configure list server show SBLSRVR_NAME(31), SBLSRVR_GROUP_NAME(46),HOST_NAME(31),INSTALL_DIR(256),SBLMGR_PID(16),SV_DISP_STATE(61),SBLSRVR_STATE(31),START_TIME(21),END_TIME(21),SBLSRVR_STATUS(101), SV_SRVRID(9)
+save preferences
+load preferences
+list comp
+list comp types
+list params
+list params for component SRProc
+list comp def
+list comp def SRProc
+list tasks
+list tasks for component SRProc
+list servers
+list sessions
+list active sessions
+list hung sessions

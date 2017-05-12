@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/String/Alignment.pm
+t/00-load.t
+t/01-global_align.t
+t/02-local_align.t
+t/03-align_strategy.t

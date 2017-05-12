@@ -1,0 +1,51 @@
+SIOC
+
+This Perl class distribution implements the SIOC ontology, enabling community
+platforms like weblogs or bulletin boards to export their information in a
+machine-readable format.
+
+The SIOC (Semantically-Interlinked Online Communities) Core Ontology provides
+the main concepts and properties required to describe information from online
+communities (e.g., message boards, wikis, weblogs, etc.) on the Semantic Web.
+
+This distribution implements the various SIOC subclasses like SIOC::Site,
+SIOC::User, SIOC::Forum or SIOC::Post. It also contains an exporter class
+(SIOC::Exporter) that Perl-based community software can use to generate a
+semantic RDF representation of its data.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc SIOC
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/SIOC
+
+    BerliOS bug tracker:
+        http://developer.berlios.de/mantis/set_project.php?project_id=9232
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/SIOC
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/SIOC
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Jochen Lillich
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

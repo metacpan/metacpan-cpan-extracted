@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+SQL/SqlObject.pm
+SQL/SqlObject/Config.pm
+SQL/SqlObject/ODBC.pm
+SQL/SqlObject/Pg.pm
+t/01_sqlobject.t
+t/02_odbc.t
+t/03_pg.t

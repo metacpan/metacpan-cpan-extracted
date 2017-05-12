@@ -1,0 +1,216 @@
+NAME
+    SMS::Send::KR::APIStore - An SMS::Send driver for the apistore.co.kr SMS
+    service
+
+VERSION
+    version 0.003
+
+SYNOPSIS
+        use SMS::Send;
+
+        # create the sender object
+        my $sender = SMS::Send->new('KR::APIStore',
+            _id            => 'keedi',
+            _api_store_key => 'XXXXXXXX',
+            _from          => '01025116893',
+        );
+
+        # send a message
+        my $sent = $sender->send_sms(
+            text  => 'You message may use up to 80 chars and must be utf8',
+            to    => '01012345678',
+        );
+
+        unless ( $sent->{success} ) {
+            warn "failed to send sms: $sent->{reason}\n";
+
+            # if you want to know detail more, check $sent->{detail}
+            use Data::Dumper;
+            warn Dumper $sent->{detail};
+        }
+
+        # Of course you can send LMS
+        my $sender = SMS::Send->new('KR::APIStore',
+            _id            => 'keedi',
+            _api_store_key => 'XXXXXXXX',
+            _type          => 'lms',
+            _from          => '01025116893',
+        );
+
+        # You can override _from or _type
+
+        #
+        # send a message
+        #
+        my $sent = $sender->send_sms(
+            text     => 'You LMS message may use up to 2000 chars and must be utf8',
+            to       => '01025116893',
+            _from    => '02114',             # you can override $self->_from
+            _type    => 'LMS',               # you can override $self->_type
+            _subject => 'This is a subject', # subject is optional & up to 40 chars
+        );
+
+        #
+        # check the result
+        #
+        my $result = $sender->report("20130314163439459");
+        printf "success:     %s\n", $result->{success} ? 'success' : 'fail';
+        printf "reason:      %s\n", $result->{reason};
+        printf "call_status: %s\n", $result->{call_status};
+        printf "dest_phone:  %s\n", $result->{dest_phone};
+        printf "report_time: %s\n", $result->{report_time};
+        printf "cmid:        %s\n", $result->{cmid};
+        printf "umid:        %s\n", $result->{umid};
+
+        # you can use cmid of the send_sms() result
+        my $sent = $sender->send_sms( ... );
+        my $result = $sender->report( $sent->{detail}{cmid} );
+
+        # or you can use the send_sms() result itself
+        my $sent = $sender->send_sms( ... );
+        my $result = $sender->report($sent);
+
+        #
+        # set caller id
+        #
+
+        # set caller id only
+        my $ret = $sender->cid( "0XXXXXXXXX" );
+
+        # set caller id and its description
+        my $ret = $sender->cid( "0XXXXXXXXX", "Office #201" );
+
+        #
+        # get caller id list
+        #
+        my $ret = $sender->cid;
+        if ( $ret->{success} ) {
+            my $cids = $ret->{number_list};
+            my $idx = 0;
+            for my $cid (@$cids) {
+                say "$idx:";
+                say "     client_id: " . $cid->{client_id};
+                say "       comment: " . ( $cid->{comment} || q{} );
+                say "    sendnumber: " . $cid->{sendnumber};
+                ++$idx;
+            }
+        }
+        else {
+            say "failed to get cid info: $ret->{reason}"
+        }
+
+DESCRIPTION
+    SMS::Send driver for sending SMS messages with the APIStore SMS service
+    <http://www.apistore.co.kr/api/apiView.do?service_seq=151>. Current
+    version of APIStore SMS service DOES NOT support HTTPS, so you have to
+    use this module at your own risk.
+
+ATTRIBUTES
+  _url
+    DO NOT change this value except for testing purpose. Default is
+    "http://api.openapi.io/ppurio/1/message".
+
+  _agent
+    The agent value is sent as the "User-Agent" header in the HTTP requests.
+    Default is "SMS-Send-KR-APIStore/#.###".
+
+  _timeout
+    HTTP request timeout seconds. Default is 3.
+
+  _id
+    Required. APIStore API id for REST API.
+
+  _api_store_key
+    Required. APIStore API key for REST API.
+
+  _from
+    Required. Source number to send sms.
+
+  _type
+    Type of sms. Currently "SMS" and "LMS" are supported. Default is "SMS".
+
+  _delay
+    Delay second between sending sms. Default is 0.
+
+METHODS
+  new
+    This constructor should not be called directly. See SMS::Send for
+    details.
+
+    Available parameters are:
+
+    *   _url
+
+    *   _agent
+
+    *   _timeout
+
+    *   _from
+
+    *   _type
+
+    *   _delay
+
+    *   _id
+
+    *   _api_store_key
+
+  send_sms
+    This method should not be called directly. See SMS::Send for details.
+
+    Available parameters are:
+
+    *   text
+
+    *   to
+
+    *   _from
+
+    *   _type
+
+    *   _delay
+
+    *   _subject
+
+    *   _epoch
+
+  report
+    This method checks the result of the request.
+
+  cid
+    This method gets/sets the caller id information.
+
+SEE ALSO
+    *   SMS::Send
+
+    *   SMS::Send::Driver
+
+    *   APIStore REST API
+        <http://www.apistore.co.kr/api/apiView.do?service_seq=151>
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/keedi/SMS-Send-KR-APIStore/issues>. You will be
+    notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/keedi/SMS-Send-KR-APIStore>
+
+      git clone https://github.com/keedi/SMS-Send-KR-APIStore.git
+
+AUTHOR
+    김도형 - Keedi Kim <keedi@cpan.org>
+
+CONTRIBUTOR
+    Hyungsuk Hong <aanoaa@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by Keedi Kim.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

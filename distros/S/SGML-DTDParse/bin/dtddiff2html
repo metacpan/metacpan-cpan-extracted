@@ -1,0 +1,158 @@
+#!/usr/bin/perl
+# $Id: dtddiff2html,v 2.2 2005/07/16 03:22:57 ehood Exp $
+# Author(s): Earl Hood, <earl@earlhood.com>
+# POD at end of file.
+
+use Getopt::Long;
+use SGML::DTDParse;
+
+MAIN: {
+  my %opts = ();
+  GetOptions(\%opts,
+    @SGML::DTDParse::CommonOptions
+  ) || SGML::DTDParse::usage(-verbose => 0, -exitval => 1);
+  SGML::DTDParse::process_common_options(\%opts);
+
+  print <<EOT;
+<html>
+<head>
+<title>Diff</title>
+<style type="text/css">
+  body {
+    background-color: #DDDDDD;
+  }
+  pre.contextDiff {
+    background: #EEEEEE;
+    border-color: black;
+    border-style: solid;
+    border-width: thin;
+    padding: 0.25em;
+  }
+  .diffDel {
+    color: red;
+  }
+  .diffAdd {
+    color: green;
+  }
+  .diffChng {
+    color: blue;
+  }
+</style>
+</head>
+<body>
+<pre class="contextDiff">
+EOT
+
+  my $in_chng = 0;
+  while (<>) {
+    chomp;
+    if (/^[!]/) {
+      if (/::=/) {
+        print '<span class="diffChng">', entify($_), "\n";
+        $in_chng = 1;
+        next;
+      } else {
+        print '<span class="diffChng">', entify($_), "</span>\n";
+        next;
+      }
+    }
+
+    if (/^(---|[*+\-])/) {
+      if ($in_chng) {
+        print "</span>";
+        $in_chng = 0;
+      }
+      elsif ($1 eq '---' || $1 eq '*') {
+        print '<b>', entify($_), "</b>\n";
+      }
+      elsif ($1 eq '+') {
+        print '<span class="diffAdd">', entify($_), "</span>\n";
+      }
+      elsif ($1 eq '-') {
+        print '<span class="diffDel">', entify($_), "</span>\n";
+      }
+      next;
+    }
+
+    if ($in_chng && !/\S/) {
+      print "</span>";
+      $in_chng = 0;
+    }
+
+    print entify($_), "\n";
+  }
+
+  print qq{</pre>\n};
+}
+
+##############################################################################
+
+sub entify {
+  my $txt = shift;
+  $txt =~ s/&/&amp;/g;
+  $txt =~ s/</&lt;/g;
+  $txt =~ s/>/&gt;/g;
+  $txt;
+}
+
+##############################################################################
+
+__END__
+
+=head1 NAME
+
+dtddiff2html - Convert DTD difference to HTML.
+
+=head1 SYNOPSIS
+
+ dtddiff parsed-dtd1.xml parsed-dtd2.xml > dtd-diff.txt
+ dtddiff2html dtd-diff.txt > dtd-diff.html
+
+ dtddiff parsed-dtd1.xml parsed-dtd2.xml | dtddiff2html > dtd-diff.html
+
+=head1 DESCRIPTION
+
+B<dtddiff2html> converts the diff-style output of B<dtddiff> into
+HTML.  The HTML created basically provides color-highlighting
+of the diff output.
+
+=head1 OPTIONS
+
+=over 4
+
+=item --version
+
+Print version and synopsis.
+
+=item --help
+
+Print synopsis and options available.
+
+=item --man
+
+Print manual page.
+
+=back
+
+=head1 SEE ALSO
+
+L<dtddiff|dtddiff>
+
+See L<SGML::DTDParse|SGML::DTDParse> for an overview of the DTDParse package.
+
+=head1 PREREQUISITES
+
+B<Getopt::Long>
+
+=head1 AVAILABILITY
+
+E<lt>I<http://dtdparse.sourceforge.net/>E<gt>
+
+=head1 AUTHORS
+
+Earl Hood, <earl@earlhood.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+See L<SGML::DTDParse|SGML::DTDParse> for copyright and license information.
+

@@ -1,0 +1,21 @@
+#!/usr/bin/perl -w
+use strict;
+
+# pick a parser, in order of preference
+use SVG::Parser;
+use SVG::Parser qw(
+    SAX=Foo::SAXParser
+    Expat=Foo::ExpatParser
+    SAX=XML::LibXML::SAX::Parser
+    SVG::Parser::ExpatParser=Bar::Parser
+    SVG::Parser::Expat
+    SVG::Parser::SAXParser
+);
+
+die "Usage: $0 <file>\n" unless @ARGV;
+
+my $parser=new SVG::Parser(-debug=>1,'--indent'=>'  ');
+
+my $svg=$parser->parsefile($ARGV[0]);
+
+print $svg->xmlify(-indent=>'    ');

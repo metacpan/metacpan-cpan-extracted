@@ -1,0 +1,9 @@
+FEATURES:
+* (foo|bar) should be doable.
+* Generally make some attempt to implement everything documented in
+  perlre(1), or at least carp() that we aren't doing the right thing.
+* Allow . to mean binary data in regular expressions (maybe with a flag
+  to new()).
+* Implement a way to over-ride the random function using a custom one.
+    - This will allow platform-independent random number generators
+    as well as Linux’s /dev/urandom / etc.

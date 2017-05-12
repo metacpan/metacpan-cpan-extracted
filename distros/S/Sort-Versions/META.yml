@@ -1,0 +1,26 @@
+---
+abstract: 'a perl 5 module for sorting of revision-like numbers'
+author:
+  - 'Kenneth J. Albanowski <kjahds@kjahds.com>'
+  - 'Ed Avis <ed@membled.com>'
+  - 'Matt Johnson <mwj99@doc.ic.ac.uk>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Sort-Versions
+requires:
+  Exporter: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/neilb/Sort-Versions
+  repository: https://github.com/neilb/Sort-Versions.git
+version: '1.62'

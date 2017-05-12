@@ -1,0 +1,29 @@
+---
+abstract: 'A Collection of String Validators.'
+author:
+  - 'John Karr <brainbuz@brainbuz.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.131490'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: String-Validator
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Email::Address: 1.893
+  Email::Valid: 0.185
+  Regexp::Common: 2011121001
+  String::Validator::Common: 0.97
+  String::Validator::Email: 0.98
+  String::Validator::Password: 0.94
+  String::Validator::Phone::NANP: 0.96
+  Test::More: 0
+version: 0.97

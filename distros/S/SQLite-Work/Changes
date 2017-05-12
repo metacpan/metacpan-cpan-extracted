@@ -1,0 +1,50 @@
+Revision History for SQLite-Work
+================================
+
+v0.1601 2016-01-01
+------------------
+
+* 2016-01-01 13:04:00 +1100
+  Fixed GithubMeta
+* 2016-01-01 13:01:34 +1100
+  tweak META; version bump
+* 2015-05-05 11:21:43 +1000
+  Dist::Zilla fix
+
+v0.16 2014-10-20
+----------------
+
+* 2014-10-20 19:55:09 +1100
+  fixing problem with prereqs
+
+v0.15 2014-10-19
+----------------
+
+* 2014-10-19 06:35:31 +1100
+  formatting for VERSION
+* 2014-10-19 06:34:32 +1100
+  formatting for VERSION
+* 2014-10-19 06:33:08 +1100
+  version bump
+* 2014-08-26 16:56:55 +1000
+  tweaking table formatting
+
+v0.14 2014-01-07
+----------------
+
+* 2014-01-07 23:17:42 +1100
+  version bump
+* 2013-10-31 17:00:53 +1100
+  enable quotes in parameters
+* 2013-10-31 14:56:04 +1100
+  Merge branch 'develop' of https://github.com/rubykat/SQLite-Work into develop
+* 2013-10-31 14:55:30 +1100
+  passing args to work better with subclasses
+* 2013-09-14 11:49:24 +1000
+  added [ReportVersions::Tiny]
+* 2013-07-27 04:40:53 +1000
+  Fixing an inconsistancy with the behaviour of groups.
+
+====================================
+End of changes in the last 1000 days
+====================================

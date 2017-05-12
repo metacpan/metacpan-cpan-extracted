@@ -1,0 +1,73 @@
+<p>
+  <a href="<% $page->uri() %>"><% loc('Back to current revision') %></a>
+</p>
+
+<table class="revision-diff">
+  <thead>
+    <tr>
+      <th class="rev1">
+        <% loc( 'Revision %1', $rev1->revision_number() ) %>
+      </th>
+      </th>
+      <th class="marker"></th>
+      <th class="rev2">
+        <% loc( 'Revision %1', $rev2->revision_number() ) %>
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="attribution">
+      <td>
+        <& /lib/user-image.mas, user => $rev1->user() &>
+        <% loc( 'Created by <a href="%html(%1)">%html(%2)</a> %on_datetime(%3).',
+                $page->wiki()->uri_for_member( $rev1->user() ),
+                $rev1->user()->best_name(),
+                $c->user()->set_time_zone_for_dt( $rev1->creation_datetime() ) ) | n %>
+      </td>
+      <td></td>
+      <td>
+        <& /lib/user-image.mas, user => $rev2->user() &>
+        <% loc( 'Created by <a href="%html(%1)">%html(%2)</a> %on_datetime(%3).',
+                $page->wiki()->uri_for_member( $rev2->user() ),
+                $rev2->user()->best_name(),
+                $c->user()->set_time_zone_for_dt( $rev2->creation_datetime() ) ) | n %>
+      </td>
+    </tr>
+  </tbody>
+
+% for my $diff (@diff) {
+  <tbody>
+    <tr class="<% $diff->[0] eq 'c' ? 'diff-changed' : q{} %>">
+      <td class="<% $diff->[0] eq q{-} ? 'diff-removed' : q{} %>">
+        <% $formatter->wiki_to_html( $diff->[1] ) | n %>
+      </td>
+      <td class="marker">
+% if ( $diff->[0] ne 'u' ) {
+        <span title="<% $diff->[0] eq '-' ? loc('text was removed') : $diff->[0] eq '+' ? loc('text was added') : loc('text was changed') %>"><% $diff->[0] eq 'c' ? '*' : $diff->[0] %></span>
+% }
+      </td>
+      <td class="<% $diff->[0] eq q{+} ? 'diff-added' : q{} %>">
+        <% $formatter->wiki_to_html( $diff->[2] ) | n %>
+      </td>
+    </tr>
+  </tbody>
+% }
+
+</table>
+
+<%args>
+$page
+$rev1
+$rev2
+@diff
+$formatter
+</%args>
+
+<%method title>
+<% $page->title() %> - <% loc( 'Revision %1 versus %2', $rev1->revision_number(), $rev2->revision_number() ) %>
+<%args>
+$page
+$rev1
+$rev2
+</%args>
+</%method>

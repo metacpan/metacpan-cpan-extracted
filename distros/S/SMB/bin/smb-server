@@ -1,0 +1,56 @@
+#!/usr/bin/perl
+
+# Copyright (C) 2014 Mikhael Goikhman <migo@freeshell.org>
+
+use strict;
+use warnings;
+
+use bytes;
+use integer;
+
+use Getopt::Long qw(:config no_ignore_case bundling);
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use SMB::Server;
+
+my $port = 445;
+my $fifo_filename = undef;
+my $quiet = 0;
+my $verbose = 0;
+
+sub show_usage (;$) {
+	my $is_error = shift || 0;
+	my $out = $is_error ? \*STDERR : \*STDOUT;
+	my $usage = qq{
+		Usage: $0 [OPTIONS]
+		Start a simple SMB server
+
+		Options:
+			-h --help            show this usage
+			-p --port PORT       use port different from the default $port
+			-f --fifo FILENAME   use named file (fifo) file to listen on instead
+			-q --quiet           do not show any messages
+			-v --verbose         show more debug messages (multiple)
+	};
+	$usage =~ s/^\n//; $usage =~ s/^\t\t?//mg;
+	print $out $usage;
+	exit $is_error;
+}
+
+GetOptions(
+	'h|help'     => sub { show_usage(0) },
+	'p|port=i'   => \$port,
+	'f|fifo=s'   => \$fifo_filename,
+	'q|quiet'    => \$quiet,
+	'v|verbose+' => \$verbose,
+) or show_usage(1);
+
+my $server = SMB::Server->new(
+	port          => $port,
+	fifo_filename => $fifo_filename,
+	quiet         => $quiet,
+	verbose       => $verbose,
+);
+
+$server->run;

@@ -1,0 +1,13 @@
+# Add a contact, while sending a completely empty 'rem' element
+template: update-domain.tt
+
+vars:
+  domain: 10zg.co.te
+  admin: registrant-001
+  empty_rem: 1
+
+output_assertions:
+  attr_is:
+    - [ '//epp:result', 'code', 2306, 'SRS: Check for correct result code' ]
+
+

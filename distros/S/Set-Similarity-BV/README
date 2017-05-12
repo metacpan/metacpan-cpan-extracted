@@ -1,0 +1,130 @@
+NAME
+
+    Set::Similarity::BV - similarity measures for sets using fast bit
+    vectors (BV)
+
+SYNOPSIS
+
+     use Set::Similarity::BV::Dice;
+    
+     # object method
+     my $dice = Set::Similarity::BV::Dice->new;
+     my $similarity = $dice->similarity('af09ff','9c09cc');
+    
+     # class method
+     my $dice = 'Set::Similarity::BV::Dice';
+     my $similarity = $dice->similarity('af09ff','9c09cc');
+
+DESCRIPTION
+
+    This is the base class including mainly helper and convenience methods.
+
+    Use one of the child classes:
+
+    Set::Similarity::BV::Cosine
+
+    Set::Similarity::BV::Dice
+
+    Set::Similarity::BV::Jaccard
+
+    Set::Similarity::BV::Overlap
+
+ Overlap coefficient
+
+    ( A intersect B ) / min(A,B)
+
+ Jaccard Index
+
+    The Jaccard coefficient measures similarity between sample sets, and is
+    defined as the size of the intersection divided by the size of the
+    union of the sample sets
+
+    ( A intersect B ) / (A union B)
+
+    The Tanimoto coefficient is the ratio of the number of features common
+    to both sets to the total number of features, i.e.
+
+    ( A intersect B ) / ( A + B - ( A intersect B ) ) # the same as Jaccard
+
+    The range is 0 to 1 inclusive.
+
+ Dice coefficient
+
+    The Dice coefficient is the number of features in common to both sets
+    relative to the average size of the total number of features present,
+    i.e.
+
+    ( A intersect B ) / 0.5 ( A + B ) # the same as sorensen
+
+    The weighting factor comes from the 0.5 in the denominator. The range
+    is 0 to 1.
+
+METHODS
+
+    All methods can be used as class or object methods.
+
+ new
+
+      $object = Set::Similarity::BV->new();
+
+ similarity
+
+      my $similarity = $object->similarity($hex1,$hex2);
+
+    $hex is a string of hexadecimal characters.
+
+ from_integers
+
+      my $similarity = $object->from_integers($AoI1,$AoI2);
+
+    Croaks if called directly. This method should be implemented in a child
+    module.
+
+ intersection
+
+      my $intersection_size = $object->intersection($AoI1,$AoI2);
+
+    $AoI is an array reference of integers. Returns the length of the
+    intersection.
+
+ combined_length
+
+      my $set_size_sum = $object->combined_length($AoI1,$AoI2);
+
+    $AoI is an array reference of integers.
+
+ min
+
+      my $min = $object->min($int1,$int2);
+
+ bits
+
+      my $bits = $object->bits($int);
+
+    Returns the number of bits set in integer.
+
+SEE ALSO
+
+    Set::Similarity::BV::Cosine
+
+    Set::Similarity::BV::Dice
+
+    Set::Similarity::BV::Jaccard
+
+    Set::Similarity::BV::Overlap
+
+SOURCE REPOSITORY
+
+    http://github.com/wollmers/Set-Similarity-BV
+
+AUTHOR
+
+    Helmut Wollmersdorfer, <helmut.wollmersdorfer@gmail.com>
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2016 by Helmut Wollmersdorfer
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

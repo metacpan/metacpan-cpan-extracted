@@ -1,0 +1,25 @@
+Revision history for Perl module Statistics::RankOrder
+
+0.13      2013-09-23 17:40:59 America/New_York
+    
+    [INCOMPATIBLE CHANGES]
+
+    - Now uses strict and warnings; Perl 5.006 minimum
+
+    [INTERNAL]
+
+    - Now uses Class::Tiny as OO system
+
+    - Updated distribution to Dist-Zilla management
+
+0.12 Tue Feb  7 00:26:16 EST 2006
+    - remove Test::Exception dependency
+    - changed syntax to be backwards compatible to 5.004
+    - added optional pod/pod-cover tests (skipped by default)
+
+0.11 Mon Aug  1 10:37:02 EDT 2005
+    - build_requires moved to requires to workaround CPANPLUS bug
+
+0.10 Thu Jul  7 00:36:56 EDT 2005
+	- lowest-mean and trimmed-lowest-mean algorithms
+    - median-rank and best-of-majority algorithms

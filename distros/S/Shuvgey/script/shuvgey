@@ -1,0 +1,8 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Plack::Runner;
+
+my $runner = Plack::Runner->new( server => 'Shuvgey' );
+$runner->parse_options(@ARGV);
+$runner->run;

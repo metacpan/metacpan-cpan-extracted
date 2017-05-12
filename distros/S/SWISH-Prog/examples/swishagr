@@ -1,0 +1,50 @@
+#!/usr/bin/perl
+#
+# example of simple SWISH::Prog indexer
+
+use strict;
+use warnings;
+use Carp;
+use SWISH::Prog;
+use Getopt::Long;
+
+my $usage = "$0 [-c config] [-d] [-v] [-w] [-a fs|mail|spider] target";
+
+my $Opt = {
+    verbose    => 0,
+    debug      => 0,
+    config     => '',    #SWISH::Prog::Config->new
+    warnings   => 0,
+    aggregator => 'fs'
+};
+
+my %allopts = (
+    'config=s'   => 'config file',
+    'verbose'    => 'be verbose',
+    debug        => 'debugging',
+    warnings     => 'print libxml2 warnings',
+    'aggregator=s' => 'aggregator type',
+);
+
+GetOptions( $Opt, keys %allopts ) or croak $usage;
+croak $usage unless @ARGV;
+
+my $prog = SWISH::Prog->new( %$Opt, aggregator => $Opt->{aggregator} );
+$prog->run(@ARGV);
+exit;
+
+=pod
+
+=head1 AUTHOR
+
+Peter Karman, E<lt>perl@peknet.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2008 by Peter Karman
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+=cut
+

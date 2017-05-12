@@ -1,0 +1,483 @@
+#!/usr/bin/perl -w
+# See copyright, etc in below POD section.
+######################################################################
+
+require 5.005;
+use Getopt::Long;
+use IO::File;
+use Pod::Usage;
+use strict;
+
+use FindBin qw($RealBin);
+use lib "$RealBin/lib";
+use lib "$RealBin/blib/lib";
+use lib "$RealBin/blib/arch";
+use lib "$RealBin/..";
+use lib "$RealBin/../Verilog/blib/lib";
+use lib "$RealBin/../Verilog/blib/arch";
+use Verilog::Getopt;
+use SystemC::Netlist;
+
+use vars qw ($Debug $VERSION $opt_makedeps $Opt_Lint $Exit_Status %Error_Unlink);
+
+#======================================================================
+
+$Opt_Lint = 1;
+
+$VERSION = '1.344';
+
+#======================================================================
+# main
+
+autoflush STDOUT 1;
+autoflush STDERR 1;
+
+$Debug = 0;
+my $opt_preproc = 0;
+my $opt_inline;
+my $opt_autos = 1;
+my @sp_files_lib;
+my @sp_files_nolib;
+my @sp_libs;
+my $opt_libcell = 0;
+my $opt_libfile;
+my $opt_libfile_libcells;
+my $opt_lint = 1;
+my $opt_ncsc;
+my $opt_tree;
+my $opt_trace_duplicates = 0;
+my $opt_write_verilog;
+my $opt_hier_only;
+my $opt_mdir = "";
+
+my $opt = new Verilog::Getopt(gcc_style=>1, vcs_style=>1);
+$opt->libext([".sp"]);
+@ARGV = $opt->parameter(@ARGV);	# Strip -D and -U flags
+if (! GetOptions (
+	  "help"	=> \&usage,
+	  "verbose"	=> \&verbose,
+	  "debug"	=> \&debug,
+	  "version"	=> sub { print "Version $VERSION\n"; exit(0); },
+	  "M:s"		=> \$opt_makedeps,
+	  "MMD:s"	=> \$opt_makedeps,
+	  "Mdir=s"	=> \$opt_mdir,
+	  "autos!"	=> \$opt_autos,
+	  "hier-only!"	=> \$opt_hier_only,
+	  "inline!"	=> \$opt_inline,
+	  "libcell!"	=> \$opt_libcell,
+	  "libfile=s"	=> \$opt_libfile,
+	  "libfile-libcells!"	=> \$opt_libfile_libcells,
+	  "lint!"	=> \$opt_lint,
+	  "ncsc!"	=> \$opt_ncsc,
+	  "preproc!"	=> \$opt_preproc,
+	  "trace-duplicates!" => \$opt_trace_duplicates,
+	  "tree=s"	=> \$opt_tree,
+	  "write-verilog=s"   => \$opt_write_verilog,
+	  "<>"		=> \&parameter,
+    )) {
+    die "%Error: Bad usage, try 'sp_preproc --help'\n";
+}
+
+$opt_mdir .= "/" if $opt_mdir ne "" && $opt_mdir !~ m!/$!;
+
+($opt_hier_only && ($opt_preproc || $opt_inline)) && die "%Error: -hier_only can't be used w/ --preproc or --inline";
+
+# Compatibility hack so that verilator can just specify --tree and get
+# libfiles only if user has the latest sp_preproc.  Can be removed ~2003/08
+# by adding --libfile to verilated.mk.in
+if (!$opt_libfile && $opt_tree && $opt_tree=~/^(.*)\.sp_tree$/) {
+    $opt_libfile = "$1.sp_lib";
+}
+
+my $nl = new SystemC::Netlist (options=>$opt,
+			       link_read=>1,
+			       strip_autos=>1,
+			       ncsc => $opt_ncsc,
+			       link_read_nonfatal => !$opt_lint,
+			       lint_checking => $opt_lint,
+			       need_text=>($opt_preproc||$opt_inline),
+			       need_signals=>!$opt_hier_only,
+			       need_covergroup=>!$opt_hier_only,
+			       );
+
+foreach my $file (@sp_files_nolib) {
+    $nl->read_file (filename=>$file,
+		    is_libcell=>0,);
+}
+foreach my $file (@sp_files_lib) {
+    $nl->read_file (filename=>$file,
+		    is_libcell=>1,);
+}
+# read_cell_library doesn't create a mod/cell if it exists, thus should be after read_file
+foreach my $file (@sp_libs) {
+    $nl->read_cell_library(filename=>$file);
+}
+
+$nl->link();
+$nl->autos();
+tree_report($nl, $opt_tree) if ($opt_tree);
+write_verilog($nl, $opt_write_verilog) if $opt_write_verilog;
+$nl->write_cell_library(filename => $opt_libfile,
+			include_libcells => $opt_libfile_libcells) if $opt_libfile;
+$nl->lint() if $opt_lint;
+our_rulecheck($nl);
+$nl->dump() if $Debug;
+$nl->exit_if_error();
+
+ #use Data::Dumper; print Dumper (\%SystemC::Module::Modules);
+
+if ($opt_preproc) {
+    foreach my $fileref ($nl->files()) {
+	next if $fileref->is_libcell();
+	my $filename_h = $opt_mdir . $fileref->basename .".h";
+	my $filename_c = $opt_mdir . $fileref->basename .".cpp";
+	my $filename_slow_c = $opt_mdir . $fileref->basename ."__Slow.cpp";
+	$fileref->write( filename=> $filename_h,
+			 type=>'interface', expand_autos=>1,
+			 keep_timestamp=>1,);
+	$fileref->write( filename=> $filename_c,
+			 type=>'implementation', expand_autos=>1,
+			 keep_timestamp=>1,);
+	if ($fileref->has_slow) {
+	    $fileref->write( filename=> $filename_slow_c,
+			     type=>'slow', expand_autos=>1,
+			     keep_timestamp=>1,);
+	}
+    }
+}
+if ($opt_inline) {
+    foreach my $fileref ($nl->files()) {
+	next if $fileref->is_libcell();
+	$fileref->write( filename=>$fileref->name(),
+			 expand_autos=>$opt_autos,
+			 keep_timestamp=>1,);
+    }
+}
+if ($opt_makedeps) {
+    my $filename = ($opt_makedeps ne "" ? $opt_makedeps
+		    : $opt_mdir."sppreproc.d");
+    $nl->dependency_write($filename);
+}
+
+$nl->exit_if_error();
+
+#----------------------------------------------------------------------
+
+sub usage {
+    print "Version $VERSION\n";
+    pod2usage(-verbose=>2, -exitval=>2, -output=>\*STDOUT, -noperldoc=>1);
+    exit (1);
+}
+
+sub verbose {
+    $SystemC::Netlist::Verbose = 1;
+}
+
+sub debug {
+    verbose();
+    $SystemC::Netlist::Debug = 1;
+    $Verilog::Netlist::Debug = 1;
+    $Debug = 1;
+}
+
+sub parameter {
+    my $param = shift;
+    if ($param =~ /\.(cc|cpp|h|hh|sp)$/) {
+	if ($opt_libcell) {
+	    push @sp_files_lib, $param;
+	} else {
+	    push @sp_files_nolib, $param;
+	}
+    } elsif ($param =~ /\.(sp_lib)$/) {
+	push @sp_libs, $param;
+    } elsif ($param =~ /sp_preproc$/) {
+	# Ignore ourself in case user passed all dependencies including this program
+    } else {
+	die "%Error: Unknown parameter: $param\n";
+    }
+}
+
+#######################################################################
+
+sub our_rulecheck {
+    my $netlist = shift;
+    foreach my $modref ($netlist->modules) {
+	foreach my $sigref ($modref->nets) {
+	    if (!$sigref->comment || $sigref->comment eq "") {
+		#$sigref->warn ($sigref, "Missing documentation on ",$sigref->name,"\n");
+	    }
+	}
+	foreach my $sigref ($modref->ports) {
+	    if (!$sigref->comment || $sigref->comment eq "") {
+		#$sigref->warn ($sigref, "Missing documentation on ",$sigref->name,"\n");
+	    }
+	}
+    }
+}
+
+#######################################################################
+
+#######################################################################
+#######################################################################
+# Level selection
+
+sub tree_report {
+    my $netlist = shift;
+    my $filename = shift;
+    mod_levels($netlist);
+    my $fh = IO::File->new(">$filename") or die "%Error: $! writing $filename\n";
+    foreach my $modref ($netlist->modules_sorted) {
+	if ($modref->userdata('level')==0
+	    && !$modref->is_libcell) {	# Not read by AUTOINOUT_MODULE
+	    tree_recurse($modref,$fh,{},"","",$modref->name);
+	    printf $fh "#\n";
+	}
+    }
+
+    printf $fh "#"x70,"\n";
+    printf $fh "#\n";
+    printf $fh "#Files:\n";
+    foreach my $fileref ($netlist->files_sorted) {
+	printf $fh "# %-50s\n", $fileref->name;
+	foreach my $uses ($fileref->uses_sorted) {
+	    printf $fh "#   use %-40s\n", $uses->{name};
+	}
+    }
+
+    $fh->close();
+}
+
+sub tree_recurse {
+    my $modref = shift;	# May be null if unnamed cell
+    my $fh = shift;
+    my $mods_printed = shift;
+    my $this_indent = shift;
+    my $next_indent = shift;
+    my $cellname = shift;
+
+    my $cmt = "";
+    if (!$modref) {
+	printf $fh "# %-50s %-50s %s\n",$this_indent."?", $cellname, $cmt."?";
+    } else {
+	$cmt = "[LIBCELL] " if $modref->is_libcell;
+	printf $fh "# %-50s %-50s %s\n",$this_indent.$modref->name, $cellname, $cmt.($modref->filename||"");
+	my @cells = ($modref->cells_sorted);
+	if ($#cells >= 0 && $mods_printed->{$modref->name}++) {
+	    printf $fh "# %-50s %-50s\n",$next_indent."\\-...", "(".$modref->name." already recursed above)";
+	} else {
+	    my $ncell = 0;
+	    foreach my $subcell (@cells) {
+		my $cell_this_indent = $next_indent."|-";
+		my $cell_next_indent = $next_indent."| ";
+		if ($ncell++ == $#cells) {
+		    $cell_this_indent = $next_indent."\\-";
+		    $cell_next_indent = $next_indent."  ";
+		}
+		tree_recurse($subcell->submod,$fh,$mods_printed,
+			     $cell_this_indent, $cell_next_indent,
+			     $cellname.".".$subcell->name);
+	    }
+	}
+    }
+}
+
+sub mod_levels {
+    my $netlist = shift;
+    foreach my $modref ($netlist->modules) {
+	$modref->userdata('level',0);
+    }
+    foreach my $modref ($netlist->modules_sorted) {
+	next if $modref->is_libcell;  # Don't start tracing at libraries, only
+	# enter them when cells under a non library module
+	mod_levels_recurse($modref,0);
+    }
+}
+
+sub mod_levels_recurse {
+    my $modref = shift;
+    my $level = shift;
+    if ($level>=($modref->userdata('level')||0)) {
+	$modref->userdata('level',$level);
+    }
+    if ($level>100) {
+	print "   In ".$modref->name."  $level\n";
+	if ($level>120) {
+	    $modref->error("Seems to have a cell that refers back to itself\n");
+	}
+    }
+    foreach my $subcell ($modref->cells_sorted) {
+	mod_levels_recurse($subcell->submod,$level+1) if $subcell->submod;
+    }
+}
+
+#######################################################################
+# Output formats
+
+sub write_verilog {
+    my $netlist = shift;
+    my $filename = shift;
+
+    mod_levels($netlist);
+    my $fh = IO::File->new(">$filename") or die "%Error: $! writing $filename\n";
+
+    # Write in top-down order to appease the program that reads this this file
+    foreach my $modref (sort {$b->userdata('level') <=> $a->userdata('level')}
+			$netlist->modules) {
+	printf $fh join("",$modref->verilog_text);
+	printf $fh "\n";
+    }
+
+    $fh->close();
+}
+
+#######################################################################
+__END__
+
+=pod
+
+=head1 NAME
+
+sp_preproc - SystemPerl Preprocessor
+
+=head1 SYNOPSIS
+
+  sp_preproc <file.sp>
+
+=head1 DESCRIPTION
+
+sp_preproc takes a .sp (systemperl) file and creates the SystemC header
+and C files.
+
+It is generally only executed from the standard build scripts.
+
+=head1 ARGUMENTS
+
+=over 4
+
+=item --help
+
+Displays this message and program version and exits.
+
+=item --hier-only
+
+Read only hierarchy information, ignore all signal information.  Useful for
+faster generation of sp_lib files.
+
+=item --inline
+
+Edit the existing source code "inline".  Similar to the Verilog-mode AUTOs.
+Use --inline --noautos to remove the expanded automatics.
+
+=item --libfile I<filename>
+
+Filename to write a list of sp_cells into, for later use as a --libcell to
+another sp_preproc run.
+
+=item --libfile-libcells
+
+Include library cells in the --libfile report.
+
+=item --libcell
+
+Files listed before --libcell will be preprocessed or inlined as
+appropriate.  Files after noexpand will only be used for resolving
+references, they will not be linked, linted, or otherwise checked.
+--nolibcell can be used to re-enable checking of subsequent files.
+
+=item --M I<filename>
+
+=item --MMD I<filename>
+
+Write dependencies in Makefile format to the specified filename.
+
+=item --Mdir I<dirname>
+
+Write preprocessor outputs to the specified directory instead of the
+current directory.
+
+=item --ncsc
+
+Create output files compatible with Cadence NC-SystemC.
+
+=item --nolint
+
+Disable lint style error checks, such as required to run doxygen on the
+SystemPerl output.
+
+=item --preproc
+
+Preprocess the code, writing to separate header and cpp files.
+
+=item --trace-duplicates
+
+Include code to trace submodule signals connected directly to a parent
+signal, generally for debugging interconnect.  Without this switch such
+signals will be presumed to have the value of their parent module's signal,
+speeding and compressing traces.
+
+=item --tree I<filename>
+
+Write a report showing the design hierarchy tree to the specified filename.
+This format may change, it should not be parsed by tools.
+
+=item --noautos
+
+With --inline, remove any expanded automatics.
+
+=item --verbose
+
+Shows which files are being written, or are the same.
+
+=item --version
+
+Displays program version and exits.
+
+=item --write-verilog I<filename>
+
+Write the SystemC interconnections in Verilog format to the specified
+filename.  Note this does not include logic, it only contains module ports
+and cells.
+
+=item -M I<filename>
+
+Writes the dependency listing (similar to I<cpp -M>) to the specified filename.
+
+=item -DI<var>=I<value>
+
+Sets a define to the given value (similar to I<cpp -D>).
+
+=item -f I<file>
+
+Parse parameters from the given file.
+
+=back
+
+=head1 LANGUAGE
+
+See L<SystemC::SystemPerl> for the language specification.
+
+=head1 DISTRIBUTION
+
+SystemPerl is part of the L<http://www.veripool.org/> free SystemC software
+tool suite.  The latest version is available from CPAN and from
+L<http://www.veripool.org/systemperl>.
+
+Copyright 2001-2014 by Wilson Snyder.  This package is free software; you
+can redistribute it and/or modify it under the terms of either the GNU
+Lesser General Public License Version 3 or the Perl Artistic License Version 2.0.
+
+=head1 AUTHORS
+
+Wilson Snyder <wsnyder@wsnyder.org>
+
+=head1 SEE ALSO
+
+L<SystemC::Manual>
+L<SystemC::SystemPerl>
+
+=cut
+
+######################################################################
+### Local Variables:
+### compile-command: "./sp_preproc "
+### End:

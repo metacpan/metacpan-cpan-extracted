@@ -1,0 +1,25 @@
+Stringify::Deep
+====================
+
+Stringifies elements in data structures for easy serialization
+
+INSTALLATION
+
+To install this module, type the following:
+
+perl Makefile.pl
+make
+make test
+make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Data::Structure::Util
+    Scalar::Util
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2012 Michael Aquilina. All rights reserved.
+

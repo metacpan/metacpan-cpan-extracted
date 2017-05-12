@@ -1,0 +1,44 @@
+{
+   "abstract" : "A Perl REPL using SOOT (ROOT)",
+   "author" : [
+      "Steffen Mueller <smueller@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.58, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "SOOT-App",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Capture::Tiny" : 0,
+            "Devel::REPL" : "1.003000",
+            "SOOT" : "0.16",
+            "Term::ANSIColor" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.04"
+}

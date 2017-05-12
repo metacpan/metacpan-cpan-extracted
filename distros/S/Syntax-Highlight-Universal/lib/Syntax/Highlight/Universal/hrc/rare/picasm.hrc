@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<!DOCTYPE hrc PUBLIC "-//Cail Lomecb//DTD Colorer HRC take5//EN"
+  "http://colorer.sf.net/2003/hrc.dtd">
+<hrc version="take5" xmlns="http://colorer.sf.net/2003/hrc"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://colorer.sf.net/2003/hrc http://colorer.sf.net/2003/hrc.xsd">
+<!--
+    Дмитрий Иоффе <dsioffe@da.ru>
+-->
+   <type name="picasm">
+
+      <import type="def"/>
+      <import type="asm"/>
+
+
+
+      <scheme name="picasm">
+         <inherit scheme="asm_core"/>
+<!-- asm keywords -->
+         <keywords ignorecase="yes" region="asmDefinition">
+            <word name="constant"/>
+            <word name="#define"/>
+            <word name="end"/>
+            <word name="equ"/>
+            <word name="error"/>
+            <word name="errorlevel"/>
+            <word name="include"/>
+            <word name="list"/>
+            <word name="messg"/>
+            <word name="nolist"/>
+            <word name="org"/>
+            <word name="page"/>
+            <word name="processor"/>
+            <word name="radix"/>
+            <word name="set"/>
+            <word name="space"/>
+            <word name="subtitle"/>
+            <word name="title"/>
+            <word name="#undefine"/>
+            <word name="variable"/>
+            <word name="else"/>
+            <word name="endif"/>
+            <word name="endw"/>
+            <word name="if"/>
+            <word name="ifdef"/>
+            <word name="ifndef"/>
+            <word name="while"/>
+            <word name="__badram"/>
+            <word name="cblock"/>
+            <word name="__config"/>
+            <word name="da"/>
+            <word name="data"/>
+            <word name="db"/>
+            <word name="de"/>
+            <word name="dt"/>
+            <word name="dw"/>
+            <word name="endc"/>
+            <word name="fill"/>
+            <word name="__idlocs"/>
+            <word name="__maxram"/>
+            <word name="res"/>
+            <word name="endm"/>
+            <word name="exitm"/>
+            <word name="expand"/>
+            <word name="local"/>
+            <word name="macro"/>
+            <word name="noexpand"/>
+            <word name="bankisel"/>
+            <word name="banksel"/>
+            <word name="code"/>
+            <word name="extern"/>
+            <word name="global"/>
+            <word name="idata"/>
+            <word name="pagesel"/>
+            <word name="udata"/>
+            <word name="udata_acs"/>
+            <word name="udata_ovr"/>
+            <word name="udata_shr"/>
+         </keywords>
+         <keywords ignorecase="yes" region="asmMnemonics">
+            <word name="BYTE"/>
+            <word name="DWORD"/>
+            <word name="FWORD"/>
+            <word name="near"/>
+            <word name="offset"/>
+            <word name="short"/>
+            <word name="ptr"/>
+            <word name="QWORD"/>
+            <word name="returns"/>
+            <word name="WORD"/>
+         </keywords>
+         <keywords ignorecase="yes" region="asmMnemonics">
+            <word name="ADDLW"/>
+            <word name="ADDWF"/>
+            <word name="ADDLW"/>
+            <word name="ANDWF"/>
+            <word name="BCF"/>
+            <word name="BSF"/>
+            <word name="BTFSC"/>
+            <word name="BTFSS"/>
+            <word name="CALL"/>
+            <word name="CLRF"/>
+            <word name="CLRW"/>
+            <word name="CLRWDT"/>
+            <word name="COMF"/>
+            <word name="DECF"/>
+            <word name="DECFSZ"/>
+            <word name="INCF"/>
+            <word name="INCFSZ"/>
+            <word name="IORLW"/>
+            <word name="IORWF"/>
+            <word name="GOTO"/>
+            <word name="MOVF"/>
+            <word name="MOVLW"/>
+            <word name="MOVWF"/>
+            <word name="NOP"/>
+            <word name="OPTION"/>
+            <word name="RETFIE"/>
+            <word name="RETLW"/>
+            <word name="RETURN"/>
+            <word name="RLF"/>
+            <word name="RRF"/>
+            <word name="SLEEP"/>
+            <word name="SUBLW"/>
+            <word name="SUBWF"/>
+            <word name="SWAPF"/>
+            <word name="TRIS"/>
+            <word name="XORLW"/>
+            <word name="XORWF"/>
+         </keywords>
+<!-- asm registers -->
+         <keywords ignorecase="yes" region="asmRegister">
+            <word name="indf"/>
+            <word name="tmr0"/>
+            <word name="tmr2"/>
+            <word name="tmr1l"/>
+            <word name="tmr1h"/>
+            <word name="pcl"/>
+            <word name="status"/>
+            <word name="fsr"/>
+            <word name="porta"/>
+            <word name="trisa"/>
+            <word name="portb"/>
+            <word name="trisb"/>
+            <word name="portc"/>
+            <word name="trisc"/>
+            <word name="portd"/>
+            <word name="trisd"/>
+            <word name="porte"/>
+            <word name="trise"/>
+            <word name="pclath"/>
+            <word name="intcon"/>
+            <word name="pir1"/>
+            <word name="pir2"/>
+            <word name="pie1"/>
+            <word name="pie2"/>
+            <word name="t1con"/>
+            <word name="t2con"/>
+            <word name="sspbuf"/>
+            <word name="sspcon"/>
+            <word name="ccpr1l"/>
+            <word name="ccpr1h"/>
+            <word name="ccpr2l"/>
+            <word name="ccpr2h"/>
+            <word name="ccp1con"/>
+            <word name="ccp2con"/>
+            <word name="rcsta"/>
+            <word name="txreg"/>
+            <word name="rcreg"/>
+            <word name="option_reg"/>
+            <word name="pcon"/>
+            <word name="pr2"/>
+            <word name="sspadd"/>
+            <word name="sspstat"/>
+            <word name="txsta"/>
+            <word name="spbrg"/>
+         </keywords>
+      </scheme>
+
+   </type>
+</hrc>
+<!-- ***** BEGIN LICENSE BLOCK *****
+   - Version: MPL 1.1/GPL 2.0/LGPL 2.1
+   -
+   - The contents of this file are subject to the Mozilla Public License Version
+   - 1.1 (the "License"); you may not use this file except in compliance with
+   - the License. You may obtain a copy of the License at
+   - http://www.mozilla.org/MPL/
+   -
+   - Software distributed under the License is distributed on an "AS IS" basis,
+   - WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+   - for the specific language governing rights and limitations under the
+   - License.
+   -
+   - The Original Code is the Colorer Library.
+   -
+   - The Initial Developer of the Original Code is
+   - Cail Lomecb <cail@nm.ru>.
+   - Portions created by the Initial Developer are Copyright (C) 1999-2003
+   - the Initial Developer. All Rights Reserved.
+   -
+   - Contributor(s):
+   -
+   - Alternatively, the contents of this file may be used under the terms of
+   - either the GNU General Public License Version 2 or later (the "GPL"), or
+   - the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
+   - in which case the provisions of the GPL or the LGPL are applicable instead
+   - of those above. If you wish to allow use of your version of this file only
+   - under the terms of either the GPL or the LGPL, and not to allow others to
+   - use your version of this file under the terms of the MPL, indicate your
+   - decision by deleting the provisions above and replace them with the notice
+   - and other provisions required by the LGPL or the GPL. If you do not delete
+   - the provisions above, a recipient may use your version of this file under
+   - the terms of any one of the MPL, the GPL or the LGPL.
+   -
+   - ***** END LICENSE BLOCK ***** -->

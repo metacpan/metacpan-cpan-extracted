@@ -1,0 +1,99 @@
+{
+   "abstract" : "setup project tool",
+   "author" : [
+      "Hiroyoshi Houchi <git@hixi-hyi.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.5.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Setup-Project",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Lite" : "0",
+            "File::Basename" : "0",
+            "File::Find" : "0",
+            "File::Find::Rule" : "0",
+            "File::Path" : "0",
+            "File::Spec::Functions" : "0",
+            "Getopt::Compact::WithCmd" : "0",
+            "IO::Prompt::Simple" : "0",
+            "Text::Xslate" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Setup::Project" : {
+         "file" : "lib/Setup/Project.pm",
+         "version" : "0.01"
+      },
+      "Setup::Project::CLI" : {
+         "file" : "lib/Setup/Project/CLI.pm"
+      },
+      "Setup::Project::Flavor::Amon2Sample" : {
+         "file" : "lib/Setup/Project/Flavor/Amon2Sample.pm"
+      },
+      "Setup::Project::Flavor::CLI" : {
+         "file" : "lib/Setup/Project/Flavor/CLI.pm"
+      },
+      "Setup::Project::Flavor::ShareDir" : {
+         "file" : "lib/Setup/Project/Flavor/ShareDir.pm"
+      },
+      "Setup::Project::Functions" : {
+         "file" : "lib/Setup/Project/Functions.pm"
+      },
+      "Setup::Project::ShareDir" : {
+         "file" : "lib/Setup/Project/ShareDir.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hixi-hyi/p5-Setup-Project/issues"
+      },
+      "homepage" : "https://github.com/hixi-hyi/p5-Setup-Project",
+      "repository" : {
+         "url" : "git://github.com/hixi-hyi/p5-Setup-Project.git",
+         "web" : "https://github.com/hixi-hyi/p5-Setup-Project"
+      }
+   },
+   "version" : "0.01"
+}

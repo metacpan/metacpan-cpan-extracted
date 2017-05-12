@@ -1,0 +1,72 @@
+Revision history for Sendmail-Queue
+
+0.800   Thu, 16 Aug 2012 13:24:00 -0400 (dfs)
+
+  * Absolutely no code changes; just fixes to tests so they do not depend
+    on the local time zone.
+
+0.700	Tue, 31 Jul 2012 14:19:39 -0400 (dfs)
+
+  * Fix tests so they don't depend on File::Slurp.
+
+  * Skip the Sendmail locking test if we can't seem to find a
+    genuine sendmail executable.
+
+0.600	Tue, 17 Jul 2012 08:55:55 -0400 (dfs)
+
+  * Lock files using both flock() and fcntl()-style locking
+    to make sure that Sendmail respects our locks.
+
+0.400	Tue, 20 Jul 2010 10:35:37 -0400	(dmo)
+
+  * Allow arbitrary Sendmail macros to be set.
+
+  * clone() now does a full and proper deep copy using Storable.
+
+0.302	Mon, 19 Jul 2010 11:35:41 -0400 (dmo)
+
+  * Cleanups to Received: header generation
+
+0.301	Mon, 28 Jun 2010 16:34:05 -0400	(dmo)
+
+  * Implement accessors for queue_directory, qf_directory and df_directory
+
+0.300	Mon, 28 Jun 2010 14:40:37 -0400 (dmo)
+
+  * Remove dependency on Class::Accessor::Fast - we now roll our own.
+
+0.200	Thu, 17 Jun 2010 16:14:20 -0400	(dmo)
+
+  * Sendmail::Queue::Qf::write() (and thus Sendmail::Queue's queue_message()
+    and queue_multiple()) will now fail if there is no sender or no recipients.
+
+  * Sendmail::Queue::queue_multiple() is now all-or-nothing.  If any queueing
+    attempt fails, the other envelopes queued for that message are removed if
+    possible.
+
+  * df file is no longer locked -- it's unnecessary.
+
+  * Better handling of potential race conditions between this code and a
+    Sendmail queue runner.
+
+  * Errors on sync() and close() are now trapped so we can clean up afterwards.
+
+  * bin/sendmail example now tries to guess correct queue directory.
+
+  * We no longer create a C-line in the qf file, as it's unnecessary.
+
+  * Headers longer than 998 characters are now wrapped at the nearest
+    whitespace when written to the qf file, if the caller has not already done
+    so.
+
+  * Flags for 8-bit data are properly set by Sendmail::Queue, and can be set
+    explicitly on Sendmail::Queue::Qf objects.
+
+0.100	Fri, 04 Jun 2010 15:39:35 -0400
+
+  * Now uses Mail::Header::Generator for generating received header
+
+0.01    Thu, 1 Nov 2007 16:14 -0400
+
+  * First version, released on an unsuspecting world.
+

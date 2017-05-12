@@ -1,0 +1,6 @@
+0.02 Tuesday 20th July, 2004
+	Soften the requirement on SVN::Core
+	require SVN::Core before SVN::Ra
+
+0.01 Tuesday 20th July, 2004
+	Initial CPAN release

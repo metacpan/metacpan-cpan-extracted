@@ -1,0 +1,19 @@
+Revision history for String-Wildcard-Bash
+
+0.03    2015-09-10 (PERLANCAR)
+
+	- Add function: convert_wildcard_to_sql.
+
+	- Make regex exportable ($RE_WILDCARD_BASH).
+
+
+0.02    2015-01-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Rebuild (Generate TODO.md).
+
+
+0.01    2014-07-26 (SHARYANTO)
+
+        - First release.

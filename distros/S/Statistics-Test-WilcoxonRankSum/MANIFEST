@@ -1,0 +1,22 @@
+Build.PL
+Changes
+lib/Statistics/Test/WilcoxonRankSum.pm
+Makefile.PL
+MANIFEST
+README
+t/00.load.t
+t/01.load_data.t
+t/02.compute_ranks.t
+t/03.rankSums.t
+t/031.rankSums.t
+t/04.exact.t
+t/05.probabilities.t
+t/05.probability_approx.t
+t/05.probability_exact.t
+t/05.probability_greater_1.t
+t/051.probability_exact.t
+t/perlcritic.t
+t/pod-coverage.t
+t/pod.t
+
+META.yml                                 Module meta-data (added by MakeMaker)

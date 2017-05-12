@@ -1,0 +1,22 @@
+---
+name: String-Expand
+version: 0.04
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+abstract: |-
+  string utility functions for expanding variables in
+  self-referential sets
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Test::Exception: 0
+  Test::More: 0
+provides:
+  String::Expand:
+    file: lib/String/Expand.pm
+    version: 0.04
+generated_by: Module::Build version 0.33
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

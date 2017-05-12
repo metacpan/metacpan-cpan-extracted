@@ -1,0 +1,43 @@
+---
+abstract: 'Provides Japanese fulltext search for L<Search::Fulltext> module'
+author:
+  - 'Sho Nakatani <lay.sakura@gmail.com>, a.k.a. @laysakura'
+build_requires:
+  Test::More: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.7.5, CPAN::Meta::Converter version 2.120921'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Search-Fulltext-Tokenizer-MeCab
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Search::Fulltext::Tokenizer::MeCab:
+    file: lib/Search/Fulltext/Tokenizer/MeCab.pm
+    version: 1.05
+requires:
+  Carp: 0
+  Cwd: 0
+  Encode: 0
+  File::Basename: 0
+  Search::Fulltext: 1.00
+  Text::MeCab: 0
+resources:
+  bugtracker: https://github.com/laysakura/Search-Fulltext-Tokenizer-MeCab/issues
+  homepage: https://github.com/laysakura/Search-Fulltext-Tokenizer-MeCab
+  repository: git://github.com/laysakura/Search-Fulltext-Tokenizer-MeCab.git
+version: 1.05

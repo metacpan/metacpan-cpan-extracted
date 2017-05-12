@@ -1,0 +1,10 @@
+README.txt
+Changes
+MANIFEST
+Makefile.PL
+PassAccessRights.pm
+PassAccessRights.xs
+passfd.c
+test.pl
+examples/httpd.pl
+examples/appd.pl

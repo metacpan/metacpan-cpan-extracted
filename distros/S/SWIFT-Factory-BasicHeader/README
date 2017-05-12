@@ -1,0 +1,31 @@
+SWIFT/Factory/BasicHeader
+=========================
+
+The Basic Header is block number 1 of a SWIFT message.
+This block appears in all SWIFT messages.
+
+The block is normally built for "input", which in SWIFT
+speak means "input to the SWIFT network".
+
+This module will implement an "Input Basic Header".
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None specific.
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2003, BIKER. All rights reserved.
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

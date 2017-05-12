@@ -1,0 +1,14 @@
+Build.PL
+Changes
+Debian_CPANTS.txt
+examples/MQ/mqclient.pl
+examples/MQ/mqserver.pl
+lib/SOAP/Transport/MQ.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/01_use.t
+t/096_characters.t
+t/097_kwalitee.t
+t/098_pod.t
+t/099_pod_coverage.t

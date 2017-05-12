@@ -1,0 +1,49 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use Getopt::Long qw(GetOptions);
+use SQL::Beautify;
+
+
+my %opt;
+
+usage() if not @ARGV;
+GetOptions(\%opt,
+	'spaces=i',
+	'help',
+) or usage();
+usage() if $opt{help};
+usage() if not @ARGV;
+
+my $sql = SQL::Beautify->new(%opt);
+
+foreach my $file (@ARGV) {
+	my $original_sql = read_file($file);
+	$sql->query($original_sql);
+	my $nice_sql = $sql->beautify;
+	print $nice_sql;
+}
+
+
+sub read_file {
+	my $file = shift;
+	open my $fh, '<', $file or die;
+	local $/ = undef;
+	my $content = <$fh>;
+	close $fh;
+	return $content;
+}
+
+sub usage {
+	print <<"END_USAGE";
+v$SQL::Beautify::VERSION
+Usage: $0 [options] FILEs
+
+      --spaces 4      - number of indentation spaces (defaults to 4)
+      
+      --help          - this help
+END_USAGE
+	exit;
+}
+

@@ -1,0 +1,66 @@
+<table id="attachments" class="standard-table">
+  <thead>
+    <tr>
+      <th><% loc('Name') %></th>
+% if ($show_page) {
+      <th><% loc('Page') %></th>
+% }
+      <th><% loc('Type') %></th>
+      <th><% loc('Size') %></th>
+      <th><% loc('Uploaded on') %></th>
+      <th><% loc('Uploaded by') %></th>
+      <th></th>
+    </tr>
+  </thead>
+% while ( my $file = $files->next() ) {
+  <tbody>
+    <tr class="<% $files->index() % 2 ? 'odd' : 'even' %>">
+      <td>
+        <a href="<% $file->uri() %>" title="<% loc('Download this file') %>"><% $file->filename() %></a>
+%   if ( $file->is_browser_displayable_image() ) {
+        <br />
+        <a href="<% $file->uri() %>" title="<% loc('Download this file') %>"><img src="<% $file->uri( view => 'thumbnail' ) %>" /></a>
+%   }
+      </td>
+% if ($show_page) {
+      <td>
+        <a href="<% $file->page()->uri() %>"><% $file->page()->title() %></a>
+      </td>
+% }
+      <td>
+        <% $file->mime_type_description_for_lang( Silki::I18N->Language() ) %>
+      </td>
+      <td>
+        <% format_bytes( $file->file_size() ) %>
+      </td>
+      <td>
+        <% loc( '%datetime(%1)', $c->user()->set_time_zone_for_dt( $file->creation_datetime() ) ) %>
+      <td>
+        <& /lib/user-link.mas, user => $file->user(), wiki => $wiki &>
+      </td>
+      <td>
+%   if ( $c->user()->has_permission_in_wiki( wiki => $file->wiki(), permission => Silki::Schema::Permission->Delete() ) ) {
+        <form action="<% $file->uri( view => 'delete_confirmation' ) %>" method="get">
+          <input type="submit" value="Delete" />
+        </form>
+%   }
+      </td>
+    </tr>
+  </tbody>
+% }
+
+% if ($pager) {
+<& /lib/table/pager.mas,
+   index     => $files->index(),
+   pager     => $pager,
+   uri_maker => sub { $wiki->uri( view => 'attachments', @_ ) } &>
+% }
+
+</table>
+
+<%args>
+$files
+$show_page => 0
+$pager => undef
+$wiki
+</%args>

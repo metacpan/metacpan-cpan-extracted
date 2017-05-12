@@ -1,0 +1,54 @@
+SQL::Loader is intended as a development tool. The way we use it is to map out a database schema for a
+project on our intranet and, as it changes, or we just need to recreate it on a new box, we use this
+module to generate the schema from the intranet page and load it into a database. Saves dumping the
+schema from some other box somewhere ( that noone knows whether is current or not :) and saves creating or
+modifying a schema manually during the development process. When multiple developers are working on a
+project, it should assist in ensuring they are 'all on the same page', schema wise at least :)
+
+DANGER! DANGER!
+
+If you are using this module it is assumed you are doing so in a development environment, say, the first
+time you build a new db, the schema has changed and now you're recreating your db, etc. This module DROPS
+all tables in the database you specify and recreates it from scratch from the URL you pass to it.
+
+For SQL::Loader to work, the page it parses must consist of html tables that represent tables in a
+database schema, in the following format:
+
+<table>
+	<tr>
+		<td>$order</td>
+		<td>$column_name</td>
+		<td>$column_type</td>
+		<td>$additional_info</td>
+	</tr>
+</table>
+
+The first three columns of the table should be fairly self explanitary. $order is simply the order of
+the columns in the resulting table. $column_name will be used as the name of the column in the table created. $column_type will be the type set for that column - field can contain any valid SQL type information.
+
+$addtional_info is currently only used for one purpose; to specify whether to make a field a PRIMARY KEY.
+This is acheived by placing the case-sensitive letters 'PK' anywhere within the third column.
+
+Preceeding each table must be a title and a keyword 'Purpose' ( note case ), each on a single line.
+
+The title is considered anything inside <h2> tags. This will become the table title.
+The 'Purpose' keyword must follow the title and be enclosed within <h3> tags. The idea of the Purpose
+keyword is to indicate that the table found following is valid and should be parsed and included in the
+database schema being generated. For example, if you are designing a new table that is still experimental
+and do not want it to be included in the schema next time someone generates it, simply ommit the Purpose
+keyword.
+
+When a title and purpose have been found, the next <table> encountered will be parsed as a table to be
+included in the database schema and loaded into the database.
+
+NOTES:
+
+A $column name of 'id' is automatically made type PRIMARY KEY AUTO_INCREMENT. This should normally
+be the first column ( ie; in the first row of your html table ) if you want to use this feature.
+
+Your HTML page can have pretty much any code you like bar any <h2> and <h3> tags that will confuse this
+module, especially if the are followed by a table. Your best bet is to not have any other <h2> or <h3>
+tags on the page to be parsed.
+
+An example script 'sql_loader_example.pl' is included in this distribution.
+

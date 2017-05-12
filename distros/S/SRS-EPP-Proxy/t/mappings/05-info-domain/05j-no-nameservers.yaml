@@ -1,0 +1,35 @@
+# Test info domain requesting no nameservers be returned
+template: info-domain.tt
+
+vars:
+  domain_name: cheese123.co.te
+  hosts: none
+  pw:
+
+input_assertions:
+  class: SRS::EPP::Command::Info::Domain
+
+SRS:
+  - assertions:
+      count:
+        - [ '/NZSRSRequest/*', 2, 'SRS: Check that there are two requests' ]
+        - [ '//Whois', 1, 'SRS: Check for only one Whois' ]
+        - [ '//DomainNameFilter', 1, 'SRS: Check for only one DomainNameFilter' ]
+        - [ '//FieldList/@NameServers', '0', 'SRS: Nameservers field not requested' ]
+      element_is:
+        - [ '/NZSRSRequest/*[1]', 'Whois', 'SRS: The first request should be a Whois' ]
+        - [ '/NZSRSRequest/*[2]', 'DomainDetailsQry', 'SRS: The second request should be a DomainDetailsQry' ]
+      match:
+        - [ '//DomainNameFilter', 'cheese123.co.te', 'SRS: Check the domain name' ]
+      match_all:
+      attr_is:
+
+
+output_assertions:
+  count:
+    - [ '//epp:resData', 1, 'EPP: Check for resData' ]
+    - [ '//domain:hostAttr', '0', 'EPP: No nameservers returned' ]
+  match:
+  match_all:
+  attr_is:
+    - [ '//epp:result', 'code', 1000, 'EPP: command ok' ]

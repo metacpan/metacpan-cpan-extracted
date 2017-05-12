@@ -1,0 +1,254 @@
+NAME
+    Sub::Curry - Create curried subroutines
+
+SYNOPSIS
+        use Sub::Curry;
+        use Sub::Curry qw/ :CONST curry /; # Import spice constants
+                                           # and the &curry function.
+
+        #my $f1 = Sub::Curry::->new(\&foo, 1, 2); # Same as below.
+        my $f1 = curry(\&foo, 1, 2);
+        my $f2 = $cb1->new(3, 4);
+
+        my $f3 = curry(\&foo, 1, HOLE, 3);
+        my $f4 = $f3->new(2, 4);
+
+        $f1->('a'); # foo(1, 2, 'a');
+        $f2->('a'); # foo(1, 2, 3, 4, 'a');
+
+        $f3->('a'); # foo(1, 'a', 3);
+        $f4->('a'); # foo(1, 2, 3, 4, 'a');
+
+        $f4->call('a'); # Same as $cb4->('a');
+
+DESCRIPTION
+    "Sub::Curry" is a module that provides the currying technique known from
+    functional languages. This module, unlike many other modules that borrow
+    techniques from functional languages, doesn't try to make Perl
+    functional. Instead it tries to make currying Perlish.
+
+    This module aims to be a base for other modules that use/provide
+    currying techniques.
+
+    This module supports a unique set of special spices (argument features).
+    It doesn't just support holes, but also introduces antiholes,
+    blackholes, whiteholes, and antispices. All these extra special spices
+    effect how the spice is applied to the subroutine. They make functions
+    such as &rcurry superfluous. See "Currying" and Sub::Curry::Cookbook.
+
+    An oft-missed feature is argument aliasing. This module preserves the
+    aliasing.
+
+    "Sub::Curry" does explicit currying. For more automatic ways to use
+    currying, look in the "Sub::Curry::*" namespace.
+
+    When version hits 1.00 the interface will be stable.
+
+    As of now, this is a beta release. It is and will continue to be
+    compatible with Sub::Curry version 0.08.
+
+  Currying
+    Currying is when you attach arguments to subroutines. This is sometimes
+    called "partial application". Currying is already done manually every
+    here and there in existing Perl code. It typically looks like
+
+        my $curried_foo = sub { foo($arg, @_) };
+        $curried_foo->(@more_args);
+        # foo($arg, @more_args);
+
+    That's all there is to primitive currying: you store arguments. The
+    stored arguments are called the spice. This module however, extends the
+    concept further by introducing several special spices.
+
+    See the &call method for how special spices are treated if left when the
+    original function will be called.
+
+    There's no need for a &rcurry subroutine--that's done with a blackhole,
+    see "Right-currying" in Sub::Curry::Cookbook.
+
+   Holes - "Sub::Curry::HOLE"
+    A hole is what it sounds like: a gap in the argument list. Later, when
+    the subroutine is called the holes are filled in. So if the spice is "1,
+    <HOLE>, 3" and then "2, 4" is applied to the curried subroutine, the
+    resulting argument list is "1, 2, 3, 4".
+
+    This can be handy if you want to curry a method. Just leave a hole as
+    the first spice for the object.
+
+    Holes can be called "scalar inserters" that defaults to "undef".
+
+   Antiholes - "Sub::Curry::ANTIHOLE"
+    An antihole put in a hole makes the hole disappear. If the spice is "1,
+    <HOLE>, 3, <HOLE>, 4" and "2, <ANTIHOLE>, 5" is applied then the result
+    will become "1, 2, 3, 4, 5".
+
+   Blackholes - "Sub::Curry::BLACKHOLE"
+    A blackhole is like a hole for lists that never gets full. There's an
+    imaginary untouchable blackhole at the end of the spice. The blackhole
+    thusly inserts the new spice before itself. The blackhole never gets
+    full because nothing is ever stored in a blackhole as it isn't a hole
+    really...
+
+    Blackholes are used to move the point of insertion from the end to
+    somewhere else, so you can curry the end of the argument list.
+
+    Blackholes can be called "list inserters" that defaults to the empty
+    list.
+
+   Whiteholes - "Sub::Curry::WHITEHOLE"
+    A whitehole removes the blackhole, but the spice that has been put into
+    the blackhole remains since blackholes themselves don't store anything.
+
+   Antispices - "Sub::Curry::ANTISPICE"
+    An antispice is like a hole except that when it's filled it disappears.
+    It's like a combination of a hole and an antihole. If the spice is "1,
+    <ANTISPICE>, 3" and "2, 4" is applied, then the result will become "1,
+    3, 4".
+
+    This can be handy if you want to provide a function as a method. Just
+    put an antispice to remove the object when called.
+
+METHODS
+    "my $curried = Sub::Curry::->new($subref, @spice)"
+        "new" is different depending on the invocant.
+
+        If the invocant is a class name then the first argument is the
+        subroutine reference that should be curried, and following arguments
+        are the spice. The special spices that can be used here are holes,
+        blackholes, and antispices.
+
+        The returned value is a spiced up closure that also is a
+        "Sub::Curry" object.
+
+        No special treatment is given if the subroutine reference is a
+        "Sub::Curry" object, see the other form of "new" instead.
+
+    "my $other = $curried->new(@spice)"
+        If the invocant is an object then all arguments are the spice, and a
+        new object will be returned.
+
+        This spice will not just be added to the previous spice. The
+        arguments will be interpreted as arguments to the already curried
+        subroutine and processed accordingly. This means that holes will be
+        filled in, but unfilled holes remain holes. The same applies to the
+        other special spices. If the spice doesn't hold spices that act on
+        spices, i.e. antiholes and whiteholes, then the *call*
+        "$curried->new(@spice)->()" is equivalent to "curry($curried,
+        @spice)->()".
+
+        The new object won't be wrapped around the old -- that would be a
+        performance hit. Instead the processed spice is put on the same
+        subroutine that the old object spiced up. This is important to
+        realize as the "uncurried" method will return the same subroutine
+        reference for $curried and $other.
+
+        Here all special spices can be used. This is the only place where
+        antiholes and whiteholes can be used.
+
+    "call"
+        Just an OO alias for dereferencing. I.e. "$curried->call(...)" is
+        the same as "$curried->(...)".
+
+        Holes that are not filled in will become "undef". Antispices and
+        blackholes will be removed. Antiholes and whiteholes cannot be used
+        here, due to optimization and implementation. If this is needed do
+        "$curried->new(@spice_with_antiholes_or_whiteholes)->()" since the
+        second form of "new" is the only place that handle antiholes.
+
+    "spice"
+        Experimental! This may be removed in future versions.
+
+        In scalar context "spice" returns the length of the spice. In list
+        context it returns the spice. This is the unprocessed spice. Special
+        spices will be present.
+
+    "uncurried"
+        Experimental! This may be removed in future versions.
+
+        Returns the original subroutine reference passed to the first form
+        of "new", that is the class invocation "Sub::Curry::->new(...)".
+
+    "cursed"
+        Returns a copy of the subroutine/object that isn't blessed, i.e.
+        lost all its properties and possibility to invoke method calls.
+        There's no speed gain in using the copy returned by "cursed".
+
+            my $f1 = curry(sub { ... }, @spice);
+            my $f2 = $f1->cursed;
+
+            $f1->();   # IDENTICAL
+            $f2->();   # CALLS
+
+EXPORTED SYMBOLS
+    No symbols are exported by default. ":ALL" exports all functions.
+    ":CONST" exports all constants.
+
+  Functions
+    &curry
+        Perhaps you think it's tiresome to write "Sub::Curry::->new" and
+        want a &curry function instead. Well, make one yourself!
+
+            *curry = Sub::Curry::->new(Sub::Curry::->can('new'), Sub::Curry::);
+
+        OK, you don't have to do it yourself. You can do
+
+            use Sub::Curry 'curry';
+
+        instead and let the module do that currying for you. Note that $c1
+        and $c2 in
+
+            my $curried = curry(\&foo, @foo);
+
+            my $c1      = curry($curried, @bar);
+            my $c2      = $curried->new(@bar);
+
+        isn't equivalent. See the second form of "new" for an explanation.
+
+  Constants
+    See "Currying".
+
+BACKWARDSCOMPABILITY
+    For backwardscompability the subroutine &Sub::Curry::Hole is provided.
+    It takes one optional integer argument. If no argument is given one hole
+    is returned. If an argument is given it returns that many holes in list
+    context. The new way of doing that is
+
+        (HOLE) x $n
+
+    where $n is the number of holes you want.
+
+BUGS
+    * Doesn't handle prototypes
+        If you feel the need for this module to handle prototypes in any
+        way, please e-mail me with an idea of how you want it or an
+        interface suggestion.
+
+WARNING
+    Don't do "&$curried;", because that will break your program! See "What's
+    the difference between calling a function as &foo and foo()?" in
+    perlfaq7.
+
+    "$curried->()" is the recommended syntax.
+
+ACKNOWLEDGMENTS
+    This module has been partly inspired by the CPAN modules listed in "SEE
+    ALSO" and credits go to David Helgason (CPAN ID: DAVIDH) who introduced
+    holes to me by writing "Sub::Curry" versions 0.0x and passed me the
+    namespace.
+
+AUTHOR
+    Johan Lodin <lodin@cpan.org>
+
+COPYRIGHT
+    Copyright 2004 Johan Lodin. All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    Attribute::Curried
+
+    Callback
+
+    Sub::DeferredPartial
+

@@ -1,0 +1,22 @@
+# Test of sending an AuthInfo field (which isn't used by NZRS)
+
+template: info-contact.tt
+
+vars:
+  contact_id: sh8013
+  pw: something
+
+input_assertions:
+  class: SRS::EPP::Command::Info::Contact
+  count: ~
+  match: ~
+  match_all: ~
+  attr_is: ~
+
+output_assertions:
+  count:
+    - [ '//epp:result', 1, 'SRS: Check for one result' ]
+  match: ~
+  match_all: ~
+  attr_is:
+    - [ '//epp:result', 'code', 2307, 'SRS: Check for correct result code' ]

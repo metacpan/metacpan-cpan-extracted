@@ -1,0 +1,108 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+L<SimpleCall::LIBSVM> 
+
+load csv file, call libsvm for mechainze learning, export predict csv file
+
+libsvm : https://www.csie.ntu.edu.tw/~cjlin/libsvm/
+
+=head2 sep
+
+default sep is comma, ','
+
+=head1 EXAMPLE
+
+example in xt/ directory, use iris data
+
+=head1 xt/test_libsvm.pl
+
+    use SimpleCall::LIBSVM;
+
+    my $s = SimpleCall::LIBSVM->new();
+
+    #train
+
+    my %data_opt = (
+        type => 'Species', 
+        data => [ qw/SepalLength SepalWidth PetalLength PetalWidth/ ], 
+    );
+
+    my $train = 'iris_train.csv';
+    my $train_opt = '-h 0';
+
+    my ($train_data, $train_type) = $s->conv_file_to_libsvm($train, %data_opt);
+    my $train_model = $s->train_libsvm($train_data, "$train.libsvm.model", train_opt => $train_opt);
+
+    # test
+
+    my $test = 'iris_test.csv';
+    my $predict_opt = '';
+
+    my ($test_data, $test_type) = $s->conv_file_to_libsvm($test, 
+        libsvm_type => $train_type, 
+        %data_opt,
+    );
+    my $test_out = $s->predict_libsvm($test_data, $train_model, "$test.libsvm.out", predict_opt=>$predict_opt);
+    my $test_predict_f = $s->conv_libsvm_to_file($test, 
+        libsvm_type=> $test_type, 
+        libsvm_out => $test_out,
+        predict_file => "$test.predict.csv",
+    );
+
+=head2 xt/chart_libsvm.pl
+
+    perl chart_libsvm.pl [predict_csv_file] [predict_type_column_index] [cnt_column_index]
+
+    example chart is  xt/iris_test.csv.predict.csv.0.x.png
+
+=begin html
+
+<img src="xt/iris_test.csv.predict.csv.0.x.png"></img>
+
+=end html
+
+=head1 FUNCTION
+
+=head2 new 
+
+init 
+
+    my $s = SimpleCall::LIBSVM->new( sep => ',' );
+
+=head2 conv_file_to_libsvm
+
+conv src file into libsvm format : $train -> $train_data , $train_type : map type into integer
+
+    my ($train_data, $train_type) = $s->conv_file_to_libsvm($train, 
+        type => 'xxx',
+        data => [ 'yyy', 'zzz' ], 
+        # libsvm_type => 'kkkk.libsvm.type' ,  #have exists type file
+        );
+
+=head2  train_libsvm 
+
+call svm-train to build  model file
+
+    my $train_model = $s->train_libsvm($train_data, "$train.libsvm.model", train_opt => $train_opt);
+
+=head2  predict_libsvm
+
+call svm-predict to predict $test_data  use $train_model
+
+    my $test_out = $s->predict_libsvm($test_data, $train_model, "$test.libsvm.out", predict_opt=>$predict_opt);
+
+=head2 conv_libsvm_to_file 
+
+merge libsvm predict out file, rewrite $test, add predict column ahead
+
+    my $test_predict_f = $s->conv_libsvm_to_file($test, 
+        libsvm_type=> $test_type, 
+        libsvm_out => $test_out,
+        predict_file => "$test.predict.csv",
+    );
+
+=cut  

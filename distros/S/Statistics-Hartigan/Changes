@@ -1,0 +1,6 @@
+Revision history for Perl extension Statistics::Hartigan.
+
+0.01  Mon Jul 25 14:30:32 2005
+	- original version; created by h2xs 1.23 with options
+		-X -n Statistics::Hartigan
+

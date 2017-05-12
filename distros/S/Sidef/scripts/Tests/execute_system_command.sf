@@ -1,0 +1,34 @@
+#!/usr/bin/ruby
+
+var info = []
+
+# Pipe (read-only)
+%p(uname -r).open_r.each { |line|
+    info << line
+    say line;
+}
+
+# Pipe with interpolation (read-only)
+%P(uname #{"-" + "r"}).open_r.each { |line|
+    info << line
+    say line;
+}
+
+var str1 = `uname -r`;              # backtick: returns a string
+var str2 = `uname #{"-" + "r"}`     # backtick with interpolation
+var str3 = %x(uname -r);            # ditto, alternative syntax
+var str4 = %X(uname #{"-" + "r"})   # bactick with interpolation
+
+info << str1.chomp
+info << str2.chomp
+info << str3.chomp
+info << str4.chomp
+
+print str1;
+print str2;
+
+assert_eq(info.len, 6)
+assert_eq(info.uniq.len, 1)
+
+Sys.system('uname -r');   # system: executes a command and prints the result
+#Sys.exec('uname -r');     # replaces current process with another

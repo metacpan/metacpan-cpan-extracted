@@ -1,0 +1,314 @@
+Changes for Perl extension SDL-Tutorial-3DWorld
+
+0.33 Wed 19 Jan 2011
+	- Added a GridPlane actor for generating wolfenstein-like levels
+	- Added a basic Fog implementation. Because it doesn't really mix
+	  well with the skybox I've kept the intensity and range down so it
+	  looks a little like a light ground mist. It will do for now.
+	- Added partially working eight-sided sprite of a Wolfenstein guard.
+
+0.32 Fri 7 Jan 2011
+	- Added a smallish test video
+	- Added the beginnings of an implementation of a flat screen TV
+	  actor. Unfortunately, the underlying SDL implementation of MPEG
+	  support isn't quite working yet, so it is disabled for now.
+	- Nesting file parsers under Asset:: wasn't really working for me
+	  logically, so moved them all to the root level.
+	- Added a test script for the ::Mesh class.
+	- The beginning of OpenGL::Array integration for ::Mesh objects,
+	  as a stepping stone to moving from display lists to more modern
+	  OpenGL Vertex Arrays (before we move all the way to OpenGL
+	  Vertex Buffer Arrays).
+	- Fixed the surface normal scaling gotcha described at this URL.
+	  http://www.opengl.org/resources/features/KilgardTechniques/oglpitfall/
+	- Restored specular material component to the teapots now they will
+	  be displayed correctly.
+
+0.31 Tue 4 Jan 2011
+	- Added a billboard actor for sprites that always orient towards
+	  the camera like particle effects and lens flares etc. Unlike the
+	  plain sprite actor, this one DOES do blurring up close because it
+	  is often used for more serious effects in 3D programs.
+	- Added a billboard demonstration which is completely unlike the
+	  way most real things will be done (this is an actual thing,
+	  instead of some spherically symmetric particle/effect)
+
+0.30 Tue 4 Jan 2011
+	- The Sprite.pm file for the previous release was accidentally
+	  not bundled with the release.
+	- Added a class for generating hedrons of other actor objects,
+	  representing the first time that actors exist in the world
+	  without being part of the main actor array.
+	- Added a 2 level recursive toilet plunger icosahedron to world.
+	- Unitised the sprite display, and correct the scaling of the
+	  demonstration sprite directly when we add it to the world.
+	- Added support for configurable GL_TEXTURE_MAG_FILTER values.
+	- We now disable blurring of sprites by default so that they
+	  intentionally look pixelish and old-school.
+
+0.29 Tue 4 Jan 2011
+	- The debug display now changes correctly when you turn debug on and off,
+	  and does so correctly for new objects in both states as well.
+	- Added support for basic Wolfenstein style sprites.
+
+0.28 Mon 3 Jan 2011
+	- Stripped a few superfluous methods out of the lighting setup.
+	- Make sure the camera direction vector is set up early to prevent
+	  warnings before the first mouse move event.
+	- Added a grid of 400 texture boxes to prove that the culling algorithm
+	  can support 500-1000 models without the need for a scene graph.
+	- Added a ::Bound class to store richer bounding data in preparation
+	  for more complex layered frustrum culling. It automatically calcaultes
+	  both the sphere and cube vales, needing only one of the two as
+	  constructor input.
+	- Moved frustrum culling from Z-cube to sphere-sphere, which should be
+	  both faster and use less CPU.
+	- Camera now pre-calculated a huge amount of frustrum data in advance,
+	  and recalculates them when the camera moves.
+	- Actors are now added by a method, which allows us to automatically
+	  attach the debugging actors to all objects including those created
+	  dynamically at run-time.
+
+0.27 Fri 31 Dec 2010
+	- Massive optimisation and tuning release to maximise the level
+	  of raw performance before we absolutely HAVE to start using a
+	  scene graph. This release should reach 100-500 world objects
+	  it gets too slow to be useful. This should be more than enough
+	  for many simple games and simulations.
+	- For improved profiling accuracy when starting the world with
+	  --benchmark we immediately enable the three "hide_" properties
+	  accessed via F1, F2, F3 so they don't show up in the profiling
+	  output.
+	- When --benchmark is enabled, we also avoid the creation of all
+	  of the ::Actor::Debug object entirely for more accurate
+	  measurement of any O(N) operations.
+	- The entire display culling logic has been removed from the camera
+	  class and inlined into the main display_actors method. Once the
+	  number of actors gets large just the Perl method call costs alone
+	  become significant for O(N) operations.
+	- Added support for a origin-relative ->{boundary} propery to avoid
+	  recalculating boundary boxes of objects that don't move.
+	- Added support for a ->{display} property to encapsulate the
+	  entire rendering process for static objects that don't move.
+	  This lets us call glCallList directly in the top level loop and
+	  avoids O(N) calls to ->display methods. Instead, we only need to
+	  call the ->display method for complex actors or those in motion.
+
+0.26 Thu 30 Dec 2010
+	- The left mouse button now generates new actors. In true FPS
+	  style these are crates! Since this results in a surprisingly
+	  large amount of trivial but creative minecrafty fun I'm doing a
+	  new release just for this one change. :)
+
+0.25 Thu 30 Dec 2010
+	- The mouse scroll wheel now controls the distance away from the
+	  camera that the selector box will float.
+	- 3DWorld now does a $VERSION integrity scan of all child classes
+	  during initialisation to make sure kthakore hasn't corrupted his
+	  installation (again).
+	- Adding a global texture cache. No noticable impact as we don't
+	  do much reuse of textures in the current world.
+	- Adding a global model cache. Because of the 121 toilet plungers
+	  in our scene this one change reduced startup time by 75%, total
+	  memory consumption by 7 meg (15%) and improved framerate by 5%.
+
+0.24 Thu 29 Dec 2010
+	- Disable solid object display order optimisation, as I suspect it
+	  that the Perl cost to sort them is bigger than the cost of just
+	  brute force drawing all of them in hardware.
+	- Added neato grid select tool
+
+0.23 Wed 29 Dec 2010
+	- Sort solid objects from nearest to farthest to increase the
+	  chance that OpenGL only needs to depth test far objects and won't
+	  need to do any colour/texture/light work at all.
+	- Added support for explicit normals in meshes and model files
+	- Moved Moved SDL::Tutorial::3DWorld::Asset::Mesh up a directory,
+	  as it didn't really make sense having it in the Asset namespace.
+	- Added F3 toggle to enable/disable the console/FPS (which costs
+	  a remarkably large amount for what it does).
+
+0.22 Wed 29 Dec 2010
+	- The bounding box actor now also displays a traditional
+	  red/green/blue axis on the original of each actor.
+	- Flying camera renamed as the God camera.
+	- All textures now wrap by default removing the need for the
+	  Tile class at all.
+	- In light of it's expanded role, renamed ::Actor::Box to the
+	  more general sounding ::Actor::Debug.
+	- We don't need to clear the color buffer when we have a skybox.
+	  Clearing only the depth buffer will have the exact same effect.
+	- Adding support for a ->{hidden} property on actors that allows
+	  them to intentionally make themselves invisible.
+	- Left CTRL now provides negative lift to the God-mode camera.
+	  i.e. It makes you go vertically downwards.
+	- Added F1 toggle to enable/disable debuging actors
+	- Added F2 toggle to enable/disable abusively expensive actors
+
+0.21 Tue 28 Dec 2010
+	- Adding directory-based asset support, which is needed for linking
+	  model files to their supporting texture (etc) files.
+	- Reorganised the file parsers into the ::Asset::* namespace.
+	- Adding a basic MTL file parser to add materials to OBJ models.
+	- Added an actor for showing the contents of a MTL file
+	- Added support for transparent materials in MTL files
+	- Actor display order is now sorted by descending distance from the camera
+	  to allow the alpha blending of transparent and anti-aliased objects
+	  to render correctly and prevent objects behind them "dissapearing".
+	- Added angle and elevation to the diagnostic console.
+	- Rewrote all my camera movement math as it was rotten. The new version is
+	  much easier to read and supports holding space down to go "up" in a camera
+	  angle relative direction.
+	- Added support for bounding boxes to actors.
+	- Added a bounding box actor, which is a semi-transparent white line cube
+	  that follows another actor around and highlights their bounding box.
+	- Added support for loading materials in OBJ files automatically from their
+	  respective MTL files.
+	- Added a plain => 1 option for disabling automatic MTL loading in cases
+	  where there is no MTL file and you just want a plain OBJ model.
+	- Added a herd of dangerous wild toilet plungers.
+	- Added a simple demonstration of actor-culling optimisation that skips
+	  drawing any actor that is behind the camera. This is nowhere near as good
+	  as frustrum culling (culling to the cemera's observation pyramid) but is
+	  simpler to implement and does the job for now.
+
+0.20 Mon 20 Dec 2010
+	- Apparently OpenGL convention dictates that all polygons have their
+	  points declared counter-clockwise to the "front" of the polygon.
+	  Once turning on face culling to save GL work, it turns out that
+	  all my shapes would inside out. Oops :)
+	- Importing a local fork of OpenGL::RWX
+	- Adding a life-sized nutcracker doll to help test RWX support.
+	- Expanded OpenGL::RWX's per-face surface normals to face-averaged
+	  per-vertex surface normals, allowing OpenGL to currectly smooth the
+	  polygons (important on polished wood toys)
+	- Added preliminary support for OBJ models (only with per-face surface
+	  normals at this point).
+	- Added a superbly detailed and giant freaking table to demonstrate the
+	  greater quality of objects you tend to be able to find for obj files.
+
+0.19 Mon 20 Dec 2010
+	- Added a "God Mode" flying camera which uses the left shift key
+	  as an exponential speed accelerator, and make it the default.
+	- Added ->current static method to ::3DWorld to get currently
+	  world. Removes the need to pass things like the camera around
+	  everywhere all the time.
+	- The skybox now locates the camera via ->current->camera instead
+	  having to be passed the camera.
+	- Added a console for overlaying the world with diagnostic text.
+	- Set min_t to zero to push frames per second as high as possible.
+	- Correcting some broken versions
+
+0.18 Sun 19 Dec 2010
+	- Moving the landscape to a typical 2000-era infinite ground plane,
+	  but with a more detailed texture than in that era.
+	  Unfortunately, the new ground plane means our skybox looks wrong
+	  now, as it was never designed for use with a ground plane.
+	- Reorganised some internals so we don't need to export from OpenGL
+	  so much. This will be removed later, once OpenGL fixes it constants.
+	- Added support for tiling textures with SDL::Tutorial::3DWorld::Tile
+
+0.17 Sat 18 Dec 2010
+	- Added preliminary support for loading models from RWX files
+
+0.16 Sat 18 Dec 2010
+	- Switch from manual GL display list code to OpenGL::List
+	- Implemented left shift for "running"
+
+0.15 Fri 17 Dec 2010
+	- Because we can be fairly certain that TextureCube (i.e. crates)
+	  will be popular, use that class to demonstrate the use of OpenGL
+	  display lists via glGenLists(), glNewList(), and glCallList().
+	- Noting that, of all things, glLineWidth() is insanely expensive.
+
+0.14 Fri 17 Dec 2010
+	- Actors are now rendered in random order to expose any places
+	  where material property state management is being done badly.
+	- Added some simple utility methods for getting paths to files
+	  and directories in the share directory.
+	- Added a TextureCube package for creating floor-origin rotatable
+	  resizable cubes with the same (and correctly oriented) texture
+	  on each face. Which is to say...
+	- Fear the mighty Crate! Weep! Swoon!
+
+0.13 Fri 17 Dec 2010
+	- Factored the teapot-specific logic into a separate class
+	- Added a new "grid cube" actor which demonstrates points, lines,
+	  multiple element actors and grid-snapping for worlds which
+	  inherently consist of a cube space (think original Wolfenstein).
+	- When a texture is displayed it now inherently defends itself
+	  against being altered by previous alpha channel settings of
+	  other objects.
+	- The 3dworld launcher now supports a --window option to disable
+	  fullscreen in places where it's weird (like on my giant portrait
+	  orientation monitors at $work)
+
+0.12 Fri 17 Dec 2010
+	- Increase default (only) resolution to 1024x768
+	- Turned on double buffering to prevent mouselook flicker
+
+0.11 Fri 17 Dec 2010
+	- OpenGL::GL_LINEAR_MIPMAP_LINEAR definitely looks better, especially
+	  when it has text on it.
+	- Change the skybox overlap to a minimum amount for slightly tighter
+	  welding of the skybox edges.
+	- Change to 24 bit colour depth so we don't get colour gradient steps
+
+0.10 Fri 17 Dec 2010
+	- The three teapots now match the official colours for the three axis
+	- Adding direction label text to the chessboard image
+	- Adding direction label text to all of the skybox image
+	- The chessboard texture was upside down, corrected
+	- The skybox images were backwards and inverted, corrected
+	- Moved the "examples" (that weren't) into the private directory
+
+0.09 Thu 16 Dec 2010
+	- The skybox cube faces now overlap just slightly, which removes the
+	  visible tearing between each face.
+	- Now the skybox doesn't suck, tweak the light position closer to
+	  where the sun is on the skybox should the shading and reflection
+	  look absolutely correct.
+
+0.08 Thu 16 Dec 2010
+	- Low-sophistication (Smooth Hinting) anti-aliasing enabled for all
+	  three of points, lines and polygons.
+	- Fixed the chessboard material so it works with blending enabled.
+	- Add GL hinting to make the texture scaling prettier.
+	- Movement is now done via the move callback, locking movement to real
+	  world time and making it independant of render speeds.
+	- Half-assed support for identifying speeds in real metres per second.
+	- Fixed a stupid trig bug in the camera movement logic, walking no
+	  longer makes you skew sideways like a drunken troll when facing east.
+
+0.07 Thu 16 Dec 2010
+	- Like all good games, 3DWorld now runs full screen
+
+0.06 Wed 15 Dec 2010
+	- The landscape is now a 10x10 metre chess board
+	- A new "at the origin" event filter for removing warp_mouse events,
+	  as the first "ignore next" one didn't account for event queueing
+	  and stuttering was starting to occur.
+	- Moved the light to approximately the location of where the sun is
+	  on the skybox for added "realism"
+	- All actors now have a velocity vector.
+	- Slightly less sucky material for the teapots.
+	- The teapots slowly fly away in the positive X, Y and Z directions
+
+0.05 Wed 15 Dec 2010
+	- Skybox is now both optional and actually works
+
+0.04 Wed 15 Dec 2010
+	- Adding a texture abstraction library
+	- Adding a simple implementation of a skybox
+
+0.03 Wed 15 Dec 2010
+	- Do not show the mouse cursor
+	- Capture the mouse cursor to allow infinite mouselook travel
+	- Adding a trivial constructor test (that doesn't init OpenGL)
+	- Adding Test::NoWarnings to the tests
+
+0.02 Wed 15 Dec 2010
+	- Fixed the lighting and material of the objects
+
+0.01 Tue 14 Dec 2010
+	- Created the initial game model

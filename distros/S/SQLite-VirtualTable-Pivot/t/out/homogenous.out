@@ -1,0 +1,15 @@
+load_extension('perlvtab.so')
+
+student|Arithmetic|Reading|Writing
+Fred|B|A|B
+Mary|||B
+student|Arithmetic|Reading|Writing
+Fred|B|A|B
+Reading
+A
+Arithmetic
+B
+student
+Fred
+student
+Mary

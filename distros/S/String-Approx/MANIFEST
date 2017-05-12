@@ -1,0 +1,26 @@
+Approx.pm
+Approx.xs
+apse.c
+apse.h
+Artistic
+ChangeLog
+COPYRIGHT
+COPYRIGHT.agrep
+LGPL
+Makefile.PL
+MANIFEST
+PROBLEMS
+README
+README.apse
+t/adist.t
+t/aindex.t
+t/amatch.t
+t/aslice.t
+t/arindex.t
+t/asubst.t
+t/user.t
+t/util
+t/words
+typemap
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

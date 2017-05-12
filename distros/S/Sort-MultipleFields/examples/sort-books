@@ -1,0 +1,56 @@
+#!perl -w
+# $Id: sort-books,v 1.2 2008/07/23 17:36:06 drhyde Exp $
+
+use strict;
+
+use Sort::MultipleFields qw(mfsort);
+use Data::Dumper;
+
+# Let's assume you have a Crazy Library, which contains each of these seven
+# works. You've got 21 copies of each book (!).  For each one you  have seven
+# copies published in each of 2001, 2002 and 2003, with the seven colours
+# of the rainbow on their spines.  They are in a completely random order.
+
+my $library = [
+    sort { rand() < 0.5 ? 1 : -1 }    # <-- random order
+    map {
+        { %{$_}, year => 2001 },
+        { %{$_}, year => 2002 },
+        { %{$_}, year => 2003 },
+    } map {
+	my $in = $_;
+        map { { %{$in}, colour => $_ } }
+	    qw(red orange yellow green blue indigo violet)
+    } (
+        { author => 'Clarke', title => 'Islands In The Sky' },
+        { author => 'Hoyle',  title => 'Black Cloud, The' },
+        { author => 'Clarke', title => 'Prelude to Space' },
+        { author => 'Asimov', title => 'Pebble in the Sky' },
+        { author => 'Asimov', title => 'Foundation' },
+        { author => 'Clarke', title => 'Rendezvous with Rama' },
+        { author => 'Asimov', title => 'David Starr, Space Ranger' }
+    )
+];
+
+# You want to sort the books first by author, then by title, then by
+# reverse year of publication (ie, most recent first) and finally by
+# colour, in the order of the colours in the rainbow.  Do it thus:
+
+$library = mfsort {
+    author => 'asc',
+    title  => 'asc',
+    year   => 'desc',
+    colour => sub { 
+        my @in = map {
+            $_ eq 'red'    ? 0 :
+            $_ eq 'orange' ? 1 :
+            $_ eq 'yellow' ? 2 :
+            $_ eq 'green'  ? 3 :
+            $_ eq 'blue'   ? 4 :
+            $_ eq 'indigo' ? 5 :
+                             6
+        } @_;
+        $in[0] <=> $in[1];
+    }
+} $library;
+print Dumper($library);

@@ -1,0 +1,192 @@
+<?xml version="1.0"?>
+<!DOCTYPE TopicSet PUBLIC "urn:newsml:iptc.org:20001006:NewsMLv1.0.dtd:1" "NewsMLv1.0.dtd">
+<TopicSet Duid="iptc.subjectqualifier" FormalName="SubjectQualifier">
+	<Comment xml:lang="en">A narrower context for a sports-related subject code, such as age or weight of athletes.</Comment>
+	<Topic Duid="sr15000001">
+		<TopicType Scheme="IptcTopicType" FormalName="SubjectQualifier"/>
+		<FormalName Scheme="IptcSubjectQualifiers">15000001</FormalName>
+		<Description xml:lang="en" Variant="Name">men</Description>
+		<Description xml:lang="en" Variant="Explanation"/>
+	</Topic>
+	<Topic Duid="sr15000002">
+		<TopicType Scheme="IptcTopicType" FormalName="SubjectQualifier"/>
+		<FormalName Scheme="IptcSubjectQualifiers">15000002</FormalName>
+		<Description xml:lang="en" Variant="Name">women</Description>
+		<Description xml:lang="en" Variant="Explanation"/>
+	</Topic>
+	<Topic Duid="sr15000003">
+		<TopicType Scheme="IptcTopicType" FormalName="SubjectQualifier"/>
+		<FormalName Scheme="IptcSubjectQualifiers">15000003</FormalName>
+		<Description xml:lang="en" Variant="Name">mixed</Description>
+		<Description xml:lang="en" Variant="Explanation"/>
+	</Topic>
+	<Topic Duid="sr15000004">
+		<TopicType Scheme="IptcTopicType" FormalName="SubjectQualifier"/>
+		<FormalName Scheme="IptcSubjectQualifiers">15000004</FormalName>
+		<Description xml:lang="en" Variant="Name">individual</Description>
+		<Description xml:lang="en" Variant="Explanation"/>
+	</Topic>
+	<Topic Duid="sr15000005">
+		<TopicType Scheme="IptcTopicType" FormalName="SubjectQualifier"/>
+		<FormalName Scheme="IptcSubjectQualifiers">15000005</FormalName>
+		<Description xml:lang="en" Variant="Name">duet/double</Description>
+		<Description xml:lang="en" Variant="Explanation"/>
+	</Topic>
+	<Topic Duid="sr15000006">
+		<TopicType Scheme="IptcTopicType" FormalName="SubjectQualifier"/>
+		<FormalName Scheme="IptcSubjectQualifiers">15000006</FormalName>
+		<Description xml:lang="en" Variant="Name">team</Description>
+		<Description xml:lang="en" Variant="Explanation"/>
+	</Topic>
+	<Topic Duid="sr15000007">
+		<TopicType Scheme="IptcTopicType" FormalName="SubjectQualifier"/>
+		<FormalName Scheme="IptcSubjectQualifiers">15000007</FormalName>
+		<Description xml:lang="en" Variant="Name">indoor</Description>
+		<Description xml:lang="en" Variant="Explanation"/>
+	</Topic>
+	<Topic Duid="sr15000008">
+		<TopicType Scheme="IptcTopicType" FormalName="SubjectQualifier"/>
+		<FormalName Scheme="IptcSubjectQualifiers">15000008</FormalName>
+		<Description xml:lang="en" Variant="Name">outdoor</Description>
+		<Description xml:lang="en" Variant="Explanation"/>
+	</Topic>
+	<Topic Duid="sr15000009">
+		<TopicType Scheme="IptcTopicType" FormalName="SubjectQualifier"/>
+		<FormalName Scheme="IptcSubjectQualifiers">15000009</FormalName>
+		<Description xml:lang="en" Variant="Name">amateur</Description>
+		<Description xml:lang="en" Variant="Explanation"/>
+	</Topic>
+	<Topic Duid="sr15000010">
+		<TopicType Scheme="IptcTopicType" FormalName="SubjectQualifier"/>
+		<FormalName Scheme="IptcSubjectQualifiers">15000010</FormalName>
+		<Description xml:lang="en" Variant="Name">professional</Description>
+		<Description xml:lang="en" Variant="Explanation"/>
+	</Topic>
+	<Topic Duid="sr15000011">
+		<TopicType Scheme="IptcTopicType" FormalName="SubjectQualifier"/>
+		<FormalName Scheme="IptcSubjectQualifiers">15000011</FormalName>
+		<Description xml:lang="en" Variant="Name">college</Description>
+		<Description xml:lang="en" Variant="Explanation"/>
+	</Topic>
+	<Topic Duid="sr15000012">
+		<TopicType Scheme="IptcTopicType" FormalName="SubjectQualifier"/>
+		<FormalName Scheme="IptcSubjectQualifiers">15000012</FormalName>
+		<Description xml:lang="en" Variant="Name">senior</Description>
+		<Description xml:lang="en" Variant="Explanation"/>
+	</Topic>
+	<Topic Duid="sr15000013">
+		<TopicType Scheme="IptcTopicType" FormalName="SubjectQualifier"/>
+		<FormalName Scheme="IptcSubjectQualifiers">15000013</FormalName>
+		<Description xml:lang="en" Variant="Name">junior</Description>
+		<Description xml:lang="en" Variant="Explanation"/>
+	</Topic>
+	<Topic Duid="sr15000014">
+		<TopicType Scheme="IptcTopicType" FormalName="SubjectQualifier"/>
+		<FormalName Scheme="IptcSubjectQualifiers">15000014</FormalName>
+		<Description xml:lang="en" Variant="Name">under18</Description>
+		<Description xml:lang="en" Variant="Explanation"/>
+	</Topic>
+	<Topic Duid="sr15000015">
+		<TopicType Scheme="IptcTopicType" FormalName="SubjectQualifier"/>
+		<FormalName Scheme="IptcSubjectQualifiers">15000015</FormalName>
+		<Description xml:lang="en" Variant="Name">under15</Description>
+		<Description xml:lang="en" Variant="Explanation"/>
+	</Topic>
+	<Topic Duid="sr15000016">
+		<TopicType Scheme="IptcTopicType" FormalName="SubjectQualifier"/>
+		<FormalName Scheme="IptcSubjectQualifiers">15000016</FormalName>
+		<Description xml:lang="en" Variant="Name">under13</Description>
+		<Description xml:lang="en" Variant="Explanation"/>
+	</Topic>
+	<Topic Duid="sr15000017">
+		<TopicType Scheme="IptcTopicType" FormalName="SubjectQualifier"/>
+		<FormalName Scheme="IptcSubjectQualifiers">15000017</FormalName>
+		<Description xml:lang="en" Variant="Name">under11</Description>
+		<Description xml:lang="en" Variant="Explanation"/>
+	</Topic>
+	<Topic Duid="sr15000018">
+		<TopicType Scheme="IptcTopicType" FormalName="SubjectQualifier"/>
+		<FormalName Scheme="IptcSubjectQualifiers">15000018</FormalName>
+		<Description xml:lang="en" Variant="Name">under9</Description>
+		<Description xml:lang="en" Variant="Explanation"/>
+	</Topic>
+	<Topic Duid="sr15000019">
+		<TopicType Scheme="IptcTopicType" FormalName="SubjectQualifier"/>
+		<FormalName Scheme="IptcSubjectQualifiers">15000019</FormalName>
+		<Description xml:lang="en" Variant="Name">precollege school related</Description>
+		<Description xml:lang="en" Variant="Explanation"/>
+	</Topic>
+	<Topic Duid="sr15000020">
+		<TopicType Scheme="IptcTopicType" FormalName="SubjectQualifier"/>
+		<FormalName Scheme="IptcSubjectQualifiers">15000020</FormalName>
+		<Description xml:lang="en" Variant="Name">qualifying/eliminations</Description>
+		<Description xml:lang="en" Variant="Explanation"/>
+	</Topic>
+	<Topic Duid="sr15000021">
+		<TopicType Scheme="IptcTopicType" FormalName="SubjectQualifier"/>
+		<FormalName Scheme="IptcSubjectQualifiers">15000021</FormalName>
+		<Description xml:lang="en" Variant="Name">preliminaries</Description>
+		<Description xml:lang="en" Variant="Explanation"/>
+	</Topic>
+	<Topic Duid="sr15000022">
+		<TopicType Scheme="IptcTopicType" FormalName="SubjectQualifier"/>
+		<FormalName Scheme="IptcSubjectQualifiers">15000022</FormalName>
+		<Description xml:lang="en" Variant="Name">round</Description>
+		<Description xml:lang="en" Variant="Explanation"/>
+	</Topic>
+	<Topic Duid="sr15000023">
+		<TopicType Scheme="IptcTopicType" FormalName="SubjectQualifier"/>
+		<FormalName Scheme="IptcSubjectQualifiers">15000023</FormalName>
+		<Description xml:lang="en" Variant="Name">qualifying round</Description>
+		<Description xml:lang="en" Variant="Explanation"/>
+	</Topic>
+	<Topic Duid="sr15000024">
+		<TopicType Scheme="IptcTopicType" FormalName="SubjectQualifier"/>
+		<FormalName Scheme="IptcSubjectQualifiers">15000024</FormalName>
+		<Description xml:lang="en" Variant="Name">final</Description>
+		<Description xml:lang="en" Variant="Explanation"/>
+	</Topic>
+	<Topic Duid="sr15000025">
+		<TopicType Scheme="IptcTopicType" FormalName="SubjectQualifier"/>
+		<FormalName Scheme="IptcSubjectQualifiers">15000025</FormalName>
+		<Description xml:lang="en" Variant="Name">classifications match</Description>
+		<Description xml:lang="en" Variant="Explanation"/>
+	</Topic>
+	<Topic Duid="sr15000026">
+		<TopicType Scheme="IptcTopicType" FormalName="SubjectQualifier"/>
+		<FormalName Scheme="IptcSubjectQualifiers">15000026</FormalName>
+		<Description xml:lang="en" Variant="Name">play-off</Description>
+		<Description xml:lang="en" Variant="Explanation"/>
+	</Topic>
+	<Topic Duid="sr15000027">
+		<TopicType Scheme="IptcTopicType" FormalName="SubjectQualifier"/>
+		<FormalName Scheme="IptcSubjectQualifiers">15000027</FormalName>
+		<Description xml:lang="en" Variant="Name">doping</Description>
+		<Description xml:lang="en" Variant="Explanation"/>
+	</Topic>
+	<Topic Duid="sr15000028">
+		<TopicType Scheme="IptcTopicType" FormalName="SubjectQualifier"/>
+		<FormalName Scheme="IptcSubjectQualifiers">15000028</FormalName>
+		<Description xml:lang="en" Variant="Name">sponsorship</Description>
+		<Description xml:lang="en" Variant="Explanation"/>
+	</Topic>
+	<Topic Duid="sr15000029">
+		<TopicType Scheme="IptcTopicType" FormalName="SubjectQualifier"/>
+		<FormalName Scheme="IptcSubjectQualifiers">15000029</FormalName>
+		<Description xml:lang="en" Variant="Name">marketing</Description>
+		<Description xml:lang="en" Variant="Explanation"/>
+	</Topic>
+	<Topic Duid="sr15000030">
+		<TopicType Scheme="IptcTopicType" FormalName="SubjectQualifier"/>
+		<FormalName Scheme="IptcSubjectQualifiers">15000030</FormalName>
+		<Description xml:lang="en" Variant="Name">disabled</Description>
+		<Description xml:lang="en" Variant="Explanation"/>
+	</Topic>
+	<Topic Duid="sr15000031">
+		<TopicType Scheme="IptcTopicType" FormalName="SubjectQualifier"/>
+		<FormalName Scheme="IptcSubjectQualifiers">15000031</FormalName>
+		<Description xml:lang="en" Variant="Name">deaf</Description>
+		<Description xml:lang="en" Variant="Explanation"/>
+	</Topic>
+</TopicSet>
+

@@ -1,0 +1,10 @@
+#! /usr/bin/perl -w
+
+use Shell::POSIX::Select qw($Prompt);
+
+$Prompt='Custom Prompt for loop 1';
+select ( 1 ){
+	$Prompt='Custom Prompt for loop 2';
+	LOOP2:
+	select ( 2 ){ last LOOP2; }
+}

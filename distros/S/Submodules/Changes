@@ -1,0 +1,22 @@
+Revision history for Submodules
+
+1.0000  2015-10-08
+        First version, released on an unsuspecting world.
+1.0002  2015-10-08
+        Improved documentation as per RT107649.
+        Fixed tests that are failing in some Linux platforms
+1.0004  2015-10-09
+        Fixed bug affecting old versions of Perl (5.14 and older)
+1.0006  2015-10-10
+        Fixed distribution settings to prevent test modules from
+		being indexed by PAUSE
+1.0008  2016-02-24
+		Added DESTROY method to Submodules::Result which would
+		cause a rather confusing warning in some cases when not present.
+1.0010  2016-02-24
+		Minor adjustments for PAUSE
+1.0012  2016-02-25
+		Added fixes that were supposed to be present in 1.0008 dist but weren't.
+		Minor adjustments for PAUSE
+1.0014  2016-02-25
+		Fixed - import method was causing a warning in old versions of Perl.

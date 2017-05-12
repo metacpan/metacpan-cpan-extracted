@@ -1,0 +1,63 @@
+{
+   "abstract" : "high-performance tools for building search applications",
+   "author" : [
+      "Peter Karman <karman@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Search-Tools",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::XSAccessor" : "0.14",
+            "Data::Dump" : "0",
+            "Encode" : "0",
+            "Encoding::FixLatin" : "0",
+            "File::Basename" : "0",
+            "Moo" : "0",
+            "Scalar::Util" : "0",
+            "Search::Query" : "0.300",
+            "Test::More" : "0.94",
+            "namespace::autoclean" : "0",
+            "perl" : "5.008003"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Search-Tools"
+      },
+      "homepage" : "https://github.com/karpet/search-tools-perl",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/karpet/search-tools-perl"
+      }
+   },
+   "version" : "1.004"
+}

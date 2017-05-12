@@ -1,0 +1,56 @@
+# NAME
+
+Script::State - Keep script local variables
+
+# SYNOPSIS
+
+    #!perl
+    use Script::State;
+
+    script_state my $count = 0; # set to last value if exists
+    say $count++;
+
+    # automatically write $count's current value to external file
+    # to be read at next script execution
+
+# FUNCTIONS/METHODS
+
+- script_state my $variable = $default;
+
+Keep this variable's state after script execution.
+
+- Script::State->store;
+
+Explicitly store current state. This is called in END block.
+
+# DESCRIPTION
+
+Script::State stores local variables to file after script execution.
+Values of scalar variables with `script_state` are stored in another file,
+and the values are automatically loaded when script is executed at next time.
+
+# HOW THIS WORKS
+
+Script::State stores variable states to file at same directory of script ($0).
+For example, if $0 eq 'foo/bar.pl', filename containing state is 'foo/.bar.pl.pl'.
+
+When Script::State is import()ed, it will load previous state from the state file,
+and at the time script_state() is called, bind corresponding value to the variable.
+
+When Script::State's END block is entered, this stores current variable values
+to the state file.
+
+# CAVEATS
+
+This modules currently uses Data::Dumper::Dump and eval() to store/load state, maybe unsafe.
+
+This modules currently does not lock state files.
+
+# AUTHOR
+
+motemen <motemen {at} gmail.com>
+
+# LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

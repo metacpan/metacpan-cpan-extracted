@@ -1,0 +1,16 @@
+Changelog.ini
+Changes
+data/synopsis.svg
+lib/SVG/Grid.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+scripts/generate.images.sh
+scripts/pod2html.sh
+scripts/synopsis.pl
+t/test.t
+xt/author/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

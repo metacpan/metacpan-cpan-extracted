@@ -1,0 +1,28 @@
+<&| /lib/filter/form.mas &>
+<form id="file-upload-form"
+      class="flush-left"
+      action="<% $uri %>"
+      method="post"
+      enctype="multipart/form-data">
+  <fieldset>
+    <legend><% $legend %></legend>
+
+    <div class="form-item">
+      <label class="for-field" for="file"><% loc('File') %>:</label>
+      <input id="file" name="file" type="file" />
+% if ( Silki::Config->instance()->max_upload_size() ) {
+      <div class="help-text">
+        <p><% loc( 'Files cannot be larger than %1.', format_bytes( Silki::Config->instance()->max_upload_size() ) ) %></p>
+      </div>
+% }
+    </div>
+
+    <input class="submit" value="Upload" type="submit" />
+  </fieldset>
+</form>
+</&>
+
+<%args>
+$uri
+$legend
+</%args>

@@ -1,0 +1,64 @@
+#!/usr/bin/env perl
+
+use Sepia::ReadLine;
+use Getopt::Long;
+
+sub usage
+{
+    print STDERR <<EOS;
+Usage: $0 [options]
+  -h,--help    Display help and exit.
+  -v,--version Display version information.
+EOS
+    exit;
+}
+
+GetOptions(help => \&usage,
+           version => sub {
+               print STDERR "Sepia version $Sepia::VERSION.\n"; exit },
+       ) or usage;
+repl();
+print "\n";
+
+__END__
+
+=head1 NAME
+
+C<sepl> -- a Term::ReadLine-based Sepia interactive shell.
+
+=head1 SYNOPSIS
+
+    $ sepl
+    Type ",h" for help, or ",q" to quit.
+    main @> substr "hello, japh", 7
+    'japh'
+    main @>
+
+=head1 DESCRIPTION
+
+C<sepl> uses L<Sepia::ReadLine> to provide an interactive Perl shell
+with many of the L<Sepia> features available in Emacs, including
+completion and all shortcuts.  It is not well-tested or frequently
+used, and should be considered experimental.
+
+=head1 SEE ALSO
+
+L<Sepia>, L<Term::ReadLine>.
+
+Most of C<Sepia>'s documentation is installed in Emacs' C<info>
+format.  On most systems it can be read from the command-line by
+typing "C<info sepia>".
+
+=head1 AUTHOR
+
+Sean O'Rourke, E<lt>seano@cpan.orgE<gt>
+
+Bug reports welcome, patches even more welcome.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2010-2011 Sean O'Rourke.  All rights reserved, some
+wrongs reversed.  This module is distributed under the same terms as
+Perl itself.
+
+=cut

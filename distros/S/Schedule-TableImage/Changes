@@ -1,0 +1,9 @@
+Revision history for Perl extension Image::Calendar.
+
+0.01  Wed Oct 22 11:57:43 2003
+	- original version; created by h2xs 1.19
+0.02  Mon Dec 1 2003    VERSION 1.10
+	- modified demo script to include relative path for use lib
+	- re ran demo script for corrected demo.png
+0.03  Fri Mar 12, 2004   VERSION 1.13
+	- modified test and demo script to specify the use of a Ghostscript font

@@ -1,0 +1,6 @@
+[% BLOCK custom_list %]
+<td>[% el.id %]</td>
+<td>[% el.title %]</td>
+<td>[% el.category_name %]</td>
+<td>[% el.entity_type %]</td>
+[% END %]

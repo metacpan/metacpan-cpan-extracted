@@ -1,0 +1,29 @@
+
+ * get feedback from developers (that's YOU!) on what they need most
+
+Otherwise,
+
+ * bugs
+  ** Simple: not recording errors
+  ** RPM spec doesn't work with Perl 5.004 MakeMaker
+
+ * functionality
+  ** record ends are carriage returns
+  ** SimpleSpec: cascading specs
+  ** create test suite
+  ** do more useful things with Entitys
+  ** Writer needs more intelligence
+  ** Simple forces a dependency on SGML::SPGroveBuilder and SP
+  ** More objects
+   - SGML::NonSGMLData
+   - SGML::Comment
+   - SGML::Whitespace
+   - SGML specific objects (marked sections, for example)
+
+ * projects
+  ** Unicode
+  ** create Document Object Model <http://www.w3.org/DOM/> layer
+  ** more examples
+
+ * issues
+  ** should SData be CharEntity or not even a special case of Entity?

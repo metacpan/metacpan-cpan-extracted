@@ -1,0 +1,117 @@
+Whats new in 1.08
+-----------------
+
+SDL::App
+========
+
+Additions
+
+SDL_OPENGLBLIT           to supoprt SDL rendering to OpenGL surface
+SDL_RESIZEABLE           app is resizable  bit mask
+SDL_INIT_TIMER          
+SDL_INIT_JOYSTICK       
+SDL_INIT_NOPARACHUTE
+SDL_INIT_EVENTTHREAD	
+SDL_INIT_EVERYTHING  		 
+SDL_RLEACCELOK	
+SDL_SRCCLIPPING
+
+::new                   custom SDL lib init flags can be passed in via -init
+
+			pass -postpone_init_video =>1 if you want to put
+			of mode setting (e.g makeintervening  calls to OpenGL 
+			set attr before mode shange)
+
+			no arguments causes minimalist SDL lib init.				 
+
+::video_mode_ok          check mode is supported
+::compile_info
+::linked_info
+::endianess
+->toggle_fullscreen      as it says
+->video_mode             change mode
+->init_mode              if new was passed postpone_init_video this will set video
+->icon
+->DESTROY                will now shutdown SDL  (removed atexit(SDL_Quit) from XS)
+			 (so you can start a new app)
+Mods
+[XXX]_init  return codes checked
+
+
+Depreactions
+SDL_TEXTWIDTH,  it's not a constant!, please use 'SDL::Font::text_width';
+
+
+
+Bugs
+SDL_RLEACCELLOK     exported by SDL::App but mising from XS:
+SDL_SRCCLIPPING     exported by SDL::App but mising from XS:
+
+
+Internal changes
+'new'           makes more use of self method, less duplication of effort
+		internal tracking of mode w,h,f,bpp to support postpone_init_video,
+		and to be used for some defaults for any other mode size changes
+
+
+
+SDL::Event
+==========
+
+SDL_VIDEORESIZE
+->resize_width
+->resize_height
+
+
+SDL::Font
+=========
+
+->text_width      moved from SDL::App:SDL_TEXT_WIDTH
+
+
+
+OpenGL::App
+===========
+
+
+ALT-Enter: toggle fullscreen 
+window resize events handled and video mode changed accrodingly
+
+
+---------------------------------------------------
+
+
+ 
+SDL::Joystick
+-------------
+
+Added the whole class in this version, pretty raw usage,
+dont rely on it, api WILL change
+
+
+
+
+
+Typemap
+-------
+added SDL_Joystick
+added const char *
+SDLKey
+
+
+
+sdlpl
+-----
+
+Joystick constants and functions
+more INIT consts
+RESIZABLE surface flag
+VIDEORESIZE event flag
+global keystates
+sdl_prep_keystate
+sdl_keystate
+
+tools
+-----
+
+added some xs support scripts to auto gen custom .xs and .pm  files

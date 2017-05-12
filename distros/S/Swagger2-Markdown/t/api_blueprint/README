@@ -1,0 +1,16 @@
+examples sourced from:
+
+    https://github.com/apiaryio/api-blueprint/tree/master/examples
+
+note because of the limitations in converting a swagger spec to API Blueprint
+some of the examples have been modified slightly in terms of the order that
+endpoints appear and also some tweaking to the attribute types. A couple of
+examples have sections removed because swagger does not support multiple diff
+reponse types per response code (either based on consumes or produces).
+
+The examples are largely the same and the tweaking here shouldn't affect the
+eventual parsing of the API Blueprint file too much[1]. If you're curious you
+should diff the examples in this dir with the examples from the above link.
+
+[1] not tested, i have merely looked at the output after parsing these files
+with aglio: https://github.com/danielgtaylor/aglio

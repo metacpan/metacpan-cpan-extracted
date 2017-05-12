@@ -1,0 +1,71 @@
+NAME
+    SQL::ReservedWords - Reserved SQL words by ANSI/ISO
+
+SYNOPSIS
+       if ( SQL::ReservedWords->is_reserved( $word ) ) {
+           print "$word is a reserved SQL word!";
+       }
+
+DESCRIPTION
+    Determine if words are reserved by ANSI/ISO SQL standard.
+
+METHODS
+    is_reserved( $word )
+        Returns a boolean indicating if $word is reserved by either
+        "SQL:1992", "SQL:1999" or "SQL:2003".
+
+    is_reserved_by_sql1992( $word )
+        Returns a boolean indicating if $word is reserved by "SQL:1992".
+
+    is_reserved_by_sql1999( $word )
+        Returns a boolean indicating if $word is reserved by "SQL:1999".
+
+    is_reserved_by_sql2003( $word )
+        Returns a boolean indicating if $word is reserved by "SQL:2003".
+
+    reserved_by( $word )
+        Returns a list with SQL standards that reserves $word.
+
+    words
+        Returns a list with all reserved words.
+
+EXPORTS
+    Nothing by default. Following subroutines can be exported:
+
+    is_reserved
+    is_reserved_by_sql1992
+    is_reserved_by_sql1999
+    is_reserved_by_sql2003
+    reserved_by
+    words
+
+SEE ALSO
+    SQL::ReservedWords::DB2
+
+    SQL::ReservedWords::MySQL
+
+    SQL::ReservedWords::ODBC
+
+    SQL::ReservedWords::Oracle
+
+    SQL::ReservedWords::PostgreSQL
+
+    SQL::ReservedWords::SQLite
+
+    SQL::ReservedWords::SQLServer
+
+    ISO/IEC 9075:1992 Database languages -- SQL
+
+    ISO/IEC 9075-2:1999 Database languages -- SQL -- Part 2: Foundation
+    (SQL/Foundation)
+
+    ISO/IEC 9075-2:2003 Database languages -- SQL -- Part 2: Foundation
+    (SQL/Foundation)
+
+AUTHOR
+    Christian Hansen "chansen@cpan.org"
+
+COPYRIGHT
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

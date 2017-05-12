@@ -1,0 +1,7 @@
+Revision history for Perl extension SAP::WAS::SOAP.
+
+0.01  Sun Apr  14 18:00:00 2002
+	- original version; created by me
+
+0.04 Thu Nov  4 16:36:33 GMT 2004
+    - added in the basic auth for SOAP::Lite from  Christian Wippermann

@@ -1,0 +1,6 @@
+Revision history for Statistics-Robust
+
+0.01    Thu July 30 2009
+        - Original version uploaded to CPAN.
+0.02    Mon July 02 2012
+        - Bug fix in median calculation for even-numbered lists

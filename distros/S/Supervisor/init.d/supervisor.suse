@@ -1,0 +1,83 @@
+#!/bin/sh
+#
+# File: supervisor
+# Date: 21-Sep-2009
+# By  : Kevin Esteb
+#
+# This is the startup procedure for supervisor on Novell SUSE.
+#
+### BEGIN INIT INFO
+# Provides:       supervisor
+# Required-Start: $network
+# Should-Start:
+# Required-Stop:
+# Should-Stop:
+# Default-Start:  2 3 5
+# Default-Stop:
+# Description: Supervisor is a simple monitor of proceesses
+### END INIT INFO
+#
+
+PIDFILE="/var/run/supervisor.pid"
+CONFIGS="/etc/supervisor.ini"
+LOGFILE="/var/log/supervisor.log"
+USER="root"
+NAME="supervisor"
+
+# integrate the overrides
+
+if [ -f /etc/sysconfig/supervisor ];then
+    . /etc/sysconfig/supervisor
+fi
+
+PROGRAM="/usr/local/bin/$NAME"
+PARAMS="--pidfile $PIDFILE --config $CONFIGS --logfile $LOGFILE"
+ARGS="-c / -s -p $PIDFILE"
+
+# integrate the suse functions
+
+. /etc/rc.status
+rc_reset
+
+# Some simple tests
+
+[[ -f $PROGRAM ]] || exit 0
+
+# See how we were called
+
+case "$1" in
+    start)
+        echo -n $"Starting supervisor: "
+        startproc $ARGS $PROGRAM $PARAMS
+        rc_status -v
+        ;;
+
+    stop)
+        echo -n $"Shutting down supervisor: "
+        killproc -t 30 -p $PIDFILE $PROGRAM
+        rc_status -v
+        ;;
+
+    status)
+        checkproc -p $PIDFILE $PROGRAM
+        rc_status -v
+        ;;
+
+    restart|reload)
+        $0 stop
+        sleep 5
+        $0 start
+        rc_status
+        ;;
+
+    try-restart)
+        $0 status >/dev/null && $0 restart
+        rc_status
+        ;;
+
+    *)
+        echo "Usage $0 (start|stop|restart|reload|status|try-restart)"
+        exit 1
+
+esac
+rc_exit

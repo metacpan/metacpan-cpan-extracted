@@ -1,0 +1,253 @@
+Revision history for SVG-Rasterize
+
+0.003008 Sat May 21 21:02:18 NZST 2011
+	 - This release is at the same time a release candidate for
+           0.004000.
+	 - Incompatible changes:
+	   - Interface of backend classes (note that this interface
+	     is marked as generally unstable):
+	     - The interface of the draw_text method has changed to
+	       allow the specification of a rotate attribute.
+	 - docu fixes
+	 - fixed outdated README
+	 - prepared the code to start support for SVG files based on
+	   XML::SAX
+
+0.003007 Tue May  3 19:51:07 NZST 2011
+	 - Incompatible changes:
+	   - The default backend SVG::Rasterize::Cairo has been
+	     renamed to SVG::Rasterize::Engine::PangoCairo. There is
+	     a base class SVG::Rasterize::Engine which backends
+	     should inherit from. If you are selecting the
+	     rasterization backend explicitly you will have to
+	     update your code. Otherwise - unless you are
+	     maintaining your own rasterization backend for
+	     SVG::Rasterize - this change is completely transparent
+	     for you.
+	 - more font attributes
+	 - minor fixes and improvements
+	 - docu expansion
+
+0.003006 Thu Apr 28 20:21:15 NZST 2011
+	 - Incompatible changes:
+	   - The current_text_position method of
+	     SVG::Rasterize::State has gone.
+	 - Fixes bug #67699.
+	 - Major revision of the traversal of the node tree enabling
+	   a much cleaner approach to deferred rasterization of text
+	   elements. This should be transparent even for hooks.
+	 - Major revision of the way text is processed. This
+	   framework will hopefully be fully capable of handling
+	   text correctly including bidi text etc..
+	 - Alignment of text via text-anchor
+	 - Positioning of individual characters
+
+0.003005 Fri Apr 22 11:53:35 NZST 2011
+	 - Support for more text attributes:
+	   - font-size (except relative font sizes)
+	 - Regex check of ID attributes.
+	 - Reorganized docu to increase user friendliness.
+	 - Reorganization and substantial expansion of test suite,
+	   guided by Devel::Cover.
+	 - Comments are ignored now as they should. This fixes bug
+	   RT#62943. Additionally, title, desc, and metadata
+	   elements are ignored.
+	 - Minor bug fixes.
+
+0.003004 Thu Jun 17 13:16:14 NZST 2010
+	 - Adds support for currentColor and hex color settings.
+	 - Introduces methods to restore default hooks.
+	 - Makefile.PL tests for sufficiently high versions of the
+	   cairo and pango C libraries thereby avoiding failing
+	   CPAN testers smoke tests.
+
+0.003003 Sun Jun 13 20:48:11 NZST 2010
+	 This is a maintenance release covering the following
+	 improvements:
+	 - The specification is split into different modules
+	   (according to the classes in the DTD) which are only
+	   loaded when needed. The avoids loading the 12KB
+	   Specification module at the start even if only small bits
+	   will be used.
+	 - The specification modules now contain information which
+	   elements are allowed to hold parsed character data (other
+	   than white space). This is checked during validation.
+	 - Class::Accessor now also throws an Exception::Class
+	   object if it is attempted to set a readonly attribute.
+
+0.003002 Fri Jun 11 20:09:34 NZST 2010
+	 - Now introducing the Pango dependency (see 0.003001).
+	 - Starting support for text elements. This brings some
+	   little, but not backwards compatible changes in the
+	   interface of SVG::Rasterize::State:
+	   - The child nodes are determined outside of state now and
+             handed over to the constructor.
+	   - The method hasChildNodes has gone, and nextChild has
+             been renamed to shift_child_node.
+	 - Additionally, there has been an interface change of the
+           before_node_hook (which was marked as experimental). It
+	   now receives named parameters and is expected to return a
+	   (potentially modified) hash.
+	 - Various bug fixes including RT#58114.
+	 - Detailed audit of the main docu.
+
+0.003001 Thu Jun  3 20:36:38 NZST 2010
+	 - Main purpose for this (kind of premature) release: Fixes
+	   bug in SVG::Rasterize::Cairo that prohibit the
+	   specification of an output file name.
+	 - New dependency Pango (1.220 or higher)...postponed in
+	   order to allow testing my perl 5.8.9 installation.
+	 - Fixes bug in validation of attributes with a list of
+	   valid values.
+
+0.003000 Wed Jun  2 20:41:08 NZST 2010
+	 Identical to 0.002003.
+
+0.002003 Wed Jun  2 20:34:37 NZST 2010 (unpublished)
+	 - Prepared the framework for greater flexibility in output
+           formats etc..
+	 - Docu fixes and expansion.
+
+0.002002 Tue Jun  1 21:08:09 NZST 2010 (unpublished)
+	 - Partial rendering of paths, polylines, and polygons if
+	   they are in error.
+	 - Consequent use of Params::Validate (or documentation that
+	   parameters are not validated).
+	 - Documentation of diagnostics.
+	 - Docu fixes and expansion.
+
+0.002001 Sun May 30 16:21:15 NZST 2010 (unpublished)
+	 - New dependency Exception::Class (1.29 or higher).
+	 - Proper error handling as required by spec (except partial
+	   rendering of path, polyline, and polygon).
+	 - Docu fixes.
+	 - All methods return explicitly.
+
+0.002000 Tue May 25 15:42:09 NZST 2010
+	 Documentation updates.
+
+0.001006 Tue May 25 15:06:16 NZST 2010 (unpublished)
+	 - Adds support for all basic shapes
+	   - rect
+	   - circle
+	   - ellipse
+	   - (line was already supported)
+	   - polyline
+	   - polygon
+	 - Revision of large parts of the docu.
+
+0.001005 Sun May 23 21:39:39 NZST 2010
+	 - Color filling (no gradients, patterns etc.).
+	 - (Semi-)transparent stroking and filling including
+	   different opacity values for stroke and fill and without
+	   the fill shining through transparent stroke.
+	 - Further newly supported properties (all fill and stroke
+	   properties):
+	   - fill-rule
+	   - stroke-linecap
+	   - stroke-linejoin
+	   - stroke-miterlimit
+	   - stroke-dashoffset
+	   - stroke-dasharray
+	 - Bugfixes:
+	   - in processing of explicit 'inherit' property
+	     values
+	   - in path data processing
+	   - color values are clamped at presentation time instead
+	     of parsing time (as recommended by the spec).
+
+0.001004 Fri May 21 21:19:54 NZST 2010 (unpublished)
+	 - Elliptical arcs including example script.
+
+0.001003 Thu May 20 19:59:30 NZST 2010 (unpublished)
+	 - Support for all path commands except elliptical arc.
+	 - Core documentation up-to-date.
+
+0.001002 Sun May 16 19:33:22 NZST 2010
+	 - The final transformation matrix is now applied by the
+	   rasterization engine and not by SVG::Rasterize. This is
+	   necessary for correct stroke-width handling with
+	   inhomogeneous scaling and skewing.
+	 - Introduces partial path support. All valid path data
+	   strings are swallowed, but only moveto, closepath, and
+	   lineto commands are supported, the rest is ignored.
+	 - Reorganizes SVG::Rasterize::Regexes into a set of
+	   hashes. The namespace pollution became uncontrollable.
+
+0.001001 Thu May 13 20:59:13 NZST 2010 (unpublished)
+	 - Further consolidates the usage of attribute checking and
+	   processing using regexes in SVG::Rasterize::Regexes.
+	 - Further completion of %SVG::Specification::ATTR_VAL.
+
+0.001000 Wed May 12 21:00:58 NZST 2010
+	 Identical to 0.000009.
+
+0.000009 Wed May 12 20:55:57 NZST 2010 (unpublished)
+	 - Introduces SVG::Rasterize::Specification,
+	   SVG::Rasterize::Properties, and
+	   SVG::Rasterize::Colors. These files are at least
+	   semiautomatically created from the DTD or human readable
+	   specification. This hopefully finalizes the general
+	   structure of the framework to deal with attributes and
+	   properties.
+	 - Commonly uses regexes are outsourced in
+	   SVG::Rasterize::Regexes leading to much cleaner code.
+	 - Unsetting of hooks (to undef) now passes parameter
+	   validation.
+
+0.000008 Thu May  6 13:28:45 NZST 2010
+	 - Corrects docu issues that I have only seen unce uploaded.
+	 - Removes POD that slipped into README making the CPAN
+	   version look empty.
+	 - Homogenizes interface of new and rasterize. The rasterize
+	   method now accepts temporary values for (the relevant)
+	   object attributes.
+	 - Input objects are now validated by interface, not by
+	   class, allowing generic DOM objects (not necessarily SVG
+	   subclasses) to be rendered.
+	 - The rasterization backend is initialized as early as
+	   possible allowing early in_error. Makes the root element
+	   even less special.
+
+0.000007 Mon May  3 14:41:06 NZST 2010
+	 - normalization of attribute values according to XML
+           specification
+	 - revised docu
+
+0.000006 Sun May  2 22:09:43 NZST 2010 (unpublished)
+	 - Introduction of hooks.
+	 - Set up framework for support of styling properties. Only
+	   very few are supported, though.
+	 - Examples directory. Only one very simple example so far.
+	 - Tested on Perl 5.8.9 with only the documented dependency
+	   modules.
+
+0.000005 Fri Apr 30 13:15:59 NZST 2010 (unpublished)
+	 Changed namespace from SVG::Render to SVG::Rasterize. It's
+	 much more specific.
+
+0.000004 Fri Apr 30 11:22:36 NZST 2010 (unpublished)
+	 - Reorganization of the viewport initialization. The root
+	   svg element is much less special now.
+	 - State only uses the name and attributes of a node. The
+	   only exception is the provision of the nextChild
+	   method. The node object is still saved for the use in
+	   hooks, but it is not used. The distinction between
+	   parsing a DOM tree or a file is entirely made in
+	   SVG::Render.
+	 - Revised the concept of length to number mapping preparing
+	   it for the support of relative lengths.
+
+0.000003 Thu Apr 29 15:51:16 NZST 2010 (unpublished)
+	 - (Almost) full documentation of SVG::Render and
+	   SVG::Render::State.
+
+0.000002 Wed Apr 28 19:33:09 NZST 2010 (unpublished)
+	 - Full support for the transform attribute.
+	 - Support for absolute units.
+	 - Initial viewport including viewBox and
+           preserveAspectRatio.
+
+0.000001 Sun Apr 25 19:43:28 NZST 2010 (unpublished)
+         First release, proof of concept only. Can only draw black
+         lines of fixed width. Shows successful deployment of Cairo.

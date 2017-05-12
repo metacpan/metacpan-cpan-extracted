@@ -1,0 +1,96 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 21b7cc5b645c5c40e447ee2be75aa8e329936ca7 Build.PL
+SHA1 b731e499f8ba87cde3ca1408efa4472d378701e7 Changes
+SHA1 585b02d0328e6f1306942c03746e134193ee7eae INSTALL
+SHA1 07d4665461be65997c32bd5d039cd7dfec868edf LICENSE
+SHA1 9cbea2ac602d82855b5910cd535eab60c6ca74c3 MANIFEST
+SHA1 15b99b2596c5d484d751416e062932cf5e7fe555 MANIFEST.SKIP
+SHA1 c3a805710e417747ffb6b375b95a67596d9b32c5 META.json
+SHA1 9aa964c91756aaf9fd43eae6470d6192e027341e META.yml
+SHA1 6e323b98c31549f4e9b0ab0d2817d79f0cccbfa6 Makefile.PL
+SHA1 5446165c421c7f98181d6bab0869e33e5c924edc README
+SHA1 fa9d666e41bcad30ee820b1259568a84729ad484 dist.ini
+SHA1 51366b6fbc2c9e678bb7304011d6d7673d031774 lib/Soar/Production.pm
+SHA1 9c6cf9d7645cdb76b185d057423dfe0979775e7d lib/Soar/Production/Parser.pm
+SHA1 9a719bcb05f2bd12b525b5a5568b07e702e2cc5e lib/Soar/Production/Parser/PRDGrammar.pm
+SHA1 c037dc16c22dd12e074adc3863c77ce15c52d0bf lib/Soar/Production/Printer.pm
+SHA1 2f80776aa652f40b7d9ee3f7c6dc676a9ca78384 t/0-use.t
+SHA1 21be2c2834e78c05801b2f818bed261ffe339240 t/00-compile.t
+SHA1 b2558c48fe9ed5f6e039f00150b78658a9619b98 t/000-report-versions-tiny.t
+SHA1 f9390f13993c13782deba2e2b16409229fef8741 t/1-basic.t
+SHA1 f74ea46a7e91458eb9ed7b06617f2217e665ca88 t/parser/00-use.t
+SHA1 38bc75ae808e4ee7d73461607424a2cff2fc696e t/parser/01-bad_input.t
+SHA1 4bb48c016ce243506b80c2ebe63b8958273a0576 t/parser/01_5-comments.t
+SHA1 b63c55484066a35b35ae5235f078a0e6ab70d466 t/parser/02-split-productions.t
+SHA1 1a8dca0d9243ce0c59f584d92ab94985a4de132d t/parser/03-production-names.t
+SHA1 c335464c27b1d7e5a999a3d4a25a8867649d32fc t/parser/04-documentation.t
+SHA1 d71f9183f96c87914e60d5d2fbe9ff174a0447e5 t/parser/05-Flags.t
+SHA1 e67a02e98a03dbf588860588bc72854826aa26e8 t/parser/06-State.t
+SHA1 2d2b4c3f9f872d59020be99126215e3b44c8dc5a t/parser/07-variables.t
+SHA1 04481b04cc4930538b3a7e2bc7cfad9994a65541 t/parser/08-attributes.t
+SHA1 5694562389f148dba0a2fb682612335fe46ced8a t/parser/09-int.t
+SHA1 a1e0a6e84eefa6526d516f9a3c283862b7f5d745 t/parser/10-float.t
+SHA1 35bb4bf1c292cb33e78ff69ef5dc7e51dd540699 t/parser/11-string.t
+SHA1 a3615452cb645c1c5c32604e96303d9b6e9d9c88 t/parser/12-quoted.t
+SHA1 31f9c51dcde9c71717688555e97e2137721a069a t/parser/13-disjunct.t
+SHA1 9fd89b695afdad8622e8b6b2917c0b284fd7ec71 t/parser/14-conjunct.t
+SHA1 b472cf62d5b8f5830700fb4edd3c21834d906b45 t/parser/15-predicate.t
+SHA1 245bbb68db0778043ac56ad116d64db4a37ddb62 t/parser/16-preference.t
+SHA1 18560f1f75defb35ef5bf1cb8f05bb29e59c355c t/parser/17-function.t
+SHA1 5e5d16ce5c180751aa0ba60e7f6da82a33bccc9f t/parser/18-negative.t
+SHA1 72342610a14d6ab037477d20776f6075b6274afe t/parser/19-conjunctiveCond.t
+SHA1 d5b98530ade198c5a41bbe717c18fd6a8145511b t/parser/20-test_data.t
+SHA1 51eb6b14b475dcd6c63ed1052501a497677c627c t/parser/TestSoarProdParser.pm
+SHA1 2e8699756b5a7a70f825719a36de08f70a72c387 t/parser/examples/b.soar
+SHA1 499ea0eea158bc8be985a55edc707d7b53bb4a3c t/parser/examples/big.soar
+SHA1 ebea9b7d06bb90f8395bb2c1208e5ab35d0e0084 t/parser/examples/generate-facts.soar
+SHA1 098f7d7cfe49b70ca6489f2331cc122f12ac382f t/parser/examples/readme.soar
+SHA1 7976f670c68616670838e915ee4b37c38f15ef28 t/parser/examples/testmulti.soar
+SHA1 fd6f73b19c082d7405817f174c1961924788b1be t/parser/perlcriticrc
+SHA1 fd6f73b19c082d7405817f174c1961924788b1be t/perlcriticrc
+SHA1 7482e9c87e5df923b0b3507e8696460b5f95b0ff t/printer/0-use.t
+SHA1 73b926072a41992482285dcc4f1c85918d10ec8f t/printer/1-test_data.t
+SHA1 499ea0eea158bc8be985a55edc707d7b53bb4a3c t/printer/big.soar
+SHA1 fd6f73b19c082d7405817f174c1961924788b1be t/printer/perlcriticrc
+SHA1 7976f670c68616670838e915ee4b37c38f15ef28 t/testmulti.soar
+SHA1 f5157159ad8a981fb1dd1b8a3f4c2bdbe50cb956 xt/author/critic.t
+SHA1 50737a918766abc9e01cf2181babc921384d35e1 xt/release/cpan-changes.t
+SHA1 8cce11ecae0b788c6305cae08f46ac70d72733a1 xt/release/dist-manifest.t
+SHA1 3c1d880373d10a6d140dc9c62a1e2400b9840671 xt/release/distmeta.t
+SHA1 89c9faaec77db0624e760b5dc2ef1c16cc870269 xt/release/kwalitee.t
+SHA1 2130572fa14249644a1411504334d8642cd16be7 xt/release/meta-json.t
+SHA1 2a16310fbd19d81a4b930938884c546936ae2c0f xt/release/minimum-version.t
+SHA1 c7ebf3bfcd659a18c808776d25d76b80cf77f47b xt/release/mojibake.t
+SHA1 9f2b82e900833271ae804696661928ac98411920 xt/release/pod-coverage.t
+SHA1 d55d6176894faeffffef8e2b635a8d334ef3fb70 xt/release/pod-linkcheck.t
+SHA1 32482ecdf5e65413872ae24fee51e5a212908267 xt/release/pod-syntax.t
+SHA1 608d7d9d2102b32459629211b6b19922e658e099 xt/release/portability.t
+SHA1 8d5581ecdf0cd1d4b95e7efc095c012ed830a9a8 xt/release/synopsis.t
+SHA1 bbcd59d081d9940af5d43337ae85458075933829 xt/release/test-version.t
+SHA1 b3768345e812996ac3e3b4decd2c91951046d807 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.17 (MingW32)
+
+iQEcBAEBAgAGBQJRuMTTAAoJEF8b+BZrlpb0Ga0H/3c5Qxxd5Cfyj6H8DI7pC3Il
+wWzSAhHBqxHprPB2eWCrG80Rh3Tnuos4a2vCz3lpkMeEbpOCApg8iS54P+mSKPAY
+pMSd2bTx9rc0dThRB9oB6cGE+RsMIiuYxw17sr+RswywA98x2rvuiGK4VHATV5F9
+bsnU1KYyCYmDaXxCVTOJyWIG+zUZyisdQwRFPTMlCUsNHiJumE0jFbfuxajuVWla
+n5b73dPYV7CoEsGWG1JI5Uw7PVKnJR7tq5xqPg8l6ci+krp4Dmmtt9Vg8YZaUFCM
+n/ZYgYU8aH863He4uCAczRNFH1ZxNlBddchMJBtK5nW4sol2NcK5nZuggGYAbu0=
+=clwl
+-----END PGP SIGNATURE-----

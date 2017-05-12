@@ -1,0 +1,44 @@
+#! /usr/bin/perl
+
+# $Id: activity,v 1.6 1999/01/07 19:21:38 carrigad Exp $
+
+# Copyright (C), 1998, 1999 Enbridge Inc.
+
+use strict;
+use SecurID::ACEdb qw(:basic ListSerialByLogin ListHistory);
+
+ApiInit() or die "Can't init ACE API: " . Result();
+
+my $username = shift;
+my $days = shift;
+
+$days = 1 unless defined $days;
+
+die "usage: $0 login [ days ]\n" unless defined $username;
+
+my $serial= ListSerialByLogin($username);
+
+die "ListSerialByLogin failed: " . Result()
+  unless defined $serial;
+
+die "Could not locate token for user $username\n" unless @{$serial};
+
+my $token = $serial->[0];
+
+print "Listing history for token $token\n";
+
+my $hist;
+die "ListHistory failed: " . Result()
+  unless $hist = ListHistory($days, $token);
+
+if (!@{$hist}) {
+  print "No history entries for the time period specified.\n";
+  exit 0;
+}
+
+printf("%-10s %-5s %-25s %s\n", qw(Date Time Client Message));
+foreach my $he (@{$hist}) {
+  printf("%-10s %-5s %-25s %s\n", map {$he->{$_}} qw(localDate localTOD clientName msgString));
+}
+
+ApiEnd();

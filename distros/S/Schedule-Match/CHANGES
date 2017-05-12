@@ -1,0 +1,23 @@
+Revision history for Perl extension Schedule::Match.
+
+0.01
+ - Initial version.
+ - This is a direct port of previous non-module version.
+
+0.02
+ - Added tests.
+ - Incorporated better crash detection algorithm.
+ - More documents.
+ - Rewritten several parts for clarity.
+ - Exports more methods.
+ - Handles t_wm and t_om.
+ - Fixed localtime for better compatibility.
+ - Optimized some loop.
+
+0.03
+ - This is the first version to be upload to CPAN.
+ - Changed module name to Schedule::Match (Time::Schedule was too generic).
+
+0.04
+ - Fixed a bug which caused "make test" to fail on some platform.
+ - Minor documentation update.

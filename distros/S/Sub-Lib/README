@@ -1,0 +1,128 @@
+NAME
+    Sub::Lib - Stuff sub-routines into a run-time namespace. Because.
+    Reasons.
+
+SYNOPSIS
+      use Sub::Lib;
+
+      # create a library
+      my $lib = Sub::Lib->new({
+        'log' => sub {print join(' ', localtime. ':', @_), "\n"},
+      });
+
+      # add methods
+      $lib->('info',  sub {$lib->('log')->('info:', @_)});
+      $lib->('warn',  sub {$lib->('log')->('warn:', @_)});
+
+      # call them directly
+      $lib->('info')->('This is for information');
+
+      # or via some sugar
+      $lib->run('warn', 'This is for warnings');
+
+      # or via some oo sugar
+      $lib->('method', sub {
+        my ($self, $name, @args) = @_;
+        $self->run($name, @args);
+      });
+      # calls the 'method' sub-routine from the library as an object
+      # method on $lib.  attaches to objects like a virus.
+      $lib->call('method', $lib, 'info', "Have you seen?  Oh I've seen.");
+
+      # cheeseburger
+      {
+        my $sub = $lib->has('warn');
+        $sub->('I can has.')
+          if $sub;
+      }
+
+      # in case you don't like exceptions
+      $lib->void('info')->('This has a high probability of working');
+      $lib->void('ofni')->('Hidden messages go here');
+
+      # why not?
+      $lib->curry('warn', 'I know stuff now')->('and later');
+
+      # why not?  for objects.
+      my $o = $lib->o('method', $lib, 'info');
+      $o->('I think I am confused');
+
+      # closures allow bending time
+      my $y = $lib->y('apex', sub {
+        my ($sub, @args) = @_;
+        $sub->('I can see forever', @args);
+      }, 'or something.');
+      $lib->('apex',  sub {$lib->('log')->('apex:', @_)});
+      $y->('can you?');
+
+      # you have been warned
+      $lib->('info')->('installed subs:', join(', ', keys %{$lib->()}));
+
+DESCRIPTION
+    Sub::Lib allows you to store sub-routines into a common library which
+    can then passed around as a variable. It's a run-time namespace.
+
+USAGE
+  "new([HASHREF | LIST])"
+    Creates a library object and initializes it with entries that may be
+    passed in as either a "HASH" reference or "LIST" of key-value pairs. The
+    object created is itself a sub-routine that can be called directly in
+    order to run sub-routines stored in the library:
+
+      $lib->('sub-routine name goes here')->(qw(sub routine args go here));
+
+    Additional sub-routines may be added by providing a "CODE" reference:
+
+      $lib->('a new sub-routine', sub {
+        # code goes here
+      });
+
+    If no arguments are passed, the internal library is returned:
+
+      my $_lib = $lib->();
+
+  "has($name)"
+    Returns the sub-routine installed in the library identified by $name or
+    undef if it does not exist.
+
+  "run($name, [LIST])"
+    Runs the sub-routine stored in the library identified by $name. An
+    exception will be thrown if no sub-routine by that name can be found.
+    Any additional arguments are passed to the sub-routine.
+
+  "call($object, $name, [LIST])"
+    Calls the sub-routine stored in the library identified by $name as a
+    method to the object in $object. This is similar to "run()" above but
+    uses Perl's object semantics. Additional arguments are passed to the
+    method.
+
+  "void($name)"
+    Either returns the sub-routine installed in the library identified by
+    $name or returns a void sub-routine. This is useful if you want to
+    blindly call sub-routines and not worry if they exist. It is debatable
+    how useful that is in itself.
+
+  "curry($name, [LIST])"
+    Returns a sub-routine that, when called, will execute the sub-routine
+    installed in the library identified by $name with arguments in "LIST"
+    prepended. Additional arguments to the call itself are also appended.
+
+  "o($name, $object, [LIST])"
+    Similar to "curry()" but the sub-routine that is returned will execute a
+    method call on the object specified by $object.
+
+  "y($name, $sub, [LIST])"
+    Creates an anonymous sub-routine that, when executed, will run the
+    "CODE" reference identified by $sub passing in the sub-routine installed
+    in the library under $name. Arguments passed in "LIST" will be curried
+    along with arguments to the call itself. Unlike other methods, "y()"
+    does not require $name to be installed when called in order to delay
+    execution for as long as possible.
+
+AUTHOR
+    jason hord <pravus@cpan.org>
+
+LICENSE
+    This software is information. It is subject only to local laws of
+    physics.
+

@@ -1,0 +1,122 @@
+Revision history for SQL-Abstract-More
+
+1.28 05.07.2016
+  - support for quoting table and column names
+  - fix warning 'redundant' appeared in perl 5.22 
+
+1.27 06.04.2015
+  - added support for IN clauses with multicolumns
+
+1.26 16.10.2014
+  - RT 99455 : ignore initial or trailing spaces in column alias parsing
+
+1.25 03.10.2014
+  - fixed Scalar::Does dependency in Makefile.PL
+
+1.24 03.10.2014
+  - RT 99182 : recent versions of Scalar::Does are too heavy, drop the dependency
+
+1.23 13.08.2014
+  - bug fix, v1.22 no longer accepted syntax x|alias when x has length 1
+
+1.22 09.08.2014
+  - avoid interference of '|' for column aliases with builtin DBMS operators
+  - also accept new() args as a hashref
+  - run the whole SQLA test suite against SQLAM
+
+1.21 20.04.2014
+  - fix missing test dependency
+  - switch to Module::Install
+
+1.20 18.04.2014
+  - support for -order_by/-limit in update() and delete() (MySQL accepts that!)
+  - -limit => 0 is no longer ignored
+
+1.19 01.02.2014
+  - better implementation for bind values within join specifications
+
+1.18 31.01.2014
+  - added support for bind values (as quoted strings) within join specifications
+
+1.17 22.07.2013
+  - fixed incorrect treatment of -limit for "RowNum" dialect (used by Oracle)
+
+1.16 16.07.2013
+  - fixed doc for join() (description of the return value)
+  - fix for RT 86895 (incorrect treatment of -order_by / -group_by)
+
+1.15 18.04.2013
+  - bind values with types : dropped syntax [$value, \%type] because of
+    conflicts with "OR" clauses of shape [$condition1, \%condition2]; so
+    only DBIx::Class-like syntax will be accepted
+
+1.14 14.04.2013
+  - fix bug introduced in v1.13 (return "" instead of return ())
+
+1.13 14.04.2013
+  - "looks_like_ternary_bind_param" renamed as "is_bind_value_with_type"
+  - support for DBIx::Class syntax of bind values with types
+
+1.12 08.04.2013
+  - fix missing bits for supporting arrayrefs in insert(), update()
+  - improvements in doc
+
+1.11 07.04.2013
+  - bind_params supports 3-args form of DBI::bind_param()
+  - values in select(), insert(), update() can be arrayrefs [$value, \%type]
+
+1.10 15.01.2013
+  - support for -desc/-asc in -order_by (compatibility with SQL::Abstract)
+
+1.09 08.12.2012
+  - dependency on SQL::Abstract 1.73 because of -ident/-value
+
+1.08 30.11.2012
+  - [rt.cpan.org #81305] replace \'=foo.bar' by {'=' => {-ident => 'foo.bar'}}
+  - [rt.cpan.org #81485] systematically order "keys %hash" for perl 5.17.6
+
+1.07 20.10.2012
+  - replace reftype tests by Scalar::Does
+  - no longer warns on -where => {field => {-in => $scalar}}
+
+1.06 02.08.2012
+ - fix in test that no longer passed with SQL::Abstract::Test v1.73
+
+1.05 31.05.2012
+ - forgot dependency on MRO::Compat
+
+1.04 29.05.2012
+ - [rt.cpan.org #77374] Use namespace::clean instead of namespace::autoclean
+ - added support for set operators (UNION/INTERSECT/MINUS/etc.)
+
+1.03 17.03.2012
+ - added support for Oracle INSERT ... RETURNING .. INTO ..
+ - croak() instead of die() upon errors
+
+1.02 13.03.2012
+ - unbless arrayrefs passed to _where_field_IN, to make SQLA happy
+
+1.01 08.03.2012
+ - fixed sql_dialect for Oracle : no 'AS' keyword in table aliases
+
+1.00 15.12.2011
+ - added methods insert(), update(), delete()
+
+0.06 13.12.2011
+ - new parameter 'max_members_IN'
+
+0.05 07.10.2011
+ - limit_offset dialect "RowNum", for @§%#! Oracle
+
+0.04 28.08.2011
+ - doc fix, thanks to Terrence Brannon
+
+0.03 07.08.2011
+ - added dependency on 'parent.pm' in Build.PL
+
+0.02 03.08.2011
+ - Fixed stupid pod test
+
+0.01 31.07.2011
+ - First release (code extracted and refactored from DBIx::DataModel)
+

@@ -1,0 +1,6 @@
+#!/bin/sh
+
+racktables="$1"
+sudo rm -rf /var/www/racktables
+sudo cp -r "$racktables" /var/www/racktables
+sudo cp secret.php /var/www/racktables/inc/secret.php

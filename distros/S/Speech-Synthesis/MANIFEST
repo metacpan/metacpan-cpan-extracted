@@ -1,0 +1,25 @@
+.cvsignore
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Test/Builder.pm
+inc/Test/More.pm
+lib/Speech/Synthesis.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00-load.t
+t/01-engines.t
+t/02-languages.t
+t/03-voices.t
+t/04-avatars.t
+t/05-speech.t
+t/pod-coverage.t
+t/pod.t

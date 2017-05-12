@@ -1,0 +1,165 @@
+NAME
+    Sub::Block - manipulate blocks of code to assemble them into subs
+
+SYNOPSIS
+       use Sub::Block;
+   
+       my $plus_one = block { $_[0] + 1 };
+       print $plus_one->(7);   # 8
+
+STATUS
+    This is all pretty experimental at the moment. Consider it to be a
+    proof-of-concept.
+
+DESCRIPTION
+    Sub::Block allows you to create objects that are conceptually code blocks
+    that can be composed with other code blocks to create subs which, when
+    called, will run the code in the blocks without all of the overhead
+    associated with a normal sub call.
+
+    Another way to think about it is that it's a cleaner way of building
+    closures than stringy eval.
+
+    Assume for example that you have a coderef $is_even which checks whether a
+    sub number is even, and you want to use `grep` to find all the even
+    numbers in a list:
+
+       my $is_even   = sub { $_[0] % 2 == 0 };
+       my @even_nums = grep { $is_even->($_) } @list;
+
+    If @list is 10,000 items long, the $is_even sub is called 10,000 times.
+    Sub calls are relatively expensive in terms of CPU time, so it would be
+    good if we could inline the contents of $is_even into the `grep` block,
+    and thus avoid those 10,000 sub calls. With Sub::Block this is possible!
+
+       my $is_even   = block { $_[0] % 2 == 0 };
+       my $grep_even = eval sprintf(
+          'sub { grep { %s } @_ }',
+          $is_even->inlininfy('$_'),
+       );
+   
+       # Below this comment, only a single sub call happens!
+       my @even_nums = $grep_even->(@list);
+
+  Constructors
+    `new($coderef)`
+        Creates a Sub::Block from an existing coderef.
+
+    `new($string, \%captures)`
+        Creates a Sub::Block from a string of Perl code, plus a hashref of
+        variables to capture.
+
+    `block { BLOCK }`
+        This is not a method, but an exported function that acts as a shortcut
+        for the constructor.
+
+  Methods
+    `sub`
+        Returns the code block as a normal coderef.
+
+        `&{}` is overloaded so that `$block->(@args)` works.
+
+    `execute(@args)`
+        Executes the code block, with @args.
+
+    `closures`
+        Returns the variables closed over by the code block.
+
+        Note that Sub::Block is powered by Sub::Quote, and closures don't
+        really work properly. See
+        <https://rt.cpan.org/Ticket/Display.html?id=87315>.
+
+    `code`
+        Returns a string of Perl code for the code block.
+
+    `inlinify(@varnames)`
+        Returns a string of Perl code for the code block, wrapped in a
+        `do{...}` block with @_ localized and the variables in @varnames
+        assigned to it. The following:
+
+           my $plus_one = block { $_[0] + 1 };
+           print $plus_one->inlinify('$foo');
+
+        Will print something like:
+
+           do {
+              local @_ = ($foo);
+              $_[0] + 1
+           };
+
+    `grep`
+        A shortcut for the example earlier in this documentation:
+
+           my $is_even   = block { $_[0] % 2 == 0 };
+           my $grep_even = $is_even->grep;
+           my @even_nums = $grep_even->execute(@list);
+
+        But $grep_even is a Sub::Block, not a normal coderef
+
+    `map`
+        Like `grep`, but `map`. :-)
+
+    `sequence(@others)`
+        Given a list of other blocks (or coderefs, which will be converted
+        into code blocks) generates a new block which calls all of the blocks
+        in sequence, with the output of each being passed into the input of
+        the next.
+
+           my $block1 = block { ... };
+           my $block2 = block { ... };
+           my $block3 = block { ... };
+   
+           # The following two are conceptually similar.
+   
+           my $seq1 = $block1->sequence($block2, $block3);
+   
+           my $seq2 = block {
+              $block3->execute(
+                 $block2->execute(
+                    $block1->execute(@_)
+                 )
+              );
+           };
+
+        You can also use the overloaded `>>` operator:
+
+           my $seq3 = $block1 >> $block2 >> $block3;
+
+        Or it can be called as a class method:
+
+           my $seq4 = Sub::Block->sequence($block1, $block2, $block3);
+
+CAVEATS
+    Sub::Block is affected by
+    <https://rt.cpan.org/Ticket/Display.html?id=87315>.
+
+    The `return`, `wantarray` and `caller` functions which rely on the sub
+    call stack will not see your code block when it's been inlined into an
+    outer sub. So `return` will really return from the outer sub, not the code
+    block.
+
+    Sub::Block will issue a warning if it notices that you've used one of
+    these keywords in your code block, but it might not always notice. (It
+    needs to walk the optree to look for them.)
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Sub-Block>.
+
+SEE ALSO
+    Sub::Quote.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2013 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

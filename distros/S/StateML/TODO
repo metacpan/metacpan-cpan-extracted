@@ -1,0 +1,3 @@
+- States should be able to contain one or more nested machines.
+- Arcs should be able to go to a state within a nested machine.
+- Arcs should be able to be assigned to states by type= matching.

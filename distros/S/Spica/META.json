@@ -1,0 +1,125 @@
+{
+   "abstract" : "the HTTP client for dealing with complex WEB API.",
+   "author" : [
+      "mizuki_r <ry.mizuki@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.7.5",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Spica",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "1.08",
+            "Class::Load" : "0.06",
+            "Clone" : "0.28",
+            "Data::Validator" : "0.09",
+            "Exporter::Lite" : "0.02",
+            "Furl" : "0.20",
+            "JSON" : "2.15",
+            "Mouse" : "0.93",
+            "MouseX::Types" : "0.01",
+            "Scalar::Util" : "0",
+            "URI" : "1.40",
+            "XML::Simple" : "0",
+            "perl" : "v5.10.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Fake::HTTPD" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Spica" : {
+         "file" : "lib/Spica.pm",
+         "version" : "0.04"
+      },
+      "Spica::Client" : {
+         "file" : "lib/Spica/Client.pm"
+      },
+      "Spica::Event" : {
+         "file" : "lib/Spica/Event.pm"
+      },
+      "Spica::Filter" : {
+         "file" : "lib/Spica/Filter.pm"
+      },
+      "Spica::Parser" : {
+         "file" : "lib/Spica/Parser.pm"
+      },
+      "Spica::Parser::JSON" : {
+         "file" : "lib/Spica/Parser/JSON.pm"
+      },
+      "Spica::Parser::XML" : {
+         "file" : "lib/Spica/Parser/XML.pm"
+      },
+      "Spica::Receiver::Iterator" : {
+         "file" : "lib/Spica/Receiver/Iterator.pm"
+      },
+      "Spica::Receiver::Row" : {
+         "file" : "lib/Spica/Receiver/Row.pm"
+      },
+      "Spica::Spec" : {
+         "file" : "lib/Spica/Spec.pm"
+      },
+      "Spica::Spec::Declare" : {
+         "file" : "lib/Spica/Spec/Declare.pm"
+      },
+      "Spica::Trigger" : {
+         "file" : "lib/Spica/Trigger.pm"
+      },
+      "Spica::Types" : {
+         "file" : "lib/Spica/Types.pm"
+      },
+      "Spica::URIMaker" : {
+         "file" : "lib/Spica/URIMaker.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/rymizuki/p5-Spica/issues"
+      },
+      "homepage" : "https://github.com/rymizuki/p5-Spica",
+      "repository" : {
+         "url" : "git://github.com/rymizuki/p5-Spica.git",
+         "web" : "https://github.com/rymizuki/p5-Spica"
+      }
+   },
+   "version" : "0.04"
+}

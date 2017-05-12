@@ -1,0 +1,123 @@
+<?xml version="1.0" ?>
+<solstice_config>
+
+    <virtual_root>/tools/</virtual_root>
+    <server_string>Inkey Dev</server_string>
+    <support_email>fakeuser@u.washington.edu</support_email>
+    <admin_email>fakeuser@u.washington.edu</admin_email>
+    <lang>en</lang>
+    <data_root>/home/fakeuser/data</data_root>
+    <webservice_rest_root>rest</webservice_rest_root><!-- if left empty this defaults to 'rest' -->
+
+    <debug_level>scam</debug_level>
+
+    <db_hosts>
+        <host 
+            host_name="example.washington.edu" 
+            type="master"
+            port="3306"
+            user="ctlt"
+            password="foopassword"
+            database_name="solstice"
+            />
+        <host 
+            host_name="example-slave1.washington.edu" 
+            type="slave"
+            port="3306"
+            user="ctlt"
+            password="foopassword"
+            database_name="solstice"
+            />
+
+        <host 
+            host_name="example-slave2.washington.edu" 
+            type="slave"
+            port="3306"
+            user="ctlt"
+            password="foopassword"
+            database_name="solstice"
+            />
+
+    </db_hosts>
+    <!-- currently supported: MySQL, Memcached -->
+    <session_backend>MySQL</session_backend>
+
+    <!-- for memcached backend -->
+    <memcached_servers>
+        <server>127.0.0.1:11211</server>
+    </memcached_servers>
+
+    <!-- for mysql backend -->
+    <session_db>sessions</session_db>
+
+    <session_cookie>solsticeSessionID</session_cookie>
+
+    <smtp_server>localhost</smtp_server>
+    <smtp_mailname>localhost</smtp_mailname>
+    <smtp_msg_wait>0.5</smtp_msg_wait>
+    <smtp_use_queue>never</smtp_use_queue> <!-- Valid values are: 'optional', 'always', 'never' -->
+
+    <development_mode>1</development_mode>
+    <require_ssl>1</require_ssl>
+    <slow_query_time>1</slow_query_time>
+
+    <encryption_key>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</encryption_key>
+
+    <boilerplate_view>Foo::View::Boilerplate::BlueSwoosh</boilerplate_view>
+
+    <log_modules>
+        <module>Solstice::Logger::File</module>
+        <module>Solstice::Logger::Database</module>
+    </log_modules>
+
+    <css_files>
+        <css_file>styles/solstice.css</css_file>
+    </css_files>
+
+
+    <js_files>
+        <js_file>javascript/solstice.js</js_file>
+        <js_file>javascript/remote.js</js_file>
+        <!-- the following yahooui files are needed to have correct event behavior -->
+        <js_file>javascript/yui/build/yahoo/yahoo-min.js</js_file>
+        <js_file>javascript/yui/build/event/event-min.js</js_file>
+        <js_file>javascript/yui/build/dom/dom-min.js</js_file>
+        <js_file>javascript/yui/build/dragdrop/dragdrop-min.js</js_file>
+        <js_file>javascript/yui/build/connection/connection-min.js</js_file>
+        <js_file>javascript/yui/build/container/container-min.js</js_file>
+        <js_file>javascript/yahooui.js</js_file>
+    </js_files>
+
+    <app_dirs>
+        <app_dir>/home/fake/apps/</app_dir>
+    </app_dirs>
+
+    <cgis>
+        <cgi virtual_path="file_upload.cgi" requires_auth="0">cgis/file_upload.cgi</cgi>
+        <cgi virtual_path="file_download.cgi" requires_auth="0">cgis/file_download.cgi</cgi>
+        <cgi virtual_path="file_thumbnail.cgi" requires_auth="0">cgis/file_thumbnail.cgi</cgi>
+        <cgi virtual_path="file_latex.cgi" requires_auth="0">cgis/file_latex.cgi</cgi>
+        <cgi virtual_path="remote/locking.cgi" requires_auth="1">cgis/locking.cgi</cgi>
+    </cgis>
+
+    <statics>
+        <static>images</static>
+        <static>javascript</static>
+        <static>styles</static>
+        <static>content</static>
+    </statics>
+
+    <remotes>
+        <remote name="subsession_check">Solstice::Controller::Remote::SubsessionCheck</remote>
+        <remote name="upload_meter">Solstice::Controller::Remote::UploadMeter</remote>
+    </remotes>
+
+    <error_html>error</error_html>
+
+    <keys>
+        <key name="log_db_name">logs</key>
+        <key name="CONTENT_URL">fo</key>
+        <key name="allow_rte_switching">0</key>
+    </keys>
+
+</solstice_config>

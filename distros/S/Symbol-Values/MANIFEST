@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Symbol-Values.t
+lib/Symbol/Values.pm
+META.yml                                 Module meta-data (added by MakeMaker)

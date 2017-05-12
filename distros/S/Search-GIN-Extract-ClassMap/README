@@ -1,0 +1,41 @@
+Search::GIN::Extract::ClassMap
+
+This module is an extension for the "Search::GIN" framework providing a
+novel way to dictate which attribute extraction techniques will be used
+for which object by having rules that map against the objects
+inheritance or the objects composed roles.
+
+This essentially permits you to register adapters for various object
+types to special-case their extraction.
+
+For example, if you had a source tree that used classes under your
+control using "MooseX::AttributeIndexes", you could easily default those
+classes to extract using "Search::GIN::Extract::AttributeIndexes". And
+if any objects of those classes had "DateTime" properties, you could
+define a handler for extracting "DateTime" meta-data for indexing
+specifically.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Kent Fredric
+<kentfredric@gmail.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

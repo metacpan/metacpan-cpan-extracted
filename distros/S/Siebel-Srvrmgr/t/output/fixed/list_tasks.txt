@@ -1,0 +1,27 @@
+srvrmgr> list tasks
+
+SV_NAME  CC_ALIAS        TK_TASKID  TK_PID  TK_DISP_RUNSTATE   
+-------  --------------  ---------  ------  -----------------  
+siebel1  ServerMgr       16777218   6974    Running            
+siebel1  ServerMgr       15728642   6963    Completed          
+siebel1  ServerMgr       14680066   6948    Completed          
+siebel1  ServerMgr       13631490   6932    Completed          
+siebel1  ServerMgr       12582914   6918    Completed          
+siebel1  ServerMgr       11534338   6910    Exited with error  
+siebel1  SvrTblCleanup   8388610    3294    Running            
+siebel1  SvrTaskPersist  7340034    3257    Running            
+siebel1  SRProc          5242887    3258    Running            
+siebel1  SRProc          5242885    3258    Running            
+siebel1  SCBroker        3145730    3226    Running            
+siebel1  SRBroker        2097167    3225    Running            
+siebel1  SRBroker        2097166    3225    Running            
+siebel1  SRBroker        2097165    3225    Running            
+siebel1  SRBroker        2097164    3225    Running            
+siebel1  SRBroker        2097161    3225    Running            
+siebel1  SRBroker        2097160    3225    Running            
+siebel1  SRBroker        2097159    3225    Running            
+siebel1  SRBroker        2097158    3225    Running            
+siebel1  SRBroker        2097157    3225    Running            
+
+20 rows returned.
+

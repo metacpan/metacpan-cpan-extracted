@@ -1,0 +1,253 @@
+/* Generated with hrd2css.pl from contrib/bred3.hrd */
+
+.def_HorzCross {
+	background-color: #ebe8e8;
+}
+
+.def_VertCross {
+	background-color: #ebe8e8;
+}
+
+.def_Number {
+	color: #8c0000;
+}
+
+.def_NumberDec {
+	color: #c00000;
+}
+
+.def_NumberHex {
+	color: #c00000;
+}
+
+.def_NumberBin {
+	color: #005b00;
+}
+
+.def_NumberOct {
+	color: #008c00;
+}
+
+.def_NumberFloat {
+	color: #800000;
+}
+
+.def_NumberSuffix {
+	color: #006600;
+}
+
+.def_String {
+	color: #e60000;
+}
+
+.def_StringContent {
+	color: #0f6900;
+}
+
+.def_StringEdge {
+	color: #800000;
+}
+
+.def_Character {
+	color: #008000;
+}
+
+.def_CharacterContent {
+	color: #00cc00;
+}
+
+.def_Comment {
+	color: #c34e00;
+}
+
+.def_CommentContent {
+	color: #7F9FBF;
+	font-weight: bold;
+}
+
+.def_CommentEdge {
+	color: #606060;
+}
+
+.def_CommentDoc {
+	color: #3F5FBF;
+}
+
+.def_CommentDocEdge {
+	color: #c0bd92;
+}
+
+.def_Symbol {
+	color: #806030;
+}
+
+.def_SymbolStrong {
+	color: #806030;
+}
+
+.def_Prefix {
+	color: #00dddd;
+}
+
+.def_Operator {
+	color: #44aadd;
+}
+
+.def_Keyword {
+	color: #400000;
+	font-weight: bold;
+}
+
+.def_KeywordStrong {
+	color: #bb7977;
+	font-weight: bold;
+}
+
+.def_FunctionKeyword {
+	color: #800000;
+	font-weight: bold;
+}
+
+.def_DeprecatedKeyword {
+	color: #008484;
+}
+
+.def_InterfaceKeyword {
+	color: #008484;
+}
+
+.def_ClassKeyword {
+	color: #800040;
+}
+
+.def_StructKeyword {
+	color: #800040;
+}
+
+.def_TypeKeyword {
+	color: #800040;
+}
+
+.def_Register {
+	color: #000080;
+}
+
+.def_Constant {
+	color: #007d45;
+}
+
+.def_VarStrong {
+	color: #007997;
+}
+
+.def_Identifier {
+	color: #005fd2;
+}
+
+.def_BooleanConstant {
+	color: #0f4d75;
+}
+
+.def_Directive {
+	color: #004a43;
+}
+
+.def_Parameter {
+	color: #074726;
+}
+
+.def_Tag {
+	color: #5f5035;
+}
+
+.def_OpenTag {
+	color: #a65700;
+}
+
+.def_CloseTag {
+	color: #a65700;
+}
+
+.def_Label {
+	color: #e34adc;
+}
+
+.def_LabelStrong {
+	color: #000000;
+	background-color: #a8a800;
+}
+
+.def_Insertion {
+	color: #000000;
+	background-color: #ffffe8;
+}
+
+.def_InsertionStart {
+	color: #800000;
+	background-color: #ffffa4;
+}
+
+.def_InsertionEnd {
+	color: #800000;
+	background-color: #ffffa4;
+}
+
+.def_Error {
+	color: #ffffff;
+	background-color: #dd0000;
+	font-weight: bold;
+	font-style: italic;
+}
+
+.def_ErrorText {
+	color: #ee00ee;
+}
+
+.def_TODO {
+	color: #ffffff;
+	background-color: #808000;
+}
+
+.def_Debug {
+	color: #80abfd;
+	background-color: #007084;
+}
+
+.def_Path {
+	color: #40015a;
+}
+
+.def_URL {
+	color: #5555DD;
+}
+
+.def_EMail {
+	color: #7144c4;
+}
+
+.def_Date {
+	color: #009797;
+}
+
+.def_Time {
+	color: #8745a0;
+}
+
+.def_PairStart {
+	color: #e17800;
+	font-weight: bold;
+}
+
+.def_PairEnd {
+	color: #e17800;
+	font-weight: bold;
+}
+
+.def_PairStrongStart {
+	color: #880088;
+}
+
+.def_PairStrongEnd {
+	color: #880088;
+}
+

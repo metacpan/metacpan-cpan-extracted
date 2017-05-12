@@ -1,0 +1,25 @@
+Revision history for Perl extension Squatting::On::PSGI
+
+0.06  Fri Apr 29 21:09:58 PDT 2011
+  - require latest Squatting
+
+0.05  Wed Apr 27 04:38:04 PDT 2011
+  - support for Plack::Middleware
+  - updated tests to work w/ Squatting 0.80
+
+0.04  Fri Mar 12 10:58:43 PST 2010
+  - use parameters() instead of param(),
+    because the latter has been deprecated in Plack::Request.
+
+0.03  Fri Jan 29 13:05:23 PST 2010
+  - same as 0.02, but I made a mistake when I used shipit.
+
+0.02  Fri Jan 29 13:05:04 PST 2010
+  - get params differently
+
+    CONTEXT:
+    http://bulknews.typepad.com/blog/2009/12/hashmultivalue-now-has-from_mixed.html
+    http://bulknews.typepad.com/blog/2009/12/perl-why-parameters-sucks-and-what-we-can-do.html
+     
+0.01  Sun Sep 13 17:51:05 2009
+  - original version

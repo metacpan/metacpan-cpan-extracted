@@ -1,0 +1,15 @@
+### OAI-ORE Resource Map (http://example.org/r)
+
+# Namespace prefixes
+@prefix ore: <http://www.openarchives.org/ore/terms/>.
+
+# Resource Map and Aggregation
+<http://example.org/r> ore:describes <http://example.org/a>.
+
+# Aggregated resources
+<http://example.org/a> ore:aggregates <http://example.org/ar1>.
+<http://example.org/a> ore:aggregates <http://example.org/ar2>.
+
+# Relations
+
+### End Resource Map

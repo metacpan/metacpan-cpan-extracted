@@ -1,0 +1,52 @@
+Revision history for DTDParse
+<http://dtdparse.sourceforge.net/>
+
+============================================================================
+2.00  Jul 16, 2005
+      (Earl Hood, earl<AT>earlhood<DOT>com)
+
+      This is the first non-beta release of the rewrite of dtdparse
+      0.97.  The following highlights changes from beta releases:
+
+      - The package root namespace has changed from XML:: to
+	SGML::.  This was mainly done to avoid conflicts and confusion
+	with numerous XML:: modules on CPAN (including the closely
+	named XML::DTDParser).	Also, DTDParse does support SGML DTDs
+	and XML is a formal subset of SGML, so using SGML:: seems
+	appropriate.
+
+      - The release contains several bug fixes from last beta release
+	along with added documentation: POD has been added for all
+	scripts and a general overview documentation is provided via
+	the meta-module SGML::DTDParse.
+
+	Documentation is still needed for the main modules.
+
+      - A new script, dtddiff (along with dtddiff2html) has been
+	added that performs a context-like diff between two parsed
+	DTDs.
+
+      - dtdparse script modified to behave more like common Unix
+	programs with respect to input and output.  If no DTD
+	filename is provided on the command-line, the DTD will
+	be read from standard-input.  If --output is not specified,
+	then XML output is sent to standard-out.  This change
+	allows dtdparse to be used in a command pipeline.
+
+      - Files have been reorganized to facilitate installation via
+	Perl's standard installation process.  See README for details.
+
+      - Version numbering modified to match style used by Perl modules:
+	2.0.0 => 2.00.
+
+      - DTDParse is now distributed under the Artistic License
+	or the GNU General Public License.  See README, Artistic,
+	and COPYING.
+
+      - Miscellaneous bug fixes.
+
+      - Primary maintenance of DTDParse has been transitioned from
+	Norman Walsh to Earl Hood.
+
+============================================================================
+$Id: Changes,v 2.2 2005/07/16 03:30:24 ehood Exp $

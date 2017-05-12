@@ -1,0 +1,104 @@
+#!/usr/bin/perl
+
+
+use strict ;
+
+# if the following programm are not in your path, you might
+# change the definitions
+
+our $ssh      = 'ssh -C ' ;
+our $svnadmin = '/usr/local/bin/svnadmin' ;
+our $svnlook  = '/usr/local/bin/svnlook' ;
+our $test     = 'test' ;
+
+# don't change anything below this line
+
+our $dump     = "$svnadmin dump" ;
+our $load     = "$svnadmin load" ;
+our $testf    = "$test -f" ;
+our $create   = "$svnadmin create" ;
+our $youngest = "$svnlook youngest" ;
+
+# ------------------------------------------------------------------------
+
+sub splitpath
+	{
+	my ($src) = @_ ;
+	
+	my ($host, $path) = split (/:/, $src, 2) ;
+	if ($host && !$path)
+		{
+		$path = $host ;
+		$host = '' ;
+		}
+		
+	return ($host, $path) ;
+	}
+
+# ------------------------------------------------------------------------
+
+sub execcmd
+	{
+	my ($host, $cmd) = @_ ;
+	
+	my $fullcmd = $host?"$ssh $host \"$cmd\"":$cmd ;
+	
+	#print "h=$host c=$cmd f=$fullcmd\n" ;
+	open FH, "$fullcmd|" or die "Cannot run $fullcmd ($!)" ;
+	my @out = <FH> ;
+	close FH ;
+	
+	return @out ;
+	}
+
+# ------------------------------------------------------------------------
+
+sub execcmdpipe
+	{
+	my ($hosta, $cmda, $hostb, $cmdb) = @_ ;
+	
+	my $fullcmda = $hosta?"$ssh $hosta \"$cmda\"":$cmda ;
+	my $fullcmdb = $hostb?"$ssh $hostb \"$cmdb\"":$cmdb ;
+	
+        #print "start $fullcmda | $fullcmdb\n" ; 
+	system ("$fullcmda | $fullcmdb") ;
+	}
+
+# ------------------------------------------------------------------------
+
+
+die "$0 <srcpath> <destpath>\n" if (@ARGV != 2) ;
+
+my ($src, $dst) = @ARGV ;
+my ($srchost, $srcpath) = splitpath ($src) ;
+my ($dsthost, $dstpath) = splitpath ($dst) ;
+
+my @dstrev = execcmd ($dsthost, "$testf '$dstpath/format' || $create '$dstpath' ; $youngest $dstpath") ;
+
+my $dstrev = $dstrev[0] ;
+chop($dstrev) ;
+die "Cannot get youngest revision of $dst\n" if ($dstrev !~ /^\d+$/) ;
+
+my @srcrev = execcmd ($srchost, "$youngest $srcpath") ;
+
+my $srcrev = $srcrev[0] ;
+chop($srcrev) ;
+die "Cannot get youngest revision of $src\n" if ($srcrev !~ /^\d+$/) ;
+ 
+print "$src is at revision $srcrev\n" ;
+print "$dst is at revision $dstrev\n" ;
+
+if ($srcrev <= $dstrev)
+	{
+	print "Destination is up to date\n" ;
+	exit 0 ;
+	}
+my $revision = '' ;
+if ($dstrev > 0)
+	{
+	$revision = ' --incremental --revision ' . ($dstrev + 1) . ':HEAD' ;
+	}
+
+execcmdpipe ($srchost, "$dump $revision $srcpath", $dsthost, "$load $dstpath") ;
+
+	

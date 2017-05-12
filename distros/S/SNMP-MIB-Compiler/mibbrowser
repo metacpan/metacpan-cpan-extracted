@@ -1,0 +1,533 @@
+#!/usr/bin/perl -w
+
+BEGIN { unshift @INC, "lib" }
+
+use strict;
+use SNMP::MIB::Compiler;
+use Data::Dumper;
+
+use Tk;
+use Tk::Tree;
+use Tk::Dialog;
+use Tk::FBox;
+
+my $DATE = '1999/09/06';
+
+my $outdir = 'out';
+my $file   = shift;
+
+$Data::Dumper::Purity = 1;
+$Data::Dumper::Indent = 1;
+$Data::Dumper::Terse  = 1;
+
+my $mib = new SNMP::MIB::Compiler;
+$mib->add_path('mibs', 'mibs/cisco', 'mibs/com21',
+	       '/home/ftp/doc/mibs/ascend');
+$mib->add_extension('', '.mib', '.my');
+
+mkdir $outdir, oct 755 unless -d $outdir;
+$mib->repository($outdir);
+
+$mib->{'accept_smiv1'} = 1;
+$mib->{'accept_smiv2'} = 1;
+
+$mib->{'debug_recursive'} = 1;
+$mib->{'debug_lexer'}     = 0;
+
+$mib->{'make_dump'}  = 1;
+$mib->{'use_dump'}   = 1;
+$mib->{'do_imports'} = 1;
+
+$mib->load($file) || $mib->compile($file) ||
+  print scalar $mib->assert if $file;
+
+exit if $file;
+
+##########################################################################
+
+my $DEBUG = 0;
+my $title = "MIB Browser";
+my $top = new MainWindow(-title => $title);
+$top->OnDestroy(sub { exit; });
+my $wins;
+
+my $menu  = $top->Frame(-relief => 'raised',
+			-borderwidth => 2)->pack(-side => 'top', -fill => 'x');
+my $frame = $top->Frame->pack(-side => 'top', -fill => 'both', -expand => 1);
+my $up    = $frame->Frame->pack(-side => 'top', -fill => 'both', -expand => 1);
+# my $down  = $frame->Frame->pack(-side => 'top');
+
+my $left  = $up->Frame->pack(-side => 'left', -expand => 1, -fill => 'both');
+$up->Frame(-relief => 'ridge', -bd => 1,
+ 	   -width => 2)->pack(-side => 'left', -fill => 'y',
+ 					  -expand => 'no');
+my $right = $up->Frame->pack(-side => 'right',  -fill => 'y',
+			     -padx => 10, -pady => 10);
+
+my $Help = $menu->Menubutton(-text => 'Help',
+			     -underline => 0)->pack(-side => 'right');
+my $HM = $Help->Menu(-tearoff => 0);
+$Help->configure(-menu => $HM);
+my $About = $top->Dialog(
+    -title          => "About $title",
+    -font           => '-*-Helvetica-Medium-R-Normal--*-140-*-*-*-*-*-*',
+    -bitmap         => 'info',
+    -default_button => 'OK',
+    -buttons        => ['OK'],
+    -text           => "         $title\n\nSNMP::MIB::Compiler " .
+		       "Version $SNMP::MIB::Compiler::VERSION\n" .
+		       "Author: Fabien Tassin\nDate: $DATE",
+);
+$Help->command(-label => '~About...', -command => [$About => 'Show']);
+my $File = $menu->Menubutton(-text => 'File',
+			     -underline => 0)->pack(-side => 'left');
+my $FM = $File->Menu(-tearoff => 1);
+$File->configure(-menu => $FM);
+
+my $Option = $menu->Menubutton(-text => 'Options',
+			       -underline => 0)->pack(-side => 'left');
+my $OM = $Option->Menu(-tearoff => 1);
+$Option->configure(-menu => $OM);
+my $t1 = "MIB locations";
+$Option->command(-label => "$t1...",
+		 -command => sub { &choose_list($t1, "$t1:",
+						\$mib->{'srcpath'})});
+my $t2 = "MIB file extensions";
+$Option->command(-label => "$t2...",
+		 -command => sub { &choose_list($t2, "$t2:",
+						\$mib->{'extensions'}, '"')});
+$Option->separator;
+$Option->checkbutton(-label => 'Accept SMIv~1',
+		     -variable => \$mib->{'accept_smiv1'});
+$Option->checkbutton(-label => 'Accept SMIv~2',
+		     -variable => \$mib->{'accept_smiv2'});
+$Option->separator;
+$Option->checkbutton(-label => 'Allow under~scores',
+		     -variable => \$mib->{'allow_underscore'});
+$Option->checkbutton(-label => 'Allow lowcase ~hstrings',
+		     -variable => \$mib->{'allow_lowcase_hstrings'});
+$Option->checkbutton(-label => 'Allow lowcase ~bstrings',
+		     -variable => \$mib->{'allow_lowcase_bstrings'});
+$Option->checkbutton(-label => 'Allow keyword \'A~NY\'',
+		     -variable => \$mib->{'allow_keyword_any'});
+$Option->separator;
+$Option->checkbutton(-label => 'Debug bro~wser',
+		     -variable => \$DEBUG);
+$Option->checkbutton(-label => '~Debug parser',
+		     -variable => \$mib->{'debug_lexer'});
+$Option->checkbutton(-label => 'Debug ~recursively',
+		     -variable => \$mib->{'debug_recursive'});
+$Option->separator;
+$Option->checkbutton(-label => '~Make dump',
+		     -variable => \$mib->{'make_dump'});
+$Option->checkbutton(-label => '~Use dump',
+		     -variable => \$mib->{'use_dump'});
+$Option->separator;
+$Option->checkbutton(-label => '~Import dependencies',
+		     -variable => \$mib->{'do_imports'});
+
+my $tree = $left->ScrlTree(-separator  => '.',
+			   -width      => 40,
+			   -height     => 25,
+			   # -background => 'white',
+			   -scrollbars => 'osoe');
+$tree->pack(-expand => 1, -fill => 'both',
+ 	    -padx => 10, -pady => 10, -side => 'top');
+my $entries;
+$tree->configure(-opencmd => sub { dyntree_opendir($tree, $mib, @_); },
+		 -command => sub { print_node($mib, $entries, @_); });
+
+# Add the root of the tree
+dyntree_adddir($tree, $mib, 'iso');
+
+my @relief = (-relief => 'sunken');
+my @pl = (-side => 'top', -padx => 10, -pady => 5, -fill => 'x');
+
+my $row = 0;
+for my $ent ('OID', 'Label', 'Status', 'Access', 'Type') {
+  my $f = $right->Frame->pack(-side => 'top', -fill => 'x', -expand => 0);
+  $$entries{$ent} = { 'l' => $f->Label(-text => "$ent :", -anchor => 'e',
+				       -justify => 'right',
+				       -width => 8,
+				      )->pack(-side => 'left'),
+		      'e' => $f->Entry(@relief)->pack(-side => 'right',
+						      -fill => 'both',
+						      -expand => 1),
+		    };
+}
+my $ent_other = $right->Scrolled('Text', @relief, -height => 5,
+				 -width => 70)->packAdjust(-fill => 'both',
+							   -expand => 0,
+							   -side => 'bottom');
+my $ent_desc = $right->Scrolled('Text', @relief,
+				-width => 70)->pack(-fill => 'both',
+						    -expand => 1,
+						    -side => 'bottom');
+
+my $l1 = "Load precompiled MIBs";
+$File->command(-label => "$l1...",
+	       -command =>  sub { &load_list($l1, "$l1:", $mib, $tree); });
+my $l2 = "Compile MIBs";
+$File->command(-label => "$l2...",
+	       -command => sub { &compile_list($l2, "$l2:", $mib, $tree); });
+$File->separator;
+$File->command(-label => '~Quit', -command => sub { exit; });
+
+MainLoop();
+
+sub print_node {
+  my $mib     = shift;
+  my $entries = shift;
+  my $oid     = shift;
+
+  my ($node) = $oid =~ m/([^\.]+)$/;
+  $oid = $mib->resolve_oid($node);
+  my $OID = $mib->convert_oid($oid);
+  my $access = $mib->{'nodes'}{$node}{'access'} || '';
+  my $status = $mib->{'nodes'}{$node}{'status'} || '';
+  my $desc = $mib->{'nodes'}{$node}{'description'} || '';
+  my $type = $mib->{'nodes'}{$node}{'type'} || '';
+  my $o = {};
+  for my $k ('syntax', 'module', 'last-updated', 'organization',
+	     'contact-info', 'NOTIFICATIONS', 'objects') {
+    $$o{$k} = $mib->{'nodes'}{$node}{$k}
+      if defined $mib->{'nodes'}{$node}{$k};
+  }
+  my $other = scalar keys %$o ? Dumper $o : "";
+
+  $desc =~ s/("$|^")//g;
+  my @t = split /\n/, $desc;
+  if (scalar @t > 1) {
+    $desc = '';
+    my $r;
+    for my $d (@t) {
+      $r = $1, last if $d =~ m/^(\s+)/;
+    }
+    if ($r) {
+      for my $d (@t) {
+	$d =~ s/^$r//;
+	$desc .= "$d\n";
+      }
+    }
+  }
+  $$entries{'OID'}{'e'}->delete(0, length $$entries{'OID'}{'e'}->get);
+  $$entries{'Label'}{'e'}->delete(0, length $$entries{'Label'}{'e'}->get);
+  $$entries{'Status'}{'e'}->delete(0, length $$entries{'Status'}{'e'}->get);
+  $$entries{'Access'}{'e'}->delete(0, length $$entries{'Access'}{'e'}->get);
+  $$entries{'Type'}{'e'}->delete(0, length $$entries{'Type'}{'e'}->get);
+  $ent_desc->delete('1.0', 'end');
+  $ent_other->delete('1.0', 'end');
+
+  $$entries{'OID'}{'e'}->insert (0, $oid);
+  $$entries{'Label'}{'e'}->insert (0, $OID);
+  $$entries{'Status'}{'e'}->insert (0, $status);
+  $$entries{'Access'}{'e'}->insert (0, $access);
+  $$entries{'Type'}{'e'}->insert (0, $type);
+  $ent_desc->insert ('0.0', $desc);
+  $ent_other->insert ('0.0', $other);
+  print "$node => ", Dumper $mib->{'nodes'}{$node} if $DEBUG;
+}
+
+sub dyntree_adddir {
+  my $tree  = shift;
+  my $mib   = shift;
+  my $oid   = shift;
+  my $prec  = shift || '';
+  my $level = shift || 0;
+
+  return unless defined $mib->{'nodes'};
+  my $id = $prec ? "$prec.$oid" : $oid;
+  my $img = defined $mib->{'tree'}{$oid} ? "winfolder" :
+    defined $mib->{'nodes'}{$oid}{'status'} ? "file" : "winfolder";
+  $tree->add($id, -text => $oid, -image => $tree->Getimage($img));
+  $tree->setmode($id, defined $mib->{'tree'}{$oid} ? "open" : "none" );
+  $tree->open($id) if $level <= 5;
+}
+
+sub dyntree_opendir {
+  my $tree = shift;
+  my $mib  = shift;
+  my $oid  = shift;
+
+  if (my @kids = $tree->infoChildren($oid)) {
+    for my $kid (@kids) {
+      $tree->show(-entry => $kid);
+    }
+    return;
+  }
+  my @t = split /\./, $oid;
+  my $o = $t[-1];
+  my $p = $t[-2] unless $#t == 0;
+  for my $node (sort { $a <=> $b } keys %{$mib->{'tree'}{$o}}) {
+    dyntree_adddir($tree, $mib, $mib->{'tree'}{$o}{$node}, $oid, $#t + 1);
+  }
+}
+
+sub compile_list {
+  my $title = shift;
+  my $descr = shift;
+  my $mib   = shift;
+  my $tree  = shift;
+
+  if (defined $$wins{'compile_list'}{$title}) {
+    $$wins{'compile_list'}{$title}->deiconify;
+    $$wins{'compile_list'}{$title}->raise;
+    return;
+  }
+  my $win = MainWindow->new(-title => $title);
+  $$wins{'compile_list'}{$title} = $win;
+  $win->OnDestroy(sub {
+		    undef $$wins{'compile_list'}{$title};
+		    undef $$wins{'compile_list'}{' data '}{$title};
+		  });
+  $win->Frame(-bd => 1, -height => 7)->pack(-side => 'top', -fill => 'x',
+					    -expand => 0);
+  my $d = $win->Frame->pack(-padx => 10, -side => 'top',
+			    -expand => 0, -fill => 'x');
+  $d->Label(-text => $descr)->pack(-side => 'left');
+  my $top = $win->Frame->pack(-padx => 10, -pady => 10, -side => 'top',
+			       -expand => 1, -fill => 'both');
+  # $top->Label(-text => "not implemented yet")->pack(-side => 'left');
+  my $bot = $win->Frame->pack(-padx => 10, -pady => 10,-side => 'top',
+			       -expand => 0, -fill => 'x');
+  my $ent = $top->Entry(-width => 40)->pack(-side => 'left');
+  my $browse = $top->Button(-text => "Browse ...",
+			    -command => sub { fileDialog($top, $ent, 'open')}
+			   )->pack(-side => 'left');
+
+  $bot->Button(-text => 'Ok',
+	       -command => sub {
+		 if ($ent->get) {
+		   $mib->compile($ent->get);
+                   print scalar $mib->assert;
+		   $tree->delete('all');
+		   dyntree_adddir($tree, $mib, 'iso');
+		 }
+		 undef $$wins{'compile_list'}{$title};
+		 undef $$wins{'compile_list'}{' data '}{$title};
+		 $win->withdraw;
+	       })->pack(-side => 'left', -expand => 1, -fill => 'x');
+  $bot->Button(-text => 'Cancel',
+	       -command => sub {
+		 undef $$wins{'compile_list'}{$title};
+		 undef $$wins{'compile_list'}{' data '}{$title};
+		 $win->withdraw;
+	       })->pack(-side => 'left', -expand => 1, -fill => 'x');
+
+}
+
+sub fileDialog {
+  my $w   = shift;
+  my $ent = shift;
+
+  my $types =
+    [["MIB files",           [ '.', '.my', '.mib'] ],
+     ["All files",		'*']
+    ];
+  my $file = $w->getOpenFile(-filetypes => $types);
+  if (defined $file && $file ne '') {
+    $ent->delete(0, 'end');
+    $ent->insert(0, $file);
+    $ent->xview('end');
+  }
+}
+
+sub load_list {
+  my $title = shift;
+  my $descr = shift;
+  my $mib   = shift;
+  my $tree  = shift;
+
+  if (defined $$wins{'load_list'}{$title}) {
+    $$wins{'load_list'}{$title}->deiconify;
+    $$wins{'load_list'}{$title}->raise;
+    return;
+  }
+  my $win = MainWindow->new(-title => $title);
+  $$wins{'load_list'}{$title} = $win;
+  $win->OnDestroy(sub {
+		    undef $$wins{'load_list'}{$title};
+		    undef $$wins{'load_list'}{' data '}{$title};
+		  });
+  $win->Frame(-bd => 1, -height => 7)->pack(-side => 'top', -fill => 'x',
+					    -expand => 0);
+  my $d = $win->Frame->pack(-padx => 10, -side => 'top',
+			    -expand => 0, -fill => 'x');
+  $d->Label(-text => $descr)->pack(-side => 'left');
+  my $top = $win->Frame->pack(-padx => 10, -pady => 10, -side => 'top',
+			       -expand => 1, -fill => 'both');
+  my $bot = $win->Frame->pack(-padx => 10, -pady => 10,-side => 'top',
+			       -expand => 0, -fill => 'x');
+  my $list = $top->Scrolled('Listbox', -height => 10,
+			    -selectmode => 'extended',
+			    -scrollbars => 'e')->pack(-side => 'left',
+						      -expand => 1,
+						      -fill => 'both');
+  $bot->Button(-text => 'Ok',
+	       -command => sub {
+		 &load_list_load($title, $mib, $list, $tree)
+		   if $list->get('anchor');
+		 undef $$wins{'load_list'}{$title};
+		 undef $$wins{'load_list'}{' data '}{$title};
+		 $win->withdraw;
+	       })->pack(-side => 'left', -expand => 1, -fill => 'x');
+  $bot->Button(-text => 'Cancel',
+	       -command => sub {
+		 undef $$wins{'load_list'}{$title};
+		 undef $$wins{'load_list'}{' data '}{$title};
+		 $win->withdraw;
+	       })->pack(-side => 'left', -expand => 1, -fill => 'x');
+  $bot->Button(-text => 'Load',
+	       -command => sub {
+		 return unless $list->get('anchor');
+		 &load_list_load($title, $mib, $list, $tree);
+	       })->pack(-side => 'left', -expand => 1, -fill => 'x');
+  $bot->Button(-text => 'Refresh',
+	       -command => sub {
+		 $list->delete(0, 'end');
+		 my $mibs = &load_list_refresh($title, $mib);
+		 $list->insert(0, @$mibs);
+	       })->pack(-side => 'left', -expand => 1, -fill => 'x');
+
+  my $mibs = &load_list_refresh($title, $mib);
+  $list->insert(0, @$mibs);
+}
+
+sub load_list_load {
+  my $title = shift;
+  my $mib   = shift;
+  my $list  = shift;
+  my $tree  = shift;
+
+  my @cur = $list->curselection;
+  local $| = 1;
+  for my $elem (@cur) {
+    print "Loading ${$$wins{'load_list'}{' data '}{$title}}[$elem]..."
+      if $DEBUG;
+    $mib->load($ {$$wins{'load_list'}{' data '}{$title}}[$elem]);
+    print "done.\n" if $DEBUG;
+  }
+  $tree->delete('all');
+  dyntree_adddir($tree, $mib, 'iso');
+}
+
+sub load_list_refresh {
+  my $title = shift;
+  my $mib   = shift;
+
+  my $dir = $mib->repository;
+  my $mibs = [];
+  opendir(DIR, $dir) || die "Error: can't opendir $dir: $!\n";
+  while (defined (my $file = readdir(DIR))) {
+    push @$mibs, $1 if $file =~ m/^(.*?)$mib->{'dumpext'}$/;
+  }
+  closedir DIR;
+  @$mibs = sort { lc $a cmp lc $b } @$mibs;
+  $$wins{'load_list'}{' data '}{$title} = $mibs;
+}
+
+sub choose_list {
+  my $title = shift;
+  my $descr = shift;
+  my $var = shift;
+  my $quote = shift;
+
+  if (defined $$wins{'choose_list'}{$title}) {
+    $$wins{'choose_list'}{$title}->deiconify;
+    $$wins{'choose_list'}{$title}->raise;
+    return;
+  }
+  my $win = MainWindow->new(-title => $title);
+  $$wins{'choose_list'}{$title} = $win;
+  $win->OnDestroy(sub { undef $$wins{'choose_list'}{$title} });
+  $win->Frame(-bd => 1, -height => 7)->pack(-side => 'top', -fill => 'x',
+					    -expand => 0);
+  my $d = $win->Frame->pack(-padx => 10, -side => 'top',
+			    -expand => 0, -fill => 'x');
+  $d->Label(-text => $descr)->pack(-side => 'left');
+  my $top = $win->Frame->pack(-padx => 10, -pady => 10, -side => 'top',
+			       -expand => 1, -fill => 'both');
+  my $add = $win->Frame->pack(-side => 'top', -expand => 0,
+			      -fill => 'x', -padx => 10);
+  my $eadd = $add->Entry()->pack(-side => 'left', -expand => 1, -fill => 'x');
+  $add->Frame(-bd => 1, -width => 10)->pack(-side => 'left', -fill => 'x',
+					   -expand => 0);
+  $win->Frame(-bd => 1, -height => 10)->pack(-side => 'top', -fill => 'x',
+					     -expand => 0);
+  $win->Frame(-relief => 'ridge', -bd => 1,
+	       -height => 2)->pack(-side => 'top', -fill => 'x', -expand => 0);
+  my $bot = $win->Frame->pack(-padx => 10, -pady => 10,-side => 'top',
+			       -expand => 0, -fill => 'x');
+  my $list = $top->Scrolled('Listbox', -height => 5,
+			    -scrollbars => 'e')->pack(-side => 'left',
+						      -expand => 1,
+						      -fill => 'both');
+  $top->Frame(-bd => 1,
+	      -height => 2)->pack(-padx => 5, -side => 'left', -fill => 'y',
+				   -expand => 0);
+  my @v = @$$var;
+  map { $_ = $quote . $_ . $quote } @v if $quote;
+  $list->insert(0, @v);
+  $add->Button(-text => 'Add', -width => 8, -command => sub {
+		 my $v = $eadd->get;
+		 $eadd->delete(0, length $v);
+		 $v = $quote . $v . $quote if $quote;
+		 $list->insert('end', $v);
+		 push @v, $v;
+		 $list->focus;
+	       })->pack(-side => 'right', -expand => 0);
+  my $right = $top->Frame->pack(-side => 'right');
+  $right->Button(-text => 'Up', -width => 8, -command => sub {
+		   return unless $list->get('anchor');
+		   my $cur = $list->curselection;
+		   if ($cur) {
+		     $list->delete($cur);
+		     $list->insert($cur - 1, $v[$cur]);
+		     $list->activate($cur - 1);
+		     $list->selectionSet($cur - 1);
+		     ($v[$cur], $v[$cur - 1]) = ($v[$cur - 1], $v[$cur]);
+		   }
+		 })->pack(-side => 'top', -expand => 1, -fill => 'both');
+  $right->Button(-text => 'Down', -width => 8, -command => sub {
+		   return unless $list->get('anchor');
+		   my $cur = $list->curselection;
+		   if (defined $cur && $cur ne '' && $cur < $#v) {
+		     $list->delete($cur);
+		     $list->insert($cur + 1, $v[$cur]);
+		     $list->activate($cur + 1);
+		     $list->selectionSet($cur + 1);
+		     ($v[$cur], $v[$cur + 1]) = ($v[$cur + 1], $v[$cur]);
+		   }
+		 })->pack(-side => 'top', -expand => 1, -fill => 'both');
+  $right->Button(-text => 'Remove', -width => 8,
+		 -command => sub {
+		   return unless $list->get('anchor');
+		   my $cur = $list->curselection;
+		   if (defined $cur && $cur ne '') {
+		     $list->delete($cur);
+		     $list->selectionSet($cur);
+		     splice @v, $cur, 1;
+		   }
+		 })->pack(-side => 'top', -expand => 1, -fill => 'both');
+  $bot->Button(-text => 'Ok',
+	       -command => sub {
+		 $$var = [];
+		 map {
+		   ($_) = $_ =~ m/^$quote(.*)$quote$/ if $quote;
+		   push @$$var, $_;
+		 } @v;
+		 $win->withdraw;
+	       })->pack(-side => 'left', -expand => 1, -fill => 'x');
+  $bot->Button(-text => 'Cancel',
+	       -command => sub {
+		 $win->withdraw;
+	       })->pack(-side => 'left', -expand => 1, -fill => 'x');
+  $bot->Button(-text => 'Apply',
+	       -command => sub {
+		 $$var = [];
+		 map {
+		   ($_) = $_ =~ m/^$quote(.*)$quote$/ if $quote;
+		   push @$$var, $_;
+		 } @v;
+	       })->pack(-side => 'left', -expand => 1, -fill => 'x');
+}

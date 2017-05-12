@@ -1,0 +1,47 @@
+---
+abstract: 'extension of placeholder'
+author:
+  - 'cho45 <cho45@lowreal.net>'
+build_requires:
+  Test::Fatal: '0'
+  Test::More: '0.98'
+configure_requires:
+  CPAN::Meta: '0'
+  CPAN::Meta::Prereqs: '0'
+  Module::Build: '0'
+  Module::Build::Tiny: '0.035'
+  perl: 5.008_001
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.2, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SQL-NamedPlaceholder
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  SQL::NamedPlaceholder:
+    file: lib/SQL/NamedPlaceholder.pm
+    version: '0.10'
+requires:
+  Exporter::Lite: '0'
+  Scalar::Util: '0'
+resources:
+  bugtracker: https://github.com/cho45/SQL-NamedPlaceholder/issues
+  homepage: https://github.com/cho45/SQL-NamedPlaceholder
+  repository: git://github.com/cho45/SQL-NamedPlaceholder.git
+version: '0.10'
+x_contributors:
+  - 'mechairoi <ttsujikawa@gmail.com>'
+  - 'shiba_yu36 <shibayu36@gmail.com>'
+  - 'Songmu <y.songmu@gmail.com>'
+  - 'karupanerura <karupa@cpan.org>'

@@ -1,0 +1,16 @@
+String-Escape-[^/]+/
+[.]tar[.]gz$
+(^|/)[.-]
+^MANIFEST[.]bak
+^Makefile$
+^Makefile[.]old
+^blib
+^pm_to_blib
+^Build
+^Build.bat
+^_build.*
+cover_db
+[.]DS_Store
+[.]lwpcookies
+htmldoc/
+pod2htm.*[.]tmp

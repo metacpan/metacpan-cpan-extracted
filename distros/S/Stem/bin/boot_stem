@@ -1,0 +1,49 @@
+#!/usr/local/bin/perl -w
+
+use strict ;
+
+use Getopt::Std ;
+
+use YAML ;
+
+my %opts ;
+
+getopts( 'v', \%opts ) ;
+
+my $cmds = Load do{ local $/ ; <> } ;
+
+foreach my $boot ( @{$cmds} ) {
+
+	if ( my $skip = $boot->{'skip'} ) {
+
+		next if $skip eq 'yes' ;
+	}
+	my $wrap = $boot->{'wrap'} || '/bin/sh -c' ;
+	my $cd = $boot->{'cd'} || '.' ;
+	my $cmd = $boot->{'cmd'} ;
+
+	my $user = $boot->{'user'} || '';
+
+	my $env = $boot->{'env'} || {} ;
+	my $stem_env = $boot->{'stem_env'} || {} ;
+
+	local( %ENV ) = ( %ENV, %{$env} ) ;
+
+	my $cmd_env = join ' ', map( "$_='$stem_env->{$_}'", keys %$stem_env ) ;
+
+	$cmd =~ s/run_stem/run_stem $cmd_env/ ;
+
+	my $system;
+	$system = "su - $user;" if $user && getpwuid($<) ne $user;
+	$system .= qq|$wrap "cd $cd ; $cmd" &| ;
+
+	print "$system\n" if $opts{'v'} ;
+
+	system $system ;
+
+	my $delay = $boot->{'delay'} || 3 ;
+
+	print "waiting $delay seconds\n" if $opts{'v'};
+
+	sleep $delay ;
+}

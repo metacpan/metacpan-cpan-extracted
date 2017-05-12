@@ -1,0 +1,7 @@
+34_act_perl.smak, 3: Global symbol "$FILE" requires explicit package name at 34_act_perl.smak line 4. at SlayMakefile.main line 26
+Building depend1 with matches: depend1   
+Building depend2 with matches: depend2   
+Building depend3 with matches: depend3   
+Building default with matches: 
+Test a HEREIS string
+  as part of an action

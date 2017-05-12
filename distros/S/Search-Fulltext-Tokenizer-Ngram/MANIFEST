@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.yml
+Makefile.PL
+README
+cpanfile
+lib/Search/Fulltext/Tokenizer/Bigram.pm
+lib/Search/Fulltext/Tokenizer/Ngram.pm
+lib/Search/Fulltext/Tokenizer/Trigram.pm
+lib/Search/Fulltext/Tokenizer/Unigram.pm
+t/Search/Fulltext/Tokenizer/Ngram.t

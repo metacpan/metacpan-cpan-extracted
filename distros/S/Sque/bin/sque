@@ -1,0 +1,49 @@
+#!/usr/bin/env perl
+package sque;
+$sque::VERSION = '0.010';
+use App::Sque;
+
+# ABSTRACT: Sque command-line tool
+
+App::Sque->run;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+sque - Sque command-line tool
+
+=head1 VERSION
+
+version 0.010
+
+=head1 SYNOPSIS
+
+This is the sque command line tool.  It can be used to start workers:
+
+    $ sque work --host 127.0.0.1 --port 61613 --workers 5 --lib ./lib --queues Queue1,Queue2,Queue3
+
+or send messages to a queue:
+
+    $ sque send --host 127.0.0.1 --port 61613 --class My::Task --queue Queue1 arg1 arg2 arg3 ...
+
+=head1 AUTHOR
+
+William Wolf <throughnothing@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+
+William Wolf has dedicated the work to the Commons by waiving all of his
+or her rights to the work worldwide under copyright law and all related or
+neighboring legal rights he or she had in the work, to the extent allowable by
+law.
+
+Works under CC0 do not require attribution. When citing the work, you should
+not imply endorsement by the author.
+
+=cut

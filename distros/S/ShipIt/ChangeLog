@@ -1,0 +1,104 @@
+0.60 (2013-02-07)
+	* Same as 0.59. Make it non TRIAL :)
+
+0.59 (2013-02-07)
+	* Support TRIAL release for PAUSE with --trial command line option
+
+0.58 (2012-11-09)
+	* Support our $VERSION = 'v1.0.0' construct per xdg
+	
+0.57 (2012-07-21)
+	* Fixed an issue with PAUSE
+
+0.56 (2012-07-21)
+	* Supports and writes different style of perl version declarations (Brad Willis)
+	* Changed the display of git unknown files to be prettier (Daniel LeWarne)
+	* Include global git exclusion files (Daniel LeWarne)
+	* Add support for not running under a terminal (Dave Lambley)
+	* Make tilde (~) to point user's home directory (Dave Lambley)
+	* miyagawa now takes over the maintenance of ShipIt
+
+0.55 (2010-03-27)
+
+	* Added a bunch of links to http://contributing.appspot.com/shipit
+
+	* Bunch of patches from the community all over the place... See
+	  version control history, linked off the Contributing URL above.
+	  (we should phase out this changelog, or make it just be the git
+	   log....)
+
+0.53 (2009-12-15)
+
+	* Mercurial support
+
+	* Module::Build support
+
+	* current_version_from_makefilepl() now also recognizes 'reference_module'
+          from Module::Install::ReadmeMarkdownFromPod
+	
+0.52 (2008-05-10)
+
+	* Added VC::Git (Yann)
+	* Hacked around an issue where svk blocks on STDIN if you don't have a
+	  depot map initialized (Yann)
+
+0.51 (2007-06-18)
+
+	* Fixed VC::SVK to work with absolute path in tagpattern (Kang-Min Liu)
+
+0.50
+        * --skip-tests option, for when tests are long and a step after DistTest fails,
+	  so next time around you can run shipit faster.  use is discouraged.
+
+	* fix MakeMaker manicheck to ignore META.yml and inc/ directory for Module::Install
+
+	* Make Perl::ModuleBuild actually work. You need to add .shipit to MANIFEST.SKIP
+	  to prevent disttest from failing (miyagawa)
+
+0.49
+	* ProjectType::Perl now works with Makefile.PL that uses Module::Install
+
+0.48
+	* new step: AddToSVNDir
+        * skip commit step if there is nothing to commit
+0.47
+	* lot more/updated docs
+0.46
+	* svk support from Tatsuhiko Miyagawa
+0.45
+	* fix ChangeVersion (which was doing nothing) when VERSION (not
+	  VERSION_FROM) was in Makefile.PL
+	* make the anti-compulsive don't-run-me-code smarter
+0.44
+	* make UploadCPAN fail earlier if MakeDist wasn't done.
+	* make ProjectType::MakeMaker's disttest ignore the .shipit file,
+	  so you don't need to put it in MANIFEST.SKIP (which is often the only
+	  thing it contains, in addition to all the boilerplate stuff)
+	* don't upload to CPAN in dry-run mode
+	* ProjectType::AutoConf support (releases memcached, at least)
+
+0.43
+	* default config as written out with --write-config had syntax error,
+	  and old list of default plugins
+0.42
+	* first version able to release itself to CPAN
+0.41
+	* rename unimplemented "Release" step to "MakeDist"
+0.40
+	* stop if they're trying to run shipit and no changes to be shipped
+0.39
+	* respecting previously-added dry-run option
+0.38
+	* make Perl projectype cleanup after itself in disttest
+0.37
+	* more docs, auto-write out config file
+	* make VC::SVN fail if locally-added files, and recommend
+	  running "svn pe svn:ignore ."
+0.36
+	* the documentation release!  and clean some noise.
+0.35
+	* the version that can properly tag releases
+0.34
+	* the release that can do commit messages from ChangeLog diffs
+0.33
+	* test release

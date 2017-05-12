@@ -1,0 +1,72 @@
+[ Changes for 0.51 - Jan 14, 2006 ]
+
+* List Params::Validate as a pre-requisite in the packaging metadata.
+
+[ Changes for 0.50 - Jan 13, 2006 ]
+
+* Switch to KinoSearch instead of Plucene for indexing.  When indexing
+  large repositories with thousands of repositories Plucene ran in to
+  memory problems.  KinoSearch appears not to have this limitation.
+
+[ Changes for 0.41 - Jan 23, 2006 ]
+
+* Work around a Plucene bug by stringifying the revision number before
+  indexing it.
+* Fix a bug, include the repository URL in the results returned by search().
+* Better documentation about the results returned by search().
+
+[ Changes for 0.40 - Jan 20, 2006 ]
+
+-- Changes by Nik Clayton
+
+* Significant changes to the API.  It's not backwards compatible, but is
+  now cleaner.
+* One index now contains information about one repo.  It's now not possible
+  to have one index contain information from multiple repos.
+* Significant enhancements to the documentation.
+* Require SVN::Log 0.03.  This gives us support for 'HEAD' in a revision
+  specification.
+* Indexing 'remembers' the last indexed revision.  The API exposes this,
+  and bin/sli now supports 'LAST' in a revision specification.
+* Significant changes to the bin/sli usage model.  It's now cleaner, but
+  is not backwards compatible.
+
+-- Changes by Garrett Rooney
+
+* Accept an alternate Analyzer in constructor [Mike Henson <mike at axl.net>].
+* Return the relevance in the result hash [Mike Henson <mike at axl.net>].
+
+[ Changes for 0.30 - Jun 14, 2004 ]
+
+* Changed verbose output of sli program to look more like 'svn log' output.
+* Moved log retrieval code into SVN::Log module, distributed separately, 
+  because it turns out that people want to use it.  In the process fixed a 
+  bug in the command line client parsing code that caused us to miss revs.
+* Add a mechanism for forcing use of the svn command line client, even if 
+  the subversion perl bindings are installed.
+* Add tests that exercise the code that uses the svn command line client 
+  to read logs from the repository.
+
+[ Changes for 0.22 - May 29, 2004 ]
+
+* Fix the 'sli' script so that it can actually create a new index.
+
+[ Changes for 0.21 - May 27, 2004 ]
+
+* Fix the log parsing code, it was refering to a nonexistant variable.
+* Make tests chmod the repository's format file since recent versions of 
+  svnadmin make it read-only.
+
+[ Changes for 0.20 - Mar 23, 2004 ]
+
+* Added CHANGES file.
+* Minor documentation fixes.
+* Correct capitalization of Plucene in dependencies.
+* If we don't have the SVN perl bindings installed, use the command line 
+  client to get log entries from the repository instead.
+* Explicitly look for the svn and svnadmin executables in Build.PL, instead 
+  of just failing horribly if they aren't found.
+
+[ Changes for 0.1 - Feb 9, 2004 ]
+
+* Initial release.

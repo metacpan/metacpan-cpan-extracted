@@ -1,0 +1,7 @@
+Revision history for StupidMarkov
+
+0.002 Sun May 10, 2009
+  - Integrating apieron@cpan.org's camel case is evil patch.
+
+0.001 Sat May  2, 2009
+  - First version, released on an unsuspecting world.

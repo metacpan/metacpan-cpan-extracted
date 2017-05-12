@@ -1,0 +1,5 @@
+0.02 2016-04-20T17:04:58+02:00
+ - Fix dependencies to PYX::Utils.
+
+0.01 2016-04-20T17:00:44+02:00
+ - First version.

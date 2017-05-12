@@ -1,0 +1,39 @@
+---
+abstract: 'Kit for SphinxSearch xmlpipe2 interface'
+author:
+  - 'bbon <bbon@mail.ru>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Sphinx-XMLpipe2
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Sphinx::XMLpipe2:
+    file: lib/Sphinx/XMLpipe2.pm
+    version: '0.05'
+requires:
+  XML::Hash::XS: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/bbon/Sphinx-XMLpipe2/issues
+  homepage: https://github.com/bbon/Sphinx-XMLpipe2
+  repository: git://github.com/bbon/Sphinx-XMLpipe2.git
+version: '0.05'
+x_contributors:
+  - 'mr_bbon <bbon@DT216.local>'

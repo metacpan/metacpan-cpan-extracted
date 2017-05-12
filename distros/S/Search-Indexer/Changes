@@ -1,0 +1,39 @@
+Revision history for Perl extension Search::Indexer.
+
+0.78 11.02.2016
+  - suppress spurious warnings in Indexer.pm
+
+0.77 04.05.2013
+  - fix warning in dump() & identify stopwords
+
+0.76 26.06.2009
+  - suppress spurious warning in addToScore
+
+0.75 24.09.2007
+  - bug fix: remove() did not work on indexes without word positions
+
+0.74 11.03.2007
+  - bug fix in checking "positions" option
+
+0.73 11.03.2007
+  - added option "positions => 0" for smaller (yet less precise) indexes
+
+0.72 
+  - fixed regex bug (missing "quotemeta")
+
+0.71 25.05.2005 
+
+  - Internal structure change : use Btree instead of Hash for
+    ixw and ixp. This takes more space but allows us to walk
+    through words in the dictionary, or through words in a 
+    given doc. INDEXES ARE NOT COMPATIBLE WITH PREVIOUS
+    VERSION, you need to reindex your docs.
+
+  - add" method : check that $docId is a fresh number
+  - "remove" method : no longer necessary to supply text buffer;
+    just give the docId to remove
+  - new method "words" and "wordIds"
+  - modified "translateQuery" for compatibility with 
+    Search::QueryParser v0.91
+
+0.70 Feb 6th. First public release.

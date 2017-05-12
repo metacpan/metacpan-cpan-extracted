@@ -1,0 +1,14 @@
+Take the mysql-DSN related file from this directory, adapt it to your
+mysql test database/host, and put it in the distribution main directory
+to run the mysql-related tests.
+
+WARNING: The mysql tests (if set up using the above) will create tables,
+         stuff data in them, and NOT CLEAN UP AFTER THEM!
+         That's a TODO, but for the time being, since this is an author
+         test, clean up after yourself.
+
+For testing the Redis storage, cp the redis "config" file into the
+distribution main directory, modify it to point at your TEST server,
+make sure it has at least ~10 databases configured.
+The Redis storage tests might also not clean up properly, but they
+*should* set expiration to ~30 seconds.

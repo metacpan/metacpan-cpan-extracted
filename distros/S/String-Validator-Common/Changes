@@ -1,0 +1,9 @@
+Revision history for String-Validator-Common
+
+1.01    2014-08-17 More POD editing, 
+	fixed test that was failing on older Perls.        
+1.00    2014-08-16 POD improvements and version bump to 1.00.
+0.97	2012-04-14 Added lowercase versions of methods.
+0.96    Corrected some typos in documentation and other trivial changes.
+
+

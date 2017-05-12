@@ -1,0 +1,40 @@
+# Update domain, remove admin contact which doesn't exist on the domain (which fails)
+template: update-domain.tt
+
+vars:
+  domain: updatable.co.te
+  admin_old: 10c
+
+input_assertions:
+  class: SRS::EPP::Command::Update::Domain
+
+SRS:
+  - assertions:
+      count:
+      match:
+        - [ '//DomainNameFilter', 'updatable.co.te', 'SRS: Check for the domain name' ]
+      match_all:
+      attr_is:
+        - [ '//FieldList', 'AdminContact', '1', 'SRS: Admin contact requested in DDQ field list' ]
+    fake_response: |-
+        <NZSRSResponse VerMajor="5" VerMinor="0">
+          <Response Action="DomainDetailsQry" FeId="8" FeSeq="4739999" OrigRegistrarId="1" RecipientRegistrarId="1" Rows="1">
+            <FeTimeStamp Day="23" Hour="17" Minute="29" Month="6" Second="44" TimeZoneOffset="+12:00" Year="2010"/>
+            <Domain DomainName="cheese123.co.te" Status="Active">
+                <AdminContact ActionId="Update handle registrant-001 1" Email="new001@registrant.co.nz" HandleId="registrant-001" Name="new registrant 001">
+                  <PostalAddress Address1="Regisrant New Address 1" City="Wellington" CountryCode="NZ"/>
+                  <Phone AreaCode="4" CountryCode="64" LocalNumber="123 ext 1"/>
+                  <Fax AreaCode="4" CountryCode="64" LocalNumber="123666"/>
+                </AdminContact>
+            </Domain>
+          </Response>
+        </NZSRSResponse>
+
+
+output_assertions:
+  count:
+    - [ '//epp:result', 1, 'Check for one result' ]
+  attr_is:
+    - [ '//epp:result', 'code', 2002, 'Check for correct result code' ]
+  match:
+    - [ '//epp:reason', 'Attempting to remove admin contact which does not exist on the domain', 'Correct error message' ]

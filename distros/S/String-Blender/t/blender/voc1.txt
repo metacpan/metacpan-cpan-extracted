@@ -1,0 +1,9 @@
+web
+net
+host
+site
+list
+archive
+core
+base
+switch

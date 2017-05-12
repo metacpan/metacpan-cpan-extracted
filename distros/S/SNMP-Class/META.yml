@@ -1,0 +1,51 @@
+---
+name: SNMP-Class
+version: 0.15
+author:
+  - 'Athanasios Douitsis <aduitsis@cpan.org>'
+abstract: A convenience class around the NetSNMP perl modules.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Class::Std: 0
+  Log::Log4perl: 0
+  NetSNMP::OID: 0
+  SNMP: 0
+  version: 0
+build_requires:
+  Module::Build: 0
+  Test::More: 0
+recommends:
+  Time::HiRes;: 0
+provides:
+  SNMP::Class:
+    file: lib/SNMP/Class.pm
+    version: 0.15
+  SNMP::Class::Cache:
+    file: lib/SNMP/Class/Cache.pm
+    version: 0.09
+  SNMP::Class::OID:
+    file: lib/SNMP/Class/OID.pm
+    version: 0.12
+  SNMP::Class::ResultSet:
+    file: lib/SNMP/Class/ResultSet.pm
+    version: v0.11
+  SNMP::Class::Utils:
+    file: lib/SNMP/Class/Utils.pm
+    version: 0.08
+  SNMP::Class::Value::IpForwarding:
+    file: lib/SNMP/Class/Varbind/IpForwarding.pm
+  SNMP::Class::Varbind:
+    file: lib/SNMP/Class/Varbind.pm
+    version: 0.13
+  SNMP::Class::Varbind::IpAddress:
+    file: lib/SNMP/Class/Varbind/IpAddress.pm
+  SNMP::Class::Varbind::IpForwarding:
+    file: lib/SNMP/Class/Varbind/IpForwarding.pm
+  SNMP::Class::Varbind::SysUpTime:
+    file: lib/SNMP/Class/Varbind/SysUpTime.pm
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

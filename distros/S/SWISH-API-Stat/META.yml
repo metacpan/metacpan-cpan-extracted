@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:               SWISH-API-Stat
+version:            0.06
+abstract:           reconnect to a SWISH::API handle if index file changes
+author:
+    - Peter Karman <karman@cpan.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Path::Class::File::Stat:  0.02
+    SWISH::API:           0.04
+    SWISH::API::More:     0.03
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

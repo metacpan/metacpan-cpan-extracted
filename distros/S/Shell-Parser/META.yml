@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name: Shell-Parser
+version: 0.04
+author:
+  - |-
+    Sébastien Aperghis-Tramoni <sebastien@aperghis.net>
+abstract: Simple shell script parser
+license: perl
+requires:
+  Carp: 0
+  Test::More: 0
+provides:
+  Shell::Parser:
+    file: lib/Shell/Parser.pm
+    version: 0.04
+generated_by: Module::Build version 0.2607

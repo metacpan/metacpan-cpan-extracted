@@ -1,0 +1,21 @@
+Release Notes for SOAP-WSDL_XS 0.2
+
+SOAP-WSDL_XS is a high performance SOAP message parser for SOAP::WSDL.
+
+See http://soap-wsdl.sourceforge.net for details.
+
+The following changes have been made:
+
+0.2 -
+
+The following bugs have been fixed (the numbers in square brackets are the
+tracker IDs from https://sourceforge.net/tracker/?group_id=111978&atid=660921):
+The numbers with # are CPAN RT IDs (http://rt.cpan.org/).
+
+   * [2611894] MessageParser_XS does not work well with attributes [patch]
+
+The following uncategorized improvements have been made:
+
+   * prepared CPAN distribution
+
+0.1 - unreleased

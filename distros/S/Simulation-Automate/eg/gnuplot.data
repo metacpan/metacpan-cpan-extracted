@@ -1,0 +1,9 @@
+# GNUplot configuration 
+#
+
+#logscale : x, y or xy
+LOGSCALE: XY
+YLABEL: Count
+XLABEL: Gap width
+STYLE: lines
+

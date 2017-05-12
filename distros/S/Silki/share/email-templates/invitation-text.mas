@@ -1,0 +1,13 @@
+<p>
+<% loc( 'You have been invited to join the %1 wiki. ', $wiki->title() ) %>
+% if ( $user->requires_activation() ) {
+<% loc( q{Once you <a href="%html(%1)">activate your user account</a>, you will be a member of the wiki.}, $user->confirmation_uri( with_host => 1 ) ) %>
+% } else {
+<% loc( q{Since you already have a user account at %1, you can <a href="%html(%2)">visit the wiki right now</a>.}, $wiki->domain()->web_hostname(), $wiki->uri( with_host => 1 ) ) %>
+% }
+</p>
+
+<%args>
+$user
+$wiki
+</%args>

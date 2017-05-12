@@ -1,0 +1,24 @@
+Solaris/NDDI version 0.01
+========================
+
+Solaris::NDDI - Perl extension for interacting with Solaris Network Device Driver
+Interface (NDDI). This module allows for getting and setting tunable parameters
+that control network stack drivers, including IP, TCP, UDP, ICMP and ARP drivers.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2001 Alexander Golomshtok
+

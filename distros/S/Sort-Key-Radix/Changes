@@ -1,0 +1,53 @@
+Revision history for Perl extension Sort::Key::Radix.
+
+0.14  Apr 16, 2012
+        - skeysort was broken (bug report by Tracey Freitas)
+
+0.13  Jun 11, 2007
+        - Add support for 16 bytes NVs on x86_64
+
+0.12  Jun 7, 2007
+	- Add support for 16 bytes NV (as when using long doubles on
+	  Sparc)
+
+0.11  Jun 6, 2007
+        - Perl redefines assert and could require perl context in
+          scope => remove assertions.
+
+0.10  Jun 5, 2007
+        - remove warnings on systems where UVs are unsigned long long
+
+0.09  Jun 5, 2007
+	- long doubles in x86 are really 10bytes long
+
+0.08  Jun 4, 2007
+        - NVs LE12 entry was missing in Makefile.PL
+
+0.07  Jun 4, 2007
+        - support perls compiled with lond double NVs on x86
+
+0.06  Jun 4, 2007
+        - some Valgrind profiling and optimizations
+
+0.05  Jun 4, 2007
+        - write configuration to rconfig.h
+        - print native float formats in "unsupported" error messages
+        - missing typemaps for perls 5.6.x added
+        - bug corrected in numbers.t
+        - some doc misspellings
+
+0.04  Jun 2, 2007
+        - pack(F, ...) not supported in Perls before 5.8.x
+
+0.03  Jun 2, 2007
+        - corrected another 64bits integers in 32bits platform bug
+        - better float keys handling
+
+0.02  Jun 2, 2007
+        - corrected bug on 32 bit platforms with perl compiled with
+          64 bit integer support.
+
+0.01  Sun May 27 18:47:00 2007
+	- original version; created by h2xs 1.23 with options
+		-An Sort::Key::Radix
+

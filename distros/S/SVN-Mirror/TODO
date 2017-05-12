@@ -1,0 +1,8 @@
+- Documentation!
+
+- VCP:
+* real branch creation and cleanups.
+* handle mixed revision branching better.
+* prop on / should be fixed so sync -a will work.
+* source_id should be stored in revision_prop.
+* implement all methods that svn::mirror::ra has.

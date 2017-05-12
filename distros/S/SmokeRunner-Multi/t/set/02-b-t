@@ -1,0 +1,6 @@
+use strict;
+use warnings;
+
+use Test::More tests => 5;
+
+ok( 0, "test $_" ) for 1..5;

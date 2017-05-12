@@ -1,0 +1,79 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+our $VERSION = '0.004';
+
+use Shell::Perl ();
+Shell::Perl->run_with_args;
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+pirl - A read-eval-print loop in Perl (see Shell::Perl)
+
+=head1 SYNOPSIS
+
+    pirl
+    pirl --noornaments
+
+    pirl --version
+    pirl -v
+
+    pirl -I dir
+    pirl -Idir1 -Idir2
+
+=head1 EXAMPLE SESSION
+
+    $ pirl
+    Welcome to the Perl shell. Type ':help' for more information
+
+
+    pirl @> 1+1
+    2
+
+    pirl @> use YAML qw(Load Dump);
+    ()
+
+    pirl @> $data = Load("--- { a: 1, b: [ 1, 2, 3] }\n");
+    { a => 1, b => [1, 2, 3] }
+
+    pirl @> $var = 'a 1 2 3'; $var =~ /(\w+) (\d+) (\d+)/
+    ("a", 1, 2)
+
+    pirl @> :q
+
+=head1 DESCRIPTION
+
+This script is the command-line interface to C<Shell::Perl>
+which does it all.
+
+By now, read the fine details at C<Shell::Perl> documentation.
+
+=head1 OPTIONS
+
+    -I dir - add the given directory to @INC
+
+    --ornaments - turn on terminal ornaments (default)
+    --noornaments - turn off terminal organments
+
+    --version, -v - prints version info and exits with 0
+
+=head1 SEE ALSO
+
+See L<Shell::Perl> for more documentation.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2007–2011 by Adriano R. Ferreira
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

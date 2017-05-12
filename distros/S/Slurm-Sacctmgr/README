@@ -1,0 +1,96 @@
+Slurm::Sacctmgr is copyright 2014-2016 by the University of Maryland.
+
+Slurm-Sacctmgr version 1.0.1
+===========================
+
+This is a wrapper around the Slurm sacctmgr command.  Basically, it provides
+some methods so that one can call the sacctmgr command from within Perl.
+There are subclasses for the various entity types recognized by the
+sacctmgr command, and for the entity types which can be used with the sacctmgr
+list/show  sub-commands there are methods which parse the output into more
+Perl friendly objects.  There are also some methods for specific common
+tasks (e.g. zeroing the usage on a slurm account, or setting the GrpCPUMins
+field for a slurm account).
+
+The Slurm::Sacctmgr package also supports verbose and dryrun modes.  The
+former essentially prints out the commands as they are being executed, the 
+latter essentially prints out the commands instead of executing them (exceptions
+are made for commands which do not update the slurm databases, which you
+generally want to run when debugging your code or it won't get to the parts 
+which really need debugging).
+
+The Perl package basically wraps calls to the Slurm sacctmgr command, and does
+not directly talk to the Slurm databases.  This has pros and cons, but as
+the Slurm sacctmgr command seems to have a fairly stable interface, the Perl
+module should be fairly stable as well.  Linking to Slurm libraries might have
+performance benefits, but this did not seem like code that needs to be highly
+optimized.  Using the wrapper approach also makes for easier correlation 
+between manual procedures thereby easing the automation of routine procedures.
+
+It has been used in production at UMD, with several Slurm versions (mainly 
+with Slurm version 14.11.7 at time of writing).  
+
+This is a pure Perl module; no compilation, etc. required.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+The Sacctmgr.pm defaults to looking for 'sacctmgr' in the PATH of the
+user running the code, but you can edit the file if you wish a different
+default 'sacctmgr' to be used.  The caller can always specify a path.
+
+DEPENDENCIES
+
+This module requires you to have Slurm installed, and in particular the
+sacctmgr command, in order to be of use.  
+
+
+COPYRIGHT AND LICENCE
+
+Written by Thomas M. Payerle <payerle@umd.edu>
+
+Copyright (C) 2014-2016 by the University of Maryland.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Any use, modification, and distribution of the Standard or Modified
+Versions is governed by this Artistic License. By using, modifying or
+distributing the Package, you accept this license. Do not use, modify,
+or distribute the Package, if you do not accept this license.
+
+If your Modified Version has been derived from a Modified Version made
+by someone other than you, you are nevertheless required to ensure that
+your Modified Version complies with the requirements of this license.
+
+This license does not grant you the right to use any trademark, service
+mark, tradename, or logo of the Copyright Holder.
+
+This license includes the non-exclusive, worldwide, free-of-charge
+patent license to make, have made, use, offer to sell, sell, import and
+otherwise transfer the Package with respect to any patent claims
+licensable by the Copyright Holder that are necessarily infringed by the
+Package. If you institute patent litigation (including a cross-claim or
+counterclaim) against any party alleging that the Package constitutes
+direct or contributory patent infringement, then this Artistic License
+to you shall terminate on the date that such litigation is filed.
+
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+

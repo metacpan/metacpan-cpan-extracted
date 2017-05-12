@@ -1,0 +1,27 @@
+Revision history for Perl extension Sys::Utmp.
+
+1.1  Fri Feb  9 07:27:18 2001
+	- original version JNS
+
+1.3  Tue Mar 27 07:59:56 BST 2001
+        - Added utmpname() at the request of someone whose e-mail 
+          I have subsequently lost.
+
+1.4  Mon Sep 10 08:12:37 BST 2001
+        - Fixed atrocious memory leak as reported by
+          Stuart Sharpe <stu@drazi.demon.co.uk>
+
+1.5  Fri Sep 14 08:21:38 BST 2001
+        - Having fixed the memory leak had introduced a coredump in
+          PL_sv_free :(
+        - Tainted ut_host as DNS might not be in our control.
+        - utmpname() was not backward compatible to 5.005
+        - added eg/pwho
+
+1.6 Fri Oct 13 16:00:24 BST 2006
+        - Changed layout of source code
+        - Fixed warnings with new gcc/perl
+        - UT_* constants weren't actually working
+        - Tainting wasn't working
+        - Improved test coverage
+        - Removed useless const code in .xs

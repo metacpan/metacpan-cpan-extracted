@@ -1,0 +1,48 @@
+---
+abstract: "Perl's Web Services Toolkit"
+author:
+  - 'Pavel Kulchenko'
+  - 'Randy J Ray'
+  - 'Byrne Reese'
+  - 'Martin Kutter <MKUTTER@cpan.org>'
+  - 'Fred Moyer'
+build_requires:
+  IO::File: '0'
+  Test::More: '0'
+  Test::Warn: '0'
+  XML::Parser::Lite: '0.715'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SOAP-Lite
+recommends:
+  Apache: '0'
+  DIME::Tools: '0.03'
+  FCGI: '0'
+  HTTP::Daemon: '0'
+  IO::File: '0'
+  MIME::Tools: '0'
+  Net::POP3: '0'
+requires:
+  Class::Inspector: '0'
+  Compress::Zlib: '0'
+  IO::SessionData: '1.03'
+  IO::Socket::SSL: '0'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '0'
+  MIME::Base64: '0'
+  Scalar::Util: '0'
+  Task::Weaken: '0'
+  URI: '0'
+  XML::Parser: '2.23'
+  constant: '0'
+  perl: v5.6.0
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=SOAP-Lite
+  repository: ssh://git@github.com:redhotpenguin/soaplite.git
+version: '1.20'

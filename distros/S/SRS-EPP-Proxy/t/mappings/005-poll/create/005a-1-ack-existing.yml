@@ -1,0 +1,14 @@
+description: Ack pre existing messages
+registrar: 1
+
+request: |-
+   <NZSRSRequest VerMinor="0" VerMajor="5" RegistrarId="100">
+       <AckMessage OriginatingRegistrarId="1" ActionId="[% actionid %] 1" TransId="00b-registrar-auth 1"/>
+       <AckMessage OriginatingRegistrarId="1" ActionId="[% actionid %] 2" TransId="00b-registrar-auth 2"/>
+       <AckMessage OriginatingRegistrarId="1" ActionId="[% actionid %] 3" TransId="00b-registrar-auth 3"/>
+   </NZSRSRequest>
+
+assertions:
+ - xpath_matches: [ '//Error', '0', 'No errors' ]
+
+

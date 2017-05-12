@@ -1,0 +1,8 @@
+Revision history for String-Random-NiceURL
+
+0.02    Sun Aug 08 2010
+        - Updates to documentation and license.
+        - Added Test::Exception to the prerequisite list
+
+0.01    Sat Aug 07 2010
+        First version.

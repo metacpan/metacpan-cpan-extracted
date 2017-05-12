@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<swf version="4" compressed="0">
+  <Header framerate="12" frames="1">
+    <size>
+      <Rectangle left="0" right="4800" top="0" bottom="4800"/>
+    </size>
+    <tags>
+      <SetBackgroundColor>
+        <color>
+          <Color red="255" green="255" blue="255"/>
+        </color>
+      </SetBackgroundColor>
+      <DefineShape objectID="1">
+        <bounds>
+          <Rectangle left="2009" right="3889" top="2430" bottom="3990"/>
+        </bounds>
+        <styles>
+          <StyleList>
+            <fillStyles>
+              <Solid>
+                <color>
+                  <Color red="0" green="102" blue="204"/>
+                </color>
+              </Solid>
+              <Solid>
+                <color>
+                  <Color red="255" green="0" blue="0"/>
+                </color>
+              </Solid>
+            </fillStyles>
+            <lineStyles>
+              <LineStyle width="20">
+                <color>
+                  <Color red="0" green="0" blue="0"/>
+                </color>
+              </LineStyle>
+            </lineStyles>
+          </StyleList>
+        </styles>
+        <shapes>
+          <Shape>
+            <edges>
+              <ShapeSetup x="3879" y="2440" fillStyle1="2" lineStyle="1"/>
+              <LineTo x="0" y="1540"/>
+              <LineTo x="-1860" y="0"/>
+              <LineTo x="0" y="-1540"/>
+              <LineTo x="1860" y="0"/>
+              <ShapeSetup/>
+            </edges>
+          </Shape>
+        </shapes>
+      </DefineShape>
+      <PlaceObject2 replace="0" depth="1" objectID="1">
+        <transform>
+          <Transform transX="0" transY="0"/>
+        </transform>
+      </PlaceObject2>
+      <DefineFont2 objectID="2" isShiftJIS="0" isUnicode="0" isANSII="1" wideGlyphOffsets="0" italic="0" bold="0" language="0" name="Times New Roman">
+        <glyphs/>
+      </DefineFont2>
+      <DefineEditText objectID="3" wordWrap="0" multiLine="0" password="0" readOnly="1" autoSize="0" hasLayout="1" notSelectable="0" hasBorder="0" isHTML="0" useOutlines="0" fontRef="2" fontHeight="740" align="0" leftMargin="0" rightMargin="0" indent="0" leading="40" variableName="" initialText="Test">
+        <size>
+          <Rectangle left="-40" right="3220" top="-40" bottom="859"/>
+        </size>
+        <color>
+          <Color red="0" green="0" blue="0" alpha="255"/>
+        </color>
+      </DefineEditText>
+      <PlaceObject2 replace="0" depth="2" objectID="3">
+        <transform>
+          <Transform transX="679" transY="645"/>
+        </transform>
+      </PlaceObject2>
+      <ShowFrame/>
+      <End/>
+    </tags>
+  </Header>
+</swf>

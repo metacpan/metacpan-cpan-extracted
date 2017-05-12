@@ -1,0 +1,8 @@
+ChangeLog
+INSTALL
+MANIFEST
+Makefile.PL
+README
+lib/SOAP/Lite/Utility.pm
+
+META.yml                                 Module meta-data (added by MakeMaker)

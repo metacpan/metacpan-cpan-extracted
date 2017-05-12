@@ -1,0 +1,19 @@
+#! /bin/sh
+# /etc/init.d/sysync
+
+case "$1" in
+  start)
+    echo "Starting sysync"
+    /usr/sbin/sysyncd
+    ;;
+  stop)
+    echo "Stopping sysync"
+    kill `cat /var/run/sysync.pid`
+    ;;
+  *)
+    echo "Usage: /etc/init.d/sysync {start|stop}"
+    exit 1
+    ;;
+esac
+
+exit 0;

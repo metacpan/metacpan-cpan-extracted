@@ -1,0 +1,143 @@
+NAME
+    Sub::Implant - Make a named sub out of a subref
+
+VERSION
+    Version 1.02
+
+SYNOPSIS
+        use Sub::Implant;
+
+        sub original { (caller 0)[3] }
+        say original(); # 'main::original'
+        implant 'Some::Package', 'implanted', \ &original;
+        say Some::Package::implanted(); # still 'main::original';
+
+        my $anon_orig = sub { (caller 0)[3] };
+        say $anon_orig->(); # 'main::__ANON__';
+        implant 'Some::Package::also_implanted', $anon_orig;
+        say Some::Package::also_implanted(); # now 'Some::Package::also_implanted'
+
+EXPORT
+    The function "implant" is exported by default. It can be imported under
+    a different name by specifying
+
+        use Sub::Implant implant => {as => 'other_name'};
+
+SUBROUTINES
+    "Sub::Implant" puts the mechanics of inserting a subref in a symbol
+    table and the action of assigning its internal name together under the
+    convenient interface of "implant(...)". See also "ACKNOWLEDGEMENTS"
+    below.
+
+    "implant $qualified_name, $subref, %opt"
+        Makes the subroutine $subref available under the name
+        $qualified_name. If $qualified_name doesn't contain a "::" (that is,
+        it isn't really qualified), it will be qualified with the name of
+        the calling package.
+
+    "implant $package, $name, $subref, %opt"
+        Makes the subroutine $subref available under the name
+        "${package}::$name". In this form $name can't also be qualified, it
+        is a fatal error if it contains '::'
+
+    If $subref is anonymous, "implant" will set its internal name (the one
+    seen by "caller") to the new name. If $subref already has a name
+    (originally or by an earlier call to "implant") that name will remain
+    unchanged.
+
+    If the target of "implant" is already defined, it emits a warning when
+    it is overwritten. Specifying "redef => 1" in %opt suppresses the
+    warning.
+
+    If an implanted subref should remain anonymous for some reason, you can
+    switch off the naming mechanism with "name => 0" in %opt.
+
+EXAMPLE
+    "Sub::Implant" is its own first customer in that it uses "implant" to
+    export itself to client modules. Here is how:
+
+        # Basing ->import on ->import_into has nothing to do with
+        # Sub::Implant, it's considered good style by some, yours
+        # truly included
+
+        sub import {
+            my $class = shift;
+            $class->_import_into(scalar caller, @_);
+        }
+
+        sub _import_into {
+            my $class = shift;
+            my ($client, @arg) = @_;
+            unshift @arg, qw(implant) unless @arg; # default export
+            my %export = (                         # provided exports
+                implant => \ &implant,
+            );
+
+            while ( @arg ) {
+                my $export = shift @arg;
+                my $code = $export{$export} or croak(
+                    "$export is not exported by the $class module"
+                );
+                # accept export options if given
+                my %opt  = %{ shift @arg } if ref $arg[0] eq 'HASH';
+                # we only understand the 'as' option
+                my $name = $opt{as} // $export;
+                implant($client, $name, $code);
+            }
+        }
+
+    While "Sub::Implant" only exports a single subroutine, you can see that
+    it can easily be amended to export more by putting more in the %export
+    hash.
+
+AUTHOR
+    Anno Siegel, "<anno5 at mac.com>"
+
+BUGS
+    There is no way to remove an implanted sub from a package.
+
+    If you find bugs or have feature requests, please report them to
+    "bug-sub-implant at rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Sub-Implant>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Sub::Implant
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker (report bugs here)
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Sub-Implant>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Sub-Implant>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Sub-Implant>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Sub-Implant/>
+
+ACKNOWLEDGEMENTS
+    I have to thank Matthijs van Duin for the "Sub::Name" module. Without
+    his prior work the setting of the internal name by "implant" wouldn't
+    exist. "Sub::Implant" comes with a slightly modified version of
+    "Sub::Name" of its own, so "Sub::Name" doesn't appear among the
+    prerequisites of "Sub::Implant".
+
+LICENSE AND COPYRIGHT
+    Copyright 2012 Anno Siegel.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

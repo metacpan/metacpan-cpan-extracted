@@ -1,0 +1,30 @@
+This is the README file for Software::Packager::Aix.
+This is Alpha software it may or may not do anything. The API is subject to
+change. 
+This module comes with NO WARRANTY.
+
+INSTALLATION
+Software::Packager::Aix uses the standard perl module install process
+It requires Software::Packager
+
+perl Makefile.PL
+make
+make test (optional but recommended)
+make install
+
+DESCRIPTION
+Software::Packager::Aix extends the Software::packager module adding the 
+ability to create AIX packages.
+
+This module does not do the packaging of the software but is merely a wrapper
+around the AIX lpp software packaging tools already provided with the AIX
+operating system.
+
+AUTHOR
+R Bernard Davison <rbdavison@cpan.org>
+
+COPYRIGHT
+Copyright (c) 2001 R Bernard Davison. All rights reserved.
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+

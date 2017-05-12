@@ -1,0 +1,31 @@
+Text/Graph/ScatterPlot version 0.01
+===================================
+
+This is my first attempt at writing a CPAN module, and I hope I did
+it properly.  If you have any problems or suggestions, please feel
+free to email me at inventor-66@comcast.net.  Thanks, and enjoy!
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  none
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2007 Les Hall
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

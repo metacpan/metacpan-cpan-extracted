@@ -1,0 +1,15 @@
+# Generic files
+~$
+.bak$
+tar.gz$
+
+# Specific files
+^Makefile$
+^pm_to_blib$
+
+# Generic directories
+\.run
+
+# Specific directories
+^blib
+

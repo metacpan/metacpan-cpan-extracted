@@ -1,0 +1,10 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README.md
+TODO
+dist.ini
+lib/SQL/Easy.pm
+t/00-load.t

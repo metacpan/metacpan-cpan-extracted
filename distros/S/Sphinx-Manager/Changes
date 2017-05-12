@@ -1,0 +1,27 @@
+Revision history for Sphinx-Manager
+
+0.01    2008-07-26
+        First release
+
+0.02	2008-07-29
+	Handling of system() return status changed to avoid spurious ECHILD.
+
+0.03	2009-10-21
+	Added sudo support.
+
+0.04	2010-04-09
+	Added $ok_if_running flag to start_searchd.
+
+0.05	2010-04-09
+	Relaxed reload so that error won't be raised if something else starts
+	searchd concurrently
+
+0.06    2011-03-23
+        Required Sphinx::Config 0.09 due to failing test case.
+
+0.07_02 2013-02-10
+        Experimental patch to address problem of rt.cpan.org #83200 (searchd inherits open file descriptors).
+
+0.08    2016-09-09
+        Fix for failing test
+        

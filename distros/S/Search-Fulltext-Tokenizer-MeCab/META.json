@@ -1,0 +1,78 @@
+{
+   "abstract" : "Provides Japanese fulltext search for L<Search::Fulltext> module",
+   "author" : [
+      "Sho Nakatani <lay.sakura@gmail.com>, a.k.a. @laysakura"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.7.5",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Search-Fulltext-Tokenizer-MeCab",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Cwd" : "0",
+            "Encode" : "0",
+            "File::Basename" : "0",
+            "Search::Fulltext" : "1.00",
+            "Text::MeCab" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Search::Fulltext::Tokenizer::MeCab" : {
+         "file" : "lib/Search/Fulltext/Tokenizer/MeCab.pm",
+         "version" : "1.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/laysakura/Search-Fulltext-Tokenizer-MeCab/issues"
+      },
+      "homepage" : "https://github.com/laysakura/Search-Fulltext-Tokenizer-MeCab",
+      "repository" : {
+         "url" : "git://github.com/laysakura/Search-Fulltext-Tokenizer-MeCab.git",
+         "web" : "https://github.com/laysakura/Search-Fulltext-Tokenizer-MeCab"
+      }
+   },
+   "version" : "1.05"
+}

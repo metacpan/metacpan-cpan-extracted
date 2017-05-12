@@ -1,0 +1,15 @@
+#! /usr/bin/perl -w
+
+use Shell::POSIX::Select;
+
+# Make sure that file-descriptor monitoring version of select
+# doesn't get identified as loopy one
+
+$rout= $timeleft= $nfound= $wout= $eout= $timeout = 0;
+$rin = $win = $ein = '';
+vec($rin,fileno(STDIN),1) = 1;
+vec($win,fileno(STDOUT),1) = 1;
+$ein = $rin | $win;
+
+($nfound,$timeleft) =
+	select($rout=$rin, $wout=$win, $eout=$ein, $timeout);               

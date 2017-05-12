@@ -1,0 +1,432 @@
+#!/usr/bin/perl -w 
+
+# TODO
+#   * (DONE) Generate the PASS / FAIL report
+#   * (DONE) Upload this to CPAN
+#   * (DONE) Add POD
+#   * (DONE) Add commandline handling for directory, etc.
+#   * Insert metadata into the png's as well via pngcrush (see below)
+#   * Create an HTML indexpage
+#   * Switch to using Carp instead of print/warn
+#   * Autogenerate the AUTHORS file
+#   * (DONE) Add keyword support (review RDF)
+#   * Upload to Inkscape file tracker
+#   * Add support for the style of metadata at http://www.w3.org/TR/2003/REC-SVG11-20030114/metadata.html 
+#   * Reuse dnote from stat_collector.pl
+#   * Change to use svg2png instead of inkscape, when possible
+#   * Don't bother creating duplicate thumbnails when copying image to 
+#     several categories
+
+# pngcrush:
+# pngcrush -text b "Copyright" \
+# "copyright 2000 svg-scribblers, Inc.
+# Placed in Public Domain June 2004" \
+# -text b "Author" "J. F. Scribbler, www.svg-scribblers.com" \
+# in.png out.png
+#
+# The "b" means place the resulting tEXt chunk before the IDAT chunks.
+# Otherwise use "a" to put it after the IDAT.
+
+
+use strict;
+use Pod::Usage;
+use Getopt::Long;
+use File::Basename;
+use File::Copy;
+use File::Find;
+use File::Path;
+use File::Spec::Functions;
+use SVG::Metadata;
+
+my $Results;
+
+#------------------------------------------------------------------------
+# Cmdline options
+#------------------------------------------------------------------------
+our $opt_version    = 0;
+our $opt_help       = 0;
+our $opt_man        = 0;
+our $opt_debug      = 0;
+our $opt_noclobber  = 0;  # Prevent script from overwriting existing files
+our $opt_passfail   = 0;
+our $opt_target_dir = 'default-0.00';
+
+Getopt::Long::Configure ("bundling", "no_ignore_case");
+GetOptions(
+           "version|V",      # Prints the version and exits
+           "help|h",         # Prints a brief help message
+           "man",            # Prints extended help
+	   "debug|D=i",      # Prints debug messages
+	   "noclobber|n",    # Sets script to not overwrite existing files
+	   "target_dir|t=s", # Specifies where files should be placed
+	   "passfail",       # Just create passfail file.
+           ) or pod2usage(-verbose => 1, -exitstatus => 0);
+
+if ($opt_version) {
+    print "$SVG::Metadata::VERSION\n";
+    exit 0;
+}
+
+pod2usage(-verbose => 2, -exitstatus => 0) if ($opt_man);
+pod2usage(-verbose => 1, -exitstatus => 0) if ($opt_help);
+pod2usage(-verbose => 1, -exitstatus => 0) if (@ARGV < 1);
+
+sub main {
+    my @search_dirs = @ARGV;
+
+    # TODO:  Handle this in a less heavy-duty manner
+    if (-e $opt_target_dir) {
+	`rm -rf $opt_target_dir`;
+    }
+    eval { mkpath([$opt_target_dir], 0, 0755) };
+    if ($@) {
+	warn "Could not create directory '$opt_target_dir': $@";
+	return 0;
+    }
+
+    find({ wanted => \&wanted, no_chdir => 1}, @search_dirs);
+
+    # Print reports
+    if (defined $Results) {
+	# Print index($Results)
+
+	# Print results PASS / FAIL of ($Results)
+	my $reportname = catfile($opt_target_dir, 'PASSFAIL');
+	if (! open (REPORT, ">$reportname")) {
+	    warn "Could not open report '$reportname' for writing: $!\n";
+	    return 0;
+	}
+	print REPORT passfail_report($Results);
+	close(REPORT);
+    } else {
+	warn "No PASSFAIL report generated\n";
+    }
+
+    return 1;
+}
+
+sub wanted {
+    if (!-d && /\.svg$/i) {
+	process_file($File::Find::name, $opt_target_dir);
+    }
+}
+
+sub create_meta {
+    my $svgmeta = shift || return 0;
+    my $metaname = shift || return 0;
+
+    if (-e $metaname) {
+	if ($opt_noclobber) {
+	    warn "Can't overwrite existing '$metaname':  --noclobber option is set\n";
+	    return 0;
+	} else {
+	    warn "Removing existing '$metaname'\n";
+	    if (!unlink $metaname) {
+		warn "Could not remove existing '$metaname': $!\n";
+		return 0;
+	    }
+	}
+    }
+
+    if (! open METAFILE, ">$metaname") {
+	warn "Could not open meta file '$metaname' for writing: $!\n";
+	return 0;
+    }
+
+    print METAFILE $svgmeta->to_text();
+
+    if (! close(METAFILE)) {
+	warn "Could not close meta file '$metaname': $!\n";
+	# We'll let it pass - shouldn't be fatal...  we hope
+    }
+
+    return 1;
+}
+
+sub create_png {
+    my $filename = shift || return 0;
+    my $pngname = shift || return 0;
+
+    if (-e $pngname) {
+	if ($opt_noclobber) {
+	    warn "Can't overwrite existing $pngname:  --noclobber options is set\n";
+	    return 0;
+	} else {
+	    warn "Removing existing $pngname\n";
+	    unlink $pngname;
+	}
+    }
+
+    my $cmd = "inkscape -f \"$filename\" -e \"$pngname\" -w 80";
+    print "Calling '$cmd'\n";
+    print `$cmd`;
+
+    if ($?) {
+	warn "Inkscape returned error:  ".($?/256)."\n";
+	return 0;
+    }
+
+    if (! -e $pngname) {
+	warn "Inkscape failed to generate $pngname\n";
+	return 0;
+    }
+
+    return 1;
+}
+
+sub passfail_report {
+    my $results = shift;
+
+    my $text = '';
+
+    $text .= sprintf("%-40s Parse Title Authr Lcnse Kywds\n", 'Filename');
+    $text .= ('-'x70) . "\n";
+    foreach my $fn (sort keys %{$results}) {
+	$text .= sprintf("%-40s   ", $fn.'.svg');
+	foreach my $field (qw(parse title authorship license keywords)) {
+	    my $result = $results->{$fn}->{$field};
+	    if ($result && $result eq 'PASS') {
+		$text .= 'X     ';
+	    } else {
+		$text .= '      ';
+	    }
+	}
+	$text .= "\n";
+    }
+    return $text;
+}
+
+# Returns true if the file successfully passed validation and 
+# was processed and stored in the target path, false otherwise.
+sub process_file {
+    my $filename = shift;
+    my $target_dir = shift;
+
+    warn "Processing file '$filename'\n" if $opt_debug>0;
+
+    my $retval = 1;
+    my $svgmeta = new SVG::Metadata;
+
+    my ($fn,$dir,$ext)  = fileparse($filename, qr{\.[^\.]*?});
+
+    $ext =~ s|^\.||;
+    my $pngname = $fn.'.png';
+    my $metaname = $fn.".txt";
+
+    warn " Parsing file\n" if $opt_debug>3;
+    if (!$svgmeta->parse($filename)) {
+	$Results->{$fn}->{parse} = "FAIL";
+	warn ' '.$svgmeta->errormsg()."\n" if $opt_debug>0;
+    } else {
+	$Results->{$fn}->{parse} = "PASS";
+    }
+
+    if (! $svgmeta->title()) {
+	# Record that it failed on title
+	$Results->{$fn}->{title} = "FAIL";
+	warn " Could not verify the title\n" if $opt_debug>1;
+	$retval = 0;
+    } else {
+	$Results->{$fn}->{title} = "PASS";
+    }
+
+    if (! $svgmeta->author()) {
+	# Add note to $Results
+	$Results->{$fn}->{authorship} = "FAIL";
+	warn " Could not verify the authorship\n" if $opt_debug>1;
+	$retval = 0;
+    } else {
+	$Results->{$fn}->{authorship} = "PASS";
+    }
+
+    if (! $svgmeta->license()) {
+	# Record that it failed on license
+	$Results->{$fn}->{license} = "FAIL";
+	warn " Could not verify the license\n" if $opt_debug>1;
+	$retval = 0;
+    } else {
+	$Results->{$fn}->{license} = "PASS";
+    }
+ 
+    if (! $svgmeta->keywords()) {
+	# Set keyword to a default one
+	$Results->{$fn}->{keywords} = "FAIL";
+	$svgmeta->addKeyword('unsorted');
+    } elsif ($svgmeta->keywords() == 1 && $svgmeta->hasKeyword('unsorted')) {
+	$Results->{$fn}->{keywords} = "FAIL";
+    } else {
+	$Results->{$fn}->{keywords} = "PASS";
+    }
+
+    # If there was anything wrong with the metadata, we reject the file 
+    # and proceed to the next iteration here.
+    if ($retval == 0) {
+	warn " Skipping file '$fn' since failed metadata test\n" if $opt_debug>0;
+	return $retval;
+    }
+
+    if ($opt_passfail) {
+      # just show some progress
+      print "$filename\n";
+    } else {
+
+      # Copy it to the target directory
+      foreach my $category ($svgmeta->keywords()) {
+	my $d = catdir($target_dir, $category);
+
+	eval { mkpath([$d], 0, 0755) };
+	if ($@) {
+	    warn "Could not create directory '$d': $@";
+	    return 0;
+	}
+
+	warn " Copying file\n" if $opt_debug>3;
+	if (!copy($filename, $d)) {
+	    warn " Could not copy file to target dir '$d': $!\n" if $opt_debug>0;
+	    return 0;
+	}
+
+	warn " Creating metadata\n" if $opt_debug>3;
+	if (! create_meta($svgmeta, catfile($d, $metaname))) {
+	    # Add note to $Results
+	    $Results->{$fn}->{metafile} = "FAIL";
+	    warn " Could not create metadata text file\n" if $opt_debug>0;
+	    $retval = 0;
+	} else {
+	    $Results->{$fn}->{metafile} = "PASS";
+	}
+
+	warn " Creating png thumbnail\n" if $opt_debug>3;
+	if (! create_png($filename, catfile($d, $pngname))) {
+	    # Add note to $Results
+	    $Results->{$fn}->{render} = "FAIL";
+	    warn " Could not create png '$pngname' in '$target_dir'\n" if $opt_debug>0;
+	    $retval = 0;
+	} else {
+	    $Results->{$fn}->{render} = "PASS";
+	}
+      }
+    }
+
+    print " File produced return value '$retval'\n" if $opt_debug>1;
+    return $retval;
+}
+
+exit main();
+
+__END__
+
+=head1 NAME
+
+svg_validate - This script scans a directory full of *.svg files and
+checks them to see if they have proper metadata.  If so, it copies them
+into a target directory and creates a png of it.  It also creates a list
+of PASS and FAIL for the different criteria.
+
+=head1 SYNOPSIS
+
+svg_validate [OPTIONS] subdir1[, subdir2...]
+
+ -V, --version     Displays version info for the script
+ -h, --help        This help screen
+ -D, --debug=N     Reports debugging info (1=sparse, 3=tons)
+ -n, --noclobber   Don't overwrite existing files
+ -t, --target_dir  Specifies where files should be placed
+     --passfail    Just generate the passfail file (still buggy)
+
+
+=head1 DESCRIPTION
+
+This script is an example of use of SVG::Metadata for processing sets of
+SVG files, selecting the ones that have proper metadata, and placing
+them into a separate directory tree.  It generates and places PNG's of
+each image as well as a text summary file with the metadata info.
+
+The purpose of this script is to assist in building the release packages
+for the Open Clip Art Library (http://www.openclipart.org/).
+
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-V>, B<--version>
+
+Displays the version information about the script.
+
+=item B<-h>, B<--help>
+
+Prints a brief help message with option summary.
+
+=item B<-D> I<N>, B<--debug>=I<N>
+
+Prints debug messages.  This expects a numerical argument corresponding
+to the debug message verbosity.
+
+=item B<-n>, B<--noclobber>
+
+Permits preventing any files to be overwritten during the processing.
+Normally, if there are existing files in the target directory, they'll
+be deleted (unlinked) and new ones written.  With this option, the
+originals will be preserved and new ones will not be generated.
+
+=item B<-t> I<DIRECTORY>, B<--target_dir> I<DIRECTORY>
+
+This option allows control over where the output files will be written
+to.  These files will include a copy of the SVG file, a PNG image
+rendered using inkscape, and a text file with a summary of the file's
+metadata.  The files will be grouped into a subdirectory tree based on
+keywords.
+
+The default target directory is 'default-0.00'.
+
+=item B<--passfail>
+
+This option allows you to skip generating the thumbnails and only
+produce the passfail report.
+
+=back
+
+=head1 PREREQUISITES
+
+C<Pod::Usage>,
+C<Getopt::Long>,
+C<File::Basename>,
+C<File::Copy>,
+C<File::Find>,
+C<File::Path>,
+C<File::Spec>,
+C<SVG::Metadata>
+
+=head1 COREQUISITES
+
+C<inkscape>
+
+=head1 SCRIPT CATEGORIES
+
+Text Processing::Filters
+Utilities
+
+=head1 BUGS
+
+None known.
+
+=head1 SEE ALSO
+
+L<SVG::Metadata>, L<inkscape>, L<XML::Simple>
+
+=head1 AUTHOR
+
+Bryce Harrington E<lt>bryce@bryceharrington.orgE<gt>
+
+L<http://www.bryceharrington.org/|http://www.bryceharrington.org/>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2004 Bryce Harrington.
+All Rights Reserved.
+
+This script is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut

@@ -1,0 +1,20 @@
+Changes
+lib/SWISH/Prog/Xapian.pm
+lib/SWISH/Prog/Xapian/Indexer.pm
+lib/SWISH/Prog/Xapian/InvIndex.pm
+lib/SWISH/Prog/Xapian/Result.pm
+lib/SWISH/Prog/Xapian/Results.pm
+lib/SWISH/Prog/Xapian/Searcher.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/01-fs.t
+t/config.xml
+t/pod-coverage.t
+t/pod.t
+t/test.conf
+t/test.html
+t/test.xml
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,8 @@
+--- #YAML:1.0
+name: SPOPSx-Tool-DateTime
+version: 0.02
+author:
+  - Andrew Sterling Hanenkamp, E<lt>hanenkamp@users.sourceforge.netE<gt>
+abstract: SPOPS extension for arbitrarily formatted DateTime fields
+license: perl
+generated_by: Module::Build version 0.261, without YAML.pm

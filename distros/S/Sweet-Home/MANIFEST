@@ -1,0 +1,42 @@
+Changes
+lib/Sweet/Config.pm
+lib/Sweet/Cookbook.pod
+lib/Sweet/DatabaseConnection.pm
+lib/Sweet/Dir.pm
+lib/Sweet/File.pm
+lib/Sweet/File/Config.pm
+lib/Sweet/File/CSV.pm
+lib/Sweet/File/DSV.pm
+lib/Sweet/File/Semaphore.pm
+lib/Sweet/File/Template.pm
+lib/Sweet/Home.pm
+lib/Sweet/HomeDir.pm
+lib/Sweet/Now.pm
+lib/Sweet/Schema.pm
+lib/Sweet/SFTP.pm
+lib/Sweet/Types.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/_compile.t
+t/_pod.t
+t/dir.t
+t/dir1/file1.csv
+t/dir1/file1.dat
+t/dir1/file1.txt
+t/dir1/file2
+t/dir1/file2.ext
+t/empty_file
+t/file-csv.t
+t/file-dsv.t
+t/file-semaphore.t
+t/file-template.t
+t/file.t
+t/file1.csv
+t/file1.dat
+t/file1.txt
+t/now.t
+t/template1.tt2
+t/utf8.txt
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

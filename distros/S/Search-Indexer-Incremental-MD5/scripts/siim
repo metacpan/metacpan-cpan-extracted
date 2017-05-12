@@ -1,0 +1,332 @@
+#!/usr/bin/perl -w
+
+use strict ;
+use warnings ;
+use Carp ;
+
+=head1 NAME 
+
+siim - Create and search a full text indexed database
+
+=head1 DOCUMENTATION
+
+Let you create and search full text indexed database based on the content of files.
+
+=head1 USAGE
+
+ $> siim --option --option  file_1 file_2 ... file_n
+
+=head2 Examples
+
+=over 2
+
+=item Adding files to an index database
+
+  $> find directories_you_want_indexed | xargs perl siim -i test -a
+
+=item Searching for text
+
+  $> siim -i test -s 'your query'
+
+=item Indexing perl modules
+
+  $> find /devel/perl_modules/My_Module -type f -readable -size -300k| grep -v blib | grep -v _build | xargs siim -p -i test -a
+
+=item Removing some files
+
+  $> xargs siim -i test -r file file ...
+
+=item Checking the index database and displaying the documents it contains
+
+  $> siim -p -i test -c
+
+=item command line completion (in your current shell)
+
+  $> siim --completion_script > /tmp/siim ; source /tmp/siim ; rm /tmp/siim
+
+=back
+
+=head1 OPTIONS
+
+  'h|help'                display help
+  'v|verbose'             display score, state, timing, ...
+  'completion_script'     generates a bash completion script
+  
+  'i|index_directory=s'   path to the database index
+  
+  'a|add_files'           add files to the database
+  'stopwords_file=s'      path to files containing stopwords
+  'maximum_document_size' default is 300 KB
+  'p|perl_mode'           pre-defined perl stopword list
+  
+  'r|remove_files'        remove files from the database
+  'c|check_index'         check the database and display file state
+  's|search=s'            search strings in the database
+  
+  'delete_database'       deletes the database in the index directory
+  'database_information'  shows some database information
+
+=head1 EXIT STATUS
+
+=over 2
+
+=item 1 - command line error
+
+=item 2 - database or command error
+
+=back
+
+=head1 AUTHOR
+
+	Nadim ibn hamouda el Khemir
+	CPAN ID: NKH
+	mailto: nkh@cpan.org
+
+=cut
+
+#------------------------------------------------------------------------------------------------------------------------
+
+our $VERSION = '0.03' ;
+
+use Getopt::Long ;
+use Term::Bash::Completion::Generator ;
+use Readonly ;
+use English qw( -no_match_vars ) ;
+
+use Search::Indexer::Incremental::MD5 qw(:all) ;
+
+#---------------------------------------------------------------------------------------------------------
+
+my (@siim_arguments) = @ARGV ;
+undef @ARGV ;
+
+siim(@siim_arguments) ;
+
+#---------------------------------------------------------------------------------------------------------
+
+sub siim
+{
+
+#~ =head2 siim(@arguments)
+
+#~ Create and search  full text indexed database based on the content of files.
+
+#~ I<Arguments> - command line arguments to be parsed by Getop::Long
+
+#~ I<Returns> -  0 (zero)
+
+#~ I<Exceptions> - 
+
+#~ =over 2 
+
+#~ =item Invalid options
+
+#~ =item Invalid index database
+
+#~ =back
+
+#~ =cut
+
+my (@arguments) = @_ ;
+my ($options, @files)  = get_options(@arguments) ;
+
+unless(@arguments)
+	{
+	display_help()  ;
+	exit(1) ;
+	}
+
+if($options->{completion_script})
+        {
+        generate_completion_script()  ;
+        exit(0) ;
+        }
+
+unless($options->{index_directory})
+        {
+	print {*STDERR} "Error: --index_directory (short -i) is required! Try --help for a complete help\n" ;
+	exit(1) ;
+	}
+
+unless 
+	(
+	$options->{search}|| $options->{add_files} || $options->{remove_files}
+	|| $options->{check_index } || $options->{delete_database} || $options->{database_information}
+	)
+	{
+	display_help() ;
+	exit(1) ;
+	}
+
+if($options->{add_files} + $options->{remove_files} + $options->{check_index } > 1)
+	{
+	print {*STDERR} "Error: only one of 'add_files', 'remove_files', 'check_index' allowed!\n" ;
+	exit(1) ;
+	}
+
+my $database_run =
+	eval
+		{
+		if($options->{delete_database})
+			{
+			delete_indexing_databases($options->{index_directory}) ;
+			}
+			
+		if($options->{database_information})
+			{
+			my $information = show_database_information($options->{index_directory}) ;
+			
+			print {*STDOUT} <<"EOI" ;
+Location: $options->{index_directory}
+Last updated on: $information->{update_date}
+Number of indexed documents: $information->{entries }
+Database size: $information->{size} bytes
+EOI
+			}
+			
+		add_files($options, \@files) if($options->{add_files}) ;
+		remove_files($options, \@files) if ($options->{remove_files}) ;
+		check_index($options) if($options->{check_index});
+		search_string($options) if($options->{search}) ;
+		
+		'database_run_ok' ;
+		} ;
+
+if($EVAL_ERROR || ! defined $database_run)
+	{
+	print {*STDERR} $EVAL_ERROR ;
+	exit(2) ;
+	}
+	
+return 0 ;
+}
+
+#------------------------------------------------------------------------------------------------------------------------
+
+sub get_options_definition
+{
+#~ =head2 get_options_definition()
+
+#~ I<Arguments> - None
+
+#~ I<Returns> - a list of tuples, config name => container
+
+#~ I<Exceptions> -None
+
+#~ =cut
+
+my ($container) = @_ ;
+
+croak "Error: Expected a hash reference!\n" if (defined $container && 'HASH' eq ref $container) ;
+
+$container ||=
+	{
+	add_files => 0,
+	remove_files => 0,
+	check_index => 0,
+	use_position => 0, 
+	} ;
+	
+my @definitions = 
+	(
+	'h|help' => \&display_help,
+	'i|index_directory=s' => \$container->{index_directory},
+	'a|add_files' => \$container->{add_files},
+	'maximum_document_size=i' => \$container->{maximum_document_size},
+	'r|remove_files' => \$container->{remove_files},
+	'c|check_index' => \$container->{check_index}, 
+	's|search=s' => \$container->{search},
+	'v|verbose' => \$container->{verbose},
+	'p|perl_mode' => \$container->{perl_mode},
+	'use_position=i' => \$container->{use_position},
+	'stopwords_file=s' => \$container->{stopwords_file},
+	'delete_database' => \$container->{delete_database},
+	'database_information' => \$container->{database_information},
+	'completion_script' => \$container->{completion_script},
+	) ;
+
+return $container, @definitions ;
+}	
+
+#------------------------------------------------------------------------------------------------------------------------
+
+sub get_options
+{
+
+#~ =head2 get_options(@arguments)
+
+#~ Parses the command line for the module to search and user defined options.
+
+#~ I<Arguments>
+
+#~ =over 2 
+
+#~ =item @arguments - the command line arguments
+
+#~ =back
+
+#~ I<Returns> -  A list containing the module to search followed by the options accepted by this command
+
+#~ I<Exceptions> - exits if an invalid option is passed
+
+#~ =cut
+
+my (@arguments) = @_ ;
+local @ARGV = @arguments ;
+
+my ($container, @definitions) = get_options_definition() ;
+
+die "Error: Invalid Option! Try --help.\n" unless GetOptions(@definitions) ;
+
+return($container, @ARGV) ;
+}
+
+#---------------------------------------------------------------------------------------------------------
+
+sub display_help
+{
+
+#~ =head2 display_help()
+
+#~ I<Arguments> - None
+
+#~ I<Returns> - Nothing
+
+#~ I<Exceptions> - exits with status code B<1>
+
+#~ =cut
+
+my ($this_script) = ($PROGRAM_NAME =~m/(.*)/sxm ) ;
+
+print {*STDERR} `perldoc $this_script`  or croak 'Error: Can\'t display help!' ; ## no critic (InputOutput::ProhibitBacktickOperators)
+
+return ;
+}
+
+#---------------------------------------------------------------------------------------------------------
+
+sub generate_completion_script
+{
+#~ =head2 generate_completion_script()
+
+#~ I<Arguments> - None
+
+#~ I<Returns> - Nothing
+
+#~ I<Exceptions> - exits with status code B<1> after emitting the completion script on stdout
+
+#~ =cut
+
+my ($container, @definitions) = get_options_definition() ;
+
+my $flip = 0 ;
+my @options = grep {++$flip % 2} @definitions ;
+
+print {* STDOUT} Term::Bash::Completion::Generator::generate_bash_completion_function('siim', [@options], undef, 0) ;
+
+return ;
+}
+
+
+#---------------------------------------------------------------------------------------------------------
+

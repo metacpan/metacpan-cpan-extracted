@@ -1,0 +1,13 @@
+c Thai-PV.cct v1.0 
+c simple reordering of Thai "PreVowels" prior to sorting
+c MJPH  1.001   28-JUL-1998     cut out cons
+c MJPH  1.002   24-MAR-2003     Sort out broken up sara am
+c MJPH  1.1     16-OCT-2003     Unicode version
+
+begin > utf8
+        store(front) u0E40 u0E41 u0E42 u0E43 u0E44 endstore
+    	use(main)
+
+group(main)
+any(front) > fwd(1) dup
+

@@ -1,0 +1,12 @@
+Revision history for Perl extension Statistics::LogRank.
+
+0.03  Wed May 21 2003
+	Fixed failing tests (due to fixing namespace)
+
+0.02  Tue May 20 2003
+	Fixed module namespace.
+
+0.01  Fri Apr  4 10:35:43 2003
+	- original version; created by h2xs 1.22 with options
+		-AXcfn Statistics::LogRank
+

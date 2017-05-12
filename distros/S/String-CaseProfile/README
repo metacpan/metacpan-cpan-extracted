@@ -1,0 +1,33 @@
+String-CaseProfile
+==================
+
+Description
+-----------
+String::CaseProfile provides a convenient way of handling the letter case
+conversion of sentences/phrases/chunks in machine translation, case-sensitive
+search and replace, and other text processing applications.
+
+Prerequisites
+-------------
+perl 5.8
+
+
+Installation
+------------
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+In Windows systems, use nmake or dmake instead.
+
+
+Copyright and license
+---------------------
+
+Copyright (C) 2007 by Enrique Nell.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

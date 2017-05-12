@@ -1,0 +1,40 @@
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary=wkc-boundary
+--wkc-boundary
+Content-type: text/plain; charset=UTF-8
+
+version:1.1
+--wkc-boundary
+Content-type: text/plain; charset=UTF-8
+
+version:1.3
+cell:B1:t:Calculated
+cell:C1:t:Expected
+cell:D1:t:Truth?
+cell:A2:t:Belfast
+cell:B2:vtf:n:7:LEN(A2)
+cell:C2:v:7
+cell:D2:vtf:nl:1:B2=C2
+cell:A3:t:London
+cell:B3:vtf:n:6:LEN(A3)
+cell:C3:v:6
+cell:D3:vtf:nl:1:B3=C3
+cell:A4:t:Скопје
+cell:B4:vtf:n:6:LEN(A4)
+cell:C4:v:6
+cell:D4:vtf:nl:1:B4=C4
+cell:A5:t:Belfast
+cell:B5:vtf:t:BELFAST:UPPER(A5)
+cell:C5:t:BELFAST
+cell:D5:vtf:nl:1:B5=C5
+cell:A6:t:London
+cell:B6:vtf:t:LONDON:UPPER(A6)
+cell:C6:t:LONDON
+cell:D6:vtf:nl:1:B6=C6
+cell:A7:t:Скопје
+cell:B7:vtf:t:СКОПЈЕ:UPPER(A7)
+cell:C7:t:СКОПЈЕ
+cell:D7:vtf:nl:1:B7=C7
+sheet:r:9:c:5
+name:TEST:All entries here should be TRUE:D2\cD7
+--wkc-boundary--

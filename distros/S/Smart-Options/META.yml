@@ -1,0 +1,55 @@
+---
+abstract: 'smart command line options processor'
+author:
+  - 'Kan Fushihara <kan.fushihara@gmail.com>'
+build_requires:
+  Capture::Tiny: '0.12'
+  Devel::Cover: '0'
+  File::Spec: '0'
+  Test::Exception: '0'
+  Test::More: '0.98'
+  Test::Requires: '0'
+  Test::TCP: '0'
+  Try::Tiny: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Smart-Options
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Smart::Options:
+    file: lib/Smart/Options.pm
+    version: '0.06'
+  Smart::Options::Declare:
+    file: lib/Smart/Options/Declare.pm
+requires:
+  Exporter: '0'
+  File::Slurp: '0'
+  List::MoreUtils: '0'
+  PadWalker: '0'
+  Text::Table: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/kan/p5-smart-options/issues
+  homepage: https://github.com/kan/p5-smart-options
+  repository: git://github.com/kan/p5-smart-options.git
+version: '0.06'
+x_contributors:
+  - 'hayajo <hayajo@cpan.org>'
+  - 'Takuji Nishibayashi <takuji31@gmail.com>'
+  - 'Hiroyuki Akabane <hirobanex@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

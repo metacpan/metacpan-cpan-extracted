@@ -1,0 +1,75 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 e2e8551c9d2f612e444d1125272226fea9347ac3 Changes
+SHA1 e4556fe0b99fc287f70ce8ff8f3bf42bfbfc25df INSTALL
+SHA1 9f08302feee12d3407b75707256be9c5c01bfbd6 LICENSE
+SHA1 6808d2cc2f30602d744ef0728ddc95c5ff8787ed MANIFEST
+SHA1 fd9411d66c9441fbbceee066acf81538569af294 MANIFEST.SKIP
+SHA1 85d58fb725c09682a4b07513d0c289a40bf19364 META.json
+SHA1 1c85c7df8fd4efc87b85b8a7329ca132aefb6972 META.yml
+SHA1 d5b93810ab1236e65803da71152869a8fbeb160b Makefile.PL
+SHA1 8b08bcb127801a642159c40dbaee72174c1c4cbe README
+SHA1 2f451225e11d2c7dae11684fb2096adfeb3ba387 README.mkdn
+SHA1 78bad2645ddb03923f6f2482ab040440d01d61aa cpanfile
+SHA1 c243e6c00a89f277588bf186c3ef3c8c2c378cd1 doap.xml
+SHA1 1b7d4632976d250956d49d509b30bdd2ac5f48e5 inc/Devel/AssertOS.pm
+SHA1 2050c7f1cff1c952edc8d8461520c55df17591d3 inc/Devel/AssertOS/MSWin32.pm
+SHA1 52dcb8b2b98363d1e1fdebd5e193bc12c57c220a inc/Devel/CheckOS.pm
+SHA1 722dd14e8e20899aedb849c2ce9bff80feff9658 lib/SmokeRunner/Multi.pm
+SHA1 6c67ab4735378ecaa01a6e9f0c5f7f5af1b4751b lib/SmokeRunner/Multi/Config.pm
+SHA1 8dd2af66f8fb91fb0d2564d7f440a48194dd3885 lib/SmokeRunner/Multi/DBI.pm
+SHA1 32d1c7736a03a1331a83c6389e72df5ac3c9c7f1 lib/SmokeRunner/Multi/Reporter.pm
+SHA1 8ec0d53ff9280693975c9dd66f961520bd28b125 lib/SmokeRunner/Multi/Reporter/Screen.pm
+SHA1 4066d97d7a8e4e13d1cb8a8cab8bc91f4780ef4b lib/SmokeRunner/Multi/Reporter/Smolder.pm
+SHA1 1cc074fe6146bc917682516d61d43e69f28cb8a5 lib/SmokeRunner/Multi/Runner.pm
+SHA1 75a3abe8cabfdb3221fee15b24f07c37198ace43 lib/SmokeRunner/Multi/Runner/Prove.pm
+SHA1 47510e92fe130a23d9b0725b00e1a31313e162b1 lib/SmokeRunner/Multi/Runner/TAPArchive.pm
+SHA1 1ffeb91d47ac042f78ffb477751d52ef6968175b lib/SmokeRunner/Multi/SafeRun.pm
+SHA1 8174cdaddb181035002bfd0632e3f59812483b83 lib/SmokeRunner/Multi/TestSet.pm
+SHA1 3c1de3c7ed7bf46394bb3c97ba68f292c71cd737 lib/SmokeRunner/Multi/TestSet/SVN.pm
+SHA1 0d449dbe8199d1b261071423426981435d2de428 lib/SmokeRunner/Multi/Validate.pm
+SHA1 4ea18368fb11f691fe0f9828bc0d87352d044096 script/smokerunner-multi
+SHA1 a8eea9cc2d9f871578ab88fb2250edbd102cf5df t/00-compile.t
+SHA1 605b203637481306fe31f182c15a8ee449589282 t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 84170ecdd12b088d5d0ad742b2b754500a82a424 t/Config.t
+SHA1 e97047b17430947acccbb11f21016075f02006fd t/DBI.t
+SHA1 395d8afcc9b8182bd7e01bca3c964c48d8ad0bc1 t/Multi.t
+SHA1 fdd05b65a63b4fd24c68dd55461d8248df7d61c2 t/Reporter.t
+SHA1 22f12c4ca0868d4eeeb1b42b80d9487f708687c2 t/Reporter/Screen.t
+SHA1 90c1fc20fa67f10670535a8f0f96b6cb1c670045 t/Reporter/Smolder.t
+SHA1 c49065dd9a205436078ee0331021328a847ee460 t/Runner.t
+SHA1 98adc23d78e049a88c596a6579b00f2b1e38962d t/Runner/Prove.t
+SHA1 1dcc2307a59b23dd0abeb0a95f15163d385732ab t/Runner/TAPArchive.t
+SHA1 d1c763ae5c14215d07e86442f0c3b00b1a14039e t/TestSet.t
+SHA1 5f0e5924df4ffd650944e8b87cc0c6f93b77a255 t/TestSet/SVN.t
+SHA1 e432babe0010ae93018c7ab45901d86926aff643 t/lib/SmokeRunner/Multi/Reporter/Test.pm
+SHA1 e98342e6ba97be2a4c95e5d41dfa54903f174b93 t/lib/SmokeRunner/Multi/Test.pm
+SHA1 28a931f3b0c075d8d6c4ce47d5e89c3fdb19ed0f t/pod-coverage.t
+SHA1 cec881e89926d320475f9de2b7fad02c2169f510 t/pod.t
+SHA1 372dd4094f173b547060236c2cb87873d50e7875 t/set/01-a-t
+SHA1 0da6218ad9568d5d8a850333ed80ba1f5d914a9b t/set/02-b-t
+SHA1 4f56781c9767acc357a38117d1aaf7c65dfbac98 t/smokerunner-multi.t
+SHA1 80ab1faf5d8174920b60461bf8c11e2225861f42 xt/release/pause-permissions.t
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlZDRYUACgkQ34Hwf+GwC4wWJQCgufmE4x+j5SLb357186HkfU5u
+hS8AnjXJi9SsCW9fk1wCe1G3WrO54FsZ
+=r/dS
+-----END PGP SIGNATURE-----

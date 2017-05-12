@@ -1,0 +1,45 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+use Sys::Lastlog;
+
+use vars qw(
+             $login
+             $port
+             $host
+             $when
+           );
+
+format STDOUT_TOP =
+Username         Port     From                    Latest
+.
+
+format STDOUT =
+@<<<<<<<<<<<<    @<<<<<   @<<<<<<<<<<<<<<<<<<<<<  @<<<<<<<<<<<<<<<<<<<<<<<
+$login,          $port,   $host,                  $when
+.
+
+my $ll = Sys::Lastlog->new();
+
+while ( my @pwent = getpwent() )
+{
+   next if $pwent[2] >= 65534;
+   my $llent = $ll->getlluid($pwent[2]) || next;
+
+
+   $login = $pwent[0];
+   $port  = $llent->ll_line();
+   $host  = $llent->ll_host();
+
+   if ( $llent->ll_time() )
+   {
+     $when = localtime($llent->ll_time());
+   }
+   else
+   {
+     $when = '**Never Logged In**';
+   }
+
+  write;
+}

@@ -1,0 +1,408 @@
+Revision history for Shipwright
+
+2.4.41 Sun Feb  1 13:31:40 CST 2015
+
+* automatically fix cpan module names like IO:File
+* skip dual lifed modules if they can't be found on cpan any more
+
+2.4.40 Thu Dec  4 19:58:37 CST 2014
+
+* work around the case that Module::Build::Version is gone in recent Module::Build version
+
+2.4.39 Sun Jan 12 10:34:35 CST 2014
+
+* in case some modules got removed from core(#91303)
+
+2.4.38 Wed Dec 11 22:10:05 CST 2013
+
+* edge case fix("requires" is empty but "configure_requires" is not for
+  usual Makefile.PL)
+
+2.4.37 Sat Dec  7 17:06:54 CST 2013
+
+* fix possible failures of command "update --follow" (#91220)
+
+2.4.36 Sat Oct 26 07:56:06 CST 2013
+
+* separate configure_requires from build_requires for M:I based packages
+* parse configure/build/test requires in Makefile too(#89778)
+
+2.4.35 Thu Oct 24 23:46:03 CST 2013
+
+* handle compressed sources with "./" as the first file listed(#89729)
+
+2.4.34 Mon Oct 21 23:26:35 CST 2013
+
+* handle special configure modules(Module::Build::Tiny)
+
+2.4.33 Sun Sep  9 14:48:28 CST 2012
+
+* tweak CleanINC to move "." to the end of @INC
+
+2.4.32 Sun Jun 17 13:25:17 CST 2012
+
+* automatically set perl build script(thanks to David Good)
+* take care of sources like CPAN::Meta and Directory::Queue
+* allow to specify perl dist like perl-5.16.0
+
+2.4.31 Tue Jan 31 07:00:59 CST 2012
+
+* fix a bug(version not recorded correctly) in bin/shipwright-builder
+
+2.4.30 Mon Aug 15 03:21:20 CST 2011
+
+* use env proxy to get http/ftp sources.
+* install the dist again if the version to install is not the same as the installed one
+
+2.4.29 Fri Aug 5 14:37:59 CST 2011
+
+* fix PERL5LIB in case multiple shipyards install to the same place.
+
+2.4.28 Sun Jul 10 11:21:59 CST 2011
+
+* auto build Dist::Zilla distribution when importing.
+* support cmake build system
+
+2.4.27 Mon Jun 13 09:55:12 CST 2011
+
+* allow to import perl with full uri
+
+2.4.26 Sun Jun 12 14:14:32 CST 2011
+
+* "import perl --version VERSION" will import perl automatically
+* "--skip Foo::" to skip both Foo and Foo::*
+* default source type is CPAN, so Foo::Bar means cpan:Foo::Bar, unless
+    there is a directory/file with that name
+* add --skip-all-build-requires option
+* add --no-default-build option to not store generated build in shipyard
+* tweak log msg a bit
+
+2.4.25 Thu Apr 28 01:57:42 CST 2011
+
+* support archives which include filenames prefixed with ./
+
+2.4.24 Sat Apr  2 19:30:01 CST 2011
+
+* add SHIPWRIGHT_TEST_EXTRA env, some complex tests are skipped by default
+
+2.4.23 Thu Mar 17 14:03:45 CST 2011
+
+* clean warnings for perl 5.13+
+* fix bugs when importing from shipyard.
+* no branch specification support when importing from another shipyard:
+    import all branches or none at all
+* tweak to suit rpm(thanks to Robin Lee).
+
+2.4.22 Wed Feb 23 11:32:58 CST 2011
+
+* make shipwright happy with old Module::Build
+* package name fixes for CleanINC and PatchModuleBuild(thanks to Robin Lee)
+
+2.4.21 Wed Feb 23 10:23:10 CST 2011
+
+* fix the bug that old Module::Build(0.36-) doesn't depend on Perl::OSType 
+    and Module::Metadata
+
+2.4.20 Tue Feb 22 16:04:31 CST 2011
+
+* fix the bug that Shipwright::Base is missing
+
+2.4.19 Mon Feb 21 15:11:57 CST 2011
+
+* use Class::XSAccessor::Compat if possible
+* copy deps of Module::Build not in core into inc( except version.pm ).
+* for Module::Build: hack to not require so strcit version.pm, as it's not in
+    core and is xs( which makes it not appropriate to copy into inc )
+
+2.4.18 Fri Dec 10 02:49:24 UTC 2010
+
+* use order.yml to get imported list(previously used map.yml and source.yml,
+     which is wrong ).
+* pod/doc fixes thanks to sartak++
+* build_script can be either build or build.pl in import cmd
+* don't show updated msg if there are no updates in update cmd
+* more doc
+
+2.4.17 Thu Oct 28 00:16:07 UTC 2010
+
+* split test_requires out of build_requires
+* tweak messages
+
+2.4.16 Tue Aug 24 02:22:15 UTC 2010
+
+* fix a bug when using --generate-tar-file
+
+2.4.15 Tue Aug 24 00:19:00 UTC 2010
+
+* fix CleanINC name
+* make scripts happy in solaris
+* tweak shipwright-builder: show a few last lines of build.log to screen to help debug
+
+2.4.14 Thu Jun 24 13:23:04 UTC 2010
+
+* update documents
+* delete cmd can delete multiple sources with one cmd
+* add --skip-installed for import cmd
+* Module::Install's feature named "-core" has special meaning
+* add branch support for shipyard source
+* update compressed file extensions for source
+* delete the dep if can't find it when to import
+* don't clear fs repository if build fails
+    ( for the script genetated by shipwright-generate )
+
+
+2.4.13 Tue Jun  8 07:34:55 UTC 2010
+
+* add cmd shipwright-generate: run it with -h to see its usage.
+* add env SHIPWRIGHT_CPAN_MIRROR to specify the cpan mirror url
+* support .zip file as source
+* tweak the "finding deps" procedure for Module::Install
+* improve `shipwright-utility --generate-tar-file`, especially for windows
+
+2.4.12 Thu May 27 07:18:28 UTC 2010
+
+* shipwright-builder: quote cmd perl and make if necessary( contains spaces )
+
+2.4.11 Mon May 24 08:46:12 UTC 2010
+
+* tweak git source part, thanks to rbuels++
+* update git backend's delete and move
+* add --no-install-base option, so we can install dists to their default directories
+* set the min_perl_version to the running perl if not defined
+* not try which cmd: it does not work at all on windows
+
+2.4.10 Wed May 19 05:54:48 UTC 2010
+
+* symlink path fix
+
+2.4.9 Tue May 11 02:21:28 UTC 2010
+
+* add env SHIPWRIGHT_DEVEL to control error output's verboseness
+* to make windows happy, try make, dmake and nmake to find make utility
+
+2.4.8 Mon Mar 15 04:38:29 UTC 2010
+
+* make defaults to "dmake" in windows
+
+2.4.7 Fri Mar 12 13:28:32 UTC 2010
+
+* make use of META.yml as a complement for M::I
+
+2.4.6 Fri Mar 12 06:52:25 UTC 2010
+
+* bug fix version
+
+2.4.5 Thu Mar 11 14:42:21 UTC 2010
+
+* requires cmd
+* tiny fix for abnormal version string( it may contains > )
+    ( see http://cpansearch.perl.org/src/JPEACOCK/version-0.80/META.yml )
+
+2.4.4 Thu Dec 10 04:00:44 GMT 2009
+
+* git backend tweak: sync when Shipwright::Backend::Git->new
+* doc update(jibsheet++)
+* add suggest line when error occurs: currently we just suggest people install modules if not installed
+* handle configure_requires in M::I based Makefile.PL
+* fix the check if realink exists way on solaris
+* Checkpoint of newest jeos-build script(chmrr++)
+* add AUTHORS to manifest
+
+2.4.3 Thu Oct 15 05:53:14 GMT 2009
+
+* fix git backend:
+    before 1.6.2, git clone an empty repo doesn't work(thanks to rbuels++)
+* add -f ( --force ) argument to create cmd.
+    now shipwright will confess if repository or path already exists when
+    create without -f
+
+2.4.2 Mon Sep 21 09:46:38 CST 2009
+
+* Shipwright::Util::PatchModuleBuild tweak( thanks to rbuels++ )
+* backend part refactor( thanks to ruz++ ): 
+    possibility in Backend.pm to load external implementations
+* pod and doc update( thanks to ruz++ )
+* abandon perl's archlib:
+    i.e. all perl modules live in as/blabla/lib/perl5, no 'darwin-2level'
+    subdir or alike any more
+
+2.4.1 Sat Sep 12 00:29:00 CST 2009
+
+* document are tweaked by ruz++. thanks, ruz++!
+* remove deps Hash::Merge, YAML and YAML::Syck
+* add env SHIPWRIGHT_SOURCE_ROOT
+* a few bugs are fixed
+
+2.4.0 Fri Aug 28 07:50:22 CST 2009
+
+* add env SHIPWRIGHT_USER_ROOT and SHIPWRIGHT_LWP_TIMEOUT
+* keep downloads and backends caches in ~/.shipwright/, to speed things up
+* add Shipwright/Manual/ENV.pod
+* use legacy rmtree in shipwright-builder
+
+2.3.5 Wed Aug  5 08:59:03 CST 2009
+
+* need File::Path 2.07 or above
+
+2.3.4 Mon Aug  3 20:37:36 CST 2009
+* add dep File::Path with version 2
+
+2.3.3 Fri Jul 31 17:23:07 CST 2009
+* not rely on system cmds like ls, cp, mv, rm any more
+* version support for git source
+
+2.3.2 Mon Jul 27 18:41:41 CST 2009
+
+* improvements version, mostly for windows
+
+2.3.1 Fri Jul 24 14:11:11 CST 2009
+
+* add --squeeze and --verbose args for shipwright-filter
+* make --as as `uname` by default
+* doc update
+
+2.3.0 Mon Jul 20 15:40:50 CST 2009
+
+* add multi-arch dists support
+* add --switch option to tools/shipwright-utility in installed dir
+* add shipwright-filter script to trim the installed dist
+    ( currently it's just --remove-pod )
+* update bin wrapper stuff( not back compatible )
+* support requires_from and test_requires_from of Module::Install
+* tweak git backend stuff, e.g. don't ignore things list in .gitignore 
+
+2.2.2 Wed Jul  8 19:11:21 CST 2009
+
+* expand ~ in path
+* update cmd bug fix
+
+2.2.1 Tue May 26 16:37:31 CST 2009
+
++ generate-tar-file option for shipwright-utility
+
+2.2.0 Mon Apr 27 13:40:25 CST 2009
+
++ git backend support
+
+2.1.8 Sat Apr 18 16:01:01 CST 2009
+
+bug fix version
+
+2.1.7 Sat Apr 18 15:30:10 CST 2009
+
+this's a bug fix version, also a bit tweak
+
+2.1.6 Sun Apr  5 13:38:59 CST 2009
+
+update for modules use Module::Install:
++ test_requires support( it's the same as build_requires )
++ recommends and feature support
+
+update for cmds:
++ env SHIPWRIGHT_REPOSITORY support so we do not need to write -r ... in each cmd all the time
++ --delete-deps for update cmd
+* refactor ktf cmd so we can set or show multiple dists at a time
+* refactor log part
+
+update for builder: 
++ default_options support so we don't need to reinput the args( one line per arg in repository's file: __default_builder_options )
++ --verbose for shipwright-builder
+* make archlibexp be in front of privlibexp in @INC
+* tweak Module::Build related stuff so we don't need some pod modules which are not in core sometimes.
+
+2.1.5 Sun Mar 15 19:51:49 CST 2009
++ support Bundle:: modules
++ --add-deps for update cmd to update deps of dists
+
+2.1.4 Sun Mar 24
+* revert back, build in the *not so clean* env is not right
++ support dual-lifed modules when building
+
+2.1.3 Mon Feb 23 11:52:13 CST 2009
+* when building, first try in the clean inc env, if this fails, then try in the not so clean inc env
+
+2.1.2 Mon Feb 23 01:14:14 CST 2009
+* don't import a source multiple times in an import cmd.
+
+2.1.1 Mon Feb 23 00:31:36 CST 2009
++ --inc arg for update so we can update inc
+* bug fixes
+
+2.1.0 Mon Jan 19 15:15:57 CST 2009
++ Git source support, with prefix "git:"
++ clean @INC when importing and building
++ downgrade ExtUtils::MakeMaker so we can use the version in core
++ version cmd
++ import multiple sources support in a single import cmd
++ --graph-deps for maintain cmd, for graphing dependencies
++ --skip-requires, --skip-build-requires, --skip-recommends for maintain cmd
+- --keep-requires, --keep-build-requires, --keep-recommends for maintain cmd
+- build cmd. it's duplicate and useless
+* no mandatory Module::Build requires when importing: we supply one in reporitory's inc/ dir
+* we can supply dist names too in --skip args for import cmd
+* turn on AUTOMATED_TESTING when building
+
+2.0.1 Mon Jan 19 15:15:57 CST 2009
++ require File::HomeDir
+
+2.0.0 Sun Jan 18 21:10:40 CST 2009
++ branch support
+* to add branch support, the layout of vessel source has changed a bit, 
+    but 2.0 can work well with old layout in case you have an old vessel source.
++ env SHIPWRIGHT_SVK, SHIPWRIGHT_SVN, SHIPWRIGHT_TEST_SVK, SHIPWRIGHT_TEST_SVN 
++ JEOS build tool to create JEOS images from a vessel
+* update cmd now will act as import except with --only-sources
+* update cmd can be feeded a new source url
+* use version;
+* bug fixes
+
+1.16 Wed Nov 12 21:39:58 CST 2008
+* clean nearly all the tmp files automatically except log
+
+1.15 Tue Nov 11 19:52:47 CST 2008
++ --skip-recommends and --skip-all-recommends option for import cmd
++ --unreferenced and --check-only option for delete cmd
++ simple setenv bat for window 
+* some bug fixes
+
+
+1.14 Tue Aug 26 16:23:56 CST 2008
+* limit versions: perl 5.8.8+, SVK 2+, SVN 1.4+
+* CFLAGS and LDFLAGS are added when build
+* use Archive::Extract instead of tar cmd to extract compressed files
+* some bug fixes
+* clean each dist right after each dist is installed
+* replace die with confess
+
+1.13 Wed Aug 20 23:11:31 CST 2008
+* refactor a bit
+* updated tutorial
+* not wrap libexec any more
+
+1.12 Thu Aug 14 00:30:16 CST 2008
+* clean some test failures
+
+
+1.10 Tue Aug 12 19:42:52 CST 2008ug 14 00:30:16 CST 2008
+* clean some test failures
+
+
+* added flags support
+* added build.pl support
+* added refs support
+* more tests
+* more docs
+* a lot of bug fixes
+
+1.01 Fri Feb 15 14:30:34 EST 2008
+
+* Fixed search.cpan.org indexing of documentation. 
+  Added more doc
+  Fixed a few cpantesters-reported issues
+
+1.0    Fri Feb 15 03:38:17 CST 2008
+       the first public release
+0.0.2  Thu Feb  7 09:08:55 CST 2008
+       no config any more
+0.0.1  Tue Nov 20 16:28:55 2007
+       Initial release.

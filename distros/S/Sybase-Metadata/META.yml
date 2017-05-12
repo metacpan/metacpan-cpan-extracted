@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                Sybase-Metadata
+version:             1
+abstract:            ~
+license:             ~
+author:              
+    - Mike O'Brien <mikeob@>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    DBD::Sybase:                   1.08
+    DBI:                           1.601
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,61 @@
+#!/usr/bin/perl
+
+# Copyright (C) 2008 Eric L. Wilhelm
+
+use warnings;
+use strict;
+
+=head1 NAME
+
+shebangml - hbml evaluator
+
+=cut
+
+package bin::shebangml;
+
+use Shebangml;
+
+sub main {
+  my (@args) = @_;
+
+  my $file;
+  if(! -t STDIN) {
+    $file = \*STDIN;
+  }
+  else {
+    $file = shift(@args);
+    (-e $file) or die 'usage: shebangml <file>';
+  }
+
+  my $hbml = Shebangml->new(out_fh => \*STDOUT);
+  my $config = '.shebangrc';
+  if(-e $config) {
+    require YAML;
+    my ($data) = YAML::LoadFile($config);
+    $hbml->configure(%$data);
+  }
+
+  # Hmm, how to get this sort of thing in here?
+  # $hbml->add_hook(img => \&inline_image);
+
+  $hbml->process($file);
+}
+
+sub inline_image {
+  my ($tag, $atts) = @_;
+  require File::Fu;
+  require MIME::Base64;
+  my $src = File::Fu->file($atts->get('src'));
+  my $enc = MIME::Base64::encode(scalar $src->read);
+  my ($type) = $src =~ m/\.([^.]+)$/;
+  $atts->set(src => "data:image/$type;base64," . $enc);
+}
+
+package main;
+
+if($0 eq __FILE__) {
+  bin::shebangml::main(@ARGV);
+}
+
+# vi:ts=2:sw=2:et:sta
+my $package = 'bin::shebangml';

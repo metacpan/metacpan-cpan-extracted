@@ -1,0 +1,32 @@
+Revision history for String-Interpolate-RE
+
+0.05 2014-06-08T16:54:02-0400
+
+  [BUILD FIX]
+
+    * add missing dependency on Test::Fatal
+
+0.04 2014-06-06T16:49:18-0400
+
+  [ENHANCEMENT]
+
+    * allow variable lookup via a function as well as a hash
+
+    * variable values may also be interpolated for other variables
+
+
+0.03
+
+  [ENHANCEMENT]
+
+    * interpolated values may be formatted with sprintf
+
+0.02
+
+  [BUG FIX]
+
+    * non-variable parts of the interpolated strings were erased. oops.
+
+0.01
+     Initial release.
+

@@ -1,0 +1,15 @@
+[% BLOCK custom_list %]
+<td>[% el.id %]</td>
+<td>[% el.title %]</td>
+<td>[% el.category_name %]</td>
+<td>
+    <div class="thumbnail">
+        <img src="[% el.image %]" alt="">
+    </div>
+</td>
+<td>
+    <div class="thumbnail">
+        <img src="[% el.thumbnail %]" alt="">
+    </div>
+</td>
+[% END %]

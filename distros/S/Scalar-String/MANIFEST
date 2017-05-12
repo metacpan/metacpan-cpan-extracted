@@ -1,0 +1,18 @@
+.cvsignore
+Build.PL
+Changes
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/Scalar/.cvsignore
+lib/Scalar/String.pm
+lib/Scalar/String.xs
+t/grade.t
+t/grade_pp.t
+t/pod_cvg.t
+t/pod_cvg_pp.t
+t/pod_syn.t
+t/setup_pp.pl
+SIGNATURE    Added here by Module::Build

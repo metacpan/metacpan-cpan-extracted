@@ -1,0 +1,14 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Authen::Passphrase::BlowfishCrypt;
+
+my $pass = Authen::Passphrase::BlowfishCrypt->new(
+    cost        => 8,
+    salt_random => 1,
+    passphrase  => shift,
+);
+
+print "\n", $pass->as_rfc2307(), "\n\n";

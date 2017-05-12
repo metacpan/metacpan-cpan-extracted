@@ -1,0 +1,74 @@
+NAME
+
+SQL Anchored Wildcards for SQL SELECT..LIKE terms, version 1.0
+
+
+
+OVERVIEW
+
+Now that so many people have the majority of their search
+experience with Web search engines, the fact that SQL
+SELECT..LIKE search terms are anchored by default is a
+real pain.
+
+For example, when searching for 'zipper' embedded in
+sentences like:
+	The zipper was invented in...
+on the Web, you just specify
+	zipper
+as your search term.  Not so in SQL interfaces -- you must
+specify
+	%zipper%
+so that the SQL LIKE term can find 'zipper' anywhere in
+the data.  This confuses most people, as they expect:
+	zipper
+without the '%'s will work just fine.  Since most people
+where I work are not SQL-literate, this posed a problem.
+
+So, SQL::AnchoredWildcards was born.  It exports a single
+function, sql_anchor_wildcards(), which takes an anchored
+SQL LIKE-like search pattern (a pattern that also supports
+'^' and '$' as beginning and ending anchors) as in:
+	^zipper
+and converts it to the true SQL LIKE term:
+	zipper%
+with appropriate quoting for literal '^' and '$' chars.
+
+
+
+PREREQUISITES
+
+In order to install and use this package you will need Perl version
+5.004 or better.  It has only been actually tested on 5.005_02+.
+
+
+
+INSTALLATION
+
+Just follow the usual procedure:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+The file sqlwildcards.html is HTML user-level documentation that
+explains all of the SQL wildcards available with
+SQL::AnchoredWildcards -- '^', '$', '%', and '_'.
+
+
+
+Comments, questions, criticisms to:
+
+Mark Leighton Fisher		Thomson Consumer Electronics
+317-587-3190			Indianapolis, IN
+fisherm@tce.com
+
+
+
+COPYRIGHT
+
+Copyright (c) 2000 Mark Leighton Fisher. All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. 
+

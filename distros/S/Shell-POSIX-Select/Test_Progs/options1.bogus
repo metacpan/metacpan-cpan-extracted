@@ -1,0 +1,5 @@
+#! /usr/bin/perl -w
+
+use Shell::POSIX::Select( style => 'bogus', style => 'Bash', prompt => 'bogus' );
+
+select $var ( localtime ){ print "$var\n"; }

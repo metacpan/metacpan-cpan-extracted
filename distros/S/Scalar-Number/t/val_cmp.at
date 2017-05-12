@@ -1,0 +1,57 @@
+use Data::Float 0.008 qw(have_nan have_infinite significand_bits);
+use Data::Integer 0.001 qw(natint_bits);
+use Test::More;
+
+do "t/num_forms.pl" or die $@ || $!;
+my @zeroes = ( natint_forms("0"), float_forms("+0"), float_forms("-0") );
+my @values = ( have_nan ? [ float_forms("nan") ] : [] );
+open(TEST_VALS, "<", "t/values.data") or die "t/values.data: $!";
+while(1) {
+	$_ = <TEST_VALS>;
+	die "t/values.data: $!" unless defined $_;
+	chomp;
+	last if $_ eq "_";
+	next if $_ eq "";
+	if($_ eq "z") {
+		push @values, \@zeroes;
+		next;
+	}
+	/\A(?:I+|i([0-9]+)"([^"]+)")=f(\*|[0-9]+)"([^"]+)"\z/
+		or die "t/values.data: malformed line [$_]";
+	my($isz, $ihex, $fsz, $fhex) = ($1, $2, $3, $4);
+	my $igood = defined($isz) && natint_bits >= $isz;
+	my $fgood = $fsz eq "*" ? have_infinite : significand_bits >= $fsz;
+	my @forms;
+	push @forms, natint_forms($ihex) if $igood;
+	push @forms, float_forms($fhex) if $fgood;
+	push @values, \@forms if @forms;
+}
+
+my $nforms = 0;
+$nforms += @$_ foreach @values;
+plan tests => 1 + 2*@zeroes*$nforms + $nforms*$nforms;
+
+use_ok "Scalar::Number", qw(sclnum_val_cmp);
+
+foreach my $vz (@zeroes) {
+	my $pz = zpat($vz);
+	for(my $ib = @values; $ib--; ) { foreach my $vb (@{$values[$ib]}) {
+		my($tz, $tb) = ($vz, $vb);
+		sclnum_val_cmp($tz, $tb);
+		is zpat($tz), $pz;
+		($tz, $tb) = ($vz, $vb);
+		sclnum_val_cmp($tb, $tz);
+		is zpat($tz), $pz;
+	} }
+}
+
+for(my $ia = @values; $ia--; ) { foreach my $va (@{$values[$ia]}) {
+	for(my $ib = @values; $ib--; ) { foreach my $vb (@{$values[$ib]}) {
+		my $expect = ($ia <=> $ib);
+		$expect = undef if $ia == 0 || $ib == 0;
+		my($ta, $tb) = ($va, $vb);
+		is sclnum_val_cmp($ta, $tb), $expect, "val[$ia] <=> val[$ib]";
+	} }
+} }
+
+1;

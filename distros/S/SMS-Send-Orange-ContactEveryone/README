@@ -1,0 +1,62 @@
+SMS-Send-Orange-ContactEveryone version 0.01
+============================================
+
+Orange ContactEveryone is a driver for SMS::Send library (http://search.cpan.org/~adamk/SMS-Send-1.06/lib/SMS/Send.pm). It is intended to work with the contacteveryone API for sending text message.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+SYNOPSIS
+   # Create a sender
+   my $sender = SMS::Send->new('Orange::ContactEveryone',
+       _ssl_opts => {
+           verify_hostname => 0,
+           SSL_verify_mode => 1,
+           SSL_cert_file => "/path/to/cert.pem",
+           SSL_key_file => "/path/to/cert.key"
+       }
+   );
+
+  # Send a message
+      my $sent = $sender->send_sms(
+          text => 'This is a test message',
+          to   => '+61 (4) 1234 5678',
+      );
+
+  # Did the send succeed.
+      if ( $sent ) {
+          print "Message sent ok\n";
+      } else {
+          print "Failed to send message\n";
+      }
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   - base
+   - Carp
+   - XML::Simple
+   - LWP::UserAgent
+   - HTTP::Request
+   - SMS::Send::Driver
+   - strict
+   - warnings
+
+AUTHOR
+    Alex Arnaud <alex.arnaud@biblibre.com>
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2016 by Alex Arnaud
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.

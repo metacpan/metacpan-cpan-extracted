@@ -1,0 +1,10 @@
+---
+global:
+  name: ShipIt-Step-Jaiku
+releases:
+  - author: 'Marcel Gruenauer <marcel@cpan.org>'
+    changes:
+      - original version
+    date: 2007-11-21T15:20:43Z
+    tags: []
+    version: 0.01

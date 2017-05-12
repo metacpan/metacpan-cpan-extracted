@@ -1,0 +1,14 @@
+description: set up domain
+registrar: 1
+
+
+request: |-
+ <NZSRSRequest VerMajor="4" VerMinor="4" RegistrarId="100">
+  <DomainCreate Delegate="0" DomainName="10v.co.te" Term="1" ActionId="[% actionid %] 2">
+    <RegistrantContact HandleId="10d"/>
+  </DomainCreate>
+ </NZSRSRequest>
+
+
+assertions:
+ - xpath_matches: [ '//Error', '0', 'No errors' ]

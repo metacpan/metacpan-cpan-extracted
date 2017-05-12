@@ -1,0 +1,190 @@
+
+=head1 NAME
+
+ SyslogScan::Daemon - Watch log files
+
+=head1 SYNOPSIS
+
+ syslogscand [-f] [-c config] {start|stop|reload|restart|check}
+
+ @ISA = qw(SyslogScan::Daemon);
+
+ newdaemon()
+
+=head1 DESCRIPTION
+
+SyslogScan::Daemon is a framework on which to hang log file
+watchers.  SyslogScan::Daemon is a subclass of L<Daemon::Generic>
+and uses L<Plugins> to create the framework.
+
+=head1 CONFIGURATION PREFIX
+
+The configuration prefix for plugins for SyslogScan::Daemon
+is ''.   Use C<plugin> to load plugins.
+
+=head1 CONFIGURATION PARAMETERS
+
+SyslogScan::Daemon defines the following configuration
+parameters which may be given in indented lines that follow
+C<plugin SyslogScan::Daemon> or 
+anywhere in the configuration file.
+
+=over 15
+
+=item debug
+
+(default 0) Turn on debugging.
+
+=item configfile
+
+(default C</etc/syslogscand.conf>).  The location of the configuration
+file for the plugins or SyslogScan::Daemon.
+
+=back
+
+=head1 WRITING PLUGINS
+
+Plugins for SyslogScan::Daemon should subclass
+SyslogScan::Daemon::Plugin.  The following methods will
+be invoked by SyslogScan::Daemon:
+
+=over 15
+
+=item new(%args)
+
+Called from L<Plugins> and C<%args> will
+come from the configuration file.  An object of the
+type of the plugin is expected as the return value.
+It's okay to C<die> here.
+
+=item preconfig($configfile)
+
+Called right after C<new()> and when a C<reload> is
+requested.  Return value is a %hash that is then 
+passed into C<postconfig()>.  It's okay to C<die>
+here.
+
+=item postconfig(%args)
+
+Called after all plugin's C<preconfig()>s are called. 
+No return value is expected.
+
+=item get_logs()
+
+Called after C<postconfig()>.  The return value of 
+C<get_logs()> is a hash: the keys are log file names
+and the values are lists of regular expressions to
+match.  For example:
+
+ sub get_logs
+ {
+	return (
+		'/var/log/mail.log'	=> [
+			qr{postfix/smtp\[\d+\]: \w+: to=<([^@]+@([^>]+))>, .*, status=(bounced).*\b(?i:blacklist(ed)?|spamming|spam list|removal|remove|block list|blocked for abuse)\b},
+			qr{postfix/smtp\[\d+\]: \w+: to=<([^@]+@([^>]+))>, .*, status=(deferred).*Rejected: \S+ listed at http},
+		],
+	);
+ }
+
+The default implementation of C<get_logs()> checks to see
+if there is a C<$self->{plugins}> member and if there is, it
+re-dispatches the C<get_logs()> call to its plugins.  It keeps
+track of the regular expressions returned by its plugins 
+that in C<matched_line()>, callbacks can be redistributed
+to the appropriate plugin:
+	
+ sub matched_line
+ {
+	my ($self, $logfile, $rx) = @_;
+
+	for my $plugin (@{$self->{logs}{$logfile}{$rx}}) {
+		my @ret = $plugin->invoke('parse_logs', $logfile, $rx);
+
+		# your stuff here...
+	}
+ }
+
+=item matched_line($file, $rx)
+
+Called after one of the regular expressions returned by 
+C<get_logs()> matched a log line.  The arguments are
+the log filename where the match was found and the
+regular expression that matched.  Passed implicitly
+are the line that was matched (C<$_>) and any of the
+numbered regular expression submatches (C<$1>, C<$2>,
+etc).  No return value is expected.
+
+=item periodic()
+
+Called once per second or so (or however of the config file says).
+
+The default implementation of C<periodic()> checks to see if
+there is a C<$self->{plugins}> member and if there is calls
+C<$self->{plugins}->invoke('periodic')> to send the heartbeat
+down the plugin tree.  
+
+=back
+
+=head2 Use L<Plugins::SimpleConfig>
+
+Using L<Plugins::SimpleConfig> to write the plugins make the job
+much easier.
+
+=head2 Plugins that have plugins
+
+For plugins that in turn have plugins, a helper function is provided in
+SyslogScan::Daemon::Plugin:
+
+ sub set_api
+ {
+	my ($self, $ssd_configfile, @api) = @_;
+
+	my $config = $self->{configfile} || $ssd_configfile;
+
+	$self->{myapi} = Plugins::API->new;
+	$self->{myapi}->api(@api);
+	$self->{myapi}->autoregister($self);
+	$self->{myapi}->register(undef, parentapi => sub { return $self->{api} });
+
+	$self->{plugins} = new Plugins context => $self->{context};
+	$self->{plugins}->readconfig($config, self => $self);
+
+	$self->{plugins}->api($self->{myapi});
+	$self->{myapi}->plugins($self->{plugins});
+
+	$self->{plugins}->initialize();
+	$self->{plugins}->invoke('preconfig', $config);
+ }
+
+To use it, define your C<preconfig()> as follows:
+
+ sub preconfig
+ {
+	my ($self, $ssd_configfile, @api) = @_;
+
+	$self->set_api($ssd_configfile,
+		stuff for Plugins::API::api()
+	);
+
+	... more initialization if needed
+ }
+	
+=head1 SEE ALSO
+
+L<Plugins>
+L<Plugins::Style1>
+L<Plugins::API>
+L<SyslogScan::Daemon::BlacklistDetector>
+L<SyslogScan::Daemon::SpamDetector>
+
+=head1 LICENSE
+
+Copyright (C) 2006, David Muir Sharnoff <muir@idiom.com>
+This module may be used and copied on the same basis as
+Perl itself.
+
+If you find this useful, please thank me by
+giving me a chance to bid on your next Internet transit
+purchase of T1 or larger.  I have good prices for T1s,
+T3s, OC3s and such.  Thank you.
+

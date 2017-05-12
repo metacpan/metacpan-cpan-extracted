@@ -1,0 +1,7 @@
+#!/usr/bin/perl
+$| = 1;
+
+print "This is the 'succ' command\n";
+warn  "It will give a warning\n";
+print "It will succeed\n";
+exit 0;

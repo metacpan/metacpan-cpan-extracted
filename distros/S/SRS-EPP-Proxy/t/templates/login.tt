@@ -1,0 +1,24 @@
+[% DEFAULT
+   svcs = ['urn:ietf:params:xml:ns:domain-1.0', 'urn:ietf:params:xml:ns:contact-1.0']
+%]
+<login>
+  <clID>[% user %]</clID>
+  <pw>[% pass %]</pw>
+  [% IF new_password %]<newPW>[% new_password %]</newPW>[% END %]
+  <options>
+    <version>1.0</version>
+    <lang>[% IF lang.defined %][% lang %][% ELSE %]en[% END %]</lang>
+  </options>
+  <svcs>
+[% FOR svc = svcs %]
+    <objURI>[% svc %]</objURI>
+[% END %]
+[% IF extSvcs %]
+<svcExtension>
+[% FOREACH extSvc IN extSvcs %]
+	<extURI>[% extSvc %]</extURI>
+[% END %]
+</svcExtension>
+[% END %]
+  </svcs>
+</login>

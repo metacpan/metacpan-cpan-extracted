@@ -1,0 +1,87 @@
+String-Random-NiceURL - v0.01
+=============================
+
+Random ID strings suitable for URLs.
+
+This module allows you to create sparse and distributed IDs such as those used
+for YouTube videos. It uses a modified base 64 character set but also makes
+sure that the first and last chars of your ID are not the dash or underscore
+characters (this helps some programs detect the URLs correctly).
+
+Any length IDs (greater than two chars) can be created and could be used for
+blog posts, short URLs, images or videos.
+
+EXAMPLE
+=======
+
+    id(2)  => 6p
+    id(6)  => NIK_qV
+    id(11) => 2qUROkj-1X6
+    ...etc...
+
+For each length (len), the number of combinations is 62^2 * 64^(len-2):
+
+* length 2 => 3844
+* length 3 => 246016
+* length 4 => 15745024  (over 15 million combinations already)
+* length 5 => 1.008e+09
+* length 6 => 6.449e+10
+* length 7 => 4.127e+12
+* length 8 => 2.642e+14
+* length 9 => 1.691e+16 (lots and lots)
+
+Out of interest, YouTube use 11 chars (but also the first and last letters can
+include dashes or underscores), so their total number of combinations is 64^11,
+which is 7.379e+19. (For comparison, this module would produce 6.925e+19
+combinations at 11 chars, so not much less but much nicer due to the
+constrained first and last chars).
+
+INSTALLATION
+============
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+=========================
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc String::Random::NiceURL
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=String-Random-NiceURL
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/String-Random-NiceURL
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/String-Random-NiceURL
+
+    Search CPAN
+        http://search.cpan.org/dist/String-Random-NiceURL
+
+AUTHOR, COPYRIGHT AND LICENCE
+=============================
+
+Written by Andrew Chilton, <andy at chilts dot org>
+
+Copyright (c) 2010, Apps Attic Ltd, all rights reserved.
+
+http://www.appsattic.com/
+
+This module is free software. You can redistribute it and/or modify it under
+the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but without any
+warranty; without even the implied warranty of merchantability or fitness for a
+particular purpose.
+
+A copy of this license is supplied with the distribution as the file COPYING.

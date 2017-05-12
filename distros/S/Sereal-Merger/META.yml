@@ -1,0 +1,28 @@
+---
+abstract: 'A tool to merge Sereal documents into single one'
+author:
+  - 'Ivan Kruglov <ivan.kruglov@yahoo.com>'
+build_requires:
+  ExtUtils::ParseXS: '2.21'
+  File::Find: '0'
+  File::Path: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '7.0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Sereal-Merger
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  XSLoader: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/Sereal/Sereal/issues
+  repository: git://github.com/Sereal/Sereal.git
+version: '0.001'

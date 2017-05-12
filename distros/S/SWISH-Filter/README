@@ -1,0 +1,44 @@
+SWISH-Filter
+=========================
+
+ABOUT
+
+SWISH::Filter is a suite of modules for converting multiple formats
+into HTML, XML or plain text. It is intended for use with Swish-e
+but can be used all on its own.
+
+SWISH::Filter relies on MIME types to call pluggable filter modules,
+which may in turn call external programs to perform the actual filtering.
+SWISH::Filters::Base defines an API for writing your own filters.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Carp
+  File::Basename
+  File::Temp
+  Symbol
+  
+In addition, many of the Filters::* modules require
+third-party packages or libraries for performing
+the actual filtering of documents.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Bill Moseley
+
+Current maintained by Peter Karman perl@peknet.com
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

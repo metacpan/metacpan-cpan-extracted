@@ -1,0 +1,40 @@
+1. Validation callbacks
+
+Add a callback method to each set, which would allow short-circuiting
+the generated arrangements if a set was unwanted. This could cut the
+number of sets enumerated drastically.
+
+For instance, suppose the set is 1, 2, 3, 4, ... 9, and you want to
+get it back in 4 sets of [3, 2, 2, 2]. Easy enough.
+
+Now imagine that you want to add the following constraints
+
+    sum set[0] == 16
+    sum set[1] == 12
+    sum set[2] ==  7
+    sum set[3] == 10
+
+The following code solves the above
+
+my $s = Set::Partition->new(
+    list      => [1..9],
+    partition => [3, 2, 2, 2],
+);
+
+while (my $r = $s->next) {
+    print join( ' ', map { "(@$_)" } @$r ), "\n" if
+        $r->[0][0] + $r->[0][1] + $r->[0][2] == 16
+            and
+        $r->[1][0] + $r->[1][1] == 12
+            and
+        $r->[2][0] + $r->[2][1] == 7
+            and
+        $r->[3][0] + $r->[3][1] == 10
+    ;
+}
+
+... but at the price of a lot of futile arrangements.
+
+2. It may be possible to do away with the sort(), and replace it
+with reversed slices and/or rotations. But it doesn't seem all that
+expensive.

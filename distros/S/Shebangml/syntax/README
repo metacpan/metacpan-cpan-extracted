@@ -1,0 +1,14 @@
+Shebangml Syntax Files
+
+Writing a syntax file basically means writing a parser all over again in
+a limited language, except that it doesn't have to functionally parse
+the format.
+
+Patches welcome!
+
+Vim
+
+The tree in syntax/vim/ can simply be mirrored into your ~/.vim/
+directory.
+
+########################################################################

@@ -1,0 +1,11 @@
+Revision history for Sub-Stubber
+0.04    Jan 06 2012
+        Declared dependency on parent.pm
+0.03    Jan 02 2012
+        Remove use Log::Fu line
+0.02    Jan 02 2012
+        Add support for subroutine replacement
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

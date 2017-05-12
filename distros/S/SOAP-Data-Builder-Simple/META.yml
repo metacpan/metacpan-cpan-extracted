@@ -1,0 +1,41 @@
+---
+abstract: 'Simplified way of creating data structures for SOAP::Lite'
+author:
+  - 'Michael Jemmeson <mjemmeson@cpan.org>'
+build_requires:
+  SOAP::Data::Builder: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, Dist::Milla version v1.0.14, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SOAP-Data-Builder-Simple
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+provides:
+  SOAP::Data::Builder::Simple:
+    file: lib/SOAP/Data/Builder/Simple.pm
+    version: '0.04'
+requires:
+  List::Util: '1.29'
+  SOAP::Lite: '0'
+  Safe::Isa: '0'
+  base: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/mjemmeson/SOAP-Data-Builder-Simple/issues
+  homepage: https://github.com/mjemmeson/SOAP-Data-Builder-Simple
+  repository: https://github.com/mjemmeson/SOAP-Data-Builder-Simple.git
+version: '0.04'

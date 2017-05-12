@@ -1,0 +1,35 @@
+#!/usr/bin/perl -w
+use strict;
+use warnings;
+use Sendmail::Queue;
+
+my $sender;
+while (my $arg = shift @ARGV) {
+	last if $arg =~ /^--$/;
+
+	if($arg =~ /^-f(.*)/) {
+		$sender = $1;
+	}
+}
+
+my @recipients = @ARGV;
+my $data       = do { local $/; <STDIN> };
+
+my @queue_directories = qw(
+	/var/spool/mqueue-client
+	/var/spool/clientmqueue
+);
+
+my ($dir) = grep { -d $_ && -x _ && -w _ } @queue_directories;
+
+die('Could not find a writeable queue directory in ' . join(',', @queue_directories)) unless $dir;
+
+my $queue = Sendmail::Queue->new({ queue_directory => $dir, });
+
+my $qid = $queue->queue_message({
+	sender     => $sender,
+	recipients => \@recipients,
+	data       => $data,
+});
+
+print "Queued as $qid\n";

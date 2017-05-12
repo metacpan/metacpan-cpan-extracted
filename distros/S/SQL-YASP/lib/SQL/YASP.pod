@@ -1,0 +1,1327 @@
+=head1 NAME
+
+SQL::YASP - SQL parser and evaluater
+
+=head1 NO LONGER BEING DEVELOPED
+
+SQL::YASP is no longer being developed. That being said, I still think it's a
+pretty cool module, so I hope you'll look through it for anything you might need.
+
+=head1 SYNOPSIS
+
+ use SQL::YASP;
+ my ($sql, $stmt, $dbrec, $params);
+
+ $sql = <<'(SQL)';
+    select 
+        -- supports single and multi-line comments
+        -- supports "as fieldname" format for select clauses
+        first ||| last as fullname
+
+    from members
+
+    where
+        /*
+        over 100 built in SQL functions and operators
+        including most MySQL functions and operators
+        */
+        ucase(first) ilike 'Joe' and
+
+        -- Perl-like regular expressions
+        first =~ m/ (Joe) | (Steve) /ix and
+
+        -- handles quoted strings and escapes in quotes
+        last = 'O''Sullivan' and
+
+        -- any level of nested parens
+        -- full support for placeholders
+        ((rank >= ?) and (rank <= ?))
+ (SQL)
+ 
+ 
+ # get statement object
+ $stmt = SQL::YASP::Statement->new($sql);
+
+ # database record: populate this hash from your database
+ $dbrec = 
+    {
+    first=>'Joe',
+    last=>'Smith',
+    email=>'joe@idocs.com',
+    rank=>10,
+    };
+
+ # input parameters
+ $params = [10, 20];
+
+ # test if this record passes the where clause
+ if ($stmt->{'where'}->evalexpr(db_record=>$dbrec, params=>$params)) {
+     # get the record as indicated by the select clause
+     my $retrec = $stmt->select_fields(db_record=>$dbrec);
+     print $retrec->{'fullname'}, "\n";
+ }
+
+=head1 INSTALLATION
+
+SQL::YASP can be installed with the usual routine:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+You can also just copy Eval.pm into the SQL/ directory of one of your library trees.
+
+=head1 A NOTE ABOUT THE STATE OF DOCUMENTATION
+
+I'm still working on the documentaton for YASP.  Documenting everything YASP
+does has proved a daunting task.  In the spirit of Eric Raymond's motto
+"Release Early, Release Often" I decided to go ahead and release YASP before
+I finish the docs.
+
+Sections that are not completed are noted with [*] in the title.
+
+=head1 A GUIDED TOUR OF YASP
+
+YASP is an SQL parser and evaluator for Perl.  It parses SQL statements,
+allows you to discover various properties of them, and helps evaluate
+expressions in the statement.  Let's look at some code that provides an
+example of the features of YASP.
+
+    1   $sql = <<'(SQL)';
+    2   select
+    3      rank,
+    4      first ||| last as fullname
+    5   from members
+    6   where first=?
+    7   (SQL)
+    8  
+    9   $stmt = SQL::YASP->parse($sql);
+    10  $dbrec = {first=>'Starflower', last=>"O'Sullivan", rank=>10};
+    11  $params = ['Starflower'];
+    12  
+    13  if ($stmt->{'where'}->evalexpr(db_record=>$dbrec, params=>$params)) {
+    14     my $calcrec = $stmt->select_fields(db_record=>$dbrec);
+    15     print $calcrec->{'rank'}, "\t", $calcrec->{'fullname'}, "\n";
+    16  }
+
+Lines 1- 7 create the SQL Select statement string we're going to parse.  Line
+2 begins the select statement.  Line 3 indicates that the C<rank> field should
+be returned.  Line 4 indicates that the C<first> and C<last> fields should be
+concatenated together using C<|||> operator (see operator documentation below),
+and the results should be named "fullname".
+
+Line 5 indicates that the fields should be selected from the C<members> table.
+The name of the table is given by the C<from> property of the statement object.
+Line 6 gives the where clause, which will be revealed by the C<where> clause
+of the statement object.
+
+Line 9 creates statement object, passing the SQL string as the only argument.
+Line 10 create an anonymous hash will store data from the database.  Your
+application can retrieve and populate this data in whatever manner you choose.
+Line 11 creates an anonymous array of parameters that will be used to evaluate
+the where clause.
+
+Line 13 evaluates the where clause, using the database record and parameters.
+If the expression returns true, then 14 calls the select_fields(, again using
+the database record hash, to return an anonymous hash of the database fields
+as indicated by the expressions in the select clause. Line 15 outputs the
+results.
+
+=head2 Lukasiewiczian Algebra
+
+By default, YASP implements Lukasiewiczian algebra in evaluating SQL
+expressions. If you would prefer to turn off Lukasiewiczian then set the parser's
+C<lukas> property to false.
+
+Lukasiewiczian algebra is the standard in most databases such as MySql and
+Oracle. Lukasiewiczian algebra is a variation on Boolean Algebra invented by
+Jan Lukasiewicz. In Boolean algreba there are two values: true and false.
+Lukasiewiczian algrebra adds a third possible value: unknown, also known as
+null. If an expression depends on null, than the expression evaluates to null.
+If the expression can be determined as true or false even though it contains
+nulls, it returns true or false.
+
+For example, consider the following AND expression:
+
+    null AND true
+
+We don't know if the expression is true because we don't know if the first
+argument is true. Ergo, the expression evaluates to null. However, in this
+expression...
+
+    null AND false
+
+... we know that the expression is false, because we know that the second
+argument is false (and therefore we know that it's not true that both arguments
+are true). Ergo the expression evaluates to false. In a similar way, the expression
+C<true or x> evaluates to true because only one of the arguments needs to be
+true in an OR, and we know the first argument is true.
+
+One of the funkiest ways that Lukasiewiczian algrebra is different from
+Boolean is in the NOT operator. Not true is false. Not false is true. Not null
+is ... null. That's because we don't know the negation of a value we don't
+know.
+
+=head1 SQL COMMANDS [*]
+
+YASP currently recognizes five SQL commands: CREATE, SELECT, DELETE, UPDATE,
+and INSERT.   The statement object returned by the parser contains properties
+of the command.  We'll start by looking at properties common to all types of
+commands, then describe properties specific to each of the commands listed
+above.
+
+Each statement object has the following properties.
+
+=over 4
+
+=item command (scalar)
+
+The command being run.  E.g., "select", "create", "inset"
+
+=item placeholders (array)
+
+Array of information about the placeholders in the command
+
+=item placeholder_count (scalar)
+
+how many placeholders were in the command
+
+=back
+
+Now let's look at properties specific to each command.
+
+=head2 CREATE
+
+=over 4
+
+=item table_name (scalar)
+
+Name of the object being created
+
+=item create_type (scalar)
+
+The type of object being created.  Right now only "table" is handled
+
+=item fields (hash)
+
+An array of information about the fields being created. The key for each hash
+element is the name of the field. The hash is indexed, so each element is
+returned in the order it is defined in the SQL command.
+
+Each field definition (i.e. each element in the fields hash) has two elements.
+"data_type" is the parsed command indicating the data type of the field.
+"modifiers" is an array of all other options defining the field, e.g.
+"unique", "undef", etc.
+
+=back
+
+=head2 SELECT
+
+=over 4
+
+=item where
+
+An expression object.  See the documentation for expression objects
+objects below.
+
+=item from
+
+This property is a hash of information about the tables from which records
+should be selected.  The key of each element is the alias of the table if an
+alias is used, or the name of the table itself.  The value is the name of the
+table.  For example, this SQL command:
+
+ select name, payment from members, registrations reg where members.id=reg.id
+
+produces a C<from> clause with these keys and values:
+
+  KEY       VALUE
+  reg       registrations
+  members   members
+
+=item fields
+
+An indexed hash describing each field that should be returned by the select
+statement.  The key of each hash element is the alias of the field (if an
+alias was given), the name of the field (if only a single field is requested,
+or the full expression.  The value of each element is an Expression object.
+See the documentation for expression objects below.
+
+=back
+
+=head2 DELETE
+
+Statement objects for the DELETE command have C<where> and C<from>
+properties like SELECT statements.
+
+=head2 UPDATE
+
+=over 4
+
+=item table_name
+
+This property holds the name of the table being updated.
+
+=item set
+
+An indexed hash describing which fields should be updated and what they should
+be updated to.  The key of each hash element is the name of the field to be
+updated.  The value of each element is an Expression object.  See the
+documentation for expression objects below.
+
+=back
+
+=head2 INSERT
+
+Statement objects for the INSERT command have C<set> and C<table_name>
+properties like UPDATE statements.
+
+=head1 EXPRESSION OBJECTS
+
+Expression objects allow you to evaluate an SQL expression against one or more
+database records.  Expression objects only have one public method, C<evalexpr>,
+so let's get right to looking at how that method works.
+
+Consider the following code:
+
+ 1   $sql = 'select name from members where id=?';
+ 2   $dbrec = { id=>10, name => 'Starflower'};
+ 3   $params = [10];
+ 4   $stmt = SQL::YASP->parse($sql);
+ 5   
+ 6   if ($stmt->{'where'}->evalexpr(db_record=>$dbrec, params=>$params))
+ 7       {print $dbrec->{'name'}, "\n"}
+
+Line 1 creates an SQL statement to select the name field from the members table.
+Notice that the where clause uses a placeholder instead of a hardcoded values.
+Line 2 creates a hash reference that represents a database record.  Line 3
+creates an array reference that is a list of parameters that will be
+substituted for placeholders in the SQL statement. Line 4 creates an SQL
+statement object.
+
+In Line 6 we use the expression object that is stored as the C<where> property
+of the statement.  We pass in the database record and the parameter list, and
+get back true or false.
+
+=head1 EXTENDING YASP
+
+YASP is designed to simplify overriding any of its functionality.  Although
+YASP works out-of-the box, developers may want to tune it to parse and
+interpret specific flavors of SQL.
+
+=head2 The Basic Concepts
+
+The first and only required step for extending YASP is to create a new package
+and set its @ISA to point to YASP.  Let's say you want to call you package
+"Extended", and that you want to put it in a file named "Extended.pm". The
+following code at the top of the package does the extending:
+
+    package Extended;
+    use strict;
+    use SQL::YASP ':all';
+    @Extended::ISA = 'SQL::YASP';
+
+As always, be sure that the last line in Extended.pm is 1 so that you can load
+it into a script.  You're now ready to use your new package.  First, load the
+package:
+
+    use Extended;
+
+then use it to parse SQL:
+
+    $stmt = Extended->parse($sql);
+
+Of course, the point of extending is to change the default functionality.
+Generally this is done in three ways for YASP: modifying the parsing options,
+modifying the operators and functions, and overriding object methods.
+
+Except for overriding methods, all of these options and properties should be
+set in the C<new> function.  Any of the options that are not explicitly set
+in C<new> are set in C<after_new>, which should I<always> be called at the
+end of C<new>.  So, for example, suppose you wanted to remove Perl-style
+regexes and /* style comments.  Your C<new> function could look like this:
+
+    sub new {
+        my ($class) = @_;
+        my $self = bless({}, $class);
+        
+        # parsing options
+        $self->{'star_comments'} = 0;
+        $self->{'perl_regex'} = 0;
+        
+        # always call after_new just before
+        # returning new parser
+        $self->after_new;
+        
+        return $self;
+    }
+
+=head2 Parsing Options
+
+The following options can be set in the C<new> function.  See their
+documentation for specifics about what each property does.
+
+    !_is_not
+    backslash_escape
+    dash_comments
+    dquote_escape
+    lukas
+    perl_regex
+    pound_comments
+    quotes
+    star_comments
+
+=head2 DEFINING SQL OPERATORS
+
+SQL operators are stored as a set sub references in the parser object.  The
+parser's C<ops> property is an array.  Each element of the array is a hash,
+and each element of the hash is a hash of information about a specific
+operator.  Was that a little confusing?  Here's an example.  Suppose we only
+wanted the parser to recognize four operators:  =, >, *, and +.  We would set
+the C<ops> property in C<new> like this:
+
+    sub new {
+        my ($class) = @_;
+        my $self = bless({}, $class);
+        
+        # operators
+        $self->{'ops'} = [
+            # comparison operators
+            {
+            '='  => { s=>sub{$_[0] eq $_[1]} }, 
+            '>' => { s=>sub{$_[0] > $_[1]} }, 
+            },
+            
+            # mathematical operators
+            {
+            '*'  => { s=>sub{$_[0] eq $_[1]},  args=>ARG_NUMERIC} ,  
+            '+' => { s=>sub{$_[0] > $_[1]},    args=>ARG_NUMERIC}, 
+            },
+        ];
+        
+        # always call after_new just
+        # before returning new parser
+        $self->after_new;
+        
+        return $self;
+    }
+
+Let's look at how the ops property is constructed.  Each element in the array
+represents a level of operator precedence. Loosest bound operators are in the
+first element, and ops of increasingly tighter binding are in higher array
+elements. Operators in the same array element have equal precedence.
+
+Each array element is itself a hash of operator definitions. The hash key is
+the name of operator itself.  Where letters are part of the operator name,
+always use lowercase.
+
+The operator definition itself is a hash of properties about the operator.
+Only one property is required, the C<s> (for "sub") property.  The C<s>
+property should reference the subroutine that actually performs the operation.
+For short subs it is usually easiest to simply use an anonymous subroutine, as
+in the example above. By default, the subroutine receives two arguments: the
+value on the left and the value on the right.  The sub should return whatever
+the result of the operation is.
+
+In a moment we'll look at how each op function is contructed, as well as the
+other properties of the operator definition, but first a note about the
+operations that are available by default from YASP.  Constructing all of your
+operators in a long array like above could get pretty obnoxious, especially
+considering that a good portion of the operators you are likely to want are
+already available by default from YASP.  Let's suppose that you only wanted
+to make one change in the default operators: you want to change C<||> from
+a concatenator to an C<or> as it is in MySql.  You could do that in the
+C<new> function like this:
+
+    sub new {
+        my ($class) = @_;
+        my $self = bless({}, $class);
+        
+        # get default operators
+        $self->{'ops'} = SQL::YASP::default_ops();
+        
+        # get rid of the default || operator
+        delete $self->{'ops'}->[OP_MISC]->{'||'};
+        
+        # alias || to or
+        $self->{'ops'}->[OP_LOGICAL]->{'||'} = $self->{'ops'}->[OP_LOGICAL]->{'or'};
+        
+        # always call after_new just
+        # before returning new parser
+        $self->after_new;
+        
+        return $self;
+    }
+
+After blessing the object, the function sets its C<ops>
+property to the default YASP operators using the SQL::YASP::default_ops()
+function, which returns an anonymous array of operator definitions.  Next,
+it removes the C<||> definition from the C<OP_MISC> level of operators.
+There are six operator precedence levels in the default definitions:
+C<OP_BETWEEN>, C<OP_LOGICAL>, C<OP_ADD>, C<OP_MULT>, C<OP_EXP>, and
+C<OP_MISC>.  The sub then redefines C<||> into the OP_LOGICAL level, setting
+its definition to the same as the C<or> operator.
+
+Turning our attention back to the other properties of an operator definition,
+the other property is C<args>, which indicates what kind of arguments the sub
+expects.  There are four possible values. C<ARG_STRING> (which is the default,
+so you can leave it out) indicates that the sub expects two strings.
+C<ARG_STRING> is null-safe: YASP will send empty strings instead of spaces to
+such subs. If you want your operator to see nulls when they are indicated, set
+C<args> to C<ARG_SENDNULLS>.  C<ARG_NUMERIC> indicates that the sub expects
+numbers.  For C<ARG_NUMERIC> operators, zero will be sent instead of null.
+
+C<ARG_RAW> is for the situation where you don't want YASP to evaluate the
+expressions on the left and right of the operator, but instead to allow your
+sub to decide how to interpret the expressions.  C<ARG_RAW> subs receieve three
+arguments. The first two are anonymous arrays of the expressions to the left
+and right of the operator.  The third argument, $opts, is a hash of values
+passed through the recursion of the C<evalexpr> ("evaluate expression") sub.
+
+To evalute one of the expressions, call C<evalexpr> passing three value:
+$opts, the expression, and a variable into which the results will be stored.
+Contrary to what might be expected, C<evalexpr> does I<not> return the results
+of the expression when called in this manner.  The results of the expression are
+stored in the third argument. The I<success> of the evaulation is returned by
+C<evalexpr>.  If C<evalexpr> returns false then there was a fatal error in the
+SQL expression (e.g. a divide by zero) and your function should proceed
+no further.
+
+For example, YASP's default C<and> operator looks like this:
+
+    $dbin[OP_LOGICAL]{'and'}  = {args=>ARG_RAW, s=>sub{
+        my ($left, $right, $opts) = @_;
+        my ($val);
+        
+        evalexpr($left, $opts, $val) or return;
+        $val or return 0;
+        
+        evalexpr($right, $opts, $val) or return;
+        return $val;
+    }};
+
+In the first call to C<evalexpr> passes $left, $opts, and $val.  The results
+of the expression are stored in $val.  If C<evalexpr> returns false then the
+function returns, proceeding no further.
+
+C<and> is an C<ARG_RAW> operator so that it short ciruits: the right expression
+is never evaluted if the left argument is false.  That's why Cand> is an
+C<ARG_RAW> operator: so that it never has to evaluate the second expression
+if the first is false.
+
+If your code discovers that the expression is invalid in some way, you can
+throw an error to indicate that the SQL is invalid. To do so, set
+$SQL::YASP::err to true, set $SQL::YASP::errstr to a description of the error,
+and return undef from the function.  For example, dividing by zero is an error,
+so your C</> operator could look like this:
+
+    $dbin[OP_MULT]{'/'} = {args=>ARG_NUMERIC, s=>sub{
+        unless ($_[1]) {
+            $SQL::YASP::err = 1;
+            $SQL::YASP::errstr = 'divide by zero';
+            return undef;
+        }
+        
+        $_[0] / $_[1];
+    }};
+
+Putting all of that code in your function can become burdensome, so you can
+also just return the results of the C<set_err> function in a single line.
+C<set_err> sets $SQL::YASP::err to true, set $SQL::YASP::errstr to its single
+argument, and returns undef. So, for example, the divide operator function
+can look like this:
+
+    $dbin[OP_MULT]{'/'} = {args=>ARG_NUMERIC, s=>sub{
+        $_[1] or return set_err('divide by zero');
+        $_[0] / $_[1];
+    }};
+
+Be sure to I<return> the results of C<set_err>, not just call it.
+
+=head2 A NOTE ABOUT THE C<NOT> OPERATOR
+
+Any operator is negated by preceding it with C<not>.  For example, our C<=>
+operator above can be negated like this:
+
+    where first not = 'Joe"
+
+If the parser's C<!_is_not> property is true (which it is by default), then
+C<!> can be used as an alias for C<not>. Because C<!> does not require any
+space after it to be parsed out, we already have a not-equals operator
+without having to define one:
+
+    where first != 'Joe"
+
+=head2 Defining SQL Functions
+
+Like operators, SQL functions are stored as a set sub references in the parser
+object.  The parser's C<functions> property is a hash of function definitions.
+Suppose, for example, that you want your parser to recognize two functions:
+C<upper>, which uppercases its argument, and C<larger>, which returns the
+larger of its two arguments.  We would set the C<functions> property in
+C<new> like this:
+
+    sub new {
+        my ($class) = @_;
+        my $self = bless({}, $class);
+        
+        # operators
+        $self->{'functions'} = 
+            {
+            'upper'  => { s=>sub{uc $_[0]} },
+            'larger' => { s=>sub{$_[0]>$_[1] ? $_[0] : $_[1]}}, 
+            };
+        
+        # always call after_new just
+        # before returning new parser
+        $self->after_new;
+        
+        return $self;
+    }
+
+Each hash key is the name of the functon itself.  Functions may consist of
+letters, numbers, and underscores, and must start with a letter.  Use lowercase
+letters only.  The value of the hash element is a function definition much like
+the operator definitions above.  The only required property is C<s> which
+references the subroutine to process the function.  For short functions it is
+usually easiest to reference an anonymous subroutine.  The C<args> property
+can take the same values as for operators: 
+C<ARG_STRING>, 
+C<ARG_RAW>, 
+C<ARG_NUMERIC>, and 
+C<ARG_SENDNULLS>.  For any of those type the subroutine will receive one
+argument: the value of the expression within the parens.  There are also one
+other argument types for functions: C<ARG_NONE>, which means that the function
+takes no arguments.
+
+You might prefer to set your functions by grabbing a hash of all of the
+default functions, then adding to and deleting from the hash as needed.  For
+example, suppose you wanted use all of the default functions, except that you
+want to delete the C<trim> and C<reverse> functions.  You could do that with a
+C<new> method like this:
+
+    sub new {
+        my ($class) = @_;
+        my $self = bless({}, $class);
+        
+        # get default operators
+        $self->{'functions'} = SQL::YASP::default_functions();
+        
+        # delete some functions we don't want
+        delete $self->{'functions'}->{'trim'};
+        delete $self->{'functions'}->{'reverse'};
+        
+        # always call after_new just
+        # before returning new parser
+        $self->after_new;
+        
+        return $self;
+    }
+
+This code loads the defaults into the C<functions> property by calling
+SQL::YASP::default_functions(), which returns an anonymous hash of all the
+default functions.  Then it simply deletes C<trim> and C<reverse> from the
+hash.
+
+=head2 OVERRIDING OBJECT METHODS
+
+Your extending class can override any method, but there are several methods
+that were particularly designed for overriding. Those methods are described in
+more detail in the "Overrideable Methods" section below.
+
+=head1 PARSER OBJECT [*]
+
+=head2 Properties [*]
+
+=over 4
+
+=item ops
+
+This property provides a set of SQL operators.  See "Setting SQL Operators"
+for more details.
+
+=item functions
+
+This property provides a set of SQL functions.  See "Setting SQL Functions"
+for more details.
+
+=item lukas [*]
+
+=item star_comments
+
+If true, the parser recognizes comments that begin with /* and end with */.
+Defaults to true.
+
+=item dash_comments
+
+If true, the parser recognizes comments that begin with -- and continue for
+the rest of the line. Defaults to true.
+
+=item pound_comments
+
+If true, the parser recognizes comments that begin with # and continue for the
+rest of the line. Defaults to true.
+
+=item quotes
+
+An array of which characters are recognized as quotes.  Defaults to single and
+double quotes. Other characters are not currently supported.  This property
+is changed from an array to a hash in after_new().
+
+=item !_is_not
+
+If true, the parser aliases the bang (aka the exclamation point: !) to the
+word "not". Defaults to true.
+
+=item perl_regex
+
+If true, the parser allows Perl-style regular expressions in the SQL.  For
+example, the following code would be allowed:
+
+    where
+        first =~ m/ (Miko) | (Starflower) /ix
+
+Defaults to true.
+
+=item keep_org_sql
+
+If true, statement objects hold on to the original SQL string in the org_sql
+property. Defaults to false.
+
+=item dquote_escape
+
+If true, quotes inside quotes can be escaped by putting two quotes in a row.
+For example, the following expression set name to O'Sullivan:
+
+    name='O''Sullivan'
+
+Defaults to true.
+
+=item backslash_escape
+
+If true, quotes inside quotes can be escaped by putting a backslash in front
+of the quote.  For example, the following expression set name to O'Sullivan:
+
+    name='O\'Sullivan'
+
+Defaults to true.
+
+=item commands
+
+This hash of hashes is used for specific situations where it may be ambiguous
+if the set of arguments is intended to be interpreted as a command or as an a
+field or table name. Currently, this property is only used in CREATE TABLE
+commands to interpret which in the list of arguments is a field name and
+which is a qualifier for the command.
+
+=item double_word_tokens
+
+A hash of tokens that consist of two words.  Each key of the hash should be
+the first word of the token.  The value of each element should be another
+hash, each key of which consists of a second word in the token, and each
+value of which consists of any true string.  The default double_word_tokens
+property is created with code like this:
+
+    $self->{'double_word_tokens'} ||= {
+        primary  =>  {key=>1},
+        current  =>  {date=>1},
+        order    =>  {by=>1},
+    };
+
+=back
+
+=head2 OVERRIDEABLE METHODS [*]
+
+=over 4
+
+=item new
+
+=item build_tree
+
+=item tree_create
+
+=item tree_create_table
+
+=item tree_select
+
+=item tree_delete
+
+=item tree_insert
+
+=item tree_update
+
+=item get_sections
+
+=item select_fields
+
+=item field_set_list
+
+=back
+
+UTILITY FUNCTIONS
+add_args
+sql_split
+arr_split
+comma_split
+object_list
+get_ixhash
+deref_args
+
+=head1 STATEMENT OBJECT [*]
+
+=head1 BINARY OPERATORS
+
+Here's a quick list of operators before we get to the full documentation:
+
+    -
+    %
+    &&
+    *
+    /
+    ^
+    ||
+    +
+    <
+    <=
+    <=>
+    <>
+    =
+    ==
+    >
+    >=
+    and
+    between
+    eq
+    eqi
+    gt
+    gti
+    iin
+    ilike
+    in
+    is
+    like
+    lt
+    lti
+    nand
+    ne
+    nei
+    nor
+    or
+    xnor
+    xor
+
+=head2 -
+
+Unary minus.  Changes positive arguments to negative, negative arguments
+to positive.
+
+    - 4
+
+returns
+
+    -4
+
+=head2 %
+
+Modulus.  Returns the remainder from dividing the first argument
+by the second.
+
+    11 % 3
+
+returns
+
+    2
+
+=head2 *
+
+Multiplication.  Multiplies the numeric value of the first argument by
+the numeric value of the second.
+
+    2*3
+
+returns
+
+    6
+
+=head2 /
+
+Division.  Divides the numeric value of the first argument by the numeric
+    value of the second.
+
+    6/3
+
+returns
+
+    2
+
+=head2 ^
+
+Exponentiation.  Raises the numeric value of the first argument by
+the numeric value of the second.
+
+    2^3
+
+returns
+
+    8
+
+=head2 ||
+
+Concatenation.  Returns the first argument concatenated with
+the second argument.
+
+    'x' || 'y'
+
+returns
+
+    xy
+
+=head2 |||
+
+Concatenate with space in between.
+
+    'x' ||| 'y'
+
+returns
+
+    x y
+
+If either of the arguments is null then the space is not added. So,
+this expression
+
+    'x' ||| null
+
+returns a string consisting solely of 'x'.  Also, the first expression must
+end with a non-space and the second expression must begin with a non-space,
+or the operator returns the strings concatenated directly without an extra
+space in between them.
+
+=head2 +
+
+Addition. Adds the numeric value of the first argument to the numeric
+value of the second.
+
+    5-3
+
+returns
+
+    2
+
+=head2 <
+
+Numeric less-than.  Returns true if the numeric value of the first argument
+is less than the numeric value of the second.
+
+    5 < 3
+
+returns false.
+
+=head2 <=
+
+Numeric less-than-or-equal-to.  Returns true if the numeric value of the
+first argument is less than or equal to the numeric value of the second.
+
+    3<=5
+
+returns true.
+
+=head2 <=>
+
+Same as =.
+
+=head2 <>
+
+Numeric not-equal.  Returns true if the numeric value of the first argument
+is not equal to the numeric value of the second.
+
+    1 <> 0
+
+returns true.
+
+=head2 =
+
+String equality.  Returns true if the two arguments are identical strings.
+
+    'Joe'='Joe'
+
+returns true.  This operator is case sensitive, so
+
+    'Joe'='joe'
+
+returns false.  This operator does I<not> compare numerically, so
+
+    '1.0' = '1'
+
+returns false.  However, unquoted numbers are always normalized, so
+
+    1.0 = 1
+
+returns true.
+
+=head2 ==
+
+Numeric equality.  Returns true if the numeric value of the first argument
+is equal to the numeric value of the second.
+
+    '1.0' == '1'
+
+returns true.
+
+=head2 =~
+
+Good old fashioned Perl regular expression matches.  This operator allows you
+to do test if a string matches using familiar regex syntax.  For example:
+
+    name =~ m/
+        (Joe) |   # regexes can include Perl-style 
+        (Steve)   # comments if you use the x param
+        /xis
+
+returns true if name contains the strings "Joe" or "Steve", case insensitively.
+Like in Perl, the x param means to ignore whitespace, the i means
+case-insensitive, and the s means to treat the entire expression like
+a single line.
+
+=head2 >
+
+Numeric greater-than.  Returns true if the numeric value of the first argument
+is greater than the numeric value of the second.
+
+    5 < 3
+
+returns true.
+
+=head2 >=
+
+Numeric greater-than-or-equal-to.  Returns true if the numeric value of the
+first argument is greater than or equal to the numeric value of the second.
+
+    5<=3
+
+returns true.
+
+=head2 AND
+
+Logical and.  Identical to &&.
+
+=head2 BETWEEN
+
+Syntax: I<NumberA> BETWEEN I<NumberB> AND I<NumberC>
+
+Returns true if the NumberA is greater than or equal to NumberB and is also
+less than or equal to NumberC.
+
+    1 between -3 and 10
+
+returns true.
+
+=head2 EQ
+
+Case sensitive string equality.
+
+    'Joe' eq 'Joe'
+
+returns true.
+
+=head2 EQI
+
+Case insensitive string equality.
+
+    'JOE' eq 'joe'
+
+returns true.
+
+=head2 GT
+
+Case-sensitive string greater-than.  Returns true if the first string is
+alphabetically after the second string.
+
+    'pear' gt 'apple'
+
+returns true.  Because it is a case-sensitive comparison, lower-case
+characters are greater then upper case characters:
+
+    'Pear' gt 'apple'
+
+returns false.
+
+=head2 GTI
+
+Case-insensitive string greater-than.  Returns true if the first string is
+alphabetically after the second string on a case-insensitive basis.
+
+    'Pear' gti 'apple'
+
+returns true.
+
+=head2 IIN
+
+Case-insensitive version of IN.  See IN below.
+
+=head2 ILIKE
+
+Case-insensitive version of LIKE.  See LIKE below.
+
+=head2 IN
+
+Returns true if the argument before IN is in the list
+of arguments after IN.
+
+    'Joe' in 'Steve', 'Joe', 'Fred'
+
+returns true.  IN is case-sensitive.  Use IIN for case-insensitivity.
+
+=head2 IREGEXP
+
+Case-insensitive version of REGEXP.
+
+=head2 IS NULL, IS NOT NULL
+
+C<IS NULL> returns true of the preceding argument is null (that's undef to us
+Perl folk).  An empty string is *not* null. C<IS NOT NULL> return true if
+the preceding argument is not null.
+
+=head2 LIKE
+
+Like, y'know, returns true if the second argument can be found anywhere in
+the first argument.
+
+    'Hi there Joey!' like 'there'
+
+returns true.  LIKE recognizes two special characters.  C<_> means "any one
+character", and C<%> means "zero or more of any character".  So, for example,
+the following expression matches if NAME contains a string that begins with
+"J", then any one character, then "e".  So "Hi Joe!", "Yo, Jae!", and "Jxe"
+would all match, but not "Jake".
+
+    NAME like 'J_e'
+
+For another example, the following expression returns true if NAME contains
+a string that starts with "J", then zero or more characters, then "e".  So "Je",
+and "Yo, Jack, how are ya?" would both match:
+
+    NAME like 'J%e'
+
+ILIKE works just like LIKE, but is case-insensitive.
+
+=head2 LT
+
+String less-than.
+
+    'apple' lt 'pear'
+
+returns true.
+
+=head2 LTI
+
+Case-insensitive string less-than.
+
+    'apple' lt 'Pear'
+
+returns true.
+
+=head2 NAND
+
+Logical NAND.  Returns true unless I<both> arguments are true.
+
+    true  nand true    -- returns false
+    true  nand false   -- returns true
+    false nand true    -- returns true
+    false nand false   -- returns true
+
+=head2 NE
+
+String not-equal.  Returns true if the string values of the two
+arguments are not the same.
+
+    'Joe' ne 'Fred'
+
+returns true.  This function is case-sensitive.
+
+=head2 NEI
+
+Case-insensitive string not-equal.  Returns true if the string
+values of the two arguments are case-insensitively not the same.
+
+    'Joe' nei 'Fred'
+
+returns true, whereas
+
+    'JOE' nei 'joe'
+
+returns false.
+
+=head2 NOR
+
+Logical NOR.  Returns true if I<both> arguments are false.
+
+    true  nor true    -- returns false
+    true  nor false   -- returns false
+    false nor true    -- returns false
+    false nor false   -- returns true
+
+=head2 OR
+
+Logical OR.  Returns true if either of the arguments is true.
+
+    true  or true    -- returns true
+    true  or false   -- returns true
+    false or true    -- returns true
+    false or false   -- returns false
+
+=head2 REGEXP
+
+Regular expression.  Returns the results of matching the first argument
+against the second. Uses plain old Perl regular expression syntax.
+
+    'whatever' regexp 'e*v'
+
+returns true.  This operator is case sensitive.  Use IREGEXP for a case-insensitivity.
+
+See also the C<=~> operator for regexes that work like good old fashioned Perl regexes.
+
+=head2 XNOR
+
+Logical XNOR.  Returns true if the truth of both arguments is equal.
+
+    true  xnor true    -- returns true
+    true  xnor false   -- returns false
+    false xnor true    -- returns false
+    false xnor false   -- returns true
+
+=head2 XOR
+
+Logical XOR.  Returns true if the truth of both arguments is I<not> equal.
+
+    true  xor true    -- returns false
+    true  xor false   -- returns true
+    false xor true    -- returns true
+    false xor false   -- returns false
+
+=head1 FUNCTIONS [*]
+
+I'm still working on documenting all the functions.  Here's a list of
+implemented functions so far to tide you over until I've gotten them
+all properly documented.
+
+    -
+    +
+    abs
+    cat
+    cat_ws
+    ceil
+    ceiling
+    char
+    cmp
+    coalesce
+    concat
+    concat_ws
+    crunch
+    defined
+    elt
+    err
+    false
+    field
+    floor
+    hascontent
+    hasnull
+    hex
+    if
+    insert
+    instr
+    int
+    isnull
+    lcase
+    left
+    length
+    load_file
+    locate
+    lower
+    lpad
+    ltrim
+    mid
+    mod
+    not
+    null
+    oct
+    ord
+    position
+    pow
+    power
+    repeat
+    replace
+    reverse
+    right
+    rpad
+    rtrim
+    sign
+    soundex
+    space
+    square
+    squared
+    strcmp
+    substr
+    substring
+    substring_index
+    tcase
+    title
+    tolower
+    totitle
+    toupper
+    trim
+    true
+    ucase
+    undef
+    upper
+
+=head1 TO DO
+
+Operators I haven't implemented yet:
+    ascii
+    conv
+    bin
+    octet_length
+    char_length
+    character_length
+    bit_length
+
+    find_in_set
+    make_set
+    export_set
+    
+    many math functions
+
+=head1 TERMS AND CONDITIONS
+
+Copyright (c) 2003 by Miko O'Sullivan.  All rights reserved.  This
+program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. This software comes with B<NO WARRANTY>
+of any kind.
+
+=head1 AUTHOR
+
+Miko O'Sullivan
+F<miko@idocs.com>
+
+=head1 VERSION
+
+=over 4
+
+=item Version 0.10    June 12, 2003
+
+Initial release
+
+=item Version 0.11    June 28, 2003
+
+Removed Debug::ShowStuff from module, which was only
+there for (as you might expect) debugging.
+
+=item Version 0.12    January 2, 2015
+
+Cleaned up test.pl. Noting that this module is no longer being developed.
+Noting some prerequisites. Changed CR's to Unix style. Changed encoding to
+UTF-8.
+
+=back
+

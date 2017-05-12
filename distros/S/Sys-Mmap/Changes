@@ -1,0 +1,83 @@
+Scott Walters, Mar 1 2017 v0.19
+* Update the FSF's mailing address in their license;
+  thanks to knnniggett
+  This also gets the CPAN and github versions in sync
+
+Scott Walters, Mar 1 2017 v0.18
+* MAP_HUGETLB MAP_HUGE_2MB MAP_HUGE_1GB, MAP_NORESERVE
+  thanks to CowboyTim
+
+Todd Rinaldo August 22 2014 v0.17_01
+* Track fixes in github now all issues are cleared from RT
+  https://github.com/toddr/Sys-Mmap/issues
+* Turn off homepage in META since there really isn't one.
+* Minor fix to COW patch related to XS spacing.
+
+Scott Walters, August 21 2014, v0.17_01
+* RT 91483 - croak("variable is not a string") was hitting because it was being
+  too selective with SV type for modern perls.
+* RT 96043 - Updates to fix perl 5.20 COW issues
+* RT 96043 - Add MAP_LOCKED flag
+* Update contributors docs.
+
+Todd Rinaldo August 19 2011 v0.16
+* Testing looks stable on all major perl versions and distros.
+* Release with only version bump
+
+Todd Rinaldo August 18 2011 v0.15_02
+* Pause blocked.
+
+Todd Rinaldo August 18 2011 v0.15_01
+* Patch from RT 70333 (Syohei YOSHIDA) to make error testing locale neutral
+* Add test for GLOB mmap
+* Make temp file larger for testing additional cases.
+
+Todd Rinaldo April 4 2011 v0.15
+* cpantesters looks good besides Win32. Waiting for someone from windows
+  world to care/submit patch
+
+Todd Rinaldo March 29 2011 v0.14_01
+* Mmap could not handle files larger than 2GB if perl was not using 64bit int.
+  Resolved the problem by taking a string and converting it via atoll,
+  depending on _FILE_OFFSET_BITS > 32
+* Added test and fix to croak if a negative offset is passed in.
+* initialize global variable pagesize = 0 so it'll set right the first time
+* Remove typemap which was only used by mmap sub. Now we're using SV,
+  it's no longer an issue.
+
+Todd Rinaldo Sept 7 2010 v0.14
+* Tests look stable. Releasing prod version of module.
+
+Todd Rinaldo Sept 1 2010 v0.13_03
+* Skip unmapping of invalid variables on BSD kernels which
+  seem to segfault on this event.
+
+Todd Rinaldo July 29 2010 v0.13_02
+* Do a little better undef detection in the SV before trying
+  to blindly unmap it.
+* Add tests to detect these cases
+
+Todd Rinaldo July 27 2010 v0.13_01
+* RT 59754 AUTOLOAD does quoted eval.
+* RT 59753 Mmap.xs:14:0: warning: "_POSIX_C_SOURCE" redefined
+* RT 15905 bug/segmentation fault on ia64 (altix)
+* RT 22615 munmap($unseen) segfaults
+* RT 59750 Update Makefile.PL to show Module dependencies.
+* RT 59749 use Test::More and test interface more thoroughly.
+* RT 59748 use XSLoader if possible for more lightweight load
+* RT 59747 Don't import Carp into module by default
+* update META.yml
+
+Aaron Kaplan, Sep 2003, v 0.12
+. cleaned up style and usage in C to fit ANSI-C
+. contributed documentation
+
+Scott Walters, Feb 2002, v 0.11
+. tied interface to help reduce foot shooting and hoop jumping
+. hardwire() utility method
+. perl 5.6.x compatability
+
+Malcolm Beattie, 21 June 1996, v 0.10
+Original author, original version
+
+. 

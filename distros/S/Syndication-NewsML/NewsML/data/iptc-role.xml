@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<!DOCTYPE TopicSet PUBLIC "urn:newsml:iptc.org:20001006:NewsMLv1.0.dtd:1" "NewsMLv1.0.dtd">
+<TopicSet Duid="iptc.role" FormalName="Role">
+	<Comment xml:lang="en">The distinguishing characteristic of a NewsComponent, or its relationship to the others with which it is associated within the same containing NewsComponent.</Comment>
+	<Topic Duid="rol1">
+		<TopicType Scheme="IptcTopicType" FormalName="Role"/>
+		<FormalName Scheme="IptcRole">Main</FormalName>
+		<Description xml:lang="en">Principal component.</Description>
+	</Topic>
+	<Topic Duid="rol2">
+		<TopicType Scheme="IptcTopicType" FormalName="Role"/>
+		<FormalName Scheme="IptcRole">Supporting</FormalName>
+		<Description xml:lang="en">Additional information that amplifies the original theme.</Description>
+	</Topic>
+	<Topic Duid="rol3">
+		<TopicType Scheme="IptcTopicType" FormalName="Role"/>
+		<FormalName Scheme="IptcRole">Supplementary</FormalName>
+		<Description xml:lang="en">Information on a related theme.</Description>
+	</Topic>
+	<Topic Duid="rol4">
+		<TopicType Scheme="IptcTopicType" FormalName="Role"/>
+		<FormalName Scheme="IptcRole">Sponsor's Message</FormalName>
+		<Description xml:lang="en">Information about or by a person or 
+organisation providing support for production of the parent material.</Description>
+	</Topic>
+	<Topic Duid="rol5">
+		<TopicType Scheme="IptcTopicType" FormalName="Role"/>
+		<FormalName Scheme="IptcRole">Thumbnail</FormalName>
+		<Description xml:lang="en">A news-component substitute, smaller than the original, used for convenience.</Description>
+	</Topic>
+	<Topic Duid="rol6">
+		<TopicType Scheme="IptcTopicType" FormalName="Role"/>
+		<FormalName Scheme="IptcRole">Preview</FormalName>
+		<Description xml:lang="en">A partial (possibly random) rendition of a news-component, such as a segment of video or audio.</Description>
+	</Topic>
+	<Topic Duid="rol7">
+		<TopicType Scheme="IptcTopicType" FormalName="Role"/>
+		<FormalName Scheme="IptcRole">Advertisement</FormalName>
+		<Description xml:lang="en">Piece of material whose presence is paid for.</Description>
+	</Topic>
+	<Topic Duid="rol8">
+		<TopicType Scheme="IptcTopicType" FormalName="Role"/>
+		<FormalName Scheme="IptcRole">Reference List</FormalName>
+		<Description xml:lang="en">A list of material that does not form part of the news object.</Description>
+	</Topic>
+	<Topic Duid="rol9">
+		<TopicType Scheme="IptcTopicType" FormalName="Role"/>
+		<FormalName Scheme="IptcRole">Caption</FormalName>
+		<Description xml:lang="en">Text providing information about the related content.</Description>
+	</Topic>
+	<Topic Duid="rol10">
+		<TopicType Scheme="IptcTopicType" FormalName="Role"/>
+		<FormalName Scheme="IptcRole">Abstract</FormalName>
+		<Description xml:lang="en">A summary or synopsis featuring the most important points of a news-component.</Description>
+	</Topic>
+	<Topic Duid="rol11">
+		<TopicType Scheme="IptcTopicType" FormalName="Role"/>
+		<FormalName Scheme="IptcRole">Content list</FormalName>
+		<Description xml:lang="en">A list of material that comprises a news object.</Description>
+	</Topic>
+	<Topic Duid="rol12">
+		<TopicType Scheme="IptcTopicType" FormalName="Role"/>
+		<FormalName Scheme="IptcRole">Table</FormalName>
+		<Description xml:lang="en">Information that needs to be presented in a structured way.</Description>
+	</Topic>
+	<Topic Duid="rol13">
+		<TopicType Scheme="IptcTopicType" FormalName="Role"/>
+		<FormalName Scheme="IptcRole">Description</FormalName>
+		<Description xml:lang="en">A description of the NewsItem.</Description>
+	</Topic>
+</TopicSet>
+

@@ -1,0 +1,22 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/SysAdmin.t
+lib/SysAdmin.pm
+lib/SysAdmin/Date.pm
+lib/SysAdmin/DB.pm
+lib/SysAdmin/File.pm
+lib/SysAdmin/SMTP.pm
+lib/SysAdmin/SNMP.pm
+scripts/check_socket.pl
+scripts/date.pl
+scripts/db/dbd_test.db
+scripts/dbd_mysql.pl
+scripts/dbd_oracle.pl
+scripts/dbd_pg.pl
+scripts/dbd_sqlite.pl
+scripts/file.pl
+scripts/smtp.pl
+scripts/snmp.pl
+META.yml                                 Module meta-data (added by MakeMaker)

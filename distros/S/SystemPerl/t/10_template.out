@@ -1,0 +1,17 @@
+
+#line 3 "test_dir/10_template.out"
+inserted: This is line 1
+inserted: This is line 2
+
+#line 100 "newfilename"
+inserted: This is line 100 of newfile
+
+#line 1 "t/10_template.in"
+Line 1 of input file
+
+Line 3 of input file
+
+Line 5 of input file
+
+#line 17 "test_dir/10_template.out"
+inserted: This is the bottom of the file

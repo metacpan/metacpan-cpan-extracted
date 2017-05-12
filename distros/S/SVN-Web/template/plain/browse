@@ -1,0 +1,31 @@
+<div class="title">
+[%|l(path, revision)%]browsing %1 (of revision %2)[%END%]
+<a href="[% script %]/[% repos | uri %]/log[% path | url %]?rev=[% rev %]">[%|l%](history of this directory)[%END%]</a>
+</div>
+[% IF entries.size == 0 %]
+<p>No entries in this directory.</p>
+[% ELSE %]
+<table border=0 width="90%" class="entries" summary="File and directory listing">
+<thead>
+<tr><th>[%|l%]name[%END%]</th><th>[%|l%]revision[%END%]</th><th>[%|l%]age[%END%]</th><th>[%|l%]size[%END%]</th></tr>
+</thead>
+<tbody>
+[% FOREACH entries %]
+<tr>
+<td class="name">
+[% IF isdir %]
+<img alt="[dir]" border="0" src="/icons/dir.gif" />
+<a href="[% script %]/[% repos | uri %]/browse[% path | url %][% name | url %]/?rev=[% rev %]">[% name %]</a>
+[% ELSE %]
+<a href="[% script %]/[% repos | uri %]/checkout[% path | url %][% name | url %]?rev=[% rev %]"><img alt="[file]" border="0" src="/icons/[% type || 'text' %].gif" /></a>
+<a href="[% script %]/[% repos | uri %]/view[% path | url %][% name | url %]?rev=[% rev %]">[% name %]</a>
+[% END %]</td>
+<td class="revision"><a href="[% script %]/[% repos | uri %]/revision?rev=[% rev %]">[% rev %]</a>
+</td>
+<td class="age">Unimpl</td>
+<td class="size">[% size %]</td>
+</tr>
+[% END %]
+</tbody>
+</table>
+[% END %]

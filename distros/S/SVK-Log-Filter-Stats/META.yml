@@ -1,0 +1,29 @@
+---
+name: SVK-Log-Filter-Stats
+version: !!perl/hash:Module::Build::Version
+  original: 0.0.4
+  qv: 1
+  version:
+    - 0
+    - 0
+    - 4
+author:
+  - 'Michael Hendricks <michael@ndrix.org>'
+abstract: display cumulative statistics for revisions
+license: mit
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+requires:
+  List::Util: 0
+  SVK: 1.99
+  Time::Local: 0
+build_requires:
+  Test::More: 0
+provides:
+  SVK::Log::Filter::Stats:
+    file: lib/SVK/Log/Filter/Stats.pm
+    version: 0.0.4
+generated_by: Module::Build version 0.2804
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

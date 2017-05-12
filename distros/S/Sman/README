@@ -1,0 +1,91 @@
+Sman
+==================
+
+NAME
+	The sman README
+
+What is sman?
+	Sman is the Searcher for Man pages. Based on the example of the
+	same name in Josh Rabinowitz's article "How To Index Anything"
+	in the July, 2003 issue of Linux Journal 
+	(http://www.linuxjournal.com/article.php?sid=6652), sman is
+	an enhanced version of 'apropos' and 'man -k'.  Sman adds 
+	several key abilities over its predecessors:
+
+	* Supports complex natural language text searches such as 
+		"(linux and kernel) or (mach and microkernel)"
+
+	* Shows results in a ranked order, and optionally an extract 
+       (using -e) of the manpage showing the searched text highlighted
+
+	* Allows for searches by manpage section, title,
+		body, or filename (use 'metaname=searchword')
+
+	* Indexes the complete contents of the man page, not just 
+		the title and description
+
+	* Uses a prebuilt index to perform fast searches
+
+	* Performs 'stemming' so that a search for "searches" 
+	  will match a document with the word "searching"
+
+Where do I get sman?  
+	Sman is currently distributed from http://joshr.com/src/sman.
+
+	It's always best to make sure you use a current version of sman.
+
+How do I install sman?
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Dependencies:
+	Sman depends on SWISH-E 2.4 or above.
+
+	SWISH-E can be found at http://www.swish-e.org/Download/
+	
+Building the index:
+	The included sman-update script is used to build (and rebuild)
+	the sman index, which is comprised of the files 'sman.index' 
+	and 'sman.index.prop'.
+
+Searching the man page index with sman:
+	The sman command is fairly simple. As its help output says:
+
+    Usage: sman [--max=#] [--rank] [--number] [--index='index'] 
+                [--file] [--help] [--repeats] [--begin=#'] [--config=file]
+                [--quote='"'] [--verbose] [--VERSION] searchword [...]
+    Ranked freetext searches on manpages.
+    Options:
+      --max=#:                limit number of results, default 20
+      --rank:                 show the rank of each hit
+      --number:               show the number of each hit
+      --index=index:          specify an index (overrides config)
+      --file:                 show the source man file for each hit
+      --help:                 this help information
+      --repeats:              show repeat manpages
+      --begin=#:              start showing hits at number N
+      --config=my-sman.conf:  a config file (specs an index file)
+      --quote='"':            specify a quoting char for output
+      --extract:              show extraction of manpage for each hit
+      --verbose:              show more output
+      --VERSION:              show version and exit
+      --scheme=[0|1]:         swish-e RankScheme to use. Default is 1
+
+
+MORE INFO
+    Sman is thoroughly documented. For more info, see 'perldoc sman',  
+    'perldoc sman-update', or the Sman distribution itself.
+
+TESTING 
+	Sman has been tested on several versions of perl and unix-like operating
+    systems.  We welcome bug reports and fixes for all platforms!
+
+COPYRIGHT AND LICENCE 
+	This software is licensed the same as perl itself.  
+	Copyright (C) 2003-2016 Josh Rabinowitz <joshr>
+

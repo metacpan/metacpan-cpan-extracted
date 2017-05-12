@@ -1,0 +1,2 @@
+File: C:\Siebel\8.1\Client\BIN\.Siebel_svrmgr.pref
+

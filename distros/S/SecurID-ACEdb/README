@@ -1,0 +1,43 @@
+This is the README file for SecurID::ACEdb, the Perl interface to the
+Security Dynamics' SecurID ACE Administration Toolkit API.
+
+This is version 0.90 of SecurID::ACEdb. This version is still considered
+alpha software. It has only been built on Solaris 2.{5.1,6} with Perl
+5.004 and above. It has only been tested against version 3.0.1 of
+ACE/Server.
+
+AVAILABILITY
+
+The latest version of SecurID::ACEdb is available from the Comprehensive
+Perl Archive Network (CPAN) or via anonymous FTP at
+
+  ftp://ftp.cnpl.enbridge.com/pub/perl 
+
+INSTALLATION
+
+See the accompanying INSTALL file for detailed installation
+directions.
+
+EXAMPLES
+
+The eg directory contains a few example scripts. 
+
+SUPPORT
+
+You can send bug reports and suggestions for improvements on this module
+to me at <mailto:Dave.Carrigan@cnpl.enbridge.com>. However, I can't
+promise to offer any other support for this module (the lawyers made me
+say that).
+
+COPYRIGHT
+
+This module is Copyright © 1998 Dave Carrigan, Enbridge Inc. All rights
+reserved.
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself. This module is distributed in the
+hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE. The copyright holder of this module can not be held liable
+for any general, special, incidental or consequential damages arising
+out of the use of the module.

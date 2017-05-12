@@ -1,0 +1,18 @@
+---
+abstract: 'Fix strings into valid SQL column names'
+author:
+  - 'Simone Cesano <scesano@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.041, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: String-SQLColumnName
+requires:
+  Lingua::EN::Numbers: '0'
+  String::CamelCase: '0'
+version: '0.002'

@@ -1,0 +1,25 @@
+Revision history for Perl extension SpringGraph.
+
+0.01  Sun Jun 27 23:08:52 2004
+	- original version; created by h2xs 1.23 with options
+		-X SpringGraph
+0.02  Mon Jul 05 19:45:36 2004
+        - added support for record shapes
+        - fixed add_edge bug
+        - major refactorting
+
+0.03  Thu Jul 08 19:20:21 2004
+       - added naive tree starting positions for nodes
+       - added dotted and dashed lines
+       - reduced node colisions in sparse graphs
+
+0.04  Wed Jul 14 16:28:32 2004
+      - fixed bug in branch plotting
+
+0.041 Thu Jul 15 16:30:31 2004
+      - fixed bug in examples script 
+
+0.05 Fru Jul 16 17:45:30 2004
+     - added new way of drawing lines from records
+     - fixed a small bug in tree plotting
+     - commented out debug warnings

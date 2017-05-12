@@ -1,0 +1,12 @@
+Revision history for Sub-Pipeline
+
+0.011     2013-12-10 20:28:57 America/New_York
+        update repository data
+
+0.010   2006-11-13
+        packaging improvements
+        more stack tracing on weird errors
+
+0.001   2006-06-12
+        First version, released on an unsuspecting world.
+

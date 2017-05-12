@@ -1,0 +1,16 @@
+2013-05-05  Juan J. Merelo Guervós  <jjmerelo@gmail.com>
+
+	* lib/String/MMM.pm: Added a new function that returns a string
+	with the result in the form %b%w.
+
+2013-01-28  JJ Merelo  <jmerelo@amy>
+
+	* lib/String/MMM.pm: For the time being, just small cosmetic
+	changes. Adding documentation too. 
+
+Revision history for Perl extension String::MMM.
+
+0.01  Sun Jan  6 13:15:36 2013
+	- original version; created by h2xs 1.23 with options
+		-A -n String::MMM
+

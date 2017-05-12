@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Solr.t
+lib/Solr.pm
+lib/Solr/HTTPUpdateHandler.pm
+lib/solr/Schema.pm

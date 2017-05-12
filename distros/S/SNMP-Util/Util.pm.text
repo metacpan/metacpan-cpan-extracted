@@ -1,0 +1,475 @@
+NAME
+    SNMP::Util - Snmp modules to perform snmp set,get,walk,next,walk_hash etc.
+
+SYNOPSIS
+    `use SNMP::Util;'
+
+    ## Documentation (POD) =head1 NAME
+
+     Perl SNMP utilities - SNMP::Util - Version 1.8
+
+DESCRIPTION
+    This Perl library is a set of utilities for configuring and monitoring SNMP based devices. This library requires
+    the UCD port of SNMP and the SNMP.pm module writted by Joe Marzot.
+
+Version
+    
+    1.0 Initial Release
+    1.1 Fixed Manifest File
+    1.2 Added get_hash / walk_hash now calls walk / Modified output in poll_value
+    1.3 Added use strict to library and fixed some bugs with my vars
+    1.4 Fixed code to elminate perl warning
+    1.5 Changed all mapInt functions to mapEnum - (support for mapInt not in 
+        Joe Marzot's version 1.8).
+    1.6 Updated docs html and text
+    1.7 Includes patches from Charles Anderson
+    1.8 Includes patches from tyoshida
+Software requirements
+    The following applications need to be built and installed before running the SNMP::Util application.
+
+        ucd-snmp-3.5 - ftp:://ftp.ece.ucdavis.edu:/pub/snmp/ucd-snmp.tar.gz
+        SNMP-1.8 - www.perl.com/CPAN
+
+Summary of functions
+     get - snmpget and return formatted array
+     get_hash - snmpget and return hash
+     get_set_restore - get value, set new range of values and restore value
+     next - snmpnext and return formatted array
+     ping_check - get uptime and return 1 if reachable
+     ping_check_exit - get uptime and exit if not reachable
+     poll_device - poll a device until it becomes reachable
+     poll_devices - poll several devices until they becomes reachable
+     poll_value - snmpget in a loop until variable reaches desired state
+     set - snmpset and return
+     set_get - snmpset followed by get and check 
+     walk - snmpwalk and return formatted array
+     walk_hash - snmpwalk and return hash ($hash->{mibname}{index} = value)
+
+Creation on the SNMP::Util object
+    You must first do a use statement to pull in the library. Then the snmp object can be created.
+
+     #!/usr/local/lib/perl
+     use lib "put lib path here" 
+     use SNMP::Util;
+
+     The SNMP::Util object is created as follows:
+
+     $snmp = new SNMP::Util(-device => $IP,
+                           -community => $community, 
+                           -timeout => 5,             
+                           -retry => 0,             
+                           -poll => 'on',            
+                           -poll_timeout => 5,        
+                           -verbose => 'off',         
+                           -errmode => 'return',    
+                           -delimiter => ' ', 
+                          )
+     
+     community = snmp community string
+     timeout = snmp timeout in seconds (You may also use sub second values ie 0.5)
+     retry = number of snmp retries on timeouts
+     poll = poll the unreachable device after number of retries reached and then retry again
+     poll timeout = poll timeout in minutes default = 5 minutes
+     verbose = controls the output of the snmp low level library
+     errmode = error mode ('return' on error or 'die' on error) default = return
+     delimeter = specifies the character to use between octets when getting octet-strings
+     
+     
+     Note: Delimiter can also be set by using the setting the Global variable as follows:
+           $SNMP::Util::Delimiter = '-'
+
+  Creating and using multiple objects
+
+    First populate an array of IP addresses:
+
+     @IP_array = ('1.1.1.1','1.1.1.2','1.1.1.3','1.1.1.4')
+        
+     foreach $IP (@IP_array){
+
+        $snmp->{$IP} = new SNMP::Util(-device => $IP,
+                          -community => $community, 
+                          -timeout => 5,             
+                          -retry => 0,               
+                          -poll => 'on',          
+                          -delimiter => ' ', 
+                          )
+     }
+
+     #Now get the uptime for each switch
+     foreach $IP (@IP_array){
+         $uptime = $snmp->{$IP}->get('v','sysUpTime.0')
+         print "Uptime for $IP = $uptime\n"
+     }
+
+How to use the object for a simple snmpget
+       $uptime = $snmp->get('v','sysUpTime.0')
+                 where 'v', is the format of the output (v = value)
+                 and $uptime contains the system uptime in 10ths of seconds
+
+MIB Loading
+    The SNMP::Util module loads the mib using the SNMP::Util_env.pm module by using the following statements.
+
+     use SNMP::Util_env
+     # Initialize mib
+     &SNMP::initMib()
+     
+     You must update the SNMP::Util_env.pm file or simply set up these environment
+     variables and the SNMP::Util_env.pm file will not override them.
+     
+     The environment variables are as follows:
+
+     $ENV{'MIBDIRS'} = '/usr/local/lib/snmp/mibs' 
+     $ENV{'MIBFILES'} = '/ats/data/mibs/rfc1850.mib:
+     /ats/data/mibs/rfc1406.mib:/ats/data/mibs/rfc1407.mib:
+     /ats/data/mibs/rfc1595.mib:/ats/data/mibs/rfc1724.mib'
+       
+     You can specify whatever MIBS you would like to load.
+
+Error Handling method
+    All error handling is done through the error handling method (error). The error message can be obtained by using
+    the method (errmsg) The detailed error message can be obtained by using the method (errmsg_detail) This error
+    method returns a boolean result to indicate if an error ocurred
+
+     example:
+
+        if ($snmp->error){
+            $error = $snmp->errmsg;
+            $error_detail = $snmp->errmsg_detail;
+            print "snmp error = $error\n";
+            print "snmp error detail = $error_detail\n";
+        }
+
+Print Output Logging
+    The printing of output is controlled by the logging routine. the amount of output is configured by setting the
+    MAX_LOG_LEVEL environment variable. There are four levels of output logging: (none,status,fail,debug). You may
+    also set the logging using the global variable Max_log_level.
+
+     none = print  no output (use errmsg only for errors)
+     status = print general status information
+     fail = print general status and failures
+     debug = print general status, failures, and debug information
+      
+     You can set the environment variable in your environment or inside the 
+     program using the following format:
+     
+        $env{'MAX_LOG_LEVEL'} = 'debug'
+
+        or using the global 
+        $SNMP::Util::Max_log_level = 'debug'
+
+     Example Output from Logging:
+
+        get (noSuchName) There is no such variable name in this MIB.
+        snmpget 100.100.100.1 public 1.3.6.1.2.1.2.2.1.1.1 1.3.6.1.2.1.2.2.1.7.1
+        snmpget 100.100.100.1 public ifIndex.1 ifAdminStatus.1
+        snmp error index = 1
+       
+        Note: error index = the index of the var bind that failed
+
+Formatting SNMP output (get, next, walk)
+    The SNMP utilities have a formatting function which will format the return values which are most cases an array.
+
+     The format options are specified as strings as follows:
+     
+     print " format string = oOnNtvei\n"
+     print " o = oid with index\n"
+     print " O = oid without index\n"
+     print " n = name with index\n"
+     print " N = name without index\n"
+     print " t = type\n"
+     print " v = value\n" 
+     print " e = enumeration\n"
+     print " i = instance of the mib variable\n\n"
+     
+     Note: enumerations apply to integers and timeticks.  It will convert integer values
+     to enumerations and it will convert timeticks to days,hours,minutes,seconds.
+     
+     example usage:
+     
+     @result = $snmp->get('nve','sysUptime.0')
+     $result[0] = sysUptime.0
+     $result[1] = 13392330
+     $result[2] = 1 days, 13:12:03
+     
+     Note: Any format can be used for the (get,walk,next routines)
+           Only 'e' or 'v' is needed in the walk_hash routine.
+
+    This formatting was designed to allow the user to format the output in whatever format they need for there
+    application. You may want to use the 'v' option when comparing timetick values, but you may want to use the 'e'
+    option for the human readable display.
+
+    The snmpget routine may be equated to an array if the formatting has more than one value or it may be equated to a
+    scalar value if the formatting has only one value. It must be equated to an array if the snmpget is a multi var
+    bind.
+
+Input Formatting
+    The input supplied to the SNMP functions is designed to be very flexible and allows the user to use shortcuts to
+    apply instances to variables.
+
+  Input formatting options for the get,next,walk
+
+    Simple format name.instance or oid.instance
+
+     $snmp->get('e','ifIndex.1','ifAdminStatus.1','ifOperStatus.1')
+     $snmp->get('e','1.3.6.1.2.1.2.2.1.1.1','1.3.6.1.2.1.2.2.1.7.1','1.3.6.1.2.1.2.2.1.8.1')
+
+    Shortcut format instance up front (no instance in mib name or oid
+
+     $snmp->get('e',1,'ifIndex','ifAdminStatus','ifOperStatus')
+     $snmp->get('e',1,'1.3.6.1.2.1.2.2.1.1','1.3.6.1.2.1.2.2.1.7','1.3.6.1.2.1.2.2.1.8')
+
+    Long format name,instance,name,instance etc of oid,instance,oid,instance etc
+
+     $snmp->get('e','ifIndex',1,'ifAdminStatus',1,'ifOperStatus',1)
+     $snmp->get('e','1.3.6.1.2.1.2.2.1.1',1,'1.3.6.1.2.1.2.2.1.7',1,'1.3.6.1.2.1.2.2.1.8',1)
+
+    You may also set up an array for any of the above formats and pass the array into the get function as follows:
+
+     @oids = ('ifIndex.1','ifAdminStatus.1','ifOperStatus.1')
+     $snmp->get('e',@oids)
+
+    Hash like format name => instance or oid => instance
+
+     $interface = 1
+     $snmp->get(
+               'e',
+               ifIndex => $interface,
+               ifAdminStatus => $interface,
+               ifOperStatus => $interface,
+               ifSpeed => $interface,
+               )
+     or 
+
+     $snmp->get(
+               index => $interface,
+               ifIndex,
+               ifAdminStatus,
+               ifOperStatus,
+               ifSpeed,
+               )
+
+    Calling get with dashed options
+
+     @result = $snmp->get(
+                         -format => 'ne',
+                         -oids => [
+                                   ifIndex => $interface,
+                                   ifAdminStatus => $interface,
+                                   ifOperStatus => $interface,
+                                   ifSpeed => $interface,
+                                   ],
+                        )
+     or 
+     @oids = ('ifIndex.1','ifAdminStatus.1','ifOperStatus.1')
+     @result = $snmp->get(
+                         -format => 'ne',
+                         -oids => \@oids,
+                         )
+     
+    Note: When using the dashed option format, you must pass the array by reference as shown 
+    above.
+     
+     
+    =head2 Input formats for the set routine
+
+    Simple format name.instance,value or oid.instance,value
+
+     $snmp->set('ifAdminStatus.1','up')
+     $snmp->set('1.3.6.1.2.1.2.2.1.7.1','up')
+
+    Shortcut format instance up front (no instance in mib name or oid
+
+     $snmp->set(1,'ifAdminStatus','up')
+     $snmp->set(1,'1.3.6.1.2.1.2.2.1.7','up')
+
+    Long format name,instance,value or oid,instance,value
+
+     $snmp->set('ifAdminStatus',1,'up')
+     $snmp->set('1.3.6.1.2.1.2.2.1.7',1,'up')
+     
+    You may also set up an array for any of the above formats and pass the array into the
+    get method as follows:
+     
+     @oids = ('ifAdminStatus.1','up')
+     $snmp->set(@oids)
+
+    Hash like format
+
+     $snmp->set(
+               "ifAdminStatus.$interface" => 'up',
+               )
+     or 
+
+     $snmp->set(
+               index => $interface,
+               "ifAdminStatus" => 'up',
+               )
+
+     
+     
+    =head1 SNMP Method summary
+
+  get
+
+    The get will do a snmpget and return an array specified by the format statement.
+
+     Usage: @result = $snmp->get('ne','ifAdminStatus.1')
+            $result[0] = ifAdminStatus.1
+            $result[1] = 'up'
+
+            $result = $snmp->get('e','ifAdminStatus.1')
+            Note: As shown above, the result is a scalar if only one value is returned
+
+  get_hash
+
+    This method will do an snmpget and return a hash. The format for the hash is (value = $hash->{mibname}{index}).
+
+     
+     example: $hash = $snmp->get_hash('ne','ifIndex.1','ifIndex.2',
+                                      'ifOperStatus.1','ifOperStatus.2'); 
+
+     $hash->{ifIndex}{1} = 1
+     $hash->{ifIndex}{2} = 2
+     $hash->{ifOperStatus}{1} = up
+     $hash->{ifOperStatus}{2} = up
+
+     Note: Valid format statements for get_hash are 'ne' or 'nv'
+     
+    =head2 get_set_restore
+
+    The get_set_restore will get the variable, set it to a range and restore the value
+
+     Usage:  @result = $snmp->get_set_restore('1..10','ifAdminStatus.1');
+             where the value '1..10' is the range of values
+
+     Note: The range is specified using .. for ranges and , for individual values. 
+
+  next
+
+    The next will do a snmpnext and return an array specified by the format statement.
+
+     Usage:  @result = $snmp->next('ne','ifAdminStatus.1')
+            $result[0] = ifAdminStatus.2
+            $result[1] = 'up'
+
+            $result = $snmp->next('e','ifAdminStatus.1')
+            Note: As shown above, the result is a scalar if only one value is returned
+     
+    =head2 ping_check
+
+    The ping_check will do a snmpget of uptime and return 1 if device is alive
+
+  ping_check_exit
+
+    The ping_check will do a snmpget of uptime and exit if not alive
+
+  poll_device
+
+    The poll_device will loop on the snmpget of uptime command until the device is reachable. The loop will exit once
+    the poll_timeout time is reached (default = 5 minutes).
+
+  poll_devices
+
+    The poll_devices will do a snmpget of uptime on several devices until the device are reachable. The loop will exit
+    once the poll_timeout time is reached (default = 5 minutes).
+
+     $snmp->poll_devices(@IP_array);
+     where @IP_array = array of IP addresses
+
+  poll_value
+
+    The poll value method will poll a mib variable until it reaches that state and returns the amount of time it took
+    to reach that state
+
+     Usage: $snmp->poll_value(-oid => "ifAdminStatus.$interface",
+                             -state => 'up',
+                             -timeout => 120,
+                             -montime => 5,
+                             -delay   => 1)
+
+     or 
+      
+     $snmp->poll_value(-oid     => "1.3.6.1.2.1.2.2.1.8",
+                      -instance => $interface,
+                      -state => 'up',
+                      -timeout => 120,
+                      -montime => 5,
+                      -delay   => 1)
+
+    or
+
+     use a array ref if you want the polling to stop when the result 
+     matches more than one value
+
+     $snmp->poll_value(-oid     => "1.3.6.1.2.1.2.2.1.8",
+                      -instance => $interface,
+                      -state => ['up','down']
+                      -timeout => 120,
+                      -montime => 5,
+                      -delay   => 1)
+
+     
+     Note: You must use the instance when using oids.
+
+  set
+
+    The set will set a group of variables and return 1 if passed
+
+     Usage:  @result = $snmp->set(
+                                 index => 1,
+                                 ifAdminStatus => 'up',
+                                 )
+
+  set_get
+
+    The set_get will set a group of variables,get,check and return 1 if passed
+
+     Usage:  @result = $snmp->set(
+                                 index => 1,
+                                 ifAdminStatus => 'up',
+                                 )
+
+  walk
+
+    The walk will do a snmpwalk and return an array specified by the format statement. It also has a special print
+    option to print out each loop in the walk. This method is capable of doing multivarbind walks.
+
+     Usage: @result = $snmp->walk(-format => 'ne',
+                                   -oids =>['ifAdminStatus'],
+                                   -print => 'on');
+                               
+                      where print = 'on' or 'off'
+
+            or use the shortcut format (Note: print will be disabled by default
+                                         
+            @result = $snmp->walk('ne','ifAdminStatus');                          
+
+            $result[0] = ifAdminStatus.1
+            $result[1] = 'up'
+            $result[2] = ifAdminStatus.2
+            $result[3] = 'up'
+            ...
+
+  walk_hash
+
+    The walk_hash will do a snmpwalk and return a hash with the value specified by the format. This method is capable
+    of doing multivarbind walks.
+
+     Usage: $result = $snmp->walk_hash('e','ifIndex','ifAdminStatus','ifOperStatus')
+            $result->{ifIndex}{1} = 1
+            $result->{ifAdminStatus}{1} = 'up'
+            $result->{ifOperStatus}{1} = 'up'
+            $result->{ifIndex}{2} = 2
+            $result->{ifAdminStatus}{2} = 'up'
+            $result->{ifOperStatus}{2} = 'up'
+
+     or 
+     Usage: $result = $snmp->walk_hash('v','ifIndex','ifAdminStatus','ifOperStatus')
+            $result->{ifIndex}{1} = 1
+            $result->{ifAdminStatus}{1} = 1
+            $result->{ifOperStatus}{1} = 1
+            $result->{ifIndex}{2} = 2
+            $result->{ifAdminStatus}{2} = 1
+            $result->{ifOperStatus}{2} = 1
+
+

@@ -1,0 +1,7 @@
+Revision history for SMS-Send-AT-TMobile: 0.002
+
+0.002     2015-01-19 11:27:51+01:00 Europe/Vienna
+    - fix sending to international numbers with a leading +
+
+0.001     2013-09-11 10:10:39 Europe/Vienna
+    - Initial release using the HTTP POST API

@@ -1,0 +1,77 @@
+Revision history for Perl extension Sys::Info::Driver::Linux.
+
+0.7902 Wed May  8 04:47:19 2013
+    => Fix for Debian.
+
+0.7902 Mon Nov 26 04:08:14 2012
+    => Use full path to ifconfig.
+    => Fixes for ::Distribution
+
+0.7901 Sun Jul 15 23:45:45 2012
+    => Workaround for the missing /etc/lsb-release and existing /etc/lsb-release.d/ (CentOS)
+    => Attach " Linux" to the name only if it doesn't have that already (RHEL).
+    => Fix for RT#72673 and RT#77563 (RHEL&CentOS)
+
+0.7900 Thu Jan  5 00:21:39 2012
+    => Fix RT#72586 (mcholste)
+    => Fix RT#70510 (jquelin, pjedwards)
+    => Updated edition lists.
+
+0.7801 Sun Jul 31 00:10:35 2011
+    => Added a diag section to unit test and some code to SPEC to disable
+       nonsense smoker setups.
+    => Move constants from base module into the driver specific one.
+       It's nonsense to have driver specific stuff in the base classes
+       anyway.
+
+0.78 Sat Apr 16 15:39:39 2011
+    => Just increased the version number.
+
+0.77 Thu Aug  5 01:34:42 2010
+    => Fix Fedora version handling. Reported by Mark T. Kennedy.
+
+0.76 Sat Jul 17 01:44:28 2010
+    => Internal cleanup.
+
+0.75_01 Fri Apr  2 03:31:54 2010
+    => Split data parts from ::Distribution into ::Distribution::Conf
+    => Several complex data structures are now converted to a simple
+       configuration file (a string in the ::Conf module currently)
+    => Config::General is now a dependency.
+    => CentOS patch by Tom Skrainar.
+
+0.74 Fri Jan 15 01:48:58 2010
+    => Fix for "The stat preceding -l _ wasn't an lstat" failures.
+
+0.73 Sun Jan 10 08:18:25 2010
+    => Add Ubuntu 9.04 to editions list.
+    => Support new uname().
+    => Perl::Critic refactoring.
+    => Merge Linux::Distribution as Sys::Info::Driver::Linux::OS::Distribution
+       since the original is not maintained and was a fragile dependency.
+    => Fix RT#42437.
+
+0.72 Thu Apr 23 17:32:32 2009
+    => Update builder.
+
+0.70 Mon Apr  6 03:54:23 2009
+    => Bump version for new stable release.
+
+0.69_11 Sat Apr  4 07:15:36 2009
+    => Implement bitness.
+
+0.69_10 Fri Apr  3 22:45:27 2009
+    => Update test suite.
+
+0.69_06 Sat Mar 14 06:20:17 2009
+    => Update test suite.
+
+0.69_05 Sat Mar 14 01:52:57 2009
+    => Fix build tools.
+
+0.69_02 Fri Mar  6 04:14:39 2009
+    => Add support for more distro code names.
+    => Fix domain name.
+
+0.69_01 Thu Mar  5 04:01:14 2009
+    => Separation from Sys::Info.

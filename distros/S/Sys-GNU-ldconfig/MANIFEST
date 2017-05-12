@@ -1,0 +1,23 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Sys/GNU/ldconfig.pm
+t/01_pod.t
+t/02_pod_coverage.t
+t/Sys-GNU-ldconfig.t
+eg/lookup
+t/etc/ld.so.conf
+t/etc/ld.so.conf.d/something-1.23.conf
+t/lib/libdb.so
+t/lib/libdb.so.4
+t/lib/libdb4.dll
+t/old-lib/libdb.so.3
+t/old-lib/libdb3.dll
+t/opt/lib/libother.so
+t/opt/lib/libother.so.13
+t/opt/lib/libother13.dll
+t/opt/something-1.23/lib/libsomething.dll
+t/opt/something-1.23/lib/libsomething.so
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

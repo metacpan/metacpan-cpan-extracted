@@ -1,0 +1,12 @@
+2.0004
+------
+* 2016-04-12 Syntax::Feature::Try is no longer used
+
+2.0003
+------
+* 2016-04-11 Default error pages added
+
+2.0002
+------
+* 2016-04-10 Static content support added
+* 2016-04-10 First public version

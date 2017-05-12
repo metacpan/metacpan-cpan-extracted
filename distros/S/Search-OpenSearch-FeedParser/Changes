@@ -1,0 +1,12 @@
+Revision history for Search-OpenSearch-Feed
+
+0.101  06 April 2015
+ - fix github #1 (optional attributes on Feed object)
+ - fix docs
+
+0.100  23 April 2014
+ - port to Moo + Type::Tiny
+
+0.01 2013-09-18
+ - First version, released on an unsuspecting world.
+

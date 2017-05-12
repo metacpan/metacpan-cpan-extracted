@@ -1,0 +1,52 @@
+{
+   "abstract" : "Quickly build & query relational data",
+   "author" : [
+      "Traian Nedelea <tron1point0@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300015, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "unrestricted"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "SQL-Abstract-Builder",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBIx::Simple" : "0",
+            "Exporter" : "0",
+            "Hash::Merge" : "0",
+            "List::Util" : "0",
+            "SQL::Abstract::More" : "0",
+            "perl" : "v5.14.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dump" : "0",
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0",
+            "Test::Requires" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v0.1.1"
+}
+

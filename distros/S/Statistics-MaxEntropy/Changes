@@ -1,0 +1,37 @@
+Revision history for Perl extension Statistics::MaxEntropy.
+
+0.4  Fri Jun 26 21:41:41 1998
+	- original version; created by h2xs 1.16
+	  at that time named Stat::ME
+0.5  ... Jul 3 9:32:00 1998
+	- first version uploaded to CPAN
+0.6  Tue Jul 13 12:00:12 1998
+	- improved test.pl by adding input files that work
+	- extended the POD
+0.7 
+	- migrated package to object oriented perl
+	- placed the reading and writing of candidates outside MaxEntropy.pm
+	  (in Candidates.pm)
+	- better handling of constant features and features that make
+	  trouble for Newton's method (in IIS)
+	- dumping and undumping of event space (using Data::Dumper by 
+	  Gurusamy Sarathy)
+	- removed the info sub (obsolete because of the dumping facility)
+	- documentation adapted for oo interface
+	- adapted ME.wrapper.pl for new options (and removed the option
+	  for information files which is now obsolete)
+	- added Monte Carlo sampling of the the event space
+	- added support for enumeration (for small event spaces)
+0.8  Tue Oct 18 12:00:12 1998
+	- added sparse vector module: SparseVector.pm with interface very much
+	  like Bit::Vector
+	- Candidates.pm and MaxEntropy.pm are configurable for choosing between
+	  Statistics::SparseVector and Bit::Vector.
+0.9  Sun Nov 21 20:03:21 1998
+	- enumeration of event space no longer stored in memory
+	- implemented Newton iteration (IIS) according to (Abney 1997)
+	- removed support for Bit::Vector; SparseVector runs the show now
+	- 
+1.0  
+	- SparseVector and MaxEntropy support sparse integer vectors now
+

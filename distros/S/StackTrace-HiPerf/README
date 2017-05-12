@@ -1,0 +1,13 @@
+NAME
+    StackTrace::HiPerf - High performance stacktraces
+
+INSTALLATION
+    To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SEE ALSO
+    See the individual module documentation for more information.

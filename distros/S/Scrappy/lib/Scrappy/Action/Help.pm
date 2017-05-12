@@ -1,0 +1,67 @@
+package Scrappy::Action::Help;
+
+BEGIN {
+    $Scrappy::Action::Help::VERSION = '0.94112090';
+}
+
+use Moose::Role;
+
+sub menu {
+    my @actions = @{shift->actions};
+    my @header  = ();
+
+    while (<DATA>) {
+        chomp;
+        push @header, $_;
+    }
+
+    @actions = map {
+        my $action = $_;
+        $action =~ s/^Scrappy::Action:://;
+        $action =~ s/::/\-/g;
+        $action =~ s/([a-z])([A-Z])/$1\_$2/g;
+        lc "\t$action"
+    } sort @actions;
+
+    return
+        join("\n", @header) . "\n"
+      . "These commands are currently available:\n\n"
+      . join("\n", @actions) . "\n";
+}
+
+sub help {
+    my $self = shift;
+    my $data = shift;
+    $data .= "::DATA";
+
+    my @header  = ();
+    my @content = ();
+
+    while (<DATA>) {
+        chomp;
+        push @header, $_;
+    }
+
+    if ($data =~ /^Scrappy::Action::/) {
+        if ($data ne 'Scrappy::Action::Help::DATA') {
+            while (<$data>) {
+                chomp;
+                push @content, $_;
+            }
+        }
+    }
+
+    return
+      join("\n", @header) . "\n"
+      . (@content ? join("\n", @content) . "\n" : "");
+}
+
+1;
+
+__DATA__
+
+Welcome to the Scrappy command-line interface.
+This application should be used to create new projects and
+execute various installed actions (under the Scrappy::Action namespace);
+
+* See `scrappy [COMMAND]` for more information on a specific command.

@@ -1,0 +1,1 @@
+Pkg5.test("foo");

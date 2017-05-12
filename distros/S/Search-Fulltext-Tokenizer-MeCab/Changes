@@ -1,0 +1,20 @@
+Revision history for Perl extension Search-Fulltext-Tokenizer-MeCab
+
+1.05 2013-10-20T15:58:17Z
+        - Uses croak instead of die. @__gfx__++
+
+1.04 2013-10-11T06:31:31Z
+        - Fixes manual
+
+1.03 2013-10-11T06:30:29Z
+        - Fixes manual
+
+1.02 2013-10-11T06:25:44Z
+        - Fixes manual
+
+1.01 2013-10-11T05:52:12Z
+        - Fixes manual
+
+1.00 2013-10-11T05:45:05Z
+        - Original version
+

@@ -1,0 +1,23 @@
+---
+abstract: 'read a sheet from Excel file into a simple arrayref of arrayrefs'
+author:
+  - 'Zoffix Znet <cpan@zoffix.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.013, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Spreadsheet-DataFromExcel
+requires:
+  Spreadsheet::ParseExcel: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/zoffixznet/Spreadsheet-DataFromExcel/issues
+  repository: git://github.com/zoffixznet/Spreadsheet-DataFromExcel.git
+version: 1.001003

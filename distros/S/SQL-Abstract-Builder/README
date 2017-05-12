@@ -1,0 +1,44 @@
+NAME
+    SQL::Abstract::Builder - Builds and executers relational queries
+
+SYNOPSIS
+        my @docs = query {"dbi:mysql:$db",$user} build {
+            -columns => [qw(id foo bar)],
+            -from => 'table1',
+            -key => 'id',
+        } include {
+            -columns => [qw(id baz glarch)],
+            -from => 'table2',
+            -key => 'table1_id',
+        } include {
+            -columns => [qw(id alfa)],
+            -from => 'table3',
+            -key => 'table1_id',
+        };
+
+DESCRIPTION
+    It gives you a very simple way to define fetch documents (rows and
+    related children) from your relational DB (instead of just rows).
+
+METHODS
+  query
+    Executes the built query. Takes either a DBIx::Simple connection or the
+    same arguments that are valid for "DBIx::Simple-"connect>.
+
+   Usage
+        my @docs = query {"dbi:mysql:$db",$user} ...
+        # OR
+        my @docs = query {$dbh} ...
+
+  build
+    Builds the query assuming the given table is the base.
+
+   Usage
+        my @refs = build { ... } ...
+
+  include
+    Includes the results of a "JOIN" on the given table when built.
+
+   Usage
+        my @refs = build { ... } include { ... }
+

@@ -1,0 +1,644 @@
+This is Version 0.21 of Spread::Message.
+	- There is some sample code in the examples directory it is provided
+	  as is, and may not even run at all. It is provided under the same
+	  terms and conditions as Spread::Message.
+
+To install do the normal stuff
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Note: you need a spread daemon running on port 4803 on localhost for the
+tests to succeed.
+
+NAME
+    Spread::Message - provide messaging using the Spread toolkit
+
+    This product uses software developed by Spread Concepts LLC for use in
+    the Spread toolkit. For more information about Spread see
+    http://www.spread.org
+
+SYNOPSIS
+        use Spread::Message;
+
+        my $mbox = Message->new(
+            spread_name => '4803@host',
+            name  => "down$$",
+            group => ['devices-down'],
+            #debug => 1,
+            member_sub  => \&process_control,
+            message_sub => \&process_data,
+            timeout_sub => \&heartbeat,
+        );
+
+        sub process_control
+        {
+            my $mbox = shift;
+            my $loop = shift;
+            # Process membership messages here. See examples
+        }
+
+        sub process_data
+        {
+            my $mbox = shift;
+            my $loop = shift;
+            # Process the data here. See examples
+        }
+
+        sub heartbeat
+        {
+            my $mbox = shift;
+            my $loop = shift;
+            # Process any timeouts here. See examples
+        }
+
+        while(1)
+        {
+            # Process different data as required
+            $mbox->rx(10,$loop);
+            $loop++;
+
+            # Extra processing of side effects created by the callbacks
+        }
+        $mbox->disconnect();
+
+    Other possibilites are:
+
+        # Connection
+        $mbox->connect;
+        $mbox->disconnect;
+
+        # Config
+        $mbox->configure(%config);
+        $spread_daemon = $mbox->spread_name;
+        $mbox->spread_name('3480@1.1.1.1');
+        $seed_name = $mbox->name;
+        $mbox->name('test');
+        $rv = $mbox->debug(); 
+        $mbox->debug(1);
+
+        # tx/rx messages
+        $mbox->send(@grps,$msg);
+        $mbox->sends(@grps,\%perlhash);
+        $hashref = $mbox->decode;
+        $msg_size = $mbox->poll;
+        $mbox->rx($timeout,@args);
+        $regular_msg = $mbox->get;
+        $msg = $mbox->getmsg($timeout);
+
+        # Object/Message details
+        $spread = $mbox->mbox;
+        @grps = $mbox->grps;
+        $sent_by = $mbox->sender;
+        $service_type = $mbox->type;
+        $message_type = $mbox->mess_type;
+        $same_endian = $mbox->endian;
+        $last_message = $mbox->msg;
+        $last_hashref = $mbox->command;
+        $is_new_message = $mbox->new_msg;
+        $time_last_received = $mbox->tm;
+        $timed_out = $mbox->timeout;
+        $mysperrorno = $mbox->error;
+        $whoami = $mbox->me;
+
+        # Test message
+        $mbox->control_msg;
+        $mbox->aimed_at_me;
+        $mbox->Is_unreliable_mess;
+        $mbox->Is_reliable_mess;
+        $mbox->Is_fifo_mess;
+        $mbox->Is_causal_mess;
+        $mbox->Is_agreed_mess;
+        $mbox->Is_safe_mess;
+        $mbox->Is_regular_mess;
+        $mbox->Is_self_discard;
+        $mbox->Is_reg_memb_mess;
+        $mbox->Is_transition_mess;
+        $mbox->Is_caused_join_mess;
+        $mbox->Is_caused_leave_mess;
+        $mbox->Is_caused_disconnect_mess;
+        $mbox->Is_caused_network_mess;
+        $mbox->Is_membership_mess;
+        $mbox->Is_reject_mess;
+        $mbox->Is_self_leave;
+
+        # Supplied Callbacks
+        $mbox->_member_sub
+        $mbox->_message_sub
+        $mbox->_error_sub
+        $mbox->_timeout_sub
+        $mbox->handle_commands_aimed_at_me
+
+DESCRIPTION
+    The Spread package provides a simple wrapper around the spread toolkit.
+    We try to provide a much higher level wrapper. By providing:
+
+        - Simple methods to send serialised Perl structures between programs
+        - Callback registration
+        - Extensible callbacks for command driven programs
+        - Lots of accesor functions
+        - Handling of incoming messages is supported via callbacks or
+        via direct polling for input. Its your choice :-)
+
+OBJECT CONFIGURATION
+        group => is an array ref of groups to subscribe to
+        debug => is a scalar variable the effects debugging output
+        name  => is a scalar variable that defines a Spread name. Must
+                 be uniq.
+
+        The following are the names of the callback config variables. Each
+        must be a CODE reference.
+
+        # These provide message gathering callbacks defined on the type of
+        # message received.
+        member_sub   =>  subroutine to handle membership messages.
+        message_sub  =>  subroutine to hanlde normal data messages
+        error_sub    =>  gets called when ever we find an error of some kind
+        timeout_sub  =>  called in the event of any timeout.
+
+        # If defined then this installs handle_commands_aimed_at_me() as the
+        # call back for each of the above and allows you to override bits and
+        # pieces. See CALLBACKS below
+        commands     => {
+            'default'  => subroutine to handle ALL default message
+            'new'      => subroutine to handle 'new' command
+            .
+            .
+        }
+
+METHODS
+  new()
+    Create a new object and get it configured.
+
+            my $mbox = Spread::Message->new(
+                            name        => $name,
+                            spread_name => '4803@localhost',
+                            group       => ['polling-ctl', 'polling-data'],
+                            member_sub  => \&my_memeber_callback,
+                            message_sub => \&my_message_callback,
+                            error_sub   => \&my_error_callback,
+                            timeout_sub => \&my_timeout_callback,
+                            debug       => 1,
+            );
+            die "Can't create a new message object" unless $mbox;
+
+    or
+
+            my $mbox = Spread::Message->new(
+                            name        => $name,
+                            spread_name => '4803@localhost',
+                            group       => ['polling-ctl', 'polling-data'],
+                            debug       => 1,
+                            commands    => {
+                                    'default'   => \&myhandlecommands;
+                            },
+            );
+            die "Can't create a new message object" unless $mbox;
+
+  configure()
+    Configure an object before getting connected. You can change the
+    configuration of an object at anytime. But make sure you disconnect and
+    then connect() again afterwards. The new method calls configure for you
+    in the right order. So, normally you wont want to call this method.
+
+    However, you may want to, so here is what you can do.
+
+            my $mbox = Spread::Message->new(
+                    name        => $name,
+                    spread_name => '4803@localhost',
+                    group       => ['polling-ctl', 'polling-data'],
+                    member_sub  => \&my_memeber_callback,
+                    message_sub => \&my_message_callback,
+                    error_sub   => \&my_error_callback,
+                    timeout_sub => \&my_timeout_callback,
+                    debug       => 0,
+            );
+            die "Can't create a new message object" unless $mbox;
+
+            # stuff happens
+
+            # Here we change the membership message call back at run time
+            $mbox->configure(member_sub => \&new_callback);
+
+            # more stuff happens and we eventually disconnect and reconnect
+            # to a different spread daemon. Same groups and call backs
+            $mbox->disconnect();
+            $mbox->configure( spread_name => '4803@newhost' );
+            $mbox->connect() || warn "Failed to attach to 4803@newhost";
+
+            # Change the debugging on the fly
+            $mbox->configure( debug => 1 );
+            $mbox->debug(1);
+
+    Configure defaults to:
+
+            name        => "pid$$"
+            group       => ['info']
+            debug       => 0
+            spread_name => '4803@localhost
+            member_sub  => sub { print something useful };
+            message_sub => sub { print something useful };
+            error_sub   => sub { print something useful };
+            timeout_sub => sub { print something useful };
+
+    You dont have to have callbacks defined. You can still use get() and
+    getmsg() to collect messages. Callbacks are only used when rx() is
+    called.
+
+    If you intend to use callbacks and sends() then consider configuring
+    your own command callbacks that will get triggered when a particular
+    command is recieved.
+
+        my $mbox = Spread::Message->new(
+            name        => $name,
+            spread_name => '4803@localhost',
+            group       => ['polling-ctl', 'polling-data'],
+            commands {
+                'default' => \&mysub,
+            },
+            debug       => 0,
+        );
+        die "Can't create a new message object" unless $mbox;
+
+        # stuff happens
+
+        # Here we change the command control back to the bundled
+        # handle_commands_aimed_at_me sub.
+        $mbox->configure(
+           commands => { 
+             'override' => \&Spread::Message::handle_commands_aimed_at_me
+           }
+        );
+
+  connect()
+    Connect an Spread::Message object to a Spread Daemon and join any groups
+    that have been configured. You almost need to use this method. It is
+    called by you after new() when you first create an object.
+
+            $mbox->connect();
+
+    You may wish to call this method if you disconnet() and later wish to
+    reconnect to the same or another Spread daemon.
+
+  join()
+    Join any groups that have been configured.
+
+            $mbox->join(); # Joins configured groups
+            $mbox->join('test'); # Joins the test group
+
+    Note: connect will join groups configured for you. So don't call join
+    unless you need to.
+
+    To find out what groups you have already joined use
+
+            my @joined_grps = $mbox->joined;
+
+  leave()
+    Leave one or more groups we have joined previously
+
+            $mbox->leave(@grps);
+
+  send()
+    Send a message to set of group/s
+
+            $mbox->send(@grps,$msg);
+
+  sends()
+    Send a message to set of group/s
+
+            $mbox->sends(@grps,$msg);
+
+    Note $msg is run through serialise() so that sends() can be used to send
+    Perl code between processes.
+
+  logit()
+    Send a message to set of logto group/s
+
+            $mbox->config( logto => ['a','b'] );
+            or
+            $mbox->logto('a','b');
+
+            $mbox->logit($msg); # Send the txt message
+
+    You set the groups/addresses you want the messages sent to by
+    configuring the logto variable.
+
+    The message is formatted such that the process id and hostname are
+    prepended to the message. Much like this:
+
+            Tue Jul 29 18:12:20 2003:[19239@localhost] Got status message
+
+  decode()
+    decode a message that has been sent using sends().
+
+            my $msg = $mbox->decode() || die "Can't decode';
+            print "The command is: ", $msg->{'cmd'}, "\n";
+            print "The structure is: ", Dumper($mbox->command), "\n";
+
+    As a side effect the variable $mbox->command() is set to hold the Perl
+    structure returned as a result of the decode.
+
+    See FINE GRAINED CALLBACKS below for further details.
+
+  disconnect()
+    Disconnect from the Spread Daemon and reset internal states. The Basic
+    configuration remains however all details of the Spread connection are
+    lost.
+
+            $mbox->disconnect();
+
+  poll()
+    Poll to see if there is a new message waiting for picking up. Returns
+    the size of the message waiting.
+
+            if($mbox->poll())
+            {
+                    #  Have a message to pick up
+            }
+            else
+            {
+                    #  Have NO message to pick up
+            }
+
+  get()
+    Pick up the next data message in the queue. get() will loop until a
+    regular data message has been received. It calls getmsg().
+
+            # wait for a data message - this could be a while
+            my $msg = $mbox->get();
+
+  rx()
+    receive next bunch of messages and trigger any call backs as required.
+    Also pass all other arguments to any called routines.
+
+            $mbox->rx($timeout,"loop 20");
+
+    Will have rx wait for $timeout seconds and call any of the defined
+    callback methods with a copy of $mbox and "loop 20" in this example.
+
+    Every callback function can expect to receive at least one paramater
+    which is a copy of the mbox and then any further paramters as defined in
+    the call to rx.
+
+    rx will return whatever the callback returns.
+
+  getmsg()
+    get the next mesage from our queue and set the current state details
+    accordingly. All the ACCESSOR functions below will be updated.
+
+            my $msg = $mbox->getmsg($timeout)
+
+            or
+
+            $mbox->getmsg($timeout);
+            my $msg = $mbox->msg;
+
+            or
+
+            $mbox->getmsg($timeout);
+            if($mbox->new_msg)
+            {
+                    my $msg = $mbox->msg;
+            }
+
+    getmsg will return the next message only if there is one to return.
+    Otherwise it returns a null string.
+
+    With debugging turned on getmsg will also print details of messages
+    received.
+
+ACCESSORS
+    mbox() - return the current Spread Mailbox connection id
+    grps() - return the current groups the last message was sent to
+    joined() - return the current groups we have joined succesfully
+    logto() - return the current groups we will log to
+    sender() - return the sender of the last message.
+    type() - return the service type of the last message.
+    mess_type() - return the message type of the last message.
+    reason() - return the reason we got the last message
+                        "$who joining"
+                        "$who leaving"
+                        "$who disconnecting"
+                        "Network change"
+                        'Transition for group '.$self->sender
+                        'membership message that left group '.$self->sender
+                        'Reject from '.$self->sender
+                        "regular message"
+                        "Error unknown message"
+        =cut
+
+        sub reason { $_[0]->{'reason'} = $_[1] if defined $_[1]; return
+        $_[0]->{'reason'}; }
+
+    endian() - return true if the last message has same endian
+    msg() - return the last message.
+    command() - return the last Perl structure decoded using the decode()
+    method.
+    new_msg() - return true if the last message was a new message indicates
+    and error when false
+    tm() - return the time the last message was received
+    timeout() - did the last rx() call time out?
+    error() - return the last error as defined by Spread sperror
+    me() - return my name as Spread knows it. This is needed to work out if
+    a message was sent to me directly rather than via a group. It is
+    effectively my private group name.
+    spread_name() - return the Spread daemon details
+    name() - return our defined name used when we first connected.
+    debug() - return our debug level
+    control_msg() - Is the current message a control message for me.
+        That is, does this message eminate from a .*-ctl group that I am
+        joined to OR is it directed specifically at me.
+
+    aimed_at_me - Is the previous message aimed specifically at me
+
+    These methods return details of the current message. See the Spread
+    documentation for further details.
+
+    Is_unreliable_mess()
+    Is_reliable_mess()
+    Is_fifo_mess()
+    Is_causal_mess()
+    Is_agreed_mess()
+    Is_safe_mess()
+    Is_regular_mess()
+    Is_self_discard()
+    Is_reg_memb_mess()
+    Is_transition_mess()
+    Is_caused_join_mess()
+    Is_caused_leave_mess()
+    Is_caused_disconnect_mess()
+    Is_caused_network_mess()
+    Is_membership_mess()
+    Is_reject_mess()
+    Is_self_leave()
+
+CALLBACKS
+    Some very simple call back are provided. You should override these when
+    calling new().
+
+    They basically print out a little information and then return. These are
+    defined as:
+
+            Spread::Message::_member_sub
+
+            Spread::Message::_message_sub
+
+            Spread::Message::_error_sub
+
+            Spread::Message::_timeout_sub
+
+    You can use them if you like. But I wouldn't :-)
+
+FINE GRAINED CALLBACKS
+    Some fine grained callback subs are provided that you can extend. This
+    makes creating Message programms a little easier. We provide a simple
+    command interpreter that can handle commands sent to us using the sends
+    method. It assumes the messages sent are done in this form:
+
+            %msg = (
+                    cmd   => 'some sort of command',
+                    .
+                    .
+            );
+
+    The only requirement is that the hashref sent to sends() has a key
+    called cmd, and that cmd contains a valid command name to call. Also,
+    you must sends() the message to a specific Spread user not to a group.
+    That is, aimed_at_me() must return true when the message is received.
+
+    We automatically handle commands where cmd is:
+
+            shut or stop or die    => program dies
+            restart                => program restarts itself
+            clone                  => program creates another copy of self
+            status                 => program sends() status info
+
+    It assumes you have defined a 'default' function. If not then a message
+    is printed.
+
+    You can define your own commands to override the ones we provide. Or you
+    can provide a single 'override' function. This is done like this:
+
+    In the receiving application:
+
+        use Data::Dumper;
+
+        sub new 
+        { 
+            # We get the Spread::Message object and any args sent to rx()
+            my($mbox,@args) = @_;
+
+            # pick up decode command
+            my %msg = %{$mbox->command};
+        
+            print "new() called with args @args\n"; 
+            print "and message >",$mbox->msg,"<\n";
+        }
+
+        sub mydefault 
+        { 
+            # We get the Spread::Message object and any args sent to rx()
+            my($mbox,@args) = @_;
+
+            # pick up decoded command
+            my %msg = %{$mbox->command};
+        
+            print "mydefault() called with args @args\n"; 
+            print "and message >",$mbox->msg,"<\n";
+        }
+
+        my $mbox = Message->new(
+            .
+            .
+            name  => "fping$$",
+            group => ['polling-ctl', 'polling-data'],
+            .
+            # This says use the fine grained commands
+            commands    => {
+                'new'       => \&new,       # handle 'new' commands
+                'default'   => \&mydefault, # handle left over commands
+
+                # Only define this if you want to catch ALL the commands
+                #'override'  => \&myoverride,
+            },
+            .
+            .
+        );
+
+        while(1)
+        {
+            # Process different data as required
+            $mbox->rx(30,'arg1','arg2');
+        }
+
+    In the sending application:
+
+        sub process_control
+        {
+            my $mbox = shift;
+
+            # A global array to hold stuff
+            @Settings::pingers = grep(/fping/,$mbox->grps);
+        }
+
+        my $mbox = Message->new(
+            .
+            group => ['polling-ctl', 'polling-data'],
+            member_sub  => \&process_control,
+            .
+        );
+
+        my %msg = (
+            cmd   => 'new'
+            .
+            .
+        );
+
+        # Use rx() to receive any membership messages and make sure you snarf
+        # away the id of the receiving application. Should exist in
+        # @Settings::pingers once a receiving application has joined a group
+        # of ours
+        $mbox->rx(30,undef);
+        my $id = shift(@Settings::pingers);
+
+        $mbox->sends($id,\%msg);   # Send new command specifically to $id
+        $msg{'cmd'} = 'restart';
+        $mbox->sends($id,\%msg);   # Send restart command specifically to $id
+        $msg{'cmd'} = 'funny';
+        $mbox->sends($id,\%msg);   # Send funny command, will call default
+        $msg{'cmd'} = 'clone';
+        $mbox->sends($id,\%msg);   # Send clone command specifically to $id
+        $msg{'cmd'} = 'stop';
+        $mbox->sends($id,\%msg);   # Send stop command specifically to $id
+
+Bugs and othet stuff
+    There are bound to be bugs in this code. It is first cut code that even
+    though used extensively hasn't been used broadly. By that I mean, the
+    bits of this code that I have used, works well for me, but my use isn't
+    your use, and you may stumble across bugs.
+
+    If you do find bugs, then please go to the effort of reporting it in a
+    manner in which I can get a good understanding of what your talking
+    about.
+
+    Please note: I have no affiliation with The Spread Group Communication
+    Toolkit. I also know next to nothing about messaging and group
+    communication, so dont' ask me about these things.
+
+TODO
+    Lots-n-lots
+
+Copyright
+    Copyright 2003-2006, Mark Pfeiffer
+
+    This code may be copied only under the terms of the Artistic License
+    which may be found in the Perl 5 source kit.
+
+    Use 'perldoc perlartistic' to see the Artistic License.
+
+    Complete documentation for Perl, including FAQ lists, should be found on
+    this system using `man perl' or `perldoc perl'. If you have access to
+    the Internet, point your browser at http://www.perl.org/, the Perl Home
+    Page.
+

@@ -1,0 +1,51 @@
+{
+   "abstract" : "wrapper around the Slurm sshare command",
+   "author" : [
+      "Tom Payerle <payerle@umd.edu>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Slurm-Sshare",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Cwd" : "0",
+            "File::Basename" : "0",
+            "Test::More" : "0.98_05"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Accessor" : "0",
+            "Getopt::Long" : "0",
+            "Pod::Usage" : "0",
+            "base" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "version" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v1.2.2"
+}

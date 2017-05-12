@@ -1,0 +1,108 @@
+NAME
+    Sub::StopCalls - stop sub calls (make it a constant)
+
+SYNOPSIS
+        my $i = 0;
+
+        sub boo {
+            return foo();
+        }
+        sub foo {
+            $i++;
+            return Sub::StopCalls::stop();
+        }
+
+        print "$i\n"; # 0
+        boo();
+        print "$i\n"; # 1
+        boo();
+        print "$i\n"; # 1
+
+DESCRIPTION
+    Basicly you can do the following in a function to mean "Hey, You! You,
+    who called me, stop calling me, I will always return the same result":
+
+        return Sub::StopCalls::stop( @result );
+
+    Still no idea how to use? Ok, here some use cases:
+
+USE CASES
+  conditional constants
+    Classic "if DEBUG" thing:
+
+        sub debug {
+            return Sub::StopCalls::stop() unless $ENV{'MY_APP_DEBUG'};
+            ...
+        }
+
+    Or logger:
+
+        package My::Logger;
+        sub warn {
+            return Sub::StopCalls::stop() if $self->{max_level} < LEVEL_WARN;
+            ...
+        }
+
+  accessors to singletons
+        package MyApp;
+    
+        my $system;
+        sub system {
+            $system ||= do {
+                ... init system object ...
+            };
+            return Sub::StopCalls::stop( $system );
+        }
+
+  hooks, triggers and callbacks
+        sub trigger {
+            my $self = shift;
+            my @triggers = $self->find_triggers(caller);
+            return Sub::StopCalls::stop() unless @triggers;
+
+            ...
+        }
+
+FUNCTIONS
+  stop
+    Does the job. Replaces call on upper level with whatever is passed into
+    the function. Expected usage:
+
+        return Sub::StopCalls::stop(...) if ...;
+
+    Some details
+
+   context
+    Result depends on context of the call that is replaced. Nothing special
+    about void or array context, however, in scalar context if more than one
+    argument passed into the function then number of elements returned:
+
+        # replaces with undef
+        sub foo { return Sub::StopCalls::stop(); }
+        # replaces with 'const'
+        sub foo { return Sub::StopCalls::stop( 'const' ); }
+    
+        # replaces with number of element in @a,
+        # but only if @a > 1, otherwise first element or undef
+        return Sub::StopCalls::stop( @a );
+
+   arguments
+    Arguments of the replaced call also "stopped", for example:
+
+        for (1..10) {
+            function_that_stops_calls( other(...) );
+        }
+
+    "other(...)" called only once. Second iteration just jumps over.
+
+    It's good in theory, but in some situations it can result in bugs.
+
+   threads
+    This module is not thread-safe at the moment.
+
+AUTHOR
+    Ruslan Zakirov <ruz@bestpractical.com>
+
+LICENSE
+    Under the same terms as perl itself.
+

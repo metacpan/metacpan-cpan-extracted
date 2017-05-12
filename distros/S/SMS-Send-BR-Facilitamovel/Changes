@@ -1,0 +1,15 @@
+Revision history for Perl extension SMS::Send::BR::Facilitamovel.
+
+0.03  Tue Fev 16 15:30:00 2016
+        - Add META
+        - Placate Perl::Critic
+        - License Informaion
+        - Reestructure code
+
+0.02  Tue Feb  8 19:00:00 2016
+        - Fix tests
+
+0.01  Tue Feb  2 23:06:25 2016
+	- original version; created by h2xs 1.23 with options
+		-AX SMS::Send::BR::Facilitamovel
+

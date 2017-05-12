@@ -1,0 +1,14 @@
+template: delete-domain.tt
+
+vars:
+  domain: 03e.co.te
+
+input_assertions:
+  class: SRS::EPP::Command::Delete::Domain
+
+output_assertions:
+  count:
+    - [ '//epp:resData', 0, 'EPP: No resData in the response' ]
+  match:
+  attr_is:
+    - [ '//epp:result', 'code', 2201, 'EPP: Successful response code' ]

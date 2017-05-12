@@ -1,0 +1,42 @@
+NAME
+    Sledge::Authorizer::BasicAuth - Basic Authentication module for Sledge
+
+SYNOPSIS
+      package Your::Authorizer;
+      use base qw(Sledge::Authorizer::BasicAuth);
+      use Your::Data::User;
+
+      __PACKAGE__->error_template('/401.html');
+      __PACKAGE__->realm('SECRET PAGE');
+
+      sub authorize {
+          my $self = shift;
+          my $page = shift;
+     
+          return if $page->session->param('user');
+     
+          my ($login_id, $passwd) = $self->basic_auth($page) or return;
+     
+          my $user = Your::Data::User->search(login_id => $login_id, passwd => $passwd)->first;
+          if ($user) {
+              $page->session->param(user => $user);
+          } else {
+              $self->show_error_page($page);
+          }
+      }
+
+DESCRIPTION
+    Sledge::Authorizer::BasicAuth is Basic Authentication module for Sledge.
+
+AUTHOR
+    MATSUNO Tokuhiro <tokuhirom@gmail.com>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+THANKS TO
+    Tatsuhiko Miyagawa.
+
+SEE ALSO
+    Bundle::Sledge
+

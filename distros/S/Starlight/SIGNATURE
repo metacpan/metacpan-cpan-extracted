@@ -1,0 +1,89 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 45824b29e74a27551816defc64f311e18712a3f8 Build.PL
+SHA1 b8163456581c1edd7d1a229171474e4779b9943f Changes
+SHA1 16c2bdf7bc020bf82b36a48121d946fa74490448 LICENSE
+SHA1 934e5bb3d3d59d955fbf1aed57ef84c7dc2cfc0d MANIFEST
+SHA1 8db1be1ca479d3b130569f025fba70fbe7e7f075 MANIFEST.SKIP
+SHA1 b98cedec86bc30702377d291ce7aecc9cc73b29f META.json
+SHA1 a1d7d0459227e75aa9d55497612ebff7117cbd88 META.yml
+SHA1 410144716e91eaf1ab10d8a851f5170a117e2a59 Makefile.PL
+SHA1 af450052c7002a93cdb22898b50be6d8a9d8c9fa README
+SHA1 7f7441e2ac57b8dc0969db4414f95d3eace19d8b README.md
+SHA1 9032740f6c463118e8b899a33a34b408a85442fb examples/ca.crt
+SHA1 a617034a3db7806fb2839327c1487eeb7f079491 examples/dump.psgi
+SHA1 71e260e97205f7cd64d03e467aa6183c1c625c85 examples/hello.psgi
+SHA1 b90a21bd98935877f549c576bfc114f14362619c examples/localhost.crt
+SHA1 4b66749be45d23101582764ef2b08368d9d71a3b examples/localhost.key
+SHA1 a95d269ef5a2a3e78de538a314fe215a2c37d38e examples/mojo.pl
+SHA1 2463dd0a515d20f57f49277ef884631f6e4614fe examples/test_fork_exit.pl
+SHA1 ba38126313a66909cc7934ef61831d7766989d97 examples/test_proxy.sh
+SHA1 2390ae31d9ee0a7ec4b1c70db96958f5a36e4c96 examples/test_rt40565.pl
+SHA1 ac8f68c8a6b75f740e73def9ffcc2d34722f153f inc/Module/Build/My.pm
+SHA1 58ed7c632067016bcba4cae76f343ac1902bf650 lib/Plack/Handler/Starlight.pm
+SHA1 944674972a460551d8f72f3e0356efc0293b161f lib/Starlight.pm
+SHA1 0f9f3055915d9fa17f42deeded14f2886dbe5557 lib/Starlight/Server.pm
+SHA1 7f99eaa5598d291e32cdde2e58db93966c399e79 script/starlight.pl
+SHA1 a6b7d27559b430bab52e6b475a2995800e8732a4 t/00base-hello.psgi
+SHA1 8cc9e727a74febde4a2320046c5cd1bc8353b3fa t/00use.t
+SHA1 f0b58d8655f3ffcf0c3849c23aeb032ce8da3099 t/01plack-test.t
+SHA1 7b218353ee4f6dd9f4fe76977c33ab579b14030d t/03post.t
+SHA1 a944042bd6dc2bba57c0873dc4f6a25472c1b89d t/04-bumpy-life.t
+SHA1 5dcb86c5be5f1f11015eb674689ad2a440b36748 t/05server-header.t
+SHA1 ec98178245af33cd3a564ca30e56f0b7c18cb665 t/06harakiri.t
+SHA1 74675c02b8378fd0f1111b53e6884fb61a30e406 t/07remote_port.t
+SHA1 639c3132899217ab8372891ada321587e0b71223 t/08chunked_req.t
+SHA1 cfe969c8dde4a79a37258c8f6ad35024089f927e t/09chunked_zero_length.t
+SHA1 62fe3c1555d810a5c3b87c5ce6068fe4f269aa92 t/10unix_domain_socket.t
+SHA1 ce6d0ba48039ff610f2a2ea386115656df0c99a7 t/50server.t
+SHA1 c68bce5e29ccb7dabdb36e5cdfec865256937c0e t/60ssl.t
+SHA1 69baaf62306a8ec52e6fd706571e19a36ecec465 t/61ssl_largebody.t
+SHA1 90353a99ac0f719b6f3e58029804d8556cedc2ab xt/check_changes.t
+SHA1 1c27e5840b0154e44120bc2edc02fbb507c76819 xt/consistent_version_numbers.t
+SHA1 67bb4c141ea95809f3db2d526ce91d9e6d894756 xt/copyright.t
+SHA1 650dccfa9b6f5a98cf731c89041bea8935dbc623 xt/cover.pl
+SHA1 88601c7f543229c6a47c92ec14d4088b4db85385 xt/cpan_changes.t
+SHA1 4f8f90e1c421bfd592e6806ec4d0a75f3d56406a xt/cpan_meta.t
+SHA1 48a67f01c35122165bb633264cba72d984d7a89e xt/dist_manifest.t
+SHA1 f5aac658ae1888964274e68d179413782082b7ad xt/distribution.t
+SHA1 af47b82dbac975ba494dfe6849d17d1e02941ac6 xt/eol.t
+SHA1 0f31d18a6a5d14438f2b9748183c120449ce2f02 xt/kwalitee.t
+SHA1 6e7f9dde7560793bcb40acc41561e07d163ad6d1 xt/minimumversion.t
+SHA1 1a1cd76027c4cc73ec56beadaf56680bbac1fd4a xt/no_tabs.t
+SHA1 f50baaa3e09228d29a19deef4ee8983a5aa702bd xt/pod_coverage.t
+SHA1 bef7d46eb5cbc3e67956d4e823ec199f41ab9268 xt/pod_spell.t
+SHA1 7a0aa034bf23f0fccce8071bec98f5f2d2e373d9 xt/pod_spellrc
+SHA1 87cb53d4ad0162a872d5c70013fc41719e030555 xt/pod_syntax.t
+SHA1 f2dd15ffc2836703f46f2622702e1676891eed21 xt/portability_files.t
+SHA1 a38994922fda6d64e2ee75198fadc464a221fea9 xt/signature.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJYGIzCAAoJEFZiF/PEOVycmnIP/ArD7BwAD5Ca0WdH860d7L4n
+ZqAak2OdJDrz7acaEu9DbAuSw/FAYFeagHnQkng68FWGd1by/n0ZV3Op1Kuw5iEj
+hQCOw6EvwNfFZwzxnlZHcqeKEs3w+iAD39/hmtCSGCobT9HR3TSi4DPxv9OKtA/2
+x5kDd9P7Mmzi/5OKAxfIIdgkcg9NZaiu/MOW51T8qHDZ4p3Ebnq//bRbY3pXaZ/l
+YcXzyMRQSgKCpCyAlGhz6A2PMe18vgyDMJeW4C9yWoZI+VLxmdAaCAwtJg0mEjMG
+yT6ZC3fKQQ99gQIkLoRsXFj+nLHNx3iDzdFRii0g6a/lKHj1wpmeUtaydQpjUk0T
+ASmXCZyWeR8PqzXto22uQVpcBoKIGhE7TJcuhT7cY59ZXO5vwGAjZsaBos9ZnSx5
+/1hjmcbbZMCBJ8zfLpIpbItprQjg3KnZr2UbW0xS3dJdWzIdWODyCMSnjFxltobN
+onfXSz6HcMD4DsJryYniBAsPaQ/hCDTCwsKKlb8gZm9x6R2GNGfn/2kXadWlRhKi
+3OebKewd/HiYSfSBnBjOymMaYACHJhuJA97k6AZGMzcL+cvmQVP3NS9RW8kx4zy/
+mnf9COm4NukmvvbjgtmMyOuu9fzY5LxXvQdyUTnQM7TQzQ213x1Ljp38l48HClal
+HYnVTo9VQrlsQnjoiITR
+=5eKA
+-----END PGP SIGNATURE-----

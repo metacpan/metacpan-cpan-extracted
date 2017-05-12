@@ -1,0 +1,61 @@
+####################################################################
+# Copyright @ 2002 Joseph A. White and The Institute for Genomic
+#       Research (TIGR)
+# All rights reserved.
+####################################################################
+
+Revision history for Perl extension SlideMap.
+
+0.01  Wed Aug 22 17:20:03 2001
+	- original version; created by h2xs 1.20 with options
+		-A -X -n SlideMap
+
+1.0  Tue Jan 29 11:48:00 2002
+	First release version of SlideMap in fully functional form.
+	Items that need to be implemented:
+		Lucidia print pattern algorithm: nearly done
+		Repeat mode for MD/MD3 arrayers; 
+			note: use repeat as if it were a pen within a block
+		Multi-algorithm convert functions based on _machine
+
+1.1	 Mon Feb 4 22:00:00 2002
+	Update finished; fully functional version with support for Lucidia 
+	array printer.
+	Changes:
+	--added _x_repeat, and _y_repeat to main constructor parameters
+	--added convert algorithms for Lucidia printer
+	--changed method of handling repeated blocks: now included as part
+		of the conversion algorithms
+	--convert_well and convert_spot are now wrappers that test _machine
+		and call appropriate subroutines.
+	--changed _repeat to act as a flag for 'repeat' mode on MD/MD3 arrayers
+	--added a get_meta method as a convenience to return meta_row, meta_col,
+		sub_row and sub_col for array indeces.  
+	Items to be added in future:
+	--method to handle spot 'pitch' in micrometers, and number of spots
+		desired.  Parameters are in place to accept x_pitch and y_pitch,
+		but these are not currently used.  
+	Bug fix:
+	--In order to support the Stanford printers, the $_slide_col calculated
+		during conversion must be complemented with _xspacing.  If statements
+		were added to the default convert methods (this is not an issue for 
+		the LUcidia printer).  
+
+1.2  Thur Feb 7 16:20:00 2002
+
+	Replaced multiple subroutines with algorithms for different arrayers with 
+	single subroutine (one each for convert_spot and convert_well) that 
+	dynamically generates an arrayer specific algorithm for the current 
+	SlideMap object.  The subroutines are created as code refs (annonymous
+	subroutines) that are then associated with class variables.  They are 
+	called in the &initialize subroutine.  This change was made for ease of 
+	maintenance and execution speed; the arrayer specific subroutines should 
+	execute faster without the conditional code.  
+	
+	Two additional get methods, showConvertSpot and showConvertWell, were 
+	added to print to screen the current algorithms in use by SlideMap.  
+	
+	test.pl was updated to run 8 tests in various configurations.  
+
+
+		

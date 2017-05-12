@@ -1,0 +1,29 @@
+String::Unique
+
+Generate deterministic unique strings based on date
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc String::Unique
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007, 2008 Wells Fargo
+Copyright (C) 2011 Christian Werner Sr.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

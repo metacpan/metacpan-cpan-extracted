@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE NewsML PUBLIC "urn:newsml:iptc.org:20001006:NewsMLv1.0.dtd:1" "../DTD/NewsMLv1.0.dtd">
+<NewsML>
+	<Catalog Href="http://www.iptc.org/site/NewsML/catalog/catalog.IptcMasterCatalog.xml"/>
+	<NewsEnvelope>
+		<DateAndTime>20020124T120000+0000</DateAndTime>
+	</NewsEnvelope>
+	<NewsItem>
+		<Identification>
+			<NewsIdentifier>
+				<ProviderId>iptc.org</ProviderId>
+				<DateId>20001006</DateId>
+				<NewsItemId>catalog.IptcMasterCatalog</NewsItemId>
+				<RevisionId PreviousRevision="10" Update="N">11</RevisionId>
+				<PublicIdentifier>urn:newsml:iptc.org:20001006:catalog.IptcMasterCatalog:11</PublicIdentifier>
+			</NewsIdentifier>
+		</Identification>
+		<NewsManagement>
+			<NewsItemType FormalName="Catalog"/>
+			<FirstCreated>20001030T120000+0000</FirstCreated>
+			<ThisRevisionCreated>20020124T120000+0000</ThisRevisionCreated>
+			<Status FormalName="Usable"/>
+		</NewsManagement>
+		<NewsComponent>
+			<ContentItem>
+				<DataContent>
+					<Catalog>
+						<!--This Resource is the current Catalog-->
+						<Resource>
+							<Urn>urn:newsml:iptc.org:20001006:catalog.IptcMasterCatalog:11</Urn>
+							<Url>http://www.iptc.org/site/NewsML/catalog/catalog.IptcMasterCatalog.xml</Url>
+						</Resource>
+						<!--This Resource is the NewsML version 1.0 DTD-->
+						<Resource>
+							<Urn>urn:newsml:iptc.org:20001006:NewsMLv1.0.dtd:1</Urn>
+							<Url>http://www.iptc.org/site/NewsML/specification/NewsMLv1.0.dtd.xml</Url>
+						</Resource>
+						<!--This Resource is the NewsML version 1.0 Functional Specification-->
+						<Resource>
+							<Urn>urn:newsml:iptc.org:20001006:NewsMLv1.0.fs:1</Urn>
+							<Url>http://www.iptc.org/site/NewsML/specification/NewsMLv1.0.fs.xml</Url>
+						</Resource>
+						<!--Within the scope of an invocation of this Catalog, the following IPTC vocabularies will serve as default vocabularies for specific NewsML elements and attributes as declared in the Context attributes of the DefaultVocabularyFor elements-->
+						<!--Start of IPTC vocabularies-->
+						<Resource>
+							<Urn>urn:newsml:iptc.org:20001006:topicset.iptc-confidence:1</Urn>
+							<Url>http://www.iptc.org/site/NewsML/topicsets/topicset.iptc-confidence.xml</Url>
+							<DefaultVocabularyFor Scheme="IptcConfidence" Context="@Confidence"/>
+						</Resource>
+						<Resource>
+							<Urn>urn:newsml:iptc.org:20001006:topicset.iptc-format:3</Urn>
+							<Url>http://www.iptc.org/site/NewsML/topicsets/topicset.iptc-format.xml</Url>
+							<DefaultVocabularyFor Scheme="IptcFormat" Context="Format"/>
+						</Resource>
+						<Resource>
+							<Urn>urn:newsml:iptc.org:20001006:topicset.iptc-genre:3</Urn>
+							<Url>http://www.iptc.org/site/NewsML/topicsets/topicset.iptc-genre.xml</Url>
+							<DefaultVocabularyFor Scheme="IptcGenre" Context="Genre"/>
+						</Resource>
+						<Resource>
+							<Urn>urn:newsml:iptc.org:20001006:topicset.iptc-howpresent:1</Urn>
+							<Url>http://www.iptc.org/site/NewsML/topicsets/topicset.iptc-howpresent.xml</Url>
+							<DefaultVocabularyFor Scheme="IptcHowPresent" Context="@HowPresent"/>
+						</Resource>
+						<Resource>
+							<Urn>urn:newsml:iptc.org:20001006:topicset.iptc-importance:1</Urn>
+							<Url>http://www.iptc.org/site/NewsML/topicsets/topicset.iptc-importance.xml</Url>
+							<DefaultVocabularyFor Scheme="IptcImportance" Context="@Importance"/>
+						</Resource>
+						<Resource>
+							<Urn>urn:newsml:iptc.org:20001006:topicset.iptc-labeltype:1</Urn>
+							<Url>http://www.iptc.org/site/NewsML/topicsets/topicset.iptc-labeltype.xml</Url>
+							<DefaultVocabularyFor Scheme="IptcLabelTypes" Context="LabelType"/>
+						</Resource>
+						<Resource>
+							<Urn>urn:newsml:iptc.org:20001006:topicset.iptc-mediatype:2</Urn>
+							<Url>http://www.iptc.org/site/NewsML/topicsets/topicset.iptc-mediatype.xml</Url>
+							<DefaultVocabularyFor Scheme="IptcMediaTypes" Context="MediaType"/>
+						</Resource>
+						<Resource>
+							<Urn>urn:newsml:iptc.org:20001006:topicset.iptc-metadatatype:1</Urn>
+							<Url>http://www.iptc.org/site/NewsML/topicsets/topicset.iptc-metadatatype.xml</Url>
+							<DefaultVocabularyFor Scheme="IptcMetadataTypes" Context="MetadataType"/>
+						</Resource>
+						<Resource>
+							<Urn>urn:newsml:iptc.org:20001006:topicset.iptc-mimetype:1</Urn>
+							<Url>http://www.iptc.org/site/NewsML/topicsets/topicset.iptc-mimetype.xml</Url>
+							<DefaultVocabularyFor Scheme="IptcMimeTypes" Context="MimeType"/>
+						</Resource>
+						<Resource>
+							<Urn>urn:newsml:iptc.org:20001006:topicset.iptc-newsitemtype:2</Urn>
+							<Url>http://www.iptc.org/site/NewsML/topicsets/topicset.iptc-newsitemtype.xml</Url>
+							<DefaultVocabularyFor Scheme="IptcNewsItemType" Context="NewsItemType"/>
+						</Resource>
+						<Resource>
+							<Urn>urn:newsml:iptc.org:20001006:topicset.iptc-notation:1</Urn>
+							<Url>http://www.iptc.org/site/NewsML/topicsets/topicset.iptc-notation.xml</Url>
+							<DefaultVocabularyFor Scheme="IptcNotation" Context="Notation|@Notation"/>
+						</Resource>
+						<Resource>
+							<Urn>urn:newsml:iptc.org:20001006:topicset.iptc-ofinterestto:1</Urn>
+							<Url>http://www.iptc.org/site/NewsML/topicsets/topicset.iptc-ofinterestto.xml</Url>
+							<DefaultVocabularyFor Scheme="IptcOfIterestTo" Context="OfInterestTo"/>
+						</Resource>
+						<Resource>
+							<Urn>urn:newsml:iptc.org:20001006:topicset.iptc-priority:1</Urn>
+							<Url>http://www.iptc.org/site/NewsML/topicsets/topicset.iptc-priority.xml</Url>
+							<DefaultVocabularyFor Scheme="IptcPriority" Context="Priority"/>
+						</Resource>
+						<Resource>
+							<Urn>urn:newsml:iptc.org:20001006:topicset.iptc-property:2</Urn>
+							<Url>http://www.iptc.org/site/NewsML/topicsets/topicset.iptc-property.xml</Url>
+							<DefaultVocabularyFor Scheme="IptcProperty" Context="Property"/>
+						</Resource>
+						<Resource>
+							<Urn>urn:newsml:iptc.org:20001006:topicset.iptc-provider:3</Urn>
+							<Url>http://www.iptc.org/site/NewsML/topicsets/topicset.iptc-provider.xml</Url>
+							<DefaultVocabularyFor Scheme="IptcProvider" Context="Provider"/>
+						</Resource>
+						<Resource>
+							<Urn>urn:newsml:iptc.org:20001006:topicset.iptc-relevance:1</Urn>
+							<Url>http://www.iptc.org/site/NewsML/topicsets/topicset.iptc-relevance.xml</Url>
+							<DefaultVocabularyFor Scheme="IptcRelevance" Context="Relevance"/>
+						</Resource>
+						<Resource>
+							<Urn>urn:newsml:iptc.org:20001006:topicset.iptc-role:1</Urn>
+							<Url>http://www.iptc.org/site/NewsML/topicsets/topicset.iptc-role.xml</Url>
+							<DefaultVocabularyFor Scheme="IptcRole" Context="Role"/>
+						</Resource>
+						<Resource>
+							<Urn>urn:newsml:iptc.org:20001006:topicset.iptc-status:1</Urn>
+							<Url>http://www.iptc.org/site/NewsML/topicsets/topicset.iptc-status.xml</Url>
+							<DefaultVocabularyFor Scheme="IptcStatus" Context="Status|FutureStatus"/>
+						</Resource>
+						<Resource>
+							<Urn>urn:newsml:iptc.org:20001006:topicset.iptc-subjectcode:5</Urn>
+							<Url>http://www.iptc.org/site/NewsML/topicsets/topicset.iptc-subjectcode.xml</Url>
+							<DefaultVocabularyFor Scheme="IptcSubjectCodes" Context="Subject|SubjectMatter|SubjectDetail"/>
+						</Resource>
+						<Resource>
+							<Urn>urn:newsml:iptc.org:20001006:topicset.iptc-subjectqualifier:5</Urn>
+							<Url>http://www.iptc.org/site/NewsML/topicsets/topicset.iptc-subjectqualifier.xml</Url>
+							<DefaultVocabularyFor Scheme="IptcSubjectQualifiers" Context="SubjectQualifier"/>
+						</Resource>
+						<Resource>
+							<Urn>urn:newsml:iptc.org:20001006:topicset.iptc-topictype:2</Urn>
+							<Url>http://www.iptc.org/site/NewsML/topicsets/topicset.iptc-topictype.xml</Url>
+							<DefaultVocabularyFor Scheme="IptcTopicType" Context="TopicType|TopicSet"/>
+						</Resource>
+						<Resource>
+							<Urn>urn:newsml:iptc.org:20001006:topicset.iptc-urgency:1</Urn>
+							<Url>http://www.iptc.org/site/NewsML/topicsets/topicset.iptc-urgency.xml</Url>
+							<DefaultVocabularyFor Scheme="IptcUrgency" Context="Urgency"/>
+						</Resource>
+						<Resource>
+							<Urn>urn:newsml:iptc.org:20011101:topicset.iptc-videocoder:2</Urn>
+							<Url>http://www.iptc.org/site/NewsML/topicsets/topicset.iptc-videocoder.xml</Url>
+							<DefaultVocabularyFor Context="//Characteristics/Property[@FormalName='VideoCoder']/@Value"/>
+						</Resource>
+						<Resource>
+							<Urn>urn:newsml:iptc.org:20011101:topicset.iptc-audiocoder:1</Urn>
+							<Url>http://www.iptc.org/site/NewsML/topicsets/topicset.iptc-audiocoder.xml</Url>
+							<DefaultVocabularyFor Context="//Characteristics/Property[@FormalName='AudioCoder']/@Value"/>
+						</Resource>
+						<Resource>
+							<Urn>urn:newsml:iptc.org:20011101:topicset.iptc-colorspace:1</Urn>
+							<Url>http://www.iptc.org/site/NewsML/topicsets/topicset.iptc-colorspace.xml</Url>
+							<DefaultVocabularyFor Context="//Characteristics/Property[@FormalName='ColorSpace']/@Value"/>
+						</Resource>
+						<Resource>
+							<Urn>urn:newsml:iptc.org:20011101:topicset.iptc-characteristicsproperty:1</Urn>
+							<Url>http://www.iptc.org/site/NewsML/topicsets/topicset.iptc-characteristicsproperty.xml</Url>
+							<DefaultVocabularyFor Scheme="CharacteristicsProperty" Context="//Characteristics//Property"/>
+						</Resource>
+						<!--End of IPTC vocabularies-->
+						<!--The following non-IPTC vocabularies are provided as useful resources but are not declared in this Catalog as default vocabularies.-->
+						<!--Start of ISO vocabularies-->
+						<Resource>
+							<Urn>urn:newsml:iptc.org:20001006:topicset.iso-country:1</Urn>
+							<Url>http://www.iptc.org/site/NewsML/topicsets/topicset.iso-country.xml</Url>
+						</Resource>
+						<Resource>
+							<Urn>urn:newsml:iptc.org:20001006:topicset.iso-currency:1</Urn>
+							<Url>http://www.iptc.org/site/NewsML/topicsets/topicset.iso-currency.xml</Url>
+						</Resource>
+						<Resource>
+							<Urn>urn:newsml:iptc.org:20001006:topicset.iso-language:2</Urn>
+							<Url>http://www.iptc.org/site/NewsML/topicsets/topicset.iso-language.xml</Url>
+						</Resource>
+						<!--End of ISO vocabularies-->
+						<!--Start of NAICS vocabularies-->
+						<Resource>
+							<Urn>urn:newsml:iptc.org:20001006:topicset.naics-classofindustry:1</Urn>
+							<Url>http://www.iptc.org/site/NewsML/topicsets/topicset.naics-classofindustry.xml</Url>
+						</Resource>
+						<!--End of NAICS vocabularies-->
+						<!--Start of NASDAQ vocabularies-->
+						<Resource>
+							<Urn>urn:newsml:iptc.org:20001006:topicset.nasdaq-company:1</Urn>
+							<Url>http://www.iptc.org/site/NewsML/topicsets/topicset.nasdaq-company.xml</Url>
+						</Resource>
+						<!--End of NASDAQ vocabularies-->
+					</Catalog>
+				</DataContent>
+			</ContentItem>
+		</NewsComponent>
+	</NewsItem>
+</NewsML>

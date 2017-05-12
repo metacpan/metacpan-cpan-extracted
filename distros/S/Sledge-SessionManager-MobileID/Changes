@@ -1,0 +1,7 @@
+Revision history for Perl extension Sledge::SessionManager::MobileID
+
+0.02    Mon Jan 21 12:29:30 2008
+        - add require module at Makefile
+
+0.01    Thu Jan 17 13:04:19 2008
+        - original version

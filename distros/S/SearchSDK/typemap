@@ -1,0 +1,11 @@
+TYPEMAP
+	avs_idxHdl_t 	T_PTROBJ
+	avs_valtype_t	T_PTROBJ
+	avs_countsHdl_t	T_PTROBJ
+	avs_parameters_t *	T_PTROBJ
+	avs_options_p_t	T_PTROBJ
+	avs_searchHdl_t	T_PTROBJ
+	avs_ranksetup_t *	T_PTROBJ
+
+
+

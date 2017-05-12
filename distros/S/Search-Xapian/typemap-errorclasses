@@ -1,0 +1,42 @@
+LogicError	O_OBJECT
+LogicError *	O_OBJECT
+RuntimeError	O_OBJECT
+RuntimeError *	O_OBJECT
+AssertionError	O_OBJECT
+AssertionError *	O_OBJECT
+InvalidArgumentError	O_OBJECT
+InvalidArgumentError *	O_OBJECT
+InvalidOperationError	O_OBJECT
+InvalidOperationError *	O_OBJECT
+UnimplementedError	O_OBJECT
+UnimplementedError *	O_OBJECT
+DatabaseError	O_OBJECT
+DatabaseError *	O_OBJECT
+DatabaseCorruptError	O_OBJECT
+DatabaseCorruptError *	O_OBJECT
+DatabaseCreateError	O_OBJECT
+DatabaseCreateError *	O_OBJECT
+DatabaseLockError	O_OBJECT
+DatabaseLockError *	O_OBJECT
+DatabaseModifiedError	O_OBJECT
+DatabaseModifiedError *	O_OBJECT
+DatabaseOpeningError	O_OBJECT
+DatabaseOpeningError *	O_OBJECT
+DatabaseVersionError	O_OBJECT
+DatabaseVersionError *	O_OBJECT
+DocNotFoundError	O_OBJECT
+DocNotFoundError *	O_OBJECT
+FeatureUnavailableError	O_OBJECT
+FeatureUnavailableError *	O_OBJECT
+InternalError	O_OBJECT
+InternalError *	O_OBJECT
+NetworkError	O_OBJECT
+NetworkError *	O_OBJECT
+NetworkTimeoutError	O_OBJECT
+NetworkTimeoutError *	O_OBJECT
+QueryParserError	O_OBJECT
+QueryParserError *	O_OBJECT
+SerialisationError	O_OBJECT
+SerialisationError *	O_OBJECT
+RangeError	O_OBJECT
+RangeError *	O_OBJECT

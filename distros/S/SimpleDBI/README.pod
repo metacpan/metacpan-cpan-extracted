@@ -1,0 +1,99 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+L<SimpleDBI>  some function base DBI
+
+support mysql
+
+=head1 TOOL
+
+=head2 query_db.pl
+
+export data from database, write into csv file:  导出数据，写入csv文件
+
+query_db.pl -t mysql -h localhost -u someusr -p somepasswd -d somedb -e 'select * from sometable limit 20' -f some.csv
+
+    -e  sql command, 待执行的sql命令
+
+    -t  database type, 数据库类型
+    -h  host, 主机
+    -u  user, 用户
+    -p  password, 密码
+    -P  port, 端口
+    -d  database name, 数据库
+    -f  output filename / load filename, 导出/导入 数据文件名
+    -s  column sep char, 分隔符
+    -c  database charset, 数据库表编码
+    -H  write head column name, 是否写表头
+
+
+=head2  load_table.pl
+
+load csv data into database : 把csv里的数据导入指定数据库表
+
+load_table.pl -t mysql -h localhost -u someusr -p somepasswd -d somedb -T sometable -f some.csv -F column_a,column_b -R 1 -s ','
+
+    -T  table, 数据表名
+    -F  field, 导入数据的列名，多个列以半角,号分隔
+    -R  replace，是否覆盖写入
+    -H  skip head line，是否跳过首行
+
+=head1 FUNCTION
+
+=head2 new
+
+    use SimpleDBI;
+    use Encode;
+    use utf8;
+
+    my $dbi = SimpleDBI->new(
+        type => 'mysql', 
+        db     => 'testdb',
+        host   => '127.0.0.1',
+        usr    => 'someusr',
+        passwd => 'somepwd',
+        #enable_utf8 => 1, 
+    );
+
+=head2 query_db
+
+    my $data = $dbi->query_db('select * from sometable limit 2', 
+    result_type => 'arrayref',  # arrayref, hashref, file
+
+    #attr => ..., # sql query attr, 
+    #bind_values => ..., # sql query bind values, 
+
+    #hash_key => [ qw/id prov/ ],  #hashref key 
+
+    #file => 'sometable.txt',  # file name
+    #sep => ',', 
+    #write_head => 1, 
+    );
+
+    print encode( 'utf8' , $_ ), "\n" for @{ $data->[0] };
+
+=head2 load_table
+
+if no set field, will auto read first line as field, and set skip_head =1 when load data 
+
+如果没有指定field，默认读入首行做为列名，并且在导入时自动跳过
+
+    my $test_file = 'xxx.txt';
+    my $test_data = [ [qw/1 测试/], [qw/2 无聊/], ];
+    $dbi->load_table(
+        $test_data, # or $test_file, 
+        table   => 'testtable',
+        field  => [qw/id name/],
+
+        #skip_head=> 0,   
+        #db  => 'otherdb',
+        #charset => 'utf8',
+        #replace => 0, 
+
+        #sep => ',', 
+    );
+
+=cut

@@ -1,0 +1,17 @@
+Revision history for Perl extension Sledge::Plugin::IfModifiedSince
+0.05  Thu Feb 02 18:54:49 2006
+    - translate document in english
+
+0.04  Sat Dec 03 19:55:01 2005
+    - Add set_last_modified method
+    - update document
+
+0.03  Sat Dec 03 15:34:47 2005
+    - warn passed parameter to if_modified_since is invalid.
+    - fix document
+
+0.02  Fri Dec 02 22:33:31 2005
+    - allow path to file as an argument of if_modified_since method.
+
+0.01  Thu Oct 27 20:58:30 2005
+	- original version

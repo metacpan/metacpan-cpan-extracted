@@ -1,0 +1,19 @@
+Revision history for Perl extension Statistics::Discrete.
+
+0.05  Tue Sep 15 11:11:37 PDT 2015
+	- reactivated module on CPAN
+
+0.04  Thu Aug  7 11:13:17 PDT 2014
+	- fixed a bug in load data function
+
+0.03  Thu May 22 12:00:00 2014
+	- improved memory efficiency
+
+0.02  Wed Mar 12 21:28:00 2014
+	- added median and percentile
+
+0.01  Tue Feb 25 15:03:57 2014
+	- original version; created by h2xs 1.23 with options
+	  -XAn Statistics::Discrete
+
+

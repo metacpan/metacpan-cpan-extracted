@@ -1,0 +1,20 @@
+---
+name: Slackware-Slackget-Network-Connection-DEBUG
+version: 0.5
+author:
+  - 'DUPUIS Arnaud <a.dupuis@infinityperl.org>'
+abstract: This class iimplements the debug:// protocol driver for Slackware::Slackget::Network::Connection
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Slackware::Slackget: 0.14
+  Test::More: 0
+provides:
+  Slackware::Slackget::Network::Connection::DEBUG:
+    file: lib/Slackware/Slackget/Network/Connection/DEBUG.pm
+    version: 0.5
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

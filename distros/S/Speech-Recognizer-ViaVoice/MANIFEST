@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+ViaVoice.pm
+ViaVoice.xs
+test.pl
+bin/pronunciations.pl.in

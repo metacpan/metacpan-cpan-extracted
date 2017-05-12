@@ -1,0 +1,49 @@
+0.12	4 April 2012
+	Change in the test-suite so that tests should also run ok on Windows
+	with Strawberry Perl.
+
+0.11	1 April 2012
+	Some code esthetics.  Verified it runs under 5.14.2, threaded and
+	unthreaded.
+
+0.10	10 May 2011
+	Added "retry" functionality for often called cronjobs that may exceed
+	their allotted wallclock time occasionally.
+
+0.09	13 May 2009
+	Added "silent" option so that a script can indicate whether or not it
+	wants to tell the world whether it saw a previous incarnation running.
+
+0.08	25 March 2008
+	Given up after almost a week getting the test to complete without
+	errors.  Added two TODO sections: manual testing indicates that
+	everything seems to work as it should, so I guess it must be some
+	test-suite artefact causing problems.
+
+	20 March 2008
+	Added support for SKIP_SYS_RUNALONE environment variable to skip the
+	functionality altogether.  After a feature request by Rick Jansen.
+	Made the code a little more adhering to PBP.
+
+0.07	15 November 2006
+	Why did testing just go ok and wrong now?  Argh, must be too late.
+	Fix for warning and test error.
+
+0.06	15 November 2006
+	Brought up to BPB standards.  Made the error message if no DATA handle
+	found, hopefully more understandable.
+
+0.05	11 June 2006
+	Added caveat of scripts being edited.
+
+0.04	11 July 2005
+	Some pod fixes.  Added link to Sys::RunAlways.
+
+0.03	10 June 2005
+	Oops. Still one more race condition to fix in test-suite.
+
+0.02	10 June 2005
+	Hopefully fixed problem with race conditions in the test-suite.
+
+0.01    9 June 2005
+	First public version of Sys/RunAlone.pm.

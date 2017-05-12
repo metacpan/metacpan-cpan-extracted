@@ -1,0 +1,28 @@
+NAME
+    Stump - Larry Wall's Slideshow Software
+
+SYNOPSIS
+        > stump init
+        > edit stump.input
+        > stump make
+        > stump speech
+
+DESCRIPTION
+    Stump is Larry Wall's slideshow presentation hacks, packaged up for
+    CPAN.
+
+    Stump takes a simple input format and some pictures and whatnot, and
+    compiles them into a OpenDocument (.odp) file that you view with your
+    favorite slideshow software.
+
+AUTHOR
+    Ingy döt Net <ingy@cpan.org>
+
+COPYRIGHT
+    Copyright 2011-2014. Ingy döt Net.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://www.perl.com/perl/misc/Artistic.html>
+

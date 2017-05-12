@@ -1,0 +1,56 @@
+
+README for the Perl module SimpleCDB
+
+	Copyright (c) 2000 Benjamin Low <b.d.low@ieee.org>. 
+	All rights reserved.
+
+	This program is free software; you can redistribute it and/or
+	modify it under the same terms as Perl itself.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	Artistic License for more details.
+
+
+DESCRIPTION
+-----------
+
+SimpleCDB - Perl-only Constant Database
+
+This is a simple perl-only DB intended for constant DB applications. A
+constant DB is one which, once created, is only ever read from (though
+this implementation allows appending of new data). That is, this is an
+"append-only DB" - records may only be added and/or extracted.
+
+Why, oh why?
+
+Unfortunately, all of the standard "system" DBMs (NBDM, SDBM, ODBM) are
+broken when it comes to "large" data sets (though I don't generally call
+20,000 records "large"). Try it, you'll see (examples/testbdm.pl program
+provided). On Solaris 2.5.1 + 2.6 boxes, testdbm showed the [NSO]DBM's 
+failing after about 13k records. On a HPUX 10.20 machine, it took about
+75,000 records to fail.
+
+Of course, there are other fine DBMs: GDBM, DB_File (BerkeleyDB v1), and 
+Dan Bernstein's CDB (constant DB). All of which require a C compiler, 
+whereas SimpleCDB is a perl-only implementation. If you have a C compiler
+handy, I recommend one of GDBM or CDB over SimpleCDB - they're (much?) 
+faster...
+
+See perldoc SimpleCDB for full documentation.
+
+INSTALLATION
+------------
+
+To install, unpack the archive and in the newly created directory type:
+
+        perl Makefile.PL
+        make
+		[make test]
+        make install
+
+Use
+        perl Makefile.PL PREFIX=<location>
+
+to install somewhere other than the system default.

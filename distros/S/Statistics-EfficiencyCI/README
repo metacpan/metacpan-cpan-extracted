@@ -1,0 +1,52 @@
+NAME
+    Statistics::EfficiencyCI - Robust confidence intervals on efficiencies
+
+SYNOPSIS
+      use Statistics::EfficiencyCI qw(efficiency_ci);
+      my $confidence_level = 0.683;
+      my ($mode, $lower_cl, $upper_cl) = efficiency_ci($k, $N, $confidence_level);
+  
+      # With default confidence level of "1sigma" == 0.683
+      my ($mode, $lower_cl, $upper_cl) = efficiency_ci($k, $N);
+
+DESCRIPTION
+    This module implements robust confidence interval calculations on
+    efficiency-like quantities. The algorithm is explained in the note by
+    Marc Paterno linked in the references below.
+
+    The employed method does not suffer from the usual boundary issue of the
+    uncertainty calculation based on the Binomial model: At an efficiency "e
+    = k/N" with small "k", the confidence interval will be asymmetric and
+    will not go below 0, which the simple calculation based on the Binomial
+    PDF will for confidence levels above the equivalent of one sigma. It
+    also does not suffer from the problem that the uncertainty vanishes at
+    "k=0" and "k=N".
+
+  EXPORTS
+    This module will optionally export the "efficiency_ci" function.
+
+SEE ALSO
+    Marc Paterno's note on calculating the uncertainty on an efficiency:
+    :<http://home.fnal.gov/~paterno/images/effic.pdf>
+
+    The ROOT library's website: <http://root.cern.ch>
+
+AUTHOR
+    Author of the Perl glue code is Steffen Mueller, <smueller@cpan.org>.
+
+    Author of the method of calculating the confidence intervals and its
+    implementation is Marc Paterno.
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2011 by Steffen Mueller
+
+    Most of the code is taken from the ROOT library (licensed under LGPL)
+    and by proxy, the CEPHES library (licensed with a modified BSD license).
+    The full list of ROOT authors can be found on the ROOT website
+    <http://root.cern.ch>.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the terms of the GNU Lesser General Public License (LGPL). You can
+    find a full copy of the license in the LICENSE file in this
+    distribution.
+

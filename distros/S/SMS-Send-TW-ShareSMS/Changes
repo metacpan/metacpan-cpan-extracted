@@ -1,0 +1,9 @@
+Revision history for Perl extension SMS::Send::TW::ShareSMS.
+
+0.02  2008/06/06
+	- fix : Makefile.PL
+
+0.01  Sat Sep  1 11:43:00 2007
+	- original version; created by h2xs 1.23 with options
+		-A -X -n SMS::Send::TW::ShareSMS
+

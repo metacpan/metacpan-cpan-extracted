@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<!DOCTYPE TopicSet PUBLIC "urn:newsml:iptc.org:20001006:NewsMLv1.0.dtd:1" "NewsMLv1.0.dtd">
+<TopicSet Duid="iptc.metadata" FormalName="MetadataType">
+	<Comment xml:lang="dn">An additional type of Metadata attched to a NewsItem.</Comment>
+	<Topic Duid="mett1">
+		<TopicType Scheme="IptcTopicType" FormalName="MetadataType"/>
+		<FormalName Scheme="IptcMetadataTypes">Order</FormalName>
+		<Description xml:lang="en">Data concerning the sequencing of a NewsComponent relative to others within the same parent NewsComponent.</Description>
+	</Topic>
+</TopicSet>
+

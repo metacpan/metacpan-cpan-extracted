@@ -1,0 +1,10 @@
+README
+syslogscand.pl
+syslogscand.PL
+lib/SyslogScan/Daemon.pm
+lib/SyslogScan/Daemon.pod
+lib/SyslogScan/Daemon/Plugin.pm
+Makefile.PL
+MANIFEST
+CHANGELOG
+META.yml                                 Module meta-data (added by MakeMaker)

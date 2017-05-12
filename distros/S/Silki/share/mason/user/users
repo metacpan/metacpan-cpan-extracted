@@ -1,0 +1,107 @@
+% if ($include_disabled) {
+<p>
+<% loc( q{Showing all users, including user accounts which have been explicitly disabled. <a href="%html(%1)">Only show active users</a>}, $c->domain()->application_uri( path => '/users' ) ) | n %>
+</p>
+% } else {
+<p>
+<% loc( q{Only showing active users. <a href="%html(%1)">Include user accounts which have been disabled</a>}, $c->domain()->application_uri( path => '/users', query => { include_disabled => 1 } ) ) | n %>
+</p>
+% }
+
+<table class="standard-table">
+  <thead>
+    <tr>
+      <th><% loc('User') %></th>
+      <th><% loc('Email') %></th>
+      <th><% loc('Memberships') %></th>
+      <th><% loc('Created') %></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+
+% while ( my $user = $users->next() ) {
+  <tbody>
+    <tr class="<% $users->index() % 2 ? 'odd' : 'even' %>">
+      <td>
+        <& /lib/user-link.mas, user => $user &>
+%   if ( $user->username() ne $user->email_address() ) {
+        (<% $user->username() %>)
+%   }
+      </td>
+      <td><% $user->email_address() %></td>
+      <td><% $user->member_wiki_count() %></td>
+      <td><%  loc( '%datetime(%1)', $c->user()->set_time_zone_for_dt( $user->creation_datetime() ) ) %></td>
+      <td>
+        <strong>
+%   if ( $user->is_admin() ) {
+<% loc('site admin') %>
+% } elsif ( $user->is_system_user() ) {
+<% loc('created by system') %>
+% } elsif ( $user->is_disabled() ) {
+<% loc('disabled') %>
+% }
+        </strong>
+      </td>
+      <td>
+%   if ( $user->is_disabled() ) {
+        <form action="<% $user->uri() %>" method="post">
+          <input type="hidden" name="x-tunneled-method" value="PUT" />
+          <input type="hidden" name="is_disabled" value="0" />
+          <input type="submit" value="<% loc('Enable') %>" />
+        </form>
+%   }
+%   elsif ( ! ( $user->user_id() == $c->user()->user_id() || $user->is_system_user() ) ) {
+        <form action="<% $user->uri() %>" method="post">
+          <input type="hidden" name="x-tunneled-method" value="PUT" />
+          <input type="hidden" name="is_disabled" value="1" />
+          <input type="submit" value="<% loc('Disable') %>" />
+        </form>
+%   }
+      </td>
+      <td>
+%   if ( ! ( $user->user_id() == $c->user()->user_id() || $user->is_system_user() ) ) {
+        <a href="<% $user->uri( view => 'purge_confirmation' ) %>">Purge</a>
+%   }
+      </td>
+    </tr>
+  </tbody>
+% }
+
+<& /lib/table/pager.mas,
+   index     => $users->index(),
+   pager     => $pager,
+   uri_maker => $uri_maker &>
+
+</table>     
+
+<%args>
+$users
+$pager
+$include_disabled
+</%args>
+
+<%init>
+my %query = $include_disabled ? ( include_disabled => 1 ) : ();
+my $uri_maker = sub {
+    my %p = @_;
+    $p{query} = { %query, %{ $p{query} || {} } };
+    return $c->domain()->application_uri( path => '/users', %p );
+};
+</%init>
+
+<%method title>
+<% $include_disabled ? loc('All Users') : loc('Active Users') %>
+<%args>
+$include_disabled
+</%args>
+</%method>
+
+<%attr>
+sidebar => [ 'admin' ]
+</%attr>
+
+<%flags>
+inherit => '/autohandler'
+</%flags>

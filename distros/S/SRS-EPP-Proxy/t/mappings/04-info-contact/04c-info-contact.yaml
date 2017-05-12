@@ -1,0 +1,37 @@
+template: info-contact.tt
+
+vars:
+  contact_id: not-found-id
+  pw:
+
+input_assertions:
+  class: SRS::EPP::Command::Info::Contact
+
+SRS:
+  - assertions:
+      count:
+        - [ '//HandleIdFilter', 1, 'SRS: Check for only one HandleIdFilter' ]
+      match:
+        - [ '//HandleIdFilter', 'not-found-id', 'SRS: Check the first HandleIdFilter' ]
+      match_all:
+      attr_is:
+
+# <epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+#   <response>
+#     <result code="2307">
+#       <msg lang="en">Unimplemented object service</msg>
+#     </result>
+#     <trID>
+#       <clTRID>brause</clTRID>
+#       <svTRID>sep.4c1ed6ef.0262.001</svTRID>
+#     </trID>
+#   </response>
+# </epp>
+
+output_assertions:
+  count:
+    - [ '//epp:resData', 0, 'EPP: No resData in the response' ]
+  match:
+  match_all:
+  attr_is:
+    - [ '//epp:result', 'code', 2303, 'EPP: Failure = Object does not exist' ]

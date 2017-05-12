@@ -1,0 +1,11 @@
+Revision history for Sub-Todo
+
+0.0.3  Wed Jul  9 22:36:00 2008
+    Added get_errno_func_not_impl() for use with $! instead of hardcoded (and possibly incorrect) 78
+
+0.0.2  Sat Sep 29 15:33:26 2007
+		Made perlcritic test optional as per http://rt.cpan.org/Ticket/Display.html?id=29554#txn-364766'
+
+0.0.1  Thu Jul 26 23:19:26 2007
+       Initial release.
+

@@ -1,0 +1,40 @@
+{
+   "abstract" : "Scheduler configurable by using plugins",
+   "author" : [
+      "[ Tony Edwardson <tony@edwardson.co.uk>i ]"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Schedule-Pluggable",
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : "0",
+            "MooseX::Object::Pluggable" : "0",
+            "MooseX::Workers" : "0",
+            "Test::More" : "0",
+            "version" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {}
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.07"
+}

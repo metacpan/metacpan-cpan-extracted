@@ -1,0 +1,20 @@
+#!/usr/local/bin/perl -w
+
+use strict;
+use ExtUtils::testlib;
+use Solaris::Procfs qw(:control_codes writectl);
+use POSIX qw(:signal_h);
+use lib '.';
+
+$|++;
+
+my $pid;
+
+foreach $pid (@ARGV) {
+
+	# Start the process
+	#
+	writectl($pid,PCKILL,SIGCONT,PCRUN,PCNULL) 
+		or warn "$pid: permission denied\n";
+}
+

@@ -1,0 +1,42 @@
+Statistics/KruskalWallis version 0.01
+===============================
+
+Statistics::KruskalWallis - Perl module to perform the Kruskall-Wallis test,
+use to test if differences exist between 3 or more independant groups of
+unequal sizes.
+
+Also includes the post-hoc Newman-Keuls test, to test if the differences
+between pairs of the tested group are significant.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Requires Statistics::Distributions to turn Kruskal Wallis statistics into p values.
+
+REFERENCES
+
+Kruskal, W. H. (1952). A nonparametric test for the several sample problem.  Annals of Mathematical Statistics, 23, 525-540.
+Kruskal, W. H. and Wallis, W. A. (1952). Use of ranks in one-criterion variance analysis. Journal of the American Statistical Association, 47, 583-621.
+
+Keuls, M (1952). The studentized range in connection with an analysis of variance. Euphytica 1, 112-122.
+Newman,D (1939). The distribution of the range in samples of a normal population, expressed in terms of an independent estimate of standard deviation. Biometrika 31, 20-30.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright 2003 Star Technology Group Ltd.
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+
+
+
+

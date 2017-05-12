@@ -1,0 +1,12 @@
+Build.PL
+Changes
+examples/excel_writer_xlsx.pl
+examples/spreadsheet_writeexcel.pl
+lib/Spreadsheet/WriteExcel/Styler.pm
+MANIFEST
+META.json
+META.yml
+README
+t/00-load.t
+t/01-styler.t
+t/pod.t

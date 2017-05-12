@@ -1,0 +1,25 @@
+Revision history for String-MatchInterpolate
+
+0.06    CHANGES:
+         * Added default_re option for variables that do not provide their own
+         * Allow changing the default variable delimiting patterns
+
+0.05    CHANGES:
+         * Allow positional interpolation and matches in list context
+         * Allow anonymous variables; best used positionally
+
+0.04    CHANGES:
+         * Added 'use warnings'
+         * Various small updates to keep CPANTS happy
+
+0.03    CHANGES:
+         * Slight performance increases, especially for templates with a
+           large number of variables
+         * Include example benchmark output in docs
+
+0.02    CHANGES:
+         * Added documentation on the 'allow_suffix' option, to make it a
+           public feature.
+
+0.01    First version, released on an unsuspecting world.
+

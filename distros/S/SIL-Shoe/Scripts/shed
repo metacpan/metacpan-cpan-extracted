@@ -1,0 +1,146 @@
+#!/usr/bin/perl
+
+use XML::Parser;
+use SIL::Shoe::Data;
+use IO::File;
+use Getopt::Std;
+use Encode;
+use Encode::TECkit;
+
+getopts('c:');
+
+our (%teckits);
+
+unless (defined $ARGV[1] && defined $opt_c)
+{
+    die <<'EOT';
+    shed -c config.xml infile outfile
+Copies Shoebox database from infile to outfile applying the instructions in
+config.xml
+EOT
+}
+
+$sh = SIL::Shoe::Data->new($ARGV[0]) || die "Can't open $ARGV[0] for reading";
+$ofh = IO::File->new("> $ARGV[1]") || die "Can't create $ARGV[1]";
+
+$ofh->print("\\_sh $sh->{' Version'} $sh->{' CSum'} $sh->{' Type'}\n");
+$ofh->print("\\_DateStampHasFourDigitYear\n") if ($sh->{' DateStamp'} == 4);
+
+$xfh = IO::File->new("< $opt_c") || die "Can't open $opt_c";
+$xtext = join('', <$xfh>);
+$xml = XML::Parser->new(Style => 'Subs', Pkg => 'SIL::Shoe::Shed',
+        Handlers => {'Char' => sub {
+            use bytes;
+            my ($xml, $text) = @_;
+            $xml->{' stack'}[-1]{' text'} .= $text if (scalar @{$xml->{' stack'}});
+            }},
+        ' stack' => [], ' sh' => $sh, ' fields' => [],
+        'Non-Expat-Options' => {' stack' => 1, ' sh' => 1, ' fields' => 1});
+    
+while ($sh->readrecord($xml->{' fields'}))
+{
+    $ofh->print("\n");
+    $xml->parse($xtext);
+    foreach $f (@{$xml->{' fields'}})
+    {
+        my ($mk) = $f;
+        $mk =~ s/\s+.*$//o;
+        $ofh->print("\\$mk $sh->{$f}\n");
+    }
+}
+
+package SIL::Shoe::Shed;
+
+sub gettext
+{
+    my ($xml, $attrs) = @_;
+    
+    if (defined $attrs->{'sfm'})
+    { return $xml->{' sh'}{$attrs->{'sfm'}}; }
+    else
+    {
+        my ($str) = $attrs->{' text'};
+        $str =~ s/^\s*//o;
+        $str =~ s/\s*$//o;
+        return $str;
+    }
+}
+
+sub insert
+{
+    my ($xml, $tag, %attrs) = @_;
+    
+    push (@{$xml->{' stack'}}, {%attrs});
+}
+
+sub insert_
+{
+    my ($xml, $tag) = @_;
+    my ($attrs) = pop(@{$xml->{' stack'}});
+    my ($mk) = $attrs->{'sfm'};
+#    my ($str) = encode_utf8($attrs->{' text'});
+    my ($str) = $attrs->{' text'};
+    my ($i);
+    
+    for ($i = 0; $i < scalar @{$xml->{' fields'}}; $i++)
+    { last if ($xml->{' fields'}[$i] eq $attrs->{'loc'}); }
+    return if ($i >= scalar @{$xml->{' fields'}});
+    
+    while (defined $xml->{' sh'}{$mk})
+    {
+        if ($mk =~ m/\d$/o)
+        { $mk++; }
+        else
+        { $mk = "$mk 0"; }
+    }
+    $str =~ s/^\s*//o;
+    $str =~ s/\s*$//o;
+    $xml->{' sh'}{$mk} = $str;
+    splice(@{$xml->{' fields'}}, $i + ($attrs->{'relative'} eq 'after' ? 1 : 0), 0, $mk);
+}
+
+sub eval
+{
+    my ($xml, $tag, %attrs) = @_;
+    
+    push (@{$xml->{' stack'}}, {%attrs});
+}
+
+sub eval_
+{
+    my ($xml, $tag) = @_;
+    my ($attrs) = pop(@{$xml->{' stack'}});
+    
+    $_ = gettext($xml, $attrs);
+    chomp;
+    my ($res) = eval "$attrs->{' text'}";
+    $xml->{' stack'}[-1]{' text'} = $res;
+}
+
+sub teckit
+{
+    my ($xml, $tag, %attrs) = @_;
+    
+    push (@{$xml->{' stack'}}, {%attrs});
+    unless (defined $teckits{$attrs{'file'}})
+    {
+        $teckits{$attrs{'file'}} = Encode::TECkit->new($attrs{'file'}) || die "Can't find teckit file $attrs{'file'}";
+    }
+}
+
+sub teckit_
+{
+    my ($xml, $tag) = @_;
+    my ($attrs) = pop(@{$xml->{' stack'}});
+    my ($str) = gettext($xml, $attrs);
+    
+    if ($attrs->{'dir'} eq 'encode')
+    {
+        $xml->{' stack'}[-1]{' text'} = $teckits{$attrs->{'file'}}->encode(Encode::decode_utf8($str));
+    }
+    else
+    {
+	my ($res) = $teckits{$attrs->{'file'}}->decode($str);
+        $xml->{' stack'}[-1]{' text'} = Encode::encode_utf8($res);
+    }
+}

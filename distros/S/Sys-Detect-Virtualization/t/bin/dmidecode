@@ -1,0 +1,17 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use File::Spec;
+use IO::File;
+
+my (undef, undef, $thisbin) = File::Spec->splitpath( $0 );
+my $filename = File::Spec->catfile($ENV{FAKE_DATA}, "${thisbin}.out");
+
+die qq{Test data $filename not found} unless -e $filename;
+
+# Hack - emit failure if we have a zero-size data file
+exit(1) if -s $filename == 0;
+
+my $fh = IO::File->new( $filename, 'r');
+print STDOUT do { local $/; <$fh>};
+close $fh;

@@ -1,0 +1,36 @@
+Statistics::RVector version 0.1
+====================
+
+Statistics::RVector, known in short as RVector, is a Perl module 
+with the intent of providing somewhat of a compatibility layer between
+the R Stats programming language and Perl.  That said, the basis of 
+RVector is a vector library with vector math capabilities, and 
+additionally supports statistical computation functions such as 
+means, modes, standard deviation, and so forth.  However, as noted, 
+the mechanics of this library are meant to mimic those of vectors 
+in R.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    * Math::Complex;
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2011 by Josh Ballard, <josh@oofle.com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

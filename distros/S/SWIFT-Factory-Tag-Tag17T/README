@@ -1,0 +1,28 @@
+SWIFT/Factory/Tag/Tag17T
+========================
+
+This class provides the TAG17T for a SWIFT message.
+
+TAG17T is used as a "Block Trade Indicator".
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+SWIFT::Factory::Tag::Tag17.pm
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2003, BIKER. All rights reserved.
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

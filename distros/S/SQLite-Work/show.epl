@@ -1,0 +1,65 @@
+[! use SQLite::Work::CGI; !]
+[-
+=head1 NAME
+
+show.epl - Embperl script to show data from an SQLite database
+
+=head2 DESCRIPTION
+
+Embperl script to show data for an SQLite database.
+If run with no arguments, will print a form with tables to select from.
+Once a table is selected, it prints a form with search criteria;
+when the search critera are filled in, it will print a report.
+
+=head2 Configuration
+
+Before the script is run, it needs to be configured.  This is done
+by setting the correct values in the %InitArgs hash (just below
+if you are looking at the source of this file).
+
+The minimum requirement is to set the 'database' value; this must be
+the name of the SQLite database file which this script accesses.
+
+See L<SQLite::Work/new> and L<SQLite::Work::CGI/new> for more information
+about possible arguments to give.
+
+=cut
+
+%InitArgs = (
+    database=>'test1.db',
+);
+
+=head2 Author
+
+Kathryn Andersen. <perlkat@katspace.com>
+Created: 2006
+
+=cut
+
+$escmode=0;
+# this creates a new CGI object which has already parsed the query
+my	$tvdb = SQLite::Work::CGI->new(%InitArgs);
+
+$output = '';
+if ($tvdb->do_connect())
+{
+    if ($tvdb->{cgi}->param('Table'))
+    {
+	if ($tvdb->{cgi}->param('Search'))
+	{
+	    $tvdb->do_select($tvdb->{cgi}->param('Table'),
+		outfile=>\$output);
+	}
+	else
+	{
+	    $output = $tvdb->make_search_form($tvdb->{cgi}->param('Table'));
+	}
+    }
+    else
+    {
+	$output = $tvdb->make_table_form();
+    }
+    $tvdb->do_disconnect();
+}
+-]
+[+ $output +]

@@ -1,0 +1,74 @@
+<p>
+<% loc( 'This page has %quant(%1,revision,revisions)', $current_rev ) %>
+</p>
+
+<form action="<% $page->uri( view => 'diff' ) %>" method="get">
+<table class="standard-table">
+  <thead>
+    <tr>
+      <th><% loc('Revision #') %></th>
+      <th><% loc('Date') %></th>
+      <th><% loc('Who') %></th>
+      <th>
+% if ( $current_rev > 1 ) {
+        <input type="submit" value="<% loc('Compare') %>" />
+% }
+      </th>
+    </tr>
+  </thead>
+% while ( my $revision = $revisions->next() ) {
+  <tbody>
+    <tr class="<% $revisions->index() % 2 ? 'odd' : 'even' %> <% defined $revision->comment() ? 'has-child-row' : q{} %>">
+      <td>
+%   if ( $revision->revision_number() == $current_rev ) {
+        <a href="<% $page->uri( ) %>"><% loc( 'Revision %1', $revision->revision_number() ) %></a>
+        (<% loc('current') %>)
+%   } else {
+        <a href="<% $revision->uri() %>"><% loc( 'Revision %1', $revision->revision_number() ) %></a>
+%   }
+      </td>
+      <td><% loc( '%datetime(%1)', $c->user()->set_time_zone_for_dt( $revision->creation_datetime() ) ) %></td>
+      <td>
+        <& /lib/user-link.mas, user => $revision->user(), wiki => $page->wiki() &>
+      </td>
+      <td>
+%   if ( $current_rev > 1 ) {
+        <input type="radio" name="revision1" value="<% $revision->revision_number() %>"
+               <% $revisions->index() == 2 ? 'checked="checked"' : q{} | n %> />
+        <input type="radio" name="revision2" value="<% $revision->revision_number() %>"
+               <% $revisions->index() == 1 ? 'checked="checked"' : q{} | n %> />
+%   }
+      </td>
+    </tr>
+%   if ( my $comment = $revision->comment() ) {
+    <tr class="<% $revisions->index() % 2 ? 'odd' : 'even' %>">
+      <td colspan="4">
+        <% $comment %>
+      </td>
+    </tr>
+%   }
+  </tbody>
+% }
+<& /lib/table/pager.mas,
+   index     => $revisions->index(),
+   pager     => $pager,
+   uri_maker => sub { $page->uri( view => 'history', @_ ) } &>
+</table>
+</form>
+
+<%args>
+$page
+$pager
+$revisions
+</%args>
+
+<%init>
+my $current_rev = $page->most_recent_revision()->revision_number();
+</%init>
+
+<%method title>
+History of Changes to <% $page->title() %>
+<%args>
+$page
+</%args>
+</%method>

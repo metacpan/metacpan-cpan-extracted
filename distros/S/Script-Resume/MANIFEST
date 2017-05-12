@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Script/Resume.pm
+t/001Basic.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,12 @@
+Software::Packager
+	Extend and improve the API and POD.
+
+Software::Packager::Object
+	This should be okay but I'd like to improve the mode method some what.
+	At present you must pass an octal value or face the consequences.
+
+Software::Packager::Tar
+	creates tar files okay but if you do a tar -tvf on the archive it gives
+	direcory checksum errors.
+	Test script may need improving.
+

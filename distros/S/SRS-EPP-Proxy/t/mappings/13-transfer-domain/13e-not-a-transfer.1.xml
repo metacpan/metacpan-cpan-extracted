@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NZSRSResponse VerMajor="5" VerMinor="2">
+  <Response Action="Whois" FeId="9" FeSeq="3428" OrigRegistrarId="100" RecipientRegistrarId="100">
+    <FeTimeStamp Day="7" Hour="11" Minute="42" Month="9" Second="56" TimeZoneOffset="+12:00" Year="2010" />
+    <Domain DomainName="mozzarella.co.te" Status="Active" />
+  </Response>
+  <Response Action="DomainUpdate" FeId="9" FeSeq="3428" OrigRegistrarId="100" RecipientRegistrarId="100" TransId="1282520580">
+    <FeTimeStamp Day="7" Hour="11" Minute="42" Month="9" Second="56" TimeZoneOffset="+12:00" Year="2010" />
+    <Error Hint="UNKNOWN_ERROR_HINT" ErrorId="CONVERT_TO_HANDLES_ONLY_FOR_TRANSFER" Severity="err">
+      <Description>The ConvertContactsToHandles flag can only be set when transferring domains</Description>
+    </Error>
+  </Response>
+</NZSRSResponse>

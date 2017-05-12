@@ -1,0 +1,270 @@
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary=wkc-boundary
+--wkc-boundary
+Content-type: text/plain; charset=UTF-8
+# Test case data set from Open Formula Specification 1.2
+# OpenFormula-v1.2-draft7.odtOpenFormula-v1.2-draft7.odt
+# Copyright (C) OASIS Open 2006. All Rights Reserved
+
+version:1.1
+--wkc-boundary
+Content-type: text/plain; charset=UTF-8
+
+version:1.3
+cell:B3:vtf:t:7:"7"
+cell:B4:vtf:n:2:2
+cell:C4:v:4
+cell:B5:vtf:n:3:3
+cell:C5:v:5
+cell:B6:vtf:nl:1:1=1
+cell:C6:v:7
+cell:B7:vtf:t:Hello:"Hello"
+cell:C7:vtc:nd:38383:2005-01-31
+cell:C8:vtc:nd:38748:2006-01-31
+cell:B9:vtf:e#DIV/0!:0:1/0:e:#DIV/0!
+cell:C9:vtc:nt:0.0833333333333333:02\c00\c00
+cell:B10:vtf:n:0:0
+cell:C10:vtc:nt:0.958333333333333:23\c00\c00
+cell:B11:v:3
+cell:C11:v:5
+cell:B12:v:4
+cell:C12:v:6
+cell:B13:t:2005-01-31T01\c00\c00
+cell:C13:v:8
+cell:B14:v:1
+cell:C14:v:4
+cell:B15:v:2
+cell:C15:v:3
+cell:B16:v:3
+cell:C16:v:2
+cell:B17:v:4
+cell:C17:v:1
+cell:A18:t:TestID
+cell:B18:t:Constellation
+cell:C18:t:Bright Stars
+cell:D18:t:Northern
+cell:E18:t:Abbrev
+cell:F18:t:Decl
+cell:G18:t:Next South
+cell:H18:t:Date
+cell:I18:t:Rev
+cell:A19:v:1
+cell:B19:t:Cancer
+cell:C19:v:0
+cell:D19:vtc:nl:1:TRUE
+cell:E19:t:Cnc
+cell:F19:v:20
+cell:G19:vtf:tw:Canis Major:B20
+cell:H19:vtc:nd:38423:2005-03-12
+cell:I19:v:13
+cell:A20:vtf:n:2:A19*2
+cell:B20:t:Canis Major
+cell:C20:v:5
+cell:D20:vtc:nl:0:FALSE
+cell:E20:t:Cma
+cell:F20:v:5
+cell:G20:vtf:tw:Orion:B27
+cell:H20:vtc:nd:37290:2002-02-03
+cell:I20:v:12
+cell:A21:vtf:n:4:A20*2
+cell:B21:t:Canis Minor
+cell:C21:v:2
+cell:D21:vtc:nl:1:TRUE
+cell:E21:t:Cmi
+cell:F21:v:-20
+cell:G21:vtf:tw:Eridanus: B24
+cell:H21:vtc:nd:38419:2005-03-08
+cell:I21:v:11
+cell:A22:vtf:n:8:A21*2
+cell:B22:t:Carina
+cell:C22:v:5
+cell:D22:vtc:nl:0:FALSE
+cell:E22:t:Car
+cell:F22:v:-60
+cell:H22:vtc:nd:33324:1991-03-27
+cell:I22:v:10
+cell:A23:vtf:n:16:A22*2
+cell:B23:t:Draco
+cell:C23:v:3
+cell:D23:vtc:nl:1:TRUE
+cell:E23:t:Dra
+cell:F23:v:75
+cell:G23:vtf:tw:Ursa Minor:B31
+cell:H23:vtc:nd:24658:1967-07-05
+cell:I23:v:9
+cell:A24:vtf:n:32:A23*2
+cell:B24:t:Eridanus
+cell:C24:v:4
+cell:D24:vtc:nl:0:FALSE
+cell:E24:t:Eri
+cell:F24:v:-29
+cell:G24:vtf:tw:Scorpio:B29
+cell:H24:vtc:nd:4741:1912-12-23
+cell:I24:v:8
+cell:A25:vtf:n:64:A24*2
+cell:B25:t:Gemini
+cell:C25:v:4
+cell:D25:vtc:nl:1:TRUE
+cell:E25:t:Gem
+cell:F25:v:20
+cell:G25:vtf:tw:Cancer:B19
+cell:H25:vtc:nd:33640:1992-02-06
+cell:I25:v:7
+cell:A26:vtf:n:128:A25*2
+cell:B26:t:Hercules
+cell:C26:v:0
+cell:D26:vtc:nl:1:TRUE
+cell:E26:t:Her
+cell:F26:v:30
+cell:G26:vtf:tw:Gemini:B25
+cell:H26:vtc:nd:12604:1934-07-04
+cell:I26:v:6
+cell:A27:vtf:n:256:A26*2
+cell:B27:t:Orion
+cell:C27:v:8
+cell:D27:vtc:nl:1:TRUE
+cell:E27:t:Ori
+cell:F27:v:5
+cell:G27:vtf:tw:Canis Minor:B21
+cell:H27:vtc:nd:3296:1909-01-08
+cell:I27:v:5
+cell:A28:vtf:n:512:A27*2
+cell:B28:t:Phoenix
+cell:C28:v:1
+cell:D28:vtc:nl:0:FALSE
+cell:E28:t:Phe
+cell:F28:v:-50
+cell:G28:vtf:tw:Carina:B22
+cell:H28:vtc:nd:32840:1989-11-28
+cell:I28:v:4
+cell:A29:vtf:n:1024:A28*2
+cell:B29:t:Scorpio
+cell:C29:v:9
+cell:D29:vtc:nl:0:FALSE
+cell:E29:t:Sco
+cell:F29:v:-40
+cell:G29:vtf:tw:Phoenix:B28
+cell:H29:vtc:nd:36578:2000-02-22
+cell:I29:v:3
+cell:A30:vtf:n:2048:A29*2
+cell:B30:t:Ursa Major
+cell:C30:v:6
+cell:D30:vtc:nl:1:TRUE
+cell:E30:t:Uma
+cell:F30:v:55.38
+cell:G30:vtf:tw:Hercules:B26
+cell:H30:vtc:nd:38075:2004-03-29
+cell:I30:v:2
+cell:A31:vtf:n:4096:A30*2
+cell:B31:t:Ursa Minor
+cell:C31:v:2
+cell:D31:vtc:nl:1:TRUE
+cell:E31:t:Uni
+cell:F31:v:70
+cell:G31:vtf:tw:Ursa Major:B30
+cell:H31:vtc:nd:16996:1946-07-13
+cell:I31:v:1
+cell:B36:t:Bright Stars
+cell:C36:t:Northern
+cell:D36:t:Constellation
+cell:E36:t:Decl
+cell:F36:t:Rev
+cell:G36:t:Bright Stars
+cell:H36:t:Date
+cell:B37:v:4
+cell:C37:vtc:nl:1:TRUE
+cell:D37:t:Ursa Major
+cell:E37:t:< 0
+cell:F37:t:<= 7
+cell:G37:t:< 4
+cell:H37:t:>1950-01-01
+cell:B38:t:<2
+cell:C38:vtc:nl:1:TRUE
+cell:D38:t:Constellation
+cell:G38:t:>= 8
+cell:H38:t:CONSTELLATION
+cell:B39:t:>1
+cell:C39:vtc:nl:0:FALSE
+cell:D39:t:Ursa
+cell:H39:t:URSA MAJOR
+cell:B50:t:x1
+cell:C50:t:x2
+cell:D50:t:y
+cell:E50:t:Value
+cell:F50:t:x3
+cell:G50:t:x4
+cell:B51:v:4
+cell:C51:v:7
+cell:D51:v:100
+cell:E51:v:10.5
+cell:F51:v:3
+cell:G51:v:23
+cell:B52:v:5
+cell:C52:v:9
+cell:D52:v:105
+cell:E52:v:7.2
+cell:F52:v:4
+cell:G52:v:24
+cell:B53:v:6
+cell:C53:v:11
+cell:D53:v:104
+cell:E53:v:200
+cell:F53:v:5
+cell:G53:v:25
+cell:B54:v:7
+cell:C54:v:12
+cell:D54:v:108
+cell:E54:v:5.4
+cell:F54:v:2
+cell:G54:v:22
+cell:B55:v:8
+cell:C55:v:15
+cell:D55:v:111
+cell:E55:v:8.1
+cell:F55:v:3
+cell:G55:v:23
+cell:B56:v:9
+cell:C56:v:17
+cell:D56:v:120
+cell:F56:v:4
+cell:G56:v:24
+cell:B57:v:10
+cell:C57:v:19
+cell:D57:v:133
+cell:F57:v:5
+cell:G57:v:25
+cell:F58:v:6
+cell:G58:v:26
+cell:F59:v:4
+cell:G59:v:24
+cell:F60:v:7
+cell:G60:v:27
+cell:B70:t:a1
+cell:C70:t:a2
+cell:D70:t:a3
+cell:F70:t:e1
+cell:G70:t:e2
+cell:H70:t:e3
+cell:B71:v:12
+cell:C71:v:45
+cell:D71:v:78
+cell:F71:v:11
+cell:G71:v:44
+cell:H71:v:77
+cell:B72:v:23
+cell:C72:v:56
+cell:D72:v:89
+cell:F72:v:22
+cell:G72:v:55
+cell:H72:v:88
+cell:B73:v:34
+cell:C73:v:67
+cell:D73:v:98
+cell:F73:v:33
+cell:G73:v:66
+cell:H73:v:99
+sheet:r:73:c:9
+name:FOUR::C4
+name:TESTDB::A18\cI31
+
+--wkc-boundary--

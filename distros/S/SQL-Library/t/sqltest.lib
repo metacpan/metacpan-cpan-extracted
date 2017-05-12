@@ -1,0 +1,10 @@
+[products_in_category]
+SELECT *
+FROM   products
+WHERE  category_id = ?
+
+[yet_another_query]
+SELECT foo
+FROM   bar
+WHERE  zoot = 1
+

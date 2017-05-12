@@ -1,0 +1,8 @@
+Revision history for Perl extension Sort::Bucket.
+
+0.02  Mon Feb  8 2010
+	- Reduced the test suite's memory usage
+
+0.01  Sat Feb  6 2010
+	- Initial release
+

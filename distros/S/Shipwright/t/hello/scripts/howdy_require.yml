@@ -1,0 +1,4 @@
+--- 
+requires:
+    Foo-Bar:
+        version: 0

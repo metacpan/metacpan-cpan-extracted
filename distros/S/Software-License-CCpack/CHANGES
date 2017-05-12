@@ -1,0 +1,89 @@
+Revision History for Software-License-CCpack
+============================================
+
+v1.11 2014-10-19
+----------------
+
+[601f9ff]
+* Author: Brendan Byrd <Perl@ResonatorSoft.org>
+* Date:   2014-10-19 11:49:53 -0400 (10 minutes ago)
+
+Clean up the license files a bit more
+
+[9470db6]
+* Author: Brendan Byrd <Perl@ResonatorSoft.org>
+* Date:   2014-10-19 10:46:05 -0400 (74 minutes ago)
+
+Fix links in POD and add x_IRC resource
+
+
+v1.10 2014-10-19
+----------------
+
+[9ddf0af]
+* Author: Brendan Byrd <Perl@ResonatorSoft.org>
+* Date:   2014-10-19 01:52:53 -0400 (10 hours ago)
+
+Release v1.10
+
+[fee83d3]
+* Author: Brendan Byrd <Perl@ResonatorSoft.org>
+* Date:   2014-10-19 01:34:24 -0400 (10 hours ago)
+
+Add .mailmap
+
+[026d489]
+* Author: Brendan Byrd <Perl@ResonatorSoft.org>
+* Date:   2014-10-19 01:23:57 -0400 (11 hours ago)
+
+Fix the test
+
+[d6fa29c]
+* Author: Brendan Byrd <Perl@ResonatorSoft.org>
+* Date:   2014-10-19 01:22:01 -0400 (11 hours ago)
+
+Make sure the licenses are in ASCII
+
+[ab52f85]
+* Author: Brendan Byrd <Perl@ResonatorSoft.org>
+* Date:   2014-10-19 00:59:55 -0400 (11 hours ago)
+
+Basic cleanup of CCpack.pm
+
+[ac3d6ad]
+* Author: Brendan Byrd <Perl@ResonatorSoft.org>
+* Date:   2014-10-19 00:45:42 -0400 (11 hours ago)
+
+Merge branch 'master' of github.com:zoffixznet/Software-License-CCpack into zoffixznet-master
+
+[6689849]
+* Author: Brendan Byrd <Perl@ResonatorSoft.org>
+* Date:   2014-10-19 00:26:40 -0400 (12 hours ago)
+
+Add all versions of licenses, including the new 4.0 ones
+
+Also, changed the cc-*.sh scripts to work with lynx, instead of a
+curl+html2text combo.
+
+[347dc7d]
+* Author: Brendan Byrd <Perl@ResonatorSoft.org>
+* Date:   2014-10-19 00:06:57 -0400 (12 hours ago)
+
+Downgrade the Perl version to 5.6
+
+[b04059b]
+* Author: Zoffix Znet <cpan@zoffix.com>
+* Date:   2014-01-18 11:34:50 -0500 (9 months ago)
+
+Probably would need these bits inside
+
+[ae20a7b]
+* Author: Zoffix Znet <cpan@zoffix.com>
+* Date:   2014-01-18 11:25:59 -0500 (9 months ago)
+
+Fixes #2 Renamed CCpack.pod to CCpack.pm
+
+
+===================================
+End of changes in the last 365 days
+===================================

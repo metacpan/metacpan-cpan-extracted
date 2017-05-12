@@ -1,0 +1,22 @@
+Sys/LoadAvg version 0.01
+============================
+
+I wrote Sys::LoadAvg sometime in 2002 before several other modules providing 
+nearly the same functionality appeared on CPAN. At the time I created it, I was 
+using it on Solaris, Linux, and iirc OpenBSD (though it may have been one of 
+the other BSDs.) I haven't needed it on other platforms, but I'll add support
+for them as the opportunity to test arises. 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002-2012 Jeremy Madea 
+

@@ -1,0 +1,55 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Syntax-Collector
+Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
+Source: https://metacpan.org/release/Syntax-Collector
+
+Files: Changes
+ META.json
+ META.yml
+ Makefile.PL
+ dist.ini
+ doap.ttl
+ t/02collection.t
+ t/03modern.t
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: CONTRIBUTING
+ INSTALL
+ LICENSE
+ examples/MyTest.pm
+ examples/basic.pl
+ inc/Test/Fatal.pm
+ inc/Test/Requires.pm
+ inc/Try/Tiny.pm
+Copyright: Unknown
+License: Unknown
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
+
+Files: README
+ lib/Syntax/Collector.pm
+Copyright: This software is copyright (c) 2012 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/01basic.t
+Copyright: Copyright 2012 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+License: Artistic-1.0
+ This software is Copyright (c) 2013 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The Artistic License 1.0
+
+License: GPL-1.0
+ This software is Copyright (c) 2013 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The GNU General Public License, Version 1, February 1989

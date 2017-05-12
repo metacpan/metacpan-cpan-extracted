@@ -1,0 +1,33 @@
+Revision history for Perl extension Slurm::Sacctmgr.
+
+1.1.0  Fri Jun 10 10:19:00 2016
+	- Added infrastructure to support multiple versions of Slurm
+		* Additional hooks added for site customization of path
+		  to sacctmgr command and setting the version.
+		* Support for querying sacctmgr for version if not specified
+	- Added support for TRES stuff introduced in 15.x.y
+		* Objects support old pre-TRES fields and TRES fields, and
+		  the fields are linked: e.g. on Slurm::Sacctmgr::Account,
+		  the values of grpcpumins and the 'cpu' element of 
+		  grptresmins are tied: setting one changes the other as well.
+		* set_cpumin_limit_on_account_cluster DEPRECATED in favor of
+		  set_grptresmin_on_account_cluster
+	- Makefile.PL aborts appropriately on OSes not supported by Slurm.
+	  Mainly added because regression tests assume POSIX like environment
+	- Removed extraneous quotes in sacctmgr arguments; sacctmgr was handling
+	  OK in most cases, but not all.
+	- sacctmgr_modify now recognized the informational message re the 
+	  number of records changed as normal, not a warning.
+	- New subclasses/ sacctmgr entities:
+		* Slurm::Sacctmgr::Resource 
+		* Slurm::Sacctmgr::Tres
+
+1.0.1  Mon Feb 08 17:27:00 2016
+	- fixed some test failures due to hash randomization (new in perl 5.18.x and later)
+	  verified with perl 5.22.1
+	  See bug #111881
+	  Thanks to SREZIC for bringing to my attention
+1.0.0  Wed Dec 23 13:36:00 2015
+	- original version; created by h2xs 1.23 with options
+		-A -X -n Slurm::Sacctmgr -v 1.00
+

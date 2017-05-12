@@ -1,0 +1,35 @@
+Socket::Class - A class to communicate with sockets
+===================================================
+
+Socket::Class provides a simple, fast and efficient way to communicate with
+sockets.
+It operates outside of the PerlIO layer and can be used as a replacement
+to IO::Socket.
+Little parts of Bluetooth technology has been integrated. Please see below.
+
+The standard build includes Bluetooth protocols for RFCOMM (stream) and
+L2CAP (datagram). Bluetooth adapters on a MS-Windows operation system must be
+compatible with the Windows Bluetooth API to get it working.
+More specific Bluetooth support could be added in the future.
+
+It has been tested on unix, darwin, MSWin(32,x64), cygwin, solaris, freebsd
+and aix platforms.
+
+INSTALLATION
+
+To install this library type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Use "perl Makefile.PL --help" for a list of available options.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007-2012 www.alien-heads.org
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

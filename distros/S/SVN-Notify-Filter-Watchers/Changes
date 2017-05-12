@@ -1,0 +1,40 @@
+Revision history for SVN-Notify-Filter-Watchers
+
+0.01   April 18, 2008
+        First version, released on an unsuspecting world.
+
+0.02   April 18, 2008
+        Fixed Makefile.PL for META.yml
+        Fixed Abstract section.
+
+0.03   April 20, 2008
+	Added --skip-walking-up to avoid walking up the path.
+        Added the start of simple tests.
+
+0.04   April 25, 2008
+	Fixed a few bugs while walking up the path.
+	Thanks to Jeff Mitchell for reporting the problem.
+
+0.05   April 29, 2008
+	Added --trim-original-to to clear any --to passed in
+	Now require 2.72 SVN::Notify for post_prepare filter
+
+0.06   May 05, 2008
+	Fixed trim_original_to
+
+0.07   May 08, 2008
+	Instead of trying to return the recipients, since we
+	are now running under post_prepare, modify
+	$self->{to} with the result.
+
+0.08   May 08, 2008
+	Make sure not to ignore $self->{to} when
+	trim_original_to is not set. Also, add some much
+	needed tests for this area of the code.
+
+0.09   May 09, 2008
+	Copy some test infrastructure from SVN::Notify to
+	help with tests on Cygwin.
+
+0.10 March 03, 2010
+	Fix problem with property on root directory.

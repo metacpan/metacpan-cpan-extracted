@@ -1,0 +1,5 @@
+test.example.com	OK
+Qual:foo.bar.tld	OK
+Qual:			SKIP
+Spam:foo@bar.com	FRIEND
+Spam:			FOE

@@ -1,0 +1,17 @@
+Revision history for Sub-MicroSig
+
+0.033     2013-10-18 11:25:11 America/New_York
+        - update bugtracker and repo metadata
+
+0.032     2007-10-08
+        - ENHANCEMENT: if no args are required, do not demand {} or []
+
+0.031     2006-11-13
+        - packaging improvements
+
+0.03      2006-03-14
+        - added MethodSig for methods with signatures
+        - fixed typo on synopsis (thanks, CWEST)
+
+0.01      2005-12-22
+        - First version, released on an unsuspecting world.

@@ -1,0 +1,134 @@
+String-Simrank 
+===========================
+
+The String::Simrank module allows rapid searches for similarity
+between query strings and a database of strings. This module is
+maintained by molecular biologists who use it for searching for
+similarities among strings representing contiguous DNA or RNA
+sequences.  This program does not construct an alignment, but rather
+finds the ratio of n-mers (A.K.A. ngrams) that are shared between a
+query and database records. The input file should be fasta formatted
+(either aligned or unaligned) multiple sequence file.  The memory
+consumption is moderate and grows linearly with the number of
+sequences and depends on the n-mer size defined by the user.  Using
+7-mers, ~20,000 strings each ~1,500 characters in length requires ~50
+Mb.
+
+The module can be used from the command line through the script
+examples/simrnak_nuc.pl provided.
+
+By default the output is written to STDOUT and represents the
+similarity of each query string to the top hits in the the database.
+The format is query_id, tab, best match database_id, colon, percent
+similarity, space second best match database_id, colon, percent
+similarity.
+
+Simrank statistic: 
+
+For those more comfortable with set theoretic descriptions of
+algorithms we provide such description. Note, however, that we only
+describe what is calculated, not how, provided description is
+algorithmicly less efficient than the one actually implemented in this
+package. In words the simrank statistic can be defined as:
+
+Definition: Simrank score is the number of unique n-mers shared
+between a query and a databases sequences divided by the smallest
+number of unique n-mers of the two.
+
+Let D be a database sequence, and Q be a query sequence. For
+a given n (length of the n-mer), we compute the number of unique
+n-mers that occur in each of the sequences. Let these numbers be
+nmer(D) and nmer(Q), respectively. Further let nvec(D) and nvec(Q) be
+the indicator vectors of length |A|^n for each possible n-mer, where
+|A| is the size of the alphabet used and
+
+nvec(D)[i] = 1 if D contains n-mer i (in a predefined total enumeration), and 0 otherwise.
+
+Then the Simrank statistic between two sequences can be computed as
+                         1
+Simrank(D,Q) = ---------------------- <nvec(D), nvec(Q)>,
+                min(nmer(D),nmer(Q))
+
+where <.,.> indicated the inner product. Of course, String:Simrank
+computes this statistic in more efficient manner than producing
+explicit enumeration of all possible n-mers. Instead, of this we only
+focus on the n-mers that are actually observed in either D or Q.
+
+INSTALLATION
+
+To install this module please use the standard procedure by typing the
+following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Simrank depends on a few packages that are readily available through
+CPAN. These are
+
+	Inline
+	Inline::C
+	File::Basename
+	IO::File
+	Fcntl
+	Data::Dumper
+	Storable
+
+EXAMPLE
+
+Standalone executable script simrank_nuc.pl is located in the examples
+folder of the distribution package. You can use the test data provided
+to learn how to use Simrank. In the following example we will build a
+database from test_data/db.fasta file and search for the similarity
+with sequences in test_data/query.fasta. To do so type:
+
+perl simrank_nuc.pl --data ../test_data/db.fasta --query ../test_data/query.fasta 
+
+You should see the following output:
+
+EscCol36	EscCol36:100.00	EscCol36-2:100.00	EscCol43:99.59	EscCol29:99.24	EscCol33:99.17	EscCol10:99.02	EscCol22:97.52EscCo110:97.03	ShgDysen:96.13	EscCol37:93.48	RmlBacte:80.56	AluAgaro:35.45
+
+Our query file contained only one sequence EscCol36. In the output the
+id of this sequence comes first, then we see the list of all sequences
+in the database sorted by their simrank statistic with the query
+sequence. We can limit the simrank identity of the output by using
+--minpct flag. For instance:
+
+perl simrank_nuc.pl --data ../test_data/db.fasta --query ../test_data/query.fasta --minpct 100
+
+will only output identical sequences.
+
+CITATION 
+
+If you use Simrank in your research please cite: 
+
+Todd Z. DeSantis, Keith Keller, Gary L. Andersen, Alexander
+V. Alekseyenko, Niels Larson Simrank: Rapid and sensitive general
+purpose k-mer search tool. (in preparation)
+
+COPYRIGHT AND LICENCE
+
+simrank - high performance DNA/RNA similarity match utility
+
+Copyright (C) 2007, 2008 Niels Larsen and Todd DeSantis.
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+
+
+

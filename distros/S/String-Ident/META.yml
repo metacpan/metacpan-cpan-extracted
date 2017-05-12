@@ -1,0 +1,32 @@
+---
+abstract: 'clean-up string to be used as identifier and in URLs'
+author:
+  - 'Jozef Kutej <jkutej@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+keywords:
+  - string
+  - cleanup
+  - identifier
+  - ascii
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: String-Ident
+provides:
+  String::Ident:
+    file: lib/String/Ident.pm
+    version: '0.03'
+requires:
+  Text::Unidecode: '0'
+resources:
+  bugtracker: http://github.com/meon/String-Ident/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/meon/String-Ident
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

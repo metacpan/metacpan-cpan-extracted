@@ -1,0 +1,27 @@
+---
+abstract: 'An extension of Smart::Comments to utilize Log::Log4perl for all output'
+author:
+  - 'Tracy Beck <tgbeck@acm.org>'
+build_requires:
+  File::Spec: '0'
+  Test::More: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Smart-Comments-Log4perl
+requires:
+  Log::Log4perl: '0'
+  Scalar::Util: '0'
+  Smart::Comments: '0'
+  Symbol: '0'
+  Tie::Handle: '0'
+  base: '0'
+  perl: '5.016'
+  strict: '0'
+version: '1.002'

@@ -1,0 +1,32 @@
+SNMP::Multi INSTALL
+
+PREREQUISTIES
+
+1. Install UCD SNMP by hand.
+
+   UCD SNMP is not the Net::SNMP found on CPAN.
+   In fact, it's not on CPAN at all (as of Jan 2002).
+   Get it from http://www.net-snmp.org/.
+
+      *** IMPORTANT ***
+
+   By default, the SNMP perl modules are not installed.  
+   The SNMP INSTALL file will help you with them.
+
+2. Memoize is also required. CPAN.pm and MakeMaker
+   ought to install it automatically for you.
+
+
+INSTALL
+
+Install SNMP::Multi just like any other CPAN module:
+
+   perl Makefile.PL
+   make
+   make test
+   
+   # as root
+   umask 002
+   make install
+
+$Id: INSTALL,v 1.1.1.1 2003/12/18 01:16:52 toni Exp $

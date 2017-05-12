@@ -1,0 +1,46 @@
+SOAP-Transport-HTTP-Nginx
+
+This module introduces new transports for SOAP::Lite module:
+SOAP::Transport::HTTP::Nginx
+XMLRPC::Transport::HTTP::Nginx
+These are HTTP transports for nginx - lightweight HTTP server and mail proxy server (http://nginx.net/).
+Take a look at examples directory for server/client examples.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc XMLRPC::Transport::HTTP::Nginx
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=SOAP-Transport-HTTP-Nginx
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/SOAP-Transport-HTTP-Nginx
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/SOAP-Transport-HTTP-Nginx
+
+    Search CPAN
+        http://search.cpan.org/dist/SOAP-Transport-HTTP-Nginx/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Alexander Soudakov
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

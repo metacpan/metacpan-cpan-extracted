@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!DOCTYPE hrc
+  PUBLIC "-//Cail Lomecb//DTD Colorer HRC take5//EN" "http://colorer.sf.net/2003/hrc.dtd">
+<hrc xmlns="http://colorer.sf.net/2003/hrc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:hrc="http://colorer.sf.net/2003/hrc" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="take5" xsi:schemaLocation="http://colorer.sf.net/2003/hrc http://colorer.sf.net/2003/hrc.xsd">
+<!--
+  insert this define into HRC base catalog file (colorer.hrc)
+
+  <prototype name="wsf" group="group" description="wsf" targetNamespace="">
+    <location link="wsf.hrc"/>
+    <filename>/\./ix</filename>
+  </prototype>
+-->
+   <type name="wsf">
+      <annotation>
+         <documentation>
+           XSLT Generated HRC scheme for language 'wsf'
+           from XML Schema with xsd2hrc.xsl version 0.9.2
+            (C) 2002-03 Cail Lomecb
+            Portions copyright (C) 2004 Eugene Efremov
+
+           Scheme parameters:
+             targetNamespace             : 
+             hrctype                     : wsf
+             allow-common-attr           : yes
+             allow-any-attr              : no
+             allow-unknown-elements      : yes
+             allow-unknown-root-elements : no
+             force-single-root           : yes
+             add-new-references          : 
+             default prefixes            : (?{}(?{}wsf):)?
+
+               you can change them with entity 'nsprefix'
+
+         </documentation>
+         <documentation>
+          Schema documentation:</documentation>
+         <contributors>Cail Lomecb, Max Belugin</contributors>
+      </annotation>
+
+      <import type="def"/>
+
+      <region name="element.start.name" parent="xml:element.defined.start.name"/>
+      <region name="element.end.name" parent="xml:element.defined.end.name"/>
+      <region name="element.start.lt" parent="xml:element.start.lt"/>
+      <region name="element.start.gt" parent="xml:element.start.gt"/>
+      <region name="element.end.lt" parent="xml:element.end.lt"/>
+      <region name="element.end.gt" parent="xml:element.end.gt"/>
+      <region name="element.nsprefix" parent="element.start.name"/>
+      <region name="element.nscolon" parent="xml:element.nscolon"/>
+      <region name="Attribute.name" parent="xml:Attribute.defined.name"/>
+      <region name="Attribute.nsprefix" parent="xml:Attribute.nsprefix"/>
+      <region name="AttValue" parent="xml:AttValue.defined"/>
+      <region name="AttValue.start" parent="xml:AttValue.defined.start"/>
+      <region name="AttValue.end" parent="xml:AttValue.defined.end"/>
+      <region name="Enumeration" parent="xml:Enumeration" description="Enumerated type values"/>
+
+      <entity name="ns-real-prefix" value="(?{}(?{}wsf):)"/>
+      <entity name="nsprefix" value="(?{}(?{}wsf):)?"/>
+
+      <scheme name="_hrc_int_elementContent">
+         <block start="/~( (&lt;) (  ((%xml:NCName;) (:) )? (%xml:Name;) ) \M &gt;?   )/x" end="/( (&lt;\/) (\y3\b)?= ( (%xml:NCName;) (:) )? (%xml:Name;) \b \M \s* (&gt;?)                   | (\/ \M &gt;) )/x" region01="PairStart" region02="element.start.lt" region05="element.nsprefix" region06="element.nscolon" region07="element.start.name" region11="PairEnd" region12="element.end.lt" region15="element.nsprefix" region16="element.nscolon" region17="element.end.name" region18="element.end.gt" region19="element.start.gt" scheme="xml:elementContent2"/>
+         <inherit scheme="xml:badChar"/>
+      </scheme>
+      <scheme name="_hrc_int_AttValue">
+         <block start="/(&#34;)/" end="/(\y1)/" region00="PairStart" region10="PairEnd" region01="AttValue.start" region11="AttValue.end" scheme="xml:AttValue.content.quot" region="AttValue"/>
+         <block start="/(')/" end="/(\y1)/" region00="PairStart" region10="PairEnd" region01="AttValue.start" region11="AttValue.end" scheme="xml:AttValue.content.apos" region="AttValue"/>
+      </scheme>
+      <scheme name="AttributeContent">
+         <inherit scheme="xml:AttributeContent">
+            <virtual scheme="xml:AttValue" subst-scheme="_hrc_int_AttValue"/>
+         </inherit>
+      </scheme>
+      <scheme name="jobType-content">
+         <inherit scheme="wsc:script-elements"/>
+         <inherit scheme="jobType-content-old"/>
+      </scheme>
+      <scheme name="scriptType-content">
+         <inherit scheme="wsc:scriptType-content"/>
+      </scheme>
+      <scheme name="scriptType-content-error">
+         <inherit scheme="scriptType-content"/>
+      </scheme>
+      <scheme name="description-element">
+         <block start="/\M &lt; (%nsprefix;description ([\s\/&gt;]|$) )/x" end="/ &gt; /x" scheme="xmlschema:string-elementContent"/>
+      </scheme>
+      <scheme name="example-element">
+         <block start="/\M &lt; (%nsprefix;example ([\s\/&gt;]|$) )/x" end="/ &gt; /x" scheme="xmlschema:string-elementContent"/>
+      </scheme>
+      <scheme name="package-element">
+         <block start="/\M &lt; (%nsprefix;package ([\s\/&gt;]|$) )/x" end="/ &gt; /x" scheme="_hrc_int_d0e12-elementContent"/>
+      </scheme>
+      <scheme name="job-element">
+         <block start="/\M &lt; (%nsprefix;job ([\s\/&gt;]|$) )/x" end="/ &gt; /x" scheme="jobType-elementContent"/>
+      </scheme>
+
+      <scheme name="namedType-content">
+         <inherit scheme="xml:element"/>
+      </scheme>
+      <scheme name="namedType-content-error">
+         <inherit scheme="namedType-content"/>
+         <inherit scheme="xml:badChar"/>
+      </scheme>
+      <scheme name="namedType-Attributes">
+         <block end="/[&#34;']?#1/" region02="Attribute.name" start="/(\s?#1|^)(name)\M([\s\=]|$)/x" scheme="xmlschema:string-AttributeContent"/>
+         <block end="/[&#34;']?#1/" region02="Attribute.name" start="/(\s?#1|^)(helpstring)\M([\s\=]|$)/x" scheme="xmlschema:string-AttributeContent"/>
+         <block end="/[&#34;']?#1/" region02="Attribute.name" start="/(\s?#1|^)(type)\M([\s\=]|$)/x" scheme="xmlschema:string-AttributeContent"/>
+         <block end="/[&#34;']?#1/" region02="Attribute.name" start="/(\s?#1|^)(required)\M([\s\=]|$)/x" scheme="xmlschema:boolean-AttributeContent"/>
+      </scheme>
+      <scheme name="namedType-elementContent">
+         <inherit scheme="_hrc_int_elementContent">
+            <virtual scheme="xml:element" subst-scheme="namedType-content"/>
+            <virtual scheme="xml:content.cdata" subst-scheme="xml:badChar"/>
+            <virtual scheme="xml:Attribute.any" subst-scheme="namedType-Attributes"/>
+         </inherit>
+      </scheme>
+<!--
+        parent: package
+-->
+
+      <scheme name="_hrc_int_d0e12-content">
+         <inherit scheme="job-element"/>
+         <inherit scheme="xml:element"/>
+      </scheme>
+      <scheme name="_hrc_int_d0e12-content-error">
+         <inherit scheme="_hrc_int_d0e12-content"/>
+         <inherit scheme="xml:badChar"/>
+      </scheme>
+      <scheme name="_hrc_int_d0e12-Attributes"/>
+      <scheme name="_hrc_int_d0e12-elementContent">
+         <inherit scheme="_hrc_int_elementContent">
+            <virtual scheme="xml:element" subst-scheme="_hrc_int_d0e12-content"/>
+            <virtual scheme="xml:content.cdata" subst-scheme="xml:badChar"/>
+            <virtual scheme="xml:Attribute.any" subst-scheme="_hrc_int_d0e12-Attributes"/>
+         </inherit>
+      </scheme>
+
+      <scheme name="jobType-content-old">
+         <block start="/\M &lt; (%nsprefix;runtime ([\s\/&gt;]|$) )/x" end="/ &gt; /x" scheme="runtimeType-elementContent"/>
+         <block start="/\M &lt; (%nsprefix;script ([\s\/&gt;]|$) )/x" end="/ &gt; /x" scheme="scriptType-elementContent"/>
+         <inherit scheme="xml:element"/>
+      </scheme>
+      <scheme name="jobType-content-error">
+         <inherit scheme="jobType-content"/>
+         <inherit scheme="xml:badChar"/>
+      </scheme>
+      <scheme name="jobType-Attributes">
+         <block end="/[&#34;']?#1/" region02="Attribute.name" start="/(\s?#1|^)(id)\M([\s\=]|$)/x" scheme="xmlschema:string-AttributeContent"/>
+      </scheme>
+      <scheme name="jobType-elementContent">
+         <inherit scheme="_hrc_int_elementContent">
+            <virtual scheme="xml:element" subst-scheme="jobType-content"/>
+            <virtual scheme="xml:Attribute.any" subst-scheme="jobType-Attributes"/>
+         </inherit>
+      </scheme>
+
+      <scheme name="runtimeType-content">
+         <block start="/\M &lt; (%nsprefix;named ([\s\/&gt;]|$) )/x" end="/ &gt; /x" scheme="namedType-elementContent"/>
+         <inherit scheme="description-element"/>
+         <inherit scheme="example-element"/>
+         <inherit scheme="xml:element"/>
+      </scheme>
+      <scheme name="runtimeType-content-error">
+         <inherit scheme="runtimeType-content"/>
+         <inherit scheme="xml:badChar"/>
+      </scheme>
+      <scheme name="runtimeType-Attributes"/>
+      <scheme name="runtimeType-elementContent">
+         <inherit scheme="_hrc_int_elementContent">
+            <virtual scheme="xml:element" subst-scheme="runtimeType-content"/>
+            <virtual scheme="xml:content.cdata" subst-scheme="xml:badChar"/>
+            <virtual scheme="xml:Attribute.any" subst-scheme="runtimeType-Attributes"/>
+         </inherit>
+      </scheme>
+
+      <scheme name="scriptType-content-old">
+         <inherit scheme="xmlschema:string-content"/>
+      </scheme>
+      <scheme name="scriptType-content-error-old">
+         <inherit scheme="scriptType-content"/>
+         <inherit scheme="xml:badChar"/>
+      </scheme>
+      <scheme name="scriptType-Attributes">
+         <block end="/[&#34;']?#1/" region02="Attribute.name" start="/(\s?#1|^)(language)\M([\s\=]|$)/x" scheme="xmlschema:string-AttributeContent"/>
+         <block end="/[&#34;']?#1/" region02="Attribute.name" start="/(\s?#1|^)(id)\M([\s\=]|$)/x" scheme="xmlschema:string-AttributeContent"/>
+      </scheme>
+      <scheme name="scriptType-elementContent">
+         <inherit scheme="_hrc_int_elementContent">
+            <virtual scheme="xml:CDSect.content.stream" subst-scheme="scriptType-content-error"/>
+            <virtual scheme="xml:content.cdata.stream" subst-scheme="scriptType-content-error"/>
+            <virtual scheme="xml:element" subst-scheme="def:empty"/>
+            <virtual scheme="xml:Attribute.any" subst-scheme="scriptType-Attributes"/>
+         </inherit>
+      </scheme>
+
+
+      <scheme name="wsf-root">
+         <annotation>
+            <documentation>
+               You can replace these elements with needed single root element
+               with customizing HRC generation process.
+              </documentation>
+         </annotation>
+         <inherit scheme="description-element"/>
+         <inherit scheme="example-element"/>
+         <inherit scheme="package-element"/>
+         <inherit scheme="job-element"/>
+      </scheme>
+      <scheme name="wsf-root-addref">
+         <inherit scheme="wsf-root"/>
+      </scheme>
+      <scheme name="wsf">
+         <inherit scheme="xml:singleroot">
+            <virtual scheme="xml:element" subst-scheme="wsf-root-addref"/>
+         </inherit>
+      </scheme>
+   </type>
+</hrc>

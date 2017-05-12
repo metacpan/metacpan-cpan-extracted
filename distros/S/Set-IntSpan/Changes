@@ -1,0 +1,82 @@
+Revision history for Perl extension Set::IntSpan
+
+1.19  2014 Apr 09
+        - unit test fix
+
+1.18  2013 Apr 03
+        - POD
+
+1.17  2013 Apr 02
+	- no use integer
+	- optimize _copy_array
+
+1.16  2010 Nov 10
+        - unit test fix for Perl 5.6.2 on x86_64
+
+1.15  2010 Nov 04
+        - added span_ord() method
+
+1.14  2010 Jun 22
+        - added ord() method
+
+1.13  2007 Oct 27
+        - recoded member(), insert(), and remove() to use a binary search
+
+1.12  2007 Sep 08
+        - added support for spans in constructors
+
+1.11  2007 Mar 17
+	- added mutating set operations
+	- added operator overloads
+
+1.10  2007 Mar 04
+        - extened new to take list of set_specs
+        - added size as an alias for cardinality
+	- added sets method
+        - added cover (extent), and holes methods
+        - added inset, pad, and trim methods
+        - added grep_spans and map_spans functions
+
+1.09  2005 Dec 13
+        - added indexing methods
+	- 'die' instead of 'croak' on fatal errors
+
+1.08  2004 May 07
+        - added the spans method
+	- cleaned up some warnings
+
+1.07  1988 Dec 03
+	- fixes to facilitate subclassing
+	  o use ref $this instead of hardcoded "Set::IntSpan"
+	  o made internal functions into methods
+	  o use method call syntax on all internal method calls,
+	    not function call syntax
+	  o use direct object syntax on all internal method calls,
+	    because indirect object syntax sometimes parses as a 
+	    function call
+	- added ABSTRACT and AUTHOR keys in Makefile.PL
+
+1.06  Mar  3 1998
+	- fixed real_set "0" bug
+
+1.05  Dec 19  1997
+	- fixed new Set::IntSpan "0"  bug
+
+1.04  Jun 12  1997
+	- runs clean under Perl 5.004
+	- added iterators
+
+1.03  Jun  7  1996 
+	- runs clean under -w
+	- moved test code to t/*.t
+	- added valid(), min() and max()
+	- documentation fixes
+
+1.01  Feb 22  1996 
+	- added $Set::IntSpan::Empty_String
+	- made Set::IntSpan an Exporter
+	- documentation fixes
+	
+1.00  Jan  2  1996 
+	- original version
+

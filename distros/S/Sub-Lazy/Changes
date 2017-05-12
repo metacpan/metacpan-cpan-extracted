@@ -1,0 +1,14 @@
+Sub-Lazy
+========
+
+Created:      2012-11-17
+Home page:    <https://metacpan.org/release/Sub-Lazy>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Sub-Lazy>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.002	2014-09-10
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.001	2012-11-17	Initial release

@@ -1,0 +1,129 @@
+#!/usr/bin/perl
+use strict;
+use base 'LEOCHARRE::CLI';
+use vars qw($VERSION);
+use Sys::Filesystem::ID ':all';
+$VERSION = sprintf "%d.%02d", q$Revision: 1.6 $ =~ /(\d+)/g;
+
+my $o = gopts('lLA');
+
+if (DEBUG){
+   $Sys::Filesystem::ID::DEBUG = 1;
+}
+
+sub usage {
+   qq{$0 - identify a storage filesystem
+
+   -l list wanted fs formats (ext2, ext3)
+   -L list all filesystems 
+   -d debug
+   -A make sure there's an fsid in each of the wanted fs formats
+
+See man fsid for more.};
+}
+
+
+my %FS = %Sys::Filesystem::ID::FS;
+
+_make_sure_all_fs_have_fsid();
+
+_list_fs();
+
+
+sub _list_fs {
+   $o->{L} or $o->{l} or return;
+
+   my @fs;
+
+   if( $o->{l} ){
+      @fs = @FSOK;
+   }
+   else {
+      @fs = @FSALL;
+   }
+
+   FS: for my $fs( @fs ){
+
+      my $h = $FS{$fs};      
+
+      for my $att ( qw(mnt dev format)){         
+         print "$att: $$h{$att}\n";
+      }
+      
+      if ( my $fsid =  get_id($fs) ){
+         printf "fsid: $fsid\n";
+      }
+
+      print "\n";
+   }      
+   exit;
+}
+
+
+sub _make_sure_all_fs_have_fsid {
+
+   $o->{A} or return;
+   $o->{l} or $o->{L} or $o->{l} = 1;
+
+   for my $mount_point (@FSOK){
+      get_id($mount_point) or create_id($mount_point) or die;
+   }
+   return 1;
+
+
+}
+
+
+# actually we just want to do one path or dev etc.. not more
+my $arg = $ARGV[0];
+defined $arg or print STDERR "missign path or dev arg\n" and exit(1);
+
+print get_id($arg);
+exit;
+
+
+__END__
+
+=pod
+
+=head1 NAME
+
+fsid - identify a filesystem
+
+=head1 DESCRIPTION
+
+This writes and reads an id file for a filesystem.
+
+   -l list wanted fs formats (ext2, ext3)i
+   -L list all filesystems 
+   -d debug
+   -A make sure there's an fsid in each of the wanted fs formats
+
+USAGE EXAMPLES
+
+List storage filesystems on this machine.
+
+   fid -l
+
+Get filesystem id for a device
+
+   fsid /dev/hda1
+
+Get filesystem id for a path
+
+   fsid ~/Desktop
+
+=head1 CAVEATS
+
+For posix systems only.
+
+=head1 SEE ALSO
+
+L<Sys::Filesystem::ID> for full API.
+L<fsidgen> generate id.
+
+=head1 AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+=cut

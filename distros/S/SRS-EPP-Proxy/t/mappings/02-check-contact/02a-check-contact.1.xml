@@ -1,0 +1,5 @@
+<NZSRSResponse VerMajor="5" VerMinor="0">
+  <Response Action="HandleDetailsQry" FeId="8" FeSeq="4713409" OrigRegistrarId="90" RecipientRegistrarId="90" Rows="0">
+    <FeTimeStamp Day="16" Hour="17" Minute="41" Month="6" Second="28" TimeZoneOffset="+12:00" Year="2010"/>
+  </Response>
+</NZSRSResponse>

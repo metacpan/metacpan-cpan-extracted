@@ -1,0 +1,133 @@
+<?xml version="1.0" ?>
+<solstice_config>
+
+    <keys>
+        <key name="allow_rte_switching">0</key>
+        <key name="host_name">www.example.com</key>
+        <!-- only set this if you're doing something non-standard -->
+        <key name="port_number"></key>
+
+        <!-- optional 404 error view class name -->
+        <key name="404_view"></key>
+
+        <!-- File content extractors for indexing -->
+        <!-- http://www.45.free.net/~vitus/software/catdoc/ -->
+        <key name="catdoc_path"></key>
+        <key name="catppt_path"></key>
+        <key name="xls2csv_path"></key>
+        <!-- the "charset_path" config should be defined if you have a custom location
+        for the resource files used by these programs -->
+        <key name="charset_path"></key>
+        <key name="tmp_space">/tmp/</key>
+    </keys>
+
+
+    <virtual_root>tools</virtual_root>
+    <server_string>Development</server_string>
+    <webservice_rest_root>rest</webservice_rest_root><!-- if left empty this defaults to 'rest' -->
+    <support_email>support@email.com</support_email>
+    <admin_email>support@email.com</admin_email>
+    <lang>en</lang>
+    <data_root>/home/user/data/</data_root>
+    <debug_level>0</debug_level>
+    <require_ssl>0</require_ssl>
+
+    <db_hosts>
+        <host 
+            host_name="test.washington.edu" 
+            type="master"
+            port="0000"
+            user="user"
+            password="password"
+            database_name="solstice"
+            />
+    </db_hosts>
+    <!-- currently supported: MySQL, Memcached -->
+    <session_backend>MySQL</session_backend>
+
+    <!-- for memcached backend -->
+    <memcached_servers>
+        <server>127.0.0.1:11211</server>
+    </memcached_servers>
+
+    <!-- for mysql backend -->
+    <session_db>sessions</session_db>
+
+    <session_cookie>solsticeSessionID</session_cookie>
+
+    <smtp_server>localhost</smtp_server>
+    <smtp_mailname>localhost</smtp_mailname>
+    <smtp_msg_wait>0.5</smtp_msg_wait>
+    <smtp_use_queue>never</smtp_use_queue> <!-- Valid values are: 'optional', 'always', 'never' -->
+
+    <!--    <compiled_view_path>/tmp/compiled_solstice_views/</compiled_view_path> -->
+    <development_mode>1</development_mode>
+    <slow_query_time>4</slow_query_time>
+
+    <encryption_key>encryption_key</encryption_key>
+
+    <!-- optional boilerplate view, always overridden by application URL attribute -->
+    <boilerplate_view>Solstice::View::Boilerplate</boilerplate_view>
+
+    <log_modules>
+        <module>Solstice::Logger::File</module>
+    </log_modules>
+
+    <css_files>
+        <css_file>styles/solstice.css</css_file>
+    </css_files>
+
+    <js_files>
+        <js_file>javascript/solstice.js</js_file>
+        <js_file>javascript/remote.js</js_file>
+        <!-- the following yahooui files are needed to have correct event behavior -->
+        <js_file>javascript/yui/build/yahoo/yahoo-min.js</js_file>
+        <js_file>javascript/yui/build/event/event-min.js</js_file>
+        <js_file>javascript/yui/build/dom/dom-min.js</js_file>
+        <js_file>javascript/yui/build/dragdrop/dragdrop-min.js</js_file>
+        <js_file>javascript/yui/build/connection/connection-min.js</js_file>
+        <js_file>javascript/yui/build/container/container-min.js</js_file>
+        <js_file>javascript/yahooui.js</js_file>
+    </js_files>
+
+    <app_dirs>
+        <app_dir>/home/user/apps/</app_dir>
+    </app_dirs>
+
+    <cgis>
+        <!-- virtual_path is an optional attribute -->
+        <cgi virtual_path="file_upload.cgi" requires_auth="0">cgis/file_upload.cgi</cgi>
+        <cgi virtual_path="file_download.cgi" requires_auth="0">cgis/file_download.cgi</cgi>
+        <cgi virtual_path="file_thumbnail.cgi" requires_auth="0">cgis/file_thumbnail.cgi</cgi>
+        <cgi virtual_path="remote/locking.cgi" requires_auth="1">cgis/locking.cgi</cgi>
+        <cgi virtual_path="_auth" requires_auth="0" url_is_prefix="1">cgis/auth_handler.pl</cgi>
+        <cgi virtual_path="static_concat" requires_auth="0" url_is_prefix="1">cgis/static_concat.cgi</cgi>
+    </cgis>
+
+    <statics>
+        <!-- virtual_path is an optional attribute -->
+        <static>images</static>
+        <static>javascript</static>
+        <static>styles</static>
+        <static>content</static>
+    </statics>
+
+    <remotes>
+        <remote name="subsession_check">Solstice::Controller::Remote::SubsessionCheck</remote>
+        <remote name="upload_meter">Solstice::Controller::Remote::UploadMeter</remote>
+    </remotes>
+
+    <error_html>
+        <![CDATA[
+        <html>
+            <head>
+                <title>Solstice Error</title>
+            </head>
+            <body>
+                <p style="font-weight: bold;">Solstice has experienced an error and cannot continue.</p>
+                <p>Please contact <a href="mailto:admint@youremail.com">admin@youremail.com</a> for assistance.</p>
+            </body>
+        </html>
+        ]]>
+    </error_html>
+</solstice_config>

@@ -1,0 +1,25 @@
+Revision history for Unique and String::Unique
+
+0.01    Fri Dec 28 15:37:04 PST 2007
+        First version, base functionality
+
+0.02    Date not given
+        Return day of year code when list value requested
+
+0.03    Mon Feb  4 13:47:11 PST 2008
+	Documentation changes only
+
+0.04    Date not recorded
+
+1.01    Fri May 30 09:37:39 PDT 2008
+	Substantial changes to supper account service 3.0, 
+        * removal of internal date functionality
+	* removal of date reporting functionality
+        * removal of Date::EzDate dependencies
+	
+1.02 Thu Jul  7 11:47:52 PDT 2011
+       Documentation and format changes to prpare for CPAN release
+       Correction of statment of known bugs [removal of statment]
+
+1.10 Fri Jul  8 22:46:01 PDT 2011
+       Rename the module String::Unique

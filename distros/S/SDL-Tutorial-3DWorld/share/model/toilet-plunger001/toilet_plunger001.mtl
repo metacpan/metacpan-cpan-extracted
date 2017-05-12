@@ -1,0 +1,16 @@
+# MTL written from D:\Projects\Modo Files\scene\toilet-plunger001\toilet_plunger001.obj
+newmtl handle
+Kd 0.687059 0.661961 0.64
+Ns 16
+d 1
+illum 2
+Ka 0 0 0
+Ks 0.00472549 0.00466667 0.00460784
+newmtl rubber
+Kd 0.51451 0.225882 0.153725
+Ns 11.3137
+d 1
+illum 2
+Ka 0 0 0
+Ks 0.01 0.01 0.01
+map_Bump E:\Program Files (x86)\Luxology\modo\content\Assets\Images\Plastic\Rough\rough_bump.png

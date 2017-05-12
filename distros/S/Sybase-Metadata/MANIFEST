@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Sybase-Metadata.t
+lib/Sybase/Metadata.pm
+META.yml                                 Module meta-data (added by MakeMaker)

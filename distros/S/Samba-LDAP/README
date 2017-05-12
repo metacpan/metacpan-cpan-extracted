@@ -1,0 +1,42 @@
+Samba-LDAP version 0.05
+
+Samba::LDAP - Manage a Samba PDC with an LDAP Backend
+
+CPAN Port of smbldap-tools found at http://samba.idealx.org/
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+
+DEPENDENCIES
+
+None.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2001-2002 IDEALX - Original smbldap-tools
+Copyright (C) 2006 Suretec Systems Ltd., 
+              - Gavin Henry <ghenry@suretecsystems.com>
+              - http://www.suretecsystems.com
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+See perldoc perlgpl

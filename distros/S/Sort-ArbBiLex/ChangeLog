@@ -1,0 +1,47 @@
+Revision history for Perl extension Sort::ArbBiLex.
+                                        Time-stamp: "2004-03-27 17:18:43 AST"
+
+2004-03-27   Sean M. Burke  sburke@cpan.org
+	* Version 4.01 -- now with Unicode support, and tests for it.
+
+2004-03-24   Sean M. Burke  sburke@cpan.org
+	* Version 3.41 -- adding an extra example to the pod.
+	Also some misc distro things: moved test.pl to t/*, etc.
+
+2001-03-19   Sean M. Burke  sburke@cpan.org
+
+	* Version 3.40 -- adding comparator functions, and documentation
+	and discussion of them.  Adding them to test.pl.  Adding "use
+	integer" to the module, for presumably tiny speed increase.
+	
+2000-12-09   Sean M. Burke  sburke@cpan.org
+
+	* Version 3.32 -- just fixing incidental typos in the POD.
+
+2000-12-08   Sean M. Burke  sburke@cpan.org
+
+	* Version 3.31 -- adding import method; relevent doc changes.
+	* Fixing apparently obscure bug in the code to check that glyphs
+	in long-form (rLoL) declarations aren't references.
+	* Moved all the POD to after the end of the module code.
+	* Deturgidified the discussion of runtime/compiletime function
+	declaration.
+		
+2000-08-22   Sean M. Burke  sburke@cpan.org
+	
+	* Version 3.21 -- fixing bug that made the second level of sorting
+	behave incorrectly in the case of multi-glyph mode.
+
+2000-05-13  Sean M. Burke  sburke@cpan.org
+
+	* Version 3.11 -- just noting my new email address.
+
+1999-01-11  Sean M. Burke  sburke@netadventure.net
+
+	* Release 3.1 -- first release version.
+
+	* Versions before 3.1 -- dozens of test versions I kicked around
+	for months and months.  Scads of interface changes, a good
+	half-dozen changes in the module name.  Endless changes to the
+	docs.
+

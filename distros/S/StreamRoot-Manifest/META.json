@@ -1,0 +1,42 @@
+{
+   "abstract" : "StreamRoot Manifest API",
+   "author" : [
+      "Lucas Tiago de Moraes <lucastiagodemoraes@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4212",
+   "license" : [
+      "Artistic_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "StreamRoot-Manifest",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON" : "0",
+            "WWW::Curl" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "StreamRoot::Manifest" : {
+         "file" : "lib/StreamRoot/Manifest.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.03"
+}

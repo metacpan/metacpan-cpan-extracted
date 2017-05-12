@@ -1,0 +1,39 @@
+bin/normalizer
+Changes
+lib/String/Normal.pm
+lib/String/Normal/Config.pm
+lib/String/Normal/Config/AddressStem.pm
+lib/String/Normal/Config/AddressStop.pm
+lib/String/Normal/Config/AreaCodes.pm
+lib/String/Normal/Config/BusinessCompress.pm
+lib/String/Normal/Config/BusinessStem.pm
+lib/String/Normal/Config/BusinessStop.pm
+lib/String/Normal/Config/States.pm
+lib/String/Normal/Config/TitleStem.pm
+lib/String/Normal/Config/TitleStop.pm
+lib/String/Normal/Type.pm
+lib/String/Normal/Type/Address.pm
+lib/String/Normal/Type/Business.pm
+lib/String/Normal/Type/City.pm
+lib/String/Normal/Type/Phone.pm
+lib/String/Normal/Type/State.pm
+lib/String/Normal/Type/Title.pm
+lib/String/Normal/Type/Zip.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+readme.md
+t/00-load.t
+t/01-business.t
+t/02-address.t
+t/03-phone.t
+t/04-state.t
+t/05-city.t
+t/06-zip.t
+t/07-title.t
+t/10-override-data.t
+t/data/compress.txt
+t/data/stem.txt
+t/data/stop.txt
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

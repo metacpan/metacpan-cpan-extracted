@@ -1,0 +1,276 @@
+#
+# Statistics::Discrete
+#
+# Chiara Orsini, CAIDA, UC San Diego
+# chiara@caida.org
+#
+# Copyright (C) 2014 The Regents of the University of California.
+#
+# Statistics::Discrete is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Statistics::Discrete is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Statistics::Discrete.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+=head1 NAME
+
+B<Statistics::Discrete> - Perl extension for statistical analyses of discrete data.
+The package provides descriptive statistics, distributions and the possibility to
+bin the distributions requested. It uses an internal "cache" in order to be as efficient
+as possible when multiple statistics are computed on the same set of data.
+
+=head1 SYNOPSIS
+
+  use Statistics::Discrete;
+ 
+  my $sd = Statistics::Discrete->new();
+
+  # Add data
+  $sd->add_data((2,5,7,2,1,7,3,3,7,333));
+  $sd->add_data_from_file("./data.txt"); 
+
+  # Descriptive Statistics
+  my $count = $sd->count(); 
+  my $min = $sd->minimum(); 
+  my $max = $sd->maximum(); 
+  my $mean = $sd->mean(); 
+  my $median = $sd->median(); 
+  my $variance = $sd->variance(); 
+  my $standard_deviation = $sd->standard_deviation(); 
+  my $percentile = $sd->percentile(90); # 90th percentile
+
+  # Distributions
+  my $fd = $sd->frequency_distribution();
+  my $pmf = $sd->probability_mass_function();
+  my $cdf = $sd->empirical_distribution_function();
+  my $ccdf = $sd->complementary_cumulative_distribution_function();
+  
+  # Binning
+  $sd->set_binning_type(Statistics::Discrete:NO_BINNING);
+  $sd->set_binning_type(Statistics::Discrete:LOG_BINNING);
+  $sd->set_binning_type(Statistics::Discrete:LIN_BINNING);
+  $sd->set_optimal_binning();
+  $sd->set_custom_num_bins(10);
+  my $cur_bins = $sd->bins();
+  my $lin_bins = $sd->compute_lin_bins($num_of_bins);
+  my $log_bins = $sd->compute_log_bins($num_of_bins);
+
+
+=head1 DESCRIPTION
+
+To use B<Statistics::Discrete>, first you need to load
+the module:
+
+  use Statistics::Discrete;
+  use strict;
+
+Then you need to create a new object of the class
+B<Statistics::Discrete>:
+
+  my $sd = Statistics::Discrete->new();
+
+Next you need to load the data to be analyzed
+in the class either by providing a numerical 
+array or a file containing the data:
+
+  $sd->add_data((2,5,7,2,1,7,3,3,7,333));
+
+or:
+  $sd->add_data_from_file("./data.txt"); 
+
+# TODO add info on file format
+
+=head2  Descriptive Statistics
+
+=over 4
+
+=item count()
+
+C<count> return the number of samples.
+
+=item minimum()
+
+C<minimum> return the minimum data value.
+
+=item maximum()
+
+C<maximum> return the maximum data value.
+
+=item mean()
+
+C<mean> return the mean value.
+
+=item median()
+
+C<median> return the median value.
+
+=item variance()
+
+C<variance> return the variance.
+
+=item standard_deviation()
+
+C<standard_deviation> return the standard deviation.
+
+=item percentile( [$perc] ) 
+
+C<percentile> return the minimum data value that satisfies the C<$perc> percentile.
+
+=back
+
+
+=head2  Distributions
+
+The distributions are computed without any binning of the data provided
+unless a binning type is explicitely provided (see section
+"Advanced Features: binning").
+
+=over 4
+
+=item frequency_distribution()
+
+C<frequency_distribution> return  a hash reference containing
+data points as keys and their frequency as the corresponding hash value.
+
+=item probability_mass_function()
+
+C<probability_mass_function> return a hash reference containing
+data points as keys and their probability mass function as the corresponding
+hash value (i.e. probability to extract exactly such a value, among the data
+set provided).
+
+=item empirical_distribution_function()
+
+C<empirical_distribution_function> return a hash reference containing
+data points as keys and the empirical distribution function associated with
+that data point as the corresponding hash value (i.e. probability to extract
+a value lower or equal to the one in the key, among the data set provided).
+Alias Empirical CDF.
+
+=item complementary_cumulative_distribution_function()
+
+C<complementary_cumulative_distribution_function> return a hash reference containing
+data points as keys and the complementary cumulative distribution function associated
+with that data point as the corresponding hash value (i.e. probability to extract
+a value greater than the one in the key, among the data set provided).
+Alias Empirical CCDF.
+
+=back
+
+=head2 Advanced Features: binning
+
+Binning influences the way the distributions are returned.
+When binning is applied, the data space is grouped into a number
+of intervals C<[b_start_i, b_end_i)>. Each bin contains information
+about data greater or equal than C<b_start_i> and lower than C<b_end_i>.
+Also, the bin is referred using its middle point, i.e.:
+
+  $ref = $bin_start + ($bin_end - $bin_start)/2;
+
+The hash references returning when calling the distibution functions
+will have these reference values as keys.
+
+When binning is applied to the frequency distribution, each bin is associated
+with the sum of the frequencies of each value within the bin. 
+
+When binning is applied to the other distributions, the returning hash represents
+a density function other than a probability distribution. In fact, the probabilities
+associated with each bin are divided by the width of bin.
+
+=over 4
+
+=item set_binning_type( [$binning_type] )
+
+C<set_binning_type> sets the binning type associated with the current class and establishes
+the binning type for the distributions computed from this line on. C<$binning_type> can take
+one of the following values:
+
+Statistics::Discrete::NO_BINNING is the default case and it tells the class to return
+non binned distributions.
+
+Statistics::Discrete::LIN_BINNING tells the class to return linearly binned distributions: i.e. the support is divided into equally spaced intervals. The default number of bins is 10, but
+it can be changed using the function C<set_custom_num_bins( [$num_bins] )>.
+
+Statistics::Discrete::LOG_BINNING tells the class to return logarithmically binned distributions: i.e. the support is divided into intervals whose width grows logarithmically (e.g. 0.1, 1, 10, 100). There is no default number of bins, in the default case the optimal number of bins is
+computed by the class itself: i.e. the number of bins chosen is the one that generates the sum of the resulting probability mass density closest to 1. 
+
+
+=item set_custom_num_bins( [$num_bins] )
+
+When the linear or the logarithmic binning is set, the user can provide a custom number of
+bins using the above function.
+
+
+=item set_optimal_binning()
+
+If the C<logarithmic binning is set>, the user can decide to switch to the optimal binning, i.e. the number of bins is automatically computed by the class.
+
+=back
+
+=head2 Additional features
+
+=over 4
+
+=item bins()
+
+C<bins()> returns a reference to a hash having the following format: keys are the bin
+reference point (or middle point), the $bins->{$ref}{"left"} and $bins->{$ref}{"right"} 
+contains the interval extreme values.
+
+=item compute_lin_bins( [$num_bins] )
+
+C<compute_lin_bins()> returns the linear bins computed on the current data set (the number of bins is provided). This does not mean the program is using this binning. The binning has to be set using the functions described in the previous section.
+
+
+=item compute_log_bins( [$num_bins] )
+
+C<compute_log_bins()> returns the logarithimic bins computed on the current data set (the number of bins is provided). This does not mean the program is using this binning. The binning has to be set using the functions described in the previous section.
+
+=back
+
+
+=head2 EXPORT
+
+None by default.
+
+
+=head1 SEE ALSO
+
+Statistics::Descriptive
+
+Statistics::Descriptive::Discrete
+
+=head1 AUTHOR
+
+Chiara Orsini, E<lt>chiara@caida.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Chiara Orsini, CAIDA, UC San Diego
+chiara@caida.org
+
+Copyright (C) 2014 The Regents of the University of California.
+
+Statistics::Discrete is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Statistics::Discrete is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Statistics::Discrete.  If not, see <http://www.gnu.org/licenses/>.
+
+
+=cut

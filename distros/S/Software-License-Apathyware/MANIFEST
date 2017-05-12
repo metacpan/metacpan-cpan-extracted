@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+README.md
+dist.ini
+lib/Software/License/Apathyware.pm
+t/00-compile.t
+t/000-report-versions-tiny.t
+t/00_use.t
+t/01_basic.t
+weaver.ini
+xt/release/changes_has_content.t
+xt/release/pod-syntax.t

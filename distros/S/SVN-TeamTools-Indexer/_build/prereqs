@@ -1,0 +1,27 @@
+do{ my $x = {
+       'build_requires' => {},
+       'conflicts' => {},
+       'requires' => {
+                       'DateTime' => 0,
+                       'URI::Escape' => 0,
+                       'XML::Simple' => 0,
+                       'HTML::Template' => 0,
+                       'SVN::Look' => 0,
+                       'Lucy' => 0,
+                       'List::Util' => 0,
+                       'Error' => 0,
+                       'File::Path' => 0,
+                       'Module::Build' => 0,
+                       'Getopt::Long' => 0,
+                       'Data::Dumper' => 0,
+                       'Exporter' => 0,
+                       'Carp' => 0,
+                       'perl' => '5.8.8',
+                       'Log::Dispatch::File' => 0,
+                       'Net::SMTP' => 0,
+                       'Log::Log4perl' => 0,
+                       'LucyX::Search::Filter' => 0
+                     },
+       'recommends' => {}
+     };
+$x; }

@@ -1,0 +1,24 @@
+---
+abstract: 'Get a gpx file from a strava ride'
+author:
+  - 'Fred Moyer <fred@redhotpenguin.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Strava-GPX
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Geo::Gpx: 0
+  LWP::UserAgent: 0
+  URI: 0
+version: 0.01

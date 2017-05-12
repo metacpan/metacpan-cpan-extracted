@@ -1,0 +1,58 @@
+Revision history for Perl extension SNMP::Trapinfo
+
+1.03 2014-09-22
+    Added option to hide passwords on read of the packet
+    Added rv2gv in Safe compartment, which is needed from perl 5.18 onwards
+
+1.02  2010-09-06
+    Added test case for Net-SNMP 5.4.2.1, which has IP in the form: 
+      UDP: [10.11.12.13]:4129->[10.10.10.10]
+	Assign copyright to Opsera
+
+1.01  2008-02-15
+	Add access to 'localtime()' function
+
+1.0   2007-03-20
+	If there is more than one trap, you have to use the marker "#---next trap---#\n" between them -
+	this does not affect data from snmptrapd as that only sends one trap at a time.
+	The marker is required because some traps have embedded linefeeds in the value. This module will
+	only read the portion that is on the same line as the key and ignore the rest (unless it
+	happens to look like a valid line).
+
+0.92  2006-12-14
+	Added safe $trap->eval using Safe.pm module (Rob Moss)
+	Operators allowed inside of the eval function are as follows:
+	http://search.cpan.org/~nwclark/perl-5.8.8/ext/Opcode/Opcode.pm
+	:base_core :base_mem :base_loop print sprintf prtf padsv padav padhv padany
+	In summary:
+	Any logic, string/integer comparison, regex and print functions will work
+	Any other operator, such as open() exec() unlink() will be denied and the reason given in $@
+
+0.91  2006-09-13
+	Small fix for regexp for hide_passwords
+	Fix to allow . in the macro names
+	Allow * in the macro names as a wildcard for a value between dots
+	New method: eval. Expands string and then evals it. Useful for perl-syntax rules
+
+0.90  2006-04-19
+	Version number format changed for CPAN
+
+0.8.3 2006-04-06
+	Warning: Trailing linefeeds are removed from $trap->packet. Needed for
+	consistency
+	Can read multiple packets from STDIN
+	Can request to hide sensitive information from packet
+
+0.8.2 2006-03-20
+	Updated documentation based on advice from Brand Hilton.
+	$trap->trapname returns undef if no snmpTrapOID found
+
+0.8.1 2006-03-16
+	Net-SNMP 5.2.1 puts extra information around the IP information on line 2
+	Parses this correctly now. ${P2} will return the entire line
+	Added ${HOSTIP} macro that will strip to just the IP
+
+0.8  Mon Mar  6 15:56:43 2006
+	- original version; created by h2xs 1.23 with options
+		-X -n SNMP::Trapinfo
+

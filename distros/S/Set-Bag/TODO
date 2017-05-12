@@ -1,0 +1,10 @@
+reorder t/bag.t more logically
+compare? (equal, disjoint, et cetera)
+symmetric difference?
+allow negative 'number of instances'?
+allow fractional 'number of instances'?
+plus minus infinite 'number of instances'?
+publicize _merge?
+
+
+

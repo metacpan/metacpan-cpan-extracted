@@ -1,0 +1,71 @@
+NAME
+    Struct::Flatten::Template - flatten data structures using a template
+
+SYNOPSIS
+      use Struct::Flatten::Template;
+
+      my $tpl = {
+        docs => [
+          {
+             key => \ { column => 0 },
+             sum => {
+                value => \ { column => 1 },
+          }
+        ],
+      };
+
+      my @data = ( );
+
+      my $hnd = sub {
+        my ($obj, $val, $args) = @_;
+
+        my $idx = $args->{_index};
+        my $col = $args->{column};
+
+        $data[$idx] ||= [ ];
+        $data[$idx]->[$col] = $val;
+      };
+
+      my $data = {
+        docs => [
+          { key => 'A', sum => { value => 10 } },
+          { key => 'B', sum => { value =>  4 } },
+          { key => 'C', sum => { value => 18 } },
+        ],
+      };
+
+      my $p = Struct::Flatten::Template->new(
+        template => $tpl,
+        handler  => $hnd,
+      );
+
+DESCRIPTION
+    This module is used for "flattening" complex, deeply-nested data
+    structures, such as those returned by an ElasticSearch aggregation
+    query.
+
+    It is configured with a template that mirrors the data structure, where
+    some parts of the template contain information how to process the
+    corresponding parts of the data structure.
+
+SEE ALSO
+    The following alternative modules can be used to flatten hashes:
+
+    Data::Hash::Flatten
+    Hash::Flatten
+
+AUTHOR
+    Robert Rothenberg, `<rrwo at cpan.org>'
+
+ACKNOWLEDGEMENTS
+    Foxtons, Ltd.
+
+LICENSE AND COPYRIGHT
+    Copyright 2014 Robert Rothenberg.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the the Artistic License (2.0). You may obtain a copy
+    of the full license at:
+
+    http://www.perlfoundation.org/artistic_license_2_0
+

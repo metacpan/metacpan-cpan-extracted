@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+roc_ui.pl
+ss_7pkt.dat
+t/Statistics-ROC.t
+lib/Statistics/ROC.pm
+META.yml                                 Module meta-data (added by MakeMaker)

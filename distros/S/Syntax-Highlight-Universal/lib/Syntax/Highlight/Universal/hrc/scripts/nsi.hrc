@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<!DOCTYPE hrc PUBLIC "-//Cail Lomecb//DTD Colorer HRC take5//EN"
+  "http://colorer.sf.net/2003/hrc.dtd">
+<hrc version="take5" xmlns="http://colorer.sf.net/2003/hrc"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://colorer.sf.net/2003/hrc http://colorer.sf.net/2003/hrc.xsd">
+<!--
+    Language: Nullsoft install system .nsi script syntax (v1.98)
+    URL: http://www.nullsoft.com/free/nsis/
+    Maintainer: Artem Zankovich (z_artem@yahoo.com)
+
+$Log: nsi.hrc,v $
+Revision 1.3  2004/01/09 07:59:05  russkih
+headers fixes, license check
+
+Revision 1.2  2003/06/11 06:24:41  Administrator
+from Artem Zankovich
+
+Revision 2.1  2003/06/10 12:35:00  Artem
+2.0 updated from 1.4
+
+Revision 2.0  2003/06/10 10:11:17  Artem
+Colorer.take5.beta1
+
+Revision 1.4  2003/06/10 09:35:01  Artem
+NSIS v1.98 upgrade
+ + ``-strings
+ + $\"
+ + new keywords
+
+Revision 1.3  2002/10/08 15:54:24  Artem
+NSIS v1.96 upgrade
+
+-->
+   <type name="nsi">
+
+      <import type="def"/>
+
+      <region name="nsiNumber" parent="Number"/>
+      <region name="nsiString" parent="String"/>
+      <region name="nsiComment" parent="Comment"/>
+      <region name="nsiWord" parent="Keyword"/>
+      <region name="nsiDir" parent="Directive"/>
+      <region name="nsiVar" parent="VarStrong"/>
+      <region name="nsiLabel" parent="Label"/>
+      <region name="nsiError" parent="Error"/>
+      <region name="nsiFunction" parent="Function"/>
+
+
+      <scheme name="nsiCore">
+         <!-- Comments -->
+         <regexp match="/\s*([;#].*$)/" region0="nsiComment"/>
+         <!-- Numbers -->
+         <regexp match="/\b\d+\b/" region0="nsiNumber"/>
+         <regexp match="/\b(0)+[0-8]+\b/" region0="nsiNumber"/>
+         <regexp match="/\b(0x)+[\da-fA-F]+\b/" region0="nsiNumber"/>
+         <!-- Variables -->
+         <regexp match="/\$R?\d/" region0="Var"/>
+         <regexp match="/\$\\[nrt&#34;]/" region0="Var"/>
+         <regexp match="/\$\{\w+\}/" region0="Var"/>
+
+
+         <keywords ignorecase="yes" region="nsiDir">
+            <!-- Compiler utility commands -->
+            <word name="!system"/>
+            <word name="!include"/>
+            <word name="!cd"/>
+            <word name="!packhdr"/>
+            <!-- Compiler defines/conditional compilation -->
+            <word name="!define"/>
+            <word name="!undef"/>
+            <word name="!ifdef"/>
+            <word name="!ifndef"/>
+            <word name="!endif"/>
+            <word name="!else"/>
+            <word name="!else ifdef"/>
+            <word name="!else ifndef"/>
+            <word name="!macro"/>
+            <word name="!macroend"/>
+            <word name="!insertmacro"/>
+         </keywords>
+         <!-- Compiler flags -->
+         <keywords ignorecase="yes" region="nsiWord">
+            <word name="SetOverwrite"/>
+            <word name="SetCompress"/>
+            <word name="SetDatablockOptimize"/>
+            <word name="SetDateSave"/>
+         </keywords>
+      </scheme>
+
+      <!-- Variables -->
+      <scheme name="nsiVars1">
+         <!-- The following "variables" are usable anywhere in a string: -->
+         <regexp match="/\$R?\d/" region0="nsiVar"/>
+         <regexp match="/\$\\[nrt&#34;]/" region0="nsiVar"/>
+         <regexp match="/\$\{\w+\}/" region0="nsiVar"/>
+      </scheme>
+
+      <scheme name="nsiVars2">
+         <inherit scheme="nsiVars1"/>
+         <!-- The following are variables that are usable in Instructions and InstallDir: -->
+         <regexp match="/\$(INSTDIR|OUTTDIR|PROGRAMFILES|DESKTOP|EXEDIR|
+                            WINDIR|SYSDIR|TEMP|STARTMENU|SMPROGRAMS|SMSTARTUP|
+                            QUICKLAUNCH|HWNDPARENT|CMDLINE|PLUGINSDIR|LANGUAGE|\$)/x" region0="nsiVar" priority="low"/>
+      </scheme>
+
+      <scheme name="nsiFS">
+         <inherit scheme="nsiCore"/>
+         <!-- Strings -->
+         <block start="/&#34;/" end="/(\$\\)?~2(&#34;)|[^\\]?#1\s*$/" scheme="nsiVars2"
+                region="nsiString" region00="PairStart" region12="PairEnd"/>
+         <block start="/'/" end="/'|[^\\]?#1\s*$/" scheme="nsiVars2"
+                region="nsiString" region00="PairStart" region10="PairEnd"/>
+         <block start="/`/" end="/`|[^\\]?#1\s*$/" scheme="nsiVars2"
+                region="nsiString" region00="PairStart" region10="PairEnd"/>
+         <!-- Labels -->
+         <regexp match="/^\s*(\.?\w+[\w\d\-]*\:)/" region0="nsiLabel"/>
+         <!-- Instructions -->
+         <keywords ignorecase="yes" region="nsiWord">
+            <!-- General purpose, basic instructions -->
+            <word name="SetOutPath"/>
+            <word name="File"/>
+            <word name="Exec"/>
+            <word name="ExecWait"/>
+            <word name="ExecShell"/>
+            <word name="Rename"/>
+            <word name="Delete"/>
+            <word name="RMDir"/>
+            <!-- Registry, INI file reading/writing/deleting instructions -->
+            <word name="WriteRegStr"/>
+            <word name="WriteRegExpandStr"/>
+            <word name="WriteRegDWORD"/>
+            <word name="WriteRegBin"/>
+            <word name="WriteINIStr"/>
+            <word name="ReadRegStr"/>
+            <word name="ReadRegDWORD"/>
+            <word name="ReadINIStr"/>
+            <word name="ReadEnvStr"/>
+            <word name="ExpandEnvStrings"/>
+            <word name="DeleteRegValue"/>
+            <word name="DeleteRegKey"/>
+            <word name="EnumRegKey"/>
+            <word name="EnumRegValue"/>
+            <word name="DeleteINISec"/>
+            <word name="DeleteINIStr"/>
+            <!-- General purpose, advanced instructions -->
+            <word name="CreateDirectory"/>
+            <word name="CopyFiles"/>
+            <word name="SetFileAttributes"/>
+            <word name="CreateShortCut"/>
+            <word name="GetTempFileName"/>
+            <word name="CallInstDLL"/>
+            <word name="RegDLL"/>
+            <word name="UnRegDLL"/>
+<!--            <word name="GetFullDLLPath"/>-->
+            <word name="GetFullPathName"/>
+            <word name="SearchPath"/>
+            <word name="GetDLLVersion"/>
+            <word name="GetDLLVersionLocal"/>
+            <word name="GetFileTime"/>
+            <word name="GetFileTimeLocal"/>
+            <word name="Nop"/>
+            <!-- Branching, flow control, error checking, user interaction, etc instructions -->
+            <word name="Goto"/>
+            <word name="Call"/>
+            <word name="Return"/>
+            <word name="IfErrors"/>
+            <word name="ClearErrors"/>
+            <word name="SetErrors"/>
+            <word name="FindWindow"/>
+            <word name="SendMessage"/>
+            <word name="IsWindow"/>
+            <word name="IfFileExists"/>
+            <word name="MessageBox"/>
+            <word name="StrCmp"/>
+            <word name="IntCmp"/>
+            <word name="IntCmpU"/>
+            <word name="Abort"/>
+            <word name="Quit"/>
+            <word name="GetFunctionAddress"/>
+            <word name="GetLabelAddress"/>
+            <word name="GetCurrentAddress"/>
+            <!-- File and directory i/o instructions -->
+            <word name="FindFirst"/>
+            <word name="FindNext"/>
+            <word name="FindClose"/>
+            <word name="FileOpen"/>
+            <word name="FileClose"/>
+            <word name="FileRead"/>
+            <word name="FileWrite"/>
+            <word name="FileReadByte"/>
+            <word name="FileWriteByte"/>
+            <word name="FileSeek"/>
+            <!-- Uninstaller instructions -->
+            <word name="WriteUninstaller"/>
+            <!-- Misc instructions -->
+            <word name="SetDetailsView"/>
+            <word name="SetDetailsPrint"/>
+            <word name="SetAutoClose"/>
+            <word name="DetailPrint"/>
+            <word name="SetShellVarContext"/>
+            <word name="Sleep"/>
+            <word name="BringToFront"/>
+            <word name="HideWindow"/>
+            <word name="StrCpy"/>
+            <word name="StrLen"/>
+            <word name="Push"/>
+            <word name="Pop"/>
+            <word name="Exch"/>
+            <word name="IntOp"/>
+            <word name="IntFmt"/>
+<!--            <word name="InstNSPlug"/>
+            <word name="DeleteNSPlug"/> -->
+            <!-- Rebooting support -->
+            <word name="Reboot"/>
+            <word name="IfRebootFlag"/>
+            <word name="SetRebootFlag"/>
+            <!-- Install Logging Instructions -->
+            <word name="LogSet"/>
+            <word name="LogText"/>
+            <!-- Section Management -->
+            <word name="SectionSetFlags"/>
+            <word name="SectionGetFlags"/>
+            <word name="SectionSetText"/>
+            <word name="SectionGetText"/>
+         </keywords>
+      </scheme>
+
+      <scheme name="nsiFunc">
+         <inherit scheme="nsiFS"/>
+         <!-- Callback functions -->
+         <keywords ignorecase="yes" region="nsiFunction">
+            <!-- Install callbacks -->
+<!--            <word name=".onInit"/>
+            <word name=".onUserAbort"/>
+            <word name=".onInstSuccess"/>
+            <word name=".onInstFailed"/>
+            <word name=".onVerifyInstDir"/>
+            <word name=".onNextPage"/>
+            <word name=".onPrevPage"/>
+            <word name=".onSelChange"/> -->
+            <!-- Uninstall callbacks -->
+<!--            <word name="un.onInit"/>
+            <word name="un.onUserAbort"/>
+            <word name="un.onUninstSuccess"/>
+            <word name="un.onUninstFailed"/>
+            <word name="un.onNextPage"/>-->
+         </keywords>
+         <keywords ignorecase="yes" region="nsiError">
+            <word name="Function"/>
+            <word name="Section"/>
+            <word name="SectionIn"/>
+            <word name="SectionEnd"/>
+            <word name="SectionDivider"/>
+            <word name="AddSize"/>
+         </keywords>
+      </scheme>
+
+      <scheme name="nsiSect">
+         <inherit scheme="nsiFS"/>
+         <keywords ignorecase="yes" region="nsiWord">
+            <word name="SectionIn"/>
+            <word name="AddSize"/>
+         </keywords>
+         <keywords ignorecase="yes" region="nsiError">
+            <word name="Section"/>
+            <word name="Function"/>
+            <word name="FunctionEnd"/>
+         </keywords>
+      </scheme>
+
+      <scheme name="nsiAttr">
+         <inherit scheme="nsiCore"/>
+         <!-- Installer attributes -->
+         <keywords ignorecase="yes" region="nsiWord">
+            <!-- General installer configuration -->
+            <word name="OutFile"/>
+            <word name="Name"/>
+            <word name="Caption"/>
+            <word name="SubCaption"/>
+            <word name="BrandingText"/>
+            <word name="Icon"/>
+            <word name="WindowIcon"/>
+            <word name="BGGradient"/>
+            <word name="SilentInstall"/>
+            <word name="SilentUnInstall"/>
+            <word name="CRCCheck"/>
+            <word name="MiscButtonText"/>
+            <word name="InstallButtonText"/>
+            <word name="FileErrorText"/>
+            <!-- Install directory configuration -->
+            <word name="InstallDir"/>
+            <word name="InstallDirRegKey"/>
+            <!-- License page configuration -->
+            <word name="LicenseText"/>
+            <word name="LicenseData"/>
+            <!-- Component page configuration -->
+            <word name="ComponentText"/>
+            <word name="InstType"/>
+            <word name="EnabledBitmap"/>
+            <word name="DisabledBitmap"/>
+            <word name="SpaceTexts"/>
+            <!-- Directory page configuration -->
+            <word name="DirShow"/>
+            <word name="DirText"/>
+            <word name="AllowRootDirInstall"/>
+            <!-- Install page configuration -->
+            <word name="InstallColors"/>
+            <word name="InstProgressFlags"/>
+            <word name="AutoCloseWindow"/>
+            <word name="ShowInstDetails"/>
+            <word name="DetailsButtonText"/>
+            <word name="CompletedText"/>
+            <!-- Uninstall configuration -->
+            <word name="UninstallText"/>
+<!--            <word name="UninstallExeName"/>-->
+            <word name="UninstallIcon"/>
+            <word name="UninstallCaption"/>
+            <word name="UninstallSubCaption"/>
+            <word name="ShowUninstDetails"/>
+            <word name="UninstallButtonText"/>
+         </keywords>
+      </scheme>
+
+      <scheme name="nsi">
+         <!-- Functions list -->
+         <regexp match="/\M^\s*(?{Function}Function|Section)\s+(?{Function}\&#34;[^\&#34;]+\&#34;|[^\&#34;\s]+)/i"/>
+         <!-- Paired -->
+         <block start="/^\s*(\!if[n]?def)\b/" end="/^\s*(\!endif)\b/" scheme="nsi" region00="nsiDir" region01="PairStart" region10="nsiDir" region11="PairEnd"/>
+         <block start="/^\s*(Function)\s+/" end="/\b(FunctionEnd)\b/" scheme="nsiFunc" region00="nsiWord" region01="PairStart" region10="nsiWord" region11="PairEnd"/>
+         <block start="/^\s*(Section)\s+/" end="/\b(SectionEnd)\b/" scheme="nsiSect" region00="nsiWord" region01="PairStart" region10="nsiWord" region11="PairEnd"/>
+         <!-- Strings -->
+         <block start="/&#34;/" end="/(\$\\)?~2(&#34;)|[^\\]?#1\s*$/" scheme="nsiVars1"
+                region="nsiString" region00="PairStart" region12="PairEnd"/>
+         <block start="/'/" end="/'|[^\\]?#1\s*$/" scheme="nsiVars1"
+                region="nsiString" region00="PairStart" region10="PairEnd"/>
+         <block start="/`/" end="/`|[^\\]?#1\s*$/" scheme="nsiVars1"
+                region="nsiString" region00="PairStart" region10="PairEnd"/>
+         <inherit scheme="nsiCore"/>
+         <inherit scheme="nsiAttr"/>
+         <!-- Sections -->
+         <keywords ignorecase="yes" region="nsiWord">
+            <word name="Section"/>
+            <word name="SectionEnd"/>
+            <word name="SectionDivider"/>
+         </keywords>
+         <!-- Functions -->
+         <keywords ignorecase="yes" region="nsiWord">
+            <word name="Function"/>
+            <word name="FunctionEnd"/>
+         </keywords>
+      </scheme>
+
+   </type>
+</hrc>
+<!-- ***** BEGIN LICENSE BLOCK *****
+   - Version: MPL 1.1/GPL 2.0/LGPL 2.1
+   -
+   - The contents of this file are subject to the Mozilla Public License Version
+   - 1.1 (the "License"); you may not use this file except in compliance with
+   - the License. You may obtain a copy of the License at
+   - http://www.mozilla.org/MPL/
+   -
+   - Software distributed under the License is distributed on an "AS IS" basis,
+   - WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+   - for the specific language governing rights and limitations under the
+   - License.
+   -
+   - The Original Code is the Colorer Library.
+   -
+   - The Initial Developer of the Original Code is
+   - Cail Lomecb <cail@nm.ru>.
+   - Portions created by the Initial Developer are Copyright (C) 1999-2003
+   - the Initial Developer. All Rights Reserved.
+   -
+   - Contributor(s):
+   -
+   - Alternatively, the contents of this file may be used under the terms of
+   - either the GNU General Public License Version 2 or later (the "GPL"), or
+   - the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
+   - in which case the provisions of the GPL or the LGPL are applicable instead
+   - of those above. If you wish to allow use of your version of this file only
+   - under the terms of either the GPL or the LGPL, and not to allow others to
+   - use your version of this file under the terms of the MPL, indicate your
+   - decision by deleting the provisions above and replace them with the notice
+   - and other provisions required by the LGPL or the GPL. If you do not delete
+   - the provisions above, a recipient may use your version of this file under
+   - the terms of any one of the MPL, the GPL or the LGPL.
+   -
+   - ***** END LICENSE BLOCK ***** -->

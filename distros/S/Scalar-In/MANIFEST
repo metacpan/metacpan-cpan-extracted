@@ -1,0 +1,19 @@
+Changes
+example/01_string_in.pl
+example/02_numeric_in.pl
+example/03_renamed_import.pl
+lib/Scalar/In.pm
+MANIFEST			This list of files
+README
+t/01_string_in.t
+t/02_numeric_in.t
+t/03_renamed_import.t
+t/11_test_examples.t
+t/chars.t
+t/perl_critic.t
+t/pod.t
+t/pod_coverage.t
+t/prereq_build.t
+Makefile.PL
+META.yml
+META.json

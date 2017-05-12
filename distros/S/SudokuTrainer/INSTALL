@@ -1,0 +1,101 @@
+CONTENTS
+--------
+Installation of Perl/Tk
+Installation
+    1. CPAN
+    2. CPANP
+    3. Module::Build
+    4. ExtUtils-MakeMaker
+Acknowledgement
+
+
+INSTALLATION OF PERL/TK
+-----------------------
+Users of Linux or of the Strawberry Perl distribution usually have
+Tk already installed or may install it easily with their package manager.
+So this section is relevant only for users that work on Windows with the
+Perl distribution ActivePerl.
+
+Newer versions of ActivePerl install the MinGW package and the dmake
+utility automatically when you use the shell commands cpan or cpanp for
+the first time. I observed this with version v5.16.3, so maybe you can
+ignore this section.
+
+Please look whether Tk (the Perl/Tk package) or gcc (a C++ compiler) is 
+installed. If none of them is present, choose one for install. In any 
+case, you will need administative privileges for this.
+
+Install gcc: Using ppm, install the MinGW package. This will also install
+             the gcc compiler. When gcc is available, the installation of
+             Games::Sudoku::Trainer can successfully install Tk as a 
+             prerequisite.
+
+Install Tk: In your browser, visit the website http://www.bribes.org/perl/.
+            On the bottom, select your repository (32 bit or 64 bit). In the
+            repository search for the "Tk" entry, copy the DOS command in it
+            and insert it in the DOS shell window. This command will add Tk
+            to the ppm repository of ActivePerl. Now you can use ppm to 
+            install Tk.
+
+
+INSTALLATION INSTRUCTIONS
+-------------------------
+
+There are several procedures available for installation of Perl modules. It's
+recommended that you use the first one in this list that is available in your
+Perl distribution. For all of them you will need administative privileges.
+
+1. CPAN
+-------
+Use the shell command "cpan Games::Sudoku::Trainer".
+
+2. CPANP
+--------
+Use the shell command "cpanp -i Games::Sudoku::Trainer".
+
+-----------------
+For the following installation procedures you need a preliminary step:
+Visit the website
+http://search.cpan.org/search?query=sudokutrainer&mode=all
+and click on the search result "SudokuTrainer",
+and from there download the distribution file, then unpack it:
+
+On Linux:   tar -xzf SudokuTrainer-<version>.tar.gz
+On Windows: Use a ZIP archiver program (e. g. winZIP or 7-Zip) to unpack the
+            distribution file.
+			
+Finally enter the distribution directory:
+cd SudokuTrainer-<version>.
+
+3. Module::Build
+----------------
+Enter the following commands, depending on your platform:
+	  Linux                      Windows
+	  -----                      -------
+	perl Build.PL              perl Build.PL
+	./Build                    Build
+	./Build test               Build test
+	sudo ./Build install       Build install
+
+4. ExtUtils-MakeMaker
+---------------------
+This installation procedure is available since the first days of CPAN, and
+it is still included in Perl installations. It uses the "make" utility.
+However the name of this utility changes slightly depending on the platform.
+e. g. on Windows the name is "dmake".
+
+Enter the following commands, depending on your platform:
+	  Linux                      Windows
+	  -----                      -------
+	perl Makefile.PL           perl Makefile.PL
+	make                       dmake
+	make test                  dmake test
+	sudo make install          dmake install
+
+
+ACKNOWLEDGEMENT
+---------------
+Big parts of the installation instructions have been taken from the tutorial 
+http://wiki.perl-community.de/Wissensbasis/ModuleWieInstalliereIchEinModul,
+which was written by the German Perl forum www.perl-community.de.
+

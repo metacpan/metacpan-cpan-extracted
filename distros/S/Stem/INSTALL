@@ -1,0 +1,73 @@
+
+			  Installation Of Stem
+
+Installing Stem is simple as you can use the classic module install
+commmands:
+
+`	perl Makefile.PL
+	make
+	make test
+	make install
+
+The installation uses Module::Build so you have to have that. You can
+get it from CPAN. The Makefile actually just is a passthrough that calls
+the Build program and is there for compatibility. You can bypass make
+and use the Build commands directly:
+
+on UNIX flavors do this:
+
+	perl Build.PL
+	Build
+	Build test
+	Build install
+
+on Windows do this:
+
+	perl Build.PL
+	perl Build
+	perl Build test
+	perl Build install
+
+The perl Makefile.PL or perl Build.PL command will query you for a
+short series of answers. These include where is perl, where to store the
+Stem executable scripts, where to store the Stem configuration files,
+etc. Each question will be explained in detail and has a reasonable
+default value.
+
+Stem has a set of demonstration applications and you will be asked if
+you want to install them. The driver scripts use xterm to
+bring up multiple windows so you can interact with the
+demonstrations. The Build.PL script will find xterms on most UNIX
+flavors that have X on them. OSX doesn't come with X by default but you
+can install the X cdrom if you want.
+
+NOTE: The xterm program is NOT required to run the demostrations. You
+can run the scripts and the commands which create the xterms will be
+printed. If you don't have xterms, they will fail but you can copy the
+Stem command (the part after the -e) and run them in terminal windows
+that you bring up yourself. This works on windows and OSX which doesn't
+have X installed. Just run those Stem commands in the order they are
+printed and each one in its own terminal window.
+
+Another option for the demo scripts is called ssfe (split screen front
+end). It is a general purpose C (UNIX only) utility that runs any
+command and provides command line editing and history. It is a nice
+little utility and it make running the demos a bit nicer. It is bundled
+in a IRC application call sirc and if you ask for it to be installed,
+the whole sirc package (just ssfe and sirc) will be built and
+installed. This build/install will be run in its own xterm. When it is
+done installing, it will sleep for a while. You can kill the xterm
+window or ^C in it and the rest of the Stem installation will continue.
+
+The installation answers you give will be stored in the module
+Stem::InstallConfig for use by any Stem application. This module is used
+by Build.PL to override the default installation answers. So the next
+time you do perl Build.PL you will see the previous choices you made as
+the defaults. Doing Build realclean will remove this module and you will
+see the original default answers.
+
+If you know the default answers are fully acceptable, you can do this:
+
+	perl Build.PL use_defaults=1
+
+and all the defaults will be used and no questions will be asked.

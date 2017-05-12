@@ -1,0 +1,71 @@
+#!/usr/bin/perl
+
+# PODNAME: histogram
+# ABSTRACT: command-line tool for generating log-log histogram of data on stdin
+
+use strict;
+use warnings;
+
+use Statistics::Histogram;
+use Getopt::Long;
+
+my $num_bins = undef;
+my $use_linear_axes = '';
+my $use_integral_bins = '';
+my $help = 0;
+
+my $result = GetOptions('bins=i' => \$num_bins,
+                        'linear' => \$use_linear_axes,
+                        'integral' => \$use_integral_bins,
+                        'help'   => \$help,
+                    );
+
+if ( !$result || $help ) {
+    print <<'EOS';
+cat data | histogram --bins 20 --linear
+cat data | histogram --integral
+
+bins and linear are optional. bins defaults to 10, and if linear
+is not specified the histogram axes are logarithmic instead of linear.
+
+If integral is given, linear is forced to be true and the histogram
+will have a bins for each integer from the smallest to largest value
+in the data, or groups of integers if bins is specified.
+EOS
+    exit;
+}
+
+
+my @data;
+while (my $line = <> ) {
+    chomp $line;
+    push @data, $line;
+}
+
+print get_histogram(\@data, $num_bins, $use_linear_axes, $use_integral_bins);
+
+
+__END__
+=pod
+
+=head1 NAME
+
+histogram - command-line tool for generating log-log histogram of data on stdin
+
+=head1 VERSION
+
+version 0.2
+
+=head1 AUTHOR
+
+Douglas Webb <doug.webb@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2005 by Douglas Webb.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

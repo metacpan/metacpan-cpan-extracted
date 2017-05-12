@@ -1,0 +1,9 @@
+0.002     2011-08-14 02:06:28 Europe/Berlin
+    - Added -stmt to force callbacks to be terminated.
+    - Fixed statement termination issue for anon constructs.
+    - Added -only_anon to enforce unnamed constructs.
+    - Added -default signature option.
+    - Doc fixes.
+
+0.001     2011-08-08 00:00:13 Europe/Berlin
+    - Initial release.

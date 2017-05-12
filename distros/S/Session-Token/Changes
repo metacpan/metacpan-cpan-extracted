@@ -1,0 +1,79 @@
+1.503  2016-08-17
+  * Link to my TPM presentation
+  * Documentation updates
+
+1.502  2015-09-19
+  * The alphabet test was using a regexp with ok() which I
+    think may be causing cpantesters failures. I changed
+    it to use like() which will also have better reporting.
+
+1.501  2015-09-09
+  * Add benchmarking example that compares token templates
+    versus String::Random's randpattern
+
+1.500  2015-09-09
+  * Use typemap to bless the C context to Session::Token
+    package and implement get() fully in XS. This is about
+    40% faster when tokens are created in a tight loop.
+
+1.010  2015-08-27
+  * Fix POD link
+
+1.009  2015-08-27
+  * Link to Leo Zovic's lisp implementation of Session::Token
+  * Fix doc typo noticed by Per Carlson
+  * Mention App::Session::Token in the docs
+  * Add token template example requested by Andrew Beverley
+
+1.008  2014-04-18
+  * Delete reference to seed pointer after de-allocation
+    * This is defensive programming in case of obscure
+      bugs in apps that invoke DESTROY multiple times
+  * Lots of documentation improvements
+  * Make podchecker happy
+
+1.007  2013-03-09
+  * Support passing constructor args in as a hash-ref as
+    well as a list
+  * Update description of Bytes::Random::Secure
+  * Doc updates
+
+1.006  2013-02-14
+  * Add section to docs describing the efficiency of the
+    re-rolling technique for eliminating mod bias
+  * Add comparison to Bytes::Random::Secure
+  * Improve non-ASCII alphabet example
+  * Don't include MYMETA files in CPAN distribution
+  * kernel-seeding test was missing from manifest
+  * Require perl 5.8 due to use of :raw
+
+0.900  2012-12-05
+  * Version number format change
+  * Include github repo and bugtracker in CPAN meta data
+  * Updated docs to describe variable-length tokens
+  * Other doc updates
+
+0.82   2012-07-20
+  * Make no-mod-bias test more useful as a stand-alone tool
+  * New test to specifically verify the kernel seeding
+    procedure is working (win32 is primary concern)
+  * Improve docs
+
+0.81   2012-06-28
+  * OK now I have CPAN versions figured out :)
+
+0.10   2012-06-28
+  * Oops, bad previous version number
+
+0.9.0  2012-06-28
+  * Experimental win32 support
+  * Fix reference test on big endian archs
+
+0.8   2012-06-26
+  * Open /dev/urandom as :raw to prevent CRLF translation &c
+  * Improve docs
+  * Record some system information in test output
+  * Add seed coverage test
+
+0.7   2012-06-17
+  * Initial release

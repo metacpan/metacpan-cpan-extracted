@@ -1,0 +1,140 @@
+
+			  Stem Technical Notes
+
+
+Stem Architecture
+
+	This describes the top level architecture of Stem, in particular
+	what its components are (Hubs and Cells) and how they work
+	together.
+
+Stem Cells
+
+	This describes Stem Cells, the primary components of a Stem
+	system. It covers both class and object type Cells, their
+	creation and registration and their method conventions.
+
+Stem Messages
+
+	This describes the content and fields of Stem messages. These are
+	used to communicate between Stem Cells.
+
+Stem Registry and Message Addresses
+
+	This describes how Cells are registered so they can receive
+	messages and the way messages are addressed.
+
+Cell Creation and Configuration
+
+	Stem Cells can be created internally via a constructor or from
+	external configurations. This describes the common systems used
+	to create and register Cells.
+
+Logging Subsystem
+
+	This describes the Stem logging subsystem including logical
+	logs, log files, log filters and how to submit log entries.
+
+Cron Subsystem
+
+	This describes the Stem Cron subsystem and how it can schedule
+	regular Stem message submissions based on time and date.
+
+Stem Events
+
+	This describes the low level Stem Event subsystem including
+	reading, writing and socket events.
+
+Security Notes
+
+	This describes the Stem security model and its features.
+
+
+	Stem Cell and Module Notes
+
+These are some of the Cells and modules in the Stem library. These notes
+will describe what they are, why they are needed and how they are
+used. Also some examples of their use and configuration are given. For
+detailed descriptions of their configuration, attributes, and methods
+see their documentation (available in the source tree or <HERE>)
+
+NOTE to jasmine: when we get the pod generation stuff going soon, we
+will make html versions of the pod docs and web them. they need to be
+linked from each cell tech notes and be in a documentation subdir with a
+nav bar link. this is later but i am just letting you know now.
+
+NOTE: also i am going to list all of the cells here, even if they don't
+have a tech notes page yet. make an empty one for them. we should come
+up with a template for their names, format, etc. i want to drop the
+'notes' part in most cases.
+
+
+Stem::Conf
+
+	This module parses and executes Stem configurations from both
+	local files and sent from remote Stem Hubs.
+
+Stem::Proc
+
+	This Cell forks off and manages external processes. They can be
+	monitored and all their I/O can be easily be integrated with
+	Stem via messages, logs and/or callbacks.
+
+Stem::SockMsg
+
+	This Cell connects to and accepts standard Internet
+	sockets. They can be monitored and all their I/O can be easily
+	be integrated with Stem via messages, logs and/or callbacks.
+
+Stem::Cron
+
+	This module creates and manages scheduled message submissions.
+
+Stem::Log
+
+	This module supports the Stem logging subsystem. It encompasses
+	the Stem::Log::File, Stem::Log::Filter and Stem::Log::Entry
+	classes. 
+
+Stem::LogTail
+
+	This Cell monitors an active external log file. It sends new
+	data into the Stem logging subsystem on periodic basis or on
+	demand.
+
+Stem::Switch
+
+	This Cell is a general purpose Stem Message multiplexor.
+	Messages directed to this Cell can be
+
+Stem::Debug
+
+	This class is used to create standard and customized debug and
+	trace subs in any Stem module. The  used
+
+Stem::Id
+
+	This class is used to create ID's for dynamically created
+	Cells that need unique addresses.
+
+Stem::Portal
+
+	This class creates and manages connections between Stem Hubs. It
+	converts Stem Messages to/from a stream format for transmission
+	over the connection.
+
+Stem::AsyncIO
+
+	This class is used by other Cells to create and manage buffered
+	I/O streams to sockets and process handles.
+
+Stem::Socket
+
+	This class is the low level API to create socket connections and
+	accepted sockets.
+
+Stem::TtyMsg
+
+	This class Cell is used to provide a TTY interface to a running
+	Stem Hub. Stem command messages can be entered and sent to Cells
+	and their responses are printed.

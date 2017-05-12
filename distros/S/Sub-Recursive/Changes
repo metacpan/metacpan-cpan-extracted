@@ -1,0 +1,22 @@
+Revision history for Perl module Sub::Recursive
+
+0.05 2015-07-18
+    - Fixed all tests.
+
+0.04 2015-07-18
+    - Fixed tests.
+    - Minor POD updates.
+    - Added license file.
+
+0.03 2005-03-11
+    - Revised documentation. Added bug section.
+    - Added experimental subroutine &mutually_recursive.
+    - Added :ALL export tag.
+    - Fix &$foo; bug.
+
+0.02 2004-12-21
+    - Incompatible!
+    - Removed everything that had to do with &_.
+
+0.01 2004-11-14
+    - original version; created by ExtUtils::ModuleMaker 0.32

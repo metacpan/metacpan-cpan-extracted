@@ -1,0 +1,8 @@
+Revision history for perl module Selenium::Remote::Driver::UserAgent
+
+0.0301 2014-11-23
+ - DEPRECATED: being renamed to Selenium::UserAgent.
+
+0.01 2014-07-18
+ - Initial commit. The module applies user agents and browser sizes to
+   Chrome and Firefox through a remote webdriver.

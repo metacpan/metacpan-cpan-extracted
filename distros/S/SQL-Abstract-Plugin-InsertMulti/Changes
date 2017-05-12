@@ -1,0 +1,17 @@
+Revision history for Perl extension SQL::Abstract::Plugin::InsertMulti
+
+0.04
+        Fri Oct 11 22:16:43 JST 2013
+        - (Incompatible changes) Refuse ARRAYREF in VALUES parameter
+
+0.03
+        Thr Oct  9 01:02:04 2009
+        - Regenerate manifest for add 01-basic.t
+
+0.02
+        Tue Oct  6 22:29:22 2009
+        - fixed sort problem on arrayref list 
+
+0.01
+        Tue Oct  6 15:38:37 2009
+        - original version

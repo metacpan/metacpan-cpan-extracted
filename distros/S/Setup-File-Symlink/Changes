@@ -1,0 +1,202 @@
+Revision history for Setup-File-Symlink
+
+0.28    2015-09-04 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.27    2015-08-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Log::Any to Log::Any::IfLOG.
+
+
+0.26    2014-05-17 (SHARYANTO)
+
+        - No functional changes.
+
+        - Replace File::Slurp with File::Slurp::Tiny.
+
+
+0.25    2013-08-05 (SHARYANTO)
+
+        - No functional changes. Tweak error messages to give more
+          details.
+
+
+0.24    2012-08-30 (SHARYANTO)
+
+        [ENHANCEMENTS]
+
+        - Add argument 'should_exist'.
+
+
+0.23    2012-08-28 (SHARYANTO)
+
+        - Do not require symlink path to be absolute.
+
+
+0.22    2012-08-24 (SHARYANTO)
+
+        [ENHANCEMENTS]
+
+        - Now uses Rinci::Transaction protocol v=2, no longer uses
+          Perinci::Sub::Gen::Undoable.
+
+        - Add functions: ln_s(), rmsym().
+
+
+0.21    2012-07-04 (SHARYANTO)
+
+        - No functional changes. Adjust to Perinci::Sub::Gen::Undoable
+          0.09.
+
+
+0.20    2012-06-23 (SHARYANTO)
+
+        - No functional changes. Adjust to Perinci::Sub::Gen::Undoable
+          0.08.
+
+
+0.19    2012-06-23 (SHARYANTO)
+
+        - No functional changes. Adjust to Perinci::Sub::Gen::Undoable
+          0.07.
+
+
+0.18    2012-06-22 (SHARYANTO)
+
+        - No functional changes. Adjust to Perinci::Sub::Gen::Undoable
+          0.06.
+
+
+0.17    2012-06-22 (SHARYANTO)
+
+        - No functional changes.
+
+        - rinci: Fix argument position.
+
+
+0.16    2012-06-06 (SHARYANTO)
+
+        - No functional changes. Now uses Perinci::Sub::Gen::Undoable.
+
+
+0.15    2012-03-28 (SHARYANTO)
+
+        - No functional changes. Require newer Test::Setup.
+
+
+0.14    2012-03-28 (SHARYANTO)
+
+        - No functional changes. Replace SubSpec PodWeaver plugin with
+          Perinci.  Use Test::Setup.
+
+
+0.13    2012-03-02 (SHARYANTO)
+
+        - No functional changes. dzil tweak to avoid line number change.
+
+
+0.12    2012-03-02 (SHARYANTO)
+
+        - No functional changes. Replace references to Sub::Spec now
+          to Rinci.
+
+
+0.11    2011-05-18 (SHARYANTO)
+
+        - No functional changes. Tweak log messages.
+
+
+0.10    2011-05-18 (SHARYANTO)
+
+        - No functional changes. Changed logging levels.
+
+
+0.09    2011-04-28 (SHARYANTO)
+
+        [INCOMPATIBLE CHANGES]
+
+        - Update undo protocol to Sub::Spec 0.13, there's no longer redo_data,
+          only undo_data.
+
+        [BUG FIXES]
+
+        - Small fixes.
+
+
+0.08    2011-04-27 (SHARYANTO)
+
+        [BUG FIXES]
+
+        - Return 500 on rollback.
+
+        - A couple of small fixes.
+
+
+0.07    2011-04-27 (SHARYANTO)
+
+        [ENHANCEMENTS]
+
+        - Increase robustness, each step now also checks state and skips if
+          desired state already reached. This means that undo can be reapplied
+          without erroring. We cannot guarantee state changes between invocation
+          of do and undo anyway, so we try our best at each step.
+
+
+0.06    2011-04-27 (SHARYANTO)
+
+        [ENHANCEMENTS]
+
+        - (Internal) refactor/reorganization.
+
+        - Implement replace_file & replace_dir.
+
+
+0.05    2011-04-21 (SHARYANTO)
+
+        - No functional change.
+
+        [INCOMPATIBLE CHANGE]
+
+        - Rename module from Setup::Symlink to Setup::File::Symlink.
+
+
+0.04    2011-04-21 (SHARYANTO)
+
+        - No functional change.
+
+        [ETC]
+
+        - Change Abstract to be more consistent with other Setup::*
+          modules.
+
+
+0.03    2011-04-18 (SHARYANTO)
+
+        [ETC]
+
+        - Some sub spec tweaks.
+
+        - Change terminology: undo/redo info -> undo/redo data.
+
+
+0.02    2011-04-13 (SHARYANTO)
+
+        [ETC]
+
+        - Minor documentation & sub spec patches.
+
+        - Build fixes: exclude backup files, add missing dependency
+          (File::chdir, Log::Any) [cpants]
+
+
+0.01    2011-04-08 (SHARYANTO)
+
+        - First release.

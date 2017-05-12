@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+Message.pm
+README
+test.pl
+META.yml                                Module meta-data (added by MakeMaker)
+examples/Utils.pm
+examples/rrdcommand
+examples/rrdselect.pl
+examples/rrdupdate.cfg
+examples/rrdupdate.pl

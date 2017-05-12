@@ -1,0 +1,72 @@
+NAME
+    SDL::Tutorial::3DWorld - Create a 3D world from scratch with SDL and
+    OpenGL
+
+DESCRIPTION
+    This tutorial is intended to demonstrate the creation of a trivial but
+    relatively usable "3D Game Engine".
+
+    The demonstration code provided implements the four main elements of a
+    basic three-dimensional game world.
+
+    *   A static landscape in which events will occur.
+
+    *   A light source to illuminate the world.
+
+    *   A collection of N objects which move around independantly inside the
+        world.
+
+    *   A user-controlled mobile camera through which the world is viewed
+
+    Each element of the game world is encapsulated inside a standalone
+    class.
+
+    This lets you see which parts of the Open GL operations are used to work
+    with each element of the game world, and provides a starting point from
+    which you can start to make your own simple game-specific engines.
+
+METHODS
+  new
+    The "new" constructor sets up the model for the 3D World, but does not
+    initiate or start the game itself.
+
+    It does not current take any parameters.
+
+  camera
+    The "camera" method returns the currently active camera for the world.
+
+    Provided as a convenience for world objects that need to know where the
+    camera is (such as the skybox).
+
+  sdl
+    The "sdl" method returns the master SDLx::App object for the world.
+
+  run
+    The "run" method is used to run the game. It takes care of all stages of
+    the game including initialisation and shutdown operations at the start
+    and end of the game.
+
+  current
+    The "current" method can be used by any arbitrary world element to get
+    access to the world while it is running.
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=SDL-Tutorial-3DWorld>
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+SEE ALSO
+    SDL, OpenGL
+
+COPYRIGHT
+    Copyright 2010 - 2011 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

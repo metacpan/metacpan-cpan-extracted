@@ -1,0 +1,10 @@
+Revision history for Perl extension String::Simrank.
+
+0.07 Firs public release of String:Simrank
+
+[[fast-forward]]
+
+0.01  Mon Mar 24 22:50:52 2008
+	- original version; created by h2xs 1.23 with options
+		-PAXn String::Simrank
+

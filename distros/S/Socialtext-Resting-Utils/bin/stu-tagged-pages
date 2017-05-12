@@ -1,0 +1,38 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Socialtext::Resting::Getopt qw/get_rester/;
+use Socialtext::Resting::TaggedPages qw/tagged_pages/;
+use Getopt::Long;
+
+sub usage {
+    die <<EOT;
+USAGE: stu-tagged-pages [--notags] [--tag <tag> ...]
+
+Return a list of pages with the specified tag(s).
+
+  --notags shows pages with no tags
+EOT
+}
+
+
+my $r = get_rester();
+my @tags;
+my $no_tags;
+GetOptions(
+    'tag=s' => \@tags,
+    'notags' => \$no_tags,
+) or usage;
+
+usage unless @tags or $no_tags;
+
+my $tagged_pages = tagged_pages(
+    rester => $r,
+    tags => \@tags,
+    notags => $no_tags,
+);
+
+print join "\n", @$tagged_pages;
+exit;
+
+

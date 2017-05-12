@@ -1,0 +1,91 @@
+ShiftJIS::X0213::MapUTF version 0.40
+================
+
+NAME
+
+ShiftJIS::X0213::MapUTF - conversion
+between Shift_JIS-2004/Shift_JISX0213 and Unicode
+
+SYNOPSIS
+
+    use ShiftJIS::X0213::MapUTF;
+
+    # for Shift_JIS-2004 (specified by JIS X 0213:2004)
+    $utf16be_string  = sjis2004_to_utf16be($sjis2004_string);
+    $sjis2004_string = utf16be_to_sjis2004($utf16be_string);
+
+    # for Shift_JISX0213 (specified by JIS X 0213:2000)
+    $utf16be_string  = sjis0213_to_utf16be($sjis0213_string);
+    $sjis0213_string = utf16be_to_sjis0213($utf16be_string);
+
+DESCRIPTION
+
+This module provides the following functions:
+
+    sjis2004_to_utf8()    converts Shift_JIS-2004 to UTF-8.
+    sjis2004_to_utf16le() converts Shift_JIS-2004 to UTF-16LE.
+    sjis2004_to_utf16be() converts Shift_JIS-2004 to UTF-16BE.
+    sjis2004_to_utf32le() converts Shift_JIS-2004 to UTF-32LE.
+    sjis2004_to_utf32be() converts Shift_JIS-2004 to UTF-32BE.
+    sjis2004_to_unicode() converts Shift_JIS-2004 to Unicode[*].
+
+    utf8_to_sjis2004()    converts UTF-8      to Shift_JIS-2004.
+    utf16le_to_sjis2004() converts UTF-16LE   to Shift_JIS-2004.
+    utf16be_to_sjis2004() converts UTF-16BE   to Shift_JIS-2004.
+    utf32le_to_sjis2004() converts UTF-32LE   to Shift_JIS-2004.
+    utf32be_to_sjis2004() converts UTF-32BE   to Shift_JIS-2004.
+    unicode_to_sjis2004() converts Unicode[*] to Shift_JIS-2004.
+
+    utf16_to_sjis2004()   converts UTF-16  to Shift_JIS-2004.
+    utf32_to_sjis2004()   converts UTF-32  to Shift_JIS-2004.
+
+    sjis0213_to_utf8()    converts Shift_JISX0213 to UTF-8.
+    sjis0213_to_utf16le() converts Shift_JISX0213 to UTF-16LE.
+    sjis0213_to_utf16be() converts Shift_JISX0213 to UTF-16BE.
+    sjis0213_to_utf32le() converts Shift_JISX0213 to UTF-32LE.
+    sjis0213_to_utf32be() converts Shift_JISX0213 to UTF-32BE.
+    sjis0213_to_unicode() converts Shift_JISX0213 to Unicode[*].
+
+    utf8_to_sjis0213()    converts UTF-8      to Shift_JISX0213.
+    utf16le_to_sjis0213() converts UTF-16LE   to Shift_JISX0213.
+    utf16be_to_sjis0213() converts UTF-16BE   to Shift_JISX0213.
+    utf32le_to_sjis0213() converts UTF-32LE   to Shift_JISX0213.
+    utf32be_to_sjis0213() converts UTF-32BE   to Shift_JISX0213.
+    unicode_to_sjis0213() converts Unicode[*] to Shift_JISX0213.
+
+    utf16_to_sjis0213()   converts UTF-16  to Shift_JISX0213.
+    utf32_to_sjis0213()   converts UTF-32  to Shift_JISX0213.
+
+    [*] .. Perl's internal format. see perlunicode.pod.
+
+DEPENDENCIES
+
+This module requires Perl 5.6.1 or later.
+(sorry, cannot be built with Perl 5.6.0!)
+
+INSTALLATION
+
+You need a C compiler to build this module.
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+COPYRIGHT AND LICENSE
+
+SADAHIRO Tomoyuki <SADAHIRO@cpan.org>
+
+Copyright(C) 2002-2007, SADAHIRO Tomoyuki. Japan. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+SEE ALSO
+
+* JIS X 0213:2000/Amd1:2004
+
+    7-bit and 8-bit double byte coded extended KANJI sets
+    for information interchange
+

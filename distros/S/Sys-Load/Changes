@@ -1,0 +1,8 @@
+Revision history for Perl extension Sys::Load.
+
+0.2  Sun Sep  1 11:57:17 2002
+	- New function: uptime();
+
+0.1  Sat Aug 31 02:22:05 2002
+	- First version; 
+

@@ -1,0 +1,15 @@
+0.92 -- 2010-07-11
+
+     * typo bug fix in modify_targets resulting in inability to remove a target.
+       From Jeremy Zawodny.
+
+0.91 -- 2007-04-26
+
+     * more methods & cleanup from Larry Leszczynski <larryl@emailplus.org>
+       to make it more usable.
+
+0.90 -- 2007-04-20
+
+     * start of docs
+
+     * first actual release.  was previously in some dev/ directory in memcached repo.

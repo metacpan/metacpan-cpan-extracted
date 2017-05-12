@@ -1,0 +1,10 @@
+Logs.pm
+MANIFEST
+Makefile.PL
+README
+t/00-load.t
+t/carp.t
+t/core.t
+t/protect.t
+t/syslog.t
+t/warnings.t

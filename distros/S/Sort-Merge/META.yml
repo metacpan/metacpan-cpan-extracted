@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name: Sort-Merge
+version: 0.01
+license: perl
+distribution_type: module
+requires: {}
+recommends: {}
+build_requires:
+  Test::More: 0
+conflicts: {}
+provides:
+  Sort::Merge:
+    file: lib/Sort/Merge.pm
+    version: 0.01
+generated_by: Module::Build version 0.21

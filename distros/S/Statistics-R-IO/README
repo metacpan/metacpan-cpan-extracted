@@ -1,0 +1,179 @@
+NAME
+    Statistics::R::IO - Perl interface to serialized R data
+
+VERSION
+    version 1.0001
+
+SYNOPSIS
+        use Statistics::R::IO;
+    
+        my $var = Statistics::R::IO::readRDS('file.rds');
+        print $var->to_pl;
+    
+        my %r_workspace = Statistics::R::IO::readRData('.RData');
+        while (my ($var_name, $value) = each %r_workspace) {
+            print $var_name, $value;
+        }
+
+        my $pi = Statistics::R::IO::evalRserve('pi');
+        print $pi->to_pl;
+
+DESCRIPTION
+    This module is a pure-Perl implementation for reading native data files
+    produced by the R statistical computing environment
+    <http://www.r-project.org>)
+
+    It provides routines for reading files in the two primary file formats
+    used in R for serializing native objects:
+
+    RDS RDS files store a serialization of a single R object (and, if the
+        object contains references to other objects, such as environments,
+        all the referenced objects as well). These files are created in R
+        using the "readRDS" function and are typically named with the ".rds"
+        file extension.
+
+    RData
+        RData files store a serialization of a collection of *named*
+        objects, typically a workspace. These files are created in R using
+        the "save" function and are typically named with the ".RData" file
+        extension. (Contents of the R workspace can also be saved
+        automatically on exit to the file named .RData, which is by default
+        automatically read in on startup.)
+
+    As of version 0.04, the module can also evaluate R code on a remote host
+    that runs the Rserve <http://www.rforge.net/Rserve/> binary R server.
+    This allows Perl programs to access all facilities of R without the need
+    to have a local install of R or link to an R library.
+
+    See "SUBROUTINES" for invocation and usage information on individual
+    subroutines, and the R Internals manual
+    <http://cran.r-project.org/doc/manuals/R-ints.html> for the
+    specification of the file formats.
+
+EXPORT
+    Nothing by default. Optionally, subroutines "readRDS", "readRData", and
+    "evalRserve", or ":all" for all three.
+
+SUBROUTINES
+    readRDS EXPR
+        Reads a file in RDS format whose filename is given by EXPR and
+        returns a Statistics::R::REXP object.
+
+    readRData EXPR
+        Reads a file in RData format whose filename is given by EXPR and
+        returns a hash whose keys are the names of objects stored in the
+        file with corresponding values as Statistics::R::REXP instances.
+
+    evalRserve REXPR [ HOSTNAME [, PORT] | HANDLE]
+        Evaluates an R expression, given as text string in REXPR, on an
+        Rserve <http://www.rforge.net/Rserve/> server and returns its result
+        as a Statistics::R::REXP object.
+
+        The server location can be specified either by its host name and
+        (optionally) port or by a connected instance of IO::Handle. The
+        caller passing the HANDLE is responsible for reading (and checking)
+        the server ID that is returned in the first 32-byte response when
+        the connection was established. This allows opening the connection
+        once and reusing it in multiple calls to 'evalRserve'.
+
+        If only REXPR is given, the function assumes that the server runs on
+        the localhost. If PORT is not specified, it defaults to the standard
+        Rserve port, 6311.
+
+        The function will close the connection to the Rserve host if it has
+        opened it itself, but not if the connection was passed as a HANDLE.
+
+DEPENDENCIES
+    Requires perl 5.010 or newer.
+
+  Core modules
+    *   strict
+
+    *   warnings
+
+    *   overload
+
+    *   Carp
+
+    *   Exporter
+
+    *   Module::Build
+
+    *   Scalar::Util
+
+    *   Test::More
+
+  Additional CPAN modules
+    *   Class::Tiny
+
+    *   Class::Tiny::Antlers
+
+    *   Class::Method::Modifiers
+
+    *   namespace::clean
+
+    *   Test::Fatal
+
+BUGS AND LIMITATIONS
+    The module currently handles the 'version 2' serialization format, used
+    since R 1.4.0 (released in December 2001). Only XDR and native-order
+    binary is implemented, and since the R documentation describes the ASCII
+    save format as "now mainly of historical interest", this is unlikely to
+    change soon. No check is performed that a file stored in native-order
+    binary was created on a platform that used the same order, and it is up
+    to the caller to ensure compatibility. (Given that the default save
+    format is XDR, and the prevalence of Intel platforms, this is unlikely
+    to be a problem for either publicly-distributed or internal data files.)
+
+    Data files compressed with 'gzip' and 'bzip2' are supported, but not
+    'xz' ones. Again, given the R defaults ('gzip') and the fact that
+    "IO::Uncompress::UnXz" is not production-ready, this is unlikely to
+    change soon.
+
+    There are some R types that are not (yet) implemented, although all
+    typical "user-facing" types -- such as vectors, lists, and environments
+    -- are. The remaining R types will be implemented as-needed; in other
+    words, if you come across one that you need to read a particular file,
+    please send me the type (the id will included in the "unimplemented
+    SEXPTYPE" error message) and, if possible, how it was generated.
+
+    There are no known bugs in this module. Please report any bugs or
+    feature requests to "bug-statistics-r-io at rt.cpan.org", or through the
+    web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Statistics-R-IO>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Statistics::R::IO
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker (report bugs here)
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Statistics-R-IO>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Statistics-R-IO>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Statistics-R-IO>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Statistics-R-IO/>
+
+AUTHOR
+    Davor Cubranic <cubranic@stat.ubc.ca>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2016 by University of British Columbia.
+
+    This is free software, licensed under:
+
+      The GNU General Public License, Version 3, June 2007
+

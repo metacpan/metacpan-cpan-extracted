@@ -1,0 +1,38 @@
+<NZSRSResponse VerMajor="5" VerMinor="0">
+<Response Action="GetMessages" FeId="8" FeSeq="4798881" MoreRowsAvailable="1" OrigRegistrarId="171" RecipientRegistrarId="171" Rows="1">
+<FeTimeStamp Day="7" Hour="09" Minute="31" Month="7" Second="40" TimeZoneOffset="+12:00" Year="2010"/>
+<Message Remaining="5">
+<Response Action="DomainUpdate" FeId="8" FeSeq="4798347" OrigRegistrarId="1" RecipientRegistrarId="171" Rows="1" TransId="005b-2-renew.yml">
+<FeTimeStamp Day="7" Hour="00" Minute="02" Month="7" Second="23" TimeZoneOffset="+12:00" Year="2010"/>
+<Domain Delegate="1" DomainName="tasty.co.te" RegistrantRef="e63a482-715-4f-a108" RegistrarId="171" Status="Active" Term="0">
+<NameServers>
+<Server FQDN="ns1.ofttech.te"/>
+<Server FQDN="ns2.ofttech.te"/>
+</NameServers>
+<RegistrantContact Name="cheese inc" Email="owner@hidden.co.te">
+<PostalAddress Address1="P.O Box something" Address2="Mt Albert" City="Auckland" CountryCode="TE"/>
+<Phone AreaCode="800" CountryCode="44" LocalNumber="123456"/>
+</RegistrantContact>
+<AdminContact Name="cheesmaster1" Email="admin@hidden.co.te">
+<PostalAddress Address1="P.O Box something" Address2="Mt Albert" City="Auckland" CountryCode="TE"/>
+<Phone AreaCode="800" CountryCode="61" LocalNumber="123456"/>
+</AdminContact>
+<TechnicalContact Name="dns Ltd" Email="dns@helper.te">
+<PostalAddress Address1="P O Box something" City="Hamilton" CountryCode="TE"/>
+<Phone AreaCode="7" CountryCode="61" LocalNumber="123456"/>
+</TechnicalContact>
+<BilledUntil Day="06" Hour="11" Minute="26" Month="8" Second="50" TimeZoneOffset="+12:00" Year="2010"/>
+<RegisteredDate Day="06" Hour="11" Minute="26" Month="5" Second="50" TimeZoneOffset="+12:00" Year="2005"/>
+<AuditDetails ActionId="RenewDomains-2010-07-06 23:30:00-tasty.co.te" RegistrarId="1">
+<AuditTime>
+<From Day="07" Hour="00" Minute="02" Month="7" Second="23" TimeZoneOffset="+12:00" Year="2010"/>
+</AuditTime>
+<AuditText>
+<![CDATA[RenewDomains]]>
+</AuditText>
+</AuditDetails>
+</Domain>
+</Response>
+</Message>
+</Response>
+</NZSRSResponse>

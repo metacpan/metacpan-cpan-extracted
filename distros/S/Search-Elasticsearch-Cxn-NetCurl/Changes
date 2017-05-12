@@ -1,0 +1,77 @@
+Revision history for Search::Elasticsearch::Cxn::NetCurl
+
+5.02    2017-04-02
+        Updated to work with Search::Elasticsearch 5.02
+
+5.00    2016-10-19
+        Bumped version for Search::Elasticsearch 5.00
+
+2.03    2016-05-24
+        Bumped version for Search::Elasticsearch 2.03
+
+2.02    2016-04-20
+        Bumped version for Search::Elasticsearch 2.02
+
+2.01    2016-04-15
+        Bumped version for Search::Elasticsearch 2.01
+
+2.00    2015-10-28
+
+        The default client is now '2_0::Direct', for use with Elasticsearch 2.x.
+        Specify client '1_0::Direct' if using with Elasticsearch 1.x.
+
+1.99    2015-08-26
+
+        This release provides support for Elasticsearch 2.0.0-beta1 and above,
+        but the default client is still '1_0::Direct' and will remain so until
+        version 2.00 is released.
+
+1.20    2015-05-17
+        Updated elasticsearch.org URLs to use elastic.co instead
+
+1.19    2015-01-15
+
+        Bug fix:
+        * Default SSL options were not being set correctly
+        * Added optional tests for https/authz/authen
+
+1.17    2014-12-29
+
+        Bug fix:
+        * handle_args were not being passed to all backends,
+          meaning that (eg) cookies could not be used
+
+1.15    2014-11-05
+        Now defaults to not verifying SSL identities, but accepts
+        ssl_options to allow backend-specific configuration
+
+1.13    The NetCurl backend is now fork safe.
+
+1.10    2014-03-05
+        Moved all modules to Search::Elasticsearch namespace.
+        See https://github.com/elasticsearch/elasticsearch-perl/issues/20
+
+1.05    2014-03-05
+        Deprecated the Elasticsearch namespace in favour of Search::Elasticsearch.
+        See https://github.com/elasticsearch/elasticsearch-perl/issues/20
+
+        Exposed connect_timeout setting for Cxn::NetCurl
+
+1.01    2014-02-09
+        Fixed plugin loader to work with latest version of Module::Runtime
+        which complains about undefined versions
+
+1.00    2014-02-07
+        Moved the NetCurl source code into the repo for Elasticsearch.pm
+
+0.03    2013-12-03
+        Removed custom timeouts - rely on defaults
+        Tidied up Curl imports
+
+0.02    2013-10-03
+        NetCurl needs longer ping/sniff timeouts on some platforms
+        Added full ES test suite
+
+0.01    2013-10-02
+        First release
+

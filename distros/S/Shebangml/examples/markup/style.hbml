@@ -1,0 +1,10 @@
+html{
+  head{
+    style{
+      P {font: 16px}
+    }
+  }#head;
+body[=bar :bam @baz]{
+  p{whee!}
+}#body;
+}#html;

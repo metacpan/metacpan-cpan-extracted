@@ -1,0 +1,51 @@
+# XXX this is very alpha
+
+h1{.for}
+
+  ul{.for[var=.items]{
+    li{$[var]}
+  }}
+
+  ul{.for[var=stuff.thing]{
+    li{$[var]}
+  }}
+
+h1{.include}
+
+em{Is actually implemented!}
+
+  .include[src=some/file_name.hbml]
+
+h1{.doctype}
+
+em{Is actually implemented!}  This outputs a proper doctype for your
+xml.  I suppose this could also have custom content or something, but
+currently it only accepts several names for standard (x)html doctypes.
+
+  .doctype[=xhtml11]
+
+h1{.require}
+
+  .require[=some::plugin]
+
+h1{Calling Functions}
+
+The em{.x} prefix will call an installed handler, either via subref or
+via a package.method syntax.
+
+  .x.handler[key=value]{content goes here}
+
+  .x.package.function[key=value]{content goes here}
+
+h1{Thick Bacon}
+
+This quoting is currently the only way to pass content to handlers.
+
+  .js.eval{{{ some javascript in here }}}
+
+And you can also have it on multiple lines, but the '{{{' has to be at
+the end of the line on opening and beginning of the line on closing.
+
+  .foo.whatever{{{
+    and something or other{in_here}
+  }}}

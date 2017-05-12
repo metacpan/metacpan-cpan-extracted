@@ -1,0 +1,68 @@
+=head1 NAME
+
+Solaris::ProcessContract::Exceptions - Exceptions for Solaris::ProcessContract
+
+=head1 SYNOPSIS
+
+  use Solaris::ProcessContract;
+
+  my $pc = Solaris::ProcessContract->new();
+
+  eval
+  {
+    my $template = $pc->get_template();
+
+    $template->activate();
+  };
+
+  if ( my $ex = Solaris::ProcessContract::Exception->caught() )
+  {
+    # Handle error
+  }
+
+=head1 DESCRIPTION
+
+This module uses L<Exception::Class> for error handling.
+
+You don't need to worry about exception handling if you don't want to.  Your
+code will just die with appropriate error if an exception happens and you don't
+do anything to catch it.
+
+=head1 EXCEPTIONS
+
+The following types of exceptions are available.  All of can be caught with
+L</"Solaris::ProcessContract::Exception">, so you only need to worry about
+specific types if you want to do specific error handling.
+
+=head2 Solaris::ProcessContract::Exception
+
+A generic exception for anything that goes in L<Solaris::ProcessContract>.
+
+All of our other exceptions are of this type, so doing: 
+
+  if ( my $ex = Solaris::ProcessContract::Exception->caught() )
+
+will catch the others, too.
+
+=head2 Solaris::ProcessContract::Exception::XS
+
+An exception for anything that goes wrong when talking to L<libcontract(3)|http://docs.oracle.com/cd/E26505_01/html/816-5173/libcontract-3lib.html>.
+
+=head2 Solaris::ProcessContract::Exception::Params
+
+An exception for any time you try and pass the wrong parameters to a method.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<Solaris::ProcessContract>
+
+=item L<Exception::Class>
+
+=back
+
+=head1 AUTHOR
+
+Danny Warren
+

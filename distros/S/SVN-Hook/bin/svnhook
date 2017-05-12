@@ -1,0 +1,57 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use SVN::Hook::CLI;
+
+SVN::Hook::CLI->dispatch(@ARGV);
+
+1;
+
+=head1 NAME
+
+svnhook - Managing subversion hooks
+
+=head1 SYNOPSIS
+
+  svnhook init /path/to/repos # enables svnhook for all hooks
+  svnhook init /path/to/repos pre-commit # or just one
+  svnhook list /path/to/repos pre-commit
+
+=head1 DESCRIPTION
+
+C<svnhook init> initializes a repository to be managed by SVN::Hook.
+Currently it doesn't work if you have existing hooks.
+
+The hook is essentially redispatching to what's under the _hook_name
+directory, for example _pre-commit/ for pre-commit hooks.  Files under
+the directory are invoked in their shell globbing sequence.  Unless
+it's a post- hook, a failed hook terminates svnhook and returns
+failure to svn.  A file ended with "-" is treated as a disabled hook
+and is not run.
+
+If you look at the hook script itself, you will find a hash table you
+can edit to provided fine-grained mapping for commits under a certian
+directroy to also run scripts under the corresponding script
+directory.
+
+=head1 LICENSE
+
+Copyright 2007 Best Practical Solutions, LLC.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+=head1 AUTHORS
+
+Chia-liang Kao E<lt>clkao@bestpractical.com<gt>
+
+=cut

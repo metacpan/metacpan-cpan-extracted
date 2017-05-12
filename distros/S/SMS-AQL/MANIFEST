@@ -1,0 +1,14 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+TODO
+eg/example.pl
+eg/send-sms
+t/1-basic.t
+t/2-pod.t
+t/3-pod-coverage.t
+t/4-mock.t
+lib/SMS/AQL.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,20 @@
+-*- Outline -*-
+
+$Format: "* Version $SysPushdRelease$"$
+* Version 0.001
+
+* Description
+
+A micro-module permitting you to change directory, lexically.
+
+* DLSI Synopsis
+
+Sys::Pushd			Easy temporary chdir.				adpO
+
+* Installation
+
+perl Makefile.PL && make all test install
+
+* Author
+
+Jesse Glick <jglick@sig.bsh.com>

@@ -1,0 +1,79 @@
+---
+abstract: 'Yet another SQL builder'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>'
+build_requires:
+  Test::More: '0.98'
+  Test::Requires: '0'
+  Tie::IxHash: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.2.0, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SQL-Maker
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  SQL::Maker:
+    file: lib/SQL/Maker.pm
+    version: '1.21'
+  SQL::Maker::Condition:
+    file: lib/SQL/Maker/Condition.pm
+  SQL::Maker::Plugin::InsertMulti:
+    file: lib/SQL/Maker/Plugin/InsertMulti.pm
+  SQL::Maker::Plugin::InsertOnDuplicate:
+    file: lib/SQL/Maker/Plugin/InsertOnDuplicate.pm
+  SQL::Maker::SQLType:
+    file: lib/SQL/Maker/SQLType.pm
+  SQL::Maker::Select:
+    file: lib/SQL/Maker/Select.pm
+  SQL::Maker::Select::Oracle:
+    file: lib/SQL/Maker/Select/Oracle.pm
+  SQL::Maker::SelectSet:
+    file: lib/SQL/Maker/SelectSet.pm
+  SQL::Maker::Util:
+    file: lib/SQL/Maker/Util.pm
+requires:
+  Class::Accessor::Lite: '0.05'
+  DBI: '0'
+  Module::Load: '0'
+  SQL::QueryMaker: '0'
+  Scalar::Util: '0'
+  parent: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/tokuhirom/SQL-Maker/issues
+  homepage: https://github.com/tokuhirom/SQL-Maker
+  repository: git://github.com/tokuhirom/SQL-Maker.git
+version: '1.21'
+x_authority: cpan:TOKUHIROM
+x_contributors:
+  - 'lestrrat <lestrrat+github@gmail.com>'
+  - 'makamaka <makamaka.donzoko@gmail.com>'
+  - 'Atsushi Kobayashi <nekokak@gmail.com>'
+  - 'yamaguchi.toru <zigorou@cpan.org>'
+  - 'Fuji, Goro <gfuji@cpan.org>'
+  - 'issm <issmxx@gmail.com>'
+  - 'Masahiro Chiba <nihen@megabbs.com>'
+  - 'Masahiro Chiba <chiba@everqueue.com>'
+  - 'Masayuki Matsuki <y.songmu@gmail.com>'
+  - 'Neil Bowers <neil@bowers.com>'
+  - 'Gelu Lupas <gvl@cpan.org>'
+  - 'karupanerura <karupa@cpan.org>'
+  - 'soh335 <sugarbabe335@gmail.com>'
+  - 'pokutuna <popopopopokutuna@gmail.com>'
+  - 'Kazuho Oku <kazuhooku@gmail.com>'
+  - 'Toshio Ito <debug.ito@gmail.com>'
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'

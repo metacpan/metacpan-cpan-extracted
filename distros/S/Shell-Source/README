@@ -1,0 +1,30 @@
+NAME
+    Shell::Source - run programs and inherit environment changes
+
+DESCRIPTION
+    The Shell::Source allows arbitrary shell scripts, or other programs for
+    that matter, to be run and their environment to be inherited into a Perl
+    program.
+
+    Begin by creating a Shell::Source object, and specifying the shell it
+    will use.
+
+    If the shell is unknown to the module, you will also need to specify how
+    to run the shell in such a way that the output is a series of lines of
+    the form NAME=value. For example, to run a csh script:
+
+     my $csh = Shell::Source->new(shell => "csh",
+                                  file  => "stuff.csh",
+                                  run   => "csh -f -c 'source [[file]]; env' |");
+
+    However, for known shells this is not required. Note that [[file]] will
+    be replaced with the filename of the program you want to run.
+
+    Output from running the program is returned from $csh->output.
+
+    Changes made to the environment by running the program may be inherited
+    by calling $csh->inherit.
+
+    The environment changes are available as a hash from $csh->env, or in
+    Bourne shell syntax from $csh->shell.
+

@@ -1,0 +1,10 @@
+Revision history for Perl extension Sourcecode::Spellchecker
+
+0.01  Tues June 11 11:00:00 2013
+    - Original version
+
+0.02  Thurs June 13 11:00:00 2013
+    - Corrected some mistakes in the POD documentation
+
+0.03  Sun April 6 14 11:00:00 2014
+    - Improved check speed

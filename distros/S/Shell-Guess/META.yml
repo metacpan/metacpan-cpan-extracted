@@ -1,0 +1,25 @@
+---
+abstract: 'Make an educated guess about the shell in use'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Module::Build: '0.28'
+  Test::More: '0.94'
+  perl: '5.006'
+configure_requires:
+  Module::Build: '0.28'
+  perl: '5.006'
+dynamic_config: '1'
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Shell-Guess
+requires:
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/plicease/Shell-Guess/issues
+  homepage: http://perl.wdlabs.com/Shell-Guess
+  repository: git://github.com/plicease/Shell-Guess.git
+version: '0.06'

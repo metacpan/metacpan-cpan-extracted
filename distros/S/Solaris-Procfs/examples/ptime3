@@ -1,0 +1,49 @@
+#!/usr/local/bin/perl -w
+
+use strict;
+use ExtUtils::testlib;
+use Solaris::Procfs qw(:control_codes :pcset_flags);
+use Solaris::Procfs::Process;
+use lib '.';
+
+$|++;
+
+my $pid;
+
+if ($pid = fork()) {
+
+	# parent
+	#
+	my $rc = waitpid($pid,0201);   # Hardcoded flag.  Aaack!!
+
+	if ($rc < 0) { die "Process already exited"; }
+
+	my $p = new Solaris::Procfs::Process $pid;
+
+	my $realtime = 
+		$p->{usage}->{pr_rtime}->{tv_sec} +
+		$p->{usage}->{pr_rtime}->{tv_nsec} / 1_000_000_000;
+
+	my $usertime = 
+		$p->{usage}->{pr_utime}->{tv_sec} +
+		$p->{usage}->{pr_utime}->{tv_nsec} / 1_000_000_000;
+
+	my $systime = 
+		$p->{usage}->{pr_stime}->{tv_sec} +
+		$p->{usage}->{pr_stime}->{tv_nsec} / 1_000_000_000;
+
+	printf("real        %.3f\nuser        %.3f\nsys         %.3f\n",
+		$realtime, $usertime, $systime
+	);
+
+} else {
+
+	# child
+	#
+	$|++;
+	my $p = new Solaris::Procfs::Process $$;
+	$p->writectl(PCSET,PR_MSACCT);
+
+	exec(@ARGV);
+}
+

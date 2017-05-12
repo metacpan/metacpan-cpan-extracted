@@ -1,0 +1,12 @@
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/Sidekick/Check/Plugin/Filled.pm
+t/00-load.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

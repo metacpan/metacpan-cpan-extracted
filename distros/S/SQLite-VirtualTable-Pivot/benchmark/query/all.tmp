@@ -1,0 +1,4 @@
+
+drop table if exists materialized;
+create table materialized as select * from __table__ order by id;
+

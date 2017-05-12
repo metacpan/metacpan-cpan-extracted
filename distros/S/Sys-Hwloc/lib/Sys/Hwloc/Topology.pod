@@ -1,0 +1,221 @@
+=head1 NAME
+
+Sys::Hwloc::Topology - Class representing a hwloc topology context
+
+=head1 SYNOPSIS
+
+       use Sys::Hwloc;
+
+       $topology = Sys::Hwloc::Topology->init;
+       $rc = $topology->load;
+       $topology->check;
+       $topology->destroy;
+
+       $rc     = $topology->ignore_type( $type );
+       $rc     = $topology->ignore_type_keep_structure( $type );
+       $rc     = $topology->ignore_all_keep_structure;
+       $rc     = $topology->set_flags( $flags );
+       $rc     = $topology->set_fsroot( $path );
+       $rc     = $topology->set_pid( $pid );
+       $rc     = $topology->set_synthetic( $string );
+       $rc     = $topology->set_xml( $path );
+       $href   = $topology->get_support;
+
+       $topology->export_xml( $path );
+
+       $depth  = $topology->depth;
+       $depth  = $topology->get_type_depth( $type );
+       $type   = $topology->get_depth_type( $depth );
+       $type   = $topology->get_type_or_below_depth( $type );
+       $type   = $topology->get_type_or_above_depth( $type );
+       $nbobjs = $topology->get_nbobjs_by_depth( $depth );
+       $nbobjs = $topology->get_nbobjs_by_type( $type );
+       $rc     = $topology->is_thissystem;
+
+       $obj    = $topology->root;
+       $obj    = $topology->get_obj_by_depth( $depth, $idx );
+       $obj    = $topology->get_obj_by_type( $type, $idx );
+       $obj    = $topology->get_next_obj_by_depth( $depth, $obj );
+       $obj    = $topology->get_next_obj_by_type( $type, $obj );
+       $obj    = $topology->get_pu_obj_by_os_index( $idx );
+       $obj    = $topology->get_common_ancestor_obj( $obj1, $obj2 );
+       $rc     = $topology->obj_is_in_subtree( $obj1, $obj2 );
+       @objs   = $topology->get_closest_objs( $obj );
+       $obj    = $topology->get_obj_below_by_type( $type1, $idx1, $type2, $idx2 );
+       $rc     = $topology->compare_objects( $obj1, $obj2 );
+
+       $string = $topology->sprintf_obj( $obj, $prefix, $verbose );
+
+       $rc     = $topology->set_cpubind( $set, $flags );
+       $rc     = $topology->set_proc_cpubind( $pid, $set, $flags );
+       $rc     = $topology->get_cpubind( $set, $flags );
+       $rc     = $topology->get_proc_cpubind( $pid, $set, $flags);
+
+       $rc     = $topology->set_membind( $set, $policy, $flags );
+       $rc     = $topology->set_membind_nodeset( $set, $policy, $flags );
+       $rc     = $topology->set_proc_membind( $pid, $set, $policy, $flags );
+       $rc     = $topology->set_proc_membind_nodeset( $pid, $set, $policy, $flags );
+       $rc     = $topology->get_membind( $set, \$policy, $flags );
+       $rc     = $topology->get_membind_nodeset( $set, \$policy, $flags );
+       $rc     = $topology->get_proc_membind( $pid, $set, \$policy, $flags );
+       $rc     = $topology->get_proc_membind_nodeset( $pid, $set, \$policy, $flags );
+
+       $set    = $topology->get_complete_cpuset;
+       $set    = $topology->get_topology_cpuset;
+       $set    = $topology->get_online_cpuset;
+       $set    = $topology->get_allowed_cpuset;
+       $set    = $topology->get_complete_nodeet;
+       $set    = $topology->get_topology_nodeset;
+       $set    = $topology->get_allowed_nodeset;
+
+       $topology->cpuset_to_nodeset( $cpuset, $nodeset );
+       $topology->cpuset_to_nodeset_strict( $cpuset, $nodeset );
+       $topology->cpuset_from_nodeset( $cpuset, $nodeset );
+       $topology->cpuset_from_nodeset_strict( $cpuset, $nodeset );
+
+       $rc   = $topology->get_nbobjs_inside_cpuset_by_depth( $cpuset, $depth );
+       $rc   = $topology->get_nbobjs_inside_cpuset_by_type( $cpuset, $type );
+       $obj  = $topology->get_obj_inside_cpuset_by_depth( $cpuset, $depth );
+       $obj  = $topology->get_obj_inside_cpuset_by_type( $cpuset, $type );
+       $obj  = $topology->get_next_obj_inside_cpuset_by_depth( $cpuset, $depth, $prev );
+       $obj  = $topology->get_next_obj_inside_cpuset_by_type( $cpuset, $type, $prev );
+       $obj  = $topology->get_first_largest_obj_inside_cpuset( $cpuset );
+       @objs = $topology->get_largest_objs_inside_cpuset( $cpuset );
+
+=head1 DESCRIPTION
+
+Sys::Hwloc::Topology is the Perl namespace used for I<struct hwloc_topology>
+data.
+
+The Sys::Hwloc::Topology class provides an object-oriented interface
+for hwloc C functions that act on topology contexts. In particular,
+every hwloc C function that gets a I<hwloc_topology> pointer as first argument
+has an OO-ish counterpart in Sys::Hwloc::Topology.
+
+A Sys::Hwloc::Topology instance is created with B<hwloc_topology_init()> or
+B<Sys::Hwloc::Topology-E<gt>init()>.
+
+The topology context is built with B<hwloc_topology_load>($topology) or B<$topology-E<gt>load()>.
+
+The underlying C data must become freed with B<hwloc_topology_destroy($topology)> or
+B<$topology-E<gt>destroy()>.
+
+=head1 METHODS
+
+Refer to L<http://www.open-mpi.org/projects/hwloc> for the full specification.
+
+This section lists only methods that are specific to Sys::Hwloc. These are
+methods, which have no pendants in the hwloc C API, or which behave differently
+compared to their hwloc C API counterparts.
+
+=over 4
+
+=item B<init>
+
+  $topology = Sys::Hwloc::Topology->init();
+
+Allocates and returns a topology context. Returns a new Sys::Hwloc::Topology instance
+on success, returns I<undef> on error.
+
+=item B<destroy>
+
+  $topology->destroy();
+
+Terminates and frees an allocated topology context.
+
+There is no automatic Perl destructor Sys::Hwloc::Topology::DESTROY.
+That means, if an initialized topology variable goes out of scope or gets another value assigned,
+the C topology context is not freed. This conforms to the usage of the hwloc C API,
+but unfortunately not to the rules of OO in Perl.
+
+=item B<get_support>
+
+  $support = $topology->get_support;
+
+Retrieves the topology support as reference to a hash.
+
+The corresponding hwloc C API function returns a pointer to a I<struct hwloc_topology_support>, instead.
+
+As with hwloc v1.1, the topology support hashref consists of the following:
+
+  $support->{discovery}->{pu}
+  $support->{cpubind}->{set_thisproc_cpubind}
+  $support->{cpubind}->{get_thisproc_cpubind}
+  $support->{cpubind}->{set_proc_cpubind}
+  $support->{cpubind}->{get_proc_cpubind}
+  $support->{cpubind}->{set_thisthread_cpubind}
+  $support->{cpubind}->{get_thisthread_cpubind}
+  $support->{cpubind}->{set_thread_cpubind}
+  $support->{cpubind}->{get_thread_cpubind}
+  $support->{membind}->{set_thisproc_membind}
+  $support->{membind}->{get_thisproc_membind}
+  $support->{membind}->{set_proc_membind}
+  $support->{membind}->{get_proc_membind}
+  $support->{membind}->{set_thisthread_membind}
+  $support->{membind}->{get_thisthread_membind}
+  $support->{membind}->{set_area_membind}
+  $support->{membind}->{get_area_membind}
+  $support->{membind}->{alloc_membind}
+  $support->{membind}->{firsttouch_membind}
+  $support->{membind}->{bind_membind}
+  $support->{membind}->{interleave_membind}
+  $support->{membind}->{replicate_membind}
+  $support->{membind}->{nexttouch_membind}
+  $support->{membind}->{migrate_membind}
+
+=item B<compare_objects>
+
+  $rc = $topology->compare_objects( $obj1, $obj2 );
+
+Compares two L<Sys::Hwloc::Obj> instances.
+Returns 1, if they are equal. Returns 0, if they are not equal.
+
+Comparison is done by comparing the underlying raw I<hwloc_obj_t> pointer values.
+
+=item B<sprintf_obj>
+
+  $string = $topology->sprintf_obj( $obj, $prefix, $verbose );
+
+This method is an alias of B<Sys::Hwloc::hwloc_obj_sprintf($prefix,$verbose)>.
+
+It returns a string that represents a given topology object in human-readable form.
+
+The arguments B<$prefix> and B<$verbose> are optional, and default to I<undef> and 0, respectively.
+The handling of these defaults is done by the hwloc C API.
+
+Note that this method is regarded as depreciated in hwloc-1.1.
+
+=item B<get_closest_objs>
+
+  @objs = $topology->get_closest_objs( $obj );
+
+The method returns an array of up to 1024 B<Sys::Hwloc::Obj> objects that are closest to $obj.
+
+=item B<get_largest_objs_inside_cpuset>
+
+  @objs = $topology->get_largest_objs_inside_cpuset( $set );
+
+The method returns an array of up to 1024 B<Sys::Hwloc::Obj> objects that cover exactly cpuset $set.
+
+=back
+
+=head1 SEE ALSO
+
+L<hwloc>(7),
+L<Sys::Hwloc::Obj>(3pm),
+L<Sys::Hwloc::Cpuset>(3pm),
+L<Sys::Hwloc::Bitmap>(3pm)
+
+=head1 AUTHOR
+
+Bernd Kallies, E<lt>kallies@zib.deE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011 Zuse Institute Berlin
+
+This package and its accompanying libraries is free software; you can
+redistribute it and/or modify it under the terms of the GPL version 2.0,
+or the Artistic License 2.0. Refer to LICENSE for the full license text.
+
+=cut

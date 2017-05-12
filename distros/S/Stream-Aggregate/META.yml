@@ -1,0 +1,33 @@
+--- #YAML:1.0
+name:               Stream-Aggregate
+version:            0.406
+abstract:           Aggregate a data stream
+author:
+    - David Muir Sharnoff <muir@idiom.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    YAML:  0
+requires:
+    B::Deparse:           0
+    Clone:                0
+    Config::Checker:      0
+    Config::YAMLMacros:   0
+    Data::Dumper:         0
+    Hash::Util:           0
+    List::EvenMoreUtils:  0
+    List::MoreUtils:      0
+    List::Util:           0
+    Tie::Function::Examples:  0
+resources:
+    repository:  http://github.com/muir/Stream-Aggregate
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

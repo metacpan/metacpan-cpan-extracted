@@ -1,0 +1,63 @@
+{
+   "abstract" : "Lucy server with OpenSearch results",
+   "author" : [
+      "Peter Karman <karman@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Search-OpenSearch-Engine-Lucy",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Load" : "0",
+            "Dezi::App" : "0.004",
+            "JSON" : "2",
+            "Moose" : "0",
+            "Path::Class" : "0",
+            "Search::OpenSearch" : "0.400",
+            "Search::Query::Dialect::Lucy" : "0.200",
+            "Search::Tools" : "1.000",
+            "Test::More" : "0",
+            "Type::Tiny" : "0",
+            "perl" : "5.008003"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Search-OpenSearch-Engine-Lucy"
+      },
+      "homepage" : "https://github.com/karpet/search-opensearch-engine-lucy-perl",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/karpet/search-opensearch-engine-lucy-perl.git"
+      }
+   },
+   "version" : "0.400"
+}

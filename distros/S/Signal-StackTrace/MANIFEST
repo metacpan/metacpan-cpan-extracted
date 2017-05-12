@@ -1,0 +1,6 @@
+lib/Signal/StackTrace.pm
+MANIFEST
+CHANGES
+Makefile.PL
+t/00-use.t
+META.yml                                 Module meta-data (added by MakeMaker)

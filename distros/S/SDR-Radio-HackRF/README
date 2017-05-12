@@ -1,0 +1,63 @@
+NAME
+    SDR::Radio::HackRF - Control HackRF software defined radio
+
+SYNOPSIS
+    TX:
+
+        my $radio = SDR::Radio::HackRF->new;
+
+        $radio->frequency(35_000_000);
+        $radio->sample_rate(8_000_000);
+
+        $radio->tx(sub {
+            my $block_size = shift;
+
+            my $output = "\x00" x $block_size;
+
+            return \$output;
+        });
+
+        $radio->run;
+
+    RX:
+
+        my $radio = SDR::Radio::HackRF->new;
+
+        $radio->frequency(35_000_000);
+        $radio->sample_rate(8_000_000);
+
+        $radio->rx(sub {
+            ## Process data in $_[0]
+        });
+
+        $radio->run;
+
+DESCRIPTION
+    This is the SDR driver for HackRF <http://greatscottgadgets.com/hackrf/>
+    devices.
+
+    Although you can use it by itself, see the SDR docs for more generic
+    usage.
+
+    In order to install this module you will need "libhackrf" installed. On
+    Ubuntu/Debian you can run:
+
+        sudo apt-get install libhackrf-dev
+
+    NOTE: This module creates background threads so you should not fork
+    after creating "SDR::Radio::HackRF" objects.
+
+SEE ALSO
+    SDR-Radio-HackRF github repo
+    <https://github.com/hoytech/SDR-Radio-HackRF>
+
+    SDR - The main module, includes examples
+
+AUTHOR
+    Doug Hoyte, "<doug@hcsw.org>"
+
+COPYRIGHT & LICENSE
+    Copyright 2015 Doug Hoyte.
+
+    This module is licensed under the same terms as perl itself.
+

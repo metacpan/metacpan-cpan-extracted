@@ -1,0 +1,34 @@
+Stem::Proc
+
+A major service in network management infrastructure is running and 
+controlling processes.  Stem::Proc is a very simple to use cell which 
+has a wide range of useful options to control the process behavior 
+and its standard I/O.  The required parameters to the cell specify 
+the program  and its arguments.   
+
+The first group of configuration parameters controls how and when the 
+process is actually started.  A process can be started at 
+configuration time or initiated by a command message.  The message 
+interface is very important as it allows process management from any 
+other cell, including Stem::Cron (this will allow emulation of the OS 
+cron running processes), Stem::SockMsg (this will allow emulation 
+of the OS inetd), and other similar needs for remote process 
+invocation.  Process monitoring is achieved by handling SIGCHLD 
+signals and I/O handle shut-down detection.  A message can be sent 
+upon process exiting and the process can optionally be restarted 
+automatically, giving you a watchdog service.
+
+The second group is much larger and controls the I/O behavior of the 
+process.  You can enable/disable any subset of its 
+stdin/stdout/stderr handles.  This is needed for processes that don't 
+use all of their standard I/O handles.  Process I/O can be managed by 
+the Stem::AsyncIO class and callbacks.  In addition, the cell can be 
+configured to transfer its I/O data to/from other cells via Stem 
+messages.  One neat feature is the ability to buffer all output from 
+a process and send it via a message only upon process exit.  This 
+emulates the running of a process in backquotes as supported by 
+shells and Perl.
+
+Processes that need to work with a terminal can optionally be run 
+behind a pseudo-TTY device. 
+

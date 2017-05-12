@@ -1,0 +1,102 @@
+
+=pod
+
+=encoding Shift_JIS
+
+=head1 名称
+
+ShiftJIS::CP932::Correct - Windows CP-932の文字列を正しいものにする
+
+=head1 概要
+
+    use ShiftJIS::CP932::Correct;
+
+    $corrected_cp932 = correct_cp932($cp932_string);
+
+=head1 説明
+
+Microsoft Code Page 932 (CP-932) のテーブルは、次の7915文字からなります。
+
+  JIS X 0201 一バイト文字 (191文字),
+  JIS X 0208 二バイト文字 (6879文字),
+  NEC特殊文字 (SJIS 13区から 83文字),
+  NEC選定IBM拡張文字 (SJIS 89～92区から 374文字),
+  そして IBM拡張文字 (SJIS 115～119区から 388文字).
+
+このテーブルには、同じ文字が二重（若干のものは三重）に定義されているために、
+Unicodeとの往復変換ができない文字があります。これは NEC および
+IBM のベンダ定義文字のためです。
+
+例えば、Unicode の C<U+2252> に対応する CP-932 の文字は、
+JIS X 0208 の C<0x81e0> と NEC特殊文字の C<0x8790> の
+２つがあります。
+そのため、Unicode から CP-932 への変換プログラムの中には、
+C<U+2252> を、不注意のため C<0x81e0> ではなく、
+C<0x8790> に変換するものがあるかもしれません。
+
+このような挙動は好ましくありません。なぜなら、
+NEC特殊文字（または他のベンダ定義文字）は互換性が低いからです。
+
+このモジュールは、そのような（正しいことは正しいのだがやはり）
+「間違っている」CP-932 文字列を正しいものにします。
+
+このモジュールは、
+"Microsoft PRB: Conversion Problem Between Shift-JIS and Unicode (Article ID: Q170559)"
+で提供されたマップを使用しています。
+
+=over 4
+
+=item C<correct_cp932(STRING)>
+
+CP-932 文字列を正しいものにして返します。
+すなわち、多重定義文字の好ましくない区点を好ましい区点に変換します。
+Unicodeとの往復変換が可能な文字はそのまま残されます。
+CP-932で定義されない区点の文字は削除されます。
+例えば，C<"\x87\x90"> は C<"\x81\xe0"> に変換されます。
+
+=item C<is_corrected_cp932(STRING)>
+
+文字列が「正しくされた」CP-932 文字列がどうかの真偽値を返します。
+
+=item C<is_cp932(STRING)>
+
+文字列が CP-932 文字列がどうかの真偽値を返します。
+
+=back
+
+=head2 輸出
+
+  correct_cp932 と is_corrected_cp932 はデフォルトで輸出されます。
+  is_cp932 は要求により輸出できます。
+
+=head1 注意事項
+
+「正しくされた」CP-932 といっても、ベンダ定義文字を含み得るものです。
+
+CP-932は、Shift_JISとは違います。
+
+=head1 作者
+
+SADAHIRO Tomoyuki <SADAHIRO@cpan.org> 貞廣 知行
+
+Copyright(C) 2001-2002, SADAHIRO Tomoyuki. Japan. All rights reserved.
+
+This module is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+=head1 参考
+
+=over 4
+
+=item 1
+
+Microsoft PRB: Conversion Problem Between Shift-JIS and Unicode
+(Article ID: Q170559)
+
+=item 2
+
+L<ShiftJIS::CP932::MapUTF>
+
+=back
+
+=cut

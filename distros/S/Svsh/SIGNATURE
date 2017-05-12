@@ -1,0 +1,41 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 10a7ee2fa2064d14ab595454a2ba35b211f60d2f Changes
+SHA1 45babae126de9c944afd3df431ec4d698cee85b7 INSTALL
+SHA1 43b9ff0e21a8504c73194bee2acdd52769627608 LICENSE
+SHA1 4596343318fa62c582d3e3fc0e0d998fa363267b MANIFEST
+SHA1 fd1adae0c110cd69e622ce39099c2d89e0e66fb8 MANIFEST.SKIP
+SHA1 0bf58e97b2c9bfa70c69ad11fff7bf72ce51b49e META.json
+SHA1 7ae04cbac7b82bb7d1c2fb1119b9710705739681 Makefile.PL
+SHA1 4c8659f61fb26130922c1c3cd634684bc5501d13 README
+SHA1 3b579a73abbe62e770c4ce5b72059e21d7286dc2 README.md
+SHA1 caaee68c4937b4d816033a47d66b661e02e6c601 bin/svsh
+SHA1 2b9ed242ce8cfdb1dbd3280b1a6c4803cc917c3b dist.ini
+SHA1 bf425b0b8f0ebdca17f7f405cb57305dc8bd3d31 lib/Svsh.pm
+SHA1 3bc35b804fa4d6706085a49cf7b4776ffb346dd9 lib/Svsh/Daemontools.pm
+SHA1 c6f7e60f703900563e609300a28a231492728e3e lib/Svsh/Perp.pm
+SHA1 688029c7bd2e642248fb5b9ef40926b4025bea47 lib/Svsh/Runit.pm
+SHA1 6204327dd7a395e19b524c485fcd76c90f9b45a5 lib/Svsh/S6.pm
+SHA1 d6e48726d1a97053b20cab488dddc331e668725f t/00-load.t
+SHA1 87768d177f8c2e2df9c591cde869e7c8a245555e t/release-dist-manifest.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iF4EAREIAAYFAlXM3xgACgkQa4OHQAFM10dOiAD9FLpcJWvEw/dADj389sNdM/CM
+KhkYZqdbV+Z/enuHP1QBAJiOeNLmPmCHL8vsYB/Oez1uLDNs8/dJJUl3cYTWk/Cx
+=jNHt
+-----END PGP SIGNATURE-----

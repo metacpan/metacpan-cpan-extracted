@@ -1,0 +1,69 @@
+Revision history for Search-Query-Dialect-KSx
+
+0.201 2 May 2014
+ - fix bug in Search::Query min version declaration
+
+0.200 1 May 2014
+ - port to Moo for Search::Query 0.300
+
+0.14 19 June 2011
+ - bump dep on Search::Query to 0.19 for croak_on_error fix.
+
+0.13 28 Oct 2010
+ - bump dep on KS 0.31 release.
+
+0.12 22 June 2010
+ - add suffix optimization to WildcardQuery
+ - preserve NOT clauses by always wrapping in a pair of ().
+ - allow for default_boolop to join clauses as ORQuery instead of only
+   ANDQuery. NOTE that unlike KinoSearch::QueryParser, this module defaults
+   to 'AND' and not 'OR'.
+
+0.11 10 May 2010
+ - fix bug where NOT clause with no explicit field had the NOT qualifier
+   applied 2x.
+ - fix stringification of simple NOT clause.
+
+0.10 08 May 2010
+ - add allow_single_wildcards feature
+
+0.09 01 May 2010
+ - fix mem leak in WildcardQuery that caused false test results.
+ - fix mem leaks in Compiler and Scorer
+ - bump dependency to KS 0.30_101 which fixes Perl stack bug that can
+   affect WildcardQuery.
+
+0.08 10 April 2010
+ - fix double negative bug in stringify().
+
+0.07 02 April 2010
+ - fix bug in as_ks_query() where NOT foo=?* was parsed differently than
+   foo!=?*
+
+0.06 26 March 2010
+ - support KS 0.30_09 API change from 'searchable' to 'searcher'
+ - add proximity support via KSx::Search::ProximityQuery
+ - fix bug in Compiler where multi-term fields were not being checked
+   correctly for wildcard matches.
+ - fix bug in as_ks_query() where !~ was not being properly parsed.
+
+0.05 14 March 2010
+ - refactor scoring via Compiler and Scorer.
+ - fix bugs with NOTQuery
+ - support NOTQuery around a RangeQuery
+ - preserve syntax of RangeQuerys on stringify()
+
+0.04 04 March 2010
+ - fix bug when no default_field is defined in Dialect	or Parser
+
+0.03 03 March 2010
+ - POD fix in NOTWildcardQuery that caused cpan to not link the .pm with
+   the .pod
+ - fix op bugs in stringify_clause()
+
+0.02 03 March 2010
+ - bump depedency on KS to 0.30_083 for support for wildcard queries.
+
+0.01 01 March 2010
+ - First version, released on an unsuspecting world.
+

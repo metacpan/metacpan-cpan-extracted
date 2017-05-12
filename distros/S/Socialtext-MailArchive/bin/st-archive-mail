@@ -1,0 +1,29 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Socialtext::Resting::Getopt qw/get_rester rester_usage/;
+use Socialtext::MailArchive;
+use Getopt::Long;
+
+my $r = get_rester();
+
+GetOptions('help' => \&usage) or usage();
+
+my $message;
+{
+    local $/;
+    $message = <STDIN>;
+}
+
+Socialtext::MailArchive->new( rester => $r )->archive_mail($message);
+exit;
+
+sub usage {
+    my $rester_usage = rester_usage();
+    print <<EOT;
+USAGE: $0 [options]
+
+$rester_usage
+EOT
+    exit 1;
+}

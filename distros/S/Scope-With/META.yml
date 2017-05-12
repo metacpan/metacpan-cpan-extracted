@@ -1,0 +1,28 @@
+---
+abstract: 'A JavaScript-style with statement for lexically-scoped method delegation'
+author:
+  - 'chocolateboy <chocolate@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.97'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Scope-With
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Devel::Declare: 0.006000
+  Mouse: 0.58
+  mysubs: 1.11
+  perl: 5.8.1
+resources:
+  license: http://opensource.org/licenses/artistic-license.php
+version: 0.01

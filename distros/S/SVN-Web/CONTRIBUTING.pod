@@ -1,0 +1,64 @@
+=head1 NAME
+
+CONTRIBUTING
+
+=head1 SYNOPSIS
+
+Information on contributing to SVN::Web
+
+=head1 DESCRIPTION
+
+If you interested in contributing to SVN::Web there are several areas that
+could definitely benefit from third party improvement.
+
+=head2 Localising
+
+All the English text in the templates B<should> be localised.  This makes
+creating a new localisation as simple as adding the appropriate message
+catalog file to F<lib/SVN/Web/I18N/>.  If you have taken the time to
+localise SVN::Web to your own language please send the message catalog to
+the maintainers for inclusion in future releases.
+
+=head2 Templates
+
+It is very easy to change SVN::Web's look by creating a new set of templates
+and adjusting the C<templatedir> configuration directive.  If you've created
+a new template set (perhaps to have SVN::Web's output mimic that of another
+web based repository browser) then please contribute it back to the
+maintainers for inclusion in future releases.
+
+=head2 New actions
+
+SVN::Web's design makes it simple to add new actions.  See L<SVN::Web::action>
+for details.
+
+If you've created a new action then please contribute it back to the maintainers
+for inclusion in future releases.
+
+Some ideas for new actions include:
+
+=over
+
+=item help
+
+Would display help to the user.
+
+=item atom
+
+Similar to the C<rss> action, but generating ATOM format output instead.
+
+=back
+
+Or look on CPAN for SVN related modules that could be usefully integrated.
+Perhaps L<SVN::Log::Index> or L<SVN::Churn> could form the basis of useful
+actions.
+
+=head2 Bug reports and fixes
+
+Of course, if you discover any bugs in SVN::Web please report them back to
+the maintainers.  It's even more useful if you're able to include a test
+case that reliably reproduces the bug.
+
+Naturally, fixes for these bugs are even more useful.  Please see the
+L<SVN::Web/BUGS> section in L<SVN::Web> for information about reporting
+bugs.

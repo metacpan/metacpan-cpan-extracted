@@ -1,0 +1,316 @@
+NAME
+    Scalar::Properties - Run-time properties on scalar variables
+
+VERSION
+    version 1.100860
+
+SYNOPSIS
+      use Scalar::Properties;
+      my $val = 0->true;
+        if ($val && $val == 0) {
+        print "yup, its true alright...\n";
+      }
+
+      my @text = (
+        'hello world'->greeting(1),
+        'forget it',
+        'hi there'->greeting(1),
+      );
+      print grep { $_->is_greeting } @text;
+
+      my $l =  'hello world'->length;
+
+DESCRIPTION
+    Scalar::Properties attempts to make Perl more object-oriented by taking
+    an idea from Ruby: Everything you manipulate is an object, and the
+    results of those manipulations are objects themselves.
+
+      'hello world'->length
+      (-1234)->abs
+      "oh my god, it's full of properties"->index('g')
+
+    The first example asks a string to calculate its length. The second
+    example asks a number to calculate its absolute value. And the third
+    example asks a string to find the index of the letter 'g'.
+
+    Using this module you can have run-time properties on initialized scalar
+    variables and literal values. The word 'properties' is used in the Perl
+    6 sense: out-of-band data, little sticky notes that are attached to the
+    value. While attributes (as in Perl 5's attribute pragma, and see the
+    "Attribute::*" family of modules) are handled at compile-time,
+    properties are handled at run-time.
+
+    Internally properties are implemented by making their values into
+    objects with overloaded operators. The actual properties are then simply
+    hash entries.
+
+    Most properties are simply notes you attach to the value, but some may
+    have deeper meaning. For example, the "true" and "false" properties
+    plays a role in boolean context, as the first example of the Synopsis
+    shows.
+
+    Properties can also be propagated between values. For details, see the
+    EXPORTS section below. Here is an example why this might be desirable:
+
+      pass_on('approximate');
+      my $pi = 3->approximate(1);
+      my $circ = 2 * $rad * $pi;
+
+      # now $circ->approximate indicates that this value was derived
+      # from approximate values
+
+    Please don't use properties whose name start with an underscore; these
+    are reserved for internal use.
+
+    You can set and query properties like this:
+
+    "$var->myprop(1)"
+        sets the property to a true value.
+
+    "$var->myprop(0)"
+        sets the property to a false value. Note that this doesn't delete
+        the property (to do so, use the "del_props" method described below).
+
+    "$var->is_myprop", "$var->has_myprop"
+        returns a true value if the property is set (i.e., defined and has a
+        true value). The two alternate interfaces are provided to make
+        querying attributes sound more natural. For example:
+
+          $foo->is_approximate;
+          $bar->has_history;
+
+    Values thus made into objects also expose various utility methods. All
+    of those methods (unless noted otherwise) return the result as an
+    overloaded value ready to take properties and method calls itself, and
+    don't modify the original value.
+
+METHODS
+  get_props
+    Get a list of names of the value's properties.
+
+  del_props(LIST)
+    Deletes one or more properties from the value. This is different than
+    setting the property value to zero.
+
+  del_all_props
+    Deletes all of the value's properties.
+
+  plus(EXPR)
+    Returns the value that is the sum of the value whose method has been
+    called and the argument value. This method also overloads addition, so:
+
+      $a = 7 + 2;
+      $a = 7->plus(2);    # the same
+
+  minus(EXPR)
+    Returns the value that is the the value whose method has been called
+    minus the argument value. This method also overloads subtraction.
+
+  times(EXPR)
+    Returns the value that is the the value whose method has been called
+    times the argument value. This method also overloads multiplication.
+
+  divide(EXPR)
+    Returns the value that is the the value whose method has been called
+    divided by the argument value. This method also overloads division.
+
+  modulo(EXPR)
+    Returns the value that is the the value whose method has been called
+    modulo the argument value. This method also overloads the modulo
+    operator.
+
+  exp(EXPR)
+    Returns the value that is the the value whose method has been called
+    powered by the argument value. This method also overloads the
+    exponentiation operator.
+
+  abs
+    Returns the absolute of the value.
+
+  zero
+    Returns a boolean value indicating whether the value is equal to 0.
+
+  length
+    Returns the result of the built-in "length" function applied to the
+    value.
+
+  size
+    Same as "length()".
+
+  reverse
+    Returns the reverse string of the value.
+
+  uc
+    Returns the result of the built-in function "uc()" applied to the value.
+
+  ucfirst
+    Returns the result of the built-in function "ucfirst()" applied to the
+    value.
+
+  lc
+    Returns the result of the built-in function "lc()" applied to the value.
+
+  lcfirst
+    Returns the result of the built-in function "lcfirst()" applied to the
+    value.
+
+  hex
+    Returns the result of the built-in function "hex()" applied to the
+    value.
+
+  oct
+    Returns the result of the built-in function "oct()" applied to the
+    value.
+
+  concat(EXPR)
+    Returns the result of the argument expression appended to the value.
+
+  append(EXPR)
+    Same as "concat(EXPR)".
+
+  swapcase
+    Returns a version of the value with every character's case reversed,
+    i.e. a lowercase character becomes uppercase and vice versa.
+
+  split /PATTERN/, LIMIT
+    Returns a list of overloaded values that is the result of splitting
+    (according to the built-in "split" function) the value along the
+    pattern, into a number of values up to the limit.
+
+  numcmp(EXPR)
+    Returns the (overloaded) value of the numerical three-way comparison.
+    This method also overloads the "<=>" operator.
+
+  cmp(EXPR)
+    Returns the (overloaded) value of the alphabetical three-way comparison.
+    This method also overloads the "cmp" operator.
+
+  eq(EXPR)
+    Return the (overloaded) boolean value of the "eq" string comparison.
+    This method also overloads that operators.
+
+  ne(EXPR)
+    Return the (overloaded) boolean value of the "ne" string comparison.
+    This method also overloads that operators.
+
+  lt(EXPR)
+    Return the (overloaded) boolean value of the "lt" string comparison.
+    This method also overloads that operators.
+
+  gt(EXPR)
+    Return the (overloaded) boolean value of the "gt" string comparison.
+    This method also overloads that operators.
+
+  le(EXPR)
+    Return the (overloaded) boolean value of the "le" string comparison.
+    This method also overloads that operators.
+
+  ge(EXPR)
+    Return the (overloaded) boolean value of the "ge" string comparison.
+    This method also overloads that operators.
+
+  eqi
+    Same as "eq()", but is case-insensitive.
+
+  nei>
+    Same as "ne()", but is case-insensitive.
+
+  lti
+    Same as "lt()", but is case-insensitive.
+
+  gti
+    Same as "gt()", but is case-insensitive.
+
+  lei
+    Same as "le()", but is case-insensitive.
+
+  gei
+    Same as "ge()", but is case-insensitive.
+
+  is_true
+    Returns whether the (overloaded) boolean status of the value is true.
+
+  is_false
+    Returns whether the (overloaded) boolean status of the value is false.
+
+  create
+    FIXME
+
+  del_prop
+    FIXME
+
+  do_downto
+    FIXME
+
+  do_downto_step
+    FIXME
+
+  do_upto
+    FIXME
+
+  do_upto_step
+    FIXME
+
+  false
+    FIXME
+
+  gen_meth
+    FIXME
+
+  handle
+    FIXME
+
+  times_do
+    FIXME
+
+  true
+    FIXME
+
+  value
+    FIXME
+
+FUNCTIONS
+  pass_on(LIST)
+    Sets (replaces) the list of properties that are passed on. There is only
+    one such list for the whole mechanism. The whole property interface is
+    experimental, but this one in particular is likely to change in the
+    future. This function is exported automatically.
+
+  passed_on(STRING)
+    Tests whether a property is passed on and returns a boolean value. This
+    function is exported automatically.
+
+  get_pass_on
+    Returns a list of names of properties that are passed on. This function
+    is exported automatically.
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Scalar-Properties>.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <http://search.cpan.org/dist/Scalar-Properties/>.
+
+    The development version lives at
+    <http://github.com/hanekomu/Scalar-Properties/>. Instead of sending
+    patches, please fork this project using the standard git and github
+    infrastructure.
+
+AUTHOR
+      Marcel Gruenauer <marcel@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2001 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

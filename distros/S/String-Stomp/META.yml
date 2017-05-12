@@ -1,0 +1,38 @@
+---
+abstract: 'Removes empty leading and trailing lines'
+author:
+  - 'Erik Carlsson <info@code301.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Syntax::Feature::Qs: '0.2004'
+  Test::More: '0.96'
+  syntax: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.042, Dist::Iller version 0.1203, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: String-Stomp
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  String::Stomp:
+    file: lib/String/Stomp.pm
+    version: '0.0102'
+requires:
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/Csson/p5-String-Stomp/issues
+  homepage: https://metacpan.org/release/String-Stomp
+  repository: https://github.com/Csson/p5-String-Stomp.git
+version: '0.0102'

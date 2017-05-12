@@ -1,0 +1,13 @@
+Revision history for Perl module SMS::Send::Kannel::SMSbox
+
+0.04 2015-11-29
+  - Updated Documentation
+
+0.03 2015-11-29
+  - Moving from SMS-Send-SMSbox namespace to SMS-Send-Kannel-SMSbox namespace to allow regional phone number support from SMS::Send driver method
+
+0.02 2015-11-24
+  - Moving common methods to SMS::Send::DriverWebService
+
+0.01 2015-10-21
+  - original version; created by ExtUtils::ModuleMaker 0.51

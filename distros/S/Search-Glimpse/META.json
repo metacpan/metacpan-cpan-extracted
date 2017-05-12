@@ -1,0 +1,57 @@
+{
+   "abstract" : "Perl extension to communicate with Glimpse server",
+   "author" : [
+      "Alberto SimÃµes <ambs@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110580",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Search-Glimpse",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : 0,
+            "Test::Pod" : "1.00",
+            "Test::Pod::Coverage" : "0.08"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Config::AutoConf" : "0.14",
+            "Module::Build" : "0.3603"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::File" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Search::Glimpse" : {
+         "file" : "lib/Search/Glimpse.pm",
+         "version" : "0.04"
+      },
+      "Search::Glimpse::Index" : {
+         "file" : "lib/Search/Glimpse/Index.pm",
+         "version" : "0.01"
+      },
+      "Search::Glimpse::Server" : {
+         "file" : "lib/Search/Glimpse/Server.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.04"
+}

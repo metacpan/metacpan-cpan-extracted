@@ -1,0 +1,10 @@
+LICENSE
+Changes
+Makefile.PL
+README
+TODO
+MANIFEST
+lib/Software/Packager/Rpm.pm
+lib/Software/Packager/Object/Rpm.pm
+t/01_initialise.t
+t/02_rpm.t

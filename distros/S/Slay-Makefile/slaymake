@@ -1,0 +1,122 @@
+#!/usr/local/bin/perl
+
+=head1 NAME
+
+slaymake - Calls Slay::Makefile module as if a make program
+
+=head1 DESCRIPTION
+
+Calls Slay::Makefile module as if a make program.  If no targets are
+specified, then the first constant set of targets in the Slay::Makefile
+is built.
+
+=head1 USAGE
+
+  slaymake [options] [targets]
+
+Options:
+
+  -d               Supply the debug flag to Slay::Maker
+  -e <perl-code>   Execute <perl-code> prior to parsing the SlayMakefile.
+                   May be multiple.
+  -f <filename>    Use <filename> as the name of the SlayMakefile 
+                   (default SlayMakefile)
+  -h               Print help
+  -V               Print version information
+
+  VAR=VAL          Sets $VAR to "VAL" prior to parsing the SlayMakefile.
+                   Processed before -e code.  May be multiple.
+
+=cut
+
+=pod
+=begin reST
+=begin Id
+Id: ${TOOL_ID}.
+Copyright (c) 2007-2008 Mark Nodine.
+Distributed under terms of the Perl license, which is the disjunction of
+the GNU General Public License (GPL) and the Artistic License.
+=end Id
+
+=cut
+
+use FindBin;
+
+use Slay::Makefile; our $VERSION = $Slay::Makefile::VERSION;
+
+use strict;
+use vars qw($TOOL_ID);
+
+main();
+
+sub main {
+    use Getopt::Long;
+    
+    $TOOL_ID = "slaymake $VERSION";
+    
+    # Get VAR=VAL strings
+    my %assigns;
+    @ARGV = grep ! (/^([a-z]\w+)=(.*)/i && do { $assigns{$1} = $2; 1 }), @ARGV;
+
+    # Set default option values
+    my %opt = (f=>'SlayMakefile');
+
+    # Parse options
+    Getopt::Long::config('no_ignore_case');
+    Usage() unless GetOptions \%opt, qw(d e=s@ f=s h V);
+    # Give usage information
+    Usage('DESCRIPTION') if $opt{h};
+    Usage('Id') if $opt{V};
+
+    my %options;
+    $options{debug} = 1 if $opt{d};
+    my $sm = Slay::Makefile->new(\%options);
+    s{\\}{\\\\} foreach values %assigns;
+    $sm->parse_string(<<EOS) if %assigns;
+{
+use vars qw(@{[map "\$$_", keys %assigns]});
+@{[map "\$$_ = q[$assigns{$_}];\n", keys %assigns]}}
+EOS
+    my $errs;
+    if ($opt{e}) {
+	$errs = $sm->parse_string(<<EOS) ;
+{
+#line 1 "-e"
+@{[map "$_\n", @{$opt{e}}]}}
+EOS
+    }
+    $errs = $sm->parse($opt{f}) unless $errs && @$errs;
+    if (@$errs) {
+	print STDERR @$errs;
+	print STDERR "Targets not built due to errors\n";
+    }
+    else {
+	$sm->make(@ARGV);
+	print $sm->maker->output;
+    }
+}
+
+# Extracts and prints usage information
+# Arguments: type of usage, end marker for usage (optional)
+sub Usage {
+    my ($what) = @_;
+    $what = "USAGE" if ! $what;
+    my $mark = $what eq 'DESCRIPTION' ? "($what|USAGE)" : $what;
+    # Devel::Cover branch 0 1 Assert I can open myself
+    if (open(ME,$0)) {
+	while (<ME>) {
+	    if ((/^=(begin|head1) $mark/ .. /^=(end $mark|cut)/) &&
+		! /^=((begin|end) $mark|cut)/) {
+		s/(\$\{[^\}]+\})/eval($1)/ge;
+		s/=head1 //;
+		print;
+	    }
+	}
+	close(ME);
+    }
+    else {
+	# Devel::Cover statement 0 0 guards internal error
+	print STDERR "Usage not available.\n";
+    }
+    exit (1);
+}

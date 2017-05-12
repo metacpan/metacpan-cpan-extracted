@@ -1,0 +1,11 @@
+Revision history for Perl extension Sys::FreezeThaw
+
+0.02  Mon Oct  7 06:20:37 CEST 2013
+	- optionally allow freeze to continue even when some
+          processes could not be stopped.
+        - also install handlers for INT, and TERM in freezethaw.
+        - add a testcase (but do not freeeze).
+
+0.01  Wed Apr  6 01:24:19 CEST 2005
+	- original version;
+

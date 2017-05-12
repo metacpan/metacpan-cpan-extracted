@@ -1,0 +1,10 @@
+
+svg_validate
+   * Add option to suppress creation of .orig files
+   * Add command to undo and move the .orig's back
+   * Add option to generate the tagged files into a separate tree
+   * Add options to enable specification of larger amount of metadata
+
+   * --passfail shouldn't *prevent* processing of files
+   * Add option to control whether files are processed
+   * Figure out why svg_metadata produced hash codes for keywords

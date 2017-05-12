@@ -1,0 +1,23 @@
+Sys-SyslogMessages version 0.01
+===============================
+
+This is a simple module that figures out where the syslog from
+the syslog.conf or the syslog-ng.conf and can copy it or tail it.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Judith Lebzelter <judith@osdl.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.

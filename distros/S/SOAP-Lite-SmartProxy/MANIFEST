@@ -1,0 +1,17 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+client/http-forward-hello.pl
+client/http-forward-newuri-calculator.pl
+client/http-goodbye.pl
+client/http-redirect-calculator.pl
+client/http-redirect-newuri-calculator.pl
+client/http-redirect-newuri-goodbye.pl
+lib/Apache/SmartProxy.pm
+lib/SOAP/Transport/HTTPX.pm
+server/SafeModules/Calculator.pm
+server/SafeModules/GoodBye.pm
+server/SafeModules/Hello.pm
+server/SafeModules/NewGoodBye.pm
+server/SafeModules/Redirect.pm

@@ -1,0 +1,58 @@
+<?xml version="1.0" ?>
+<app_config>
+
+    <keys>
+        <key name="example">Example</key>
+    </keys>
+
+    <application_url>app</application_url>
+    <db_name>app_database</db_name>    
+
+    <config_namespace>App</config_namespace>
+    <error_handler>App::ErrorHandler</error_handler>
+    
+    <urls> 
+        <url
+            virtual_path        = "/"
+            url_is_prefix       = "0"
+            pageflow            = "Main"
+            initial_state       = "app_home"
+            requires_auth       = "1"
+            disable_back_button = "1"
+            escape_frames       = "0"
+            debug_level         = "0"
+            view_top_nav        = "1"
+            title               = "Example Page"
+            boilerplate_view    = "BlueSlash::View"
+            require_session     = "1"
+            />
+    </urls>
+
+    <webservices>
+        <resource virtual_path="v1/" controller="App::Controller::REST::v1::List" url_is_prefix="0"/>
+        <resource virtual_path="v1/{user}/{id}/results" controller="App::Controller::REST::v1::Results" url_is_prefix="1"/>
+    </webservices>
+
+    <remotes>
+        <remote name="example_remote">App::Controller::Remote::Example</remote>
+    </remotes>
+
+    <css_files>
+        <css_file>content/app.css</css_file>
+    </css_files>
+
+    <js_files>
+        <js_file>content/app.js</js_file>
+    </js_files>
+
+    <statics>
+        <static>content</static>
+        <static>images</static>
+        <static virtual_path="js">javascript</static>
+    </statics>
+
+    <cgis>
+        <cgi virtual_path="example.cgi" requires_auth="0">cgis/example.cgi</cgi>
+    </cgis>
+
+</app_config>

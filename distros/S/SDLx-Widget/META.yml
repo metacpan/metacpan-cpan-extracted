@@ -1,0 +1,35 @@
+---
+abstract: 'Common Widgets using SDL'
+author:
+  - 'Dustin Mays, garu, Zpmorgan, kthakore, FROGGS'
+build_requires:
+  SDL: 2.523
+  Test::More: 0.88
+configure_requires:
+  Module::Build: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: SDLx-Widget
+provides:
+  SDLx::Widget:
+    file: lib/SDLx/Widget.pm
+    version: 0.072
+  SDLx::Widget::Menu:
+    file: lib/SDLx/Widget/Menu.pm
+    version: 0.072
+  SDLx::Widget::Textbox:
+    file: lib/SDLx/Widget/Textbox.pm
+    version: 0.072
+requires:
+  Clipboard: 0
+  Mouse: 0
+  SDL: 2.523
+resources:
+  bugtracker: https://github.com/PerlGameDev/SDLx-Widget/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/PerlGameDev/SDLx-Widget
+version: 0.072

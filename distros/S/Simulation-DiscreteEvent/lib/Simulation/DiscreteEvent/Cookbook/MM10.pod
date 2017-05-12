@@ -1,0 +1,232 @@
+=pod
+
+=head1 NAME
+
+Simulation::DiscreteEvent::Cookbook::MM10 - Modelling M/M/1/0 queue
+
+=head1 MODELLING M/M/1/0 QUEUE
+
+=head2 A Bit of Theory
+
+M/M/1/0 queue is usually first example in any book on queueing theory. Let's
+see how we can build the model of this system using
+L<Simulation::DiscreteEvent>.
+
+In M/M/1/0 system customers arrive in random moments of time independently of
+each over. The interval between moments of arrival is a random variable
+distributed exponentially, i.e. its density function is
+I<< f(t)=lambda*exp(-lambda*t), t>0 >>. The I<lambda> parameter is arrival rate
+- the average number of customers arriving in a unit of time. There's a
+single server in the system which serves customers. The time required to serve
+a customer is exponentially distributed random variable. The density function is 
+I<< f(t)=mu*exp(-mu*t), t>0 >>. The I<mu> parameter determines the average number
+of customers that can be served in a unit of time. If customer arrives while
+server is still busy with another customer, then new customer is turned away
+and leaves the system. Let's try to determine probability that arrived customer
+will be turned away.
+
+In discrete-event simulation we assume that system may change its state only in
+discrete moments of time then some event occurs. Between events the state of
+the system is constant. Before simulation we're scheduling some events for
+certain moments, and then during simulation handling these events. Inside event
+handler we can schedule some additional events, so simulation may run
+endlessly. We can limit number of events that will be generated, or specify
+model time at which simulation should be stopped.
+
+=head2 Building a Model
+
+The base class for model is L<Simulation::DiscreteEvent>. Instance of this
+class manages events' queue and invokes event handlers. Here's how we will use it:
+
+    use Simulation::DiscreteEvent;
+    my $model = Simulation::DiscreteEvent->new();
+
+=head2 Creating Server Class
+
+Now we should add server unit to the model. Server unit contains event
+handlers. Each server is inherited from L<Simulation::DiscreteEvent::Server>
+class. This class contains dispatcher that invokes different handlers depending
+on event, so our server class should only define event handlers and specify for
+each handler on which event it should be invoked. Here's the server class:
+
+    package Simulation::DiscreteEvent::CB::MM10;
+    use Moose;
+    use Math::Random qw(random_exponential);
+    BEGIN { extends 'Simulation::DiscreteEvent::Server' }
+
+    # server state
+    has busy => ( is => 'rw', default => 0 );
+
+    # arrival rate
+    has lambda => ( is => 'rw', required => 1 );
+
+    # serving rate
+    has mu => ( is => 'rw', required => 1 );
+
+    # number of served customers
+    has served => (
+        is      => 'rw',
+        traits  => ['Counter'],
+        default => 0,
+        handles => { inc_served => 'inc' }
+    );
+
+    # number of rejected customers
+    has rejected => (
+        is      => 'rw',
+        traits  => ['Counter'],
+        default => 0,
+        handles => { inc_rejected => 'inc' }
+    );
+
+    # New customer arrived
+    sub arrival : Event {
+        my $self = shift;
+        my $next_time = $self->model->time 
+            + random_exponential( 1, 1 / $self->lambda );
+        $self->model->schedule( $next_time, $self, 'arrival' );
+        if ( $self->busy ) {
+            $self->inc_rejected;
+        }
+        else {
+            my $srv_time = $self->model->time
+                + random_exponential( 1, 1 / $self->mu );
+            $self->model->schedule( $srv_time, $self, 'finished' );
+            $self->busy(1);
+        }
+    }
+
+    # Customer served
+    sub finish : Event(finished) {
+        my $self = shift;
+        $self->inc_served;
+        $self->busy(0);
+    }
+
+    no Moose;
+    __PACKAGE__->meta->make_immutable;
+
+As you can see we're using L<Moose>, if you don't know what Moose is, you
+should read L<Moose::Manual>. We're defining several attributes and two event
+handlers. Each event handler is marked with C<Event> method attribute, e.g.
+finish method has C<Event(finished)> attribute on it that shows that event
+"finished" should be handled by finish method. If event name is the same as
+method name you can use just C<:Event> attribute without parameters, as for
+"arrival" event in this example.
+
+Here are two types of events: "arrival" - that means that new customer has
+arrived, and "finished" that means that server has finished serving customer.
+Let's start from 'arrival' handler. First we're computing time when next
+customer will arrive, for that we're adding to current model time
+(C<< $self->model->time >>) random value with exponential distribution. After
+that we're scheduling event for the next customer.  B<Schedule> function
+accepts three arguments (fourth argument is optional): time of the event to
+schedule, reference to the server that should handle event, and type of the
+event. After scheduling event for the next customer we're returning to current
+and checking if server busy or not. If server already busy, then we reject
+arrived customer. If server is free, customer is served. We're computing time
+when serving will be finished and scheduling that event. Also, we're changing
+server state to busy.
+
+Handler for "finished" event is much simpler. We're just increasing number of
+served customers and changing server state back to free.
+
+=head2 Completing Model
+
+Now we have a class for server and can return to the model. In order to add
+server to model we're using the B<add> method:
+
+    $server = $model->add(
+        "Simulation::DiscreteEvent::CB::MM10",
+        lambda => 2,
+        mu     => 3,
+    );
+
+This will create new instance of Simulation::DiscreteEvent::CB::MM10 with
+lambda and mu passed to constructor.
+
+We almost ready to run. Just one detail: before we start simulation we should
+schedule at least one event. Without it simulation will finish immediately. We
+could use B<schedule> method, which we used in server code, but instead let's
+try another method - B<send>.  This method schedules event for current time. As
+we're not yet started simulation the current model time is 0.
+
+    $model->send($server, "arrival");
+
+So after we start simulation, server will receive "arrival" event, will start
+serving customer, and schedule next "arrival" and "finished" events. In order to 
+start simulation we're using B<run> method.
+
+    $model->run(1000);
+
+Simulation runs while there are events scheduled, and while model time is less
+than value passed to run method. In our case simulation will be stopped at model 
+time 1000.
+
+And after simulation finished we print numbers of served and rejected
+customers, and loss probability:
+
+    print "Served customers:    ", $server->served, "\n";
+    print "Rejected customers:  ", $server->rejected, "\n";
+    print "Customers loss rate: ", 
+        $server->rejected/($server->served + $server->rejected), "\n";
+
+And here's the whole script:
+
+    use strict;
+    use warnings;
+    use Simulation::DiscreteEvent;
+    
+    my $model = Simulation::DiscreteEvent->new;
+    
+    my $server = $model->add(
+        "Simulation::DiscreteEvent::CB::MM10",
+        lambda => 2,
+        mu     => 3,
+    );
+    
+    $model->send( $server, "arrival" );
+    $model->run(1000);
+    
+    print "Served customers:    ", $server->served,   "\n";
+    print "Rejected customers:  ", $server->rejected, "\n";
+    print "Customers loss rate: ",
+        $server->rejected / ( $server->served + $server->rejected ), "\n";
+
+This will output something like that:
+
+    Served customers:    1221
+    Rejected customers:  820
+    Customers loss rate: 0.401763841254287
+
+So we can see that about 40% of customers will be lost, and in real life it
+probably means that we should increase throughput of the server, or add more
+servers.
+
+=head1 AUTHOR
+
+Pavel Shaydo, C<< <zwon at cpan.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-simulation-discreteevent at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Simulation-DiscreteEvent>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 SEE ALSO
+
+L<Simulation::DiscreteEvent>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2010 Pavel Shaydo.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+
+=cut
+

@@ -1,0 +1,50 @@
+# $Id: TODO 1.8 Fri, 19 Sep 1997 13:00:45 -0400 jesse $ -*- Outline -*-
+
+* magicrcs
+
+Reorganize options docs. Test on more situations. Warn vs. die more often
+(e.g. on tmpfile create & delete before checkin can occur?). Figure out how to
+really redirect STDERR away, and maybe pick up those messages on syslog?
+Multi-level verbosity. Default log author to file owner.
+
+* Interface
+Provide a higher-level interface. E.g.:
+
+use SGI::FAM::Higher qw(wait_create);
+wait_create {
+  my $new=shift;
+  ...
+} 'dir1', 'dir2';
+
+* XSUB
+Clean up a bit on the FAMEventPtr->fc and ->fr methods? Try the P5P method for
+blessing the pointers in the desired fashion; random typemap tweaks.
+
+* Selects
+Provide ability to mindlessly select on the FAM file descriptor and provide
+appropriate handlers for the resultant signals, using callbacks.
+
+* Insulation
+Removing some low-level constraints.
+
+** Pathnames
+Use rel2abs where necessary.
+
+** Moves
+Provide mechanism for detecting moves. I.e., if a create or delete is
+registered, note filesystem/inode and wait for the other. (Seems to be create
+then delete, as expected, but could be munged due to asynchronous
+notification.)
+
+** Auto-monitor files in dir
+To check for execution, I guess; that seems to be the only unmonitored thing.
+
+** Exist events
+Cause them to be suitably removed from view, unless some purpose can be
+demonstrated. Ditto for ack events.
+
+** Changes
+Use fstat, MD5, &c. to determine the exact change.
+
+** Suspended diffs
+Some mechanism to explicitly poll after a resumption.

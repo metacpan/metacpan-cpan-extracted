@@ -1,0 +1,175 @@
+README						Sun Aug  5 15:39:21 BST 2000
+
+Version 1.08
+
+	This release is a minor upgrade with major improvements in 
+functionality and examples.  Mostly adding OpenGL support with associated 
+examples and a rip of an SDL/OpenGL tutorial already in existence for C.  
+		
+README						Sun Aug  5 15:39:21 BST 2000
+
+by David J. Goehrig 
+
+Preface
+
+	The contents of this directory make up my first mostly
+complete perl bindings for the Simple DirectMedia Layer written
+by Sam Lantinga <slouken@devolution.com>.  This a complete rewrite
+from my previous code base, and as such has not been fully tested.
+
+	The file sdlpl.xs contains the C level bindings for SDL. 
+This file was written in under two days, and as such needs to be
+documented better, and may contain a few bugs.  In a few cases I
+have chosen to deviate from a straight binding to an SDL function.
+This was usually done to make it more perl-friendly.
+
+	The module sdlpl.pm is EMPTY.  None of the functionality
+of said library should be access through it.  Rather, I have provided
+a collection of "object oriented" modules to handle the perl level
+interface.  
+
+Prerequisites
+
+	Before attempting to install this monstrosity, please make sure
+you have the following properly installed:
+
+
+SDL-1.1.3 or greater 
+	http://www.devolution.com/~slouken/SDL
+
+	smpeg-0.3.4 or greater
+		http://www.lokisoft.com/
+
+	SDL_mixer-1.0.5 
+		http://www.devolution.com/~slouken/SDL/projects/SDL_mixer	
+
+	SDL_image-1.0.0
+		http://www.devolution.com/~slouken/SDL
+
+	www.libsdl.org
+
+Open GL libraries
+	
+	Mesa 3.1 or greater  (GLX accelration is (ahem) 'optional'!!! )
+		http:/www.mesa3d.org
+
+
+Perl Open GL Module
+
+        OpenGL-0.5.0  or greater
+		http://www.perl.com/CPAN/
+		(or use CPAN Shell:  type "install OpenGL" at the prompt)
+
+
+Optional, but highly recommended anyway:
+
+                
+PDL Modules  
+        
+	CPAN
+        http://pdl.perl.org
+	
+        (has dependancy on 'at least' OpenGL)
+
+
+
+Image Magick and bindings for perl.
+
+	CPAN
+
+Gtk
+	CPAN  for perl bindings
+	www.gtk.org
+
+
+Installation
+
+	Once you have that bundle installed, simply build and install this
+module as specified in the perlmod manpage:
+
+			perl Makefile.PL
+			make
+			make install
+
+Testing
+
+	I can't be bothered to write a test script for this entire thing.
+There are simply too many things that can go wrong, and I'd rather write
+more useful code, so if it built OK then assume it is all OK and get
+on with it.
+
+Examples
+
+	In the directory /examples/ I have placed a few samplers which
+show the basic usage of each piece of the puzzle.  Reading the man
+pages should give a information regarding each funciton.  When in doubt
+read the code, and consult the SDL documentation.  If you are still
+having trouble track me down and email me.
+
+More examples are available seperately from  
+http://www.metaverse.fsnet.co.uk/sdlpl/
+email: wayne@metaverse.fsnet.co.uk.
+
+
+On Version Numbers
+
+	This is version 1.07, as in I think pretty much everything works,
+and what bugs there are have yet to be discovered.  As sdlpl.xs is larger
+than the LGPL, I feel it has reached critical mass.  
+
+	I rely heavily upon scripts to generate most of the code in the
+distribution.  Bindings like this are highly repetititive, and as such
+lend themselves to creation via perl.  As such, I have not actually read
+all of the code myself.  So take it with a grain of salt.
+
+(hmm, David I would like those scripts please! [wayne])
+
+The Future
+
+As I can't get everything for the SDL to compile for FreeBSD, FreeBSD support 
+is also relegated to the offing.  Observant people will see that I have 
+already generated the code for C function callbacks, they are there if you 
+can use them.
+
+	The MOST important thing, however, is to finish the documentation,
+and write up a short booklet on using the SDL with Perl.  I have tried
+to document everything in *.pm, but I think it really helps to have
+access to the insides of my head when using this.
+
+Other things todo:
+
+Core lib:
+
+SDL::OpenGL::GtkApp
+SDL::Gimp::Plugin
+SDL::Sprite         
+SDL::SpriteFile
+SDL::Demo::App
+SDL::Path::Evaluators
+SDL::Pak
+SDL::Net
+...
+
+Examples:
+
+SDL from within a Gimp Plugin
+Reg-ex drawing !
+ImageMagick genration of sprites at run time.
+
+Bug fixing:
+
+
+
+Greatest Sentance in Documentation:
+
+Similary, 
+
+	$mixer->group_channels(from,to,group) 
+
+will add channels from 'from' to 'to' to group 'group'. <line 356 in Mixer.pm>
+
+CREDITS
+
+	David J. Goehrig			Copyright (C) 2000
+	Wayne Keenan                            Added OpenGL & Glut like support
+						and numerous examples, suggestions

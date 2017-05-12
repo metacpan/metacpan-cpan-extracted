@@ -1,0 +1,20 @@
+<div id="<!-- sol_var name -->_container" style="position: relative; width: <!-- sol_var width -->; height: <!-- sol_var height -->;" align="">
+	<textarea id="<!-- sol_var name -->" name="<!-- sol_var name -->" style="width: 99%; height: <!-- sol_var height -->;"/><!-- sol_var content --></textarea>
+	<br style="clear:both;" />
+
+	<!-- sol_if is_resizable -->
+	<div class="sol_resizebutton" title="Resize this box" onmousedown="Solstice.TextArea.startResize(event, '<!-- sol_var name -->');" onselect="return false;" ondragstart="return false;" onmouseover="this.style.cursor='se-resize';"></div><!-- /sol_if -->
+</div>
+
+<!-- sol_if rte_switch -->
+<div id="<!-- sol_var name -->_switch" class="sol_rte_switch">
+    <!-- sol_if using_plaintext -->
+    <!-- sol_lang textarea_switch_rich_text --> <!-- sol_var rte_switch -->
+    <script type="text/javascript">Solstice.TextArea.isRichTextEnabled = false;</script>
+    <!-- sol_else -->
+    <!-- sol_lang textarea_switch_plain_text --> <!-- sol_var rte_switch -->
+    <!-- /sol_if -->
+</div><!-- /sol_if -->
+
+<!-- sol_if is_resizable -->
+<div id="<!-- sol_var name -->_resize" class="sol_resizeguide"></div><!-- /sol_if -->

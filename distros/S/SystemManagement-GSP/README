@@ -1,0 +1,38 @@
+SystemManagement-GSP
+====================
+
+This is a system management interface to the telnet-based "GSP" tool.
+The Hewlett-Packard version of it is called "HP Management Processor"
+or "MP" for short.  Web access is also available, but it just spawns
+a Java client to tunnel to the same telnet interface.  This appears to
+be the only way to have a secure connection (using the Java to tunnel
+through HTTPS).
+
+For more details, see the POD documentation.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Test::More
+    Expect
+    IO::Socket::INET
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Kees Cook, OSDL <kees@osdl.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

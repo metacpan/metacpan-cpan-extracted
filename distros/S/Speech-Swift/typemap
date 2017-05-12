@@ -1,0 +1,13 @@
+swift_engine*			T_PTROBJ
+swift_params*			T_PTROBJ
+swift_port*			T_PTROBJ
+swift_voice*			T_PTROBJ
+swift_waveform*			T_PTROBJ
+
+swift_result_t			T_IV
+swift_event_t			T_IV
+swift_voice_retention_policy_t	T_IV
+
+const void*			T_PV
+const void**			T_PV
+int*				T_PV

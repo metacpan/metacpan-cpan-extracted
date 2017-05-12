@@ -1,0 +1,45 @@
+2003-04-29  Paul Stodghill  <stodghil@cs.cornell.edu>
+
+	* README: Released 0.02
+
+	* Changes, NEWS:
+	"Changes" is renamed to "NEWS"
+
+2003-04-15  Paul Stodghill  <stodghil@quimby-xp>
+
+	* README:
+	Add instructions for installing as non-root.
+
+	* Makefile.PL:
+	Don't be so strict about the version of XML::LibXML.
+
+	* Makefile.PL:
+	Set the prerequisites for real.
+
+2003-01-17  Paul Stodghill  <stodghil@quimby-xp>
+
+	* Changes, README:
+	Version 0.01
+
+2003-01-15  Paul Stodghill  <stodghil@quimby-xp>
+
+	* README:
+	Added acknowledgment of NSF support.
+
+	* COPYING:
+	Added copyright and terms of use.
+
+	* Makefile.PL, README:
+	Added copyright notice.
+
+	* COPYING: Original version
+
+	* Changes, README:
+	h2xs assigned verion 0.01, but this is really 0.00.
+
+	* .cvsignore, Changes, MANIFEST, Makefile.PL:
+	Original version.
+
+	* README:
+	Moved to new location that is consistent with CPAN-style distribution.
+

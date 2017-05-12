@@ -1,0 +1,57 @@
+SNMP-Agent
+
+This module aids in the building of SNMP subagents. It is a very simple
+way to extend the functionality of the system SNMP daemon via its AgentX
+support.
+
+For any SNMP information to be provided by the agent a SNMP OID is
+coupled with a function that generates the desired output.  A trivial
+example of this is included in the perldoc information.
+
+Depends on: 
+
+	NetSNMP::agent
+	NetSNMP::ASN
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc SNMP::Agent
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=SNMP-Agent
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/SNMP-Agent
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/SNMP-Agent
+
+    Search CPAN
+        http://search.cpan.org/dist/SNMP-Agent/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011 Alexander Else
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,10 @@
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README
+lib/Sub/Curry.pm
+lib/Sub/Curry/Cookbook.pod
+t/01basic.t
+t/02spices.t
+META.yml                                 Module meta-data (added by MakeMaker)

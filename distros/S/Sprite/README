@@ -1,0 +1,17 @@
+Sprite, v3.21
+-------------
+
+What is it? No, it's not the soda that claims, "Image is Nothing, Thirst
+is Everything" :-) However, it is a useful module that allows you to access 
+text-delimited databases, such as those exported from applications like 
+MS Excel, using a _small_ subset of SQL.
+
+Sprite has some cool advantages, like allowing you to embed Perl's powerful 
+regular expressions -- not those wimpy ones that come with your commercial 
+relational database engine -- into your queries.
+
+Version 3.21 fixes several bugs, and allows you to trap errors generated
+by Sprite. Take a look at the HISTORY and TIPS documents for more info!
+
+Shishir Gundavaram
+April 21, 1998

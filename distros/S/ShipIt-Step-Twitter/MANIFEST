@@ -1,0 +1,27 @@
+Changes
+inc/Module/AutoInstall.pm
+inc/Module/Install.pm
+inc/Module/Install/AutoInstall.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/ExtraTests.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+inc/Test/More.pm
+lib/ShipIt/Step/Twitter.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/01_misc.t
+xt/author/00_compile.t
+xt/author/01_perl_critic.t
+xt/author/02_pod.t
+xt/author/03_podspell.t
+xt/author/04_pod_coverage.t
+xt/author/perlcriticrc

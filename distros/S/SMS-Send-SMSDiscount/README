@@ -1,0 +1,41 @@
+NAME
+    SMS::Send::SMSDiscount - SMS::Send driver to send via smsdiscount.com
+
+VERSION
+    version 1.111780
+
+SYNOPSIS
+      # Create a testing sender
+      my $send = SMS::Send->new( 'SMSDiscount',
+                                 _login => 'smsdiscount username',
+                                 _password => 'smsdiscount password' );
+
+      # Send a message
+      $send->send_sms(
+         text => 'Hi there',
+         to   => '+61 (4) 1234 5678',
+      );
+
+DESCRIPTION
+    SMS::Send driver for sending SMS messages with the SMS Discount Software
+    (http://www.smsdiscount.com/) service.
+
+METHODS
+  CONSTRUCTOR
+    This constructor should not be called directly. See SMS::Send for
+    details.
+
+SEE ALSO
+    SMS::Send(3), SMS::Send::Driver(3)
+
+    SMS Discount Website: http://www.smsdiscount.com/
+
+AUTHOR
+    Mark Hindess <soft-cpan@temporalanomaly.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Mark Hindess.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

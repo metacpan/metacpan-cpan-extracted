@@ -1,0 +1,28 @@
+---
+abstract: 'A filter that converts an image to base64 and outputs XML'
+author:
+  - 'Logan Bell, C<< <loganbell at gmail.com> >>'
+  - 'Logan Bell <loganbell@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: SWISH-Filters-ImageToXml
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Mime::Base64: 0
+  Search::OpenSearch::Engine::Lucy: 0.06
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/logie17/SWISH-Filters-ImageToXml.git
+version: 0.01

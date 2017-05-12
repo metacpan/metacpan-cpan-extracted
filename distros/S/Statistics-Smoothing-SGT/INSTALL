@@ -1,0 +1,95 @@
+    Welcome to the SGT package, version 2.01
+    -----------------------------------------------------
+
+		     December 22, 2006
+
+                   Copyright (C) 2006
+
+              Florian Doemges (florian@doemges.net)
+               Ruhr-University, Bochum, Germany
+
+              Bjoern Wilmsmann (bjoern@wilmsmann.de)
+               Ruhr-University, Bochum, Germany
+
+    SGT is available at CPAN:
+
+              http://search.cpan.org/dist/SGT/
+
+===================================================================
+
+Dependencies:
+
+none
+
+===================================================================
+
+Installation:
+
+If you have administrative privileges you can install the SGT
+package by running the following commands:
+
+perl Makefile.PL
+make
+make test
+make install
+
+This will install the module in system directories (/usr/bin/ etc). In
+this case, it's very likely that you will be able to run SGT, without having 
+to explicitly set any environment variables.
+
+If you do not have administrative privileges, you can use the PREFIX variable 
+to specify a directory to which you have write access, and you can use the  
+LIB variable to specify the directory where the module is supposed to be installed:
+
+perl Makefile.PL PREFIX=/home/mydirectory/SGT LIB=/home/mydirectory/SGT/lib
+make
+make test
+make install
+
+The SGT Perl module will be installed in $LIB/lib. 
+
+To use the SGT package, you will need to set your PATH variable to
+include $PREFIX/bin and the PERL5LIB variable to include the $LIB/lib  
+directory locations. These are displayed during the execution of 'make  
+install', so please make a note of them and be sure to set your  
+environment variables accordingly.
+
+===================================================================
+
+Orientation:
+
+INSTALL           : this file
+
+CHANGES           : a basic changelog
+
+MANIFEST          : a list of the files found in this distribution,
+                    created automatically by "make manifest" and used
+                    by Makefile.PL
+
+===================================================================
+
+Please have a look at the SGT homepage:
+
+http://www.topicalizer.com/bwilmsmann/wiki/index.php/SGT
+
+
+===================================================================
+
+This suite of programs is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as published
+by the Free Software Foundation; either version 2 of the License, or (at
+your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS  FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc., 59
+Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+Note: The text of the GNU General Public License is provided in the file
+GPL that you should have received with this distribution.
+
+---

@@ -1,0 +1,373 @@
+@prefix cpan-uri: <http://purl.org/NET/cpan-uri/terms#> .
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-bugs: <http://ontologi.es/doap-bugs#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://purl.org/NET/cpan-uri/dist/String-Copyright/project>
+	a                    doap:Project;
+	cpan-uri:x_help_wanted <http://usefulinc.com/ns/doap#documenter>, <http://usefulinc.com/ns/doap#tester>;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/jonass>;
+	doap-deps:runtime-requirement [ doap-deps:on "constant 0"^^doap-deps:CpanId ], [ doap-deps:on "Exporter::Tiny 0"^^doap-deps:CpanId ], [ doap-deps:on "perl 5.008001"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Number::Range 0.04"^^doap-deps:CpanId ], [ doap-deps:on "Test::More 0"^^doap-deps:CpanId ], [ doap-deps:on "utf8 0"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=String-Copyright>, <https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=libstring-copyright-perl>;
+	doap:category        [ rdfs:label "Sourcecode" ], [ rdfs:label "Licensing" ];
+	doap:created         "2016-07-21"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/jonass>;
+	doap:download-page   <https://metacpan.org/release/String-Copyright>;
+	doap:homepage        <https://metacpan.org/pod/String::Copyright>, <https://metacpan.org/release/String-Copyright>;
+	doap:license         <http://www.gnu.org/licenses/gpl-3.0.txt>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/jonass>;
+	doap:name            "String-Copyright";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-001>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-001001>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-001002>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-001003>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-001004>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-001005>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-002000>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-002001>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-003000>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-003001>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-003002>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-003003>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-003004>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-003005>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://anonscm.debian.org/cgit/build-common/string-copyright.git>;
+	];
+	doap:shortdesc       "representation of text-based copyright statements".
+
+<http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-001001>
+	a                    doap:Version;
+	dc:identifier        "String-Copyright-0.001001"^^xsd:string;
+	dc:issued            "2016-07-22"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Regression;
+			rdfs:label "Fix stop custom-decode encoded copyright sign.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Add notes to POD on possible encoding issues.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/jonass>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/String-Copyright-0.001001.tar.gz>;
+	doap:revision        "0.001001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-001002>
+	a                    doap:Version;
+	dc:identifier        "String-Copyright-0.001002"^^xsd:string;
+	dc:issued            "2016-07-24"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Include copyright sign when stringifying..";
+		], [
+			a doap-changeset:Update;
+			rdfs:label "Detect alternative representations for copyright sign and hyphen-minus.";
+		], [
+			a doap-changeset:BackCompat;
+			rdfs:label "Avoid superfluous regex modifiers /l /i /x.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix typo in regex: Misdetected some discussions about copyright as copyright statement.";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Improve range tests: Separate multi-range test from new test of newline before year-delimiting comma.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/jonass>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/String-Copyright-0.001002.tar.gz>;
+	doap:revision        "0.001002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-001003>
+	a                    doap:Version;
+	dc:identifier        "String-Copyright-0.001003"^^xsd:string;
+	dc:issued            "2016-07-26"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Fix extend block into next line(s) only when purely years detected (not on any - possibly owner - string ending in digits).";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Tighten parser slightly regarding corner cases of years tied up in line-wrapping.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Improve parsing of year-like strings: Treat as owner (instead of dropping) in more corner cases.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Tighten parsing to consider only space and tab (not other whitespace) where appropriate.";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Add a few tests for year-like owner field.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Refactor parsing to use pre-compiled regular expressions.";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Extend testsuite.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Fix stop include next line based on it starting with digits (only on previous line ending with digits).";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix silence closure warnings for regex variable.", "Use Test::Script to ensure correct perl invokes script in tests.";
+			doap-bugs:fixes <http://purl.org/NET/cpan-uri/rt/ticket/116460>;
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/srezic>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/jonass>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/String-Copyright-0.001003.tar.gz>;
+	doap:revision        "0.001003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-001004>
+	a                    doap:Version;
+	dc:identifier        "String-Copyright-0.001004"^^xsd:string;
+	dc:issued            "2016-07-27"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix use re 'eval'.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/jonass>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/String-Copyright-0.001004.tar.gz>;
+	doap:revision        "0.001004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-001005>
+	a                    doap:Version;
+	dc:identifier        "String-Copyright-0.001005"^^xsd:string;
+	dc:issued            "2016-07-29"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Tighten owner detection to require non-punctuation as initial character.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Fix stop exclude define's (misses statements embedded in e.g. \"banner\" define); instead tighten sign detection to require space around pseudo-sign (c).";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Relax years detection to tolerate initial commas.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Limit chatter detection to non-email-like strings generally (not only for info/information).";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Detect chatter before signs or owners.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Detect comma before years.";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Adjust and extend testsuite.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/jonass>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/String-Copyright-0.001005.tar.gz>;
+	doap:revision        "0.001005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release.";
+	dc:identifier        "String-Copyright-0.001"^^xsd:string;
+	dc:issued            "2016-07-22"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/jonass>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/String-Copyright-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-002000>
+	a                    doap:Version;
+	dc:identifier        "String-Copyright-0.002000"^^xsd:string;
+	dc:issued            "2016-08-04"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Misc. improvements e.g. in detecting non-sign chatter, delimiting characters and whitespace.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Use Exporter::Tiny.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Implement threshold options, with none by default (was hardcoded threshold_after=5).";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Parse multiple lines at a time.";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Extend testsuite with (some yet unsupported) corner cases.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/jonass>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/String-Copyright-0.002000.tar.gz>;
+	doap:revision        "0.002000"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-002001>
+	a                    doap:Version;
+	dc:identifier        "String-Copyright-0.002001"^^xsd:string;
+	dc:issued            "2016-08-04"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix chatter detection to handle double whitespace.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/jonass>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/String-Copyright-0.002001.tar.gz>;
+	doap:revision        "0.002001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-003000>
+	a                    doap:Version;
+	dc:identifier        "String-Copyright-0.003000"^^xsd:string;
+	dc:issued            "2016-08-13"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Strip \"All rights reserved\" boilerplate.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Fix list example option inside threshold header in POD.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Drop undocumented blocks sub.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Keep years and owners separate internally.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Add format option.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/jonass>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/String-Copyright-0.003000.tar.gz>;
+	doap:revision        "0.003000"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-003001>
+	a                    doap:Version;
+	dc:identifier        "String-Copyright-0.003001"^^xsd:string;
+	dc:issued            "2016-08-21"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix relax detection of owner to permit prefix (for styled names like \"(URW)++\").";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Improve cleanup of \"all rights reserved\" boilerplate to not necessarily be last.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/jonass>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/String-Copyright-0.003001.tar.gz>;
+	doap:revision        "0.003001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-003002>
+	a                    doap:Version;
+	dc:identifier        "String-Copyright-0.003002"^^xsd:string;
+	dc:issued            "2016-09-07"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix avoid misdetecting bogus multi-range year spans.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Shorten regexes $blank_or_break_re $comma_re and make more greedy.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Capture each year span.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Use Number::Range to normalize years.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix strip owner intro (e.g. \"by \").";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix suppress eq as chatter.";
+			doap-changeset:thanks <http://webid.debian.net/maintainers/pere>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/jonass>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/String-Copyright-0.003002.tar.gz>;
+	doap:revision        "0.003002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-003003>
+	a                    doap:Version;
+	dc:identifier        "String-Copyright-0.003003"^^xsd:string;
+	dc:issued            "2016-09-07"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix reset detected chatter at newline (regression since 0.002000).";
+			doap-bugs:fixes <https://bugs.debian.org/836832>;
+			doap-changeset:thanks <http://webid.debian.net/maintainers/dod>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/jonass>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/String-Copyright-0.003003.tar.gz>;
+	doap:revision        "0.003003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-003004>
+	a                    doap:Version;
+	dc:identifier        "String-Copyright-0.003004"^^xsd:string;
+	dc:issued            "2016-09-23"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Suppress \"assigned\" and \"generated\" as chatter.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix avoid regex modifier r (available only since Perl 5.14).";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Fix remove POD mentions or subs for unimplemented features.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Add TODO file.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/jonass>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/String-Copyright-0.003004.tar.gz>;
+	doap:revision        "0.003004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-003005>
+	a                    doap:Version;
+	dc:identifier        "String-Copyright-0.003005"^^xsd:string;
+	dc:issued            "2016-11-30"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix skip chatter after boilerplate.";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Add tests for broken copyright sign and boilerplate chatter.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix skip some pseudosign chatter, and skip single question mark after copyright signs (possibly fallout from broken converted copyright sign).";
+			doap-bugs:fixes <https://bugs.debian.org/838896>;
+			doap-changeset:thanks <http://webid.debian.net/maintainers/dod>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/jonass>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/String-Copyright-0.003005.tar.gz>;
+	doap:revision        "0.003005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/jonass>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:dr@jones.dk>, <mailto:jonass@cpan.org>;
+	foaf:name            "Jonas Smedegaard";
+	foaf:nick            "JONASS";
+	foaf:page            <https://metacpan.org/author/JONASS>.
+
+<http://purl.org/NET/cpan-uri/person/srezic>
+	a                    foaf:Person;
+	foaf:nick            "SREZIC";
+	foaf:page            <https://metacpan.org/author/SREZIC>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/116460>
+	a                    doap-bugs:Issue;
+	doap-bugs:id         "116460"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=116460>.
+
+<http://webid.debian.net/maintainers/dod>
+	foaf:mbox            <mailto:dod@debian.org>;
+	foaf:name            "Dominique Dumont".
+
+<http://webid.debian.net/maintainers/pere>
+	foaf:mbox            <mailto:pere@debian.org>;
+	foaf:name            "Petter Reinholdtsen".
+
+<http://www.gnu.org/licenses/gpl-3.0.txt>
+	dc:title             "GNU General Public License version 3 or newer.".
+

@@ -1,0 +1,10 @@
+<Message>
+  <From petal:condition="true:yaml/user/from" petal:repeat="from yaml/user/from" petal:content="from">Foo</From>
+  <To petal:condition="true:yaml/user/to" petal:repeat="to yaml/user/to" petal:content="to">Foo</To>
+  <Cc petal:condition="true:yaml/user/cc" petal:repeat="cc yaml/user/cc" petal:content="cc">Foo</Cc>
+  <Bcc petal:condition="true:yaml/user/bcc" petal:repeat="bcc yaml/user/bcc" petal:content="bcc">Foo</Bcc>
+  <Subject petal:content="yaml/subject">Your account is over limit</Subject>
+  <SetSender petal:content="yaml/setsender">Your account is over limit</SetSender>
+  <Say petal:repeat="item yaml/para" petal:content="item">Dear Customer,</Say>
+  <Attach petal:condition="true:yaml/attach" petal:repeat="item yaml/attach" petal:content="item">File</Attach>
+</Message>

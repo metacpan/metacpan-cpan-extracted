@@ -1,0 +1,11 @@
+ArrayOfArrays.pm
+Changes
+MANIFEST
+README
+Makefile.PL
+t/01_load.t
+t/02_numeric.t
+t/03_alphabetical.t
+t/04_regex.t
+t/05_link.t
+t/06_multi_column.t

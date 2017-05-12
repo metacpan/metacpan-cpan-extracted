@@ -1,0 +1,59 @@
+SQL::Concrete
+
+This module converts SQL fragments interleaved with variable references
+and some keywords into one regular SQL string along with a list of bind
+values, suitable for passing to DBI.
+
+It is an antithesis of sorts to SQL::Abstract: you are expected to write
+most of any query as regular SQL. The job of this module is to manage
+your placeholders for you rather than hide the SQL, and it can infer
+them from data structures you usually already have. Without it, passing
+the data from such data structures to DBI manually would mean
+laboriously destructuring them into a plain list of bind values, then
+carefully ensuring the correspondence of placeholders with the order of
+bind values every time you modify the query.
+
+This module does do *some* SQL generation, but it makes no attempt to
+invent conventions to express all possible SQL constructs. The aim is
+only to make common obvious cases easier to read and write. For anything
+beyond that you are expected to fall back to verbatim SQL.
+
+This makes database code easier to read as well as easier to write,
+while easily providing ready access to all SQL features, even without
+SQL::Concrete having to have specific support for almost any of them.
+
+SQL, unparametrized:
+   name LIKE "%son" AND (age >= 10 AND age <= 20)
+
+DBI with placeholders:
+   'name LIKE ? AND (age >= ? AND age <= ?)', '%son', 10, 20
+
+SQL::Abstract, trying to express it all:
+   { name => { like => '%son' }, age => [ -and => { '>=', 10 }, { '<=', 20 } ] }
+
+SQL::Concrete, lacking syntactic shortcuts for this task:
+   'name LIKE', \'%son', 'AND (age >=', \10, 'AND', 'age <=', \20, ')'
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Aristotle Pagaltzis.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

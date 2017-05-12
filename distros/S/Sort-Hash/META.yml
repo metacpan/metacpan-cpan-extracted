@@ -1,0 +1,29 @@
+---
+abstract: 'Sort the keys of a Hash into an Array.'
+author:
+  - 'John Karr <brainbuz@brainbuz.org>'
+build_requires:
+  Test::Exception: 0
+  Test::More: 0
+  Test::Warn: 0
+  Test::Warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.133380'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Sort-Hash
+no_index:
+  file:
+    - lib/Sort/Hash1.pm
+requires:
+  Exporter: 0
+  Scalar::Util: 1.24
+  Try::Tiny: 0.13
+  perl: 5.008
+  strict: 0
+  warnings: 0
+version: 2.05

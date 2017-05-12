@@ -1,0 +1,8 @@
+Changes
+CP1251.xs
+Makefile.PL
+MANIFEST
+README
+t/String-CP1251.t
+lib/String/CP1251.pm
+META.yml                                 Module meta-data (added by MakeMaker)

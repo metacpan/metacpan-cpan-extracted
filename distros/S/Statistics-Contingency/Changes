@@ -1,0 +1,62 @@
+Revision history for Perl extension Statistics::Contingency.
+
+0.09 - Sat Jun  8 22:39:02 CDT 2013
+
+ - Converted to Git and Dist::Zilla.  Moved from Google Code to GitHub.
+
+0.08 - Sat Aug 23 22:20:30 2008
+
+ - Fix a "can't take log of 0" error that sometimes happens when
+   printing the stats_table(). [Erik Aronesty & Jochen Leidner]
+
+0.07 - Tue Jun 10 20:44:58 2008
+
+ - Added a set_entries() method to directly set the four entries of
+   the contingency table.
+
+ - Added a Build.PL as an alternative installer to the Makefile.PL.
+
+0.06  Sat Feb  8 12:18:54 CST 2003
+
+ - The output of stats_table() will now auto-expand to show 3
+   significant digits in all data elements, or however many is
+   specified as an argument to the method.
+
+ - Added a note in the documentation pointing out the fact that
+   micro_accuracy is always equal to macro_accuracy, and micro_error
+   is always equal to macro_error.
+
+0.05  Wed Oct 30 18:47:17 AEST 2002
+
+ - Since miE and maE are the same, don't print both in the
+   stats_table() method.  Just call it 'Err'.
+
+0.04  Wed Sep 18 19:06:01 AEST 2002
+
+ - A precision edge case has been changed.  Now, if no categories were
+   assigned, and some categories should have been assigned, the
+   precision is returned as 0.  Previous versions returned 1.  This
+   edge case isn't discussed in the literature I've seen.  Note that
+   with this change, the macro-precision will typically be reported as
+   a lower number than before (but the micro-precision usually won't
+   change).  Recall and F1 aren't affected by this change (they're
+   both still 0), nor are error and accuracy.
+
+ - Tests have been added to ensure the above changes stick.
+
+0.03  Wed Aug  7 23:53 AEST 2002
+
+ - Corrected some documentation errors
+
+ - Added Params::Validate to the dependency list in Makefile.PL
+
+0.02  Fri Jul 19 13:53:00 2002
+
+ - Calling add_result() will now delete any cached calculations, so you
+   can check the various metrics while you add results iteratively.
+
+
+0.01  Mon Jun 24 13:34:40 2002
+ - original version; created by h2xs 1.21 with options
+		-XA -n Statistics::Contingency
+

@@ -1,0 +1,50 @@
+Revision history for Perl module SWF::NeedsRecompile
+
+1.06  31 Jul 2008
+      [INCOMPATIBILITIES]
+      - Upped minimum Perl from 5.006 to 5.008
+      [FIXES]
+      - Binmode for Windows (http://www.nntp.perl.org/group/perl.cpan.testers/1636318, DAGOLDEN)
+      [INTERNALS]
+      - Perl::Critic compliance
+
+1.05  20 May 2007
+      [ENHANCEMENTS]
+      - Use File::HomeDir instead of $ENV{HOME}
+      - Better use of File::Spec
+      [FIXES]
+      - Forgot to declare dependency on Regexp::Common
+      [INTERNALS]
+      - Changed maintainer
+
+1.04  15 Dec 2005
+      [INCOMPATIBILITIES]
+      - Change envvar from SWFCOMPILE_VERBOSE to SWFCOMPILE_VERBOSITY
+      [ENHANCEMENTS]
+      - Split log messages into errors and info
+      - Added set_verbosity and get_verbosity methods
+
+1.03  28 Nov 2005
+      [ENHANCEMENTS]
+      - Support for SWFCOMPILE_VERBOSE envvar
+      [FIXES]
+      - Ignore code inside comments comments
+      - Only ignore "/* ... */" comments in .fla files because the "// ..."
+        regexp causes a seemingly-infinite loop
+      - Add an empirical list of Flash 6 classes to ignore
+      - Don't recurse if class instantiates itself
+      [INTERNALS]
+      - Perl::Critic compliance
+
+1.02  27 Sep 2005
+      [FIXES]
+      - Add omitted test to MANIFEST
+
+1.01  21 Sep 2005
+      [ENHANCEMENTS]
+      - More tests
+      [INTERNALS]
+      - Refactor huge functions into manageable pieces
+
+1.00  10 Aug 2005
+      First public release

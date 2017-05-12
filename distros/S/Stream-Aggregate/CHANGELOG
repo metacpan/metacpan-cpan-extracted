@@ -1,0 +1,35 @@
+= 2011/05/12	0.406
+
+One more test needs rounded numbers.
+
+= 2011/05/11	0.405
+
+Changed some tests so they're resiliant to math
+variations.
+
+= 2011/05/05	0.404
+
+Add missing dependency on Tie::Function::Examples.
+
+= 2011/05/05	0.403
+
+Add in missing build dependency on YAML.
+
+Add reference to github repository.
+
+= 2011/05/04	0.402
+
+Change package from 'Aggregate' to 'Stream-Aggregate'
+
+= 2011/05/03	0.401
+
+Added combinations for cross-product contexts.
+
+Added an example configuration to the documentation.
+
+User code can now habe strict and warnings.
+
+= 2009/07/24	0.302
+
+YAML::ConfigFile got renamed to Config::YAMLMacros
+

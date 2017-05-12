@@ -1,0 +1,10 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use FindBin qw($Bin);
+use Path::Class;
+use lib dir(dir($Bin)->parent, 'lib')->stringify;
+use SVL::Command;
+
+SVL::Command->dispatch();
+

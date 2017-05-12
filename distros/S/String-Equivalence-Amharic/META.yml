@@ -1,0 +1,11 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         String-Equivalence-Amharic
+version:      0.04
+version_from: lib/String/Equivalence/Amharic.pm
+installdirs:  site
+requires:
+    Regexp::Ethiopic:              0.15
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

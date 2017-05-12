@@ -1,0 +1,30 @@
+---
+abstract: 'Set sockopt httpready/dataready on FreeBSD and Linux'
+author:
+  - 'Mons Anderson <mons@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+  lib::abs: 0.90
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Socket-AcceptFilter
+no_index:
+  directory:
+    - inc
+    - t
+provides:
+  Socket::AcceptFilter:
+    file: lib/Socket/AcceptFilter.pm
+    version: 0.03
+requires:
+  perl: 5.8.8
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.03

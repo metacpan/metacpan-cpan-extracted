@@ -1,0 +1,50 @@
+=pod
+
+=head1 NAME
+
+SOAP-WSDL_XS - Fast XS based deserializer for SOAP::WSDL
+
+=head1 DESCRIPTION
+
+SOAP-WSDL_XS provides a high-performance SOAP message deserializer for
+SOAP-WSDL.
+
+See L<SOAP::WSDL::Deserializer::XSD_XS|SOAP::WSDL::Deserializer::XSD_XS> for
+details.
+
+=head1 CAVEATS
+
+SOAP-WSDL_XS provides a SOAP message parser implemented in C and XS. Due to
+the nature of C, possible bugs may cause security issues.
+
+SOAP-WSDL_XS is not recommended for public SOAP server yet - you should
+use SOAP-WSDL_XS only in a trusted environment with known communication
+partners only.
+
+=head1 BUGS
+
+Please report any bugs or feature requests to
+C<bug-soap-wsdl_xs at rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=SOAP-WSDL_XS>.  I will be
+notified, and then you'll automatically be notified of progress on your bug
+as I make changes.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2004-2009 Martin Kutter.
+
+This file is part of SOAP-WSDL_XS. You may distribute/modify it under
+the same terms as perl itself
+
+=head1 AUTHOR
+
+Martin Kutter E<lt>martin.kutter fen-net.deE<gt>
+
+=head1 REPOSITORY INFORMATION
+
+ $Rev: 805 $
+ $LastChangedBy: kutterma $
+ $Id: WSDL_XS.pod 815 2009-03-03 20:27:17Z kutterma $
+ $HeadURL: https://soap-wsdl.svn.sourceforge.net/svnroot/soap-wsdl/SOAP-WSDL/trunk/lib/SOAP/WSDL.pm $
+
+=cut

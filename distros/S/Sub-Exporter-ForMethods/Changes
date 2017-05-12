@@ -1,0 +1,8 @@
+Revision history for Sub-Exporter-ForMethods
+
+0.100052  2015-07-17 19:27:36-04:00 America/New_York
+        - add the ability to bless the wrapper into the wrapped sub's class,
+          if requested
+
+0.100051  2013-10-18 11:14:47 America/New_York
+          update bugtracker and repo metadata

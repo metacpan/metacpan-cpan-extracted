@@ -1,0 +1,18 @@
+Revision history for Perl module SQLite_File
+0.050 2015-10-10
+    - added patch from @tokuhirom to prevent BSD system fail
+      (thanks tokuhirom and Slaven)
+    - updated copyright
+0.04 2015-10-10
+    - added patch from Barry C that prevents unique constraint
+      violation when opening a hash db file later
+    - added tests 003 and 004 to confirm the fix (and they are
+      in fact broken in 0.03)
+0.03 2015-07-15
+    - added git repo metadata, some "modernizing"
+0.02 Mon Oct 12 21:00:00 2009
+    - fix pod; full find_dup functionality
+0.01 Mon Oct 12 10:34:44 2009
+    - original version; created by ExtUtils::ModuleMaker 0.51
+
+

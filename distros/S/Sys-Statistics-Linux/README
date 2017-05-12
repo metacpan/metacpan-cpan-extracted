@@ -1,0 +1,436 @@
+NAME
+    Sys::Statistics::Linux - Front-end module to collect system statistics
+
+SYNOPSIS
+        use Sys::Statistics::Linux;
+
+        my $lxs = Sys::Statistics::Linux->new(
+            sysinfo   => 1,
+            cpustats  => 1,
+            procstats => 1,
+            memstats  => 1,
+            pgswstats => 1,
+            netstats  => 1,
+            sockstats => 1,
+            diskstats => 1,
+            diskusage => 1,
+            loadavg   => 1,
+            filestats => 1,
+            processes => 1,
+        );
+
+        sleep 1;
+        my $stat = $lxs->get;
+
+DESCRIPTION
+    Sys::Statistics::Linux is a front-end module and gather different linux
+    system information like processor workload, memory usage, network and
+    disk statistics and a lot more. Refer the documentation of the
+    distribution modules to get more information about all possible
+    statistics.
+
+MOTIVATION
+    My motivation is very simple... every linux administrator knows the
+    well-known tool sar of sysstat. It helps me a lot of time to search for
+    system bottlenecks and to solve problems, but it's hard to parse the
+    output if you want to store the statistics into a database. So I thought
+    to develope Sys::Statistics::Linux. It's not a replacement but it should
+    make it simpler to you to write your own system monitor.
+
+    If Sys::Statistics::Linux doesn't provide statistics that are strongly
+    needed then let me know it.
+
+TECHNICAL NOTE
+    This distribution collects statistics by the virtual /proc filesystem
+    (procfs) and is developed on the default vanilla kernel. It is tested on
+    x86 hardware with the distributions RHEL, Fedora, Debian, Ubuntu,
+    Asianux, Slackware, Mandriva and openSuSE (SLES on zSeries as well but a
+    long time ago) on kernel versions 2.4 and/or 2.6. It's possible that it
+    doesn't run on all linux distributions if some procfs features are
+    deactivated or too much modified. As example the linux kernel 2.4 can
+    compiled with the option `CONFIG_BLK_STATS' what turn on or off block
+    statistics for devices.
+
+    Don't give up if some of the modules doesn't run on your hardware! Tell
+    me what's wrong and I will try to solve it! You just have to make the
+    first move and to send me a mail. :-)
+
+VIRTUAL MACHINES
+    Note that if you try to install or run `Sys::Statistics::Linux' under
+    virtual machines on guest systems that some statistics are not
+    available, such as `SockStats', `PgSwStats' and `DiskStats'. The reason
+    is that not all /proc data are passed to the guests.
+
+    If the installation fails then try to force the installation with
+
+        cpan> force install Sys::Statistics::Linux
+
+    and notice which tests fails, because this statistics maybe not
+    available on the virtual machine - sorry.
+
+DELTAS
+    The statistics for `CpuStats', `ProcStats', `PgSwStats', `NetStats',
+    `DiskStats' and `Processes' are deltas, for this reason it's necessary
+    to initialize the statistics before the data can be prepared by `get()'.
+    These statistics can be initialized with the methods `new()', `set()'
+    and `init()'. For any option that is set to 1, the statistics will be
+    initialized by the call of `new()' or `set()'. The call of init()
+    re-initialize all statistics that are set to 1 or 2. By the call of
+    `get()' the initial statistics will be updated automatically. Please
+    refer the section METHODS to get more information about the usage of
+    `new()', `set()', `init()' and `get()'.
+
+    Another exigence is to sleep for a while - at least for one second -
+    before the call of `get()' if you want to get useful statistics. The
+    statistics for `SysInfo', `MemStats', `SockStats', `DiskUsage',
+    `LoadAVG' and `FileStats' are no deltas. If you need only one of these
+    information you don't need to sleep before the call of `get()'.
+
+    The method `get()' prepares all requested statistics and returns the
+    statistics as a Sys::Statistics::Linux::Compilation object. The inital
+    statistics will be updated.
+
+MANUAL PROC(5)
+    The Linux Programmer's Manual
+
+        http://www.kernel.org/doc/man-pages/online/pages/man5/proc.5.html
+
+    If you have questions or don't understand the sense of some statistics
+    then take a look into this awesome documentation.
+
+OPTIONS
+    All options are identical with the package names of the distribution in
+    lowercase. To activate the gathering of statistics you have to set the
+    options by the call of `new()' or `set()'. In addition you can
+    deactivate statistics with `set()'.
+
+    The options must be set with one of the following values:
+
+        0 - deactivate statistics
+        1 - activate and init statistics
+        2 - activate statistics but don't init
+
+    In addition it's possible to pass a hash reference with options.
+
+        my $lxs = Sys::Statistics::Linux->new(
+            processes => {
+                init => 1,
+                pids => [ 1, 2, 3 ]
+            },
+            netstats => {
+                init => 1,
+                initfile => $file,
+            },
+        );
+
+    Option `initfile' is useful if you want to store initial statistics on
+    the filesystem.
+
+        my $lxs = Sys::Statistics::Linux->new(
+            cpustats => {
+                init     => 1,
+                initfile => '/tmp/cpustats.yml',
+            },
+            diskstats => {
+                init     => 1,
+                initfile => '/tmp/diskstats.yml',
+            },
+            netstats => {
+                init     => 1,
+                initfile => '/tmp/netstats.yml',
+            },
+            pgswstats => {
+                init     => 1,
+                initfile => '/tmp/pgswstats.yml',
+            },
+            procstats => {
+                init     => 1,
+                initfile => '/tmp/procstats.yml',
+            },
+        );
+
+    Example:
+
+        #!/usr/bin/perl
+        use strict;
+        use warnings;
+        use Sys::Statistics::Linux;
+
+        my $lxs = Sys::Statistics::Linux->new(
+            pgswstats => {
+                init => 1,
+                initfile => '/tmp/pgswstats.yml'
+            }
+        );
+
+        $lxs->get(); # without to sleep
+
+    The initial statistics are stored to the temporary file:
+
+        #> cat /tmp/pgswstats.yml
+        --- 
+        pgfault: 397040955
+        pgmajfault: 4611
+        pgpgin: 21531693
+        pgpgout: 49511043
+        pswpin: 8
+        pswpout: 272
+        time: 1236783534.9328
+
+    Every time you call the script the initial statistics are loaded/stored
+    from/to the file. This could be helpful if you doesn't run it as daemon
+    and if you want to calculate the average load of your system since the
+    last call. Do you understand? I hope so :)
+
+    To get more information about the statistics refer the different modules
+    of the distribution.
+
+        sysinfo     -  Collect system information              with Sys::Statistics::Linux::SysInfo.
+        cpustats    -  Collect cpu statistics                  with Sys::Statistics::Linux::CpuStats.
+        procstats   -  Collect process statistics              with Sys::Statistics::Linux::ProcStats.
+        memstats    -  Collect memory statistics               with Sys::Statistics::Linux::MemStats.
+        pgswstats   -  Collect paging and swapping statistics  with Sys::Statistics::Linux::PgSwStats.
+        netstats    -  Collect net statistics                  with Sys::Statistics::Linux::NetStats.
+        sockstats   -  Collect socket statistics               with Sys::Statistics::Linux::SockStats.
+        diskstats   -  Collect disk statistics                 with Sys::Statistics::Linux::DiskStats.
+        diskusage   -  Collect the disk usage                  with Sys::Statistics::Linux::DiskUsage.
+        loadavg     -  Collect the load average                with Sys::Statistics::Linux::LoadAVG.
+        filestats   -  Collect inode statistics                with Sys::Statistics::Linux::FileStats.
+        processes   -  Collect process statistics              with Sys::Statistics::Linux::Processes.
+
+METHODS
+  new()
+    Call `new()' to create a new Sys::Statistics::Linux object. You can call
+    `new()' with options. This options would be passed to the method
+    `set()'.
+
+    Without options
+
+        my $lxs = Sys::Statistics::Linux->new();
+
+    Or with options
+
+        my $lxs = Sys::Statistics::Linux->new( cpustats => 1 );
+
+    Would do nothing
+
+        my $lxs = Sys::Statistics::Linux->new( cpustats => 0 );
+
+    It's possible to call `new()' with a hash reference of options.
+
+        my %options = (
+            cpustats => 1,
+            memstats => 1
+        );
+
+        my $lxs = Sys::Statistics::Linux->new(\%options);
+
+  set()
+    Call `set()' to activate or deactivate options.
+
+    The following example would call `new()' and initialize
+    `Sys::Statistics::Linux::CpuStats' and delete the object of
+    `Sys::Statistics::Linux::SysInfo'.
+
+        $lxs->set(
+            processes =>  0, # deactivate this statistic
+            pgswstats =>  1, # activate the statistic and calls new() and init() if necessary
+            netstats  =>  2, # activate the statistic and call new() if necessary but not init()
+        );
+
+    It's possible to call `set()' with a hash reference of options.
+
+        my %options = (
+            cpustats => 2,
+            memstats => 2
+        );
+
+        $lxs->set(\%options);
+
+  get()
+    Call `get()' to get the collected statistics. `get()' returns a
+    Sys::Statistics::Linux::Compilation object.
+
+        my $lxs  = Sys::Statistics::Linux->new(\%options);
+        sleep(1);
+        my $stat = $lxs->get();
+
+    Or you can pass the time to sleep with the call of `get()'.
+
+        my $stat = $lxs->get($time_to_sleep);
+
+    Now the statistcs are available with
+
+        $stat->cpustats
+
+        # or
+
+        $stat->{cpustats}
+
+    Take a look to the documentation of Sys::Statistics::Linux::Compilation
+    for more information.
+
+  init()
+    The call of `init()' initiate all activated statistics that are
+    necessary for deltas. That could be helpful if your script runs in a
+    endless loop with a high sleep interval. Don't forget that if you call
+    `get()' that the statistics are deltas since the last time they were
+    initiated.
+
+    The following example would calculate average statistics for 30 minutes:
+
+        # initiate cpustats
+        my $lxs = Sys::Statistics::Linux->new( cpustats => 1 );
+
+        while ( 1 ) {
+            sleep(1800);
+            my $stat = $lxs->get;
+        }
+
+    If you just want a current snapshot of the system each 30 minutes and
+    not the average then the following example would be better for you:
+
+        # do not initiate cpustats
+        my $lxs = Sys::Statistics::Linux->new( cpustats => 2 );
+
+        while ( 1 ) {
+            $lxs->init;              # init the statistics
+            my $stat = $lxs->get(1); # get the statistics
+            sleep(1800);             # sleep until the next run
+        }
+
+    If you want to write a simple command line utility that prints the
+    current workload to the screen then you can use something like this:
+
+        my @order = qw(user system iowait idle nice irq softirq total);
+        printf "%-20s%8s%8s%8s%8s%8s%8s%8s%8s\n", 'time', @order;
+
+        my $lxs = Sys::Statistics::Linux->new( cpustats => 1 );
+
+        while ( 1 ){
+            my $cpu  = $lxs->get(1)->cpustats;
+            my $time = $lxs->gettime;
+            printf "%-20s%8s%8s%8s%8s%8s%8s%8s%8s\n",
+                $time, @{$cpu->{cpu}}{@order};
+        }
+
+  settime()
+    Call `settime()' to define a POSIX formatted time stamp, generated with
+    localtime().
+
+        $lxs->settime('%Y/%m/%d %H:%M:%S');
+
+    To get more information about the formats take a look at `strftime()' of
+    POSIX.pm or the manpage `strftime(3)'.
+
+  gettime()
+    `gettime()' returns a POSIX formatted time stamp, @foo in list and $bar
+    in scalar context. If the time format isn't set then the default format
+    "%Y-%m-%d %H:%M:%S" will be set automatically. You can also set a time
+    format with `gettime()'.
+
+        my $date_time = $lxs->gettime;
+
+    Or
+
+        my ($date, $time) = $lxs->gettime();
+
+    Or
+
+        my ($date, $time) = $lxs->gettime('%Y/%m/%d %H:%M:%S');
+
+EXAMPLES
+    A very simple perl script could looks like this:
+
+        use strict;
+        use warnings;
+        use Sys::Statistics::Linux;
+
+        my $lxs = Sys::Statistics::Linux->new( cpustats => 1 );
+        sleep(1);
+        my $stat = $lxs->get;
+        my $cpu  = $stat->cpustats->{cpu};
+
+        print "Statistics for CpuStats (all)\n";
+        print "  user      $cpu->{user}\n";
+        print "  nice      $cpu->{nice}\n";
+        print "  system    $cpu->{system}\n";
+        print "  idle      $cpu->{idle}\n";
+        print "  ioWait    $cpu->{iowait}\n";
+        print "  total     $cpu->{total}\n";
+
+    Set and get a time stamp:
+
+        use strict;
+        use warnings;
+        use Sys::Statistics::Linux;
+
+        my $lxs = Sys::Statistics::Linux->new();
+        $lxs->settime('%Y/%m/%d %H:%M:%S');
+        print $lxs->gettime, "\n";
+
+    If you want to know how the data structure looks like you can use
+    `Data::Dumper' to check it:
+
+        use strict;
+        use warnings;
+        use Sys::Statistics::Linux;
+        use Data::Dumper;
+
+        my $lxs = Sys::Statistics::Linux->new( cpustats => 1 );
+        sleep(1);
+        my $stat = $lxs->get;
+
+        print Dumper($stat);
+
+    How to get the top 5 processes with the highest cpu workload:
+
+        use strict;
+        use warnings;
+        use Sys::Statistics::Linux;
+
+        my $lxs = Sys::Statistics::Linux->new( processes => 1 );
+        sleep(1);
+        my $stat = $lxs->get;
+        my @top5 = $stat->pstop( ttime => 5 );
+
+BACKWARD COMPATIBILITY
+    The old options and keys - CpuStats, NetStats, etc - are still available
+    but deprecated! It's not possible to access the statistics via
+    Sys::Statistics::Linux::Compilation and it's not possible to call
+    `search()' and `psfind()' if you use the old options.
+
+    You should use the new options and access the statistics over the
+    accessors
+
+        $stats->cpustats
+
+    or directly with
+
+        $stats->{cpustats}
+
+PREREQUISITES
+        Carp
+        POSIX
+        Test::More
+        Time::HiRes
+        UNIVERSAL
+
+EXPORTS
+    No exports.
+
+TODOS
+       * Are there any wishs from your side? Send me a mail!
+
+REPORTING BUGS
+    Please report all bugs to <jschulz.cpan(at)bloonix.de>.
+
+AUTHOR
+    Jonny Schulz <jschulz.cpan(at)bloonix.de>.
+
+COPYRIGHT
+    Copyright (C) 2006-2008 by Jonny Schulz. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

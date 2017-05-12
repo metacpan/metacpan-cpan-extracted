@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 33317486c4fa2cf7fec85bf92ed38ac0f64233a0 CONTRIBUTING
+SHA1 61526eab30ffdf09206bf77cb6e825286171a3c6 COPYRIGHT
+SHA1 6bd7b17d81be63d08d4efa6cb80106e72887842c CREDITS
+SHA1 6f24ce9566481175747f77b49f48ec6ec7c6b594 Changes
+SHA1 761d48f6a783ca05b557a59feb8c1f1a2465af3f INSTALL
+SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
+SHA1 59cf61b8dd6bf5cb05f2f8116e7f7eb11c17438a MANIFEST
+SHA1 a4f96f682144ba742ed67d1c45e1028abe81fbc5 META.json
+SHA1 653dce712607147652019e6efbf951e723ada0a9 META.yml
+SHA1 ebfaff9cc18ec303b0b0ba0b21f048fda6ce9c2b Makefile.PL
+SHA1 acf39d7d2078f59779207687363f671a975ad091 README
+SHA1 6618808a74a35bf63567b4529a283f93d572cd7b dist.ini
+SHA1 75f71c3c3ff82fa33b0c072cd6409d7615398cef doap.ttl
+SHA1 d31762ff76363f3d228ca2ac68f9f438ce0d7b1d examples/json_to_html.pl
+SHA1 7a25f959d74f93a27cd7b8d0cb4171e3e1f9a59a examples/model_to_html.pl
+SHA1 df15e600aaf7be1dfb6c56cdf3a91f0b65be129d examples/pretdsl_to_html.pl
+SHA1 29c4eb129624e7310a2d253a1322d3ef891d4a6e examples/sparql_to_html.pl
+SHA1 385747b9f86f4ed83cc9e55d5469930adaff1bf5 examples/turtle_to_html.pl
+SHA1 c18bcd948bb48fd5eccdaf452d009b3d87ac39ea examples/turtle_tokens.pl
+SHA1 db5cb18adaa8010a9126bbc68c84f93bd71f5b15 examples/xml_to_html.pl
+SHA1 3bae3a7aa594df08d5ab484bebad15cb4c826f86 lib/Syntax/Highlight/JSON2.pm
+SHA1 e27cb8d4d15f61b38bb41180d133891f5638577e lib/Syntax/Highlight/RDF.pm
+SHA1 e8d678b8095cd838da18480c3460fd7b55492028 lib/Syntax/Highlight/XML.pm
+SHA1 7af1d4de0e036575adbe821942f07b3f4f51ef8a t/01basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlQRhhcACgkQzr+BKGoqfTmdYQCffC92gUm7Aj4Mi0hgVj+nF0yZ
+NhsAoInjknlgLl5YqQMkO0lgf8Qa8zYt
+=8wDF
+-----END PGP SIGNATURE-----

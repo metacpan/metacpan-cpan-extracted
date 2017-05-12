@@ -1,0 +1,34 @@
+---
+abstract: 'Perl interface with the R statistical program'
+author:
+  - 'Florent Angly <florent.angly@gmail.com> (2011 rewrite)'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: '0.47'
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Statistics-R
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  IPC::Run: '0.1'
+  Regexp::Common: 0
+  Text::Balanced: '1.97'
+  Text::Wrap: 0
+  perl: 5.6.0
+  version: '0.77'
+resources:
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Name=Statistics-R
+  homepage: http://search.cpan.org/search?query=statistics%3A%3AR&mode=dist
+  license: http://dev.perl.org/licenses/
+  repository: git@github.com:bricas/statistics-r.git
+version: '0.34'

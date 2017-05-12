@@ -1,0 +1,8 @@
+b
+ab
+bc
+abc
+#
+@TYPE    type1
+@OPTION  b1
+@OPTION  b2 = valb2

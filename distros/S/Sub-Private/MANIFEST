@@ -1,0 +1,12 @@
+Build.PL
+Changes
+MANIFEST
+README
+lib/Sub/Private.pm
+t/Foo.pm
+t/00-load.t
+t/01-private.t
+t/pod.t
+examples/Foo.pm
+examples/private-test.pl
+META.yml

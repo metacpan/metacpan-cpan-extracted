@@ -1,0 +1,47 @@
+# NAME
+
+Spreadsheet::Simple - Simple interface to spreadsheet files
+
+# SYNOPSIS
+
+    use Spreadsheet::Simple;
+
+    my $s     = Spreadsheet::Simple->new(format => 'Excel');
+    my $doc   = $s->read_file($file);
+    my $sheet = $doc->get_sheet_by_name('sheet1');
+
+    $sheet->get_cell(0, 0)->value eq 'name'; # A1
+    $sheet->get_cell(1, 0)->value eq 'Fred'; # A2
+
+    # $cell->color -- TODO
+
+# METHODS
+
+## read\_file($file)
+
+This method returns a new [Spreadsheet::Simple::Document](http://search.cpan.org/perldoc?Spreadsheet::Simple::Document) object.
+
+## write\_file($file, $doc)
+
+TODO. Unimplemented.
+
+## new\_document(sheets => ArrayRef\[ Spreadsheet::Simple::Sheet \])
+
+Convenience method to construct new [Spreadsheet::Simple::Document](http://search.cpan.org/perldoc?Spreadsheet::Simple::Document) object.
+
+# BUGS
+
+Please report any bugs or feature requests to `bug-spreadsheet-simple at rt.cpan.org`, or through
+the web interface at [http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Spreadsheet-Simple](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Spreadsheet-Simple).  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+# AUTHOR
+
+Dylan William Hardison
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Infinity Interactive, Inc.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

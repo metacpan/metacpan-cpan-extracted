@@ -1,0 +1,21 @@
+abstract: Generate SVK Statistics graph.
+author: Kang-min Liu <gugod@gugod.org>
+build_requires: 
+  Test::More: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: SVK-Churn
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Chart::Strip: 0
+  IO::All: 0
+  Quantum::Superpositions: 0
+  SVK: 2
+  perl: 5.8.8
+version: 0.05

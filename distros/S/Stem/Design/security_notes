@@ -1,0 +1,18 @@
+Security
+
+A critical aspect of any network application these days is security. 
+Stem hubs communicate with each other via standard internet sockets. 
+This communication can be made secure by tunneling over existing 
+open source products such as SSH and Stunnel.  Stem runs the security 
+program and has it connect with the remote hub and its stdin/stdout 
+is used for the local connection.  The Stem::Proc cell is used to 
+manage this external security program and it provides all the I/O 
+support needed.  The Stem::Portal cell is used to connect Stem hubs 
+together and it has configuration options to select the desired 
+security application and options.  A Stem hub can listen for portal 
+connections using a Listen socket bound to localhost or an IP 
+address.  By using localhost and a secure transport, a Stem hub 
+cannot be accessed by any unauthorized programs.
+
+
+

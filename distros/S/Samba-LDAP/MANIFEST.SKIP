@@ -1,0 +1,14 @@
+#defaults
+^Makefile$
+^MANIFEST.bak$
+^blib/
+^pm_to_blib$
+^blibdirs$
+^Build$
+^_build/
+^.svn/
+^lib/.svn/
+^lib/Samba/.svn/
+^lib/Samba/LDAP/.svn/
+^scripts/.svn/
+^t/.svn/

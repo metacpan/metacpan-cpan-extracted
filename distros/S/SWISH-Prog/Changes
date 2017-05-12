@@ -1,0 +1,370 @@
+Revision history for Perl extension Prog.
+
+0.75 11 Dec 2013
+ - 3.1.0 release of swish3 cli:
+   * remove --lucy_highlightable and replace with -I (--Indexer_opts)
+   * rename --aggregator_opts to --Aggregator_opts
+ 
+0.74 01 Oct 2013
+ - packaaging clean up only
+
+0.73 12 Sept 2013
+ - turn off Pod tests unless RELEASE_TESTING env var set. Pod::Coverage
+   failures were because optional dependencies were not present but module
+   load was attempted in order to walk symbol tree for pod tests.
+
+0.72 10 Sept 2013
+ - add TRACE_ALL to pod-coverage test to discover why it suddenly started
+   epic fail
+ - add explicit port to t/17-spider-server, running on 5002
+
+0.71 1 Aug 2013
+ - add --null_term feature to swish3 example
+ - add sitemap support to Spider
+ - swish3 -W <n> sets SWISH_PARSER_WARNINGS env var
+
+0.70 10 Feb 2013
+ - add tests for Utils class.
+ - Utils extension regex now matches \w+ rather than hardcoded document
+   extensions.
+
+0.69 05 Feb 2013
+ - fix documentation for SWISH::Prog::InvIndex::Meta, add data() accessor
+   method.
+
+0.68 23 Jan 2013
+ - fix failing test t/17-spider-server with 'use base' vs '@ISA'
+ - force URI objects to stringify when passing in/out of cache
+
+0.67 19 Jan 2013
+ - Spider now uses LWP::RobotUA to respect robots.txt. Dependency on
+   WWW::Mechanize is removed.
+ - Spider authorization features now work. Added bona fide test suite for
+   spidering.
+ - expand Queue API to add remove() and clean() and internal locking on
+   get()
+ - Spider->modified_since feature to allow for incremental crawls
+ - Added new class SWISH::Prog::Aggregator::Spider::Response, refactoring
+   appropriate UA methods into Response class since WWW::Mechanize was
+   intentionally blurring the logical distinction.
+ - Spider->file_rules (new feature) follows same code path as
+   Aggregator::FS.
+ - added Utils::write_log and ::write_log_line methods for standardizing
+   debug output
+
+0.66 8 Dec 2012
+ - yanked redundant test t/09 as it is now part of Search::Tools
+ - fix t/05 spider to warn on correct missing module; fix spider count
+
+0.65 5 Nov 2012
+ - add more tests for MailFS aggregator
+ - all Aggregators now set content-type to valid MIME instead of custom
+   Swish types
+ - Aggregator->set_parser_from_type() will now not override a defined
+   Doc->parser() value 
+
+0.64 12 Oct 2012
+ - add --aggregator_opts to swish3 and SWISH::Prog
+ - add looks_like_feed() to Spider, and add dependency on XML::Feed
+ - switch Spider::UA parent class to WWW::Mechanize::GZip
+
+0.63 11 Sept 2012
+ - add TagAlias support to Config. TagAlias is a Swish3 feature.
+ - improve SWISH::Prog documentation
+ - add --doc_filter to swish3, to allow for set_filter to work from an
+   external Perl file.
+
+0.62 3 Sept 2012
+ - support subclassing of Indexer in start() sanity check introduced in
+   0.61
+ - add InvIndex->meta_file method and avoid referring to swish.xml directly
+
+0.61 23 Aug 2012
+ - swish3 now catches exceptions and re-throws errors
+ - swish3 now passes --debug flag into Searcher->new
+ - base Indexer now performs check on existing indexes to verify that you
+   aren't trying to run one format's Indexer against a different format's
+   index.
+ - swish_last_start file now created by base Indexer class, not swish3 cli.
+
+0.60 28 July 2012
+ - add *_property methods to InvIndex::Meta
+ - SWISH::3 now required dependency
+ - added use_quotes and quote_char features to Aggregator::DBI, inspired by
+   patch from Miko O'Sullivan.
+
+0.59 26 July 2012
+ - add FollowXInclude support for Swish3
+
+0.58 26 June 2012
+ - fix Config class for FuzzyIndexingMode conversion to XML (ver3)
+
+0.57 7 May 2012
+ - change default max_depth in Spider to 1 (makes it actually work by
+   default)
+
+0.56 2 Apr 2012
+ - make swish3 stdin/stdout utf8 safe
+
+0.55 6 Nov 2011
+ - fix skip test count in t/15
+
+0.54 14 Oct 2011
+ - $SWISH::Prog::Utils::DefaultExtension now let's you configure default
+   file extension
+ - fix SWISH::Prog::Config->new() to support perldoc's claims of passing in
+   a hashref or named attribute pairs.
+
+0.53 09 Oct 2011
+ - fix DBI Aggregator to make code support docs for swishtitle and
+   swishdescription. Bug reported by Logan Bell.
+ - fix FS Aggregator behavior to work like 2.x and not skip files with no
+   extension.
+ - fix bug in swish3 where index dir is not created before swish_last_start
+   is touched.
+ - confess() when swish.xml does not exist
+ - base Aggregator class no longer requires an indexer in new().
+
+0.52 26 Sept 2011
+ - add support for IndexFile config option
+ - add --lucy_highlightable option to swish3
+ - new class SWISH::Prog::ReplaceRules for backcompat
+ - add get_stemmer_lang() method to Config class for Snowball stemmer
+   forward-compat.
+
+0.51 28 June 2011
+ - add 'Lucy' backend
+
+0.50 22 Feb 2011
+ - make swish3 -N flag argument optional, defaulting to
+   indexdir/swish_last_start
+ - error check in base Indexer for valid invindex param
+ - misc doc fixes
+
+0.49 07 Jan 2011
+ - refactor FileRules feature into File::Rules module
+
+0.48 03 Nov 2010
+ - added progress() feature to Aggregator classes, and 'expected' param to
+   swish3.
+ - add CascadeMetaContext config option for Swish3 compatibility
+ - bump SWISH::3 (optional) dependency to 0.09
+ - fix MailFS aggregator to preserve filesystem paths as Doc url
+
+0.47 25 July 2010
+ - add Search time to swish3 (3.0.7)
+ - fix bug in Native::Searcher affecting fieldtypes
+
+0.46 22 June 2010
+ - add dep on Search::Query
+ - add default_boolop feature to Native::Searcher
+ - fix IncludeConfigFile recursionin Config->ver2_to_ver()
+
+0.45 08 May 2010
+ - fix swish3 to allow "swishrank" as -x option
+ - enable -H option in swish3
+ - SWISH::3->slurp optimization now uses transparent gunzip feature.
+   Requires SWISH::3 >= 0.06.
+ - fix backcompat for DefaultContents config in Config->ver2_to_ver3()
+
+0.44 19 Mar 2010
+ - register MailFS aggregator as 'mailfs' for use with swish3 -S
+
+0.43 19 Mar 2010
+ - remove docs and method for 'sort_order' in abstract Searcher class. No
+   subclass uses it, deferring to 'order' in the search() method opts.
+ - FS->crawl now returns count
+ - add MailFS aggregator class
+
+0.42 27 Feb 2010
+ - add invindex format to search output headers in swish3
+ - add parsed query to search output headers in swish3; add query() method
+   to base Results class.
+ - add progress_size to Aggregator and implement in FS.
+
+0.41 10 Feb 2010
+ - fix the check_swish() feature in Native::Indexer to only return the
+   version number, not the whole output of swish-e -V (fixes the -D fix in
+   0.40).
+
+0.40 09 Feb 2010
+ - make -D '\x03' optional in Native::Indexer based on which version of
+   swish-e is available. The -D feature is only in 2.4.8 or newer.
+
+0.39 07 Feb 2010
+ - add fix for systems using Swish-e 2.6, which doesn't create a
+   index.swish-e file.
+ - remove the requires_external_bin from Makefile.PL since KSx and Xapian
+   do not require swish-e but do require SWISH::Prog. Fix tests (which also
+   check for swish-e) to SKIP the correct number of tests.
+
+0.38 05 Feb 2010
+ - add support for 'order', 'limit', 'start', 'max' and 'rank_scheme' in
+   Native::Searcher.
+ - Utils->perl_to_xml() moved to Search::Tools::XML (where it really
+   belonged).
+ - enable more options to swish3
+
+0.37 01 Feb 2010
+ - add -D '\x03' to the Native::Indexer exec command. This mimics
+   libswish3.
+ - examples/swish3 now installed by default with usual make install.
+ - added -N option to swish3, along with ok_if_newer_than feature in
+   Aggregator.
+ - added dependency on Rose::DateTime.
+ - Native Indexer can now merge() and add().
+ - -l and -M options now supported in swish3
+ - yank Query.pm and QueryParser.pm. They weren't used and the idea is now
+   fleshed out in Search::Query if we ever need it.
+ - Searcher may now take an array of invindex values, and always returns an
+   array ref of values.
+
+0.36 12 Jan 2009
+ - fix Config bug where StoreDescription was ignored in ver2_to_ver3()
+ - switch to Module::Install 
+ - updates to example/swish3
+ - fix t/03_object.t to test for JSON not YAML::Syck (see RT#53275)
+
+0.35 09 Jan 2009
+ - fix bug in Config where $append flag was being interpreted as a
+   MetaName/Property
+ - fix bug in Config where ver2_to_ver3 was calling $self->new instead of
+   $class->new when passed a filename.
+ - fix bug in Spider where filter was not being passed correctly.
+
+0.34 07 Jan 2009
+ - fix mem leak test to include only those outside our control.
+ - add version() to SWISH::Prog::Doc to pick header style per instance.
+
+0.33 02 Jan 2010
+ - fix bug where SWISH::3->slurp was being called with out binmode flag and
+   .gz files were getting their NUL bytes stripped.
+ - add test_mode feature (set with SWISH_TEST env var)
+ - fix some memory leaks
+ - fix JSON::XS dependency (JSON required, not JSON::XS).
+
+0.32 12 Dec 2009
+ - Config->ver2_to_ver3() method now supported.
+ - fix bug in Prog.pm to allow Config passed in aggregator and Indexer
+   passed in aggregator
+ - removed dependency on Class::Accessor for Config.pm
+ - refactor internal handling of Config object so there is only ever one
+   per Prog instance
+ - refactor internal handling of Config to support SWISH::3::Config
+ - FileRules support now in Aggregator::FS
+
+0.31 1  Dec 2009
+ - POD fixes
+
+0.30 29 Nov 2009
+ - change KinoSearch to KSx in implementation registry
+ - fix bug in base Searcher where InvIndex class was not loaded.
+
+0.29 8 Nov 2009
+ - add strip_plural option to Utils->perl_to_xml()
+ - add count attribute to arrayref values of hashrefs in perl_to_xml()
+ - fix method/param name strictness bug revealed by Rose::ObjectX::CAF
+   0.03.  This mostly required internal param name changes to official
+   method names.
+
+0.28 30 Sept 2009
+ - add some missing calls to SUPER::init()
+
+0.27 28 Sep 2009
+ - make QueryParser and Query part of the official install, even though
+   there are still TODO items
+ - add all_metanames() method to Config
+ - refactor to use Search::Tools and Rose::ObjectX::CAF instead of
+   Class::Accessor::Fast
+
+0.26 26 Feb 2009
+ - fix off-by-one error in skip test count in t/03-object.t
+
+0.25 26 Jan 2009
+ - added more features to example/swish3
+ - add missing test file to MANIFEST
+ - tests clean up after themselves wrt swish.xml header files
+
+0.24 20 Jan 2009  (Happy Obama Day!)
+ - add base Searcher, Results and Result classes
+ - refactor QueryParser to use Search::QueryParser::SQL
+ - flesh out the InvIndex::Meta class, adding XML::Simple dependency
+ - IMPORTANT: rename Native classes to match naming convention
+
+0.23 11 Dec 2008
+ - properly clean up temp Config files
+
+0.22 10 Dec 2008
+ - added support for SWISH::Prog::DBI
+ - use SWISH::3 for slurping files, if available.
+ - fix bug in SWISH::Prog::Utils->perl_to_xml where hash refs were not
+   getting tagged.
+
+0.21 31 Oct 2008
+ - fix tests to skip correct numbers if swish-e not installed
+ - change to JSON::XS and make json default format in Aggregator::Object
+ - add perl_to_xml() in Utils
+ - change t/04 to manually create dirs at test time
+
+0.20 23 April 2008
+ - complete rewrite of the API for Swish3 development
+
+0.08 22 Nov 2007
+ - added S::P::Mail class and example swishmail.pl script
+ - sync all $VERSION vars to same value
+ - allow for non-standard docclass names
+
+0.07 * S::P::Object iterator now uses more idiomatic while/next algorithm.
+
+0.06 * S::P::Object now defers to explicit 'config' passed in new().
+
+0.05 * S::P::Object now uses JSON or YAML to serialize values instead of Data::Dump
+ - This change is sync'd with SWISH::API::Object 0.0.6
+
+0.04 * S::P::DBI no longer calls disconnect() on db handle in DESTROY
+ - fixed bug with auto-defining metanames
+ - S::P::Config always returns arrayref on directive method calls
+ - use MIME::Types instead of File::Type
+ - S::P::Find now uses File::Find instead of Path::Class::Iterator
+ - S::P::Object obj_filter() must return an object of some kind
+ - S::P::Object will not dump() scalar strings, thus avoiding extra quotes
+ - S::P::Config added stringify() method and reverted from IO::All to
+   File::Slurp
+ - S::Prog added elapsed() method
+ - S::Prog new() verbose now defaults to 1
+
+0.03 * removed all mentions of SWISH3
+ - test indexes are removed as part of 'make clean'
+ - switched from Data::Dumper to Data::Dump
+ - added new SWISH::Prog::Object example
+ - fixed bug in SWISH::Prog::Headers to test defined()	   rather than
+   simply eval true/false
+ - fixed bug in SWISH::Prog::DBI with accepting DBI handle in init()
+ - changed to using IO::All instead of File::stat and File::Slurp for
+   better UTF8 support
+ - changed default order of init() and init_indexer() to work more
+   intuitively. Fixed S::P::DBI accordingly. To prevent an indexer from
+   being init'd (as in 0.02) simply override init_indexer() and don't call
+   SUPER::init_indexer().
+ - new feature: SWISH::Prog::Find
+ - renamed meta() to table_meta() in SWISH::Prog::DBI for clarity.
+ - S::P::Config now always handles config params as arrays
+ - Config metanames() propertynames() and propertynamesnostripchars()  are
+   no longer available 
+ - S::P::Config now requires IO::All and Config::General; added read2()
+   method.
+ - new feature placeholder: SWISH::Prog::Spider
+
+0.02 POD fixes
+ - added merge() add() and mv() methods to S::P::Index and t/3merge.t and
+   t/4add.t
+ - added 2 more test docs
+ - added format() accessor to S::P::Index
+ - changed S::P::I to use Class::Accessor::Fast since we don't need to
+   override get/set
+ - S::P now always inits an indexer even if fh=>0
+ - added private _index_methods to S::P
+
+0.01 2005-11-22T21:54:37Z
+ - original version; created by h2xs 1.22 with options -XA -n Prog
+

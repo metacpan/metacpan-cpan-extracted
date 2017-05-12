@@ -1,0 +1,26 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         SoggyOnion
+version:      0.04
+version_from: lib/SoggyOnion.pm
+installdirs:  site
+requires:
+    Cache::FileCache:              0
+    File::Basename:                0
+    File::Find::Rule:              0
+    File::Path:                    0
+    Geo::Weather:                  0
+    HTML::Entities:                0
+    HTML::Strip:                   0
+    HTML::TokeParser:              0
+    IO::All:                       0
+    IO::Scalar:                    0
+    LWP::Simple:                   0
+    Parallel::ForkManager:         0
+    Template:                      0
+    Test::More:                    0
+    XML::RSS:                      0
+    YAML:                          0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

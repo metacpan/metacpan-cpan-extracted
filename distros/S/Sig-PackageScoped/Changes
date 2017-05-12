@@ -1,0 +1,24 @@
+0.04  2007-10-31
+
+- One of these days I will learn how to release a module. This should
+  fix the regressing version problem for real.
+
+
+0.03  2007-10-31
+
+- I'd really like to smack myself for making module versions based on
+  CVS revision numbers.
+
+
+0.02  2007-10-31
+
+- Just bringing the packaging and tests up to modern standards. I
+  don't really think any sane person should use this module.
+
+
+0.01  2001-11-22
+
+- Initial release.  This seems to work but is considered quite alpha.
+  Hopefully, people will start using it and I can improve it based on
+  user feedback.
+

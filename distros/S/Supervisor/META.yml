@@ -1,0 +1,57 @@
+---
+abstract: 'A process to supervisor other processes'
+author:
+  - 'Kevin L. Esteb <kesteb@wsipc.org>'
+build_requires:
+  Badger: 0.06
+  Config::IniFiles: 2.39
+  DateTime: 0.4501
+  File::Pid: 0
+  JSON: 2.15
+  POE: 1.007
+  Set::Light: 0.04
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Supervisor
+provides:
+  Supervisor:
+    file: lib/Supervisor.pm
+    version: 0.08
+  Supervisor::Base:
+    file: lib/Supervisor/Base.pm
+    version: 0.06
+  Supervisor::Class:
+    file: lib/Supervisor/Class.pm
+  Supervisor::Constants:
+    file: lib/Supervisor/Constants.pm
+  Supervisor::Controller:
+    file: lib/Supervisor/Controller.pm
+    version: 0.02
+  Supervisor::Log:
+    file: lib/Supervisor/Log.pm
+  Supervisor::Process:
+    file: lib/Supervisor/Process.pm
+    version: 0.03
+  Supervisor::ProcessFactory:
+    file: lib/Supervisor/ProcessFactory.pm
+    version: 0.02
+  Supervisor::RPC::Client:
+    file: lib/Supervisor/RPC/Client.pm
+    version: 0.02
+  Supervisor::RPC::Server:
+    file: lib/Supervisor/RPC/Server.pm
+    version: 0.02
+  Supervisor::Session:
+    file: lib/Supervisor/Session.pm
+    version: 0.02
+  Supervisor::Utils:
+    file: lib/Supervisor/Utils.pm
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.08

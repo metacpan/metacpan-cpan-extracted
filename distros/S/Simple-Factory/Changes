@@ -1,0 +1,10 @@
+0.07 	Wed Jul 22 08:40:10 CEST 2015
+	- fix pod and dependency in dist.ini
+
+0.08	Wed Jul 22 08:51:26 CEST 2015
+	- add license ( MIT )
+	- force minperl to 5.10.0
+
+0.09	Sat Jul 25 17:23:02 CEST 2015
+	- add on_error "confess" and "undef"
+	- add eager attr

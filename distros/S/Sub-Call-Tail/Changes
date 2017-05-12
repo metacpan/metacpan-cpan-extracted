@@ -1,0 +1,24 @@
+Revision history for Sub-Call-Tail
+
+0.06      2015-07-03 23:15:54Z
+          - fix breakage by v5.17.5-247-g049bd5f (RT#81860, Zefram)
+          - warning added to docs, at the author's request
+
+0.05      2012-05-29
+          - Remove the deprecated use of qw() as parens in Makefile.PL
+
+0.04      2009-11-02
+          - Correct fallback definition of AvREIFY_only (Andrew Rodland)
+
+0.03      2009-11-01
+          - Makefile.PL voodoo
+
+0.02      2009-11-01
+          - stricter checking of modified entersub ops (Zefram)
+          - better skipping logic and other tweaks for the leak test
+          - use get_cv instead of get_cvn_flags as it is not yet in ppport.h
+          - improved reification logic (gfx & nothingmuch)
+          - more thorough testing
+
+0.01      2009-10-31
+          - Initial release

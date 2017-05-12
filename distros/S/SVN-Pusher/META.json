@@ -1,0 +1,56 @@
+{
+   "abstract" : "Propagate changesets between two different svn repositories.",
+   "author" : [
+      "(based on SVN::Push by Gerald Richter E<lt>richter@dev.ecos.deE<gt>)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "SVN-Pusher",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "SVN::Core" : "0",
+            "URI::Escape" : "0",
+            "perl" : "v5.8.8"
+         }
+      }
+   },
+   "provides" : {
+      "SVN::Pusher" : {
+         "file" : "lib/SVN/Pusher.pm",
+         "version" : "0.09"
+      },
+      "SVN::Pusher::CmdLine" : {
+         "file" : "lib/SVN/Pusher/CmdLine.pm"
+      },
+      "SVN::Pusher::MirrorEditor" : {
+         "file" : "lib/SVN/Pusher.pm"
+      },
+      "SVN::Pusher::MyCallbacks" : {
+         "file" : "lib/SVN/Pusher.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://bitbucket.org/shlomif/perl-svn-pusher"
+      }
+   },
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

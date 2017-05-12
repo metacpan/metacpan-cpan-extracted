@@ -1,0 +1,19 @@
+Revision history for Spork-Shlomify
+
+0.0203  2015-12-06
+          - Remove occurences of an old E-mail address.
+
+0.0202  2015-05-30
+          - Add 'resources' to META.yml.
+
+0.0201  2014-01-31
+          - Convert Module::Build to Test::Run::Builder.
+          - Cleanups to Build.PL.
+          - Add t/cpan-changes.t and t/style-trailing-space.t .
+
+0.0200  2006-08-27
+          - Made sure the <img tag validates.
+
+0.0100  2006-03-09
+          - First version, released on an unsuspecting world.
+

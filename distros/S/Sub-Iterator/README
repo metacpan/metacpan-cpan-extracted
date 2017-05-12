@@ -1,0 +1,16 @@
+SYNOPSIS
+
+     use Sub::Iterator qw(gen_array_iterator gen_fh_iterator);
+    
+     my $sub = gen_array_iterator([1, 2, 3]);
+     $sub->(); # -> 1
+     $sub->(); # -> 2
+     $sub->(); # -> 3
+     $sub->(); # -> undef
+
+FUNCTIONS
+
+ gen_array_iterator(\@ary) -> code
+
+ gen_fh_iterator($fh) -> code
+

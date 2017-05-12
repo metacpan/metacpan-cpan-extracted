@@ -1,0 +1,18 @@
+Build.PL
+Makefile.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+Changes
+bin/mibProxy
+etc/mibProxy.conf
+lib/SNMP/MibProxy.pm
+t/00-load.t
+t/01-load.t
+t/boilerplate.t
+t/mibProxy.t
+t/pod-coverage.t
+t/pod.t
+log/mibProxy.log
+META.json
+SIGNATURE    Added here by Module::Build

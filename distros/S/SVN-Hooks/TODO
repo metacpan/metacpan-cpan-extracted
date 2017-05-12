@@ -1,0 +1,40 @@
+* Email UTF-8
+   The SVN::Look module should obtain all information from the svnlook
+   command in UTF-8 and use it accordingly. In particular, the emails
+   sent by the Mailer plugin should be MIME compatible and specify
+   UTF-8 character encoding.
+
+* Use YAML for the configuration files
+   I've mixed feelings about the Perl-script-as-a-configuration-file
+   thing. It gives us power, but the power is in the hands of the
+   repository admins, which can then run scripts in the subversion
+   server. A declarative configuration file would be more
+   secure. Perhaps we can still preserve all the power we need by
+   using YAML [http://www.yaml.org/].
+
+* Reimplement SVN::Look to use the Perl SVN bindings instead of
+  calling svnlook. However, another approach would be to implement an
+  option in svnlook to dump all information in a format like XML so
+  that we wouldn't need to call it several times.
+
+* Check the svnchecker project <http://svnchecker.tigris.org/> to see
+  if there is some interesting functionality there that is missing
+  here.
+
+* Check the hook ideas in
+  http://stackoverflow.com/questions/884608/share-common-useful-svn-pre-commit-hooks.
+
+* Implement a plugin for kicking of Jenkins builds.
+
+* Implement a scmbug integration plugin.
+
+* Implement a clone of
+   http://svn.collab.net/viewvc/svn/trunk/contrib/hook-scripts/case-insensitive.py
+
+* I18N the SVN::Hooks messages.
+
+* Implement the funcionality of
+  http://svn.collab.net/repos/svn/trunk/contrib/hook-scripts/case-insensitive.py
+  as a plugin.
+
+* Increment SVN::Hooks::Notify to send emails in HTML.

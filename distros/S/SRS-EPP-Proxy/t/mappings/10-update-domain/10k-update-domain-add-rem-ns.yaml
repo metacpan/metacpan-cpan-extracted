@@ -1,0 +1,37 @@
+template: update-domain.tt
+
+vars:
+  domain: cheese.co.te
+  nslist:
+    - ns5.everydns.net
+    - ns6.everydns.net
+  nslist_old:
+    - ns1.everydns.net
+
+input_assertions:
+  class: SRS::EPP::Command::Update::Domain
+
+SRS:
+    -
+        assertions: 
+           count:
+               - [ '//DomainDetailsQry', 1, 'DDQ generated']
+           match:
+               - [ '//DomainNameFilter', 'cheese.co.te', 'SRS[1] - Domain name filter correct' ]
+    -
+        assertions:
+           count:
+               - [ '//Server', 5, 'SRS[2] - 5 name servers' ]
+               - [ '//Server[@FQDN = "ns2.everydns.net"]', 1, 'ns2 in server list']
+               - [ '//Server[@FQDN = "ns3.everydns.net"]', 1, 'ns3 in server list']
+               - [ '//Server[@FQDN = "ns4.everydns.net"]', 1, 'ns4 in server list']
+               - [ '//Server[@FQDN = "ns5.everydns.net"]', 1, 'ns5 in server list']
+               - [ '//Server[@FQDN = "ns6.everydns.net"]', 1, 'ns6 in server list']
+           match:  
+               - [ '//DomainNameFilter', 'cheese.co.te', 'SRS[2] - Domain name filter correct' ]
+
+output_assertions:
+  count:
+    - [ '//epp:result', 1, 'SRS: Check for one result' ]
+  attr_is:
+    - [ '//epp:result', 'code', 1000, 'SRS: Check for correct result code' ]

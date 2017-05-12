@@ -1,0 +1,172 @@
+NAME
+    String::Sections - Extract labeled groups of sub-strings from a string.
+
+VERSION
+    version 0.3.2
+
+SYNOPSIS
+      use String::Sections;
+
+      my $sections = String::Sections->new();
+      my $result = $sections->load_list( @lines );
+      # TODO
+      # $sections->load_string( $string );
+      # $sections->load_filehandle( $fh );
+      #
+      # $sections->merge( $other_sections_object );
+
+      my @section_names = $result->section_names();
+      if ( $result->has_section( 'section_label' ) ) {
+        my $string_ref = $result->section( 'section_label' );
+        ...
+      }
+
+DESCRIPTION
+    Data Section sports the following default data markup
+
+      __[ somename ]__
+      Data
+      __[ anothername ]__
+      More data
+
+    This module is designed to behave as a work-alike, except on already
+    extracted string data.
+
+METHODS
+  "new"
+  "new( %args )"
+      my $object = String::Sections->new();
+
+      my $object = String::Sections->new( attribute_name => 'value' );
+
+  "load_list ( @strings )"
+      my @strings = <$fh>;
+
+      my $result = $string_section->load_list( @strings );
+
+    This method handles data as if it had been slopped in unchomped from a
+    filehandle.
+
+    Ideally, each entry in @strings will be terminated with $/ , as the
+    collated data from each section is concatenated into a large singular
+    string, e.g.:
+
+      $result = $string_section->load_list("__[ Foo ]__\n", "bar\n", "baz\n" );
+      $section_foo = $result->section('Foo')
+      # bar
+      # baz
+
+      $result = $s_s->load_list("__[ Foo ]__\n", "bar", "baz" );
+      $result->section('Foo');
+      # barbaz
+
+      $object->load_list("__[ Foo ]__", "bar", "baz" ) # will not work by default.
+
+    This behaviour may change in the future, but this is how it is with the
+    least effort for now.
+
+  "load_string"
+    TODO
+
+  "load_filehandle( $fh )"
+      my $result = $object->load_filehandle( $fh )
+
+  "header_regex"
+  "empty_line_regex"
+  "document_end_regex"
+  "line_escape_regex"
+  "default_name"
+  "stop_at_end"
+  "ignore_empty_prelude"
+  "enable_escapes"
+ATTRIBUTES
+  "header_regex"
+  "empty_line_regex"
+  "document_end_regex"
+  "line_escape_regex"
+  "default_name"
+  "stop_at_end"
+  "ignore_empty_prelude"
+  "enable_escapes"
+PRIVATE METHODS
+  "__add_line"
+  "_default_header_regex"
+  "_default_empty_line_regex"
+  "_default_document_end_regex"
+  "_default_line_escape_regex"
+  "_default_default_name"
+  "_default_stop_at_end"
+  "_default_ignore_empty_prelude"
+  "_default_enable_escapes"
+PRIVATE FUNCTIONS
+  "_croak"
+  "_regex_type"
+  "_string_type"
+  "_boolean_type"
+DEVELOPMENT
+    This code is still new and under development.
+
+    All the below facets are likely to change at some point, but don't
+    largely contribute to the API or usage of this module.
+
+    *   Needs Perl 5.10.1
+
+        To make some of the development features easier.
+
+Recommended Use with Data::Handle
+    This modules primary inspiration is Data::Section, but intending to
+    split and decouple many of the internal parts to add leverage to the
+    various behaviors it contains.
+
+    Data::Handle solves part of a problem with Perl by providing a more
+    reliable interface to the __DATA__ section in a file that is not impeded
+    by various things that occur if its attempted to be read more than once.
+
+    In future, I plan on this being the syntax for connecting Data::Handle
+    with this module to emulate Data::Section:
+
+      my $dh = Data::Handle->new( __PACKAGE__ );
+      my $ss = String::Sections->new( stop_at_end => 1 );
+      my $result = $ss->load_filehandle( $dh );
+
+    This doesn't implicitly perform any of the inheritance tree magic
+    Data::Section does, but its also planned on making that easy to do when
+    you want it with "->merge( $section )"
+
+    For now, the recommended code is not so different:
+
+      my $dh = Data::Handle->new( __PACKAGE__ );
+      my $ss = String::Sections->new( stop_at_end => 1 );
+      my $result  = $ss->load_list( <$dh> );
+
+    Its just somewhat less efficient.
+
+SIGNIFICANT CHANGES
+  Since 0.1.x
+   API
+    In 0.1.x, "API" was
+
+        my $section = String::Sections->new();
+        $section->load_*( $source );
+        $section->section_names
+
+    This was inherently fragile, and allowed weird things to occur when
+    people tried to get data from it without it being populated yet.
+
+    So starting with 0.2.0, the "API" is
+
+        my $section = String::Sections->new();
+        my $result  = $section->load_*( $source );
+        $result->section_names;
+
+    And the main class is a factory for "String::Sections::Result" objects.
+
+AUTHOR
+    Kent Fredric <kentnl@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Kent Fredric <kentnl@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,53 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.38.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 78d5c0d4e084488f5d8c2b417a93ff826dd74e7a Base.pm
+SHA1 454e689f67d9216f8b2698db734a3662854224ea Changes
+SHA1 6dce61a5613d61187c9e856f8534e603bb29e529 MANIFEST
+SHA1 7a0eac94cc277f8deeba69b838b14b778f1dac81 META.yml
+SHA1 8dfb50b55ef08f2836cd3735b8053093c81a151d Makefile.PL
+SHA1 e8f6a7b024087a3f90805010dc41ede42d574343 README
+SHA1 cf9b797f777506899aad937f60a585a6e842aea9 doap.rdf
+SHA1 5535e11321a756f3d26a9e587c1b5dcec09ba4a1 t/args.t
+SHA1 71e7bc77032b0822edae3385a37387a5623713a1 t/default.t
+SHA1 5dda1f560b6547e68287d3ad3ab2c0ee95f12da1 t/histfile.t
+SHA1 45ff23ec358829912e0b4b015a5d8d07870a0a2b t/history
+SHA1 ae8b4a4a879370f21308fb8ad03fbade5c0dff5b t/import.t
+SHA1 8e0d5bf9f7260cd8de12f8a6fbb627d1e245827c t/init_completions.t
+SHA1 e15d52b9d9f65d3370067a3b715f8501918ae0f1 t/init_help.t
+SHA1 69ce756e647066874b2e21e7b308389ca8b7cb6b t/init_rcfiles.t
+SHA1 f71cd8e082482654eb2115a160c92398c99dbc98 t/init_rl.t
+SHA1 56b31eab459a102af689ccf871d0bd712c5b088d t/intro.t
+SHA1 b5085c672cf3e597d36900f6a51cf30e85bc9daf t/misc.t
+SHA1 236dad1938e29d70f7a0546c97399bbe78c84260 t/new.t
+SHA1 3d97ec3011959d7c7a6a424d250bf7acfbdd0289 t/outro.t
+SHA1 a7a681812c6df73e408b2a30a785dc937e8d3e38 t/pager.t
+SHA1 65c3eae659e7ae924089454524e6c00f2c06601b t/parse_rcfile.t
+SHA1 c443ab5e0302196f3ff8a64059d923ce5fe6d271 t/parseline.t
+SHA1 ec0e69d0dc4202b6f18ccc450e9b2cc3119a7373 t/pre,postcmd.t
+SHA1 3d363020194359d832e14c17071b8963178fc47f t/progname.t
+SHA1 df2815fe5bd99b0e72a7dd4ba96a19cff470ec24 t/prompt.t
+SHA1 feb59423b8f0177be8e2a4bcd4a24bad6458a7f4 t/prompt_no.t
+SHA1 816e7fd045443b6337b25f57eb5b96e9d37c3630 t/shellrc
+SHA1 721b34c29298c40cae698bdcbc8c77a16bc3637c t/term.t
+SHA1 66fbbebfa03b9b931f16a268a65d1674bbcfa83a t/version.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.6 (GNU/Linux)
+
+iD8DBQFBUA5+zsinjrVhZaoRAla5AJ9QEzKWcSueVdWj2PhtED2SzV4v4QCfSFyY
+fO3i/+7A7wVmWPCrkey2VVY=
+=hJIe
+-----END PGP SIGNATURE-----

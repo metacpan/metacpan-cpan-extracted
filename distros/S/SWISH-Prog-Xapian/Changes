@@ -1,0 +1,39 @@
+Revision history for SWISH-Prog-Xapian
+
+0.01    24 Nov 2009
+    * First version, released on an unsuspecting world.
+
+0.02    1 Dec 2009
+    * fixes to POD
+
+0.03    12 Dec 2009
+    * support SWISH::3::Config format internally.
+      Can now read Swish-e 2.4.x config files and apply
+      them to Swish3 format.
+
+0.04    02 Feb 2010
+    * changes to support SWISH::Prog 0.37:
+        * no more config() for Searcher
+        * Searcher supports multiple InvIndex dbs
+
+0.05    19 June 2011
+    * bump SWISH::3 dependency to 0.09
+
+0.06    22 Oct 2011
+    * add prop_id_map() so that Searcher can return any PropertyName
+      in results
+    * fix some failing tests
+    * bump dependencies
+
+0.07    23 Oct 2011
+    * fix bug where existing swish.xml was being ignored.
+    * add more meta to swish.xml like SWISH::Prog::Lucy has.
+
+0.08    19 Feb 2012
+    * fix prop_id_map in Result
+    * add sorting support
+    * add facets support
+
+0.09    16 Feb 2013
+    * add missing requirements to Makefile.PL
+

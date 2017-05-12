@@ -1,0 +1,7 @@
+
+Add more tests
+  - object call
+  - nested alarm_call calls
+  - setting the _ERROR messages
+  - setting the timeout
+

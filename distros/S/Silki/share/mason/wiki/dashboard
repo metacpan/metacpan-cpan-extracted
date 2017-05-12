@@ -1,0 +1,116 @@
+<div id="dashboard">
+  <div class="yui-g">
+    <div class="yui-u first">
+      <div class="dashboard-item">
+        <h2>Recent Changes</h2>
+
+        <ul>
+% while ( my ( $page, $revision ) = $changes->next() ) {
+          <li>
+            <a href="<% $page->uri() %>"><% $page->title() %>
+              (<% loc( 'revision %1', $revision->revision_number() ) %>)</a>
+            - <% loc( '%datetime(%1)', $c->user()->set_time_zone_for_dt( $revision->creation_datetime() ) ) %>
+          </li>
+% }
+        </ul>
+      </div>
+    </div>
+
+    <div class="yui-u">
+      <div class="dashboard-item">
+        <h2>Popular Pages</h2>
+
+        <ul>
+% while ( my $page = $views->next() ) {
+          <li>
+            <a href="<% $page->uri() %>"><% $page->title() %></a> -
+%   my $raw = $views->raw_row();
+            <% loc( '%quant( %1, view, views )', $raw->[-1] ) %>
+          </li>
+% }
+% unless ( $views->index() ) {
+          <li><% loc( q{Looks like there hasn't been any page view activity in this wiki yet.} ) %></li>
+% }
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="yui-g">
+    <div class="yui-u first">
+      <div class="dashboard-item">
+        <h2>Popular Tags</h2>
+
+        <ul>
+% while ( my $tag = $tags->next() ) {
+<& tag-as-li.mas, tag => $tag, count => $tags->raw_row()->[-1] &>
+% }
+% unless ( $tags->index() ) {
+          <li><% loc( q{Looks like no pages have been tagged in this wiki yet.} ) %></li>
+% }
+        </ul>
+      </div>
+    </div>
+
+    <div class="yui-u">
+      <div class="dashboard-item">
+        <h2>Active Users</h2>
+
+        <ul id="active-users">
+% while ( my $user = $users->next() ) {
+          <li>
+            <& /lib/user-link.mas, user => $user, wiki => $wiki &> -
+            <% loc( '%datetime(%1)', 
+               DateTime::Format::Pg->parse_datetime( $users->raw_row()->[-1] ) ) %>
+          </li>
+% }
+% unless ( $users->index() ) {
+          <li><% loc( q{Looks like there hasn't been any user activity for the past month in this wiki.} ) %></li>
+% }
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="yui-g">
+    <div class="yui-u first">
+      <div class="dashboard-item">
+        <h2><% loc('Wiki Tools') %></h2>
+
+        <ul>
+          <li>
+            <a href="<% $wiki->uri( view => 'attachments' ) %>"
+               title="<% loc('All attachments in this wiki') %>"><% loc( 'All Attachments (%1)', $wiki->file_count() ) %></a>
+          </li>
+          <li>
+            <a href="<% $wiki->uri( view => 'orphans' ) %>"
+               title="<% loc('Pages with no incoming links') %>"><% loc( 'Orphans (%1)', $wiki->orphaned_page_count() ) %></a>
+          </li>
+          <li>
+            <a href="<% $wiki->uri( view => 'wanted' ) %>"
+               title="<% loc( 'Links to pages which do not yet exist' ) %>"><% loc( 'Wanted Pages (%1)', $wiki->wanted_page_count() ) %></a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="yui-u">
+    </div>
+  </div>
+
+</div>
+
+
+<%args>
+$wiki
+$changes
+$tags
+$views
+$users
+</%args>
+
+<%method title>
+<% loc( '%1 Dashboard ', $wiki->title() ) %>
+<%args>
+$wiki
+</%args>
+</%method>

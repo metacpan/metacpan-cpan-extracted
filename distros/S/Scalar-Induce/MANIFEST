@@ -1,0 +1,16 @@
+Build.PL
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+dist.ini
+lib/Scalar/Induce.pm
+lib/Scalar/Induce.xs
+t/00-compile.t
+t/10-pure_perl.t
+t/10-xs.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

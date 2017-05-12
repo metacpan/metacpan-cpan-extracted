@@ -1,0 +1,84 @@
+Sys::CPU is Copyright (c) 2001-2010, MZSanford
+
+This module is free software; you
+can redistribute it and/or modify it under the same terms
+as Perl itself. For more details, see the full text of the
+licenses in the directory LICENSES.
+
+NAME
+    Sys::CPU - Perl extension for getting CPU information. Currently only
+    number of CPU's supported.
+
+SYNOPSIS
+      use Sys::CPU;
+  
+      $number_of_cpus = Sys::CPU::cpu_count();
+      printf("I have %d CPU's\n",$number_of_cpus);
+      print "  Speed : ",Sys::CPU::cpu_clock(),"\n";
+      print "  Type  : ",Sys::CPU::cpu_type(),"\n";
+
+DESCRIPTION
+    In responce to a post on perlmonks.org, a module for counting the number
+    of CPU's on a system. Support has now also been added for type of CPU
+    and clock speed. While much of the code is from UNIX::Processors, win32
+    support has been added (but not tested).
+
+  EXPORT
+
+    None by default.
+
+AUTHOR
+    MZSanford
+MAINTENANCE
+    Marc Koderer
+
+
+SEE ALSO
+    perl(1), sysconf(3)
+
+CHANGES
+
+Revision history for Perl extension Sys::CPU.
+
+0.01  Wed Jun 27 16:43:58 2001
+	- original version; created by h2xs 1.20 with options -A -n Sys::CPU
+
+0.10
+        - Added cpu_type and cpu_clock functions
+        - Changed to better win32 suppport (untested)
+
+0.20
+        - Fixed linux support
+
+0.25
+        - Fixed dist tar problem
+                
+0.30
+        - Fixed win32 supprot to work with Windows 2000 (thanks Gary)
+        - Changed interface to eliminate cpu numbers
+
+0.35
+        - Fixed linux support (thanks Peter)
+
+0.40
+        - Fixed HP-UX support (thanks Brett Gersekowski)
+
+0.45
+        - Fixed Solaris support
+
+0.50
+        - Fixed Darwin/Mac Os support (Marc Koderer)
+
+0.51
+        - Fixed hidden mac os files
+
+0.52
+        - Fixed bug 50933 and 25253
+        - Added license info (Fedora bug 585336)
+
+0.53
+        - Fixed bug in s390 CPU detection (thanks Petr Pisar)
+
+0.54
+        - Clean up some compiler warnings introduced in 0.53 (thanks Petr Pisar)
+        - Clean up other compiler warnings (thanks Petr Pisar)

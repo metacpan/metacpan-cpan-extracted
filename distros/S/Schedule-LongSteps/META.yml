@@ -1,0 +1,28 @@
+---
+abstract: 'Manage long term processes over arbitrary large spans of time.'
+author:
+  - 'Jerome Eteve <jerome.eteve@gmail.com>'
+build_requires:
+  Test::MockDateTime: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Schedule-LongSteps
+requires:
+  Class::Load: '0'
+  Data::UUID: '1.220'
+  DateTime: '1.18'
+  Log::Any: '1.032'
+  Moose: '2.1405'
+  Scope::Guard: '0.21'
+resources:
+  homepage: https://github.com/jeteve/Schedule-LongSteps
+  repository: https://github.com/jeteve/Schedule-LongSteps.git
+version: '0.015'
+x_serialization_backend: 'YAML::Tiny version 1.69'

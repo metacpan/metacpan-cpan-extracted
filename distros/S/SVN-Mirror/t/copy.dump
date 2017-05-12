@@ -1,0 +1,365 @@
+SVN-fs-dump-format-version: 2
+
+UUID: 7c8d9873-fde5-0310-a021-8c25c974132e
+
+Revision-number: 0
+Prop-content-length: 56
+Content-length: 56
+
+K 8
+svn:date
+V 27
+2004-10-09T06:00:58.996459Z
+PROPS-END
+
+Revision-number: 1
+Prop-content-length: 102
+Content-length: 102
+
+K 7
+svn:log
+V 0
+
+K 10
+svn:author
+V 8
+autrijus
+K 8
+svn:date
+V 27
+2004-10-09T06:02:26.089472Z
+PROPS-END
+
+Node-path: foo
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Revision-number: 2
+Prop-content-length: 102
+Content-length: 102
+
+K 7
+svn:log
+V 0
+
+K 10
+svn:author
+V 8
+autrijus
+K 8
+svn:date
+V 27
+2004-10-09T06:02:39.780027Z
+PROPS-END
+
+Node-path: foo/bar
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Revision-number: 3
+Prop-content-length: 102
+Content-length: 102
+
+K 7
+svn:log
+V 0
+
+K 10
+svn:author
+V 8
+autrijus
+K 8
+svn:date
+V 27
+2004-10-09T06:06:46.649383Z
+PROPS-END
+
+Node-path: foo/bar/v1
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: foo/bar/v1/A
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 2
+Text-content-md5: 60b725f10c9c85c70d97880dfe8191b3
+Content-length: 12
+
+PROPS-END
+a
+
+
+Node-path: foo/bar/v1/B
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: foo/bar/v1/B/B1
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 3
+Text-content-md5: 08778dfd9ac4f603231896aba7aad523
+Content-length: 13
+
+PROPS-END
+b1
+
+
+Node-path: foo/bar/v1/C
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: foo/bar/v1/C/C1
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 3
+Text-content-md5: 5f0be34bb091840ea8975755ab076740
+Content-length: 13
+
+PROPS-END
+c1
+
+
+Node-path: foo/bar/v1/C/C2
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: foo/bar/v1/C/C2/C2A
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: foo/bar/v1/C/C2/C2A/C2A1
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 5
+Text-content-md5: a5a607eca268b252d213cca185280b2e
+Content-length: 15
+
+PROPS-END
+c2a1
+
+
+Node-path: foo/bar/v1/C/C2/C2B
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 4
+Text-content-md5: 3e155956a7e7bbe576a67965a775937e
+Content-length: 14
+
+PROPS-END
+c2b
+
+
+Node-path: foo/bar/v1/C/C2/C2C
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 4
+Text-content-md5: e376d57fedc271829c1635339ddb613d
+Content-length: 14
+
+PROPS-END
+c2a
+
+
+Revision-number: 4
+Prop-content-length: 102
+Content-length: 102
+
+K 7
+svn:log
+V 0
+
+K 10
+svn:author
+V 8
+autrijus
+K 8
+svn:date
+V 27
+2004-10-09T06:07:51.378261Z
+PROPS-END
+
+Node-path: foo/bar/v2
+Node-kind: dir
+Node-action: add
+Node-copyfrom-rev: 3
+Node-copyfrom-path: foo/bar/v1
+
+
+Node-path: foo/bar/v2/A
+Node-kind: file
+Node-action: change
+Text-content-length: 5
+Text-content-md5: ed77ecdb26a03bb9ac3b2a80386f5a48
+Content-length: 5
+
+a-v2
+
+
+Node-path: foo/bar/v2/B/B1
+Node-action: delete
+
+
+Node-path: foo/bar/v2/C/C1
+Node-kind: file
+Node-action: change
+Text-content-length: 6
+Text-content-md5: 5edc4ae6f129de80fea554da8e98b8a8
+Content-length: 6
+
+c1-v2
+
+
+Node-path: foo/bar/v2/C/C2/C2A/C2A1
+Node-kind: file
+Node-action: change
+Text-content-length: 8
+Text-content-md5: 86067f0ef02d956fc030639aa283d8d4
+Content-length: 8
+
+c2a1-v2
+
+
+Node-path: foo/bar/v2/C/C2/C2B
+Node-kind: file
+Node-action: change
+Text-content-length: 7
+Text-content-md5: 77d9134bd8729daf00eb6d7746a39bf3
+Content-length: 7
+
+c2b-v2
+
+
+Node-path: foo/bar/v2/C/C2/C2C
+Node-action: delete
+
+
+Revision-number: 5
+Prop-content-length: 102
+Content-length: 102
+
+K 7
+svn:log
+V 0
+
+K 10
+svn:author
+V 8
+autrijus
+K 8
+svn:date
+V 27
+2004-10-09T06:09:09.753092Z
+PROPS-END
+
+Node-path: foo/bar/v3
+Node-kind: dir
+Node-action: add
+Node-copyfrom-rev: 4
+Node-copyfrom-path: foo/bar/v2
+
+
+Node-path: foo/bar/v3/A
+Node-kind: file
+Node-action: change
+Text-content-length: 5
+Text-content-md5: ad7c00e1585c11ea5c038a684e531c7d
+Content-length: 5
+
+a-v3
+
+
+Node-path: foo/bar/v3/B/B1
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 6
+Text-content-md5: c1fb402adc8eab82761b3949c375d074
+Content-length: 16
+
+PROPS-END
+B1-v3
+
+
+Node-path: foo/bar/v3/C/C1
+Node-kind: file
+Node-action: change
+Text-content-length: 6
+Text-content-md5: d89756db7f1e69fdfac8826789104744
+Content-length: 6
+
+c1-v3
+
+
+Node-path: foo/bar/v3/C/C2/C2A/C2A1
+Node-kind: file
+Node-action: change
+Text-content-length: 8
+Text-content-md5: a63aa94ea2525689de9efe76a1afc64c
+Content-length: 8
+
+c2a1-v3
+
+
+Node-path: foo/bar/v3/C/C2/C2B
+Node-kind: file
+Node-action: change
+Text-content-length: 7
+Text-content-md5: d55ec3d5dcdf52f8c486187c90db59ed
+Content-length: 7
+
+c2b-v3
+
+
+Node-path: foo/bar/v3/C/C2/C2C
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 7
+Text-content-md5: b3affaa51af25e24726f439649227c32
+Content-length: 17
+
+PROPS-END
+C2C-v3
+
+

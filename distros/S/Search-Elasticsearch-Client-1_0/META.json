@@ -1,0 +1,76 @@
+{
+   "abstract" : "Thin client with full support for Elasticsearch 1.x APIs",
+   "author" : [
+      "Clinton Gormley <drtech@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Search-Elasticsearch-Client-1_0",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::EOL" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Devel::GlobalDestruction" : "0",
+            "Moo" : "0",
+            "Moo::Role" : "0",
+            "Search::Elasticsearch" : "5.02",
+            "Search::Elasticsearch::Role::API" : "0",
+            "Search::Elasticsearch::Role::Client::Direct" : "0",
+            "Search::Elasticsearch::Role::Is_Sync" : "0",
+            "Search::Elasticsearch::Util" : "0",
+            "Try::Tiny" : "0",
+            "namespace::clean" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "IO::Socket::SSL" : "0",
+            "Log::Any::Adapter" : "0",
+            "Log::Any::Adapter::Callback" : "0.09",
+            "POSIX" : "0",
+            "Search::Elasticsearch::Role::Cxn" : "0",
+            "Sub::Exporter" : "0",
+            "Test::Deep" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0.98",
+            "lib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/elastic/elasticsearch-perl/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/elastic/elasticsearch-perl.git",
+         "web" : "https://github.com/elastic/elasticsearch-perl"
+      }
+   },
+   "version" : "5.02",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
+}
+

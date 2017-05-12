@@ -1,0 +1,13 @@
+Revision history for Sub-Deferrable
+
+0.05    12/15/2012
+        Minor cleanup and kwalitee enhancements.
+
+0.04    10/27/2012
+        Switch to Build.PL and add author tests.
+
+0.03    3/18/08
+        "Optimize" undefer() by schwern
+
+0.01    9/19/2006
+        First version, released on an unsuspecting world.

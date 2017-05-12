@@ -1,0 +1,12 @@
+Makefile$
+.git
+blib
+c-test
+\.o$
+MANIFEST.bak
+\.bs$
+Sort-XS-
+Makefile.old
+.project
+XS.c
+MYMETA.

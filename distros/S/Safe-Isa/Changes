@@ -1,0 +1,26 @@
+Revision history for Safe-Isa
+
+1.000006 - 2016-10-31
+  - now falling back to $obj->isa if DOES/does is not implemented on the
+    object, to avoid fatal errors on perls too old to have their own DOES
+    (RT#100866)
+
+1.000005 - 2014-08-16
+  - comment blessed use so people who don't know perl stop trying to break it
+  - add link to lightning talk given at YAPC::NA 2013
+
+1.000004 - 2013-09-18
+  - fixed slightly mangled metadata from last release
+
+1.000003 - 2013-03-25
+  - fix NAME in Makefile.PL (RT#84212)
+
+1.000002 - 2012-07-19
+  - Document why we don't try and handle class names
+  - Missed another stupid doc typo (thanks MJD)
+
+1.000001 - 2012-07-18
+  - Fix stupid doc typo (thanks miyagawa)
+
+1.000000 - 2012-07-18
+  - Initial release

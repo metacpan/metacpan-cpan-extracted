@@ -1,0 +1,443 @@
+<?xml version="1.0"?>
+<!DOCTYPE TopicSet PUBLIC "urn:newsml:iptc.org:20001006:NewsMLv1.0.dtd:1" "NewsMLv1.0.dtd">
+<TopicSet Duid="iptc.mimetype" FormalName="MimeType">
+	<Comment xml:lang="en">The formal label identifying the MIME-type of a ContentItem.</Comment>
+	<Topic Duid="mim2">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">text/vnd.IPTC.NewsML</FormalName>
+		<Description xml:lang="en">IPTC News Markup Language (NewsML(tm))</Description>
+		<Property FormalName="FileExtension" Value="xml"/>
+	</Topic>
+	<Topic Duid="mim3">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">text/vnd.IPTC.NITF</FormalName>
+		<Description xml:lang="en">IPTC News Industry Text Format (NITF).</Description>
+		<Property FormalName="FileExtension" Value="xml"/>
+	</Topic>
+	<Topic Duid="mim4">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">application/acad</FormalName>
+		<Description xml:lang="en">AutoCAD drawing files</Description>
+		<Property FormalName="FileExtension" Value="dwg"/>
+	</Topic>
+	<Topic Duid="mim5">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">application/x-binhex</FormalName>
+		<Description xml:lang="en">BinHex Encoded</Description>
+		<Property FormalName="FileExtension" Value="hqx"/>
+		<Property FormalName="FileExtension" Value="uue"/>
+		<Property FormalName="FileExtension" Value="xxe"/>
+	</Topic>
+	<Topic Duid="mim6">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">application/clariscad</FormalName>
+		<Description xml:lang="en">ClarisCAD files</Description>
+		<Property FormalName="FileExtension" Value="ccad"/>
+	</Topic>
+	<Topic Duid="mim7">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">application/dxf</FormalName>
+		<Description xml:lang="en">DXF (AutoCAD)</Description>
+		<Property FormalName="FileExtension" Value="dxf"/>
+	</Topic>
+	<Topic Duid="mim8">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">application/msaccess</FormalName>
+		<Description xml:lang="en">Microsoft Access file</Description>
+		<Property FormalName="FileExtension" Value="mdb"/>
+	</Topic>
+	<Topic Duid="mim9">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">application/msword</FormalName>
+		<Description xml:lang="en">Microsoft Word file</Description>
+		<Property FormalName="FileExtension" Value="doc"/>
+	</Topic>
+	<Topic Duid="mim10">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">application/octet-stream</FormalName>
+		<Description xml:lang="en">Uninterpreted binary</Description>
+		<Property FormalName="FileExtension" Value="bin"/>
+	</Topic>
+	<Topic Duid="mim11">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">application/pdf</FormalName>
+		<Description xml:lang="en">PDF (Adobe Acrobat)</Description>
+		<Property FormalName="FileExtension" Value="pdf"/>
+	</Topic>
+	<Topic Duid="mim12">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">application/postscript</FormalName>
+		<Description xml:lang="en">PostScript, encapsulated PostScript,Adobe Illustrator</Description>
+		<Property FormalName="FileExtension" Value="ai"/>
+		<Property FormalName="FileExtension" Value="ps"/>
+		<Property FormalName="FileExtension" Value="eps"/>
+	</Topic>
+	<Topic Duid="mim13">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">application/rtf</FormalName>
+		<Description xml:lang="en">Rich Text Format file</Description>
+		<Property FormalName="FileExtension" Value="rtf"/>
+	</Topic>
+	<Topic Duid="mim14">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">application/vnd.ms-excel</FormalName>
+		<Description xml:lang="en">Microsoft Excel file</Description>
+		<Property FormalName="FileExtension" Value="xls"/>
+	</Topic>
+	<Topic Duid="mim15">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">application/vnd.ms-powerpoint</FormalName>
+		<Description xml:lang="en">Microsoft PowerPoint file</Description>
+		<Property FormalName="FileExtension" Value="ppt"/>
+	</Topic>
+	<Topic Duid="mim16">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">application/x-cdf</FormalName>
+		<Description xml:lang="en">Channel Definition Format file</Description>
+		<Property FormalName="FileExtension" Value="cdf"/>
+	</Topic>
+	<Topic Duid="mim17">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">application/x-csh</FormalName>
+		<Description xml:lang="en">C-shell script</Description>
+		<Property FormalName="FileExtension" Value="csh"/>
+	</Topic>
+	<Topic Duid="mim18">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">application/x-dvi</FormalName>
+		<Description xml:lang="en">TeX</Description>
+		<Property FormalName="FileExtension" Value="dvi"/>
+	</Topic>
+	<Topic Duid="mim19">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">application/x-javascript</FormalName>
+		<Description xml:lang="en">JavaScript source file</Description>
+		<Property FormalName="FileExtension" Value="js"/>
+	</Topic>
+	<Topic Duid="mim20">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">application/x-latex</FormalName>
+		<Description xml:lang="en">LaTeX source file</Description>
+		<Property FormalName="FileExtension" Value="latex"/>
+	</Topic>
+	<Topic Duid="mim21">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">application/x-mif</FormalName>
+		<Description xml:lang="en">FrameMaker MIF format</Description>
+		<Property FormalName="FileExtension" Value="mif"/>
+	</Topic>
+	<Topic Duid="mim22">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">application/x-msexcel</FormalName>
+		<Description xml:lang="en">Microsoft Excel file</Description>
+		<Property FormalName="FileExtension" Value="xls"/>
+	</Topic>
+	<Topic Duid="mim23">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">application/x-mspowerpoint</FormalName>
+		<Description xml:lang="en">Microsoft PowerPoint file</Description>
+		<Property FormalName="FileExtension" Value="ppt"/>
+	</Topic>
+	<Topic Duid="mim24">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">application/x-tcl</FormalName>
+		<Description xml:lang="en">TCL script</Description>
+		<Property FormalName="FileExtension" Value="tcl"/>
+	</Topic>
+	<Topic Duid="mim25">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">application/x-tex</FormalName>
+		<Description xml:lang="en">TeX source file</Description>
+		<Property FormalName="FileExtension" Value="tex"/>
+	</Topic>
+	<Topic Duid="mim26">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">application/x-texinfo</FormalName>
+		<Description xml:lang="en">Texinfo (emacs)</Description>
+		<Property FormalName="FileExtension" Value="texinfo, texi "/>
+	</Topic>
+	<Topic Duid="mim27">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">application/x-troff</FormalName>
+		<Description xml:lang="en">troff file</Description>
+		<Property FormalName="FileExtension" Value="t"/>
+		<Property FormalName="FileExtension" Value="tr"/>
+		<Property FormalName="FileExtension" Value="roff"/>
+	</Topic>
+	<Topic Duid="mim28">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">application/x-troff-man</FormalName>
+		<Description xml:lang="en">troff with MAN macros</Description>
+		<Property FormalName="FileExtension" Value="man "/>
+	</Topic>
+	<Topic Duid="mim29">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">application/x-troff-me</FormalName>
+		<Description xml:lang="en">troff with ME macros</Description>
+		<Property FormalName="FileExtension" Value="me"/>
+	</Topic>
+	<Topic Duid="mim30">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">application/x-troff-ms</FormalName>
+		<Description xml:lang="en">troff with MS macros</Description>
+		<Property FormalName="FileExtension" Value="ms"/>
+	</Topic>
+	<Topic Duid="mim31">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">application/x-wais-source</FormalName>
+		<Description xml:lang="en">WAIS source file</Description>
+		<Property FormalName="FileExtension" Value="src"/>
+	</Topic>
+	<Topic Duid="mim32">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">application/zip</FormalName>
+		<Description xml:lang="en">ZIP archive</Description>
+		<Property FormalName="FileExtension" Value="zip"/>
+	</Topic>
+	<Topic Duid="mim33">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">audio/basic</FormalName>
+		<Description xml:lang="en">Basic audio (usually m-law)</Description>
+		<Property FormalName="FileExtension" Value="au"/>
+		<Property FormalName="FileExtension" Value="snd"/>
+	</Topic>
+	<Topic Duid="mim34">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">audio/x-aiff</FormalName>
+		<Description xml:lang="en">AIFF audio</Description>
+		<Property FormalName="FileExtension" Value="aif"/>
+		<Property FormalName="FileExtension" Value="aiff"/>
+		<Property FormalName="FileExtension" Value="aifc"/>
+	</Topic>
+	<Topic Duid="mim35">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">audio/x-wav</FormalName>
+		<Description xml:lang="en">Windows WAVE audio</Description>
+		<Property FormalName="FileExtension" Value="wav "/>
+	</Topic>
+	<Topic Duid="mim36">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">audio/mp3</FormalName>
+		<Description xml:lang="en">ISO MPEG audio</Description>
+		<Property FormalName="FileExtension" Value="mp3"/>
+	</Topic>
+	<Topic Duid="mim37">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">image/bmp</FormalName>
+		<Description xml:lang="en">Microsoft Bit Mapped Image</Description>
+		<Property FormalName="FileExtension" Value="bmp"/>
+	</Topic>
+	<Topic Duid="mim38">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">image/gif</FormalName>
+		<Description xml:lang="en">GIF image</Description>
+		<Property FormalName="FileExtension" Value="gif"/>
+	</Topic>
+	<Topic Duid="mim39">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">image/ief</FormalName>
+		<Description xml:lang="en">Image Exchange Format file</Description>
+		<Property FormalName="FileExtension" Value="ief"/>
+	</Topic>
+	<Topic Duid="mim40">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">image/jpeg</FormalName>
+		<Description xml:lang="en">JPEG image</Description>
+		<Property FormalName="FileExtension" Value="jpeg"/>
+		<Property FormalName="FileExtension" Value="jpg"/>
+		<Property FormalName="FileExtension" Value="jpe"/>
+	</Topic>
+	<Topic Duid="mim41">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">image/tiff</FormalName>
+		<Description xml:lang="en">TIFF image</Description>
+		<Property FormalName="FileExtension" Value="tiff"/>
+		<Property FormalName="FileExtension" Value="tif"/>
+	</Topic>
+	<Topic Duid="mim42">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">image/x-cmu-raster</FormalName>
+		<Description xml:lang="en">CMU Raster image</Description>
+		<Property FormalName="FileExtension" Value="ras"/>
+	</Topic>
+	<Topic Duid="mim43">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">image/x-portable-anymap</FormalName>
+		<Description xml:lang="en">PBM Anymap image format</Description>
+		<Property FormalName="FileExtension" Value="pnm"/>
+	</Topic>
+	<Topic Duid="mim44">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">image/x-portable-bitmap</FormalName>
+		<Description xml:lang="en">PBM Bitmap image format</Description>
+		<Property FormalName="FileExtension" Value="pbm"/>
+	</Topic>
+	<Topic Duid="mim45">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">image/x-portable-graymap</FormalName>
+		<Description xml:lang="en">PBM Graymap image format</Description>
+		<Property FormalName="FileExtension" Value="pgm"/>
+	</Topic>
+	<Topic Duid="mim46">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">image/x-portable-pixmap</FormalName>
+		<Description xml:lang="en">PBM Pixmap image format</Description>
+		<Property FormalName="FileExtension" Value="ppm"/>
+	</Topic>
+	<Topic Duid="mim47">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">image/x-rgb</FormalName>
+		<Description xml:lang="en">RGB image format</Description>
+		<Property FormalName="FileExtension" Value="rgb"/>
+	</Topic>
+	<Topic Duid="mim48">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">image/x-xbitmap</FormalName>
+		<Description xml:lang="en">X Bitmap image</Description>
+		<Property FormalName="FileExtension" Value="xbm"/>
+	</Topic>
+	<Topic Duid="mim49">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">image/x-xpixmap</FormalName>
+		<Description xml:lang="en">X Pixmap image</Description>
+		<Property FormalName="FileExtension" Value="xpm"/>
+	</Topic>
+	<Topic Duid="mim50">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">image/x-xwindowdump</FormalName>
+		<Description xml:lang="en">X Windows Dump (xwd)</Description>
+		<Property FormalName="FileExtension" Value="xwd"/>
+	</Topic>
+	<Topic Duid="mim51">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">multipart/x-gzip</FormalName>
+		<Description xml:lang="en">GNU ZIP archive</Description>
+		<Property FormalName="FileExtension" Value="gzip"/>
+	</Topic>
+	<Topic Duid="mim52">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">multipart/x-zip</FormalName>
+		<Description xml:lang="en">PKZIP archive</Description>
+		<Property FormalName="FileExtension" Value="zip"/>
+	</Topic>
+	<Topic Duid="mim53">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">text/css</FormalName>
+		<Description xml:lang="en">Cascading style sheet</Description>
+		<Property FormalName="FileExtension" Value="css"/>
+	</Topic>
+	<Topic Duid="mim54">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">text/html</FormalName>
+		<Description xml:lang="en">HTML file</Description>
+		<Property FormalName="FileExtension" Value="html"/>
+		<Property FormalName="FileExtension" Value="htm"/>
+	</Topic>
+	<Topic Duid="mim55">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">text/plain</FormalName>
+		<Description xml:lang="en">Plain text</Description>
+		<Property FormalName="FileExtension" Value="txt "/>
+	</Topic>
+	<Topic Duid="mim56">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">text/richtext</FormalName>
+		<Description xml:lang="en">MIME Rich Text</Description>
+		<Property FormalName="FileExtension" Value="rtx"/>
+	</Topic>
+	<Topic Duid="mim57">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">text/rtf</FormalName>
+		<Description xml:lang="en">Rich Text Format</Description>
+		<Property FormalName="FileExtension" Value="rtf"/>
+	</Topic>
+	<Topic Duid="mim58">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">application/msword</FormalName>
+		<Description xml:lang="en">Microsoft Word Document</Description>
+		<Property FormalName="FileExtension" Value="doc"/>
+	</Topic>
+	<Topic Duid="mim59">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">text/tab-separated- values</FormalName>
+		<Description xml:lang="en">Text with tab-separated values</Description>
+		<Property FormalName="FileExtension" Value="tsv"/>
+	</Topic>
+	<Topic Duid="mim60">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">text/sgml</FormalName>
+		<Description xml:lang="en">SGML document (ISO 8879)</Description>
+		<Property FormalName="FileExtension" Value="sgml"/>
+		<Property FormalName="FileExtension" Value="sgm"/>
+	</Topic>
+	<Topic Duid="mim61">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">text/xml</FormalName>
+		<Description xml:lang="en">XML document</Description>
+		<Property FormalName="FileExtension" Value="xml"/>
+	</Topic>
+	<Topic Duid="mim62">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">text/x-setext</FormalName>
+		<Description xml:lang="en">Struct-Enhanced text</Description>
+		<Property FormalName="FileExtension" Value="etx"/>
+	</Topic>
+	<Topic Duid="mim63">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">text/xsl</FormalName>
+		<Description xml:lang="en">XSL style sheet</Description>
+		<Property FormalName="FileExtension" Value="xsl"/>
+	</Topic>
+	<Topic Duid="mim64">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">video/mpeg</FormalName>
+		<Description xml:lang="en">MPEG video</Description>
+		<Property FormalName="FileExtension" Value="mpeg"/>
+		<Property FormalName="FileExtension" Value="mpg"/>
+		<Property FormalName="FileExtension" Value="mpe"/>
+	</Topic>
+	<Topic Duid="mim65">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">video/quicktime</FormalName>
+		<Description xml:lang="en">QuickTime video</Description>
+		<Property FormalName="FileExtension" Value="qt"/>
+		<Property FormalName="FileExtension" Value="mov"/>
+	</Topic>
+	<Topic Duid="mim66">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">video/x-msvideo</FormalName>
+		<Description xml:lang="en">Microsoft Windows video</Description>
+		<Property FormalName="FileExtension" Value="avi"/>
+	</Topic>
+	<Topic Duid="mim67">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">video/x-sgi-movie</FormalName>
+		<Description xml:lang="en">SGI movie player format</Description>
+		<Property FormalName="FileExtension" Value="movie "/>
+	</Topic>
+	<Topic Duid="mim68">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">image/png</FormalName>
+		<Description xml:lang="en">Portable Network Graphics Image</Description>
+		<Property FormalName="FileExtension" Value="png"/>
+	</Topic>
+	<Topic Duid="mim69">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">image/cgm</FormalName>
+		<Description xml:lang="en">Computer Graphics Metafile</Description>
+		<Property FormalName="FileExtension" Value="cgm"/>
+	</Topic>
+	<Topic Duid="mim70">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">audio/x-pn-realaudio</FormalName>
+		<Description xml:lang="en">Real Audio</Description>
+		<Property FormalName="FileExtension" Value="rm"/>
+	</Topic>
+	<Topic Duid="mim71">
+		<TopicType Scheme="IptcTopicType" FormalName="MimeType"/>
+		<FormalName Scheme="IptcMimeTypes">video/x-pn-realvideo</FormalName>
+		<Description xml:lang="en">Real Video</Description>
+		<Property FormalName="FileExtension" Value="rm"/>
+	</Topic>
+</TopicSet>
+

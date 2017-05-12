@@ -1,0 +1,28 @@
+String-Compare-Length 
+==================================
+
+With this module, you can calculate the difference in 
+length between a string and the average length of strings 
+in an array. Not limiting itself to simple arrays, the 
+module also accomodates hashes of arrays. You can also 
+compare the average lengths of strings in two arrays.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by Mike Accardo
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

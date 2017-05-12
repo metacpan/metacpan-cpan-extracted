@@ -1,0 +1,38 @@
+=pod
+
+=head1 Serengeti - High-level automation tool for scraping websites.
+
+Serengeti is a framework that lets you scrape websites using JavaScript 
+syntax. 
+
+The tool provides developers with both high-level (think DOM, forms etc) as 
+well as more low-level access (think raw source) of the resources it requests.
+
+=head1 API
+
+=head2 The global object - $
+
+=head3 Methods
+
+=over 4
+
+=item get ( url : String ) : Response
+
+=item get ( url : String, query_params : Object ) : Response
+
+=back
+
+=head2 Response
+
+=head3 Properties
+
+=head3 Methods
+
+=over 4
+
+=item form ( search_query : Object ) : Form
+
+=back
+
+=cut
+

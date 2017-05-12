@@ -1,0 +1,3 @@
+﻿srvrmgr> load preferences
+File: /opt/oracle/app/product/8.0.0/siebel_1/siebsrvr/bin/.Siebel_svrmgr.pref
+

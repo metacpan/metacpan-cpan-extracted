@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+Mmsg.xs
+README
+t/Socket-Mmsg.t
+lib/Socket/Mmsg.pm

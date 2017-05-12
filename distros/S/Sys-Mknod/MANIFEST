@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+Mknod.pm
+README
+t/01-mknod.t
+META.yml                                 Module meta-data (added by MakeMaker)
+debian/rules				Debian build files
+debian/README.Debian
+debian/changelog
+debian/control
+debian/copyright

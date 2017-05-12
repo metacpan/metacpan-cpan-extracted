@@ -1,0 +1,41 @@
+---
+abstract: 'get type and class information for scalars'
+author:
+  - 'Joseph Brenner, <doom@kzsu.stanford.edu>'
+build_requires:
+  FindBin: '0'
+  Test::Deep: '0'
+  Test::Exception: '0'
+  Test::More: '0.96'
+  lib: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.16, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Scalar-Classify
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  Exporter: '0'
+  Scalar::Util: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/doomvox/scalar-classify/issues
+  homepage: https://github.com/doomvox/scalar-classify
+  repository: https://github.com/doomvox/scalar-classify.git
+version: '0.02'
+x_contributors:
+  - 'Joseph Brenner <doomvox@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.64'

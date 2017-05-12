@@ -1,0 +1,69 @@
+---
+abstract: 'simple spreadsheet worker'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test::More: '0.61'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.016, CPAN::Meta::Converter version 2.140640'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Spreadsheet-Wright
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Spreadsheet::Wright:
+    file: lib/Spreadsheet/Wright.pm
+    version: '0.105'
+  Spreadsheet::Wright::CSV:
+    file: lib/Spreadsheet/Wright/CSV.pm
+    version: '0.105'
+  Spreadsheet::Wright::Excel:
+    file: lib/Spreadsheet/Wright/Excel.pm
+    version: '0.105'
+  Spreadsheet::Wright::HTML:
+    file: lib/Spreadsheet/Wright/HTML.pm
+    version: '0.105'
+  Spreadsheet::Wright::JSON:
+    file: lib/Spreadsheet/Wright/JSON.pm
+    version: '0.105'
+  Spreadsheet::Wright::OpenDocument:
+    file: lib/Spreadsheet/Wright/OpenDocument.pm
+    version: '0.105'
+  Spreadsheet::Wright::OpenDocumentXML:
+    file: lib/Spreadsheet/Wright/OpenDocumentXML.pm
+    version: '0.105'
+  Spreadsheet::Wright::XHTML:
+    file: lib/Spreadsheet/Wright/XHTML.pm
+    version: '0.105'
+recommends:
+  Archive::Zip: '0'
+  DateTime: '0'
+  HTML::HTML5::Writer: '0'
+  JSON: '0'
+  Spreadsheet::WriteExcel: '0'
+  XML::LibXML: '1.62'
+requires:
+  Text::CSV: '0'
+  parent: '0'
+  perl: '5.010000'
+resources:
+  X_identifier: http://purl.org/NET/cpan-uri/dist/Spreadsheet-Wright/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Spreadsheet-Wright
+  homepage: https://metacpan.org/release/Spreadsheet-Wright
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-spreadsheet-wright.git
+version: '0.105'
+x_contributors:
+  - 'AMALTSEV <amaltsev@cpan.org>'

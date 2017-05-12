@@ -1,0 +1,12 @@
+Revision history for StreamRoot-Manifest
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+        
+0.02    2015-08-18/12:32
+        Changed url of method authenticate and added header 'Content-type: application/x-www-form-urlencoded'.
+        Chenged methods: addManifest, updateManifest, removeManifest & showManifest, now can add many params.
+        Created method loop to added many params.
+
+0.03    2015-08-18/17:01
+        Solved error in documentation

@@ -1,0 +1,73 @@
+{
+   "abstract" : "An incremental logparser to be used with Net-SNMP",
+   "author" : [
+      "Nito Martinez <nito@qindel.es>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "SNMP-LogParser",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "FindBin" : "0",
+            "IPC::Run3" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.14",
+            "Test::Pod::Coverage" : "1.04",
+            "Test::SharedFork" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::Properties::Simple" : "0.14",
+            "Data::Dumper" : "0",
+            "Fcntl" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "File::stat" : "0",
+            "Getopt::Long" : "0",
+            "Log::Dispatch::FileRotate" : "0",
+            "Log::Log4perl" : "0",
+            "POSIX" : "0",
+            "Pod::Usage" : "0",
+            "Proc::ProcessTable" : "0",
+            "Statistics::Descriptive" : "0",
+            "Storable" : "0",
+            "constant" : "0",
+            "lib" : "0",
+            "parent" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "SNMP::LogParser" : {
+         "file" : "lib/SNMP/LogParser.pm",
+         "version" : "1.27938"
+      },
+      "SNMP::LogParserDriver" : {
+         "file" : "lib/SNMP/LogParserDriver.pm"
+      },
+      "SNMP::LogParserDriver::ExampleDriver" : {
+         "file" : "lib/SNMP/LogParserDriver/ExampleDriver.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.27938"
+}

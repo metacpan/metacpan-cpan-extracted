@@ -1,0 +1,18 @@
+Changes
+inc/Devel/CheckLib.pm
+lib/Set/IntSpan/Fast/XS.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/all-range.t
+t/basic.t
+t/construct.t
+t/internals.t
+t/misc.t
+t/miscstring.t
+t/pod.t
+t/string.t
+XS.xs
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

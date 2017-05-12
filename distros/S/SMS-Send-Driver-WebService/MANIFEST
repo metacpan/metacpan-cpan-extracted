@@ -1,0 +1,18 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/SMS/Send/Driver/WebService.pm
+t/001_load.t
+t/002_new.t
+t/003_set.t
+t/004_cfg.t
+t/005_subclass.t
+t/006_subclass_defaults.t
+t/007_subclass_defaults_cfg.t
+t/008_url.t
+perl-SMS-Send-Driver-WebService.spec
+SMS-Send.ini
+META.yml                                 Module meta-data (added by MakeMaker)

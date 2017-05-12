@@ -1,0 +1,22 @@
+version 0.001; 2012-02-01
+
+  * bugfix: properly avoid duff constant folding with pos() code on Perl
+    5.9.4 and above, which only occurred when warnings were disabled in
+    the context of the pos() expression
+
+  * bugfix: also influence rindex, as $[ does
+
+  * bugfix: require bugfixed version of Lexical::SealRequireHints (for
+    compatibility with early-loaded warnings.pm) and invoke it earlier
+    to make sure it takes effect in time
+
+  * update documentation for $[ changes in Perl 5.15.3 and 5.15.5
+
+  * in Build.PL, declare incompatibility with pre-0.19
+    B::Hooks::OP::Check, which doesn't play nicely around op check hooking
+
+  * convert .cvsignore to .gitignore
+
+version 0.000; 2011-09-07
+
+  * initial released version

@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:s0="http://mcp.org/WebServices/Persistence" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" targetNamespace="http://mcp.org/WebServices/Persistence" xmlns="http://schemas.xmlsoap.org/wsdl/">
+  <types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://mcp.org/WebServices/Persistence">
+      <s:element name="Get">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="myName" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="Put">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="myName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="myValue" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="PutResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="TestString">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="x" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="TestStringResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="TestStringResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="TestMath">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="x" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="y" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="TestMathResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="TestMathResult" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="string" nillable="true" type="s:string" />
+      <s:element name="int" type="s:int" />
+    </s:schema>
+  </types>
+  <message name="GetSoapIn">
+    <part name="parameters" element="s0:Get" />
+  </message>
+  <message name="GetSoapOut">
+    <part name="parameters" element="s0:GetResponse" />
+  </message>
+  <message name="PutSoapIn">
+    <part name="parameters" element="s0:Put" />
+  </message>
+  <message name="PutSoapOut">
+    <part name="parameters" element="s0:PutResponse" />
+  </message>
+  <message name="TestStringSoapIn">
+    <part name="parameters" element="s0:TestString" />
+  </message>
+  <message name="TestStringSoapOut">
+    <part name="parameters" element="s0:TestStringResponse" />
+  </message>
+  <message name="TestMathSoapIn">
+    <part name="parameters" element="s0:TestMath" />
+  </message>
+  <message name="TestMathSoapOut">
+    <part name="parameters" element="s0:TestMathResponse" />
+  </message>
+  <message name="GetHttpGetIn">
+    <part name="myName" type="s:string" />
+  </message>
+  <message name="GetHttpGetOut">
+    <part name="Body" element="s0:string" />
+  </message>
+  <message name="PutHttpGetIn">
+    <part name="myName" type="s:string" />
+    <part name="myValue" type="s:string" />
+  </message>
+  <message name="PutHttpGetOut" />
+  <message name="TestStringHttpGetIn">
+    <part name="x" type="s:string" />
+  </message>
+  <message name="TestStringHttpGetOut">
+    <part name="Body" element="s0:string" />
+  </message>
+  <message name="TestMathHttpGetIn">
+    <part name="x" type="s:string" />
+    <part name="y" type="s:string" />
+  </message>
+  <message name="TestMathHttpGetOut">
+    <part name="Body" element="s0:int" />
+  </message>
+  <message name="GetHttpPostIn">
+    <part name="myName" type="s:string" />
+  </message>
+  <message name="GetHttpPostOut">
+    <part name="Body" element="s0:string" />
+  </message>
+  <message name="PutHttpPostIn">
+    <part name="myName" type="s:string" />
+    <part name="myValue" type="s:string" />
+  </message>
+  <message name="PutHttpPostOut" />
+  <message name="TestStringHttpPostIn">
+    <part name="x" type="s:string" />
+  </message>
+  <message name="TestStringHttpPostOut">
+    <part name="Body" element="s0:string" />
+  </message>
+  <message name="TestMathHttpPostIn">
+    <part name="x" type="s:string" />
+    <part name="y" type="s:string" />
+  </message>
+  <message name="TestMathHttpPostOut">
+    <part name="Body" element="s0:int" />
+  </message>
+  <portType name="PersistenceSoap">
+    <operation name="Get">
+      <input message="s0:GetSoapIn" />
+      <output message="s0:GetSoapOut" />
+    </operation>
+    <operation name="Put">
+      <input message="s0:PutSoapIn" />
+      <output message="s0:PutSoapOut" />
+    </operation>
+    <operation name="TestString">
+      <input message="s0:TestStringSoapIn" />
+      <output message="s0:TestStringSoapOut" />
+    </operation>
+    <operation name="TestMath">
+      <input message="s0:TestMathSoapIn" />
+      <output message="s0:TestMathSoapOut" />
+    </operation>
+  </portType>
+  <portType name="PersistenceHttpGet">
+    <operation name="Get">
+      <input message="s0:GetHttpGetIn" />
+      <output message="s0:GetHttpGetOut" />
+    </operation>
+    <operation name="Put">
+      <input message="s0:PutHttpGetIn" />
+      <output message="s0:PutHttpGetOut" />
+    </operation>
+    <operation name="TestString">
+      <input message="s0:TestStringHttpGetIn" />
+      <output message="s0:TestStringHttpGetOut" />
+    </operation>
+    <operation name="TestMath">
+      <input message="s0:TestMathHttpGetIn" />
+      <output message="s0:TestMathHttpGetOut" />
+    </operation>
+  </portType>
+  <portType name="PersistenceHttpPost">
+    <operation name="Get">
+      <input message="s0:GetHttpPostIn" />
+      <output message="s0:GetHttpPostOut" />
+    </operation>
+    <operation name="Put">
+      <input message="s0:PutHttpPostIn" />
+      <output message="s0:PutHttpPostOut" />
+    </operation>
+    <operation name="TestString">
+      <input message="s0:TestStringHttpPostIn" />
+      <output message="s0:TestStringHttpPostOut" />
+    </operation>
+    <operation name="TestMath">
+      <input message="s0:TestMathHttpPostIn" />
+      <output message="s0:TestMathHttpPostOut" />
+    </operation>
+  </portType>
+  <binding name="PersistenceSoap" type="s0:PersistenceSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document" />
+    <operation name="Get">
+      <soap:operation soapAction="http://mcp.org/WebServices/Persistence/Get" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="Put">
+      <soap:operation soapAction="http://mcp.org/WebServices/Persistence/Put" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="TestString">
+      <soap:operation soapAction="http://mcp.org/WebServices/Persistence/TestString" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="TestMath">
+      <soap:operation soapAction="http://mcp.org/WebServices/Persistence/TestMath" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+  </binding>
+  <binding name="PersistenceHttpGet" type="s0:PersistenceHttpGet">
+    <http:binding verb="GET" />
+    <operation name="Get">
+      <http:operation location="/Get" />
+      <input>
+        <http:urlEncoded />
+      </input>
+      <output>
+        <mime:mimeXml part="Body" />
+      </output>
+    </operation>
+    <operation name="Put">
+      <http:operation location="/Put" />
+      <input>
+        <http:urlEncoded />
+      </input>
+      <output />
+    </operation>
+    <operation name="TestString">
+      <http:operation location="/TestString" />
+      <input>
+        <http:urlEncoded />
+      </input>
+      <output>
+        <mime:mimeXml part="Body" />
+      </output>
+    </operation>
+    <operation name="TestMath">
+      <http:operation location="/TestMath" />
+      <input>
+        <http:urlEncoded />
+      </input>
+      <output>
+        <mime:mimeXml part="Body" />
+      </output>
+    </operation>
+  </binding>
+  <binding name="PersistenceHttpPost" type="s0:PersistenceHttpPost">
+    <http:binding verb="POST" />
+    <operation name="Get">
+      <http:operation location="/Get" />
+      <input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </input>
+      <output>
+        <mime:mimeXml part="Body" />
+      </output>
+    </operation>
+    <operation name="Put">
+      <http:operation location="/Put" />
+      <input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </input>
+      <output />
+    </operation>
+    <operation name="TestString">
+      <http:operation location="/TestString" />
+      <input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </input>
+      <output>
+        <mime:mimeXml part="Body" />
+      </output>
+    </operation>
+    <operation name="TestMath">
+      <http:operation location="/TestMath" />
+      <input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </input>
+      <output>
+        <mime:mimeXml part="Body" />
+      </output>
+    </operation>
+  </binding>
+  <service name="Persistence">
+    <port name="PersistenceSoap" binding="s0:PersistenceSoap">
+      <soap:address location="http://ctcstager.tc.cornell.edu/Users/heber/Persistence/Persistence.asmx" />
+    </port>
+    <port name="PersistenceHttpGet" binding="s0:PersistenceHttpGet">
+      <http:address location="http://ctcstager.tc.cornell.edu/Users/heber/Persistence/Persistence.asmx" />
+    </port>
+    <port name="PersistenceHttpPost" binding="s0:PersistenceHttpPost">
+      <http:address location="http://ctcstager.tc.cornell.edu/Users/heber/Persistence/Persistence.asmx" />
+    </port>
+  </service>
+</definitions>

@@ -1,0 +1,42 @@
+String/Substrings version 0.02
+==============================
+
+NAME
+    String::Substrings - module to extract some/all substrings from a string
+
+SYNOPSIS
+      use String::Substrings;
+ 
+      my @parts  = substrings $string;
+      my @tripel = substrings $string, 3;
+  
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  String::Random    
+  Test::Differences 
+  Test::Exception   
+  Test::More        
+  Test::ManyParams
+  
+All these modules are only needed for the tests.
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2002 Janek Schleicher
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

@@ -1,0 +1,43 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use autodie qw( :all );
+
+use lib 'lib', 'inc';
+
+use FindBin;
+use MIME::Base64 qw( encode_base64 );
+use Silki::DatabaseManager;
+use Storable qw( nfreeze );
+
+Silki::DatabaseManager->new(
+    db_name          => 'SilkiTest',
+    drop             => 1,
+    seed             => 0,
+    quiet            => 1,
+    _existing_config => {}, # XXX - uber hack!
+)->update_or_install_db();
+
+require Silki::Config;
+
+Silki::Config->instance()->_set_database_name('SilkiTest');
+
+require Silki::Schema;
+
+open my $fh, '>', 't/lib/Silki/Test/FakeSchema.pm';
+
+print {$fh}
+    sprintf( <<'EOF', encode_base64( nfreeze( Silki::Schema->Schema() ) ) );
+package Silki::Test::FakeSchema;
+
+use strict;
+use warnings;
+
+use MIME::Base64 qw( decode_base64 );
+use Storable qw( thaw );
+
+$Silki::Schema::TestSchema = thaw( decode_base64( '%s' ) );
+
+1;
+EOF

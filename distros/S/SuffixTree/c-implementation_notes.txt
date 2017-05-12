@@ -1,0 +1,487 @@
+suffix_tree 1.0
+=========================
+Version: 2.0  
+
+README file updated on: 08-2002
+
+This document is a summary of the project report and contains useful
+information for development purposes.
+
+By:          Dotan Tsadok.
+Instructor:  Shlomo Yona.
+
+Table of Contents
+-----------------
+
+ 1. Project Overview
+ 2. Installation instructions
+ 3. User Guide
+ 4. Developer Guide
+ 5. Testing Guide
+ 6. References
+ 7. License
+ 8. Reporting bugs
+
+1. Project Overview
+-------------------
+
+The intention of this project is to provide an open-source implementation
+for an efficient data structure for strings manipulation - the Suffix Tree.
+The code was written with as much consistency with the theoretical algorithm
+as possible (see references). It provides a set of interface functions for
+creating and searching the tree. 
+
+The suffix tree is implemented in ANSI-C. The code is written based on the
+original algorithm by E.Ukkonen. For a detailed description see references.
+
+The code is explained internally (comments in the code) and externally (this
+document) and thus could be used for development.
+
+the structure was tested for both correctness and space/time performance (see
+Testing Guide).
+
+2. Installation instructions
+----------------------------
+
+Installation for Command Line Use
+
+Files needed for the installation:
+
+* suffix_tree.c
+* suffix_tree.h
+* main.c
+
+For all platforms that support ANSI C: Windows/DOS/Linux/Unix/Mac:
+
+* Copy the files suffix_tree.c, suffix_tree.h and main.c into your working
+  directory.
+* Compile suffix_tree.c and main.c (they both include suffix_tree.h so make 
+  sure they are at the same directory) in that order. For example, in UNIX
+  prompt write: 
+    gcc -ansi -pedantic -Wall suffix_tree.c main.c -o suffix_tree
+  In the above example, the executable suffix_tree will be created.
+* Run the executable:
+	./suffix_tree
+* For further usage information User Guide.
+
+Installation for "As Is" Development
+
+Files needed for the installation:
+
+* suffix_tree.c
+* suffix_tree.h
+
+For all platforms that support ANSI C: Windows/DOS/Linux/Unix/Mac:
+
+* Copy the files suffix_tree.c and suffix_tree.h to your working directory. 
+* Compile suffix_tree.c (it includes suffix_tree.h so make sure they are at the
+  same directory). 
+* In your code - include (#include) suffix_tree.h.
+* Use interface functions that are listed in suffix_tree.h (see developer
+  Guide). 
+
+Installation for Advanced Development
+
+Same as the above (see Installation for "As Is" Development) only now 
+changes are made to suffix_tree.c and/or suffix_tree.h by the programmer.
+
+
+--------------------------------------------------------
+Example of using the interface functions for developing:
+--------------------------------------------------------
+#include "suffix_tree.h"
+#include <stdio.h>
+
+int main()
+{
+  /*Will hold the position of the substring if exists in the tree.*/
+  DBL_WORD position;
+
+  /*Create the suffix tree*/
+  SUFFIX_TREE* tree = ST_CreateTree("mississippi", 11);
+
+  /*Print the suffix tree.*/
+  ST_PrintTree(tree);
+
+  /*Search for a substring in the tree and return its position if exists.*/
+  position = ST_FindSubstring(tree, "ssis", 4);
+	
+  /*Print the position of the substring*/
+  printf("\nPosition of ssis in mississippi is %ld.\n\n", position);
+	
+  /*Delete the tree and all its nodes.*/
+  ST_DeleteTree(tree);
+}
+
+--------------------------------------------------------
+
+
+3. User Guide
+-------------
+
+For online help - just run the executable files (see installation instructions).
+The following printout will appear:
+
+USAGE: suffix_tree <cmd> <string | filename> [<search string>] [p]
+
+examples: immidiate string with printing:   suffix_tree s  mystring trin p
+          string from file:                 suffix_tree f  mytree.txt substring
+          immidate with self testing:       suffix_tree ts mystring trin
+          file with self testing:           suffix_tree tf mytree.txt substring
+
+<cmd> - Command. These commands are available:
+             s - build a suffix tree based on an immediate string, meanning
+                 the actual string follows the command.
+             f - build a suffix tree based on a file, meanning the
+                 full path file name follows the command.
+             ts - same as the s command but includes a self-test
+                  as well (See Testing Guide).
+             tf - same as the f command but includes a self-test
+                  as well (See Testing Guide).
+<string | filename> - the string that follows command s or the file name that
+                       follows the command f (see <cmd>).
+<search string> - the string to search after the construction is done.
+[p] - optional - print the tree. Printing is useful when dealing with
+                 small trees, while printing a large tree
+                 could take a long time.
+
+
+The tree size is theoretically bounded by about 4 billion characters
+(see Testing Guide). But - memory will probably be over on much lower
+numbers.
+In such case - A message "Out of memory." will apear on the screen and 
+the progarm will exit.
+
+Output examples:
+
+When STATISTICS is defined (see Developer Guide) and command line is 
+"./suffix_tree s mississippi sip", the following output appears:
+=======================================================
+Constructing tree.....Done.
+
+root
++mississippi$
++i
+|+ssi
+||+ssippi$
+||+ppi$
+|+ppi$
+|+$
++s
+|+si
+||+ssippi$
+||+ppi$
+|+i
+||+ssippi$
+||+ppi$
++p
+|+pi$
+|+i$
++$
+
+N = 12
+Construction: Bytes allocated per text symbol   = 53.083
+                    Atomic operations per text symbol = 4.000
+
+Searching:    Atomic operations per text symbol = 2.333
+
+Results:      Substring exists in position 7.
+=======================================================
+
+When STATISTICS is not defined the command line is "s mississippi sip",
+the following output appears:
+
+=======================================================
+Constructing tree.....Done.
+
+root
++mississippi$
++i
+|+ssi
+||+ssippi$
+||+ppi$
+|+ppi$
+|+$
++s
+|+si
+||+ssippi$
+||+ppi$
+|+i
+||+ssippi$
+||+ppi$
++p
+|+pi$
+|+i$
++$
+
+Results:      Substring exists in position 7.
+=======================================================
+
+4. Developer Guide
+------------------
+
+Basic Ideas
+-----------
+
+* The suffix tree is an acyclic trie.
+* The sources string is a the string the tree is based on. Only one true
+  source string exists.
+* The Ukkonen algorithm, as described in the references, is for constructing
+  a tree out of one sources string and not for adding strings to the tree.
+  Therfore, this suffix tree behaves the same.
+* The $ sign is considered unique and thus must not be a part of the source
+  string. 
+* The standart \0 sign is not assumed to end the string. This is why the
+  length parameter is neccessary in the cunstruction process.
+* a character is of type char so up to 256 different symbols are
+  supported. There's no need to define how many different symbols are in
+  the source string in advance.
+* #define STATISTICS for measuring time/space complexity.
+* #define DEBUG for print-outs of stages in the constructing and searching 
+  algorithms.
+* ST_ERROR is a global variable (and not a #define) that symbols an error. It
+  equals length+10 (and thus is not a macro).
+* A path of a node is a string from the root to that node.
+* All edges are represented inside their ending nodes (more detail later) by
+  an index of the starting position and ending position in the source string.
+* Rules 1 and 3 are implicit and thus are not implemented. Only rule 2 is
+  "real".
+* a variable edge_pos is used for storing the index relarive an specific edge
+  where last match occured (details later).
+* A function SPA is called for each prefix of the source string. In return,
+  SPA calles to function SEA for each suffix of that suffix. Naively, this
+  takes O(m^3) time.
+* A major shortcut in Ukkonen's algorithm: When rule 3 is applied in a
+  specific suffix, current SEA is done and current SPA is done. The next
+  SPA starts by increasing e (the virtual end of all leaves) by one, and
+  starts calling SEA only from the suffix which rule 3 was applied to in
+  the previous phase (cause for that - implicit rule 1). For more detailes
+  on that see Ukkonen's algorithm (references).
+
+
+Data Structures
+--------------
+
+The suffix tree is represented by the following data:
+
+ * tree_string - the one and only string of the tree, all edges point to it
+                 (using indice).
+ * length      - the length of the string + 1 for the $ sign.
+ * e           - the current end of the tree. Used in all leaves.
+ * root        - pointerto the tree's root node.
+
+In the suffix tree there are no edges - edges are represented by their
+ending nodes. Meanning: edge from node A to node B is written inside node B.
+Being acyclic - no two incoming edges are of the same node, and thus it is
+implemented correctly.
+
+A node is represented by the floowing data:
+
+ * sons          - a linked list of sons of that node.
+ * right_sibling - a linked list of right siblings of that node.
+ * left_sibling  - a linked list of left siblings of that node.
+ * father        - a pointer to that node's father.
+ * suffix_link   - a pointer to the node that represents the largest suffix
+                     of the current node.
+ * path_position - index of the start position of the node's path.
+ * edge_label_start - start index of the incoming edge.
+ * edge_label_end   - end index of the incoming edge.
+
+The actual string of the tree is written from index 1 for consistency
+with the algorithm. Also - a $ sign is added at the end of it to make
+the final implicit tree into explicit one (see references).
+
+
+Interface functions
+-------------------
+
+ST_CreateTree(const char* str, DBL_WORD length)
+
+Allocates memory for the tree and starts Ukkonen's construction algorithm. 
+Parameters: pointer to the string, length of the string.
+Returns   : pointer to the new tree.
+
+
+
+ST_FindSubstring(SUFFIX_TREE* tree, char* W, DBL_WORD P)
+
+Searches for a string in the tree. It traverses the tree down starting
+its root like in a regular trie.
+Parameters: the tree to search in, a pointer to the string to look for,
+            length of that string.
+Returns   : if string is not in the tree - returns ST_ERROR.
+            Else, returns the position it was found in the source string.
+
+
+
+ST_PrintTree(SUFFIX_TREE* tree)
+
+Prints the tree.
+Parameters: the tree to print.
+Returns   : void.
+
+
+
+ST_DeleteTree(SUFFIX_TREE* tree)
+
+Deletes a suffix tree.
+Parameters: the tree to delete.
+Returns   : void.
+
+
+
+ST_SelfTest(SUFFIX_TREE* tree)
+
+Tests a suffix tree - search for all substrings of the main string (see
+Testing Guide).
+Parameters: the tree to test.
+Returns   : 1 for success, 0 for failure.
+
+
+Major Internal Functions
+------------------------
+
+apply_extension_rule_2()
+
+Apply extension rule 2 (see Ukkonen's algorithm) - 2 cases:
+
+                                      (1)           (1)
+1.A new son (leaf) is added to       /   \  ->     / | \
+  a node that already has sons.     (2) (3)      (2)(3)(4)
+
+
+2.An edge is split and a new           |            |
+  leaf and an internal node are        |           (3)
+  added.                               |    ->     / \
+                                      (1)        (1) (2)
+Parameters: see code.
+Returns   : a pointer to the newly created node.
+
+
+
+
+
+trace_string()
+
+Traces for a string in the tree.
+Parameters: see code.
+Returns   : the node where tracing has stopped, the edge position where
+            last match occured, the string position where last match
+            occured, number of characters found, a flag for signaling
+            whether search is done, and a flag to signal whether search
+            stopped at a last character of an edge.
+
+
+
+
+follow_suffix_link(SUFFIX_TREE* tree, POS* pos)
+
+Creates a suffix link of a newly created node (meaning, after rule 2 was
+applied) according to Ukkonen's rules.
+Parameters: the tree, the newly created node.
+Returns   : the position in edge where last match occured (while tracing
+            for the suffix node).
+
+
+SEA()
+
+Single-Phase-Algorithm (see references). Ensures that a specific extension
+is in the tree by:
+
+1. Following the current node's suffix link.
+2. Checking whether the rest of the extension already is in the tree
+   (implicit rule 3).
+3. If it is - reporting of rule 3 (= current phase is done, report handled
+   by function SPA()).
+4. If it's not - inserting it by applying rule 2 (creating a new leaf - see
+   function apply_extension_rule_2()).
+Parameters: see code.
+Returns   : a pointer to the current node, the one that will be used in the
+            next extentsion/phase.
+
+
+
+
+void SPA()
+
+Performs all insertion of a single phase by calling function SEA. See Basic
+Ideas and description of SEA.
+Parameters: see code.
+Returns   : a pointer to the current node, the one that will be used in the
+            next phase.
+
+
+
+Minor Internal Functions
+------------------------
+create_node(NODE* father, DBL_WORD start, DBL_WORD end, DBL_WORD position)
+
+Allocates a node with the given field-values. All other fields are field
+with NULL or 0.
+Parameters: the node's father, incoming edge start and stop index, path
+            position.
+Returns   : a pointer to that node.
+
+
+
+find_son(SUFFIX_TREE* tree, NODE* node, char character)
+
+Finds a son of the node that starts with character. Used for seraching
+in the tree.
+Parameters: the tree, the source node, the character to look for.
+Returns   : a pointer to that son if exists, otherwise NULL.
+
+
+
+get_node_label_end(SUFFIX_TREE* tree, NODE* node)
+
+Returns the end index of the incoming edge to that node.
+
+IMPORTANT: this function is requierd because leaves does not really
+hold their incoming edge end index - the real one is tree->e, which is
+increased by one in each phase. This function identify if the node is a
+leaf and due to that it returns its real end. NEVER access
+node->edge_label_end directly.
+
+
+
+get_node_label_length(SUFFIX_TREE* tree, NODE* node)
+
+Returns the length of the incoming edge to that node. 
+Uses function get_node_label_end() (IMPORTANT: See description of the
+previous function).
+
+
+
+5. Testing Guide
+----------------
+There is a SelfTest interface function for testing a specific tree.
+It searches all possible substring of the sources string in the tree.
+In large trees this can take a cosiderable amount of time, so be careful
+with it.
+
+All indices are unsigned long int - meanning they are bounded by 2^32.
+But - this is only theoretical. The tree has not been tested for that for
+lack of memory reasons. It would take many gigabytes to handle that amount
+of characters, considering a certain coeficent on the number of characters.
+
+
+6. References
+-------------
+[1] Dan Gusfield, Algorithms on Strings, Trees and Sequences, Chapter 6 -
+    Linear-Time Construction of Suffix Trees, Ukkonen's Algorithm.
+    University of California, Davis, 1997.
+
+[2] Udi Manbar and Gene Myers, Suffix Arrays: A new method for on-line
+    string searches. University of Arizona, Tucson, 1989.
+
+7. License
+----------
+Copyright (c) 2002, 2003 Shlomo Yona. All rights reserved.
+
+This library is free software. 
+You can redistribute it and/or modify it under the same terms as Perl itself.  
+
+8. Bug reports
+--------------
+Please report bugs to Shlomo Yona <shlomo@cs.haifa.ac.il>

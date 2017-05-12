@@ -1,0 +1,270 @@
+
+<region name='ClassOutline' parent='def:Outlined'/>
+<region name='FunctionOutline' parent='def:Outlined'/>
+
+<!-- !!EE add -->
+<region name="HereDoc" parent="perl:HereDoc"/>
+<region name="HereDocName" parent="perl:HereDocName"/>
+<region name="HereDocLt" parent="perl:HereDocLt"/>
+<region name="SystemExec" parent="perl:SystemExec"/>
+<region name="VarString" parent="def:Var"/>
+
+<region name="dKeyWord" parent="def:Keyword"/>
+<region name="dKeyWord2" parent="def:FunctionKeyword"/>
+<region name="dParam2" parent="def:Constant"/>
+<region name="dDepr" parent="def:DeprecatedKeyword"/>
+
+
+
+<!-- EE add begin -->
+
+<!-- pure strings -->
+
+<scheme name="StringBaseCore">
+ <regexp match="/\\['\\]/" region0="StringContent"/>
+</scheme>
+
+<scheme name="StringCore">
+ <inherit scheme="StringBaseCore"/>
+ <!-- regexp match='/\\\\$/' region0="dError"/ -->
+ <regexp match='/\\[^xX0-7]/' region0="StringContent"/>
+ <regexp match='/\\$/' region0="StringContent"/>
+ <regexp match='/\\(x|X)[\da-fA-F]{1,8}/' region0="StringContent"/>
+ <regexp match='/\\[0-7]{1,12}/' region0="StringContent"/>
+ <regexp match='/\{\$[^\}]+\}?/' region0="VarString"/>
+ <regexp match='/\$\w+/' region0="VarString"/>
+ <!-- regexp match='/[^\\\"]$/' region0="dError"/ -->
+</scheme>
+
+<!-- RPSE Regexp -->
+
+<scheme name="RegExp.Modif">
+ <keywords region="regexp:SpecArea">
+  <symb name="i"/>
+  <symb name="m"/>
+  <symb name="s"/>
+  <symb name="x"/>
+  <symb name="U"/>
+  <symb name="X"/>
+  <symb name="-" region="def:Symbol"/>
+ </keywords>
+ <inherit scheme="regexp:pcre.modif"/>
+</scheme>
+
+<scheme name="RegExp.BaseCore">
+ <inherit scheme="regexp:pcre.regexp">
+  <virtual scheme="regexp:string" subst-scheme="StringBaseCore"/>
+  <virtual scheme="regexp:pcre.modif" subst-scheme="RegExp.Modif"/>
+  <virtual scheme="regexp:pcre.regexp" subst-scheme="RegExp.BaseCore"/>
+ </inherit>
+</scheme>
+
+<scheme name="RegExp.Core">
+ <inherit scheme="regexp:pcre.regexp">
+  <virtual scheme="regexp:string" subst-scheme="StringCore"/>
+  <virtual scheme="regexp:pcre.modif" subst-scheme="RegExp.Modif"/>
+  <virtual scheme="regexp:pcre.regexp" subst-scheme="RegExp.Core"/>
+ </inherit>
+</scheme>
+
+<scheme name="RegExp.StringBase">
+ <annotation>
+  <documentation>
+   php regexp for '' strings
+  </documentation>
+  <appinfo> <todo> <![CDATA[
+    Мultistring regexps not supported now.
+    For add this functionality, change ) to |$) before end of
+    last string of this regexp.
+
+    Note! This can make problems with the text similar to this:
+    $str='| a long
+    string
+    ';
+    if first symbol of string - ^\w\s.
+    I recommend to use HERE DOC in this case.
+  ]]> </todo> </appinfo>
+ </annotation>
+
+ <inherit scheme="StringBaseCore"/>
+ <block scheme="RegExp.BaseCore">
+  <start region2="def:PairStart" region3="StringEdge"><![CDATA[
+   /([^\\]')?#2
+    (([\/\|\@\#\%\$\^&\*\?\!\~]))\M
+    (([^'])|(\\'))*(\2[isUmDAexXS]*')
+   /xs
+  ]]></start>
+  <end region1="def:PairEnd" region2="StringEdge" region3="regexp:SpecArea">
+  <![CDATA[
+   /((\y2([isUmDAexXS]*)))\M'/
+  ]]></end>
+ </block>
+</scheme>
+
+
+<scheme name="RegExp.String">
+ <annotation>
+  <documentation>
+   php regexp for custom "" strings
+  </documentation>
+  <appinfo> <todo> <![CDATA[
+    Не поддерживаются многострочные регекспы.
+    Для их включения заменить ) на |$) в конце последней сторки регекспа
+
+    Внимание! Это может создавать проблемы с записями типа:
+    $str="| длинная
+    стока
+    ";
+    если первый символ строки - ^\w\s.
+    Я рекомендую в таких случаях использовать here doc.
+  ]]> </todo> </appinfo>
+ </annotation>
+
+ <inherit scheme="StringCore"/>
+ <block scheme="RegExp.Core">
+  <start region2="def:PairStart" region3="StringEdge"><![CDATA[
+   /([^\\]")?#2
+    (([\/\|\@\#\%\$\^&\*\?\!\~]))\M
+    (([^"])|(\\"))*(\2[isUmDAexXS]*")
+   /xs
+  ]]></start>
+  <end region1="def:PairEnd" region2="StringEdge" region3="regexp:SpecArea">
+  <![CDATA[
+   /((\y2([isUmDAexXS]*)))\M"/
+  ]]></end>
+ </block>
+</scheme>
+
+
+<!-- POSIX RegExp -->
+
+<scheme name="posix.BaseCore">
+ <inherit scheme="regexp:posix.regexp">
+  <virtual scheme="regexp:string" subst-scheme="StringBaseCore"/>
+  <virtual scheme="regexp:posix.regexp" subst-scheme="posix.BaseCore"/>
+ </inherit>
+</scheme>
+
+<scheme name="posix.Core">
+ <inherit scheme="regexp:posix.regexp">
+  <virtual scheme="regexp:string" subst-scheme="StringCore"/>
+  <virtual scheme="regexp:posix.regexp" subst-scheme="posix.Core"/>
+ </inherit>
+</scheme>
+
+<scheme name="posix.Support">
+ <block start='/~[^\,]*?((&#34;))/' end='/(&#34;)/'
+  scheme="posix.Core" region="String"
+  region01="PairStart" region10="PairEnd"
+ />
+ <block start="/~[^\,]*?((\'))/" end="/(\')/"
+  scheme="posix.BaseCore" region="String"
+  region01="PairStart" region10="PairEnd"
+ />
+ <inherit scheme="Script"/>
+</scheme>
+
+<!-- EE add end -->
+
+
+    <scheme name="Script">
+      <!-- Numbers -->
+      <inherit scheme="CHexNumber"/>
+      <inherit scheme="FloatNumber"/>
+      <inherit scheme="DecNumber"/>
+
+      <!-- EE: support regexp -->
+      <block start="/&#34;/" end="/&#34;/" scheme="RegExp.String" region="String"/>
+      <block start="/'/" end="/'/" scheme="RegExp.StringBase" region="String"/>
+
+      <!-- Linear Comments-->
+      <block start="/\/\/|\#/" end="/$/" scheme="Comment" region="Comment" priority="low"/>
+      <block start="/\/\*/" end="/\*\//" scheme="Comment"
+               region="Comment" region00="PairStart" region10="PairEnd"/>
+
+
+<!-- EE: changed -->
+         <block start="/(&lt;&lt;&lt;)([a-zA-Z_][\w_]*)(\s.*)?$/" end="/^(\y2)\M;$/"
+           scheme="StringCore" region="HereDoc"
+           region00="PairStart" region10="PairEnd" region03="def:Error"
+           region01="HereDocLt" region02="HereDocName" region11="HereDocName"
+         />
+
+<!-- EE add: System command -->
+         <block start="/`/" end="/`/" scheme="StringCore"
+          region="SystemExec" region00="String" region10="String"
+         />
+         <!-- regexp match='/ ` ( (\\.) | [^\\"] )* ` /x' / -->
+
+<!-- EE add: posix regexp support (ereg\w*)|(spliti?)|(sql_regcase)-->
+        <block start="/\b(ereg\w*|spliti?|sql_regcase)((\())/i"
+         end="/(\))/" scheme="posix.Support"
+         region01="KeywordStrong" region02="PairStart" region03="Symbol"
+         region10="PairEnd" region11="Symbol"
+        />
+
+
+<!-- variable highlighting // added by kx -->
+<!-- EE add: 'this' -->
+         <regexp match="/\B\S(this)\b/" region0="Var" region1="Keyword"/>
+         <regexp match="/(\B\$[\w][\w_]*?)\b/" region="Var"/>
+<!-- EE add: variable for objects -->
+         <regexp match='/(\-&gt;)(\s)*\w+((\w)*(\s)*\()?!/' region="Var" region1="Symbol" />
+
+      <!-- here-doc support // added by kx
+      <block start="/&lt;&lt;&lt;([a-zA-Z_][\w_]+)/" end="/^(\y1);$/" scheme="c:String"
+               region="CommentDoc" region00="PairStart" region10="PairEnd" region01="Keyword" region11="Keyword"/>
+       -->
+      <!-- variable highlighting // added by kx
+      <regexp match="/(\B\$[\w][\w_]*?)\b/" region="Var"/>-->
+
+      <regexp match="/^\M \s* \b (class) \s+ (?{ClassOutline}[\w_]+ [\w_:\$]*? )/x"/>
+<!-- Brablc BEGIN -->
+      <regexp match="/^\M \s* (\/\*\w+\*\/)? \s* (\/\*\w+\*\/)? \s* \b (function) [\s&amp;]+ (?{FunctionOutline}[\:\w_*&amp;~]+)/x"/>
+<!-- Brablc END -->
+
+
+      <inherit scheme="PairedBrackets">
+        <virtual scheme="PairedBrackets" subst-scheme="Script"/>
+      </inherit>
+
+
+      <!-- EE: add any "SymbolStrong" -->
+         <keywords region="Symbol">
+            <symb name=";" region="SymbolStrong"/>
+            <symb name="="/><symb name="+"/>
+            <symb name="-"/><symb name="/"/><symb name="*"/>
+            <symb name="&amp;"/><symb name="|"/><symb name="^"/>
+            <!-- EE: this operators cannot used in this plase...
+            symb name="("/><symb name=")"/>
+            <symb name="["/><symb name="]"/ -->
+            <symb name=","/><symb name="."/>
+            <symb name="?" region="SymbolStrong"/>
+            <symb name=":" region="SymbolStrong"/>
+            <symb name="@" region="SymbolStrong"/>
+            <symb name="!"/><symb name="~"/>
+            <symb name="&lt;"/><symb name="&gt;"/>
+            <symb name="%"/>
+            <!-- EE: this operators cannot used in this plase...
+             symb name="{"/><symb name="}"/ -->
+            <!-- EE: add word operators -->
+            <word name="or"/>
+            <word name="xor"/>
+            <word name="and"/>
+         </keywords>
+         <!-- EE: copy from c.hrc -->
+         <keywords region="def:Error">
+            <symb name="["/><symb name="]"/>
+            <symb name="{"/><symb name="}"/>
+            <symb name="("/><symb name=")"/>
+            <symb name="*/"/>
+         </keywords>
+
+      <keywords region="KeywordStrong" ignorecase="yes">
+        <word name="case-folded"/>
+        <word name="case-folding"/>
+      </keywords>
+
+      <inherit scheme="base-keywords"/>
+
+    </scheme>

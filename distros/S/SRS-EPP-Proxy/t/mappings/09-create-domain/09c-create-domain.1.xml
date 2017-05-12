@@ -1,0 +1,9 @@
+<NZSRSResponse VerMajor="5" VerMinor="0">
+  <Response Action="DomainCreate" FeId="8" FeSeq="4794943" OrigRegistrarId="90" RecipientRegistrarId="90" TransId="brause2347">
+    <FeTimeStamp Day="6" Hour="13" Minute="19" Month="7" Second="16" TimeZoneOffset="+12:00" Year="2010"/>
+    <Error ErrorId="DOMAIN_ALREADY_EXISTS" Hint="INVALID_REQUEST_ERROR" Severity="err">
+      <Description><![CDATA[Create requested for a registered domain]]></Description>
+      <ErrorDetails><![CDATA[cheese.co.nz]]></ErrorDetails>
+    </Error>
+  </Response>
+</NZSRSResponse>

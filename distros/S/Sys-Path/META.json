@@ -1,0 +1,73 @@
+{
+   "abstract" : "supply autoconf style installation directories",
+   "author" : [
+      "Jozef Kutej <jkutej@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4202",
+   "keywords" : [
+      "system",
+      "paths",
+      "instalation",
+      "deployment",
+      "applications"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Sys-Path",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "File::Path" : "2.07",
+            "File::Temp" : "0",
+            "Test::Differences" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3607"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cwd" : "0",
+            "Digest::MD5" : "0",
+            "File::Spec" : "0",
+            "JSON::Util" : "0",
+            "List::MoreUtils" : "0",
+            "Text::Diff" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Sys::Path" : {
+         "file" : "lib/Sys/Path.pm",
+         "version" : "0.14"
+      },
+      "Sys::Path::SPc" : {
+         "file" : "lib/Sys/Path/SPc.pm",
+         "version" : "0.14"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/jozef/Sys-Path/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/jozef/Sys-Path.git"
+      }
+   },
+   "version" : "0.14"
+}

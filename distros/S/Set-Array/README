@@ -1,0 +1,396 @@
+NAME
+    Set::Array - Arrays as objects with lots of handy methods (including Set
+    comparisons) and support for method chaining.
+
+SYNOPSIS
+    "my $sao1 = Set::Array->new(1,2,4,"hello",undef);"
+
+    "my $sao2 = Set::Array->new(qw(a b c a b c));"
+
+    "print $sao1->length; # prints 5"
+
+    "$sao2->unique->length->print; # prints 3"
+
+PREREQUISITES
+    Perl 5.6 or later
+
+    The 'Want' module by Robin Houston. Available on CPAN.
+
+DESCRIPTION
+    Set::Array allows you to create arrays as objects and use OO-style
+    methods on them. Many convenient methods are provided here that appear
+    in the FAQ's, the Perl Cookbook or posts from comp.lang.perl.misc. In
+    addition, there are Set methods with corresponding (overloaded)
+    operators for the purpose of Set comparison, i.e. +, ==, etc.
+
+    The purpose is to provide built-in methods for operations that people
+    are always asking how to do, and which already exist in languages like
+    Ruby. This should (hopefully) improve code readability and/or
+    maintainability. The other advantage to this module is method-chaining
+    by which any number of methods may be called on a single object in a
+    single statement.
+
+OBJECT BEHAVIOR
+    The exact behavior of the methods depends largely on the calling
+    context.
+
+    Here are the rules:
+
+    * If a method is called in void context, the object itself is modified.
+
+    * If the method called is not the last method in a chain (i.e. it's
+    called in object context), the object itself is modified by that method
+    regardless of the 'final' context or method call.
+
+    * If a method is called in list or scalar context, a list or list
+    refererence is returned, respectively. The object itself is NOT
+    modified.
+
+    Here's a quick example:
+
+    "my $sao = Set::Array->new(1,2,3,2,3);" "my @uniq = $sao->unique(); #
+    Object unmodified. '@uniq' contains 3 values." "$sao->unique(); # Object
+    modified, now contains 3 values"
+
+    Here are the exceptions:
+
+    * Methods that report a value, such as boolean methods like *exists()*
+    or other methods such as *at()* or *as_hash()*, never modify the object.
+
+    * The methods *clear()*, *delete()*, *delete_at()*, and *splice* will
+    always modify the object. It seemed much too counterintuitive to call
+    these methods in any context without actually
+    deleting/clearing/substituting the items!
+
+    * The methods *shift()* and *pop()* will modify the object AND return
+    the value that was shifted or popped from the array. Again, it seemed
+    much too counterintuitive for something like "$val = $sao->shift" to
+    return a value while leaving the object's list unchanged. If you really
+    want the first or last value without modifying the object, you can
+    always use the *first()* or *last()* method, respectively.
+
+    * The *join()* method always returns a string and is really meant for
+    use in conjunction with the *print()* method.
+
+BOOLEAN METHODS
+    exists(*val*) - Returns 1 if *val* exists within the array, 0 otherwise.
+    If no value (or *undef*) is passed, then this method will test for the
+    existence of undefined values within the array.
+
+    is_empty() - Returns 1 if the array is empty, 0 otherwise. Empty is
+    defined as having a length of 0.
+
+STANDARD METHODS
+    at(*index*) - Returns the item at the given index (or *undef*). A
+    negative index may be used to count from the end of the array. If no
+    value (or *undef*) is specified, it will look for the first item that is
+    not defined.
+
+    clear() - Empties the array (i.e. length becomes 0). You may pass a '1'
+    to this method to set each element of the array to *undef* rather than
+    truly empty it.
+
+    compact() - Removes undefined elements from the array.
+
+    count(*?val?*) - Returns the number of instances of *val* within the
+    array. If *val* is not specified (or is *undef*), the method will return
+    the number of undefined values within the array.
+
+    delete(*list*) - Deletes all items within *list* from the array that
+    match. This method will crash if *list* is not defined. If your goal is
+    to delete undefined values from your object, use the *compact()* method
+    instead.
+
+    delete_at(*index, ?index?*) - Deletes the item at the specified index.
+    If a second index is specified, a range of items is deleted. You may use
+    -1 or the string 'end' to refer to the last element of the array.
+
+    fill(*val,?start?,?length?*) - Sets the selected elements of the array
+    (which may be the entire array) to *val*. The default value for start is
+    0. If length is not specified the entire array, however long it may be
+    at the time of the call, will be filled. Alternatively, a quoted integer
+    range may be used.
+
+    e.g. "$sao->fill('x','3-5');"
+
+    The array length/size may not be expanded with this call - it is only
+    meant to fill in already-existing elements.
+
+    first() - Returns the first element of the array (or undef).
+
+    flatten() - Causes a one-dimensional flattening of the array,
+    recursively. That is, for every element that is an array (or hash, or a
+    ref to either an array or hash), extract its elements into the array.
+
+    e.g. "my $sa = Set::Array->new([1,3,2],{one=>'a',two=>'b'},x,y,z);"
+
+    "$sao->flatten->join(',')->print; # prints "1,3,2,one,a,two,b,x,y,z""
+
+    foreach(*sub ref*) - Iterates over an array, executing the subroutine
+    for each element in the array. If you wish to modify or otherwise act
+    directly on the contents of the array, use $_ within your sub reference.
+
+    e.g. To increment all elements in the array by one...
+
+    "$sao->foreach(sub{ ++$_ });"
+
+    get - Alias for the indices() method.
+
+    index(*val*) - Returns the index of the first element of the array
+    object that contains *val*. Returns *undef* if no value is found.
+
+    Note that there is no dereferencing here so if you're looking for an
+    item nested within a ref, use the *flatten* method first.
+
+    indices(*val1,?val2?, ?val...?*) - Returns an array consisting of the
+    elements at the specified indices or *undef* if the element is out of
+    range.
+
+    A range may also be used. It must be a quoted string in '0..3' format.
+
+    join(*?char?*) - Joins the individual elements of the list into a single
+    string with the elements separated by the value of *char*. Useful in
+    conjunction with the *print()* method. If no character is specified,
+    then *char* defaults to a comma.
+
+    e.g. "$sao->join('-')->print;"
+
+    last() - Returns the last element of the array (or *undef*).
+
+    length() - Returns the number of elements within the array.
+
+    max() - Returns the maximum value of an array. No effort is made to
+    check for non-numeric data.
+
+    pack(*template*) - Packs the contents of the array into a string (in
+    scalar context) or a single array element (in object or void context).
+
+    pop() - Removes the last element from the array. Returns the popped
+    element.
+
+    print(*?1?*) - Prints the contents of the array. If a '1' is provided as
+    an argument, the output will automatically be terminated with a newline.
+
+    This also doubles as a 'contents' method, if you just want to make a
+    copy of the array, e.g. my @copy = $sao->print;
+
+    Can be called in void or list context, e.g.
+
+    "$sao->print(); # or..." "print "Contents of array are: ",
+    $sao->print();"
+
+    push(*list*) - Adds *list* to the end of the array, where *list* is
+    either a scalar value or a list. Returns an array or array reference in
+    list or scalar context, respectively. Note that it does not return the
+    length in scalar context. Use the *length* method for that.
+
+    reverse() - Reverses the order of the contents of the array.
+
+    rindex(*val*) - Similar to the 'index()' method, except that it returns
+    the index of the last *val* found within the array.
+
+    set(*index*,*value*) - Sets the element at *index* to *value*, replacing
+    whatever may have already been there.
+
+    shift() - Shifts the first element of the array and returns the shifted
+    element.
+
+    sort(*?coderef?*) - Sorts the contents of the array in alphabetical
+    order, or in the order specified by the optional *coderef*. Use your
+    standard *$a* and *$b* variables within your calling program, e.g:
+
+    "my $sao = Set::Array->new( { name => 'Berger', salary => 20000 }, {
+    name => 'Berger', salary => 15000 }, { name => 'Vera', salary => 25000
+    }, );"
+
+    "my $subref = sub{ $b->{name} cmp $a->{name} || $b->{salary} <=>
+    $a->{salary} };"
+
+    "$sao14->sort($subref)->flatten->join->print(1);"
+
+    splice(*?offset?,?length?,?list?*) - Splice the array starting at
+    position *offset* up to *length* elements, and replace them with *list*.
+    If no list is provided, all elements are deleted. If length is omitted,
+    everything from *offset* onward is removed.
+
+    Returns an array or array ref in list or scalar context, respectively.
+    This method always modifies the object, regardless of context. If your
+    goal was to grab a range of values without modifying the object, use the
+    *indices* method instead.
+
+    unique() - Removes/returns non-unique elements from the list.
+
+    unshift(*list*) - Prepends a scalar or list to array. Note that this
+    method returns an array or array reference in list or scalar context,
+    respectively. It does not return the length of the array in scalar
+    context. Use the *length* method for that.
+
+ODDBALL METHODS
+    as_hash() - Returns a hash based on the current array, with each even
+    numbered element (including 0) serving as the key, and each odd element
+    serving as the value. This can be switched by using the *key_order*
+    option and setting it to 'odd', in which case the even values serve as
+    the values, and the odd elements serve as the keys. The default is
+    *even*.
+
+    Of course, if you don't care about insertion order, you could just as
+    well do something like, "$sao-"reverse->as_hash;>
+
+    Dies if the array contains an odd number of elements. This method does
+    not actually modify the object itself in any way. It just returns a
+    plain hash in list context or a hash reference in scalar context. The
+    reference is not blessed, therefore if this method is called as part of
+    a chain, it must be the last method called.
+
+    impose(*?append/prepend?*,*string*) - Appends or prepends the specified
+    string to each element in the array. Specify the method by using either
+    the keyword 'append' or 'prepend'. The default is 'append'.
+
+    randomize() - Randomizes the order of the elements within the array.
+
+    rotate(*direction*) - Moves the last item of the list to the front and
+    shifts all other elements one to the right, or vice-versa, depending on
+    what you pass as the direction - 'ftol' (first to last) or 'ltof' (last
+    to first). The default is 'ltof'.
+
+    e.g. my $sao = Set::Array->new(1,2,3);
+
+    $sao->rotate(); # order is now 3,1,2
+
+    $sao->rotate('ftol'); # order is back to 1,2,3
+
+OVERLOADED (COMPARISON) OPERATORS
+  General Notes
+
+    For overloaded operators you may pass a Set::Array object, or just a
+    normal array reference (blessed or not) in any combination, so long as
+    one is a Set::Array object. You may use either the operator or the
+    equivalent method call.
+
+    Examples (using the '==' operator or 'is_equal' method):
+
+    my $sao1 = Set::Array->new(1,2,3,4,5); my $sao2 =
+    Set::Array->new(1,2,3,4,5); my $ref1 = [1,2,3,4,5];
+
+    if($sao1 == $sao2)... # valid if($sao1 == $ref1)... # valid if($ref1 ==
+    $sao2)... # valid if($sao1->is_equal($sao2))... # valid
+    if($sao1->is_equal($ref1))... # valid
+
+    All of these operations return either a boolean value (for equality
+    operators) or an array (in list context) or array reference (in scalar
+    context).
+
+    & or bag - The union of both sets, including duplicates.
+
+    - or difference - Returns all elements in the left set that are not in
+    the right set.
+
+    == or is_equal - This tests for equality of the content of the sets,
+    though ignores order. Thus, comparing (1,2,3) and (3,1,2) will yield a
+    *true* result.
+
+    != or not_equal - Tests for inequality of the content of the sets.
+    Again, order is ignored.
+
+    * or intersection - Returns all elements that are common to both sets.
+
+    % or symmetric_difference - Returns all elements that are in one set or
+    the other, but not both. Opposite of intersection.
+
+    + or union - Returns the union of both sets. Duplicates excluded.
+
+EXAMPLES
+    For our examples, I'll create 3 different objects
+
+    my $sao1 = Set::Array->new(1,2,3,a,b,c,1,2,3); my $sao2 =
+    Set::Array->new(1,undef,2,undef,3,undef); my $sao3 =
+    Set::Array->new(1,2,3,['a','b','c'],{name=>"Dan"});
+
+    How do I...
+
+    *get the number of unique elements within the array?*
+
+    "$sao1->unique()->length();"
+
+    *count the number of non-undef elements within the array?*
+
+    "$sao2->compact()->length();"
+
+    *count the number of unique elements within an array, excluding undef?*
+
+    "$sao2->compact()->unique()->length();"
+
+    *print a range of indices?*
+
+    "$sao1->indices('0..2')->print();"
+
+    *test to see if two Set::Array objects are equal?*
+
+    "if($sao1 == $sao2){ ... }"
+
+    "if($sao1->is_equal($sao2){ ... } # Same thing"
+
+    *fill an array with a value, but only if it's not empty?*
+
+    "if(!$sao1->is_empty()){ $sao1->fill('x') }"
+
+    *shift an element off the array and return the shifted value?*
+
+    "my $val = $sao1->shift())"
+
+    *shift an element off the array and return the array?*
+
+    "my @array = $sao1->delete_at(0)"
+
+    *flatten an array and return a hash based on now-flattened array?, with
+    odd elements as the key?*
+
+    "my %hash = $sao3->flatten()->reverse->as_hash();"
+
+    *delete all elements within an array?*
+
+    "$sao3->clear();"
+
+    "$sao3->splice();"
+
+    *modify the object AND assign a value at the same time?*
+
+    "my @unique = $sao1->unique->print;"
+
+KNOWN BUGS
+    There is a bug in the *Want-0.05* module that currently prevents the use
+    of most of the overloaded operators, though you can still use the
+    corresponding method names. The equality operators == and != should
+    work, however.
+
+FUTURE PLANS
+    Anyone want a built-in 'permute()' method?
+
+    I'm always on the lookout for faster algorithms. If you've looked at the
+    code for a particular method and you know of a faster way, please email
+    me. Be prepared to backup your claims with benchmarks (and the benchmark
+    code you used). Tests on more than one operating system are preferable.
+    No, *map* is not always faster - *foreach* loops usually are in my
+    experience.
+
+    More flexibility with the foreach method (perhaps with iterators?).
+
+    Ultimately, I want to create a Set::Hash and Set::String module (both
+    already in the works) and have all three modules bundled together. Then,
+    whenever I return a string or a hash (instead of an array), I return
+    them as objects, allowing you to continue method chaining no matter what
+    type of data is returned, using methods appropriate for the return type.
+
+    This probably means a major re-write using a virtual class, but the API
+    probably won't change for the subclasses.
+
+THANKS
+    Thanks to all the kind (and sometimes grumpy) folks at
+    comp.lang.perl.misc who helped me with problems and ideas I had.
+
+    Thanks also to Robin Houston for the 'Want' module! Where would method
+    chaining be without it?
+
+AUTHOR
+    Daniel Berger djberg96@hotmail.com
+

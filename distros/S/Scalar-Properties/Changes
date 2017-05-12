@@ -1,0 +1,59 @@
+Revision history for Perl extension Scalar-Properties
+
+1.100860  2010-03-27 16:06:07 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+0.15  Thu Jul 25 15:27:43 CEST 2008 (Marcel Gruenauer <marcel@cpan.org>)
+    - Changed dist style and Changes back to standard. People didn't like it -
+      the nail that sticks out gets hammered down.
+    - Added standard test files; this will also help with CPANTS.
+
+0.14  Thu, 29 May 2008 12:07:03 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - Converted Changes file to YAML style
+    - .shipit: added Twitter step
+    - Makefile.PL: added auto_install() and process_templates()
+    - lib/*: converted to template
+    - updated MANIFEST
+    - updated t/perlcriticrc
+    - .shipit: fixed svk.tagpattern
+    - tags: NEWFEATURE
+
+0.13  Thu, 18 Oct 2007 10:09:39 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+    - fixed version requirement of Test::More
+    - improved documentation
+
+0.12  Sun, 09 Nov 2003 11:31:00 +0100 (David Cantrell <pause@barnyard.co.uk>)
+    - applied patch to fix interpolation bug, reported and patch supplied by
+      makamaka@users.sourceforge.jp
+    - added test for this bug
+    - changed true() function in test.pl to show a useful comment for each test
+      if supplied
+
+0.11  Tue, 04 Nov 2003 18:54:00 +0100 (David Cantrell <pause@barnyard.co.uk>)
+    - fixed operand ordering bug in generated functions for binary ops
+    - fixed bug in test suite which only showed up after fixing above ;-)
+
+0.10  Wed, 27 Jun 2001 20:31:45 +0100 (Marcel Gruenauer <marcel@cpan.org>)
+    - added code execution methods, abs(), zero()
+    - added is_false() method
+    - added 'has_' prefix for property querying
+    - added property propagation (pass_on(), passed_on(), get_pass_on())
+    - added property introspection (get_props(), del_props(), del_all_props())
+    - added tests and documentation for all of the above
+
+0.03  Wed, 27 Jun 2001 16:08:46 +0100 (Marcel Gruenauer <marcel@cpan.org>)
+    - added many string methods, plus tests and documentation
+    - changed boolean methods to return an overloaded boolean value so it can
+      take properties as well
+
+0.02  Tue, 26 Jun 2001 00:08:24 +0100 (Marcel Gruenauer <marcel@cpan.org>)
+    - value() stringifies if argument not of this package
+    - added options to import() to be able to selectively specify constant
+      overloading from different packages, e.g. overloading 'qr' from a Regex
+      package
+    - added methods length, size, reverse and tests for those
+    - added TODO document
+
+0.01  Tue, 26 Jun 2001 19:35:58 +0100 (Marcel Gruenauer <marcel@cpan.org>)
+    - original version; created by h2xs 1.20 with options -XAn
+      Scalar::Properties

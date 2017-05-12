@@ -1,0 +1,154 @@
+outstanding for later:
+
+Net::Pcap::FindDevice:
+    - Spin off as a separate distribution
+
+Sniffer::HTTP
+    - implement multiple outstanding requests/responses for one connection
+    - find out why it doesn't listen on just port 80
+
+v0.24 20161109:
+      - Fix RT 107349, reported by Slaven Rezic
+	  - Still not moved to Net::Inspect
+
+v0.23 (20120308):
+      - Make IP address detection work on other networks as well
+      - Remove reliance on Exporter::Lite in favour of a recent Exporter.pm
+      - Prepare for moving to Net::Inspect instead of hand-rolling
+        the TCP stack
+      - Silence a warning if no Transfer-Encoding header was received
+
+v0.22 (20110430):
+      - More configurability of ->run(), suggested by Keith Schincke
+      - C<device> can now be a preconfigured Net::Pcap device
+      - C<netmask> can now be specified, in case you have a capture interface
+        without an IP address
+
+v0.21 (20110327):
+      - Fix loop behaviour in Sniffer::HTTP::flush_window to process more
+        than one packet
+      . Add synopsis to dump-raw.pl
+      . Fix tests, again
+
+v0.20 (20110322):
+      - POD fixes
+      - Reduced default value for snaplen libpcap parameter
+      - Made snaplen parameter configurable, after discussion in
+        http://perlmonks.org/?node_id=894262
+
+v0.19 (20090215):
+      - Sniffer::HTTP: src_port and dst_port are now initialized from the
+        first packet if they are yet unset
+
+v0.18 (20081109):
+      - Bail out of testing if no device is found by Net::Pcap
+      . Only test changes, no upgrade necessary.
+
+v0.17 (20070113):
+      - James Mastros suggested skipping more tests if not
+        running as root on non-Win32 platforms. The tests now
+	output a warning if you are not on Win32 and $> is nonzero.
+	The tests will still be run but likely you need to execute
+	them using
+
+	    sudo make test
+
+	to get results unobstructed by permissions. This
+	affects
+	    t/01-find-device.t
+	    t/05-dump-to-file.t
+
+v0.16 (20060918):
+      - Fixed a typo in the synopsis of HTTP::Sniffer
+      - POD fixes
+      - "Transfer-Encoding: chunked" is now case insensitive, thanks to
+        Andre Nurwono
+      - Fix t/05-dump-to-file.t to gracefully fail if the user
+        cannot sniff due to (likely) permission problems.
+
+v0.15 (20060605):
+      - Added the missing File::Slurp prerequisite, found by Joshua Ben Jore
+      - No code/functionality changes
+
+v0.14 (20060426):
+      - Fixed a bug where too much data was parsed, thanks to Karl Pietri
+        for the report and capture file
+
+v0.13 (200602xx):
+      - added missing dependency on Exporter::Lite (reported by J. Jore)
+      - added prerequisite of libpcap of at least 0.8
+      - fixed stupid error that never let you specify an interface
+      - disabled the 'any' device as it returns frames in a format
+        that is different from Ethernet frames (and the libpcap
+        documentation is opaque to me in that regard)
+
+v0.12 (20051112):
+      - live-http-headers.pl now also outputs the status message
+        of the response.
+      - dropped support for v0.04 of Net::Pcap, as there is a
+        PPM for Net::Pcap v0.09 on uwinnipeg now:
+          Perl 5.6: http://theoryx5.uwinnipeg.ca/ppmpackages
+          Perl 5.8: http://theoryx5.uwinnipeg.ca/ppms
+
+v0.11 (20051107):
+      - Refactored code out into Net::Pcap::FindDevice which
+        will soon begin a life of its own in a separate distribution
+        (thanks to Bart Lateur and James Mastros)
+      - You can specify a device by IP and not just by name or description.
+        (suggested by Bart Lateur)
+      - The live-capture test t/05 now has an alarm() to kill
+        itself if it takes over 60 seconds.
+
+v0.10 (20051106):
+      - Staleness calbacks didn't work at all. Fixed now.
+
+v0.09 (20051106):
+      - added timeout to Sniffer::HTTP
+      - added stale connection detection to Sniffer::HTTP
+      - added last_activity to Sniffer::Connection
+      - added timestamp handling from Net::Pcap so even
+        captures play back with the correct timestamps
+      - add "Tee to file" capability to ->run() under the
+        option name "capture_file"
+
+v0.08 (20051104):
+      - Make magic less OS dependent:
+        * qr// checks against keys and values, regardless of OS
+      - guard against ->run(qr//), ->run(undef), ->run("") - these are
+        handled gracefully
+      - Make request absolute from Host: header
+      - Reading from libpcap capture files works, even with filters
+      - Add (example of) reading from an ethereal or Wireshark capture (see t/03*)
+      - Fixed partially borked handling of Transfer-Encoding: chunked
+      - Find and remember port number from TCP packets
+          and put it in the request (faked via Host: header)
+
+v0.07 (20051103)
+      - Added Pcap example filters
+      - added much more magic to select a suitable interface
+        to listen on. See find_device().
+
+v0.06 (200510xx)
+      - Fixed crash if Sniffer::HTTP object is created without a log()
+        callback.
+      - The Pcap filter parameter was not used at all...
+
+v0.05 (200510xx)
+      - Added much documentation and clarifications thanks to (in no order)
+         theorbtwo, blokhead, Bart Lateur,
+      - Added live-http-headers.pl example script
+      - Added methods to handle Ethernet and IP packets
+      - Renamed handle_packet to handle_tcp_packet
+      - handle_tcp_packet now accepts both, a raw TCP frame
+        or a NetPacket::TCP hash
+      - The demo script live-http-headers.pl has better/saner defaults
+      - The test script dump-raw.pl has better/saner defaults
+      - added simplicistic ->run method that tries to use sane defaults
+      - Net::Pcap is now a prerequisite
+
+v0.04 (200510xx)
+      - Fixed the out-of-order TCP problem for now
+      - added some first semblance of a test suite
+
+v0.03 (200510xx)
+      - some public release

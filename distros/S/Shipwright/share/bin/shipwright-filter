@@ -1,0 +1,156 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Carp;
+use File::Find;
+use File::Spec::Functions qw/catfile catdir splitdir/;
+use lib 'inc';
+
+my %args;
+@ARGV = '--help' unless @ARGV;
+
+confess "unknown option"
+  unless GetOptions( \%args, 'remove-pod', 'squeeze', 'verbose', 'help' );
+
+my $USAGE = <<'END'
+run: ./bin/shipwright-filter --remove-pod
+run: ./bin/shipwright-filter --squeeze
+
+options: 
+
+help: print this usage
+
+remove-pod: remove .pm files' pod, this will ignore files that match lines in
+    file __pod_ignores, which contains a list of regex line by line
+
+squeeze: squeeze lib files. this is done by replace duplicate files by
+linking
+
+verbose: show more info to stdout
+
+END
+  ;
+
+if ( $args{'help'} ) {
+    print $USAGE;
+    exit 0;
+}
+
+if ( $args{'remove-pod'} ) {
+    my @regex = get_pod_ignores();
+    find(
+        sub {
+            return unless -f && /\.pm$/;
+            for my $regex (@regex) {
+                my $return = eval { $File::Find::name =~ /$regex/ };
+                if ( $@ ) {
+                    warn "the regex $regex in __pod_ignores is not so right";
+                }
+                return if $return;
+            }
+
+            open my $fh, '<', $_
+              or return;    # die is not cool: it's just a filter
+            my $content = do { local $/; <$fh> };
+            print "removing pod from $File::Find::name\n" if $args{verbose};
+            apply( \$content, $_ );
+            chmod oct 755, $_;
+            open $fh, '>', $_ or return;
+            print $fh $content;
+            close $fh;
+            chmod oct 444 , $_;
+        },
+        get_install_base() || @ARGV
+    );
+    print "removing pod finished.\n";
+}
+elsif ( $args{'squeeze'} ) {
+    my $as_dir = catdir( get_install_base(), 'as' );
+    my $dh;
+    opendir $dh, $as_dir or die $!;
+    my @as = grep { $_ !~ /^\.\.?$/ } readdir $dh;
+    if ( @as >= 1 ) {
+        require File::Compare
+          or die "can't require File::Compare, you need to install this module";
+
+        my $first_as = shift @as;
+        my $sub = sub {
+            my $name = $File::Find::name;
+            return unless -f $name;
+            my $name_under_lib = $name;
+            $name_under_lib =~ s!\Q$as_dir\E[/\\]\Q$first_as\E[/\\]lib[/\\]!!;
+            for my $as ( @as ) {
+                my $another = $name;
+                $another =~ s!(?<=\Q$as_dir\E[/\\])\Q$first_as\E!$as!;
+                # compare return 0 to indicate the two files are equal
+                unless ( File::Compare::compare( $name, $another ) ) {
+                    my $depth = scalar( splitdir($File::Find::dir) ) -
+                        scalar( splitdir( $as_dir ) );
+                    print "squeeze $another\n" if $args{verbose};
+                    unlink $another;
+                    link catfile( ('..') x $depth,
+                        $first_as, 'lib', $name_under_lib ),
+                      $another;
+                }
+            }
+        };
+        find( $sub, catdir( $as_dir, $first_as, 'lib' ) );
+    }
+
+
+    print "sequeeze finished.\n";
+}
+
+# this sub is stolen from PAR::Filter::PodStrip
+sub apply {
+    my ( $ref, $filename, $name ) = @_;
+
+    no warnings 'uninitialized';
+
+    my $data = '';
+    $data = $1 if $$ref =~ s/((?:^__DATA__\r?\n).*)//ms;
+
+    my $line = 1;
+    if ( $$ref =~ /^=(?:head\d|pod|begin|item|over|for|back|end|cut)\b/ ) {
+        $$ref = "\n$$ref";
+        $line--;
+    }
+    $$ref =~ s{(
+	(.*?\n)
+	(?:=(?:head\d|pod|begin|item|over|for|back|end)\b
+    .*?\n)
+	(?:=cut[\t ]*[\r\n]*?|\Z)
+	(\r?\n)?
+    )}{
+	my ($pre, $post) = ($2, $3);
+        "$pre#line " . (
+	    $line += ( () = ( $1 =~ /\n/g ) )
+	) . $post;
+    }gsex;
+
+    $$ref =~ s{^=encoding\s+\S+\s*$}{\n}mg;
+    $$ref = '#line 1 "' . ($filename) . "\"\n" . $$ref
+      if length $filename;
+    $$ref =~ s/^#line 1 (.*\n)(#!.*\n)/$2#line 2 $1/g;
+    $$ref .= $data;
+}
+
+sub get_install_base {
+    if ( open my $fh, '<', '__install_base' ) {
+        my $install_base = <$fh>;
+        close $fh;
+        chomp $install_base;
+        return $install_base;
+    }
+}
+
+sub get_pod_ignores {
+    my @regex;
+    if ( open my $fh, '<', '__pod_ignores' ) {
+        @regex = <$fh>;
+        chomp @regex;
+    }
+    return grep { /\S/ } @regex;
+}

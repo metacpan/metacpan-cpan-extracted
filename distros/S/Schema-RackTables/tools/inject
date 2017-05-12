@@ -1,0 +1,64 @@
+#!/opt/perl/current/bin/perl
+use v5.14;
+use strict;
+use warnings;
+use autodie;
+
+use Data::Dump  qw< dd pp >;
+use DBIx::Class::Schema::Diff;
+use File::Path;
+use File::Slurp;
+use JSON::XS;
+
+
+my $app = "RackTables";
+
+my %param = @ARGV;
+my $src = $param{from} || die "usage: $0 from <directory>\n";
+my $dst = $param{to} // "lib";
+
+push @INC, $dst, $src;
+my $jsoner = JSON::XS->new->pretty;
+
+mkpath "$dst/Schema/$app";
+
+my $ref_db_path = "$dst/Schema/$app/versions.json";
+my $new_db_path = "$src/Schema/$app/versions.json";
+
+my $ref_db = decode_json(eval { read_file($ref_db_path) } // "{}");
+my $new_db = decode_json(read_file($new_db_path));
+
+my $prev = $ref_db->{versions}[-1] // $new_db->{versions}[0];
+my %schema_for = ( $prev->{version} => $prev->{schema} // $prev->{version} );
+my @files;
+
+while (my $curr = shift @{$new_db->{versions}}) {
+    my $curr_vn = version2schema($curr->{version});
+    my $prev_vn = version2schema($prev->{schema} // $prev->{version});
+
+    my $dbdiff = DBIx::Class::Schema::Diff->new(
+        old_schema => "Schema::$app\::$prev_vn",
+        new_schema => "Schema::$app\::$curr_vn",
+    );
+
+    if ($dbdiff->diff) {
+        $schema_for{$curr->{version}} = $curr->{version};
+        push @files, "$src/Schema/$app/$curr_vn.pm",
+            "$src/Schema/$app/$curr_vn";
+    }
+    else {
+        $schema_for{$curr->{version}} = $schema_for{$prev->{version}};
+    }
+
+    $curr->{schema} = $schema_for{$curr->{version}};
+    push @{ $ref_db->{versions} }, $curr;
+
+    $prev = $curr;
+}
+
+system "rsync", "-aC", @files, "$dst/Schema/$app/";
+write_file($ref_db_path, $jsoner->encode($ref_db));
+
+sub schema2version { $_[0] =~ s/_/./rg }
+sub version2schema { $_[0] =~ s/\./_/rg }
+

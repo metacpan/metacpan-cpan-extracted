@@ -1,0 +1,49 @@
+Sdict Perl module
+=================
+
+This module was written to support binary dictionary files stored in
+.dct format. It is pure Perl module which can be used to
+compile/decompile dictionary databases, perform search and navigation
+across the dictionary and get detailed info about it.
+
+The whole Sdictionary project which contains additional tools and
+modules available at
+http://freshmeat.net/projects/sdictionary/
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+   Compress::Zlib
+
+Also this module requires these other modules and libraries for dictionary
+compilation (not needed for regular usage): 
+
+   Sort::ArbBiLex
+   Unicode::Collate
+
+
+LIMITATIONS
+
+The only little-endian architectures are supported.
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (c) 2001-2007 by Alexey Semenoff [http://swaj.net].
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+__END__

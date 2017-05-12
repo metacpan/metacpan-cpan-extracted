@@ -1,0 +1,21 @@
+Revision history for Perl extension Starch::Store::Amazon::DynamoDB.
+
+0.04 2015-07-27
+
+ - Properly extend the BUILD method.
+
+0.03 2015-07-22
+
+ - Issue a no-op get() during store build time to initialize all the
+   LWP stuff which dramatically slows down the first DDB call.
+
+0.02 2015-07-21
+
+ - Better Carp caller reporting.
+ - Fix Type::Tiny union constraints sometimes failing on Perl < 5.14.
+ - Fix several dependency issues.
+
+0.01 2015-07-16
+
+ - First version.
+

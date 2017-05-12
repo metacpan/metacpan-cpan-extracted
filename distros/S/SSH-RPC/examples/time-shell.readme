@@ -1,0 +1,17 @@
+If you just want to test time-shell.pl without installing it, type:
+
+./time-shell.pl
+
+Then paste one of the following into your shell:
+
+{ "command" : "time" }
+
+{ "command" : "hiResTime" }
+
+The first will return a scalar representation of time, while the second will return an array reference of the time values. In doing this we're simulating what SSH::RPC::Client would send the shell if we used time-client.pl.
+
+To install the shell simply run useradd like this:
+
+useradd -s /path/to/time-shell.pl testuser
+
+Then either set up a password for testuser or an ssh key so you can authenticate against it.

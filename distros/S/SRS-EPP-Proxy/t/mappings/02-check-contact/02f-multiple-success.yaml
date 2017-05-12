@@ -1,0 +1,30 @@
+template: check-contact.tt
+
+vars:
+  contact_ids:
+    - 02f1
+    - 02f2
+    - nada
+
+input_assertions:
+  class: SRS::EPP::Command::Check::Contact
+
+SRS:
+  - assertions:
+      count:
+        - [ '//HandleIdFilter', 3, 'SRS: Check that there were 3 HandleIdFilters' ]
+
+output_assertions:
+  count:
+   - [ '//contact:cd', '3', 'Three contact containers' ]
+   - [ '//contact:id', 3, 'Check there are 2 ids' ]
+  match:
+   - [ '//contact:cd[1]/contact:id', '02f1', 'Check first contact' ]
+   - [ '//contact:cd[2]/contact:id', '02f2', 'Check second contact' ]
+   - [ '//contact:cd[3]/contact:id', 'nada', 'Check third contact' ]
+  match_all:
+  attr_is:
+   - [ '//contact:cd[1]/contact:id', 'avail', '0', 'First contact not available' ]
+   - [ '//contact:cd[2]/contact:id', 'avail', '0', 'Second contact not available' ]
+   - [ '//contact:cd[3]/contact:id', 'avail', '1', 'Third contact available' ]
+   

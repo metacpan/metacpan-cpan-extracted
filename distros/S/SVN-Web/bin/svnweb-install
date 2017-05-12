@@ -1,0 +1,140 @@
+#!/usr/bin/perl
+use strict;
+use Config;
+use File::Copy;
+use File::Basename;
+use File::Find;
+
+BEGIN {
+
+    # This is a nasty hack.  SVN::Core has a bug.  "perl -MSVN::Core -c -e 1"
+    # will dump core.  Something to do with the interaction between "-c"
+    # running BEGIN blocks but not running END blocks, or similar.
+    #
+    # Anyway, we want to test to make sure this script compiles cleanly.
+    # And we want to use SVN::Web.  Since the two are mutually exclusive,
+    # only use SVN::Web (and hence SVN::Core) if we're not compiling.
+    if(!$^C) {
+        require SVN::Web;
+    }
+}
+
+my $version = SVN::Web->VERSION();
+
+die "already have config.yaml" if -e 'config.yaml';
+
+open my $fh, '>', 'config.yaml';
+
+print $fh <<END;
+version: $version
+
+# Actions, the classes that implement them, and where they should appear
+# in the action menu
+actions:
+  blame:
+    class: SVN::Web::Blame
+    action_menu:
+      show:
+        - file 
+      link_text: (view blame)
+  browse:
+    class: SVN::Web::Browse
+    action_menu:
+      show:
+        - directory
+      link_text: (browse directory)
+  checkout:
+    class: SVN::Web::Checkout
+    action_menu:
+      show:
+        - file
+      link_text: (checkout)
+  diff:
+    class: SVN::Web::Diff
+  list:
+    class: SVN::Web::List
+    opts:
+      public_repos_uri: hide_local
+  log:
+    class: SVN::Web::Log
+    action_menu:
+      show:
+        - file
+        - directory
+      link_text: (view revision log)
+  revision:
+    class: SVN::Web::Revision
+  rss:
+    class: SVN::Web::RSS
+    action_menu:
+      show:
+        - file
+        - directory
+      link_text: (rss)
+      head_only: 1
+      icon: /css/trac/feed-icon-16x16.png
+  view:
+    class: SVN::Web::View
+    action_menu:
+      show:
+        - file
+      link_text: (view file)
+
+# Languages.  Specify the localisation files, and how they should be described
+# in the web interface.  You probably don't want to change this.
+languages:
+  en: English
+  fr: Fran&ccedil;ais
+  zh_cn: Chinese (Simplified)
+  zh_tw: Chinese (Traditional)
+
+# Set the default language here.  If not set, English is used
+#default_language: fr
+
+# Time and date formatting
+timedate_format: '%Y/%m/%d %H:%M:%S'
+
+# Timezone.  Uncomment the next line to use the server's timezone instead
+# of UTC.  Or, specify a literal timezone (C<timezone: 'EST'> for example)
+#timezone: local
+
+# set your repository path below:
+#
+#repos:
+#  test: '/tmp/svnweb-test'
+#  test2: '/tmp/svnweb-test2'
+#
+# or a parent path contains repositories
+#
+#reposparent: '/path/to/repositories'
+#
+# if you set a parent you can block specific repositories
+# like this:
+#
+#block:
+#  - 'blocked1'
+#  - 'blocked2'
+#
+
+END
+
+close $fh;
+
+# XXX: export the template too
+
+print "SVN::Web now installed! please see config.yaml\n";
+
+=head1 COPYRIGHT
+
+Copyright 2003-2004 by Chia-liang Kao C<< <clkao@clkao.org> >>.
+
+Copyright 2005-2007 by Nik Clayton C<< <nik@FreeBSD.org> >>.
+
+Copyright 2012 by Dean Hamstead C<< <dean@fragfest.com.au> >>.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+See L<http://www.perl.com/perl/misc/Artistic.html>
+
+=cut

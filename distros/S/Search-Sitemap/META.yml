@@ -1,0 +1,44 @@
+---
+abstract: 'Perl extension for managing Search Engine Sitemaps'
+author:
+  - 'Jason Kohles, <email@jasonkohles.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::Mock::LWP::UserAgent: 0
+  Test::Most: 0
+  ok: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Search-Sitemap
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Carp: 0
+  Class::Trigger: 0
+  DateTime: 0
+  HTML::Entities: 0
+  IO::File: 0
+  IO::Zlib: 0
+  LWP::UserAgent: 0
+  Module::Find: 0
+  Moose: 0
+  Moose::Util::TypeConstraints: 0
+  MooseX::ClassAttribute: 0
+  MooseX::Types: 0
+  MooseX::Types::Moose: 0
+  MooseX::Types::URI: 0
+  POSIX: 0
+  XML::Twig: 0
+  namespace::clean: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 2.13

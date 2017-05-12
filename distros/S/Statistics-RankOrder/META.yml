@@ -1,0 +1,46 @@
+---
+abstract: 'Algorithms for determining overall rankings from a panel of judges'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  File::Spec: 0
+  File::Spec::Functions: 0
+  File::Temp: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  List::Util: 0
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.17
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.132660'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Statistics-RankOrder
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Statistics::RankOrder:
+    file: lib/Statistics/RankOrder.pm
+    version: 0.13
+requires:
+  Carp: 0
+  Class::Tiny: 0
+  perl: 5.008001
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/dagolden/Statistics-RankOrder/issues
+  homepage: https://github.com/dagolden/Statistics-RankOrder
+  repository: https://github.com/dagolden/Statistics-RankOrder.git
+version: 0.13
+x_authority: cpan:DAGOLDEN

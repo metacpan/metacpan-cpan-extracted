@@ -1,0 +1,10 @@
+Revision history for Perl extension Shell::Tools.
+
+0.04	Sat, May 23 2015
+	- Shell::Tools::Extra now imports "rule" from File::Find::Rule
+	- fix a few tests that failed under specific circumstances
+	- a few documentation updates
+
+0.02	Thu, Jan  1 2015	commit c5ef39a0ae818ba46df10ad8af6db77494675a7a
+	- first public release
+

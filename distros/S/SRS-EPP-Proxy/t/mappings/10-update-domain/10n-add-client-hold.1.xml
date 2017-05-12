@@ -1,0 +1,37 @@
+<NZSRSResponse VerMajor="5" VerMinor="0">
+  <Response Action="DomainUpdate" FeId="8" FeSeq="4803306" OrigRegistrarId="90" RecipientRegistrarId="90" Rows="1" TransId="brause8769">
+    <FeTimeStamp Day="8" Hour="15" Minute="23" Month="7" Second="27" TimeZoneOffset="+12:00" Year="2010"/>
+    <Domain Delegate="0" DomainName="cheese.co.nz" RegistrarId="90" Status="Active" Term="1" UDAI="GbtMuYY9">
+      <NameServers>
+        <Server FQDN="ns2.everydns.net"/>
+        <Server FQDN="ns3.everydns.net"/>
+        <Server FQDN="ns4.everydns.net"/>
+        <Server FQDN="ns5.everydns.net"/>
+        <Server FQDN="ns6.everydns.net"/>
+      </NameServers>
+      <RegistrantContact ActionId="Update handle registrant-001 1" Email="new001@registrant.co.nz" HandleId="registrant-001" Name="new registrant 001">
+        <PostalAddress Address1="Regisrant New Address 1" City="Wellington" CountryCode="NZ"/>
+        <Phone AreaCode="4" CountryCode="64" LocalNumber="123 ext 1"/>
+        <Fax AreaCode="4" CountryCode="64" LocalNumber="123666"/>
+      </RegistrantContact>
+      <AdminContact ActionId="Update handle registrant-001 1" Email="new001@registrant.co.nz" HandleId="registrant-001" Name="new registrant 001">
+        <PostalAddress Address1="Regisrant New Address 1" City="Wellington" CountryCode="NZ"/>
+        <Phone AreaCode="4" CountryCode="64" LocalNumber="123 ext 1"/>
+        <Fax AreaCode="4" CountryCode="64" LocalNumber="123666"/>
+      </AdminContact>
+      <TechnicalContact ActionId="Update handle registrant-001 1" Email="new001@registrant.co.nz" HandleId="registrant-001" Name="new registrant 001">
+        <PostalAddress Address1="Regisrant New Address 1" City="Wellington" CountryCode="NZ"/>
+        <Phone AreaCode="4" CountryCode="64" LocalNumber="123 ext 1"/>
+        <Fax AreaCode="4" CountryCode="64" LocalNumber="123666"/>
+      </TechnicalContact>
+      <BilledUntil Day="06" Hour="13" Minute="19" Month="8" Second="58" TimeZoneOffset="+12:00" Year="2010"/>
+      <RegisteredDate Day="06" Hour="13" Minute="19" Month="7" Second="58" TimeZoneOffset="+12:00" Year="2010"/>
+      <AuditDetails ActionId="brause8769" RegistrarId="90">
+        <AuditTime>
+          <From Day="08" Hour="15" Minute="23" Month="7" Second="27" TimeZoneOffset="+12:00" Year="2010"/>
+        </AuditTime>
+        <AuditText/>
+      </AuditDetails>
+    </Domain>
+  </Response>
+</NZSRSResponse>

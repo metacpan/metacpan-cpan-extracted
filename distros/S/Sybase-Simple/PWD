@@ -1,0 +1,8 @@
+# This file contains optional login id, passwd and server info for the test
+# programs:
+# You probably don't want to have it lying around after you've made
+# sure that everything works OK.
+
+PWD=
+SRV=troll
+UID=sa

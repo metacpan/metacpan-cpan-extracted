@@ -1,0 +1,11 @@
+BridgeQuery.pm
+Changes
+examples/bq.pl
+LICENSE
+Makefile.PL
+MANIFEST
+README
+INSTALL
+TODO
+test.pl
+META.yml                                 Module meta-data (added by MakeMaker)

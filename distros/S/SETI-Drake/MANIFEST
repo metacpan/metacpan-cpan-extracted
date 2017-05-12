@@ -1,0 +1,17 @@
+CHANGES
+lib/.svn/entries
+lib/.svn/format
+lib/SETI/.svn/entries
+lib/SETI/.svn/format
+lib/SETI/.svn/prop-base/Drake.pm.svn-base
+lib/SETI/.svn/text-base/Drake.pm.svn-base
+lib/SETI/Drake.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+t/.svn/entries
+t/.svn/format
+t/.svn/prop-base/SETI-Drake.t.svn-base
+t/.svn/text-base/SETI-Drake.t.svn-base
+t/SETI-Drake.t
+META.yml                                 Module meta-data (added by MakeMaker)

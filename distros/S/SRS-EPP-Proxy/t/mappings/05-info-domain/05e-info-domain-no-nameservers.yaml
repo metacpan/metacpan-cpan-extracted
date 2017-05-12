@@ -1,0 +1,34 @@
+template: info-domain.tt
+
+vars:
+  domain_name: no-nameserver.co.te
+  pw:
+
+input_assertions:
+  class: SRS::EPP::Command::Info::Domain
+
+SRS:
+  - assertions:
+      count:
+        - [ '/NZSRSRequest/*', 2, 'SRS: Check that there are two requests' ]
+        - [ '//Whois', 1, 'SRS: Check for only one Whois' ]
+        - [ '//DomainNameFilter', 1, 'SRS: Check for only one DomainNameFilter' ]
+      element_is:
+        - [ '/NZSRSRequest/*[1]', 'Whois', 'SRS: The first request should be a Whois' ]
+        - [ '/NZSRSRequest/*[2]', 'DomainDetailsQry', 'SRS: The second request should be a DomainDetailsQry' ]
+      match:
+        - [ '//DomainNameFilter', 'no-nameserver.co.te', 'SRS: Check the domain name' ]
+      match_all:
+      attr_is:
+output_assertions:
+  count:
+    - [ '//epp:resData', 1, 'EPP: Check for resData' ]
+    - [ '//domain:hostAttr', 0, 'EPP: Zero nameservers' ]
+  match:
+    - [ '//domain:name', 'no-nameserver.co.te', 'EPP: Check domain name is correct' ]
+    - [ '//domain:roid', '6dc92f1925d2-DOM', 'EPP: Check domain roid is correct' ]
+    - [ '//domain:crDate', '/\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d:\d\d/', 'EPP: Check created date' ]
+    - [ '//domain:exDate', '/\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d:\d\d/', 'EPP: Check expiry date' ]
+  match_all:
+  attr_is:
+    - [ '//epp:result', 'code', 1000, 'EPP: command ok' ]

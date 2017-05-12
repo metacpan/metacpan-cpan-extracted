@@ -1,0 +1,32 @@
+---
+abstract: 'Read information from an Excel file.'
+author:
+  - 'Douglas Wilson (dougw@cpan.org)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Spreadsheet-ParseExcel
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Crypt::RC4: '0'
+  Digest::Perl::MD5: '0'
+  IO::File: '0'
+  IO::Scalar: '0'
+  OLE::Storage_Lite: '0.19'
+  Scalar::Util: '0'
+resources:
+  MailingList: http://groups.google.com/group/spreadsheet-parseexcel
+  bugtracker: http://github.com/runrig/spreadsheet-parseexcel/issues
+  homepage: http://github.com/runrig/spreadsheet-parseexcel/
+  repository: http://github.com/runrig/spreadsheet-parseexcel
+version: '0.65'

@@ -1,0 +1,13 @@
+%module{SOOT};
+
+class TArrayC {
+  TArrayC(AV* array)
+    %code{%
+      size_t len;
+      Char_t* ary = SOOT::AVToIntegerVec<Char_t>(aTHX_ array, len);
+      RETVAL = new TArrayC(len, ary);
+      free(ary);
+    %};
+  TArrayCharArray GetArray();
+};
+

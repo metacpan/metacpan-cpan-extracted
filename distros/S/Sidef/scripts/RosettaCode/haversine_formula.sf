@@ -1,0 +1,34 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Haversine_formula
+#
+
+class EarthPoint(lat, lon) {
+
+    const earth_radius = 6371       # mean earth radius
+    const radian_ratio = Num.pi/180
+
+    # accessors for radians
+    method latR { self.lat * radian_ratio }
+    method lonR { self.lon * radian_ratio }
+
+    method haversine_dist(EarthPoint p) {
+        var arc = __CLASS__(
+            self.lat - p.lat,
+            self.lon - p.lon,
+        )
+
+        var a = [ pow(sin(arc.latR / 2), 2),
+                  pow(sin(arc.lonR / 2), 2) *
+                  cos(self.latR) * cos(p.latR),
+                ].sum
+
+        earth_radius * asin(sqrt(a)) * 2
+    }
+}
+
+var BNA = EarthPoint.new(lat: 36.12, lon: -86.67)
+var LAX = EarthPoint.new(lat: 33.94, lon: -118.4)
+
+say BNA.haversine_dist(LAX)   # => 2886.444442837983299747157823945...

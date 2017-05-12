@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         SyslgScnDamn-Blacklist
+version:      0.44
+version_from: lib/SyslogScan/Daemon/BlacklistDetector.pm
+installdirs:  site
+requires:
+    Mail::SendVarious:             0
+    SyslogScan::Daemon:            0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

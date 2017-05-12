@@ -1,0 +1,50 @@
+#! /usr/bin/perl
+
+# searchd simulation daemon
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Sphinx::Config;
+
+my $config_file;
+
+GetOptions("config=s" => \$config_file);
+die "Must specify config file" unless $config_file;
+
+my $config = Sphinx::Config->new;
+$config->parse($config_file);
+my $pid_file = $config->get('searchd', undef, 'pid_file');
+
+die "Can't find pid_file in $config_file" unless $pid_file;
+my $status_file = $pid_file . '.status';
+
+my $pid = fork();
+exit if $pid > 0;
+
+die "fork() failed; $!" if $pid < 0;
+
+sub write_file {
+    my $file = shift;
+    my $content = shift;
+    open my $fh, ">", $file or die "Failed to open file $file: $!";
+    print $fh $content;
+    close($fh);
+}
+
+my $status = "STARTED";
+$SIG{'HUP'} = sub { $status = "HUPped"; write_file($status_file, $status); };
+
+write_file($pid_file, $$);
+write_file($status_file, $status);
+
+my $i = 0;
+while (1) {
+    sleep(100);
+    write_file($status_file, $status);
+    $i++;
+}
+
+END {
+#    unlink($pid_file);
+}

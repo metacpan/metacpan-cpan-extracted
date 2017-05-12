@@ -1,0 +1,33 @@
+NAME
+
+    String::Defer
+
+    A Perl module providing strings with delayed interpolation.
+
+        my $defer = String::Defer->new(\my $targ);
+        my $str   = "foo $defer bar";
+
+        $targ = "one";  say $str;   # foo one bar
+        $targ = "two";  say $str;   # foo two bar
+
+INSTALLATION
+
+    While it is possible to install this module manually, by running
+
+        perl Build.PL
+        ./Build
+        ./Build test
+        ./Build install
+
+    the recommended procedure is to use CPAN.pm or one of the other
+    automated interfaces to the CPAN.
+
+DOCUMENTATION
+
+    Full documentation in POD form is available in the .pm files in the
+    distribution. After installation they can be read with perldoc in
+    the usual way.
+
+AUTHOR
+
+    Ben Morrow <ben@morrow.me.uk>

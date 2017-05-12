@@ -1,0 +1,17 @@
+Revision history for Scalar::Constant 
+
+0.001.005  Sun Jan  29 2012
+       Include new test in manifest
+
+0.001.004  Sun Jan  29 2012
+       Fixed https://rt.cpan.org/Public/Bug/Display.html?id=74485
+
+0.001.003  Sun Jan  22 2012
+       Fixed https://rt.cpan.org/Public/Bug/Display.html?id=73488
+
+0.001.002  Tue Jul  7 2009
+       Recovered most of the docs.
+
+0.001.001  Tue Jul  7 2009
+       Initial release.
+

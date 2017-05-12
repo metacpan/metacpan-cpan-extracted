@@ -1,0 +1,30 @@
+Revision history for Perl extension Sort::SQL.
+
+0.01  Fri Mar 23 09:37:42 2007
+	- original version; created by h2xs 1.23 with options
+		-XA -n Sort::SQL
+
+0.02  Fri Mar 30 2007
+        - removed spurious Perl 5.8.7 requirement
+
+0.03  23 Oct 2007
+        - Perl 5.005? really?? ok. we can play that game.
+
+0.04  13 June 2009
+        - support comma-separated pairs
+        - refactor to fix bug with two columns with same name.
+
+0.05  13 June 2009
+        - fix regexp for pair separation introduced in 0.04
+
+0.06  14 June 2009
+        - refactor for parse() method
+
+0.07  20 Nov 2009
+        - avoid possible SQL injection by skipping any column names
+          that match \W
+
+0.08  29 Nov 2009
+        - fix regex in SQL-injection filter from 0.07 to allow table
+          prefixes on column names.
+

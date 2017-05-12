@@ -1,0 +1,426 @@
+# -*- coding: utf-8-emacs; -*-
+
+---
+# Reference test data for SIAM::Driver::Simple
+# WARNING: t/10-driver-simple.t verifies the MD5 data of this data. Update the
+# test script if you modify the contents below.
+
+# Contracts and services
+
+# This is an example of a business user with dual fiber connection and
+# a leased rack space
+-
+  siam.object.id:                 CTRT0001
+  siam.object.class:              SIAM::Contract
+  siam.contract.inventory_id:     INVC0001
+  siam.contract.customer_name:    Perpetualair Lavishbison, Inc.
+  siam.contract.customer_id:      CUST01
+  siam.object.has_reports:        1
+  xyz.billing_ok:                 1
+  _contains_:
+    -
+      siam.object.id:            SRVC0001.01
+      siam.object.class:         SIAM::Service
+      siam.svc.product_name:     Business Internet Standard
+      siam.svc.type:             fttx
+      siam.svc.inventory_id:     BIS0001
+      xyz.svc.street:            Musterstrasse 10
+      xyz.svc.zip:               8050
+      xyz.svc.city:              Zürich
+      _contains_:
+        -
+          siam.object.id:            SRVC0001.01.u01
+          siam.object.class:         SIAM::ServiceUnit
+          siam.svcunit.name:         BIS.64876.45
+          siam.svcunit.type:         fttx.p2p
+          siam.svcunit.inventory_id: BIS.64876.45
+          xyz.access.redundant:      0
+          xyz.serviceclass:          10
+          _contains_:
+            -
+              siam.object.id:            SRVC0001.01.u01.c01
+              siam.object.class:         SIAM::ServiceComponent
+              siam.svcc.name:            Access Port
+              siam.svcc.type:            IFMIB.Port
+              siam.svcc.inventory_id:    SRVC0001.01.u01.c01
+              siam.svcc.devc_id:         DEV_ZUR8050AN33_p01
+
+        -
+          siam.object.id:            SRVC0001.01.u02
+          siam.object.class:         SIAM::ServiceUnit
+          siam.svcunit.name:         BIS.89999.56
+          siam.svcunit.type:         fttx.p2p
+          siam.svcunit.inventory_id: BIS.89999.56
+          xyz.access.redundant:      0
+          _contains_:
+            -
+              siam.object.id:            SRVC0001.01.u02.c01
+              siam.object.class:         SIAM::ServiceComponent
+              siam.svcc.name:            Access Port
+              siam.svcc.type:            IFMIB.Port
+              siam.svcc.inventory_id:    SRVC0001.01.u02.c01
+              siam.svcc.devc_id:         DEV_OLT4600AN03_p01
+          
+    -
+      siam.object.id:            SRVC0001.02
+      siam.object.class:         SIAM::Service
+      siam.svc.product_name:     Business Rack Space
+      siam.svc.type:             xyz.rackspace
+      siam.svc.inventory_id:     BIS0002
+      xyz.svc.street:            Datastrasse 77
+      xyz.svc.zip:               8600
+      xyz.svc.city:              Dübendorf
+      _contains_:
+        -
+          siam.object.id:            SRVC0001.02.u01
+          siam.object.class:         SIAM::ServiceUnit
+          siam.svcunit.name:         BRS.8979.23
+          siam.svcunit.type:         rackspace
+          siam.svcunit.inventory_id: BRS.8979.23
+          xyz.room.id:                   DUB8600R02
+          xyz.rack.id:                   002-005
+          xyz.rack.slice:                1-8          
+          _contains_:
+            -
+              siam.object.id:            SRVC0001.02.u01.c01
+              siam.object.class:         SIAM::ServiceComponent
+              siam.svcc.name:            Access Port
+              siam.svcc.type:            IFMIB.Port
+              siam.svcc.inventory_id:    SRVC0001.02.u02.c01
+              siam.svcc.devc_id:         DEV_DUB8600AN04_p02
+
+    -
+      siam.object.id:            RPT0001.01
+      siam.object.class:         SIAM::Report
+      siam.report.name:          Top traffic usage
+      siam.report.description: >
+        Top traffic usage on service ports of Perpetualair Lavishbison, Inc.
+      siam.report.object_class:  SIAM::ServiceComponent
+      siam.report.type:          torrus.traffic.top
+      siam.report.last_updated:  1997-07-16T19:20:30+01:00
+      _compute_siam.report.content: >
+        [{"siam.report.item_id": "SRVC0001.01.u01.c01"},
+        {"siam.report.item_id": "SRVC0001.02.u01.c01"}]
+
+-
+  siam.object.id:                 CTRT0002
+  siam.object.class:              SIAM::Contract
+  siam.contract.inventory_id:     INVC0002
+  siam.contract.customer_name:    Zetamouse Ecosysteminfo, Inc.
+  siam.contract.customer_id:      CUST02
+  _contains_:
+    -
+      siam.object.id:            SRVC0002.01
+      siam.object.class:         SIAM::Service
+      siam.svc.product_name:     Virtual Private Hosting
+      siam.svc.type:             xyz.vps
+      siam.svc.inventory_id:     BIS0003
+      xyz.svc.street:            Datastrasse 78
+      xyz.svc.zip:               8600
+      xyz.svc.city:              Dübendorf
+      _contains_:
+        -
+          siam.object.id:            SRVC0002.01.u01
+          siam.object.class:         SIAM::ServiceUnit
+          siam.svcunit.name:         VPH.8788.99
+          siam.svcunit.type:         vps
+          siam.svcunit.inventory_id: VPH.8788.99
+          _contains_:
+            -
+              siam.object.id:            SRVC0002.01.u02.c01
+              siam.object.class:         SIAM::ServiceComponent
+              siam.svcc.name:            Virtual Machine
+              siam.svcc.type:            HOST
+              siam.svcc.inventory_id:    SRVC0002.01.u02.c01
+              siam.svcc.devc_id:         DEV_DUB8600VH05_h
+
+# Devices
+-
+  siam.object.id:            DEV_ZUR8050AN33
+  siam.object.class:         SIAM::Device
+  siam.device.inventory_id:  ZUR8050AN33
+  siam.device.name:          ZUR8050AN33
+  snmp.managed:              1
+  snmp.host:                 ZUR8050AN33.domain.net
+  _contains_:
+    -
+      siam.object.id:            DEV_ZUR8050AN33_p01
+      siam.object.class:         SIAM::DeviceComponent
+      siam.devc.inventory_id:    ZUR8050AN33_p01
+      siam.devc.type:            IFMIB.Port
+      siam.devc.name:            GigabitEthernet0/1
+      siam.devc.full_name:       ZUR8050AN33 GigabitEthernet0/1
+      siam.devc.description:     SAP102233
+      torrus.nodeid:             xyz-if://ZUR8050AN33_p01
+    -
+      siam.object.id:            DEV_ZUR8050AN33_p02
+      siam.object.class:         SIAM::DeviceComponent
+      siam.devc.inventory_id:    ZUR8050AN33_p02
+      siam.devc.type:            IFMIB.Port
+      siam.devc.name:            GigabitEthernet0/2
+      siam.devc.full_name:       ZUR8050AN33 GigabitEthernet0/2
+      siam.devc.description:     SAP102234
+      torrus.nodeid:             xyz-if://ZUR8050AN33_p02
+  
+-
+  siam.object.id:            DEV_OLT4600AN03
+  siam.object.class:         SIAM::Device
+  siam.device.inventory_id:  OLT4600AN03
+  siam.device.name:          OLT4600AN03
+  snmp.managed:              1
+  snmp.host:                 OLT4600AN03.domain.net
+  _contains_:
+    -
+      siam.object.id:            DEV_OLT4600AN03_p01
+      siam.object.class:         SIAM::DeviceComponent
+      siam.devc.inventory_id:    OLT4600AN03_p01
+      siam.devc.type:            IFMIB.Port
+      siam.devc.name:            GigabitEthernet0/1     
+      siam.devc.full_name:       OLT4600AN03 GigabitEthernet0/1
+      siam.devc.description:     SAP102235
+      torrus.nodeid:             xyz-if://OLT4600AN03_p01
+    -
+      siam.object.id:            DEV_OLT4600AN03_p02
+      siam.object.class:         SIAM::DeviceComponent
+      siam.devc.inventory_id:    OLT4600AN03_p02
+      siam.devc.type:            IFMIB.Port
+      siam.devc.name:            GigabitEthernet0/2
+      siam.devc.full_name:       OLT4600AN03 GigabitEthernet0/2
+      siam.devc.description:     SAP102236
+      torrus.nodeid:             xyz-if://OLT4600AN03_p02
+  
+-
+  siam.object.id:            DEV_DUB8600AN04
+  siam.object.class:         SIAM::Device
+  siam.device.inventory_id:  DUB8600AN04
+  siam.device.name:          DUB8600AN04
+  snmp.managed:              1
+  snmp.host:                 DUB8600AN04.domain.net
+  _contains_:
+    -
+      siam.object.id:            DEV_DUB8600AN04_p01
+      siam.object.class:         SIAM::DeviceComponent
+      siam.devc.inventory_id:    DUB8600AN04_p01
+      siam.devc.type:            IFMIB.Port
+      siam.devc.name:            GigabitEthernet0/1     
+      siam.devc.full_name:       DUB8600AN04 GigabitEthernet0/1
+      siam.devc.description:     SAP102237
+      torrus.nodeid:             xyz-if://DUB8600AN04_p01
+    -
+      siam.object.id:            DEV_DUB8600AN04_p02
+      siam.object.class:         SIAM::DeviceComponent
+      siam.devc.inventory_id:    DUB8600AN04_p02
+      siam.devc.type:            IFMIB.Port
+      siam.devc.name:            GigabitEthernet0/2
+      siam.devc.full_name:       DUB8600AN04 GigabitEthernet0/2
+      siam.devc.description:     SAP102238
+      torrus.nodeid:             xyz-if://DUB8600AN04_p02
+
+-
+  siam.object.id:            DEV_DUB8600VH05
+  siam.object.class:         SIAM::Device
+  siam.device.inventory_id:  DUB8600VH05
+  siam.device.name:          DUB8600VH05
+  snmp.managed:              1
+  snmp.host:                 DUB8600VH05.domain.net
+  _contains_:
+    -
+      siam.object.id:            DEV_DUB8600VH05_h
+      siam.object.class:         SIAM::DeviceComponent
+      siam.devc.inventory_id:    DUB8600VH05_h
+      siam.devc.type:            HOST
+      siam.devc.name:            DUB8600VH05
+      siam.devc.full_name:       DUB8600VH05 vhost
+      siam.devc.description:     SAP102239
+      vm.name:                   VPH.8788.99.01
+      vm.ram.limit:              1024
+      vm.ram.guaranteed:         512
+      vm.disk.size:              40
+      torrus.nodeid:             xyz-vm://DUB8600VH05
+
+# Users and access control
+
+-
+  siam.object.id:            CSCP0001
+  siam.object.class:         SIAM::AccessScope
+  siam.scope.name:           Contract.0001
+  siam.scope.applies_to:     SIAM::Contract
+  _contains_:
+    -
+      siam.object.id:            CSCP0001.m01
+      siam.object.class:         SIAM::ScopeMember
+      siam.scmember.object_id:   CTRT0001
+
+-
+  siam.object.id:            CSCP0002
+  siam.object.class:         SIAM::AccessScope
+  siam.scope.name:           Contract.0002
+  siam.scope.applies_to:     SIAM::Contract
+  _contains_:
+    -
+      siam.object.id:            CSCP0002.m01
+      siam.object.class:         SIAM::ScopeMember
+      siam.scmember.object_id:   CTRT0002
+
+-
+  siam.object.id:            ASCP_CUST
+  siam.object.class:         SIAM::AccessScope
+  siam.scope.name:           CustomerVisibleAttributes
+  siam.scope.applies_to:     SIAM::Attribute
+  _contains_:
+    -
+      siam.object.id:            ASCP_CUST.m01
+      siam.object.class:         SIAM::ScopeMember
+      siam.scmember.object_id:   ATTR0001
+    -
+      siam.object.id:            ASCP_CUST.m02
+      siam.object.class:         SIAM::ScopeMember
+      siam.scmember.object_id:   ATTR0002
+    -
+      siam.object.id:            ASCP_CUST.m03
+      siam.object.class:         SIAM::ScopeMember
+      siam.scmember.object_id:   ATTR0003
+    -
+      siam.object.id:            ASCP_CUST.m04
+      siam.object.class:         SIAM::ScopeMember
+      siam.scmember.object_id:   ATTR0004
+    -
+      siam.object.id:            ASCP_CUST.m05
+      siam.object.class:         SIAM::ScopeMember
+      siam.scmember.object_id:   ATTR0005
+    -
+      siam.object.id:            ASCP_CUST.m06
+      siam.object.class:         SIAM::ScopeMember
+      siam.scmember.object_id:   ATTR0006
+    -
+      siam.object.id:            ASCP_CUST.m07
+      siam.object.class:         SIAM::ScopeMember
+      siam.scmember.object_id:   ATTR0007
+    -
+      siam.object.id:            ASCP_CUST.m08
+      siam.object.class:         SIAM::ScopeMember
+      siam.scmember.object_id:   ATTR0008
+    -
+      siam.object.id:            ASCP_CUST.m09
+      siam.object.class:         SIAM::ScopeMember
+      siam.scmember.object_id:   ATTR0009
+    -
+      siam.object.id:            ASCP_CUST.m10
+      siam.object.class:         SIAM::ScopeMember
+      siam.scmember.object_id:   ATTR0010
+    -
+      siam.object.id:            ASCP_CUST.m11
+      siam.object.class:         SIAM::ScopeMember
+      siam.scmember.object_id:   ATTR0011
+
+  
+# Users
+# inline passwords are the result of:
+#  echo -n `echo -n "secretsalt" | openssl sha`salt | openssl base64
+-
+  siam.object.id:            USER0001
+  siam.object.class:         SIAM::User
+  siam.user.uid:             root
+  user.cn:                   Administrator
+  user.auth.method:          inline
+  user.auth.password: "{SSHA}NWE5MDg0MWU0ODY3Y2VjMTQ2NzU0NjNhOWEzZDFmMjI4MTFiZDQ2YnNhbHQ="
+  _contains_:
+    -
+      siam.object.id:                 PRIV0001.01
+      siam.object.class:              SIAM::Privilege
+      siam.privilege.access_scope_id: SIAM.SCOPE.ALL.CONTRACTS
+      siam.privilege.type:            ViewContract
+    -
+      siam.object.id:                 PRIV0001.02
+      siam.object.class:              SIAM::Privilege
+      siam.privilege.access_scope_id: SIAM.SCOPE.ALL.ATTRIBUTES
+      siam.privilege.type:            ViewAttribute
+
+
+      
+-
+  siam.object.id:            USER0002
+  siam.object.class:         SIAM::User
+  siam.user.uid:             perpetualair
+  user.cn:                   Perpetualair Lavishbison
+  user.auth.method:          inline
+  user.auth.password: "{SSHA}NWE5MDg0MWU0ODY3Y2VjMTQ2NzU0NjNhOWEzZDFmMjI4MTFiZDQ2YnNhbHQ="
+    
+  _contains_:
+    -
+      siam.object.id:                 PRIV0002.01
+      siam.object.class:              SIAM::Privilege
+      siam.privilege.access_scope_id: CSCP0001
+      siam.privilege.type:            ViewContract
+    -
+      siam.object.id:                 PRIV0002.02
+      siam.object.class:              SIAM::Privilege
+      siam.privilege.access_scope_id: ASCP_CUST
+      siam.privilege.type:            ViewAttribute
+
+-
+  siam.object.id:            USER0003
+  siam.object.class:         SIAM::User
+  siam.user.uid:             zetamouse
+  user.cn:                   Zetamouse Ecosysteminfo
+  user.auth.method:          inline
+  user.auth.password: "{SSHA}NWE5MDg0MWU0ODY3Y2VjMTQ2NzU0NjNhOWEzZDFmMjI4MTFiZDQ2YnNhbHQ="
+  _contains_:
+    -
+      siam.object.id:                 PRIV0003.01
+      siam.object.class:              SIAM::Privilege
+      siam.privilege.access_scope_id: CSCP0002
+      siam.privilege.type:            ViewContract
+    -
+      siam.object.id:                 PRIV0003.02
+      siam.object.class:              SIAM::Privilege
+      siam.privilege.access_scope_id: ASCP_CUST
+      siam.privilege.type:            ViewAttribute
+
+
+## Attrinutes visible to the customer
+-
+  siam.object.id:            ATTR0001
+  siam.object.class:         SIAM::Attribute
+  siam.attribute.name:       siam.contract.customer_name
+
+-
+  siam.object.id:            ATTR0002
+  siam.object.class:         SIAM::Attribute
+  siam.attribute.name:       xyz.billing_ok
+  
+-
+  siam.object.id:            ATTR0003
+  siam.object.class:         SIAM::Attribute
+  siam.attribute.name:       siam.svc.product_name
+  
+-
+  siam.object.id:            ATTR0004
+  siam.object.class:         SIAM::Attribute
+  siam.attribute.name:       siam.svc.inventory_id
+
+-
+  siam.object.id:            ATTR0005
+  siam.object.class:         SIAM::Attribute
+  siam.attribute.name:       siam.svcunit.inventory_id
+  
+-
+  siam.object.id:            ATTR0006
+  siam.object.class:         SIAM::Attribute
+  siam.attribute.name:       xyz.access.redundant
+
+-
+  siam.object.id:            ATTR0009
+  siam.object.class:         SIAM::Attribute
+  siam.attribute.name:       vm.ram.limit
+
+-
+  siam.object.id:            ATTR0010
+  siam.object.class:         SIAM::Attribute
+  siam.attribute.name:       vm.ram.guaranteed
+
+-
+  siam.object.id:            ATTR0011
+  siam.object.class:         SIAM::Attribute
+  siam.attribute.name:       vm.disk.size
+

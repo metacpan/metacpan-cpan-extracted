@@ -1,0 +1,39 @@
+---
+abstract: 'Swish3 Apache Lucy backend'
+author:
+  - 'Peter Karman, C<< <karman at cpan.org> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: http://dev.perl.org/licenses/
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: SWISH-Prog-Lucy
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Lucy: '0.003002'
+  LucyX::Search::WildcardQuery: 0.05
+  Path::Class::File::Lockable: 0
+  Path::Class::File::Stat: 0.03
+  SWISH::3: 1.000006
+  SWISH::Prog: 0.75
+  Search::Query: 0.17
+  Search::Query::Dialect::Lucy: 0.04
+  Sort::SQL: 0.06
+  Sys::Hostname: 0
+  Test::More: 0
+  perl: 5.8.3
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=SWISH-Prog-Lucy
+  homepage: http://dev.swish-e.org/wiki/perl
+  license: http://opensource.org/licenses/gpl-license.php
+  repository: http://svn.swish-e.org/perl/SWISH-Prog-Lucy/
+version: '0.25'

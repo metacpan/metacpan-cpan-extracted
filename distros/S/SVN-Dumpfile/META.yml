@@ -1,0 +1,21 @@
+--- #YAML:1.0
+name:                SVN-Dumpfile
+version:             0.13.107
+abstract:            Perl extension to access and manipulate Subversion dumpfiles
+license:             ~
+author:              
+    - Martin Scharrer <martin@scharrer-online.de>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Carp:                          1.04
+    Data::Dumper:                  2.121
+    Date::Parse:                   2.27
+    Digest::MD5:                   2.36
+    File::Temp:                    0.2
+    IO::File:                      1.13
+    IO::Handle:                    1.25
+    Readonly:                      1.03
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

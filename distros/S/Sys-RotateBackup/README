@@ -1,0 +1,22 @@
+NAME
+    Sys::RotateBackup - Rotate numbered backup directories
+
+METHODS
+  rotate
+    Rotate all valid types in vault.
+
+  cleanup
+    Remove all unnecessary directores.
+
+NAME
+    Sys::RotateBackup - rotate numiercal directories
+
+AUTHOR
+    Dominik Schulz <dominik.schulz@gauner.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Dominik Schulz.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

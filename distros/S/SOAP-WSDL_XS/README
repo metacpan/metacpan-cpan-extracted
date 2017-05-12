@@ -1,0 +1,93 @@
+INSTALLING ON WINDOWS
+=====================
+
+SOAP-WSDL_XS has successfully been compiled on windows using either
+MinGW/MSYS/gcc or Visual Studio 2005
+
+Only the MinGW/MSYS/gcc variant is described here - to compile with Visual
+Studio, you'll need to a add .manifest XML files for the resulting dll.
+
+Installing on Windows using MinGW/MSYS/gcc
+------------------------------------------
+
+Prerequisites
+-------------
+
+Install MinGW and MSYS. You may follow the instructions from
+http://www.mingw.org/download.shtml
+It's probably easiest to just use the installer package for MinGW and MSYS.
+You need at least MinGW, gcc, w32api and MSYS.
+
+Install expat libraries (http://expat.sourceforge.net/) The expat_win32
+package from http://sourceforge.net/project/showfiles.php?group_id=10127 is the
+right one.
+
+Install SOAP-WSDL >= 2.01.
+
+Install ExtUtils-CBuilder >= 0.24. Older versions of ExtUtils::CBuilder have 
+a bug which prevents the propagation of compiler flags from the build file to 
+your C compiler.
+
+You may try to install both through CPAN or via ppm (if available).
+
+Preparations
+------------
+
+1. Start MSYS. You should see a bash-like shell.
+Note that C: is /c/ in MSYS.
+
+2. Setup environment:
+
+You'll have to setup a few environment variables for the header and library
+files to be found.
+
+This is where I have my expat installation's header files
+
+   @> export CPATH='/c/Program Files/Expat 2.0.1/Source/lib'
+
+This is where my perl-related dlls lives
+I've already copied my expat library to perl's bin path. If you have not, you
+probably have to add the path to libexpat.dll here.
+
+   @> export LIBRARY_PATH='/c/perl/bin'
+
+Building
+--------
+
+1. Unwrap SOAP-WSDL_XS into a directory
+2. go there
+   @>cd /d/workspace/SOAP-WSDL_XS
+
+3. Run the following mantra:
+
+   perl Build.PL
+   perl Build
+   perl Build test
+
+Installing
+----------
+
+You may install SOAP-WSDL_XS with
+
+   perl Build install
+
+Note however, that you need to copy libexpat.dll to somewhere in your path.
+
+I copied it to C:\Perl\bin for convenience.
+
+TROUBLESHOOTING
+===============
+
+ Can't load 'C:/Perl/site/lib/auto/SOAP/WSDL/Expat/MessageParser_XS/
+ MessageParser_XS.dll' for module SOAP::WSDL::Expat::MessageParser_XS: 
+ load_file:The specified module could not be found at C:/Perl/lib/DynaLoader.pm 
+ line 229.
+
+If you get this message (path may vary according to your perl's location), your 
+system probably can't find libexpat.dll. You'll need to add it's location to
+your "PATH" environment variable, or copy it to a location in your path 
+(I usually use "C:\Perl\bin"). 
+
+See the "Prerequisites" section on where to get libexpat.dll
+
+

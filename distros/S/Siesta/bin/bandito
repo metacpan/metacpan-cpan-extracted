@@ -1,0 +1,273 @@
+#!/usr/local/bin/perl -w
+
+use strict; 
+use Siesta; 
+use Siesta::List; 
+use Siesta::Member; 
+
+use Python::Serialise::Marshal; 
+use Email::Folder;
+use Email::LocalDelivery;
+use POSIX qw/strftime/;
+
+my $old_archive_dir;
+
+BEGIN {
+     while (@ARGV) {
+        
+        if (@ARGV && $ARGV[0] eq '-a') {
+            shift;
+            $old_archive_dir = shift;
+        } elsif (@ARGV && $ARGV[0] eq '-f') {
+            shift;
+            $Siesta::Config::CONFIG_FILE = shift;
+        } else {
+            last;
+        }
+
+    }
+}
+use Siesta::Config;
+
+
+
+=pod
+
+=head1 NAME
+
+bandito - a tool for stealing mailman configurations
+
+
+=head1 USAGE
+
+    bandito [opts] <path to a mailman list config db>
+
+
+=head1 ALTERNATIVE CONFIG FILE
+
+By default bandito will use the config file specified in
+Siesta::Config. However by doing
+
+    % bandito -f <path to some file> <path to a mailman list config db>
+
+an alternative can be used instead.
+
+
+=head1 ALTERNATIVE ARCHIVE IMPORT
+
+If you're migrating from a none standard Mailman config and 
+the old archive is not in the location that the config thinks it is
+then you can do this :
+
+    % bandito -a <full path to old archive> <path to a mailman list config db>
+
+to specify an alternative archive.
+
+=head1 DESCRIPTION
+
+Bandito is a tool for stealing configurations from mailing list managers and 
+importing them into Siesta. At the moment it only does Mailman but will 
+eventually also do Ezmlm and Majordomo and anything else people want.
+
+It handles most thing - including moving your old archives across and
+setting up the list footers. However it won't be able to handle things like 
+digest members until Siesta gets digests.
+
+See the TODO section below.
+
+=head1 TODO
+
+=over 4
+
+=item digest members
+
+=item welcome/farewell messages
+
+=item max message size
+
+=item bouncing
+
+=back 
+
+=head1 COPYRIGHT
+
+(c)opyright 2003 - the siesta dev team
+
+=head1 SEE ALSO
+
+L<Siesta>, L<Siesta::UserGuide>, L<nacho>
+
+=cut
+
+# Bitfield for member options.  
+# Taken from 
+# http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/mailman/mailman/Mailman/Defaults.py.in?content-type=text/vnd.viewcvs-markup
+
+my %flags = (
+    Digests                  => 0, # handled by other mechanism, doesn't need a flag.
+    DisableDelivery          => 1, # Obsolete; use set/getDeliveryStatus()
+    DontReceiveOwnPosts      => 2, # Non-digesters only
+    AcknowledgePosts         => 4,
+    DisableMime              => 8, # Digesters only
+    ConcealSubscription      => 16,
+    SuppressPasswordReminder => 32,
+    ReceiveNonmatchingTopics => 64,
+    Moderate                 => 128,
+    DontReceiveDuplicates    => 256,
+);
+
+
+my $file = shift || die "You must pass a mailman config.db\n";
+my $pr   = Python::Serialise::Marshal->new($file) || die "Couldn't open $file\n";
+
+
+my $data = $pr->load();
+
+
+(my $list_name   = $data->{private_archive_file_dir}) =~ s!.+/([^/]+).mbox$!$1!;
+my $owner        = Siesta::Member->find_or_create({ email => $data->{owner}->[0] });
+my $post_address = $list_name.'@'.$data->{host_name};
+my $return_path  = $list_name.'-bounce@'.$data->{host_name};
+
+print "Creating a new list '$list_name' ...\n";
+print "\towner is '$owner'\n";
+print "\tpost address is '$post_address'\n";
+print "\treturn path is '$return_path'\n";
+print "\n\n";
+
+# create the new list
+my $list = Siesta::List->new (
+    name  => $list_name,
+    owner => $owner,
+    post_address => $post_address,
+    return_path  => $return_path, 
+
+) or die "Failed to create a new list\n";
+
+
+# make the new members
+print "Adding new members : \n";
+foreach my $email (keys %{$data->{passwords}}) {
+    print "$email ";
+    my $member = Siesta::Member->find_or_create({ email => $email });
+    my $nomail = ($data->{user_options}->{$email} & $flags{'DisableDelivery'} == $flags{'DisableDelivery'});
+    #$member->nomail($nomail);
+    #$member->password($data->{passwords}->{$email});
+	$member->update;
+    $list->add_member( $member );    
+
+
+
+}
+print "\n\n";
+
+
+
+print "Adding plugins : ";
+# first qet the sub and unsub queues out of the way
+$list->set_plugins( sub   => qw(Subscribe)   );
+$list->set_plugins( unsub => qw(UnSubscribe) );
+
+my @plugins = qw(Debounce MembersOnly Moderated ListHeaders ReplyTo SubjectTag MessageFooter Send Archive);
+print join ", ", @plugins;
+print "\n\n";
+$list->set_plugins( post => @plugins );
+
+# now get them out again
+my %plugins = map { $_->name => $_ } $list->plugins;
+
+print "Setting options :\n";
+# reply to 
+my $reply_to      = $data->{'reply_goes_to_list'};
+   $reply_to      = 0 unless defined $reply_to;
+print "ReplyTo => $reply_to\n";
+$plugins{'ReplyTo'}->pref('munge',$reply_to);
+
+
+# members only
+my $members_only  = $data->{'member_posting_only'};
+   $members_only  = 0 unless defined $members_only;
+
+print "MembersOnly => $members_only\n";
+$plugins{'MembersOnly'}->pref('approve', $members_only);
+$plugins{'MembersOnly'}->pref('tell_user', 1);
+$plugins{'MembersOnly'}->pref('allowed_posters', join " ", @{$data->{posters}});
+
+
+# set the subject line
+my $subject_munge = $data->{'subject_prefix'};
+   $subject_munge = "" unless defined $subject_munge;
+print "SubjectTag => $subject_munge\n";
+
+# whether or not it's moderated
+my $moderated     = $data->{'moderated'};
+   $moderated     = 0 unless defined $moderated;
+print "Moderated => $moderated\n";
+$plugins{'Moderated'}->pref('moderated', $moderated);
+$plugins{'Moderated'}->pref('tell_user', 1);  
+
+
+# the message footer
+my $footer = $data->{'msg_footer'};
+if ($footer && $footer !~ /^\s+$/m) {
+    $footer =~ s!%\(([^\)]+)\)!\[% $1 %\]!gm;
+    $plugins{'MessageFooter'}->pref('footer',$footer);
+}
+
+foreach my $key (qw(info description web_page_url host_name cgiext)) {
+    my $val = $data->{$key};
+    $plugins{'MessageFooter'}->pref($key, $val)
+            if ($val && $val !~ /^\s+$/m);
+
+}
+$plugins{'MessageFooter'}->pref('description',$data->{'description'});
+print "MessageFooter => ",$data->{'description'},"\n";
+
+
+# now copy across the archives
+
+# where are we going to get the mails from
+my $in     = $old_archive_dir || $data->{'public_archive_file_dir'};
+
+
+unless (-e $in) {   
+    warn "No such file or dir '$in'\n";
+    goto FAIL;
+}
+
+my $folder;
+
+unless($folder = Email::Folder->new($in)) {
+    warn "Couldn't open '$in' to read archives from\n";
+    goto FAIL;
+}
+
+# work out where to stick them
+my $name = $list->name;
+my $path = "$Siesta::Config::ARCHIVE/$name/";
+
+unless (-e $path) {
+    warn "No such file or dir '$in'\n";
+    goto FAIL;
+}
+
+
+# and then deliver each one
+foreach my $mail ($folder->messages()) {
+    unless (Email::LocalDelivery->deliver( $mail->as_string, $path )) {
+        warn "local delivery into '$path' failed - couldn't copy archives from '$in'\n";
+        goto FAIL;
+    }
+}
+
+# yay!
+print "Successfully copied archives from '$in' to '$path'\n";
+
+# erk
+FAIL:
+
+
+print "\n\nNow paste this into your aliases file :\n\n\n"; 
+print $list->alias("bandito (the Siesta config stealing tool)");
+
+

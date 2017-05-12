@@ -1,0 +1,134 @@
+#!/usr/bin/perl -w
+use strict;
+use SVK;
+use SVK::XD;
+use SVN::Repos;
+use SVK::Util 'traverse_history';
+use Getopt::Long;
+
+my $revspec;
+
+sub usage {
+        print <<EOUSAGE;
+Usage:  pullyu [-r=revision] repopath mirrorpath
+    Prints out a svn dump file from a complete mirrored svk depot.  
+    repopath is the path to your local svk repository, usually ~/.svk/local
+    mirrorpath is the path to the mirror, such as /mirrors/myproject
+    
+    Example: ./pullyu ~/.svk/local /mirrors/myproject > myproject-svn-dumpfile
+    
+EOUSAGE
+exit;
+}
+
+
+die unless GetOptions ("r|revision=s@" => \$revspec);
+
+use SVN::Dump 0.03;
+
+my $repospath = shift or usage();
+my $path      = shift or usage();
+
+my $repos = SVN::Repos::open($repospath) or die $!;
+my $depot = SVK::Depot->new({ depotname => '', repos => $repos, repospath => $repospath});
+my $t  = SVK::Path->real_new({ depot => $depot, path => $path })
+    ->refresh_revision;
+
+my $r = $revspec ? (bless { revspec => $revspec}, 'SVK::Command')->parse_revlist($t) : [0];
+$r->[1] ||= $t->revision;
+
+my ( $m, $mpath ) = $t->is_mirrored;
+die "only whole repository mirrors are supported.\n" if length($mpath);
+$t->revision($r->[1]);
+$t->normalize;
+
+my @revs;
+
+traverse_history(
+    root     => $t->root,
+    path     => $t->path,
+    cross    => 0,
+    callback => sub {
+        my ( $path, $rev ) = @_;
+	return 0 if $rev < $r->[0];
+        unshift @revs, $rev;
+        1;
+    }
+);
+
+autoflush STDERR 1;
+my $i    = 0;
+my $pool = SVN::Pool->new_default;
+
+my $prefix = substr( $m->path, 1 );
+
+print SVN::Dump::Headers->new(
+            { 'SVN-fs-dump-format-version' => 3 } )->as_string;
+print SVN::Dump::Headers->new({ 'UUID' => $m->source_uuid })->as_string;
+my $prev = $r->[0] ? 0 : undef;
+for my $rev (@revs) {
+    $pool->clear;
+
+    my $rrev = $m->find_remote_rev($rev) or next;
+
+    my $r = $t->mclone( revision => $rev );
+    my $scalar;
+    open my $buf, '+>', \$scalar;
+    SVN::Repos::dump_fs2( $repos, $buf, undef, $rev, $rev, 1, 1, undef,
+        undef );
+    seek $buf, 0, 0;
+    my $dump = SVN::Dump->new( { fh => $buf } );
+    while ( my $record = $dump->next_record() ) {
+        next if $record->type eq 'format' || $record->type eq 'uuid';
+	# padding
+	if (!defined $prev || $prev) {
+	    for my $pad (($prev||0)+1 .. $rrev-1) {
+		print pad_rev($pad)->as_string;
+		++$prev;
+	    }
+	}
+
+        my $translate = sub {
+            my $rec = shift;
+            $rec->set_header('Revision-number' => $rrev)
+                if $rec->get_header('Revision-number');
+
+	    if (my $rev = $rec->get_header('Node-copyfrom-rev')) {
+		$rec->set_header('Node-copyfrom-rev' =>
+				 scalar $m->find_remote_rev( $rev ) );
+	    }
+
+	    if (my $path = $rec->get_header('Node-copyfrom-path')) {
+		$path =~ s{^\Q$prefix\E/?}{} or die "$path untranslatable";
+		$rec->set_header('Node-copyfrom-path' => $path );
+	    }
+
+            if ( my $prop = $rec->get_property_block ) {
+                $prop->delete('svm:headrev');
+            }
+
+            if ( my $path = $rec->get_header('Node-path') ) {
+		$path =~ s{^\Q$prefix\E/?}{}
+                    or die "$path not translatable";
+                $rec->set_header('Node-path' => $path);
+            }
+
+        };
+        $translate->( $record );
+        my $inc = $record->get_included_record;
+        $translate->( $inc ) if $inc;
+
+        print $record->as_string;
+    }
+    $prev = $rrev;
+
+    printf STDERR "%d/%d\r", ++$i, scalar @revs;
+}
+
+sub pad_rev {
+    my $rev = shift;
+    my $pad = SVN::Dump::Record->new;
+    $pad->set_headers_block(SVN::Dump::Headers->new( { 'Revision-number' => $rev }) );
+    return $pad;
+}
+

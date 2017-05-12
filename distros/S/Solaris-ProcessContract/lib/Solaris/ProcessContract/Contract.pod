@@ -1,0 +1,86 @@
+=head1 NAME
+
+Solaris::ProcessContract::Contract - Manage a Solaris process contract instance via libcontract
+
+=head1 SYNOPSIS
+
+  # Get the latest contract created in the scope of our process
+  my $contract = $pc->get_latest_contract();
+  
+  # Get the id of this contract
+  print $contract->id();
+
+  # Abandon the process contract
+  $contract->control->abandon();
+
+  # Adopt the process contract
+  $contract->control->adopt();
+
+=head1 DESCRIPTION
+
+This class allows you to query and control a specific solaris process contract.
+
+=head1 METHODS
+
+=head2 new
+
+Use the L<Solaris::ProcessContract/"get_contract"> or L<Solaris::ProcessContract/"get_latest_contract">
+methods to create a new instance of this object instead of calling this yourself.
+
+  # Get the most recently created contract in the scope of our process
+  my $contract = $pc->get_latest_contract();
+  
+  # Get a specific contract by id, if we have permission to do so
+  my $contract = $pc->get_contract( 12345 );
+
+=head2 id
+
+Arguments: C<none>
+
+Returns: C<$id>
+
+Returns the id of this contract.
+
+  print $contract->id();
+
+=head2 control
+
+Arguments: C<none>
+
+Returns: C<$control>
+
+Provides access to the L<Solaris::ProcessContract::Contract::Control> object for
+this contract.
+
+  # Access the control object the easy way
+  $contract->control->abandon();
+
+  # Access the control object by reference
+  my $control = $contract->control();
+  $control->abandon();
+
+This allows you to use the libcontract control functions to make changes to this
+contract.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<Solaris::ProcessContract>
+
+=item L<Solaris::ProcessContract::Contract::Control>
+
+=item L<Solaris::ProcessContract::Exceptions>
+
+=item L<libcontract(3)|http://docs.oracle.com/cd/E26505_01/html/816-5173/libcontract-3lib.html>
+
+=item L<contract(4)|http://docs.oracle.com/cd/E26505_01/html/816-5174/contract-4.html>
+
+=item L<process(4)|http://docs.oracle.com/cd/E26505_01/html/816-5174/process-4.html>
+
+=back
+
+=head1 AUTHOR
+
+Danny Warren
+

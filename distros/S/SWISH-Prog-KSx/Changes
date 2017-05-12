@@ -1,0 +1,94 @@
+Revision history for SWISH-Prog-KSx
+
+0.01    29 Nov 2009
+    * First version, released on an unsuspecting world.
+
+0.02    1 Dec 2009
+    * POD fixes
+
+0.03    12 Dec 2009
+    * support SWISH::3::Config format internally.
+      Can now read Swish-e 2.4.x config files and apply
+      them to Swish3 format.
+
+0.04    02 Jan 2010
+    * fix mem leaks, config use.
+
+0.05    07 Jan 2009
+    * add fielded search support.
+
+0.06    01 Feb 2010
+    * add properties to index as stored but non-analyzed fields.
+    * alias_for meta/props not created as fields (TODO queryparser
+      mapping)
+    * RangeQuery support added with search($query, { limit => $limit })
+    * PolySearcher always used internall, 
+      supporting multiple invindex simultaneously.
+
+0.07    01 Feb 2010
+    * Searcher can now accept a Swish-e/SQL-like sort order string.
+
+0.08    22 Feb 2010
+    * Indexer will now remove any existing doc with same 
+      swishdocpath before calling add_doc().
+
+0.09    01 March 2010
+    * support sort by rank
+    * add Search::Query::Dialect::KSx support, for compat with Swish-e
+      query syntax.
+
+0.10    26 March 2010
+    * fix bug with MetaNameAlias not being respected in query parsing.
+    * KinoSearch 0.30_09 required.
+
+0.11    01 May 2010
+    * pass Search::Query object into Results->query
+    * add support for MetaNamesRank
+    * bump deps for KS and Search::Query::Dialect::KSx
+
+0.12    08 May 2010
+    * always sort by score so that a score is calculated and doc_id
+      so that paging works consistently.
+
+0.13    22 June 2010
+    * add default_boolop to Searcher.
+
+0.14    25 July 2010
+    * fix bug where Doc values were not being flagged as UTF-8 in
+      Indexer.
+    * fix bug where built-in PropertyNames were not being allowed
+      to be both MetaNames and PropertyNames
+    * add ability to sort by PropertyNameAlias values, like native
+      Swish-e 2.x can.
+    * switch field indexing order to prefer PropertyNames over
+      MetaNames because of how whitespace is stored (or not).
+
+0.15    28 Oct 2010
+    * bump SWISH::3 dependency to 0.09
+    * bump KS dependency to 0.31
+
+0.16    28 Oct 2010
+    * forgot to actually bump KS dependency
+
+0.17    07 Jan 2011
+    * add Path::Class::File::Lockable dependency, to lock
+      the invindex during KS->commit and write of the swish.xml header.
+    * add Path::Class::File::Stat to automatically re-open 
+      the internal KS searcher inside a S::P::KSx::Searcher 
+      if the invindex has been modified while the searcher was open.
+    * add support for UndefinedMetaTags and UndefinedXMLAttributes
+
+0.18    22 Feb 2011
+    * bump dep for Path::Class::File::Stat to 0.03
+    * fix uninit warning for UUID when no UUID is defined in the swish.xml file
+
+0.19    18 May 2011
+    * bump dep for KS 0.313
+    * fix class names for FieldType to Plan to avoid compat stub bug
+
+0.20    12 Jan 2012
+    * fix failing tests from newer SWISH::Prog file rules
+
+0.21    2 Apr 2012
+    * add t/05-utf8.t to test UTF-8 strings
+

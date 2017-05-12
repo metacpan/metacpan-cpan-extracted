@@ -1,0 +1,40 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.66.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 9fa7981bd10297dfe4ed37b6ad96f35326d29396 .cvsignore
+SHA1 69644b6e77995e79f0ca7a6813a6ea8115adba30 Build.PL
+SHA1 d2ab585015cddf3feefc86b756fbe4239e29a23a Changes
+SHA1 8670cb69238325e4d24ffaac6a192f78f77b9d40 MANIFEST
+SHA1 88f1530a143361b5b905b38c39eb6381ae0ae804 META.json
+SHA1 fb2ff31fabee91930b3b15fdb1497840de8a9e02 META.yml
+SHA1 2157ae40589595d6cc1585fd7279b25bcf8f5852 Makefile.PL
+SHA1 ca61089d299bdd5e8b46bab6b3df6a9120735125 README
+SHA1 c185a100351b2eb6d840b8ff2ce73c96d154f6a6 lib/Scalar/.cvsignore
+SHA1 67669ff83780aed544041758b04829d1d0a7a79c lib/Scalar/String.pm
+SHA1 a1401fed7bd4ae529987183449638576e52a170c lib/Scalar/String.xs
+SHA1 f36c5928277d92e38d3eb240221dfcfcc6d51cce t/grade.t
+SHA1 438cb548ab97eede0c7f70604f2a33ac4990af10 t/grade_pp.t
+SHA1 904d9a4f76525e2303e4b0c168c68230f223c8de t/pod_cvg.t
+SHA1 3f447b1d0b8a6247c3a311087f8d66da1c3ca5db t/pod_cvg_pp.t
+SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
+SHA1 329a2984b7ee54b4f6f12ca70ffaa9513945fea3 t/setup_pp.pl
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAk2gbu0ACgkQOV9mt2VyAVF8VACfeggJjQvSWgwB4Vi+eRorQnU3
+OzsAoInVGJqOMIiSDZkyzWM9kXmljj77
+=6T4Z
+-----END PGP SIGNATURE-----

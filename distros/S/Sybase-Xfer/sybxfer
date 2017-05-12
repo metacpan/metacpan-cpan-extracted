@@ -1,0 +1,20 @@
+#!/ms/dist/perl5/bin/perl5.005
+#
+# $Id: sybxfer,v 1.6 2000/11/12 18:05:36 spragues Exp $
+#
+#
+#driver script for Sybase::Xfer.pm
+#
+#
+
+   use lib '/ms/dist/dart/perl/modules';
+
+#modules
+   use Sybase::Xfer;
+   
+#init it
+   my $xf = new Sybase::Xfer(@ARGV);
+
+#run it
+   exit $xf->xfer();
+

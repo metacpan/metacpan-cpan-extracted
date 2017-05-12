@@ -1,0 +1,7 @@
+0.03    2010-07-05      Generally helps if you remember to update the MANIFEST
+
+0.02    2010-07-05      Add truss support
+                        Checks if a tracing program is available to reduce FAIL
+
+0.01    2010-06-28      Initial release
+

@@ -1,0 +1,16 @@
+lib/Statistics/Frequency.pm
+Makefile.PL
+MANIFEST
+README
+ChangeLog
+t/00_use.t
+t/01_new.t
+t/02_data.t
+t/03_add.t
+t/04_remdata.t
+t/05_remelem.t
+t/06_clear.t
+t/07_copy.t
+t/08_update.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

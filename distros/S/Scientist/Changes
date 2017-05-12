@@ -1,0 +1,37 @@
+0.009 2016-xx-xx
+    - WIP
+0.008 2016-04-27
+    - Fix regression where candidate code was not in eval{}
+    - Test2 over Test::More
+    - Use more Dzil modules
+    - Documentation clean up
+    - Welcoming Joshua Keroes as contributor
+0.007 2016-03-25
+    - Add matched/mismatched
+    - Add observation
+    - Add observation{candidate}
+    - Add observation{control}
+    - Add observation{diagnostic}
+0.006 2016-02-22
+    - Scientist understands perl list/scalar context when run called
+    - Publish added (With documentation/test showing how to extend)
+    - Control and Candidate code called in random order
+
+0.005 2016-02-19
+    - Add context, a hash ref returned in the result set
+    - Add enabled, default is true
+    - Add experiment as member of result set.
+    - Extend the pod
+
+0.004 2016-02-17
+    - Add duration timing to result set.
+
+0.003 2016-02-16
+    - Improve/fix tests and change code structure.
+    - Documentation and Distzilla.
+
+0.002 2016-02-14
+    - Mainly addition of automated testing.
+
+0.001 2016-02-13
+    - Initial release.

@@ -1,0 +1,165 @@
+=pod
+
+=head1 NAME
+
+Design notes about Sierra
+
+=head1 DISCLAIMER
+
+Yo, I've just read a lot of Herbert Kornfeld (The Onion) again and so
+if this file has a distinctly casual tone its to blame, but before I
+get started shouts going out to all ma dogs in Accountz Reeceevable
+and those bitcthez in payroll, keep the accounting clean and the
+balance green. Ya all know what I'm saying. 
+
+=head1 INTRODUCTION
+
+So, Sierra is a mailing list manager. Mailing lists managers process
+incoming mail. They may process it in various ways, but its all just
+mail processing goddamit!
+
+Computers use Inputs and they provide Outputs, they also use
+storage. Thats really what they do, any MLM that runs on a computer
+will do the same.
+
+The inputs will be incoming mails, the outputs will be outgoing
+mails. Storage well thats just stuff innit?
+
+Of course there is also all the web shit, but I'm ignoring that for
+now.
+
+So just for any of the slow kids at the back of the class mail comes
+in, it gets processed (maybe some storage ops go on) and then it gets
+output to somewhere (or not). It's not rocket science and hence MLM
+software doesn't need to be rocket science.
+
+=head1 PROCESSING
+
+So mail hits the localhost's SMTP, now we don't want to tinker around
+with loadable modules or any of that sheeit, lets ignore any
+optimisations for now.
+
+So it comes to various addresses, lets say we have a mailing list
+called arp@host.com (Accounts Receivable Posse), now if have arp as
+really an alias for sierra then mail will get sent to sierra instead.
+So it arrives there and being a good mail system it looks for a
+.forward file, whats this it finds? why its listener.pl , the entry 
+point to the Sierra system, now listener.pl might be very simple,
+something like
+
+	use Sierra::Listener qw(process);
+
+	my $mail = join ('',(<>));
+	listen($mail);
+	return 1;
+
+of course later on it can be SOAPafied or some shit if speed is an
+issue with the main process, but on day 1 we don't care, we only really
+care about whats going to happen in process().
+
+So what is going to happen in process? Well something like this,
+
+    sub process {
+	my ($mailraw) = @_;
+	my $mail  = Sierra::Mail->new($mailraw);
+	my $group = Sierra::Group->load_by_email($mail->{dest_address});
+	
+	# All in the other stuff MLM's do
+
+	for (@{$group->get_addresses_of_people_who_actually_want_this_shit()}) {
+	    send_mail($_,$mail->raw());
+	}
+    }
+
+and thats basically it. Jobs a good 'ne.
+
+Ok, there's all the shit in the middle, such as handling digests,
+rejecting mails from ponces not on all the mailing list, removing
+stupidly long company added .sig's for people who want it done,
+etc. etc.
+
+So the nice simple process sub becomes a big pile of steaming business
+logic. As more and more whiners^w people with valuable ideas start 
+to suggest things.
+
+So I suggest we have a Plugins/ dir in the Sierra code, basically you
+can stick anything in, a bit like a procmail rule and it gets a nice
+reference to the Mail object and it can arse around with it and at the
+end return true or false, true means carry on with more rules and
+false means stop, this mail has been `dealt' with.
+
+I don't know how to order how these rules are applied, for instance
+we might like our unsubbed sender rejecter plugin to run before 
+the the digest or archiver.
+
+I do know a list of Plugins that we would want, here is some of them,
+
+	Digest Plugin
+		Use its own private storage (possible issue), to store
+		information about mails in the current digest and then
+		sends them all out.
+	Subscriber Only Plugin
+		Checks that the mail has arrived from a subscriber,
+		otherwise punts it, or puts it in a holding pattern
+		waiting for the mail admins
+	Sig Adjuster
+		If a user has asked for their sig to be chopped,
+		everything under '-- ' will be removed. Handy for
+		corporate sig stuff.
+	Archiver
+		Stores the mail somewhere, if the group has selected
+		that, might actually set a no delete flag or some such.
+	Signal/Noise rejecter
+		Runs jwz's code for S/N and rejects anything with too
+		low a S/N value
+	Spamassasin Plugin
+		Rejects any mail with a high value after being checked
+		by SA.
+	Evil Advertiser Plugin
+		Adds evil advertising like Yahoo to a mail
+	Scribot/URL Vampire Plugin
+		Generates a Scribot like page with a list of unique
+		URL's
+
+Sometimes i think that the actual mail sending should be a plugin as
+well but I'm not sure.
+	
+One way of ordering the plugins would be to create a run level
+structure.
+
+E.g. 
+
+	Level 0, read only, the mail will be untouched and unhacked
+		Subscriber Only Plugin
+		Spamassasin Plugin
+		S/N Rejecter
+		Scribot/URL Vampire
+	Level 1, read write, open season on mail adjustments
+		Evil Advertiser
+		Sig Adjuster
+	Level 2, read only, the mail has now be altered
+		Digest Generator
+		Archive Generator
+
+This would be fairly sensible
+
+Now all groups can select which plugins can be used on their mailing
+list. (One crazy reason maybe the final normal mail sending should be
+a plugin is so that you could subscribe Sierra to another mailing list
+and still use Sig Vampire, Archive Generator).
+
+=head1 CONFIGURATION AND ADMINISTRATION
+
+Err do this later
+
+=head1 AUTHOR
+
+Greg McCarroll <greg@mccarroll.demon.co.uk>
+
+=cut
+
+
+
+
+
+

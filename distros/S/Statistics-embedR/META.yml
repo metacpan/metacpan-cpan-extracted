@@ -1,0 +1,25 @@
+---
+abstract: 'Object-oriented interface for Statistics::useR.'
+author:
+  - 'Hongwen Qiu <qiuhongwen@gmail.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Statistics-embedR
+provides:
+  Statistics::embedR:
+    file: lib/Statistics/embedR.pm
+    version: v0.10.1
+requires:
+  Statistics::useR: 0.01
+  perl: 5.010
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/qiuhw/Statistics-embedR
+version: v0.10.1

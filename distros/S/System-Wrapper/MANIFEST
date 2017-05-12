@@ -1,0 +1,21 @@
+Build.PL
+Changes
+MANIFEST
+MANIFEST.SKIP
+README
+lib/System/Wrapper.pm
+lib/System/Wrapper.pm.Moose
+lib/System/Wrapper/Parallel.pm
+t/boilerplate.t
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+script/test.pl
+script/tpb.pl
+Makefile.PL
+LICENSE
+META.yml
+ignore.txt
+META.json
+SIGNATURE    Added here by Module::Build

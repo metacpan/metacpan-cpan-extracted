@@ -1,0 +1,129 @@
+* DESCRIPTION (-*- org -*-)
+Sepia is a set of features to make Emacs a better tool for Perl
+development, including:
+
+    * an interactive prompt (REPL) for evaluating code;
+    * cross-referencing to find and navigate between function and
+      variable definitions and uses;
+    * variable- and function-name completion.
+    * eldoc support to echo function arguments in the minibuffer
+    * functions to simplify POD browsing with Emacs-w3m
+
+Please see the Sepia.html or sepia.info for documentation.
+* INSTALLATION
+The basic installation procedure is:
+
+    1) run "perl Makefile.PL; make; make install"
+    2) optionally, install w3m and Emacs-w3m
+    3) put the elisp files somewhere Emacs will find them.
+
+Sepia is developed on the latest version of GNU Emacs, which can be
+obtained from CVS or as a prebuilt package on some platforms.  It can
+run on other versions of Emacs, but may require additional packages.
+** Requirements for GNU Emacs 22
+*** (optional) emacs-w3m from http://emacs-w3m.namazu.org/
+*** (optional) w3m from http://w3m.sourceforge.net/
+*** (optional) snippet.el from http://www.kazmier.com/computer/snippet.el
+** Additional requirements GNU Emacs 21
+*** ido.el
+    http://cvs.savannah.gnu.org/viewcvs/*checkout*/emacs/lisp/ido.el?root=emacs
+*** FreeBSD may require the following packages:
+    tree-widget-emacs21-2.0
+    emacs-w3m-emacs21-1.4.4_2
+    mule-ucs-emacs21-0.85.r3
+    semi-emacs21-1.14.6_1
+    wv-1.2.4
+    xlhtml-0.5_1,1
+    libgsf-1.14.3
+    flim-emacs21-1.14.8
+    apel-emacs21-10.7
+    ja-nkf-2.05
+
+* DEVELOPMENT
+The "official" source code repository mirror is at
+
+    http://repo.or.cz/w/sepia.git
+
+To get a copy, install Git, then
+
+    git clone git://repo.or.cz/sepia.git
+
+To submit a patch, please send a diff to the author, including an
+Emacs-style ChangeLog entry.
+* TODO
+** (Medium) Get the variable def/use analysis working again.
+** (Hard) return from anything in the debugger
+   Make it possible to return from intermediate calls in the debugger.
+   Returning from die() is not often useful.
+
+   This can be done with a clever DB::sub, but that dramatically slows
+   down execution.
+** (Medium) fix `sepia-beginning-of-defun' and `sepia-end-of-defun'.
+   While they work for "normal" sub definitions, they fail on
+   definitions that are all on one line, e.g.
+
+       sub foo { ... }
+       sub bar {
+           ...
+       }
+** (Medium) Fix string escaping when passing between Perl and Emacs
+   IO::Scalar's README tickles a bug.
+** (Hard) Make the debugger's "next" work
+   "next" (as opposed to "step") assumes that the next statement after
+   line $n is line $n+1, which isn't true for loops, blank lines,
+   multi-line statements, etc.  Fix this somehow.  One way might be to
+   temporary regain control on a op_next/op_nextstate, or whatever
+   those are called, but this would be hard and/or require XS.
+
+   If we set $^P to populate @dbline, we can use that to find
+   breakable lines, but that still doesn't fix backward branches in
+   loops.
+** (Medium) Make "finish" more reliable
+   It currently assumes that the last breakable statement in a sub is
+   one line before its end.  The "right" solution would be like above:
+   to hook op_leave temporarily.  This would similarly require XS
+   trickery.
+** (Medium) Enable partial-word completion of lexicals
+** (Hard) Rewrite completion code, which is pretty ugly now.
+   This wouldn't seem "hard" but, having hacked on two completion
+   codebases (Sepia's and complete.el's), I know there are always a
+   lot of subtle cases to get right, and what acts "naturally" by
+   human standards is extremely complicated to specify in code.
+** (Easy) Document existing hooks and add_hook()/remove_hook()
+@PRE_PROMPT, @PRE_EVAL, @POST_EVAL
+** (Hard) Add appropriate hooks
+   Possibly update existing functions to make use of hooks for better
+   modularity.
+* KNOWN BUGS
+The following is a list of bugs that are difficult to automatically
+reproduce, with the dates they were first observed.
+** (2006-05-19) Function definition lines occasionally all go wrong.
+   Rebuilding the Xref database fixes this.
+** (2006-05-19) The cursor misses by several lines jumping to a definition.
+   This is hard to fix -- Perl doesn't give exact line numbers for sub
+   defs, so we have to do some minor regex-searching.
+** (2006-05-19) `sepia-var-assigns' doesn't work yet -- don't use it.
+** (2006-05-19) named method calls (mostly?) detected, but naively.
+   Nothing smart is done about packages, so e.g. "new Foo" will result
+   in listings for every instance of "new" in your program.
+** (2008-01-18) the first value printed in the debugger is undef.  why?!
+** (2009-12-13) completion deletes things it shouldn't
+   e.g. $x->method => method.  I need to rewrite this code to not
+   suck.
+** (2010-09-30) <backspace> broken in view-mode
+   <backspace> should scroll up if you enable view-mode, but for
+   whatever reason it stays bound to hungry-delete.  I'm not sure if
+   this is my fault, or cperl's.
+** (2011-02-22) Sepia::Xref::load_pad segfaults
+While traversing inside File::Find::contract_name.  Backtrace:
+    #0  0x00000001001afa30 in XS_B__COP_hints_hash ()
+    #1  0x00000001001b12ba in XS_B__GV_STASH ()
+    #2  0x0000000100075708 in Perl_pp_entersub ()
+    #3  0x000000010006e6cc in Perl_runops_standard ()
+    #4  0x000000010006e43a in perl_run ()
+* COPYRIGHT AND LICENCE
+Copyright (C) 2004-2011 Sean O'Rourke
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, at the time at which this
+version of Sepia was released.

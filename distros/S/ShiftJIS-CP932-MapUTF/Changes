@@ -1,0 +1,106 @@
+Revision history for Perl module ShiftJIS::CP932::MapUTF.
+
+1.03  Sun Aug  7 10:28:03 2011
+    - fix the tarball with world writable files.
+
+1.02  Mon Jun  4 22:11:58 2007
+    - mkheader, unilen() - avoid unpack('C*') on unicode.
+
+1.01  Wed Oct 11 00:01:34 2006
+    - POD, the section SEE ALSO:
+      The dead link at http://www.microsoft.com/typography/unicode/932.txt
+      was replaced with the page in WindowsBestFit under www.unicode.org
+
+1.00  Sun Mar 13 16:45:32 2005
+    - META.yml is added.
+    - Japanese POD named JAPANESE is added (again).
+    - UTF-8 strings to be compared are encoded without the help
+      of perl's "utf8" in t10heavy.t.
+
+0.34  Sat Oct 18 12:22:31 2003
+    - removed JP pod.
+
+0.33  Sat Oct 11 20:34:47 2003
+    - Internal tweak in XSUB: no longer relies on a string to be
+      terminated with '\0'.
+
+0.32  Sun Jul 20 13:23:44 2003
+    - changed INSTALLATION (cf. README).
+    - simplified Makefile.PL.
+    - modified how to build XSUB edition (sorry for inconvenience).
+      The purePerl-XSUB converter is now provided as two perl script files,
+      named "enableXS" and "disableXS".
+      (no longer <perl Makefile.PL xs> and <perl Makefile.PL noxs>.)
+
+0.31  Sun May 04 22:48:10 2003
+    - doc tweaks and detypos.
+    - removed double-byte characters from MapUTF.pod.
+
+0.30  Sun May 04 11:12:21 2003
+    - clarified and documented on some ambiguous behaviors.
+    - manipulation of illegal ShiftJIS strings: SJIS_CALLBACK coderef are
+      called with two parameters (like UNICODE_CALLBACK).
+    - added the 3rd parameter, OPTION.
+      'g', 's', 't' for cp932-to-unicode conversions.
+      'g', 's', 'f' for unicode-to-cp932 conversions.
+    - added utf16_to_cp932() and utf32_to_cp932().
+      [but not yet cp932_to_utf16() and cp932_to_utf32(); cf. Export in POD.]
+    - modified t04xncr.t avoiding a non-character.
+    - added new tests, t11grade.t to t15fall.t.
+
+0.21  Sun Nov 03 19:32:21 2002
+    - fixed a momery leak when the process died in a callback.
+      like: eval { utf32be_to_cp932(sub { die }, "\x00"); };
+
+0.20  Sat Nov 02 14:42:04 2002
+    - manipulation of illegal Unicode strings: u*_to_cp932 functions
+      may call a UNICODE_CALLBACK coderef with two parameters.
+    - cp932_to_utf8() and utf8_to_cp932() are supported again
+      (as before v. 0.08).
+    - non-XS (pure Perl) version is supported again.
+    - tests are improved.
+
+0.14  Sat Jun 08 07:40:43 2002
+    - fix: unicode_to_cp932() was broken with any character
+      greater than U+FFFF, like "\x{10000}".
+
+0.13  Sat May 11 13:55:25 2002
+    - unreferenced local variables are removed.
+
+0.12  Sun Apr 14 22:53:12 2002
+    - now uses utf8n_to_uvuni() instead of utf8n_to_uvchr().
+    - some doc fix.
+
+0.11  Sun Feb 10 17:07:22 2002
+    - added ShiftJIS::CP932::MapUTF::Supplements (experimental).
+
+0.10  Sun Jan 20 19:44:06 2002
+    - some detypo in POD and README.
+
+0.09  Sun Jan 20 11:26:14 2002
+    - Halfwidth Katakana take 4 bytes in UTF-EBCDIC.
+
+0.08  Sun Jan 20 10:26:38 2002
+    - now understands wide characters;
+      but only works on Unicode aware Perl (i.e. Perl 5.6 or later).
+
+0.07  Sun Oct 20 14:35:03 2001 (not released)
+    - unpaired surrogate.
+
+0.06  Sun Oct 13 16:24:52 2001 (not released)
+    - surrogate pairs are supported.
+
+0.05  Tue Oct 02 00:16:25 2001
+    - input/output of wide characters are abandoned.
+
+0.04  Sat Sep 08 12:11:15 2001
+    - modified test.t: Perl 5.005 warns against '\x{hhhh}'.
+
+0.03  Thu Sep 06 22:15:21 2001
+    - fix: wrong utf8 regex.
+
+0.02  Sun Jun 17 01:39:12 2001
+    - added the CODEREF argument.
+
+0.01  Wed Jun 13 20:14:08 2001
+    - original version; created by h2xs 1.19

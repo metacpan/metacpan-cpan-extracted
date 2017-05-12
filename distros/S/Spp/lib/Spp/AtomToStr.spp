@@ -1,0 +1,173 @@
+(context AtomToStr)
+
+(def strchar-to-str(char)
+  (case char
+    (when \n (return '\\n'))
+    (when \t (return '\\t'))
+    (when \r (return '\\r'))
+    (when \" (return '\\\"'))
+    (when \' (return "\\\'"))
+    (else (return char))))
+
+(def atoms-to-strs(atoms)
+  (my strs [])
+  (for atom in atoms
+    (strs << (atom-to-str atom)))
+  (return strs))
+
+(def atoms-to-str(atoms)
+  (my $strs (atoms-to-strs atoms))
+  (return (join $strs ' ')))
+
+(def pair-to-str(pair)
+  (my $pair-strs (atoms-to-strs $pair))
+  (return (join $pair-strs ' => ')))
+
+(def atom-to-str(atom)
+  (my ($type value) atom)
+  (return (atoms-to-str atom) if (is-array $type))
+  (case $type
+    (when :dot      (return value))
+    (when :any      (return value))
+    (when :nil      (return value))
+    (when :bool     (return value))
+    (when :sym      (return value))
+    (when :context  (return value))
+    (when :assert   (return value))
+    (when :cclass   (return value))
+    (when :int      (return value))
+    (when :ctoken   (return "<{value}>"))
+    (when :rtoken   (return "<.{value}>"))
+    (when :gtoken   (return "<!{value}>"))    
+    (when :str      (return (str-to-str value)))
+    (when :array    (return (array-to-str value)))
+    (when :hash     (return (hash-to-str value)))
+    (when :string   (return (string-to-str value)))
+    (when :lambda   (return (lambda-to-str value)))
+    (when :list     (return (list-to-str value)))
+    (when :exprs    (return (atoms-to-str value)))
+    (when :char     (return (char-to-str value)))
+    (when :rule     (return (rule-to-str value)))
+    (when :token    (return (token-to-str value)))
+    (when :group   (return (group-to-str value)))
+    (when :branch  (return (branch-to-str value)))
+    (when :lbranch (return (lbranch-to-str value)))
+    (when :rept    (return (rept-to-str value)))
+    (when :look    (return (look-to-str value)))
+    (when :strs    (return (strs-to-str value)))
+    (when :alias   (return (alias-to-str value)))
+    (when :chclass (return (chclass-to-str value)))
+    (when :action  (return (atoms-to-str value)))
+    (else (error "Unknown atom to str: {$type}"))))
+
+(def str-to-str(str)
+  (my chars [])
+  (for char in (split str)
+    (chars << (strchar-to-char char)))
+  (my str-str (join chars))
+  (return "'{str-str}'"))
+
+(def array-to-str(values)
+  (my strs (atoms-to-strs values))
+  (my array-str (join strs ','))
+  (return "[{array-str}]"))
+
+(def hash-to-str(values)
+  (my strs [])
+  (for pair in values
+    (strs << (pair-to-str pair)))
+  (my hash-str (join strs ','))
+  (return "\{{hash-str}\}"))
+
+(def string-to-str($atoms)
+  (my @strs [])
+  (for $atom in @atoms
+     (if (is-str $atom)
+       (@strs << ($atom 1))
+       else
+       (@strs << (atom-to-str $atom))))
+  (return (join @strs)))
+
+(def lambda-to-str(@atoms)
+  (my (@args $exprs) @atoms)
+  (my $args-str (atoms-to-str @args))
+  (my $exprs-str (atom-to-str $exprs))
+  (return "(def ({$args-str}) {$exprs-str})"))
+
+(def list-to-str($atoms)
+  (my $list-str (atoms-to-str $atoms))
+  (return "({$list-str})"))
+
+(def char-to-str($char)
+  (case $char
+    (when \n return '\\n')
+    (when \t return '\\t')
+    (when \r return '\\r')
+    (else (return "\\{$char}"))))
+
+(def rule-to-str($rule)
+  (my $rule-str (atom-to-str $rule))
+  (return ":\{ {$atom-str} \}"))
+
+(def group-to-str(@tokens)
+  (my @strs [])
+  (for $token in @tokens
+    (@strs << (atom-to-str $token)))
+  (my branch-str (join @strs ' '))
+  (return "( {branch-str} )"))
+
+(def lbranch-to-str(@branches)
+  (my @strs [])
+  (for $tokens in @branches
+    (@strs << (atom-to-str $tokens)))
+  (my $branch-str (join @strs ' | '))
+  (return "( {$branch-str} )"))
+
+(def branch-to-str(@branches)
+  (my @strs [])
+  (for $tokens in @branches
+    (@strs << (atom-to-str $tokens)))
+  (my branch-str (join @strs ' || '))
+  (return "( {branch-str} )"))
+
+(def rept-to-str(rept)
+  (my atom-str (atom-to-str (rept 0)))
+  (my rept-str (rept [-1 -1]))
+  (return (atom-str + rept-str)))
+
+(def look-to-str(look)
+  (my rept-str (rept-to-str look))
+  (my look-str (atom-to-str (look 2)))
+  (return "{rept-str} {look-str}"))
+
+(def strs-to-str(atoms)
+  (my strs-str (join atoms ' '))
+  (return "< {strs-str} >"))
+
+(def alias-to-str(atoms)
+  (my (alias-name atom) atoms)
+  (my atom-str (atom-to-str atom))
+  (return "<{alias-name}>={atom-str}"))
+
+(def chclass-to-str(atoms)
+  (my @chclass-list [])
+  (for atom in atoms
+    (if ((atom 0) == 'flip')
+      (@chclass-list << '^')
+      else
+      (@chclass-list << (atom 1))))
+  (my $chclass-str (join @chclass-list))
+  (return "[{$chclass-str}]"))
+
+(def match-log-to-str(%cursor)
+  (my $len (%cursor :Len))
+  (my $match-str (%cursor :Str))
+  (my @stack (%cursor :Log))
+  (for @log in @stack
+    (my ($flag $atom $pos) @log)
+    (my $str (substr $match-str $pos ($pos + 30)))
+    (my $rule-str (atom-to-str $atom))
+    (my $sub-rule-str (format '%-30.30s' $rule-str))
+    (say "{$flag} | {$sub-rule-str} | {$sub_str} | [{$pos}, {$len}]")))
+
+(end AtomToStr)

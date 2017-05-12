@@ -1,0 +1,15 @@
+<p>
+<% loc( 'Your account will be active once you confirm your email address. An email has been sent to %1 with a confirmation uri.', $user->email_address() ) %>
+</p>
+
+<%args>
+$user
+</%args>
+
+<%attr>
+sidebar => []
+</%attr>
+
+<%method title>
+<% loc('Your Account Requires Confirmation') %>
+</%method>

@@ -1,0 +1,61 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use YAML qw( LoadFile );;
+
+my( $module ) = @ARGV;
+
+if( !defined $module ) {
+    die "usage: $0 Foo::Bar";
+}
+
+my( $home )  = glob "~";
+my $yml_file = "$home/.skeletor.yml";
+
+if( ! -f $yml_file ) {
+    die "$yml_file not found";
+}
+
+my $yml = LoadFile( $yml_file );
+
+for my $param ( qw( author ) ) {
+    if( !exists $yml->{ $param } ) {
+        die "$param not defined in $yml_file";
+    }
+}
+
+system "skeletor",
+  "--template", "Skeletor::Template::Quick",
+  "--as", $module,
+  "--author", $yml->{ author };
+
+  # I haven't found a way to define permissions of template files in skeletor
+( my $name_dashed = $module ) =~ s/::/-/g;
+system "chmod +x $name_dashed/eg/*";
+
+=head2 NAME
+
+skel - Customized skeletor for Skeletor::Template::Quick
+
+=head1 SYNOPSIS
+
+   $ skel Foo::Bar
+
+=head1 DESCRIPTION
+
+C<skel> is a wrapper around skeletor with a C<Skeletor::Template::Quick> template. 
+Before running it, create a preferences file in C<~/.skeletor.yml> containing at
+least the following setting:
+
+    --- ~/.skeletor.yml
+    author: Joe Schmoe <joe@schmoe.com>
+
+=head1 AUTHOR
+
+Mike Schilli <m@perlmeister.com>
+    
+=head1 LICENSE
+
+Copyright 2015 by Mike Schilli <m@perlmeister.com>, all rights reserved.
+This program is free software, you can redistribute it and/or
+modify it under the same terms as Perl itself.

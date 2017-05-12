@@ -1,0 +1,3 @@
+rm -f fail_twice_1 fail_twice_2
+rm -f always_fail_1 always_fail_2 always_fail_3
+rm -f always_succ_1 always_succ_2 always_succ_3

@@ -1,0 +1,8 @@
+TODO list for Perl module Statistics::RserveClient
+
+- Better tests and debugging for recursive structures (e.g., lists)
+- Implement more of Rserve protocol, e.g., long packets, authentication
+- Better error handling
+- Better debugging
+- Configuration file?
+- JSON output?

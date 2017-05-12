@@ -1,0 +1,19 @@
+.travis.yml
+Changes
+lib/SMS/API/CMTelecom.pm
+lib/SMS/Send/CMTelecom.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/00-load.t
+t/02-sms.t
+t/03-sms-real.t
+t/04-sms-send-load.t
+t/05-sms-send-send.t
+t/06-validate-number.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

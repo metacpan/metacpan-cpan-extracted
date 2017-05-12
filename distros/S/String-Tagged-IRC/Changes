@@ -1,0 +1,13 @@
+Revision history for String-Tagged-IRC
+
+0.03    2016/07/15 14:56:37
+        [CHANGES]
+         * Declare dependency on perl 5.010 because of // operator
+
+0.02    2014/11/14 17:52:33
+        [CHANGES]
+         * Rename the tags to fit the String::Tagged::Formatting API spec
+
+0.01    2014/11/12 19:51:48
+        First version, released on an unsuspecting world.
+

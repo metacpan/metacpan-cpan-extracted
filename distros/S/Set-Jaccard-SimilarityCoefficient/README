@@ -1,0 +1,74 @@
+    Calculate the Jaccard Similarity Coefficient.
+
+NAME
+    Set::Jaccard::SimilarityCoefficient - Calculate the Jaccard Similarity
+    Coefficient of 2 sets
+
+VERSION
+    # VERSION
+
+SYNOPSIS
+    $res = Set::Jaccard::SimilarityCoefficient::calc(\@set_a, \@set_b);
+
+    OR
+
+    my $a = Set::Scalar->new(@set_a); my $b = Set::Scalar->new(@set_b); $res
+    = Set::Jaccard::SimilarityCoefficient::calc($a, $b);
+
+DESCRIPTION
+    Set::Jaccard::SimilarityCoefficient lets you calculate the Jaccard
+    Similarity Coefficient for either arrayrefs or Set::Scalar objects.
+
+    Briefly, the Jaccard Similarity Coefficient is a simple measure of how
+    similar 2 sets are. The calculation is (in pseudo-code):
+
+            count(difference(SET-A, SET-B)) / count(union(SET-A, SET-B))
+
+    There is a Jaccard Similarity Coefficient routine already in CPAN, but
+    it is specialized for use by Text::NSP. I wanted a generic routine that
+    could be used by anyone so Set::Jaccard::SimilarityCoefficient was born.
+
+SUBROUTINES/METHODS
+    calc(A, B) calculates the Jaccard Similarity Coefficient for the
+    arguments A and B. A and B can be either array references or Set::Scalar
+    objects.
+
+DIAGNOSTICS
+    new() will complain if A or B is empty, not either a reference to an
+    array, or not a Set::Scalar object.
+
+    calc() could theoretically throw DivideByZeroException when the union of
+    the two sets has 0 members. However, that would require set A or set B
+    to have 0 members, which was previously prohibited by the prohibition on
+    empty sets.
+
+CONFIGURATION AND ENVIRONMENT
+    This module should work wherever Perl works.
+
+DEPENDENCIES
+    Set::Scalar
+
+INCOMPATIBILITIES
+    None that I know of.
+
+BUGS AND LIMITATIONS
+    There are no bugs that I know of. Given that this is non-trivial code,
+    there will be bugs.
+
+    The types of arguments are limited to either array references or
+    Set::Scalar objects.
+
+AUTHOR
+    Mark Leighton Fisher, <markleightonfisher@gmail.com>
+
+LICENSE AND COPYRIGHT
+    Set::JaccardSimilarityCoefficient is licensed under the same terms as
+    Perl itself.
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 26:
+        Unknown directive: =function
+

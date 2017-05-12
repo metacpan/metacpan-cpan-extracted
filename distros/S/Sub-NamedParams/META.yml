@@ -1,0 +1,14 @@
+---
+name: Sub-NamedParams
+version: 1.02
+author:
+  - Curtis "Ovid" Poe <moc.oohay@eop_divo_sitruc>
+abstract: Perl extension for using named arguments with any sub
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+provides:
+  Sub::NamedParams:
+    file: lib/Sub/NamedParams.pm
+    version: 1.02
+generated_by: Module::Build version 0.2702

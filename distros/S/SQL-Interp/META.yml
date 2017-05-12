@@ -1,0 +1,42 @@
+---
+abstract: 'Interpolate Perl variables into SQL statements'
+author:
+  - 'David Manura (http://math2.org/david/contact)'
+  - 'Mark Stosberg <mark@summersault.com>'
+build_requires: {}
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SQL-Interp
+provides:
+  DBIx::Interp:
+    file: lib/DBIx/Interp.pm
+    version: '1.24'
+  DBIx::Interp::STX:
+    file: lib/DBIx/Interp.pm
+  DBIx::Interp::db:
+    file: lib/DBIx/Interp.pm
+  SQL::Interp:
+    file: lib/SQL/Interp.pm
+    version: '1.24'
+  SQL::Interp::SQL:
+    file: lib/SQL/Interp.pm
+  SQL::Interp::Variable:
+    file: lib/SQL/Interp.pm
+recommends:
+  Filter::Simple: '0'
+  Scalar::Util: '0'
+  Text::Balanced: '1.87'
+requires:
+  DBI: '1'
+  Sub::Exporter: '0'
+  perl: v5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/markstos/SQL-Interp
+version: '1.24'

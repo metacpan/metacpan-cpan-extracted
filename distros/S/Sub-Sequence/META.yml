@@ -1,0 +1,28 @@
+---
+abstract: 'simplest, looping over an array in chunks'
+author:
+  - 'Dai Okabayashi <bayashi@cpan.org>'
+build_requires:
+  Test::Exception: 0
+  Test::More: 0.88
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Sub-Sequence
+provides:
+  Sub::Sequence:
+    file: lib/Sub/Sequence.pm
+    version: 0.03
+requires:
+  Carp: 0
+  Exporter: 0
+  parent: 0
+  perl: v5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/bayashi/Sub-Sequence
+version: 0.03

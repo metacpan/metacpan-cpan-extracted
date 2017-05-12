@@ -1,0 +1,121 @@
+# NAME
+
+ShipIt::Step::Facebook - ShipIt step to announce the upload on Facebook
+
+# SYNOPSIS
+
+None.
+
+# DESCRIPTION
+
+This [ShipIt](http://search.cpan.org/perldoc?ShipIt) step announces the upload to Facebook.
+
+To use it, just list it in your `.shipit` file. You might want to use it
+after the `UploadCPAN` step, as it is not a good idea to announce the
+upload before it has gone through - something might go wrong with the upload.
+
+If this step fails - maybe Facebook is down - a warning is issued, but the
+shipit process doesn't die. This is because you might have uploaded the
+distribution to CPAN already, and it would be a shame for the whole process to
+die just because you're not able to facebook.
+
+# GET FACEBOOK ACCESS_TOKEN AND STORE
+
+run `tools/init.pl` in this distribution.
+
+Please follow the message of a script.
+
+# CONFIGURATION
+
+In the `.shipit` file:
+
+    facebook.config = ~/.shipit.facebook
+    facebook.distname = Foo-Bar
+    facebook.message = shipped %d %v - soon at %f
+    facebook.target = me
+
+You can define three configuration values for this step:
+
+The Variables is not mandatory.
+
+- facebook.config
+
+This is the location of the file that contains the Facebook access_token and
+Wall target_id in YAML style. The first tilde is expanded to the user's home
+directory. An example file could look like this:
+
+    access_token: ACCESS_TOKEN
+    target: me
+
+The access_token is mandatory.
+
+
+
+default '~/.shipit.facebook'
+
+- facebook.distname
+
+This variable is optional; it is the distribution's name. If the variable is
+not defined, the step will try to read the distribution name from the META.yml
+file.
+
+- facebook.message
+
+This variable is optional; it is the message to send to Facebook. You can use
+placeholders, which will be expanded. If the variable is not defined, this
+default message will be used:
+
+    shipped %d %v - soon at %f
+
+The following placeholders are recognized:
+
+    - %d
+
+    Will be expanded to the distribution name that you defined in
+    `facebook.distname`.
+
+    - %u
+
+    Will be expanded to the distribution's CPAN URL - if the distribution name is
+    `Foo-Bar`, for example, the URL will be
+    `http://search.cpan.org/dist/Foo-Bar`.
+
+    - %f
+
+    Will be expanded to the distribution's FrePAN URL - if the distribution name is
+    `Foo-Bar`, for example, the URL will be
+    `http://frepan.org/dist/Foo-Bar`.
+
+    - %v
+
+    Will be expanded to the version of the distribution you're shipping.
+
+    - %%
+
+    Will result in a percent sign.
+
+- facebook.target
+
+you can select Wall page in message write.
+
+When you want to carry out POST to Wall of `http://www.facebook.com/kazuhiro.osawa`:
+
+    facebook.target = kazuhiro.osawa
+
+When you want to carry out POST to Wall of `http://www.facebook.com/pages/Yappo/200453809970361`:
+
+    facebook.target = 200453809970361
+
+# AUTHOR
+
+Kazuhiro Osawa <yappo {at} shibuya {dot} pl>
+
+# SEE ALSO
+
+[ShipIt](http://search.cpan.org/perldoc?ShipIt),
+many code takes from [ShipIt::Step::Twitter](http://search.cpan.org/perldoc?ShipIt::Step::Twitter)
+
+# LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

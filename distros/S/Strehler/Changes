@@ -1,0 +1,291 @@
+1.6.8
+===
+
+__Sat Jan 30 2016__
+
+* send_error used again with Dancer2 0.1660001
+* app.psgi (copy of app.pl) added to demo generation
+
+1.6.7
+===
+
+__Sat Jan 16 2016__
+
+* send_error substituted because it gave problems with Dancer2 0.165000
+
+1.6.6
+===
+
+__Tue Nov 04 2015__
+
+* Bugfix about retrieving subcategories
+
+1.6.5
+===
+
+__Mon Jun 29 2015__
+
+* Test case about API fixed (it failed with high perl version)
+
+1.6.4
+===
+
+__Sat Jun 20 2015__
+
+* Bugfix on public dir
+
+1.6.3
+===
+
+__Sun Jun 14 2015__
+
+* EntityType Select FormFu element
+* API to see entity schema
+* Perlcritic added [Thanks to VadimPushtaev]
+* Some bugfix and refactoring
+
+1.6.2
+===
+
+__Sat May 2 2015__
+
+* New way to define required fields on forms 
+* "Submit and Publish" button
+* has_tag method
+
+1.6.1
+===
+
+__Sun Apr 12 2015__
+
+* Bugfix for a fatal error getting elements using tags
+
+1.6.0
+===
+
+__Tue Mar 31 2015__
+
+* Categories with more than two levels
+* Error management
+* Different behaviour for user form.
+* Deletion for category tree implemented
+* Better error management in strehler script
+
+1.5.5
+===
+
+__Sun Feb 8 2015__
+
+* Strehler script enhancements:
+    * pwdchange
+    * batch
+    * categories
+    * testelement
+    * schemadump
+    * initentity
+* Dashboard links block
+* Homepage link
+* Check for statics version
+* Bugfix
+* Refactoring
+
+
+1.5.1
+===
+
+__Thu Jan 8 2015__
+
+* Urgent bugfix about image upload
+
+
+1.5.0
+===
+
+__Wen Jan 7 2015__
+
+* Dashboard
+* Language filter on list page
+* Test migrated to Plack::Test
+
+
+1.4.2
+===
+
+_Sun Dec 7 2014_
+
+* Urgent bugfix on EX plugin
+
+1.4.1
+===
+
+_Sun Dec 7 2014_
+
+* Smoother EX keywords configuration
+* More parameters in EX list keyword
+
+1.4.0
+===
+
+_Sat Dec 6 2014_
+
+* auto_publish flag
+* EX Plugin
+* Change password for user
+* ATTENTION: Strehler::Dancer2::Plugin is now Strehler::Dancer2::Plugin::Admin
+* Bugfix
+
+1.3.3
+=====
+
+_Sat Nov 22 2014_
+
+* Some more config.yml fixed
+
+1.3.2
+=====
+
+_Fri Nov 21 2014_
+
+* Released to fix things that went broken after Dancer2 0.154000 release
+
+
+1.3.1
+=====
+
+_Sun Nov 16 2014_
+
+* Refactoring, bugfixing and some clean-up!
+
+1.3.0
+=====
+
+_Mon Nov 10 2014_
+
+* Alignment with Dancer2 0.15x
+* Visible flag
+* Check introduced to avoid loading files with name more than 50 characters
+* custom_list_view dismissed, add_custom_snippet and custom_list_template added
+* Connection checked before initdb
+* Data from File fields is now passed to generic save_form (refactoring of Image) 
+* More bugfix and refactoring
+
+1.2.2
+=====
+
+_Wed Jul 23 2014_
+
+* Bugfix on category deletion
+* Error message when user try to create a categorized entity but no category is in the system.
+
+1.2.1
+=====
+
+_Thu Jul 17 2014_
+
+* Bugfix on Strehler::Helpers that made package lose compatibility with older perl
+
+1.2.0
+=====
+
+_Wen Jul 16 2014_
+
+* RESTful APIs
+* Slugged role
+* Dummy frontend site for demo
+* Bugfix and refactoring
+
+1.1.10
+======
+
+_Sun May 25 2014_
+
+* data_fields and multilang_data_fields introduced in Streher::Element
+* get_attr has now a bare flag
+* Bugfix
+* Documentation
+
+1.1.9
+=====
+
+_Mon May 19 2014_
+
+* Configuration refactoring
+* FomrFu elements to encapsulate all Strehler logic (Category, DisplayOrder,PublishDate, Tags)
+* Articles' search box search now in articles texts too.
+* Documentation
+* Generic bugfix
+
+1.1.8
+=====
+
+_Thu May 3 2014_
+
+* Strehler statics bugs solved
+
+1.1.7
+=====
+
+_Thu May 1 2014_
+
+* Filter can now take a category and all its subcategories
+* Fix on strehler script. Now initdb works.
+* Compatibility with Dancer 0.14 (tests only)
+
+1.1.6
+=====
+
+_Tue Apr 15 2014_
+
+* fields\_list introduced to manage table header in Strehler backend list view
+* Elements in list view can now be ordered
+* Search box
+* Filters on category and search box hidden with an accordion
+* Slug visible while editing articles
+* Last chapter feature can be used also if entity is not categorized
+
+1.1.5
+=====
+
+_Tue Apr 01 2014_
+
+* Bugfix on rendering attributes retrieved using custom accessors
+
+1.1.4
+=====
+
+_Mon Mar 31 2014_
+
+* Bugfix on category editing
+
+1.1.3
+=====
+
+_Sun Mar 30 2014_
+
+* Another tags bugfix
+* Better management of Date fields
+* Schema updated
+
+1.1.2
+=====
+
+_Sat Mar 29 2014_
+
+* Fix to make Strehelr forms compatible with HTML::FormFu 1.00
+* Tags bugfix
+* Image edit bugfix
+* Javascript refactoring
+
+1.1.1
+=====
+
+_Wen Mar 26 2014_
+
+* Demo.pm renamed to avoid its indexing as a distribution module.
+
+1.1.0
+=====
+
+_Tue Mar 25 2014_
+
+First release on CPAN

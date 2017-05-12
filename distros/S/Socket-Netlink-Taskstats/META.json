@@ -1,0 +1,57 @@
+{
+   "abstract" : "interface to Linux's C<Taskstats> generic\nnetlink socket protocol",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Socket-Netlink-Taskstats",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CChecker" : "0.02",
+            "ExtUtils::H2PM" : "0.06",
+            "Module::Build" : 0,
+            "Module::Build::Compat" : 0,
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::CChecker" : "0.02",
+            "Module::Build" : 0,
+            "Module::Build::Compat" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "5.57",
+            "Socket::Netlink" : "0.04"
+         }
+      }
+   },
+   "provides" : {
+      "IO::Socket::Netlink::Taskstats" : {
+         "file" : "lib/IO/Socket/Netlink/Taskstats.pm",
+         "version" : "0.03"
+      },
+      "Socket::Netlink::Taskstats" : {
+         "file" : "lib/Socket/Netlink/Taskstats.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.03"
+}

@@ -1,0 +1,74 @@
+#!/bin/sh -e
+### BEGIN INIT INFO
+# Provides:          silki
+# Required-Start:    $local_fs $remote_fs $network $syslog
+# Required-Stop:     $local_fs $remote_fs $network $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# X-Interactive:     true
+# Short-Description: Start/stop Silki Starman server
+### END INIT INFO
+
+# To install this into the /etc/rc*.d directories you can run this command as
+# root:
+#
+# update-rc.d silki start 70 2 3 4 5 . stop 05 0 1 6 .
+
+. /lib/lsb/init-functions
+
+LISTEN="127.0.0.1:13000"
+RUNDIR="/var/run/silki"
+PIDFILE="$RUNDIR/starman.pid"
+STARMAN="/usr/local/bin/starman"
+APP="/usr/local/bin/silki.psgi"
+USER="www-data"
+WORKERS="5"
+
+if [ ! -f $APP ] ; then
+    echo "ERROR: No Silki app at $APP"
+    exit 2
+fi
+
+silki_start () {
+    log_daemon_msg "Starting Silki Starman server"
+
+    if [ ! -d $RUNDIR ] ; then
+        mkdir $RUNDIR;
+        chown $USER $RUNDIR;
+    fi
+
+    start-stop-daemon -p $PIDFILE --chuid $USER --startas $STARMAN --start -- --listen $LISTEN --workers $WORKERS --preload-app --daemonize --pid $PIDFILE $APP
+    log_end_msg $?
+}
+
+silki_stop () {
+    log_daemon_msg "Stopping Silki Starman server"
+    start-stop-daemon -p $PIDFILE --stop --retry 5 || echo -n "...which is not running"
+    log_end_msg $?
+}
+
+case $1 in
+    start)
+        silki_start
+    ;;
+
+    stop)
+        silki_stop
+    ;;
+
+    restart|reload)
+        silki_stop
+        silki_start
+    ;;
+
+    status)
+        status_of_proc -p $PIDFILE "starman $APP" "Silki Starman server" && exit 0 || exit $?
+    ;;
+
+    *)
+        echo "Usage: /etc/init.d/silki {start|stop|restart|reload|status}"
+        exit 1
+    ;;
+esac
+
+exit 0

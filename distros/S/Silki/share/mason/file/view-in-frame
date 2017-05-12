@@ -1,0 +1,27 @@
+<p>
+  <% loc( 'The contents of <em>%html(%1)</em>', $file->filename() ) | n %>
+</p>
+
+<iframe src="<% $file->uri( view => 'content' ) %>"
+        id="file-view-iframe"
+        frameborder="1"
+        width="100%" height="100%"></iframe>
+
+<p>
+  <a href="<% $file->uri( view => 'content_as_attachment' ) %>"><% loc( 'Download this file' ) %></a>
+</p>
+<%args>
+$file
+</%args>
+
+<%attr>
+sidebar      => []
+show_sidebar => 0
+</%attr>
+
+<%method title>
+<% $file->filename() %>
+<%args>
+$file
+</%args>
+</%method>

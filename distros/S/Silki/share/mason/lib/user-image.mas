@@ -1,0 +1,13 @@
+% if ($image) {
+<img class="user-image-mini" src="<% $image->uri( view => 'mini' ) %>" />
+% } else {
+<img class="user-image-mini" src="/images/user_gray.png" height="32" width="40" />
+% }
+
+<%args>
+$user
+</%args>
+
+<%init>
+my $image = $user->image();
+</%init>

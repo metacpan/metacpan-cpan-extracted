@@ -1,0 +1,294 @@
+####################################################################
+# Copyright @ 2002 Joseph A. White and The Institute for Genomic
+#       Research (TIGR)
+# All rights reserved.
+####################################################################
+
+SlideMap.pm	v.1.2	Author: Joseph A. White		Feb 7, 2002
+
+Although the author has attempted to keep this document up to date, it 
+may refer to a previous version; check the version listed above.  The 
+most up to date documentation can be found by using perldoc SlideMap
+after the SlideMap module has been installed.  
+
+SlideMap is used to create a row/col -> plate/well map of a microarray 
+slide.  It does not as yet incorporate annotation data into the map, 
+but simply creates the map object based on input parameters.  The map 
+is an ordered list of spots with references to annonymous arrays 
+containing array_row, array_col, plate_alias, well.  SlideMap currently 
+supports 5 types of arrayers: IAS (default), MD, MD3, and Stanford.
+(Others will be implemented as needed.)  
+
+SlideMap provides 2 methods for conversion of spots->wells and vise-versa,
+based on instantiated parameters.  
+
+The main parameters are: 
+machine: 	the type of array printing machine used (IAS is the default)
+x_pin: 		the number of print head pens in the 'X' (plate_row) dimension
+y_pin: 		the number of print head pens in the 'Y' (plate_col) dimension
+			(x_pin = 2, and y_pin = 6 are the defaults)
+x_spacing: 	the number of spots in one row of a block on the array
+y_spacing: 	the number of spots in one column of a block on the array
+			(x_spacing = 24, and y_spacing = 25 are the defaults)
+
+To install:
+	perl Makefile.PL [LIB=<desired directory>]
+	make
+	make test
+	make install
+
+	Or just place SlideMap.pm in your desired directory and 'use' it.
+
+
+The SlideMap module can be used in several ways:
+a) 'use' SlideMap, call the constructor with all parameters, and convert 
+	spots or wells, fill the map object and loop over it:
+	
+	use SlideMap;
+	$sm->SlideMap->new( machine => "MD3", x_pin => 1, y_pin => 12,
+				xspacing => 32, yspacing => 10);
+	$ref = $sm->fill_map;
+	foreach $row_ref (@$ref)) {
+		($row,$col,$plate,$well) = @$row_ref;
+		...
+	}
+
+b) 'use' SlideMap, call the constructor with minimal parameters, and set 
+	parameters individually, then re-initialize and loop over the map:
+
+	use SlideMap;
+	$sm->SlideMap->new( machine => "MD3");
+	$sm->setBlockDimensions(32,6);
+	$ref = $sm->fill_map;
+	foreach $row_ref (@$ref)) {
+		($row,$col,$plate,$well) = @$row_ref;
+		...
+	}
+
+c) 'use' SlideMap, call the constructor with machine argument not 
+	listed above, set parameters individuzlly, then initialize the 
+	map. This is useful for arrayers that are not listed above but 
+	operate similarly to one of the above mentioned machines. NOTE:
+	default values for parameters are used in this case).
+	
+	use SlideMap;
+	$sm->SlideMap->new(x_pin => 2, y_pin => 12, xspacing => 32, 
+		yspacing => 10, machine => 'arrayer');
+	$sm->setNoComplement(1);
+	$sm->setFormat(1);
+	$sm->setPrintDirection(1);
+	$sm->setRepeatMode(1);
+	$ref = $sm->fill_map;
+	foreach $row_ref (@$ref)) {
+		($row,$col,$plate,$well) = @$row_ref;
+		...
+	}
+
+There are several default values associated with each arrayer listed 
+above.  They are:
+
+IAS:
+Default:
+format = 1
+print_direction = 0
+x_repeat = 1
+y_repeat = 1
+noComplement = 0
+
+MD3:
+format = 2
+print_direction = 1
+x_repeat = 2
+y_repeat = 1
+x_spacing = 32
+x_pin = 1
+y_pin = 12
+noComplement = 1
+
+MD:
+format = 1
+print_direction = 0
+x_repeat = 2
+y_repeat = 1
+yspacing = 16
+x_pin = 1
+y_pin = 6
+noComplement = 1
+
+Stanford:
+format = 1
+print_direction = 0
+noComplement = 0
+x_pin = 4
+y_pin = 4
+x_repeat = 1
+y_repeat = 1
+
+=head1 DETAILS
+
+This constructor call will create a SlideMap object using the default 
+parameter settings: 
+
+$sm = SlideMap->new( machine => "IAS", x_pin => 2, y_pin => 6,
+				xspacing => 24, yspacing => 25);
+
+The constructor will do all initialization, but will 'NOT' create a 
+map in memory.  That can be done as follows:
+
+$sm->fill_map;
+
+After the map has been created in memory, a reference to the map 
+object is obtained by calling getMap.  The map object is an array 
+consisting of references to annonymous arrays holding array_row, 
+array_col, plate_alias (or number), well number.
+
+$map_ref = $sm->getMap;
+
+Individual spots can be mapped back to their originating microtitre 
+plate by supplying the row and column index of the spot to 
+convert_spot:
+
+($plate_num, $well, $plate_row, $plate_col) 
+	= $sm->convert_spot($array_row, $array_col);
+  
+Well is an integer representing the well position on a plate.  
+Starting from well 1 (A1), this number increases across a row and 
+then to the next row, so A12 in a 96-well plate is well 12 and B1 
+is well 13, etc.  Plate_row is an 1-based integer that represents 
+the row.
+
+Likewise, the row and column indeces for a spot can be obtained 
+from the plate_num and well used as source for the spot.  
+NOTE: plate_num here refers to the position of the plate in the 
+series of plates used for the printing, i.e. it is an plate ordinal.  
+
+($array_row, $array_col, $meta_row, $meta_col, $sub_row, $sub_col) 
+		= $sm->convert_well($plate_num, $well);
+
+The meta_row and meta_col indeces refer to the row/col indeces of 
+the pin that printed the spot in question.  The sub_row and sub_col 
+indeces refer to the indeces of the spot within a block.  The 
+array_row and array_col indeces are obvious.
+  
+SlideMap includes a convenience method to return the meta_row/col, 
+and sub_row/col indeces for a pair of array_row, array_col indeces:
+
+($_meta_row,$_meta_col,$_sub_row,$_sub_col) 
+  		= $sm->get_meta($array_row, $array_col);
+
+The following are get/set methods that can be used to customize a
+SlideMap object to accomodate array printers not supported at the 
+time of release of SlideMap.pm.  
+
+All of the following 'set*' methods require re-initialization of 
+the SlideMap object:
+
+$sm->initialize;
+
+getMachine: returns the current machine setting:
+
+$arrayer = $sm->getMachine;
+
+setMachine: sets the machine type used for printing.  Currently 
+SlideMap supports 4 types of arrayers: 'IAS', 'MD', 'MD3', and 
+'Stanford'.  To set the machine type:
+
+$sm->setMachine("arrayer");
+$sm->initailize;
+
+setPrintHead: defines the numbers of pens in the print head, 
+	'X' (plate_row) and 'Y' (plate_col):
+
+$sm->setPrintHead(2, 6);
+
+getPrintHead: returns the numbers of pens in the print head:
+
+($x_pin, $y_pin) = $sm->getPrintHead;
+  
+setBlockDimensions: set maximumn row and column indeces in blocks 
+on the array, row first then column:
+
+$sm->setBlockDimensions(25, 24);
+
+getBlockDimensions: returns block dimensions:
+
+($x_spacing, $y_spacing) = $sm->getBlockDimensions;
+  
+setNoComplement: switches printing pattern in the 'X' dimension; 
+this is in effect complementing (1 - x) in the 'X' dimension only.  
+Valid values are 0 => complemented, and 1 => 'NOT' complemented:
+
+$sm->setNoComplement([ 0 | 1 ]);
+
+getNoComplement: returns the current value of the noComplement 
+parameter:
+
+$noComplement = $sm->getNoComplement;
+  
+setRepeatMode: number of repeated blocks in 'X' dimension.  Valid 
+values are 1 - 4:
+
+$sm->setRepeatMode([ 1 | 2 | 3 | 4 ]);
+
+getRepeatMode: returns the current value of the repeat parameter:
+
+$repeat = $sm->getRepeatMode;
+  
+setFormat: microtitre plate format: valid values are 1 => 96-well, 
+and 2=> 384-well:
+
+$sm->setFormat([ 1 | 2 ]);
+
+getFormat: returns the current value of the format parameter:
+
+$plate_format = $sm->getFormat;
+  
+setPrintDirection: defines the order of printing used by the 
+printer.  Valid values are 0 => top->bottom, and 1 => left->right:
+
+$sm->setPrintDirection([ 0 | 1 ]);
+
+getPrintDirection: returns the current value of the print_dir 
+parameter:
+
+$direction = $sm->getPrintDirection;
+  
+setPlateOrder: define a list of plate labels (aliases) for the 
+complete set of plates used for printing.  The list should include 
+all repeats of the plate:
+
+$sm->setPlateOrder("[A,B,C,D,E,F,G ... | 1,2,3,4,5, ... ]");
+
+getPlateOrder: returns a reference to an array containing the 
+entire list of plate labels:
+
+$plate_order_ref = $sm->getPlateOrder;
+
+
+=head1 DIAGNOTICS
+
+diagnostics: returns the full set of current values for the 
+SlideMap parameters:
+
+$sm->diagnostics;
+
+print_spots/print_wells: prints an entire set of row/col/plate/well 
+values based on the current SlideMap parameters.  if the optional 
+parameter is set to 1 (true) then well numbers are printed as well 
+numbers; if set to 0 or not set, then the well number is returned 
+as row_col, i.e. A1, B12, etc.  These methods are useful for 
+diagnosing errors in the print pattern.
+
+$sm->print_spots([ 1 | 0 ]);
+$sm->print_wells([ 1 | 0 ]);
+
+The algorithms used to convert spots to wells and vise-versa are 
+dynamically generated based on the type of arrayer (machine) supplied
+as a parameter to the constructor (or to setMachine).  To view the 
+algorithm currently being used, use either of the following methods:
+
+$sm->showConvertWell;
+$sm->showConvertSpot;
+
+
+Joseph A. White;	jwhite@tigr.org		Version 1.2		Feb. 7, 2002

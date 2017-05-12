@@ -1,0 +1,10 @@
+Changes
+lib/Search/OpenSearch/Engine/KSx.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/01-rest-api.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

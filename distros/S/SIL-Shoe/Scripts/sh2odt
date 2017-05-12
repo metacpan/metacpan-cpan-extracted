@@ -1,0 +1,883 @@
+#!/usr/bin/perl
+
+$VERSION = '1.1';   #   MJPH     05-SEP-2006     Indent interlinear block to ease cursor handling
+# $VERSION = '1.0.1'; #   MJPH     26-AUG-2006     Add font-asian, font-complex stuff
+# $VERSION = '1.0';   #   MJPH     25-AUG-2006     Original
+
+use SIL::Shoe::Settings;
+use SIL::Shoe::Data;
+use Encode qw(_utf8_on decode_utf8 encode_utf8);
+use Encode::Registry;
+use File::Spec;
+use Getopt::Std;
+use Archive::Zip qw(:CONSTANTS);
+use Pod::Usage
+
+getopts("c:e:hms:");
+
+if ($opt_h)
+{
+    pod2usage( -verbose => 2);
+    exit;
+}
+
+unless (defined $ARGV[0])
+{
+    pod2usage(1);
+    exit;
+}
+
+unless (defined $ARGV[0])
+{
+    die <<'EOT';
+    sh2odt [-s settings_dir] [-c codepage] [-e encs] [-m] infile [outfile]
+
+Converts Shoebox data to OpenOffice format
+
+    -c codepage     Set system codepage for this process
+    -e enc,enc      Add Encoding:: subsets in Perl 5.8.1
+    -m              MDF character marker support
+    -s dir          Directory to find .typ files in [.]
+    
+If outfile is missing, it is created as the input file with extension replaced
+by .odt. This allows a user to drop a data file on a shortcut.
+EOT
+}
+
+%esc = (                    # as per XML spec.
+    '<' => '&lt;',
+    '>' => '&gt;',
+    '&' => '&amp;',
+    "'" => '&apos;',
+    '"' => '&quot;'
+    );
+    
+%charsets = (
+    0 => 1252,      # ansi - Western European
+    1 => 0,         # default
+    2 => 0,         # symbol
+    3 => 0,         # invalid
+    77 => 10000,    # mac
+    128 => 932,     # Shift JIS
+    129 => 949,     # Hangul
+    130 => 1361,    # Johab
+    134 => 936,     # GB2312 Simplified Chinese
+    136 => 950,     # Big5 Traditional Chinese
+    161 => 1253,    # Greek
+    162 => 1254,    # Turkish
+    163 => 1258,    # Vietnamese
+    177 => 1255,    # Hebrew
+    178 => 1256,    # Arabic
+    179 => 'arabictrad',
+    180 => 'arabicuser',
+    181 => 'hebrewuser',
+    186 => 1257,    # Baltic
+    204 => 1251,    # Russian (Cyrillic)
+    222 => 874,     # Thai
+    238 => 1250,    # Eastern European
+    254 => 437,     # PC 437
+    255 => 'oem'
+    );
+
+unless (defined $ARGV[1])
+{
+    $ARGV[1] = $ARGV[0];
+    $ARGV[1] =~ s/(\.[^.]*)?$/.odt/o;
+}
+
+if ($] > 5.007 && $opt_e)
+{
+    foreach (split(/\s*[,;]\s*/, $opt_e))
+    {
+        require "Encode/$opt_e.pm";
+        &{"Encode::$opt_e::import"};
+    }
+}
+
+$opt_s = "." unless defined $opt_s;
+$settings = SIL::Shoe::Settings->new($opt_s) || die "Unable to read settings directory at $opt_s";
+
+$s = SIL::Shoe::Data->new($ARGV[0], undef, nostripnl => 1)
+        || die "Can't open $ARGV[0]";
+$zip = Archive::Zip->new();
+$zip->addDirectory('META-INF')->desiredCompressionMethod(COMPRESSION_DEFLATED);
+$zip->addString(<<'EOT', 'META-INF/manifest.xml')->desiredCompressionMethod(COMPRESSION_DEFLATED);
+<?xml version="1.0"?>
+<!DOCTYPE manifest:manifest PUBLIC "-//OpenOffice.org//DTD Manifest 1.0//EN" "Manifest.dtd">
+<manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0">
+ <manifest:file-entry manifest:media-type="application/vnd.oasis.opendocument.text" manifest:full-path="/"/>
+ <manifest:file-entry manifest:media-type="text/xml" manifest:full-path="content.xml"/>
+</manifest:manifest>
+EOT
+
+$outfile = <<'EOT';
+<?xml version="1.0" encoding="UTF-8"?>
+
+<office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" 
+xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" 
+xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" 
+xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" 
+xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" 
+xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" 
+xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" 
+xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" 
+xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" 
+xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" 
+xmlns:chart="urn:oasis:names:tc:opendocument:xmlns:chart:1.0" 
+xmlns:dr3d="urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0" 
+xmlns:math="http://www.w3.org/1998/Math/MathML" 
+xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0" 
+xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0" 
+xmlns:ooo="http://openoffice.org/2004/office" xmlns:ooow="http://openoffice.org/2004/writer" 
+xmlns:oooc="http://openoffice.org/2004/calc" xmlns:dom="http://www.w3.org/2001/xml-events" 
+xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" office:version="1.0" office:class="text">
+ <office:scripts/>
+EOT
+
+$typef = $settings->type($s->{' Type'}) || die "Can't find .typ file for type: $s->{' Type'}";
+$typef->read;
+$s->{' key'} = $typef->{'mkrRecord'}[0] || $typef->{'mkrRecord'};        # bug in .typ file results in mkrRecord going in twice
+$lngdef = $settings->lang($typef->{'lngDefault'});
+$lngdef->add_specials if ($lngdef);
+if ($opt_c)
+{ $deflang = $opt_c; }
+elsif ($lngdef->{'codepage'})
+{ $deflang = $lngdef->{'codepage'}; }
+elsif ($^O eq 'MSWin32')
+{
+    require Win32::TieRegistry;
+    Win32::TieRegistry->import(Delimiter => '/');
+
+    $deflang = $Registry->{"LMachine/SYSTEM/ControlSet/CurrentControlSet/Control/Nls/CodePage//ACP"};
+}
+
+unless ($deflang)
+{ $deflang = 1252; }
+
+$defenc = Encode::Registry::find_encoding($deflang) || Encode::Registry::find_encoding('iso-8859-1')
+    || die "Can't make an encoding converter for $deflang";
+
+$typen = $s->{' Type'};
+$typen =~ s/\s+/_/oig;
+
+$dtd = make_dtd($typef, $typen);
+
+$outfile .= <<'EOT';
+ <office:styles>
+  <style:default-style style:family="paragraph">
+   <style:paragraph-properties fo:hyphenation-ladder-count="no-limit"
+    style:punctuation-wrap="hanging" style:line-break="strict"
+    style:tab-stop-distance="0.4925in" style:writing-mode="page"/>
+   <style:text-properties style:use-window-font-color="true" fo:font-family="Times New Roman"
+    fo:font-size="11pt" fo:language="en" fo:country="US" fo:hyphenate="false"
+    fo:hyphenation-remain-char-count="2" fo:hyphenation-push-char-count="2"/>
+  </style:default-style>
+  <style:style style:name="interlinear-block" style:display-name="interlinear-block" style:family="paragraph">
+   <style:paragraph-properties fo:margin-top="0in" fo:margin-bottom="6pt" fo:margin-left="6pt"/>
+  </style:style>
+  <style:style style-name="interlinear-line" style:display-name="interlinear-line" style:family="paragraph">
+   <style:paragraph-properties fo:margin-top="0in" fo:margin-bottom="0in"/>
+  </style:style>
+  <style:style style:name="interlinear-frame" style:display-name="interlinear-frame" style:family="graphic">
+    <style:graphic-properties fo:margin-left="0in" fo:margin-right="0.05in" style:vertical-pos="top"
+    style:vertical-rel="baseline" fo:padding="0in" fo:border="none" style:shadow="none" fo:margin-top="0pt"
+    fo:margin-bottom="0in"/>
+  </style:style>
+  <style:style style:name="interlinear-frame-block" style:display-name="interlinear-frame-block" style:family="graphic">
+    <style:graphic-properties fo:margin-left="0in" fo:margin-right="0.05in" style:vertical-pos="top"
+    style:vertical-rel="baseline" fo:padding="0in" fo:border="none" style:shadow="none" fo:margin-top="6pt"
+    fo:margin-bottom="0in"/>
+  </style:style>
+EOT
+
+foreach $m (sort keys %{$typef->{'mkr'}})
+{
+    my ($fntmkr, $italic, $bold, $color);
+    my ($mkr) = $typef->{'mkr'}{$m};
+    my ($enc, $cp) = get_enc($m, $settings, $typef, $defenc, $opt_s);
+    my ($fname);
+
+    $outfile .= "  <style:style style:name=\"$dtd->{$m}{'element'}\" style:family=\"" 
+        . (defined $mkr->{'CharStyle'} ? 'text' : 'paragraph') 
+        . "\" style:display-name=\"$m\">\n";
+    unless (defined $mkr->{'CharStyle'})
+    {
+        $outfile .= "   <style:paragraph-properties fo:margin-top=\"0pt\" fo:margin-bottom=\"6pt\"/>\n";
+    }
+
+    if (defined $mkr->{'fnt'})
+    { $fntmkr = $mkr->{'fnt'}; }
+    else
+    { 
+        $fntmkr = $settings->lang($mkr->{'lng'});
+        $fntmkr->add_specials;
+    }
+    $fname = $fntmkr->{'Name'};
+    my ($nfname);
+    if (!defined $mkr->{'fnt'} && defined $fntmkr->{'unicode_font'})
+    { $nfname = $fntmkr->{'unicode_font'}; }
+    elsif ($cp)
+    { $nfname = Encode::Registry::find_encfont($cp, $fname); }
+    $fname = $nfname if ($nfname);
+    $fname = decode_utf8($fname);
+
+    $outfile .= "   <style:text-properties style:use-window-font-color=\"true\" fo:font-family=\"$fname\"
+fo:font-size=\"$fntmkr->{'Size'}pt\" style:font-family-asian=\"$fname\" style:font-family-complex=\"$fname\"
+style:font-size-asian=\"$fntmkr->{'Size'}pt\" style:font-size-complex=\"$fntmkr->{'Size'}pt\"";
+    $outfile .= " fo:font-style=\"italic\" style:font-style-asian=\"italic\" style:font-style-complex=\"italic\"" if (defined $fntmkr->{'Italic'});
+    $outfile .= " fo:font-weight=\"bold\" style:font-weight-asian=\"bold\" style:font-weight-complex=\"bold\"" if (defined $fntmkr->{'Bold'});
+    $outfile .= " fo:color=\"rgb($fntmkr->{'rgbColor'})\"" if (defined $fntmkr->{'rgbColor'} && $fntmkr->{'rgbColor'} ne '0,0,0');
+    $outfile .= "/>\n  </style:style>\n";
+}
+$outfile .= <<'EOT';
+ </office:styles>
+ <office:body>
+  <office:text>
+EOT
+
+$in_p = 0;
+$frame_count = 1;
+while ($s->readrecord(\@fields))
+{
+    $indent = 0;
+    @stack = ('shoebox');
+    for ($i = 0; $i <= $#fields; $i++)
+    {
+        $f = $fields[$i];
+        $marker = $f;
+        next if ($s->{$marker} eq "");
+        $marker =~ s/\s+.*$//oi;    # strip to the name back to its sfm
+
+        if (defined $dtd->{$marker}{'interlinid'})
+        {
+            if (!defined $interlin_level)
+            {
+                if ($in_p)
+                { $outfile .= "</text:p>\n"; }
+                $outfile .= "   <text:p text:style-name=\"interlinear-block\">";
+                $in_p = 1;
+            }
+            elsif ($dtd->{$marker}{'interlinid'} == 0)
+            { 
+                $outfile .= output_block($rows, $dtd);
+                $rows = [];
+            }
+            $interlin_level = $dtd->{$marker}{'interlinid'};
+            $rows->[$interlin_level] = build_pos($s->{$f});
+            next;
+        }
+        elsif (defined $interlin_level)
+        {
+            $outfile .= output_block($rows, $dtd);
+            $rows = [];
+            undef $interlin_level;
+        }
+        ($s->{$f}, $dump) = convert_text($s->{$f}, '', $opt_m, $marker, $settings, $typef, $defenc, $opt_s, $dtd);
+
+        if ($typef->{'mkr'}{$marker}{'CharStyle'})
+        {
+            unless ($in_p)
+            {
+                $outfile .= "   <text:p>";
+                $in_p = 1;
+            }
+            $outfile .= "<text:span text:style-name=\"$dtd->{$marker}{'element'}\">$s->{$f}</text:span>\n";
+        }
+        else
+        {
+            if ($in_p)
+            { $outfile .= "</text:p>\n"; }
+            $outfile .= "   <text:p text:style-name=\"$dtd->{$marker}{'element'}\">$s->{$f}";
+            $in_p = 1;
+        }
+    }
+    if (defined $interlin_level)
+    {
+        $outfile .= output_block($rows, $dtd);
+        $rows = [];
+        undef $interlin_level;
+    }
+    if ($in_p)
+    {
+        $outfile .= "</text:p>\n";
+        $in_p = 0;
+    }
+}
+$outfile .= "  </office:text>\n </office:body>\n</office:document>\n";
+
+$zip->addString(\$outfile, "content.xml")->desiredCompressionMethod(COMPRESSION_DEFLATED);
+$zip->writeToFileNamed($ARGV[1]);
+
+sub make_dtd
+{
+    my ($tf, $typen) = @_;
+    my ($k, $tree, $mk, $lcount, $nk);
+
+    $tree = {};
+    $lcount = 0;
+    foreach $k (@{$tf->{'intprc'}})
+    {
+        foreach $mk ($k->{'mkrFrom'}, $k->{'mkrTo'})
+        {
+            unless (defined $tree->{$mk}{'interlinid'})
+            {
+                $tree->{$mk}{'interlinid'} = $lcount;
+                $tree->{'interlinear block'}{'markers'}[$lcount++] = $mk;
+                $tf->{'mkr'}{$mk}{'CharStyle'} = 'text';        # force interlinear block lines to be char style
+            }
+        }
+#        $tree->{$k->{'mkrTo'}}{'interlin_parent'} = $tree->{$k->{'mkrFrom'}}{'interlinid'};
+        $tree->{$k->{'mkrTo'}}{'parent'} = $k->{'mkrFrom'};
+        push(@{$tree->{$k->{'mkrFrom'}}{'interlin_child'}}, $tree->{$k->{'mkrTo'}}{'interlinid'});
+    }
+    
+    foreach $k (keys %{$tf->{'mkr'}})
+    {
+        $nk = transform($k);
+        $tree->{$k}{'element'} = $nk;
+        $parent = $tf->{'mkr'}{$k}{'mkrOverThis'};
+        if (defined $tree->{$k}{'interlinid'})
+        {
+            if (defined $tree->{$k}{'parent'})
+            { $parent = $tree->{$k}{'parent'}[0]; }
+            else
+            { 
+                push (@{$tree->{'interlinear block'}{'child'}}, $k);
+                $nk = 'interlinear block';
+                $tree->{$nk}{'element'} = 'interlinear-block';
+                $tree->{$k}{'parent'} = [$nk];
+                $k = 'interlinear block';
+            }
+        }
+        $parent ||= 'shoebox';
+        $tree->{$k}{'parent'} = [$parent] unless defined $tree->{$k}{'parent'};
+        push (@{$tree->{$parent}{'child'}}, $k);
+        if (defined $tf->{'mkr'}{$k} && defined $tf->{'mkr'}{$k}{'mkrsOverThis'})
+        {
+            foreach (split(' ', $tf->{'mkr'}{$k}{'mkrsOverThis'}))
+            {
+                push (@{$tree->{$k}{'parent'}}, $_);
+                push (@{$tree->{$_}{'child'}}, $nk);
+            }
+        }
+    }
+
+    $tree;
+}
+
+sub transform
+{
+    my ($str) = (@_);
+    $str =~ s/^(\d)/_.$1/o;
+    $str;
+}
+
+
+sub protect
+{
+    my ($str) = @_;
+    
+    $str =~  s/([<>&'"])/$esc{$1}/og;    # tidy up data ']
+    $str;
+}
+
+
+sub convert_text
+{
+    my ($str, $delim, $opt_m, $marker, $settings, $typef, $defenc, $base, $dtd) = @_;
+    my ($enc, $cp) = get_enc($marker, $settings, $typef, $defenc, $base);
+    my ($pre, $post, $match, $q, $res);
+    
+    $q = "|$delim" if ($delim);
+    if ($opt_m && $str =~ m/(\|(\w+)\{$q)/)
+    {
+        $pre = $`;      #`
+        $post = $';     #'
+        $match = $2;
+        
+        if ($1 eq $delim)
+        {
+            if ($enc)
+            { return (protect($enc->decode($pre)), $post); }
+            else
+            { 
+                $pre =~ s/[\xf0-\xff][\x80-\xbf]+//og;      # this trims all surrogates, not sure if want to
+                return (protect(decode_utf8($pre, 0)), $post);
+            }
+        }
+        else
+        {
+            $res = protect($enc ? $enc->decode($pre) : decode_utf8($pre));
+            $res .= "<text:span text:style-name=\"" . (defined $dtd->{$match} ? "$dtd->{$match}{'element'}" : "$match") . "\">";
+            ($pre, $post) = convert_text($post, '}', $opt_m, $match, $settings, $typef, $enc, $base, $dtd);
+            $res .= $pre;
+            $res .= "</text:span>";
+            $res .= protect($enc ? $enc->decode($post) : decode_utf8($post));
+            return ($res, undef);
+        }
+    }
+    elsif ($enc)
+    { return (protect($enc->decode($str)), undef); }
+    else
+    {
+        $str =~ s/[\xf0-\xff][\x80-\xbf]+//og;      # this trims all surrogates, not sure if want to
+        return (protect(decode_utf8($str, 0)), undef);
+    }
+}
+
+    
+sub get_enc
+{
+    my ($marker, $settings, $typef, $defenc, $base) = @_;
+    my ($res, $enc);
+    
+    unless ($lang = $settings->lang($typef->{'mkr'}{$marker}{'lng'}))
+    { $enc = $defenc; }
+    elsif (defined $lang->{'encoding'})
+    { $enc = $lang->{'encoding'}; }
+    elsif (defined $lang->{'UnicodeLang'})
+    { undef $enc; }
+    else
+    {
+        my ($cp);
+        $lang->add_specials;
+        $cp = $lang->{'codepage'};
+        if ($cp eq 'none')
+        { $enc = undef; }           # this may cause problems since data can be non utf8 conformant
+        elsif ($cp =~ /\.tec$/o)
+        {
+            $enc = Encode::TECkit->new(File::Spec->catfile($base, $cp));
+            unless ($enc)
+            {
+                print STDERR "Unable to find TECkit mapping $cp, using default encoding\n";
+                $enc = $defenc;
+            }
+        }
+        else
+        {
+            $cp ||= $charsets{hex($lang->{'charset'})};
+            $enc = Encode::Registry::find_encoding($cp);
+            $res = $cp;
+            if (!$enc && $cp)
+            {
+                print STDERR "Unable to find encoding $cp, using default\n";
+                $enc = $defenc;
+            }
+        }
+        $lang->{'encoding'} = $enc;
+    }
+    ($enc, $res);
+}
+
+sub build_pos
+{
+    my ($str) = @_;
+    my ($match, $num, $pos, $substr, $first, $new, $last);
+
+    $pos = 0;
+    $num = 0;
+#    $str =~ s/^\s?//og;
+    while ($str =~ m/^(\S+)\s*/oi)
+    {
+        $substr = $1;
+        $match = $&;
+        $str = $';  #'
+        $new = SIL::Shoe::Interlin::Node->new(
+            text => $substr,
+            num => $num,
+            pos => $pos,
+            end => $pos + length($substr));
+        if ($last)
+        {
+            $last->{'next'} = $new;
+            $last = $new;
+        }
+        else
+        {
+            $first = $new;
+            $last = $new;
+        }
+        $pos += length($match);
+        $num++;
+    }
+    return $first;
+}
+
+sub make_tree
+{
+    my ($dtd, $row, $prow, $ind, $pind) = @_;
+    my ($child, $parent, $oldp, $plast);
+
+    for ($child = $row; defined $child; $child = $child->{'next'})
+    {
+# find actual parent of this child
+        for ($parent = $prow; defined $parent; $parent = $parent->{'next'})
+        {
+            if ($child->{'pos'} == $parent->{'pos'})
+            {
+                $plast = $parent;
+                last;
+            }
+            elsif ($child->{'pos'} < $parent->{'pos'})
+            { last; }
+            $plast = $parent;
+        }
+        
+        $child->{'parent'} = $plast;
+        push(@{$plast->{'children'}[$ind]}, $child);
+
+        $oldp = $plast;
+        for ($parent = $plast->{'next'}; defined $parent; $parent = $parent->{'next'})
+        {
+            last unless ($child->{'end'} >= $parent->{'pos'});
+            $oldp = $parent;
+        }
+
+        mark_links($dtd, $plast, $oldp, $pind) if ($oldp ne $plast);
+    }
+}
+
+
+sub mark_links
+{
+    my ($dtd, $first, $last, $ind) = @_;
+    my ($pfirst, $plast, $pind);
+    my ($mk) = $dtd->{'interlinear block'}{'markers'}[$ind];
+
+    $pind = $dtd->{$dtd->{$mk}{'parent'}}{'interlinid'} if (defined $dtd->{$mk}{'parent'});
+    if (defined $pind)
+    {
+        $pfirst = $first->{'parent'};
+        $plast = $last->{'parent'};
+        mark_links($dtd, $pfirst, $plast, $pind) if ($pfirst ne $plast);
+    }
+
+    for ($pfirst = $first; $pfirst ne $last; $pfirst = $pfirst->{'next'})
+    { $pfirst->{'linked'} = 1; }
+}
+
+
+sub output_block
+{
+    my ($rows, $dtd) = @_;
+    my ($i);
+    
+    for ($i = 0; $i < scalar @{$rows}; $i++)
+    {
+        $mk = $dtd->{'interlinear block'}{'markers'}[$i];
+        if (defined $dtd->{$mk}{'parent'} && defined $dtd->{$dtd->{$mk}{'parent'}}{'interlinid'})
+        {
+            my ($pid) = $dtd->{$dtd->{$mk}{'parent'}}{'interlinid'};
+            make_tree($dtd, $rows->[$i], $rows->[$pid], $i, $pid);
+        }
+    }
+    process_stack($dtd, 0, $rows);
+}
+
+sub process_stack
+{
+    my ($dtd, $ind, $rows) = @_;
+    my ($p, $c, $op, $res);
+
+    for ($p = $rows->[$ind]; defined $p; $p = $p->{'next'})
+    {
+        $op->{'linked'} = 1 if (defined $op && !$p->{'children'});
+        $op = $p;
+    }
+
+    for ($c = $rows->[$ind]; defined $c; $c = $c->{'next'})
+    {
+        for ($p = $c; defined $p && $p->{'linked'}; $p = $p->{'next'})
+        { }
+
+        if ($p ne $c)
+        {
+            $c->{'chained'} = $p;
+            mark_children($dtd, $c, $p, $ind);
+            $c = $p;
+        }
+    }
+
+    for ($c = $rows->[$ind]; defined $c; $c = $c->{'next'})
+    {
+        next unless ($c->{'chained'});
+        remove_links($dtd, $c, $c->{'chained'}, $ind);
+    }
+
+    for ($p = $rows->[$ind]; defined $p; $p = $p->{'next'})
+    {
+        $res .= "<draw:frame text:anchor-type=\"as-char\" draw:style-name=\"interlinear-frame-block\" fo:min-width=\"0.1402in\" draw:name=\"frame$frame_count\" draw:z-index=\"$frame_count\">\n";
+        $res .= "     <draw:text-box fo:min-height=\"0.1402in\">\n";
+        $frame_count++;
+        $res .= stack_xml($p, $ind, $dtd);
+        $res .= "    </draw:text-box></draw:frame>";
+    }
+    $res;
+}
+
+
+sub mark_children
+{
+    my ($dtd, $first, $last, $ind) = @_;
+    my ($cind, $cfirst, $clast, $c, $p);
+
+    return unless (scalar @{$dtd->{$dtd->{'interlinear block'}{'markers'}[$ind]}{'interlin_child'}});
+    foreach $cind (@{$dtd->{$dtd->{'interlinear block'}{'markers'}[$ind]}{'interlin_child'}})
+    {
+        $cfirst = $first->{'children'}[$cind][0];
+        next unless $cfirst;
+        for ($p = $first; defined $p && $p ne $last->{'next'}; $p = $p->{'next'})
+        {
+            foreach $c (@{$p->{'children'}[$cind]})
+            {
+                if ($cfirst->{'pos'} <= $c->{'pos'})
+                {
+                    $clast = $c;
+                }
+                else
+                {
+                    $clast = $cfirst;
+                    $cfirst = $c;
+                }
+            }
+        }
+
+        if ($cfirst)
+        {
+            $clast ||= $cfirst;
+            $cfirst->{'chained'} = $clast;
+            for ($c = $cfirst; $c ne $clast; $c = $c->{'next'})
+            {
+                $c->{'linked'} = 1;
+            }
+            $first->{'fchild'}[$cind] = $cfirst;
+            mark_children($dtd, $cfirst, $clast, $cind);
+        }
+    }
+}
+
+
+sub remove_links
+{
+    my ($dtd, $first, $last, $ind) = @_;
+    my ($cind, $c);
+
+    if (scalar @{$dtd->{$dtd->{'interlinear block'}{'markers'}[$ind]}{'interlin_child'}})
+    {
+        foreach $cind (@{$dtd->{$dtd->{'interlinear block'}{'markers'}[$ind]}{'interlin_child'}})
+        {
+            $c = $first->{'fchild'}[$cind];
+            next unless $c;
+            remove_links($dtd, $c, $c->{'chained'}, $cind);
+            $first->{'children'}[$cind] = [$c];
+            $c->{'parent'} = $first;
+        }
+    }
+
+    for ($c = $first->{'next'}; defined $c && $c ne $last->{'next'}; $c = $c->{'next'})
+    {
+        $first->{'text'} .= " $c->{'text'}";
+    }
+    $first->{'next'} = $c;
+    $first->{'linked'} = 0;
+}
+
+
+sub stack_xml
+{
+    my ($first, $ind, $dtd) = @_;
+    my ($mk, $enc, $str, $lang, $c, $child, $cp, $res);
+    
+    $mk = $dtd->{'interlinear block'}{'markers'}[$ind];
+    
+    ($enc, $cp) = get_enc($mk, $settings, $typef, $defenc, $opt_s);
+
+    if ($first)
+    {
+        $str = $first->{'text'};
+        if ($enc)
+        { $str = $enc->decode($str); }
+        else
+        {
+            $str =~ s/[\xf0-\xff][\x80-\xbf]+//og;      # this trims all surrogates, not sure if want to
+            $str = decode_utf8($str, 0);
+        }
+        $str =~ s/([<>&'"])/$esc{$1}/og;    # tidy up data ']
+    }
+    else
+    { $str = ''; }
+
+    $res = "     <text:p text:style-name=\"interlinear-line\"><text:span text:style-name=\"$dtd->{$mk}{'element'}\">$str</text:span></text:p>\n";
+
+    if (defined $dtd->{$mk}{'interlin_child'})
+    {
+        foreach $c (@{$dtd->{$mk}{'interlin_child'}})
+        {
+            if ($first && @{$first->{'children'}[$c]})
+            {
+                $res .= "     <text:p text:style-name=\"interlinear-line\">" if (@{$first->{'children'}[$c]} > 1);
+                foreach $child (@{$first->{'children'}[$c]})
+                {
+                    if (@{$first->{'children'}[$c]} > 1)
+                    {
+                        $res .= "<draw:frame text:anchor-type=\"as-char\" draw:style-name=\"interlinear-frame\" fo:min-width=\"0.1402in\" draw:name=\"frame$frame_count\" draw:z-index=\"$frame_count\">\n";
+                        $res .= "    <draw:text-box fo:min-height=\"0.1402in\">\n";
+                        $frame_count++;
+                    }
+                    $res .= stack_xml($child, $c, $dtd);
+                    $res .= "    </draw:text-box></draw:frame>" if (@{$first->{'children'}[$c]} > 1);
+                }
+                $res .= "</text:p>\n" if (@{$first->{'children'}[$c]} > 1);
+            }
+            else
+            { $res .= stack_xml(undef, $c, $dtd); }
+        }
+    }
+    $res;
+}
+
+
+package SIL::Shoe::Interlin::Node;
+
+sub new
+{
+    my ($class, %attrs) = @_;
+    my ($self) = {%attrs};
+
+    bless $self, ref $class || $class;
+}
+
+sub le
+{
+    my ($test, $against) = @_;
+    my ($p);
+
+    for ($p = $test; defined $p; $p = $p->{'next'})
+    {
+        return 1 if ($p eq $against);
+    }
+    return 0;
+}
+
+__END__
+
+=head1 TITLE
+
+sh2odt - convert Shoebox/Toolbox to OpenOffice .odt file
+
+=head1 SYNOPSIS
+
+    sh2odt [-s settings_dir] [-c codepage] [-e encs] [-m] infile [outfile]
+
+Converts Shoebox data to OpenOffice format
+
+=head1 OPTIONS
+
+    -c codepage     Set system codepage for this process
+    -e enc,enc      Add Encoding:: subsets in Perl 5.8.1
+    -m              MDF character marker support
+    -s dir          Directory to find .typ files in [.]
+    
+If outfile is missing, it is created as the input file with extension replaced
+by .odt. This allows a user to drop a data file on a shortcut.
+
+=head1 DESCRIPTION
+
+sh2odt converts a Shoebox/Toolbox file into an OpenOffice .odt file. To do
+this it needs to convert data to Unicode. It also converts interlinear
+text into character level frames whereby each frame contains a single
+interlinear block and is treated by the system as if it were a character.
+It can then be copied and pasted into tables, reflowed like normal text, etc.
+
+Using sh2odt involves two aspects: preparing for conversion in terms of
+giving information about encoding conversion and even XML template output; and
+running the program, knowing what command line option does what.
+This manual is not a tutorial and so we list all the details with little or
+no indication of relative priority.
+
+=head2 Running sh2odt
+
+Here we list the various command line options and give further details on each
+
+=over 4
+
+=item -c
+
+Specifies the default codepage to be used when converting data. In effect it
+specifies that sh2xml should act as though it were running on a system with the
+given default codepage. This means that data in languages with no given encoding
+conversion will be converted using this codepage.
+
+=item -e
+
+Perl has internal support for a large number of industry standard encodings. This
+option specifies which sets to pull in apart from the default set. Values include
+
+  Byte - standard ISO 8859 type single byte encodings
+  CN   - Continental China encodings including cp 936, GB 12345 and GB 2312
+  JP   - Japanese encodings including cp 932 and ISO 2022
+  KR   - Korean encodings including cp 949
+  TW   - Taiwanese encodings including cp 950
+  HanExtra - more Chinese encodings including GB 18030
+  JIS2K - More Japanese encodings
+  Ebcdic - surely not!
+  Symbols - various symbol encodings
+
+See man Encode::Supported or the corresponding module documentation for details of
+what is supported on your Perl installation.
+
+=item -m
+
+MDF and perhaps other schemas support the ability to use inline markers of the
+form C<|mk{>I<text>C<}>. sh2odt has the ability to work with these schemes. Data
+marked in such a way is output with a character style of the given marker's
+name.
+
+=item -s
+
+sh2xml requires access to information about the structure of the database
+and language information. This is held in files in the same directory as the
+C<.prj> project file used when running Shoebox/Toolbox.
+
+=back
+
+=head2 Preparing for Conversion
+
+The basic need is to be able to specify how to convert text in a particular
+language into Unicode. This can be done by specifying a conversion mapping
+in each language file. Shoebox and Toolbox do not have a UI for specifying
+such conversion information, so we add information to the options/description
+field. The codepage specification takes the form:
+
+  \codepage = value
+
+The specification needs to be on a line on its own. The I<value> can take a
+number of forms.
+
+=over 4
+
+=item I<name>
+
+A mapping name either from the set of names supported by the Perl Encode
+module, or specified in an SIL Converters repository.
+
+=item I<filename>.tec
+
+The path and filename of a TECkit binary mapping file. The path is
+relative to the settings directory.
+
+=item none
+
+No mapping should be done. The data is assumed to be in UTF-8 encoding.
+
+=back
+
+sh2odt creates styles for each marker and outputs the font used for
+each marker. If the data has been converted, then the font isn't
+appropriate to that encoding any more. To specify an appropriate
+font it is possible to specify this in the description field using
+
+  \unicode_font = value
+
+Where I<value> is the font name to be used for the Unicode form of the data.

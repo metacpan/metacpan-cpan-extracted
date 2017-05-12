@@ -1,0 +1,374 @@
+--- Simulation-Automate-1.0.0/Automate.pm	2004-05-27 14:52:32.000000000 +0100
++++ Simulation-Automate-1.0.1/Automate.pm	2004-08-13 16:17:37.538381168 +0100
+@@ -1,11 +1,11 @@
+ package Simulation::Automate;
+ 
+ use vars qw( $VERSION );
+-$VERSION = "1.0.0";
++$VERSION = "1.0.1";
+ 
+ #################################################################################
+ #                                                                              	#
+-#  Copyright (C) 2000,2002 Wim Vanderbauwhede. All rights reserved.             #
++#  Copyright (C) 2000,2002-2004 Wim Vanderbauwhede. All rights reserved.        #
+ #  This program is free software; you can redistribute it and/or modify it      #
+ #  under the same terms as Perl itself.                                         #
+ #                                                                              	#
+@@ -18,7 +18,7 @@
+ #this module is then called via eval() and used by Simulation::Automate.pm 
+ #Loops calls &Automate::main() at every pass through the loops.
+ #
+-#$Id: Automate.pm,v 1.2 2003/09/04 09:53:25 wim Exp $
++#$Id$
+ #
+ 
+ 
+@@ -71,7 +71,7 @@
+ ################################################################################
+ 
+ &execute_loop($datafile,$dataset,$simref,\@flags) && do {
+-#unlink "Loops_$dataset.pm";
++unlink "Loops_$dataset.pm";
+ };
+ if($dataset ne 'synsim'){
+ print STDERR "\nFinished SynSim run for $dataset.data\n\n";
+@@ -90,7 +90,7 @@
+ 
+ sub preprocess_commandline {
+ my $datafile=$_[0];
+-my ($batch,$interactive,$nosims,$plot,$verbose,$warn,$justplot)=(0,0,0,0,0,0,0);
++my ($batch,$interactive,$nosims,$plot,$verbose,$warn,$justplot,$list_postprocessors)=(0,0,0,0,0,0,0,0);
+ my $default=1;
+ if(@ARGV) {
+ my $dtf=0;
+@@ -106,6 +106,7 @@
+       if(/-v/){$verbose=1;next}
+       if(/-w/){$warn=1;next;}
+       if(/-P/){$justplot=1;next}
++      if(/-A/){$list_postprocessors=1;next}
+       if(/-D/) {
+ 	(not -d 'TEMPLATES') && mkdir 'TEMPLATES';
+ 	(not -d 'TEMPLATES/SIMTYPES') && mkdir 'TEMPLATES/SIMTYPES';
+@@ -128,7 +129,7 @@
+ This directory must contain at least a TEMPLATES/SIMTYPE subdir 
+ with the simulation templates, and a data file. See documentation for more information.
+ 
+-syntax: ./$script [-h -D -i -p -P -v -w -N datafile]
++syntax: ./$script [-h -D -i -p -P -A -v -w -N datafile]
+ 
+ Possible switches:
+ 
+@@ -138,13 +139,37 @@
+  -p : plot. This creates the plot, but does not display it
+  -i : interactive. Creates a plot on the screen after every iteration. Implies -p -v
+  -P : Plot. This displays plots created with -p
++ -A : Analysis Templates. Displays a list of all available analysis templates and the man page
+  -w : 'warnings'. Show warnings for undefined variables.
+  -N : 'No simulations'. Does only postprocessing
+  -h, -? : this help
+ HELP
+ }
+     } # foreach @ARGV
++if($list_postprocessors) {
++#convenience function to list available postprocessors
++#so get all subs from PostProcessors
++
++print "\n";
++if(-e '../Simulation/Automate.pm') {
++#This is good for a local SynSim, not for a global one
++system("pod2text ../Simulation/Automate.pm | perl -n -e 'print if /^POST/../^DICT/ and !/DICT/' | less");
+ 
++} else {
++system("man Simulation::Automate");
++
++}
++no strict;
++require('../Simulation/Automate/PostProcessors.pm');
++print "\nAvailable postprocessing routines:\n\n";
++foreach my $key (sort keys %Simulation::Automate::PostProcessors::) {
++
++if( $key=~/^[A-Z]+[a-z]+/){
++print "$key \n";
++}
++}
++die "\n";
++}
+ #test if the last argument might be the filename (if no -f flag)
+ if($default){
+ my $test=$ARGV[@ARGV-1];
+@@ -170,7 +195,7 @@
+ 
+ ";
+ }
+-if($justplot){
++if($justplot) {
+ #convenience function to plot results
+ chomp(my $simtype=`egrep '^SIM(TYPE|NAME|ULATION|TEMPL)|^\ *TEMPLATE' $datafile`);
+ $simtype=~s/^SIM(TYPE|NAME|ULATION)|^\s*TEMPLATE\s*:\s*//;
+@@ -189,6 +214,8 @@
+ system("$gv ${simtype}-$anatype.ps");
+ die "Done\n";
+ }
++
++
+ return [$batch,$interactive,$nosims,$plot,$verbose,$warn];
+ } #END of preprocess_commandline
+ 
+@@ -293,7 +320,24 @@
+  foreach my $par (sort keys %{$data{$sim}}) {
+ $par!~/^\_/ && next;
+   #Here as good as anywhere else
+-  if ((exists $data{$sim}{XVAR} and $par eq $data{$sim}{XVAR})  or (exists $data{$sim}{SWEEPVAR} and $par eq  $data{$sim}{SWEEPVAR})) {
++#WV 010604 
++# We must deal with CONDVAR
++# This is not good: it means some postprocessors require a change to the code!
++#Anyway
++my $conditional =0;
++if (exists $data{$sim}{CONDVAR}) {
++#CONDVAR must be the sweepvar
++$conditional =1;
++}
++
++  if ( ( not $conditional and
++ (
++(exists $data{$sim}{XVAR} and $par eq $data{$sim}{XVAR})  or (exists $data{$sim}{SWEEPVAR} and $par eq  $data{$sim}{SWEEPVAR})
++)
++) or ( $conditional and 
++( $par eq $data{$sim}{CONDVAR})
++) 
++) {
+     #the sweep variable, make sure it's ; not ,
+     $data{$sim}{$par}=~s/,/;/g; # a bit rough, comments at end get it as well
+     #make sure grouped variables are treated as well
+@@ -581,6 +625,9 @@
+ $line[1]=$line;
+ $line[1]=~s/\s*\,\s*/,/g;
+ $line[1]=~s/\s*\;\s*/;/g;
++#13082004:What if we just replace ; by , here?
++($line[1]!~/[a-zA-Z]/) &&($line[1]=~s/;/,/g); # if there are no expressions
++
+ $data{$sim}{$line[0]}=$line[1];
+ } elsif (/:/) {
+ my @line=();#split(/\s*:\s*/,$_);
+@@ -626,7 +673,7 @@
+ my $incl=$_;
+ $incl=~s/^.*\:\s*//;
+ $incl=~s/\s+$//;
+-my @incl=($incl=~/,/)?split(/\s*,\s*/,$incl):($incl);
++my @incl=($incl=~/[,;]/)?split(/\s*[,;]\s*/,$incl):($incl);
+ foreach my $inclf (@incl) {
+ open(INCL,"<$inclf")|| die $!;
+ while(my $incl=<INCL>) {
+@@ -640,8 +687,8 @@
+ }
+ }; # END of allow INCL files
+ #print STDERR "$_\n";
+-s/(\#.*)//;
+-s/[;,]\s*$//; # be tolerant
++s/(\#.*)//; # strip comments
++s/[;,]\s*$//; # be tolerant: remove separators at end of line
+ if(/SIM(TYPE|NAME|ULATION|TEMPL)|\bTEMPLATE\s*:/) {
+ my $sims=$_;
+ s/TEMPLATE/SIMULATION/;
+@@ -672,13 +719,19 @@
+ }
+ /^\s*GROUP\s*:\s*([\_A-Z0-9\,\;\s]+)$/ && do {
+ my $groupline=$1;
+-my @grouped=split(/\s*\;\s*/,$groupline);
+-foreach my $group (@grouped){
+-my @groupline=split(/\s*\,\s*/,$group);
++#This assumes a single GROUP line with a semicol-separated list of comma-separated values
++#Too complex. Just allow multiple GROUP lines, one per group
++#my @grouped=split(/\s*\;\s*/,$groupline);
++#foreach my $group (@grouped){
++#my @groupline=split(/\s*\,\s*/,$group);
++#foreach my $item (@groupline){
++#$grouped{$item}=$groupline[0];
++#}
++#}
++my @groupline=split(/\s*[\,\;]\s*/,$groupline);
+ foreach my $item (@groupline){
+ $grouped{$item}=$groupline[0];
+ }
+-}
+ next;
+ };
+ if($simpart) {
+@@ -704,8 +757,9 @@
+ #
+ sub expand_list {
+ my $list=shift;
+-my $sep=',';
+-($list=~/;/)&&($sep=';');
++$list=~s/\#.*$//;
++my $sep=($list=~/;/)?';':','; #
++
+ my @list=split(/\s*$sep\s*/,$list);
+ if(@list==3 && $list!~/[a-zA-Z]/) { #
+ if(
+@@ -1543,13 +1597,13 @@
+ Comments are preceded by '#'. 
+ Comments, blanks and empty lines are ignored
+ 
+-=item Simulation variables 
++=item Parameters
+ 
+-Simulation variables ("parameters") are in UPPERCASE with a leading '_', and must be separated from their values with a '='.
++Parameters (simulation variables) are in UPPERCASE with a leading '_', and must be separated from their values with a '='.
+ 
+-=item Configuration variables 
++=item Keywords
+ 
+-Configuration variables ("keywords") are in UPPERCASE, and must be separated from their values with a ':'.
++Keywords (configuration variables) are in UPPERCASE, and must be separated from their values with a ':'.
+ 
+ =item Lists of values
+ 
+@@ -1608,31 +1662,17 @@
+ 
+ =head2 Configuration variables
+ 
+-A number of variables are provided to configure SynSim's behaviour:
++A number of configuration variables ("keywordsw) are provided to configure SynSim's behaviour. There is no mandatory order, but they must appear before the simulation variable. For the default order, see the L</"EXAMPLES">. 
++In alphabetical order, they are:
+ 
+ =over 4
+ 
+-=item TITLE
+-
+-The title of the DOE. This title is used on the plots, but typically it is the first line of the datafile and describes the DOE.
+-
+-=item TEMPLATE
+-
+-B<Alternative names:> SIMULATION, SIMTEMPL, SIMTYPE
+-
+-The name of the template file, with or without extension. By convention, this is the same as the type of simulation to be performed. If no extension is given, SynSIm checks for a B<TEMPLEXT> keyword; if this is not defined, the extenstion defaults to C<.templ>. SynSim will look for the template file in F<TEMPLATES/> and F<TEMPLATES/SIMTYPES/>.
+-
+-B<Note:> Multiple simulation types
+-
+-The value of SIMULATION can be a ','-separated list. In this case, SynSim will use the datafile for multiple types of simulations. Every item in the list can be used as a section header, demarkating a section with variables particular to that specific simulation. 
+-
+-=item TEMPLEXT (optional)
+ 
+-Extension of template files (default: C<.templ>)
++=item ANALYSIS
+ 
+-=item DEVTYPE (optional)
++B<Alternative names:> ANALYSIS_TEMPLATE, ANATEMPL
+ 
+-The name of the device on which to perform the simulation. If defined, SynSim will look in TEMPLATES/DEVTYPES for a file with TEMPL and DEVTYPE, and prepend this file to the simulation template before parsing. This keyword can take a list of values
++Name of the routine to be used for the result analysis (postprocessing). This routine must be defined in PostProcessors.pm or in a file in the F<PLUGINS/> directory. A number of generic routines are provided, see L</"POSTPROCESSING">.
+ 
+ =item COMMAND
+ 
+@@ -1643,57 +1683,94 @@
+         yoursim1 -i INPUTFILE -o OUTPUTFILE
+         yoursim2 INPUTFILE > OUTPUTFILE
+ 
++=item DEVTYPE (optional)
++
++The name of the device on which to perform the simulation. If defined, SynSim will look in TEMPLATES/DEVTYPES for a file with TEMPL and DEVTYPE, and prepend this file to the simulation template before parsing. This keyword can take a list of values
++
+ =item EXT
+ 
+ Extension of input file (default: .pl)
+ 
+ Some simulators expect a particular extension for the input file. This can be specified with the keyword B<EXT>.
+ 
++=item GROUP (optional)
++
++This keyword can be used to change the default behaviour of creating nested loops for every parameter.
++It takes as argument a list of parameters. The behaviour for grouped parameters is to change at the same time. All parameter lists in the group must have the same number of values. More than one group can be created.
++
++Example:
++
++	# First group: 2 parameters, each 4 values
++	GROUP: _PAR_A1,_PAR_A2
++	# Second group: 3 parameters, each 3 values
++	GROUP: _PAR_B1,_PAR_B2,_PAR_B3
++	# SynSim will run 4*3 simulations (default without groups would be 16*27)
++
++	_PAR_A1 = 0;1;2;4
++	_PAR_A2 = 3;4;5;6
++
++	_PAR_B1 = -1;1;2
++	_PAR_B2 = 3;4;7
++	_PAR_B3 = 3;6;15
++
+ =item INCLUDE (optional)
+ 
+ If the value of INCLUDE is an exisiting filename, this datafile will be included on the spot.
+ 
++=item NORMVAR (optional)
++
++The name of the variable to normalise the results with. The results will be divided by the corresponding value of the variable.
++
++=item NRUNS (optional)
++
++
+ =item OUTPUT_FILTER_PATTERN (optional)
+ 
+ A Perl regular expression to filter the output of the simulation (default : .*). Tis is very usefull for very verbose simulators. The results file will only contain the filtered output.
+ 
+-=item ANALYSIS
++=item PREPROCESSOR (optional)
+ 
+-B<Alternative names:> ANALYSIS_TEMPLATE, ANATEMPL
++The name of a function which modifies C<@results> before the actual postprocessing. Very usefull to "streamline" the raw results for postprocessing.
+ 
+-Name of the routine to be used for the result analysis (postprocessing). This routine must be defined in PostProcessors.pm or in a file in the F<PLUGINS/> directory. A number of generic routines are provided, see L</"POSTPROCESSING">.
++=item TEMPLATE
+ 
+-=item XVAR (optional)
++B<Alternative names:> SIMULATION, SIMTEMPL, SIMTYPE
+ 
+-B<Alternative name:> SWEEPVAR
++The name of the template file, with or without extension. By convention, this is the same as the type of simulation to be performed. If no extension is given, SynSIm checks for a B<TEMPLEXT> keyword; if this is not defined, the extenstion defaults to C<.templ>. SynSim will look for the template file in F<TEMPLATES/> and F<TEMPLATES/SIMTYPES/>.
+ 
+-The name of the variable to be sweeped. Mandatory if the postprocessing routine is XYPlot. 
++B<Note:> Multiple simulation types
+ 
+-=item NORMVAR (optional)
++The value of SIMULATION can be a ','-separated list. In this case, SynSim will use the datafile for multiple types of simulations. Every item in the list can be used as a section header, demarkating a section with variables particular to that specific simulation. 
+ 
+-The name of the variable to normalise the results with. The results will be divided by the corresponding value of the variable.
++=item TEMPLEXT (optional)
+ 
+-=item NRUNS (optional)
++Extension of template files (default: C<.templ>)
+ 
+-The number of times the simulation has to be performed. For statistical work.
++=item TITLE
+ 
+-=item YCOL (optional)
++The title of the DOE. This title is used on the plots, but typically it is the first line of the datafile and describes the DOE.
+ 
+-B<Alternative name:> DATACOL
++=item XVAR (optional)
+ 
+-The column in the output file which contains the simulation results (default: 2). Mandatory if using any of the generic postprocessing routines. 
++B<Alternative name:> SWEEPVAR
++
++The name of the variable to be sweeped. Mandatory if the postprocessing routine is XYPlot. 
++
++The number of times the simulation has to be performed. For statistical work.
+ 
+ =item XCOL (optional)
+ 
+ The column in the output file which contains the X-values.
+ 
+-=item PREPROCESSOR (optional)
++=item YCOL (optional)
+ 
+-The name of a function which modifies C<@results> before the actual postprocessing. Very usefull to "streamline" the raw results for postprocessing.
++B<Alternative name:> DATACOL
++
++The column in the output file which contains the simulation results (default: 2). Mandatory if using any of the generic postprocessing routines. 
+ 
+ =item XLABEL, YLABEL, LOGSCALE, PLOTSTYLE, XTICS, YTICS, XSTART, XSTOP, YSTART, YSTOP (optional)
+ 
+-Variables to allow more flexibility in the customization of the plots. XLABEL and YLABEL are the X and Y axis labels. LOGSCALE is either X, Y or XY, and results in a logarithmic scale for the chosen axis. PLOTSTYLE and following are identical to the corresponding C<gnuplot> keywords, see the gnuplot documentation for details.
++Variables to allow more flexibility in the customization of the plots. They are identical to the corresponding (lowercase) C<gnuplot> keywords, see the gnuplot documentation for details. The most commonly used, XLABEL and YLABEL are the X and Y axis labels. LOGSCALE is either X, Y or XY, and results in a logarithmic scale for the chosen axis.
+ 
+ =back
+ 

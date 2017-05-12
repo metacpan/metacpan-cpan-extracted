@@ -1,0 +1,11 @@
+bin/wikrad
+Changes
+lib/Socialtext/Wikrad.pm
+lib/Socialtext/Wikrad/Listbox.pm
+lib/Socialtext/Wikrad/PageViewer.pm
+lib/Socialtext/Wikrad/Window.pm
+Makefile.PL
+MANIFEST
+README
+t/use.t
+META.yml                                 Module meta-data (added by MakeMaker)

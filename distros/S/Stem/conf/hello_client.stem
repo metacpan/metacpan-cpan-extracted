@@ -1,0 +1,24 @@
+# hello_client.stem
+#
+[
+	class	=>	'Stem::Hub',
+	name	=>	'system_B',
+	args	=>	[
+		'host' => 'localhost',
+	],
+],
+[
+	class	=>	'Stem::Portal',
+	args	=>	[],
+],
+[
+	class	=>	'Stem::Proc',
+	name	=>	'hello',
+	args	=>	[
+		path		=> 'bin/hello.sh',
+		proc_args	=> ['client'],
+		cell_attr	=> [
+			'data_addr'	=> 'system_A:console',
+		],
+	],
+],

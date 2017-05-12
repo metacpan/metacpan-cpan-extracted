@@ -1,0 +1,15 @@
+SQL::YASP
+    Version 0.10 June 12, 2003
+
+      Initial release
+
+    Version 0.11 June 28, 2003
+
+      Removed Debug::ShowStuff from module, which was only there for (as
+      you might expect) debugging.
+
+    Version 0.12 January 2, 2015
+
+      Cleaned up test.pl. Noting that this module is no longer being
+      developed. Noting some prerequisites. Changed CR's to Unix style.
+      Changed encoding to UTF-8.

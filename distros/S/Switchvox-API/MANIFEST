@@ -1,0 +1,8 @@
+lib/Switchvox/API.pm
+lib/Switchvox/API/Request.pm
+lib/Switchvox/API/Response.pm
+Makefile.PL
+Changes
+MANIFEST
+README
+META.yml                                 Module meta-data (added by MakeMaker)

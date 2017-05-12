@@ -1,0 +1,55 @@
+{
+   "abstract" : "Coefficients for any lag, as correlogram, with significance tests",
+   "author" : [
+      "Roderick Garton <rgarton@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Statistics-Autocorrelation",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "List::AllUtils" : "0.07",
+            "Math::Cephes" : "0.5303",
+            "Statistics::Data" : "0.08",
+            "Statistics::Lite" : "3.2",
+            "Statistics::Zed" : "0.072",
+            "Test::More" : "0.92"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4007"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::AllUtils" : "0.07",
+            "Math::Cephes" : "0.5303",
+            "Statistics::Data" : "0.08",
+            "Statistics::Lite" : "3.2",
+            "Statistics::Zed" : "0.10"
+         }
+      }
+   },
+   "provides" : {
+      "Statistics::Autocorrelation" : {
+         "file" : "lib/Statistics/Autocorrelation.pm",
+         "version" : "0.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.06"
+}

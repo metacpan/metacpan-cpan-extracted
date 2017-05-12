@@ -1,0 +1,78 @@
+[%# This file defines a macro, 'log_msg', that you should call to format
+    Subversion log messages.
+
+    The macro can pass the message through multiple filters to ensure that
+    it is formatted correctly.
+
+    To override this file, either edit it directly, or (preferred), make
+    a copy of it, and use the 'templatedirs' directive in config.yaml
+    to specify the directory you copied it to.  Then edit the copy.
+
+    Here is the default definition.  It converts the message to HTML, and
+    retains the original line breaks.
+%]
+
+[% MACRO log_msg(text)
+   text | html | html_line_break %]
+
+[%# Here is a more complex example.  There's the same HTML conversion as
+    before.  In addition,
+
+    * Template::Plugin::Clickable and Template::Plugin::Clickable::Email
+      are used to find URIs and e-mail addresses and make them clickable.
+
+    * Strings that look like 'r1234' in the log message are converted
+      to links to the 'revision' action for this repository.  Note the
+      use of ${c.script} and ${c.repos} to ensure that the correct
+      repository is used.
+
+    * Strings that look like 'rt#1234' are converted to links to the
+      relevant RT ticket in the CPAN ticketing system.
+
+    Comment out the previous definition, and remove the '#' on the first
+    line of this definition to use it.
+%]
+
+[%#
+   USE Clickable;
+   USE click_email = Clickable::Email;
+   USE revision    = Subst
+     pattern     = 'r(\d+)'
+     replacement = "<a href='${c.script}/${c.repos}/revision?rev=\$1'>r\$1</a>"
+     global      = 1;
+   USE rt          = Subst
+     pattern     = 'rt#(\d+)'
+     replacement = '<a href="http://rt.cpan.org/NoAuth/Bug.html?id=$1">rt#$1</a>'
+     global      = 1;
+
+   MACRO log_msg(text)
+       text | html | html_line_break | clickable | $click_email | $revision | $rt;
+
+%]
+
+[%# You can also define different results per-repository.  For example,
+    if you have two repositories that both use 'rt#1234' to refer to tickets,
+    but that use two different RT instances, you might define it like so:
+%]
+
+[%#
+   USE rt1 = Subst
+     pattern     = 'rt#(\d+)'                     
+     replacement = '<a href="/rt1/rt.cgi?id=$1">rt#$1</a>'
+     global      = 1;
+
+   USE rt2 = Subst
+     pattern     = 'rt#(\d+)'                     
+     replacement = '<a href="/rt2/rt.cgi?id=$1">rt#$1</a>'
+     global      = 1;
+
+   MACRO log_msg(text)
+     SWITCH c.repos;
+     CASE 'repo1';
+       text | html | html_line_break | $rt1;
+     CASE 'repo2';
+       text | html | html_line_break | $rt2;
+     CASE;
+       text | html | html_line_break;
+     END;
+%]

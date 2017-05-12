@@ -1,0 +1,157 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+use Getopt::Long;
+use Sys::Facter;
+
+#-----------------------------------------------------------------------------
+
+sub usage {
+  my $argv0 = (split '/', $0)[-1];
+  print <<EOF;
+Usage:
+  $argv0 [--modules=/module/dir] [--yaml] [facts ...]
+
+Note: unless you use --yaml or request a single fact, the output is not
+machine parseable.
+EOF
+  exit;
+}
+
+my %opts = (
+  help  => 0,
+  yaml  => 0,
+  modules => [],
+);
+
+my $result = GetOptions(
+  "help|h"        => \$opts{help},
+  "modules|m=s@"  =>  $opts{modules},
+  "yaml"          => \$opts{yaml},
+);
+
+my @facts = @ARGV;
+
+if (not $result or $opts{help}) {
+  usage();
+}
+
+#-----------------------------------------------------------------------------
+
+my $facter = new Sys::Facter(modules => $opts{modules});
+$facter->load(@facts);
+
+if ($opts{yaml}) {
+  dump_facts_yaml($facter->facts, \@facts);
+} else {
+  dump_facts_facter($facter->facts, \@facts);
+}
+
+#-----------------------------------------------------------------------------
+
+sub dump_facts_facter {
+  my ($facts, $requested) = @_;
+
+  if ($requested && @$requested == 1) {
+    my $f = $requested->[0];
+    printf "%s\n", $facts->{$f} if defined $facts->{$f};
+    return;
+  }
+
+  $requested = [sort keys %$facts] unless $requested && @$requested;
+
+  for my $f (@$requested) {
+    printf "%s => %s\n", $f, $facts->{$f} if defined $facts->{$f};
+  }
+}
+
+sub dump_facts_yaml {
+  my ($facts, $requested) = @_;
+
+  my $dump;
+
+  eval {
+    require YAML;
+    $YAML::UseHeader = $YAML::UseHeader = 0;
+    $dump = \&YAML::Dump;
+  } or eval {
+    require YAML::Syck;
+    $YAML::Syck::SortKeys = $YAML::Syck::SortKeys = 1;
+    $YAML::Syck::Headless = $YAML::Syck::Headless = 1;
+    $dump = \&YAML::Syck::Dump;
+  };
+
+  if ($@) {
+    die "Couldn't load YAML dumper module: $@";
+  }
+
+  local $\ = undef;
+  if (@$requested) {
+    for my $f (sort @$requested) {
+      print $dump->({ $f => $facts->{$f} });
+    }
+  } else {
+    print $dump->($facts);
+  }
+}
+
+#-----------------------------------------------------------------------------
+
+=head1 NAME
+
+pffacter - collect facts about operating system
+
+=head1 SYNOPSIS
+
+  pffacter [--modules=/module/dir] [--yaml] [facts ...]
+
+  pffacter --help
+
+=head1 DESCRIPTION
+
+This is a command line interface for module L<Sys::Facter(3)>. It collects
+information (facts) about host operating system and prints them to STDOUT.
+
+By default, all facts available are printed in form that mimics Puppet's
+Facter output. You may also specify which facts are to be printed, what will
+make run a bit faster and output a bit more terse.
+
+If you specify a single fact to be printed, fact name will be skipped in
+output, so you'll get just a fact's content. If you specify more than one
+fact, please use I<--yaml> option to make an output machine-readable.
+
+If you have own Pfacter modules that you want to load, you can point the
+directory containing them with option I<--modules>. You may specify this
+option multiple times.
+
+=head1 USAGE EXAMPLES
+
+Get a single fact:
+
+  $ pffacter operatingsystem
+  Debian
+
+Get few facts:
+
+  $ pffacter kernel hostname domain
+  kernel => Linux
+  hostname => desktop01
+  domain => example.net
+
+Get few facts as YAML:
+
+  $ pffacter --yaml kernel hostname kernelrelease fqdn lsbid
+  fqdn: desktop01.example.net
+  hostname: desktop01
+  kernel: Linux
+  kernelrelease: 2.6.32-5-686
+  lsbid: Debian
+
+=head1 SEE ALSO
+
+L<Sys::Facter(3)>
+
+=cut
+
+# vim:ft=perl

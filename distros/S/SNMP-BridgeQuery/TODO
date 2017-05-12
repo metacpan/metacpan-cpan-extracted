@@ -1,0 +1,7 @@
+1)  Check for installation of Net::SNMP
+   (fixed 20030825 - JDS)
+
+2)  Figure out why I get bogus results from some MACs.
+    (Which is why there is a 12 character check for validity.)
+   (fixed 20040313 - JDS) 
+

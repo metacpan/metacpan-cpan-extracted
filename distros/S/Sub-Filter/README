@@ -1,0 +1,33 @@
+NAME
+
+Sub::Filter - automatically filter function's return value
+
+DESCRIPTION
+
+This module allows a function to be augmented with a filter that will be
+applied to its return values.  Whenever the function returns, by whatever
+means, the value (or list of values) being returned is passed through the
+filter before going to the caller.  The filter may be any function, and
+may perform type checking/coercion, logging, or any other manipulation.
+The filtering is invisible to the body of the augmented function: the
+stack shows its normal caller, not a wrapping stack frame.
+
+INSTALLATION
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+AUTHOR
+
+Andrew Main (Zefram) <zefram@fysh.org>
+
+COPYRIGHT
+
+Copyright (C) 2009, 2010, 2013 Andrew Main (Zefram) <zefram@fysh.org>
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

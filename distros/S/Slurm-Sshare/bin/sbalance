@@ -1,0 +1,477 @@
+#!/usr/bin/env perl
+#The above "shebang" will run whatever Perl is found in the user's
+#path.  It is advised that sysadmins replace this with the proper
+#path to the appropriate Perl binary on their systems.  Presumably
+#the one with Slurm::Share module installed.
+#
+#Script to report on usage and limits for users/accounts
+use strict;
+use warnings;
+
+#If Slurm::Sshare is not installed in the standard location for
+#site libraries for this version of Perl, you probably need to
+#uncomment and edit the 'use lib' line below to enable perl to
+#find the requisite modules.
+#use lib "/path/to/my/perl/libraries"
+
+use Slurm::Sshare;
+
+use Pod::Usage;
+use Getopt::Long;
+use version;
+
+#For convenience, sbalance versions should match associated Slurm::Sshare
+#version, but do separately (in case someone somehows mixes versions)
+my $SBALANCE_VERSION = qw(1.2.2);
+
+my $Sshare = 'Slurm::Sshare';
+
+my $DEFAULT_SSHARE_PATH;
+#If $DEFAULT_SSHARE_PATH is not set, this script will default to
+#using whatever sshare command the Slurm::Sshare module defaults to,
+#which typically is whatever sshare is in the user's path.  It is
+#advised to set DEFAULT_SSHARE_PATH to the appropriate path to the
+#sshare command on your system, to avoid this script being overly
+#dependent on the user's environment.  To do so, uncomment the
+#line below and change to the full path to sshare on your system.
+#$DEFAULT_SSHARE_PATH='/usr/local/bin/sshare';
+
+my $sshare_cmd_source;
+
+
+#System administrators probably will want to modify the
+#following subroutine to properly default the cluster for
+#their systems.  If not modified (i.e. returns undef), the
+#user will either need to specify the cluster on the command
+#line, or the sshare command will default the cluster, which
+#might or might not be what is desired
+sub default_our_cluster()
+{	return;
+}
+
+sub show_version_info()
+{	my $sshare_version = $Slurm::Sshare::VERSION;
+	my $perl_version = $^V;
+	my $perl_version_str = sprintf "%vd", $perl_version;
+	my $sshare_command = $Sshare->sshare;
+
+	print STDERR <<EOF;
+sbalance version $SBALANCE_VERSION
+Perl version $perl_version_str
+Slurm::Share version $sshare_version
+Using sshare command: $sshare_command [$sshare_cmd_source]
+
+EOF
+}
+	
+sub get_accounts_from_users($$)
+#Does same as get_accounts_from_user, but combines over multiple users
+{	my $users = shift;
+	my $cluster = shift;
+	die "Invalid user list '$users' to get_accounts_from_users at "
+		unless $users && ref($users) eq 'ARRAY';
+
+	my $sshare_recs = $Sshare->sshare_list(users=>$users, clusters=>$cluster);
+	#We only want records with both the user and account fields set
+	my @sshare_recs = grep { defined $_->user && defined $_->account } @$sshare_recs; 
+
+	#Extract the accounts
+	my @accounts = map { $_->account } @sshare_recs;
+	#Remove duplicates
+	my %temp = map { $_ => undef } @accounts;
+	my $accounts = [ keys %temp ];
+	return $accounts;
+}
+
+sub dump_usage($$$;$)
+{	my $account = shift;
+	my $cluster = shift;
+	my $users = shift;
+	my $options = shift || {};
+
+	my $suppress0 = $options->{suppress0};
+
+	my $rec = $Sshare->usage_for_account_in_cluster( 
+		cluster=>$cluster, account=>$account, users=>$users);
+	unless ( $rec && ref($rec) eq 'ARRAY' )
+	{	die "\nError looking up usage for account $account: $rec\n";
+	}
+	my ( $cpusec_used, $cpumin_limit, $cpumin_unused, $userdata) = @$rec;
+
+	my $ksu_used = sprintf "%.2f", $cpusec_used/60/60/1000;
+	my $ksu_lim  = sprintf "%.2f", $cpumin_limit/60/1000 if defined $cpumin_limit;
+	my $ksu_unused  = sprintf "%.2f", $cpumin_unused/60/1000;
+	my $pused =0 ;
+	$pused = $cpusec_used/60/$cpumin_limit*100 if $cpumin_limit;
+	$pused = sprintf "%.1f", $pused;
+
+	
+	$cluster = 'DEFAULT' unless defined $cluster;
+	print <<EOF;
+Account: $account ($cluster)
+EOF
+	if ( defined $cpumin_limit )
+	{
+	print <<EOF;
+Limit: 	   $ksu_lim kSU
+Unused:    $ksu_unused kSU 
+EOF
+	}
+	print <<EOF;
+Used:  	   $ksu_used kSU ($pused % of limit)
+EOF
+
+	my @users = ();
+	if ( $userdata && ref($userdata) eq 'HASH' )
+	{	@users = sort ( keys %$userdata );
+	}
+
+	USER: foreach my $user (@users)
+	{	my $usersecs = $userdata->{$user} || 0;
+		next USER if $suppress0 && ! $usersecs;
+		$ksu_used = sprintf "%.4f", $usersecs/60/60/1000;
+		$pused =0;
+		$pused = $usersecs/$cpusec_used*100 if $cpusec_used;
+		$pused = sprintf "%.1f", $pused;
+		print <<EOF;
+	User $user used $ksu_used kSU ($pused % of total usage)
+EOF
+	}
+}
+
+sub dump_usage_machine($$$;$)
+{	my $account = shift;
+	my $cluster = shift;
+	my $users = shift;
+	my $options = shift || {};
+
+	my $noheaders = $options->{noheaders};
+	my $suppress0 = $options->{suppress0};
+
+	my $rec = $Sshare->usage_for_account_in_cluster( 
+		cluster=>$cluster, account=>$account, users=>$users);
+	unless ( $rec && ref($rec) eq 'ARRAY' )
+	{	die "\nError looking up usage for account $account: $rec\n";
+	}
+	my ( $cpusec_used, $cpumin_limit, $cpumin_unused, $userdata) = @$rec;
+	
+	$cluster = 'DEFAULT' unless defined $cluster;
+	print "#cluster : account : limit (cpu-min):used (cpu-sec) : " .
+		"unused (cpu-min)\n" unless $noheaders;
+	print "${cluster}:${account}:${cpumin_limit}:${cpusec_used}:${cpumin_unused}\n";
+
+	my @users = ();
+	if ( $userdata && ref($userdata) eq 'HASH' )
+	{	@users = sort ( keys %$userdata );
+	}
+
+	my $header_printed = 0;
+	USERS: foreach my $user (@users)
+	{	my $usersecs = $userdata->{$user} || 0;
+		next USERS if $suppress0 && ! $usersecs;
+		unless ( $noheaders || $header_printed )
+		{ 	print "#cluster : account : username :" .
+				" used (cpu-sec)\n";
+			$header_printed = 1;
+		}
+		print "${cluster}:${account}:${user}:${usersecs}\n";
+	}
+}
+	
+
+#-------------------------------------------------------------------
+#		Main
+#-------------------------------------------------------------------
+
+my $help;
+my $man;
+my $cluster;
+my $accounts = [];
+my $users = [];
+my $allusers = 0;
+my $headers = 1;
+my $machine=0;
+my $verbose=0;
+my $suppress0 = 1;
+my $alt_sshare_path;
+my $show_version;
+
+my $res = GetOptions(
+	'h|help!' => \$help,
+	'V|version!' => \$show_version,
+	'manual!' => \$man,
+	'machine!' => \$machine,
+	'allusers|all-users|all_users!' => \$allusers,
+	'headers!' => \$headers,
+	'v|verbose!' => \$verbose,
+	'suppress|suppress0|suppress-zero|suppresszero|suppress_zero!' => \$suppress0,
+
+	'cluster=s' => \$cluster,
+	'a|account=s' => $accounts,
+	'user=s' => $users,
+
+	#This is for debugging purposes only, do NOT advertise it in usage, etc
+	'sshare-alternate-path=s' => \$alt_sshare_path,
+);
+
+unless ( $res )
+{	pod2usage( -exitval=>1, -verbose=>0, -msg=>'Error parsing arguments');
+}
+if ( $man )
+{	pod2usage( -exitval=>0, -verbose=>2);
+}
+if ( $help )
+{	pod2usage( -exitval=>0, -verbose=>1);
+}
+
+#Set the sshare command here (show will show up in show_version_info)
+if ( defined $alt_sshare_path )
+{	$Sshare->sshare($alt_sshare_path);
+	$sshare_cmd_source='cmd-line argument';
+} elsif ( defined $DEFAULT_SSHARE_PATH )
+{	$Sshare->sshare($DEFAULT_SSHARE_PATH);
+	$sshare_cmd_source='script default';
+} else
+{	$sshare_cmd_source='Slurm::Sshare default';
+}
+	
+if ( $show_version )
+{	show_version_info;
+	exit
+}
+
+my $noheaders = ! $headers;
+if ( $noheaders )
+{	warn "Ignoring --noheaders; only valid with machine parsable output.\n"
+		unless $machine;
+}
+my $options = {
+	noheaders => $noheaders,
+	suppress0 => $suppress0,
+};
+
+$Sshare->verbose($verbose);
+
+unless ( defined $cluster )
+{	#Use default_our_cluster to default the cluster
+	$cluster = default_our_cluster;
+}
+
+my $tmp;
+unless ( scalar(@$accounts) )
+{	#No accounts given
+	$users = [ $ENV{USER} ] unless scalar(@$users);
+
+	$accounts = get_accounts_from_users($users, $cluster);
+	die "Error getting accounts from user list: $accounts at "
+		unless ( $accounts && ref($accounts) eq 'ARRAY');
+	unless ( scalar(@$accounts) )
+	{	$tmp = join ", ", @$users;
+		print "No accounts found for user list ($tmp).\n";
+		exit 0;
+	}
+}
+
+my $sep = '';
+$users = undef if $allusers;
+foreach my $account (sort @$accounts)
+{	print $sep;
+	if ( $machine )
+	{	dump_usage_machine($account, $cluster, $users, $options);
+	} else
+	{	dump_usage($account, $cluster, $users, $options);
+		$sep="\n";
+	}
+}
+
+__END__
+
+=head1 NAME
+
+sbalance - Print Slurm allocation limits, usage, and balance
+
+=head1 SYNOPSIS
+
+sbalance  [--account ACCOUNT] [--user USER] [ --all [ --nosuppress0 ] ] [--machine [-noheaders]] [--help ] [ --man ]  [ --version ] [ --verbose ]
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--account ACCOUNT> : display information for this allocation account.  May be repeated.
+
+=item B<--user USER> : display information for the allocation accounts this user has access to.  May be repeated.
+
+=item B<--all> : Display per user information for all users of the allocation account.
+
+=item B<--nosuppress0> : When displaying user information for all users of the allocation account, include users with 0 usage.
+
+=item B<--machine> : Produce machine parsable output
+
+=item B<--noheaders> : When producing machine parsable output, omit headers.
+
+=item B<--help> : Will print basic usage instructions
+
+=item B<--man> : Will print full man page
+
+=item B<--verbose> : Print more information.  In particular, print sshare commands being executed.  Can abbreviate as -v.
+
+=item B<--version>: Will print version information, Can abbreviate as -V.
+
+=back
+
+=head1 DESCRIPTION
+
+Displays Slurm usage and allocation account balance for specified allocation
+accounts.  ACCOUNT may be repeated.  If no ACCOUNTs are
+given, defaults to all allocation accounts the specified USER (or user
+running the script if no ACCOUNT or USER specified) has 
+access to.  
+
+If one or more USER is given, will also print out information
+about how much each specified user has used.  (If no user or account specified,
+the information for the user running the script will be displayed.)  The flag 
+B<--all> will print out for all users with associations for the allocation 
+account.  If --nosuppress0, then users will be 
+printed even if they have 0 usage.
+
+Normally information printed in user friendly fashion, in units of kSU
+(1000-CPU-hours).  If --machine is given, prints out lines in a machine 
+parsable format, with units as per sshare output (limit and unused 
+are in CPU-minutes, used in CPU-seconds).  Header lines will be included, 
+prefixed by a #, unless --noheaders given.
+
+=head2 Explanation of output (normal display mode)
+
+This section describes in detail the output in the normal mode
+of display  (i.e. no B<--machine> flag).
+For each allocation account displayed, the following is shown:
+
+=over 4
+
+=item B<Account:>
+
+Followed by the name of the allocation account, along with the 
+cluster in parentheses
+(or DEFAULT if the default cluster for the B<sshare> command).
+
+=item B<Limit:>
+
+This is the B<GrpCPUMins> (or the B<cpu> member of B<GrpTRESMins>) for
+the main association for this allocation account.  This is displayed
+in units of kSU ( 1 kSU = 1000 SU = 1000 CPU-core-hour).
+
+=item B<Unused:>
+
+This is the difference between the B<Limit> and B<Used> values, in kSU.
+
+=item B<Used:>
+
+This is the number of SUs consumed by all jobs charged against the
+allocation account since the usage was last reset (or from the creation
+of the allocation).  This is in kSU.  In parentheses is displayed
+the same value, as a percentage of Limit above (assuming Limit is nonzero).
+
+=back
+
+This will be followed by zero or more lines showing usage for individual
+users against this allocation account.  These are only shown if a 
+specific list of users are requested, or the B<--all>  flag is given, or
+neither users nor accounts were specified (which is treated as if B<--user>
+was given for the user running the script).  Even when the above condition
+is met, unless the B<--nosuppress0> flag is given, only users that actually
+have non-zero usage will be displayed.
+
+For each user to be display, an indented line of the form
+
+	User USERNAME used X kSU ( Y % of total usage)
+
+is displayed. 
+
+In this case, B<USERNAME> is the username of the user, B<X> is the 
+number of kSU consumed by jobs run by that user charging against this 
+allocation account.  B<Y> represents the same number, but expressed as a
+percentage of the total usage of the allocation.
+
+
+=head2 Explanation of output (machine-parsable display mode)
+
+This section describes in detail the output in the machine-parsable
+display mode (i.e. with the B<--machine> flag).  In this mode, there
+is one line line (preceded by a header line unless B<--noheaders> is
+given) printed for each allocation account with the general usage information
+for the allocation account, possibly followed by another header line
+(unless B<--noheaders> is given) and one line for each user for which
+usage information is displayed.  The header line before the user usage
+information is only printed if there is at least one user usage line
+printed.
+
+All header lines start with the B<#> character, and are the only lines
+starting with that, so they can be deleted easily (as well as omitted 
+altogether by giving the B<--noheaders> flag).
+
+The field separators for all lines are the colon (:) character.
+
+The main allocation account usage lines have the following fields, in
+order:
+
+=over 4
+
+=item B<cluster>: name of the cluster, or DEFAULT if using the sshare default cluster.
+
+=item B<account>: the name of the allocation account
+
+=item B<limit>: the B<GrpCPUMins>/B<GrpTRESMins> B<cpu> member limit, in CPU-minutes.
+
+=item B<used>: the B<RawUsage> for the association, in CPU-seconds.
+
+=item B<unused>: The difference between B<limite> and <used>, in CPU-minutes.
+
+=back
+
+The user usage lines have the following fields, in order:
+
+=over 4
+
+=item B<cluster>: name of the cluster, as above.
+
+=item B<account>: the name of the allocation account, as above.
+
+=item B<username>: the username of the user.
+
+=item B<used>: the B<RawUsage> for this user/allocation account, in CPU-seconds.
+
+=back
+
+=head1 KNOWN ISSUES
+
+This currently only supports a fairly simple (but also believed to be fairly
+common) case where allocation account limits are set in the B<GrpCPUMins>
+(or B<cpu> member of B<GrpTRESMins>) in the main association for the 
+allocation account, and there are no limits imposed on individual user
+associations.
+
+For TRES enabled Slurm versions, we currently only display balances 
+related to the B<cpu> resource.  And that assumes that the 
+B<TRESBillingWeights> is set to "cpu=1.0" (the default).  These limitations
+are currently at least in part due to the B<sshare> command not being 
+able to display the B<usage_tres_raw> information, so we are reporting
+against the B<RawUsage> output of B<sshare>, which returns the "billable"
+(e.g. processed by B<TRESBillingWeights>) version of the usage.
+
+It is planned to add another field, B<Available>, giving the difference
+between B<UnUsed> and the estimated CPU-minutes (or other TRES resources) needed
+to complete all currently running jobs for that allocation account.  When
+B<AccountingStorageEnforce> is set to safe, this is the actual criteria
+used to determine whether there are sufficient "funds" in the allocation
+account to allow a job to start, and is probably what the user really wants
+to see.
+
+=head1 AUTHOR
+
+Tom Payerle, E<lt>payerle@umd.eduE<gt>
+
+Copyright (c) University of Maryland, 2014-2015.  All rights reserved.
+
+
+

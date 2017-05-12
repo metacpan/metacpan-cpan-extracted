@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:         SystemPerl
+version:      1.344
+version_from: Netlist.pm
+abstract:     SystemC Netlist Utilities and Parsing
+license:      perl
+installdirs:  site
+author:
+    - Wilson Snyder <wsnyder@wsnyder.org>
+resources:
+    homepage: http://www.veripool.org/systemperl
+    bugtracker: http://www.veripool.org/systemperl-bugs
+requires:
+    Pod::Usage:                    1.34
+    Verilog::Getopt:               2.211
+    Verilog::Netlist:              2.315
+
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.4.html
+    version: 1.4
+distribution_type: module
+generated_by: hand

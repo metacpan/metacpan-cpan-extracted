@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/SOAPjr.pm
+lib/SOAPjr/base.pm
+lib/SOAPjr/message.pm
+lib/SOAPjr/request.pm
+lib/SOAPjr/response.pm
+t/00-load.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

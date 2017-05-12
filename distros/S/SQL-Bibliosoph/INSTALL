@@ -1,0 +1,13 @@
+
+SQL::Bibliosoph
+	
+	* Tested with PERL 5.8 and MySQL 5.0
+	* Needs
+		Object::InsideOut
+
+	* Instalation
+		perl Makefile.PL
+		make
+		make install
+	
+	

@@ -1,0 +1,15 @@
+xml: ''
+
+vars: {}
+
+# Integration tests don't (yet) support not having a template
+integration_skip: 1
+
+output_assertions:
+  count:
+    - [ '//epp:resData', 0, 'EPP: No resData in the response' ]
+
+  match:
+    - [ '//epp:msg', 'Empty String', 'correct message' ]
+  attr_is:
+    - [ '//epp:result', 'code', 2400, 'Unknown error' ]

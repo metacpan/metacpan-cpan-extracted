@@ -1,0 +1,267 @@
+Schedule-Pluggable version 0.0.7
+
+NAME
+       Schedule::Pluggable − Flexible Perl Process Scheduler
+
+SYNOPSIS
+        EXAMPLE #1:    Simple Run in Series
+           use Schedule::Pluggable;
+           my $p = Schedule::Pluggable−>new;
+           my $status = $p−>run_in_series( [ qw/command1 command2 command3/ ] );
+
+        EXAMPLE #2:    Simple Run in Parallel
+           use Schedule::Pluggable;
+           my $p = Schedule::Pluggable−>new;
+           my $status = $p−>run_in_parallel( [ qw/command1 command2 command3/ ] );
+
+
+        EXAMPLE #3:    With Job  Names
+           use Schedule::Pluggable;
+           my $p = Schedule::Pluggable−>new;
+           my @jobs = (
+                       { name => "FirstJob", command => "somescript.sh" },
+                       { name => "2nd Job", command => sub { do_something; } },
+                       );
+           my $status = $p−>run_schedule( \@jobs );
+
+         EXAMPLE #4:    With Prerequsites
+           use Schedule::Pluggable;
+           my $p = Schedule::Pluggable−>new;
+           my $jobs = [ { name => "FirstJob",
+                          command => "somescript.sh" },
+                        { name => "SecondJob",
+                          command => sub { do_something; },
+                          prerequisites => [qw/FirstJob/] },
+                      ];
+           my $status = $p−>run_schedule( $jobs );
+
+         EXAMPLE #5:    Same as #4 but with dependencies
+           use Schedule::Pluggable;
+           my $p = Schedule::Pluggable−>new;
+           my $jobs = [ { name => "FirstJob",
+                          command => "somescript.sh",
+                          dependencies => [qw/SecondJob/] },
+                        { name => "SecondJob",
+                          command => sub { do_something; } },
+                      ];
+           my $status = $ps−>run_schedule( $jobs );
+
+         EXAMPLE #5:  With Groups
+           use Schedule::Pluggable;
+           my $p = Schedule::Pluggable−>new;
+           my $jobs = ( { name => "one", command => "one.sh", dependencies => [ qw/Reports/ ] },
+                        { name => "two", command => "two.pl" }, groups => [ qw/Reports/] },
+                        { name => "three", command => "three.pl" }, groups => [ qw/Reports/] },
+                        { name => "four", command => "four.ksh" }, prerequisites => [ qw/Reports/] },
+                       );
+           my $status = $p−>run_schedule( $jobs );
+
+         EXAMPLE #6: Getting the config from an XML file
+
+           use Schedule::Pluggable (JobsConfig => 'JobsFromXML');
+           my $p = Schedule::Pluggable−>new;
+           my $status = $p−>run_schedule({XMLFile => 'path to xml file'});
+
+           XMlFile in following format :−
+           <?xml version="1.0"?>
+           <Jobs>
+               <Job name='Job1' command='succeed.pl'>
+                   <params>3</params>
+                   <dependencies>second</dependencies>
+               </Job>
+               <Job name='Job2' command='fail.pl'>
+                   <params>3</params>
+                   <group>second</group>
+               </Job>
+               ...
+           <Jobs>
+DESCRIPTION
+       Schedule::Pluggable is a perl module which provides a simple but
+       powerful way of running processes in a controlled way.  In true perl
+       fashion it makes simple things easy and complicated things possible.
+       It also uses a system of plugins so you can change it’s behaviour to
+       suit your requirements by supplying your own plugins.  For most cases
+       the default plugins will suffice however.
+
+OPTIONS
+       You can override the default behaviour of Schedule::Pluggable by
+       supplying options with the use statement in for form of a hash
+
+       i.e.
+
+       use Schedule::Pluggable ( Option => "value’ );
+
+       The Following options are supported :−
+
+   JobsConfig
+       Specifies which plugin to use to provide the job configuration −
+       defaults to JobsFromData which expects you to supply the job
+       configuration in an array
+
+       Each plugin is expected to
+
+       e.g.
+
+       use Schedule::Pluggable ( JobsConfig => ’JobsFromSomeWhere’ );
+
+       Currently the available values are :−
+
+       JobsFromArray
+           The default which activates the role
+           ’Schedule::Pluggable::Plugin::JobsFromData’ which as the name
+           suggests expects the job configuration to be be supplied as an
+           reference to an array of jobs to run.
+
+       JobsFromXML
+           Activates plugin Schedule::Pluggable::Plugin::JobsFromXML which
+           obtains the jobs configuration from an XML file
+       This enables you to specify a different source for the config by
+       supplying an appropriate plugin for it − see writing Plugins for
+       details
+
+   EventHandler
+       Controls what happens when an event happens like a jobs starting a job
+       failing e.t.c Defaults to DefaultEventHandler which is a plugin
+       Schedule::Pluggable::Plugin::DefaultEventHandler Here is what is passed
+       depending on event type
+
+       JobName     − Always passed
+       Command     − Always passed
+       Stdout      − Passed on JobStdout and JobSucceeded only
+       Stderr      − Passed on JobStderr and JobFailed
+       ReturnValue − Passed on JobFailed
+
+       This handler uses other configuration options to control it’s behaviour
+       as follows :−
+
+       EventsToReport
+
+       Comma separated list of events to report on or ’all’ for al of them of
+       ’none’ for none of them Defaults to
+       qq/JobFailed,JobSucceeded,JobStderr/
+
+       e.g.
+
+       use Schedule::Pluggable ( EventsToReport =>
+       qw/JobQueued,JobFailed,JobSucceeded,JobStderr/ );
+
+       PrefixWithTimeStamp
+
+       whether to prefix messages with the current time in dd/mm/yyyy
+       HH::MM::SS format.
+
+       Defaults to 1 (timestamp is produced)
+
+   MessagesTo
+       where messages are sent − stdout by default
+       If supplied a filehandle, will call the print method on it and pass the
+       details, for anything else will call directly.  So this could be a
+       Log::Log4perl method e.g. $log−>info or $log−>{ Category }−>info
+
+   ErrorsTo
+       where error messages are sent − stderr by default
+
+       If supplied a filehandle, will call the print method on it and pass the
+       details, for anything else will call directly.  So this could be a
+       Log::Log4perl method e.g. $log−>error or $log−>{ Category }−>error
+
+       e.g.
+
+       use Schedule::Pluggable ( ErrorsTo => \&my_logger );
+
+       or
+
+       use Schedule::Pluggable; my $p = Schedule::Pluggable−>new( MessagesTo
+       => \&my_logger );
+
+JOB CONIFIGURATION FORMAT
+       A Job entry can be a scalar value in which case it is assumed to
+       contain a command to run or a hash containing some or all of the
+       following :−
+
+       name
+           the name of the job
+
+       command        − command to run
+       params         − array of parameters to the command
+       groups         − array of groups to which the job belongs
+       prerequisites  − array of jobs or groups which must have completed
+       successfully before job with start
+       dependencies   − array of jobs or groups which must wait until this job
+       has completed successfully before they will start
+
+       Obviously the bare minimum is to supply a command to run If a name is
+       not supplied, it will be allocated one in the format Jobn where n is an
+       incrementing number starting at 1 and increases with each job specified
+
+METHODS
+       run_in_series ( $job_specification )
+           Utility method to run the supplied jobs in series by creating
+           dependencies where each job is dependant on the previous one and
+           then calls run_schedule with the revised definition
+
+       run_in_parallel ( $job_specification )
+           Runs the supplied jobs in parallel
+
+           Utility method to run the supplied jobs in parallel by removing and
+           dependencies which are defined and the  call run_schedule
+
+       run_schedule ( $job_specification )
+           The main method of the module − takes a supplied job definition −
+           processes the information to validate and expand the definition and
+           then runs the jobs as specified.  When any event occurs, the
+           appropriate callback is called if required to report on progress
+           and on completion returns a structure detailing what happened in
+           the following format :−
+
+           $status = { TotalJobs       => <total number of jobs in schedule>,
+                       TotalFailed     => <number of jobs which failed>,
+                       TotalFinished   => <number of jobs which finished>,
+                       TotalSucceeded’ => <number of successfull jobs>’
+                       LastUpdate      => ’dd/mm/yyyy hh::mm::ss’,
+                       Failed          => {
+                                            <Job which failed> => {
+                                                                    status => ....
+     BUILDARGS       Handles module options via import or passed on objet
+       creation
+       BUILD           Handles loading plugins
+
+JOB DEFINITIONS
+       Jobs are specified as reference to an array which can contain either a
+       list of commands ot run or as hash values
+
+       scalar values containing commands to run
+       hashes containing at least one key ’command’ with the value containing
+       the command to run
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+Moose
+MooseX::Workers
+MooseX::Object::Pluggable
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010, Tony Edwardson
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

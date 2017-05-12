@@ -1,0 +1,16 @@
+#!/usr/bin/perl
+
+use SVN::Core;
+use SVN::Repos;
+use SVN::Fs;
+
+use strict;
+
+die "usage setuuid <path> <uuid>\n" if (@ARGV < 1) ;
+
+my $repos = SVN::Repos::open ($ARGV[0]);
+my $fs    = $repos->fs;
+print $fs -> get_uuid (), " -> $ARGV[1]\n" ;
+$fs -> set_uuid ($ARGV[1]) if ($ARGV[1]) ;
+
+

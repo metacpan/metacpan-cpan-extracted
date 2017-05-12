@@ -1,0 +1,57 @@
+{
+   "abstract" : "An improved Spork.",
+   "author" : [
+      "Shlomi Fish"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Spork-Shlomify",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Spoon" : "0",
+            "Spork" : "0",
+            "Test::More" : "0",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "Spork::Shlomify" : {
+         "file" : "lib/Spork/Shlomify.pm",
+         "version" : "0.0203"
+      },
+      "Spork::Shlomify::Config" : {
+         "file" : "lib/Spork/Shlomify/Config.pm"
+      },
+      "Spork::Shlomify::Formatter" : {
+         "file" : "lib/Spork/Shlomify/Formatter.pm"
+      },
+      "Spork::Shlomify::Slides" : {
+         "file" : "lib/Spork/Shlomify/Slides.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.opensource.org/licenses/mit-license.php"
+      ],
+      "repository" : {
+         "url" : "http://github.com/shlomif/perl-Spork-Shlomify"
+      }
+   },
+   "version" : "0.0203",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

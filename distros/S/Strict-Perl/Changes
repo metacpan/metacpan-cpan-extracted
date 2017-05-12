@@ -1,0 +1,86 @@
+Revision history for this software.
+
+2017.05 2017-03-05 00:00:00
+  - define NORECURS, PM, and PL_FILES in Makefile.PL
+  - created by INABA Hitoshi
+
+2017.04 2017-02-14 00:00:00
+  - remove prohibited keywords, prohibited special variables, prohibited operator, and must keyword
+  - add pMakefile.PL again
+  - created by INABA Hitoshi
+
+2017.03 2017-02-03 00:00:00
+  - Test::Simply rollback to version 0.03
+  - remove pMakefile.PL
+  - created by INABA Hitoshi
+
+2017.02 2017-01-30 00:00:00
+  - rollback to version 2015.08
+  - created by INABA Hitoshi
+
+2017.01 2017-01-25 00:00:00
+  - remove '.' from @INC (CVE-2016-1238: Important unsafe module load path flaw)
+  - created by INABA Hitoshi
+
+2015.08 2015-06-27 00:00:00
+  - fix 001_test.t for Microsoft Windows
+  - add Test/Simply.pm
+  - created by INABA Hitoshi
+
+2015.07 2015-06-25 00:00:00
+  - fix 001_test.t for cmd.exe of Microsoft Windows
+  - created by INABA Hitoshi
+
+2015.06 2015-06-23 00:00:00
+  - allow prohibited keywords with sigil
+  - allow prohibited keywords until #line
+  - allow prohibited keywords after __END__
+  - created by INABA Hitoshi
+
+2014.10 2014-08-10 00:00:00
+  - remove prohibited modules: bytes
+  - created by INABA Hitoshi
+
+2014.09 2014-08-10 00:00:00
+  - add prohibited modules: bytes
+  - fix ABSTRACT
+  - created by INABA Hitoshi
+
+2014.08 2014-08-08 00:00:00
+  - add prohibited modules: Thread, threads, encoding, and Switch
+  - created by INABA Hitoshi
+
+2014.07 2014-08-07 00:00:00
+  - support Modern::Open
+  - created by INABA Hitoshi
+
+2014.06 2014-08-05 00:00:00
+  - remove Fatal module
+  - fix name of META.yml
+  - created by INABA Hitoshi
+
+2014.05 2014-04-03 00:00:00
+  - add prohibited keywords: given, when
+  - created by INABA Hitoshi
+
+2014.04 2014-02-09 00:00:00
+  - support Fake::Our
+  - created by INABA Hitoshi
+
+2014.03 2014-01-25 00:00:00
+  - fix 001_test.pl (Too late to run CHECK block at Strict::Perl line 113)
+  - allow Name "main::*" used only once on perl 5.00503 to 5.010
+  - created by INABA Hitoshi
+
+2014.02 2014-01-19 00:00:00
+  - allow bareword file handle
+  - allow $^B .. $^K, $^M .. $^Z, $^{...}
+  - allow $#a, $#{...}
+  - use autodie on perl5.010001 or later
+  - add Makefile.PL
+  - 001_test.pl use Test::Simple on perl5.006 or later
+  - created by INABA Hitoshi
+
+2014.01 2014-01-13 00:00:00
+  - original version
+  - created by INABA Hitoshi

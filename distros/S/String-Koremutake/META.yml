@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name: String-Koremutake
+version: 0.30
+author:
+  - Leon Brocard C<acme@astray.com>
+abstract: |-
+  Convert to/from Koremutake Memorable Random Strings
+license: perl
+requires:
+  Error: 0.15
+  Test::Exception: 0.15
+  Test::More: 0.01
+provides:
+  String::Koremutake:
+    file: lib/String/Koremutake.pm
+    version: 0.30
+generated_by: Module::Build version 0.2605

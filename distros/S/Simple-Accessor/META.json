@@ -1,0 +1,64 @@
+{
+   "abstract" : "a light and simple way to provide accessor in perl",
+   "author" : [
+      "Nicolas R. <atoomic@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Simple-Accessor",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Pod::Coverage::TrustPod" : "0"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Scalar::Util" : "0",
+            "Test::More" : "0.94",
+            "blib" : "1.01",
+            "lib" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/atoomic/Simple-Accessor.git",
+         "web" : "https://github.com/atoomic/Simple-Accessor"
+      }
+   },
+   "version" : "1.11",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

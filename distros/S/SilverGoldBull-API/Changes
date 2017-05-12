@@ -1,0 +1,26 @@
+Revision history for SilverGoldBull-API
+
+0.01    2016-11-27
+        Initial release
+
+0.02    2016-11-27
+        Update documentation
+
+0.03    2016-11-27
+        Add license and dependency
+
+0.04    2016-11-27
+        Update license
+
+0.05    2016-11-27
+        Fix cpantester errors
+
+0.06    2016-11-27
+        Update dependency and documentation
+
+0.07    2016-11-28
+        Fix https://rt.cpan.org/Public/Bug/Display.html?id=119003 issue
+
+0.08    2016-11-28
+        Added synopsis and improve methods documentation
+

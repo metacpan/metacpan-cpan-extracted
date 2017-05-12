@@ -1,0 +1,6 @@
+Revision history for Perl extension Scalar::Listify.
+
+0.01  Wed Nov 22 14:11:11 2000
+	- original version; created by h2xs 1.20 with options
+		-A -X -n Scalar::Listify
+

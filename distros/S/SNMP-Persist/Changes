@@ -1,0 +1,24 @@
+Revision history for SNMP-Persist
+
+0.01    2006/10/25
+        Initial version released
+
+0.02	2006/10/26
+	Example fixed in the documentation
+	A crucial fix in the module itself (let pipes be piping hot)
+
+0.03	2006/10/27
+	A nasty error in printing output for nonexisting subtree 
+	A requirements change in META.yml file (threads required)
+	Solved a deadlock problem associated with snmpd strange behaviour(?)
+
+0.04	2007/01/29
+	fixed a panic in MUTEX_DESTROY() caused by wrong usage of mutex as a storage for something else (thanks to Cyriel de Grijs for pointing out the crash!)
+	changes	to the example in the manual - application counter initialized too early (thanks goes to Cyriel de Grijs again)
+	
+
+0.05	2007/02/16
+	Below problems would remain unnoticed without Pawel Krzesniak feedback - thanks!
+	 * modified the getnext algorithm - don't need to sort to find a successive item
+	 * scripts now dies gracefully when snmpd stops
+	 * wait for data to be gathered first, instead of answering immediately with NONE

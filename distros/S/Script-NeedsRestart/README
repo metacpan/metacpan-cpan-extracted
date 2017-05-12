@@ -1,0 +1,51 @@
+NAME
+    Script::NeedsRestart - checks mtime of script and it's included files
+
+SYNOPSIS
+        use Script::NeedsRestart;
+        Script::NeedsRestart->set_logger($log);       # optional
+
+        while (1) {
+            last if Script::NeedsRestart->check_mtimes;
+        
+            # or
+        
+            Script::NeedsRestart->restart_if_needed();
+        
+            # .... do something
+            sleep(10);
+        }
+
+DESCRIPTION
+    File modification time based checking of script and included files.
+
+FUNCTIONS
+  check_mtimes
+    Scans script file and all included Perl modules in ` %INC ' for
+    modification timestamp and returns true if any of the files have
+    modification timestamp greater then the script start-up time.
+
+    In case scripts running via any of the daemon tools, check can be an
+    indication when to terminate the loop to initiate auto restarted.
+
+  restart
+    re-exec current script
+
+  restart_if_needed
+    will re-exec current script if it or any dependent files changed.
+
+  set_logger
+    setting optional logger, if set, ` check_mtimes() ' and ` restart() '
+    will will log their events.
+
+        Script::NeedsRestart->set_logger($log);
+
+AUTHOR
+    Jozef Kutej, `<jkutej at cpan.org>'
+
+COPYRIGHT & LICENSE
+    Copyright 2009 Jozef Kutej, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

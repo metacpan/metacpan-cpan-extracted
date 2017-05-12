@@ -1,0 +1,10 @@
+Changes
+lib/Sub/Delete.pm
+Makefile.PL
+MANIFEST
+README
+t/test.t
+t/Test/Builder/Module.pm
+t/Test/Builder.pm
+t/Test/More.pm
+META.yml                                 Module meta-data (added by MakeMaker)

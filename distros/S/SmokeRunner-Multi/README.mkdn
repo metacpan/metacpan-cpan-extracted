@@ -1,0 +1,85 @@
+# NAME
+
+SmokeRunner::Multi - Manage smoke tests across multiple branches/checkouts/projects
+
+# VERSION
+
+version 0.21
+
+# SYNOPSIS
+
+    use SmokeRunner::Multi;
+
+    my $runner = SmokeRunner::Multi->new();
+
+    $runner->run_and_report_next_set();
+
+# DESCRIPTION
+
+This distribution was created to help manage the running of automated
+tests across multiple branches or checkouts.
+
+Each branch is called a "test set", and sets are ordered based on
+various criteria.  This class provide a high-level interface for
+getting the next set, running its tests, and reporting on them.
+
+Also see the `smokerunner-multi` script that comes with this
+distribution.
+
+# METHODS/FUNCTIONS
+
+This class provides the following methods:
+
+## SmokeRunner::Multi->new()
+
+Creates a new object.
+
+## $smoker->next\_set()
+
+Returns the next test set to be run.
+
+## $smoker->run\_and\_report\_next\_set()
+
+This is a convenience method that can be used to run and report on the
+next test set in a single step.
+
+As a convenience (mostly for testing), it returns the reporter object
+it creates internally.
+
+## $smoker->make\_runner( ... )
+
+This is a convenience method for making a
+`SmokeRunner::Multi::Runner` object of the class specified in the
+config file. Any parameters passed to this method will be passed on to
+the Runner class's constructor.
+
+## $smoker->make\_reporter( ... )
+
+This is a convenience method for making a
+`SmokeReporter::Multi::Reporter` object of the class specified in the
+config file. Any parameters passed to this method will be passed on to
+the Reporter class's constructor.
+
+# CONFIGURATION
+
+See [SmokeRunner::Multi::Config](https://metacpan.org/pod/SmokeRunner::Multi::Config) for details on configuring the smoke
+runner. You need to create a minimal config file to do much of
+anything.
+
+# SEE ALSO
+
+See the other classes in this distribution for more information:
+[SmokeRunner::Multi::TestSet](https://metacpan.org/pod/SmokeRunner::Multi::TestSet), [SmokeRunner::Multi::Runner](https://metacpan.org/pod/SmokeRunner::Multi::Runner),
+[SmokeRunner::Multi::Reporter](https://metacpan.org/pod/SmokeRunner::Multi::Reporter), and [SmokeRunner::Multi::Config](https://metacpan.org/pod/SmokeRunner::Multi::Config).
+
+# AUTHORS
+
+- Dave Rolsky <autarch@urth.org>
+- Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2007 by LiveText, Inc..
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

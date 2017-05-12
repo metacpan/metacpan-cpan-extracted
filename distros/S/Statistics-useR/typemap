@@ -1,0 +1,18 @@
+# typemap for Statistics::useR
+
+RVec *		T_RObj
+
+INPUT
+T_RObj
+	if(sv_derived_from($arg, \"Statistics\:\:RData\")) {
+	  IV addr = SvIV((SV*)SvRV($arg));
+	  $var = INT2PTR($type, addr);
+	}
+	else
+	  Perl_croak(aTHX_ \"%s: %s is not an object of RData\",
+			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+			\"$var\")
+	
+OUTPUT
+T_RObj
+	sv_setref_pv($arg, \"Statistics\:\:RData\", (void*)$var);

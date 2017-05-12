@@ -1,0 +1,100 @@
+Revision history for Perl module Sort::Versions
+
+1.62 2015-12-13 NEILB
+    - Fixed Hack Kampbjørn's surname -- I'd previously switched the ø to an
+      upper-case Ø -- thanks to pink-mist for pointing this out.
+    - Updated github repo URL after changing my github username
+
+1.61 2015-04-29 NEILB
+    - Removed spaces from function prototype for versioncmp(). RT#103810
+      Kerin Millar++
+    - Added [MetaJSON] so the dist will get a META.json file
+
+1.60 2014-06-13 NEILB
+    - CPAN Testers hasn't reported any failures, so my first
+      non-developer release.
+    - Added SEE ALSO section to doc.
+
+1.5_01 2014-06-11 NEILB
+
+    - Switched to Dist::Zilla, moving Versions.pm into lib/Sort/ in the process
+      This will address RT#83016 as a side effect.
+    - Specified utf-8 encoding for pod, and put Hack's surname in UTF-8.
+      RT#89433
+    - Added separate COPYRIGHT AND LICENSE section in pod, in expected format.
+    - Added github repo to pod.
+    - Reformatted this file as per CPAN::Changes::Spec
+
+1.5 2003-08-25 EDAVIS
+
+    - mkdist: Changed to 'mkdist' written in Perl; now checks version
+      numbers.
+
+    - Makefile.PL: Removed DISTNAME - change to Perl standard
+      convention of calling the package Sort-Versions-xxx.tar.gz.
+      Though I don't know quite what DISTNAME did.
+
+    - Makefile.PL: Get the version number from Versions.pm rather than
+      hardcoding it in Makefile.PL.
+
+    - Versions.pm: Removed CVS log; I'm not that keen on it, especially
+      as most of the log messages were empty.
+
+    - t/versions.t: Use Test::More (based on patch from mwj99).
+
+    - t/versions.t: Added some more test cases and commented the
+      existing tests.  I think this partly follows a patch from mwj99.
+
+
+1.4 2002-03-10 EDAVIS
+
+    - README: Some revisions and modernizing prompted by Matt's new
+      version (although I didn't incorporate all his changes).
+
+    - Versions.pm: Updated my email address.
+
+    - t/versions.t: Added some tests for calling versioncmp directly,
+      if perl >= 5.6.
+
+    - Versions.pm: Made versions() deprecated, so versioncmp() is the
+      routine to call.  Small code tidying.
+
+    - t/versions.t: Run each test in package main and package Foo.
+
+    - Versions.pm, t/versions.t: Applied patch from Slaven Rezic to let
+      versions() work when called from a package other than main.  But
+      this is not the final answer, I intend to deprecate versions() and
+      move the code into versioncmp(), which has saner argument passing
+      (not the magic $a and $b).
+
+
+1.3 2002-01-29 EDAVIS
+
+    - Versions.pm: Version 1.3: patch from Hack Kampbjørn for '-' digit
+      groupings as well as '.'.
+
+    - README: Added some rather lame examples of -.
+
+    - t/versions.t: Added some tests for - digit grouping.
+
+
+1.2 2001-07-28 EDAVIS
+
+    - t/versions.t: Whoops - got the leading-zero tests the wrong way round.
+
+    - README: Whoops - got the leading-zero examples the wrong way
+      round in the README.
+
+    - mkdist: Modified from Lingua::Preferred to Sort::Versions.
+
+    - Versions.pm: Added $VERSION.
+
+    - mkdist: Initial revision
+
+    - t/versions.t: Added tests for leading-zero numeric comparisons.
+
+    - Versions.pm: Added support for numeric comparisons where one
+      version number has a leading zero.
+
+    - README: Fixed spelling mistake.
+

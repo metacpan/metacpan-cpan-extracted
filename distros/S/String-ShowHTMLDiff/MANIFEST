@@ -1,0 +1,6 @@
+css/example.css
+lib/String/ShowHTMLDiff.pm
+Makefile.PL
+MANIFEST			This list of files
+t/html_colored_diff.t
+META.yml                                 Module meta-data (added by MakeMaker)

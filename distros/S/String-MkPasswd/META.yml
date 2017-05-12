@@ -1,0 +1,29 @@
+---
+abstract: 'random password generator'
+author:
+  - 'Chris Grau <cgrau@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: String-MkPasswd
+requires:
+  Carp: 0
+  Exporter: 0
+  File::Basename: 0
+  Getopt::Long: 0
+  Text::Wrap: 0
+  base: 0
+  constant: 0
+  perl: 5.006001
+  strict: 0
+resources:
+  homepage: https://github.com/sirhc/string-mkpasswd
+  repository: https://github.com/sirhc/string-mkpasswd.git
+version: 0.05

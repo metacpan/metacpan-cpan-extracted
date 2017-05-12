@@ -1,0 +1,73 @@
+          <table width='200' border='0' cellpadding='0' cellspacing='0'>
+            <tr>
+              <td colspan='7'><img src='images/zero.gif' alt='' width='2' height='10'></td>
+            </tr>
+            <tr>
+              <td><img src='images/zero.gif' alt='' width='10' height='2'></td>
+              <td colspan='5' bgcolor='#4C4C4C'><img src='images/zero.gif' alt='' width='2' height='2'></td>
+              <td><img src='images/zero.gif' alt='' width='20' height='2'></td>
+            </tr>
+            <tr>
+              <td><img src='images/zero.gif' alt='' width='2' height='2'></td>
+              <td bgcolor='#4C4C4C'><img src='images/zero.gif' alt='' width='2' height='30'></td>
+              <td bgcolor='#978D72'><img src='images/zero.gif' alt='' width='10' height='2'></td>
+              <td bgcolor='#978D72' width='396'>
+                <div class='clsParagraphTitle'>
+                  siesta <img src='images/help_small.gif' alt='Help' width='19' height='19' style='position:relative;top:3'>
+                </div>
+                <hr>
+                <div>
+                  <img src='images/zero.gif' alt='' width='2' height='5'>
+                </div>
+                <div>
+                  <a href='register.tt2' class='clsNavFirst'>register</a>
+                </div>
+                <div>
+                  <img src='images/zero.gif' alt='' width='2' height='5'>
+                </div>
+                <hr>
+                <div>
+                  <img src='images/zero.gif' alt='' width='2' height='5'>
+                </div>
+                <div>
+                  <a href='siesta_signin.php' class='clsNavFirst'>sign in</a>
+                </div>
+                <div>
+                  <img src='images/zero.gif' alt='' width='2' height='5'>
+                </div>
+                <hr>
+                <div>
+                  <img src='images/zero.gif' alt='' width='2' height='5'>
+                </div>
+                <div>
+                  <a href='user.php' class='clsNavFirst'>siesta</a>
+                </div>
+                <div>
+                  <img src='images/zero.gif' alt='' width='2' height='5'>
+                </div>
+                <div>
+                  &nbsp; <a href='siesta_about.php' class='clsNavSecond'>- about</a>
+                </div>
+                <div>
+                  <img src='images/zero.gif' alt='' width='2' height='5'>
+                </div>
+                <div>
+                  &nbsp; <a href='siesta_help.php' class='clsNavSecond'>- help</a>
+                </div>
+                <div>
+                  <img src='images/zero.gif' alt='' width='2' height='10'>
+                </div>
+              </td>
+              <td bgcolor='#978D72'><img src='images/zero.gif' alt='' width='10' height='2'></td>
+              <td bgcolor='#4C4C4C'><img src='images/zero.gif' alt='' width='2' height='2'></td>
+              <td><img src='images/zero.gif' alt='' width='2' height='2'></td>
+            </tr>
+            <tr>
+              <td><img src='images/zero.gif' alt='' width='2' height='2'></td>
+              <td colspan='5' bgcolor='#4C4C4C'><img src='images/zero.gif' alt='' width='2' height='2'></td>
+              <td><img src='images/zero.gif' alt='' width='2' height='2'></td>
+            </tr>
+            <tr>
+              <td colspan='7'><img src='images/zero.gif' alt='' width='2' height='10'></td>
+            </tr>
+          </table>

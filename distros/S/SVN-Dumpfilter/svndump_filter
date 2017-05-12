@@ -1,0 +1,55 @@
+#!/usr/bin/perl -w
+# $Id: svndump_filter 278 2007-01-13 12:37:13Z martin $
+# Copyright (C) 2006 by Martin Scharrer <martin@scharrer-online.de>
+# This is free software under the GPL.
+
+use strict;
+use SVN::Dumpfilter qw(Dumpfilter dos2unix_filter svn_recalc_prop_header svn_recalc_textcontent_header);
+
+my $dumpfile = shift @ARGV;
+my $outfile  = shift @ARGV;
+
+sub multi_filter (\%;$);
+sub plexec_filter (\%;$);
+
+Dumpfilter($dumpfile, $outfile, \&multi_filter);
+
+exit(0);
+
+sub multi_filter (\%;$)
+ {
+   my $href = shift;
+   my $recalc = shift || 1;
+   plexec_filter(%$href,0);
+   dos2unix_filter(%$href,$recalc);
+ }
+
+sub plexec_filter (\%;$)
+ {
+   my $href = shift;
+   my $recalc = shift || 1;
+   my $header = $href->{'header'};
+   my $prop   = $href->{'properties'};
+
+   # Set svn:executable property on all Perl scripts
+   return unless ( exists $header->{'Node-path'} &&
+     $header->{'Node-path'}   =~ /\.pl$/i &&
+     exists $header->{'Node-action'} && 
+     $header->{'Node-action'} =~ /^add|change$/  &&
+     exists $header->{'Node-kind'} && 
+     $header->{'Node-kind'}   eq 'file'   );
+   
+   return if exists $prop->{'svn:executable'};
+   
+   # Set eol-style:
+   $prop->{'svn:executable'} = '*';
+
+   if ($recalc)
+    {
+     svn_recalc_prop_header(%$href);        # call if you changed properties
+     #svn_recalc_textcontent_header(%$href); # call if you modified text content
+    }
+ }
+
+
+__END__

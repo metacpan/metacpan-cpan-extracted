@@ -1,0 +1,27 @@
+Revision history for Statistics-Sequences-Joins-0.20
+
+0.20 2016.03.17
+    - added optional argument "ncorr" to variance() and so z_value() methods to include the Burdick-Kelly correction for small N (used by default to now, and still)
+    - changed obsdev() so that it also--like expected(), variance(), etc.--works with sufficient statistics (specifying trials and prob); only the "observed" value also needs to be specified
+    - added croak() to observed() if it fails to find a sequence of data (a referenced array, with a non-zero scalar value) that has been pre-loaded or given by the arg "data"
+    - removed aliases for observed(), expected(), variance(), z_value() and p_value() methods for brevity and so as to be compatible with other Statistics::Sequences modules. Most of these aliases were already removed from PODs of earlier versions. They are still supported (in the background) but unlikely to be supported in any later version.
+    - substantially expanded/revised POD.
+
+0.11 2013.06.24
+    - test issues resolved
+
+0.10 2013.06.22
+    - CPAN upload of 0.06+ revisions
+    - NB: not compatible with earlier versions
+
+0.061 2012.09.11
+    - get p-value as well as z-value from method zscore returned if wantarray.
+    - send args from 'test' to descriptives methods
+    - correct joincount_observed() and other desc methods to use testdata returned, if any, not necessarily sent or previously transformed
+    - POD note re skipping mean etc if dichotomizing about it
+
+0.06 2012.09.07
+	- new methods joincount_observed, joincount_expected, and joincount_variance
+
+# [see Statistics::Sequences for earlier changes]
+

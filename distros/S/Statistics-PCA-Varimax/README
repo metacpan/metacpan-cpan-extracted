@@ -1,0 +1,41 @@
+Statistics-PCA-Varimax version 0.0.2
+
+=head1 DESCRIPTION
+
+Varimax rotation is a change of coordinates used in principal component analysis and factor analysis that maximizes the
+sum of the variances of the squared loadings matrix. This module exports a single routine 'rotate'. This routine is
+called in LIST context and accepts a LIST-of-LISTS (LoL) corresponding to the loadings matrix of a factor analysis and
+returns two references to LoLs. The first is a LoL of the rotated loadings and the seconds is a LoL of the orthogonal
+matrix. See http://en.wikipedia.org/wiki/Varimax_rotation.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+'Carp'                      =>  '1.08',
+'Math::GSL::Linalg::SVD'    =>  '0.0.2',
+'Math::MatrixReal'          =>  '2.05',
+'List::Util'                =>  '1.22',
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009, Daniel S. T. Hughes
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -1,0 +1,8 @@
+Revision history for Perl extension SOOT::SQL2Tree.
+
+0.02  Thu Feb 24 18:00 2011
+  - Support for at least DBD::mysql
+
+0.01  Wed Feb 23 20:00 2011
+  - original version
+

@@ -1,0 +1,109 @@
+NAME
+
+    SMS::Send::DeviceGsm - An SMS::Send driver for Device::Gsm.
+
+VERSION
+
+    version 1.08
+
+SYNOPSIS
+
+      my $sender = SMS::Send->new('DeviceGsm',
+            _baudrate => '19200', 
+            _port     => '/dev/ttyS1',
+            );
+      
+      # Send a message to ourself
+      my $sent = $sender->send_sms(
+            text => 'Messages have a limit of 160 chars',
+            to   => '+61 4 444 444',
+            );
+      
+      # Did it send?
+      if ( $sent ) {
+            print "Sent test message\n";
+      } 
+      else {
+            print "Test message failed\n";
+      }
+
+DESCRIPTION
+
+    SMS::Send::DeviceGsm is an SMS::Send driver that uses Device::Gsm to
+    deliver messages via attached hardware.
+
+    You provide the hardware port and the baudrate to use. Consult
+    Device::Gsm for further information on what devices and baudrates are
+    supported.
+
+ Disclaimer
+
+    The authors of this driver take no responsibility for any costs accrued
+    on your phone bill by using this module.
+
+    Using this driver will cost you money. YOU HAVE BEEN WARNED
+
+METHODS
+
+ new
+
+      # Create a new sender using this driver
+      my $sender = SMS::Send->new( 'DeviceGsm',
+            _baudrate => '19200', 
+            _port     => '/dev/ttyS1',
+            );
+
+    The new constructor takes two parameters, which should be passed
+    through from the SMS::Send constructor.
+
+    The params are driver-specific for now, until SMS::Send adds a standard
+    set of params for specifying the login and password.
+
+    _baudrate
+
+      The _baudrate param defaults to '19200'.
+
+    _port
+
+      The _port param is the serial port to connect to. On Unix, can be
+      also a convenient link as /dev/modem (the default value). For Win32,
+      COM1,2,3,4 can be used.
+
+    Returns a new SMS::Send::DeviceGsm object, or dies on error.
+
+ send_sms
+
+      # Send a message to a particular address
+      my $result = $sender->send_sms(
+            text => 'This is a test message',
+            to   => '+61 4 1234 5678',
+            );
+
+    The send_sms method sends a standard text SMS message to a destination
+    phone number.
+
+SUPPORT
+
+    Bugs should be reported via the CPAN bug tracker at
+
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=SMS-Send-DeviceGsm
+
+    For other issues, contact the author.
+
+SEE ALSO
+
+    SMS::Send
+
+    Device::Gsm
+
+AUTHOR
+
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

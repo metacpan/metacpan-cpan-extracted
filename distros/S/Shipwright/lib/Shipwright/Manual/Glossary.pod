@@ -1,0 +1,36 @@
+=head1 NAME
+
+Shipwright::Manual::Glossary - Glossary
+
+=head1 DESCRIPTION
+
+=head2 source
+ 
+the distribution to be imported into a shipyard; e.g. a package from cpan.
+Normally, shipyard has more than one source.
+
+=head2 shipyard
+
+The place where all stuff lives, shipwright's own wrappers, all the dists, etc.
+Currently, FS(file system), SVN, SVK and Git are supported.
+
+=head2 vessel
+
+the final product.
+e.g. after running C<./bin/shipwright-builder --install-base /tmp/foo>
+all stuff below /tmp/foo is the vessel
+
+=head1 SEE ALSO
+
+L<Shipwright>, L<Shipwright::Manual>
+
+=head1 AUTHORS
+
+sunnavy  C<< <sunnavy@bestpractical.com> >>
+
+=head1 LICENCE AND COPYRIGHT
+
+Shipwright is Copyright 2007-2015 Best Practical Solutions, LLC.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

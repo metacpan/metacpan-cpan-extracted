@@ -1,0 +1,10 @@
+Revision history for Perl extension Synapse::CLI::Config
+
+TODO:
+	- Work out spaces in arguments
+	- Make it possible to pass YAML files as argument
+	- More testing and debugging
+
+0.1 Mon Apr 30 19:01:21 MUT 2012	
+	- initial release
+

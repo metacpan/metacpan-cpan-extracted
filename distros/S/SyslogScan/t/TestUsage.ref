@@ -1,0 +1,36 @@
+		0,0		2,107		1,15
+$gUsage = SyslogScan::Usage=ARRAY
+   0  SyslogScan::Volume=ARRAY
+      0  2
+      1  107
+   1  SyslogScan::Volume=ARRAY
+      0  1
+      1  15
+   2  SyslogScan::Volume=ARRAY
+      0  0
+      1  0
+		0,0		2,107		1,15
+$gUsage2 = SyslogScan::Usage=ARRAY
+   0  SyslogScan::Volume=ARRAY
+      0  2
+      1  107
+   1  SyslogScan::Volume=ARRAY
+      0  1
+      1  15
+   2  SyslogScan::Volume=ARRAY
+      0  0
+      1  0
+		0,0		3,1607		1,15
+$gUsage3 = SyslogScan::Usage=ARRAY
+   0  SyslogScan::Volume=ARRAY
+      0  3
+      1  1607
+   1  SyslogScan::Volume=ARRAY
+      0  1
+      1  15
+   2  SyslogScan::Volume=ARRAY
+      0  0
+      1  0
+B: 0,0 S: 2,107 R: 1,15
+RM: 1
+RB: 15

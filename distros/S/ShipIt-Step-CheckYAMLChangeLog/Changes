@@ -1,0 +1,17 @@
+---
+global:
+  name: ShipIt-Step-CheckYAMLChangeLog
+releases:
+  - author: 'Marcel Gruenauer <marcel@cpan.org>'
+    changes:
+      - 'Updated Changes file to new YAML style, making tests pass'
+    date: 2007-11-14T11:30:35Z
+    tags:
+      - BUGFIX
+    version: 0.02
+  - author: 'Marcel Gruenauer <marcel@cpan.org>'
+    changes:
+      - original version
+    date: 2007-11-08T15:51:54Z
+    tags: []
+    version: 0.01

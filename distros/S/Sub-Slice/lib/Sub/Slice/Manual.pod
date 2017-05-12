@@ -1,0 +1,501 @@
+=head1 NAME
+
+Sub::Slice::Manual - user guide for Sub::Slice
+
+=head1 USING Sub::Slice
+
+Sub::Slice is a way of breaking down a long-running process and maintaining state across a stateless protocol.
+This allows the client to draw a progress bar or abort the process part-way through.
+
+The mechanism used by Sub::Slice is similar to the session management used on many web user authentication systems.  
+However rather than simply passing an ID back as a token as these systems do, 
+in Sub::Slice a data structure with richer information is passed to the client, 
+allowing the client to make some intelligent decisions rather than blindly maintain state.
+
+=head2 Overview
+
+Use of Sub::Slice is best explained with a minimal example.
+Assume that there is a remoting protocol between the client and server such as XML/HTTP.
+For the sake of brevity, assume that methods called in package Server:: on the client are magically remoted to the server.
+
+The server does two things.  The first is to issue a token for the client to use:
+
+	#Server
+	sub create_token {
+		my $job = new Sub::Slice();
+		return $job->token;
+	}
+
+The second is to provide the routine into which the token is passed for each iteration:
+
+	sub do_work {
+		my $token = shift;
+		my $job = new Sub::Slice(token => $token);
+
+		at_start $job sub {
+			my $files = files_to_process();
+
+			#Store some data defining the work to do
+			$job->store("files", $files); 
+		};
+
+		at_stage $job "each_iteration" sub {
+
+			#Get some work
+			my $files = $job->fetch("files"); 
+			my $file = shift @$files;
+
+			my $was_ok = process_file($file);
+
+			#Record we did the work
+			$job->store("files", $files);
+
+			#Check if there's any more work left to do 
+			$job->done() unless(@$files); 
+
+		};
+	}
+
+The client somehow gets a token back from the server.
+It then passes this back to the server for each iteration.
+It can inspect the token to check if there is any more work left.
+
+	#Client
+	my $token = Server::create_token();
+	for(1 .. MAX_ITERATIONS) {
+		Server::do_work($token);
+		last if $token->{done};
+	}
+
+=head2 Named stages
+
+You can create any number of named stages.  This is useful if you need to complete several phases of iterative processing.
+
+	sub do_work {
+		my $token = shift;
+		my $job = new Sub::Slice(token => $token);
+
+		at_start $job sub {
+			my $files = files_to_process();
+			$job->store("files", $files);
+			$job->store("position", 0);
+			$job->next_stage("check_files"); #explicitly start with this stage
+		};
+
+		at_stage $job "check_files", sub {
+			my $files = $job->fetch("files");
+			my $position = $job->fetch("position");
+			my $file = $files->[$position];
+			check_file($file) or $job->abort("check failed for $file");
+			$job->store("position", $position+1);
+
+			#Decide when to move to next stage
+			$job->next_stage("publish_files") if($position == scalar @$files);
+		};
+
+		at_stage $job "publish_files" sub {
+			my $files = $job->fetch("files");
+			my $file = shift @$files;		
+			my $was_ok = process_file($file);
+			$job->store("files", $files);
+			$job->done() unless(@$files); 
+		};		
+	}
+
+If next_stage is NOT called, Sub::Slice begins iterations using the FIRST at_stage block within the routine.
+In the example above, we could have omitted the C<next_stage> call from C<at_start> and the "check_files" sub would have still been called first.
+
+=head2 Return values
+
+Return values from the at_* methods are accessible via C<$job-E<gt>return_value()>.
+This allows you to capture the return value from the coderef and do something with it
+(such as store it into $job with set_data or return it to the caller):
+
+	sub do_work {
+		my $token = shift;
+		my $job = new Sub::Slice(token => $token);
+
+		at_start $job sub {
+			my $files = files_to_process();
+			$job->store("files", $files);
+			$job->store("position", 0);
+
+			#This won't return from do_work, only from the at_* coderef
+			return scalar(@$files) . " files to process";
+		};
+
+		at_stage $job "check_files", sub {
+			my $files = $job->fetch("files");
+			my $position = $job->fetch("position");
+			my $file = $files->[$position];
+			check_file($file) or $job->abort("check failed for $file");
+			$job->store("position", $position+1);
+			return "processed $file";
+		};
+
+		#Get the return value from the at_* coderef
+		return $job->return_value; 
+	}
+
+=head2 Aborting a job
+
+If the there is a problem, the server may abort the Sub::Slice iteration.  Extending the example above:
+
+	my $was_ok = process_file($file);
+	$job->abort("Unable to process $file") unless($was_ok);
+
+The client can detect this by checking the C<abort> property of the token:
+
+	for(1 .. MAX_ITERATIONS) {
+		Server::do_work($token);
+		if($token->{done} || $token->{abort}) {
+			warn "Remote error: " .  $token->{error} 
+				if($token->{abort});
+			last;
+		}
+	}
+
+The C<error> property is also set by the server calling C<abort()>.  
+
+=head2 Premature termination from the client
+
+The client can stop the iteration by setting the C<done> property of the token to a true value:
+
+	for(1 .. MAX_ITERATIONS) {
+		Server::do_work($token);
+		$token->{done} = 1 if( user_pressed_cancel() );
+		last if($token->{done} || $token->{abort});
+	}
+
+=head2 Handling transport errors
+
+If there is a transport error occurs during one of the client-server exchanges during a sub-sliced job,
+the client will know there has been an error from it's transport client interface.  It WONT know what state the
+server is in - the server may or may not have successfully completed the last batch of iterations.
+
+The client should therefore simply represent the token to the server (which won't have been updated to reflect the 
+work that may or may not have been done) and let the server worry about how to interpret this.  For example
+if the server could reprocess the units of work if they are re-runnable, or if could elect to skip them
+if it knows they have already been done.
+
+Of course if the tranport keeps failing, the client is entitled to give up entirely on job or save it for
+retrying later.  If the client does just give up on the job, the server should have a cleaner process in place
+to mop up any dangling sub-slice jobs that were never finished off by the client (see L</Using a belt-and-braces cleaner process>).
+
+=head2 Tuning the iterations per call from the client
+
+You can use the C<iterations> property of the token to tell the server the maxmimum number of iterations it
+should perform on the next call.  Beware that zero is interpreted as an infinite number of iterations.
+
+	use Time::HiRes;
+	use constant ACCEPTABLE_WAIT => 5; #Can cope with 5 sec between updates on client
+
+	while(1) {
+		my $i1 = $token->{count};
+		my $t1 = time();
+
+		Server::do_work($token);
+
+		my $di = $token->{count} - $i1;
+		my $dt = time() - $t;
+		my $iterations_per_sec = $di/$dt;
+
+		#Calculate the optimal number of iterations to perform per call
+		$token->{iterations} = int($iterations_per_sec * ACCEPTABLE_WAIT) || 1;
+
+		last if($token->{done} || $token->{abort});
+	}
+
+=head2 Using at_start and at_end
+
+The C<at_start> and C<at_end> blocks are run, respectively, before the first
+iteration, and after the last. They allow you to perform initialisation and 
+a "commit" once all the at_stage steps have completed successfully
+(such as sending a set of generated files to a sink):
+
+	sub do_work {
+		my $token = shift;
+		my $job = new Sub::Slice(token => $token);
+
+		at_start $job sub {
+			find_files($job);			
+		};
+
+		at_stage "each_iteration" sub {
+			work_through_list($job);
+		}
+
+		at_end $job sub {
+			post_files($job);
+		};
+	}
+
+WARNING: You might consider using C<at_start> and C<at_end> to allocate and 
+deallocate resources used for the job (an example would be using a lock file 
+to ensure that jobs are run serially), but C<at_end> will not be run if a job dies in an C<at_stage> coderef.  
+This means that resources allocated in at_start could leak if a job 
+is aborted by something dying in an C<at_stage> coderef.
+You can code defensively around this, by trapping any exceptions and deallocating
+resources if the job has been aborted: 
+
+	sub do_work {
+		my $token = shift;
+		my $job = new Sub::Slice(token => $token);
+
+		#Trap any exceptions
+		eval {
+			at_start $job sub {
+				my $id = create_lock_file();
+				$job->store(lockfile_id => $id);
+			};
+	
+			#NB when something dies, Sub::Slice sets $job->abort($@) and rethrows the exception
+			at_stage "each_iteration" sub {
+				#Either your code or Sub::Slice::Backend::* might raise an exception
+				die("an exception") unless went_smoothly($job);
+			}; 
+		};
+		my $error = $@; #save away $@
+
+		# Cleanup if job has succeeded or failed
+		#  we could have used an at_end block for the successful case, 
+		#  but we'd need still need to check for the job being aborted here 
+		if($job->token->{done} || $job->token->{abort}) {
+			my $id = $job->fetch(lockfile_id);
+			release_lock_file($id);
+		};
+
+		die($error) if($error); #Rethrow exceptions
+	}
+
+=head2 Storing BLOB data
+
+If you need to store large amounts of data against a key, you can use the C<store_blob> method
+rather than the C<store> method.
+
+	$job->store('key1' => $wee_thing);
+	$job->store_blob('key2' => $huge_thing);
+
+To get this back on a subsequent iteration, use the C<fetch_blob> method
+
+	$wee_thing = $job->fetch('key1');
+	$huge_thing = $job->fetch_blob('key2');
+
+Alternatively you can let Sub::Slice take care of when to use BLOB storage by giving it a threshold size:
+
+	my $job = new Sub::Slice(token => $token, 'auto_blob_threshold' => 4096); #Store anything >4K as a BLOB
+	$job->store('key1' => $wee_thing);
+	$job->store('key2' => $huge_thing); #this will be stored as a blob if bigger than 4K
+	$wee_thing = $job->fetch('key1');
+	$huge_thing = $job->fetch('key2');
+
+Note that currently auto_blob_threshold only applies to scalars containing characters or bytes (not references).
+	
+It's up to the backend exactly what it does with BLOB data.  The different store/fetch methods give the backend the 
+opportunity to use a more efficient storage strategy for large chunks of BLOB data.
+For example, in the default C<Filesystem> backend, normal key-value data is serialised into a storable file for each Sub::Slice job 
+whereas BLOB data is held outside in separate files.
+
+=head2 Using a belt-and-braces cleaner process
+
+Although Sub::Slice cleans up jobs that are finished, the data from jobs never completed will persist.
+In real life, this kind of "should never happen" error has a habit of happening occasionally so it's advisable to use a 
+cleaner process to clear up any ancient Sub::Slice junk:
+
+	# clean up jobs from the default path, after the default period
+	perl -MSub::Slice::Backend::Filesystem -we "Sub::Slice::Backend::Filesystem->new()->cleanup"
+
+This will delete anything over the default age threshold from the default subslice path.  
+You can override defaults:
+	
+	# clean up jobs from /var/tmp/sslice, after 20 days
+	Sub::Slice::Backend::Filesystem->new(path => '/var/tmp/sslice')->cleanup(20)
+
+Alternatively, you can clean up with a couple of find(1) commands (if under UNIX):
+
+	find /var/tmp/sub_slice -type f -mtime +1 -exec rm {} \;
+	find /var/tmp/sub_slice -type d -mtime +1 -empty -exec rmdir {} \;
+
+This is basically what the cleanup call does, plus some additional error checking.
+
+=head1 EXAMPLES
+
+=head2 Simple HTTP remoting
+
+This is a "roll your own remoting protocol" example to show how Sub::Slice iteracts with some real remoting code.
+
+	##################################################################
+	# Client
+	##################################################################
+
+	use XML::Simple;
+	use HTTP::Request::Common qw(POST);
+	use LWP::UserAgent;
+	use constant MAX_ITERATIONS => 100;
+
+	my $token = create_token();
+	my $i = 0;
+	while (!$token->{done}) { 
+	        die "Long loop, presumed infinite" if $i++ > MAX_ITERATIONS;
+		do_work($token);
+		last if $token->{done};
+	}
+
+	# Proxy methods for remoting
+	sub create_token {
+		_call_method("create_token");
+	}
+
+	sub do_work {
+		_call_method("do_work", shift());
+	}
+
+	# Primative HTTP remoting
+	sub _call_method {
+		my ($name, $arg) = @_;
+		my $xml = (defined $arg) ? XMLout($arg) : '<opt/>'; #Serialise data as XML
+		my $ua = LWP::UserAgent->new;
+		my $req = POST 'http://myserver/cgi-bin/server.pl', 
+			[ method => $name, args => $xml ];	
+		my $res = $ua->request($req);
+		die($res->message) unless($res->is_success);
+		$xml = $res->content();
+		%$arg = %{XMLin($xml)};
+		$arg;
+	}
+
+	##################################################################
+	# Server - server.pl (installed into cgi-bin on myserver)
+	##################################################################
+
+	use CGI;
+	use XML::Simple;
+	use Sub::Slice;
+	use constant ALLOWED_METHOD => 
+		{ map {$_ => 1} qw(create_token do_work) };
+
+	# Primitive HTTP server dispatcher
+	my $method = CGI::param('method');
+	die("Unrecognised method ($method) called") 
+		unless ALLOWED_METHOD->{$method};
+	my $args = XMLin( CGI::param('args')); #Deserialise data
+	my $out = $method->($args);
+	$out = XMLout ({ %$out }); # won't serialize a blessed class
+	print "Content-type: text/xml\n\n";
+	print $out;
+
+	sub create_token {
+		my $job = new Sub::Slice();
+		return $job->token;
+	}
+
+	sub do_work { #Mindlessly simple example
+		my $token = shift;
+		my $job = new Sub::Slice (token => $token);
+
+		at_start $job sub {
+			$job->store("steps_to_take", 50);
+			$job->store("position", 0);
+		};
+
+		at_stage $job "check_files", sub {
+			my $position = $job->fetch("position");
+			$job->store("position", $position+1);
+			$job->done() if($position >= $job->fetch("steps_to_take"));
+		};
+		$job->token;
+	}
+
+
+Note that we return the job token from E<amp>do_work, so that it gets updated
+on the client. If we didn't do this, we would keep resetting position to 0,
+and we would loop forever (until we hit MAX_ITERATIONS).
+
+=head2 Using Sub::Slice with SOAP::Lite
+
+Rolling your own remoting protocol may be fun, but it's often more sensible to
+use a standard one such as XML/RPC or SOAP.  Here's an example SOAP server
+using Sub::Slice with SOAP::Lite.
+
+	##################################################################
+	# SOAP Server - soapserver.pl (installed into cgi-bin on myserver)
+	##################################################################
+	use strict;
+	use SOAP::Transport::HTTP;
+	SOAP::Transport::HTTP::CGI
+		-> dispatch_to('My::SoapServer')
+		-> handle;
+
+	package My::SoapServer;
+
+	sub create_token {
+		my $class = shift;
+		my @args = @_;
+
+		my $job = new Sub::Slice();
+		at_start $job sub {
+			$job->store(args => @args);
+			$job->store("steps_to_take", scalar @args);
+			$job->store("position", 0);
+		};
+
+		return $job->token;
+	}
+
+	sub do_work {
+		my $class = shift;
+		my ($token) = @_;
+
+		my $job = new Sub::Slice( token => $token);
+		at_stage $job "check_files" sub {
+			my $position = $job->fetch("position");
+			$job->store("position", $position+1);
+			$job->done() if($position >= $job->fetch("steps_to_take"));
+		};
+		return $job->token;
+	}
+
+Here's its client-side counterpart. The first
+few lines are where we define our SOAP application and process the request:
+
+	##################################################################
+	# SOAP Client
+	##################################################################
+	use strict;
+	use SOAP::Lite;
+	my $soap = SOAP::Lite
+		->uri("http://myserver.org/My/SoapServer")
+		->proxy("http://myserver/cgi-bin/soapserver.pl");
+	my @filenames = qw(badger.xhtml vole.xhtml dormouse.xhtml);
+	my ($token) = $soap->create_token(@filenames)->result;
+	while (!$token->{done} && !$token->{abort}) {
+		($token) = $soap->do_work($token)->result;
+	}
+
+It starts by defining the C<$soap> object which will connect to our application
+at the C<proxy> url. The methods called on C<$soap> are transparently proxied
+over HTTP to our application. The proxied methods don't return the values from
+the remote method, but rather a SOAP message object. To access the return
+values from the remote method we call C<paramsall()> on the SOAP message
+object. And finally, our example retrieves an updated copy of the C<$token>
+after each remote call.
+
+See L<SOAP::Lite> for more information. In particular, the sections on
+AutoBinding and AutoDispatching may give you some ideas about how to improve on
+keeping the token up-to-date in the client.
+
+=head1 VERSION
+
+$Revision: 1.16 $ on $Date: 2004/12/17 16:31:27 $ by $Author: tims $
+
+=head1 AUTHOR
+
+John Alden <cpan _at_ bbc _dot_ co _dot_ uk>
+
+=head1 COPYRIGHT
+
+(c) BBC 2004. This program is free software; you can redistribute it and/or modify it under the GNU GPL.
+
+See the file COPYING in this distribution, or http://www.gnu.org/licenses/gpl.txt 
+
+=cut

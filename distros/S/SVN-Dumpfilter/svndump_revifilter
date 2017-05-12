@@ -1,0 +1,43 @@
+#!/usr/bin/perl -w
+# $Id: svndump_revifilter 278 2007-01-13 12:37:13Z martin $
+# Copyright (C) 2006 by Martin Scharrer <martin@scharrer-online.de>
+# This is free software under the GPL.
+
+use strict;
+use SVN::Dumpfilter;
+
+my $dumpfile = shift @ARGV;
+my $outfile  = shift @ARGV;
+
+sub revifilter (\%;$);
+
+Dumpfilter($dumpfile, $outfile, \&revifilter);
+
+exit(0);
+
+
+sub revifilter (\%;$)
+ {
+   my $href = shift;
+   my $recalc = shift || 1;
+   my $header = $href->{'header'};
+   my $prop   = $href->{'properties'};
+
+   # Just revisions, please
+   return unless exists $header->{'Revision-number'};
+  
+   print "Revision: " . $header->{'Revision-number'} . "\n";
+   print "Date: " . $prop->{'svn:date'}, "\n\n";
+   $prop->{'svn:author'} = 'test';
+
+   $prop->{'svn:log'} .= "\n(Changed by filter)";
+
+   if ($recalc)
+    {
+     svn_recalc_prop_header(%$href);        # call if you changed properties
+     #svn_recalc_textcontent_header(%$href); # call if you modified text content
+    }
+ }
+
+
+__END__

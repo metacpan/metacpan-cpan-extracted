@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<!DOCTYPE NZSRSResponse SYSTEM "protocol.dtd">
+<NZSRSResponse VerMajor="5" VerMinor="2" RegistrarId="100">
+<Response Action="HandleUpdate" FeId="8" FeSeq="4954448" OrigRegistrarId="1" RecipientRegistrarId="100" TransId="blah 1281481777.566267">
+<FeTimeStamp Day="11" Hour="11" Minute="09" Month="8" Second="37" TimeZoneOffset="+12:00" Year="2010"/>
+<Error Hint="INVALID_REQUEST_ERROR" ErrorId="HANDLE_DOES_NOT_EXIST" Severity="err">
+<Description><![CDATA[There is no Handle with the given HandleId.]]></Description>
+<ErrorDetails><![CDATA[no_exist]]></ErrorDetails></Error></Response></NZSRSResponse>

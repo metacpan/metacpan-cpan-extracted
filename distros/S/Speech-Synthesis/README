@@ -1,0 +1,29 @@
+Speech-Synthesis
+
+There are all sorts of Speech Synthesis (or Text To Speech) modules
+on CPAN, supporting all kinds of different Speech APIs. However, each
+of these modules has its own functions and methods, and writing platform-independent
+code using these modules is a hell.
+Therefore Speech::Synthesis provides one API that supports many different
+speech APIs, like Mac::Speech on OS X, Win32::SAPI4, Win32::SAPI5 and
+Win32::MSAgent on Win32 platforms, and Festival::Client::Async on all
+other platforms. You never have to worry about their different ways: just use
+Speech::Synthesis!
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Jouke Visser
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

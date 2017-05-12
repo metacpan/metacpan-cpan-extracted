@@ -1,0 +1,152 @@
+---
+abstract: 'Read xlsx/xlsm/xml extention Excel files'
+author:
+  - 'Jed Lund <jandrew@cpan.org>'
+build_requires:
+  File::Copy: '0'
+  File::Temp: '0'
+  Log::Shiras::Unhide: '0'
+  Spreadsheet::ParseExcel: '0'
+  Test::Deep: '0'
+  Test::Moose: '2.1801'
+  Test::Most: '0'
+  Test::TypeTiny: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '7.04'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Spreadsheet-Reader-ExcelXML
+provides:
+  Spreadsheet::Reader::ExcelXML:
+    file: lib/Spreadsheet/Reader/ExcelXML.pm
+    version: v0.16.8
+  Spreadsheet::Reader::ExcelXML::Cell:
+    file: lib/Spreadsheet/Reader/ExcelXML/Cell.pm
+    version: v0.16.8
+  Spreadsheet::Reader::ExcelXML::CellToColumnRow:
+    file: lib/Spreadsheet/Reader/ExcelXML/CellToColumnRow.pm
+    version: v0.16.8
+  Spreadsheet::Reader::ExcelXML::Chartsheet:
+    file: lib/Spreadsheet/Reader/ExcelXML/Chartsheet.pm
+    version: v0.16.8
+  Spreadsheet::Reader::ExcelXML::Error:
+    file: lib/Spreadsheet/Reader/ExcelXML/Error.pm
+    version: v0.16.8
+  Spreadsheet::Reader::ExcelXML::Row:
+    file: lib/Spreadsheet/Reader/ExcelXML/Row.pm
+    version: v0.16.8
+  Spreadsheet::Reader::ExcelXML::SharedStrings:
+    file: lib/Spreadsheet/Reader/ExcelXML/SharedStrings.pm
+    version: v0.16.8
+  Spreadsheet::Reader::ExcelXML::Styles:
+    file: lib/Spreadsheet/Reader/ExcelXML/Styles.pm
+    version: v0.16.8
+  Spreadsheet::Reader::ExcelXML::Types:
+    file: lib/Spreadsheet/Reader/ExcelXML/Types.pm
+    version: v0.16.8
+  Spreadsheet::Reader::ExcelXML::Workbook:
+    file: lib/Spreadsheet/Reader/ExcelXML/Workbook.pm
+    version: v0.16.8
+  Spreadsheet::Reader::ExcelXML::WorkbookFileInterface:
+    file: lib/Spreadsheet/Reader/ExcelXML/WorkbookFileInterface.pm
+    version: v0.16.8
+  Spreadsheet::Reader::ExcelXML::WorkbookMetaInterface:
+    file: lib/Spreadsheet/Reader/ExcelXML/WorkbookMetaInterface.pm
+    version: v0.16.8
+  Spreadsheet::Reader::ExcelXML::WorkbookPropsInterface:
+    file: lib/Spreadsheet/Reader/ExcelXML/WorkbookPropsInterface.pm
+    version: v0.16.8
+  Spreadsheet::Reader::ExcelXML::WorkbookRelsInterface:
+    file: lib/Spreadsheet/Reader/ExcelXML/WorkbookRelsInterface.pm
+    version: v0.16.8
+  Spreadsheet::Reader::ExcelXML::Worksheet:
+    file: lib/Spreadsheet/Reader/ExcelXML/Worksheet.pm
+    version: v0.16.8
+  Spreadsheet::Reader::ExcelXML::WorksheetToRow:
+    file: lib/Spreadsheet/Reader/ExcelXML/WorksheetToRow.pm
+    version: v0.16.8
+  Spreadsheet::Reader::ExcelXML::XMLReader:
+    file: lib/Spreadsheet/Reader/ExcelXML/XMLReader.pm
+    version: v0.16.8
+  Spreadsheet::Reader::ExcelXML::XMLReader::FileWorksheet:
+    file: lib/Spreadsheet/Reader/ExcelXML/XMLReader/FileWorksheet.pm
+    version: v0.16.8
+  Spreadsheet::Reader::ExcelXML::XMLReader::NamedSharedStrings:
+    file: lib/Spreadsheet/Reader/ExcelXML/XMLReader/NamedSharedStrings.pm
+    version: v0.16.8
+  Spreadsheet::Reader::ExcelXML::XMLReader::NamedStyles:
+    file: lib/Spreadsheet/Reader/ExcelXML/XMLReader/NamedStyles.pm
+    version: v0.16.8
+  Spreadsheet::Reader::ExcelXML::XMLReader::NamedWorksheet:
+    file: lib/Spreadsheet/Reader/ExcelXML/XMLReader/NamedWorksheet.pm
+    version: v0.16.8
+  Spreadsheet::Reader::ExcelXML::XMLReader::PositionSharedStrings:
+    file: lib/Spreadsheet/Reader/ExcelXML/XMLReader/PositionSharedStrings.pm
+    version: v0.16.8
+  Spreadsheet::Reader::ExcelXML::XMLReader::PositionStyles:
+    file: lib/Spreadsheet/Reader/ExcelXML/XMLReader/PositionStyles.pm
+    version: v0.16.8
+  Spreadsheet::Reader::ExcelXML::XMLReader::WorkbookMeta:
+    file: lib/Spreadsheet/Reader/ExcelXML/XMLReader/WorkbookMeta.pm
+    version: v0.16.8
+  Spreadsheet::Reader::ExcelXML::XMLReader::WorkbookProps:
+    file: lib/Spreadsheet/Reader/ExcelXML/XMLReader/WorkbookProps.pm
+    version: v0.16.8
+  Spreadsheet::Reader::ExcelXML::XMLReader::WorkbookRels:
+    file: lib/Spreadsheet/Reader/ExcelXML/XMLReader/WorkbookRels.pm
+    version: v0.16.8
+  Spreadsheet::Reader::ExcelXML::XMLReader::WorkbookXML:
+    file: lib/Spreadsheet/Reader/ExcelXML/XMLReader/WorkbookXML.pm
+    version: v0.16.8
+  Spreadsheet::Reader::ExcelXML::ZipReader:
+    file: lib/Spreadsheet/Reader/ExcelXML/ZipReader.pm
+    version: v0.16.8
+  Spreadsheet::Reader::ExcelXML::ZipReader::WorkbookMeta:
+    file: lib/Spreadsheet/Reader/ExcelXML/ZipReader/WorkbookMeta.pm
+    version: v0.16.8
+  Spreadsheet::Reader::ExcelXML::ZipReader::WorkbookProps:
+    file: lib/Spreadsheet/Reader/ExcelXML/ZipReader/WorkbookProps.pm
+    version: v0.16.8
+  Spreadsheet::Reader::ExcelXML::ZipReader::WorkbookRels:
+    file: lib/Spreadsheet/Reader/ExcelXML/ZipReader/WorkbookRels.pm
+    version: v0.16.8
+requires:
+  Archive::Zip: '1.30'
+  Capture::Tiny: '0'
+  Carp: '0'
+  Clone: '0'
+  Data::Dumper: '0'
+  DateTime::Format::Flexible: '0'
+  DateTimeX::Format::Excel: '0'
+  Encode: '0'
+  FileHandle: '0'
+  IO::File: '0'
+  IO::Handle: '1.25'
+  Modern::Perl: '1.20150127'
+  Moose: '0'
+  Moose::Role: '0'
+  MooseX::HasDefaults::RO: '0'
+  MooseX::ShortCut::BuildInstance: '1.040'
+  MooseX::StrictConstructor: '0'
+  Spreadsheet::Reader::Format: v0.6.4
+  Spreadsheet::Reader::Format::FmtDefault: '0'
+  Spreadsheet::Reader::Format::ParseExcelFormatStrings: '0'
+  Test::Moose: '2.1801'
+  Type::Library: '1.000'
+  Type::Utils: '0'
+  Types::Standard: '0'
+  lib: '0'
+  perl: '5.010'
+  strict: '0'
+  version: '0.77'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/jandrew/p5-spreadsheet-reader-excelxml/issues
+  homepage: https://github.com/jandrew/p5-spreadsheet-reader-excelxml
+  repository: https://github.com/jandrew/p5-spreadsheet-reader-excelxml.git
+version: v0.16.8
+x_authority: cpan:JANDREW

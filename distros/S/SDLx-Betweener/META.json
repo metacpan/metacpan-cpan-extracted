@@ -1,0 +1,57 @@
+{
+   "abstract" : "SDL Perl XS Tweening Animation Library",
+   "author" : [
+      "eilara <ran.eilam@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "SDLx-Betweener",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::SDL" : "1.430",
+            "Moose" : "2.0402",
+            "SDL" : "2.536",
+            "perl" : "5.012"
+         }
+      }
+   },
+   "provides" : {
+      "SDLx::Betweener" : {
+         "file" : "lib/SDLx/Betweener.pm",
+         "version" : "0.0105"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/shlomif/SDLx-Betweener.git",
+         "web" : "https://github.com/shlomif/SDLx-Betweener"
+      }
+   },
+   "version" : "0.0105"
+}

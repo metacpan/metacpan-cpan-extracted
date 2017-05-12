@@ -1,0 +1,35 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Socialtext::Resting::Getopt qw/get_rester rester_usage/;
+use Socialtext::CPANWiki;
+use Getopt::Long;
+
+$| = 1; # turn on autoflushing
+
+my $rester = get_rester;
+my $filter = '';
+GetOptions(
+    'f|filter-page=s' => \$filter,
+) or usage();
+
+Socialtext::CPANWiki->new(
+    rester => $rester,
+    filter_page => 'Socialtext CPAN Modules',
+)->update;
+
+exit;
+
+
+sub usage {
+    my $rester_usage = rester_usage();
+    die <<EOT;
+$0 <rester options> <options>
+Where <options> are:
+  --filter-page     Name of a page containing a bulleted list
+                    of packages to put on the wiki.
+
+Where <rester options> are:
+$rester_usage
+EOT
+}

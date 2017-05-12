@@ -1,0 +1,97 @@
+{
+   "abstract" : "Windows driver for Sys::Info",
+   "author" : [
+      "Burak Gursoy <burak@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Sys-Info-Driver-Windows",
+   "no_index" : {
+      "directory" : [
+         "monolithic_version",
+         "builder",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Capture::Tiny" : 0,
+            "ExtUtils::CBuilder" : 0,
+            "Test::More" : "0.40",
+            "Test::Sys::Info" : "0.20"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::General" : 0,
+            "ExtUtils::CBuilder" : 0,
+            "Sys::Info::Base" : "0.78",
+            "Sys::Info::Driver::Unknown" : "0.78",
+            "Win32::OLE" : 0,
+            "Win32::TieRegistry" : 0,
+            "Win32API::Net" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Sys::Info::Driver::Windows" : {
+         "file" : "lib/Sys/Info/Driver/Windows.pm",
+         "version" : "0.78"
+      },
+      "Sys::Info::Driver::Windows::Constants" : {
+         "file" : "lib/Sys/Info/Driver/Windows/Constants.pm",
+         "version" : "0.78"
+      },
+      "Sys::Info::Driver::Windows::Device" : {
+         "file" : "lib/Sys/Info/Driver/Windows/Device.pm",
+         "version" : "0.78"
+      },
+      "Sys::Info::Driver::Windows::Device::CPU" : {
+         "file" : "lib/Sys/Info/Driver/Windows/Device/CPU.pm",
+         "version" : "0.78"
+      },
+      "Sys::Info::Driver::Windows::Device::CPU::WMI" : {
+         "file" : "lib/Sys/Info/Driver/Windows/Device/CPU/WMI.pm",
+         "version" : "0.78"
+      },
+      "Sys::Info::Driver::Windows::Device::CPU::WMI::Conf" : {
+         "file" : "lib/Sys/Info/Driver/Windows/Device/CPU/WMI/Conf.pm",
+         "version" : "0.78"
+      },
+      "Sys::Info::Driver::Windows::OS" : {
+         "file" : "lib/Sys/Info/Driver/Windows/OS.pm",
+         "version" : "0.78"
+      },
+      "Sys::Info::Driver::Windows::OS::Editions" : {
+         "file" : "lib/Sys/Info/Driver/Windows/OS/Editions.pm",
+         "version" : "0.78"
+      },
+      "Sys::Info::Driver::Windows::OS::Net" : {
+         "file" : "lib/Sys/Info/Driver/Windows/OS/Net.pm",
+         "version" : "0.78"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://bitbucket.org/burak/cpan-sys-info-driver-windows/"
+      }
+   },
+   "version" : "0.78"
+}

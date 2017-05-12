@@ -1,0 +1,10 @@
+<div class="container">
+    <h2><center>[% element.title %]</center></h2>
+    <hr />
+    <div class="row">
+        <div class="incipit">[% element.incipit %]</div>
+        <div class="abstract">[% element.abstract %]</div>
+        <div class="text">[% element.text %]</div>
+    </div>
+</div>
+    

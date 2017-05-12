@@ -1,0 +1,62 @@
+Schedule::RateLimiter version 0.01
+==========================
+
+This module provides a way to voluntarily restrict how many times a given
+action may take place within a specified time frame.  Such a tool may be useful
+if you have written something which periodically polls some public resource and
+want to ensure that you do not overburden that resource with too many requests.
+
+  # Don't let this event happen more than 5 times in a 60 second period.
+  my $throttle = Schedule::RateLimiter->new ( iterations => 5,
+                                      seconds    => 60 );
+
+  # Cycle forever, but not too fast.
+  while ( $throttle->event() ) {
+      &do_something;
+  }
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Test::More
+  Time::HiRest
+
+TODO
+
+* Add a constructor parameter that takes number of seconds and iterations and
+normalizes so the number of iterations equals one.  This defeats the best fit
+model and gives you the most even fit instead.
+
+* Add a way to find out how much time it will take before the next event may
+run.
+
+* Add support for multiple requirements (for example, 5 in 100 seconds AND 6 in
+120 seconds).
+
+* Add support for a best-fit situation where there are multiple events
+with different restrictions happening together.
+
+* Add support to "roll back" an event that was recorded but did not happen.
+
+* Add support to alter the limits on an object that already has recorded
+events.
+
+
+COPYRIGHT AND LICENCE
+
+This module was authored by Daniel J. Wright (wright@pair.com) for pair
+Networks, Inc.
+
+Copyright (C) 2003 pair Networks, Inc.   (www.pair.com)
+
+This module is licensed under the same license at Perl itself.

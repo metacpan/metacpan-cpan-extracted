@@ -1,0 +1,79 @@
+# WV Thu Aug  1 14:05:03 BST 2002
+# $Id: synsim.data,v 1.1 2002/09/11 15:42:37 wim Exp $
+# This is the general template for the input data file for the OPSnet SynSim script.
+# Conventions:
+# lists of values for parameters are comma-separated
+# lists of values for the parameters in a set of curvers are semicolumn (;) separated. The shortcut '..' is allowed provided that the values are integers
+# When using more than one set, they al must have the same number of elements. THis is because the corresponding elements are combined. eg:
+# _SET1 = 1;2;3
+# _SET2 = 4;5;6
+# This gives 3 simulations with resp. (1,4),(2,5) and (3,6).
+# Lines starting with '#' and blank lines are ignored
+# Lines starting with an underscore (_) are supposed to have following synstax:
+# _NAME = VALUE1 [,VALUE2[,..,VALUEn]]
+# The script will do a 'for'-loop over every parameter with more than one value. As a consequence,
+# DEVTYPE can have only 1 argument.
+# For every value of _SIMTYPE, the corresponding section must be present e.g.:
+# bufsim3
+# _SAMPL = ...;...
+# Make sure the SIMTYPE does not have an underscore, otherwise it's considered as a parameter, not a value.
+#
+# The TITLE statement is not a parameter, it's just a title to be used in the reports
+#
+# Unix is case dependent!
+#
+TITLE: SynSim test bufsim3
+#_TITLE = SynSim test bufsim3
+#_SIMTYPE = bufsim3
+SIMTYPE : bufsim3
+DEVTYPE : OPSnode
+TEMPL : .templ
+# the program that runs the input file
+COMMAND : perl
+EXT : .pl
+# To filter the output of the simulation
+OUTPUT_FILTER_PATTERN : F0
+# Name of the template file for the result analysis
+ANALYSIS_TEMPLATE : ErrorFlags
+# number of packets to be generated
+_NPACK = 10000
+# number of ports
+_NPORTS = 2
+# traffic distribution type: Poisson, Pareto, Uniform
+_TRAFDIST = 2
+# packet length distribution type: uniform, Ethernet, IP, all MIN, all MAX
+_PLDIST = 2
+# Pareto constant
+_K_PARETO = 1.181232218
+# For uniform dist, to have same mean as Poisson
+_NMAXGAP = 2.386294361
+# number of buffers
+_NBUFS = 8,16,32
+# type of buffer
+# 0: adjustable; 1: fixed length; 2: multi-exit
+_BUFTYPE = 1,2
+# the output mux of the buffer can be blocking or non-blocking
+_BLOCKING = 0
+# unit packet length  50*8+50 bits, and a timestep is a bit
+_UNITPL = 450
+_UNITGW = 450
+# max number of units
+_NMAX = 30
+# intermediate number of units
+_NMED = 0
+# minimum gap width
+_MINGW = 450
+# "gap" between head and tail of packet in circulating buffer
+_MINBGW = 100
+# Sampling factor to speed up simulation with a factor UNITPL/SAMPL
+_SAMPL = 50
+# keep packet order
+_KEEP_ORDER = 0,1
+#verbose or not
+_VERBOSE = 0
+# to analyse the generated traffic
+_ONLY_TRAFFIC = 0
+# generate data for histograms
+_HISTS = 0
+# size of population
+_POP_SAMPLE = 1..2

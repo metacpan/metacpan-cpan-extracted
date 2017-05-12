@@ -1,0 +1,29 @@
+---
+name: Socket-Multicast6
+version: 0.04
+author:
+  - |-
+    Based on L<Socket::Multicast> by Jonathan Steinert, E<lt>hachi@cpan.orgE<gt>
+    Socket::Multicast6 by Nicholas J Humfrey, E<lt>njh@cpan.orgE<gt>
+abstract: Constructors and constants for IPv4 and IPv6 multicast socket operations.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Socket: 0
+  Socket6: 0.19
+  Test::More: 0
+  perl: 5.6.1
+build_requires:
+  Devel::PPPort: 0
+  ExtUtils::CBuilder: 0
+  ExtUtils::Constant: 0
+  Module::Build: 0.20
+provides:
+  Socket::Multicast6:
+    file: lib/Socket/Multicast6.pm
+    version: 0.04
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

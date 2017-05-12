@@ -1,0 +1,6 @@
+Makefile.PL
+MANIFEST
+SuperPython.pm
+hello.spy
+sieve.spy
+jasph.spy

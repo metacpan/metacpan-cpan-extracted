@@ -1,0 +1,501 @@
+---
+abstract: 'A decentralized version control system'
+author:
+  - 'Chia-liang Kao <clkao@clkao.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.94'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: SVK
+no_index:
+  directory:
+    - inc
+    - t
+provides:
+  SVK:
+    file: lib/SVK.pm
+    version: v2.2.3
+  SVK::Accessor:
+    file: lib/SVK/Accessor.pm
+  SVK::Command:
+    file: lib/SVK/Command.pm
+    version: v2.2.3
+  SVK::Command::Add:
+    file: lib/SVK/Command/Add.pm
+    version: v2.2.3
+  SVK::Command::Admin:
+    file: lib/SVK/Command/Admin.pm
+    version: v2.2.3
+  SVK::Command::Annotate:
+    file: lib/SVK/Command/Annotate.pm
+    version: v2.2.3
+  SVK::Command::Branch:
+    file: lib/SVK/Command/Branch.pm
+    version: v2.2.3
+  SVK::Command::Branch::checkout:
+    file: lib/SVK/Command/Branch.pm
+  SVK::Command::Branch::create:
+    file: lib/SVK/Command/Branch.pm
+  SVK::Command::Branch::diff:
+    file: lib/SVK/Command/Branch.pm
+  SVK::Command::Branch::info:
+    file: lib/SVK/Command/Branch.pm
+  SVK::Command::Branch::list:
+    file: lib/SVK/Command/Branch.pm
+  SVK::Command::Branch::listprojects:
+    file: lib/SVK/Command/Branch.pm
+  SVK::Command::Branch::merge:
+    file: lib/SVK/Command/Branch.pm
+  SVK::Command::Branch::move:
+    file: lib/SVK/Command/Branch.pm
+  SVK::Command::Branch::offline:
+    file: lib/SVK/Command/Branch.pm
+  SVK::Command::Branch::online:
+    file: lib/SVK/Command/Branch.pm
+  SVK::Command::Branch::pull:
+    file: lib/SVK/Command/Branch.pm
+  SVK::Command::Branch::push:
+    file: lib/SVK/Command/Branch.pm
+  SVK::Command::Branch::remove:
+    file: lib/SVK/Command/Branch.pm
+  SVK::Command::Branch::setup:
+    file: lib/SVK/Command/Branch.pm
+  SVK::Command::Branch::switch:
+    file: lib/SVK/Command/Branch.pm
+  SVK::Command::Cat:
+    file: lib/SVK/Command/Cat.pm
+    version: v2.2.3
+  SVK::Command::Checkout:
+    file: lib/SVK/Command/Checkout.pm
+    version: v2.2.3
+  SVK::Command::Checkout::detach:
+    file: lib/SVK/Command/Checkout.pm
+  SVK::Command::Checkout::list:
+    file: lib/SVK/Command/Checkout.pm
+  SVK::Command::Checkout::purge:
+    file: lib/SVK/Command/Checkout.pm
+  SVK::Command::Checkout::relocate:
+    file: lib/SVK/Command/Checkout.pm
+  SVK::Command::Cleanup:
+    file: lib/SVK/Command/Cleanup.pm
+    version: v2.2.3
+  SVK::Command::Cmerge:
+    file: lib/SVK/Command/Cmerge.pm
+    version: v2.2.3
+  SVK::Command::Commit:
+    file: lib/SVK/Command/Commit.pm
+    version: v2.2.3
+  SVK::Command::Copy:
+    file: lib/SVK/Command/Copy.pm
+    version: v2.2.3
+  SVK::Command::Delete:
+    file: lib/SVK/Command/Delete.pm
+    version: v2.2.3
+  SVK::Command::Depotmap:
+    file: lib/SVK/Command/Depotmap.pm
+    version: v2.2.3
+  SVK::Command::Depotmap::add:
+    file: lib/SVK/Command/Depotmap.pm
+  SVK::Command::Depotmap::detach:
+    file: lib/SVK/Command/Depotmap.pm
+  SVK::Command::Depotmap::list:
+    file: lib/SVK/Command/Depotmap.pm
+  SVK::Command::Depotmap::relocate:
+    file: lib/SVK/Command/Depotmap.pm
+  SVK::Command::Describe:
+    file: lib/SVK/Command/Describe.pm
+    version: v2.2.3
+  SVK::Command::Diff:
+    file: lib/SVK/Command/Diff.pm
+    version: v2.2.3
+  SVK::Command::Help:
+    file: lib/SVK/Command/Help.pm
+    version: v2.2.3
+  SVK::Command::Ignore:
+    file: lib/SVK/Command/Ignore.pm
+    version: v2.2.3
+  SVK::Command::Import:
+    file: lib/SVK/Command/Import.pm
+    version: v2.2.3
+  SVK::Command::Info:
+    file: lib/SVK/Command/Info.pm
+    version: v2.2.3
+  SVK::Command::List:
+    file: lib/SVK/Command/List.pm
+    version: v2.2.3
+  SVK::Command::Log:
+    file: lib/SVK/Command/Log.pm
+    version: v2.2.3
+  SVK::Command::Merge:
+    file: lib/SVK/Command/Merge.pm
+    version: v2.2.3
+  SVK::Command::Mirror:
+    file: lib/SVK/Command/Mirror.pm
+    version: v2.2.3
+  SVK::Command::Mirror::bootstrap:
+    file: lib/SVK/Command/Mirror.pm
+  SVK::Command::Mirror::detach:
+    file: lib/SVK/Command/Mirror.pm
+  SVK::Command::Mirror::list:
+    file: lib/SVK/Command/Mirror.pm
+  SVK::Command::Mirror::recover:
+    file: lib/SVK/Command/Mirror.pm
+  SVK::Command::Mirror::relocate:
+    file: lib/SVK/Command/Mirror.pm
+  SVK::Command::Mirror::unlock:
+    file: lib/SVK/Command/Mirror.pm
+  SVK::Command::Mirror::upgrade:
+    file: lib/SVK/Command/Mirror.pm
+  SVK::Command::Mkdir:
+    file: lib/SVK/Command/Mkdir.pm
+    version: v2.2.3
+  SVK::Command::Move:
+    file: lib/SVK/Command/Move.pm
+    version: v2.2.3
+  SVK::Command::Patch:
+    file: lib/SVK/Command/Patch.pm
+    version: v2.2.3
+  SVK::Command::Patch::FileRequired:
+    file: lib/SVK/Command/Patch.pm
+  SVK::Command::Patch::apply:
+    file: lib/SVK/Command/Patch.pm
+  SVK::Command::Patch::delete:
+    file: lib/SVK/Command/Patch.pm
+  SVK::Command::Patch::dump:
+    file: lib/SVK/Command/Patch.pm
+  SVK::Command::Patch::list:
+    file: lib/SVK/Command/Patch.pm
+  SVK::Command::Patch::regen:
+    file: lib/SVK/Command/Patch.pm
+  SVK::Command::Patch::test:
+    file: lib/SVK/Command/Patch.pm
+  SVK::Command::Patch::update:
+    file: lib/SVK/Command/Patch.pm
+  SVK::Command::Patch::view:
+    file: lib/SVK/Command/Patch.pm
+  SVK::Command::Propdel:
+    file: lib/SVK/Command/Propdel.pm
+    version: v2.2.3
+  SVK::Command::Propedit:
+    file: lib/SVK/Command/Propedit.pm
+    version: v2.2.3
+  SVK::Command::Propget:
+    file: lib/SVK/Command/Propget.pm
+    version: v2.2.3
+  SVK::Command::Proplist:
+    file: lib/SVK/Command/Proplist.pm
+    version: v2.2.3
+  SVK::Command::Propset:
+    file: lib/SVK/Command/Propset.pm
+    version: v2.2.3
+  SVK::Command::Pull:
+    file: lib/SVK/Command/Pull.pm
+    version: v2.2.3
+  SVK::Command::Push:
+    file: lib/SVK/Command/Push.pm
+    version: v2.2.3
+  SVK::Command::Resolved:
+    file: lib/SVK/Command/Resolved.pm
+    version: v2.2.3
+  SVK::Command::Revert:
+    file: lib/SVK/Command/Revert.pm
+    version: v2.2.3
+  SVK::Command::Smerge:
+    file: lib/SVK/Command/Smerge.pm
+    version: v2.2.3
+  SVK::Command::Status:
+    file: lib/SVK/Command/Status.pm
+    version: v2.2.3
+  SVK::Command::Switch:
+    file: lib/SVK/Command/Switch.pm
+    version: v2.2.3
+  SVK::Command::Sync:
+    file: lib/SVK/Command/Sync.pm
+    version: v2.2.3
+  SVK::Command::Update:
+    file: lib/SVK/Command/Update.pm
+    version: v2.2.3
+  SVK::Command::Verify:
+    file: lib/SVK/Command/Verify.pm
+    version: v2.2.3
+  SVK::Config:
+    file: lib/SVK/Config.pm
+    version: v2.2.3
+  SVK::Depot:
+    file: lib/SVK/Depot.pm
+    version: v2.2.3
+  SVK::Editor:
+    file: lib/SVK/Editor.pm
+  SVK::Editor::ByPass:
+    file: lib/SVK/Editor/ByPass.pm
+  SVK::Editor::Checkout:
+    file: lib/SVK/Editor/Checkout.pm
+    version: v2.2.3
+  SVK::Editor::Combine:
+    file: lib/SVK/Editor/Combine.pm
+    version: v2.2.3
+  SVK::Editor::Combiner:
+    file: lib/SVK/Editor/Combiner.pm
+    version: v2.2.3
+  SVK::Editor::Composite:
+    file: lib/SVK/Editor/Composite.pm
+    version: v2.2.3
+  SVK::Editor::Copy:
+    file: lib/SVK/Editor/Copy.pm
+    version: v2.2.3
+  SVK::Editor::CopyHandler:
+    file: lib/SVK/Editor/CopyHandler.pm
+    version: v2.2.3
+  SVK::Editor::Delay:
+    file: lib/SVK/Editor/Delay.pm
+    version: v2.2.3
+  SVK::Editor::Diff:
+    file: lib/SVK/Editor/Diff.pm
+    version: v2.2.3
+  SVK::Editor::Dynamic:
+    file: lib/SVK/Editor/Dynamic.pm
+  SVK::Editor::FilterProp:
+    file: lib/SVK/Editor/FilterProp.pm
+  SVK::Editor::InteractiveCommitter:
+    file: lib/SVK/Editor/InteractiveCommitter.pm
+    version: v2.2.3
+  SVK::Editor::InteractiveStatus:
+    file: lib/SVK/Editor/InteractiveStatus.pm
+    version: v2.2.3
+  SVK::Editor::InteractiveStatus::Action:
+    file: lib/SVK/Editor/InteractiveStatus.pm
+  SVK::Editor::InteractiveStatus::AddDirectoryAction:
+    file: lib/SVK/Editor/InteractiveStatus.pm
+  SVK::Editor::InteractiveStatus::AddFileAction:
+    file: lib/SVK/Editor/InteractiveStatus.pm
+  SVK::Editor::InteractiveStatus::DeleteFileAction:
+    file: lib/SVK/Editor/InteractiveStatus.pm
+  SVK::Editor::InteractiveStatus::ModifyBinaryFileAction:
+    file: lib/SVK/Editor/InteractiveStatus.pm
+  SVK::Editor::InteractiveStatus::ModifyDirectoryPropAction:
+    file: lib/SVK/Editor/InteractiveStatus.pm
+  SVK::Editor::InteractiveStatus::ModifyFileAction:
+    file: lib/SVK/Editor/InteractiveStatus.pm
+  SVK::Editor::InteractiveStatus::ModifyFilePropAction:
+    file: lib/SVK/Editor/InteractiveStatus.pm
+  SVK::Editor::InteractiveStatus::OpenDirectoryAction:
+    file: lib/SVK/Editor/InteractiveStatus.pm
+  SVK::Editor::InteractiveStatus::UI:
+    file: lib/SVK/Editor/InteractiveStatus.pm
+  SVK::Editor::MapRev:
+    file: lib/SVK/Editor/MapRev.pm
+  SVK::Editor::Merge:
+    file: lib/SVK/Editor/Merge.pm
+    version: v2.2.3
+  SVK::Editor::Patch:
+    file: lib/SVK/Editor/Patch.pm
+    version: v2.2.3
+  SVK::Editor::PropEol:
+    file: lib/SVK/Editor/PropEol.pm
+    version: v2.2.3
+  SVK::Editor::Rename:
+    file: lib/SVK/Editor/Rename.pm
+    version: v2.2.3
+  SVK::Editor::Serialize:
+    file: lib/SVK/Editor/Serialize.pm
+  SVK::Editor::Status:
+    file: lib/SVK/Editor/Status.pm
+    version: v2.2.3
+  SVK::Editor::SubTree:
+    file: lib/SVK/Editor/SubTree.pm
+    version: v2.2.3
+  SVK::Editor::Tee:
+    file: lib/SVK/Editor/Tee.pm
+  SVK::Editor::Translate:
+    file: lib/SVK/Editor/Translate.pm
+    version: v2.2.3
+  SVK::Editor::TxnCleanup:
+    file: lib/SVK/Editor/TxnCleanup.pm
+    version: v2.2.3
+  SVK::Editor::View:
+    file: lib/SVK/Editor/View.pm
+    version: v2.2.3
+  SVK::Editor::XD:
+    file: lib/SVK/Editor/XD.pm
+    version: v2.2.3
+  SVK::I18N:
+    file: lib/SVK/I18N.pm
+  SVK::Inspector:
+    file: lib/SVK/Inspector.pm
+  SVK::Inspector::Compat:
+    file: lib/SVK/Inspector/Compat.pm
+  SVK::Inspector::Root:
+    file: lib/SVK/Inspector/Root.pm
+  SVK::Log::ChangedPath:
+    file: lib/SVK/Log/ChangedPath.pm
+  SVK::Log::ChangedPaths:
+    file: lib/SVK/Log/ChangedPaths.pm
+  SVK::Log::Filter:
+    file: lib/SVK/Log/Filter.pm
+  SVK::Log::Filter::Author:
+    file: lib/SVK/Log/Filter/Author.pm
+  SVK::Log::Filter::Grep:
+    file: lib/SVK/Log/Filter/Grep.pm
+  SVK::Log::Filter::Head:
+    file: lib/SVK/Log/Filter/Head.pm
+  SVK::Log::Filter::Output:
+    file: lib/SVK/Log/Filter/Output.pm
+  SVK::Log::Filter::Selection:
+    file: lib/SVK/Log/Filter/Selection.pm
+  SVK::Log::Filter::Std:
+    file: lib/SVK/Log/Filter/Std.pm
+  SVK::Log::Filter::XML:
+    file: lib/SVK/Log/Filter/XML.pm
+  SVK::Log::FilterPipeline:
+    file: lib/SVK/Log/FilterPipeline.pm
+  SVK::Logger:
+    file: lib/SVK/Logger.pm
+    version: v2.2.3
+  SVK::Logger::Compat:
+    file: lib/SVK/Logger.pm
+  SVK::Merge:
+    file: lib/SVK/Merge.pm
+  SVK::Merge::Info:
+    file: lib/SVK/Merge/Info.pm
+  SVK::MimeDetect:
+    file: lib/SVK/MimeDetect.pm
+  SVK::MimeDetect::FileLibMagic:
+    file: lib/SVK/MimeDetect/FileLibMagic.pm
+  SVK::MimeDetect::FileMMagic:
+    file: lib/SVK/MimeDetect/FileMMagic.pm
+  SVK::MimeDetect::FileType:
+    file: lib/SVK/MimeDetect/FileType.pm
+  SVK::MimeDetect::Internal:
+    file: lib/SVK/MimeDetect/Internal.pm
+  SVK::Mirror:
+    file: lib/SVK/Mirror.pm
+  SVK::Mirror::Backend::SVNRa:
+    file: lib/SVK/Mirror/Backend/SVNRa.pm
+  SVK::Mirror::Backend::SVNRaPipe:
+    file: lib/SVK/Mirror/Backend/SVNRaPipe.pm
+  SVK::Mirror::Backend::SVNSync:
+    file: lib/SVK/Mirror/Backend/SVNSync.pm
+  SVK::MirrorCatalog:
+    file: lib/SVK/MirrorCatalog.pm
+  SVK::Notify:
+    file: lib/SVK/Notify.pm
+  SVK::Patch:
+    file: lib/SVK/Patch.pm
+    version: v2.2.3
+  SVK::Patch::CommitEditor:
+    file: lib/SVK/Patch.pm
+  SVK::Patchset:
+    file: lib/SVK/Patchset.pm
+  SVK::Path:
+    file: lib/SVK/Path.pm
+    version: v2.2.3
+  SVK::Path::Checkout:
+    file: lib/SVK/Path/Checkout.pm
+    version: v2.2.3
+  SVK::Path::Txn:
+    file: lib/SVK/Path/Txn.pm
+  SVK::Path::View:
+    file: lib/SVK/Path/View.pm
+    version: v2.2.3
+  SVK::Project:
+    file: lib/SVK/Project.pm
+    version: v2.2.3
+  SVK::Resolve:
+    file: lib/SVK/Resolve.pm
+  SVK::Resolve::AraxisMerge:
+    file: lib/SVK/Resolve/AraxisMerge.pm
+  SVK::Resolve::Emacs:
+    file: lib/SVK/Resolve/Emacs.pm
+  SVK::Resolve::FileMerge:
+    file: lib/SVK/Resolve/FileMerge.pm
+  SVK::Resolve::GVim:
+    file: lib/SVK/Resolve/GVim.pm
+  SVK::Resolve::GtkDiff:
+    file: lib/SVK/Resolve/GtkDiff.pm
+  SVK::Resolve::Guiffy:
+    file: lib/SVK/Resolve/Guiffy.pm
+  SVK::Resolve::KDiff3:
+    file: lib/SVK/Resolve/KDiff3.pm
+  SVK::Resolve::Meld:
+    file: lib/SVK/Resolve/Meld.pm
+  SVK::Resolve::P4WinMerge:
+    file: lib/SVK/Resolve/P4WinMerge.pm
+  SVK::Resolve::TkDiff:
+    file: lib/SVK/Resolve/TkDiff.pm
+  SVK::Resolve::TortoiseMerge:
+    file: lib/SVK/Resolve/TortoiseMerge.pm
+  SVK::Resolve::Vim:
+    file: lib/SVK/Resolve/Vim.pm
+  SVK::Resolve::WinMerge:
+    file: lib/SVK/Resolve/WinMerge.pm
+  SVK::Resolve::XXDiff:
+    file: lib/SVK/Resolve/XXDiff.pm
+  SVK::Root:
+    file: lib/SVK/Root.pm
+  SVK::Root::Checkout:
+    file: lib/SVK/Root/Checkout.pm
+  SVK::Root::Checkout::Entry:
+    file: lib/SVK/Root/Checkout.pm
+  SVK::Root::Checkout::History:
+    file: lib/SVK/Root/Checkout.pm
+  SVK::Root::View:
+    file: lib/SVK/Root/View.pm
+  SVK::Target::Universal:
+    file: lib/SVK/Target/Universal.pm
+    version: v2.2.3
+  SVK::Test:
+    file: lib/SVK/Test.pm
+    version: v2.2.3
+  SVK::Util:
+    file: lib/SVK/Util.pm
+    version: v2.2.3
+  SVK::VerifyEditor:
+    file: lib/SVK/Command/Verify.pm
+  SVK::View:
+    file: lib/SVK/View.pm
+  SVK::XD:
+    file: lib/SVK/XD.pm
+    version: v2.2.3
+  SVK::XD::Signature:
+    file: lib/SVK/XD.pm
+  Tie::StdScalar::Tee:
+    file: lib/SVK/Test.pm
+requires:
+  Algorithm::Annotate: 0
+  Algorithm::Diff: 1.1901
+  App::CLI: 0
+  Class::Accessor::Fast: 0
+  Class::Autouse: 1.15
+  Class::Data::Inheritable: 0
+  Data::Hierarchy: 0.30
+  Encode: 2.10
+  File::Spec: 3.19
+  File::Temp: 0.17
+  Getopt::Long: 2.35
+  IO::Digest: 0
+  List::MoreUtils: 0
+  Path::Class: 0.16
+  PerlIO::eol: 0.13
+  PerlIO::via::dynamic: 0.11
+  PerlIO::via::symlink: 0.02
+  Pod::Escapes: 0
+  Pod::Simple: 0
+  SVN::Mirror: 0.71
+  SVN::Simple::Edit: 0.27
+  Term::ReadKey: 0
+  Time::HiRes: 0
+  Time::Progress: 0
+  UNIVERSAL::require: 0
+  URI: 0
+  YAML::Syck: 0.60
+  version: 0.68
+resources:
+  license: http://dev.perl.org/licenses/
+version: 2.002003

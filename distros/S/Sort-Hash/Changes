@@ -1,0 +1,29 @@
+Revision history for Sort::Hash
+
+2.05	arguments parsing now uses ref to find the hashref,
+	so arguments can be in any order.
+2.04	25 July 2014
+	META.yml fix, attempting to prevent indexing of Sort::Hash1.
+2.02,203    15 July 2014
+        Pod Fixes.
+        Remove version number from Sort::Hash1 because Kwalitee didn't like it.
+2.01    15 July 2014
+	Fixed a minor pod error
+2.00    14 July 2014
+	Rewrote interface
+1.05    12 July 2014
+		Added Fatal switch to enable choice of dying or warning.
+		When fatal is off a failed sort returns an empty set.
+1.04    9 April 2014
+        Minor Doc fix to improve CPANTS Kwalitee.
+	    1.041 fixed version number in POD.
+1.03    8 February 2014
+        Fixed error in MakeFile to specify minimum pre-reqs.
+1.02    7 February 2014
+        attempting to numeric sort an alpha value warns and returns undef.
+        added alphastrict to reject alpha sort with numeric values.
+1.01    6 February 2014
+        Specified minimum Perl Version of 5.8
+        Added Changelog.
+1.00    4 February 2014
+        First version, released on an unsuspecting world.

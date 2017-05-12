@@ -1,0 +1,10 @@
+network,country_iso_code,subdivision_1_iso_code,country_name,subdivision_1_name
+1.0.0.0/24,AU,,澳大利亚,
+1.0.1.0/24,CN,,中国,
+1.0.2.0/23,CN,,中国,
+1.0.4.0/27,AU,VIC,澳大利亚,
+1.0.4.32/27,AU,VIC,澳大利亚,
+1.0.4.64/26,AU,VIC,澳大利亚,
+1.0.4.128/25,AU,VIC,澳大利亚,
+1.0.5.0/24,AU,VIC,澳大利亚,
+1.0.6.0/23,AU,,澳大利亚,

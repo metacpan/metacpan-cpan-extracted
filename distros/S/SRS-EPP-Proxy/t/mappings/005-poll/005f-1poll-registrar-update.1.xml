@@ -1,0 +1,70 @@
+<NZSRSResponse VerMajor="5" VerMinor="2">
+<Response Action="GetMessages" FeId="9" FeSeq="112" MoreRowsAvailable="1" OrigRegistrarId="100" RecipientRegistrarId="100" Rows="1">
+<FeTimeStamp Day="2" Hour="10" Minute="41" Month="8" Second="21" TimeZoneOffset="+12:00" Year="2010"/>
+<Message Remaining="0">
+<Response Action="RegistrarUpdate" FeId="9" FeSeq="2" OrigRegistrarId="1" RecipientRegistrarId="100" TransId="Test /tmp/srsregn-regression//submodules/SRS-EPP-Proxy/t/mappings/00-setup/create/00b-registrar-auth.yml 0 1">
+<FeTimeStamp Day="2" Hour="10" Minute="39" Month="8" Second="17" TimeZoneOffset="+12:00" Year="2010"/>
+<Registrar AccRef="n/a" Name="Model Registrar A" RegistrarId="100" URL="www.model-a.co.te">
+<RegistrarPublicContact Name="Model A Registrar" Email="support@model-a.co.te">
+<PostalAddress Address1="42 Seldon Lane" City="Agyropol" CountryCode="NZ" PostalCode="99001"/>
+<Phone AreaCode="9" CountryCode="99" LocalNumber="234-5678"/>
+<Fax AreaCode="9" CountryCode="99" LocalNumber="234-5679"/>
+</RegistrarPublicContact>
+<RegistrarSRSContact Name="Model A Registrar" Email="manager@model-a.co.te">
+<PostalAddress Address1="42 Seldon Lane" City="Agyropol" CountryCode="NZ" PostalCode="99001"/>
+<Phone AreaCode="9" CountryCode="99" LocalNumber="234-5678"/>
+<Fax AreaCode="9" CountryCode="99" LocalNumber="234-5679"/>
+</RegistrarSRSContact>
+<DefaultTechnicalContact Name="Model A Registrar" Email="support@model-a.co.te">
+<PostalAddress Address1="42 Seldon Lane" City="Agyropol" CountryCode="NZ" PostalCode="99001"/>
+<Phone AreaCode="9" CountryCode="99" LocalNumber="234-5678"/>
+<Fax AreaCode="9" CountryCode="99" LocalNumber="234-5679"/>
+</DefaultTechnicalContact>
+<EncryptKeys>
+<EncryptKey>
+<![CDATA[-----BEGIN PGP PUBLIC KEY BLOCK-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+mI0ES95VnwEEAJrnQXzbyd8mlBuFj3vqb7DNI0lfwYM8gDZrOTAV/YroK3xNjHmn
+hb+AUPrytt7UtUGQkhW78vv3Ydri6JMKFozYkm8xja31k+s5cinaOcvrhj97AZwy
+a1n2PrfoArBRQAk62f/gJK7pC0Pe8k8jNl82E/RmN859Wfi6ZC/Sl0djABEBAAG0
+OFNSUyBFUFAgUHJveHkgKERhZW1vbikgPHNycy1lcHAtcHJveHktc3JzcnBzQHNy
+cy5uZXQubno+iLwEEwECACYFAkveVZ8CGwMFCQHhM4AGCwkIBwMCBBUCCAMEFgID
+AQIeAQIXgAAKCRDlST+x5EQPb+hlA/0Y5l9TUAeZP58HLZmXkzIY3zFfS2Rasbnt
+OWjWx2MDlR3BiebK7dUtvhtPJtJVdOIPCOM+XC1qIXWLHW9oqoanuMHz3qWjXnXX
+cBdZHzkIwW1bwShJA41yCES7uoE5iDkFeCpRUHnL+d9pemIVGLlo1CALGye/T6QH
+aacYNfaA6A==
+=A2qP
+-----END PGP PUBLIC KEY BLOCK-----]]>
+</EncryptKey>
+</EncryptKeys>
+<EPPAuth Password="$5$S^XJmdcT$rxczpSnm1.sY12TcfPXaRS3Ckkenq9hFIpMzwXc7Lj."/>
+<Allowed2LDs>
+<SecondLD DomainName="co.te"/>
+<SecondLD DomainName="net.te"/>
+<SecondLD DomainName="org.te"/>
+</Allowed2LDs>
+<Roles>
+<Role RoleName="CancelDomain"/>
+<Role RoleName="Connect"/>
+<Role RoleName="CreateDomain"/>
+<Role RoleName="Query"/>
+<Role RoleName="QueryACL"/>
+<Role RoleName="Registrar"/>
+<Role RoleName="TransferDomain"/>
+<Role RoleName="UncancelDomain"/>
+<Role RoleName="UpdateDomain"/>
+<Role RoleName="UpdateRegistrar"/>
+<Role RoleName="Whois"/>
+</Roles>
+<AuditDetails ActionId="Test /tmp/srsregn-regression//submodules/SRS-EPP-Proxy/t/mappings/00-setup/create/00b-registrar-auth.yml 0 1" RegistrarId="1">
+<AuditTime>
+<From Day="02" Hour="10" Minute="39" Month="8" Second="17" TimeZoneOffset="+12:00" Year="2010"/>
+</AuditTime>
+<AuditText/>
+</AuditDetails>
+</Registrar>
+</Response>
+</Message>
+</Response>
+</NZSRSResponse>

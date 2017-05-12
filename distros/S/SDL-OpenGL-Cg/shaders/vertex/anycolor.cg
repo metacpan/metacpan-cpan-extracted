@@ -1,0 +1,15 @@
+struct main_output {
+  float4 position : POSITION;
+  float4 color    : COLOR;
+};
+
+main_output main (float4 position : POSITION,
+                  uniform float4 constantColor,
+		  uniform float4x4 modelViewProj) {
+  main_output OUT;
+  
+  OUT.position = mul(modelViewProj, position); 
+  OUT.color    = constantColor; 
+
+  return OUT;
+}

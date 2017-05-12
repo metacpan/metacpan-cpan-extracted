@@ -1,0 +1,28 @@
+---
+abstract: 'Smart match friendly tests.'
+author:
+  - 'Leon Timmermans <fawaka@gmail.com>'
+build_requires:
+  Test::More: 0
+  ok: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200000, CPAN::Meta::Converter version 2.101670'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: SmartMatch-Sugar
+requires:
+  Carp: 0
+  Class::Inspector: 0
+  Scalar::Util: 0
+  Sub::Exporter: 0
+  constant: 0
+  overload: 0
+  perl: 5.010
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=SmartMatch-Sugar
+  repository: git://github.com/Leont/smartmatch-sugar.git
+version: 0.05

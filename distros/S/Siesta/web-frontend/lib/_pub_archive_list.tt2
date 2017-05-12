@@ -1,0 +1,11 @@
+            <p>These are the available mailing lists on this system - some of them may have publicly available archives.</p>
+	    [% IF !session.user %]<p>By logging in you may be able to see more mailing lists and view more archives.</p>[% END %]
+            <table>
+            [% FOR list = Siesta.lists %]
+              <tr>
+                <td class='clsSubNav'><a href="list.tt2?list=[% list.name %]">[% list.name %]</a></td>
+                <td class='clsDescription'>[% list.description %]</td>
+                <td class='clsSmallLink'><a href="archive/[% list.name %]">archive</a></td>
+              </tr>
+            [% END %]
+            </table>

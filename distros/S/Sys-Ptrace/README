@@ -1,0 +1,73 @@
+NAME
+    Sys::Ptrace - Perl interface to the ptrace(2) command
+
+SYNOPSIS
+      use Sys::Ptrace qw(ptrace PTRACE_TRACEME);
+
+      ptrace( PTRACE_TRACEME, $pid, $addr, $data );
+
+EXAMPLES
+      use Sys::Ptrace qw(ptrace PTRACE_SYSCALL PTRACE_CONT PTRACE_TRACEME);
+
+      ptrace(PTRACE_SYSCALL, $pid, undef, undef);
+
+      ptrace(PTRACE_CONT, $pid, undef, undef);
+
+      ptrace(PTRACE_TRACEME, $$, 0, 0);
+
+DESCRIPTION
+    Perl interface to the ptrace(2) command. This module is meant to be used
+    mostly for debugging purposes and for black box testing where the source
+    code is generally not available or unknown. This may also prove useful
+    when the program or script in question has already been compiled to a
+    binary or it is third party code.
+
+  EXPORT
+    ptrace( $request, $pid, $addr, $data)
+
+      Returns true on success and sets $! on failure.
+
+  EXPORT_OK
+      PT_ATTACH
+      PT_CONTINUE
+      PT_DETACH
+      PT_GETFPREGS
+      PT_GETFPXREGS
+      PT_GETREGS
+      PT_KILL
+      PT_READ_D
+      PT_READ_I
+      PT_READ_U
+      PT_SETFPREGS
+      PT_SETFPXREGS
+      PT_SETREGS
+      PT_STEP
+      PT_SYSCALL
+      PT_TRACE_ME
+      PT_WRITE_D
+      PT_WRITE_I
+      PT_WRITE_U
+      ptrace
+
+    and all PTRACE_* constants defined in linux/ptrace.h and asm/ptrace.h
+
+BUGS
+    It is designed specifically for linux OS on the x86 and x86_64
+    platforms. It is not meant to be tested or used on any other system at
+    this time. Any portability changes and/or bug fixes should be sent to
+    the author.
+
+AUTHOR
+    Rob Brown, rob@roobik.com
+
+COPYRIGHT
+    Copyright (c) 2001 Rob Brown. All rights reserved.
+
+    Copyright (c) 2012 John Lightsey. All rights reserved.
+
+    This program is free software; you may redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    ptrace(2)
+

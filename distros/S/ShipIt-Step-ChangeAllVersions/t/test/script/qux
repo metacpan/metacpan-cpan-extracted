@@ -1,0 +1,10 @@
+#!perl -w
+package App::qux;
+
+use strict;
+
+our $VERSION = qq(0.001);
+
+sub App::qux::qux { 42 }
+
+1;

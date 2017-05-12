@@ -1,0 +1,16 @@
+Revision history for Perl extension Sort-strverscmp
+
+0.014 2016-07-21T03:10:34Z
+
+    - Remove documentation for `strverssort`.
+
+0.013 2016-07-20T01:44:32Z
+
+    - Fix issuing causing Perl "5.10", aka, "5.100" to be required.
+    - Add support for using `strverscmp` as the `SUBNAME` in a `sort SUBNAME LIST`.
+
+0.012 2015-10-29T03:39:45Z
+
+    - Added `versionsort` alias for `strverssort` to match GNU function name.
+    - Initial changelog.
+

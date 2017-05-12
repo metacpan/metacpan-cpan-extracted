@@ -1,0 +1,180 @@
+#!/usr/bin/perl
+use SIL::Shoe::Diff3;
+use SIL::FS;
+use Algorithm::Merge qw(merge traverse_sequences3);
+use Symbol;
+use Getopt::Std;
+
+@rules = (
+    ['text/shoebox', 'merge_shoebox'],
+    ['text', 'merge_lines'],
+    );
+
+getopts('m:q');
+
+unless (defined $ARGV[3])
+{
+    die <<'EOT';
+zipmerge [-m manifest] [-q] basedir newdir1 newdir2 outdir
+
+Merges the differences between newdir1 and basedir and the differences
+between newdir2 and basedir, to produce a new basedir output to outdir.
+Each of these directories may be a .zip file in which case the directory is
+considered to be inside the .zip file. Output may also be to a .zip file.
+
+ -m manifest  Specifies a manifest file containing a list of files to process
+              file type [-option value [-option value [...]]]
+              types are: MIME types e.g. text/application
+ -q           quiet
+EOT
+}
+
+foreach $fname (@ARGV[0..2])
+{
+    my ($fs);
+    if ($fname =~ m/\.zip$/oi)
+    { $fs = SIL::FS::Zip->new($fname, -manfile => $opt_m); }
+    else
+    {
+        $fs = SIL::FS::File->new($fname, -manfile => $opt_m);
+        $fs->remove_list(File::Spec->rel2abs($ARGV[0])) if ($ARGV[0] =~ m/\.zip$/oi);
+    }
+    push (@fs, $fs);
+}
+
+if ($ARGV[3] =~ m/\.zip$/oi)
+{ $outfs = SIL::FS::Zip->new(); }
+else
+{ $outfs = SIL::FS::File->new($ARGV[3]); }
+
+# merge the manifests as an unordered list, so may result in re-orderings
+# in the output manifest. Output the merged file here and remove from the
+# working manifest.
+if ($opt_m)
+{
+    foreach $fs (@fs)
+    { push (@ms, [map {[$_, @{$fs->{'manifest'}{$_}}]} sort keys %{$fs->{'manifest'}}]); }
+    @mans = merge(@ms, { CONFLICT => sub {
+        my ($l, $r) = @_;
+        
+        if ($l->[0] ne $r->[0])
+        { return ($l, $r); }
+        elsif ($l->[1] ne $r->[1])
+        {
+            print STDERR "Conflicting types for $l->[0] found. Selecting the strictest\n";
+            $ln = -1; $lr = -1;
+            for ($i = 0; $i < @rules; $i++)
+            {
+                if ($ln == -1 && $l->[1] =~ m/$rules->[0]/oi)
+                { $ln = $i; }
+                if ($rn == -1 && $r->[1] =~ m/$rules->[0]/oi)
+                { $rn = $i; }
+            }
+            if ($ln < $rn)
+            { return $l; }
+            else
+            { return $r; }
+        }
+        else
+        {
+            print STDERR "Conflicting parameters for $l->[0]. Outputting both. Needs manual fixing!\n";
+            return ($l, $r);
+        }}}, sub { join("\t", $_[0]->[0], $_[0]->[1], %{$_[0]->[2]}); });
+    $outfs->put_lines($opt_m, map{join("\t", $_->[0], $_->[1], %{$_->[2]})} @mans);
+    %manifest = map {$_->[0] => [$_->[1], $_->[2]]} @mans;
+    delete $manifest{$opt_m};
+    foreach $fs (@fs)
+    { 
+        $fs->{'manifest'} = \%manifest;
+        $fs->{'filelist'} = [sort keys %manifest];
+    }
+}
+
+traverse_sequences3($fs[0]->{'filelist'}, $fs[1]->{'filelist'}, $fs[2]->{'filelist'}, {
+    NO_CHANGE => sub { match3(@fs, map {$fs[$_]{'filelist'}[$_[$_]]} (0 .. 2)); },
+    DIFF_A => sub {
+        if (scalar @_ == 2)
+        {
+            output_file($fs[1], $fs[1]->{'filelist'}[$_[-2]]);
+            output_file($fs[2], $fs[2]->{'filelist'}[$_[-1]]);
+        }
+        elsif (scalar @_ == 3)
+        { print STDERR "File lists clashing!: $fs[0]->{'filelist'}[$_[0]], $fs[1]->{'filelist'}[$_[1]], $fs[2]->{'filelist'}[$_[2]]\n"; }},
+    DIFF_B => sub {
+        if (scalar @_ == 1)
+        { output_file($fs[1], $fs[1]->{'filelist'}[$_[0]]); }
+        elsif (scalar @_ == 3)
+        { print STDERR "File lists clashing!: $fs[0]->{'filelist'}[$_[0]], $fs[1]->{'filelist'}[$_[1]], $fs[2]->{'filelist'}[$_[2]]\n"; }},
+    DIFF_C => sub {
+        if (scalar @_ == 1)
+        { output_file($fs[2], $fs[2]->{'filelist'}[$_[0]]); }
+        elsif (scalar @_ == 3)
+        { print STDERR "File lists clashing!: $fs[0]->{'filelist'}[$_[0]], $fs[1]->{'filelist'}[$_[1]], $fs[2]->{'filelist'}[$_[2]]\n"; }},
+    CONFLICT => sub {
+        print STDERR "File lists clashing!: $fs[0]->{'filelist'}[$_[0]], $fs[1]->{'filelist'}[$_[1]], $fs[2]->{'filelist'}[$_[2]]\n"; }
+    });
+    
+if ($ARGV[3] =~ m/\.zip$/oi)
+{ $outfs->writeTo($ARGV[3]); }
+
+sub output_file
+{
+    my ($fs, $fname) = @_;
+    $outfs->put_str($fname, $fs->get_str($fname));
+    print STDERR "Outputting $fname\n" unless $opt_q;
+}
+
+sub match3
+{
+    my ($fs0, $fs1, $fs2, $fn0, $fn1, $fn2) = @_;
+    my ($type, $opts) = @{$fs0->{'manifest'}{$fn0}};
+    my ($r, $found);
+    
+    print STDERR "merging: $fn0, $fn1, $fn2\n" unless $opt_q;
+    foreach $r (@rules)
+    {
+        if ($type =~ /$r->[0]/)
+        {
+            &{$r->[1]}(@_, %{$opts});
+            $found = 1;
+            last;
+        }
+    }
+    merge_lines(@_) unless $found;
+}
+
+sub merge_lines
+{
+    my ($fs0, $fs1, $fs2, $fn0, $fn1, $fn2, %opts) = @_;
+    my (@lines, $ccount);
+    
+    $lines[0] = [$fs0->get_lines($fn0)];
+    $lines[1] = [$fs1->get_lines($fn1)];
+    $lines[2] = [$fs2->get_lines($fn2)];
+    
+    $outfs->put_lines($fn0, merge(@lines, { CONFLICT => sub ($$) { $ccount++; (
+        q{<!-- ------ START CONFLICT ------ -->},
+        (@{$_[0]}),
+        q{<!-- ---------------------------- -->},
+        (@{$_[1]}),
+        q{<!-- ------  END  CONFLICT ------ -->},
+    ) }}));
+    print STDERR "$fn0: $ccount clashes!\n" if ($ccount && !$opt_q);
+}
+
+sub merge_shoebox
+{
+    my ($fs0, $fs1, $fs2, $fn0, $fn1, $fn2, %opts) = @_;
+    my (@fs) = ($fs0, $fs1, $fs2);
+    my (@fn) = ($fn0, $fn1, $fn2);
+    my (@sh, $fsc, @lines, $i, @fh, $ccount);
+    
+    for ($i = 0; $i < 3; $i++)
+    {
+        my ($lines) = $fs[$i]->get_str($fn[$i]);
+        push (@fh, SIL::FS::Scalar->new(\$lines));
+    }
+    
+    $outfs->put_str($fn0, SIL::Shoe::Diff3->shmerge(@fh, -ccountref => \$ccount, %opts));
+    print STDERR "$fn0: $ccount clashes!\n" if ($ccount && !$opt_q);
+}

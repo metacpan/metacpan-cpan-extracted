@@ -1,0 +1,20 @@
+# Info contact on a handle with phone/fax numbers
+
+template: info-contact.tt
+
+vars:
+  contact_id: 04f
+
+input_assertions:
+  class: SRS::EPP::Command::Info::Contact
+
+output_assertions:
+  count:
+    - [ '//epp:result', 1, 'SRS: Check for one result' ]
+  match:
+    - [ '//contact:voice', '+64.4123456', 'Phone number correct']
+    - [ '//contact:fax', '+64.4123666', 'Fax number correct']
+  match_all: ~
+  attr_is:
+    - [ '//epp:result', 'code', 1000, 'SRS: Check for correct result code' ]
+    - [ '//contact:voice', 'x', 'ext 1', 'Extention correct']

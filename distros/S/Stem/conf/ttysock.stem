@@ -1,0 +1,8 @@
+# ttysock.stem
+#
+# drive this from the command line with
+# tty_host and tty_port
+[
+	class	=>	'Stem::TtySock',
+	args	=>	[],
+],

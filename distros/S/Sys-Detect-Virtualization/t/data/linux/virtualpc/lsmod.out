@@ -1,0 +1,34 @@
+Module                  Size  Used by
+ipv6                  229856  23 
+dm_snapshot            17020  0 
+dm_mirror              20080  0 
+dm_mod                 53144  2 dm_snapshot,dm_mirror
+de4x5                  43520  0 
+ftdi_sio               29672  0 
+usbserial              29352  1 ftdi_sio
+ehci_hcd               28968  0 
+ohci_hcd               18628  0 
+uhci_hcd               29744  0 
+usb_storage            78176  0 
+usbkbd                  6752  0 
+usbcore               119364  7 ftdi_sio,usbserial,ehci_hcd,ohci_hcd,uhci_hcd,usb_storage,usbkbd
+nls_iso8859_1           4096  0 
+nls_cp437               5760  0 
+vfat                   12032  0 
+fat                    48764  1 vfat
+floppy                 56804  0 
+sd_mod                 17200  0 
+sr_mod                 16964  0 
+scsi_mod              135688  3 usb_storage,sd_mod,sr_mod
+ide_cd                 39076  0 
+cdrom                  36352  2 sr_mod,ide_cd
+rtc                    11828  0 
+ext3                  125960  1 
+jbd                    50676  1 ext3
+mbcache                 8164  1 ext3
+ide_disk               15584  3 
+generic                 4612  0 [permanent]
+piix                    9956  0 [permanent]
+ide_core              116788  5 usb_storage,ide_cd,ide_disk,generic,piix
+evdev                   9408  0 
+mousedev               11328  0 

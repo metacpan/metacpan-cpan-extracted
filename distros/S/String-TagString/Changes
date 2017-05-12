@@ -1,0 +1,19 @@
+Revision history for String-TagString
+
+0.005     2013-12-25 22:31:49-0500 America/New_York
+          fix version number, repo links
+
+0.004     2013-07-07 07:42:03 America/New_York
+        repackage, update bugtracker and repo
+
+0.003   2010-05-20
+        more documentation
+        disallow undef in arrayref tags
+        disallow tagstrings with multiple contradictory tag entries
+
+0.002   2009-02-03
+        some quoting and escaping fixes
+
+0.001   2009-02-01
+        First version, released on an unsuspecting world.
+

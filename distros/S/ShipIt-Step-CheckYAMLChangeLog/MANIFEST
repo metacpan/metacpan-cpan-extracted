@@ -1,0 +1,21 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/StandardTests.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+inc/Test/Compile.pm
+inc/Test/More.pm
+inc/UNIVERSAL/require.pm
+lib/ShipIt/Step/CheckYAMLChangeLog.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/01_misc.t
+t/README

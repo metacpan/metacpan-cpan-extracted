@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+Makefile.PL
+SlideShow.pm
+test.pl
+examples/slideshow-master
+examples/nph-slideshow-viewer

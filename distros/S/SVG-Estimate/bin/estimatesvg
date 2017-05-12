@@ -1,0 +1,94 @@
+#!/usr/bin/env perl
+
+=head1 NAME
+
+estimatesvg - Do quick estimations of files via the CLI.
+
+=head1 VERSION
+
+version 1.0107
+
+=head1 SYNOPSIS
+
+ estimatesvg /path/to/file.svg
+
+=head1 OPTIONS
+
+ -h --help      Display help.
+ -c --csv       Output CSV data about the estimate.
+
+=cut
+
+use strict;
+use warnings;
+use lib '../lib', 'lib';
+use SVG::Estimate;
+use feature 'say';
+use Getopt::Long;
+use Time::HiRes qw(tv_interval gettimeofday);
+
+my $csv;
+my $help;
+my $dpi = 72;
+my $summarize = 0;
+
+GetOptions(
+    'h|help'       => \$help,
+    'c|csv'        => \$csv,
+    's|summarize'  => \$summarize,
+    'dpi=i'        => \$dpi,
+);
+
+if ($help) {
+    say "Usage: $0 /path/to/file.svg";
+    exit;
+}
+
+if ($csv) {
+    ##Horrible, schlocky, approximate CSV generation
+    say join ",", 'File',
+                  "Total(px)", "Total(in)",
+                  "Shape(px)", "Shape(in)",
+                  "Travel(px)", "Travel(in)",
+                  "Shapes",
+                  ;
+}
+
+my $t0 = [gettimeofday];
+
+foreach my $file (@ARGV) {
+    unless (-f $file) {
+        say "$file not found";
+        next;
+    }
+
+    my $se = SVG::Estimate->new(file_path => $file, summarize => $summarize, );
+    $se->estimate;
+    if ($csv) {
+        say join ",", $file,
+                      $se->round($se->length,0), $se->round($se->length / $dpi),
+                      $se->round($se->shape_length,0), $se->round($se->shape_length / $dpi),
+                      $se->round($se->travel_length,0), $se->round($se->travel_length / $dpi),
+                      $se->shape_count,
+                      ;
+    }
+    else {
+        say $file;
+        say "\tTotal Length: ".$se->round($se->length,0)."px ". $se->round($se->length / $dpi)."in";
+        say "\tShape Length: ".$se->round($se->shape_length,0)."px ". $se->round($se->shape_length / $dpi)."in";
+        say "\tTravel Length: ".$se->round($se->travel_length,0)."px ". $se->round($se->travel_length / $dpi)."in";
+        say "\tShapes: ".$se->shape_count;
+        my $width = abs($se->max_x - $se->min_x);
+        my $height = abs($se->max_y - $se->min_y);
+        say "\tx(min, max): (".$se->round($se->min_x)."px, ".$se->round($se->max_x)."px)";
+        say "\ty(min, max): (".$se->round($se->min_y)."px, ".$se->round($se->max_y)."px)";
+        say "\tWidth: ".int($width)."px ".$se->round($width / $dpi)."in";
+        say "\tHeight: ".int($height)."px ".$se->round($height / $dpi)."in";
+    }
+}
+
+my $elapsed = tv_interval ( $t0 );
+
+unless ($csv) {
+    say "Processed in $elapsed seconds.";
+}

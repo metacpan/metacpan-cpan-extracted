@@ -1,0 +1,4 @@
+Revision history for SMS-Send-WebSMS: 0.001
+
+0.001     2015-01-09 11:16:46+01:00 Europe/Vienna
+    - Initial release using the HTTPS JSON API

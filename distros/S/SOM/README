@@ -1,0 +1,55 @@
+Currently only OS/2 is supported.
+Start Makefile.PL like this:
+
+  perl Makefile.PL TOOLKIT=F:/TOOLKIT
+
+(we need to know the path to the toolkit header files and libraries).
+
+Now Makefile.PL has some code to determine the location automatically.
+
+=========================================================================
+
+To run t/animal.t and t/wrong_method.t: put animals.dll (from the TOOLKIT
+samples) in the current directory, and make sure that SOM.IR from the animal
+directory is on your SOMIR path.
+
+If the voodoo in the current versions of these tests is voodooish enough,
+this should work automatically now.
+
+=========================================================================
+Possible bugs: I could not manage to make starting up SOMDD and WPDServer
+as reliable as I want it.  I put workarounds against many
+bugs/undocumented-limitations, but still things are not that good.  Things
+run smoothly if the deamons are already running.
+
+Thus the test scripts won't shutdown the servers unless
+$ENV{PERLTEST_SHUTDOWN_SERVERS} is true.
+
+=====================  What to do if the servers get stuck?
+
+Sometimes killing WPS and SOMDD (in this order?) helps.  There is a tool
+in utils/dsom_shutdown_servers.pl which performs the shutdown of
+DSOM in a documented way (with many fallbacks), but it usually blocks.
+Killing the blocked utility is benign.
+
+To clean this condition: 
+
+  a) run utils/dsom_shutdown_servers.pl (probably some errors are going
+	to be reported);
+
+  b) kill the second copy of PMSHELL (if it would not die itself
+	when SOMDD terminates);
+
+  c) run utils/dsom_start_servers.pl.
+
+[Fact: when WinRestartWPDServer() returns success, WinIsWPDServerReady()
+ does not return true for a *long* time (may be a second).
+
+ Conjecture: even after WinIsWPDServerReady() returns true (we wait for this),
+ the server is not yet actually ready.  This is why starting it several
+ seconds before the tests makes everything run smoothly.
+
+ No, putting a 5sec delay does not help...  The damage happens when the
+ servers are shut down.  This is why everything is OK if the servers
+ run before starting the tests: then they are not shut down by the tests.
+]

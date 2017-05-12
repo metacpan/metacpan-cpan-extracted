@@ -1,0 +1,164 @@
+Revision history for Perl extension SVG::TT::Graph.
+
+0.25 Tue 14 Apr 2015 21:26:11
+    - Make TimeSeries accept max_scale_value. (FGasper)
+    - Teach TimeSeries to accept a time zone for date display. (FGasper)
+
+0.24 Wed 9 Jul 2014 19:23:11
+    - Added config.show_path_title to control whether to include new
+      title attribute in path tag, default to '0' (mikejbwhoo)
+    - Added TITLE attribute to PATH tag in SHOW DATA section (mikejbwhoo)
+    - Added config.show_title_fields to allow for fields array element to
+      be shown instead of title attribute used in add_data, looks nice
+      when creating non-overlapping bars, default to '0' (mikejbwhoo)
+    - Above changes made only to Pie, Bar, BarHorizontal, BarLine
+      (mikejbwhoo)
+
+0.23 Mon 4 Feb 2013 21:14:40
+    - fix division by zero errors in all graph types (Carsten Wolff)
+    - Doc clarification (elnjensen)
+
+0.22 Sun 14 Oct 2012 09:43:58
+    - Link to github for issue tracking
+    - Allow reversed y-axis (elnjensen)
+    - Add missing class for data point labels (snabb)
+
+0.21
+  - New type of graph available: XY (written by Florent Angly, but largely based
+    on the TimeSeries module by David Meibusch)
+
+0.20
+  - Fixed wrong formatting of Y labels in SVG::TT:Graph::BarHorizontal (patch by
+    Erin Schönhals)
+  - Fixed wrong formatting of Y labels in SVG::TT::Graph::Bar
+
+0.19
+  - Fixed warning messages with missing data title (#69691, reported by
+    dean@fragfest.com.au, patch by Florent Angly)
+
+0.18 - Thu  5 Jan 2012
+  - Added format_x_axis, format_y_axis callback options (Eric Johnson)
+
+0.17 - Wed Jul 20 2011
+  - By default, do not compress() or tidy() the SVG
+  - Line and Timeseries graphs now have points styled as '.dataPointNN',
+    consistently with BarLine graphs (patch from Henrik Pauli, #67834)
+  - Added a max_scale_value option to set the maximum value for the Y axis of
+    Bar and Line graphs (patch by Bryce and Henrik Pauli, #20475)
+  - Repackaged module without extra files (#56718)
+
+0.16 - Sun Apr 18 2010
+  - Javascript code in the piechart and timeseries put into a CDATA tag
+
+0.15 - Sat Apr 17 2010
+  - Method get_template() moved from SVG::TT::Graph::* to SVG::TT::Graph to avoid redundancy
+  - Fixed bug in get_template(). The DATA filehandle is now read from the beginning
+    at each get_template call
+  - Makefile.PL does not use autoinstall aymore (not a good practice for CPAN modules)
+  - Rollover improvements in piechart
+
+0.14 - Mon Apr 05 2010
+  - Fixed some unit tests and the URL of the repository
+
+0.13 - Sat Apr 03 2010
+  - Revised TT templates warnings due to undef values (bug # 44115)
+  - Fixed the "used only once" warnings (bug # 43854, thank you Ia Hun)
+  - Introduced a new method to use random colors instead of the 12 predefined
+    colors. Along with the dynamic allocation of the number of style elements,
+    this allows an unlimited number of dataseries
+  - Added Javascript code to display field name when the mouse rolls over a
+    piechart wedge
+  - Implemented an optional new method to tidy the formatting of the SVG files
+    (using XML::Tidy)
+  - Replaced carriage returns by line feeds because it is more portable
+    (http://www.webmasterworld.com/forum13/4067.htm)
+  - Did documentation, unit testing and packaging revisions
+  - Misc little code touch ups
+
+0.12 - Mon Feb 16 12:00:00 EST 2009
+  -  Missed updating the versions for some of the sub libraries.
+
+0.11 - Sun Feb 15 22:54:00 EST 2009
+  - Applied patches:
+    http://rt.cpan.org/Ticket/Display.html?id=38441 - Ampersands in Fields cause XML error
+    http://rt.cpan.org/Ticket/Display.html?id=43326 - Multiple data sets in Bar.pm will now show stacked graphs
+    http://rt.cpan.org/Ticket/Display.html?id=43325 - Allow toggling the display of data on TimeSeries
+
+0.10 - Mon Apr 28 21:07:30 BST 2008
+  - Applied patches:
+    http://rt.cpan.org/Ticket/Display.html?id=34491
+    http://rt.cpan.org/Ticket/Display.html?id=22896
+    http://rt.cpan.org/Ticket/Display.html?id=20828
+    http://rt.cpan.org/Ticket/Display.html?id=20475
+
+0.09
+  - Applied path patch for Firefox from Pat Ekman for Pie
+  - patched other modules so Firefox works (doesn't like comma's in a path)
+
+0.08
+  - Fix stylesheet for Pie
+
+0.07
+  Help from Yanick with the following:
+
+  - Bug fixes:
+    #7342 (bad default stylesheet class)
+    #8680 (Typo in defaut Stylesheet for SVG::TT::Graph::TimeSeries)
+    #7541 (BarHorizontal)
+    #7549 (Character width setting in BarHorizontal)
+
+0.06
+  - Put in comment so people know where to copy the
+    style sheet from (e.g. not including the <style> or CDATA)
+
+0.05 (dev)
+  David Meibusch changes:
+  - Calls calculations() prior to burn if available
+  - 'calc' now passed to template if available
+  - _range_calc has moved from TimeSeries.pm to Graph.pm
+
+  TimeSeries:
+  - rollover_values
+  - data_value_format
+  - max_time_span
+  - y_label_format
+  - rotate_x_labels
+
+  Other changes:
+  - Renamed README to INSTALL
+  - rotate_x_labels added
+  - y_title_text_direction added
+  - scale_integers added
+  - Minor doc patch "\r\n" to "\r\n\r\n"
+  - Stylesheet presets increased (from 10) to support 12 datasets
+  - Bug fix regarding show_data_values with Bar
+  - Bug fix with scales of values under 5
+  - Added BarLine as a graph module
+  - Added TimeSeries as a graph module - by David
+  - Added Prereq of 'DateTime' - lots of modules but
+    don't think it's bad to encourage people to use it
+  - Altered style sheet from fill-opacity: 0.2; to fill-opacity: 0.5;
+
+0.04 Wed Sept 24 2003
+  - Patch from David Meibusch for Pie if slice > 50%
+  - Patch from David Meibusch for Line to add 'stacked' option
+
+0.03  Wed Aug 28
+  - Doc fix thanks to Mike Castle
+  - Renaming (sorry, thought it best to do ASAP)
+  - y_marker  to  scale_divisions
+  - xfields   to  fields
+  - y_start   to  min_scale_value
+  - stagger_x_labels method added to Bar and Line
+  - bar_gap method added to Bar and BarHorizontal
+  - made the padding clever depending on length
+    of labels, including the key.
+
+0.02  Thurs Aug 21 17:16:09 2003
+  - Now with added Pie!!
+  - oh, and tests
+  - and docs
+  - and methods for changing config after constructor
+
+0.01  Wed Aug 20 11:26:09 2003
+  - First public release - well if PAUSE was up

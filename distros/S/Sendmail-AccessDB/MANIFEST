@@ -1,0 +1,15 @@
+Changes
+lib/Sendmail/AccessDB.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+Sendmail-AccessDB-1.03.tar.gz
+Sendmail-AccessDB-1.04.tar.gz
+t/01_ini.t
+t/02_expand.t
+t/03_functions.t
+t/test
+t/test.db
+META.json                                Module JSON meta-data (added by MakeMaker)

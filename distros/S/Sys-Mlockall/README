@@ -1,0 +1,30 @@
+Sys-Mlockall version 0.01
+=========================
+
+This module provides a quick-and-dirty interface to the mlockall() and
+munlockall() system calls. mlockall() can be used to prevent your process's
+memory from being placed in swap, which can be useful for scripts that
+deal with sensitive information (passwords / RSA keys / stardrive plans / etc).
+
+INSTALLATION
+
+Note that running the unit tests requires root permissions, and also requires
+that the BSD::Resource module be installed.
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+LICENCE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+MAINTAINER
+
+Tyler MacDonald <japh@crackerjack.net>
+

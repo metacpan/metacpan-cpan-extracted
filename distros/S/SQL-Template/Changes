@@ -1,0 +1,15 @@
+Revision history for SQL-Template
+
+0.2.2   22/04/2014
+	    Improved test suite
+	    
+0.2.1   21/04/2014
+	    Add missing dependencies to testing process
+	    
+0.2.0   20/04/2014
+	    Released to github repository
+        New build process with dzil
+
+0.1.0   02/10/2009
+        First version
+

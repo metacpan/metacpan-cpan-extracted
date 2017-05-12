@@ -1,0 +1,32 @@
+Revision history for Perl extension SVG::Grid.
+
+1.04  2017-04-22T11:52:00
+	- Patch t/test.t so that before comparing shipped SVG with generated one, zap within those
+		2 files the versions #s of the SVG modules which created the files. This is necessary
+		because I generated data/synopsis.svg with SVG V 2.64, but any version might be
+		installed on another machine. See #RT212178. Thanx to Slaven Rezic for the report.
+
+1.03  2016-08-14T11:33:00
+	- Stop using Test::Stream. Use Test::More shipped in the Test::Simple distro.
+		See RT#116932. Thanx to Chad Granum.
+	- Update version #s in pre-reqs.
+	- Adopt new repo structure. For details, see
+		http://savage.net.au/Ron/html/My.Workflow.for.Building.Distros.html.
+	- Update .gitignore and MANIFEST.SKIP.
+	- Move File::Spec, File::Temp, Test::Pod and Test::Simple to TEST_REQUIRES within Makefile.PL.
+	- Change licence from Artistic to Perl.
+
+1.02  2016-03-21T13:44:00
+	- Patch image_link() to return the auto-generated id of the image element. Likewise,
+		rectangle_link() returns the id of the rectangle element and text_link() returns the id
+		of the text element.
+	- Patch t/test.t to clean up the string name of the test.
+
+1.01  2016-02-25T13:53:00
+	- No code changes.
+	- After I had a fight with github, git updated t/test.t to restore the obsolete name cell.svg
+		instead of synopsis.svg as the file to be compared to the output of the test, so the test
+		failed.
+
+1.00  2016-02-21T15:05:00
+	- Original version

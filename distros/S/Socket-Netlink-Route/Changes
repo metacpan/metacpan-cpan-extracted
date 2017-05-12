@@ -1,0 +1,30 @@
+Revision history for Socket-Netlink-Route
+
+0.05    BUGFIXES:
+         * s/set_nlattrs/change_nlattrs/ since that's the actual method name
+
+0.04    CHANGES:
+         * Renamed 'mac' to 'lladdr'
+         * Implemented nlattr packing functions
+         * Updated for IO::Socket::Netlink 0.04
+
+0.03    CHANGES:
+         * Use rtnl_link_stats rather than net_device_stats, because that's
+           the correct structure
+         * Prefer to obtain inet_ntop from Socket rather than Socket6
+         * Optionally skip IFALIAS because older libcs/kernels don't have it
+
+0.02    ADDITIONS:
+         * Direct accessors for IfaddrMsg's prefix and RtMsg's src and dst
+         * RTM_{NEW,DEL,GET}NEIGH and associated message class
+         * Multicast group constants
+
+        CHANGES:
+         * Don't hard-depend on Socket6; just use it if it's available
+
+        BUGFIXES:
+         * Declare build_requires ExtUtils::H2PM
+
+0.01    First version, released on an unsuspecting world.
+
+

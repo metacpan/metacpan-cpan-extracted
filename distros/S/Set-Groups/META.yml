@@ -1,0 +1,19 @@
+---
+name: Set-Groups
+version: 0.8
+author:
+  - 'Jacquelin Charbonnel <jacquelin.charbonnel at math.cnrs.fr>'
+abstract: A set of groups.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Test::More: 0
+provides:
+  Set::Groups:
+    file: lib/Set/Groups.pm
+    version: 0.8
+generated_by: Module::Build version 0.2807
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,38 @@
+---
+name: Scalar-Andand
+version: 0.05
+author:
+  - 'Leon Timmermans <leont@cpan.org>'
+abstract: Guarded method invocation.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Test::Exception: 0
+  Test::More: 0
+  Test::Warn: 0
+requires:
+  Class::Null: 0
+  autobox::Core: 0
+  perl: 5.008
+configure_requires:
+  Module::Build: 0.340201
+dynamic_config: 0
+provides:
+  Scalar::Andand:
+    file: lib/Scalar/Andand.pm
+    version: 0.05
+  Scalar::Andand::Scalar:
+    file: lib/Scalar/Andand/Scalar.pm
+    version: 0.05
+  Scalar::Andand::Undef:
+    file: lib/Scalar/Andand/Undef.pm
+    version: 0.05
+no_index:
+  package:
+    - Scalar::Andand::Undef
+    - Scalar::Andand::Scalar
+generated_by: Module::Build version 0.340201
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

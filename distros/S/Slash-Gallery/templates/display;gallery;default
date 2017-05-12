@@ -1,0 +1,109 @@
+__section__
+default
+__description__
+
+__title__
+
+__page__
+gallery
+__lang__
+en_US
+__name__
+display
+__template__
+[% mytitle = BLOCK %][% FILTER strip_literal %]
+[% Slash.getData('header') %]: [% picture.name %]
+[% END; END; INCLUDE titlebar title => mytitle %]
+
+<TABLE BORDER="0" WIDTH="99%" CELLPADDING="5"><TR>
+<TD VALIGN="top" WIDTH="[% sizes.small.width + 10 %]"
+><IMG SRC="[% constants.rootdir %]/gallery.pl?op=view&amp;size=small&amp;pic_id=[% pic_id %]"></TD>
+<TD VALIGN="top" WIDTH="[% sizes.small.width * 2 %]">
+	<P><B>[% picture.name | strip_literal %]</B><BR>
+	   <EM>[% Slash.timeCalc(picture.date) %]</EM></P>
+	<P><BLOCKQUOTE>[% picture.description | strip_literal %]</BLOCKQUOTE></P>
+
+[%# you can basically use any EXIF tags here you want!  yay! %]
+	<P><FONT FACE="[% constants.mainfontface %]" SIZE="-1">
+	<B>Exposure time</B>: [% picture.info.ExposureTime.smart %] seconds<BR>
+	<B>Focal length</B>: [% picture.info.FocalLength + 0 %] mm<BR>
+	<B>F-stop</B>: [% picture.info.FNumber + 0 %]<BR>
+	<B>ISO</B>: [% picture.info.ISOSpeedRatings %]<BR>
+	<B>Flash</B>: [%
+	IF picture.info.Flash == 'Yes';
+		name = 'CoolPix-FlashSetting';
+		IF picture.info.$name;
+			'Yes: '; picture.info.$name.lc.ucfirst;
+		ELSE;
+			'Yes';
+		END;
+	ELSE;
+		'No';
+	END %]<BR>
+	[%- name = 'CoolPix-AFFocusPosition'; IF picture.info.$name %]
+	<B>Focus</B>: [% picture.info.$name %] ([% name = 'CoolPix-FocusMode'; picture.info.$name %])<BR>
+	[%- END %]
+	<B>Camera</B>: [% picture.info.Make.lc.ucfirst %] [% picture.info.Model %]
+
+	<P><B>Picture ID</B>: [% picture.id %]
+	[%- IF is_admin %]
+	<BR><B>File name</B>: [% picture.filename %]
+	[%- END %]
+	</FONT></P>
+
+<P><SMALL>[% PROCESS picture_menu %]</SMALL></P></TD></TR></TABLE>
+
+<BR CLEAR="ALL">
+
+[% IF is_admin %]
+<FORM METHOD="POST" ACTION="[% constants.rootdir %]/gallery.pl">
+<TABLE BORDER="0" WIDTH="99%">
+	<TR>
+		<TD>Name</TD>
+		<TD><INPUT NAME="name" VALUE="[% picture.name | strip_attribute %]" SIZE="60"></TD>
+	</TR>
+[%# don't care
+	<TR>
+		<TD>UID</TD>
+		<TD><INPUT NAME="uid"  VALUE="[ picture.uid | strip_attribute ]" SIZE="6"></TD>
+	</TR>
+%]
+	<TR>
+		<TD>Rotate</TD>
+		<TD><SELECT NAME="rotate">
+			<OPTION VALUE="0"[% ' SELECTED' IF picture.rotate == 0 %]>0 degrees</OPTION>
+			<OPTION VALUE="1"[% ' SELECTED' IF picture.rotate == 1 %]>90 degrees</OPTION>
+			<OPTION VALUE="2"[% ' SELECTED' IF picture.rotate == 2 %]>180 degrees</OPTION>
+			<OPTION VALUE="3"[% ' SELECTED' IF picture.rotate == 3 %]>270 degrees</OPTION>
+		</SELECT></TD>
+	</TR>
+	<TR>
+		<TD>Date</TD>
+		<TD><INPUT NAME="date" VALUE="[% picture.date | strip_attribute %]" SIZE="30"></TD>
+	</TR>
+
+	<TR>
+		<TD>Description</TD>
+		<TD><TEXTAREA NAME="description" ROWS="10" COLS="80">[% picture.description | strip_literal %]</TEXTAREA></TD>
+	</TR>
+
+	<TR>
+		<TD>Groups</TD>
+		<TD><SELECT NAME="groups_multiple" MULTIPLE SIZE="5">
+[%
+   groups = gallery.get_groups;
+   FOREACH group = groups.values.sort("name");
+%]<OPTION VALUE="[% group.id %]"[% picture.groups.${group.id} ? ' SELECTED' : '' %]>[% group.name | strip_literal %]</OPTION>[%
+   END;
+%]		</SELECT></TD>
+	</TR>
+</TABLE>
+<INPUT TYPE="hidden" NAME="formkey" VALUE="[% form.formkey %]">
+<INPUT TYPE="hidden" NAME="pic_id" VALUE="[% pic_id %]">
+<INPUT TYPE="hidden" NAME="op" VALUE="save_picture">
+<INPUT TYPE="submit">
+</FORM>
+[% END %]
+
+__seclev__
+500

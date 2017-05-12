@@ -1,0 +1,12 @@
+2009-11-24
+    0.0202  Updated M::I to 0.91, via rafl++
+
+2008-09-23
+    0.0201  Correction to dodgy upload
+    0.02    update to D::D 0.002, including automatic semicolons!
+            Looks like the parser doesn't run till after import finishes, so storing @CANS
+                in a package variable
+            Which means that adding new autosubs later should be possible.  Added test
+
+2008-07-05
+    0.01    initial release

@@ -1,0 +1,24 @@
+This is a Sample Stump Speech!
+This is the first slide...
+
+Wanna See a Picture?
+
+There's One on the next Slide:
+
+i:picture.jpg
+
+Words
+Get
+Centered
+
+B:Colors
+M:Are
+R:Nice
+
+    # This is some Perl code:
+    sub foo {
+        say "Hi!";
+    }
+
+The End
+Any Questions?

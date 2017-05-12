@@ -1,0 +1,7 @@
+Revision history for Config-Files-Simple
+
+0.01  	Tue Jun 21 09:45:00 2016
+        - original version; created by mziescha
+
+0.01.1 	Thu Jun 23 10:50:00 2016
+        * fix stop matching on file separator

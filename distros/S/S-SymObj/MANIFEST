@@ -1,0 +1,8 @@
+lib/SymObj.pm				The S-SymObj perl module
+Makefile.PL				The perl Makefile
+MANIFEST				This list of files
+MANIFEST.SKIP				Files to exclude from MANIFEST
+README					Introductional reading
+test.pl					Automated test for the module
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

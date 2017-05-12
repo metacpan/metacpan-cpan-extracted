@@ -1,0 +1,62 @@
+README FILE FOR MODULES SQL::Statement and SQL::Parser
+
+These modules can be used stand-alone to parse SQL statements 
+or used with DBI and DBD::CSV, DBD::AnyData or other drivers to
+create, modify, and query data in many kinds of formats including
+XML, CSV, Fixed Length, Excel Spreadsheets and many others.
+
+WHO NEEDS IT?
+
+If you use the DBI drivers for flatfiles, Excel spreadsheets, or
+formats such as XML via the CSV, AnyData, or Excel DBDs, this
+distribution will greatly expand the range of supported SQL, as
+well as provide support for text-like numbers and alphabetic
+comparisons previously missing in those drivers.  Some of the
+features included in this release are partial support for
+multi-table joins, for set and string functions, for numeric
+expressions, for the IN and BETWEEN predicates and much more.
+
+HOW DO I INSTALL IT?
+
+If you are familiar with the standard make/nmake procedures,
+simply do as always:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+You may also use nmake or dmake on windows.  Since the modules
+are pure perl, you may also simply copy the enclosed SQL
+directory into your lib directory (either your main site/lib or
+a private area).
+
+WHAT ELSE DO I NEED?
+
+  to parse SQL statements:
+
+     perl
+
+  to create, query, & modify databases
+
+     perl
+     DBI
+     DBD::CSV or DBD::AnyData or other DBDs that subclass SQL::Statement
+
+        
+WHERE DO I FIND OUT MORE?
+
+If you are using it via one of the DBD drivers, see the help
+documentation for that driver.  If you are subclassing the
+moduels, there are extensive help documents included with the
+modules.  Use perldoc or pod2html or simply read the POD section
+of the .pm files.  For further questions, write to the
+the dbi-users@perl.org listserv or try www.perlmonks.org.
+
+WHO DUNNIT?
+
+The original XS versions of the modules were written by Jochen
+Wiedmann.  The current, pure perl versions were rewritten
+(mostly from the ground up) by Jeff Zucker 
+<jzuckerATcpan.org>.  Both versions are currently maintained
+by Jens Rehsack <rehsack@cpan.org>.

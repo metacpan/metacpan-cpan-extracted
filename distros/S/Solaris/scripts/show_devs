@@ -1,0 +1,70 @@
+#!/usr/local/bin/perl -w
+
+use strict;
+use Solaris::Kstat;
+use Solaris::MapDev qw(:ALL);
+
+my $ks = Solaris::Kstat->new();
+my %mod_to_name = (sd => "Disk", ssd => "Disk", # broken kstats! dad => "Disk",
+                   atapicd => "Disk", st => "Tape", fd => "Floppy");
+foreach my $mod (qw(sd ssd dad atapicd st fd))
+   {
+   my $err = "${mod}err";
+   foreach my $i (sort(keys(%{$ks->{$err}})))
+      {
+      my $inst = "${mod}${i}";
+      my $sd = inst_to_dev($inst);
+      my $info = $ks->{$err}{$i}{"$inst,err"};
+      my $prod = $info->{Product};
+      $prod =~ s/Revision//i;
+      my $vendor = $info->{Vendor};
+      $vendor =~ s/\s+$//;
+      print("$mod_to_name{$mod} $sd ($inst) ",
+            "$vendor $prod Rev $info->{Revision} ",
+            "Serial $info->{'Serial No'}\n");
+      if ($mod_to_name{$mod} eq "Disk")
+         {
+         print("   $info->{Size} Sectors $info->{Heads} Heads ",
+               "$info->{RPM} RPM\n");
+         }
+      
+      }
+   }
+__END__
+
+=head1 NAME
+
+show_devs - Show information about connected disks and tapes
+
+=head1 SYNOPSIS
+
+show_devs
+
+=head1 DESCRIPTION
+
+This simple script dumps information about all the disks and tapes currently
+known by the OS.
+
+=head1 EXAMPLES
+
+ $ show_devs
+ Disk c0t0d0 (sd0) SEAGATE ST34371W SUN4.2G Rev 7462 Serial 9710911499
+    4292075520 Sectors 16 Heads 5400 RPM
+ Disk c0t1d0 (sd1) TOSHIBA XM5701TASUN12XCD Rev 0297 Serial 01/29/97
+    1.84467440651196e+19 Sectors 0 Heads 0 RPM
+ Disk c0t9d0 (sd8) SEAGATE ST15230W SUN4.2G Rev 0738 Serial 00377197
+    4292075520 Sectors 16 Heads 5400 RPM
+ Disk c0t10d0 (sd9) SEAGATE ST15230W SUN4.2G Rev 0738 Serial 00393458
+    4292075520 Sectors 16 Heads 5400 RPM
+ Tape rmt/1 (st2) ARCHIVE Python 02635-XXX Rev 567A Serial 01/29/97
+ $ 
+
+=head1 AUTHOR
+
+Alan Burlison, <Alan.Burlison@uk.sun.com>
+
+=head1 SEE ALSO
+
+L<kstat(3K)> L<Solaris::Kstat(3)> L<Solaris::MapDev>
+
+=cut

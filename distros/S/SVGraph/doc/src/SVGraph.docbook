@@ -1,0 +1,1011 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+"http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">
+<article lang="sk">
+  <title>SVGraph</title>
+
+  <articleinfo>
+    <pubdate>YYYY-MM-DD</pubdate>
+
+    <revhistory>
+      <revision>
+        <revnumber>1</revnumber>
+
+        <date>2005-01-07</date>
+
+        <author>
+          <firstname>Roman</firstname>
+
+          <surname>Fordinál</surname>
+        </author>
+
+        <revdescription>
+          <para>Creation of this documentation.</para>
+        </revdescription>
+      </revision>
+
+      <revision>
+        <revnumber>2</revnumber>
+
+        <date>2005-07-07</date>
+
+        <author>
+          <firstname>Matej</firstname>
+
+          <surname>Gregor</surname>
+        </author>
+
+        <revdescription>
+          <para>Change of structure of this document, added new
+          information.</para>
+        </revdescription>
+      </revision>
+
+      <revision>
+        <revnumber>3</revnumber>
+
+        <date>2006-11-07</date>
+
+        <author>
+          <firstname>Michal</firstname>
+
+          <surname>Ondrovič</surname>
+        </author>
+
+        <revdescription>
+          <para>Added new information.</para>
+        </revdescription>
+      </revision>
+
+      <revision>
+        <revnumber>4</revnumber>
+
+        <date>2008-02-20</date>
+
+        <author>
+          <firstname>Roman</firstname>
+
+          <surname>Fordinal</surname>
+        </author>
+
+        <revdescription>
+          <para>Legal notice update.</para>
+        </revdescription>
+      </revision>
+    </revhistory>
+
+    <authorgroup>
+      <corpauthor>WebCom, s.r.o.</corpauthor>
+
+      <author>
+        <firstname>Roman</firstname>
+
+        <surname>Fordinál</surname>
+
+        <email>fordinal@webcom.sk</email>
+      </author>
+
+      <author>
+        <firstname>Matej</firstname>
+
+        <surname>Gregor</surname>
+
+        <email>gregor@webcom.sk</email>
+      </author>
+
+      <author>
+        <firstname>Michal</firstname>
+
+        <surname>Ondrovič</surname>
+
+        <email>ondrovic@webcom.sk</email>
+      </author>
+    </authorgroup>
+
+    <legalnotice>
+        <para>This program is free software; you can redistribute it and/or modify it
+        under LGPLv2.
+        </para>
+    </legalnotice>
+
+    <abstract>
+      <para></para>
+    </abstract>
+  </articleinfo>
+
+  <section>
+    <title>SVGraph Library</title>
+
+    <para>This library is used for generation of graphs in SVG format. With
+    the help of the SVGraph library you should easy and itelligent design your
+    own graph and its range.</para>
+
+    <section>
+      <title>SVGraph::2D::columns</title>
+
+      <para>Class for column graphs.</para>
+
+      <section>
+        <title>Dictionary</title>
+
+        <para></para>
+      </section>
+
+      <section>
+        <title>New object of a column graph</title>
+
+        <para>Creation of a new object of a column graph :</para>
+
+        <synopsis>my $graph=SVGraph::2D::column-&gt;new(%params);</synopsis>
+
+        <para>%param:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>title</para>
+
+            <para>Title of the graph. It will by displayed in the body of the
+            graph.</para>
+          </listitem>
+
+          <listitem>
+            <para>type</para>
+
+            <para>Type of drawing of the graph:</para>
+
+            <itemizedlist>
+              <listitem>
+                <para>normal</para>
+              </listitem>
+
+              <listitem>
+                <para>normal/percentage</para>
+              </listitem>
+
+              <listitem>
+                <para>overlap</para>
+              </listitem>
+            </itemizedlist>
+          </listitem>
+
+          <listitem>
+            <para>x</para>
+
+            <para>Width of the graph.</para>
+          </listitem>
+
+          <listitem>
+            <para>y</para>
+
+            <para>Height of the graph.</para>
+          </listitem>
+
+          <listitem>
+            <para>reload</para>
+
+            <para>Time in seconds for automatical refresh of the graph. It is
+            assured by the javascript function reload().</para>
+          </listitem>
+
+          <listitem>
+            <para>show_legend</para>
+
+            <para>1/0</para>
+
+            <para>Displays the legend on the right site of the graph.</para>
+          </listitem>
+
+          <listitem>
+            <para>show_legend_reverse</para>
+
+            <para>1/0</para>
+
+            <para>Displays the legend in reverse order.</para>
+          </listitem>
+
+          <listitem>
+            <para>show_areas</para>
+
+            <para>1/0</para>
+
+            <para>Displays the areas in graph.</para>
+          </listitem>
+
+          <listitem>
+            <para>show_label_textsize</para>
+
+            <para>Textsize in labels on the x axis.</para>
+          </listitem>
+
+          <listitem>
+            <para>show_areas_opacity</para>
+
+            <para>0.0 -&gt; 1.1</para>
+
+            <para>Shows areas with defined alpha.</para>
+          </listitem>
+
+          <listitem>
+            <para>show_data</para>
+
+            <para>1/0</para>
+
+            <para>Shows the values above each colunm.</para>
+          </listitem>
+
+          <listitem>
+            <para>show_data_background</para>
+
+            <para>1/0</para>
+
+            <para>Shows the values above columns with background.</para>
+          </listitem>
+
+          <listitem>
+            <para>show_grid_x</para>
+
+            <para>1/0</para>
+
+            <para>Shows the grid on x axis and the labels.</para>
+          </listitem>
+
+          <listitem>
+            <para>grid_y_scale_minimum</para>
+
+            <para>Defines the starting value of the graph.</para>
+          </listitem>
+
+          <listitem>
+            <para>grid_y_scale_maximum</para>
+
+            <para>Defines the maximum value displayed on the y axis</para>
+          </listitem>
+
+          <listitem>
+            <para>grid_y_main_spacing</para>
+
+            <para>Defines spacing in the grid on the y axis.</para>
+          </listitem>
+        </itemizedlist>
+      </section>
+
+      <section>
+        <title>Adding columns into graph</title>
+
+        <para>Columns are data accumulators of the same type.</para>
+
+        <para>For adding new columns in the graph is used following
+        method:</para>
+
+        <synopsis>my $column = $graph-&gt;addColumn(%params);</synopsis>
+
+        <para>%params :</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>title</para>
+
+            <para>Name of the coulmn.</para>
+          </listitem>
+
+          <listitem>
+            <para>show_area</para>
+
+            <para>0/1</para>
+
+            <para>Shows the columns as areas.</para>
+          </listitem>
+
+          <listitem>
+            <para>show_line</para>
+
+            <para>0/1</para>
+
+            <para>Allows to display the column as a line.</para>
+          </listitem>
+
+          <listitem>
+            <para>color</para>
+
+            <para>Color of the column.</para>
+          </listitem>
+        </itemizedlist>
+      </section>
+
+      <section>
+        <title>Adding row labels</title>
+
+        <para>For adding labels to rows is used the following method:</para>
+
+        <synopsis>$graph-&gt;addRowLabel($label_text);</synopsis>
+
+        <para>Parameters:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>$label_text</para>
+
+            <para>Text, which identifies the row.</para>
+          </listitem>
+        </itemizedlist>
+      </section>
+
+      <section>
+        <title>Adding data to graph</title>
+
+        <synopsis>$column-&gt;addData($label_text, value);</synopsis>
+
+        <para>Parameters:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>$label_text</para>
+
+            <para>Text in row label.</para>
+          </listitem>
+        </itemizedlist>
+      </section>
+
+      <section>
+        <title>Adding value marks</title>
+
+        <synopsis>$graph-&gt;addValueMark(value,%params);</synopsis>
+
+        <para>%params:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>front</para>
+
+            <para>1/0</para>
+
+            <para>The markline is in the front of the graph.</para>
+          </listitem>
+
+          <listitem>
+            <para>size</para>
+
+            <para>Size of the line.</para>
+          </listitem>
+
+          <listitem>
+            <para>color</para>
+
+            <para>Color of the line.</para>
+          </listitem>
+
+          <listitem>
+            <para>right</para>
+
+            <para>0/1</para>
+
+            <para>Is the label on the right (1) or left (0) side?</para>
+          </listitem>
+
+          <listitem>
+            <para>show_label</para>
+
+            <para>Shows the label. Default is it the value of the mark.</para>
+          </listitem>
+
+          <listitem>
+            <para>show_label_text</para>
+
+            <para>Shows a text as the label.</para>
+          </listitem>
+        </itemizedlist>
+      </section>
+
+      <section>
+        <title>Example</title>
+
+        <para>Code:</para>
+
+        <programlisting>#!/bin/perl
+use SVGraph::2D::columns;
+use strict;
+
+my $graph=SVGraph::2D::columns-&gt;new(
+  title =&gt; "My graph",
+  type =&gt; "normal",
+  x =&gt; 500,
+  y =&gt; 300,
+  show_legend =&gt; 1,
+  show_data =&gt; 1,
+  show_data_background =&gt;1,
+  grid_y_scale_maximum =&gt; 70.00,
+  show_grid_x =&gt; 1
+  );
+
+# adding two columns
+my %columns;
+$columns{first}=$graph-&gt;addColumn(title=&gt;"first"); 
+$columns{second}=$graph-&gt;addColumn(title=&gt;"second");
+
+# adding rows and labels
+$graph-&gt;addRowLabel('1');
+$graph-&gt;addRowLabel('2');
+
+# data for graph
+$columns{first}-&gt;addData('1',14);
+$columns{second}-&gt;addData('2',50);
+
+$graph-&gt;addValueMark(20,front =&gt; 1, color =&gt; 'blue', 
+                    right =&gt; 1, show_label_text =&gt; 'minimum', show_label =&gt; 1);
+
+# create svg file
+open (my $fh, "+&gt;graph.svg");
+print $fh $graph-&gt;prepare;</programlisting>
+
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="images/graph.svg" />
+          </imageobject>
+        </mediaobject>
+      </section>
+    </section>
+
+    <section>
+      <title>SVGraph::2D::lines</title>
+
+      <para>Class for the line graphs.</para>
+
+      <section>
+        <title>Dictionary</title>
+
+        <para></para>
+      </section>
+
+      <section>
+        <title>New object of a line graph</title>
+
+        <para>Creation of a new object of a line graph :</para>
+
+        <synopsis>my $graf=SVGraph::2D::lines-&gt;new(%params)</synopsis>
+
+        <para>%params:<itemizedlist>
+            <listitem>
+              <para>title</para>
+
+              <para>Title of the graph. It will by displayed in the body of
+              the graph.</para>
+            </listitem>
+
+            <listitem>
+              <para>type</para>
+
+              <para>Type of drawing of the graph:</para>
+
+              <itemizedlist>
+                <listitem>
+                  <para>normal</para>
+                </listitem>
+
+                <listitem>
+                  <para>normal/percentage</para>
+                </listitem>
+
+                <listitem>
+                  <para>stacked</para>
+
+                  <para>The values are counted together.</para>
+
+                  <mediaobject>
+                    <imageobject>
+                      <imagedata fileref="images/stacked.jpeg" />
+                    </imageobject>
+                  </mediaobject>
+                </listitem>
+
+                <listitem>
+                  <para>stacked/percentage</para>
+                </listitem>
+
+                <listitem>
+                  <para>overlap</para>
+                </listitem>
+              </itemizedlist>
+            </listitem>
+
+            <listitem>
+              <para>x</para>
+
+              <para>Width of the graph.</para>
+            </listitem>
+
+            <listitem>
+              <para>y</para>
+
+              <para>Height of the graph.</para>
+            </listitem>
+
+            <listitem>
+              <para>reload</para>
+
+              <para>Time in seconds for automatical refresh of the graph. It
+              is assured by the javascript function reload().</para>
+            </listitem>
+
+            <listitem>
+              <para>show_legend</para>
+
+              <para>1/0</para>
+
+              <para>Displays the legend on the right site of the graph.</para>
+            </listitem>
+
+            <listitem>
+              <para>show_legend_reverse</para>
+
+              <para>0/1</para>
+
+              <para>Displays the legend in reverse order.</para>
+            </listitem>
+
+            <listitem>
+              <para>show_points</para>
+
+              <para>0/1</para>
+
+              <para>Displays points in the graph.</para>
+
+              <mediaobject>
+                <imageobject>
+                  <imagedata fileref="images/points.jpeg" />
+                </imageobject>
+              </mediaobject>
+            </listitem>
+
+            <listitem>
+              <para>show_points_middle</para>
+
+              <para>0/1</para>
+
+              <para>Displayes point in the middle of defined values.</para>
+            </listitem>
+
+            <listitem>
+              <para>show_lines</para>
+
+              <para>1/0</para>
+
+              <para>Shows lines in the line graph.</para>
+            </listitem>
+
+            <listitem>
+              <para>show_lines_smooth</para>
+
+              <para>0/1</para>
+
+              <para>Rounds the lines in the graph.</para>
+            </listitem>
+
+            <listitem>
+              <para>show_areas</para>
+
+              <para>1/0</para>
+
+              <para>Displays the areas in graph.</para>
+            </listitem>
+
+            <listitem>
+              <para>show_label_textsize</para>
+
+              <para>Textsize in labels on the x axis.</para>
+            </listitem>
+
+            <listitem>
+              <para>show_areas</para>
+
+              <para>1/0</para>
+
+              <para>Dislpays the areas.</para>
+            </listitem>
+
+            <listitem>
+              <para>show_areas_opacity</para>
+
+              <para>0.0 -&gt; 1.1</para>
+
+              <para>Shows areas with defined alpha.</para>
+            </listitem>
+
+            <listitem>
+              <para>show_lines_smooth_range</para>
+
+              <para>1/0</para>
+
+              <para>Smooths ranges around the lines.</para>
+            </listitem>
+
+            <listitem>
+              <para>show_data</para>
+
+              <para>1/0</para>
+
+              <para>Shows the values above each colunm.</para>
+            </listitem>
+
+            <listitem>
+              <para>show_data_background</para>
+
+              <para>1/0</para>
+
+              <para>Shows the values above columns with background.</para>
+            </listitem>
+
+            <listitem>
+              <para>show_grid_x</para>
+
+              <para>1/0</para>
+
+              <para>Shows the grid on x axis and the labels.</para>
+            </listitem>
+
+            <listitem>
+              <para>grid_y_scale_minimum</para>
+
+              <para>Defines the starting value of the graph.</para>
+            </listitem>
+
+            <listitem>
+              <para>grid_y_scale_maximum</para>
+
+              <para>Defines the maximum value displayed on the y axis</para>
+            </listitem>
+
+            <listitem>
+              <para>grid_y_main_spacing</para>
+
+              <para>Defines spacing in the grid on the y axis.</para>
+            </listitem>
+          </itemizedlist></para>
+      </section>
+
+      <section>
+        <title>Adding columns into graph</title>
+
+        <para>Columns are data accumulators of the same type.</para>
+
+        <para>For adding new columns in the graph is used following
+        method:</para>
+
+        <synopsis>my $column = $graph-&gt;addColumn(%params);</synopsis>
+
+        <para>%params :</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>title</para>
+
+            <para>Name of the coulmn.</para>
+          </listitem>
+
+          <listitem>
+            <para>show_area</para>
+
+            <para>0/1</para>
+
+            <para>Shows the columns as areas.</para>
+          </listitem>
+
+          <listitem>
+            <para>show_line</para>
+
+            <para>0/1</para>
+
+            <para>Allows to display the column as a line.</para>
+          </listitem>
+
+          <listitem>
+            <para>color</para>
+
+            <para>Color of the column.</para>
+          </listitem>
+        </itemizedlist>
+      </section>
+
+      <section>
+        <title>Adding row labels</title>
+
+        <para>For adding labels to rows is used the following method:</para>
+
+        <synopsis>$graph-&gt;addRowLabel($label_text);</synopsis>
+
+        <para>Parameters:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>$label_text</para>
+
+            <para>Text, which identifies the row.</para>
+          </listitem>
+        </itemizedlist>
+      </section>
+
+      <section>
+        <title>Adding data to graph</title>
+
+        <synopsis>$column-&gt;addData($label_text, value);</synopsis>
+
+        <para>Parameters:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>$label_text</para>
+
+            <para>Text in row label.</para>
+          </listitem>
+        </itemizedlist>
+      </section>
+
+      <section>
+        <title>Adding value marks</title>
+
+        <synopsis>$graph-&gt;addValueMark(value,%params);</synopsis>
+
+        <para>%params:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>front</para>
+
+            <para>1/0</para>
+
+            <para>The markline is in the front of the graph.</para>
+          </listitem>
+
+          <listitem>
+            <para>size</para>
+
+            <para>Size of the line.</para>
+          </listitem>
+
+          <listitem>
+            <para>color</para>
+
+            <para>Color of the line.</para>
+          </listitem>
+
+          <listitem>
+            <para>right</para>
+
+            <para>0/1</para>
+
+            <para>Is the label on the right (1) or left (0) side?</para>
+          </listitem>
+
+          <listitem>
+            <para>show_label</para>
+
+            <para>Shows the label. Default is it the value of the mark.</para>
+          </listitem>
+
+          <listitem>
+            <para>show_label_text</para>
+
+            <para>Shows a text as the label.</para>
+          </listitem>
+        </itemizedlist>
+      </section>
+
+      <section>
+        <title>Example</title>
+
+        <para>Code:</para>
+
+        <programlisting>#!/bin/perl
+use strict;
+use SVGraph::2D::lines;
+
+my $graph=SVGraph::2D::lines-&gt;new(
+ title =&gt; "My graph",
+ type =&gt; "normal/percentage",
+ x =&gt; 500,
+ y =&gt; 300,
+ show_lines =&gt; 1,
+ show_points =&gt; 1,
+ grid_y_main_lines =&gt; 0,
+ show_label_textsize =&gt; 20,
+ show_legend =&gt; 1,
+ show_data =&gt; 1,
+ show_data_background =&gt; 1,
+ show_grid_x =&gt; 0
+);
+
+# two columns -&gt; two lines in the graph
+my %columns;
+$columns{first}=$graph-&gt;addColumn(title=&gt;"first", show_line=&gt;1);
+$columns{second}=$graph-&gt;addColumn(title=&gt;"second", show_line=&gt;1);
+
+$graph-&gt;addRowLabel('1');
+$graph-&gt;addRowLabel('2');
+$graph-&gt;addRowLabel('3');
+
+$graph-&gt;addValueMark(20,front =&gt; 1, color =&gt; 'blue', right =&gt; 1, 
+                     show_label_text =&gt; 'something', show_label =&gt; 1);
+# data for graph
+$columns{first}-&gt;addData('1',30);
+$columns{first}-&gt;addData('2',60);
+$columns{first}-&gt;addData('3',50);
+$columns{second}-&gt;addData('1',20);
+$columns{second}-&gt;addData('2',0);
+$columns{second}-&gt;addData('3',70);
+
+# creates svg file
+open (my $fh, "+&gt;graph.svg");
+print $fh $graph-&gt;prepare;</programlisting>
+
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="images/graph2.svg" />
+          </imageobject>
+        </mediaobject>
+      </section>
+    </section>
+
+    <section>
+      <title>SVGraph::2D::map</title>
+
+      <para>Class for graph maps.</para>
+
+      <section>
+        <title>Dictionary</title>
+
+        <para></para>
+      </section>
+
+      <section>
+        <title>New object of a map</title>
+
+        <para>Creation of a new object of a map graph :</para>
+
+        <synopsis>my $map=SVGraph::2D::map-&gt;new(%params);</synopsis>
+
+        <para>%param:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>title</para>
+
+            <para>Title of the graph.</para>
+          </listitem>
+
+          <listitem>
+            <para>continent</para>
+
+            <para>Continent to be displayed. For whole world is it 'world',
+            for slovakia is this parameter 'slovakia'.</para>
+          </listitem>
+
+          <listitem>
+            <para>x</para>
+
+            <para>Width of the graph.</para>
+          </listitem>
+
+          <listitem>
+            <para>y</para>
+
+            <para>Height of the graph.</para>
+          </listitem>
+
+          <listitem>
+            <para>reload</para>
+
+            <para>Time in seconds for automatical refresh of the graph. It is
+            assured by the javascript function reload().</para>
+          </listitem>
+
+          <listitem>
+            <para>show_legend</para>
+
+            <para>1/0</para>
+
+            <para>Disables the legend.</para>
+          </listitem>
+        </itemizedlist>
+      </section>
+
+      <section>
+        <title>Adding columns into graph</title>
+
+        <para>Columns are data accumulators of the same type. In the map is
+        only one column.</para>
+
+        <para>Creating new column :</para>
+
+        <synopsis>my $column = $map-&gt;addColumn(%params);</synopsis>
+
+        <para>%params :</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>title</para>
+
+            <para>Name of the coulmn.</para>
+          </listitem>
+
+          <listitem>
+            <para>color</para>
+
+            <para>Color of the countries.</para>
+          </listitem>
+        </itemizedlist>
+      </section>
+
+      <section>
+        <title>Adding row labels</title>
+
+        <para>Row labels identifies countries, which have defined value. For
+        adding labels to rows is used the following method:</para>
+
+        <synopsis>$map-&gt;addRowLabel($label_text);</synopsis>
+
+        <para>Parameters:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>$label_text</para>
+
+            <para>Text, which identifies the row.</para>
+          </listitem>
+        </itemizedlist>
+      </section>
+
+      <section>
+        <title>Adding data to graph</title>
+
+        <synopsis>$column-&gt;addData($label_text, value);</synopsis>
+
+        <para>Parameters:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>$label_text</para>
+
+            <para>Text in row label.</para>
+          </listitem>
+        </itemizedlist>
+      </section>
+
+      <section>
+        <title>Example</title>
+
+        <para>Code:</para>
+
+        <programlisting>#!/bin/perl
+
+use SVGraph::2D::map;
+use strict;
+
+my $svgfh;
+
+open($svgfh,"+&gt;map.svg") or die $!;
+
+my $map = SVGraph::2D::map-&gt;new(title =&gt; 'europe', continent =&gt; 'europe', x =&gt; 400, y =&gt; 400);
+
+my $column = $map-&gt;addColumn(title =&gt; 'europe', color =&gt; 'blue');
+
+
+$map-&gt;addRowLabel('SK');
+$column-&gt;addData('SK', 2520);
+
+$map-&gt;addRowLabel('CZ');
+$column-&gt;addData('CZ', 1000);
+
+$map-&gt;addRowLabel('GB');
+$column-&gt;addData('GB', 545);
+
+
+print $svgfh $map-&gt;prepare();</programlisting>
+
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="map.png" />
+          </imageobject>
+        </mediaobject>
+      </section>
+    </section>
+  </section>
+</article>

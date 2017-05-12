@@ -1,0 +1,18 @@
+Changes             List of changes
+lib/SQL/Yapp.pm     Main module file
+Makefile.PL         The Perl makefile
+MANIFEST			This list of files
+MANIFEST.SKIP       List of files to skip in MANIFEST
+README              The file to read in the beginning
+TODO                TODO list
+t/00-load.t         Load test
+t/manifest.t        Test to check manifest is ok
+t/pod-coverage.t    Docs coverage test
+t/pod.t             General docs
+t/boilerplate.t     Test to check basic stuff doesn't still have the initial setting
+t/syntax.t          Simple preprocessing test and Perl parsing test.  Does not need DB connection.
+t/docexamples.t     Tests examples from the documentation
+t/dialect.t         Test SQL dialect support
+t/simple.t          Tests used while implementing new features
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

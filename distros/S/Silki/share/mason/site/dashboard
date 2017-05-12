@@ -1,0 +1,56 @@
+% if ($user_wiki_count) {
+<h2><% loc('Wikis You Are a Member of') %></h2>
+
+<& /lib/wiki-list.mas, wikis => $user_wikis &>
+% } elsif ( $c->user()->is_authenticated() ) {
+<p>
+  <% loc( 'You are not a member of any wikis.' ) %>
+</p>
+% }
+% if ($public_wiki_count) {
+%   if ( $c->user()->is_authenticated() ) {
+<h2><% loc('Public Wikis') %></h2>
+%   }
+
+<& /lib/wiki-list.mas, wikis => $public_wikis &>
+% }
+
+% if ( ! $c->user()->is_authenticated ) {
+%   if ($public_wiki_count) {
+<p>
+  <% loc( 'You are not logged in, and can only see public wikis.
+           Please <a href="%html(%1)">log in</a> to see wikis
+           of which you are a member.',
+           $c->domain()->application_uri( path => '/user/login_form' ) ) | n %>
+</p>
+%   } else {
+<p>
+  <% loc( 'This site has no public wikis available.
+           Please <a href="%html(%1)">log in</a>
+           if you have an account.', $c->domain()->application_uri( path => '/user/login_form' ) ) | n %>
+</p>
+%   }
+% }
+
+% if ( $c->user()->is_admin() ) {
+<& /admin.mas &>
+% }
+
+<%args>
+$user_wiki_count => 0
+$user_wikis => undef
+$public_wikis
+$public_wiki_count
+</%args>
+
+<%attr>
+sidebar => []
+</%attr>
+
+<%method title>
+% if ( $c->user()->is_authenticated() ) {
+<% loc( 'Wikis readable by %1', $c->user()->best_name() ) %>
+% } else {
+Public wikis
+% }
+</%method>

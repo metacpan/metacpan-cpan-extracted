@@ -1,0 +1,10 @@
+Build.PL
+MANIFEST			This list of files
+README
+META.yml
+Makefile.PL
+lib/Sort/Merge.pm
+eg/sortorderlogs_new.pl
+t/basic.t
+t/boundary.t
+t/normal.t

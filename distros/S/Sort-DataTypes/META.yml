@@ -1,0 +1,26 @@
+---
+abstract: 'Sort a list of data using methods relevant to the type of data'
+author:
+  - 'Sullivan Beck <sbeck@cpan.org>'
+build_requires:
+  Test::Inter: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Sort-DataTypes
+provides:
+  Sort::DataTypes:
+    file: lib/Sort/DataTypes.pm
+    version: 3.01
+requires:
+  Date::Manip: 0
+  Exporter: 0
+  Storable: 0
+  perl: 5.000
+resources:
+  license: http://dev.perl.org/licenses/
+version: 3.01

@@ -1,0 +1,142 @@
+Revision history for SPOPSx-Ginsu.
+
+0.58  Wed, Jun 2, 2004
+	- updated to sync with SPOPS-0.87
+	- removed _execute_multiple_record_query() since tables names bug
+	  was fixed in SPOPS-0.86
+
+0.57  Fri, Apr 23, 2004 (first CPAN release)
+	- renamed to SPOPSx::Ginsu
+	- updated to sync with SPOPS-0.83
+		- began using Log::Log4perl
+		- overrode _execute_multiple_record_query() temporarily due to
+		  'lc' table names bug in SPOPS::DBI
+		- overrode _get_definitive_fields, now used by clone()
+		- removed DEBUG field from $p everywhere
+	- removed create_unless_exists() method
+
+==========  renamed from ESPOPS to SPOPSx-Ginsu  ==========
+
+0.56  Thu, Apr 15, 2004
+	- fetch_group_by_fields() and fetch_group_by_ids() now return an empty
+	  arrayref if an empty arrayref is passed in for the values.
+
+0.55  Mon, Dec 15, 2003
+	- updated to sync with SPOPS-0.80
+	- refactored things to move table def and DBI connection parameters out
+	  of the main ESPOPS classes to allow multiple packages to use ESPOPS
+	  without interfering with each other.
+	- updated to sync with SPOPS-0.78
+
+0.54  Thu, May 22, 2003
+	- Added fetch_count() and modified fetch_group() so that they work for
+	  classes that do not have their own table. The 'class' field of each
+	  fetched row is check to make sure that it "isa" object of the calling
+	  class, otherwise it is excluded.
+	- Added check which dies if auto-fetching a field fails.
+	- Modified new() to set uninitialized fields to undef. This is to fix a
+	  a problem in which the clone method would not set fields that did not
+	  exist in the original object, even if a value for the field was passed
+	  to the clone() method. E.g. For an object with fields: field1, field2
+	  after executing the following ...
+	    $a = MyObject->new({ field1 => 'Hello' });
+	    $b = $a->clone({ field2 => 'World' });
+	  ... 'field2' would not exist in $a or even in $b.
+
+0.53  Tue, Mar 25, 2003
+	- Requires SPOPS-0.74 (new interface for db_discover_types)
+    - Added code to clean up partial saves when an insert fails in some
+      table.
+    - Changed CREATE TABLE to CREATE TABLE IF NOT EXISTS in $TABLE_DEF.
+
+0.52  Wed, Sep 11, 2002
+    - Updated to sync with SPOPS-0.68. Minor changes to fetch() and
+      fetch_group(). Removed docs for refetch() and field_update() since
+      they are now in SPOPS::DBI.
+
+0.51  Mon, Aug 12, 2002
+    - Updated to sync with SPOPS-0.64. Minor changes to fetch() and save().
+      Removed refetch() and field_update() since they are now in SPOPS::DBI.
+
+0.50  Sat, Aug 3, 2002
+    - Revamped the way objects are saved. Previously, the pre_save_action()
+      method took care of getting things into the parent tables by creating
+      parent objects and saving them (causing untold grief in implementing
+      other pre_save_actions). The pre_save_action() method has been removed
+      and a save() method has now been added. This method was copied directly
+      from SPOPS::DBI::save() in SPOPS-0.61 and some small modifications made
+      so that the object is successively blessed into each of the classes it
+      inherits from (starting with ESPOPS::Object and ending with the class
+      itself), and the appropriate _save_insert() or _save_update() is
+      called. This eliminates the creation of parent objects via new and it
+      eliminates the multiple calls to pre/post_save_action during a given
+      object save. *** NOTE: THIS MAY CAUSE INCOMPATIBILITIES *** (e.g. the
+      pre/post_save_action methods in Boat.pm in the tests had to be changed)
+    - Replaced fetch() with one modified from the SPOPS::DBI::fetch() in
+      SPOPS-0.61.
+    - Replaced fetch_group() with one modified from SPOPS::DBI::fetch_group()
+      in SPOPS-0.61. Unlike previous versions of ESPOPS::Object::fetch_group(),
+      this version only does individual fetches for rows in the result of the
+      initial db_select for which the 'class' field does not match the class
+      used to call fetch_group(). So fetching many objects of the same class
+      should be much faster if the correct class is used to call fetch_group.
+      Fetching objects of different classes using a fetch_group called by a
+      common base class will be done exactly as before.
+    - Added e_has_a, and pre/post_fetch/save/remove_actions which handle
+      forward direction auto fetching/saving/removing.
+    - Added pm_fetch() method to do polymorphic fetch. Functionally identical
+      to calling fetch_group with a where clause which is just an id clause.
+    - Modified isa_classes() to return classes in order of proximity to
+      current class in the inheritance tree. The calling class is always the
+      first element and ESPOPS::Object is always the last element in the list.
+      Modfied the order of tables in join created by fetch/fetch_group().
+    - Added fetch_group_by_field() and fetch_group_by_ids() methods.
+    - Added refetch() and field_update() methods. Currently do NOT work for
+      inherited fields.
+    - Added create_unless_exists() method, implemented by Raj.
+
+0.42  Fri, Apr 29, 2002
+
+    - Modified ESPOPS::DBI's create_table() and drop_table() to do nothing
+      if $CONF and $TABLE_DEF are not defined. This allows a class to inherit
+      from an ESPOPS class without adding a table. The Vehicle class is now
+      an example of this.
+    - Turned off PrintError in DBI->connect in ESPOPS::DBI.pm
+    - Added RaiseError and AutoCommit to DBI->connect in ESPOPS::DBI.pm
+    - Modified global_datasource_handle() to make it try 10 times to connect
+      before giving up.
+    - Removed SQL_BIGINT from list in _is_numeric_type() so it won't break
+      with DBI-1.21
+    - Added test for cloning with false value in t/08_clone.t
+    
+0.4   Thu, Oct 18, 2001
+
+    - Updated to work with SPOPS-0.51.
+      Changed global_db_handle() to global_datasource_handle() in ESPOPS::DBI.
+      Changed to 'use SPOPS 0.51' in ESPOPS::DBI.
+
+    - Added timestamp field to the Object table.
+    
+    - Added a 08_clone.t to test clone().
+
+0.3   Thu, Aug 30, 2001
+
+    - Updated to work with SPOPS-0.50.
+      Updated _config_processed method for checking whether config was processed.
+      Switched to SPOPS::ClassFactory for the actual config processing.
+
+    - Modified fetch_group to accept $p->{from} so it can be used with joins.
+
+    - Modified as_string to handle undefined fields gracefully.
+    
+    - Added 'use SPOPS 0.50' to ESPOPS::DBI.pm.
+
+
+0.2   Fri, Jul 20, 2001
+
+    - Updated to work with SPOPS-0.41 (where save returns object not id).
+
+
+0.1   Tue, Jul 17, 2001
+
+    - First release, tested with SPOPS-0.40.

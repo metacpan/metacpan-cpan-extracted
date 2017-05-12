@@ -1,0 +1,6 @@
+%module{SOOT};
+
+class TFormula {
+  TFormulaFloatArray GetParameters();
+};
+

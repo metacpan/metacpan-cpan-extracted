@@ -1,0 +1,106 @@
+{
+   "abstract" : "The official client for Elasticsearch",
+   "author" : [
+      "Clinton Gormley <drtech@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Search-Elasticsearch",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::EOL" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Hijk" : "0.25",
+            "IO::Socket::IP" : "0.37",
+            "URI::Escape::XS" : "0"
+         },
+         "requires" : {
+            "Any::URI::Escape" : "0",
+            "Data::Dumper" : "0",
+            "Devel::GlobalDestruction" : "0",
+            "Encode" : "0",
+            "File::Temp" : "0",
+            "HTTP::Headers" : "0",
+            "HTTP::Request" : "0",
+            "HTTP::Tiny" : "0.043",
+            "IO::Compress::Deflate" : "0",
+            "IO::Compress::Gzip" : "0",
+            "IO::Select" : "0",
+            "IO::Socket" : "0",
+            "IO::Uncompress::Gunzip" : "0",
+            "IO::Uncompress::Inflate" : "0",
+            "JSON::MaybeXS" : "1.002002",
+            "JSON::PP" : "0",
+            "LWP::UserAgent" : "0",
+            "List::Util" : "0",
+            "Log::Any" : "1.02",
+            "Log::Any::Adapter" : "0",
+            "MIME::Base64" : "0",
+            "Module::Runtime" : "0",
+            "Moo" : "2.001000",
+            "Moo::Role" : "0",
+            "POSIX" : "0",
+            "Package::Stash" : "0.34",
+            "Scalar::Util" : "0",
+            "Sub::Exporter" : "0",
+            "Time::HiRes" : "0",
+            "Try::Tiny" : "0",
+            "URI" : "0",
+            "namespace::clean" : "0",
+            "overload" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Cpanel::JSON::XS" : "0",
+            "JSON::XS" : "0",
+            "Mojo::IOLoop" : "0",
+            "Mojo::UserAgent" : "0"
+         },
+         "requires" : {
+            "IO::Socket::SSL" : "0",
+            "Log::Any::Adapter::Callback" : "0.09",
+            "Test::Deep" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0.98",
+            "Test::SharedFork" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/elastic/elasticsearch-perl/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/elastic/elasticsearch-perl.git",
+         "web" : "https://github.com/elastic/elasticsearch-perl"
+      }
+   },
+   "version" : "5.02",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
+}
+

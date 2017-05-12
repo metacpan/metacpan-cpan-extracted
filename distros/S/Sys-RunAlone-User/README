@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Sys-RunAlone-User,
+version 0.01:
+
+  make sure only one invocation of a script is active at a time per user
+
+This software is copyright (c) 2012 by Madison Koenig.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

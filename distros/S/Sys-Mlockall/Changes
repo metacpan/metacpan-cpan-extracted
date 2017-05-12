@@ -1,0 +1,6 @@
+Revision history for Perl extension Sys::Mlockall.
+
+0.01  Sun Jul  4 11:29:12 2010
+	- original version; created by h2xs 1.23 with options
+		-AP -b 5.6.0 Sys::Mlockall
+

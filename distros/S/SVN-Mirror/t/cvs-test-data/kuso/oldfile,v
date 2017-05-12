@@ -1,0 +1,83 @@
+head	1.2;
+access;
+symbols
+	so=this/is/another:1.1
+	bad=tag/looks-like_this:1.2.0.6
+	cleanup:1.1.2.2.0.4
+	weirdbranch:1.1.2.2.0.2
+	newtag:1.2
+	newbranch:1.2.0.4
+	funnytag:1.2
+	sometag:1.2
+	anotherbranch:1.2.0.2
+	somebranch:1.1.0.2;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2003.05.12.05.43.36;	author xclkao;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2003.05.12.05.42.33;	author xclkao;	state Exp;
+branches
+	1.1.2.1;
+next	;
+
+1.1.2.1
+date	2003.05.12.06.19.39;	author xclkao;	state Exp;
+branches;
+next	1.1.2.2;
+
+1.1.2.2
+date	2003.06.12.15.58.52;	author xclkao;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@newfile
+@
+text
+@this is old
+sfkaslfksdlfsdklf
+@
+
+
+1.1
+log
+@init
+@
+text
+@d2 1
+@
+
+
+1.1.2.1
+log
+@modify on branch
+@
+text
+@a1 1
+edited on branch
+@
+
+
+1.1.2.2
+log
+@massive change on branch
+@
+text
+@a2 2
+massive change on branch
+
+@
+
+

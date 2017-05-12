@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hrc PUBLIC "-//Cail Lomecb//DTD Colorer HRC take5//EN" "http://colorer.sf.net/2003/hrc.dtd">
+<hrc xmlns="http://colorer.sf.net/2003/hrc" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://colorer.sf.net/2003/hrc http://colorer.sf.net/2003/hrc.xsd" version="take5">
+<!--
+  insert this define into HRC base catalog file (colorer.hrc)
+
+  <prototype name="wsc" group="group" description="wsc" targetNamespace="">
+    <location link="wsc.hrc"/>
+    <filename>/\./ix</filename>
+  </prototype>
+--><type name="wsc">
+<annotation>
+<documentation>
+           XSLT Generated HRC scheme for language 'wsc'
+           from XML Schema with xsd2hrc.xsl version 0.9 (c) Cail Lomecb
+
+           Scheme parameters:
+             targetNamespace             : 
+             hrctype                     : wsc
+             allow-common-attr           : yes
+             allow-any-attr              : no
+             allow-unknown-elements      : yes
+             allow-unknown-root-elements : no
+             force-single-root           : yes
+             default prefixes            : (?{}(?{}wsc):)?
+               you can change them with entity 'nsprefix'
+
+         </documentation>
+<documentation>
+          Schema documentation:</documentation>
+<contributors>Cail Lomecb, Max Belugin</contributors>
+</annotation>
+<import type="def"/>
+<region parent="xml:element.defined.start.name" name="element.start.name"/>
+<region parent="xml:element.defined.end.name" name="element.end.name"/>
+<region parent="xml:element.start.lt" name="element.start.lt"/>
+<region parent="xml:element.start.gt" name="element.start.gt"/>
+<region parent="xml:element.end.lt" name="element.end.lt"/>
+<region parent="xml:element.end.gt" name="element.end.gt"/>
+<region parent="element.start.name" name="element.nsprefix"/>
+<region parent="xml:element.nscolon" name="element.nscolon"/>
+<region parent="xml:Attribute.defined.name" name="Attribute.name"/>
+<region parent="xml:Attribute.nsprefix" name="Attribute.nsprefix"/>
+<region parent="xml:AttValue.defined" name="AttValue"/>
+<region parent="xml:AttValue.defined.start" name="AttValue.start"/>
+<region parent="xml:AttValue.defined.end" name="AttValue.end"/>
+<region description="Enumerated type values" parent="xml:Enumeration" name="Enumeration"/>
+<entity value="(?{}(?{}wsc):)" name="ns-real-prefix"/>
+<entity value="(?{}(?{}wsc):)?" name="nsprefix"/>
+<scheme name="_hrc_int_elementContent">
+<block scheme="xml:elementContent2" region19="element.start.gt" region18="element.end.gt" region17="element.end.name" region16="element.nscolon" region15="element.nsprefix" region12="element.end.lt" region11="PairEnd" region07="element.start.name" region06="element.nscolon" region05="element.nsprefix" region02="element.start.lt" region01="PairStart" end="/( (&lt;\/) (\y3\b)?= ( (%xml:NCName;) (:) )? (%xml:Name;) \b \M \s* (&gt;?)                   | (\/ \M &gt;) )/x" start="/~( (&lt;) (  ((%xml:NCName;) (:) )? (%xml:Name;) ) \M &gt;?   )/x"/>
+<inherit scheme="xml:badChar"/>
+</scheme>
+<scheme name="_hrc_int_AttValue">
+<block region="AttValue" scheme="xml:AttValue.content.quot" region11="AttValue.end" region01="AttValue.start" region10="PairEnd" region00="PairStart" end="/(\y1)/" start="/(&quot;)/"/>
+<block region="AttValue" scheme="xml:AttValue.content.apos" region11="AttValue.end" region01="AttValue.start" region10="PairEnd" region00="PairStart" end="/(\y1)/" start="/(')/"/>
+</scheme>
+<scheme name="AttributeContent">
+<inherit scheme="xml:AttributeContent">
+<virtual subst-scheme="_hrc_int_AttValue" scheme="xml:AttValue"/>
+</inherit>
+</scheme>
+<scheme name="perl-elementContent">
+<inherit scheme="_hrc_int_elementContent">
+<virtual scheme="xml:element" subst-scheme="def:empty"/>
+<virtual scheme="xml:content.cdata.stream" subst-scheme="perl:perl"/>
+<virtual scheme="xml:CDSect.content.stream" subst-scheme="perl:perl"/>
+<virtual scheme="xml:Attribute.any" subst-scheme="scriptType-Attributes"/>
+</inherit>
+</scheme>
+<scheme name="vbScript-elementContent">
+<inherit scheme="_hrc_int_elementContent">
+<virtual scheme="xml:element" subst-scheme="def:empty"/>
+<virtual scheme="xml:content.cdata.stream" subst-scheme="vbScript:vbScript"/>
+<virtual scheme="xml:CDSect.content.stream" subst-scheme="vbScript:vbScript"/>
+<virtual scheme="xml:Attribute.any" subst-scheme="scriptType-Attributes"/>
+</inherit>
+</scheme>
+<scheme name="jScript-elementContent">
+<inherit scheme="_hrc_int_elementContent">
+<virtual scheme="xml:element" subst-scheme="def:empty"/>
+<virtual scheme="xml:content.cdata.stream" subst-scheme="jScript:jScript"/>
+<virtual scheme="xml:CDSect.content.stream" subst-scheme="jScript:jScript"/>
+<virtual scheme="xml:Attribute.any" subst-scheme="scriptType-Attributes"/>
+</inherit>
+</scheme>
+<scheme name="script-elements">
+<block start="/\M (&lt;(script [^&gt;]+ (perlscript[\d\.]*) [^&gt;]*) &gt;) /ix" end="/&gt;/" scheme="perl-elementContent"/>
+<block start="/\M (&lt;(script [^\&gt;]+ (j(ava)?script[\d\.]*) [^\&gt;]*) \&gt;) /ix" end="/&gt;/" scheme="jScript-elementContent"/>
+<block start="/\M (&lt;(script [^&gt;]+ (vbscript[\d\.]*) [^&gt;]*) &gt; ) /ix" end="/&gt;/" scheme="vbScript-elementContent"/>
+</scheme>
+<scheme name="componentType-content">
+<inherit scheme="script-elements"/>
+<inherit scheme="componentType-content-old"/>
+</scheme>
+<scheme name="scriptType-content">
+<inherit scheme="jScript:jScript"/>
+</scheme>
+<scheme name="scriptType-content-error">
+<inherit scheme="scriptType-content"/>
+</scheme>
+<scheme name="get-element">
+<block end="/ &gt; /x" start="/\M &lt; (%nsprefix;get ([\s\/&gt;]|$) )/x" scheme="_hrc_int_N10021-elementContent" xmlns="http://colorer.sf.net/2003/hrc"/>
+</scheme>
+<scheme name="package-element">
+<block end="/ &gt; /x" start="/\M &lt; (%nsprefix;package ([\s\/&gt;]|$) )/x" scheme="_hrc_int_N1003D-elementContent" xmlns="http://colorer.sf.net/2003/hrc"/>
+</scheme>
+<scheme name="component-element">
+<block end="/ &gt; /x" start="/\M &lt; (%nsprefix;component ([\s\/&gt;]|$) )/x" scheme="componentType-elementContent" xmlns="http://colorer.sf.net/2003/hrc"/>
+</scheme>
+<scheme name="put-element">
+<block end="/ &gt; /x" start="/\M &lt; (%nsprefix;put ([\s\/&gt;]|$) )/x" scheme="_hrc_int_N10077-elementContent" xmlns="http://colorer.sf.net/2003/hrc"/>
+</scheme>
+<scheme name="PARAMETERType-content">
+<inherit scheme="xml:element" xmlns="http://colorer.sf.net/2003/hrc"/>
+</scheme>
+<scheme name="PARAMETERType-content-error">
+<inherit scheme="PARAMETERType-content" xmlns="http://colorer.sf.net/2003/hrc"/>
+<inherit scheme="xml:badChar" xmlns="http://colorer.sf.net/2003/hrc"/>
+</scheme>
+<scheme name="PARAMETERType-Attributes">
+<block region02="Attribute.name" end="/[&quot;']?#1/" start="/(\s?#1|^)(name)\M([\s\=]|$)/x" scheme="xmlschema:string-AttributeContent"/>
+</scheme>
+<scheme name="PARAMETERType-elementContent">
+<inherit scheme="_hrc_int_elementContent">
+<virtual subst-scheme="PARAMETERType-content" scheme="xml:element"/>
+<virtual subst-scheme="xml:badChar" scheme="xml:content.cdata"/>
+<virtual subst-scheme="PARAMETERType-Attributes" scheme="xml:Attribute.any"/>
+</inherit>
+</scheme>
+<scheme name="componentType-content-old">
+<block end="/ &gt; /x" start="/\M &lt; (%nsprefix;registration ([\s\/&gt;]|$) )/x" scheme="registrationType-elementContent" xmlns="http://colorer.sf.net/2003/hrc"/>
+<block end="/ &gt; /x" start="/\M &lt; (%nsprefix;public ([\s\/&gt;]|$) )/x" scheme="publicType-elementContent" xmlns="http://colorer.sf.net/2003/hrc"/>
+<block end="/ &gt; /x" start="/\M &lt; (%nsprefix;script ([\s\/&gt;]|$) )/x" scheme="scriptType-elementContent" xmlns="http://colorer.sf.net/2003/hrc"/>
+<inherit scheme="xml:element" xmlns="http://colorer.sf.net/2003/hrc"/>
+</scheme>
+<scheme name="componentType-content-error">
+<inherit scheme="componentType-content" xmlns="http://colorer.sf.net/2003/hrc"/>
+<inherit scheme="xml:badChar" xmlns="http://colorer.sf.net/2003/hrc"/>
+</scheme>
+<scheme name="componentType-Attributes">
+<block region02="Attribute.name" end="/[&quot;']?#1/" start="/(\s?#1|^)(id)\M([\s\=]|$)/x" scheme="xmlschema:string-AttributeContent"/>
+</scheme>
+<scheme name="componentType-elementContent">
+<inherit scheme="_hrc_int_elementContent">
+<virtual subst-scheme="componentType-content" scheme="xml:element"/>
+<virtual subst-scheme="xml:badChar" scheme="xml:content.cdata"/>
+<virtual subst-scheme="componentType-Attributes" scheme="xml:Attribute.any"/>
+</inherit>
+</scheme>
+<!--
+        parent: get
+-->
+<scheme name="_hrc_int_N10021-content">
+<inherit scheme="xml:element" xmlns="http://colorer.sf.net/2003/hrc"/>
+</scheme>
+<scheme name="_hrc_int_N10021-content-error">
+<inherit scheme="_hrc_int_N10021-content" xmlns="http://colorer.sf.net/2003/hrc"/>
+<inherit scheme="xml:badChar" xmlns="http://colorer.sf.net/2003/hrc"/>
+</scheme>
+<scheme name="_hrc_int_N10021-Attributes">
+<block region02="Attribute.name" end="/[&quot;']?#1/" start="/(\s?#1|^)(internalName)\M([\s\=]|$)/x" scheme="xmlschema:string-AttributeContent"/>
+</scheme>
+<scheme name="_hrc_int_N10021-elementContent">
+<inherit scheme="_hrc_int_elementContent">
+<virtual subst-scheme="_hrc_int_N10021-content" scheme="xml:element"/>
+<virtual subst-scheme="xml:badChar" scheme="xml:content.cdata"/>
+<virtual subst-scheme="_hrc_int_N10021-Attributes" scheme="xml:Attribute.any"/>
+</inherit>
+</scheme>
+<scheme name="methodType-content">
+<block end="/ &gt; /x" start="/\M &lt; (%nsprefix;PARAMETER ([\s\/&gt;]|$) )/x" scheme="PARAMETERType-elementContent" xmlns="http://colorer.sf.net/2003/hrc"/>
+<block end="/ &gt; /x" start="/\M &lt; (%nsprefix;parameter ([\s\/&gt;]|$) )/x" scheme="parameterType-elementContent" xmlns="http://colorer.sf.net/2003/hrc"/>
+<inherit scheme="xml:element" xmlns="http://colorer.sf.net/2003/hrc"/>
+</scheme>
+<scheme name="methodType-content-error">
+<inherit scheme="methodType-content" xmlns="http://colorer.sf.net/2003/hrc"/>
+<inherit scheme="xml:badChar" xmlns="http://colorer.sf.net/2003/hrc"/>
+</scheme>
+<scheme name="methodType-Attributes">
+<block region02="Attribute.name" end="/[&quot;']?#1/" start="/(\s?#1|^)(name)\M([\s\=]|$)/x" scheme="xmlschema:string-AttributeContent"/>
+<block region02="Attribute.name" end="/[&quot;']?#1/" start="/(\s?#1|^)(progid)\M([\s\=]|$)/x" scheme="xmlschema:string-AttributeContent"/>
+</scheme>
+<scheme name="methodType-elementContent">
+<inherit scheme="_hrc_int_elementContent">
+<virtual subst-scheme="methodType-content" scheme="xml:element"/>
+<virtual subst-scheme="xml:badChar" scheme="xml:content.cdata"/>
+<virtual subst-scheme="methodType-Attributes" scheme="xml:Attribute.any"/>
+</inherit>
+</scheme>
+<!--
+        parent: package
+-->
+<scheme name="_hrc_int_N1003D-content">
+<inherit scheme="component-element" xmlns="http://colorer.sf.net/2003/hrc"/>
+<inherit scheme="xml:element" xmlns="http://colorer.sf.net/2003/hrc"/>
+</scheme>
+<scheme name="_hrc_int_N1003D-content-error">
+<inherit scheme="_hrc_int_N1003D-content" xmlns="http://colorer.sf.net/2003/hrc"/>
+<inherit scheme="xml:badChar" xmlns="http://colorer.sf.net/2003/hrc"/>
+</scheme>
+<scheme name="_hrc_int_N1003D-Attributes"/>
+<scheme name="_hrc_int_N1003D-elementContent">
+<inherit scheme="_hrc_int_elementContent">
+<virtual subst-scheme="_hrc_int_N1003D-content" scheme="xml:element"/>
+<virtual subst-scheme="xml:badChar" scheme="xml:content.cdata"/>
+<virtual subst-scheme="_hrc_int_N1003D-Attributes" scheme="xml:Attribute.any"/>
+</inherit>
+</scheme>
+<scheme name="parameterType-content">
+<inherit scheme="xml:element" xmlns="http://colorer.sf.net/2003/hrc"/>
+</scheme>
+<scheme name="parameterType-content-error">
+<inherit scheme="parameterType-content" xmlns="http://colorer.sf.net/2003/hrc"/>
+<inherit scheme="xml:badChar" xmlns="http://colorer.sf.net/2003/hrc"/>
+</scheme>
+<scheme name="parameterType-Attributes">
+<block region02="Attribute.name" end="/[&quot;']?#1/" start="/(\s?#1|^)(name)\M([\s\=]|$)/x" scheme="xmlschema:string-AttributeContent"/>
+</scheme>
+<scheme name="parameterType-elementContent">
+<inherit scheme="_hrc_int_elementContent">
+<virtual subst-scheme="parameterType-content" scheme="xml:element"/>
+<virtual subst-scheme="xml:badChar" scheme="xml:content.cdata"/>
+<virtual subst-scheme="parameterType-Attributes" scheme="xml:Attribute.any"/>
+</inherit>
+</scheme>
+<scheme name="propertyType-content">
+<inherit scheme="get-element" xmlns="http://colorer.sf.net/2003/hrc"/>
+<inherit scheme="put-element" xmlns="http://colorer.sf.net/2003/hrc"/>
+<inherit scheme="xml:element" xmlns="http://colorer.sf.net/2003/hrc"/>
+</scheme>
+<scheme name="propertyType-content-error">
+<inherit scheme="propertyType-content" xmlns="http://colorer.sf.net/2003/hrc"/>
+<inherit scheme="xml:badChar" xmlns="http://colorer.sf.net/2003/hrc"/>
+</scheme>
+<scheme name="propertyType-Attributes">
+<block region02="Attribute.name" end="/[&quot;']?#1/" start="/(\s?#1|^)(progid)\M([\s\=]|$)/x" scheme="xmlschema:string-AttributeContent"/>
+<block region02="Attribute.name" end="/[&quot;']?#1/" start="/(\s?#1|^)(name)\M([\s\=]|$)/x" scheme="xmlschema:string-AttributeContent"/>
+<block region02="Attribute.name" end="/[&quot;']?#1/" start="/(\s?#1|^)(internalName)\M([\s\=]|$)/x" scheme="xmlschema:string-AttributeContent"/>
+<block region02="Attribute.name" end="/[&quot;']?#1/" start="/(\s?#1|^)(get)\M([\s\=]|$)/x" scheme="xmlschema:string-AttributeContent"/>
+<block region02="Attribute.name" end="/[&quot;']?#1/" start="/(\s?#1|^)(put)\M([\s\=]|$)/x" scheme="xmlschema:string-AttributeContent"/>
+</scheme>
+<scheme name="propertyType-elementContent">
+<inherit scheme="_hrc_int_elementContent">
+<virtual subst-scheme="propertyType-content" scheme="xml:element"/>
+<virtual subst-scheme="xml:badChar" scheme="xml:content.cdata"/>
+<virtual subst-scheme="propertyType-Attributes" scheme="xml:Attribute.any"/>
+</inherit>
+</scheme>
+<scheme name="publicType-content">
+<block end="/ &gt; /x" start="/\M &lt; (%nsprefix;method ([\s\/&gt;]|$) )/x" scheme="methodType-elementContent" xmlns="http://colorer.sf.net/2003/hrc"/>
+<block end="/ &gt; /x" start="/\M &lt; (%nsprefix;property ([\s\/&gt;]|$) )/x" scheme="propertyType-elementContent" xmlns="http://colorer.sf.net/2003/hrc"/>
+<inherit scheme="xml:element" xmlns="http://colorer.sf.net/2003/hrc"/>
+</scheme>
+<scheme name="publicType-content-error">
+<inherit scheme="publicType-content" xmlns="http://colorer.sf.net/2003/hrc"/>
+<inherit scheme="xml:badChar" xmlns="http://colorer.sf.net/2003/hrc"/>
+</scheme>
+<scheme name="publicType-Attributes"/>
+<scheme name="publicType-elementContent">
+<inherit scheme="_hrc_int_elementContent">
+<virtual subst-scheme="publicType-content" scheme="xml:element"/>
+<virtual subst-scheme="xml:badChar" scheme="xml:content.cdata"/>
+<virtual subst-scheme="publicType-Attributes" scheme="xml:Attribute.any"/>
+</inherit>
+</scheme>
+<!--
+        parent: put
+-->
+<scheme name="_hrc_int_N10077-content">
+<inherit scheme="xml:element" xmlns="http://colorer.sf.net/2003/hrc"/>
+</scheme>
+<scheme name="_hrc_int_N10077-content-error">
+<inherit scheme="_hrc_int_N10077-content" xmlns="http://colorer.sf.net/2003/hrc"/>
+<inherit scheme="xml:badChar" xmlns="http://colorer.sf.net/2003/hrc"/>
+</scheme>
+<scheme name="_hrc_int_N10077-Attributes">
+<block region02="Attribute.name" end="/[&quot;']?#1/" start="/(\s?#1|^)(internalName)\M([\s\=]|$)/x" scheme="xmlschema:string-AttributeContent"/>
+</scheme>
+<scheme name="_hrc_int_N10077-elementContent">
+<inherit scheme="_hrc_int_elementContent">
+<virtual subst-scheme="_hrc_int_N10077-content" scheme="xml:element"/>
+<virtual subst-scheme="xml:badChar" scheme="xml:content.cdata"/>
+<virtual subst-scheme="_hrc_int_N10077-Attributes" scheme="xml:Attribute.any"/>
+</inherit>
+</scheme>
+<scheme name="registrationType-content">
+<inherit scheme="xml:element" xmlns="http://colorer.sf.net/2003/hrc"/>
+</scheme>
+<scheme name="registrationType-content-error">
+<inherit scheme="registrationType-content" xmlns="http://colorer.sf.net/2003/hrc"/>
+<inherit scheme="xml:badChar" xmlns="http://colorer.sf.net/2003/hrc"/>
+</scheme>
+<scheme name="registrationType-Attributes">
+<block region02="Attribute.name" end="/[&quot;']?#1/" start="/(\s?#1|^)(description)\M([\s\=]|$)/x" scheme="xmlschema:string-AttributeContent"/>
+<block region02="Attribute.name" end="/[&quot;']?#1/" start="/(\s?#1|^)(progid)\M([\s\=]|$)/x" scheme="xmlschema:string-AttributeContent"/>
+<block region02="Attribute.name" end="/[&quot;']?#1/" start="/(\s?#1|^)(version)\M([\s\=]|$)/x" scheme="xmlschema:decimal-AttributeContent"/>
+<block region02="Attribute.name" end="/[&quot;']?#1/" start="/(\s?#1|^)(classid)\M([\s\=]|$)/x" scheme="xmlschema:string-AttributeContent"/>
+</scheme>
+<scheme name="registrationType-elementContent">
+<inherit scheme="_hrc_int_elementContent">
+<virtual subst-scheme="registrationType-content" scheme="xml:element"/>
+<virtual subst-scheme="xml:badChar" scheme="xml:content.cdata"/>
+<virtual subst-scheme="registrationType-Attributes" scheme="xml:Attribute.any"/>
+</inherit>
+</scheme>
+<scheme name="scriptType-content-old">
+<inherit scheme="xmlschema:string-content" xmlns="http://colorer.sf.net/2003/hrc"/>
+</scheme>
+<scheme name="scriptType-content-error-old">
+<inherit scheme="scriptType-content" xmlns="http://colorer.sf.net/2003/hrc"/>
+<inherit scheme="xml:badChar" xmlns="http://colorer.sf.net/2003/hrc"/>
+</scheme>
+<scheme name="scriptType-Attributes">
+<block region02="Attribute.name" end="/[&quot;']?#1/" start="/(\s?#1|^)(language)\M([\s\=]|$)/x" scheme="xmlschema:string-AttributeContent"/>
+<block region02="Attribute.name" end="/[&quot;']?#1/" start="/(\s?#1|^)(id)\M([\s\=]|$)/x" scheme="xmlschema:string-AttributeContent"/>
+</scheme>
+<scheme name="scriptType-elementContent">
+<inherit scheme="_hrc_int_elementContent">
+<virtual subst-scheme="scriptType-content-error" scheme="xml:CDSect.content.stream"/>
+<virtual subst-scheme="scriptType-content-error" scheme="xml:content.cdata.stream"/>
+<virtual subst-scheme="def:empty" scheme="xml:element"/>
+<virtual subst-scheme="scriptType-Attributes" scheme="xml:Attribute.any"/>
+</inherit>
+</scheme>
+
+<scheme name="wsc-root">
+<annotation>
+<documentation>
+               You can replace these elements with needed single root element
+               with customizing HRC generation process.
+              </documentation>
+</annotation>
+<inherit scheme="get-element"/>
+<inherit scheme="package-element"/>
+<inherit scheme="component-element"/>
+<inherit scheme="put-element"/>
+</scheme>
+<scheme name="wsc">
+<inherit scheme="xml:singleroot">
+<virtual subst-scheme="wsc-root" scheme="xml:element"/>
+</inherit>
+</scheme>
+</type>
+</hrc>

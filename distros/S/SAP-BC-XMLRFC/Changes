@@ -1,0 +1,11 @@
+Revision history for Perl extension SAP::BC::XMLRFC.
+
+0.01  Mon May  22 06:00:00 200
+	- original version; created by me
+0.03 Mon Jul 17 22:00:58 BST 2000
+	- change distribution arround to use a single package file to hold Iface, Tab, Parm, and Struct - to make it much easier to maintain and more compact.
+	- add auto loading for the Parameter/Table names, and create an empty destroy method to stop Perl 5.6 errors with autoload.
+0.05 Fri Dec 28 08:40:43 GMT 2001
+	- this is a big revision of SAP::BC and SAP::BC::XMLRFC inorder to bring it up to speed for SAP Business Connector 4.x.  Major changes in service list look up and the XML document format for the call has changed too.  Note: all calls now need a user that can lookup some of the sap.admin functions for createTemplate, listServers, and listServiceMaps.
+0.06 Fri Oct 04 20:52:43 GMT 2002
+        - Thanks to a hard working Oliver Maul we have been upgraded to support  v4.6, session handling

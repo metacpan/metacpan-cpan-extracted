@@ -1,0 +1,69 @@
+# Minutes:
+# ========
+
+      *      *     *     *     *            qw(20:15 27/12/1999 Monday)
+     20      *     *     *     *            qw(20:20 27/12/1999 Monday)
+  10-50      *     *     *     *            qw(20:15 27/12/1999 Monday)
+13-30/4      *     *     *     *            qw(20:17 27/12/1999 Monday)
+     10      *     *     *     *            qw(21:10 27/12/1999 Monday)
+  18,20      *     *     *     *            qw(20:18 27/12/1999 Monday)
+
+# Hours:
+# ======
+
+     *      21     *     *     *            qw(21:00 27/12/1999 Monday)
+     *      19     *     *     *            qw(19:00 28/12/1999 Tuesday)
+     * 10-23/5     *     *     *            qw(20:15 27/12/1999 Monday)
+     * 10-23/7     *     *     *            qw(10:00 28/12/1999 Tuesday)
+
+# Days-of-Month:
+# ==============
+
+        *        *       29        2        *         qw(00:00 29/02/2000 Tuesday)
+       23        4  23-30/3        *        *         qw(04:23 29/12/1999 Wednesday)
+       12       21       27        *        *         qw(21:12 27/12/1999 Monday)
+       12       19       27        *        *         qw(19:12 27/01/2000 Thursday)
+        *       18  21,15,8        *        *         qw(18:00 08/01/2000 Saturday)
+
+# Months:
+# =======
+
+       *        *        *       11        *         qw(00:00 01/11/2000 Wednesday)
+       *        *        *       12        *         qw(20:15 27/12/1999 Monday)
+       *        *        *        0        *         qw(00:00 01/01/2000 Saturday)
+      42        0        4  Jan-Dec        *         qw(00:42 04/01/2000 Tuesday)
+      42       21        4 Jan-Dec/2       *         qw(21:42 04/01/2000 Tuesday)
+      42       21        * Feb-Dec/2       *         qw(21:42 27/12/1999 Monday)
+      42       19        * Feb-Dec/2       *         qw(19:42 28/12/1999 Tuesday)
+      42       19       27 Feb-Dec/2       *         qw(19:42 27/02/2000 Sunday)
+
+# Days-of-Week:
+# =============
+
+       14       15        *  Dec,Jan        0         qw(15:14 02/01/2000 Sunday)
+       14       15        *  Dec,Jan        7         qw(15:14 02/01/2000 Sunday)
+        0       12        *        *  Mon-Fri         qw(12:00 28/12/1999 Tuesday)
+        *        *        *        *      Mon         qw(20:15 27/12/1999 Monday)
+        0       21        *        *      Mon         qw(21:00 27/12/1999 Monday)
+        0       19        *        *      Mon         qw(19:00 03/01/2000 Monday)
+       13       14        *        * Sun-Sat/2        qw(14:13 28/12/1999 Tuesday)
+
+
+# Horrible combinations ;-):
+# ==========================
+
+        0       21       27        *      Wed         qw(21:00 27/12/1999 Monday)
+        0       19       27        *      Wed         qw(19:00 29/12/1999 Wednesday)
+        0    19,21       27        *      Wed         qw(21:00 27/12/1999 Monday)
+20-30/5,17    19,21       27        *      Wed         qw(21:17 27/12/1999 Monday)
+
+
+# With seconds (6th column)
+# =========================
+       *         *        *        *        *     *         qw(seconds_test)
+       *         *        *        *        *     0-59/2    qw(seconds_test)
+       *         *        *        *        *     2,4,6     (5 +  4)."seconds_test"
+
+
+
+

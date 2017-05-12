@@ -1,0 +1,217 @@
+
+SearchSDK(3)   User Contributed Perl Documentation   SearchSDK(3)
+
+
+NAME
+     AltaVista::SearchSDK - Perl extension for AltaVista Search
+     Software Development Kit
+
+SYNOPSIS
+     use AltaVista::SearchSDK;
+
+     avs_adddate(idx, yr, mo, da, startloc)
+
+     avs_addfield(idx, pFname, startloc, endloc)
+
+     avs_addliteral(idx, pWord, loc)
+
+     avs_addvalue(idx, valtype, value, loc)
+
+     avs_addword(idx, pWords, loc, pNumWords)
+
+     avs_buildmode(idx)
+
+     avs_buildmode_ex(idx, ntiers)
+
+     avs_close(idx)
+
+     avs_compact(idx, bMore_p)
+
+     avs_compactionneeded(idx)
+
+     avs_compact_minor(idx, bMore_p)
+
+     avs_count(idx, pWordPrefix, pCountsHdl)
+
+     avs_count_close(CountsHdl)
+
+     avs_count_getcount(CountsHdl)
+
+     avs_countnext(CountsHdl)
+
+     avs_count_getword(CountsHdl)
+
+     avs_default_options(pOptions)
+
+     avs_define_valtype(name, minval, maxval, valtype_p)
+
+     avs_deletedocid(idx, pDocId, pCount)
+
+     avs_enddoc(idx)
+
+     avs_errmsg(code)
+
+     avs_getindexmode(idx)
+
+     avs_getindexversion(idx)
+
+     avs_getindexversion_counts_v(countsHdl)
+
+     avs_getindexversion_search_v(searchHdl)
+
+     avs_getsearchresults(searchHdl, resultNum)
+
+     avs_getsearchterms(psearchHdl, termNum, term, count)
+
+     avs_lookup_valtype(name)
+
+     avs_makestable(idx)
+
+     avs_open(path, mode, pIdx)
+
+     avs_querymode(idx)
+
+     avs_release_valtypes()
+
+     avs_search(idx, pQuery, pBoolQuery, pOptions, pDocsFound,
+     pDocsReturned, pTermCount, pSearchHdl)
+
+     avs_search_close(pSearchHdl)
+
+     avs_search_ex(idx, pQuery, pBoolQuery, pOptions,
+     searchsince, pDocsFound, pDocsReturned, pTermCount,
+     pSearchHdl)
+
+     avs_search_genrank(idx, pBoolQuery, pRankTerms, pRankSetup,
+     pOptions, searchsince, pDocsFound, pDocsReturned,
+     pSearchHdl)
+
+     avs_search_getdata(searchHdl)
+
+     avs_search_getdatalen(searchHdl)
+
+     avs_search_getdate(psearchHdl, year, month, day)
+
+     avs_search_getdocid(searchHdl)
+
+     avs_search_getdocidlen(searchHdl)
+
+     avs_search_getrelevance(psearchHdl)
+
+     avs_setdocdata(idx, pDocData, len)
+
+     avs_setdocdate(idx, year, month, day)
+
+     avs_setdocdatetime(idx, year, month, day, hour, minute,
+     second)
+
+     avs_setparseflags(idx, parseflags)
+
+     avs_setrankval(idx, valtype, value)
+
+     avs_startdoc(idx, pDocId, flags, pStartLoc)
+
+     avs_timer(current)
+
+     avs_version()
+
+     avs_create_options(limit, timeout, flags)
+
+DESCRIPTION
+     This set of extensions provides wrappers for all the C
+     functionality of the AltaVista Search software development
+     kit (SDK) except for a few functions that did not make sense
+     to export to perl.
+
+     All the functions of the 97 Rev B kit are available as
+     advertised, except for the following:
+
+     avs_add_ms_callback UNIMPLEMENTED
+         It makes no sense to implement this function, since it
+         would require being able to pass a C function handle
+         through perl.
+
+     avs_addrankterms UNIMPLEMENTED
+         Internal function
+
+     avs_newdoc UNIMPLEMENTED
+         No easy way to provide filter function
+
+     avs_search_getdata_copy UNIMPLEMENTED
+         No need for this function
+
+     avs_search_getdocid_copy UNIMPLEMENTED
+         No need for this function
+
+     avs_search_getrelevance RETURN ARGUMENT
+         Relevance is returned as a string representation of the
+         float
+
+PREREQUITES
+     Perl 5.004, the AltaVista SearchSDK 97 Rev B
+
+INSTALLATION
+     To install this module, move into the directory where this
+     file is located.  First copy avs.h and libavs97b.a from your
+     AltaVista SearchSDK source hierarchy into this directory.
+     Then type the following:
+
+             perl Makefile.PL
+             make
+             make test
+             make install
+
+     This will install the module into the Perl library
+     directory.
+
+AUTHOR
+     James M. Turner <james@csmonitor.com>
+
+     Copything (C) 1998 The Christian Science Publishing Society.
+     All rights reserved
+
+     This program is free software, you can redistribute it
+     and/or modify it under the same terms as Perl itself.
+
+SEE ALSO
+     perl(1), AltaVista Search SDK documentation.
+
+BUGS
+     This beta version has been tested in a live environment for
+     certain conditions, but has by no means been extensively
+     tested.  In particular, it has not been tested on anything
+     but Solaris 2.5 on an Ultra.  Please let me know if you get
+     it work under other platforms or operating systems.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+10/Jul/98            Last change: perl 5.004                    4
+
+
+

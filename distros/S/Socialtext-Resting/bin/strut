@@ -1,0 +1,672 @@
+#!/usr/bin/env perl
+
+# strut
+
+use strict;
+use warnings;
+use lib 'lib';
+
+use LWP::UserAgent;
+use LWP::MediaTypes qw(guess_media_type);
+use Socialtext::Resting;
+use File::Temp;
+use Pod::Usage;
+
+my %opts;
+use App::Options (
+    values => \%opts,
+    options => [
+        "username",
+        "password",
+        "server",
+                ],
+    option => {
+        username => {
+            description => "Username to use for REST actions",
+            env         => "STRUT_USERNAME",
+            required    => 0,
+        },
+        password => {
+            description => "Password for REST",
+            env         => "STRUT_PASSWORD",
+            required    => 0,
+        },
+        server => {
+            description => "Server URL for REST",
+            env         => "STRUT_SERVER",
+            required    => 0,
+        },
+        verbose => {
+            description => "Verbosity",
+            env         => "STRUT_VERBOSE",
+            required    => 0,
+        },
+        accept => {
+            description => "Accept header",
+            env         => "STRUT_ACCEPT",
+            required    => 0,
+        },
+        count => {
+            description => "Number to return",
+            env         => "STRUT_FILTER",
+            required    => 0,
+        },
+        filter => {
+            description => "Filter name",
+            env         => "STRUT_FILTER",
+            required    => 0,
+        },
+        query => {
+            description => "Query string",
+            env         => "STRUT_QUERY",
+            required    => 0,
+        },
+        order => {
+            description => "Return order",
+            env         => "STRUT_ORDER",
+            required    => 0,
+        },
+        author => {
+            description => "Page author",
+            env         => "STRUT_AUTHOR",
+            required    => 0,
+        },
+        date   => {
+            description => "Date for page",
+            env         => "STRUT_DATE",
+            required    => 0,
+        },
+    },
+);
+
+=head1 NAME
+
+strut - command line interface (using Socialtext::Resting) to the 
+Socialtext REST services
+
+=head1 SYNOPSIS
+
+   strut help
+
+   strut configure
+   
+   strut list_workspaces
+   strut list_pages <workspace>
+
+   strut get_page <workspace> <pagename>
+   strut set_page <workspace> <pagename> <filename>
+
+   strut list_tags <workspace> <pagename>
+   strut put_tag <workspace> <pagename> <tag>
+   strut set_tags <workspace> <pagename> <tags>
+
+   strut list_tagged_pages <workspace> <tag>
+
+   strut list_attachments <workspace> <pagename>
+   strut get_attachment <workspace> <pagename> <attachment>
+   strut add_attachment <workspace> <pagename> <filename>
+
+   strut show_breadcrumbs <workspace>
+   strut show_backlinks <workspace> <pagename>
+   strut show_frontlinks <workspace> <pagename>
+
+   All list operations can further be controlled with the following operations:
+   --query (search term for within the results)
+   --filter (filter the titles of the results)
+   --order (only accepts 'newest' right now)
+   --count (restrict number of returned results)
+   --accept (for your accept headers - text/html, text/plain, application/json)
+
+   Example:
+     strut --query=searchterm --filter=titlefilter --order=newest --count=number list_pages myworkspace 
+
+=cut
+
+my $BASE_URI = '/data/workspaces';
+
+# Globals Rool!
+our $User;
+our $Password;
+our $Server;
+our @Workspaces;
+our $Workspace;
+our @Pages;
+our $Page;
+our $Content;
+our @Tags;
+my %strut_command;
+
+if ( (!$opts{username} ||
+     !$opts{password} ||
+     !$opts{server}) &&
+     ($ARGV[0] !~ /\bhelp\b/i)) {
+     print "You must first configure strut with your server information.\n";
+     dispatch('configure');
+}
+
+our $Strutter = Socialtext::Resting->new(
+        username => $opts{username},
+        password => $opts{password},
+        server   => $opts{server},
+        accept   => $opts{accept},
+        query    => $opts{query},
+        order    => $opts{order},
+        filter   => $opts{filter},
+        count    => $opts{count},
+        verbose  => $opts{verbose},
+);
+
+dispatch();
+
+sub dispatch {
+    my $command = shift;
+    init_commands();
+
+    if ($command) {
+        $strut_command{$command}();
+        exit;
+    }
+
+    if (!@ARGV) {
+        usage();
+    } else {
+        my $count = 0;
+        my $verb = shift(@ARGV);
+        while (my $check = shift(@ARGV)) {
+            $opts{$count++} = $check;
+        }
+        if ( exists $strut_command{$verb} ) {
+            $strut_command{$verb}();
+        } else {
+            print "No such command $verb - for a complete list of subcommands type 'strut help'\n";
+        }
+    }
+    exit;
+}
+                
+sub init_commands {
+	%strut_command = (
+			help                      => sub {usage()},
+			list_workspaces           => sub {list_workspaces()},
+			list_pages                => sub {list_pages()},
+			list_workspace_tags       => sub {list_workspace_tags()},
+			list_tagged_pages         => sub {list_tagged_pages()},
+			get_page                  => sub {get_page()},
+			set_page                  => sub {set_page()},
+			list_tags		  => sub {list_tags()},
+			set_tags		  => sub {set_tags()},
+                        put_tag                   => sub {put_tag()},
+			list_attachments	  => sub {list_attachments()},
+			get_attachment		  => sub {get_attachment()},
+			add_attachment		  => sub {add_attachment()},
+			configure		  => sub {configure()},
+                        show_breadcrumbs          => sub {show_breadcrumbs()},
+                        show_backlinks            => sub {show_backlinks()},
+                        show_frontlinks           => sub {show_frontlinks()},
+			);
+}
+=head1 COMMANDS
+
+The following commands are supported
+
+=head2 help
+
+Standard man page for this program
+
+=cut
+sub usage {
+    my $msg = shift || '';
+    pod2usage( { -verbose => 2} );
+    exit;
+}
+
+=head2 configure
+
+Configure strut with username, password, and server information.  See
+the CONFIGURATION section below for a discussion of your configuration
+options.
+
+=cut
+
+sub configure {
+    if (! -d "$ENV{HOME}/.app") {
+        mkdir "$ENV{HOME}/.app";
+        chmod(0700, "$ENV{HOME}/.app");
+    }
+    open (FILE, ">$ENV{HOME}/.app/strut.conf");
+    @ARGV = ();
+    foreach my $opt ('username', 'password', 'server') {
+        print "$opt: ";
+        $opts{$opt} = <>;
+        print FILE "$opt = $opts{$opt}";
+    }
+    chmod (0600, "$ENV{HOME}/.app/strut.conf");
+}
+
+##################################################
+#
+# Workspace actions
+# pick_workspace
+# show_workspaces
+# show_pages
+# list_pages
+# list_tagged_pages
+# list_workspace_tags
+# show_breadcrumbs
+# 
+##################################################
+
+=head2 show_breadcrumbs
+
+Get the breadcrumbs for the current user in this workspace.
+
+=cut
+
+sub show_breadcrumbs {
+    use_positional( "workspace" => 0 );
+    _pick_workspace( $opts{workspace} );
+    printemout(_show_breadcrumbs());
+}
+
+sub _show_breadcrumbs {
+    $Strutter->get_breadcrumbs();
+}
+
+=head2 list_workspaces
+
+Give a list of all workspaces on the server
+
+=cut
+sub list_workspaces {
+    printemout(_list_workspaces());
+}
+
+sub _pick_workspace {
+    my $workspace = shift;
+    if ($workspace) {
+        $Strutter->workspace($workspace);
+        return;
+    }
+    @Workspaces = _list_workspaces();
+    $Strutter->workspace ( _pick_thing('Workspace', \@Workspaces) );
+}
+
+sub _list_workspaces {
+    $Strutter->get_workspaces();
+}
+
+sub _list_pages {
+    use_positional("workspace" => 0);
+    _pick_workspace($opts{workspace}); 
+    $Strutter->get_pages();
+}
+
+sub _list_workspace_tags {
+    use_positional("workspace" => 0);
+    _pick_workspace($opts{workspace});
+    $Strutter->get_workspace_tags();
+}
+
+sub _list_tagged_pages {
+    use_positional("workspace" => 0,
+		   "tag" => 1);
+    _pick_workspace($opts{workspace});
+    $Strutter->get_taggedpages($opts{tag});
+}
+
+=head2 list_workspace_tags <workspace>
+
+List the tags for a workspace.
+
+=cut
+
+sub list_workspace_tags {
+    printemout(_list_workspace_tags());
+}
+
+=head2 list_pages <workspace>
+
+Give a list of all pages in the given workspace.  If no workspace
+is given you will be prompted to pick from available workspaces.
+
+=cut
+sub list_pages {
+    printemout(_list_pages());
+}
+
+=head2 list_tagged_pages <workspace>
+
+Give a list of all pages in the given workspace with the given tag.
+
+=cut
+sub list_tagged_pages {
+    printemout(_list_tagged_pages());
+}
+
+##################################################
+#
+# Page actions - these actions need a workspace 
+# and page to function
+# pick_page
+# get_page
+# set_page
+# list_tags
+# list_attachments
+# get_attachment
+# set_tags
+# show_frontlinks
+# show_backlinks
+# 
+##################################################
+
+sub pick_page {
+    my $workspace = shift;
+    if (my $page = shift) { 
+        $Strutter->workspace($workspace);
+        return $page;
+    }
+    @Pages = _list_pages($workspace);
+    my $page = _pick_thing ('Page', \@Pages);
+    return $page;
+}
+
+=head2 get_page <workspace> <page_name>
+
+Retrieve the contents of the specified page.  If no
+workspace or page are given the user will be prompted
+to select from the available workspaces/pages.
+
+=cut
+sub get_page {
+    use_positional ("workspace" => 0,
+                    "page"      => 1);
+    if ($opts{workspace} && !$opts{page}) {
+        usage("get_page needs a workspace and page name to operate.\n\n" .
+              "You can pass these in via the command line:\n\t" .
+              "get_page <workspace> <page_name>\n");
+    }
+    $Page = pick_page($opts{workspace}, $opts{page});
+    my $content = $Strutter->get_page($Page);
+    print "Content of $Page:\n$content\n";
+}
+
+=head2 set_page <workspace> <page_name> <filename>
+
+Save the specified page on the system.
+
+=cut
+sub set_page {
+    use_positional ("workspace" => 0,
+                    "page"      => 1,
+                    "filename"  => 2);
+    if (!$opts{page} || !$opts{filename}) {
+        usage("set_page needs a workspace, page name, and filename to operate.\n\n" .
+              " You can pass these in via the command line:\n\t" .
+              " set_page <workspace> <page_name> <filename>\n");
+    }
+    my $Page = pick_page($opts{workspace}, $opts{page});
+    my $content;
+    if ( $opts{author} || $opts{date} ) {
+        my %content_object;
+        $content_object{content} = readfile($opts{filename});
+        if ( $opts{date} ) {
+            $content_object{date} = $opts{date};
+        }
+        if ( $opts{author} ) {
+            $content_object{from} = $opts{author};
+        }
+        $content = \%content_object;
+    } else {
+        $content = readfile($opts{filename});
+    }
+
+    $Strutter->put_page($Page, $content);
+}
+
+=head2 add_attachment <workspace> <page_name> <filename>
+
+Add the attachment to the specifed page on the system.
+
+=cut
+
+sub add_attachment {
+    use_positional ("workspace" => 0,
+                    "page"      => 1,
+                    "filename"  => 2);
+
+    if (!$opts{filename}) {
+        usage ("I don't wanna");
+    }
+    my $Page = pick_page($opts{workspace}, $opts{page});
+    open (FILE, "$opts{filename}") or die "Can't open $opts{filename}: $!\n";
+    my $content = readfile($opts{filename});
+    my $type = guess_media_type($opts{filename});
+    my $location = $Strutter->post_attachment(
+                        $Page, $opts{filename}, $content, $type);
+    print "$opts{filename} attached as $location\n";
+}
+
+=head2 list_attachments <workspace> <page_name>
+
+List all attachments on the specified page.
+
+=cut
+
+sub list_attachments {
+    printemout(_list_attachments());
+}
+
+sub _list_attachments {
+    use_positional ("workspace" => 0,
+		    "page"      => 1);
+    if (!$opts{workspace} || !$opts{page}) {
+	usage("list_attachments needs a workspace and page name to operate.");
+    }
+    my $Page = pick_page($opts{workspace}, $opts{page});
+    $Strutter->get_page_attachments($Page);
+}
+
+=head2 list_pagetags <workspace> <page_name>
+
+List all tags on the specified page.
+
+=cut
+
+sub list_tags {
+    printemout(_list_tags());
+}
+
+sub _list_tags {
+    use_positional ("workspace" => 0,
+                    "page"      => 1);
+    if ($opts{workspace} && !$opts{page}) {
+        usage("list_tags needs a workspace and page name to operate.\n\n" .
+              "You can pass these in via the command line:\n\t" .
+              "list_tags <workspace> <page_name>\n");
+    }
+    my $Page = pick_page($opts{workspace}, $opts{page});
+    $Strutter->get_pagetags($Page);
+}
+
+=head2 show_backlinks <workspace> <page_name>
+
+Show backlinks to the specified page name.
+
+=cut
+
+sub show_backlinks {
+    use_positional(
+        "workspace" => 0,
+        "page"      => 1,
+    );
+    if ( !$opts{page} ) {
+        usage(    "show_backlinks needs a workspace and page name.\n\n"
+                . "You can pass these in via the command line:\n\t"
+                . "show_backlinks <workspace> <page_name> <tag>\n" );
+    }
+    my $Page = pick_page( $opts{workspace}, $opts{page} );
+    printemout($Strutter->get_backlinks( $Page ));
+
+}
+
+=head2 show_frontlinks <workspace> <page_name>
+
+Show frontlinks to the specified page name.
+
+=cut
+
+sub show_frontlinks {
+    use_positional(
+        "workspace" => 0,
+        "page"      => 1,
+    );
+    if ( !$opts{page} ) {
+        usage(    "show_frontlinks needs a workspace and page name.\n\n"
+                . "You can pass these in via the command line:\n\t"
+                . "show_frontlinks <workspace> <page_name> <tag>\n" );
+    }
+    my $Page = pick_page( $opts{workspace}, $opts{page} );
+    printemout($Strutter->get_frontlinks( $Page ));
+
+}
+
+=head2 put_tag <workspace> <page_name> <tag>
+
+Add the specified tag to the specified page name.
+
+=cut
+
+sub put_tag {
+    use_positional(
+        "workspace" => 0,
+        "page"      => 1,
+        "tag"       => 2
+    );
+    if ( !$opts{tag} ) {
+        usage(    "put_tag needs a workspace, page name, and a tag name.\n\n"
+                . "You can pass these in via the command line:\n\t"
+                . "put_tag <workspace> <page_name> <tag>\n" );
+    }
+    my $Page = pick_page( $opts{workspace}, $opts{page} );
+    $Strutter->put_pagetag( $Page, $opts{tag} );
+
+    my @now_tags = $Strutter->get_pagetags($Page);
+    print "Page now has @now_tags\n";
+}
+         
+=head2 set_tags <workspace> <page_name> <tags>
+
+Set the tags for the specified page name.
+
+=cut
+
+sub set_tags {
+    use_positional ("workspace" => 0,
+                    "page"      => 1);
+    if ($opts{workspace} && !$opts{page}) {
+        usage("set_tags needs a workspace and page name and a list of tags.\n\n" .
+              "You can pass these in via the command line:\n\t" .
+              "get_page <workspace> <page_name>\n");
+    }
+    my $count = 2;
+    my @new_tags;
+    while (my $tag = $opts{$count++}) {
+        push (@new_tags, $tag);
+    }
+    my $Page = pick_page($opts{workspace}, $opts{page});
+    my @old_tags = list_tags();
+
+    my %tag_map     = map { $_ => $_ } @old_tags;
+    my %new_tag_map = map { $_ => $_ } @new_tags;
+    
+    foreach my $tag (@new_tags) {
+        $Strutter->put_pagetag($Page, $tag) unless $tag_map{$tag};
+    }
+
+    foreach my $tag (@old_tags) {
+        $Strutter->delete_pagetag( $Page, $tag ) unless $new_tag_map{$tag};
+    }
+        
+    my @now_tags = $Strutter->get_pagetags($Page);
+    print "Page now has @now_tags\n";
+}
+
+
+# Utility subroutines used elsewhere in the code
+sub readfile {
+    my ($filename) = shift;
+    if (! open (NEWFILE, $filename)) {
+        print STDERR "$filename could not be opened for reading: $!\n";
+        return;
+    }
+    my ($savedreadstate) = $/;
+    undef $/;
+    my $data = <NEWFILE>;
+    $/ = $savedreadstate;
+    close (NEWFILE);
+
+    return ($data);
+}
+
+sub _pick_thing {
+   my $name      = shift;
+   my $array_ref = shift;
+   my $count     = 0;
+
+   foreach my $thing (@$array_ref) {
+       print $count++, "\t$thing\n";
+   }
+
+   my $index = <>;
+   chomp($index);
+
+   if ( length $index ) {
+      return $array_ref->[$index];
+   }
+
+   return undef;
+}
+
+sub use_positional {
+    my %vars = @_;
+    foreach my $name (keys %vars) {
+        if ( $opts{$vars{$name}} ) {
+            $opts{$name} = $opts{$vars{$name}};
+        }
+    }
+}
+
+sub printemout {
+    foreach (@_) {
+        print "$_\n";
+    }
+}
+
+=head1 CONFIGURATION
+
+In order to run correctly, strut needs to have a username, 
+password, and server name.  This can be configured in one 
+of several ways:
+
+=head2 Command line:
+
+    strut --username <username> --password <password> --server <server>
+
+=head2 Environment variables:
+
+    STRUT_USERNAME
+    STRUT_PASSWORD
+    STRUT_SERVER
+
+=head2 Configuration file:
+
+    ~/.app/strut.conf
+
+If strut can't determine your username/password/server, it will
+call the 'configure' subcommand to create a configuration file for
+you.
+
+=head1 AUTHORS
+
+    <chris.dent@socialtext.com>
+    <kirsten.jones@socialtext.com>

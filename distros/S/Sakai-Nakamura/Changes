@@ -1,0 +1,50 @@
+Revision history for Perl extension Sakai::Nakamura.
+
+0.13  Mon Apr 23 05:45:00 2012
+        - fixed some issues with command line support.
+
+0.12  Sun Apr 15 21:05:00 2012
+        - command line support added in.
+        - better distinguishing of groups / members
+        - additional content functionality.
+
+0.11  Mon Apr  2 20:45:00 2012
+        - Additional tests
+        - Refactoring auth to subclass correctly
+        - Removing unneccessary constructors
+        - Added view visibility on content.
+
+0.10  Tue Feb 14 21:00:00 2012
+        - Increasing test coverage to > 95%
+
+0.09  Sun Feb 05 15:55:00 2012
+        - Adding support for groups and worlds.
+        - Adding more test coverage.
+
+0.08  Thu Jan 26 12:00:00 2012
+        - Fixing me service support.
+        - adding external tests for user.
+
+0.07  Wed Jan 25 06:00:00 2012
+        - Adding support for roles.
+        - Adding external unit tests.
+
+0.06  Mon Oct  3 20:30:00 2011
+        - Adding in support for profile updates.
+
+0.05  Wed Jul 13 15:55:00 2011
+        - Setting the referer on every request to meet
+          the Nakamura security constraints.
+
+0.04  Wed Jul 13 11:45:00 2011
+	- Fixing creation of Nakamura Authn object in tests.
+
+0.03  Tue Aug 10 20:10:00 2010
+	- Bringing across more code from Apache::Sling that was sakai specific.
+
+0.02  Fri Aug  6 16:25:00 2010
+	- Creating initial versions of the various subclasses.
+        - Bringing across tests.
+
+0.01  Fri Aug  6 11:45:00 2010
+	- original version

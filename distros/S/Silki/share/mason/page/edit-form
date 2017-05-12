@@ -1,0 +1,12 @@
+<& /lib/forms/page.mas, %ARGS &>
+
+<%attr>
+show_sidebar => 0
+</%attr>
+
+<%method title>
+<% loc( 'Edit %1', $page->title() ) %>
+<%args>
+$page
+</%args>
+</%method>

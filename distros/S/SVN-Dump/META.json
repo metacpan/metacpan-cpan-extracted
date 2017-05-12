@@ -1,0 +1,64 @@
+{
+   "abstract" : "A Perl interface to Subversion dumps",
+   "author" : [
+      "Philippe \"BooK\" Bruhat <book@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "SVN-Dump",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "SVN::Dump" : {
+         "file" : "lib/SVN/Dump.pm",
+         "version" : "0.06"
+      },
+      "SVN::Dump::Headers" : {
+         "file" : "lib/SVN/Dump/Headers.pm",
+         "version" : 0
+      },
+      "SVN::Dump::Property" : {
+         "file" : "lib/SVN/Dump/Property.pm",
+         "version" : 0
+      },
+      "SVN::Dump::Reader" : {
+         "file" : "lib/SVN/Dump/Reader.pm",
+         "version" : 0
+      },
+      "SVN::Dump::Record" : {
+         "file" : "lib/SVN/Dump/Record.pm",
+         "version" : 0
+      },
+      "SVN::Dump::Text" : {
+         "file" : "lib/SVN/Dump/Text.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/book/SVN-Dump"
+      }
+   },
+   "version" : "0.06"
+}

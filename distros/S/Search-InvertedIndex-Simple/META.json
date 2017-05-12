@@ -1,0 +1,49 @@
+{
+   "abstract" : "Build indexes for a set of search keys",
+   "author" : [
+      "Ron Savage <ron@savage.net.au>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "artistic_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Search-InvertedIndex-Simple",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Pod" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Set::Array" : "0.19",
+            "strict" : "1.03",
+            "warnings" : "1.03"
+         }
+      }
+   },
+   "provides" : {
+      "Search::InvertedIndex::Simple" : {
+         "file" : "lib/Search/InvertedIndex/Simple.pm",
+         "version" : "1.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/artistic-license.php"
+      ]
+   },
+   "version" : "1.04"
+}

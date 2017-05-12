@@ -1,0 +1,44 @@
+#!/usr/bin/perl
+use strict;
+use vars qw($VERSION);
+use Getopt::Std::Strict 'dhv';
+use Sys::Filesystem::MountPoint 'to_mount_point';
+use Carp;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.1.1.1 $ =~ /(\d+)/g;
+
+init();
+
+$ARGV[0] or print usage() and exit;
+
+my $p = to_mount_point($ARGV[0]) 
+   or die("Failed for $ARGV[0], $Sys::Filesystem::MountPoint::errstr\n");
+print $p;
+exit;
+
+
+
+sub usage {
+   qq{Usage: mountpointq [OPTION]... PATH
+Show mount point for a path or device.
+
+   -d       debug on
+   -h       help
+   -v       version
+
+AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+SEE ALSO
+
+Sys::Filesystem::MountPoint - parent package
+
+}}
+
+sub init {
+   $opt_h and print usage() and exit;
+   $opt_v and print $VERSION and exit;
+
+}
+
+

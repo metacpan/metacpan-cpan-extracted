@@ -1,0 +1,102 @@
+--------------
+ Ginsu README                                      Wed, Jun 2, 2004
+--------------
+
+SPOPSx::Ginsu (which began its life as ESPOPS) stands for SPOPS
+eXtension for Generalized INheritance SUpport. It is a Perl object
+oriented persistence tool. To put it in the context of the other tools
+summarized at (http://poop.sourceforge.net/) it essentially adds some of
+Tangram's functionality to SPOPS.
+
+SPOPS::DBI implements an inherited persistence mechanism for classes
+whose objects are each stored as a row in a single database table. Each
+class has its own table and all of the persistent fields are stored in
+that table. Ginsu extends this implementation to handle subclassing of
+such objects, including polymorphic retrieval. The fields of a given
+object are stored across several database tables, one for each parent
+class with persistent fields. A Ginsu object is simply an SPOPS::DBI
+object stored across multiple database tables.
+
+Ginsu and SPOPS also differ in the usage style. With standard SPOPS,
+classes are typically created at runtime from configuration files and
+any code for the classes is imported from a separate code class. With
+Ginsu, each class looks like a standard Perl class, with its own .pm
+file containing the class's code. The BEGIN block includes variables
+containing the SPOPS configuration data for the class. To use a Ginsu
+class, you simply 'use' it as you would any other Perl class.
+
+Currently, Ginsu has only been tested with MySQL, since that's what we
+use. It should be fairly easy to make it work with any database SPOPS
+supports, but that has not become a priority for my own use.
+
+For more documentation on Ginsu classes, see the POD documentation ...
+
+    perldoc SPOPSx::Ginsu
+    perldoc SPOPSx::Ginsu::DBI
+
+
+--------------
+ INSTALLATION
+--------------
+
+To install Ginsu, simply run
+
+    perl Makefile.PL
+
+specifying the database, username and password to be used for the tests,
+then
+
+    make
+    make test
+    make install
+
+
+-----------------
+ GETTING STARTED
+-----------------
+
+1. Create a datasource class (see t/MyDBI.pm for an example).
+2. Create a root base class (see t/MyBaseObject.pm for an example).
+3. Create user classes that inherit from the root base class.
+4. Create a script that:
+	(a) defines the package variables used by datasource class
+	(b) 'use's your user classes
+	(c) plays with persistent objects
+
+
+----------
+ EXAMPLES
+----------
+
+There are a bunch of example objects in t/* which are used for testing.
+Their inheritance relationships and has_a and links_to relationships
+between the classes are shown in the PDF file Example.pdf, along with a
+spreadsheet showing some of the instances used. These objects all
+inherit behavior from the Ginsu classes.
+
+The classes Boat and Boatyard also add some behavior to automatically
+fetch/save/remove Anchor's and Slip's respectively. This is the forward
+and backward direction auto-fetching/saving/removing described in
+docs/new_has_a.txt and docs/update_to_new_has_a.txt. The forward
+direction is handled by the temporary 'e_has_a' configuration (see
+OBJECT RELATIONSHIPS in the SPOPSx::Ginsu pod docs), and the backward
+direction is hard coded for these specific classes.
+
+You can also find a Template.pm file in the eg directory that you can
+cut and paste to start a new Ginsu object file.
+
+Thanks to Chris Winters for developing SPOPS. Our hope is that the Ginsu
+functionality (not necessarily this code) might eventually be included
+as part of the SPOPS distribution, along with the enhanced has-a and
+links-to functionality mentioned in the docs.
+
+Any help with any of the following development tasks is appreciated.
+ - making Ginsu database independent
+ - fixing some of the SPOPS functionality that we've broken or ignored in
+   Ginsu (security, lazy loading, database independence, strict fields)
+ - integrating Ginsu functionality into the SPOPS core
+ - implementing the enhanced object relationship configuration
+
+
+Ray Zimmerman
+Raj Chandran

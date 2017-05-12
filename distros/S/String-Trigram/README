@@ -1,0 +1,344 @@
+String::Trigram version 0.12
+====================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+none
+
+===============================================================================
+
+NAME
+    String::Trigram - Find similar strings by trigram (or 1, 2, 4,
+    etc.-gram) method
+
+SYNOPSIS
+      use String::Trigram;
+
+  Object Oriented Interface
+      my @cmpBase = qw(establishment establish establishes established disestablish disestablishmentarianism);
+
+      my $trig = new String::Trigram(cmpBase => \@cmpBase);
+
+      my $numOfSimStrings = $trig->getSimilarStrings("establishing", \%result);
+
+      print "Found $numOfSimStrings similar strings.\n";
+
+      foreach (keys %result) {
+        print "Similar string $_ has a similarity of ", sprintf ("%02f", ($result{$_} * 100)), "%\n";
+      }
+
+  Functional Interface
+      my $string1 = "foo";
+      my $string2 = "boo";
+
+      my $smlty = String::Trigram::compare($string1, $string2);
+
+      print "$string1 and $string2 have a similarity of ", sprintf("%.2f", ($smlty * 100)), "%.\n";
+
+      $smlty = String::Trigram::compare($string1, $string2);
+
+      print "$string1 and $string2 have a similarity of ", sprintf("%.2f", ($smlty * 100)), "%.\n";
+
+DESCRIPTION
+    This module computes the similarity of two strings based on the trigram
+    method. This consists of splitting some string into triples of
+    characters and comparing those to the trigrams of some other string. For
+    example the string kangaroo has the trigrams "{kan ang nga gar aro
+    roo}". A wrongly typed kanagaroo has the trigrams "{kan ana nag aga gar
+    aro roo}". To compute the similarity we divide the number of matching
+    trigrams (tokens not types) by the number of all trigrams (types not
+    tokens). For our example this means dividing 4 / 9 resulting in 0.44.
+
+    To balance the disadvantage of the outer characters (every one of which
+    occurs in only one trigram - while the second and the penultimate occur
+    in two and the rest of the characters in three trigrams each) somewhat
+    we pad the string with blanks on either side resulting in two more
+    trigrams ' ka' and 'ro ', when using a padding of one blank. Thus we
+    arrive at 6 matching trigrams and 11 trigrams all in all, resulting in a
+    similarity value of 0.55.
+
+    When using the trigram method there is one thing that might appear as a
+    problem: Two short strings with one (or two or three ...) different
+    trigrams tend to produce a lower similarity then two long ones. To
+    counteract this effect, you can set the module's "warp" property. If you
+    set it to something greater than 1.0 (try something between 1.0 and 3.0,
+    flying at warp 9 won't get you anywhere here), this will lift the
+    similarity of short strings more and the similarity of long strings
+    less, resulting in the '%%%' curve in the (schematical) diagram below.
+
+            1.0
+      simi-  |                                   %            *      %
+      larity |             %           *                   #         #
+      value  |      %         *          #
+             |            *     #
+             |    %    *    #
+             |       *   #
+             |      *
+             |   % * #
+             |
+             |   *
+             |  % #
+             |  *
+             |                         ***  no warp (i.e. warp == 1.0)
+             | %#                      %%%                    warp > 1
+             | *                       ###                    warp < 1
+             |________________________________________________________
+            0.0
+                                                      length of string
+
+           Dependency of similarity value on length of string and warp
+
+    Don't hesitate to use this feature, it sometimes really helps generating
+    useful results where you otherwise wouldn't have got any.
+
+    Please be aware of that a "warp" less than 1.0 will result in an inverse
+    effect pulling down the similarity of short strings a lot and the
+    similarity of long ones less, resulting in the '###' curve. I have no
+    idea what this can be good for, but it's just a side effect of the
+    method. How is all this done? Take a look at the code.
+
+    Splitting strings into trigrams is a time consuming affair and if you
+    want to compare a set of n strings to another set of m strings and you
+    do it on a member to member base you will have to do n * m splittings.
+    To avoid this, this module takes a set of strings as the base of
+    comparison and generates an index of every trigram occuring in any of
+    the members of the set (including the information, how often the trigram
+    occurs in a given member string). Then you can feed it the members of
+    the other set one by one. This results in an amount of n + m splitting
+    plus the overhead from generating the index. This way we save a lot of
+    time at the expense of memory, so - if you operate on a great amount of
+    strings - this might turn out to be somewhat of a problem. But there you
+    are. There's no such thing as a free lunch.
+
+    Anyway - the module is optimized for comparisons of sets of string which
+    results in single comparisons being slower than it might be. So, if you
+    use the "compare()" function which compares single strings in a
+    functional interface, to be able to use the full functionality of the
+    module and not to get into the need to program same things twice,
+    internally a String::Trigram object is instantiated and an index of the
+    trigrams of one of the strings is generated. In practice however this
+    shouldn't be a big disadvantage since a single comparison or just a few
+    won't need too much (absolute) time.
+
+METHODS
+  new
+      my @base = qw(chimpanzee lion emu kangaroo);
+
+      my $trig = new String::Trigram(cmpBase => \@base);
+
+    This is the constructor. Before we are able to do any computing of
+    similarities, it will want the parameter "cmpBase" to point to a
+    reference to an array of strings (the base of comparison). Everything
+    else is taken care of unless you want to change the defaults:
+
+      my $trig = new String::Trigram(cmpBase        => \@base,
+                                     minSim         => 0.5,
+                                     warp           => 1.6,
+                                     ignoreCase     => 0,
+                                     keepOnlyAlNums => 1,
+                                     ngram          => 5,
+                                     debug          => 1);
+
+    PARAMETERS:
+
+    *   "cmpBase" - Reference to array containing strings for base of
+        comparison.
+
+    *   "minSim" - Minimal similarity you are prepared to accept. Specify a
+        value between 0 (not similar at all) and 1 (identity). Any string
+        matching with less (equals) than "minSim" will not be returned in
+        "getSimilarStrings()" and not counted as a match in
+        "getBestMatch()", even if it is the only one. Default is 0, so
+        anything even remotely matching will be returned.
+
+    *   "ngram" - If you do not want to use trigrams, but some other n in
+        n-gram, use this parameter, for example ngram => 5 for 5-grams.
+
+    *   "warp" - Set warp attribute (see description). Default is 1.0 (no
+        warp).
+
+    *   "ignoreCase" - Just that. Default is 1 (do ignore case)
+
+    *   "keepOnlyAlNums" - Remove any \W character before comparison.
+        Default is 0 (keep every character).
+
+    *   "padding" - Set the number of blanks for padding string (see above).
+        The number has to be between 0 and n-1 (n from n-gram). Default is
+        n-1.
+
+    *   "debug" - print some debugging information to STDERR
+
+    CROAKS IF ...
+
+    *   it gets an unknown parameter
+
+    *   ngram is 0
+
+    *   parameter cmpBase does not point to a reference to an array
+
+    *   minimal similarity is out of bounds (should be 0 <= minSim <= 1)
+
+    *   warp is out of bounds (0 <= warp)
+
+    *   padding is out of bounds (should be 0 <= padding <= n-1)
+
+  reInit
+      $trig->reInit(["zebra", "tiger", "snake", "gorilla", "kangaroo"]);
+
+    Give the object a new base of comparison (deleting the old one).
+
+    CROAKS IF ...
+
+    *   parameter does not point to a reference to an array
+
+  extendBase
+      $trig->extendBase(["zebra", "tiger", "snake", "gorilla", "kangaroo"]);
+
+    Add strings to object's base of comparison.
+
+    CROAKS IF ...
+
+    *   parameter does not point to a reference to an array
+
+  minSim
+      $trig->minSim();
+      $trig->minSim(0.8);
+
+    Get or set minimal accepted similarity (see above).
+
+    CROAKS IF ...
+
+    *   minimal similarity is out of bounds (should be 0 <= minSim <= 1)
+
+  warp
+      $trig->warp();
+      $trig->warp(1.4);
+
+    Get or set warp (see above).
+
+    CROAKS IF ...
+
+    *   warp is out of bounds (should be 0 <= warp)
+
+  ignoreCase
+      $trig->ignoreCase();
+      $trig->ignoreCase(0);
+
+    Get or set ignoreCase property (see above).
+
+  keepOnlyAlNums
+      $trig->keepOnlyAlNums();
+      $trig->keepOnlyAlNums(1);
+
+    Get or set keepOnlyAlNums property (see above).
+
+  padding
+      $trig->padding();
+      $trig->padding(2);
+
+    Get or set padding property (see above).
+
+    CROAKS IF ...
+
+    *   padding is out of bounds (should be 0 <= padding <= n-1)
+
+  debug
+      $trig->debug();
+      $trig->debug(1);
+
+    Get or set debug property. For debugging to STDERR, set to 1.
+
+  getSimilarStrings
+      my %results = ();
+      my $numOfSimStrings = $trig->getSimilarStrings("zebrilla", \%results [, minSim => 0.6, warp => 0.7]);
+
+    Get similar strings for first parameter from base of comparison. The
+    result is saved in the second parameter (a reference to a hash), the
+    keys being the strings and the values the similarity values. The method
+    returns the number of found similar strings.
+
+    If parameters minSim or warp are defined, those values are changed
+    temporalily.
+
+    CROAKS IF ...
+
+    *   second parameter is not a reference to a hash
+
+  getBestMatch
+      my @bestMatches = ();
+      my $sim = $trig->getBestMatch("zebrilla", \@bestMatches [, minSim => 0.6, warp => 0.7]);
+
+    Don't bother about all those more or less similar strings, just get the
+    best one. This might actually be more than one, since several strings
+    might result in the same similarity value. So the second parameter is a
+    reference to an array, taking the best similar strings, the first
+    parameter is the string to compare. Returns similarity of best match or
+    0 if there are no similar strings at all (please observe that in the
+    case of no match the return value was -1 up to $VERSION == 0.02).
+
+    If parameters minSim or warp are defined, those values are changed
+    temporarily.
+
+    CROAKS IF ...
+
+    *   second parameter is not a reference to an array
+
+FUNCTIONS
+  compare
+      my $sim = compare($string1, $string2);
+
+    or
+
+      my $sim = compare($string1,
+                        $string2,
+                        minSim         => 0.3,
+                        warp           => 1.8,
+                        ignoreCase     => 0,
+                        keepOnlyAlNums => 1,
+                        ngram          => 5,
+                        debug          => 1);
+
+    Use this if you don't want use the oo- interface. Returns resulting
+    similarity. Note that this is not a very fast way to use the module, if
+    you do a lot of comparisons, since internally for every call to
+    compare() a new Trigram object is initialized (and "DESTROY"ed as it
+    goes out of scope).
+
+    CROAKS IF ...
+
+    [same as using new() and getSimilarStrings()]
+
+EXPORT_OK
+      compare()
+
+AUTHOR
+    Tarek Ahmed, <tarek@epost.de>
+
+SEE ALSO
+    *   "String::Similarity" - Uses edit scripts to compute similarity
+        between strings.
+
+    *   "String::Approx" - Uses Levenshtein edit distance to compute
+        similarity between strings.
+
+    *   "Text::Soundex" - Uses soundex method to compute similarity between
+        strings.
+
+    For an early description of the method, see: R.C. Angell, G.E. Freund,
+    and P. Willet. Automatic spelling correction using a trigram similarity
+    measure. Information Processing and Management, 19(4):255--261, 1983.
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2003 Tarek Ahmed. All rights reserved. This program is free 
+software; you can redistribute it and/or modify it under the same terms as Perl 
+itself.

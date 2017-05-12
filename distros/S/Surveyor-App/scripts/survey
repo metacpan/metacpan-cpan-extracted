@@ -1,0 +1,78 @@
+#!/usr/bin/perl
+# survey
+use Getopt::Std;
+getopts( 'tp:i:', \my %opts );
+
+unless( $opts{'p'} =~ m/\A((?:[A-Z0-9_]+)(?:::[A-Z0-9_]+)*)\z/i ) {
+	die "Invalid package name [$opts{'p'}]\n";
+	}
+eval "use $1; 1";
+
+use Surveyor::App;
+
+if( $opts{'t'} ) {
+	Surveyor::App::test( $opts{'p'}, @ARGV ) or
+		die( 'Tests do not pass for $opts{p}' );
+	}
+
+$opts{'i'} = int( $opts{'i'} );
+
+Surveyor::App::run( $opts{'p'}, int($opts{'i'}) || 10_000, @ARGV );
+
+=head1 NAME
+
+Surveyor::App - Run benchmarks from a package
+
+=head1 SYNOPSIS
+
+	% survey -p PACKAGE -i ITERATIONS -t ARGS;
+
+=head1 DESCRIPTION
+
+C<survey> runs the benchmark subroutines from a package. That way,
+you can pass over your benchmarks as a module.
+
+=over 4
+
+=item -p PACKAGE
+
+The package that has the C<bench_>.
+
+=item -i ITERATIONS
+
+The number of iterations to run.
+
+Default: 10_000
+
+=item -t
+
+Run tests to ensure that call C<bench_> subroutines return the same
+thing.
+
+=back
+
+=head1 TO DO
+
+
+=head1 SEE ALSO
+
+
+=head1 SOURCE AVAILABILITY
+
+This source is in a Git repository that I haven't made public
+because I haven't bothered to set it up. If you want to clone
+it, just ask and we'll work something out.
+
+	https://github.com/briandfoy/surveyor-app
+
+=head1 AUTHOR
+
+brian d foy, C<< <bdfoy@cpan.org> >>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2013, brian d foy, All Rights Reserved.
+
+You may redistribute this under the same terms as Perl itself.
+
+=cut

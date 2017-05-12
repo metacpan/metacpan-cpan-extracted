@@ -1,0 +1,28 @@
+---
+abstract: "A Public Domain \"License\""
+author:
+  - 'William Wolf <throughnothing@gmail.com>'
+build_requires:
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::More: 0
+  perl: 5.006
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132830'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Software-License-PublicDomain
+requires:
+  Software::License: 0
+  parent: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/throughnothing/Software-License-PublicDomain/issues
+  repository: git://github.com/throughnothing/Software-License-PublicDomain.git
+version: 0.1

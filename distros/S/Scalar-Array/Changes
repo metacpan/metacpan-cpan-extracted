@@ -1,0 +1,6 @@
+Revision history for Perl extension Scalar::Array.
+
+0.01  Sat Feb 20 01:07:29 2010
+	- original version; created by h2xs 1.23 with options
+		-n Scalar::Array
+

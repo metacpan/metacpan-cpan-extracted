@@ -1,0 +1,54 @@
+<table class="standard-table">
+  <thead>
+    <tr>
+      <th><% loc('Wiki') %></th>
+      <th><% loc('Privacy') %></th>
+      <th><% loc('Domain') %></th>
+      <th><% loc('Page count') %></th>
+      <th><% loc('Member count') %></th>
+      <th><% loc('Created By') %></th>
+      <th><% loc('Created On') %></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+
+% while ( my $wiki = $wikis->next() ) {
+  <tbody>
+    <tr class="<% $wikis->index() % 2 ? 'odd' : 'even' %>">
+      <td><a href="<% $wiki->uri() %>"><% $wiki->title() %></a></td>
+      <td><% loc( $wiki->permissions_name() ) %></td>
+      <td><a href="<% $wiki->domain()->uri() %>"><% $wiki->domain()->web_hostname() %></a></td>
+      <td><% $wiki->page_count() %></td>
+      <td><% $wiki->member_count() %></td>
+      <td><a href="<% $wiki->creator()->uri() %>"><% $wiki->creator()->best_name() %></td>
+      <td><% loc( '%datetime(%1)', $c->user()->set_time_zone_for_dt( $wiki->creation_datetime() ) ) %></td>
+      <td><a href="<% $wiki->uri( view => 'export' ) %>">Export</a></td>
+      <td><a href="<% $wiki->uri( view => 'delete_confirmation' ) %>">Delete</a></td>
+    </tr>
+  </tbody>
+% }
+
+<& /lib/table/pager.mas,
+   index     => $wikis->index(),
+   pager     => $pager,
+   uri_maker => sub { $c->domain()->application_uri( path => '/wikis', @_ ) } &>
+
+</table>     
+
+<%args>
+$wikis
+$pager
+</%args>
+
+<%method title>
+All Wikis
+</%method>
+
+<%attr>
+sidebar => [ 'admin' ]
+</%attr>
+
+<%flags>
+inherit => '/autohandler'
+</%flags>

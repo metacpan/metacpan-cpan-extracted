@@ -1,0 +1,23 @@
+Revision history for Perl extension Statistics::useR.
+
+0.01  Wed Mar  3 14:55:22 2010
+	- original version; created by h2xs 1.23 with options
+		-A -n Statistics::useR
+		Finished on Mar 8 2010
+
+0.01_001 Fri Mar 12 11:33 2010
+	- Change Makefile.PL to avoid testing failure due to R dependencies.
+
+0.01_002 Thu Mar 18 17:28 2010
+	- Improvement for data type check.
+
+0.01_003 Mon Mar 22 1:10 2010
+	- Improvement for data type check.
+
+0.1.0    Wed May 11 11:18 2011
+	- Add support for parallel analysis (multiple processes)
+	- Add some handy functions
+	- Update the documentation
+
+0.1.1    Mon May 23 12:11 2011
+	- Update Pod file

@@ -1,0 +1,70 @@
+{
+   "abstract" : "delay string interpolation until you really want it",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Moose::Meta::Class::__ANON__::SERIAL::6 version , CPAN::Meta::Converter version 2.140640",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "String-Interpolate-Delayed",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "PadWalker" : "1.0",
+            "PerlX::QuoteOperator" : "0.04",
+            "String::Interpolate" : "0.3",
+            "UNIVERSAL::ref" : "0.09"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Fatal" : "0.007"
+         }
+      }
+   },
+   "provides" : {
+      "String::Interpolate::Delayed" : {
+         "file" : "lib/String/Interpolate/Delayed.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/String-Interpolate-Delayed/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=String-Interpolate-Delayed"
+      },
+      "homepage" : "https://metacpan.org/release/String-Interpolate-Delayed",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-string-interpolate-delayed.git",
+         "web" : "https://github.com/tobyink/p5-string-interpolate-delayed"
+      }
+   },
+   "version" : "0.002"
+}

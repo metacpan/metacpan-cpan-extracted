@@ -1,0 +1,22 @@
+---
+abstract: 'Create a standard histogram for command-line display'
+author:
+  - 'Douglas Webb <doug.webb@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200000, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Statistics-Histogram
+requires:
+  Carp: 0
+  Exporter: 0
+  Getopt::Long: 0
+  Statistics::Descriptive: 0
+  constant: 0
+  parent: 0
+version: 0.2

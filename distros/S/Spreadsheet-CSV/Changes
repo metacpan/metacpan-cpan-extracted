@@ -1,0 +1,73 @@
+Revision history for Spreadsheet-CSV
+
+0.20   Fri Oct 31 21:10:00 2014
+        Fixing tests to cope with changing temp file handling in CGI.pm
+
+0.19   Sat Jul 05 12:40:00 2014
+        Corrected tests again to allow for differing float values
+
+0.18   Sat Jul 05 09:29:00 2014
+        Added more build requirements
+        Corrected tests to allow for differing float values
+
+0.17   Fri Jul 04 21:33:00 2014
+        Added better utf8 checks for csv files for old perls
+        Added CGI as a build requirement
+
+0.16   Fri Jul 04 07:00:00 2014
+        Added missing data files
+
+0.15   Sat Jun 21 19:44:00 2014
+        Switching binary back on by default in Text::CSV_XS.  This allows line feeds to be accepted.
+	Additional coverage tests to handle line feeds in source documents.
+
+0.14   Thu Jan 02 19:28:00 2014
+        Changed the behaviour when parsing text/csv files.  The Text::CSV_XS will not have binary switched on by default.  Instead,
+        the filehandle passed to Text::CSV_XS will have ':encoding(UTF-8)' switched on.
+        Added corrupt csv and non-spreadsheet (image) test cases
+        Improved code coverage a little
+
+0.13   Tue Dec 31 10:50:00 2013
+        Updated minimum requirement for Text::CSV_XS
+        Fix $ExtUtils::MakeMaker::VERSION checking to allow for non numeric version numbers (RHEL clones)
+
+0.12   Sat Dec 28 14:00:00 2013
+        Added content_type and suffix methods
+
+0.11   Thu Dec 26 15:38:00 2013
+        Discovered issues from extracting floating point numbers from Spreadsheet::ParseExcel
+        re-wrote t/01-import.t to accept values supplied by Spreadsheet::ParseExcel
+
+0.10   Thu Dec 26 07:49:00 2013
+        Added more debugging to tests for CPAN Tester failures
+        Set minimum perl to 5.10
+
+0.09   Wed Dec 25 20:32:00 2013
+        Syntax fixes
+
+0.08   Wed Dec 25 19:15:00 2013
+        Improved handling of XML entities
+
+0.07   Wed Dec 25 13:31:00 2013
+        Added License support in Makefile.PL
+
+0.06   Wed Dec 25 13:13:00 2013
+        Added kspread support
+
+0.05   Wed Dec 25 09:17:00 2013
+        Added t/05-sheets-utf8.t for UTF-8 testing and worksheet selection
+        Added default binary option to Text::CSV_XS calls
+
+0.04   Wed Dec 25 07:15:00 2013
+        Added binmode calls to tests
+	Code fixes to allow running on older perls
+
+0.03   Tue Dec 24 07:50:00 2013
+        Added better pod for error_diag method
+
+0.02   Tue Dec 24 07:34:00 2013
+        Fixed problems with pod coverage test
+
+0.01   Mon Dec 23 22:15:00 2013
+        Initial release.
+

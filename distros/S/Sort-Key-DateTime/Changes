@@ -1,0 +1,27 @@
+Revision history for Perl extension Sort::Key::DateTime.
+
+0.07  Apr 24, 2010
+        - some test were failing due to missing time zones
+
+0.06  Apr 21, 2010
+        - updated to work with latest version of Sort::Key and to use
+          the multikey sorting infrastructure
+
+0.05  May 23, 2005
+	- updated to work with latest version of Sort::Key
+
+0.04  May 12, 2005
+	- internal change: use constants instead of hard coded numbers
+	  to select keysort comparison algorithm.
+
+0.03  May 9, 2005
+	- INCOMPATIBLE CHANGE: nothing exported by default now
+	- new dtcmpstr() function
+
+0.02  Apr 26, 2005
+	- renamed to Sort::Key::DateTime
+
+0.01  Tue Apr 26 23:30:02 2005
+	- original version; created by h2xs 1.23 with options
+		-AX -n DateTime::Sort::Key
+

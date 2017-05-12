@@ -1,0 +1,14 @@
+Revision history for Perl extension SQL::Entity.
+
+0.05  Sun Sep 07 2008
+   - Fix MYSQL limit bug
+   - Abstracted dml generation to separated module, so that is can be easily customize (for isntanvr by SQL::Abstract)
+
+0.04  Sun Jun 01 2008
+    -  Added LOBs support
+
+0.03  Sun May 18 2008
+    -  Subquery fix
+
+0.01  Sun May 18 2008
+    -  Initial import to CPAN.

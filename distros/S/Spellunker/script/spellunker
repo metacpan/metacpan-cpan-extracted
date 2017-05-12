@@ -1,0 +1,22 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Spellunker::CLI;
+Spellunker::CLI->new()->run();
+
+__END__
+
+=head1 NAME
+
+spellunker - Spelling checker
+
+=head1 SYNOPSIS
+
+    % spellunker path/to/file
+    % spellunker < path/to/file
+
+=head1 DESCRIPTION
+
+This is yet another spelling checker.
+
+You can check the spelling misses in your text file.

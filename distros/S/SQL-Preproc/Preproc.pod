@@ -1,0 +1,1419 @@
+=head1	NAME
+
+SQL::Preproc - Embed SQL in your Perl (ala SQL preprocessors)
+
+=head1	SYNOPSIS
+
+	use SQL::Preproc 
+		subclass => 'Chart', 
+		emit => 1, 
+		keepsql => 1, 
+		syntax => [ 'Teradata' ], 
+		pponly => 1,
+		relax => 1,
+		alias => 1,
+		debug => 1;
+
+	use DBI;
+	use DBI qw(:sql_types);
+	use SQL::Preproc::ExceptContainer;
+	use DBIx::Chart;
+
+	...some code...
+
+	my ($host, $user, $passwd) = @ARGV;
+	
+	DECLARE CONTEXT $sqlpp_ctxt;
+
+	CONNECT TO "Teradata:$host"
+		USER $userid IDENTIFIED BY $passwd AS myconn WITH tdat_mode => ANSI;
+
+	my $more_rows;
+	WHENEVER NOTFOUND { $more_rows = undef }
+
+	WHENEVER SQLERROR { 
+		my ($ctxt, $err, $state, $errmsg) = @_;
+		die $errmsg;
+	}
+	
+	DECLARE CURSOR mycursor AS 
+		SELECT * FROM mytable FOR UPDATE;
+
+	OPEN mycursor;
+
+	my ($col1, $col2, $col3, $col4);
+	while ($more_rows) {
+
+		FETCH mycursor INTO :$col1, :$col2, :$col3, :$col4;
+
+		if ($col1 > $col4) {
+			UPDATE mytable SET col4 = col4 + 100 
+				WHERE CURRENT OF mycursor;
+		}
+	}
+
+	CLOSE mycursor;
+	#
+	#	do a bulkload via array binding
+	#
+	
+	my @col1 = ();
+	my @col2 = ();
+	my @col3 = ();
+
+	#
+	#	load some data into the arrays, then send it to the DBMS
+	#
+
+	EXEC SQL INSERT INTO sometable VALUES(:@col1, :@col2, :@col3);
+	
+	#
+	#	now create a chart, dumping results to @_
+	#
+	SELECT * FROM mytable
+	RETURNING LINEGRAPH(*), IMAGEMAP
+	WHERE WIDTH=500 
+		AND HEIGHT=500
+		AND FORMAT='PNG'
+		AND LOGO='myimage.png'
+		AND X_AXIS='Date'
+		AND Y_AXIS='Stock Price'
+		AND MAPNAME='stockmap'
+		AND SIGNATURE='GOWI Systems, Inc.'
+		AND SHOWPOINTS=1
+		AND POINT='opencircle';
+
+	open(OUTF, '>mychart.png') || die $!;
+	binmode OUTF;
+	print OUTF, $_[0];
+	close OUTF;
+
+	open(OUTF, '>mychart.map') || die $!;
+	print OUTF, $_[1];
+	close OUTF;
+
+	DISCONNECT myconn;
+
+=begin html
+
+<h2>Download</h2>
+
+<a href="http://www.presicient.com/sqlpp/SQL-Preproc-0.10.tar.gz">
+SQL-Preproc-0.10.tar.gz</a>
+
+=end html
+
+=head1 PREREQUISITE MODULES
+
+Perl 5.8+ (preferably 5.8.5+)
+
+L<DBI> 1.42
+
+L<Filter::Simple> 0.78
+
+L<Text::Balanced> 1.95
+
+L<DBIx::Chart> 0.01 (only when subclass => 'Chart')
+
+DBI Driver for target database system
+
+I<(Optional)> L<Filter::ExtractSource> 0.02 (to dump generated source code;
+an alternative to the B<emit> directive).
+
+I<(Optional)> Target DBMS syntax extension module (see L<Defining SEMs>)
+defined in a SQL::Preproc::<name> package, e.g.,
+see the included SQL::Preproc::Teradata.
+
+=head1 INSTALLATION
+
+Use the usual
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+except on Windows, where you need to
+
+	perl Makefile.PL
+	nmake
+	nmake test
+	nmake install
+
+=head3 Notes on Testing
+
+In order to run the test suite, you'll need at least
+L<DBD::CSV>; however, L<DBD::CSV>'s limited functionality in 
+some areas (e.g., no native TYPE metadata) limits the testing
+possible (e.g., no DESCRIBE testing). To use another DBI driver,
+define the environment variable B<SQLPREPROC_DSN> to a DBI
+compatible DSN string (e.g., 'dbi:Oracle:host'). The test suite
+will use that value instead of DBD::CSV if defined. If your driver
+requires a user id and/or password, they can be assigned
+to the B<SQLPREPROC_USER> and B<SQLPREPROC_PASSWORD>
+environment variables, respectively.
+
+Also note that you'll need to install L<DBIx::Chart> and
+all of its dependent modules in order to run the subclass
+driver tests. Syntax extension testing is not yet possible.
+
+=head1 DESCRIPTION
+
+A SQL preprocessor for Perl. Via Filter::Simple, 
+embedded SQL statements are converted into DBI calls to 
+perform the specified database operation.
+
+B<NOTE>: The current release should be considered B<ALPHA>
+release software, and subject to change at the whim of the
+author. This release is being provided primarily because it
+is probably useful for a large number of basic database
+applications; to solicit feedback; and, frankly, because
+I've run out of time/resources to push it any farther at the moment, 
+I<(contributors are certainly welcome...)>.
+
+The biggest missing pieces at the moment are full integration of
+SEMs, and more thorough test cases.
+
+=head2 Background
+
+For the unfamiliar, embedded SQL first appeared shortly after
+relational databases, primarily for use in COBOL or PL/1 programs.
+In recent years, it is most frequently used with C or C++,
+and, more recently, with Java, via SQLJ. And, now, with Perl!
+
+=head2 Design
+
+Currently, SQL::Preproc embeds a complete code translation in
+place of the source SQL statements, rather than using a runtime
+module to implement the common functionality. While this leads
+to significantly more code within the translated source, it minimizes
+the runtime dependencies on external modules, and provides the
+opportunity for the user to directly inspect the generated code.
+A future release will provide a SQL::Preproc::Runtime module, which
+will provide the common functionality, and reduce the translated
+code size.
+
+=head2 Behaviors
+
+A few usage notes...
+
+=head3 Modules to C<use>/C<require>
+
+Due to the ability to disable/re-enable SQL::Preproc,
+and to process files with multiple packages defined,
+SQL::Preproc can't "C<use>" all the needed modules
+at hte right times. Therefore, the application must 
+explicitly C<use> the following modules:
+
+	use DBI;
+	use SQL::Preproc::ExceptContainer;
+	use DBI qw(:sql_types);		# in case the application needs type info
+	use DBIx::<subclass>;		# if the application uses a DBI subclass
+
+These should be C<use>'d B<after> the "use SQL::Preproc;" statement
+in order to capture them in any B<emit>'d source code.
+
+Also, when using SQL::Preproc on a package, its probably best
+to "C<use SQL::Preproc;>" before the C<package> statement.
+
+=head3 Supported SQL Syntax
+
+SQL statements are detected in the source using the following rules:
+
+=over 4
+
+=item 1
+
+The statement B<must> start on its own line, and must be preceded
+by a line ending in any of '{', '}', ':', '?', ';' (ignoring
+intervening whitespace and comments) B<AND>
+
+=item 2
+
+The statement begins with the prefix "EXEC SQL" B<OR>
+
+=item 3
+
+The statement begins with one of the recognized introductory
+keywords (B<uppercase only>), and can be subsequently parsed as
+a recognizable SQL statement  B<OR>
+
+=item 4
+
+The statement begins with an introductory keyword
+installed by any SQL::Preproc syntax extension module
+(I<aka> B<SEM> - see L<Defining SEMs>).
+
+=back
+
+Once a potential SQL statement is detected, SQL::Preproc appends
+all subsequent lines of code into the statement until a line
+ending with a semicolon (';') terminator (again, ignoring whitespace
+and trailing comments) is detected. This accumulation permits support for
+multistatement SQL requests for those DBMS's that support them (though
+some syntactic morphing may be required).
+
+=head3 Perl Variables as Placeholders
+
+Placeholder values within SQL statements are detected as a 
+colon followed by a valid Perl variable name (as detected by
+L<Text::Balanced>::extract_variable()). Placeholder
+behavior follows the following rules when the statement is executed:
+
+=head4 :scalar-name
+
+For B<CALL> statements only, B<$scalar-name> is assigned the value of 
+the associated OUT parameter.
+
+=head4 :$scalar
+
+=over 4
+
+=item B<in SELECT/FETCH...INTO clause>
+
+B<$scalar> is assigned the value of the associated output column
+
+=item B<as IN/INOUT CALL parameter>
+
+B<$scalar> is bound as a source data parameter and, for INOUT parameters,
+receives the output parameter value (via C<bind_param_inout()>).
+
+=item B<in DESCRIBE..INTO clause>
+
+B<$scalar> is assigned an arrayref of hashrefs of the returned column metadata
+of the form
+
+	[
+	    { 
+	        Name => $sth->{NAME},
+	        Type => $sth->{TYPE},
+	        Precision => $sth->{PRECISION},
+	        Scale => $sth->{Scale}
+	    },
+	#    ...other column metadata...
+	]
+
+=item B<as a source data placeholder>
+
+the value of B<$scalar> is bound to the associated placeholder
+
+=back
+
+=head4 :@array
+
+=over 4
+
+=item B<in SELECT..INTO clause>
+
+@array is assigned the arrayrefs of all returned rows,
+I<ala> $sth->fetchall_arrayref().
+Only a single placeholder may be specified.
+
+=item B<in a FETCH...INTO clause>
+
+@array is assigned the associated output column values from 
+a single returned row, I<ala> $sth->fetchrow_array(). 
+Only a single placeholder may be specified.
+
+=item B<in DESCRIBE..INTO clause>
+
+@array is assigned the hashrefs of the returned column metadata
+of the form
+
+	(
+	    { 
+	        Name => $sth->{NAME},
+	        Type => $sth->{TYPE},
+	        Precision => $sth->{PRECISION},
+	        Scale => $sth->{Scale}
+	    },
+	#    ...other column metadata...
+	)
+
+Only a single placeholder may be specified.
+
+=item B<as a source data placeholder>
+
+@array is bound to the associated placeholder for a bulk execute operation,
+i.e., $sth->bind_param_array() and $sth->execute_array(). Not supported
+for source data placeholders for B<SELECT...INTO>, cursor, or B<CALL> statements.
+
+=back
+
+=head4 :%hash
+
+=over 4
+
+=item B<in SELECT..INTO clause>
+
+%hash is assigned the associated output column values 
+for all returned rows, keyed by the column name. 
+Only a single placeholder may be specified. B<NOTE> 
+that this is different than C<fetchall_hashref()>,
+which returns a hashref keyed by a selected column's value.
+
+=item B<in FETCH..INTO clause>
+
+%hash is assigned the associated output column values 
+for a single returned row, keyed by column name, I<ala>
+$sth->fetchrow_hashref(). Only a single placeholder may be specified.
+
+=item B<in DESCRIBE..INTO clause>
+
+Receives the returned column metadata, keyed by the returned
+column names, e.g.,
+
+	(
+	    $sth->{NAME} =>
+	    { 
+	        Type => $sth->{TYPE},
+	        Precision => $sth->{PRECISION},
+	        Scale => $sth->{Scale}
+	    },
+	#    ...other column metadata...
+	)
+
+Only a single placeholder may be specified.
+
+=item B<as a source data placeholder>
+
+Not supported.
+
+=back
+
+Any combination of references, array elemements, or
+hash entries may be specified, e.g.,
+:$$scalarref, :@$arrayref, :%$hashref, :$$myhash->{some_entry}
+are all valid placeholder syntax.
+
+=head4 Supplying Placeholder Type Information
+
+I<This feature is not yet implemented.>
+
+In the scenarios described above, the placeholders 
+are bound without explicit type information (i.e., default
+binding). I<(Note that in most other strongly-type languages, 
+embedded SQL derives a placeholder's binding type information 
+from the defined type of the associated variable.)>
+In the event a query with placeholders requires
+explicitly defined type information, SQL::Preproc provides
+a typing mechanism via the B<USING> clause query prefix:
+
+B<USING ( perl-variable type-info [ , ... ] ) sql-statement>
+
+e.g., assume a target table of
+
+	CREATE TABLE sometable (
+		column1 integer,
+		column2	varchar(30),
+		column3	float
+	);
+
+and an INSERT statement of
+
+	INSERT INTO sometable VALUES (:$col1, :$col2, :$col3);
+
+If explicit type information is required, it can be provided via
+
+	USING (col1 int, col2 varchar(30), col3 float)
+		INSERT INTO sometable VALUES (:$col1, :$col2, :$col3);
+
+Note that, if the B<USING> clause omits some placeholder
+variables, those variables will use the default binding.
+
+Acceptable types are any of the following DBI type codes without
+the B<'SQL_'> prefix I<[precision, scale denoted by (P), (P,S)]>:
+
+	BINARY(P)
+	BIT
+	BLOB
+	BLOB LOCATOR
+	BOOLEAN
+	CHAR(P)
+	CLOB
+	CLOB LOCATOR
+	DATE
+	DATETIME
+	DECIMAL(P,S)
+	DOUBLE
+	DOUBLE PRECISION
+	FLOAT
+	GUID
+	INTEGER
+	INT
+	INTERVAL
+	INTERVAL DAY
+	INTERVAL DAY TO HOUR(P)
+	INTERVAL DAY TO MINUTE(P)
+	INTERVAL DAY TO SECOND(P,S)
+	INTERVAL HOUR(P)
+	INTERVAL HOUR TO MINUTE(P,S)
+	INTERVAL HOUR TO SECOND(P,S)
+	INTERVAL MINUTE(P)
+	INTERVAL MINUTE TO SECOND(P,S)
+	INTERVAL MONTH
+	INTERVAL SECOND(P)
+	INTERVAL YEAR
+	INTERVAL YEAR TO MONTH
+	LONGVARBINARY(P)
+	LONGVARCHAR(P)
+	MULTISET
+	MULTISET LOCATOR
+	NUMERIC
+	REAL
+	REF
+	ROW
+	SMALLINT
+	TIME(P)
+	TIMESTAMP(P,S)
+	TINYINT
+	TIMESTAMP(P,S) WITH TIMEZONE
+	TIME(P) WITH TIMEZONE
+	UDT
+	UDT LOCATOR
+	VARBINARY(P)
+	VARCHAR(P)
+	WCHAR(P)
+	WLONGVARCHAR(P)
+	WVARCHAR(P)
+
+
+=head3 Supplying Statement Attributes
+
+In some I<(hopefully rare)> circumstances, an application needs to
+specify some DBI statement level attributes with their SQL. SQL::Preproc
+supports this using the B<EXEC SQL> prefixed form of SQL statements.
+If the B<EXEC SQL> prefix is B<immediately> followed by an attributes
+hash list (i.e., C<{ <attribute =>>C< value [, ... ] }>, it will be
+supplied to the associated DBI C<do()>, C<prepare()>, or C<execute()>
+call. E.g.
+
+	EXEC SQL { chart_type_map => [ 
+			{ NAME => 'x', TYPE => SQL_INTEGER },
+			{ NAME => 'y', TYPE => SQL_INTEGER } ] 
+		}
+		SELECT * INTO :$image, :$imagemap from simpline;
+
+will result in a DBI call of
+
+	$sth = $dbh->prepare('SELECT * from simpline',
+		{ chart_type_map => [ 
+			{ NAME => 'x', TYPE => SQL_INTEGER },
+			{ NAME => 'y', TYPE => SQL_INTEGER } ] 
+		});
+
+This method mimics the "escape" syntax used, e.g., by ODBC and JDBC,
+for normalizing variations on SQL dialect and type formatting.
+Note that, in the event the SQL statement to be executed begins
+with such an escape clause, and no statement attributes are needed,
+the SQL must be preceded by an empty hash list, e.g.,
+
+	EXEC SQL {}
+		{fn some_special_sql_dialect};
+
+I<Admittedly, this method is a bit clumsy, but, assuming
+statement attributes are rarely needed, it minimizes
+both the parsing required, and the risk of colliding with
+some database system's SQL dialect.>
+
+=head3 Default Recognized SQL Statements
+
+The following statements are recognized by default
+by SQL::Preproc. Note that wherever a B<name> value
+is specified, either a literal value or a scalar variable
+may be used, and the resulting scalar value must match
+the regex /^[_A-Za-z]\w*$/.
+
+=over 4
+
+=item B<BEGIN WORK>
+
+Begins a section of code to be executed as a single
+transaction, up to any COMMIT WORK or ROLLBACK WORK
+statement. (Causes current $dbh to set AutoCommit => 0)
+
+=item B<CLOSE name>
+
+Closes the specified cursor by calling the associated
+cursor's $sth->finish().
+
+=item B<COMMIT [ WORK ]>
+
+Commits any open transaction on the current connection.
+AutoCommit is turned back on after this statement is executed.
+
+=item B<CONNECT TO dsn [ USER user [ IDENTIFIED BY password ] [ AS name ] [ WITH attributes ]>
+
+Connects to the specified I<dsn> as I<user>, I<password>, with an optional
+I<attributes> hash, optionally assigned the given I<name>.
+
+The B<dsn, user, password, or name> values may be provided as either a scalar variable
+reference, a string literal, or a parenthesized expression:
+
+The B<attributes> is specified as a hashref list, i.e.,
+I<attribute> => I<value>.
+
+B<dsn> is the usual DBI DSN, although the 'dbi:'
+prefix is optional. 
+
+B<user> is the userid for the connection.
+
+B<password> is the password for the given userid.
+
+B<name> is a name assigned to the connection, to permit
+disambiguating multiple concurrent connections within
+the same application. If no name is given, then the default
+name 'default' is supplied.
+
+B<attributes> is a hash list of driver-specific
+attributes/value pairs which are supplied to the
+DBI connect() method.
+
+After a successful CONNECT, the connection is made the "current"
+connection, which will be used for all SQL operations up to a
+B<SET CONNECTION> statement changes the current connection.
+
+=item B<DECLARE CONTEXT $scalar>
+
+Identifies a scalar variable to be used as the SQL::Preproc
+runtime context hashref. The application is responsible for
+declaring $scalar, and/or passing $scalar to subroutines.
+If DECLARE CONTEXT is omitted, then SQL::Preproc defaults
+to $sqlpp_ctxt.
+
+This statement was introduced in order to permit SQL::Preproc
+runtime context to be shared between multiple Perl packages/objects,
+so that, e.g., an application may create connections in one
+object, and then use those connections in other objects/packages.
+The context is a hashref with the following contents:
+
+	{
+	    dbhs => { },            # hashref of connection handles, keyed by name
+	    sths => { },            # hashref of prepared statement handles, keyed by name
+	    cursors => { },         # hashref of cursor statement handles, keyed by name
+	    current_dbh => $dbh,    # current connection handle
+	    current_sth => $sth,    # current statement handle
+	    SQLERROR => [ ],        # stack of error exception objects
+	    NOTFOUND => [ ],        # stack of no rows found exception objects
+		handler_idx => 0 || -1,	# indicates which entry is used on the 
+								# exception handler stacks
+	    rows => $scalar         # rowcount of last DBI statement execution
+	};
+
+If the DECLARE'd scalar is not recognized as a hashref at runtime,
+it will be instantiated with the above structure.
+
+=item B<DECLARE CURSOR name AS select-statement>
+
+Declares a cursor, possibly updatable.
+
+B<select-statement> must be an explicitly specified SELECT
+statement. It may contain placeholders, but cannot
+contain an INTO clause, nor can it be an expression
+requiring runtime evaluation.
+
+Note that the statement will be prepared and executed on the
+current connection B<when the cursor was declared>, which
+may be different than the current connection when
+the cursor is opened. Updatable cursor syntax is database dependent.
+
+=item B<DESCRIBE name [ INTO target ]>
+
+Deposits the returned column metadata information for the named 
+cursor statement into the target placeholder, as defined
+in the L<Perl Variables as Placeholders> section above. If no target is provided,
+the metadata is stored in @_ as an array of hashrefs of metdata.
+
+Note that for some DBI drivers, the column metadata will not be available
+until B<after> the cursor has been opened (i.e., the statement has been 
+executed).
+
+=item B<DISCONNECT [ name | ALL ]>
+
+Disconnects either the current connection (if either B<name> or B<ALL> 
+is not specified), or the named connection, or ALL connections.
+
+=item B<EXECUTE name, EXEC name>
+
+Executes the named PREPARE'd statement. Placeholder values within the named
+statement are applied as described in the L<Perl Variables as Placeholders> section above.
+The named statement B<cannot> be a data returning statement.
+
+Note that the statement will be executed on the
+current connection B<when the statement was prepared>, which
+may be different than the current connection when
+the statement is executed.
+
+=item B<EXECUTE IMMEDIATE string-expr>
+
+Immediately executes the specified statement, which is supplied as
+either a string expression (either a string literal, or any expression which
+evaluates to a string). The resulting statement B<cannot> be a data 
+returning statement. The statement is executed on the current connection,
+and is not subject to any SEM translation processing.
+
+=item B<FETCH name [ INTO placeholder-list ]>
+
+Fetches the current row of the named cursor into the 
+the specied placeholder list (as described in the L<Perl Variables as Placeholders>
+section above); if no INTO clause is specified, the returned
+column values are stored in @_. The cursor is first advanced to the 
+next row, and then the row is retrieved. 
+
+=item B<OPEN name>
+
+Opens the named cursor by executing the associated SELECT
+statement. Placeholder data for the SELECT statement
+is applied as described in the L<Perl Variables as Placeholders> section above.
+When a cursor is OPENed, it is positioned B<before> the first row
+of the result set.
+
+Note that the cursor will be opened on the
+current connection B<when the statement was prepared>, which
+may be different than the current connection when
+the cursor is opened.
+
+=item B<PREPARE name FROM statement>
+
+Prepares the specified B<statement>, supplied as a literal SQL 
+statement, and assigns it the specified B<name>. Returned column 
+metadata can be retrieved via the B<DESCRIBE> statement.
+The statement is prepared on the current connection,
+and may be processed by any defined SEM's.
+
+Note that the statement will be executed on the
+current connection B<when the statement was prepared>, which
+may be different than the current connection when the statement is executed.
+
+=item B<RAISE [ SQLERROR | NOT FOUND ] [ param-list ]>
+
+Raises the specified exception, passing in the optional parameter
+list. SQL::Preproc will prepend the DECLARE'd context variable
+to the I<param-list> before invoking the specified exception
+handler. The usual exception handler rules apply (i.e.,
+B<RAISE> inside an exception handler will invoke the default handler.
+
+=item B<ROLLBACK [ WORK ]>
+
+Rolls back any open transaction on the current connection.
+AutoCommit is turned back on after this statement is executed.
+
+=item B<SELECT column-list [ INTO placeholder-list ] select-body>
+
+Executes the SELECT statement on the current connection, 
+placing the results into the B<placeholder-list> as 
+described in the L<Perl Variables as Placeholders>
+section above; if no INTO clause is provided, then the
+returned column values are stored in @_. 
+B<select-body> is the remainder of the SELECT
+statement , e.g., FROM/WHERE/GROUP/etc. clauses.
+
+=item B<SET CONNECTION name>
+
+Sets the current connection to the named connection. The current
+connection is always used for succeding SQL statements.
+
+=item B<WHENEVER [ SQLERROR | NOT FOUND ] { I<perl-statements> }>
+
+Defines an exception handler. A B<SQLERROR> exception is raised
+whenever a DBI operation returns a defined, non-zero error code,
+or SQL::Preproc detects a runtime anomaly, e.g., attempting to
+execute a SQL statement when no connection is available.
+A B<NOT FOUND> condition is raised whenever a SELECT or
+OPEN cursor statement returns no rows, or the application
+attempts to FETCH beyond the end of a cursor.
+I<perl-statements> is 1 or more Perl statements. SQL::Preproc
+treats the exception handler as a closure at runtime (hence the required
+opening and closing braces), and passes in the context hash, the 
+error code, the SQL state, and the error message text when the 
+handler is invoked (B<NOTE:> The error information
+does not apply for B<NOT FOUND> conditions).
+
+The default exception handler for B<SQLERROR> is
+
+	die $sqlpp_ctxt->{current_dbh}->errstr;
+
+The default exception handler for B<NOT FOUND> is to 
+silently ignore the condition and continue processing; this can
+be problematic for cursor B<FETCH> loops, so be sure to either
+define a B<NOT FOUND> handler, or use other information to
+terminate those loops.
+
+Note that exception handlers are subject to Perl's normal scoping
+rules, i.e., an exception handler defined within a scope block
+is not available outside that block. Multiple exception handlers 
+can be defined within multiple scope levels; only the most current
+handler definition for a condition will be applied. B<Note that
+handlers cannot be nested>, i.e., a handler cannot be defined 
+inside the body of a handler. Any exceptions raised within
+an exception handler are handled by the default handlers.
+
+Note that some operations within exception handlers can lead to 
+general chaos, e.g., "goto" labels outside the current scope.
+
+=item B<Standard SQL Statements>
+
+By default, the following statements are recognized and 
+processed only to extract placeholder variables, and are otherwise
+executed immediately:
+
+B<ALTER, CREATE, DELETE, DROP, GRANT, INSERT, REPLACE, REVOKE, UPDATE>
+
+Syntax extension modules may interpret these statements differently.
+
+=back
+
+=head3 Default Targets for SELECT/FETCH Operations
+
+If FETCH or SELECT are specified without an expicit INTO Clause,
+the column values are returned in @_. Note that only the first row's
+values will be returned for a SELECT.
+
+=head2 Configuration Flags
+
+The following flags can be specified in the
+"use SQL::Preproc" statement:
+
+=over 4
+
+=item B<alias> => I<scalar | undef>
+
+When set to a 'true' value (the default), line number 
+aliasing is enabled. When enabled, SQL::Preproc emits
+C<#line >I<linenumber> into the output source stream, matching
+the linenumber from which the translated SQL statement was taken
+from the input stream. Note that the I<linenumber> values may not
+perfectly align to the original source, especially if SQL::Preproc
+is disabled (via C<no SQL::Preproc>), and then re-enabled.
+
+=item B<debug> => I<scalar | undef>
+
+When set to a non-zero value, causes diagnostic information to be
+dumped to STDERR during the preprocessing phase.
+
+=item B<emit> => I<number | filename-string>
+
+When set to a defined, nonzero numeric value, causes the translated output from the 
+SQL::Preproc filter to be dumped to STDOUT. When set to a filename string,
+opens the specified file for writing, and prints translated output to that file.
+I<filename-string> may be 'STDOUT' or 'STDERR', in which case the output
+will be sent to STDOUT or STDERR, respectively.
+This is useful, e.g., for debugging SQL::Preproc behavior, or saving the resulting 
+sourcecode for distribution in systems lacking Filter::Simple or SQL::Preproc
+support. Also see L<Filter::ExtractSource> for an alternative method
+of capturing filtered source code.
+
+=item B<keepsql> => I<scalar | undef>
+
+When set to a defined, nonzero value, causes SQL::Preproc to output
+the original SQL statements as Perl comments preceding the translated
+output code.
+
+=item B<pponly> => I<scalar | undef>
+
+When set to a non-zero value, causes an exit immediately
+after the preprocessing phase, i.e., the resulting code is
+not further processed by perl. Useful for diagnosing errors
+when used in combination with B<emit>.
+
+=item B<relax> => I<scalar | undef>
+
+When set to a non-zero value, relaxes the generated error checking
+code. Under normal circumstances, nearly all embedded SQL statements
+are preceded by various safety checks (e.g., does a connection
+exist ? Does the referenced cursor exist ?, etc.). Enabling "relaxed"
+mode causes SQL::Preproc to skip generation of this "safety net" code 
+to both improve performance and reduce generated code size.
+
+=item B<subclass> => I<string>
+
+When set to a defined string, causes SQL::Preproc to use
+the string as a DBIx subclassing module name, rather than DBI directly.
+Note that this can be an issue for subclasses that do not process
+regular SQL or handle the usual DBI interface methods/attributes.
+An example supported subclass is 'Chart' (i.e., DBIx::Chart).
+
+=item B<syntax> => [ I<SEM-name [,...]> ]
+
+When set to a SEM name (e.g., 'Oracle', 'MySQL', etc.),
+causes SQL::Preproc to attempt to load a SQL::Preproc SEM
+with the same name (e.g., SQL::Preproc::Oracle,
+SQL::Preproc::MySQL, etc.). This feature permits driver
+and/or database specific SQL syntax to be recognized and
+preprocessed. (See the next section, L<Defining SEMs>,
+for details on creating and using SEMs).
+
+=back
+
+=head2 Defining SEMs
+
+I<This feature is not currently fully integrated, but is documented
+to solicit comments.>
+
+In order to support variations in SQL syntax, SQL::Preproc
+can be configured to load additional syntax preprocessing
+modules I<aka> SEMs (as described above).
+
+To create a SQL::Preproc SEM, create a new
+package named "SQL::Preproc::<extension-name>". The 
+module should define 
+
+=over 4
+
+=item B<a new() constructor method>
+
+This method is the standard object constructor. A SEM object is
+created for each defined SEM. The constructor should 
+return an instance of the class.
+
+A SQL::Preproc callback is passed to the SEM constructor
+to permit the constructor to install new keyword hooks, or
+hooks to existing keywords (see example below).
+
+In addition to the default supported SQL keywords defined
+in the L<Default Recognized SQL Statements> section above,
+SQL::Preproc supports 2 special keywords: 'EXECSQL' to represent the 
+'EXEC SQL' introductory keyword, and 'sqlpp_MULTISTMT' to represent 
+multistatement SQL requests.
+
+Example:
+
+	package SQL::Preproc::Foo;
+
+	my %my_translations = (
+		'FOO', 'my_foo_xlator',
+		'BAR', 'my_bar_xlator',
+	);
+	sub new {
+		my ($class, $sqlpp_callback) = @_;
+		
+		my $self = { };
+		bless $self, $class;
+
+		&$sqlpp_callback($self, $_, $my_translations{$_})
+			foreach (keys %my_translations);
+		return $self;
+	}
+	
+	sub my_foo_xlator {...}
+
+	sub my_bar_xlator {...}
+
+=item B<translation methods>
+
+These are the methods called whenever SQL::Preproc detects
+a registered keyword hook for the SEM.
+The method is called as an object method, and is passed the
+matching keyword, the complete statement text, the currently
+B<DECLARE>'d preprocessor context variable name, and an arrayref 
+of placeholder variables extracted from the statement.
+
+This method is responsible for recognizing any specialized
+SQL statement syntax. If the statement does not match
+any of its syntax rules, the method returns undef; otherwise,
+the method generates the appropriate Perl/DBI code to
+execute the statement.
+
+Example:
+
+	sub my_foo_xlator {
+		my ($self, $keyword, $stmt, $ctxt, $phs) = @_;
+		
+		return undef unless
+			(...parse $stmt here...);
+		...translate $stmt...
+		return $xlated_perl_code;
+	}
+
+If a SEM returns a 'false' value (undef or zero) from a translation method,
+SQL::Preproc will pass the statement to the next available SEM registered
+to the detected keyword. If no other SEM is registered, or can translate
+the statement, the default translation is attempted. If the default
+translation cannot be generated, then the original statement 
+is emitted without translation.
+
+=back
+
+=head3 Multiple SEMs
+
+SEMs are applied to SQL statements in the order they are defined
+in the B<syntax> qualifier (See L<Default Targets for SELECT/FETCH Operations>).
+
+When SQL::Preproc detects a possible embedded SQL statement, it successively
+passes the statement to each associated SEM until one of them returns a 'true'
+value, indicating it successfully translated the statement. If no SEM can
+translate the statement, the default translation is attempted.
+
+Note that, since translation occurs prior to execution of the resulting
+script, it is not possible to dynamically apply SEM's at runtime based
+on current connection information.
+
+=head2 Application Access to Runtime Elements
+
+Driver-specific statement and connection metadata can
+be directly manipulated by the application to do the usual DBI things
+via the DECLARE'd CONTEXT hashref variable. The context hash contains 
+the following members:
+
+=over 4
+
+=item B<current_dbh>
+
+Current connection handle. Set after CONNECT
+or SET CONNECTION statements.
+
+=item B<curr_dbh_name>
+
+Name of the current connection.
+
+=item B<current_sth>
+
+Current statement handle. Set after a statement is prepared and/or
+executed, including when a cursor is opened.
+
+=item B<dbhs>
+
+Hashref of connection handles, keyed by the associated connection name.
+
+=item B<sths>
+
+Hashref mapping PREPAREd statement names to statement handles.
+
+=item B<cursors>
+
+Hashref of statement handles, keyed by the associated cursor name,
+as specified in the DECLARE CURSOR SQL statement.
+
+=item B<cursor_map>
+
+Hashref mapping of DECLARE'd cursor names to the DBI driver generated
+cursor names. Note that this value is set on OPEN (i.e., when the
+statement handle is executed), not DECLARE (i.e., when the
+statement handle is created).
+
+=item B<cursor_open>
+
+Hashref of the cursor names indicating the cursor state;
+set when the cursor is OPEN'ed, and cleared when the cursor 
+is CLOSEd.
+
+=item B<cursor_phs>
+
+Hashref mapping cursor names to the list of any associated placeholder
+variable names. Used for binding placeholders when the
+cursor is OPEN'ed.
+
+=item B<stmt_map>
+
+Hashref mapping PREPAREd statement or cursor names to the name of the
+connection on which they're open. Used to purge the statement handles
+when the associated connection is closed.
+
+=item B<stmt_phs>
+
+Hashref mapping PREPAREd statement names to the list of any associated 
+placeholder variable names. Used for binding placeholders when the
+statement is EXECUTEd.
+
+=item B<SQLERROR>
+
+Arrayref (stack, actually) of SQL::Preproc::ExceptContainer objects. 
+WHENEVER SQLERROR statements create a SQL::Preproc::ExceptContainer object, 
+which is pushed on this arrayref.
+When any subsequent SQL statement raises an error, the topmost object is
+invoked to handle the exception. When a SQL::Preproc::ExceptContainer object
+goes out of scope, it is removed from the stack.
+
+=item B<NOTFOUND>
+
+Arrayref (stack, actually) of SQL::Preproc::ExceptContainer objects. 
+WHENEVER NOT FOUND statements create a SQL::Preproc::ExceptContainer object, 
+which is pushed on this arrayref.
+When any subsequent data-returning SQL statement returns with no rows 
+found, the topmost object is invoked to handle the exception. 
+When a SQL::Preproc::ExceptContainer object
+goes out of scope, it is removed from the stack.
+
+=item B<handler_idx>
+
+Contains the current stack index to use for selecting exception handlers.
+Usually -1, but when an exception is caught, this is changed to
+0 in order to force use of the default handlers when within a handler.
+
+=item B<rows>
+
+Contains the rowcount returned by the various DBI statement
+execution methods.
+
+=item B<tuple_status>
+
+Contains the ArrayTupleStatus arrayref populated by C<execute_array()>.
+Should be inspected in any SQLERROR whenever a bulk operation is
+performed (i.e., whenever an array variable is bound as an input
+placeholder).
+
+=back
+
+Applications are free to access and/or modify these items
+as needed at runtime. E.g., if an application chooses to
+use some other method for creating a DBI connection, it may
+avoid using the CONNECT TO... syntax, instead performing something
+like
+
+	$sqlpp_ctxt->{current_dbh} = $sqlpp_ctxt->{dbhs}{$myname} = 
+		my_own_connection_factory();
+
+	...embedded SQL referencing $myname connection...
+	
+Some elements are useful within exception handlers, e.g.,
+B<current_sth> and/or B<tuple_status> in a SQLERROR
+handler.
+
+=head1 LIMITATIONS/RESTRICTIONS
+
+There are limits to what can be handled by
+SQL::Preproc, though it should easily support most
+common uses of DBI.
+
+Be sure to review the lexical rules described in L<Supported SQL Syntax>
+section above.
+
+=head4 Multistatement SQL
+
+Multistatement SQL requests are currently parsed, but
+not supported, due to DBI's lack of a standard interface for 
+handling multistatement resultsets. Until this issue is 
+resolved, multistatement requests are only
+supportable by SEMs providing driver-specific
+implementations.
+
+=head4 Avoid $__except_N, $__expr_N Variable Names
+
+C<WHENEVER> clauses result in the creation of a lexically
+scoped variable with a name like B<$__except_N>, where I<N> is 
+an "uniquifier" integer. Applications should avoid using similarly
+named variables in order to avoid name conflicts.
+
+Likewise, C<EXECUTE IMMEDIATE> can take any sort of expression,
+including C<eval{ }>s and heredocs. In order to simplify processing,
+the argument is assigned to a C<$__expr_N> scalar before applying
+the value to the DBI C<do()> function.
+
+=head4 Generic Runtime Error Codes and States
+
+Currently, runtime exceptions raised due to SQL::Preproc (rather than
+L<DBI|DBI>) always report an error code of -1, and
+as SQLSTATE of 'S1000'. While the error message text will be detailed
+enough to describe the error, a future release will attempt to provide more
+useful/standards conformant error code and SQLSTATE values.
+
+=head4 Updatable Cursors
+
+Support for updatable cursors varies widely among DBI drivers;
+as such, the default implementation provided by SQL::Preproc may
+not function properly with your DBI driver, and may require a SEM.
+SQL::Preproc's default behavior assumes
+
+=over 8
+
+=item 1
+
+the cursor SELECT statement includes any needed qualifiers to make
+it updatable, including repeating the B<DECLARE'd> cursor name if
+needed.
+
+=item 2
+
+the DBI driver (or database system) synthesizes its own internal name 
+for the cursor, which is provided in the $sth->{CursorName} attribute after
+execution, and may be different than the B<DECLARE'd> cursor name.
+
+=item 3
+
+Positioned updates use the B<WHERE CURRENT OF> I<cursorname> suffix,
+where I<cursorname> is the B<DECLARE'd> cursoname.
+
+=item 4
+
+SQL::Preproc remaps the synthesized CursorName to the B<DECLARE'd>
+cursor name.
+
+=item 5
+
+Currently, C<UPDATE/DELETE...WHERE CURRENT OF cursor-name> B<cannot> be
+used as a B<PREPARE'd> statement, or within an B<EXECUTE IMMEDIATE>
+statement expression, due to the need for SQL::Preproc to remap the
+cursor-name at execution time.
+
+=item 6
+
+The positioned C<UPDATE/DELETE> must be executed on the same connection
+on which the cursor was C<DECLARE>'d.
+
+=back
+
+=head4 Cursors and Transactions
+
+The behavior of cursors with respect to transaction 
+boundaries varies among database systems. At present, SQL::Preproc makes no
+assumptions regarding survivability of cursors following transaction
+commit or rollback.
+
+=head4 Stored Procedure CALLs
+
+Like updatable cursors, stored procedure behavior varies between DBI
+drivers and database systems, and may require a SEM
+to override SQL::Preproc's default behavior. SQL::Preproc's
+default implementation
+
+=over 8
+
+=item 1
+
+Always uses C<bind_param_inout()> to bind IN/INOUT parameters. IN/INOUT
+parameters are recognized as B<:$scalar>. OUT parameters are bound
+via C<bind_col()>, and are recognized as B<:scalar-name>, without any
+Perl variable introductory qualifier (i.e., no [$%@]).
+
+=item 2
+
+Replaces the IN/INOUT placeholders with the B<?> placeholder syntax, and
+removes the colon prefix from the B<:scalar-name> OUT parameters. Note this
+latter behavior may conflict with naming requirements of some database
+systems.
+
+=item 3
+
+Assigns the positional argument of either B<bind_param_inout()> or B<bind_col()>
+based on its sequence within the argument list, reading left to right,
+with the IN/INOUT sequence being separate from the OUT sequence, i.e.,
+the IN/INOUT argument sequence counter is separate from the OUT argument
+sequence counter.
+
+=item 4
+
+Supports only scalar variables to be bound for any of IN, INOUT, or OUT parameters.
+
+=item 5
+
+Does not assume any returned results, other than values returned in
+INOUT or OUT parameters.
+
+=back
+
+=head4 PREPARE'd Statement Restrictions
+
+At present, due to various differences in statement placeholder semantics,
+some statements cannot be B<PREPARE>'d:
+
+=over 8
+
+=item B<SELECT (or other data returning statements)>
+
+The mix of input and output placeholders creates PREPARE issues.
+As an alternative, use B<DECLARE CURSOR> syntax instead, or simply
+execute directly.
+
+=item B<CALL>
+
+Stored procedure placeholder semantics (as described above) are not
+currently handled dur PREPARE processing.
+
+=item B<UPDATE/DELETE...WHERE CURRENT OF cursorname>
+
+As mentioned above, the remapping of cursor names creates issues
+with PREPARE.
+
+=back
+
+=head4 SEMs and Subclassed DBI
+
+Syntax extension modules and subclassed DBI may be mutually exclusive,
+if the subclassed DBI uses SQL syntax extensions that may raise
+errors in the SEM (e.g., DBIx::Chart's 
+"RETURNING..." syntax for rendering charts). In future, SQL::Preproc
+will permit chaining of SEMs, so that a subclass
+SEM can filter out its extensions before
+passing them off to a database-specific SEM.
+
+=head4 Perl Language Restrictions
+
+=over 4
+
+=item B<Syntax Error Reporting>
+
+SQL::Preproc implements a minimal parser, based on 
+L<Filter::Simple> and L<Text::Balanced>. Misplaced
+punctuation, and especially missing quote delimiters,
+are not readily detected, though Perl itself may
+provide reasonably useful clues about where the syntax
+error is located.
+
+=item B<Cannot Mix Embedded SQL With Trailing Control Statements>
+
+SQL::Preproc requires a semicolon ';' to detect the end of an
+embedded SQL statement. In addition, several embedded SQL statemente
+generate multiple Perl statements, including control statements.
+Therefore, trailing Perl control statement syntax is not compatible 
+with embedded SQL. E.g.,
+
+	EXECUTE some_prepared_stmt
+		foreach (0..$max_rows);
+
+is not compatible, but
+
+	foreach (0..$max_rows) {
+		EXECUTE some_prepared_stmt;
+	}
+
+is compatible.
+
+=item B<General Identifiers May Be Detected As SQL>
+
+Due to the limited parse of the detected SQL statements,
+under some circumstances, a "false" SQL detect may occur
+if, e.g., a subroutine has been defined with the same name
+and case as a registered keyword. E.g, if a subroutine
+SELECT has been defined, and is referenced in an expression
+such as
+
+	$variable = $expression ? function1($arg) :
+		SELECT ($arg);
+
+then SQL::Preproc will assume C<SELECT ($arg)> is embedded
+SQL and provide a translation for it. The simplest solution
+is to avoid defining any subroutine name which might collide
+with a SQL introductory keyword, especially if it will be used
+as either a "naked" identifier, or following any of the
+predecent characters used by SQL::Preproc to detect an SQL statement
+(any of C<;, {, }, :>).
+
+=item B<Avoid Using SQL Keywords That Are Perl Keywords>
+
+Similar to the above case, registering (via a SEM) and using
+a SQL keyword that is also a Perl keyword (e.g., BEGIN, END),
+I<(without using an introductory B<EXEC SQL> prefix)>,
+could lead to parsing problems.
+
+=item B<Cannot Embed Perl Comments Within Embedded SQL>
+
+SQL::Preproc currently does not filter out Perl comments
+within embedded SQL statements, so 
+
+	EXEC SQL
+	#
+	# this isn't allowed!!!
+	#
+		INSERT INTO mytable VALUES(...);
+
+will probably cause some problems.
+
+=item B<Heredoc Limitations>
+
+Due to an apparent bug in Text::Balanced 1.65, heredocs
+are parsed entirely by SQL::Preproc. The only supported
+here syntax is 
+
+	<<'<name>'[;]
+	some heredoc
+	test
+	<name>
+	[;]
+
+or
+
+	<<"<name>"[;]
+	some heredoc
+	test
+	<name>
+	[;]
+
+E.g.,
+
+	<<'HEREDOC'
+	some heredoc
+	test
+	HEREDOC
+	;
+	
+
+=back
+
+=head4 Debugging SQL::Preproc
+
+As  a source filter, debugging SQL::Preproc requires an extra
+pinch of syntactic sugar for debugging. Near the top of the
+@INC/SQL/Preproc.pm file, is a commented line
+
+#$DB::single=1;
+
+Uncomment this line to force the Perl debugger to stop within
+SQL::Preproc at startup, rather than at the first line of the
+program being filtered.
+
+If you encounter unexplainable errors, emit the generated code
+using
+
+	use SQL::Preproc
+		emit => 'somefile.pl',
+		keepsql => 1,
+		alias => undef,
+		pponly;
+
+This will write the translated code to 'somefile.pl', keeping
+the original SQL as comments, and turns off the line number
+aliasing. Try running 'somefile.pl' under the perl debugger
+and see if that isolates the error. And if you still have
+problems, edit the output file to remove any confidential
+info, and forward to me.
+
+=head1 TO DO
+
+=over 4
+
+=item 1.
+
+bundle syntax handlers for popular databases (Oracle, MySQL, Pg, etc.)
+(I'd be happy to consider adding SEMs to the bundle
+if anyone is interested in providing them).
+
+=item 2.
+
+support for multi-statement requests
+
+=back
+
+=head1 SEE ALSO
+
+L<Filter::Simple>, L<Text::Balanced>, L<DBI>, L<DBIx::Chart>
+
+=head1 ACKNOWLEDGEMENTS
+
+Special thanks to Damian Conway for his assistance/patience
+in tweaking Filter::Simple to support SQL::Preproc's
+requirements.
+
+=head1 AUTHOR and COPYRIGHT
+
+COPYRIGHT(C) 2004,2005, Dean Arnold, Presicient Corp., USA. All rights reserved.
+
+L<mailto:darnold@presicient.com>
+
+L<http://www.presicient.com/sqlpp>
+
+Permission is granted to use this software according to the terms of the
+Artistic License, as specified in the Perl README file,
+with the exception that commercial distribution, either 
+electronic or via physical media, as either a standalone package, 
+or incorporated into a third party product, requires prior 
+written approval of the author.
+
+This software is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Presicient Corp. reserves the right to provide support for this software
+to individual sites under a separate (possibly fee-based)
+agreement.
+
+=cut

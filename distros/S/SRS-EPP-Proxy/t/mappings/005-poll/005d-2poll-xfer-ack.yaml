@@ -1,0 +1,20 @@
+template: poll-ack.tt
+
+vars:
+  msg_id: 0001005d-2-xfer.yml%20
+
+input_assertions:
+  class: SRS::EPP::Command::Poll
+  match:
+
+SRS:
+ - assertions:
+     count:
+     attr_is:
+      - [ '//AckMessage', 'TransId', '005d-2-xfer.yml ', 'EPP: TransId has trailing space' ]
+     
+output_assertions:
+  attr_is:
+    - [ '//epp:result', 'code', 1000, 'EPP: response code' ]
+  match:
+    - [ '//epp:msgQ/@id', '/\+$/', 'EPP: escaped a trailing space' ]

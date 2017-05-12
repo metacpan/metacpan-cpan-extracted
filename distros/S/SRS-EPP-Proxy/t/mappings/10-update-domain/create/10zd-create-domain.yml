@@ -1,0 +1,22 @@
+description: set up domain to be cancelled
+registrar: 1
+
+
+request: |-
+ <NZSRSRequest VerMajor="4" VerMinor="4" RegistrarId="100">
+  <DomainCreate Delegate="1" DomainName="10zd.co.te" Term="1" ActionId="[% actionid %] 2">
+    <RegistrantContact HandleId="10d"/>
+    <AdminContact HandleId="10d"/>
+    <TechnicalContact HandleId="10d"/>
+    <NameServers>
+      <Server FQDN="ns1.everydns.net"/>
+      <Server FQDN="ns2.everydns.net"/>
+      <Server FQDN="ns3.everydns.net"/>
+      <Server FQDN="ns4.everydns.net"/>
+    </NameServers>
+  </DomainCreate>
+ </NZSRSRequest>
+
+
+assertions:
+ - xpath_matches: [ '//Error', '0', 'No errors' ]

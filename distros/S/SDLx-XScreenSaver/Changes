@@ -1,0 +1,9 @@
+Revision history for Perl extension SDLx::XScreenSaver.
+
+0.02  Sun, 01 Feb 2015 11:46:12 -0600
+	- Update Devel::CheckLib for compatibility with newer Perl versions RT95254
+
+0.01  Sun Apr 17 22:50:00 2010
+	- Initial version
+
+

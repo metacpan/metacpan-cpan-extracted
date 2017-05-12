@@ -1,0 +1,89 @@
+#!/usr/bin/perl
+
+# Copyright (C) 2008 Eric L. Wilhelm
+
+use warnings;
+use strict;
+
+=head1 NAME
+
+shebangd - a little shebangml webserver
+
+=cut
+
+package Shebangml::Server;
+use base 'HTTP::Server::Simple::Er';
+
+use File::Fu;
+
+use Class::Accessor::Classy;
+ri qw(html_root component_root);
+no  Class::Accessor::Classy;
+
+my %types = (
+  map({$_ => "image/$_"} qw(png jpg)),
+  ico => 'image/x-icon',
+  map({$_ => "application/"} qw(pdf)),
+  ps  => 'application/postscript',
+  map({$_ => "text/$_"} qw(css)),
+);
+sub handler {
+  my $self = shift;
+
+  eval {
+    my $path = $self->path;
+    $path =~ s#/$#/index.html#;
+    $path =~ s#^/+## or die;
+    $path = $self->html_root + $path;
+
+    if($path =~ m/\.html$/) {
+      my $hbml = $path & sub {s/\.html$/.hbml/};
+      if($hbml->e) {
+        my $fh = $hbml->piped_open('shebangml');
+        return $self->output(join('', <$fh>));
+      }
+    }
+    my %params;
+    my ($ext) = $path =~ m/\.([^\.]+)$/;
+    if(my $type = $types{$ext}) {
+      $params{content_type} = $type;
+    }
+    $self->output(\%params, scalar($path->read));
+  };
+  if(my $err = $@) {
+    use Text::Wrap ();
+    local $Text::Wrap::columns = 72 || $Text::Wrap::columns;
+    $err = Text::Wrap::wrap('','  ', $err);
+    $self->output(500 => "<pre>$err</pre>");
+  }
+}
+
+package bin::shebangd;
+
+use Getopt::Helpful;
+
+sub main {
+  my (@args) = @_;
+
+  my $port = 8089;
+  my $hopt = Getopt::Helpful->new(
+    ['p|port=i', \$port, '<port>', "port number ($port)"],
+    '+help',
+  );
+  $hopt->Get_from(\@args);
+
+  my $server = Shebangml::Server->new(
+    port      => $port,
+    html_root => File::Fu->dir(-d 'html' ? 'html' : '.'),
+  );
+  $server->run;
+}
+
+package main;
+
+if($0 eq __FILE__) {
+  bin::shebangd::main(@ARGV);
+}
+
+# vi:ts=2:sw=2:et:sta
+my $package = 'bin::shebangd';

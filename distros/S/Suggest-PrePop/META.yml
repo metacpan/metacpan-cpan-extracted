@@ -1,0 +1,36 @@
+---
+abstract: 'suggestions based on prefix and popularity'
+author:
+  - Inspire
+build_requires:
+  Test::Most: '0.34'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Suggest-PrePop
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Cache::RedisDB: '0.09'
+  Moose: '2.0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/Inspire-com/perl-Suggest-PrePop/issues
+  homepage: https://github.com/Inspire-com/perl-Suggest-PrePop
+  repository: https://github.com/Inspire-com/perl-Suggest-PrePop.git
+version: 2.1.1
+x_contributors:
+  - 'Matt Miller <matt@inspire.com>'
+  - 'nebulous <nebulous@crashed.net>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

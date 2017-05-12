@@ -1,0 +1,42 @@
+Revision history for Statistics-Sequences-Runs-0.22
+
+0.22 2017.04.10
+    - validity checks for expected(), variance(), skewness() and kurtosis() changed to ensure that the frequencies of each state are defined.
+    - observed() changed to not only increment from the second element if it is different from the first, but to also count 1 if it is the first element and possibly only element. The result is no different from the prior algorithm, which simply set the count to increment from 1, not 0.
+    - cases where there are no elements in the loaded sequence, or there is only one state in the sequence, revised so that the expected and z_values are empty strings in the first case, and only expected is defined in the second (z_score is again empty, because there is no variance).
+    - observed_per_state() method also revised to ensure handles a sequence with only 1 run, or an empty sequence (see POD).
+    - p_value exact method rationalised so that tails arg has no effect
+    - require Statistics::Zed of 0.10 in build
+    - croak re more than 2 states no longer also prints all states (could be many)
+    - p_value changed to not call parent stats_hash() method for its (own) values; get them itself
+    - bi_frequency edited to set @vals = as values of %states by default, not end of if() clause
+    - removed excessive aliases and experimental lrx() method
+    - POD additions and edits, adding SUPPORT section
+
+0.21 2015.01.11
+    - corrected some POD issues
+
+0.20 2015.01.10
+    - added pmf(), cdf() and cdfi() methods: prob mass and cumulative dist functions for runs; 
+    - added public methods for their constituent frequencies, n_max_seq() and m_seq_k()
+    - added bi_frequency()
+    - rationalised calling for an exact p_value() re above: if exact option when calling p_value() is true, it will always return the "correct" p-value from the cdf, i.e., either from cdf() if observed() < expected(), otherwise from cdfi(). So the values 0 and -1 are no longer used to customise which one to go to, for if the "correct" one is not given, a value greater than 1 could be returned.
+    - load() no longer  itself checks if the data contain only 2 elements; this is left for each submethod to check, as they can always be given novel data in any case; & prevents load() having to access() whatever data it loaded, however it loaded it.
+    - added: skewness() and kurtosis() methods
+    - Build.pl and Makefile.pl now explicitly require "Array::Compare" for testing
+    - misc. clean-ups of some code and POD, including doi links in REFERENCES section.
+
+0.12 2013.08.12
+    - fixed an anomaly in a test file that became incompatible with latest version (0.06+) of Statistics::Data.
+
+0.11 2013.07.01
+    - load() checks last loaded sequence as composed of only two elements by reading with index => -1
+    - De-Moosified
+    - Misc POD revisions only
+
+0.10 2013.06.01
+    - uses Statistics-Sequences as base, which use Statistics::Data as its base - not compatible with prior versions (<= 0.06). 
+
+0.01 2006.12.31
+    - First version, released on an unsuspecting world.
+

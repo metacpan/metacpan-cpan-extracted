@@ -1,0 +1,31 @@
+bin/svplus
+Changes
+eg/example.svp
+lib/DBIx/SystemCatalog.pm
+lib/DBIx/SystemCatalog/mysql.pm
+lib/DBIx/SystemCatalog/Oracle.pm
+lib/DBIx/SystemCatalog/Pg.pm
+lib/DBIx/SystemCatalog/XBase.pm
+lib/Hints.pm
+lib/Hints/Base.pm
+lib/Hints/Base/svplus.pm
+lib/Hints/X.pm
+lib/Logo/svplus.pm
+lib/PostScript/Poster.pm
+lib/Print/Printcap.pm
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+MYMETA.json
+MYMETA.yml
+README
+README.md
+t/01.t
+t/02.t
+t/03.t
+t/04.t
+t/05.t
+t/06.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

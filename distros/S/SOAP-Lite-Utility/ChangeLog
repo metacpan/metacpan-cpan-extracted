@@ -1,0 +1,9 @@
+Revision history for soap_lite_utility.
+
+0.01  Sun May 29 12:33:39 2005
+	- original version; created by sdist 1.9
+	- Implementing create_soap_instance
+	- Implementing soap_assert
+	- Implementing packaging & docs
+
+

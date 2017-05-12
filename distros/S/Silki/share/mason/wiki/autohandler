@@ -1,0 +1,30 @@
+<%init>
+return $m->call_next();
+</%init>
+
+<%method local_nav>
+  <ul>
+    <li>
+      <a href="<% $wiki->uri( view => 'tags' ) %>"
+         title="<% loc( 'All tags in this wiki' ) %>"><% loc( 'Tags (%1)', $wiki->tag_count() ) %></a>
+    </li>
+    <li>
+      <a href="<% $wiki->uri( view => 'users' ) %>"
+         title="<% loc( 'Wiki members' ) %>"><% loc('People') %></a>
+    </li>
+% if ( $c->user()->has_permission_in_wiki( wiki => $wiki, permission => Silki::Schema::Permission->Manage() ) ) {
+    <li>
+      <a href="<% $wiki->uri( view => 'settings' ) %>"
+         title="<% loc( 'Change settings for this wiki' ) %>"><% loc('Settings') %></a> 
+    </li>
+% }
+  </ul>
+
+<%args>
+$wiki
+</%args>
+</%method>
+
+<%attr>
+sidebar => [ 'recently-viewed' ]
+</%attr>

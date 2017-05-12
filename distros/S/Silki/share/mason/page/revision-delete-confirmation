@@ -1,0 +1,24 @@
+<p>
+  <% loc('Are you sure you want to purge this revision? Once you do, the revision cannot be recovered.') %>
+</p>
+
+<p>
+  <% loc( 'Revision <em>%1</em> of %2 for %3',
+          $revision->revision_number(),
+          $page->most_recent_revision()->revision_number(),
+          $page->title() ) | n %>
+</p>
+
+<form action="<% $revision->uri() %>" method="post">
+  <input type="hidden" name="x-tunneled-method" value="DELETE" />
+  <input type="submit" value="<% loc('Yes, delete it') %>" />
+</form>
+
+<%args>
+$revision
+$page
+</%args>
+
+<%method title>
+<% loc( 'Delete this page?') %>
+</%method>

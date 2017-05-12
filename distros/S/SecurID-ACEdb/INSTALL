@@ -1,0 +1,21 @@
+First, edit Makefile.PL to change the LIBS and INC, which specify the
+location of the ACE Administrative API libraries and include
+files. These files are typically found in the examples subdirectory
+under the top-level ACE/Server installation. You must also modify the
+macro field and change the DLC variable, which specifies where the RDBMS
+libraries are kept.
+
+You should be able to install by running these commands:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+Before you can test this package, you will need to have write access to
+the ACE databases, because some of the tests require creating and
+destroying bogus users. Even if the tests did not modify any databases
+the API always opens the databases in read/write mode. The test script
+will ask you for the serial number of an unused token for doing the user 
+modification tests. If you want to skip these tests, enter the word NONE 
+in place of the serial number. 

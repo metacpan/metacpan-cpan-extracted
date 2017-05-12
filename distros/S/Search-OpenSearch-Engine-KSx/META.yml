@@ -1,0 +1,30 @@
+--- #YAML:1.0
+name:               Search-OpenSearch-Engine-KSx
+version:            0.09
+abstract:           KinoSearch server with OpenSearch results
+author:
+    - Peter Karman <karman@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    perl:                5.008003
+    Search::OpenSearch:  0.13
+    SWISH::Prog::KSx:    0.17
+    Test::More:          0
+resources:
+    bugtracker:  http://rt.cpan.org/NoAuth/Bugs.html?Dist=Search-OpenSearch-Engine-KSx
+    homepage:    http://perl.peknet.com/
+    license:     http://dev.perl.org/licenses/
+    repository:  http://svn.peknet.com/perl/Search-OpenSearch-Engine-KSx/
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

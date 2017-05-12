@@ -1,0 +1,14 @@
+Changes
+lib/String/Validator/Email.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/11-length.t   
+t/21-options.t  
+t/22-mx.t
+t/10-matches.t  
+t/20-default.t  
+t/23-string.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

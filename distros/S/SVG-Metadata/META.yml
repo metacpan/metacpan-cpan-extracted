@@ -1,0 +1,18 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         SVG-Metadata
+version:      0.28
+version_from: lib/SVG/Metadata.pm
+installdirs:  site
+requires:
+    File::Basename:                2.6
+    File::Copy:                    2.03
+    File::Find:                    1.04
+    File::Path:                    1.0404
+    File::Spec:                    0.82
+    Getopt::Long:                  2.25
+    Pod::Usage:                    1.14
+    XML::Twig:                     3.15
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

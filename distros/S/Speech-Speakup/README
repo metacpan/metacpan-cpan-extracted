@@ -1,0 +1,28 @@
+       Speech::Speakup         The Speakup screen-reader
+
+Speakup is a screen-reader that runs on Linux as a module within the
+kernel.  A screen-reader allows blind or visually-impaired people to
+hear text as it appears on the screen, and to review text already
+displayed anywhere on the screen. Speakup only runs on linux consoles,
+but is powerful and ergonomic, and runs during the boot process.
+
+The Speech::Speakup module allows applications a consistent,
+easy-to-use interface to get or set Speakup's various parameters.
+
+Speakup has parameters at the screen-reader level that you can
+get and set by using the routines speakup_get and speakup_set.
+
+One of those parameters is the particular voice synthesiser engine
+that speakup will use; this synthesiser has its own parameters,
+parameters that speakup will use when invoking it, and which you
+can get and set by using the routines synth_get and synth_set.
+
+To install just:
+   perl Makefile.PL ; make ; make install
+
+For up-to-date source, see http://search.cpan.org/~pjb
+
+A call-interface-compatible Python3-module may be included one day,
+but is not yet included.
+
+Peter Billam                http://www.pjb.com.au/comp/contact.html

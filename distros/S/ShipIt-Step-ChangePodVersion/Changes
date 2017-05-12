@@ -1,0 +1,13 @@
+0.04    2010-08-03
+        Added minimum version requirements to prerequisites
+
+0.03    2010-05-03
+        Fixed Pod not to have two BUGS sections
+        Tested editing of all Modules' Pod VERSION  with HTTP::Exception and it worked like charm
+
+0.02    2010-05-03
+        Added Option to edit all Modules' Pod VERSION
+        Added Code for editing all Modules
+
+0.01    2010-05-03
+        Initial Implementation

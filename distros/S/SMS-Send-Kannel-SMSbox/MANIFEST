@@ -1,0 +1,15 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/SMS/Send/Kannel/SMSbox.pm
+perl-SMS-Send-Kannel-SMSbox.spec
+t/001_load.t
+t/changes.t
+t/kwalitee.t
+t/pod-coverage.t
+t/pod-spell.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

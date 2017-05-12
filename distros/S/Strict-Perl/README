@@ -1,0 +1,61 @@
+NAME
+
+  Strict::Perl - Perl module to restrict old/unsafe constructs
+
+SYNOPSIS
+
+  use Strict::Perl 2017.05; # must version, must match
+
+DESCRIPTION
+
+  Strict::Perl provides a restricted scripting environment excluding old/unsafe
+  constructs, on both modern Perl and traditional Perl.
+
+  Strict::Perl works in concert with Modern::Open and Fake::Our if those are used
+  in your script.
+
+  Version specify is required when use Strict::Perl, like;
+
+    use Strict::Perl 2017.05;
+
+  It's die if specified version doesn't match Strict::Perl's version.
+
+  On Perl 5.010001 or later, Strict::Perl works as;
+
+    use strict;
+    use warnings qw(FATAL all);
+    use Fatal # by compatible routine in Strict::Perl
+    qw(
+        seek sysseek
+        dbmclose dbmopen
+        binmode close chmod chown fcntl flock ioctl open sysopen truncate
+        chdir closedir opendir link mkdir readlink rename rmdir symlink
+        pipe
+        msgctl msgget msgrcv msgsnd
+        semctl semget semop
+        shmctl shmget shmread
+        accept bind connect getsockopt listen recv send setsockopt shutdown socketpair
+        fork
+    );
+    use autodie qw(
+        read sysread syswrite
+        fileno
+    );
+
+  Prohibited modules in script are;
+
+    Thread  threads  encoding  Switch
+
+  Please see POD document for other Perl version and more information.
+
+INSTALLATION
+
+  1. Copy Strict/Perl.pm to @INC directory.
+
+SEE ALSO
+
+  ina - CPAN
+  http://search.cpan.org/~ina/
+
+  BackPAN - A Complete History of CPAN
+  http://backpan.perl.org/authors/id/I/IN/INA/

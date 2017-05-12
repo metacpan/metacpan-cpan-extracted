@@ -1,0 +1,52 @@
+Revision history for Perl extension Scalar::Util::Numeric.
+
+0.40 Mon Oct 20 22:55:00 2014
+
+    - RT 122843: handle case variants of 1.#IND, 1.#INF &c. on Windows (thanks, Aaron Crane)
+
+0.30 Mon Sep 29 22:57:42 2014
+
+    - improve test diagnostics to help track down perl 5.21.3 regression (Schwern)
+    - fix test nits (Schwern)
+    - add the standard CPAN .gitignore file (Schwern)
+    - update ppport.h from 3.19 to 3.24 (chocolateboy)
+
+0.22 Wed Aug 25 11:45:18 2010
+
+    - Windows: don't call grok_number if we already know it isn't
+    - XS cleanup
+    - more tests
+
+0.21 Wed Aug 25 02:53:53 2010
+
+    - call grok_number directly rather than the redundant looks_like_number wrapper
+
+0.20 Tue Aug 24 22:56:36 2010
+
+    - try to fix Inf and NaN on Windows
+    - handle overloaded objects
+
+0.11 Mon Aug 23 17:52:30 2010
+
+    - only show diagnostics for failing tests
+
+0.10  Sat Aug 21 14:16:07 2010
+
+    - bump min perl version to 5.8.0
+    - implement all functions in XS
+    - test that isint and isfloat aren't fooled by "1.0" (Schwern)
+    - eliminate the test-only deps on Math::Complex and Math::BigInt (Schwern)
+    - add GitHub repository
+    - update ppport.h
+    - misc cleanup (chocolateboy, Schwern)
+
+0.02  Sun Oct 9 23:27:04 2005
+
+    - fix uvmax test
+    - fix documentation typo (thanks, Mike Castle)
+
+0.01  Sat Mar 26 15:01:09 2005
+
+    - original version; created by h2xs 1.23 with options
+        -n Scalar::Util::Numeric
+

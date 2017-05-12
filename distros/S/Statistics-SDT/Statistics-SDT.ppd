@@ -1,0 +1,8 @@
+<SOFTPKG NAME="Statistics-SDT" VERSION="0,05,0,0">
+    <TITLE>Statistics-SDT</TITLE>
+    <ABSTRACT>Signal detection theory (SDT) measures of sensitivity and response-bias</ABSTRACT>
+    <AUTHOR>Roderick Garton &lt;rgarton@cpan.org&gt;</AUTHOR>
+    <IMPLEMENTATION>
+        <CODEBASE HREF="PPM-Statistics-SDT-0.05.tar.gz" />
+    </IMPLEMENTATION>
+</SOFTPKG>

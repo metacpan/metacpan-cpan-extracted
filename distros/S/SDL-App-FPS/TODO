@@ -1,0 +1,25 @@
+
+############################################################################## 
+SDL::App::FPS:
+
+* stop_time_warp_ramp() is fine, but we also need
+  freeze_time_warp_ramp() and unfreeze_time_warp_ramp()
+* inline _ramp_time_warp() into update() for more speed?
+* add a fullscreen_toggled_handler() hook ?
+* code most of the critical stuff in SDL::App::FPS in XS for low-overhead
+  (especially necc. for next_frame() and handle_events())
+* sort our timers and buttons into active/inactive groups, too, as to not
+  need to check the inactive ones at all
+* call $event->button() and pass this to the check() routines of Button
+  objects, because those saves us multiple calls to get the same value 
+* elliptic shapes for Button are not properly yet
+* load() and save() are not fully done yet
+* Thingy: signals SIGNALE_ACTIVATE and SIGNAL_DEACTIVATE
+  (and don't ignore the ACTIVATE signal even when not active)
+* let clock jump directly to a specific time (instead of just ramping time
+  warp up)
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

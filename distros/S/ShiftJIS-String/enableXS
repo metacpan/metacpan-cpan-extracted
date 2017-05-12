@@ -1,0 +1,16 @@
+#!perl
+use File::Copy ();
+
+if (-f "String.xsX") {
+    print STDERR "Enabling XSUB in sources...\n";
+
+    die "***** Failed, sources could be inconsistent! *****\n"
+    unless  File::Copy::move('MANIFEST',	'MANIFEST.NXS')
+	and File::Copy::move('MANIFEST.XS',	'MANIFEST')
+	and File::Copy::move('String.pm',	'String.pmN')
+	and File::Copy::move('String.xsX',	'String.xs')
+	and File::Copy::move('String.pmX',	'String.pm');
+}
+
+1;
+__END__

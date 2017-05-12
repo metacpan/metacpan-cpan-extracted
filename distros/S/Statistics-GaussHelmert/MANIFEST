@@ -1,0 +1,9 @@
+README
+ChangeLog
+MANIFEST
+Makefile.PL
+GaussHelmert.pm
+t/basic.t
+t/line_estimation.t
+t/simple_line_estimation.t
+example/line2d-estimation.pl

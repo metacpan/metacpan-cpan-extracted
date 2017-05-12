@@ -1,0 +1,12 @@
+SQLite::DB
+===========
+
+SQLite is a small fast embedded SQL database engine.
+
+SQLite:DB provides an simple object oriented wrapper to DBI 
+and SQLite DBD driver, so you can easyly interface with then.
+
+For more information, take an look on DBI and DBD::SQLite.
+
+This module is distributed under the same terms as Perl itself, and
+is copyright Vitor Serra Mori, 2004.

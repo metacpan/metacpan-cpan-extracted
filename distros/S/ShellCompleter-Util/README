@@ -1,0 +1,21 @@
+SYNOPSIS
+
+DESCRIPTION
+
+    This module will be replaced by the newer Shell::Completer when it is
+    ready.
+
+    This module provides utility routines for App::ShellCompleter::*
+    applications.
+
+FUNCTIONS
+
+ run_shell_completer_for_getopt_long_app(%go_spec)
+
+SEE ALSO
+
+    App::ShellCompleter::* modules which use this module, e.g.
+    App::ShellCompleter::mpv.
+
+    Getopt::Long::Complete
+

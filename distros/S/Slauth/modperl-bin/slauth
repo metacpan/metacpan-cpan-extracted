@@ -1,0 +1,8 @@
+# "Slauth" web authentication system
+# user access and administrative interface
+
+use Slauth::User::Web;
+
+my $r = shift;
+my $web = new Slauth::User::Web ( "request" => $r );
+return $web->interface;

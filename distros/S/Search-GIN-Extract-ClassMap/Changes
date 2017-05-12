@@ -1,0 +1,123 @@
+Revision history for Search-GIN-Extract-ClassMap
+
+1.000003 2017-03-07T10:08:08Z b8fae85
+ - Bugfix: avoid test failures with -Ddefault_inc_excludes_dot
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000002, see misc/*.deps* for details
+ - develop: +3 ↑2 (suggests: ↑2)
+
+1.000002 2015-08-16T08:09:03Z 7e56737
+ [Documentation]
+ - Turns out I suck at L<>, and this release hopefully finally has all the L<> links fixed.
+
+1.000001 2015-08-16T08:00:25Z 1ed7610
+ [Documentation Fix]
+ - Don't you hate it when you find yourself short of a colon?
+
+1.000000 2015-08-16T07:38:09Z 5020828
+ [01 - Version Scheme]
+ - Version scheme migrated from mantissa=8 to mantissa=6.
+ - This is the primary reason for the 1.x on the box.
+ - https://questhub.io/realm/perl/quest/5388d3a9bbd0be2224000129
+
+ [02 - Installer Changed To ExtUtils::MakeMaker]
+ - Many install-time things have changed due to shipping with ExtUtils::MakeMaker as the installer
+ - https://questhub.io/realm/perl/quest/5388cc12bbd0be5b2500011f
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01060817, see misc/*.deps* for details
+ - build: -1
+ - configure: +2 -1 (recommends: +1)
+ - develop: +54 -2 (recommends: +1 -1, suggests: +1 ↑1)
+ - runtime: (recommends: +1)
+ - test: +3 ↓1 -2 (recommends: +3)
+
+0.01060817 2013-04-10T06:25:04Z
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01060816, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: +5 (suggests: ↑1)
+ - test: ↑1
+
+ [Documentation]
+ - Update copyright year
+ - Add README.mkdn
+
+ [Meta]
+ - Bug tracker to github issues
+
+ [Packaging]
+ - Utilise test_requires in Build.PL
+
+0.01060816 2012-03-13T06:22:02Z
+ - Maintenance Release
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01060815, see misc/*.deps* for details
+ - develop: (recommends: ↑1, suggests: ↑1)
+ - runtime: +3
+ - test: -1
+
+ [Internals]
+ - Move $VERSION declarations out of BEGIN
+ - Declare $AUTHORITY in all namespaces.
+
+ [Packaging]
+ - Update LICENSE (  Year, Indent, Address )
+ - Moved release/author tests to xt/
+ - Move github uri's to https://
+ - add x_authority to meta
+ - move to git versions
+ - regenerate compile tests.
+
+0.01060815 2011-04-14T03:32:21Z
+ - Maintenance release.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01002312, see misc/*.deps* for details
+ - build: +1
+ - configure: +1
+ - develop: +1 (recommends: +1, suggests: +1)
+ - runtime: +4 ↓4 -2
+ - test: +4
+
+ [Documentation]
+ - Fixed a few POD spelling issues.
+
+ [Packaging]
+ - Move to @Author::KENTNL
+ - Stop shipping Makefile.PL
+ - perlcriticrc moved to perlcritic.rc and made more strict.
+ - add .gitignore.
+ - Changes reworked to CPAN::Changes form.
+
+ [Tests]
+ - removed hand-coded critic/kwalitee tests.
+ - added report-versions-tiny
+ - added CPAN::Changes
+ - added DistMeta
+ - added EOL
+ - added generated kwalitee
+ - added generated critic
+
+0.01002312 2009-09-18T00:54:27Z
+ - Use Moose's Trait Attribute Helpers
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01001206, see misc/*.deps* for details
+ - runtime: ↑1 -1
+
+0.01001206 2009-09-06T18:00:57Z
+ - Added depend on 'aliased'
+ - Added [CompileTests]
+ - Dropped manual load tests in favour of generated ones.
+ - Start shipping dist.ini with builds because we really don't mind.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01000604, see misc/*.deps* for details
+ - runtime: +1
+
+0.01000604 2009-08-31T16:05:53Z
+ - First version.

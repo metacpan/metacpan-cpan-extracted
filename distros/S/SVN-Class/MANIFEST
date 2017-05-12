@@ -1,0 +1,17 @@
+Changes
+MANIFEST
+#META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/SVN/Class.pm
+lib/SVN/Class/File.pm
+lib/SVN/Class/Dir.pm
+lib/SVN/Class/Info.pm
+lib/SVN/Class/Repos.pm
+t/00-load.t
+t/01-svn.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

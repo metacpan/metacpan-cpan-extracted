@@ -1,0 +1,7 @@
+Revision history for Perl extension Sys::Mknod.
+
+0.02  Mon Jan  5 12:49:16 NZDT 2004
+    o Fixed docs, released to CPAN (finally!)
+
+0.01  Wed Oct 24 12:21:06 2001
+    o mknod(), mkfifo() implemented

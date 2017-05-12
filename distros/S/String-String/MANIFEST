@@ -1,0 +1,16 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+SIGNATURE
+lib/String/String.pm
+lib/String/String/JA.pod
+lib/UNIVERSAL/to_s.pm
+lib/UNIVERSAL/to_s/JA.pod
+t/00-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+t/stringy.t
+t/to_s.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,55 @@
+Revision history for Sub-Exporter-Progressive
+
+0.001013  2016-10-21 08:48:28-07:00 America/Los_Angeles
+  - Avoid possible warnings about special variables only being used once
+    (Graham Knop)
+
+0.001012  2016-08-23 11:18:21-07:00 America/Los_Angeles
+  - Many small performance improvements (Peter Rabbitson)
+
+0.001011 - 2013-10-28
+  - Fix in global destruction (Graham Knop)
+  - Fix SYNOPSIS
+  - Fix duplicate word in DESCRIPTION (RT#86072)
+
+0.001010 - 2013-03-26
+  - Fix module name in Makefile.PL (RT#83932)
+  - Work around Exporter.pm not installable on perl < 5.8.0
+
+0.001009 - 2013-03-12
+  - disallow version names in random parts of the import list for consistency
+    with Sub::Exporter (Toby Inkster)
+  - perl 5.6 support
+  - more metadata
+
+0.001008 - 2013-01-22
+  - Fix prereqs
+
+0.001007 - 2013-01-21
+  - Rewrite -tag to :tag for Exporter.pm
+
+0.001006 - 2012-08-27
+  - Handle ':all' correctly
+
+0.001005 - 2012-08-25
+  - Add support for tags
+  - Warn if defaults are not in exports
+  - Add explicit dependency on Test::More 0.89
+
+0.001004 - 2012-08-09
+  - fix skipping when Sub::Exporter isn't installed
+
+0.001003  2012-08-01 12:47:28 America/Chicago
+  - remove warning if there are no defaults
+
+0.001002  2012-07-31 08:59:43 America/Chicago
+  - Make Sub::Exporter an optional dep (which is kinda the whole point)
+  - warning about too complex usage of Sub::Exporter::Progressive is now
+    an exception
+
+0.001001  2012-07-29 19:58:40 America/Chicago
+  - Fix '-all' option for the default group
+
+0.001000  2012-07-29 16:44:01 America/Chicago
+  - Initial Release
+

@@ -1,0 +1,192 @@
+Revision history for Perl extension Starman
+
+0.4014  2015-06-03 12:01:00 PDT
+        - Treat ECONNRESET like EPIPE (i.e. ignore), not as a fatal error #114 (Tim Bunce)
+
+0.4013  2015-05-14 15:01:20 PDT
+        - Fixed some bad git merges.
+
+0.4012  2015-05-14 14:59:48 PDT
+        - Add --net_server-* options to pass directly to Net::Server backend (#109)
+        - Updated documentation
+
+0.4011  2014-11-11 08:07:43 PST
+        - Move the app dispatch into a method #107
+
+0.4010  2014-08-22 09:37:22 PDT
+        - Support --read-timeout #103 (slobo)
+        - Handle Expect header case insensitively #101 (oschwald)
+
+0.4009  2014-04-03 14:39:27 PDT
+        - Do not send chunked body for HEAD requests #87 (therigu)
+        - Added --disable-proctitle option to disable the proctitle change #97
+
+0.4008  2013-09-08 21:09:22 PDT
+        - Make response write loop a zero-copy (ap)
+
+0.4007  2013-09-02 17:11:38 PDT
+        - Handle EPIPE and stops writing to the socket #84 (ap)
+
+0.4006  2013-08-16 12:43:19 PDT
+        - Same as 0.4005, non-devel
+
+0.4005  2013-08-13 22:12:11 PDT
+        - Fix SSL implementation bug where body longer than 16K doesn't get written correctly #78 (kazeburo, siracusa) 
+
+0.4004  2013-08-12 11:41:13 PDT
+        - Note that SSL support is experimental
+
+0.4003  2013-08-08 14:32:24 PDT
+        - Fix ssl condition for banner
+
+0.4002  2013-08-08 14:20:45 PDT
+        - Fix banner message for host/port broken in 0.4 (siracusa)
+
+0.4001  2013-07-29 23:14:10 PDT
+        - Skip ssl tests if LWP doesn't support HTTPS
+
+0.4000  2013-07-28 23:53:55 PDT
+        - support SSL (aristotle)
+
+0.3014  2013-06-16 01:07:52 PDT
+        - bump Test::TCP dep, not really necessary but avoid 1.27 bug
+
+0.3013  2013-06-12 22:52:54 PDT
+        - Fix writer tests for Plack update
+
+0.3012  2013-06-12 12:31:11 PDT
+        - typo fixes
+        - Fix dependencies for LWP::UserAgent
+
+0.3011  2013-04-24 17:39:31 PDT
+        - Disabled flock serialization when it's unnecessary. This will improve the performance
+          when you have many Starman worker processes on Linux systems (kazeburo) #69
+
+0.3010  2013-04-24 07:04:02 PDT
+        - Switch back to Module::Build::Tiny with fixed #!perl shebang
+
+0.3009  2013-04-23 17:34:57 PDT
+        - Switch to MakeMaker because of shebang bug
+          https://github.com/Leont/module-build-tiny/issues/3
+
+0.3008  2013-04-06 22:04:53 PDT
+        - switch to Module::Build::Tiny with Milla. Might not install bat correctly but we don't
+          support Win32 anyway.
+
+0.3007  2013-03-28 12:55:45 PDT
+        - Accept HTTP requests with LF termination per HTTP spec recommendation (oschwald) #56
+        - Documentation fix (oalders)
+
+0.3006  Wed Dec 19 09:55:05 JST 2012
+        - Clear out @ARGV, rather than restoring it, to avoid messing with Net::Server internals
+
+0.3005  Wed Nov 14 19:46:31 PST 2012
+        - Added a warning in runtime/documentation to NOT use -r/-R with Starman
+
+0.3004  Thu Nov  8 19:40:45 PST 2012
+        - Added --interval option to the sample start_server command
+        - Makefile.PL fix
+
+0.3003  Thu Sep 27 09:39:56 JST 2012
+        - Fixed the test hang in some environments, introduced in 0.3002 [RT:79865]
+
+0.3002  Tue Sep 25 15:26:43 JST 2012
+        - Added a documentation for --signal-on-term for Server::Starter 0.12 (kazuho, ether)
+        - Set REMOTE_PORT PSGI environment variable #50 (dex4er)
+        - Fix a test failure with a directory containing whitespace (clkao)
+
+0.3001  Mon Jun 25 10:57:20 PDT 2012
+        - Fix SERVER_NAME and SERVER_PORT not exist on UNIX socket mode #24
+        - Improved documentation
+        - Ensure that chunk buffer contains terminating HTTP newline (Peter Makholm)
+
+0.3000  Mon Feb 20 16:31:44 PST 2012
+        - This be a 0.3 release
+
+0.29_90 Thu Dec  1 19:40:52 PST 2011
+        - Changed the way server handles HUP and QUIT signals
+          HUP will just restart all the workers gracefully
+          QUIT will gracefully shutdown workers and the master
+          See `man 1 starman` and look for SIGNALS section.
+
+0.2014  Sun Sep 18 12:43:06 PDT 2011
+        - Fixed broken PSGI response headers after the output (cho45)
+
+0.2013  Sat Jun 25 11:51:47 PDT 2011
+        - Relaxed the harakiri tests (audreyt)
+
+0.2012  Wed Jun 22 13:51:59 PDT 2011
+        - Implemented psgix.harakiri mode (audreyt)
+        - Added --error-log option (Paulo E. Castro)
+
+0.2011  Tue May 24 09:41:52 PDT 2011
+        - Fix chunked response with 0-length PSGI array elements (chmrr)
+
+0.2010  Mon Mar 28 16:23:23 PDT 2011
+        - Fixed packaging. No changes.
+
+0.2009  Fri Mar 25 19:15:23 PDT 2011
+        - Requires Plack 0.9971 to support localizing $0 to fix the FindBin issues #7, #15, #18, #19
+        - Calls srand() automatically in the child init hook to avoid a fixed random seed #20
+        - Implemented --keepalive-timeout which defaults to 1 (acme)
+
+0.2008  Mon Feb 14 17:19:20 PST 2011
+        - Documented that -E is automatically set to 'deployment' RT:61517 (timbunce)
+        - Check the defined-ness of the input buffer to suppress warnings RT:60007
+
+0.2007 Thu Sep 30 14:09:00 PDT 2010
+        - Fixed a bug where Date header can be duplicate if the app generates one (spleenjack)
+
+0.2006 Fri Jul  2 17:21:22 PDT 2010
+        - Fixed a bug in chunked response when Content-Length is 0. #8 (chiba)
+        - Documented --pid and --daemonize
+
+0.2005 Fri Jul  2 17:02:16 PDT 2010
+        - Don't use lib 'lib'
+        - Documentation updates (miyagawa, grantm)
+
+0.2004 Tue Apr 20 21:22:31 JST 2010
+        - Delay set $0 in master so FindBin works. #7
+
+0.2003 Mon Apr 19 15:19:06 JST 2010
+        - Upped Plack dependency
+
+0.2002 Sat Apr 17 18:44:24 PDT 2010
+        - Switch kyoto.jpg to use baybridge.jpg for testing
+
+0.2001 Tue Apr 13 21:45:15 PDT 2010
+        - Fixed the way to set the default Delayed loader
+
+0.2000 Tue Apr 13 20:22:24 PDT 2010
+        - INCOMPATIBLE: starman executable by default loads the application with Delayed to be safer.
+          Use --preload-app command line option to preload the application in the master process.
+          See `starman --help` for details.
+
+0.1007 Tue Apr 13 19:45:59 PDT 2010
+        - Fixed a bug where Content-Length less response are sent in Keep-Alive without chunked,
+          choking HTTP/1.0 clients (patspam) #6
+
+0.1006 Tue Apr 13 00:01:23 CEST 2010
+        - Fixed 100% CPU loop when an unexpected EOF happens (Graham Barr)
+
+0.1005 Sun Mar 28 14:37:03 PDT 2010
+        - Implemented starman -v
+
+0.1004 Sat Mar 27 19:10:06 PDT 2010
+        - Implemented --disable-keepalive for broken frontend proxy such as mod_proxy + mpm_prefork
+        - Documented --backlog 
+
+0.1003 Sun Mar 21 21:08:39 PDT 2010
+        - Fixed SERVER_PORT when used with Server::Starter (Reported by ronsavage)
+
+0.1002 Wed Mar 10 12:10:46 JST 2010
+        - Officially do not support Win32
+
+0.1001 Sat Feb 27 05:03:18 PST 2010
+        - Fix documentations
+        - Set 'deployment' PLACK_ENV by default
+        - Do not reopen stdio for possibly faster operations
+        - require Net::Server 0.91 for new() (sekimura)
+
+0.1000 Mon Feb 15 17:56:33 PST 2010
+        - original version

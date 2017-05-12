@@ -1,0 +1,28 @@
+---
+abstract: 'Call isa, can, does and DOES safely on things that may not be objects'
+author:
+  - 'mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Safe-Isa
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Exporter: '5.57'
+  Scalar::Util: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Safe-Isa
+  repository: git://git.shadowcat.co.uk/p5sagit/Safe-Isa.git
+version: '1.000006'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

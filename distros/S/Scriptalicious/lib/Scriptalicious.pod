@@ -1,0 +1,523 @@
+
+=head1 NAME
+
+Scriptalicious - Make scripts more delicious to SysAdmins
+
+=head1 SYNOPSIS
+
+ use Scriptalicious
+      -progname => "pu";
+ 
+ our $VERSION = "1.00";
+ 
+ my $url = ".";
+ getopt getconf("u|url" => \$url);
+ 
+ run("echo", "doing something with $url");
+ my $output = capture("svn", "info", $url);
+ 
+ __END__
+ 
+ =head1 NAME
+ 
+ pu - an uncarved block of wood
+ 
+ =head1 SYNOPSIS
+ 
+ pu [options] arguments
+ 
+ =head1 DESCRIPTION
+ 
+ This script's function is to be a blank example that many
+ great and simple scripts may be built upon.
+ 
+ Remember, you cannot carve rotten wood.
+ 
+ =head1 COMMAND LINE OPTIONS
+ 
+ =over
+ 
+ =item B<-h, --help>
+ 
+ Display a program usage screen and exit.
+ 
+ =item B<-V, --version>
+ 
+ Display program version and exit.
+ 
+ =item B<-v, --verbose>
+ 
+ Verbose command execution, displaying things like the
+ commands run, their output, etc.
+ 
+ =item B<-q, --quiet>
+ 
+ Suppress all normal program output; only display errors and
+ warnings.
+ 
+ =item B<-d, --debug>
+ 
+ Display output to help someone debug this script, not the
+ process going on.
+ 
+ =back
+
+=head1 DESCRIPTION
+
+This module helps you write scripts that conform to best common
+practices, quickly.  Just include the above as a template, and your
+script will accept all of the options that are included in the manual
+page, as well as summarising them when you use the C<-h> option.
+
+(Unfortunately, it is not possible to have a `use' dependency
+automatically add structure to your POD yet, so you have to include
+the above manually.  If you want your help message and Perldoc to be
+meaningful, that is.)
+
+Shortcuts are provided to help you abort or die with various error
+conditions; all of which print the name of the program running (taken
+from C<$0> if not passed).  The motive for this is that "small"
+scripts tend to just get written and forgotten; so, when you have a
+larger system that is built out of lots of these pieces it is
+sometimes guesswork figuring out which script a printed message comes
+from!
+
+For instance, if your program is called with invalid arguments, you
+may simply call C<abort> with a one-line message saying what the
+particular problem was.  When the script is run, it will invite the
+person running the script to try to use the C<--help> option, which
+gives them a summary and in turn invites them to read the Perldoc.
+So, it reads well in the source;
+
+  @ARGV and abort "unexpected arguments: @ARGV";
+  $file or abort "no filename supplied";
+
+And in the output;
+
+  somescript: no filename supplied!
+  Try `somescript --help' for a summary of options
+
+On the other hand, if you call C<barf>, then it is considered to be a
+hard run-time failure, and the invitation to read the C<--help> page
+to get usage not given.  Also, the messages are much tidier than you
+get with C<die> et al.
+
+  open FOO, "<$file" or barf "failed to open $file; $!";
+
+Which will print:
+
+  somescript: failed to open somefile; Permission denied
+
+Scriptalicious has no I<hard> dependancies; all the methods, save
+reading passwords from the user, will work in the absence of extra
+installed modules on all versions of Perl from 5.6.0 onwards.
+
+To avoid unnecessary explicit importing of symbols, the following
+symbols and functions are exported into the caller's namespace:
+
+=over
+
+=item C<$VERBOSE>
+
+Set to 0 by default, and 1 if C<-v> or C<--verbose> was found during
+the call to C<getopt()>.  Extra C<-v>'s or C<--debug> will push this
+variable higher.  If C<-q> or C<--quiet> is specified, this will be
+less than one.
+
+=item C<$PROGNAME>
+
+It is recommended that you only ever read this variable, and pass it
+in via the import.  This is not automatically extracted from the POD
+for performance reasons.
+
+=item C<$CONFIG>
+
+Name of the configuration file.  Set before a call to C<getconf>, or
+read afterwards to see if a config file was used.  New in
+Scriptalicious 1.16
+
+=item B<getopt(@getopt_args)>
+
+Fetch arguments via C<Getopt::Long::GetOptions>.  The C<bundling>
+option is enabled by default - which differs from the standard
+configuration of B<Getopt::Long>.  To alter the configuration, simply
+call C<Getopt::Long::config>.  See L<Getopt::Long> for more
+information.
+
+=item B<getopt_lenient(@getopt_args)>
+
+Just like C<getopt()>, but doesn't cause a fatal error if there are
+any unknown options.
+
+=item B<getconf(@getopt_args)>
+
+Fetches configuration, takes arguments in the same form as
+B<getopt()>..
+
+The configuration file is expected to be in F<~/.PROGNAMErc>,
+F</etc/perl/PROGNAME.conf>, or F</etc/PROGNAME.conf>.  Only the first
+found file is read, and unknown options are ignored for the time
+being.
+
+The file is expected to be in YAML format, with the top entity being a
+hash, and the keys of the hash being the same as specifying options on
+the command line.  Using YAML as a format allows some simplificiations
+to getopt-style processing - C<=s%> and C<=s@> style options are
+expected to be in a real hash or list format in the config file, and
+boolean options must be set to C<true> or C<false> (or some common
+equivalents).
+
+Returns the configuration file as Load()'ed by YAML in scalar context,
+or the argument list it was passed in list context.
+
+For example, this minimal script (missing the documentation, but hey
+at least it's a start);
+
+  getopt getconf
+      ( "something|s" => \$foo,
+        "invertable|I!" => \$invertable,
+        "integer|i=i" => \$bar,
+        "string|s=s" => \$cheese,
+        "list|l=s@" => \@list,
+        "hash|H=s%" => \%hash, );
+
+Will accept the following invocation styles;
+
+  foo.pl --help
+  foo.pl --version
+  foo.pl --verbose
+  foo.pl --debug
+  foo.pl --quiet
+  
+  foo.pl --something
+  foo.pl --invertable
+  foo.pl --no-invertable    <=== FORM DIFFERS IN CONFIG FILE
+  foo.pl --integer=7
+  foo.pl --string=anything
+  foo.pl --list one --list two --list three
+  foo.pl --hash foo=bar --hash baz=cheese
+
+Equivalent config files:
+
+  something: 1
+
+  invertable: on
+
+  invertable: off
+
+  integer: 7
+
+  string: anything
+
+  list:
+    - one
+    - two
+    - three
+
+  list: [ one, two, three ]
+
+  hash:
+    foo: bar
+    baz: cheese
+
+Note that more complex and possibly arcane usages of Getopt::Long
+features may not work with getconf (patches welcome).
+
+This can be handy for things like database connection strings; all you
+have to do is make an option for them, and then the user of the
+script, or a SysAdmin can set up their own config file for the script
+to automatically set the options.
+
+=item B<getconf_f($filename, @getopt_args)>
+
+As B<getconf()>, but specify a filename.
+
+=cut
+
+=item B<say "something">
+
+Prints a message to standard output, unless quiet mode (C<-q> or
+C<--quiet>) was specified.  For normal program messages.
+
+=item B<mutter "progress">
+
+Prints a message to standard output, if verbose mode (C<-v>) or debug
+mode (C<-d>) is enabled (ie, if C<$VERBOSE E<gt> 0>).  For messages
+designed to help a I<user of the script> to see more information about
+what is going on.
+
+=item B<whisper "detail">
+
+Prints a message to standard output, if debug mode (C<-d>) is enabled
+or multiple verbose options were passed (ie, if C<$VERBOSE E<gt> 1>).
+For messages designed to help a I<person debugging the script> to see
+more information about what is going on internally to the script.
+
+=item B<abort "won't go to sea in a storm">
+
+Prints a short program usage message (extracted from the POD synopsis)
+and exits with an error code.
+
+=item B<moan "weather is miserable">
+
+Prints a warning to standard error.  It is preceded with the text
+C<warning:>.  The program does not exit.
+
+=item B<protest "don't know the weather report">
+
+Prints an error message to standard error.  It is preceded with the
+text C<error:>.  The program does not exit.
+
+=item B<barf "hit an iceberg">
+
+Prints a warning to standard error.  It is preceded with the text
+C<warning:>.  The program does not exit.
+
+=item B<run("command", "arg1", "arg2")>
+
+Runs a command or closure, barf's with a relevant error message if
+there is a problem.  Program output is suppressed unless running in
+verbose mode.
+
+C<run()> and the three alternatives listed below may perform arbitrary
+filehandle redirection before executing the command.  This can be a
+very convenient way to do shell-like filehandle plumbing.
+
+For example;
+
+  run( -in => sub { print "Hello, world!\n" },
+       -out => "/tmp/outfile",
+       -out2 => "/dev/null",
+       @command );
+
+This will connect the child process' standard input (C<-in>) to a
+closure that is printing "C<Hello, world!\n>".  The output from the
+closure will appear on standard input of the run command.  Note that
+the closure is run in a sub-process and so will not be able to set
+variables in the calling program.
+
+It will also connect the program's standard output (C<-out>) to
+C</tmp/outfile>, and its standard error (filehandle 2) to C</dev/null>
+(the traditional way of junking error output).
+
+If you wanted to connect two filehandles to the same place, you could
+pass in C<GLOB> references instead;
+
+  run( -out => \*MYOUT,
+       -out2 => \*MYOUT,
+       @command );
+
+Any filehandle can be opened in any mode; C<-in> merely defaults to
+meaning C<-in0>, and C<-out> defaults to meaning C<-out1>.  There is
+no C<-err>; use C<-out2>.  C<-rw> exists (defaulting to C<-rw0>), but
+is probably of limited use.
+
+Here is an example of using C<prompt_passwd()> to hijack C<gpg>'s
+password grabbing;
+
+  my $password = prompt_passwd("Encryption password: ");
+  my $encrypted = run( -in4 => sub { print "$password\n" },
+                       "gpg", "--passphrase-fd", "4", "-c", $file )
+
+=item B<run_err("command", "arg2", "arg1")>
+
+Same as run, but returns the error code rather than assuming that the
+command will successfully complete.  Again, output it suppressed.
+
+=item B<capture("command", "1gra", "2gra")>
+
+runs a command, capturing its output, barfs if there is a problem.
+Returns the output of the command as a list or a scalar.
+
+=item B<capture_err("command", "foo")>
+
+Works as B<capture>, but the first returned item is the error code of
+the command ($?) rather than the first line of its output.  Also, it
+only ever returns the output as a list.
+
+Usage:
+
+   my ($rc, @output) = capture_err("somecommand", @args);
+
+=item B<hush_exec()>
+
+=item B<unhush_exec()>
+
+C<hush_exec> is used to indicate that the programs you are running are
+only of interest to someone debugging the script.  So, the messages
+showing commands run and giving execution timings will not be printed
+without C<-vv> (double verbose) or C<-d> (debug, which is the same
+thing).
+
+=item B<start_timer()>
+
+=item B<show_delta()>
+
+=item B<show_elapsed()>
+
+These three little functions are for printing run times in your
+scripts.  Times are displayed for running external programs with
+verbose mode normally, but this will let you display running times for
+your main program easily.
+
+=item B<sci_unit($num, [$unit, $precision])>
+
+Returns a number, scaled using normal scientific prefixes (from atto
+to exa).  Optionally specify a precision which is passed to sprintf()
+(see L<perldoc/sprintf>).  The default is three significant figures.
+
+From Scriptalicious 1.08, the "u" character is used in place of the
+Greek "mu" due to encoding compatibility issues.
+
+=item B<time_unit($num, [$precision])>
+
+Converts a floating point number of seconds to a human-readable time,
+the precision specifies the number of significant decimal digits,
+which is used to compute a "quanta" for the value given, values below
+which are not displayed.  $precision defaults to 4.
+
+examples:
+
+ time_unit(10.1) => "10.10s"
+ time_unit(1) => "1.000s"
+ time_unit(0.1) => "100ms"
+ time_unit(86401,2) => "1d 0h"
+ time_unit(86401,3) => "1d 0h"
+ time_unit(86401) => "1d 0h:0m"
+ time_unit(86400+3600/2) => "1d 0h:30m"
+ time_unit(86401,5) => "1d 0h:0m:1s"
+ time_unit(7*86400) => "1w0d 0h"
+ time_unit(-0.0002) => "-200us"
+
+=item B<prompt_regex($prompt, qr/(.*)/)>
+
+Prompts for something, using the prompt "C<$prompt>", matching the
+entered value (sans trailing linefeed) against the passed regex.
+
+Note that this differs from the previous behaviour of prompt_regex,
+which took a sub.
+
+=item B<prompt_sub($prompt, sub { /(.*)/ && $1 })>
+
+Prompts for something, using the prompt "C<$prompt>", feeding the sub
+with the entered value (sans trailing linefeed), to use a default, the
+passed sub should simply return it with empty input.
+
+=item B<prompt_passwd([$prompt])>
+
+Same as C<prompt_regex>, but turns off echo.  C<$prompt> defaults to
+"C<Password: >" for this function.
+
+=item B<prompt_string([$prompt])>
+
+Prompt for a string.
+
+=item B<prompt_int([$prompt])>
+
+get an integer
+
+=item B<prompt_for([ [$type =>] $what])>
+
+Prompts for a value for C<$what>.  This constructs a prompt saying, eg
+"C<Enter value for $what>".  Calls the equivalent C<prompt_foo()>
+method.
+
+=item B<prompt_yn([$prompt])>
+
+prompts for yes or no, presuming neither
+
+=item B<prompt_Yn([$prompt])>
+
+=item B<prompt_yN([$prompt])>
+
+prompts for yes or no, presuming yes and no, respectively.
+
+You can also spell these as C<prompt_nY> and C<prompt_Ny>.
+
+=item B<anydump($ref)>
+
+Dump C<$ref> via C<YAML>, falling back to C<Data::Dumper> if YAML
+fails to load (or dies during the dump).  Returns a string.
+
+=item B<tsay($template, $vars)>
+
+Prints the template C<$template> with C<$vars>.  C<$template> may be
+included at the end of the file as a data section, for instance:
+
+ use Scriptalicious;
+
+ tsay hello => { name => "Bernie" };
+
+ __END__
+
+ __hello__
+ Hello, [% name %]
+ [% INCLUDE yomomma %]
+ __yomomma__
+ Yo momma's so fat your family portrait has stretchmarks.
+
+This will print:
+
+ Hello, Bernie
+ Yo momma's so fat your family portrait has stretchmarks.
+
+Note that the script goes to lengths to make sure that the information
+is always printed whether or not Template Toolkit is installed.  This
+gets pretty verbose, but at least solves the "argh!  that script
+failed, but I don't know why because it needed this huge dependancy to
+tell me" problem.
+
+For example, the above would be printed as:
+
+ scriptname: 
+
+=item B<foo()>
+
+If you've got a short little Perl function that implements something
+useful for people writing Shell scripts in Perl, then please feel free
+to contribute it.  And if it really is scriptalicious, you can bet
+your momma on it getting into this module!
+
+=back
+
+=head1 SEE ALSO
+
+Simon Cozen's L<Getopt::Auto> module does a very similar thing to this
+module, in a quite different way.  However, it is missing C<say>,
+C<run>, etc.  So you'll need to use some other module for those.  But
+it does have some other features you might like and is probably
+engineered better.
+
+There's a template script at L<Getopt::Long/Documentation and help
+texts> that contains a script template that demonstrates what is
+necessary to get the basic man page / usage things working with the
+traditional L<Getopt::Long> and L<Pod::Usage> combination.
+
+L<Getopt::Plus> is a swiss army chainsaw of Getopt::* style modules,
+contrasting to this module's approach of elegant simplicity (quiet in
+the cheap seats!).
+
+L<Getopt::EUCLID> is Damian Conway's take on this.
+
+Finally, if you don't mind the dependencies of Moose (or Mouse), then
+L<MooseX::Getopt> and L<MooseX::SimpleConfig> are much more elegant
+approaches to getopt handling and configuration than this module.
+
+If you have solved this problem in a new and interesting way, or even
+rehashed it in an old, boring and inelegant way and want your module
+to be listed here, please contact the
+
+=head1 AUTHOR AND LICENSE
+
+Sam Vilain, L<samv@cpan.org>
+
+Copyright 2005-2008, Sam Vilain.  All rights reserved.  This program
+is free software; you can use it and/or distribute it under the same
+terms as Perl itself; either the latest stable release of Perl when
+the module was written, or any subsequent stable release.
+
+Please note that this applies retrospectively to all Scriptalicious
+releases; apologies for the lack of an explicit license.
+
+=cut
+

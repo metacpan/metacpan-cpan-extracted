@@ -1,0 +1,31 @@
+---
+abstract: 'SysV Shared memory made easy'
+author:
+  - 'Leon Timmermans <leont@cpan.org>'
+build_requires:
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::Fatal: 0
+  Test::More: 0
+  Test::Warnings: 0.005
+configure_requires:
+  Module::Build::Tiny: 0.035
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300038, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: SysV-SharedMem
+requires:
+  Carp: 0
+  IPC::SysV: 0
+  Sub::Exporter::Progressive: 0
+  XSLoader: 0
+  perl: 5.008
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=SysV-SharedMem
+  repository: git://github.com/Leont/sysv-sharedmem.git
+version: 0.010

@@ -1,0 +1,34 @@
+---
+abstract: 'See What I Mean?!'
+author:
+  - 'Ingy döt Net <ingy@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Swim
+no_index:
+  directory:
+    - example
+    - inc
+    - t
+    - xt
+requires:
+  HTML::Escape: '0'
+  Hash::Merge: '0'
+  IPC::Run: '0'
+  Pegex: '0.41'
+  Text::Autoformat: '0'
+  YAML::XS: '0'
+  perl: v5.8.1
+resources:
+  bugtracker: https://github.com/ingydotnet/swim-pm/issues
+  homepage: https://github.com/ingydotnet/swim-pm
+  repository: https://github.com/ingydotnet/swim-pm.git
+version: 0.1.46

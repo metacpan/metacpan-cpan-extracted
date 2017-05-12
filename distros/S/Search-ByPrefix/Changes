@@ -1,0 +1,8 @@
+Revision history for Search-ByPrefix
+
+0.02    2017-01-29
+        - Minor optimization: takes only one reference of the value when adding a new key.
+        - Fixed an example.
+
+0.01    2016-07-29
+        First version, released on an unsuspecting world.

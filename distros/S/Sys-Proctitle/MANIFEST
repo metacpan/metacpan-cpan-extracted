@@ -1,0 +1,14 @@
+Changes
+Makefile.PL
+MANIFEST
+perl-Sys-Proctitle.spec
+Proctitle.xs
+README
+t/Sys-Proctitle.t
+lib/Sys/Proctitle.pm
+libsetproctitle/Makefile
+libsetproctitle/setproctitle.c
+libsetproctitle/setproctitle.h
+libsetproctitle/setproctitle.map
+mk_README.sh
+META.yml                                 Module meta-data (added by MakeMaker)

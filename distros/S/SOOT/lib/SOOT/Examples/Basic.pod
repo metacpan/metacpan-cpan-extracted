@@ -1,0 +1,2562 @@
+
+=head1 NAME
+
+SOOT::Examples::Basic - SOOT Examples for Basic
+
+=head1 DESCRIPTION
+
+This is a listing of all SOOT examples for Basic.
+
+=head1 EXAMPLES
+
+
+=head2 analyze.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  $gApplication->AsyncRun;
+  
+  $gROOT->Reset();
+  my $c1 = TCanvas->new("c1","Analyze.mac",620,790);
+  $c1->Range(-1,0,19,30);
+  my $pl1 = TPaveLabel->new(0,27,3.5,29,"Analyze");
+  $pl1->SetFillColor(42);
+  $pl1->Draw();
+  
+  my $pt1 = TPaveText->new(0,22.8,4,25.2);
+  my $t1  = $pt1->AddText("Parenthesis matching");
+  my $t2  = $pt1->AddText("Remove unnecessary");
+  my $t2a = $pt1->AddText("parenthesis");
+  $pt1->Draw();
+  
+  my $pt2 = TPaveText->new(6,23,10,25);
+  my $t3  = $pt2->AddText("break of");
+  my $t3a = $pt2->AddText("Analyze");
+  $pt2->Draw();
+  
+  my $pt3 = TPaveText->new(0,19,4,21);
+  my $t4  = $pt3->AddText("look for simple");
+  my $t5  = $pt3->AddText("operators");
+  $pt3->Draw();
+  
+  my $pt4 = TPaveText->new(0,15,4,17);
+  my $t6  = $pt4->AddText("look for an already");
+  my $t7  = $pt4->AddText("defined expression");
+  $pt4->Draw();
+  
+  my $pt5 = TPaveText->new(0,11,4,13);
+  my $t8  = $pt5->AddText("look for usual");
+  my $t9  = $pt5->AddText("functions :cos sin ..");
+  $pt5->Draw();
+  
+  my $pt6 = TPaveText->new(0,7,4,9);
+  my $t10 = $pt6->AddText("look for a");
+  my $t11 = $pt6->AddText("numeric value");
+  $pt6->Draw();
+  
+  my $pt7 = TPaveText->new(6,18.5,10,21.5);
+  my $t12 = $pt7->AddText("Analyze left and");
+  my $t13 = $pt7->AddText("right part of");
+  my $t14 = $pt7->AddText("the expression");
+  $pt7->Draw();
+  
+  my $pt8 = TPaveText->new(6,15,10,17);
+  my $t15 = $pt8->AddText("Replace expression");
+  $pt8->Draw();
+  
+  my $pt9 = TPaveText->new(6,11,10,13);
+  my $t16 = $pt9->AddText("Analyze");
+  $pt9->SetFillColor(42);
+  $pt9->Draw();
+  
+  my $pt10 = TPaveText->new(6,7,10,9);
+  my $t17  = $pt10->AddText("Error");
+  my $t18  = $pt10->AddText("Break of Analyze");
+  $pt10->Draw();
+  
+  my $pt11 = TPaveText->new(14,22,17,24);
+  $pt11->SetFillColor(42);
+  my $t19  = $pt11->AddText("Analyze");
+  my $t19a = $pt11->AddText("Left");
+  $pt11->Draw();
+  
+  my $pt12 = TPaveText->new(14,19,17,21);
+  $pt12->SetFillColor(42);
+  my $t20  = $pt12->AddText("Analyze");
+  my $t20a = $pt12->AddText("Right");
+  $pt12->Draw();
+  
+  my $pt13 = TPaveText->new(14,15,18,18);
+  my $t21  = $pt13->AddText("StackNumber++");
+  my $t22  = $pt13->AddText("operator[StackNumber]");
+  my $t23  = $pt13->AddText("= operator found");
+  $pt13->Draw();
+  
+  my $pt14 = TPaveText->new(12,10.8,17,13.2);
+  my $t24  = $pt14->AddText("StackNumber++");
+  my $t25  = $pt14->AddText("operator[StackNumber]");
+  my $t26  = $pt14->AddText("= function found");
+  $pt14->Draw();
+  
+  my $pt15 = TPaveText->new(6,7,10,9);
+  my $t27  = $pt15->AddText("Error");
+  my $t28  = $pt15->AddText("break of Analyze");
+  $pt15->Draw();
+  
+  my $pt16 = TPaveText->new(0,2,7,5);
+  my $t29 = $pt16->AddText("StackNumber++");
+  my $t30 = $pt16->AddText("operator[StackNumber] = 0");
+  my $t31 = $pt16->AddText("value[StackNumber] = value found");
+  $pt16->Draw();
+  
+  my $ar = TArrow->new(2,27,2,25.4,0.012,"|>");
+  $ar->SetFillColor(1);
+  $ar->Draw();
+  $ar->DrawArrow(2,22.8,2,21.2,0.012,"|>");
+  $ar->DrawArrow(2,19,2,17.2,0.012,"|>");
+  $ar->DrawArrow(2,15,2,13.2,0.012,"|>");
+  $ar->DrawArrow(2,11,2, 9.2,0.012,"|>");
+  $ar->DrawArrow(2, 7,2, 5.2,0.012,"|>");
+  $ar->DrawArrow(4,24,6,24,0.012,"|>");
+  $ar->DrawArrow(4,20,6,20,0.012,"|>");
+  $ar->DrawArrow(4,16,6,16,0.012,"|>");
+  $ar->DrawArrow(4,12,6,12,0.012,"|>");
+  $ar->DrawArrow(4, 8,6, 8,0.012,"|>");
+  $ar->DrawArrow(10,20,14,20,0.012,"|>");
+  $ar->DrawArrow(12,23,14,23,0.012,"|>");
+  $ar->DrawArrow(12,16.5,14,16.5,0.012,"|>");
+  $ar->DrawArrow(10,12,12,12,0.012,"|>");
+  
+  my $ta = TText->new(2.2,22.2,"err = 0");
+  $ta->SetTextFont(71);
+  $ta->SetTextSize(0.015);
+  $ta->SetTextColor(4);
+  $ta->SetTextAlign(12);
+  $ta->Draw();
+  $ta->DrawText(2.2,18.2,"not found");
+  $ta->DrawText(2.2,6.2,"found");
+  
+  my $tb = TText->new(4.2,24.1,"err != 0");
+  $tb->SetTextFont(71);
+  $tb->SetTextSize(0.015);
+  $tb->SetTextColor(4);
+  $tb->SetTextAlign(11);
+  $tb->Draw();
+  $tb->DrawText(4.2,20.1,"found");
+  $tb->DrawText(4.2,16.1,"found");
+  $tb->DrawText(4.2,12.1,"found");
+  $tb->DrawText(4.2, 8.1,"not found");
+  my $l1 = TLine->new(12,16.5,12,23);
+  $l1->Draw();
+  
+  $c1->Update();
+  $gApplication->wait;
+  
+
+
+
+=head2 archi.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  
+  $gROOT->Reset();
+  my $c1 = TCanvas->new("c1","Dictionary Architecture",20,10,750,930);
+  $c1->SetBorderSize(0);
+  $c1->Range(0,0,20.5,26);
+  
+  my $title = TPaveLabel->new(4,24,16,25.5,$c1->GetTitle());
+  $title->SetFillColor(46);
+  $title->Draw();
+  
+  my $dll = TPavesText->new(0.5,19,4.5,23,5,"tr");
+  $dll->SetFillColor(39);
+  $dll->SetTextSize(0.023);
+  $dll->AddText(" ");
+  $dll->AddText("Dynamically");
+  $dll->AddText("Linked");
+  $dll->AddText("Libraries");
+  $dll->Draw();
+  
+  my $dlltitle = TPaveLabel->new(1.5,22.6,3.5,23.3,"DLLs");
+  $dlltitle->SetFillColor(28);
+  $dlltitle->Draw();
+  
+  my $cpp = TPavesText->new(5.5,19,9.5,23,5,"tr");
+  $cpp->SetTextSize(0.023);
+  $cpp->AddText(" ");
+  $cpp->AddText("Commented");
+  $cpp->AddText("Header");
+  $cpp->AddText("Files");
+  $cpp->Draw();
+  
+  my $ cpptitle = TPaveLabel->new(6.5,22.6,8.5,23.3,"C++");
+  $cpptitle->SetFillColor(28);
+  $cpptitle->Draw();
+  
+  my $odl = TPavesText->new(10.5,19,14.5,23,5,"tr");
+  $odl->SetTextSize(0.023);
+  $odl->AddText(" ");
+  $odl->AddText("Objects");
+  $odl->AddText("Description");
+  $odl->AddText("Files");
+  $odl->Draw();
+  
+  my $odltitle = TPaveLabel->new(11.5,22.6,13.5,23.3,"ODL");
+  $odltitle->SetFillColor(28);
+  $odltitle->Draw();
+  
+  my $idl = TPavesText->new(15.5,19,19.5,23,5,"tr");
+  $idl->SetTextSize(0.023);
+  $idl->AddText(" ");
+  $idl->AddText("Interface");
+  $idl->AddText("Definition");
+  $idl->AddText("Language");
+  $idl->Draw();
+  
+  my $idltitle = TPaveLabel->new(16.5,22.6,18.5,23.3,"IDL");
+  $idltitle->SetFillColor(28);
+  $idltitle->Draw();
+  
+  my $p1  = TWbox->new(7.8,10,13.2,17,11,12,1);
+  $p1->Draw();
+  my $pro1 = TText->new(10.5,15.8,"Process 1");
+  $pro1->SetTextAlign(21);
+  $pro1->SetTextSize(0.03);
+  $pro1->Draw();
+  
+  my $p1dict = TPaveText->new(8.8,13.8,12.2,15.6);
+  $p1dict->SetTextSize(0.023);
+  $p1dict->AddText("Dictionary");
+  $p1dict->AddText("in memory");
+  $p1dict->Draw();
+  
+  my $p1object = TPavesText->new(8.6,10.6,12.1,13.0,5,"tr");
+  $p1object->SetTextSize(0.023);
+  $p1object->AddText("Objects");
+  $p1object->AddText("in memory");
+  $p1object->Draw();
+  
+  my $p2 = TWbox->new(15.5,10,20,17,11,12,1);
+  $p2->Draw();
+  
+  my $pro2 = TText->new(17.75,15.8,"Process 2");
+  $pro2->SetTextAlign(21);
+  $pro2->SetTextSize(0.03);
+  $pro2->Draw();
+  
+  my $p2dict = TPaveText->new(16,13.8,19.5,15.6);
+  $p2dict->SetTextSize(0.023);
+  $p2dict->AddText("Dictionary");
+  $p2dict->AddText("in memory");
+  $p2dict->Draw();
+  
+  my $p2object = TPavesText->new(16.25,10.6,19.25,13.0,5,"tr");
+  $p2object->SetTextSize(0.023);
+  $p2object->AddText("Objects");
+  $p2object->AddText("in memory");
+  $p2object->Draw();
+  
+  my $stub1 = TWbox->new(12.9,11.5,13.6,15.5,49,3,1);
+  $stub1->Draw();
+  my $tstub1 = TText->new(13.25,13.5,"Stub1");
+  $tstub1->SetTextSize(0.025);
+  $tstub1->SetTextAlign(22);
+  $tstub1->SetTextAngle(90);
+  $tstub1->Draw();
+  
+  my $stub2 = TWbox->new(15.1,11.5,15.8,15.5,49,3,1);
+  $stub2->Draw();
+  
+  my $tstub2 = TText->new(15.45,13.5,"Stub2");
+  $tstub2->SetTextSize(0.025);
+  $tstub2->SetTextAlign(22);
+  $tstub2->SetTextAngle(-90);
+  $tstub2->Draw();
+  
+  my $ar1 = TArrow->new;
+  $ar1->SetLineWidth(6);
+  $ar1->SetLineColor(1);
+  $ar1->SetFillStyle(1001);
+  $ar1->SetFillColor(1);
+  $ar1->DrawArrow(13.5,14,15,14,0.012,"|>");
+  $ar1->DrawArrow(15.1,13,13.51,13,0.012,"|>");
+  
+  my $cint = TPaveText->new(1.0,15.0,8.0,17.5);
+  $cint->SetFillColor(39);
+  $cint->SetBorderSize(1);
+  $cint->SetTextSize(0.023);
+  $cint->AddText("C++ Interpreter");
+  $cint->AddText("and program builder");
+  $cint->Draw();
+  
+  my $command = TPaveText->new(2.5,13.4,8.0,14.5);
+  $command->SetTextSize(0.023);
+  $command->SetFillColor(39);
+  $command->SetBorderSize(1);
+  $command->AddText("Command Thread");
+  $command->Draw();
+  
+  my $view = TPavesText->new(1.0,9.5,7.7,12.6,3,"tr");
+  $view->SetFillColor(39);
+  $view->SetBorderSize(2);
+  $view->SetTextSize(0.023);
+  $view->AddText("Viewer Thread(s)");
+  $view->AddText("Picking");
+  $view->AddText("Context Menus");
+  $view->AddText("Inspector/Browser");
+  $view->Draw();
+  
+  my $web = TPavesText->new(0.5,5,6,8.5,5,"tr");
+  $web->SetTextSize(0.023);
+  $web->AddText(" ");
+  $web->AddText("generated");
+  $web->AddText("automatically");
+  $web->AddText("from dictionary");
+  $web->AddText("and source files");
+  $web->Draw();
+  
+  my $webtitle = TPaveLabel->new(1.5,8.1,5.0,8.8,"HTML Files");
+  $webtitle->SetFillColor(28);
+  $webtitle->Draw();
+  
+  my $printed = TPavesText->new(0.5,1.0,6,4,5,"tr");
+  $printed->SetTextSize(0.023);
+  $printed->AddText(" ");
+  $printed->AddText("generated");
+  $printed->AddText("automatically");
+  $printed->AddText("from HTML files");
+  $printed->Draw();
+  
+  my $printedtitle = TPaveLabel->new(1.5,3.6,5.0,4.3,"Printed Docs");
+  $printedtitle->SetFillColor(28);
+  $printedtitle->Draw();
+  
+  my $box1 = TBox->new(0.2,9.2,14.25,17.8);
+  $box1->SetFillStyle(0);
+  $box1->SetLineStyle(2);
+  $box1->Draw();
+  
+  my $box2 = TBox->new(10.2,18.7,20.2,23.6);
+  $box2->SetFillStyle(0);
+  $box2->SetLineStyle(3);
+  $box2->Draw();
+  
+  $ar1->DrawArrow(2.5,17.5,2.5,18.9,0.012,"|>");
+  $ar1->DrawArrow(5.5,9.2,5.5,8.7,0.012,"|>");
+  $ar1->DrawArrow(5.5,5,5.5,4.2,0.012,"|>");
+  $ar1->DrawArrow(8.5,9.2,8.5,8.2,0.012,"|>");
+  $ar1->DrawArrow(9.5,8.1,9.5,9.0,0.012,"|>");
+  $ar1->DrawArrow(6.5,19,6.5,17.6,0.012,"|>");
+  $ar1->DrawArrow(8.5,19,8.5,17.1,0.012,"|>");
+  $ar1->DrawArrow(11.5,19,11.5,17.1,0.012,"|>");
+  
+  
+  my $ootitle = TPaveLabel->new(10.5,7.8,17,8.8,"Objects Data Base");
+  $ootitle->SetFillColor(28);
+  $ootitle->Draw();
+  
+  my $pio = TPad->new("pio","pio",0.37,0.02,0.95,0.31,49);
+  $pio->Range(0,0,12,8);
+  $pio->Draw();
+  $pio->cd();
+  
+  my $raw = TPavesText->new(0.5,1,2.5,6,7,"tr");
+  $raw->Draw();
+  
+  my $dst1 = TPavesText->new(4,1,5,3,7,"tr");
+  $dst1->Draw();
+  
+  my $dst2 = TPavesText->new(6,1,7,3,7,"tr");
+  $dst2->Draw();
+  
+  my $dst3 = TPavesText->new(4,4,5,6,7,"tr");
+  $dst3->Draw();
+  
+  my $dst4 = TPavesText->new(6,4,7,6,7,"tr");
+  $dst4->Draw();
+  
+  my $xlow = 8.5;
+  my $ylow = 1;
+  my $dx   = 0.5;
+  my $dy   = 0.5;
+  for my $j (1..8) {
+    my $y0 = $ylow + ($j-1)*0.7;
+    my $y1 = $y0 + $dy;
+    for my $i (1..4) {
+       my $x0 = $xlow +($i-1)*0.6;
+       my $x1 = $x0 + $dx;
+       my $anal = TPavesText->new($x0,$y0,$x1,$y1,7,"tr");
+       $anal->Draw();
+    }
+  }
+  my $daq = TText->new();
+  $daq->SetTextSize(0.07);
+  $daq->SetTextAlign(22);
+  $daq->DrawText(1.5,7.3,"DAQ");
+  $daq->DrawText(6,7.3,"DST");
+  $daq->DrawText(10.,7.3,"Physics Analysis");
+  $daq->DrawText(1.5,0.7,"Events");
+  $daq->DrawText(1.5,0.3,"Containers");
+  $daq->DrawText(6,0.7,"Tracks/Hits");
+  $daq->DrawText(6,0.3,"Containers");
+  $daq->DrawText(10.,0.7,"Attributes");
+  $daq->DrawText(10.,0.3,"Containers");
+  
+  $c1->cd();
+  
+  $gApplication->Run;
+
+
+
+=head2 arrow.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  
+  $gROOT->Reset();
+  my $c1 = TCanvas->new("c1");
+  $c1->Range(0,0,1,1);
+  my $par = TPaveLabel->new(0.1,0.8,0.9,0.95,"Examples of various arrow formats");
+  $par->SetFillColor(42);
+  $par->Draw();
+  
+  my $ar1 = TArrow->new(0.1,0.1,0.1,0.7);
+  $ar1->Draw();
+  
+  my $ar2 = TArrow->new(0.2,0.1,0.2,0.7,0.05,"|>");
+  $ar2->SetAngle(40);
+  $ar2->SetLineWidth(2);
+  $ar2->Draw();
+  
+  my $ar3 = TArrow->new(0.3,0.1,0.3,0.7,0.05,"<|>");
+  $ar3->SetAngle(40);
+  $ar3->SetLineWidth(2);
+  $ar3->Draw();
+  
+  my $ar4 = TArrow->new(0.46,0.7,0.82,0.42,0.07,"|>");
+  $ar4->SetAngle(60);
+  $ar4->SetLineWidth(2);
+  $ar4->SetFillColor(2);
+  $ar4->Draw();
+  
+  my $ar5 = TArrow->new(0.4,0.25,0.95,0.25,0.15,"<|>");
+  $ar5->SetAngle(60);
+  $ar5->SetLineWidth(4);
+  $ar5->SetLineColor(4);
+  $ar5->SetFillStyle(3008);
+  $ar5->SetFillColor(2);
+  $ar5->Draw();
+  
+  $gApplication->Run;
+
+
+
+=head2 basic3d.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  
+  $gROOT->Reset();
+  my $c1 = TCanvas->new("c1","PolyLine3D & PolyMarker3D Window",200,10,700,500);
+  
+  # create a pad
+  my $p1 = TPad->new("p1","p1",0.05,0.02,0.95,0.82,46,3,1);
+  $p1->Draw();
+  $p1->cd();
+  
+  # creating a view
+  my $view = TView->new(1); # FIXME doesn't work as of 2010-03-04 (TView not available in ROOT?)
+  $view->SetRange(5,5,5,25,25,25);
+  
+  # create a first PolyLine3D
+  my $pl3d1 = TPolyLine3D->new(5);
+  
+  # set points
+  $pl3d1->SetPoint(0, 10, 10, 10);
+  $pl3d1->SetPoint(1, 15, 15, 10);
+  $pl3d1->SetPoint(2, 20, 15, 15);
+  $pl3d1->SetPoint(3, 20, 20, 20);
+  $pl3d1->SetPoint(4, 10, 10, 20);
+  
+  # set attributes
+  $pl3d1->SetLineWidth(3);
+  $pl3d1->SetLineColor(5);
+  
+  # create a second PolyLine3D
+  my $pl3d2 = TPolyLine3D->new(4);
+  
+  # set points
+  $pl3d2->SetPoint(0, 5, 10, 5);
+  $pl3d2->SetPoint(1, 10, 15, 8);
+  $pl3d2->SetPoint(2, 15, 15, 18);
+  $pl3d2->SetPoint(3, 5, 20, 20);
+  $pl3d2->SetPoint(4, 10, 10, 5);
+  
+  # set attributes
+  $pl3d2->SetLineWidth(5);
+  $pl3d2->SetLineColor(2);
+  
+  # create a first PolyMarker3D
+  my $pm3d1 = TPolyMarker3D->new(12);
+  
+  # set points
+  $pm3d1->SetPoint(0, 10, 10, 10);
+  $pm3d1->SetPoint(1, 11, 15, 11);
+  $pm3d1->SetPoint(2, 12, 15, 9);
+  $pm3d1->SetPoint(3, 13, 17, 20);
+  $pm3d1->SetPoint(4, 14, 16, 15);
+  $pm3d1->SetPoint(5, 15, 20, 15);
+  $pm3d1->SetPoint(6, 16, 18, 10);
+  $pm3d1->SetPoint(7, 17, 15, 10);
+  $pm3d1->SetPoint(8, 18, 22, 15);
+  $pm3d1->SetPoint(9, 19, 28, 25);
+  $pm3d1->SetPoint(10, 20, 12, 15);
+  $pm3d1->SetPoint(11, 21, 12, 15);
+  
+  # set marker size, color & style
+  $pm3d1->SetMarkerSize(2);
+  $pm3d1->SetMarkerColor(4);
+  $pm3d1->SetMarkerStyle(2);
+  
+  # create a second PolyMarker3D
+  my $pm3d2 = TPolyMarker3D->new(8);
+  
+  $pm3d2->SetPoint(0, 22, 15, 15);
+  $pm3d2->SetPoint(1, 23, 18, 21);
+  $pm3d2->SetPoint(2, 24, 26, 13);
+  $pm3d2->SetPoint(3, 25, 17, 15);
+  $pm3d2->SetPoint(4, 26, 20, 15);
+  $pm3d2->SetPoint(5, 27, 15, 18);
+  $pm3d2->SetPoint(6, 28, 20, 10);
+  $pm3d2->SetPoint(7, 29, 20, 20);
+  
+  # set marker size, color & style
+  $pm3d2->SetMarkerSize(2);
+  $pm3d2->SetMarkerColor(1);
+  $pm3d2->SetMarkerStyle(8);
+  
+  # draw
+  $pl3d1->Draw();
+  $pl3d2->Draw();
+  $pm3d1->Draw();
+  $pm3d2->Draw();
+  
+  # draw a title/explanation in the canvas pad
+  $c1->cd();
+  my $title = TPaveText->new(0.1,0.85,0.9,0.97);
+  $title->SetFillColor(24);
+  $title->AddText("Examples of 3-D primitives");
+  
+  my $click = $title->AddText("Click anywhere on the picture to rotate");
+  $click->SetTextColor(4);
+  $title->Draw();
+  
+  $gApplication->Run;
+
+
+
+=head2 bill.pl
+
+  use strict;
+  use warnings;
+  use Math::Trig;
+  use SOOT ':all';
+  
+  my ($kFALSE, $kTRUE) = (0,1);
+  
+  ##// benchmark comparing write/read to/from keys or trees
+  ##// for example for N=10000, the following output is produced
+  ##// on a P IV 62.4GHz
+  ##   
+  ##// root -b -q bill.C    or root -b -q bill.C++
+  ##//
+  ##//billw0  : RT=  1.070 s, Cpu=  1.050 s, File size=  45508003 bytes, CX= 1
+  ##//billr0  : RT=  0.740 s, Cpu=  0.730 s
+  ##//billtw0 : RT=  0.720 s, Cpu=  0.660 s, File size=  45163959 bytes, CX= 1
+  ##//billtr0 : RT=  0.420 s, Cpu=  0.420 s
+  ##//billw1  : RT=  6.600 s, Cpu=  6.370 s, File size=  16215349 bytes, CX= 2.80687
+  ##//billr1  : RT=  2.290 s, Cpu=  2.270 s
+  ##//billtw1 : RT=  3.260 s, Cpu=  3.230 s, File size=   6880273 bytes, CX= 6.5642
+  ##//billtr1 : RT=  0.990 s, Cpu=  0.980 s
+  ##//billtot : RT= 18.290 s, Cpu= 15.920 s
+  ##//******************************************************************
+  ##//*  ROOTMARKS = 600.9   *  Root3.05/02   20030201/1840
+  ##//******************************************************************
+  
+  my $N = 10000;       #number of events to be processed
+  my $timer = TStopwatch->new();
+  print $timer, "\n";
+  bill();
+  
+  # write N histograms as keys
+  sub billw {
+    my $compress = shift;
+    $timer->Start();
+    my $f = TFile->new("/tmp/bill.root","recreate","bill benchmark with keys",$compress);
+    my $h = TH1F->new("h","h",1000,-3,3);
+    $h->FillRandom("gaus", 50000);
+     
+    for my $i (0..$N-1) {
+      my $name = sprintf("h%d", $i);
+      $h->SetName($name);
+      $h->Fill(2*$gRandom->Rndm());
+      $h->Write();
+    }
+    $timer->Stop();
+    printf("billw%d  : RT=%7.3f s, Cpu=%7.3f s, File size= %9d bytes, CX= %g\n",
+             $compress,
+             $timer->RealTime(), 
+             $timer->CpuTime(),
+             $f->GetBytesWritten(),
+             $f->GetCompressionFactor());
+  
+    $f->Close();
+  }
+  
+  # read N histograms from keys
+  sub billr {
+    my $compress = shift;
+    $timer->Start();
+    my $f = TFile->new("/tmp/bill.root");
+    my $lst = $f->GetListOfKeys();
+    my $nobj = $lst->GetSize();
+  
+    my $hx = TH1F->new('hx','h',100,0,1);
+    $hx->AddDirectory($kFALSE);
+  
+    my $hmean = TH1F->new("hmean","hist mean from keys",100,0,1);
+     
+    my $h;
+    for my $i (0..$nobj-1) {
+      my $name = sprintf("h%d", $i);
+      $h = $f->Get($name);
+      $hmean->Fill($h->GetMean(), 1.0);
+    }
+    $timer->Stop();
+    printf("billr%d  : RT=%7.3f s, Cpu=%7.3f s\n", $compress, $timer->RealTime(), 
+                                                              $timer->CpuTime());
+  }
+  # write N histograms to a Tree
+  sub billtw {
+    my $compress = shift;
+    $timer->Start();
+    my $f = TFile->new("/tmp/billt.root","recreate","bill benchmark with trees",$compress);
+    my $h = TH1F->new("h","h",1000,-3,3);
+    $h->FillRandom("gaus",50000);
+    my $T = TTree->new("T","test bill");
+    $T->Branch("event","TH1F",$h,64000,0);
+    for my $i (0..$N) {
+      my $name = sprintf("h%d",$i);
+      $h->SetName($name);
+      $h->Fill(2*$gRandom->Rndm());
+      $T->Fill();
+    }
+    $T->Write();
+    $timer->Stop();
+    printf("billtw%d : RT=%7.3f s, Cpu=%7.3f s, File size= %9d bytes, CX= %g\n",
+      $compress,
+      $timer->RealTime(),
+      $timer->CpuTime(),
+      $f->GetBytesWritten(),
+      $f->GetCompressionFactor());
+  }
+  sub billtr {
+    my $compress = shift;
+  }
+  sub bill {
+     my $totaltimer = TStopwatch->new();
+     $totaltimer->Start();
+     for my $compress (0..2) {
+       billw($compress);
+       billr($compress);
+  #     billtw($compress);
+  #     billtr($compress);
+     }
+     $gSystem->Unlink("/tmp/bill.root");
+     $gSystem->Unlink("/tmp/billt.root");
+     $totaltimer->Stop();
+     my $rtime = $totaltimer->RealTime();
+     my $ctime = $totaltimer->CpuTime();
+     printf("billtot : RT=%7.3f s, Cpu=%7.3f s\n",$rtime,$ctime);
+     # reference is a P IV 2.4 GHz
+     my $rootmarks = 600*(16.98 + 14.40)/($rtime + $ctime);
+     printf("******************************************************************\n");
+     printf("*  ROOTMARKS =%6.1f   *  Root%-8s  %d/%d\n",
+          $rootmarks, $gROOT->GetVersion(),
+                      $gROOT->GetVersionDate(), 
+                      $gROOT->GetVersionTime());
+     printf("******************************************************************\n");
+  }
+
+
+
+=head2 ellipse.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  
+  $gROOT->Reset();
+  my $c1 = TCanvas->new("c1");
+  $c1->Range(0,0,1,1);
+  
+  my $pel = TPaveLabel->new(0.1,0.8,0.9,0.95,"Examples of Ellipses");
+  $pel->SetFillColor(42);
+  $pel->Draw();
+  
+  my $el1 = TEllipse->new(0.25,0.25,.1,.2);
+  $el1->Draw();
+  
+  my $el2 = TEllipse->new(0.25,0.6,.2,.1);
+  $el2->SetFillColor(6);
+  $el2->SetFillStyle(3008);
+  $el2->Draw();
+  
+  my $el3 = TEllipse->new(0.75,0.6,.2,.1,45,315);
+  $el3->SetFillColor(2);
+  $el3->SetFillStyle(1001);
+  $el3->SetLineColor(4);
+  $el3->Draw();
+  
+  my $el4 = TEllipse->new(0.75,0.25,.2,.15,45,315,62);
+  $el4->SetFillColor(5);
+  $el4->SetFillStyle(1001);
+  $el4->SetLineColor(4);
+  $el4->SetLineWidth(6);
+  $el4->Draw();
+  
+  $gApplication->Run;
+
+
+
+=head2 feynman.pl
+
+  use strict;
+  use warnings;
+  use Math::Trig;
+  use SOOT ':all';
+  
+  my $c1 = TCanvas->new("c1", "A canvas", 10,10, 600, 300);
+  $c1->Range(0, 0, 140, 60);
+  my $linsav = int($gStyle->GetLineWidth());
+  
+  $gStyle->SetLineWidth(3);
+  
+  my $t = TLatex->new();
+  $t->SetTextAlign(22);
+  $t->SetTextSize(0.1);
+  
+  my $l;
+  $l = TLine->new(10, 10, 30, 30); 
+  $l->Draw();
+  
+  $l = TLine->new(10, 50, 30, 30); 
+  $l->Draw();
+  
+  my $ginit = TCurlyArc->new(30, 30, 12.5*sqrt(2), 135, 225);
+  $ginit->SetWavy();
+  $ginit->Draw();
+  
+  $t->DrawLatex(7,6,"e^{-}");
+  $t->DrawLatex(7,55,"e^{+}");
+  $t->DrawLatex(7,30,"#gamma");
+  
+  my $gamma = TCurlyLine->new(30, 30, 55, 30);
+  $gamma->SetWavy();
+  $gamma->Draw();
+  $t->DrawLatex(42.5,37.7,"#gamma");
+  
+  my $a = TArc->new(70, 30, 15);
+  $a->Draw();
+  $t->DrawLatex(55, 45,"#bar{q}");
+  $t->DrawLatex(85, 15,"q");
+  
+  my $gluon = TCurlyLine->new(70, 45, 70, 15);
+  $gluon->Draw();
+  $t->DrawLatex(77.5,30,"g");
+  
+  my $z0 = TCurlyLine->new(85, 30, 110, 30);
+  $z0->SetWavy();
+  $z0->Draw();
+  $t->DrawLatex(100, 37.5,"Z^{0}");
+  
+  $l = TLine->new(110, 30, 130, 10); 
+  $l->Draw();
+  
+  $l = TLine->new(110, 30, 130, 50); 
+  $l->Draw();
+  
+  my $gluon1 = TCurlyArc->new(110, 30, 12.5*sqrt(2), 315, 45);
+  $gluon1->Draw();
+  
+  $t->DrawLatex(135,6,"#bar{q}");
+  $t->DrawLatex(135,55,"q");
+  $t->DrawLatex(135,30,"g");
+  $c1->Update();
+  
+  $gStyle->SetLineWidth($linsav);
+  $gApplication->Run;
+  
+
+
+
+=head2 fildir.pl
+
+  #
+  # This macro displays the ROOT Directory data structure
+  #
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  
+  $gROOT->Reset();
+  
+  my $c1 = TCanvas->new('c1', 'ROOT FilDir description', 700, 900);
+  $c1->Range(1, 1, 19, 24.5);
+  my $title = TPaveLabel->new(4, 23, 16, 24.2, 'ROOT File/Directory/Key description');
+  $title->SetFillColor(16);
+  $title->Draw();
+  
+  my $keycolor = 42;
+  my $dircolor = 21;
+  my $objcolor = 46;
+  my $file = TPaveText->new(2, 19, 6, 22);
+  $file->SetFillColor(39);
+  $file->Draw();
+  $file->SetTextSize(0.04);
+  $file->AddText('TFile');
+  $file->AddText('Header');
+  
+  my $arrow = TArrow->new(6, 20.5, 17, 20.5, 0.02, '|>');
+  $arrow->SetFillStyle(1001);
+  $arrow->SetLineWidth(2);
+  $arrow->Draw();
+  
+  my $free = TPaveText->new(8, 20, 11, 21);
+  $free->SetFillColor(18);
+  $free->Draw();
+  $free->AddText('First:Last');
+  
+  my $free2 = TPaveText->new(12, 20, 15, 21);
+  $free2->SetFillColor(18);
+  $free2->Draw();
+  $free2->AddText('First:Last');
+  
+  my $tfree = TText->new(6.2, 21.2, 'fFree = TList of free blocks');
+  $tfree->SetTextSize(0.02);
+  $tfree->Draw();
+  
+  my $tkeys = TText->new(5.2, 18.2, 'fKeys = TList of Keys');
+  $tkeys->SetTextSize(0.02);
+  $tkeys->Draw();
+  
+  my $tmemory = TText->new(3.2, 15.2, 'fListHead = TList of Objects in memory');
+  $tmemory->SetTextSize(0.02);
+  $tmemory->Draw();
+  
+  $arrow->DrawArrow(5, 17, 17, 17, 0.02, '|>');
+  my $line = TLine->new(5, 19, 5, 17);
+  $line->SetLineWidth(2);
+  $line->Draw();
+  
+  my $key0 = TPaveText->new(7, 16, 10, 18);
+  $key0->SetTextSize(0.04);
+  $key0->SetFillColor($keycolor);
+  $key0->AddText('Key 0');
+  $key0->Draw();
+  
+  my $key1 = TPaveText->new(12, 16, 15, 18);
+  $key1->SetTextSize(0.04);
+  $key1->SetFillColor($keycolor);
+  $key1->AddText('Key 1');
+  $key1->Draw();
+  
+  $line->DrawLine(3, 19, 3, 14);
+  $line->DrawLine(3, 14, 18, 14);
+  
+  my $obj0 = TPaveText->new(5, 13, 8, 15);
+  $obj0->SetFillColor($objcolor);
+  $obj0->AddText('Object');
+  $obj0->Draw();
+  
+  my $dir1 = TPaveText->new(10, 13, 13, 15);
+  $dir1->SetFillColor($dircolor);
+  $dir1->AddText('SubDir');
+  $dir1->Draw();
+  
+  my $obj1 = TPaveText->new(15, 13, 18, 15);
+  $obj1->SetFillColor($objcolor);
+  $obj1->AddText('Object');
+  $obj1->Draw();
+  
+  $arrow->DrawArrow(12, 11, 17, 11, 0.015, '|>');
+  $arrow->DrawArrow(11, 9, 17, 9, 0.015, '|>');
+  $line->DrawLine(12, 13, 12, 11);
+  $line->DrawLine(11, 13, 11, 9);
+  
+  my $key2 = TPaveText->new(14, 10.5, 16, 11.5);
+  $key2->SetFillColor($keycolor);
+  $key2->AddText('Key 0');
+  $key2->Draw();
+  
+  my $obj2 = TPaveText->new(14, 8.5, 16, 9.5);
+  $obj2->SetFillColor($objcolor);
+  $obj2->AddText('Object');
+  $obj2->Draw();
+  
+  my $ldot = TLine->new(10, 15, 2, 11);
+  $ldot->SetLineStyle(2);
+  $ldot->Draw();
+  $ldot->DrawLine(13, 15, 8, 11);
+  $ldot->DrawLine(13, 13, 8, 5);
+  
+  my $dirdata = TPaveText->new(2, 5, 8, 11);
+  $dirdata->SetTextAlign(12);
+  $dirdata->SetFillColor($dircolor);
+  $dirdata->Draw();
+  $dirdata->SetTextSize(0.015);
+  $dirdata->AddText('fModified: True if directory is modified');
+  $dirdata->AddText('fWritable: True if directory is writable');
+  $dirdata->AddText('fDatimeC: Creation Date/Time');
+  $dirdata->AddText('fDatimeM: Last mod Date/Time');
+  $dirdata->AddText('fNbytesKeys: Number of bytes of key');
+  $dirdata->AddText('fNbytesName : Header length up to title');
+  $dirdata->AddText('fSeekDir: Start of Directory on file');
+  $dirdata->AddText('fSeekParent: Start of Parent Directory');
+  $dirdata->AddText('fSeekKeys: Pointer to Keys record');
+  
+  my $keydata = TPaveText->new(10, 2, 17, 7);
+  $keydata->SetTextAlign(12);
+  $keydata->SetFillColor($keycolor);
+  $keydata->Draw();
+  
+  $ldot->DrawLine(14, 11.5, 10, 7);
+  $ldot->DrawLine(16, 11.5, 17, 7);
+  
+  $keydata->SetTextSize(0.015);
+  $keydata->AddText('fNbytes: Size of compressed Object');
+  $keydata->AddText('fObjLen: Size of uncompressed Object');
+  $keydata->AddText('fDatime: Date/Time when written to store');
+  $keydata->AddText('fKeylen: Number of bytes for the key');
+  $keydata->AddText('fCycle : Cycle number');
+  $keydata->AddText('fSeekKey: Pointer to Object on file');
+  $keydata->AddText('fSeekPdir: Pointer to directory on file');
+  $keydata->AddText('fClassName: "TKey"');
+  $keydata->AddText('fName: Object name');
+  $keydata->AddText('fTitle: Object Title');
+  
+  $c1->Update();
+  
+  $gApplication->Run;
+  
+  __END__
+
+
+
+=head2 first.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  
+  $gROOT->Reset;
+  
+  my $nut = TCanvas->new('nut', 'FirstSession', 100, 10, 700, 900); 
+  $nut->Range(0, 0, 20, 24); 
+  $nut->SetFillColor(10); 
+  $nut->SetBorderSize(2); 
+   
+  my $pl = TPaveLabel->new( 3, 22, 17, 23.7, 'My first SOOT interactive session', 'br'); 
+  $pl->SetFillColor(18); 
+  $pl->Draw(); 
+   
+  my $t = TText->new(0,0,'a'); 
+  $t->SetTextFont(62); 
+  $t->SetTextSize(0.025); 
+  $t->SetTextAlign(12); 
+  $t->DrawText(2, 20.3, 'SOOT provides ROOT bindings for Perl');
+  $t->DrawText(2, 19.3, 'Blocks of lines can be entered typographically.'); 
+  $t->DrawText(2, 18.3, 'Previous typed lines can be recalled.'); 
+   
+  $t->SetTextFont(72); 
+  $t->SetTextSize(0.026); 
+  $t->DrawText(3, 17, '> my ($x, $y) = (5, 7)'); 
+  $t->DrawText(3, 16, '> $x*sqrt($y)'); 
+  $t->DrawText(3, 14, '> print "sqrt($_) = " . sqrt($_) for 2..7');
+  $t->DrawText(3, 10, '> use SOOT; my $f1 = TF1->new( "f1", "sin(x)/x", 0, 10 )'); 
+  $t->DrawText(3,  9, '> $f1.Draw()'); 
+  $t->SetTextFont(81); 
+  $t->SetTextSize(0.018); 
+  $t->DrawText(4, 15,   '13.228756555322953'); 
+  $t->DrawText(4, 13.3, 'sqrt(2) = 1.414214');
+  $t->DrawText(4, 12.7, 'sqrt(3) = 1.732051'); 
+  $t->DrawText(4, 12.1, 'sqrt(4) = 2.000000'); 
+  $t->DrawText(4, 11.5, 'sqrt(5) = 2.236068'); 
+  $t->DrawText(4, 10.9, 'sqrt(6) = 2.449490'); 
+   
+  my $pad = TPad->new('pad', 'pad', .2, .05, .8, .35); 
+  $pad->SetFillColor(42); 
+  $pad->SetFrameFillColor(33); 
+  $pad->SetBorderSize(10); 
+  $pad->Draw(); 
+  $pad->cd(); 
+  $pad->SetGrid(); 
+   
+  my $f1 = TF1->new('f1', 'sin(x)/x', 0, 10); 
+  $f1->Draw(); 
+  $nut->cd(); 
+  $nut->Update(); 
+  
+  $gApplication->Run;
+  
+  __END__
+
+
+
+=head2 geant3task.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  
+  # FIXME Error in <RootX11ErrorHandler>: BadDrawable (invalid Pixmap or Window parameter) (TGListTree XID: 60817649, XREQ: 53)
+  
+  my $geant3 = TTask->new("geant3","Geant3 simulation main program");      
+  $gROOT->GetListOfTasks()->Add($geant3);
+  my $uginit = TTask->new("uginit","Initialisation manager");      
+  my $grun   = TTask->new("grun","#Run manager");      
+  my $uglast = TTask->new("uglast","Termination manager");      
+  $geant3->Add($uginit);
+  $geant3->Add($grun);
+  $geant3->Add($uglast);
+  my $ginit  = TTask->new("ginit","Geant3 initialisation");      
+  my $ugeom  = TTask->new("ugeom","Geometry initialisation manager");      
+  my $gphysi = TTask->new("gphysi","Initialise cross-sections and energy loss tables");      
+  my $ggclos = TTask->new("ggclos","Geometry analyzer and optimizer");      
+  $uginit->Add($ginit);
+  $uginit->Add($ugeom);
+  $uginit->Add($gphysi);
+  $uginit->Add($ggclos);
+  my $gtrigi = TTask->new("gtrigi","Event initialisation");      
+  my $gtrig  = TTask->new("gtrig","Event manager");      
+  my $gtrigc = TTask->new("gtrigc","Event cleaner");      
+  $grun->Add($gtrigi);
+  $grun->Add($gtrig);
+  $grun->Add($gtrigc);
+  my $glast  = TTask->new("glast","Geant3 termination");      
+  my $igend  = TTask->new("igend","Graphics package termination");      
+  $uglast->Add($glast);
+  $uglast->Add($igend);
+  my $gukine = TTask->new("gukine","Event generator manager");      
+  my $gutrev = TTask->new("gutrev","Event application manager");      
+  my $gudigi = TTask->new("gudigi","Event digitisation manager");      
+  my $guout  = TTask->new("guout","Event termination manager");      
+  $gtrig->Add($gukine);
+  $gtrig->Add($gutrev);
+  $gtrig->Add($gudigi);
+  $gtrig->Add($guout);
+  my $gtreve = TTask->new("gtreve","Geant3 event manager");      
+  $gutrev->Add($gtreve);
+  my $gltrac = TTask->new("gltrac","Initialize tracking parameters");      
+  my $gftrac = TTask->new("gftrac","select next track segment from stack JTRACK");      
+  my $gutrak = TTask->new("gutrak","Application track manager");      
+  $gtreve->Add($gltrac);
+  $gtreve->Add($gftrac);
+  $gtreve->Add($gutrak);
+  my $gtrack = TTask->new("gtrack","Geant3 track manager");      
+  $gutrak->Add($gtrack);
+  my $gtgama = TTask->new("gtgama","photon propagator");      
+  my $gtelec = TTask->new("gtelec","electron propagator");      
+  my $gtneut = TTask->new("gtneut","neutron propagator");      
+  my $gthadr = TTask->new("gthadr","hadron propagator");      
+  my $gtmuon = TTask->new("gtmuon","muon propagator");      
+  my $gtnino = TTask->new("gtnino","geantino propagator");      
+  my $gtckov = TTask->new("gtckov","Cherenkov light propagator");      
+  my $gthion = TTask->new("gthion","heavy ion propagator");      
+  my $gustep = TTask->new("gustep","Application step manager");      
+  my $gtmedi = TTask->new("gtmedi","Geometry volume finder");      
+  $gtrack->Add($gtgama);
+  $gtrack->Add($gtelec);
+  $gtrack->Add($gtneut);
+  $gtrack->Add($gthadr);
+  $gtrack->Add($gtmuon);
+  $gtrack->Add($gtnino);
+  $gtrack->Add($gtckov);
+  $gtrack->Add($gthion);
+  $gtrack->Add($gustep);
+  $gtrack->Add($gtmedi);
+  my $gtnext = TTask->new("gtnext","Geometry bounary manager");      
+  my $gpairg = TTask->new("gpairg","Generate pair production");      
+  my $gcomp  = TTask->new("gcomp","Generate Compton scattering");      
+  my $gphot  = TTask->new("gphot","Generate photo effect");      
+  my $grayl  = TTask->new("grayl","Generate Rayleigh effect");      
+  my $gpfis  = TTask->new("gpfis","Generate photo fission");      
+  $gtgama->Add($gtnext);
+  $gtgama->Add($gpairg);
+  $gtgama->Add($gcomp);
+  $gtgama->Add($gphot);
+  $gtgama->Add($grayl);
+  $gtgama->Add($gpfis);
+  my $guswim = TTask->new("guswim","magnetic field propagator");      
+  my $ggckov = TTask->new("ggckov","Generate Cherenkov photons");      
+  my $gsync  = TTask->new("gsync","Generate synchrotron radiation");      
+  my $gmults = TTask->new("gmults","Apply multiple scattering");      
+  my $gbreme = TTask->new("gbreme","Generate Bremsstrahlung");      
+  my $gdray  = TTask->new("gdray","Generate delta ray");      
+  my $ganni  = TTask->new("ganni","Generate Positron annihilation");      
+  my $gannir = TTask->new("gannir","Stopped tracks and annihilation at rest");      
+  
+  $gtelec->Add($gtnext);
+  $gtelec->Add($guswim);
+  $gtelec->Add($ggckov);
+  $gtelec->Add($gsync);
+  $gtelec->Add($gmults);
+  $gtelec->Add($gbreme);
+  $gtelec->Add($gdray);
+  $gtelec->Add($ganni);
+  $gtelec->Add($gannir);
+  my $guphad = TTask->new("guphad","Hadronic cross-section manager");      
+  my $guhadr = TTask->new("guhadr","Hadronic cascade manager");      
+  my $gdecay = TTask->new("gdecay","Particle decay");      
+  $gtneut->Add($gtnext);
+  $gtneut->Add($guphad);
+  $gtneut->Add($guhadr);
+  $gtneut->Add($gdecay);
+  
+  $gthadr->Add($gtnext);
+  $gthadr->Add($guphad);
+  $gthadr->Add($guswim);
+  $gthadr->Add($ggckov);
+  $gthadr->Add($gmults);
+  $gthadr->Add($guhadr);
+  $gthadr->Add($gdecay);
+  $gthadr->Add($gdray);
+  my $gbremm = TTask->new("gbremm","Generate Bremsstrahlung");      
+  my $gpairm = TTask->new("gpairm","Generate Pair production");      
+  my $gmunu  = TTask->new("gmunu","Generate Nuclear interaction");      
+  $gtmuon->Add($gtnext);
+  $gtmuon->Add($guswim);
+  $gtmuon->Add($ggckov);
+  $gtmuon->Add($gmults);
+  $gtmuon->Add($gbremm);
+  $gtmuon->Add($gpairm);
+  $gtmuon->Add($gdecay);
+  $gtmuon->Add($gdray);
+  $gtmuon->Add($gmunu);
+  $gtmuon->Add($gdecay);
+  
+  $gtnino->Add($gtnext);
+  my $glisur = TTask->new("glisur","Photon is reflected");      
+  $gtckov->Add($gtnext);
+  $gtckov->Add($glisur);
+  
+  $gthion->Add($gtnext);
+  $gthion->Add($guswim);
+  $gthion->Add($gmults);
+  $gthion->Add($guhadr);
+  $gthion->Add($gdray);
+  
+  TBrowser->new;
+  
+  $gApplication->Run;
+  
+  __END__
+
+
+
+=head2 labels1.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  
+  # Setting alphanumeric labels in a 1-d histogram
+  # author; Rene Brun
+  my $people = [qw(
+    Jean Pierre Marie Odile Sebastien Fons Rene
+    Nicolas Xavier Greg Bjarne Anton Otto Eddy Peter Pasha
+    Philippe Suzanne Jeff Valery
+  )];
+  my $size = scalar @$people;
+  
+  my $c1 = TCanvas->new("c1","demo bin labels",10,10,900,500);
+  $c1->SetGrid();
+  $c1->SetBottomMargin(0.15);
+  my $h = TH1F->new("h","test",$size,0,$size);
+  $h->SetFillColor(38);
+  $h->Fill($gRandom->Gaus(0.5*$size,0.2*$size)*1.0) for 0..4999;
+  $h->SetStats(0);
+  $h->GetXaxis()->SetBinLabel($_,$people->[$_-1]) for 1..$size-1;
+  $h->Draw();
+  my $pt = TPaveText->new(0.6,0.7,0.98,0.98,"brNDC");
+  $pt->SetFillColor(18);
+  $pt->SetTextAlign(12);
+  $pt->AddText("Use the axis Context Menu LabelsOption");
+  $pt->AddText(" \"a\"   to sort by alphabetic order");
+  $pt->AddText(" \">\"   to sort by decreasing vakues");
+  $pt->AddText(" \"<\"   to sort by increasing vakues");
+  $pt->Draw();
+  
+  $gApplication->Run;
+  
+
+
+
+=head2 labels2.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  
+  use constant nx => 12;
+  use constant ny => 20;
+  my $months  = [qw(January February March April May June July
+                    August September October November December)];
+  my $people  = [qw(Jean Pierre Marie Odile Sebastien Fons Rene
+                    Nicolas Xavier Greg Bjarne Anton Otto Eddy Peter Pasha
+                    Philippe Suzanne Jeff Valery)];
+  my $c1 = TCanvas->new("c1","demo bin labels",10,10,800,800);
+  $c1->SetGrid();
+  $c1->SetLeftMargin(0.15);
+  $c1->SetBottomMargin(0.15);
+  my $h = TH2F->new("h","test",nx,0,nx,ny,0,ny);
+  $h->Fill($gRandom->Gaus(0.5*nx,0.2*nx)*1.0, $gRandom->Gaus(0.5*ny,0.2*ny)*1.0) for 0..4999;
+  
+  $h->SetStats(0);
+  $h->GetXaxis()->SetBinLabel($_,$months->[$_-1]) for 1..nx-1;
+  $h->GetYaxis()->SetBinLabel($_,$people->[$_-1]) for 1..ny-1; 
+  $h->Draw("text");
+  
+  my $pt = TPaveText->new(0.6,0.85,0.98,0.98,"brNDC");
+  $pt->SetFillColor(18);
+  $pt->SetTextAlign(12);
+  $pt->AddText("Use the axis Context Menu LabelsOption");
+  $pt->AddText(" \"a\"   to sort by alphabetic order");
+  $pt->AddText(" \">\"   to sort by decreasing values");
+  $pt->AddText(" \"<\"   to sort by increasing values");
+  $pt->Draw();
+  
+  $c1->Update();
+  
+  $gApplication->Run;
+
+
+
+=head2 latex.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  
+  my $c1 = TCanvas->new("c1","test",600,700);
+  # write formulas
+  my $l = TLatex->new;
+  $l->SetTextAlign(12);
+  $l->SetTextSize(0.04);
+  $l->DrawLatex(0.1,0.9,"1)   C(x) = d #sqrt{#frac{2}{#lambdaD}}  #int^{x}_{0}cos(#frac{#pi}{2}t^{2})dt");
+  $l->DrawLatex(0.1,0.7,"2)   C(x) = d #sqrt{#frac{2}{#lambdaD}}  #int^{x}cos(#frac{#pi}{2}t^{2})dt");
+  $l->DrawLatex(0.1,0.5,"3)   R = |A|^{2} = #frac{1}{2}#left(#[]{#frac{1}{2}+C(V)}^{2}+#[]{#frac{1}{2}+S(V)}^{2}#right)");
+  $l->DrawLatex(0.1,0.3,"4)   F(t) = #sum_{i=-#infty}^{#infty}A(i)cos#[]{#frac{i}{t+i}}");
+  $l->DrawLatex(0.1,0.1,"5)   {}_{3}^{7}Li");
+  $c1->Print("latex.ps");
+  
+  $gApplication->Run;
+  
+  __END__
+
+
+
+=head2 latex2.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  
+  $gROOT->Reset();
+  my $c1 = TCanvas->new("c1");
+  my $l =  TLatex->new;
+  $l->SetTextAlign(23);
+  $l->SetTextSize(0.1);
+  $l->DrawLatex(0.5,0.95,"e^{+}e^{-}#rightarrowZ^{0}#rightarrowI#bar{I}, q#bar{q}");
+  $l->DrawLatex(0.5,0.75,"|#vec{a}#bullet#vec{b}|=#Sigmaa^{i}_{jk}+b^{bj}_{i}");
+  $l->DrawLatex(0.5,0.5,"i(#partial_{#mu}#bar{#psi}#gamma^{#mu}+m#bar{#psi})=0#Leftrightarrow(#Box+m^{2})#psi=0");
+  $l->DrawLatex(0.5,0.3,"L_{em}=eJ^{#mu}_{em}A_{#mu} , J^{#mu}_{em}=#bar{I}#gamma_{#mu}I , M^{j}_{i}=#SigmaA_{#alpha}#tau^{#alphaj}_{i}");
+  $c1->Print("latex2.ps");
+  
+  $gApplication->Run;
+  
+  __END__
+
+
+
+=head2 latex3.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  
+  my $c1 = TCanvas ->new("c1");
+  my $pt = TPaveText->new(.05,.1,.95,.8);
+  
+  $pt->AddText("#frac{2s}{#pi#alpha^{2}}  #frac{d#sigma}{dcos#theta} (e^{+}e^{-} #rightarrow f#bar{f} ) = ".
+              "#left| #frac{1}{1 - #Delta#alpha} #right|^{2} (1+cos^{2}#theta)");
+  
+  $pt->AddText("+ 4 Re #left{ #frac{2}{1 - #Delta#alpha} #chi(s) #[]{#hat{g}_{#nu}^{e}#hat{g}_{#nu}^{f} ".
+              "(1 + cos^{2}#theta) + 2 #hat{g}_{a}^{e}#hat{g}_{a}^{f} cos#theta) } #right}");
+  
+  $pt->AddText("+ 16#left|#chi(s)#right|^{2} #left[(#hat{g}_{a}^{e}^{2} + #hat{g}_{v}^{e}^{2})".
+            "(#hat{g}_{a}^{f}^{2} + #hat{g}_{v}^{f}^{2})(1+cos^{2}#theta)".
+            "+ 8 #hat{g}_{a}^{e} #hat{g}_{a}^{f} #hat{g}_{v}^{e} #hat{g}_{v}^{f}cos#theta#right] ");
+  
+  $pt->SetLabel("Born equation");
+  $pt->Draw();
+  
+  $gApplication->Run;
+  
+  __END__
+
+
+
+=head2 latex4.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  
+  # Draw the Greek letters as a table and save the result as GIF, PS, PDF 
+  # and SVG files. 
+  # Lowercase Greek letters are obtained by adding a # to the name of the letter. 
+  # For an uppercase Greek letter, just capitalize the first letter of the
+  # command name. Some letter have two representations. The name of the
+  # second one (the "variation") starts with "var".
+  my $c1 = TCanvas->new("greek","greek",600,700);
+  
+  my $l = TLatex->new;
+  $l->SetTextSize(0.03);
+  
+  # Draw the columns titles
+  $l->SetTextAlign(22);
+  $l->DrawLatex(0.165, 0.95, "Lower case");
+  $l->DrawLatex(0.495, 0.95, "Upper case");
+  $l->DrawLatex(0.825, 0.95, "Variations");
+  
+  # Draw the lower case letters
+  $l->SetTextAlign(12);
+  my ($y, $x1, $x2);
+  $y = 0.90; $x1 = 0.07; $x2 = $x1+0.2;
+  my @letters = qw(
+    alpha beta gamma delta epsilon zeta eta
+    theta iota kappa lambda mu nu xi omicron
+    pi rho sigma tau upsilon phi chi psi omega
+  );
+  foreach my $letter (@letters) {
+    $l->DrawLatex($x1, $y, "$letter : ");
+    $l->DrawLatex($x2, $y, "#$letter");
+    $y -= 0.0375;
+  }
+  
+  # Draw the upper case letters
+  $y = 0.90; $x1 = 0.40; $x2 = $x1+0.2;
+  foreach my $letter (map {ucfirst $_} @letters) {
+    $l->DrawLatex($x1, $y, "$letter : ");
+    $l->DrawLatex($x2, $y, "#$letter");
+    $y -= 0.0375;
+  }
+  
+  # Draw the variations
+  my @letterVariations  = qw(varepsilon vartheta varsigma varUpsilon varphi varomega);
+  my @letterVariationsY = (0.7500, 0.6375, 0.2625, 0.1875, 0.1500, 0.0375);
+  $x1 = 0.73; $x2 = $x1+0.2;
+  foreach my $i (0..$#letterVariations) {
+    my $letter = $letterVariations[$i];
+    my $y      = $letterVariationsY[$i];
+    $l->DrawLatex($x1, $y, "$letter : ");
+    $l->DrawLatex($x2, $y, "#$letter");
+  }
+  
+  # Save the picture in various formats
+  $c1->Print("greek.ps");
+  $c1->Print("greek.gif");
+  $c1->Print("greek.pdf");
+  $c1->Print("greek.svg");
+  
+  $gApplication->Run;
+
+
+
+=head2 logscale.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  
+  my $c1 = TCanvas->new("c1","Various options on LOG scales plots",0,0,700,900);
+  $c1->SetFillColor(30);
+  
+  my $pad1 = TPad->new("pad1","pad1",0.03,0.62,0.50,0.92,32);
+  my $pad2 = TPad->new("pad2","pad2",0.51,0.62,0.98,0.92,33);
+  my $pad3 = TPad->new("pad3","pad3",0.03,0.02,0.97,0.535,38);
+  $pad1->Draw(); 
+  $pad2->Draw(); 
+  $pad3->Draw();
+  
+  my $title = TPaveLabel->new(0.1,0.94,0.9,0.98,"Various options on LOG scales plots");
+  $title->SetFillColor(16);
+  $title->SetTextFont(42);
+  $title->Draw();
+  
+  my $pave = TPaveText->new(0.1,0.55,0.9,0.61);
+  $pave->SetFillColor(42);
+  $pave->SetTextAlign(12);
+  $pave->SetTextFont(42);
+  $pave->AddText("When more Log labels are requested, the overlaping labels are removed");
+  $pave->Draw();
+  
+  $pad1->cd();
+  $pad1->SetLogy();
+  $pad1->SetGridy();
+  my $f1 = TF1->new("f1","x*sin(x)*exp(-0.1*x)+15",-10.,10.);
+  my $f2 = TF1->new("f2","(sin(x)+cos(x))**5+15",-10.,10.);
+  my $f3 = TF1->new("f3","(sin(x)/(x)-x*cos(x))+15",-10.,10.);
+  $f1->SetLineWidth(1); 
+  $f1->SetLineColor(2);
+  $f2->SetLineWidth(1); 
+  $f2->SetLineColor(3);
+  $f3->SetLineWidth(1); 
+  $f3->SetLineColor(4);
+  #f1->SetTitle("");
+  $f1->Draw();
+  $f2->Draw("same");
+  $f3->Draw("same");
+  $f1->GetYaxis()->SetMoreLogLabels();
+  my $pave1 = TPaveText->new(-6,2,6,6);
+  $pave1->SetFillColor(42);
+  $pave1->SetTextAlign(12);
+  $pave1->SetTextFont(42);
+  $pave1->AddText("Log scale along Y axis.");
+  $pave1->AddText("More Log labels requested.");
+  $pave1->Draw();
+  
+  $pad2->cd();
+  my $x = [200., 300, 400, 500, 600, 650, 700, 710, 900,1000];
+  my $y = [200., 1000, 900, 400, 500, 250, 800, 150, 201, 220];
+  my $g_2 = TGraph->new(10,$x,$y);
+  #g_2->SetTitle("");
+  $g_2->Draw("AL*");
+  $g_2->SetMarkerColor(2);
+  $g_2->GetYaxis()->SetMoreLogLabels();
+  $g_2->GetYaxis()->SetNoExponent();
+  $pad2->SetLogy();
+  $g_2->GetXaxis()->SetMoreLogLabels();
+  $pad2->SetLogx();
+  $pad2->SetGridx();
+  my $pave2 = TPaveText->new(150,80,500,180);
+  $pave2->SetFillColor(42);
+  $pave2->SetTextFont(42);
+  $pave2->SetTextAlign(12);
+  $pave2->AddText("Log scale along X and Y axis.");
+  $pave2->AddText("More Log labels on both.");
+  $pave2->AddText("No exponent along Y axis.");
+  $pave2->Draw();
+  
+  $pad3->cd();
+  $pad3->SetGridx();
+  $pad3->SetGridy();
+  $pad3->SetLogy();
+  $pad3->SetLogx();
+  my $f4 = TF1->new("f4a","x*sin(x+10)+25",1,21); 
+  $f4->SetLineWidth(1); 
+  $f4->Draw();
+  $f4->SetNpx(200);
+  #f4->SetTitle("");
+  $f4->GetYaxis()->SetMoreLogLabels();
+  $f4->GetXaxis()->SetMoreLogLabels();
+  my $f5 = TF1->new("f4b","x*cos(x+10)*sin(x+10)+25",1,21); 
+  $f5->SetLineWidth(1); 
+  $f5->Draw("same");
+  $f5->SetNpx(200);
+  
+  my $max = 20;
+  for my $i (reverse(1..$max)) {
+    my $f = TF1->new(sprintf("f4b_%d",$i),"x*sin(x+10)*[0]/[1]+25",1,21);
+    $f->SetParameter(0,$i);
+    $f->SetParameter(1,$max);
+    $f->SetNpx(200);
+    $f->SetLineWidth(1); 
+    $f->SetLineColor($i+10); 
+    $f->Draw("same");
+    $f->keep;
+    $f = TF1->new(sprintf("f4c_%d",$i),"x*cos(x+10)*sin(x+10)*[0]/[1]+25",1,25);
+    $f->SetParameter(0,$i);
+    $f->SetParameter(1,$max);
+    $f->SetNpx(200);
+    $f->SetLineWidth(1); 
+    $f->SetLineColor($i+30); 
+    $f->Draw("same");
+    $f->keep;
+  }
+  my $pave3 = TPaveText->new(1.2,8,9,15);
+  $pave3->SetFillColor(42);
+  $pave3->AddText("Log scale along X and Y axis.");
+  $pave3->SetTextFont(42);
+  $pave3->SetTextAlign(12);
+  $pave3->AddText("More Log labels on both.");
+  $pave3->AddText("The labels have no exponents because they would be 0 or 1");
+  $pave3->Draw();
+  
+  $gApplication->Run;
+  
+
+
+
+=head2 psexam.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  
+  # FIXME Obviously, there are charset issues
+  
+  # Example of text produced with PostScript illustrating how to use
+  # the various text control characters, national accents, sub and superscripts
+  
+  $gROOT->Reset();
+  my $c1 = TCanvas->new("c1","PostScript examples",100,10,600,700);
+  
+  my $title = TPaveLabel->new(.2,.9,.8,.95,"Printed text with PostScript");
+  $title->SetFillColor(16);
+  $title->Draw();
+  
+  my $pt1 = TPaveText->new(.1,.5,.9,.8);
+  $pt1->SetTextFont(61);
+  $pt1->SetFillColor(18);
+  $pt1->AddText("Künstler in den größten Städten");
+  $pt1->AddText("\253\265 l\@'\372uvre on conna\333t l\@'artisan\273");
+  $pt1->AddText("(proverbe fran\321ais)");
+  $pt1->AddText("\252\241Ma\337ana\41 \322ag&\306!das&\313!\272, dit l\@'\323l\325ve.");
+  $pt1->Draw();
+  
+  
+  my $pt2 = TPaveText->new(.1,.1,.9,.4);
+  $pt2->SetTextFont(61);
+  $pt2->SetFillColor(18);
+  $pt2->SetTextSize(0.04);
+  $pt2->AddText("e^+!e^-! '5# Z^0! '5# ll&^-!, qq&^\261!");
+  $pt2->AddText("| a&^`\256#! \267 b&^`\256#! | = `\345# a^i?jk!+b^kj?i");
+  $pt2->AddText("i ('d#?`m!y#&^\261!`g^m#! + m `y#&^\261! = 0' r# (~r# + m^2!)`y# = 0");
+  $pt2->AddText("L?em! = e J^`m#?em! A?`m#! , J^`m#?em!=l&^\261!` g?m#!l , M^j?i! = `\345&?a#! A?`a! t^a#j?i! ");
+  $pt2->Draw();
+  
+  $c1->Print("psexam.ps");
+  
+  $gApplication->Run;
+
+
+
+=head2 pstable.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  
+  # FIXME port charset issues
+  
+  sub _pstable {
+    
+    # program to display all possible types of ROOT/Postscript characters
+  
+    my $rsymbol1 = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N",
+                    "O","P","Q","R","S","T","U","V","W","X","Y","Z",
+                    "0","1","2","3","4","5","6","7","8","9",
+                    ".",",","+","-","*","/","=","(",")","{","}","END"];
+  
+    my $rsymbol2 = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n",
+                    "o","p","q","r","s","t","u","v","w","x","y","z",
+                    ":","\;","\@","\\","\_","\|","\%",
+                    "\@'","<",">","[","]","\42","\@\43","\@\136",
+                    "\@\77","\@\41","\@&","\$","\@\176"," ","END"];
+  
+    my $rsymbol3 = ["\241","\242","\243","\244","\245","\246","\247","\250",
+                    "\251","\252","\253","\254","\255","\256","\257","\260",
+                    "\261","\262","\263","\264","\265","\266","\267","\270",
+                    "\271","\272","\273","\274","\275","\276","\277","\300",
+                    "\301","\302","\303","\304","\305","\306","\307","\310",
+                    "\311","\312","\313","\314","\315","\316","\317","END"];
+  
+    my $rsymbol4 = ["\321","\322","\323","\324","\325","\326","\327","\330",
+                    "\331","\332","\333","\334","\335","\336","\337","\340",
+                    "\341","\342","\343","\344","\345","\346","\347","\340",
+                    "\351","\352","\353","\354","\355","\356","\357","\360",
+                    "\361","\362","\363","\364","\365","\366","\367","\370",
+                    "\371","\372","\373","\374","\375","\376","\377","END"];
+  
+    my $xrange = 18;
+    my $yrange = 25;
+    my $w = 650;
+    my $h = int($w*$yrange/$xrange);
+    my $c1 = TCanvas->new("c1","c1",200,10,$w,$h);
+    $c1->Range(0,0,$xrange,$yrange);
+  
+    my $t = TText->new(0,0,"a");
+    $t->SetTextSize(0.02);
+    $t->SetTextFont(62);
+    $t->SetTextAlign(22);
+  
+    table(0.5,0.5*$xrange-0.5,$yrange,$t,$rsymbol1,0);
+    table(0.5*$xrange+0.5,$xrange-0.5,$yrange,$t,$rsymbol2,0);
+  
+    my $tlabel = TText->new(0,0,"a");
+    $tlabel->SetTextFont(72);
+    $tlabel->SetTextSize(0.018);
+    $tlabel->SetTextAlign(22);
+    $tlabel->DrawText(0.5*$xrange,1.3,"Input characters are standard keyboard characters");
+    $c1->Modified();
+    $c1->Update();
+    $c1->Print("pstable1.ps");
+  
+    my $c2 = TCanvas->new("c2","c2",220,20,$w,$h);
+    $c2->Range(0,0,$xrange,$yrange);
+  
+    table(0.5,0.5*$xrange-0.5,$yrange,$t,$rsymbol3,1);
+    table(0.5*$xrange+0.5,$xrange-0.5,$yrange,$t,$rsymbol4,1);
+  
+    $tlabel->DrawText(0.5*$xrange,1.3,"Input characters using backslash and octal numbers");
+    $c2->Modified();
+    $c2->Update();
+    $c2->Print("pstable2.ps");
+  
+  sub table {
+    my ($x1, $x2, $yrange, $t, $rsymbol, $isoctal) = @_;
+    my $n = scalar @$rsymbol;
+    my $y1  = 2.5;
+    my $y2  = $yrange - 0.5;
+    my $dx  = ($x2-$x1)/5;
+    my $dy  = ($y2 - 1 - $y1)/($n+1);
+    my $y   = $y2 - 1 - 0.7*$dy;
+    my $xc0 = $x1  + 0.5*$dx;
+    my $xc1 = $xc0 + $dx;
+    my $xc2 = $xc1 + $dx;
+    my $xc3 = $xc2 + $dx;
+    my $xc4 = $xc3 + $dx;
+  
+    my $line = TLine->new();
+    $line->DrawLine($x1,$y1,$x1,$y2);
+    $line->DrawLine($x1,$y1,$x2,$y1);
+    $line->DrawLine($x1,$y2,$x2,$y2);
+    $line->DrawLine($x2,$y1,$x2,$y2);
+    $line->DrawLine($x1,$y2-1,$x2,$y2-1);
+    $line->DrawLine($x1+  $dx,$y1,$x1+  $dx,$y2);
+    $line->DrawLine($x1+2*$dx,$y1,$x1+2*$dx,$y2);
+    $line->DrawLine($x1+3*$dx,$y1,$x1+3*$dx,$y2);
+    $line->DrawLine($x1+4*$dx,$y1,$x1+4*$dx,$y2);
+  
+    my $tit = TText->new(0,0,"a");
+    $tit->SetTextSize(0.015);
+    $tit->SetTextFont(72);
+    $tit->SetTextAlign(22);
+    $tit->DrawText($xc0,$y2-0.6,"Input");
+    $tit->DrawText($xc1,$y2-0.6,"Roman");
+    $tit->DrawText($xc2,$y2-0.6,"Greek");
+    $tit->DrawText($xc3,$y2-0.6,"Special");
+    $tit->DrawText($xc4,$y2-0.6,"Zapf");
+  
+    for (my $i=0; $i<$n; $i++) {
+      my $text;
+      if ($isoctal) {
+        $text = sprintf("\@\\ %3o", $rsymbol->[$i]);
+      } 
+      else {
+        $text = $rsymbol->[$i];
+      }
+      $t->DrawText($xc0,$y,$text);
+      $text = sprintf("%s",$rsymbol->[$i]);
+      $t->DrawText($xc1,$y,$text);
+      $text = sprintf("`%s", $rsymbol->[$i]);
+      $t->DrawText($xc2,$y,$text);
+      $text = sprintf("'%s",$rsymbol->[$i]);
+      $t->DrawText($xc3,$y,$text);
+      $text = sprintf("~%s",$rsymbol->[$i]);
+      $t->DrawText($xc4,$y,$text);
+      $y -= $dy;
+    }
+  }
+  
+  _pstable;
+  
+  $gApplication->Run;
+
+
+
+=head2 quarks.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  
+  my $c1 = TCanvas->new("c1", "c1",10,10,630,760);
+  $c1->SetFillColor(kBlack);
+  my $quarkColor  = 50;
+  my $leptonColor = 16;
+  my $forceColor  = 38;
+  my $titleColor  = kYellow;
+  my $border = 8;
+  
+  my $texf = TLatex->new(0.90,0.455,"Force Carriers");
+  $texf->SetTextColor($forceColor);
+  $texf->SetTextAlign(22);
+  $texf->SetTextSize(0.07);
+  $texf->SetTextAngle(90);
+  $texf->Draw();
+  
+  my $texl = TLatex->new(0.11,0.288,"Leptons");
+  $texl->SetTextColor($leptonColor);
+  $texl->SetTextAlign(22);
+  $texl->SetTextSize(0.07);
+  $texl->SetTextAngle(90);
+  $texl->Draw();
+  
+  my $texq = TLatex->new(0.11,0.624,"Quarks");
+  $texq->SetTextColor($quarkColor);
+  $texq->SetTextAlign(22);
+  $texq->SetTextSize(0.07);
+  $texq->SetTextAngle(90);
+  $texq->Draw();
+  
+  my $tex = TLatex->new(0.5,0.5,"u");
+  $tex->SetTextColor($titleColor);
+  $tex->SetTextFont(32);
+  $tex->SetTextAlign(22);
+  $tex->SetTextSize(0.14);
+  $tex->DrawLatex(0.5,0.93,"Elementary");
+  $tex->SetTextSize(0.12);
+  $tex->DrawLatex(0.5,0.84,"Particles");
+  $tex->SetTextSize(0.05);
+  $tex->DrawLatex(0.5,0.067,"Three Generations of Matter");
+  
+  $tex->SetTextColor(kBlack);
+  $tex->SetTextSize(0.8);
+  
+  my $pad = TPad->new("pad", "pad",0.15,0.11,0.85,0.79);
+  $pad->Draw();
+  $pad->cd();
+  $pad->Divide(4,4,0.0003,0.0003);
+  
+  $pad->cd(1);
+  $gPad->SetFillColor($quarkColor);
+  $gPad->SetBorderSize($border);
+  $tex->DrawLatex(.5,.5,"u");
+  
+  $pad->cd(2);
+  $gPad->SetFillColor($quarkColor);
+  $gPad->SetBorderSize($border);
+  $tex->DrawLatex(.5,.5,"c");
+  
+  $pad->cd(3);
+  $gPad->SetFillColor($quarkColor);
+  $gPad->SetBorderSize($border);
+  $tex->DrawLatex(.5,.5,"t");
+  
+  $pad->cd(4);
+  $gPad->SetFillColor($forceColor);
+  $gPad->SetBorderSize($border);
+  $tex->DrawLatex(.5,.55,"#gamma");
+  
+  $pad->cd(5);
+  $gPad->SetFillColor($quarkColor);
+  $gPad->SetBorderSize($border);
+  $tex->DrawLatex(.5,.5,"d");
+  
+  $pad->cd(6);
+  $gPad->SetFillColor($quarkColor);
+  $gPad->SetBorderSize($border);
+  $tex->DrawLatex(.5,.5,"s");
+  
+  $pad->cd(7);
+  $gPad->SetFillColor($quarkColor);
+  $gPad->SetBorderSize($border);
+  $tex->DrawLatex(.5,.5,"b");
+  
+  $pad->cd(8);
+  $gPad->SetFillColor($forceColor);
+  $gPad->SetBorderSize($border);
+  $tex->DrawLatex(.5,.55,"g");
+  
+  $pad->cd(9);
+  $gPad->SetFillColor($leptonColor);
+  $gPad->SetBorderSize($border);
+  $tex->DrawLatex(.5,.5,"#nu_{e}");
+  
+  $pad->cd(10);
+  $gPad->SetFillColor($leptonColor);
+  $gPad->SetBorderSize($border);
+  $tex->DrawLatex(.5,.5,"#nu_{#mu}");
+  
+  $pad->cd(11);
+  $gPad->SetFillColor($leptonColor);
+  $gPad->SetBorderSize($border);
+  $tex->DrawLatex(.5,.5,"#nu_{#tau}");
+  
+  $pad->cd(12);
+  $gPad->SetFillColor($forceColor);
+  $gPad->SetBorderSize($border);
+  $tex->DrawLatex(.5,.5,"Z");
+  
+  $pad->cd(13);
+  $gPad->SetFillColor($leptonColor);
+  $gPad->SetBorderSize($border);
+  $tex->DrawLatex(.5,.5,"e");
+  
+  $pad->cd(14);
+  $gPad->SetFillColor($leptonColor);
+  $gPad->SetBorderSize($border);
+  $tex->DrawLatex(.5,.56,"#mu");
+  
+  $pad->cd(15);
+  $gPad->SetFillColor($leptonColor);
+  $gPad->SetBorderSize($border);
+  $tex->DrawLatex(.5,.5,"#tau");
+  
+  $pad->cd(16);
+  $gPad->SetFillColor($forceColor);
+  $gPad->SetBorderSize($border);
+  $tex->DrawLatex(.5,.5,"W");
+  
+  $c1->cd();
+  
+  $c1->Update();
+  
+  $gApplication->Run;
+  
+
+
+
+=head2 testrandom.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  use Math::Trig;
+  
+  sub testAll {
+    use constant N => 100000;
+    my $cpn = 100000./N;
+  
+    my $r1 = TRandom->new;
+    my $r2 = TRandom2->new;
+    my $r3 = TRandom3->new;
+  
+    my $sw = TStopwatch->new;
+    printf("Distribution            microseconds/call\n");
+    printf("                    TRandom  TRandom2 TRandom3\n");
+  
+    my $x;
+    $sw->Start();
+    for my $i (0..N-1) {
+      $x = $r1->Rndm($i);
+    }
+    printf("Rndm.............. %8.3f",$sw->CpuTime()*$cpn);
+  
+    $sw->Start();
+    for my $i (0..N-1) {
+      $x = $r2->Rndm($i);
+    }
+    printf(" %8.3f",$sw->CpuTime()*$cpn);
+  
+    $sw->Start();
+    for my $i (0..N-1) {
+      $x = $r3->Rndm($i);
+    }
+    printf(" %8.3f\n",$sw->CpuTime()*$cpn);
+  
+    $sw->Start();
+    for (0..N-1) {
+      $x = $r1->Gaus(0,1);
+    }
+    printf("Gaus.............. %8.3f",$sw->CpuTime()*$cpn);
+  
+    $sw->Start();
+    for (0..N-1) {
+      $x = $r2->Gaus(0,1);
+    }
+    printf(" %8.3f", $sw->CpuTime()*$cpn);
+  
+    $sw->Start();
+    for (0..N-1) {
+      $x = $r3->Gaus(0,1);
+    }
+    printf(" %8.3f\n",$sw->CpuTime()*$cpn);
+  
+    $sw->Start();
+    for (0..N-1) {
+      $x = $r1->Landau(0,1);
+    }
+    printf("Landau............ %8.3f",$sw->CpuTime()*$cpn);
+  
+    $sw->Start();
+    for (0..N-1) {
+      $x = $r2->Landau(0,1);
+    }
+    printf(" %8.3f",$sw->CpuTime()*$cpn);
+  
+    $sw->Start();
+    for (0..N-1) {
+      $x = $r3->Landau(0,1);
+    }
+    printf(" %8.3f\n",$sw->CpuTime()*$cpn);
+  
+    $sw->Start();
+    for (0..N-1) {
+      $x = $r1->Binomial(5,0.5);
+    }
+    printf("Binomial(5,0.5)... %8.3f",$sw->CpuTime()*$cpn);
+  
+    $sw->Start();
+    for (0..N-1) {
+      $x = $r2->Binomial(5,0.5);
+    }
+    printf(" %8.3f",$sw->CpuTime()*$cpn);
+  
+    $sw->Start();
+    for (0..N-1) {
+      $x = $r3->Binomial(5,0.5);
+    }
+    printf(" %8.3f\n",$sw->CpuTime()*$cpn);
+  
+    $sw->Start();
+    for (0..N-1) {
+      $x = $r1->Binomial(15,0.5);
+    }
+    printf("Binomial(15,0.5).. %8.3f",$sw->CpuTime()*$cpn);
+  
+    $sw->Start();
+    for (0..N-1) {
+      $x = $r2->Binomial(15,0.5);
+    }
+    printf(" %8.3f",$sw->CpuTime()*$cpn);
+  
+    $sw->Start();
+    for (0..N-1) {
+      $x = $r3->Binomial(15,0.5);
+    }
+    printf(" %8.3f\n",$sw->CpuTime()*$cpn);
+  
+    $sw->Start();
+    for (0..N-1) {
+      $x = $r1->Poisson(3);
+    }
+    printf("Poisson(3)........ %8.3f",$sw->CpuTime()*$cpn);
+  
+    $sw->Start();
+    for (0..N-1) {
+      $x = $r2->Poisson(3);
+    }
+    printf(" %8.3f",$sw->CpuTime()*$cpn);
+  
+    $sw->Start();
+    for (0..N-1) {
+      $x = $r3->Poisson(3);
+    }
+    printf(" %8.3f\n",$sw->CpuTime()*$cpn);
+  
+    $sw->Start();
+    for (0..N-1) {
+      $x = $r1->Poisson(10);
+    }
+    printf("Poisson(10)....... %8.3f",$sw->CpuTime()*$cpn);
+  
+    $sw->Start();
+    for (0..N-1) {
+      $x = $r2->Poisson(10);
+    }
+    printf(" %8.3f",$sw->CpuTime()*$cpn);
+  
+    $sw->Start();
+    for (0..N-1) {
+      $x = $r3->Poisson(10);
+    }
+    printf(" %8.3f\n",$sw->CpuTime()*$cpn);
+  
+    $sw->Start();
+    for (0..N-1) {
+      $x = $r1->Poisson(70);
+    }
+    printf("Poisson(70)....... %8.3f",$sw->CpuTime()*$cpn);
+  
+    $sw->Start();
+    for (0..N-1) {
+      $x = $r2->Poisson(70);
+    }
+    printf(" %8.3f",$sw->CpuTime()*$cpn);
+  
+    $sw->Start();
+    for (0..N-1) {
+      $x = $r3->Poisson(70);
+    }
+    printf(" %8.3f\n",$sw->CpuTime()*$cpn);
+  
+    $sw->Start();
+    for (0..N-1) {
+      $x = $r1->Poisson(100);
+    }
+    printf("Poisson(100)...... %8.3f",$sw->CpuTime()*$cpn);
+  
+    $sw->Start();
+    for (0..N-1) {
+      $x = $r2->Poisson(100);
+    }
+    printf(" %8.3f",$sw->CpuTime()*$cpn);
+  
+    $sw->Start();
+    $x = $r3->Poisson(100) for (0..N-1);
+    printf(" %8.3f\n",$sw->CpuTime()*$cpn);
+  
+    my $f1 = TF1->new("f1","gaus",-4,4);
+    $f1->SetParameters(1,0.,1.);
+  
+    $gRandom->($r1);
+    $sw->Start();
+    for (0..N-1) {
+       $x = $f1->GetRandom();
+    }
+    printf("GausTF1........... %8.3f",$sw->CpuTime()*$cpn);
+  
+    $gRandom->($r2);
+    $sw->Start();
+    for (0..N-1) {
+       $x = $f1->GetRandom();
+    }
+    printf(" %8.3f",$sw->CpuTime()*$cpn);
+  
+    $gRandom->($r3); # FIXME Assignment operators or similar (see TODO)
+    $sw->Start();
+    for (0..N-1) {
+       $x = $f1->GetRandom();
+    }
+    printf(" %8.3f\n",$sw->CpuTime()*$cpn);
+  
+    my $f2 = TF1->new("f2","landau",-5,15);
+    $f2->SetParameters(new array::Array('d',[1,0,1]));
+  
+    $gRandom->($r1);
+    $sw->Start();
+    for (0..N-1) {
+       $x = $f2->GetRandom();
+    }
+    printf("LandauTF1......... %8.3f",$sw->CpuTime()*$cpn);
+  
+    $gRandom->($r2);
+    $sw->Start();
+    for (0..N-1) {
+       $x = $f2->GetRandom();
+    }
+    printf(" %8.3f",$sw->CpuTime()*$cpn);
+  
+    $gRandom->($r3);
+    $sw->Start();
+    for (0..N-1) {
+       $x = $f2->GetRandom();
+    }
+    printf(" %8.3f\n",$sw->CpuTime()*$cpn);
+  }
+  
+  sub testRandom3 {
+  
+    my $RefValue = [
+       0.81733006,0.99906090,0.51035437,0.13153291,0.03541635,0.99246953,0.62570870,0.06259195,
+       0.41071051,0.13477367,0.98087230,0.83739344,0.96552844,0.22128745,0.44443750,0.33807132,
+       0.70534207,0.03319661,0.36874827,0.42297428,0.58917768,0.31198491,0.90208136,0.70879117,
+       0.45695755,0.54116575,0.07224296,0.22841073,0.21145732,0.78509043,0.52266975,0.15731867,
+       0.74431815,0.24225334,0.71237144,0.71139078,0.65817271,0.67160887,0.71958352,0.52671765,
+       0.81637290,0.48441294,0.38109662,0.99952637,0.47448673,0.57408927,0.29098035,0.00700452,
+       0.02613592,0.31053063,0.20498745,0.07792653,0.77710219,0.00397776,0.24915641,0.49163196,
+       0.26287272,0.64487490,0.04627505,0.49447185,0.78513214,0.15551811,0.28760017,0.32910048,
+       0.54834635,0.72919981,0.31700058,0.79623664,0.87401422,0.61549255,0.19901847,0.65743758,
+       0.36394627,0.64682013,0.78236511,0.30151095,0.62095993,0.95354393,0.18781735,0.86562104,
+       0.24958360,0.84537539,0.17959665,0.26342110,0.86091750,0.99298659,0.31777386,0.66680234,
+       0.25841019,0.71407696,0.64696258,0.92890438,0.20011200,0.03900434,0.25476924,0.45721227,
+       0.29274370,0.40278521,0.02927933,0.24882571,0.41015308,0.49048318,0.24055835,0.22030061,
+       0.25621529,0.11392559,0.55531160,0.15336550,0.77020781,0.55553334,0.02459224,0.46012777,
+       0.35751076,0.07315001,0.29045640,0.49781675,0.64193243,0.56658425,0.92454871,0.45266960,
+       0.55095565,0.59174837,0.99767534,0.05236326,0.33946435,0.50946936,0.85102374,0.22797478,
+       0.29799012,0.63136922,0.95319405,0.53548567,0.49403618,0.58334783,0.43009950,0.69254489,
+       0.80089172,0.38947293,0.05254629,0.58134491,0.14240379,0.92969809,0.81686257,0.38736825,
+       0.17661743,0.38507002,0.39606030,0.88077117,0.77854230,0.60595983,0.14658502,0.86708308,
+       0.08412199,0.62269042,0.33618395,0.95572246,0.03277188,0.98509318,0.10418194,0.17320687,
+       0.65619013,0.31015625,0.06194080,0.07175284,0.03035102,0.71576738,0.72023646,0.37316047,
+       0.43220056,0.78602933,0.72523767,0.08624364,0.33417859,0.15025760,0.21162379,0.56819255,
+       0.37239232,0.58210006,0.18396678,0.85786951,0.94358435,0.36472649,0.06869341,0.96937716,
+       0.69800896,0.15787523,0.85394390,0.29648328,0.82789802,0.17741989,0.25410572,0.41110448,
+       0.98677803,0.79315873,0.88411529,0.09048238,0.50307567,0.08148165,0.32418417,0.83330672,
+       0.14074385,0.83302705,0.54050764,0.88252641,0.74173695,0.51913331,0.26276695,0.20602320,
+       0.77550233,0.74370025,0.15857482,0.18634406,0.46725959,0.60993159,0.36738095,0.83240586,
+       0.52622445,0.85894528,0.38599805,0.61522709,0.67019941,0.72176407,0.10916136,0.96260655,
+       0.95708292,0.44343951,0.45103833,0.73053001,0.84836401,0.19097768,0.71441120,0.78900459,
+       0.98617819,0.60887900,0.36223114,0.35412423,0.24378622,0.38721935,0.91932366,0.25089762,
+       0.69778047,0.75226990,0.47017556,0.20146258,0.47643465,0.73658783,0.06264829,0.52467006,
+       0.06467187,0.25951195,0.62394357,0.23024284,0.21489860,0.11107103,0.27047458,0.68687182,
+       0.48635525,0.81884360,0.32680150,0.27568774,0.82213186,0.70811095,0.78211868,0.49311790,
+       0.35617696,0.29174889,0.42600296,0.62369889,0.49800726,0.73278784,0.10412470,0.24892372,
+       0.88282504,0.18740641,0.83361413,0.39586229,0.21048279,0.01735519,0.30001581,0.40672912,
+       0.10188941,0.18197491,0.27156564,0.59752112,0.99950864,0.94920455,0.92408342,0.71184385,
+       0.48303596,0.85067874,0.13648935,0.74769050,0.60639437,0.76909182,0.01186354,0.49329672,
+       0.10714793,0.78120836,0.11658467,0.39158614,0.02654157,0.27961507,0.72004317,0.07286112,
+       0.91178413,0.59644492,0.86471944,0.52164190,0.14834674,0.45319741,0.75070517,0.52213560,
+       0.58789377,0.22021929,0.65313632,0.43755274,0.88293108,0.00881952,0.28076366,0.81677460,
+       0.62997773,0.72974092,0.73809120,0.00210845,0.50009595,0.88197326,0.56397940,0.28592215,
+       0.29689698,0.32257535,0.02991649,0.15802567,0.57426849,0.63224317,0.09780467,0.09221793,
+       0.40275296,0.96533188,0.09078909,0.23537767,0.18503637,0.14755087,0.83069161,0.05797206,
+       0.29209753,0.46332474,0.33187428,0.51277665,0.65900698,0.88450671,0.80162803,0.06285642,
+       0.65370611,0.41792440,0.37322222,0.31673850,0.42032287,0.12915823,0.99183469,0.50494915,
+       0.10313063,0.87186173,0.83058283,0.28692706,0.86617909,0.07066538,0.82276822,0.49743861,
+       0.65517282,0.71056031,0.65894907,0.73515636,0.74182474,0.24757007,0.96248561,0.47191825,
+       0.02204604,0.00993510,0.51349674,0.04662995,0.74141249,0.28316860,0.45211229,0.44299580,
+       0.96397909,0.45046886,0.61147180,0.24238744,0.75822703,0.46695985,0.08545828,0.59658000,
+       0.97305912,0.09186353,0.86482636,0.72104425,0.86841101,0.82149848,0.34538708,0.19123514,
+       0.47904939,0.73141185,0.14705495,0.54148300,0.83091474,0.53555212,0.06001840,0.80458720,
+       0.66447743,0.05214252,0.54033370,0.05829573,0.82837277,0.21585693,0.07343976,0.45574279,
+       0.16894963,0.77891380,0.25957446,0.42626845,0.44766521,0.88144142,0.79273048,0.56690366,
+       0.31655285,0.20033301,0.69382520,0.20676850,0.14943414,0.04203240,0.77226726,0.93434004,
+       0.00665110,0.24343808,0.96196466,0.05028409,0.08433921,0.52343028,0.71457802,0.79246257,
+       0.42211837,0.41186206,0.93308887,0.28888652,0.00323350,0.81831010,0.89112996,0.77793345,
+       0.46166572,0.47337993,0.99742385,0.87176229,0.16908698,0.90926109,0.43674447,0.47276792,
+       0.65706547,0.77427418,0.39377904,0.70637717,0.39966382,0.36218531,0.61958411,0.46097110,
+       0.52431923,0.29710511,0.77794336,0.44065830,0.51102742,0.11329236,0.58040572,0.13812234,
+       0.18067337,0.29238623,0.53972462,0.71159170,0.03686473,0.57088434,0.78560214,0.08681037,
+       0.26271669,0.08707718,0.56324526,0.19315938,0.68643390,0.54113702,0.03742116,0.33642405,
+       0.17822265,0.88021518,0.13789732,0.07373062,0.54532172,0.33518099,0.78282745,0.66610581,
+       0.25997006,0.70633347,0.32169739,0.30070857,0.45696895,0.51743666,0.28306410,0.83102753,
+       0.37514942,0.27281418,0.71187608,0.75990978,0.71379176,0.18195183,0.43799556,0.87754865,
+       0.27787586,0.66214825,0.80039407,0.50308127,0.09761988,0.64426099,0.93303703,0.30862984,
+       0.97503342,0.94690058,0.76828286,0.03591404,0.45211060,0.26951636,0.16420588,0.20041079,
+       0.30508215,0.44198933,0.81286523,0.07283472,0.79325444,0.23966486,0.80650448,0.63822675,
+       0.62994282,0.61568470,0.15902616,0.22079987,0.61860009,0.38280795,0.66446975,0.19140073,
+       0.17553973,0.37348454,0.40893456,0.79177487,0.65256982,0.52810438,0.88118109,0.70080330,
+       0.09183587,0.42844970,0.61741237,0.28062020,0.82689390,0.66541543,0.58731742,0.85583051,
+       0.28754463,0.80540403,0.04342987,0.30965563,0.54072529,0.25111917,0.02636629,0.56375924,
+       0.76976160,0.04933231,0.19725465,0.24075160,0.55275752,0.17601844,0.57611845,0.43910581,
+       0.83540259,0.77444162,0.17398828,0.73866963,0.94636429,0.47407761,0.82412350,0.66616686,
+       0.76924418,0.55549670,0.17107736,0.18734632,0.26965591,0.48438918,0.57178814,0.47970533,
+       0.28482623,0.59927202,0.77796561,0.74676815,0.38522871,0.28586360,0.41433794,0.98753382,
+       0.91795320,0.64912250,0.02104557,0.28765939,0.56002049,0.95388346,0.49398375,0.56624579,
+       0.61676996,0.08280439,0.93088510,0.82063055,0.21403632,0.18384002,0.57404210,0.05138611,
+       0.68620413,0.30963975,0.86843956,0.28382975,0.70009432,0.06553222,0.88487274,0.17017184,
+       0.51737725,0.95630554,0.62574404,0.75923421,0.86190631,0.89923650,0.32888148,0.39459141,
+       0.17985475,0.16045021,0.52749047,0.81488465,0.66252785,0.59856171,0.45339297,0.93769466,
+       0.44489423,0.89846779,0.93638325,0.94966682,0.79465849,0.69384779,0.50030870,0.34862620,
+       0.47509697,0.72458342,0.51266543,0.85502048,0.69921358,0.88701421,0.86361008,0.76017494,
+       0.39756695,0.25727441,0.85957870,0.44207373,0.54087748,0.17149436,0.53558357,0.72188831,
+       0.07041658,0.29999474,0.46125135,0.84884899,0.37471755,0.79585295,0.85398628,0.12487134,
+       0.70795774,0.59243011,0.09883110,0.37293453,0.05747022,0.62335461,0.66017320,0.26258314,
+       0.19813686,0.48144864,0.87688960,0.23327933,0.88500531,0.75490883,0.36335473,0.39153243,
+       0.59674457,0.81137417,0.61825663,0.40660643,0.82674346,0.94034309,0.17119000,0.92063020,
+       0.95492463,0.73737746,0.45790558,0.36707067,0.04820434,0.54420593,0.79276160,0.78515019,
+       0.53871723,0.35180979,0.91601484,0.03539422,0.53669714,0.23358341,0.88200486,0.63750977,
+       0.62103354,0.94898313,0.91268509,0.91611582,0.22251574,0.86644709,0.44068809,0.44828197,
+       0.82204251,0.01335423,0.11663959,0.88761171,0.72659529,0.77960883,0.61659203,0.68707521,
+       0.67666380,0.97686601,0.46010131,0.13248757,0.74619763,0.19479952,0.99025307,0.93819672,
+       0.27181737,0.73673592,0.28543724,0.22792783,0.90523485,0.93823619,0.78501439,0.61656516,
+       0.07955141,0.18168917,0.29082605,0.65797642,0.32823333,0.81331039,0.57147047,0.69893420,
+       0.20831241,0.95777075,0.63984640,0.88738242,0.07848082,0.82684414,0.98029069,0.66526810,
+       0.38557133,0.71149557,0.94858490,0.62926765,0.90885914,0.63053097,0.30342354,0.15757158,
+       0.00025002,0.79558801,0.12340674,0.15472735,0.91599988,0.26034480,0.37218003,0.31505156,
+       0.82802884,0.89673239,0.18346699,0.84168200,0.61789605,0.08168748,0.59156852,0.07958038,
+       0.96195833,0.66408685,0.08095598,0.07095613,0.84685589,0.27739931,0.98959400,0.51626225,
+       0.84261701,0.54025792,0.37685974,0.02342340,0.92266817,0.77435713,0.77067911,0.51277625,
+       0.56118371,0.43209985,0.36942455,0.44084938,0.98089105,0.71676238,0.69984047,0.84869031,
+       0.63547183,0.04148475,0.43743286,0.84123202,0.52038168,0.28615072,0.28352163,0.79736192,
+       0.47167238,0.59169495,0.81284136,0.19419823,0.34367688,0.12288628,0.73169755,0.23054063,
+       0.82395547,0.25653393,0.05918229,0.49808932,0.71105968,0.84663708,0.36985755,0.76035179,
+       0.74522674,0.76960632,0.39913976,0.67396122,0.06664612,0.55662705,0.25707708,0.40266841,
+       0.60609242,0.40501726,0.54303688,0.91351521,0.22723418,0.70937689,0.99817752,0.67228136,
+       0.74630914,0.65870585,0.92889114,0.25387954,0.64329686,0.46943028,0.04378946,0.13098710,
+       0.27603392,0.92670784,0.68034038,0.74874919,0.22048594,0.65726347,0.18700630,0.43129192,
+       0.53484836,0.65180659,0.40891688,0.53964046,0.31092230,0.15700634,0.67510544,0.93051722,
+       0.70192617,0.06589912,0.81070749,0.88715652,0.63461777,0.17327079,0.85346016,0.13309837,
+       0.74074193,0.41495818,0.13114635,0.29676602,0.55575998,0.08474479,0.68264860,0.14314954,
+       0.38683757,0.10459365,0.81642443,0.79792244,0.61012448,0.11771586,0.75822460,0.07478109,
+       0.90581110,0.47274042,0.27752421,0.80769814,0.22061377,0.13478922,0.50175379,0.12971842,
+       0.08710200,0.39966582,0.24793967,0.53151429,0.51359819,0.17133100,0.48634444,0.90454564,
+       0.35394807,0.77980258,0.95855173,0.85080743,0.83472335,0.50540362,0.95554870,0.33335771,
+       0.20280484,0.72904434,0.94055151,0.75802221,0.35794192,0.99512716,0.64422638,0.71713156,
+       0.56521412,0.39549143,0.11438263,0.68851566,0.93209728,0.38786572,0.67497578,0.08170274,
+       0.78648148,0.01316856,0.64208455,0.69919498,0.70325948,0.25694323,0.06213494,0.75401522,
+       0.02352755,0.50620675,0.99215984,0.78649662,0.99722138,0.38401222,0.56054967,0.27620015,
+       0.11796089,0.19867418,0.12293884,0.78472313,0.79924393,0.00775441,0.17381195,0.20126848,
+       0.20433789,0.12794894,0.58498394,0.40009110,0.43708467,0.90969847,0.81032084,0.28461705,
+       0.68974048,0.44176976,0.13168968,0.20271071,0.42777169,0.48731570,0.48192040,0.09814809,
+       0.12716694,0.87015685,0.47095372,0.02672373,0.24331047,0.34338493,0.00177808,0.91418113,
+       0.19211809,0.90684713,0.52045770,0.98002315,0.31741128,0.38021534,0.60643025,0.34356139,
+       0.08454933,0.68452069,0.79046616,0.64493681,0.60069897,0.78646781,0.44859417,0.30481706 
+     ];
+  
+     my $r = TRandom3->new(4357);
+     my $x;
+  
+     # check whether the sequence is ok or not
+     my $rc1 = 0;
+     for (0..999) {
+       $x = $r->Rndm();
+       if (abs($x-$RefValue->[$_]) > 10e-8) {
+         printf("i=%d x=%.8f but should be %.8f\n", $_, $x, $RefValue->[$_]);
+         $rc1 += 1;
+       }
+     }
+  
+     # check whether a state can be saved and restored
+     my $file = TFile->new("random3.root","RECREATE");
+     $file->SetCompressionLevel(0);
+     $r->Write("r");
+     $file->Close;
+  
+     $file = TFile->new("random3.root");
+     my $rs = $file->Get("r");
+     my $rc2 = 0;
+     for (0..999) {
+       $rc2 += 1 if ($r->Rndm() - $rs->Rndm() != 0); 
+     }
+     printf("state restoration failed\n") if ($rc2 != 0);
+  
+     return $rc1 + $rc2;
+  }
+  sub testrandom {
+    testRandom3;
+    testAll;
+  }
+  
+  
+  testrandom;
+
+
+
+=head2 tree.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  
+  $gROOT->Reset();
+  
+  my $c1 = TCanvas->new('c1','Tree Data Structure',200,10,750,940);
+  $c1->Range(0,-0.1,1,1.15);
+  
+  $gBenchmark->Start('tree');
+  
+  my $branchcolor = 26;
+  my $leafcolor   = 30;
+  my $basketcolor = 42;
+  my $offsetcolor = 43;
+  
+  #title = TPaveLabel->new(.3,1.05,.8,1.13,c1.GetTitle());
+  my $title = TPaveLabel->new(.3,1.05,.8,1.13,'Tree Data Structure');
+  $title->SetFillColor(16);
+  $title->Draw();
+  
+  my $tree = TPaveText->new(.01,.75,.15,1.00);
+  $tree->SetFillColor(18);
+  $tree->SetTextAlign(12);
+  
+  my $tnt = $tree->AddText('Tree');
+  $tnt->SetTextAlign(22);
+  $tnt->SetTextSize(0.030);
+  $tree->AddText('fScanField');
+  $tree->AddText('fMaxEventLoop');
+  $tree->AddText('fMaxVirtualSize');
+  $tree->AddText('fEntries');
+  $tree->AddText('fDimension');
+  $tree->AddText('fSelectedRows');
+  $tree->Draw();
+  
+  my $farm = TPavesText->new(.01,1.02,.15,1.1,9,'tr');
+  my $tfarm = $farm->AddText('CHAIN');
+  $tfarm->SetTextSize(0.024);
+  $farm->AddText('Collection');
+  $farm->AddText('of Trees');
+  $farm->Draw();
+  
+  my $link = TLine->new(.15,.92,.80,.92);
+  $link->SetLineWidth(2);
+  $link->SetLineColor(1);
+  $link->Draw();
+  $link->DrawLine(.21,.87,.21,.275);
+  $link->DrawLine(.23,.87,.23,.375);
+  $link->DrawLine(.25,.87,.25,.775);
+  $link->DrawLine(.41,.25,.41,-.025);
+  $link->DrawLine(.43,.25,.43,.075);
+  $link->DrawLine(.45,.25,.45,.175);
+  
+  my $branch0 = TPaveLabel->new(.20,.87,.35,.97,'Branch 0');
+  $branch0->SetTextSize(0.35);
+  $branch0->SetFillColor($branchcolor);
+  $branch0->Draw();
+  
+  my $branch1 = TPaveLabel->new(.40,.87,.55,.97,'Branch 1');
+  $branch1->SetTextSize(0.35);
+  $branch1->SetFillColor($branchcolor);
+  $branch1->Draw();
+  
+  my $branch2 = TPaveLabel->new(.60,.87,.75,.97,'Branch 2');
+  $branch2->SetTextSize(0.35);
+  $branch2->SetFillColor($branchcolor);
+  $branch2->Draw();
+  
+  my $branch3 = TPaveLabel->new(.80,.87,.95,.97,'Branch 3');
+  $branch3->SetTextSize(0.35);
+  $branch3->SetFillColor($branchcolor);
+  $branch3->Draw();
+  
+  my $leaf0 = TPaveLabel->new(.4,.75,.5,.8,'Leaf 0');
+  $leaf0->SetFillColor($leafcolor);
+  $leaf0->Draw();
+  
+  my $leaf1 = TPaveLabel->new(.6,.75,.7,.8,'Leaf 1');
+  $leaf1->SetFillColor($leafcolor);
+  $leaf1->Draw();
+  
+  my $leaf2 = TPaveLabel->new(.8,.75,.9,.8,'Leaf 2');
+  $leaf2->SetFillColor($leafcolor);
+  $leaf2->Draw();
+  
+  my $firstevent = TPaveText->new(.4,.35,.9,.4);
+  $firstevent->AddText('First event of each basket');
+  $firstevent->AddText('Array of fMaxBaskets Integers');
+  $firstevent->SetFillColor($basketcolor);
+  $firstevent->Draw();
+  
+  my $basket0 = TPaveLabel->new(.4,.25,.5,.3,'Basket 0');
+  $basket0->SetFillColor($basketcolor);
+  $basket0->Draw();
+  
+  my $basket1 = TPaveLabel->new(.6,.25,.7,.3,'Basket 1');
+  $basket1->SetFillColor($basketcolor);
+  $basket1->Draw();
+  
+  my $basket2 = TPaveLabel->new(.8,.25,.9,.3,'Basket 2');
+  $basket2->SetFillColor($basketcolor);
+  $basket2->Draw();
+  
+  my $offset = TPaveText->new(.55,.15,.9,.2);
+  $offset->AddText('Offset of events in fBuffer');
+  $offset->AddText('Array of fEventOffsetLen Integers');
+  $offset->AddText('(if variable length structure);');
+  $offset->SetFillColor($offsetcolor);
+  $offset->Draw();
+  
+  my $buffer = TPaveText->new(.55,.05,.9,.1);
+  $buffer->AddText('Basket buffer');
+  $buffer->AddText('Array of fBasketSize chars');
+  $buffer->SetFillColor($offsetcolor);
+  $buffer->Draw();
+  
+  my $zipbuffer = TPaveText->new(.55,-.05,.75,.0);
+  $zipbuffer->AddText('Basket compressed buffer');
+  $zipbuffer->AddText('(if compression);');
+  $zipbuffer->SetFillColor($offsetcolor);
+  $zipbuffer->Draw();
+  
+  my $ar1 = TArrow->new();
+  $ar1->SetLineWidth(2);
+  $ar1->SetLineColor(1);
+  $ar1->SetFillStyle(1001);
+  $ar1->SetFillColor(1);
+  $ar1->DrawArrow(.21,.275,.39,.275,0.015,'|>');
+  $ar1->DrawArrow(.23,.375,.39,.375,0.015,'|>');
+  $ar1->DrawArrow(.25,.775,.39,.775,0.015,'|>');
+  $ar1->DrawArrow(.50,.775,.59,.775,0.015,'|>');
+  $ar1->DrawArrow(.70,.775,.79,.775,0.015,'|>');
+  $ar1->DrawArrow(.50,.275,.59,.275,0.015,'|>');
+  $ar1->DrawArrow(.70,.275,.79,.275,0.015,'|>');
+  $ar1->DrawArrow(.45,.175,.54,.175,0.015,'|>');
+  $ar1->DrawArrow(.43,.075,.54,.075,0.015,'|>');
+  $ar1->DrawArrow(.41,-.025,.54,-.025,0.015,'|>');
+  
+  my $ldot = TLine->new(.95,.92,.99,.92);
+  $ldot->SetLineStyle(3);
+  $ldot->Draw();
+  $ldot->DrawLine(.9,.775,.99,.775);
+  $ldot->DrawLine(.9,.275,.99,.275);
+  $ldot->DrawLine(.55,.05,.55,0);
+  $ldot->DrawLine(.9,.05,.75,0);
+  
+  my $pname = TText->new(.46,.21,'fEventOffset');
+  $pname->SetTextFont(72);
+  $pname->SetTextSize(0.018);
+  $pname->Draw();
+  $pname->DrawText(.44,.11,'fBuffer');
+  $pname->DrawText(.42,.01,'fZipBuffer');
+  $pname->DrawText(.26,.81,'fLeaves = TObjArray of TLeaf');
+  $pname->DrawText(.24,.40,'fBasketEvent');
+  $pname->DrawText(.22,.31,'fBaskets = TObjArray of TBasket');
+  $pname->DrawText(.20,1.0,'fBranches = TObjArray of TBranch');
+  
+  my $ntleaf = TPaveText->new(0.30,.42,.62,.7);
+  $ntleaf->SetTextSize(0.014);
+  $ntleaf->SetFillColor($leafcolor);
+  $ntleaf->SetTextAlign(12);
+  $ntleaf->AddText('fLen: number of fixed elements');
+  $ntleaf->AddText('fLenType: number of bytes of data type');
+  $ntleaf->AddText('fOffset: relative to Leaf0-fAddress');
+  $ntleaf->AddText('fNbytesIO: number of bytes used for I/O');
+  $ntleaf->AddText('fIsPointer: True if pointer');
+  $ntleaf->AddText('fIsRange: True if leaf has a range');
+  $ntleaf->AddText('fIsUnsigned: True if unsigned');
+  $ntleaf->AddText('*fLeafCount: points to Leaf counter');
+  $ntleaf->AddText(' ');
+  $ntleaf->AddLine(0,0,0,0);
+  $ntleaf->AddText('fName = Leaf name');
+  $ntleaf->AddText('fTitle = Leaf type (see Type codes)');
+  $ntleaf->Draw();
+  
+  my $type = TPaveText->new(.65,.42,.95,.7);
+  $type->SetTextAlign(12);
+  $type->SetFillColor($leafcolor);
+  $type->AddText(' ');
+  $type->AddText('C : a character string');
+  $type->AddText('B : an 8 bit signed integer');
+  $type->AddText('b : an 8 bit unsigned integer');
+  $type->AddText('S : a 16 bit signed short integer');
+  $type->AddText('s : a 16 bit unsigned short integer');
+  $type->AddText('I : a 32 bit signed integer');
+  $type->AddText('i : a 32 bit unsigned integer');
+  $type->AddText('F : a 32 bit floating point');
+  $type->AddText('D : a 64 bit floating point');
+  $type->AddText('TXXXX : a class name TXXXX');
+  $type->Draw();
+  
+  my $typecode = TPaveLabel->new(.7,.68,.9,.72,'fType codes');
+  $typecode->SetFillColor($leafcolor);
+  $typecode->Draw();
+  
+  $ldot->DrawLine(.4,.75,.30,.7);
+  $ldot->DrawLine(.5,.75,.62,.7);
+  
+  my $ntbasket = TPaveText->new(0.02,-0.07,0.35,.25);
+  $ntbasket->SetFillColor($basketcolor);
+  $ntbasket->SetTextSize(0.014);
+  $ntbasket->SetTextAlign(12);
+  $ntbasket->AddText('fNbytes: Size of compressed Basket');
+  $ntbasket->AddText('fObjLen: Size of uncompressed Basket');
+  $ntbasket->AddText('fDatime: Date/Time when written to store');
+  $ntbasket->AddText('fKeylen: Number of bytes for the key');
+  $ntbasket->AddText('fCycle : Cycle number');
+  $ntbasket->AddText('fSeekKey: Pointer to Basket on file');
+  $ntbasket->AddText('fSeekPdir: Pointer to directory on file');
+  $ntbasket->AddText("fClassName: 'TBasket'");
+  $ntbasket->AddText('fName: Branch name');
+  $ntbasket->AddText('fTitle: Tree name');
+  $ntbasket->AddText(' ');
+  $ntbasket->AddLine(0,0,0,0);
+  $ntbasket->AddText('fNevBuf: Number of events in Basket');
+  $ntbasket->AddText('fLast: pointer to last used byte in Basket');
+  $ntbasket->Draw();
+  
+  $ldot->DrawLine(.4,.3,0.02,0.25);
+  $ldot->DrawLine(.5,.25,0.35,-.07);
+  $ldot->DrawLine(.5,.3,0.35,0.25);
+  
+  my $ntbranch = TPaveText->new(0.02,0.40,0.18,0.68);
+  $ntbranch->SetFillColor($branchcolor);
+  $ntbranch->SetTextSize(0.015);
+  $ntbranch->SetTextAlign(12);
+  $ntbranch->AddText('fBasketSize');
+  $ntbranch->AddText('fEventOffsetLen');
+  $ntbranch->AddText('fMaxBaskets');
+  $ntbranch->AddText('fEntries');
+  $ntbranch->AddText('fAddress of Leaf0');
+  $ntbranch->AddText(' ');
+  $ntbranch->AddLine(0,0,0,0);
+  $ntbranch->AddText('fName: Branchname');
+  $ntbranch->AddText('fTitle: leaflist');
+  $ntbranch->Draw();
+  
+  $ldot->DrawLine(.2,.97,.02,.68);
+  $ldot->DrawLine(.35,.97,.18,.68);
+  $ldot->DrawLine(.35,.87,.18,.40);
+  
+  my $basketstore = TPavesText->new(.8,-0.088,0.952,-0.0035,7,'tr');
+  $basketstore->SetFillColor(28);
+  $basketstore->AddText('Baskets');
+  $basketstore->AddText('Stores');
+  $basketstore->Draw();
+  $c1->Update();
+  
+  $gBenchmark->Show('tree');
+  
+  $gApplication->Run;
+  
+
+
+
+=head2 two.pl
+
+  use strict;
+  use warnings;
+  use SOOT ':all';
+  
+  # example of macro illustrating how to superimpose two histograms
+  # with different scales in the "same" pad.
+  
+  my $c1 = TCanvas->new("c1","example of two overlapping pads",600,400);
+  
+  # create/fill draw h1
+  $gStyle->SetOptStat(0);
+  
+  my $h1 = TH1D->new("h1","my histogram",100,-3,3);
+  $h1->FillRandom('gaus', 10000);
+  $h1->Draw();
+  $c1->Update();
+  
+  # create hint1 filled with the bins integral of h1
+  my $hint1 = TH1F->new("hint1","h1 bins integral",100,-3,3);
+  my $sum = 0;
+  for my $i (1..100) {
+    $sum += $h1->GetBinContent($i);
+    $hint1->SetBinContent($i, $sum);
+  }
+  
+  # scale hint1 to the pad coordinates
+  my $rightmax = 1.1*$hint1->GetMaximum();
+  my $scale = $c1->GetUymax()/$rightmax;
+  
+  $hint1->SetLineColor(kRed);
+  $hint1->Scale($scale);
+  $hint1->Draw("same");
+  
+  # draw an axis on the right side
+  my $axis = TGaxis->new($c1->GetUxmax()*1.0, $c1->GetUymin()*1.0,
+                              $c1->GetUxmax()*1.0, $c1->GetUymax()*1.0, 
+                              0,$rightmax,510,"+L");
+  $axis->SetLineColor(kRed);
+  $axis->SetTextColor(kRed);
+  $axis->Draw();
+  
+  $c1->Update;
+  
+  $gApplication->Run;
+  
+
+
+
+
+=head1 SEE ALSO
+
+L<SOOT>
+
+=head1 AUTHOR
+
+Steffen Mueller, E<lt>smueller@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2010 by Steffen Mueller
+
+SOOT, the Perl-ROOT wrapper, is free software; you can redistribute it and/or modify
+it under the same terms as ROOT itself, that is, the GNU Lesser General Public License.
+A copy of the full license text is available from the distribution as the F<LICENSE> file.
+
+=cut
+

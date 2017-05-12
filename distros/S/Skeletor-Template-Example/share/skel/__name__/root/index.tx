@@ -1,0 +1,13 @@
+<: cascade "html.tx" :>
+<: around title -> { :>TicTacToe - Games and new Game<: } :>
+<: around body -> { :>
+  <h1>Existing Games</h1>
+  <p>The following is a list of ongoing or completed games</p>
+  <: if !$games.0 { 'No games yet!' } :> 
+  <ol><: for $games -> $game { :>
+    <li><a href='<: $game :>'><: $game :></a></li>
+  <: } :></ol>
+  <h1>Start a new game</h1>
+  <p>Choose the first move for 'X' in a new game</p>
+  <: include '_form.tx' :>
+<: } :>

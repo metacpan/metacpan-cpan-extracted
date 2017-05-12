@@ -1,0 +1,80 @@
+Written by:
+   Sullivan Beck (sbeck@cpan.org)
+Any suggestions, bug reports, or donations :-) should be sent to me.
+
+1.00  2013-09-13
+   - Initial release.
+
+1.10  2013-10-30
+   - Better handling of 'flow' lines.
+   - Rewrite of script generating lines to be much cleaner.
+   - Several new options:
+      global options: failure, simple
+      per-command options: noredir, retry, sleep
+
+1.11  2013-10-31
+   - Replaced 'declare' with a more standard way of doing arithmetic
+     since declare broke on several systems.
+   - Changed HISTORY file to new Changes specification.  Suggested by
+     RT 89910.
+
+1.12  2013-12-06
+   - New options:
+      ssh_sleep, check
+
+2.00  2014-03-06
+   - Significant rewrite including several backwards incompatible
+     changes.
+        changed script generating routines to be cleaner
+        generated script is now simpler to read
+   - Bug where exit code wasn't getting set correctly by script
+   - Change several options including:
+       changed 'run' option to 'mode'
+       changed 'f-output' values to not start with 'f-':
+       changed 'simple' to 'script' and adjusted meaning
+       changed 'echo' option (no longer applies to 'script' mode)
+       changed 'failure' option slightly (no longer refers to 'simple' option)
+   - Output of running in script mode changed (in a backward incompatible way)
+   - The dire/env methods can now query current values
+   - Added mode method
+
+2.01  2014-04-03
+   - Updated example files for 2.xx (forgot to do then when 2.00 was released)
+   - Fixed a bug where the dire option was getting lowercased
+   - Some simple fixes to avoid a warning and unwanted blank lines
+
+2.02  2014-05-22
+   - Fixed a bug where script output was not getting handled correctly
+
+2.03  2015-12-08
+   - Put distro on GitHub.  Gabor Szabo
+   - Improvements to POD formatting.
+   - Added tmp_script, tmp_script_keep, ssh_script, and ssh_script_keep options.
+
+2.10  2016-07-01
+   - Fixed bug where the generated list of commands would not return you to
+     the original directory.
+   - Fixed a bug in env command which wasn't returning the documented values.
+   - Revamped how scripts are generated (scripts are a bit simpler and have
+     the potential to better support flow commands).
+   - Fixed a bug where flow commands weren't handled correctly with
+     failure=display.
+   - Deprecated the command option 'flow'.  It is determined by parsing the
+     command instead.  The option 'flow' is allowed, but totally ignored and will
+     be removed at some point in the future.
+   - Currently only support if/elif/else/fi flow structure, but more will be
+     added in the future.
+
+2.11  2016-07-05
+   - Fixed a packaging problem (a .swp file got included)
+   - Added support for while/done, until/done, and for/done flow structures.
+
+2.12  2016-08-22
+   - Improved test scripts, and added a number of new tests.
+   - Getting `pwd` in a directory with soft links was failing.  RT 117096
+
+2.13  2017-02-10
+   - Got rid of global data (stuck it in the object) to avoid problems
+     when calling multiple times.
+
+2.14

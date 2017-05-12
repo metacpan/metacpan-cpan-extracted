@@ -1,0 +1,7 @@
+MANIFEST
+LICENSE
+README
+Changes
+lib/SQL/Library.pm
+t/001_load.t
+Makefile.PL

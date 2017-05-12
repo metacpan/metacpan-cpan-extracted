@@ -1,0 +1,27 @@
+---
+abstract: 'Automatically create README for your Perl Package before releasing'
+author:
+  - 'Thomas Mueller <tmueller@cpan.org>'
+build_requires:
+  Test::Exception: 0.29
+  Test::More: 0.88
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: ShipIt-Step-Readme
+provides:
+  ShipIt::Step::Readme:
+    file: lib/ShipIt/Step/Readme.pm
+    version: 0.03
+requires:
+  Pod::Readme: 0.09
+  ShipIt: 0.53
+  base: 0
+  strict: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.03

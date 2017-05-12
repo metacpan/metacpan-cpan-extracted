@@ -1,0 +1,24 @@
+# Rejected if we don't have any streets on the request
+template: update-contact.tt
+
+vars:
+  contact_id: blah1
+  city: updated city
+  state: new state
+  pcode: 4444
+  ccode: AU
+  phone: +64.1234567
+  fax: +64.1234567
+  email: update@email.com
+
+input_assertions:
+  class: SRS::EPP::Command::Update::Contact
+
+
+output_assertions:
+  count: 
+    - [ '//epp:resData', 0, "No res data returned"]
+  attr_is:
+    - [ '//epp:result', 'code', 2306, 'EPP: Correct response code' ]
+
+

@@ -1,0 +1,25 @@
+---
+abstract: 'Base Module for creating new String::Validator Modules.'
+author:
+  - 'John Karr <brainbuz@brainbuz.org>'
+build_requires:
+  Test::More: '0'
+  base: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.140640'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: String-Validator-Common
+requires:
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/brainbuz/String-Validator/issues
+  homepage: https://github.com/brainbuz/String-Validator
+  repository: https://github.com/brainbuz/String-Validator.git
+version: '1.01'

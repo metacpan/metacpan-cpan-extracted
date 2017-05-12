@@ -1,0 +1,9 @@
+<NZSRSResponse VerMajor="5" VerMinor="0">
+  <Response Action="Whois" FeId="8" FeSeq="4739879" OrigRegistrarId="1" RecipientRegistrarId="100">
+    <FeTimeStamp Day="23" Hour="14" Minute="49" Month="6" Second="20" TimeZoneOffset="+12:00" Year="2010"/>
+    <Domain DomainName="registrar-101.co.te" Status="Active"/>
+  </Response>
+  <Response Action="DomainDetailsQry" FeId="8" FeSeq="4739999" OrigRegistrarId="1" RecipientRegistrarId="100" Rows="1">
+    <FeTimeStamp Day="23" Hour="17" Minute="29" Month="6" Second="44" TimeZoneOffset="+12:00" Year="2010"/>
+  </Response>
+</NZSRSResponse>

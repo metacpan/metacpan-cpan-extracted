@@ -1,0 +1,66 @@
+$Id: TODO.pod,v 0.7 2001/11/01 07:05:31 brendan Exp $
+
+=for html
+<div id="content">
+<H1>
+TODO
+</H1>
+</div>
+<div id="content">
+
+=begin text
+
+TODO
+
+=over 4
+
+=item *
+Store catalogs for future use: eg <Role> tag should look up DefaultVocabularyFor "Role"...???
+
+=item *
+Allow creation/modification of NewsML documents as well as just reading them
+
+=item *
+A Syndication::NewsML::Simple type module that takes the pain out of accessing all these methods.
+
+=item *
+Better error checking
+
+=item *
+Better handling of error reporting -- don't just croak() every time something goes wrong
+
+=item *
+POD docs of each class (!)
+
+=item *
+Or at least some kind of class/method map so people know what they can call
+
+=item *
+Separate out the classes into more than one file!
+
+=item *
+Finish off t/4_reuters.t and examples/NewsMLParser.pl
+
+=item *
+Possibly change the way the constructor works... call it Syndication::NewsML::Parser?
+
+=item *
+The rest of the TODO list ;-)
+
+=back
+
+=head2 Would be nice
+
+=over 4
+
+=item *
+
+=back
+
+=for text
+** This file was automatically generated from **
+** doc/TODO.pod. To edit it, see there.    **
+
+=end text
+
+=for html </div>

@@ -1,0 +1,99 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.42.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+
+SHA1 2727a367c164f4d58d2df97c34436635993cd23c BUGS
+SHA1 2f70fd497db1f7f9e8411abe76d963469583d9ca CHANGES
+SHA1 aef6e5848fa96b4cf248c14f2d3ee88976cbb433 CREDITS
+SHA1 558e1072e6968da2749b44a83269df70f464503a FPS.xs
+SHA1 d6a6c30ee6d9ba6b9afab8bbf6a25e1b23c744e0 LICENSE
+SHA1 b4a79047dab816594a1022c19aa6cb171c59b298 MANIFEST
+SHA1 5f038359515da1acee43686b0f040062a68172b2 META.yml
+SHA1 f997dde0301cc18883c17d7d6cf5ff1286993e5d Makefile.PL
+SHA1 88f30db4d0aa92b6ae789ab83d9fc846f4a8a81f README
+SHA1 a3e85fd47ed1285f222cdae1ebff4c8d664674c6 TODO
+SHA1 52f89972a7fc125c75e4f1fad9b1d14aab6f819b examples/boulder/boulder.pl
+SHA1 69b3f125b59c8da2b1ec5a6438998fc44f599807 examples/boulder/data/level0001.txt
+SHA1 73f0486cc62cb94732f71eee19eec6439aeed7c5 examples/boulder/lib/SDL/App/FPS/MyBoulder.pm
+SHA1 128b9f606cf0d047cce6125d94026978ab5325a7 examples/boulder/lib/SDL/App/FPS/MyCave.pm
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 examples/boulder/save/quicksave.txt
+SHA1 4af69ac88735c1b245155aee197721f14cc958cc examples/buttons.pl
+SHA1 64a32ae110c0cb46323b1dde55a3cdf64385f59b examples/colors.pl
+SHA1 0c712c061c074abedcbfc748be38f1dfc23ae474 examples/config/mandel.cfg
+SHA1 9dfa7472a553da905b4ba192f0efec518877838c examples/config/opengl.cfg
+SHA1 662601134b576256feffad5ed91d48e4bbeffe95 examples/data/console.fnt
+SHA1 fe7311d4b22922ce4a4e666174c0bf9e359d0ff3 examples/data/courier.bmp
+SHA1 8954faa20420dab7a70c0acb968d848cdc6de752 examples/data/fps.fnt
+SHA1 85c803f1b0f5cf0be70adf02e5d21624e7f933dd examples/demo.pl
+SHA1 10b58307f8e723edd65182fb75669d941fb17f83 examples/empty.pl
+SHA1 2a7cc010a592cd18e442c106f7b845236fb28646 examples/event.pl
+SHA1 e0316c996f04d64146c162c50b4a58bb29cebcce examples/keycheck.pl
+SHA1 5e51d18f1c6d23510cbc0a30539cdb472c16e894 examples/lib/SDL/App/FPS/Demo.pm
+SHA1 a7deabeb94c3539da043a227ffccff0d9ac33131 examples/lib/SDL/App/FPS/Empty.pm
+SHA1 06fc419eec8bc02d10046edf5114497b432c511a examples/lib/SDL/App/FPS/MyButt.pm
+SHA1 b4fca9dce897626a9f3e72f0865658d5227a1de4 examples/lib/SDL/App/FPS/MyColors.pm
+SHA1 f5b5d18f1526d6953a52d561150b7ec656611ab4 examples/lib/SDL/App/FPS/MyEvent.pm
+SHA1 b573c4c866c84aabb993f6b2b6eade6495a38ede examples/lib/SDL/App/FPS/MyKeyCheck.pm
+SHA1 abfaccfd6c072e6934358e568b1ea9940ada6ecb examples/lib/SDL/App/FPS/MyMandel.pm
+SHA1 5c03a341c1877295b2cca06af4330dd069279dc6 examples/lib/SDL/App/FPS/MyMouse.pm
+SHA1 09e23523242f6aaa9fdf0e36b5e50ecb79cdd5c3 examples/lib/SDL/App/FPS/MyOpenGL.pm
+SHA1 44589d4bb593257df0e5abf1d6af0da12eb85de8 examples/lib/SDL/OpenGL/Cube.pm
+SHA1 f06b560afb258ab3f6619fd72a6a58468e00d83c examples/mandel.pl
+SHA1 c01ba7b5cd912efb4eb753f4cc7f242658032015 examples/mouse.pl
+SHA1 e0a1ecf190ceb60ea60f09de632ed5a1549dfc56 examples/opengl.pl
+SHA1 ccd097c406a4e68cb21339e83843db77701f7bb4 inc/Module/AutoInstall.pm
+SHA1 ce1878a4fb1b8b3f1367f620b0a6608051e372cd inc/Module/Install.pm
+SHA1 94866deed45156890199c3f04fc84af2a3a172e6 inc/Module/Install/AutoInstall.pm
+SHA1 f2c85ff6f61ba16632329a13bd453bf5dd3a558c inc/Module/Install/Base.pm
+SHA1 72a98f83f78122e2ca7d3db7a890e2f8fe97490a inc/Module/Install/Can.pm
+SHA1 98fc2ce57c71abe76f7662fe30b2998da2d24170 inc/Module/Install/Fetch.pm
+SHA1 beb9a02cfd4cfa161d36c4c95050ccb3d4ce4d7e inc/Module/Install/Include.pm
+SHA1 7542a2c66c309ea5b210f7671628f46f26a20718 inc/Module/Install/Makefile.pm
+SHA1 e70e07f90fbaa941b82c8a5ff9da4851b4db1239 inc/Module/Install/Metadata.pm
+SHA1 6266ecd2f55ab3f3beebd6db54702881cbe748a9 inc/Module/Install/Win32.pm
+SHA1 6f945e247389da9a2dd996bd21cbd93dff84f04e inc/Module/Install/WriteAll.pm
+SHA1 07ff86f539c3d57563c996a0f701f40fdc21d27f lib/SDL/App/FPS.pm
+SHA1 46490a523a90ddb583f7e27a08b02a8f08db5e00 lib/SDL/App/FPS/Button.pm
+SHA1 5f98b8cdfeab77429547d629645bb7be8549ad26 lib/SDL/App/FPS/Color.pm
+SHA1 0a13aabc665be448231ed183c75499a4158cd7c5 lib/SDL/App/FPS/EventHandler.pm
+SHA1 15553751e5c63cdb79bde6a2ba2d2b65bc6fa469 lib/SDL/App/FPS/Group.pm
+SHA1 21a369a148cf0f58ba48c636525c255b13fa8996 lib/SDL/App/FPS/Thingy.pm
+SHA1 7e4672ce82aa9607eec9ac4018252a13df4549a3 lib/SDL/App/FPS/Timer.pm
+SHA1 a83c8906445a93ec6ebc3804435df4cbd43d5f68 t/SDL/App/MyFPS.pm
+SHA1 6c122d4a331d9e14aac12b5e094f5978424b815e t/SDL/App/MyFPS2.pm
+SHA1 776c823c14673286d583900a4fc3b5b4a4a2e474 t/button.t
+SHA1 4a863a54e485c30feb3c4bf48860c35af3724185 t/color.t
+SHA1 cb327011656d343468b228dc8e52eeb85e842a03 t/config/client.cfg
+SHA1 c15e4c1fd731d9ea716646844119970e8af8cfb0 t/config/test.cfg
+SHA1 d7917f51887d06f7b299a3c2593272f4ab79a75e t/event.t
+SHA1 99c8c46b31250e3971b5cba399478d827f5ddde9 t/fps_timer.t
+SHA1 55a4805c0d62db74c53da47417a0bbf3490fa987 t/group.t
+SHA1 c3553dbf8e355d7f25ccbd3633ce534d897bbacf t/mycfg.t
+SHA1 d40b464f8512ff1e0af5644efc2b80fb058085bf t/myfps.t
+SHA1 47224ac3001fcfb0f74ff86d0902ae399690421b t/myopt.t
+SHA1 14dd3a3969ac4aa6809c09f910fdb001481a7897 t/test-data/console.fnt
+SHA1 04bbc3b7c2d3e3374647b8cab31dd0acf3dd5287 t/test-data/fps.fnt
+SHA1 e26275bc4c63d360c2ec02c361ec44899575beb1 t/thingy.t
+SHA1 9d6f156d9ac31d7e8c7161e61e2a94f9d6c399b1 t/timer.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.4 (GNU/Linux)
+
+iQEVAwUBRANkgHcLPEOTuEwVAQH++Qf9HTDLY2LsaZGs37ehApnixCkDefIAcbxh
+htab4AcfB9u3NBtkGpyppCiC1GWWAzsQnrJyzj8zBjv1p9pvQac2etawfuChzjDc
+/XmupNJROvScz03brm2/abWN9Vtghi3QgALhtDopfR0qqINp5FOuQcc5egHL9lQ0
+pwzVBXybWWh7gS8BJsKuaT3iGS/xMmbl4xQ2MPkvjmCdHujWp+GbpncDl7n+8BPU
+6reKEWbqP3Zv1+Cq0ZsiLDicWX8bMdp7jqmGomkMGJ/ZdCxWEvFQpHiAQ7tRuUfl
+WpExiHZnmnS+4W441w3xzjGDlQ5r4rDHUeoDGSLHZMOfrFxo8vYsHQ==
+=eAEP
+-----END PGP SIGNATURE-----

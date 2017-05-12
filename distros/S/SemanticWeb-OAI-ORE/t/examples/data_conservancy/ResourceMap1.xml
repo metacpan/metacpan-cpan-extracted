@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Example resource map for arXiv-dcs datapub application, submission to arXiv -->
+<!-- Simeon Warner $Date: 2010-09-08 14:21:03 $ -->
+
+<rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:foaf="http://xmlns.com/foaf/0.1/"
+  xmlns:ore="http://www.openarchives.org/ore/terms/"
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:dcterms="http://purl.org/dc/terms/" 
+  xmlns:dcsterms="http://datapub.dataconservancy.org/terms/"
+  xmlns:arxiv="http://arxiv.org/schemas/atom/">
+
+<!-- The Resource Map -->
+<rdf:Description rdf:about="http://datapub.example.com/ResourceMap">
+ <rdf:type rdf:resource="ore:ResourceMap"/>
+ <ore:describes rdf:resource="http://datapub.example.com/Aggregation"/>
+ <dcterms:creator rdf:parseType="Resource">
+  <foaf:name >datapub web app</foaf:name>
+ </dcterms:creator>
+ <dcterms:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2010-06-16T14:10:19.085-04:00</dcterms:created>
+ <dcterms:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2010-06-16T14:10:19.085-04:00</dcterms:modified>
+</rdf:Description>
+
+<!-- The Aggregation (article) -->
+<rdf:Description rdf:about="http://datapub.example.com/Aggregation">
+ <rdf:type rdf:resource="ore:Aggregation"/>
+ <dc:title >A simple title</dc:title>
+ <dcterms:abstract>A simple, but useless, abstract.</dcterms:abstract>
+
+ <!-- Authors of the article -->
+ <dcterms:creator rdf:parseType="Resource">
+  <dcsterms:rank>1</dcsterms:rank>
+  <foaf:name>Fukui, Y.</foaf:name>
+  <foaf:mbox>fukui@a.phys.nagoya-u.ac.jp</foaf:mbox>
+  <foaf:Organization>Nagoya University</foaf:Organization>
+ </dcterms:creator>
+ <!-- reverse 3 and 2 in serialization to test rank-->
+ <dcterms:creator rdf:parseType="Resource">
+  <dcsterms:rank>3</dcsterms:rank>
+  <foaf:name>Minamidani, T.</foaf:name>
+  <foaf:Organization>Nagoya University</foaf:Organization>
+ </dcterms:creator>
+ <dcterms:creator rdf:parseType="Resource">
+  <dcsterms:rank>2</dcsterms:rank>
+  <foaf:name>Kawamura, A.</foaf:name>
+  <foaf:Organization>Nagoya University</foaf:Organization>
+ </dcterms:creator>
+
+ <!-- Categories (minimal form, no labels) -->
+ <arxiv:primary_category rdf:resource="http://arxiv.org/terms/arXiv/astro-ph.CO" />
+ <dcterms:subject rdf:resource="http://arxiv.org/terms/arXiv/astro-ph.SR" />
+ <dcterms:subject rdf:resource="http://arxiv.org/terms/arXiv/astro-ph.HE" />
+
+ <!--Aggregated Resources-->
+ <ore:aggregates rdf:resource="file://ms.tex"/>
+ <ore:aggregates rdf:resource="file://README"/>
+ <ore:aggregates rdf:resource="file://jks2000-mdstringindex.ps"/>
+ <ore:aggregates rdf:resource="file://pom.xml"/>
+ <ore:aggregates rdf:resource="file://moo.sgf"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="file://ms.tex">
+ <dcterms:type>tex</dcterms:type>
+ <dcterms:conformsTo rdf:resource="http://purl.org/dc/dcmitype/Text"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="file://README">
+ <dcterms:conformsTo rdf:resource="http://purl.org/dc/dcmitype/Text"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="file://jks2000-mdstringindex.ps">
+ <dcterms:type>ps</dcterms:type>
+ <dcterms:conformsTo rdf:resource="http://purl.org/dc/dcmitype/Text"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="file://pom.xml">
+ <dcterms:type>xml</dcterms:type>
+ <dcterms:conformsTo rdf:resource="http://datapub.dataconservancy.org/type/DataPub-DS"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="file://moo.sgf">
+ <dcterms:type>sgf</dcterms:type>
+ <dcterms:conformsTo rdf:resource="http://datapub.dataconservancy.org/type/DataPub-DS"/>
+</rdf:Description>
+
+</rdf:RDF>

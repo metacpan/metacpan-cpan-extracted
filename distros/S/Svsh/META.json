@@ -1,0 +1,60 @@
+{
+   "abstract" : "Process supervision shell for daemontools/perp/s6/runit",
+   "author" : [
+      "Ido Perlmuter <ido@ido50.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Svsh",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Term::ReadLine::Gnu" : "1.26"
+         },
+         "requires" : {
+            "Getopt::Compact" : "0",
+            "Moo" : "0",
+            "Moo::Role" : "0",
+            "Proc::Killall" : "0",
+            "Term::ANSIColor" : "0",
+            "Term::ShellUI" : "0",
+            "lib" : "0",
+            "namespace::clean" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ido50/Svsh/issues"
+      },
+      "homepage" : "https://ido50.github.io/Svsh/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ido50/Svsh.git",
+         "web" : "https://github.com/ido50/Svsh"
+      }
+   },
+   "version" : "1.002000"
+}
+

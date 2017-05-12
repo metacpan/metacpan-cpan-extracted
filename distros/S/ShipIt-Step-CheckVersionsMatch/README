@@ -1,0 +1,27 @@
+NAME
+    ShipIt::Step::CheckVersionsMatch - Check that all modules with a
+    $VERSION match
+
+SYNOPSIS
+      steps = FindVersion, ChangeVersion, CheckChangeLog, CheckVersionsMatch, DistTest, Tag, MakeDist
+
+DESCRIPTION
+    So the Moose distribution, of which I'm a maintainer, has a $VERSION in
+    every damn module (not my idea). This ShipIt step checks to make sure
+    that they all match.
+
+AUTHOR
+    Dave Rolsky, "<autarch@urth.org>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-shipit-step-checkversionsmatch@rt.cpan.org", or through the web
+    interface at <http://rt.cpan.org>. I will be notified, and then you'll
+    automatically be notified of progress on your bug as I make changes.
+
+COPYRIGHT & LICENSE
+    Copyright 2008 Dave Rolsky, All Rights Reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,165 @@
+# test to check a huge list of domains
+template: check-domain.tt
+
+vars:
+  domains:
+    - cheese.co.te
+    - ffo.co.te
+    - foo.net.te
+    - bar.org.te
+    - cheese.co.te
+    - ffo.co.te
+    - foo.net.te
+    - bar.org.te
+    - cheese.co.te
+    - ffo.co.te
+    - foo.net.te
+    - bar.org.te
+    - cheese.co.te
+    - ffo.co.te
+    - foo.net.te
+    - bar.org.te
+    - cheese.co.te
+    - ffo.co.te
+    - foo.net.te
+    - bar.org.te
+    - cheese.co.te
+    - ffo.co.te
+    - foo.net.te
+    - bar.org.te
+    - cheese.co.te
+    - ffo.co.te
+    - foo.net.te
+    - bar.org.te
+    - cheese.co.te
+    - ffo.co.te
+    - foo.net.te
+    - bar.org.te
+    - cheese.co.te
+    - ffo.co.te
+    - foo.net.te
+    - bar.org.te
+    - cheese.co.te
+    - ffo.co.te
+    - foo.net.te
+    - bar.org.te
+    - cheese.co.te
+    - ffo.co.te
+    - foo.net.te
+    - bar.org.te
+    - cheese.co.te
+    - ffo.co.te
+    - foo.net.te
+    - bar.org.te
+    - cheese.co.te
+    - ffo.co.te
+    - foo.net.te
+    - bar.org.te
+    - cheese.co.te
+    - ffo.co.te
+    - foo.net.te
+    - bar.org.te
+    - cheese.co.te
+    - ffo.co.te
+    - foo.net.te
+    - bar.org.te
+    - cheese.co.te
+    - ffo.co.te
+    - foo.net.te
+    - bar.org.te
+    - cheese.co.te
+    - ffo.co.te
+    - foo.net.te
+    - bar.org.te
+    - cheese.co.te
+    - ffo.co.te
+    - foo.net.te
+    - bar.org.te
+    - cheese.co.te
+    - ffo.co.te
+    - foo.net.te
+    - bar.org.te
+    - cheese.co.te
+    - ffo.co.te
+    - foo.net.te
+    - bar.org.te
+    - cheese.co.te
+    - ffo.co.te
+    - foo.net.te
+    - bar.org.te
+    - cheese.co.te
+    - ffo.co.te
+    - foo.net.te
+    - bar.org.te
+    - cheese.co.te
+    - ffo.co.te
+    - foo.net.te
+    - bar.org.te
+    - cheese.co.te
+    - ffo.co.te
+    - foo.net.te
+    - bar.org.te
+    - cheese.co.te
+    - ffo.co.te
+    - foo.net.te
+    - bar.org.te
+    - cheese.co.te
+    - ffo.co.te
+    - foo.net.te
+    - bar.org.te
+    - cheese.co.te
+    - ffo.co.te
+    - foo.net.te
+    - bar.org.te
+    - cheese.co.te
+    - ffo.co.te
+    - foo.net.te
+    - bar.org.te
+    - cheese.co.te
+    - ffo.co.te
+    - foo.net.te
+    - bar.org.te
+    - cheese.co.te
+    - ffo.co.te
+    - foo.net.te
+    - bar.org.te
+    - cheese.co.te
+    - ffo.co.te
+    - foo.net.te
+    - bar.org.te
+    - cheese.co.te
+    - ffo.co.te
+    - foo.net.te
+    - bar.org.te
+
+
+input_assertions:
+  class: SRS::EPP::Command::Check::Domain
+  count:
+    - [ '//domain:name', 128, 'Initial EPP: Four domains to check' ]
+
+SRS:
+  - assertions:
+      count:
+        - [ '//Whois', 128, 'SRS: Check that there are 4 domains' ]
+        - [ '/NZSRSRequest/*', 128, 'SRS: Check there are only 4 commands' ]
+      match: []
+      match_all:
+        - [ '//Whois/@FullResult', '0', 'SRS: Check all FullResult attributes are zero' ]
+      attr_is:
+        - [ '/NZSRSRequest/Whois[1]', 'DomainName', 'cheese.co.te', 'SRS: Check cheese is the first check' ]
+        - [ '/NZSRSRequest/Whois[128]', 'DomainName', 'bar.org.te', 'SRS: Check bar is the last check' ]
+
+output_assertions:
+  count:
+    - [ '//domain:cd', 128, 'Check there are 128 domains' ]
+    - [ '//domain:name', 128, 'Check there are 128 domains' ]
+    - [ '//domain:name/@avail', 128, 'Check there are 128 domains' ]
+  match:
+    - [ '//epp:resData/domain:chkData/domain:cd[1]/domain:name', 'cheese.co.te', 'Check cheese is in the response' ]
+  match_all:
+    # ToDo: make XMLMappingTests.pm work with regexes
+    # - [ '//domain:name/@avail', '/^0|1$/', 'Check the values are boolean' ]
+  attr_is:
+    - [ '//domain:cd[1]/domain:name', 'avail', '0', 'SRS: first result should be taken/active' ]
+    - [ '//domain:cd[128]/domain:name', 'avail', '1', 'SRS: last result should be available' ]

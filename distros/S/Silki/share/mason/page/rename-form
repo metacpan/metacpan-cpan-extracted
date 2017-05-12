@@ -1,0 +1,25 @@
+<&| /lib/filter/form.mas &>
+<form action="<% $page->uri( view => 'title' ) %>" method="post">
+  <input type="hidden" name="x-tunneled-method" value="PUT" />
+
+  <fieldset>
+    <div class="form-item">
+      <label for="title" class="for-field"><% loc('New Title') %></label>
+      <input type="text" class="text" name="title" id="title" value="<% $page->title() %>" />
+    </div>
+
+    <input type="submit" class="submit" value="<% loc('Submit') %>" />
+  </fieldset>
+</form>
+</&>
+
+<%args>
+$page
+</%args>
+
+<%method title>
+<% loc( 'Rename %1', $page->title() ) %>
+<%args>
+$page
+</%args>
+</%method>

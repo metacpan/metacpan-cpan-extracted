@@ -1,0 +1,20 @@
+Revision History for StaticVolt
+===============================
+
+v1.00 2013-10-14
+----------------
+
+2013-10-14 23:56:20 +0530  Update version to 1.00
+2013-10-14 23:56:02 +0530  Update e-mail address
+2013-10-14 23:51:54 +0530  Add 'Success Stories' section
+2013-10-14 23:10:37 +0530  Add Gavin Shelley to 'Contributors'
+2013-10-14 10:17:02 -0700  Merge pull request #3 from columbusmonkey/add-rel-base
+2013-02-06 22:02:37 +0000  Add some more tests for a single level _site target
+2013-02-04 01:38:53 +0000  Fix docs for new sv_rel_base variable
+2013-02-04 00:36:12 +0000  Addng relative path variable for layouts to use to be able to refer to shared resources
+2013-01-23 23:18:50 +0000  Adding README.md for GitHub
+2013-01-10 19:51:44 +0000  Update the default back-end and documentation destination for output to be '_site' instead of '_destination', to agree with the staticvolt tool that has always used '_site'. (Also minor doc typo fix.)
+
+===================================
+End of changes in the last 365 days
+===================================

@@ -1,0 +1,29 @@
+# Test info domain on a domain with dnssec
+template: info-domain.tt
+
+vars:
+  domain_name: 05p.co.te
+  
+extensions: 
+    - urn:ietf:params:xml:ns:secDNS-1.1
+
+input_assertions:
+  class: SRS::EPP::Command::Info::Domain
+
+output_assertions:
+  count:
+    - [ '//epp:resData', 1, '1 resData element returned' ]
+    - [ '//epp:extension', 1, '1 extension element returned' ]
+    - [ '//secDNS:dsData', 2, 'Two dsData elements returned' ]
+  match:
+    - [ '//secDNS:dsData[1]/secDNS:keyTag', 1, 'First keytag element correct' ]
+    - [ '//secDNS:dsData[1]/secDNS:alg', 5, 'First alg element correct' ]
+    - [ '//secDNS:dsData[1]/secDNS:digestType', 1, 'First digestType element correct' ]
+    - [ '//secDNS:dsData[1]/secDNS:digest', '1234abcd11111111111111111111111111111111', 'First digest element correct' ]
+    - [ '//secDNS:dsData[2]/secDNS:keyTag', 4, 'First keytag element correct' ]
+    - [ '//secDNS:dsData[2]/secDNS:alg', 6, 'First alg element correct' ]
+    - [ '//secDNS:dsData[2]/secDNS:digestType', 2, 'First digestType element correct' ]
+    - [ '//secDNS:dsData[2]/secDNS:digest', '8888ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff', 'First digest element correct' ]
+  match_all:
+  attr_is:
+    - [ '//epp:result', 'code', 1000, 'EPP: command ok' ]

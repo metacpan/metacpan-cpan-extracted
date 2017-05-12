@@ -1,0 +1,11 @@
+Revision history for Perl extension Spreadsheet::WriteExcel::Worksheet::SheetProtection.
+
+0.03  January 17, 2008 7:15:19 PM CST
+	- rebuild module WITHOUT hidden MacOS files
+
+0.02  Wed Jan 16 23:40:13 2008
+	- fixed test script
+
+0.01  Sat May 28 12:40:13 2005
+	- original version; created by h2xs 1.22
+

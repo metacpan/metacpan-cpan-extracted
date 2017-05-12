@@ -1,0 +1,29 @@
+---
+abstract: 'verifies if the OS is supported by Siebel applications'
+author:
+  - 'Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+  Test::Pod: '1.22'
+  Test::Pod::Coverage: '1.08'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Siebel-AssertOS
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+resources:
+  bugtracker: https://github.com/glasswalk3r/siebel-gnu-tools/issues
+  homepage: https://github.com/glasswalk3r/siebel-gnu-tools
+  license: http://www.gnu.org/licenses/gpl.txt
+  repository: https://github.com/glasswalk3r/siebel-gnu-tools
+version: '0.07'

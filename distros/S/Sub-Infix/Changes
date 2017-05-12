@@ -1,0 +1,26 @@
+Sub-Infix
+=========
+
+Created:      2013-05-13
+Home page:    <https://metacpan.org/release/Sub-Infix>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Sub-Infix>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.004	2014-07-02
+
+ - Backport to Perl 5.6.
+
+0.003	2014-03-03
+
+ [ Packaging ]
+ - use Dist::Inkt.
+
+ [ Other ]
+ - Don't use base.pm.
+
+0.002	2013-05-20
+
+ [ Packaging ]
+ - test_requires Test::Fatal.
+
+0.001	2013-05-13	Initial release

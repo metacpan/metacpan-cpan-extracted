@@ -1,0 +1,40 @@
+################################################################################
+# Spork Configuration File.
+# 
+# Please read this file over and set the values to your own.
+#
+# If you want global settings for all your slideshows, copy this file to
+# ~/.sporkrc/config.yaml. Any settings in this local file will override
+# the global value of that setting.
+# 
+# See C<perldoc Spork::Config> for details on settings.
+################################################################################
+author_name: Kang-min Liu
+author_email: gugod@gugod.org
+author_webpage: http://gugod.org/
+copyright_string: Copyright &copy; 2004 Kang-min Liu
+
+banner_bgcolor: hotpink
+show_controls: 1
+image_width: 350
+auto_scrolldown: 1
+logo_image: logo.png
+file_base: .
+
+slides_file: Spork.slides
+template_directory: template/tkslide
+template_path:
+- ./template/tkslide
+slides_directory: slides
+download_method: wget
+character_encoding: utf-8
+link_previous: &lt; &lt; Previous
+link_next: Next &gt;&gt;
+link_index: Index
+
+start_command: open slides/start.html
+
+template_class: Spork::Template::TKSlide
+formatter_class: Spork::Formatter::TKSlide
+slides_class: Spork::Slides::TKSlide
+

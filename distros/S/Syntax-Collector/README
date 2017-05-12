@@ -1,0 +1,147 @@
+NAME
+    Syntax::Collector - collect a bundle of modules into one
+
+SYNOPSIS
+    In lib/Example/ProjectX/Syntax.pm
+
+       package Example::ProjectX::Syntax;
+   
+       use 5.010;
+       our $VERSION = 1;
+   
+       use Syntax::Collector q/
+          use strict 0;
+          use warnings 0;
+          use feature 0 ':5.10';
+          use Scalar::Util 1.21 qw(blessed);
+       /;
+   
+       1;
+       __END__
+
+    In projectx.pl:
+
+       #!/usr/bin/perl
+   
+       use Example::ProjectX::Database;
+       use Example::ProjectX::Syntax 1;
+       # strict, warnings, feature ':5.10', etc are now enabled!
+   
+       say "Welcome to ProjectX";
+
+DESCRIPTION
+    Perl is such a flexible language that the language itself can be extended
+    from within. (Though much of the more interesting stuff needs XS hooks
+    like Devel::Declare.)
+
+    One problem with this is that it often requires a lot of declarations at
+    the top of your code, loading various syntax extensions. The syntax module
+    on CPAN addresses this somewhat by allowing you to load a bunch of
+    features in one line, provided each syntax feature implements the
+    necessary API:
+
+       use syntax qw/io maybe perform/;
+
+    However this introduces problems of its own. If we look at the code above,
+    it is non-obvious that it requires Syntax::Feature::Io,
+    Syntax::Feature::Maybe and Syntax::Feature::Perform, which makes it
+    difficult for automated tools such as Module::Install to automatically
+    calculate your code's dependencies.
+
+    Syntax::Collector to the rescue!
+
+       package Example::ProjectX::Syntax;
+       use 5.010;
+       use Syntax::Collector q/
+       use strict 0;
+       use warnings 0;
+       use feature 0 ':5.10';
+       use Scalar::Util 1.21 qw(blessed);
+       /;
+
+    When you `use Syntax::Collector`, you provide a list of modules to
+    "collect" into a single package (notice the `q/.../`). This list of
+    modules looks like a big string of Perl code that is going to be passed to
+    `eval`, but don't let that fool you - it is not.
+
+    Each line must conform to the following pattern:
+
+       (use|no) MODULENAME VERSION (OTHERSTUFF)? ;
+
+    (Actually hash comments, and blank lines are also allowed.) The semantics
+    of all that is pretty much what you'd expect, except that when MODULENAME
+    begins with "Syntax::Feature::" it's treated with some DWIMmery, and
+    `install` is called instead of `import`. Note that VERSION is required,
+    but if you don't care which version of a module you use, it's fine to set
+    VERSION to 0. (Yes, VERSION is even required for pragmata.)
+
+    Now, you ask... why stuff all that structured data into a string, and
+    parse it out again? Because to naive lexical analysis (e.g.
+    Module::Install) it really looks like a bunch of "use" lines, and not just
+    a single quoted string. This helps tools calculate the dependencies of
+    your collection; and thus the dependencies of other code that uses your
+    collection.
+
+    As well as providing an `import` method for your collection,
+    Syntax::Collector also provides a `modules` method, which can be called to
+    find out which modules a collection includes. Called in list context, it
+    returns a list. Called in scalar context, it returns a reference to a `{
+    module => version }` hash.
+
+  Exporting
+    Syntax::Collector will also make your class inherit from Exporter::Tiny so
+    that in addition to collecting up a bunch of features from other modules,
+    your syntax collection can also export its own functions.
+
+       package Example::ProjectX::Syntax;
+   
+       use 5.010;
+       our $VERSION = 1;
+   
+       use Syntax::Collector q/
+         use strict 0;
+         use warnings 0;
+         use feature 0 ':5.10';
+         use Scalar::Util 1.21 qw(blessed);
+       /;
+   
+       our @EXPORT = qw( foo bar );
+   
+       sub foo { ... }
+   
+       1;
+       __END__
+
+  Import Options
+    Modules importing your syntax collection can suppress particular lines:
+
+       use Example::ProjectX::Syntax qw( -warnings );
+
+    Or provide alternative import options:
+
+       use Example::ProjectX::Syntax
+          '-Scalar::Util' => [qw/ blessed refaddr /];
+
+    See also Exporter::Tiny.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Syntax-Collector>.
+
+SEE ALSO
+    Exporter::Tiny.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

@@ -1,0 +1,38 @@
+Changes
+lib/Skeletor/Template/Example.pm
+Makefile.PL
+MANIFEST			This list of files
+README.mkdn
+share/skel/__name__/__name_lc_underscore___local.pl.ttt
+share/skel/__name__/dist.ini.ttt
+share/skel/__name__/lib/__project_fullpath__.pm.ttt
+share/skel/__name__/lib/__project_fullpath__/Controller/Game.pm.ttt
+share/skel/__name__/lib/__project_fullpath__/Controller/Root.pm.ttt
+share/skel/__name__/lib/__project_fullpath__/Form/Game.pm.ttt
+share/skel/__name__/lib/__project_fullpath__/Model/Form/Game.pm.ttt
+share/skel/__name__/lib/__project_fullpath__/Model/Schema.pm.ttt
+share/skel/__name__/lib/__project_fullpath__/Schema.pm.ttt
+share/skel/__name__/lib/__project_fullpath__/Schema/DefaultRS.pm.ttt
+share/skel/__name__/lib/__project_fullpath__/Schema/Result.pm.ttt
+share/skel/__name__/lib/__project_fullpath__/Schema/Result/Board.pm.ttt
+share/skel/__name__/lib/__project_fullpath__/Schema/Result/Game.pm.ttt
+share/skel/__name__/lib/__project_fullpath__/Schema/ResultSet.pm.ttt
+share/skel/__name__/lib/__project_fullpath__/Schema/ResultSet/Board.pm.ttt
+share/skel/__name__/lib/__project_fullpath__/Schema/ResultSet/Game.pm.ttt
+share/skel/__name__/lib/__project_fullpath__/Server.pm.ttt
+share/skel/__name__/lib/__project_fullpath__/View/HTML.pm.ttt
+share/skel/__name__/lib/__project_fullpath__/View/JSON.pm.ttt
+share/skel/__name__/root/_board.tx
+share/skel/__name__/root/_form.tx
+share/skel/__name__/root/_status.tx
+share/skel/__name__/root/game/show_board.tx
+share/skel/__name__/root/html.tx
+share/skel/__name__/root/index.tx
+share/skel/__name__/t/draw.t.ttt
+share/skel/__name__/t/json.t.ttt
+share/skel/__name__/t/o_wins.t.ttt
+share/skel/__name__/t/use.t.ttt
+share/skel/__name__/t/x_wins.t.ttt
+t/use.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

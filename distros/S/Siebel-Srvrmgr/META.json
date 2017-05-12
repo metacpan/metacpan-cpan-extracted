@@ -1,0 +1,392 @@
+{
+   "abstract" : "utilities to be used with the Siebel srvrmgr program",
+   "author" : [
+      "Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Siebel-Srvrmgr",
+   "no_index" : {
+      "directory" : [
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.014004"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Cwd" : "0",
+            "Devel::CheckOS" : "0",
+            "Devel::Gladiator" : "0.07",
+            "English" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::More" : "0.88",
+            "Test::Most" : "0",
+            "Test::Perl::Critic" : "1.03",
+            "Test::TempDir::Tiny" : "0.016"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Data::Inheritable" : "0.08",
+            "Config::IniFiles" : "2.88",
+            "Data::Dumper" : "0",
+            "DateTime" : "1.26",
+            "Encode" : "0",
+            "Exporter" : "0",
+            "FSA::Rules" : "0.34",
+            "Fcntl" : "0",
+            "File::BOM" : "0.14",
+            "File::Copy" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0.2304",
+            "Getopt::Std" : "0",
+            "Hash::Util" : "0",
+            "IO::Select" : "0",
+            "IO::Socket" : "0",
+            "IPC::Open3" : "0",
+            "List::Util" : "1.42",
+            "Log::Log4perl" : "1.41",
+            "Moose" : "2.0401",
+            "Moose::Role" : "2.1604",
+            "Moose::Util" : "2.1604",
+            "Moose::Util::TypeConstraints" : "2.0402",
+            "MooseX::AbstractFactory" : "0.004000",
+            "MooseX::FollowPBP" : "0.05",
+            "MooseX::Singleton" : "0.29",
+            "POSIX" : "0",
+            "Scalar::Util" : "0",
+            "Scalar::Util::Numeric" : "0.40",
+            "Set::Tiny" : "0.04",
+            "Storable" : "2.51",
+            "String::BOM" : "0.3",
+            "Symbol" : "0",
+            "Test::Class" : "0.36",
+            "Test::Differences" : "0.63",
+            "Test::Moose" : "2.1806",
+            "Test::Most" : "0.35",
+            "Test::Pod" : "1.22",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::TempDir::Tiny" : "0.016",
+            "Try::Tiny" : "0.27",
+            "YAML::XS" : "0.62",
+            "namespace::autoclean" : "0.13",
+            "perl" : "5.014004"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Class::Data::Inheritable" : "0.08",
+            "Config::IniFiles" : "2.88",
+            "Cwd" : "0",
+            "DateTime" : "1.26",
+            "Devel::Gladiator" : "0.07",
+            "Regexp::Common" : "2016060801",
+            "Regexp::Common::time" : "0.07",
+            "Set::Tiny" : "0.04",
+            "Test::Class" : "0.36",
+            "Test::Differences" : "0.63",
+            "Test::Moose" : "2.1806",
+            "Test::More" : "0",
+            "Test::Most" : "0.35",
+            "Test::Output" : "1.03",
+            "Test::Perl::Critic" : "1.03",
+            "Test::Pod" : "1.22",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::TempDir::Tiny" : "0.016",
+            "perl" : "5.014004"
+         }
+      }
+   },
+   "provides" : {
+      "Siebel::Srvrmgr" : {
+         "file" : "lib/Siebel/Srvrmgr.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::Comps_source" : {
+         "file" : "lib/Siebel/Srvrmgr/Comps_source.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::Connection" : {
+         "file" : "lib/Siebel/Srvrmgr/Connection.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::Daemon" : {
+         "file" : "lib/Siebel/Srvrmgr/Daemon.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::Daemon::Action" : {
+         "file" : "lib/Siebel/Srvrmgr/Daemon/Action.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::Daemon::Action::Check::Component" : {
+         "file" : "lib/Siebel/Srvrmgr/Daemon/Action/Check/Component.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::Daemon::Action::Check::Server" : {
+         "file" : "lib/Siebel/Srvrmgr/Daemon/Action/Check/Server.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::Daemon::Action::CheckComps" : {
+         "file" : "lib/Siebel/Srvrmgr/Daemon/Action/CheckComps.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::Daemon::Action::CheckTasks" : {
+         "file" : "lib/Siebel/Srvrmgr/Daemon/Action/CheckTasks.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::Daemon::Action::Dummy" : {
+         "file" : "lib/Siebel/Srvrmgr/Daemon/Action/Dummy.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::Daemon::Action::Dumper" : {
+         "file" : "lib/Siebel/Srvrmgr/Daemon/Action/Dumper.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::Daemon::Action::ListCompDef" : {
+         "file" : "lib/Siebel/Srvrmgr/Daemon/Action/ListCompDef.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::Daemon::Action::ListCompTypes" : {
+         "file" : "lib/Siebel/Srvrmgr/Daemon/Action/ListCompTypes.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::Daemon::Action::ListComps" : {
+         "file" : "lib/Siebel/Srvrmgr/Daemon/Action/ListComps.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::Daemon::Action::ListParams" : {
+         "file" : "lib/Siebel/Srvrmgr/Daemon/Action/ListParams.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::Daemon::Action::ListSessions" : {
+         "file" : "lib/Siebel/Srvrmgr/Daemon/Action/ListSessions.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::Daemon::Action::LoadPreferences" : {
+         "file" : "lib/Siebel/Srvrmgr/Daemon/Action/LoadPreferences.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::Daemon::Action::Serializable" : {
+         "file" : "lib/Siebel/Srvrmgr/Daemon/Action/Serializable.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::Daemon::ActionFactory" : {
+         "file" : "lib/Siebel/Srvrmgr/Daemon/ActionFactory.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::Daemon::ActionStash" : {
+         "file" : "lib/Siebel/Srvrmgr/Daemon/ActionStash.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::Daemon::Cleanup" : {
+         "file" : "lib/Siebel/Srvrmgr/Daemon/Cleanup.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::Daemon::Command" : {
+         "file" : "lib/Siebel/Srvrmgr/Daemon/Command.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::Daemon::Condition" : {
+         "file" : "lib/Siebel/Srvrmgr/Daemon/Condition.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::Daemon::Connection" : {
+         "file" : "lib/Siebel/Srvrmgr/Daemon/Connection.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::Daemon::Heavy" : {
+         "file" : "lib/Siebel/Srvrmgr/Daemon/Heavy.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::Daemon::Light" : {
+         "file" : "lib/Siebel/Srvrmgr/Daemon/Light.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::Daemon::Offline" : {
+         "file" : "lib/Siebel/Srvrmgr/Daemon/Offline.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::IPC" : {
+         "file" : "lib/Siebel/Srvrmgr/IPC.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::ListParser" : {
+         "file" : "lib/Siebel/Srvrmgr/ListParser.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::ListParser::Buffer" : {
+         "file" : "lib/Siebel/Srvrmgr/ListParser/Buffer.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::ListParser::FSA" : {
+         "file" : "lib/Siebel/Srvrmgr/ListParser/FSA.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::ListParser::Output" : {
+         "file" : "lib/Siebel/Srvrmgr/ListParser/Output.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::ListParser::Output::Duration" : {
+         "file" : "lib/Siebel/Srvrmgr/ListParser/Output/Duration.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::ListParser::Output::Enterprise" : {
+         "file" : "lib/Siebel/Srvrmgr/ListParser/Output/Enterprise.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::ListParser::Output::ListComp::Comp" : {
+         "file" : "lib/Siebel/Srvrmgr/ListParser/Output/ListComp/Comp.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::ListParser::Output::ListComp::Server" : {
+         "file" : "lib/Siebel/Srvrmgr/ListParser/Output/ListComp/Server.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::ListParser::Output::ListProcs::Proc" : {
+         "file" : "lib/Siebel/Srvrmgr/ListParser/Output/ListProcs/Proc.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::ListParser::Output::ListServers::Server" : {
+         "file" : "lib/Siebel/Srvrmgr/ListParser/Output/ListServers/Server.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::ListParser::Output::ListTasks::Task" : {
+         "file" : "lib/Siebel/Srvrmgr/ListParser/Output/ListTasks/Task.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::ListParser::Output::LoadPreferences" : {
+         "file" : "lib/Siebel/Srvrmgr/ListParser/Output/LoadPreferences.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::ListParser::Output::Set" : {
+         "file" : "lib/Siebel/Srvrmgr/ListParser/Output/Set.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::ListParser::Output::Tabular" : {
+         "file" : "lib/Siebel/Srvrmgr/ListParser/Output/Tabular.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::ListParser::Output::Tabular::ByServer" : {
+         "file" : "lib/Siebel/Srvrmgr/ListParser/Output/Tabular/ByServer.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::ListParser::Output::Tabular::ListComp" : {
+         "file" : "lib/Siebel/Srvrmgr/ListParser/Output/Tabular/ListComp.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::ListParser::Output::Tabular::ListCompDef" : {
+         "file" : "lib/Siebel/Srvrmgr/ListParser/Output/Tabular/ListCompDef.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::ListParser::Output::Tabular::ListCompTypes" : {
+         "file" : "lib/Siebel/Srvrmgr/ListParser/Output/Tabular/ListCompTypes.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::ListParser::Output::Tabular::ListParams" : {
+         "file" : "lib/Siebel/Srvrmgr/ListParser/Output/Tabular/ListParams.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::ListParser::Output::Tabular::ListProcs" : {
+         "file" : "lib/Siebel/Srvrmgr/ListParser/Output/Tabular/ListProcs.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::ListParser::Output::Tabular::ListServers" : {
+         "file" : "lib/Siebel/Srvrmgr/ListParser/Output/Tabular/ListServers.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::ListParser::Output::Tabular::ListSessions" : {
+         "file" : "lib/Siebel/Srvrmgr/ListParser/Output/Tabular/ListSessions.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::ListParser::Output::Tabular::ListTasks" : {
+         "file" : "lib/Siebel/Srvrmgr/ListParser/Output/Tabular/ListTasks.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::ListParser::Output::Tabular::Struct" : {
+         "file" : "lib/Siebel/Srvrmgr/ListParser/Output/Tabular/Struct.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::ListParser::Output::Tabular::Struct::Delimited" : {
+         "file" : "lib/Siebel/Srvrmgr/ListParser/Output/Tabular/Struct/Delimited.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::ListParser::Output::Tabular::Struct::Fixed" : {
+         "file" : "lib/Siebel/Srvrmgr/ListParser/Output/Tabular/Struct/Fixed.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::ListParser::Output::ToString" : {
+         "file" : "lib/Siebel/Srvrmgr/ListParser/Output/ToString.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::ListParser::OutputFactory" : {
+         "file" : "lib/Siebel/Srvrmgr/ListParser/OutputFactory.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::Log::Enterprise" : {
+         "file" : "lib/Siebel/Srvrmgr/Log/Enterprise.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::Log::Enterprise::Archive" : {
+         "file" : "lib/Siebel/Srvrmgr/Log/Enterprise/Archive.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::Log::Enterprise::Parser::Comp_alias" : {
+         "file" : "lib/Siebel/Srvrmgr/Log/Enterprise/Parser/Comp_alias.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::Manual" : {
+         "file" : "lib/Siebel/Srvrmgr/Manual.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::OS::Process" : {
+         "file" : "lib/Siebel/Srvrmgr/OS/Process.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::OS::Unix" : {
+         "file" : "lib/Siebel/Srvrmgr/OS/Unix.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::Regexes" : {
+         "file" : "lib/Siebel/Srvrmgr/Regexes.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::Types" : {
+         "file" : "lib/Siebel/Srvrmgr/Types.pm",
+         "version" : "0.29"
+      },
+      "Siebel::Srvrmgr::Util::IniDaemon" : {
+         "file" : "lib/Siebel/Srvrmgr/Util/IniDaemon.pm",
+         "version" : "0.29"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/glasswalk3r/siebel-monitoring-tools/issues"
+      },
+      "homepage" : "https://github.com/glasswalk3r/siebel-monitoring-tools",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/glasswalk3r/siebel-monitoring-tools.git",
+         "web" : "https://github.com/glasswalk3r/siebel-monitoring-tools"
+      }
+   },
+   "version" : "0.29",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

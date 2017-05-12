@@ -1,0 +1,27 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Signals/XSIG.pm
+lib/Signals/XSIG/Default.pm
+lib/Signals/XSIG/TieArray56.pm
+spike/analyze_default_signal_behavior.pl
+t/SignalHandlerTest.pm
+t/00-load.t
+t/01-SIG.t
+t/02-SIGhash.t
+t/03-XSIG.t
+t/04-XSIGarray.t
+t/05-XSIGhash.t
+t/10-handlers.t
+t/11-local.t
+t/20-defaults.tt
+t/20a-defaults.t
+t/20b-defaults.t
+t/20c-defaults.t
+t/21-override-defaults.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

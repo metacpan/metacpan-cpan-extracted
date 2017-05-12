@@ -1,0 +1,16 @@
+---
+abstract: 'String::Util -- String processing utilities'
+author:
+    - "Miko O'Sullivan <miko@idocs.com>"
+generated_by: home grown
+license: perl
+name: String-Util
+provides:
+    String::Util:
+        file: lib/String/Util.pm
+        version: 1.26
+requires:
+    Number::Misc: 1.2
+    Test::Toolbox: 0.2
+    perl: 5.003
+version: 1.26

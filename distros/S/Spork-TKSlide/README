@@ -1,0 +1,27 @@
+###  README --- Spork-TKSlide
+
+## Copyright 2004 Liu Kang-min
+##
+## Author: gugod@gugod.org
+## Keywords: Spork, Slide
+
+What is TKSlide?
+
+TKSlide stands for "Tkirby's slides", 
+It's XML / HTML backend, and pure JavaScript navigation.
+Design to be Cross Browser
+Please see http://www.csie.ntu.edu.tw/~b88039/slide/
+for the latest generator and DTD, and online demostration.
+
+What doesn Spork::TKSlide do ?
+
+It uses easy Spork/Kwiki syntax
+and generate the very cool tkslide effect.
+That's all it does. You don't have to remember
+those XML/HTMl tags anymore.
+
+Install this module from CPAN and check the usagee in
+Spork::Config::TKSlide pod, enjoy it.
+
+Cheers,
+Kang-min Liu

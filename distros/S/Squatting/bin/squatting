@@ -1,0 +1,289 @@
+#!/usr/bin/perl
+
+use strict;
+no  strict 'refs';
+use warnings;
+use lib 'lib';
+
+require Squatting;
+use Squatting::H;
+use Getopt::Long;
+use Data::Dump 'pp';
+
+# defaults
+$_{port}    = 4234;
+$_{debug}   = 1;
+$_{module}  = [ 'With::Log', 'With::AccessTrace' ];
+
+# command line options
+Getopt::Long::Configure('no_ignore_case');
+GetOptions(
+  \%_,
+  'port|p=i',
+  'log|l=s',
+  'console|C',
+  'debug=i',
+  'version|v',
+  'config|c=s%',
+  'show-config|s',
+  'module|m=s@',
+  'logo',
+  'help|h',
+);
+
+sub help {
+  print "Squatting $Squatting::VERSION - launch a Squatting web application
+
+Usage: squatting [OPTIONS]... App
+
+Options:
+    -p, --port NUM                   Port for web server (defaults to $_{port})
+    -c, --config ATTR=VALUE          Set an app's %CONFIG variables
+    -s, --show-config                Display an app's %CONFIG and exit
+    -m, --module MODULE              Load a Squatting plugin into the app
+    -l, --log FILE                   Log file  # TODO
+    -C, --console                    Run in console mode with Shell::Perl
+    --debug NUM                      Continuity debug_level (defaults to $_{debug})
+
+    -v, --version                    Display Squatting version
+    --logo                           Display the International Squatting Symbol
+    --help                           Display this help message
+
+";
+}
+
+if ($_{version}) {
+  print "Version $Squatting::VERSION\n";
+  exit 0;
+} elsif ($_{help}) {
+  help;
+  exit 0;
+} elsif ($_{log}) {
+  $_{config}{'with.log.path'} = $_{log};
+} elsif ($_{logo}) {
+  print <DATA>;
+  exit 0;
+} else {
+
+}
+
+# warn pp($_{config}), "\n";
+# warn pp(\%_), "\n";
+
+my $app = shift;
+if ($app) {
+  $app =~ s/\.pmc?$//;
+  my $path = $app;
+  $path =~ s{::}{/}g;
+  $path .= ".pm";
+  require "$path";
+  my $C = \%{$app."::CONFIG"};
+  for (keys %{$_{config}}) {
+    if (/\[/ || /\{/) {
+      my $key = $_;
+      # XXX - If you can think of a better way, let me know.
+      eval '$C->'.$key.' = $_{config}'."{'$key'}";
+    } else {
+      $C->{$_} = $_{config}{$_}
+    }
+  }
+  if ($_{'show-config'}) {
+    print pp($C), "\n";
+    exit 0;
+  }
+  if ($_{console}) {
+    eval { require Shell::Perl };
+    if ($@) {
+      print "Please install Shell::Perl if you'd like to use the Squatting console.\n";
+      exit 1;
+    }
+    $app->load_components(@{$_{module}});
+    $app->init;
+    # XXX - This is broken.  I have to think this over.
+    sub Squatting::Controller::mock_init {
+      my $self = shift;
+      $self->{cr}          = {}; # TODO - provide a mock Continuity::Request
+      $self->{env}         = { REQUEST_PATH => &{"$app"."::Controllers::R"}($self->name, @_) };
+      $self->{cookies}     = {};
+      $self->{input}       = {};
+      $self->{headers}     = {};
+      $self->{v}           = {};
+      $self->{status}      = 200;
+      $self;
+    };
+    foreach my $method (qw(get post put delete)) {
+      *{$app."::$method" } = sub {
+        my $cc = ${$app."::Controllers::C"}{$_[1]}->clone->mock_init(@_[2..$#_]);
+        $cc->env->{REQUEST_METHOD} = $method;
+        if (ref($_[-1]) eq 'HASH') {
+          $cc->input = pop @_;
+        }
+        my $content = $app->service($cc, @_[2..$#_]);
+        ($cc, $content);
+      };
+    }
+    $0 = $app;
+    my $pirl = Shell::Perl->new;
+    $pirl->set_package($app."::Controllers");
+    $pirl->run;
+  } else {
+    my @components = ( "On::Continuity", @{$_{module}} );
+    $app->load_components(@components);
+    $app->init;
+    $app->continue(
+      port        => $_{port},
+      log         => $_{log},
+      debug_level => $_{debug},
+    );
+  }
+} else {
+  help;
+}
+
+exit 0;
+
+=head1 NAME
+
+squatting -- Squatting server start-up script
+
+=head1 SYNOPSIS
+
+Usage:
+
+  squatting [OPTION]... APPLICATION
+
+Starting an App in web server mode on port 4234:
+
+  squatting -p 4234 App
+
+Start an App in interactive console mode:
+
+  squatting -C App
+  Welcome to the Perl shell. Type ':help' for more information
+
+  App @> \@App::Controllers::C
+  App @> \%App::Controllers::C
+  App @> \@App::Views::V
+  App @> \%App::Views::V
+  App @> App->get('Home')
+  App @> App->post('Comment', { name => 'beppu', body => 'Why?' })
+
+=head1 DESCRIPTION
+
+Start a Squatting application.
+
+=head1 OPTIONS
+
+=over 2
+
+=item -p, --port NUM
+
+Port for web server (defaults to 4234)
+
+=item -c, --config ATTR=VALUE
+
+The standard way to configure a Squatting application is to manipulate its
+C<%CONFIG> hash.  The --config option lets you set values in this hash, and you
+may use --config multiple times in a single command line.
+
+B<Example>:
+
+  squatting App --config doc_root=/www/app.com --config hostname=app.com
+
+=item -s, --show-config
+
+Display an App's %CONFIG hash and exit.
+
+=item -m, --module MODULE
+
+This option can be used to load additional Squatting plugins into the app, and
+you may use this option multiple times in a single command line.  Note that
+L<Squatting::With::AccessTrace> and L<Squatting::With::Log> are loaded by
+default.
+
+B<Example>:  Loading Squatting::With::UTF8 and Squatting::With::Coro::Debug
+
+  squatting App -m With::UTF8 -m With::Coro::Debug
+
+=item -l, --log FILE
+
+Send log output to a log file.
+
+=item -C, --console
+
+Run in console mode with Shell::Perl.
+
+=item --debug NUM
+
+Set Continuity's debug level.  0 is the least verbose setting, and higher
+numbers get progressively more verbose.
+
+=item -v, --version
+
+Show version
+
+=item --logo
+
+Display the B<International Squatting Symbol>.
+
+=item -h, --help
+
+Show the help message
+
+=back
+
+=cut
+
+
+__DATA__
+
+                                                                  -+m
+                                                                 .%- ..
+                                                               . m*#-+
+                                                               m+*##+m.
+                                                          ...- m#*#%-..
+                                                        --.. +mm###-+-.
+                                                      ..- m..*#####*m++
+                                                   .--+.-m#m+.%+-m###+
+                                                  .-m..###+...% m#m-##% .
+                                                     +%+.. -++.+  m--#-+
+                                                  .. --..%*-%-    --+#.m
+                                                   -  - -.--+# ..   +#m+
+                                                        ..#-+%.    +.#..
+                                           .    . .    .%#-...     .-+.-
+                                   .   -.+m+-. .. .-.++#.*-...       . .
+                           ..- .+. ..+..+---+%---.--.--#m#+..        +
+                        .-. m .. -.m++m####%###-##%.++*%++ m .
+                      . +. m-- *##*#+###..-m+m.++.#-####-%-m.  ..
+                      -m#--%###-m+- --+%m..--. -  .-*%####% ..-. -.
+                   -...-*##%m+.+-+.++-m#+-. .. . +.+%%-#m..m#%m+..-.
+                   -..*#**m.-.+..-.m+-##+.-       +m-+*%- %-- %##-
+                 ...++*++.. . .     +m##*-.       -.%m+ +  -.-++%+-
+                . ++###.%.--   . . *m+##%%.     .-%-#-    .  ...#...
+                 ..%*+m       . + m+####%..     .-+%#+-       .-#--
+                 -.#mm..    --.- +%#-m#%%     ...%+##%+        .+..\-
+                .+mm%+ .. ..m-m.+%%+m**+..    --.##%m--.        + #-.
+                .--%%.   . m .#++ %-- +mm-.  ...m##m-.+         -+*--
+                 +-#+-   . .##+..   +..m     .m-#%#%--          -.##-.
+               .%.**+. ...m#%..- .. ...# m . +-%#.%+           . %#%..+
+               -+##%.+..  #-. -.       .m+..m -#%mm            .--**++
+               .-%.*m+-...mm+        . .+ +-  -m-+.            ..*#.. .
+               .-+*m#%m**++-+        ..  -##.%%.-            - ..##+-.
+               - +-*%##%+mm--+          . .#m-m-           - -+.m.##-+.
+                .. m*##*#*%-m+-  - .    . .m.+.m      ..     m%+.*-% -
+                ...+##m%####m-+m- -.   .. ..- ++..  .  +.. +%-###m-%.
+                 ..%#-%#++%####.+.m-+.     . +m#+#+%.. . -#*###m.--
+                 . %-mm ++-mm+**##%mm.   - .+mm#+*.+--.#/##-+-+m    .
+                ..+.#    - +-. m%m#m#*+.-..+##*###%m#%#% .--- - . .
+                .-m#m. .  .  ..m+...#%m--+-*#+######.%+..  .+
+              ..m-#%. .      ..- .+--  -   .---.-**-+--...
+             .+.#m#m-            ..   . . - -..- ..*
+            . +-##-+. .                     --  . ..
+             .+##m%+
+              .%.---
+             ..  .
+              ...
+
+  http://en.wikipedia.org/wiki/Squatting
+  http://github.com/beppu/squatting/tree/master
+

@@ -1,0 +1,163 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+L<SimpleR::Stat> 
+
+Simple Stat on arrayref, like sum, mean, calc rate, etc
+
+简单数据统计处理
+
+=head1 DESC 
+
+传入 scalar num / arrayref，计算 sum 求和, mean 均值, rate 比例 等
+
+=begin html
+
+实例参考<a href="xt/">xt子文件夹</a>
+
+=end html
+
+=head1 FUNCTION
+
+=head2 calc_rate_arrayref
+
+    my @data = (3, 4, 1);
+    my $r = calc_rate_arrayref(\@data);
+    dump($r);
+    #$r:[0.375, 0.5, 0.125]
+
+
+=head2 transpose_arrayref($arr)
+
+数组行列转置
+
+    my $s= [ 1, 2 , 3 ], [ 4, 5 , 6 ] ];
+    my $d = transpose_arrayref($s);
+    # $d : [[1 ,4], [2, 5], [3 ,6 ]] ;
+
+=head2  sort_by_other_arrayref($arr, $other_arr, $map_sub, $sort_sub) 
+
+根据指定的变换函数、排序函数处理other_arr，再将other_arr重排次序复制到arr进行重排
+
+    my $label = [ qw/x y z/ ];
+    my $data = [ [qw/3 2 1 4/],  [ qw/2 3 5 6/ ], [qw/4 5 1 6/] ];
+
+    my ($new_label, $new_data) = sort_by_other_arrayref(
+        $label, $data, 
+         sub { # data line
+            my ($r) = @_; 
+            my ($g, $n, $b, $f) = @$r;
+            my $all = $g+$n+$b+$f;
+            return [ $f/$all, $b/$all ] }, 
+         sub {
+            my ($x, $y) = @_;
+            ($x->[0] <=> $y->[0]) or ($x->[1] <=> $y->[1]) },
+    );
+
+    dump($new_label, $new_data);
+    #$new_label ["z", "y", "x"]
+    #$new_data  [[4, 5, 1, 6], [2, 3, 5, 6], [3, 2, 1, 4]]
+
+=head2 map_arrayref($arr, $calc_sub, %option)
+
+取出数组中某些项，做指定运算，返回结果
+
+参数：
+
+return_arrayref : 以arraryref格式返回结果，默认是以array格式返回
+
+keep_source : 返回的结果中保留原始数据
+
+calc_col : 指定数组中的项
+
+    my $data=[ 'haha', 'xx', 4 , 2, 3, 1, 'heihei'];
+    my @res = map_arrayref(
+        $data, 
+        \&calc_rate_arrayref,
+
+        calc_col => [ 2 .. 5 ], 
+
+        return_arrayref => 1, 
+        keep_source => 1, 
+    );
+    # [ "haha", "xx", 4, 2, 3, 1, "heihei", 0.4, 0.2, 0.3, 0.1 ] 
+    #keep_source => 1, return_arrayref=> 0 : ( "haha", "xx", 4, 2, 3, 1, "heihei", 0.4, 0.2, 0.3, 0.1 )
+    #keep_source => 0, return_arrayref=> 1 : [ 0.4, 0.2, 0.3, 0.1 ] 
+
+=head2 calc_percent_arrayref($arr, $format);
+
+    my $format = "%.2f%%";
+    my @data = (3, 4, 1);
+    my $r = calc_percent_arrayref(\@data, $format);
+    dump($r);
+    #$r : ["37.50%", "50.00%", "12.50%"]
+
+=head2 sum_arrayref
+
+    my $d = [ 1, 4, 3 ];
+    my $r = sum_arrayref($d);
+    # $r = 8
+
+=head2 mean_arrayref
+
+    my $d = [ 1, 4, 3 ];
+    my $r = mean_arrayref($d);
+    # $r = 2.66666667
+
+=head2 median_arrayref
+
+    my $d = [ 1, 4, 3 ];
+    my $r = median_arrayref($d);
+    # $r = 3
+
+=head2 uniq_arrayref
+
+    my $d = [ 1, 1, 4, 4, 3 ];
+    my $r = uniq_arrayref($d, 
+            # remember_key_order => 0, 
+    );
+    # $r = [ 1, 3, 4 ] 
+
+=head2 uniq_arrayref_cnt
+
+    my $d = [ 1, 1, 4, 4, 3 ];
+    my $r = uniq_arrayref_cnt($d);
+    # $r = 3
+
+=head1 OTHER FUNCTION
+
+=head2 conv_arrayref_to_hash 
+
+将arrayref转换为hash，注意重复的key会被覆盖掉，数据可能变少
+
+    my $data=[ ['a','b',3],['e','f',6], ['a','f',9]];
+    my $r = conv_arrayref_to_hash($data, [ 0, 1 ], 2, 
+            # remember_key_order => 0, 
+    );
+    # $r =  { a => { b => 3, f => 9 }, e => { f => 6 } },
+
+=head1 BASE FUNCTION
+
+=head2 calc_rate
+
+    my $r = calc_rate(3, 4);
+    # $r = 0.75
+
+=head2 format_percent
+
+    my $r = format_percent(0.675, "%.2f%%");
+    # $r = '67.50%'
+
+=head2 calc_compare_rate
+
+计算增量
+
+    my $r = calc_compare_rate(4, 7);
+    # $r = 0.75
+    my ($r2, $diff) = calc_compare_rate(4, 7);
+    # $r2 = 0.75, $diff = 3
+
+=cut

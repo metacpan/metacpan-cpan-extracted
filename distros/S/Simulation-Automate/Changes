@@ -1,0 +1,647 @@
+Revision history for Perl extension Simulation::Automate (was Simulation::Tools::SynSim).
+1.0.1  Fri Aug 13 15:03:32 BST 2004
+	Some minor bug fixes and small changes to the documentation.
+	- CondXYPlot bug 
+	- support multiple GROUP lines
+	- documented this behaviour in the POD
+	- synsim has now a -A flag to list all available Analyses
+	- POD: keywords in alphabetical order
+	- Minor fixes: see diff
+1.0.0  Mon Jan  5 11:23:42 UTC 2004
+	Finally the first "real" release of SynSim. LOTS of changes, but all to make it simpler, less buggy, with more features and still backward compatible. See the POD, the examples in the eg/ folder and the tutorial on my web site (www.comms.eee.strath.ac.uk/~wim/synsim_tutorial.html)
+	- list separator is now always comma; grouping is now supported via the GROUP keyword.
+	- Postprocessing and preprocessing modules are now MUCH easier to write, and can be put in a PLUGINS folder in your project directory
+	- Templates can now reside directly under TEMPLATES; use SIMTYPES and DEVTYPES folders only when you really need them
+	- I added a lot of aliases for the keywords, now you can say TEMPLATE instead of SIMTYPE etc.;
+	- Please read the POD, it's all there
+	- And to know the nitty-gritty, look at the diff
+
+0.9.7  Thu Sep  4 10:56:45 BST 2003
+	- Fixed a bug in the expression handling: now > and < are supported as well
+	- Fixed a bug in the from;to;step-style construct
+	- Fixed remote host checking
+	- Added a -D flag to create an empty directory structure
+	- See Simulation-Automate.diff for all changes
+
+0.9.5  Mon Jul  7 15:06:51 BST 2003
+	- Flags: -i now implies -v -p; -f is now optional; -N now works as it should; -P is a new convenience flag to just plot results.
+	- The list syntax in the datafile has been extended with a from;to;step-style construct
+	- The distinction between simulation variables, configuration variables and variables for use in the postprocessing modules is now more clear. As a result, _POP_SAMPLE is now obsolete and replaced by NRUNS. Read the POD for details. 
+	- There are now hooks in the generic postprocessing routines. You can now provide your own simple routines to modify the result files in place before handing them to the postprocessing routines. See the POD.
+	- There is a new generic postprocessing routine which allows conditional plots. See the POD.
+	- SynSim now makes it easy to run on a remote host.
+	- Under the hood, a lot has changed. The next release, 1.0, will introduce self-documenting names for the result files, and as a result slightly break compatibility (for those using -N only).
+	- See Simulation-Automate.diff for all changes
+
+0.9.4  Mon Apr  7 16:04:18 BST 2003
+	- Added support for expressions in datafile
+	- Postprocessing routines ErrorFlags and Histogram are now generic
+ 	- Losts of minor fixes and improvements:
+
+diff -r -u Simulation-Automate-0.9.3/Automate/Analysis.pm Simulation-Automate-0.9.4/Automate/Analysis.pm
+--- Simulation-Automate-0.9.3/Automate/Analysis.pm	Thu Jan  9 15:31:19 2003
++++ Simulation-Automate-0.9.4/Automate/Analysis.pm	Mon Apr  7 14:49:07 2003
+@@ -1,7 +1,7 @@
+ package Simulation::Automate::Analysis;
+ 
+ use vars qw( $VERSION );
+-$VERSION = '0.9.3';
++$VERSION = "0.9.4";
+ 
+ #################################################################################
+ #                                                                              	#
+@@ -18,7 +18,7 @@
+ This is not finished by far, but already useful.
+ This module is used by SynSim.pm and PostProcessors.pm
+ 
+-$Id: Analysis.pm,v 1.2 2003/01/08 11:40:35 wim Exp $
++$Id: Analysis.pm,v 1.2 2003/04/07 13:23:01 wim Exp $
+ 
+ =cut
+ 
+@@ -118,6 +118,7 @@
+ foreach my $logkey (sort keys %trend) {
+ ($logkey !~/log/i) && next;
+ foreach my $i (0..@{$trend{$logkey}}-1) {
++#carp "$i:${$trend{$logkey}}[$i]\n";
+ if(${$trend{$logkey}}[$i]>0){
+ ${$trend{$logkey}}[$i]=log(${$trend{$logkey}}[$i])/log(10); 
+ } else {
+@@ -304,8 +305,8 @@
+  $binfile=shift;
+  @pars= @{shift(@_)}; # deref an array ref
+  $title=shift||'';
+-my $log=shift||'';
+-
++ $log=shift||'';
++#carp "LOG:$log\n";
+ $uctitle=uc($title);
+ $lctitle=lc($title);
+ $lctitle=~s/\s+/_/g;
+diff -r -u Simulation-Automate-0.9.3/Automate/Main.pm Simulation-Automate-0.9.4/Automate/Main.pm
+--- Simulation-Automate-0.9.3/Automate/Main.pm	Thu Jan  9 15:31:32 2003
++++ Simulation-Automate-0.9.4/Automate/Main.pm	Mon Apr  7 14:49:07 2003
+@@ -1,7 +1,7 @@
+ package Simulation::Automate::Main;
+ 
+ use vars qw( $VERSION );
+-$VERSION = '0.9.3';
++$VERSION = "0.9.4";
+ 
+ ################################################################################
+ #                                                                              #
+@@ -21,7 +21,7 @@
+ 
+ This module is generic.
+ 
+-$Id: Main.pm,v 1.2 2003/01/08 11:40:35 wim Exp $
++$Id: Main.pm,v 1.2 2003/04/07 13:23:01 wim Exp $
+ 
+ =cut
+ 
+@@ -42,6 +42,12 @@
+ use  Simulation::Automate::Analysis;
+ 
+ ##################################################################################
++my $simpid=undef; 
++#END{
++#print `ps -f | grep bufsim3| grep -v grep`;
++#print STDERR "Sending SIGTERM to simulator ($simpid) from $0 ...\n";
++#kill 'TERM',$simpid;
++#}
+ 
+ sub main {
+ 
+@@ -104,13 +110,46 @@
+   close (NEW);
+   
+   if($nosims==0) {
+-
+     if($verbose) {
+-      system("$commandline");
++
++if (!defined($simpid = fork())) {
++    # fork returned undef, so failed
++    die "cannot fork: $!";
++} elsif ($simpid == 0) {
++                # fork returned 0, so this branch is the child
++    exec("$commandline");
++                # if the exec fails, fall through to the next statement
++    die "can't exec $commandline : $!";
++} else { 
++                # fork returned neither 0 nor undef, 
++                # so this branch is the parent
++
++waitpid($simpid, 0);
++} 
++
++#      system("$commandline");
+     } else { 
+-      print STDERR "\n";
+-      print STDERR grep /$pattern/,`$commandline > simlog 2>&1`;
+-      print STDERR "\n";
++      print STDERR "\n" if $verbose;
++
++#      print STDERR grep /$pattern/,`$commandline > simlog 2>&1`;
++
++#or, with a pipe:
++
++$simpid = open(SIM, "$commandline 2>&1 |") || die "can't fork: $!"; 
++open(LOG,">simlog");
++while (<SIM>) {
++print LOG;
++/$pattern/ && do {
++print STDERR;# if $verbose;
++};
++} 
++close LOG;
++my $ppid=getpgrp($simpid);
++if(not $ppid) {
++close SIM || die "Trouble with $commandline: $! $?";
++}
++
++      print STDERR "\n" if $verbose;
+     }
+   } # if simulations not disabled
+     if($nsims>1) {
+@@ -135,7 +174,7 @@
+ return \@results;
+ } #END of main()
+ 
+-print STDERR "#" x 80,"\n#\t\t\tSynSim simulation automation tool\n#\n#  (c) Wim Vanderbauwhede 2000,2002. All rights reserved.\n#  This program is free software; you can redistribute it and/or modify it\n#  under the same terms as Perl itself.\n#\n","#" x 80;#,"\n\n Module SynSim::Main loaded\n\n";
++print STDERR "\n","#" x 80,"\n#\t\t\tSynSim simulation automation tool\n#\n#  (c) Wim Vanderbauwhede 2000,2002. All rights reserved.\n#  This program is free software; you can redistribute it and/or modify it\n#  under the same terms as Perl itself.\n#\n","#" x 80,"\n";
+ 
+ #-------------------------------------------
+ # SUBROUTINES
+@@ -157,6 +196,13 @@
+ my $fh=shift; 
+ my $dataset=shift;
+ my $warn=shift;
++my %exprdata=();
++foreach my $key (keys %simdata) {
++  ($key!~/^_/) && next;
++  if(@{$simdata{$key}}==1) {
++    $exprdata{$key}=&check_for_expressions(\%simdata,$key,$nsim);
++  } # if..else
++} # foreach 
+ 
+ 	# OPEN TEMPLATE
+ 	open (TEMPL, "<$templfilename")||die "Can't open $templfilename\n";
+@@ -167,23 +213,26 @@
+ 			my $ndata=@{$simdata{$key}};
+ 			if($ndata>1) {
+ 			  if($line =~ s/$key(?!\w)/$simdata{$key}->[$nsim]/g){
+-			  print STDERR "# $key = ",$simdata{$key}->[$nsim],"\n";
++#			  print STDERR "# $key = ",$simdata{$key}->[$nsim],"\n" if $warn;
+ 			}
+ 			} else {
+-			  $line =~ s/$key(?!\w)/$simdata{$key}->[0]/g;
++#			  my $simdata=&check_for_expressions(\%simdata,$key,$nsim);
++			  $line =~ s/$key(?!\w)/$exprdata{$key}/g;
++#			  print STDERR "# $key = ",$simdata{$key}->[0],"\n" if $warn;
+ 			} # if..else
+ 
+ 		      } # foreach 
+ 
+-		  # check for not_defined variables
+-		if($line=~/\b(_\w+?)\b/&&$line!~/$1\$/) {
+-		  my $nondefvar=$1;
+-		  $line=~s/$nondefvar/0/;
+-		  print STDERR "\nWarning: $nondefvar ($templfilename) not defined in $dataset.\n" if $warn; #Substituted by 0.\n";
+-		} # if some parameter is still there
+-		print $fh $line;
+-	} # while
++		  # check for undefined variables
++		  while($line=~/\b(_\w+?)\b/&&$line!~/$1\$/) {
++		    my $nondefvar=$1;
++		    $line=~s/$nondefvar/0/g; # All undefined vars substituted by 0
++		    print STDERR "\nWarning: $nondefvar ($templfilename) not defined in $dataset.\n" if $warn; 
++		  } # if some parameter is still there
++		  print $fh $line;
++		} # while
+ close TEMPL;
++
+ } # END OF gen_sim_script 
+ 
+ sub egrep {
+@@ -198,3 +247,29 @@
+ close IN;
+ close OUT;
+ }
++
++sub check_for_expressions {
++my $dataref=shift;
++my $key=shift;
++my $nsim=shift;
++my %simdata=%{$dataref};	
++my $expr=$simdata{$key}->[0];
++if($expr=~/(_[A-Z_]+)/) { # was "if"
++while($expr=~/(_[A-Z_]+)/) { # was "if"
++#variable contains other variables
++#_A =3*log(_B)+_C*10-_D**2
++#_A =3 ;log;_B;;_C;10;_D;;2
++my @maybevars=split(/[\ \*\+\-\/\^\(\)\[\]\{\}\?\:\=]+/,$expr);
++my @vars=();
++foreach my $maybevar ( @maybevars){
++($maybevar=~/_[A-Z]+/)&& push @vars,$maybevar;
++}
++foreach my $var (@vars) {
++my $simn=(@{$simdata{$var}}==1)?0:$nsim;
++$expr=~s/$var/$simdata{$var}->[$simn]/g;
++}
++}
++#print STDERR "$key=$expr=>",eval($expr),"\n";
++}
++return eval($expr);
++}
+diff -r -u Simulation-Automate-0.9.3/Automate/PostProcLib.pm Simulation-Automate-0.9.4/Automate/PostProcLib.pm
+--- Simulation-Automate-0.9.3/Automate/PostProcLib.pm	Thu Jan  9 15:31:41 2003
++++ Simulation-Automate-0.9.4/Automate/PostProcLib.pm	Mon Apr  7 14:49:07 2003
+@@ -1,7 +1,7 @@
+ package Simulation::Automate::PostProcLib;
+ 
+ use vars qw( $VERSION );
+-$VERSION = '0.9.3';
++$VERSION = "0.9.4";
+ 
+ ################################################################################
+ #                                                                              #
+@@ -18,7 +18,7 @@
+ PostProcessors.pm module.
+ This module is generic.
+ 
+-$Id: PostProcLib.pm,v 1.3 2003/01/08 12:19:38 wim Exp $
++$Id: PostProcLib.pm,v 1.2 2003/04/07 13:23:01 wim Exp $
+ 
+ =cut
+ 
+@@ -60,6 +60,7 @@
+ 			  $xlabel
+ 			  $ylabel
+ 			  $logscale
++			  $style
+ 			  @results
+ 			  );
+ 
+@@ -136,7 +137,7 @@
+ ($simtitle=~/$key/) && do {
+ my $val=$Simulation::Automate::PostProcLib::simdata{$key};
+ my $nicekey=$make_nice{$key}{title};
+-my $niceval=$make_nice{$key}{$val}||join(',',@{$val});
++my $niceval=$make_nice{$key}{${$val}[0]}||join(',',@{$val});
+ $simtitle=~s/$key/$nicekey:\ $niceval/;
+ };
+ $Simulation::Automate::PostProcLib::title=$simtitle;
+@@ -146,9 +147,10 @@
+ $Simulation::Automate::PostProcLib::ylabel=$Simulation::Automate::PostProcLib::simdata{YLABEL}||"$Simulation::Automate::PostProcLib::title";
+ $Simulation::Automate::PostProcLib::xlabel=$Simulation::Automate::PostProcLib::simdata{XLABEL}||"$Simulation::Automate::PostProcLib::title";
+ $Simulation::Automate::PostProcLib::logscale=($Simulation::Automate::PostProcLib::simdata{LOGSCALE})?"set nologscale xy\nset logscale ".lc($Simulation::Automate::PostProcLib::simdata{LOGSCALE}):'set nologscale xy';
++#STYLE
++$Simulation::Automate::PostProcLib::style=$Simulation::Automate::PostProcLib::simdata{STYLE}||'';
+ 
+-
+-$Simulation::Automate::PostProcLib::sweepvartitle=$make_nice{$Simulation::Automate::PostProcLib::sweepvar}{title}||$Simulation::Automate::PostProcLib::xlabel||$Simulation::Automate::PostProcLib::sweepvar;
++$Simulation::Automate::PostProcLib::sweepvartitle=$Simulation::Automate::PostProcLib::xlabel||$make_nice{$Simulation::Automate::PostProcLib::sweepvar}{title}||$Simulation::Automate::PostProcLib::xlabel||$Simulation::Automate::PostProcLib::sweepvar;
+ ( $Simulation::Automate::PostProcLib::legendtitle, $Simulation::Automate::PostProcLib::legend)=@{&create_legend($Simulation::Automate::PostProcLib::sweepvals,\%make_nice)};
+ 
+ }
+@@ -191,8 +193,8 @@
+ $legendtitle='';
+ foreach my $key (sort keys %title) {
+ $legendtitle.=',';
+-$legendtitle.=$make_nice{$key}{title}||$key;
+-$legend.=$make_nice{$key}{$title{$key}}||$title{$key};
++$legendtitle.=$make_nice{$key}{title}||&make_nice($key);
++$legend.=$make_nice{$key}{$title{$key}}||&make_nice($title{$key});
+ $legend.=',';
+ }
+ $legend=~s/,$//;
+@@ -248,7 +250,7 @@
+ my $legend='';
+ my $legendtitle='';
+ foreach my $key (sort keys %title) {
+-my $titlepart=$make_nice{$key}{title}||$key;
++my $titlepart=$make_nice{$key}{title}||&make_nice($key);
+ $legendtitle.=','.$titlepart;
+ my $legendpart=$make_nice{$key}{$title{$key}}||$title{$key};
+ $legend.=','.$legendpart;
+@@ -258,6 +260,15 @@
+ return [$legendtitle,$legend];
+ }
+ #------------------------------------------------------------------------------
++sub make_nice {
++my $varname=shift;
++$varname=~s/^_//;
++$varname=~s/_/ /g;
++$varname=lc($varname);
++$varname=~s/^([a-z])/uc($1)/e;
++return $varname;
++}
++#------------------------------------------------------------------------------
+ 1;
+ #print STDERR "#" x 80,"\n#\t\t\tSynSim simulation automation tool\n#\n#\t\t\t(C) Wim Vanderbauwhede 2002\n#\n","#" x 80,"\n\n Module SynSim::PostProcLib loaded\n\n";
+ 
+diff -r -u Simulation-Automate-0.9.3/Automate/PostProcessors.pm Simulation-Automate-0.9.4/Automate/PostProcessors.pm
+--- Simulation-Automate-0.9.3/Automate/PostProcessors.pm	Thu Jan  9 15:31:46 2003
++++ Simulation-Automate-0.9.4/Automate/PostProcessors.pm	Mon Apr  7 14:49:07 2003
+@@ -1,7 +1,7 @@
+ package Simulation::Automate::PostProcessors;
+ 
+ use vars qw( $VERSION );
+-$VERSION = '0.9.3';
++$VERSION = "0.9.4";
+ 
+ ################################################################################
+ #                                                                              #
+@@ -17,7 +17,7 @@
+ This module contains all subroutines needed for postprocessing of the simulations results. 
+ Some routines are quite generic, but most are specific to the type of simulation.
+ 
+-$Id: PostProcessors.pm,v 1.2 2003/01/08 11:40:36 wim Exp $
++$Id: PostProcessors.pm,v 1.2 2003/04/07 13:23:02 wim Exp $
+ 
+ =cut
+ 
+@@ -29,14 +29,20 @@
+ use Simulation::Automate::Analysis;
+ use Simulation::Automate::PostProcLib;
+ ##################################################################################
++# Three generic routines are provided:
++# SweepVar: to make a sweep over one variable while using any number of parameters
++# ErrorFlags: 
++# Histogram: to create simple histograms
++
+ # This is a very generic module to generate plots from any sweep that is not the buffer depth
+ 
+ sub SweepVar {
+ my @args=@_;
+ &prepare_plot(@args);
+ 
+-#my $norm=${$simdata{$normvar}}[0]||1; 
+-my $norm=${$simdata{$normvar}}[$count]||1; 
++(!@{$simdata{$normvar}})&&(${$simdata{$normvar}}[0]=1);
++my $norm=(@{$simdata{$normvar}}>1)?${$simdata{$normvar}}[$count]:${$simdata{$normvar}}[0];
++#my $norm=${$simdata{$normvar}}[$count]||1; 
+ my $col=$datacol+1;
+ 
+ my @sweepvarvals=@{$simdata{$sweepvar}};
+@@ -106,7 +112,7 @@
+ 
+ my $xtics=2;#change later
+ my $firstplotline=<<"ENDH";
+-set terminal postscript landscape enhanced  color solid "Helvetica" 12
++set terminal postscript landscape enhanced  color solid "Helvetica" 14
+ set output "${simtempl}-${anatempl}.ps"
+ 
+ $logscale
+@@ -118,9 +124,9 @@
+ set key right top box 
+ set key title "$legendtitle" 
+ 
+-set title "$title" "Helvetica,14"
+-set xlabel "$sweepvartitle"
+-set ylabel "$ylabel"
++set title "$title" "Helvetica,18"
++set xlabel "$sweepvartitle" "Helvetica,16"
++set ylabel "$ylabel" "Helvetica,16"
+ 
+ ENDH
+ 
+@@ -134,14 +140,18 @@
+ my @args=@_;
+ &prepare_plot(@args);
+ 
+-my $norm=${$simdata{$normvar}}[0]||1;
++(!@{$simdata{$normvar}})&&(${$simdata{$normvar}}[0]=1);
++my $norm=(@{$simdata{$normvar}}>1)?${$simdata{$normvar}}[$count]:${$simdata{$normvar}}[0];
++#my $norm=${$simdata{$normvar}}[0]||1;
+ 
+ my $sweepvarval=$simdata{$sweepvar}[0];
+ 
+ #this is to combine the values for different buffers into 1 file
+-$sweepvals=~s/\-$sweepvar\-\d+//;
+ 
+-if($verylast==0){
++$sweepvals=~s/\-*$sweepvar\-[\d\.]+//;
++$sweepvals=~s/^\-*//;
++
++if($verylast==0) {
+ # calc average after every $count
+ 
+ my $par='LOSS';
+@@ -204,6 +214,8 @@
+ } else {
+ ### On the very last run, collect the results into one nice plot
+ 
++
++
+ #this is very critical. The quotes really matter!
+ # as a rule, quotes inside gnuplot commands must be escaped
+ 
+@@ -240,13 +252,24 @@
+ 
+ my @args=@_;
+ &prepare_plot(@args);
+-
++my $plotstyle=($style ne '')?$style:'boxes';
+ my $sweepvarval=${$simdata{$sweepvar}}[0]; # used for nbins?!
+ 
++my $par='DATA';#must be "LOG" for log plot
++my $log=''; #must be 'log' for log plot
++#carp "LOGSCALE: $logscale\n";
++my @logscale=split("\n",$logscale);
++    if($logscale[1]=~/x/i){
++$logscale[1]=~s/x//i;
++$logscale="$logscale[0]\n$logscale[1]\n";
++$par='LOG';#'DATA';#must be "LOG" for log plot
++$log='log'
++    }
++#carp "LOGSCALE: $logscale\n";
++
+   if($verylast==0) {
+-my $par='DATA';
+-#print STDERR '%{&build_histograms("'."${simtempl}_C$count.res".'"'.",[$par,$datacol],$title,'',$sweepvarval)}\n";die;
+-my %hists=%{&build_histograms("${simtempl}_C$count.res",[$par,$datacol],$title,'',$sweepvarval)};
++
++my %hists=%{&build_histograms("${simtempl}_C$count.res",[$par,$datacol],$title,$log,$sweepvarval)};
+ 
+ #system("grep '#' ${simtempl}_C$count.res > ${simtempl}-${anatempl}-$sweepvals.res");
+ &egrep('#',"${simtempl}_C$count.res",'>',"${simtempl}-${anatempl}-$sweepvals.res");
+@@ -257,10 +280,10 @@
+ }
+ close HIST;
+ if($interactive) {
+-&gnuplot( "plot '${simtempl}-${anatempl}-$sweepvals.res' with boxes\n\!sleep 1\n");
++&gnuplot( "plot '${simtempl}-${anatempl}-$sweepvals.res' with $plotstyle\n\!sleep 1\n");
+ }
+ } else {
+-my $plotlinetempl=q("\'$filename\' title \"$legend\" with boxes");
++my $plotlinetempl=q("\'$filename\' title \"$legend\" with ).$plotstyle.q(");
+ 
+ my $firstplotline=<<"ENDH";
+ set terminal postscript landscape enhanced  color solid "Helvetica" 12
+diff -r -u Simulation-Automate-0.9.3/Automate.pm Simulation-Automate-0.9.4/Automate.pm
+--- Simulation-Automate-0.9.3/Automate.pm	Thu Jan  9 15:49:28 2003
++++ Simulation-Automate-0.9.4/Automate.pm	Mon Apr  7 14:49:07 2003
+@@ -1,7 +1,7 @@
+ package Simulation::Automate;
+ 
+ use vars qw( $VERSION );
+-$VERSION = '0.9.3';
++$VERSION = "0.9.4";
+ 
+ #################################################################################
+ #                                                                              	#
+@@ -18,7 +18,7 @@
+ #this module is then called via eval() and used by Simulation::Automate.pm 
+ #Loops calls &Automate::main() at every pass through the loops.
+ #
+-#$Id: Automate.pm,v 1.2 2003/01/08 11:39:59 wim Exp $
++#$Id: Automate.pm,v 1.2 2003/04/07 13:22:58 wim Exp $
+ #
+ 
+ 
+@@ -62,7 +62,7 @@
+ &execute_loop($datafile,$dataset,$simref,\@flags) && do {
+ unlink "Loops_$dataset.pm";
+ };
+-
++print STDERR "\nFinished SynSim run for $dataset\n\n";
+ return 1;
+ }
+ #===============================================================================
+@@ -79,18 +79,18 @@
+ my $default=1;
+ if(@ARGV) {
+ my $dtf=0;
+-    foreach(@ARGV){
++    foreach(@ARGV) {
+       if(/-f/){$dtf=1;next}
+-      if($dtf==1){
+-      $_[0]=$_;$datafile=$_;$default=0;$dtf=0;
+-}
++      if($dtf==1) {
++	$_[0]=$_;$datafile=$_;$default=0;$dtf=0;
++      }
+       if(/-b/){$batch=1;next} 
+       if(/-i/){$interactive=1;next}
+       if(/-N/){$nosims=1;next}
+       if(/-p/){$plot=1;next}
+       if(/-v/){$verbose=1;next}
+       if(/-w/){$warn=1;next;}
+-      if(/-h|-\?/){ 
++      if(/-h|-\?/) { 
+ my $script=$0;
+ $script=~s/.*\///;
+ die <<"HELP";
+@@ -116,6 +116,14 @@
+ }
+     } # foreach @ARGV
+ 
++#test if the last argument might be the filename (if no -f flag)
++if($default){
++my $test=$ARGV[@ARGV-1];
++if($test!~/^\-/) {
++$datafile=$test;
++$default=0;
++}
++}
+     if($default) {
+ print STDERR "Assuming $datafile as input data filename\n" if $verbose;
+ }
+@@ -407,13 +415,21 @@
+   foreach (@{$multisimdata{$sim}}){
+ 
+   if(/^\s*_/) {
+-my @line=split(/\s*=\s*/,$_);
+ 
++my @line=();#split(/\s*=\s*/,$_);
++# changed to allow expressions with "=" 
++my $line=$_;
++($line=~s/^([A-Z0-9_]+)?\s*=\s*//)&&($line[0]=$1);
++$line[1]=$line;
+ $line[1]=~s/\s*\,\s*/,/g;
+ $line[1]=~s/\s*\;\s*/;/g;
+ $data{$sim}{$line[0]}=$line[1];
+ } elsif (/:/) {
+-my @line=split(/\s*:\s*/,$_);
++my @line=();#split(/\s*:\s*/,$_);
++# changed to allow expressions with ":"
++my $line=$_;
++($line=~s/^([A-Z0-9_]+)?\s*\:\s*//)&&($line[0]=$1);
++$line[1]=$line;
+ ##strip leading _
+ #$line[0]=~s/^\s*_//;
+ #strip trailing spaces
+@@ -450,13 +466,13 @@
+ /^\s*$/ && next;
+ chomp;
+ # allow include files for configuration variables
+-/INCL\s*:/ && do {
++/INCL.*\s*:/ && do {
+ my $incl=$_;
+ $incl=~s/^.*\:\s*//;
+ $incl=~s/\s+$//;
+ my @incl=($incl=~/,/)?split(/\s*,\s*/,$incl):($incl);
+ foreach my $inclf (@incl) {
+-open(INCL,"<$inclf");
++open(INCL,"<$inclf")|| die $!;
+ while(<INCL>){
+ /^\s*\#/ && next;
+ /^\s*$/ && next;
+@@ -510,9 +526,10 @@
+ my $datafilename=shift;
+ my $dataset=shift;
+ 
+-eval("
+-use Loops_$dataset;
+-");
++require "./Loops_$dataset.pm";
++#eval("
++#use Loops_$dataset;
++#");
+ 
+ my $simref=shift;
+ my @flags=@{shift(@_)};
+@@ -527,7 +544,12 @@
+ my $dirname= "${sim}-$dataset";
+ 
+   if(-e $dirname && -d $dirname && ($nosims==0)) {
+-print STDERR "\n# Removing old $dirname dir\n".`rm -Rf $dirname` if $verbose;
++print STDERR "\n# Removing old $dirname dir\n" if $verbose;
++if ($verbose) {
++print `rm -Rf $dirname`;
++} else {
++system("rm -Rf $dirname");
++}
+ }
+ 
+   if (not -e "TEMPLATES/SIMTYPES/$sim$templ" ) {
+
+	
+
+0.9.3  Thu Jan  9 15:14:59 GMT 2003
+	- Changed name to Simulation::Automate
+	- Changed Makefile.PL to include localinstall target
+	- Some fixes for undefined variables, to avoid warnings
+	- added synsim-mode.el (Color highlighting of SynSim data files for XEmacs) to eg/
+
+0.9.2  Wed Nov 13 16:14:50 GMT 2002
+	- fixed Makefile.PL: 
+	9,12c9,12
+	<    ($] >= 5.005 ?   ## Add these new keywords supported since 5.005
+	<     ('ABSTRACT' => 'Simulation Automation Tool', 
+	<     'AUTHOR'   => 'Wim Vanderbauwhede <wim@motherearth.org>') : ()),
+	< 
+	---
+	>    ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
+	>     'ABSTRACT'=> 'Simulation Automation Tool', 
+	>     'AUTHOR'     => 'Wim Vanderbauwhede <wim@motherearth.org>') : ()),
+	> ,
+	- fixed some warnings in PostProcLibs.pm due to words not defined in Dictionary
+	- removed non-generic routines from PostProcessors.pm
+
+0.9.1  Mon Nov 11 13:48:31 2002
+	- original version; created by h2xs 1.21 with options
+		-X -n Simulation::Tools::SynSim
+

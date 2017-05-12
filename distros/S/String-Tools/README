@@ -1,0 +1,12 @@
+NAME
+    String::Tools - Various tools for handling strings.
+
+DESCRIPTION
+    "String::Tools" is a collection of tools to manipulate strings.
+
+AUTHOR
+    Bob Kleemann
+
+SEE ALSO
+    "join" in perlfunc, Any templating system.
+

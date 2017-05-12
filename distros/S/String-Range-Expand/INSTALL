@@ -1,0 +1,33 @@
+Installing String-Range-Expand
+Mithun Ayachit
+
+
+
+DISTRIBUTION PAGE
+
+
+The latest and all previous releases for String-Range-Expand can be
+downloaded from https://metacpan.org/release/String-Range-Expand
+
+
+
+INSTALL USING cpanm
+
+
+String-Range-Expand can be installed with cpanm using the following
+command
+
+    cpanm .
+
+
+
+INSTALL USING Module::Build
+
+
+String-Range-Expand can be installed with Module::Build using the
+following commands
+
+    perl ./Build.PL
+    ./Build
+    ./Build test
+    ./Build install

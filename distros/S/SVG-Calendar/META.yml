@@ -1,0 +1,46 @@
+---
+abstract: 'Creates calendars in SVG format which can be printed'
+author:
+  - 'Ivan Wills <ivan.wills@gmail.com>'
+build_requires:
+  Test::More: '0.88'
+  Test::Warnings: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SVG-Calendar
+provides:
+  SVG::Calendar:
+    file: lib/SVG/Calendar.pm
+    version: v0.3.11
+recommends:
+  Astro::Coord::ECI::Moon: '0.044'
+  Astro::MoonPhase: '0.6'
+  Pod::Coverage: '0'
+  Test::Kwalitee: '0'
+  Test::Perl::Critic: '0'
+  Test::Spelling: '0'
+requires:
+  Clone: '0.17'
+  Config::Std: '0'
+  DateTime::Format::Strptime: '0'
+  File::ShareDir: '1.102'
+  Image::ExifTool: '7.0'
+  Math::Trig: '1.15'
+  Path::Tiny: '0.061'
+  Readonly: '1.03'
+  Scalar::Util: '0'
+  Template: '2.14'
+  perl: '5.006'
+  version: '0.74'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=SVG-Calendar
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/ivanwills/SVG-Calendar.git
+version: v0.3.11
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

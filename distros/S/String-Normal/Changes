@@ -1,0 +1,26 @@
+Revision history for String-Normal
+
+0.06
+
+0.05
+    - normalizer tool now uses config file
+    - added --config option to normalizer tool
+    - corrected normalizer tool --version arg
+    - corrected license type in Makefile
+
+0.04
+    - removed start (^) and end ($) from title and address stop word removal
+    - improved documentation
+
+0.03
+    - adjusted rules for Title
+
+0.02
+    - added Title type
+    - configs can be overriden via file args
+    - normalizer takes --file arg
+    - better documentation
+
+0.01    
+    - First version, released on an unsuspecting world.
+

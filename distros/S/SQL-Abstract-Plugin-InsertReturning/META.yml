@@ -1,0 +1,18 @@
+---
+abstract: 'Augment SQL::Abstract->insert with support for returning data'
+author:
+  - 'Oliver Charles <oliver.g.charles@googlemail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.11
+generated_by: 'Dist::Zilla version 1.100651'
+license: ~
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: SQL-Abstract-Plugin-InsertReturning
+requires:
+  SQL::Abstract: 1.61
+  Sub::Exporter: 0.9
+  Test::More: 0.88
+version: 0.05

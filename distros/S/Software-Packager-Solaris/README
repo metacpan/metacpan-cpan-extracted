@@ -1,0 +1,32 @@
+This is the README file for Software::Packager::Solaris.
+This is Alpha software it may or may not do anything. The API is subject to
+change. 
+This module comes with NO WARRANTY.
+
+INSTALLATION
+Software::Packager::Solaris uses the standard perl module install process
+It requires Software::Packager
+
+perl Makefile.PL
+make
+make test [TEST_VERBOSE=1] (optional but recommended)
+make install
+
+DESCRIPTION
+Software::Packager::Solaris extends Software::packager providing the ability
+to create packages for the Solaris platform.
+
+This module does not do the packaging of the software but is merely a wrapper
+around the various software packaging tools already provided with the Solaris
+operating system.
+
+For more details see the documentation on Software::Packager
+
+AUTHOR
+R Bernard Davison <rbdavison@cpan.org>
+
+COPYRIGHT
+Copyright (c) 2001 R Bernard Davison. All rights reserved.
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+

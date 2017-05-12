@@ -1,0 +1,10 @@
+<!DOCTYPE NZSRSResponse SYSTEM "protocol.dtd"><NZSRSResponse VerMajor="5" VerMinor="2">
+<Response Action="HandleDetailsQry" FeId="8" FeSeq="4923021" OrigRegistrarId="922" RecipientRegistrarId="922" Rows="1">
+<FeTimeStamp Day="4" Hour="10" Minute="32" Month="8" Second="09" TimeZoneOffset="+12:00" Year="2010"/>
+<Handle HandleId="testhandle-01" Name="EPP Test Registrar II" Email="initial@testemail.co.nz" RegistrarId="922">
+<PostalAddress Address1="Test Address 1" PostalCode="1234" City="New City" CountryCode="NZ" Province="New State"/>
+<Phone AreaCode="12" CountryCode="12" LocalNumber="123456"/>
+      <CreatedDate Day="03" Hour="17" Minute="03" Month="6" Second="58" TimeZoneOffset="+12:00" Year="2010"/>
+<AuditDetails ActionId="srsrps-1_519" RegistrarId="1">
+<AuditTime><From Day="04" Hour="10" Minute="31" Month="8" Second="40" TimeZoneOffset="+12:00" Year="2010"/></AuditTime><AuditText>
+<![CDATA[User Id: manuela]]></AuditText></AuditDetails></Handle></Response></NZSRSResponse>

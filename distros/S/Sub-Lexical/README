@@ -1,0 +1,36 @@
+Sub/Lexical version 0.81
+========================
+
+Using this module will give your code the illusion of having lexically
+scoped subroutines. This is because where ever a sub is lexically declared
+it will really just turn into a my()ed scalar pointing to a coderef.
+
+However the lexically scoped subs seem to work as one might expect them to.
+They can see other lexically scoped variables and subs, and will fall out of
+scope like they should. You can pass them around like coderefs, give them
+attributes and prototypes too if you're feeling brave. Another advantage is
+you can use them as truly private methods in packages, thereby realising
+the dream of true encapsulation so many have dreamed of.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	Carp
+	Regexp::Common
+	Filter::Simple
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2002, Dan Brook. All Rights Reserved. This module is free
+software. It may be used, redistributed and/or modified under the same terms
+as Perl itself.

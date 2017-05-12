@@ -1,0 +1,77 @@
+NAME
+
+    String::Ident - clean-up string to be used as identifier and in URLs
+
+SYNOPSIS
+
+        my $ident = String::Ident->cleanup('Hello w≈ìrlƒè!')
+        is($ident,'Hello-woerld')
+
+DESCRIPTION
+
+    clean-up string to be used as identifier and in URLs
+
+METHODS
+
+ cleanup()
+
+    cleanup does the following things to convert your messy string into
+    something that you can use as an identifier:
+
+        # replace unicode by ascii
+        $text = unidecode($text);
+    
+        # replace anything basides numbers, letters and dash by dash
+        $text =~ s/[^-A-Za-z0-9]/-/g;
+    
+        # one dash is enough
+        $text =~ s/--+/-/g;
+    
+        # no need to start or end with a dash
+        $text =~ s/-$//g;
+        $text =~ s/^-//g;
+    
+        # maximum length
+        $text = substr($text,0,30);
+    
+        # min length is set to 4 filled in by random letters
+
+    cleanup per default truncates the text to 30 chars. You can pass in
+    some other limit, or -1 to not truncate:
+
+      cleanup("some very long tˆxt Lorem ipsum dolor sit amet, consectetur adipiscing elit, ", 15);
+      # 'some-very-long-toxt-'
+    
+      cleanup("some very long tˆxt Lorem ipsum dolor sit amet, consectetur adipiscing elit, ", -1);
+      # 'some-very-long-toxt-Lorem-ipsum-dolor-sit-amet-consectetur-adipiscing-elit'
+
+AUTHOR
+
+    Jozef Kutej, <jkutej at cpan.org>
+
+CONTRIBUTORS
+
+    The following people have contributed to the String::Ident by
+    committing their code, sending patches, reporting bugs, asking
+    questions, suggesting useful advises, nitpicking, chatting on IRC or
+    commenting on my blog (in no particular order):
+
+      * Andrea Pavlovic
+
+      * Syohei YOSHIDA
+
+      * Thomas Klausner, <domm@plix.at>
+
+THANKS
+
+    Thanks to V÷V - Verband ÷sterreichischer Volkshochschulen
+    <http://www.vhs.or.at/> for sponsoring development of this module.
+
+LICENSE AND COPYRIGHT
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,17 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Search-InvertedIndex
+version:      1.14
+version_from: lib/Search/InvertedIndex.pm
+installdirs:  site
+requires:
+    Class::NamedParms:             1.04
+    Class::ParmList:               1.03
+    DB_File:                       0
+    Digest::SHA1:                  0
+    Test::More:                    0
+    Tie::DB_File::SplitHash:       1.01
+    Tie::FileLRUCache:             1.01
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

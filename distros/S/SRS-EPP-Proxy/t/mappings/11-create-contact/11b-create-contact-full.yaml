@@ -1,0 +1,40 @@
+# Successful create, with full details
+template: create-contact.tt
+
+vars:
+  name: Albert Einstein
+  street: electric avenue
+  street2: brixton
+  city: Anywhere
+  state: NSW
+  pcode: 300000
+  ccode: NZ
+  phone: +64.48017211
+  fax: +64.48017211
+  email: a@smartarse.co.te
+  contact_id: full1
+
+input_assertions:
+  class: SRS::EPP::Command::Create::Contact
+  match:
+
+SRS:
+ - assertions:
+     attr_is:
+       - [ '/NZSRSRequest/HandleCreate', 'HandleId', 'full1', 'SRS: create handle' ]
+       - [ '/NZSRSRequest/HandleCreate', 'Name', 'Albert Einstein', 'SRS: got the name' ]
+       - [ '/NZSRSRequest/HandleCreate', 'Email', 'a@smartarse.co.te', 'SRS: got the email' ]
+       - [ '/NZSRSRequest/HandleCreate/PostalAddress', 'Address1', 'electric avenue', 'SRS: got the street' ]
+       - [ '/NZSRSRequest/HandleCreate/PostalAddress', 'City', 'Anywhere', 'SRS: got the city' ]
+       - [ '/NZSRSRequest/HandleCreate/PostalAddress', 'Province', 'NSW', 'SRS: got the state' ]
+       - [ '/NZSRSRequest/HandleCreate/PostalAddress', 'PostalCode', '300000', 'SRS: got the postcode' ]
+       - [ '/NZSRSRequest/HandleCreate/PostalAddress', 'CountryCode', 'NZ', 'SRS: got the countrycode' ]
+       - [ '/NZSRSRequest/HandleCreate/Phone', 'LocalNumber', '48017211', 'SRS: got the phone' ]
+       - [ '/NZSRSRequest/HandleCreate/Phone', 'CountryCode', '64', 'SRS: got the phone cc' ]
+       - [ '/NZSRSRequest/HandleCreate/Fax', 'LocalNumber', '48017211', 'SRS: got the fax' ]
+       - [ '/NZSRSRequest/HandleCreate/Fax', 'CountryCode', '64', 'SRS: got the fax cc' ]
+output_assertions:
+  attr_is:
+    - [ '//epp:result', 'code', 1000, 'EPP: Correct response code' ]
+
+

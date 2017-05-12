@@ -1,0 +1,5 @@
+TODO list for Perl module String::Sprintf
+
+- Support for overloading strftime (planned for the next release - soon)
+- Proper support for position indexed values like "%2$03X" is next (also soon)
+

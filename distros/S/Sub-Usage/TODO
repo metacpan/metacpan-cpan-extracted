@@ -1,0 +1,11 @@
+TODO list for Sub::Usage
+
+- I haven't decide whether I have to trap the calling from eval context or
+  just facilitate it.
+
+- allow the argument to be in array reference, no just scalar (string).
+
+- make the caller package name as the default prefix in some way.
+
+
+Hasanuddin Tamir <hasant@trabas.com>

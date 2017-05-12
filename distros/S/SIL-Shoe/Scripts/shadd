@@ -1,0 +1,63 @@
+#!/usr/bin/perl
+use SIL::Shoe::Data;
+use Getopt::Std;
+use IO::File;
+use File::Copy;
+
+getopts('d:o:');
+
+unless (defined $ARGV[1])
+{
+    die <<'EOT';
+    shadd [-o outfile] [-d dupfile] infile1 infile2
+Adds two Shoebox databases together removing duplicate records. infile1 takes
+precedence over infile2.
+
+  -d dupfile    output removed records to this file
+  -o outfile    output to this file or STDOUT
+EOT
+}
+
+$s1 = SIL::Shoe::Data->new($ARGV[0]) || die "Can't open $ARGV[0]";
+$s2 = SIL::Shoe::Data->new($ARGV[1]) || die "Can't open $ARGV[1]";
+
+if ($opt_o)
+{ $ofh = IO::File->new("> $opt_o") || die "Can't create $opt_o"; }
+else
+{ $ofh = IO::File->new(">&STDOUT"); }
+
+if ($opt_d)
+{ 
+    $dfh = IO::File->new("> $opt_d") || die "Can't create $opt_d";
+    $dfh->print("\\_sh $s2->{' Version'} $s->{' CSum'} $s2->{' Type'}\n");
+    $dfh->print("\\_DateStampHasFourDigitYear\n") if ($s2->{' DateStamp'} == 4);
+    $dfh->print("\n");
+}
+
+$s1->index;
+$s2->index;
+
+@outkeys = sort {$s1->{' index'}{$a}[0] <=> $s1->{' index'}{$b}[0]} keys %{$s1->{' index'}};
+
+copy($ARGV[0], $ofh);
+
+foreach $k (sort {$s2->{' index'}{$a}[0] <=> $s2->{' index'}{$b}[0]} keys %{$s2->{' index'}})
+{
+    foreach $o (@{$s2->{' index'}{$k}})
+    {
+
+        if (defined $s1->{' index'}{$k})
+        {
+            if ($dfh)
+            {
+                $s2->proc_record(sub {$dfh->print("$_\n")}, $o);
+                $dfh->print("\n");
+            }
+        }
+        else
+        {
+            $s2->proc_record(sub {$ofh->print("$_\n")}, $o);
+            $ofh->print("\n");
+        }
+    }
+}

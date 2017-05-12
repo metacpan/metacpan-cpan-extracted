@@ -1,0 +1,31 @@
+{
+   "abstract" : "Wrapper around ps utility on unix",
+   "author" : [
+      "justnoxx"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "System-Process",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/justnoxx/system-process",
+         "web" : "https://github.com/justnoxx/system-process.git"
+      }
+   },
+   "version" : "0.19"
+}

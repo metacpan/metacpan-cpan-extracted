@@ -1,0 +1,21 @@
+abstract: a framework for event-driven SDL games/applications
+author: Tels
+build_requires:
+  Test::More: 0.42
+distribution_type: module
+generated_by: Module::Install version 0.55
+license: gpl
+name: SDL-App-FPS
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+recommends:
+  Math::Fractal::Mandelbrot: 0.04
+requires:
+  Config::Simple: 4.48
+  Games::Console: 0.04
+  Games::OpenGL::Font::2D: 0.07
+  SDL: 2.1.3
+version: 0.21

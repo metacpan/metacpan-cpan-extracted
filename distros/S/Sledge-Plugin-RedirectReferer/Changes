@@ -1,0 +1,16 @@
+Revision history for Sledge-Plugin-RedirectReferer
+
+0.04    2006-08-03
+        add : last_access_url method.
+        fix : register last access url.
+        fix : some more...
+
+0.03    2006-07-27
+        fix : use URI. At referer url is your host, hostname is removed.
+
+0.02    2006-07-05
+        fix : pod. orz...
+
+0.01    2006-07-05
+        First version, released on an unsuspecting world.
+

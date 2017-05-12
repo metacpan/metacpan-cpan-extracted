@@ -1,0 +1,27 @@
+[
+	class	=>	'Stem::Console',
+],
+[
+	class   =>	'Stem::SockMsg',
+	name	=>	'cli_sock',
+	args    =>      [
+		port		=> 8888,
+		server		=> 1,
+            	host		=> '',
+		cell_attr	=> [
+			'cloneable'	=> 1,
+			'data_addr'	=> 'cli',
+			'codec'		=> 'Data::Dumper',
+		],
+	],
+],
+[
+	class	  =>	'Stem::Demo::CLI',
+	name	  =>	'cli',
+	args      =>	[
+		cell_attr => [
+			cloneable	=> 1,
+			no_io		=> 1,
+		],
+	],
+],

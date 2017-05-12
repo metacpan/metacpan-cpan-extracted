@@ -1,0 +1,19 @@
+--- 
+abstract: ~
+author: Agent Zhang <agentzh@gmail.com>
+distribution_type: module
+generated_by: Module::Install version 0.67
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Sim
+no_index: 
+  directory: 
+    - sample
+    - inc
+    - t
+requires: 
+  Carp: 0
+  perl: 5.004001
+version: 0.03

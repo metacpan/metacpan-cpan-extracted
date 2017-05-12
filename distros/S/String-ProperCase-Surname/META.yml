@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                String-ProperCase-Surname
+version:             0.03
+abstract:            Converts Surnames to Proper Case
+license:             ~
+author:              
+    - Michael R. Davis (mdavis@stopllc.com)
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    strict:                        0
+    Test::Simple:                  0.44
+    warnings:                      0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

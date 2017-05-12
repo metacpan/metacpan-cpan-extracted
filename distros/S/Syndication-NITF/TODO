@@ -1,0 +1,20 @@
+TODO
+
+    * Allow creation/modification of NITF documents as well as just reading
+    them
+    * A Syndication::NITF::Simple type module that takes the pain out of
+    accessing all these methods.
+    * Better error checking
+    * Better handling of error reporting -- don't just croak() every time
+    something goes wrong
+    * POD docs of each class (!)
+    * Integration with Syndication::NewsML module
+    * Finish off test suite (need more examples!)
+    * More support code: nitf-table handlers, ID schema helpers, etc
+    * More useful example parser
+    * The rest of the TODO list ;-)
+  Would be nice
+
+    ** This file was automatically generated from **
+    ** doc/TODO.pod. To edit it, see there.    **
+

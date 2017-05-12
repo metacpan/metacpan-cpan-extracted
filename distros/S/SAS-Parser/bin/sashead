@@ -1,0 +1,75 @@
+#!/usr/local/bin/perl -s
+#
+# sashead - Make and print a boxed header comment for a SAS file
+
+# With editors which allow a piped command to be executed against
+# the current file, sashead may be used to automatically create
+# and insert a header.
+
+$usage = q{sashead [options] sasfile[.sas]
+  where options are:
+    [-width=width]       Total width of header
+    [-indent=indent]     Spaces at left
+    [-frame=frame]       4 frame chars: top, bottom, left, right ('--||')
+    [-update]            Update the file [not fully implemented]
+    [-mac]               Document any macro definitions found
+    [-style=style]       Use style 'plain', 'pod', 'html' or 'latex' for macdefs
+    };
+
+#	If you cannot install SAS::Parser in the standard lib/perl
+#  directory, uncomment next line and change to your personal 
+#  lib/perl directory
+#	use lib "$ENV{HOME}/lib/perl";
+#	push(@INC, "$ENV{HOME}/lib/perl");
+
+ use SAS::Header;
+ $p = new SAS::Header;
+
+ my $file = shift @ARGV;
+ die "$usage" unless $file;
+ 
+ $p->parse_file($file);         # returns a SAS::Parser object
+ 
+ $SAS::Header::width  = $width  if $width;
+ $SAS::Header::indent = $indent if $indent;
+ $SAS::Header::frame  = $frame  if $frame;
+ $style = $style || 'plain';
+ 
+ $head = $p->makeheader();
+
+ if ($mac) {
+	my $macdefs = $p->macdefs();
+	my $desc;
+	foreach (split ' ', $macdefs) {
+		$desc .= $p->macdescribe($_, $style);
+		}
+	$head .= $desc;
+	}
+
+ # Prepend the header to the file, but we probably want to
+ # delete an old one first.  We leave this part as an exercise.
+
+	if ($update) {
+		$fullname = $p->{file};
+		$text = SAS::Parser::readfile($fullname);
+		# !!!!! delete an existing header here !!!!
+		$text = $head . $text;
+		&rewrite($fullname, $text, '.bak');	
+	}
+	else {
+		print $head;
+	}
+	
+exit;
+
+# Re-write a file, adding a $bak suffix to the original 
+
+sub rewrite {
+	my ($file, $text, $bak) = @_;
+	my $old = $file . $bak;
+	rename($file, $old) || die "Could not rename $file to $old";
+	open (OUT, ">$file");
+	print OUT $text;
+	close OUT;
+}
+ 

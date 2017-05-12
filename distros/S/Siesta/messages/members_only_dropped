@@ -1,0 +1,3 @@
+[% list.name %] MembersOnly dropped a message from [% mail.from %]
+
+

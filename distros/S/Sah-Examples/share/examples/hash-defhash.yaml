@@ -1,0 +1,7 @@
+# a defhash is a hash with some restriction on the keys. each key must be a
+# string in the form of: /\A\w+(\.\w+)*\z/
+
+[hash, {
+  each_key: ['str*', match: '\A\w+(\.\w+)*\z']
+}]
+

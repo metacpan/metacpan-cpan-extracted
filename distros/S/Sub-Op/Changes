@@ -1,0 +1,13 @@
+Revision history for Sub-Op
+
+0.02    2010-01-08 21:40 UTC
+        + Chg : INCOMPATIBLE CHANGE : The "len" member of the sub_op_config_t
+                struct was renamed to "namelen".
+        + Fix : Handle existing prototyped subs and constants.
+        + Fix : Less symbols and packages should be vivified under B::.
+        + Tst : Test monkeypatching of B::OP and B::Deparse.
+        + Upd : Bump Variable::Magic dependency to 0.40.
+
+0.01    2010-01-02 21:10 UTC
+        First version, released on an unsuspecting world.
+

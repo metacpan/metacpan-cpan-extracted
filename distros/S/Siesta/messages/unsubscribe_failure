@@ -1,0 +1,8 @@
+Hi,
+ You could not be unsubscribed from [% list.name %]
+
+Maybe you are not a member? You might like to contact
+[% list.owner.email %] for more assistance.
+
+Apologies,
+- Siesta::Plugin::UnSubscribe

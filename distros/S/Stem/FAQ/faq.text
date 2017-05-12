@@ -1,0 +1,407 @@
+S: About M<Stem>
+
+
+Q: What is M<Stem>?
+
+A: M<Stem> is a general purpose networking toolkit and a suite of ready
+to use network applications. Its goal is to transform common network
+programming to configuration and make uncommon network programming much
+simpler. Some M<Stem> users will use its suite of applications and
+modules and just configure them to perform their needed network
+tasks. Others will create new M<Stem> modules to perform their specific
+tasks and integrate them with M<Stem>'s standard modules using
+configurations.  In both cases, M<Stem> will speed up network
+application development, simplify maintenance, and lower lifetime costs.
+
+
+Q: Where can I get M<Stem>?
+A: M<Stem> can now be downloaded by the general public. Go to the 
+<A HREF="download.html">download</A> page to get the latest version.
+
+
+Q: What Can I Do With M<Stem>?
+A: M<Stem> is a general purpose networking toolkit. As such, it can
+be the backbone or framework of almost any networked (distributed)
+application you can imagine. M<Stem> is designed with standard modules 
+that are aimed at specific application niches. Some M<Stem> users
+want a simple solution to common problems while others need a way to 
+accelerate network application development. Via this modular design, 
+M<Stem> can satisfy the differing needs of both groups. 
+
+
+Q: What Are the Top M<Stem> Applications?
+A: The most commonly requested applications of 
+M<Stem> are log management, file distribution, 
+monitoring and remote command execution. For more on 
+M<Stem> applications, see the <A href="products.html">niches</A> page.
+
+QUOTE<
+	Stem Monitoring. \
+	Overloaded Server Appears. \
+	Remediation. \
+	-- U.G. \
+     >
+
+Q: Why Should I Use M<Stem>?
+A: You should use M<Stem> if:
+<UL>
+	<LI><P>You are tired of reinventing the wheel for each
+	network application you build. M<Stem> provides you with all
+	the common services that a network application needs and
+	makes them very simple to use.</P></LI>
+
+	<LI><P>You don't want to be forced to rely on a commercial
+	monolithic network tool that everyone hates to use. M<Stem> is
+	low cost and Open Source. You can easily write new modules
+	to customize M<Stem> to your needs.</P></LI>
+
+	<LI><P>You want to dramatically reduce the development
+	and maintenance costs of developing your new
+	network applications. M<Stem> tranforms common network
+	programming to configuration. Even if you create new M<Stem>
+	modules, it is very simple to connect them together with
+	M<Stem> configurations. This lowers your development time and
+	costs in many ways.</P></LI>
+
+	<LI><P>You just want to use a well-designed network system that
+	will make your profession much more enjoyable. M<Stem> is
+	architected to be easy to use at both the configuration and
+	coding levels. Our goal is for all M<Stem> users to enjoy
+	working with it and reduce the frustrations and stress of
+	network management.</P></LI>
+</UL>
+
+<P>These are just a few of the many reasons why 
+M<Stem> should be in place on your network.  
+If you have questions on how M<Stem> will benefit 
+your individual needs, <A HREF="mailto:faq@stemsystems.com">please contact us</A>.
+
+
+Q: Who Is Using M<Stem>?
+A: A start up firm hired M<Stem Systems> to implement a specialized
+web crawler.  M<Stem> will be used as
+the communications backbone for this multiprocessor system and
+it will interconnect and manage all of its components. Some of
+those components include subprocesses doing the page fetches,
+site objects, html page parsers, custom filters, crawl management
+and a database.
+
+QUOTE<
+	Divers search limpid pools. \
+	Precious Perl is summer's find, \
+	But Stem is loved more. \
+	-- D.G. \
+>
+
+Q: How can I be notified about M<Stem> updates?
+A: M<Stem Systems> has a email list dedicated to M<Stem> updates.  To
+subscribe, send an empty email to: news-subscribe@stemsystems.com.  This
+is a low volume list used for sending important news regarding M<Stem>
+(ie - new releases).
+
+S: M<Stem> Design
+
+Q: Do I Need To Get Rid Of [Commercial Application] To Use M<Stem>?
+A: No, M<Stem> can run in parallel with all of 
+your existing applications. As long as M<Stem> 
+can have access to its own TCP ports (which can be configured to
+any available ones), it has no need to conflict with any of your current
+systems.
+
+QUOTE<
+	superglue the net \
+	tie the machines together \
+	stem keeps it all sane \
+	-- U.G. \
+>
+
+
+Q: What is a M<Stem> Hub?
+A: A M<Stem> Hub is a single Perl process running 
+M<Stem>. It can function as a complete standalone 
+application or be connected to other M<Stem> Hubs in a
+networked application. M<Stem> Hubs contain the 
+M<Stem> core system and M<Stem>
+Cells that have been created by configuration files. 
+
+<P>For more on this, read the 
+<A href="technotes/arch_notes.html">architecture notes</A> document or find it 
+in the Design directory of the tarball.
+
+Q: What is a M<Stem> Cell?
+A: A M<Stem> Cell is a Perl object that has 3 major characteristics:
+
+<OL>
+   <LI><P>First, it is registered as a Cell in this Hub with a cell name and 
+	an optional target name</P></LI>
+   <LI><P>It has a set of methods designated to handle messages directed at 
+	the Cell</P></LI>
+   <LI><P>It sends messages to other cells.</P></LI>
+</OL>
+
+
+S: M<Stem> Features
+
+
+Q: What is a M<Stem> Message?
+A: M<Stem> Messages carry commands and data between 
+M<Stem> Cells. They are addressed with a 
+Hub/Cell/Target triplet. 
+
+<P>Messages can be any one of a wide range of types including command, 
+data, log, stderr etc. They can carry any form of data to a maximum 
+(to be designated later) size. 
+
+<P>See
+<A HREF="technotes/message_notes.html">message notes</A> document for more.
+
+QUOTE<
+	Nets catch more than fish. \
+	Data's trapped beneath the waves. \
+	Stem frees; packets breathe. \
+	-- D.G. \
+>
+
+
+Q: How Hard Is M<Stem> To Install/Configure?
+A: M<Stem> is very easy to install. It only requires 
+Perl 5.005_03 and one code module Event.pm that you can get from 
+<A HREF="http://search.cpan.org">CPAN</A>. The rest of
+M<Stem> is comprised of pure Perl modules.
+
+<p>M<Stem> has a step by step installation
+script that guides you through the installation process and any
+required modules that are necessary for the normal functioning of M<Stem>.
+It is easy to use and allows you to customize the installation to
+your liking or take the default install.
+
+<P>Much more on this can be found in the 
+<A href="technotes/config_notes.html">config notes</A> 
+document or in the Design directory of the tarball.
+
+
+Q: Can M<Stem> Do Guaranteed Messaging?
+A: M<Stem>'s core design does not directly support 
+guaranteed message delivery. It was designed this way, as the 
+technical market that M<Stem> targets
+doesn't have a strong requirement for this feature as the
+commercial/e-business markets have. 
+
+<P>Future releases of M<Stem> will support guaranteed delivery via a 
+separate module that is now under development.
+
+
+
+Q: Does M<Stem> Use XML?
+A: M<Stem>'s messages are designed to not be specific 
+to any format or encoding. They can carry data structure in any format the 
+designer wants,	including XML.  In fact, the message itself can also be in 
+any format as long as it is properly identified and a module to decode that 
+format is installed. 
+
+<p>M<Stem> is currently in the process of including
+<a href="http://www.yaml.org" name="YAML">YAML</a> as its primary format for
+messages, configuration files, and logs, but as demand arises other message formats
+including XML will be supported.
+
+<P>One longer-term goal is that message formats from many other
+systems will be supported by gateways modules, which will translate
+between M<Stem> and external messages.
+
+Q: What Kind Of Security Does M<Stem> Use?
+A: M<Stem> doesn't do direct authentication and secure
+transmissions. Currently it relies upon industry standard utilities such as ssh and
+stunnel to provide the secure socket connections between 
+M<Stem> hubs (processes).  Security is a great concern to
+everyone and M<Stem> development is looking into the possibilities
+of supporting various mechanisms and levels of security (i.e. - ssh, ssl, etc)
+through configurable modules.
+
+QUOTE<
+	Information rain \
+	Can drown the sleepy server, \
+	But for Stem's shelter. \
+	-- D.G. \
+>
+
+
+Q: Can M<Stem> Do Central Configuration Management?
+A: The log management project under development has this requirement. The
+lists of log files on each system that need to be monitored are
+maintained on the central system. Configuration files are autogenerated
+from those lists and distributed to all the M<Stem> hubs in this network
+application. The same mechanism can be used to distribute configuration
+files for other applications and M<Stem> can also notify them to reload the
+new files.
+
+Q: Can M<Stem> Handle My Content Distribution?
+A: Distributing content is similar to distributing configuration files and
+will use the same mechanisms. What content is distributed to where can
+all be easily controlled by M<Stem> configurations without any additional
+programming.
+
+
+S: Developing with M<Stem>
+
+
+Q: Can I Extend M<Stem> Myself To Suit Our Needs?
+A: M<Stem> is designed to be modified and extended very
+easily. You can copy existing modules or use design ideas from them to
+created new Cells for your own needs.
+
+<P>The high level Cell API hides the complexities of
+network communication and message transfer, leaving you free to focus on
+the specific design and coding of your custom Cells.
+
+
+QUOTE<
+	Just one message lost \
+	could stop your business blooming. \
+	Fear not: grasp the stem! \
+	-- D.G. \
+>
+
+Q: Is There a M<Stem> Tutorial?
+A: M<Stem> Development has created a <a href="cookbook.html" name="cookbook">cookbook</a> of examples that demonstrates the
+design of M<Stem> cells from the simplest form up
+to various levels of complexity.
+
+
+Q: Should I Modify M<Stem> On My Own Or Use M<Stem>'s Development Team?
+A: If your requirements are simple, and you have skilled staff to do the
+work, there's no reason not to develop and maintain your own M<Stem>-based
+systems. If your applications are complex applications, your staff new
+to M<Stem>, or your time-frame short, you will probably find it more
+cost-effective to let M<Stem Systems>' expert team develop your system for
+you.
+
+<P>Otherwise, M<Stem Systems> can assist you in the design, development and
+configuration of your application. How much assistance can be provided
+depends on the customer subscription deal and any other contracts. If
+you do not have a subscription, our support will be limited to bug fixes
+and email and you will have to maintain your modified code on your own.
+
+Q: Which Operating Systems Support M<Stem>?
+A: M<Stem> runs runs without any modification under any Unix flavor (Solaris,
+Linix, FreeBSD, etc.)  Support for WinX is in the planning stage and is
+expected to be released in the near future.
+
+Q: What Is M<Stem>'s License?
+A: M<Stem> will be released under the <a
+href="http://www.gnu.org/copyleft/gpl.html" name="GPL">GNU General
+Public License</a> starting with version 0.06.  Our intent is for
+M<Stem> to be free for non-commercial use.  Commercial licenses can be
+purchased through M<Stem Systems>.  Please contact <a
+href="mailto:info@stemsystems.com">Stem Systems</a> for more
+information regarding commercial license.
+
+
+S: M<Stem Systems>
+
+
+Q: What Is M<Stem Systems>?
+A: M<Stem Systems> is the company which is developing and maintaining M<Stem>. It
+owns the copyright to the M<Stem> codebase and is releasing it to its
+customers and the open source community. M<Stem Systems> also sells support
+subscriptions to the M<Stem> user community.
+
+QUOTE<
+	Black chips nurture life. \
+	Data shoots out, seeking Spring. \
+	Stem makes all fertile. \
+	-- D.G. \
+>
+
+Q: What Is The Business Model Of M<Stem Systems>?
+A: M<Stem Systems> has three business models,
+<ol>
+	<li>Development Projects</li>
+	<li>Support Subscriptions</li>
+     	<li>3rd Party products and VAR's</li>
+</ol>
+
+Q: How Much Does M<Stem> Cost?
+A: 0.06 will be under the
+<a href="http://www.gnu.org/copyleft/gpl.html" name="GPL">GNU General
+Public License</a>.  M<Stem> can be used freely for non-commercial
+use.  For commercial and acedemic licenses please contact us at <a
+href="mailto:sales@stemsystems.com">Stem Systems</a> for more
+information.
+
+
+Q: Who Are Your Technical Advisors?
+A: Our technical advisors are listed <A HREF="company.html">here</A>.
+
+S: Miscellaneous
+
+
+Q: How Can I Learn M<Stem>?
+A: The best way right now is to start with the technical notes and get a
+basic understanding of M<Stem>, its architecture and
+its nomenclature. Then run the various demo scripts and read their 
+configuration files. Developers will go next to the Cell documentation that 
+describes each Cell's function, their attributes and how to configure it. 
+Once some insight into each Cell is attained the next step would be to go
+through M<Stem>'s <a href="cookbook.html" name="cookbook">cookbook</a>
+of examples put together by the developers of M<Stem>.  This will
+show you how to extend M<Stem> with your own Cells.
+
+<P>We are discussing the
+creation of classes with a training firm when the demand arises.
+
+Q: What Is The Future Of M<Stem>?
+A: M<Stem> will constantly be growing its Cell library and adding support for
+new features. Whenever any repeated networked operations can be
+identified, M<Stem> will create a M<Stem> Cell to 
+perform it. Then M<Stem>'s
+users can easily integrate that new Cell without programming or needing
+to re-invent that wheel.
+
+Q: Who Created M<Stem>?
+A: M<Stem> was created by Uri Guttman, and is the 
+culmination of his long career in systems architecture and development. He has combined a
+quarter century of experience designing and implementing event-driven
+systems with his love of Perl to produce a powerful, yet easy-to-use
+framework for network applications. 
+
+<P>For more on M<Stem>'s creator, see the 
+<A HREF="http://stemsystems.com/company.html">M<Stem> Team biographies</A>.
+
+Q: How (and why) Was M<Stem> Conceived?
+A: M<Stem> was created when its designer was contracted 
+to a network application development group who were constantly 
+putting out fires and creating a massive ad hoc system. It was clear that they needed a
+framework to give structure to their network application design. 
+M<Stem> was the result.
+
+QUOTE<
+	Coders or firemen? \
+	System in conflagration. \
+	From ashes rose Stem. \
+	-- U.G. \
+>
+
+
+Q: What Does M<Stem> Stand For?
+A: M<Stem> is not an acronym or an abbreviation, rather it is named from the
+real word 'stem' which has several dictionary meanings that map well to M<Stem>.
+
+<DL><DT><B>v. tr.</B></DT>
+<DD><OL><LI>To stop or hold back by or as if by damming; as in "stem the tide"</OL></DD></DL>
+
+<DL><DT><B>n.</B></DT>
+<DD><OL><LI>A slender stalk supporting or connecting another plant part, such as a leaf or flower.
+	<LI>A connecting or supporting part.
+</OL></DD></DL>
+
+<DL><DT><B>n.</B></DT>
+<DD><OL><LI>A line of ancestry : STOCK; especially : a fundamental line from
+which others have arisen. as in "stem cell" in biology.</OL></DD></DL>
+
+
+QUOTE<
+	To keep your network \
+	flowering when the heat's on, \
+	it needs a strong stem. \
+	-- D.C. \
+>

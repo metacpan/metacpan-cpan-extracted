@@ -1,0 +1,32 @@
+Revision history for Perl extension Snort::Rule.
+
+1.07  Sun Oct 26
+	- fixed minor bug with rule splitting Rule.pm +334 so we only get a single pair
+
+1.06  Tue Feb 20 09:00:00
+	- downgraded 'use 5.00800' to 'use 5.005000' in the Makefile for compatability issues
+
+1.05  Sat Oct 28 15:00:00
+	- Fixes and Enhancements from Ephraim
+	- Fixed string() bug wrt non-value options (ie: nocase).
+	- Created $obj->opt() to grap specific options
+
+1.03  Wed May 24 15:00:00
+	- Fixed the opts() method wrt new() && init(). Should work now :)
+
+1.02  Wed May 17 14:06:00
+	- fixed new() so you can pass the -opts parm with a HASHREF
+
+1.01  Wed May 17 15:17:00
+	- ALTERED THE API!! parms are now prefixed by '-' (ie: '-parm => ').
+	- Fixed new() so default values are filled in
+	- opts() now accepts args as a HASHREF
+	- Cleaned up docs a little
+
+1.00  Fri Apr 14 12:05:00 2006
+	- Module Cleaned up
+	- Documentation cleaned for initial release
+
+0.01  Sun Jan  1 16:28:05 2006
+	- original version; created by h2xs 1.23 with options
+		-AXc -n Snort::Rule

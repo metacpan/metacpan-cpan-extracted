@@ -1,0 +1,11 @@
+This tries to implement a standard subset of what the future
+"SystemManagement" set of perl modules will allow.  It is modelled
+after the "PowerEdge::RAC" module.
+
+Interface methods:
+
+new	       (takes authentication/connection parameters)
+power_off
+power_on
+power_cycle
+is_powered_on

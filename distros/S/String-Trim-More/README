@@ -1,0 +1,63 @@
+DESCRIPTION
+
+    This is an alternative to String::Trim (and similar modules, see "SEE
+    ALSO"). Instead of a single trim function, this module provides several
+    from which you can choose on, depending on your needs.
+
+FUNCTIONS
+
+ ltrim($str) => STR
+
+    Trim whitespaces (including newlines) at the beginning of string.
+    Equivalent to:
+
+     $str =~ s/\A\s+//s;
+
+ ltrim_lines($str) => STR
+
+    Trim whitespaces (not including newlines) at the beginning of each line
+    of string. Equivalent to:
+
+     $str =~ s/^\s+//mg;
+
+ rtrim($str) => STR
+
+    Trim whitespaces (including newlines) at the end of string. Equivalent
+    to:
+
+     $str =~ s/[ \t]+\z//s;
+
+ rtrim_lines($str) => STR
+
+    Trim whitespaces (not including newlines) at the end of each line of
+    string. Equivalent to:
+
+     $str =~ s/[ \t]+$//mg;
+
+ trim($str) => STR
+
+    ltrim + rtrim.
+
+ trim_lines($str) => STR
+
+    ltrim_lines + rtrim_lines.
+
+ trim_blank_lines($str) => STR
+
+    Trim blank lines at the beginning and the end. Won't trim blank lines
+    in the middle. Blank lines include lines with only whitespaces in them.
+
+ ellipsis($str[, $maxlen, $ellipsis]) => STR
+
+    Return $str unmodified if $str's length is less than $maxlen (default
+    80). Otherwise cut $str to ($maxlen - length($ellipsis)) and append
+    $ellipsis (default '...') at the end.
+
+SEE ALSO
+
+    For trim functions: String::Trim, Text::Trim, String::Strip,
+    String::Util.
+
+    For ellipsis/eliding: Text::Elide (elide at word boundaries),
+    String::Elide::Parts (elide with more options).
+

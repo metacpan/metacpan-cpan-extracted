@@ -1,0 +1,15 @@
+Build.PL
+Changes
+MANIFEST
+README
+LICENSE
+lib/Syntax/Highlight/CSS.pm
+examples/css.pl
+t/00-load.t
+t/01-parse.t
+xt/pod-coverage.t
+xt/pod.t
+xt/kwalitee.t
+Makefile.PL
+META.yml
+META.json

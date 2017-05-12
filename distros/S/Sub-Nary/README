@@ -1,0 +1,168 @@
+NAME
+    Sub::Nary - Try to count how many elements a subroutine can return in
+    list context.
+
+VERSION
+    Version 0.03
+
+SYNOPSIS
+        use Sub::Nary;
+
+        my $sn = Sub::Nary->new();
+        my $r  = $sn->nary(\&hlagh);
+
+DESCRIPTION
+    This module uses the B framework to walk into subroutines and try to
+    guess how many scalars are likely to be returned in list context. It's
+    not always possible to give a definitive answer to this question at
+    compile time, so the results are given in terms of "probability of
+    return" (to be understood in a sense described below).
+
+METHODS
+  "new"
+    The usual constructor. Currently takes no argument.
+
+  "nary $coderef"
+    Takes a code reference to a named or anonymous subroutine, and returns a
+    hash reference whose keys are the possible numbers of returning scalars,
+    and the corresponding values the "probability" to get them. The special
+    key 'list' is used to denote a possibly infinite number of returned
+    arguments. The return value hence would look at
+
+        { 1 => 0.2, 2 => 0.4, 4 => 0.3, list => 0.1 }
+
+    that is, we should get 1 scalar 1 time over 5 and so on. The sum of all
+    values is 1. The returned result, and all the results obtained from
+    intermediate subs, are cached into the object.
+
+  "flush"
+    Flushes the Sub::Nary object cache. Returns the object itself.
+
+PROBABILITY OF RETURN
+    The probability is computed as such :
+
+    * When branching, each branch is considered equally possible.
+        For example, the subroutine
+
+            sub simple {
+             if (rand < 0.1) {
+              return 1;
+             } else {
+              return 2, 3;
+             }
+            }
+
+        is seen returning one or two arguments each with probability "1/2".
+        As for
+
+            sub hlagh {
+             my $x = rand;
+             if ($x < 0.1) {
+              return 1, 2, 3;
+             } elsif ($x > 0.9) {
+              return 4, 5;
+             }
+            }
+
+        it is considered to return 3 scalars with probability "1/2", 2 with
+        probability "1/2 * 1/2 = 1/4" and 1 (when the two tests fail, the
+        last computed value is returned, which here is "$x > 0.9" evaluated
+        in the scalar context of the test) with remaining probability "1/4".
+
+    * The total probability law for a given returning point is the
+    convolution product of the probabilities of its list elements.
+        As such,
+
+            sub notsosimple {
+             return 1, simple(), 2
+            }
+
+        returns 3 or 4 arguments with probability "1/2" ; and
+
+            sub double {
+             return simple(), simple()
+            }
+
+        never returns 1 argument but returns 2 with probability "1/2 * 1/2 =
+        1/4", 3 with probability "1/2 * 1/2 + 1/2 * 1/2 = 1/2" and 4 with
+        probability "1/4" too.
+
+    * If a core function may return different numbers of scalars, each kind
+    is considered equally possible.
+        For example, "stat" returns 13 elements on success and 0 on error.
+        The according probability will then be "{ 0 => 0.5, 13 => 0.5 }".
+
+    * The "list" state is absorbing in regard of all the other ones.
+        This is just a pedantic way to say that "list + fixed length =
+        list". That's why
+
+            sub listy {
+             return 1, simple(), @_
+            }
+
+        is considered as always returning an unbounded list.
+
+        Also, the convolution law does not behave the same when "list"
+        elements are involved : in the following example,
+
+            sub oneorlist {
+             if (rand < 0.1) {
+              return 1
+             } else {
+              return @_
+             }
+            }
+
+            sub composed {
+             return oneorlist(), oneorlist()
+            }
+
+        "composed" returns 2 scalars with probability "1/2 * 1/2 = 1/4" and
+        a "list" with probability "3/4".
+
+EXPORT
+    An object-oriented module shouldn't export any function, and so does
+    this one.
+
+CAVEATS
+    The algorithm may be pessimistic (things seen as "list" while they are
+    of fixed length) but not optimistic (the opposite, duh).
+
+    "wantarray" isn't specialized when encountered in the optree.
+
+DEPENDENCIES
+    perl 5.8.1.
+
+    Carp (standard since perl 5), B (since perl 5.005) and XSLoader (since
+    perl 5.006).
+
+AUTHOR
+    Vincent Pit, "<perl at profvince.com>", <http://www.profvince.com>.
+
+    You can contact me by mail or on #perl @ FreeNode (vincent or
+    Prof_Vince).
+
+BUGS
+    Please report any bugs or feature requests to "bug-b-nary at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Sub-Nary>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Sub::Nary
+
+    Tests code coverage report is available at
+    <http://www.profvince.com/perl/cover/Sub-Nary>.
+
+ACKNOWLEDGEMENTS
+    Thanks to Sebastien Aperghis-Tramoni for helping to name this module.
+
+COPYRIGHT & LICENSE
+    Copyright 2008 Vincent Pit, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,187 @@
+=head1 NAME
+
+SIAM::Documentation::DriverSpec - SIAM driver specification
+
+
+=head1 INTRODUCTION
+
+A SIAM driver is what connects to the enterprise database and retrieves
+objects and their attributes.
+
+There is no base class for a driver, and the enterprises are free to implement
+the drivers in in their preferred ways.
+
+A driver is a Perl object which must provide a number of methods, as described
+below. The validity of the driver object is verified by
+C<validate_driver()> method of C<SIAM::Object>
+
+The driver class should take care of error reporting. It should be able
+to send its error messages to STDERR or a log file.
+
+
+=head1 METHODS
+
+=head2 new
+
+ my $driver = EnterpriseDriverClass->new($drvopts);
+
+The new() method creates an instance of the driver object. It takes a
+hash reference as an argument. This hash defines all configuration
+needed to initialize the driver.
+
+One entry in the configuration hash is mandatory: C<Logger>. It supplies
+a reference to an object which is used for all logging. The object must
+implement the following methods: B<debug>, B<info>, B<warn>, and
+B<error>.
+
+Requirements for the rest of configuration hash are defined by the
+driver class.
+
+The new() method should validate the configuration and return undef in
+case of problems.
+
+
+=head2 connect
+
+Connects the driver to its underlying databases. Returns true in case of
+success.
+
+
+=head2 disconect
+
+Disconnects the driver from its underlying databases and frees its
+internal memory. The driver should be able to connect() again.
+
+
+=head2 fetch_attributes
+
+ $status = $driver->fetch_attributes($attrs);
+
+The argument is a hash reference that contains the SIAM::Object mandatory
+attributes (C<siam.object.id> and C<siam.object.class>).
+
+The driver should populate the provided hashref with the rest of the object's
+attributes, based on its ID and class.
+
+The method should return undef in case of failures, and true otherwise.
+
+
+
+=head2 fetch_computable
+
+  $value = $driver->fetch_computable($id, $key);
+
+Returns a computable value for the object. The driver must return empty
+string if the computable is not supported. Returns undef if the object
+ID is invalid.
+
+
+=head2 fetch_contained_object_ids
+
+  $ids = $driver->fetch_contained_object_ids($id, $classname, $options);
+
+The method returns an arrayref containing IDs of contained objects of a
+given class. The method must return an empty arrayref if there are no
+contained objects.
+
+Options define a filter as follows. If no filter is defined, all
+relevant object IDs should be returned.
+
+  $ids = $driver->fetch_contained_object_ids($id, 'SIAM::Contract', {
+       'match_attribute' => [ 'siam.object.access_scope_id',
+                                 ['SCOPEID01', 'SCOPEID02'] ]
+      }
+     );
+
+In this example, only the contracts which match the specified access
+scopes are returned.
+
+
+=head2 fetch_contained_classes
+
+  $classes = $driver->fetch_contained_classes($id);
+
+The method returns an arrayref with all object classes that are
+contained within the specified object.
+
+
+
+=head2 fetch_container
+
+  $attr = $driver->fetch_container($id);
+
+The method returns a hashref containing C<siam.object.id> and
+C<siam.object.class> attribute values of the object that is a container
+for the specified object.
+
+The method returns undef if the specified object ID does not exist.
+
+If the container is the SIAM root, only the C<siam.object.id> attribute
+should be returned, with the value I<SIAM.ROOT>.
+
+
+=head2 fetch_object_ids_by_attribute
+
+  $list = $driver->fetch_object_ids_by_attribute($classname, $attr, $value);
+
+The method returns an arrayref with object identifiers of given class
+and a matched attribute value. Empty arrayref should be returned if no
+objects match the criteria.
+
+
+=head2 set_condition
+
+  $driver->set_condition($id, 'torrus.import_successful', 1);
+
+The method interprets a (key, value) pair that the client application
+sets as a new condition for an object. The driver is free to do anything
+with this data.
+
+=head2 manifest_attributes
+
+  my $manifest = $driver->manifest_attributes();
+
+The method returns an arrayref with all attribute names introduced by
+the driver.
+
+
+
+
+
+
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2011 Stanislav Sinyagin.
+
+This program is distributed under the MIT (X11) License:
+L<http://www.opensource.org/licenses/mit-license.php>
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+
+=cut
+
+# Local Variables:
+# mode: cperl
+# End:

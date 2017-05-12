@@ -1,0 +1,30 @@
+FUNCTIONS
+
+ encode_js_string($str[, $mode]) => STR
+
+    Encode Perl string $str to its JavaScript literal representation using
+    double quotes ("). This is currently implemented using JSON encoding.
+
+    If $mode is set to 1, will produce literal representation using single
+    quotes (') instead.
+
+    If $mode is set to 2, will produce single-quoted JS string to be put
+    inside a double-quoted JS string literal, useful for producing for
+    example jQuery expression like:
+
+     $("h2.contains('this is JS string inside another JS string')")
+
+    Will die on failure.
+
+ decode_js_string($js_str) => STR
+
+    Given a JavaScript string literal representation in $js_str, decode to
+    get the value.
+
+    Currently implemented using JSON decoding of stringified $js_str.
+
+    Currently does not support JavaScript string representation that uses
+    single quotes (').
+
+    Will die on failure.
+

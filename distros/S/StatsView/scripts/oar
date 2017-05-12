@@ -1,0 +1,100 @@
+#!/usr/local/bin/perl -w
+
+use strict;
+use StatsView::Oracle;
+
+################################################################################
+# Main
+
+# Available monitors
+my %avail_mons =
+   (
+   '-bc'  => 'BufferCache',
+   '-ddc' => 'DataDictionaryCache',
+   '-dio' => 'DatafileIO',
+   '-de'  => 'DynamicExtension',
+   '-lc'  => 'LibraryCache',
+   '-sp'  => 'SharedPool',
+   '-tio' => 'TablespaceIO',
+   );
+
+# Defaults
+my $user     = '/';
+my $password = '';
+my $database = $ENV{ORACLE_SID} || '';
+my $output   = undef;
+my $interval = 60;
+my $count    = -1;
+my $spacing  = 1;
+my %monitors = ();
+
+# Process the arguments
+while ($_ = shift(@ARGV))
+   {
+   CASE:
+      {
+      $_ =~ /^-[h?]$/ and do
+         {
+         print("oar: arguments are:  -O <output file>\n");
+         print("                     -L <login> as user/pass\@database\n");
+         print("                     -O <file>\n");
+         print("                    [-I <interval>]\n");
+         print("                    [-C <count>]\n");
+         print("                    [-S <sample spacing>]\n");
+         print("                     -A   = all stats\n");
+         foreach my $flag (sort(keys(%avail_mons)))
+            {
+            my $name = $avail_mons{$flag};
+            $name =~ s/([a-z])([A-Z])/$1 $2/g;
+            printf("                     %-4s = %s stats\n", $flag, $name);
+            }
+         exit(2);
+         };
+      $_ eq '-L' and do
+         {
+         ($user, $password, $database) = split(/[\/\@]/, shift(@ARGV));
+         $user = '/' if (! $user);
+         $password = '' if (! $password);
+         $database = '' if (! $database);
+         last CASE;
+         };
+      $_ eq '-O' and do
+         {
+         $output = shift(@ARGV);
+         last CASE;
+         };
+      $_ eq '-I' and do
+         {
+         $interval = shift(@ARGV);
+         last CASE;
+         };
+      $_ eq '-C' and do
+         {
+         $count = shift(@ARGV);
+         last CASE;
+         };
+      $_ eq '-S' and do
+         {
+         $spacing = shift(@ARGV);
+         last CASE;
+         };
+      $_ eq '-A' and do
+         {
+         foreach my $mon (values(%avail_mons)) { $monitors{$mon} = 1; }
+         last CASE;
+         };
+      # Default
+      if (exists($avail_mons{$_})) { $monitors{$avail_mons{$_}} = 1 }
+      else { die("Illegal command-line flag '$_'\n"); }
+      }
+   }
+die("No output file specified\n") if (! $output);
+die("No monitors specified\n") if (! keys(%monitors));
+
+# Run the monitoring
+my $oar = StatsView::Oracle->new($database, $user, $password, $output,
+                                 $interval, $spacing, keys(%monitors));
+$oar->run($count);
+exit(0);
+
+################################################################################

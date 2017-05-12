@@ -1,0 +1,12 @@
+ArbBiLex.pm
+ChangeLog
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/00_about.t
+t/10_basic.t
+t/15_basic_source.t
+t/20_unicode.t
+t/25_unicode_source.t
+META.yml                                 Module meta-data (added by MakeMaker)

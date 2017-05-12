@@ -1,0 +1,80 @@
+=encoding euc-jp
+
+=head1 NAME
+
+String::Gsub::Functions::JA - core functions of String::Gsub (ja-doc)
+
+=head1 名前
+
+String::Gsub::Functions::JA - 正規表現操作な関数
+
+=head1 書式
+
+ use String::Gsub::Functions qw(gsub);
+ 
+ print gsub("abcabc", qr/(b)/,sub{uc$1}); # ==> "aBcaBc"
+ 
+ gsubx(my $str = "abcabc", qr/(b)/, sub{uc $1});
+ print $str; # ==> "aBcaBc";
+
+=head1 説明
+
+このモジュールでは次の４つの関数を実装しています. 
+
+ gsub ($str, $regexp, $replacement)
+ gsubx($str, $regexp, $replacement)
+ subs ($str, $regexp, $replacement)
+ subsx($str, $regexp, $replacement)
+
+C<$regexp> には正規表現(C<qr//>)を, 
+C<$replacement> には置換時に呼ばれる関数へのリファレンスを渡します.
+C<$replacement> 関数では通常の正規表現構文内と同様に C<$1>, C<$2>, ...
+等が利用できます. 
+
+また, C<$regexp> 及び C<$replacement> には文字列も可能ですが, 
+通常の正規表現構文で使ったときと異なる点があります. 
+
+C<$regexp> に文字列を渡した場合, それは正規表現ではなく純粋に文字列に
+マッチします. 特殊文字はエスケープされます. 
+
+C<$replacement> に文字列を渡した場合, その中の一部の文字列を
+マッチの結果で置換して, それを置換文字列として使います. 
+置換される文字列は, C<\1>, C<\2>, ... と, C<\&>, C<\`>, C<\'> です. 
+それぞれの意味は C<$1>, ... と同じです. 
+
+=head1 エクスポート
+
+このモジュールからは C<gsub>, C<gsubx>, C<subs>, C<subsx> の４つの関数を
+エクスポートできます. 
+
+デフォルトでは何もエクスポートしません.
+
+=head1 関数
+
+=head2 gsub($str, $regexp, $replacement)
+
+全体の置換を実行. 新しい文字列を返す.
+元の文字列は変化しない.
+
+=head2 gsubx($str, $regexp, $replacement)
+
+gsub と同様全体の置換を実行. 但しこちらは文字列
+そのものを変更し, 変更後の文字列を返す.
+
+=head2 subs($str, $regexp, $replacement)
+
+１回の置換を実行. 新しい文字列を返す.
+元の文字列は変化しない.
+
+=head2 subsx($str, $regexp, $replacement)
+
+sub と同様全体の置換を実行. 但しこちらは文字列
+そのものを変更し, 変更後のの文字列を返す.
+
+=head1 SEE ALSO
+
+L<String::Gsub>, L<String::Gsub::JA>,
+L<String::Gsub::Functions>, L<String::Gsub::Functions::JA>
+
+=cut
+

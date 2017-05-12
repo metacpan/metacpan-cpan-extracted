@@ -1,0 +1,48 @@
+{
+   "abstract" : "String Length Comparisons",
+   "author" : [
+      "Michael Accardo <accardo@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "String-Compare-Length",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mixedconnections/String-Compare-Length/issues"
+      },
+      "homepage" : "https://github.com/mixedconnections/String-Compare-Length",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mixedconnections/String-Compare-Length.git",
+         "web" : "https://github.com/mixedconnections/String-Compare-Length"
+      }
+   },
+   "version" : "0.05"
+}
+

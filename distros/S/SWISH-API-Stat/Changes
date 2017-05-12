@@ -1,0 +1,23 @@
+Revision history for Perl extension SWISH::API::Stat.
+
+0.01  Sat Sep 16 08:42:52 2006
+	- original version; created by h2xs 1.23 with options
+		-XA -n SWISH::API::Stat
+
+0.02
+    * fixed Makefile.PL to reflect S::A::More dependency
+
+0.03
+    * maintenance only
+
+0.04
+    * fixed tests to skip if SWISH::API is not installed
+
+0.05
+    * respect paranoia level on initial search()
+
+0.06
+    * add another paranoia level of 'Execute' set ot 2,
+      and change 'Search' level to 1 so that this module
+      actually works out of the box.
+

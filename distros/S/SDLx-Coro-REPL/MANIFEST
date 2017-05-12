@@ -1,0 +1,8 @@
+Changes
+eg/sdl_coro_repl.pl
+lib/SDLx/Coro/REPL.pm
+Makefile.PL
+MANIFEST
+README
+t/SDLx-Coro-REPL.t
+META.yml                                 Module meta-data (added by MakeMaker)

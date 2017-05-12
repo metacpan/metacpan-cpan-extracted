@@ -1,0 +1,26 @@
+SQL::Preproc TODO:
+
+- test with Apache/mod_perl
+
+- implement USING syntax
+
+- finish SQL::Preproc::Teradata
+
+- build test for SQL::Preproc::Teradata
+
+- test with Apache/mod_perl
+
+- finish SQL::Preproc::Runtime to reduce translated code size
+
+- create SQL::Preproc::MySQL
+
+- build test for SQL::Preproc::MySQL
+
+- create SQL::Preproc::Pg
+
+- build test for SQL::Preproc::Pg
+
+- create SQL::Preproc::Oracle
+
+- build test for SQL::Preproc::Oracle
+

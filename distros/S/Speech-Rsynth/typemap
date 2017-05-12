@@ -1,0 +1,26 @@
+######################################################################
+# File: typemap
+# - requires "perlobject.map" by Dean Roehrich, version 19960302
+
+######################################################################
+TYPEMAP
+rsynth_synth_ptr	O_OBJECT
+CharPtr			T_PV_OR_UNDEF
+
+######################################################################
+INPUT
+T_PV_OR_UNDEF
+	if (SvPOK($arg)) {
+	  $var = SvPV($arg,PL_na);
+	} else {
+	  $var = NULL;
+	}
+
+######################################################################
+OUTPUT
+T_PV_OR_UNDEF
+	if ($var) {
+	  sv_setpv((SV*)$arg, $var);
+	} else {
+	  sv_setsv($arg,(SV*)&PL_sv_undef);
+	}

@@ -1,0 +1,19 @@
+lib/Sys/Info/Driver/BSD.pm
+lib/Sys/Info/Driver/BSD/Device.pm
+lib/Sys/Info/Driver/BSD/OS.pm
+lib/Sys/Info/Driver/BSD/Device/CPU.pm
+t/03-basic.t
+Build.PL
+Changes
+MANIFEST
+README
+SPEC
+.perlcriticrc
+builder/Build.pm
+builder/Build/Spec.pm
+t/201-pod.t
+t/202-pod-coverage.t
+Makefile.PL	Generated automatically
+LICENSE
+META.yml
+META.json

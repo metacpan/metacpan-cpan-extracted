@@ -1,0 +1,112 @@
+---
+abstract: 'Create SQL programmatically'
+author:
+  - 'Timm Murray <tmurray@wumpus-cave.net>'
+build_requires:
+  Test::Pod: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SQL-Functional
+provides:
+  SQL::Functional:
+    file: lib/SQL/Functional.pm
+    version: '0.3'
+  SQL::Functional::AndClause:
+    file: lib/SQL/Functional/AndClause.pm
+    version: '0.3'
+  SQL::Functional::Clause:
+    file: lib/SQL/Functional/Clause.pm
+    version: '0.3'
+  SQL::Functional::CountClause:
+    file: lib/SQL/Functional/CountClause.pm
+    version: '0.3'
+  SQL::Functional::DeleteClause:
+    file: lib/SQL/Functional/DeleteClause.pm
+    version: '0.3'
+  SQL::Functional::DistinctClause:
+    file: lib/SQL/Functional/DistinctClause.pm
+    version: '0.3'
+  SQL::Functional::FieldClause:
+    file: lib/SQL/Functional/FieldClause.pm
+    version: '0.3'
+  SQL::Functional::FieldRole:
+    file: lib/SQL/Functional/FieldRole.pm
+    version: '0.3'
+  SQL::Functional::FromClause:
+    file: lib/SQL/Functional/FromClause.pm
+    version: '0.3'
+  SQL::Functional::FunctionClause:
+    file: lib/SQL/Functional/FunctionClause.pm
+    version: '0.3'
+  SQL::Functional::GroupByClause:
+    file: lib/SQL/Functional/GroupByClause.pm
+    version: '0.3'
+  SQL::Functional::InsertClause:
+    file: lib/SQL/Functional/InsertClause.pm
+    version: '0.3'
+  SQL::Functional::JoinClause:
+    file: lib/SQL/Functional/JoinClause.pm
+    version: '0.3'
+  SQL::Functional::LimitClause:
+    file: lib/SQL/Functional/LimitClause.pm
+    version: '0.3'
+  SQL::Functional::LiteralClause:
+    file: lib/SQL/Functional/LiteralClause.pm
+    version: '0.3'
+  SQL::Functional::MatchClause:
+    file: lib/SQL/Functional/MatchClause.pm
+    version: '0.3'
+  SQL::Functional::NullClause:
+    file: lib/SQL/Functional/NullClause.pm
+    version: '0.3'
+  SQL::Functional::OrClause:
+    file: lib/SQL/Functional/OrClause.pm
+    version: '0.3'
+  SQL::Functional::OrderByClause:
+    file: lib/SQL/Functional/OrderByClause.pm
+    version: '0.3'
+  SQL::Functional::PlaceholderClause:
+    file: lib/SQL/Functional/PlaceholderClause.pm
+    version: '0.3'
+  SQL::Functional::SelectClause:
+    file: lib/SQL/Functional/SelectClause.pm
+    version: '0.3'
+  SQL::Functional::SetClause:
+    file: lib/SQL/Functional/SetClause.pm
+    version: '0.3'
+  SQL::Functional::TableClause:
+    file: lib/SQL/Functional/TableClause.pm
+    version: '0.3'
+  SQL::Functional::TruncateClause:
+    file: lib/SQL/Functional/TruncateClause.pm
+    version: '0.3'
+  SQL::Functional::UpdateClause:
+    file: lib/SQL/Functional/UpdateClause.pm
+    version: '0.3'
+  SQL::Functional::ValuesClause:
+    file: lib/SQL/Functional/ValuesClause.pm
+    version: '0.3'
+  SQL::Functional::VerbatimClause:
+    file: lib/SQL/Functional/VerbatimClause.pm
+    version: '0.3'
+  SQL::Functional::WhereClause:
+    file: lib/SQL/Functional/WhereClause.pm
+    version: '0.3'
+  SQL::Functional::WrapClause:
+    file: lib/SQL/Functional/WrapClause.pm
+    version: '0.3'
+requires:
+  Moose: '2.1805'
+  namespace::autoclean: '0.28'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/frezik/SQL-Functional/issues
+  homepage: http://www.wumpus-cave.net
+  repository: https://github.com/frezik/SQL-Functional
+version: '0.3'

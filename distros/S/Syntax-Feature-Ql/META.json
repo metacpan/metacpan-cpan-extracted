@@ -1,0 +1,71 @@
+{
+   "abstract" : "Turns a quoted string into a single line",
+   "author" : [
+      "Robert 'phaylon' Sedlacek <rs@474.at>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300003, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Syntax-Feature-Ql",
+   "no_index" : {
+      "directory" : [
+         "t/"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "B::Hooks::EndOfScope" : "0.09",
+            "Devel::Declare" : "0.006007",
+            "Devel::Declare::Context::Simple" : 0,
+            "Sub::Install" : "0.925",
+            "Syntax::Feature::Simple::V2" : 0,
+            "aliased" : 0,
+            "namespace::clean" : 0,
+            "strictures" : "1",
+            "syntax" : "0.003"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "Test::More" : 0,
+            "strict" : 0,
+            "warnings" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Syntax::Feature::Ql" : {
+         "file" : "lib/Syntax/Feature/Ql.pm",
+         "version" : "0.001000"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Syntax-Feature-Ql"
+      },
+      "homepage" : "https://github.com/phaylon/Syntax-Feature-Ql/wiki",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/phaylon/Syntax-Feature-Ql.git",
+         "web" : "http://github.com/phaylon/Syntax-Feature-Ql"
+      }
+   },
+   "version" : "0.001000",
+   "x_authority" : "cpan:PHAYLON"
+}
+

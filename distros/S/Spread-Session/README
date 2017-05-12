@@ -1,0 +1,35 @@
+Spread::Session version 0.1
+===========================
+
+Wrapper module for Spread.pm, providing an object-oriented interface
+to the Spread messaging toolkit.  The existing Spread.pm package is
+a straightforward functional interface to the Spread C API.
+
+A session represents a connection to a Spread messaging daemon.  The
+publish and subscribe functions are for communication via spread groups.
+
+Handling of incoming messages is supported via callbacks; the receive()
+method does not directly return the incoming message parameters to the
+calling code.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Spread
+  Log::Channel
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 Jason W. May.  All rights reserved.
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

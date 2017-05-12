@@ -1,0 +1,18 @@
+Revision history for Syntax-Highlight-Shell
+
+0.04    2005.04.03
+        [TESTS] Corrected t/01api.t
+        [DOC] Added direct RT link.
+
+0.03    2004.10.16
+        [DOC] Small changes in the documentation. 
+        [TESTS] Updated t/10highlight.t
+
+0.02    2004.10.16
+        [BUGFIX] RT#7982 (Allen Day): Example does not work  => see RT#7981
+        [BUGFIX] RT#7983 (Allen Day): <pre></pre> output even when disabled
+        [DOC] Corrected and improved the documentation. 
+
+0.01    2004.10.11
+        First version, released on an unsuspecting world.
+

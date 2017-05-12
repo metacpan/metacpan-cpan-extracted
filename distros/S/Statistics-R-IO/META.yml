@@ -1,0 +1,32 @@
+---
+abstract: 'Perl interface to serialized R data'
+author:
+  - 'Davor Cubranic <cubranic@stat.ubc.ca>'
+build_requires:
+  Test::Fatal: '0'
+  Test::MockObject: '0'
+  Test::MockObject::Extends: '0'
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.143240'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Statistics-R-IO
+requires:
+  Carp: '0'
+  Class::Method::Modifiers: '0'
+  Class::Tiny: '0'
+  Class::Tiny::Antlers: '0.023'
+  Math::Complex: '0'
+  Scalar::Util: '0'
+  namespace::clean: '0.24'
+  perl: '5.010'
+resources:
+  homepage: https://github.com/cubranic/Statistics-R-IO
+  repository: https://github.com/cubranic/Statistics-R-IO.git
+version: '1.0001'

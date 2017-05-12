@@ -1,0 +1,62 @@
+{
+   "abstract" : "Swish3 KinoSearch backend",
+   "author" : [
+      "Peter Karman <karman at cpan dot org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.120530",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "SWISH-Prog-KSx",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "KinoSearch" : "0.313",
+            "Path::Class::File::Lockable" : "0",
+            "Path::Class::File::Stat" : "0.03",
+            "SWISH::3" : "1",
+            "SWISH::Prog" : "0.55",
+            "Search::Query" : "0.17",
+            "Search::Query::Dialect::KSx" : "0.12",
+            "Sort::SQL" : "0.06",
+            "Test::More" : "0",
+            "perl" : "5.008003"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=SWISH-Prog-KSx"
+      },
+      "homepage" : "http://dev.swish-e.org/wiki/perl",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://svn.swish-e.org/perl/SWISH-Prog-KSx/"
+      }
+   },
+   "version" : "0.21"
+}

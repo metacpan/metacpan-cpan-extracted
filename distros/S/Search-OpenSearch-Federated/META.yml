@@ -1,0 +1,40 @@
+---
+abstract: 'aggregate OpenSearch results'
+author:
+  - '- American Public Media Group'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.08'
+license: http://dev.perl.org/licenses/
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Search-OpenSearch-Federated
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Data::Dump: 0
+  Data::Transformer: 0
+  JSON: 0
+  LWP::UserAgent: 0
+  Moo: 0
+  Normalize: 0
+  Parallel::Iterator: 0
+  Scalar::Util: 0
+  Search::Tools: '1.000'
+  Test::More: 0
+  XML::Feed: 0
+  XML::Simple: 0
+  perl: 5.8.3
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Search-OpenSearch-Federated
+  homepage: https://github.com/karpet/search-opensearch-federated-perl
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/karpet/search-opensearch-federated-perl
+version: '0.007'

@@ -1,0 +1,119 @@
+Revision history for Perl extension Circa.
+
+Release 1.18 2003/01/02 12:10:25
+	Working file: demo/circa_admin.PL
+	revision 1.6 - Add check for --id parameter when needed
+	             - Update SYNOPSIS pod part
+
+	Working file: lib/Search/Circa.pm
+	revision 1.18 - Small update to trace method for cluck only 
+	                on level 5 and upper
+
+	Working file: lib/Search/Circa/Indexer.pm
+	revision 1.39 - Rewrite set_host_indexed method, update POD doc
+	revision 1.38 - Update call of look_at to use hash in place of list
+	revision 1.37 - Some minor fixe suite to last update
+
+	Working file: lib/Search/Circa/Parser.pm
+	revision 1.27 - Add url found with meta http-equiv refresh
+	revision 1.26 - Use hash in place of list in look_at
+	              - Call analyse in each text call in place of global 
+                        var TEXT
+	              - Update POD doc
+	revision 1.25 - Some minor fixe suite to last update
+
+	Working file: lib/Search/Circa/Url.pm
+	revision 1.19 - Small update to trace SQL request on level 4, not 3
+
+	Working file: t/15CircaParser.t
+	revision 1.5 - Fix for new interface of look_at
+
+Release 1.17 2002/12/29 13:55:16
+	Working file: demo/circa_admin.PL
+	revision 1.5 - Update POD documentation
+	revision 1.4 - Update usage of options & pod
+	revision 1.3 - Use Pod::Usage
+
+	Working file: demo/circa_search.PL
+	revision 1.6 - Update POD documentation
+	revision 1.5 - Fix for ajust display
+	revision 1.4 - Use Pod::Usage
+
+	Working file: demo/cgi-bin/search.cgi.PL
+	revision 1.5 - Fix for ajust display
+
+	Working file: demo/ecrans/circa.htm
+	revision 1.7 - lifting de la page et happy css
+
+	Working file: lib/Search/Circa.pm
+	revision 1.17 - Another update of pod documentation
+	revision 1.16 - Update POD documentation
+	revision 1.15 - Use disconnect in DESTROY, update trace methode
+
+	Working file: lib/Search/Circa/Indexer.pm
+	revision 1.36 - Another update of pod documentation
+	revision 1.35 - Update POD documentation
+	revision 1.34 - Don't use last_update with parse_new
+	revision 1.33 - Merge addSite / addLocaleSite, use hash for parameters
+	revision 1.32 - Add cleandb method
+
+	Working file: lib/Search/Circa/Parser.pm
+	revision 1.24 - Update POD documentation
+	revision 1.23 - Add undef %inside => dangerous global var ...
+	revision 1.22 - Some optimization after bench
+	revision 1.21 - Ajout phase pour ne pas analyser les mots d'un sommaire
+	revision 1.20 - Use ref in analyse, update stopwords
+
+	Working file: lib/Search/Circa/Search.pm
+	revision 1.21 - Update POD documentation
+	revision 1.20
+	- Ajout phase privilegiant le et (+nb mots*100 au score si tous 
+	 les mots trouves dans le doc)
+	- Affichage que de 20 liens suivants / precedant
+	revision 1.19 - Use template from conf
+
+	Working file: lib/Search/Circa/Url.pm
+	revision 1.18 - Don't load last_update for need_parser
+
+Release 1.14 2002/08/19 10:19:34
+	- Lot of changes !!!!
+	- New installation procedure
+	- New test suite
+	- Update lot of code for error checking
+
+Release 1.11 2001/10/28 14:14:25 2001 alian
+	- Add faq in Circa pod documentation
+	- New parameter in CircaConf: hash %conf used by all scripts
+	- Add Annuaire package and annuaire.pl script to manage directory
+	- Search: Remove warning when print root categorie
+	- Indexer : 
+ 		- Add method move_categorie in Categorie to move categorie 
+		from one to another
+		- Correct bug with url indexing with file://
+		- New interface for admin.pl
+
+Release 1.9 2001/10/14 17:31:22 2001 alian
+	- Ajout d'un mode debug
+	- Suppression trace recherche
+	- Correction routine import / export
+	- Correction fichier de test (test.pl)
+
+Release 1.8 2001/08/29 16:18:08 alian
+	- Manage a new namespace Search::Circa
+
+Release 1.7 2001/08/24 13:37:56 alian
+	- Add Annuaire.pm package for manage directory
+
+Release 1.6  2001/08/05 20:36:10  alian
+	- Remove some bugs
+	- Add verbose message when can't connect
+
+Release 1.5  2001/06/02 08:18:26  alian
+	- First release of Circa as one package
+
+Circa is a merge between Circa::Indexer and Circa::Search.
+Before this release, last release of Circa::Indexer is 1.8 and 
+Circa::Search is 1.5
+
+So I use some common code in Circa.pm, split other code in Url.pm, 
+Categorie.pm and Parser.pm

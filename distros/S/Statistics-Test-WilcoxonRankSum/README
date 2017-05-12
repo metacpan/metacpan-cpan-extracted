@@ -1,0 +1,74 @@
+Statistics-Test-WilcoxonRankSum version 0.0.1
+
+Performs the Wilcoxon (aka Mann-Whitney) rank sum test on two sets of numeric data.
+
+In statistics, the Mann-Whitney U test (also called the
+Mann-Whitney-Wilcoxon (MWW), Wilcoxon rank-sum test, or
+Wilcoxon-Mann-Whitney test) is a non-parametric test for assessing
+whether two samples of observations come from the same
+distribution. The null hypothesis is that the two samples are drawn
+from a single population, and therefore that their probability
+distributions are equal. See the Wikipedia entry
+http://en.wikipedia.org/wiki/Mann-Whitney_U (for eg.) or statistic
+textbooks for further details.
+
+When the sample sizes are small the probability can be computed
+directly. For larger samples usually a normal approximation is used.
+
+Input to the test are two sets (lists) of numbers. The values of both
+lists are ranked from the smallest to the largest, while remembering
+which set the items come from. When the values are the same, they get
+an average rank. For each of the sample sets, we compute the rank
+sum. Under the assumption that the two samples come from the same
+population, the rank sum of the first set should be close to the value
+B<n1 * (n1 + n2 + 1)/2>, where n1 and n2 are the sample sizes. The
+test computes the (exact, resp. approximated) probability of the
+actual rank sum against the expected value (which is the one given
+above). So, when the computed probability is below 0.05, we can
+reject the null hypothesis at level 0.05 and conclude that the two
+samples are significantly different.
+
+The implementation follows the mechanics described above. The exact
+probability is computed for sample sizes less than 20, but this
+threshold can be set with `new'. For larger samples the probability is
+computed by normal approximation.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+
+DEPENDENCIES
+
+uses the following:
+
+ Carp
+ Carp::Assert
+ Class::Std
+ Contextual::Return
+ Set::Partition
+ List::Util qw(sum)
+ Math::BigFloat
+ Math::Counting
+ Statistics::Distributions
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008, Ingrid Falk
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

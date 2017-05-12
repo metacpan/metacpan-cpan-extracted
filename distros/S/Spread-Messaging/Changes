@@ -1,0 +1,13 @@
+Revision history for Perl extension Spread::Messaging.
+
+0.01  Wed Mar  7 14:32:20 2007
+	- original version; created by h2xs 1.23 with options
+		-AXc -n Spread::Messaging
+
+0.02  xx-xxx-xxxx K.Esteb
+      Internal versions
+
+0.03  18-Sep-2008 K.Esteb
+      Combined the various chunks of code into one package.
+      Released to CPAN.
+      

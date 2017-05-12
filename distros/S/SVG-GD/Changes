@@ -1,0 +1,31 @@
+Revision history for Perl extension SVG.
+
+0.15 23 Apr 2008
+	- Cleaned up META.yml
+
+0.14 21 Apr 2008
+	- Added use warnigns to module SVG.
+
+0.13 21 Apr 2008
+	- Improved META.yml
+
+0.12 14 Apr 2008
+	- Improved POD
+	- added no strict refs
+
+0.11 13 Apr 2008
+	- Improved POD
+	- Updated tests
+	- Added license file
+
+0.08 12 Apr 2008
+	- Improved POD
+	- Updated tests
+	- Added license file
+
+0.07 14 Nov 2003
+	- Changed distribution to resemble current structure best practices.
+        - Fixed POD
+
+0.01 Friday 06 November
+	- Added SVG::GD to allow GD users to output SVG for simple GD drawings (RO)

@@ -1,0 +1,49 @@
+NAME
+    Sys::RevoBackup - an rsync-based backup script
+
+METHODS
+  run
+    Run the backups.
+
+  vaults
+    Return a list of all vaults (i.e. backup jobs).
+
+CONFIGURATION
+    Place the configuration inside /etc/revobackup/revobackup.conf
+
+        <Sys>
+            <RevoBackup>
+                bank = /srv/backup/bank
+                <Rotations>
+                        daily = 10
+                        weekly = 4
+                        monthly = 12
+                        yearly = 10
+                </Rotations>
+                <Vaults>
+                        <test001>
+                                source = /home/
+                                description = Uhm
+                                hardlink = 1
+                                nocrossfs = 1
+                        </test001>
+                        <anotherhost>
+                                source = anotherhost:/
+                                description = Backup anotherhost
+                        </anotherhost>
+                </Vaults>
+            </RevoBackup>
+        </Sys>
+
+NAME
+    Sys::RevoBackup - Rsync based backup script
+
+AUTHOR
+    Dominik Schulz <dominik.schulz@gauner.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Dominik Schulz.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

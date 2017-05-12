@@ -1,0 +1,17 @@
+\~$
+.hg
+.gz$
+.bak$
+.diff$
+.patch$
+.orig$
+.lwpcookies
+.releaserc
+.shipit
+_build
+^Build$
+^Makefile$
+t/002_config
+t/recreate
+t/survey_repos
+t/testconfig

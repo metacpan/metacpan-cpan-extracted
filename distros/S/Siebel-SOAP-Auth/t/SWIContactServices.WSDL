@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions  xmlns="http://schemas.xmlsoap.org/wsdl/"  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"  xmlns:xsdLocal1="http://www.siebel.com/xml/SWIContactIO"  targetNamespace="http://siebel.com/asi/V0"  xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"  xmlns:xsd="http://www.w3.org/2001/XMLSchema"  xmlns:tns="http://siebel.com/asi/V0" >
+    <types >
+        <xsd:schema  elementFormDefault="qualified"  attributeFormDefault="unqualified"  xmlns:xsdLocal1="http://www.siebel.com/xml/SWIContactIO"  targetNamespace="http://www.siebel.com/xml/SWIContactIO"  xmlns:xsd="http://www.w3.org/2001/XMLSchema" >
+            <xsd:annotation >
+                <xsd:documentation >Copyright (C) 2001-2004 Siebel Systems, Inc. All rights reserved. Siebel XSD Generation</xsd:documentation >
+            </xsd:annotation >
+            <xsd:element  name="ListOfSwicontactio"  type="xsdLocal1:ListOfSwicontactio" />
+            <xsd:complexType  name="ListOfSwicontactioTopElmt" >
+                <xsd:sequence >
+                    <xsd:element  name="ListOfSwicontactio"  maxOccurs="1"  minOccurs="1"  type="xsdLocal1:ListOfSwicontactio" />
+                </xsd:sequence >
+            </xsd:complexType >
+            <xsd:complexType  name="ListOfSwicontactio" >
+                <xsd:sequence >
+                    <xsd:element  name="Contact"  maxOccurs="unbounded"  minOccurs="0"  type="xsdLocal1:Contact" />
+                </xsd:sequence >
+            </xsd:complexType >
+            <xsd:complexType  name="Contact" >
+                <xsd:sequence >
+                    <xsd:element  name="Id"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="Alias"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="CellularPhone"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="ContactPersonTitle"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="CurrencyCode"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="DateofBirth"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="EmailAddress"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="FaxPhone"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="FirstName"  maxOccurs="1"  minOccurs="1"  type="xsd:string" />
+                    <xsd:element  name="HomePhone"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="IntegrationId"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="JobTitle"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="LastName"  maxOccurs="1"  minOccurs="1"  type="xsd:string" />
+                    <xsd:element  name="Gender"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="MM"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="MaritalStatus"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="MiddleName"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="MotherMaidenName"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="PrimaryOrganizationId"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="PrimaryPersonalAddressId"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="RowId"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="SocialSecurityNumber"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="Status"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="SuppressAllCalls"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="SuppressAllEmails"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="SuppressAllFaxes"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="SuppressAllMailings"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="WorkPhone"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="AIAIntegrationId"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="ConsumerLink"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="ListOfAccount"  maxOccurs="1"  minOccurs="0"  type="xsdLocal1:ListOfAccount" />
+                    <xsd:element  name="ListOfComInvoiceProfile"  maxOccurs="1"  minOccurs="0"  type="xsdLocal1:ListOfComInvoiceProfile" />
+                    <xsd:element  name="ListOfOrganization"  maxOccurs="1"  minOccurs="0"  type="xsdLocal1:ListOfOrganization" />
+                    <xsd:element  name="ListOfPersonalAddress"  maxOccurs="1"  minOccurs="0"  type="xsdLocal1:ListOfPersonalAddress" />
+                    <xsd:element  name="ListOfUcmContactPrivacy"  maxOccurs="1"  minOccurs="0"  type="xsdLocal1:ListOfUcmContactPrivacy" />
+                    <xsd:element  name="ListOfFmLocation"  maxOccurs="1"  minOccurs="0"  type="xsdLocal1:ListOfFmLocation" />
+                </xsd:sequence >
+                <xsd:attribute  name="operation"  type="xsd:string" />
+            </xsd:complexType >
+            <xsd:complexType  name="ListOfAccount" >
+                <xsd:sequence >
+                    <xsd:element  name="Account"  maxOccurs="unbounded"  minOccurs="0"  type="xsdLocal1:Account" />
+                </xsd:sequence >
+            </xsd:complexType >
+            <xsd:complexType  name="Account" >
+                <xsd:sequence >
+                    <xsd:element  name="RowId"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                </xsd:sequence >
+            </xsd:complexType >
+            <xsd:complexType  name="ListOfComInvoiceProfile" >
+                <xsd:sequence >
+                    <xsd:element  name="ComInvoiceProfile"  maxOccurs="unbounded"  minOccurs="0"  type="xsdLocal1:ComInvoiceProfile" />
+                </xsd:sequence >
+            </xsd:complexType >
+            <xsd:complexType  name="ComInvoiceProfile" >
+                <xsd:sequence >
+                    <xsd:element  name="BillingProfileId"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="AccountId"  maxOccurs="1"  minOccurs="1"  type="xsd:string" />
+                </xsd:sequence >
+            </xsd:complexType >
+            <xsd:complexType  name="ListOfOrganization" >
+                <xsd:sequence >
+                    <xsd:element  name="Organization"  maxOccurs="unbounded"  minOccurs="0"  type="xsdLocal1:Organization" />
+                </xsd:sequence >
+            </xsd:complexType >
+            <xsd:complexType  name="Organization" >
+                <xsd:sequence >
+                    <xsd:element  name="Id"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="Name"  maxOccurs="1"  minOccurs="1"  type="xsd:string" />
+                    <xsd:element  name="Organization"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="OrganizationId"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="AIAIntegrationId"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                </xsd:sequence >
+                <xsd:attribute  name="operation"  type="xsd:string" />
+            </xsd:complexType >
+            <xsd:complexType  name="ListOfPersonalAddress" >
+                <xsd:sequence >
+                    <xsd:element  name="PersonalAddress"  maxOccurs="unbounded"  minOccurs="0"  type="xsdLocal1:PersonalAddress" />
+                </xsd:sequence >
+            </xsd:complexType >
+            <xsd:complexType  name="PersonalAddress" >
+                <xsd:sequence >
+                    <xsd:element  name="Id"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="AddressName"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="City"  maxOccurs="1"  minOccurs="1"  type="xsd:string" />
+                    <xsd:element  name="Country"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="County"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="EmailAddress"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="IntegrationId"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="PostalCode"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="Province"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="State"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="StreetAddress"  maxOccurs="1"  minOccurs="1"  type="xsd:string" />
+                    <xsd:element  name="StreetAddress2"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="AIAIntegrationId"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="AddressLink"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="CarrierRouteCode"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="DSFDeliveryType"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="DSFSeasonalIndicator"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="DeliveryPointBarcode"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="LargePrisonFlag"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="NCOALinkNewMoveEffectiveDate"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="NCOALinkNewMoveType"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="OptOutInaccurateRecordFlag"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="PostalAddressFlags"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                </xsd:sequence >
+                <xsd:attribute  name="operation"  type="xsd:string" />
+            </xsd:complexType >
+            <xsd:complexType  name="ListOfUcmContactPrivacy" >
+                <xsd:sequence >
+                    <xsd:element  name="UcmContactPrivacy"  maxOccurs="unbounded"  minOccurs="0"  type="xsdLocal1:UcmContactPrivacy" />
+                </xsd:sequence >
+            </xsd:complexType >
+            <xsd:complexType  name="UcmContactPrivacy" >
+                <xsd:sequence >
+                    <xsd:element  name="Id"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="AffiliateFlag"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="AffiliateMethod"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="AffiliateSource"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="AffiliateSystem"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="ChannelFlag"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="ChannelMethod"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="ChannelSource"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="ChannelSystem"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="ContactId"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="CoverLetterType"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="CoverLetterTypeII"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="IntegrationId"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="LockedFlag"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="NonaffiliateFlag"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="NonaffiliateMethod"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="NonaffiliateSource"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="NonaffiliateSystem"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="NoticeSendFlag"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="NoticeSentDate"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="NoticeSentReason"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="NoticeSentType"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="OFACFlag"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="PENDEndDate"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="PENDStartDate"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="PrivacyParentType"  maxOccurs="1"  minOccurs="1"  type="xsd:string" />
+                    <xsd:element  name="PrivacyStateCode"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="PrivacyUID"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="ReceiveAnnualNoticeFlag"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="ReceiveAnnualNoticeMethod"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="ReceiveAnnualNoticeSource"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="ReceiveAnnualNoticeSystem"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="StatePENDPeriod"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="TelemarketingFlag"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="TelemarketingMethod"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="TelemarketingSource"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="TelemarketingSystem"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="AIAIntegrationId"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="BankruptcyDataFlag"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="DMAEmailFlag"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="DMAMailFlag"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="DMAPhoneFlag"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="DeceasedDataFlag"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="DerogatoryDataFlag"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="FTCDoNotCallFlag"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="OptOutConsAtBusFlag"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="OptOutDeceasedFlag"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="OptOutHighlySensitiveFlag"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="OverallSuppressionFlag"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="SAGPhoneFlag"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="TaxLienJudgmentFlag"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                    <xsd:element  name="WirelessFlag"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                </xsd:sequence >
+                <xsd:attribute  name="operation"  type="xsd:string" />
+            </xsd:complexType >
+            <xsd:complexType  name="ListOfFmLocation" >
+                <xsd:sequence >
+                    <xsd:element  name="FmLocation"  maxOccurs="unbounded"  minOccurs="0"  type="xsdLocal1:FmLocation" />
+                </xsd:sequence >
+            </xsd:complexType >
+            <xsd:complexType  name="FmLocation" >
+                <xsd:sequence >
+                    <xsd:element  name="Id"  maxOccurs="1"  minOccurs="0"  type="xsd:string" />
+                </xsd:sequence >
+            </xsd:complexType >
+        </xsd:schema >
+        <xsd:schema  elementFormDefault="qualified"  attributeFormDefault="unqualified"  targetNamespace="http://siebel.com/asi/V0"  xmlns:xsd="http://www.w3.org/2001/XMLSchema" >
+            <xsd:import  namespace="http://www.siebel.com/xml/SWIContactIO" />
+            <xsd:element  name="SWIContactServicesQueryByExample_Input" >
+                <xsd:complexType >
+                    <xsd:sequence >
+                        <xsd:element  name="UTCCanonical"  minOccurs="0"  type="xsd:string" />
+                        <xsd:element  ref="xsdLocal1:ListOfSwicontactio" />
+                    </xsd:sequence >
+                </xsd:complexType >
+            </xsd:element >
+            <xsd:element  name="SWIContactServicesQueryByExample_Output" >
+                <xsd:complexType >
+                    <xsd:sequence >
+                        <xsd:element  ref="xsdLocal1:ListOfSwicontactio" />
+                    </xsd:sequence >
+                </xsd:complexType >
+            </xsd:element >
+            <xsd:element  name="SWIContactServicesSynchronize_Input" >
+                <xsd:complexType >
+                    <xsd:sequence >
+                        <xsd:element  name="UTCCanonical"  minOccurs="0"  type="xsd:string" />
+                        <xsd:element  ref="xsdLocal1:ListOfSwicontactio" />
+                        <xsd:element  name="StatusObject"  minOccurs="0"  type="xsd:string" />
+                    </xsd:sequence >
+                </xsd:complexType >
+            </xsd:element >
+            <xsd:element  name="SWIContactServicesSynchronize_Output" >
+                <xsd:complexType >
+                    <xsd:sequence >
+                        <xsd:element  ref="xsdLocal1:ListOfSwicontactio" />
+                    </xsd:sequence >
+                </xsd:complexType >
+            </xsd:element >
+            <xsd:element  name="SWIContactServicesInsertOrUpdate_Input" >
+                <xsd:complexType >
+                    <xsd:sequence >
+                        <xsd:element  name="UTCCanonical"  minOccurs="0"  type="xsd:string" />
+                        <xsd:element  ref="xsdLocal1:ListOfSwicontactio" />
+                        <xsd:element  name="StatusObject"  minOccurs="0"  type="xsd:string" />
+                    </xsd:sequence >
+                </xsd:complexType >
+            </xsd:element >
+            <xsd:element  name="SWIContactServicesInsertOrUpdate_Output" >
+                <xsd:complexType >
+                    <xsd:sequence >
+                        <xsd:element  ref="xsdLocal1:ListOfSwicontactio" />
+                    </xsd:sequence >
+                </xsd:complexType >
+            </xsd:element >
+        </xsd:schema >
+    </types >
+    <message  name="SWIContactServicesQueryByExample_Input" >
+        <part  name="SWIContactServicesQueryByExample_Input"  element="tns:SWIContactServicesQueryByExample_Input" />
+    </message >
+    <message  name="SWIContactServicesQueryByExample_Output" >
+        <part  name="SWIContactServicesQueryByExample_Output"  element="tns:SWIContactServicesQueryByExample_Output" />
+    </message >
+    <message  name="SWIContactServicesSynchronize_Input" >
+        <part  name="SWIContactServicesSynchronize_Input"  element="tns:SWIContactServicesSynchronize_Input" />
+    </message >
+    <message  name="SWIContactServicesSynchronize_Output" >
+        <part  name="SWIContactServicesSynchronize_Output"  element="tns:SWIContactServicesSynchronize_Output" />
+    </message >
+    <message  name="SWIContactServicesInsertOrUpdate_Input" >
+        <part  name="SWIContactServicesInsertOrUpdate_Input"  element="tns:SWIContactServicesInsertOrUpdate_Input" />
+    </message >
+    <message  name="SWIContactServicesInsertOrUpdate_Output" >
+        <part  name="SWIContactServicesInsertOrUpdate_Output"  element="tns:SWIContactServicesInsertOrUpdate_Output" />
+    </message >
+    <portType  name="SWI_spcContact_spcService" >
+        <operation  name="SWIContactServicesQueryByExample" >
+            <input  message="tns:SWIContactServicesQueryByExample_Input" />
+            <output  message="tns:SWIContactServicesQueryByExample_Output" />
+        </operation >
+        <operation  name="SWIContactServicesSynchronize" >
+            <input  message="tns:SWIContactServicesSynchronize_Input" />
+            <output  message="tns:SWIContactServicesSynchronize_Output" />
+        </operation >
+        <operation  name="SWIContactServicesInsertOrUpdate" >
+            <input  message="tns:SWIContactServicesInsertOrUpdate_Input" />
+            <output  message="tns:SWIContactServicesInsertOrUpdate_Output" />
+        </operation >
+    </portType >
+    <binding  name="SWI_spcContact_spcService"  type="tns:SWI_spcContact_spcService" >
+        <soap:binding  transport="http://schemas.xmlsoap.org/soap/http"  style="document" />
+        <operation  name="SWIContactServicesQueryByExample" >
+            <soap:operation  soapAction="document/http://siebel.com/asi/V0:SWIContactServicesQueryByExample" />
+            <input >
+                <soap:body  use="literal" />
+            </input >
+            <output >
+                <soap:body  use="literal" />
+            </output >
+        </operation >
+        <operation  name="SWIContactServicesSynchronize" >
+            <soap:operation  soapAction="document/http://siebel.com/asi/V0:SWIContactServicesSynchronize" />
+            <input >
+                <soap:body  use="literal" />
+            </input >
+            <output >
+                <soap:body  use="literal" />
+            </output >
+        </operation >
+        <operation  name="SWIContactServicesInsertOrUpdate" >
+            <soap:operation  soapAction="document/http://siebel.com/asi/V0:SWIContactServicesInsertOrUpdate" />
+            <input >
+                <soap:body  use="literal" />
+            </input >
+            <output >
+                <soap:body  use="literal" />
+            </output >
+        </operation >
+    </binding >
+    <service  name="SWIContactServices" >
+        <port  binding="tns:SWI_spcContact_spcService"  name="SWI_spcContact_spcService" >
+            <soap:address  location="https://newvegas.foobar.org/eai_enu/start.swe?SWEExtSource=SecureWebService&amp;SWEExtCmd=Execute&amp;WSSOAP=1" />
+        </port >
+    </service >
+</definitions >

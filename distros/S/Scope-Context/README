@@ -1,0 +1,361 @@
+NAME
+    Scope::Context - Object-oriented interface for inspecting or acting upon
+    upper scope frames.
+
+VERSION
+    Version 0.03
+
+SYNOPSIS
+        use Scope::Context;
+
+        for (1 .. 5) {
+         sub {
+          eval {
+           # Create Scope::Context objects for different upper frames :
+           my ($block, $eval, $sub, $loop);
+           {
+            $block = Scope::Context->new;
+            $eval  = $block->eval;   # == $block->up
+            $sub   = $block->sub;    # == $block->up(2)
+            $loop  = $sub->up;       # == $block->up(3)
+           }
+
+           eval {
+            # This throws an exception, since $block has expired :
+            $block->localize('$x' => 1);
+           };
+
+           # This will print "hello" when the current eval block ends :
+           $eval->reap(sub { print "hello\n" });
+
+           # Ignore warnings just for the loop body :
+           $loop->localize_elem('%SIG', __WARN__ => sub { });
+
+           # Execute the callback as if it ran in place of the sub :
+           my @values = $sub->uplevel(sub {
+            return @_, 2;
+           }, 1);
+           # @values now contains (1, 2).
+
+           # Immediately return (1, 2, 3) from the sub, bypassing the eval :
+           $sub->unwind(@values, 3);
+
+           # Not reached.
+          }
+
+          # Not reached.
+         }->();
+
+         # unwind() returns here. "hello\n" was printed, and now warnings are
+         # ignored.
+        }
+
+        # $SIG{__WARN__} has been restored to its original value, warnings are no
+        # longer ignored.
+
+DESCRIPTION
+    This class provides an object-oriented interface to Scope::Upper's
+    functionalities. A Scope::Context object represents a currently active
+    dynamic scope (or context), and encapsulates the corresponding
+    Scope::Upper-compatible context identifier. All of Scope::Upper's
+    functions are then made available as methods. This gives you a prettier
+    and safer interface when you are not reaching for extreme performance,
+    but rest assured that the overhead of this module is minimal anyway.
+
+    The Scope::Context methods actually do more than their subroutine
+    counterparts from Scope::Upper : before each call, the target context
+    will be checked to ensure it is still active (which means that it is
+    still present in the current call stack), and an exception will be
+    thrown if you attempt to act on a context that has already expired. This
+    means that :
+
+        my $cxt;
+        {
+         $cxt = Scope::Context->new;
+        }
+        $cxt->reap(sub { print "hello\n });
+
+    will croak when "reap" is called.
+
+METHODS
+  "new"
+        my $cxt = Scope::Context->new;
+        my $cxt = Scope::Context->new($scope_upper_cxt);
+
+    Creates a new immutable Scope::Context object from the
+    Scope::Upper-comptabile context identifier $context. If omitted,
+    $context defaults to the current context.
+
+  "here"
+    A synonym for "new".
+
+  "cxt"
+        my $scope_upper_cxt = $cxt->cxt;
+
+    Read-only accessor to the Scope::Upper context identifier associated
+    with the invocant.
+
+  "uid"
+        my $uid = $cxt->uid;
+
+    Read-only accessor to the Scope::Upper unique identifier representing
+    the Scope::Upper context associated with the invocant.
+
+    This class also overloads the "==" operator, which will return true if
+    and only if its two operands are Scope::Context objects that have the
+    same UID.
+
+  "is_valid"
+        my $is_valid = $cxt->is_valid;
+
+    Returns true if and only if the invocant is still valid (that is, it
+    designates a scope that is higher on the call stack than the current
+    scope).
+
+  "assert_valid"
+        $cxt->assert_valid;
+
+    Throws an exception if the invocant has expired and is no longer valid.
+    Returns true otherwise.
+
+  "package"
+        $cxt->package;
+
+    Returns the namespace in use when the scope denoted by the invocant
+    begins.
+
+  "file"
+        $cxt->file;
+
+    Returns the name of the file where the scope denoted by the invocant
+    belongs to.
+
+  "line"
+        $cxt->line;
+
+    Returns the line number where the scope denoted by the invocant begins.
+
+  "sub_name"
+        $cxt->sub_name;
+
+    Returns the name of the subroutine called for this context, or "undef"
+    if this is not a subroutine context.
+
+  "sub_has_args"
+        $cxt->sub_has_args;
+
+    Returns a boolean indicating whether a new instance of @_ was set up for
+    this context, or "undef" if this is not a subroutine context.
+
+  "gimme"
+        $cxt->gimme;
+
+    Returns the context (in the sense of "perlfunc/wantarray" : "undef" for
+    void context, '' for scalar context, and true for list context) in which
+    the scope denoted by the invocant is executed.
+
+  "eval_text"
+        $cxt->eval_text;
+
+    Returns the contents of the string being compiled for this context, or
+    "undef" if this is not an eval context.
+
+  "is_require"
+        $cxt->is_require;
+
+    Returns a boolean indicating whether this eval context was created by
+    "require", or "undef" if this is not an eval context.
+
+  "hints_bits"
+        $cxt->hints_bits;
+
+    Returns the value of the lexical hints bit mask (available as $^H at
+    compile time) in use when the scope denoted by the invocant begins.
+
+  "warnings_bits"
+        $cxt->warnings_bits;
+
+    Returns the bit string representing the warnings (available as
+    "${^WARNING_BITS}" at compile time) in use when the scope denoted by the
+    invocant begins.
+
+  "hints_hash"
+        $cxt->hints_hash;
+
+    Returns a reference to the lexical hints hash (available as "%^H" at
+    compile time) in use when the scope denoted by the invocant begins. This
+    method is available only on perl 5.10 and greater.
+
+  "want"
+        my $want = $cxt->want;
+
+    Returns the Perl context (in the sense of "perlfunc/wantarray") in which
+    is executed the closest subroutine, eval or format enclosing the scope
+    pointed by the invocant.
+
+  "up"
+        my $up_cxt = $cxt->up;
+        my $up_cxt = $cxt->up($frames);
+        my $up_cxt = Scope::Context->up;
+
+    Returns a new Scope::Context object pointing to the $frames-th upper
+    scope above the scope pointed by the invocant.
+
+    This method can also be invoked as a class method, in which case it is
+    equivalent to calling "up" on a Scope::Context object representing the
+    current context.
+
+    If omitted, $frames defaults to 1.
+
+        sub {
+         {
+          {
+           my $up = Scope::Context->new->up(2); # == Scope::Context->up(2)
+           # $up points two contextes above this one, which is the sub.
+          }
+         }
+        }
+
+  "sub"
+        my $sub_cxt = $cxt->sub;
+        my $sub_cxt = $cxt->sub($frames);
+        my $sub_cxt = Scope::Context->sub;
+
+    Returns a new Scope::Context object pointing to the "$frames + 1"-th
+    subroutine scope above the scope pointed by the invocant.
+
+    This method can also be invoked as a class method, in which case it is
+    equivalent to calling "sub" on a Scope::Context object for the current
+    context.
+
+    If omitted, $frames defaults to 0, which results in the closest sub
+    enclosing the scope pointed by the invocant.
+
+        outer();
+
+        sub outer {
+         inner();
+        }
+
+        sub inner {
+         my $sub = Scope::Context->new->sub(1); # == Scope::Context->sub(1)
+         # $sub points to the context for the outer() sub.
+        }
+
+  "eval"
+        my $eval_cxt = $cxt->eval;
+        my $eval_cxt = $cxt->eval($frames);
+        my $eval_cxt = Scope::Context->eval;
+
+    Returns a new Scope::Context object pointing to the "$frames + 1"-th
+    "eval" scope above the scope pointed by the invocant.
+
+    This method can also be invoked as a class method, in which case it is
+    equivalent to calling "eval" on a Scope::Context object for the current
+    context.
+
+    If omitted, $frames defaults to 0, which results in the closest eval
+    enclosing the scope pointed by the invocant.
+
+        eval {
+         sub {
+          my $eval = Scope::Context->new->eval; # == Scope::Context->eval
+          # $eval points to the eval context.
+         }->()
+        }
+
+  "reap"
+        $cxt->reap($code);
+
+    Executes $code when the scope pointed by the invocant ends.
+
+    See "reap" in Scope::Upper for details.
+
+  "localize"
+        $cxt->localize($what, $value);
+
+    Localizes the variable described by $what to the value $value when the
+    control flow returns to the scope pointed by the invocant, until said
+    scope ends.
+
+    See "localize" in Scope::Upper for details.
+
+  "localize_elem"
+        $cxt->localize_elem($what, $key, $value);
+
+    Localizes the element $key of the variable $what to the value $value
+    when the control flow returns to the scope pointed by the invocant,
+    until said scope ends.
+
+    See "localize_elem" in Scope::Upper for details.
+
+  "localize_delete"
+        $cxt->localize_delete($what, $key);
+
+    Deletes the element $key from the variable $what when the control flow
+    returns to the scope pointed by the invocant, and restores it to its
+    original value when said scope ends.
+
+    See "localize_delete" in Scope::Upper for details.
+
+  "unwind"
+        $cxt->unwind(@values);
+
+    Immediately returns the scalars listed in @values from the closest
+    subroutine enclosing the scope pointed by the invocant.
+
+    See "unwind" in Scope::Upper for details.
+
+  "yield"
+        $cxt->yield(@values);
+
+    Immediately returns the scalars listed in @values from the scope pointed
+    by the invocant, whatever it may be (except a substitution eval
+    context).
+
+    See "yield" in Scope::Upper for details.
+
+  "uplevel"
+        my @ret = $cxt->uplevel($code, @args);
+
+    Executes the code reference $code with arguments @args in the same
+    setting as the closest subroutine enclosing the scope pointed by the
+    invocant, then returns to the current scope the values returned by
+    $code.
+
+    See "uplevel" in Scope::Upper for details.
+
+DEPENDENCIES
+    Carp (core module since perl 5), overload (since 5.2.0), Scalar::Util
+    (since 5.7.3).
+
+    Scope::Upper 0.21.
+
+SEE ALSO
+    Scope::Upper.
+
+    Continuation::Escape.
+
+AUTHOR
+    Vincent Pit, "<perl at profvince.com>", <http://www.profvince.com>.
+
+    You can contact me by mail or on "irc.perl.org" (vincent).
+
+BUGS
+    Please report any bugs or feature requests to "bug-scope-context at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Scope-Context>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Scope::Context
+
+COPYRIGHT & LICENSE
+    Copyright 2011,2012,2013,2015 Vincent Pit, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,19 @@
+Syntax-Highlight-RDF
+====================
+
+Created:      2013-03-21
+Home page:    <https://metacpan.org/release/Syntax-Highlight-RDF>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Syntax-Highlight-RDF>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.003	2014-09-11
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.002	2013-03-23
+
+ [ Bug Fixes ]
+ - Fix fatal UTF-8-related warning on certain Perls.
+
+0.001	2013-03-22	Initial release

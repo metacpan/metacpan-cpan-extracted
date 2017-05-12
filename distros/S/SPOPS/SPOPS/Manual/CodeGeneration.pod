@@ -1,0 +1,292 @@
+=head1 NAME
+
+SPOPS::Manual::CodeGeneration - How SPOPS builds classes
+
+=head1 SYNOPSIS
+
+This part of the SPOPS manual describes how SPOPS generates the class
+code and how you can customize the process.
+
+=head1 DESCRIPTION
+
+So with configuration, we would create a number of slots into which
+classes could install behaviors. The slots are:
+
+=over 4
+
+=item B<manipulate_configuration>
+
+=item B<id_method>
+
+=item B<read_code>
+
+=item B<fetch_by>
+
+=item B<has_a (relationship)>
+
+=item B<links_to (relationship)>
+
+=item B<add_rule>
+
+=back
+
+They're described in more detail below.
+
+A class in the hierarchy for an object (or in the 'rules_from' list)
+could install a behavior in none or all of the slots. So for instance,
+C<SPOPS::Configure::DBI> has been replaced by
+L<SPOPS::ClassFactory::DBI|SPOPS::ClassFactory::DBI>, which reads the
+configuration for L<SPOPS::DBI|SPOPS::DBI>-derived objects and
+installs DBI-specific C<links_to> behaviors.
+
+Multiple behaviors can be installed in each slot, with the idea that
+order shouldn't matter. Since we do a depth-first inheritance walk we
+should be ok -- more specific classes will execute their behaviors
+before the more general ones.
+
+The processing of each slot uses a form of the 'Chain of
+Responsibility' pattern -- a behavior can decide to perform or not
+perform any action and continue (C<OK>), to perform an action, to
+declare the slot finished (C<DONE>), to stop the process entirely
+(C<ERROR>) or that the behavior has made changes which necessitates
+refreshing the behavior listing (C<RESTART>).
+
+As a simple example of a behavior, say we wanted to ensure that all of
+our objects are using a particular L<SPOPS::DBI|SPOPS::DBI> subclass:
+
+  1: package My::UseMyDBIClass; # -*-perl-*-
+  2: 
+  3: use strict;
+  4: 
+  5: my $USE_CLASS = 'SPOPS::DBI::Pg';
+  6: 
+  7: sub behavior_factory {
+  8:   my ( $class ) = @_;
+  9:   return { manipulate_configuration => \&check_spops_subclass };
+ 10: }
+ 11: 
+ 12: sub check_spops_subclass {
+ 13:     my ( $config ) = @_;
+ 14:     foreach ( @{ $config->{isa} } ) {
+ 15:         s/^SPOPS::DBI::.*$/$USE_CLASS/;
+ 16:     }
+ 17:     return ( SPOPS::ClassFactory::RESTART, undef );
+ 18: }
+
+We would just put this method in a common parent to all our objects
+and install the behavior in the 'manipulate_configuration' slot. When
+the class is configured the rule would be executed and we would never
+have to worry about our objects using the wrong DBI class again. (This
+is common in OpenInteract when you install new packages and forget to
+run 'oi_manage change_spops_driver'.)
+
+And that's it! The system enables very focused and flexible
+behaviors. For instance, we could create one C<links_to> behavior for
+DBI to handle the current configuration style and another to handle
+the proposed (and more robust) C<SPOPS::Inheritable> configuration
+style. The first could step through the 'links_to' configuration items
+and process only those it can, while the second could do the same. And
+neither has to know about the other.
+
+We could also do wacky stuff, like install a 'read_code' behavior to
+use LWP to grab a module and checksums off a code repository
+somewhere. If the checksum and code match up, we can bring the code
+into the SPOPS class.
+
+=head1 SLOTS
+
+We use the term 'slots' to refer to the different steps we walk
+through to create, configure and auto-generate methods for an SPOPS
+class. Each 'slot' can have multiple behaviors attached to it.
+
+=head2 Finding Slot Behaviors
+
+Slot behaviors can come from any of the classes in the @ISA for the
+generated class, or from any of the classes listed in the 'rules_from'
+configuration key.
+
+The differences between the 'isa' and the 'rules_from' class lists
+are:
+
+=over 4
+
+=item *
+
+The classes listed in 'rules_from' are used by themselves. The 'isa'
+classes we use L<Class::ISA|Class::ISA> to find the inheritance tree
+of our generated SPOPS class so we can look into each of them for
+relevant behaviors.
+
+=item *
+
+The 'rules_from' classes are not used by anything once the class has
+been generated, while 'isa' classes are used in the normal Perl manner
+for inheritance.
+
+=back
+
+=head2 Slot Listing
+
+Here are the current slots and a description of each. Note that they
+might change -- in particular, the 'links_to' and 'has_a' slots might
+be merged into a single 'relationship' slot.
+
+=over 4
+
+=item *
+
+B<manipulate_configuration>: Modify the configuration as
+necessary. SPOPS comes with one method to transform arrayrefs (for
+easy typing) into hashref (for easy lookup). Other options might be to
+set application-specific information accessible from all your objects,
+futz around with the @ISA, etc.
+
+=item *
+
+B<id_method>: Very focused: generate an C<id( [ $new_id ] )>
+method. SPOPS uses these to ensure it can get the crucial information
+from every object -- class and ID -- without having to know what the
+ID field is.
+
+SPOPS comes with a default method for this that will probably work
+fine for you -- see
+L<SPOPS::ClassFactory::DefaultBehavior|SPOPS::ClassFactory::DefaultBehavior>.
+
+=item *
+
+B<read_code>: Reads in code from another class to the class being
+created/configured. SPOPS comes with a method to read the value(s)
+from the configuration key 'code_class', find them from @INC and read
+them in.
+
+But you can perform any action you need here -- you could even issue a
+SOAP request to read Perl code (along with checksums) off the net,
+check the code then read it in.
+
+=item *
+
+B<fetch_by>: Process the 'fetch_by' configuration key. SPOPS comes
+with autogenerated methods to do this, but you can modify it and
+implement your own.
+
+=item *
+
+B<has_a>: Process the 'has_a' configuration key. Usually this is
+implementation-specific and involves auto-generating methods. SPOPS
+comes with a default for this, but an implementation class can elect
+to not use it by returning the 'DONE' constant.
+
+=item *
+
+B<links_to>: Process the 'links_to' configuration key. Usually this is
+implementation-specific and involves auto-generating methods.
+
+=item *
+
+B<add_rule>: You will probably never need to create a behavior here:
+SPOPS has one that performs the same duties as
+C<SPOPS::Configure::Ruleset> used to -- it scans the @ISA of a class,
+finds the ruleset generation methods from all the parents and installs
+these coderefs to the class.
+
+=back
+
+=head1 BEHAVIOR GENERATOR
+
+The behavior generator is called 'behavior_factory' (the name can be
+imported in the constant 'FACTORY_METHOD') and it takes a single
+argument, the name of the class for which the behaviors are being
+generated. It should return a hashref with the slot names as keys. A
+value should either be a coderef (for a single behavior) or an
+arrayref of coderefs (for multiple behaviors).
+
+Here is an example, directly from from C<SPOPS>:
+
+ sub behavior_factory {
+     my ( $class ) = @_;
+     $log->is_info &&
+         $log->info( "Installing SPOPS default behaviors for ($class)" );
+     return { manipulate_configuration =>
+                    \&SPOPS::ClassFactory::DefaultBehavior::conf_modify_config,
+             read_code                =>
+                    \&SPOPS::ClassFactory::DefaultBehavior::conf_read_code,
+             id_method                =>
+                    \&SPOPS::ClassFactory::DefaultBehavior::conf_id_method,
+             has_a                    =>
+                    \&SPOPS::ClassFactory::DefaultBehavior::conf_relate_hasa,
+             fetch_by                 =>
+                    \&SPOPS::ClassFactory::DefaultBehavior::conf_relate_fetchby,
+             add_rule                 =>
+                    \&SPOPS::ClassFactory::DefaultBehavior::conf_add_rules, };
+ }
+
+So with this we're installing one behavior each into the slots
+'manipulate_configuration', 'read_code', 'id_method', 'has_a',
+'fetch_by' and 'add_rule'. Here's an example that installs multiple
+behaviors in a single slot:
+
+ sub behavior_factory {
+     my ( $class ) = @_;
+     return { links_to => [ \&simple_linking, \&complex_linking ] };
+ }
+
+ sub simple_linking { ... }
+ sub complex_linking { ... }
+
+=head1 BEHAVIOR DESCRIPTION
+
+Behaviors can be simple or complicated, depending on what you need
+them to do. The simple behavior we showed above does a single, simple
+task and then exits. This is probably the best strategy for most
+behavior uses -- focus each one one a single task so you it's easy to
+follow and debug. The fact that we run the behaviors only once, when
+the class is being generated, means that you don't have to worry so
+much about efficiency.
+
+Every behavior returns a two-item list. The first is the status of the
+behavior, the second is an optional message.
+
+The potential status return values are all constants that can be
+imported from L<SPOPS::ClassFactory|SPOPS::ClassFactory>:
+
+=over 4
+
+=item *
+
+B<OK>: The behavior executed without errors and that additional
+behaviors can execute.
+
+=item *
+
+B<DONE>: The behavior executed without errors and that additional
+behaviors in this slot should not execute.
+
+=item *
+
+B<RESTART>: The behavior executed without errors but modified some
+aspect of the class or its configuration such that it is necessary to
+revisit the behavior map and see if there are any additional ones. The
+most common cause of this is adding one or more classes to 'isa' or
+'rules_from'.
+
+=item *
+
+B<NOTIFY>: The behavior executed with errors, but the errors will be
+written (via C<warn>) to STDERR rather than halting the process.
+
+=item *
+
+B<ERROR>: The behavior executed with errors, and that the entire
+process should immediately stop.
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright (c) 2001-2004 Chris Winters. All rights reserved.
+
+See L<SPOPS::Manual|SPOPS::Manual> for license.
+
+=head1 AUTHORS
+
+Chris Winters E<lt>chris@cwinters.comE<gt>

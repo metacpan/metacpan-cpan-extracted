@@ -1,0 +1,1199 @@
+[Changes for 1.08 - 30 Jun 2006]
+
+* Fix a bug that stalled schedule entries confusing merge to schedule
+  entries for replace rather than add, which then makes revert fail.
+
+* report_copath now reports '.' for the anchor.
+
+* Don't die in svk mkdir when make_path returns undef, which means the
+ directory is already there.
+
+* Fix warnings about "Use of uninitialized value in array element"
+  when doing various "svk help command".
+
+* Dependency fixes.
+
+[Changes for 1.07 - 25 Feb 2006]
+
+* Make the noisy prototype mismatch warning caused by autouse and Perl
+  5.8.8 go away. [Jim Meyering]
+
+* Disallow control character in copath.
+
+* Fix a infinite loop triggered by "svk revert //path".
+
+* Fix failed patch generation where a directory is added with properties.
+
+[Changes for 1.06 - 10 Dec 2005]
+
+* Workaround File::Spec 3.14 API change, which is causing svk's use of
+  svn libraries to fail its assertion.
+
+* Fix a bug that 'svk update' can update meta data of checkout but not
+  the file contents in some cases.  This caused the checkout to
+  contain changes reverting what is in the repository.
+
+* Fix a bug mirror state can be inconsistent when 'svk cp' use with
+  non-canonical paths.
+
+* Typo fixes in error message. [mb]
+
+[Changes for 1.05 - 6 Oct 2005]
+
+* Make use of the new svn API (fs_closest_copy) when available. This
+  boosts performance for smerge, switch and info.
+
+* Performance boost by re-implementation of SVN::Mirror::has_local.
+
+* Fixed the case that "svk up" doesn't do the right thing when running
+  for a subdirectory of a checkout that has gone in the target
+  revision.
+
+* Fix merge base lookup so merged-from takes precedence as base when
+  doing push.
+
+* Documentation update on "mv -p", switches "--parent", "--quiet" etc.
+
+* Stream is properly closed to avoid svn-trunk segfault.
+
+* Now tells the user if a file/directory creation is impossible by
+  reverting.
+
+* "svk sync -a" now aborts all sync if one repository sync is aborted.
+
+* Fixes in path encodings and other i18n related issues.
+
+* Failsafe for the case with node_created_rev on '/'.
+
+* A command line completion script is added into contrib/.
+
+* A script available in contrib/svkopendiff enables svk diff to use
+  FileMerge to display output.
+
+[Changes for 1.04 - 24 Aug 2005]
+
+* Fix various locking bugs exposed by the concurrency fix introduced
+  in 1.03.  This includes "svk mv A B" not scheduling A for deletion,
+  "svk cp -p" not scheduling newly created parent directories for
+  addition.
+
+* Use tab characters as the separators between path, depot path and
+  label in diff output.  This behaviour conforms to the output of
+  Subversion and GNU diff.
+
+[Changes for 1.03 - 18 Aug 2005]
+
+* "svk status" now accepts a --verbose (-v) switch which functions
+  just like the svn clients switch of the same name.
+
+* "svk log" and "svk revert" now accept a --quiet (-q) switch.
+
+* "svk diff" now accepts a --non-recursive (-N) switch.
+
+* Support --quiet in svk propdel and svk propset.
+
+* Fix message when doing svk propdel --revprop.
+
+* Allow svk update --sync --check-only to sync and then check what
+  would be updated in your working copy.
+
+* Fix a bug that that status and revert won't work on explicit
+  command line targets that are replaced with history.
+
+* Fix path encoding for replaced item in "svk add".
+
+* Fix a bug that svk cp A B would die if A has properties.
+
+* Fix a bug in cb_rev for mirrored path, that was using wrong base
+  revision for delete_entry when a node was replaced with history.
+
+* Fix a bug in merge editor for replaced items being deleted but not
+  replaced.
+
+* Fix merging replaced item to checkout.
+
+* Fix a bug when a file is obstructed by a stalled directory, it would
+  cause checkout_delta to cache its signature, and thus not reported
+  as obstructed for the second time.
+
+* Reduce memory leak in nearest_copy().
+
+* Fix a regression that svk sm -l (without -m or --template) should
+  prompt for log message.
+
+* Be more carefull handling failures when writing out statefile.
+
+* Fix an issue with concurrent svk storing their own state.
+
+[Changes for 1.02 - 2 Aug 2005]
+
+* "svk mirror" now supports moving mirror points with "svk mv".
+
+* "svk co" now resumes checkouts from where it left off if it gets
+  interrupted mid-way.
+
+* "svk commit", "svk smerge" and other commands that accept commit
+  messages now accept a --template option, to provide a customised file
+  for commit messages.
+
+* SVK's documentation is now up to date with the "svk reference"
+  section of the work-in-progress SVK book.
+
+* "Silent errors" from output of subversion repository hooks are
+  now reported.
+
+* "svk status" now supports some additional options found in "svn
+  status": --non-recursive to only list changes in the current
+  directory, and --no-ignore to display files which are normally ignored
+  due to a 'svn:ignore' property or rule.
+
+* "svk describe" accepts the "r12345" revision number form, for ease
+  of use.
+
+* New -q (quiet) option to svk copy.
+
+* The -q (quiet) option to "svk status" now also hides files missing
+  in working copy (previously this just suppressed output for unknown
+  files in the working copy).
+
+* Confusing messages generated by "svk update" that really applied
+  only to "svk merge" are no longer printed by "svk update".
+
+* Make "svk revert" work in a few cases where it didn't before, with
+  moved files in the working copy.
+
+* "svk ci --import" now replace symlinks with files properly.
+
+* "svk mv" is now more careful about making sure that the target path
+  exists.
+
+* "svk rm" across multiple depot paths could cause svk to hang.
+
+* "svk propset" now works directly on mirrored paths.
+
+* Various commands that would silently ignore excess arguments now
+  raise errors.
+
+* Specifying a revision for "svk propset" and "svk propedit" commands
+  is now correctly disallowed on checkout paths.
+
+* Using "svk smerge" without all of your mirrored paths up to date
+  would try to merge too much if you merged components from those
+  out-of-date paths.  This has been fixed.
+
+* Various cosmetic fixes to make svk output more precise, for
+  scriptability purposes.  This was mostly centred around removal of
+  spurious blank lines.
+
+* A memory leak fix with "svk smerge".
+
+* UTF-8 workarounds for buggy versions of Encode.pm.
+
+[Changes for 1.01 - 11 Jul 2005]
+
+* Fix a memory leak when constructing copy cache for revisions
+  involving many changed paths.
+
+* Fix a memory leak when updating directories containing lots of files.
+
+* Fix memory leaks when having mixed-revision checkout with many
+  entries.
+
+* Fix a segfault in patch creation and viewing triggered by
+  copy+modification files.
+
+* Fix a bug in svk diff: diffing deeply added directory triggers
+  "checkout_delta called with non-dir".
+
+* Fix a bug that when copy destination's basepath does not exist, svk
+  prompts for url initialisation.
+
+* Partially fix a bug that deleting a path containing mirrors will
+  result in inconsistent mirror state.
+
+* Fix svk ls -f to list the path, instead of depot root path. [Autrijus]
+
+* Fix a bug that push (smerge -I) will use wrongly encoded commit
+  message if you are not using utf8. [Jorge Daza <jorge@drqueue.org>]
+
+* Fix a crash bug when switch to a branch that has new files with keywords.
+
+* When checkout to existing directory, if the directory is from the
+  very same depotpath, do an update instead of dying.  This resembles
+  the svn and cvs behaviour.
+
+* Fix patch list/view/dump/delete for those can't be applied. [Jody Belka]
+
+* Fix svk checkout --detach to detach a checkout even if the directory's
+  parent no longer exists. [Jody Belka]
+
+* svk checkout --list now shows removed checkout with '?', and
+  supports --purge.  [David Glasser]
+
+* Fix a bug that a file is not properly handled when a symlink is
+  overwritten by file, without proper replace.
+
+* Fix a bug that patch --apply thinks the commit fails and save the
+  commit message to a temp file.
+
+* svk blame now takes --remoterev to show remote revision.
+
+* svk sync -a now does the right thing on given depotpath. [Jody Belka]
+
+* make svk update, ls, and cat use new revspec parser so they support
+  remote-revision form and friends. [gugod]
+
+* Pull as a lump under all conditions, even depot path. [Norman Nunley]
+
+* Misc documentation and tests fixes and improvements. [jesse,knewt,matthewd,Tom Sibley]
+
+* Fix the autouse hack so Devel::DProf works again.
+
+[Changes for 1.00 - 9 May 2005]
+
+* Fix backspace in prompt function for certain terminals.
+  [Martijn van Beers <martijn@eekeek.org>]
+
+* Fix the case that when checkout creates parent directory for you,
+  the state wasn't properly flushed due to inappropriate lock.
+  [matthewd]
+
+* Document --file for everything that supports --message. [matthewd]
+
+* Support 'vim -d' and 'gvim -df' for conflict resolution.
+  [Derrick Daugherty <derrick@blinky-lights.org>]
+
+[Changes for 0.994 - 29 Apr 2005]
+
+* Fix the warning "Revision too large" when doing svk log -l1 on a
+  checkout which is not HEAD.
+
+* Fix an edge case in post-commit checkout optimization on deleted
+  entry.  This was causing stacktrace and not updating the checkout
+  metadata accordingly.
+
+* Only consider a g-merge to be a change when the merge source and destination
+  paths are the same.  This eliminates empty revisions created by
+  push. [matthewd]
+
+* Improve the "Depot path" information, display the full path inside
+  the repository instead of the checkout-point. [gugod]
+
+* make sure $ENV{SVKPAGER} refers to an executable. [gugod]
+
+* Fix svk diff on 0-length file on checkout.
+
+[Changes for 0.993 - 25 Apr 2005]
+
+* Save commit message from editor in a tmpfile if commit fails. [#8336]
+
+* Fix tests for bdb backend.
+
+* svk import -C should not actually create import path nor turn path
+  into copath. [#8719]
+
+* Fix a bug that a dummy switch won't update revision metadata, which
+  might be non-exist for the new branch.
+
+* Ignore existing locks when trying to unlock a mirror.
+
+* Added examples to the intro. [jesse]
+
+[Changes for 0.992 - 18 Apr 2005]
+
+* Fix keyword translation for undesired characters. [matthewd]
+
+* Fix svk switch from a removed branch.
+
+* Don't trust LML would return a valid encoding that Encode knows.
+  [Eric Gillespie <epg@pretzelnet.org>]
+
+* Recognize merge-conflict error, so no stacktrace for it.
+
+* svk info now skips files not under version control. [#8220] [gugod]
+
+* Fix locked mirror messages.
+
+* Various pool usage fixes.
+
+[Changes for 0.991 - 29 Mar 2005]
+
+* Fix a regression for smerge supplying message from editor.
+
+* Fix an edge case that push doesn't report empty merge when
+  the mirrored remote repository is completely empty.
+
+* Proper locking for svn::mirror objects, and mirror --unlock.
+
+* svk patch subcommands are now options. [jesse]
+
+* Support HEAD, BASE, and {DATE} in many commands using -r. [gugod]
+
+* Support mkdir multiple copaths. [hcchien]
+
+* Add --summary to smerge and push to show logs for changes to be merged. [#7791]
+
+* Optionally support paging help text with IO::Pager. [gugod]
+
+* Fix support for replace with history.
+
+* Don't trust LML would return a valid encoding that Encode knows.
+  [Eric Gillespie <epg@pretzelnet.org>]
+
+* Make multiple -r options to dwim. [#7038]
+
+* Allow import into mirrored path, and cleanup old code.
+
+* Allow merge -c -REV to rollback rev.  This is the same as -rREV:REV-1.
+
+* Add missing -c help to merge. [Ethan Tuttle <ethan@etuttle.com>]
+
+* Make checkout, update, and merge deal with unwritable checkout copy
+  more gracefully.
+
+* Fix move on mirrored path.
+
+* Fix rm for scheduled symlinks.
+
+* Proper message for cp nonexisting parent without -p.
+
+* Properly skip special node types like socket or device in checkout_delta.
+
+* On writing mixed-eol files, don't croak on normalization.
+
+* When doing file-anchored merges, ensure file is opened before
+  cb_merged is called.
+
+* When doing file-level merge, translate and report the target path
+  properly.
+
+* Do proper eol translation per svn:eol on local (yours) node
+  before textual merges are invoked.
+
+* Proper io layer ordering, and force re-translation for merge text
+  when needed.
+
+* Reopen FH in prepare_fh when needed, since apply_textdelta already
+  closed the fh for us.
+
+* Propset now works on multiple overlapping copaths. [#8139]
+
+* Fix a buglet that two props set on a added node will be reported
+  as added and prop-modified.
+
+* Make svk info work on removed path. [mathhewd]
+
+* Reflect errors in bin/svk exit codes. [matthewd]
+
+* Update various help messages [#7217] [#7877] [hcchien]
+
+* svk verify now only checks with the content guarded by PGP block.
+
+* Fix a bug that interactive merge dies out horribly when you
+  edit the merged file, exit with saving and answer a)bort.
+
+[Changes for 0.30 - 2 Mar 2005]
+
+* Support native encodings for pathnames and log messages handling.
+
+* Interactively resolve deleted files that are modified. [ruz]
+
+* Make use of Class::Autouse to reduce start-up time. [Schwern]
+
+* Support mkdir copath. [hcchien]
+
+* svk help <command> should list the aliases of that command. #6082
+  [Schwern]
+
+* More history-tracing performance optimization.
+
+* Speed up svk help commands by not using pod::simple to extract the
+  brief description.  [kcwu]
+
+* Fix signature cache caused by merge via update.
+
+* Unbreak win32's ReadKey in get_prompt. [Autrijus]
+
+* In merge editor's prop merger, use a proper pool to retrieve
+  the base_prop and local_prop to avoid leaks.
+
+* Clean pools when getting log in reverse order, like merge logs, to
+  prevent leaks.
+
+* Fix pool usage in editor::diff to avoid leaks.
+
+* Fix a newline introduce when saying "accept yours" in resolver.
+
+* Fix SVK::Notify report for when report anchor is "0".
+
+* Do not allow existing depotpath to be entered in when autovivifying,
+  which would led to undesired copies.
+
+* When listing mirror, skip unloadable or invliad entries gracefully.
+
+* When doing svk ps svn:eol-style, check if the file mixed newlines.
+
+* Draft intro.pod. [lukhnos]
+
+* Many more tests, with contribution from matthewd.
+
+[Changes for 0.29 - 1 Feb 2005]
+
+* New copy_ancestors implementation for speeding up merge base lookup
+  and svk info.
+
+* Publish node signature in SVK::Editor::XD update mode.  This makes
+  svk st fast the first time after checkout.
+
+* Partially support remote copies that cross mirror anchors.
+
+* Implement svk ci -F (and in other commands that do commit), to read
+  log message from a file.
+
+* "at / ay" in svk resolve are now "safe": they will accept the
+  non-conflicting chunks from the other side, instead of overwriting
+  them with theirs/yours version. [Autrijus]
+
+* get_prompt() now uses Term::ReadKey to always read from the
+  interactive terminal; this solves the problem of eg.  "svk patch -P
+  - < foo.patch" clobbering the interaction. [Autrijus]
+
+* Autovivification for mirrors now take sane defaults. [Autrijus]
+
+* Add -C|--check-only to svk update. [Jody Belka]
+
+* Dangling Conflict items are now reported.
+
+* Fix a problem that 'g'-merged properties are still scheduled on
+  checkout.
+
+* Fix a problem that an already deleted directory from checkout is
+  usable to be rm'ed.
+
+* Many other minor fixes regarding error message and usability.
+
+* General code cleanups.
+
+[Changes for 0.28 - 9 Jan 2005]
+
+* Support -r in blame.
+
+* "svk import PATH" now prompts for a depot path to import into. [Autrijus]
+
+* Propget now reports paths properly.
+
+* Fix a bug that tabs are treated as binary for auto-prop upon svk
+  add. [Autrijus]
+
+* Fix 'svk add' to accept explicit targets which are in the ignore list.
+
+* Die with a more helpful message when mirroring onto an existing path.
+
+* Fix a bug that symlinks to existing dirs is not properly given
+  svn:special properties.
+
+* Cleanup Editor::Sign and fix uncleaned tmp files.
+
+* Fix a bug that 'svk import' does not respect svn:ignore.
+
+* For unknown files, make revert report ignored only on explicit
+  targets.
+
+* Many code cleanups.
+
+[Changes for 0.27 - 20 Dec, 2004]
+
+* Allow "svk cp URI" to work akin to "svk co URI". [Autrijus]
+
+* Fix delete (and move) path reporting.
+
+* Fix checkout to deep directory that doesn't exist.
+
+* Fix cp/mv src modified-ness check.
+
+* New: checkout --export mode to detach after checkout.
+
+* Normalize line endings in all incoming patch blocks. [Autrijus]
+
+* Fix a case in merge involving renames.  When a file was renamed and
+  its parent was also renamed separately, it should not be skipped.
+
+* Remove the useless ticket associated with SVK::Patch, so the size of
+  patch blocks is reduced.
+
+* Fix a bug in svk add would ask users to add parent where it's
+  already added.
+
+* sync -a shouldn't die on stalled depotmap entry.
+
+* Fix patch creation (commit -P) bug dying when there's something
+  deleted.
+
+* Fix commit buffer target parsing, particularly for the case that
+  only a file is the target and the property will not be committed and
+  lost.
+
+* merge and push now supports --verbatim. [Alejandro Mery]
+
+* "svk log" now displays "(no author)" for revisions without an
+   author. [Leland David]
+
+* Fix a case that smerge would use wrong base when the anchor was
+  replaced by itself in the history.
+
+* Fix a problem for svk with svn 1.2.x, editor::merge will generate
+  "Bad file descriptor" fatal error when merging into a dav server.
+  This was caused by improper pool life scope and is now fixed.
+
+[Changes for 0.26 - 9 Nov, 2004]
+
+* svk push -P. [Autrijus]
+
+* Allow checkout, mirrored, and copy anchors to be different
+  from each other, for the purpose of "push" and "pull"..[Autrijus]
+
+* In incremental smerge, increase the fromrev after each
+  individual merge. [Autrijus]
+
+* Ignore empty lines for svk:merge parsing.
+
+* Use local time for log output. [Wen-chien Jesse Sung]
+
+* Properties are now being merged.
+
+* Exsting directories are now being merged.
+
+* Allow custom resolver for properties.
+
+* Support svk:merge property auto-merging, when doing smerge.
+
+* Create svn config directory if it doesn't exist.
+
+* Commit to mirrored path was always sending full text
+  due to an incorrect $cb{mirror} check.  This is a regression since
+  0.23.
+
+* Fix a bug that when committing from a checkout with descendents
+  being mirrored path, the commit can ruin the mirror state.
+
+* Fix svk merge -l rN:M loading too many logs.
+
+* Fix svk admin to work  with non-default depots.
+
+* New: svk ci -N, svk update/checkout --quiet.
+
+* Fix svk cp a directory to checkout and then commit.
+
+[Changes for 0.25 - 25 Oct, 2004]
+
+* Fix the mkdir sequence which causes first-time svk users fatal error.
+  [Autrijus]
+
+[Changes for 0.24 - 24 Oct, 2004]
+
+* Fix svk ps regression for svn 1.0.x.
+
+* Fallback to getpwuid($<) in case $ENV{HOME} or $ENV{USER} is not
+  set, as is the case in Fink.  Reported by Christian Schaffner.
+  [Autrijus]
+
+* Fix "svk pull -a" when the current directory is not a
+  checkout path. [Autrijus]
+
+* Fix checkout_delta cache on win32. [Autrijus]
+
+* Fix svk move copath destination with trailing slash.
+
+* Make svk move checks if the target already exists before doing
+  anything that might leave the checkout in an inconsistent state.
+
+* "svk cp //depotpath" should be parsed as "svk cp //depotpath .",
+  not "svk cp . //depotpath".  Reported by Jesse Vincent. [Autrijus]
+
+* New: svk admin rmcache.
+
+* The old commit message prompt is now split into two:
+ - Those with editable target list now shows:
+   "=== Targets to commit (you may delete items from it) ==="
+ - Those without editable targets now shows:
+   "=== Please enter your commit message above this line ==="
+ [Autrijus]
+ 
+* If SVN::Core version is too old, die with a meaningful message.
+  [Autrijus]
+
+[Changes for 0.23 - 18 Oct, 2004]
+
+* New: commit / smerge -P creats patch, and obsoletes unintuitive svk
+  patch create.
+
+* New: svk merge now supports -cN which means -r N-1:N.
+
+* New: svk mirror --recover. [Autrijus]
+
+* New: svk mkdir -p and svk copy -p to create intermediate directories.
+
+* New: svk pull DEPOTPATH. [Jesse Vincent]
+
+* Proper svn:eol-style support with the same semantics as svn. [Autrijus]
+
+* Proper upper/lower case normalization for Win32 filesystems. [Autrijus]
+
+* The SVK Help system, as SVK/Help/[lang/]/*.pod. [Autrijus]
+
+* The log produced by smerge -l no longer contains the duplicated logs
+  that were merged from the current target.
+
+* smerge -I and repeated smerge now works on checkout.
+
+* commit --import or import now treats obstructed items as replaced.
+
+* Don't skip explicit targets on svk add.
+
+* Correctly obtain the user name on non-unix platforms. [Autrijus]
+
+* Fix pool abuse in history tracing code. [Autrijus]
+
+* Fix smerge -IB.
+
+* svk patch delete now works.
+
+* svk delete now works within mirrored paths.
+
+* svk annotate now works on files with CR/CRLF line endings. [Autrijus]
+
+[Changes for 0.22 - 4 Oct, 2004]
+
+* Interactive merge support is now default. [Autrijus]
+
+* svk patch apply.
+
+* Modular external merge tool support, with the following supported:
+  AraxisMerge, Emacs, FileMerge, GtkDiff, Guiffy, KDiff3, Meld,
+  P4WinMerge, TkDiff, TortoiseMerge, XXDiff. [Autrijus]
+
+* Patch format changed, it's now unidiff with FreezeThaw-serialized
+  SVK::Patch. [Autrijus]
+
+* merge and smerge now supports -f and -t options to deduce copy
+  source as target. [Eric Lindvall]
+
+* Experimental depotpath auto-vivification from URL. [Autrijus]
+  This allows you to svk checkout URL and svk cp URL local-branch.
+
+* Experimental svk push and pull support.
+
+* sync and update now supports -s and -m to sync and/or merge from
+  branch source. [Autrijus]
+
+* revert now also marks nodes as resolved.
+
+* mirror, checkout and switch now all support --list, --detach and
+  --relocate. [Autrijus]
+
+* New aliases: cm => cmerge, depot => depotmap, sw => switch.
+
+* Implement "svk depot --add", "svk depot --delete". [Autrijus]
+
+* prop{get,set,edit,del} on revprops. [Autrijus]
+
+* Fix smerge -l that trims logs before another smerge in the other
+  direction.
+
+* Use svn's internal streamy diff library instead of
+  Text::Diff. [Autrijus]
+
+* svk import --to-checkout can import a directory and turn it to a
+  checkout path in-place . [Autrijus]
+
+* -s (--sign) is renamed to -S.
+
+* rename import --force to --from-checkout.
+
+* $Revision$ now means $Rev$, not $FileRev$, to agree with Subversion.
+
+* "svk mirror --list" and "svk sync --all" now operates on all depots,
+  if no arguments is given, instead of on //. [Autrijus]
+
+* svk admin to wrap svnadmin. [Autrijus]
+
+* svk cleanup --all. [Autrijus]
+
+* "svk diff PATH1 PATH2 PATH3 ..." works as svn does. [Autrijus]
+
+* We now use the self-contained File::Type instead of
+  File::MimeInfo. [Autrijus]
+
+[Changes for 0.21 - 20 Sep, 2004]
+
+* svk now runs natively on win32. [Autrijus]
+
+* New: svk ls -v. [Plasma]
+
+* New: svk propget (pg). [Autrijus]
+
+* Use D::H->store_fast. This makes checkout 5% faster.
+
+* Ignore checksum in Editor::XD when they are alrady checked by
+  Editor::Merge.  This makes update and merge to copath 25-30% faster.
+
+* SVNFSTYPE default to bdb with svn 1.0.x, otherwise fsfs.
+
+* Authentication prompts are now handled. [Autrijus]
+
+* For internal differ, Don't output diff for binary nodes. [Plasma]
+
+* Use IO::Digest to get the md5 while reading the merged file, instead
+  of reading it again.
+
+* Add support to use SVKMERGE on win32, in particular
+  p4winmrg, guiffy. [Autrijus]
+
+* Error messages are now printed to STDERR.
+
+* "svk sm --base" and "svk sm --baseless" now always do what
+  they are documented to do, overriding existing merge
+  tickets. [Autrijus]
+
+* Prepend depot name before svk mi --list. [Autrijus]
+
+* Fix delete_entry in diff editor for external diff tool.
+
+* Delay SVN::Mirror loading.  This makes startup time faster.
+
+* Make SVK::Editor::Delay also delays open_file and discard no-op opens.
+  This optimized the consumed bandwidth when committing/merging to
+  remote.
+
+* Fix merge ticket parsing and generation for paths mirrored with vcp.
+
+* Make describe work on current copath, otherwise fallback to '//'.
+  [Ruslan U. Zakirov]
+
+* Fix a scary but harmless message after committing copied nodes with
+  messages from editor.
+
+* Add expand_copy option to checkout_delta.  This allows diff works
+  correctly (in terms of what svn does) with copied checkout.
+
+* Allow checking out a file with differet name.
+
+* Eliminate repeating mimetype() calls. [Autrijus]
+
+* Fix tests for File::MimeInfo not installed.
+
+* full zh_tw and zh_cn translation. [Autrijus]
+
+* Transaction errors are now reported nicely.
+
+* Many checkout_delta cleanups.
+
+* Many documentation improvement. [Autrijus] 
+
+[Changes for 0.20 - 4 Sep, 2004]
+
+*** First Beta Release ***
+
+* svk commit --import for automatically add and remove entries.
+
+* When yaml loading error, save the old file to a backup location.
+
+* Fix $FileRev$ on non-latest checkout.
+
+* Support svn's auto-prop configration.
+
+* svk rm --keep-local (or -K). [#4652]
+
+* Fix deep recursion of _delta_dir when there's a directory entry '0'.
+
+* Allow patch regen, update, and apply.
+
+* Make File::MimeInfo really optional. [Autrijus Tang]
+
+* Many paths translating cleanups toward a win32 port.
+
+[Changes for 0.19 - 21 Aug, 2004]
+
+* Support merge --track-rename.
+
+* Support svk diff -s or --summarize.
+
+* Support checking out a single file.
+
+* Supoprt multiple sources in svk copy and move.
+
+* Support direct copy and move in mirrored path.
+
+* Support proper merge anchoring. This allows smerge point to be a file.
+
+* Supoprt svn:eol-style. (native, LF, CRLF. no CR support)
+
+* Fix a bug committing added directories to mirrored path directly would fail.
+
+* Auto-prop support: adding svn:mime-type according to file magic upon
+  add or import.
+
+* Symlink support fixes.
+
+* Fix a memory leak due to circular reference in SVK::Editor::XD callbacks.
+
+* Misc performance and memory usage improvements to checkout.
+
+[Changes for 0.18 - 4 Aug, 2004]
+
+***WANRING*** 
+
+Mirrored path states incompatible with previous versions of SVK. run
+svk mirror --upgrade // (and other depots if you have).
+
+***WANRING*** 
+
+* More code cleanup, documentation and test suites.
+
+* Fix <cmd> --help regression.
+
+* Fix cmerge regression.
+
+* Fix ls -f with non-default depot. [#3943] [Kang-min Liu]
+
+* Import into checkout path should remove scheduleanchor after commit.
+
+* svn-1.1 compatible symlink (svn:special) support.
+
+* Performance improvement for import by avoiding unnecessary prop check.
+
+* Allow import to commit to remote repository directly.
+
+* make checkout_delta and import call abort_edit upon SIGINT.
+
+* svk mirror --list and --upgrade commands.
+
+* Make SVN::Mirror required when it already exists. [Ruslan U. Zakirov]
+
+* Various commands should now respect path@rev target syntax.
+
+* Depot creation now respects $ENV{SVNFSTYPE}.
+
+* Fix a bug that smerge -I is giving incorrect merge ticket.
+
+* Fix delete merging conflicts handling and implement partial deletes.
+
+* Fix checkout path reporting and anchoring problem.
+
+* Implement propdel on checkout copy.
+
+* svk diff now shows deleted files recursvely.
+
+[Changes for 0.17 - 17 Jul, 2004]
+
+* Optimize checkout_delta with mtime/inode/size signatures.
+
+* Implement smerge -I for incremental merging.
+
+* Make smerge -lm <msg> do what you mean.
+
+* When using external merge tools, give local, base, new and merged
+  tmpfiles sane names. [Autrijus]
+
+* Improve documentation.
+
+* Fix cb_rev when commiting to just-moved files in mirrored path.
+
+* Cleanup SVK::Merge and others.
+
+[Changes for 0.16 - 30 Jun, 2004 - German Perl Workshop Release]
+
+* Fix pool usage in svk annotate with svn_fsfs.
+
+* Many More tests.
+
+* Unbreak 'svk help'.
+
+* Fix a bug in revert that both text/prop modified files are not
+  reverted correctly.
+
+* Require D::H 0.18 so delete_verbose will work in checkout_delta.
+
+* Refactor Editor::Status to use SVK::Notify.
+
+* Fix a bug for merge base when merge anchor is not mirror anchor.
+
+* Preliminary true delete_entry tree merge in SVK::Editor::Merge.
+
+* Cleanup SVK::Command::Diff.
+
+* Make checkout_delta respect base_root when it's different from xdroot.
+
+* Take care of unset svn:executable and update.
+
+* Support replaced items in checkout copy.
+
+[Changes for 0.15 - 26 May, 2004]
+
+* Fix a bug that keyword-substituted files would cause merge or conflict.
+
+* Various pool fixes to support SVNFSTYPE=fsfs.
+
+* Support external merge tools with $ENV{SVKMERGE}.
+
+* Merge collision for added files on both sides.
+
+* Support options and value without whitespace in between.
+
+* Support svk <cmd> --help.
+
+* Allow users to override svkpath with $ENV{SVKROOT}. [Jesse Vincent]
+
+* Fix the merge ticket for the case that the mirrored source is / on remote.
+
+* Patch management prototype (svk patch).
+
+* svk ls features to accommodate shell completion. [Jesse Vincent]
+
+* Various merge improvement detecting better ancestor in certain cases.
+
+[Changes for 0.14 - 26 Apr, 2004]
+
+* Display copy/merge information in svk info. [Kang-min Liu]
+
+* Fix annotate -x for renamed files.
+
+* Allow import --force over checkout path.
+
+* Allow svk command output to be stored in a scalar.
+
+* Support svk copy depotpath path.
+
+* Implement dir add with history in checkout_delta.
+
+* Add stat as alias to status. [Dave Rolsky]
+
+* Forbid the command that use simple edit (mkdir, mv, cp)
+  to work on mirrored path unless run with --direct.
+
+* Provide more accurate action (propmod, edit after copy) in svk log.
+
+* Fix sync -a on depot other than //.
+
+* sm -l now indent the log message. [Autrijus]
+
+* Support non-recursive checkout.
+
+* Let svk copy and add reported paths relative to the one given from
+  command line.
+
+* Fix status output for added directory from MergeEditor.
+
+* Support mirroring from vcp source via SVN::Mirror.
+
+[Changes for 0.13 - 11 Apr, 2004]
+
+* Fix svk checkout anchor problems for creating and checking.
+
+* Fix a bug that file is not closed for unchanged and merged (g) but
+  prop change.
+
+* Baseless smerge via -B / --baseless. [Autrijus]
+
+* Arbitary-based smerge via -b / --base. [Autrijus]
+
+* Get rid of IO::String.
+
+* Cleanup invocation interface, move things from bin/svk to SVK.pm.
+
+* Improve PPerl friendliness.
+
+* New commands: svk propdel, svk depotmap -l.
+
+[Changes for 0.12 - 28 Mar, 2004 - YAPC::Taipei::2004 Release Party]
+
+* Report hostname when doing smerge -l.
+
+* Support external diff with environment variable SVKDIFF.
+
+* Various improvements in svk status and revert.
+
+* Support pgp signatures and verification with gpg.
+
+* Cache copy history lookup.
+
+* Use perlio scalar instead of IO::String for the output of textual
+  merge. This is about 15% faster than IO::String.
+
+* Support delete depotpath directly.
+
+* DelayEditor for Optimizing editor calls before sending to expensive editors.
+
+* Various tree merge improvements in MergeEditor and XD::Editor.
+
+* Command Options in POD. [Jesse Vincent]
+
+* svk move. [Autrijus Tang]
+
+* svk list -R. [viirya]
+
+* zh translation. [Autrijus, Piaip]
+
+* i18n framework. [Autrijus Tang]
+
+* Fix svk cleanup.
+
+* Fix checkout to a path with trailing slash. [#2350]
+
+[Changes for 0.11 - 14 Mar, 2004]
+
+***WANRING*** 
+
+Checkout path schedules incompatible with previous versions of SVK. Do
+commit or revert your checkouts before upgrading.
+
+***WANRING*** 
+
+* Fine-grained copath locking.
+
+* Basic commit signing support with merge -s or commit -s.
+
+* When a file is locally modified, merging prop-change on file results 
+  in incorrect checksum. [#2322]
+
+* Fix an incorrect live time of SVN::Stream, which causes crash on OS X.
+  [Matthijs van Duin]
+
+* Help system improvements. [Jesse Vincent]
+
+* ls -R. [hcchien]
+
+* Misc performance enhancements.
+
+[Changes for 0.10 - 05 Mar, 2004]
+
+* Change distname.
+
+* Fix svn help for listing commands
+
+* Fix adding files when committing to mirrored path.
+
+[Changes for 0.09 - 05 Mar, 2004]
+
+* Command invocation interface cleanup.
+
+* Move to SVK:: namespace.
+
+* Reduce root->check_path calls in checkout_delta .
+
+* Commit target editing support [Autrijus].
+
+* svk cat, ls and switch.
+
+* Avoid opening repository multiple times.
+
+* Let checkout_delta generate strict editor calls.
+
+* Support committing to mirrored path directly.
+
+* Commit / Merge to remote now brings the mirrored path updated.
+
+* Various code cleanups.
+
+* Fix some pool abuse.
+
+* Keyword enhacement (p4-like). [Autrijus]
+
+* Update to modern perl build system. [Autrijus]
+
+[Changes for 0.08 - 16 Feb, 2004]
+
+* Support multi-parent branch auto merging.
+
+* Support property diff output in DiffEditor.
+
+* Cherry picking merge support.
+
+* svk sync -a to sync all mirrored path in the given depot.
+
+* checkout_delta now handle props and do_commit commits them.
+
+* Respect conflict flag in status and commit.
+
+* Store and respect the deleted state of mixed-revision checkout copy.
+
+* Various doc improvements and code cleanups.
+
+[Changes for 0.07 - 15 Jan, 2004]
+
+* Memory usage enhancements.
+
+* Support but not require subversion 0.36.0.
+
+* clean up multiple targets handling for various commands.
+
+* svk status now reports what is given in command line.
+
+[Changes for 0.06 - 26 Dec, 2003]
+
+* Correct a pacakging problem.
+
+* New command: svk import, version.
+
+* svk status, revert improvement.
+
+[Changes for 0.05 - 20 Dec, 2003]
+
+* svk help and some usage are written.
+
+* Better svk diff support: file target, dpath1 vs dpath2.
+
+* Mergeback now transfers textdelta.
+
+* update, add, delete, revert, and sync now support multiple targets.
+
+* svk depotmap for depot mapping configuration.
+
+* Fix a segfault for empty merges.
+
+* Merge-ticket handling now mutliple-safe.
+
+* Committing to mirrored path now forbidden by default.
+
+* Make sm respect -C for XD destination.
+
+* New commands: svk resolved, describe, propedit.
+
+* smerge -l now brings the logs for candidate revisions to editor buffer.
+
+* svk process now locks for state file.
+
+* New default local repository location ~/.svk/local.
+
+* Support svn:ignore property.
+
+* Use checkout_delta for svk status.
+
+* Require svn 0.35.
+
+[Changes for 0.04 - 06 Dec, 2003]
+
+* Textual merge now uses svn's internal diff library.
+
+* new DiffEdtitor to handle depot diff.
+
+* Requires svn 0.34
+
+[Changes for 0.03 - 26 Nov, 2003]
+
+* Merge editor now calls open_file only when necessary.
+  This makes merge back to RA a lot faster for mutual merged branches.
+
+* Merge editor status 'g' means file merged bug unmodified.
+
+* Fix a xdroot creation bug.
+
+* New - svk log -r.
+
+[Changes for 0.02 - 19 Nov, 2003]
+
+* Fix packaging problem for missed Makefile.PL.
+
+[Changes for 0.01 - 19 Nov, 2003]
+
+Initial Release.

@@ -1,0 +1,5 @@
+0.25:
+  - adds ARM support
+
+0.1:
+  - first release.  epoll and sendfile only.  Linux only.

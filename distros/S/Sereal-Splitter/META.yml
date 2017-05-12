@@ -1,0 +1,36 @@
+---
+abstract: 'splits a Sereal blob in chunks of roughly the same size'
+author:
+  - 'Damien Krotkine <dams@cpan.org>'
+build_requires:
+  Data::Dumper: '0'
+  ExtUtils::ParseXS: '2.21'
+  File::Find: '0'
+  File::Path: '0'
+  File::Spec: '0'
+  Scalar::Util: '0'
+  Sereal::Decoder: '0'
+  Sereal::Encoder: '0'
+  Test::More: '0.88'
+  XSLoader: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Sereal-Splitter
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  XSLoader: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/Sereal/Sereal/issues
+  repository: git://github.com/Sereal/Sereal.git
+version: '0.840'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

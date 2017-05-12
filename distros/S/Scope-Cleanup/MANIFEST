@@ -1,0 +1,27 @@
+.gitignore
+Build.PL
+Changes
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/Scope/Cleanup.pm
+lib/Scope/Cleanup.xs
+t/caller.t
+t/context.t
+t/die.t
+t/error.t
+t/escape.t
+t/exit.t
+t/pod_cvg.t
+t/pod_syn.t
+t/scope.t
+t/via_death.t
+t/via_die.t
+t/via_escape.t
+t/via_exit.t
+t/via_fmtlocalret.t
+t/via_return.t
+t/via_sublocalret.t
+SIGNATURE    Added here by Module::Build

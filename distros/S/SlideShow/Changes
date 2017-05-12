@@ -1,0 +1,6 @@
+Revision history for Perl extension SlideShow.
+
+2.00  Sat Jan  1 15:30:00 2000
+	Kevin A. Lenzo <lenzo@cs.cmu.edu>
+	- original version; created by h2xs 1.19
+	- prior version was only released locally.

@@ -1,0 +1,25 @@
+---
+abstract: 'Tool for inspecting subroutines.'
+author:
+  - 'Chad Granum <exodist@cpan.org>'
+build_requires:
+  Test2::Tools::Tiny: '1.302072'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Sub-Info
+requires:
+  B: '0'
+  Carp: '0'
+  Importer: '0.024'
+  perl: '5.008001'
+resources:
+  bugtracker: http://github.com/exodist/Sub-Info/issues
+  repository: http://github.com/exodist/Sub-Info/
+version: '0.002'
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -1,0 +1,388 @@
+#!/usr/bin/perl -w
+use strict;
+use File::Find;
+use Getopt::Long;
+use File::Which;
+use Search::Estraier;
+use Text::Iconv;
+#use File::MMagic;
+use File::MMagic::XS qw/:compat/;
+use Time::HiRes qw/time/;
+use HTML::TreeBuilder;
+use Data::Dump qw/dump/;
+
+my $collection;		# name which will be inserted
+my $path_add;		# add additional info in path
+my $verbose;
+my $exclude;
+
+#$verbose = 1;
+my $debug = 0;
+my $force = 0;
+my $all = 0;
+my $skip_images = 0;
+
+my $result = GetOptions(
+	"collection=s" => \$collection,
+	"path=s" => \$path_add,
+	"verbose!" => \$verbose,
+	"debug!" => \$debug,
+	"exclude=s" => \$exclude,
+	"force!" => \$force,
+	"all!" => \$all,
+	"skip-images!" => \$skip_images,
+);
+
+my ($node_url,$dir) = @ARGV;
+
+die <<"_END_OF_USAGE_" if (! $node_url || ! $dir);
+usage: $0 http://localhost:1978/node/my_dir /path/to/directory
+
+options:
+	--collection="name of collection"
+	--path=/path/to/add/at/end
+	--exclude=regex_to_exclude
+	--skip-images
+	--verbose
+	--force
+	--debug
+	--all	save placeholders for all files
+_END_OF_USAGE_
+
+if (! -e $dir) {
+	warn "directory $dir doesn't exist, skipping\n";
+	exit 1;
+}
+
+#my $basedir = $0;
+#$basedir =~ s,/[^/]+$,/,;
+#require "$basedir/filter.pm";
+
+my $docs = 0;
+my $start_t = time();
+
+my $filter;
+foreach my $f (qw/pdftotext pstotext/) {
+	my $w = which($f);
+	if ($w) {
+		$filter->{$f} = $w;
+		print STDERR "using $f filter at $w\n" if ($verbose);
+	}
+}
+
+#my $mm = new File::MMagic('/usr/share/misc/file/magic');
+my $mm = new File::MMagic::XS();
+
+my $iconv = new Text::Iconv('iso-8859-2', 'utf-8');
+
+select(STDERR); $|=1;
+select(STDOUT); $|=1;
+
+my $db = new Search::Estraier::Node(
+	url => $node_url,
+	user => 'admin',
+	passwd => 'admin',
+	croak_on_error => 1,
+	create => 1,
+);
+
+#
+# check if hhc file exists, and if it does, extract information from it
+#
+
+my $hhc_file;
+# try to find hhc
+find({ wanted => sub {
+		return unless( m!\.hhc$!i );
+		$hhc_file = $_;
+		warn "using $hhc_file for tree structure\n";
+	},
+	follow => 1,
+	follow_skip => 2,
+	no_chdir => 1,
+}, $dir);
+
+my $meta;
+
+if ($hhc_file) {
+
+	sub param {
+		my ($el) = @_;
+
+		my $n;
+		foreach my $p ( $el->find('param') ) {
+			$n->{ $p->attr('name') } = $p->attr('value');
+		}
+
+		if ( ! defined($n->{Local}) ) {
+			warn "### skipped = ",dump($n),$/;
+			return;
+		}
+
+		my $path = $dir . '/' . $n->{Local};
+		$path =~ s!//!/!g;
+		$path = lc($path);
+
+		$n->{path} = $path;
+
+		my $nr = $n->{ImageNumber} || return $n;
+
+		if ($nr == 27) {
+			$meta->{title} = $n->{Name};
+			$meta->{index_path} = $path;
+		} elsif ($nr == 21) {
+			$meta->{toc_path} = $path;
+		} elsif ($nr == 1) {
+			$meta->{foreword_path} = $path;
+		} elsif ($nr == 11) {
+			# nop
+		} else {
+			warn "unknown ImageNumber: $nr\n";
+		}
+
+		return $n;
+	}
+
+	my $tree = HTML::TreeBuilder->new;
+	$tree->parse_file($hhc_file);
+
+	my $prefix = $collection ? ( $collection . ' :: ' ) : '';
+
+	my @prefix;
+	my $depth = 0;
+
+	foreach my $e ( $tree->look_down( sub { $_[0]->tag =~ m/(object)/ } ) ) {
+
+#		printf("%05s %s\n", $e->parent->address(), $e->as_HTML() );
+
+		my $l = ($e->depth() / 2) - 1;
+
+		$prefix[ 0 ] = $meta->{title} || '';
+
+		my $n = param($e);
+		$prefix[ $l ] = $n->{Name};
+
+		next unless ($n->{path});
+
+		my $t = '';
+		my @p;
+		foreach my $i ( 0 .. $l ) {
+			push @p, $prefix[ $i ] if ($prefix[ $i ]);
+		}
+		$t = join(' :: ', @p ) if (@p);
+
+		$meta->{path2title}->{ $n->{path} } = $t;
+
+	}
+
+	$tree->delete;
+
+}
+
+
+find({ wanted => \&file, 
+	follow => 1,
+	follow_skip => 2,
+	no_chdir => 1,
+}, $dir);
+
+my $dur = (time() - $start_t) || 1;
+printf STDERR "%d documents in %.2fs [%.2f docs/s]\n", $docs, $dur, ($docs / $dur);
+
+$db->master(
+	action => 'sync'
+);
+
+
+exit;
+
+sub dump_contents {
+	my ($db,$contents,$mtime,$path,$size) = @_;
+
+	return unless (defined($contents));	# don't die on empty files
+
+	if ($exclude && $path =~ m/$exclude/i) {
+		print STDERR "skip: $path\n" if ($verbose);
+		return;
+	}
+
+	use bytes;
+	if (! $size) {
+		$size = length $contents;
+	}
+
+	print STDERR " [$size]" if ($verbose);
+
+	# create a document object 
+	my $doc = new Search::Estraier::Document;
+
+	my $title;
+
+	if ( defined($meta->{path2title}->{lc($path)}) ) {
+		$title = $meta->{path2title}->{lc($path)};
+		warn " $title\n";
+	} else {
+
+		$title = $1 if ($contents =~ m#<title>(.+?)</title>#is);
+
+		# chop long titles to 100 chars
+		$title = substr($title, 0, 100) . '...' if ($title && length($title) > 100);
+		# use path if no title is found
+		$title ||= $path;
+	
+	}
+
+	# add attributes to the document object 
+	$doc->add_attr('@uri', "file:///$path");
+	$doc->add_attr('@title', $iconv->convert($title));
+	$doc->add_attr('@size', $size);
+	$doc->add_attr('@mtime', $mtime);
+
+	if ($contents) {
+		# html2text
+		$contents =~ s#<script.*?</script>##gis;
+		$contents =~ s#<[^>]+/*>##gs;
+		$contents =~ s#\s\s+# #gs;
+
+		$doc->add_text($iconv->convert($contents));
+	}
+	# store path
+	$doc->add_hidden_text($path);
+	# boost title
+	$doc->add_hidden_text($title);
+
+	print $doc->dump_draft if ($debug);
+
+	# register the document object to the database
+	$db->put_doc($doc);
+
+	$docs++;
+
+}
+
+sub filter_to_pages {
+		my ($path, $mtime, $command) = @_;
+
+		print STDERR "$path {converting}" if ($verbose);
+
+		open(F,"$command |") || die "can't open $command with '$path': $!";
+		my $html;
+		while(<F>) {
+			$html .= $_;
+		}
+		close(F);
+
+		return if (! $html);
+
+		my $file_only = $path;
+		$file_only =~ s/^.*\/([^\/]+)$/$1/g;
+
+		my ($pre_html,$pages,$post_html) = ('<html><head><title>$path :: page ##page_nr##</title></head><body><pre>',$html,'</pre></body></html>');
+
+		($pre_html,$pages,$post_html) = ($1,$2,$3) if ($html =~ m/^(<html>.+?<pre>)(.+)(<\/pre>.+?)$/si);
+
+		if ($collection) {
+			$pre_html =~ s/<title>(.+?)<\/title>/<title>$collection :: page ##page_nr##<\/title>/si;
+		} else {
+			$pre_html =~ s/<title>(.+?)<\/title>/<title>$1 :: page ##page_nr##<\/title>/si ||
+			$pre_html =~ s/<title><\/title>/<title>$file_only :: page ##page_nr##<\/title>/si;
+		}
+
+		# save empty entry as a placeholder
+		dump_contents($db, ' ', $mtime, "$path");
+
+		my $page_nr = 1;
+		foreach my $page (split(/\f/s,$pages)) {
+			print STDERR " $page_nr" if ($verbose);
+			my $pre_tmp = $pre_html;
+			$pre_tmp =~ s/##page_nr##/$page_nr<\/title>/s;
+			dump_contents($db, $pre_tmp . $page . $post_html, $mtime, "$path#$page_nr") if ($page !~ m/^\s*$/s);
+			$page_nr++;
+		}
+
+
+
+}
+
+sub file {
+
+	my $path = $_;
+	my $contents;
+
+	return if (! $force && -l $path || $path =~ m#/.svn# || $path =~ m/(~|.bak|.gif)$/);
+	return if (! $all && -d $path);
+
+	my $mtime = (stat($path))[9] || -1;
+	my $mtime_db;
+	eval { $db->get_doc_attr_by_uri("file:///$path", '@mtime') } unless ($force);
+	$mtime_db ||= -2;
+
+	if ($mtime == $mtime_db) {
+		print STDERR "# same: $path $mtime\n" if ($verbose);
+		return unless($force);
+	} else {
+		print STDERR "# changed: $path $mtime != $mtime_db\n" if ($debug);
+	}
+
+	# skip files on which File::MMagic::XS croaks
+	if ($path =~ m#\.au$#) {
+		warn "skipped '$path' to prevent File::MMagic::XS bug\n" if ($debug);
+		return;
+	}
+
+	my $type = $mm->checktype_filename($path);
+	$type =~ s/\s+/ /gs;
+
+	print STDERR "# $path $type\n" if ($debug);
+
+	if ($type =~ m/pdf/i) {
+		if ($filter->{pdftotext}) {
+			filter_to_pages($path, $mtime, qq( $filter->{pdftotext} -htmlmeta "$path" - ));
+		} else {
+			warn "skipping '$path', no pdftotext filter\n" if ($verbose);
+			return;
+		}
+	} elsif ($type eq 'application/postscript') {
+		if ($filter->{pstotext}) {
+			filter_to_pages($path, $mtime, qq( $filter->{pstotext} "$path" ));
+		} else {
+			warn "skipping '$path', no pstotext filter\n" if ($verbose);
+			return;
+		}
+	} elsif ($type =~ m!^image/! && $skip_images) {
+		warn "skipping image '$path'\n" if ($verbose);
+		return;	# don't index images
+	} else {
+
+#		return if (! -f $path || ! m/\.(html*|php|pl|txt|info|log|text)$/i);
+		if (-f $path &&
+			$type !~ m/html/ &&
+			$path !~ m/\.(php|pl|txt|info|log|text)$/io
+		) {
+			dump_contents($db, '', $mtime, $path, -s $path) if ($all);
+			return;
+		}
+
+		# skip index files
+		return if ($path =~ m/index_(?:[a-z]+|symbol)\.html*/i);
+
+		open(F,"$path") || die "can't open file: $path";
+		print STDERR "$path ($type)" if ($verbose);
+		while(<F>) {
+			$contents .= "$_";
+		}
+		$contents .= "\n\n";
+
+		#$contents = filter($contents,$collection);
+
+		# add optional components to path
+		$path .= " $path_add" if ($path_add);
+
+		dump_contents($db, $contents, $mtime, $path);
+	}
+
+	print STDERR "\n" if ($verbose);
+#	die "zero size content in '$path'" if (! $contents);
+
+}
+

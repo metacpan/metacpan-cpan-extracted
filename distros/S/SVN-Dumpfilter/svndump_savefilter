@@ -1,0 +1,51 @@
+#!/usr/bin/perl -w
+# $Id: svndump_savefilter 278 2007-01-13 12:37:13Z martin $
+# Copyright (C) 2006 by Martin Scharrer <martin@scharrer-online.de>
+# This is free software under the GPL.
+
+use strict;
+use SVN::Dumpfilter qw(Dumpfilter dos2unix_filter svn_recalc_prop_header svn_recalc_textcontent_header);
+use Data::Dumper;
+
+sub save_filter (\%;$);
+
+my $outfile   = pop @ARGV || '-';
+my @dumpfiles = @ARGV;
+
+if (!@dumpfiles) 
+ { @dumpfiles = ('-'); }
+my @revs;
+my $current_rev;
+my $errors = 0;
+
+foreach my $dumpfile (@dumpfiles)
+ {
+   $errors += Dumpfilter($dumpfile, "", \&save_filter);
+ }
+
+print STDERR "Debug: Number of revs: ", scalar @revs, "\n";
+#print Dumper(\@revs);
+
+exit($errors ? 1 : 0);
+
+sub save_filter (\%;$)  #
+ {
+   my $href = shift;
+   my $recalc = shift || 1;
+   my $header = $href->{'header'};
+   my $prop   = $href->{'properties'};
+
+   if (exists $header->{'Revision-number'})
+    {
+      # struct with pointer to rev.hash and array to hold node hashes of this rev
+      my $revstruct = [ $href, [] ]; 
+      $current_rev = $revstruct->[1]; # set current rev pointer to empty array
+      push @revs, $revstruct;
+    }
+   else 
+    {
+      push @$current_rev, $href;
+    }
+ }
+
+__END__

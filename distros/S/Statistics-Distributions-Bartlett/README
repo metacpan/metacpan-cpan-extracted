@@ -1,0 +1,35 @@
+Statistics-Distributions-Bartlett version 0.0.2 
+
+Bartlett test is used to test if k samples have equal variances. Such homogeneity of is assumed by other statistical tests.  
+The Bartlett test can be used to verify that assumption. See
+http://www.itl.nist.gov/div898/handbook/eda/section3/eda357.htm.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+'Statistics::Distributions' => '1.02', 
+'Carp' => '1.08', 'Perl6::Form' => '0.04',
+'List::Util' => '1.19',
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010, Daniel S. T. Hughes
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

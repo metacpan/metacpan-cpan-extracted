@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+README.md
+t/Sphinx-Config-Builder.t
+lib/Sphinx/Config/Builder.pm

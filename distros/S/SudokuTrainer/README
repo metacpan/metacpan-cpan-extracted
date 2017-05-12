@@ -1,0 +1,110 @@
+CONTENTS
+--------
+Purpose
+Description
+    Train a sudoku strategy
+    Get the next strategy for continuation
+    Get the next value for continuation
+Supported sudoku strategies
+Installation
+Starting SudokuTrainer
+Display the documentation
+Restrictions
+
+
+PURPOSE
+-------
+This document informs about SudokuTrainer version 0.01.5.
+
+
+DESCRIPTION
+-----------
+SudokuTrainer applies a series of sudoku strategies to find a
+continuation in solving the user's sudoku game, starting with
+the easiest strategies. The user may pause this process at 
+various events to see what SudokuTrainer has achieved.
+
+SudokuTrainer may help the user in three areas:
+- Train a certain sudoku strategy
+- See which strategy is used in the current state of the game
+- Get a new value to continue solving the game
+Each of these usage areas has it's own documentation.
+
+Train a sudoku strategy
+-----------------------
+The user pauses SudokuTrainer when it just found the desired strategy.
+At this moment the consequences of the finding are not yet shown on
+the visible sudoku board. So the user may try to find the strategy
+himself. If he isn't successful he may ask SudokuTrainer for clues.
+The aim is to find the strategy with minimum help.
+
+Get the next strategy for continuation
+--------------------------------------
+All currently known values (the preset and the found) are used as the
+initial puzzle. The user lets run SudokuTrainer a single step. Then he
+may try to detect the finding, or just see all the clues at once. The
+game may go on.
+
+Get the next value for continuation
+-----------------------------------
+This aid is well suited for sudoku players that don't know about
+strategies. All currently known values (the preset and the found) are 
+used as the initial puzzle. The user lets pause SudokuTrainer when the
+next value is found. He can't see it on the visible sudoku board, so he
+lets run SudokuTrainer to the next value. Now the previous finding is
+shown (and marked) on the board. The game may go on.
+
+
+SUPPORTED SUDOKU STRATEGIES
+---------------------------
+This version of SudokuTrainer supports the following strategies:
+    Bivalue Universal Grave
+    Block-Line Interaction
+    Full House
+    Hidden Pair
+    Hidden Single
+    Line-Block Interaction
+    Naked Pair
+    Naked Single
+    Skyscraper
+    Turbot Fish
+    Two-String Kite
+    Unique Rectangle Type 1
+    Unique Rectangle Type 2
+    X Wing
+    XY Wing
+
+	
+INSTALLATION
+------------
+See the separate file INSTALL for instructions.
+
+
+STARTING SUDOKUTRAINER
+----------------------
+On Linux:   sudokutrainer.pl   (in any directory)
+
+On Windows: sudokutrainer      (in any directory)
+
+
+DISPLAY THE DOCUMENTATION
+-------------------------
+SudokuTrainer aims at 3 groups of users (cf. section DESCRIPTION above).
+So the docu is devided into several sections. They can be read by
+    perldoc Games::Sudoku::Trainer::General_info   (General info)
+    perldoc Games::Sudoku::Trainer::Training       (Train a strategy)
+    perldoc Games::Sudoku::Trainer::Obstacle       (Get next strategy)
+    perldoc Games::Sudoku::Trainer::Nextvalue      (Get next value)
+    perldoc enter_presets.pl                       (Enter preset values)
+
+
+RESTRICTIONS
+------------
+SudokuTrainer never uses trial and error to proceed. As a 
+consequence, SudokuTrainer cannot completely solve sudoku games 
+that have multiple solutions.
+
+SudokuTrainer deals with classical 9x9 sudoku games only.
+
+SudokuTrainer is neither a sudoku teacher nor a sudoku player.
+

@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Sub/Go.pm
+t/assign.t
+t/basic.t
+t/chain.t
+t/next.t
+t/release-pod-coverage.t
+t/release-pod-spell.t
+t/release-pod-syntax.t

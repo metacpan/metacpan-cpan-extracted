@@ -1,0 +1,17 @@
+template: poll-ack.tt
+
+vars:
+  msg_id: 0001005f-2-update-reg.yml
+
+input_assertions:
+  class: SRS::EPP::Command::Poll
+  match:
+
+SRS:
+ - assertions:
+     count:
+     attr_is:
+output_assertions:
+  attr_is:
+    - [ '//epp:result', 'code', 1000, 'EPP: response code' ]
+    - [ '//epp:msgQ', 'count', 0, 'EPP: count of remaining messges' ]

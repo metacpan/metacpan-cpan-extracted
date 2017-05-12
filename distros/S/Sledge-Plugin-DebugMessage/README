@@ -1,0 +1,28 @@
+NAME
+    Sledge::Plugin::DebugMessage - show the debug message
+
+SYNOPSIS
+        package Your::Pages;
+        use Sledge::Plugin::DebugMessage;
+
+DESCRIPTION
+    Sledge::Plugin::DebugMessage is debug utility for Sledge.
+
+    You can see the request, template parameters, session parameters, and
+    any debug messages, in your HTML footer.
+
+METHODS
+  debug
+        $a->debug('USER' => $user);
+
+    set the debug message.
+
+AUTHOR
+    MATSUNO Tokuhiro <tokuhirom@gmail.com>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    Bundle::Sledge, Sledge::Plugin::DebugScreen
+

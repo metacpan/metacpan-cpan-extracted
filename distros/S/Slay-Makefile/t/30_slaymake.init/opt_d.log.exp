@@ -1,0 +1,2 @@
+default: checking default debug1
+default: deps: depend1, depend2, depend3

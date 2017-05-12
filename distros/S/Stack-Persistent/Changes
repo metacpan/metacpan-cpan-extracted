@@ -1,0 +1,20 @@
+Revision history for Perl extension Stack::Presistent.
+
+0.01  27-Apr-2007 K.Esteb
+      original version; created by h2xs 1.23 with options
+      -AXc -n Stack::Presistent
+
+0.02 27-Jul-2007 K.Esteb
+     Fixed a spelling mistake - remember Presistent is spelled
+     Persistent
+     
+0.03 08-Aug-2007 K.Esteb
+     Fixed a bug. The backing cache was being deleted when the main
+     process exited. Kinds defeats the purpose. Changed the default
+     epxiration to indefinate.
+     
+0.04 19-Dec-2008 K.Esteb
+     Fixed a problem with required modules. Makefile.PL now lists
+     Cache::FastMmap as a required module.
+
+	       

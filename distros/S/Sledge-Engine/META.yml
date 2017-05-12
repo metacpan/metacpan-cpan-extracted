@@ -1,0 +1,30 @@
+---
+abstract: 'run Sledge based application (EXPERIMENTAL).'
+author:
+  - 'Tomohiro IKEBE <ikebe@shebang.jp>'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Sledge-Engine
+provides:
+  Sledge::Engine:
+    file: lib/Sledge/Engine.pm
+    version: 0.04
+  Sledge::Engine::Apache::MP13:
+    file: lib/Sledge/Engine/Apache/MP13.pm
+  Sledge::Engine::CGI:
+    file: lib/Sledge/Engine/CGI.pm
+requires:
+  Class::Inspector: 1.16
+  Module::Pluggable: 3.1
+  Sledge::Hammer: 1.0
+  Sledge::Utils: 0.02
+  String::CamelCase: 0.01
+  Test::More: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.04

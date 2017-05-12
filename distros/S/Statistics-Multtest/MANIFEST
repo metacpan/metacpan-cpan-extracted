@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Statistics/Multtest.pm
+t/00-1load.t
+t/00-export-all.t
+t/00-export-all2.t
+t/00-pod.t
+t/00-pod-coverage.t
+t/1prototype.t
+t/2model.t
+t/3qvalue.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

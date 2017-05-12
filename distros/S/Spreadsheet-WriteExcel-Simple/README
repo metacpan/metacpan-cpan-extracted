@@ -1,0 +1,85 @@
+NAME
+    Spreadsheet::WriteExcel::Simple - A simple single-sheet Excel document
+
+SYNOPSIS
+      my $ss = Spreadsheet::WriteExcel::Simple->new;
+         $ss->write_bold_row(\@headings);
+         $ss->write_row(\@data);
+
+      print $ss->data;
+            # or
+            $ss->save("filename.xls");
+
+DESCRIPTION
+    This provides an abstraction to the Spreadsheet::WriteExcel module for
+    easier creation of simple single-sheet Excel documents.
+
+    In its most basic form it provides two methods for writing data:
+    write_row and write_bold_row which write the data supplied to the next
+    row of the spreadsheet.
+
+    However, you can also use $ss->book and $ss->sheet to get at the
+    underlying workbook and worksheet from Spreadsheet::WriteExcel if you
+    wish to manipulate these directly.
+
+METHODS
+  new
+      my $ss = Spreadsheet::WriteExcel::Simple->new;
+
+    Create a new single-sheet Excel document. You should not supply this a
+    filename or filehandle. The data is stored internally, and can be
+    retrieved later through the 'data' method or saved using the 'save'
+    method.
+
+  write_row / write_bold_row
+      $ss->write_bold_row(\@headings);
+      $ss->write_row(\@data);
+
+    These write the list of data into the next row of the spreadsheet.
+
+    Caveat: An internal counter is kept as to which row is being written to,
+    so if you mix these functions with direct writes of your own, these
+    functions will continue where they left off, not where you have written
+    to.
+
+  data
+      print $ss->data;
+
+    This returns the data of the spreadsheet. If you're planning to print
+    this to a web-browser, be sure to print an 'application/excel' header
+    first.
+
+  book / sheet
+      my $workbook  = $ss->book;
+      my $worksheet = $ss->sheet;
+
+    These return the underlying Spreadsheet::WriteExcel objects representing
+    the workbook and worksheet respectively. If you find yourself making
+    more that a trivial amount of use of these, you probably shouldn't be
+    using this module, but using Spreadsheet::WriteExcel directly.
+
+  save
+            $ss->save("filename.xls");
+
+    Save the spreadsheet with the given filename.
+
+BUGS
+    This can't yet handle dates in a sensible manner.
+
+AUTHOR
+    Tony Bowden
+
+BUGS and QUERIES
+    Please direct all correspondence regarding this module to:
+    bug-Spreadsheet-WriteExcel-Simple@rt.cpan.org
+
+SEE ALSO
+    Spreadsheet::WriteExcel. John McNamara has done a great job with this
+    module.
+
+COPYRIGHT
+    Copyright (C) 2001-2005 Tony Bowden. All rights reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

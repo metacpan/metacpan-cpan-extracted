@@ -1,0 +1,32 @@
+SQL::Biblisoph 
+
+	A SQL statement library. The module prepare declared statement at initialization,
+	for performance reason. SQL statement can use bind paramenters. Currently it is only tested using MySQL.
+
+INSTALL
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+COPYRIGHT
+	Copyright (c) 2007-2012 Matias Alejo Garcia. All rights reserved.
+	This program is free software; you can redistribute it and/or
+	modify it under the same terms as Perl itself.
+
+
+PREREQUISITES
+	Object::InsideOut
+	DBI
+	DBD:mysql
+
+Future Changes
+    *   See github log
+
+More info
+    @ Github
+        http://github.com/matiu/SQL--Bibliosoph
+
+    @ Cpan
+        http://search.cpan.org/~matiu/
+

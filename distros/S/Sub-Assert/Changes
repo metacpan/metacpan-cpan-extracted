@@ -1,0 +1,21 @@
+Revision history for Perl extension Sub::Assert.
+
+1.23  Sun Nov  1 15:52:00 2009
+  - Distrubution upgrades from Alexandr Ciornii.
+
+1.22  Mon Nov  6 09:23:11 2006
+  - Distrubution upgrade: clear license, spec-conformant META.yml, etc.
+
+1.21  Fri Jun 30 21:12:50 2006
+  - Added META.yml.
+  - Added POD test.
+
+1.20  Sat May 31 18:39:13 2003
+  - Fixed bug without pre or post conditions.
+
+1.10  Wed May 28 22:43:57 2003
+  - Added the Sub::Assert::Nothing functionality.
+
+1.01  Mon May 26 20:15:22 2003
+  - original version as uploaded to CPAN
+

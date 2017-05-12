@@ -1,0 +1,22 @@
+Changes
+DSOM.xs
+Ir.xs
+MANIFEST
+Makefile.PL
+README
+SOM.pm
+SOM.xs
+SOMObject.xs
+common_init.h
+t/animal.t
+t/dsom_object.t
+t/dsom_wps.t
+t/ir.t
+t/wrong_method.t
+typemap
+utils/xsubpp
+utils/dsom_shutdown_servers.pl
+utils/dsom_start_servers.pl
+utils/animals.dll
+utils/ORXSMP.IR
+META.yml                                 Module meta-data (added by MakeMaker)

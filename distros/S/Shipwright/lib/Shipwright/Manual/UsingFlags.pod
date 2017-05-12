@@ -1,0 +1,69 @@
+=head1 NAME
+
+Shipwright::Manual::UsingFlags - Using flags
+
+=head1 DESCRIPTION
+
+Shipwright B<flags> is a method to make a single shipyard to support multiple variants of vessels.
+
+Imagine you want to create a project which requires a database. There are
+several database types you want to support in the same shipyard, while you'd
+like each built vessel to only support one type. (Sometimes you have to choose
+one because some dists will be confused if provided with more than one type;
+e.g.  for RT, you have to supply the database type when running ./configure).
+
+This is a task that you can use Shipwright flags to accomplish.
+
+For example, say you want to support both mysql and postgresql, and you've
+imported mysql, DBD::mysql, postgresql and DBD::Pg to the repository.
+
+The next step is to mark dists with flags; let's use C<mysql> and
+C<postgresql> for this example.
+
+    $ shipwright flags -r ... mysql --set mysql
+    $ shipwright flags -r ... cpan-DBD-mysql --set mysql
+    $ shipwright flags -r ... postgresql --set postgresql
+    $ shipwright flags -r ... cpan-DBD-Pg --set postgresql
+    $ shipwright flags -r ... --mandatory --set mysql,postgresql db
+
+B<Flags> data is stored in F<shipwright/flags.yml>
+
+When building, you can then set C<--flags> to C<mysql> or C<postgresql> to
+install support for that database only.
+
+If a dist needs this info to configure (like RT for example), you'll need
+to customize the build script; see L<Shipwright::Manual::CustomizeBuild> for
+information about how to do this.
+
+If no flags are specified during build, both mysql and postgresql would be
+installed to the vessel. Which one RT chooses to configure for depends on its
+build script.
+
+If necessary, you can also specify certain flags as being mandatory. For
+example, you can specify that a database flag is mandatory; if no flag labelled
+C<db> is specified when invoking the build script, the first one is used as a
+default (mysql in this case) rather than the repository being built with no
+flags. This allows shipyards to support different variants or versions of a
+program.
+
+Note:
+
+Shipwright will automatically add C<default> to C<--flags>, and if a
+dist has no flags set (i.e. it does not appear in F<shipwright/flags.yml>),
+it will be given the C<default> flag and will be installed by default.
+
+=head1 SEE ALSO
+
+L<Shipwright>, L<Shipwright::Manual>
+
+=head1 AUTHORS
+
+sunnavy  C<< <sunnavy@bestpractical.com> >>
+
+=head1 LICENCE AND COPYRIGHT
+
+Shipwright is Copyright 2007-2015 Best Practical Solutions, LLC.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

@@ -1,0 +1,331 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body style="background-color: white">
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#REQUIRED-MODULES">REQUIRED MODULES</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#new">new</a></li>
+      <li><a href="#getNextRow-">getNextRow()</a></li>
+      <li><a href="#numSheets-">numSheets()</a></li>
+      <li><a href="#openSpreadsheet-fileName-">openSpreadsheet(fileName)</a></li>
+      <li><a href="#currentSheetNum-">currentSheetNum()</a></li>
+      <li><a href="#currentSheetName-">currentSheetName()</a></li>
+      <li><a href="#setCurrentSheetNum-num-">setCurrentSheetNum(num)</a></li>
+      <li><a href="#getNextSheet-">getNextSheet()</a></li>
+      <li><a href="#getFirstSheet-">getFirstSheet()</a></li>
+      <li><a href="#cellValue-row-col-">cellValue(row, col)</a></li>
+      <li><a href="#getFirstRow-">getFirstRow()</a></li>
+      <li><a href="#setHeadingRow-rowNumber-">setHeadingRow(rowNumber)</a></li>
+      <li><a href="#setRow-rowNumber-">setRow(rowNumber)</a></li>
+      <li><a href="#getRowNumber-">getRowNumber()</a></li>
+      <li><a href="#logexp-message-">logexp(message)</a></li>
+      <li><a href="#logmsg-debug-message-">logmsg(debug, message)</a></li>
+    </ul>
+  </li>
+  <li><a href="#EXAMPLE-APPLICATIONS">EXAMPLE APPLICATIONS</a></li>
+  <li><a href="#ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</a></li>
+  <li><a href="#KNOWN-ISSUES">KNOWN ISSUES</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#LICENSE">LICENSE</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#UPDATE-HISTORY">UPDATE HISTORY</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Spreadsheet::BasicRead - Methods to easily read data from spreadsheets (.xls, .xlxs and .xlxm)</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Provides methods for simple reading of a Excel spreadsheet row at a time returning the row as an array of column values. Properties can be set so that blank rows are skipped. The heading row can also be set so that reading always starts at this row which is the first row of the sheet by default. Properties can also be set to skip the heading row.</p>
+
+<pre><code> Note 1. Leading and trailing white space is removed from cell values.
+
+ Note 2. Row and column references are zero (0) indexed. That is cell
+         A1 is row 0, column 0
+
+ Note 3. Now handles .xlxs and .xlsm files</code></pre>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> <span class="keyword">use</span> <span class="variable">Spreadsheet::BasicRead</span><span class="operator">;</span>
+ 
+ <span class="keyword">my</span> <span class="variable">$xlsFileName</span> <span class="operator">=</span> <span class="string">'Test.xls'</span><span class="operator">;</span>
+ 
+ <span class="keyword">my</span> <span class="variable">$ss</span> <span class="operator">=</span> <span class="variable">new</span> <span class="variable">Spreadsheet::BasicRead</span><span class="operator">(</span><span class="variable">$xlsFileName</span><span class="operator">)</span> <span class="operator">||</span>
+    <span class="keyword">die</span> <span class="string">"Could not open '</span><span class="variable">$xlsFileName</span><span class="string">': $!"</span><span class="operator">;</span>
+ 
+ <span class="comment"># Print the row number and data for each row of the</span>
+ <span class="comment"># spreadsheet to stdout using '|' as a separator</span>
+ <span class="keyword">my</span> <span class="variable">$row</span> <span class="operator">=</span> <span class="number">0</span><span class="operator">;</span>
+ <span class="keyword">while</span> <span class="operator">(</span><span class="keyword">my</span> <span class="variable">$data</span> <span class="operator">=</span> <span class="variable">$ss</span><span class="operator">-&gt;</span><span class="variable">getNextRow</span><span class="operator">())</span>
+ <span class="operator">{</span>
+    <span class="variable">$row</span><span class="operator">++;</span>
+    <span class="keyword">print</span> <span class="keyword">join</span><span class="operator">(</span><span class="string">'|'</span><span class="operator">,</span> <span class="variable">$row</span><span class="operator">,</span> <span class="variable">@$data</span><span class="operator">),</span> <span class="string">"\n"</span><span class="operator">;</span>
+ <span class="operator">}</span>
+ 
+ <span class="comment"># Print the number of sheets</span>
+ <span class="keyword">print</span> <span class="string">"There are "</span><span class="operator">,</span> <span class="variable">$ss</span><span class="operator">-&gt;</span><span class="variable">numSheets</span><span class="operator">(),</span> <span class="string">" in the spreadsheet\n"</span><span class="operator">;</span>
+ 
+ <span class="comment"># Set the heading row to 4</span>
+ <span class="variable">$ss</span><span class="operator">-&gt;</span><span class="variable">setHeadingRow</span><span class="operator">(</span><span class="number">4</span><span class="operator">);</span>
+ 
+ <span class="comment"># Skip the first data line, it's assumed to be a heading</span>
+ <span class="variable">$ss</span><span class="operator">-&gt;</span><span class="variable">skipHeadings</span><span class="operator">(</span><span class="number">1</span><span class="operator">);</span>
+ 
+ <span class="comment"># Print the name of the current sheet</span>
+ <span class="keyword">print</span> <span class="string">"Sheet name is "</span><span class="operator">,</span> <span class="variable">$ss</span><span class="operator">-&gt;</span><span class="variable">currentSheetName</span><span class="operator">(),</span> <span class="string">"\n"</span><span class="operator">;</span>
+ 
+ <span class="comment"># Reset back to the first row of the sheet</span>
+ <span class="variable">$ss</span><span class="operator">-&gt;</span><span class="variable">getFirstRow</span><span class="operator">();</span>
+</code></pre>
+
+<h1 id="REQUIRED-MODULES">REQUIRED MODULES</h1>
+
+<p>The following modules are required:</p>
+
+<pre><code> Spreadsheet::ParseExcel
+ Spreadsheet::XLSX</code></pre>
+
+<p>Optional module File::Log can be used to allow simple logging of errors.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<p>There are no class methods, the object methods are described below. Private class method start with the underscore character &#39;_&#39; and should be treated as <i>Private</i>.</p>
+
+<h2 id="new">new</h2>
+
+<p>Called to create a new BasicReadNamedCol object. The arguments can be either a single string (see <a href="#SYNOPSIS">&#39;SYNOPSIS&#39;</a>) which is taken as the filename of the spreadsheet of as named arguments.</p>
+
+<pre><code> <span class="variable">eg</span><span class="operator">.</span>  <span class="keyword">my</span> <span class="variable">$ss</span> <span class="operator">=</span> <span class="variable">Spreadsheet::BasicReadNamedCol</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span>
+                  <span class="string">fileName</span>      <span class="operator">=&gt;</span> <span class="string">'MyExcelSpreadSheet.xls'</span><span class="operator">,</span>
+                  <span class="string">skipHeadings</span>  <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span>
+                  <span class="string">skipBlankRows</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span>
+                  <span class="string">log</span>           <span class="operator">=&gt;</span> <span class="variable">$log</span><span class="operator">,</span>
+                  <span class="string">oldCell</span>       <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span>
+              <span class="operator">);</span>
+</code></pre>
+
+<p>The following named arguments are available:</p>
+
+<dl>
+
+<dt id="skipHeadings">skipHeadings</dt>
+<dd>
+
+<p>Don&#39;t output the headings line in the first call to <a href="#getNextRow">&#39;getNextRow&#39;</a> if true. This is the first row of the spreadsheet unless the setHeadingRow function has been called to set the heading row.</p>
+
+</dd>
+<dt id="skipBlankRows">skipBlankRows</dt>
+<dd>
+
+<p>Skip blank lines in the spreadsheet if true.</p>
+
+</dd>
+<dt id="log">log</dt>
+<dd>
+
+<p>Use the File::Log object to log exceptions. If not provided error conditions are logged to STDERR</p>
+
+</dd>
+<dt id="fileName">fileName</dt>
+<dd>
+
+<p>The name (and optionally path) of the spreadsheet file to process.</p>
+
+</dd>
+<dt id="oldCell">oldCell</dt>
+<dd>
+
+<p>Empty cells returned undef pre version 1.5. They now return &#39;&#39;.</p>
+
+<p>The old functionality can be turned on by setting argument <i>oldCell</i> to true</p>
+
+</dd>
+</dl>
+
+<p><b>Note that new will die if the spreadsheet can not be successfully opened.</b> As such you may wish to wrap the call to new in a eval block. See xlsgrep|EXAMPLE APPLICATIONS for an example of when this might be desirable.</p>
+
+<h2 id="getNextRow-">getNextRow()</h2>
+
+<p>Get the next row of data from the spreadsheet. The data is returned as an array reference.</p>
+
+<pre><code> <span class="variable">eg</span><span class="operator">.</span>  <span class="variable">$rowDataArrayRef</span> <span class="operator">=</span> <span class="variable">$ss</span><span class="operator">-&gt;</span><span class="variable">getNextRow</span><span class="operator">();</span>
+</code></pre>
+
+<h2 id="numSheets-">numSheets()</h2>
+
+<p>Returns the number of sheets in the spreadsheet</p>
+
+<h2 id="openSpreadsheet-fileName-">openSpreadsheet(fileName)</h2>
+
+<p>Open a new spreadsheet file and set the current sheet to the first sheet. The name and optionally path of the spreadsheet file is a required argument to this method.</p>
+
+<h2 id="currentSheetNum-">currentSheetNum()</h2>
+
+<p>Returns the current sheet number or undef if there is no current sheet. <a href="#setCurrentSheetNum">&#39;setCurrentSheetNum&#39;</a> can be called to set the current sheet.</p>
+
+<h2 id="currentSheetName-">currentSheetName()</h2>
+
+<p>Return the name of the current sheet or undef if the current sheet is not defined. see <a href="#setCurrentSheetNum">&#39;setCurrentSheetNum&#39;</a>.</p>
+
+<h2 id="setCurrentSheetNum-num-">setCurrentSheetNum(num)</h2>
+
+<p>Sets the current sheet to the integer value &#39;num&#39; passed as the required argument to this method. Note that this should not be bigger than the value returned by <a href="#numSheets">&#39;numSheets&#39;</a>.</p>
+
+<h2 id="getNextSheet-">getNextSheet()</h2>
+
+<p>Returns the next sheet &quot;ssBook&quot; object or undef if there are no more sheets to process. If there is no current sheet defined the first sheet is returned.</p>
+
+<h2 id="getFirstSheet-">getFirstSheet()</h2>
+
+<p>Returns the first sheet &quot;ssBook&quot; object.</p>
+
+<h2 id="cellValue-row-col-">cellValue(row, col)</h2>
+
+<p>Returns the value of the cell defined by (row, col)in the current sheet.</p>
+
+<h2 id="getFirstRow-">getFirstRow()</h2>
+
+<p>Returns the first row of data from the spreadsheet (possibly skipping the column headings <a href="#new">&#39;skipHeadings&#39;</a> as an array reference.</p>
+
+<h2 id="setHeadingRow-rowNumber-">setHeadingRow(rowNumber)</h2>
+
+<p>Sets the effective minimum row for the spreadsheet to &#39;rowNumber&#39;, since it is assumed that the heading is on this row and anything above the heading is not relavent.</p>
+
+<p><b>Note:</b> the row (and column) numbers are zero indexed.</p>
+
+<h2 id="setRow-rowNumber-">setRow(rowNumber)</h2>
+
+<p>Sets the row to be returned by the next call to <a href="#getNextRow">&#39;getNextRow&#39;</a>. Note that if the heading row has been defined and the row number set with setRow is less than the heading row, data will be returned from the heading row regardless, unless skip heading row has been set, in which case it will be the row after the heading row.</p>
+
+<h2 id="getRowNumber-">getRowNumber()</h2>
+
+<p>Returns the number of the current row (that has been retrieved). Note that row numbers are zero indexed. If a row has not been retrieved as yet, -1 is returned.</p>
+
+<h2 id="logexp-message-">logexp(message)</h2>
+
+<p>Logs an exception message (can be a list of strings) using the File::Log object if it was defined and then calls die message.</p>
+
+<h2 id="logmsg-debug-message-">logmsg(debug, message)</h2>
+
+<p>If a File::Log object was passed as a named argument <a href="#new">&#39;new&#39;</a> and if &#39;debug&#39; (integer value) is equal to or greater than the current debug Level (see File::Log) then the message is added to the log file.</p>
+
+<p>If a File::Log object was not passed to new then the message is output to STDERR.</p>
+
+<h1 id="EXAMPLE-APPLICATIONS">EXAMPLE APPLICATIONS</h1>
+
+<p>Two sample (but usefull) applications are included with this distribution.</p>
+
+<p>The simplest is dumpSS.pl which will dump the entire contents of a spreadsheet to STDOUT. Each sheet is preceeded by the sheet name (enclosed in ***) on a line, followed by each row of the spreadsheet, with cell values separated by the pipe &#39;|&#39; character. There is no special handling provided for cells containing the pipe character.</p>
+
+<p>A more complete example is xlsgrep. This application can be used to do a perl pattern match for cell values within xls files in the current and sub directories. There are no special grep flags, however this should not be a problem since perl&#39;s pattern matching allows for most requirements within the search pattern.</p>
+
+<pre><code> Usage is: xlsgrep.pl pattern</code></pre>
+
+<p>To do a case insensative search for &quot;Some value&quot; in any xls file in the current directory you would use:</p>
+
+<pre><code> xlsgrep &#39;(?i)Some value&#39;</code></pre>
+
+<p>For further details, see each applications POD.</p>
+
+<h1 id="ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</h1>
+
+<p>I would like to acknowledge the input and patches recieved from the following:</p>
+
+<p>Ilia Lobsanov, Bryan Maloney, Bill (from Datacraft), nadim and D. Dewey Allen</p>
+
+<h1 id="KNOWN-ISSUES">KNOWN ISSUES</h1>
+
+<p>None, however please contact the author at gng@cpan.org should you find any problems and I will endevour to resolve then as soon as possible.</p>
+
+<p>If you have any enhancement suggestions please send me an email and I will try to accommodate your suggestion.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p>Spreadsheet:ParseExcel on CPAN does all the hard work, thanks Kawai Takanori (Hippo2000) kwitknr@cpan.org</p>
+
+<p>The included applications dumpSS.pl and xlsgrep.pl</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<pre><code> Greg George, IT Technology Solutions P/L, Australia
+ Mobile: +61-404-892-159, Email: gng@cpan.org</code></pre>
+
+<h1 id="LICENSE">LICENSE</h1>
+
+<p>Copyright (c) 1999- Greg George. All rights reserved. This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>This is version 1.12</p>
+
+<h1 id="UPDATE-HISTORY">UPDATE HISTORY</h1>
+
+<pre><code> <span class="variable">Revision</span> <span class="number">1.12</span>  <span class="number">2017</span><span class="operator">/</span><span class="number">05</span><span class="operator">/</span><span class="number">01</span> <span class="variable">Greg</span>
+ <span class="operator">-</span> <span class="variable">Added</span> <span class="variable">handling</span> <span class="variable">of</span> <span class="operator">.</span><span class="variable">xlxs</span> <span class="operator">&amp;</span> <span class="operator">.</span><span class="variable">xlxm</span> <span class="variable">files</span>
+ <span class="operator">-</span> <span class="variable">Added</span> <span class="variable">utf8</span> <span class="variable">conversion</span> <span class="keyword">for</span> <span class="operator">.</span><span class="variable">xls</span><span class="operator">[</span><span class="operator">x|</span><span class="regex">m] files as well as decoding of html escapes &amp;amp; &amp;lt; and &amp;gt;
+ 
+ Revision 1.11  2012/04/10 11:08:42  Greg
+ - Added handling of .xlxs files
+ 
+ Revision 1.10  2006/04/30 05:35:13  Greg
+ - added getRowNumber()
+ 
+ Revision 1.9  2006/03/05 02:43:34  Greg
+ - Update of Acknowledgments
+ 
+ Revision 1.8  2006/03/05 02:31:41  Greg
+ - Changes to cellValue return to cater for 'GENERAL' value sometimes returned from OpenOffice spreadsheets
+   patch provided by Ilia Lobsanov &lt;samogon</span><span class="variable">@gmail</span><span class="regex">.com&gt;
+   see http://www.annocpan.org/~KWITKNR/Spreadsheet-ParseExcel-0.2602/ParseExcel.pm#note_18
+ 
+ Revision 1.7  2006/01/25 22:17:47  Greg
+ - Correction to reading of the first row of the next sheet (without calling getFirstRow).
+   Error detected and reported by Tim Rossiter
+ - Reviewed memory useage as reported by Ilia Lobsanov - this seems to be in the underlying OLE::Storage_Lite
+ 
+ Revision 1.6  2005/02/21 09:54:08  Greg
+ - Update to setCurrentSheetNum() so that the new sheet is handled by BasicRead functions
+ 
+ Revision 1.5  2004/10/08 22:40:27  Greg
+ - Changed cellValue to return '' for an empty cell rather than undef (requested by D D Allen).  Old functionality can be maintained by setting named parameter 'oldCell' to true in call to new().
+ - Added examples to POD
+ 
+ Revision 1.4  2004/10/01 11:02:21  Greg
+ - Updated getNextRow to skip sheets that have nothing on them
+ 
+ Revision 1.3  2004/09/30 12:32:25  Greg
+ - Update to currentSheetNum and getNextSheet functions
+ 
+ Revision 1.2  2004/08/21 02:30:29  Greg
+ - Added setHeadingRow and setRow
+ - Updated documentation
+ - Remove irrelavant use lib;
+ 
+ Revision 1.1.1.1  2004/07/31 07:45:02  Greg
+ - Initial release to CPAN
+ </span>
+</code></pre>
+
+
+</body>
+
+</html>
+
+

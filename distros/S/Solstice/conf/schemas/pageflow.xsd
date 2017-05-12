@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+  <xsd:element name="application">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="states" />
+        <xsd:element ref="pageflows" />
+        <xsd:element ref="globaltransitions" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="states">
+    <xsd:complexType>
+      <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+        <xsd:element name="state">
+          <xsd:complexType>
+            <xsd:attribute name="name" type="xsd:string" use="required" />
+            <xsd:attribute name="controller" type="xsd:string" use="required" />
+          </xsd:complexType>
+        </xsd:element>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="pageflows">
+    <xsd:complexType>
+      <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+        <xsd:element ref="pageflow" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="globaltransitions" >
+    <xsd:complexType>
+      <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+        <xsd:element ref="transition" minOccurs="0" />
+        <xsd:element ref="begin" minOccurs="0" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+
+  <xsd:element name="pageflow">
+    <xsd:complexType>
+      <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+        <xsd:element ref="state" />
+    <xsd:element ref="globaltransitions" minOccurs="0"/>
+    </xsd:sequence>
+      <xsd:attribute name="name" type="xsd:string" use="required" />
+      <xsd:attribute name="entrance" type="xsd:string" use="required" />
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="state">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="transitions" />
+        <xsd:element ref="failovers" minOccurs="0" />
+      </xsd:sequence>
+      <xsd:attribute name="name" type="xsd:string" use="required" />
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="transitions">
+    <xsd:complexType>
+      <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+        <xsd:element ref="transition" minOccurs="0" />
+        <xsd:element ref="begin" minOccurs="0" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="transition">
+    <xsd:complexType>
+      <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+        <xsd:element ref="lifecycle" />
+      </xsd:sequence>
+      <xsd:attribute name="action" type="xsd:string" use="required" />
+      <xsd:attribute name="state" type="xsd:string" use="required" />
+      <xsd:attribute name="pageflow" type="xsd:string" use="optional" />
+      <xsd:attribute name="onback" type="xsd:string" />
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="begin">
+    <xsd:complexType>
+      <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+        <xsd:element ref="lifecycle" />
+      </xsd:sequence>
+      <xsd:attribute name="action" type="xsd:string" use="required" />
+      <xsd:attribute name="application" type="xsd:string" />
+      <xsd:attribute name="pageflow" type="xsd:string" use="required" />
+      <xsd:attribute name="input" type="xsd:string" />
+      <xsd:attribute name="output" type="xsd:string" />
+      <xsd:attribute name="onback" type="xsd:string" />
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:simpleType name="lifecycleName">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="freshen" />
+      <xsd:enumeration value="validate" />
+      <xsd:enumeration value="update" />
+      <xsd:enumeration value="commit" />
+      <xsd:enumeration value="revert" />
+      <xsd:enumeration value="validPreConditions" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:element name="lifecycle">
+    <xsd:complexType>
+      <xsd:attribute name="name" type="lifecycleName" use="required" />
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="failovers">
+    <xsd:complexType>
+      <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+        <xsd:element ref="failover" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="failover">
+    <xsd:complexType>
+      <xsd:attribute name="name" type="lifecycleName" use="required" />
+      <xsd:attribute name="state" type="xsd:string" use="required" />
+    </xsd:complexType>
+  </xsd:element>
+
+</xsd:schema>

@@ -1,0 +1,54 @@
+---
+abstract: 'Perl extension to reduce boilerplate in Perl shell scripts'
+author:
+  - 'Hauke D <haukex@zero-g.net>'
+build_requires:
+  Capture::Tiny: '0'
+  Config: '0'
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Shell-Tools
+no_index:
+  directory:
+    - t
+    - inc
+recommends:
+  File::Find::Rule: '0'
+  File::pushd: '0'
+  IPC::Run3::Shell: '0.52'
+  Path::Class: '0'
+  Try::Tiny: '0'
+requires:
+  Carp: '0'
+  Cwd: '0'
+  Data::Dumper: '0'
+  Exporter: '0'
+  Fcntl: '0'
+  File::Basename: '0'
+  File::Copy: '0'
+  File::Find: '0'
+  File::Path: '2.08'
+  File::Spec::Functions: '0'
+  File::Temp: '0'
+  FindBin: '0'
+  Getopt::Std: '1.04'
+  IO::File: '0'
+  IO::Handle: '0'
+  List::Util: '0'
+  Pod::Usage: '0'
+  Scalar::Util: '0'
+  base: '0'
+  perl: '5.008000'
+resources:
+  bugtracker: https://github.com/haukex/Shell-Tools/issues
+  homepage: https://github.com/haukex/Shell-Tools
+  repository: https://github.com/haukex/Shell-Tools.git
+version: '0.04'

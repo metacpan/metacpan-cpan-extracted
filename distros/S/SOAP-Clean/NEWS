@@ -1,0 +1,14 @@
+Revision history for Perl extension SOAP::Clean.
+
+0.02  Tue 04/29/03 07:27 PM
+	- Bug fix release in support of the Pipe Problem experiments
+	- wsdl-client.pl will print the total size of requests and
+	  responses when verbose flag is given.
+
+0.01  Fri 01/17/03 05:52 AM
+	- First release
+
+0.00  Wed Jan 15 08:52:49 2003
+	- original version; directory structure created by h2xs 1.21
+	with options -A -n SOAP::Clean
+

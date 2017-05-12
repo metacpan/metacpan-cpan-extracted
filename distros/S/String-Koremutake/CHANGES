@@ -1,0 +1,12 @@
+ChangeLog for String::Koremutake:
+
+0.30 Mon Apr  4 07:02:38 CST 2005
+	- throw an exception if you don't pass in a number or
+          koremutake string
+	- minor doc cleanup
+
+0.29 Fri Mar 25 04:25:48 GMT 2005
+	- 100% pod coverage
+
+0.28 Sat Jan  8 11:41:27 GMT 2005
+	- First released version

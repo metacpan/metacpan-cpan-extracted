@@ -1,0 +1,8 @@
+Revision history for Perl extension Sort::Fields.
+
+0.01  Sat Jan 24 01:20:08 1998
+	- original version; created by h2xs 1.16
+
+0.90 Fri Jan 30 13:33:13 MST 1998
+	- first reasonable beta version
+	- incorporates a stable sorting option

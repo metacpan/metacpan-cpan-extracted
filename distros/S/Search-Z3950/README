@@ -1,0 +1,27 @@
+Search::Z3950
+=============
+
+Simple Z39.50 searching for ordinary folk.
+
+See the POD documentation for details.
+
+
+INSTALLING
+----------
+
+Follow the usual Perl module installation process:
+
+    perl Makefile.PL
+    make
+    make test
+    [sudo] make install
+
+NOTE: When you run `make test', Search::Z3950 will, by default, contact the
+(U.S.A.) Library of Congress's Z39.50 server.  To choose a different server
+to use in testing, run `perl Makefile.PL --interact' instead of just
+`perl Makefile.PL'.  You will then be able to choose from a list of servers.
+
+WARNING: Unfortunately, testing against other servers may result in failure,
+because I haven't tested the tests themselves to make sure the proper queries
+are sent!
+

@@ -1,0 +1,28 @@
+Revision history for Sys-Run-Safer
+
+0.04    2015-09-06 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.03    2014-12-24 (PERLANCAR)
+
+	- No functional changes.
+
+	- Mention some other alternative modules [RT#101074].
+
+
+0.02    2014-12-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- [pod] Fix example in Synopsis.
+
+
+0.01     2014-12-18 (PERLANCAR)
+
+         - First release.

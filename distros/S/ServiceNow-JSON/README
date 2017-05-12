@@ -1,0 +1,32 @@
+ServiceNow-JSON version 0.01
+============================
+
+Allows for easy use of the ServiceNow JSON REST api from perl.  Supports
+both legacy and new JSON versions.  
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Moose
+    REST::Client
+    MIME::Base64
+    JSON
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2014 by Kevin L. Kane
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+

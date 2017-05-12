@@ -1,0 +1,54 @@
+---
+x-api-blueprint:
+  resource_section: name_uri
+  action_section: name_method
+swagger: "2.0"
+info:
+  version: "1.0"
+  title: Named Resource and Actions API
+  description: |
+    This API example demonstrates how to name a resource and its actions, to give the reader a better idea about what the resource is used for.
+
+    ## API Blueprint
+    + [Previous: Resource and Actions](02.%20Resource%20and%20Actions.md)
+    + [This: Raw API Blueprint](https://raw.github.com/apiaryio/api-blueprint/master/examples/03.%20Named%20Resource%20and%20Actions.md)
+    + [Next: Grouping Resources](04.%20Grouping%20Resources.md)
+
+paths:
+  /message:
+    x-api-blueprint:
+      summary: My Message
+      description: |
+        OK, `My Message` probably isn't the best name for our resource but it will do for now. Note the URI `/message` is enclosed in square brackets.
+
+    get:
+      summary: Retrieve a Message
+      description: |
+        Now this is informative! No extra explanation needed here. This action clearly retrieves the message.
+
+      produces:
+        - text/plain
+      responses:
+        200:
+          description: The response message
+          schema:
+            format: string
+            example: "Hello World!"
+    put:
+      summary: Update a Message
+      description: |
+        `Update a message` - nice and simple naming is the best way to go.
+
+      consumes:
+        - text/plain
+      parameters:
+        - in: body
+          name: message
+          schema:
+            format: string
+            example: "All your base are belong to us."
+      responses:
+        204:
+          description: The response message
+
+# vim: ts=2:sw=2:et

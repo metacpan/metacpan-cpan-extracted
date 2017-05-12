@@ -1,0 +1,196 @@
+/* standard elements */
+body
+    {
+    background: #FFFFFF;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-weight: normal;
+    }
+td
+    {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-weight: normal;
+    text-decoration: none;
+    }
+input
+    {
+    }
+select
+    {
+    }
+p
+    {
+    color: #000000;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-weight: normal;
+    }
+blockquote
+    {
+    color: #000000;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-weight: normal;
+    }
+dl
+    {
+    color: #000000;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-weight: normal;
+    }
+
+dt
+    {
+    color: #000000;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-weight: normal;
+    }
+
+ul
+    {
+    color: #000000;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-weight: normal;
+    list-style-type: disc;
+    }
+ol
+    {
+    color: #000000;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-weight: normal;
+    }
+h1
+    {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: larger;
+    font-weight: bold;
+    color: #B82619;
+    }
+h2
+    {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: larger;
+    font-weight: bold;
+    color: #B82619;
+    background-color: #EAE2BB;
+    }
+h3
+    {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    color: #000000;
+    }
+h4
+    {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    color: #B82619;
+    }
+
+/* default links */
+a:link
+    {
+    color: #B82619;
+    text-decoration: underline;
+    }
+a:visited
+    {
+    color: #80764F;
+    text-decoration: underline;
+    }
+a:hover
+    {
+    color: #000000;
+    text-decoration: underline;
+    }
+a:active
+    {
+    color: #B82619;
+    text-decoration: underline;
+    }
+
+/* general styles */
+.heading
+    {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: larger;
+    font-weight: bold;
+    color: #B82619;
+    }
+.headingwhite
+    {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: larger;
+    font-weight: bold;
+    color: #FFFFFF;
+    }
+.subheading
+    {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    color: #B82619;
+    }
+.subheadingsmall
+    {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    color: #B82619;
+    }
+.subheadingblack
+    {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    color: #000000;
+    }
+.subheadingwhite
+    {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    color: #FFFFFF;
+    }
+.docsubheading
+    {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    color: #B82619;
+    background-color: #EAE2BB;
+    }
+.docsubheadinggrey
+    {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    color: #B82619;
+    background-color: #cccccc;
+    }
+.error
+    {
+    color: #B82619;
+    }
+.err
+    {
+    color: #B82619;
+    }
+
+/* deco */
+.lineColour
+    {
+    background: #999999;
+    }
+
+/* unordered list without bullets */
+ul.sans
+    {
+    list-style-type: none;
+    }
+
+td.block
+    {
+    background: #EaE2BB;
+    }
+
+/*  footer  */
+td.footer
+    {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: smaller;
+    color: #000000;
+    text-decoration: none;
+    }
+

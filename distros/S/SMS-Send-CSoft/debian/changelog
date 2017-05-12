@@ -1,0 +1,29 @@
+libsms-send-csoft-perl (1.111490-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Mark Hindess <soft-debian@temporalanomaly.com>  Sun, 29 May 2011 20:06:55 +0100
+
+libsms-send-csoft-perl (1.111480-1) unstable; urgency=low
+
+  * Make testing more portable.
+
+ -- Mark Hindess <soft-debian@temporalanomaly.com>  Sat, 28 May 2011 20:48:16 +0100
+
+libsms-send-csoft-perl (1.102671-1) unstable; urgency=low
+
+  * Fix $VERSION.
+
+ -- Mark Hindess <soft-debian@temporalanomaly.com>  Fri, 24 Sep 2010 16:16:02 +0100
+
+libsms-send-csoft-perl (1.102670-1) unstable; urgency=low
+
+  * Make tests more robust.
+
+ -- Mark Hindess <soft-debian@temporalanomaly.com>  Fri, 24 Sep 2010 12:49:34 +0100
+
+libsms-send-csoft-perl (1.102600-1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Mark Hindess <soft-debian@temporalanomaly.com>  Fri, 17 Sep 2010 10:33:43 +0100

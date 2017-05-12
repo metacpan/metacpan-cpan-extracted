@@ -1,0 +1,43 @@
+
+Installation
+------------
+
+To install the script and man pages in the standard areas, 
+give the sequence of commands
+
+ $ perl Makefile.PL
+ $ make
+ $ make test
+ $ make install      # you probably need to do this step as superuser
+
+If you want to install the script in your own private space, use
+
+ $ perl Makefile.PL PREFIX=/home/joeuser \
+        INSTALLMAN1DIR=/home/joeuser/man/man1 \
+        INSTALLMAN3DIR=/home/joeuser/man/man3      
+ $ make
+ $ make test
+ $ make install      # can do this step as joeuser
+
+Note that `make test` does nothing interesting.
+
+
+Uninstallation
+--------------
+
+Under a user with sufficient permissions and from the program
+distribution directory, execute
+
+  perl Makefile.PL
+
+if there isn't a file called Makefile.  Then execute
+
+  make uninstall
+
+This sometimes works, and sometimes it does not.  If it refuses to work,
+you can simply remove all files by hand.  Look for the .packlist file
+which perl created when installing the software and remove all files you
+find in there.
+
+
+

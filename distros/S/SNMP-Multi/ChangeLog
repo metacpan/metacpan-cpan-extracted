@@ -1,0 +1,9 @@
+2003-12-18  toni  <toni@irational.org>
+
+	* 2.1 added work-around to make UseNumeric work, made method
+	"remaining" optionaly cumulative (takes existing VarReq object as
+	am optional argument - remaning hosts get added to it)
+
+	
+Fri Jan 11 12:18:13 PST 2002
+	- Public release

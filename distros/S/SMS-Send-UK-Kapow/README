@@ -1,0 +1,37 @@
+SMS-Send-UK-Kapow
+
+SMS::Send::UK::Kapow is a SMS::Send driver that delivers messages
+via the http://www.kapow.co.uk website.
+
+Messages for any country can be sent through this interface, although
+Kapow is generally aimed at users in the UK.
+
+You need to create an account at http://www.kapow.co.uk to be able to
+use this driver. You will also need to purchase some SMS credits for 
+your account. Other optional services such getting a custom 'from-id'
+or setting trusted sender email addresses can be configured in your
+Kapow account and used through this module.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc SMS::Send::UK::Kapow
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Jeremy Jones
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

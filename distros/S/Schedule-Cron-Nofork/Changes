@@ -1,0 +1,13 @@
+Revision history for Perl extension Schedule::Cron::Nofork.
+
+0.03
+  - imported into cvs
+  - added inline test
+  - made Makefile.PL Perl 5.8 compliant
+
+0.02
+  - Fixed prerequisites in Makefile.PL
+
+0.01  Fri Jan 10 10:00:29 2003
+  - original version; created by h2xs 1.21 with options
+    -X Schedule::Cron::Nofork

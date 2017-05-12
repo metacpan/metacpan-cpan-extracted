@@ -1,0 +1,27 @@
+The following people have commit access to the SVK sources.
+Note that this is not a full list of SVK's authors, however --
+for that, you'd need to look over the log messages to see all the
+patch contributors.
+
+If you have a question or comment, it's probably best to mail
+svk-devel@bestpractical.com, rather than mailing any of these people
+directly.
+
+[ This file may be incomplete; if you are a committer, please add yourself ]
+
+        clkao      Chia-liang Kao <clkao@clkao.org>
+      audreyt      Audrey Tang <cpan@audreyt.org>
+      glasser      David Glasser <glasser@mit.edu>
+        gugod      Kang-Min Liu <gugod@gugod.org>
+      hcchien      Hsin-Chang Chien <hcchien@hcchien.org>
+        jesse      Jesse Vincent <jesse@bestpractical.com>
+       klight      Kevin Light <klight@walkertechnical.com>
+         knew
+      lukhnos      Lukhnos Liu <lukhnos@lukhnos.org>
+     matthewd
+           mb      Michael Brouwer <mb.7766@gmail.com>
+       mndrix      Michael Hendricks <michael@ndrix.org>
+      nnunley      Norman Nunley <nnunley@gmail.com>
+       rbrown
+       sartak      Shawn M Moore <sartak@bestpractical.com>
+         stig      Stig Brautaset <stig@brautaset.org>

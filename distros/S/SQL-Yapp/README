@@ -1,0 +1,73 @@
+SQL-Yapp - Yet Another Perl Preprocessor for SQL
+
+The SQL::Yapp module is an embedded preprocessor for Perl that lets
+you use native SQL expressions in Perl that can directly be used with
+e.g. DBI.  Perl variables can be interpolated easily, and SQL
+substatements and expressions can be parsed separately and used in
+larger expressions.  The goal is to make SQL injections impossible
+while using a natural SQL language syntax directly in Perl.
+
+By parsing all embedded SQL statements, this package also provides
+compile-time syntax checking of SQL.
+
+Example:
+
+   my %values= (
+       title  => 'The Language Construction Kit',
+       author => 'Mark Rosenfelder',
+       isbn13 => '978-0984470006',
+   );
+   sqlDo{ INSERT INTO book SET %values };
+
+The module has some capabilities to normalise SQL statements and
+translate between SQL dialects to ease porting.
+
+Although the current SQL parser is far from complete, most things and
+many extensions already works.  The man page gives an extensive
+overview of what is implemented.
+
+The major goals are security (i.e., lack of SQL injections), ease of
+use, and concise and natural mixing of Perl and SQL.  Completeness or
+efficiency comes second.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc SQL::Yapp
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=SQL-Yapp
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/SQL-Yapp
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/SQL-Yapp
+
+    Search CPAN
+        http://search.cpan.org/dist/SQL-Yapp/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) Henrik Theiling
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

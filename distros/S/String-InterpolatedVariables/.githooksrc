@@ -1,0 +1,14 @@
+force_plugins = PerlCompile, PerlCritic, ValidatePODFormat, BlockNOCOMMIT, PrependTicketID, RequireCommitMessage, ValidateChangelogFormat, VersionTagsRequireChangelog
+project_prefixes = GH
+extract_ticket_id_from_branch = /^($project_prefixes\d+)/
+normalize_branch_ticket_id = s/^(.*?)(\d+)$/\U$1-$2/
+extract_ticket_id_from_commit = /^\(($project_prefixes-\d+)\) /
+
+[PrependTicketID]
+commit_prefix_format = /($ticket_id) /
+
+[PerlCompile]
+lib_paths = ./lib/
+
+[VersionTagsRequireChangelog]
+changelog_path = Changes

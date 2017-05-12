@@ -1,0 +1,23 @@
+---
+abstract: 'Move or rename symbols at compile time.'
+author:
+  - 'Chad Granum <exodist@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Symbol-Move
+requires:
+  B: '0'
+  Carp: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: http://github.com/exodist/Symbol-Move/issues
+  repository: http://github.com/exodist/Symbol-Move/
+version: '0.000002'

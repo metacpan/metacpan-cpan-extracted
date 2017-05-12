@@ -1,0 +1,11 @@
+Build.PL
+Changes
+MANIFEST
+README
+lib/Statistics/embedR.pm
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/Statistics-embedR.t
+META.yml

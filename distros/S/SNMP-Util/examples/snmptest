@@ -1,0 +1,1249 @@
+#!/usr/local/bin/perl 
+
+## Wayne Marquette
+##
+## 08/06/98
+##
+## Test script for evaluating the nvew SNMP module from Bay Networks (gmarzot).
+
+use SNMP::Util;
+$ENV{'MAX_LOG_LEVEL'} = 'status';
+
+if (@ARGV < 1){
+   print "Usage: \n";
+   print "       snmptest <IP> <community string> \n";
+   print "\n";
+   print "       IP = IP address or Switch name\n";
+   print "       comm = defaults to hostname\n";
+   exit;
+}
+
+## Local variables.
+my(
+   $community,
+   $errno,
+   $host1,
+   $instance1,
+   $oid,
+   $oid1,
+   $oid2,
+   $oid_num,
+   $snmp1,
+   $type,
+   $value,
+   $vars,
+   @vals,
+   );
+
+## Variable init.
+$IP = $ARGV[0];
+$community = $ARGV[1];
+
+$snmp = new SNMP::Util(-device => $IP,
+                  -community => $community,
+                  -timeout => 5,
+                  -retry => 2,
+                  -poll => 'on',
+                  -poll_timeout => .1,
+	          -verbose => 'off',
+		  -delimiter => ' ',  # Optional for octets default is space
+                 )
+    or die "Can't create snmp object for $IP\n";
+
+$test_num = 1;
+print "\n-------------------------------------------------------------------------------\n";
+print "\n>>>> Test $test_num - Get system uptime  <<<<\n";
+print "\n";
+print "input: name.index\n";
+print "output: name,value,enum\n";
+print "\n";
+@uptime = $snmp->get('nve','sysUpTime.0');
+print "uptime = @uptime\n";
+
+if (!$snmp->error && $uptime[0] =~ /sysUpTime/ && $uptime[1] =~ /^\d+/ && $uptime[2] =~ /day/){
+    print "\nTest - passed\n";
+    $test_results[$test_num] = 1;
+}
+else{
+    $error = $snmp->errmsg;
+    print "\nTest - failed $error\n";
+    $test_results[$test_num] = 0;
+    $error_detail = $snmp->errmsg_detail;
+    print "error_detail = $error_detail\n";
+}
+
+$test_num++;
+print "\n-------------------------------------------------------------------------------\n";
+print "\n>>>> Test $test_num - Get system uptime  <<<<\n";
+print "\n";
+print "input: oid, index\n";
+print "output: name,value,enum\n";
+print "\n";
+@uptime = $snmp->get('nve',"1.3.6.1.2.1.1.3",0);
+print "uptime = @uptime\n";
+
+if (!$snmp->error &&$uptime[0] =~ /sysUpTime/ && $uptime[1] =~ /^\d+/ && $uptime[2] =~ /day/){
+    print "\nTest - passed\n";
+    $test_results[$test_num] = 1;
+}
+else{
+    $error = $snmp->errmsg;
+    print "\nTest - failed $error\n";
+    $test_results[$test_num] = 0;
+}
+
+$test_num++;
+print "\n-------------------------------------------------------------------------------\n";
+print "\n>>>> Test $test_num - Get system Descriptor Displaystring  <<<<\n";
+print "\n";
+print "input: name.index\n";
+print "output: value\n";
+print "\n";
+$sysdescr = $snmp->get('v','sysDescr.0');
+print "sys descr = $sysdescr\n";
+
+if (!$snmp->error && $sysdescr =~ /^[a-zA-Z]+/){
+    print "\nTest - passed\n";
+    $test_results[$test_num] = 1;
+}
+else{
+    $error = $snmp->errmsg;
+    print "\nTest - failed $error\n";
+    $test_results[$test_num] = 0;
+}
+
+if ($sysdescr =~ /ascend/i){ # Get octet string if device is Ascend
+    $test_num++;
+    print "\n-------------------------------------------------------------------------------\n";
+    print "\n>>>> Test $test_num - Get octet-string  <<<<\n";
+    print "\n";
+    print "input: name.index\n";
+    print "output: value\n";
+    print "\n";
+    $result = $snmp->get('v','nodePollStatus.0');
+    print "Node Poll Status = $result\n";
+    
+    if (!$snmp->error && $result =~ /^[0-9a-fA-F][0-9a-fA-F]\s+/){
+	print "\nTest - passed\n";
+	$test_results[$test_num] = 1;
+    }
+    else{
+        $error = $snmp->errmsg;
+        print "\nTest - failed $error\n";
+	$test_results[$test_num] = 0;
+    }
+}
+
+if ($sysdescr =~ /ascend/i){ # Get octet string if device is Ascend
+    $SNMP::Util::Delimiter = '-';
+    $test_num++;
+    print "\n-------------------------------------------------------------------------------\n";
+    print "\n>>>> Test $test_num - Get octet-string with delimiter '-' <<<<\n";
+    print "\n";
+    print "input: name.index\n";
+    print "output: value\n";
+    print "\n";
+    $result = $snmp->get('v','nodePollStatus.0');
+    print "Node Poll Status = $result\n";
+    
+    if (!$snmp->error && $result =~ /^[0-9a-fA-F][0-9a-fA-F]-/){
+	print "\nTest - passed\n";
+	$test_results[$test_num] = 1;
+    }
+    else{
+        $error = $snmp->errmsg;
+        print "\nTest - failed $error\n";
+	$test_results[$test_num] = 0;
+    }
+}
+
+# Get the first ethernet interface
+$ether_int = '';
+@result = $snmp->walk('ie','ifType');
+for ($i = 0; $i< $#result; $i+=2){
+    if ($result[$i+1] =~ /ethernet/i){
+	$ether_int = $result[$i];
+	last;
+    }
+}
+ 
+ 
+if ($sysdescr !~ /ascend/i && $ether_int ne '' ){ 
+    $SNMP::Util::Delimiter = '-';
+    $test_num++;
+    print "\n-------------------------------------------------------------------------------\n";
+    print "\n>>>> Test $test_num - Get physaddress with delimiter '-' <<<<\n";
+    print "\n";
+    print "input: name.index\n";
+    print "output: value\n";
+    print "\n";
+    $result = $snmp->get('v',"ifPhysAddress.$ether_int");
+    print " physcical address for interface $ether_int = $result\n";
+    
+    if (!$snmp->error && $result =~ /^[0-9a-fA-F][0-9a-fA-F]-/){
+	print "\nTest - passed\n";
+	$test_results[$test_num] = 1;
+    }
+    else{
+        $error = $snmp->errmsg;
+        print "\nTest - failed $error\n";
+	$test_results[$test_num] = 0;
+    }
+}
+
+if ($sysdescr =~ /ascend/i ){ 
+    $test_num++;
+    print "\n-------------------------------------------------------------------------------\n";
+    print "\n>>>> Test $test_num - Get IpAddr <<<<\n";
+    print "\n";
+    print "input: name.index\n";
+    print "output: value\n";
+    print "\n";
+    $result = $snmp->get('v',"ipRouteDest.$IP");
+    print " Get of ip route dest = $result\n";
+    
+    if (!$snmp->error && $result =~ /^\d+\.\d+\.\d+\.\d+/){
+	print "\nTest - passed\n";
+	$test_results[$test_num] = 1;
+    }
+    else{
+        $error = $snmp->errmsg;
+        print "\nTest - failed $error\n";
+	$test_results[$test_num] = 0;
+    }
+}
+
+ 
+
+$test_num++;
+print "\n-------------------------------------------------------------------------------\n";
+print "\n>>>> Test $test_num - walk with name and get last interface <<<<<<\n";
+print "\n";
+print "input: name\n";
+print "output: index\n";
+print "\n";
+@interfaces = $snmp->walk('i','ifAdminStatus');
+print "interfaces = @interfaces\n";
+$interface = $interfaces[$#interfaces];
+$interface2 = $interfaces[$#interface-1];
+
+if (!$snmp->error && (defined $interface && $interface =~ /^\d+/)){
+    print "\nTest - passed\n";
+    $test_results[$test_num] = 1;
+}
+else{
+    $error = $snmp->errmsg;
+    print "\nTest - failed $error\n";
+    $test_results[$test_num] = 0;
+}
+$interface = 1 unless defined $interface;
+
+$test_num++;
+print "\n-------------------------------------------------------------------------------\n";
+print "\n>>>> Test $test_num -  walk with an oid <<<<<<\n";
+print "\n";
+print "input: oid\n";
+print "output: index\n";
+print "\n";
+@interfaces = $snmp->walk('i','1.3.6.1.2.1.2.2.1.7');
+print "interfaces = @interfaces\n";
+
+if (!$snmp->error && @interfaces >= 1){
+    print "\nTest - passed\n";
+    $test_results[$test_num] = 1;
+}
+else{
+    $error = $snmp->errmsg;
+    print "\nTest - failed $error\n";
+    $test_results[$test_num] = 0;
+}
+
+
+$test_num++;
+print "\n-------------------------------------------------------------------------------\n";
+print "\n>>>> Test $test_num - output format test  <<<<<<\n";
+print "\n";
+print " format string = oOnNtvei\n";
+print " o = oid with index\n";
+print " O = oid without index\n";
+print " n = name with index\n";
+print " N = name without index\n";
+print " t = type\n";
+print " v = value\n";
+print " e = enumeration\n";
+print " i = index\n\n";
+print "\n";
+@oids = ($interface,ifAdminStatus);
+@result = $snmp->get('oOnNtvei',@oids);
+print "result = @result\n";
+if (!$snmp->error && 
+    $result[0] =~ /^1.3.6.1/ && $result[1] =~ /^1.3.6.1/ &&
+    $result[2] =~ /^ifAdminStatus\.\d+$/ && $result[3] =~ /^ifAdminStatus$/ &&
+    $result[4] =~ /integer/i && $result[5] =~ /^\d+/ &&
+    ($result[6] eq 'up' || $result[6] eq 'down') &&
+    $result[7] =~ /^\d+/){
+    print "\nTest - passed\n";
+    $test_results[$test_num] = 1;
+}
+else{
+    $error = $snmp->errmsg;
+    print "\nTest - failed $error\n";
+    $test_results[$test_num] = 0;
+}
+
+$test_num++;
+print "\n-------------------------------------------------------------------------------\n";
+print "\n>>>> Test $test_num - get test <<<<<<\n";
+print "\n";
+print "input: array - index,list of name\n";
+print "output: name,enum\n\n";
+print "\n";
+@oids = ($interface,ifIndex,ifAdminStatus,ifOperStatus,ifSpeed);
+@result = $snmp->get('ne',@oids);
+print "result = @result\n";
+if (!$snmp->error && 
+    $result[0] =~ /^ifIndex/ && $result[1] =~ /^\d+/ &&
+    $result[2] =~ /^ifAdminStatus/ && ($result[3] eq 'up' || $result[3] eq 'down') &&
+    $result[4] =~ /^ifOperStatus/ && ($result[5] eq 'up' || $result[5] eq 'down') &&
+    $result[6] =~ /^ifSpeed/ && $result[7] =~ /\d+/){
+    print "\nTest - passed\n";
+    $test_results[$test_num] = 1; 
+}
+else{
+    $error = $snmp->errmsg;
+    print "\nTest - failed $error\n";
+    $test_results[$test_num] = 0;
+}
+
+$test_num++;
+print "\n-----------------------------------------------------------------------
+--------\n";
+print "\n>>>> Test $test_num - get hash test with enum <<<<<<\n";
+print "\n";
+print "input: array - index,list of name\n";
+print "output: hash\n\n";
+print "\n";
+
+
+@oids = ($interface,ifIndex,ifAdminStatus,ifOperStatus,ifSpeed);
+$result = $snmp->get_hash('ne',@oids);
+print "result->{ifIndex}{$interface} = $result->{ifIndex}{$interface}\n";
+print "result->{ifAdminStatus}{$interface} = $result->{ifAdminStatus}{$interface}\n";
+print "result->{ifOperStatus}{$interface} = $result->{ifOperStatus}{$interface}\n";
+print "result->{ifSpeed}{$interface} = $result->{ifSpeed}{$interface}\n";
+if (!$snmp->error &&
+    $result->{ifIndex}{$interface} =~ /^\d+/ &&
+    $result->{ifAdminStatus}{$interface} eq 'up' || $result->{ifAdminStatus}{$interface} eq 'down' &&
+    $result->{ifOperStatus}{$interface} eq 'up' || $result->{ifOperStatus}{$interface} eq 'down' &&
+    $result->{ifSpeed}{$interface} =~ /^\d+/){
+    print "\nTest - passed\n";
+    $test_results[$test_num] = 1;
+}
+else{
+    $error = $snmp->errmsg;
+    print "\nTest - failed $error\n";
+    $test_results[$test_num] = 0;
+}
+
+$test_num++;
+print "\n-----------------------------------------------------------------------
+--------\n";
+print "\n>>>> Test $test_num - get hash test with value <<<<<<\n";
+print "\n";
+print "input: array - index,list of name\n";
+print "output: hash\n\n";
+print "\n";
+
+
+@oids = ($interface,ifIndex,ifAdminStatus,ifOperStatus,ifSpeed);
+$result = $snmp->get_hash('nv',@oids);
+print "result->{ifIndex}{$interface} = $result->{ifIndex}{$interface}\n";
+print "result->{ifAdminStatus}{$interface} = $result->{ifAdminStatus}{$interface}\n";
+print "result->{ifOperStatus}{$interface} = $result->{ifOperStatus}{$interface}\n";
+print "result->{ifSpeed}{$interface} = $result->{ifSpeed}{$interface}\n";
+if (!$snmp->error &&
+    $result->{ifIndex}{$interface} =~ /^\d+/ &&
+    $result->{ifAdminStatus}{$interface} =~ /^\d+/ &&
+    $result->{ifOperStatus}{$interface} =~ /^\d+/ &&
+    $result->{ifSpeed}{$interface} =~ /^\d+/){
+    print "\nTest - passed\n";
+    $test_results[$test_num] = 1;
+}
+else{
+    $error = $snmp->errmsg;
+    print "\nTest - failed $error\n";
+    $test_results[$test_num] = 0;
+}
+
+
+
+$test_num++;
+print "\n-------------------------------------------------------------------------------\n";
+print "\n>>>> Test $test_num - get test  <<<<<<\n";
+print "\n";
+print "input: array - name,instance,name,instance ...\n";
+print "output: name,enum\n\n";
+print "\n";
+@oids = (ifIndex,$interface,ifAdminStatus,$interface,ifOperStatus,$interface,ifSpeed,$interface);
+@result = $snmp->get('ne',@oids);
+print "result = @result\n";
+if (!$snmp->error && 
+    $result[0] =~ /^ifIndex/ && $result[1] =~ /^\d+/ &&
+    $result[2] =~ /^ifAdminStatus/ && ($result[3] eq 'up' || $result[3] eq 'down') &&
+    $result[4] =~ /^ifOperStatus/ && ($result[5] eq 'up' || $result[5] eq 'down') &&
+    $result[6] =~ /^ifSpeed/ && $result[7] =~ /\d+/){
+    print "\nTest - passed\n";
+    $test_results[$test_num] = 1;
+}
+else{
+    $error = $snmp->errmsg;
+    print "\nTest - failed $error\n";
+    $test_results[$test_num] = 0;
+}
+
+$test_num++;
+print "\n-------------------------------------------------------------------------------\n";
+
+print "\n\n>>>> Test $test_num -  get test  <<<<<<\n";
+print "\n";
+print "input: array - name.instance,name.instance ...\n";
+print "output: name,enum\n\n";
+print "\n";
+@oids = ("ifIndex.$interface","ifAdminStatus.$interface","ifOperStatus.$interface","ifSpeed.$interface");
+@result = $snmp->get('ne',@oids);
+print "result = @result\n";
+
+if (!$snmp->error && 
+    $result[0] =~ /^ifIndex/ && $result[1] =~ /^\d+/ &&
+    $result[2] =~ /^ifAdminStatus/ && ($result[3] eq 'up' || $result[3] eq 'down') &&
+    $result[4] =~ /^ifOperStatus/ && ($result[5] eq 'up' || $result[5] eq 'down') &&
+    $result[6] =~ /^ifSpeed/ && $result[7] =~ /\d+/){
+    print "\nTest - passed\n";
+    $test_results[$test_num] = 1;
+}
+else{
+    $error = $snmp->errmsg;
+    print "\nTest - failed $error\n";
+    $test_results[$test_num] = 0;
+}
+
+$test_num++;
+print "\n-------------------------------------------------------------------------------\n";
+
+print "\n\n>>>>  Test $test_num - get test  <<<<<<\n";
+print "\n";
+print "input: array - index => instance, name, name, ...\n";
+print "output: name,enum\n\n";
+print "\n";
+@oids = (
+         index => $interface,
+	 ifIndex,
+	 ifAdminStatus,
+	 ifOperStatus,
+	 ifSpeed,
+	);
+
+@result = $snmp->get('ne',@oids);
+print "result = @result\n";
+if (!$snmp->error && 
+    $result[0] =~ /^ifIndex/ && $result[1] =~ /^\d+/ &&
+    $result[2] =~ /^ifAdminStatus/ && ($result[3] eq 'up' || $result[3] eq 'down') &&
+    $result[4] =~ /^ifOperStatus/ && ($result[5] eq 'up' || $result[5] eq 'down') &&
+    $result[6] =~ /^ifSpeed/ && $result[7] =~ /\d+/){
+    print "\nTest - passed\n";
+    $test_results[$test_num] = 1;
+}
+else{
+    $error = $snmp->errmsg;
+    print "\nTest - failed $error\n";
+    $test_results[$test_num] = 0;
+}
+
+$test_num++;
+print "\n-------------------------------------------------------------------------------\n";
+
+print "\n\n>>>>  Test $test_num - get test  <<<<<<\n";
+print "\n";
+print "input: format,instance,name,name ...\n";
+print "output: name,enum\n\n";
+print "\n";
+@result = $snmp->get(
+			'ne',
+			$interface,
+	                ifIndex,
+			ifAdminStatus,
+			ifOperStatus,	
+			ifSpeed,
+		 	);
+print "result = @result\n";
+if (!$snmp->error && 
+    $result[0] =~ /^ifIndex/ && $result[1] =~ /^\d+/ &&
+    $result[2] =~ /^ifAdminStatus/ && ($result[3] eq 'up' || $result[3] eq 'down') &&
+    $result[4] =~ /^ifOperStatus/ && ($result[5] eq 'up' || $result[5] eq 'down') &&
+    $result[6] =~ /^ifSpeed/ && $result[7] =~ /\d+/){
+    print "\nTest - passed\n";
+    $test_results[$test_num] = 1;
+}
+else{
+    $error = $snmp->errmsg;
+    print "\nTest - failed $error\n";
+    $test_results[$test_num] = 0;
+    
+}
+
+$test_num++;
+print "\n-------------------------------------------------------------------------------\n";
+
+print "\n\n>>>>  Test $test_num - get test  <<<<<<\n";
+print "\n";
+print "input: name => instance, name => instance ...\n";
+print "output: name,enum\n\n";
+print "\n";
+@result = $snmp->get(
+                        'ne',
+			ifIndex => $interface,
+                        ifAdminStatus => $interface,
+                        ifOperStatus => $interface,
+                        ifSpeed => $interface,
+                        );
+print "result = @result\n";
+if (!$snmp->error && 
+    $result[0] =~ /^ifIndex/ && $result[1] =~ /^\d+/ &&
+    $result[2] =~ /^ifAdminStatus/ && ($result[3] eq 'up' || $result[3] eq 'down') &&
+    $result[4] =~ /^ifOperStatus/ && ($result[5] eq 'up' || $result[5] eq 'down') &&
+    $result[6] =~ /^ifSpeed/ && $result[7] =~ /\d+/){
+    print "\nTest - passed\n";
+    $test_results[$test_num] = 1;
+}
+else{
+    $error = $snmp->errmsg;
+    print "\nTest - failed $error\n";
+    $test_results[$test_num] = 0;
+}
+
+$test_num++;
+print "\n-------------------------------------------------------------------------------\n";
+
+print "\n\n>>>>  Test $test_num - get test  <<<<<<\n";
+print "\n";
+print "input: -format => format-string, -oids => [array ref]\n";
+print "output: name,enum\n\n";
+print "\n";
+@result = $snmp->get(
+	             -format => 'ne',
+	             -oids => \@oids,
+	            );
+print "result = @result\n";
+if (!$snmp->error && 
+    $result[0] =~ /^ifIndex/ && $result[1] =~ /^\d+/ &&
+    $result[2] =~ /^ifAdminStatus/ && ($result[3] eq 'up' || $result[3] eq 'down') &&
+    $result[4] =~ /^ifOperStatus/ && ($result[5] eq 'up' || $result[5] eq 'down') &&
+    $result[6] =~ /^ifSpeed/ && $result[7] =~ /\d+/){
+    print "\nTest - passed\n";
+    $test_results[$test_num] = 1;
+}
+else{
+    $error = $snmp->errmsg;
+    print "\nTest - failed $error\n";
+    $test_results[$test_num] = 0;
+}
+
+$test_num++;
+print "\n-------------------------------------------------------------------------------\n";
+print "\n\n>>>> Test $test_num -  get test using  <<<<<<\n";
+print "\n";
+print "input: -format => format-string, -oids => [ name => instance, name => instance, ...]\n";
+print "output: name,enum\n\n";
+print "\n";
+@result = $snmp->get(
+		     -format => 'ne',
+		     -oids => [
+                               ifIndex => $interface,
+			       ifAdminStatus => $interface,
+			       ifOperStatus => $interface,
+			       ifSpeed => $interface,      
+			       ],
+	            );
+print "result = @result\n";
+if (!$snmp->error && 
+    $result[0] =~ /^ifIndex/ && $result[1] =~ /^\d+/ &&
+    $result[2] =~ /^ifAdminStatus/ && ($result[3] eq 'up' || $result[3] eq 'down') &&
+    $result[4] =~ /^ifOperStatus/ && ($result[5] eq 'up' || $result[5] eq 'down') &&
+    $result[6] =~ /^ifSpeed/ && $result[7] =~ /\d+/){
+    print "\nTest - passed\n";
+    $test_results[$test_num] = 1;
+}
+else{
+    $error = $snmp->errmsg;
+    print "\nTest - failed $error\n";
+    $test_results[$test_num] = 0;
+}
+
+$test_num++;
+print "\n-------------------------------------------------------------------------------\n";
+print "\n\n>>>>  Test $test_num -  get test   <<<<<<\n";
+print "\n";
+print "input: instance, oid,oid,oid ...\n";
+print "output: name,enum\n\n";
+print "\n";
+@oids = ($interface,'1.3.6.1.2.1.2.2.1.1','1.3.6.1.2.1.2.2.1.7','1.3.6.1.2.1.2.2.1.8','1.3.6.1.2.1.2.2.1.5');
+@result = $snmp->get('ne',@oids);
+print "result = @result\n";
+if (!$snmp->error && 
+    $result[0] =~ /^ifIndex/ && $result[1] =~ /^\d+/ &&
+    $result[2] =~ /^ifAdminStatus/ && ($result[3] eq 'up' || $result[3] eq 'down') &&
+    $result[4] =~ /^ifOperStatus/ && ($result[5] eq 'up' || $result[5] eq 'down') &&
+    $result[6] =~ /^ifSpeed/ && $result[7] =~ /\d+/){
+    print "\nTest - passed\n";
+    $test_results[$test_num] = 1;
+}
+else{
+    $error = $snmp->errmsg;
+    print "\nTest - failed $error\n";
+    $test_results[$test_num] = 0;
+}
+
+
+$test_num++;
+print "\n-------------------------------------------------------------------------------\n";
+
+print "\n\n>>>> Test $test_num - get test   <<<<<<\n";
+print "\n";
+print "input: oid,instance,oid,instance ...\n";
+print "output: name,enum\n\n";
+print "\n";
+@oids = ('1.3.6.1.2.1.2.2.1.1',$interface,'1.3.6.1.2.1.2.2.1.7',$interface,'1.3.6.1.2.1.2.2.1.8',$interface,'1.3.6.1.2.1.2.2.1.5',$interface);
+@result = $snmp->get('ne',@oids);
+print "result = @result\n";
+if (!$snmp->error && 
+    $result[0] =~ /^ifIndex/ && $result[1] =~ /^\d+/ &&
+    $result[2] =~ /^ifAdminStatus/ && ($result[3] eq 'up' || $result[3] eq 'down') &&
+    $result[4] =~ /^ifOperStatus/ && ($result[5] eq 'up' || $result[5] eq 'down') &&
+    $result[6] =~ /^ifSpeed/ && $result[7] =~ /\d+/){
+    print "\nTest - passed\n";
+    $test_results[$test_num] = 1;
+}
+else{
+    $error = $snmp->errmsg;
+    print "\nTest - failed $error\n";
+    $test_results[$test_num] = 0;
+}
+
+$test_num++;
+print "\n-------------------------------------------------------------------------------\n";
+print ">>>>>  Test $test_num - poll value   <<<<<<\n";
+print "\n";
+print "input: -oid => name.instance\n";
+print "\n";
+print "poll value with name\n";
+$snmp->poll_value(-oid     => "ifOperStatus.$interface",
+		  -state => 'up',
+		  -timeout => 30,
+		  -montime => 5,
+		  -delay   => 1);
+
+if (!$snmp->error){ 
+    print "\nTest - passed\n";
+    $test_results[$test_num] = 1;
+}
+else{
+    $error = $snmp->errmsg;
+    print "\nTest - failed $error\n";
+    $test_results[$test_num] = 0;
+}
+ 
+$test_num++;
+print "\n-------------------------------------------------------------------------------\n";
+print ">>>>>  Test $test_num - poll value   <<<<<<\n";
+print "\n";
+print "input: -oid => oid, -instance => instance\n";
+print "\n";
+
+print "poll value with oid\n";
+$snmp->poll_value(-oid     => "1.3.6.1.2.1.2.2.1.8",
+		  -instance => $interface,
+		  -state => 'up',
+		  -timeout => 30,
+		  -montime => 5,
+		  -delay   => 1);
+
+if (!$snmp->error){ 
+    print "\nTest - passed\n";
+    $test_results[$test_num] = 1;
+}
+else{    
+    $error = $snmp->errmsg;
+    print "\nTest - failed $error\n";
+    $test_results[$test_num] = 0;
+}
+ 
+
+print "The next sequence of tests will set interface $interface to down then up\n";
+print "Enter return to continue or skip to skip test: ";
+chomp($answer = <stdin>);
+goto SKIP if ($answer =~ /skip/i);
+
+$test_num++;
+print "\n-------------------------------------------------------------------------------\n";
+print "\n\n>>>> Test $test_num - set test  <<<<<<\n";
+print "\n";
+print "input: instance,name,enum ...\n";
+print "\n";
+@oids = ($interface,'ifAdminStatus','down','ifAdminStatus','up');
+$snmp->set(@oids);
+if (!$snmp->error){ 
+    print "\nTest - passed\n";
+    $test_results[$test_num] = 1;
+}
+else{
+    $error = $snmp->errmsg;
+    print "\nTest - failed $error\n";
+    $test_results[$test_num] = 0;
+}
+
+$test_num++;
+print "\n-------------------------------------------------------------------------------\n";
+print "\n\n>>>> Test $test_num - set test  <<<<<<\n";
+print "\n";
+print "input: name.instance,enum,name.instance,enum ...\n";
+print "\n";
+
+@oids = ("ifAdminStatus.$interface",'down',"ifAdminStatus.$interface",'up');
+$snmp->set(@oids);
+if (!$snmp->error){ 
+    print "\nTest - passed\n";
+    $test_results[$test_num] = 1;
+}
+else{
+    $error = $snmp->errmsg;
+    print "\nTest - failed $error\n";
+    $test_results[$test_num] = 0;
+}
+
+$test_num++;
+print "\n-------------------------------------------------------------------------------\n";
+print "\n\n>>>> Test $test_num - set test  <<<<<<\n";
+print "\n";
+print "input: name,instance,enum,name,instance,enum ...\n";
+print "\n";
+
+@oids = ("ifAdminStatus",$interface,'down',"ifAdminStatus",$interface,'up');
+$snmp->set(@oids);
+if (!$snmp->error){
+    print "\nTest - passed\n";
+    $test_results[$test_num] = 1;
+}
+else{
+    $error = $snmp->errmsg;
+    print "\nTest - failed $error\n";
+    $test_results[$test_num] = 0;
+}
+
+$test_num++;
+print "\n-------------------------------------------------------------------------------\n";
+print "\n\n>>>> Test $test_num - set test  <<<<<<\n";
+print "\n";
+print "input: name.instance,enum,name.instance,enum ...\n";
+print "\n";
+
+@oids = ("ifAdminStatus.$interface",'down',"ifAdminStatus.$interface",'up');
+$snmp->set(@oids);
+if (!$snmp->error){ 
+    print "\nTest - passed\n";
+    $test_results[$test_num] = 1;
+}
+else{
+    $test_results[$test_num] = 0;
+    $error = $snmp->errmsg;
+    print "\nTest - failed $error\n";
+}
+
+$test_num++;
+print "\n-------------------------------------------------------------------------------\n";
+
+print "\n\n>>>> Test $test_num - set test  <<<<<<\n";
+print "\n";
+print "input: instance,name,value,name,value ...\n";
+print "\n";
+@oids = ($interface,'ifAdminStatus',2,'ifAdminStatus',1);
+$snmp->set(@oids);
+
+if (!$snmp->error){ 
+    print "\nTest - passed\n";
+    $test_results[$test_num] = 1;
+}
+else{
+    $error = $snmp->errmsg;
+    print "\nTest - failed $error\n";
+    $test_results[$test_num] = 0;
+}
+
+$test_num++;
+print "\n-------------------------------------------------------------------------------\n";
+
+print "\n\n>>>>  Test $test_num - set test <<<<<<\n";
+print "\n";
+print "input: instance,oid,enum,oid,enum ...\n";
+print "\n";
+@oids = ($interface,'1.3.6.1.2.1.2.2.1.7','down','1.3.6.1.2.1.2.2.1.7','up');
+$snmp->set(@oids);
+if (!$snmp->error){ 
+    print "\nTest - passed\n";
+    $test_results[$test_num] = 1;
+}
+else{
+    $error = $snmp->errmsg;
+    print "\nTest - failed $error\n";
+    $test_results[$test_num] = 0;
+}
+
+$test_num++;
+print "\n-------------------------------------------------------------------------------\n";
+
+print "\n\n>>>>  Test $test_num - set test <<<<<<\n";
+print "\n";
+print "input: instance,oid,value,oid,value ...\n";
+print "\n";
+@oids = ($interface,'1.3.6.1.2.1.2.2.1.7',2,'1.3.6.1.2.1.2.2.1.7',1);
+$snmp->set(@oids);
+if (!$snmp->error){ 
+    print "\nTest - passed\n";
+    $test_results[$test_num] = 1;
+}
+else{
+    $error = $snmp->errmsg;
+    print "\nTest - failed $error\n";
+    $test_results[$test_num] = 0;
+}
+
+$test_num++;
+print "\n-------------------------------------------------------------------------------\n";
+print "\n\n>>>>  Test $test_num - set test <<<<<<\n";
+print "\n";
+print "input: oid,instance,value,oid,instance,value ...\n";
+print "\n";
+@oids = ('1.3.6.1.2.1.2.2.1.7',$interface,2,'1.3.6.1.2.1.2.2.1.7',$interface,1);
+$snmp->set(@oids);
+if (!$snmp->error){ 
+    print "\nTest - passed\n";
+    $test_results[$test_num] = 1;
+}
+else{
+    $error = $snmp->errmsg;
+    print "\nTest - failed $error\n";
+    $test_results[$test_num] = 0;
+}
+
+$test_num++;
+print "\n-------------------------------------------------------------------------------\n";
+print "\n\n>>>>  Test $test_num - set test <<<<<<\n";
+print "\n";
+print "input: index => instance, name => enum, name => enum ...\n";
+print "\n";
+
+print "\n\n>>>>  set test using hash format with instance and no array  <<<<<<\n";
+		$snmp->set(
+		index => $interface,
+		ifAdminStatus => 'down',
+		ifAdminStatus => 'up',
+		);
+
+if (!$snmp->error){ 
+    print "\nTest - passed\n";
+    $test_results[$test_num] = 1;
+}
+else{
+    $error = $snmp->errmsg;
+    print "\nTest - failed $error\n";
+    $test_results[$test_num] = 0;
+}
+
+$test_num++;
+print "\n-------------------------------------------------------------------------------\n";
+print "\n\n>>>>  Test $test_num - set test  <<<<<<\n";
+print "\n";
+print "input:  name.instance => enum, name.instance => enum ...\n";
+print "\n";
+$snmp->set(
+                "ifAdminStatus.$interface" => 'down',
+                "ifAdminStatus.$interface" => 'up',
+                );
+
+if (!$snmp->error){ 
+    print "\nTest - passed\n";
+    $test_results[$test_num] = 1;
+}
+else{
+    $error = $snmp->errmsg;
+    print "\nTest - failed $error\n";
+    $test_results[$test_num] = 0;
+}
+
+$test_num++;
+print "\n-------------------------------------------------------------------------------\n";
+print "\n\n>>>>  Test $test_num - set test  <<<<<<\n";
+
+print "\n";
+print "input:  name.instance => enum, name.instance2 => enum ...\n";
+print "\n";
+$snmp->set(
+                "ifAdminStatus.$interface" => 'up',
+                "ifAdminStatus.$interface2" => 'up',
+                );
+
+if (!$snmp->error){ 
+    print "\nTest - passed\n";
+    $test_results[$test_num] = 1;
+}
+else{
+    $error = $snmp->errmsg;
+    print "\nTest - failed $error\n";
+    $test_results[$test_num] = 0;
+}
+
+$test_num++;
+print "\n-------------------------------------------------------------------------------\n";
+print "\n\n>>>>  Test $test_num - set test  <<<<<<\n";
+
+print "\n";
+print "input:  name.instance => enum, name.instance2 => enum ...\n";
+print "\n";
+$snmp->set(
+                "ifAdminStatus.$interface" => 'up',
+                "ifAdminStatus.$interface2" => 'up',
+                );
+
+if (!$snmp->error){ 
+    print "\nTest - passed\n";
+    $test_results[$test_num] = 1;
+}
+else{
+    $error = $snmp->errmsg;
+    print "\nTest - failed $error\n";
+    $test_results[$test_num] = 0;
+}
+
+$test_num++;
+print "\n-------------------------------------------------------------------------------\n";
+print "\n\n>>>>  Test $test_num - set_get test  <<<<<<\n";
+print "\n";
+print "input:  name.instance, value\n";
+print "\n";
+@result = $snmp->set_get("ifAdminStatus.$interface",1);
+
+if (!$snmp->error){
+    print "\nTest - passed\n";
+    $test_results[$test_num] = 1;
+}
+else{
+    $error = $snmp->errmsg;
+    print "\nTest - failed $error\n";
+    $test_results[$test_num] = 0;
+}
+
+$test_num++;
+print "\n-------------------------------------------------------------------------------\n";
+print "\n\n>>>>  Test $test_num - get_set_restore  <<<<<<\n";
+print "\n";
+print "input:  range,name.instance\n";
+print "\n";
+print "\n\n>>>>  get_set_restore test  <<<<<<\n";
+
+$snmp->get_set_restore('1',"ifAdminStatus.$interface");
+
+if (!$snmp->error){
+    print "\nTest - passed\n";
+    $test_results[$test_num] = 1;
+}
+else{
+    $error = $snmp->errmsg;
+    print "\nTest - failed $error\n";
+    $test_results[$test_num] = 0;
+}
+
+$test_num++;
+print "\n-------------------------------------------------------------------------------\n";
+print "\n\n>>>>  Test $test_num - get_set_restore  <<<<<<\n";
+print "\n";
+print "input:  range,name.instance\n";
+print "\n";
+print "\n\n>>>>  get_set_restore test  <<<<<<\n";
+
+$snmp->get_set_restore('1..2',"ifAdminStatus.$interface");
+
+if (!$snmp->error){ 
+    print "\nTest - passed\n";
+    $test_results[$test_num] = 1;
+}
+else{
+    $error = $snmp->errmsg;
+    print "\nTest - failed $error\n";
+    $test_results[$test_num] = 0;
+}
+
+$test_num++;
+print "\n-------------------------------------------------------------------------------\n";
+print "\n\n>>>>  Test $test_num - set display string test  <<<<<<\n";
+print "\n";
+print "input:  name.instance, value\n";
+print "\n";
+
+$sys_contact =  $snmp->get('v',"sysContact.0");
+print "sys_contact = $sys_contact\n";
+
+print "Setting sysContact to: test-string\n";
+$snmp->set("sysContact.0" => 'test-string');
+$result = $snmp->get('v',"sysContact.0");
+print "Restoring sysContact to $sys_contact\n";
+$snmp->set("sysContact.0" => $sys_contact);
+$restore_result = $snmp->get('v',"sysContact.0");
+
+if (!$snmp->error && $result eq 'test-string' && $restore_result eq $sys_contact ){ 
+    print "\nTest - passed\n";
+    $test_results[$test_num] = 1;
+}
+else{
+    $error = $snmp->errmsg;
+    print "\nTest - failed $error\n";
+    $test_results[$test_num] = 0;
+}
+
+SKIP:
+$test_num++;
+print "\n-------------------------------------------------------------------------------\n";
+print "\n\n>>>>  Test $test_num - next test  <<<<<<\n";
+print "\n";
+print "input:  name.instance\n";
+print "\n";
+@result = $snmp->next('ne',"ifAdminStatus.$interface");
+print "result = @result\n";
+
+if (!$snmp->error && $result[0] =~ /ifOperStatus/ && ($result[1] eq 'up' || $result[1] eq 'down')){ 
+    print "\nTest - passed\n";
+    $test_results[$test_num] = 1;
+}
+else{
+    $error = $snmp->errmsg;
+    print "\nTest - failed $error\n";
+    $test_results[$test_num] = 0;
+}
+
+
+
+if ($sysdescr =~ /ascend/i){
+    $test_num++;
+    print "\n-------------------------------------------------------------------------------\n";
+    print "\n\n>>>>  Test $test_num - walk test  <<<<<<\n";
+    print "\n";
+    print "input: array - name.index,name.index ...\n";
+    print "output: oid,name,type,enum\n\n";
+    print "\n";
+    print "\n\n>>>>  walk test  <<<<<<\n";
+    @cards = $snmp->walk('v','cardLogicalSlotId');
+    $card = $cards[2]; 
+    if ($card == 1){
+       $card = $cards[3];
+    }
+    
+    @result = $snmp->walk('onte',"pportAdminStatus.$card","pportOperStatus.$card");
+    print "walk result = @result\n";
+
+    if (!$snmp->error){
+        print "\nTest - passed\n";
+        $test_results[$test_num] = 1;
+    }
+    else{
+        $error = $snmp->errmsg;
+        print "\nTest - failed $error\n";
+        $test_results[$test_num] = 0;
+    }
+
+    $test_num++;
+    print "\n-------------------------------------------------------------------------------\n";
+    print "\n\n>>>>  Test $test_num - walk test  <<<<<<\n";
+    print "\n";
+    print "input: array - index,name,name etc ...\n";
+    print "output: oid,name,type,enum\n\n";
+    print "\n";
+
+
+    @result = $snmp->walk('onte',$card,"pportAdminStatus","pportOperStatus");
+    print "walk result = @result\n";
+
+    if (!$snmp->error){
+        print "\nTest - passed\n";
+        $test_results[$test_num] = 1;
+    }
+    else{
+        $error = $snmp->errmsg;
+        print "\nTest - failed $error\n";
+        $test_results[$test_num] = 0;
+    }
+
+}
+
+$test_num++;
+print "\n-------------------------------------------------------------------------------\n";
+print "\n\n>>>>  Test $test_num - walk test  <<<<<<\n";
+print "\n";
+print "input: array - name,name,name ...\n";
+print "output: oid,name,type,enum\n\n";
+print "\n";
+print "\n\n>>>>  walk test  <<<<<<\n";
+@oids = qw(ifAdminStatus ifOperStatus ifSpeed);
+@result = $snmp->walk('onte',@oids);
+print "walk result = @result\n";
+
+$number_results = @result;
+$number_interfaces = @interfaces;
+if (!$snmp->error && $number_results == ($number_interfaces * 3 * 4)){ 
+    print "\nTest - passed\n";
+    $test_results[$test_num] = 1;
+}
+else{
+    $error = $snmp->errmsg;
+    print "\nTest - failed $error\n";
+    $test_results[$test_num] = 0;
+}
+
+$test_num++;
+print "\n-------------------------------------------------------------------------------\n";
+print "\n\n>>>>  Test $test_num - walk test  <<<<<<\n";
+print "\n";
+print "input: array - oid,oid,oid ...\n";
+print "output: oid,name,type,enum\n\n";
+print "\n";
+print "\n\n>>>>  walk test  <<<<<<\n";
+@oids = ('1.3.6.1.2.1.2.2.1.7','1.3.6.1.2.1.2.2.1.8','1.3.6.1.2.1.2.2.1.5');
+@result = $snmp->walk('onte',@oids);
+print "walk result = @result\n";
+
+$number_results = @result;
+$number_interfaces = @interfaces;
+if (!$snmp->error && $number_results == ($number_interfaces * 3 * 4)){ 
+    print "\nTest - passed\n";
+    $test_results[$test_num] = 1;
+}
+else{
+    $error = $snmp->errmsg;
+    print "\nTest - failed $error\n";
+    $test_results[$test_num] = 0;
+}
+
+$test_num++;
+print "\n-------------------------------------------------------------------------------\n";
+print "\n\n>>>>  Test $test_num - walk with print test  <<<<<<\n";
+print "\n";
+print "input: array - name,name,name ...\n";
+print "output: oid,name,type,enum\n\n";
+print "\n";
+print "\n\n>>>>  walk_verbose test  <<<<<<\n";
+@oids = qw(ifAdminStatus ifOperStatus );
+@result = $snmp->walk(-format =>'onte',
+	              -oids => \@oids,
+		      -print => 'on',
+                     );
+
+$number_results = @result;
+$number_interfaces = @interfaces;
+if (!$snmp->error && $number_results == ($number_interfaces * 2 * 4)){ 
+    print "\nTest - passed\n";
+    $test_results[$test_num] = 1;
+}
+else{
+    $error = $snmp->errmsg;
+    print "\nTest - failed $error\n";
+    $test_results[$test_num] = 0;
+}
+
+@oids = qw(ifAdminStatus ifOperStatus ifSpeed);
+$test_num++;
+print "\n-------------------------------------------------------------------------------\n";
+print "\n\n>>>>  Test $test_num - walk_hash test enum  <<<<<<\n";
+
+print "\n\n>>>>  walk_hash test  <<<<<<\n";
+$hash = $snmp->walk_hash('e',@oids);
+@indexes = sort by_index (keys %{$hash->{$oids[0]}});
+foreach $index (@indexes){
+   print "hash->{ifAdminStatus}{$index} = $hash->{ifAdminStatus}{$index}\n"; 
+   print "hash->{ifOperStatus}{$index} = $hash->{ifOperStatus}{$index}\n"; 
+   print "hash->{ifSpeed}{$index} = $hash->{ifSpeed}{$index}\n\n"; 
+}
+if (!$snmp->error && @indexes == @interfaces){ 
+    print "\nTest - passed\n";
+    $test_results[$test_num] = 1; 
+}
+else{
+    $error = $snmp->errmsg;
+    print "\nTest - failed $error\n";
+    $test_results[$test_num] = 0;
+    
+}
+ 
+$test_num++;
+print "\n-------------------------------------------------------------------------------\n";
+print "\n\n>>>>  Test $test_num - walk_hash test value  <<<<<<\n";
+
+print "\n\n>>>>  walk_hash test  <<<<<<\n";
+$hash = $snmp->walk_hash('v',@oids);
+@indexes = sort by_index (keys %{$hash->{$oids[0]}});
+foreach $index (@indexes){
+   print "hash->{ifAdminStatus}{$index} = $hash->{ifAdminStatus}{$index}\n";
+   print "hash->{ifOperStatus}{$index} = $hash->{ifOperStatus}{$index}\n";
+   print "hash->{ifSpeed}{$index} = $hash->{ifSpeed}{$index}\n\n";
+}
+if (!$snmp->error && @indexes == @interfaces){
+    print "\nTest - passed\n";
+    $test_results[$test_num] = 1;
+}
+else{
+    $error = $snmp->errmsg;
+    print "\nTest - failed $error\n";
+    $test_results[$test_num] = 0;
+   
+}
+
+
+print "--------------------------------------------------------------\n";
+print ">>>>>>  Test Summary   <<<<<<<\n";
+$pass_flag = 1;
+for ($i = 1; $i <=$#test_results ; $i++){
+    if ($test_results[$i]){
+	print "Test $i - passed\n";
+	$passed++;
+    }
+    else{
+	print "Test $i - failed\n";
+	$pass_flag = 0;
+	$failed++;
+    }
+}
+if ($pass_flag){
+    print "\nAll tests passed\n";
+}
+else{
+    print "\n$passed Test passed\n";
+    print "$failed Test Failed\n";
+}
+
+
+sub by_index {
+    local($i, @a, @b);
+
+    @a = split (/\./, $a);
+    @b = split (/\./, $b);
+
+    if (@a > @b) {
+        $#b = $#a;
+    }
+    elsif (@b > @a) {
+        $#a = $#b;
+    }
+
+    for ($i = 0; $i <= $#a; $i++) {
+        return ($a[$i] <=> $b[$i]) unless ($a[$i] == $b[$i]);
+    }
+
+    0;
+}
+

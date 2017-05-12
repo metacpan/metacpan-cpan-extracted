@@ -1,0 +1,113 @@
+NAME
+    SMS::Send::AU::MyVodafone - An SMS::Send driver for the
+    myvodafone.com.au website
+
+SYNOPSIS
+      # Get the sender and login
+      my $sender = SMS::Send->new('AU::MyVodafone',
+            _login    => '04 444 444', # Whitespace is ignored
+            _password => 'abcdefg',
+            );
+  
+      # Send a message to ourself
+      my $sent = $sender->send_sms(
+            text => 'Messages have a limit of 160 chars',
+            to   => '+61 4 444 444',
+            );
+  
+      # Did it send?
+      if ( $sent ) {
+            print "Sent test message\n";
+      } else {
+            print "Test message failed\n";
+      }
+
+DESCRIPTION
+    SMS::Send::AU::MyVodaphone is an regional SMS::Send driver for Australia
+    that delivers messages via the <http://myvodafone.com.au> website
+    Web2TXT feature.
+
+    Using your phone number as a login, and your existing password, this
+    driver allows any Australian with a Vodafone to send SMS messages (with
+    the message cost added to your account).
+
+  Preparing to Use This Driver
+    As well as setting up your myvodfone.com.au account and password, the
+    Web2TXT feature requires acceptance of an additional disclaimer and
+    conditions of use form.
+
+    You "must" manually accept this disclaimer and conditions before you
+    will be able to use this driver.
+
+    While we certainly could make the driver do it for you, acceptance of
+    the terms of use implies you understand the cost structure and rules
+    surrounding the use of the Web2TXT feature.
+
+  Disclaimer
+    Other than dieing on encountering the terms of use form, no other
+    protection is provided, and the authors of this driver take no
+    responsibility for any costs accrued on your phone bill by using this
+    module.
+
+    Using this driver will cost you money. YOU HAVE BEEN WARNED
+
+METHODS
+  new
+      # Create a new sender using this driver
+      my $sender = SMS::Send->new(
+            _login    => '04 444 444',
+            _password => 'abcdefg',
+            );
+
+    The "new" constructor takes two parameters, which should be passed
+    through from the SMS::Send constructor.
+
+    The params are driver-specific for now, until SMS::Send adds a standard
+    set of params for specifying the login and password.
+
+    _login
+        The "_login" param should be your phone number. That is, the phone
+        to send from and to be billed to for the messages.
+
+        The login should be an Australian-format number. That is, starting
+        with zero-four "04".
+
+    _password
+        The "_password" param should be your myvodafone.com.au password.
+
+    During construction, the driver will actively log in to the
+    myvodafone.com.au website using the credentials provided, to verify they
+    are correct.
+
+    It will not check for your acceptance of the terms and conditions at
+    this point. That is done at "send_sms"-time.
+
+    Returns a new "SMS::Send::AU::MyVodafone" object, or dies on error.
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=SMS-Send-AU-MyVodafone>
+
+    For other issues, contact the author.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+COPYRIGHT
+    Copyright 2005 - 2008 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+    Additionally, you are again reminded that this software comes with no
+    warranty of any kind, including but not limited to the implied warranty
+    of merchantability.
+
+    ANY use of this module may result in charges on your phone bill, and you
+    should use this software with care. The author takes no responsibility
+    for any such charges accrued.
+

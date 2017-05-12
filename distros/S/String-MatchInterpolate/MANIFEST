@@ -1,0 +1,16 @@
+benchmark.pl
+Build.PL
+Changes
+lib/String/MatchInterpolate.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/01use.t
+t/02simple.t
+t/03with_suffix.t
+t/04long.t
+t/05default_re.t
+t/06delimiters.t
+t/99pod.t

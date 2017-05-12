@@ -1,0 +1,13 @@
+Revision history for Statistics-WilcoxonRankSum
+
+0.0.7  Thu Mar 28 2011
+       RT 65797: incorrect p-values when observed rank sum > expected rank sum
+0.0.6  Thu Aug  6 2009
+       RT 48055: p-values > 1 returned
+0.0.5  Fri May 15 10:36:05 2009
+       RT 46813: documentation issue
+0.0.4  Fri May 15 10:36:05 2009
+       RT 46093: documentation issue
+0.0.1  Wed Jan  9 10:12:07 2008
+       Initial release.
+

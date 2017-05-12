@@ -1,0 +1,40 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 c594897ba2ffd85ac467457ee60cbceff7de6b5e .cvsignore
+SHA1 b3010ad05bb1a73384fb42f3c259ea3f51c9d82d Build.PL
+SHA1 f0abf4a201add8fedd672567b0a368e423085385 Changes
+SHA1 dfb471a2cd8b1b666bc3d13e76861f0250d096e3 MANIFEST
+SHA1 d7c41b75d33ee36ce815c58f7d5f4b28c65f42d8 META.json
+SHA1 3f7cf1aeed1e27d9d9c66b573bd3cab8f485d47f META.yml
+SHA1 062456d27f39590acabc272ee7856689ceb3fb49 Makefile.PL
+SHA1 d73d74bc2605d588ee6d9d856d6e897a8d2fdb82 README
+SHA1 c75177774b675fc4f90be19fa08d830c7feba263 lib/Scope/Escape/.cvsignore
+SHA1 9d278022f333e5acfc1ad3708d78df0ffa209a06 lib/Scope/Escape/Sugar.pm
+SHA1 3f9bc6e3fed150b137b8c23af37b4287ea913f61 lib/Scope/Escape/Sugar.xs
+SHA1 21acf401499b5906eaf3c700b1028cb7e1d275a5 t/block.t
+SHA1 09f0b1b1493989fa6d637ca3137280df22e6b1a8 t/catch.t
+SHA1 5f2ed6da6378b37c38d3857e9a96dfde32782d09 t/leximport.t
+SHA1 904d9a4f76525e2303e4b0c168c68230f223c8de t/pod_cvg.t
+SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
+SHA1 3cd35d0484be05965951f51c63c3eb54b4a92d40 t/with_escape.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAk5lN/IACgkQOV9mt2VyAVHsogCfToznGO/pb2qiqMG6NsWXtH66
+Vv4An1+LytaxiYeodA2D+2S8kCG/zCqM
+=zeAg
+-----END PGP SIGNATURE-----

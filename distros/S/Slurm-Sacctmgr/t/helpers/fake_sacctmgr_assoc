@@ -1,0 +1,632 @@
+#!/bin/sh
+#
+#Fake sacctmgr show assoc results for testing
+#
+#Updated to handle preTRES (Slurm v 14.x.y) and postTRES (Slurm 15.x.y) data
+#USe env var FAKE_SLURM_VERSION to set this
+#Also accepts --version and format= arguments
+
+#Order of fields is now controllable via format option
+#Below is the default if no format given
+FORMAT_FIELDS="cluster account user partition fairshare grpjobs grpnodes grpcpus grpmem grpsubmitjobs grpwall grpcpumins maxjobs maxnodes maxcpus maxsubmitjobs maxwall maxcpumins qos defaultqos grpcpurunmins"
+#FORMAT_FIELDS="account cluster defaultqos fairshare grpjobs grpsubmitjobs grpwall id lft maxjobs maxsubmitjobs maxwall parentid parentname partition qos rgt user grpcpumins grpcpurunmins grpcpus grpnodes maxcpumins maxcpus maxnodes"
+
+verbose_flag=
+
+print_version()
+{	version=$1
+	cat - <<EOF
+slurm $version
+EOF
+	exit 0
+}
+
+print_header()
+{
+	tmptext=
+	for fld in $FORMAT_FIELDS
+	do
+		case $fld in
+		#-----	Common stuff
+		    account)
+			tmptext="${tmptext}Account"
+			;;
+		    cluster)
+			tmptext="${tmptext}Cluster"
+			;;
+		    defaultqos)
+			tmptext="${tmptext}Def QOS"
+			;;
+		    fairshare)
+			tmptext="${tmptext}Share"
+			;;
+		    grpjobs)
+			tmptext="${tmptext}GrpJobs"
+			;;
+		    grpsubmitjobs)
+			tmptext="${tmptext}GrpSubmit"
+			;;
+		    grpwall)
+			tmptext="${tmptext}GrpWall"
+			;;
+		    id)
+			tmptext="${tmptext}ID"
+			;;
+		    lft)
+			tmptext="${tmptext}LFT"
+			;;
+		    maxjobs)
+			tmptext="${tmptext}MaxJobs"
+			;;
+		    maxsubmitjobs)
+			tmptext="${tmptext}MaxSubmit"
+			;;
+		    maxwall)
+			tmptext="${tmptext}MaxWall"
+			;;
+		    parentid)
+			tmptext="${tmptext}Par ID"
+			;;
+		    parentname)
+			tmptext="${tmptext}ParName"
+			;;
+		    partition)
+			tmptext="${tmptext}Partition"
+			;;
+		    qos)
+			tmptext="${tmptext}QOS"
+			;;
+		    rgt)
+			tmptext="${tmptext}RGT"
+			;;
+		    user)
+			tmptext="${tmptext}User"
+			;;
+		#-----	preTRES stuff
+		    grpcpumins)
+			tmptext="${tmptext}GrpCPUMins"
+			;;
+		    grpcpurunmins)
+			tmptext="${tmptext}GrpCPURunMins"
+			;;
+		    grpcpus)
+			tmptext="${tmptext}GrpCPUs"
+			;;
+		    grpnodes)
+			tmptext="${tmptext}GrpNodes"
+			;;
+		    grpmem)
+			tmptext="${tmptext}GrpMem"
+			;;
+		    maxcpumins)
+			tmptext="${tmptext}MaxCPUMins"
+			;;
+		    maxcpus)
+			tmptext="${tmptext}MaxCPUS"
+			;;
+		    maxnodes)
+			tmptext="${tmptext}MaxNodes"
+			;;
+		#-----	postTRES stuff
+		    grptresmins)
+			tmptext="${tmptext}GrpTRESMins"
+			;;
+		    grptresrunmins)
+			tmptext="${tmptext}GrpTRESRunMins"
+			;;
+		    grptres)
+			tmptext="${tmptext}GrpTRES"
+			;;
+		    maxtresmins)
+			tmptext="${tmptext}MaxTRESMins"
+			;;
+		    maxtres)
+			tmptext="${tmptext}MaxTRES"
+			;;
+		    maxtrespernode)
+			tmptext="${tmptext}MaxTRESPerNode"
+			;;
+		    *)
+			echo >&2 "Unrecognized field name $fld in format string, aborting"
+			exit 1;
+			;;
+		esac
+		tmptext="${tmptext}|"
+	done
+	echo $tmptext
+}
+
+
+print_assoc()
+{	
+	#Clear values
+	#	common
+	tmp_account=
+	tmp_cluster=
+	tmp_defaultqos=
+	tmp_fairshare=
+	tmp_grpjobs=
+	tmp_grpsubmitjobs=
+	tmp_grpwall=
+	tmp_id=
+	tmp_lft=
+	tmp_maxjobs=
+	tmp_maxsubmitjobs=
+	tmp_maxwall=
+	tmp_parentid=
+	tmp_parentname=
+	tmp_partition=
+	tmp_qos=
+	tmp_rgt=
+	tmp_user=
+
+	#preTRES stuff
+	tmp_grpcpumins=
+	tmp_grpcpurunmins=
+	tmp_grpcpus=
+	tmp_grpmem=
+	tmp_grpnodes=
+	tmp_maxcpumins=
+	tmp_maxcpus=
+	tmp_maxnodes=
+
+	#postTRES stuff
+	tmp_grptresmins=
+	tmp_grptresrunmins=
+	tmp_grptres=
+	tmp_maxtresmins=
+	tmp_maxtres=
+	tmp_maxtrespernode=
+
+
+	#Set values
+	while [ $# -gt 0 ]
+	do
+		key=$1
+		val=$1
+		shift
+		key=`echo $key | sed -e 's/=.*$//'`
+		val=`echo $val | sed -e 's/^[^=]*=//'`
+		#echo >&2 "$key = $val"
+
+		case $key in
+		#----	Common fields
+		    account)
+			tmp_account=$val
+			;;
+		    cluster)
+			tmp_cluster=$val
+			;;
+		    defaultqos)
+			tmp_defaultqos=$val
+			;;
+		    fairshare)
+			tmp_fairshare=$val
+			;;
+		    grpjobs)
+			tmp_grpjobs=$val
+			;;
+		    grpsubmitjobs)
+			tmp_grpsubmitjobs=$val
+			;;
+		    grpwall)
+			tmp_grpwall=$val
+			;;
+		    id)
+			tmp_id=$val
+			;;
+		    lft)
+			tmp_lft=$val
+			;;
+		    maxjobs)
+			tmp_maxjobs=$val
+			;;
+		    maxsubmitjobs)
+			tmp_maxsubmitjobs=$val
+			;;
+		    maxwall)
+			tmp_maxwall=$val
+			;;
+		    parentid)
+			tmp_parentid=$val
+			;;
+		    parentname)
+			tmp_parentname=$val
+			;;
+		    partition)
+			tmp_partition=$val
+			;;
+		    qos)
+			tmp_qos=$val
+			;;
+		    rgt)
+			tmp_rgt=$val
+			;;
+		    user)
+			tmp_user=$val
+			;;
+
+		#----	preTRES fields
+		    grpcpumins)
+			tmp_grpcpumins=$val
+			;;
+		    grpcpurunmins)
+			tmp_grpcpurunmins=$val
+			;;
+		    grpcpus)
+			tmp_grpcpus=$val
+			;;
+		    grpnodes)
+			tmp_grpnodes=$val
+			;;
+		    grpmem)
+			tmp_grpmem=$val
+			;;
+		    maxcpumins)
+			tmp_maxcpumins=$val
+			;;
+		    maxcpus)
+			tmp_maxcpus=$val
+			;;
+		    maxnodes)
+			tmp_maxnodes=$val
+			;;
+
+		#----	postTRES fields
+		    grptres)
+			tmp_grptres=$val
+			;;
+		    grptresmins)
+			tmp_grptresmins=$val
+			;;
+		    grptresrunmins)
+			tmp_grptresrunmins=$val
+			;;
+		    maxtres)
+			tmp_maxtres=$val
+			;;
+		    maxtresmins)
+			tmp_maxtresmins=$val
+			;;
+		    maxtrespernode)
+			tmp_maxtrespernode=$val
+			;;
+
+
+		#----	ERROR
+		    *)
+			echo >&2 "Unrecognized parm $key, aborting"
+			exit 1
+			;;
+		esac
+	done
+		    
+	#Print values
+	tmptext=
+	for fld in $FORMAT_FIELDS
+	do
+		case $fld in
+		#----	common fields
+		    account)
+			tmptext="${tmptext}${tmp_account}"
+			;;
+		    cluster)
+			tmptext="${tmptext}${tmp_cluster}"
+			;;
+		    defaultqos)
+			tmptext="${tmptext}${tmp_defaultqos}"
+			;;
+		    fairshare)
+			tmptext="${tmptext}${tmp_fairshare}"
+			;;
+		    grpjobs)
+			tmptext="${tmptext}${tmp_grpjobs}"
+			;;
+		    grpsubmitjobs)
+			tmptext="${tmptext}${tmp_grpsubmitjobs}"
+			;;
+		    grpwall)
+			tmptext="${tmptext}${tmp_grpwall}"
+			;;
+		    id)
+			tmptext="${tmptext}${tmp_id}"
+			;;
+		    lft)
+			tmptext="${tmptext}${tmp_lft}"
+			;;
+		    maxjobs)
+			tmptext="${tmptext}${tmp_maxjobs}"
+			;;
+		    maxsubmitjobs)
+			tmptext="${tmptext}${tmp_maxsubmitjobs}"
+			;;
+		    maxwall)
+			tmptext="${tmptext}${tmp_maxwall}"
+			;;
+		    parentid)
+			tmptext="${tmptext}${tmp_parentid}"
+			;;
+		    parentname)
+			tmptext="${tmptext}${tmp_parentname}"
+			;;
+		    partition)
+			tmptext="${tmptext}${tmp_partition}"
+			;;
+		    qos)
+			tmptext="${tmptext}${tmp_qos}"
+			;;
+		    rgt)
+			tmptext="${tmptext}${tmp_rgt}"
+			;;
+		    user)
+			tmptext="${tmptext}${tmp_user}"
+			;;
+
+		#----	preTRES fields
+		    grpcpumins)
+			tmptext="${tmptext}${tmp_grpcpumins}"
+			;;
+		    grpcpurunmins)
+			tmptext="${tmptext}${tmp_grpcpurunmins}"
+			;;
+		    grpcpus)
+			tmptext="${tmptext}${tmp_grpcpus}"
+			;;
+		    grpmem)
+			tmptext="${tmptext}${tmp_grpmem}"
+			;;
+		    grpnodes)
+			tmptext="${tmptext}${tmp_grpnodes}"
+			;;
+		    maxcpumins)
+			tmptext="${tmptext}${tmp_maxcpumins}"
+			;;
+		    maxcpus)
+			tmptext="${tmptext}${tmp_maxcpus}"
+			;;
+		    maxnodes)
+			tmptext="${tmptext}${tmp_maxnodes}"
+			;;
+
+		#----	preTRES fields
+		    grptresmins)
+			tmptext="${tmptext}${tmp_grptresmins}"
+			;;
+		    grptresrunmins)
+			tmptext="${tmptext}${tmp_grptresrunmins}"
+			;;
+		    grptres)
+			tmptext="${tmptext}${tmp_grptres}"
+			;;
+		    maxtresmins)
+			tmptext="${tmptext}${tmp_maxtresmins}"
+			;;
+		    maxtres)
+			tmptext="${tmptext}${tmp_maxtres}"
+			;;
+		    maxtrespernode)
+			tmptext="${tmptext}${tmp_maxtrespernode}"
+			;;
+
+		#----	ERROR
+		    *)
+			echo >&2 "Unrecognized field name $fld in format string, aborting"
+			exit 1;
+			;;
+		esac
+		tmptext="${tmptext}|"
+	done
+	echo $tmptext
+
+
+}
+
+print_assoc_1()
+{	print_assoc id=1 parentid=0 account=root \
+		cluster=yottascale fairshare=1 \
+		lft=101000 rgt=101999 \
+		defaultqos=normal partition=gpus
+}
+
+print_assoc_2()
+{	print_assoc id=2 account=root user=root \
+		parentid=1 parentname=root \
+		cluster=yottascale fairshare=1 \
+		lft=102000 rgt=102999 \
+		defaultqos=normal partition=gpus
+}
+
+print_assoc_3()
+{	print_assoc id=3 account=abc124 \
+		parentid=1 parentname=root \
+		maxjobs=1000  maxsubmitjobs=2000  maxwall=4000 \
+		grpjobs=1500 grpsubmitjobs=3000  grpwall=6000 \
+		qos=high,normal \
+		cluster=yottascale fairshare=1 \
+		lft=103000 rgt=103999 \
+		defaultqos=normal partition=gpus \
+		maxcpumins=60000  maxtresmins="cpu=60000" \
+		maxcpus=100 maxnodes=5  maxtres="cpu=100,node=5" \
+		grpcpumins=90000  grptresmins="cpu=90000"\
+		grpcpus=150  grpnodes=7  grptres="cpu=150,node=7,gres/gpu=5"
+}
+
+print_assoc_4()
+{	print_assoc id=4 account=abc124 user=payerle \
+		parentid=3 parentname=abc124 \
+		cluster=yottascale fairshare=1 \
+		lft=104000 rgt=104999 \
+		defaultqos=normal partition=gpus \
+		maxcpumins=40000 maxtresmins="cpu=40000"
+}
+
+print_specified_assoc()
+{	aid=$1
+
+	case $aid in
+	   1)
+		print_assoc_1
+		;;
+	   2)
+		print_assoc_2
+		;;
+	   3)
+		print_assoc_3
+		;;
+	   4)
+		print_assoc_4
+		;;
+	   *)
+		x=x
+		#echo >&2 "Unknown assoc $usr"
+		;;
+	esac
+}
+
+print_assocs()
+{	#We always have --noheader
+	if [ "x$verbose_flag" = "xyes" ]; then
+		print_header
+	fi
+	while [ $# -gt 0 ]
+	do
+		aid=$1
+		shift
+		print_specified_assoc $aid
+	done
+}
+
+print_all_assocs()
+{	#Must do alphabetically
+	print_assocs 1 2 3 4
+}
+
+
+print_root_acct_assocs()
+{	#Print all assocs with account=root
+	print_assocs 1 2
+}
+
+print_abc124_assocs()
+{	#Print all assocs with account=abc124
+	print_assocs 3 4
+}
+
+print_root_user_assocs()
+{	#Print all assocs with user=root
+	print_assocs  2
+}
+
+print_payerle_assocs()
+{	#Print all assocs with user=payerle
+	print_assocs  4
+}
+
+print_root_nouser_assocs()
+{	#Print assocs for account=root, user=
+	print_assocs 1
+}
+
+print_root_root_assocs()
+{	#Print all assocs with account=root, user=root
+	print_root_user_assocs
+}
+
+print_abc124_nouser_assocs()
+{	#Print assocs with account=abc124 user=
+	print_assocs 3
+}
+
+print_abc124_payerle_assocs()
+{	#Print all assocs with account=abc124, user=payerle
+	print_payerle_assocs
+}
+
+print_no_assocs()
+{	print_assocs 'no-such-assoc'
+}
+
+#Parse options
+acct_flag=
+user_flag=
+
+while [ $# -gt 0 ]
+do
+	arg=$1
+	shift
+
+	case $arg in
+	    --version)
+		#Print version and exit
+		if [ "x$FAKE_SLURM_VERSION" = "x" ]; then
+			print_version 14
+		else
+			print_version $FAKE_SLURM_VERSION
+		fi
+		exit 0
+		;;
+	    format=*)
+		#Set our format string
+		tmp=`echo $arg | sed -e 's/^format=//' -e "s/'//g" -e 's/"//g' -e 's/,/ /g'`
+		FORMAT_FIELDS=$tmp
+		;;
+	    account=* )
+		tmp=`echo $arg | sed -e 's/^account=//' -e "s/'//g" -e 's/"//g' `
+		acct_flag=$tmp
+		;;
+	    user=* )
+		tmp=`echo $arg | sed -e 's/^user=//' -e "s/'//g" -e 's/"//g' `
+		user_flag=$tmp
+		if [ "x$tmp" = "x" ]; then
+			user_flag="NOUSER"
+		fi
+		;;
+	    -v|--verbose)
+		verbose_flag=yes
+		;;
+	esac
+done
+
+if [ "x${acct_flag}" != "x" ]; then
+	#account requested, possibly with user
+	if [ "x${user_flag}" = "x" ]; then
+		if [ "x${acct_flag}" = "xroot" ]; then
+			print_root_acct_assocs
+		elif [ "x${acct_flag}" = "xabc124" ]; then
+			print_abc124_assocs
+		else
+			print_no_assocs
+		fi
+	elif [ "x${user_flag}" = "xroot" ]; then
+		if [ "x${acct_flag}" = "xroot" ]; then
+			print_root_root_assocs
+		else
+			print_no_assocs
+		fi
+	elif [ "x${user_flag}" = "xpayerle" ]; then
+		if [ "x${acct_flag}" = "xabc124" ]; then
+			print_abc124_payerle_assocs
+		else
+			print_no_assocs
+		fi
+	elif [ "x${user_flag}" = "xNOUSER" ]; then
+		if [ "x${acct_flag}" = "xabc124" ]; then
+			print_abc124_nouser_assocs
+		elif [ "x${acct_flag}" = "xroot" ]; then
+			print_root_nouser_assocs
+		else
+			print_no_assocs
+		fi
+	fi
+elif [ "x${user_flag}" = "xroot" ]; then
+	print_root_user_assocs
+elif [ "x${user_flag}" = "xpayerle" ]; then
+	print_payerle_assocs
+elif [ "x${user_flag}" != "x" ]; then
+	print_no_assocs
+else
+	#No flags, print all accounts
+	print_all_assocs
+fi
+
+

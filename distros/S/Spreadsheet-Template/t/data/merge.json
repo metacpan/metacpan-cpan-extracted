@@ -1,0 +1,43 @@
+%% my $default = { color => '#000000', size => 14 };
+%% format(basic => $default.merge({bold => true(),align => 'left'}));
+
+{
+   "selection"  : 0,
+   "worksheets" : [
+      {
+         "column_widths" : [ 14.6, 18.5, 15.8, 12.2 ],
+         "name"          : "Merge Report 1",
+         "selection"     : [ 1, 9 ],
+         "row_heights"   : [ 25, 18, 18, 18 ],
+         "cells"         : [
+            %% for $headers -> $header {
+            [
+               [% c($header.value1, "basic") %],
+               [% c($header.value2, "basic") %],
+               [% c($header.value3, "basic") %],
+               [% c($header.value4, "basic") %]
+            ],
+            %% }
+            %% for $rows -> $row {
+            [
+               [% c($row.value1, "basic", "number") %],
+               [% c($row.value2, "basic", "number") %],
+               [% c($row.value3, "basic", "number") %],
+               [% c($row.value4, "basic", "number") %]
+            ],
+            %% }
+            []
+         ],
+         "merge" : [
+            [% merge('A1:D1', 'Merged Header', 'basic', 'string') %],
+            [% merge(
+                   'A4:D4',
+                   $rows.map(-> $a {$a.value1}).reduce(-> $a,$b {$a + $b}),
+                   'basic',
+                   'number',
+                   formula => 'SUM(A2:A3)'
+               ) %]
+         ]
+      }
+   ]
+}

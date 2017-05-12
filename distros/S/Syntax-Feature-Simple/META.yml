@@ -1,0 +1,44 @@
+---
+abstract: 'DWIM syntax extensions'
+author:
+  - "Robert 'phaylon' Sedlacek <rs@474.at>"
+build_requires:
+  Test::Fatal: 0.003
+  Test::More: 0.98
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200015, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Syntax-Feature-Simple
+no_index:
+  directory:
+    - t/
+provides:
+  Syntax::Feature::Simple:
+    file: lib/Syntax/Feature/Simple.pm
+    version: 0.002
+  Syntax::Feature::Simple::V1:
+    file: lib/Syntax/Feature/Simple/V1.pm
+    version: 0.002
+  Syntax::Feature::Simple::V2:
+    file: lib/Syntax/Feature/Simple/V2.pm
+    version: 0.002
+requires:
+  Carp: 0
+  Sub::Install: 0.925
+  Syntax::Feature::Function: 0.001
+  Syntax::Feature::Method: 0.001
+  Syntax::Feature::Sugar::Callbacks: 0.002
+  parent: 0
+  strictures: 1
+  syntax: 0.003
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Syntax-Feature-Simple
+  homepage: https://github.com/phaylon/Syntax-Feature-Simple/wiki
+  repository: git://github.com/phaylon/Syntax-Feature-Simple.git
+version: 0.002
+x_authority: cpan:PHAYLON

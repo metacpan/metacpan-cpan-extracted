@@ -1,0 +1,26 @@
+---
+abstract: 'Combine several SVG images into a single SVG sprite'
+author:
+  - 'Marius Gavrilescu <marius@ieval.ro>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.0402, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SVG-SpriteMaker
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  SVG: '0'
+  SVG::Parser: '0'
+  perl: '5.014'
+resources:
+  repository: https://git.ieval.ro/?p=svg-spritemaker.git
+version: '0.002'

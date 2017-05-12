@@ -1,0 +1,63 @@
+This is the README file for SVN::Push, a subversion repository 
+distribution tool.
+
+Subversion is a version control system, you can find more information
+at http://subversion.tigris.org/.
+
+
+SVN::Push is a module which let you push the content of a repoitory
+or a parts of a repository to another subversion repository, using the
+Ra layer. This means you can access the repositories by URL, so
+it works also with remote repositories. It's also possible to specify
+the revisions to push, so you need not to copy all revision and can
+instead just push a cumulated revision, where necessary.
+
+svnpush is a command line frontend for SVN::Push.
+
+svndumpload is a command line tool which is able to replicate
+a full repository to another by doing incremental dumps and loads.
+It checks the revsion of the destination repsitory and
+dumps only changes. One or both repositories could
+be on a remote machine, in which case ssh access is necessary.
+The main adavatage of svndumpload over svnpush is that it preserves
+copy history.
+
+svnsetuuid is a command line tool to set the uuid of a repostory.
+This is necessary in case you want later on your working copy
+with svn switch --relocate, in which case both repositories need to
+have the same uuid.
+
+
+* Installation
+
+You need subversion 0.37.0 release or newer, with perl bindings support
+to use SVN::Push.
+
+SVN::Push uses the stanard perl module install process:
+
+% perl Makefile.PL
+% make
+# make install
+
+* Configuration
+
+After install the module, see perldoc bin/svnpush and perldoc Push.pm for more information.
+
+* AUTHORS
+
+Gerald Richter E<lt>richter@dev.ecos.deE<gt>
+
+* CREDITS
+
+A lot of ideas and code is taken from SVN::Mirror by
+Chia-liang Kao E<lt>clkao@clkao.orgE<gt>
+
+* COPYRIGHT
+
+Copyright 2004 by Gerald Richter E<lt>richter@dev.ecos.deE<gt>
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+See http://www.perl.com/perl/misc/Artistic.html
+

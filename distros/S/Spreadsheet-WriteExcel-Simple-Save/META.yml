@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Spreadsheet-WriteExcel-Simple-Save
+version:      0.05
+version_from: Save.pm
+installdirs:  site
+requires:
+    File::Temp:                    0.14
+    Spreadsheet::ParseExcel:       0.26
+    Spreadsheet::WriteExcel:       0.42
+    Spreadsheet::WriteExcel::Simple: 0.03
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.16

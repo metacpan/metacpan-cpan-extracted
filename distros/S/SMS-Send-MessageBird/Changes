@@ -1,0 +1,11 @@
+Revision history for SMS-Send-MessageBird
+
+0.04    Remove MYMETA.* from the MANIFEST file.
+
+0.03    Add SMS::Send::Driver to the prereqs.
+
+0.02    Add Prereqs and correct licenece to the Makefile.
+
+0.01    2016-07-04 12:37
+        Initial version of the Driver.
+

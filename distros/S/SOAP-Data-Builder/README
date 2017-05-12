@@ -1,0 +1,36 @@
+SOAP-Data-Builder version 0.01
+==============================
+
+This Module provides a quick and easy way to build complex SOAP data
+and header structures for use with SOAP::Lite.
+
+It primarily provides a wrapper around SOAP::Serializer and SOAP::Data
+(or SOAP::Header) enabling you to generate complex XML within your SOAP
+request or response.
+
+Developed by Aaron Trevena at Surrey Technologies, Ltd. 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  SOAP::Lite
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 by Aaron J Trevena and Surrey Technologies, Ltd 
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

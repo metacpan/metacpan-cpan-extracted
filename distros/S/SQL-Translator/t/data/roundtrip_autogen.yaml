@@ -1,0 +1,321 @@
+---
+schema:
+  procedures:
+    foo_proc:
+      comments: Go Sox!
+      extra:
+        bar: baz
+        foo: bar
+        hello: world
+      name: foo_proc
+      order: 1
+      owner: Nomar
+      parameters:
+        - foo
+        - bar
+      sql: select foo from bar
+  tables:
+    Another:
+      constraints:
+        - deferrable: 1
+          expression: ''
+          fields:
+            - id
+          match_type: ''
+          name: ''
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: PRIMARY KEY
+      extra:
+        bar: baz
+        foo: bar
+        hello: world
+        mysql_table_type: InnoDB
+      fields:
+        id:
+          data_type: int
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 0
+          name: id
+          order: 1
+          size:
+            - 10
+      indices: []
+      name: Another
+      options: []
+      order: 2
+    Basic:
+      constraints:
+        - deferrable: 1
+          expression: ''
+          extra:
+            bar: baz
+            foo: bar
+            hello: world
+          fields:
+            - id
+          match_type: ''
+          name: ''
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: PRIMARY KEY
+        - deferrable: 1
+          expression: ''
+          fields:
+            - email
+          match_type: ''
+          name: emailuniqueindex
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: UNIQUE
+        - deferrable: 1
+          expression: ''
+          fields:
+            - another_id
+          match_type: ''
+          name: Basic
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields:
+            - id
+          reference_table: Another
+          type: FOREIGN KEY
+      extra:
+        bar: baz
+        foo: bar
+        hello: world
+        mysql_table_type: InnoDB
+      fields:
+        another_id:
+          data_type: int
+          default_value: 2
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: another_id
+          order: 8
+          size:
+            - 10
+        decimal:
+          data_type: decimal
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: decimal
+          order: 11
+          size:
+            - 10
+            - 2
+        description:
+          data_type: text
+          default_value: ''
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: description
+          order: 3
+          size:
+            - 0
+        email:
+          data_type: varchar
+          default_value: ~
+          extra:
+            bar: baz
+            foo: bar
+            hello: world
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 1
+          name: email
+          order: 4
+          size:
+            - 500
+        emptytagdef:
+          comments: Hello 'emptytagdef'
+          data_type: varchar
+          default_value: backslash \ single-quote '
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: emptytagdef
+          order: 7
+          size:
+            - 0
+        explicitemptystring:
+          data_type: varchar
+          default_value: ''
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: explicitemptystring
+          order: 6
+          size:
+            - 0
+        explicitnulldef:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: explicitnulldef
+          order: 5
+          size:
+            - 0
+        id:
+          data_type: int
+          default_value: ~
+          extra:
+            ZEROFILL: 1
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 0
+          name: id
+          order: 1
+          size:
+            - 10
+        numeric:
+          data_type: numeric
+          default_value: 42.69
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: numeric
+          order: 10
+          size:
+            - 9
+            - 1
+        timest:
+          data_type: timestamp
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: timest
+          order: 9
+          size:
+            - 0
+        title:
+          data_type: varchar
+          default_value: hello
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: title
+          order: 2
+          size:
+            - 100
+      indices:
+        - extra:
+            bar: baz
+            foo: bar
+            hello: world
+          fields:
+            - title
+          name: titleindex
+          options: []
+          type: NORMAL
+      name: Basic
+      options: []
+      order: 1
+    '`table` [with] "quotes"':
+      constraints:
+        - deferrable: 1
+          expression: ''
+          fields:
+            - '`field` [with] "quotes"'
+          match_type: ''
+          name: ''
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: PRIMARY KEY
+      fields:
+        '`field` [with] "quotes"':
+          data_type: int
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 0
+          name: '`field` [with] "quotes"'
+          order: 1
+          size:
+            - 10
+      indices: []
+      name: '`table` [with] "quotes"'
+      options: []
+      order: 3
+  triggers:
+    '`trigger` [with] "quotes"':
+      action: select timestamp();
+      database_events:
+        - insert
+      fields: ~
+      name: '`trigger` [with] "quotes"'
+      on_table: '`table` [with] "quotes"'
+      order: 3
+      perform_action_when: before
+    bar_trigger:
+      action: update modified2=timestamp();
+      database_events:
+        - insert
+        - update
+      extra:
+        hello: aliens
+      fields: ~
+      name: bar_trigger
+      on_table: Basic
+      order: 2
+      perform_action_when: before
+    foo_trigger:
+      action: update modified=timestamp();
+      database_events:
+        - insert
+      extra:
+        bar: baz
+        foo: bar
+        hello: world
+      fields: ~
+      name: foo_trigger
+      on_table: Basic
+      order: 1
+      perform_action_when: after
+  views:
+    email_list:
+      extra:
+        bar: baz
+        foo: bar
+        hello: world
+      fields:
+        - email
+      name: email_list
+      order: 1
+      sql: SELECT email FROM Basic WHERE (email IS NOT NULL)
+translator:
+  add_drop_table: 0
+  filename: t/data/roundtrip.xml
+  no_comments: 0
+  parser_args: {}
+  parser_type: SQL::Translator::Parser::XML
+  producer_args: {}
+  producer_type: SQL::Translator::Producer::YAML
+  show_warnings: 0
+  trace: 0
+  version: 0.11021

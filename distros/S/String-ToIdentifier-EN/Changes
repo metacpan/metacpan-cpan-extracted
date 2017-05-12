@@ -1,0 +1,38 @@
+Revision history for String::ToIdentifier::EN
+
+0.11 2013-08-27 19:00:41
+    - POD typo fixes from dsteinbrunner #1
+
+0.10 2013-06-10 00:22:12
+    - convert to dzil
+    - add =encoding UTF-8 to ::Unicode POD (RT#85981)
+
+0.09  2012-11-05 02:47:53
+    - bump up Lingua::EN::Inflect::Phrase dep to 0.16 (latest) due to unescaped
+      braces in regex in Lingua::EN::Tagger
+
+0.08  2012-09-24 03:59:43
+    - update for Lingua::EN::Inflect::Phrase 0.14
+    - change ascii 'acknowledge' to 'ack'
+
+0.07  2012-02-27 22:31:06
+    - work around a bug in [:upper:] in 5.15.8
+
+0.06  2011-11-19 17:49:34
+    - fix for perl 5.8.3 (RT#72088)
+
+0.05  2011-10-23 01:23:18
+    - fix different adjacent chars being replaced
+    - fix accented single char unidecodes in ::EN
+
+0.04  2011-10-17 14:12:40
+    - preserve capitalization of original string
+
+0.03  2011-10-10 22:10:58
+    - minor changes
+
+0.02  2011-10-06 10:17:00
+    - improve Unicode char translation algorithm
+
+0.01  2011-10-06 00:19:00
+    - Initial version.

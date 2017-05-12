@@ -1,0 +1,16 @@
+Build.PL
+Changes
+lib/ShipIt/Step/Readme.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00-load.t
+t/01-readme.t
+t/02-exceptions.t
+t/boilerplate.t
+t/eol.t
+t/eol_special.t
+t/manifest.t
+t/pod.t
+t/prereqs.t

@@ -1,0 +1,87 @@
+2003-01-15  Paul Stodghill  <stodghil@quimby-xp>
+
+	* soap-client.pl, soap-client.sh, soap-server.cgi, soap-server.sh, soap-server2.cgi, test.cgi, test.sh:
+	Added copyright notice.
+
+2003-01-13  Paul Stodghill  <stodghil@quimby-xp>
+
+	* soap-client.sh:
+	Verbosity is now set with -v -v -v.
+
+2003-01-03  Paul Stodghill  <stodghil@quimby-xp>
+
+	* test.cgi:
+	Specify an in_order.
+
+	* soap-client.pl:
+	Test the optional sleep_for argument.
+
+2002-12-31  Paul Stodghill  <stodghil@quimby-xp>
+
+	* soap-server2.cgi, soap-server.cgi:
+	sleep_for is optional and defaults to 5.
+
+	* soap-server2.cgi:
+	Use the parameter constructor functions found in SOAP::Clean::Server
+
+	* soap-server2.cgi:
+	Original version.
+
+	* soap-client.pl:
+	Added comment for using soap-server2.cgi
+
+2002-12-27  Paul Stodghill  <stodghil@quimby-xp>
+
+	* soap-client.pl:
+	Don't use usage_msg. Use usage, can walk the data structures to print
+	the usage info.
+
+	* soap-client.sh:
+	Shell script version of soap-client.pl that uses wsdl-client.pl
+
+2002-12-22  Paul Stodghill  <stodghil@quimby-xp>
+
+	* soap-client.pl:
+	Do not assume XML::LibXML. Use the SOAP::Clean::XML??? interface.
+	XML objects are read from string instead of file.
+
+2002-12-16  Paul Stodghill  <stodghil@quimby-xp>
+
+	* test.cgi, test.sh:
+	Original version.
+
+2002-12-10  Paul Stodghill  <stodghil@quimby-xp>
+
+	* soap-client.pl:
+	Rewritten to handle the new WSDL-based Client class.
+
+	* soap-server.cgi:
+	Add in_order and out_order information.
+
+2002-12-02  Paul Stodghill  <stodghil@quimby-xp>
+
+	* soap-server.sh, soap-server.cgi:
+	New argument, sleep_for, to server.
+
+	* soap-client.pl:
+	Add a test for namespaces of embedded XML.
+	New argument, sleep_for, to server.
+
+2002-11-17  Paul Stodghill  <stodghil@quimby-xp>
+
+	* soap-server.cgi:
+	VERBOSE_SERVER functionality moved to CGI.pm
+
+2002-11-15  Paul Stodghill  <stodghil@quimby-xp>
+
+	* soap-client.pl:
+	urn is obtained from the server.
+
+	* soap-server.sh:
+	Don't sleep for so long.
+
+2002-11-12  Paul Stodghill  <stodghil@quimby-xp>
+
+	* a.xml, soap-client.pl, soap-server.cgi, soap-server.sh:
+	"Original version". Taken from ../
+

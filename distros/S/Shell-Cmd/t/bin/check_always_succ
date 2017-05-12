@@ -1,0 +1,8 @@
+#!/usr/bin/perl
+$| = 1;
+
+if (-f "always_succ_2" ) {
+   exit 0;
+} else {
+   exit 40;
+}

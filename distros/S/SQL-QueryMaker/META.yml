@@ -1,0 +1,30 @@
+---
+abstract: 'helper functions for SQL query generation'
+author:
+  - 'Kazuho Oku'
+build_requires:
+  DateTime: 0
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.98
+  Test::Requires: 0
+  Tie::IxHash: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: SQL::QueryMaker
+name: SQL-QueryMaker
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Scalar::Util: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.03

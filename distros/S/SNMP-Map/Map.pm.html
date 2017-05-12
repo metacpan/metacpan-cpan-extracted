@@ -1,0 +1,328 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>SNMP::Map - Tool for drawing network map</title>
+<link rev="made" href="mailto:root@gohan25.freebsd.org" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#methods">METHODS</a></li>
+	<ul>
+
+		<li><a href="#new">new</a></li>
+		<li><a href="#get_data">get_data</a></li>
+		<li><a href="#get_output">get_output</a></li>
+		<li><a href="#error">error</a></li>
+		<li><a href="#nodes_info">nodes_info</a></li>
+		<li><a href="#edge_info">edge_info</a></li>
+	</ul>
+
+	<li><a href="#notes">NOTES</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#license">LICENSE</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>SNMP::Map - Tool for drawing network map</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+
+ my $map = new SNMP::Map;
+ $map-&gt;get_data(username=&gt; 'user',
+               password =&gt;'pass',
+               ipv3 =&gt; ['10.8.255.238','10.8.255.239','10.8.255.244','10.8.255.248'],
+               vlan=&gt;'vlan-224'
+ );
+ $map-&gt;get_output(file =&gt; 'map.jpg');</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>The SNMP::Map module is used for drawing network map of hosts which support SNMP.
+Spanning Tree root switch can be distinguished by its position and color. Module provides
+switches and ports on the picture linked by each other.You can get various information 
+about switch and its link. Image map file is also available. So, it can be used to create
+javascript for popuping additional info.</p>
+<p>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<p>
+</p>
+<h2><a name="new">new</a></h2>
+<p>This is the constructor. It does not accept any attributes.</p>
+<pre>
+ my $map = new SNMP::Map;</pre>
+<p>
+</p>
+<h2><a name="get_data">get_data</a></h2>
+<p><code>get_data</code> method gets data from switches using SNMP protocol. It starts from the spanning tree root switch,
+and makes recursive calls to all switches linked to root. By default, it uses SNMP v3, but for switches
+listed in ipv2 array reference,it uses SNMP v2. If a failure occurs, method returns underfined value,
+you can use 'error' method to get error. At least, one ip adress must be specified by <strong>ipv2</strong> or <strong>ipv3</strong> attribute.
+It is recommended to get more info,  list all switches by <strong>ipv2</strong> and <strong>ipv3</strong> attributes. It was tested on
+'WS-C2950','WS-C2960','WS-3750' platforms. 'WS-C2950' switches must be listed in <strong>ipv2</strong>.</p>
+<p>Attributes:</p>
+<dl>
+<dt><strong><a name="item_username">username</a></strong><br />
+</dt>
+<dd>
+username for SNMP v3.
+</dd>
+<p></p>
+<dt><strong><a name="item_password">password</a></strong><br />
+</dt>
+<dd>
+password for SNMP v3.
+</dd>
+<p></p>
+<dt><strong><a name="item_community">community</a></strong><br />
+</dt>
+<dd>
+community for SNMP v2.
+</dd>
+<p></p>
+<dt><strong><a name="item_timeout">timeout</a></strong><br />
+</dt>
+<dd>
+timeout for SNMP.
+</dd>
+<p></p>
+<dt><strong><a name="item_ipv3">ipv3</a></strong><br />
+</dt>
+<dd>
+array reference consist of list of hosts which is supported SNMP v3.
+</dd>
+<p></p>
+<dt><strong><a name="item_ipv2">ipv2</a></strong><br />
+</dt>
+<dd>
+array reference consist of list of hosts which is supported SNMP v2.
+</dd>
+<p></p>
+<dt><strong><a name="item_debug">debug</a></strong><br />
+</dt>
+<dd>
+switch on/off debug.can be true or false. Debug information is printed to STDERR.
+</dd>
+<p></p>
+<dt><strong><a name="item_vlan">vlan</a></strong><br />
+</dt>
+<dd>
+vlan to draw map.
+</dd>
+<p></p></dl>
+<pre>
+ $map-&gt;get_data(username=&gt;'user',
+                community=&gt;'comm',
+                password=&gt;'pass',
+                ipv3=&gt;['10.8.255.115','10.8.255.118','10.8.255.119','10.8.255.111'],
+                ipv2=&gt;['10.8.255.145','10.8.255.133','10.8.255.151','10.8.255.149'],
+                vlan =&gt; 'vlan-192');</pre>
+<p>
+</p>
+<h2><a name="get_output">get_output</a></h2>
+<p>This method is used for saving image into file. Also you can get an image map file.
+A color value used in attributes of the method may be ``h,s,v'' (hue, saturation, brightness)
+floating point numbers between 0 and 1, or an X11 color name such as 'white', 'black',
+'red', 'green', 'blue', 'yellow', 'magenta', 'cyan', or 'burlywood'.</p>
+<p>Attributes:</p>
+<dl>
+<dt><strong><a name="item_root_color">root_color</a></strong><br />
+</dt>
+<dd>
+sets the outline color for Spanning Tree root switch, and the default fill color if 
+the 'style' is 'filled' and 'fillcolor' is not specified.
+</dd>
+<p></p>
+<dt><strong><a name="item_root_fillcolor">root_fillcolor</a></strong><br />
+</dt>
+<dd>
+sets the fill color for Spanning Tree root switch when the style is 'filled'. If not 
+specified, the 'fillcolor' when the 'style' is 'filled' defaults to be the same as the 
+outline color.
+</dd>
+<p></p>
+<dt><strong><a name="item_root_fontcolor">root_fontcolor</a></strong><br />
+</dt>
+<dd>
+sets the label text color for Spanning Tree root switch.
+</dd>
+<p></p>
+<dt><strong><a name="item_color">color</a></strong><br />
+</dt>
+<dd>
+sets the outline color for hosts and the default fill color if the 'style' is 'filled' 
+and 'fillcolor' is not specified.
+</dd>
+<p></p>
+<dt><strong><a name="item_fillcolor">fillcolor</a></strong><br />
+</dt>
+<dd>
+sets the fill color for hosts when the style is 'filled'. If not specified, the 'fillcolor'
+when the 'style' is 'filled' defaults to be the same as the outline color.
+</dd>
+<p></p>
+<dt><strong><a name="item_fontcolor">fontcolor</a></strong><br />
+</dt>
+<dd>
+sets the label text color for hosts.
+</dd>
+<p></p>
+<dt><strong><a name="item_shapes">shapes</a></strong><br />
+</dt>
+<dd>
+sets hash reference for the host`s shape, the key - regexp for the device platform, value - shape.
+shape could be: 'record', 'plaintext', 'ellipse', 'circle', 'egg', 'triangle', 'box', 'diamond',
+'trapezium', 'parallelogram', 'house', 'hexagon', 'octagon'. <strong>unknown</strong> key is for hosts for which 
+platform is unknown.
+</dd>
+<p></p>
+<dt><strong><a name="item_edges_colors">edges_colors</a></strong><br />
+</dt>
+<dd>
+sets array reference for colors of the links between hosts. First element of array reference
+is the color for the unknown state of link. Last element is the color for link in blocking state.
+2-7 elements - colors for hosts depending of its cost. Formula to correspond link color and its
+cost -  <code>log(1/cost)*100</code> .
+</dd>
+<p></p>
+<dt><strong><a name="item_file">file</a></strong><br />
+</dt>
+<dd>
+file to output image.
+</dd>
+<p></p>
+<dt><strong><a name="item_format">format</a></strong><br />
+</dt>
+<dd>
+format of image file. Could be: 'ps','hpgl','pcl','mif','pic','gd','gd2','gif','jpg','png','wbmp',
+'vrml','vtx,'mp','fig','svg','svgz','plain'.
+</dd>
+<p></p>
+<dt><strong><a name="item_layout">layout</a></strong><br />
+</dt>
+<dd>
+The <strong>layout</strong> attribute determines which layout algorithm GraphViz.pm will use. Possible values are:
+'dot','neato','twopi','circo','fdp'. 'dot' and 'circo' are recommended.
+</dd>
+<p></p>
+<dt><strong><a name="item_bgcolor">bgcolor</a></strong><br />
+</dt>
+<dd>
+background color of image.
+</dd>
+<p></p>
+<dt><strong><a name="item_height_2c_width">height, width</a></strong><br />
+</dt>
+<dd>
+minimal height/width of image in inches.
+</dd>
+<p></p>
+<dt><strong><a name="item_fontsize">fontsize</a></strong><br />
+</dt>
+<dd>
+host`s label font size.
+</dd>
+<p></p>
+<dt><strong><a name="item_style">style</a></strong><br />
+</dt>
+<dd>
+host`s style. Could be: 'filled', 'solid', 'dashed', 'dotted', 'bold', 'invis'.
+</dd>
+<p></p>
+<dt><strong><a name="item_edge_style">edge_style</a></strong><br />
+</dt>
+<dd>
+style of link. Could be: 'filled', 'solid', 'dashed', 'dotted', 'bold', 'invis'.
+</dd>
+<p></p>
+<dt><strong><a name="item_cmap_2cimap">cmap,imap</a></strong><br />
+</dt>
+<dd>
+file to output client-side/server-side image file. <strong>href</strong> parameter in the html tags 
+is the ip adress for hosts and number for links. You can change it to <strong>nohref</strong> and use
+'nodes_info' and 'edge_info' methods to create javascript pop up.
+</dd>
+<p></p></dl>
+<pre>
+ $map-&gt;get_output(file=&gt;'../map.jpg',
+                 root_fillcolor=&gt;'blue',
+                 root_fontcolor=&gt;'cyan',
+                 fontcolor=&gt;'red',
+                 color=&gt;'green',
+                 shapes =&gt; {unknown =&gt; 'record','IP Phone' =&gt;'ellipse'},
+                 edges_colors=&gt;['blue','0,0,0.9','0,0,0.8','0,0,0.7','0,0.5,0.6','0,0,0.5','0,0,0.4','red'],
+                 height=&gt;5,
+                 width=&gt;9,
+                 edge_style=&gt;'dashed',
+                 cmap=&gt;'map'
+);</pre>
+<p>
+</p>
+<h2><a name="error">error</a></h2>
+<p>return last error message.</p>
+<p>
+</p>
+<h2><a name="nodes_info">nodes_info</a></h2>
+<p>returns hash reference with information about host.To use this method you must call 'get_data'
+method first. Keys of the hash reference are the ip address of the hosts.The following 
+information could be obtained:</p>
+<pre>
+ $info = $map-&gt;nodes_info();
+ print $info-&gt;{10.8.255.101}{deviceID};
+ print $info-&gt;{10.8.255.101}{priority};
+ print $info-&gt;{10.8.255.101}{mac};
+ print $info-&gt;{10.8.255.101}{platform};
+ print $info-&gt;{10.8.255.101}{interfaces}{Gi0/1}{cost}; #cost for Gi0/1 port
+ print $info-&gt;{10.8.255.101}{interfaces}{Gi0/1}{cost}; #state for Gi0/1 port</pre>
+<p>
+</p>
+<h2><a name="edge_info">edge_info</a></h2>
+<p>take the number of the link as first parameter. To use this method you must call 'get_data'
+method first.Number correspond to <strong>href</strong> parameter of the image map file of link. The 
+following information could be obtained:</p>
+<pre>
+ $info = $map-&gt;edge_info(5);
+ print $info-&gt;{from_ip};
+ print $info-&gt;{from_interface}; #name of the port
+ print $info-&gt;{from_virtual}; #name of the virtual port
+ print $info-&gt;{to_ip};
+ print $info-&gt;{to_interface}; #name of the port
+ print $info-&gt;{to_virtual}; #name of the virtual port</pre>
+<p>
+</p>
+<hr />
+<h1><a name="notes">NOTES</a></h1>
+<p>Module was tested on 'WS-C2950','WS-C2960','WS-3750' platforms. <strong>ipv2</strong> option in 'get_data' 
+method is used for WS-C2950.</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Krol Alexander &lt;<a href="mailto:kasha@bigmir.net">kasha@bigmir.net</a>&gt;</p>
+<p>
+</p>
+<hr />
+<h1><a name="license">LICENSE</a></h1>
+<p>This module is free software; you can redistribute it or modify it under the same terms as Perl itself.</p>
+
+</body>
+
+</html>

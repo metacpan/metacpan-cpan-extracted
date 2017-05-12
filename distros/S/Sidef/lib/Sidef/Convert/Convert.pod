@@ -1,0 +1,137 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Convert::Convert
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = Convert.new(...);
+
+=head1 METHODS
+
+
+=head2 to_a
+
+Convert.to_a() -> I<Obj>
+
+Return the
+
+Aliases: I<to_array>
+
+=cut
+
+=head2 to_b
+
+Convert.to_b() -> I<Obj>
+
+Return the
+
+Aliases: I<to_bool>
+
+=cut
+
+=head2 to_caller
+
+Convert.to_caller() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 to_dir
+
+Convert.to_dir() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 to_f
+
+Convert.to_f() -> I<Obj>
+
+Return the
+
+Aliases: I<to_float>
+
+=cut
+
+=head2 to_fcaller
+
+Convert.to_fcaller() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 to_file
+
+Convert.to_file() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 to_i
+
+Convert.to_i() -> I<Obj>
+
+Return the
+
+Aliases: I<to_int>
+
+=cut
+
+=head2 to_n
+
+Convert.to_n() -> I<Obj>
+
+Return the
+
+Aliases: I<to_num>
+
+=cut
+
+=head2 to_obj
+
+Convert.to_obj() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 to_r
+
+Convert.to_r() -> I<Obj>
+
+Return the
+
+Aliases: I<to_rat>
+
+=cut
+
+=head2 to_re
+
+Convert.to_re() -> I<Obj>
+
+Return the
+
+Aliases: I<to_regex>
+
+=cut
+
+=head2 to_s
+
+Convert.to_s() -> I<Obj>
+
+Return the
+
+Aliases: I<to_str>
+
+=cut

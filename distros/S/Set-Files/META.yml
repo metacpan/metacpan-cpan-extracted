@@ -1,0 +1,27 @@
+---
+abstract: 'routines to work with files, each definining a single set'
+author:
+  - 'Sullivan Beck <sbeck@cpan.org>'
+build_requires:
+  Test::Inter: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Set-Files
+provides:
+  Set::Files:
+    file: lib/Set/Files.pm
+    version: 1.06
+requires:
+  Carp: 0
+  IO::File: 0
+  perl: 5.000
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.06

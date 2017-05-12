@@ -1,0 +1,76 @@
+SWF::Builder - creates FLASH(R) movie (SWF) files.
+This package contains:
+
+  SWF::Builder                   - Main module.
+  SWF::Builder::ActionScript     - SWF ActionScript object.
+  SWF::Builder::ActionScript::Compiler
+                                 - SWF ActionScript compiler.
+  SWF::Character                 - SWF character, frame, and display instance.
+  SWF::Builder::Character::Bitmap
+                                 - SWF Bitmap object.
+  SWF::Builder::Bitmap::Lossless::*
+                                 - Drivers for SWF Bitmap object.
+  SWF::Builder::Character::Font  - SWF font object.
+  SWF::Builder::Character::Font::TTF
+				 - Font manager using Font::TTF.
+  SWF::Builder::Character::Font::FreeType
+				 - Font manager using Font::FreeType.
+  SWF::Builder::Character::MovieClip
+                                 - SWF movie clip object.
+  SWF::Builder::Character::Shape - SWF shape object.
+  SWF::Builder::Character::Text  - SWF static text object.
+  SWF::Builder::Gradient         - SWF gradient object.
+  SWF::Builder::Shape            - Drawing extention of shapes.
+  SWF::Builder::ExElement
+
+See each POD for further information.
+
+PREREQUISITES
+
+perl 5.8 or higher
+SWF::File 0.27 or higher
+
+Either Font::TTF or Font::FreeType is necessary to use fonts and texts.
+Font::TTF supports only TTF, but is written in pure perl.
+Font::FreeType supports TTF, OTF, and PostScript fonts, but requires FreeType library and C compiler.
+
+Math::Bezier::Convert is necessary to draw cubic bezier curves.
+
+INSTALLATION
+
+You install SWF modules by the usual method:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+
+SCRIPTS
+
+Following scripts and SWF movie are included in this archive.
+
+ asc.plx      - ActionScript compiler frontend.
+ mctest.plx   - Sample script.
+ tracewindow.plx
+              - Debug window movie. It displays results of trace actions
+                compiled with "Trace=>'lcwin'".
+ masktest.plx - Sample script of mask.
+ flowmes.plx  - Creates flow-in-message movie.
+                It is necessary to change font path for other than Windows.
+ fields.plx   - Sample of text fields.
+ htmltest.plx - Sample of HTML texts.
+                It is necessary to change font for other than Windows.
+ exportasset.plx & importasset.plx
+              - Sample of export and import assets.
+ arctest.plx  - Sample script for elliptic arc. See POD.
+ tiger.plx    - Sample script of 'path' drawing a famous tiger converted from SVG.
+
+
+COPYRIGHT
+    Copyright 2000-2003, Yasuhiro Sasama (ySas), <ysas@nmt.ne.jp>
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+

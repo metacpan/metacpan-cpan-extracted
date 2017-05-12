@@ -1,0 +1,8 @@
+0.06  Mon, 28 Feb 2011 11:33:36 +0100
+  - Include all Shell::Command tests from ExtUtils-Command.
+
+0.05  Mon, 28 Feb 2011 10:16:44 +0100
+  - Initial release of Shell::Command to CPAN as part of a Shell-Command
+    distribution. This module has been split off the ExtUtils-Command
+    distribution from CPAN. Future ExtUtils-Command uploads will not include the
+    Shell::Command module anymore.

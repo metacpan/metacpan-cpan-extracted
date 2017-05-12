@@ -1,0 +1,38 @@
+---
+abstract: 'Address SVG images using cells of $n1 x $n2 pixels'
+author:
+  - 'Ron Savage (ron@savage.net.au)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  Test::Pod: '1.51'
+  Test::Simple: '1.302052'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SVG-Grid
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Slurper: '0.009'
+  Getopt::Long: '0'
+  Moo: '2.002004'
+  Pod::Usage: '0'
+  SVG: '2.64'
+  Types::Standard: '1.000005'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=SVG-Grid
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ronsavage/SVG-Grid.git
+version: '1.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

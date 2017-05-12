@@ -1,0 +1,12 @@
+Makefile
+Makefile.old
+blib
+pm_to_blib
+ListUtil.o
+Util.bs
+ListUtil.c
+*.bak
+.*.swp
+Scalar-Util-LooksLikeNumber-*
+MYMETA.json
+MYMETA.yml

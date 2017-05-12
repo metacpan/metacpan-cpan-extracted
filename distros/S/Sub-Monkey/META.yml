@@ -1,0 +1,25 @@
+---
+abstract: 'Dynamically and neatly monkey patch a module'
+author:
+  - 'Brad Haywood <brad@geeksware.net>'
+  - 'Brad Haywood <brad@geeksware.net>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.04'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Sub-Monkey
+no_index:
+  directory:
+    - inc
+    - t
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.001

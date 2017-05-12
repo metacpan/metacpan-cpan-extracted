@@ -1,0 +1,2 @@
+TYPEMAP
+HvObject *      O_HvRV

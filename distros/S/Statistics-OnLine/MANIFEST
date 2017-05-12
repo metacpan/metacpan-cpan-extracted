@@ -1,0 +1,8 @@
+Build.PL
+Changes
+INSTALL
+lib/Statistics/OnLine.pm
+Makefile.PL
+MANIFEST
+META.yml
+t/1.t

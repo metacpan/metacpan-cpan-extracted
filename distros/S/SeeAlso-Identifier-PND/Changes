@@ -1,0 +1,27 @@
+Revision history for Perl module SeeAlso::Identifier::PND
+
+0.62 Sun May  8 00:35 CEST 2016
+    - 10-digit identifiers starting with "11" are imminent
+
+0.61 Mon Feb 17 15:40:07 CET 2014
+    - require perl 5.8.2
+
+0.60 Sat May 26 21:31:00 CEST 2011
+    - allow MARC prefixes (DE-588a) and (DE-588) for GND
+
+0.59 Fri Dec  9 02:14:58 CET 2011
+    - 9-digit-identifiers like 188416994 have been introduced,
+      abandon restriction for 2nd digit of 9-digit identifiers
+
+0.5703 Mon Jul 18 09:30:20 CEST 2011
+    - loose required version of M:B
+    - more aggressive cleanup before syntax checks
+    - pod fixes
+
+0.5701 Fri May 20 10:15:29 CEST 2011
+    - hash/index and canonical/normalized can now also set values
+      like other SeeAlso::Identifier classes do.
+
+0.57 Sat May 14 16:42:26 2011
+    - original version; created by ExtUtils::ModuleMaker 0.51
+

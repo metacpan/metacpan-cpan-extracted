@@ -1,0 +1,15 @@
+Build.PL
+Changes
+MANIFEST
+README
+lib/Set/Toolkit.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t.bkp
+t/toolkit-as_array.t
+t/toolkit-as_boolean.t
+t/toolkit-as_string.t
+t/toolkit-search.t
+t/toolkit-set_functions.t
+Makefile.PL
+META.yml

@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+SelfUnzip.pm
+SelfUnzip.xs
+test.pl
+perlmain.c
+tst/Foo.pm

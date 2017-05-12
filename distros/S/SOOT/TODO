@@ -1,0 +1,75 @@
+Wrapper / guts:
+- Refactor global function wrapping
+- Implement method caching
+  => Implemented for struct accessors
+  => Needs implementation for the general case
+  ===> Implementation for non-overloaded methods that either just checks
+       the number of arguments or at least just checks the SPECIFIC types
+       of the arguments (without going via the expensive prototype calculation)
+  ===> Implementation for overloaded methods. Can be optimized to break out of
+       a validation loop based in argument types.
+- Implement can()
+- Fix Color_t lookup and other primitive types
+  (Note: I might have fixed this by accident. SetLineColor(int) now works. Does GetLineColor?)
+- Investigate wrapping all/more enums
+- Investigate references
+- Implement TTree/Branch (arguments-as-return-values)
+- Implement TList? / TFile::GetListOfKeys? => see examples/Basic/bill.pl 
+- Assignment operators
+  => Specifically, consider "gRandom = new TRandom(...);" in C.
+     There is no equivalent in Perl beacuse "$gRandom = TRandom->new()" will
+     just overwrite the Perl object and the ROOT objects will internally
+     use the C-level gRandom which is no longer referenced by $gRandom.
+  => General solution is a proper cross-language memory
+     management / ownership setup (PyROOT?)
+  => Reasonably simple stop-gap solution would be, for example, to
+     overload CODE dereferencing for TObjects to behave as assignment operators.
+     The above C code could become: "$gRandom->(...)".
+  ====> While mostly implemented now, this still fails on the const qualifier. Doh.
+- Either lose the silly overloading or add string overloading to get the refaddr
+  (If so, add bool overloading, too)
+
+Packaging:
+- Investigate ROOT's build system and how SOOT could be integrated
+  without sacrificing CPAN-installation. (Specifically, investigate
+  inlining of dependencies.)
+  => Works locally, but is really hacky.
+  => Problems with how a tree of files can be installed by the same means
+     as the rest of ROOT. Need hookable "make install" target.
+- Convert to using Module::Build::WithXSpp
+- Use ExtUtils::Typemap::* instead of shipping perlobject.map, etc
+
+Documentation / UI:
+- Convert more examples and fix the ensuing madness.
+- Check existing examples/ for FIXME's.
+- ROOTSYS/tutorials to comply with Rene's requirements for inclusion.
+- Document the SOOT <-> ROOT differences
+=> TArray*!
+
+Testing:
+- Much, much more testing...
+- Specifically expose more guts via SOOT::API for unit testing.
+=> joincproto and friends
+=> global variable tools
+
+
+BUGS:
+- delete doesn't work as expected:
+$ $g = TGraph->new(1, [1.],[1.])
+$TGraph1 = \do { my $v = 79536896 };
+bless( $TGraph1, 'TGraph' );
+$ $g2 = $g->as('TGraph')
+$TGraph1 = \do { my $v = 79536896 };
+bless( $TGraph1, 'TGraph' );
+$ $g3 = $g->as('TGraph')
+$TGraph1 = \do { my $v = 79536896 };
+bless( $TGraph1, 'TGraph' );
+$ $g3->delete;
+$ $g3
+INT
+$ print Dumper $g
+$VAR1 = bless( do{\(my $o = 79536896)}, 'TGraph' );
+$ print Dumper $g2
+$VAR1 = bless( do{\(my $o = 79536896)}, 'TGraph' );
+$ print Dumper $g3
+Runtime error: Bizarre copy of IO in anonlist at /usr/local/lib/perl/5.10.0/Data/Dumper.pm line 553.

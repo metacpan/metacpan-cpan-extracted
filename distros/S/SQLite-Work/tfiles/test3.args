@@ -1,0 +1,18 @@
+--database tfiles/test1.db
+--row_ids episodes=title_id
+--table episodes
+--sort_by category
+--sort_by series_title
+--sort_by season
+--sort_by season_position
+--sort_by title
+--sort_by sub_title
+--headers "{$category}"
+--headers "{$series_title:title}"
+--limit 20
+--page 10
+--report_style medium
+--truncate_colnames 4
+# add default formats
+--default_format episodes+title=title
+--default_format episodes+series_title=title

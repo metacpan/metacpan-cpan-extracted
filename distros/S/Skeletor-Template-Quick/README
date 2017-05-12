@@ -1,0 +1,43 @@
+NAME
+    Skeletor::Template::Quick - Quick set of skeletor templates
+
+SYNOPSIS
+          # First, configure the preferences file
+        $ cat ~/.skeletor.yml
+        # ~/.skeletor.yml
+        author: Joe Schmoe <joe@schmoe.com>
+
+          # Then, create skeletons for new cpan modules
+        $ skel Foo::Bar
+
+        $ tree Foo-Bar/
+        Foo-Bar/
+        ├── Changes
+        ├── eg
+        │   └── foo-bar
+        ├── lib
+        │   └── Foo
+        │       └── Bar.pm
+        ├── Makefile.PL
+        ├── MANIFEST.SKIP
+        └── t
+            └── 001Basic.t
+
+    4 directories, 6 files
+
+DESCRIPTION
+    "Skeletor::Template::Quick" is a template for "App::Skeletor", a utility
+    to create skeletons for new Perl module distributions.
+
+    It comes with a command line utilty "skel" which requires a preferences
+    file "~/.skeletor.yml" and alleviates the user from having to specify
+    the same list of parameters (author, template, etc.) on "skeletor" calls
+    every time.
+
+LEGALESE
+    Copyright 2015 by Mike Schilli, all rights reserved. This program is
+    free software, you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+AUTHOR
+    2015, Mike Schilli <cpan@perlmeister.com>

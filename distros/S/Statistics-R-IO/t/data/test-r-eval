@@ -1,0 +1,123 @@
+#!/usr/bin/Rscript
+
+test_eval <- function(expr_name, expr_text) {
+    expr <- parse(text = expr_text, keep.source = TRUE)
+    value <- eval(expr, envir=globalenv())
+
+    save_serialize(expr_name, value)
+    save_serialize_noxdr(expr_name, value)
+    save_rds(expr_name, value)
+    save_xz_rds(expr_name, value)
+    save_bzip_rds(expr_name, value)
+}
+
+
+save_serialize <- function(name, value) {
+    f <- file(paste0(name, '-xdr'), open='wb')
+    serialize(value, f)
+    close(f)
+}
+
+
+save_serialize_noxdr <- function(name, value) {
+    f <- file(paste0(name, '-noxdr'), open='wb')
+    serialize(value, f, xdr=FALSE)
+    close(f)
+}
+
+
+save_rds <- function(name, value) {
+    saveRDS(value, paste0(name, '-xdr.rds'))
+}
+
+
+save_xz_rds <- function(name, value) {
+    saveRDS(value, paste0(name, '-xdr_xz.rds'), compress = 'xz')
+}
+
+
+save_bzip_rds <- function(name, value) {
+    saveRDS(value, paste0(name, '-xdr_bzip.rds'), compress = 'bzip2')
+}
+
+
+tests <- list(
+    `empty_char` = 'character()',
+    `empty_int` = 'integer()',
+    `empty_num` = 'numeric()',
+    `empty_cpx` = 'complex()',
+    `empty_lgl` = 'logical()',
+    `empty_list` = 'list()',
+    `empty_raw` = 'raw()',
+    `empty_sym` = 'bquote()',
+    `empty_expr` = 'expression()',
+    `empty_clos` = '{function() {}}',
+    `null` = 'NULL',
+    `char_na` = 'c("foo", "", NA, 23)',
+    `num_na` = 'c(11.3, NaN, -Inf, NA, 0)',
+    `int_na` = 'c(11L, 0L, NA, 0L)',
+    `cpx_na` = 'c(1, NA_complex_, 3i, 0)',
+    `lgl_na` = 'c(TRUE, FALSE, TRUE, NA)',
+    `list_na` = 'list(1, 1L, list("b", list(letters[4:7], NA, c(44.1, NA)), list()))',
+    `list_null` = 'list(NULL)',
+    `pairlist_untagged` = 'as.pairlist(list(1L, 2L, 3L))',
+    `pairlist_tagged` = 'as.pairlist(list(foo=1L, 2L, c=3L))',
+    `noatt-123l`='1:3',
+    `abc-123l`='c(a=1L, b=2L, c=3L)',
+    `noatt-123456`='1234.56',
+    `foo-123456`='c(foo=1234.56)',
+    `f-123456`='c(f=1234.56)',
+    `noatt-cpx`='3+2i',
+    `foo-cpx`='c(foo=3+2i)',
+    `cpx-1i`='1i',
+    `cpx-0i`='5+0i',
+    `cpx-vector`='complex(real=1:3, imaginary=4:6)',
+    `noatt-abc`='letters[1:3]',
+    `ABC-abc`='c(A="a", B="b", C="c")',
+    `noatt-raw`='as.raw(c(1,2,3,255, 0))',
+    `noatt-list`="list(1:3, list('a', 'b', 11), 'foo')",
+    `noatt-true`='TRUE',
+    `noatt-tfftf`='c(T, F, F, T, F)',
+    `ABCDE-tfftf`='c(A=T, B=F, C=F, D=T, E=F)',
+    `foobar-list`="list(foo=1:3, list('a', 'b', 11), bar='foo')",
+    `noatt-mat`='matrix(-1:4, 2, 3)',
+    `ab-mat`="matrix(-1:4, 2, 3, dimnames=list(c('a', 'b')))",
+    `cars`='head(cars)',
+    `mtcars`='head(mtcars)',
+    `iris`='head(iris)',
+    `lang-lm-mpgwt`='lm(mpg ~ wt, data = head(mtcars))$call',
+    `mtcars-lm-mpgwt`='lm(mpg ~ wt, data = head(mtcars))',
+    `expr_null` = 'expression(NULL)',
+    `expr_int` = 'expression(42L)',
+    `expr_call` = 'expression(1+2)',
+    `expression_many` = 'expression(u, v, 1+0:9)',
+    `clos_null` = '{function() NULL}',
+    `clos_int` = '{function() 1L}',
+    `clos_add` = '{function() 1+2}',
+    `clos_args` = '{function(a, b) {a - b}}',
+    `clos_defaults` = '{function(a=3, b) {a + b * pi}}',
+    `clos_dots` = '{function(x=3, y, ...) {x * log(y) }}',
+    `baseenv` = 'baseenv()',
+    `emptyenv` = 'emptyenv()',
+    `globalenv` = 'globalenv()',
+    `env_attr` = 'local({ e <- new.env(parent=globalenv()); attributes(e) <- list(foo = "bar", fred = 1:3); e })',
+    `df_auto_rownames` = 'data.frame(a=1:3, b=c("x", "y", "z"), stringsAsFactors=FALSE)',
+    `df_expl_rownames` = 'data.frame(a=1:3, b=c("x", "y", "z"), stringsAsFactors=FALSE)[1:3,]',
+    `s4` = 'local({
+         library(methods)
+         track <- setClass("track", slots = c(x="numeric", y="numeric"))
+         t1 <- track(x = 1:4, y = 2:4 + 0)
+         t1
+     })',
+    `s4_subclass` = 'local({
+         library(methods)
+         track <- setClass("track", slots = c(x="numeric", y="numeric"))
+         t1 <- track(x = 1:4, y = 2:4 + 0)
+         trackCurve <- setClass("trackCurve", slots = c(smooth = "numeric"), contains = "track")
+         t1s <- trackCurve(t1, smooth = 1:3)
+         t1s
+     })')
+
+for (i in seq_along(tests)) {
+    test_eval(names(tests)[i], tests[[i]])
+}

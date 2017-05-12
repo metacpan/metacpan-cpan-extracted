@@ -1,0 +1,8 @@
+lib/Set/ConsistentHash.pm
+Makefile.PL
+CHANGES
+MANIFEST			This list of files
+MANIFEST.SKIP
+t/00-load.t
+t/10-all.t
+META.yml                                 Module meta-data (added by MakeMaker)

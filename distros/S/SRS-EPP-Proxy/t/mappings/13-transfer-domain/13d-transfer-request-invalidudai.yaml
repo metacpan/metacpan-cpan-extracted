@@ -1,0 +1,17 @@
+template: transfer-domain.tt
+
+vars:
+  domain: mozzarella.co.te
+  auth: UDAiUDAj
+
+int_dont_use_stash: 1
+
+input_assertions:
+  class: SRS::EPP::Command::Transfer::Domain
+  match:
+    - [ '//domain:pw', 'UDAiUDAj', 'found auth info data' ]
+
+output_assertions:
+  attr_is:
+    - [ '//epp:result', 'code', 2202, 'EPP: Correct response code' ]
+

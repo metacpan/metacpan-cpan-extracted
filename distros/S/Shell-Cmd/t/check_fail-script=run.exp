@@ -1,0 +1,102 @@
+SC_FAILED=0;
+SC_EXIT=0;
+main () {
+   SC_ORIG_DIRE=`pwd`;
+   SC_DIRE=`pwd`;
+
+   #
+   # Command 2
+   #
+   SC_CURR_EXIT=0;
+   SC_CURR_SUCC=0;
+   #
+   # Command 2.1
+   #
+   if [ $SC_CURR_SUCC -eq 0 ]; then
+      rm -f always_fail_1 always_fail_2 always_fail_3 ;
+      CMD_EXIT=$?;
+      if [ $CMD_EXIT -eq 0 ]; then
+         SC_CURR_SUCC=1;
+         SC_CURR_EXIT=0;
+      elif [ $SC_CURR_EXIT -eq 0 ]; then
+         SC_CURR_EXIT=$CMD_EXIT;
+      fi
+   fi
+
+   if [ $SC_EXIT -eq 0  -a  $SC_CURR_EXIT -ne 0 ]; then
+      SC_EXIT=$SC_CURR_EXIT;
+      SC_FAILED=2;
+   fi
+   if [ $SC_EXIT -ne 0 ]; then
+      return
+   fi
+
+   #
+   # Command 3
+   #
+   SC_CURR_EXIT=0;
+   SC_CURR_SUCC=0;
+   SC_RETRIES=4;
+   SC_TRY=0;
+   while [ $SC_TRY -lt $SC_RETRIES ]; do
+      #
+      # Command 3.1  [Retry: $SC_TRY]
+      #
+      if [ $SC_CURR_SUCC -eq 0 ]; then
+         TESTDIR/bin/always_fail ;
+         # CHECK WITH
+         TESTDIR/bin/check_always_fail ;
+         CMD_EXIT=$?;
+         if [ $CMD_EXIT -eq 0 ]; then
+            SC_CURR_SUCC=1;
+            SC_CURR_EXIT=0;
+         elif [ $SC_CURR_EXIT -eq 0 ]; then
+            SC_CURR_EXIT=$CMD_EXIT;
+         fi
+      fi
+
+      if [ $SC_CURR_EXIT -eq 0 ]; then
+         break;
+      fi
+      SC_TRY=`expr $SC_TRY + 1`;
+   done
+   if [ $SC_EXIT -eq 0  -a  $SC_CURR_EXIT -ne 0 ]; then
+      SC_EXIT=$SC_CURR_EXIT;
+      SC_FAILED=3;
+   fi
+   if [ $SC_EXIT -ne 0 ]; then
+      return
+   fi
+
+   #
+   # Command 4
+   #
+   SC_CURR_EXIT=0;
+   SC_CURR_SUCC=0;
+   #
+   # Command 4.1
+   #
+   if [ $SC_CURR_SUCC -eq 0 ]; then
+      TESTDIR/bin/succ ;
+      CMD_EXIT=$?;
+      if [ $CMD_EXIT -eq 0 ]; then
+         SC_CURR_SUCC=1;
+         SC_CURR_EXIT=0;
+      elif [ $SC_CURR_EXIT -eq 0 ]; then
+         SC_CURR_EXIT=$CMD_EXIT;
+      fi
+   fi
+
+   if [ $SC_EXIT -eq 0  -a  $SC_CURR_EXIT -ne 0 ]; then
+      SC_EXIT=$SC_CURR_EXIT;
+      SC_FAILED=4;
+   fi
+   if [ $SC_EXIT -ne 0 ]; then
+      return
+   fi
+   cd "$SC_ORIG_DIRE";
+}
+
+main
+exit $SC_EXIT;
+

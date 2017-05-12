@@ -1,0 +1,62 @@
+Revision history for Perl module SQL::Exec
+
+0.10 2013-03-27
+
+ - Cleaned the header of SQL::Exec::Statement
+ - Added clean implementations of get_columns and table_exists functions
+ - Added num_of_fields, num_of_params and get_fields functions
+ - Fixed a bug related as to which query is printed in case of errors
+
+0.09 2013-03-19
+
+ - Fixed the count_lines function (too much opened transaction)
+ - Refactored the code to always use the SQL::Exec::Statement class
+ - Corrected a problem with the absence of DESTROY in the Statement class
+ - Fixed typo in all 'too much' error messages
+ - BREAK: changed the arguments for the query_to_file function
+ - added the query_one_hash and query_all_hashes functions
+
+0.08 2013-03-13
+
+ - Typo in SQL::Exec::SQLite documentation
+ - Catch an error when an SQLite handle cannot be initialized
+
+0.07 2013-02-23
+
+ - Add support for the DBD::Oracle plsql_errstr function
+ - Fix a problem with the stop_on_error option
+ - Add preliminary support for prepared statement
+
+0.06 2013-02-04
+
+ - Same as 0.05 but for Oracle
+ - The print_query option can now correctly be set
+ - Better error reporting when the connection fails
+
+0.05 2013-01-30
+
+ - Add the get_dbh and get_conn fonctions
+ - Complete the documentation
+ - Correction in the replace.t test (which fails with older Test::Subs)
+ - Fix some bug in the ODBC and Teradata class.
+ - Check the number of parameters to bind
+
+0.04 2013-01-26
+
+ - Fix typo in the documentation
+ - Add the execute_multiple functions
+ - Better error reporting in conjonction with DBIx::Connector
+ - Check the validity of the connection string for better error messages
+
+0.03 2013-01-22
+
+ - add documentation for the options
+
+0.02 2013-01-15
+
+ - Fix typo in the documentation
+ - Improve handling of statements w.r.t. SQLite specificities
+
+0.01 2013-01-14
+
+ - Initial release

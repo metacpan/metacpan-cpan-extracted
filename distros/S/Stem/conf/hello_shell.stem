@@ -1,0 +1,14 @@
+# hello_shell.stem
+[
+	class	=>	'Stem::Console',
+],
+[
+	class	=>	'Stem::Proc',
+	name	=>	'hello',
+	args	=>	[
+		path		=> 'bin/hello.sh',
+		cell_attr	=> [
+			'data_addr'	=> 'console',
+		],
+	],
+],

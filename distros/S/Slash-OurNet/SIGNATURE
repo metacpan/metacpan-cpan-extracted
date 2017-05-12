@@ -1,0 +1,69 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.66.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 dd4ce5300fa65d23d75fe1c97b55fa39bb48ac39 Changes
+SHA1 9056fe01b320fd0d1b735eed79c22e73a5ae2337 MANIFEST
+SHA1 bd80a1cefa5b23f2fdda8fbcefff41246530dfb9 META.yml
+SHA1 b3bbd1aa6efde22fac3c5ba48b8186167f8c5781 Makefile.PL
+SHA1 f8ffa91de5562ab22eb45789ac849139d5bc9138 PLUGIN
+SHA1 7471fb3155cb4f7c44ab4084c4b75e4f11d93d99 README
+SHA1 c058fb5734dc76ad9088b06348d3d7e42d6d1f40 images/archive.gif
+SHA1 e48c105cfb04c0f6ebbe85a55d8749822e40b364 images/archive.png
+SHA1 ea80164a8b9b1991b024bf6ec0c13cfe299acdbc images/cash_sq.gif
+SHA1 b7a970116385caabe13073c36bcd4096e5313b4f images/elix.png
+SHA1 fa8debb685adc209c48e1d1845639ace27730bbf images/folder.gif
+SHA1 fa8debb685adc209c48e1d1845639ace27730bbf images/icon_folder.gif
+SHA1 7305dbe2904416e28decb05396988a5d51d578be inc/Module/Install.pm
+SHA1 129960509127732258570c122042bc48615222e1 inc/Module/Install/Base.pm
+SHA1 cf3356ed9a5bd2f732527ef9e7bc5ef4458c8a93 inc/Module/Install/Can.pm
+SHA1 bf0a3e1977effc2832d7a813a76dce3f31b437b6 inc/Module/Install/Fetch.pm
+SHA1 b721c93ca5bc9a6aa863b49af15f1b1de6125935 inc/Module/Install/Makefile.pm
+SHA1 026cc0551a0ad399d195e395b46bdf842e115192 inc/Module/Install/Metadata.pm
+SHA1 a615bb050ca0b2d79bfa0224addcb83019a53b09 inc/Module/Install/ReadmeFromPod.pm
+SHA1 5457015ea5a50e93465bf2dafa29feebd547f85b inc/Module/Install/Win32.pm
+SHA1 051e7fa8063908befa3440508d0584a2497b97db inc/Module/Install/WriteAll.pm
+SHA1 53bc40d1e28178e4228a1fcc3035a5b618ce1854 lib/Slash/OurNet.pm
+SHA1 0f221a5be54159c385103cbeb1f0e9efcdee4ab1 lib/Slash/OurNet/Standalone.pm
+SHA1 a1ea138402c4e6b97fa5a89e0690688c9fd48400 ournet.conf
+SHA1 df399d541ad973578af120ca19691a77eac32b38 ournet.pl
+SHA1 dc4570004234291023939c9d115a1a2df1c9f89a po/en.po
+SHA1 2447b8db5796ed6cf6dcb57a6d4644150b5c6104 po/zh_cn.po
+SHA1 dd880f93f59f7227a1c6567b486b45634d6d4597 po/zh_tw.po
+SHA1 20db5ccb8af1f4122eb6ba70948f8907ce54f93d t/use.t
+SHA1 1bea8f12b12dfa2759feeeefbc43a7be6ae1cc63 templates/elixus/article;ournet;default
+SHA1 2fb510c312a8ed693622272b318009fa25ca2f72 templates/elixus/board;ournet;default
+SHA1 4ed2ea6d5b735214c535a6f8f30f7252933aa2ff templates/elixus/data;ournet;default
+SHA1 f7750916fdf7ef8dac3c82f65838ded867e74f70 templates/elixus/footer;ournet;default
+SHA1 773bddb71382733ed2b80aabb887035c7840a2ef templates/elixus/group;ournet;default
+SHA1 b75efd5e7bf674b5450910faa62ce697543443e6 templates/elixus/header;ournet;default
+SHA1 d24a78db553455386cd8c17a9f0aa32e3695ad9b templates/elixus/main;ournet;default
+SHA1 e4ef547bfff81fb379670bf7c4c6cc27f34e415f templates/elixus/navigation;ournet;default
+SHA1 18843b6df9388667d2dc6c23ca6fef18dd8e05f5 templates/music543/article;ournet;default
+SHA1 f635f51442abf999bc720f185655ca388afe6a56 templates/music543/board;ournet;default
+SHA1 4ed2ea6d5b735214c535a6f8f30f7252933aa2ff templates/music543/data;ournet;default
+SHA1 41d55c491b7be136aceab1560ff7a0a51df6a7c5 templates/music543/footer;ournet;default
+SHA1 d0c158ad3a9977283f0d6d6695ab00efb7b2d49e templates/music543/group;ournet;default
+SHA1 aebfe581e54e5a9a3cd39bbaf2f3abba5d380df3 templates/music543/header;ournet;default
+SHA1 41a4f1e2c2c77e969f2aad24c2f57aaf2048ed57 templates/music543/main;ournet;default
+SHA1 4632b803df156bd153e1da617b521cf70390110c templates/music543/navigation;ournet;default
+SHA1 5e7ad5f64435cece3b8e183313d5104750e0710e trapped.pl
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (Darwin)
+
+iEYEARECAAYFAkziAVsACgkQtLPdNzw1AaDE2gCdH/00X/pVii9RiBPJsa6XnLgq
+GScAnA7TCgMPtU6PPM8RQ2bJQdRQ9MmX
+=uHcy
+-----END PGP SIGNATURE-----

@@ -1,0 +1,26 @@
+SNMP/Map
+=====================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules:
+
+ Net/SNMP
+ GraphViz
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Alexander Krol
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+

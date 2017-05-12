@@ -1,0 +1,248 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Socket qw(
+   AF_INET
+   SOCK_STREAM SOCK_DGRAM SOCK_RAW
+   IPPROTO_TCP IPPROTO_UDP IPPROTO_IP
+   inet_ntoa unpack_sockaddr_in
+);
+use Socket::GetAddrInfo qw( getaddrinfo AI_PASSIVE AI_CANONNAME );
+
+# Not sure where we'll find IPv6 things
+my $AF_INET6;
+BEGIN {
+   $AF_INET6 = eval { Socket::AF_INET6() } ||
+               eval { require Socket6 and Socket6::AF_INET6() };
+   if( defined &Socket::unpack_sockaddr_in6 ) {
+      *unpack_sockaddr_in6 = \&Socket::unpack_sockaddr_in6;
+      *inet_ntop           = \&Socket::inet_ntop;
+   }
+   elsif( eval { require Socket6 and defined &Socket6::unpack_sockaddr_in6 } ) {
+      *unpack_sockaddr_in6 = \&Socket6::unpack_sockaddr_in6;
+      *inet_ntop           = \&Socket6::inet_ntop;
+   }
+}
+use constant CAN_IPv6 => defined &unpack_sockaddr_in6;
+
+sub getfamilybynumber
+{
+   my ( $family ) = @_;
+   return "AF_INET"  if $family == AF_INET;
+   return "AF_INET6" if defined $AF_INET6 and $family == $AF_INET6;
+   return $family;
+}
+
+sub getsocktypebynumber
+{
+   my ( $socktype ) = @_;
+   return "SOCK_STREAM" if $socktype == SOCK_STREAM;
+   return "SOCK_DGRAM"  if $socktype == SOCK_DGRAM;
+   return "SOCK_RAW"    if $socktype == SOCK_RAW;
+   return $socktype;
+}
+
+sub getprotocolbynumber
+{
+   my ( $protocol ) = @_;
+   return "IPPROTO_TCP" if $protocol == IPPROTO_TCP;
+   return "IPPROTO_UDP" if $protocol == IPPROTO_UDP;
+   return "IPPROTO_IP"  if $protocol == IPPROTO_IP;
+   return $protocol;
+}
+
+sub usage
+{
+   my ( $exitcode ) = @_;
+
+   my $basename = $0;
+   $basename =~ m{/([^/]+?)$} and $basename = $1;
+
+   print STDERR <<"EOF";
+Performs a getaddrinfo(3) lookup and prints the returned address structures
+
+Usage:
+  $basename [HOST] [SERVICE] [options...]
+
+Options:
+
+  --host, -H HOST       Hostname to resolve
+  --service, -S SERVICE Service name or port number to resolve
+
+  -4                    Restrict to just AF_INET (IPv4) results
+  -6                    Restrict to just AF_INET6 (IPv6) results
+
+  --stream              Restrict to just SOCK_STREAM results
+  --dgram               Restrict to just SOCK_DGRAM results
+
+  --proto PROTO         Restrict to just results of the given IP protocol
+
+  --passive             Set the AI_PASSIVE hint; results will used to bind()
+                        and listen() rather than connect()
+
+  --canonical           Retrive the canonical name for the requested host
+
+  --help                Display this help and exit
+
+EOF
+
+   exit $exitcode;
+}
+
+my $host;
+my $service;
+my %hints;
+
+GetOptions(
+   'host|H=s'    => \$host,
+   'service|S=s' => \$service,
+
+   '4' => sub { $hints{family} = AF_INET },
+   '6' => sub { defined $AF_INET6 ? $hints{family} = $AF_INET6
+                                  : die "Cannot do AF_INET6\n"; },
+
+   'stream|s' => sub { $hints{socktype} = SOCK_STREAM },
+   'dgram'    => sub { $hints{socktype} = SOCK_DGRAM },
+
+   'proto=s' => sub {
+      my $proto = $_[1];
+      unless( $proto =~ m/^\d+$/ ) {
+         my $protonum = getprotobyname( $proto );
+         defined $protonum or die "No such protocol - $proto\n";
+         $proto = $protonum;
+      }
+      $hints{protocol} = $proto;
+   },
+
+   'passive' => sub { $hints{flags} ||= AI_PASSIVE },
+
+   'canonical' => sub { $hints{flags} ||= AI_CANONNAME },
+
+   'help|h' => sub { usage( 0 ) },
+) or usage( 1 );
+
+$host    = shift @ARGV if @ARGV and !defined $host;
+$service = shift @ARGV if @ARGV and !defined $service;
+
+defined $host or defined $service or
+   usage( 1 );
+
+$host    ||= "";
+$service ||= "0";
+
+my ( $err, @res ) = getaddrinfo( $host, $service, \%hints );
+
+die "Cannot getaddrinfo() - $err\n" if $err;
+
+printf "Resolved host '%s', service '%s'\n", $host, $service;
+
+if( $res[0]->{canonname} ) {
+   printf "  Canonical name '%s'\n", $res[0]->{canonname};
+}
+
+print "\n";
+
+foreach my $res ( @res ) {
+   my $address_string;
+   if( $res->{family} == AF_INET ) {
+      my ( $port, $host ) = unpack_sockaddr_in $res->{addr};
+      $address_string = sprintf "%s:%d", inet_ntoa( $host ), $port;
+   }
+   elsif( CAN_IPv6 and $res->{family} == $AF_INET6 ) {
+      my ( $port, $host ) = unpack_sockaddr_in6( $res->{addr} );
+      $address_string = sprintf "[%s]:%d", inet_ntop( $res->{family}, $host ), $port;
+   }
+   else {
+      $address_string = sprintf '{family=%d,addr=%v02x}', $res->{family}, $res->{addr};
+   }
+
+   printf "socket(%-8s, %-11s, %-11s) + '%s'\n",
+      getfamilybynumber($res->{family}),
+      getsocktypebynumber($res->{socktype}),
+      getprotocolbynumber($res->{protocol}),
+      $address_string;
+}
+
+__END__
+
+=head1 NAME
+
+C<getaddrinfo> - command-line tool to C<getaddrinfo(3)> resolver
+
+=head1 SYNOPSIS
+
+B<getaddrinfo> [I<options...>] I<host> I<service>
+
+=head1 DESCRIPTION
+
+This tool provides a convenient command-line wrapper around the
+C<getaddrinfo(3)> resolver function. It will perform a single lookup and print
+the returned results in a human-readable form. This is mainly useful when
+debugging address resolution problems, because it allows inspection of the
+C<getaddrinfo(3)> behaviour itself, outside of any real program that is trying
+to use it.
+
+=head1 OPTIONS
+
+=over 8
+
+=item --host, -H HOST
+
+Hostname to resolve. If not supplied, will use the first positional argument
+
+=item --service, -S SERVICE
+
+Service name or port number to resolve. If not supplied, will use the second
+positional argument.
+
+=item -4
+
+Restrict to just C<AF_INET> (IPv4) results
+
+=item -6
+
+Restrict to just C<AF_INET6> (IPv6) results
+
+=item --stream
+
+Restrict to just C<SOCK_STREAM> results
+
+=item --dgram 
+
+Restrict to just C<SOCK_DGRAM> results
+
+=item --proto PROTO
+
+Restrict to just results of the given IP protocol
+
+=item --passive
+
+Set the C<AI_PASSIVE> hint; results will used to bind() and listen() rather
+than connect()
+
+=item --canonical
+
+Retrive the canonical name for the requested host
+
+=item --help
+
+Display a help summary and exit
+
+=back
+
+=head1 OUTPUT FORMAT
+
+Each line of output will be given in a form that indicates the four result
+fields of C<ai_family>, C<ai_socktype>, C<ai_protocol> and C<ai_addr>. The
+first three are printed in the form of a C<socket(2)> call, either
+symbolically or numerically, and the latter is printed as a plain string
+following it. For example
+
+ socket(AF_INET , SOCK_STREAM, IPPROTO_TCP) + '127.0.0.1:80'
+
+=head1 AUTHOR
+
+Paul Evans <leonerd@leonerd.org.uk>

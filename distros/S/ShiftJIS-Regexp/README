@@ -1,0 +1,43 @@
+ShiftJIS::Regexp: version 1.03
+==============
+
+NAME
+
+ShiftJIS::Regexp - regular expressions in Shift-JIS
+
+SYNOPSIS
+
+    use ShiftJIS::Regexp qw(:all);
+    match('‚ ‚¨‚P‚Q', '\p{Hiragana}{2}\p{Digit}{2}');
+    match('‚ ‚¢‚¢‚¤‚¤‚¤', '^‚ ‚¢+‚¤{3}$');
+    replace($str, 'A', '‚`', 'g');
+
+DESCRIPTION
+
+This module provides some functions for Shift-JIS aware regular expressions
+which are aware of Shift-JIS and can be used on the byte-oriented perl.
+
+    re() returns a Shift-JIS aware regular expression.
+    match() works like m/// but is aware of Shift-JIS.
+    replace() works like s/// but is aware of Shift-JIS.
+    jsplit() works like CORE::split but is aware of Shift-JIS.
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+PREREQUISITES
+
+   Perl 5.003 or later (Recommended: Perl 5.005 or later)
+
+COPYRIGHT AND LICENSE
+
+   Copyright(C) 2001-2012, SADAHIRO Tomoyuki. Japan. All rights reserved.
+
+   This module is free software; you can redistribute it
+   and/or modify it under the same terms as Perl itself.

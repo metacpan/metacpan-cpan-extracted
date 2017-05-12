@@ -1,0 +1,13 @@
+Revision history for Perl extension String::Substrings.
+
+0.02  Fri Aug 23
+        - implemented length argument to method substrings
+          * substrings STRING [, LENGTH]
+        - added Test::ManyParams to the requirements
+
+0.01  Tue Aug 20
+        - implemented method substrings
+          * substrings STRING
+	- original version; created by h2xs 1.22 with options
+		-XA -b5.6.0 String::Substrings
+

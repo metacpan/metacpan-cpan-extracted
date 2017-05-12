@@ -1,0 +1,33 @@
+# Remove a non-existant ds record
+template: update-domain.tt
+
+vars:
+  domain: 10-dnssec.co.te
+  dnssec:
+    rem:
+      -
+        keytag: 1
+        alg: 5
+        digest_type: 1
+        digest: 1234abcd11111111111111111111111111111111
+
+input_assertions:
+  class: SRS::EPP::Command::Update::Domain
+
+SRS:
+    -
+        assertions: 
+           count:
+               - [ '//DomainDetailsQry', 1, 'DDQ generated']
+           match:
+               - [ '//DomainNameFilter', '10-dnssec.co.te', 'SRS[1] - Domain name filter correct' ]
+           attr_is:
+               - [ '//FieldList', 'DNSSEC', '1', 'SRS[1] - DNSSEC info requested in field list' ]
+
+output_assertions:
+  count:
+    - [ '//epp:result', 1, 'SRS: Check for one result' ]
+  attr_is:
+    - [ '//epp:result', 'code', 2002, 'SRS: Check for correct result code' ]
+  match:
+    - [ '//epp:value', '1234abcd11111111111111111111111111111111', "Correct value returned"]

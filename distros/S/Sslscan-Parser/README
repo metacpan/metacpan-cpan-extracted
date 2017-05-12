@@ -1,0 +1,53 @@
+Sslscan-Parser
+
+Parse sslscan scan data with Perl
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDS / SETUP
+
+    $ cpan
+    cpan> install CPAN
+    exit
+    cpan> install Bundle::CPAN
+    exit
+    cpan> install Object::InsideOut
+    exit
+    cpan> install File::Temp
+
+NOTE: Install libxml2-dev before you install XML::LibXML
+
+$ sudo apt-get install libxml2-dev
+
+    cpan> install XML::LibXML
+    cpan> install Test::More ( if you want to run the tests ) 
+    cpan> install Test::Class ( if you want to run the tests ) 
+
+NOTE
+
+sslscan 1.6-1.8.1 has a bug in the XML output, there you must run the output through a small perl script to clean it up.
+
+cat sslscan.xml | fix_xml.pl > sslscan_fixed.xml
+
+fix_xml.pl and a few other scripts are included in the scripts/ directory.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Sslscan::Parser
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Joshua "Jabra" Abraham
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

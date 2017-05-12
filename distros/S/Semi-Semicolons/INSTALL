@@ -1,0 +1,22 @@
+WHAT IS THIS?
+
+This is Semi::Semicolons, a perl module and complete waste of disk
+space.  Please see the README that comes with this distribution.
+
+HOW DO I INSTALL IT?
+
+To install this module, cd to the directory that contains this README
+file and type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+To install this module into a specific directory, do:
+   perl Makefile.PL PREFIX=/name/of/the/directory
+   ...the rest is the same...
+
+Please also read the perlmodinstall man page and a good psychiatrist,
+if available.
+

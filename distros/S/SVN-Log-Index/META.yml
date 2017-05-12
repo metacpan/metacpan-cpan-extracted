@@ -1,0 +1,27 @@
+---
+name: SVN-Log-Index
+version: 0.51
+author:
+  - 'The current maintainer is Nik Clayton, <nikc@cpan.org>.'
+  - 'The original author was Garrett Rooney, <rooneg@electricjellyfish.net>'
+abstract: Index and search over Subversion commit logs.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Exception::Class: 0
+  KinoSearch: 0.15
+  Params::Validate: 0
+  SVN::Log: 0.03
+  Test::Exception: 0
+  YAML: 0
+recommends:
+  SVN::Core: 0
+provides:
+  SVN::Log::Index:
+    file: lib/SVN/Log/Index.pm
+    version: 0.51
+generated_by: Module::Build version 0.2806
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

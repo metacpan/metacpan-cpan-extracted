@@ -1,0 +1,249 @@
+{
+   "abstract" : "A light-weight, nerdy, smart CMS in perl based on Perl Dancer2 framework.",
+   "author" : [
+      "Simone Fare' <cymon@tiscali.it>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Strehler",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Authen::Passphrase::BlowfishCrypt" : "0",
+            "Carp" : "0",
+            "Cwd" : "0",
+            "DBI" : "0",
+            "DBIx::Class::Core" : "0",
+            "DBIx::Class::Schema" : "0",
+            "DBIx::Class::Schema::Loader" : "0",
+            "DBIx::Class::TimeStamp" : "0",
+            "Dancer2" : "0.166001",
+            "Dancer2::Core::App" : "0",
+            "Dancer2::Core::Runner" : "0",
+            "Dancer2::Plugin" : "0",
+            "Dancer2::Plugin::Ajax" : "0",
+            "Dancer2::Plugin::DBIC" : "0",
+            "Dancer2::Serializer::JSON" : "0",
+            "DateTime::Format::SQLite" : "0",
+            "DateTime::Format::Strptime" : "0",
+            "File::Copy" : "0",
+            "File::Copy::Recursive" : "0",
+            "File::Path" : "0",
+            "HTML::FormFu" : "1.00",
+            "HTML::FormFu::Element::Block" : "0",
+            "HTML::FormFu::Element::Fieldset" : "0",
+            "HTML::FormFu::Element::Label" : "0",
+            "HTML::FormFu::Element::Select" : "0",
+            "HTML::FormFu::Element::Text" : "0",
+            "HTML::FormFu::Validator" : "0",
+            "IO::Prompt" : "0",
+            "Lingua::EN::Inflect" : "0",
+            "Module::Load" : "0",
+            "Moo" : "0",
+            "Moo::Role" : "0",
+            "Moose" : "0",
+            "SQL::Translator" : "0",
+            "SQL::Translator::Parser::DBIx::Class" : "0",
+            "Term::ReadKey" : "0",
+            "Text::Unidecode" : "0",
+            "Time::localtime" : "0",
+            "Try::Tiny" : "0",
+            "Unicode::Normalize" : "0",
+            "YAML::XS" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "FindBin" : "0",
+            "HTTP::Cookies" : "0",
+            "HTTP::Request" : "0",
+            "HTTP::Request::Common" : "0",
+            "JSON" : "0",
+            "Plack::Builder" : "0",
+            "Plack::Test" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Strehler" : {
+         "file" : "lib/Strehler.pm",
+         "version" : "v1.6.8"
+      },
+      "Strehler::API" : {
+         "file" : "lib/Strehler/API.pm",
+         "version" : "v1.6.8"
+      },
+      "Strehler::Admin" : {
+         "file" : "lib/Strehler/Admin.pm",
+         "version" : "v1.6.8"
+      },
+      "Strehler::Dancer2::Plugin::Admin" : {
+         "file" : "lib/Strehler/Dancer2/Plugin/Admin.pm",
+         "version" : "v1.6.8"
+      },
+      "Strehler::Dancer2::Plugin::EX" : {
+         "file" : "lib/Strehler/Dancer2/Plugin/EX.pm",
+         "version" : "v1.6.8"
+      },
+      "Strehler::Element" : {
+         "file" : "lib/Strehler/Element.pm",
+         "version" : "v1.6.8"
+      },
+      "Strehler::Element::Article" : {
+         "file" : "lib/Strehler/Element/Article.pm",
+         "version" : "v1.6.8"
+      },
+      "Strehler::Element::Image" : {
+         "file" : "lib/Strehler/Element/Image.pm",
+         "version" : "v1.6.8"
+      },
+      "Strehler::Element::Log" : {
+         "file" : "lib/Strehler/Element/Log.pm",
+         "version" : "v1.6.8"
+      },
+      "Strehler::Element::Role::Configured" : {
+         "file" : "lib/Strehler/Element/Role/Configured.pm",
+         "version" : "v1.6.8"
+      },
+      "Strehler::Element::Role::Maintainer" : {
+         "file" : "lib/Strehler/Element/Role/Maintainer.pm",
+         "version" : "v1.6.8"
+      },
+      "Strehler::Element::Role::Slugged" : {
+         "file" : "lib/Strehler/Element/Role/Slugged.pm",
+         "version" : "v1.6.8"
+      },
+      "Strehler::Element::User" : {
+         "file" : "lib/Strehler/Element/User.pm",
+         "version" : "v1.6.8"
+      },
+      "Strehler::FormFu::Element::Category" : {
+         "file" : "lib/Strehler/FormFu/Element/Category.pm",
+         "version" : "v1.6.8"
+      },
+      "Strehler::FormFu::Element::DisplayOrder" : {
+         "file" : "lib/Strehler/FormFu/Element/DisplayOrder.pm",
+         "version" : "v1.6.8"
+      },
+      "Strehler::FormFu::Element::EntitySelect" : {
+         "file" : "lib/Strehler/FormFu/Element/EntitySelect.pm",
+         "version" : "v1.6.8"
+      },
+      "Strehler::FormFu::Element::EntityTypeSelect" : {
+         "file" : "lib/Strehler/FormFu/Element/EntityTypeSelect.pm",
+         "version" : "v1.6.8"
+      },
+      "Strehler::FormFu::Element::PublishDate" : {
+         "file" : "lib/Strehler/FormFu/Element/PublishDate.pm",
+         "version" : "v1.6.8"
+      },
+      "Strehler::FormFu::Element::Slug" : {
+         "file" : "lib/Strehler/FormFu/Element/Slug.pm",
+         "version" : "v1.6.8"
+      },
+      "Strehler::FormFu::Element::SubmitBlock" : {
+         "file" : "lib/Strehler/FormFu/Element/SubmitBlock.pm",
+         "version" : "v1.6.8"
+      },
+      "Strehler::FormFu::Element::SubmitBlockMulti" : {
+         "file" : "lib/Strehler/FormFu/Element/SubmitBlockMulti.pm",
+         "version" : "v1.6.8"
+      },
+      "Strehler::FormFu::Element::Tags" : {
+         "file" : "lib/Strehler/FormFu/Element/Tags.pm",
+         "version" : "v1.6.8"
+      },
+      "Strehler::FormFu::Validator::CategoryUnique" : {
+         "file" : "lib/Strehler/FormFu/Validator/CategoryUnique.pm",
+         "version" : "v1.6.8"
+      },
+      "Strehler::FormFu::Validator::FilenameTooLong" : {
+         "file" : "lib/Strehler/FormFu/Validator/FilenameTooLong.pm",
+         "version" : "v1.6.8"
+      },
+      "Strehler::FormFu::Validator::UserUnique" : {
+         "file" : "lib/Strehler/FormFu/Validator/UserUnique.pm",
+         "version" : "v1.6.8"
+      },
+      "Strehler::Forms" : {
+         "file" : "lib/Strehler/Forms.pm",
+         "version" : "v1.6.8"
+      },
+      "Strehler::Helpers" : {
+         "file" : "lib/Strehler/Helpers.pm",
+         "version" : "v1.6.8"
+      },
+      "Strehler::Meta::Category" : {
+         "file" : "lib/Strehler/Meta/Category.pm",
+         "version" : "v1.6.8"
+      },
+      "Strehler::Meta::Tag" : {
+         "file" : "lib/Strehler/Meta/Tag.pm",
+         "version" : "v1.6.8"
+      },
+      "Strehler::Schema" : {
+         "file" : "lib/Strehler/Schema.pm",
+         "version" : "v1.6.8"
+      },
+      "Strehler::Schema::Result::ActivityLog" : {
+         "file" : "lib/Strehler/Schema/Result/ActivityLog.pm",
+         "version" : "v1.6.8"
+      },
+      "Strehler::Schema::Result::Article" : {
+         "file" : "lib/Strehler/Schema/Result/Article.pm",
+         "version" : "v1.6.8"
+      },
+      "Strehler::Schema::Result::Category" : {
+         "file" : "lib/Strehler/Schema/Result/Category.pm",
+         "version" : "v1.6.8"
+      },
+      "Strehler::Schema::Result::ConfiguredTag" : {
+         "file" : "lib/Strehler/Schema/Result/ConfiguredTag.pm",
+         "version" : "v1.6.8"
+      },
+      "Strehler::Schema::Result::Content" : {
+         "file" : "lib/Strehler/Schema/Result/Content.pm",
+         "version" : "v1.6.8"
+      },
+      "Strehler::Schema::Result::Description" : {
+         "file" : "lib/Strehler/Schema/Result/Description.pm",
+         "version" : "v1.6.8"
+      },
+      "Strehler::Schema::Result::Image" : {
+         "file" : "lib/Strehler/Schema/Result/Image.pm",
+         "version" : "v1.6.8"
+      },
+      "Strehler::Schema::Result::Tag" : {
+         "file" : "lib/Strehler/Schema/Result/Tag.pm",
+         "version" : "v1.6.8"
+      },
+      "Strehler::Schema::Result::User" : {
+         "file" : "lib/Strehler/Schema/Result/User.pm",
+         "version" : "v1.6.8"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://www.strehler-cms.org",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/cym0n/strehler.git",
+         "web" : "https://github.com/cym0n/strehler"
+      }
+   },
+   "version" : "1.6.8"
+}
+

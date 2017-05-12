@@ -1,0 +1,248 @@
+#!/usr/bin/env perl
+
+use strict;
+
+use Sparrow::Constants;
+
+use Sparrow::Commands::Project;
+use Sparrow::Commands::Plugin;
+use Sparrow::Commands::Task;
+use Sparrow::Commands::TaskBox;
+use Sparrow::Commands::Index;
+
+use Sparrow::Commands::RemoteTask;
+
+use Sparrow::Misc;
+
+use Carp;
+
+unless (@ARGV) {
+    usage();
+    exit;
+}
+
+my $object = shift @ARGV;
+
+# initialization part 
+
+init_sparrow_env();
+
+unless (-f spi_file()){
+    update_index();
+}
+
+if ($object eq  'plg'){
+
+    my $action = shift @ARGV;
+
+    if ( $action eq 'list') {
+
+        show_installed_plugins();
+
+    } elsif ( $action eq 'search') {
+
+        search_plugins(@ARGV);
+
+    } elsif ( $action eq 'install'){
+
+        install_plugin( @ARGV );        
+
+    } elsif( $action  eq 'remove'){
+
+        remove_plugin( shift @ARGV );        
+
+    } elsif( $action  eq 'upload'){
+
+        upload_plugin();        
+
+    } elsif ( $action  eq 'show'){
+
+        show_plugin( @ARGV );        
+
+    } elsif ( $action  eq 'man' or $action eq 'info' or $action eq 'help' ){
+
+        man_plugin( @ARGV );        
+
+    } elsif ( $action  eq 'run'){
+
+        run_plugin( @ARGV );        
+
+    } else  { 
+
+        confess "unknown command: $action @ARGV";
+
+    }
+
+} elsif ($object eq  'index'){
+
+    my $action = shift @ARGV;
+
+    if ( $action eq 'update') {
+
+        update_index();
+
+    }elsif ( $action eq 'summary') {
+
+        index_summary();
+
+    }else{
+
+        confess "unknown command: $action @ARGV";
+
+    }
+
+} elsif ($object eq  'project'){
+
+    my $action = shift @ARGV;
+
+    if ( $action eq 'list') {
+
+        projects_list();
+
+    } elsif ( $action eq 'create') {
+
+        my $name = shift @ARGV;
+
+        project_create($name);
+
+    } elsif ( $action eq 'show') {
+
+        my $name = shift @ARGV;
+
+        project_show($name, @ARGV);
+
+    } elsif ( $action eq 'remove') {
+
+        my $name = shift @ARGV;
+
+        project_remove($name);
+
+    } else  { 
+
+        confess "unknown command: $action @ARGV";
+
+    }
+
+} elsif ($object eq  'task') {
+
+    my $action = shift @ARGV;
+
+    if ( $action eq 'list') {
+
+        task_list(@ARGV);
+
+    } elsif ( $action eq 'add') {
+
+        my $name = shift @ARGV;
+
+        task_add((split '/', $name),@ARGV);
+
+    } elsif ( $action eq 'ini' ) {
+
+        my $name = shift @ARGV;
+
+        task_ini((split '/', $name), @ARGV);
+
+    } elsif ( $action eq 'load_ini' ) {
+
+        my $name = shift @ARGV;
+
+        task_load_ini((split '/', $name), @ARGV);
+
+    } elsif ( $action eq 'show' ){
+
+        my $name = shift @ARGV;
+
+        task_show((split '/', $name), @ARGV);
+
+    } elsif( $action  eq 'run'){
+
+        my $name = shift @ARGV;
+
+        my $tid = shift @ARGV;
+
+        task_run((split '/', $name), $tid, @ARGV);
+
+    } elsif( $action  eq 'remove'){
+
+        my $name = shift @ARGV;
+
+        task_remove((split '/', $name), @ARGV);
+
+    } else  { 
+
+        confess "unknown command: $action @ARGV";
+
+    }
+
+} elsif ($object eq  'remote') {
+
+    shift @ARGV; # this should be 'task' 
+
+    my $action = shift @ARGV;
+
+    if ( $action eq 'upload') {
+
+        my $name = shift @ARGV;
+
+        remote_task_upload($name,@ARGV);
+
+    } elsif ( $action eq 'install' ) {
+
+        my $name = shift @ARGV;
+
+        remote_task_install($name);
+
+    } elsif ( $action eq 'run' ) {
+
+        my $name = shift @ARGV;
+
+        remote_task_run($name);
+
+    } elsif ( $action eq 'share' ) {
+
+        my $name = shift @ARGV;
+
+        remote_task_share($name);
+
+    } elsif ( $action eq 'hide' ){
+
+        my $name = shift @ARGV;
+
+        remote_task_hide($name);
+
+    } elsif ( $action eq 'remove' ){
+
+        my $name = shift @ARGV;
+
+        remote_task_remove($name);
+
+    } elsif( $action  eq 'list'){
+
+        remote_task_list();
+
+    } elsif( $action  eq 'public' and $ARGV[0] eq 'list'){
+
+        remote_task_public_list();
+
+    } else  { 
+
+        confess "unknown command: $action @ARGV";
+
+    }
+
+} elsif ($object eq  'box') {
+
+    my $action = shift @ARGV;
+
+    if ( $action eq 'run') {
+
+      box_run(@ARGV);
+
+    }
+
+} else {
+    usage();
+    exit(1);
+}
+

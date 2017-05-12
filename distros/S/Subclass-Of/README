@@ -1,0 +1,180 @@
+NAME
+    Subclass::Of - import a magic subclass
+
+SYNOPSIS
+    Create a subclass overriding a method:
+
+       use Subclass::Of "LWP::UserAgent",
+          -as      => "ImpatientUA",
+          -methods => [
+             sub new {
+                my $self = ::SUPER();
+                $self->timeout(15);
+                $self->max_redirect(3);
+                return $self;
+             }
+          ];
+   
+       my $ua = ImpatientUA->new;
+
+    Create a subclass at runtime, adding roles:
+
+       use Subclass::Of;
+   
+       my $subclass = subclass_of(
+          "My::Class",
+          -with => [qw/ My::Role Your::Role His::Role Her::Role /],
+       );
+   
+       my $object = $subclass->new;
+
+DESCRIPTION
+    Load a class, creating a subclass of it with additional roles (Moose,
+    Mouse, Moo and Role::Tiny should all work) and/or additional methods, and
+    providing a lexically-scoped alias for the subclass.
+
+  Compile-Time Usage
+    To create a subclass at compile-time, use the following syntax:
+
+       use SubClass::Of $base_class, %options;
+
+    The following options are supported:
+
+    `-methods`
+        An arrayref of `name => coderef` pairs of methods that you wish to add
+        to your subclass.
+
+        As you might expect, you can override methods defined in the base
+        class. However, because of the way `$self->SUPER::method()` is
+        resolved by Perl, it will not work. Instead a `::SUPER()` function is
+        provided. If called with no arguments, then it automatically calls the
+        superclass method with the same arguments that the subclass was called
+        with; if called with arguments, then the superclass method gets those
+        arguments exactly. (If calling it with arguments, remember to include
+        the invocant!)
+
+    `-with`
+        The package names of one or more roles (Moose::Role, Role::Tiny, etc)
+        you wish to apply to your subclass.
+
+    `-has`
+        Attributes to apply to the child class. You can provide Moose-style
+        specifications for each attribute:
+
+           use Subclass::Of "MyClass",
+              -has => [
+                 foo   => (),    # default spec
+                 bar   => [...],
+                 baz   => {...},
+                 quux  => sub { "default" },
+              ];
+
+        Note that the attribute specifications need to be supported by the OO
+        framework of the parent class. Moose, Mouse and Moo all support fairly
+        similar attribute specs, but they differ on some details. The `is`,
+        `default` and `required` options should be pretty safe bets; `isa`
+        will be fine if you're using Type::Tiny type constraints.
+
+        If the parent class is a plain old Perl class, then a small built-in
+        attribute builder is used, which assumes that the object is a blessed
+        hash. The builder supports `is`, `isa` and `default` (which is always
+        treated as lazy). It only builds accessors, *not* a constructor!
+
+    `-package`
+        The package name for the subclass. Usually you can ignore this;
+        Subclass::Of will think one up of its own.
+
+    `-as`
+        Subclass::Of will export a lexically scoped alias for the package
+        name. By lexically scoped I mean:
+
+           {
+              use Subclass::Of "LWP::UserAgent", -as => "MyUA";
+              # "MyUA" is available here ...
+           }
+           # ... but not here
+
+        By "alias", I mean a constant that returns the subclass' package name
+        as a string. (See aliased.)
+
+        The `-as` option allows you to name this alias. You may request
+        multiple aliases using an arrayref of strings.
+
+        If you don't provide a `-as` option, the last component of the parent
+        class name (e.g. `UserAgent` for subclasses of LWP::UserAgent) will be
+        used. If you don't want an alias, try `-as => []`.
+
+  Run-Time Usage
+    To create a subclass at compile-time, use the following syntax:
+
+       use Subclass::Of;
+   
+       my $subclass = subclass_of($base_class, %options);
+
+    Note that the `subclass_of` function is only exported if `use
+    Subclass::Of` is called with no import list.
+
+    The options supported are the same as with compile-time usage, except
+    `-as` is ignored. (No alias is generated.)
+
+    The return value of `subclass_of` is the name of the class as a string.
+
+  Wrapping Subclass::Of
+    If you need to provide a wrapper for Subclass::Of, and thus install scoped
+    aliases into other packages, use the `install` method:
+
+       require Subclass::Of;
+       Subclass::Of->install($base, -into => $target, %options);
+
+DIAGNOSTICS
+    *Subclass::Of is overwriting function ...*
+        An alias is overwriting an existing sub.
+
+        Try setting `-as` to avoid this.
+
+    *Subclass::Of is overwriting alias ...*
+        An alias is overwriting an existing alias created by Subclass::Of.
+
+        This can often happen if you try to create two subclasses of the same
+        base class and rely on the automatically generated alias names:
+
+           use Subclass::Of "Foo::Bar", ...;  # alias = Bar
+           use Subclass::Of "Foo::Bar", ...;  # alias = Bar (warning!)
+
+        Try explicitly setting `-as` to avoid this, or use Subclass::Of in a
+        smaller lexical scope.
+
+    There is no supported method to switch these warnings off. You should fix
+    the problems they're telling you about.
+
+CAVEATS
+    Certain class builders don't play nice with certain role builders. Moose
+    classes should be able to consume a mixture of Moose and Moo roles. Moo
+    classes should be able to consume a mixture of Moose, Moo, Mouse and
+    Role::Tiny roles. Mouse classes should be able to consume Mouse roles. Any
+    class should be able to consume Role::Tiny roles, provided you don't try
+    to mix in other roles at the same time. (For example, a Mouse class can
+    consume a Role::Tiny role, but it can't consume a Role::Tiny role and a
+    Mouse role simultaneously.)
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Subclass-Of>.
+
+SEE ALSO
+    base, parent, aliased, as, use, Package::Butcher.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2013 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

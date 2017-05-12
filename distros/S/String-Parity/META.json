@@ -1,0 +1,42 @@
+{
+   "abstract" : "parity (odd/even/mark/space) handling functions",
+   "author" : [
+      "Winfried Koenig"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "String-Parity",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilb/String-Parity",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilb/String-Parity.git",
+         "web" : "https://github.com/neilb/String-Parity"
+      }
+   },
+   "version" : "1.34"
+}
+

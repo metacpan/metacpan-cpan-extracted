@@ -1,0 +1,43 @@
+{
+   "abstract" : "Routines to measure similarity of partitions.",
+   "author" : [
+      "Jeff Kubina (jeff.kubina@gmail.com)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.59, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Set-Partitions-Similarity",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dump" : "1.19",
+            "List::MoreUtils" : "0.33",
+            "Text::CSV" : "1.21"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.54"
+}

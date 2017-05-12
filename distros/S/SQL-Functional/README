@@ -1,0 +1,9 @@
+Create SQL programmatically.
+
+    my ($sql, @sql_params) = SELECT star,
+        FROM( 'foo' ),
+        WHERE match( 'bar', 'IN', SUBSELECT(
+            ['id'],
+            FROM( 'bar_tbl' ),
+            WHERE match( 'baz', '>', 2 )
+        ));

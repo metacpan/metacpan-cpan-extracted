@@ -1,0 +1,12 @@
+Revision history for Perl extension Synapse::Monitor::Listener
+
+0.3 Mon May  7 12:13:08 GMT 2012
+	- fixed bug in Synapse::Monitor::Listener::Action
+
+0.2 Mon May  7 13:06:36 MUT 2012
+	- removed File::Copy dependancy
+	- added Synapse::Logger reporting
+
+0.1 Fri May  4 00:48:53 MUT 2012
+	- initial release
+

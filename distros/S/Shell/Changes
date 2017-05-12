@@ -1,0 +1,29 @@
+
+Revision history for Shell.
+
+0.73    Sun Jan 3 2016
+        - INSTALLDIRS should be 'site' for Perl 5.11+ (CPAN #50729)
+        - fix podchecker warnings (CPAN #64924)
+
+0.72_01 Wed Sep 30 2009
+        - sync with blead
+
+0.72    Fri Feb 2 2007
+        - no real change
+        - fixed test bug that produced false warning	
+
+0.71    Wed Jul 7 2006
+        - fixed POD: =begin private with no =end private
+        - new tests t/01_use.t and t/99_pod.t
+
+0.7     Wed Jul 6 2006 
+        - using closures rather than eval "string" (r466)
+        - tabs to spaces in sources (r468)
+        - (change #28502 to bleadperl)
+
+0.6     Wed Jul 5 2006
+        - initial CPAN release
+
+undef   Thu Sep 22 1994
+        - Larry Wall posts to perl5-porters@isu.edu about
+          "a new module [he] just wrote": Shell.pm

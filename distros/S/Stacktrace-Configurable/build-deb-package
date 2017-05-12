@@ -1,0 +1,68 @@
+#!/bin/bash
+
+set -e
+
+perl Build.PL
+
+./Build
+
+./Build test
+
+rm -rf .debinst
+
+mkdir .debinst
+
+./Build install --destdir .debinst --verbose --installdirs vendor
+find .debinst -name .packlist -print0 | xargs -0r rm
+while find .debinst -type d -empty -print0 | xargs -0 rmdir 2>/dev/null; do
+    :
+done
+
+N="$(perl -MCPAN::Meta -le 'print +CPAN::Meta->load_file(q{META.json})
+                                             ->name')"
+V="$(perl -MCPAN::Meta -le 'print +CPAN::Meta->load_file(q{META.json})
+                                             ->version')"
+R="$(perl -MCPAN::Meta -MModule::CoreList -le '
+  my $r=CPAN::Meta->load_file(q{META.json})
+                  ->effective_prereqs
+                  ->requirements_for(qw/runtime requires/);
+  $,=", ";
+  print map {
+    $_ eq q{perl}
+    ? $_.q{ (>= }.$r->requirements_for_module($_).q{-0)}
+    : defined $Module::CoreList::version{$]}->{$_}
+    ? ()
+    : do {
+      my $n=$_;
+      $n=~s/::/-/g;
+      lc(qq{lib$n-perl}).q{ (>= }.$r->requirements_for_module($_).q{-0)};
+    };
+  } $r->required_modules;
+')"
+A="$(perl -CO -MCPAN::Meta -le '
+  $,=q{, };
+  print +CPAN::Meta->load_file(q{META.json})
+                   ->authors
+')"
+D="$(perl -CO -MCPAN::Meta -le '
+  print +CPAN::Meta->load_file(q{META.json})
+                   ->abstract
+')"
+
+mkdir .debinst/DEBIAN
+cat >.debinst/DEBIAN/control <<EOF
+Package: lib$N-perl
+Architecture: all
+Depends: $R
+Version: $V-1
+Maintainer: $A
+Description: $D
+EOF
+
+for i in control postinst prerm triggers; do
+    [ -f "debian/$i" ] && cp "debian/$i" ".debinst/DEBIAN/$i"
+done
+
+fakeroot dpkg-deb --build .debinst .
+
+rm -rf .debinst

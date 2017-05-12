@@ -1,0 +1,411 @@
+#!/bin/sh
+#
+#Fake sacctmgr show resource results for testing
+
+
+#Order of fields is now controllable via format option
+#Below is the default if no format given
+FORMAT_FIELDS="name server type count allocated servertype cluster percentallowed"
+
+verbose_flag=
+
+print_version()
+{	version=$1
+	cat - <<EOF
+slurm $version
+EOF
+	exit 0
+}
+
+print_header()
+{
+    if [ "x$verbose_flag" = "xyes" ]; then
+	tmptext=
+	for fld in $FORMAT_FIELDS
+	do
+		case $fld in
+		#-----	Common stuff
+		    allocated)
+			tmptext="${tmptext}% Allocated"
+			;;
+		    cluster)
+			tmptext="${tmptext}Cluster"
+			;;
+		    count)
+			tmptext="${tmptext}Count"
+			;;
+		    description)
+			tmptext="${tmptext}Descr"
+			;;
+		    flags)
+			tmptext="${tmptext}Flags"
+			;;
+		    servertype)
+			tmptext="${tmptext}ServerType"
+			;;
+		    name)
+			tmptext="${tmptext}Name"
+			;;
+		    percentallowed)
+			tmptext="${tmptext}% Allowed"
+			;;
+		    server)
+			tmptext="${tmptext}Server"
+			;;
+		    type)
+			tmptext="${tmptext}Type"
+			;;
+
+		#-----	no preTRES stuff
+		#-----	no postTRES stuff
+		#-----	ERROR
+		    *)
+			echo >&2 "Unrecognized field name $fld in format string, aborting"
+			exit 1;
+			;;
+		esac
+		tmptext="${tmptext}|"
+	done
+	echo $tmptext
+	#Print at most once
+	verbose_flag=
+    fi
+}
+
+
+print_resource()
+{	
+	#Clear values
+	#	common
+	tmp_allocated=
+	tmp_cluster=
+	tmp_count=
+	tmp_description=
+	tmp_flags=
+	tmp_servertype=
+	tmp_name=
+	tmp_percentallowed=
+	tmp_server=
+	tmp_type=
+
+	#no preTRES stuff
+	#no postTRES stuff
+
+	#Set values
+	while [ $# -gt 0 ]
+	do
+		key=$1
+		val=$1
+		shift
+		key=`echo $key | sed -e 's/=.*$//'`
+		val=`echo $val | sed -e 's/^[^=]*=//'`
+		#echo >&2 "$key = $val"
+
+		case $key in
+		#----	Common fields
+		    allocated)
+			tmp_allocated=$val
+			;;
+		    cluster)
+			tmp_cluster=$val
+			;;
+		    count)
+			tmp_count=$val
+			;;
+		    description)
+			tmp_description=$val
+			;;
+		    flags)
+			tmp_flags=$val
+			;;
+		    servertype)
+			tmp_servertype=$val
+			;;
+		    name)
+			tmp_name=$val
+			;;
+		    percentallowed)
+			tmp_percentallowed=$val
+			;;
+		    server)
+			tmp_server=$val
+			;;
+		    type)
+			tmp_type=$val
+			;;
+
+		#----	no preTRES fields
+		#----	postTRES fields
+		#----	ERROR
+		    *)
+			echo >&2 "Unrecognized parm $key, aborting"
+			exit 1
+			;;
+		esac
+	done
+		    
+	#Print values
+	tmptext=
+	for fld in $FORMAT_FIELDS
+	do
+		case $fld in
+		#----	common fields
+		    allocated)
+			tmptext="${tmptext}${tmp_allocated}"
+			;;
+		    cluster)
+			tmptext="${tmptext}${tmp_cluster}"
+			;;
+		    count)
+			tmptext="${tmptext}${tmp_count}"
+			;;
+		    description)
+			tmptext="${tmptext}${tmp_description}"
+			;;
+		    flags)
+			tmptext="${tmptext}${tmp_flags}"
+			;;
+		    servertype)
+			tmptext="${tmptext}${tmp_servertype}"
+			;;
+		    name)
+			tmptext="${tmptext}${tmp_name}"
+			;;
+		    percentallowed)
+			tmptext="${tmptext}${tmp_percentallowed}"
+			;;
+		    server)
+			tmptext="${tmptext}${tmp_server}"
+			;;
+		    type)
+			tmptext="${tmptext}${tmp_type}"
+			;;
+
+		#----	preTRES fields
+		#----	preTRES fields
+		#----	ERROR
+		    *)
+			echo >&2 "Unrecognized field name $fld in format string, aborting"
+			exit 1;
+			;;
+		esac
+		tmptext="${tmptext}|"
+	done
+	echo $tmptext
+
+
+}
+
+print_foo()
+{	print_header
+	print_resource \
+		name=foo \
+		server=rlmserver.umd.edu \
+		count=100 \
+		servertype=rlm \
+		percentallowed=100 \
+		cluster=yottascale \
+		type=License \
+		allocated=100
+}
+
+print_matlab_ys()
+{	print_header
+	print_resource \
+		name=matlab \
+		server=flexlm.umd.edu \
+		count=500 \
+		servertype=flexlm \
+		percentallowed=90 \
+		cluster=yottascale \
+		type=License \
+		allocated=100
+}
+
+print_matlab_test()
+{	print_header
+	print_resource \
+		name=matlab \
+		server=flexlm.umd.edu \
+		count=500 \
+		servertype=flexlm \
+		percentallowed=10 \
+		cluster=testcluster \
+		type=License \
+		allocated=100
+}
+
+print_matlab()
+{	print_matlab_ys
+	print_matlab_test
+}
+
+print_all()
+{	print_header
+	print_foo
+	print_matlab
+}
+
+print_none()
+{	print_header
+}
+
+#Parse options
+name_flag=
+stype_flag=
+cluster_flag=
+type_flag=
+
+while [ $# -gt 0 ]
+do
+	arg=$1
+	shift
+
+	case $arg in
+	    --version)
+		#Print version and exit
+		if [ "x$FAKE_SLURM_VERSION" = "x" ]; then
+			print_version 14
+		else
+			print_version $FAKE_SLURM_VERSION
+		fi
+		exit 0
+		;;
+	    format=*)
+		#Set our format string
+		tmp=`echo $arg | sed -e 's/^format=//' -e "s/'//g" -e 's/"//g' -e 's/,/ /g'`
+		FORMAT_FIELDS=$tmp
+		;;
+	    name=*)
+		tmp=`echo $arg | sed -e 's/^name=//' -e "s/'//g" -e 's/"//g' `
+		name_flag=$tmp
+		;;
+	    cluster=* )
+		tmp=`echo $arg | sed -e 's/^cluster=//' -e "s/'//g" -e 's/"//g' `
+		cluster_flag=$tmp
+		;;
+	     servertype=* )
+		tmp=`echo $arg | sed -e 's/^servertype=//' -e "s/'//g" -e 's/"//g' `
+		stype_flag=$tmp
+		;;
+	     type=* )
+		tmp=`echo $arg | sed -e 's/^type=//' -e "s/'//g" -e 's/"//g' `
+		type_flag=$tmp
+		;;
+	     -v|--verbose)
+		verbose_flag=yes
+		;;
+	esac
+done
+
+#Everything must have license type
+if [ "x${type_flag}" != "x" -a "x$type_flag" != "xLicense" ]; then
+	print_none
+	exit 0
+fi
+
+if [ "x${name_flag}" = "x" ]; then
+	#No name flag given
+	if [ "x${stype_flag}" = "x" ]; then
+		#No servertype flag given
+		if [ "x${cluster_flag}" = "x" ]; then
+			#No flags given, print everything
+			print_all
+		else
+			#Only cluster given
+			case $cluster_flag in
+			   yottascale)
+				print_matlab_ys
+				;;
+			   testcluster)
+				print_matlab_test
+				;;
+			   *)
+				print_none
+				;;
+			esac
+		fi
+	else
+		#Servertype given
+		case $stype_flag in
+		   flexlm)
+			if [ "x$cluster_flag" = "x" ]; then
+				#No cluster given
+				print_matlab
+			else
+				case $cluster_flag in
+				   yottascale)
+					print_matlab_ys
+					;;
+				   testcluster)
+					print_matlab_test
+					;;
+				   *)
+					print_none
+					;;
+				esac
+			fi
+			;;
+		   rlm)
+			if [ "x$cluster_flag" = "x" ]; then
+				#No cluster given
+				print_foo
+			else
+				#cluster given, doesn't match
+				print_none
+			fi
+			;;
+		   *)
+			print_none
+			;;
+		esac
+	fi
+else
+	#Name given
+	case $name_flag in
+	   foo)
+		if [ "x$stype_flag" = "x" -o "x$stype_flag" = "xrlm" ]; then
+			#servertype not given or matches
+			if [ "x$cluster_flag" = "x" -o \
+				"x$cluster_flag" = "xyottascale" ]; then
+				#Cluster not given or matches
+				print_foo
+			else
+				print_none
+			fi
+		else
+			#Wrong servertype
+			print_none
+		fi
+		;;
+	   matlab)
+		if [ "x$stype_flag" = "x" -o "x$stype_flag" = "xflexlm" ]; then
+			#servertype not specified or correct
+			if [ "x$cluster_flag" = "x" ]; then
+				#Cluster not specified
+				print_matlab
+			else
+				case $cluster_flag in
+				   yottascale)
+					print_matlab_ys
+					;;
+				   testcluster)
+					print_matlab_test
+					;;
+				   *)
+					print_none
+					;;
+				esac
+			fi
+		else
+			#incorrect servertype specified
+			print_none
+		fi
+		;;
+	   *)
+		#Unknown product
+		print_none
+		;;
+	esac
+fi
+

@@ -1,0 +1,25 @@
+Sort-Bucket
+===========
+
+Sort::Bucket is an XS module, implementing a bucket sort in string
+lexical order for Perl arrays.  It can be much faster than Perl's
+builtin sort function, if the data to be sorted is well suited to a
+bucket sort.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 by Nick Cleaton
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+

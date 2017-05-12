@@ -1,0 +1,21 @@
+#!perl
+use strict;
+use warnings;
+use utf8;
+
+use Plack::Loader;
+use <% $package %>::Web;
+
+my $port        = 5000;
+my $host        = '127.0.0.1';
+my $max_workers = 1;
+
+print "<% $package %>: http://${host}:${port}/\n";
+
+my $loader = Plack::Loader->load('Starlet',
+    port        => $port,
+    host        => $host,
+    max_workers => $max_workers,
+);
+
+$loader->run(<% $package %>::Web->to_app());

@@ -1,0 +1,244 @@
+NAME
+    "Set::Partitions::Similarity" - Routines to measure similarity of
+    partitions.
+
+SYNOPSIS
+      use Set::Partitions::Similarity qw(getAccuracyAndPrecision);
+      use Data::Dump qw(dump);
+
+      # set elements are Perl strings, sets are array references
+      # partitions are nested arrays.
+      dump getAccuracyAndPrecision ([[qw(a b)],[1,2]], [[qw(a b 1)],[2]]);
+      # dumps:
+      # ("0.5", "0.25")
+
+      # a partition is equivalent to itself, even the empty partition.
+      dump getAccuracyAndPrecision ([[1,2], [3,4]], [[2,1], [4,3]]);
+      dump getAccuracyAndPrecision ([], []);
+      # dumps:
+      # (1, 1)
+      # (1, 1)
+
+      # accuracy and precision are symmetric functions.
+      my ($p, $q) = ([[1,2,3], [4]], [[1], [2,3,4]]);
+      dump getAccuracyAndPrecision ($p, $q);
+      dump getAccuracyAndPrecision ($q, $p);
+      # dumps:
+      # ("0.333333333333333", "0.2")
+      # ("0.333333333333333", "0.2")
+
+      # checks partitions and throws an exception.
+      eval { getAccuracyAndPrecision ([[1]], [[1,2]], 1); };
+      warn $@ if $@;
+      # dumps:
+      # partitions are invalid, they have different set elements.
+
+DESCRIPTION
+    A partition of a set is a collection of mutually disjoint subsets of the
+    set whose union is the set. "Set::Partitions::Similarity" provides
+    routines that measure the *accuracy* and *precision* between two
+    partitions of a set. The measures can assess the performance of a binary
+    clustering algorithm by comparing the clusters the algorithm creates
+    against the correct clusters of test data.
+
+  Accuracy and Precision
+    Let "S" be a set of "n" elements and let "P" be a partition of "S". Let
+    T(S) be the set of all sets of two distinct elements of "S"; so T(S) has
+    "n*(n-1)/2" sets. The partition "P" uniquely defines a partitioning of
+    T(S) into two sets, C(P) and D(P) where C(P) is the set of all pairs in
+    T(S) such that both elements of a pair occur in the same set in "P", and
+    define D(P) as "T(S)-C(P)", the complement.
+
+    Given two partitions "P" and "Q" of the set "S", the *accuracy* is
+    defined as "(|C(P) ^ C(Q)| + |D(P) ^ D(Q)|) / (n*(n-1)/2)", where | |
+    gives the size of a set and ^ represents the intersection operator. The
+    *precision* is defined as "|C(P) ^ C(Q)| / (|C(P) ^ C(Q)| + |C(P) ^
+    D(Q)| + |D(P) ^ C(Q)|)". The *accuracy* and *precision* return values
+    ranging from zero (no similarity) to one (equivalent partitions). The
+    *distance* between two partitions is defined as *1-accuracy*, and in
+    mathematics is a metric. The *distance* returns values ranging from zero
+    (equivalent partitions) to one (no similarity).
+
+    All the methods implemented that compute the *accuracy*, *precision*,
+    and *distance* run in time linear in the number of elements of the set
+    partitioned.
+
+ROUTINES
+  "areSubsetsDisjoint ($Partition)"
+    The routine "areSubsetsDisjoint" returns true if the subsets of the
+    partition are disjoint, false otherwise. It can be used to check the
+    validity of a partition.
+
+    $Partition
+        The partition is stored as a nested array reference of the form
+        "[[],...[]]". For example, the set partition "{{a,b}, {1,2}}" of the
+        set "{a,b,1,2}" should be stored as the nested array reference
+        "[['a','b']],[1,2]]". Note the elements of a set are represented as
+        Perl strings.
+
+    An example:
+
+      use Set::Partitions::Similarity qw(areSubsetsDisjoint);
+      use Data::Dump qw(dump);
+      dump areSubsetsDisjoint ([[1,2,3], [4]]);
+      dump areSubsetsDisjoint ([[1,2,3], [4,1]]);
+      # dumps:
+      # "1"
+      # "0"
+
+  "getAccuracy ($PartitionP, $PartitionQ, $CheckValidity)"
+    The routine "getAccuracy" returns the *accuracy* of the two partitions.
+
+    "$PartitionP, $PartitionQ"
+        The partitions are stored as nested array references of the form
+        "[[],...[]]". For example, the set partition "{{a,b}, {1,2}}" of the
+        set "{a,b,1,2}" should be stored as the nested array references
+        "[['a','b']],[1,2]]". Note the elements of a set are represented as
+        Perl strings.
+
+    $CheckValidity
+        If $CheckValidity evaluates to true, then checks are performed to
+        ensure both partitions are valid and an exception is thrown if they
+        are not. The default is false.
+
+    An example:
+
+      use Set::Partitions::Similarity qw(getAccuracy);
+      use Data::Dump qw(dump);
+      dump getAccuracy ([[qw(a b)], [qw(c d)]], [[qw(a b c d)]]);
+      dump getAccuracy ([[qw(a b c d)]], [[qw(a b)], [qw(c d)]]);
+      # dumps:
+      # "0.333333333333333"
+      # "0.333333333333333"
+
+  "getAccuracyAndPrecision ($PartitionP, $PartitionQ, $CheckValidity)"
+    The routine "getAccuracyAndPrecision" returns the *accuracy* and
+    *precision* of the two partitions as an array "(accuracy, precision)".
+
+    "$PartitionP, $PartitionQ"
+        The partitions are stored as nested array references of the form
+        "[[],...[]]". For example, the set partition "{{a,b}, {1,2}}" of the
+        set "{a,b,1,2}" should be stored as the nested array references
+        "[['a','b']],[1,2]]". Note the elements of a set are represented as
+        Perl strings.
+
+    $CheckValidity
+        If $CheckValidity evaluates to true, then checks are performed to
+        ensure both partitions are valid and an exception is thrown if they
+        are not. The default is false.
+
+    An example:
+
+      use Set::Partitions::Similarity qw(getAccuracyAndPrecision);
+      use Data::Dump qw(dump);
+      dump getAccuracyAndPrecision ([[1,2], [3,4]], [[1], [2], [3], [4]]);
+      dump getAccuracyAndPrecision ([[1], [2], [3], [4]], [[1,2], [3,4]]);
+      # dumps:
+      # ("0.666666666666667", 0)
+      # ("0.666666666666667", 0)
+
+  "getDistance ($PartitionP, $PartitionQ, $CheckValidity)"
+    The routine "getDistance" returns *1-accuracy* of the two partitions, or
+    "1-getAccuracy($PartitionP, $PartitionQ, $CheckValidity)".
+
+    "$PartitionP, $PartitionQ"
+        The partitions are stored as nested array references of the form
+        "[[],...[]]". For example, the set partition "{{a,b}, {1,2}}" of the
+        set "{a,b,1,2}" should be stored as the nested array references
+        "[['a','b']],[1,2]]". Note the elements of a set are represented as
+        Perl strings.
+
+    $CheckValidity
+        If $CheckValidity evaluates to true, then checks are performed to
+        ensure both partitions are valid and an exception is thrown if they
+        are not. The default is false.
+
+    An example:
+
+      use Set::Partitions::Similarity qw(getDistance);
+      use Data::Dump qw(dump);
+      dump getDistance ([[1,2,3], [4]], [[1], [2,3,4]]);
+      # dumps:
+      # "0.666666666666667"
+
+  "getPrecision ($PartitionP, $PartitionQ, $CheckValidity)"
+    The routine "getPrecision" returns the *precision* of the two
+    partitions.
+
+    "$PartitionP, $PartitionQ"
+        The partitions are stored as nested array references of the form
+        "[[],...[]]". For example, the set partition "{{a,b}, {1,2}}" of the
+        set "{a,b,1,2}" should be stored as the nested array references
+        "[['a','b']],[1,2]]". Note the elements of a set are represented as
+        Perl strings.
+
+    $CheckValidity
+        If $CheckValidity evaluates to true, then checks are performed to
+        ensure both partitions are valid and an exception is thrown if they
+        are not. The default is false.
+
+    An example:
+
+      use Set::Partitions::Similarity qw(getPrecision);
+      use Data::Dump qw(dump);
+      dump getPrecision ([[1,2,3], [4]], [[1], [2,3,4]]);
+      # dumps:
+      # "0.2"
+
+EXAMPLE
+    The code following measures the *distance* of a set of 512 elements
+    partitioned equally into subsets of size $s to the entire set.
+
+      use Set::Partitions::Similarity qw(getDistance);
+      my @p = ([0..511]);
+      for (my $s = 1; $s <= 512; $s += $s)
+      {
+        my @q = map { [$s*$_..($s*$_+$s-1)] } (0..(512/$s-1));
+        print join (', ', $s, getDistance (\@p, \@q, 1)) . "\n";
+      }
+      # dumps:
+      # 1, 1
+      # 2, 0.998043052837573
+      # 4, 0.99412915851272
+      # 8, 0.986301369863014
+      # 16, 0.970645792563601
+      # 32, 0.939334637964775
+      # 64, 0.876712328767123
+      # 128, 0.75146771037182
+      # 256, 0.500978473581213
+      # 512, 0
+
+INSTALLATION
+    To install the module run the following commands:
+
+      perl Makefile.PL
+      make
+      make test
+      make install
+
+    If you are on a windows box you should use 'nmake' rather than 'make'.
+
+BUGS
+    Please email bugs reports or feature requests to
+    "bug-set-partitions-similarities@rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Set-Partitions-Similarit
+    y>. The author will be notified and you can be automatically notified of
+    progress on the bug fix or feature request.
+
+AUTHOR
+     Jeff Kubina<jeff.kubina@gmail.com>
+
+COPYRIGHT
+    Copyright (c) 2009 Jeff Kubina. All rights reserved. This program is
+    free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+KEYWORDS
+    accuracy, clustering, measure, metric, partitions, precision, set,
+    similarity
+
+SEE ALSO

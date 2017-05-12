@@ -1,0 +1,118 @@
+Revision history for Sphinx-Search
+
+0.01    2007-09-07
+        Initial release for sphinx-0.9.8-cvs-20070818
+
+0.02	2007-09-08
+	Update to support UTF-8
+
+0.03	2007-09-09
+	Upgraded API with AddQuery/RunQueries for sphinx-0.9.8-cvs-20070907
+
+0.04    2007-09-10
+	Added support for tests to use non-standard mysql socket
+
+0.05	2007-09-16
+	Fixed bug [rt.cpan.org #29383]
+	Added support for filter excludes
+
+0.06	2007-09-24
+	Upgraded API with SetGeoAnchor and SetFilterFloatRange for
+	sphinx-0.9.8-svn-r820
+
+0.07	2007-10-15
+	Upgraded API with SetIndexWeights for sphinx-0.9.8-svn-r871
+
+0.08	2007-11-24
+	Fixed handling of error conditions on recv and connect (Igor Gerdler,
+	rt.cpan.org #30934, #30935)
+
+0.09	2007-12-12
+	Upgraded API for sphinx-0.9.8-svn-r985
+
+0.10	2008-01-30
+	Upgraded API for sphinx-0.9.8-svn-r1112
+
+0.11	2008-03-11
+	Upgraded API for sphinx-0.9.8-rc1
+
+0.12	2008-07-25
+	Upgraded API for sphinx-0.9.8
+
+0.13_01	2009-01-29
+	Upgraded API for sphinx-0.9.9-rc1, development release.   Open/Close
+	for persistent connections are known to not work; also 64 bit IDs fail.
+
+0.14	2009-02-06
+	Fixed 64 bit ID problem (testing issue) and persistent connections.
+
+0.15	2009-02-25
+	Fixed return values in BuildExcerpts (some error conditions returned 0,
+	should have been undef) (rt.cpan.org #43583)
+
+0.16	2009-04-08
+	Upgraded API for sphinx-0.9.9-rc2
+
+0.17	2009-04-09
+	Added support for inserting encoder/decoder for translating charsets between perl and searchd.
+	Additional UTF-8 tests.
+
+0.18	2009-04-09
+	Included missing test files in CPAN package.
+
+0.19	2009-04-10
+	Removed request for GMP implementation of Math::BigInt due to apparent
+	bug in Math::BigInt on 32 bit architectures (Math::BigInt::Calc and
+	Math::BigInt::GMP give different answers for 32 bit shift of long
+	integer)
+	Fixed incorrect setting for _max_id that was causing results with 64 bit IDs to be
+	ignored unless SetIDRange() had been called.
+
+0.20	2009-05-01
+	Fixed dependency list to prevent failing tests on some systems.
+
+0.21	2009-05-04
+	Fixed another missing dependency (Encode)
+	Fixed 64 bit ID signed transfer on 32 bit systems compiled with -Duse64bitint.
+
+0.22    2009-05-07 
+     	Moved use of Config variables out of new so Config is only accessed at startup, to avoid delays in
+	new(). (rt.cpan.org #45789)
+
+0.23_02 2010-04-04
+	Updated for compatibility with svn-r2269.
+	rt.cpan.org #54698 - doc fix
+	rt.cpan.org #56406 - string attributes
+
+0.23_03 2010-05-06
+	rt.cpan.org #57171 - fixed occasional warnings due to uninitialised
+	values
+
+0.24	2010-12-07
+	Updated for compatibility with 1.10-beta (svn-r2420)
+
+0.25_01 2010-12-07
+	Updated for compatibility with svn-r2575
+
+0.25_02 2010-12-16
+	rt.cpan.org #63945 - fixed missing constants
+
+0.25_03 2011-03-23
+        Fixed variable "warnings" in results hash, should be "warning"
+
+0.26.1 2011-07-27
+       Updated for compatibility with 2.0.1-beta (svn-2792)
+
+0.27.1 2012-02-19
+       Updated for compatibility with 2.0.3-release
+
+0.27.2 2012-03-18
+       Incorporated persistent connections patch from Alexey Kholodkov (rt.cpan.org #70760)
+       Minor changes to fix perlcritic warnings.
+
+0.28   2013-06-20
+       rt.cpan.org #84830 - documentation update
+       Updated for compatibility with 2.0.8-release
+
+0.29   2015-03-17
+       Updated for 2.2.8. Added experimental SphinxQL support.

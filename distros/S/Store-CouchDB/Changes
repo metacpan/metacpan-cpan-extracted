@@ -1,0 +1,330 @@
+==================================================
+Changes from 2013-08-05 00:00:00 +0000 to present.
+==================================================
+
+----------------------------------------
+version 3.8 at 2014-08-05 19:36:35 +0000
+----------------------------------------
+
+  Change: f891344790cc8c6cfb83ccde5995fc2d539b1998
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-05-09 01:03:42 +0000
+
+    v3.7 
+
+----------------------------------------
+version 3.7 at 2014-04-01 23:40:23 +0000
+----------------------------------------
+
+  Change: 0017f1709c43c58c2c1c99a5d6266c6bc76fa6db
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-04-02 12:40:23 +0000
+
+    silenced warnings when _uri_encode returns undef and is concatenated
+    afterwards 
+
+----------------------------------------
+version 3.6 at 2014-03-31 03:35:24 +0000
+----------------------------------------
+
+  Change: 6722cfde7b7c071f02ba742732b418495676669d
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-03-31 16:35:24 +0000
+
+    added support getting a specific revision with get_doc() 
+
+  Change: 668bd0d81c83d0ad7e551a234e570f309b81d14d
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-03-31 16:05:12 +0000
+
+    use more intuitive test DB name 
+
+  Change: a28a842f7c3014cd95d9bc56b8055601812e1676
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-03-31 16:04:00 +0000
+
+    doc ID for show_doc needs to be set before the query params 
+
+  Change: 0c3a4d4a9a9f489fa8a718a4bc0c7c98436f5904
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-03-31 16:03:12 +0000
+
+    implemented first version of _changes feed with test 
+
+  Change: 98a52bd56ceb1aee4cb62703cab0d2f4be82be83
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-03-31 15:53:59 +0000
+
+    updated documentation 
+
+  Change: 3e90ea932c057fc64a086ef486165cd0a33f5c7c
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-03-31 15:53:18 +0000
+
+    handle uri_encoding of query params separately. also json encode all
+    of them. make sure booleans are encoded correctly 
+
+----------------------------------------
+version 3.5 at 2014-03-26 13:17:15 +0000
+----------------------------------------
+
+  Change: 710d6e184110b71106c5dd4bda9b6ef5f19af3a7
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-03-27 02:17:15 +0000
+
+    make order of result arrays irrelevant for all_docs tests by sorting
+    them, version bump 
+
+  Change: 143c1daf0a02b58a5daaf0261dab3eb71daf97e3
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-03-27 02:15:54 +0000
+
+    always try to JSON decode response content and debug dump it, because
+    even couchDB errors are in JSON. include the content in the error
+    attribute for better error handling 
+
+  Change: 266ca6bb47146b6694d28cfd11c8ce632bfeeb6d
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-03-27 02:13:03 +0000
+
+    make sure couchDB _id is a string, always 
+
+  Change: 852a52aac4e217413df585c4d659038e0fd05f86
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-03-27 02:12:00 +0000
+
+    don't try to set revision if there was an error and there is none 
+
+----------------------------------------
+version 3.4 at 2014-03-24 13:29:03 +0000
+----------------------------------------
+
+  Change: 1db4e13cc3c6af20eeef82d9aab9f379f094dbe6
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-03-25 02:29:03 +0000
+
+    dump result nicely if json decode was successful, otherwise just dump
+    as usual 
+
+  Change: 8c4bbdead14e21b803778c55c9f7449a395ca50a
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-03-25 02:28:06 +0000
+
+    JSON encodes values as strings if they have been dumped or
+    concatenated in any way before encoding. make sure JSON always
+    encodes the same way and offer a fallback view call for keys that are
+    broken (e.g. strings instead of numbers/floats) 
+
+  Change: 1223076db670822c479a046914017bd0a1e26952
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-03-25 02:22:34 +0000
+
+    let get_view_array actually return an array, otherwise it was
+    absolutely identical to get_array_view 
+
+  Change: af5103e5883c97f4630a12ca9837b6c4cc87ae03
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-03-25 02:18:09 +0000
+
+    added all_docs() method 
+
+  Change: 54350b4b94fe7e39840feea1c41868c08c724242
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-03-24 17:41:56 +0000
+
+    pass options to p() because something seems to overwrite them 
+
+  Change: 3526ad5bfedb1f1f9117247c1028332e54b91ba3
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-03-24 17:19:36 +0000
+
+    added _dump() and _log() for convenience 
+
+  Change: 2e97bc7319ccf0bb610eb8cf31d0db133a3e2bf7
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-03-24 15:38:02 +0000
+
+    adjusted number of tests in subgroup 
+
+  Change: 3074b9177caf720099f253ba0d5000e3fadbb15a
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-03-23 20:32:53 +0000
+
+    use Data::Printer to debug print payload and response 
+
+  Change: 22df797e035fe513291a5baa2d60306787e5d596
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-03-23 20:19:35 +0000
+
+    changed update_doc 
+
+  Change: deb2569ac94bb596f14b434cb8433f5ed066d34f
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-03-23 16:29:45 +0000
+
+    set default content-type for put_file to text/plain to enforce
+    correct behaviour. suggestions for a better default welcome 
+
+  Change: cc16eae7dc6d8ba08c218f9d7963fc01d68e81bb
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-03-23 16:25:58 +0000
+
+    don't try to delete a non-existing doc or if the ID is missing 
+
+  Change: fa8e721737244c21a912f26a6528be140786cca9
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-03-23 16:23:57 +0000
+
+    DO NOT modify incoming doc! we are passed a hashref, which means we
+    must be careful, so don't delete doc->_id instead update its _rev for
+    convenience 
+
+  Change: 4fb699bf0cee1837a9bf63f45b9ee662941878a3
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-03-23 16:21:14 +0000
+
+    make sure things don't break horribly when input is not a hashref,
+    instead return with an error 
+
+  Change: a4fcd41160f1f3338f9f4f932684ba4e5ac0534b
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-03-23 16:17:29 +0000
+
+    support single scalar input for del_doc, get_doc, copy_doc and
+    head_doc 
+
+  Change: 3b79f37bbf0374cd88262d92b00cf17d6bdceaca
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-03-23 15:07:32 +0000
+
+    use _check_db() to set the DB as well to reduce duplicate code 
+
+  Change: 219e1307434c5bf02178807708d2265a3c605a28
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-03-22 21:45:37 +0000
+
+    v3.3 
+
+----------------------------------------
+version 3.3 at 2014-03-22 08:44:51 +0000
+----------------------------------------
+
+  Change: c5c5870c6400077362a1b3aff274ebf79d5be7f6
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-03-22 21:44:51 +0000
+
+    only need binmode in debug mode, this will silence a lot of warnings
+    when used with Tie::Syslog 
+
+----------------------------------------
+version 3.2 at 2014-02-26 01:05:29 +0000
+----------------------------------------
+
+  Change: 8720e057122d05893a6bccef8d5ab2ca11709e88
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-02-26 14:05:29 +0000
+
+    fixed wantarray return for put_doc and put_file, also added test for
+    it 
+
+----------------------------------------
+version 3.1 at 2014-02-25 13:29:55 +0000
+----------------------------------------
+
+  Change: 9febad5e994f639ee99477ceca5e6b94a514bdf3
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-02-26 02:29:55 +0000
+
+    added tests 
+
+  Change: 9eaede510a6cbb16931c959001d415d72d240729
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-02-26 02:29:45 +0000
+
+    updated documentation, version bump 
+
+  Change: e44971fbc8066331188b8358738cd23778db5e55
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-02-26 02:29:04 +0000
+
+    fixed method handling, parse content type correctly 
+
+  Change: 48f701008bd898cb30158a1687ceafc0a53f1d34
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-02-26 02:25:43 +0000
+
+    added list_view, show_doc and delete_db methods to reflect CouchDB
+    _list, _show and DELETE db calls 
+
+  Change: b515acd7bde4976d4d0bb19469a3b2f3e61b26a7
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-02-26 02:20:55 +0000
+
+    ignore .build dir 
+
+----------------------------------------
+version 3.0 at 2014-01-05 03:07:56 +0000
+----------------------------------------
+
+  Change: 0f0d22dc3d57ad549225f402002da85abf915c4a
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-01-05 16:07:56 +0000
+
+    added all_dbs() method and made db attribute optional 
+
+----------------------------------------
+version 2.9 at 2013-12-18 13:12:51 +0000
+----------------------------------------
+
+  Change: 91ba309c779d9e389cd484404deea7c0cae49ffd
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-12-19 02:12:51 +0000
+
+    satisfy perlcritic 
+
+  Change: edf67ead74d58f1f252ce6603e64fc28cdcd90f1
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-12-19 02:11:52 +0000
+
+    satisfy perlcritic 
+
+  Change: 3639413d3c54980ca1ae2a0230ff0af2fb2cc8b4
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-12-19 02:08:01 +0000
+
+    be backward compatible with boolean matching 
+
+  Change: e4310e1e260f8a6a351ce826cc2ba53041eb2365
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-12-19 02:04:42 +0000
+
+    booleans evaluate to 1/0 now with new JSON lib 
+
+  Change: 4d9e1ef39487856dcd1461258cd4da1cced4069f
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-12-18 21:50:15 +0000
+
+    removed cpanfile stuff for now 
+
+  Change: 2eb76be653fdb1c8b54fee3bab9dc1974f8ced15
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-12-18 21:47:21 +0000
+
+    added generated README.pod for github 
+
+  Change: 4fdca587393aab4523c877fb55d77f55b2f261eb
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-12-18 21:45:54 +0000
+
+    migrated to Dist::Zilla 
+
+  Change: dc7053b3f669c3f57e79ed369ff4f8940ff24550
+  Author: Lenz Gschwendtner <lenz@ideegeo.com>
+  Date : 2013-07-10 17:28:59 +0000
+
+    made missing document ID in get_doc non-fatal and added shorter way
+    of calling get_doc 
+
+=================================================
+Plus 24 releases after 2013-08-05 00:00:00 +0000.
+=================================================

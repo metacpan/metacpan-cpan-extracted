@@ -1,0 +1,28 @@
+This is the Perl distribution ShipIt-Step-ApplyYAMLChangeLogVersion.
+
+INSTALLATION
+
+ShipIt-Step-ApplyYAMLChangeLogVersion installation is straightforward. If your
+CPAN shell is set up, you should just be able to do
+
+    % cpan ShipIt::Step::ApplyYAMLChangeLogVersion
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+ShipIt-Step-ApplyYAMLChangeLogVersion documentation is available as in POD. So
+you can do:
+
+    % perldoc ShipIt::Step::ApplyYAMLChangeLogVersion
+
+to read the documentation online with your favorite pager.
+
+Marcel Gruenauer

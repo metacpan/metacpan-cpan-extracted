@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<shoebox type="Text">
+
+<shoebox-format>
+  <marker name="dt" style="par">
+    <language>Date</language>
+    <font size="12">Courier New</font>
+  </marker>
+  <marker name="fe" style="par">
+    <language>English</language>
+    <font size="11">Times New Roman</font>
+  </marker>
+  <marker name="ge" style="char">
+    <language>English</language>
+    <font size="11">Times New Roman</font>
+    <interlinear level="4"/>
+  </marker>
+  <marker name="mb" style="char">
+    <language>UNICODE Thai</language>
+    <font size="18">Angsana New</font>
+    <interlinear level="2"/>
+  </marker>
+  <marker name="name" style="par">
+    <language>Default</language>
+    <font size="11">Times New Roman</font>
+  </marker>
+  <marker name="pr" style="char">
+    <language>IPA93</language>
+    <font size="12">Doulos SIL</font>
+    <interlinear level="3"/>
+  </marker>
+  <marker name="ps" style="char">
+    <language>Default</language>
+    <font size="11">Times New Roman</font>
+    <interlinear level="5"/>
+  </marker>
+  <marker name="ref" style="par">
+    <language>Default</language>
+    <font size="11">Times New Roman</font>
+  </marker>
+  <marker name="tx" style="char">
+    <language>UNICODE Thai</language>
+    <font size="18">Angsana New</font>
+    <interlinear level="1"/>
+  </marker>
+</shoebox-format>
+
+<name value="Fishy">
+  <ref value="Fishy001">
+    <interlinear-block>
+      <tx value="กุ้งทะเลใหญ่">
+        <mb value="กุ้ง">
+          <pr>kûŋ</pr>
+          <ge>shrimp</ge>
+          <ps>N</ps>
+        </mb>
+        <mb value="ทะเล">
+          <pr>tʰalee</pr>
+          <ge>sea</ge>
+          <ps>N</ps>
+        </mb>
+        <mb value="ใหญ่">
+          <pr>yài</pr>
+          <ge>big</ge>
+          <ps>Adj</ps>
+        </mb>
+      </tx>
+    </interlinear-block>
+    <fe>Lobster</fe>
+  </ref>
+  <dt>22/Apr/2005</dt>
+</name>
+
+</shoebox>

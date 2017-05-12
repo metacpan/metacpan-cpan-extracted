@@ -1,0 +1,158 @@
+NAME
+
+SF::SF_form_secure - Data integrity for forms, links, cookie or other things.
+
+SYNOPSIS
+
+ require SF::SF_form_secure;
+
+ $SF::SF_form_secure::code = 'Security_Key';
+ $SF::SF_form_secure::exp = '';
+ $SF::SF_form_secure::ip_ct = '';
+
+ my $extra_code = 'Name:Password';
+ my $stuff = SF::SF_form_secure::x_secure(4, $extra_code, '');
+ print $stuff;
+ $stuff = SF::SF_form_secure::x_secure(5, $extra_code, $stuff);
+ print $stuff;
+
+PREREQUISITES
+
+This modules requires the following perl modules:
+
+Digest::SHA1
+
+=head1 ABSTRACT
+
+Data integrity for forms, links, cookie or other things.
+
+DESCRIPTION
+
+ Must Provide a secret key.
+ Controle the expiration function and minutes used 1 to 99, blank is off.
+ Can use Remote IP in encoding.
+ Many security level Combos 4 examples!
+ Check referer encoding, and/or maching referer.
+ Checks incoming QUERY_STRING encoding is correct.
+ Returns the number 1 if Check is ok.
+ Returns English Text if Check is Bad.
+ Action 4 and 5 where made to use in Form's, URL's, cookies and anywhere else you like.
+
+ This file does not have many hours of testing.
+ Please Report all Bugs and report if all go's well!
+
+SUPPORT
+
+ 1) Must Provide the same secret key for all action types.
+ 2) Must Provide the same  time and/or ip setting for all actions.
+
+EXAMPLE
+
+ Usage:
+
+ # Load the module and set variables
+
+ require SF_form_secure;
+ $SF_form_secure::code = 'Secuity_Key'; # Must Provide a secret key.
+ $SF_form_secure::exp = '5'; # Minutes code will expire in 1 to 99, blank is off..
+ $SF_form_secure::ip_ct = 'ip'; # use Remote IP in encoding, blank is off.
+ -------------------------------------------------------------------------------
+
+ # Set page up for self encoding if encoding is missing
+ # 3 - is the action type
+ # 'op=testForm;module=Flex_Form' - to work, must provide a matching self link
+ # '' - not used for this action
+
+ my $sec_self = SF_form_secure::x_secure('3', 'op=testForm;module=Flex_Forma', '');
+ if ($sec_self) {
+ print "Location: http://www.domain.com/index.cgi?$sec_self\n\n";
+ }
+ -------------------------------------------------------------------------------
+
+ # This makes encoded links for the next page
+ # 1 - is the action type
+ # 'op=testForm2;module=Flex_Form' - The link to encode
+ # '' - not used for this action
+
+ my $secure_link = SF_form_secure::x_secure(1, 'op=testForm2;module=Flex_Forma', '');
+
+ # example of $secure_link = 'op=testForm;module=Flex_Forma;Flex=e690dec564cf52fcfcc967a9d5c079a7687f87d1|1161373021';
+ # 1161373021 date is bound in encoding.
+
+ -------------------------------------------------------------------------------
+
+ # Full Security - To get to this area the referer must match the one given, the incoming link and past referer encoding must be correct.
+ # 2 - is the action type
+ # 3 - 1 Check Referer encoding, 2 Check link encoding, 3 Check Both, Blank is off
+ # "http://www.domain.com/index.cgi?op=testForm;module=Flex_Form" - Match this Referer, Blank is off
+
+ my $secure_check = SF_form_secure::x_secure(2, 3, "http://www.domain.com/index.cgi?op=testForm;module=Flex_Forma");
+ if ($secure_check ne 1) {
+ print $secure_check;
+ }
+
+ -------------------------------------------------------------------------------
+
+ # Medium Security 1 - To get to this area the referer must match the one given and incoming link encoding must be correct.
+ # 2 - is the action type
+ # 2 -  1 Check Referer encoding, 2 Check link encoding, 3 Check Both, Blank is off
+ # "http://www.domain.com/index.cgi?op=testForm;module=Flex_Form" - Match this Referer, Blank is off
+
+ my $secure_check = SF_form_secure::x_secure(2, 2, "http://www.domain.com/index.cgi?op=testForm;module=Flex_Form");
+ if ($secure_check ne 1) {
+ print $secure_check;
+ }
+
+ -------------------------------------------------------------------------------
+
+ # Medium Security 2 - To get to this area the referer encoding and incoming link encoding must be correct.
+ # 2 - is the action type
+ # 3 -  1 Check Referer encoding, 2 Check link encoding, 3 Check Both, Blank is off
+ # '' - Match this Referer, Blank is off
+
+ my $secure_check = SF_form_secure::x_secure(2, 3, '');
+ if ($secure_check ne 1) {
+ print $secure_check;
+ }
+
+ -------------------------------------------------------------------------------
+
+ # Low Security - To get to this area the incoming link encoding must be correct.
+ # 2 - is the action type
+ # 2 -  1 Check Referer encoding, 2 Check link encoding, 3 Check Both, Blank is off
+ # '' - Match this Referer, Blank is off
+
+ my $secure_check = SF_form_secure::x_secure(2, 2, '');
+ if ($secure_check ne 1) {
+ print $secure_check;
+ }
+
+NOTES
+
+To Provide a uniqe link others can not use
+Format the provided key something like this
+$key = $key . $Member_Name;
+and/or
+use the IP encoding
+the new key format and/or ip encoding will need to be used for all actions
+
+BUGS
+
+some security levels can hirt the search engine ranking of the site.
+
+TODO
+
+None.
+
+AUTHOR
+
+By: Nicholas K. Alberto
+
+This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+Bug reports and comments to sflex@cpan.com.
+
+SEE ALSO
+
+Digest::SHA1, CGI::EncryptForm

@@ -1,0 +1,30 @@
+---
+abstract: 'Sphinx search engine management (start/stop)'
+author:
+  - 'Jon Schutz <jon@jschutz.net>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.143240'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Sphinx-Manager
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Class::Accessor::Fast: '0'
+  File::Spec: '0'
+  FindBin: '0'
+  POSIX: '0'
+  Path::Class: '0'
+  Proc::ProcessTable: '0'
+  Sphinx::Config: '0.09'
+  Test::More: '0'
+version: '0.08'

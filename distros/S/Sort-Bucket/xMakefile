@@ -1,0 +1,28 @@
+#
+# This is the maintainer's Makefile - it is used only to assemble new
+# versions of this module for upload to CPAN.
+#
+# As part of the pre-release checks you will be dropped into ispell - use
+# "i" for insert to accept spellings, so that the new words will be inserted
+# into spellfile.txt.
+#
+
+SPELL ?= ispell -x
+SPELL_FILES = lib/Sort/Bucket.pm lib/Sort/Bucket.xs Build.PL Changes README \
+            src/*.c t/* xt/*
+
+dist: spell clean
+	perl Build.PL
+	./Build manifest
+	./Build dist
+	./Build
+	./Build test
+	./Build test --test_files=xt/*.t
+
+
+clean:
+	rm -rf Build _build blib META.yml Makefile Makefile.PL MANIFEST* \
+		Debian_CPANTS* `find lib -name \*.c -o -name \*.o`
+
+spell:
+	${SPELL} -p spellfile.txt ${SPELL_FILES}

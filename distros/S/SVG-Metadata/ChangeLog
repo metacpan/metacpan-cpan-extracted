@@ -1,0 +1,167 @@
+
+2005-08-20 Bryce
+
+	* Adding a to_hash() routine that returns metadata as a Perl hash
+	
+2005-07-22 Jonadab
+	* Added try_harder() and adjusted parse() to support it.
+	* Made retain_xml() a method, like strict_validation() and try_harder()
+	  For backward compatibility, it is still also settable as an option to parse()
+	* When parse fails, it now returns undef in scalar context or an empty list
+	  in list context -- a false value either way.
+	* Bumped version number to 0.27
+        * The POD for subject() was not strictly accurate before and is now
+	  more accurate, because I changed parse() slightly to do part of
+	  what it says, and also elaborated on the POD to accurately reflect
+	  what to_rdf() does.
+	* Added some comments and fleshed out some more POD while I was tinkering.
+	
+2005-07-20 Jonadab
+	* Use XML::Twig methods instead of hash reference structure.
+	  This eliminates the HASH bug and makes to_svg() work better.
+	* Bumped version number to 0.26
+
+2005-05-30 bryce
+
+	* Incorporating Jonadab's patch to fix metadata preservation.
+
+2005-04-09 Stephen Silver
+
+	* Fix to encode_entities() call to only encode <>&'"
+
+2005-04-09 crschmidt
+
+	* lib/SVG/Metadata.pm:  Fixing tabs, improving RDF generation.
+
+2005-02-07 23:00  bryce
+
+	* lib/SVG/Metadata.pm:  Corrected a few bugs in the printing of
+	  keywords in emitted RDF.  Fixed problem with parsing publisher
+	  information. 
+	* scripts/svg_annotate:  Added -e flag for editing metadata.
+	  Fiddled with how keywords are edited a little.
+
+2004-10-17 23:00  bryce
+
+	* lib/SVG/Metadata.pm:  Switching to use of HTML::Entities
+
+	* scripts/svg_annotate:  For automatically generated titles,
+	  instead of using the first filename for titles of all images, 
+	  use each file's filename.
+
+2004-10-10 12:15  bryce
+
+	* lib/SVG/Metadata.pm:  Adding escaping of <, >, and & for rdf
+
+2004-10-04 21:38  bryce
+
+	* scripts/svg_annotate:  Adding -k,--keywords feature
+
+2004-08-06 00:38  bryce
+
+	* lib/SVG/Metadata, scripts/svg_annotate:  Keywords functionality
+
+2004-06-26 14:39  bryce
+
+	* scripts/: cleanup_clipart, test_it, unpack_clipart,
+	  package_clipart, retrieve_clipart: 
+	  adding some new scripts
+	
+2004-06-24 22:04  bryce
+
+	* lib/SVG/Metadata.pm: Fixing author() breakage
+
+2004-06-23 00:55  bryce
+
+	* lib/SVG/Metadata.pm: Fleshing out docs and hooking up more
+	accessor functions
+
+2004-06-22 23:02  bryce
+
+	* lib/SVG/Metadata.pm: Adding some metadata items and expanding the
+	types of inputs that parse() takes.
+
+2004-06-20 16:41  bryce
+
+	* Makefile.PL, lib/SVG/Metadata.pm, scripts/package_clipart.sh: I
+	found that XML::Twig 3.09 was not up to snuff, so requiring the
+	latest version in Makefile.PL.
+	
+	Also adding backend support for a bunch more metadata fields.  Much
+	of this is just hooks, and the rest of the support is still TBD.
+	
+	Major change is making it accept RDF that is in <metadata> elements
+	(where it is supposed to go, after all.)
+	
+	Minor change is to start shifting from author -> creator.
+	
+	Also fleshed out the packaging script a tad, to help automate
+	processing a little.  Still a work in progress and unlikely to be
+	of use to anyone but myself.
+
+2004-06-19 13:26  bryce
+
+	* scripts/svg_annotate: Testing --delete; adding undef of newline
+
+2004-06-19 13:06  bryce
+
+	* lib/SVG/Metadata.pm, scripts/svg_annotate, t/0.use.t: Adding a
+	test and the --delete feature
+
+2004-06-16 09:07  bryce
+
+	* lib/SVG/Metadata.pm: Upping the rev number
+
+2004-06-16 09:07  bryce
+
+	* MANIFEST, Makefile.PL: Adding the new script to MANIFEST, etc.
+
+2004-06-16 00:20  bryce
+
+	* lib/SVG/Metadata.pm, scripts/svg_annotate, scripts/svg_validate:
+	Adding svg_annotate and augmenting the perl module with ability to
+	print RDF.
+
+2004-06-13 20:59  nemies
+
+	* ChangeLog, Makefile.PL, lib/SVG/Metadata.pm: converted to
+	XML::Twig for namespace sanity.
+
+2004-06-13 20:29  bryce
+
+	* lib/SVG/Metadata.pm, scripts/svg_validate: Adding _owner,
+	separate from _author, for holding the rights info
+
+2004-06-13 19:40  nemies
+
+	* .cvsignore: Adding .cvsignore
+
+2004-06-13 19:28  bryce
+
+	* Makefile.PL, README: Adding README
+
+2004-06-13 19:22  nemies
+
+	* scripts/svg_validate: Whoops, forgot the parse element.
+
+2004-06-13 19:20  nemies
+
+	* scripts/svg_validate: Adding missing "opt_man" and correcting
+	version report
+
+2004-06-13 19:16  bryce
+
+	* MANIFEST, lib/SVG/Metadata.pm, scripts/package_clipart.sh,
+	scripts/svg_validate: Fleshing out documentation, adding
+	commandline options, etc.
+
+2004-06-13 00:04  bryce
+
+	* COPYING, MANIFEST, Makefile.PL, lib/SVG/Metadata.pm,
+	scripts/svg_validate: Initial revision
+
+2004-06-13 00:04  bryce
+
+	* COPYING, MANIFEST, Makefile.PL, lib/SVG/Metadata.pm,
+	scripts/svg_validate: Initial import
+

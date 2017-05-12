@@ -1,0 +1,260 @@
+What Can I Do With Stem?
+
+You should probably ask, "What can't I do with Stem?" :-). Stem is not
+bound by any narrow niche definition since it is a general purpose
+networking toolkit. As such it can be the backbone of almost any
+networked application. On the other hand Stem is designed with standard
+modules that are aimed at specific application niches. Some Stem users
+want a a way to accelerate network application development and others
+want a simple solution to common problems. Stem can satisfy the
+differing needs of both groups.
+
+What Are the Top Stem applications?
+
+The most commonly requested applications of Stem are log management,
+file distribution, monitoring and remote command execution. For more on
+Stem applications see the <A href="/app_niches.html">niches</A> page.
+
+Why Should I Use Stem?
+
+You should use Stem if you are tired of reinventing the wheel for each
+network application you build. Or if you don't want to be forced to rely
+on a commercial monolithic network tool that everyone hates to use. Or
+if you want to dramatically reduce the development and maintenance costs
+of developing your new network applications. Or if you just want to use
+a well designed network system that will make your profession much more
+enjoyable. Please contact us if you want more reasons.
+
+Who Is Using Stem?
+
+Currently we are developing a Stem based log management system for a
+Fortune 500 company. It will watch growing log files on hundreds of
+systems and transfer the new log records to a central system for
+analysis and archiving. This complex system will use standard Stem
+modules and require only a single customized tool that creates the
+configuration files. Another Internet content provider company we are
+talking to is interested in a similar system. We don't know of any
+products that can manage logs over a network as simply and elegantly as
+Stem. 
+
+What Existing Products Does Stem Improve On?
+
+Stem is not a direct improvement of any existing product. Rather it is a
+coherent integration of a range of network services as used by many
+products. Stem did not invent logging, monitoring, process management,
+file transfers, etc, but it has put them together under a simple
+architecture that meets the needs of the technical market.  With Stem,
+solving many common network problems doesn't require any coding at all,
+just simple edits to text-based configuration files. Even when coding
+*is* required, Stem allows you to develop and maintain complex network
+applications much more cheaply and reliably than existing application
+frameworks.
+
+Do I Need To Get Rid Of [Commercial App] To Use Stem?
+
+No, Stem can run in parallel with all of your existing applications. As long
+as Stem can have access to its own TCP ports (which can be configured to
+any available ones), it has no need to conflict with any of your current
+systems.
+
+What is a Stem Hub?
+
+A Stem Hub is a single Perl process running Stem. It can function as a
+complete stand-alone application or be connected to other Stem Hubs in a
+networked application. Stem Hubs contain the Stem core system and Stem
+Cells that have been created by configuration files. For more on this
+read the <A href="/tech_notes/arch_notes.html">arch_notes</A> document
+or find it in the Design directory of the tarball.
+
+What is a Stem Cell?
+
+A Stem Cell is a Perl object which has to have 3 major characteristics:
+
+	1. It has been registered as a Cell in this Hub with a cell name
+	   and an optional target name.
+
+	2. It has to have a set of methods designated to handle messages
+	   directed at the Cell.
+
+	3. It has to be able to send messages to other cells.
+
+What is a Stem Message?
+
+Stem Messages carry commands and data between Stem Cells. They are
+addressed with a Hub/Cell/Target triplet. Messages can be any one of a
+wide range of types including command, data, log, stderr etc. They can
+carry any form of data to a maximum (to be designated later) size. See
+<A /tech_notes/message_notes.html">message_notes</A> document for more.
+
+How Hard Is Stem To Install/Configure?
+
+Stem is very easy to install. It only requires Perl 5.005_03 and one
+code module Event.pm that you can get from CPAN. The rest of Stem is
+comprised of pure Perl modules which need no special installation
+handling. Read the INSTALL document for more on how to
+install it. The quickstart instruction is simply to cd to the stem
+download directory and say
+./install.pl
+
+Much more on this can be found in the <A
+href="/tech_notes/design_notes.html">config_notes</A> document or in
+the Design directory of the tarball.
+
+Can Stem Do Guaranteed Messaging?
+
+*Stem's core design does not directly support guaranteed message
+delivery. It was designed this way, as the technical market that Stem
+targets does not have that strong a requirement for this feature as the
+commercial/e-business markets have. Future releases of Stem will support
+guaranteed delivery via a separate module that is now under development.
+
+Does Stem Use XML?
+
+Stem's messages are designed to not be specific to any format or
+encoding. They can carry data structure in any format the designer wants
+including XML. In fact, the message itself can also be in any format as
+long as it is properly identified and a module to decode that format is
+installed. Currently only the Stem internal message format is used but
+as demand arises, other message formats, including XML will be
+supported. One longer term goal is that message formats from many other
+systems will be supported by gateway modules which will translate
+between Stem and external messages.
+
+What Kind Of Security Does Stem Use?
+
+Stem doesn't directly do authentication and secure transmissions. Rather
+it relies upon industry standard utilities such as SSL, ssh and stunnel to
+provide secure socket connections between Stem hubs (processes).
+
+Can Stem Do Central Configuration Management?
+
+The log management project under development has this requirement. The
+lists of log files on each system that need to be monitored are
+maintained on the central system. Configuration files are auto-generated
+from those lists and distributed to all the Stem hubs in this network
+application. The same mechanism can be used to distribute configuration
+files for other applications and Stem can also notify them to reload the
+new files.
+
+Can Stem Handle My Content Distribution?
+
+Distributing content is similar to distributing configuration files and
+will use the same mechanisms. What content is distributed to where can
+all be easily controlled by Stem configurations without any additional
+programming.
+
+Can I Extend Stem Myself To Suit Our Needs?
+
+Stem is designed to be modified and extended very easily. You can copy
+existing modules or use design ideas from them to created new Cells for
+your own needs.  The high level Cell API hides the complexities of
+network communication and message transfer, leaving you free to focus on
+the specific design and coding of your custom Cells.
+
+Should I Modify Stem On My Own Or Use Stem's Development Team?
+
+If your requirements are simple, and you have skilled staff to do the
+work, there's no reason not to develop and maintain your own Stem-based
+systems. If your applications are complex applications, your staff new
+to Stem, or your time-frame short, you will probably find it more
+cost-effective to let Stem Systems' expert team develop your system for
+you.
+
+Otherwise Stem Systems can assist you in the design, development and
+configuration of your application. How much assistance can be provided
+depends on the customer subscription deal and any other contracts. If
+you do not have a subscription, our support will be limited to bug fixes
+and email and you will have to maintain your modified code on your own.
+
+Which Operating Systems Support Stem?
+
+Stem runs without any modification under any Unix flavor (Solaris,
+Linux, FreeBSD, etc.)  Support for WinX is in the planning stage and is
+expected to be released in Q3 2002. 
+
+How Can I Contribute to Stem?
+
+What Does Stem's Open Source License Allow Me To do?
+
+Is Stem Open Source?
+
+We are happy to announce that as of version 0.06, Stem is now under
+the GPL.
+
+What Is Stem Systems?
+
+Stem Systems is the company which is developing and maintaining Stem. It
+owns the copyright to the Stem code base and is releasing it to its
+customers and the open source community. Stem Systems also sells support
+subscriptions to the Stem user community.
+
+What Is the Business Model Of Stem Systems?
+
+Stem itself is free to use. Users can buy support subscriptions from
+Stem Systems which include Stem configuration and development
+assistance. Subscribers get earlier access to releases of new Stem
+versions and modules and direct support from Stem's development team.
+
+How Much Does a Stem Subscription Cost?
+
+The base price is an annual fee of $300 for each computer system (box)
+which is running Stem. Volume, site and educational discounts are
+available.
+
+Who Are Your Technical Advisors?
+
+
+
+What Are Your Resources?
+
+How Can I Learn Stem?
+
+The best way right now is to start with the technical notes and get a
+basic understanding of Stem, its architecture and its nomenclature. Then
+run the various demo scripts and read their configuration files.
+Developers will go next to the Cell documentation which describes each
+Cell's function, their attributes and how to configure it. There are no
+training materials now, but we are discussing the creation of classes
+with a training firm for when the demand arises.
+
+What Is the Future Of Stem?
+
+Stem will constantly be growing it Cell library and adding support for
+new features. Whenever any repeated networked operation can be
+identified, Stem will create a Stem Cell to perform it. Then Stem's
+users can easily integrate that new Cell without programming or needing
+to reinvent that wheel.
+
+Who Created Stem?
+
+Stem was created by Uri Guttman, and is the culmination of his long
+career in systems architecture and development. He has combined a
+quarter century of experience designing and implementing event-driven
+systems with his love of Perl to produce a powerful, yet easy-to-use
+framework for network applications. For more on Stem's creator, see the
+Stem Team biographies.
+
+How (and why) was Stem conceived?
+
+Stem was created when its designer was contracted to a network
+application development group where they were constantly putting out
+fires and creating a massive ad hoc system.  It was clear that they
+needed a framework to give structure to their network application
+design. Stem was the result.
+
+What Does Stem Stand For?
+
+Stem is not an acronym or an abbreviation, rather it is named from the
+real word 'stem' which has several dictionary meanings that map well to Stem.
+
+v. tr.
+  1.  To stop or hold back by or as if by damming; as in "stem the tide"
+
+n.
+  1. A slender stalk supporting or connecting another plant part, such
+     as a leaf or flower.
+  2. A connecting or supporting part.
+
+n.
+  1. A line of ancestry : STOCK; especially : a fundamental line from
+     which others have arisen. as in "stem cell" in biology.

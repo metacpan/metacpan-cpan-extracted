@@ -1,0 +1,20 @@
+Revision history for String-InterpolatedVariables
+
+v1.1.0  2017-03-22
+        - Relicensed under Perl 5 terms.
+
+v1.0.4  2014-04-19
+        - Fix "package version matches dist version" for CPANTS.
+
+v1.0.3  2014-04-17
+        - Fix license declared in meta files.
+
+v1.0.2  2014-04-12
+        - Add missing dependency (GH-1).
+
+v1.0.1  2014-03-29
+        - Fix typos and clean up documentation.
+
+v1.0.0  2014-03-29
+        - Extracted distribution from
+          Perl::Critic::Policy::ValuesAndExpressions::PreventSQLInjection.

@@ -1,0 +1,206 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Simple::IPInfo - Get IP/IPList Info (location, as number, etc)
+
+给定IP列表，查对应的区域信息，或AS号
+
+=head1 SYNOPSIS
+
+    use Simple::IPInfo;
+    use Data::Dumper;
+    use utf8;
+
+    my $rr_loc = get_ip_loc([ [ '202.38.64.10'], ['202.96.196.33'] ]);
+    my $inet_rr_loc = get_ip_loc([ ['3395339297'], ['3391504394'] ]);
+    print Dumper($rr_loc, $inet_rr_loc);
+
+    my $rr_asn = get_ip_as([ [ '202.38.64.10'], ['202.96.196.33'] ], reserve_inet=>1);
+    print Dumper($rr_asn);
+
+    my $arr = [ [qw/202.38.64.10 xxx/], [qw/8.8.8.8 yyy/], ];
+    my $r = get_ipinfo(
+        $arr, 
+        i => 0,
+        write_file => '02.ip_loc.csv', 
+        sep => ',', 
+        charset         => 'utf8',
+        return_arrayref => 1,
+        ipinfo_names    => [qw/country area isp country_code area_code isp_code/],
+        write_head => [qw/ip some country area isp country_code area_code isp_code/ ], 
+    );
+    print Dumper($r);
+
+=head1 DESCRIPTION
+
+    default ip as data: ftp://routeviews.org/dnszones/originas.bz2
+
+    default ip location data: http://ip.taobao.com
+
+    use iso 3166 country_code, subdivision_1 code, isp shortcut name
+
+=head1 METHOD
+
+=head2 get_ip_loc
+
+get ip location, with country, area, isp, country_code, area_code, isp_code
+
+返回IP区域信息，包括国家、省份、运营商，及其英文iso3166编号
+
+=head2 get_ip_as
+
+get ip as number
+
+返回IP的AS号
+
+=head2 get_ipinfo
+
+get ip info, with specified ipinfo_file 
+
+
+=head2  iterate_ipinfo
+
+add ipinfo to inet-sorted arrayref, for large file
+
+Note that, lines are inet-sorted
+
+    use Simple::IPInfo;
+    use Data::Dumper;
+
+    my $arr = [ [qw/8.8.8.8 yyy/], [qw/202.38.64.10 xxx/], ];
+
+    my $r = iterate_ipinfo(
+        $arr,  # or some big inet-sorted file : $big_inet_sorted_csv, 
+        i => 0,
+        write_file => '02.ip_loc.csv', 
+        sep => ',', 
+        charset         => 'utf8',
+        return_arrayref => 1,
+        ipinfo_names    => [qw/country area isp country_code area_code isp_code/],
+        write_head => [qw/ip some country area isp country_code area_code isp_code/ ], 
+    );
+    print Dumper($r);
+
+    my $inet_arr = [['3391504394' , 'ceshi'], [ '3395339297', 'test'], ];
+    my $r = iterate_ipinfo(
+        $inet_arr, 
+        i=>0,
+        write_file => '02.inet_loc.csv', 
+        sep => ',', 
+        charset         => 'utf8',
+        return_arrayref => 1,
+        ipinfo_names    => [qw/country area isp country_code area_code isp_code/],
+        write_head => [qw/inet some country area isp country_code area_code isp_code/ ], 
+    );
+    print Dumper($r);
+
+=head1 ATTR
+
+=head2 DEBUG
+
+set $Simple::IPInfo::DEBUG = 1  for more details
+
+=head1 BIN
+
+csv is in xt/ directory
+
+=head2 add_inet.pl
+
+    $ add_inet.pl -f 02.ip_raw.csv -i 0 -d 02.ip_inet.csv
+    $ sort -t, -k3 -n 02.ip_inet.csv > 02.ip_inet.sort.csv
+
+=head2 add_ip_info.pl
+
+    $ add_ip_info.pl -f 02.ip_inet.sort.csv -d 02.add_ip_info.csv -i 0 -t loc
+
+    -f : source file 源文件, inet-sorted
+    -d : dest file 目标文件
+    -i : ip is in cloumn x, ip在第x列
+    -H : skip head or not，default is 0 (not skip) 默认不跳过首行
+    -t : loc or as, default is loc；添加信息类型，默认是加loc信息，也可指定为as
+    -s : sep character, default is ',' 默认分隔符为逗号
+
+=head2 make_inet_from_cidr.pl
+
+make_inet_from_cidr.pl [src_file] [dst_file]
+
+    $ pip install csvkit
+    $ cd xt/data/
+
+    $ csvcut -c network,isp,autonomous_system_number isp_cidr.csv > isp_cidr.csv.cut
+    $ make_inet_from_cidr.pl isp_cidr.csv.cut isp_inet.csv
+
+    $ csvcut -c network,geoname_id city_blocks_ipv4.csv > city_blocks_ipv4.csv.cut
+    $ csvcut -c geoname_id,country_iso_code,subdivision_1_iso_code,country_name,subdivision_1_name city_locations_zh-CN.csv > city_locations_zh-CN.csv.cut
+    $ csvjoin -c geoname_id city_blocks_ipv4.csv.cut city_locations_zh-CN.csv.cut |csvcut -C geoname_id > city_cidr.csv
+    $ make_inet_from_cidr.pl city_cidr.csv city_inet.csv
+
+=head2 refine_inet.pl
+
+refine_inet.pl [src_file] [dst_file]
+
+src_file's inet is sorted by csvsort
+
+    $ csvsort isp_inet.csv > isp_inet.csv.sort
+    $ refine_inet.pl isp_inet.csv.sort isp_inet.csv.sort.refine
+
+    $ csvsort city_inet.csv > city_inet.csv.sort
+    $ refine_inet.pl city_inet.csv.sort city_inet.csv.sort.refine
+
+=head2 merge_inet.pl 
+
+merge_inet.pl [src_inet_file1] [src_inet_file2] [dst_merge_file]
+
+    $ merge_inet.pl city_inet.csv.sort.refine isp_inet.csv.sort.refine merge_city_isp_inet.csv
+
+=head1 XBIN
+
+install: curl bunzip2 tar
+
+=head2 get ip as data from routeviews.org
+    
+    $ perl gen_inet_as.pl inet_as.csv
+
+=head2 get ip loc from taobao
+
+1) init data dir, and send ip query to taobao
+
+    ask_ip_loc_init.pl
+    ask_ip_loc.pl
+
+2) merge data/*.csv to ip_loc_taobao.csv , tidy it, update old ip_loc.csv
+
+    $ perl ip_loc_taobao.pl
+    $ perl ip_loc_tidy.pl ip_loc_taobao.csv ip_loc_taobao.tidy.csv
+    $ perl ip_loc_update.pl ip_loc.csv ip_loc_taobao.tidy.csv ip_loc_update.csv
+
+3) guess loc from as, update , write new ip_loc.csv
+
+    $ perl ip_loc_from_as.pl ip_loc_update.csv ip_loc_from_as.csv
+    $ perl ip_loc_update.pl ip_loc_update.csv ip_loc_from_as.csv ip_loc.csv
+
+4) map into inet file, and refine inet_loc_src.csv 
+
+    $ make_inet_from_cidr.pl ip_loc.csv inet_loc_raw.csv 'ip,country,area,isp'
+    $ refine_inet.pl inet_loc_raw.csv inet_loc_src.csv
+
+5) add iso_3166 code for inet_loc_src.csv, use merge_file.pl from SimpleR::Reshape 
+
+inet_loc_src.csv : s, e , country, area, isp 
+
+inet_loc.csv : s, e , country, area, isp , country_code, area_code, isp_code
+
+    $ merge_file.pl -f country.csv -k 1 -v 0 -F inet_loc_src.csv -K 2 -o inet_loc.csv.c
+    $ merge_file.pl -f country_area.csv -k 0,3 -v 1 -F inet_loc.csv.c -K 5,3 -o inet_loc.csv.p
+    $ merge_file.pl -f country_isp.csv -k 0,3 -v 1 -F inet_loc.csv.p -K 5,4 -o inet_loc.csv
+
+=head1 AUTHOR
+
+Abby Pan <abbypan@gmail.com>
+
+Thanks to Gabor Szabo <szabgab@gmail.com>, Neil Bowers <neil@bowers.com>
+
+=cut

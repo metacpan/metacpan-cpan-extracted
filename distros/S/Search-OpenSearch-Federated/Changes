@@ -1,0 +1,28 @@
+Revision history for Search-OpenSearch-Federated
+
+0.007 23 July 2014
+ - replace old init() method with defaults on 'has' definitions
+
+0.006 11 May 2014
+ - switch to Moo in support of Search::Tools 1.000
+
+0.005 18 June 2013
+ - add subtotals()
+ - add facets()
+
+0.004 6 May 2013
+ - add debugging help
+ - add normalize_scores() feature
+
+0.003 30 April 2013
+ - fix pod SYNOPSIS for old class name
+ - make SOF a subclass of Search::Tools::Object and define real accessor
+   methods
+
+0.002 18 March 2013
+ - better error checking when a URL returns zero results
+ - add missing dependences to Makefile.PL
+
+0.001 8 March 2013
+ - initial release
+

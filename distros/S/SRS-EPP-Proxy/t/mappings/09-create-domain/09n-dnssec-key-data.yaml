@@ -1,0 +1,28 @@
+# Create with dns sec key data values, which are not supported
+template: create-domain.tt
+
+vars:
+  domain: 09n.co.te
+  owner: id123
+  dnssec:
+    -
+        is_key_data: 1
+        flags: 1
+        alg: 5
+        protocol: 1
+        pub_key: 1234abcd11111111111111111111111111111111
+    -
+        is_key_data: 1
+        flags: 1
+        alg: 5
+        protocol: 1
+        pub_key: 1234abcd11111111111111111111111111111111
+
+input_assertions:
+  class: SRS::EPP::Command::Create::Domain
+
+output_assertions:
+  count:
+  match:
+  attr_is:
+    - [ '//epp:result', 'code', '2306', 'SRS: Check result code' ]

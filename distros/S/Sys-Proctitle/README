@@ -1,0 +1,76 @@
+NAME
+    Sys::Proctitle - modify proctitle on Linux
+
+SYNOPSIS
+      use Sys::Proctitle qw/:all/;
+      setproctitle( "my new title" );
+      setproctitle( qw/my new title/ );
+      $s=getproctitle;
+
+     or
+
+      {
+        # set proctitle while in block
+        my $proctitle=Sys::Proctitle->new( 'my new title' );
+        ...
+      }
+
+INSTALLATION
+     perl Makefile.PL
+     make
+     make test
+     make install
+
+DEPENDENCIES
+    *   This module works only on linux.
+
+    *   perl 5.8.0
+
+DESCRIPTION
+    "Sys::Proctitle" provides an interface for setting the process title
+    shown by "ps", "top" or similar tools on Linux. Why do we need this? One
+    could simply change $0 to achieve the same result. Well, first setting
+    $0 did not work with 5.8.0. Further, setting $0 won't work with
+    mod_perl.
+
+  Procedural Interface
+    *setproctitle( arg1, arg2, ... argN )*
+        all arguments are joined with "\0". The resulting string is set as
+        process title.
+
+    *getproctitle()*
+        returns the current process title. On Linux the space useable as
+        process title consists of the original space for argv the process
+        was executed with plus the space of the original environment. This
+        function returns the current content of this buffer.
+
+        The length of the returned string is the maximum process title
+        length.
+
+  Object Interface
+    *new( arg1, arg2, ... argN )*
+        the current process title is saved. Then the arguments are passed to
+        "setproctitle".
+
+    *DESTROY()*
+        restores the saved process title.
+
+EXPORT
+    None by default.
+
+    On demand "setproctitle" and "getproctitle" are exported.
+
+    The ":all" Exporter tag exports "setproctitle" and "getproctitle".
+
+SEE ALSO
+    Apache::ShowStatus
+
+AUTHOR
+    Torsten Foertsch, <torsten.foertsch@gmx.net>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2004 by Torsten Foertsch
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,9 @@
+Build.PL
+Changes
+lib/Statistics/Welford.pm
+MANIFEST			This list of files
+t/functions.t
+t/pod.t
+t/pod_coverage.t
+Makefile.PL
+META.yml

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+  <xsd:element name="content_types">
+    <xsd:complexType>
+      <xsd:all>
+        <xsd:element name="content_type" minOccurs="0" maxOccurs="unbounded">
+          <xsd:complexType>
+            <xsd:attribute name="name" type="xsd:string" use="required"/>
+            <xsd:attribute name="description" type="xsd:string" use="required"/>
+            <xsd:attribute name="icon" type="xsd:string" use="required"/>
+            <xsd:all>
+              <xsd:element name="synonyms" minOccurs="1" maxOccurs="1">
+                <xsd:complexType>
+                  <xsd:element name="synonym" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:complexType>
+              </xsd:element>
+              <xsd:element name="extensions" minOccurs="1" maxOccurs="1">
+                <xsd:complexType>
+                  <xsd:element name="extension" type="xsd:string" minOccurs="0" maxOccurs="unbounded">
+                    <xsd:complexType>
+                      <xsd:attribute name="default" use="optional">
+                        <xsd:restriction base="xsd:integer">
+                          <xsd:enumeration value="0" />
+                          <xsd:enumeration value="1" />
+                        </xsd:restriction>
+                      </xsd:attribute>
+                    </xsd:complexType>
+                  </xsd:element>
+                </xsd:complexType>
+              </xsd:element>
+            </xsd:all>  
+          </xsd:complexType>
+        </xsd:element>
+      </xsd:all>
+    </xsd:complexType>
+  </xsd:element> 
+   
+</xsd:schema>  

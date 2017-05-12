@@ -1,0 +1,32 @@
+CHANGES
+-------
+
+0.06  Sun, 09 Dec 2012 14:55:26 -0600
+    - Fix type sizes in XS  code for AMD64 compatibility
+    - Removed dependency on h2ph converted headers in  t/110_constants.t
+    - Fixed hanging behavior in t/200_strace.t
+    - Removed obsolete RPM spec file generation logic
+
+0.05  Mon Nov 30 12:00:00 2001
+	- Added t/200_strace.t for an
+	  actual test using PTRACE_SYSCALL
+
+0.04  Mon Nov 30 11:00:00 2001
+	- Added README to MANIFEST
+	- Copied association constants from /usr/include/sys/ptrace.h
+	- Avoid hard coded hacky require "ptrace.ph" stuff.
+	- Fix spewage for test suite.
+
+0.03  Mon Nov 26 16:36:00 2001
+	- Allow lower level arguments
+	- PTRACE_PEEK* data return hack
+        - Removed AutoLoad stuff
+	- Added rpm spec file
+	- Better test suite
+
+0.02  Mon Nov 26 16:13:00 2001
+	- Created by h2xs 1.20 by running the following:
+	  "h2xs sys::ptrace"
+	- Renamed all "sys::ptrace" to "Sys::Ptrace"
+	  to conform better to perl style
+	- Added a ptrace interface to Ptrace.xs

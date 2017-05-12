@@ -1,0 +1,191 @@
+--- #YAML:1.0
+# ---------------------------------------------------------------
+# This file is in the YAML data serialization format.  To parse
+# this file, use the Perl module `YAML', available via CPAN:
+# <URL:http://search.cpan.org/perldoc?YAML>.
+# For more information on YAML, see <URL:http://www.yaml.org/>.
+# ---------------------------------------------------------------
+# The data in this file is based on information from The Library
+# of Congress's Web site:
+# <URL:http://lcweb.loc.gov/z3950/agency/resources/testport.html>
+#
+# NOTE: The first service listed is taken as the default for
+# testing purposes.
+#
+# WARNING: I've only tested this data using the Library of
+# Congress Z39.50 service.  Other services will probably fail
+# unless you change their information manually.
+# ---------------------------------------------------------------
+- name:           Library of Congress
+  abbrev:         loc
+  location:       Washington, DC, USA
+  host:           z3950.loc.gov
+  port:           7090
+  databaseName:   Voyager
+  querytype:      prefix
+  elementSetName: F
+  preferredRecordSyntax: 19
+  # 19 = USMARC
+  logic_types: &stdlogictypes
+    and:
+      templates:
+        prefix:   '@and %s %s'
+        ccl:      '%s and %s'
+        ccl2rpn:  '%s and %s'
+    or:
+      templates:
+        prefix:   '@or %s %s'
+        ccl:      '%s or %s'
+        ccl2rpn:  '%s or %s'
+  search_types: &stdsearchtypes
+    - name: isbn
+      multiple: 0
+      templates:
+        prefix: '@attr 1=7 @attr 4=1 "%s"'
+    - name: title
+      multiple: 0
+      templates:
+        prefix: '@attr 1=4 @attr 4=1 "%s"'
+    - name: author
+      multiple: 0
+      templates:
+        prefix: '@attr 1=1003 @attr 4=1 "%s"'
+    - name: issn
+      multiple: 0
+      templates:
+        prefix: '@attr 1=8 @attr 4=1 "%s"'
+  searches: &stdsearches
+     # Searches that must return 1 or more records
+     - &hobbit
+       name:   Title search
+       type:   title
+       string: Hobbit
+     - &hitchhiker
+       name:   ISBN search
+       type:   isbn
+       string: 1878956000
+     - &harpers
+       name:   ISSN search
+       type:   issn
+       string: 0017-789X
+- name:           University of Southern California
+  abbrev:         usc
+  location:       California, USA
+  host:           library.usc.edu
+  port:           2200
+  databaseName:   unicorn
+  querytype:      prefix
+  elementSetName: F
+  preferredRecordSyntax: 19
+  logic_types:    *stdlogictypes
+  search_types:   *stdsearchtypes
+  searches:       *stdsearches
+- name:           Universidad de los Andes
+  abbrev:         uandes
+  location:       Merida, Venezuela
+  host:           bolivar.hacer.ula.ve
+  port:           9999
+  databaseName:   bolivar
+  querytype:      prefix
+  elementSetName: F
+  preferredRecordSyntax: 19
+  logic_types:    *stdlogictypes
+  search_types:   *stdsearchtypes
+  searches:       *stdsearches
+- name:           TeraText Database System
+  abbrev:         tera
+  location:       Melbourne, Australia
+  host:           z3950.inquirion.com
+  port:           210
+  databaseName:   Marc
+  querytype:      prefix
+  elementSetName: F
+  preferredRecordSyntax: 19
+  logic_types:    *stdlogictypes
+  search_types:   *stdsearchtypes
+  searches:       *stdsearches
+- name:           Cosmotron Test Server
+  abbrev:         cosmo
+  location:       Bratislava, Slovakia
+  host:           rlw.savba.sk
+  port:           8888
+  databaseName:   test_un_cat
+  querytype:      prefix
+  elementSetName: F
+  preferredRecordSyntax: 19
+  logic_types:    *stdlogictypes
+  search_types:   *stdsearchtypes
+  searches:       *stdsearches
+- name:           Lucent Technologies Library Network
+  abbrev:         lucent
+  location:       New Jersey, USA
+  host:           z3950.bell-labs.com
+  port:           210
+  databaseName:   books
+  querytype:      prefix
+  elementSetName: F
+  preferredRecordSyntax: 19
+  logic_types:    *stdlogictypes
+  search_types:   *stdsearchtypes
+  searches:       *stdsearches
+- name:           COPAC
+  abbrev:         copac
+  location:       Manchester, UK
+  host:           z3950.copac.ac.uk
+  port:           2020
+  databaseName:   xxdefault
+  querytype:      prefix
+  elementSetName: F
+  preferredRecordSyntax: 19
+  logic_types:    *stdlogictypes
+  search_types:   *stdsearchtypes
+  searches:       *stdsearches
+- name:           OCLC First Search
+  abbrev:         wcat
+  location:       Ohio, USA
+  host:           tikal.dev.oclc.org
+  port:           210
+  databaseName:   WorldCat
+  querytype:      prefix
+  elementSetName: F
+  preferredRecordSyntax: 19
+  logic_types:    *stdlogictypes
+  search_types:   *stdsearchtypes
+  searches:       *stdsearches
+- name:           CNR-IEI/CNUCE
+  abbrev:         cnuce
+  location:       Pisa, Italy
+  host:           bibli.iei.pi.cnr.it
+  port:           2100
+  databaseName:   IEI-Books
+  querytype:      prefix
+  elementSetName: F
+  preferredRecordSyntax: 19
+  logic_types:    *stdlogictypes
+  search_types:   *stdsearchtypes
+  searches:       *stdsearches
+- name:           Universite catholique de Louvain
+  abbrev:         louvain
+  location:       Louvain-la-Neuve, Belgium
+  host:           bib.sia.ucl.ac.be
+  port:           3520
+  user:           guest
+  password:       guest
+  databaseName:   DEFAULT
+  querytype:      prefix
+  elementSetName: F
+  preferredRecordSyntax: 19
+  logic_types:    *stdlogictypes
+  search_types:   *stdsearchtypes
+  searches:       *stdsearches
+- name:           Florida SUS Library catalogs
+  abbrev:         fsu
+  location:       Florida, USA
+  host:           fc1n01e.fcla.edu
+  port:           210
+  databaseName:   FS
+  querytype:      prefix
+  elementSetName: F
+  preferredRecordSyntax: 19
+  logic_types:    *stdlogictypes
+  search_types:   *stdsearchtypes

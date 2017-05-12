@@ -1,0 +1,215 @@
+Revision history for Perl extension Set::Array.
+
+0.30  Wed Sep 18 09:21:00 2013
+	- No code changes.
+	- Add t/intersection.*.pl as part of the expanded discussion of methods such as intersection().
+		This code was developed in conjunction with Joern Behre, to help clear up confusion over
+		the issue of the uniqueness of items returned from various methods.
+	- Add an FAQ with an item discussing this issue.
+	- Expand the discussion of overloaded operators to recommend testing of the output of various methods
+		before production use, and that unique() may need to be called, since unique() is not called
+		automatically during a call to, say, intersection().
+	- Include docs for bag(), difference(), intersection(), is_equal() and not_equal() explicitly among
+		all other methods, besides their original mention under 'OVERLOADED (COMPARISON) OPERATORS'.
+	- Include docs for new() as well.
+
+0.29  Wed Jul  3 16:20:00 2013
+	- No code changes.
+	- Rename CHANGES to Changes as per CPAN::Changes::SPEC.
+	- Recreate META.* files so they say licence is artistic_2 rather than artistic_1.
+		Build.PL and Makefile.PL already said artistic_2, but the META.* files didn't.
+		There is no reference to licences in the source of the module itself.
+		This was requested by Christopher Meng who packages stuff for Fedora.
+
+0.28  Wed Dec 19 08:50:00 2012
+	- Extend fix for RT#81971 to add ^ in the regexps used in index() and rindex(), so they are now
+		/^\Q$value\E$/ and not just /\Q$value\E$/. This issue was also reported by Henrik Hald Nørgaard.
+	- Update docs for rindex() is say undef is returned - as with index() - if the value is not found.
+	- Extend t/rt.81971.t to check rindex() returns undef when searching for the suffix of a value.
+
+0.27  Sat Dec 15 07:19:00 2012
+	- Fix RT#81971, kindly reported by Henrik Hald Nørgaard.
+		When special chars, as used in regexps, are set members, or used to find set members, they
+		must be quoted with \Q$value\E inside regexps.
+		This fix was applied to count(), delete(), exists(), index() and rindex().
+	- Add t/rt.81971.t to exercise the new code.
+	- While examining the code for this fix, I found a couple of other bugs: In index() and rindex(),
+		the value searched for was compared with each set member using this regexp, /$value/,
+		instead of this regexp, /$value$/. The missing, trailing, $ meant that the member could match just
+		the prefix of $value, rather than match the value exactly. So in those 2 methods the tests are now
+		/\Q$value\E$/. The other 3 methods mentioned above already used /$value$/.
+
+0.26  Thu Mar 22 10:50:00 2012
+	- No code changes.
+	- Expand the sample code and comments under difference() to show more clearly what sets get
+		changed during operations, and to show another way of determining the difference between sets.
+
+0.25  Fri Mar  9 16:58:00 2012
+	- Add Try::Tiny to pre-reqs. Add attributes, overload, strict, subs and warnings too.
+
+0.24  Wed Mar  7 11:52:00 2012
+	- Due to bugs in Want's want('OBJECT') and wantref(), I used Try::Tiny to capture a call to want('OBJECT') in sub difference().
+	  If an error is thrown, I just ignore it. So, to get what's probably the expected result, see the sample code in the docs for difference().
+	  To this end, I've added an explicit section (=head2) in the docs for difference().
+	- Ship the sample code as t/difference.pl.
+
+0.23  Tue Feb 15 15:03:00 2011
+	- Replace /usr/bin/perl with /usr/bin/env perl.
+	- Replace common::sense with use strict and use warnings, to get uninit var warnings.
+	- Add MYMETA.json to MANIFEST.SKIP.
+	- Update META.yml.
+	- Add META.json to distro.
+
+0.22  Thu Dec  9 19:58:00 2010
+	- Rewrite the docs for compact(), delete(), duplicates(), reverse(), sort() and unique(),
+		after email discussions with belg4mit. See RT#63543.
+	- Expand t/test.t with specific tests for unique() in scalar, list and chained context.
+
+0.21  Fri Dec  3 11:26:00 2010
+	- Implement, document and test cpop() and cshift(), as suggested by Jerrad Pierce. See RT#63543.
+	- Patch print() to call CORE::print explicitly.
+	- Remove version check test from t/test.t.
+
+0.20  Wed Feb 10 13:53:02 2010
+	- Add META.yml. Update MANIFEST.SKIP. Add MANIFEST and MYMETA.yml.
+	- Change version # is t/test.t.
+
+0.19  Fri Nov 13 13:20:00 2009
+	- Run dos2unix
+	- Rename Changes.txt to CHANGES
+
+0.18  Wed Nov  5 09:45:00 2008
+	  - Patch sub indices() to accept more than 1 digit at each end of the range.
+	  	Hence not just '0..9', but now '0..99', '0..99999', etc are all supported.
+		Thanx to Georg Kipka for pointing out this problem
+	  - I (Ron) found the same problem in the code for sub fill(). Also, the docs for
+		fill() mistakenly used '3-5' as an example, instead of '3..5'
+	  - Clean up the documentation generally, particularly the as_hash() method
+	  - Document that the to_hash() method is an alias for as_hash()
+	  - Document that the symm_diff() method is an alias for symmetric_difference()
+	  - Fix documentation for join($string), which used to say join($char)
+	  - Add new tests for as_hash(), fill() and indices()
+	  - Add Test::Deep to Build.PL and Makefile.PL, to support new tests for as_hash()
+
+0.17  Fri Jul 25 09:40:00 2008
+	  - Patch sub intersection again to properly handle 0 as a member of a set
+
+0.16  Fri Jul 25 09:28:00 2008
+	  - Arrrrgggggghhhhh. Patch t/test.t, to change the version number
+
+0.15  Tue Jul 22 10:55:00 2008
+	  - Patch sub intersection to fix RT#29871. Add corresponding test
+	  - Rename Changes to Changes.txt to match my other modules
+	  - Add Changelog.ini
+
+0.14  Mon Apr 10 19:51:00 2006
+	- Fix test which used a hard-coded version number
+
+0.13  Sun Apr 09 13:58:00 2006
+	- Incorporate the patch supplied by Marke, with thanks. Now the method 'difference' returns
+		the objects in the difference, and not the stingified versions of those objects.
+		Also, Marke's test has been added to test.t.
+		Note: The undocument method 'complement' has not been updated. Email me suggestions if
+		o You know exactly what it ought to do
+		o How it differs from calling 'difference' with the $reversed flag set
+
+0.12  Mon Jan 10 16:10:00 2005
+	- Switch maintainers from the original author Daniel Berger to Ron Savage
+	- Switch primary build method to Module::Build by adding a Build.PL, and update Makefile.PL
+	- Patch subs intersection() and symmetric_difference() so they handle values == 0, which means
+		they now work for array indexes
+	- Patch sub flatten() to stop warnings like:
+		Using an array as a reference is deprecated at ... Array.pm line 227
+	- Clean up a couple of tests to make them run cleanly
+	- Add a final test for handling 0
+	- Add a POD test
+	- Put tests in t/
+
+0.11  Wed Feb 02 07:01:00 2004
+        - Fixed bug in exists() method.  Thanks go to Rob Kinyon for the spot and
+          the fix.
+        - Fixed bug in the count() method.
+        - Fixed bug in the delete() method.
+        - Added a to_hash() alias for the as_hash() method.
+        - Added more tests
+
+0.10  Sun Jul 28 20:46:00 2002
+        - Added 'duplicates()' method
+	- Added a 'sym_diff' alias for the 'symmetric_difference()' method.
+	- Added a 'contains' alias for the 'exists()' method.
+	- A few of the overloaded methods did not behave consistently with the
+	  rest of the module when it came to void calling context.  This has
+	  been fixed.
+        - Removed a debug print statement that had been inadvertently left in
+	  the 'symmetric_difference()' method.  Oops.  Thanks to Martin
+	  Krzywinski for the spot.
+        - This file has been changed to show the most recent changes on the
+	  top of the page. :)
+        - Minor POD fixes
+
+0.09  Fri Jun 21 11:22:00 2002
+        - bag() method calling context issue fixed
+        - The intersection() method (taken from the Cookbook) was broken.
+	  It has been fixed.  Thanks to James Keenan for the spot.
+	- Some minor POD fixes.
+
+0.08  Fri Dec 21 09:00:00 2001
+        - Modified 'is_equal' and 'not_equal' to deal with undef values
+        - Stricter error checking in 'foreach' method
+        - Added 'impose()' method
+        - Added 'pack()' method
+        - Added 'rindex()' method
+        - Added the beginnings of a test suite
+        - Fixed a major bug in the 'delete_at()' method (oops)
+        - Renamed 'empty()' method to 'is_empty()'
+
+0.07  Tue Nov 27 09:00:00 2001
+        - Added the 'set()' method.  Thanks to Steffen Muller for the idea.
+        - Created an alias called 'get()' for the 'indices()' method.
+        - Fixed several methods that weren't handling '0' correctly.
+        - Replaced 'die' with 'croak' throughout module.
+        - Updated the docs.
+
+0.06  Tue Nov 20 14:30:00 2001
+        - Fixed a bug with the 'unique' method.  I had evaluated
+        contexts incorrectly, causing it to fail when part of a
+        chain.  Thanks to Steffen Muller for the spot.
+        - Freed some memory that was being wasted in the unique method
+        - Fixed this archive a bit to expand a bit more properly
+
+0.05  Mon Oct 9 12:30:00 2001
+        - Turned on the 'fallback' option for 'overload'.  This
+        prevents errors for simple operations like "if($sao)", because
+        I was accidentally using the overloaded operators in some
+        cases where I meant to use the CORE operators.  Thanks to
+        Terrence Brannon for the spot.
+
+0.04  Fri Oct 5 12:00:00 2001
+        - Modified the 'sort' method so that it handles coderefs
+        in the same manner as Perl's built-in 'sort' method (with
+        the exception that the word 'sub' is required).  Thanks
+        to Sean McAfee for the help.
+
+0.03  Tue Oct 2 08:00:00 2001
+        - Changed the 'splice' method so that its return values
+        are consistent with the rest of the module.
+
+0.02  Wed Sep 26 16:00:00 2001
+        - Modified several methods to either handle or die on
+          undefined values.  The following methods were changed:
+
+        count - Counts undef elements if no args (or undef).
+        delete - Dies if no arg (or undef).  Now takes a list,
+           rather than a scalar, as an arg (though can still take
+           a scalar, of course).
+        delete_at - Dies if no start index supplied (or undef).
+        exists - Now possible to test for existence of 'undef'.
+        foreach - Dies if no arg supplied (or undef).
+        index - If no arg (or undef), returns index of first
+           occurrence of 'undef' value within array.
+        indices - Dies if no arg supplied (or undef).
+        join - Now defaults to comma if no value supplied.
+
+0.01  Tue Sep 25 15:34:11 2001
+	- original version; created by h2xs 1.21 with options
+		-A -X -n Set::Array

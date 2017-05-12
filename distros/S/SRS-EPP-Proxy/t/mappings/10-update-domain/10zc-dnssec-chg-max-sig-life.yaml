@@ -1,0 +1,14 @@
+# Change max sig life, which is not supported
+template: update-domain.tt
+
+vars:
+  domain: 10-dnssec.co.te
+  dnssec:
+    max_sig_life: 1234567
+
+output_assertions:
+  count:
+    - [ '//epp:result', 1, 'SRS: Check for one result' ]
+  attr_is:
+    - [ '//epp:result', 'code', 2306, 'SRS: Check for correct result code' ]
+

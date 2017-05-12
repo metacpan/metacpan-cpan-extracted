@@ -1,0 +1,69 @@
+Welcome to String::Approx 3.0.
+
+This release is a major update from String Approx 2,
+of which 2.7 was the last release.  See later about the future
+of version 2.
+
+The most important change was that the underlying algorithm was
+changed completely.  Instead of doing everything in Perl using regular
+expressions we now do the matching in C using the so-called Manber-Wu
+k-differences algorithm shift-add.  You have met this algorithm if you
+have used the agrep utility or the Glimpse indexing system.
+Because this implementation shares no code with agrep, only the
+well-publicized algorithms, the use of this software is limited only
+by my copyright (file COPYRIGHT).  This interpretation has been kindly
+confirmed by Udi Manber.  More details in the file README.apse.
+
+This change brings both good and bad news.  Good news first.
+
+* We are now 2-3 times faster than String::Approx version 2.
+* There should be no limit on the length of the pattern.
+  Extremely long patterns haven't been tested much, though, so
+  please do not assume overmuch.  The used algorithm is actually
+  _independent_ of the length of the pattern: it's O(kn) where
+  k is the number of errors and n the length of the text.
+
+Then the bad news:
+
+* You do need a C compiler.  If your system does not have a C compiler
+  you should either get one or find a friendly soul to compile this
+  extension for you.
+  I won't be deleting the String::Approx 2.7 because in some
+  restrictive environments compiling C is not an option.
+* The semantics of asubstitute() have changed.  The match is now
+  always stingy; that is, as short as possible.  Previously
+  if you matched for "word" with edit distance of two, "cork"
+  and "wool" both would have matched -- and they still do.
+  But: the matching parts will be "or" and "wo" and nothing more.
+  There's still the stingy option but that's rather pointless now
+  as far as shortening the match goes: it is now useful only for
+  sligthly speeding up matching.  This change messes up asubstitute()
+  rather badly, I'm very sorry about this.  I will try to think of
+  something better in future releases.
+* aregex() is gone not to return because we no more use regular expressions.
+* The 'compat1' option to be backward compatible with String::Approx
+  release 1 is no more supported.
+  
+Perl 5.8 is required.
+
+This library is free software; you can redistribute it and/or modify
+under either the terms of the Artistic License 2.0, or the GNU Library
+General Public License, Version 2.  See the files Artistic and LGPL
+for more details.
+
+About the future of String::Approx version 2:
+(1) I repeat: I won't be deleting version 2.7.
+(2) Any updates on the version 2 are unlikely.
+    The software simply grew past maintainability.
+
+Installation is as horribly complicated as before:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Let me (jhi@iki.fi) know of any trouble.  Also let me know of
+cool uses you put String::Approx into.
+
+That's it.  Enjoy.

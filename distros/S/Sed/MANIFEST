@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+Makefile.PL
+Sed.pm
+t/01load.t
+t/02tr.t
+t/03caps.t

@@ -1,0 +1,114 @@
+Sim-OPT version 0.62
+============================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008-2017 by Gian Luca Brunetti and Politecnico di Milano.
+This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 2 or later.
+
+Sim::OPT is an optimization and morphing program oriented to problem decomposition. It can be used with simulation programs receiving text files as input and emitting text files as output. Some of Sim::OPT's optimization modules (Sim::OPT, Sim::OPT::Descent) pursue optimization through block search, allowing blocks (subspaces) to overlap, and allowing a free intermix of sequential searches (inexact Gauss-Seidel method) and parallell ones (inexact Jacobi method). The Sim::OPT::Takechange module seeks for the least explored search paths when exploring new search spaces sequentially (following rules presented in: http://dx.doi.org/10.1016/j.autcon.2016.08.014). Sim::OPT::Morph, the morphing module, manipulates chosen parameters in the configuration files (constituted by text files) describing models for simulation programs, recognizing variables by position. The Sim::OPT::Parcoord3d module converts 2D parallel coordinates plots in Autolisp instructions for obtaining 3D plots as Autocad drawings.
+
+Sim::OPT's morphing and reporting modules contain several additional functions specifically targeting the ESP-r building performance simulation platform. A working knowledge of ESP-r (http://www.esru.strath.ac.uk/Programs/ESP-r.htm) is necessary to use those functionalities.
+
+To install Sim::OPT, the command <cpanm Sim::OPT> has to be issued as a superuser. OPT can then be loaded through the command <use Sim::OPT> in a Perl repl. To ease the launch, the batch file "opt" (which can be found packed in the "optw.tar.gz" file in "examples" folder in this distribution) may be copied in a work directory and the command <opt> may be issued. That command will call OPT with the settings specified in the configuration file. When launched, Sim::OPT will ask the path to that file, which must contain a suitable description of the operations to be accomplished and point to an existing simulation model.
+
+The "$mypath" variable in the configuration file must be set to the work directory where the base model reside.
+
+To run the morphing functions of OPT without making OPT launch the simulation program, the setting <$exeonfiles = "n";> should be specified in the configuration file. That way, the commands will only be printed to a file. This can be aimed to inspect the commands that OPT would give the simulation program.
+
+Besides an OPT configuration file, separate configuration files for propagation of constraints may be created. Those can be useful to give the morphing operations greater flexibility. Propagation of constraints can regard the geometry of a model, solar shadings, mass/flow network, controls, and generic text files descripting a simulation model.
+
+The simulation model folders and the result files that will be created in a parametric search will be named as the base model, plus numbers and other characters  naming model instances. For example, the instance produced in the first iteration for a root model named "model" in a search constituted by 3 morphing phases and 5 iteration steps each will be named "model_1-1_2-1_3-1"; and the last one "model_1-5_2-5_3-5".
+
+The structure of the block searches is described through the variable "@sweeps" in the configuration file. Each case is listed inside square brackets. And each search subspace (block) in each case is listed inside square brakets. For example: a sequence constituted by two sequential brute force searches, one regarding parameters 1, 2, 3 and the other regarding parameters 1, 4, 5, 7 would be described with: @sweeps = ( [ [ 1, 2, 3 ] ] , [ [ 1, 4, 5, 7 ] ] )   (1). And a sequential block search with the first subspace regarding parameters 1, 2, 3 and the second regarding parameters 3, 4, 5, 6 would be described with: @sweeps = ( [ [ 1, 2, 3 ] , [ 3, 4, 5, 6 ] ] ). 
+
+By default the behaviour of the program is sequential. To make it parallel locally, subspaces must be given names so as to work as collectors. A name named "name" must be written ">name" and placed at the end of the block from which it is receiving the value produced by the block. Clearly, one named block (cell) can receive inputs by more than one block. The name named "name" should instead be written "name>" and placed at the beginning of the block in the case that it brings into it the values it contains.
+
+An example: ( [ [ "0>", 1, 2, 3, ">a" ] , [ "0>", 3, 4, 5, 6, ">a" ] , [ "a>" 6, 7, 8, 9 ] , [ 11, 12, 13, ">b" ] , [ ">b", 14, 15, 16, ">c" ], [ ">b", 15, 16, 17, ">c" ], [">c"] ] ). The ">"s signalling the named blocks can be seen as a sort of markup language for blocks which allows to nest parts of a search. 
+
+Numerical blocks, for example [ 1, 2, 3 ], are automatically named, in the sense that they can also be used as containers. The name of the block in questionm, for example, is "1_2_3", so there is no need to create new containers and names esplicitly. For this reason, there is also no need of specifying a container block at the beginning of a block or at the end of a block to describe directed graphs. Only specifying collectors at the entry or at the exit of some blocks is necessary when there is parallelism involved. For example, the last cited search could also have been written in the following manner: 
+( [ [ 1, 2, 3, ">6, 7, 8, 9" ] , [ "0>", 3, 4, 5, 6, ">6, 7, 8, 9" ] , [ 6, 7, 8, 9 ] , [ 11, 12, 13, ">14, 15, 16" ] , [ 14, 15, 16, ">c" ], [ 11, 12, 13, ">15, 16, 17" ] ,[ 15, 16, 17, ">c" ] ] ). But sometimes it may be worth adding extra containers for the sake of clarity.
+
+The collector-like block "0>" is a particular case: it is the base case. The beginning of a search always begin with a "0>", explicitly or implicitly. Other "0>"s can be present along the search graph as starting points. But it is cleaner not to alter the block "0", not to use it as a collector.
+
+The possibility of articulating a mix of parallel and sequential searches is more fundamental that can be expressed, because it allows to design search structures with a depth, embodying precedence, and therefore procedural time, it them. 
+
+The mentioned representation tools are sufficient for describing directed graphs.
+
+The number of iterations to be taken into account for each parameter for each case is specified in the "@varinumbers" variable. To specifiy that the parameters of the last example are to be tried for three values (iterations) each, @varinumbers has to be set to ( { 1 => 3, 2 => 3, 3 => 3, 4 => 3, 5 => 3, 6 => 3 } ).
+
+The instance number that has to considered the basic one, corresponding to the root case, is specified by the variable "@miditers". "@miditers" for the last example may be for instance set to ( { 1 => 2, 2 => 2, 3 => 2, 4 => 2, 5 => 2, 6 => 2 } ).
+
+Where Sim::OPT may be fit for a task? Where a certain exploration is complex and/or when it is to be confronted through decomposition, by dividing a problem in overlapping subproblems; when there aren't slick tools suitable to decomposition-based, simulation-based optimization; when spending a day, or two, or three setting up a model may spare months of work.
+
+Where it may not be suitable for the task? Due to the investment which is necessary for getting acquainted with its raw interface, for quick shots at small explorations.
+
+The program works under Linux.
+
+Sim::OPT::Morph is morphing program for preparing model instances (in text format) to be given to simulation programs in design-aimed explorations. Sim::OPT::Morph is controlled by the Sim::OPT module, which manages the structure of searches. 
+
+More specifically, Sim::OPT::Morph can manipulate the text files constituting the description of models for simulation programs. The general function dedicated to that aim recognizes variables by position and modifies them through linear variations (so to perform translations or rotations, for instance) and possibly propagation of constraint with user-defined rules. Additionally, Sim::OPT::Morph features several specialized functions which are specific to the ESP-r building performance simulation platform; those functions can manage the simulation program directly, through the shell, or by manipulating model configuration files. Some of these functionalities involve operations in which the Radiance lighting performance simulation platform is called through ESP-r. 
+
+The morphing instructions must be written in a configuration file whose name will be asked at the launch of Sim::OPT. This distribution includes two examples of such files: an OPT's configuration file for an ESP-r model and an OPT's configuration for an EnergyPlus model for the same building and the same morphing operations. (EnergyPlus is another building simulation platform.)
+
+Configuration files for propagation of constraints may be specified in addition to a configuration file. Propagation of constraints can be used to direct the morphing of model and give to the morphing operations greater flexibility. Propagation of constraints can target the model configuration files or, in the case of ESP-r, trigger modification operations performed through the shell and regarding geometry, solar shadings, mass/flow network and controls. 
+
+Sim::OPT::Sim is the module used by Sim::OPT to launch the simulations once the models have been built. Sim::OPT::Sim's presently existing functionalities can be used to launch simulations in ESP-r and EnergyPlus. The possibility to call simulation programs other than the cited two may be pursued through modifications of the code dedicated to EnergyPlus (which is actually meant as an example of a generic case). This portion of code may be actually constituted by the single line launching the simulation program through the shell.
+
+Sim::OPT::Report is the module used by Sim::OPT to retrieve simulation results. Sim::OPT::Report performs two kinds of action. The first, which is required only by certain simulation programs, is that of making the simulation program write the results in a user-specified text format. This functionality is platform-specific and is presently implemented only for ESP-r (EnergyPlus does not require that). The second functionality is that of gathering the results in a user-specified manner. That functionality is based on pattern-matching and is not simulation-program-specific.
+
+Sim::OPT::Descent is an module collaborating with the Sim::OPT module for performing block coordinate descent. It closes the loop formed by Sim::OPT -> Sim::OPT::Morph -> Sim::OPT::Sim -> Sim::OPT::Report::retrieve -> Sim::OPT::Report::report -> Sim::OPT::Descent -> Sim::OPT, which repeats at every block search cycle. It is a circularly recursive loop. 
+
+The objective function for rating the performances of the candidate solutions can be obtained by the weighting of objective functions (performance indicators) performed by the Sim::OPT::Report module, which follows user-specified criteria.
+
+The "Sim::OPT::Takechance" module can produce efficient search structures for block coordinate descent given some initialization blocks (subspaces). Its strategy is based on measuring the efficiency of alternative search paths to pick the most efficient one. This is done by seeking for the search moves warranting that (1) the search wake is fresher than that of the average random ones and (2) the search moves are more novel than the average random ones.
+
+"Sim::OPT::Takechance" can be called from "Sim::OPT" or directly from the command line (after issuing < re.pl > and < use Sim::OPT::Takechance >) with the command < takechance your_configuration_file.pl >.
+
+The variables to be taken into account to describe the initialization blocks of a search in the configuration file are "@chanceseed" (representing the sequence of design variables at each search step) and "@caseseed" (representing the sequence of decompositions to be taken into account). (In place of the "@chaceseed" and "@caseseed" variables, a "@sweepseed" variable can be specified, written with the same criteria of the variable "@sweeps" described in the documentation of the "Sim::OPT" module; but this possibility has not been throughly tested yet.)
+
+How "@chanceseed" and "@caseseed" should be specified is more quickly described with a couple of examples. 
+
+1) If brute force optimization is sought for a case composed by 4 parameters, the following settings should be specified: <@chanceseed = ([1, 2, 3, 4]);> and <@caseseed = ( [ [0, 4] ] ) ;>.
+
+2) If optimization is sought for two cases (brute force, again, for instance, with a different and overlapping set of 5 parameters for the two of them), the two sets of parameters in questions has to be specificied as sublists of the general parameter list: <@chanceseed = ([1, 2, 3, 4, 6, 7, 8], [1, 2, 3, 4, 6, 7, 8]);> and <@caseseed = ( [ [0, 5] , [3, 8] ] ) ;>.
+
+3) If a block search is sought on the basis of 5 parameters, with 4 overlapping active blocks composed by 3 parameters each having the leftmost parameters in position 0, 1, 2 and 4, and two search sweeps are to be performed, with the second sweep having the parameters in inverted order and the leftmost parameters in position 2, 4, 3 and 1, the following settings should be specified: <@chanceseed = ( [ [1, 2, 3, 4, 5], [1, 2, 3, 4, 5], [1, 2, 3, 4, 5], [1, 2, 3, 4, 5], [5, 4, 3, 2, 1], [5, 4, 3, 2, 1], [5, 4, 3, 2, 1], [5, 4, 3, 2, 1]] );> and <@caseseed = ( [ [0, 3], [1, 3], [2, 3], [4, 3] ], [2, 3], [4, 3], [3, 3], [1, 3] ] );>.
+
+4) By playing with the order of the parameters' sequence, blocks with non-contiguous parameters can be specified. Example: <@chanceseed = ( [ [1, 2, 3, 4, 5], [1, 2, 3, 4, 5], [1, 2, 3, 4, 5], [1, 2, 3, 4, 5], [5, 2, 4, 1, 3], [2, 4, 1, 5, 2], [5, 1, 4, 2, 3], [5, 1, 4, 2, 3] ] );> and <@caseseed = ( [ [0, 3], [1, 3], [2, 3], [4, 3] ], [2, 3], [4, 3], [3, 3], [1, 3] ] );>.
+
+5) The initialization blocks can be of different size. Example: <@chanceseed = ( [ [1, 2, 3, 4, 5], [1, 2, 3, 4, 5], [1, 2, 3, 4, 5], [1, 2, 3, 4, 5], [5, 2, 4, 1, 3], [2, 4, 1, 5, 2], [5, 1, 4, 2, 3], [5, 1, 4, 2, 3] ] );> and <@caseseed = ( [ [0, 3], [1, 3], [2, 3], [4, 3] ], [2, 2], [4, 2], [3, 4], [1, 4] ] );>.
+
+Other variables which are necessary to define in the configuration file for describing the operations to be performed by the "Sim::OPT::Takechance" module are "@chancedata", "$dimchance", "@pars_tocheck" and "@varinumbers".
+
+"@chancedata" is composed by references to arrays (one for each search path to be taken into account, as in all the other cases), each of which composed by three values: the first specifying the length (how many variables) of the blocks to be added; the second specifying the length of the overlap between blocks; the third specifying the number of sweeps (subsearches, searches in subspaces) to be added. For example, the setting < @chancedata = ([4, 3, 2]); > implies that the blocks to be added to the search path are each 4 parameters long, have each an overlap of 3 parameters with the immediately preceding block, and are 2 in number - that is, 2 sweeps have to be added to the search path.
+
+"$dimchance" tells the program among how many random samples the blocks to be added to the search path have to be chosen. The higher the value, the most efficient the search structure will turn out to be, the higher the required computation time will be. High values are likely to be required by large search structures.
+
+"@varinumbers" is shared with the Sim::OPT module. It specifies the number of iterations to be taken into account for each parameter and each search case. For example, to specifiy that the parameters of a search structure involving 5 parameters (numbered from 1 to 5) for one case are to be tried for 3 values (iterations) each, "@varinumbers" has to be set to "( { 1 => 3, 2 => 3, 3 => 3, 4 => 3, 5 => 3 } )".
+
+"@pars_tocheck" is a variable in which the parameter numbers to be taken into account in the creation of the added search path have to be listed. If it is not defined, all the available parameters will be used.
+
+The response produced by the "Sim::OPT::Takechance" module will be written in a long-name file in the work folder: "./search_structure_that_may_be_adopted.txt".
+
+"Sim::OPT::Parcoord3d" can be called from !Sim::OPT! or directly from the command line (after issuing < re.pl > and < use Sim::OPT::Parcoord3d >) with the command < parcoord3d your_configuration_file.pl >.
+
+The variables to be specified in the configuration file are described in the comments in the "Sim::OPT" configuration file included in the "examples" folder in this distribution. 
+
+Two annotated examples ("esp.pl" for ESP-r and "ep.pl" for EnergyPlus) can be found packed in the "optw.tar.gz" file in "examples" directory in this distribution. They constitute the available documentation. Additionally, reference to the source code may be made.
+
+
+Gian Luca Brunetti, Politecnico di Milano. 2008-2017
+gianluca.brunetti@polimi.it
+
+

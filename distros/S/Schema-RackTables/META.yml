@@ -1,0 +1,31 @@
+---
+abstract: 'Inventory of the database schemas of RackTables'
+author:
+  - 'Sebastien Aperghis-Tramoni (saper@cpan.org)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Schema-RackTables
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  DBIx::Class::Schema: '0'
+  File::Basename: '0'
+  File::Spec::Functions: '0'
+  JSON::XS: '0'
+  Moo: '0'
+  Test::More: '0'
+resources:
+  repository: https://github.com/maddingue/Schema-RackTables
+version: '1.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

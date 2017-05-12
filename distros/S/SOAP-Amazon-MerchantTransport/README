@@ -1,0 +1,81 @@
+SOAP-Amazon-MerchantTransport
+
+This module provides a simple way to access Amazon's Merchant Services via
+SOAP (with MIME attachments). It is based on SOAP::Lite and MIME::Tools.  
+
+The goal behind SOAP::Amazon::MerchantTransport (SAMT) is to provide access to
+the SOAP services Amazon provides without having to deal with the
+incompatibilities between SOAP::Lite and Amazon's implementation of SOAP. SAMT
+tries to bridge the gap and make working with Amazon's SOAP services as easy
+as it should be. 
+
+THE SCOPE OF THIS MODULE
+
+This module is to ease the submission of XML Feeds to Amazon.
+
+This module does not write your Amazon XML Feeds, it only simplifies the
+submission of those feeds. If you need help writing the Amazon XML Feeds for
+pricing, inventory, orders, etc. view the sample feeds in the Amazon
+Documentation. Contact your integration manager for access to these.
+
+Also this module does not handle SOAP errors for you. It uses SOAP::Lite
+to submit the XML requests and returns a SOAP::SOM object, unless
+another handler is specified.
+
+THE NEED
+
+The reason I wrote this module was to ease the pain of trying to use SOAP::Lite
+with Amazon's Merchant SOAP Services. As of this writing SOAP::Lite has a hard
+time reading WSDL files with MIME bindings. There are also a few other
+peculiarities when working with Amazon and SOAP::Lite. 1) The name of 
+the method is not the root element of the SOAP Envelope. The 'merchant' header
+and the method name are sibling elements. This is not the default when using
+SOAP::Lite. 2) They don't send the optional 'start' parameter in the 
+'Multipart/Related' header (as recommended by W3 in RFC 2387). 3) The way
+they handle mime takes a little bit of trickery.
+
+I hope this module will save other developers the hours of frustration figuring
+out all the intricacies of Amazon's SOAP.
+
+VERSION INFORMATION
+
+The current version is 0.2. This module is stable alpha. Most of the major
+method Amazon provides are implemented. The biggest omission at the moment is
+that the 'postDocumentDownloadAck' is not implemented.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc SOAP::Amazon::MerchantTransport
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/SOAP-Amazon-MerchantTransport
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=SOAP-Amazon-MerchantTransport
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/SOAP-Amazon-MerchantTransport
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/SOAP-Amazon-MerchantTransport
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Nate Murray
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

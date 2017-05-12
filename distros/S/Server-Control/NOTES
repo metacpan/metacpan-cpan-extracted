@@ -1,0 +1,64 @@
+RESTARTING SERVER ON CHANGE (TAKE 2)
+
+The PiedPiper was a good idea, but trying to have it daemonize and live in the background
+was more difficult than expected.
+
+So for now, make it like Catalyst/Plack. Have it live in the foreground, and restart
+(hup) server when files changed.
+
+
+RELOADING MODULES ON CHANGE
+
+Would like to solve this by building on Perrin's MaxRequestsPerChild=1 idea.
+
+* Server::Control::Plugin::PiedPiper
+  * After successful_start, record $ppid, call start_watcher
+  * Attributes:
+    - notify (a File::ChangeNotify object or params hash)
+    - parent_check_interval
+  * Watcher forks immediately, returns pid
+  * Watcher sets alarm to call check_for_parent() once every parent_check_interval secs.
+  * Blocks on ChangeNotify. Whenever an event is received, call check_for_parent(), then kill children of ppid.
+  * check_for_parent() uses Proc::ProcessTable to see if parent is alive and is the same process, exits otherwise
+
+Could Server::Control::Plugin::PiedPiper::Watcher be a Server::Control subclass?
+It just needs a do_start, which forks the child, creates the pid file on start, removes
+the pid file on exit. There is probably something that does this already on CPAN.
+Then we have to change S::C so that port can be undef without harm.
+
+The advantage is that we can then call regular ->start and ->stop and have S::C handle
+the pid file parsing.
+
+PARSING APACHE CONF FILE
+
+Parse Apache config to find the following:
+
+ServerRoot - required
+Listen - defaults to localhost:80
+PidFile - defaults to ServerRoot/logs/httpd.pid
+ErrorLog - defaults to logs/error_log (Unix) logs/error.log (Windows and OS/2)
+
+If we can do this, is there any reason for the user to specify the root_dir and have us determine conf_file via that? Doesn't seem to be.
+
+Have to be prepared that we won't be able to get some things from Apache config, in which case we'll have to default them.
+
+HOW TO WRAP HTTP::Server::Simple
+
+* HTTP::Server::Simple has no constructor arguments other than port. Everything is in the class. So there's not much reason to pass in an object, as opposed to a class name.
+* Take server_class and net_server_params
+* For port, pid_file, and error_log/log_file: use what is passed in or is provided in net_server_params
+* Call server_class->new using our port()
+  * Pass net_server_params along with port, pid_file, and error_log to run()
+
+HOW TO WRAP Net::Server
+
+  * Take net_server_class and net_server_params
+  * For port, pid_file, and error_log/log_file: use what is passed in or is provided in net_server_params
+  * Pass net_server_params along with port and pid_file to run()
+
+* HTTP::Server::Simple has a net_server method that can be overriden in the subclass. It must point to a Net::Server subclass. However, we can do like HTTP::Engine::Interface::ServerSimple and create an anonymous
+* Can pass Net::Server arguments to HTTP::Server::Simple::run().
+
+* Net::Server does not have obvious accessors for its properties (port, etc.) - you have to use get_property.
+* For our purposes, Net::Server gets its arguments either from the prebuilt object, or when passed to the run method.
+* So...the simplest case is for us to accept net_server (a class) and net_server_configure. Take a look at how HTTP::Engine::Interface::ServerSimple does it - it creates an anonymous subclass of HTTP::Server::Simple which overrides net_server.

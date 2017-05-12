@@ -1,0 +1,31 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html><head>
+<title>[% IF action == 'list' %][%|l%]Repository List[%END%][% ELSE %][% action %]: /[% repos %][% path %][% END %] ([% IF rev %]Rev: [% rev %], [% END %]via SVN::Web)</title>
+</head><body>
+<div id="banner">
+<h1>SVN::Web - [%|l%][% action %][%END%]</h1>
+</div>
+[% UNLESS nonav %]
+<div id="links">
+<div id="navpath">
+<a href="[% script | url %]">[%|l%]Repository list[%END%]</a> |
+  [% url = [script,repos,''] %]
+  [% url = url.join('/') %]
+  [% urlpath = ['',''] %]
+<a href="[% url | url %]">[[% repos %]]</a>
+  [% FOREACH p = navpaths %]
+    [% CALL urlpath.splice(-1, 0, p) %]
+    [% IF loop.count == loop.size %]
+      [% IF p %]
+/   [% p %]
+      [% END %]
+    [% ELSE %]
+/    <a href="[% url | url %]browse[% urlpath.join('/') | url %][% IF rev %]?rev=[% rev %][% END %]">[% p %]</a>
+    [% END %]
+  [% END %]
+</div>
+</div>
+[% END %]
+<div id="content">

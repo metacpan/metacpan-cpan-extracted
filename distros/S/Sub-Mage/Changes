@@ -1,0 +1,45 @@
+Revision history for Sub-Mage
+
+0.32    07/12/2012
+        Fixed a slight bug in Class::LOP when extending classes
+
+0.31    21/11/2012
+	Started using mro which was breaking tests using older versions of Perl. 	Stuck 'use 5.010' in the Makefile.PL, which hopefully should fix that?
+
+0.030   07/11/2012
+        This is a whole new release because the internals of 
+        Sub::Mage have been replaced using Class::LOP (Lightweight Object Protocol) which is included with this distribution.
+        Please let me know if anything isn't working as it should :-)
+
+0.020   28/03/2012
+        Cleaned up some old code and more importantly fixed a nasty bug in the accessors. Augment has been renamed to extends, for obvious reasons.
+
+0.019   08/02/2012
+        Resurrected. I've taken the best from Goose and put it into Sub::Mage. I liked the idea of having the :Class stuff optional. This allows you to use the likes of other OOP frameworks without this module getting in your way!
+        Sub::Mage has been cleaned up a lot. Some new methods have been added from Goose (Check the POD for a list of methods). 
+
+0.018   02/Dec/2011
+        I doubt I will be updating Sub::Mage anymore, sorry. It has been taken over by Goose. It's basically Sub::Mage, but without the silly method names, and some 
+        extra sugar for those with a sweet tooth ;-)
+        There have been no changes in this release - it's merely to update the documentation and let you know it will no longer be maintained in place of Goose.
+
+0.017   23/Nov/2011
+        Minor adjustment to the POD
+        Added 'extends' for those of you who feel silly typing 'augment'. Myself included. Chances are if you need 'extends' you'll probably want Mo(o|u)se anyway ;-)
+
+0.016   21/Nov/2011
+        Updated the pod to reflect new chainable instructions, and added 'drop_sub' method.
+
+0.015   21/Nov/2011
+        Altered the 'chainable' method. Only return $self was getting a bit annoying when I actually wanted to bless something like $self-{_this}.
+        Now you can add an extra parameter called 'bless'.
+        # chainable 'method' => ( class => 'BlessTo::ThisClass', bless => '_this' );
+        The above will return something similar to "return bless $self->{_this_}, 'BlessTo::ThisCLass'"
+        If you ommit the 'bless' it will use just $self.
+
+        I discovered a bug in 'augment' that was only allowing one augmentation. This has been fixed.
+
+
+0.01    
+        First version, released on an unsuspecting world.
+

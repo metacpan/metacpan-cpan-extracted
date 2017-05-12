@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         SNMP-Multi
+version:      2.1
+version_from: Multi.pm
+installdirs:  site
+requires:
+    Memoize:                       0.62
+    SNMP:                          4.2
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.21

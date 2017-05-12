@@ -1,0 +1,156 @@
+SNC/Manipulator version 0.30
+=======================
+
+NAME
+
+    SNC::Manipulator - Manipulate and Configure Sony SNC-RZ30N networked cameras.
+
+SYNOPSIS
+
+      use SNC::Manipulator;  
+
+      $SNCcamera = new SNC::Manipulator( "192.168.99.4" );
+
+      #Or to use a custom port (2024) call this
+      $SNCcamera = new SNC::Manipulator( "192.168.99.4", "2024" );
+
+      $SNCcamera->setLogin( 'admin', 'pass' );  #lvl 4
+
+      $SNCcamera->moveToPreset( 0 );
+      $SNCcamera->move( "left" );
+      $SNCcamera->move( "right" );
+      $SNCcamera->move( "up" );
+      $SNCcamera->move( "down" );
+
+DESCRIPTION
+
+    SNC::Manipulator provides a perl interface to all the functions
+    available through Sony's control software (and more) on SNC-RZ30N webcams.
+
+USAGE
+
+    new()
+      Constructor.
+      Returns new instance of SNC::Manipulator.
+
+
+    setDelay( $delay )
+      parameters:
+        $delay, time in milliseconds.
+
+      sets delay between requests in some functions; an example of this is in move().
+      the default delay is 500.
+
+
+    inquiry( $inqjs )
+      parameters:
+        $inqjs, string passed to inquiry function
+
+      Gets data from camera; and structures inside instance like this:
+      $instance{sysinfo}{TitleBar} = "Name of Room";
+
+      Returns hash structured like %h{TitleBar} = "Name of Room";
+
+
+    move( $moveinst )
+      parameters:
+        $moveinst, movement instruction;
+          Compass direction (NSEW), In, Out, Home
+
+      Moves camera according to the $movinst, for the approximateally the duration
+      of the "delay" (whatever was set with setDelay, or default)
+    
+ 
+    moveDirectPT( $x, $y )
+      parameters:
+        $x, integer between 0 and 640
+        $y, integer between 0 and 480
+
+      Moves camera according to the xy point of $x and $y;
+      accordingly to the current view of the camera.
+
+
+    moveRelative( $moveDirection, $movePercentage )
+      parameters:
+        $moveDirection, compass direction.
+        $movePercentage, 10,15,20,25,30,40,50,66.7,83.3, or 100.
+
+      Moves camera accordingly to the $moveDirection by the
+      percentage of the screen found in $movePercentage.
+
+
+    moveToPreset( $preset )
+      parameters:
+        $preset, preset number.
+
+      Moves camera to preset $preset.
+
+
+    stop()
+
+      Internal function.
+
+      This will only need to be called if you wish to
+      halt the camera's movement for some reason.
+
+
+    rawVISCA( $visca )
+      parameters:
+        $visca, VISCA statement
+
+      For use by people who know how to build a VISCA statement.
+
+
+    captureToFile( $file )
+      parameters:
+        $file, filename to record current snapshot image to.
+
+      Records current snapshot image (oneshotimage.jpg)
+
+
+    setLogin( $username, $password )
+      parameters:
+        $username, camera username
+        $password, camera password
+
+      Sets the credentials for the camera.
+
+
+    sendRequest( $type, $code )
+      parameters:
+        $type, 'visca', 'directpt', 'relative', or 'inquiry'
+        $code, string to pass to camera
+
+      Internal function.
+
+      You will never need to call this.
+
+
+    customDelay()
+    
+      Internal function.
+
+      sleeps for the amount of milliseconds set in setDelay, or default.
+    
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+DEPENDENCIES
+
+  HTTP::Request::Common
+  LWP::UserAgent
+
+BUGS
+
+  Its beta with minimal functionality, here there be demons.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004/2005 Charles A Morris.  All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it under the same terms as Perl itself.

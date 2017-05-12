@@ -1,0 +1,27 @@
+---
+abstract: 'a regexp-based string filter'
+author:
+  - 'Cybozu Labs, Inc.  Written by Kazuho Oku.'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  HTML::Entities: 0
+  Test::More: 0.88
+  URI::Escape: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.93'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: String-Filter
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Regexp::Assemble: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

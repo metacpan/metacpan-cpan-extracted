@@ -1,0 +1,32 @@
+---
+abstract: 'SMS::Send driver for SMSMidlet - Czech Republic '
+author:
+  - 'Radek Šiman <rbit@rbit.cz>'
+build_requires:
+  Module::Build: '0.28'
+  SMS::Send: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SMS-Send-CZ-Smsmidlet
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  DateTime: '0'
+  Digest::MD5: '0'
+  LWP::UserAgent: '0'
+  Log::LogLite: '0'
+  SMS::Send::Driver: '0'
+  URI::Escape: '0'
+  base: '0'
+  strict: '0'
+  warnings: '0'
+version: '1.000'
+x_serialization_backend: 'YAML::Tiny version 1.69'

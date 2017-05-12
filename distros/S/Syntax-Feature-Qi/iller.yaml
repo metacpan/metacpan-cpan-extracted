@@ -1,0 +1,34 @@
+---
+doctype: dist
+
+header:
+  name: Syntax-Feature-Qi
+
+prereqs:
+  runtime:
+    requires:
+      - perl: 5.010000
+      - Devel::Declare: 0.006007
+      - B::Hooks::EndOfScope: 0.09
+      - Sub::Install: 0.925
+      - Devel::Declare::Context::Simple
+      - namespace::clean: 0.25
+      - syntax: 0.004
+
+plugins:
+ - +config: Author::CSSON
+
+---
+doctype: weaver
+
+plugins:
+ - +config: Author::CSSON
+
+---
+doctype: cpanfile
+
+---
+doctype: gitignore
+config: Author::CSSON
+always:
+ - /Syntax-Feature-Qi-*

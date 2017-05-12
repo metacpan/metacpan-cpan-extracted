@@ -1,0 +1,7 @@
+Revision history for Perl extension Sledge::Request::Apache::I18N
+
+0.02  Sat Jan 12 22:48:40 2008
+    - support multi params
+      Thanks to nekokak
+0.01  Tue Apr 18 20:45:32 2006
+	- original version

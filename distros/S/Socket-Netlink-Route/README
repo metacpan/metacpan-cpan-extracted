@@ -1,0 +1,24 @@
+NAME
+    `Socket::Netlink::Route' - interface to Linux's `NETLINK_ROUTE' netlink
+    socket protocol
+
+DESCRIPTION
+    This module contains the low-level constants and structure handling
+    functions required to use the `NETLINK_ROUTE' protocol of Linux's
+    `PF_NETLINK' socket family. It is suggested to use the high-level object
+    interface to this protocol instead; see IO::Socket::Netlink::Route.
+
+    For more information, see the Linux kernel documentation about the
+    `NETLINK_ROUTE' protocol family in rtnetlink(7)
+
+     $ man 7 rtnetlink
+
+SEE ALSO
+    *   Socket::Netlink - interface to Linux's `PF_NETLINK' socket family
+
+    *   IO::Socket::Netlink::Route - Object interface to `NETLINK_ROUTE'
+        netlink protocol sockets
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

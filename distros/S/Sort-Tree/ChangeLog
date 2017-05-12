@@ -1,0 +1,34 @@
+Revision history for Perl module Sort::Tree
+
+1.09  2004/05/06 14:00:00 bryce
+	- Added patch from Pat Deegan implementing alphabetical sorting,
+  	  the traverse() function, etc.  
+	
+1.08  2003/09/09 15:30:00 bryce
+	- Added patch from Kevin White fixing bug where if root item is
+	  not the first in the given array then strange things can occur.	
+	
+1.07  2003/06/19 12:00:00  bryce
+	- Fixing POD to be more standard with CPAN requirements
+	
+1.06  2003/06/15 14:00:00  bryce
+	- Breaking out into its own module & documenting better
+	
+1.05  2003/04/04 07:08:19  bryce
+	- Sorting of columns in a document tree now works properly
+	
+1.04  2003/03/10 23:25:57  bryce
+	- Implementing folder tree display (it works!)
+	
+1.03  2003/03/10 17:18:22  bryce
+	- Working on getting folder navigation implemented
+	
+1.02  2003/03/07 01:45:55  bryce
+	- Adding error msg trace_tree() support
+	
+1.01  2003/02/18 21:08:04  bryce
+	- Adding Sort::Tree
+
+1.00  Sun Jun 15 12:47:39 2003
+	- original version; created by sdist 1.3
+

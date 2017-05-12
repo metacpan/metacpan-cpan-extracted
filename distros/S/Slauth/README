@@ -1,0 +1,58 @@
+Slauth version 0.02
+===================
+
+Slauth is a set of Perl modules which manage authentication and authorization
+functions under mod_perl for Apache 2.  It has a plugin architecture allowing
+multiple approaches for administration and user registration.  It currently
+handles HTTP Basic and cookie authentication, depending on which is selected
+in any given directory.  Slauth supports virtual servers with independent
+configurations.
+
+HISTORY
+
+Slauth was originally developed for use by Stratofox, an amateur aerospace
+tracking and recovery team.  (Sometimes this has also been called
+"nearspacecraft hunting".)
+
+The ability to have users self-register based on Mailman mail list
+subscriptions resulted mostly from discussions with two rocket-building
+groups that Stratofox works with.  The rocket-builders parted paths and
+didn't want each other's private information available to the other.
+At the time both were nearly ready to attmept the first non-government
+space launch.  After some discussion, this capability was developed by
+Stratofox during the search for an acceptable method to continue to
+work with both groups and continue to participate in their launches.
+
+INSTALLATION
+
+Note: instead of using ExtUtils::MakeMaker, the installation process is
+based on Module::Build (which is intended to supersede it.)  The process
+is similar, using Build.PL instead of Makefile.PL and our own generated
+Build script (made by Build.PL) instead of your system's make command.
+
+To install this module type the following:
+
+   perl Build.PL
+   Build
+   Build test
+   Build install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	mod_perl for Apache 2.0, CGI, CGI::Carp, CGI::Cookie, Digest::MD5,
+	IO::File
+
+WEB SITE AND MAIL LISTS
+
+See http://www.slauth.org/ for more information about the project.
+There are also mail lists at http://www.slauth.org/mailman/listinfo .
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004-2006 by Ian Kluft
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.

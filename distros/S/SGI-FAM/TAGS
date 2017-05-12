@@ -1,0 +1,102 @@
+
+lib/SGI/FAM.pm,361
+sub AUTOLOAD 17,329
+sub DESTROY 33,701
+sub err(;$) 37,767
+sub abspath($;) 66,1472
+sub new 120,2934
+sub pending 134,3244
+sub debug_level 146,3482
+sub next_event 165,3809
+sub monitor 188,4596
+sub check_monitored 222,5648
+sub cancel 228,5793
+sub monitored 243,6157
+sub suspended 259,6460
+sub suspend 272,6691
+sub resume 296,7245
+sub which 322,8061
+
+monitor,0
+
+magicrcs,314
+sub msg($;$;) 32,889
+sub excluded($;) 42,1104
+sub chmog($$$) 52,1544
+sub rcsperm($;) 88,2540
+sub md5($;) 95,2705
+sub rcscommit($;) 102,2838
+sub rcsinit($;) 145,3924
+sub monitor($$) 187,5271
+sub cleanup() 211,5901
+sub init() 229,6344
+sub event() 257,6842
+sub debug_dump() 298,7963
+sub handler 312,8291
+
+FAM.xs,898
+constant(name)16,192
+constant(16,192
+static char *famerror(122,2059
+static void famwarn(126,2135
+constant(name)143,2394
+constant(143,2394
+famerror()147,2431
+FAMOpen2(fc, appName)159,2572
+FAMClose(fc)164,2635
+FAMMonitorCollection(fc, filename, fr, userData, depth, mask)182,2942
+FAMMonitorDirectory2(fc, filename, fr)191,3104
+FAMMonitorFile2(fc, filename, fr)197,3202
+FAMSuspendMonitor(fc, fr)203,3295
+FAMResumeMonitor(fc, fr)208,3363
+FAMCancelMonitor(fc, fr)213,3430
+FAMNextEvent(fc, fe)218,3497
+FAMPending(fc)223,3558
+FAMDebugLevel(fc, debugLevel)227,3598
+fc_DESTROY(fc)237,3752
+fc_new(class)245,3922
+fc_fd(fc)254,4068
+fr_DESTROY(fr)267,4241
+fr_new(class)274,4356
+fr_reqnum(fr)283,4496
+fr_setreqnum(fr, new)291,4591
+fe_DESTROY(fe)303,4761
+fe_new(class)310,4870
+fe_fc(fe)325,5221
+fe_fr(fe)334,5339
+fe_hostname(fe)343,5445
+fe_filename(fe)351,5530
+fe_code(fe)359,5622
+
+FAM.c,460
+constant(25,406
+static char *famerror(131,2273
+static void famwarn(135,2349
+XS(147,2545
+XS(168,2909
+XS(188,3230
+XS(217,3824
+XS(245,4358
+XS(285,5346
+XS(322,6178
+XS(359,6995
+XS(395,7755
+XS(431,8512
+XS(467,9269
+XS(503,10006
+XS(531,10546
+XS(560,11155
+XS(586,11640
+XS(607,12078
+XS(635,12633
+XS(660,13060
+XS(681,13483
+XS(709,14029
+XS(735,14547
+XS(760,14966
+XS(781,15379
+XS(810,15965
+XS(839,16539
+XS(867,17069
+XS(895,17599
+XS(926,18160

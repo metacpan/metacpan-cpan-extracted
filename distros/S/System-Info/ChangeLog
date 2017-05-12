@@ -1,0 +1,31 @@
+0.054	- 2017-03-21,  H.Merijn Brand
+    * It's 2017
+    * Add DSM-6.1
+    * Add OpenSUSE 42.2
+    * Improve /pro/cpuinfo parsing (RT#120559)
+    * Add CentOS 7.3
+    * Add Oracle Server 7.2
+
+0.053	- 2016-09-19,  H.Merijn Brand
+    * Add tests for NixOS 16.09
+    * Add tests for Fedora-23
+    * Add tests for OpenELEC-6.95.3 (7-beta)
+    * Add tests for Fedora-14
+    * Add tests for Rasbian-8
+    * Add tests for opensuse Tumbleweed
+    * Use DISTRIB_RELEASE
+    * Use VERSION_ID (Tumbleweed)
+
+0.052	- 2016-07-11,  H.Merijn Brand
+    * 0.051 had a version mismatch in the dist file
+    * Add tests for CentOS-7.2
+
+0.051	- 2016-05-12,  H.Merijn Brand
+    * Add DSM-6.0
+    * Test with perl 5.24.0
+
+0.050	- 2016-04-28,  H.Merijn Brand
+    * CPANTESTERS PASS'd on 049_01, so release to CPAN
+
+0.043	- 2016-04-24,  H.Merijn Brand
+    * Direct extract from System

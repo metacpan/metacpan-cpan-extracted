@@ -1,0 +1,16 @@
+Changes
+lib/Str/Filter.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/filter.t
+t/no-args.t
+xt/author/critic.t
+xt/author/perlcritic.rc
+xt/author/pod-coverage.t
+xt/release/kwalitee.t
+xt/release/pod-syntax.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

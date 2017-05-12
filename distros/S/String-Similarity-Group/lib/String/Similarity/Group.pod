@@ -1,0 +1,209 @@
+=pod
+
+=head1 NAME
+
+String::Similarity::Group - take a list of strings and group them by similarity within a threshold
+
+=head1 SYNOPSIS
+
+   use String::Similarity::Group ':all';
+   
+   my @elements = qw/victory victori matrix latrix ooland/;   
+   
+   my @groups   = groups( 0.8, \@elements );
+   # ( [ 'victory', 'victori' ], [ 'matrix', 'latrix' ] )
+   
+   my @loners   = loners( 0.8, \@elements );
+   # ( 'ooland' )
+   
+   # Which of the elements closest matches a string?
+   my($element, $score) = similarest(\@elements, 'oland');
+   # ( 'ooland', 0.83 )
+
+=head1 DESCRIPTION
+
+Imagine you have a list of filenames, and you want to group them by similarity.
+You can simply pass at list of strings, the min similarity to match, and you 
+get an array of groups ( array refs of similar elements).
+
+Or if you have a list of strings, and you want to know which is most similar to your
+control string.
+
+If you have a list of names of people, and you want to know which are the most unique 
+of the bunch.
+
+=head1 SUBS
+
+None exported by default.
+
+=head2 groups()
+
+First argument is similarity minimum.
+Second argument is an array ref ( of the strings in question).
+
+Returns array. 
+Each element of this array is an array ref, of a group of elements, 
+that match at least as your similarity minimum argument.
+If an element did not contain at least one match, it is left out.
+
+   my @groups = groups( 0.80, [ qw/vitamins vtamins vitanims profile/] );
+
+=head3 lazy matching vs hard matching
+
+As we group, the first element is the 'group leader', by default, as 
+we test elements, we test only to each group leader, and pick the highest
+matching. This decreases the number of similarity procedures exponentially,
+and still provides great results (tests included in distro).
+
+You may however want to have stricter, or lazier- matching..
+
+If you use lazy matching, we stop at the first positive match to classify an element
+onto a group. With hard matching (default), we continue evaluating every element
+until we have the best match possible- to classify.
+Hard matching is important when you have a low similarity minimun set- to get more accurate
+results.
+
+=head4 groups()
+
+Default. Finds closest group leader, to group by.
+
+=head4 groups_hard()
+
+Thorough grouping.
+Finds closest element, in every group, to group by.
+
+=head4 groups_lazy()
+
+Laziest grouping, tests to first matching group leader, without comparing the others.
+
+=cut
+
+
+
+
+
+=head2 loners()
+
+First argument is similarity min.
+Second argument is an array ref to the strings in question.
+
+Returns array of every element that does not group.
+
+If an element did contain more than one match, it is left out.
+For example, if your list has very different strings, and you set the min high..
+
+   my @elements = qw/victory victori couples singling/;   
+   my @loners = loners( 0.9, \@elements );
+   scalar @loners == 2 or die;
+   # @loners contains couples, singing
+
+Another way to explain what this does: I have a list of 50 names of people. Which 
+are the most unique ones?
+
+=cut
+
+
+
+
+=head2 similarest()
+
+Arguments are array ref, string, and optionally a similarity minimum.
+Returns array, first element is element that matches highest, second element is the
+similarity score.
+
+For example, you have a list of names, you want to see which of these names is most 
+alike the name 'Paul'..
+
+   my @names = qw/Paula James Marcus Gregg/;
+   my( $closest_name, $score ) = similarest(  \@names, 'Paul' );
+
+What if you only want to get a result if the similarity is at least 0.8 ?
+
+   my @names = qw/Paula James Marcus Gregg/;
+   my( $closest_name, $score ) = similarest(  \@names, 'Paul', 0.8 );
+
+If none matches (if all score to 0, or all scores are below your similarity minimum 
+argument), returns undef.
+
+=head2 sort_by_silimarity()
+
+Arguments are array ref, string, and optionally a similarity minimum.
+Returns array or array ref depending on context.
+
+Elements are ordered by highest to lowest similarity.
+
+   my @a = qw/assumptionatedexpress socount acount/;
+   my @b = sort_by_similarity( \@, 'acoun' ); # returns  acount socount assumptionatedexpress
+   
+   my @b = sort_by_similarity( \@, 'acoun', 0.9 ); # returns acount
+
+
+=cut
+
+
+
+=head1 similarity minimum
+
+See L<String::Similarity>.
+Minimum required to be a positive match, float from 0.00 to 1.00.
+
+=head2 Varying the similarity minimum
+
+If you relax or tighten the similarity minimum, you get different results.
+   
+   my @groups   = groups( 0.80, [qw/victory victori matrix latrix ooland] );
+   # ( [ 'victory', 'victori' ], [ 'matrix', 'latrix' ] )
+   
+If you set the minimum very low, it means we tolerate just about any match...
+
+   my @groups   = groups( 0.05, [qw/victory victori matrix latrix ooland] );
+   # ( [ 'victory', 'victori', 'matrix', 'latrix', 'ooland' ] )
+
+Thus we deem there to be one group, in this case, not very useful.
+
+=cut
+
+
+
+
+=head1 CAVEATS
+
+This is alpha software. Still in development.
+
+=head1 DISCUSSION
+
+If you use the same element twice, it is ignored. This is beacause of the internals.
+That means if you do this:
+
+   my @groups   = groups( 0.8, [qw/victory victory] );
+
+Nothing is returned!
+
+If you lower the similarity minimum a lot, we get high groupings, one group tends to accumulate
+a lot more matches than other groups. This is because inside, we test against every element
+in a group to make a positive group match.
+
+Should this work differently? See any bugs? Have any suggestions? Please contact the AUTHOR.
+
+=head1 SEE ALSO
+
+L<String::Similarity>, excellent package to deem similarity between strings.
+L<gbs> - included in package, cli interface command.
+
+=head1 AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+=head1 LICENSE
+
+This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself, i.e., under the terms of the "Artistic License" or the "GNU General Public License".
+
+=head1 DISCLAIMER
+
+This package is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+See the "GNU General Public License" for more details.
+
+=cut
+
+

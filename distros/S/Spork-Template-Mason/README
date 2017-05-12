@@ -1,0 +1,6 @@
+Sample Mason templates for Spork.
+
+perl Build.PL
+./Build
+./Build test
+./Build install

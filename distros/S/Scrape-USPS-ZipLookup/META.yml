@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:               Scrape-USPS-ZipLookup
+version:            2.6
+abstract:           Programmatic interaction with the USPS Zip Code Lookup web application
+author:
+    - Gregor N. Purdy, Sr. (gnp@acm.org)
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    HTML::TreeBuilder::XPath:  0.14
+    HTTP::Request::Common:  6.03
+    LWP::Protocol::https:  6.03
+    LWP::UserAgent:       6.04
+    XML::XPathEngine:     0.13
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

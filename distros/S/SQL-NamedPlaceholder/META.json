@@ -1,0 +1,85 @@
+{
+   "abstract" : "extension of placeholder",
+   "author" : [
+      "cho45 <cho45@lowreal.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.2",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "SQL-NamedPlaceholder",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0",
+            "Module::Build::Tiny" : "0.035",
+            "perl" : "5.008_001"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter::Lite" : "0",
+            "Scalar::Util" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Fatal" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "SQL::NamedPlaceholder" : {
+         "file" : "lib/SQL/NamedPlaceholder.pm",
+         "version" : "0.10"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/cho45/SQL-NamedPlaceholder/issues"
+      },
+      "homepage" : "https://github.com/cho45/SQL-NamedPlaceholder",
+      "repository" : {
+         "url" : "git://github.com/cho45/SQL-NamedPlaceholder.git",
+         "web" : "https://github.com/cho45/SQL-NamedPlaceholder"
+      }
+   },
+   "version" : "0.10",
+   "x_contributors" : [
+      "mechairoi <ttsujikawa@gmail.com>",
+      "shiba_yu36 <shibayu36@gmail.com>",
+      "Songmu <y.songmu@gmail.com>",
+      "karupanerura <karupa@cpan.org>"
+   ]
+}

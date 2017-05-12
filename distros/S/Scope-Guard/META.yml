@@ -1,0 +1,28 @@
+---
+abstract: 'lexically-scoped resource management'
+author:
+  - 'chocolateboy <chocolate@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Scope-Guard
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.006001'
+resources:
+  bugtracker: https://github.com/chocolateboy/Scope-Guard/issues
+  repository: https://github.com/chocolateboy/Scope-Guard
+version: '0.21'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_test_requires:
+  Test::More: 0

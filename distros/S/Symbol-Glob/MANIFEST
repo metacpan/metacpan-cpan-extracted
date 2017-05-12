@@ -1,0 +1,16 @@
+.cvsignore
+Changes
+lib/Symbol/Glob.pm
+Makefile.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00.load.t
+t/01build.t
+t/02setget.t
+t/03capture.t
+t/04corners.t
+t/05override.t
+t/06delete.t
+t/pod-coverage.t
+t/pod.t

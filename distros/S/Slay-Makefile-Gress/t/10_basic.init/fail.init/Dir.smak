@@ -1,0 +1,4 @@
+test: jefferson.ok madison.ok
+
+%.ok:
+        echo "Bad" > $TARGET

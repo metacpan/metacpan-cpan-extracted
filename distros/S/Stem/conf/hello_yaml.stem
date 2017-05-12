@@ -1,0 +1,12 @@
+--- #YAML:1.0
+-
+ class: Stem::Console
+-
+ class: Stem::Proc
+ name: hello
+ args:
+    path: bin/hello.sh
+    proc_args: 
+     - Athena Health
+    cell_attr:
+     data_addr: console

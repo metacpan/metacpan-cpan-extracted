@@ -1,0 +1,84 @@
+NAME
+    Spreadsheet::WriteExcel::FromDB - Convert a database table to an Excel
+    spreadsheet
+
+SYNOPSIS
+      use Spreadsheet::WriteExcel::FromDB;
+
+      my $dbh = DBI->connect(...);
+
+      my $ss = Spreadsheet::WriteExcel::FromDB->read($dbh, $table_name);
+      $ss->ignore_columns(qw/foo bar/); 
+      # or
+      $ss->include_columns(qw/foo bar/); 
+
+      $ss->restrict_rows('age > 10');
+
+      print $ss->as_xls;
+      # or
+            $ss->write_xls('spreadsheet.xls');
+
+DESCRIPTION
+    This module exports a database table as an Excel Spreadsheet.
+
+    The data is not returned in any particular order, as it is a simple task
+    to perform this in Excel. However, you may choose to ignore certain
+    columns, using the 'ignore_columns' method.
+
+METHODS
+  read
+    Creates a spreadsheet object from a database handle and a table name.
+
+  dbh / table
+    Accessor / mutator methods for the database handle and table name.
+
+  restrict_rows
+      $ss->restrict_rows('age > 10');
+
+    An optional 'WHERE' clause for restricting the rows returned from the
+    database.
+
+  ignore_columns
+      $ss->ignore_columns(qw/foo bar/);
+
+    Output all columns, except these ones, to the spreadsheet.
+
+  include_columns
+      $ss->include_columns(qw/foo bar/);
+
+    Only include these columns into the spreadsheet.
+
+  as_xls
+      print $ss->as_xls;
+
+    Return the table as an Excel spreadsheet.
+
+  write_xls
+            $ss->write_xls('spreadsheet.xls');
+
+    Write the table to a spreadsheet with the given filename.
+
+BUGS
+    Dates are handled as strings, rather than dates.
+
+AUTHOR
+    Tony Bowden
+
+BUGS and QUERIES
+    Please direct all correspondence regarding this module to:
+    bug-Spreadsheet-WriteExcel-Simple@rt.cpan.org
+
+COPYRIGHT AND LICENSE
+      Copyright (C) 2001-2005 Tony Bowden.
+
+      This program is free software; you can redistribute it and/or modify it under
+      the terms of the GNU General Public License; either version 2 of the License,
+      or (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful, but WITHOUT
+      ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+      FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+    Spreadsheet::WriteExcel::Simple. Spreadsheet::WriteExcel. DBI
+

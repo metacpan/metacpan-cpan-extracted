@@ -1,0 +1,49 @@
+Header
+lines
+
+== stencil ==
+
+If you write this:
+
+--input--
+
+    <%= badge '3' %>
+
+--end input--
+
+It becomes this:
+
+--output--
+
+    <span class="badge">3</span>
+
+--end output--
+
+== stencil ==
+
+If you write this [2]:
+
+--input--
+
+    <%= badge '3' %>
+
+--end input--
+
+It becomes this:
+
+--output--
+
+    <span class="badge">3</span>
+
+--end output--
+
+
+
+== stencil { loop => [qw/first second/]} ==
+
+--input--
+  looped: [var]
+--end input--
+--output--
+  looped: [var]
+--end output--

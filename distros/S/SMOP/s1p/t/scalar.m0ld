@@ -1,0 +1,19 @@
+my $interpreter;
+my $scope;
+my $out_scalar = $scope."postcircumfix:{ }"("$OUT");
+my $out = $out_scalar."FETCH"();
+
+my $void = $out."print"("1..2\n");
+
+my $Scalar_scalar = $scope."postcircumfix:{ }"("Scalar");
+my $Scalar = $Scalar_scalar."FETCH"();
+
+my $s1 = $Scalar."new"();
+my $tmp = $s1."FETCH"();
+my $void = $s1."STORE"("o");
+my $o = $s1."FETCH"();
+my $void = $out."print"($o,"k 1\n");
+
+my $s2 = $Scalar."new"("k 2\n");
+my $k2 = $s2."FETCH"();
+my $void = $out."print"("o",$k2);

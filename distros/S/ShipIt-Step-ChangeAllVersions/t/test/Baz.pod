@@ -1,0 +1,10 @@
+=head1 VERSION
+
+This is Baz version v0.001.
+
+=head1 OTHER SECTION
+
+We care only the VERSION section. The version 0.001 should not be changed.
+
+=cut
+

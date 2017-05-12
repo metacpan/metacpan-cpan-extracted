@@ -1,0 +1,53 @@
+NAME
+    Set::Crontab - Expand crontab(5)-style integer lists
+
+SYNOPSIS
+    $s = Set::Crontab->new("1-9/3,>15,>30,!23", [0..30]);
+
+    if ($s->contains(3)) { ... }
+
+DESCRIPTION
+    Set::Crontab parses crontab-style lists of integers and defines
+    some utility functions to make it easier to deal with them.
+
+  Syntax
+
+    Numbers, ranges, *, and step values all work exactly as described
+    in the crontab(5) manpage. A few extensions to the standard syntax
+    are described below.
+
+    < and >
+        <N selects the elements smaller than N from the entire range,
+        and adds them to the set. >N does likewise for elements larger
+        than N.
+
+    !   
+        !N excludes N from the set. It applies to the other specified
+        range; otherwise it applies to the specified ranges (i.e. "!3"
+        with a range of "1-10" corresponds to "1-2,4-10", but ">3,!7" in
+        the same range means "4-6,8-10").
+
+  Functions
+
+    new($spec, [@range])
+        Creates a new Set::Crontab object and returns a reference to it.
+
+    contains($num)
+        Returns true if `$num' exists in the set.
+
+    list()
+        Returns the expanded list corresponding to the set.
+
+    The functions described above croak if they are called with
+    incorrect arguments.
+
+SEE ALSO
+    The crontab(5) manpage.
+
+AUTHOR
+    Abhijit Menon-Sen <ams@toroid.org>
+
+    Copyright 2001 Abhijit Menon-Sen <ams@toroid.org>
+
+    This module is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself.

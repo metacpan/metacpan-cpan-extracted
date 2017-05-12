@@ -1,0 +1,64 @@
+NAME
+    String::Index - Perl XS module for strchr()/index() hybrids
+
+SYNOPSIS
+      use String::Index qw( cindex ncindex crindex ncrindex );
+  
+      $first_vowel    =   cindex("broadcast", "aeiouy");  # 2
+      $last_vowel     =  rcindex("broadcast", "aeiouy");  # 6
+      $first_nonvowel =  ncindex("eerily",    "aeiouy");  # 2
+      $last_nonvowel  = ncrindex("eerily",    "aeiouy");  # 4
+
+ABSTRACT
+    This module provides functions that are a cross between Perl's "index()"
+    and "rindex()" and C's "strchr()" and "strrchr()".
+
+DESCRIPTION
+    This module provides four functions that are Perl/C hybrids. They allow
+    you to scan a string for the first or last occurrence of any of a set of
+    characters, or not of a set of characters.
+
+  Exported on request
+    There are four functions, which must be exported explicitly.
+
+    cindex(STR, CHARS, POSITION)
+    cindex(STR, CHARS)
+        It returns the position of the first occurrence of one of CHARS in
+        STR at or after POSITION. If POSITION is omitted, starts searching
+        from the beginning of the string. The return value is based at 0. If
+        none of the characters you are searching for are found, it returns
+        -1.
+
+    ncindex(STR, CHARS, POSITION)
+    ncindex(STR, CHARS)
+        It returns the position of the first occurrence of a character other
+        than those in the string CHARS in STR at or after POSITION. If
+        POSITION is omitted, starts searching from the beginning of the
+        string. The return value is based at 0. If STR is composed entirely
+        of characters in CHARS, it returns -1.
+
+    crindex(STR, CHARS, POSITION)
+    crindex(STR, CHARS)
+        Works just like "cindex()" except that it returns the position of
+        the LAST occurrence of any of CHARS in STR. If POSITION is
+        specified, returns the last occurrence at or before that position.
+
+    ncrindex(STR, CHARS, POSITION)
+    ncrindex(STR, CHARS)
+        Works just like "ncindex()" except that it returns the position of
+        the LAST occurrence of any character other than those in CHARS in
+        STR. If POSITION is specified, returns the last occurrence at or
+        before that position.
+
+SEE ALSO
+    See the man page for "strchr()".
+
+AUTHOR
+    Jeff "japhy" Pinyan, <japhy@pobox.com>
+
+COPYRIGHT AND LICENSE
+    Copyright 2004 by japhy
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,45 @@
+
+		       Stem::Portal Design Notes
+
+The Stem::Portal class supports the transmission of Stem Messages
+between Stem Hubs. Portals are based on sockets and are configured very
+similarly to a Socket with host and port attributes. Also a Portal can
+be designated a TCP/IP server or a client. Once two Hubs are connected
+via their Portals, they communicate peer to peer in full duplex mode.
+
+Portals are sent a Message to transmit by the Stem::Msg delivery
+subsystem. The Message is converted to a byte stream format and written
+to the Portal socket. When a Portal reads a byte stream Message from its
+socket, it converts it back to an internal Message and sends it to the
+Stem::Msg class for delivery.
+
+When a Stem Portal connects to another, they both exchange a special
+'register' type Stem Message. This message when received by a Portal is
+trapped and never sent for delivery to the Stem::Msg subsystem. The
+'register' message contains the Hub name of the remote Portal. This name
+is then stored in a registry private to the Portal class. It is used by
+the Stem::Msg delivery subsystem to look up which Portal to use to send
+out a remote message. You can see the current state of the Portal
+registry by sending a 'status' command message to the Portal class. This
+is easily done from the terminal (if the Hub has Stem::TtyMsg
+configured) with the command:
+
+	:port status
+
+If you put a Hub name before the :, you will get the Portal registry
+status of that Hub.
+
+A special alias is set up for a client Portal that is the first one
+configured in a Hub. It is given the alias DEFAULT and this Portal
+becomes the default destination for any Messages that aren't delivered
+locally. So if a Stem Message has no Hub in its 'to' address and the
+Cell name is not registered locally, it is sent to the DEFAULT Portal
+and hence to the Hub it is connected to. This is very similar to the
+default route in IP routers like the routed daemon. A new feature (to be
+implemented soon) will be to allow the setting of the DEFAULT Portal at
+configuration or run time.
+
+Security of Hub to Hub communications are handled by the Portal
+Cells. There are two designs in progress, one which pipes over ssh to
+the other Hub, and an internal encryption module which will perform the
+same functions but be more efficient.

@@ -1,0 +1,78 @@
+#
+# $Header: /cvsroot/devicetool/Solaris-DeviceTree/lib/Solaris/DeviceTree.pod,v 1.1 2003/12/07 19:35:24 honkbude Exp $
+#
+
+=pod
+
+=head1 NAME
+
+Solaris::DeviceTree - Perl interface to the Solaris devicetree
+
+=head1 SYNOPSIS
+
+  use Solaris::DeviceTree
+
+Construction and destruction:
+
+  $devtree = Solaris::DeviceTree->new
+  $devtree = Solaris::DeviceTree->new( use => [ qw( libdevinfo path_to_inst filesystem ) ] )
+  $devtree->DESTROY
+
+Tree traversal:
+
+  @children = $devtree->child_nodes
+  @siblings = $devtree->sibling_nodes
+  $node = $node->parent_node
+  $root = $node->root_node
+
+Methods concerning tree merging:
+
+  @sources = $node->sources
+
+Data access methods:
+
+  $path = $node->devfs_path
+  $instance = $devtree->instance
+  $id = $node->nodeid
+  @compat_names = $devtree->compatible_names
+  ...
+
+=head1 DESCRIPTION
+
+The L<Solaris::DeviceTree> module implements the L<Solaris::DeviceTree::Node>
+interface to access the Solaris device tree in a unified view from multiple data sources.
+The devicetree is presented as a hierarchical collection of nodes.
+The information is collected from the kernel via access to
+C<libdevinfo>, the contents of the file C</etc/path_to_inst> and
+the filesystem entries below C</dev> and C</devices>.
+Each node contains the unified information from the data sources
+configured during object construction.
+
+
+=head1 EXAMPLES
+
+=head2 Print the device pathes contained in the C</etc/path_to_inst>
+
+  use Solaris::DeviceTree;
+
+  my $t = Solaris::DeviceTree->new( use => [ qw( path_to_inst ) ] );
+  my @nodes = ( $t );
+  while( @nodes > 0 ) {
+    my $node = shift @nodes;
+    print $node->devfs_path, "\n";
+    unshift @nodes, $node->child_nodes;
+  }
+
+=head1 AUTHOR
+
+Copyright 1999-2003 Dagobert Michelsen.
+
+
+=head1 SEE ALSO
+
+L<Solaris::DeviceTree::PathToInst>, L<Solaris::DeviceTree::Filesystem>,
+L<Solaris::DeviceTree::Libdevinfo>.
+
+=cut
+
+1;

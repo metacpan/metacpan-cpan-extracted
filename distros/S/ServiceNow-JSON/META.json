@@ -1,0 +1,44 @@
+{
+   "abstract" : "Absraction Library for ServiceNow JSON WebServices",
+   "author" : [
+      "Kevin L. Kane <kkane@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "ServiceNow-JSON",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON" : "0.01",
+            "MIME::Base64" : "0.01",
+            "Moose" : "0.01",
+            "REST::Client" : "0.01"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.01"
+}

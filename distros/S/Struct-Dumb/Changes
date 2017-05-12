@@ -1,0 +1,41 @@
+Revision history for Struct-Dumb
+
+0.09    2016/03/09 17:49:17
+        [CHANGES]
+         * Allow callers to allow ARRAY dereference for special circumstances
+
+0.08    2015/12/15 17:45:46
+        [CHANGES]
+         * Support perl 5.8.x (which lacks overloading.pm)
+
+0.07    2015/10/11 12:37:51
+        [BUGFIXES]
+         * Provide the other conversion overload operations and allow fallback
+
+0.06    2015/10/07 00:24:52
+        [BUGFIXES] 
+         * Ensure that structs are still boolean true
+
+0.05    2015/10/06 23:12:58
+        [BUGFIXES]
+         * Throw an exception on attempts to dereference a struct as an
+           array (RT107583)
+         * Throw an exception if accessor-mutators are invoked with extra
+           arguments
+         * Give AUTOLOAD :lvalue context so it reports the right message for
+           attempts to assign to missing fields (RT107577)
+
+0.04    2015/09/30 18:29:01
+        [CHANGES]
+         * Support creating a predicate test function
+
+0.03    2014/07/25 10:01:02
+        [CHANGES]
+         * Support named constructors (RT97452)
+
+0.02    BUGFIXES:
+         * Fix unit tests to cope with new Carp message format, with the "."
+           appended
+
+0.01    First version, released on an unsuspecting world.
+

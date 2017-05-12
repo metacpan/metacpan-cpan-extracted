@@ -1,0 +1,9 @@
+Revision history for Perl extension Sash.
+
+1.01  Sat Mar 10 12:20:00 2007
+	- Brought the documentation more up to date.  Still
+          need to writeup how to develop a plugin and contribute
+          to sash.
+1.00  Mon Feb 26 22:19:52 2007
+	- original version;
+

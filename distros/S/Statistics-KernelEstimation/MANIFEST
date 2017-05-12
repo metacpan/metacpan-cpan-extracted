@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01sanity.t
+t/02gauss.t
+t/03box.t
+t/04epanechnikov.t
+t/05histogram.t
+lib/Statistics/KernelEstimation.pm
+META.yml                                 Module meta-data (added by MakeMaker)

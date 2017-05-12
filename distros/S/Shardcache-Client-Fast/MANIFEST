@@ -1,0 +1,13 @@
+Changes
+Fast.xs
+Makefile.PL
+MANIFEST
+ppport.h
+typemap
+t/Shardcache-Client-Fast.t
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/Shardcache/Client/Fast.pm
+lib/Shardcache/Client/Fast/MultifResultParser.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

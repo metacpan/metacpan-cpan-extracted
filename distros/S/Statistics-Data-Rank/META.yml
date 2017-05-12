@@ -1,0 +1,26 @@
+---
+abstract: 'Utilities for ranking data'
+author:
+  - 'Roderick Garton <rgarton@cpan.org>'
+build_requires:
+  Array::Compare: '2.02'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.421'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Statistics-Data-Rank
+provides:
+  Statistics::Data::Rank:
+    file: lib/Statistics/Data/Rank.pm
+    version: '0.02'
+requires:
+  List::AllUtils: '0.09'
+  Statistics::Data: '0.09'
+  Statistics::Lite: '3.2'
+  String::Util: '1.24'
+version: '0.02'

@@ -1,0 +1,37 @@
+SYNOPSIS
+
+     use String::Elide::Lines qw(elide);
+
+DESCRIPTION
+
+    String::Elide::Lines is based on String::Elide::Parts but works on a
+    per-line basis.
+
+FUNCTIONS
+
+ elide($str, $len[, \%opts]) => str
+
+    Elide lines from a string if the string contains more than $len lines.
+
+    String can be marked with <elspan prio=N truncate=T
+    marker=M>...</elspan> so there can be multiple parts with different
+    priorities and truncate direction. The default priority is 1. You can
+    mark less important lines with higher priority to let it be elided
+    first. The markup will be removed from the string before eliding.
+
+    Known options:
+
+      * marker => str (default: '..')
+
+      * truncate => 'top'|'middle'|'bottom'|'ends' (default: 'bottom')
+
+      * default_prio => int (default: 1)
+
+SEE ALSO
+
+    String::Elide::Parts is the basis of this module but works on a
+    per-character basis. See that module's SEE ALSO for list of other
+    string eliding modules.
+
+    Pod::Elide uses this module.
+

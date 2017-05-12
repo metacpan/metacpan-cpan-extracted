@@ -1,0 +1,36 @@
+SQL::Interpolate
+    - Simplified interpolation of variables into SQL statements.
+
+Copyright (c) 2004-2005, David Manura.
+This module is free software. It may be used, redistributed
+and/or modified under the same terms as Perl itself.
+See http://www.perl.com/perl/misc/Artistic.html.
+
+To install (with ExtUtils::MakeMaker):
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+To install (with Module::Build):
+
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
+
+This module may require the following other modules:
+
+  Text::Balanced
+    - comes with Perl 5.8 and is needed only when using
+      SQL::Interpolate with source filtering enabled
+
+  Filter::Simple
+    - comes with Perl 5.8, needed only when using
+      SQL::Interpolate with source filtering enabled.
+
+  DBI
+    - needed by DBIx::Interpolate
+
+Documentation is in the POD.

@@ -1,0 +1,15 @@
+<table cellpadding="0" cellspacing="0" class="sol_alert_container">
+  <tr>
+    <td><img src="<!-- sol_var name=alert_image -->" alt="Alert" title="Alert" /></td>
+    <td style="width: 99%; padding-left: 20px;">
+      <!-- sol_if name=errors -->
+      <!-- sol_loop name=errors -->
+      <span class="sol_error_notification_text"><!-- sol_var name=msg --></span><br />
+      <!-- /sol_loop -->
+      <!-- sol_else -->
+      <span class="sol_error_notification_text">There were problems with your form.</span>
+      <!-- /sol_if -->
+    </td>
+  </tr>
+</table>
+<br />

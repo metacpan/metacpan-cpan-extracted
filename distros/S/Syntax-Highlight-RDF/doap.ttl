@@ -1,0 +1,83 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Syntax-Highlight-RDF/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-recommendation [ doap-deps:on "JSON 2.00"^^doap-deps:CpanId ], [ doap-deps:on "RDF::Trine 1.000"^^doap-deps:CpanId ], [
+		doap-deps:on "RDF::TrineX::Serializer::MockTurtleSoup 0.001"^^doap-deps:CpanId;
+	];
+	doap-deps:runtime-requirement [ doap-deps:on "MooX::Struct 0.001"^^doap-deps:CpanId ], [
+		doap-deps:on "Throwable::Factory 0.001"^^doap-deps:CpanId;
+	], [ doap-deps:on "URI"^^doap-deps:CpanId ], [
+		doap-deps:on "HTML::HTML5::Entities 0.001"^^doap-deps:CpanId;
+	], [ doap-deps:on "IO::Detect 0.001"^^doap-deps:CpanId ], [ doap-deps:on "Moo 1.001000"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::LongString"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Syntax-Highlight-RDF>;
+	doap:created         "2013-03-21"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/Syntax-Highlight-RDF>;
+	doap:homepage        <https://metacpan.org/release/Syntax-Highlight-RDF>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "Syntax-Highlight-RDF";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Syntax-Highlight-RDF/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Syntax-Highlight-RDF/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Syntax-Highlight-RDF/v_0-003>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-syntax-highlight-rdf>;
+	];
+	doap:shortdesc       "syntax highlighting for various RDF-related formats".
+
+<http://purl.org/NET/cpan-uri/dist/Syntax-Highlight-RDF/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "Syntax-Highlight-RDF-0.001"^^xsd:string;
+	dc:issued            "2013-03-22"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Syntax-Highlight-RDF-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Syntax-Highlight-RDF/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "Syntax-Highlight-RDF-0.002"^^xsd:string;
+	dc:issued            "2013-03-23"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix fatal UTF-8-related warning on certain Perls.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Syntax-Highlight-RDF-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Syntax-Highlight-RDF/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "Syntax-Highlight-RDF-0.003"^^xsd:string;
+	dc:issued            "2014-09-11"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Switch to Dist::Inkt.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Syntax-Highlight-RDF-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

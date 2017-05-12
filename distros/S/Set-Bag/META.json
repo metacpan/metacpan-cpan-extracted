@@ -1,0 +1,42 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "David Oswald <davido@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Set-Bag",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.56"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.004000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {},
+   "version" : "1.012"
+}

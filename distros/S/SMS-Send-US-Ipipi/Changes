@@ -1,0 +1,11 @@
+Revision history for Perl extension SMS::Send::US::Ipipi.
+
+0.02 Mon June 1 2008
+    - fixed test suite to deal with login information
+    - improving documentation and install notes
+    
+0.01  Tue May 27 13:35:03 2008
+    - original version; created by h2xs 1.23 with options
+        -AX -n SMS::Send::US::Ipipi
+    - copied Adam Kennedy's SMS::Send::AU::MyVodafone module.
+

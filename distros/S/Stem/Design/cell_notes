@@ -1,0 +1,107 @@
+
+			 Stem Cell Design Notes
+
+Stem Cells are the fundamental working unit in a Stem application.
+Cells are Perl objects that have 3 primary characteristics: First, they
+must be registered with a Stem address. Second, they must have public
+methods that can take an incoming message as an argument. And third, a
+cell must be able to generate messages.  There are three major types of
+Stem Cells: class, object and cloned Cells.  These are described in
+further detail below.
+
+Class Cells are created by a Stem class which registers itself (using
+the Stem::Route::register_class routine at module load time) and are
+always registered using its class name.  Class Cells are typically
+created by modules which manage some global resource and don't need to
+have multiple object instances created. A common reason for this is a
+module which has a 'status_cmd' (or similar) method that is used to
+get the status of the whole module. The Class Cell registration makes
+those methods accessible via messages. Some Stem classes such as
+Stem::Conf, Stem::Portal, Stem::Msg are Class Cells. Some modules can be
+a Class Cell and also create Object Cells.  Class Cells can optionally
+be registered with aliases. The aliases make it easier to send a command
+message from the terminal (using Stem::TtyMsg) to a class Cell
+(Stem::Route is aliased to 'reg', Stem::Cron is aliased to 'cron').
+
+Object Cells are objects that are created by a class's constructor and
+are then registered with the Stem::Route::register_cell routine. The
+registration takes the object and a required name (unique to this Hub).
+Most often an Object Cell is created by a configuration but any module
+can construct an object and register it. Since configurations can be
+loaded from files and executed anywhere, Stem Cells can be configured at
+any time during the existance of the current Stem system.
+
+Cloned Cells are only created by existing parent Object Cells. (Parent
+Cells are Object Cells set up to create Cloned Cells). When the parent
+Cell gets some form of trigger (typically a socket connection or a
+special command message), it makes a clone of itself and does whatever
+special work the cloned object needs. The parent Cell owns a Stem::Id
+object which it calls to generate a unique (within this Cell) Target
+name which it uses to register the cloned Cell. So the new Cell has a
+unique Cell/Target name pair which can be used in messages directed at
+it. In a typical case, the new Cloned Cell will send a message elsewhere
+informing some other object about its existance; e.g., The Stem::SockMsg
+class can be configured to clone itself when a socket connection is made and
+then it will send a 'pipe_start' command message out. In an Inetd
+configuration that message would be directed to a parent Stem::Proc
+Object Cell which will clone itself and fork a process. This clone will
+respond to the SockMsg message with its new target address, thereby
+setting up a Stem pipe between the socket and process. When either the
+process exits or the socket is closed, the cloned Cells are notified and
+they clean up and unregister themselves.
+
+You can always find the current set of Cells in a Hub by sending a
+'status' command message to the Class Cell Stem::Route. This is also
+registered with the alias of 'reg'. So from the terminal (if your Hub
+has configured in Stem::TtyMsg) you can type:
+
+reg status
+
+to get the registered Cells in this Hub or
+
+:hubname:reg status
+
+to get the Cells in a remote Hub.
+
+
+When a Stem message is delivered in a Hub, its 'to' address is looked up
+in the Hub's registry and the message is delivered to the destination
+Cell via a method.  A Cell must have some well known methods that handle
+incoming messages. These method names have well defined formats and
+uses. In general there are three groups of incoming message methods. All
+of these delivery methods get passed the message itself as their sole
+argument.
+
+The first group of delivery methods are those that handle command
+messages. These are named for the command (the 'cmd' field of a command
+message) with '_cmd' appended. So a foo command message will be
+delivered to the foo_cmd method if it exists in the destination Cell. If
+a command message method returns a value, it is automatically sent back
+to the originating Cell in a response message.
+
+The second group handles all other message types. They are named for the
+message type with a suffix of '_in'. So a 'foo' type message would be
+delivered to the 'foo_in' method if it exists in the destination Cell. A
+very common message type is 'data' and it gets delivered to the
+'data_in' method.
+
+The final group has the single method 'msg_in' which is used if no other
+method can handle the message. This is the default message delivery
+method. You can have a Cell with just this method and it should be
+designed to handle all expected message types.
+
+The use of specific delivery methods is not critical but it encourages
+cleaner Cell design by having methods focus on doing work and not on
+deciding how to handle different message types. This is in keeping with
+the Stem design philosophy of doing as much common work as possible
+behind the scenes, while leaving only the problem specific work to the
+Cell.
+
+There are no design considerations for sending messages from a Cell. It
+just creates a message object with the class call Stem::Msg->new and
+then dispatches it.  If the message doesn't have the 'from' address set,
+it will default to the address of the current Cell (if it is known).  If
+the code that generates a new message is not a registered Cell, then you
+must specify the 'from' address as one can't be deduced.
+
+For more on Cell addresses see registry_notes and message_notes.

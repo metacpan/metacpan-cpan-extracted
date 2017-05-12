@@ -1,0 +1,47 @@
+# Add and remove ds records to a domain
+template: update-domain.tt
+
+vars:
+  domain: 10-dnssec.co.te
+  dnssec:
+    add:
+      -
+        keytag: 1
+        alg: 5
+        digest_type: 1
+        digest: 1234abcd11111111111111111111111111111113
+    rem:
+      -
+        keytag: 1
+        alg: 5
+        digest_type: 1
+        digest: 1234abcd11111111111111111111111111111111
+
+input_assertions:
+  class: SRS::EPP::Command::Update::Domain
+
+SRS:
+    -
+        assertions: 
+           count:
+               - [ '//DomainDetailsQry', 1, 'DDQ generated']
+           match:
+               - [ '//DomainNameFilter', '10-dnssec.co.te', 'SRS[1] - Domain name filter correct' ]
+           attr_is:
+               - [ '//FieldList', 'DNSSEC', '1', 'SRS[1] - DNSSEC info requested in field list' ]
+    -
+        assertions:
+           count:
+               - [ '//DS', 3, 'SRS[2] - 3 ds records' ]
+           match:  
+               - [ '//DomainNameFilter', '10-dnssec.co.te', 'SRS[2] - Domain name filter correct' ]
+               - [ '//DS[1]/Digest', '8888ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff', "Second DS record correct" ]
+               - [ '//DS[2]/Digest', '1234abcd11111111111111111111111111111112', "Third DS record correct" ]
+               - [ '//DS[3]/Digest', '1234abcd11111111111111111111111111111113', "First DS record correct" ]
+
+
+output_assertions:
+  count:
+    - [ '//epp:result', 1, 'SRS: Check for one result' ]
+  attr_is:
+    - [ '//epp:result', 'code', 1000, 'SRS: Check for correct result code' ]

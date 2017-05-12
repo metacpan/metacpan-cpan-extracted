@@ -1,0 +1,104 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Schema::RDBMS::AUS;
+use Schema::RDBMS::AUS::User;
+
+{
+    my %o;
+    my %commands = (
+        help    =>  \&help,
+        delete  =>  sub{},
+        info    =>  \&info,
+        edit    =>  \&edit,
+        add     =>  \&add,
+    );
+
+    sub {
+        use Getopt::Long;
+        GetOptions(\%o,
+            (map {"$_|".substr($_,0,1)} @_),
+            (map {"$_|".substr($_,0,1)."=s"} qw(password name id)),
+            (map {"$_=s"} qw(db dbuser dbpass password_crypt)),
+            ('is_group')
+        );
+        
+        local $" = "|--";
+        die "$0 [--@_]" if 1 != grep {$o{$_}} @_;
+    }->(keys %commands);
+    
+    $o{_password} = delete $o{password} if exists $o{password};
+
+    exit $commands{(grep { $o{$_} } keys %commands)[0]}->(%o);
+}
+
+sub getdb {
+    my %o = @_;
+    return Schema::RDBMS::AUS->dbh(@o{'db','dbuser','dbpass'});
+}
+
+sub help {
+    print <<"EOT";
+Usage: $0 --info|--delete|--add|--help
+    --db=DSN --dbuser=username --dbpass=password
+    --add|--delete 
+    --name=username --id=id --password=password
+    --password_crypt=crypt --is_group
+EOT
+    0;
+}
+
+sub info {
+    my $dbh = &getdb;
+    my %o = @_;
+
+    die "A username (--name) or id (--id) is required"
+        unless $o{name} || $o{id};
+    
+    my $user = Schema::RDBMS::AUS::User->load(%o, _dbh => $dbh);
+    user_info($user);
+}
+
+sub user_info {
+    my $user = shift;
+    printf(
+        qq{User #%i:\n  Name: %s\n Crypt: %s\n  Used: %s\n Group: %s\n\n},
+        @$user{'id', 'name', 'password_crypt'},
+        $user->{time_used} ? $user->{time_used} : 'Never',
+        $user->{is_group} ? 'Yes' : 'No'
+    );
+        
+    return 0;
+}
+
+sub add {
+    my $dbh = &getdb;
+    my %o = @_;
+    
+    die "--id is not allowed for add" if $o{id};
+    my $user = Schema::RDBMS::AUS::User->create(%o, _dbh => $dbh);
+    user_info($user);
+}
+
+sub edit {
+    my $dbh = &getdb;
+    my %o = @_;
+    
+    my $user = Schema::RDBMS::AUS::User->load(%o, _dbh => $dbh);
+    $dbh->transaction(sub {
+        if($o{password_crypt} && !$o{_password}) {
+            warn "Warning: changing password_crypt without changing password ",
+                "will probably make account unusuable!";
+        }
+        %$user = (%$user, %o);
+        delete $user->{_password};
+        $user->save;
+        $user = $user->load;
+        $user->reset_password($o{_password}) if exists $o{_password};
+        user_info($user);
+        1;
+    });
+    
+    0;
+}

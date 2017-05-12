@@ -1,0 +1,9 @@
+
+Windows 2000 IP Configuration
+
+Ethernet adapter Local Area Connection:
+
+	Connection-specific DNS Suffix  . : 
+	Autoconfiguration IP Address. . . : 169.254.109.232
+	Subnet Mask . . . . . . . . . . . : 255.255.0.0
+	Default Gateway . . . . . . . . . : 

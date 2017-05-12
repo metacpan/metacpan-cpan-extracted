@@ -1,0 +1,8 @@
+Status: 200
+Content-Type: application/xml; charset: utf-8
+
+<?xml version="1.0" encoding="UTF-8"?>
+<formats>
+<format name="seealso" type="text/javascript" />
+<format name="opensearchdescription" type="application/opensearchdescription+xml" docs="http://www.opensearch.org/Specifications/OpenSearch/1.1/Draft_3#OpenSearch_description_document" />
+</formats>

@@ -1,0 +1,52 @@
+#!/usr/local/bin/perl -w
+
+use strict;
+use ExtUtils::testlib;
+use Solaris::Procfs qw(:procfiles);
+use lib '.';
+
+my $pid;
+
+die "usage: $0 pid\n" unless @ARGV;
+
+foreach $pid (@ARGV) {
+
+	warn "$0: no such process: $pid\n" unless $pid =~ /\d+/;
+
+	my $creds = prcred($pid);
+
+	unless (defined $creds and ref($creds) eq 'HASH') {
+
+		warn "Can't open /proc/$pid/cred: $!\n";
+		next;
+	}
+
+	print "$pid:\t";
+
+	my ($euid,$ruid,$suid,$egid,$rgid,$sgid,$groups) = (
+		$creds->{pr_euid},
+		$creds->{pr_ruid},
+		$creds->{pr_suid},
+		$creds->{pr_egid},
+		$creds->{pr_rgid},
+		$creds->{pr_sgid},
+		$creds->{pr_groups}
+	);
+
+	if ($euid == $ruid and $ruid == $suid) {
+		print "e/r/suid=$ruid  ";
+	} else {
+		print "euid=$euid ruid=$ruid suid=$suid  ";
+	}
+
+	if ($egid == $rgid and $rgid == $sgid) {
+		print "e/r/sgid=$rgid\n";
+	} else {
+		print "egid=$egid rgid=$rgid sgid=$sgid\n";
+	}
+
+	print("\tgroups: ", join(' ', @$groups), "\n")
+		if scalar @$groups > 1;
+}
+
+

@@ -1,0 +1,315 @@
+---
+MY:file<NULL.pad>: &1 !!perl/hash:Stash
+  '!file': NULL.pad
+  '!id':
+  - MY:file<NULL.pad>:line(1):pos(0)
+  '!line': 1
+  'GLOBAL::': !!perl/hash:Stash
+    '!file':
+      name: CORE.setting
+    '!id':
+    - GLOBAL
+    '!line': 1
+  'OUTER::': []
+MY:file<NULL.pad>:line(1):pos(0): *1
+MY:file<STD.pm6>: !!perl/hash:Stash
+  '!file': &2
+    name: STD.pm6
+  '!id': &3
+  - MY:file<STD.pm6>
+  '!line': 0
+  $!: !!perl/hash:NAME
+    dynamic: 1
+    file: *2
+    line: 1
+    name: $!
+    scope: my
+  $/: !!perl/hash:NAME
+    dynamic: 1
+    file: *2
+    line: 1
+    name: $/
+    scope: my
+  $?LONGNAME: STD
+  $_: !!perl/hash:NAME
+    dynamic: 1
+    file: *2
+    line: 1
+    name: $_
+    scope: my
+  '&STD': &4 !!perl/hash:NAME
+    declaredat: 196
+    file: *2
+    inlex: *3
+    inpkg: &5
+    - GLOBAL
+    line: 8
+    mult: only
+    name: STD
+    of: ~
+    scope: our
+    used: 1
+    xlex: *5
+  'OUTER::':
+  - MY:file<CORE.setting>:line(507):pos(11402)
+  STD: *4
+  'STD::': !!perl/hash:Stash
+    '!file': *2
+    '!id':
+    - GLOBAL::STD
+    '!line': 8
+    'PARENT::': *5
+MY:file<STD.pm6>:line(8):pos(196): !!perl/hash:Stash
+  '!IN_DECL': package
+  '!file': *2
+  '!id':
+  - MY:file<STD.pm6>:line(8):pos(196)
+  '!line': 8
+  'OUTER::':
+  - MY:file<STD.pm6>
+MY:file<lib/DEBUG.pm6>: &6 !!perl/hash:Stash
+  '!file': &7
+    name: lib/DEBUG.pm6
+  '!id': &8
+  - MY:file<lib/DEBUG.pm6>
+  '!line': 0
+  $!: !!perl/hash:NAME
+    dynamic: 1
+    file: *7
+    line: 1
+    name: $!
+    scope: my
+  $/: !!perl/hash:NAME
+    dynamic: 1
+    file: *7
+    line: 1
+    name: $/
+    scope: my
+  $?CORE_ID: MY:file<CORE.setting>:line(507):pos(11402)
+  $?LONGNAME: DEBUG
+  $?SETTING_ID: MY:file<CORE.setting>:line(507):pos(11402)
+  $_: !!perl/hash:NAME
+    dynamic: 1
+    file: *7
+    line: 1
+    name: $_
+    scope: my
+  '&DEBUG': &9 !!perl/hash:NAME
+    declaredat: 15
+    file: *7
+    inlex: *8
+    line: 1
+    mult: only
+    name: DEBUG
+    of: ~
+    scope: my
+    used: 1
+    xlex: *8
+  DEBUG: *9
+  'DEBUG::': !!perl/hash:Stash
+    '!file': *7
+    '!id':
+    - MY:file<lib/DEBUG.pm6>::DEBUG
+    '!line': 1
+    'PARENT::': *8
+  'EXPORT::': !!perl/hash:Stash
+    '!id': &10
+    - MY:file<lib/DEBUG.pm6>::EXPORT
+    'DEFAULT::': !!perl/hash:Stash
+      '!id':
+      - MY:file<lib/DEBUG.pm6>::EXPORT::DEFAULT
+      '&EXPR': &11 !!perl/hash:NAME
+        const: 1
+        declaredat: 220
+        export: DEFAULT
+        file: *7
+        inlex: *8
+        line: 7
+        mult: only
+        name: EXPR
+        of: ~
+        scope: ''
+        xlex: *8
+      '&autolexer': &12 !!perl/hash:NAME
+        const: 1
+        declaredat: 35
+        export: DEFAULT
+        file: *7
+        inlex: *8
+        line: 2
+        mult: only
+        name: autolexer
+        of: ~
+        scope: ''
+        xlex: *8
+      '&callm_show_subnames': &13 !!perl/hash:NAME
+        const: 1
+        declaredat: 446
+        export: DEFAULT
+        file: *7
+        inlex: *8
+        line: 13
+        mult: only
+        name: callm_show_subnames
+        of: ~
+        scope: ''
+        xlex: *8
+      '&cursors': &14 !!perl/hash:NAME
+        const: 1
+        declaredat: 324
+        export: DEFAULT
+        file: *7
+        inlex: *8
+        line: 10
+        mult: only
+        name: cursors
+        of: ~
+        scope: ''
+        xlex: *8
+      '&fates': &15 !!perl/hash:NAME
+        const: 1
+        declaredat: 133
+        export: DEFAULT
+        file: *7
+        inlex: *8
+        line: 5
+        mult: only
+        name: fates
+        of: ~
+        scope: ''
+        xlex: *8
+      '&fixed_length': &16 !!perl/hash:NAME
+        const: 1
+        declaredat: 103
+        export: DEFAULT
+        file: *7
+        inlex: *8
+        line: 4
+        mult: only
+        name: fixed_length
+        of: ~
+        scope: ''
+        xlex: *8
+      '&longest_token_pattern_generation': &17 !!perl/hash:NAME
+        const: 1
+        declaredat: 190
+        export: DEFAULT
+        file: *7
+        inlex: *8
+        line: 6
+        mult: only
+        name: longest_token_pattern_generation
+        of: ~
+        scope: ''
+        xlex: *8
+      '&matchers': &18 !!perl/hash:NAME
+        const: 1
+        declaredat: 254
+        export: DEFAULT
+        file: *7
+        inlex: *8
+        line: 8
+        mult: only
+        name: matchers
+        of: ~
+        scope: ''
+        xlex: *8
+      '&mixins': &19 !!perl/hash:NAME
+        const: 1
+        declaredat: 399
+        export: DEFAULT
+        file: *7
+        inlex: *8
+        line: 12
+        mult: only
+        name: mixins
+        of: ~
+        scope: ''
+        xlex: *8
+      '&symtab': &20 !!perl/hash:NAME
+        const: 1
+        declaredat: 66
+        export: DEFAULT
+        file: *7
+        inlex: *8
+        line: 3
+        mult: only
+        name: symtab
+        of: ~
+        scope: ''
+        xlex: *8
+      '&trace_call': &21 !!perl/hash:NAME
+        const: 1
+        declaredat: 290
+        export: DEFAULT
+        file: *7
+        inlex: *8
+        line: 9
+        mult: only
+        name: trace_call
+        of: ~
+        scope: ''
+        xlex: *8
+      '&try_processing': &22 !!perl/hash:NAME
+        const: 1
+        declaredat: 365
+        export: DEFAULT
+        file: *7
+        inlex: *8
+        line: 11
+        mult: only
+        name: try_processing
+        of: ~
+        scope: ''
+        xlex: *8
+      '&use_color': &23 !!perl/hash:NAME
+        const: 1
+        declaredat: 484
+        export: DEFAULT
+        file: *7
+        inlex: *8
+        line: 14
+        mult: only
+        name: use_color
+        of: ~
+        scope: ''
+        xlex: *8
+      EXPR: *11
+      'PARENT::': *10
+      autolexer: *12
+      callm_show_subnames: *13
+      cursors: *14
+      fates: *15
+      fixed_length: *16
+      longest_token_pattern_generation: *17
+      matchers: *18
+      mixins: *19
+      symtab: *20
+      trace_call: *21
+      try_processing: *22
+      use_color: *23
+    'PARENT::': *8
+  EXPR: *11
+  'OUTER::':
+  - MY:file<CORE.setting>:line(507):pos(11402)
+  autolexer: *12
+  callm_show_subnames: *13
+  cursors: *14
+  fates: *15
+  fixed_length: *16
+  longest_token_pattern_generation: *17
+  matchers: *18
+  mixins: *19
+  symtab: *20
+  trace_call: *21
+  try_processing: *22
+  use_color: *23
+MY:file<lib/DEBUG.pm6>:line(1):pos(15): !!perl/hash:Stash
+  '!IN_DECL': package
+  '!file': *7
+  '!id':
+  - MY:file<lib/DEBUG.pm6>:line(1):pos(15)
+  '!line': 1
+  'OUTER::':
+  - MY:file<lib/DEBUG.pm6>
+UNIT: *6

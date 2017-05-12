@@ -1,0 +1,6 @@
+#!/bin/sh
+dbicdump \
+	-o dump_directory=schema_dumps/lib \
+	-o components='["InflateColumn::DateTime"]' "Schema::RackTables::$1" \
+	-o moniker_map='sub { $_[0] }' \
+	'dbi:mysql:racktables' racktables racktables

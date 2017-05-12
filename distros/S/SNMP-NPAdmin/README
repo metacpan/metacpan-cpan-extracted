@@ -1,0 +1,66 @@
+
+SNMP::NPAdmin v1.0
+$Date: 2002/11/15 03:57:43 $
+
+################################################################################
+
+The 'SNMP::NPAdmin' is perl module that provides a high-level API for querying
+printers via SNMP.  It is a Perl-port of Ben Woodard's 'npadmin' utility, which
+is written in C++.  Object-oriented and procedural interfaces are provided.
+
+The usefulness of this module relies on receiving feedback from its users.
+There is no way for the author to know about all of the printers that are
+being used.  So, if anybody has any 
+
+################################################################################
+
+Requirements:
+
+	perl v5.005_03 or later
+	perl module SNMP v4.2.0 from CPAN
+	UCD-SNMP v4.2.x, http://www.net-snmp.org/
+
+################################################################################
+
+Required MIBs:
+
+	Two requisite MIBs are included in this package:
+
+		Printer-MIB	(RFC 1759)
+		JETDIRECT3-MIB	(HP private MIB)
+
+################################################################################
+
+Installation Instructions:
+
+	perl Makefile.PL
+	make
+	make test		* no tests implemented yet
+	make install
+
+################################################################################
+
+I certainly would appreciate any feedback from people that use it, including
+complaints, suggestions, patches or anything.  Even people that don't use it
+are welcome to send comments.
+
+Thanks for using SNMP::NPAdmin and for your feedback.
+
+Cordially,
+Robert Lehr
+bozzio@the-lehrs.com
+
+################################################################################
+
+Legal information: 
+
+    Copyright (c) 2001 Robert Lehr. All rights reserved.  This program is free
+    software; you can redistribute it and/or modify it under the same terms as
+    Perl itself.
+  
+    Caveat emptor.  Use this module at your own risk.  I will accept no
+    responsibility any loss of any kind that is the direct or indirect result
+    of the use of this module.
+
+################################################################################
+

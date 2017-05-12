@@ -1,0 +1,55 @@
+Change log for SQL::QueryBuilder::OO
+$Date: 2016-03-03 08:07:05 +0100 (Thu, 03 Mar 2016) $
+
+0.2.6   2016-03-03 (Thu, 3 Mar 2016)
+    * Perl::Critic tests should really execute locally (https://rt.cpan.org/Public/Bug/Display.html?id=107348)
+
+0.2.5   2016-03-02 (Wed, 2 Mar 2016)
+    * allow for "generic" objects (blessed references) to be bound against a condition if they have a `to_string()` method
+    * inverted Perl::Critic invocation condition
+
+0.2.4   2015-09-16 (Wed, 16 Sep 2015)
+    * removed several "write to $_" occurrences that invaded callers' namespace
+    * removed several unintended "to_string()" conversions when checking variables
+    * fixed sqlValueList to optionally convert its arguments to sqlParameter
+    * replaced cumbersome "getLastInsertId" implementation with native DBI code
+
+0.2.3   2015-09-02 (Wed, 2 Sep 2015)
+    * code clean-up according to self-defined Perl::Critic rules
+    * added "no warning" pragma for experimental features
+    * cleaned up and corrected Build.PL
+    * (svn) appended ignore property for build artifacts
+
+0.2.2   2015-03-18 (Wed, 18 Mar 2015)
+    * added: operator overloading for `sqlCondition`s
+    * added: `sqlValueDate` and `sqlValueDateTime` binding parameters
+    * added: `where()` method accepts `undef` as condition to allow for unconditional queries
+    * added: `sqlCondition::NOTIN()`
+    * fixed: `sqlQuery::exec` returns the number of affected rows of a non-SELECT statement
+    * completed documentation
+
+0.2.1   2015-02-11 (Wed, 11 Feb 2015)
+    * added: `limit()` method accepts `undef` as first or both parameters to skip the LIMIT clause
+    * fixed: when passing a HASHREF to the `orderBy()` method, subsequent "toString" executes of a query object will leave the HASHREF intact (was modified)
+
+0.2.0   2014-04-07 (Mon, 07 Apr 2014)
+    * removed another build-breaker (added "use version" statement [http://www.cpantesters.org/cpan/report/bfc9639c-bbe9-11e3-bf29-e1298806f0e4])
+    * changed version number to suppress ("lower version number" warning in PAUSE)
+
+0.1.2   2014-04-03 (Thu, 03 Apr 2014)
+    * replaced DBI's `last_insert_id` with (less portable) `LAST_INSERT_ID()` SQL function call
+    * added missing `_interpolateByName`
+    * added `fetchArray`
+    * fixed bug when fetching named parameters
+    * fixed bug when quoting "select all from table" references (table.*)
+    * chose the lazy way and added man-page as README
+
+0.1.1   2014-04-01 (Tue, 01 Apr 2014)
+    * Removed "use DBI" which broke tests mostly on BSD systems
+
+0.1     2014-03-31 (Mon, 31 Mar 2014)
+    * PHP port completed
+    * Added documentation
+    * Restructured for MakeMaker layout
+
+$Revision: 56 $

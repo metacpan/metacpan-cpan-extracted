@@ -1,0 +1,31 @@
+# Test polling of a handle update that changed some domains
+template: poll-req.tt
+
+vars:
+
+# Skipped because I'm too lazy to setup the data
+integration_skip: 1
+
+input_assertions:
+  class: SRS::EPP::Command::Poll
+  match:
+
+SRS:
+ - assertions:
+     count:
+       - [ '/NZSRSRequest/*', 1, 'SRS: there is 1 srs command' ]
+       - [ '/NZSRSRequest/GetMessages/TypeFilter', 2, 'SRS: there are both typefilters' ]
+     attr_is:
+       - [ '/NZSRSRequest/GetMessages', 'QueueMode', '1', 'SRS: Get message correct' ]
+       - [ '/NZSRSRequest/GetMessages', 'MaxResults', '1', 'SRS: request wants just one row' ]
+output_assertions:
+  count:
+    - [ '//epp:msgQ/epp:msg', '2', "EPP: 2 msgs returned" ]
+    - [ '//domain:infData', '2', "EPP: 2 domain records returned" ]
+  attr_is:
+    - [ '//epp:result', 'code', 1301, 'EPP: Correct response code' ]
+  match:
+    - [ '//epp:msgQ/epp:msg[1]', 'New UDAI', "EPP: Correct first message type" ]
+    - [ '//epp:msgQ/epp:msg[2]', 'New UDAI', "EPP: Correct second message type" ]
+    - [ '//domain:infData[1]/domain:name', 'amazon-payment-uk.net.nz', "EPP: correct first domain" ]
+    - [ '//domain:infData[2]/domain:name', 'gatzevent.org.nz', "EPP: correct second domain" ]

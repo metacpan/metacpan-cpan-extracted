@@ -1,0 +1,9 @@
+ChangeLog
+LICENSE
+MANIFEST
+Makefile.PL
+README
+lib/Statistics/GammaDistribution.pm
+t/00moduleParsing.t
+t/01methods.t
+META.yml                                 Module meta-data (added by MakeMaker)

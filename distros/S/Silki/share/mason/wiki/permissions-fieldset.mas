@@ -1,0 +1,43 @@
+  <fieldset>
+    <legend><% loc('Permissions') %></legend>
+
+    <div class="form-item">
+      <input id="public" class="radio" type="radio" name="permissions" value="public" />
+      <label for="public" class="for-radio"><% loc('public') %></label>
+      <div class="help-text">
+        <p>
+          <% loc('In a public wiki, anyone can read and edit pages without logging in. However, only wiki members can delete pages or upload files.') %>
+        </p>
+      </div>
+    </div>
+    <div class="form-item">
+      <input id="public-authenticate-to-edit" class="radio" type="radio" name="permissions" value="public-authenticate-to-edit" />
+      <label for="public-authenticate-to-edit" class="for-radio"><% loc('public-authenticate-to-edit') %></label>
+      <div class="help-text">
+        <p>
+          <% loc('Like a public wiki, but users must log-in to edit. However, users do not have to be explicitly invited to become members.') %>
+        </p>
+      </div>
+    </div>
+    <div class="form-item">
+      <input id="public-read-only" class="radio" type="radio" name="permissions" value="public-read-only" />
+      <label for="public-read-only" class="for-radio"><% loc('public-read-only') %></label>
+      <div class="help-text">
+        <p>
+          <% loc('Like a public wiki, but only explicitly invited members may edit pages.') %>
+        </p>
+      </div>
+    </div>
+    <div class="form-item">
+      <input id="private" class="radio" type="radio" name="permissions" value="private" />
+      <label for="private" class="for-radio"><% loc('private') %></label>
+      <div class="help-text">
+        <p>
+          <% loc('Only explicitly invited members may access this wiki.') %>
+        </p>
+      </div>
+    </div>
+
+    <input class="submit" type="submit" value="Submit" />
+
+  </fieldset>

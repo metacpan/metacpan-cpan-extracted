@@ -1,0 +1,424 @@
+0.2.36 2017-04-18
+
+* Requires latest version of Outthentic
+
+0.2.35 2017-04-17
+
+* Requires latest version of Outthentic
+
+0.2.34 2017-04-11
+
+* Requires latest version of Outthentic
+
+0.2.33 2017-04-10
+
+* Modified changes log ( occasionally missed at previos version )
+
+0.2.32 2017-04-10
+
+* run tasks and plugins - change titles in reports 
+
+* automatic guessing of configuration format support
+
+* task box run - transparently passes all plugin related options
+
+* Add `help`, `info` aliases for `plg man` command
+
+0.2.31 2017-03-29
+
+* Requires latest version of Outthentic
+
+0.2.30 2017-03-18
+
+* bring in versions at Changes file
+
+0.2.29 2017-03-18
+
+* init_sparrow_env - do not remove sparrow cache ( need to fix https://github.com/melezhik/sparrowdo/issues/4 )
+
+0.2.28 2017-03-02
+
+* Requires latest version of Outthentic
+
+0.2.27 2017-03-02
+
+* Requires latest version of Outthentic
+
+0.2.26 2017-02-17  
+
+* Reports - changed markers for plugins and tasks 
+* Requires latest version of Outthentic - to add timestamps to sparrow reports (#9)
+
+0.2.25 2017-01-11
+
+* support for task get created before version: 0.2.23 - evaluate task description as task name in case of missing task description in task meta data.
+ 
+0.2.24 2017-01-11
+
+* improved readability of reports - print story footprints as plugins names when running plugins
+
+0.2.23 2017-01-09
+
+* tasks - now save task description in meta data ( so that to print it out in task report )
+* task boxes - add task descriptions to tasks
+
+0.2.22 2017-01-09
+
+* Sets git credential timeout for private plugin install 
+* Improves task reports
+* Passes --task parameter to strun ( to print out task names )
+
+0.2.21  2016-12-19
+
+* requires latest version of Outthentic
+
+0.2.20 2016-12-15
+
+* depends on latest version of Outthentic ( to allow --purge-cache )
+* mention a --purge-cache at Sparrow doc
+
+0.2.19 2016-11-23
+
+* sparrow task run --nocolor hotfix
+
+0.2.18 2016-11-21
+
+* sparrow task run --dump-config hotfix
+
+0.2.17 2016-11-21
+
+* add --nocolor option to actions which might produce color output
+* remote task `public-list` changed to `public list`
+* documentation - describe `--dump-config` option for tasks
+ 
+0.2.16 2016-11-18
+
+* fix broken POD
+
+
+0.2.15 2016-11-18
+
+* a formal release to rely on latest version of Outthentic
+* introducing SPARROW_NO_COLOR var
+
+
+0.2.14 2016-10-29
+
+* task list added
+* alternative task name notation
+
+0.2.13 2016-10-24
+
+* A formal release to rely on latest Outthentic version
+
+0.2.12 2016-10-24
+
+* META.yml re-created after occasionally get lost
+
+0.2.11 2016-10-24
+
+* Update Readme so that metacpan show module name correctly.
+
+
+0.2.10 2016-10-24
+
+* Makes comments to remote tasks
+
+0.2.9 2016-10-24
+
+* Add task owner part to public remote tasks list
+
+0.2.8 2016-10-24
+
+* A hot fix for load ini for remote task
+
+0.2.7 2016-10-24
+
+* A hot fix for running public remote task
+
+0.2.6 2016-10-24
+
+* A release candidate on `remote tasks` feature
+
+0.2.5 2016-10-20
+
+* a formal release to require latest version of Outthentic
+
+0.2.4 2016-10-10
+
+* fix for `find: The relative path `local/bin' is included in the PATH environment variable, which is insecure in combination with the -execdir action of find.  Please remove that entry from $PATH`
+
+0.2.3 2016-10-06
+
+* run swat plugins via `plg run` command
+
+0.2.2 2016-10-05
+
+* an attempt to fix PAUSE "Database error" ( failed to add v. 0.2.1 )
+
+0.2.1 2016-10-04
+
+* made a trivial implementation of `plg man` command 
+
+* cleared in documentation on two types of sparrow plugins - Swat and Outthentic
+
+0.2.0 2016-10-04
+
+* swat plugins get back to sparrow family!!!
+
+* `task add` action now accept --host parameter to make it possible run swat plugins
+
+0.1.22 2016-08-25
+
+* generated tasks names should be unique in task box queue
+
+0.1.21 2016-08-25
+
+* task box - remove duplicate plugin install commands
+
+* impove sparrow task execution output ( I love when it colours! ;)
+
+
+0.1.20 2016-08-20
+ 
+* make it again dependent on the latest version of Outthentic
+
+0.1.19 2016-08-20
+
+* make it again dependent on the latest version of Outthentic
+
+0.1.19 2016-08-19
+
+* make it again dependent on the latest version of Outthentic
+
+0.1.18 2016-08-18
+
+* make it again dependent on the latest version of Outthentic
+
+0.1.17 2016-08-18
+
+* requires latest version of Outthentic
+
+0.1.16 2016-08-16
+
+* a minimal changes - removes some extra new lines at sparrow output
+* add quiet parameter for `box run` command
+ 
+0.1.15 2016-08-15
+
+* requires a latest version of Outthentic ( really the latest one )
+
+0.1.14 2016-08-15
+
+* requires a latest version of Outthentic
+
+0.1.13 2016-08-12
+
+* sparrow task boxes - a set of sparrow tasks
+
+0.1.12 2016-07-11
+
+* use latest version of Outthentic
+* a minor documentation fix pull/4  - thanks to @olshevskiy87
+
+0.1.11 2016-06-28
+
+* make spi, spl, sproot locations configurable
+
+0.1.10 2016-06-27
+
+* correct location of spi, spl in case of running sparrow under sudo
+
+0.1.9 2016-06-27
+
+* verbose mode - show some message only when verbose mode is enabled
+* small bug fixes
+
+
+0.1.8 2016-06-16
+
+* task/json configuration support
+* made `sparrow index update` less verbose
+* made `sparrow task|plg run` output a bit friendly
+* require latest version of Outthentic to support JSON configurations
+
+0.1.7 2016-05-28
+
+* A no-changes release to require a latest version of Outthentic (0.1.5)
+
+0.1.6 2016-05-28
+
+* A no-changes release to require a latest version of Outthentic (0.1.4)
+
+0.1.5 2016-05-22
+
+* run plugin command: do not read plugin meta for private plugins
+
+0.1.4 2016-05-22
+
+* private plugins could be run as is
+
+0.1.3 2016-05-13
+
+* run task, plugin: PERL5LIB exported now to respect carton environment
+
+0.1.2 2016-05-06
+
+* small documentation fixes
+* added to PATH carton bin path  when run plugins or tasks
+* requires latest version of Outthentic
+
+0.1.1 2016-05-05
+
+* Dependencies support for Ruby ( Gemfile / bundler )
+
+0.1.0 2016-05-04
+
+A historical release. BREAKING CHANGES:
+
+* checkpoints are replaced by tasks, see documentation
+* sparrow plugins no require cpanfile to get run
+* swat plugins are deprecated
+* a placeholder for task boxes features ( coming soon )
+
+0.0.25 2016-05-02
+
+* a minor breaking changes in check run action ( see documentation )
+
+0.0.24 2016-04-19
+
+* runtime parameters support for generic plugins ( first implementation, could buggy )
+
+0.0.23 2016-04-12
+
+* hotfix for `--yaml path' resolution
+
+0.0.22 2016-04-12
+
+* a lot of updates of documentation
+* --yaml parameter to pass  yml configuration files for sparrow plugins
+* minor changes in help info
+
+0.0.21 2016-03-28
+
+* sparrow_hub_api_url could be set by $sparrow_hub_api_url environment variable
+* 0 Exit code when trying to create an already existing checkpoint - issues/1
+
+0.0.20 2016-02-23
+
+* action `sparrow plg run` to run plugin tests as is ( without check points )
+
+* documentation improved
+
+0.0.19 2016-02-22
+
+* execute `carton update` when install public plugin
+
+0.0.18 2016-02-17
+
+* do not exclude suite.ini when uploading plugin
+
+0.0.17 2016-01-21
+
+* public plugin install - use `curl -k` in attempt to solve centos5 ssl related issues. it looks like a dirty hack but I could
+not find any better
+
+0.0.16 2016-01-21
+
+* public plugin install - always use `carton` to install dependencies probably missed for previous
+
+* index update - use `curl -k` in attempt to solve centos5 ssl related issues. it looks like a dirty hack but I could
+not find any better
+
+0.0.15  2016-01-19
+
+* actualized distribution short description
+
+* hot fix for plg upload command ( *.ini was accidentally ignored, but now only suite.ini gets ignored when creating tarball  )
+
+0.0.14  2016-01-19
+
+* breaking changes:
+
+    * command \`check set_swat' is deprecated due to check set ini
+
+* new commands to support test suite ini files:
+
+    * \`check set ini'
+
+    * \`check load_ini'    
+
+* support for generic plugins ( outthentic )
+
+0.0.13  2015-12-30
+
+- documentation release - correct url to SparrowHub - https://sparrowhub.org  
+
+# 0.0.12 2015-12-30
+
+* now it's possible to set SaprrowHub credentials via sph_user and sph_token environment variables
+* added missed dependencies ( at least for perl <= 5.20, thanks to Travis!  ) - Json
+* added build status badge to README.md file
+
+0.0.11 2015-12-29
+
+* compatible with the latest version of swat. swat.my passed by swat_my environment variable
+
+0.0.10 2015-12-29
+
+* a couple of hot fixes: 1) create spl_file if not exists; 2) removed HTTP::Tiny usage
+
+0.0.9 2015-12-29
+
+* documentation small improvements
+* new option `--cron` for check run command
+* internal tests improvements
+
+0.0.8 2015-12-27
+
+* *breaking changes*
+
+    * changed checkpoints commands API, see documentation
+
+    * code refactoring
+
+0.0.7 2015-12-18
+
+* integration with SparrowHub - https://sparrowhub.org
+* checkpoints as replacements for sites and linked plugins
+
+
+0.0.6 2015-12-03
+
+* regenerated cpan meta files ( suddenly got lost in version 0.0.5 )
+
+0.0.5 2015-12-03
+
+* new commands: site_info
+* code clean up
+* improved output 
+
+0.0.4 2015-11-30
+
+* add more outthentic tests
+* remove project command
+* minor documentation changes
+
+
+0.0.3 2015-11-30
+
+* minor improvements in output ( sorting, etc )
+* propagate some errors in more meaningful manner
+* cleanup documentation
+
+0.0.2 2015-11-29
+
+* various bug fixes
+* refactoring
+* add some remove operations
+* improved documentation
+
+0.0.1 2015-11-27
+
+* Initial release to CPAN
+

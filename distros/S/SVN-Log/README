@@ -1,0 +1,117 @@
+NAME
+    SVN::Log - Extract change logs from a Subversion server.
+
+SYNOPSIS
+      use SVN::Log;
+
+      my $revs = SVN::Log::retrieve ("svn://host/repos", 1);
+
+      print Dumper ($revs);
+
+DESCRIPTION
+    SVN::Log retrieves and parses the commit logs from Subversion
+    repositories.
+
+VARIABLES
+  $FORCE_COMMAND_LINE_SVN
+    If this is true SVN::Log will use the command line svn client instead of
+    the subversion perl bindings when it needs to access the repository.
+
+FUNCTIONS
+  retrieve
+      retrieve('svn://host/repos', $start_rev, $end_rev);
+
+    Retrieve one or more log messages from a repository. If a second
+    revision is not specified, the revision passed will be retrieved,
+    otherwise the range of revisions from $start_rev to $end_rev will be
+    retrieved.
+
+    One or both of $start_rev and $end_rev may be given as "HEAD", meaning
+    the most recent (youngest) revision in the repository. To retrieve all
+    the log messages in the repository.
+
+      retrieve('svn://host/repos', 1, 'HEAD');
+
+    To do the same thing, but retrieve the log messages in reverse order
+    (i.e., most recent log message first):
+
+      retrieve('svn://host/repos, 'HEAD', 1);
+
+    The revisions are returned as a reference to an array of hashes. Each
+    hash contains the following keys:
+
+    revision
+        The number of the revision.
+
+    paths
+        A hashref indicating the paths modified by this revision. Each key
+        is the name of the path modified in this revision. The value is a
+        reference to another hash, with the following possible keys.
+
+        action
+            The activity that happened to this path. One of "A", "M", or
+            "D", for "Added", "Modified", or "Deleted" respectively. This
+            key is always present.
+
+        copyfrom_path
+            If the action was "A" or "M" then this path may have been copied
+            from another path in the repository. If it was then this key
+            contains the path in the repository that the file was originally
+            copied from.
+
+        copyfrom_rev
+            If "copyfrom_path" is set then this value contains the revision
+            that the path in "copyfrom_path" was copied from.
+
+    author
+        The author of the revision. May legitimately be undefined if the
+        repository allows unauthenticated commits (e.g., over WebDAV).
+
+    date
+        The date of this revision.
+
+    message
+        The commit message from this revision.
+
+    Alternatively, you can pass "retrieve()" a hash containing the
+    repository, start and end revisions, and a callback function which will
+    be called for each revision, like this:
+
+      retrieve ({ repository => "svn://svn.example.org/repos",
+                  start => 1,
+                  end => 2,
+                  callback => sub { print @_; } });
+
+    The callback will be passed a reference to a hash of paths modified, the
+    revision, the author, the date, and the message associated with the
+    revision.
+
+    See SVN::Log::Index for the cannonical example of how to do this.
+
+SEE ALSO
+    SVN::Log::Index
+
+BUGS
+    Please report any bugs or feature requests to "bug-svn-log@rt.cpan.org",
+    or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=SVN-Log>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+AUTHOR
+    The current maintainer is Nik Clayton, <nikc@cpan.org>.
+
+    The original author was Garrett Rooney, <rooneg@electricjellyfish.net>.
+    Originally extracted from from SVN::Log::Index by Richard Clamp,
+    <richardc@unixbeard.net>
+
+COPYRIGHT
+    Copyright 2005 Nik Clayton. All Rights Reserved.
+
+    Copyright 2004 Garrett Rooney. All Rights Reserved.
+
+    Copyright 2004 Richard Clamp. All Rights Reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,5 @@
+
+select attribute_001, count(1)
+from __table__
+group by attribute_001;
+

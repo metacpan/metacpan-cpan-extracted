@@ -1,0 +1,167 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Block::Block
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = Block.new(...);
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef::Object::Object
+	* Sidef::Convert::Convert
+
+=head1 METHODS
+
+
+=head2 &
+
+I<Obj> B<&> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<grep>
+
+=cut
+
+=head2 *
+
+I<Obj> B<*> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<repeat>
+
+=cut
+
+=head2 <<
+
+I<Obj> B<E<lt>E<lt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<for>, I<each>, I<foreach>
+
+=cut
+
+=head2 >>
+
+I<Obj> B<E<gt>E<gt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<map>
+
+=cut
+
+=head2 call
+
+Block.call() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 cap
+
+Block.cap() -> I<Obj>
+
+Return the
+
+Aliases: I<capture>
+
+=cut
+
+=head2 do
+
+Block.do() -> I<Obj>
+
+Return the
+
+Aliases: I<run>
+
+=cut
+
+=head2 dump
+
+Block.dump() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 exec
+
+Block.exec() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ffork
+
+Block.ffork() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 fork
+
+Block.fork() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 if
+
+Block.if() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 loop
+
+Block.loop() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 new
+
+Block.new() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 thr
+
+Block.thr() -> I<Obj>
+
+Return the
+
+Aliases: I<thread>
+
+=cut
+
+=head2 while
+
+Block.while() -> I<Obj>
+
+Return the
+
+=cut

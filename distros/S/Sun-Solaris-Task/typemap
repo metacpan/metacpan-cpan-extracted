@@ -1,0 +1,16 @@
+#
+# Copyright 2002 Sun Microsystems, Inc.  All rights reserved.
+# Use is subject to license terms.
+#
+#ident	"@(#)typemap	1.1	02/05/14 SMI"
+#
+#
+
+TYPEMAP
+	taskid_t	T_IV
+	projid_t	T_IV
+
+INPUT
+
+OUTPUT
+

@@ -1,0 +1,7 @@
+[% USE Siesta %]
+[% PROCESS I_SHOULDNT_EXIST.tt2 %]
+[% INCLUDE _header.tt2 %]
+<p>If you do not have a login already you may be able to create one yourself, as long as the <a href='mailto:[% admin.email %] '>[% admin.name %]</a> allows it.</p>
+[% INCLUDE _pub_lists_list.tt2 %]<br />
+[% INCLUDE _pub_archive_list.tt2 %]
+[% INCLUDE _footer.tt2 %]

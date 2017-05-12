@@ -1,0 +1,31 @@
+---
+abstract: 'sending exception log messages to Sentry.'
+author:
+  - 'Dan Gardiner <daniel@theenginuity.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Sentry-Log-Raven
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  JSON: 2.0
+  HTTP::Request::Common: 0
+  LWP::UserAgent: 0
+  MIME::Base64: 0
+  Time::HiRes: 0
+  DateTime: 0
+  Sys::Hostname: 0
+  Mozilla::CA: 0
+  IO::Socket::SSL: 0
+  perl: 5.006
+version: 1.03

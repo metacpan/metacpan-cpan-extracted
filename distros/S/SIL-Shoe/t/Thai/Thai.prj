@@ -1,0 +1,109 @@
+\+ShProjectSettings 
+\ver 5.0
+\ProgramVersion 1.4 Nov 2004 Windows
+\ProjectPath D:\Src\Projects\Shoebox\testing\Thai\Thai.prj
+\LockProject 0
+\AutomaticKeyboardSwitching
+\+CorpusSet 
+\WordLstMaxCount 10
+\ConcordanceSearchType 3
+\ConcordanceLimitCount
+\ConcordanceMaxCount 1000
+\ConcordanceOutput lookup.db
+\-CorpusSet
+\LangCtrlHeight 24
+\+fntMarkers 
+\Name MS Sans Serif
+\Size 10
+\-fntMarkers
+\+rundosMarkers 
+\-rundosMarkers
+\placementMain normal -1 -1 -1 -1 823 41 1608 635
+\+dblst 
+
+\+db d:\src\projects\shoebox\testing\Thai\dict.db
+\+wndlst 
+\+wnd 
+\placement normal -1 -1 -1 -1 0 0 623 333
+\z 0
+\ViewMarkers
+\widthMarkerArea 50
+\JumpTarget
+\FocusTarget
+\+brflst 
+\FieldEmptyEntry *empty*
+\NoFieldEntry *no field*
+\+brf 
+\mkr lx
+\width 605
+\-brf
+\-brflst
+\+ind 
+\mkrPriKey lx
+\srtPriKey Thai UNICODE
+\-ind
+\+rec 
+\fldPriKey กุ้งทะเลใหญ่
+\-rec
+\+keySearch 
+\match_char p
+\-keySearch
+\+keyInsert 
+\fldPri ใหญ่
+\MatchWhole
+\match_char p
+\-keyInsert
+\CaretLine 1
+\CaretLineScroll 1
+\CaretChar 26
+\-wnd
+\-wndlst
+\-db
+
+\+db D:\Src\Projects\Shoebox\testing\Thai\text.db
+\+wndlst 
+\+wnd 
+\placement normal -1 -1 -1 -1 25 25 648 358
+\z 1
+\ViewMarkers
+\widthMarkerArea 50
+\JumpTarget
+\FocusTarget
+\+brflst 
+\FieldEmptyEntry *empty*
+\NoFieldEntry *no field*
+\+brf 
+\mkr name
+\width 605
+\-brf
+\-brflst
+\+ind 
+\mkrPriKey name
+\srtPriKey Default
+\-ind
+\+rec 
+\fldPriKey Fishy
+\-rec
+\+keySearch 
+\match_char p
+\-keySearch
+\+keyInsert 
+\MatchWhole
+\match_char p
+\-keyInsert
+\CaretLine 0
+\CaretLineScroll 0
+\CaretChar 5
+\-wnd
+\-wndlst
+\-db
+
+\-dblst
+\+Find 
+\match_char p
+\+ftxlst 
+\-ftxlst
+\-Find
+\AmbigBoxLeft 0
+\AmbigBoxTop 20
+\-ShProjectSettings

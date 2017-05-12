@@ -1,0 +1,20 @@
+<p>
+  <% loc('Are you sure you want to delete this file? Once you do, the file cannot be recovered.') %>
+</p>
+
+<p>
+  <% loc( 'File: <em>%html(%1)</em>', $file->filename() ) | n %>
+</p>
+
+<form action="<% $file->uri() %>" method="post">
+  <input type="hidden" name="x-tunneled-method" value="DELETE" />
+  <input type="submit" value="<% loc('Yes, delete it') %>" />
+</form>
+
+<%args>
+$file
+</%args>
+
+<%method title>
+<% loc( 'Delete this file?') %>
+</%method>

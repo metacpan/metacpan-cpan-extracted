@@ -1,0 +1,51 @@
+{
+   "abstract" : "Comments that do more than just sit there",
+   "author" : [
+      "Damian Conway <DCONWAY@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Smart-Comments",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "Filter::Simple" : "0",
+            "List::Util" : "0",
+            "Text::Balanced" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.99"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilb/Smart-Comments",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilb/Smart-Comments.git",
+         "web" : "https://github.com/neilb/Smart-Comments"
+      }
+   },
+   "version" : "1.06"
+}
+

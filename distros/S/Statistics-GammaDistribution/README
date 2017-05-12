@@ -1,0 +1,7 @@
+How to install (simple)
+
+  $ perl Makefile.PL
+  $ make install
+
+The final command might need superuser privileges.
+

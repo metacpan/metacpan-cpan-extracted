@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution String-RewritePrefix,
+version 0.007:
+
+  rewrite strings based on a set of known prefixes
+
+This software is copyright (c) 2013 by Ricardo Signes.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

@@ -1,0 +1,16 @@
+This module provides a convenient way to sort on several fields
+
+To install, do the usual dance:
+    less Makefile.PL
+    less lib/Sort/MultipleFields.pm
+    less t/*
+those being to ensure that I'm not being evil.
+
+then do this to install the module:
+    perl Makefile.PL
+    make
+    make test
+    make install (you may need to do this as root)
+
+or to install it and all its dependencies from the CPAN:
+    sudo perl -MCPAN -e 'install qw(Sort::MultipleFields)'

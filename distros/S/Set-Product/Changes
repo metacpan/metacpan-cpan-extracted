@@ -1,0 +1,11 @@
+Revision history for Set-Product
+
+0.03  Mon Nov 16 07:24:15 UTC 2015
+    - Stopped importing the PP module if XS is used.
+    - Updated the benchmarks to reflect the recent change to the XS module.
+
+0.02  Tue Oct  6 01:11:44 UTC 2015
+    - Fixed operator precedence in check for XS. (Hunter McMillen)
+
+0.01  Mon Aug 31 01:39:42 UTC 2015
+    - Initial distribution.

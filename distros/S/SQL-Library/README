@@ -1,0 +1,108 @@
+NAME
+    SQL::Library - A module for managing simple SQL libraries stored in
+    INI-like files.
+
+VERSION
+    This document refers to version 0.0.5 of SQL::Library.
+
+SYNOPSIS
+      use SQL::Library;
+    
+      my $sql = new SQL::Library { lib => 'sql.lib' };
+                            # or { lib => [ <FH> ] };
+                            # or { lib => [ $string ] };
+
+      ## Ask for a library entry by name...
+      my $query = $sql->retr( 'some_sql_query' );
+
+      ## Add or update an entry...
+      $sql->set( 'yet_another_query', <<'END' );
+      SELECT foo
+      FROM   bar
+      WHERE  zoot = 1
+      END
+
+      ## Remove an entry from the library...
+      $sql->drop( 'one_more_query' );
+
+      ## List the entries in the library...
+      print join( ' : ', $sql->elements ), "\n";
+
+      ## Dump the contents of the library to a string...
+      my $lib_str = $sql->dump;
+
+      ## Write the library to disk...
+      $sql->write;
+
+LIBRARY FILE FORMAT
+    The format for the library files looks a little like an INI file.
+    However, unlike an INI file, it does not handle key=value pairs which
+    are divided into sections. Library entry names are on a line by
+    themselves, enclosed in square brackets. Whatever occurs until the next
+    title tag is the value of the library entry. Blank lines, pound signs
+    (#) and C++ style comments (//) are all discarded.
+
+    A sample library file might look like this:
+
+      ## A sample library file
+
+      [get_survey_questions]
+      select   question_no,
+               question_text
+      from     question
+      where    survey_id = ?
+      order by question_no
+
+      [get_survey_info]
+      select title,
+             date_format( open_date, '%Y%m%d' ) as open_date, 
+             date_format( close_date, '%Y%m%d' ) as close_date, 
+             template_file
+      from   survey
+      where  survey_id = ?
+
+OBJECT METHODS
+    PACKAGE->new( HASHREF )
+        Create a new library handle. Currently, the only argument supported
+        in the hashref is "lib", which refers to the file containing the SQL
+        library.
+
+    $OBJ->retr( NAME )
+        Returns the library entry referenced by NAME.
+
+    $OBJ->set( NAME, VALUE )
+        Sets the library entry NAME to VALUE. This is used both to create
+        new library entries and to update existing ones.
+
+    $OBJ->drop( NAME )
+        Drops entry NAME form the library.
+
+    $OBJ->elements
+        Returns a list of all entry names in the library.
+
+    $OBJ->dump
+        Returns a string containing the library contents in the same INI
+        format that the module reads from.
+
+    $OBJ->write
+        Writes the library to the file named in "lib".
+
+BUGS
+    *   write() should write to a string, if it was so called.
+
+TO-DO
+    *   Complete test suite
+
+AUTHOR
+    Doug Gorley <douggorley@shaw.ca>
+
+CO-MAINTAINER
+    Chris Vertonghen <chrisv@cpan.org> (post-0.0.3)
+
+COPYRIGHT & LICENSE
+    Copyright (C) 2004 by Doug Gorley.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.2 or, at
+    your option, any later version of Perl 5 you may have available.
+

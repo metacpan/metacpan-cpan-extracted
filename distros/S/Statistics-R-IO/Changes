@@ -1,0 +1,77 @@
+Revision history for Statistics-R-IO
+
+1.0001  29 May 2016
+        - minor bug fix: remove accidentally left-behind uses of Moose
+
+1.0     28 May 2016
+        - switch from Moose to Class::Tiny and Class::Tiny::Antlers (#52)
+        - Implement S4 SEXPs (#49)
+        - QAP parsing of tagged and untagged pairlists (#47)
+        - Add a 'sexptype' attribute to REXPs
+        - Add an `inherits` method to the 'REXP' class (#45)
+        - Add a copy and single-argument constructor to Unknown
+        - Allow specyfing image dimensions in the WebWork macro (#51)
+        - Capture R error message from Rserve::eval (#43)
+        - Fix failing tests wit NaN/Inf on Windows (#40)
+
+0.101   23 December 2014
+        - Fix failing tests involving comparison with infinity/NaN (#40)
+        - Better handling of unopened server file handle in destructor (#41)
+        - Declare testing dependency on Test::Mock::Extends
+        
+0.10    17 December 2014
+        - Implement complex vector SEXPs (#30)
+        - Implement closure SEXPs (#29, #32, #34, #35, #36, #38)
+        - Implement expression SEXPs (#26)
+        - Implement special environments global, base, and empty (#31,
+          #33)
+        - Allow configuring Rserve host from WebWork settings
+        - Add graceful failure in WWk macros if Rserve host is not
+          configured
+        - Fix parsing of special row names (#39)
+
+0.092   21 July 2014
+        - fix setting custom Rserve host and port
+        - allow specifying Rserve host for unit tests with RSERVE_HOST
+          environment variable
+
+0.091   30 June 2014
+        - Lower the minimum Perl version to 5.010
+        
+0.08    23 June 2014
+        - Use scalars in Perl rep of list for atomic vectors of length 1
+        - Switch from Moo to Moose (#22)
+        - Create Rserve::get_file method to copy a file from the R server
+        - Allow using low-level sockets as Rserve handles
+        - Include a WebWork macros that wrap the Rserve functionality
+
+0.071   22 May 2014
+        - Fix test failures when using Perl with long doubles (#9)
+
+0.07    13 May 2014
+        - Implement NA values for all vector types (#16, #17, #18)
+        - Fix parsing of logical vectors (incl. #14, #4)
+        - Use Perl IO for Rserve communication (#13)
+        - Fix argument check to work on 32-bit Perl (#12)
+        
+0.06    16 April 2014
+        - Fix out-of-memory crashes on OpenBSD (issue #10)
+        - Fix test failures when using Perl with long doubles (#9)
+        - Specify prerequisites' minimum version where necessary (#11)
+        
+0.05    2 April 2014
+        - Provide an object-oriented API to Rserve client
+        - Implement the Rserve QAP1 protocol for data serialization
+
+0.04    27 March 2014
+        Implement a basic Rserve client
+
+0.03    21 March 2014
+        Provide an object-oriented API to RDS and RData files
+
+0.02    20 March 2014
+        Fix failure on Perl 5.12 caused by using a 5.14 feature.
+
+0.01    18 March 2014
+        Initial release.
+

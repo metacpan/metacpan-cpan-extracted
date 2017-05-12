@@ -1,0 +1,67 @@
+---
+abstract: 'Use GNU license with "or later" clause'
+author:
+  - 'Van de Bugger <van.de.bugger@gmail.com>'
+build_requires:
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Scalar::Util: '0'
+  Test::DiagINC: '0.002'
+  Test::More: '0'
+  blib: '1.01'
+  if: '0'
+  perl: '5.006'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Software-License-OrLaterPack
+provides:
+  Software::License::AGPL_3::or_later:
+    file: lib/Software/License/AGPL_3/or_later.pm
+    version: v0.10.2
+  Software::License::GPL_1::or_later:
+    file: lib/Software/License/GPL_1/or_later.pm
+    version: v0.10.2
+  Software::License::GPL_2::or_later:
+    file: lib/Software/License/GPL_2/or_later.pm
+    version: v0.10.2
+  Software::License::GPL_3::or_later:
+    file: lib/Software/License/GPL_3/or_later.pm
+    version: v0.10.2
+  Software::License::LGPL_2_1::or_later:
+    file: lib/Software/License/LGPL_2_1/or_later.pm
+    version: v0.10.2
+  Software::License::LGPL_3_0::or_later:
+    file: lib/Software/License/LGPL_3_0/or_later.pm
+    version: v0.10.2
+  Software::License::OrLaterPack:
+    file: lib/Software/License/OrLaterPack.pm
+    version: v0.10.2
+requires:
+  Software::License::AGPL_3: '0'
+  Software::License::GPL_1: '0'
+  Software::License::GPL_2: '0'
+  Software::License::GPL_3: '0'
+  Software::License::LGPL_2_1: '0'
+  Software::License::LGPL_3_0: '0'
+  Text::Wrap: '0'
+  parent: '0'
+  perl: '5.006'
+  strict: '0'
+  version: '0.77'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Software-License-OrLaterPack
+  homepage: https://metacpan.org/release/Software-License-OrLaterPack
+  license: http://www.gnu.org/licenses/gpl-3.0.txt
+  repository: http://hg.savannah.nongnu.org/hgweb/orlaterpack
+version: v0.10.2
+x_serialization_backend: 'YAML::Tiny version 1.69'

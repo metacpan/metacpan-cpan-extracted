@@ -1,0 +1,17 @@
+Revision history for Search::Z3950
+==================================
+
+0.05  29 Apr 2004 - First CPAN release
+    - Changed name (was "Zoose").  Lots of mucking about with CVS (*sigh*).
+    - Makefile.PL is now non-interactive by default.
+    - Changed ISBN search, which stopped working for some strange reason.
+
+0.03  14 Aug 2003
+    - Simple search tests now pass (using Library of Congress server).
+      
+0.02  28 May 2003
+    - Got the basics working OK.  Not enough tests yet to be sure.
+
+0.01  27 May 2003
+	- Original version, non-working.
+

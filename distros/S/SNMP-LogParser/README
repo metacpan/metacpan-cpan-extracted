@@ -1,0 +1,64 @@
+SNMP-LogParser
+
+The SNMP-LogParser is one component script that allows to access log
+file information via SNMP. 
+
+The logparser script is used to incrementally parse log files.
+The idea is that the log parser is invoked from Unix cron updating a stats file that
+could then be tied easily into Net-SNMP (see http://www.net-snmp.org) by using the
+SNMP-MibProxy module.
+
+This module has bit of learning curve, you need to learn the methods of the base
+class B<SNMP::LogParserDriver> and then implement an inherited class of
+it to the parsing that you need.
+
+Once you've learned it, you can do quick deployments of SNMP info gathered from
+log files.
+
+You have more examples of LogParser Drivers in the EXAMPLES directory
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+    ./Build install_system
+
+The last command install_system will populate files in /etc and in /var if you have pernissions to do so.
+
+Please be aware that the installation tries to write create the directories:
+/etc/logparser, /var/log/logparser and /var/lib/logparser.
+To change those directories please run:
+
+    perl Build.PL --install_path etc=/etc/logparser --install_path log=/var/log/logparser --install_path work=/var/lib/logparser 
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc SNMP::LogParser
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/SNMP-LogParser
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=SNMP-LogParser
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/SNMP-LogParser
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/SNMP-LogParser
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Nito Martinez
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

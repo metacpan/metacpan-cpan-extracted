@@ -1,0 +1,28 @@
+---
+abstract: 'Slide Presentations (Only Really Kwiki)'
+author:
+  - 'Ingy döt Net <ingy@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Spork
+name: Spork
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Kwiki: 0.38
+  Kwiki::Cache: 0.11
+  Spoon: 0.22
+  perl: 5.6.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.21

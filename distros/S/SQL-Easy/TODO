@@ -1,0 +1,10 @@
+
+For now I have several more things that I think should be implemented here:
+
+ * Now there are subs that return row and col info in an array.
+   I whant to make subs that return that info in a hash.
+
+ * I think it is a good idea to make aliases for subs for powerusers.
+   Instead of writing $se->return_one(...) it it easier (but less clear) to write $se->ro(...)
+
+ * Maybe use SQL::Beautify to show formated sql requests in logs

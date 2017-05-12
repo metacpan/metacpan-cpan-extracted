@@ -1,0 +1,13 @@
+=== Horizontal Rule
+--- swim
+foo
+
+----
+
+bar
+--- html
+<p>foo</p>
+
+<hr/>
+
+<p>bar</p>

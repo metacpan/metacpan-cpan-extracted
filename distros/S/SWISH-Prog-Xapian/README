@@ -1,0 +1,38 @@
+SWISH-Prog-Xapian
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc SWISH::Prog::Xapian
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/SWISH-Prog-Xapian
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=SWISH-Prog-Xapian
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/SWISH-Prog-Xapian
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/SWISH-Prog-Xapian
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Peter Karman
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

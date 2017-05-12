@@ -1,0 +1,22 @@
+---
+name: SVN-Log
+version: 0.03
+author:
+  - 'The current maintainer is Nik Clayton, <nikc@cpan.org>.'
+  - |-
+    The original author was Garrett Rooney, <rooneg@electricjellyfish.net>.
+    Originally extracted from from SVN::Log::Index by Richard Clamp,
+    <richardc@unixbeard.net>
+abstract: Extract change logs from a Subversion server.
+license: perl
+requires:
+  perl: 5.006
+recommends:
+  SVN::Core: 0
+build_requires:
+  Test::More: 0
+provides:
+  SVN::Log:
+    file: lib/SVN/Log.pm
+    version: 0.03
+generated_by: Module::Build version 0.2611

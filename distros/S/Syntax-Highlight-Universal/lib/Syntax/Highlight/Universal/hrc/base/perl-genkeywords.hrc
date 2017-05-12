@@ -1,0 +1,2851 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<region xmlns="http://colorer.sf.net/2003/hrc" name="packages" parent="WordExt"/>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="all-packages" if="use-packages">
+   <keywords region="packages">
+      <word name="ARS"/>
+      <word name="AppConfig"/>
+      <word name="Archie"/>
+      <word name="AsciiDB"/>
+      <word name="Async"/>
+      <word name="AtExit"/>
+      <word name="AudioCD"/>
+      <word name="AutoLoader"/>
+      <word name="AutoSplit"/>
+      <word name="BBDB"/>
+      <word name="BTRIEVE"/>
+      <word name="Barcode"/>
+      <word name="Benchmark"/>
+      <word name="BerkeleyDB"/>
+      <word name="Bit"/>
+      <word name="BnP"/>
+      <word name="CGI_Lite"/>
+      <word name="CIPP"/>
+      <word name="CPAN"/>
+      <word name="CSS"/>
+      <word name="Calendar"/>
+      <word name="Callback"/>
+      <word name="Catalog"/>
+      <word name="Chatbot"/>
+      <word name="Cisco"/>
+      <word name="CompBio"/>
+      <word name="Continuus"/>
+      <word name="ControlX10"/>
+      <word name="Coy"/>
+      <word name="Cwd"/>
+      <word name="DBM"/>
+      <word name="DBZ_File"/>
+      <word name="DDL"/>
+      <word name="DNS"/>
+      <word name="DWH_File"/>
+      <word name="Debug"/>
+      <word name="Des"/>
+      <word name="Dialog"/>
+      <word name="Dir"/>
+      <word name="DirHandle"/>
+      <word name="DynaLoader"/>
+      <word name="Emacs"/>
+      <word name="Email"/>
+      <word name="End"/>
+      <word name="English"/>
+      <word name="Errno"/>
+      <word name="Error"/>
+      <word name="Event"/>
+      <word name="Exporter"/>
+      <word name="FAQ"/>
+      <word name="FCGI"/>
+      <word name="FFI"/>
+      <word name="Fcntl"/>
+      <word name="FileCache"/>
+      <word name="FindBin"/>
+      <word name="FreezeThaw"/>
+      <word name="GDBM_File"/>
+      <word name="GDS2"/>
+      <word name="GIFgraph"/>
+      <word name="Gedcom"/>
+      <word name="Geography"/>
+      <word name="Getargs"/>
+      <word name="Gimp"/>
+      <word name="Gnome"/>
+      <word name="GnuPG"/>
+      <word name="GraphViz"/>
+      <word name="HPUX"/>
+      <word name="Hash"/>
+      <word name="Hints"/>
+      <word name="HyperWave"/>
+      <word name="IMAP"/>
+      <word name="IPChains"/>
+      <word name="IPTables"/>
+      <word name="Imager"/>
+      <word name="Include"/>
+      <word name="Ingperl"/>
+      <word name="LEGO"/>
+      <word name="MIDI"/>
+      <word name="MLDBM"/>
+      <word name="MQSeries"/>
+      <word name="MVS"/>
+      <word name="MailBot"/>
+      <word name="Make"/>
+      <word name="Memoize"/>
+      <word name="Msql"/>
+      <word name="MySQL"/>
+      <word name="Mysql"/>
+      <word name="NDBM_File"/>
+      <word name="NEXT"/>
+      <word name="NNML"/>
+      <word name="O"/>
+      <word name="ODBM_File"/>
+      <word name="ObjStore"/>
+      <word name="Opcode"/>
+      <word name="OpenGL"/>
+      <word name="OurNet"/>
+      <word name="PApp"/>
+      <word name="PCL"/>
+      <word name="PGP"/>
+      <word name="PGPLOT"/>
+      <word name="POSIX"/>
+      <word name="PPresenter"/>
+      <word name="PV"/>
+      <word name="Palm"/>
+      <word name="Penguin"/>
+      <word name="Perf"/>
+      <word name="Perl"/>
+      <word name="PerlIO"/>
+      <word name="Perlbug"/>
+      <word name="Pg"/>
+      <word name="PgSQL"/>
+      <word name="Pogo"/>
+      <word name="Postgres"/>
+      <word name="Ptty"/>
+      <word name="Qt"/>
+      <word name="R3"/>
+      <word name="Rc"/>
+      <word name="Rcs"/>
+      <word name="Real"/>
+      <word name="Ref"/>
+      <word name="Religion"/>
+      <word name="RenderMan"/>
+      <word name="Resources"/>
+      <word name="Roman"/>
+      <word name="Router"/>
+      <word name="SAP"/>
+      <word name="SDBM_File"/>
+      <word name="SelectSaver"/>
+      <word name="SelfLoader"/>
+      <word name="Server"/>
+      <word name="ShellScript"/>
+      <word name="Slash"/>
+      <word name="Socket6"/>
+      <word name="Softref"/>
+      <word name="Spectrum"/>
+      <word name="Sprite"/>
+      <word name="Stat"/>
+      <word name="Storable"/>
+      <word name="Sx"/>
+      <word name="Syntax"/>
+      <word name="TFTP"/>
+      <word name="Taint"/>
+      <word name="Tangram"/>
+      <word name="Tcl"/>
+      <word name="Thesaurus"/>
+      <word name="Tivoli"/>
+      <word name="UNIVERSAL"/>
+      <word name="Usage"/>
+      <word name="Video"/>
+      <word name="WAIT"/>
+      <word name="WDDX"/>
+      <word name="Wais"/>
+      <word name="WebCache"/>
+      <word name="WebFS"/>
+      <word name="XBase"/>
+      <word name="Xbase"/>
+      <word name="YAML"/>
+      <word name="dTemplate"/>
+      <word name="diagnostics"/>
+      <word name="enum"/>
+      <word name="integer"/>
+      <word name="less"/>
+      <word name="lib"/>
+      <word name="locale"/>
+      <word name="namespace"/>
+      <word name="overload"/>
+      <word name="sigtrap"/>
+      <word name="strict"/>
+      <word name="subs"/>
+      <word name="vars"/>
+   </keywords>
+   <inherit scheme="package-AI"/>
+   <inherit scheme="package-Acme"/>
+   <inherit scheme="package-Algorithm"/>
+   <inherit scheme="package-AltaVista"/>
+   <inherit scheme="package-Apache"/>
+   <inherit scheme="package-App"/>
+   <inherit scheme="package-AppleII"/>
+   <inherit scheme="package-Archive"/>
+   <inherit scheme="package-Array"/>
+   <inherit scheme="package-Astro"/>
+   <inherit scheme="package-Attribute"/>
+   <inherit scheme="package-Audio"/>
+   <inherit scheme="package-Authen"/>
+   <inherit scheme="package-B"/>
+   <inherit scheme="package-BSD"/>
+   <inherit scheme="package-Be"/>
+   <inherit scheme="package-Blatte"/>
+   <inherit scheme="package-Bundle"/>
+   <inherit scheme="package-Business"/>
+   <inherit scheme="package-C"/>
+   <inherit scheme="package-CDB_File"/>
+   <inherit scheme="package-CGI"/>
+   <inherit scheme="package-CORBA"/>
+   <inherit scheme="package-Cache"/>
+   <inherit scheme="package-Carp"/>
+   <inherit scheme="package-Chart"/>
+   <inherit scheme="package-Class"/>
+   <inherit scheme="package-Compress"/>
+   <inherit scheme="package-Config"/>
+   <inherit scheme="package-Conjury"/>
+   <inherit scheme="package-Convert"/>
+   <inherit scheme="package-Crypt"/>
+   <inherit scheme="package-Curses"/>
+   <inherit scheme="package-Cz"/>
+   <inherit scheme="package-DBD"/>
+   <inherit scheme="package-DBI"/>
+   <inherit scheme="package-DBIx"/>
+   <inherit scheme="package-DB_File"/>
+   <inherit scheme="package-DCE"/>
+   <inherit scheme="package-DFA"/>
+   <inherit scheme="package-Data"/>
+   <inherit scheme="package-Date"/>
+   <inherit scheme="package-Db"/>
+   <inherit scheme="package-DbFramework"/>
+   <inherit scheme="package-Decision"/>
+   <inherit scheme="package-Devel"/>
+   <inherit scheme="package-Device"/>
+   <inherit scheme="package-Digest"/>
+   <inherit scheme="package-Embedix"/>
+   <inherit scheme="package-Env"/>
+   <inherit scheme="package-EventServer"/>
+   <inherit scheme="package-Exception"/>
+   <inherit scheme="package-ExtUtils"/>
+   <inherit scheme="package-FUSE"/>
+   <inherit scheme="package-Festival"/>
+   <inherit scheme="package-File"/>
+   <inherit scheme="package-Filesys"/>
+   <inherit scheme="package-Filter"/>
+   <inherit scheme="package-Finance"/>
+   <inherit scheme="package-Font"/>
+   <inherit scheme="package-GD"/>
+   <inherit scheme="package-Games"/>
+   <inherit scheme="package-Geo"/>
+   <inherit scheme="package-Getopt"/>
+   <inherit scheme="package-Graph"/>
+   <inherit scheme="package-Graphics"/>
+   <inherit scheme="package-HP200LX"/>
+   <inherit scheme="package-HTML"/>
+   <inherit scheme="package-HTTP"/>
+   <inherit scheme="package-HTTPD"/>
+   <inherit scheme="package-Heap"/>
+   <inherit scheme="package-Hook"/>
+   <inherit scheme="package-I18N"/>
+   <inherit scheme="package-IO"/>
+   <inherit scheme="package-IPC"/>
+   <inherit scheme="package-Image"/>
+   <inherit scheme="package-Inline"/>
+   <inherit scheme="package-Jabber"/>
+   <inherit scheme="package-Java"/>
+   <inherit scheme="package-LWP"/>
+   <inherit scheme="package-Language"/>
+   <inherit scheme="package-Lingua"/>
+   <inherit scheme="package-Linux"/>
+   <inherit scheme="package-List"/>
+   <inherit scheme="package-Locale"/>
+   <inherit scheme="package-LockFile"/>
+   <inherit scheme="package-Log"/>
+   <inherit scheme="package-MARC"/>
+   <inherit scheme="package-MIME"/>
+   <inherit scheme="package-MP3"/>
+   <inherit scheme="package-MPEG"/>
+   <inherit scheme="package-MSDOS"/>
+   <inherit scheme="package-MSSQL"/>
+   <inherit scheme="package-Mac"/>
+   <inherit scheme="package-Mail"/>
+   <inherit scheme="package-Math"/>
+   <inherit scheme="package-Metadata"/>
+   <inherit scheme="package-Modem"/>
+   <inherit scheme="package-Module"/>
+   <inherit scheme="package-Mon"/>
+   <inherit scheme="package-Net"/>
+   <inherit scheme="package-NetAddr"/>
+   <inherit scheme="package-NetPacket"/>
+   <inherit scheme="package-NetServer"/>
+   <inherit scheme="package-Netscape"/>
+   <inherit scheme="package-News"/>
+   <inherit scheme="package-NexTrieve"/>
+   <inherit scheme="package-No"/>
+   <inherit scheme="package-Number"/>
+   <inherit scheme="package-OLE"/>
+   <inherit scheme="package-OS2"/>
+   <inherit scheme="package-Object"/>
+   <inherit scheme="package-PDF"/>
+   <inherit scheme="package-PDL"/>
+   <inherit scheme="package-POE"/>
+   <inherit scheme="package-Parallel"/>
+   <inherit scheme="package-Parse"/>
+   <inherit scheme="package-Perl6"/>
+   <inherit scheme="package-Persistent"/>
+   <inherit scheme="package-Pod"/>
+   <inherit scheme="package-PostScript"/>
+   <inherit scheme="package-Proc"/>
+   <inherit scheme="package-Puppet"/>
+   <inherit scheme="package-Python"/>
+   <inherit scheme="package-Quantum"/>
+   <inherit scheme="package-RADIUS"/>
+   <inherit scheme="package-RAS"/>
+   <inherit scheme="package-RDF"/>
+   <inherit scheme="package-RPC"/>
+   <inherit scheme="package-RPM"/>
+   <inherit scheme="package-RTF"/>
+   <inherit scheme="package-Regexp"/>
+   <inherit scheme="package-Replication"/>
+   <inherit scheme="package-SGI"/>
+   <inherit scheme="package-SGML"/>
+   <inherit scheme="package-SNMP"/>
+   <inherit scheme="package-SQL"/>
+   <inherit scheme="package-Safe"/>
+   <inherit scheme="package-Scalar"/>
+   <inherit scheme="package-Schedule"/>
+   <inherit scheme="package-Search"/>
+   <inherit scheme="package-Sendmail"/>
+   <inherit scheme="package-Set"/>
+   <inherit scheme="package-Shell"/>
+   <inherit scheme="package-Silly"/>
+   <inherit scheme="package-Socket"/>
+   <inherit scheme="package-Solaris"/>
+   <inherit scheme="package-Sort"/>
+   <inherit scheme="package-Speech"/>
+   <inherit scheme="package-Spreadsheet"/>
+   <inherit scheme="package-Statistics"/>
+   <inherit scheme="package-String"/>
+   <inherit scheme="package-Sub"/>
+   <inherit scheme="package-Sybase"/>
+   <inherit scheme="package-Symbol"/>
+   <inherit scheme="package-Sys"/>
+   <inherit scheme="package-SyslogScan"/>
+   <inherit scheme="package-SystemC"/>
+   <inherit scheme="package-TeX"/>
+   <inherit scheme="package-Term"/>
+   <inherit scheme="package-Test"/>
+   <inherit scheme="package-Text"/>
+   <inherit scheme="package-Thread"/>
+   <inherit scheme="package-Tie"/>
+   <inherit scheme="package-Time"/>
+   <inherit scheme="package-Tk"/>
+   <inherit scheme="package-Tree"/>
+   <inherit scheme="package-URI"/>
+   <inherit scheme="package-Unicode"/>
+   <inherit scheme="package-Unix"/>
+   <inherit scheme="package-User"/>
+   <inherit scheme="package-VCS"/>
+   <inherit scheme="package-VMS"/>
+   <inherit scheme="package-VRML"/>
+   <inherit scheme="package-Verilog"/>
+   <inherit scheme="package-WML"/>
+   <inherit scheme="package-WWW"/>
+   <inherit scheme="package-Win32"/>
+   <inherit scheme="package-Win32API"/>
+   <inherit scheme="package-X11"/>
+   <inherit scheme="package-X500"/>
+   <inherit scheme="package-XML"/>
+   <inherit scheme="package-Xmms"/>
+   <inherit scheme="package-ex"/>
+   <regexp match="/\b\w[\w\d]*\s*(::)\s*\w[\w\d]*\b/" region="packages" region1="Symb"/>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-AI" if="use-package-AI">
+   <keywords region="packages">
+      <word name="AI::Categorize"/>
+      <word name="AI::Fuzzy"/>
+      <word name="AI::Gene::Sequence"/>
+      <word name="AI::Gene::Simple"/>
+      <word name="AI::NeuralNet::SOM"/>
+      <word name="AI::jNeural"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Acme" if="use-package-Acme">
+   <keywords region="packages">
+      <word name="Acme::Buffy"/>
+      <word name="Acme::Morse::Audible"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Algorithm" if="use-package-Algorithm">
+   <keywords region="packages">
+      <word name="Algorithm::Diff"/>
+      <word name="Algorithm::Graphs::TransitiveClosure"/>
+      <word name="Algorithm::LUHN"/>
+      <word name="Algorithm::Numerical::Sample"/>
+      <word name="Algorithm::Numerical::Shuffle"/>
+      <word name="Algorithm::Permute"/>
+      <word name="Algorithm::SISort"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-AltaVista" if="use-package-AltaVista">
+   <keywords region="packages">
+      <word name="AltaVista::PerlSDK"/>
+      <word name="AltaVista::SearchSDK"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Apache" if="use-package-Apache">
+   <keywords region="packages">
+      <word name="Apache::ACEProxy"/>
+      <word name="Apache::ASP"/>
+      <word name="Apache::AddHostPath"/>
+      <word name="Apache::AntiSpam"/>
+      <word name="Apache::Archive"/>
+      <word name="Apache::AuthCookie"/>
+      <word name="Apache::AuthCookieLDAP"/>
+      <word name="Apache::AuthExpire"/>
+      <word name="Apache::AuthLDAP"/>
+      <word name="Apache::AuthPerLDAP"/>
+      <word name="Apache::AuthenCache"/>
+      <word name="Apache::AuthenIMAP"/>
+      <word name="Apache::AuthenNIS"/>
+      <word name="Apache::AuthenPasswd"/>
+      <word name="Apache::AuthenPasswdSrv"/>
+      <word name="Apache::AuthenSmb"/>
+      <word name="Apache::AuthenURL"/>
+      <word name="Apache::AuthzNIS"/>
+      <word name="Apache::AuthzPasswd"/>
+      <word name="Apache::AutoIndex"/>
+      <word name="Apache::Backhand"/>
+      <word name="Apache::CVS"/>
+      <word name="Apache::Clickable"/>
+      <word name="Apache::Compress"/>
+      <word name="Apache::Connection"/>
+      <word name="Apache::Constants"/>
+      <word name="Apache::Cookie"/>
+      <word name="Apache::Cookie::Encrypted"/>
+      <word name="Apache::DB"/>
+      <word name="Apache::DBI"/>
+      <word name="Apache::DBILogConfig"/>
+      <word name="Apache::DBILogger"/>
+      <word name="Apache::DBILogin"/>
+      <word name="Apache::DProf"/>
+      <word name="Apache::Debug"/>
+      <word name="Apache::DebugInfo"/>
+      <word name="Apache::Dispatch"/>
+      <word name="Apache::DnsZone"/>
+      <word name="Apache::DumpHeaders"/>
+      <word name="Apache::Embperl"/>
+      <word name="Apache::EmbperlChain"/>
+      <word name="Apache::ExtUtils"/>
+      <word name="Apache::FakeRequest"/>
+      <word name="Apache::File"/>
+      <word name="Apache::Filter"/>
+      <word name="Apache::GTopLimit"/>
+      <word name="Apache::Gateway"/>
+      <word name="Apache::GzipChain"/>
+      <word name="Apache::HTMLView"/>
+      <word name="Apache::Icon"/>
+      <word name="Apache::Include"/>
+      <word name="Apache::Layer"/>
+      <word name="Apache::Leak"/>
+      <word name="Apache::Lint"/>
+      <word name="Apache::Log"/>
+      <word name="Apache::LogFile"/>
+      <word name="Apache::LogIgnore"/>
+      <word name="Apache::MP3::Skin"/>
+      <word name="Apache::Mason"/>
+      <word name="Apache::MimeXML"/>
+      <word name="Apache::Mmap"/>
+      <word name="Apache::Module"/>
+      <word name="Apache::ModuleConfig"/>
+      <word name="Apache::ModuleDoc"/>
+      <word name="Apache::Motd"/>
+      <word name="Apache::Mysql"/>
+      <word name="Apache::NNTPGateway"/>
+      <word name="Apache::OWA"/>
+      <word name="Apache::OpenIndex"/>
+      <word name="Apache::OutputChain"/>
+      <word name="Apache::PHLogin"/>
+      <word name="Apache::PageKit"/>
+      <word name="Apache::ParseControl"/>
+      <word name="Apache::ParseLog"/>
+      <word name="Apache::PassFile"/>
+      <word name="Apache::Peek"/>
+      <word name="Apache::PerlRun"/>
+      <word name="Apache::PerlSections"/>
+      <word name="Apache::PrettyPerl"/>
+      <word name="Apache::PrettyText"/>
+      <word name="Apache::ProxyPass"/>
+      <word name="Apache::ProxyPassThru"/>
+      <word name="Apache::RandomLocation"/>
+      <word name="Apache::RedirectDBI"/>
+      <word name="Apache::RefererBlock"/>
+      <word name="Apache::Registry"/>
+      <word name="Apache::RegistryLoader"/>
+      <word name="Apache::Reload"/>
+      <word name="Apache::Request"/>
+      <word name="Apache::RequestNotes"/>
+      <word name="Apache::Resource"/>
+      <word name="Apache::Roaming"/>
+      <word name="Apache::SIG"/>
+      <word name="Apache::SSI"/>
+      <word name="Apache::SSIChain"/>
+      <word name="Apache::Sandwich"/>
+      <word name="Apache::Scoreboard"/>
+      <word name="Apache::Server"/>
+      <word name="Apache::Session"/>
+      <word name="Apache::SharedMem"/>
+      <word name="Apache::ShowRequest"/>
+      <word name="Apache::SimpleReplace"/>
+      <word name="Apache::SizeLimit"/>
+      <word name="Apache::SmallProf"/>
+      <word name="Apache::Stage"/>
+      <word name="Apache::StatINC"/>
+      <word name="Apache::Status"/>
+      <word name="Apache::Storage"/>
+      <word name="Apache::SubProcess"/>
+      <word name="Apache::Sybase::CTlib"/>
+      <word name="Apache::Symbol"/>
+      <word name="Apache::Symdump"/>
+      <word name="Apache::Table"/>
+      <word name="Apache::TempFile"/>
+      <word name="Apache::Template"/>
+      <word name="Apache::Throttle"/>
+      <word name="Apache::TimedRedirect"/>
+      <word name="Apache::Traffic"/>
+      <word name="Apache::TransLDAP"/>
+      <word name="Apache::URI"/>
+      <word name="Apache::UploadMeter"/>
+      <word name="Apache::UploadSvr"/>
+      <word name="Apache::Usertrack"/>
+      <word name="Apache::Util"/>
+      <word name="Apache::VMonitor"/>
+      <word name="Apache::Watchdog::RunAway"/>
+      <word name="Apache::ePerl"/>
+      <word name="Apache::httpd_conf"/>
+      <word name="Apache::iNcom"/>
+      <word name="Apache::src"/>
+      <word name="Apache::test"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-App" if="use-package-App">
+   <keywords region="packages">
+      <word name="App::Info"/>
+      <word name="App::Manager"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-AppleII" if="use-package-AppleII">
+   <keywords region="packages">
+      <word name="AppleII::Disk"/>
+      <word name="AppleII::ProDOS"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Archive" if="use-package-Archive">
+   <keywords region="packages">
+      <word name="Archive::Parity"/>
+      <word name="Archive::Tar"/>
+      <word name="Archive::Zip"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Array" if="use-package-Array">
+   <keywords region="packages">
+      <word name="Array::Compare"/>
+      <word name="Array::IntSpan"/>
+      <word name="Array::PrintCols"/>
+      <word name="Array::Reform"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Astro" if="use-package-Astro">
+   <keywords region="packages">
+      <word name="Astro::Coord"/>
+      <word name="Astro::Cosmology"/>
+      <word name="Astro::FITS::Header"/>
+      <word name="Astro::Misc"/>
+      <word name="Astro::MoonPhase"/>
+      <word name="Astro::SLA"/>
+      <word name="Astro::SkyCat"/>
+      <word name="Astro::SunTime"/>
+      <word name="Astro::Sunrise"/>
+      <word name="Astro::Time"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Attribute" if="use-package-Attribute">
+   <keywords region="packages">
+      <word name="Attribute::Abstract"/>
+      <word name="Attribute::Deprecated"/>
+      <word name="Attribute::Handlers"/>
+      <word name="Attribute::Memoize"/>
+      <word name="Attribute::Overload"/>
+      <word name="Attribute::Signature"/>
+      <word name="Attribute::TieClasses"/>
+      <word name="Attribute::Types"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Audio" if="use-package-Audio">
+   <keywords region="packages">
+      <word name="Audio::CD"/>
+      <word name="Audio::Ecasound"/>
+      <word name="Audio::MPEG"/>
+      <word name="Audio::Mixer"/>
+      <word name="Audio::OSS"/>
+      <word name="Audio::Play::MPG123"/>
+      <word name="Audio::SoundFile"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Authen" if="use-package-Authen">
+   <keywords region="packages">
+      <word name="Authen::ACE"/>
+      <word name="Authen::ACE4"/>
+      <word name="Authen::CyrusSASL"/>
+      <word name="Authen::Krb4"/>
+      <word name="Authen::Krb5"/>
+      <word name="Authen::Krb5::Easy"/>
+      <word name="Authen::Krb5::KDB"/>
+      <word name="Authen::PAM"/>
+      <word name="Authen::PIN"/>
+      <word name="Authen::SASL"/>
+      <word name="Authen::SASL::Cyrus"/>
+      <word name="Authen::TacacsPlus"/>
+      <word name="Authen::Ticket"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-B" if="use-package-B">
+   <keywords region="packages">
+      <word name="B::Fathom"/>
+      <word name="B::Graph"/>
+      <word name="B::LexInfo"/>
+      <word name="B::Size"/>
+      <word name="B::TerseSize"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-BSD" if="use-package-BSD">
+   <keywords region="packages">
+      <word name="BSD::Ipfwgen"/>
+      <word name="BSD::Resource"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Be" if="use-package-Be">
+   <keywords region="packages">
+      <word name="Be::Attribute"/>
+      <word name="Be::Query"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Blatte" if="use-package-Blatte">
+   <keywords region="packages">
+      <word name="Blatte::Builtins"/>
+      <word name="Blatte::Compiler"/>
+      <word name="Blatte::HTML"/>
+      <word name="Blatte::Parser"/>
+      <word name="Blatte::Syntax"/>
+      <word name="Blatte::Ws"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Bundle" if="use-package-Bundle">
+   <keywords region="packages">
+      <word name="Bundle::Bugzilla"/>
+      <word name="Bundle::Perl6"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Business" if="use-package-Business">
+   <keywords region="packages">
+      <word name="Business::Cashcow"/>
+      <word name="Business::CreditCard"/>
+      <word name="Business::ISBN"/>
+      <word name="Business::ISSN"/>
+      <word name="Business::OnlinePayment"/>
+      <word name="Business::UPC"/>
+      <word name="Business::US_Amort"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-C" if="use-package-C">
+   <keywords region="packages">
+      <word name="C::DynaLib"/>
+      <word name="C::Include"/>
+      <word name="C::Scan"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-CDB_File" if="use-package-CDB_File">
+   <keywords region="packages">
+      <word name="CDB_File"/>
+      <word name="CDB_File::BiIndex"/>
+      <word name="CDB_File::BiIndex::Generator"/>
+      <word name="CDB_File::Generator"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-CGI" if="use-package-CGI">
+   <keywords region="packages">
+      <word name="CGI::Application"/>
+      <word name="CGI::ArgChecker"/>
+      <word name="CGI::Authent"/>
+      <word name="CGI::Base"/>
+      <word name="CGI::BasePlus"/>
+      <word name="CGI::Cache"/>
+      <word name="CGI::Carp"/>
+      <word name="CGI::Debug"/>
+      <word name="CGI::Deurl"/>
+      <word name="CGI::Enurl"/>
+      <word name="CGI::FormMagick"/>
+      <word name="CGI::Formalware"/>
+      <word name="CGI::Imagemap"/>
+      <word name="CGI::LogCarp"/>
+      <word name="CGI::MiniSvr"/>
+      <word name="CGI::Minimal"/>
+      <word name="CGI::MultiValuedHash"/>
+      <word name="CGI::MxScreen"/>
+      <word name="CGI::Out"/>
+      <word name="CGI::PathInfo"/>
+      <word name="CGI::Persistent"/>
+      <word name="CGI::Portable"/>
+      <word name="CGI::QuickForm"/>
+      <word name="CGI::Request"/>
+      <word name="CGI::Response"/>
+      <word name="CGI::SSI"/>
+      <word name="CGI::SSI_Parser"/>
+      <word name="CGI::Screen"/>
+      <word name="CGI::SecureState"/>
+      <word name="CGI::Session"/>
+      <word name="CGI::SpeedyCGI"/>
+      <word name="CGI::State"/>
+      <word name="CGI::Test"/>
+      <word name="CGI::URI2param"/>
+      <word name="CGI::Validate"/>
+      <word name="CGI::WML"/>
+      <word name="CGI::XML"/>
+      <word name="CGI::XMLForm"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-CORBA" if="use-package-CORBA">
+   <keywords region="packages">
+      <word name="CORBA::IDLtree"/>
+      <word name="CORBA::IOP::IOR"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Cache" if="use-package-Cache">
+   <keywords region="packages">
+      <word name="Cache::Cache"/>
+      <word name="Cache::Mmap"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Carp" if="use-package-Carp">
+   <keywords region="packages">
+      <word name="Carp"/>
+      <word name="Carp::Assert"/>
+      <word name="Carp::Datum"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Chart" if="use-package-Chart">
+   <keywords region="packages">
+      <word name="Chart::Base"/>
+      <word name="Chart::GRACE"/>
+      <word name="Chart::Graph"/>
+      <word name="Chart::PNGgraph"/>
+      <word name="Chart::Plot"/>
+      <word name="Chart::XMGR"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Class" if="use-package-Class">
+   <keywords region="packages">
+      <word name="Class::Accessor"/>
+      <word name="Class::ArrayObjects"/>
+      <word name="Class::BlackHole"/>
+      <word name="Class::Classless"/>
+      <word name="Class::Contract"/>
+      <word name="Class::DBI"/>
+      <word name="Class::DBI::mysql"/>
+      <word name="Class::Date"/>
+      <word name="Class::Delegate"/>
+      <word name="Class::Facade"/>
+      <word name="Class::Fields"/>
+      <word name="Class::Handler"/>
+      <word name="Class::Holon"/>
+      <word name="Class::ISA"/>
+      <word name="Class::Loader"/>
+      <word name="Class::MakeMethods"/>
+      <word name="Class::MethodMaker"/>
+      <word name="Class::MethodMapper"/>
+      <word name="Class::Multimethods"/>
+      <word name="Class::Mutator"/>
+      <word name="Class::NamedParms"/>
+      <word name="Class::ObjectTemplate"/>
+      <word name="Class::ObjectTemplate::DB"/>
+      <word name="Class::ParamParser"/>
+      <word name="Class::ParmList"/>
+      <word name="Class::Prototyped"/>
+      <word name="Class::PseudoHash"/>
+      <word name="Class::Singleton"/>
+      <word name="Class::StructTemplate"/>
+      <word name="Class::Tangram"/>
+      <word name="Class::Template"/>
+      <word name="Class::Translucent"/>
+      <word name="Class::Tree"/>
+      <word name="Class::WhiteHole"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Compress" if="use-package-Compress">
+   <keywords region="packages">
+      <word name="Compress::Bzip2"/>
+      <word name="Compress::LZF"/>
+      <word name="Compress::LZO"/>
+      <word name="Compress::LZV1"/>
+      <word name="Compress::Zlib"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Config" if="use-package-Config">
+   <keywords region="packages">
+      <word name="Config::FreeForm"/>
+      <word name="Config::IniFiles"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Conjury" if="use-package-Conjury">
+   <keywords region="packages">
+      <word name="Conjury::C"/>
+      <word name="Conjury::Core"/>
+      <word name="Conjury::Stage"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Convert" if="use-package-Convert">
+   <keywords region="packages">
+      <word name="Convert::ASCII::Armor"/>
+      <word name="Convert::ASN1"/>
+      <word name="Convert::BER"/>
+      <word name="Convert::Base32"/>
+      <word name="Convert::BinHex"/>
+      <word name="Convert::DUDE"/>
+      <word name="Convert::EBCDIC"/>
+      <word name="Convert::GeekCode"/>
+      <word name="Convert::IBM390"/>
+      <word name="Convert::Morse"/>
+      <word name="Convert::PEM"/>
+      <word name="Convert::RACE"/>
+      <word name="Convert::Recode"/>
+      <word name="Convert::SciEng"/>
+      <word name="Convert::TNEF"/>
+      <word name="Convert::Translit"/>
+      <word name="Convert::UU"/>
+      <word name="Convert::UUlib"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Crypt" if="use-package-Crypt">
+   <keywords region="packages">
+      <word name="Crypt::Blowfish"/>
+      <word name="Crypt::Blowfish_PP"/>
+      <word name="Crypt::CBC"/>
+      <word name="Crypt::CBCeasy"/>
+      <word name="Crypt::CipherSaber"/>
+      <word name="Crypt::DES"/>
+      <word name="Crypt::DH"/>
+      <word name="Crypt::DSA"/>
+      <word name="Crypt::ECB"/>
+      <word name="Crypt::GOST"/>
+      <word name="Crypt::GPG"/>
+      <word name="Crypt::IDEA"/>
+      <word name="Crypt::Keys"/>
+      <word name="Crypt::NULL"/>
+      <word name="Crypt::OTP"/>
+      <word name="Crypt::OpenPGP"/>
+      <word name="Crypt::OpenSSL::RSA"/>
+      <word name="Crypt::OpenSSL::Random"/>
+      <word name="Crypt::PGP5"/>
+      <word name="Crypt::PGPSimple"/>
+      <word name="Crypt::PassGen"/>
+      <word name="Crypt::Passwd"/>
+      <word name="Crypt::PasswdMD5"/>
+      <word name="Crypt::RC4"/>
+      <word name="Crypt::RSA"/>
+      <word name="Crypt::RandPasswd"/>
+      <word name="Crypt::Random"/>
+      <word name="Crypt::Rijndael"/>
+      <word name="Crypt::Rijndael_PP"/>
+      <word name="Crypt::Rot13"/>
+      <word name="Crypt::SKey"/>
+      <word name="Crypt::SmbHash"/>
+      <word name="Crypt::Solitaire"/>
+      <word name="Crypt::TEA"/>
+      <word name="Crypt::TripleDES"/>
+      <word name="Crypt::Twofish"/>
+      <word name="Crypt::Twofish2"/>
+      <word name="Crypt::UnixCrypt"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Curses" if="use-package-Curses">
+   <keywords region="packages">
+      <word name="Curses"/>
+      <word name="Curses::Forms"/>
+      <word name="Curses::Widgets"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Cz" if="use-package-Cz">
+   <keywords region="packages">
+      <word name="Cz::Cstocs"/>
+      <word name="Cz::Sort"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-DBD" if="use-package-DBD">
+   <keywords region="packages">
+      <word name="DBD::ADO"/>
+      <word name="DBD::ASAny"/>
+      <word name="DBD::CSV"/>
+      <word name="DBD::DB2"/>
+      <word name="DBD::DtfSQLmac"/>
+      <word name="DBD::Empress"/>
+      <word name="DBD::Excel"/>
+      <word name="DBD::Illustra"/>
+      <word name="DBD::Informix"/>
+      <word name="DBD::Informix4"/>
+      <word name="DBD::Ingres"/>
+      <word name="DBD::InterBase"/>
+      <word name="DBD::Multiplex"/>
+      <word name="DBD::ODBC"/>
+      <word name="DBD::Oracle"/>
+      <word name="DBD::PgPP"/>
+      <word name="DBD::PrimeBase"/>
+      <word name="DBD::QBase"/>
+      <word name="DBD::RAM"/>
+      <word name="DBD::RDB"/>
+      <word name="DBD::SearchServer"/>
+      <word name="DBD::Solid"/>
+      <word name="DBD::Sprite"/>
+      <word name="DBD::Sqlflex"/>
+      <word name="DBD::Sybase"/>
+      <word name="DBD::Unify"/>
+      <word name="DBD::XBase"/>
+      <word name="DBD::mSQL"/>
+      <word name="DBD::mysql"/>
+      <word name="DBD::mysqlPP"/>
+      <word name="DBD::pNET"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-DBI" if="use-package-DBI">
+   <keywords region="packages">
+      <word name="DBI"/>
+      <word name="DBI::Format"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-DBIx" if="use-package-DBIx">
+   <keywords region="packages">
+      <word name="DBIx::Abstract"/>
+      <word name="DBIx::AnyDBD"/>
+      <word name="DBIx::Browse"/>
+      <word name="DBIx::CGITables"/>
+      <word name="DBIx::Copy"/>
+      <word name="DBIx::DBSchema"/>
+      <word name="DBIx::FetchLoop"/>
+      <word name="DBIx::FullTextSearch"/>
+      <word name="DBIx::HTMLView"/>
+      <word name="DBIx::Lookup::Field"/>
+      <word name="DBIx::OracleSequence"/>
+      <word name="DBIx::Password"/>
+      <word name="DBIx::Recordset"/>
+      <word name="DBIx::Sequence"/>
+      <word name="DBIx::SystemCatalog"/>
+      <word name="DBIx::Table"/>
+      <word name="DBIx::TextIndex"/>
+      <word name="DBIx::Tree"/>
+      <word name="DBIx::XHTML_Table"/>
+      <word name="DBIx::XML_RDB"/>
+      <word name="DBIx::dbMan"/>
+      <word name="DBIx::glueHTML"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-DB_File" if="use-package-DB_File">
+   <keywords region="packages">
+      <word name="DB_File"/>
+      <word name="DB_File::DB_Database"/>
+      <word name="DB_File::Lock"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-DCE" if="use-package-DCE">
+   <keywords region="packages">
+      <word name="DCE::ACL"/>
+      <word name="DCE::DFS"/>
+      <word name="DCE::Login"/>
+      <word name="DCE::Registry"/>
+      <word name="DCE::Status"/>
+      <word name="DCE::UUID"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-DFA" if="use-package-DFA">
+   <keywords region="packages">
+      <word name="DFA::Command"/>
+      <word name="DFA::Kleene"/>
+      <word name="DFA::Simple"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Data" if="use-package-Data">
+   <keywords region="packages">
+      <word name="Data::Buffer"/>
+      <word name="Data::Compare"/>
+      <word name="Data::DRef"/>
+      <word name="Data::Denter"/>
+      <word name="Data::Dumper"/>
+      <word name="Data::Flow"/>
+      <word name="Data::HexDump"/>
+      <word name="Data::Hexdumper"/>
+      <word name="Data::Iterator"/>
+      <word name="Data::JavaScript"/>
+      <word name="Data::Lazy"/>
+      <word name="Data::Locations"/>
+      <word name="Data::MaskPrint"/>
+      <word name="Data::MultiValuedHash"/>
+      <word name="Data::Random"/>
+      <word name="Data::Reporter"/>
+      <word name="Data::Serializer"/>
+      <word name="Data::Walker"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Date" if="use-package-Date">
+   <keywords region="packages">
+      <word name="Date::Calc"/>
+      <word name="Date::Chinese"/>
+      <word name="Date::Convert"/>
+      <word name="Date::Convert::French_Rev"/>
+      <word name="Date::DayOfWeek"/>
+      <word name="Date::Discordian"/>
+      <word name="Date::Doomsday"/>
+      <word name="Date::Easter"/>
+      <word name="Date::Format"/>
+      <word name="Date::Gregorian"/>
+      <word name="Date::Handler"/>
+      <word name="Date::ICal"/>
+      <word name="Date::ISO"/>
+      <word name="Date::Interval"/>
+      <word name="Date::Japanese::Era"/>
+      <word name="Date::Language"/>
+      <word name="Date::Manip"/>
+      <word name="Date::Parse"/>
+      <word name="Date::Passover"/>
+      <word name="Date::Roman"/>
+      <word name="Date::Simple"/>
+      <word name="Date::SundayLetter"/>
+      <word name="Date::Tolkien::Shire"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Db" if="use-package-Db">
+   <keywords region="packages">
+      <word name="Db::Ctree"/>
+      <word name="Db::DFC"/>
+      <word name="Db::Documentum"/>
+      <word name="Db::Mediasurface"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-DbFramework" if="use-package-DbFramework">
+   <keywords region="packages">
+      <word name="DbFramework::Attribute"/>
+      <word name="DbFramework::DataModel"/>
+      <word name="DbFramework::DataType"/>
+      <word name="DbFramework::ForeignKey"/>
+      <word name="DbFramework::Key"/>
+      <word name="DbFramework::Persistent"/>
+      <word name="DbFramework::PrimaryKey"/>
+      <word name="DbFramework::Table"/>
+      <word name="DbFramework::Util"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Decision" if="use-package-Decision">
+   <keywords region="packages">
+      <word name="Decision::ACL"/>
+      <word name="Decision::Markov"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Devel" if="use-package-Devel">
+   <keywords region="packages">
+      <word name="Devel::CallerItem"/>
+      <word name="Devel::Constants"/>
+      <word name="Devel::CoreStack"/>
+      <word name="Devel::Cover"/>
+      <word name="Devel::Coverage"/>
+      <word name="Devel::DProf"/>
+      <word name="Devel::DebugInit"/>
+      <word name="Devel::DumpStack"/>
+      <word name="Devel::Leak"/>
+      <word name="Devel::Messenger"/>
+      <word name="Devel::Modlist"/>
+      <word name="Devel::PPPort"/>
+      <word name="Devel::Peek"/>
+      <word name="Devel::RegExp"/>
+      <word name="Devel::SearchINC"/>
+      <word name="Devel::SmallProf"/>
+      <word name="Devel::StackTrace"/>
+      <word name="Devel::Symdump"/>
+      <word name="Devel::TraceFuncs"/>
+      <word name="Devel::TraceLoad"/>
+      <word name="Devel::TraceMethods"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Device" if="use-package-Device">
+   <keywords region="packages">
+      <word name="Device::ISDN::OCLM"/>
+      <word name="Device::ParallelPort"/>
+      <word name="Device::SerialPort"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Digest" if="use-package-Digest">
+   <keywords region="packages">
+      <word name="Digest::BubbleBabble"/>
+      <word name="Digest::HMAC"/>
+      <word name="Digest::MD2"/>
+      <word name="Digest::MD4"/>
+      <word name="Digest::MD5"/>
+      <word name="Digest::Perl::MD5"/>
+      <word name="Digest::SHA1"/>
+      <word name="Digest::UserSID"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Embedix" if="use-package-Embedix">
+   <keywords region="packages">
+      <word name="Embedix::DB"/>
+      <word name="Embedix::ECD"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Env" if="use-package-Env">
+   <keywords region="packages">
+      <word name="Env"/>
+      <word name="Env::Modulecmd"/>
+      <word name="Env::Path"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-EventServer" if="use-package-EventServer">
+   <keywords region="packages">
+      <word name="EventServer::Functions"/>
+      <word name="EventServer::Gettimeofday"/>
+      <word name="EventServer::Signal"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Exception" if="use-package-Exception">
+   <keywords region="packages">
+      <word name="Exception::Class"/>
+      <word name="Exception::Cxx"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-ExtUtils" if="use-package-ExtUtils">
+   <keywords region="packages">
+      <word name="ExtUtils::DynaGlue"/>
+      <word name="ExtUtils::Embed"/>
+      <word name="ExtUtils::F77"/>
+      <word name="ExtUtils::MakeMaker"/>
+      <word name="ExtUtils::Manifest"/>
+      <word name="ExtUtils::configPL"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-FUSE" if="use-package-FUSE">
+   <keywords region="packages">
+      <word name="FUSE::Client"/>
+      <word name="FUSE::Server"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Festival" if="use-package-Festival">
+   <keywords region="packages">
+      <word name="Festival::Client"/>
+      <word name="Festival::Client::Async"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-File" if="use-package-File">
+   <keywords region="packages">
+      <word name="File::BSDGlob"/>
+      <word name="File::Backup"/>
+      <word name="File::Basename"/>
+      <word name="File::BasicFlock"/>
+      <word name="File::Cache"/>
+      <word name="File::CacheDir"/>
+      <word name="File::CheckTree"/>
+      <word name="File::Compare"/>
+      <word name="File::Copy"/>
+      <word name="File::CounterFile"/>
+      <word name="File::Data"/>
+      <word name="File::Find"/>
+      <word name="File::Find::Rule"/>
+      <word name="File::Flock"/>
+      <word name="File::Glob"/>
+      <word name="File::LckPwdF"/>
+      <word name="File::Listing"/>
+      <word name="File::Lock"/>
+      <word name="File::NFSLock"/>
+      <word name="File::Path"/>
+      <word name="File::Remote"/>
+      <word name="File::Repl"/>
+      <word name="File::Rsync"/>
+      <word name="File::Searcher"/>
+      <word name="File::Searcher::Interactive"/>
+      <word name="File::Slurp"/>
+      <word name="File::Sort"/>
+      <word name="File::Spec"/>
+      <word name="File::Sync"/>
+      <word name="File::Tail"/>
+      <word name="File::Temp"/>
+      <word name="File::Touch"/>
+      <word name="File::VirtualPath"/>
+      <word name="File::Which"/>
+      <word name="File::chmod"/>
+      <word name="File::lockf"/>
+      <word name="File::stat"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Filesys" if="use-package-Filesys">
+   <keywords region="packages">
+      <word name="Filesys::Df"/>
+      <word name="Filesys::DiskFree"/>
+      <word name="Filesys::DiskSpace"/>
+      <word name="Filesys::Ext2"/>
+      <word name="Filesys::SamFS"/>
+      <word name="Filesys::SmbClientParser"/>
+      <word name="Filesys::Statvfs"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Filter" if="use-package-Filter">
+   <keywords region="packages">
+      <word name="Filter::Simple"/>
+      <word name="Filter::Trigraph"/>
+      <word name="Filter::Util::Call"/>
+      <word name="Filter::Util::Exec"/>
+      <word name="Filter::cpp"/>
+      <word name="Filter::decrypt"/>
+      <word name="Filter::exec"/>
+      <word name="Filter::sh"/>
+      <word name="Filter::tee"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Finance" if="use-package-Finance">
+   <keywords region="packages">
+      <word name="Finance::Bank::Commonwealth"/>
+      <word name="Finance::NikkeiQuote"/>
+      <word name="Finance::Quote"/>
+      <word name="Finance::QuoteHist"/>
+      <word name="Finance::Streamer"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Font" if="use-package-Font">
+   <keywords region="packages">
+      <word name="Font::AFM"/>
+      <word name="Font::Fret"/>
+      <word name="Font::TFM"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-GD" if="use-package-GD">
+   <keywords region="packages">
+      <word name="GD::Barcode"/>
+      <word name="GD::Graph"/>
+      <word name="GD::Text"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Games" if="use-package-Games">
+   <keywords region="packages">
+      <word name="Games::AIBots"/>
+      <word name="Games::Alak"/>
+      <word name="Games::Cards"/>
+      <word name="Games::Dice"/>
+      <word name="Games::Dissociate"/>
+      <word name="Games::WordFind"/>
+      <word name="Games::Worms"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Geo" if="use-package-Geo">
+   <keywords region="packages">
+      <word name="Geo::IP"/>
+      <word name="Geo::METAR"/>
+      <word name="Geo::Storm_Tracker"/>
+      <word name="Geo::WeatherNOAA"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Getopt" if="use-package-Getopt">
+   <keywords region="packages">
+      <word name="Getopt::ArgvFile"/>
+      <word name="Getopt::Attribute"/>
+      <word name="Getopt::Declare"/>
+      <word name="Getopt::EvaP"/>
+      <word name="Getopt::GetArgs"/>
+      <word name="Getopt::Long"/>
+      <word name="Getopt::Mixed"/>
+      <word name="Getopt::Regex"/>
+      <word name="Getopt::Simple"/>
+      <word name="Getopt::Std"/>
+      <word name="Getopt::Tabular"/>
+      <word name="Getopt::Tiny"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Graph" if="use-package-Graph">
+   <keywords region="packages">
+      <word name="Graph::Kruskal"/>
+      <word name="Graph::Reader"/>
+      <word name="Graph::Reader::XML"/>
+      <word name="Graph::Writer"/>
+      <word name="Graph::Writer::Dot"/>
+      <word name="Graph::Writer::VCG"/>
+      <word name="Graph::Writer::XML"/>
+      <word name="Graph::Writer::daVinci"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Graphics" if="use-package-Graphics">
+   <keywords region="packages">
+      <word name="Graphics::ColorNames"/>
+      <word name="Graphics::Libplot"/>
+      <word name="Graphics::MNG"/>
+      <word name="Graphics::Plotter"/>
+      <word name="Graphics::Simple"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-HP200LX" if="use-package-HP200LX">
+   <keywords region="packages">
+      <word name="HP200LX::DB"/>
+      <word name="HP200LX::DBgui"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-HTML" if="use-package-HTML">
+   <keywords region="packages">
+      <word name="HTML::ActiveLink"/>
+      <word name="HTML::Base"/>
+      <word name="HTML::Bricks"/>
+      <word name="HTML::CalendarMonth"/>
+      <word name="HTML::CalendarMonthDB"/>
+      <word name="HTML::EP"/>
+      <word name="HTML::EasyTags"/>
+      <word name="HTML::Element"/>
+      <word name="HTML::ElementGlob"/>
+      <word name="HTML::ElementRaw"/>
+      <word name="HTML::ElementSuper"/>
+      <word name="HTML::ElementTable"/>
+      <word name="HTML::Embperl"/>
+      <word name="HTML::Encoding"/>
+      <word name="HTML::Entities"/>
+      <word name="HTML::Entities::ImodePictogram"/>
+      <word name="HTML::FillInForm"/>
+      <word name="HTML::FormTemplate"/>
+      <word name="HTML::Formatter"/>
+      <word name="HTML::FromText"/>
+      <word name="HTML::GenToc"/>
+      <word name="HTML::HeadParser"/>
+      <word name="HTML::Index"/>
+      <word name="HTML::LinkExtor"/>
+      <word name="HTML::LinkExtractor"/>
+      <word name="HTML::Lint"/>
+      <word name="HTML::LoL"/>
+      <word name="HTML::Macro"/>
+      <word name="HTML::Mason"/>
+      <word name="HTML::ParseBrowser"/>
+      <word name="HTML::Parser"/>
+      <word name="HTML::Processor"/>
+      <word name="HTML::QuickCheck"/>
+      <word name="HTML::Simple"/>
+      <word name="HTML::SimpleParse"/>
+      <word name="HTML::StickyForms"/>
+      <word name="HTML::Stream"/>
+      <word name="HTML::Subtext"/>
+      <word name="HTML::Table"/>
+      <word name="HTML::TableExtract"/>
+      <word name="HTML::TableLayout"/>
+      <word name="HTML::Tagset"/>
+      <word name="HTML::Template"/>
+      <word name="HTML::TokeParser"/>
+      <word name="HTML::Validator"/>
+      <word name="HTML::WebMake"/>
+      <word name="HTML::Widgets::Menu"/>
+      <word name="HTML::Widgets::Search"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-HTTP" if="use-package-HTTP">
+   <keywords region="packages">
+      <word name="HTTP::Browscap"/>
+      <word name="HTTP::BrowserDetect"/>
+      <word name="HTTP::Cookies"/>
+      <word name="HTTP::DAV"/>
+      <word name="HTTP::Daemon"/>
+      <word name="HTTP::Date"/>
+      <word name="HTTP::GHTTP"/>
+      <word name="HTTP::Headers"/>
+      <word name="HTTP::Message"/>
+      <word name="HTTP::Negotiate"/>
+      <word name="HTTP::QuickBase"/>
+      <word name="HTTP::Request"/>
+      <word name="HTTP::Request::Common"/>
+      <word name="HTTP::Request::Form"/>
+      <word name="HTTP::Response"/>
+      <word name="HTTP::SimpleLinkChecker"/>
+      <word name="HTTP::Size"/>
+      <word name="HTTP::Status"/>
+      <word name="HTTP::WebTest"/>
+      <word name="HTTP::Webdav"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-HTTPD" if="use-package-HTTPD">
+   <keywords region="packages">
+      <word name="HTTPD::Authen"/>
+      <word name="HTTPD::GroupAdmin"/>
+      <word name="HTTPD::Log::Filter"/>
+      <word name="HTTPD::UserAdmin"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Heap" if="use-package-Heap">
+   <keywords region="packages">
+      <word name="Heap::Binary"/>
+      <word name="Heap::Binomial"/>
+      <word name="Heap::Elem"/>
+      <word name="Heap::Elem::Num"/>
+      <word name="Heap::Elem::NumRev"/>
+      <word name="Heap::Elem::Ref"/>
+      <word name="Heap::Elem::RefRev"/>
+      <word name="Heap::Elem::Str"/>
+      <word name="Heap::Elem::StrRev"/>
+      <word name="Heap::Fibonacci"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Hook" if="use-package-Hook">
+   <keywords region="packages">
+      <word name="Hook::PrePostCall"/>
+      <word name="Hook::Scope"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-I18N" if="use-package-I18N">
+   <keywords region="packages">
+      <word name="I18N::Charset"/>
+      <word name="I18N::Collate"/>
+      <word name="I18N::LangTags"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-IO" if="use-package-IO">
+   <keywords region="packages">
+      <word name="IO::AtomicFile"/>
+      <word name="IO::Default"/>
+      <word name="IO::Dir"/>
+      <word name="IO::File"/>
+      <word name="IO::Filter"/>
+      <word name="IO::Handle"/>
+      <word name="IO::Lines"/>
+      <word name="IO::Multiplex"/>
+      <word name="IO::Pipe"/>
+      <word name="IO::React"/>
+      <word name="IO::Scalar"/>
+      <word name="IO::ScalarArray"/>
+      <word name="IO::Seekable"/>
+      <word name="IO::Select"/>
+      <word name="IO::Socket"/>
+      <word name="IO::String"/>
+      <word name="IO::Stringy"/>
+      <word name="IO::Stty"/>
+      <word name="IO::Tee"/>
+      <word name="IO::Tty"/>
+      <word name="IO::Wrap"/>
+      <word name="IO::WrapTie"/>
+      <word name="IO::Zlib"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-IPC" if="use-package-IPC">
+   <keywords region="packages">
+      <word name="IPC::Cache"/>
+      <word name="IPC::ChildSafe"/>
+      <word name="IPC::LDT"/>
+      <word name="IPC::Locker"/>
+      <word name="IPC::Open2"/>
+      <word name="IPC::Open3"/>
+      <word name="IPC::Run"/>
+      <word name="IPC::Session"/>
+      <word name="IPC::Shareable"/>
+      <word name="IPC::SharedCache"/>
+      <word name="IPC::Signal"/>
+      <word name="IPC::SysV"/>
+      <word name="IPC::XPA"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Image" if="use-package-Image">
+   <keywords region="packages">
+      <word name="Image::DS9"/>
+      <word name="Image::DeAnim"/>
+      <word name="Image::GD::Thumbnail"/>
+      <word name="Image::Grab"/>
+      <word name="Image::IPTCInfo"/>
+      <word name="Image::Imlib2"/>
+      <word name="Image::Info"/>
+      <word name="Image::Magick"/>
+      <word name="Image::ParseGIF"/>
+      <word name="Image::Size"/>
+      <word name="Image::Timeline"/>
+      <word name="Image::WorldMap"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Inline" if="use-package-Inline">
+   <keywords region="packages">
+      <word name="Inline::ASM"/>
+      <word name="Inline::C"/>
+      <word name="Inline::CPP"/>
+      <word name="Inline::CPR"/>
+      <word name="Inline::Files"/>
+      <word name="Inline::Guile"/>
+      <word name="Inline::Java"/>
+      <word name="Inline::Python"/>
+      <word name="Inline::Struct"/>
+      <word name="Inline::Tcl"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Jabber" if="use-package-Jabber">
+   <keywords region="packages">
+      <word name="Jabber::Connection"/>
+      <word name="Jabber::RPC"/>
+      <word name="Jabber::RPC::HTTPgate"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Java" if="use-package-Java">
+   <keywords region="packages">
+      <word name="Java"/>
+      <word name="Java::JVM::Classfile"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-LWP" if="use-package-LWP">
+   <keywords region="packages">
+      <word name="LWP::Conn"/>
+      <word name="LWP::MediaTypes"/>
+      <word name="LWP::Parallel"/>
+      <word name="LWP::Protocol"/>
+      <word name="LWP::RobotUA"/>
+      <word name="LWP::Simple"/>
+      <word name="LWP::UA"/>
+      <word name="LWP::UserAgent"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Language" if="use-package-Language">
+   <keywords region="packages">
+      <word name="Language::Basic"/>
+      <word name="Language::DATR::DATR2XML"/>
+      <word name="Language::Prolog"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Lingua" if="use-package-Lingua">
+   <keywords region="packages">
+      <word name="Lingua::Conjunction"/>
+      <word name="Lingua::DetectCharset"/>
+      <word name="Lingua::EN::AddressParse"/>
+      <word name="Lingua::EN::Fathom"/>
+      <word name="Lingua::EN::Hyphenate"/>
+      <word name="Lingua::EN::Infinitive"/>
+      <word name="Lingua::EN::Inflect"/>
+      <word name="Lingua::EN::MatchNames"/>
+      <word name="Lingua::EN::NameCase"/>
+      <word name="Lingua::EN::NameParse"/>
+      <word name="Lingua::EN::Nickname"/>
+      <word name="Lingua::EN::Numbers::Ordinate"/>
+      <word name="Lingua::EN::Squeeze"/>
+      <word name="Lingua::EN::Syllable"/>
+      <word name="Lingua::Ident"/>
+      <word name="Lingua::Ispell"/>
+      <word name="Lingua::JA::Number"/>
+      <word name="Lingua::JA::Sort::JIS"/>
+      <word name="Lingua::PT::pln"/>
+      <word name="Lingua::Preferred"/>
+      <word name="Lingua::RU::Antimat"/>
+      <word name="Lingua::RU::Charset"/>
+      <word name="Lingua::Romana::Perligata"/>
+      <word name="Lingua::Stem"/>
+      <word name="Lingua::ZH::CCDICT"/>
+      <word name="Lingua::ZH::CEDICT"/>
+      <word name="Lingua::ZH::HanConvert"/>
+      <word name="Lingua::Zompist::Barakhinei"/>
+      <word name="Lingua::Zompist::Cadhinor"/>
+      <word name="Lingua::Zompist::Kebreni"/>
+      <word name="Lingua::Zompist::Verdurian"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Linux" if="use-package-Linux">
+   <keywords region="packages">
+      <word name="Linux::AIO"/>
+      <word name="Linux::Cpuinfo"/>
+      <word name="Linux::Fuser"/>
+      <word name="Linux::Pid"/>
+      <word name="Linux::Svgalib"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-List" if="use-package-List">
+   <keywords region="packages">
+      <word name="List::Intersperse"/>
+      <word name="List::Util"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Locale" if="use-package-Locale">
+   <keywords region="packages">
+      <word name="Locale::Country"/>
+      <word name="Locale::Currency"/>
+      <word name="Locale::Language"/>
+      <word name="Locale::Maketext"/>
+      <word name="Locale::Msgcat"/>
+      <word name="Locale::PGetText"/>
+      <word name="Locale::PO"/>
+      <word name="Locale::SubCountry"/>
+      <word name="Locale::gettext"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-LockFile" if="use-package-LockFile">
+   <keywords region="packages">
+      <word name="LockFile::Lock"/>
+      <word name="LockFile::Manager"/>
+      <word name="LockFile::Simple"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Log" if="use-package-Log">
+   <keywords region="packages">
+      <word name="Log::Agent"/>
+      <word name="Log::Agent::Logger"/>
+      <word name="Log::Agent::Rotate"/>
+      <word name="Log::Delayed"/>
+      <word name="Log::Detect"/>
+      <word name="Log::Dispatch"/>
+      <word name="Log::Dispatch::TkText"/>
+      <word name="Log::Dispatch::ToTk"/>
+      <word name="Log::Dispatch::Win32EventLog"/>
+      <word name="Log::Topics"/>
+      <word name="Log::TraceMessages"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-MARC" if="use-package-MARC">
+   <keywords region="packages">
+      <word name="MARC::Record"/>
+      <word name="MARC::XML"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-MIME" if="use-package-MIME">
+   <keywords region="packages">
+      <word name="MIME::Base64"/>
+      <word name="MIME::Decoder"/>
+      <word name="MIME::Entity"/>
+      <word name="MIME::Head"/>
+      <word name="MIME::Lite"/>
+      <word name="MIME::Lite::HTML"/>
+      <word name="MIME::Parser"/>
+      <word name="MIME::QuotedPrint"/>
+      <word name="MIME::Types"/>
+      <word name="MIME::Words"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-MP3" if="use-package-MP3">
+   <keywords region="packages">
+      <word name="MP3::Daemon"/>
+      <word name="MP3::Info"/>
+      <word name="MP3::M3U"/>
+      <word name="MP3::Tag"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-MPEG" if="use-package-MPEG">
+   <keywords region="packages">
+      <word name="MPEG::ID3v1Tag"/>
+      <word name="MPEG::ID3v2Tag"/>
+      <word name="MPEG::MP3Play"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-MSDOS" if="use-package-MSDOS">
+   <keywords region="packages">
+      <word name="MSDOS::Attrib"/>
+      <word name="MSDOS::Descript"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-MSSQL" if="use-package-MSSQL">
+   <keywords region="packages">
+      <word name="MSSQL::DBlib"/>
+      <word name="MSSQL::Sqllib"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Mac" if="use-package-Mac">
+   <keywords region="packages">
+      <word name="Mac::AppleEvents::Simple"/>
+      <word name="Mac::Apps::Anarchie"/>
+      <word name="Mac::Apps::Launch"/>
+      <word name="Mac::Apps::MacPGP"/>
+      <word name="Mac::Apps::PBar"/>
+      <word name="Mac::AssistantFrames"/>
+      <word name="Mac::Comm::OT_PPP"/>
+      <word name="Mac::DtfSQL"/>
+      <word name="Mac::FileSpec::Unixish"/>
+      <word name="Mac::Glue"/>
+      <word name="Mac::Macbinary"/>
+      <word name="Mac::OSA::Simple"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Mail" if="use-package-Mail">
+   <keywords region="packages">
+      <word name="Mail::Address"/>
+      <word name="Mail::Alias"/>
+      <word name="Mail::Audit"/>
+      <word name="Mail::Box"/>
+      <word name="Mail::Cap"/>
+      <word name="Mail::CheckUser"/>
+      <word name="Mail::Ezmlm"/>
+      <word name="Mail::Field"/>
+      <word name="Mail::Field::Received"/>
+      <word name="Mail::Folder"/>
+      <word name="Mail::Freshmeat"/>
+      <word name="Mail::Header"/>
+      <word name="Mail::IMAPClient"/>
+      <word name="Mail::Internet"/>
+      <word name="Mail::ListDetector"/>
+      <word name="Mail::Mailer"/>
+      <word name="Mail::MboxParser"/>
+      <word name="Mail::POP3Client"/>
+      <word name="Mail::Procmail"/>
+      <word name="Mail::QmailRemote"/>
+      <word name="Mail::Send"/>
+      <word name="Mail::Sender"/>
+      <word name="Mail::Sendmail"/>
+      <word name="Mail::SpamAssassin"/>
+      <word name="Mail::Util"/>
+      <word name="Mail::Vacation"/>
+      <word name="Mail::Vacation::LDAP"/>
+      <word name="Mail::Verify"/>
+      <word name="Mail::Vmailmgr"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Math" if="use-package-Math">
+   <keywords region="packages">
+      <word name="Math::Amoeba"/>
+      <word name="Math::Approx"/>
+      <word name="Math::BaseCalc"/>
+      <word name="Math::Bezier"/>
+      <word name="Math::Bezier::Convert"/>
+      <word name="Math::BigFloat"/>
+      <word name="Math::BigInt"/>
+      <word name="Math::BigInt::BitVect"/>
+      <word name="Math::BigInt::Pari"/>
+      <word name="Math::BigIntFast"/>
+      <word name="Math::BigInteger"/>
+      <word name="Math::BigRat"/>
+      <word name="Math::BooleanEval"/>
+      <word name="Math::Brent"/>
+      <word name="Math::Business::BlackScholes"/>
+      <word name="Math::Business::EMA"/>
+      <word name="Math::CDF"/>
+      <word name="Math::Calc::Units"/>
+      <word name="Math::Cephes"/>
+      <word name="Math::Complex"/>
+      <word name="Math::Derivative"/>
+      <word name="Math::Expr"/>
+      <word name="Math::FFT"/>
+      <word name="Math::Fleximal"/>
+      <word name="Math::Fortran"/>
+      <word name="Math::Fraction"/>
+      <word name="Math::Geometry"/>
+      <word name="Math::Libm"/>
+      <word name="Math::Logic"/>
+      <word name="Math::Matrix"/>
+      <word name="Math::MatrixBool"/>
+      <word name="Math::MatrixReal"/>
+      <word name="Math::MatrixReal::Ext1"/>
+      <word name="Math::Pari"/>
+      <word name="Math::Polynomial"/>
+      <word name="Math::Polynomial::Solve"/>
+      <word name="Math::Project"/>
+      <word name="Math::RPN"/>
+      <word name="Math::Random"/>
+      <word name="Math::Random::MT"/>
+      <word name="Math::Round"/>
+      <word name="Math::SigFigs"/>
+      <word name="Math::Spline"/>
+      <word name="Math::Trig"/>
+      <word name="Math::TrulyRandom"/>
+      <word name="Math::VecStat"/>
+      <word name="Math::VectorReal"/>
+      <word name="Math::ematica"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Metadata" if="use-package-Metadata">
+   <keywords region="packages">
+      <word name="Metadata::Base"/>
+      <word name="Metadata::IAFA"/>
+      <word name="Metadata::SOIF"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Modem" if="use-package-Modem">
+   <keywords region="packages">
+      <word name="Modem::VBox"/>
+      <word name="Modem::Vgetty"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Module" if="use-package-Module">
+   <keywords region="packages">
+      <word name="Module::InstalledVersion"/>
+      <word name="Module::Reload"/>
+      <word name="Module::Signature"/>
+      <word name="Module::Use"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Mon" if="use-package-Mon">
+   <keywords region="packages">
+      <word name="Mon::Client"/>
+      <word name="Mon::SNMP"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Net" if="use-package-Net">
+   <keywords region="packages">
+      <word name="Net::ACAP"/>
+      <word name="Net::AIM"/>
+      <word name="Net::AOLIM"/>
+      <word name="Net::Bind"/>
+      <word name="Net::CDDBScan"/>
+      <word name="Net::CIDR"/>
+      <word name="Net::Cmd"/>
+      <word name="Net::DHCP::Watch"/>
+      <word name="Net::DHCPClient"/>
+      <word name="Net::DLookup"/>
+      <word name="Net::DNS"/>
+      <word name="Net::DNSServer"/>
+      <word name="Net::Daemon"/>
+      <word name="Net::Daemon::SSL"/>
+      <word name="Net::Dnet"/>
+      <word name="Net::Domain"/>
+      <word name="Net::FTP"/>
+      <word name="Net::FTPServer"/>
+      <word name="Net::FreeDB"/>
+      <word name="Net::Gen"/>
+      <word name="Net::Gnutella"/>
+      <word name="Net::Goofey"/>
+      <word name="Net::Google"/>
+      <word name="Net::HTTPTunnel"/>
+      <word name="Net::Hesiod"/>
+      <word name="Net::Hotline"/>
+      <word name="Net::ICB"/>
+      <word name="Net::ICQ"/>
+      <word name="Net::ICQV5"/>
+      <word name="Net::ICQV5CD"/>
+      <word name="Net::ICal"/>
+      <word name="Net::IMAP"/>
+      <word name="Net::IMAP::Simple"/>
+      <word name="Net::IRC"/>
+      <word name="Net::Ident"/>
+      <word name="Net::Inet"/>
+      <word name="Net::Interface"/>
+      <word name="Net::Jabber"/>
+      <word name="Net::LDAP"/>
+      <word name="Net::LDAPapi"/>
+      <word name="Net::LMTP"/>
+      <word name="Net::NIS"/>
+      <word name="Net::NISPlus"/>
+      <word name="Net::NNTP"/>
+      <word name="Net::Netmask"/>
+      <word name="Net::Netrc"/>
+      <word name="Net::OSCAR"/>
+      <word name="Net::PH"/>
+      <word name="Net::POP3"/>
+      <word name="Net::Pager"/>
+      <word name="Net::ParseWhois"/>
+      <word name="Net::Patricia"/>
+      <word name="Net::Pcap"/>
+      <word name="Net::Peep"/>
+      <word name="Net::Ping"/>
+      <word name="Net::Ping::External"/>
+      <word name="Net::Printer"/>
+      <word name="Net::QMQP"/>
+      <word name="Net::SCP"/>
+      <word name="Net::SFTP"/>
+      <word name="Net::SMPP"/>
+      <word name="Net::SMS"/>
+      <word name="Net::SMS::Genie"/>
+      <word name="Net::SMS::Web"/>
+      <word name="Net::SMTP"/>
+      <word name="Net::SNMP"/>
+      <word name="Net::SNMP::Interfaces"/>
+      <word name="Net::SNPP"/>
+      <word name="Net::SOCKS"/>
+      <word name="Net::SSH"/>
+      <word name="Net::SSH::Perl"/>
+      <word name="Net::SSL"/>
+      <word name="Net::SSLeay"/>
+      <word name="Net::Server"/>
+      <word name="Net::Syslog"/>
+      <word name="Net::TCP"/>
+      <word name="Net::TFTP"/>
+      <word name="Net::Telnet"/>
+      <word name="Net::Telnet::Cisco"/>
+      <word name="Net::Time"/>
+      <word name="Net::Traceroute"/>
+      <word name="Net::Traceroute6"/>
+      <word name="Net::UDP"/>
+      <word name="Net::Whois"/>
+      <word name="Net::Whois::RIPE"/>
+      <word name="Net::XWhois"/>
+      <word name="Net::Z3950"/>
+      <word name="Net::hostent"/>
+      <word name="Net::netent"/>
+      <word name="Net::protoent"/>
+      <word name="Net::servent"/>
+      <word name="Net::xAP"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-NetAddr" if="use-package-NetAddr">
+   <keywords region="packages">
+      <word name="NetAddr::IP"/>
+      <word name="NetAddr::IP::Find"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-NetPacket" if="use-package-NetPacket">
+   <keywords region="packages">
+      <word name="NetPacket::ARP"/>
+      <word name="NetPacket::Ethernet"/>
+      <word name="NetPacket::IGMP"/>
+      <word name="NetPacket::IP"/>
+      <word name="NetPacket::TCP"/>
+      <word name="NetPacket::UDP"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-NetServer" if="use-package-NetServer">
+   <keywords region="packages">
+      <word name="NetServer::Generic"/>
+      <word name="NetServer::Portal"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Netscape" if="use-package-Netscape">
+   <keywords region="packages">
+      <word name="Netscape::Bookmarks"/>
+      <word name="Netscape::Cache"/>
+      <word name="Netscape::History"/>
+      <word name="Netscape::HistoryURL"/>
+      <word name="Netscape::Server"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-News" if="use-package-News">
+   <keywords region="packages">
+      <word name="News::Article"/>
+      <word name="News::Gateway"/>
+      <word name="News::GnusFilter"/>
+      <word name="News::NNTPClient"/>
+      <word name="News::Newsrc"/>
+      <word name="News::Scan"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-NexTrieve" if="use-package-NexTrieve">
+   <keywords region="packages">
+      <word name="NexTrieve"/>
+      <word name="NexTrieve::Collection"/>
+      <word name="NexTrieve::Collection::Index"/>
+      <word name="NexTrieve::DBI"/>
+      <word name="NexTrieve::Daemon"/>
+      <word name="NexTrieve::Docseq"/>
+      <word name="NexTrieve::Document"/>
+      <word name="NexTrieve::HTML"/>
+      <word name="NexTrieve::Hitlist"/>
+      <word name="NexTrieve::Hitlist::Hit"/>
+      <word name="NexTrieve::Index"/>
+      <word name="NexTrieve::MIME"/>
+      <word name="NexTrieve::Mbox"/>
+      <word name="NexTrieve::Message"/>
+      <word name="NexTrieve::Overview"/>
+      <word name="NexTrieve::PDF"/>
+      <word name="NexTrieve::Query"/>
+      <word name="NexTrieve::Querylog"/>
+      <word name="NexTrieve::RFC822"/>
+      <word name="NexTrieve::Replay"/>
+      <word name="NexTrieve::Resource"/>
+      <word name="NexTrieve::Search"/>
+      <word name="NexTrieve::Targz"/>
+      <word name="NexTrieve::UTF8"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-No" if="use-package-No">
+   <keywords region="packages">
+      <word name="No::Dato"/>
+      <word name="No::KontoNr"/>
+      <word name="No::PersonNr"/>
+      <word name="No::Sort"/>
+      <word name="No::Telenor"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Number" if="use-package-Number">
+   <keywords region="packages">
+      <word name="Number::Encode"/>
+      <word name="Number::Format"/>
+      <word name="Number::Phone::US"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-OLE" if="use-package-OLE">
+   <keywords region="packages">
+      <word name="OLE::PropertySet"/>
+      <word name="OLE::Storage"/>
+      <word name="OLE::Storage_Lite"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-OS2" if="use-package-OS2">
+   <keywords region="packages">
+      <word name="OS2::ExtAttr"/>
+      <word name="OS2::FTP"/>
+      <word name="OS2::PrfDB"/>
+      <word name="OS2::REXX"/>
+      <word name="OS2::UPM"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Object" if="use-package-Object">
+   <keywords region="packages">
+      <word name="Object::Info"/>
+      <word name="Object::Realize::Later"/>
+      <word name="Object::Transaction"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-PDF" if="use-package-PDF">
+   <keywords region="packages">
+      <word name="PDF::Core"/>
+      <word name="PDF::Create"/>
+      <word name="PDF::Labels"/>
+      <word name="PDF::Parse"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-PDL" if="use-package-PDL">
+   <keywords region="packages">
+      <word name="PDL::Meschach"/>
+      <word name="PDL::NetCDF"/>
+      <word name="PDL::NiceSlice"/>
+      <word name="PDL::Options"/>
+      <word name="PDL::PP"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-POE" if="use-package-POE">
+   <keywords region="packages">
+      <word name="POE::Component::Client::FTP"/>
+      <word name="POE::Component::Client::UserAgent"/>
+      <word name="POE::Component::IRC::Onjoin"/>
+      <word name="POE::Component::MPG123"/>
+      <word name="POE::Component::Pcap"/>
+      <word name="POE::Component::RSS"/>
+      <word name="POE::Component::Server::HTTP"/>
+      <word name="POE::Component::SubWrapper"/>
+      <word name="POE::Component::UserBase"/>
+      <word name="POE::Kernel"/>
+      <word name="POE::Session"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Parallel" if="use-package-Parallel">
+   <keywords region="packages">
+      <word name="Parallel::ForkManager"/>
+      <word name="Parallel::Pvm"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Parse" if="use-package-Parse">
+   <keywords region="packages">
+      <word name="Parse::FixedLength"/>
+      <word name="Parse::Lex"/>
+      <word name="Parse::RecDescent"/>
+      <word name="Parse::Syslog"/>
+      <word name="Parse::Tokens"/>
+      <word name="Parse::Vipar"/>
+      <word name="Parse::Yapp"/>
+      <word name="Parse::ePerl"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Perl6" if="use-package-Perl6">
+   <keywords region="packages">
+      <word name="Perl6::Interpolators"/>
+      <word name="Perl6::Parameters"/>
+      <word name="Perl6::Variables"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Persistent" if="use-package-Persistent">
+   <keywords region="packages">
+      <word name="Persistent::Base"/>
+      <word name="Persistent::DBI"/>
+      <word name="Persistent::LDAP"/>
+      <word name="Persistent::MySQL"/>
+      <word name="Persistent::Oracle"/>
+      <word name="Persistent::Sybase"/>
+      <word name="Persistent::mSQL"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Pod" if="use-package-Pod">
+   <keywords region="packages">
+      <word name="Pod::Checker"/>
+      <word name="Pod::Diff"/>
+      <word name="Pod::DocBook"/>
+      <word name="Pod::HTML"/>
+      <word name="Pod::HTML2Pod"/>
+      <word name="Pod::Hlp"/>
+      <word name="Pod::LaTeX"/>
+      <word name="Pod::Lyx"/>
+      <word name="Pod::Man"/>
+      <word name="Pod::POM"/>
+      <word name="Pod::PP"/>
+      <word name="Pod::Parser"/>
+      <word name="Pod::Pdf"/>
+      <word name="Pod::RTF"/>
+      <word name="Pod::Rtf"/>
+      <word name="Pod::Sdf"/>
+      <word name="Pod::Select"/>
+      <word name="Pod::Simplify"/>
+      <word name="Pod::Text"/>
+      <word name="Pod::Tree"/>
+      <word name="Pod::Usage"/>
+      <word name="Pod::XML"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-PostScript" if="use-package-PostScript">
+   <keywords region="packages">
+      <word name="PostScript::BasicTypesetter"/>
+      <word name="PostScript::Document"/>
+      <word name="PostScript::Elements"/>
+      <word name="PostScript::Font"/>
+      <word name="PostScript::FontInfo"/>
+      <word name="PostScript::FontMetrics"/>
+      <word name="PostScript::ISOLatin1Encoding"/>
+      <word name="PostScript::Metrics"/>
+      <word name="PostScript::PrinterFontMetrics"/>
+      <word name="PostScript::PseudoISO"/>
+      <word name="PostScript::Resources"/>
+      <word name="PostScript::StandardEncoding"/>
+      <word name="PostScript::TextBlock"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Proc" if="use-package-Proc">
+   <keywords region="packages">
+      <word name="Proc::Background"/>
+      <word name="Proc::Forkfunc"/>
+      <word name="Proc::ProcessTable"/>
+      <word name="Proc::Queue"/>
+      <word name="Proc::SafePipe"/>
+      <word name="Proc::Short"/>
+      <word name="Proc::Simple"/>
+      <word name="Proc::Spawn"/>
+      <word name="Proc::SyncExec"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Puppet" if="use-package-Puppet">
+   <keywords region="packages">
+      <word name="Puppet::Any"/>
+      <word name="Puppet::Body"/>
+      <word name="Puppet::Log"/>
+      <word name="Puppet::VcsTools::File"/>
+      <word name="Puppet::VcsTools::History"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Python" if="use-package-Python">
+   <keywords region="packages">
+      <word name="Python::Err"/>
+      <word name="Python::Object"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Quantum" if="use-package-Quantum">
+   <keywords region="packages">
+      <word name="Quantum::Entanglement"/>
+      <word name="Quantum::Superpositions"/>
+      <word name="Quantum::Usrn"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-RADIUS" if="use-package-RADIUS">
+   <keywords region="packages">
+      <word name="RADIUS::Dictionary"/>
+      <word name="RADIUS::Packet"/>
+      <word name="RADIUS::UserFile"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-RAS" if="use-package-RAS">
+   <keywords region="packages">
+      <word name="RAS::AS5200"/>
+      <word name="RAS::HiPerARC"/>
+      <word name="RAS::PortMaster"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-RDF" if="use-package-RDF">
+   <keywords region="packages">
+      <word name="RDF::Core"/>
+      <word name="RDF::Service"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-RPC" if="use-package-RPC">
+   <keywords region="packages">
+      <word name="RPC::ONC"/>
+      <word name="RPC::PlClient"/>
+      <word name="RPC::PlServer"/>
+      <word name="RPC::Simple"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-RPM" if="use-package-RPM">
+   <keywords region="packages">
+      <word name="RPM::Constants"/>
+      <word name="RPM::Database"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-RTF" if="use-package-RTF">
+   <keywords region="packages">
+      <word name="RTF::Generator"/>
+      <word name="RTF::Parser"/>
+      <word name="RTF::Tokenizer"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Regexp" if="use-package-Regexp">
+   <keywords region="packages">
+      <word name="Regexp::Common"/>
+      <word name="Regexp::Shellish"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Replication" if="use-package-Replication">
+   <keywords region="packages">
+      <word name="Replication::Recall::Client"/>
+      <word name="Replication::Recall::DBServer"/>
+      <word name="Replication::Recall::Server"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-SGI" if="use-package-SGI">
+   <keywords region="packages">
+      <word name="SGI::FAM"/>
+      <word name="SGI::FM"/>
+      <word name="SGI::GL"/>
+      <word name="SGI::SysCalls"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-SGML" if="use-package-SGML">
+   <keywords region="packages">
+      <word name="SGML::Element"/>
+      <word name="SGML::Entity"/>
+      <word name="SGML::Parser"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-SNMP" if="use-package-SNMP">
+   <keywords region="packages">
+      <word name="SNMP::BridgeQuery"/>
+      <word name="SNMP::Monitor"/>
+      <word name="SNMP::Util"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-SQL" if="use-package-SQL">
+   <keywords region="packages">
+      <word name="SQL::Generator"/>
+      <word name="SQL::Schema"/>
+      <word name="SQL::Snippet"/>
+      <word name="SQL::Statement"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Safe" if="use-package-Safe">
+   <keywords region="packages">
+      <word name="Safe"/>
+      <word name="Safe::Hole"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Scalar" if="use-package-Scalar">
+   <keywords region="packages">
+      <word name="Scalar::Properties"/>
+      <word name="Scalar::Util"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Schedule" if="use-package-Schedule">
+   <keywords region="packages">
+      <word name="Schedule::At"/>
+      <word name="Schedule::ByClock"/>
+      <word name="Schedule::Cron"/>
+      <word name="Schedule::Load"/>
+      <word name="Schedule::Match"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Search" if="use-package-Search">
+   <keywords region="packages">
+      <word name="Search::Binary"/>
+      <word name="Search::Dict"/>
+      <word name="Search::InvertedIndex"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Sendmail" if="use-package-Sendmail">
+   <keywords region="packages">
+      <word name="Sendmail::AccessDB"/>
+      <word name="Sendmail::Milter"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Set" if="use-package-Set">
+   <keywords region="packages">
+      <word name="Set::Bag"/>
+      <word name="Set::CheckList"/>
+      <word name="Set::Crontab"/>
+      <word name="Set::CrossProduct"/>
+      <word name="Set::Infinite"/>
+      <word name="Set::IntRange"/>
+      <word name="Set::IntSpan"/>
+      <word name="Set::NestedGroups"/>
+      <word name="Set::Object"/>
+      <word name="Set::Scalar"/>
+      <word name="Set::Window"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Shell" if="use-package-Shell">
+   <keywords region="packages">
+      <word name="Shell"/>
+      <word name="Shell::Source"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Silly" if="use-package-Silly">
+   <keywords region="packages">
+      <word name="Silly::StringMaths"/>
+      <word name="Silly::Werder"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Socket" if="use-package-Socket">
+   <keywords region="packages">
+      <word name="Socket"/>
+      <word name="Socket::PassAccessRights"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Solaris" if="use-package-Solaris">
+   <keywords region="packages">
+      <word name="Solaris::ACL"/>
+      <word name="Solaris::Contents"/>
+      <word name="Solaris::InstallDB"/>
+      <word name="Solaris::Kstat"/>
+      <word name="Solaris::MapDev"/>
+      <word name="Solaris::Package"/>
+      <word name="Solaris::Procfs"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Sort" if="use-package-Sort">
+   <keywords region="packages">
+      <word name="Sort::ArbBiLex"/>
+      <word name="Sort::Fields"/>
+      <word name="Sort::Versions"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Speech" if="use-package-Speech">
+   <keywords region="packages">
+      <word name="Speech::Festival"/>
+      <word name="Speech::Festival::Synthesiser"/>
+      <word name="Speech::Recognizer::SPX"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Spreadsheet" if="use-package-Spreadsheet">
+   <keywords region="packages">
+      <word name="Spreadsheet::ParseExcel"/>
+      <word name="Spreadsheet::WriteExcel"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Statistics" if="use-package-Statistics">
+   <keywords region="packages">
+      <word name="Statistics::ChiSquare"/>
+      <word name="Statistics::ConwayLife"/>
+      <word name="Statistics::Descriptive"/>
+      <word name="Statistics::Distributions"/>
+      <word name="Statistics::LTU"/>
+      <word name="Statistics::MaxEntropy"/>
+      <word name="Statistics::OLS"/>
+      <word name="Statistics::ROC"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-String" if="use-package-String">
+   <keywords region="packages">
+      <word name="String::Approx"/>
+      <word name="String::BitCount"/>
+      <word name="String::Buffer"/>
+      <word name="String::CRC"/>
+      <word name="String::CRC32"/>
+      <word name="String::DiffLine"/>
+      <word name="String::Edit"/>
+      <word name="String::Multibyte"/>
+      <word name="String::Parity"/>
+      <word name="String::Random"/>
+      <word name="String::RexxParse"/>
+      <word name="String::Scanf"/>
+      <word name="String::ShellQuote"/>
+      <word name="String::Similarity"/>
+      <word name="String::Strip"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Sub" if="use-package-Sub">
+   <keywords region="packages">
+      <word name="Sub::Curry"/>
+      <word name="Sub::Quotelike"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Sybase" if="use-package-Sybase">
+   <keywords region="packages">
+      <word name="Sybase::BCP"/>
+      <word name="Sybase::Simple"/>
+      <word name="Sybase::Sybperl"/>
+      <word name="Sybase::Xfer"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Symbol" if="use-package-Symbol">
+   <keywords region="packages">
+      <word name="Symbol"/>
+      <word name="Symbol::Approx::Sub"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Sys" if="use-package-Sys">
+   <keywords region="packages">
+      <word name="Sys::AlarmCall"/>
+      <word name="Sys::CPU"/>
+      <word name="Sys::Hostname"/>
+      <word name="Sys::Hostname::Long"/>
+      <word name="Sys::Lastlog"/>
+      <word name="Sys::Syslog"/>
+      <word name="Sys::Utmp"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-SyslogScan" if="use-package-SyslogScan">
+   <keywords region="packages">
+      <word name="SyslogScan::SendmailLine"/>
+      <word name="SyslogScan::SyslogEntry"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-SystemC" if="use-package-SystemC">
+   <keywords region="packages">
+      <word name="SystemC::Netlist"/>
+      <word name="SystemC::Parser"/>
+      <word name="SystemC::Vregs"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-TeX" if="use-package-TeX">
+   <keywords region="packages">
+      <word name="TeX::DVI"/>
+      <word name="TeX::Hyphen"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Term" if="use-package-Term">
+   <keywords region="packages">
+      <word name="Term::ANSIColor"/>
+      <word name="Term::ANSIScreen"/>
+      <word name="Term::Cap"/>
+      <word name="Term::Complete"/>
+      <word name="Term::Gnuplot"/>
+      <word name="Term::Info"/>
+      <word name="Term::Interact"/>
+      <word name="Term::ProgressBar"/>
+      <word name="Term::Prompt"/>
+      <word name="Term::Query"/>
+      <word name="Term::ReadKey"/>
+      <word name="Term::ReadLine"/>
+      <word name="Term::ReadLine::Gnu"/>
+      <word name="Term::ReadLine::Perl"/>
+      <word name="Term::Screen"/>
+      <word name="Term::Size"/>
+      <word name="Term::TUI"/>
+      <word name="Term::VT102"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Test" if="use-package-Test">
+   <keywords region="packages">
+      <word name="Test::Cmd"/>
+      <word name="Test::Exception"/>
+      <word name="Test::Harness"/>
+      <word name="Test::Mail"/>
+      <word name="Test::Manifest"/>
+      <word name="Test::More"/>
+      <word name="Test::Pod"/>
+      <word name="Test::Reporter"/>
+      <word name="Test::Simple"/>
+      <word name="Test::Unit"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Text" if="use-package-Text">
+   <keywords region="packages">
+      <word name="Text::Abbrev"/>
+      <word name="Text::Balanced"/>
+      <word name="Text::BarGraph"/>
+      <word name="Text::Bastardize"/>
+      <word name="Text::BibTeX"/>
+      <word name="Text::CSV"/>
+      <word name="Text::CSV_XS"/>
+      <word name="Text::DelimMatch"/>
+      <word name="Text::DoubleMetaphone"/>
+      <word name="Text::English"/>
+      <word name="Text::EtText"/>
+      <word name="Text::FastTemplate"/>
+      <word name="Text::FillIn"/>
+      <word name="Text::Format"/>
+      <word name="Text::German"/>
+      <word name="Text::Graphics"/>
+      <word name="Text::Header"/>
+      <word name="Text::Iconv"/>
+      <word name="Text::Macros"/>
+      <word name="Text::Merge"/>
+      <word name="Text::MetaText"/>
+      <word name="Text::Metaphone"/>
+      <word name="Text::MicroMason"/>
+      <word name="Text::ParseWords"/>
+      <word name="Text::Refer"/>
+      <word name="Text::Scan"/>
+      <word name="Text::ScriptTemplate"/>
+      <word name="Text::SimpleTemplate"/>
+      <word name="Text::Soundex"/>
+      <word name="Text::Tabs"/>
+      <word name="Text::TeX"/>
+      <word name="Text::Templar"/>
+      <word name="Text::Template"/>
+      <word name="Text::TreeFile"/>
+      <word name="Text::Trie"/>
+      <word name="Text::Vpp"/>
+      <word name="Text::Wrap"/>
+      <word name="Text::iPerl"/>
+      <word name="Text::xSV"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Thread" if="use-package-Thread">
+   <keywords region="packages">
+      <word name="Thread::Pool"/>
+      <word name="Thread::Queue"/>
+      <word name="Thread::RWLock"/>
+      <word name="Thread::Semaphore"/>
+      <word name="Thread::Signal"/>
+      <word name="Thread::Specific"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Tie" if="use-package-Tie">
+   <keywords region="packages">
+      <word name="Tie::AliasHash"/>
+      <word name="Tie::Array"/>
+      <word name="Tie::CPHash"/>
+      <word name="Tie::Cache"/>
+      <word name="Tie::Cache::LRU"/>
+      <word name="Tie::CharArray"/>
+      <word name="Tie::Cycle"/>
+      <word name="Tie::DBI"/>
+      <word name="Tie::DB_FileLock"/>
+      <word name="Tie::DB_Lock"/>
+      <word name="Tie::Dir"/>
+      <word name="Tie::Discovery"/>
+      <word name="Tie::DxHash"/>
+      <word name="Tie::File"/>
+      <word name="Tie::FileLRUCache"/>
+      <word name="Tie::GHash"/>
+      <word name="Tie::Handle"/>
+      <word name="Tie::Hash"/>
+      <word name="Tie::Hash::Regex"/>
+      <word name="Tie::Hash::Stack"/>
+      <word name="Tie::HashDefaults"/>
+      <word name="Tie::IxHash"/>
+      <word name="Tie::LDAP"/>
+      <word name="Tie::LLHash"/>
+      <word name="Tie::ListKeyedHash"/>
+      <word name="Tie::MmapArray"/>
+      <word name="Tie::Multidim"/>
+      <word name="Tie::OffsetArray"/>
+      <word name="Tie::Persistent"/>
+      <word name="Tie::RDBM"/>
+      <word name="Tie::RangeHash"/>
+      <word name="Tie::RegexpHash"/>
+      <word name="Tie::Scalar"/>
+      <word name="Tie::Scalar::Timeout"/>
+      <word name="Tie::SecureHash"/>
+      <word name="Tie::SentientHash"/>
+      <word name="Tie::ShadowHash"/>
+      <word name="Tie::SortHash"/>
+      <word name="Tie::StrictHash"/>
+      <word name="Tie::SubstrHash"/>
+      <word name="Tie::TextDir"/>
+      <word name="Tie::Toggle"/>
+      <word name="Tie::TransactHash"/>
+      <word name="Tie::WarnGlobal"/>
+      <word name="Tie::Watch"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Time" if="use-package-Time">
+   <keywords region="packages">
+      <word name="Time::Avail"/>
+      <word name="Time::CTime"/>
+      <word name="Time::DaysInMonth"/>
+      <word name="Time::HiRes"/>
+      <word name="Time::JulianDay"/>
+      <word name="Time::Local"/>
+      <word name="Time::Object"/>
+      <word name="Time::ParseDate"/>
+      <word name="Time::Period"/>
+      <word name="Time::Piece::MySQL"/>
+      <word name="Time::Seconds"/>
+      <word name="Time::Stopwatch"/>
+      <word name="Time::TAI64"/>
+      <word name="Time::Timezone"/>
+      <word name="Time::Unix"/>
+      <word name="Time::Warp"/>
+      <word name="Time::Zone"/>
+      <word name="Time::gmtime"/>
+      <word name="Time::localtime"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Tk" if="use-package-Tk">
+   <keywords region="packages">
+      <word name="Tk::Autoscroll"/>
+      <word name="Tk::Axis"/>
+      <word name="Tk::CheckBox"/>
+      <word name="Tk::ChildNotification"/>
+      <word name="Tk::Clock"/>
+      <word name="Tk::Cloth"/>
+      <word name="Tk::Columns"/>
+      <word name="Tk::ComboEntry"/>
+      <word name="Tk::ContextHelp"/>
+      <word name="Tk::Date"/>
+      <word name="Tk::DateEntry"/>
+      <word name="Tk::Dial"/>
+      <word name="Tk::Enscript"/>
+      <word name="Tk::FcyEntry"/>
+      <word name="Tk::FileDialog"/>
+      <word name="Tk::FileEntry"/>
+      <word name="Tk::FireButton"/>
+      <word name="Tk::FontDialog"/>
+      <word name="Tk::Getopt"/>
+      <word name="Tk::HTML"/>
+      <word name="Tk::HistEntry"/>
+      <word name="Tk::IconCanvas"/>
+      <word name="Tk::JComboBox"/>
+      <word name="Tk::JPEG"/>
+      <word name="Tk::LockDisplay"/>
+      <word name="Tk::MListbox"/>
+      <word name="Tk::Menustrip"/>
+      <word name="Tk::More"/>
+      <word name="Tk::NumEntry"/>
+      <word name="Tk::ObjEditor"/>
+      <word name="Tk::ObjEditorDialog"/>
+      <word name="Tk::ObjScanner"/>
+      <word name="Tk::PNG"/>
+      <word name="Tk::Pane"/>
+      <word name="Tk::PathEntry"/>
+      <word name="Tk::Pgplot"/>
+      <word name="Tk::Pod"/>
+      <word name="Tk::ProgressBar"/>
+      <word name="Tk::RotCanvas"/>
+      <word name="Tk::SplitFrame"/>
+      <word name="Tk::TFrame"/>
+      <word name="Tk::TIFF"/>
+      <word name="Tk::TabFrame"/>
+      <word name="Tk::TabbedForm"/>
+      <word name="Tk::TableEdit"/>
+      <word name="Tk::TableMatrix"/>
+      <word name="Tk::TextANSIColor"/>
+      <word name="Tk::TiedListbox"/>
+      <word name="Tk::Tree"/>
+      <word name="Tk::TreeGraph"/>
+      <word name="Tk::WaitBox"/>
+      <word name="Tk::Workspace"/>
+      <word name="Tk::XMLViewer"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Tree" if="use-package-Tree">
+   <keywords region="packages">
+      <word name="Tree::Base"/>
+      <word name="Tree::DAG_Node"/>
+      <word name="Tree::Fat"/>
+      <word name="Tree::M"/>
+      <word name="Tree::Nary"/>
+      <word name="Tree::Smart"/>
+      <word name="Tree::Ternary"/>
+      <word name="Tree::Ternary_XS"/>
+      <word name="Tree::Trie"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-URI" if="use-package-URI">
+   <keywords region="packages">
+      <word name="URI::Attr"/>
+      <word name="URI::Bookmark"/>
+      <word name="URI::Bookmarks"/>
+      <word name="URI::Escape"/>
+      <word name="URI::Find"/>
+      <word name="URI::URL"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Unicode" if="use-package-Unicode">
+   <keywords region="packages">
+      <word name="Unicode::Japanese"/>
+      <word name="Unicode::Lite"/>
+      <word name="Unicode::Map8"/>
+      <word name="Unicode::MapUTF8"/>
+      <word name="Unicode::String"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Unix" if="use-package-Unix">
+   <keywords region="packages">
+      <word name="Unix::ConfigFile"/>
+      <word name="Unix::Login"/>
+      <word name="Unix::Processors"/>
+      <word name="Unix::Syslog"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-User" if="use-package-User">
+   <keywords region="packages">
+      <word name="User::Utmp"/>
+      <word name="User::grent"/>
+      <word name="User::pwent"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-VCS" if="use-package-VCS">
+   <keywords region="packages">
+      <word name="VCS"/>
+      <word name="VCS::PVCS"/>
+      <word name="VCS::StarTeam"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-VMS" if="use-package-VMS">
+   <keywords region="packages">
+      <word name="VMS::Device"/>
+      <word name="VMS::Filespec"/>
+      <word name="VMS::ICC"/>
+      <word name="VMS::Lock"/>
+      <word name="VMS::Mail"/>
+      <word name="VMS::Misc"/>
+      <word name="VMS::Monitor"/>
+      <word name="VMS::Persona"/>
+      <word name="VMS::Priv"/>
+      <word name="VMS::Process"/>
+      <word name="VMS::Queue"/>
+      <word name="VMS::System"/>
+      <word name="VMS::User"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-VRML" if="use-package-VRML">
+   <keywords region="packages">
+      <word name="VRML::Base"/>
+      <word name="VRML::Browser"/>
+      <word name="VRML::Color"/>
+      <word name="VRML::VRML1"/>
+      <word name="VRML::VRML2"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Verilog" if="use-package-Verilog">
+   <keywords region="packages">
+      <word name="Verilog::Language"/>
+      <word name="Verilog::Parser"/>
+      <word name="Verilog::Pli"/>
+      <word name="Verilog::SigParser"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-WML" if="use-package-WML">
+   <keywords region="packages">
+      <word name="WML::Card"/>
+      <word name="WML::Deck"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-WWW" if="use-package-WWW">
+   <keywords region="packages">
+      <word name="WWW::BBSWatch"/>
+      <word name="WWW::Cache::Google"/>
+      <word name="WWW::Link"/>
+      <word name="WWW::Robot"/>
+      <word name="WWW::RobotRules"/>
+      <word name="WWW::Search"/>
+      <word name="WWW::Search::AlltheWeb"/>
+      <word name="WWW::Search::Ebay"/>
+      <word name="WWW::Search::FirstGov"/>
+      <word name="WWW::Search::Go"/>
+      <word name="WWW::Search::Google"/>
+      <word name="WWW::Search::HotBot"/>
+      <word name="WWW::Search::Lycos"/>
+      <word name="WWW::Search::RpmFind"/>
+      <word name="WWW::Search::Yahoo"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Win32" if="use-package-Win32">
+   <keywords region="packages">
+      <word name="Win32::ADO"/>
+      <word name="Win32::API"/>
+      <word name="Win32::ASP"/>
+      <word name="Win32::AbsPath"/>
+      <word name="Win32::AdminMisc"/>
+      <word name="Win32::ChangeNotify"/>
+      <word name="Win32::Clipboard"/>
+      <word name="Win32::Console"/>
+      <word name="Win32::DriveInfo"/>
+      <word name="Win32::Event"/>
+      <word name="Win32::EventLog"/>
+      <word name="Win32::EventLog::Carp"/>
+      <word name="Win32::FUtils"/>
+      <word name="Win32::FileOp"/>
+      <word name="Win32::GUI"/>
+      <word name="Win32::GuiTest"/>
+      <word name="Win32::Guidgen"/>
+      <word name="Win32::IPC"/>
+      <word name="Win32::Internet"/>
+      <word name="Win32::MultiMedia::Joystick"/>
+      <word name="Win32::MultiMedia::Mci"/>
+      <word name="Win32::Mutex"/>
+      <word name="Win32::NetAdmin"/>
+      <word name="Win32::NetResource"/>
+      <word name="Win32::ODBC"/>
+      <word name="Win32::OLE"/>
+      <word name="Win32::OLE::OPC"/>
+      <word name="Win32::Pipe"/>
+      <word name="Win32::Process"/>
+      <word name="Win32::RASE"/>
+      <word name="Win32::Registry"/>
+      <word name="Win32::Semaphore"/>
+      <word name="Win32::SerialPort"/>
+      <word name="Win32::SharedFileOpen"/>
+      <word name="Win32::Shortcut"/>
+      <word name="Win32::Sound"/>
+      <word name="Win32::SystemInfo"/>
+      <word name="Win32::WinError"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Win32API" if="use-package-Win32API">
+   <keywords region="packages">
+      <word name="Win32API::CommPort"/>
+      <word name="Win32API::File"/>
+      <word name="Win32API::Registry"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-X11" if="use-package-X11">
+   <keywords region="packages">
+      <word name="X11::Auth"/>
+      <word name="X11::Fvwm"/>
+      <word name="X11::Keysyms"/>
+      <word name="X11::Lib"/>
+      <word name="X11::Motif"/>
+      <word name="X11::Protocol"/>
+      <word name="X11::Toolkit"/>
+      <word name="X11::Wcl"/>
+      <word name="X11::XEvent"/>
+      <word name="X11::XFontStruct"/>
+      <word name="X11::Xbae"/>
+      <word name="X11::Xpm"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-X500" if="use-package-X500">
+   <keywords region="packages">
+      <word name="X500::DN"/>
+      <word name="X500::DN::Parser"/>
+      <word name="X500::RDN"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-XML" if="use-package-XML">
+   <keywords region="packages">
+      <word name="XML::AutoWriter"/>
+      <word name="XML::CSV"/>
+      <word name="XML::Canonical"/>
+      <word name="XML::Catalog"/>
+      <word name="XML::Checker"/>
+      <word name="XML::Clean"/>
+      <word name="XML::Comma"/>
+      <word name="XML::DOM"/>
+      <word name="XML::Directory"/>
+      <word name="XML::Doctype"/>
+      <word name="XML::Dumper"/>
+      <word name="XML::Edifact"/>
+      <word name="XML::Element"/>
+      <word name="XML::Encoding"/>
+      <word name="XML::Excel"/>
+      <word name="XML::Filter::DetectWS"/>
+      <word name="XML::Filter::Reindent"/>
+      <word name="XML::Filter::SAXT"/>
+      <word name="XML::Filter::Sort"/>
+      <word name="XML::GDOME"/>
+      <word name="XML::GDOME::XSLT"/>
+      <word name="XML::GXML"/>
+      <word name="XML::Generator"/>
+      <word name="XML::Grove"/>
+      <word name="XML::Handler::Composer"/>
+      <word name="XML::Handler::PrintEvents"/>
+      <word name="XML::NamespaceSupport"/>
+      <word name="XML::PPD"/>
+      <word name="XML::PYX"/>
+      <word name="XML::Parser"/>
+      <word name="XML::QL"/>
+      <word name="XML::RegExp"/>
+      <word name="XML::Registry"/>
+      <word name="XML::SAXDriver::CSV"/>
+      <word name="XML::SAXDriver::Excel"/>
+      <word name="XML::Sablotron"/>
+      <word name="XML::Simple"/>
+      <word name="XML::Stream"/>
+      <word name="XML::TreeBuilder"/>
+      <word name="XML::Twig"/>
+      <word name="XML::UM"/>
+      <word name="XML::Writer"/>
+      <word name="XML::Writer::String"/>
+      <word name="XML::XForms::Generator"/>
+      <word name="XML::XPath"/>
+      <word name="XML::XQL"/>
+      <word name="XML::XSLT"/>
+      <word name="XML::Xalan"/>
+      <word name="XML::Xerces"/>
+      <word name="XML::miniXQL"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-Xmms" if="use-package-Xmms">
+   <keywords region="packages">
+      <word name="Xmms::Config"/>
+      <word name="Xmms::Remote"/>
+   </keywords>
+</scheme>
+<scheme xmlns="http://colorer.sf.net/2003/hrc" name="package-ex" if="use-package-ex">
+   <keywords region="packages">
+      <word name="ex::constant::vars"/>
+      <word name="ex::implements"/>
+      <word name="ex::interface"/>
+      <word name="ex::override"/>
+   </keywords>
+</scheme>

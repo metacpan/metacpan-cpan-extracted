@@ -1,0 +1,30 @@
+SWIFT/Factory/Tag/Tag30T
+========================
+
+This module provides a class for the TAG30T of a SWIFT message.
+
+TAG30 contains the "Trade Date".
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules:
+
+  SWIFT::Factory::Tag::Tag30
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2003, Gustav Schaffter. All rights reserved.
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

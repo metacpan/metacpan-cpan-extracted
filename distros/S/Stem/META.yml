@@ -1,0 +1,132 @@
+--- #YAML:1.0
+name: Stem
+version: 0.11
+author: ~
+abstract: ~
+license: gpl
+dynamic_config: 1
+provides:
+  Stem:
+    file: lib/Stem.pm
+    version: 0.11
+  Stem::AsyncIO:
+    file: lib/Stem/AsyncIO.pm
+  Stem::Boot:
+    file: lib/Stem/Boot.pm
+  Stem::Cell:
+    file: lib/Stem/Cell/Sequence.pm
+  Stem::ChatLabel:
+    file: lib/Stem/ChatLabel.pm
+  Stem::Class:
+    file: lib/Stem/Class.pm
+  Stem::Codec:
+    file: lib/Stem/Codec.pm
+  Stem::Codec::Data::Dumper:
+    file: lib/Stem/Codec/Data/Dumper.pm
+  Stem::Codec::Storable:
+    file: lib/Stem/Codec/Storable.pm
+  Stem::Codec::YAML:
+    file: lib/Stem/Codec/YAML.pm
+  Stem::Conf:
+    file: lib/Stem/Conf.pm
+  Stem::Console:
+    file: lib/Stem/Console.pm
+  Stem::Cron:
+    file: lib/Stem/Cron.pm
+  Stem::DBI:
+    file: lib/Stem/DBI.pm
+  Stem::Debug:
+    file: lib/Stem/Debug.pm
+  Stem::Demo::CLI:
+    file: lib/Stem/Demo/CLI.pm
+  Stem::Demo::World:
+    file: lib/Stem/Demo/World.pm
+  Stem::Event:
+    file: lib/Stem/Event.pm
+  Stem::Event::EventPM:
+    file: lib/Stem/Event/EventPM.pm
+  Stem::Event::IO:
+    file: lib/Stem/Event.pm
+  Stem::Event::Perl:
+    file: lib/Stem/Event/Perl.pm
+  Stem::Event::Plain:
+    file: lib/Stem/Event/Perl.pm
+  Stem::Event::Queue:
+    file: lib/Stem/Event/Queue.pm
+  Stem::Event::Read:
+    file: lib/Stem/Event.pm
+  Stem::Event::Signal:
+    file: lib/Stem/Event/Signal.pm
+  Stem::Event::Timer:
+    file: lib/Stem/Event.pm
+  Stem::Event::Tk:
+    file: lib/Stem/Event/Tk.pm
+  Stem::Event::Write:
+    file: lib/Stem/Event.pm
+  Stem::Event::Wx:
+    file: lib/Stem/Event/Wx.pm
+  Stem::Event::Wx::App:
+    file: lib/Stem/Event/Wx.pm
+  Stem::Event::Wx::Timer:
+    file: lib/Stem/Event/Wx.pm
+  Stem::File:
+    file: lib/Stem/File.pm
+  Stem::Gather:
+    file: lib/Stem/Gather.pm
+  Stem::Hub:
+    file: lib/Stem/Hub.pm
+  Stem::Id:
+    file: lib/Stem/Id.pm
+  Stem::Inject:
+    file: lib/Stem/Inject.pm
+  Stem::Load::Driver:
+    file: lib/Stem/Load/Driver.pm
+  Stem::Load::Ticker:
+    file: lib/Stem/Load/Ticker.pm
+  Stem::Log:
+    file: lib/Stem/Log.pm
+  Stem::Log::Entry:
+    file: lib/Stem/Log/Entry.pm
+  Stem::Log::File:
+    file: lib/Stem/Log/File.pm
+  Stem::Log::Tail:
+    file: lib/Stem/Log/Tail.pm
+  Stem::Msg:
+    file: lib/Stem/Msg.pm
+  Stem::Packet:
+    file: lib/Stem/Packet.pm
+  Stem::Portal:
+    file: lib/Stem/Portal.pm
+  Stem::Proc:
+    file: lib/Stem/Proc.pm
+  Stem::Route:
+    file: lib/Stem/Route.pm
+  Stem::SockMsg:
+    file: lib/Stem/SockMsg.pm
+  Stem::Socket:
+    file: lib/Stem/Socket.pm
+  Stem::Switch:
+    file: lib/Stem/Switch.pm
+  Stem::Test::ConfTypes:
+    file: lib/Stem/Test/ConfTypes.pm
+  Stem::Test::Echo:
+    file: lib/Stem/Test/Echo.pm
+  Stem::Test::Flow:
+    file: lib/Stem/Test/Flow.pm
+  Stem::Test::PacketIO:
+    file: lib/Stem/Test/PacketIO.pm
+  Stem::Test::UDP:
+    file: lib/Stem/Test/UDP.pm
+  Stem::Trace:
+    file: lib/Stem/Trace.pm
+  Stem::TtySock:
+    file: lib/Stem/TtySock.pm
+  Stem::UDPMsg:
+    file: lib/Stem/UDPMsg.pm
+  Stem::Util:
+    file: lib/Stem/Util.pm
+  Stem::Vars:
+    file: lib/Stem/Vars.pm
+  Stem::WorkQueue:
+    file: lib/Stem/WorkQueue.pm
+generated_by: Module::Build version 0.2611

@@ -1,0 +1,28 @@
+$Id: README,v 1.2 1998/01/18 00:21:24 ken Exp $
+Copyright (C) 1997 Ken MacLeod
+See the file COPYING for distribution terms.
+
+
+			   Grove Examples
+
+The following examples are listed in concept order, starting with the
+first will lead into concepts in the later examples.  All examples
+require a grove builder module and will use SGML::SPGroveBuilder
+unless you edit them.
+
+    visitor.pl
+        A skeleton of the Visitor pattern.  Doesn't actually do
+        anything visible.  Includes a description of the Visitor
+        concept.
+
+    simple-dump.pl
+        Uses the visitor pattern to dump groves on standard output in
+        an indented format, uses an extra argument to `accept' to hold
+        context (well, `depth' anyway :-).
+
+    my-html.pl, my-html.html
+        Uses `accept_gi'/`visit_gi_NAME' to support adding new tags to
+        HTML-like document instances.  This example in particular
+        allows you to embed Perl code into HTML documents.  Uses
+        Perl's AUTOLOAD in `my-html.pl' and ``CDATA marked sections''
+        in `my-html.html'.

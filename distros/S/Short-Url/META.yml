@@ -1,0 +1,22 @@
+---
+abstract: 'Encodes and Decodes short urls by using Bijection'
+author:
+  - 'Adam Hopkins <srchulo@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Short-Url
+requires:
+  Carp: '0'
+  Mouse: '0'
+  strict: '0'
+resources:
+  bugtracker: https://github.com/srchulo/Short--Url/issues
+version: '0.013'
+x_serialization_backend: 'YAML::Tiny version 1.69'

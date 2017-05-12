@@ -1,0 +1,132 @@
+---
+name: Slackware-Slackget
+version: 0.17
+author:
+  - 'Arnaud DUPUIS <a.dupuis@infinityperl.org>'
+abstract: Main library for slack-get package manager 1.X
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Data::Dumper: '>= 2.121_02'
+  File::Copy: '>= 2.08'
+  Getopt::Long: 0
+  HTTP::Request: '>= 1.40'
+  HTTP::Status: '>= 1.28'
+  LWP::Simple: '>= 1.41'
+  Net::FTP: '>= 2.75'
+  POE: 0.9999
+  POE::Component::Logger: 1.0
+  Proc::Daemon: 0
+  Test::More: 0.70
+  Time::HiRes: '>= 1.66'
+  XML::Parser: 0
+  XML::Simple: 2.18
+  perl: '>= 5.8.5'
+provides:
+  Slackware::Slackget:
+    file: lib/Slackware/Slackget.pm
+    version: 0.17
+  Slackware::Slackget::Base:
+    file: lib/Slackware/Slackget/Base.pm
+    version: 1.0.4
+  Slackware::Slackget::Config:
+    file: lib/Slackware/Slackget/Config.pm
+    version: 1.0.1
+  Slackware::Slackget::Date:
+    file: lib/Slackware/Slackget/Date.pm
+    version: 1.0.1
+  Slackware::Slackget::File:
+    file: lib/Slackware/Slackget/File.pm
+    version: 1.0.5
+  Slackware::Slackget::GPG:
+    file: lib/Slackware/Slackget/GPG.pm
+    version: 0.4
+  Slackware::Slackget::GPG::Signature:
+    file: lib/Slackware/Slackget/GPG/Signature.pm
+    version: 0.5
+  Slackware::Slackget::List:
+    file: lib/Slackware/Slackget/List.pm
+    version: 1.0.1
+  Slackware::Slackget::Local:
+    file: lib/Slackware/Slackget/Local.pm
+    version: 1.0.0
+  Slackware::Slackget::MD5:
+    file: lib/Slackware/Slackget/MD5.pm
+    version: 0.2
+  Slackware::Slackget::Media:
+    file: lib/Slackware/Slackget/Media.pm
+    version: 0.9.9
+  Slackware::Slackget::MediaList:
+    file: lib/Slackware/Slackget/MediaList.pm
+    version: 0.9.11
+  Slackware::Slackget::Network:
+    file: lib/Slackware/Slackget/Network.pm
+    version: 1.0.0
+  Slackware::Slackget::Network::Auth:
+    file: lib/Slackware/Slackget/Network/Auth.pm
+    version: 1.0.0
+  Slackware::Slackget::Network::Backend::Base64:
+    file: lib/Slackware/Slackget/Network/Backend/Base64.pm
+    version: 0.8.0
+  Slackware::Slackget::Network::Backend::Bzip2:
+    file: lib/Slackware/Slackget/Network/Backend/Bzip2.pm
+    version: 0.8.0
+  Slackware::Slackget::Network::Backend::Gzip:
+    file: lib/Slackware/Slackget/Network/Backend/Gzip.pm
+    version: 0.8.1
+  Slackware::Slackget::Network::Backend::TEST:
+    file: lib/Slackware/Slackget/Network/Backend/TEST.pm
+    version: 0.8.0
+  Slackware::Slackget::Network::Backend::XML:
+    file: lib/Slackware/Slackget/Network/Backend/XML.pm
+    version: 0.9.0
+  Slackware::Slackget::Network::Connection:
+    file: lib/Slackware/Slackget/Network/Connection.pm
+    version: 1.0.0
+  Slackware::Slackget::Network::Connection::FILE:
+    file: lib/Slackware/Slackget/Network/Connection/FILE.pm
+    version: 0.6.0
+  Slackware::Slackget::Network::Connection::FTP:
+    file: lib/Slackware/Slackget/Network/Connection/FTP.pm
+    version: 1.0.0
+  Slackware::Slackget::Network::Connection::HTTP:
+    file: lib/Slackware/Slackget/Network/Connection/HTTP.pm
+    version: 1.0.0
+  Slackware::Slackget::Network::Message:
+    file: lib/Slackware/Slackget/Network/Message.pm
+    version: 0.9.1
+  Slackware::Slackget::Package:
+    file: lib/Slackware/Slackget/Package.pm
+    version: 1.0.3
+  Slackware::Slackget::PackageList:
+    file: lib/Slackware/Slackget/PackageList.pm
+    version: 1.0.0
+  Slackware::Slackget::PkgTools:
+    file: lib/Slackware/Slackget/PkgTools.pm
+    version: 1.0.21
+  Slackware::Slackget::Search:
+    file: lib/Slackware/Slackget/Search.pm
+    version: 1.0.0
+  Slackware::Slackget::SpecialFileContainer:
+    file: lib/Slackware/Slackget/SpecialFileContainer.pm
+    version: 1.0.0
+  Slackware::Slackget::SpecialFileContainerList:
+    file: lib/Slackware/Slackget/SpecialFileContainerList.pm
+    version: 1.0.0
+  Slackware::Slackget::SpecialFiles::CHECKSUMS:
+    file: lib/Slackware/Slackget/SpecialFiles/CHECKSUMS.pm
+    version: 1.0.0
+  Slackware::Slackget::SpecialFiles::FILELIST:
+    file: lib/Slackware/Slackget/SpecialFiles/FILELIST.pm
+    version: 1.0.0
+  Slackware::Slackget::SpecialFiles::PACKAGES:
+    file: lib/Slackware/Slackget/SpecialFiles/PACKAGES.pm
+    version: 1.0.0
+  Slackware::Slackget::Status:
+    file: lib/Slackware/Slackget/Status.pm
+    version: 1.0.100
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

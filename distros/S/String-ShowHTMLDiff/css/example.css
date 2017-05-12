@@ -1,0 +1,12 @@
+span.diff_minus {
+	color: #D55;
+	text-decoration: line-through
+}
+
+span.diff_plus {
+	color: #181
+}
+
+span.diff_unchanged {
+	color: #888;
+}

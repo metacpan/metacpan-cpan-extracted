@@ -1,0 +1,15 @@
+
+=head1 NAME
+
+Sweet::Cookbook
+
+=head2 Create a temporary dir
+
+    use File::Temp qw(tempdir);
+    use Sweet::Dir;
+
+    my $temp_dir = Sweet::Dir->new( path => tempdir() );
+    $temp_dir->create;
+
+=cut
+

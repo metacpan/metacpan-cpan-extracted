@@ -1,0 +1,178 @@
+README for Sort::ArbBiLex
+                                        Time-stamp: "2004-03-27 17:19:01 AST"
+
+			    Sort::ArbBiLex
+	      (arbitrary bi-level lexicographic sorting)
+
+[Partially excerpted from the POD.]
+
+Sort::ArbBiLex -- make sort functions for arbitrary sort orders
+
+NAME
+    Sort::ArbBiLex -- make sort functions for arbitrary sort orders
+
+SYNOPSIS
+      use Sort::ArbBiLex;
+
+      *fulani_sort = Sort::ArbBiLex::maker(  # defines &fulani_sort
+        "a A
+         c C
+         ch Ch CH
+         ch' Ch' CH'
+         e E
+         l L
+         lh Lh LH
+         n N
+         r R
+         s S
+         u U
+         z Z
+        "
+      );
+      @words = <>;
+      @stuff = fulani_sort(@words);
+      foreach (@stuff) { print "<$_>\n" }
+
+CONCEPTS
+    Writing systems for different languages usually have specific sort
+    orders for the glyphs (characters, or clusters of characters) that each
+    writing system uses. For well-known national languages, these different
+    sort orders (or someone's idea of them) are formalized in the locale for
+    each such language, on operating system flavors that support locales.
+    However, there are problems with locales; cf. the perllocale manpage.
+    Chief among the problems relevant here are:
+
+    * The basic concept of "locale" conflates language/dialect, writing
+    system, and character set -- and country/region, to a certain extent.
+    This may be inappropriate for the text you want to sort. Notably, this
+    assumes standardization where none may exist (what's THE sort order for
+    a language that has five different Roman-letter-based writing systems in
+    use?).
+
+    * On many OS flavors, there is no locale support.
+
+    * Even on many OS flavors that do suport locales, the user cannot create
+    his own locales as needed.
+
+    * The "scope" of a locale may not be what the user wants -- if you want,
+    in a single program, to sort the array @foo by one locale, and an array
+    @bar by another locale, this may prove difficult or impossible.
+
+    In other words, locales (even if available) may not sort the way you
+    want, and are not portable in any case.
+
+    This module is meant to provide an alternative to locale-based sorting.
+
+    This module makes functions for you that implement bi-level
+    lexicographic sorting according to a sort order you specify.
+    "Lexicographic sorting" means comparing the letters (or properly,
+    "glyphs") in strings, starting from the start of the string (so that
+    "apple" comes after "apoplexy", say) -- as opposed to, say, sorting by
+    numeric value. "Lexicographic sorting" is sometimes used to mean just
+    "ASCIIbetical sorting", but I use it to mean the sort order used by
+    *lexicograph*ers, in dictionaries (at least for alphabetic languages).
+
+    Consider the words "resume" and "résumé" (the latter should display on
+    your POD viewer with acute accents on the e's). If you declare a sort
+    order such that e-acute ("é") is a letter after e (no accent), then
+    "résumé" (with accents) would sort after every word starting with "re"
+    (no accent) -- so "résumé" (with accents) would come after "reward".
+
+    If, however, you treated e (no accent) and e-acute as the same letter,
+    the ordering of "resume" and "résumé" (with accents) would be
+    unpredictable, since they would count as the same thing -- whereas
+    "resume" should always come before "résumé" (with accents) in English
+    dictionaries.
+
+    What bi-level lexicographic sorting means is that you can stipulate that
+    two letters like e (no accent) and e-acute ("é") generally count as the
+    same letter (so that they both sort before "reward"), but that when
+    there's a tie based on comparison that way (like the tie between
+    "resume" and "résumé" (with accents)), the tie is broken by a
+    stipulation that at a second level, e (no accent) does come before e-
+    acute ("é").
+
+    (Some systems of sort order description allow for any number of levels
+    in sort orders -- but I can't imagine a case where this gets you
+    anything over a two-level sort.)
+
+    Moreover, the units of sorting for a writing system may not be
+    characters exactly. In some forms of Spanish, ch, while two characters,
+    counts as one glyph -- a "letter" after c (at the first level, not just
+    the second, like the e in the paragraph above). So "cuerno" comes
+    *before* "chile". A character-based sort would not be able to see that
+    "ch" should count as anything but "c" and "h". So this library doesn't
+    assume that the units of comparison are individual characters.
+
+[end POD excerpt]
+
+
+PREREQUISITES
+
+This suite requires Perl 5; I've only used it under Perl 5.004, so for
+anything lower, you're on your own.
+
+Sort::ArbBiLex doesn't use any nonstandard modules.
+
+
+INSTALLATION
+
+You install Sort::ArbBiLex, as you would install any perl module
+library, by running these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you want to install a private copy of Sort::ArbBiLex in your home
+directory, then you should try to produce the initial Makefile with
+something like this command:
+
+  perl Makefile.PL LIB=~/perl
+
+Then you may need something like
+  setenv PERLLIB "$HOME/perl"
+in your shell initialization file (e.g., ~/.cshrc).
+
+For further information, see perldoc perlmodinstall
+
+
+DOCUMENTATION
+
+POD-format documentation is included in ArbBiLex.pm.  POD is readable
+with the 'perldoc' utility.  See ChangeLog for recent changes.
+
+
+MACPERL INSTALLATION NOTES
+
+Don't bother with the makefiles.  Just make a Sort directory in your
+MacPerl site_lib or lib directory, and move ArbBiLex.pm into there.
+
+
+SUPPORT
+
+Questions, bug reports, useful code bits, and suggestions for
+Sort::ArbBiLex should just be sent to me at sburke@cpan.org
+
+
+AVAILABILITY
+
+The latest version of Sort::ArbBiLex is available from the
+Comprehensive Perl Archive Network (CPAN).  Visit
+<http://www.perl.com/CPAN/> to find a CPAN site near you.
+
+
+COPYRIGHT
+
+Copyright 1999-2004, Sean M. Burke <sburke@cpan.org>, all rights
+reserved.  This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+AUTHOR
+
+Sean M. Burke <sburke@cpan.org>

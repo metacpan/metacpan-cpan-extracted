@@ -1,0 +1,31 @@
+
+SVG::Metadata
+-------------
+
+Introduction
+============
+See `man SVG::Metadata` after installation for more details about this
+Perl module.
+
+The script svg_validate is provided as an example.  It demonstrates an
+example of using SVG::Metadata to extract SVG files that have valid
+metadata into a separate directory structure for packaging.  See 
+`man svg_validate` after installation for more details on it.
+
+
+Installation
+============
+SVG::Metadata is installed like any other Perl module:
+
+ $ perl Makefile.PL
+ $ make
+ $ su
+ # make install
+
+
+Bugs and Ideas
+==============
+Please report bugs and ideas to the author or to either the Inkscape
+development mailing list, at inkscape-devel@lists.sourceforge.net, or
+the Open Clip Art Library mailing list, at clipart@freedesktop.org.
+

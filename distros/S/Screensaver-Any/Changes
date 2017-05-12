@@ -1,0 +1,13 @@
+0.002   2017-03-31 (PERLANCAR)
+
+        - [Incompatible change] Rename function is_screensaver_active to
+          screensaver_is_active.
+
+        - [Enhancement] Add function: prevent_screensaver_activated.
+
+        - Fixes/tweaks.
+
+
+0.001   2017-03-30 (PERLANCAR)
+
+        - First release.

@@ -1,0 +1,7 @@
+#!/bin/bash
+
+err=/tmp/err
+
+rm -f $err
+perl -Ilib bin/stackrad "$@" 2> $err
+cat $err

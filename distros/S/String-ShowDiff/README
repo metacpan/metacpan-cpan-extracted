@@ -1,0 +1,55 @@
+String/ShowDiff version 0.03
+============================
+
+NAME
+
+String::ShowDiff - Perl extension to help visualize differences between strings
+
+SYNOPSIS
+
+  use String::ShowDiff qw/ansi_colored_diff/;
+  print ansi_colored_diff("abcehjlmnp", "bcdefjklmrst");
+
+  # or a bit more detailed:
+  my %options = ('u' => 'reset',
+                 '+' => 'on_green',
+		 '-' => 'on_red');
+  print ansi_colored_diff($oldstring, $newstring, \%options);
+
+  # of course, you can also set the what context shall be shown
+
+DESCRIPTION
+
+This module is a wrapper around the diff algorithm from the module
+Algorithm::Diff. It's job is to simplify a visualization of the differences of each strings.
+
+Compared to the many other Diff modules,
+the output is neither in diff-style nor are the recognised differences on line or word boundaries,
+they are at character level.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	Algorithm::Diff
+	Term::ANSIColor
+	Test::More
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2003 Janek Schleicher
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

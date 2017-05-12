@@ -1,0 +1,36 @@
+---
+abstract: 'JABBER support for SOAP::Lite'
+author:
+  - 'Martin Kutter <martin.kutter@fen-net.de>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: SOAP-Transport-JABBER
+provides:
+  SOAP::Transport::JABBER:
+    file: lib/SOAP/Transport/JABBER.pm
+    version: 0.713
+  SOAP::Transport::JABBER::Client:
+    file: lib/SOAP/Transport/JABBER.pm
+    version: 0.713
+  SOAP::Transport::JABBER::Query:
+    file: lib/SOAP/Transport/JABBER.pm
+    version: 0.713
+  SOAP::Transport::JABBER::Server:
+    file: lib/SOAP/Transport/JABBER.pm
+    version: 0.713
+  URI::jabber:
+    file: lib/SOAP/Transport/JABBER.pm
+requires:
+  Net::Jabber: 0
+  SOAP::Lite: 0.711
+  perl: v5.6.0
+resources:
+  license: http://www.perlfoundation.org/artistic_license_1_0
+version: 0.713

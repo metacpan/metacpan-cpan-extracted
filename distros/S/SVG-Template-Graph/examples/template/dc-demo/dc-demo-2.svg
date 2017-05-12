@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<svg width="730" height="447" viewBox="0 0 730 447" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<style type="text/css">
+<![CDATA[
+@font-face{font-family:'ArialMT';src:url("data:;base64,\
+T1RUTwADACAAAQAQQ0ZGIMFmCZMAAACIAAAE3UdQT1Ovwr8XAAAFaAAAAFBjbWFwAHsA7AAAADwA\
+AABMAAAAAQAAAAMAAAAMAAQAQAAAAAwACAACAAQAIAAlAC4ANQA5//8AAAAgACUALQAwADj////h\
+/93/1v/V/9MAAQAAAAAAAAAAAAAAAAEABAIAAQEBCEFyaWFsTVQAAQEBIfgbAfgYBPty+476gvou\
+BR0AAK0zDfejD/ezEbAcBLgSAAEBAdRDb3B5cmlnaHQgKGMpIDE5OTEsIDE5OTMsIDE5OTYsIDE5\
+OTcsIDE5OTgsIDE5OTkgQWRvYmUgU3lzdGVtcyBJbmNvcnBvcmF0ZWQuICBBbGwgUmlnaHRzIFJl\
+c2VydmVkLkFyaWFsIGlzIGEgdHJhZGVtYXJrIG9mIFRoZSBNb25vdHlwZSBDb3Jwb3JhdGlvbiwg\
+cmVnaXN0ZXJlZCBpbiB0aGUgVVMgUGF0ZW50IGFuZCBUcmFkZW1hcmsgT2ZmaWNlIGFuZCBlbHNl\
+d2hlcmUuAAABAAEAAAYAAA4BABEFABkBAA0CAAEAAwAMAJgArAC6AQMBKAGMAgYCNwKKAxQDeyAO\
+IIuLAfdKiwMO+IxwyPeWx4fI95bHEtTX9y3X9xzX9y3XE7/U+LMV+z7xcrzJ57X3J/ctLrBN+wFi\
+KjQe9yz3EBXYiydxZ4srPj+L76Svi+zXHxPf97X8hxX7PvFyvMnntfcn9y0usE37AWIqNB73LPcQ\
+FdiLJ3Fniys+P4vvpK+L7NcfE7/8WPvRFdQG+Bn5hQVEBg5X92vjAav3oQOr92sV96Hj+6EGDiCL\
+7wHk7wPkFu/vJwYOf9P439MBuOX3suUDuPf1FTaM+6z3fPd9i/e02NqL97P7fft9i/u1Ph7lFvci\
+n/cs9w73F5j7PfsR+w5++z/7FvsXf/dC9wseDqB2+WN3Afez4wP4Cxb5Y1IHZ0I0RzdkCDYHq5fj\
+s8PBCPzEBw6L4PjG0wG75fen5QP4jeAV+/QGl56XpNrKlZO/t5WUCPcn9xCn1NEa40/3A/s3U/sB\
+fPsCWx59a4htiXflgRj3I4z3EI2aG9nEVkNsg2JZUx9oZGhpVWA5SfsNJ477BAj4bgYOf9P3tM9c\
+dve/0xL4F+VR6RO0t/dRFSeV1Cb3JRv3DvcL3vcgtn24b64fE7hrs2aTdJAIjQfgsZjQsBrzM937\
+DUH7Bmr7LXAe43sF0pWyxtsbw8hnPx8T2CP7AndZkB6BPgWPnJ+QpBsTtN/DTzw3Sko5+wR29a6E\
+Hw6gdvc/3PhkdwH32eMD99kW4/c/7Nwq+GRDBvva/GQFOvfKB/t03BX3cvfXBY371wYOf9P35dn3\
+JuAB+DrpA7X3UBX7MJn3E1/kG/cz4PcT9xT3MvsM1SVaW3lwZB+y91MF97Hg+/cGRfwE3oEFsaO5\
+qscb3dFV+wAvVDgsbzGS9xR3Hw5/0/e20/d10xK15U7l933lTuUT6vdG+BcVE/J2h3SFcXYIVF+A\
+SWQa+w7nKvck9yPn7PcL71PGPaMejQcT7KuW1K3tGutA5vsZ+xU/NiceE+og12+qgR569ygVw7jB\
+0h4T7M2+WUpLWF1KHxPqUk+v2h8T8m773xXUv9Ln2dBTMTJJVDwzUc3bHg5/0/dL2Pfb0wG25fe5\
+4gPD9zoV+z6g9yGDshv3lIv3xtr3K23LZ7gfw19KqUUb+xguJ/si+ynxNvcC4cbBs6MfjQZGjH77\
+ZPsvGyl74KeGH/eo98gVN10+LT1Kx+npyNrf38FAMB4OcqT5YJf7Zpf3RIsG9/GU/MyWB9MK4wvT\
+mAwM45IMDfjAFPgVFQAAAAABAAAACgAeACwAAURGTFQACAAEAAAAAP//AAEAAAABa2VybgAIAAAA\
+AQAAAAEABAACAAAAAQAIAAEAEgAEAAAAAQAMAAEAAf/EAAEAAQAE")}
+@font-face{font-family:'Arial-BoldMT';src:url("data:;base64,\
+T1RUTwADACAAAQAQQ0ZGICHcbKcAAADwAAALmUdQT1O0u8WVAAAMjAAAAWRjbWFwA8cEEQAAADwA\
+AAC0AAAAAQAAAAMAAAAMAAQAqAAAACYAIAAEAAYAIAAlADAANABBAEQARgBKAFAAUwBZAGEAZgBp\
+AHAAdgB4AHr//wAAACAAJQAwADIAQQBDAEYASQBQAFMAWQBhAGMAaQBsAHIAeAB6////4f/d/9P/\
+0v/G/8X/xP/C/73/u/+2/6//rv+s/6r/qf+o/6cAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\
+AAAAAAAAAAAAAAAAAQAEAgABAQENQXJpYWwtQm9sZE1UAAEBASH4GwH4FAT7O/uO+oL6PwUdAACt\
+NQ33qA/33xG+HAtmEgABAQHUQ29weXJpZ2h0IChjKSAxOTkxLCAxOTkzLCAxOTk2LCAxOTk3LCAx\
+OTk4LCAxOTk5IEFkb2JlIFN5c3RlbXMgSW5jb3Jwb3JhdGVkLiAgQWxsIFJpZ2h0cyBSZXNlcnZl\
+ZC5BcmlhbCBpcyBhIHRyYWRlbWFyayBvZiBUaGUgTW9ub3R5cGUgQ29ycG9yYXRpb24uIHJlZ2lz\
+dGVyZWQgaW4gdGhlIFVTIFBhdGVudCBhbmQgVHJhZGVtYXJrIE9mZmljZSBhbmQgZWxzZXdoZXJl\
+LgAAAQABAAAGAAARAAATAgAiAAAkAQAnAAAqAQAxAAA0AAA6AABCAABEAwBKAABNBABTBABZAABb\
+AAAiAgABAAQADgCcAP4BWQHKAgICPAKUAuIDCAMeA1sDsAQiBFAE3wUnBY0F6wYqBkwGYgbZByoH\
+dAfcCBwIigjUCSkJWQmOCdP8FQ78FYuLAfdKiwMO93Zw2Pdy2I7Y93LYErj27/b3Pfbv9hO/9yz4\
+sBXVmLCwsZdlQkB/Z2Vlf7HUHiCIFSqvM/cP9yKY9xHJ9wNg2fsG+yJ8+xVNHvea/MgV+A75hwUp\
+BvwS/YcFE9/31/dNFSqvM/cP9yGZ9w/L9wNg2fsF+yN8+xNLHvaOFdaXr7Gxl2VCQX9mZWV/sdQe\
+Dn/3BviL9wYBuPck90X3JAP3qfljFfsGUUg8bR9uPIowWxpZizCpOx48qMZI9wcb9wbFz9uoH6nb\
+jOa5Gr2J5m7bHtptUc37Bhv7BgTNok37UvtRdE1JSnTI91L3U6LIzB8Oi/cU+HH3BgG29x33U/cd\
+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")}
+]]>
+</style>
+<g font-face="ArialMT">
+	<!-- outer furnishings -->
+	<g fill="#FFFFFF" stroke="#411DA4" id="backgrounds">
+		<rect width="729" y="0.5" fill="none" x="0.5" stroke-width="1.5" id="background_all" height="446" />
+		<rect width="564" y="87.5" fill="white" stroke="red" x="89.5" stroke-width="4" id="rectangle.graph.data.space.bg" height="246" />
+	</g>
+	<!-- traces -->
+	<g id="group.traces" text-anchor="middle">
+		<!-- trace insertion takes place here -->
+		<g id="group.trace.1" fill="none" stroke="red" stroke-width="2">
+			<g id="group.trace.data.1"  stroke="#333333" stroke-width="0.5" fill="#411DA4"/>
+			<g id="group.trace.grid.1" stroke="gray" stroke-width="1"/>
+			<g id="group.trace.axes.1" stroke="none" fill="black">
+				<g id="group.trace.axes.x.1" stroke="gray" fill="none" stroke-width="1"/>
+				<g id="group.trace.axes.y.1" stroke="gray" fill="none" stroke-width="1"/>
+				<g id="group.trace.axes.values.x.1" text-anchor="middle" stroke="none" fill="black" transform="translate(0,260)"/>
+				<g id="group.trace.axes.values.y.1" stroke="none" fill="black" text-anchor="start" transform="translate(-40,0)"/>
+				<g id="group.trace.axes.title.x.1" text-anchor="middle" transform="translate(365,370)" font-size="12" fill="#411DA4" font-weight="Bold"/>
+				<g id="group.trace.axes.title.y.1.c" text-anchor="middle" transform="translate(40,200)">
+					<g id="group.trace.axes.title.y.1" transform="rotate(-90)" font-weight="Bold" font-size="12" fill="#411DA4"/>
+				</g>
+			</g>
+		</g>
+		<!-- trace insertion takes place here -->
+		<g id="group.trace.2" fill="none" stroke="blue" stroke-width="2">
+			<g id="group.trace.data.2" fill="none" stroke="#2C1877" stroke-width="1.5"/>
+			<g id="group.trace.grid.2" stroke="gray" stroke-width="1"/>
+			<g id="group.trace.axes.2" stroke="none" fill="black">
+				<g id="group.trace.axes.x.2" stroke="gray" fill="none" stroke-width="1"/>
+				<g id="group.trace.axes.y.2" stroke="gray" fill="none" stroke-width="1"/>
+				<g id="group.trace.axes.values.x.2" stroke="none" fill="black"/>
+				<g id="group.trace.axes.values.y.2" stroke="none" fill="black" text-anchor="start" transform="translate(578,0)"/>
+				<g id="group.trace.axes.title.x.2" transform="translate(365,400)"/>
+				<g id="group.trace.axes.title.y.2.c" text-anchor="middle" transform="translate(710,200)">
+					<g id="group.trace.axes.title.y.2" transform="rotate(90)" font-weight="Bold" font-size="12" fill="#411DA4"/>
+				</g>
+			</g>
+		</g>
+		<!-- trace insertion takes place here -->
+		<g id="group.trace.3" fill="none" stroke="red" stroke-width="2">
+			<g id="group.trace.data.3" stroke-width="0.5" stroke="#333333"  fill="#FBFCC5"/>
+			<g id="group.trace.grid.3" stroke="gray" stroke-width="1"/>
+			<g id="group.trace.axes.3" stroke="none" fill="black">
+				<g id="group.trace.axes.x.3" stroke="none" fill="black"/>
+				<g id="group.trace.axes.y.3" stroke="none" fill="black"/>
+				<g id="group.trace.axes.values.x.3" stroke="none" fill="black"/>
+				<g id="group.trace.axes.values.y.3" stroke="none" fill="black"/>
+				<g id="group.trace.axes.title.x.3"/>
+				<g id="group.trace.axes.title.y.3"/>
+			</g>
+		</g>
+		<!-- trace insertion takes place here -->
+		<g id="group.trace.4" fill="none" stroke="blue" stroke-width="2">
+			<g id="group.trace.data.4" fill="none" stroke="#FFC978" stroke-width="1.5"/>
+			<g id="group.trace.grid.4" stroke="gray" stroke-width="1"/>
+			<g id="group.trace.axes.4" stroke="none" fill="black">
+				<g id="group.trace.axes.x.4" stroke="none" fill="black"/>
+				<g id="group.trace.axes.y.4" stroke="none" fill="black"/>
+				<g id="group.trace.axes.values.x.4" stroke="none" fill="black"/>
+				<g id="group.trace.axes.values.y.4" stroke="none" fill="black"/>
+				<g id="group.trace.axes.title.x.4"/>
+				<g id="group.trace.axes.title.y.4"/>
+			</g>
+		</g>
+	</g>
+	<!-- graph global titles -->
+	<g id="group.graph.title" text-anchor="middle" fill="#411DA4" stroke="none" font-size="17" transform="translate(365,30)"/>
+	<!-- trace labels -->
+	<g id="titles" text-anchor="middle" fill="black" stroke="none" transform="translate(330 410)">
+		<!-- trace label 1 -->
+		<g transform="translate(-200,0)">
+			<g  stroke="#333333" stroke-width="0.5" fill="#411DA4">
+				<rect x="0" y="-10" width="20" height="10"/>
+			</g>
+			<g id="group.trace.title.1" transform="translate(25,0)" text-anchor="start" stroke="none" fill="black"/>
+		</g>
+		<!-- trace label 2 -->
+		<g transform="translate(-75,0)">
+			<g  fill="none" stroke="#2C1877" stroke-width="1.5">
+				<rect x="0" y="-10" width="20" height="10"/>
+			</g>
+			<g id="group.trace.title.2" transform="translate(25,0)" text-anchor="start" stroke="none" fill="black"/>
+		</g>
+		<!-- trace label 3 -->
+		<g transform="translate(75,0)">
+			<g fill="#FBFCC5"  stroke="#333333" stroke-width="0.5">
+				<rect x="0" y="-10" width="20" height="10"/>
+			</g>
+			<g id="group.trace.title.3" transform="translate(25,0)" text-anchor="start" stroke="none" fill="black"/>
+		</g>
+
+		<!-- trace label 4 -->
+		<g transform="translate(200,0)">
+			<g fill="none" stroke="#FFC978" stroke-width="1.5">
+				<rect x="0" y="-10" width="20" height="10"/>
+			</g>
+			<g id="group.trace.title.4" transform="translate(25,0)" text-anchor="start" stroke="none" fill="black"/>
+		</g>
+
+
+
+
+	</g>
+
+
+
+	<rect width="564" y="87.5" fill="none" stroke="grey" x="89.5" stroke-width="2" id="rectangle.graph.data.space" height="246" />
+</g>
+</svg>

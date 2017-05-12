@@ -1,0 +1,65 @@
+{
+   "abstract" : "Clean subroutines with an attribute",
+   "author" : [
+      "Mark Fowler <mark@twoshortplanks.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.101612, CPAN::Meta::Converter version 2.101670",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Sub-Clean",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt",
+         "utils",
+         "example",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Attribute::Lexical" : 0,
+            "B::Hooks::EndOfScope" : 0,
+            "Sub::Identify" : 0,
+            "namespace::clean" : 0,
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : 0,
+            "FindBin" : 0,
+            "Test::More" : 0,
+            "Test::Perl::Critic" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-sub-clean at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Sub-Clean"
+      },
+      "homepage" : "http://github.com/2shortplanks/Sub-Clean/tree",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/2shortplanks/Sub-Clean.git",
+         "web" : "http://github.com/2shortplanks/Sub-Clean/tree"
+      }
+   },
+   "version" : "0.01"
+}
+

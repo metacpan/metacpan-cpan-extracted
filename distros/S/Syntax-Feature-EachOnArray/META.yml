@@ -1,0 +1,22 @@
+---
+abstract: 'Emulate each(@array) on Perl < 5.12'
+author:
+  - 'Steven Haryanto <stevenharyanto@gmail.com>'
+build_requires:
+  Module::Build: 0.3601
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Syntax-Feature-EachOnArray
+requires:
+  Hash::FieldHash: 0
+  syntax: 0
+resources:
+  homepage: http://metacpan.org/dist/Syntax-Feature-EachOnArray
+  repository: http://github.com/sharyanto/perl-Syntax-Feature-EachOnArray
+version: 0.04

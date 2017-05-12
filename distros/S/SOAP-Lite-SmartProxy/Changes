@@ -1,0 +1,11 @@
+Revision history for Perl extension SOAP::Transport::HTTPX.
+
+
+Wed Feb 14 16:33:42 EST 2001
+	- missed direct class invocation test on smart proxy, fixed.
+	- version set to 0.11
+	
+
+Wed Feb 14 12:56:37 EST 2001
+
+	- initial release.

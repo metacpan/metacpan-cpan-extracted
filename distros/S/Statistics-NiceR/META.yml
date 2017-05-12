@@ -1,0 +1,54 @@
+---
+abstract: 'interface to the R programming language'
+author:
+  - 'Zakariyya Mughal <zmughal@cpan.org>'
+build_requires:
+  PDL: 0
+  PDL::IO::Dumper: 0
+  Test::Most: 0
+  perl: 5.012
+configure_requires:
+  ExtUtils::MakeMaker: 0
+  Inline: 0.67
+  Inline::C: 0.62
+  PDL: 0
+  perl: 5.012
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Statistics-NiceR
+requires:
+  Capture::Tiny: 0
+  Data::Frame: 0
+  File::Basename: 0
+  File::Glob: 0
+  File::Slurp::Tiny: 0
+  File::Spec: 0
+  File::Spec::Functions: 0
+  File::Which: 0
+  IPC::Cmd: 0
+  Inline: 0
+  List::AllUtils: 0
+  PDL::Core::Dev: 0
+  PDL::Factor: 0
+  PDL::Lite: 0
+  PDL::LiteF: 0
+  PDL::Types: 0
+  Scalar::Util: 0
+  Scalar::Util::Numeric: 0
+  Storable: 0
+  Text::Template: 0
+  Try::Tiny: 0
+  custom::failures: 0
+  overload: 0
+  perl: 5.012
+  strict: 0
+  warnings: 0
+resources:
+  IRC: irc://irc.perl.org/#pdl
+  homepage: https://github.com/zmughal/p5-Statistics-NiceR
+  repository: https://github.com/zmughal/p5-Statistics-NiceR.git
+version: 0.03

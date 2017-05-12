@@ -1,0 +1,28 @@
+--- #YAML:1.0
+name:               SOAP-ISIWoK
+version:            3.01
+abstract:           interogate the ISI WoS database
+author:
+    - Tim Brody <tdb2@ecs.soton.ac.uk>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    HTTP::Cookies:  0
+    MIME::Base64:   0
+    SOAP::Lite:     0.6
+resources:
+    type:  git
+    url:   git://github.com/timbrody/soap-isiwok.git
+    web:   https://github.com/timbrody/soap-isiwok
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

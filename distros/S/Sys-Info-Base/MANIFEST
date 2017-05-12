@@ -1,0 +1,32 @@
+.perlcriticrc
+Build.PL			Generated automatically
+builder/lib/Build.pm
+builder/lib/Build/Constants.pm
+builder/lib/Build/Spec.pm
+builder/lib/Build/Util.pm
+builder/templates/pod/author.pod
+builder/templates/pod/monolith-warning.pod
+builder/templates/tools/Build.PL
+builder/templates/tools/builder.header
+builder/templates/tools/Makefile.PL
+builder/templates/tools/Makefile.PL.hook
+Changes
+lib/Sys/Info/Base.pm
+lib/Sys/Info/Constants.pm
+lib/Sys/Info/Device.pm
+lib/Sys/Info/Device/CPU.pm
+lib/Sys/Info/Driver.pm
+lib/Sys/Info/Helper.pm
+lib/Sys/Info/OS.pm
+LICENSE
+Makefile.PL			Generated automatically
+MANIFEST
+META.json
+META.yml
+README
+SPEC
+t/03-basic.t
+t/lib/MyLoadableThing.pm
+t/slurp.txt
+xt/author/201-pod.t
+xt/author/202-pod-coverage.t

@@ -1,0 +1,14 @@
+Revision history for Perl extension SMS::Send::SMSDiscount.
+
+1.111780  2011-06-27 22:57:25 Europe/London
+        - Another attempt to fix test failures.
+
+1.102671  2010-09-24 16:49:55 Europe/London
+        - Fix $VERSION.
+
+1.102670  2010-09-24 13:26:55 Europe/London
+        - Make tests more robust.
+
+1.102480  2010-09-05 21:18:42 Europe/London
+	- Initial CPAN release taken from my code at
+          http://www.xpl-perl.org.uk/

@@ -1,0 +1,75 @@
+==================================================
+Changes from 2013-03-20 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.006 at 2014-03-20 08:56:03 +0000
+------------------------------------------
+
+  Change: 9d9faad65774ded8a054e6ad47375aa4fd1e0cef
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2014-03-20 09:53:16 +0000
+
+    -use PodWeaver 
+
+------------------------------------------
+version 0.005 at 2014-02-25 14:32:43 +0000
+------------------------------------------
+
+  Change: e131eb9f3b2d1a7033e6cc87b2237801fecbf758
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2014-02-25 15:32:43 +0000
+
+    remove non-portable command test 
+
+------------------------------------------
+version 0.004 at 2014-02-25 08:27:19 +0000
+------------------------------------------
+
+  Change: acc1639674c687a1adc38ec3ce9ae3f3654a6b0a
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2014-02-25 09:27:19 +0000
+
+    documentation update, added test for commandline 
+
+------------------------------------------
+version 0.003 at 2014-02-21 12:21:51 +0000
+------------------------------------------
+
+  Change: cb05eae53b1108c6cef96ae8ae46178a7f788d50
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2014-02-21 13:21:51 +0000
+
+    -changed default parameters
+
+    -added cut_middle option 
+
+------------------------------------------
+version 0.002 at 2014-02-20 12:39:12 +0000
+------------------------------------------
+
+  Change: cd6a329526841068f5b2a07f65ec6f6c87853002
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2014-02-20 13:39:12 +0000
+
+    -added domain_edge option -added commandline wrapper 
+
+------------------------------------------
+version 0.001 at 2014-02-20 09:34:37 +0000
+------------------------------------------
+
+  Change: 6606a8c0312b4869254bea21bf73d129837629bd
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2014-02-20 10:34:37 +0000
+
+    -implemented module and test 
+
+  Change: bc19a05801ca93ae610bf40d706fd8d302a6c31e
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2014-02-20 09:09:33 +0000
+
+    -created module String::ShortenHostname 
+
+================
+End of releases.
+================

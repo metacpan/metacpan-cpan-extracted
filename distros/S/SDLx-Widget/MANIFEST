@@ -1,0 +1,19 @@
+Build.PL
+Changes
+data/chest.png
+data/hero.png
+examples/menu.pl
+examples/submenu.pl
+lib/SDLx/Widget.pm
+lib/SDLx/Widget/Menu.pm
+lib/SDLx/Widget/Textbox.pm
+LICENSE
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+META.yml
+README
+t/001_load.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+Todo

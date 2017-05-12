@@ -1,0 +1,14 @@
+Makefile.PL
+Namazu.pm
+Namazu.xs
+Namazu.pod.ja
+TODO
+MANIFEST
+ChangeLog
+t/data/en/plain.txt
+t/data/en/html.html
+t/data/ja/html.html
+t/data/ja/plain.txt
+t/01-mkindex.t
+t/02-search.t
+META.yml                                 Module meta-data (added by MakeMaker)

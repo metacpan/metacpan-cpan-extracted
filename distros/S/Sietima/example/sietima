@@ -1,0 +1,31 @@
+#!/usr/bin/env perl
+use FindBin::libs;
+use Sietima::Policy;
+use Sietima::CmdLine;
+
+Sietima::CmdLine->new({
+    traits => [qw(
+                     NoMail
+                     ReplyTo
+                     Headers
+                     WithOwner
+                     Debounce
+                     SubjectTag
+                     SubscriberOnly::Moderate
+                     WithMailStore
+             )],
+    args => {
+        owner => 'dakkar@thenautilus.net',
+        mail_store => {
+            class => 'Sietima::MailStore::FS',
+            root => '/tmp/sietima-store',
+        },
+        return_path => 'dakkar-sietima@thenautilus.net',
+        subject_tag => 'Test',
+        subscribers => [
+            'dakkar-a@thenautilus.net',
+            { primary => 'dakkar-b@thenautilus.net', aliases => [ 'dakkar-bis@thenautilus.net' ] },
+            { primary => 'dakkar-c@thenautilus.net', prefs => { wants_mail => 0 } },
+        ],
+    },
+})->run;

@@ -1,0 +1,32 @@
+Sub::Contract
+=============
+
+Yet another contract module for Perl5
+
+See perldoc Sub::Contract for more information.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   accessors
+   Sub::Name
+
+AUTHOR
+
+Erwan Lemonnier
+
+COPYRIGHT AND LICENCE
+
+See perldoc Sub::Contract
+
+

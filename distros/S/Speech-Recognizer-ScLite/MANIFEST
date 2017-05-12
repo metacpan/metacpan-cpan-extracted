@@ -1,0 +1,15 @@
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+ScLite.pm
+
+# test code
+test.pl
+t/test.hyp
+t/test.ref
+
+# symbiotic helper class
+Line/Makefile.PL
+Line/Line.pm
+

@@ -1,0 +1,98 @@
+Revision history for SVN-Class
+
+0.18 24 Sept 2014
+ - add support for svn 1.8 working copy 'Relative URL'
+
+0.17 8 Nov 2011
+ - add support for svn 1.7 working copy root path via
+   https://rt.cpan.org/Ticket/Display.html?id=72218
+
+0.16 02 April 2010
+ - fix temp commit message file path for Windows.  See
+   https://rt.cpan.org/Ticket/Display.html?id=54969
+
+0.15 22 Aug 2009
+ - fix http://rt.cpan.org/Ticket/Display.html?id=48748 by writing commit()
+   message to a temp file.
+
+0.14 18 Aug 2009
+ - fix svn_run command debugging
+
+0.13_03 16 April 2009
+ - Class::XSAccessor now triggers Pod::Coverage warnings if methods are
+   documented. Added docs in SVN::Class::Info.
+ - made stdout/stdin aliasing conditional based on SVN_CLASS_ALIAS_STDOUT
+   env var. default is now *off* so that things work as you would expect,
+   and the hack of aliasing them now used only when explicitly asked for.
+ - added Text::ParseWords to Makefile deps so IPC::Run works.
+
+0.13_02 10 Feb 2009
+ - drop Class::Accessor::Fast in favor of Rose::Object since we already
+   required Rose::Object via Rose::URI. One less dependency, plus
+   Rose::Object now has an XS option if Class::XSAccessor is installed.
+
+0.13_01 4 Feb 2009
+ - some debugging for Win32
+
+0.13 22 April 2009
+ - fix test for Mac OS X TMPDIR issue where repos url contained '+'
+   characters
+
+0.12 3 Feb 2009
+ - added IPC::Run to Makefile for Win32 cpan testers
+
+0.11 24 Nov 2008
+ - set success value if undef, always.
+
+0.10 22 Nov 2008
+ - catch SIG{CHLD} issue when running under CatalystX::CMS by local()izing
+   sig handler
+
+0.09 16 Oct 2008
+ - fix bug with commit() not passing opts on to svn_run()
+ - fix bug with status() returning wrong value if $obj is dir
+
+0.08_03 10 July 2008
+ - dumb error after all. Needed to SKIP the right number of tests when svn
+   bin not found.
+
+0.08_02 7 July 2008
+ - another debugging release
+
+0.08_01 4 July 2008
+ - **developer release only** -- trying to track down 50% fail rate in
+   CPANTS.
+ - no idea why tests fail after 20 tests in t/01-svn.t so switched to
+   File::Temp for that test, along with using local repos for author test.
+ - turned on debugging for tests.
+
+0.08 22 July 2008
+ - no code changes, just an official release now that 0.07 test snafu is
+   resolved.
+
+0.07 13 Feb 2008
+ - added SVN::Class::Info and parent info() method
+ - added outstr() method
+ - added SVN::Class::Repos
+
+0.06 17 Jan 2008
+ - documented all the accessors in SVN::Class
+ - turned off debugging in tests
+
+0.05 18 Oct 2007
+ - **dev release only** -- turned on debugging in tests
+
+0.04 17 Oct 2007
+ - Prefix all svn_run() calls with LANG=C to standardize svn output.
+ - Thanks to uwe.voelker@gmx.de for the fix.
+
+0.03 16 Oct 2007
+ - Added missing Path::Class::File::Stat to dependency list.
+
+0.02 16 Oct 2007
+ - Added missing .pm files to MANIFEST (did I just ignore make distcheck?)
+ - t/01-svn.t only runs if svn is found in PATH
+
+0.01 27 Sept 2007
+ - First version, released on an unsuspecting world.
+

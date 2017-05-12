@@ -1,0 +1,10 @@
+          <li>
+            <a href="<% $tag->uri() %>" title="<% loc( 'Pages tagged %1', $tag->tag() ) %>"
+               ><% $tag->tag() %>
+              - <% loc( '%quant( %1, page, pages )', $count ) %></a>
+          </li>
+
+<%args>
+$tag
+$count
+</%args>

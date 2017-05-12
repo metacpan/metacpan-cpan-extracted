@@ -1,0 +1,81 @@
+1999-07-26  Jochen Wiedmann  <joe@ispsoft.de> (0.1012)
+
+	* lib/SNMP/Monitor/Event/IfLoad.pm: Added support for ifSpeed = 0,
+	  if the SNMP agent doesn't return proper speed values.
+
+1999-06-09  Jochen Wiedmann  <joe@ispsoft.de> (0.1010)
+
+	* lib/SNMP/Monitor/Event/IfLoad.pm (Query): Suppressed logging of negative
+	  numbers. This could happen in case of a router reset or something similar.
+
+1999-04-26  Jochen Wiedmann  <joe@ispsoft.de> (0.1010)
+
+	* snmpmonRep.PL: Added options --daily and --scale. Added POD docs.
+	  My thanks to WWL Internet Stuttgart (formerly ISS Internet Service
+	  Stuttgart) for paying this.
+
+1999-02-09  Jochen Wiedmann  <joe@ispsoft.de> (0.1009)
+
+	* lib/SNMP/Monitor/EP.pm (_ep_snmpmon_ifgif): Added Scale == -1,
+	  in which case an optimal scale is choosen by looking into the
+	  database. My thanks to Alexandre Baumeister <alex@finance-net.com>.
+	* Fixed a minor display bug in t/graph.ep (Alexandre Baumeister
+	  <alex@finance-net.com>).
+
+1998-11-03  Jochen Wiedmann  <joe@ispsoft.de> (0.1008)
+
+	* html_templates/*: Removed my(undef, ...) to support older
+	  Perl versions.
+	* snmpmon.PL: Fixed ->{delete} to ->{'delete'}.
+	* html_templates/graph.ep.PL: Fixed $to_x$ to $cgi->to_x$.
+	* Removed use of FROM_UNIXTIME().
+	* Added Combo interfaces. My thanks to ISS Internet Service
+	  Stuttgart for paying this.
+
+1998-07-24  Jochen Wiedmann  <joe@ispsoft.de> (0.1007)
+
+	* html_templates/*.ep.PL: Removed epparse- and epperl- (gone
+	  with HTML::EP, 0.1100)
+
+1998-07-21  Jochen Wiedmann  <joe@ispsoft.de> (0.1006)
+
+	* html_templates/(ifgif|state).ep.PL: Fixed average calculation
+	  to use time() as a maximum of $to.
+	* html_templates/ifgif.ep.PL: Inserted 'title' argument into
+	  plot command.
+
+1998-07-21  Jochen Wiedmann  <joe@ispsoft.de> (0.1005)
+
+	* html_templates/graph.ep.PL: Added average display.
+	* html_templates/stats.ep.PL: Added octet sum.
+
+1998-07-19  Jochen Wiedmann  <joe@ispsoft.de> (0.1004)
+
+	* snmpmon.PL (Start): Fixed use of setlogsock for Solaris.
+	  (This is becoming a nightmare ...)
+	* README: Fixed references to gnuplot sources.
+	* lib/SNMP/Monitor/Event/IfLoad.pm (Process): Fixed INSERT statement,
+	  so that NULL values are never used.
+
+	My thanks to Lupe Christoph, <lupe@alanya.m.isar.de>
+
+1998-07-13  Jochen Wiedmann  <joe@ispsoft.de>
+
+	* lib/SNMP/Monitor/Install.pm (Install): Installation default
+	  is now /etc/snmpmon.
+
+1998-07-13  Jochen Wiedmann  <joe@ispsoft.de> (0.1001)
+
+	* Added support for Solaris.
+
+	* lib/SNMP/Monitor/Install.pm: The AddRouter() method is now
+	  sending separate requests for each interface it detects and
+	  not one reuqest for all interfaces. (It seems that some
+	  hubs can't work with fragmented packets.)
+
+1998-06-13  Jochen Wiedmann  <joe@ispsoft.de>
+
+	* Original version. My thanks to ZVW (Zeitungsverlag Waiblingen)
+	  for paying this.
+
+

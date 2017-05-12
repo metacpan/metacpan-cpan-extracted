@@ -1,0 +1,157 @@
+NAME
+    SVG::Plot - a simple module to take one or more sets of x,y points and
+    plot them on a plane
+
+SYNOPSIS
+       use SVG::Plot;
+       my $points = [[0,1,'http://uri/'],[2,3,'/uri/foo.png']];
+       my $plot = SVG::Plot->new(
+                                  points => $points,
+                                  debug => 0,
+                                  scale => 0.025,
+                                  max_width => 800,
+                                  max_height => 400,
+                                  point_size => 3,
+                                  point_style => {
+                                      fill => 'blue',
+                                      stroke => 'yellow'
+                                  },
+                                  line => 'follow',
+                                  margin => 6,
+                                ); 
+       # -- or --
+       $plot->points($points);
+       $plot->scale(4);
+
+       print $plot->plot;
+
+DESCRIPTION
+    a very simple module which allows you to give one or more sets of points
+    [x co-ord, y co-ord and optional http uri]) and plot them in SVG.
+
+    $plot->points($points) where $points is a reference to an array of array
+    references.
+
+    see new for a list of parameters you can give to the plot. (overriding
+    the styles on the ponts; sizing a margin; setting a scale; optionally
+    drawing a line ( line => 'follow' ) between the points in the order they
+    are specified.
+
+METHODS
+    new
+          use SVG::Plot;
+
+          # Simple use - single set of points, all in same style.
+          my $points = [ [0, 1, 'http://uri/'], [2, 3, '/uri/foo.png'] ];
+          my $plot = SVG::Plot->new(
+                                     points => \@points,
+                                     point_size => 3,
+                                     point_style => {
+                                         fill => 'blue',
+                                         stroke => 'yellow'},
+                                     line => 'follow',
+                                     debug => 0,
+                                     scale => 0.025,
+                                     max_width => 800,
+                                     max_height => 400,
+                                     margin => 6,
+                                   );
+
+          # Prepare to plot two sets of points, in distinct styles.
+          my $pubs      = [
+              [ 522770, 179023, "http://example.com/?Andover_Arms ],
+              [ 522909, 178232, "http://example.com/?Blue Anchor  ] ];
+          my $stations  = [
+              [ 523474, 178483, "http://example.com/?Hammersmith" ] ];
+          my $pointsets = [ { points => $pubs,
+                              point_size => 3,
+                              point_style => { fill => "blue" }
+                            },
+                            { points => $stations,
+                              point_size => 5,
+                              point_style => { fill => "red" }
+                            } ];
+          my $plot = SVG::Plot->new(
+                                     pointsets => $pointsets,
+                                     scale => 0.025,
+                                     max_width => 800,
+                                     max_height => 400
+                                   );
+   
+        you can supply a grid in the format
+
+          SVG::Plot->new(
+            grid => { min_x => 1,
+                      min_y => 2,
+                      max_x => 15,
+                      max_y => 16 }
+                      );
+
+        or
+
+          $plot->grid($grid)
+
+        this is like a viewbox that shifts the boundaries of the plot.
+
+        if it's not specified, the module works out the viewbox from the
+        highest and lowest X and Y co-ordinates in the list(s) of points.
+
+        Note that the actual margin will be half of the value set in
+        "margin", since half of it goes to each side.
+
+        If "max_width" and/or "max_height" is set then "scale" will be
+        reduced if necessary in order to keep the width down.
+
+        If "debug" is set to true then debugging information is emitted as
+        warnings.
+
+        If "point_size" is set to "AUTO" then
+        Algorithm::Points::MinimumDistance will be used to make the point
+        circles as large as possible without overlapping, within the
+        constraints of "min_point_size" (which defaults to 1) and
+        "max_point_size" (which defaults to 10). Note that if you have
+        multiple pointsets then the point circle sizes will be worked out
+        *per set*.
+
+        All arguments have get_set accessors like so:
+
+          $plot->point_size(3);
+
+        The "point_size", "point_style" attributes of the SVG::Plot object
+        will be used as defaults for any pointsets that don't have their own
+        style set.
+
+    plot
+          print $plot->plot;
+
+        "plot" will croak if the object has a "max_width" or "max_height"
+        attribute that is smaller than its "margin" attribute, since this is
+        impossible.
+
+NOTES
+    this is an early draft, released mostly so Kake can use it in OpenGuides
+    without having non-CPAN dependencies.
+
+    for an example of what one should be able to do with this, see
+    http://space.frot.org/rdf/tubemap.svg ... a better way of making
+    meta-information between the lines, some kind of matrix drawing; cf the
+    grubstreet link below, different styles according to locales, sets,
+    conceptual contexts...
+
+    it would be fun to supply access to different plotting algorithms, not
+    just for the cartesian plane; particularly the buckminster fuller
+    dymaxion map; cf Geo::Dymaxion, when that gets released
+    (http://iconocla.st/hacks/dymax/ )
+
+    to see work in progress,
+    http://un.earth.li/~kake/cgi-bin/plot2.cgi?cat=Pubs&cat=Restaurants&cat=
+    Tube&colour_diff_this=loc&action=display
+
+BUGS
+    possibly. this is alpha in terms of functionality, beta in terms of
+    code; the API won't break backwards, though.
+
+AUTHOR
+        Jo Walsh  ( jo@london.pm.org )
+        Kate L Pugh ( kake@earth.li )
+

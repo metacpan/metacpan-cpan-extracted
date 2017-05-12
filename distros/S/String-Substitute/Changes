@@ -1,0 +1,27 @@
+Revision history for String-Substitute
+
+0.007     2017-03-29 15:52:36+01:00 Europe/London
+    Remove List::Gather dependency, as issue #2 said it was problematic in Perl 5.16 as will be
+
+0.006     2017-03-23 13:43:56+00:00 Europe/London
+    Make URL a proper link in the SUPPORT section of the POD.
+
+0.005     2017-03-23 12:50:24+00:00 Europe/London
+    Use cross product of sets instead of Regexp::Genex.
+    A crash happened inside Regexp::Genex when I integrated this module into a larger package.
+      unexpected token '(' during '' at /opt/perl-5.20.2/lib/site_perl/5.20.3/Regexp/Genex.pm line 455.
+    I don't know what caused it, but it's scared me off Regexp::Genex for now.
+    I think the new code is cleaner anyway.
+
+0.004     2017-03-23 11:21:38+00:00 Europe/London
+    Declared dependency on Regexp::Genex
+
+0.003     2017-03-22 14:02:50+00:00 Europe/London
+    Removed use of namespace::autoclean from early in development.
+
+0.002     2017-03-22 13:59:11+00:00 Europe/London
+    Made some POD improvements.
+
+0.001     2017-03-22 13:11:09+00:00 Europe/London
+    First version.
+

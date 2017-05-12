@@ -1,0 +1,78 @@
+NAME
+
+SVGGraph::Pie - Perl extension for Pie as SVG
+
+SYNOPSIS
+
+  use SVGGraph::Pie;
+
+  my $svggraph = SVGGraph::Pie->new;
+  $svggraph->CreateGraph(
+      {
+          imageheight => 500,
+          imagewidth  => 500,
+          centertop  => 250,
+          centerleft => 250,
+          radius => 200,
+          title => 'Financial Results Q1 2002',
+          titlestyle => 'font-size:24;fill:#FF0000;',
+          borderwidth => 4, # border line's width
+          label => 'true',  # Woud you like display label?
+          labeltop  => '100',
+          labelleft => '400',
+      },
+      [
+          {value => 10, color => 'red'},
+          {value => 20, color => 'blue'),
+          ...
+          ..
+          .
+      ],
+  );
+
+DESCRIPTION
+
+SVGGraph::Pie allow you to create Piegraphs as SVG very easily.
+
+EXAMPLES
+
+  #!/usr/bin/perl -w
+
+  use strict;
+  use SVGGraph::Pie;
+
+  my @values = [
+      {value => 11, color => 'red'},
+      {value => 23, color => 'rgb(200,0,0)'},
+      {value => 39, color => 'rgb(150,0,0)'},
+      {value => 13, color => 'rgb(100,0,0)'},
+      {value => 44, color => 'rgb(100,0,50)'},
+      {value => 50, color => 'rgb(50,0,100)'},
+      {value => 60, color => 'rgb(0,0,100)'},
+      {value => 12, color => 'rgb(0,0,150)'},
+      {value => 39, color => 'rgb(0,0,200)'},
+  ];
+
+  my $svggraph = SVGGraph::Pie->new;
+
+  print "Content-type: image/svg-xml\n\n";
+  print $svggraph->CreateGraph(
+      {
+          imageheight => 500,
+          imagewidth  => 1000,
+          radius => 200,
+          title => 'Financial Results Q1 2002',
+          titlestyle => 'font-size:24;fill:#FF0000;',
+          borderwidth => 4,
+          label => 'true',
+      },
+      \@values,
+  );
+
+AUTHOR
+
+milano <milano@cpan.org>
+
+SEE ALSO
+
+SVG, SVGGraph

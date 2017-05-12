@@ -1,0 +1,39 @@
+Revision history for Perl extension SuffixTree
+
+0.07 2013-01-02
+  - Provided better documentation of the LICENSE (no material change, just
+    better documented).
+
+0.06 2012-11-02
+  - "Changes" is now CPAN::Changes::Spec compliant.
+  - Added t/09-changes.t
+
+0.05 2012-10-24
+  - Applied an adaptation of the patches supplied in RT#11256 and RT#11243.
+  - find_substring() now returns 0 if substring isn't found.
+  - Documented that find_substring() is 1-based, and that 0 indicates not found.
+  - Added an adaptation of the test from RT#60010.
+  - Added release tests to the test suite (optional).
+  - Test suite and module are now strict/warnings compliant.
+
+0.03 2003-01-07
+  - Removed @EXPORT_OK from globals (we have no such variable)
+  - @EXPORT inserted to globals
+  - Using strict
+  - Added a README file containing some portability related 
+    information
+  - t/use.pl renamed to t/test_use.t
+  - Declaring previous interface as deprecated (though still 
+    supported), offering a more Perllish interface instead.
+
+0.02 2003-01-06
+  - Added t/use.pl test that only tests if the module 
+    loads correctly in 'use SuffixTree'
+  - Renamed README to c-implementation_notes.txt
+  - Minor documentation changes
+  - Updated MANIFEST
+
+0.01 2003-01-04
+  - Took files from http://cs.haifa.ac.il/~shlomo/suffix_tree/
+  - Made a Perl wrapper for the header file using SWIG
+  - The original version

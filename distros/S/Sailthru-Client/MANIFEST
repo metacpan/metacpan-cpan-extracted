@@ -1,0 +1,12 @@
+Changes
+lib/Sailthru/Client.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/sailthru_api.t
+t/sailthru_client.t
+t/sailthru_client_deprecated.t
+t/sailthru_client_request.t
+t/sig.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

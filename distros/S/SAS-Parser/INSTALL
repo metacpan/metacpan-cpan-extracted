@@ -1,0 +1,48 @@
+INSTALLATION
+     If you're reading this, you have successfully unpacked the
+     distribution tar.gz archive.  cd there now.
+
+     SAS::Parser follows the standard scheme for installing Perl
+     extensions:
+     
+      perl Makefile.PL
+      make
+      make install
+
+     This should install the lib/SAS/*.pm modules in the standard Perl
+     library, and the bin/* scripts in someplace on your PATH
+     (e.g., /usr/local/bin).  It will also make manpages for the
+     lib/SAS/*.pm modules somewhere that man and perldoc can find.
+     
+     If this does not work for you, you may simply copy the .pm files in
+     the lib/SAS/ directory to a SAS directory under the standard Perl
+     lib/perl directory and the executable scripts to somewhere on
+     your PATH.
+     
+      mkdir /usr/local/lib/perl5/SAS
+      cp -p lib/SAS/* /usr/local/lib/perl5/SAS
+      cp -p bin/* /usr/local/bin
+
+     If even that doesn't work, you may just create a ~/lib/perl/SAS
+     directory and copy the .pm files there.
+     
+      perl Makefile.PL PREFIX=~ LIB=~/lib/perl/SAS
+      make
+      make install
+
+     or, by hand,
+	  
+      mkdir ~/lib/perl/SAS
+      cp lib/* ~/lib/perl/SAS
+      cp bin/* ~/bin
+      
+     You then have to tell Perl to search there for these modules, e.g.,
+     
+      use lib "$ENV{HOME}/lib/perl";
+
+     in scripts, or
+     
+      perl -I~/lib/perl ...
+
+     on the command line.
+

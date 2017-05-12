@@ -1,0 +1,23 @@
+Sub-Apply
+======================
+
+INSTALLATION
+
+To install this module type the following:
+
+   cpanm Sub::Apply
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  parent
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2011 by Yoshihiro Sasaki
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

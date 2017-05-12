@@ -1,0 +1,55 @@
+NAME
+     SAS::Parser - Parse a SAS program file
+
+SYNOPSIS
+      use SAS::Parser;
+      $p = new SAS::Parser;
+      $p->parse_file('mysas.sas');         # returns a SAS::Parser object
+
+     or
+
+      $file = shift @ARGV;
+      $p->parse_file($file, {options});
+
+     After parsing, you can access the information stored in the
+     SAS::Parser object as follows:
+
+      @procs = $p->procs();               # get list of procs called
+      @datasets = $p->datasets();         # get list of datasets created
+      $macros = $p->macros();             # get string of macros called
+
+
+DESCRIPTION
+     SAS::Parser is a base tool for use in writing applications
+     which deal with .sas programs.  It can be used as a
+     documentation tool, e.g., to extract lists of procedures
+     used, data sets created, macros used, etc., and produce a
+     nicely formatted header in a consistent format, or to
+     produce standard documentation headers for SAS macros. It
+     can also be used as a pre-processor to a SAS code formatter,
+     to produce WWW documents, etc.  It is not likely to be
+     useful as a SAS syntex checker without a good deal of
+     additional work.  It does as reasonable a job on SAS macros
+     as can be expected without being an actual macro processor.
+
+     I had written a large number of specialized scripts for some
+     of these tasks, and found that I was re-doing similar stuff
+     each time.  SAS::Parser is an attempt to bring this to the
+     next level, where the basic statement parsing can be
+     assumed, and your application can just work with the info
+     extracted.
+
+     It's just a beginning, and all the rest depends on
+     writing Perl code making use of SAS::Parser to accomplish
+     such tasks.  See SAS::Header for one such extension.
+ 
+
+REQUIREMENTS
+     Requires Perl 5.002 or better.
+     Uses Text::Balanced
+
+
+AUTHOR
+     Michael Friendly  <friendly@yorku.ca>
+
+

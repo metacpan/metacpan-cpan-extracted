@@ -1,0 +1,32 @@
+# 0.025
+Initial Release with full packaging (3 tests, pod missing)
+
+# 0.026
+- Added proto of Child / Tree loading (experimental interface)
+- Tuned up pod documentation
+
+# 0.027
+- Public release candidate for preview
+
+# 0.028
+- Initial public release
+- Last minute pod cleanups
+
+# 0.029
+- Skip test 03... when missing non-CORE module DBD::CSV Instead of
+  adding mandatory dependency to DBD::CSV
+- Uncommented $dbh->do("create table ...") to make it easier to copy-paste
+  the SYSNOPSIS as a working example
+
+# 0.030
+- Fixed documentation of update() to clearly state the return value
+  (this could previously be derived only from source code).
+- Changed methods to throw exceptions with a strong deprecation of
+errstr() setter/getter method. Run persistence methods in eval to protect
+calling code, catch exceptions.
+- Fixed debug messaged to go (consistently) into STDERR.
+
+
+# 0.31
+- Itegrate POD into code and deprecate use of home-brew comments extraction system
+- Add (an ugly) $StoredHash::hardval class variable to work around FreeTDS / MSSQL 80 character truncation problem with prepared statements. Set to true value $StoredHash::hardval causes SQL to use literal (escaped) values in SQL instead of parametrized prepared statements.

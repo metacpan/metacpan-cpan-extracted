@@ -1,0 +1,33 @@
+Statistics-Suggest version 0.01
+===============================
+
+INSTALLATION
+
+Download SUGGEST from http://glaros.dtc.umn.edu/gkhome/suggest/download
+
+Find libsuggest.a which matches your environment and place it under
+your library path (or specify its path with LIBS option as shown below).
+
+Then do:
+
+   perl Makefile.PL [LIBS='-L/where/to/find/libsuggest.a -lsuggest']
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  libsuggest.a from SUGGEST
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Ikuhiro IHARA
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,10 @@
+2008-09-06  peter@stuifzand.eu
+
+	* Added more documentation
+	* Use Apache::Test to test the Handler.
+
+2008-09-03  Peter Stuifzand <peter@stuifzand.eu>
+
+	* Created version 0.0.1 of Sleep.
+	* Added tests
+	* Added INSTALL instructions

@@ -1,0 +1,20 @@
+Revision history for Perl extension SQL-Translator-Producer-DBIxSchemaDSL
+
+0.04 2016-02-03T07:25:45Z
+
+    - DO NOT USE `is_unique` attribute for column when the index name is changed.
+
+0.03 2016-01-28T11:22:18Z
+
+    - follow zero default value
+
+0.02 2016-01-27T04:00:25Z
+
+    - follow TEXT type
+    - should add `size` option for DECIMAL type
+    - added some test cases
+
+0.01 2016-01-26T14:27:46Z
+
+    - original version
+

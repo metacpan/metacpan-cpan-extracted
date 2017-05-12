@@ -1,0 +1,106 @@
+<!-- $Id: dtd.dtd,v 2.1 2005/07/02 23:51:17 ehood Exp $ -->
+<!-- This is the DTD for the documents produced by DTDParse.
+     The public identifier for this DTD is:
+
+      "-//Norman Walsh//DTD DTDParse V2.0//EN"
+
+  -->
+
+<!ELEMENT dtd (notation|entity|element|attlist)+>
+<!ATTLIST dtd
+	version		CDATA	#REQUIRED
+	unexpanded	CDATA	#IMPLIED
+	title		CDATA	#IMPLIED
+	namecase-general	CDATA	#IMPLIED
+	namecase-entity	CDATA	#IMPLIED
+	xml		CDATA	#IMPLIED
+	system-id	CDATA	#IMPLIED
+	public-id	CDATA	#IMPLIED
+	declaration	CDATA	#IMPLIED
+	created-by	CDATA	#IMPLIED
+	created-on	CDATA	#IMPLIED
+>
+
+<!ELEMENT notation EMPTY>
+<!ATTLIST notation
+	name		CDATA	#REQUIRED
+	public		CDATA	#IMPLIED
+	system		CDATA	#IMPLIED
+>
+
+<!ELEMENT entity (text-expanded?, text?)>
+<!ATTLIST entity
+	name		CDATA	#REQUIRED
+	type		CDATA	#REQUIRED
+	notation	CDATA	#IMPLIED
+	public		CDATA	#IMPLIED
+	system		CDATA	#IMPLIED
+>
+
+<!ELEMENT text	(#PCDATA)*>
+<!ELEMENT text-expanded	(#PCDATA)*>
+
+<!ELEMENT element (content-model-expanded, content-model?,
+                   inclusions?, exclusions?)>
+<!ATTLIST element
+	name		CDATA	#REQUIRED
+	stagm		CDATA	#IMPLIED
+	etagm		CDATA	#IMPLIED
+	content-type	(element|mixed|cdata|empty|rcdata)	#IMPLIED
+>
+
+<!ENTITY % cm.mix "sequence-group|or-group|and-group
+                   |element-name|parament-name
+                   |pcdata|cdata|rcdata|empty">
+
+<!ELEMENT content-model-expanded (%cm.mix;)>
+<!ELEMENT content-model (%cm.mix;)>
+<!ELEMENT inclusions (%cm.mix;)>
+<!ELEMENT exclusions (%cm.mix;)>
+
+<!ELEMENT sequence-group (%cm.mix;)*>
+<!ATTLIST sequence-group
+	occurrence	CDATA	#IMPLIED
+>
+
+<!ELEMENT or-group (%cm.mix;)*>
+<!ATTLIST or-group
+	occurrence	CDATA	#IMPLIED
+>
+
+<!ELEMENT and-group (%cm.mix;)*>
+<!ATTLIST and-group
+	occurrence	CDATA	#IMPLIED
+>
+
+<!ELEMENT element-name EMPTY>
+<!ATTLIST element-name
+	name		CDATA	#REQUIRED
+	occurrence	CDATA	#IMPLIED
+>
+
+<!ELEMENT parament-name EMPTY>
+<!ATTLIST parament-name
+	name		CDATA	#REQUIRED
+>
+
+<!ELEMENT empty EMPTY>
+<!ELEMENT pcdata EMPTY>
+<!ELEMENT cdata EMPTY>
+<!ELEMENT rcdata EMPTY>
+
+<!ELEMENT attlist (attdecl, attribute+)>
+<!ATTLIST attlist
+	name	CDATA	#REQUIRED
+>
+
+<!ELEMENT attdecl (#PCDATA)>
+
+<!ELEMENT attribute EMPTY>
+<!ATTLIST attribute
+	name		CDATA	#REQUIRED
+	type		CDATA	#REQUIRED
+	enumeration	(yes|no|notation)	#IMPLIED
+	value		CDATA	#REQUIRED
+	default		CDATA	#REQUIRED
+>

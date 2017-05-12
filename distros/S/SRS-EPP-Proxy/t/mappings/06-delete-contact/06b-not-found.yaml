@@ -1,0 +1,18 @@
+template: delete-contact.tt
+
+vars:
+  contact_id: c_id1
+
+input_assertions:
+  match:
+
+SRS:
+  - assertions:
+      attr_is:
+
+output_assertions:
+  count:
+    - [ '//epp:resData', 0, 'EPP: No resData in the response' ]
+  match:
+  attr_is:
+    - [ '//epp:result', 'code', 2303, 'EPP: Failure = NOT_FOUND' ]

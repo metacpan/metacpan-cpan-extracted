@@ -1,0 +1,251 @@
+=head1 NAME
+
+Sys::Hwloc::Bitmap - Class representing a hwloc bitmap object
+
+=head1 SYNOPSIS
+
+       use Sys::Hwloc;
+
+       $map  = Sys::Hwloc::Bitmap->alloc;
+       $omap = $map->dup;
+       $map->copy( $omap );
+       $map->free;
+
+       $map->zero;
+       $map->fill;
+       $map->only( $id );
+       $map->allbut( $id );
+       $map->from_ulong( $mask );
+       $map->from_ith_ulong( $i, $mask );
+       $rc   = $map->sscanf( $string );
+       $rc   = $map->sscanf_list( $string );
+       $rc   = $map->sscanf_taskset( $string );
+       $map->set( $id );
+       $map->set_range( $ida, $ide );
+       $map->set_ith_ulong( $i, $mask );
+       $map->clr( $id );
+       $map->clr_range( $ida, $ide );
+       $map->singlify;
+
+       $val  = $map->ulong;
+       $val  = $map->to_ith_ulong( $i );
+       $val  = $map->sprintf;
+       $val  = $map->sprintf_list;
+       $val  = $map->sprintf_taskset;
+       @ids  = $map->ids;
+
+       $rc   = $map->isset( $id );
+       $rc   = $map->iszero;
+       $rc   = $map->isfull;
+
+       $id   = $map->first;
+       $id   = $map->next( $previd );
+       $id   = $map->last;
+
+       $val  = $map->weight;
+
+       $map->or( $omap );
+       $map->and( $omap );
+       $map->andnot( $omap );
+       $map->xor( $omap );
+       $map->not;
+
+       $rc   = $map->intersects( $omap );
+       $rc   = $map->includes( $omap );
+       $rc   = $map->isincluded( $omap );
+       $rc   = $map->isequal( $omap );
+       $rc   = $map->compare( $omap );
+       $rc   = $map->compare_first( $omap );
+
+
+=head1 DESCRIPTION
+
+Sys::Hwloc::Bitmap is the Perl namespace used for I<struct hwloc_cpuset>
+and I<struct hwloc_nodeset> data since hwloc-1.1.
+
+Before hwloc-1.1, similar functionality was provided by L<Sys::Hwloc::Cpuset>.
+
+The Sys::Hwloc::Bitmap class provides an object-oriented interface
+for hwloc C functions that act on bitmap objects. In particular,
+every hwloc C function that gets a I<hwloc_bitmap> pointer as first argument
+has an OO-ish counterpart in Sys::Hwloc::Bitmap.
+
+A Sys::Hwloc::Bitmap instance is created with B<hwloc_bitmap_alloc()> or
+B<Sys::Hwloc::Bitmap-E<gt>alloc()>.
+
+The underlying C data must become freed with B<hwloc_bitmap_free()> or
+B<$bitmap-E<gt>free()>.
+
+=head1 METHODS
+
+Refer to L<http://www.open-mpi.org/projects/hwloc> for the full specification.
+
+This section lists only methods that are specific to Sys::Hwloc. These are
+methods, which have no pendants in the hwloc C API, or which behave differently
+compared to their hwloc C API counterparts.
+
+=over 4
+
+=item B<alloc>
+
+  $map = Sys::Hwloc::Bitmap->alloc();
+
+Allocates and returns a bitmap. Returns a new Sys::Hwloc::Bitmap instance
+on success, returns I<undef> on error.
+
+=item B<free>
+
+  $set->free();
+
+Frees an allocated bitmap.
+
+There is no automatic Perl destructor Sys::Hwloc::Bitmap::DESTROY.
+That means, if an initialized bitmap variable goes out of scope or gets another value assigned,
+the C bitmap is not freed. This conforms to the usage of the hwloc C API,
+but unfortunately not to the rules of OO in Perl.
+
+=item B<ids>
+
+  @ids = $map->ids;
+
+Returns the bits that are set in a bitmap as an array of unsigned numbers.
+
+The method is a replacement of the hwloc C API macro pair B<hwloc_bitmap_foreach_begin> and B<hwloc_bitmap_foreach_end>.
+
+The following example shows the use of the hwloc C API macros, and what the Perl B<ids> method does:
+
+  /* This is C */
+  unsigned id;
+  hwloc_bitmap_foreach_begin(id, map) {
+    printf("id = %u\n", id);
+  }
+  hwloc_bitmap_foreach_end();
+
+  # This is Perl
+  foreach $id ($map->ids) {
+    printf "id = %u\n", $id;
+  }
+
+=item B<sprintf_list>
+
+  $string = $map->sprintf_list
+
+Returns a string containing the bits set in a bitmap as a comma-separated list of decimal numbers and ranges of numbers.
+The format conforms to the B<List Format> of Linux cpusets, see L<cpuset>(7).
+
+This method is currently not part of the hwloc C API.
+
+The following example script will print "0-7,16,17,24-27".
+
+  $map = Sys::Hwloc::Bitmap->alloc;
+  $map->set_range(0,7);
+  $map->set_range(16,17);
+  $map->set_range(24,27);
+  printf "%s\n", $map->sprintf_list;
+  $map->free;
+
+=item B<sscanf_list>
+
+  $rc = $map->sscanf_list( $string );
+
+Parses a Linux L<cpuset>(7) list format ASCII string and stores it in bitmap $map.
+
+Returns 0 on success, -1 on error. If error, the content of $map is undefined.
+
+This method is currently not part of the hwloc C API. It is the reverse of B<$string = $map-E<gt>sprintf_list>.
+
+=item B<includes>
+
+  $rc = $map->includes( $omap );
+
+Tests wether $omap is part of $map.
+
+This method is not part of the hwloc C API. It is equivalent to B<$omap-E<gt>isincluded($map)>.
+
+=item B<or>
+
+  $map->or( $omap );
+
+ORes $map with $omap, similar to B<|=>.
+
+The long version of this in pure hwloc is:
+
+  $tempmap = hwloc_bitmap_alloc;
+  hwloc_bitmap_or($tempmap, $map, $omap);
+  hwloc_bitmap_free($map);
+  $map = $tempmap;
+
+=item B<and>
+
+  $map->and( $omap );
+
+ANDs $map with $omap, similar to B<&=>.
+
+The long version of this in pure hwloc is:
+
+  $tempmap = hwloc_bitmap_alloc;
+  hwloc_bitmap_and($tempmap, $map, $omap);
+  hwloc_bitmap_free($map);
+  $map = $tempmap;
+
+=item B<andnot>
+
+  $map->andnot( $omap );
+
+ANDs $map with the negation of $omap.
+
+The long version of this in pure hwloc is:
+
+  $tempmap = hwloc_bitmap_alloc;
+  hwloc_bitmap_andnot($tempmap, $map, $omap);
+  hwloc_bitmap_free($map);
+  $map = $tempmap;
+
+=item B<xor>
+
+  $map->xor( $omap );
+
+XORes $map with $omap, similar to B<^=>.
+
+The long version of this in pure hwloc is:
+
+  $tempmap = hwloc_bitmap_alloc;
+  hwloc_bitmap_xor($tempmap, $map, $omap);
+  hwloc_bitmap_free($map);
+  $map = $tempmap;
+
+=item B<not>
+
+  $map->not;
+
+Negates $map.
+
+The long version of this in pure hwloc is:
+
+  $tempmap = hwloc_bitmap_alloc;
+  hwloc_bitmap_not($tempmap, $map);
+  hwloc_bitmap_free($map);
+  $map = $tempmap;
+
+=back
+
+=head1 SEE ALSO
+
+L<hwloc>(7),
+L<Sys::Hwloc::Topology>(3pm),
+L<Sys::Hwloc::Obj>(3pm),
+L<Sys::Hwloc::Cpuset>(3pm)
+
+=head1 AUTHOR
+
+Bernd Kallies, E<lt>kallies@zib.deE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011 Zuse Institute Berlin
+
+This package and its accompanying libraries is free software; you can
+redistribute it and/or modify it under the terms of the GPL version 2.0,
+or the Artistic License 2.0. Refer to LICENSE for the full license text.
+
+=cut

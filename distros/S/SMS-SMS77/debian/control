@@ -1,0 +1,14 @@
+Source: libsms-sms77-perl
+Section: perl
+Priority: optional
+Build-Depends: debhelper (>= 5.0.0), libmodule-build-perl, perl (>= 5.8.8-7)
+Maintainer: Markus Benning <werewolf@datenwalze.de>
+Standards-Version: 3.7.2
+
+Package: libsms-sms77-perl
+Architecture: any
+Depends: libwww-perl
+Description: a perl module for sending sms via sms77.de
+ a perl module for sending sms via sms77.de
+ .
+ This description was automagically extracted from the module by dh-make-perl.

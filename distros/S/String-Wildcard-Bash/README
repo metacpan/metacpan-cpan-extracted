@@ -1,0 +1,59 @@
+SYNOPSIS
+
+        use String::Wildcard::Bash qw(
+            $RE_WILDCARD_BASH
+            contains_wildcard
+            convert_wildcard_to_sql
+        );
+    
+        say 1 if contains_wildcard(""));      # -> 0
+        say 1 if contains_wildcard("ab*"));   # -> 1
+        say 1 if contains_wildcard("ab\\*")); # -> 0
+    
+        say convert_wildcard_to_sql("foo*");  # -> "foo%"
+
+DESCRIPTION
+
+FUNCTIONS
+
+ contains_wildcard($str) => bool
+
+    Return true if $str contains wildcard pattern. Wildcard patterns
+    include * (meaning zero or more characters), ? (exactly one character),
+    [...] (character class), {...,} (brace expansion). Can handle
+    escaped/backslash (e.g. foo\* does not contain wildcard, it's foo
+    followed by a literal asterisk *).
+
+    Aside from wildcard, bash does other types of expansions/substitutions
+    too, but these are not considered wildcard. These include tilde
+    expansion (e.g. ~ becomes /home/alice), parameter and variable
+    expansion (e.g. $0 and $HOME), arithmetic expression (e.g. $[1+2]),
+    history (!), and so on.
+
+    Although this module has 'Bash' in its name, this set of wildcards
+    should be applicable to other Unix shells. Haven't checked completely
+    though.
+
+ convert_wildcard_to_sql($str) => str
+
+    Convert bash wildcard to SQL. This includes:
+
+      * converting unescaped * to %
+
+      * converting unescaped ? to _
+
+      * escaping unescaped <%>
+
+      * escaping unescaped _
+
+    Unsupported constructs currently will be passed as-is.
+
+SEE ALSO
+
+    Regexp::Wildcards to convert a string with wildcard pattern to
+    equivalent regexp pattern. Can handle Unix wildcards as well as SQL and
+    DOS/Win32. As of this writing (v1.05), it does not handle character
+    class ([...]) and interprets brace expansion differently than bash.
+
+    Other String::Wildcard::* modules.
+

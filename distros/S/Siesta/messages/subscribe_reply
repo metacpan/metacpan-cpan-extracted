@@ -1,0 +1,7 @@
+Hi,
+ You have been successfully subscribed to [% list.name %]
+
+[% IF newuser %]In addition an account has created for you with the password [% user.password %][% END %]
+
+Enjoy,
+- Siesta::Plugin::Subscribe

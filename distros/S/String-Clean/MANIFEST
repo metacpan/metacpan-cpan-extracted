@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+docs/string-clean.xul
+lib/String/Clean.pm
+lib/String/Clean/XSS.pm
+t/00-load.t
+t/10-string_clean.t
+t/11-clean_XSS.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t

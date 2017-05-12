@@ -1,0 +1,20 @@
+[% active_actions = [] %]
+[% FOREACH action IN c.config.actions.keys %]
+   [% IF (c.config.actions.$action.action_menu.show.grep(context).size
+          OR c.config.actions.$action.action_menu.show == 'global')
+        AND action != c.action
+        AND (NOT c.config.actions.$action.action_menu.head_only OR at_head)
+      %]
+    [% active_actions.push(action) %]
+  [% END %]
+[% END %]
+
+[% IF active_actions.size %]
+<div class="actions">
+  <ul>
+  [% FOREACH action IN active_actions %]
+    <li><a href="[% c.script %]/[% c.repos | uri %]/[% action %][% c.path | url %][% revstr %]">[% IF c.config.actions.$action.action_menu.icon %]<img class="icon" alt="" src="[% c.base_uri %][% c.config.actions.$action.action_menu.icon %]" /> [% END %][%|l%][% c.config.actions.$action.action_menu.link_text %][%END%]</a></li>
+  [% END %]
+  </ul>
+</div>
+[% END %]

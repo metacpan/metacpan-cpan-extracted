@@ -1,0 +1,6 @@
+Revision history for Perl extension Sorauta::SVN::AutoCommit.
+
+0.01  Wed Jan 25 19:06:00 2012
+	- original version; created by h2xs 1.23 with options
+		-AX -n Sorauta::SVN::AutoCommit
+

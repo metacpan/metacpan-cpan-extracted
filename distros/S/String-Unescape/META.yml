@@ -1,0 +1,25 @@
+---
+abstract: 'Unescape perl-escaped string'
+author:
+  - 'Yasutaka ATARASHI <yakex@cpan.org>'
+build_requires:
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: String-Unescape
+requires:
+  perl: 5.008
+resources:
+  homepage: https://github.com/yak1ex/String-Unescape
+  repository: https://github.com/yak1ex/String-Unescape.git
+version: v0.0.3

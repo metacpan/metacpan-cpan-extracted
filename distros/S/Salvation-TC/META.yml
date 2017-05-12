@@ -1,0 +1,30 @@
+---
+abstract: 'Yet another type constraint system'
+author:
+  - 'Gennadiy Filatov <gfilatov@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Salvation-TC
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Class::Inspector: '0'
+  Devel::PartialDump: '0'
+  List::MoreUtils: '0'
+  Module::Load: '0'
+  Scalar::Util: '0'
+  Time::Piece: '0'
+  boolean: '0'
+resources:
+  repository: https://github.com/kainwinterheart/salvation-tc.git
+version: '0.12'

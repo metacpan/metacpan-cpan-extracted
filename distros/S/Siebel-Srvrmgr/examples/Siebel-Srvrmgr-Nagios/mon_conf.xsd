@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="http://code.google.com/p/siebel-monitoring-tools/" xmlns="http://code.google.com/p/siebel-monitoring-tools/" xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified">
+  <xs:element name="siebelMonitor">
+    <xs:complexType>
+      <xs:sequence minOccurs="1" maxOccurs="1">
+        <xs:element name="connection">
+          <xs:complexType>
+            <xs:all maxOccurs="1" minOccurs="1">
+              <xs:element name="siebelServer" type="xs:string" />
+              <xs:element name="srvrmgrPath" type="xs:string" />
+              <xs:element name="srvrmgrExec" type="xs:string" />
+              <xs:element name="siebelEnterprise" type="xs:string" />
+              <xs:element name="siebelGateway" type="xs:string" />
+              <xs:element name="user" type="xs:string" />
+              <xs:element name="password" type="xs:string" />
+            </xs:all>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="servers">
+          <xs:complexType>
+            <xs:sequence minOccurs="1" maxOccurs="unbounded">
+              <xs:element name="server">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="components">
+                      <xs:complexType>
+                        <xs:sequence minOccurs="1" maxOccurs="unbounded">
+                          <xs:element name="component">
+                            <xs:complexType>
+                              <xs:attribute name="alias" type="xs:string" use="required" />
+                              <xs:attribute name="description" type="xs:string" use="required" />
+                              <xs:attribute name="ComponentGroup" type="xs:string" use="required" />
+                              <xs:attribute name="OKStatus" type="xs:string" use="optional" />
+                              <xs:attribute name="criticality" type="xs:integer" use="required" />
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="componentsGroups">
+                      <xs:complexType>
+                        <xs:sequence minOccurs="1" maxOccurs="unbounded">
+                          <xs:element name="componentGroup">
+                            <xs:complexType>
+                              <xs:attribute name="name" type="xs:string" use="required" />
+                              <xs:attribute name="defaultOKStatus" type="xs:string" use="required" />
+                              <xs:attribute name="defaultTaskOKStatus" type="xs:string" use="required" />
+                            </xs:complexType>                            
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute name="name" type="xs:string" use="required" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

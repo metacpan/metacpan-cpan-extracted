@@ -1,0 +1,8 @@
+srvrmgr> list comp def SRProc
+
+CC_NAME                                                                       CT_NAME                                                                       CC_RUNMODE                       CC_ALIAS                         CC_DISP_ENABLE_ST                                              CC_DESC_TEXT                                                                                                          CG_NAME                                                                       CG_ALIAS                         CC_INCARN_NO             
+----------------------------------------------------------------------------  ----------------------------------------------------------------------------  -------------------------------  -------------------------------  -------------------------------------------------------------  --------------------------------------------------------------------------------------------------------------------  ----------------------------------------------------------------------------  -------------------------------  -----------------------  
+Server Request Processor                                                      Server Request Processor (SRP)                                                Interactive                      SRProc                           Active                                                         Server Request scheduler and request/notification store and forward processor                                         Auxiliary System Management                                                   SystemAux                        0                        
+
+1 row returned.
+

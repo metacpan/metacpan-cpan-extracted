@@ -1,0 +1,13 @@
+Revision history for Perl extension Speech::eSpeak.
+
+0.3   Sat Dec 15 2007
+	Remove Perl version requirement.
+	Add several simplified functions.
+
+0.22
+	Most of the API has been implemented except two callbacks.
+
+0.01  Mon May 28 21:05:16 2007
+	- original version; created by h2xs 1.23 with options
+		-n Speech::eSpeak speak_lib.h
+

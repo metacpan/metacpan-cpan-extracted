@@ -1,0 +1,17 @@
+Revision history for Syndication::NITF
+
+  v0.01 - Released to CPAN 12 Dec 2001
+
+    - Debugged in much more depth...
+
+    - added examples/NITFParser.pl, sample program that parses and outputs
+    info describing an NITF file. Doesn't do much more right now.
+
+  v0.01 - Released to CPAN 1 Nov 2001
+
+    - Very basic, just accessor methods and a few support functions so far.
+    Will add more functionality and documentation soon.
+
+    ** This file was automatically generated from **
+    ** doc/Changes.pod. To edit it, see there.    **
+

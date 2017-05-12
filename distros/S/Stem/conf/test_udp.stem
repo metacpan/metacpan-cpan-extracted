@@ -1,0 +1,28 @@
+# test_udp.stem
+[
+	class	=>	'Stem::UDPMsg',
+	name	=>	'send_only',
+	args	=>	[
+#		send_host	=> 'localhost',
+	],
+],
+[
+	class	=>	'Stem::UDPMsg',
+	name	=>	'recv_only',
+	args	=>	[
+		bind_port	=> 9999,
+		bind_host	=> 'localhost',
+		data_addr	=> 'udp_test',
+		timeout_addr	=> 'udp_test',
+		server		=> 1,
+		timeout		=> 1,
+	],
+],
+[
+	class	=>	'Stem::Test::UDP',
+	name	=>	'udp_test',
+	args	=>	[
+		send_addr => 'send_only',
+		send_port => '9999',
+	],
+],

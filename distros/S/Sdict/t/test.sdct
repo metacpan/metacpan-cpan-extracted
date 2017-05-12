@@ -1,0 +1,18 @@
+# $RCSfile: test.sdct,v $
+# $Author: swaj $
+# $Revision: 1.1 $
+#
+<header>
+title =  title
+copyright = copyright
+version = 1.0
+w_lang = en
+a_lang = en
+</header>
+#
+#
+#
+a___letter a
+b___letter b
+c___letter c
+#

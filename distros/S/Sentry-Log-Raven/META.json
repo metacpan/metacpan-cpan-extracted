@@ -1,0 +1,61 @@
+{
+   "abstract" : "sending exception log messages to Sentry.",
+   "author" : [
+      "Dan Gardiner <daniel@theenginuity.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Sentry-Log-Raven",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON" : "2.0",
+            "HTTP::Request::Common" : "0",
+	    "LWP::UserAgent" : "0",
+            "MIME::Base64" : "0",
+            "Time::HiRes" : "0",
+	    "DateTime" : "0",
+ 	    "Sys::Hostname" : "0",
+	    "Mozilla::CA" : "0",
+ 	    "IO::Socket::SSL" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/creator11/Sentry-Log-Raven/issues"
+      },
+      "homepage" : "https://github.com/creator11/Sentry-Log-Raven",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/creator11/Sentry-Log-Raven.git",
+         "web" : "https://github.com/creator11/Sentry-Log-Raven"
+      }
+   },
+   "version" : "1.03"
+}

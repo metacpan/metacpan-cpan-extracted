@@ -1,0 +1,67 @@
+Subtitles 
+=========
+
+Video files (avi, mpeg etc) are sometimes accompanied with subtitles, which are
+currently very popular as text files. The command line tool 'subs' and its perl
+backend Subtitles.pm provide means for simple loading, re-timing, converting,
+and storing these subtitle files. The supported formats are .srt, .sub, .smi,
+and .idx. An example of a GUI subtitle player is included.
+
+USAGE
+=====
+
+Warning: -i is a great feature, but use it with certain caution.
+
+If subtitles are shown too early ( 5 seconds):
+
+   subs -i -b 5 file.sub
+
+If subtitles are for a movie in 25 fps, need to be for 24
+( actual for frame-based formats only ).
+
+   subs -i -a 24/25 file.sub
+
+If subtitles start 1 second too early, but in 1 hour are late in 7 seconds:
+
+   subs -i -p 0 -1 -p 1:00:00 +7 file.sub
+
+Join two parts with 15-second gap
+  
+    subs -o joined.sub -j 15 part1.sub part2.sub 
+
+Split in two after 50 minutes and half a second ( makes basename.1.sub
+and basename.2.sub ).
+
+    subs -o basename.sub -s 50:00.5 toobig.sub
+
+Remove closed caption-specific comments such as '[Sneezing]' or '[Music playing]'
+
+    subs -e 's/[\s-]*\[.*\]\s*\n*//gs' sub.sub
+
+Separate overlapped lines
+
+    subs -O subs.sub
+
+Zip two subtitles together -- read time information from one, text from another
+
+    subs -z time.sub text.sub
+
+INSTALLATION
+============
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+COPYRIGHT AND LICENCE
+=====================
+
+Copyright (C) 2004 Dmitry Karasik
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

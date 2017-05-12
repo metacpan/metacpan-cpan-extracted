@@ -1,0 +1,12 @@
+^MYMETA\.
+^Build$
+^Build.bat$
+^_build
+^blib
+^callparser1\.h$
+^lib/Syntax/Feature/QwComments\.(?:c|o)$
+^Syntax-Feature-QwComments-.*
+^.git/
+~$
+.bak$
+^TODO\.txt$

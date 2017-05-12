@@ -1,0 +1,78 @@
+Seeder version 0.01
+======================
+
+  Seeder is a framework for DNA motif discovery. It is designed for efficient
+  and reliable prediction of regulatory motifs in eukaryotic promoters. In
+  order to generate DNA motifs, you need one positive set of DNA sequences in
+  fasta format and one background set of DNA sequences in fasta format.
+
+CONTACT INFO
+
+  Author      : francois.fauteux2@mail.mcgill.ca
+  Bug reports : contact author
+
+SYSTEM REQUIREMENTS
+
+  - Perl 5.6.0 or later
+
+DEPENDENCIES
+
+  - Carp
+  - List::Util
+  - List::MoreUtils
+  - Algorithm::Loops
+  - Math::Spline
+  - Bioperl
+    o Bio::SeqIO
+    o Bio::LiveSeq::DNA
+    o Bio::LiveSeq::SeqI
+
+INSTALLATION
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+USAGE
+
+  To perform motif discovery, follow this sequence of operations:
+
+  (1) Generation of  the index with the Seeder::Index module.
+
+  (2) Generation of the background distributions with the Seeder::Background
+      module.
+
+  (3) Motif discovery with the Seeder::Finder module.
+
+SUPPORT AND DOCUMENTATION
+
+  After installing, you can find documentation for this module with the
+  perldoc command.
+
+    perldoc Seeder
+    perldoc Seeder::Index
+    perldoc Seeder::Background
+    perldoc Seeder::Finder
+
+  You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Seeder
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Seeder
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Seeder
+
+    Search CPAN
+        http://search.cpan.org/dist/Seeder
+
+
+COPYRIGHT AND LICENCE
+
+  Copyright (C) 2008 François Fauteux
+
+  This program is free software; you can redistribute it and/or modify it
+  under the same terms as Perl itself.

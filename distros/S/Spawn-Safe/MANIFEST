@@ -1,0 +1,5 @@
+Makefile.PL
+MANIFEST
+README
+t/Spawn-Safe.t
+lib/Spawn/Safe.pm

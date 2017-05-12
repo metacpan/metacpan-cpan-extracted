@@ -1,0 +1,16 @@
+Revision history for Perl extension Solr.
+
+0.01  Fri Jan 18 10:47:28 2008
+	- original version; created by h2xs 1.23 with options
+		-XAn Solr
+
+0.02  Wed Feb 6 4:20:00 2008
+	- Added post_file generic method for posting any file to solr server.  Differs from add_by_file in
+	  how logging is handled
+		-Tim Garafola
+
+0.03 Friday Feb 8 11:45:00 2008
+	- Added timeout variable to all HTTPUpdateHandler methods to allow for adjusting LWP UserAgent timeout 
+	  value in posts.
+		-Tim Garafola
+

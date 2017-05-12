@@ -1,0 +1,83 @@
+QUICK DESCRIPTION
+   Sybase::Xfer transfers data between two Sybase servers 
+   with multiple options like specifying a where_clause, 
+   a smart auto_delete option, pump data from a perl sub
+   to name a few.
+   
+   Also comes with a command line wrapper, sybxfer.
+	
+
+INSTALLATION (the usual)
+   perl Makefile.PL [ LIB=<alternate installation> ]
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+   Requires Perl Version 5.005 or beyond
+
+   Requires packages:
+      Sybase::DBlib
+      Getopt::Long
+      Tie::IxHash
+
+
+SYNOPSIS
+   #from perl
+      #!/usr/bin/perl5.005
+      use Sybase::Xfer;
+      $h = new Sybase::Xfer( %options );
+      $h->xfer();
+      $h->done();
+
+   #from shell
+      #!/usr/ksh
+      sybxfer <options> 
+ 
+
+DESCRIPTION (from the pod)
+
+If you're in an environment with multiple servers and you don't want
+to use cross-server joins then this module may be worth a gander. It 
+transfers data from one server to another server row-by-row in memory 
+w/o using an intermediate file. 
+
+To juice things up it can take data from any set of sql commands as 
+long as the output of the sql matches the definition of the target table.
+And it can take data from a perl subroutine if you're into that. 
+
+It also has some smarts to delete rows in the target table before the
+data is transferred by several methods. See the -truncate_flag, -delete_flag
+and -auto_delete switches. 
+
+Everything is controlled by switch settings sent has a hash to the module.
+In essence one describes the from source and the to source and the module
+takes it from there. 
+
+Error handling: 
+
+An attempt was made to build in hooks for robust error reporting via perl
+callbacks. By default, it will print to stderr the data, the column names,
+and their datatypes upon error. This is especially useful when sybase reports
+attempt to load an oversized row warning message. 
+
+ 
+Auto delete: 
+
+More recently the code has been tweaked to handle the condition where data
+is bcp'ed into a table but the row already exists and the desired result 
+to replace the row. Originally, the -delete_flag option was meant for this
+condition. ie. clean out the table via the -where_clause before the bcp in
+was to occur. If this is action is too drastic, however, by using the 
+-auto_delete option one can be more precise and force only those rows about
+to be inserted to be deleted before the bcp in begins. It will bcp the 'key'
+information to a temp table, run a delete (in a loop so as not to blow any 
+log space) via a join between the temp table and target table and then begin
+the bcp in. It's weird but in the right situation it may be exactly what 
+you want. Typically used to manually replicate a table.
+
+
+CONTACTS
+   my e-mail: stephen.sprague@msdw.com 
+

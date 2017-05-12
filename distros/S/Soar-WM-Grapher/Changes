@@ -1,0 +1,7 @@
+Revision history for Soar-WM-Grapher
+
+0.02      2012-12-18 02:25:55 UTC
+	Fixed pod sections which were entirely header due to a missing space.
+
+0.01      2012-12-01 21:35:59 UTC
+	Initial release.

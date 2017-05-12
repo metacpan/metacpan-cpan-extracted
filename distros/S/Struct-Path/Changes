@@ -1,0 +1,80 @@
+Revision history for Struct-Path
+
+0.65    2017-05-04
+        slist() now also returns references to values
+        refactoring
+
+0.64    2017-03-15
+        is_implicit_step() subroutine added
+
+0.63    2017-02-22
+        docs improved
+
+0.62    2017-01-23
+        'paths' opt for spath() added (highly experimental)
+
+0.61    2017-01-15
+        discard path if coderef returned false value
+        slist() refactored (~15% faster now)
+
+0.60    2016-12-05
+        regexp match for hash keys specification supported
+
+0.52    2016-11-28
+        Array's items removal fixed (don't fail on out of range indexes in nostrict mode)
+
+0.51    2016-11-27
+        Array's items removal fixed (don't remove items from specified to the end)
+
+0.50    2016-08-30
+        Coderefs as path steps in spath() supported
+
+0.41    2016-08-19
+        spath_delta(): don't return full second path if it's a subset of first one
+
+0.40    2016-08-18
+        spath_delta() appeared
+
+0.33    2016-08-11
+        Dist corrected, tests refactored
+
+0.32    2016-08-05
+        Any thing as a structure accepted by spath() from now on
+
+0.31    2016-08-01
+        Pod corrected
+
+0.30    2016-07-30
+        slist() appeared
+
+0.21    2016-07-07
+        Addressing method in pod described
+        Unsignificant refactoring
+
+0.20    2016-06-28
+        Path structure format changed (hashes definition)
+
+0.12    2016-06-13
+        Pod and dist corrected
+
+0.11    2016-06-12
+        'expand' opt for spath() implemented
+
+0.10    2016-05-22
+        'delete' opt for spath() implemented
+
+0.09    2016-05-22
+        Pod and dist corrected, unused code removed
+
+0.08    2016-05-16
+        'strict' opt appeared
+        tests and dist cleaned up
+        cosmetics
+
+0.04    2016-04-29
+        'deref' opt for spath() added
+
+0.01    2016-04-27
+        spath() appeared.
+        Draft.
+

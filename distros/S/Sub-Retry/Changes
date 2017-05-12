@@ -1,0 +1,25 @@
+Revision history for Perl extension Sub::Retry
+
+0.06 2013-08-14T01:49:55Z
+
+    - add argument "$n" to &code
+      (Cside_)
+
+0.05 2013-05-01T08:42:39Z
+
+    - Do not sleep in last time
+
+0.04
+
+    - fixed typo in docs(xaicron)
+
+0.03
+
+    - no feature changes
+
+0.02
+
+    - added retry_if(xaicron)
+
+0.01    Thu Jan 13 20:21:11 2011
+        - original version

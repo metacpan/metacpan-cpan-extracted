@@ -1,0 +1,89 @@
+SVG-Rasterize
+
+Rasterize SVG content to pixel graphics.
+
+SVG::Rasterize can be used to rasterize SVG objects to pixel
+graphics building on the perl bindings of the cairo library (by
+default, other underlying rasterization engines could be added). The
+direct rasterization of SVG _files_ might be implemented in the
+future, right now you should have a look at SVG::Parser which can
+generate an SVG object from an svg file.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+CHANGES
+
+For a list of changes have a look at the separate Changes file.
+
+DEPENDENCIES
+
+SVG::Rasterize depends on the following modules:
+
+Class::Accessor,  version 0.30  or higher
+SVG,              version 2.37  or higher
+Cairo,            version 1.061 or higher
+Pango,            version 1.220 or higher
+Params::Validate, version 0.91  or higher
+Scalar::Util,     version 1.19  or higher
+Exception::Class, version 1.29  or higher
+Test::More,       version 0.86  or higher
+Test::Exception   version 0.27  or higher
+Test::Warn        version 0.08  or higher
+
+Furthermore, the underlying cairo and pango C libraries are required
+at least in version 1.8.8 and version 1.22.4, respectively. These
+dependencies are not automatically fulfilled by installing a
+sufficiently high version of the respective Perl module. For pango,
+the functionality of version 1.22 is indeed required. In contrast,
+cairo version 1.2 might actually be enough. However, 1.8 was the
+smallest version I got pango compiled with.
+
+With respect to the module code, the dependency on Cairo and Pango
+is not strict. Both are loaded by SVG::Rasterize::Engine::PangoCairo
+and that module is only loaded dynamically if no other rasterization
+backend has been specified (see documentation for details). However,
+if you do not provide a different backend, which would probably at
+least require a wrapper written by you, then you cannot do anything
+without SVG::Rasterize::Engine::PangoCairo (and thereby Cairo and
+Pango). Therefore I have included them as a strict dependency. You
+could take them out of the Makefile.PL if you know what you are
+doing. However, the distribution will not pass the test suite
+without them.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with
+the perldoc command.
+
+    perldoc SVG::Rasterize
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=SVG-Rasterize
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/SVG-Rasterize
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/SVG-Rasterize
+
+    Search CPAN
+        http://search.cpan.org/dist/SVG-Rasterize/
+
+
+Copyright 2010-2011 Lutz Gehlen.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of either: the GNU General Public License as
+published by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.

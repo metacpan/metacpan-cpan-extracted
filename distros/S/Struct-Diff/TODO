@@ -1,0 +1,9 @@
+*   dvalidate($diff)
+    Recursive diff validator
+
+*   Callbacks for equal type cmp function.
+    Provided function must return diff substructure with custom states.
+    patch() also must provide callback interface to support such new states.
+    profits: traditional text diff may be implemented for texts in leaf nodes and so on.
+
+*   add opt 'path' to dtraverse

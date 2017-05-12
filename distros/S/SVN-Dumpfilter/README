@@ -1,0 +1,41 @@
+SVN-Dumpfilter version 1.00
+===========================
+
+SVN::Dumpfilter filters a Subversion (http://subversion.tigris.org/) dumpfile.
+The file is parsed and a call-back subfunction is called with a hash-reference for
+every 'node'. This function can modify, add or delete headers, properties and
+the content of the node. After processing of the call-back function the node is
+re-assembled and stored in an output file.
+
+The parse and re-assemble processes are done by dedicated subfunctions which
+can be also exported ('internal' tag) for special filters (e.g. merging filter
+which has to write the output file by its own).
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+ Digest::MD5 (Standard module in Perl 5.8.1)
+
+An installation of Subversion is needed to export and import the 
+dumpfiles.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Martin Scharrer
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

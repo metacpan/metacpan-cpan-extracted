@@ -1,0 +1,13 @@
+# Create a domain with a period of 0
+template: create-domain.tt
+
+vars:
+  domain: 09q.co.te
+  owner: id123
+  period: 0
+
+output_assertions:
+  match:
+    - [ '//epp:reason', '/bad value ''0''/', 'Rejected due to period of 0' ]
+  attr_is:
+    - [ '//epp:result', 'code', '2004', 'Response code correct' ]

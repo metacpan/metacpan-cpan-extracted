@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Sub/Exporter/Simple.pm
+t/basic.t
+t/lib/Test.pm
+t/release-kwalitee.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

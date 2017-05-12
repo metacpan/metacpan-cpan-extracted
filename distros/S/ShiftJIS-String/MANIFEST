@@ -1,0 +1,39 @@
+Changes
+README
+Makefile.PL
+MANIFEST	for Pure Perl
+MANIFEST.XS	for XSUB
+String.pm	for Pure Perl
+String.pod
+enableXS
+disableXS
+String.xsX	for XSUB
+String.pmX	for XSUB
+META.yml
+samples/trans.txt
+String/Japanese.pod
+t/alnum.t
+t/capture.t
+t/index.t
+t/issjis.t
+t/kana1.t
+t/kana2.t
+t/kana3.t
+t/kana4.t
+t/kana5.t
+t/kana6.t
+t/kana7.t
+t/length.t
+t/long.t
+t/mkrange.t
+t/strcmp.t
+t/strxfrm.t
+t/strsplit.t
+t/strspn.t
+t/subst.t
+t/substr.t
+t/test.t
+t/tr.t
+t/trhisto.t
+t/trim.t
+t/unary.t

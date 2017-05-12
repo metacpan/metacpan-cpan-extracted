@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/String-Simrank.t
+lib/String/Simrank.pm

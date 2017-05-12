@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/String-Examine.t
+lib/String/Examine.pm
+META.yml                                 Module meta-data (added by MakeMaker)

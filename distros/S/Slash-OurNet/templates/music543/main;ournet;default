@@ -1,0 +1,44 @@
+__section__
+default
+__description__
+Print out all the articles
+
+* title = passed to titlebar
+* width = passed to titlebar
+* articles = all articles
+
+__title__
+
+__page__
+ournet
+__lang__
+en_US
+__name__
+main
+__template__
+[% INCLUDE titlebar %]
+
+<table width=100% cellpadding=3 cellspacing=0 border=11
+             bordercolor="#78859d">
+    <tr><td>[% loc('Subject') %]</td><td>[% loc('From') %]</td><td>[% loc('Date') %]</td></tr>
+[% FOREACH articles %]
+    <tr><td>
+    <a class="link" href="[% url %]">[% title %]</a>
+    
+    </td><td align=center width="1%"><nobr>
+    [% author %]
+    </nobr></td>
+    <td align=center width="1%"><nobr>
+    <a class="date" name="[% header.Date %]">20[% date %]</a>
+    </nobr></td></tr>
+
+    [% IF preview %]
+    <tr><td bgcolor="black" colspan=3 class="TRANS"><tt>
+    <span class="description">[% preview %]</span>
+    </tt></td></tr>
+    [% END %]
+[% END %]
+</table>
+
+__seclev__
+10000

@@ -1,0 +1,78 @@
+[% PROCESS header %]
+
+[% PROCESS _action_menu %]
+[% PROCESS _log_msg %]
+
+<div class="title">
+  <p align="right">[%|l%](show last)[%END%]
+  [% FOREACH items_per_page = [20, 50, 100, '(all)'] %]
+    [% IF items_per_page == limit %]
+      [%|l%][% items_per_page %][%END%]
+    [% ELSE %]
+      <a href="[% c.script %]/[% c.repos | uri %]/log[% c.path | url %]?limit=[% items_per_page %][% IF rev %];rev=[% rev %][%END%]">[%|l%][% items_per_page %][%END%]</a>
+    [% END %]
+    [% IF items_per_page != '(all)' %], [% END %]
+  [% END %]<br />
+  [% IF ! at_oldest %]
+  <a href="[% c.script %]/[% c.repos | uri %]/log[% c.path | url %]?rev=[% revs.last.rev - 1%]">[%|l%](next page)[%END%]</a>
+  [% END %]</p>
+</div>
+
+[% IF ! isdir %]
+<form action="[% c.script %]/[% c.repos | uri %]/diff[% c.path | url %]" method="get">
+<input type="submit" value="[%|l%](diff selected revisions)[%END%]"/>
+[% END %]
+<table id="chglist" class="listing" summary="[%|l%](revision log)[%END%]">
+  <thead>
+    <tr>
+[% IF ! isdir %]
+      <th></th>
+[% END %]
+      <th class="date">[%|l%](date)[%END%]</th>
+      <th class="rev">[%|l%](file)[%END%]</th>
+      <th class="chgset">[%|l%](revision)[%END%]</th>
+      <th class="author">[%|l%](author)[%END%]</th>
+      [% IF ! isdir %]<th class="diff">[%|l%](diff)[%END%]</th>[% END %]
+      <th class="summary">[%|l%](revision log)[%END%]</th>
+    </tr>
+  </thead>
+  <tbody>
+  [% FOREACH revs %]
+  <tr class="[% loop.count % 2 ? "even" : "odd" %]">
+[% IF ! isdir %]
+    <td><input type="checkbox" name="revs" value="[% rev %]" /></td>
+[% END %]
+    <td class="date">[% date %]</td>
+    <td class="rev">[% IF isdir %]
+        <a href="[% c.script %]/[% c.repos | uri %]/browse[% c.path | url %]?rev=[% rev %]">[% rev %]</a>
+      [% ELSE %]
+        <a href="[% c.script %]/[% c.repos | uri %]/view[% c.path | url %]?rev=[% rev %]">[% rev %]</a>
+      [% END %]</td>
+    <td class="chgset"><a href="[% c.script %]/[% c.repos | uri %]/revision/?rev=[% rev %]">[% rev %]</a></td>
+    <td class="author">[% author || '(no author)' %]</td>
+    [% IF ! isdir %]<td class="diff">[% UNLESS loop.count == loop.size %]
+        [% prev = loop.count %]
+        <a href="[% c.script %]/[% c.repos | uri %]/diff[% c.path | url %]?rev1=[% rev - 1 %];rev2=[% rev %]">HTML</a> | <a href="[% c.script %]/[% c.repos %]/diff[% c.path %]?rev1=[% rev - 1 %];rev2=[% rev %];mime=text/plain">TEXT</a><br/>
+      [% END %]</td>[% END %]
+    <td class="summary">[% log_msg(msg) %]
+
+      [% FOREACH pk = paths %]
+        [% IF pk.value.isdir %]
+          [% IF pk.value.copyfrom %]
+            Copied from <a href="[% c.script %]/[% c.repos | uri %]/browse[% pk.value.copyfrom | url %]?rev=[% pk.value.copyfromrev %]">[%|l(pk.value.copyfrom, pk.value.copyfromrev)%]%1:%2[%END%]</a><br />
+          [% END %]
+        [% ELSE %]
+          [% IF pk.value.copyfrom %]
+            Copied from <a href="[% c.script %]/[% c.repos | uri %]/log[% pk.value.copyfrom | url %]?rev=[% pk.value.copyfromrev %]">[%|l(pk.value.copyfrom, pk.value.copyfromrev)%]%1:%2[%END%]</a><br />
+          [% END %]
+        [% END %]
+      [% END %]
+    </td>
+  </tr>
+  [% END %]
+  </tbody>
+</table>
+[% IF ! isdir %]
+</form>
+[% END %]
+[% PROCESS footer %]

@@ -1,0 +1,15 @@
+FAILED: 0
+CMD: 2 [  ]
+ALT [0]: TESTDIR/bin/succ
+STDOUT:
+This is the 'succ' command
+It will succeed
+STDERR:
+It will give a warning
+CMD: 3 [  ]
+ALT [0]: TESTDIR/bin/succ.2
+STDOUT:
+This is the 'succ.2' command
+It will succeed too
+STDERR:
+It will give a warning too

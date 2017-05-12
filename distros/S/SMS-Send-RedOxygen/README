@@ -1,0 +1,61 @@
+NAME
+    SMS::Send::RedOxygen - SMS::Send driver for RedOxygen.com RedSMS
+
+SYNOPSIS
+      # Create a RedOxygen sender. For now, only AccountID+Password authentication
+      # is supported; anonymous IP address based sending won't work.
+      #
+      my $send = SMS::Send->new( 
+          'RedOxygen',
+          _accountid => 'RedOxygenAccountID',
+          _password => 'RedOxygenPassword',
+          _email => 'RegisteredEmail'
+      );
+  
+      # Send a message
+      $send->send_sms(
+          text => 'Hi there',
+          to   => '+61 (4) 1234 5678',
+      );
+
+      # An exception is thrown if the web API replies with a HTTP status
+      # code other than a 2xx OK or if the reply body error code is anything
+      # except 0000. The error can be found in the exception text.
+
+DESCRIPTION
+    This SMS::Send driver bridges the SMS::Send API to RedOxygen's web API
+    for SMS sending. RedOxygen uses custom message formats and response
+    codes and can't just be used via simple JSON POST calls.
+
+    To use this driver you must have a RedOxygen account, either a trial or
+    full account. RedOxygen's rates are not flat across all regions on most
+    accounts though such accounts may be negoated.
+
+    This driver requires numbers to be in full international format.
+
+    LWP::UserAgent must be available for this module to function. This is
+    typically packaged as libwww-perl on many systems, and can also be
+    installed from CPAN.
+
+LICENSE
+    The same as for Perl itself
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=SMS-Send-RedOxygen>
+
+    For other issues, contact the author.
+
+AUTHOR
+    Craig Ringer <craig@2ndquadrant.com> using SMS::Send by Adam Kennedy.
+
+COPYRIGHT
+    Copyright 2012 Craig Ringer
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

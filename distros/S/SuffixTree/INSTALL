@@ -1,0 +1,6 @@
+To install the script and create man pages use the commands:
+
+  perl Makefile.PL
+  make
+  make test
+  make install          

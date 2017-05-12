@@ -1,0 +1,15 @@
+#!/usr/bin/perl -w
+# $Id: svndump_nullfilter 278 2007-01-13 12:37:13Z martin $
+# Copyright (C) 2006 by Martin Scharrer <martin@scharrer-online.de>
+# This is free software under the GPL.
+
+use strict;
+use SVN::Dumpfilter qw(Dumpfilter null_filter);
+
+my $dumpfile = shift @ARGV;
+my $outfile  = shift @ARGV;
+
+Dumpfilter($dumpfile, $outfile, \&null_filter);
+
+exit(0);
+__END__

@@ -1,0 +1,49 @@
+---
+abstract: 'incremental string with your rule'
+author:
+  - 'issm <issmxx@gmail.com>'
+build_requires:
+  Test::Exception: '0.32'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: String-Incremental
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  String::Incremental:
+    file: lib/String/Incremental.pm
+    version: '0.01'
+  String::Incremental::Char:
+    file: lib/String/Incremental/Char.pm
+  String::Incremental::FormatParser:
+    file: lib/String/Incremental/FormatParser.pm
+  String::Incremental::String:
+    file: lib/String/Incremental/String.pm
+  String::Incremental::Types:
+    file: lib/String/Incremental/Types.pm
+requires:
+  Data::Validator: '1.04'
+  Mouse: v2.3.0
+  MouseX::Types: '0.06'
+  Try::Tiny: '0.22'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/issm/p5-String-Incremental/issues
+  homepage: https://github.com/issm/p5-String-Incremental
+  repository: git://github.com/issm/p5-String-Incremental.git
+version: '0.01'

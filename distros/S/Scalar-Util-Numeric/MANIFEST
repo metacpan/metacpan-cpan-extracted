@@ -1,0 +1,12 @@
+Changes
+lib/Scalar/Util/Numeric.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+Numeric.xs
+ppport.h
+README
+t/all.t
+t/pod.t
+META.json                                Module JSON meta-data (added by MakeMaker)

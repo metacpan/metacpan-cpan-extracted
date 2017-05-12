@@ -1,0 +1,179 @@
+Revision history for Search-OpenSearch
+
+0.409 08 June 2015
+ - fix Makefile.PL reqs for 0.408
+
+0.408 08 June 2015
+ - swapped namespace::autoclean in, namespace::sweep out. See https://rt.cpan.org/Ticket/Display.html?id=104822
+
+0.407 19 Aug 2014
+ - fix bug in mtime response getter, for subclasses that override results()
+
+0.406 15 Aug 2014
+ - Response->add_attribute no longer hardcodes type of Maybe[Str]
+
+0.405 24 July 2014
+ - doc tweeks to remove references to Rose::ObjectX::CAF and SWISH::Prog.
+
+0.404 09 July 2014
+ - set 'cache' method lazy attribute so that init_cache is deferred till after
+   init_cache_ok is called.
+
+0.403 09 July 2014
+ - switch from 'default' to 'builder' attribute in method defs, as that
+   is more reliable when used with Maybe [ Foo ]
+
+0.402 03 July 2014
+ - fix min version of Type::Tiny (https://rt.cpan.org/Public/Bug/Display.html?id=96917)
+
+0.401 02 July 2014
+ - add Response->get_mtime() and 'updated' field in JSON responses
+   to match the existing 'updated' field in XML response.
+
+0.400 07 June 2014
+ - official Moose release
+
+0.399_05 05 June 2014
+ - refactor Types library to follow Type::Tiny::Manual::Libraries style
+
+0.399_04 23 April 2014
+ - fix bug in Response->facets type declaration (HashRef not ArrayRef)
+
+0.399_03 23 April 2014
+ - add missing indexer() attribute
+ - add missing init_link method
+
+0.399_02 23 April 2014
+ - make attributes with a 'builder' also 'lazy' to resolve load-order problems
+
+0.399_01 22 April 2014
+ - port to Moose
+
+0.31 02 March 2014
+ - check for !defined $query rather than !$query
+
+0.30 16 Oct 2013
+ - coerce facet query input to UTF8
+ - fix double-encoding bug in json_query attribute of JSON response
+
+0.29 16 Oct 2013
+ - coerce all query input to UTF8
+
+0.28 01 Oct 2013
+ - packaging clean up only
+
+0.27 4 March 2013
+ - add init_cache_key_seed() method
+
+0.26 28 Feb 2013
+ - bump Search::Tools dependency to skip over 0.89 S::T bug.
+
+0.25 12 Feb 2013
+ - add strip_markup => 1 to default snipper_config
+
+0.24 18 Dec 2012
+ - add Engine->response_version
+
+0.23 17 Oct 2012
+ - add suggester() method to Engine and suggestions() to Response
+
+0.22 10 Oct 2012
+ - debug param now passed from Engine to Response
+ - charset encoding UTF-8 now passed explicitly in Response->content_type
+   for JSON and XML.
+
+0.21 19 Sept 2012
+ - add Tiny Response class
+ - add 'x' param support for returning a subset of an Engine's field
+   values, per request.
+
+0.20 3 Sept 2012
+ - move XML-escaping of field values *after* snipping is performed, in case
+   the Snipper breaks the markup. Most noticeable with quote and apos
+   entities.
+ - add Engine->get_allowed_http_methods method
+
+0.19 22 Aug 2012
+ - change XML response format to more closely align with OpenSearch (Atom)
+   spec, particularly for SOS-specific metadata
+
+0.18 21 Aug 2012
+ - add array_field_values option to Engine
+
+0.17 6 Aug 2012
+ - add version() to Response and Engine classes.
+ - add error() method to Response and Engine classes.
+ - switch to Module::Install
+
+0.16 26 July 2012
+ - add missing dependency on Data::UUID
+ - add content_type() get method on Response subclasses
+ - add Response::ExtJS class
+ - add get_facets_cache_key() method to Engine
+ - refactor Response->add_attribute() method
+
+0.15 22 Oct 2011
+ - add 't' param, deprecating 'format'
+ - add 'u' param, deprecating 'link'
+ - add searcher_config and indexer_config and flesh out new() pod.
+
+0.14 26 Sept 2011
+ - create UUID string instead of binary in XML response format 
+ - default hiliter config now uses tag <b class="h"> instead of <span
+   style="...">
+ - add init_default_response_format to base Engine class.
+
+0.13 19 June 2011
+ - logger dependent on debug==true
+
+0.12 14 Jan 2011
+ - add Response->add_attribute feature
+
+0.11 07 Jan 2011
+ - add has_rest_api feature to base Engine class.
+ - add debug attribute to Engine class.
+
+0.10 30 Nov 2010
+ - pass original args to Engine->search() through to build_results() and
+   build_facets(). This (in theory) should make it easier for subclasses to
+   extend the functionality of search() without needing to override it.
+
+0.09 25 July 2010
+ - fix bug and clarify docs w.r.t 'c', 'f' and 'r' params to
+   Engine->search()
+ - add "query_json" object to Response
+
+0.08 26 June 2010
+ - add missing 'order' param to default Searcher params
+ - add 'parser_config' to Engine
+
+0.07 22 June 2010
+ - refactor base classes to move most functionality into the Engine, and
+   added 'r' option to not return results (for facets only, e.g.).
+ - stringify() Response classes should always return UTF-8 octets (bytes) 
+   not characters. This should ensure no "wide character" warnings when
+   printing and will work with S::OS::Server::Plack, which requires bytes.
+ - add default_boolop support with 'b' param
+ - add parsed_query to Response
+
+0.06 23 May 2010
+ - add 'engine' to Response
+ - add client tests with WWW::OpenSearch
+
+0.05 22 Feb 2010
+ - add facet support
+
+0.04 05 Feb 2010
+ - fix off-by-one error in fetch_results()
+
+0.03 03 Feb 2010
+ - drop XML::Atom in favor of hand-rolled XML with Search::Tools::XML. This
+   is primarily to avoid double-escaping the highlighting.
+ - add snippet and highlighting support via Search::Tools.
+
+0.02 02 Feb 2010
+ - initial XML support, via XML::Atom.
+
+0.01 01 Feb 2010
+ - First version, released on an unsuspecting world.
+

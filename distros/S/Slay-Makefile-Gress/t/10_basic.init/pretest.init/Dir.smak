@@ -1,0 +1,8 @@
+test: washington.ok adams.ok
+
+pretest:
+        touch washington.dat
+        echo Bad > adams.dat
+
+%.ok:   %.dat
+        cp $DEP0 $TARGET

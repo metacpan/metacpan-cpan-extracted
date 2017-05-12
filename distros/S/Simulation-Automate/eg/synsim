@@ -1,0 +1,17 @@
+#!/usr/bin/perl -w
+#eval '/usr/bin/env perl -w $0 ${1+"$@"}'
+#if 0;	
+
+#$Id: synsim,v 1.3 2003/08/14 13:31:06 wim Exp $
+
+#setpgrp(0,$$);
+
+use strict;
+use lib '.','..';
+
+#first check for remote host.
+#to keep it easy, if the remote host is not accessible, sinsim stops.
+
+use Simulation::Automate;
+
+&synsim();

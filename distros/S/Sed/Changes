@@ -1,0 +1,66 @@
+2002-01-23 08:16  dlc
+
+	* Sed.pm: Added more documentation.
+
+2002-01-18 09:23  dlc
+
+	* Changes: cvs2cl generated changelog
+
+2002-01-18 09:23  dlc
+
+	* MANIFEST, Sed.pm, test.pl, t/01load.t, t/02tr.t, t/03caps.t:
+	Added t directory and 3 tests within it; removed test.pl.  Updated
+	MANIFEST to reflect this change.  Modified Sed.pm.
+
+2001-09-19 16:59  dlc
+
+	* Sed.pm, test.pl: Changes.
+
+2001-09-18 08:41  dlc
+
+	* Sed.pm: Added copyright info.
+
+2001-08-21 08:46  dlc
+
+	* test.pl: Added more tests.
+
+2001-08-21 08:45  dlc
+
+	* Sed.pm: Added a lot of POD and a few examples.
+
+2001-08-17 10:25  dlc
+
+	* Sed.pm: POD typo.
+
+2001-08-17 10:25  dlc
+
+	* Sed.pm: Added some examples.
+
+2001-08-10 16:06  dlc
+
+	* Sed.pm: Added pod.
+
+2001-08-10 15:09  dlc
+
+	* test.pl: Added some basic tests.
+
+2001-08-10 15:04  dlc
+
+	* Sed.pm: Added more concrete example.	Added (slightly) more pod.
+
+2001-07-19 17:08  dlc
+
+	* Changes, MANIFEST, Makefile.PL, test.pl: Initial revision
+
+2001-07-19 17:08  dlc
+
+	* Changes, MANIFEST, Makefile.PL, test.pl: Sed
+
+2001-07-19 17:02  dlc
+
+	* Sed.pm: Removed silliness.
+
+2001-05-03 12:01  darren
+
+	* Sed.pm: Initial revision
+

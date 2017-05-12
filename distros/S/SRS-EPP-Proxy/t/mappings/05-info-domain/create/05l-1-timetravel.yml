@@ -1,0 +1,3 @@
+# Go forward 15 days where all the tests will be run
+#  This is so the domain can be cancelled without cancelling in grace period
+forward: 15 days

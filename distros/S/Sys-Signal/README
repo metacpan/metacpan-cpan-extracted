@@ -1,0 +1,26 @@
+NAME
+    Sys::Signal - Set signal handlers with restoration of existing C
+    sighandler
+
+SYNOPSIS
+      use Sys::Signal ();
+      eval {    
+          my $h = Sys::Signal->set(ALRM => sub { die "timeout\n" });    
+          alarm $timeout;   
+          ... do something thay may timeout ...
+          alarm 0;    
+      };    
+      die $@ if $@;
+
+DESCRIPTION
+    The *Sys::Signal* *set* method works much like `local $SIG{FOO}', but
+    with the added functionality of restoring the underlying signal handler
+    to the previous C function, rather than Perl's. Unless, of course,
+    Perl's C signal handler was the previous handler.
+
+AUTHOR
+    Doug MacEachern
+
+SEE ALSO
+    perl(1).
+

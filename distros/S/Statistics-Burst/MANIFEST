@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Statistics-Burst.t
+lib/Statistics/Burst.pm

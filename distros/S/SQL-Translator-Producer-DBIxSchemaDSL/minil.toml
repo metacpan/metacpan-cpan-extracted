@@ -1,0 +1,6 @@
+name = "SQL-Translator-Producer-DBIxSchemaDSL"
+badges = ["travis"]
+authority="cpan:KARUPA"
+
+module_maker="ModuleBuildTiny"
+

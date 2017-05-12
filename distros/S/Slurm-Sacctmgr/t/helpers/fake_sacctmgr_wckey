@@ -1,0 +1,330 @@
+#!/bin/sh
+#
+#Fake sacctmgr show wckey results for testing
+
+#Updated to handle preTRES (Slurm v 14.x.y) and postTRES (Slurm 15.x.y) data
+#USe env var FAKE_SLURM_VERSION to set this
+#Also accepts --version and format= arguments
+
+#Order of fields is now controllable via format option
+#Below is the default if no format given
+FORMAT_FIELDS="wckey cluster user"
+
+verbose_flag=
+
+print_version()
+{	version=$1
+	cat - <<EOF
+slurm $version
+EOF
+	exit 0
+}
+
+print_header()
+{
+    if [ "x$verbose_flag" = "xyes" ]; then
+	tmptext=
+	for fld in $FORMAT_FIELDS
+	do
+		case $fld in
+		#-----	Common stuff
+		    cluster)
+			tmptext="${tmptext}Cluster"
+			;;
+		    user)
+			tmptext="${tmptext}User"
+			;;
+		    wckey)
+			tmptext="${tmptext}WCKey"
+			;;
+
+		#-----	no preTRES stuff
+		#-----	no postTRES stuff
+		#-----	ERROR
+		    *)
+			echo >&2 "Unrecognized field name $fld in format string, aborting"
+			exit 1;
+			;;
+		esac
+		tmptext="${tmptext}|"
+	done
+	echo $tmptext
+	#Print at most once
+	verbose_flag=
+    fi
+}
+
+
+print_wckey()
+{	
+	#Clear values
+	#	common
+	tmp_cluster=
+	tmp_user=
+	tmp_wckey=
+
+	#no preTRES stuff
+	#no postTRES stuff
+
+	#Set values
+	while [ $# -gt 0 ]
+	do
+		key=$1
+		val=$1
+		shift
+		key=`echo $key | sed -e 's/=.*$//'`
+		val=`echo $val | sed -e 's/^[^=]*=//'`
+		#echo >&2 "$key = $val"
+
+		case $key in
+		#----	Common fields
+		    cluster)
+			tmp_cluster=$val
+			;;
+		    user)
+			tmp_user=$val
+			;;
+		    wckey)
+			tmp_wckey=$val
+			;;
+
+		#----	no preTRES fields
+		#----	postTRES fields
+		#----	ERROR
+		    *)
+			echo >&2 "Unrecognized parm $key, aborting"
+			exit 1
+			;;
+		esac
+	done
+		    
+	#Print values
+	tmptext=
+	for fld in $FORMAT_FIELDS
+	do
+		case $fld in
+		#----	common fields
+		    cluster)
+			tmptext="${tmptext}${tmp_cluster}"
+			;;
+		    user)
+			tmptext="${tmptext}${tmp_user}"
+			;;
+		    wckey)
+			tmptext="${tmptext}${tmp_wckey}"
+			;;
+
+		#----	preTRES fields
+		#----	preTRES fields
+		#----	ERROR
+		    *)
+			echo >&2 "Unrecognized field name $fld in format string, aborting"
+			exit 1;
+			;;
+		esac
+		tmptext="${tmptext}|"
+	done
+	echo $tmptext
+
+
+}
+
+print_aaa_ys_payerle()
+{	print_header
+	print_wckey wckey='aaa' cluster='yottascale' user='payerle'
+}
+
+print_aaa_ys_root()
+{	print_header
+	print_wckey wckey='aaa' cluster='yottascale' user='root'
+}
+
+print_bbb_ys_root()
+{	print_header
+	print_wckey wckey='bbb' cluster='yottascale' user='root'
+}
+
+print_ccc_test1_payerle()
+{	print_header
+	print_wckey wckey='ccc' cluster='test1' user='payerle'
+}
+
+print_ddd_ys_payerle()
+{	print_header
+	print_wckey wckey='ddd' cluster='yottascale' user='payerle'
+}
+
+print_aaa()
+{	print_header
+	print_aaa_ys_payerle
+	print_aaa_ys_root
+}
+
+print_bbb()
+{	print_header
+	print_bbb_ys_root
+}
+
+print_ccc()
+{	print_header
+	print_ccc_test1_payerle
+}
+
+print_ddd()
+{	print_header
+	print_ddd_ys_payerle
+}
+
+print_payerle()
+{	print_header
+	print_aaa_ys_payerle
+	print_ccc_test1_payerle
+	print_ddd_ys_payerle
+}
+
+print_root()
+{	print_header
+	print_aaa_ys_root
+	print_bbb_ys_root
+}
+
+print_all()
+{	print_header
+	print_aaa
+	print_bbb
+	print_ccc
+	print_ddd
+}
+
+print_none()
+{	print_header
+}
+
+#Parse options
+wckey_flag=
+user_flag=
+cluster_flag=
+
+while [ $# -gt 0 ]
+do
+	arg=$1
+	shift
+
+	case $arg in
+	    --version)
+		#Print version and exit
+		if [ "x$FAKE_SLURM_VERSION" = "x" ]; then
+			print_version 14
+		else
+			print_version $FAKE_SLURM_VERSION
+		fi
+		exit 0
+		;;
+	    format=*)
+		#Set our format string
+		tmp=`echo $arg | sed -e 's/^format=//' -e "s/'//g" -e 's/"//g' -e 's/,/ /g'`
+		FORMAT_FIELDS=$tmp
+		;;
+	    wckey=*)
+		tmp=`echo $arg | sed -e 's/^wckey=//' -e "s/'//g" -e 's/"//g' `
+		wckey_flag=$tmp
+		;;
+	    name=*)
+		tmp=`echo $arg | sed -e 's/^name=//' -e "s/'//g" -e 's/"//g' `
+		wckey_flag=$tmp
+		;;
+	    cluster=* )
+		tmp=`echo $arg | sed -e 's/^cluster=//' -e "s/'//g" -e 's/"//g' `
+		cluster_flag=$tmp
+		;;
+	     user=* )
+		tmp=`echo $arg | sed -e 's/^user=//' -e "s/'//g" -e 's/"//g' `
+		user_flag=$tmp
+		;;
+	     -v|--verbose)
+		verbose_flag=yes
+		;;
+	esac
+done
+
+if [ "x${wckey_flag}" != "x" ]; then
+	case $wckey_flag in
+	   aaa)
+		if [ "x${user_flag}" != "x" ]; then
+			case $user_flag in
+			    root)
+				print_aaa_ys_root
+				;;
+			    payerle)
+				print_aaa_ys_payerle
+				;;
+			    *)
+				print_none
+				;;
+			esac
+		else
+			print_aaa
+		fi
+		;;
+	   bbb)
+		if [ "x${user_flag}" != "x" ]; then
+			case $user_flag in
+			    root)
+				print_bbb_ys_root
+				;;
+			    *)
+				print_none
+				;;
+			esac
+		else
+			print_bbb
+		fi
+		;;
+	   ccc)
+		if [ "x${user_flag}" != "x" ]; then
+			case $user_flag in
+			    payerle)
+				print_ccc_test1_payerle
+				;;
+			    *)
+				print_none
+				;;
+			esac
+		else
+			print_ccc
+		fi
+		;;
+	   ddd)
+		if [ "x${user_flag}" != "x" ]; then
+			case $user_flag in
+			    payerle)
+				print_ddd_ys_payerle
+				;;
+			    *)
+				print_none
+				;;
+			esac
+		else
+			print_ddd
+		fi
+		;;
+	   *)
+		print_none
+		;;
+	esac
+elif [ "x${user_flag}" != "x" ]; then
+	case $user_flag in
+	    root)
+		print_root
+		;;
+	    payerle)
+		print_payerle
+		;;
+	    *)
+		print_none
+		;;
+	esac
+else
+	print_all
+fi
+

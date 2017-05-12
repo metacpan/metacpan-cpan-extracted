@@ -1,0 +1,23 @@
+--- 
+abstract: Base class for pcAnywhere utility functions
+author: 
+  - Darren Kulp, C<< <darren at kulp.ch> >>, based on code from Stephen J. Friedl,
+build_requires: 
+  Test::More: 0.42
+distribution_type: module
+generated_by: Module::Install version 0.680
+license: unknown
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Symantec-PCAnywhere-Profile
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Carp: 0
+  Compress::Zlib: 0
+  Digest::MD5: 0
+  MIME::Base64: 0
+version: 0.06

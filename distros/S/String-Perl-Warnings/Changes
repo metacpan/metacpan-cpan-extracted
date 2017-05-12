@@ -1,0 +1,84 @@
+==================================================
+Changes from 2010-01-16 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 1.16 at 2015-01-15 12:18:42 +0000
+-----------------------------------------
+
+  Change: ecafecb996962722c31cf4ee4e0de67356ab9003
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2015-01-15 12:18:42 +0000
+
+    Updated the range of perls in documentation 
+
+-----------------------------------------
+version 1.14 at 2015-01-15 12:14:09 +0000
+-----------------------------------------
+
+  Change: 85ee2b44379cf0bbc8c3938042c7e108f7e1fab1
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2015-01-15 12:14:09 +0000
+
+    Added new perl warnings since the last release 
+
+-----------------------------------------
+version 1.12 at 2013-09-30 12:23:42 +0000
+-----------------------------------------
+
+  Change: 6ea31d7ed48a1914e951ec1f4ecce9ee6be3cf54
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-09-30 13:23:42 +0000
+
+    Remove the other \c type warning too 
+
+-----------------------------------------
+version 1.10 at 2013-09-29 17:26:29 +0000
+-----------------------------------------
+
+  Change: 7ae0131a63b01880d73863629216d3e8d403bfdf
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-09-29 18:26:29 +0000
+
+    Just ignore the \c{ warnings for now 
+
+-----------------------------------------
+version 1.08 at 2013-09-28 15:38:53 +0000
+-----------------------------------------
+
+  Change: 9902c4092a936c0fba15407e6b048da7c9eea9c2
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-09-28 16:38:53 +0000
+
+    Convert distribution to Dist::Zilla 
+
+  Change: 0e3c3e09e1e77ca19555f770e534453e8ff033ae
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-09-28 16:13:04 +0000
+
+    Bring warnings up to date with v5.18.1 
+
+-----------------------------------------
+version 1.06 at 2011-06-17 11:05:03 +0000
+-----------------------------------------
+
+  Change: 148f37524b0c5399afa66bf04c80cad73a406ed2
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-06-17 12:05:03 +0000
+
+    Made efficiency refactorings. All the performance hit should be up
+    front now. 
+
+-----------------------------------------
+version 1.04 at 2010-04-15 22:26:00 +0000
+-----------------------------------------
+
+  Change: 1bacd63aa03e38ec6bf3d71f2938149efe156bd5
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2010-04-15 23:26:00 +0000
+
+    Add all warnings for all stable perls from 5.6.0 -> 5.12.0 
+
+================================================
+Plus 2 releases after 2010-01-16 00:00:00 +0000.
+================================================

@@ -1,0 +1,68 @@
+{
+   "abstract" : "Wrap external command with a DWIM sub",
+   "author" : [
+      "Olivier Mengu\u00e9 <dolmen@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "System-Sub",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::More" : "0.88",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "File::Which" : "0",
+            "IPC::Run" : "0",
+            "Scalar::Util" : "1.11",
+            "Sub::Name" : "0",
+            "Symbol" : "0",
+            "constant" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "blib" : "1.01",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/dolmen/p5-System-Sub",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dolmen/p5-System-Sub.git",
+         "web" : "https://github.com/dolmen/p5-System-Sub"
+      }
+   },
+   "version" : "0.162800"
+}
+

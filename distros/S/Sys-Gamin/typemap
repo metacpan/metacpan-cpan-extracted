@@ -1,0 +1,4 @@
+FAMEvent *					T_PTROBJ
+FAMRequest *					T_PTROBJ
+FAMConnection *					T_PTROBJ
+FAMCodes					T_IV

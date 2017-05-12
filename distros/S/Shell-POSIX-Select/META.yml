@@ -1,0 +1,26 @@
+---
+abstract: "The POSIX Shell's \"select\" loop for Perl"
+author:
+  - 'Tim Maher <tim@teachmeperl.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Shell-POSIX-Select
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  File::Spec::Functions: '0'
+  Filter::Simple: '0'
+  Text::Balanced: '1.89'
+version: '0.06'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,21 @@
+Revision history for perl distribution SolarBeam
+
+0.04 2016-11-18T14:38:32+0100
+ - Improved error handling in SolarBeam::Respons
+
+0.03 2016-11-17T09:20:47+0100
+ - Fix handling of $tx error
+
+0.02 2016-11-07T13:12:45+0100
+ - Fix JSON error handling when parsing response
+ - Fix SolarBeam::search(): $ua->post() need a plain hash and not Mojo::Parameters
+ - Add SolarBeam::Response::facet_fields_as_hashes()
+ - Change SolarBeam::url() is a method that coerce string into Mojo::URL
+ - Change SolarBeam::Response::parse() to take Mojo::Transaction object
+ - Rename SolarBeam::Response::QTime() to query_time()
+ - Rename SolarBeam::Response::numFound() to num_found()
+ - Remove SolarBeam::Response::ok()
+ - Remove SolarBeam::Response::status()
+
+0.01 2016-10-21T12:46:14Z +0200
+ - Initial EXPERIMENTAL release

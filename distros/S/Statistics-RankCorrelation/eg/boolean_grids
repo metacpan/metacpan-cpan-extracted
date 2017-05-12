@@ -1,0 +1,24 @@
+#!/usr/bin/perl -w
+
+# This just illustrates what the correlation_matrix() function does.
+
+use strict;
+use Statistics::RankCorrelation;
+use List::Permutor;
+
+my $x = List::Permutor->new( qw( 1 2 3 4 ) );
+
+my %seen;
+
+my $i = 0;
+
+while( my @x = $x->next ) {
+    next if exists $seen{"@x"};  # Don't show duplicate permutations.
+
+    $seen{"@x"} = undef;
+
+    my $m = Statistics::RankCorrelation::correlation_matrix( \@x );
+
+    printf "%d: %s =>\n%s\n",
+        ++$i, join( ' ', @x ), join( "\n", map{"\t@$_"} @$m );
+}

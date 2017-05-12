@@ -1,0 +1,29 @@
+SWIFT/Factory/Tag/Tag21
+=======================
+
+SWIFT::Factory::Tag::Tag21 - Provide a TAG21 for a SWIFT message.
+
+Tag 21 is used to provide the Related Reference in a SWIFT message.
+It is up to the sending party to make sure the reference is relevant.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+Currently no other modules are used.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2003, Gustav Schaffter. All rights reserved.
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

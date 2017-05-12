@@ -1,0 +1,63 @@
+Revision history for Sub-Throttler
+
+v0.2.10  2016-02-29 23:49:59 EET
+	- Reformat doc.
+	- Fix fragile tests.
+
+v0.2.9  2016-02-18 16:53:48 EET
+	- Update dependencies.
+
+v0.2.8  2016-02-17 20:38:52 EET
+	- Fix fragile tests.
+
+v0.2.7  2016-02-15 20:18:13 EET
+	- Fix POD.
+
+v0.2.6  2016-02-15 20:12:45 EET
+	- Fix POD.
+
+v0.2.5  2016-02-15 19:10:57 EET
+	- Fix fragile tests.
+
+v0.2.4  2016-02-12 20:34:00 EET
+	- Use Export::Attrs instead of Perl6::Export::Attrs.
+
+v0.2.3  2015-03-31 07:11:26 EEST
+	- Fix tests portability.
+
+v0.2.2  2015-03-30 01:12:40 EEST
+	- Convert to Dist::Milla.
+	- Fix tests portability.
+
+v0.2.1  2015-03-25 03:36:24 EET
+	- Fix doc.
+	- Fix dependencies.
+	- Relax timings in test.
+
+v0.2.0  2014-12-07 09:23:28 EET
+	- Add support for throttling sync subs.
+	- Add support for CODEREF for non-anonymous functions.
+	- Add support for class methods and subclasses.
+	- Update tests.
+
+	[INCOMPATIBLE API CHANGE]
+	- rename Sub::Throttler::Rate::EV to Sub::Throttler::Periodic::EV
+	- user func $target return HASHREF instead of one/two scalar/array
+	- add sync acquire()
+	- rename acquire() to try_acquire()
+	- removed used()
+	- removed :plugin export tag from Sub::Throttler
+
+	[API CHANGE]
+	- period() can be modified
+	- add load()
+	- add save()
+	- add Sub::Throttler::Rate::AnyEvent
+	- add Sub::Throttler::algo
+
+v0.1.1  2014-07-26 13:50:13 EEST
+	- Fix tests to be less fragile.
+
+v0.1.0  2014-07-25 17:31:44 EEST
+	- Initial public release.
+

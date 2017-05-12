@@ -1,0 +1,20 @@
+Changes file for SETI::Drake
+
+0.0201 Sat Apr 20, 2008
+    - Added Carl Sagan.
+    - Improved the test and Makefile.
+    - Improved the POD.
+
+0.02 Wed Sep 7 ~11:45PM 2005
+    - Fixed every part of the documentation.
+    - Set the defaults Frank's Nova video that I finally watched.
+    - Cleaned up the test case file a bit.
+
+0.0101 Sun Oct 31
+    - Oh man. Really lame typo. (Forgetting to spellcheck)--
+
+0.01 Fri Oct 29
+    - First release...
+
+0.00_1 Thu Oct 28 18:59:35 2004
+    - Created by Module::Husbandry.

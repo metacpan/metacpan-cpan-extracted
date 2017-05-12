@@ -1,0 +1,70 @@
+Sport-Analytics-SimpleRanking
+
+This module provides a method that calculate Doug Drinen's simple ranking system. 
+It also provides access to some other common stats.
+
+    use Sport::Analytics::SimpleRanking;
+    my $stats = Sport::Analytics::SimpleRanking->new();
+    my $games = [
+        "Boston,13,Atlanta, 27",
+        "Dallas,17,Chicago,21",
+        "Eugene,30,Fairbanks,41",
+        "Atlanta,15,Chicago,3",
+        "Eugene,21,Boston,24",
+        "Fairbanks,17,Dallas,7",
+        "Dallas,19,Atlanta,7",
+        "Boston,9,Fairbanks,31",
+        "Chicago,10,Eugene,30",
+    ];
+    $stats->load_data( $games );
+    my  $srs = $stats->simpleranking( verbose => 1 );
+    my $mov = $stats->mov;
+    my $sos = $stats->sos;
+    for ( keys %$srs ) {
+        print "Team $_ has a srs of ", $srs->{$_};
+        print " and a mov of ",$mov->{$_},"\n";
+    }
+
+This module uses List::Util and Carp. 
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Sport::Analytics::SimpleRanking
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Sport-Analytics-SimpleRanking
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Sport-Analytics-SimpleRanking
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Sport-Analytics-SimpleRanking
+
+    Search CPAN
+        http://search.cpan.org/dist/Sport-Analytics-SimpleRanking/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011 David Myers
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

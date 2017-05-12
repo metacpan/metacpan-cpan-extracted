@@ -1,0 +1,17 @@
+Revision history for Perl extension Sub::Usage.
+
+0.03  Mon Feb 25 21:24:12 2002
+    - Renamed to Sub::Usage (suggested by Matthew Sachs)
+    - Fixed the POD heavily (patch sent by Matthew Sachs)
+    - Added TODO file in distribution
+
+0.02  Sun Feb 24 12:31:08 2002
+    - Found bug, added note in the section on BUGS
+    - parse_fqpn() croak caused by the bug above. it was called early,
+      the $caller parameter should be checked first. fixed.
+    - fixed the uri in AVAILABILITY section (in README file)
+
+0.01  Sat Feb 23 13:09:02 2002
+    - original version; created by h2xs 1.21 with options
+        -A -X -n Usage::Sub
+

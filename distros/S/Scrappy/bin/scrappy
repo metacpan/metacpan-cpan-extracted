@@ -1,0 +1,45 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use File::Basename 'dirname';
+use File::Spec;
+
+=head1 NAME
+
+scrappy - The Scrappy Command-Line Utility
+
+=head1 SYNOPSIS
+
+    $ scrappy
+    $ scrappy ...
+    $ scrappy generate project MyApp
+    
+For fun, download a web page using the Scrappy Action Download, .e.g ....
+
+    $ scrappy download page http://search.cpan.org/
+    
+... easy huh, checkout some of the existing actions or create your own with
+Scrappy, your All Powerful Web Spidering, Scraping, Creeping Crawling Framework.
+
+=head1 DESCRIPTION
+
+List and run L<Scrappy> actions to build web crawlers, generate boiler-plate code
+and more. Install actions from the L<Scrappy::Action> namespace.
+
+=cut
+
+# is Scrappy installed
+eval 'use Scrappy::Action';
+die <<EOF if $@;
+
+It looks like you don't have the Scrappy Framework installed.
+Please visit http://search.cpan.org/dist/Scrappy/ for detailed installation instructions.
+
+EOF
+
+# Start the command system
+Scrappy::Action->new->execute(@ARGV);
+
+1;

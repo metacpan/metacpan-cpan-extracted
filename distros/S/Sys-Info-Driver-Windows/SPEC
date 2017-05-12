@@ -1,0 +1,32 @@
+## no critic ( TestingAndDebugging::RequireUseStrict      )
+## no critic ( TestingAndDebugging::RequireUseWarnings    )
+## no critic ( ValuesAndExpressions::ProhibitMagicNumbers )
+## no critic ( Modules::RequireEndWithOne                 )
+die "OS unsupported\n" if $^O !~ m{ \A MSWin }xmsi;
+{
+    module_name    => 'Sys::Info::Driver::Windows',
+    requires       => {
+        'Sys::Info::Base'            => '0.78',
+        'Sys::Info::Driver::Unknown' => '0.78',
+        'ExtUtils::CBuilder'         => 0,
+        'Win32::OLE'                 => 0,
+        'Win32::TieRegistry'         => 0,
+        'Config::General'            => 0,
+        'Win32API::Net'              => 0,
+        ( $] < 5.006 ? ( 'warnings::compat' => 0 ) : ()),
+    },
+    build_requires => {
+        'Test::Sys::Info' => '0.20',
+        'Capture::Tiny'   => 0,
+    },
+    recommends     => {},
+    sign           => 0,
+    dist_author    => 'Burak Gursoy <burak@cpan.org>',
+    include_dirs   => [ q{.} ],
+    xs_files       => { 'Windows.xs' => 'lib/Sys/Info/Driver/Windows.xs' },
+    meta_merge     => {
+        resources => {
+            repository => 'http://bitbucket.org/burak/cpan-sys-info-driver-windows/',
+        },
+    },
+}

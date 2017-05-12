@@ -1,0 +1,44 @@
+String-Tests
+
+It is very common (for example when doing user input validation) to have to run
+a series of tests on a single string of data. This module attempts to ease the
+burden of doing so, by amalgamating all tests into a single boolean method call.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc String::Tests
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=String-Tests
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/String-Tests
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/String-Tests
+
+    Search CPAN
+        http://search.cpan.org/dist/String-Tests
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Shaun Fryer
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

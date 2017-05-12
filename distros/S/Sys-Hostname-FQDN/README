@@ -1,0 +1,105 @@
+NAME
+      Sys::Hostname::FQDN - Get the short or long hostname
+
+SYNOPSIS
+      use Sys::Hostname::FQDN qw(
+            asciihostinfo
+            gethostinfo
+            inet_ntoa
+            inet_aton
+            fqdn
+            short
+      );
+
+      $host = short();
+      $fqdn = fqdn();
+      ($name,$aliases,$addrtype,$length,@addrs)=gethostinfo();
+      ($name,$aliases,$addrtype,$length,@addrs)=asciihostinfo();
+      $dotquad = inet_ntoa($netaddr);
+      $netaddr = inet_aton($dotquad);
+
+INSTALLATION
+    To install this module type the following:
+
+      perl Makefile.PL
+      make
+      make test
+      make install
+
+    Solaris users, see the 'hints' subdirectory if you have problems with
+    the build.
+
+DESCRIPTION
+    Sys::Hostname::FQDN uses the host 'C' library to discover the (usually)
+    short host name, then uses (perl) gethostbyname to extract the real
+    hostname.
+
+    The results from gethostbyname are exported as gethostinfo and
+    asciihostinfo as a convenience since they are available. Similarly, the
+    'C' library functions inet_ntoa and inet_aton are exported.
+
+    $host = short();
+          returns the host part of this host's FQDN.
+
+    $fqdn = fqdn();
+          returns the fully qualified host name of this host.
+
+    ($name,$aliases,$addrtype,$length,@addrs)=gethostinfo();
+          returns:
+            $name       fully qualifed host name of this host.
+            $aliases    alternate names for this host.
+            $addrtype   The type of address; always AF_INET at present.
+            $length     The length of the address in bytes.
+            @addrs      array of network addresses for this host 
+                        in network byte order.
+
+    ($name,$aliases,$addrtype,$length,@addrs)=asciihostinfo();
+          returns:
+            $name       fully qualifed host name of this host.
+            $aliases    alternate names for this host.
+            $addrtype   The type of address; always AF_INET at present.
+            $length     The length of the address in bytes.
+            @addrs      array of dot quad IP addresses for this host.
+
+    $dotquad = inet_ntoa($netaddr);
+          input:        packed network address in network byte order.
+          returns:      dot quad IP address.
+
+    $netaddr = inet_aton($dotquad);
+          input:        dot quad IP address.
+          returns:      packed network address in network byte order.
+
+DEPENDENCIES
+      none
+
+EXPORT
+      None by default
+
+EXPORT_OK
+      asciihostinfo
+      gethostinfo
+      inet_ntoa
+      inet_aton
+      fqdn
+      short
+
+AUTHOR
+    Michael Robinton <michael@bizsystems.com>
+
+COPYRIGHT AND LICENCE
+      Copyright 2003, Michael Robinton <michael@bizsystems.com>
+ 
+      This program is free software; you can redistribute it and/or modify
+      it under the terms of the GNU General Public License as published by
+      the Free Software Foundation; either version 2 of the License, or
+      (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+      GNU General Public License for more details.
+
+      You should have received a copy of the GNU General Public License
+      along with this program; if not, write to the Free Software
+      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. 
+

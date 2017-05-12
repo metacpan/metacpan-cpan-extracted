@@ -1,0 +1,22 @@
+severity = 1
+color = 1
+verbose = 8
+
+# Configure these policies
+[InputOutput::RequireCheckedSyscalls]
+exclude_functions = print
+[Documentation::RequirePodSections]
+lib_sections = NAME | VERSION | SYNOPSIS | DESCRIPTION | SUBROUTINES/METHODS | DIAGNOSTICS | CONFIGURATION AND ENVIRONMENT | DEPENDENCIES | INCOMPATIBILITIES | BUGS AND LIMITATIONS | AUTHOR | COPYRIGHT AND LICENSE
+script_sections = NAME | USAGE | DESCRIPTION | REQUIRED ARGUMENTS | OPTIONS | DIAGNOSTICS | EXIT STATUS | CONFIGURATION | DEPENDENCIES | INCOMPATIBILITIES | BUGS AND LIMITATIONS | AUTHOR | COPYRIGHT AND LICENSE
+
+# Do not load these policies
+[-Subroutines::RequireArgUnpacking]
+[-CodeLayout::ProhibitParensWithBuiltins]
+[-CodeLayout::RequireTidyCode]
+[-ControlStructures::ProhibitCStyleForLoops]
+[-ControlStructures::ProhibitPostfixControls]
+[-ControlStructures::ProhibitUnlessBlocks]
+[-Subroutines::ProhibitBuiltinHomonyms]
+[-ValuesAndExpressions::ProhibitNoisyQuotes]
+[-ValuesAndExpressions::RequireInterpolationOfMetachars]
+[-Variables::ProhibitPunctuationVars]

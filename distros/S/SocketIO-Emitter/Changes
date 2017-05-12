@@ -1,0 +1,15 @@
+Revision history for Perl extension p5-SocketIO-Emitter.
+
+0.04  Jul 14 2016
+    - fixed "Experimental push on scalar is now forbidden" error.
+
+0.03  Jul 12 2016
+    - downgrade Data::MessagePack(0.49)
+    - add dependencey namespace::clean
+
+0.02  Jul 11 2016
+    - support for version 0.3.0 or higher(@papix)
+    - upgrade Data::MessagePack 0.50
+
+0.01  Jul 10 2016
+    First version.

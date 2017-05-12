@@ -1,0 +1,28 @@
+---
+abstract: 'SQL syntax in Perl with compile-time syntax checks'
+author:
+  - 'Henrik Theiling <cpan@theiling.de>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: SQL-Yapp
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  Data::Dumper: 0
+  Filter::Simple: 0
+  Hash::Util: 0
+  Scalar::Util: 0
+  Test::More: 0
+  Text::Balanced: 0
+version: 2.001

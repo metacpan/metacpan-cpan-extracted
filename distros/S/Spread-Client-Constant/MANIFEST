@@ -1,0 +1,11 @@
+Changes
+Constant.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/Spread-Client-Constant.t
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/Spread/Client/Constant.pm
+META.yml                                 Module meta-data (added by MakeMaker)

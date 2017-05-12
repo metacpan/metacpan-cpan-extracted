@@ -1,0 +1,527 @@
+Revision history for Perl extension Search::HiLiter.
+
+1.004 11 Marh 2016
+ - Carp::cluck() in to_utf8() is the string argument is undefined
+
+1.003 08 June 2015
+ - swapped namespace::autoclean in, namespace::sweep out. See https://rt.cpan.org/Ticket/Display.html?id=104823
+
+1.002 18 Aug 2014
+ - warn and skip undefined transliteration mappings
+
+1.001 23 July 2014
+ - zap use of File::Slurp in tests
+ - small optimization to to_utf8() to privilege is_ascii() over
+   other encoding tests.
+
+1.000_01 21 July 2014
+ - test 'use locale' (and its absence) against cpantesters
+
+1.000 18 April 2014
+ - the official Moo release
+
+0.999_04 11 April 2014
+ - make namespace::sweep dependency explicit in Makefile.PL. Same issue as 0.999_03.
+
+0.999_03 11 April 2014
+ - make Moo dependency explicit as cpantesters does not seem to pull it in
+   via Search::Query
+
+0.999_01 08 April 2014
+ - Drop Rose::ObjectX::CAF object system in favor of Moo + Class::XSAccessor.
+   Moo is required by Search::Query (dependency) and 
+   Class::XSAccessor was already being used by Rose::Object if present.
+
+0.99 02 March 2014
+ - Snipper doc fixes
+ - change !$query to !defined $query check in @_ unrolling
+
+0.98 14 Nov 2013
+ - add new method as_sentences() to TokenListUtils
+ - fix perl_to_xml for blessed objects
+
+0.97 4 Oct 2013
+ - fix_cp1252_codepoints_in_utf8 now operates on bytes internally in regex
+   substitution.
+
+0.96 13 June 2013
+ - force blessed references to stringify in xml conversion
+
+0.95 7 June 2013
+ - make POD tests optional with PERL_AUTHOR_TEST
+
+0.94 31 May 2013
+ - quiet regex whitespace warning in Perl >= 5.18.0
+
+0.93 19 March 2013
+ - (more) fix off-by-one memory bug regression introduced in 0.91
+
+0.92 19 March 2013
+ - QueryParser->stemmer will now coerce return values through to_utf8() (RT
+   #83771)
+ - fix off-by-one memory bug regression introduced in 0.91
+
+0.91 4 March 2013
+ - XML->escape() now converts single quote to &#39; instead of &apos; in
+   order to conform with both the HTML and XML specs.
+
+0.90 14 Feb 2013
+ - fix bug in refactor of perl_to_xml where 2nd arg is hashref representing
+   root element.
+
+0.89 14 Feb 2013
+ - fix bug in refactor of perl_to_xml to preserve markup escaping for old
+   syntax.
+
+0.88 13 Feb 2013
+ - fix bug in Snipper when strip_markup=>1 and show=>1 and length of text
+   less than max_chars
+ - XML->perl_to_xml now supports named key/value hashref as argument
+   instead of C-style method signature.
+
+0.87 12 Feb 2013
+ - XML->tag_safe() now catches edge case where double colons (as in Perl
+   package names) are properly escaped.
+ - add Snipper->strip_markup feature
+
+0.86 04 Jan 2013
+ - switch from " to ' marks in HiLiter tag attributes. This allows for
+   compat with hiliting within JSON blobs.
+
+0.85 03 Dec 2012
+ - fix failing test t/30-perl-to-xml.t from assuming predictable hash key
+   order, which in Perl >= 5.17.6 is random. See
+   https://rt.cpan.org/Ticket/Display.html?id=81528.
+
+0.84 25 Oct 2012
+ - internal HeatMap refactor to relax sanity checks around stemmed phrase
+   matching.
+
+0.83 12 Oct 2012
+ - UTF8::is_sane_utf8() now runs through entire string instead of stopping
+   at first suspect sequence.
+ - add Query->unique_terms, ->num_unique_terms, ->phrases, and
+   ->non_phrases methods in aid to HeatMap, which needed a refactor to fix
+   a bug affecting duplicate terms in phrases when stemming was on.
+
+0.82 28 Sept 2012
+ - fix off-by-one bug in HeatMap proximity counting for phrases
+
+0.81 6 Sept 2012
+ - refactor sanity check for HeatMap matches against phrases, to try and
+   avoid false positives when stemmer is used.
+ - HeatMap weight now includes term proximity when sorting likely snippets
+
+0.80 3 Sept 2012
+ - fix Query->matches_* stemming support to work with phrases.
+
+0.79 22 Aug 2012
+ - allow XML->perl_to_xml to support root_element as a hashref with tag and
+   attrs
+
+0.78 21 Aug 2012
+ - optimizations to HeatMap and Snipper sentence detection, which has the
+   nice side effect of avoiding breaking HTML entities in snipped HTML. To
+   take advantage, use as_sentences => 1.
+
+0.77 15 Aug 2012
+ - add stemming support for Query->matches_html and Query->matches_text
+ - add HiLiter->html_stemmer with passthrough to plain_stemmer until
+   failing test cases materialize.
+ - some fixes for stemming support, mostly turning off optimizations based
+   on regular expressions.
+
+0.76 7 Aug 2012
+ - finally(!) add real stemming tests and support to Snipper and HiLiter 
+
+0.75 6 Aug 2012
+ - add some tests for Perl 5.17.x test failures
+ - fix edge case where short snip generated spurious ellipses
+
+0.74 21 May 2012
+ - yank some meta data from a test doc to avoid security scan problems on
+   CPAN
+
+0.73 13 May 2012 (Happy Mothers Day)
+ - fix edge case with snipping phrases that contain non-word characters
+   other than spaces.
+
+0.72 30 April 2012
+ - more fixes, similar to 0.71 (for now missing Keywords class)
+
+0.71 28 Feb 2012
+ - fix failing tests due to removed classes in 0.70
+
+0.70 23 Feb 2012
+ - refactor XML->escape for some performance gain
+ - remove long-deprecated Keywords classes
+
+0.69 22 Feb 2012
+ - fix XML->escape() to preserve UTF-8 flag on the returned SV*
+
+0.68 15 Jan 2012
+ - add missing dTHX macro per
+   https://rt.cpan.org/Ticket/Display.html?id=74022
+
+0.67 12 Jan 2012
+ - bolster Tokenizer sentence detection, adding list of abbreviations from
+   Linga::EN::Tagger.
+ - fix missing 'lang' param for SpellCheck
+ - fix placement of dSP macro in tokenize() C func to properly scope stack
+   variables.
+ - add slurp() method to Search::Tools
+
+0.66 05 Dec 2011
+ - undo 0.65 change, since HTML entities are case sensitive
+   (http://www.w3.org/TR/html4/charset.html#h-5.3.2)
+
+0.65 02 Dec 2011
+ - lowercase named entity matches. patch from Adam Lesperance.
+
+0.64 02 Dec 2011
+ - optimizations to regex matching in Query->matches and HiLiter
+ - according to Unicode spect \xfeff (BOM) is deprecated as whitespace
+   character in favor of \x2060. HTML whitespace definition changed
+   accordingly.
+ - fix edge case in HiLiter where match on single letter could cause
+   infinite loop.
+ - add Query->fields method to see the fields searched for.
+ - fix XML->unescape_named to support entities with \d in them, and
+   case-insensitive. https://rt.cpan.org/Ticket/Display.html?id=72904
+
+0.63 06 Oct 2011
+ - change __func__ macro to use FUNCION__ instead since Perl core
+   implements that portable macro.
+
+0.62 26 Aug 2011
+ - remove ';' as sentence boundary character (it was marked as TODO in
+   search-tools.c) because character entities use it (e.g. &amp;).
+
+0.61 29 July 2011
+ - add term_min_length option to QueryParser, to ignore terms unless then
+   are N chars or longer. Useful for skipping single-character words when
+   Snipping or HiLiting. For backwards compatibility the default is 1.
+ - fix treat_uris_like_phrases regex to add / character in addition to @.\
+
+0.60 13 July 2011
+ - fix whitespace def to include &nbsp; (broke HTML::HiLiter)
+
+0.59 19 June 2011
+ - add normalize_whitespace feature to XML->no_html() method.
+ - add several Unicode whitespace defs to $whitespace regex in XML class
+   per http://en.wikipedia.org/wiki/Mapping_of_Unicode_characters
+
+0.58 27 May 2011
+ - fix unescaped string in regex in HiLiter
+
+0.57 22 Feb 2011
+ - extend bug-fix from 0.56 to prevent false matches on match markers.
+
+0.56 10 Feb 2011
+ - fix bug where query terms 'span' or 'style' were breaking hiliting by
+   "double-dipping"
+
+0.55 25 Oct 2010
+ - disable one more test for perl >= 5.14 (see 0.54)
+
+0.54 24 Oct 2010
+ - fixes for Search::Query 0.18
+ - disabled some tests that break under perl >= 5.14.  See
+   https://rt.cpan.org/Ticket/Display.html?id=62417
+
+0.53 26 June 2010
+ - add ->matches_text and ->matches_html methods to Query class
+
+0.52 22 June 2010
+ - tweek locale tests because some OSes (linux) use 'UTF8' instead of
+   'UTF-8' naming.
+ - small optimizations to HiLiter
+
+0.51 23 May 2010
+ - singularizer in XML->perl_to_xml will now treat common English plurals
+
+0.50 19 May 2010
+ - fix default regex for QueryParser->term_re and Tokenizer->re to match
+   default QueryParser->word_characters. The chief difference is that now
+   the hyphen "-" is considered a word character if it appears like a
+   single quote does. So this: don't think twice it's all-right is now 5
+   tokens instead of 6.
+
+0.49 08 May 2010
+ - change from FUNCTION__ to __func__ in all .c code.
+
+0.48 30 April 2010
+ - fix treat_phrases_as_singles bug in Snipper where phrases were never
+   being matched.
+ - compromise on proximity query syntax ("foo bar"~10) by always treating
+   as single terms.
+
+0.47 16 April 2010
+ - fix regex bug in Transliterate->convert where newlines were being
+   skipped.
+
+0.46 06 April 2010
+ - fix croak message for debug-level sanity check on text match in HiLiter.
+ - fix bugs with as_sentences for checking end boundaries.
+
+0.45 04 March 2010
+ - change QueryParser tests for range to use native dialect, not SWISH.
+
+0.44 24 Feb 2010
+ - fix locale test case comparison for UTF-8 (RT#54941 reported by John
+   Napiorkowski)
+
+0.43 06 Feb 2010
+ - fix bug with Search::Query::Parser method name (error() not err()).
+ - fix doc bug in Snipper.
+ - refactor QueryParser internals to work with latest Search::Query 0.07.
+
+0.42 03 Feb 2010
+ - fix bug in XML->tag_safe that disallowed XML namespaces.
+ - add XML->tidy method.
+
+0.41 01 Feb 2010
+ - move SWISH::Prog::Utils perl_to_xml() feature to Search::Tools::XML.
+
+0.40 31 Jan 2010
+ - added ignore_length() feature to Snipper.
+ - added treat_phrases_as_singles() feature to Snipper.
+
+0.39 23 Jan 2010
+ - switch from Search::QueryParser to Search::Query::Parser. This change
+   means that some methods in Search::Tools::Query and
+   Search::Tools::QueryParser were added, removed or modified. Please check
+   the documentaiton.
+
+0.38 22 Jan 2010
+ - add support for wildcard at start of term in addition to end of term.
+ - added Windows-1252 (cp1252) encoding helpers.
+ - added Encoding::FixLatin as a dependency.
+ - fix off-by-one errors in find_bad_*_report and find_bad_* UTF8
+   functions.
+ - add debug_bytes() to UTF8 class.
+
+0.37 06 Dec 2009
+ - fix blead perl REGEXP change for Perls >= 5.11. [r2330]
+
+0.36 3 Dec 2009
+ - add FUNCTION__ definition for those Perls (<5.8.8) that lack it.
+
+0.35 30 Nov 2009
+ - add UTF::byte_length() function just like bytes::length()
+ - some attempts to compile under Win32 (programming a bit blind with
+   nothing to test on...)
+
+0.34 22 Nov 2009
+ - make the bigfile test optional and make it use the 'offset' snipper to
+   reduce mem use by 60%.
+
+0.33 19 Nov 2009
+ - switch default Snipper type to 'offset' to optimize for large target
+   texts.
+ - add Tokenizer->get_offsets() method in C/XS.
+ - fix Snipper->show feature to work as the author expected it to. Do not
+   return anything if no match.
+ - refactor is_ascii C code and is_sentence_start() to return false if
+   match on UPPER as opposed to Upper.
+
+0.32 31 Oct 2009
+ - fix mem leaks
+ - optimize normalize_whitespace regex 
+
+0.31 14 Oct 2009
+ - add missing dTHX; macro to st_malloc per RT #50509
+
+0.30 13 Oct 2009
+ - do not prefix ellipse to snippets in Snipper when as_sentences is true.
+ - add attribute support to XML->start_tag().
+ - bump Rose::ObjectX::CAF req version to catch bad param names and fix a
+   couple.
+ - fix as_sentences feature in HeatMap where $end offset was overrunning
+   the tokens array length.
+
+0.29 11 Oct 2009
+ - tweek snippet sorting to value higher unique term frequency.
+ - add XML->strip_markup as alias for no_html()
+ - added as_sentences experimental feature to Snipper and supporting
+   classes.
+
+0.28 29 Sept 2009
+ - add missing dTHX macro for 5.10 build.
+
+0.27 29 Sept 2009
+ - optimize XML->escape() and remove %XML::Ents as public variable.
+   escape() is now in C/XS, borrowed from mod_perl.
+ - add query_class() to QueryParser to allow subclassing Query
+
+0.26 23 Sept 2009
+ - fix a couple of Perl::Critic warnings (trivial imo)
+ - fix repos and homepage links in Makefile.PL
+ - fix a couple of regex escape bugs in HiLiter
+ - fix an innocuous bug in Object that passed extra args to 
+   QueryParser->new in _normalize_args
+ - add \002/\003 no-hiliting marker support in HiLiter	(for HTML::HiLiter)
+ - HiLiter->light() now returned UTF-8 encoded text like  Snipper->snip()
+   does.
+ - fix regex build bug where phrase could be separated by multiple 
+   whitespace chars.
+
+0.25 19 Sept 2009
+ - add missing $VERSION back to Keywords.pm to satisfy CPAN
+
+0.24 19 Sept 2009
+ - thanks to Henry at zen for prompting the bug fixes and improvements	in
+   this release.
+ - fix Data::Dump calls from pp() to fully-qualified.
+ - Snipper->snip() will always return UTF-8 encoded text.
+ - rename Snipper methods snipper_name, snipper_force and snipper_type	to
+   type_used, force and type.
+ - document Snipper->type().
+ - fix some off-by-one errors in all the snip() algorithms
+ - fix the debugging code in Snipper
+ - add sanity check fallback to plain() hiliter to persevere if plain 
+   regex obviously fails.
+ - add ignore_fields feature
+ - add treat_uris_like_phrases feature
+ - RegExp, RegExp::Keywords, RegExp::Keyword and Keywords are all 
+   deprecated in favor of the new, tidier and cleaner QueryParser,  Query
+   and RegEx classes. Backwards compatibility is preserved for existing
+   code, but users should move to the new API as  documented in
+   Search::Tools. RegExp will carp every time you build() with it.
+ - added new Tokenizer, Token and TokenList XS code for must faster
+   snipping.
+ - added PP versions of tokenizing code, both for benchmarking and 
+   comparision.  As expected, XS is much faster. The extra speed makes it 
+   possible to be more accurate in snippet extraction without sacrificing 
+   performance.
+
+0.23 17 July 2009
+ - change utf8_safe() XML method to change low non-whitespace ascii chars
+   to single space. This makes them XML-spec compliant.
+
+0.22 22 Jan 2009
+ - continue fixing Transliterate bug exposed in version 0.20
+
+0.21 22 Jan 2009
+ - fix bug in init of Transliterate map that was triggered when multiple
+   instances are created in a single app
+
+0.20 16 Dec 2008
+ - refactor Transliterate->convert(). now 244% faster.
+
+0.19 16 Dec 2008
+ - more tests
+ - clarify use of ebit in Transliterate docs
+
+0.18 02 Dec 2008
+ - add more debugging to to_utf8() function.
+ - make Text::Aspell optional, since it has non-CPAN dependency
+
+0.17 22 May 2008
+ - fix typos in S::T::SpellCheck
+ - refactor some remaining classes to use Search::Tools::Object class
+
+0.16 22 Nov 2007
+ - refactor common object stuff into new Search::Tools::Object class
+ - change behaviour of XML escape()/unescape() to return filtered values
+   instead of in-place
+
+0.15
+ - fix t/09locale.t to skip if UTF-8 charset not available via setlocale()
+
+0.14
+ - fixed <version> in Makefile.PL
+
+0.13
+ - added File::Slurp to requirements, since tests use it.
+ - changed 'use <version>' syntax to be portable.
+
+0.12
+ - change tests to force locale for spelling dictionaries, or skip if not
+   found
+
+0.11
+ - fix bug in UTF8.pm where latin1 was flagged internally as UTF-8 and so
+   fooled the native Perl checks.
+ - rewrite is_latin1() and find_bad_latin1() as XS.
+ - refactored is_valid_utf8() to use internal Perl is_utf8_string() plus
+   is_latin() and is_ascii() checks to help reduce ambiguity.
+ - hardcode locale into some tests so that latin1 is not magically upgraded
+   to utf8 by perl.
+
+0.10
+ - fix bug in Tools.xs where NULL was being returned as SV* instead of
+   &PL_sv_undef
+
+0.09
+ - separated the UTF8 checking into Search::Tools::UTF8 and use XS to check
+   valid utf8. Among other things, fixes the string length bug on
+   is_valid_utf8()  that previously segfaulted if the string was longer
+   than 24K.
+
+0.08
+ - fixed bug with S::T::XML utf8_escape() with escaping a literal 0
+ - changed required minimum perl to 5.8.3 for correct UTF-8 support.
+ - kris@koehntopp.de suggested changes to the default character map in
+   S::T::T to better support multiple transliteration options. This
+   resulted in per-instance character map and no more package %Map. See doc
+   in S::T::T for map() method.
+
+0.07
+ - added more utf8 methods to S::T::Transliterate.
+ - added $sane threshold to prevent segfaults when checking for valid_utf8
+   in long strings (like file slurps)
+ - changed example/swish-e.pl to use SWISH::API::Object
+ - fixed subtle regex bug with constructing word boundaries wrt
+   ignore_*_chars
+
+0.06
+ - Kezmega@sbcglobal.net found a bug when running under -T taint mode.
+   fixed in S::T::Keywords.
+
+0.05
+ - added spellcheck() convenience method to S::T
+ - added t/11synopsis.t test
+ - changed POD to reflect new methods
+ - added query() accessor to S::T::SpellCheck
+ - thanks to Kezmega@sbcglobal.net for the above suggestions
+ - fixed POD example in S::T::HiLiter
+
+0.04
+ - added S::T::SpellCheck
+ - fixed (finally I hope) charset/locale/lang issue by making it global
+   accessor and checking for C and POSIX
+ - reorged default settings in S::T::Keywords to set in new() rather than
+   each time in extract()
+
+0.03
+ - fixed charset/locale issue in S::T::Keywords reported by Debbie Jones
+
+0.02
+ - added example/ scripts
+ - fixed S::T::K SYNOPSIS to reflect reality
+ - POD fixes
+ - added is_valid_utf8() method to S::T::Transliterate along with valid
+   utf8 check in convert()
+ - rewrote S::T::Keywords logic to: * correctly parse stopwords (all are
+   compared with lc()) * return phrases as phrases * additional UTF-8
+   checks * parse according to RegExp character definitions
+ - changed default UTF8Char regexp in S::T::RegExp
+ - changed default WordChar regexp in S::T::RegExp
+ - begin_characters and end_characters are no longer supported since they
+   were logically just the inverse of ignore_*_char plus word_characters.
+   The entire regexp construction was refactored with that in mind.
+ - @Search::Tools::Accessors now provides (saner) way for subclasses to
+   inherit attributes like word_characters, stemmer, stopwords, etc.
+ - S::T::RegExp kw_opts is no longer supported
+ - stopwords are intentionally left in phrases, as are special boolean
+   words
+ - added ->phrase accessor to S::T::R::Keyword
+ - S::T::HiLiter now higlights all phrases before singles so that any
+   overlap privileges the phrase match. Example would be 'foo and "foo
+   bar"' where the phrase "foo bar" should receive precedence over single
+   word 'foo'.
+
+0.01 2006-06-22T08:06:59Z
+ - original version
+

@@ -1,0 +1,35 @@
+---
+abstract: 'polyglot query parsing'
+author:
+  - 'Peter Karman <karman@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Search-Query
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::Dump: '0'
+  Data::Transformer: '0'
+  Module::Pluggable: '0'
+  Moo: '0'
+  Scalar::Util: '0'
+  Test::More: '0'
+  Type::Tiny: '0'
+  namespace::autoclean: '0.28'
+  perl: '5.008003'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Search-Query
+  homepage: https://github.com/karpet/search-query-perl
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/karpet/search-query-perl
+version: '0.307'

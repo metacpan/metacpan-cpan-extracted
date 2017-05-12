@@ -1,0 +1,81 @@
+#!/usr/bin/perl
+
+# This script is licensed under the FDL (Free Documentataion License)
+# The complete license text can be found at http://www.gnu.org/copyleft/fdl.html
+#
+# SAL powered authentication support for Squid Proxy server
+# (Script assumes an RHL/FC, Apache + mod_auth_mysql setup...)
+
+use strict;
+use SAL::DBI;
+
+my $logfile = "/var/log/squid/salsquid.log";
+
+my $auth_server = 'localhost';
+my $auth_user = '';
+my $auth_pass = '';
+my $auth_db = 'HttpAuth';
+my $auth_table = 'users';
+
+my $UserCol = 0;
+my $PassCol = 1;
+
+my $dbo_factory = new SAL2::DBI;
+my $dbo_users = $dbo_factory->spawn_mysql($auth_server, $auth_user, $auth_pass, $auth_db);
+
+my $stdin = <STDIN>;
+chomp($stdin);
+my ($user, $pass) = split(/\s+/, $stdin);
+salsquidlog("USER: $user");
+
+my $query = qq[SELECT username, passwd FROM $auth_table WHERE username='$user']; $dbo_users->execute($query);
+my $uname = $dbo_users->{data}->[0][$UserCol];
+my $upass = $dbo_users->{data}->[0][$PassCol];
+
+my $result = validate_user($uname, $upass, $pass);
+log_and_reply($result);
+
+#################################################################
+# SUBS 'N FUNCS
+
+sub log_and_reply {
+	my $message = shift;
+
+	salsquidlog("REPLY: $message");
+
+	print "$message\n";
+}
+
+sub salsquidlog {
+	my $message = shift;
+
+	my $timestamp = localtime();
+
+	open(LOG, ">> $logfile");
+	print LOG "[salsquid] $timestamp $message\n";
+	close LOG;
+}
+
+sub validate_user {
+	my ($uname, $upass, $pass) = @_;
+	my $crypted;
+
+	# if authenticating against /etc/shadow, uncomment the following line
+	# $upass = get_pass($uname);
+
+	$crypted = crypt($pass, $upass);		# crypt(plaintext, salt)
+
+	if ($crypted eq $upass) {
+		return "OK";
+	} else {
+		return "ERR";
+	}
+}
+
+# for local users (in /etc/shadow)
+sub get_pass {
+	my $user = shift;
+	my $pass = `grep $user /etc/shadow`;
+	(undef, $pass, undef) = split(/:/, $pass);
+	return $pass;
+}

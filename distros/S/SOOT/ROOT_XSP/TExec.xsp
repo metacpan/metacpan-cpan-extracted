@@ -1,0 +1,85 @@
+%module{SOOT};
+
+%{
+#include <sstream>
+%}
+
+class TExec {
+  TExec(const char* name, SV* command)
+    %code{%
+      SV* tmpsv;
+      if (SvROK(command)
+          && (tmpsv = SvRV(command))
+          && SvTYPE(tmpsv) == SVt_PVCV)
+      {
+        RETVAL = new TExec(name, "");
+        const unsigned long int id = (unsigned long int)RETVAL;
+        SOOT::StorePerlCallback(aTHX_ id, command);
+        std::stringstream cmd;
+        cmd << "TExecImpl::RunPerlCallback(" << id << ")";
+        RETVAL->SetAction(cmd.str().c_str());
+      }
+      else {
+        RETVAL = new TExec(name, SvPV_nolen(command));
+      }
+    %};
+
+%{
+
+void
+TExec::DESTROY(self)
+    SV* self
+  PPCODE:
+    TObject* obj = SOOT::LobotomizeObject(aTHX_ self);
+    if (SOOT::UnregisterObject(aTHX_ self)) {
+      SOOT::ClearStoredPerlCallback(aTHX_ (unsigned long int)obj);
+    }
+
+%}
+
+  void Exec(SV* command = NULL)
+    %code{%
+      if (command == NULL || command == &PL_sv_undef) {
+        // exec default action
+        THIS->Exec();
+      }
+      else {
+        // exec special command
+        SV* tmpsv;
+        if (SvROK(command)
+            && (tmpsv = SvRV(command))
+            && SvTYPE(tmpsv) == SVt_PVCV)
+        {
+          SOOT::ExecPerlCallback(aTHX_ command);
+        }
+        else {
+          THIS->Exec(SvPV_nolen(command));
+        }
+      }
+    %};
+
+  void Paint(SV* option = NULL)
+    %code{%
+      THIS->Paint();
+    %};
+
+  void SetAction(SV* command)
+    %code{%
+      SV* tmpsv;
+      if (SvROK(command)
+          && (tmpsv = SvRV(command))
+          && SvTYPE(tmpsv) == SVt_PVCV)
+      {
+        const unsigned long int id = (unsigned long int)THIS;
+        SOOT::StorePerlCallback(aTHX_ id, command);
+        std::stringstream cmd;
+        cmd << "TExecImpl::RunPerlCallback(" << id << ")";
+        THIS->SetAction(cmd.str().c_str());
+      }
+      else {
+        THIS->SetAction(SvPV_nolen(command));
+      }
+    %};
+
+};
+

@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/SQLite/DB.pm
+t/00basic.t
+t/01logon.t
+t/02cr_table.t
+t/03insert.t
+t/04select.t
+t/05tran.t
+t/06error.t
+t/99cleanup.t

@@ -1,0 +1,12 @@
+abstract: ~
+author: Kieren Diment <zarquon@cpan.org>
+build_requires: 
+  Test::Exception: 0
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: unknown
+no_index: 
+  directory: 
+    - inc
+    - t
+version: 0.01

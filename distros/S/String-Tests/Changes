@@ -1,0 +1,17 @@
+Revision history for String-Tests
+
+0.05    Wed 10 Dec 2008
+        Never did add t/string-tests.t to the MANIFEST. duh!
+
+0.04    Wed 10 Dec 2008
+        Added a couple tests. Refactored POD a bit more.
+
+0.03    Tue  9 Dec 2008
+        Bug fix ... forgot to update $VERSION in POD. oops.
+
+0.02    Tue  9 Dec 2008
+        Refactored capture syntax and POD
+
+0.01    Fri 28 Nov 2008
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,28 @@
+__section__
+default
+__description__
+
+__title__
+
+__page__
+gallery
+__lang__
+en_US
+__name__
+picture_menu
+__template__
+[
+[% IF sizes.small %]
+ <A HREF="[% constants.rootdir %]/gallery.pl?op=view&amp;size=small&amp;pic_id=[% pic_id %]">s</A>
+[% END; IF sizes.medium %]
+ <A HREF="[% constants.rootdir %]/gallery.pl?op=view&amp;size=medium&amp;pic_id=[% pic_id %]">m</A>
+[% END; IF sizes.large %]
+ <A HREF="[% constants.rootdir %]/gallery.pl?op=view&amp;size=large&amp;pic_id=[% pic_id %]">l</A>
+[% END; IF sizes.big %]
+ <A HREF="[% constants.rootdir %]/gallery.pl?op=view&amp;size=big&amp;pic_id=[% pic_id %]">b</A>
+ <A HREF="[% constants.rootdir %]/gallery.pl?op=view&amp;size=full&amp;pic_id=[% pic_id %]">f</A>
+[% END %]
+| <A HREF="[% constants.rootdir %]/gallery.pl?op=display&amp;pic_id=[% pic_id %]">d</A>
+]
+__seclev__
+500

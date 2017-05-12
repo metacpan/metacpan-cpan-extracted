@@ -1,0 +1,3 @@
+#!/bin/sh
+rm ../README
+pod2text ../MaxEntropy.pm > ../README

@@ -1,0 +1,52 @@
+#!/usr/local/bin/perl -w
+
+use strict;
+use ExtUtils::testlib;
+use Solaris::Procfs qw(:procfiles writectl :control_codes :pcset_flags);
+use lib '.';
+
+$|++;
+
+my $pid;
+
+if ($pid = fork()) {
+
+	# parent
+	#
+	my $rc = waitpid($pid,0201);   # Hardcoded flag.  Aaack!!
+
+	if ($rc < 0) { die "Process already exited"; }
+
+	my $usage  = usage($pid);
+
+	my $realtime = 
+		$usage->{pr_rtime}->{tv_sec} +
+		$usage->{pr_rtime}->{tv_nsec} / 1_000_000_000;
+
+	my $usertime = 
+		$usage->{pr_utime}->{tv_sec} +
+		$usage->{pr_utime}->{tv_nsec} / 1_000_000_000;
+
+	my $systime = 
+		$usage->{pr_stime}->{tv_sec} +
+		$usage->{pr_stime}->{tv_nsec} / 1_000_000_000;
+
+	printf("real        %.3f\nuser        %.3f\nsys         %.3f\n",
+		$realtime, $usertime, $systime
+	);
+
+} else {
+
+	# child
+	#
+	$|++;
+
+	# Turn on microstate accounting
+	#
+	writectl($$,PCSET,PR_MSACCT);
+
+	# Exec the target process
+	#
+	exec(@ARGV);
+}
+

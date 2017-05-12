@@ -1,0 +1,6 @@
+^_build
+^Build$
+^blib
+~$
+\.bak$
+\B\.svn\b

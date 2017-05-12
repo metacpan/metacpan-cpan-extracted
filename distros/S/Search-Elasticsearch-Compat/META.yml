@@ -1,0 +1,38 @@
+---
+abstract: 'A compatibility layer for migrating from ElasticSearch.pm'
+author:
+  - 'Clinton Gormley <drtech@cpan.org>'
+build_requires:
+  ElasticSearch::SearchBuilder: '0'
+  Test::Differences: '0'
+  Test::Exception: '0'
+  Test::More: '0.98'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.013, CPAN::Meta::Converter version 2.133380'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Search-Elasticsearch-Compat
+recommends:
+  JSON::XS: '0'
+  URI::Escape::XS: '0'
+requires:
+  Any::URI::Escape: '0'
+  Carp: '0'
+  JSON: '0'
+  Moo: '0'
+  Scalar::Util: '0'
+  Search::Elasticsearch: '1.10'
+  Sub::Exporter: '0'
+  constant: '0'
+  namespace::clean: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/elasticsearch/elasticsearch-perl-compat/issues
+  repository: git://github.com/elasticsearch/elasticsearch-perl-compat.git
+version: '0.10'

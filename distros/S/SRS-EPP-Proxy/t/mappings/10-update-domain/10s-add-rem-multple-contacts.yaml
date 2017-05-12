@@ -1,0 +1,23 @@
+# Add and remove multiple contacts of the same type (which should fail)
+template: update-domain.tt
+
+vars:
+  domain: cheese.co.te
+  tech_old: registrant-001
+  tech_old2: registrant-001
+  admin: blah
+  admin2: blah2
+  admin_old: foo
+  admin_old2: foo
+
+input_assertions:
+  class: SRS::EPP::Command::Update::Domain
+
+
+output_assertions:
+  count:
+    - [ '//epp:result', 1, 'Check for one result' ]
+  attr_is:
+    - [ '//epp:result', 'code', 2306, 'Check for correct result code' ]
+  match:
+    - [ '//epp:reason', 'Only one admin contact per domain supported', 'Correct reason' ]

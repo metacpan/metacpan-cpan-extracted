@@ -1,0 +1,24 @@
+Change file for String::REPartition
+Avi Finkel <avi@finkel.org>
+
+Version 1.0 : 12/13/99 06:18
+
+  No changes -- initial release
+
+Version 1.1 : 1/12/00 01:12
+
+  Made a few minor changes in order to fail more gracefully when presented with particularly degenerate data sets -- it's all Philip's fault.
+  The code now chomp()s all input, since perl does some interesting things with $ and trailing \n
+  Fixed a somewhat stupid bug which caused gross errors when dealing with some specifically degenerate data sets.  Thanks to Mark-Jason Dominus for finding that one.
+
+Version 1.4 : 5/23/00 01:54
+
+	Cleaning up tests to be more standard.  I'm not sure where 1.2 went.  1.3 had an accident.
+
+Version 1.5 : 8/12/07 01:54
+
+	Fixing up dependency information, adding dep. tests.
+
+Version 1.6 : 8/14/07 05:54
+
+	Removing use of mostly broken module Test::Dependencies

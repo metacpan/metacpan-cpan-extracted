@@ -1,0 +1,58 @@
+NAME
+    Syntax::Keyword::Val - Provides a readonly variant of 'my' called 'val'
+
+WARNING
+    While I do have serious intentions for this module in the future, it is
+    definitely a *toy* as written now. At this stage, it serves better as a
+    simple example of using Keyword::Simple.
+
+DESCRIPTION
+    Simply use this module, then place the "val" keyword where you'd
+    normally use "my" for a read-only variant.
+
+     use Syntax::Keyword::Val;
+
+     val $foo = "bar";
+     $foo = 123;        # ERROR
+
+     val $foo = {a => 123, b => 456};
+     $foo->{a}   = 666;       # ERROR
+     $foo->{xyz} = "xyzzy";   # ERROR
+     delete $foo->{b};        # ERROR
+
+    The implementation uses Data::Lock, which itself uses the very fast
+    internal SV flag to enforce the read-only status, so there should be no
+    runtime penalty for using it.
+
+BUGS
+    Bugs and missing features aplenty. To start, due to the hacky
+    implementation using Keyword::Simple (which is great, but quite
+    limited), the "val" keyword currently only works for standalone
+    declarations, i.e. statements that would normally begin with "my".
+    Statements like this will not work:
+
+     # Doesn't work, will generate a syntax error
+     open val $fh, '<', $filename;
+
+    Only scalars and references can be declared as "val". Attempting to
+    declare a list or hash as a val will make it a normal variable (and
+    issue a warning)
+
+     # Issues a warning (assuming 'use warnings' is in effect)
+     val @foo = qw(foo bar baz);
+
+    Finally, "val" only applies to the first variable in a group, and the
+    rest are read-write as normal.
+
+     # Issues a warning (assuming 'use warnings' is in effect)
+     val ($foo, $bar) = @baz;
+
+AUTHOR
+    Chuck Adams <cja987@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Chuck Adams
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

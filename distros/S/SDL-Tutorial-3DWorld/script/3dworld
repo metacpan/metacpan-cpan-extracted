@@ -1,0 +1,22 @@
+#!/usr/bin/perl
+
+# Simple bootstrap loader with no functionality.
+
+use 5.008005;
+use strict;
+use warnings;
+use SDL::Tutorial::3DWorld ();
+
+our $VERSION = '0.33';
+
+# Load the game
+my $game = SDL::Tutorial::3DWorld->new( @ARGV );
+unless ( $game ) {
+	print "Failed to load 3D World\n";
+	exit(0);
+}
+
+# Start the game
+$game->run;
+
+exit(0);

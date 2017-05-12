@@ -1,0 +1,58 @@
+{
+   "abstract" : "DB_File emulator with SQLite backend",
+   "author" : [
+      "Mark A. Jensen"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "SQLite_File",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "AnyDBM_File::Importer" : "0",
+            "Module::Build" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "AnyDBM_File::Importer" : "0"
+         },
+         "requires" : {
+            "DBD::SQLite" : "1.25",
+            "Fcntl" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "SQLite_File" : {
+         "file" : "lib/SQLite_File.pm",
+         "version" : "0.050"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=SQLite_File"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/majensen/sqlite_file.git"
+      }
+   },
+   "version" : "0.050"
+}

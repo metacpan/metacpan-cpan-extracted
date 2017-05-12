@@ -1,0 +1,11 @@
+1.0000  2016-10-21   Add more tests to improve coverage;
+                     Fix minor issue found thereby;
+                     Add data from Wikibooks to cover up to 250 degrees of freedom;
+                     Document error messages
+
+0.6     2013-09-19   Fixed trivial doc-bug, spotted by Mike Castle
+
+0.5     2003-11-16   Maintainer changed from Jon Orwant to David Cantrell;
+                     Larger table so we can work with bigger data sets
+
+0.01    1999-10-18   Original version; created by h2xs 1.16

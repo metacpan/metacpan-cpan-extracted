@@ -1,0 +1,21 @@
+#!/usr/bin/ruby
+
+# Tests for prefix methods
+
+var i = int(12.5);
+
+assert_eq(i, 12);
+assert_eq(lc("TeSt"), "test");
+assert_eq(ceil(12.1.add(2)), 15);
+
+var int = 42;
+assert_eq(int, 42);
+assert_eq(::int(12.5), 12);         # `::` solves the ambiguity
+
+var l1 = lcm([3,4]...)
+assert_eq(l1, 12)
+
+var l2 = ::lcm [3,4]...
+assert_eq(l2, 12)
+
+say "** Test passed!";

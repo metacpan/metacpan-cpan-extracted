@@ -1,0 +1,24 @@
+# Just update the contact name, not the street
+template: update-contact.tt
+
+vars:
+  name: updated name
+  contact_id: simple1
+  transaction_id: raclette
+
+
+input_assertions:
+  class: SRS::EPP::Command::Update::Contact
+  match:
+
+SRS:
+ - assertions:
+     attr_is:
+       - [ '/NZSRSRequest/HandleUpdate', 'HandleId', 'simple1', 'SRS: handle id correct on request' ]
+output_assertions:
+  count: 
+    - [ '//epp:resData', 0, "No res data returned"]
+  attr_is:
+    - [ '//epp:result', 'code', 1000, 'EPP: Correct response code' ]
+
+

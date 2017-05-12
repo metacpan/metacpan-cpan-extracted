@@ -1,0 +1,8 @@
+#!/usr/bin/perl
+
+use Sysadm::Install qw(:all);
+print STDERR "Type perl code, terminate by CTRL-D\n";
+my $in = join "", <>;
+$in =~ s/\n/ /g;
+
+print "perl -e ", qquote($in, ':shell'), "\n";

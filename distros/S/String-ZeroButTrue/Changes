@@ -1,0 +1,9 @@
+Revision history for String-ZeroButTrue
+
+0.2  Fri Jan  9 09:50:46 2009
+       fix POD SYNOPSIS syntax error && typo
+       made check case insensitive and do one less eq
+
+0.1  Thu Jan  7 20:47:58 2009
+       Initial release.
+

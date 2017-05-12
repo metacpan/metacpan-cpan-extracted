@@ -1,0 +1,570 @@
+
+=head1 NAME
+
+SDL::Event - General event structure
+
+=head2 CATEGORY
+
+Core, Events, Structure
+
+=head1 SYNOPSIS
+
+ use SDL::Event;  # for the event object itself
+ use SDL::Events; # functions for event queue handling
+ 
+ SDL::init(SDL_INIT_VIDEO);
+ my $event = SDL::Event->new();
+ 
+ while(1)
+ {
+     SDL::Events::pump_events();
+
+     if(SDL::Events::poll_event($event))
+     {
+        if($event->type == SDL_MOUSEBUTTONDOWN)
+        {
+            # now you can handle the details
+            $event->button_which;
+            $event->button_button;
+            $event->button_x;
+            $event->button_y;
+        }
+        
+        last if $event->type == SDL_QUIT;
+     }
+
+     # your screen drawing code will be here
+ }
+ 
+=head1 DESCRIPTION
+
+Event handling allows your application to receive input from the user. 
+Event handling is initalised (along with video) with a call to:
+
+C<SDL::init(SDL_INIT_VIDEO);>
+
+Internally, SDL stores all the events waiting to be handled in an event queue. 
+Using functions like C<SDL::Events::poll_event()>, C<SDL::Events::peep_events> 
+and C<SDL::Events::wait_event()> you can observe and handle waiting input events.
+
+The key to event handling in SDL is the C<SDL::Event> union. 
+The event queue itself is composed of a series of C<SDL::Event> unions, one for each waiting event. 
+C<SDL::Event> unions are read from the queue with the C<SDL::Events::poll_event()> function 
+and it is then up to the application to process the information stored with them. 
+
+=head1	METHODS
+
+=head2	new
+
+C<new> creates an empty event-object, which can be used store information. 
+Either by calling C<poll_event($event)> that transfers one event from the queue into our object 
+or by setting all the needed data manually in order to push the event to the queue.
+
+ use SDL::Event;
+
+ my $event = SDL::Event->new();
+ 
+=head2	type
+
+SDL::Event is a union of all event structures used in SDL, using it is a simple matter of knowing 
+which union member relates to which event C<type>.
+
+ print 'heureka' if $event->type == SDL_MOUSEBUTTONDOWN;
+
+Available type constants:
+
+=over 4
+
+=item *
+
+L<SDL_ACTIVEEVENT|/Application_visibility_events> - Application visibility event structure 
+
+=item *
+
+L<SDL_KEYDOWN|/Keyboard_events> - Keyboard event structure 
+
+=item *
+
+L<SDL_KEYUP|/Keyboard_events> - Keyboard event structure 
+
+=item *
+
+L<SDL_MOUSEMOTION|/Mouse_motion_events> - Mouse motion event structure 
+
+=item *
+
+L<SDL_MOUSEBUTTONDOWN|/Mouse_button_events> - Mouse button event structure 
+
+=item *
+
+L<SDL_MOUSEBUTTONUP|/Mouse_button_events> - Mouse button event structure 
+
+=item *
+
+L<SDL_JOYAXISMOTION|/Joystick_axis_events> - Joystick axis motion event structure 
+
+=item *
+
+L<SDL_JOYBALLMOTION|/Joystick_trackball_events> - Joystick trackball motion event structure 
+
+=item *
+
+L<SDL_JOYHATMOTION|/Joystick_hat_events> - Joystick hat position change event structure 
+
+=item *
+
+L<SDL_JOYBUTTONDOWN|/Joystick_button_events> - Joystick button event structure 
+
+=item *
+
+L<SDL_JOYBUTTONUP|/Joystick_button_events> - Joystick button event structure 
+
+=item *
+
+L<SDL_VIDEORESIZE|/Window_resize_events> - Window resize event structure 
+
+=item *
+
+L<SDL_VIDEOEXPOSE|/Window_expose_events> - Window expose event 
+
+=item *
+
+L<SDL_QUIT|/Quit_event> - Quit requested event 
+
+=item *
+
+L<SDL_USEREVENT|/User_defined_events> - A user-defined event type 
+
+=item *
+
+L<SDL_SYSWMEVENT|/System_window_manager_events> - Platform-dependent window manager event. 
+
+=back
+
+Event types are grouped by masks. C<SDL_EVENTMASK($type)> will return the proper mask for the given C<type>.
+
+Available event mask constants:
+
+=over 4
+
+=item *
+
+SDL_ACTIVEEVENTMASK
+
+=item *
+
+SDL_KEYDOWNMASK
+
+=item *
+
+SDL_KEYUPMASK
+
+=item *
+
+SDL_KEYEVENTMASK
+
+=item *
+
+SDL_MOUSEMOTIONMASK
+
+=item *
+
+SDL_MOUSEBUTTONDOWNMASK
+
+=item *
+
+SDL_MOUSEBUTTONUPMASK
+
+=item *
+
+SDL_MOUSEEVENTMASK
+
+=item *
+
+SDL_JOYAXISMOTIONMASK
+
+=item *
+
+SDL_JOYBALLMOTIONMASK
+
+=item *
+
+SDL_JOYHATMOTIONMASK
+
+=item *
+
+SDL_JOYBUTTONDOWNMASK
+
+=item *
+
+SDL_JOYBUTTONUPMASK
+
+=item *
+
+SDL_JOYEVENTMASK
+
+=item *
+
+SDL_VIDEORESIZEMASK
+
+=item *
+
+SDL_VIDEOEXPOSEMASK
+
+=item *
+
+SDL_QUITMASK
+
+=item *
+
+SDL_SYSWMEVENTMASK
+
+=back
+
+This way you can check if a given C<type> matches a mask:
+
+ (SDL_EVENTMASK(SDL_JOYBUTTONDOWN)   & SDL_MOUSEEVENTMASK) # is false
+ (SDL_EVENTMASK(SDL_MOUSEBUTTONDOWN) & SDL_MOUSEEVENTMASK) # is true
+ (SDL_EVENTMASK(SDL_MOUSEBUTTONUP)   & SDL_MOUSEEVENTMASK) # is true
+ (SDL_EVENTMASK(SDL_MOUSEMOTION)     & SDL_MOUSEEVENTMASK) # is true
+ 
+ # and also true is:
+ 
+ (SDL_MOUSEEVENTMASK == SDL_EVENTMASK(SDL_MOUSEBUTTONDOWN) 
+                      | SDL_EVENTMASK(SDL_MOUSEBUTTONUP) 
+                      | SDL_EVENTMASK(SDL_MOUSEMOTION))
+
+=head2 Application visibility events
+
+C<active> is used when an event of type C<SDL_ACTIVEEVENT> is reported.
+
+When the mouse leaves or enters the window area a C<SDL_APPMOUSEFOCUS> type activation event occurs, 
+if the mouse entered the window then B<gain> will be 1, otherwise B<gain> will be 0. 
+
+A C<SDL_APPINPUTFOCUS> type activation event occurs when the application loses or gains keyboard focus. 
+This usually occurs when another application is made active. 
+
+Finally, a C<SDL_APPACTIVE> type event occurs when the application is either minimised/iconified (B<gain>=0) or restored. 
+
+A single event can have multiple values set in B<state>.
+
+B<Note:> This event does not occur when an application window is first created. 
+
+A new ActiveEvent (to fake focus loss) will be created like this:
+
+ my $event = SDL::Event->new();
+    $event->type(SDL_ACTIVEEVENT);
+    $event->active_gain(0);
+    $event->active_state(SDL_APPMOUSEFOCUS);
+
+ # I think this is wrong, ->active_type() should get SDL_APPMOUSEFOCUS, but what state gets?
+
+=head3 active_gain
+
+See C<active>. 0 if the event is a loss or 1 if it is a gain.
+
+=head3 active_state
+
+A bitmask of the following values: SDL_APPMOUSEFOCUS if mouse focus was gained or lost, 
+SDL_APPINPUTFOCUS if input focus was gained or lost, and SDL_APPACTIVE if the application was iconified (gain=0) or restored(gain=1).
+
+=head2 Keyboard events
+
+C<key> is used when an event of type C<SDL_KEYDOWN> or C<SDL_KEYUP> is reported.
+
+The type and state actually report the same information, they just use different values to do it. 
+A keyboard event generally occurs when a key is released (C<type=SDL_KEYUP> or C<key_state=SDL_RELEASED>) 
+and when a key is pressed (C<type=SDL_KEYDOWN> or C<key_state=SDL_PRESSED>). 
+
+The C<SDLK_CAPSLOCK> and C<SDLK_NUMLOCK> keys are special cases and report an C<SDL_KEYDOWN> when first pressed, 
+then an C<SDL_RELEASED> when released and pressed again. For these keys C<KEYUP> and C<KEYDOWN> events are therefore 
+analogous to the state of the caps lock and num lock LEDs rather than the keys themselves. 
+These special cases are required for compatibility with Sun workstations.
+
+B<Note:> Repeating C<SDL_KEYDOWN> events will occur if key repeat is enabled (see L<SDL::Events::enable_key_repeat|SDL::Events/"enable_key_repeat">). 
+
+=head3 key_state
+
+C<SDL_PRESSED> or C<SDL_RELEASED>
+
+=head3 key_scancode
+
+The C<scancode> field should generally be left alone, it is the hardware-dependent scancode returned by the keyboard.
+
+=head3 key_sym
+
+The C<sym> field is extremely useful. It is the SDL-defined value of the key (see the keysym definitions in SDLKey). 
+This field is very useful when you are checking for certain key presses, like so: 
+
+ while(poll_event($event))
+ {
+     switch($event->type)
+     {
+         case SDL_KEYDOWN:
+             move_left() if($event->key_sym == SDLK_LEFT);
+             break;
+         .
+         .
+         .
+     }
+ }
+
+=head3 key_mod
+
+C<mod> stores the current state of the keyboard modifiers as explained in SDL_GetModState.
+
+=head3 key_unicode
+
+The C<unicode> field is only used when UNICODE translation is enabled with L<SDL::Events::enable_unicode|SDL::Events/"enable_unicode">. 
+If C<unicode> is non-zero then this is the UNICODE character corresponding to the keypress. 
+If the high 9 bits of the character are 0, then this maps to the equivalent ASCII character:
+
+ my $char;
+ if(($event->key_unicode & 0xFF80) == 0)
+ {
+     $char = $event->key_unicode & 0x7F;
+ }
+ else
+ {
+     print("An International Character.\n");
+ }
+
+UNICODE translation does create a slight overhead so don't enable it unless its needed.
+
+NOTE: Key release events (SDL_KEYUP) won't necessarily (ever?) contain unicode information. 
+See L<http://lists.libsdl.org/pipermail/sdl-libsdl.org/2005-January/048355.html>
+
+=head2 Mouse motion events
+
+Simply put, a SDL_MOUSEMOTION type event occurs when a user moves the mouse within the 
+application window or when SDL_WarpMouse is called. Both the absolute (C<motion_x> and C<motion_y>) 
+and relative (C<motion_xrel> and C<motion_yrel>) coordinates are reported along with the current 
+button states (C<motion_state>).
+
+=head3 motion_state
+
+The button state can be interpreted using the C<SDL_BUTTON> macro (see L<SDL::Events::get_mouse_state|SDL::Events/"get_mouse_state">). 
+
+=head3 motion_x, motion_y
+
+The X/Y coordinates of the mouse
+
+=head3 motion_xrel, motion_yrel
+
+Relative motion in the X/Y direction.
+
+If the cursor is hidden (SDL_ShowCursor(0)) and the input is grabbed (SDL_WM_GrabInput(SDL_GRAB_ON)), 
+then the mouse will give relative motion events even when the cursor reaches the edge of the screen. 
+This is currently only implemented on Windows and Linux/Unix-alikes.
+
+=head2 Mouse button events
+
+When a mouse button press or release is detected, the number of the button pressed (from 1 to 255, 
+with 1 usually being the left button and 2 the right) is placed into C<button_button>. The position of the mouse 
+when this event occurred is stored in the C<button_x> and the C<button_y> fields. Like a keyboard event,
+information on whether the event was a press or a release event is stored in both the C<button_type> 
+and C<button_state> fields, but this should be obvious.
+
+Mouse wheel events are reported as buttons 4 (up) and 5 (down). Two events are generated i.e. you get 
+a C<SDL_MOUSEBUTTONDOWN> followed by a C<SDL_MOUSEBUTTONUP> event.
+
+=head3 button_which
+
+The input device index
+
+=head3 button_button
+
+The mouse button index (C<SDL_BUTTON_LEFT>, C<SDL_BUTTON_MIDDLE>, C<SDL_BUTTON_RIGHT>, C<SDL_BUTTON_WHEELUP>, 
+C<SDL_BUTTON_WHEELDOWN>)
+
+=head3 button_state
+
+C<SDL_PRESSED> or C<SDL_RELEASED>
+
+=head3 button_x, button_y
+
+The X/Y coordinates of the mouse at press/release time
+
+=head2 Joystick axis events
+
+A C<SDL_JOYAXISMOTION> event occurs whenever a user moves an axis on the joystick.
+
+=head3 jaxis_which
+
+The field C<jaxis_which> is the index of the joystick that reported the event.
+
+=head3 jaxis_axis
+
+The C<jaxis_axis> is the index of the axis (for a more detailed explanation see the Joystick section).
+
+=head3 jaxis_value
+
+C<jaxis_value> is the current position of the axis (range: -32768 to 32767).
+
+=head2 Joystick button events
+
+A C<SDL_JOYBUTTONDOWN> or C<SDL_JOYBUTTONUP> event occurs when ever a user presses 
+or releases a button on a joystick.
+
+=head3 jbutton_which
+
+The field C<jbutton_which> is the index of the joystick that reported the event.
+
+=head3 jbutton_button
+
+The C<jbutton_button> is the index of the button (for a more detailed explanation see the Joystick section).
+
+=head3 jbutton_state
+
+C<jbutton_state> is the current state of the button which is either C<jbutton_SDL_PRESSED> 
+or C<jbutton_SDL_RELEASED>. 
+
+=head2 Joystick hat events
+
+A C<SDL_JOYHATMOTION> event occurs when ever a user moves a hat on the joystick. 
+
+=head3 jhat_which
+
+The field C<jhat_which> is the index of the joystick that reported the event.
+
+=head3 jhat_hat
+
+C<jhat_hat> is the index of the hat (for a more detailed explanation see the Joystick section).
+
+=head3 jhat_value
+
+C<jhat_value> is the current position of the hat. It is a bitwise OR'd combination of the following 
+values (whose meanings should be pretty obvious):
+
+=over 4
+
+=item *
+
+C<SDL_HAT_CENTERED>
+
+=item *
+
+C<SDL_HAT_UP>
+
+=item *
+
+C<SDL_HAT_RIGHT>
+
+=item *
+
+C<SDL_HAT_DOWN>
+
+=item *
+
+C<SDL_HAT_LEFT>
+
+=back
+
+The following defines are also provided:
+
+=over 4
+
+=item *
+
+C<SDL_HAT_RIGHTUP>
+
+=item *
+
+C<SDL_HAT_RIGHTDOWN>
+
+=item *
+
+C<SDL_HAT_LEFTUP>
+
+=item *
+
+C<SDL_HAT_LEFTDOWN>
+
+=back
+
+=head2 Joystick trackball events
+
+A C<SDL_JOYBALLMOTION> event occurs when a user moves a trackball on the joystick.
+
+=head3 jball_which
+
+The field C<jball_which> is the index of the joystick that reported the event.
+
+=head3 jball_ball
+
+C<jball_ball> is the index of the trackball (for a more detailed explanation see the Joystick section).
+
+=head3 jball_xrel, jball_yrel
+
+Trackballs only return relative motion, this is the change in position on the ball since it was last 
+polled (last cycle of the event loop) and it is stored in C<jball_xrel> and C<jball_yrel>.
+
+=head2 Window resize events
+
+=head3 resize_w, resize_h
+
+When C<SDL_RESIZABLE> is passed as a flag to C<SDL_SetVideoMode> the user is allowed to resize the 
+applications window. When the window is resized an C<SDL_VIDEORESIZE> is reported, with the new 
+window width and height values stored in the resize structure's C<resize_w> and C<resize_h>. 
+When an C<SDL_VIDEORESIZE> is received the window should be resized to the new dimensions using 
+SDL_SetVideoMode. 
+
+=head2 Window expose events
+
+A C<VIDEOEXPOSE> event is triggered when the screen has been modified outside of the application, 
+usually by the window manager and needs to be redrawn.
+
+=head2 System window manager events
+
+The system window manager event contains a system-specific information about unknown window manager 
+events. If you enable this event using C<SDL_EventState>, it will be generated whenever unhandled 
+events are received from the window manager. This can be used, for example, to implement cut-and-paste 
+in your application.
+
+If you want to obtain system-specific information about the window manager, you can fill in the 
+version member of a SDL_SysWMinfo structure (details can be found in SDL_syswm.h, which must be included) 
+using the SDL_VERSION() macro found in SDL_version.h, and pass it to the function:
+
+ int SDL_GetWMInfo(SDL_SysWMinfo *info);
+ 
+See L<http://www.libsdl.org/cgi/docwiki.cgi/SDL_SysWMEvent>
+
+=head3 syswm_msg
+
+=head2 User defined events
+
+This event is unique, it is never created by SDL but only by the user. The event can be pushed onto
+the event queue using C<SDL::Events::push_event>. The contents of the structure members are completely up to the 
+programmer, the only requirement is that type is a value from C<SDL_USEREVENT> to C<SDL_NUMEVENTS-1> (inclusive)
+
+ my $event = SDL::Event->new();
+    $event->type ( SDL_USEREVENT + 3 );
+    $event->user_code(10);
+    $event->user_data1('hello event');
+
+ SDL::Events::push_event($event);
+
+=head3 user_code
+
+User defined event code (integer).
+
+=head3 user_data1, user_data2
+
+User defined data.
+
+=head2 Quit event
+
+As can be seen, the C<SDL_QuitEvent> structure serves no useful purpose. The event itself, on the other hand, 
+is very important. If you filter out or ignore a quit event then it is impossible for the user to close the 
+window. On the other hand, if you do accept a quit event then the application window will be closed, and 
+screen updates will still report success even though the application will no longer be visible.
+
+B<Note>: The macro SDL_QuitRequested will return non-zero if a quit event is pending 
+
+=head1 AUTHORS
+
+See L<SDL/AUTHORS>.
+
+=head1 SEE ALSO
+
+L<perl>

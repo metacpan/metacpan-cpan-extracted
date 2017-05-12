@@ -1,0 +1,12 @@
+include common.smakh
+
+default:   depend1 depend2 depend3 depend4a
+	{ trace(@_) }
+
+{
+qr(^depend(\d+)$)
+}:
+	{
+	    my ($maker, $target, $deps, $matches) = @_;
+	    push @OUTPUT, "Regexp rule for building $target with matches @$matches\n";
+	}

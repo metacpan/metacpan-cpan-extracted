@@ -1,0 +1,294 @@
+
+=pod
+
+=head1 NAME
+
+SDL::Audio - SDL Bindings for Audio
+
+=head1 CATEGORY
+
+Core, Audio
+
+=head1 CONSTANTS
+
+The constants are exported by default. You can avoid this by doing:
+
+ use SDL::Audio ();
+
+and access them directly:
+
+ SDL::Audio::AUDIO_S16SYS;
+
+or by choosing the export tags below:
+
+Export tag: ':format'
+
+ AUDIO_U8
+ AUDIO_S8
+ AUDIO_U16LSB
+ AUDIO_S16LSB
+ AUDIO_U16MSB
+ AUDIO_S16MSB
+ AUDIO_U16
+ AUDIO_S16 
+ AUDIO_U16SYS
+ AUDIO_S16SYS
+
+Export tag: ':status'
+
+ SDL_AUDIO_STOPPED
+ SDL_AUDIO_PLAYING
+ SDL_AUDIO_PAUSED
+
+=head1 METHODS
+
+=head2 open
+
+  use SDL;
+  use SDL::Audio;
+  
+  SDL::init(SDL_INIT_AUDIO);
+
+  my $desired = SDL::AudioSpec->new();
+  
+  my $obtained;
+
+  SDL::Audio::open( $desired, $obtained );
+  
+  # $obtained->... (A new SDL::AudioSpec now);
+
+This function opens the audio device with the desired parameters, and returns 0 if successful, placing the actual hardware parameters in the structure pointed to by obtained. If obtained is NULL, the audio data passed to the callback function will be guaranteed to be in the requested format, and will be automatically converted to the hardware audio format if necessary. This function returns -1 if it failed to open the audio device, or couldn't set up the audio thread.
+
+To open the audio device a desired SDL::AudioSpec must be created.
+
+  my $desired = SDL::AudioSpec->new();
+
+You must then fill this structure with your desired audio specifications.
+
+=over 
+
+=item The desired audio frequency in samples-per-second. 
+
+    $desired->freq
+
+=item The desired audio format. See L<SDL::AudioSpec>
+    
+    $desired->format
+
+=item The desired channels (1 for mono, 2 for stereo, 4 for surround, 6 for surround with center and lfe). 
+
+    $desired->channels
+
+=item The desired size of the audio buffer in samples. This number should be a power of two, and may be adjusted by the audio driver to a value more suitable for the hardware. Good values seem to range between 512 and 8192 inclusive, depending on the application and CPU speed. Smaller values yield faster response time, but can lead to underflow if the application is doing heavy processing and cannot fill the audio buffer in time. A stereo sample consists of both right and left channels in LR ordering. Note that the number of samples is directly related to time by the following formula: ms = (samples*1000)/freq 
+
+    $desired->samples
+    
+=item This should be set to a function that will be called when the audio device is ready for more data. It is passed a pointer to the audio buffer, and the length in bytes of the audio buffer. This function usually runs in a separate thread, and so you should protect data structures that it accesses by calling SDL::Audio::lock and SDL::Audio::unlock in your code. 
+
+THIS IS NOT READY YET
+
+    $desired->callback
+
+    my $callback = sub{ my ($userdata, $stream, $len) = @_;  };
+
+    $userdata is a reference stored in the userdata field of the SDL::AudioSpec. 
+    $stream is a pointer to the audio buffer you want to fill with information and $len is the length of the audio buffer in bytes.
+
+    $desired->userdata
+
+    This pointer is passed as the first parameter to the callback function. 
+
+=back
+
+SDL::Audio::open reads these fields from the desired SDL::AudioSpec structure passed to the function and attempts to find an audio configuration matching your desired. As mentioned above, if the obtained parameter is NULL then SDL with convert from your desired audio settings to the hardware settings as it plays.
+
+If obtained is NULL then the desired SDL::AudioSpec is your working specification, otherwise the obtained SDL::AudioSpec becomes the working specification and the desired specification can be deleted. The data in the working specification is used when building L<SDL::AudioCVT>'s for converting loaded data to the hardware format.
+
+SDL::Audio::open calculates the size and silence fields for both the $desired and $obtained specifications. The size field stores the total size of the audio buffer in bytes, while the silence stores the value used to represent silence in the audio buffer
+
+The audio device starts out playing silence when it's opened, and should be enabled for playing by calling SDL::Audio::pause(0) when you are ready for your audio callback function to be called. Since the audio driver may modify the requested size of the audio buffer, you should allocate any local mixing buffers after you open the audio device. 
+
+=head2 pause
+
+ pause( $bool )
+
+This function pauses and unpauses the audio callback processing. It should be called with C<$bool = 0> after opening the audio device to 
+start playing sound. This is so you can safely initialize data for your callback function after opening the audio device. Silence will 
+be written to the audio device during the pause.
+
+=head2 get_status
+
+ int get_status();
+
+Returns either C<SDL_AUDIO_STOPPED>, C<SDL_AUDIO_PLAYING> or C<SDL_AUDIO_PAUSED> depending on the current audio state. 
+
+=head2 load_wav 
+
+ SDL::AudioSpec load_wav( $filename, $spec );
+
+This function loads a WAVE file into memory.
+
+If this function succeeds, it returns the given C<SDL::AudioSpec>, filled with the audio data format of the wave data, and sets C<buf> 
+to a buffer containing the audio data, and sets C<len> to the length of that audio buffer, in bytes. You need to free the audio buffer 
+with C<SDL::Audio::free_wav> when you are done with it.
+
+This function returns NULL and sets the SDL error message if the wave file cannot be opened, uses an unknown data format, or is corrupt. 
+Currently raw, MS-ADPCM and IMA-ADPCM WAVE files are supported.
+
+Example:
+
+ use SDL;
+ use SDL::Audio;
+ use SDL::AudioSpec;
+ 
+ SDL::init(SDL_INIT_AUDIO);
+ 
+ # Converting some WAV data to hardware format
+
+ my $desired  = SDL::AudioSpec->new();
+ my $obtained = SDL::AudioSpec->new();
+ 
+ # Set desired format
+ $desired->freq(22050);
+ $desired->channels(1);
+ $desired->format(AUDIO_S16);
+ $desired->samples(8192);
+ 
+ # Open the audio device
+ if( SDL::Audio::open($desired, $obtained) < 0 )
+ {
+     printf( STDERR "Couldn't open audio: %s\n", SDL::get_error() );
+     exit(-1);
+ }
+ 
+ # Load the test.wav
+ my $wav_ref = SDL::Audio::load_wav('../../test/data/sample.wav', $obtained);
+ 
+ unless( $wav_ref )
+ {
+     warn( "Could not open sample.wav: %s\n", SDL::get_error() );
+     SDL::Audio::close_audio();
+     SDL::quit;
+     exit(-1);
+ }
+ 
+ my ( $wav_spec, $wav_buf, $wav_len ) = @{$wav_ref};
+
+=head2 free_wav 
+
+ free_wav( $buffer )
+
+After a WAVE file has been opened with C<load_wav> its data can eventually be freed with C<free_wav>. C<buffer> is the buffer created 
+by C<load_wav>. 
+
+=head2 convert
+
+ SDL::Audio->convert( cvt, data, len )
+ 
+Converts audio data to a desired audio format.
+
+C<convert> takes as first parameter C<cvt>, which was previously initialized. Initializing a C<SDL::AudioCVT> is a two step process. 
+First of all, the structure must be created via C<SDL::AudioCVT-E<gt>build> along with source and destination format parameters. Secondly, 
+the C<data> and C<len> fields must be setup. C<data> should point to the audio data buffer being source and destination at 
+once and C<len> should be set to the buffer length in bytes. Remember, the length of the buffer pointed to by buf should be 
+C<len*len_mult> bytes in length.
+
+Once the C<SDL::AudioCVT> structure is initialized, we can pass it to C<convert>, which will convert the audio data pointed to 
+by C<data>. If C<convert> fails C<undef> is returned, otherwise the converted C<SDL::AudioCVT> structure.
+
+If the conversion completed successfully then the converted audio data can be read from C<cvt-E<gt>buf>. The amount of valid, converted, 
+audio data in the buffer is equal to C<cvt-E<gt>len*cvt-E<gt>len_ratio>. 
+
+Example:
+
+ use SDL;
+ use SDL::Audio;
+ use SDL::AudioSpec;
+ use SDL::AudioCVT;
+ 
+ SDL::init(SDL_INIT_AUDIO);
+ 
+ # Converting some WAV data to hardware format
+
+ my $desired  = SDL::AudioSpec->new();
+ my $obtained = SDL::AudioSpec->new();
+ 
+ # Set desired format
+ $desired->freq(22050);
+ $desired->channels(1);
+ $desired->format(AUDIO_S16);
+ $desired->samples(8192);
+ 
+ # Open the audio device
+ if( SDL::Audio::open($desired, $obtained) < 0 )
+ {
+     printf( STDERR "Couldn't open audio: %s\n", SDL::get_error() );
+     exit(-1);
+ }
+ 
+ # Load the test.wav
+ my $wav_ref = SDL::Audio::load_wav('../../test/data/sample.wav', $obtained);
+ 
+ unless( $wav_ref )
+ {
+     warn( "Could not open sample.wav: %s\n", SDL::get_error() );
+     SDL::Audio::close_audio();
+     SDL::quit;
+     exit(-1);
+ }
+ 
+ my ( $wav_spec, $wav_buf, $wav_len ) = @{$wav_ref};
+ 
+ # Build AudioCVT
+ my $wav_cvt = SDL::AudioCVT->build( $wav_spec->format, $wav_spec->channels, $wav_spec->freq,
+                                     $obtained->format, $obtained->channels, $obtained->freq); 
+
+ # Check that the convert was built
+ if( $wav_cvt == -1 )
+ {
+     warn( "Couldn't build converter!\n" );
+     SDL::Audio::close();
+     SDL::Audio::free_wav($wav_buf);
+     SDL::quit();
+     exit(-1);
+ }
+ 
+ # And now we're ready to convert
+ SDL::Audio::convert($wav_cvt, $wav_buf, $wav_len);
+ 
+ # We can free original WAV data now
+ SDL::Audio::free_wav($wav_buf);
+ 
+B<TODO>: What to do with it? How to use callback? See http://www.libsdl.org/cgi/docwiki.cgi/SDL_ConvertAudio
+
+=head2 mix
+
+Mixes audio data
+
+B<Not implemented yet>. See: L<http://www.libsdl.org/cgi/docwiki.cgi/SDL_MixAudio>
+
+=head2 lock
+
+ lock();
+
+The lock manipulated by these functions protects the callback function. During a C<lock> period, you can be guaranteed that the callback 
+function is not running. Do not call this from the callback function or you will cause deadlock.
+
+=head2 unlock
+
+ unlock();
+
+Unlocks a previous C<lock> call.
+
+=head2 close 
+
+ close();
+
+Shuts down audio processing and closes the audio device.  
+
+=head1 AUTHORS
+
+See L<SDL/AUTHORS>.
+
+=cut
+

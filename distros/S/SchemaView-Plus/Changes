@@ -1,0 +1,132 @@
+Revision history for Perl extension SchemaView Plus.
+
+0.17 <20140118>
+	- put Math::Project, Data::CompactDump to separate CPAN distribution
+	- remove Data::RefSupport (obsolete with List::Flatten)
+
+0.16 <20020121>
+	- removing test for XML::SimpleParser
+
+0.15 <20020111>
+	- PostScript::Poster instead of standalone poster
+
+0.14 <20011127>
+	- DBIx::SystemCatalog::XBase - fs_ls() implementation
+	- DBIx::SystemCatalog used for dbsh - fs_ls()
+	- Data::CompactDump output format - export, loading with autodetecting
+	- stop working on XML::SimpleParser - bad way
+	- new betatester Muller
+	- founded new bugs, enlarging todo
+	- start working on PostScript::Poster
+	- MANIFEST.SKIP
+	- DBIx::SystemCatalog::Oracle support for unique and indexes
+
+0.13 <20011113>
+	- finding objects in object repository
+	- edit relationship
+	- create relationship
+
+0.12 <20011111>
+	- new about box
+	- splash
+	- setting program name for ps/top structures
+	- support for printing to Ghostview (gv) and printer
+	- Print::Printcap interface to /etc/printcap
+	- changing order in edit table dialog changed from drag to button
+	- constant size of Place button
+	- showing PK in more information dialog
+	- don't uppercase table name in rename and new object
+	- setting PK in edit table dialog
+	- in edit table dialog don't uppercase added items
+	- retrieve overwrites objects in Object repository
+		(but forgot all new informations)
+	- don't store retrieve_ items from previous versions
+	- filters in retrieving dialog
+	- memorize connection information in retrieve schema
+	- optionable extra information in Object repository
+	- correcting bug with Object repository showing
+	- DBIx::SystemCatalog indexes and unique indexes support
+	- showing PK in edit table dialog
+	- some new hints
+	- postering support
+	- PostScript printing options (limits, rotation) (Luf)
+	- saving and restoring selected font in *.svp files
+	- changing font on canvas (Luf), need Tk::FontDialog
+	- DBIx::SystemCatalog::Pg made by Luf
+	- showing primary keys in tables
+	- add line between table name and table columns
+	- retrieve primary keys
+	- new about box dialog
+	- DBIx::SystemCatalog::Pg support for relationships (thanks to Luf)
+	- correct bug with dropping unplaced objects
+	- small changes in GUI
+
+0.11 <20010420>
+	- Data::RefSupport
+	- start working on XML::SimpleParser
+	- announcing on Freshmeat
+
+0.10 <20010419>
+	- multiple columns relationships support
+	- little corrections in putting and dropping dragpoints in smooth curve
+	- correct bug with empty object repository
+	- new table or view in repository
+	- edit table or view in repository
+	- rename table, view or relationship in repository
+	- changing order of items in edit table
+	- new file and object repository if we start svplus without arguments
+
+0.09 <20010407>
+	- take out license files (same as Perl)
+	- directory structure changes
+	- popup menu (relationships, dragpoints, tables, canvas, repository)
+	- some new hints
+	- big bug with scrolling and dragpoints solved
+	- bug with drag'n'drop tables and scrolling solved
+	- bug with more information about object solved
+	- Drop button in object repository
+	- selection make visible selected item in object repository
+	- saving position of scrollbars and canvas dimensions
+	- saving position and dimensions of all windows
+	- Hints::X 0.02, Hints::Base 0.02 (small changes)
+	- Hana Cerna's wedding's day - now Mrs. Netrefova
+
+0.08 <20010406>
+	- opening object repository window with raising
+	- Math::Project 0.03 with EXPORT_OK version of exporting functions
+	- hints database for svplus
+	- Hints::X and integrating hints into svplus
+	- key press and key release routines
+	- Control+Delete for dropping relationships
+
+0.07 <20010405>
+	- hints, hints base modules
+
+0.06 <20010404>
+	- solving some small known bugs
+	- Math::Project 0.02
+	- error handling (in test mode)
+	- drag'n'drop between repository and canvas
+
+0.05 <20010403>
+	- simple post-install tests (loading modules, Math::Project)
+	- dropping dragpoints
+	- solving strange adding of dragpoints
+
+0.04 <20010325>
+	- coords based connections (dragpoint)
+	- progress bar
+	- smooth connection
+
+0.03 <20010322>
+	- enhanced object repository
+	- relationships and their connections
+
+0.02 <20010319>
+	- CPAN-style installation
+	- documentation
+	- introduce to SchemaView's author Miroslav Kripac
+
+0.01 <20010318>
+	- first devel release
+	- presented on MZLU in Brno

@@ -1,0 +1,40 @@
+# Update a domain with a registrant contact that doesn't exist
+template: update-domain.tt
+
+vars:
+  domain: cheese.co.te
+  owner: noexist
+
+input_assertions:
+  class: SRS::EPP::Command::Update::Domain
+  count:
+    - [ '//domain:name', 1, 'SRS: Check for the domain' ]
+    - [ '//domain:registrant', 1, 'SRS: Check for the registrant' ]
+  match:
+    - [ '//domain:name', 'cheese.co.te', 'SRS: Check the domain name' ]
+    - [ '//domain:registrant', 'noexist', 'SRS: Check the registrant' ]
+
+SRS:
+  - assertions:
+      count:
+      match:
+        - [ '//DomainNameFilter', 'cheese.co.te', 'SRS: Check for the domain name' ]
+        - [ '//RegistrantContact/@HandleId', 'noexist', 'SRS: Handle of registrant contact changed' ]
+      match_all:
+      attr_is:
+    fake_response: |-
+      <NZSRSResponse VerMajor="5" VerMinor="0">
+        <Response Action="DomainUpdate" FeId="8" FeSeq="4803365" OrigRegistrarId="90" RecipientRegistrarId="90" TransId="brause8770">
+          <FeTimeStamp Day="8" Hour="16" Minute="19" Month="7" Second="54" TimeZoneOffset="+12:00" Year="2010"/>
+          <Error ErrorId="HANDLE_DOES_NOT_EXIST" Hint="UNKNOWN_ERROR_HINT" Severity="err">
+            <Description><![CDATA[There is no Handle with the given HandleId.]]></Description>
+            <ErrorDetails><![CDATA[RegistrantContact]]></ErrorDetails>
+          </Error>
+        </Response>
+      </NZSRSResponse>
+
+output_assertions:
+  count:
+    - [ '//epp:result', 1, 'SRS: Check for one result' ]
+  attr_is:
+    - [ '//epp:result', 'code', 2303, 'SRS: Check for correct result code' ]

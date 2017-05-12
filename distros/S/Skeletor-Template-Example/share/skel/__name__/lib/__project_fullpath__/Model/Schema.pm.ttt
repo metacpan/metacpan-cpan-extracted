@@ -1,0 +1,30 @@
+package [% namespace %]::Model::Schema;
+
+use Moose;
+extends 'Catalyst::Model::DBIC::Schema';
+
+__PACKAGE__->config(schema_class => '[% namespace %]::Schema');
+__PACKAGE__->meta->make_immutable;
+
+=head1 TITLE
+
+[% namespace %]::Model::Schema- Proxy for [% namespace %]::Schema
+
+=head1 DESCRIPTION
+
+Proxies all the L<[% namespace %]::Schema> information to L<[% namespace %]::Model::Schema>
+
+=head1 METHODS
+
+This class defines the following methods
+
+=head1 AUTHORS & COPYRIGHT
+
+See L<[% namespace %]>.
+
+=head1 LICENSE
+
+See L<[% namespace %].
+
+=cut
+

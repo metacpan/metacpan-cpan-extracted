@@ -1,0 +1,13 @@
+Changes
+eSpeak.xs
+speak_lib.h
+typemap
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/Speech-eSpeak.t
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/Speech/eSpeak.pm
+META.yml                                 Module meta-data (added by MakeMaker)

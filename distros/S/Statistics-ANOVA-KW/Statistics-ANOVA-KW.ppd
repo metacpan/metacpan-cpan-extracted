@@ -1,0 +1,12 @@
+<SOFTPKG NAME="Statistics-ANOVA-KW" VERSION="0.01">
+    <ABSTRACT>Kruskall-Wallis statistics and test (nonparametric independent analysis of variance by ranks for nominally grouped data)</ABSTRACT>
+    <AUTHOR>Roderick Garton &lt;rgarton@cpan.org&gt;</AUTHOR>
+    <IMPLEMENTATION>
+        <REQUIRE NAME="Statistics::Data::Rank" VERSION="0.01" />
+        <REQUIRE NAME="Statistics::Lite" VERSION="3.62" />
+        <REQUIRE NAME="Statistics::Data" VERSION="0.11" />
+        <REQUIRE NAME="List::AllUtils" VERSION="0.09" />
+        <REQUIRE NAME="Math::Cephes" VERSION="0.5304" />
+        <CODEBASE HREF="PPM-Statistics-ANOVA-KW-0.01.tar.gz" />
+    </IMPLEMENTATION>
+</SOFTPKG>

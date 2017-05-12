@@ -1,0 +1,25 @@
+# Successful create with minimal set of details
+template: create_contact_minimal.tt
+
+vars:
+  name: Albert Einstein
+  street: electric avenue
+  city: Anywhere
+  ccode: NZ
+  phone: +64.44798699
+  email: a@smartarse.co.te
+  contact_id: minimal1
+
+input_assertions:
+  class: SRS::EPP::Command::Create::Contact
+  match:
+
+SRS:
+ - assertions:
+     attr_is:
+       - [ '/NZSRSRequest/HandleCreate', 'HandleId', 'minimal1', 'SRS: create handle' ]
+output_assertions:
+  attr_is:
+    - [ '//epp:result', 'code', 1000, 'EPP: Correct response code' ]
+
+

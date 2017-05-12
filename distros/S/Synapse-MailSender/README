@@ -1,0 +1,30 @@
+Synapse-MailSender
+===================
+
+Synapse-MailSender is an email templating and notification sending mechanism
+based on Petal::Tiny and MIME::Lite.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+MIME::Lite
+MIME::Type::FileName
+XML::Parser::REX
+Petal::Tiny
+YAML::XS
+
+
+COPYRIGHT AND LICENCE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

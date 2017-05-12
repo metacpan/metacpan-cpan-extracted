@@ -1,0 +1,9 @@
+Revision history for Perl extension String::FixedLen
+
+0.02 2007-08-03 06:36:10 UTC
+    - The MANIFEST file forgot to list itself, and thus was
+      not included in the tarball. Oops.
+
+0.01 2007-08-02 22:06:53 UTC
+    - initial version.
+

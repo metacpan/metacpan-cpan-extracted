@@ -1,0 +1,38 @@
+[% USE Siesta( 'action' => 'login' ) %]
+[% IF Siesta.success %]
+[% session.user = Siesta.success %]
+[% END %]
+
+[% INCLUDE _header.tt2 %]
+
+[% IF session.user %]
+<h2>Hello [% session.user.email | html %]</h2>
+[% ELSE;
+       IF Siesta.has_errors;
+           PROCESS _errors_list.tt2;
+       END; %]
+<h2>Login failed.</h2>
+[% END %]
+
+Messages you can unlock:<br />
+[% FOR deferred = Siesta.deferred %]
+<a href="resume.tt2?id=[% deferred.id %]">[% deferred.message.subject | html %].</a> [% deferred.why | html %]<br />
+[% END %]
+
+<p>&nbsp;</p>
+
+Lists you are subscribed to:<br />
+<table>
+[% FOR list = Siesta.user.lists %]
+<tr>
+        <td class='clsSubNav'><a href="list.tt2?list=[% list.name %]">[% list.name %]</a></td>
+        <td class='clsDescription'>[% list.description %]</td>
+        <td class='clsSmallLink'><a href="archive/[% list.name %]">archive</a></td>
+</tr>
+[% END %]
+</table>
+
+
+
+[% INCLUDE _footer.tt2 %]
+

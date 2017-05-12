@@ -1,0 +1,25 @@
+Revision history for Perl extension Statistics::EfficiencyCI.
+
+0.07  Fri Mar 28 10:52 2014
+  - Option to upgrade warnings to exceptions.
+  - Less eager to warn.
+
+0.06  Tue Mar 25 10:52 2014
+  - Replace some printf use in C code with Perl warn() for
+    saner debugging.
+
+0.05  Mon Oct 07 15:00 2013
+  - Expose beta_ab, beta_cf, ibetai to Perl.
+
+0.04  Tue Sep 25 08:00 2012
+  - Expose log_gamma to Perl.
+
+0.03  Wed Feb  2 20:00 2011
+  - Add missing header include.
+
+0.02  Tue Feb  1 20:00 2011
+  - Require 5.8.1, not 5.10.1
+
+0.01  Mon Jan 31 20:00 2011
+  - original version
+

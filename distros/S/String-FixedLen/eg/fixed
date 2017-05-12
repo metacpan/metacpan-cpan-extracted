@@ -1,0 +1,15 @@
+use strict;
+use warnings;
+
+use String::FixedLen;
+
+tie my $str, 'String::FixedLen', 4;
+
+sub p { print "[$str]\n" }
+
+$str = 'a';              p;
+$str .= 'bcde';          p;
+$str = "hello, world\n"; p;
+$str = "wis$str";        p;
+$str = 9999 + 2;         p;
+$str = sqrt(2);          p;

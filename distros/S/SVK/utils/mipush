@@ -1,0 +1,110 @@
+#!/usr/bin/perl -w
+use strict;
+use SVK;
+use SVK::XD;
+use SVN::Repos;
+use SVK::Util 'traverse_history';
+use Getopt::Long;
+#15:03 <clkao> mirror boot
+#15:03 <clkao> o mirror state initialisation, SVK::Mirror accessible
+#15:03 <clkao> o dump->read_record
+#15:03 <clkao> o translate record, add revprop for svm:head
+#15:03 <clkao> o svn::repos::load_from_dump($record->as_string)
+
+my $revspec;
+
+sub usage {
+        print <<EOUSAGE;
+Usage:  mipush repopath depotpath svn_dump_file
+    Reverse version of pullyu
+    
+    Example: ./mipush ./.svk/local //mirror/svk myproject-svn-dumpfile
+    
+EOUSAGE
+exit;
+}
+
+
+die unless GetOptions ("r|revision=s@" => \$revspec);
+
+use SVN::Dump 0.03;
+
+my $repospath = shift or usage();
+my $depotpath = shift or usage();
+my ($depotname, $path) = $depotpath =~ m|^/([^/]*)(/.*?)/?$|;
+my $file = shift or usage();
+
+my $repos = SVN::Repos::open($repospath) or die $!;
+my $depot = SVK::Depot->new({ depotname => $depotname, repos => $repos, repospath => $repospath});
+# TODO: for exists mirror, maybe we should remove it and create a new one?
+my $t  = SVK::Path->real_new({ depot => $depot, path => $path })
+    ->refresh_revision;
+my ( $m, $mpath ) = $t->is_mirrored;
+die $t->depotpath." is not a mirrored path.\n" if !$m;
+die $t->depotpath." is inside a mirrored path.\n" if $mpath;
+die "only whole repository mirrors are supported.\n" if length($mpath);
+
+
+my $prev = undef;
+my $rev = 0;
+my $dump = SVN::Dump->new( { file => $file } );
+my $prefix = $m->path.'/';
+my $buf;
+my $header;
+while ( my $record = $dump->next_record() ) {
+    if ($record->type eq 'format' || $record->type eq 'uuid') {
+	$header = $header.$record->as_string;
+	next;
+    }
+
+    my $translate = sub {
+	my $rec = shift;
+
+	if (my $path = $rec->get_header('Node-copyfrom-path')) {
+	    $path = $prefix.$path;
+	    $rec->set_header('Node-copyfrom-path' => $path );
+	}
+#	if (my $rev = $rec->get_header('Node-copyfrom-rev')) {
+#	    $rec->set_header('Node-copyfrom-rev' => 0);
+#		scalar $m->find_local_rev( $rev, $m->source_uuid ) - $rev);
+#	    warn "$rev changed to ". (scalar $m->find_local_rev( $rev, $m->source_uuid ) - $rev) ;
+#	}
+	
+	if ($rec->get_header('Revision-number')) {
+	    $rev = $rec->get_header('Revision-number');
+	    $prev = $rev if !$prev;
+	    $rec->set_property('svm:headrev',$m->source_uuid.':'.$rev."\n");
+	}
+
+
+	if ( my $path = $rec->get_header('Node-path') ) {
+	    $path = $prefix.$path;
+	    $rec->set_header('Node-path' => $path);
+	}
+
+    };
+    $translate->( $record );
+    my $inc = $record->get_included_record;
+    $translate->( $inc ) if $inc;
+
+    if ($rev and $prev != $rev) {
+	import_repos($header,$buf);
+	$buf = "";
+	$prev = $rev;
+    }
+
+    $buf = $buf.$record->as_string;
+}
+
+if ($rev) {
+    import_repos($header,$buf);
+}
+sub import_repos {
+    my ($header, $buf) = @_;
+    $buf = $header.$buf;
+    open my $fh, '<', \$buf;
+    my $ret = SVN::Repos::load_fs2( $repos, $fh, \*STDERR, $SVN::Repos::load_uuid_default, undef, 0, 0, undef, undef );
+    # (repos,dumpstream,feedback_stream,uuid_action,parent_dir,use_pre_commit_hook,use_post_commit_hook,cancel_func,cancel_baton,pool);
+    return $ret;
+}
+

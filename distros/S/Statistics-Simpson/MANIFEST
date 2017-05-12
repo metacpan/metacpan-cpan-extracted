@@ -1,0 +1,10 @@
+ChangeLog
+Makefile.PL
+MANIFEST
+README
+lib/Statistics/Simpson.pm
+t/00new.t
+t/01anon.t
+t/02spec.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

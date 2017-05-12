@@ -1,0 +1,1422 @@
+#!/usr/bin/perl
+# sh2xml_l.pl
+# This is about as good as I can do without any more information. Any suggestions
+# for where to go from here. Someone could take the output from this automated
+# solution and use XSLT to re-organise according to a different DTD.
+
+$VERSION = '1.4'; #     MJPH    16-FEB-2006     Support lang tags with -l & -p
+# $VERSION = '1.3'; #     MJPH    23-OCT-2006     Add -p, \xpath
+# $VERSION = '1.2.1'; #   MJPH    19-SEP-2006     Add documentation!
+# $VERSION = '1.2';   #   MJPH    13-SEP-2006     Add template output
+# $VERSION = '1.1.1'; #   MJPH    27-SEP-2005     More consistent use of $opt_a
+# $VERSION = '1.1';   #   MJPH    24-MAY-2005     Add -m and \mkrsOverThis support, fix -c
+# $VERSION = '1.0.4'; #   MJPH    22-APR-2005     Fix Unicode fonts in -f and handling unicode text
+# $VERSION = '1.0.3'; #   MJPH     8-JUN-2004     Add charset support
+# $VERSION = '1.0.2'; #   MJPH    15-MAR-2003     Convert font names via system codepage
+# $VERSION = '1.0.1'; #   MJPH     5-MAR-2003     Add system codepage support
+# $VERSION = '1.0';   #   MJPH     9-MAY-2003     Add Unicode support for Toolbox
+
+use SIL::Shoe::Settings;
+use SIL::Shoe::Data;
+use Encode qw(_utf8_on decode_utf8 encode_utf8);
+use Encode::Registry;
+use File::Spec;
+use Getopt::Std;
+use Pod::Usage;
+
+getopts("a:c:d:e:fhil:mps:x:z:");
+
+if ($opt_h)
+{
+    pod2usage( -verbose => 2);
+    exit;
+}
+
+unless (defined $ARGV[0])
+{
+    pod2usage(1);
+    exit;
+}
+
+%esc = (                    # as per XML spec.
+    '<' => '&lt;',
+    '>' => '&gt;',
+    '&' => '&amp;',
+    "'" => '&apos;',
+    '"' => '&quot;'
+    );
+    
+%charsets = (
+    0 => 1252,      # ansi - Western European
+    1 => 0,         # default
+    2 => 0,         # symbol
+    3 => 0,         # invalid
+    77 => 10000,    # mac
+    128 => 932,     # Shift JIS
+    129 => 949,     # Hangul
+    130 => 1361,    # Johab
+    134 => 936,     # GB2312 Simplified Chinese
+    136 => 950,     # Big5 Traditional Chinese
+    161 => 1253,    # Greek
+    162 => 1254,    # Turkish
+    163 => 1258,    # Vietnamese
+    177 => 1255,    # Hebrew
+    178 => 1256,    # Arabic
+    179 => 'arabictrad',
+    180 => 'arabicuser',
+    181 => 'hebrewuser',
+    186 => 1257,    # Baltic
+    204 => 1251,    # Russian (Cyrillic)
+    222 => 874,     # Thai
+    238 => 1250,    # Eastern European
+    254 => 437,     # PC 437
+    255 => 'oem'
+    );
+
+my $c;
+my %months = (map {$_ => ++$c} qw(jan feb mar apr may jun jul aug sep oct nov dec));
+
+unless (defined $ARGV[1])
+{
+    $ARGV[1] = $ARGV[0];
+    $ARGV[1] =~ s/(\.[^.]*)?$/.xml/o;
+}
+
+if ($] > 5.007 && $opt_e)
+{
+    foreach (split(/\s*[,;]\s*/, $opt_e))
+    {
+        require "Encode/$opt_e.pm";
+        &{"Encode::$opt_e::import"};
+    }
+}
+
+if ($opt_m)
+{ $opt_a = '_' unless defined $opt_a; }
+else
+{ $opt_a = "value" unless defined $opt_a; }
+
+my ($vern_lang, $vern_script);
+
+if ($opt_p)
+{
+    require SIL::Shoe::XPath;
+    require XML::XPath::Node::Element;
+    my ($t) = Text::LangTag->parse($opt_l);
+    my ($s) = $t->just_script;
+    $vern_script = $s->to_string;
+    $vern_lang = $t->no_script->to_string;
+}
+
+$opt_s = "." unless defined $opt_s;
+$settings = SIL::Shoe::Settings->new($opt_s) || die "Unable to read settings directory at $opt_s";
+
+$s = SIL::Shoe::Data->new($ARGV[0], undef, nostripnl => 1)
+        || die "Can't open $ARGV[0]";
+open(OUTFILE, ">$ARGV[1]") || die "Can't create $ARGV[1]";
+binmode(OUTFILE, ":utf8");
+select OUTFILE;
+
+$typef = $settings->type($s->{' Type'}) || die "Can't find .typ file for type: $s->{' Type'}";
+$typef->read;
+$typef->add_specials;
+$s->{' key'} = $typef->{'mkrRecord'}[0] || $typef->{'mkrRecord'};        # bug in .typ file results in mkrRecord going in twice
+$lngdef = $settings->lang($typef->{'lngDefault'});
+$lngdef->add_specials if ($lngdef);
+if ($opt_c)
+{ $deflang = $opt_c; }
+elsif ($lngdef->{'codepage'})
+{ $deflang = $lngdef->{'codepage'}; }
+elsif ($^O eq 'MSWin32')
+{
+    require Win32::TieRegistry;
+    Win32::TieRegistry->import(Delimiter => '/');
+
+    $deflang = $Registry->{"LMachine/SYSTEM/ControlSet/CurrentControlSet/Control/Nls/CodePage//ACP"};
+}
+
+unless ($deflang)
+{ $deflang = 1252; }
+
+$defenc = Encode::Registry::find_encoding($deflang) || Encode::Registry::find_encoding('iso-8859-1')
+    || die "Can't make an encoding converter for $deflang";
+
+print '<?xml version="1.0" encoding="UTF-8"' . ($opt_i ? ' standalone="yes"' : '') . ' ?>' . "\n";
+print '<?xml-stylesheet type="text/xsl" href="' . $opt_x . "\"?>\n" if ($opt_x);
+
+$typen = $s->{' Type'};
+$typen =~ s/\s+/_/oig;
+if ($opt_d)
+{ print "<!DOCTYPE $typen SYSTEM \"$opt_d\">\n"; }
+
+$dtd = make_dtd($typef, $typen);
+
+if (defined $typef->{'pre_xml'})
+{ print process_template($typef->{'pre_xml'}, $opt_l, $s) . "\n\n"; }
+else
+{ print "<shoebox type=\"$s->{' Type'}\">\n\n"; }
+
+if ($opt_f)
+{
+    print "<shoebox-format>\n";
+    foreach $m (sort keys %{$typef->{'mkr'}})
+    {
+        my ($fntmkr, $italic, $bold, $color);
+        my ($mkr) = $typef->{'mkr'}{$m};
+        my ($enc, $cp) = get_enc($m, $settings, $typef, $defenc, $opt_s);
+        my ($fname);
+        
+        print "  <marker name=\"$dtd->{$m}{'element'}\"";   #"
+        print " style=\"" . (defined $mkr->{'CharStyle'} ? 'char' : 'par') . "\"";
+        print ">\n";
+        print "    <language>$mkr->{'lng'}</language>\n";
+         if (defined $mkr->{'fnt'})
+        { $fntmkr = $mkr->{'fnt'}; }
+        else
+        { $fntmkr = $settings->lang($mkr->{'lng'}); }
+        
+        $italic = defined $fntmkr->{'Italic'} ? 'italic' : undef;
+        $bold = defined $fntmkr->{'Bold'} ? 'bold' : undef;
+        $color = $fntmkr->{'rgbColor'} eq '0,0,0' ? undef : defined $fntmkr->{'rgbColor'};
+        $bold .= ' ' if ($bold && $italic);
+        
+        print "    <font size=\"$fntmkr->{'Size'}\"";
+        print " style=\"$bold$italic\"" if ($bold || $italic);
+        print " color=\"$color\"" if ($color);
+        $fname = $fntmkr->{'Name'};
+        my ($nfname);
+        $fntmkr->add_specials if (ref $fntmkr ne 'HASH');
+        if (!defined $mkr->{'fnt'} && defined $fntmkr->{'unicode_font'})
+        { $nfname = $fntmkr->{'unicode_font'}; }
+        elsif ($cp)
+        { $nfname = Encode::Registry::find_encfont($cp, $fname); }
+        $fname = $nfname if ($nfname);
+        print ">" . protect($defenc->decode($fname)) . "</font>\n";
+
+        if (defined $dtd->{$m}{'interlinid'})
+        { print "    <interlinear level=\"" . ($dtd->{$m}{'interlinid'} + 1) . "\"/>\n"; }
+        if ($dtd->{$m}{'element'} ne $m)
+        { print "    <original-marker>" . protect($m) . "</original-marker>\n"; }
+        print "  </marker>\n";
+    }
+    print "</shoebox-format>\n\n";
+}
+
+while ($s->readrecord(\@fields))
+{
+    $indent = 0;
+    @stack = ('shoebox');
+    for ($i = 0; $i <= $#fields; $i++)
+    {
+        $f = $fields[$i];
+        $marker = $f;
+        next if ($s->{$marker} eq "");
+        $marker =~ s/\s+.*$//oi;    # strip to the name back to its sfm
+
+        if (defined $dtd->{$marker}{'interlinid'})
+        {
+            if (!defined $interlin_level)
+            {
+                if ($opt_p)
+                {
+                    $introot = XML::XPath::Node::Element->new('interlinear-block');
+                    $s->{' xpath_context'}[-1]->appendChild($introot);
+                }
+                else
+                {
+                    print " " x $indent . "<interlinear-block>\n";
+                    $indent += 2;
+                }
+            }
+            elsif ($dtd->{$marker}{'interlinid'} == 0)
+            { 
+                output_block($indent, $rows, $dtd, $introot);
+                $rows = [];
+            }
+            $interlin_level = $dtd->{$marker}{'interlinid'};
+            $rows->[$interlin_level] = build_pos($s->{$f});
+            next;
+        }
+        elsif (defined $interlin_level)
+        {
+            output_block($indent, $rows, $dtd, $introot);
+            $rows = [];
+            if ($opt_p)
+            { print $introot->toString(0, " " x $indent); }
+            else
+            {
+                $indent -= 2;
+                print " " x $indent . "</interlinear-block>\n";
+            }
+            undef $interlin_level;
+        }
+        ($s->{$f}, $dump) = convert_text($s->{$f}, '', $opt_m, $marker, $settings, $typef, $defenc, $opt_s, $dtd);
+
+# need to handle @{$dtd->{$marker}{'parent'}} here to find: least closes or least insertions if needed
+# need to add ability to read DTD from external file and sync with SFMs
+        if (defined $dtd->{$marker}{'parent'})
+        {
+            my ($best) = -1; 
+            my ($cost);
+            for ($h = 0; $h < scalar @stack; $h++)      # up the tree to find the best root subtree
+            {
+                if (defined $dtd->{$stack[$h]}{'cost'}{$marker} && (!defined $cost || scalar @{$dtd->{$stack[$h]}{'cost'}{$marker}} < $cost))
+                {
+                    $best = $h;
+                    $cost = scalar @{$dtd->{$stack[$h]}{'cost'}{$marker}};
+                    last if ($cost == 0);       # take first zero cost solution;
+                }
+            }
+            
+            while ($best-- > 0)        # close off to the root of this subtree
+            {
+                $p = shift(@stack);
+                $indent -= 2 unless (defined $dtd->{$p}{'pre_template'} && !defined $dtd->{$p}{'post_template'});
+                print close_xml($s, $dtd, $p, $indent, $opt_p);
+            }
+            
+            $p = $stack[0];         # get the root of this subtree
+            foreach $h (@{$dtd->{$p}{'cost'}{$marker}})     # output path to us
+            {
+                print open_xml($s, $dtd, $h, $indent, undef, $opt_a, $opt_m, $opt_p,
+                        $settings->lang($typef->{'mkr'}{$h}{'lng'}) || $lngdef);
+                unshift (@stack, $h);
+                $indent += 2 unless (defined $dtd->{$h}{'pre_template'} && !defined $dtd->{$h}{'post_template'});
+            }
+        }
+        print open_xml($s, $dtd, $marker, $indent, $s->{$f}, $opt_a, $opt_m, $opt_p,
+                        $settings->lang($typef->{'mkr'}{$marker}{'lng'}) || $lngdef);
+        if (@{$dtd->{$marker}{'child'}})
+        {
+            unshift(@stack, $marker);
+            $indent += 2 unless (defined $dtd->{$marker}{'pre_template'} && !defined $dtd->{$marker}{'post_template'});
+        }
+
+    }
+    if (defined $interlin_level)
+    {
+        output_block($indent, $rows, $dtd, $introot);
+        $rows = [];
+        if ($opt_p)
+        { print $introot->toString(0, " " x $indent); }
+        else
+        {
+            $indent -= 2;
+            print " " x $indent . "</interlinear-block>\n";
+        }
+        undef $interlin_level;
+    }
+    
+    while ($#stack >= 1)
+    {
+        my ($h) = shift(@stack);
+        $indent -= 2 unless (defined $dtd->{$h}{'pre_template'} && !defined $dtd->{$h}{'post_template'});
+        print close_xml($s, $dtd, $h, $indent, $opt_p);
+    }
+    print "\n";
+}
+
+if (defined $typef->{'post_xml'})
+{ print OUTFILE process_template($typef->{'post_xml'}, $opt_l, $s); }
+else
+{ print OUTFILE "</shoebox>\n"; }
+close OUTFILE;
+
+sub make_dtd
+{
+    my ($tf, $typen) = @_;
+    my ($k, $tree, $mk, $lcount, $nk);
+
+    $tree = {};
+    $lcount = 0;
+    foreach $k (@{$tf->{'intprc'}})
+    {
+        foreach $mk ($k->{'mkrFrom'}, $k->{'mkrTo'})
+        {
+            unless (defined $tree->{$mk}{'interlinid'})
+            {
+                $tree->{$mk}{'interlinid'} = $lcount;
+                $tree->{'interlinear block'}{'markers'}[$lcount++] = $mk;
+            }
+        }
+#        $tree->{$k->{'mkrTo'}}{'interlin_parent'} = $tree->{$k->{'mkrFrom'}}{'interlinid'};
+        $tree->{$k->{'mkrTo'}}{'parent'} = $k->{'mkrFrom'};
+        push(@{$tree->{$k->{'mkrFrom'}}{'interlin_child'}}, $tree->{$k->{'mkrTo'}}{'interlinid'});
+    }
+    
+    foreach $k (keys %{$tf->{'mkr'}})
+    {
+        $nk = transform($k);
+        $tree->{$k}{'element'} = $nk;
+        $parent = $tf->{'mkr'}{$k}{'mkrOverThis'};
+        if (defined $tree->{$k}{'interlinid'})
+        {
+            if (defined $tree->{$k}{'parent'})
+            { $parent = $tree->{$k}{'parent'}[0]; }
+            else
+            { 
+                push (@{$tree->{'interlinear block'}{'child'}}, $k);
+                $nk = 'interlinear block';
+                $tree->{$nk}{'element'} = 'interlinear-block';
+                $tree->{$k}{'parent'} = [$nk];
+                $k = 'interlinear block';
+            }
+        }
+        $parent ||= 'shoebox';
+        $tree->{$k}{'parent'} = [$parent] unless defined $tree->{$k}{'parent'};
+        push (@{$tree->{$parent}{'child'}}, $k);
+        if (defined $tf->{'mkr'}{$k} && defined $tf->{'mkr'}{$k}{'mkrsOverThis'})
+        {
+            foreach (split(' ', $tf->{'mkr'}{$k}{'mkrsOverThis'}))
+            {
+                push (@{$tree->{$k}{'parent'}}, $_);
+                push (@{$tree->{$_}{'child'}}, $nk);
+            }
+        }
+        $tree->{$k}{'pre_template'} = $tf->{'mkr'}{$k}{'pre_xml'} if (defined $tf->{'mkr'}{$k} && defined $tf->{'mkr'}{$k}{'pre_xml'});
+        $tree->{$k}{'post_template'} = $tf->{'mkr'}{$k}{'post_xml'} if (defined $tf->{'mkr'}{$k} && defined $tf->{'mkr'}{$k}{'post_xml'});
+    }
+
+    foreach (qw(pre_default post_default xpath_default))
+    { $tree->{$_} = $tf->{$_}; }
+
+    # build cost path from each possible ancestor to each possible leaf
+    foreach $k (sort keys %{$tree})
+    {
+        $nk = transform($k);
+        foreach $p (@{$tree->{$k}{'parent'}})
+        { distance($tree, $p, $k, []); }
+        if ($opt_p)
+        {
+            if ($tf->{'mkr'}{$k}{'xpath'})
+            { $tree->{$k}{'xpath'} = $tf->{'mkr'}{$k}{'xpath'}; }
+            elsif ($opt_m)
+            { $tree->{$k}{'xpath'} = "$nk/$opt_a=\$v"; }
+            elsif (@{$tree->{$k}{'child'}})
+            { $tree->{$k}{'xpath'} = "$nk\[\@$opt_a=\$v]"; }
+            else
+            { $tree->{$k}{'xpath'} = "$nk=\$v"; }
+            foreach (qw(xvar xtype))
+            {
+                next unless (defined $tf->{'mkr'}{$k}{$_});
+                my ($s) = $tf->{'mkr'}{$k}{$_};
+                $s =~ s/\s*$//o;
+                $tree->{$k}{$_} = $s;
+            }
+        }
+    }
+    
+    return $tree unless (defined $opt_d || defined $opt_i);
+
+    if (defined $opt_d)
+    {
+        open(DTD, ">$opt_d") || die "Can't create $opt_d";
+        select DTD;
+        print '<?xml version="1.0" encoding="UTF-8" ?>' . "\n";
+    }
+
+    print "<!DOCTYPE shoebox [\n";
+    if ($opt_f)
+    {
+        print "<!ELEMENT shoebox (shoebox-format, ($tree->{'shoebox'}{'child'}[0])*)>\n";
+        print <<'EOT';
+<!ELEMENT shoebox-format (marker)*>
+<!ELEMENT marker (language, font, interlinear?, original-marker?)>
+<!ATTLIST marker 
+    name CDATA #REQUIRED
+    style (char | par) #REQUIRED>
+
+<!ELEMENT language (#PCDATA)>
+
+<!ELEMENT font (#PCDATA)>
+<!ATTLIST font 
+        size CDATA #REQUIRED
+        style CDATA #IMPLIED
+        color CDATA #IMPLIED>
+        
+<!ELEMENT interlinear EMPTY>
+<!ATTLIST interlinear level CDATA #IMPLIED>
+
+<!ELEMENT original-marker (#PCDATA)>
+
+EOT
+    }
+    else
+    { print "<!ELEMENT shoebox ($tree->{'shoebox'}{'child'}[0])*>\n"; }
+
+    print "<!ATTLIST shoebox type CDATA #IMPLIED>\n\n";
+
+    foreach $nk (sort keys %{$tree})
+    { 
+        next if ($nk eq 'shoebox');
+        if (defined $tree->{$nk}{'child'})
+        {
+            my (@list) = map {$tree->{$_}{'element'}} sort @{$tree->{$nk}{'child'}};
+            unshift(@list, $opt_a) if ($opt_m);
+            print "<!ELEMENT $tree->{$nk}{'element'} (" . join("|", @list) . ")*>\n";
+            print "<!ATTLIST $tree->{$nk}{'element'} $opt_a CDATA #IMPLIED>\n\n" unless ($opt_m);
+        }
+        elsif ($opt_m)
+        { print "<!ELEMENT $tree->{$nk}{'element'} ( $opt_a )?\n"; }
+        else
+        { print "<!ELEMENT $tree->{$nk}{'element'} (#PCDATA)>\n"; }
+    }
+
+    print "]>\n\n";
+
+    if (defined $opt_d)
+    {
+        select OUTFILE;
+        close(DTD);
+    }
+    $tree;
+}
+
+# build path from leaf to all possible ancestors storing only the shortest path
+sub distance
+{
+    my ($tree, $parent, $leaf, $dist) = @_;
+    my ($p);
+    
+    if (!defined $tree->{$parent}{'cost'}{$leaf} || scalar @{$tree->{$parent}{'cost'}{$leaf}} > scalar @{$dist})
+    { 
+        $tree->{$parent}{'cost'}{$leaf} = $dist;
+        foreach $p (@{$tree->{$parent}{'parent'}})
+        { distance($tree, $p, $leaf, [$parent, @{$dist}]); }
+    }
+}
+
+sub transform
+{
+    my ($str) = (@_);
+    $str =~ s/^(\d)/_.$1/o;
+    $str;
+}
+
+
+sub protect
+{
+    my ($str) = @_;
+    
+    $str =~  s/([<>&'"])/$esc{$1}/og;    # tidy up data ']
+    $str;
+}
+
+
+sub convert_text
+{
+    my ($str, $delim, $opt_m, $marker, $settings, $typef, $defenc, $base, $dtd) = @_;
+    my ($enc, $cp) = get_enc($marker, $settings, $typef, $defenc, $base);
+    my ($pre, $post, $match, $q, $res);
+    
+    $q = "|$delim" if ($delim);
+    if ($opt_m && $str =~ m/(\|(\w+)\{$q)/)
+    {
+        $pre = $`;      #`
+        $post = $';     #'
+        $match = $2;
+        
+        if ($1 eq $delim)
+        {
+            if ($enc)
+            { return (protect($enc->decode($pre)), $post); }
+            else
+            { return (protect(decode_utf8($pre)), $post); }
+        }
+        else
+        {
+            $res = protect($enc ? $enc->decode($pre) : decode_utf8($pre));
+            $res .= defined $dtd->{$match} ? "<$dtd->{$match}{'element'}>" : "<$match>";
+            ($pre, $post) = convert_text($post, '}', $opt_m, $match, $settings, $typef, $enc, $base, $dtd);
+            $res .= $pre;
+            $res .= defined $dtd->{$match} ? "</$dtd->{$match}{'element'}>" : "</$match>";
+            $res .= protect($enc ? $enc->decode($post) : decode_utf8($post));
+            return ($res, undef);
+        }
+    }
+    else
+    { return (protect($enc ? $enc->decode($str) : decode_utf8($str)), undef); }
+}
+
+    
+sub get_enc
+{
+    my ($marker, $settings, $typef, $defenc, $base) = @_;
+    my ($res, $enc);
+    
+    unless ($lang = $settings->lang($typef->{'mkr'}{$marker}{'lng'}))
+    { $enc = $defenc; }
+    elsif (defined $lang->{'encoding'})
+    { $enc = $lang->{'encoding'}; }
+    elsif (defined $lang->{'UnicodeLang'})
+    { undef $enc; }
+    else
+    {
+        my ($cp);
+        $lang->add_specials;
+        $cp = $lang->{'codepage'};
+        if ($cp eq 'none')
+        { $enc = undef; }           # this may cause problems since data can be non utf8 conformant
+        elsif ($cp =~ /\.tec$/o)
+        {
+            $enc = Encode::TECkit->new(File::Spec->catfile($base, $cp));
+            unless ($enc)
+            {
+                print STDERR "Unable to find TECkit mapping $cp, using default encoding\n";
+                $enc = $defenc;
+            }
+        }
+        else
+        {
+            $cp ||= $charsets{hex($lang->{'charset'})};
+            $enc = Encode::Registry::find_encoding($cp);
+            $res = $cp;
+            if (!$enc && $cp)
+            {
+                print STDERR "Unable to find encoding $cp, using default\n";
+                $enc = $defenc;
+            }
+        }
+        $lang->{'encoding'} = $enc;
+    }
+    ($enc, $res);
+}
+
+sub open_xml
+{
+    my ($sh, $dtd, $mk, $indent, $value, $attrib, $n_attrib, $usexp, $lang) = @_;
+    my ($res);
+    my ($mark) = $dtd->{$mk}{'element'} || $mk;
+
+    if ($usexp)
+    {
+        my (%vars);
+        if ($mk eq $sh->{' key'})       # first field of record?
+        { 
+            $sh->{' xpath_root'} = XML::XPath::Node::Element->new();
+            $sh->{' xpath_context'} = [$sh->{' xpath_root'}];
+            $sh->{' rnumber'}++;
+        }
+
+        $value = datatype($dtd->{$mk}{'xtype'}, $value) if ($dtd->{$mk}{'xtype'});
+        $var = {
+            'v' => $value,
+            'k' => $sh->{$sh->{' key'}},
+            'm' => $mk,
+            'rn' => $sh->{' rnumber'},
+            'fn' => $sh->{' fnumber'}++,
+            'vl' => $vern_lang,
+            'vs' => $vern_script,
+            'll' => $lang->lang_tag || 'und',
+            'ls' => $lang->script_tag || 'Zyyy',
+        };
+        %vars = process_vars($dtd->{$mk}{'xvar'}, $var) if ($dtd->{$mk}{'xvar'});
+
+        print STDERR "\\$mk $dtd->{$mk}{'xpath'}, " . join (",", %$var, %vars) . "\n" if (($opt_z & 1) != 0);
+        my ($nodes) = XML::XPath->find($dtd->{$mk}{'xpath'} || $dtd->{'xpath_default'}, $sh->{' xpath_context'}[-1], 'create', {%$var, %vars});
+        push (@{$sh->{' xpath_context'}}, $nodes->get_node(1)) if (@{$dtd->{$mk}{'child'}});
+    }
+    elsif (defined $dtd->{$mk}{'pre_template'})
+    { $res = process_template($dtd->{$mk}{'pre_template'}, $value, $sh, $indent) . "\n"; }
+    elsif (!defined $dtd->{$mk}{'element'} && defined $dtd->{'pre_default'})
+    { $res = process_template($dtd->{'pre_default'}, $value, $sh, $indent, $mk) . "\n"; }
+    elsif ($n_attrib)
+    {
+        $res = " " x $indent;
+        $res .= "<$mark>\n";
+        $res .= " " x $indent;
+        $res .= "  <$attrib>$value</$attrib>\n";
+        unless (defined $dtd->{$mk}{'child'})
+        { $res .= close_xml($sh, $dtd, $mk, $indent); }
+    } elsif (defined $dtd->{$mk}{'child'})
+    {
+        $res = " " x $indent;
+        $res .= "<$mark";
+        $res .= " $attrib=\"$value\"" if ($value);
+        $res .= ">\n";
+    } elsif ($value)
+    { $res = " " x $indent . "<$mark>$value</$mark>\n"; }
+    else
+    { $res = " " x $indent . "<$mark/>\n"; }
+
+    return $res;
+}
+
+
+sub close_xml
+{
+    my ($sh, $dtd, $p, $indent, $usexp) = @_;
+    my ($res);
+    my ($mark) = $dtd->{$p}{'element'} || $p;
+
+    if ($usexp)
+    {
+        pop (@{$sh->{' xpath_context'}});
+        if ($p eq $sh->{' key'})
+        {
+            $res = $sh->{' xpath_root'}->toString(0, " " x $indent);
+            delete($sh->{' xpath_root'})->dispose;
+        }
+    }
+    elsif (defined $dtd->{$p}{'post_template'})
+    { $res = process_template($dtd->{$p}{'post_template'}, '', $sh, $indent) . "\n"; }
+    elsif (defined $dtd->{$p}{'pre_template'})
+    { }
+    elsif (!defined $dtd->{$p}{'element'} && defined $dtd->{'post_default'})
+    { $res = process_template($dtd->{'post_default'}, '', $sh, $indent, $p) . "\n"; }
+    elsif (!defined $dtd->{$p}{'element'} && defined $dtd->{'pre_default'})
+    { }
+    else
+    { $res = " " x $indent . "</$mark>\n"; }
+
+    return $res;
+}
+
+sub process_template
+{
+    my ($template, $value, $sh, $indent, $mark) = @_;
+    my ($res) = $template;
+    $res =~ s/\s*$//os;
+    $res =~ s/(^|\n)/$1 . " " x $indent/ges;
+    $res =~ s/%V/$value/g;
+    $res =~ s/%F\((.*?)\)/$sh->{$1}/g;
+    $res =~ s/%M/$mark/g;
+    return $res;
+}
+
+sub process_vars
+{
+    my ($input, $vars) = @_;
+    my ($key, $val, @res);
+
+    while ($input =~ m/(\S+)\s*=\s*(?:"([^"]+)"|'([^']+)'|(\S+))/ogsx) #"
+    {
+        $key = $1;
+        $val = $2 || $3 || $4;
+        $val =~ s/\$([a-zA-Z0-9]+)/$vars->{$1}/oge;
+        push (@res, $key => $val);
+    }
+    return @res;
+}
+
+sub expand_vars
+{
+    my ($var, $str, $sh, $mk) = @_;
+
+    if ($var eq 'v')
+    { return $str; }
+    elsif ($var eq 'k')
+    { return $sh->{$sh->{' key'}}; }
+    elsif ($var eq 'm')
+    { return $mk; }
+    elsif ($var eq 'rn')
+    { return $sh->{' rnumber'}; }
+    elsif ($var eq 'fn')
+    { return $sh->{' fnumber'}; }
+    else
+    { return ""; }
+}
+
+sub datatype
+{
+    my ($type, $str) = @_;
+    my ($res) = $str;
+
+    if ($type eq 'date')
+    {
+        my (@f) = split(/\s*\/\s*/, $str);
+        unshift (@f, 1) unless ($f[0]);
+        $res = sprintf("%04d-%02d-%02d", $f[2], $months{lc($f[1])}, $f[0]);
+    }
+    return $res;
+}
+
+sub build_pos
+{
+    my ($str) = @_;
+    my ($match, $num, $pos, $substr, $first, $new, $last);
+
+    $pos = 0;
+    $num = 0;
+#    $str =~ s/^\s?//og;
+    while ($str =~ m/^(\S+)\s*/oi)
+    {
+        $substr = $1;
+        $match = $&;
+        $str = $';  #'
+        $new = SIL::Shoe::Interlin::Node->new(
+            text => $substr,
+            num => $num,
+            pos => $pos,
+            end => $pos + length($substr));
+        if ($last)
+        {
+            $last->{'next'} = $new;
+            $last = $new;
+        }
+        else
+        {
+            $first = $new;
+            $last = $new;
+        }
+        $pos += length($match);
+        $num++;
+    }
+    return $first;
+}
+
+sub make_tree
+{
+    my ($dtd, $row, $prow, $ind, $pind) = @_;
+    my ($child, $parent, $oldp, $plast);
+
+    for ($child = $row; defined $child; $child = $child->{'next'})
+    {
+# find actual parent of this child
+        for ($parent = $prow; defined $parent; $parent = $parent->{'next'})
+        {
+            if ($child->{'pos'} == $parent->{'pos'})
+            {
+                $plast = $parent;
+                last;
+            }
+            elsif ($child->{'pos'} < $parent->{'pos'})
+            { last; }
+            $plast = $parent;
+        }
+        
+        $child->{'parent'} = $plast;
+        push(@{$plast->{'children'}[$ind]}, $child);
+
+        $oldp = $plast;
+        for ($parent = $plast->{'next'}; defined $parent; $parent = $parent->{'next'})
+        {
+            last unless ($child->{'end'} >= $parent->{'pos'});
+            $oldp = $parent;
+        }
+
+        mark_links($dtd, $plast, $oldp, $pind) if ($oldp ne $plast);
+    }
+}
+
+
+sub mark_links
+{
+    my ($dtd, $first, $last, $ind) = @_;
+    my ($pfirst, $plast, $pind);
+    my ($mk) = $dtd->{'interlinear block'}{'markers'}[$ind];
+
+    $pind = $dtd->{$dtd->{$mk}{'parent'}}{'interlinid'} if (defined $dtd->{$mk}{'parent'});
+    if (defined $pind)
+    {
+        $pfirst = $first->{'parent'};
+        $plast = $last->{'parent'};
+        mark_links($dtd, $pfirst, $plast, $pind) if ($pfirst ne $plast);
+    }
+
+    for ($pfirst = $first; $pfirst ne $last; $pfirst = $pfirst->{'next'})
+    { $pfirst->{'linked'} = 1; }
+}
+
+
+sub output_block
+{
+    my ($indent, $rows, $dtd, $introot) = @_;
+    my ($i);
+    
+    for ($i = 0; $i < scalar @{$rows}; $i++)
+    {
+        $mk = $dtd->{'interlinear block'}{'markers'}[$i];
+        if (defined $dtd->{$mk}{'parent'} && defined $dtd->{$dtd->{$mk}{'parent'}}{'interlinid'})
+        {
+            my ($pid) = $dtd->{$dtd->{$mk}{'parent'}}{'interlinid'};
+            make_tree($dtd, $rows->[$i], $rows->[$pid], $i, $pid);
+        }
+    }
+    process_stack($dtd, 0, $rows, $indent, $introot);
+    
+}
+
+sub process_stack
+{
+    my ($dtd, $ind, $rows, $indent, $introot) = @_;
+    my ($p, $c, $op);
+
+    for ($p = $rows->[$ind]; defined $p; $p = $p->{'next'})
+    {
+        $op->{'linked'} = 1 if (defined $op && !$p->{'children'});
+        $op = $p;
+    }
+
+    for ($c = $rows->[$ind]; defined $c; $c = $c->{'next'})
+    {
+        for ($p = $c; defined $p && $p->{'linked'}; $p = $p->{'next'})
+        { }
+
+        if ($p ne $c)
+        {
+            $c->{'chained'} = $p;
+            mark_children($dtd, $c, $p, $ind);
+            $c = $p;
+        }
+    }
+
+    for ($c = $rows->[$ind]; defined $c; $c = $c->{'next'})
+    {
+        next unless ($c->{'chained'});
+        remove_links($dtd, $c, $c->{'chained'}, $ind);
+    }
+
+    for ($p = $rows->[$ind]; defined $p; $p = $p->{'next'})
+    { stack_xml($p, $ind, $dtd, $indent, $introot); }
+}
+
+
+sub mark_children
+{
+    my ($dtd, $first, $last, $ind) = @_;
+    my ($cind, $cfirst, $clast, $c, $p);
+
+    return unless (scalar @{$dtd->{$dtd->{'interlinear block'}{'markers'}[$ind]}{'interlin_child'}});
+    foreach $cind (@{$dtd->{$dtd->{'interlinear block'}{'markers'}[$ind]}{'interlin_child'}})
+    {
+        $cfirst = $first->{'children'}[$cind][0];
+        next unless $cfirst;
+        for ($p = $first; defined $p && $p ne $last->{'next'}; $p = $p->{'next'})
+        {
+            foreach $c (@{$p->{'children'}[$cind]})
+            {
+                if ($cfirst->{'pos'} <= $c->{'pos'})
+                {
+                    $clast = $c;
+                }
+                else
+                {
+                    $clast = $cfirst;
+                    $cfirst = $c;
+                }
+            }
+        }
+
+        if ($cfirst)
+        {
+            $clast ||= $cfirst;
+            $cfirst->{'chained'} = $clast;
+            for ($c = $cfirst; $c ne $clast; $c = $c->{'next'})
+            {
+                $c->{'linked'} = 1;
+            }
+            $first->{'fchild'}[$cind] = $cfirst;
+            mark_children($dtd, $cfirst, $clast, $cind);
+        }
+    }
+}
+
+
+sub remove_links
+{
+    my ($dtd, $first, $last, $ind) = @_;
+    my ($cind, $c);
+
+    if (scalar @{$dtd->{$dtd->{'interlinear block'}{'markers'}[$ind]}{'interlin_child'}})
+    {
+        foreach $cind (@{$dtd->{$dtd->{'interlinear block'}{'markers'}[$ind]}{'interlin_child'}})
+        {
+            $c = $first->{'fchild'}[$cind];
+            next unless $c;
+            remove_links($dtd, $c, $c->{'chained'}, $cind);
+            $first->{'children'}[$cind] = [$c];
+            $c->{'parent'} = $first;
+        }
+    }
+
+    for ($c = $first->{'next'}; defined $c && $c ne $last->{'next'}; $c = $c->{'next'})
+    {
+        $first->{'text'} .= " $c->{'text'}";
+    }
+    $first->{'next'} = $c;
+    $first->{'linked'} = 0;
+}
+
+
+sub stack_xml
+{
+    my ($first, $ind, $dtd, $indent, $introot) = @_;
+    my ($mk, $enc, $str, $lang, $c, $child, $cp);
+    
+    $mk = $dtd->{'interlinear block'}{'markers'}[$ind];
+    
+    ($enc, $cp) = get_enc($mk, $settings, $typef, $defenc, $opt_s);
+
+    if ($first)
+    {
+        $str = $first->{'text'};
+        if ($enc)
+        { $str = $enc->decode($str); }
+        else
+        { $str = decode_utf8($str, 0); }
+        $str =~ s/([<>&'"])/$esc{$1}/og unless ($introot);    # tidy up data ']
+    }
+    else
+    { $str = ''; }
+
+    print " " x $indent;
+    if (defined $dtd->{$mk}{'interlin_child'})
+    {
+        if ($introot)
+        { 
+            my ($nodes) = XML::XPath->find($dtd->{$mk}{'xpath'}, $sh->{' xpath_context'}[-1], 'create', {
+                'v' => $str,
+                'k' => $sh->{$sh->{' key'}},
+                'rn' => $sh->{' rnumber'},
+                'fn' => $sh->{' fnumber'}++
+            });
+            push (@{$sh->{' xpath_context'}}, $nodes->get_node(1));
+        }
+        elsif ($first)
+        { print "<$dtd->{$mk}{'element'} $opt_a=\"$str\">\n"; }
+        else
+        { print "<$dtd->{$mk}{'element'}>\n"; }
+
+        foreach $c (@{$dtd->{$mk}{'interlin_child'}})
+        {
+            if ($first && @{$first->{'children'}[$c]})
+            {
+                foreach $child (@{$first->{'children'}[$c]})
+                { stack_xml($child, $c, $dtd, $indent + 2, $introot); }
+            }
+            else
+            { stack_xml(undef, $c, $dtd, $indent + 2, $introot); }
+        }
+        if ($introot)
+        { pop (@{$sh->{' xpath_context'}}); }
+        else
+        { print " " x $indent . "</$dtd->{$mk}{'element'}>\n"; }
+    }
+    elsif ($introot)
+    {
+        my ($nodes) = XML::XPath->find($dtd->{$mk}{'xpath'}, $sh->{' xpath_context'}[-1], 'create', {
+            'v' => $str,
+            'k' => $sh->{$sh->{' key'}},
+            'rn' => $sh->{' rnumber'},
+            'fn' => $sh->{' fnumber'}++
+        });
+    }
+    elsif ($first)
+    { print "<$dtd->{$mk}{'element'}>$str</$dtd->{$mk}{'element'}>\n"; }
+    else
+    { print "<$dtd->{$mk}{'element'}/>\n"; }
+}
+
+package SIL::Shoe::Interlin::Node;
+
+sub new
+{
+    my ($class, %attrs) = @_;
+    my ($self) = {%attrs};
+
+    bless $self, ref $class || $class;
+}
+
+sub le
+{
+    my ($test, $against) = @_;
+    my ($p);
+
+    for ($p = $test; defined $p; $p = $p->{'next'})
+    {
+        return 1 if ($p eq $against);
+    }
+    return 0;
+}
+
+__END__
+
+=head1 TITLE
+
+sh2xml - Convert Shoebox data to XML
+
+=head1 SYNOPSIS
+
+    sh2xml [-s settings_dir] [-a attrib] [-c codepage] [-d file]
+            [-x stylesheet] [-e encs] [-m] [-i] [-f] infile [outfile]
+
+Converts Shoebox data to XML based on marker hierarchy and interlinear text.
+
+=head1 OPTIONS
+
+    -a attrib       Default attribute name (or tag if -m) [value]
+    -c codepage     Set system codepage for this process
+    -d file         output file for DTD
+    -e enc,enc      Add Encoding:: subsets in Perl 5.8.1
+    -f              Add formatting information <shoebox-format>
+    -h              Print copious help (the manpage)
+    -i              Include DTD in data file (overriden by -d)
+    -l lang         Pass language identifier to XML output
+    -m              MDF style output with character marker support
+    -p              Use XPath for output
+    -s dir          Directory to find .typ files in [.]
+    -x stylesheet   XSL stylesheet filename to reference in the XML file
+    
+If outfile is missing, it is created as the input file with extension replaced
+by .xml. This allows a user to drop a data file on a shortcut.
+
+=head1 DESCRIPTION
+
+The aim of sh2xml is to take Shoebox or Toolbox data and to convert it into a
+consistent XML structure. To do this, it analyses the database type (.typ file)
+to create an XML structure and then ensures that the data conforms to that
+structure. Since XML assumes its data is in a single encoding, sh2xml converts
+legacy encoded data into Unicode. Interlinear text is handled correctly in that
+the vertical interlinear relationships within a block are broken out into a
+tree, making it easier for later analysis and conversion. Finally, sh2xml will
+also embed the formatting information about each field from the type file if
+so requested.
+
+Using sh2xml involves two aspects: preparing for conversion in terms of
+giving information about encoding conversion and even XML template output; and
+running the program, knowing what command line option does what.
+This manual is not a tutorial and so we list all the details with little or
+no indication of relative priority.
+
+=head2 Running sh2xml
+
+Here we list the various command line options and give further details on each
+
+=over 4
+
+=item -a
+
+This option specifies the name of the attribute that should be used to store
+the value of a field when that field has child elements. This approach is used
+to avoid the creation of XML mixed models. The default value of -a is C<value>.
+For example, consider the following short record:
+
+  \lx record
+  \ge description
+
+which would be converted to:
+
+  <lx value="record">
+    <ge>description</ge>
+  </lx>
+
+Notice that only the field with a child uses the attribute. This behaviour may
+be changed using the C<-m> option.
+
+=item -c
+
+Specifies the default codepage to be used when converting data. In effect it
+specifies that sh2xml should act as though it were running on a system with the
+given default codepage. This means that data in languages with no given encoding
+conversion will be converted using this codepage.
+
+=item -d
+
+Outputs the auto-generated DTD to the given file.
+
+=item -e
+
+Perl has internal support for a large number of industry standard encodings. This
+option specifies which sets to pull in apart from the default set. Values include
+
+  Byte - standard ISO 8859 type single byte encodings
+  CN   - Continental China encodings including cp 936, GB 12345 and GB 2312
+  JP   - Japanese encodings including cp 932 and ISO 2022
+  KR   - Korean encodings including cp 949
+  TW   - Taiwanese encodings including cp 950
+  HanExtra - more Chinese encodings including GB 18030
+  JIS2K - More Japanese encodings
+  Ebcdic - surely not!
+  Symbols - various symbol encodings
+
+See man Encode::Supported or the corresponding module documentation for details of
+what is supported on your Perl installation.
+
+=item -f
+
+Add a formatting section before the data records in the output file. The structure
+of this section is:
+
+  <!ELEMENT shoebox-format (marker)*>
+  <!ELEMENT marker (language, font, interlinear?, original-marker?)>
+  <!ATTLIST marker 
+    name CDATA #REQUIRED
+    style (char | par) #REQUIRED>
+
+  <!ELEMENT language (#PCDATA)>
+
+  <!ELEMENT font (#PCDATA)>
+  <!ATTLIST font 
+        size CDATA #REQUIRED
+        style CDATA #IMPLIED
+        color CDATA #IMPLIED>
+        
+  <!ELEMENT interlinear EMPTY>
+  <!ATTLIST interlinear level CDATA #IMPLIED>
+
+  <!ELEMENT original-marker (#PCDATA)>
+
+=item -h
+
+Print out this document
+
+=item -i
+
+Rather than export the generated DTD to an external file, this option specifies
+that the DTD should be included within the generated XML file
+
+=item -l
+
+This option is passed for template output as part of the initial template for
+output so that a language name, for example, can be output in the root element
+of a document.
+
+When used with -p it specifies the language tag for the vernacular text. If the
+tag uses a script part, this is considered to be a suppress script for the
+language, otherwise the script tag comes from the xpath specification in the
+.typ file.
+
+=item -m
+
+MDF and perhaps other schemas support the ability to use inline markers of the
+form C<|mk{>I<text>C<}>. sh2xml has the ability to work with these schemes. But
+XML can't include markup in an attribute. So the C<-m> changes the basic output
+structure to include the text in its own element as the first child of the
+element. The C<-a> option specifies the name of this inserted element. By
+default it has a value of C<_>. For example:
+
+  \lx record
+  \ge description
+
+is output as
+
+  <lx>
+    <_>record</_>
+    <ge>
+      <_>description</_>
+    </ge>
+  </lx>
+
+=item -s
+
+sh2xml requires access to information about the structure of the database
+and language information. This is held in files in the same directory as the
+C<.prj> project file used when running Shoebox/Toolbox.
+
+=item -x
+
+One powerful features of XML is the ability to specify a default stylesheet
+that is to be used to render the file as HTML within a browser. This option
+sets the filename of that XSL stylesheet.
+
+=back
+
+=head2 Preparing for Conversion
+
+The basic need is to be able to specify how to convert text in a particular
+language into Unicode. This can be done by specifying a conversion mapping
+in each language file. Shoebox and Toolbox do not have a UI for specifying
+such conversion information, so we add information to the options/description
+field. The codepage specification takes the form:
+
+  \codepage = value
+
+The specification needs to be on a line on its own. The I<value> can take a
+number of forms.
+
+=over 4
+
+=item I<name>
+
+A mapping name either from the set of names supported by the Perl Encode
+module, or specified in an SIL Converters repository.
+
+=item I<filename>.tec
+
+The path and filename of a TECkit binary mapping file. The path is
+relative to the settings directory.
+
+=item none
+
+No mapping should be done. The data is assumed to be in UTF-8 encoding.
+
+=back
+
+When the C<-f> option is in effect, sh2xml outputs the font used for
+each marker. If the data has been converted, then the font isn't
+appropriate to that encoding any more. To specify an appropriate
+font it is possible to specify this in the description field using
+
+  \unicode_font = value
+
+Where I<value> is the font name to be used for the Unicode form of the data.
+
+=head2 Template XML Generation
+
+sh2xml has the ability to generate XML based on instructions in the database
+type file. The template for each marker is stored in the description for
+that field, and then template for the whole file is stored in the description
+for the whole database. The template takes the form of the XML to be output
+for the field. Within each template various special strings are replaced
+with data information:
+
+=over 4
+
+=item %V
+
+The value of the field
+
+=item %M
+
+The field marker
+
+=item %S(I<marker>)
+
+This looks up the first occurrence of the field specified by I<marker> and
+outputs its value. The field should already have been output or be encoded
+in Unicode already.
+
+=back
+
+There are two markers that specify the template to be output.
+
+=over 4
+
+=item pre_xml
+
+This specifies what should be output when the field is processed, effectively
+as the start of an element.
+
+=item post_xml
+
+This specifies what should be output when the field and all its children have
+been output.
+
+=back
+
+If there is a C<pre_xml> but no C<post_xml>, nothing is output when the field
+is finished being output along with all its children. If both are empty then
+the default XML output is used according to the C<-m> and C<-a> options.
+
+The C<pre_xml> and C<post_xml> markers can be used for the whole database by
+using them in the database description field. In this case the C<%M> is replaced
+by the value passed in via the C<-l> option.
+
+For example, consider the following SFM snippet
+
+  \lx record
+  \ge description
+
+with templates for each marker as:
+
+  Marker: lx
+  Description:
+    \pre_xml <entry><lex><form script="Latn">%V</form></lex>
+    \post_xml </entry>
+
+  Marker: ge
+  Description:
+    \pre_xml <gloss lang="eng">%V</gloss>
+
+Then the output will be
+
+  <entry><lex><form script="Latn">record</form></lex>
+    <gloss lang="eng">description</gloss>
+  </entry>
+
+=head2 XPath based Generation
+
+Another approach that is offered by sh2xml is to generate XML using XPath. With
+this approach each marker has an XPath expression associated with it. This is
+used by sh2xml to generate the necessary XML elements associated with each field
+as it is encountered.
+
+XPath was not originally designed to be used for node creation, instead it was
+purely designed for node testing, to see whether a particular node conforms to
+a particular XPath expression. This has been extended to support node creation
+particularly:
+
+=over 4
+
+=item .
+
+Any absent child element in an expression is inserted into the output tree.
+
+=item .
+
+Any absent attribute element in an expression is inserted into the output tree.
+
+=item .
+
+'and' and 'or' have been extended to return nodesets rather than simple
+booleans. Thus 'X or Y' will return nodeset X if X is non-empty or nodeset Y.
+Likewise 'X and Y' will return either false if X is empty or return the
+nodeset Y.
+
+=item .
+
+The '=' operator has been extended to support assignment. In particular, if there
+is a nodeset on the left hand side, it will not be tested but all its nodes
+will have their values set to whatever is on the right hand side of the
+expression. If this too is a nodeset then only the first node is used.
+
+=back
+
+The aim of such an XPath description is to provide a single description that
+may be used for both XML generation and for conversion from XML back to SFM.
+
+XPath has the concept of variables and this is the mechanism used to pass
+the information from the field to the XPath expression for use therein.
+
+=over 4
+
+=item v
+
+$v contains the value of the field
+
+=item k
+
+$k contains the value of the key field of the record
+
+=item rn
+
+$rn contains a unique number for the record. Basically it aims to be a record
+number.
+
+=item fn
+
+$fn contains a unique number for the field. It doesn't guarantee to count
+fields accurately, but it does try to be unique for each XPath called.
+
+=back
+
+If no \xpath entry is given in a field's description, one of three default
+xpaths are used.
+
+=over 4
+
+=item .
+
+If -m is used then the XPath used for the lx field will be:
+
+    \xpath lx/_=$v
+
+Obviously if -a changes then the xpath changes too.
+
+=item .
+
+Otherwise, if the field has children, then the xpath for lx will be:
+
+    \xpath lx[@value=$s]
+
+=item .
+
+And if there are no children and the text is stored as a text node in the
+element then the xpath for lx will be:
+
+    \xpath lx=$s
+
+=back
+
+=cut

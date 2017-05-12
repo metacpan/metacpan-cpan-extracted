@@ -1,0 +1,6 @@
+Revision history for Perl extension SigAction::SetCallBack.
+
+0.01  Sun Aug 29 16:31:04 2010
+	- original version; created by h2xs 1.23 with options
+		-AX SigAction::SetCallBack
+

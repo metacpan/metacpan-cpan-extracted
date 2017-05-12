@@ -1,0 +1,47 @@
+SQL-QueryBuilder-Pretty
+
+Version 0.01
+
+DESCRIPTION
+
+The main goal of this Module was not the beautify mechanism, wich is
+allready well implemented in SQL::Beautify, but to provide a easy way to
+add new SQL languages, and related rules, in a modular and independent
+fashion.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc SQL::QueryBuilder::Pretty
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=SQL-QueryBuilder-Pretty
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/SQL-QueryBuilder-Pretty
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/SQL-QueryBuilder-Pretty
+
+    Search CPAN
+        http://search.cpan.org/dist/SQL-QueryBuilder-Pretty
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by André Rivotti Casimiro.
+
+Published under the terms of the Artistic License 2.0.

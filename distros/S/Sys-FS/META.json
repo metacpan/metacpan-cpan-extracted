@@ -1,0 +1,63 @@
+{
+   "abstract" : "filesystem interaction tools",
+   "author" : [
+      "Dominik Schulz <tex@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Sys-FS",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "File::Copy" : "0",
+            "File::Spec" : "0",
+            "Log::Tree::RequiredLogger" : "0",
+            "Moose" : "0",
+            "Sys::Run" : "0",
+            "feature" : "0",
+            "mro" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.010_000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gittex/Sys-FS/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/gittex/Sys-FS.git",
+         "web" : "https://github.com/gittex/Sys-FS"
+      }
+   },
+   "version" : "0.11",
+   "x_authority" : "cpan:TEX"
+}
+

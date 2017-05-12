@@ -1,0 +1,31 @@
+Sedna version 0.01
+=====================
+
+This module implements the Perl bindings for the Sedna XML database.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires Sedna XML database to be installed on either
+/usr/lib/sedna or /usr/local/sedna with a shared object available
+(which might not be the default compilation option).
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2010 by Daniel Ruoso
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,43 @@
+Revision history for Supervisor
+
+0.01    21-Sep-2009 K.Esteb
+        First version, released on an unsuspecting world.
+
+0.02    20-Oct-2009 K.Esteb
+        Added Config::IniFiles as a dependency
+
+0.03    01-Nov-2009 K.Esteb
+        Apparently the above change got lost with the upload to CPAN.
+
+0.04    09-Nov-2009 K.Esteb
+        Apparently I forgot about JSON. This is now a dependency. Easy to
+          miss dependencies when all your test environments already have 
+          those modules installed.
+
+0.05    25-Nov-2009 K.Esteb
+        Added support for a "debug" switch in supervisor.
+        "debug" will now turn on debug messages within the various log files.
+        Changed the yield() to delay_add() in start() of Process.pm.
+        Added checks for the wheel in _start_process_timeout() and
+          _stop_process_timeout() of Process.pm
+        Added a kill_process event and corresponding kill_process() method to
+          Process.pm.
+
+0.06    09-Dec-2009 K.Esteb
+        Added a "logfile" parameter to bin/supervisor so that you can specify
+          the log file on Debian. The start-stop-daemon routine does not
+          allow you to redirect stdout/stderr.
+        Fixed init.d/supervisor.debian to remove some syntax errors
+        Fixed init.d/supervisor.rhel to remove syntax errors
+        Hmmm, I thought the LSB was supposed to normalize startup files...
+
+0.07    29-Dec-2009 K.Esteb
+        Added a Supervisor.pm module for documentation and as a placeholder
+          when trying to install from CPAN.
+
+0.08    17-Jun-2010 K.Esteb
+        Using the equivalent of kill -0 <pid> to determine if a process is
+          active, is not reliable enough, so I switched over to see if the 
+          <pid> exists in the /proc name space which is maintained by the
+          kernel, so it should be very reliable.
+          

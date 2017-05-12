@@ -1,0 +1,10 @@
+Revision history for String-Validor
+
+0.94	February 21, 2012 
+	Resolved missing dependency in Makefile.
+0.93	February 20, 2012
+	Refactored common code to base class.
+0.90	January 15, 2012
+	Pre-release of String::Validator and String::Validator::Password.
+
+

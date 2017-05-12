@@ -1,0 +1,23 @@
+---
+name: Sub-Signatures
+version: 0.21
+author:
+  - Curtis "Ovid" Poe <moc.oohay@eop_divo_sitruc>
+abstract: 'Use proper signatures for subroutines, including dispatching.'
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Filter::Simple: 0.78
+  Sub::Uplevel: 0.09
+build_requires:
+  Test::Exception: 0.21
+  Test::More: 0.6
+provides:
+  Sub::Signatures:
+    file: lib/Sub/Signatures.pm
+    version: 0.21
+generated_by: Module::Build version 0.2703
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

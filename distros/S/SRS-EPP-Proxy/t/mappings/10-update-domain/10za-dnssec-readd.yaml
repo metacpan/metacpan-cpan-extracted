@@ -1,0 +1,35 @@
+# Add a ds record to a domain that doesn't currently have any
+template: update-domain.tt
+
+vars:
+  domain: 10-dnssec.co.te
+  dnssec:
+    add:
+      -
+        keytag: 1
+        alg: 5
+        digest_type: 1
+        digest: 1234abcd11111111111111111111111111111111
+
+SRS:
+    -
+        assertions: 
+           count:
+               - [ '//DomainDetailsQry', 1, 'DDQ generated']
+           match:
+               - [ '//DomainNameFilter', '10-dnssec.co.te', 'SRS[1] - Domain name filter correct' ]
+           attr_is:
+               - [ '//FieldList', 'DNSSEC', '1', 'SRS[1] - DNSSEC info requested in field list' ]
+    -
+        assertions:
+           count:
+               - [ '//DS', 1, 'SRS[2] - 1 ds records' ]
+           match:
+               - [ '//DS[1]/Digest', '1234abcd11111111111111111111111111111111', "DS record correct" ]
+
+output_assertions:
+  count:
+    - [ '//epp:result', 1, 'SRS: Check for one result' ]
+  attr_is:
+    - [ '//epp:result', 'code', 1000, 'SRS: Check for correct result code' ]
+

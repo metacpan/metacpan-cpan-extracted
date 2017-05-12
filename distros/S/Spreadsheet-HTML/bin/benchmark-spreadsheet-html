@@ -1,0 +1,265 @@
+#!/usr/bin/env perl 
+
+use strict;
+use warnings;
+
+use Benchmark;
+use Pod::Usage;
+use Getopt::Long;
+use Data::Dumper;
+
+GetOptions (
+    'size=i'        => \my $size,
+    'count=i'       => \my $count,
+    'module=s'      => \my @include,
+    'only-self'     => \my $only_self,
+    'help'          => \my $help,
+    'man'           => \my $man,
+);
+pod2usage( -verbose => 0 ) if $help;
+pod2usage( -verbose => 2 ) if $man;
+
+$size  ||= 500;
+$count ||= 5;
+our $data   = [ map [($_)x$size], 1..$size ];
+
+# Data::Table requires unique headings;
+my $head    = $size;
+our $header = [ map $head++, @{ $data->[0] } ];
+
+my %modules = (
+    'CGI'                   => \&cgi,
+    'Template'              => \&template,
+    'Data::Table'           => \&data_table,
+    'HTML::Tiny'            => \&html_tiny,
+    'HTML::Table'           => \&html_table,
+    'HTML::Element'         => \&html_element,
+    'HTML::AutoTag'         => \&html_autotag,
+    'HTML::Template'        => \&html_template,
+    'HTML::Tabulate'        => \&html_tabulate,
+    'HTML::FromArrayref'    => \&html_fromarrayref,
+    'DBIx::XHTML_Table'     => \&dbix_xhtml_table,
+    'Spreadsheet::HTML'     => \&spreadsheet_html,
+);
+
+my @skipped;
+
+if ($only_self) {
+    eval "use Spreadsheet::HTML";
+    die "must install Spreadsheet::HTML to run --only-self benchmarks\n" if $@;
+
+    %modules = (
+        north               => sub { self_only( north    => data => $data ) },
+        south               => sub { self_only( south    => data => $data ) },
+        east                => sub { self_only( east     => data => $data ) },
+        west                => sub { self_only( west     => data => $data ) },
+
+        fill                => sub { self_only( generate => fill => join( 'x', $size, $size ) ) },
+        wrap                => sub { self_only( generate => data => $data, wrap         => 10 ) },
+        indent              => sub { self_only( generate => data => $data, indent       => '    ' ) },
+        encodes             => sub { self_only( generate => data => $data, encodes      => '<>&="' ) },
+        empty               => sub { self_only( generate => data => $data, empty        => ' ' ) },
+        tgroups1            => sub { self_only( generate => data => $data, tgroups      => 1 ) },
+        tgroups2            => sub { self_only( generate => data => $data, tgroups      => 2 ) },
+        group               => sub { self_only( generate => data => $data, group        => 10 ) },
+        matrix              => sub { self_only( generate => data => $data, matrix       => 1 ) },
+        headless            => sub { self_only( generate => data => $data, headless     => 1 ) },
+        sorted_attrs        => sub { self_only( generate => data => $data, sorted_attrs => 1 ) },
+        headings            => sub { self_only( generate => data => $data, headings     => [ sub { shift }, { class => "headings" } ] ) },
+
+        tr                  => sub { self_only( generate => data => $data, tr => { class => "tr" } ) },
+        td                  => sub { self_only( generate => data => $data, td => [ sub { shift }, { class => "td"       } ] ) },
+
+        scroll             => sub { self_only( scroll      => data => $data ) },
+        checkerboard        => sub { self_only( checkerboard => data => $data ) },
+        conway              => sub { self_only( conway       => data => $data ) },
+        tictactoe           => sub { self_only( tictactoe    => data => $data ) },
+        calculator          => sub { self_only( calculator   => data => $data ) },
+        calendar            => sub { self_only( calendar     => data => $data ) },
+        beadwork_dk         => sub { self_only( beadwork     => data => $data, preset => 'dk' ) },
+
+        list_by_col         => sub { self_only( list         => data => $data ) },
+        list_by_row         => sub { self_only( list         => data => $data, row => 0 ) },
+        select_by_col       => sub { self_only( select       => data => $data, labels => 1 ) },
+        select_by_row       => sub { self_only( select       => data => $data, labels => 1, row => 0 ) },
+    );
+
+} else {
+
+    for (keys %modules) {
+        eval "use $_";
+        if ($@) { 
+            push @skipped, $_;
+            delete $modules{$_};
+        }
+    }
+}
+
+if (@include) {
+    my %include = map { $_ => 1 } @include;
+    for (keys %modules) {
+        delete $modules{$_} unless $include{$_};
+    }
+}
+
+if (@skipped) {
+    print "Skipping these modules (not installed):\n";
+    print "\t$_\n" for sort @skipped;
+}
+
+printf "Comparing these %s (%d x %d for %d iters):\n", ( $only_self ? 'methods' : 'modules' ), $size, $size, $count;
+print "\t$_\n" for sort keys %modules;
+Benchmark::cmpthese( $count, \%modules );
+
+
+sub brute_force {
+    my $str = '';
+    $str .= "<table>\n";
+    for (@$data) {
+        $str .= "    <tr>\n";
+        for (@$_) {
+            $str .= "        <td>$_</td>\n";
+        }
+        $str .= "    </tr>\n";
+    }
+    $str .= "</table>\n";
+    return $str;
+}
+
+sub cgi {
+    my $q = CGI->new;
+    $q->table( $q->Tr([ map $q->td( $_ ), @$data ]) );
+}
+
+sub template {
+    my $tmpl = '<table>[% FOREACH row = rows %]
+    <tr>[% FOREACH cell = row %]
+        <td>[% cell %]</td>[% END %]
+    </tr>[% END %]
+</table>
+';
+    my $table = Template->new;
+    my $out = '';
+    $table->process( \$tmpl, { rows => $data }, \$out ) or warn $table->error, $/;
+}
+
+sub html_template {
+    my $tmpl = q(<table><tmpl_loop rows>
+    <tr><tmpl_loop row>
+        <td><tmpl_var cell></td></tmpl_loop>
+    </tr></tmpl_loop>
+</table>
+);
+    my $table = HTML::Template->new( scalarref => \$tmpl, die_on_bad_params => 0 );
+    $table->param( rows => [ map { row => [ map { cell => $_ }, @$_ ] }, @$data  ] );
+    $table->output;
+}
+
+sub html_table {
+    my $table = new HTML::Table( $data );
+    $table->getTable;
+}
+
+sub html_element {
+    my $table = HTML::Element->new_from_lol( [table => map [tr => map [td => $_ ], @$_ ], @$data ]);
+    $table->as_HTML;
+}
+
+sub html_tiny {
+    my $h = HTML::Tiny->new;
+    $h->table( [ map $h->tr( [ map $h->td( $_ ), @$_ ] ), @$data ]);
+}
+
+sub html_autotag {
+    my $auto = HTML::AutoTag->new;
+    $auto->tag( tag => 'table', cdata => [ map { tag => 'tr', cdata => [ map { tag => 'td', cdata => $_, }, @$_ ], }, @$data ] );
+}
+
+sub dbix_xhtml_table {
+    my $table = DBIx::XHTML_Table->new( $data );
+    $table->output;
+}
+
+sub html_fromarrayref {
+    HTML::FromArrayref::HTML( [ table => {}, map [ tr => {}, map [ td => $_ ], @$_ ], @$data ] );
+}
+
+sub data_table {
+    my $t = Data::Table->new( $data, $header, 0 );
+    $t->html;
+}
+
+sub html_tabulate {
+    my $t = HTML::Tabulate->new;
+    $t->render( $data);
+}
+
+sub spreadsheet_html {
+    my $table = Spreadsheet::HTML->new( data => $data );
+    $table->generate;
+}
+
+sub self_only {
+    my $method = shift;
+    my $table = Spreadsheet::HTML->new( @_ );
+    $table->$method;
+}
+
+
+__END__
+=head1 NAME
+
+benchmark-spreadsheet-html - HTML table generator benchmarks.
+
+=head1 SYNOPSIS
+
+benchmark-spreadsheet-html
+
+ Options:
+   --modules        benchmark only these modules
+   --size           number of rows and columns in table
+   --count          number of times to run benchmarks
+   --only-self      test various configurations on distro only
+   --help           list usage
+   --man            print man page
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--modules>
+
+Benchmark only these modules.
+
+  benchmark-spreadsheet-html --module Template --module HTML::Template
+
+=item B<--size>
+
+Number of rows and columns in sample table. Default 500.
+
+  benchmark-spreadsheet-html --size 1000
+
+=item B<--count>
+
+Number of times to run benchmarks. Default 5.
+
+  benchmark-spreadsheet-html --count 10
+
+=item B<--only-self>
+
+Benchmark various configurations on Spreadsheet::HTML only.
+Runs many configurations, so lower the size of the data to expedite results.
+
+  benchmark-spreadsheet-html --only-self --size 100
+
+=item B<--help>
+
+Print a brief help message and exits.
+
+=item B<--man>
+
+Prints the manual page and exits.
+
+=back
+
+=cut

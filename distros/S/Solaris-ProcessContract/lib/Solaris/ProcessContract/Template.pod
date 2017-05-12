@@ -1,0 +1,263 @@
+=head1 NAME
+
+Solaris::ProcessContract::Template - Manage a Solaris process contract template instance via libcontract
+
+=head1 SYNOPSIS
+
+  # Create a fresh template
+  my $template = $pc->template();
+  
+  # Set behaviors flags for this template
+  $template->set_parameters( CT_PR_NOORPHAN );
+
+  # Set event monitoring flags for this template
+  $template->set_informative_events( CT_PR_EV_FORK );
+  $template->set_fatal_events( CT_PR_EV_CORE|CT_PR_EV_HWERR );
+  $template->set_critical_events( CT_PR_EV_HWERR );
+
+  # Activate this template, so that it will be used the next time we create a
+  # child process
+  $pc->template->activate();
+
+  # Stop using this template, so that we go bach to the default behavior of
+  # creating child processes in our own contract
+  $pc->template->clear();
+
+=head1 DESCRIPTION
+
+The process contract template allows you to define which contract the next
+child process you create will use.
+
+By default, child processes are created in the same contract as the parent.
+
+By settings up and then L<"activating"|/"activate"> a template, you are telling
+solaris to use a different contract with those settings the next time a process
+is created.
+
+It will continue to create new contracts with that template for every process
+you fork, until you call L</"clear">.  That returns you to the original
+behavior of creating new processes in the same contract as your parent.
+
+Calls to L</"activate"> and L</"clear"> are aware of which process they are
+called from.  For example, calling L</"clear"> from the parent process will
+set that behavior for only the parent, the child contract will still continue
+to use that template to create new contracts until you call L</"clear"> from
+the child process as well.
+
+=head1 METHODS
+
+=head2 new
+
+Use the L<Solaris::ProcessContract/"get_template"> method to create a new
+instance of this object instead of calling this yourself.
+
+  my $template = $pc->get_template();
+
+=head2 activate
+
+Arguments: C<none>
+
+Returns: C<undef>
+
+Activate this template so that it will be used the next time a new child process
+is created.
+
+  $template->activate();
+
+This method is context aware, so it will only affect the process that you call
+it from.  See L</"DESCRIPTION"> for more information.
+
+=head2 clear
+
+Arguments: C<none>
+
+Returns: C<undef>
+
+Clear this template so that it will no longer be used for the next child
+process that is created.
+
+  $template->clear();
+
+This method is context aware, so it will only affect the process that you call
+it from.  See L</"DESCRIPTION"> for more information.
+
+=head2 set_parameters
+
+Arguments: C<$flags>
+
+Returns: C<undef>
+
+Set the behavior parameter C<$flags> on this template.
+
+  # Set one flag
+  $template->set_parameters( CT_PR_PGRPONLY );
+
+  # Set multiple flags
+  $template->set_parameters( CT_PR_INHERIT|CT_PR_PGRPONLY );
+
+  # Unset all flags
+  $template->set_parameters( 0 );
+
+This allows you to control the behavior of the next contract that will be
+created.  
+
+See L<Solaris::ProcessContract/"Param Flags"> for a list of available
+parameter flags and what they do.
+
+None of the parameter flags are set by default, so you only need to set this
+if you wish to change the template behavior.
+
+=head2 get_parameters
+
+Arguments: C<none>
+
+Returns: C<$flags>
+
+Gets the current parameter C<$flags> that are set on this template.
+
+See L</"set_parameters">.
+
+=head2 set_informative_events
+
+Arguments: C<$flags>
+
+Returns: C<undef>
+
+Set the informative events C<$flags> on this template.
+
+  # Set one flag
+  $template->set_informative_events( CT_PR_EV_FORK );
+
+  # Set multiple flags
+  $template->set_informative_events( CT_PR_EV_FORK|CT_PR_EV_EXIT|CT_PR_EV_CORE );
+
+  # Unset all flags
+  $template->set_informative_events( 0 );
+
+This allows you to control which events will be reported for this contract
+group.
+
+If you do not set this value yourself, L<"CT_PR_EV_CORE"|Solaris::ProcessContract/"CT_PR_EV_CORE">
+and L<"CT_PR_EV_SIGNAL"|Solaris::ProcessContract/"CT_PR_EV_SIGNAL"> will be used as the default
+informative events.
+
+See L<Solaris::ProcessContract/"Event Flags"> for a list of available
+event flags.
+
+=head2 get_informative_events
+
+Arguments: C<none>
+
+Returns: C<$flags>
+
+Returns the current informative events C<$flags> that are set on this template.
+
+See L</"set_informative_events">.
+
+=head2 set_fatal_events
+
+Arguments: C<$flags>
+
+Returns: C<undef>
+
+Set the fatal events C<$flags> on this template.
+
+  # Set one flag
+  $template->set_fatal_events( CT_PR_EV_EMPTY );
+
+  # Set multiple flags
+  $template->set_fatal_events( CT_PR_EV_HWERR|CT_PR_EV_CORE );
+
+  # Unset all flags
+  $template->set_fatal_events( 0 );
+
+This allows you to control which events will cause all processes in the contract
+to be automatically killed.
+
+See L<Solaris::ProcessContract/"Event Flags"> for a list of available
+event flags.
+
+If you do not set this value yourself, L<"CT_PR_EV_EMPTY"|Solaris::ProcessContract/"CT_PR_EV_EMPTY">
+and L<"CT_PR_EV_HWERR"|Solaris::ProcessContract/"CT_PR_EV_HWERR"> will be used as the default
+informative events.
+
+=head2 get_fatal_events
+
+Arguments: C<none>
+
+Returns: C<$flags>
+
+Returns the current fatal events C<$flags> that are set on this template.
+
+See L</"set_fatal_events">.
+
+=head2 set_critical_events
+
+Arguments: C<$flags>
+
+Returns: C<undef>
+
+Set the critical events C<$flags> on this template.
+
+  # Set one flag
+  $template->set_fatal_events( CT_PR_EV_EMPTY );
+
+  # Set multiple flags
+  $template->set_fatal_events( CT_PR_EV_HWERR|CT_PR_EV_CORE );
+
+  # Unset all flags
+  $template->set_fatal_events( 0 );
+
+This allows you to control which events will cause both this contract and any
+ones related to it to be destroyed.
+
+See L<Solaris::ProcessContract/"Event Flags"> for a list of available
+event flags.
+
+If you do not set this value yourself L<"CT_PR_EV_HWERR"|Solaris::ProcessContract/"CT_PR_EV_HWERR">
+will be used as the default informative event.
+
+=head2 get_critical_events
+
+Arguments: C<none>
+
+Returns: C<$flags>
+
+Returns the current critical events C<$flags> that are set on this template.
+
+See L</"set_critical_events">.
+
+=head2 reset
+
+Arguments: C<none>
+
+Returns C<undef>
+
+If you wish to start over with a fresh template, but don't want to destroy the
+one you have and create a new instance, use L<"/reset"> to start this template
+over.
+
+Alternately, you could just set your template instance to C<undef> and then run
+L<Solaris::ProcessContract/"template"> in L<Solaris::ProcessContract> to get a
+new one.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<Solaris::ProcessContract>
+
+=item L<Solaris::ProcessContract::Exceptions>
+
+=item L<libcontract(3)|http://docs.oracle.com/cd/E26505_01/html/816-5173/libcontract-3lib.html>
+
+=item L<contract(4)|http://docs.oracle.com/cd/E26505_01/html/816-5174/contract-4.html>
+
+=item L<process(4)|http://docs.oracle.com/cd/E26505_01/html/816-5174/process-4.html>
+
+=back
+
+=head1 AUTHOR
+
+Danny Warren
+

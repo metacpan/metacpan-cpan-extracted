@@ -1,0 +1,43 @@
+# hello_server.stem
+#
+[
+	class	=>	'Stem::Console',
+],
+[
+	class	=>	'Stem::Hub',
+	name	=>	'system_A',
+	args	=>	[],
+],
+[
+	class	=>	'Stem::Portal',
+	args	=>	[
+		'server' => 1,
+		'host' => 'localhost',
+	],
+],
+[
+	class	=>	'Stem::Switch',
+	name	=>	'sw',
+	args	=>	[
+		in_map => [
+
+			h => [ qw( h h3 ) ],
+		],
+		out_map => [
+
+			h => 'hello',
+			h3 => 'system_B:hello',
+		],
+	],
+],
+[
+	class	=>	'Stem::Proc',
+	name	=>	'hello',
+	args	=>	[
+		path		=> 'bin/hello.sh',
+		proc_args	=> ['server'],
+		cell_attr	=> [
+			'data_addr'	=> 'console',
+		],
+	],
+],

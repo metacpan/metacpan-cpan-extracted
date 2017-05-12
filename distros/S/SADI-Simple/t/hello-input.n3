@@ -1,0 +1,11 @@
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix hello: <http://sadiframework.org/examples/hello.owl#> .
+@prefix input: <http://sadiframework.org/examples/t/hello-input.n3#> .
+
+<http://sadiframework.org/examples/t/hello-input.n3#1>
+    a hello:NamedIndividual;
+    foaf:name "Guy Incognito" .
+
+<http://sadiframework.org/examples/t/hello-input.n3#2>
+    a hello:NamedIndividual;
+    foaf:name "Homer Simpson" .

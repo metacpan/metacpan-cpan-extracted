@@ -1,0 +1,72 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+my %Commands = (
+    help => \&help,
+    list => \&list,
+    run  => \&run,
+);
+
+my $cmd = shift;
+
+unless ( $cmd && $Commands{$cmd} ) {
+    print "\n  ** Unknown or missing command.\n";
+    help();
+    exit 1;
+}
+
+require SmokeRunner::Multi;
+$Commands{$cmd}->();
+
+
+sub list {
+    require DateTime;
+    require SmokeRunner::Multi::TestSet;
+
+    my @sets = SmokeRunner::Multi::TestSet->All();
+
+    print "\n  Test sets in order\n\n";
+    print sprintf( "  %-20s | P? | last run\n", 'name' );
+    print '  ' . ( '-' x 44 ) . "\n";
+
+    for my $set (@sets) {
+        my $last_run = $set->last_run_time()
+            ? DateTime->from_epoch( epoch => $set->last_run_time(),
+            time_zone => 'local' )->strftime('%Y-%m-%d %H:%M')
+            : 'never';
+
+        print sprintf(
+            "  %-20s | %1s  | %-16s\n",
+            $set->name(),
+            ( $set->is_prioritized() ? 'X' : ' ' ),
+            $last_run
+        );
+    }
+
+    print "\n";
+}
+
+sub run {
+    my $reporter = SmokeRunner::Multi->new()->run_and_report_next_set();
+
+    print "No sets need to be run\n"
+	unless $reporter;
+}
+
+sub help {
+    print <<'EOF';
+
+  smokerunner-multi [command]
+
+    This script accepts the following commands:
+
+    help                what you're looking at
+
+    list                list all sets in order
+
+    run                 run and report on the next set
+
+EOF
+}

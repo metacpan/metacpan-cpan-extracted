@@ -1,0 +1,207 @@
+=head1 NAME
+
+Sub::Slice::Backend - API for Sub::Slice backends
+
+=head1 SYNOPSIS
+
+	use Sub::Slice;
+	use Sub::Slice::Backend::MyBackend;
+	our %Options = ( ...options for your backend... );
+	
+	sub create_token {
+		my $job = new Sub::Slice (
+			backend => 'MyBackend',
+			storage_options => \%Options,
+		);
+		return $job->token;
+	}
+	
+	sub do_work {
+		my $job = new Sub::Slice (
+			backend => 'MyBackend',
+			storage_options => \%Options,
+			token => shift()
+		);
+		
+		...
+	}
+
+=head1 DESCRIPTION
+
+This is the API which storage backends for Sub::Slice must implement.
+Sub::Slice comes with a default Filesystem backend using Storable to serialise data.  
+If you'd rather store the Sub::Slice data somewhere else or in another format, you can create an adaptor class
+satisfying this API to plug Sub::Slice into your storage system.
+
+=head2 Module naming conventions
+
+If a string matching \w+ is passed to Sub::Slice for the backend, the module is assumed to be in the Sub::Slice::Backend namespace
+(such as the example in the SYNOPSIS).  If you have a module in a namespace other than the top-level one, e.g. MySystem::StorageModule,
+that exposes this API, Sub::Slice will happily use this as a backend module without you needing to create a wrapper in the Sub::Slice::Backend namespace.
+
+	my $job = new Sub::Slice (
+		backend => 'MySystem::StorageModule',
+		storage_options => \%Options,
+	);
+
+
+=head1 METHODS
+
+=over 4
+
+=item $backend = new Sub::Slice::Backend::YOURCLASS(\%options)
+
+Contructor takes a hash of options
+
+=item $id = $backend->new_id()
+
+Generates a new ID.
+
+=item $job = $backend->load_job($id)
+
+Loads an existing job from persistent storage
+
+=item $backend->save_job($job)
+
+Saves a job to persistent storage
+
+=item $backend->delete_job($id)
+
+Removes a job from persistent storage
+
+=item $backend->store($job, $key, $data)
+
+Store data for job
+
+=item $data = $backend->fetch($job, $key)
+
+Fetch data for job
+
+=item $backend->store_blob($job, $key, $data)
+
+Store BLOB data for job
+
+=item $data = $backend->fetch_blob($job, $key)
+
+Fetch BLOB data for job
+
+=item $count = $backend->cleanup($age)
+
+Deletes any leftover data which has been unmodified for at least $age 
+days (default 1 day). $count will equal the number of files or items 
+deleted, or may be undef if cleanup wasn't able to scan for leftover data
+(eg. because a directory didn't exist). Should die if it doesn't manage
+to clean up (eg. because of a permissions problem).
+
+Normally, tasks should clean up after themselves, so unless you are
+experiencing errors, cleanup will have nothing to do.
+
+=back
+
+=head1 Strategies for issuing IDs
+
+The storage API requires that you can issue an ID for a new record before storing data into it.
+In an Oracle database you normally use a sequence to generate a unique ID in advance of storing a record so this isn't a problem.
+In MySQL, if you are planning on using an AUTO_INCREMENT column to generate ids, you're probably best off inserting an empty row.
+Alternatively in most database engines you can simulate an Oracle sequence using a counter table 
+(see the example in the MySQL manual for a neat example using LAST_INSERT_ID).
+If your storage engine doesn't have a unique ID mechanism, a couple of strategies are open to you:  
+you can use a perl GUID generator (such as Data::UUID), or you can roll your own sequence generator as in the example below.
+
+=head1 Worked Example
+
+Here's a sample implementation.  
+It's not a particularly good one in that it doesn't handle concurrent processes writing to the DBM file,
+but it does illustrate the steps required to write a backend.
+
+	package Sub::Slice::Backend::MLDBM;
+	
+	use GDBM_File;
+	use Storable();
+	use MLDBM qw(GDBM_File Storable);
+
+The constructor takes a hashref of storage options, which you're free to define the meaning of.
+These are what the caller will pass in as the storage_options to Sub::Slice.
+
+	sub new {
+		my ($class, $options) = @_;
+		my $dbm = $options->{DBM} or die("You must supply a DBM");
+		my %db;
+		tie(%db, 'MLDBM', $dbm, GDBM_WRCREAT, 0666) or die("unable to tie to $dbm");
+		my $self = {$db => \%db};
+		return bless($self, $class);
+	}
+
+	sub DESTROY {
+		my $self = shift;
+		untie %{$self->{db}} if tied %{$self->{db}};
+	}
+
+The C<new_id> routine should create a unique ID which can be used to store the job against.
+Here we use a sentinel key to store a sequence counter against:
+	
+	sub new_id {
+		my ($self) = @_;
+		my $id = ++$self->{db}->{__COUNT__};
+		return $id;
+	}
+
+The delete_job routine takes an ID rather than a job:
+
+	sub delete_job {
+		my ($self, $id) = @_;
+		delete $self->{db}->{$id};
+	}
+	
+This allows it to be used in cleaner processes without loading the job first.
+The load_job routine should return the job given the ID:
+	
+	sub load_job {
+		my ($self, $id) = @_;
+		return $self->{db}->{$id};
+	}
+
+The save_job should persist the job (against the ID):
+	
+	sub save_job {
+		my ($self, $job) = @_;
+		$self->{db}->{$job->{id}} = $job;
+	}
+
+Store and fetch methods are passed the job object so they can hang data on it, if the backend desires:
+
+	sub store {
+		my ($self, $job, $key, $value) = @_;
+		$job->{data}{$key} = $value;
+	}
+	
+	sub fetch {
+		my ($self, $job, $key) = @_;
+		return $job->{data}{$key};
+	}
+
+If there is no optimisation you want to perform for BLOB data, the following implementation is legitimate:
+	
+	sub store_blob {
+		shift()->store(@_);
+	}
+	
+	sub fetch_blob {
+		shift()->fetch(@_);
+	}
+
+=head1 VERSION
+
+$Revision: 1.8 $ on $Date: 2004/12/17 14:41:21 $ by $Author: johna $
+
+=head1 AUTHOR
+
+John Alden <cpan _at_ bbc _dot_ co _dot_ uk>
+
+=head1 COPYRIGHT
+
+(c) BBC 2004. This program is free software; you can redistribute it and/or modify it under the GNU GPL.
+
+See the file COPYING in this distribution, or http://www.gnu.org/licenses/gpl.txt 
+
+=cut

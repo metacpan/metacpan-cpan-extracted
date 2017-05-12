@@ -1,0 +1,17 @@
+Changes
+Build.PL
+Makefile.PL
+MANIFEST
+README
+lib/Statistics/Zed.pm
+t/00-useok.t
+t/01-loaded_data.t
+t/02-direct_data.t
+t/03-p_value.t
+t/04-p2z.t
+t/05-string.t
+t/06-ccorr.t
+t/07-tails.t
+Statistics-Zed.ppd
+META.yml
+META.json

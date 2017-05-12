@@ -1,0 +1,20 @@
+Build.PL
+LICENSE
+MANIFEST			This list of files
+Makefile.PL
+README
+Todo
+lib/SDL/OpenGL/Cg.pm
+lib/SDL/OpenGL/Cg.pod
+lib/SDL/OpenGL/Cg.xs
+lib/SDL/OpenGL/ppport.h
+shaders/vertex/anycolor.cg
+shaders/vertex/green.cg
+shaders/vertex/xyplot.cg
+t/001_load.t
+t/002_cg_profile_constants_class.t
+t/003_cg_profile_constants_export.t
+t/004_enable_disable_profiles_class.t
+t/005_error_handling.t
+test-scripts/app-test.pl
+test-scripts/nonapp-test.pl

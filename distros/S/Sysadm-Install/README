@@ -1,0 +1,544 @@
+######################################################################
+    Sysadm::Install 0.48
+######################################################################
+
+NAME
+    Sysadm::Install - Typical installation tasks for system administrators
+
+SYNOPSIS
+      use Sysadm::Install qw(:all);
+
+      my $INST_DIR = '/home/me/install/';
+
+      cd($INST_DIR);
+      cp("/deliver/someproj.tgz", ".");
+      untar("someproj.tgz");
+      cd("someproj");
+
+         # Write out ...
+      blurt("Builder: Mike\nDate: Today\n", "build.dat");
+
+         # Slurp back in ...
+      my $data = slurp("build.dat");
+
+         # or edit in place ...
+      pie(sub { s/Today/scalar localtime()/ge; $_; }, "build.dat");
+
+      make("test install");
+
+         # run a cmd and tap into stdout and stderr
+      my($stdout, $stderr, $exit_code) = tap("ls", "-R");
+
+DESCRIPTION
+    Have you ever wished for your installation shell scripts to run
+    reproducibly, without much programming fuzz, and even with optional
+    logging enabled? Then give up shell programming, use Perl.
+
+    "Sysadm::Install" executes shell-like commands performing typical
+    installation tasks: Copying files, extracting tarballs, calling "make".
+    It has a "fail once and die" policy, meticulously checking the result of
+    every operation and calling "die()" immediately if anything fails.
+
+    "Sysadm::Install" also supports a *dry_run* mode, in which it logs
+    everything, but suppresses any write actions. Dry run mode is enabled by
+    calling Sysadm::Install::dry_run(1). To switch back to normal, call
+    Sysadm::Install::dry_run(0).
+
+    As of version 0.17, "Sysadm::Install" supports a *confirm* mode, in
+    which it interactively asks the user before running any of its functions
+    (just like "rm -i"). *confirm* mode is enabled by calling
+    Sysadm::Install::confirm(1). To switch back to normal, call
+    Sysadm::Install::confirm(0).
+
+    "Sysadm::Install" is fully Log4perl-enabled. To start logging, just
+    initialize "Log::Log4perl". "Sysadm::Install" acts as a wrapper class,
+    meaning that file names and line numbers are reported from the calling
+    program's point of view.
+
+  FUNCTIONS
+    "cp($source, $target)"
+        Copy a file from $source to $target. "target" can be a directory.
+        Note that "cp" doesn't copy file permissions. If you want the target
+        file to reflect the source file's user rights, use "perm_cp()" shown
+        below.
+
+    "mv($source, $target)"
+        Move a file from $source to $target. "target" can be a directory.
+
+    "download($url)"
+        Download a file specified by $url and store it under the name
+        returned by "basename($url)".
+
+    "untar($tarball)"
+        Untar the tarball in $tarball, which typically adheres to the
+        "someproject-X.XX.tgz" convention. But regardless of whether the
+        archive actually contains a top directory "someproject-X.XX", this
+        function will behave if it had one. If it doesn't have one, a new
+        directory is created before the unpacking takes place. Unpacks the
+        tarball into the current directory, no matter where the tarfile is
+        located. Please note that if you're using a compressed tarball
+        (.tar.gz or .tgz), you'll need IO::Zlib installed.
+
+    "untar_in($tar_file, $dir)"
+        Untar the tarball in $tgz_file in directory $dir. Create $dir if it
+        doesn't exist yet.
+
+    "pick($prompt, $options, $default, $opts)"
+        Ask the user to pick an item from a displayed list. $prompt is the
+        text displayed, $options is a referenc to an array of choices, and
+        $default is the number (starting from 1, not 0) of the default item.
+        For example,
+
+            pick("Pick a fruit", ["apple", "pear", "pineapple"], 3);
+
+        will display the following:
+
+            [1] apple
+            [2] pear
+            [3] pineapple
+            Pick a fruit [3]>
+
+        If the user just hits *Enter*, "pineapple" (the default value) will
+        be returned. Note that 3 marks the 3rd element of the list, and is
+        *not* an index value into the array.
+
+        If the user enters 1, 2 or 3, the corresponding text string
+        ("apple", "pear", "pineapple" will be returned by "pick()".
+
+        If the optional $opts hash has "{ tty => 1 }" set, then the user
+        response will be expected from the console, not STDIN.
+
+    "ask($prompt, $default, $opts)"
+        Ask the user to either hit *Enter* and select the displayed default
+        or to type in another string.
+
+        If the optional $opts hash has "{ tty => 1 }" set, then the user
+        response will be expected from the console, not STDIN.
+
+    "mkd($dir)"
+        Create a directory of arbitrary depth, just like
+        "File::Path::mkpath".
+
+    "rmf($dir)"
+        Delete a directory and all of its descendents, just like "rm -rf" in
+        the shell.
+
+    "cd($dir)"
+        chdir to the given directory. If you don't want to have cd() modify
+        the internal directory stack (used for subsequent cdback() calls),
+        set the stack_update parameter to a false value:
+
+            cd($dir, {stack_update => 0});
+
+    "cdback()"
+        chdir back to the last directory before a previous "cd". If the
+        option "reset" is set, it goes all the way back to the beginning of
+        the directory stack, i.e. no matter how many cd() calls were made in
+        between, it'll go back to the original directory:
+
+              # go all the way back
+            cdback( { reset => 1 } );
+
+    "make()"
+        Call "make" in the shell.
+
+    "pie($coderef, $filename, ...)"
+        Simulate "perl -pie 'do something' file". Edits files in-place.
+        Expects a reference to a subroutine as its first argument. It will
+        read out the file $filename line by line and calls the subroutine
+        setting a localized $_ to the current line. The return value of the
+        subroutine will replace the previous value of the line.
+
+        Example:
+
+            # Replace all 'foo's by 'bar' in test.dat
+                pie(sub { s/foo/bar/g; $_; }, "test.dat");
+
+        Works with one or more file names.
+
+        If the files are known to contain UTF-8 encoded data, and you want
+        it to be read/written as a Unicode strings, use the "utf8" option:
+
+            pie(sub { s/foo/bar/g; $_; }, "test.dat", { utf8 => 1 });
+
+    "plough($coderef, $filename, ...)"
+        Simulate "perl -ne 'do something' file". Iterates over all lines of
+        all input files and calls the subroutine provided as the first
+        argument.
+
+        Example:
+
+            # Print all lines containing 'foobar'
+                plough(sub { print if /foobar/ }, "test.dat");
+
+        Works with one or more file names.
+
+        If the files are known to contain UTF-8 encoded data, and you want
+        it to be read into Unicode strings, use the "utf8" option:
+
+            plough(sub { print if /foobar/ }, "test.dat", { utf8 => 1 });
+
+    "my $data = slurp($file, $options)"
+        Slurps in the file and returns a scalar with the file's content. If
+        called without argument, data is slurped from STDIN or from any
+        files provided on the command line (like <> operates).
+
+        If the file is known to contain UTF-8 encoded data and you want to
+        read it in as a Unicode string, use the "utf8" option:
+
+            my $unicode_string = slurp( $file, {utf8 => 1} );
+
+    "blurt($data, $file, $options)"
+        Opens a new file, prints the data in $data to it and closes the
+        file. If "$options->{append}" is set to a true value, data will be
+        appended to the file. Default is false, existing files will be
+        overwritten.
+
+        If the string is a Unicode string, use the "utf8" option:
+
+            blurt( $unicode_string, $file, {utf8 => 1} );
+
+    "blurt_atomic($data, $file, $options)"
+        Write the data in $data to a file $file, guaranteeing that the
+        operation will either complete fully or not at all. This is
+        accomplished by first writing to a temporary file which is then
+        rename()ed to the target file.
+
+        Unlike in "blurt", there is no $append mode in "blurt_atomic".
+
+        If the string is a Unicode string, use the "utf8" option:
+
+            blurt_atomic( $unicode_string, $file, {utf8 => 1} );
+
+    "($stdout, $stderr, $exit_code) = tap($cmd, @args)"
+        Run a command $cmd in the shell, and pass it @args as args. Capture
+        STDOUT and STDERR, and return them as strings. If $exit_code is 0,
+        the command succeeded. If it is different, the command failed and
+        $exit_code holds its exit code.
+
+        Please note that "tap()" is limited to single shell commands, it
+        won't work with output redirectors ("ls >/tmp/foo" 2>&1).
+
+        In default mode, "tap()" will concatenate the command and args given
+        and create a shell command line by redirecting STDERR to a temporary
+        file. "tap("ls", "/tmp")", for example, will result in
+
+            'ls' '/tmp' 2>/tmp/sometempfile |
+
+        Note that all commands are protected by single quotes to make sure
+        arguments containing spaces are processed as singles, and no
+        globbing happens on wildcards. Arguments containing single quotes or
+        backslashes are escaped properly.
+
+        If quoting is undesirable, "tap()" accepts an option hash as its
+        first parameter,
+
+            tap({no_quotes => 1}, "ls", "/tmp/*");
+
+        which will suppress any quoting:
+
+            ls /tmp/* 2>/tmp/sometempfile |
+
+        Or, if you prefer double quotes, use
+
+            tap({double_quotes => 1}, "ls", "/tmp/$VAR");
+
+        wrapping all args so that shell variables are interpolated properly:
+
+            "ls" "/tmp/$VAR" 2>/tmp/sometempfile |
+
+        Another option is "utf8" which runs the command in a terminal set to
+        UTF8.
+
+        Error handling: By default, tap() won't raise an error if the
+        command's return code is nonzero, indicating an error reported by
+        the shell. If bailing out on errors is requested to avoid return
+        code checking by the script, use the raise_error option:
+
+            tap({raise_error => 1}, "ls", "doesn't exist");
+
+        In DEBUG mode, "tap" logs the entire stdout/stderr output, which can
+        get too verbose at times. To limit the number of bytes logged, use
+        the "stdout_limit" and "stderr_limit" options
+
+            tap({stdout_limit => 10}, "echo", "123456789101112");
+
+    "$quoted_string = qquote($string, [$metachars])"
+        Put a string in double quotes and escape all sensitive characters so
+        there's no unwanted interpolation. E.g., if you have something like
+
+           print "foo!\n";
+
+        and want to put it into a double-quoted string, it will look like
+
+            "print \"foo!\\n\""
+
+        Sometimes, not only backslashes and double quotes need to be
+        escaped, but also the target environment's meta chars. A string
+        containing
+
+            print "$<\n";
+
+        needs to have the '$' escaped like
+
+            "print \"\$<\\n\";"
+
+        if you want to reuse it later in a shell context:
+
+            $ perl -le "print \"\$<\\n\";"
+            1212
+
+        "qquote()" supports escaping these extra characters with its second,
+        optional argument, consisting of a string listing all escapable
+        characters:
+
+            my $script  = 'print "$< rocks!\\n";';
+            my $escaped = qquote($script, '!$'); # Escape for shell use
+            system("perl -e $escaped");
+
+            => 1212 rocks!
+
+        And there's a shortcut for shells: By specifying ':shell' as the
+        metacharacters string, qquote() will actually use '!$`'.
+
+        For example, if you wanted to run the perl code
+
+            print "foobar\n";
+
+        via
+
+            perl -e ...
+
+        on a box via ssh, you would use
+
+            use Sysadm::Install qw(qquote);
+
+            my $cmd = 'print "foobar!\n"';
+               $cmd = "perl -e " . qquote($cmd, ':shell');
+               $cmd = "ssh somehost " . qquote($cmd, ':shell');
+
+            print "$cmd\n";
+            system($cmd);
+
+        and get
+
+            ssh somehost "perl -e \"print \\\"foobar\\\!\\\\n\\\"\""
+
+        which runs on "somehost" without hickup and prints "foobar!".
+
+        Sysadm::Install comes with a script "one-liner" (installed in bin),
+        which takes arbitrary perl code on STDIN and transforms it into a
+        one-liner:
+
+            $ one-liner
+            Type perl code, terminate by CTRL-D
+            print "hello\n";
+            print "world\n";
+            ^D
+            perl -e "print \"hello\\n\"; print \"world\\n\"; "
+
+    "$quoted_string = quote($string, [$metachars])"
+        Similar to "qquote()", just puts a string in single quotes and
+        escapes what needs to be escaped.
+
+        Note that shells typically don't support escaped single quotes
+        within single quotes, which means that
+
+            $ echo 'foo\'bar'
+            >
+
+        is invalid and the shell waits until it finds a closing quote.
+        Instead, there is an evil trick which gives the desired result:
+
+            $ echo 'foo'\''bar'  # foo, single quote, \, 2 x single quote, bar
+            foo'bar
+
+        It uses the fact that shells interpret back-to-back strings as one.
+        The construct above consists of three back-to-back strings:
+
+            (1) 'foo'
+            (2) '
+            (3) 'bar'
+
+        which all get concatenated to a single
+
+            foo'bar
+
+        If you call "quote()" with $metachars set to ":shell", it will
+        perform that magic behind the scenes:
+
+            print quote("foo'bar");
+              # prints: 'foo'\''bar'
+
+    "perm_cp($src, $dst, ...)"
+        Read the $src file's user permissions and modify all $dst files to
+        reflect the same permissions.
+
+    "owner_cp($src, $dst, ...)"
+        Read the $src file/directory's owner uid and group gid and apply it
+        to $dst.
+
+        For example: copy uid/gid of the containing directory to a file
+        therein:
+
+            use File::Basename;
+
+            owner_cp( dirname($file), $file );
+
+        Usually requires root privileges, just like chown does.
+
+    "$perms = perm_get($filename)"
+        Read the $filename's user permissions and owner/group. Returns an
+        array ref to be used later when calling "perm_set($filename,
+        $perms)".
+
+    "perm_set($filename, $perms)"
+        Set file permissions and owner of $filename according to $perms,
+        which was previously acquired by calling "perm_get($filename)".
+
+    "sysrun($cmd)"
+        Run a shell command via "system()" and die() if it fails. Also works
+        with a list of arguments, which are then interpreted as program name
+        plus arguments, just like "system()" does it.
+
+    "hammer($cmd, $arg, ...)"
+        Run a command in the shell and simulate a user hammering the ENTER
+        key to accept defaults on prompts.
+
+    "say($text, ...)"
+        Alias for "print ..., "\n"", just like Perl6 is going to provide it.
+
+    "sudo_me()"
+        Check if the current script is running as root. If yes, continue. If
+        not, restart the current script with all command line arguments is
+        restarted under sudo:
+
+            sudo scriptname args ...
+
+        Make sure to call this before any @ARGV-modifying functions like
+        "getopts()" have kicked in.
+
+    "bin_find($program)"
+        Search all directories in $PATH (the ENV variable) for an executable
+        named $program and return the full path of the first hit. Returns
+        "undef" if the program can't be found.
+
+    "fs_read_open($dir)"
+        Opens a file handle to read the output of the following process:
+
+            cd $dir; find ./ -xdev -print0 | cpio -o0 |
+
+        This can be used to capture a file system structure.
+
+    "fs_write_open($dir)"
+        Opens a file handle to write to a
+
+            | (cd $dir; cpio -i0)
+
+        process to restore a file system structure. To be used in
+        conjunction with *fs_read_open*.
+
+    "pipe_copy($in, $out, [$bufsize])"
+        Reads from $in and writes to $out, using sysread and syswrite. The
+        buffer size used defaults to 4096, but can be set explicitly.
+
+    "snip($data, $maxlen)"
+        Format the data string in $data so that it's only (roughly) $maxlen
+        characters long and only contains printable characters.
+
+        If $data is longer than $maxlen, it will be formatted like
+
+            (22)[abcdef[snip=11]stuvw]
+
+        indicating the length of the original string, the beginning, the
+        end, and the number of 'snipped' characters.
+
+        If $data is shorter than $maxlen, it will be returned unmodified
+        (except for unprintable characters replaced, see below).
+
+        If $data contains unprintable character's they are replaced by "."
+        (the dot).
+
+    "password_read($prompt, $opts)"
+        Reads in a password to be typed in by the user in noecho mode. A
+        call to password_read("password: ") results in
+
+            password: ***** (stars aren't actually displayed)
+
+        This function will switch the terminal back into normal mode after
+        the user hits the 'Return' key.
+
+        If the optional $opts hash has "{ tty => 1 }" set, then the prompt
+        will be redirected to the console instead of STDOUT.
+
+    "nice_time($time)"
+        Format the time in a human-readable way, less wasteful than the
+        'scalar localtime' formatting.
+
+            print nice_time(), "\n";
+              # 2007/04/01 10:51:24
+
+        It uses the system time by default, but it can also accept epoch
+        seconds:
+
+            print nice_time(1170000000), "\n";
+              # 2007/01/28 08:00:00
+
+        It uses localtime() under the hood, so the outcome of the above will
+        depend on your local time zone setting.
+
+    "def_or($foo, $default)"
+        Perl-5.9 added the //= construct, which helps assigning values to
+        undefined variables. Instead of writing
+
+            if(!defined $foo) {
+                $foo = $default;
+            }
+
+        you can just write
+
+            $foo //= $default;
+
+        However, this is not available on older perl versions (although
+        there's source filter solutions). Often, people use
+
+            $foo ||= $default;
+
+        instead which is wrong if $foo contains a value that evaluates as
+        false. So Sysadm::Install, the everything-and-the-kitchen-sink under
+        the CPAN modules, provides the function "def_or()" which can be used
+        like
+
+            def_or($foo, $default);
+
+        to accomplish the same as
+
+            $foo //= $default;
+
+        How does it work, how does $foo get a different value, although it's
+        apparently passed in by value? Modifying $_[0] within the subroutine
+        is an old Perl trick to do exactly that.
+
+    "is_utf8_data($data)"
+        Check if the given string has the utf8 flag turned on. Works just
+        like Encode.pm's is_utf8() function, except that it silently returns
+        a false if Encode isn't available, for example when an ancient perl
+        without proper utf8 support is used.
+
+    "utf8_check($data)"
+        Check if we're using a perl with proper utf8 support, by verifying
+        the Encode.pm module is available for loading.
+
+    "home_dir()"
+        Return the path to the home directory of the current user.
+
+AUTHOR
+    Mike Schilli, <m@perlmeister.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2004-2007 by Mike Schilli
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.3 or, at
+    your option, any later version of Perl 5 you may have available.
+

@@ -1,0 +1,11 @@
+Revision history for Perl extension SQL::QueryMaker.
+
+0.03
+	- add doc for `sql_ne` (thanks to @debug-ito)
+	- fix compile error when Carp is not loaded
+
+0.02
+	- treat objects that do not implement `as_sql` method as bind parameters (#1)
+
+0.01
+	- initial release

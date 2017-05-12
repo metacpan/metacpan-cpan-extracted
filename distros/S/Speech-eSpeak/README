@@ -1,0 +1,43 @@
+Speech-eSpeak version 0.4
+==========================
+
+This is a Perl binding for eSpeak TTS.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If ERROR occurs from the above operation, read below:
+
+Make sure you have made symbolic links of eSpeak first. The release of eSpeak from SourceForge is a stand alone version. You should do the following command first:
+
+#sudo ln -s /{path_to_espeak}/shared_library/libespeak.so.{version} /usr/lib/libespeak.so
+#sudo ln -s /{path_to_espeak}/shared_library/libespeak.so.{version} /usr/lib/libespeak.so.1
+#sudo ln -s /{path_to_espeak}/espeak-data /
+#ln -s /{path_to_espeak}/espeak-data ~/
+#sudo ln -s /{path_to_espeak}/espeak /usr/bin/
+
+You should substitute {path_to_espeak} and {version} according to your situation.
+
+If you are using a 64bit system, you may need to make a 64bit libespeak.so from source yourself. Here is an existed one from Ubuntu which I have never tried myself:
+
+http://packages.ubuntu.com/gutsy/libs/libespeak1
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  libespeak.so
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007-2012 by Cameron Wong
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

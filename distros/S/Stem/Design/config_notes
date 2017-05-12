@@ -1,0 +1,227 @@
+
+      Stem Object and Cell Creation and Configuration Design Notes
+
+All Stem cells and objects share the same API style in their constructor
+methods (commonly 'new'). All parameters are passed as key/value
+attributes and processed with Stem::Class::parse_args which is driven
+with a simple table of field descriptions. Each field is described by an
+anonymous hash with attribute/values. Each allowed field must have a
+name and it also can have several optional description attributes. Here
+are the supported field description attributes:
+
+	name		The value of this is the name of this
+			field. Obviously the field name is required.
+
+	required	This is a boolean value that says this field
+			is required. If it is not set in the constructor
+			call, an error string is returned.
+
+	default		The value for this is the default for this
+			field. It is used if this field is not set in
+			the constructor.
+
+	class		The value for this is a Stem class (Perl
+			package) name. It means the value of this
+			parameter will be parsed as the arguments to the
+			constructor ('new' for now) of that class. The
+			object returned is saved as the value of this
+			field. If the called constructor returns an
+			error string, it is returned.
+
+	class_args	The value of this is an anonymous list
+			of attribute/value pairs for this class
+			field. They are passed after the caller's
+			arguments and so will override any duplicate
+			passed in parameters.
+
+	callback	The value of this is a code reference which is
+			called to do custom construction of this
+			field. The code ref is called with the new
+			object, the field name and the anonymous
+			reference which has the field's passed in
+			values.
+
+	type		The value for this attribute is the type of the
+			field. Currently unsupported, it is meant for
+			stronger type checking of parameters such as
+			booleans. This will be supported soon.
+
+	env		The value for this attribute is a name of a Stem
+			environment variable. If this name is found in
+			%Stem::Vars::Env then the value in that
+			hash is used as the value for this
+			attribute. This overrides any value passed in
+			the the constructor or a default option.
+			NOTE: Stem environment variables can be set from
+			many places including the command line, the
+			shell environment, command messages and the terminal.
+
+Here is a typical constructor from the Stem::Log class. It has 3 fields
+of which the first is required the other two have defaults. The
+beginning of the constructor sub is shown below and that same two lines
+of code is used in almost every class constructor.
+
+
+my $field_info = [
+
+	{
+		'name'		=>	'log',
+		'required'	=>	1,
+	},
+	{
+		'name'		=>	'level',
+		'default'	=>	'info',
+	},
+	{
+		'name'		=>	'text',
+		'default'	=>	'',
+	},
+
+] ;
+
+sub new
+
+	my $self = Stem::Class::parse_args( $field_info, @_ ) ;
+	return $self unless ref $self ;
+
+
+Object Creation Error Handling
+
+Stem cells and objects are being created all the time and in many
+ways. There is a standard way Stem constructor subs return errors. If the
+object construction works, it returns the object. If there is an error,
+it returns the error string. The caller must test constructor
+returns with ref to see if they worked. This makes it easy to pass back
+error messages to higher level objects with this code shown above.
+
+The first line parses the passed arguments (in @_) with a field
+description table. The second line tests if an object was created. If it
+was (ref $self is true), then the constructor continues. Otherwise, the
+error string is just returned to the caller. So the exact low level
+error is propagated up the call tree. This is used consistently in all
+of the constructors so even if you have a class which has a field which
+is a class (see the 'class' field type above), and it has a parse error,
+that error will be passed all the way up to the highest level call
+(typically in the Stem::Config module).
+
+Stem Cell Configuration
+
+Stem cells are typically created by the Stem::Conf class. The primary
+source of configuration data is from a file and that is handled by the
+load method. Currently config files are legal Perl and are just parsed
+with string eval. (Don't yell, I know it sucks but it is simple to
+bootstrap.) The next revision of this module will tighten up the
+specifications of config files and create a proper parser for it. The
+parser will probably use Parse::RecDescent (written by our advisor
+Damian Conway who will probably write the parser for us :). The config
+syntax will probably be similar to what it is now, but barewords
+(actually any token without whitespace) will be allowed anywhere. Only
+value strings with white space will need to be quoted. Config keywords will
+always be barewords. Fat comma will be supported and [] will demark
+lists of anything. There won't be any hashes since this is really just a
+mass of initializations and a list is fine to initialize a hash.
+
+A Stem cell configuration is comprised of a list of attribute/value
+pairs. You can also have a list of cell configurations in one file,
+but each configuration is handled independently. Each configuration
+entry has only a few options in the usual format of key/value pairs. The
+first is 'class', which is required and it names the Stem class which
+will be configured. The next one is 'name' and it is optional but almost
+always used. It is the name that this cell will be registered as and
+that is the address that will be used to send messages to this cell. The
+last major option is 'args' and its value is a list of attribute/value
+pairs used to initialize the cell.  Which set of configuration options
+is what controls how a cell is created and/or registered.
+
+The 'class' option is first processed and if it is not loaded, Stem will
+load it for you. This can be done remotely which allows for a servlet
+style of behavior, i.e. a request can come in and be a configuration or
+converted to one and the required Stem class will be loaded and a cell
+created. That cell can then be passed a message and respond to it. All
+of that can occur at runtime on demand.
+
+If the 'args' option is set, then a constructor of the class is called
+and it is passed the attribute/value pairs from the list value of
+'args'. The constructor method is defaulted to 'new' but that can be
+overridden with the 'method' option. The constructor processes its
+arguments (most likely using the Stem::Class::parse_args routine
+described above) and has 3 possible return values. If it returns undef,
+nothing more is done by the Stem::Conf module for this configuration. If
+a string is returned, that is assumed to be an error message and it is
+either printed or returned to the originator of this configuration. Any
+other configurations in this file (or passed in remote configuration)
+are skipped. If the retun value is a ref, then it is assumed
+to be an object and it can be registered with the address in the 'name'
+option.
+
+If the 'name' option is set, that will be used to register the cell or
+class itself. In most of the configuration cases, an object is created
+by the class constructor with the 'args' option and it is then
+registered as a cell with that name for its address. If no 'args'
+option is set, then the class itself is registered under the 'name'
+value and it is a class level cell. There can only be one class level
+cell for any class although it could be registered under multiple names
+(aliases). In addition, the value of the 'name' option is passed along
+with the 'args' values to the constructor as the attribute 'reg_name'.
+
+Here are some example classes which are configured in several of those
+ways:
+
+The Stem::Hub class needs to be initialized with a registration name
+but has no other attributes. So its configuration has a 'name' and an
+'args' option whose value is an empty list (that forces the constructor
+to be called).
+
+	[
+		class	=>	'Stem::Hub',
+		name	=>	'server',
+		args	=>	[],
+	]
+
+The Stem::TTY::Msg class configuration doesn't use the 'name' option and
+it used an empty 'args' value. So its constructor is called and it
+returns its single class level object, and that is registered under its
+class name.
+
+	[
+		class	=>	'Stem::TTY::Msg',
+		args	=>	[],
+	]
+
+
+The Stem::Demo::Cmd class is a class level cell that just has a 'name'
+option in its configuration and that is used to register the class
+itself.
+
+	[
+		class	=>	'Stem::Demo::Cmd',
+		name	=>	'cmd',
+	]
+
+
+The Stem::Sock::Msg is configured in the most common way, with 'name' and
+'args' options and values for the arguments.
+
+	[
+		class	=>	'Stem::Sock::Msg',
+		name	=>	'C',
+		args	=>	[
+			port	=> 6668,
+			server	=> 1,
+			data_msg	=> [
+				to_cell		=> 'sw',
+				to_target	=> 'c',
+			],
+		],
+	]
+
+
+Normally a single configuration file is loaded by the run_stem program
+at start up time.  The Stem::Conf module also supports loading a
+configuration file via a command message or another configuration (which
+is similar to include files or Perl modules). A configuration which
+loads a configuration file can evaluate in the current Hub or send it to
+any Hub in the Stem system. This allows for centralized management of
+Stem configurations. As an aid to this, the stem_msg program can be used
+to send a 'load' command message to a Hub.
+

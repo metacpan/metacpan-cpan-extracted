@@ -1,0 +1,36 @@
+
+Revision history for Perl module Statistics::LineFit
+
+0.01 Sat Nov 15 09:42:50 2003
+     Original version; created by ExtUtils::ModuleMaker 0.32
+
+0.01 Mon Nov 17 15:27:57 PST 2003
+     Release to CPAN.
+
+0.02 Tue Nov 18 12:22:45 PST 2003
+     Fixed format bug in POD documentation.
+
+0.03 Sun Nov 24 15:25:36 PST 2003
+     Changed epsilon tolerance in test 14_scale_weights from 1.0e-11 to 1.0e-10
+     to make test pass on MSWin32-x86-multi-thread.
+ 
+     Modified tests 02_R5ptsU1-D through 08_3ptsU1-D to run cleanly with
+     "use strict".  All test files (*.t) are now "use strict" clean and
+     -w clean.
+
+     Minor revisions to documentation.
+ 
+0.04 Mon Jan 5 23:05:15 PST 2004
+     No significant changes.  Minor revisions to documentation and code.
+
+0.05 Tue May 18 13:39:13 PST 2004
+     No significant changes.  Minor revisions to documentation.
+
+0.06 Tue May 25 10:54:04 PST 2004
+     Added check to verify that at least two of the weights are nonzero.
+     Minor revisions to documentation.
+
+0.07 Wed Sep  2 09:09:36 PST 2004
+     Added varianceOfEstimates() method to compute the variances of the 
+     estimates of the intercept and slope.
+

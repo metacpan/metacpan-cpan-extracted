@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<!DOCTYPE NZSRSResponse SYSTEM "protocol.dtd">
+<NZSRSResponse VerMajor="5" VerMinor="2"><Error Hint="INVALID_REQUEST_ERROR" ErrorId="XML_PARSE_ERROR" Severity="err"><Description><![CDATA[XML parse error]]></Description><ErrorDetails><![CDATA[:3: element HandleUpdate: validity error : Element HandleUpdate does not carry attribute ActionId
+   <HandleUpdate HandleId="simple1" Email="update@email.com"/>
+                                                              ^ ]]></ErrorDetails></Error></NZSRSResponse>

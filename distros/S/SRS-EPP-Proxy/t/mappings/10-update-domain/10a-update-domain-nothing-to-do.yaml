@@ -1,0 +1,22 @@
+template: update-domain.tt
+
+vars:
+  domain: cheese.co.te
+
+input_assertions:
+  class: SRS::EPP::Command::Update::Domain
+  count:
+    - [ '//domain:name', 1, 'SRS: Check for the domain' ]
+    - [ '//domain:registrant', 0, 'SRS: No registrant' ]
+  match:
+    - [ '//domain:name', 'cheese.co.te', 'SRS: Check the domain name' ]
+
+SRS:
+
+output_assertions:
+  count:
+    - [ '//epp:result', 1, 'SRS: Check for one result' ]
+  match:
+  match_all:
+  attr_is:
+    - [ '//epp:result', 'code', 2002, 'SRS: Check for correct result code' ]

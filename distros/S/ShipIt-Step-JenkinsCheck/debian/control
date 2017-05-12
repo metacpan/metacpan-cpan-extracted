@@ -1,0 +1,13 @@
+Source: libshipit-step-jenkinscheck-perl
+Section: perl
+Priority: optional
+Build-Depends: debhelper (>= 5.0.0)
+Build-Depends-Indep: perl (>= 5.10.1), libwww-perl, libtry-tiny-perl, libterm-readline-gnu-perl, libjson-perl, libshipit-perl
+Maintainer: Dave Lambley <davel@state51.co.uk>
+Standards-Version: 3.7.2
+Homepage: http://search.cpan.org/dist/ShipIt-Step-JenkinsCheck/
+
+Package: libshipit-step-jenkinscheck-perl
+Architecture: all
+Depends: ${perl:Depends}, ${misc:Depends}, libwww-perl, libtry-tiny-perl, libterm-readline-gnu-perl, libjson-perl, libshipit-perl
+Description: Jenkins integration for ShipIt.

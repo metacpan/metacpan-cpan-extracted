@@ -1,0 +1,7 @@
+name = "Setup-Project"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+script_files=['bin/*', 'script/*']
+
+[FileGatherer]
+include_dotfiles = false

@@ -1,0 +1,8 @@
+--- #YAML:1.0
+name: SPOPSx-Tool-YAML
+version: 0.03
+author:
+  - Andrew Sterling Hanenkamp, E<lt>hanenkamp@users.sourceforge.netE<gt>
+abstract: A SPOPS extension for the storage of complex objects
+license: perl
+generated_by: Module::Build version 0.261, without YAML.pm

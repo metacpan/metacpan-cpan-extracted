@@ -1,0 +1,148 @@
+#!/bin/sh
+#
+# File: supervisor
+# Date: 21-Sep-2009
+# By  : Kevin Esteb
+#
+# This is the startup procedure for supervisor on Debian.
+#
+### BEGIN INIT INFO
+# Provides:       supervisor
+# Required-Start: $network
+# Required-Stop:  $network
+# Default-Start:  2 3 4 5
+# Default-Stop:   0 1 6
+# Short-Desctiption: Start/Stop Supervisor
+# Description: Supervisor is a simple monitor of proceesses
+### END INIT INFO
+#
+
+PIDFILE="/var/run/supervisor.pid"
+CONFIGS="/etc/supervisor.ini"
+USER="root"
+NAME="supervisor"
+DESC="Start/Stop Supervisor"
+LOGFILE="/var/log/supervisor.log"
+
+# integrate the overrides
+
+if [ -r /etc/default/$NAME ];then
+    . /etc/default/$NAME
+fi
+
+PROGRAM="/usr/local/bin/$NAME"
+PARAMS="--pidfile $PIDFILE --config $CONFIGS --logfile $LOGFILE"
+SCRIPTNAME=/etc/init.d/$NAME
+
+# Load the VERSOSE setting and other rcS variables
+
+if [ -f /lib/init/vars.sh ];then
+    . /lib/init/vars.sh
+fi
+
+# Define LSB log_* functions.
+# Depends on lsb-base (>= 3.0-6) to ensure that this file is present
+
+if [ -f /lib/lsb/init-function ];then
+    . /lib/lsb/init-functions
+fi
+
+# Some simple tests
+
+[[ -f $PROGRAM ]] || exit 0
+
+fn_start() {
+
+    start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $PROGRAM \
+        --test > /dev/null \
+        || return 1
+    #
+    start-stop-daemon --start --quiet --pidfile $PIDFILE --background --exec $PROGRAM -- \
+        $PARAMS \
+        || return 2
+    #
+}
+
+fn_stop() {
+
+    start-stop-daemon --stop --quiet --retry=TERM/30/KILL/5 \
+        --pidfile $PIDFILE \
+        --name $NAME
+    RETVAL="$?"
+    [ "$RETVAL" = 2 ] && return 2
+    #
+    [[ -f $PIDFILE ]] && rm -f $PIDFILE
+
+    return "$RETVAL"
+
+}
+
+fn_reload() {
+
+    start-stop-daemon --stop --signal 1 --quiet --pidfile $PIDFILE \
+        --name $NAME
+    return 0
+
+}
+
+# See how we were called
+
+case "$1" in
+    start)
+        [ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC" "$NAME"
+        fn_start
+        case "$?" in
+            0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
+            2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
+        esac
+        ;;
+
+    stop)
+        [ "$VERBOSE" != no ] && log_daemon_msg "Stopping $DESC" "$NAME"
+        fn_stop
+        case "$?" in
+            0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
+            2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
+        esac
+        ;;
+
+    #reload|force-reload)
+        #
+        # If fn_reload() is not implemented then leave this commented out
+        # and leave 'force-reload' as an alias for 'restart'.
+        #
+        #log_daemon_msg "Reloading $DESC" "$NAME"
+        #fn_reload
+        #log_end_msg $?
+        #;;
+
+    restart|force-reload)
+        #
+        # If the "reload" option is implemented then remove the
+        # 'force-reload' alias
+        #
+        log_daemon_msg "Restarting $DESC" "$NAME"
+        fn_stop
+        case "$?" in
+            0|1)
+                fn_start
+                case "$?" in
+                    0) log_end_msg 0 ;;
+                    1) log_end_msg 1 ;; # Old process is still running
+                    *) log_end_msg 1 ;; # Failed to start
+                esac
+                ;;
+            *)
+                # Failed to stop
+                log_end_msg 1
+                ;;
+        esac
+        ;;
+
+    *)
+        echo "Usage: $SCRIPTNAME {start|stop|restart|force-reload}" >&2
+        exit 3
+        ;;
+esac
+
+:

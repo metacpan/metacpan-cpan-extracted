@@ -1,0 +1,18 @@
+Revision history for Perl extension Starman::ModCluster.
+
+0.01  Wed May  7 14:09:08 2014
+	- initial release
+0.02  Fri May  9 12:00:00 2014
+	- adding support status support
+0.03  Fri May  9 18:00:00 2014
+	- added multicast support
+0.05 Tue May 14 00:40:00 2014
+	- fixed bug where node would not re-register with mod_cluster
+0.06 Tue May 14 12:19:00 2014
+	- removed debug messages that were left by mistake
+0.07 Tue June 7 11:53:00 2014
+	- added rest of the MCMP CONFIG method keys
+0.08 Tue June 7 12:21:00 2014
+	- fixed bug with status broadcast
+0.09 Tue June 11 12:41:00 2014
+	- fixed sticky session force option

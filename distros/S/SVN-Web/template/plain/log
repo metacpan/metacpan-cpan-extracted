@@ -1,0 +1,52 @@
+[% USE cgi = CGI %]
+
+<div class="title">
+[%|l(path)%]history for path %1[%END%] <a href="[% script | url %]/[% repos | url %]/rss[% path | url %]">[%|l%](track)[%END%]</a>
+[% IF isdir %]
+<a href="[% script %]/[% repos | uri %]/browse[% path | url %]?rev=[% rev %]">[%|l%](browse)[%END%]</a>
+[% END %]
+</div>
+<div class="title">
+<form action="[% cgi.self_url %]" method="get">[%|l%]Show last[%END%] <input name="limit" size=4 value="[% limit %]" /> changes <input type="submit" name="submit" value="[%|l%]Show[%END%]" /></form>
+</div>
+[% FOREACH revs %]
+<hr />
+<a name="rev[% rev %]"/>
+<a href="[% script %]/[% repos | uri %]/revision/?rev=[% rev %]">[%|l(rev)%]revision %1[%END%]</a>
+[% IF isdir %]
+<a href="[% script %]/[% repos | uri %]/browse[% path | url %]?rev=[% rev %]">[%|l%](browse)[%END%]</a>
+[% ELSE %]
+<a href="[% script %]/[% repos | uri %]/checkout[% path | url %]?rev=[% rev %]">[%|l%](checkout)[%END%]</a>
+[% END %]
+ - [% author %] - [% date %]<br/>
+
+[% UNLESS isdir || loop.count == loop.size%]
+[% prev = loop.count %]
+[%|l%](diff with previous)[%END%]: <a href="[% script %]/[% repos | uri %]/diff[% path | url %]?rev1=[% revs.$prev.rev %];rev2=[% rev %]">HTML</a> | <a href="[% script | url %]/[% repos | url %]/diff[% path | url %]?rev1=[% revs.$prev.rev %];rev2=[% rev %];mime=text/plain">TEXT</a><br/>
+[% END %]
+<p>
+[% msg | log_msg %]
+</p>
+[% FOREACH pk = paths %]
+[% pk.value.action %] -
+[% IF pk.value.isdir %]
+<a href="[% script %]/[% repos | uri %]/browse[% pk.key | url %]/?rev=[% rev %]">[% pk.key %]</a>
+[% IF pk.value.copyfrom %]
+<a href="[% script %]/[% repos | uri %]/browse[% pk.value.copyfrom | url  %]?rev=[% pk.value.copyfromrev %]">[%|l(pk.value.copyfrom, pk.value.copyfromrev)%](from %1:%2)[%END%]</a>
+[% END %]
+
+[% ELSE %]
+[% IF pk.value.action == 'D' %]
+[% pk.key %]
+[% ELSE %]
+<a href="[% script %]/[% repos | uri %]/view[% pk.key | url %]?rev=[% rev %]">[% pk.key %]</a>
+<a href="[% script %]/[% repos | uri %]/checkout[% pk.key | url %]?rev=[% rev %]">[%|l%](checkout)[%END%]</a>
+[% END %]
+[% IF pk.value.copyfrom %]
+<a href="[% script %]/[% repos | uri %]/log[% pk.value.copyfrom | url %]#rev[% pk.value.copyfromrev %]">[%|l(pk.value.copyfrom, pk.value.copyfromrev)%](from %1:%2)[%END%]</a>
+[% END %]
+[% END %]
+
+<br />
+[% END %]
+[% END %]

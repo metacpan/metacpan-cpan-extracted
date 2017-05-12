@@ -1,0 +1,7 @@
+Makefile.PL
+MANIFEST
+README
+t/SOAP-ISIWoK.t
+lib/SOAP/ISIWoK.pm
+lib/SOAP/ISIWoK/Lite.pm
+META.yml                                 Module meta-data (added by MakeMaker)

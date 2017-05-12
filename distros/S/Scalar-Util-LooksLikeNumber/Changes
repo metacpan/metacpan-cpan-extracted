@@ -1,0 +1,10 @@
+1.39.2  2015-11-06 (PERLANCAR)
+
+        - No functional changes.
+
+        - Add META.json [RT#108328].
+
+
+1.39.1  2014-06-30 (SHARYANTO)
+
+        - First release, based on Scalar-List-Util code.

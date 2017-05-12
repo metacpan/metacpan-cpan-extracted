@@ -1,0 +1,153 @@
+NAME
+     SyslogScan::Daemon::BlacklistDetector - notice when a mail server has been blacklisted
+
+SYNOPSIS
+     plugin SyslogScan::Daemon::BlacklistDetector
+            debug           0
+
+     bld_plugin SyslogScan::Daemon::BlacklistDetector::Postfix
+            debug           0
+            rx_ourIP        127\.0\.0\.1
+            logpath         /var/log/mail.log
+
+     bld_plugin SyslogScan::Daemon::BlacklistDetector::EmailNotify
+            debug           0
+            notify          your@email.here
+            renotify_time   7200
+            forget_time     3600
+            sendfrom        root
+            clean_time      1800
+            maxkeep         100
+
+DESCRIPTION
+    SyslogScan::Daemon::BlacklistDetector watches the mail log for SMTP
+    reject messages that indicate that your mail server has been blacklisted
+    by another site.
+
+    SyslogScan::Daemon::BlacklistDetector is a plugin for
+    SyslogScan::Daemon. The SYNOPSIS shows the configuration lines you might
+    use in "/etc/syslogscand.conf" to turn on the blacklist detector.
+
+CONFIGURATION PREFIX
+    The configuration prefix for plugins for
+    SyslogScan::Daemon::BlacklistDetector is "bld_". Use "bld_plugin" to
+    load plugins.
+
+CONFIGURATION PARAMETERS
+    SyslogScan::Daemon::BlacklistDetector defines the following
+    configuration parameters which may be given in indented lines that
+    follow "plugin SyslogScan::Daemon::BlacklistDetector" or with the
+    confuration prefix ("bld_") anywhere in the configuration file after the
+    "plugin SyslogScan::Daemon::BlacklistDetector" line.
+
+    debug          (default 0) Turn on debugging.
+
+WRITING PLUGINS
+    Plugins for SyslogScan::Daemon::BlacklistDetector should subclass
+    "SyslogScan::Daemon::BlacklistDetector::Plugin". Except for "new()" and
+    "preconfig()", all of these methods are optional.
+
+    SyslogScan::Daemon::BlacklistDetector will invoke the following methods
+    on its plugins:
+
+    new()          See notes for plugins for SyslogScan::Daemon.
+
+    preconfig()    See notes for plugins for SyslogScan::Daemon.
+
+    get_logs()     See notes for plugins for SyslogScan::Daemon.
+
+    parse_logs()   Called after one of the regular expressions returned by
+                   "get_logs()" matched a log line. The arguments are the
+                   log filename where the match was found and the regular
+                   expression that matched. Passed implicitly are the line
+                   that was matched ($_) and any of the numbered regular
+                   expression submatches ($1, $2, etc).
+
+                   The return value is a %hash of information. The hash
+                   should be completely empty if the log line is not a SMPT
+                   rejection.
+
+                   The following keys are required:
+
+                   status         This should be "deferred" for a 4XX
+                                  rejection and "bounced" for a 5XX
+                                  rejection.
+
+                   logline        This should be the whole log line ($_).
+
+                   sourceip       The IP address used by the MTA for sending
+                                  email. This may be "unknown".
+
+                   destdomain     The domain of the recipient that bounced.
+
+                   to_address     The recipient that bounced.
+
+                   The return value is the %info hash passed to exactly one
+                   of the following: "grelisted()", "recipient_reject()",
+                   "sender_reject()", "content_reject()"
+                   "realtime_reject()", and "blacklisted()".
+
+    greylisted(%info)
+                   This is called if the "logline" returned by
+                   "parse_logs()" contatins the word "greylisted".
+
+    recipient_reject(%info)
+                   This is called if the "logline" returned by
+                   "parse_logs()" matches a regular expression that
+                   indicates that the rejection was due to being sent to a
+                   particular recipient.
+
+                   The regular expression is hard-coded to encourage
+                   everyone to share any changes with the author.
+
+    sender_reject(%info)
+                   This is called if the "logline" returned by
+                   "parse_logs()" matches a regular expression that
+                   indicates that the rejection was due to being sent from a
+                   particular sender.
+
+                   The regular expression is hard-coded to encourage
+                   everyone to share any changes with the author.
+
+    content_reject(%info)
+                   This is called if the "logline" returned by
+                   "parse_logs()" matches a regular expression that
+                   indicates that the rejection was due to the content of
+                   the message sent.
+
+                   The regular expression is hard-coded to encourage
+                   everyone to share any changes with the author.
+
+    realtime_reject(%info)
+                   This is called if the "logline" returned by
+                   "parse_logs()" matches a regular expression that
+                   indicates that the rejection was due to a transitory
+                   blacklist.
+
+                   The regular expression is hard-coded to encourage
+                   everyone to share any changes with the author.
+
+    blacklisted(%info)
+                   This is called for lines that don't match the regular
+                   expressions for "grelisted()", "realtime_reject()",
+                   "sender_reject()", or "recipient_reject()" or
+                   "content_reject()".
+
+    periodic()     See notes for plugins for SyslogScan::Daemon.
+
+LICENSE
+    Copyright (C) 2006, David Muir Sharnoff <muir@idiom.com>
+
+    This module may be used and copied on the same terms as Perl itself.
+
+    If you need help writing additional modules for BlacklistDetector.pm,
+    I'm usually available to do so. Inquire for rates.
+
+SEE ALSO
+    The context for the blacklist detector: SyslogScan::Daemon, Plugins,
+    Plugins::API.
+
+    Plugins for the blacklist detector:
+    SyslogScan::Daemon::BlacklistDetector::Postfix,
+    SyslogScan::Daemon::BlacklistDetector::EmailNotify.
+

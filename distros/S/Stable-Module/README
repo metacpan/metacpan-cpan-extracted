@@ -1,0 +1,42 @@
+NAME
+
+  Stable::Module - frequently used modules on Perl5 application
+
+SYNOPSIS
+
+  use Stable::Module;          # any version
+  use Stable::Module ver.sion; # match or die
+
+DESCRIPTION
+
+  Stable::Module provides frequently used modules on Perl5 application, on both
+  modern Perl and traditional Perl.
+
+  Stable::Module works as:
+
+    use Cwd             qw(cwd);
+    use FindBin         qw($Bin);
+    use File::Basename  qw(fileparse basename dirname);
+    use File::Path      qw(mkpath rmtree);
+    use File::Copy      qw(copy move);
+    use File::Compare   qw(compare);
+    use Sys::Hostname   qw(hostname);
+    use Time::Local     qw(timelocal);
+    use List::Util      qw(first shuffle max maxstr min minstr sum);
+    use List::MoreUtils qw(all any none notall uniq);
+    use feature         qw(say);
+
+  fileparse, basename, dirname, mkpath, rmtree, copy, and move can treat multibyte
+  encoding of path name.
+
+INSTALLATION
+
+  1. Copy Stable/Module.pm to @INC directory.
+
+SEE ALSO
+
+  ina - CPAN
+  http://search.cpan.org/~ina/
+
+  BackPAN - A Complete History of CPAN
+  http://backpan.perl.org/authors/id/I/IN/INA/

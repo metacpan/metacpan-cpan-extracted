@@ -1,0 +1,6 @@
+#! /usr/bin/perl -w
+
+use Shell::POSIX::Select;
+
+select our $var (1) { print "$var\n"; }
+print "Outside loop, var is $var\n";

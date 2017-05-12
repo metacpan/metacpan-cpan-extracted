@@ -1,0 +1,32 @@
+Revision history for Perl extension Silly::StringMaths.
+
+*** 0.13 (15th July 1998)
+
+The test script, ironically, didn't point to the new name of the module,
+and failed even though no tests were defined. This has now been fixed,
+and some basic tests added as well.
+
+*** 0.12 (14th July 1998)
+
+Renamed Silly::StringMaths (it was previously tentatively entitled
+Math::Strings), and exporter support added. (I don't tend to like the
+exporter mechanism, but the interface is otherwise extremely clunky.)
+
+*** 0.11 (10th July 1998)
+
+Slight modification made to the divide routine to allow the cunning
+
+	$divisor =~ s%.%.%g;
+	$base="A"x($base =~ s%$divisor%%g);
+
+(which is why I wrote this in the first place)
+
+
+*** 0.10 (9th July 1998)
+
+Original version - support for the four basic operators
+(add, subtract, multiply, divide), plus exponentiate, 
+and the useful functions sign, negative and invert.
+
+
+

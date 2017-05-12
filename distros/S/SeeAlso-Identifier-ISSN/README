@@ -1,0 +1,14 @@
+pod2text SeeAlso::Identifier::ISSN.pm > README
+
+Use ISSN in the framework of SeeAlso::Identifier
+
+You can create it now by using the command shown above from this directory.
+
+At the very least you should be able to use this set of instructions
+to install the module...
+
+perl Build.PL
+./Build
+./Build test
+./Build install
+

@@ -1,0 +1,175 @@
+Release history for String-Sections
+
+0.3.2 2013-09-26T07:43:21Z
+ [00 Minor]
+ - Attempt to avoid Test::Compile bugs on Win32
+
+ [Dependencies::Added / test requires]
+ - File::Spec
+
+ [Dependencies::Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.8.2 → v1.8.3
+
+0.3.1 2013-08-30T20:45:10Z
+ [!Minor]
+ - Bump to get newer Test::Compile
+
+ [Dependencies::Added / develop requires]
+ - Test::Kwalitee 1.08
+
+ [Dependencies::Added / test requires]
+ - IO::Handle
+ - IPC::Open3
+
+ [Dependencies::Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.8.0 → v1.8.2
+
+ [Dependencies::Removed / test requires]
+ - Capture::Tiny
+ - blib
+
+0.3.0 2013-08-11T07:11:18Z
+ [!Major]
+ - section_names now retains document order where possible.
+ - use section_names_sorted if you need them sorted
+ - More type constraints inside.
+
+ [Dependencies::Added / runtime requires]
+ - Types::Standard
+
+ [Dependencies::Added / test requires]
+ - Capture::Tiny
+ - blib
+
+ [Dependencies::Changed / build requires]
+ - Module::Build 0.4005 → 0.4007
+
+ [Dependencies::Changed / configure requires]
+ - Module::Build 0.4005 → 0.4007
+
+ [Dependencies::Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.7.4 → v1.8.0
+
+ [Dependencies::Removed / runtime requires]
+ - Params::Classify
+
+ [Dependencies::Removed / test requires]
+ - File::Find
+ - File::Temp
+
+0.2.3 2013-07-16T03:37:29Z
+ [Bug Fixes]
+ - Need recent Moo for builder => sub {}
+
+ [Dependencies::Changed / runtime requires]
+ - Moo 0 → 1.000008
+
+0.2.2 2013-06-25T04:12:32Z
+ [Bug Fixes]
+ - load_filehandle used ->_default name instead of ->default_name
+ - _isa_string tried to call ::Classif<t> instead of ::Classif<y>
+ - shallow_merge called blessed() instead of _blessed()
+
+ [Dependencies::Added / test requires]
+ - Data::Dump
+ - FindBin
+ - Path::Tiny
+ - Sub::Exporter::Progressive
+ - lib
+
+ [Documentation]
+ - default_name now stubbed
+
+ [Tests]
+ - Much more thoughrough coverage of load_file and load_list behaviour.
+ - Generated tests Facilitated by an arsenal of configuration and
+   templates, using String::Sections to generate the templated tests as
+   well.
+ - devel/compile_test_templates.pl is thus an example of potential usage.
+
+0.2.1 2013-06-21T12:10:27Z
+ [Dependencies::Removed / runtime requires]
+ - Sub::Quote
+
+ [Documentation]
+ - Misc Documentation enhancement
+
+0.2.0 2013-06-20T19:58:41Z
+ [00_NOTEWORTHY Changes]
+ - Interface majorly refactored and split.
+ - Main class is now an instance factory instead of a self-mutator.
+
+ [Dependencies::Added / develop requires]
+ - Pod::Coverage::TrustPod
+ - Test::CPAN::Changes 0.19
+ - Test::CPAN::Meta
+ - Test::Pod 1.41
+ - Test::Pod::Coverage 1.08
+ - version 0.9901
+
+ [Dependencies::Added / runtime requires]
+ - Params::Classify
+ - strict
+ - warnings
+
+ [Dependencies::Changed / build requires]
+ - Module::Build 0.3601 → 0.4005
+
+ [Dependencies::Changed / configure requires]
+ - Module::Build 0.3601 → 0.4005
+
+ [Dependencies::Changed / develop recommends]
+ - Dist::Zilla::PluginBundle::Author::KENTNL::Lite 0.01009803 → v1.3.0
+
+ [Dependencies::Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.0.0 → v1.7.4
+
+ [Dependencies::Changed / test requires]
+ - Test::More 0.96 → 0.98
+
+ [Dependencies::Removed / runtime recommends]
+ - Params::Classify
+
+ [Dependencies::Removed / test requires]
+ - English
+
+ [Documentation]
+ - Update copyright year.
+ - Update LICENSE address
+ - Added README.mkdn to project
+
+ [Internals]
+ - Add $AUTHORITY var in all packages
+ - Move $VERSION var out of BEGIN {}
+
+ [Meta]
+ - adds x_authority key
+ - bug tracker to github issues
+ - git URIs moved to https:// protocols
+
+ [Packaging]
+ - utilises Module::Build 0.4004 test_requires
+ - author/release tests no longer in t/
+
+0.1.1 2011-06-07T16:22:34Z
+ [Dependencies]
+ - No longer uses Package::Stash
+ - Adds Moo and Sub::Quote ( part of Moo )
+ - No longer recommends Sub::Name for develop time.
+
+ [Documentation]
+ - Eliminated Documentation referring to experiemental ideas that are now
+   righly removed.
+
+ [Features]
+ - Implemented load_filehandle
+
+ [Internals]
+ - Refactored Line adding logic to its own private function.
+ - Eliminated all the hand-rolled OO in favour of Moo.
+ - Reworked many internal things to rely on Moo code instead.
+ - Eliminated lots of redundant foolish lazyload code.
+
+0.1.0 2011-04-30T02:11:31Z
+ - First version.
+

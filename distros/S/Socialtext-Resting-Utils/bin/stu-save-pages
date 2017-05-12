@@ -1,0 +1,21 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Socialtext::Resting;
+use Socialtext::Resting::Getopt qw/get_rester/;
+
+my $r = get_rester();
+my @pages = $r->get_pages;
+
+unless (@pages) {
+    die "No pages in workspace " . $r->workspace . "\n";
+}
+
+print "Saving " . scalar(@pages) . " pages ...\n";
+for my $p (@pages) {
+    print "Saving '$p' ...\n";
+    my $filename = Socialtext::Resting::_name_to_id($p);
+    open(my $fh, ">$filename") or die "Can't open $filename: $!";
+    print $fh $r->get_page($p);
+    close $fh or die "Can't write $filename: $!";
+}

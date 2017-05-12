@@ -1,0 +1,8 @@
+Build.PL
+Changes
+lib/SPOPSx/Tool/DateTime.pm
+MANIFEST			This list of files
+t/strptime.t
+META.yml
+Makefile.PL
+README

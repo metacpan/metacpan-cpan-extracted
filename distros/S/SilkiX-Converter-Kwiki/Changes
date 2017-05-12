@@ -1,0 +1,15 @@
+0.03   2010-09-17
+
+- User mapping wasn't handled correctly, and could cause a crash bug.
+
+
+0.02   2010-09-07
+
+- Added a --fast option to speed up conversion. This is done by disabling
+  triggers during conversion, which means you really shouldn't run the
+  conversion while anyone might be using the web app.
+
+
+0.01   2010-06-04
+
+- Initial release

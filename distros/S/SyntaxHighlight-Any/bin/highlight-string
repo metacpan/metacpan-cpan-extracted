@@ -1,0 +1,111 @@
+#!perl
+
+use 5.010;
+use autodie;
+use strict;
+use warnings;
+use Log::Any::App '$log';
+
+use File::Slurp::Tiny qw(read_file);
+use Getopt::Long;
+use SyntaxHighlight::Any qw(highlight_string list_languages);
+
+our $VERSION = '0.06'; # VERSION
+
+my %opts;
+Getopt::Long::Configure("permute");
+GetOptions(
+    'lang|l=s'   => \$opts{lang},
+    'output|o=s' => \$opts{output},
+    'lang-list' => sub {
+        print map {"$_\n"} list_languages();
+        exit 0;
+    },
+    'help' => sub {
+        print <<EOT;
+highlight-string - Syntax-highlight code using various backends
+
+Usage:
+  highlight-string [--lang=S] [--output=S] FILE ...
+  highlight-string --lang-list
+  highlight-string --help
+
+Options:
+  --lang=S (-l)     Set language (use --lang-list to print list of known
+                    languages)
+  --output=S (-o)   Set output format (either 'ansi' or 'html')
+  --lang-list       Show list of supported languages.
+
+EOT
+        exit 0;
+    },
+);
+
+if (!@ARGV || @ARGV==1 && $ARGV[0] eq '-') {
+    local $/;
+    my $str = <STDIN>;
+    print highlight_string($str, \%opts);
+} else {
+    for my $f (@ARGV) {
+        $log->debugf("Formatting file %s ...", $f);
+        my $str = read_file($f);
+        print highlight_string($str, \%opts);
+    }
+}
+
+# ABSTRACT: Syntax-highlight code using various backends
+# PODNAME: highlight-string
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+highlight-string - Syntax-highlight code using various backends
+
+=head1 VERSION
+
+This document describes version 0.06 of highlight-string (from Perl distribution SyntaxHighlight-Any), released on 2015-08-18.
+
+=head1 SYNOPSIS
+
+ % highlight-string -l perl script.pl
+ % highlight-string --help
+
+=head1 DESCRIPTION
+
+This program is a simple command-line interface for L<SyntaxHighlight::Any>.
+
+=head1 SEE ALSO
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/SyntaxHighlight-Any>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-SyntaxHighlight-Any>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=SyntaxHighlight-Any>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,76 @@
+use strict;
+
+=head1 NAME
+
+String::RexxStack - Introduction to RexxStack modules
+
+=head1 DESCRIPTION
+
+RexxStack is an implementation of a more elaborate stack data structure
+than a regular stack.  This structure (and its related functions) has
+always been an extension to the Rexx framework in platforms like CMS,
+Amiga, OS/2, and Unix to serve as a glue-macro language not just
+between applications, but also to interface operations between 
+the operating system, the shell, and the applications. In Unix speak,
+it is similar to a daemon able to funnel data between separate 
+applications and perhaps the shell itself.
+
+
+ It is a more elaborate data structure than a regular stack since 
+
+ (a) It contains buffers within the stack, and stack operations 
+     can be applied within a region of the stack, 
+
+ (b) It support multiple stacks in stack- within-stack fashion, 
+
+ (c) It supports both a Perlish and Rexx systax -- the Rexx syntax 
+     is probably simpler.
+
+ (d) The stack scope can be internal to  the application (as usual), or 
+     the Stack can run as a daemon to enable sharing of data between 
+     network applications, or you could use both the internal plus the 
+     networking stacks at the same time.
+
+
+Since every stack is actually a stack-of-stacks, this documentation
+uses both terms interchangeably.
+
+The implementation of RexxStack is locate in module String::RexxStack::Named.pm .
+The network applications are bin/rexstack.pm and bin/rexqueue.pm, and
+although they have been implemented and tested, in order to expedite this
+release, I decided to withhold publication of everything related to
+networking for a future day. Send me an email if you need an
+advanced copy.
+
+
+=head1 Roadmap
+
+=over
+
+=item Internal RexxStack
+
+ This release.
+
+=item External & Internal RexxStack
+
+Implements rxstack and rxqueue (the networking interface). The code
+has been implemented, documented, and passed all tests. Is is still
+alpha and not ready for release.
+
+=item Multi-threaded External & Internal RexxStack
+
+After the simple version of rxstack is released, the rxstack will 
+probably be implemented as a threaded server.
+
+=back
+
+=head1 AUTHOR
+
+Ioannis Tambouras, E<lt>ioannis@earthlink.netE<gt>
+
+=head1 SEE ALSO
+
+L<String::RexxStack::Named.pm>,
+L<String::TieStack>,
+L<regina>
+

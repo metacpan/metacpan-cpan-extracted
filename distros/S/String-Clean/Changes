@@ -1,0 +1,21 @@
+Revision history for String-Clean
+
+0.01    12/07
+        the always exciting, 'you have to start somewhere' version
+
+0.011   12/07
+        the 'oops I forgot to modify the MANIFEST and Changes files' version
+
+0.02    12/07
+        Added $opt->{escape} and $opt->{word_boundary}
+
+0.021   12/07 
+        adding Test::Pod::Coverage to the reqs for the pod test, it seems to
+        be bailing on NetBSD:
+        http://www.nntp.perl.org/group/perl.cpan.testers/2007/12/msg856161.html
+
+0.022   02/08
+        doc changes, added some acknowledgments and theres now a presentation in the docs folder
+
+0.03    Dec 01, 2010
+        Moved to dzil and added a memoize like thing so that the YAML doc does not get reparsed every time

@@ -1,0 +1,31 @@
+<NZSRSResponse VerMajor="4" VerMinor="3" RegistrarId="104">
+<Response Action="DomainUpdate" FeId="2" FeSeq="122118672" OrigRegistrarId="104" RecipientRegistrarId="104" Rows="1" TransId="20100624092216713">
+<FeTimeStamp Day="24" Hour="09" Minute="23" Month="6" Second="05" TimeZoneOffset="+12:00" Year="2010"/>
+<Domain Delegate="1" DomainName="chedder4.co.te" RegistrantRef="24642" RegistrarId="104" Status="Active" Term="1">
+   <NameServers>
+     <Server FQDN="ns1.moca.co.te"/>
+     <Server FQDN="ns2.discountdomains.co.te"/>
+   </NameServers>
+   <RegistrantContact Name="Funsies International" Email="ingridc@silly-int.co.te">
+     <PostalAddress Address1="6 boring road" City="Middlesex" CountryCode="NZ"/>
+     <Phone AreaCode="3" CountryCode="64" LocalNumber="9266660"/>
+   </RegistrantContact>
+   <AdminContact Name="Funsies International" Email="ingridc@silly-int.co.te">
+     <PostalAddress Address1="6 boring road" City="Middlesex" CountryCode="NZ"/>
+     <Phone AreaCode="3" CountryCode="64" LocalNumber="9666600"/>
+   </AdminContact>
+   <TechnicalContact Name="Funsies International" Email="ingridc@silly-int.co.te">
+     <PostalAddress Address1="6 boring road" City="Middlesex" CountryCode="NZ"/>
+     <Phone AreaCode="3" CountryCode="64" LocalNumber="9666600"/>
+   </TechnicalContact>
+   <BilledUntil Day="28" Hour="11" Minute="31" Month="7" Second="37" TimeZoneOffset="+12:00" Year="2011"/>
+   <RegisteredDate Day="28" Hour="11" Minute="31" Month="7" Second="37" TimeZoneOffset="+12:00" Year="2009"/>
+   <AuditDetails ActionId="20100624092216713" RegistrarId="104">
+     <AuditTime>
+       <From Day="24" Hour="09" Minute="23" Month="6" Second="05" TimeZoneOffset="+12:00" Year="2010"/>
+     </AuditTime>
+   <AuditText/>
+   </AuditDetails>
+</Domain>
+</Response>
+</NZSRSResponse>

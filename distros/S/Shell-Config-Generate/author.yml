@@ -1,0 +1,15 @@
+---
+pod_spelling_system:
+  stopwords:
+    - bourne
+    - cmd.exe
+    - FreeBSD
+    - Solaris
+    - ideomatic
+    - 44bsd-csh
+    - inline
+    - cmd
+    - exe
+    - Portably
+    - PowerShell
+    - Macpherson

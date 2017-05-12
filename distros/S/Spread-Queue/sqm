@@ -1,0 +1,31 @@
+#!/usr/bin/perl
+
+use strict;
+use Spread::Queue::Manager;
+use Log::Channel;
+use Getopt::Long;
+
+my $USAGE = "usage: sqm [-v {1,2}] queue-name";
+my $verbose = 0;
+GetOptions("verbose|v=i" => \$verbose) or die $USAGE;
+
+my $queue_name = shift @ARGV || die $USAGE;
+
+disable Log::Channel "Spread::Session";
+disable Log::Channel "Spread::Queue";
+disable Log::Channel "Spread::Queue::FIFO";
+
+if ($verbose > 0) {
+    enable Log::Channel "Spread::Queue";
+    disable Log::Channel "Spread::Queue::FIFO";
+    enable Log::Channel "Spread::Queue::Manager";
+}
+if ($verbose > 1) {
+    enable Log::Channel "Spread::Session";
+    enable Log::Channel "Spread::Session::message";
+    enable Log::Channel "Spread::Queue::FIFO";
+}
+
+my $session = new Spread::Queue::Manager(QUEUE => $queue_name);
+
+$session->run;

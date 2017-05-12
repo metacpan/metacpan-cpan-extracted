@@ -1,0 +1,10 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+dist.ini
+lib/StatusBoard/Graph.pm
+lib/StatusBoard/Graph/DataSeq.pm
+t/001.t
+t/release-cpan-changes.t

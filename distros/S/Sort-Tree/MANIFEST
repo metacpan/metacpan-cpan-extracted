@@ -1,0 +1,8 @@
+lib/Sort/Tree.pm
+Makefile.PL
+t/test.t
+README
+INSTALL
+ChangeLog
+MANIFEST
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,16 @@
+name: Speech-Synthesis
+version: 0.03
+abstract: A generic interface for different Text To Speech Engines
+author: Jouke Visser <jouke@pvoice.org>
+license: perl
+distribution_type: module
+build_requires:
+  Test::More: 0
+requires:
+  perl: 5.6.0
+  Win32::Locale: 0
+  Win32::OLE: 0
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.37

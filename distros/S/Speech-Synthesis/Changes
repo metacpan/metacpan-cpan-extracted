@@ -1,0 +1,11 @@
+Revision history for Speech-Synthesis
+
+0.01    August 8, 2005
+        First version, support for SAPI4, SAPI5, MSAgent and MacSpeech
+0.02    August 11, 2005
+        Second release, supporting Festival too
+0.03    August 12, 2005
+        Fix in Festival support to get more information on installed voices
+        Update in InstalledLanguages for Festival.
+        Added host and port parameters to all methods so you could run
+        your festival server on something else than localhost port 1319

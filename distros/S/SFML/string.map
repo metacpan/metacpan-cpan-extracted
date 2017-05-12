@@ -1,0 +1,15 @@
+# C++ string typemap
+
+TYPEMAP
+
+string		CPP_STRING
+
+OUTPUT
+
+CPP_STRING
+	 sv_setpv((SV*)$arg, $var.c_str());
+
+INPUT
+
+CPP_STRING
+	$var = string(SvPV_nolen($arg));

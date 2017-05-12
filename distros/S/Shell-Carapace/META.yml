@@ -1,0 +1,50 @@
+---
+abstract: 'Simple realtime output for ssh and shell commands'
+author:
+  - 'Eric Johnson <eric.git@iijo.org>'
+build_requires:
+  Test::Fatal: '0'
+  Test::MinimumVersion::Fast: '0'
+  Test::Most: '0'
+  Test::Pod: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Shell-Carapace
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Shell::Carapace:
+    file: lib/Shell/Carapace.pm
+    version: '0.22'
+  Shell::Carapace::SSH:
+    file: lib/Shell/Carapace/SSH.pm
+  Shell::Carapace::Shell:
+    file: lib/Shell/Carapace/Shell.pm
+requires:
+  IO::Pty: '0'
+  IPC::Open3::Simple: '0'
+  Moo: '0'
+  Net::OpenSSH: '0'
+  String::ShellQuote: '0'
+resources:
+  bugtracker: https://github.com/kablamo/p5-shell-carapace/issues
+  homepage: https://github.com/kablamo/p5-shell-carapace
+  repository: git://github.com/kablamo/p5-shell-carapace.git
+version: '0.22'
+x_authority: cpan:KABLAMO
+x_contributors:
+  - 'Eric Johnson <github@iijo.org>'

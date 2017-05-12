@@ -1,0 +1,16 @@
+include common.smakh
+
+{
+    $ENV{FILE} = $FILE = "34_act_array";
+}
+
+default:   depend1 depend2 depend3
+	{ trace(@_);
+          push @OUTPUT, <<'EOS'
+ Test a HEREIS string
+   as part of an action
+ EOS
+	  }
+	      # Oops, an unmatched }
+
+# The default action already *is* a perl action

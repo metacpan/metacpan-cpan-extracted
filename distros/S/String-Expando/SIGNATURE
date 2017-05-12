@@ -1,0 +1,36 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 ec2d8fc53b25044f4df2448f84b2fa814e764ae7 INSTALL
+SHA1 3fd66c56df9037abe3654f6d1f8ec11170280c92 LICENSE
+SHA1 13e5f32f465d986621b931dd97085832e992ea71 MANIFEST
+SHA1 f184c61f673d28d06cff899b989ba9f09a102c37 META.json
+SHA1 48112bb5d03d1de2a2c3ad316e9cdf2c89eb8732 META.yml
+SHA1 65e2e05d058f1cdf30d6c1ab97117a1a27d2f92b Makefile.PL
+SHA1 043549ea73ad5f015863def6c9e7a293e020a28e README.md
+SHA1 e42128ecceb9025fdb8154d76b028f569d89fe59 dist.ini
+SHA1 762cacd323b175c9e828577055dc42a92bdc510a lib/String/Expando.pm
+SHA1 3a3406514eca2d6d157ab266ca6a4994cfa4315c t/001.use.t
+SHA1 9a97152168c9acd6d8964711e84e11aee8fd4deb t/002.simple.t
+SHA1 fa45d6e6ab1cd421349dea4ef527bfd5cdc8a09e t/author-critic.t
+SHA1 dc3eefcab3399f9a70861c332bb4a81ddcbb45e4 t/release-pod-syntax.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAlOzkmgACgkQ9IHYOgPo3G37+ACgqbZePz5ORJJwGBMY3q+gkWEI
+bVgAn0vVpfp9dPiUYvJOkplfaqKEBOaj
+=djPf
+-----END PGP SIGNATURE-----

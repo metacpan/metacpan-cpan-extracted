@@ -1,0 +1,36 @@
+Solaris::DevLog version 1.00
+============================
+
+This module facilitates reading syslog messages via streams under Sun
+Solaris, and supoprts the syslog door mechanism.  See the POD for more
+details.
+
+Special thanks to Netzwert AG <http://www.netzwert.ag> for supporting
+the development of this module.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires the Solaris libraries:
+
+   libdoor
+   libthread
+
+TODO
+
+I'd like to add a better test suite.
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2002 Greg Bossert
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

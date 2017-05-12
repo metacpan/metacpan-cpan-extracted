@@ -1,0 +1,53 @@
+<p>
+<% loc('Orphaned pages are pages which no other page in the system links to, making them harder to discover. You might want to consider linking them.') %>
+</p>
+
+% if ($orphan_count) {
+<table class="standard-table">
+  <thead>
+    <tr>
+      <th><% loc('Title') %></th>
+      <th><% loc('Created By') %></th>
+      <th><% loc('# of Revisions') %></th>
+      <th><% loc('Last Edited By') %></th>
+    </tr>
+  </thead>
+%   while ( my $page = $orphans->next() ) {
+  <tbody>
+    <tr class="<% $orphans->index() % 2 ? 'odd' : 'even' %>">
+      <td><a href="<% $page->uri() %>"><% $page->title() %></td>
+      <td>
+        <& /lib/user-link.mas, user => $page->user(), wiki => $wiki &>
+      </td>
+      <td>
+        <% $page->revision_count() %>
+      </td>
+      <td>
+        <& /lib/user-link.mas, user => $page->most_recent_revision()->user(), wiki => $wiki &>
+      </td>
+    </tr>
+  </tbody>
+%   }
+
+<& /lib/table/pager.mas,
+   index     => $orphans->index(),
+   pager     => $pager,
+   uri_maker => sub { $wiki->uri( view => 'orphans', @_ ) } &>
+
+</table>
+% } else {
+<p>
+<% loc('This wiki has no orphaned pages. Well done!') %>
+</p>
+% }
+
+<%args>
+$orphan_count
+$orphans
+$wiki
+$pager
+</%args>
+
+<%method title>
+<% loc('Orphaned Pages') %>
+</%method>

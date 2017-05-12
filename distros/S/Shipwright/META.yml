@@ -1,0 +1,60 @@
+---
+abstract: 'Best Practical Builder'
+author:
+  - 'sunnavy <sunnavy@bestpractical.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  IPC::Cmd: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.14'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Shipwright
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+    - xt
+recommends:
+  Class::XSAccessor::Compat: 0
+requires:
+  Algorithm::Dependency::Ordered: 0
+  Algorithm::Dependency::Source::HoA: 0
+  App::CLI: 0
+  Archive::Extract: 0
+  Archive::Tar: 0
+  CPAN: 1.9205
+  CPAN::DistnameInfo: 0
+  Class::Accessor::Fast: 0
+  File::Compare: 0
+  File::Copy: 0
+  File::Copy::Recursive: 0
+  File::Path: 2.07
+  File::Slurp: 0
+  File::Spec: 0
+  File::Temp: 0.18
+  File::Which: 0
+  IO::Uncompress::Bunzip2: 0
+  IO::Uncompress::RawInflate: '2.012'
+  IPC::Run3: 0
+  LWP::UserAgent: 0
+  List::MoreUtils: 0
+  Log::Log4perl: 0
+  Module::Build: 0
+  Module::CoreList: 0
+  Module::Info: 0
+  UNIVERSAL::require: 0
+  YAML::Tiny: 0
+  perl: 5.8.8
+  version: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/bestpractical/shipwright.git
+version: '2.004041'

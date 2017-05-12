@@ -1,0 +1,10 @@
+MANIFEST
+Makefile.PL
+README
+kickstart
+lib/SysConfig.pm
+lib/SysConfig/Kickstart.pm
+lib/SysConfig/XML.pm
+t/T.pm
+t/kickstart.t
+t/xml.t

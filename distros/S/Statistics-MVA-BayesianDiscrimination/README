@@ -1,0 +1,55 @@
+Statistics-MVA-BayesianDiscrimination version 0.0.2
+
+Discriminant analysis is a procedure for classifying a set of observations each with k variables into predefined classes such as to allow the
+determination of the class of new observations based upon the values of the k variables for these new observations. Group membership based on linear combinations of the variables. From the set of observations where group membership is know the procedure constructs a set of linear functions, termed
+discriminant functions, such that: 
+
+    L = B[0] * x1 + B[1] * x1 +... ... + B[n] * x_n - c
+
+Where B[0] is a constant, B[n's] are discriminant coefficients and x's are the input variables. These discriminant functions
+(there is one for each group - consequently as this module only analyses data for two groups atm it generates two such
+discriminant functions.
+
+Before proceding with the analysis you should: (1) Perform Bartlett´s test to see if the covariance matrices of the data
+are homogenous for the populations used (see L<Statistics::MVA::Bartlett>. If they are not homogenous you should use Quadratic Discrimination analysis.
+(2) test for equality of the group means using Hotelling's T^2 (see L<Statistics::MVA::HotellingTwoSample> or MANOVA. If
+the groups do not differ significantly it is extremely unlikely that discrimination analysis with generate any usefull
+discrimination rules. (3) Specify the prior probabilities. This module allows you to do this in several ways - see
+L</priors>.
+
+This class automatically generates the discrimination coefficients at part of object construction. You can then either
+use the C<output> method to access these values or use the C<discriminate> method to apply the equations to a new
+observation. Both of these methods are context dependent - see </METHODS>. See
+http://en.wikipedia.org/wiki/Linear_discriminant_analysis for further details.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+'Statistics::MVA' => '0.0.1',
+'Carp' => '1.08', 
+'Math::Cephes' => '0.47', 
+'List::Util' => '1.19',
+'Text::SimpleTable' => '2.0',
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010, Daniel S. T. Hughes
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

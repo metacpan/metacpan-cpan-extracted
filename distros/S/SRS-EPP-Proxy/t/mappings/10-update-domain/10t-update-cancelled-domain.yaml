@@ -1,0 +1,66 @@
+# Successfully update a domain, changing the registrant contact
+template: update-domain.tt
+
+vars:
+  domain: 10t.co.te
+  owner: registrant-001
+
+input_assertions:
+  class: SRS::EPP::Command::Update::Domain
+  count:
+    - [ '//domain:name', 1, 'SRS: Check for the domain' ]
+    - [ '//domain:registrant', 1, 'SRS: Check for the registrant' ]
+  match:
+    - [ '//domain:name', '10t.co.te', 'SRS: Check the domain name' ]
+    - [ '//domain:registrant', 'registrant-001', 'SRS: Check the registrant' ]
+
+SRS:
+  - assertions:
+      count:
+      match:
+        - [ '//DomainNameFilter', '10t.co.te', 'SRS: Check for the domain name' ]
+        - [ '//RegistrantContact/@HandleId', 'registrant-001', 'SRS: Handle of registrant contact changed' ]
+      match_all:
+      attr_is:
+    fake_response: |-
+      <NZSRSResponse VerMajor="5" VerMinor="0">
+        <Response Action="DomainUpdate" FeId="8" FeSeq="4803306" OrigRegistrarId="90" RecipientRegistrarId="90" Rows="1" TransId="brause8769">
+          <FeTimeStamp Day="8" Hour="15" Minute="23" Month="7" Second="27" TimeZoneOffset="+12:00" Year="2010"/>
+          <Domain Delegate="1" DomainName="10t.co.te" RegistrarId="90" Status="Active" Term="1" UDAI="GbtMuYY9">
+            <NameServers>
+              <Server FQDN="ns1.hidns.com"/>
+              <Server FQDN="ns2.hidns.com"/>
+              <Server FQDN="ns3.hidns.com"/>
+            </NameServers>
+            <RegistrantContact ActionId="Update handle registrant-001 1" Email="new001@registrant.co.nz" HandleId="registrant-001" Name="new registrant 001">
+              <PostalAddress Address1="Regisrant New Address 1" City="Wellington" CountryCode="NZ"/>
+              <Phone AreaCode="4" CountryCode="64" LocalNumber="123 ext 1"/>
+              <Fax AreaCode="4" CountryCode="64" LocalNumber="123666"/>
+            </RegistrantContact>
+            <AdminContact ActionId="Update handle registrant-001 1" Email="new001@registrant.co.nz" HandleId="registrant-001" Name="new registrant 001">
+              <PostalAddress Address1="Regisrant New Address 1" City="Wellington" CountryCode="NZ"/>
+              <Phone AreaCode="4" CountryCode="64" LocalNumber="123 ext 1"/>
+              <Fax AreaCode="4" CountryCode="64" LocalNumber="123666"/>
+            </AdminContact>
+            <TechnicalContact ActionId="Update handle registrant-001 1" Email="new001@registrant.co.nz" HandleId="registrant-001" Name="new registrant 001">
+              <PostalAddress Address1="Regisrant New Address 1" City="Wellington" CountryCode="NZ"/>
+              <Phone AreaCode="4" CountryCode="64" LocalNumber="123 ext 1"/>
+              <Fax AreaCode="4" CountryCode="64" LocalNumber="123666"/>
+            </TechnicalContact>
+            <BilledUntil Day="06" Hour="13" Minute="19" Month="8" Second="58" TimeZoneOffset="+12:00" Year="2010"/>
+            <RegisteredDate Day="06" Hour="13" Minute="19" Month="7" Second="58" TimeZoneOffset="+12:00" Year="2010"/>
+            <AuditDetails ActionId="brause8769" RegistrarId="90">
+              <AuditTime>
+                <From Day="08" Hour="15" Minute="23" Month="7" Second="27" TimeZoneOffset="+12:00" Year="2010"/>
+              </AuditTime>
+              <AuditText/>
+            </AuditDetails>
+          </Domain>
+        </Response>
+      </NZSRSResponse>
+
+output_assertions:
+  count:
+    - [ '//epp:result', 1, 'SRS: Check for one result' ]
+  attr_is:
+    - [ '//epp:result', 'code', 1000, 'SRS: Check for correct result code' ]

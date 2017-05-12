@@ -1,0 +1,16 @@
+---
+name: SCGI
+version: 0.6
+author:
+  - 'Thomas Yandell L<mailto:tom+scgi@vipercode.com>'
+abstract: SCGI server library for perl
+license: perl
+requires:
+  perl: 5.8.0
+provides:
+  SCGI:
+    file: lib/SCGI.pm
+    version: 0.6
+  SCGI::Request:
+    file: lib/SCGI/Request.pm
+generated_by: Module::Build version 0.26

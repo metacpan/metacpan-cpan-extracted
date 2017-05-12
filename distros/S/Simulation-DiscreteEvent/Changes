@@ -1,0 +1,51 @@
+Revision history for Simulation-DiscreteEvent
+
+0.09    Sun Jun 27 2010 Pavel Shaydo <zwon@cpan.org>
+    * Fixed another log(0) test failure
+
+0.08    Wed May 26 2010 Pavel Shaydo <zwon@cpan.org>
+    * Fixed test failure if rand returns 0
+
+Thu Mar 11 2010 Pavel Shaydo <zwon@cpan.org>
+    * Improved tests
+    * Minor fixes
+    * Added Test::Most to test requirements
+    * Updated Module::Install
+
+0.07    Sat Feb  6 2010 Pavel Shaydo <zwon@cpan.org>
+    * Improved _build_dispatch_table. Now if event name is the same as
+      handler subroutine name you can just specify :Event attribute
+      instead of :Event(name)
+    * Added S::DE::Generator module
+    * Added S::DE::Sink module
+    * Wrote Cookbook/Callcenter.pod
+    * Added state_inc and state_dec methods to S::DE::NumericState
+    * Fixed Cookbook/MM10.pod
+
+0.06    Fri Jan 29 2010 Pavel Shaydo <zwon@cpan.org>
+    * Minor fix in MM10.pod
+    * Minor fix in MM10.pm
+
+0.05    Fri Jan 29 2010 Pavel Shaydo <zwon@cpan.org>
+    * Started Cookbook. Wrote Cookbook/MM10.pod with example.
+    * Fixed code for loading server modules in DiscreteEvent.pm
+    * Removed parent from test requirements
+    * Switched to Test::LeakTrace in no-leak.t
+
+0.04    Thu Jan 21 2010 Pavel Shaydo <zwon@cpan.org>
+    * Added NumericState role
+    * Added Recorder role
+
+0.03    Tue Jan 19 2010 Pavel Shaydo <zwon@cpan.org>
+    * fixed memory leak in Server
+    * fixed requirements
+
+0.02    Mon Jan 18 2010 Pavel Shaydo <zwon@cpan.org>
+    * Now dispatch table is built automatically based on
+      methods attributes.
+    * Fixed POD problems
+    * Test suite improved
+
+0.01    Sat Jan 16 2010 Pavel Shaydo <zwon@cpan.org>
+    * First version, released on an unsuspecting world.
+

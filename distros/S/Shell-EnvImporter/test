@@ -1,0 +1,10 @@
+#!/bin/sh
+
+perl Makefile.PL 2>&1 > /dev/null
+make 2>&1 > /dev/null
+
+echo -e "\n\n************************** TEST **************************\n\n"
+make test 2>&1 | colorize --pattern 'All tests successful' --green | colorize --pattern 'Failed' --red
+echo -e "\n\n************************ END TEST ************************\n\n"
+make clean 2>&1 > /dev/null
+/bin/rm Makefile.old 2>&1 > /dev/null

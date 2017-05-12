@@ -1,0 +1,14 @@
+Revision history for String::Defer.
+
+3       2012-01-03
+    - 5.15 changes the behaviour of LVALUE substr.
+
+2       2011-11-01
+    - Skip the ~~ test on 5.10.0.
+    - Document the cases where perl stringifies too soon.
+
+1       2011-10-24
+    Initial release.
+        - Deferring of scalar or code refs.
+        - Deferred concatenation.
+        - Deferred joins.

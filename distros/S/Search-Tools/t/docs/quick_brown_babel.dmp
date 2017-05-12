@@ -1,0 +1,15 @@
+# translations of 'the quick brown fox jumped over the lazy dog'
+
+$var = {
+
+'Chinese Simple' => '布朗在迅速跳下懒狐狗',
+'Korean'	=> '빠른 갈색 여우는 게으른 개에 뛰어올랐다',
+'Arabic' => 'فوكس براون السريع قفز فوق الكلب كسلان',
+'Portuguese' => 'a raposa marrom rápida saltou sobre o cão preguiçoso',
+'Spanish' => 'el zorro marrón rápido saltó sobre el perro perezoso',
+'English' => 'the quick brown fox jumped over the lazy dog',
+# added per RT bug #23880
+'German'  => 'Die Ärzte'	# ("Die UPPER CASE A-Umlaut rzte")
+};
+
+

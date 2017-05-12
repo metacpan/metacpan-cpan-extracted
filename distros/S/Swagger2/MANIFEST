@@ -1,0 +1,25 @@
+.perltidyrc
+.ship.conf
+.travis.yml
+Changes
+cpanfile
+examples/websocket.pl
+lib/Mojolicious/Command/swagger2.pm
+lib/Mojolicious/Plugin/Swagger2.pm
+lib/Swagger2.pm
+lib/Swagger2/Client.pm
+lib/Swagger2/Editor.pm
+lib/Swagger2/POD.pm
+lib/Swagger2/public/ace.js
+lib/Swagger2/public/mode-json.js
+lib/Swagger2/public/mode-yaml.js
+lib/Swagger2/public/theme-solarized_dark.js
+lib/Swagger2/public/worker-json.js
+lib/Swagger2/SchemaValidator.pm
+lib/Swagger2/swagger2-client.js
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-basic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

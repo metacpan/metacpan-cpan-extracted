@@ -1,0 +1,34 @@
+---
+abstract: 'MQ support for SOAP::Lite'
+author:
+  - 'Martin Kutter <martin.kutter@fen-net.de>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: SOAP-Transport-MQ
+provides:
+  SOAP::Transport::MQ:
+    file: lib/SOAP/Transport/MQ.pm
+    version: 0.712
+  SOAP::Transport::MQ::Client:
+    file: lib/SOAP/Transport/MQ.pm
+    version: 0.712
+  SOAP::Transport::MQ::Server:
+    file: lib/SOAP/Transport/MQ.pm
+    version: 0.712
+  URI::mq:
+    file: lib/SOAP/Transport/MQ.pm
+    version: 0.712
+requires:
+  MQSeries: 0
+  SOAP::Lite: 0.711
+  perl: v5.6.0
+resources:
+  license: http://www.perlfoundation.org/artistic_license_1_0
+version: 0.712

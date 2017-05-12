@@ -1,0 +1,32 @@
+---
+abstract: 'Server plugin for Salvation::AnyNotify'
+author:
+  - 'Gennadiy Filatov <gfilatov@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Salvation-AnyNotify-Plugin-Server
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  AnyEvent: '0'
+  Plack: '0'
+  Salvation::AnyNotify: '0.01'
+  Salvation::AnyNotify::Plugin::Daemon: '0'
+  Salvation::DaemonDecl: '0'
+  Salvation::Method::Signatures: '0.02'
+  Salvation::TC: '0.11'
+  Sub::Recursive: '0'
+  Twiggy: '0'
+resources:
+  repository: https://github.com/kainwinterheart/salvation-anynotify-server.git
+version: '0.01'

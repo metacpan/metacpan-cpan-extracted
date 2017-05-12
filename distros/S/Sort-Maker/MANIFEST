@@ -1,0 +1,24 @@
+Changes
+Makefile.PL
+Sort/Maker.pm
+MANIFEST
+README
+t/errors.t
+t/simple.t
+t/arrays.t
+t/hashes.t
+t/io.t
+t/ref_in_varying.t
+t/descending_grt_string.t
+t/GRT.t
+t/numbers.t
+t/regex.t
+t/init_code.t
+t/string_data.t
+t/name.t
+t/code.t
+t/closure.t
+t/bad_code.t
+t/common.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+slides/sort_maker.txt

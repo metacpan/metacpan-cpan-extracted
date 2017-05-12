@@ -1,0 +1,48 @@
+Revision history for ServiceNow-Simple
+0.10 2017-05-01
+ - Change to use demo019 as demo011 is no longer responding
+
+0.09 2013-12-16
+ - Correction to test 04-get_instance_url.t
+ 
+0.08 2013-12-09
+ - Added instance_url as argument to new() and new method set_instance_url
+   to allow for those cases where the standard instance.service-now.com does not apply.  
+   Suggestion by John Andersen
+   http://community.servicenow.com/forum/20300#comment-44864
+   
+0.07 2013-11-20
+ - Update to handling of proxy following RT#90358 and assistance from Jay K. Slay
+ - New flag remove_env_proxy
+ - carp more often
+ 
+0.06 2013-11-10
+ - Fix format of change file to conform to
+   https://metacpan.org/pod/CPAN::Changes::Spec (Neil Bowers)
+ - Add chunked processing for get* calls using a function callback
+
+0.05 2013-10-30
+ - Set SOAP data elements type from WSDL rather than have SOAP guess
+ - POD updates
+
+0.04 2013 -1-29
+ - Capture and handle connection errors in tests
+ - TODO - Change from using default SOAP serialisation to using details
+   from the WSDL
+
+0.03 2013 -1-21
+ - Tweak to handling of config data
+ - Tweak so automated testing does not fail
+ - Set default instance=demo019, user=admin and password=admin for testing
+
+0.02 2013 -1-20
+ - Fixed reported issues with questions in Makefile.PL affecting automated
+   testing [rt.cpan.org #89550] CHORNY@cpan.org
+ - __limits in new() was being ignored
+ - Updated documenation
+
+0.01 2013 -1-15
+ - First version, covering the basic features, with the following methods:
+   get get_keys get_records insert new print_results set_instance set_soap
+   set_table soap_debug update The main usage is described in the Synopsis,
+   further documentation to follow 

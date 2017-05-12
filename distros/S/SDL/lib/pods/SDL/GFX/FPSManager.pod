@@ -1,0 +1,49 @@
+
+=head1 NAME
+
+SDL::GFX::FPSManager - data structure used by SDL::GFX::Framerate
+
+=head1 CATEGORY
+
+GFX, Structure
+
+=head1 METHODS
+
+=head2 new
+
+ use SDL;
+ use SDL::GFX::Framerate;
+ use SDL::GFX::FPSManager;
+
+ my $fps = SDL::GFX::FPSManager->new(0, 0, 0, 0);
+
+Initialize the framerate manager object. Arguments: framecount, rateticks, lastticks, rate.
+
+=head2 framecount
+
+ my $fc = $fps->framecount;
+
+Returns the C<framecount>.
+
+=head2 rateticks
+
+ my $rt = $fps->rateticks;
+
+Returns the C<rateticks>.
+
+=head2 lastticks
+
+ my $lt = $fps->lastticks;
+
+Returns the C<lastticks>.
+
+=head2 rate
+
+ my $r = $fps->rate;
+
+Returns the C<rate>.
+
+=head1 AUTHORS
+
+See L<SDL/AUTHORS>.
+

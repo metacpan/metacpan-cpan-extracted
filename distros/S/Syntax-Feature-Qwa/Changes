@@ -1,0 +1,14 @@
+Syntax-Feature-Qwa
+==================
+
+Created:      2012-03-13
+Home page:    <https://metacpan.org/release/Syntax-Feature-Qwa>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Syntax-Feature-Qwa>
+Maintainer:   Toby Inkster <tobyink@cpan.org>
+
+0.002	2014-09-10
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.001	2012-03-16	Initial release

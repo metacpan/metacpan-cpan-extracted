@@ -1,0 +1,2450 @@
+<html>
+<body>
+<h3>Content</h3>
+<a href="#Introduction">Introduction</a><br>
+<a href="#DirectPositioning">Direct positioning for cells</a><br>
+<a href="#Autoincrement">Positioning with autoincrement</a><br>
+<a href="#Styles">Styles</a><br>
+<a href="#Color">Color</a><br>
+<a href="#Border">Border</a><br>
+<a href="#Image">Image</a><br>
+<a href="#Charts">Charts</a><br>
+
+<a name="Introduction">
+<h3>Introduction</h3>
+The Spreadsheet::XML_to_XLS module gives nothing except another way to use Spreadsheet::WriteExcel, written by John McNamara (jmcnamara@cpan.org). But in conjuntion with XLST technology it allows to build user-friendly Excel document with data, which were taken from any external source.<p>
+<img src="images/step0.png" align="left" width="223" height="118" hspace="30">
+For example, let's build new Excel report to represent information from the "<font color="blue">downloads</font>" table in some Oracle database. It takes just 3 trivial steps now.<br clear="all">
+
+<h5>Step 1. Extract data from some source (Oracle DB)</h5>
+Let's export data from Oracle DB.<br>
+First create the following <font color="blue">oracle.sql</font> file:
+<table cellpadding='5'>
+<tr>
+<td bgcolor='#FFFF80'>
+<pre>
+<font color="brown">set</font> heading <font color="red">off</font>
+<font color="brown">set</font> feedback <font color="red">off</font>
+<font color="brown">set</font> pagesize <font color="red">0</font>
+<font color="brown">set</font> linesize <font color="red">0</font>
+<font color="brown">set</font> long <font color="red">999999</font>
+<font color="red">spool</font> oracle.xml
+<font color="brown">select</font> dbms_xmlgen.getxml (
+    <font color="red">'select * from downloads order by amount desc'</font>
+) xml <font color="brown">from</font> dual;
+<font color="red">spool</font> off
+<font color="red">quit</font>
+</pre>
+</td>
+</tr>
+</table>
+Then use the SQL file to get data and save in the <font color="blue">oracle.xml</font> file:<br>
+<font color="blue">
+<pre>
+$ sqlplus
+<i>&lt;enter log name, password, and SID to pass authentication in Oracle></i>
+> @oracle.sql
+</pre>
+</font>
+
+<img src="images/step1.png" align="right" width="221" height="109">
+Let's assume, we got the following XML document in the <font color="blue">oracle.xml</font> file:
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre><font color="teal">
+&lt;ROWSET>
+ &lt;ROW>
+  &lt;COUNTRY><font color="black">U.S.</font>&lt;/COUNTRY>
+  &lt;AMOUNT><font color="black">509</font>&lt;/AMOUNT>
+ &lt;/ROW>
+ &lt;ROW>
+  &lt;COUNTRY><font color="black">China</font>&lt;/COUNTRY>
+  &lt;AMOUNT><font color="black">99</font>&lt;/AMOUNT>
+ &lt;/ROW>
+ &lt;ROW>
+  &lt;COUNTRY><font color="black">U.K.</font>&lt;/COUNTRY>
+  &lt;AMOUNT><font color="black">81</font>&lt;/AMOUNT>
+ &lt;/ROW>
+ &lt;ROW>
+  &lt;COUNTRY><font color="black">Canada</font>&lt;/COUNTRY>
+  &lt;AMOUNT><font color="black">41</font>&lt;/AMOUNT>
+ &lt;/ROW>
+ &lt;ROW>
+  &lt;COUNTRY><font color="black">Germany</font>&lt;/COUNTRY>
+  &lt;AMOUNT><font color="black">40</font>&lt;/AMOUNT>
+ &lt;/ROW>
+ &lt;ROW>
+  &lt;COUNTRY><font color="black">France</font>&lt;/COUNTRY>
+  &lt;AMOUNT><font color="black">40</font>&lt;/AMOUNT>
+ &lt;/ROW>
+&lt;/ROWSET></font>
+</pre>
+</td>
+</tr>
+</table>
+
+<h5>Step 2. Modify XML document.</h5>
+Now you have to modify the <font color="blue">oracle.xml</font> document to meet requirements of the Spreadsheet::XML_to_XLS module.<br>
+First create the following <font color="blue">modify.xsl</font> file:<br>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='#FFFF80'>
+<pre><font color="teal">
+&lt;<font color="brown">xsl:stylesheet</font> <font color="blue">version=<font color="red">"1.0"</font></font>
+    xmlns:<font color="blue">xsl=<font color="red">"http://www.w3.org/1999/XSL/Transform"</font></font>>
+    &lt;<font color="brown">xsl:output</font> <font color="blue">indent=<font color="red">'yes'</font> doctype-system=<font color="red">'xml_to_excel.dtd'</font></font>/>
+    &lt;<font color="brown">xsl:template</font> <font color="blue">match=<font color="red">"/"</font></font>>
+        &lt;workbook>
+            &lt;<font color="brown">xsl:for-each</font> <font color="blue">select=<font color="red">"ROWSET"</font></font>>
+                &lt;worksheet>
+                    &lt;set <font color="blue">bold=<font color="red">"1"</font></font>>
+                        &lt;cell><font color="black">Country</font>&lt;/cell>
+                        &lt;cell <font color="blue">width=<font color="red">"12"</font></font>><font color="black">Downloads</font>&lt;/cell>
+                    &lt;/set>
+                    &lt;set <font color="blue">type=<font color="red">"col"</font></font>>
+                       &lt;<font color="brown">xsl:for-each</font> <font color="blue">select=<font color="red">"ROW"</font></font>>
+                           &lt;set>
+                               &lt;cell>&lt;<font color="brown">xsl:value-of</font> <font color="blue">select=<font color="red">"COUNTRY"</font></font>/>&lt;/cell>
+                               &lt;cell>&lt;<font color="brown">xsl:value-of</font> <font color="blue">select=<font color="red">"AMOUNT"</font></font>/>&lt;/cell>
+                           &lt;/set>
+                       &lt;/<font color="brown">xsl:for-each</font>>
+                       &lt;set <font color="blue">col=<font color="red">"+0"</font> name=<font color="red">"country"</font></font>/>
+                       &lt;set <font color="blue">col=<font color="red">"+1"</font> name=<font color="red">"amount"</font></font>/>
+                    &lt;/set>
+                    &lt;chart <font color="blue">pos=<font color="red">"C2"</font> type=<font color="red">"column"</font> x=<font color="red">"15"</font> y=<font color="red">"5"</font></font>>
+                        &lt;data <font color="blue">category=<font color="red">"country"</font> values=<font color="red">"amount"</font></font>/>
+                        &lt;title <font color="blue">name=<font color="red">"Downloads (millions)"</font></font>/>
+                    &lt;/chart>
+                &lt;/worksheet>
+            &lt;/<font color="brown">xsl:for-each</font>>
+        &lt;/workbook>
+    &lt;/<font color="brown">xsl:template</font>>
+&lt;/<font color="brown">xsl:stylesheet</font>></font>
+</pre>
+</td>
+</tr>
+</table>
+Then take document from <font color="blue">oracle.xml</font>, modify it by means <font color="blue">modify.xsl</font>, and save result in <font color="blue">excel.xml</font>:
+<font color="blue">
+<pre>
+$ java -cp xalan-j_2_7_0/xalan.jar org.apache.xalan.xslt.Process -in oracle.xml -xsl modify.xsl -out excel.xml
+</pre>
+</font>
+<img src="images/step2.png" align="right" width="185" height="61">
+You have to receive the following <font color="blue">excel.xml</font> file:
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre><font color="purple">
+&lt;?xml <font color="blue">version=<font color="red">"1.0"</font> encoding=<font color="red">"UTF-8"</font></font>?>
+&lt;!DOCTYPE workbook SYSTEM <font color="red">"xml_to_excel.dtd"</font>></font>
+<font color="teal">&lt;workbook>
+&lt;worksheet>
+&lt;set <font color="blue">bold=<font color="red">"1"</font></font>>
+&lt;cell><font color="black">Country</font>&lt;/cell>
+&lt;cell <font color="blue">width=<font color="red">"12"</font></font>><font color="black">Downloads</font>&lt;/cell>
+&lt;/set>
+&lt;set <font color="blue">type=<font color="red">"col"</font></font>>
+&lt;set>
+&lt;cell><font color="black">U.S.</font>&lt;/cell>
+&lt;cell><font color="black">509</font>&lt;/cell>
+&lt;/set>
+&lt;set>
+&lt;cell><font color="black">China</font>&lt;/cell>
+&lt;cell><font color="black">99</font>&lt;/cell>
+&lt;/set>
+&lt;set>
+&lt;cell><font color="black">U.K.</font>&lt;/cell>
+&lt;cell><font color="black">81</font>&lt;/cell>
+&lt;/set>
+&lt;set>
+&lt;cell><font color="black">Canada</font>&lt;/cell>
+&lt;cell><font color="black">41</font>&lt;/cell>
+&lt;/set>
+&lt;set>
+&lt;cell><font color="black">Germany</font>&lt;/cell>
+&lt;cell><font color="black">40</font>&lt;/cell>
+&lt;/set>
+&lt;set>
+&lt;cell><font color="black">France</font>&lt;/cell>
+&lt;cell><font color="black">40</font>&lt;/cell>
+&lt;/set>
+&lt;set <font color="blue">name=<font color="red">"country"</font> col=<font color="red">"+0"</font></font>/>
+&lt;set <font color="blue">name=<font color="red">"amount"</font> col=<font color="red">"+1"</font></font>/>
+&lt;/set>
+&lt;chart <font color="blue">y=<font color="red">"5"</font> x=<font color="red">"15"</font> type=<font color="red">"column"</font> pos=<font color="red">"C2"</font></font>>
+&lt;data <font color="blue">values=<font color="red">"amount"</font> categories=<font color="red">"country"</font></font>/>
+&lt;title <font color="blue">name=<font color="red">"Downloads (millions)"</font></font>/>
+&lt;/chart>
+&lt;/worksheet>
+&lt;/workbook></font>
+</pre>
+</td>
+</tr>
+</table>
+
+<img src="images/step3.png" align="right" width="188" height="67">
+<h5>Step 3. Build an Excel document.</h5>
+Build final <font color="blue">excel.xls</font> document by means the Spreadsheet::XML_to_XLS module:
+<br clear="all">
+<font color="blue">
+<pre>
+$ export PERLLIB=/usr/lib/perl/5.10
+$ perl -e 'use Spreadsheet::XML_to_XLS; Spreadsheet::XML_to_XLS->build("excel.xml", "excel.xls");'
+</pre>
+</font>
+We have to receive the following document in the <font color="blue">excel.xls</font> file:<br align="all">
+<img src="images/introduction.png" width="772" height="428" vspace="10"><br>
+So, you don't need to be an Oracle expert to build such report. Neither an Java guru. Neither a Perl adept.<br>
+You don't need to be familiar with programming at all.<br>
+Also pay attention, you don't need Microsoft Windows to build that Excel report. For example, I wrote shell scripts to deliver such reports from Unix server.<p>
+Now we are ready to start with main guide. <br>
+No any coding forever, just deal with data in input text file.<p>
+
+<a name="DirectPositioning">
+<h3>Direct positioning for each cell</h3>
+<h4>Example 1. Row and column numbers</h4>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet name="Markets">
+        &lt;cell row='0' col='1'>AAA&lt;/cell>
+        &lt;cell row='1' col='0'>BBB&lt;/cell>
+        &lt;cell row='1' col='2'>CCC&lt;/cell>
+        &lt;cell row='2' col='1'>DDD&lt;/cell>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+<img src="images/screenA1.png" width="348" height="274">
+</td>
+</tr>
+</table>
+Keep in mind, unlike Excel, the package indexes columns and rows from zero, but not from one.<br>
+
+<h4>Example 2. Alphanumerical position</h4>
+The package allows to use positioning in Excel style.
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet name="Markets">
+        &lt;cell pos='B1'>AAA&lt;/cell>
+        &lt;cell pos='A2'>BBB&lt;/cell>
+        &lt;cell pos='C2'>CCC&lt;/cell>
+        &lt;cell pos='B3'>DDD&lt;/cell>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+The same result as for Example 1.
+</td>
+</tr>
+</table>
+
+<a name="Autoincrement">
+<h3>Positioning with autoincrementing</h3>
+<h4>Example 3. All cells in one column</h4>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet name="Markets">
+        &lt;cell>AAAA&lt;/cell>
+        &lt;cell>BBBB&lt;/cell>
+        &lt;cell>CCCC&lt;/cell>
+        &lt;cell>DDDD&lt;/cell>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+<img src="images/screenB1.png" width="261" height="162">
+</td>
+</tr>
+</table>
+
+<h4>Example 4. All cells in one row</h4>
+You may use the "type" attribute to change layout. The attribute has to have the "col" or "row" value.<br/>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet name="Markets" <font color="red">type="row"</font>>
+        &lt;cell>AAAA&lt;/cell>
+        &lt;cell>BBBB&lt;/cell>
+        &lt;cell>CCCC&lt;/cell>
+        &lt;cell>DDDD&lt;/cell>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+<img src="images/screenB2.png" width="314" height="157">
+</td>
+</tr>
+</table>
+
+<h4>Example 5. Jump to another position</h4>
+You may change position for next cell manualy, but not follow autoincrement<br/>
+In that example the "CCCC" cell been shifted to column No 3 (the "D" column).<br/> 
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet name="Markets" type="row">
+        &lt;cell>AAAA&lt;/cell>
+        &lt;cell>BBBB&lt;/cell>
+        &lt;cell <font color="red">col="3"</font>>CCCC&lt;/cell>
+        &lt;cell>DDDD&lt;/cell>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+<img src="images/screenB3.png" width="377" height="138">
+</td>
+</tr>
+</table>
+
+<h4>Example 6. Change start position for a column or row</h4>
+You may specify position for new row or column in the worksheet tag.<br/>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet name="Markets" <font color="red">col="1" row="1"</font>>
+        &lt;cell>AAAA&lt;/cell>
+        &lt;cell>BBBB&lt;/cell>
+        &lt;cell>CCCC&lt;/cell>
+        &lt;cell>DDDD&lt;/cell>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+<img src="images/screenB4.png" width="247" height="186">
+</td>
+</tr>
+</table>
+or<br/>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet name="Markets" <font color="red">pos="B2"</font>>
+        &lt;cell>AAAA&lt;/cell>
+        &lt;cell>BBBB&lt;/cell>
+        &lt;cell>CCCC&lt;/cell>
+        &lt;cell>DDDD&lt;/cell>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+the same result
+</td>
+</tr>
+</table>
+
+<h4>Example 7. Multiple rows</h4>
+You may use several <font color="blue">set</font> tags to create few rows or columns.<br/>
+<font color="blue">Sets</font> may be nested. They may use the same attributes as worksheet<br/>
+(I used the bg_color attribute to highlight columns.)<br/>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet name="Markets">
+        <font color="blue">&lt;set bg_color="#FFFFC0"></font>
+            &lt;cell>AAAA&lt;/cell>
+            &lt;cell>BBBB&lt;/cell>
+            &lt;cell>CCCC&lt;/cell>
+            &lt;cell>DDDD&lt;/cell>
+            &lt;cell>EEEE&lt;/cell>
+        <font color="blue">&lt;/set></font>
+        <font color="blue">&lt;set bg_color="#FFC0FF"></font>
+            &lt;cell>aaaa&lt;/cell>
+            &lt;cell>bbbb&lt;/cell>
+            &lt;cell>cccc&lt;/cell>
+        <font color="blue">&lt;/set></font>
+        <font color="blue">&lt;set bg_color="#C0FFFF"></font>
+            &lt;cell>1111&lt;/cell>
+            &lt;cell>2222&lt;/cell>
+            &lt;cell>3333&lt;/cell>
+            &lt;cell>4444&lt;/cell>
+        <font color="blue">&lt;/set></font>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+<img src="images/screenC1.png" width="433" height="190">
+</td>
+</tr>
+</table>
+
+<h4>Example 8. Multiple cols</h4>
+You may specify the type="row" attribute in the worksheet tag to build columns, but not rows:<br/>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet name="Markets" <font color="red">type="row"</font>>
+        &lt;set bg_color="#FFFFC0">
+            &lt;cell>AAAA&lt;/cell>
+            &lt;cell>BBBB&lt;/cell>
+            &lt;cell>CCCC&lt;/cell>
+            &lt;cell>DDDD&lt;/cell>
+            &lt;cell>EEEE&lt;/cell>
+        &lt;/set>
+        &lt;set bg_color="#FFC0FF">
+            &lt;cell>aaaa&lt;/cell>
+            &lt;cell>bbbb&lt;/cell>
+            &lt;cell>cccc&lt;/cell>
+        &lt;/set>
+        &lt;set bg_color="#C0FFFF">
+            &lt;cell>1111&lt;/cell>
+            &lt;cell>2222&lt;/cell>
+            &lt;cell>3333&lt;/cell>
+            &lt;cell>4444&lt;/cell>
+        &lt;/set>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+<img src="images/screenC2.png" width="309" height="193">
+</td>
+</tr>
+</table>
+
+<h4>Example 9. Skip columns and rows</h4>
+You may use "+n" value to skip n columns or rows.<br/>
+Skip 2 rows before the "EEEE" cell<br/>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet name="Markets">
+        &lt;cell>AAAA&lt;/cell>
+        &lt;cell>BBBB&lt;/cell>
+        &lt;cell>CCCC&lt;/cell>
+        &lt;cell>DDDD&lt;/cell>
+        &lt;cell <font color="red">row="+2"</font>>EEEE&lt;/cell>
+        &lt;cell>FFFF&lt;/cell>
+        &lt;cell>GGGG&lt;/cell>
+    &lt;/worksheet>
+&lt;/workbook>
+</td>
+<td>
+<img src="images/screenD1.png" width="234" height="252">
+</td>
+</tr>
+</table>
+Skip 1 column before 2nd and 3rd set.<br/>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet name="Markets" type="row" font="Arial" size="8">
+        &lt;set>
+            &lt;cell>1 * 1 = 1&lt;/cell>
+            &lt;cell>1 * 2 = 2&lt;/cell>
+            &lt;cell>1 * 3 = 3&lt;/cell>
+            &lt;cell>1 * 4 = 4&lt;/cell>
+            &lt;cell>1 * 5 = 5&lt;/cell>
+            &lt;cell>1 * 6 = 6&lt;/cell>
+            &lt;cell>1 * 7 = 7&lt;/cell>
+            &lt;cell>1 * 8 = 8&lt;/cell>
+            &lt;cell>1 * 9 = 9&lt;/cell>
+            &lt;cell>1 * 10 = 10&lt;/cell>
+        &lt;/set>
+        &lt;set <font color="red">col="+1"</font>>
+            &lt;cell>2 * 1 = 2&lt;/cell>
+            &lt;cell>2 * 2 = 4&lt;/cell>
+            &lt;cell>2 * 3 = 6&lt;/cell>
+            &lt;cell>2 * 4 = 8&lt;/cell>
+            &lt;cell>2 * 5 = 10&lt;/cell>
+            &lt;cell>2 * 6 = 12&lt;/cell>
+            &lt;cell>2 * 7 = 14&lt;/cell>
+            &lt;cell>2 * 8 = 16&lt;/cell>
+            &lt;cell>2 * 9 = 18&lt;/cell>
+            &lt;cell>2 * 10 = 20&lt;/cell>
+        &lt;/set>
+        &lt;set <font color="red">col="+1"</font>>
+            &lt;cell>3 * 1 = 3&lt;/cell>
+            &lt;cell>3 * 2 = 6&lt;/cell>
+            &lt;cell>3 * 3 = 9&lt;/cell>
+            &lt;cell>3 * 4 = 12&lt;/cell>
+            &lt;cell>3 * 5 = 15&lt;/cell>
+            &lt;cell>3 * 6 = 18&lt;/cell>
+            &lt;cell>3 * 7 = 21&lt;/cell>
+            &lt;cell>3 * 8 = 24&lt;/cell>
+            &lt;cell>3 * 9 = 27&lt;/cell>
+            &lt;cell>3 * 10 = 30&lt;/cell>
+        &lt;/set>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+<img src="images/screenD2.png" width="441" height="282">
+</td>
+</tr>
+</table>
+
+<a name="Styles">
+<h3>Styles</h3>
+<h4>Example 10. Properties with boolean selector</h4>
+There are few formats been allowed to turn on or turn off certain property.<br/>
+Look at possible sintaxes for the <font color="red"><code>bold</code></font> property for<br/>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet name="Markets" size="8" pos="B2">
+        &lt;set>
+            &lt;cell <font color="red">bold="<b>0</b>"</font>>bold="0"&lt;/cell>
+            &lt;cell <font color="red">bold="<b>1</b>"</font>>bold="1"&lt;/cell>
+            &lt;cell italic="1">numeric switch&lt;/cell>
+        &lt;/set>
+        &lt;set>
+            &lt;cell <font color="red">bold="<b>no</b>"</font>>bold="no"&lt;/cell>
+            &lt;cell <font color="red">bold="<b>yes</b>"</font>>bold="yes"&lt;/cell>
+            &lt;cell italic="1">user-friendly no/yes switch&lt;/cell>
+        &lt;/set>
+        &lt;set>
+            &lt;cell <font color="red">bold="<b>No</b>"</font>>bold="No"&lt;/cell>
+            &lt;cell <font color="red">bold="<b>Yes</b>"</font>>bold="Yes"&lt;/cell>
+            &lt;cell italic="1">the switch is case-insensitive&lt;/cell>
+        &lt;/set>
+        &lt;set>
+            &lt;cell <font color="red">bold="<b>n</b>"</font>>bold="n"&lt;/cell>
+            &lt;cell <font color="red">bold="<b>y</b>"</font>>bold="y"&lt;/cell>
+            &lt;cell italic="1">the no/yes switch been reduced to one character&lt;/cell>
+        &lt;/set>
+        &lt;set>
+            &lt;cell <font color="red">bold="<b>off</b>"</font>>bold="off"&lt;/cell>
+            &lt;cell <font color="red">bold="<b>on</b>"</font>>bold="on"&lt;/cell>
+            &lt;cell italic="1">off/on switch&lt;/cell>
+        &lt;/set>
+        &lt;set>
+            &lt;cell <font color="red">bold="<b>false</b>"</font>>bold="false"&lt;/cell>
+            &lt;cell <font color="red">bold="<b>true</b>"</font>>bold="true"&lt;/cell>
+            &lt;cell italic="1">boolean format&lt;/cell>
+        &lt;/set>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+<img src="images/screenE1.png" width="512" height="220">
+</td>
+</tr>
+</table>
+The same way you may assign <font color="blue">italic</font> and <font color="blue">underline</font> attributes.<br/>
+
+<h4>Example 11. Inherit style</h4>
+Let's take hte following input XML document:<br/>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet name="Markets">
+        <font color="blue">&lt;set></font>
+            <font color="brown">&lt;cell <font color="red">font="Arial" size="8" italic="1" bold="1"</font>>Day&lt;/cell></font>
+            <font color="brown">&lt;cell <font color="red">font="Arial" size="8" italic="1" bold="1"</font>>Hours&lt;/cell></font>
+        <font color="blue">&lt;/set></font>
+        <font color="blue">&lt;set></font>
+            <font color="brown">&lt;cell <font color="red">font="Arial" size="8"</font>>Monday&lt;/cell></font>
+            <font color="brown">&lt;cell <font color="red">font="Arial" size="8"</font>>8.2&lt;/cell></font>
+        <font color="blue">&lt;/set></font>
+        <font color="blue">&lt;set></font>
+            <font color="brown">&lt;cell <font color="red">font="Arial" size="8"</font>>Tuesday&lt;/cell></font>
+            <font color="brown">&lt;cell <font color="red">font="Arial" size="8"</font>>12.7&lt;/cell></font>
+        <font color="blue">&lt;/set></font>
+        <font color="blue">&lt;set></font>
+            <font color="brown">&lt;cell <font color="red">font="Arial" size="8"</font>>Wednesday&lt;/cell></font>
+            <font color="brown">&lt;cell <font color="red">font="Arial" size="8"</font>>11.5&lt;/cell></font>
+        <font color="blue">&lt;/set></font>
+        <font color="blue">&lt;set></font>
+            <font color="brown">&lt;cell <font color="red">font="Arial" size="8"</font>>Thursday&lt;/cell></font>
+            <font color="brown">&lt;cell <font color="red">font="Arial" size="8"</font>>7.4&lt;/cell></font>
+        <font color="blue">&lt;/set></font>
+        <font color="blue">&lt;set></font>
+            <font color="brown">&lt;cell <font color="red">font="Arial" size="8"</font>>Friday&lt;/cell></font>
+            <font color="brown">&lt;cell <font color="red">font="Arial" size="8"</font>>5.1&lt;/cell></font>
+        <font color="blue">&lt;/set></font>
+        <font color="blue">&lt;set></font>
+            <font color="brown">&lt;cell <font color="red">font="Arial" size="8" italic="1" bold="1"</font>>Total&lt;/cell></font>
+            <font color="brown">&lt;cell <font color="red">font="Arial" size="8" italic="1" bold="1"</font>>&lt;![CDATA[=SUM(B2:B6)]]>&lt;/cell></font>
+        <font color="blue">&lt;/set></font>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+<img src="images/screenE2.png" width="280" height="228">
+</td>
+</tr>
+</table>
+All <font color="brown">cells</font> in a <font color="blue">set</font> have the same list of attributes.<br>
+And we may move these attributes from <font color="brown">set</font> to appropriate <font color="blue">set</font> tag.<br>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet name="Markets">
+        <font color="blue">&lt;set <b><font color="red">font="Arial" size="8"</b> italic="1" bold="1"</font>></font>
+            <font color="brown">&lt;cell>Day&lt;/cell></font>
+            <font color="brown">&lt;cell>Hours&lt;/cell></font>
+        <font color="blue">&lt;/set></font>
+        <font color="blue">&lt;set <b><font color="red">font="Arial" size="8"</b></font>></font>
+            <font color="brown">&lt;cell>Monday&lt;/cell></font>
+            <font color="brown">&lt;cell>8.2&lt;/cell></font>
+        <font color="blue">&lt;/set></font>
+        <font color="blue">&lt;set <b><font color="red">font="Arial" size="8"</b></font>></font>
+            <font color="brown">&lt;cell>Tuesday&lt;/cell></font>
+            <font color="brown">&lt;cell>12.7&lt;/cell></font>
+        <font color="blue">&lt;/set></font>
+        <font color="blue">&lt;set <b><font color="red">font="Arial" size="8"</b></font>></font>
+            <font color="brown">&lt;cell>Wednesday&lt;/cell></font>
+            <font color="brown">&lt;cell>11.5&lt;/cell></font>
+        <font color="blue">&lt;/set></font>
+        <font color="blue">&lt;set <b><font color="red">font="Arial" size="8"</b></font>></font>
+            <font color="brown">&lt;cell>Thursday&lt;/cell></font>
+            <font color="brown">&lt;cell>7.4&lt;/cell></font>
+        <font color="blue">&lt;/set></font>
+        <font color="blue">&lt;set <b><font color="red">font="Arial" size="8"</b></font>></font>
+            <font color="brown">&lt;cell>Friday&lt;/cell></font>
+            <font color="brown">&lt;cell>5.1&lt;/cell></font>
+        <font color="blue">&lt;/set></font>
+        <font color="blue">&lt;set <b><font color="red">font="Arial" size="8"</b> italic="1" bold="1"</font>></font>
+            <font color="brown">&lt;cell>Total&lt;/cell></font>
+            <font color="brown">&lt;cell>&lt;![CDATA[=SUM(B2:B6)]]>&lt;/cell></font>
+        <font color="blue">&lt;/set></font>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+The same result.
+</td>
+</tr>
+</table>
+Now we may see, all these <font color="blue">set</font> tags have 2 similar attributes: <font color="red"><code>font="Arial" size="8"</code></font>.<br>
+Let's shift them 1 step up to the <font color="brown">worksheet</font> tag:<br>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    <font color="brown">&lt;worksheet name="Markets" <font color="red"><b>font="Arial" size="8"</b></font>></font>
+        <font color="blue">&lt;set <font color="red">italic="1" bold="1"</font>></font>
+            &lt;cell>Day&lt;/cell>
+            &lt;cell>Hours&lt;/cell>
+        <font color="blue">&lt;/set></font>
+        <font color="blue">&lt;set></font>
+            &lt;cell>Monday&lt;/cell>
+            &lt;cell>8.2&lt;/cell>
+        <font color="blue">&lt;/set></font>
+        <font color="blue">&lt;set></font>
+            &lt;cell>Tuesday&lt;/cell>
+            &lt;cell>12.7&lt;/cell>
+        <font color="blue">&lt;/set></font>
+        <font color="blue">&lt;set></font>
+            &lt;cell>Wednesday&lt;/cell>
+            &lt;cell>11.5&lt;/cell>
+        <font color="blue">&lt;/set></font>
+        <font color="blue">&lt;set></font>
+            &lt;cell>Thursday&lt;/cell>
+            &lt;cell>7.4&lt;/cell>
+        <font color="blue">&lt;/set></font>
+        <font color="blue">&lt;set></font>
+            &lt;cell>Friday&lt;/cell>
+            &lt;cell>5.1&lt;/cell>
+        <font color="blue">&lt;/set></font>
+        <font color="blue">&lt;set <font color="red">italic="1" bold="1"</font>></font>
+            &lt;cell>Total&lt;/cell>
+            &lt;cell>&lt;![CDATA[=SUM(B2:B6)]]>&lt;/cell>
+        <font color="blue">&lt;/set></font>
+    <font color="brown">&lt;/worksheet></font>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+Still the same result.
+</td>
+</tr>
+</table>
+In other words, these <font color="red"><code>font="Arial" size="8"</code></font> attributes define common style for all cells in the Markets worksheet.<br>
+You may declare new style with <font color="brown">name="default"</font>.<br>
+The style will be applied for all cell in all worksheets by default.<br>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    <font color="brown">&lt;style name="<b>default</b>" <font color="red">font="Arial" size="8"</font>/></font>
+    &lt;worksheet name="Markets">
+        <font color="blue">&lt;set <font color="red">italic="1" bold="1"</font>></font>
+            &lt;cell>Day&lt;/cell>
+            &lt;cell>Hours&lt;/cell>
+        <font color="blue">&lt;/set></font>
+        &lt;set>
+            &lt;cell>Monday&lt;/cell>
+            &lt;cell>8.2&lt;/cell>
+        &lt;/set>
+        &lt;set>
+            &lt;cell>Tuesday&lt;/cell>
+            &lt;cell>12.7&lt;/cell>
+        &lt;/set>
+        &lt;set>
+            &lt;cell>Wednesday&lt;/cell>
+            &lt;cell>11.5&lt;/cell>
+        &lt;/set>
+        &lt;set>
+            &lt;cell>Thursday&lt;/cell>
+            &lt;cell>7.4&lt;/cell>
+        &lt;/set>
+        &lt;set>
+            &lt;cell>Friday&lt;/cell>
+            &lt;cell>5.1&lt;/cell>
+        &lt;/set>
+        <font color="blue">&lt;set <font color="red">italic="1" bold="1"</font>></font>
+            &lt;cell>Total&lt;/cell>
+            &lt;cell>&lt;![CDATA[=SUM(B2:B6)]]>&lt;/cell>
+        <font color="blue">&lt;/set></font>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+The same result.
+</td>
+</tr>
+</table>
+The first a the last sets have little different style: <font color="brown">font="Arial" size="8" italic="1" bold="1"</font>.<br>
+Let's describe that style as second <font color="brown">style</font> and name it <font color="red">header</font>:
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    <font color="brown">&lt;style name="default" <b>font="Arial" size="8"</b>/></font>
+    <font color="brown">&lt;style <font color="red">name="header"</font> <b>font="Arial" size="8"</b> italic="1" bold="1"/></font>
+    &lt;worksheet name="Markets">
+        <font color="blue">&lt;set <font color="red">style="header"</font>></font>
+            &lt;cell>Day&lt;/cell>
+            &lt;cell>Hours&lt;/cell>
+        <font color="blue">&lt;/set></font>
+        &lt;set>
+            &lt;cell>Monday&lt;/cell>
+            &lt;cell>8.2&lt;/cell>
+        &lt;/set>
+        &lt;set>
+            &lt;cell>Tuesday&lt;/cell>
+            &lt;cell>12.7&lt;/cell>
+        &lt;/set>
+        &lt;set>
+            &lt;cell>Wednesday&lt;/cell>
+            &lt;cell>11.5&lt;/cell>
+        &lt;/set>
+        &lt;set>
+            &lt;cell>Thursday&lt;/cell>
+            &lt;cell>7.4&lt;/cell>
+        &lt;/set>
+        &lt;set>
+            &lt;cell>Friday&lt;/cell>
+            &lt;cell>5.1&lt;/cell>
+        &lt;/set>
+        <font color="blue">&lt;set <font color="red">style="header"</font>></font>
+            &lt;cell>Total&lt;/cell>
+            &lt;cell>&lt;![CDATA[=SUM(B2:B6)]]>&lt;/cell>
+        <font color="blue">&lt;/set></font>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+The same result.
+</td>
+</tr>
+</table>
+A style may inherit (extend) other style.<br>
+For example, the <font color="brown">header</font> style may extend the <font color="red">default</font> style, but not describe <font color="brown"><b>font</b></font> and <font color="brown"><b>size</b></font> attributes itself:<br>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    <font color="brown">&lt;style <font color="red">name="default"</font> <b>font="Arial" size="8"</b>/></font>
+    <font color="brown">&lt;style name="header" <font color="red">extend="default"</font> italic="1" bold="1"/></font>
+    &lt;worksheet name="Markets">
+        &lt;set style="header">
+            &lt;cell>Day&lt;/cell>
+            &lt;cell>Hours&lt;/cell>
+        &lt;/set>
+        &lt;set>
+            &lt;cell>Monday&lt;/cell>
+            &lt;cell>8.2&lt;/cell>
+        &lt;/set>
+        &lt;set>
+            &lt;cell>Tuesday&lt;/cell>
+            &lt;cell>12.7&lt;/cell>
+        &lt;/set>
+        &lt;set>
+            &lt;cell>Wednesday&lt;/cell>
+            &lt;cell>11.5&lt;/cell>
+        &lt;/set>
+        &lt;set>
+            &lt;cell>Thursday&lt;/cell>
+            &lt;cell>7.4&lt;/cell>
+        &lt;/set>
+        &lt;set>
+            &lt;cell>Friday&lt;/cell>
+            &lt;cell>5.1&lt;/cell>
+        &lt;/set>
+        &lt;set style="header">
+            &lt;cell>Total&lt;/cell>
+            &lt;cell>&lt;![CDATA[=SUM(B2:B6)]]>&lt;/cell>
+        &lt;/set>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+The same result.
+</td>
+</tr>
+</table>
+You may create multi-level hierarhy of styles.<br>
+
+<a name="Color">
+<h4>Example 12. Color</h4>
+There are few predefined colors in the Spreadsheet::WriteExcel module.<br>
+But I can use few other colors, which I select yourself.<br>
+User-defined color has to have the following format: <font color="blue">#[0-9A-F]{6}</font>.<br>
+There are 3 color-related attributes: <font color="blue">color</font>, <font color="blue">bg_color</font>, <font color="blue">fg_color</font>.<br>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet name="Markets" pos="B2">
+        &lt;cell <font color="red">bg_color="black"</font> color="white">black&lt;/cell>
+        &lt;cell <font color="red">bg_color="white"</font>>white&lt;/cell>
+        &lt;cell <font color="red">bg_color="red"</font>>red&lt;/cell>
+        &lt;cell <font color="red">bg_color="lime"</font>>lime&lt;/cell>
+        &lt;cell <font color="red">bg_color="blue"</font> color="yellow">blue&lt;/cell>
+        &lt;cell <font color="red">bg_color="yellow"</font>>yellow&lt;/cell>
+        &lt;cell <font color="red">bg_color="magenta"</font>>magenta&lt;/cell>
+        &lt;cell <font color="red">bg_color="cyan"</font>>cyan&lt;/cell>
+        &lt;cell <font color="red">bg_color="brown"</font> color="white">brown&lt;/cell>
+        &lt;cell <font color="red">bg_color="green"</font> color="white">green&lt;/cell>
+        &lt;cell <font color="red">bg_color="navy"</font> color="white">navy&lt;/cell>
+        &lt;cell <font color="red">bg_color="purple"</font> color="white">purple&lt;/cell>
+        &lt;cell <font color="red">bg_color="silver"</font>>silver&lt;/cell>
+        &lt;cell <font color="red">bg_color="gray"</font>>gray&lt;/cell>
+        &lt;cell <font color="red">bg_color="orange"</font>>orange&lt;/cell>
+        &lt;set>
+            &lt;cell <font color="red">bg_color="#C08040"</font> color="white">#C08040&lt;/cell>
+            &lt;cell italic="yes">	user-defined color&lt;/cell>
+        &lt;/set>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+<img src="images/screenF1.png" width="349" height="384">
+</td>
+</tr>
+</table>
+There is simple example of using colors below.<br>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    <font color="brown">&lt;style name="default" font="Arial" size="8" <font color="red"><b>bg_color="#E0E0E0"</b></font>/></font>
+    <font color="brown">&lt;style name="header" extend="default" italic="1" bold="1" <font color="red"><b>bg_color="silver"</b></font>/></font>
+    &lt;worksheet name="Markets" pos="B3">
+        &lt;set <font color="brown">style="header"</font>>
+            &lt;cell>Day&lt;/cell>
+            &lt;cell>Hours&lt;/cell>
+        &lt;/set>
+        &lt;set>
+            &lt;cell>Monday&lt;/cell>
+            &lt;cell>8.2&lt;/cell>
+        &lt;/set>
+        &lt;set>
+            &lt;cell>Tuesday&lt;/cell>
+            &lt;cell>12.7&lt;/cell>
+        &lt;/set>
+        &lt;set>
+            &lt;cell>Wednesday&lt;/cell>
+            &lt;cell>11.5&lt;/cell>
+        &lt;/set>
+        &lt;set>
+            &lt;cell>Thursday&lt;/cell>
+            &lt;cell>7.4&lt;/cell>
+        &lt;/set>
+        &lt;set>
+            &lt;cell>Friday&lt;/cell>
+            &lt;cell>5.1&lt;/cell>
+        &lt;/set>
+        &lt;set <font color="brown">style="header"</font>>
+            &lt;cell>Total&lt;/cell>
+            &lt;cell>&lt;![CDATA[=SUM(C4:C8)]]>&lt;/cell>
+        &lt;/set>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+<img src="images/screenF2.png" width="302" height="248">
+</td>
+</tr>
+</table>
+
+<h4>Example 13. Filling skipped cells</h4>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet>
+        <font color="blue">&lt;set name="track" row="1" <font color="red"><b>bg_color="yellow"</b></font>></font>
+            <font color="brown">&lt;cell>step&lt;/cell></font>
+            <font color="brown">&lt;cell>step&lt;/cell></font>
+            <font color="brown">&lt;cell <font color="red"><b>col="+1"</b></font>>jump&lt;/cell></font>
+            <font color="brown">&lt;cell>step&lt;/cell></font>
+            <font color="brown">&lt;cell>step&lt;/cell></font>
+        <font color="blue">&lt;/set></font>
+        <font color="blue">&lt;set name="sandbox" <font color="red"><b>bg_color="silver"</b></font>></font>
+            <font color="brown">&lt;cell row='3' col='2'>AAA&lt;/cell></font>
+            <font color="brown">&lt;cell row='4' col='1'>BBB&lt;/cell></font>
+            <font color="brown">&lt;cell row='4' col='3'>CCC&lt;/cell></font>
+            <font color="brown">&lt;cell row='5' col='2'>DDD&lt;/cell></font>
+        <font color="blue">&lt;/set></font>
+    &lt;/worksheet>
+&lt;/workbook>
+<td>
+<img src="images/screenF3.png" width="462" height="212">
+</td>
+</tr>
+</table>
+We pass the C2 cell in the <font color="blue">trank</font> set. But the cell should be filled with yesllow color nervertheless. <br>
+In the <font color="blue">sandbox</font> set we describe 4 cells only. But all 9 cells have to get silver background color.<br>
+
+<h4>Example 14. Width and height for cells</h4>
+Sometimes cells are too small to show content.<br>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet pos="c2" type="row">
+            &lt;cell><font color="blue">In a galaxy far, far away.</font>&lt;/cell>
+            &lt;cell> &lt;/cell>
+            &lt;cell pos="b3"><font color="brown">There are
+many lines 
+of text.</font>&lt;/cell>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+<img src="images/screenG1.png" width="314" height="150">
+</td>
+</tr>
+</table>
+You may specify expected width and height for cells yourself:<br>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet pos="c2" type="row">
+            &lt;cell <font color="red">width="20"</font>><font color="blue">In a galaxy far, far away.</font>&lt;/cell>
+            &lt;cell> &lt;/cell>
+            &lt;cell pos="b3" <font color="red">height="36"</font>><font color="brown">There are
+many lines 
+of text.</font>&lt;/cell>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+<img src="images/screenG2.png" width="398" height="194">
+</td>
+</tr>
+</table>
+
+You may specify width and height for a set of cells. For example,<br>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet pos="C3">
+        <font color="blue">&lt;set name="track" bg_color="yellow" <font color="red">width="4.2"</font>></font>
+            &lt;cell>step&lt;/cell>
+            &lt;cell>step&lt;/cell>
+            &lt;cell col="+1">jump&lt;/cell>
+            &lt;cell>step&lt;/cell>
+            &lt;cell>step&lt;/cell>
+        <font color="blue">&lt;/set></font>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+<img src="images/screenG3.png" width="529" height="211">
+</td>
+</tr>
+</table>
+Columns from C to H have reduced width now. Pay attention, other columns still have standard width.<br>
+
+<h4>Example 15. Align</h4>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet width="15">
+        &lt;set pos="C2" type="row" bold="yes">
+            &lt;cell align="right">align="right"&lt;/cell>
+            &lt;cell align="center">align="center"&lt;/cell>
+            &lt;cell align="left">align="left"&lt;/cell>
+        &lt;/set>
+        &lt;set pos="B3" type="col" bold="yes">
+            &lt;cell valign="bottom">valign="bottom"&lt;/cell>
+            &lt;cell valign="vcenter">valign="vcenter"&lt;/cell>
+            &lt;cell valign="top">valign="top"&lt;/cell>
+        &lt;/set>
+        &lt;set pos="C3" type="col" height="30">
+            &lt;set>
+                <font color="blue">&lt;cell <font color="red">align="right" valign="bottom"</font>>AAAA&lt;/cell></font>
+                <font color="blue">&lt;cell <font color="red">align="center" valign="bottom"</font>>BBBB&lt;/cell></font>
+                <font color="blue">&lt;cell <font color="red">align="left" valign="bottom"</font>>CCCC&lt;/cell></font>
+            &lt;/set>
+            &lt;set>
+                <font color="blue">&lt;cell <font color="red">align="right" valign="vcenter"</font>>DDDD&lt;/cell></font>
+                <font color="blue">&lt;cell <font color="red">align="center" valign="vcenter"</font>>EEEE&lt;/cell></font>
+                <font color="blue">&lt;cell <font color="red">align="left" valign="vcenter"</font>>FFFF&lt;/cell></font>
+            &lt;/set>
+            &lt;set>
+                <font color="blue">&lt;cell <font color="red">align="right" valign="top"</font>>GGGG&lt;/cell></font>
+                <font color="blue">&lt;cell <font color="red">align="center" valign="top"</font>>HHHH&lt;/cell></font>
+                <font color="blue">&lt;cell <font color="red">align="left" valign="top"</font>>IIII&lt;/cell></font>
+            &lt;/set>
+        &lt;/set>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+<img src="images/screenG4.png" width="637" height="266">
+</td>
+</tr>
+</table>
+Note: The <font color="red">valign="middle"</font> attribute is also acceptable here to meet HTML standard.<br>
+It has the same effect as valign="vcenter" above.<br>
+
+<h4>Example 16. Wrapping and indent</h4>
+You may specify indent for text in any cell.<br>
+Also you may execute wrapping to show long text withing single cell.<br>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet pos="B2" width="25">
+        &lt;cell>no indent&lt;/cell>
+        &lt;cell <font color="red"><b>indent="1"</b></font>>indent="1"&lt;/cell>
+        &lt;cell <font color="red"><b>indent="2"</b></font>>indent="2"&lt;/cell>
+        &lt;cell <font color="red"><b>indent="3"</b></font>>indent="3"&lt;/cell>
+        &lt;cell <font color="brown"><b>wrap="yes"</b></font> height="47">The Sinai Agama is an agamid lizard native to northern and eastern Africa and the Middle East.&lt;/cell>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+</tr>
+<tr>
+<td>
+<img src="images/screenG5.png" width="383" height="251">
+</td>
+</tr>
+</table>
+
+<h4>Example 17. Comment</h4>
+The comment attribute is allowed in the cell tag only.<br>
+You may use the <font color="red">comment attribute</font> to make short comment for a cell.<br>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet pos="B2">
+        <font color="blue">&lt;cell <font color="red">comment="This is a comment"</font>>Hello&lt;/cell></font>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+<img src="images/screenG6.png" width="368" height="172">
+</td>
+</tr>
+</table>
+You may use the <font color="red">comment tag</font> to make long comment for a cell.<br>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet>
+        <font color="brown">&lt;cell>Bellevue<font color="blue"><font color="red">&lt;comment></font>Bellevue is a city in the Eastside region of King County, Washington, United States, across Lake Washington from Seattle. 
+Long known as a suburb or satellite city of Seattle, it is now categorized as an edge city or a boomburb with a population of 122,363 at the 2010 census.<font color="red">&lt;/comment></font></font>&lt;/cell></font>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+</tr>
+<tr>
+<td>
+<img src="images/screenG7.png" width="311" height="247">
+</td>
+</tr>
+</table>
+
+<h4>Example 18. Truncate text and comment</h4>
+You can use the <font color="red">trunc</font> attribute to truncate text in some cell or comment.<br>
+The <font color="red">trunc</font> attibure cuts spaces at the beginning and end of the text. Also it replaces all ends of line inside the text with space character.<br>
+For example,<br>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet>
+        <font color="brown">&lt;cell <font color="red"><b>trunc="yes"</b></font>>
+Bellevue
+<font color="blue">&lt;comment <font color="red"><b>trunc="yes"</b></font>>
+Bellevue is a city in the Eastside region of King County, 
+Washington, United States, across Lake Washington from Seattle. 
+Long known as a suburb or satellite city of Seattle, 
+it is now categorized as an edge city or a boomburb with 
+a population of 122,363 at the 2010 census.
+&lt;/comment></font>
+        &lt;/cell></font>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+<img src="images/screenG8.png" width="310" height="244">
+</td>
+</tr>
+</table>
+You can see, that input XML document is more readable, than previous one.<br>
+
+<h4>Example 19. Size of dropdown window for comment</h4>
+You can specify size of the window in pixels by means <font color="red">width</font> and <font color="red">height</font> attributes.<br>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet>
+        &lt;cell trunc="yes">
+Bellevue
+<font color="blue">&lt;comment trunc="yes" <font color="red">width="150" height="160"</font>>
+Bellevue is a city in the Eastside region of King County, 
+Washington, United States, across Lake Washington from Seattle. 
+Long known as a suburb or satellite city of Seattle, 
+it is now categorized as an edge city or a boomburb with 
+a population of 122,363 at the 2010 census.
+&lt;/comment></font>
+        &lt;/cell>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+<img src="images/screenG9.png" width="329" height="257">
+</td>
+</tr>
+</table>
+
+<a name="Border">
+<h4>Example 20. Border</h4>
+The border and border_color allow to describe border for a cell.<br>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;style name="data" color="#606060" height="20" align="center" valign="middle"/>
+    &lt;worksheet pos="B2">
+        <font color="blue">&lt;cell <font color="red">border="1" border_color="red"</font> align="center">Hello&lt;/cell></font>
+        &lt;set row="+2" style="data" width="1">
+            &lt;set width="12">
+                <font color="blue">&lt;cell <font color="red">border="1"</font>>border="1"&lt;/cell></font>
+                <font color="blue">&lt;cell <font color="red">border="2"</font> row="+1">border="2"&lt;/cell></font>
+                <font color="blue">&lt;cell <font color="red">border="3"</font> row="+1">border="3"&lt;/cell></font>
+                <font color="blue">&lt;cell <font color="red">border="4"</font> row="+1">border="4"&lt;/cell></font>
+                <font color="blue">&lt;cell <font color="red">border="5"</font> row="+1">border="5"&lt;/cell></font>
+            &lt;/set>
+            &lt;set col="+1" width="12">
+                <font color="blue">&lt;cell <font color="red">border="6"</font>>border="6"&lt;/cell></font>
+                <font color="blue">&lt;cell <font color="red">border="7"</font> row="+1">border="7"&lt;/cell></font>
+                <font color="blue">&lt;cell <font color="red">border="8"</font> row="+1">border="8"&lt;/cell></font>
+                <font color="blue">&lt;cell <font color="red">border="9"</font> row="+1">border="9"&lt;/cell></font>
+                <font color="blue">&lt;cell <font color="red">border="10"</font> row="+1">border="10"&lt;/cell></font>
+            &lt;/set>
+            &lt;set col="+1" width="12">
+                <font color="blue">&lt;cell <font color="red">border="11"</font>>border="11"&lt;/cell></font>
+                <font color="blue">&lt;cell <font color="red">border="12"</font> row="+1">border="12"&lt;/cell></font>
+                <font color="blue">&lt;cell <font color="red">border="13"</font> row="+1">border="13"&lt;/cell></font>
+            &lt;/set>
+        &lt;/set>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+<img src="images/screenH1.png" width="476" height="395">
+</td>
+</tr>
+</table>
+Note: There are few other boder-related implicit attributes:<br>
+<font color="blue">border_top</font>, <font color="blue">border_bottom</font>, 
+<font color="blue">border_left</font>, <font color="blue">border_right</font>,<br>
+<font color="blue">border_top_color</font>, <font color="blue">border_bottom_color</font>, 
+<font color="blue">border_left_color</font>, <font color="blue">border_right_color</font>.<br>
+
+You are not expected to use them ever yourself.<p>
+You may create internal grid for any set of cells by means these 2 attributes.<br>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet>
+        &lt;set name="sandbox" align="center" bg_color="silver" <font color="red">border="1" border_color="gray"</font>>
+            &lt;cell row='1' col='2'>AAA&lt;/cell>
+            &lt;cell row='2' col='1'>BBB&lt;/cell>
+            &lt;cell row='2' col='3'>CCC&lt;/cell>
+            &lt;cell row='3' col='2'>DDD&lt;/cell>
+        &lt;/set>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+<img src="images/screenH2.png" width="374" height="173">
+</td>
+</tr>
+</table>
+You may use the <font color="blue">border_common</font> and <font color="blue">border_common_color</font> attributes the same way to build common frame for a set of cells.<br>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet>
+        &lt;set name="sandbox" align="center" bg_color="silver" border="1" border_color="gray" 
+             <font color="red">border_common="6" border_common_color="blue"</font>>
+            &lt;cell row='1' col='2'>AAA&lt;/cell>
+            &lt;cell row='2' col='1'>BBB&lt;/cell>
+            &lt;cell row='2' col='3'>CCC&lt;/cell>
+            &lt;cell row='3' col='2'>DDD&lt;/cell>
+        &lt;/set>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+<img src="images/screenH3.png" width="371" height="179">
+</td>
+</tr>
+</table>
+Another example without internal grid:<br>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet>
+        &lt;set name="sandbox" align="center" bg_color="silver" <font color="red">border_color="gray" border_common="2"</font>>
+            &lt;cell row='1' col='2'>AAA&lt;/cell>
+            &lt;cell row='2' col='1'>BBB&lt;/cell>
+            &lt;cell row='2' col='3'>CCC&lt;/cell>
+            &lt;cell row='3' col='2'>DDD&lt;/cell>
+        &lt;/set>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+<img src="images/screenH4.png" width="370" height="155">
+</td>
+</tr>
+</table>
+
+<h4>Example 21. Join cells</h4>
+The <font color="red">colspan</font> attribute allows to join two or more cells in the same row.<br>
+The package doesn't allow to join cells in the same column.<br>
+There is centering for content of the joined cell.<br>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet pos="A2" type="row">
+        &lt;cell align="right">###&lt;/cell>
+        <font color="blue">&lt;cell <font color="red">colspan="2"</font>>Hello, world!&lt;/cell></font>
+        &lt;cell align="left">###&lt;/cell>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+<img src="images/screenI1.png" width="329" height="144">
+</td>
+</tr>
+</table>
+
+<a name="Image">
+<h4>Example 22. Image</h4>
+Image in a cell.<br>
+The <font color="red">src</font> is mandatory attribute, which specify an image to be inserted.<br>
+Optional <font color="red">x</font> and <font color="red">y</font> attributes execute tiny positioning for the image withing cell (left upper corner).<br>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet pos="B2" align="right">
+        &lt;set bold="yes" align="center">
+            &lt;cell width="12">Indices&lt;/cell>
+            &lt;cell>Price&lt;/cell>
+            &lt;cell width="3"> &lt;/cell>
+            &lt;cell colspan="2">Today's Change&lt;/cell>
+        &lt;/set>
+        &lt;set>
+            &lt;cell>FTSE 100&lt;/cell>
+            &lt;cell>5,649.68&lt;/cell>
+            <font color="blue">&lt;cell><font color="red">&lt;img src="up.png" x="6" y="1"/></font>&lt;/cell></font>
+            &lt;cell>+25.42&lt;/cell>
+            &lt;cell>+0.45%&lt;/cell>
+        &lt;/set>
+        &lt;set>
+            &lt;cell>DAX&lt;/cell>
+            &lt;cell>6,057.92&lt;/cell>
+            <font color="blue">&lt;cell><font color="red">&lt;img src="down.png" x="6" y="2"/></font>&lt;/cell></font>
+            &lt;cell>-38.07&lt;/cell>
+            &lt;cell>-0.62%&lt;/cell>
+        &lt;/set>
+        &lt;set>
+            &lt;cell>CAC 40&lt;/cell>
+            &lt;cell>3,137.36&lt;/cell>
+            <font color="blue">&lt;cell><font color="red">&lt;img src="down.png" x="6" y="2"/></font>&lt;/cell></font>
+            &lt;cell>-7.55&lt;/cell>
+            &lt;cell>-0.24%&lt;/cell>
+        &lt;/set>
+        &lt;set>
+            &lt;cell>TR EUROPE&lt;/cell>
+            &lt;cell>118.66&lt;/cell>
+            <font color="blue">&lt;cell><font color="red">&lt;img src="down.png" x="6" y="2"/></font>&lt;/cell></font>
+            &lt;cell>-0.92&lt;/cell>
+            &lt;cell>-0.77%&lt;/cell>
+        &lt;/set>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+<img src="images/screenJ1.png" width="490" height="190">
+</td>
+</tr>
+</table>
+You may combine text and images withing single cell also.<br>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet pos="B2" align="right">
+        &lt;set bold="yes" align="center">
+            &lt;cell width="12">Indices&lt;/cell>
+            &lt;cell>Price&lt;/cell>
+            &lt;cell colspan="2">Today's Change&lt;/cell>
+        &lt;/set>
+        &lt;set>
+            &lt;cell>FTSE 100&lt;/cell>
+            &lt;cell>5,649.68&lt;/cell>
+            <font color="blue">&lt;cell><font color="red">&lt;img src="up.png" x="6" y="1"/></font>+25.42&lt;/cell></font>
+            &lt;cell>+0.45%&lt;/cell>
+        &lt;/set>
+        &lt;set>
+            &lt;cell>DAX&lt;/cell>
+            &lt;cell>6,057.92&lt;/cell>
+            <font color="blue">&lt;cell><font color="red">&lt;img src="down.png" x="6" y="2"/></font>-38.07&lt;/cell></font>
+            &lt;cell>-0.62%&lt;/cell>
+        &lt;/set>
+        &lt;set>
+            &lt;cell>CAC 40&lt;/cell>
+            &lt;cell>3,137.36&lt;/cell>
+            <font color="blue">&lt;cell><font color="red">&lt;img src="down.png" x="6" y="2"/></font>-7.55&lt;/cell></font>
+            &lt;cell>-0.24%&lt;/cell>
+        &lt;/set>
+        &lt;set>
+            &lt;cell>TR EUROPE&lt;/cell>
+            &lt;cell>118.66&lt;/cell>
+            <font color="blue">&lt;cell><font color="red">&lt;img src="down.png" x="6" y="2"/></font>-0.92&lt;/cell></font>
+            &lt;cell>-0.77%&lt;/cell>
+        &lt;/set>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+<img src="images/screenJ2.png" width="432" height="186">
+</td>
+</tr>
+</table>
+<p>
+Image in a worksheet.<br>
+You have to specify desired position for the image in that case. 
+(The <font color="blue">pos</font> attirbute or the <font color="blue">col</font>&<font color="blue">row</font> ones)<br>
+The <font color="blue">src</font> attribute specify path and file name for picture to be inserted.<br>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet pos="B2" align="right">
+        &lt;set>
+            &lt;cell colspan="2" bold="yes" trunc="yes">
+                 Intel Corp (INTC.O)
+            &lt;/cell>
+        &lt;/set>
+        <font color="red">&lt;img pos="B7" src="intel.png"/></font>
+        &lt;set row="+1" width="10">
+            &lt;set width="17">
+                &lt;cell bold="yes">INTC.O on Nasdaq&lt;/cell>
+                &lt;cell>25.25 USD&lt;/cell>
+                &lt;cell>6 Jan 2012&lt;/cell>
+            &lt;/set>
+            &lt;set width="20">
+                &lt;cell bold="yes">Price change (% chg)&lt;/cell>
+                &lt;cell>$-0.15 (-0.59%)&lt;/cell>
+            &lt;/set>
+            &lt;set col="+1">
+                &lt;cell bold="yes">Prev Close&lt;/cell>
+                &lt;cell>$25.40&lt;/cell>
+            &lt;/set>
+            &lt;set>
+                &lt;cell bold="yes">Open&lt;/cell>
+                &lt;cell>$25.21&lt;/cell>
+            &lt;/set>
+            &lt;set>
+                &lt;cell bold="yes">Volume&lt;/cell>
+                &lt;cell>36,345,172&lt;/cell>
+                &lt;cell bold="yes" row="+1">Avg. Vol&lt;/cell>
+                &lt;cell>33,578,436&lt;/cell>
+                &lt;cell bold="yes" row="+1">52-wk High&lt;/cell>
+                &lt;cell>$25.78&lt;/cell>
+                &lt;cell bold="yes" row="+1">52-wk Low&lt;/cell>
+                &lt;cell>$19.16&lt;/cell>
+            &lt;/set>
+        &lt;/set>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+<img src="images/screenJ3.png" width="703" height="519">
+</td>
+</tr>
+</table>
+
+<a name="Charts">
+<h3>Charts</h3>
+Current package supports few predefined types of charts.<br>
+
+<a name="ChartArea">
+<h4>Example 23. Area</h4>
+You may build some simple charts while transfering from XML to Excel.<br>
+For the <font color="blue">chart</font> tag you have to specify position. (<font color="blue">pos</font> or <font color="blue">col</font>&<font color="blue">row</font>))<br>
+Also you have to specify data for the chart in the <font color="blue">values</font> attribute.<br>
+The <font color="blue">type="area"</font> deternime type of the chart.<br>
+You may use <font color="blue">x</font> and <font color="blue">y</font> to make tiny positioning for the chart.<br>
+And you may specify size of the chart by means the <font color="blue">width</font> and <font color="blue">height</font> attributes.
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet>
+        &lt;cell>1&lt;/cell>
+        &lt;cell>4&lt;/cell>
+        &lt;cell>5&lt;/cell>
+        &lt;cell>2&lt;/cell>
+        &lt;cell>1&lt;/cell>
+        &lt;cell>5&lt;/cell>
+        <font color="blue">&lt;chart pos="B2" type="area" x="10" width="0.7" height="0.7">
+             &lt;data values="$A$1:$A$6"/>
+        &lt;/chart></font>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+<img src="images/screenK1.png" width="527" height="328">
+</td>
+</tr>
+</table>
+It may be annoying to deal with Excel annotation for value in the <font color="red">values</font> attribute. (<font color="blue">values="$A$1:$A$6"</font> in the example)<br>
+The package proposes much easier decision.<br>
+Just put these data cells into some named set. Then tell name of the set in the <font color="red">values</font> attribute.<br>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet <font color="blue">type="row"</font>>
+        <font color="blue">&lt;set <font color="red">name="<b>dataset</b>"</font>></font>
+            &lt;cell>1&lt;/cell>
+            &lt;cell>4&lt;/cell>
+            &lt;cell>5&lt;/cell>
+            &lt;cell>2&lt;/cell>
+            &lt;cell>1&lt;/cell>
+            &lt;cell>5&lt;/cell>
+        <font color="blue">&lt;/set></font>
+        <font color="blue">&lt;chart pos="B2" type="area" x="10" width="0.7" height="0.7">
+            <font color="red">&lt;data values="<b>dataset</b>"/></font>
+        &lt;/chart></font>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+The same result.
+</td>
+</tr>
+</table>
+There may be a row of cells with data, but not a column.<br>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet>
+        <font color="blue">&lt;set <font color="red">name="<b>dataset</b>"</font>></font>
+            &lt;cell>1&lt;/cell>
+            &lt;cell>4&lt;/cell>
+            &lt;cell>5&lt;/cell>
+            &lt;cell>2&lt;/cell>
+            &lt;cell>1&lt;/cell>
+            &lt;cell>5&lt;/cell>
+        <font color="blue">&lt;/set></font>
+        <font color="blue">&lt;chart pos="A2" type="area" x="10" y="10" width="0.7" height="0.7">
+            <font color="red">&lt;data values="<b>dataset</b>"/></font>
+        &lt;/chart></font>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+<img src="images/screenK2.png" width="460" height="343">
+</td>
+</tr>
+</table>
+
+<h4>Example 24. A virtual set</h4>
+We have few rows with some information. And we want to build a chart with data from the C3:C8 column.<br>
+Unfortunately, cells for that columns are included in blue rows already.<br>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet pos="B2">
+        &lt;set>
+            &lt;cell bold="yes" trunc="yes">
+                 Holiday week downloads (millions)
+            &lt;/cell>
+        &lt;/set>
+        <font color="blue">&lt;set</font> border="1" border_color="silver" bg_color="#E0E0FF"<font color="blue">></font>
+            &lt;cell>U.S.&lt;/cell>
+            <font color="brown">&lt;cell>509&lt;/cell></font>
+        <font color="blue">&lt;/set></font>
+        <font color="blue">&lt;set</font> border="1" border_color="silver" bg_color="#C0C0FF"<font color="blue">></font>
+            &lt;cell>China&lt;/cell>
+            <font color="brown">&lt;cell>99&lt;/cell></font>
+        <font color="blue">&lt;/set></font>
+        <font color="blue">&lt;set</font> border="1" border_color="silver" bg_color="#E0E0FF"<font color="blue">></font>
+            &lt;cell>U.K.&lt;/cell>
+            <font color="brown">&lt;cell>81&lt;/cell></font>
+        <font color="blue">&lt;/set></font>
+        <font color="blue">&lt;set</font> border="1" border_color="silver" bg_color="#C0C0FF"<font color="blue">></font>
+            &lt;cell>Canada&lt;/cell>
+            <font color="brown">&lt;cell>41&lt;/cell></font>
+        <font color="blue">&lt;/set></font>
+        <font color="blue">&lt;set</font> border="1" border_color="silver" bg_color="#E0E0FF"<font color="blue">></font>
+            &lt;cell>Germany&lt;/cell>
+            <font color="brown">&lt;cell>40&lt;/cell></font>
+        <font color="blue">&lt;/set></font>
+        <font color="blue">&lt;set</font> border="1" border_color="silver" bg_color="#C0C0FF"<font color="blue">></font>
+            &lt;cell>France&lt;/cell>
+            <font color="brown">&lt;cell>40&lt;/cell></font>
+        <font color="blue">&lt;/set></font>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+<img src="images/screenK3.png" width="374" height="215">
+</td>
+</tr>
+</table>
+Decision is<br>
+- Insert <font color="blue">wrapping set</font> to group data cells. (<code><font color="blue"><b>&lt;set type="...">...&lt;/set></b></font></code>). Pay attention, the set does not include the "Holiday week..." header.<br>
+- Withing the wrapping set insert <font color="red">empty set</font>, which has <code><font color="red">name</font></code> and <code><font color="red">col</font></code> attributes (<code><font color="red">&lt;set name="..." col="2"/></font></code>).<br>
+- You may use the name (<code><font color="brown">"<b>dataset</b>"</font></code>) to deliver that column to a chart.<br>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet pos="B2" name="Market">
+        &lt;set>
+            &lt;cell bold="yes" trunc="yes">
+                Holiday week downloads (millions)
+            &lt;/cell>
+        &lt;/set>
+        <font color="blue"><b>&lt;set type="col"></b></font>
+            &lt;set border="1" border_color="silver" bg_color="#E0E0FF" name="US data">
+                &lt;cell>U.S.&lt;/cell>
+                &lt;cell>509&lt;/cell>
+            &lt;/set>
+            &lt;set border="1" border_color="silver" bg_color="#C0C0FF">
+                &lt;cell>China&lt;/cell>
+                &lt;cell>99&lt;/cell>
+            &lt;/set>
+            &lt;set border="1" border_color="silver" bg_color="#E0E0FF">
+                &lt;cell>U.K.&lt;/cell>
+                &lt;cell>81&lt;/cell>
+            &lt;/set>
+            &lt;set border="1" border_color="silver" bg_color="#C0C0FF">
+                &lt;cell>Canada&lt;/cell>
+                &lt;cell>41&lt;/cell>
+            &lt;/set>
+            &lt;set border="1" border_color="silver" bg_color="#E0E0FF">
+                &lt;cell>Germany&lt;/cell>
+                &lt;cell>40&lt;/cell>
+            &lt;/set>
+            &lt;set border="1" border_color="silver" bg_color="#C0C0FF">
+                &lt;cell>France&lt;/cell>
+                &lt;cell>40&lt;/cell>
+            &lt;/set>
+            <font color="red">&lt;set name="<font color="brown"><b>dataset</b></font>" col="2"/></font>
+        <font color="blue"><b>&lt;/set></b></font>
+        <font color="brown">&lt;chart pos="D3" type="area" x="10" y="10" width="0.7" height="0.7">
+            &lt;data values="<b>dataset</b>"/>
+        &lt;/chart></font>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+<img src="images/screenK4.png" width="644" height="357">
+</td>
+</tr>
+</table>
+Pay attention, we used the <font color="blue">col="2"</font> attribute for that virtual set. It means column C.<br>
+It would be easier to use relative positioning in the <font color="blue">col</font> attribute, but not specify column number.<br>
+col="+0" takes the first column from the wrapping set.<br>
+col="+1" takes the second column.<br>
+col="+2" takes the third column, etc.<br>
+In current example we take data cells from the second column:<br>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet pos="B2" name="Market">
+        &lt;set>
+            &lt;cell bold="yes" trunc="yes">
+                Holiday week downloads (millions)
+            &lt;/cell>
+        &lt;/set>
+        <font color="blue">&lt;set type="col"></font>
+            &lt;set border="1" border_color="silver" bg_color="#E0E0FF" name="US data">
+                &lt;cell>U.S.&lt;/cell>
+                &lt;cell>509&lt;/cell>
+            &lt;/set>
+            &lt;set border="1" border_color="silver" bg_color="#C0C0FF">
+                &lt;cell>China&lt;/cell>
+                &lt;cell>99&lt;/cell>
+            &lt;/set>
+            &lt;set border="1" border_color="silver" bg_color="#E0E0FF">
+                &lt;cell>U.K.&lt;/cell>
+                &lt;cell>81&lt;/cell>
+            &lt;/set>
+            &lt;set border="1" border_color="silver" bg_color="#C0C0FF">
+                &lt;cell>Canada&lt;/cell>
+                &lt;cell>41&lt;/cell>
+            &lt;/set>
+            &lt;set border="1" border_color="silver" bg_color="#E0E0FF">
+                &lt;cell>Germany&lt;/cell>
+                &lt;cell>40&lt;/cell>
+            &lt;/set>
+            &lt;set border="1" border_color="silver" bg_color="#C0C0FF">
+                &lt;cell>France&lt;/cell>
+                &lt;cell>40&lt;/cell>
+            &lt;/set>
+            <font color="red">&lt;set name="dataset" <b>col="+1"</b>/></font>
+        <font color="blue">&lt;/set></font>
+        &lt;chart pos="D3" type="area" x="10" y="10" width="0.7" height="0.7">
+            &lt;data values="dataset"/>
+        &lt;/chart>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+the same result.
+</td>
+</tr>
+</table>
+The same way, we may take data cells from some row.<br>
+Pay attention, we use the <font color="blue">row</font> attribute in the virtual set now.<br>
+The <font color="blue">row="+1"</font> attribute means we take data from second row of the wrapping set. (blue area)<br>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet pos="B2" name="Market">
+        &lt;set>
+            &lt;cell bold="yes" trunc="yes">
+                Holiday week downloads (millions)
+            &lt;/cell>
+        &lt;/set>
+        <font color="blue">&lt;set bg_color="#E0E0FF" border_color="silver"></font>
+            &lt;set border="1">
+                &lt;cell>U.S.&lt;/cell>
+                &lt;cell>509&lt;/cell>
+            &lt;/set>
+            &lt;set border="1">
+                &lt;cell>China&lt;/cell>
+                &lt;cell>99&lt;/cell>
+            &lt;/set>
+            &lt;set border="1">
+                &lt;cell>U.K.&lt;/cell>
+                &lt;cell>81&lt;/cell>
+            &lt;/set>
+            &lt;set border="1">
+                &lt;cell>Canada&lt;/cell>
+                &lt;cell>41&lt;/cell>
+            &lt;/set>
+            &lt;set border="1">
+                &lt;cell>Germany&lt;/cell>
+                &lt;cell>40&lt;/cell>
+            &lt;/set>
+            &lt;set border="1">
+                &lt;cell>France&lt;/cell>
+                &lt;cell>40&lt;/cell>
+            &lt;/set>
+            <font color="red">&lt;set name="dataset" <b>row="+1"</b>/></font>
+        <font color="blue">&lt;/set></font>
+        &lt;chart pos="B5" type="area" x="7" y="7" width="0.7" height="0.7">
+            &lt;data values="dataset"/>
+        &lt;/chart>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+<img src="images/screenK5.png" width="560" height="386">
+</td>
+</tr>
+</table>
+Let's add user specified categories (X axis) and a series name to the <font color="red"><code>data</code></font> tag.<br>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet>
+        &lt;set pos="B2" width="5" border="1" border_color="silver">
+            <font color="blue">&lt;set name="abscissa"</font> bg_color="#D0D0FF"<font color="blue">></font>
+                &lt;cell>2&lt;/cell>
+                &lt;cell>3&lt;/cell>
+                &lt;cell>4&lt;/cell>
+                &lt;cell>5&lt;/cell>
+                &lt;cell>6&lt;/cell>
+                &lt;cell>7&lt;/cell>
+            <font color="blue">&lt;/set></font>
+            <font color="blue">&lt;set name="ordinate"</font> bg_color="#C0C0FF"<font color="blue">></font>
+                &lt;cell>1&lt;/cell>
+                &lt;cell>4&lt;/cell>
+                &lt;cell>5&lt;/cell>
+                &lt;cell>2&lt;/cell>
+                &lt;cell>1&lt;/cell>
+                &lt;cell>5&lt;/cell>
+            <font color="blue">&lt;/set></font>
+        &lt;/set>
+        <font color="brown">&lt;chart pos="D2" type="area" x="20" width="0.7" height="0.9">
+            <font color="red">&lt;data <b>categories</b>="abscissa" <b>values</b>="ordinate" <b>name</b>="Test data series 1"/></font>
+        &lt;/chart></font>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+<img src="images/screenK6.png" width="612" height="389">
+</td>
+</tr>
+</table>
+Same as previous chart but with title and axes labels, which were added by means <font color="red"><code>x_axis</code></font> and <font color="red"><code>y_axis</code></font> tags.<br>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet>
+        &lt;set pos="B2" width="5" border="1" border_color="silver">
+            &lt;set name="abscissa" bg_color="#D0D0FF">
+                &lt;cell>2&lt;/cell>
+                &lt;cell>3&lt;/cell>
+                &lt;cell>4&lt;/cell>
+                &lt;cell>5&lt;/cell>
+                &lt;cell>6&lt;/cell>
+                &lt;cell>7&lt;/cell>
+            &lt;/set>
+            &lt;set name="ordinate" bg_color="#C0C0FF">
+                &lt;cell>1&lt;/cell>
+                &lt;cell>4&lt;/cell>
+                &lt;cell>5&lt;/cell>
+                &lt;cell>2&lt;/cell>
+                &lt;cell>1&lt;/cell>
+                &lt;cell>5&lt;/cell>
+            &lt;/set>
+        &lt;/set>
+        <font color="blue">&lt;chart pos="D2" type="area" x="20" width="0.7" height="0.9">
+            &lt;data categories="abscissa" values="ordinate" name="Test data series 1"/>
+            <font color="red">&lt;title name="Results of sample analysis"/>
+            &lt;x_axis name="Sample number"/>
+            &lt;y_axis name="Sample length (cm)"/></font>
+        &lt;/chart></font>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+<img src="images/screenK7.png" width="524" height="391">
+</td>
+</tr>
+</table>
+Same as previous chart but with one more series and with chart sheet name.<br>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet>
+        &lt;set pos="B2" width="5" border="1" border_color="silver">
+            &lt;set name="scale" bg_color="#D0D0FF">
+                &lt;cell>2&lt;/cell>
+                &lt;cell>3&lt;/cell>
+                &lt;cell>4&lt;/cell>
+                &lt;cell>5&lt;/cell>
+                &lt;cell>6&lt;/cell>
+                &lt;cell>7&lt;/cell>
+            &lt;/set>
+            &lt;set name="dataset1" bg_color="#C0C0FF">
+                &lt;cell>1&lt;/cell>
+                &lt;cell>4&lt;/cell>
+                &lt;cell>5&lt;/cell>
+                &lt;cell>2&lt;/cell>
+                &lt;cell>1&lt;/cell>
+                &lt;cell>5&lt;/cell>
+            &lt;/set>
+            &lt;set name="dataset2" bg_color="#B0B0FF">
+                &lt;cell>3&lt;/cell>
+                &lt;cell>6&lt;/cell>
+                &lt;cell>7&lt;/cell>
+                &lt;cell>5&lt;/cell>
+                &lt;cell>4&lt;/cell>
+                &lt;cell>3&lt;/cell>
+            &lt;/set>
+        &lt;/set>
+        <font color="blue">&lt;chart pos="E2" <font color="red">name="Results Chart"</font> type="area" x="20" width="0.7" height="0.9">
+            <font color="red">&lt;data categories="scale" values="dataset1" name="Test data series 1"/>
+            &lt;data categories="scale" values="dataset2" name="Test data series 2"/></font>
+            &lt;title name="Results of sample analysis"/>
+            &lt;x_axis name="Sample number"/>
+            &lt;y_axis name="Sample length (cm)"/>
+        &lt;/chart></font>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+<img src="images/screenK8.png" width="564" height="392">
+</td>
+</tr>
+</table>
+
+<a name="ChartBar">
+<h4>Example 25. Bar chart</h4>
+A minimal bar chart.<br>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet>
+        &lt;set pos="B2" name="dataset" type="col">
+            &lt;cell>1&lt;/cell>
+            &lt;cell>4&lt;/cell>
+            &lt;cell>5&lt;/cell>
+            &lt;cell>2&lt;/cell>
+            &lt;cell>1&lt;/cell>
+            &lt;cell>5&lt;/cell>
+        &lt;/set>
+        <font color="blue">&lt;chart pos="C2" <font color="red">type="<b>bar</b>"</font> x="20" width="0.7" height="0.7">
+            &lt;data values="dataset"/>
+        &lt;/chart></font>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+<img src="images/screenL1.png" width="505" height="327">
+</td>
+</tr>
+</table>
+A minimal chart with user specified categories (Y axis) and a series name.<br>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet>
+        &lt;set pos="B2" width="5" border="1" border_color="silver">
+            <font color="brown">&lt;set <font color="red">name="<b>category</b>"</font> bg_color="#D0D0FF">
+                &lt;cell>2&lt;/cell>
+                &lt;cell>3&lt;/cell>
+                &lt;cell>4&lt;/cell>
+                &lt;cell>5&lt;/cell>
+                &lt;cell>6&lt;/cell>
+                &lt;cell>7&lt;/cell>
+            &lt;/set>
+            &lt;set <font color="red">name="<b>amount</b>"</font> bg_color="#C0C0FF">
+                &lt;cell>1&lt;/cell>
+                &lt;cell>4&lt;/cell>
+                &lt;cell>5&lt;/cell>
+                &lt;cell>2&lt;/cell>
+                &lt;cell>1&lt;/cell>
+                &lt;cell>5&lt;/cell>
+            &lt;/set></font>
+        &lt;/set>
+        <font color="blue">&lt;chart pos="D2" type="bar" x="20" width="0.7" height="0.9">
+            &lt;data <font color="red">categories="<b>category</b>" values="<b>amount</b>"</font> name="Test data series 1"/>
+        &lt;/chart></font>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+<img src="images/screenL2.png" width="547" height="385">
+</td>
+</tr>
+</table>
+Same as previous chart but with added title and axes labels.<br>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet>
+        &lt;set pos="B2" width="5" border="1" border_color="silver">
+            &lt;set name="number" bg_color="#D0D0FF">
+                &lt;cell>2&lt;/cell>
+                &lt;cell>3&lt;/cell>
+                &lt;cell>4&lt;/cell>
+                &lt;cell>5&lt;/cell>
+                &lt;cell>6&lt;/cell>
+                &lt;cell>7&lt;/cell>
+            &lt;/set>
+            &lt;set name="lenght" bg_color="#C0C0FF">
+                &lt;cell>1&lt;/cell>
+                &lt;cell>4&lt;/cell>
+                &lt;cell>5&lt;/cell>
+                &lt;cell>2&lt;/cell>
+                &lt;cell>1&lt;/cell>
+                &lt;cell>5&lt;/cell>
+            &lt;/set>
+        &lt;/set>
+        <font color="blue">&lt;chart pos="D2" type="bar" x="20" width="0.7" height="0.9">
+            &lt;data categories="number" values="lenght" name="Test data series 1"/>
+            <font color="red">&lt;title name="Results of sample analysis"/>
+            &lt;x_axis name="Sample number"/>
+            &lt;y_axis name="Sample length (cm)"/></font>
+        &lt;/chart></font>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+<img src="images/screenL3.png" width="521" height="391">
+</td>
+</tr>
+</table>
+Same as previous chart but with an added series and with a user specified chart sheet name.<br>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet>
+        &lt;set pos="B2" width="5" border="1" border_color="silver">
+            &lt;set name="scale" bg_color="#D0D0FF">
+                &lt;cell>2&lt;/cell>
+                &lt;cell>3&lt;/cell>
+                &lt;cell>4&lt;/cell>
+                &lt;cell>5&lt;/cell>
+                &lt;cell>6&lt;/cell>
+                &lt;cell>7&lt;/cell>
+            &lt;/set>
+            &lt;set name="dataset1" bg_color="#C0C0FF">
+                &lt;cell>1&lt;/cell>
+                &lt;cell>4&lt;/cell>
+                &lt;cell>5&lt;/cell>
+                &lt;cell>2&lt;/cell>
+                &lt;cell>1&lt;/cell>
+                &lt;cell>5&lt;/cell>
+            &lt;/set>
+            &lt;set name="dataset2" bg_color="#B0B0FF">
+                &lt;cell>3&lt;/cell>
+                &lt;cell>6&lt;/cell>
+                &lt;cell>7&lt;/cell>
+                &lt;cell>5&lt;/cell>
+                &lt;cell>4&lt;/cell>
+                &lt;cell>3&lt;/cell>
+            &lt;/set>
+        &lt;/set>
+        <font color="blue">&lt;chart pos="E2" <font color="red">name="Results Chart"</font> type="bar" x="20" width="0.7" height="0.9">
+            <font color="red">&lt;data categories="scale" values="dataset1" name="Test data series 1"/>
+            &lt;data categories="scale" values="dataset2" name="Test data series 2"/></font>
+            &lt;title name="Results of sample analysis"/>
+            &lt;x_axis name="Sample number"/>
+            &lt;y_axis name="Sample length (cm)"/>
+        &lt;/chart></font>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+<img src="images/screenL4.png" width="557" height="391">
+</td>
+</tr>
+</table>
+
+<a name="ChartColumn">
+<h4>Example 26. Column chart</h4>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet>
+        &lt;set pos="B2" width="5" border="1" border_color="silver">
+            &lt;set name="scale" bg_color="#D0D0FF">
+                &lt;cell>2&lt;/cell>
+                &lt;cell>3&lt;/cell>
+                &lt;cell>4&lt;/cell>
+                &lt;cell>5&lt;/cell>
+                &lt;cell>6&lt;/cell>
+                &lt;cell>7&lt;/cell>
+            &lt;/set>
+            &lt;set name="dataset1" bg_color="#C0C0FF">
+                &lt;cell>1&lt;/cell>
+                &lt;cell>4&lt;/cell>
+                &lt;cell>5&lt;/cell>
+                &lt;cell>2&lt;/cell>
+                &lt;cell>1&lt;/cell>
+                &lt;cell>5&lt;/cell>
+            &lt;/set>
+            &lt;set name="dataset2" bg_color="#B0B0FF">
+                &lt;cell>3&lt;/cell>
+                &lt;cell>6&lt;/cell>
+                &lt;cell>7&lt;/cell>
+                &lt;cell>5&lt;/cell>
+                &lt;cell>4&lt;/cell>
+                &lt;cell>3&lt;/cell>
+            &lt;/set>
+        &lt;/set>
+        <font color="blue">&lt;chart pos="E2" name="Results Chart" <font color="red">type="<b>column</b>"</font> x="20" width="0.7" height="0.9">
+            &lt;data categories="scale" values="dataset1" name="Test data series 1"/>
+            &lt;data categories="scale" values="dataset2" name="Test data series 2"/>
+            &lt;title name="Results of sample analysis"/>
+            &lt;x_axis name="Sample number"/>
+            &lt;y_axis name="Sample length (cm)"/></font>
+        &lt;/chart>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+<img src="images/screenL5.png" width="561" height="380">
+</td>
+</tr>
+</table>
+
+<a name="ChartLine">
+<h4>Example 27. Line chart</h4>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet>
+        &lt;set pos="B2" width="5" border="1" border_color="silver">
+            &lt;set name="scale" bg_color="#D0D0FF">
+                &lt;cell>2&lt;/cell>
+                &lt;cell>3&lt;/cell>
+                &lt;cell>4&lt;/cell>
+                &lt;cell>5&lt;/cell>
+                &lt;cell>6&lt;/cell>
+                &lt;cell>7&lt;/cell>
+            &lt;/set>
+            &lt;set name="dataset1" bg_color="#C0C0FF">
+                &lt;cell>1&lt;/cell>
+                &lt;cell>4&lt;/cell>
+                &lt;cell>5&lt;/cell>
+                &lt;cell>2&lt;/cell>
+                &lt;cell>1&lt;/cell>
+                &lt;cell>5&lt;/cell>
+            &lt;/set>
+            &lt;set name="dataset2" bg_color="#B0B0FF">
+                &lt;cell>3&lt;/cell>
+                &lt;cell>6&lt;/cell>
+                &lt;cell>7&lt;/cell>
+                &lt;cell>5&lt;/cell>
+                &lt;cell>4&lt;/cell>
+                &lt;cell>3&lt;/cell>
+            &lt;/set>
+        &lt;/set>
+        <font color="blue">&lt;chart pos="E2" name="Results Chart" <font color="red">type="<b>line</b>"</font> x="20" width="0.7" height="0.9">
+            &lt;data categories="scale" values="dataset1" name="Test data series 1"/>
+            &lt;data categories="scale" values="dataset2" name="Test data series 2"/>
+            &lt;title name="Results of sample analysis"/>
+            &lt;x_axis name="Sample number"/>
+            &lt;y_axis name="Sample length (cm)"/></font>
+        &lt;/chart>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+<img src="images/screenL6.png" width="566" height="385">
+</td>
+</tr>
+</table>
+
+<a name="ChartPie">
+<h4>Example 27. Pie chart</h4>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet>
+        &lt;set bold="yes">
+            &lt;cell>Category&lt;/cell>
+            &lt;cell>Values&lt;/cell>
+        &lt;/set>
+        <font color="brown">&lt;set type="col"></font>
+            &lt;set>
+                &lt;cell>Apple&lt;/cell>
+                &lt;cell>60&lt;/cell>
+            &lt;/set>
+            &lt;set>
+                &lt;cell>Cherry&lt;/cell>
+                &lt;cell>30&lt;/cell>
+            &lt;/set>
+            &lt;set>
+                &lt;cell>Pecan&lt;/cell>
+                &lt;cell>10&lt;/cell>
+            &lt;/set>
+            <font color="brown">&lt;set <b>name="category"</b> col="+0"/></font>
+            <font color="brown">&lt;set <b>name="data"</b> col="+1"/></font>
+        <font color="brown">&lt;/set></font>
+        <font color="blue">&lt;chart pos="D1" name="Popular Pie Types" <font color="red">type="<b>pie</b>"</font> width="0.6" height="1.0">
+            &lt;data <font color="red">categories="<b>category</b>" values="<b>data</b>"</font> name="Pie sales data"/>
+            &lt;title name="Popular Pie Types"/>
+        &lt;/chart></font>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+<img src="images/screenL7.png" width="585" height="415">
+</td>
+</tr>
+</table>
+
+<a name="ChartScatter">
+<h4>Example 28. Scatter chart</h4>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet>
+        &lt;set bold="yes">
+            &lt;cell>Category&lt;/cell>
+            &lt;cell>Values 1&lt;/cell>
+            &lt;cell>Values 2&lt;/cell>
+        &lt;/set>
+        &lt;set>
+            &lt;set name="category">
+                &lt;cell>2&lt;/cell>
+                &lt;cell>3&lt;/cell>
+                &lt;cell>4&lt;/cell>
+                &lt;cell>5&lt;/cell>
+                &lt;cell>6&lt;/cell>
+                &lt;cell>7&lt;/cell>
+            &lt;/set>
+            &lt;set name="values1">
+                &lt;cell>1&lt;/cell>
+                &lt;cell>4&lt;/cell>
+                &lt;cell>5&lt;/cell>
+                &lt;cell>2&lt;/cell>
+                &lt;cell>1&lt;/cell>
+                &lt;cell>5&lt;/cell>
+            &lt;/set>
+            &lt;set name="values2">
+                &lt;cell>3&lt;/cell>
+                &lt;cell>6&lt;/cell>
+                &lt;cell>7&lt;/cell>
+                &lt;cell>5&lt;/cell>
+                &lt;cell>4&lt;/cell>
+                &lt;cell>3&lt;/cell>
+            &lt;/set>
+
+        &lt;/set>
+        <font color="blue">&lt;chart pos="E2" name="Results Chart" <font color="red">type="<b>scatter</b>"</font> width="0.7" height="1.0">
+            &lt;data categories="category" values="values1" name="Test data series 1"/>
+            &lt;data categories="category" values="values2" name="Test data series 2"/>
+            &lt;title name="Results of sample analysis"/>
+            &lt;x_axis name="Sample number"/>
+            &lt;y_axis name="Sample length (cm)"/>
+        &lt;/chart></font>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+<td>
+<img src="images/screenL8.png" width="705" height="418">
+</td>
+</tr>
+</table>
+
+<a name="ChartStock">
+<h4>Example 29. Stock chart</h4>
+<table cellpadding='5'>
+<tr>
+<td bgcolor='lightgrey'>
+<pre>
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE workbook SYSTEM "xml_to_xls.dtd">
+&lt;workbook>
+    &lt;worksheet>
+        &lt;set bold="yes" width="6">
+            &lt;cell width="10">Date&lt;/cell>&lt;cell>Open&lt;/cell>&lt;cell>High&lt;/cell>&lt;cell>Low&lt;/cell>&lt;cell>Close&lt;/cell>
+        &lt;/set>
+        &lt;set type="col">
+            &lt;set>&lt;cell>2009-08-19&lt;/cell>&lt;cell>100.00&lt;/cell>&lt;cell>104.06&lt;/cell>&lt;cell>95.96&lt;/cell> &lt;cell>100.34&lt;/cell>&lt;/set>
+            &lt;set>&lt;cell>2009-08-20&lt;/cell>&lt;cell>101.01&lt;/cell>&lt;cell>109.08&lt;/cell>&lt;cell>100.50&lt;/cell>&lt;cell>108.31&lt;/cell>&lt;/set>
+            &lt;set>&lt;cell>2009-08-23&lt;/cell>&lt;cell>110.75&lt;/cell>&lt;cell>113.48&lt;/cell>&lt;cell>109.05&lt;/cell>&lt;cell>109.40&lt;/cell>&lt;/set>
+            &lt;set>&lt;cell>2009-08-24&lt;/cell>&lt;cell>111.24&lt;/cell>&lt;cell>111.60&lt;/cell>&lt;cell>103.57&lt;/cell>&lt;cell>104.87&lt;/cell>&lt;/set>
+            &lt;set>&lt;cell>2009-08-25&lt;/cell>&lt;cell>104.96&lt;/cell>&lt;cell>108.00&lt;/cell>&lt;cell>103.88&lt;/cell>&lt;cell>106.00&lt;/cell>&lt;/set>
+            &lt;set>&lt;cell>2009-08-26&lt;/cell>&lt;cell>104.95&lt;/cell>&lt;cell>107.95&lt;/cell>&lt;cell>104.66&lt;/cell>&lt;cell>107.91&lt;/cell>&lt;/set>
+            &lt;set>&lt;cell>2009-08-27&lt;/cell>&lt;cell>108.10&lt;/cell>&lt;cell>108.62&lt;/cell>&lt;cell>105.69&lt;/cell>&lt;cell>106.15&lt;/cell>&lt;/set>
+            &lt;set>&lt;cell>2009-08-30&lt;/cell>&lt;cell>105.28&lt;/cell>&lt;cell>105.49&lt;/cell>&lt;cell>102.01&lt;/cell>&lt;cell>102.01&lt;/cell>&lt;/set>
+            &lt;set>&lt;cell>2009-08-31&lt;/cell>&lt;cell>102.30&lt;/cell>&lt;cell>103.71&lt;/cell>&lt;cell>102.16&lt;/cell>&lt;cell>102.37&lt;/cell>&lt;/set>
+            &lt;set name="date" col="+0"/>
+            &lt;set name="open" col="+1"/>
+            &lt;set name="high" col="+2"/>
+            &lt;set name="low" col="+3"/>
+            &lt;set name="close" col="+4"/>
+        &lt;/set>
+        <font color="blue">&lt;chart pos="F2" name="Results Chart" x="10" <font color="red">type="<b>stock</b>"</font> width="1.2">
+            &lt;data categories="date" values="open" name="Open"/>
+            &lt;data categories="date" values="high" name="High"/>
+            &lt;data categories="date" values="low" name="Low"/>
+            &lt;data categories="date" values="close" name="Close"/>
+            &lt;title name="Open-High-Low-Close"/>
+            &lt;x_axis name="Date"/>
+            &lt;y_axis name="Share price"/>
+        &lt;/chart></font>
+    &lt;/worksheet>
+&lt;/workbook>
+</pre>
+</td>
+</tr>
+<tr>
+<td>
+<img src="images/screenL9.png" width="973" height="375">
+</td>
+</tr>
+</table>
+<p>
+The Spreadsheet::XML_to_XLS module is not an example of programming art. I wrote it to solve certain tasks in my current project. And I hope, the module will be useful for you also. It would be great if you let me know what additional functionality do you need in your project, send me an example of XML file, which the module fails to treat, report discovered defects.
+<p>
+Regards,<p>
+<a href="http://ru.linkedin.com/pub/radik-usmanov/1/56/464">Radik Usmanov</a><p>
+<a href="radik.usmanov@ubs.com">radik.usmanov@ubs.com</a>,<br>
+<a href="rusmanov@luxoft.com">rusmanov@luxoft.com</a>.
+</body>
+</html>
+

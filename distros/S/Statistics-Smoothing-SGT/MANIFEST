@@ -1,0 +1,13 @@
+CHANGES
+Docs/README.pod
+FDL
+GPL
+INSTALL
+MANIFEST
+Makefile.PL
+README
+lib/Statistics/Smoothing/SGT.pm
+test.pl
+META.yml                                 Module meta-data (added by MakeMaker)
+
+

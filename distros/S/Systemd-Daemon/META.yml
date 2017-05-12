@@ -1,0 +1,62 @@
+---
+abstract: 'Write systemd-aware daemons in Perl'
+author:
+  - 'Van de Bugger <van.de.bugger@gmail.com>'
+build_requires:
+  Devel::Symdump: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  File::Which: '0'
+  FindBin: '0'
+  Getopt::Long: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  IPC::Run3: '0'
+  IPC::System::Simple: '0'
+  Path::Tiny: '0'
+  Symbol: '0'
+  Test::Builder::Module: '0'
+  Test::DiagINC: '0.002'
+  Test::More: '0'
+  autodie: '0'
+  blib: '1.01'
+  if: '0'
+  lib: '0'
+  perl: '5.006'
+configure_requires:
+  Devel::CheckLib: '0.9'
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.041, CPAN::Meta::Converter version 2.150005'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Systemd-Daemon
+provides:
+  Systemd::Daemon:
+    file: lib/Systemd/Daemon.pm
+    version: '0.07'
+  Systemd::Daemon::Stub:
+    file: lib/Systemd/Daemon/Stub.pm
+    version: '0.07'
+  Systemd::Daemon::XS:
+    file: lib/Systemd/Daemon/XS.pm
+    version: '0.07'
+requires:
+  Carp: '0'
+  Exporter::Tiny: '0'
+  POSIX: '0'
+  Readonly: '0'
+  Try::Tiny: '0'
+  parent: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Systemd-Daemon
+  homepage: https://metacpan.org/release/Systemd-Daemon
+  license: http://www.gnu.org/licenses/gpl-3.0.txt
+  repository: https://vandebugger.fedorapeople.org/hg/perl-Systemd-Daemon
+version: '0.07'

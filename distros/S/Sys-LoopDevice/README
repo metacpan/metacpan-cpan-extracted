@@ -1,0 +1,18 @@
+SYNOPSIS
+
+     use Sys::LoopDevice qw(
+         list_attached_loop_devices
+         list_detached_loop_devices
+         attach_loop_devices
+         detach_loop_devices
+     );
+
+DESCRIPTION
+
+    STATUS: Early release, API might still change significantly and only
+    Linux support has been implemented.
+
+    TODO: Support other OS'es
+
+    TODO: Support ro option when attaching
+

@@ -1,0 +1,27 @@
+--- #YAML:1.0
+name:         SVN-S4
+version:      1.064
+version_from: lib/SVN/S4.pm
+abstract:     Wrapper for Subversion
+license:      perl
+installdirs:  site
+author:
+    - Bryce Denney
+    - Wilson Snyder <wsnyder@wsnyder.org>
+resources:
+    homepage: http://www.veripool.org/svn-s4
+    bugtracker: http://www.veripool.org/svn-s4-bugs
+requires:
+    SVN::Client:                    0
+    Config::Tiny:                   0
+    Digest::MD5:                    0
+    DBD::SQLite:                    0
+    IO::AIO:                        0
+    MIME::Base64:                   0
+    Test::More:                     0
+
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.4.html
+    version: 1.4
+distribution_type: module
+generated_by: hand

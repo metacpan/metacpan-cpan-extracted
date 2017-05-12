@@ -1,0 +1,50 @@
+
+body {
+	margin: 0em;
+	padding: 0em;
+    text-align: center;
+	font-family: "Courier New", Courier, monospace;
+}
+
+#page {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#header {
+    height: 4em;
+    width: 54em;
+    text-align: left;
+    margin-bottom: 10px;
+}
+
+#container {
+    float: left;
+    height: 26em;
+    width: 54em;
+    text-align: left;
+    margin-bottom: 10px;
+}
+
+#menu {
+    float: left;
+    height: 26em;
+    width: 11em;
+    margin-bottom: 10px;
+}
+
+#content {
+    float: left;
+    height: 26em;
+    width: 41em;
+    margin-bottom: 10px;
+}
+
+#footer {
+    clear: both;
+    height: 1em;
+    width: 54em;
+    text-align: left;
+    margin-bottom: 10px;
+}
+

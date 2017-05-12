@@ -1,0 +1,29 @@
+---
+abstract: 'An advanced SQL generator.'
+author:
+  - 'Aran Deltac <bluefeet@gmail.com>'
+build_requires:
+  Test::More: 0.98
+  Try::Tiny: 0.11
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300000, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: SQL-Abstract-Query
+requires:
+  Clone: 0.31
+  List::MoreUtils: 0.33
+  List::Util: 1.23
+  Moose: 2.0204
+  MooseX::ClassAttribute: 0.26
+  SQL::Abstract: 1.72
+  SQL::Dialect: 0.02
+  namespace::autoclean: 0.13
+resources:
+  bugtracker: https://github.com/bluefeet/SQL-Abstract-Query/issues
+  repository: git://github.com/bluefeet/SQL-Abstract-Query.git
+version: 0.03

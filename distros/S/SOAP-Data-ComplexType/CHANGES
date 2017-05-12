@@ -1,0 +1,82 @@
+0.044	13 November 2006
+	Corrected get and set method return values in array context for some error cases (where class type is unknown): now returns empty list when no values exist, instead of undef.
+	
+	Added new methods to SOAP::Data::ComplexType: as_soap_data_instance, as_xml_data_instance.
+
+	Corrected minor content bug in POD.
+	
+0.041	19 May 2006
+	Made autoload accessor, get, and set methods SOAP Array type aware, such that they now correctly return appropriate values depending on the caller context: list or scalar.
+	
+	Improved reliability of SOAP::Data::ComplexType::Builder::Element argument parsing.
+	
+	Rewrote SOAP::Data::ComplexType::Builder::Element method add_elem to correct type checking and fix buggy new object construction case.
+	
+	Changed autoload accessor method to return actual object values (i.e. SOAP::Data:ComplexType::Builder::Element objects or scalar data), instead of raw data.
+	(Change actually occured in 0.04.)
+	*NOTE* this breaks backward compatibility with scripts that depended on a raw data structure return result from autoload accessor methods.
+	Also, do not depend on the type or structure of returned objects at this time, as this will be changing soon as internal package structure is optimized (next major release).
+
+0.04	13 May 2006
+	Added get() and set() accessor methods.  Autoload accessor methods changed to implement these methods.  get() will now return a list of values if the caller
+	expects array form.
+	
+	When changing the value of an element, the return value is now the previous value
+	that was stored before the change.  Also, SOAP::Data::ComplexType::Builder element is now supported as a valid value to set (multiple values may be specified within an arrayref).
+	
+	Deprecated and removed set_elem() method.
+	
+	Changed purpose of get_elem to return the actual object representation of that element, instead of the value.
+	
+	Added a comprehensive test suite.
+	
+	Fixed memory leak regarding circular references of parent objects in child objects.
+	
+	Added recursion detection and prevention in data structure passed to new() constructor.
+	
+	Added complete support for complex Array classes (that extend the SOAP Array class).
+	
+	Many internal architectural changes, including streamlining SOAP::Data::ComplexType::Builder and adding many support methods to SOAP::Data::ComplexType::Builder::Element.
+	
+	Corrected a minor object type checking bug in SOAP::Data::ComplexType::Builder method get_as_data.
+
+0.031	27 February 2006
+	SOAP::Data::ComplexType::AUTLOAD now warns with stack traces instead of dieing on them.
+	Intention is to have run-time stability preferred without requiring exception traps everywhere in implementing applications (for now).
+	
+	Added eva{...} enclosure to SOAP::Data::ComplexType::as_raw_data(...) and SOAP::Data::ComplexType::Builder::serialize(...).
+	
+	Added object type checking in SOAP::Data::ComplexType::Builder get_as_raw(...), get_as_data(...), and add_elem(...).
+	
+	Overloaded SOAP::Data::ComplexType::Builder parent class find_elem(...) to handle better type checking.
+
+0.03	25 January 2006
+	Fixed minor error case handling syntax bug in set_elem().
+	
+	Fixed bug where if value were 0, SOAP::Data::ComplexType::Builder::get_as_data() would interpret this as undef.
+	
+	Added strict and warnings pragmas to all packages.
+	
+	Rewrote internals to support nested objects for constructor input.
+	
+	Support added for complexTypes with fields that can have more than once occurance (i.e. array-like types).
+	
+	Added documentation for new object methods.
+	
+	Misc documentation updates.
+
+0.02	27 December 2005
+	Added support for raw perl data dump of data structures: as_raw_data().
+	
+	Added get_elem() and set_elem() for access to nested elements and to elements who share names of object methods.
+	
+	Modified autoloader to return a raw perl data dump of node (instead of simple scalar dump.
+	
+	Added support of SOAP data or XML serialization of any arbitrary node (includes children) within the ComplexType object.
+	
+	Corrected bug in element attribute parsing.
+	
+	Minor bug fix in SOAP::Data::ComplexType::Builder::Element method value().
+
+0.01	26 October 2005
+	First public version of ComplexType.pm.

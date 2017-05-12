@@ -1,0 +1,116 @@
+#!/usr/bin/env shebangml
+
+html{head{title{shebangml}}body{
+  h4{<p>this is a p</p>}
+  p{Well, that was a lie.  This is a p.}
+  div{and a div}
+  h4{Elements}
+  p{
+    Elements are word characters with boxes ('[...]') and/or blocks
+    ('{...}') attached to them.  Instead of "<p>stuff</p>", it is just
+    "p\{stuff\}".  This makes shebangml harder to parse, but easier to
+    write.  To make an element, you must have a box (e.g.
+    'img\[href="..."]') or a block (e.g. 'p\{...\}'.)
+  }
+  h4{Escapes}
+  p{
+    You can just type '&' or '<' wherever you want.  To escape brace or
+    bracket characters, simply precede them with a backslash.  A literal
+    backslash requires two backslashes.  How many common xml tags use no
+    attributes and have no content?  All I can think of is <br>, so
+    instead of \\br\[], you may use '\\n;' for linebreaks.  The
+    backslash also provides numbered characters:  for example where you
+    would write &#955; (decimal) or &#x03BB; (hex), you instead write
+    \\#955; or \\#x03BB; to get a '\#x03BB;' character, the backslash
+    serves as the &.
+  }
+  h4{tables}
+  table[border=1]{
+    thead{th{column 1}th{column2}}
+    tr{
+      td{thing} td{other thing}
+    }
+    tr{
+      td{a}td{b}
+    }
+  }
+  ul{
+    li{bing}
+    li{bang}
+    ul{li{boom}li{boppity}li{boo}}
+  }
+  h4{Balanced Braces and Brackets}
+  p{
+    Braces and brackets may be bare as long as they are balanced to each other.
+    ul{
+      li{Must be escaped:}
+      ul{
+        li{An opening '\[', if preceded by word.}
+        li{An opening '\{', if preceded by word.}
+        li{A closing '\}', if unbalanced.}
+      }
+      li{Must not be escaped:}
+      ul{
+        li{A closing '\}', if needed for balance.}
+      }
+    }
+    That is, an opening '{' is allowed to be bare as long as it is
+    balanced by a bare '}'.  If in doubt, feel free to escape them all.
+    In practice, you'll probably only need this feature them in the case
+    of:
+    pre{
+      style\{
+        P {font: 16px}
+      \}
+    }
+  }
+  h4{Comments}
+  p{
+    Comments start with a '#' character at the beginning of a line and go
+    through the end of the line.  Leading whitespace is optional.
+    pre{
+      \# just like this
+    }
+    Multi-line comments attach a block to the '#' character and go
+    through the end of the closing line.
+    pre{
+      \#{ Start of comment
+        and still commenting.
+        blah blah blah
+      \#} end of comment - right until now.
+    }
+  }
+  h4{Closing Assertions}
+  p{
+    You may optionally close a block with '\}#tagname;', which is
+    exactly like the xml closing '</tag>', except you will probably only
+    use it as an assertion on long blocks like 'html' or 'body'.
+  }
+  h4{The Gotcha}
+  p{
+    Of course there had to be one, right.  The tag name (e.g. 'html',
+    'head', 'body', 'div', &c) em{must} be immediately connected to the
+    box/block for it to be identified.  This means:
+    pre{
+      code{img\[href="..."]} strong{not} code{img [href="..."]}
+      code{p\{...\}} strong{not} code{p {...}}.
+    }
+  }
+  h4{Next}
+  p{
+    Something to do with templating...
+  }
+########################################################################
+# comments like this would rock.  Maybe even
+#{
+  Multiline comments?
+  These could really contain anything so long as the end token is
+  sufficiently rigorous.  Do they get passed-through into the output or
+  discarded (I guess that's an option)?
+#} # this is still a comment line and nothing else matters
+  p{see the comments in this file for the bit about the comments}
+# I'm putting this here for vim's balance, not the parser's {
+#} this is also a comment line simply because it is a comment line.
+  # indented comments are fine too.
+}#body;}#html;
+

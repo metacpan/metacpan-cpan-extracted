@@ -1,0 +1,9 @@
+LICENSE
+ChangeLog
+Makefile.PL
+README
+MANIFEST
+lib/Software/Packager/Svr4.pm
+lib/Software/Packager/Object/Svr4.pm
+t/01_initialise.t
+t/02_solaris.t

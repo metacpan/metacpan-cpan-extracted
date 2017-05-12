@@ -1,0 +1,35 @@
+---
+abstract: 'show the debug screen if crashed'
+author:
+  - 'MATSUNO Tokuhiro <tokuhirom@gmail.com>'
+  - 'Koichi Taniguchi <taniguchi@livedoor.jp>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Sledge-Plugin-DebugScreen
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Sledge::Exception::StackTrace:
+    file: lib/Sledge/Plugin/DebugScreen.pm
+    version: 0
+  Sledge::Plugin::DebugScreen:
+    file: lib/Sledge/Plugin/DebugScreen.pm
+    version: 0.08
+requires:
+  Devel::StackTrace: 1.12
+  IO::File: 1.1
+  Template: 2.14
+  perl: 5.008001
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.08

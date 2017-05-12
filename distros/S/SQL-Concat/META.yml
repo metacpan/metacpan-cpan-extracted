@@ -1,0 +1,33 @@
+---
+abstract: 'SQL concatenator, only cares about bind-vars, to write SQL generator'
+author:
+  - 'KOBAYASHI, Hiroaki <hkoba@cpan.org>'
+build_requires:
+  Module::Build::Pluggable::CPANfile: '0.05'
+  Test::Kantan: '0.4'
+  rlib: '0'
+configure_requires:
+  Module::Build: '0'
+  Module::Build::Pluggable: '0'
+  Module::Build::Pluggable::CPANfile: '0.05'
+  Module::CPANfile: '0'
+  rlib: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SQL-Concat
+provides:
+  SQL::Concat:
+    file: lib/SQL/Concat.pm
+    version: '0.001'
+requires:
+  MOP4Import::Declare: '0.003'
+  perl: '5.010'
+  rlib: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/hkoba/perl-SQL-Concat
+version: '0.001'

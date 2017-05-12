@@ -1,0 +1,70 @@
+---
+version: 0.18
+date:    Wed Aug 10 18:08:34 CEST 2011
+changes:
+- Make M:I:SD version match SD version.
+---
+version: 0.17
+date:    Fri Jun 10 22:02:33 EST 2011
+changes:
+- Only act on ^##\s.* instead of ^##.*
+---
+version: 0.16
+date:    Wed Jun  1 20:13:25 EST 2011
+changes:
+- Rerelease with Module::Package 0.19
+---
+version: 0.15
+date:    Mon May 30 00:08:33 EST 2011
+changes:
+- Rerelease with Module::Package 0.16
+---
+version: 0.14
+date:    Sat May 28 16:27:08 EST 2011
+changes:
+- Rerelease with Module::Package 0.14
+---
+version: 0.13
+date:    Sat May 28 03:08:07 EST 2011
+changes:
+- Upgrade Module::Package with deps_list
+- Add $VERSION to Module::Install::Stardoc
+---
+version: 0.12
+date:    Wed May 18 18:14:14 EST 2011
+changes:
+- Allow pod in comments
+- Switch to Module::Package
+---
+version: 0.11
+date:    Wed May 18 00:57:38 EST 2011
+changes:
+- VERSION confusion. Need to be above 0.10.
+---
+version: 0.05
+date:    Tue May 17 22:25:22 EST 2011
+changes:
+- use inc::Package
+- support stardoc_clean_pod
+---
+version: 0.04
+date:    Mon May 16 23:53:45 EST 2011
+changes:
+- Add SEE ALSO support
+- Use Package for module install
+---
+version: 0.03
+date:    Sun May 15 23:46:56 EST 2011
+changes:
+- Don't ship with Test::Differences in tests.
+---
+version: 0.02
+date:    Sun May 15 16:36:41 EST 2011
+changes:
+- Remove XXX
+- Add Makefile.PL dependencies.
+---
+version: 0.01
+date:    Sun May 15 16:15:38 EST 2011
+changes:
+- First Release

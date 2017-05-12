@@ -1,0 +1,9 @@
+Canonical.pm
+Makefile.PL
+t/main.t
+t/list
+testit
+MANIFEST
+README
+LICENSE
+Changes

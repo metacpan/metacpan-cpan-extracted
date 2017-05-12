@@ -1,0 +1,29 @@
+---
+abstract: 'trim whitespace from your strings'
+author:
+  - 'Mike Doherty <doherty@cpan.org>'
+  - 'Jeff Pinyan <pinyan@cpan.org>'
+  - 'Rob Kinyon <rkinyon@cpan.org>'
+  - 'Αριστοτέλης Παγκαλτζής (Aristotle Pagaltzis) <aristotle@cpan.org>'
+build_requires:
+  Data::Dumper: 0
+  File::Find: 0
+  File::Temp: 0
+  Test::Builder: 0.94
+  Test::More: 0.94
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: String-Trim
+requires:
+  Exporter: 5.57
+  perl: 5.006
+resources:
+  bugtracker: https://github.com/doherty/String-Trim/issues
+  repository: git://github.com/doherty/String-Trim.git
+version: 0.005

@@ -1,0 +1,23 @@
+Short_t			T_IV
+const Short_t		T_IV
+UShort_t		T_UV
+const UShort_t		T_UV
+Int_t			T_IV
+const Int_t		T_IV
+UInt_t			T_UV
+const UInt_t		T_UV
+Double_t		T_NV
+const Double_t		T_NV
+Float_t			T_NV
+const Float_t		T_NV
+Long64_t		T_IV
+const Long64_t		T_IV
+ULong64_t		T_UV
+const ULong64_t		T_UV
+Bool_t			T_IV
+const Bool_t		T_IV
+
+INPUT
+
+OUTPUT
+

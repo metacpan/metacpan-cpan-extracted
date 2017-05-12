@@ -1,0 +1,70 @@
+{
+   "abstract" : "interface to Linux's C<PF_NETLINK> socket family",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Socket-Netlink",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0",
+            "ExtUtils::H2PM" : "0.07",
+            "Module::Build" : "0",
+            "Module::Build::Compat" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::CChecker" : "0.02",
+            "Module::Build" : "0",
+            "Module::Build::Compat" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "5.57"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::HexString" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "IO::Socket::Netlink" : {
+         "file" : "lib/IO/Socket/Netlink.pm",
+         "version" : "0.05"
+      },
+      "IO::Socket::Netlink::Generic" : {
+         "file" : "lib/IO/Socket/Netlink/Generic.pm",
+         "version" : "0.05"
+      },
+      "Socket::Netlink" : {
+         "file" : "lib/Socket/Netlink.pm",
+         "version" : "0.05"
+      },
+      "Socket::Netlink::Generic" : {
+         "file" : "lib/Socket/Netlink/Generic.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

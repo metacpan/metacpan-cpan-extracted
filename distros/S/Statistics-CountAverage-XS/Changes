@@ -1,0 +1,6 @@
+Revision history for Perl extension Statistics::CountAverage::XS.
+
+0.01  Thu May 26 12:04:01 2011
+	- original version; created by h2xs 1.23 with options
+		-A --use-new-tests -n Statistics::CountAverage::XS
+

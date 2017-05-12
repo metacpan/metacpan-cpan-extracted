@@ -1,0 +1,21 @@
+Revision history for Perl extension SDLx-Betweener.
+
+0.0105  2015-05-30
+    - Fix the resources in the previous version.
+
+0.0104  2015-05-30
+    - Add "resources" to the META.yml.
+
+0.0103  2014-04-10
+    - CPANTS : remove more MYMETA.yml and MYMETA.json files.
+
+0.0102  2014-01-31
+    - CPANTS: LICENSE file, LICENSE field, and MIN_PERL_VERSION .
+    - Add t/cpan-changes.t .
+
+0.0101  2012-12-03
+    - add the typemap to the distribution (it was missing, but required).
+
+0.0100  2012-02-07
+	- original version
+

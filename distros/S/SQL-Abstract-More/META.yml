@@ -1,0 +1,39 @@
+---
+abstract: 'extension of SQL::Abstract with more constructs and more flexible API'
+author:
+  - 'Laurent Dami, C<< <laurent dot dami at cpan dot org> >>'
+  - 'Laurent Dami <dami@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  List::MoreUtils: 0
+  SQL::Abstract::Test: 0
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+  Module::Install: 0
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.08'
+license: artistic2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: SQL-Abstract-More
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  MRO::Compat: 0
+  Params::Validate: 0
+  SQL::Abstract: 1.73
+  namespace::clean: 0
+  parent: 0
+  perl: 5.8.0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=SQL-Abstract-More
+  homepage: https://metacpan.org/author/DAMI
+  license: http://www.perlfoundation.org/artistic_license_2_0
+  repository: git://github.com/damil/SQL-Abstract-More.git
+version: '1.28'

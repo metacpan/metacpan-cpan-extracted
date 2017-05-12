@@ -1,0 +1,43 @@
+#!/usr/bin/perl
+
+# Copyright (C) 2008 Eric L. Wilhelm
+
+use warnings;
+use strict;
+
+=head1 NAME
+
+html2hbml - 
+
+=cut
+
+package bin::html2hbml;
+
+use Shebangml::FromHTML;
+
+sub main {
+  my (@args) = @_;
+  my $fh;
+  unless(-t STDIN) {
+    $fh = \*STDIN;
+  }
+  else {
+    my $file = shift(@args) or die 'must have file';
+    open($fh, '<', $file) or die "$!";
+    binmode($fh, ':utf8');
+  }
+
+  my $parser = Shebangml::FromHTML->new;
+  $parser->parse($fh);
+  binmode(STDOUT, ':utf8');
+  print $parser->output;
+}
+
+package main;
+
+if($0 eq __FILE__) {
+  bin::html2hbml::main(@ARGV);
+}
+
+# vi:ts=2:sw=2:et:sta
+my $package = 'bin::html2hbml';

@@ -1,0 +1,19 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/Sys/Utmp.pm
+lib/Sys/Utmp/Utent.pm
+Utmp.xs
+examples/pwho
+META.yml                                 Module meta-data (added by MakeMaker)
+t/01pod.t
+t/02podcoverage.t
+t/03utmp.t
+t/04constants.t
+t/05fields.t
+t/06taint.t
+t/07utent_methods.t
+t/08utent_types.t
+META.json                                Module JSON meta-data (added by MakeMaker)

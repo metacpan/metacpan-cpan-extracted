@@ -1,0 +1,85 @@
+Squid-Guard version 0.15
+============================
+
+Squid::Guard is a module for creating a simple yet flexible
+redirector for the Squid web cache engine.
+It was inspired by squidGuard, a popular squid redirector written
+in C, but aims to be more flexible and in some ways simpler
+to use.
+I was happy with squidGuard and used it for years. But I needed
+certain extra features like the ability to differentiate
+between users based on some external program output, group
+belongings etc.
+squidGuard did not support this, so Squid::Guard was born.
+
+The module has built-in support for some common tasks performed in
+Squid redirectors, including:
+- lookup of domain or url in .db files created from text files,
+like squidGuard does. Expression files are also supported.
+Contrary to squidGuard, here the regexps are Perl regexps ;)
+- lookup of user in UNIX or winbind (SaMBa, Windows) groups
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+USAGE
+
+See the examples for inspiration.
+
+The fundamental part is defining a callback function, which has to
+be registered to the module via the checkf method.
+This function will be called for every request that is performed to
+the redirector. Here you decide what to do with it.
+
+If you're looking for a redirector, them it's likely that you want
+to use some list of sites or urls to deny or accept your client'
+requests. This is accomplished in a way similar to squidGuard.
+
+First collect the domains, urls and/or expressions plaintext files.
+You can use your own, or download some publicly available list like
+http://www.shallalist.de/ (thank you Shalla).
+Organize your files in categories which correspond to some
+directory on your disk. For example, say you want two categories,
+named whitelist and blacklist. Each category contains some domains
+or urls which you want to always accept/deny respectively.
+you can create the directories /var/lib/guard/whitelist and
+/var/lib/guard/blacklist , put your domains, urls and/or
+expressions files there.
+Then you have to register your two categories in your module via
+the addcateg method. This will create or update the .db files if
+needed (like in squidGuard, .db are created only for domains and
+urls files).
+Now in your callback function you can use the checkincateg method
+to check if a request comes in a certain category, and decide what
+to do with it.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  DB_File
+
+TODO
+
+. Mysql or LDAP queries for determining user gruop belongings
+. Add -d and -h in the luxguard example script
+. prepend debug messages with "FATAL: " "ERROR: " "WARNING: "
+. support threads with concurrency protocol
+. update documentation to correct usage of the term "redirect"
+("redirector"/"redirection" -> "helper program").
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 by Luigi Iotti
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

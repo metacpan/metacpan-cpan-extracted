@@ -1,0 +1,72 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Schema::RackTables - Inventory of the database schemas of RackTables
+
+
+=head1 DESCRIPTION
+
+This module is an inventory of the database schemas of the web
+application RackTables. Following Schema::Bugzilla's principles,
+it provides access to the database schema of each known version
+of the software.
+
+
+=head1 INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Alternatively, to install with Module::Build, you can use
+the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+=head1 SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module
+with the perldoc command.
+
+    perldoc Schema::RackTables
+
+You can also look for information at:
+
+=over
+
+=item * Meta CPAN -
+L<https://metacpan.org/pod/Schema::RackTables>
+
+=item * Search CPAN -
+L<http://search.cpan.org/dist/Schema-RackTables>
+
+=item * AnnoCPAN, Annotated CPAN documentation -
+L<http://annocpan.org/dist/Schema-RackTables>
+
+=item * RT, CPAN's request tracker -
+L<http://rt.cpan.org/Public/Dist/Display.html?Dist=Schema-RackTables>
+
+=item * CPAN Ratings -
+L<http://cpanratings.perl.org/d/Schema-RackTables>
+
+=back
+
+The source code is available on Git Hub:
+L<https://github.com/maddingue/Schema-RackTables/>
+
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (C) 2016 Sébastien Aperghis-Tramoni
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

@@ -1,0 +1,25 @@
+---
+doctype: dist
+
+header:
+  name: String-Stomp
+
+prereqs:
+  runtime:
+    requires:
+      - perl: 5.010001
+  test:
+    requires:
+      - syntax
+      - Syntax::Feature::Qs: 0.2004
+  develop:
+    requires:
+       - perl: 5.014000
+
+plugins:
+ - +config: Author::CSSON
+---
+doctype: weaver
+
+plugins:
+  - +config: Author::CSSON

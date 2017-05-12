@@ -1,0 +1,13 @@
+nodedef> name, label, field1, field2
+n1,A,a,b
+n2,B,c,d
+n3,C,e,f
+n4,D,g,h
+edgedef> node1, node2, directed, weight
+n1,n2,true,1
+n1,n3,true,1
+n3,n2,true,1
+n3,n4,true,1
+n4,n2,true,1
+n4,n3,true,1
+

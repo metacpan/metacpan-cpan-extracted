@@ -1,0 +1,15 @@
+description: set up domain
+registrar: 1
+
+request: |-
+ <NZSRSRequest VerMajor="4" VerMinor="4" RegistrarId="100">
+  <HandleCreate Email="someone@example.com" HandleId="c_id1" Name="A Person" ActionId="[% actionid %]">
+            <PostalAddress Address1="1 Acacia Ave" Address2="Treewood" City="Wellington" CountryCode="NZ" PostalCode="6021" Province="Wellington"/>
+            <Phone AreaCode="4" CountryCode="4" LocalNumber="0000000"/>
+            <AuditText><![CDATA[Handles test!
+      User Id: evan]]></AuditText>
+    </HandleCreate> 
+ </NZSRSRequest>
+
+assertions:
+ - xpath_matches: [ '//Error', '0', 'No errors' ]

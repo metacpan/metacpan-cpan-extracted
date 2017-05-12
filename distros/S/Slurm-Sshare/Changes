@@ -1,0 +1,31 @@
+Revision history for Slurm-Sshare
+
+1.2.2	2016-Mar-08
+	Really fix bug 112721
+1.2.1	2016-Mar-07
+	sbalance output now deterministic even with hash order randomization
+	(accounts listed alphabetically).  This is mainly to fix regression
+	test failures on newer perls.
+	Also fixed bug 112721 (test of sbalance relying on perl in shebang of
+	script, not perl used for build).  Thanks to SREZIC for catching.
+1.2.0	2016-Feb-24
+	Add compatibility for Slurm 15.08.2 (Trackable Resources)
+	Still somewhat basic, and sshare cmd does not expose usage_tres_raw
+	yet.  That is what sbalance really needs to look at!
+	Add ability to specify sshare capabilities/version when setting sshare path.
+	Add partition, grptresmins, and tresrunmins data fields
+	Add nopartinfo argument to sshare_list, sshare_list will now request partition
+		information by default if sshare supports it.
+	Add slurm_usage* methods, etc.
+	Deprecated usage_for_account_in_cluster method
+	Fixed documentation for sbalance command, and changed "Available"
+	to "Unused" (want to reserve "Available" for "Unused" less CPURunMins)
+
+1.1.0	2016-Feb-09
+	Added sbalance utility.
+	Also have Makefile.PL complain if not on Unix-like OS
+
+1.0.0   2016-Jan-20
+        packaged for CPAN
+	Package existed since July 2014, finally cleaning up enough for release
+

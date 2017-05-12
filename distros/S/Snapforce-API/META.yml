@@ -1,0 +1,24 @@
+---
+abstract: 'Perl module for simple use of the Snapforce API.'
+author:
+  - 'Gabriel Benamy <gabriel_benamy@snapforce.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.12, CPAN::Meta::Converter version 2.143240'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Snapforce-API
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  HTTP::Request::Common: '6.11'
+  LWP::UserAgent: '6.15'
+  XML::Parser: '2.44'
+version: '0.02'

@@ -1,0 +1,224 @@
+#!/usr/bin/perl -w
+use strict;
+use lib qw{.} ;
+use SVN::Core '0.32';
+use SVN::Push;
+use Getopt::Long ;
+
+
+=head1 NAME
+
+svnpush - command line interface for remote Subversion repository push
+
+=head1 SYNOPSIS
+
+    % svnpush init http://hosta/path http://hostb/path
+
+    # run the actual mirroring
+    % svnpush push http://hosta/path http://hostb/path
+
+=head1 DESCRIPTION
+
+F<svnpush> push a repository to another repository or parts of a
+repository to another repository
+
+=head1 COMMANDS
+
+=over
+
+=item init B<srcurl> B<desturl> 
+
+Initialize the B<desturl> repository to be pushed from B<srcurl>. 
+
+=item check B<srcurl> B<desturl> 
+
+Check if B<desturl> repository was pushed from B<srcurl> and if it is
+up to date. 
+
+=item push [options] B<srcurl> B<desturl> 
+
+Invoke the push of B<srcurl> to B<desturl>
+
+Possible options:
+
+=over
+
+=item -c --create
+
+Initialzie B<desturl> for pushing if not already done
+
+=item -m --message=<text>
+
+Use <text> for B<every> commit that is done during push
+
+=item -r --revision=<from>:<to>
+
+Push only changes between (including) the two given revision.
+Revision can also be C<HEAD> which means the newest revision in
+the repository.
+
+=back
+
+Example:
+
+  svnpush push --create -r HEAD -m 'New Release' https://svn.example.com/repos https://svn2.example.com/release
+
+This will push the HEAD revision of the first URL to the second URL. The
+direcory of the second URL will be created if it isn't there. If, since the
+last push, multiple revision had been commited to the source, they will be
+commited as one revision to the destination. If you leave out the -r option
+every revision in the source will be commited as one revision to the
+destination.
+
+=item walk [options] B<srcurl> B<desturl> B<regex> B<repos1> .. B<reposN> 
+
+Invoke the push of for all reositories underneath B<srcurl> to B<desturl> 
+given with as B<repos1> .. B<reposN>. Only directories matching B<regex>
+are replicated.
+
+Possible options:
+
+=over
+
+=item -c --create
+
+Initialzie B<desturl> for pushing if not already done
+
+=item -m --message=<text>
+
+Use <text> for B<every> commit that is done during push
+
+=back
+
+
+=back
+
+=cut
+
+# --------------------------------------------------------------------------
+
+sub do_help {
+    require Pod::Text;
+    my $parser = Pod::Text->new (sentence => 0, width => 78);
+    $parser->parse_from_file ($0, '-' );
+}
+
+# --------------------------------------------------------------------------
+
+sub do_init {
+    die "$0 init <source> <target>" unless $#_ == 1;
+    my ($source, $target) = @_;
+    my $m = SVN::Push->new( target  => $target,
+                       		source  => $source);
+    $m -> create_target ;
+}
+
+# --------------------------------------------------------------------------
+
+sub opt_walk { return ('create|c', 'message|m:s') }
+
+sub do_walk 
+    {
+    die "$0 walk [--create] [--message=<text>] <source> <target> <pattern> [<repos1> .. <reposN>]\n" unless $#_ >= 2;
+    my ($options, $source, $target, $pattern, $logmsg) = @_;
+    my $m = SVN::Push::walk($source, $target, $pattern, [@_[3..$#_]],
+                             $options -> {create}, $options -> {message}) ;
+    }
+
+# --------------------------------------------------------------------------
+
+sub opt_push { return ('create|c', 'message|m:s', 'revision|r:s') }
+
+
+sub do_push 
+    {
+    die "$0 push [--create] [--message=<text>] [--revision=<from>:<to>] <source> <target>\n" unless $#_ >= 2;
+    my ($options, $source, $target) = @_;
+
+    my %revs ;
+    if ($options -> {revision})
+	{
+        my ($start, $end) = split (/:/, $options -> {revision}, 2) ;	
+	%revs = (startrev => $start, endrev => $end) ;
+	}
+
+    my $m = SVN::Push->new( target  => $target,
+                       	    source  => $source,
+			    %revs,
+                       	    logmsg  => $options -> {message});
+
+    if ($m->init ($options -> {create}) > 0)
+    	{
+    	$m->run;
+    	}
+    }
+
+# --------------------------------------------------------------------------
+
+sub do_check 
+    {
+    die "$0 check <source> <target>\n" unless $#_ >= 2;
+    my ($options, $source, $target) = @_ ;
+    my $m = SVN::Push->new(target => $target,
+                           source => $source);
+
+    $m->init;
+    }
+
+# --------------------------------------------------------------------------
+
+sub mergeback {
+    my ($path, $branch_path, $repospath, $rev) = @_;
+    my $pool = SVN::Pool->new_default;
+	
+    my $m = SVN::Push->new(target_path => $path, target => $repospath,
+			     pool => $pool, 
+			     get_source => 1);
+    $m->init;
+    $m->mergeback ($rev-1, $branch_path, $rev);
+}
+
+# --------------------------------------------------------------------------
+
+my $cmd = shift || 'help';
+
+my $cmdsub = "do_$cmd" ;
+my $cmdopt = "opt_$cmd" ;
+
+die "Command not recognized. Try $0 help\n" unless main->can($cmdsub);
+
+no strict 'refs';
+
+my %options ;
+if (main -> can ($cmdopt))
+    {
+    eval { Getopt::Long::Configure ('bundling') } ;
+    $@ = "" ;
+    my $ret = GetOptions (\%options, &$cmdopt()) ;
+    }
+
+
+&$cmdsub(\%options, @ARGV);
+
+
+=head1 AUTHORS
+
+Gerald Richter E<lt>richter@dev.ecos.deE<gt>
+
+=head1 CREDITS
+
+A lot of ideas and code is taken from SVN::Mirror by
+Chia-liang Kao E<lt>clkao@clkao.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2004 by Gerald Richter E<lt>richter@dev.ecos.deE<gt>
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+See L<http://www.perl.com/perl/misc/Artistic.html>
+
+=cut
+
+1;

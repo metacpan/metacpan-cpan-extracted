@@ -1,0 +1,42 @@
+Revision history for Perl extension Sys::MemInfo.
+
+0.01  Thu Oct 24 01:10:47 2005
+    - original version
+
+0.02  Fri Dec 02 03:08:00 2005
+    - added HPUX11 support
+
+0.03  Tue Dec 06 02:36:00 2005
+    - added WinXP and Windows Server 2003 support
+    - added real test, thanks H. Merijn Brand
+
+0.04  Wed Dec 21 02:08:00 2005
+    - added Tru64 support
+
+0.05  Wed Aug 16 23:14:32 2006
+    - fixed wrong memory report (long overflow on linux)
+      thanks Laurent Dufour <dufour_l _at_ hotmail.com>
+
+0.90  Sun Sep 17 10:24:59 2006
+    - added win 9x/ME/NT support
+    - use GlobalMemoryStatusEx with WinXP, no longuer
+      depend on psapi.dll
+    - added total and free swap informations (totalswap
+      and freeswap directives)
+    - added availkeys and get functions,
+      thanks Wilson Snyder <wsnyder _at_ wsynder.org>
+    - debug *bsd support
+    - added Irix support
+
+0.91  Thu Nov 09 23:49:00 2006
+    - added Mac OS X Darwin support
+    - debug freebsd support
+    - patch test script, thanks Wilson Snyder
+
+0.98  Wed Sep 14 22:55:00 2014
+    - added cygwin support (RT #85152), thanks <kqfhjjgrn _at_ yahoo.es>
+    - RT #80636
+    - fixed pod abstract (RT #94160), thanks <NEILB _at_ cpan.org>
+
+0.99  Fri Oct 14 02:12:00 2016
+    - fixed compilation (RT #69366), thanks Stefan Jakobs <projects _at_ localside.net>

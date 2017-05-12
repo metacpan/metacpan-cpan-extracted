@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Seeder.pm
+lib/Seeder/Background.pm
+lib/Seeder/Finder.pm
+lib/Seeder/Index.pm
+t/00_load.t
+t/01_index.t
+t/02_background.t
+t/03_finder.t
+t/bseq.fasta
+t/pseq.fasta
+META.yml                                 Module meta-data (added by MakeMaker)

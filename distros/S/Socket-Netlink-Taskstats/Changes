@@ -1,0 +1,13 @@
+Revision history for Socket-Netlink-Taskstats
+
+0.03    CHANGES:
+         * Use IO::Socket::Netlink 0.04's ability to distinguish command from
+           (response) message classes.
+         * Support register_cpumask and deregister_cpumask
+         * Added an example script to watch for process exits
+
+0.02    CHANGES:
+         * Declare configure_requires ExtUtils::CChecker
+
+0.01    First version, released on an unsuspecting world.
+

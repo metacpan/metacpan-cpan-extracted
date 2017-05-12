@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- converted with SWISH::Prog::Config ver2_to_ver3()  -->
+<swish>
+ <!-- WARNING: BeginCharacters ignored by Swish3 -->
+ <BeginCharacters>abcdefghijklmnopqrstuvwxyz0123456789</BeginCharacters>
+ <BumpPositionCounterCharacters>|.</BumpPositionCounterCharacters>
+ <!-- WARNING: EndCharacters ignored by Swish3 -->
+ <EndCharacters>abcdefghijklmnopqrstuvwxyz0123456789</EndCharacters>
+ <!-- WARNING: FileFilter ignored by Swish3 -->
+ <FileFilter>.pdf ../filter-bin/_pdf2html.pl</FileFilter>
+ <!-- WARNING: IgnoreFirstChar ignored by Swish3 -->
+ <IgnoreFirstChar>.-</IgnoreFirstChar>
+ <!-- WARNING: IgnoreLastChar ignored by Swish3 -->
+ <IgnoreLastChar>.-</IgnoreLastChar>
+ <IgnoreWords>file: stopwords/my_stopwords.txt</IgnoreWords>
+ <SourceDir>.</SourceDir>
+ <SourceOnly>.config .pdf</SourceOnly>
+ <TranslateCharacters>:ascii7:</TranslateCharacters>
+ <Verbosity>2</Verbosity>
+ <!-- WARNING: WordCharacters ignored by Swish3 -->
+ <WordCharacters>abcdefghijklmnopqrstuvwxyz0123456789.-</WordCharacters>
+ <Index>
+  <Format>Native</Format>
+ </Index>
+</swish>

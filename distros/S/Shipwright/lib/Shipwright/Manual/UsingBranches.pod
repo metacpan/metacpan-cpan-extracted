@@ -1,0 +1,63 @@
+=head1 NAME
+
+Shipwright::Manual::UsingBranches - Using branches
+
+=head1 DESCRIPTION
+
+Shipwright B<branches> is a method to keep multiple sources for one source,
+a bit like branches in vcs.
+Technically, all the sources for I<foo> live below I<sources/foo/>.
+
+Sources from CPAN can't be branched, or in the other way, can only have one branch.
+Technically, only dists occurred in shipwright/source.yml can be branched.
+
+Imagine we have an app Foo, of which the layout in vcs is like:
+trunk/...
+branches/1.0/...
+branches/2.0/...
+
+With B<branches> support, we can add all the 3 versions in shipwright:
+
+    $ shipwright import -r ... svn:.../trunk --name Foo --as trunk
+    $ shipwright import -r ... svn:.../branches/1.0 --name Foo --as branches/1.0
+    $ shipwright import -r ... svn:.../branches/2.0 --name Foo --as branches/2.0
+
+the branch names can be whatever you want, no need to be the same layout as your 
+vcs system
+now we have I<trunk>, I<1.0> and I<2.0> branches in shipwright:
+
+    $ shipwright list -r ... Foo
+
+will show "branches: trunk, branches/1.0, branches/2.0"
+
+When build, the 1st one will be treated as the default branch.
+to change the default branch, e.g. we want to change 2.0 as the default:
+
+    $ shipwright defaultbranch -r ... Foo branches/2.0
+
+If we don't want to change the default branch, we can also supply --branch arg 
+when build:
+
+    $ ./bin/shipwright-builder --branches Foo=branches/2.0
+
+Note:
+
+Since all these branches share the same build script and the same dep sources,
+if branches are way too different, it's better to import it as another source
+instead of branching.
+
+=head1 SEE ALSO
+
+L<Shipwright>, L<Shipwright::Manual>
+
+=head1 AUTHORS
+
+sunnavy  C<< <sunnavy@bestpractical.com> >>
+
+=head1 LICENCE AND COPYRIGHT
+
+Shipwright is Copyright 2007-2015 Best Practical Solutions, LLC.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

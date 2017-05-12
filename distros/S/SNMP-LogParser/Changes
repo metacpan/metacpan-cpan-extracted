@@ -1,0 +1,78 @@
+$Id: Changes 24744 2014-09-26 14:38:45Z nito $
+
+Revision history for SNMP-LogParser
+
+1.24742 03/05/2012
+
+   [BUGS]
+
+   * Fixed bug #99152 and patch about s/cleanUpAndExit/cleanupAndExit/ reported via rt.cpan.org
+
+1.15290 03/05/2012
+
+   [BUGS]
+
+   * Fixed bug in include option
+
+1.14996  10/04/2012
+
+    [OTHER]
+
+    * Copied lock.t test to concurrentProcess.t which was empty, waiting to be done
+      and has a more descriptive name than lock.t
+
+1.14990  10/04/2012
+
+    [ENHANCEMENTS]
+
+    * Added lock test
+
+    [OTHER]
+
+    * Cleaned-up code to follow modern practices
+    * Will work only on perl version >= 5.6 as needed by required modules
+    * Reorganized examples
+
+1.10178  10/02/2011
+         
+    [ENHANCEMENTS]
+
+    * Added -I command line option to add directories to @INC (Rafael Porres - rporres)
+
+    [BUG FIXES]
+
+    * Command line options -k and -o didn't work as advertised (rporres)
+
+1.10052  25/1/2011
+	 Updated eval condition on non existent logdrivers
+
+1.0767  1/12/2007
+        Changed name from NetSNMP-LogParser to SNMP-LogParser. Suggestion from brian d foy <brian.d.foy@gmail.com>  (Perl Authors Upload Server)
+
+1.0537  18/10/2007
+        Changed SEEK_CUR in &Fcntl::SEEK_CUR because of "t/logparser............Undefined subroutine &File::Temp::SEEK_SET called at blib/script/logparser line 332."
+
+
+1.0530  17/10/2007
+        Removed taint mode in t/logparser.t (Problems with File::Path 2.01 in perl 5.6.2). I rather have it working in more versions than tainted
+
+1.0481  15/10/2007
+        Changed Build.PL for a dependency on File::Path 1.05 for Taint mode
+
+1.0480  14/10/2007
+        Changed t/mibProxy.t to not setup PERL5LIB
+
+1.0479  14/10/2007
+        Changed lib/NetSNMP/MibProxy.pm to not use the our declaration which breaks the test on perl5.005
+
+1.0475    14-10-2007
+	Delete the only used once $opt_d in line 162 of bin/logparser
+	Added Test::Pod::Coverage 1.04 to the requisites in Build.PL
+
+1.0469    11-10-2007
+        Changed name from QND-NetSNMP-LogParser to NetSNMP-LogParser
+
+
+1.0462    5-10-2007
+        First public version
+

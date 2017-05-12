@@ -1,0 +1,5 @@
+2002-11-12  Paul Stodghill  <stodghil@quimby-xp>
+
+	* CAcert.pem, CAkey.pem, KEY.pem, dsig.tmpl, enc.tmpl, private.pem, private2.pem, public.pem, public2.pem:
+	"Original version". Taken from ../
+

@@ -1,0 +1,298 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use Carp;
+use Getopt::Std;
+use MIME::Base64;
+
+use lib '../lib';
+use Secret::Simple;
+
+our $VERSION = '0.11';
+
+my %opt;
+
+sub usage {
+
+  $! = 0;
+  die <<EOF;
+Usage: $0 [options] [decrypt|encrypt] [ciphertext]
+
+Options:
+    -f keyfile         use specified file as key
+    -F keyfile_b64     use specified file as (base 64 enc) key
+    -h                 help (this display)
+    -i infile          specify input file
+    -I infile_b64      specify input file (base 64 enc contents)
+    -k                 use multi-line STDIN for key
+    -K                 use multi-line STDIN for (base 64 enc) key
+    -o outfile         specify output file
+    -0 outfile_b64     specify output file (base 64 enc contents)
+    -p                 use one-line STDIN as key
+    -P                 use one-line STDIN as (base 64 enc) key
+
+  * Key values and plaintext must be input from a file or STDIN. Any
+    STDIN key value will be expected before STDIN plain or ciphertext.
+    A STDIN key option (-k or -p) and the -f file key option may be
+    used together to specify a combined key, STDIN key first.
+
+  * A dash (-) can be substituted for any filename to have the input
+    or output be from STDIN or STDOUT respectively. By default encrypt
+    will expect one line of raw STDIN text, and decrypt will expect
+    either a Base 64 encoded command-line argument or one line of
+    encoded STDIN.
+
+Examples:
+
+    Decrypt encoded ciphertext using default key:
+    % sstool decrypt 'zzpjnDlUqz3+KCke5Rr4dA=='
+
+    Encrypt plaintext using specified file as key:
+    % sstool -f ~/secret.key encrypt
+    jblow^password
+                                    [Perl Secret::Simple sstool v$VERSION]
+EOF
+}
+
+sub bomb { printf STDERR (shift)."\n"; exit 1 }
+
+sub get_input {
+    my ($msg) = @_;
+    print STDERR $msg if $msg;
+    my $input;
+    while (<STDIN>) {
+        last if $_ =~ /^\.\s*$/;
+        $input .= $_;
+    }
+    return $input;
+}
+
+sub get_key_stdin {
+    my $p1 = get_input("---Provide multi-line key input---\n");
+    bomb("Blank key input!") if !$p1 || $p1 =~ /^\s*$/;
+    return $p1;
+}
+
+sub do_key {
+    my ($cmd) = @_;
+
+    bomb("Invalid combination of key options.")
+      if ($opt{f} && $opt{F}) || ($opt{k} && $opt{K})
+      || ($opt{p} && $opt{P}) || ($opt{k} && $opt{p})
+      || ($opt{k} && $opt{P}) || ($opt{K} && $opt{p})
+      || ($opt{K} && $opt{P});
+
+    my @keys = ();
+    map { push @keys, $_ if $opt{$_} } qw( p P k K f F );
+    unless (@keys) {
+        # try to use default SSH id_dsa key
+        bomb('No ~/.ssh/id_dsa default key. Please provide a key.')
+          unless glob('~/.ssh/id_dsa');
+        return qw( {sskeyfile} );
+    }
+
+    # make sure all files are valid
+    for (my $i=0; $i<@keys; $i++) {
+        if ($keys[$i] && $keys[$i] =~ /[fF]/) {
+            my $fn = glob($opt{$keys[$i]});
+            bomb("Bad key file '$opt{$keys[$i]}'.")
+              unless -r $fn;
+        }
+    }
+
+    my @data;
+    if ($keys[0] =~ /[pP]/) {
+        print STDERR "Enter passphrase: ";
+        my $p1 = <STDIN>;
+        print STDERR "^..........again: ";
+        my $p2 = <STDIN>;
+        bomb("Passphrases do not match. Try again.")
+          unless $p1 eq $p2;
+        chomp($p1);
+        chomp($p2);
+        bomb("Blank key input!") if !$p1 || $p1 =~ /^\s*$/;
+        push  @data, ($keys[0] eq 'P' ? decode_base64($p1) : $p1);
+        shift @keys;
+    } elsif ($keys[0] =~ /[kK]/) {
+        my $p1 = get_key_stdin();
+        push  @data, ($keys[0] eq 'K' ? decode_base64($p1) : $p1);
+        shift @keys;
+    }
+
+    if ($keys[0] && $keys[0] =~ /[fF]/) {
+        if ($opt{$keys[0]} eq '-')  {
+            my $p1 = get_key_stdin();
+            push @data, ($keys[0] eq 'F' ? decode_base64($p1) : $p1);
+            return @data;
+        }
+        my $fn = glob($opt{$keys[0]});
+        if ($keys[0] eq 'f') {
+            push @data, '{sskeyfile}'.$opt{$keys[0]};
+            return @data;
+        }
+        push @data, decode_base64( Secret::Simple::_read_rawfile($fn) );
+    }
+    return @data;
+}
+
+sub get_input_stdin {
+    my $p1 = get_input("---Provide multi-line input---\n");
+    bomb("Blank input!") if !$p1 || $p1 =~ /^\s*$/;
+    return $p1;
+}
+
+sub do_input {
+    my ($cmd, $b64ciphertext) = @_;
+
+    bomb("Invalid combination of input options.")
+      if $opt{i} && $opt{I};
+
+    return decode_base64($b64ciphertext) if $cmd eq 'decrypt' && $b64ciphertext;
+
+    return decode_base64(get_input_stdin()) if $opt{I} && $opt{I} eq '-';
+    return get_input_stdin() if $opt{i} && $opt{i} eq '-';
+    if ($opt{i} || $opt{I}) {
+        my $fn = glob( $opt{i} ? $opt{i} : $opt{I} );
+        bomb('Invalid input file specified') unless -r $fn;
+        my $input = Secret::Simple::_read_rawfile($fn);
+        return decode_base64($input) if $opt{I};
+        return $input;
+    }
+    my $input = <STDIN>;
+    chomp($input);
+    bomb("Blank ciphertext input!") if !$input || $input =~ /^\s*$/;
+
+    return $cmd eq 'decrypt' ? decode_base64($input) : $input;
+}
+
+sub wrap_ciphertext {
+    my ($ciphertext) = @_;
+    return unless $ciphertext;
+    return "-----BEGIN AES ENCRYPTED-----\n".
+      encode_base64($ciphertext).
+      "-----END AES ENCRYPTED-------\n";
+}
+
+sub write_rawfile {
+    my ($fn, $data) = @_;
+    return unless $data;
+    bomb("Unable to write to file.")
+      unless open my ($F), ">$fn";
+    binmode($F);
+    print $F $data;
+    close $F;
+    return 1;
+}
+
+sub do_output {
+    my ($cmd, $input, @key) = @_;
+
+    bomb("Invalid combination of input options.")
+      if $opt{o} && $opt{O};
+    my $fn = glob( $opt{o} ? $opt{o} : $opt{O} );
+
+    bomb('Please specify more information.')
+        unless $input && @key;
+
+    if ($cmd eq 'decrypt') {
+        my $data = ssdecrypt($input, @key);
+        if ($opt{o} || $opt{O}) {
+            $data = encode_base64($data) if $opt{O};
+            write_rawfile($fn, $data);
+            return 1;
+        }
+        print $data."\n";
+        return 1;
+    }
+
+    # encrypt
+    my $data = ssencrypt($input, @key);
+    if ($opt{o} || $opt{O}) {
+        $data = encode_base64($data) if $opt{O};
+        write_rawfile($fn, $data);
+        return 1;
+    }
+    print wrap_ciphertext( $data );
+    return 1;
+}
+
+# main
+
+    $|++;
+    getopts("f:F:hi:I:kKo:O:pP", \%opt);
+    usage() if $opt{h};
+    my ($cmd, $b64ciphertext) = @ARGV;
+    usage() unless $cmd;
+    usage() unless $cmd =~ /(d|dec|decrypt|e|enc|encrypt)/;
+    $cmd = substr($cmd,0,1) eq 'e' ? 'encrypt' : 'decrypt';
+
+    my @key = do_key($cmd);
+    my $input = do_input($cmd, $b64ciphertext);
+    do_output($cmd, $input, @key);
+
+__END__
+
+=head1 NAME
+
+sstool - Secret::Simple sstool command line tool
+
+=head1 VERSION
+
+This document describes Secret::Simple sstool version 0.11
+
+=head1 SYNOPSIS
+
+  Usage: sstool [options] [decrypt|encrypt] [ciphertext]
+
+  Options:
+
+    -f keyfile         use specified file as key
+    -F keyfile_b64     use specified file as (base 64 enc) key
+    -h                 help (this display)
+    -i infile          specify input file
+    -I infile_b64      specify input file (base 64 enc contents)
+    -k                 use multi-line STDIN for key
+    -K                 use multi-line STDIN for (base 64 enc) key
+    -o outfile         specify output file
+    -0 outfile_b64     specify output file (base 64 enc contents)
+    -p                 use one-line STDIN as key
+    -P                 use one-line STDIN as (base 64 enc) key
+
+  * Key values and plaintext must be input from a file or STDIN. Any
+    STDIN key value will be expected before STDIN plain or ciphertext.
+    A STDIN key option (-k or -p) and the -f file key option may be
+    used together to specify a combined key, STDIN key first.
+
+  * A dash (-) can be substituted for any filename to have the input
+    or output be from STDIN or STDOUT respectively. By default encrypt
+    will expect one line of raw STDIN text, and decrypt will expect
+    either a Base 64 encoded command-line argument or one line of
+    encoded STDIN.
+
+=head1 DESCRIPTION
+
+The C<sstool> command line utility complements the C<Secret::Simple>
+module by simplifying creation and manipulation of encrypted data.
+
+=head1 EXAMPLES
+
+Decrypt encoded ciphertext using default key:
+
+    % sstool decrypt 'zzpjnDlUqz3+KCke5Rr4dA=='
+
+Encrypt plaintext using specified file as key:
+
+    % sstool -f ~/secret.key encrypt
+    jblow^password
+
+=head1 AUTHOR
+
+Adam G. Foust, <nospam-agf@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2006, Adam G. Foust. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

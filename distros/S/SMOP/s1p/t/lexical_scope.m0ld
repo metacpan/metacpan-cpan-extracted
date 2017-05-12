@@ -1,0 +1,78 @@
+my $interpreter;
+my $scope;
+my $void;
+my $out_scalar = $scope."lookup"("$OUT");
+my $out = $out_scalar."FETCH"();
+#my $out_scalar = $scope."lookup"("$OUT");
+#my $out = $out_scalar."FETCH"();
+
+$void = $out."print"("1..9\n");
+
+my $LexicalScope_scalar = $scope."lookup"("LexicalScope");
+my $LexicalScope = $LexicalScope_scalar."FETCH"();
+
+my $new_scope = $LexicalScope."new"();
+my $outer = $new_scope."outer"();
+my $void = $outer."STORE"($scope);
+
+
+my $out2_scalar = $scope."lookup"("$OUT");
+my $out2 = $out2_scalar."FETCH"();
+
+my $void = $out2."print"("ok 1\n");
+
+my $var = $new_scope."postcircumfix:{ }"("$foo");
+
+my $void = $var."STORE"("ok 2\n");
+my $ok2 = $var."FETCH"();
+my $void = $out."print"($ok2);
+
+my $var2 = $new_scope."lookup"("$foo");
+my $void = $var2."STORE"("ok 3\n");
+my $ok3 = $var2."FETCH"();
+my $void = $out."print"($ok3);
+
+my $true = $new_scope."exists"("$foo");
+if $true {goto ok4} else {goto not_ok4};
+not_ok4: my $void = $out."print"("not ok 4\n");
+goto end_if;
+ok4: my $void = $out."print"("ok 4\n");
+end_if: noop;
+
+my $false = $new_scope."exists"("$OUT");
+if $false {goto not_ok5} else {goto ok5};
+not_ok5: my $void = $out."print"("not ok 5\n");
+goto end_if2;
+ok5: my $void = $out."print"("ok 5\n");
+end_if2: noop;
+
+my $var3 = $new_scope."postcircumfix:{ }"("$bar");
+my $void = $var3."STORE"("ok 6 # variables are cloned over\n");
+my $ok6 = $var3."FETCH"();
+my $void = $out."print"($ok6);
+
+my $cloned_scope = $new_scope."clone"();
+
+my $void = $out."print"("ok 7 # lives after clone\n");
+
+
+my $var3_cloned = $cloned_scope."postcircumfix:{ }"("$bar");
+
+
+my $var4_in_orginal = $new_scope."postcircumfix:{ }"("$baz");
+my $var4_in_cloned = $cloned_scope."postcircumfix:{ }"("$baz");
+
+my $var5_in_orginal = $new_scope."postcircumfix:{ }"("$baz2");
+my $var5_in_cloned = $cloned_scope."postcircumfix:{ }"("$baz2");
+
+my $void = $var4_in_cloned."STORE"("ok 8 # new variables in the cloned scope don't get overwritten by ones in the orginal\n");
+my $void = $var4_in_orginal."STORE"("not ok 8 # new variables in the cloned scope get overwritten by ones in the orginal\n");
+
+my $ok8 = $var4_in_cloned."FETCH"();
+my $void = $out."print"($ok8);
+
+my $void = $var5_in_orginal."STORE"("ok 9 # new variables in the orginal scope don't get overwritten by ones in the cloned\n");
+my $void = $var5_in_cloned."STORE"("not ok 9 # new variables in the orginal scope get overwritten by ones in the cloned\n");
+
+my $ok9 = $var5_in_orginal."FETCH"();
+my $void = $out."print"($ok9);

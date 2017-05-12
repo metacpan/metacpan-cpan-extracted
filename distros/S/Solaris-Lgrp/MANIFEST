@@ -1,0 +1,15 @@
+bin/lgrpinfo
+Changes
+Lgrp.pm
+Lgrp.xs
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml
+pod/Lgrp.pod
+pod/lgrpinfo.pod
+README
+t/Lgrp.t
+t/Lgrp_api.t
+typemap

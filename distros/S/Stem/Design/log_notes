@@ -1,0 +1,133 @@
+
+			  Stem Logging Design
+
+The Stem logging subsystem is designed to be very flexible, powerful and
+yet simple to use. Log data comes into the system via a Log Entry which
+is submitted to Logical Logs. Entries can be submitted to multiple
+Logical Logs which can be local to the current Hub or on remote
+Hubs. Each Logical Log processes the Entry which can be filtered,
+redirected and written to physical log files.  Logical Log filter rules
+can match the text or label with regular expressions, test the range or
+value of the level, check the time of day or do any boolean combination
+of those. If an Entry passes a set of rules, then it is passed to a set
+of actions which can execute a wide range of operations upon it
+including printing the entry to a file, sending it via email or to a
+pager, printing it to stderr, or the entry can be forwarded to other
+Logical Logs. The full set of filter rules and actions are described
+below.
+
+Log Entries are constructed with the 'new' method of the
+Stem::Log::Entry class. The caller can set the entry's text, label, and
+a severity level and the timestamp is automatically stored in the
+entry. If any Logical Logs are specified the entry is submitted to
+them. In any case, the entry object is returned and it can be submitted
+to Logical Logs with its submit method. The class Stem::Log::Entry is
+registered as a Cell so Log Entries that are forwarded from remote Hubs
+can be handled by this class.  Log Entries can be created by created and
+submitted by code anywhere in Stem. Many Cells can be configured to
+submit Log Entries which contain data or status information. The
+Debug/Trace subsystem also generates Log Entries as do any monitoring
+modules such as Stem::LogTail.
+
+
+A Logical Log is constructed by the 'new' method of the Stem::Log
+class. They are typically created by external configurations but some
+modules create them internally for their own use. Each Logical Log on a
+Hub must have a unique name and that is the name used to submit Log
+Entries. Remote Logical Logs are referred to by a string of the form
+'Hub:LogName'. Any place where you can specify a Logical Log name, you
+can also use a remote Log name.
+
+When a Log Entry is submitted to a Logical Log it gets filtered and
+processed. The Logical Log is configured with optional physical file and
+filter attributes. If there is no filter in a Logical Log, its default
+is to print any submitted Entries to its file (if there is one). Logical
+Logs don't need to have a physical file attribute as they can filter and
+print their Entries to many other possible destinations (see below for a
+list of actions and Entry destinations).
+
+The 'path' attribute of a Logical Log specifies its file. Other
+attributes control the long term management of the file. They include
+when to rotate the log file, the format of the timestamp suffix of the
+rotated files, any compression to be performed, where to move archived
+logs, eternal programs to be called to process the log file, etc. These
+log file handling attributes and their code support are under development.
+
+The filter attribute of a Logical Log consists of a set of key/value
+pairs which are called filter operations. When an Entry is submitted to
+a Logical Log which has a filter, a private hash copy of all of its data
+is made and a special boolean called the filter flag is set in that
+hash. All of the filter operations are processed sequentially and work
+with that flag. The operations can be grouped into 3 types, flag
+operations, rules and actions. Flag operations directly modify the
+filter flag and its behavior which is used to control the rules and
+actions of this filter. Rules are boolean tests that check the submitted
+entry for some condition and can set or clear the filter flag. Actions
+print or forward the submitted Entry only if the filter flag is
+currently true. The filter flag is initialized to true so all actions
+and rules will be executed until some rule or flag operation clears it.
+
+Flag operations are always executed regardless of the current value of
+the filter flag. The current value of the filter flag can be set,
+cleared or inverted. Also the boolean operation that is used with the
+rules can be selected. It defaults to 'and' which causes each rule's
+boolean result to be 'and'ed with the filter flag and stored there. If
+the flag operator is set to 'or', then the rule result is or'ed with the
+flag and stored back into it. The boolean test of the filter flag can be
+inverted with the 'invert_test' flag operation. By combining the flag
+operations and the negated prefix of rules (see below) you can get any
+boolean combination of rules. If you want multiple sets of rules each
+with their own set of actions in a filter, just set the filter flag to
+true before each set of rules and follow them by their associated
+actions. If you want to execute some actions if any of a set of rules is
+true, set the filter flag to false, set the flag operation to 'or' and
+set the test to inverted. The next rules will execute since the test in
+inverted and the flags is false. If any rule returns true, it will will
+set the flag since it is 'or'ed with it. The rest of the rules will be
+skipped. Then the normal_test operation should be executed. The actions
+that follow will only be executed if any rule was true.
+
+Filter rules are only executed if the filter flag is currently true (or
+false when the inverted_flag operation is in effect). Each filter rule
+name can be prefixed with 'not_' which will invert the results of the
+rule. There are many builtin rules which are grouped into three
+categories. The first group matches either an Entry label or text with a
+regular expression. The second group compares the Entry severity level
+with an integer. The third group compares the Entry severity level with
+a global value in the %Stem::Vars::Env hash. Those hash values can
+be set on the command line, from environment variables and by code. This
+allows for fine control of how Entries get filtered by level. Examples
+of using that facility are to enable debug/trace calls to output to
+stderr or be forwarded to a remote Logical Log.
+
+Filter actions, like filter rules are only executed if the filter flag
+is currently true (or false when the inverted_flag operation is in
+effect). But actions cannot affect the value of the filter flag and are
+meant to send Log Entries to different destinations. The builtin actions
+can print Log Entries to stdout, stderr or the controlling TTY. Entries
+can be emailed, sent to a pager, written to the console with the wall or
+write commands, or forwarded to other Logical Logs. Of course they also
+can be written the to physical file associated with this Logical Log.
+
+WARNING: Currently forwarding loops can be created with Log filter
+actions. There are plans to detect them with either storing in the Log
+Entry a hop count or a history of which Logical Logs it has seen.
+
+Custom filter rules and actions can also be created. Any module can have
+them and they are called by their name which is the value of the
+'custom' operation. The difference between a custom rule and action is
+that the rules return a defined boolean value while the actions return
+the undefined value (a plain return does that).
+
+When a Log Entry needs to printed by an action (which all builtin ones
+except forwarding does), it must format the Entry. This is controlled by
+the 'format' attribute of the Logical Log. The format value is similar
+to sprintf and uses % as a field marker. It can print the Entry text
+(%T), label (%L), level (%l), timestamp (%l) and original Logical Log
+name (%N) (so forwarded Log Entries can say where they came from). The
+default Log Entry format is %T which will just print the text. Also the
+timestamp which is normally printed as an integer (Unix Epoch time) can
+be printed with the %f marker in a strftime format. The attribute which
+controls the time format is 'strftime'.  The default strftime format is
+%C which will print the time as the command 'date' will.
+

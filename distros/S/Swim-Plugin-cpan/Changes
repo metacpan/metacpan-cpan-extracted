@@ -1,0 +1,22 @@
+0.0.7 Fri Mar 13 18:10:48 PDT 2015
+ - Fixed a typo that messed up cpan-head. @mohawk++
+
+0.0.6 Sun Jan  4 15:57:06 PST 2015
+ - Add VERSION section
+ - Update docs
+
+0.0.5 Thu Jan  1 18:17:52 PST 2015
+ - Allow block-func calls to take args controlling the sections
+
+0.0.4 Wed Dec 31 22:29:59 PST 2014
+ - Allow for multiple authors
+
+0.0.3 Wed Dec 31 21:29:42 PST 2014
+ - Fix irc channel
+
+0.0.2 Wed Dec 31 21:26:15 PST 2014
+ - Update copyright year.
+
+0.0.1 Wed Dec 31 21:22:30 PST 2014
+ - Initial release
+

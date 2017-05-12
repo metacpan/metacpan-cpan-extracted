@@ -1,0 +1,38 @@
+Sys-Signals-Block
+
+This module provides an easy way to block the delivery of certain signals.
+This is essentially just a wrapper around:
+
+   POSIX::sigprocmask(SIG_BLOCK, ...)
+   POSIX::sigprocmask(SIG_UNBLOCK, ...)
+
+but with a much simpler API.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Class::Accessor
+
+COPYRIGHT AND LICENCE
+
+   Copyright (C) 2009 by Michael Schout
+
+   This program is free software; you can redistribute it and/or modify it
+   under the terms of either:
+
+   *   the GNU General Public License as published by the Free Software
+       Foundation; either version 1, or (at your option) any later
+       version, or
+
+   *   the Artistic License version 2.0.
+

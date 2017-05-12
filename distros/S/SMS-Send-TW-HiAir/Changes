@@ -1,0 +1,7 @@
+Revision history for Perl extension SMS::Send::TW::HiAir.
+
+0.02  2010 Feb 17 01:00:00
+	- Fix get a Mojibake SMS when input big5 message.
+
+0.01  2008 Mar 16 18:10:47 
+	- original version; Initial release.

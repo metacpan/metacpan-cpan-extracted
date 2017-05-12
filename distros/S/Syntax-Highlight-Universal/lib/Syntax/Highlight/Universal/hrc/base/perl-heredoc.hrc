@@ -1,0 +1,50 @@
+
+<scheme name="perl-hd">
+ <regexp match="/(&lt;&lt;)([&quot;&apos;`]?)([a-zA-Z_][\w_]*)(\2)/"
+  region="HereDoc" region1="HereDocLt" region3="HereDocName"
+  region2="def:PairStart" region4="def:PairEnd"
+ />
+ <inherit scheme="perl-core">
+  <virtual scheme="perl-core" subst-scheme="perl-hd"/>
+ </inherit>
+</scheme>
+
+<scheme name="hd.shell">
+ <block start="/~/" end="/$/" scheme="perl-hd" region="def:default"/>
+ <inherit scheme="String"/>
+</scheme>
+
+<scheme name="hd.shell.is">
+ <inherit scheme="hd.shell">
+  <virtual scheme="String" subst-scheme="InterpolateString"/>
+ </inherit>
+</scheme>
+<scheme name="hd.shell.ex">
+ <inherit scheme="hd.shell.is"/>
+ <block start="/^\M.*?/" end="/$/" region="SystemExec" scheme="InterpolateString"/>
+</scheme>
+
+<scheme name="heredoc">
+ <block start="/^\M.*&lt;&lt;([&quot;]?)([a-zA-Z_][\w_]*)\1/" end="/^(\y2)$/"
+  scheme="hd.shell.is" region="HereDoc" priority="low"
+  region11="HereDocName"
+ />
+ <block start="/^\M.*&lt;&lt;(`)([a-zA-Z_][\w_]*)\1/" end="/^(\y2)$/"
+  scheme="hd.shell.is" region="SystemExec" priority="low"
+  region11="HereDocName"
+ />
+ <block start="/^\M.*&lt;&lt;(&apos;)([a-zA-Z_][\w_]*)\1/" end="/^(\y2)$/"
+  scheme="hd.shell" region="HereDoc" priority="low"
+  region11="HereDocName"
+ />
+
+<!--[^\[\]\(\)\{\}]
+  region00="def:PairStart" region10="def:PairEnd"
+         <block start="/&lt;&lt;\x22([a-zA-Z_][\w_]*)\x22/" end="/^(\y1)$/" scheme="InterpolateString" region="HereDoc" region00="def:PairStart" region10="def:PairEnd" region01="Word" region11="Word"/>
+         <block start="/&lt;&lt;'([a-zA-Z_][\w_]*)'/" end="/^(\y1)$/" scheme="def:Comment" region="HereDoc" region00="def:PairStart" region10="def:PairEnd" region01="Word" region11="Word"/>
+         <block start="/&lt;&lt;`([a-zA-Z_][\w_]*)`/" end="/^(\y1)$/" scheme="def:Comment" region="HereDoc" region00="def:PairStart" region10="def:PairEnd" region01="Word" region11="Word"/>
+         <block start="/&lt;&lt;([a-zA-Z_][\w_]*)/" end="/^(\y1)$/" scheme="InterpolateString"
+         region="HereDoc" region00="def:PairStart" region10="def:PairEnd" region01="Word" region11="Word"/>
+         <block start="/&lt;&lt;\M([^\s\w_])/" end="/^$/" scheme="InterpolateString" region="HereDoc" region00="def:PairStart" region10="def:PairEnd" region01="Word" region11="Word"/>
+-->
+</scheme>

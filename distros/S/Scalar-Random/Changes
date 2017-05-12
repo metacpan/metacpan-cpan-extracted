@@ -1,0 +1,9 @@
+Revision history for Perl extension Scalar::Random.
+
+0.02  Mon Dec 22 21:57:13 2008
+	- typo in AUTHOR
+	- text change in description
+0.01  Sat Dec 20 18:13:11 2008
+	- original version; created by h2xs 1.23 with options
+		-A -n Scalar::Random
+

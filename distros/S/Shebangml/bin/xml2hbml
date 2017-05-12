@@ -1,0 +1,43 @@
+#!/usr/bin/perl
+
+# Copyright (C) 2008 Eric L. Wilhelm
+
+use warnings;
+use strict;
+
+=head1 NAME
+
+xml2hbml - convert xml to shebangml
+
+=cut
+
+package bin::xml2hbml;
+
+use Shebangml::FromXML;
+
+sub main {
+  my (@args) = @_;
+
+  my $fh;
+  unless(-t STDIN) {
+    $fh = \*STDIN;
+  }
+  else {
+    my $file = shift(@args) or die 'must have file';
+    open($fh, '<', $file) or die "$!";
+  }
+
+  my $parser = Shebangml::FromXML->new;
+  $parser->parse($fh);
+  binmode(STDOUT, ':utf8');
+  print $parser->output, "\n";
+}
+
+package main;
+
+if($0 eq __FILE__) {
+  bin::xml2hbml::main(@ARGV);
+}
+
+# vi:ts=2:sw=2:et:sta
+my $package = 'bin::xml2hbml';

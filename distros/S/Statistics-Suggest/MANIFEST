@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+Suggest.xs
+typemap
+t/Statistics-Suggest.t
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/Statistics/Suggest.pm
+suggest.h
+META.yml                                 Module meta-data (added by MakeMaker)

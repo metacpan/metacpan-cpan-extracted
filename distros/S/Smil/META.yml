@@ -1,0 +1,92 @@
+--- #YAML:1.0
+name: Smil
+version: 0.893
+author:
+  - |-
+    Chris Dawson (cdawson@webiphany.com)
+    http://www.webiphany.com/perlysmil/
+abstract: |-
+  Perl extension for dynamic generation of SMIL files.
+license: perl
+provides:
+  QT:
+    file: lib/SMIL/QT.pm
+    version: 0.893
+  RN::RealText:
+    file: lib/RN/RealText.pm
+    version: 0.893
+  SMIL::Anchor:
+    file: lib/SMIL/Anchor.pm
+    version: 0.893
+  SMIL::AnchoredMedia:
+    file: lib/SMIL/AnchoredMedia.pm
+    version: 0.893
+  SMIL::Body:
+    file: lib/SMIL/Body.pm
+    version: 0.893
+  SMIL::Code:
+    file: lib/SMIL/Code.pm
+    version: 0.893
+  SMIL::Head:
+    file: lib/SMIL/Head.pm
+    version: 0.893
+  SMIL::Href:
+    file: lib/SMIL/Href.pm
+    version: 0.893
+  SMIL::Layout:
+    file: lib/SMIL/Layout.pm
+    version: 0.893
+  SMIL::Media:
+    file: lib/SMIL/Media.pm
+    version: 0.893
+  SMIL::MediaAttributes:
+    file: lib/SMIL/MediaAttributes.pm
+    version: 0.893
+  SMIL::MediaFactory:
+    file: lib/SMIL/MediaFactory.pm
+    version: 0.893
+  SMIL::MediaResolver:
+    file: lib/SMIL/MediaResolver.pm
+    version: 0.893
+  SMIL::Meta:
+    file: lib/SMIL/Meta.pm
+    version: 0.893
+  SMIL::Par:
+    file: lib/SMIL/Par.pm
+    version: 0.893
+  SMIL::Region:
+    file: lib/SMIL/Region.pm
+    version: 0.893
+  SMIL::RootLayout:
+    file: lib/SMIL/RootLayout.pm
+    version: 0.893
+  SMIL::Seq:
+    file: lib/SMIL/Seq.pm
+    version: 0.893
+  SMIL::Switch:
+    file: lib/SMIL/Switch.pm
+    version: 0.893
+  SMIL::SystemSwitches:
+    file: lib/SMIL/SystemSwitches.pm
+    version: 0.893
+  SMIL::TimelineBase:
+    file: lib/SMIL/TimelineBase.pm
+    version: 0.893
+  SMIL::Transition:
+    file: lib/SMIL/Transition.pm
+    version: 0.893
+  SMIL::UnanchoredMedia:
+    file: lib/SMIL/UnanchoredMedia.pm
+    version: 0.893
+  SMIL::XMLBase:
+    file: lib/SMIL/XMLBase.pm
+    version: 0.893
+  SMIL::XMLContainer:
+    file: lib/SMIL/XMLContainer.pm
+    version: 0.893
+  SMIL::XMLTag:
+    file: lib/SMIL/XMLTag.pm
+    version: 0.893
+  Smil:
+    file: lib/Smil.pm
+    version: 0.893

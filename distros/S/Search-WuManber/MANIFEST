@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+README
+t/00-isa.t
+t/01-demo.t
+demo.pl
+WuManber.pm
+WuManber.xs
+wumanber_impl.h
+wumanber_impl.c
+MANIFEST
+META.yml                                 Module meta-data (added by MakeMaker)

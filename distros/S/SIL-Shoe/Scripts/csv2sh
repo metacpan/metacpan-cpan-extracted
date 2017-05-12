@@ -1,0 +1,78 @@
+#!/usr/bin/perl
+
+use Getopt::Std;
+use Pod::Usage;
+
+$VERSION='0.2';     #   MJPH    27-JUN-2006     Don't output blank sfms
+# $VERSION='0.1';     #   MJPH    20-JUN-2006     original
+
+getopts('ho:u');
+
+if ($opt_h)
+{
+    pod2usage( -verbose => 2);
+    exit;
+}
+
+if ($opt_o)
+{
+    open(OUT, "> $opt_o") || die "Can't open $opt_o for output";
+    binmode (OUT, ":utf8") if ($opt_u);
+    select OUT;
+}
+
+$header = <>;
+chomp $header;
+$header =~ s/^\x{FEFF}//o if ($opt_u);
+@head = get_csv($header);
+
+$gap = 0;
+while(<>)
+{
+    chomp;
+    @dat = get_csv($_);
+    next unless (@dat);
+    $i = 0;
+    if ($gap)
+    { print "\n"; }
+    else
+    { $gap = 1; }
+    for ($i = 0; $i < scalar @dat; $i++)
+    { print "\\$head[$i] $dat[$i]\n" if ($head[$i]); }        # don't print blank sfms
+}
+
+sub get_csv
+{
+    my ($str) = @_;
+    my (@dat) = $str =~ m/(?=.)((?:"(?:""|[^"])*")|(?:[^,]*))(?:,|$)/og;        #"
+    my ($empty) = 1;
+
+    foreach (@dat)
+    { 
+        s/""/"/og if (s/^"(.*)"$/$1/o);     #"
+        $empty = 0 if ($_ ne '');
+    }
+    if ($empty)
+    { return undef; }
+    else
+    { return @dat;}
+}
+
+__END__
+
+=head1 NAME
+
+csv2sh - converts Comma Separated Variables into Shoebox/Toolbox
+
+=head1 SYNOPSIS
+
+  csv2sh [-o file] [-u] infile
+
+    -o file     Optional output file otherwise output goes to stdout
+    -u          Assume file is in Unicode (so ignore BOM, etc.)
+
+=head1 DESCRIPTION
+
+csv2sh reads a comma separated variables file, as output from a spreadsheet
+and converts it into standard format markers. The marker names (without \)
+are assumed to be the column headers. Blank lines are ignored.

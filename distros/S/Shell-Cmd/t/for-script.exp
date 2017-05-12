@@ -1,0 +1,13 @@
+FAILED: 0
+CMD: 3 [  ]
+ALT [0]: echo $i
+STDOUT:
+1
+STDERR:
+
+CMD: 3 [  ]
+ALT [0]: echo $i
+STDOUT:
+2
+STDERR:
+

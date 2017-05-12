@@ -1,0 +1,23 @@
+NAME
+    Siesta::Plugin::MetaDiscussion - reject messages to a mailing list about
+    mailing lists
+
+INSTALL
+    % perl Makefile.PL
+    % make
+    % make test
+    % sudo make install
+
+DESCRIPTION
+    THIS HAS BEEN TOTALLY UNTESTED, WAIT FOR RELEASE 0.02 UNLESS YOU WANT TO
+    DO DEBUGGING. IT DOESNT EVEN PASS TESTS ON MY BOX ... MUHAHAHAHAHAHA!
+
+    (Fixed now and released as 0.02 but this note kept in for historical
+    reasons - Simon)
+
+COPYRIGHT
+    (c)opyright 2003 - Greg McCarroll <greg@mccarroll.org.uk>
+
+FIXED BY
+    Simon Wistow
+

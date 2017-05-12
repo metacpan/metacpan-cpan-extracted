@@ -1,0 +1,59 @@
+This illustration was used as figure 9 in our open-access paper:
+http://www.palarch.nl/wp-content/Wedel-and-Taylor-2013-Neural-spine-bifurcation-in-sauropod-dinosaurs-PJVP-10-11.pdf
+
+
+	Wedel, Mathew J., and Michael P. Taylor. 2013a. Neural spine
+	bifurcation in sauropod dinosaurs of the Morrison Formation:
+	ontogenetic and phylogenetic implications. PalArch's Journal
+	of Vertebrate Palaeontology 10(1):1-34.
+	
+The figure caption is:
+
+	Figure 9. Degree of neural spine bifurcation of presacral
+	vertebrae in well-preserved Morrison Formation sauropod
+	specimens representing several taxonomic groups. In all taxa
+	with deep bifurcations, these are concentrated around the
+	cervico-dorsal transition. 'No data' markers may mean that the
+	vertebrae are not preserved (e.g., posterior dorsals of
+	Suuwassea emilieae ANS 21122), that the degree of bifurcation
+	cannot be assessed (e.g., anterior cervicals of Barosaurus
+	lentus AMNH 6341), or that the serial positions of the
+	vertebrae are uncertain so they contribute no information on
+	serial changes in bifurcation (e.g., the four cervical
+	vertebrae known for Barosaurus lentus YPM 429). The
+	Camarasaurus specimens are roughly in ontogenetic order:
+	C. lentus CM 11338 is a juvenile, C. grandis YPM 1905 and
+	GMNH-PV 101/WPL 1995, and C. supremus AMNH 5761 are adults,
+	and C. lewisi BYU 9047 is geriatric. See text for sources of
+	data.
+
+It was the first illustration produced by this software, and the
+motivation for writing it.
+
+Our goal was to represent how deeply split the neural spines of the
+vertebrae are in the various taxa. We did this in two ways
+
+1. By designing glyphs that show either a deep or shallow cleft, or a
+   small notch, or no splitting at all;
+
+2. By using colour to generate a "heat-map" show the degree of
+   splitting (red hottest, then orange, then yellow, and green
+   coolest).
+
+The final published version of this illustration was enhanced by hand
+in two ways (both by Matt):
+
+1. The addition of a key at the top, explaining the meaning of each
+   glyph.
+
+2. The shape of the two most anterior vertebra was edited by hand to
+   suggest the shape of the atlas/axis combination.
+
+The published version, incorporating the results of this hand-hacking,
+can be seen at
+http://svpow.com/papers-by-sv-powsketeers/wedel-and-taylor-2013-on-sauropod-neural-spine-bifurcation/
+
+It would have been better for both of these additions to be done by
+VertFigure rather than needing a manual pass afterwards: if we'd had
+more time we probably would have enhanced the program accordingly, but
+we were in a hurry to get submitted. A future release might fix this.

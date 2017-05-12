@@ -1,0 +1,8 @@
+^_build.*
+^blib.*
+^MYMETA.yml$
+^MYMETA\.json$
+.*gz$
+.*~$
+^t/var
+MANIFEST.bak

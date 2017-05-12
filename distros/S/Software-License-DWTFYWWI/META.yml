@@ -1,0 +1,29 @@
+---
+abstract: "The \"Do Whatever The Fuck You Want With It\" license"
+author:
+  - 'Ævar Arnfjörð Bjarmason <avar@cpan.org>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+generated_by: 'Dist::Zilla version 2.101170'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Software-License-DWTFYWWI
+no_index:
+  directory:
+    - t
+recommends: {}
+requires:
+  Software::License: 0
+resources:
+  Ratings: http://cpanratings.perl.org/d/Software-License-DWTFYWWI
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Software-License-DWTFYWWI
+  homepage: http://search.cpan.org/dist/Software-License-DWTFYWWI/
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/avar/software-license-dwtfywwi
+version: 0.01

@@ -1,0 +1,30 @@
+[
+	class	=>	'Stem::Console',
+],
+[
+	'class'	=>	'Stem::Hub',
+	'name'	=>	'proc',
+	'args'	=>	[],
+],
+
+# this portal listens for the driver hub
+[
+	'class'	=>	'Stem::Portal',
+	'name'	=>	'Echo',
+	'args'	=>	[
+		'host'		=> '',
+		'port'		=> 10001,
+		'server'	=> 1
+	],
+],
+[
+	class	=>	'Stem::Proc',
+	name	=>	'echo',
+	args	=>	[
+		path		=> './bin/echo_worker.pl',
+		spawn_now	=> 1,
+		cell_attr	=> [
+			'worker_mode'		=> 1,
+		],
+	],
+],

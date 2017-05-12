@@ -1,0 +1,34 @@
+---
+name: Search-Mousse
+version: 0.32
+author:
+  - 'Leon Brocard, C<< <acme@astray.com> >>'
+abstract: A simple and fast inverted index
+license: perl
+requires:
+  CDB_File: 0
+  Class::Accessor::Chained::Fast: 0
+  Cwd: 0
+  List::Uniq: 0
+  MealMaster: 0
+  Path::Class: 0
+  Search::ContextGraph: 0
+  Search::QueryParser: 0
+  Set::Scalar: 0
+  Storable: 0
+  Test::Exception: 0
+  Test::More: 0
+  Text::Soundex: 0
+provides:
+  CDB_File::Maker_Thawed:
+    file: lib/CDB_File_Thawed.pm
+  CDB_File_Thawed:
+    file: lib/CDB_File_Thawed.pm
+  Search::Mousse:
+    file: lib/Search/Mousse.pm
+    version: 0.32
+  Search::Mousse::Writer:
+    file: lib/Search/Mousse/Writer.pm
+  Search::Mousse::Writer::Related:
+    file: lib/Search/Mousse/Writer/Related.pm
+generated_by: Module::Build version 0.2611

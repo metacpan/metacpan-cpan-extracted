@@ -1,0 +1,23 @@
+% if ($tag_count) {
+<ul>
+%   while ( my $tag = $tags->next() ) {
+<& tag-as-li.mas, tag => $tag, count => $tags->raw_row()->[-1] &>
+%   }
+</ul>
+% } else {
+<p>
+  <% loc('This wiki does not have any tagged pages yet.') %>
+</p>
+% }
+
+<%args>
+$tag_count
+$tags => undef
+</%args>
+
+<%method title>
+<% loc( 'Tags in Use for %1', $wiki->title() ) %>
+<%args>
+$wiki
+</%args>
+</%method>

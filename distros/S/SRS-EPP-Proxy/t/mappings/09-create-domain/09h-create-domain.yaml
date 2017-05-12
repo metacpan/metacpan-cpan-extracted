@@ -1,0 +1,18 @@
+# Create a with more than one admin contact (not allowed)
+template: create-domain.tt
+
+vars:
+  domain: 09g.co.te
+  owner: id123
+  admin: shazzam1234
+  admin2: something
+  tech: alcatraz367
+  no_ns: 1
+
+input_assertions:
+  class: SRS::EPP::Command::Create::Domain
+
+
+output_assertions:
+  attr_is:
+    - [ '//epp:result', 'code', '2306', 'EPP: correct response code' ]

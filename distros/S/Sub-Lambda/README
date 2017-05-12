@@ -1,0 +1,56 @@
+Sub-Lambda (0.2)
+
+The module provides syntactic sugar for lambda expressions in Perl. With
+Sub::Lambda you gain the convenient fn subroutine:
+
+  (fn x => fn y => '$x-$y')->(1)->(2) # -1
+
+Also, there is an experimental Sub::Lambda::Filter that goes one step
+beyond that and lets you write:
+
+  (\x -> \y -> {$x-$y})->(1)->(2) #3
+
+  ((\f -> \a -> \b -> f b a) (\x -> \y -> {$x-$y}) {1} {2}) # 1
+
+See the POD documentation for more examples.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Sub::Lambda
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Sub-Lambda
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Sub-Lambda
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Sub-Lambda
+
+    Search CPAN
+        http://search.cpan.org/dist/Sub-Lambda
+
+If you find bugs, please email me at name.surname@gmail.com (Anton).
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Anton Tayanovskyy
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

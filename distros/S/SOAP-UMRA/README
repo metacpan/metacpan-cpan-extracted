@@ -1,0 +1,41 @@
+SOAP::UMRA - Access an UMRA SOAP service from perl
+==================================================
+
+UMRA (User Management Resource Administrator) is a product by tools4ever to
+link multiple authentication systems together. It can speak to AD, SAP, SQL
+server and through powershell to other services too. This module allows you to
+talk to its SOAP service from perl, so you can integrate account management
+with your Perl based (web) application.
+
+INSTALLATION
+
+You can download the latest code from http://github.com/seveas/soap-umra
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+SOAP::Lite
+HTTP::Cookies
+An UMRA installation
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 by Dennis Kaarsemaker
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program.  If not, see <http://www.gnu.org/licenses/>.

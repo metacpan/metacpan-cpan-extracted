@@ -1,0 +1,84 @@
+<?xml version="1.0" ?>
+<!DOCTYPE workbook SYSTEM "../FromXML.dtd">
+
+<!-- This is my XML file! $Version$ -->
+<!-- Can you handle this you jerky? -->
+<workbook>
+  <worksheet title="Practitioner Profiles">
+    <format name="default" />
+    <format name="bold1" bold="1" />
+    <format name="heading" bold="1" bg_color="yellow" align="center" font="Courier" size="12" italic="1" />
+    <format name="undl1" underline="1" bold="1" />
+    <format name="zipFormat" num_format="00000" />
+    <format name="zip4Format" num_format="0000" />
+    <row format="heading">
+      <cell>PRACT_ID</cell>
+      <cell>LAST</cell>
+      <cell>FIRST</cell>
+      <cell>MIDDLE</cell>
+      <cell>SUFX</cell>
+      <cell>CRED</cell>
+      <cell>GENDER</cell>
+      <cell>SPECIALTY1</cell>
+      <cell>SPECIALTY2</cell>
+      <cell>ADRR ID</cell>
+      <cell>ADRR1</cell>
+      <cell>ADRR2</cell>
+      <cell>ADRR3</cell>
+      <cell>ADRR4</cell>
+      <cell>CITY</cell>
+      <cell>STATE</cell>
+      <cell>ZIP</cell>
+      <cell>ZIP4</cell>
+      <cell>PHONE1</cell>
+      <cell>PHONE2</cell>
+      <cell>FAX</cell>
+      <cell>TERRITORY</cell>
+    </row>
+    <row>
+    </row>
+    <row format="bold1">
+      <cell type="number" format="bold1">11784</cell>
+      <cell format="bold1">SMITH</cell>
+      <cell format="bold1">JOHN</cell>
+      <cell format="bold1">J</cell>
+      <cell format="bold1"></cell>
+      <cell format="undl1">MD</cell>
+      <cell format="bold1">M</cell> <!-- 1,7 -->
+      <cell>Internal Medicine (Internal Medicine)</cell>
+      <cell>Hematology (Internal Medicine)</cell>
+      <cell type="number">43131</cell>
+      <cell>1 HOSPITAL DR</cell>
+      <cell></cell>
+      <cell></cell>
+      <cell></cell>
+      <cell>LOWELL</cell>
+      <cell>MA</cell>
+      <cell type="number" format="zipFormat">01852</cell>
+      <cell type="number" format="zip4Format">1311</cell>
+      <cell></cell>
+      <cell></cell>
+      <cell></cell>
+      <cell>#001234</cell>
+    </row>
+    <cell index="1,7" format="undl1" />
+  </worksheet>
+  <worksheet title="Hospital Affiliations">
+    <row>
+      <cell>PRACT_ID</cell>
+      <cell>LAST</cell>
+      <cell>FIRST</cell>
+      <cell>MIDDLE</cell>
+      <cell>CRED</cell>
+      <cell>ORG_ID</cell>
+      <cell>ORGANIZATION</cell>
+      <cell>ADDR1</cell>
+      <cell>ADDR2</cell>
+      <cell>CITY</cell>
+      <cell>STATE</cell>
+      <cell>ZIP</cell>
+      <cell>PHONE</cell>
+      <cell>TERRITORY</cell>
+    </row>
+  </worksheet>
+</workbook>

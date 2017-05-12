@@ -1,0 +1,8 @@
+
+
+  gzip -dc SWISH-xx.xx.tar.gz | tar xof -
+
+  perl Makefile.PL  (or perl Makefile.PL PREFIX=/path/to/local/lib)
+  make
+  make test (optional - as it currently doesn't do anything)
+  make install  (su root first if needed)

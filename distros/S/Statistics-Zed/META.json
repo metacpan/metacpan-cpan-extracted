@@ -1,0 +1,50 @@
+{
+   "abstract" : "Data-handling and calculations for ratio of observed to standard deviation (zscore)",
+   "author" : [
+      "Roderick Garton <rgarton@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Statistics-Zed",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.92"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4007"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Math::Cephes" : "0.5303",
+            "Scalar::Util" : "1.35",
+            "Statistics::Data" : "0.08",
+            "Statistics::Lite" : "3.2",
+            "String::Util" : "1.21"
+         }
+      }
+   },
+   "provides" : {
+      "Statistics::Zed" : {
+         "file" : "lib/Statistics/Zed.pm",
+         "version" : "0.10"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.10"
+}

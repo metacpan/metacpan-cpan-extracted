@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/SMS-CPAGateway.t
+lib/SMS/CPAGateway.pm
+META.yml                                 Module meta-data (added by MakeMaker)

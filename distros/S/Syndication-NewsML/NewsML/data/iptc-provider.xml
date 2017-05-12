@@ -1,0 +1,216 @@
+<?xml version="1.0"?>
+<!DOCTYPE TopicSet PUBLIC "urn:newsml:iptc.org:20001006:NewsMLv1.0.dtd:1" "NewsMLv1.0.dtd">
+<TopicSet Duid="iptc.provider" FormalName="Provider">
+	<Comment xml:lang="en">A company, publication or service provider registered with IPTC and assigned a unique ID by IPTC.</Comment>
+	<Topic Duid="pid1">
+		<TopicType Scheme="IptcTopicType" FormalName="Provider"/>
+		<FormalName Scheme="IptcProvider">AFP</FormalName>
+		<Description xml:lang="fr" Variant="Company">Agence France-Presse</Description>
+	</Topic>
+	<Topic Duid="pid2">
+		<TopicType Scheme="IptcTopicType" FormalName="Provider"/>
+		<FormalName Scheme="IptcProvider">AP</FormalName>
+		<Description xml:lang="en" Variant="Company">Associated Press</Description>
+	</Topic>
+	<Topic Duid="pid3">
+		<TopicType Scheme="IptcTopicType" FormalName="Provider"/>
+		<FormalName Scheme="IptcProvider">APD</FormalName>
+		<Description xml:lang="en" Variant="Service">Associated Press German</Description>
+	</Topic>
+	<Topic Duid="pid4">
+		<TopicType Scheme="IptcTopicType" FormalName="Provider"/>
+		<FormalName Scheme="IptcProvider">APE</FormalName>
+		<Description xml:lang="en" Variant="Service">Associated Press English</Description>
+	</Topic>
+	<Topic Duid="pid5">
+		<TopicType Scheme="IptcTopicType" FormalName="Provider"/>
+		<FormalName Scheme="IptcProvider">APF</FormalName>
+		<Description xml:lang="en" Variant="Service">Associated Press French</Description>
+	</Topic>
+	<Topic Duid="pid6">
+		<TopicType Scheme="IptcTopicType" FormalName="Provider"/>
+		<FormalName Scheme="IptcProvider">APS</FormalName>
+		<Description xml:lang="en" Variant="Service">Associated Press Spanish</Description>
+	</Topic>
+	<Topic Duid="pid7">
+		<TopicType Scheme="IptcTopicType" FormalName="Provider"/>
+		<FormalName Scheme="IptcProvider">BN</FormalName>
+		<Description xml:lang="en" Variant="Company">Broadcast News</Description>
+	</Topic>
+	<Topic Duid="pid8">
+		<TopicType Scheme="IptcTopicType" FormalName="Provider"/>
+		<FormalName Scheme="IptcProvider">BW</FormalName>
+		<Description xml:lang="en" Variant="Company">Business Wire</Description>
+	</Topic>
+	<Topic Duid="pid9">
+		<TopicType Scheme="IptcTopicType" FormalName="Provider"/>
+		<FormalName Scheme="IptcProvider">CP</FormalName>
+		<Description xml:lang="en" Variant="Company">The Canadian Press</Description>
+	</Topic>
+	<Topic Duid="pid10">
+		<TopicType Scheme="IptcTopicType" FormalName="Provider"/>
+		<FormalName Scheme="IptcProvider">CTK</FormalName>
+		<Description xml:lang="en" Variant="Company">Czech News Agency</Description>
+	</Topic>
+	<Topic Duid="pid11">
+		<TopicType Scheme="IptcTopicType" FormalName="Provider"/>
+		<FormalName Scheme="IptcProvider">dpa</FormalName>
+		<Description xml:lang="de" Variant="Company">Deutsche Presse-Agentur GmbH</Description>
+	</Topic>
+	<Topic Duid="pid12">
+		<TopicType Scheme="IptcTopicType" FormalName="Provider"/>
+		<FormalName Scheme="IptcProvider">GLOBE</FormalName>
+		<Description xml:lang="en" Variant="Company">Boston Globe</Description>
+	</Topic>
+	<Topic Duid="pid13">
+		<TopicType Scheme="IptcTopicType" FormalName="Provider"/>
+		<FormalName Scheme="IptcProvider">HNA</FormalName>
+		<Description xml:lang="en" Variant="Company">Croatian News Agency</Description>
+	</Topic>
+	<Topic Duid="pid14">
+		<TopicType Scheme="IptcTopicType" FormalName="Provider"/>
+		<FormalName Scheme="IptcProvider">IHT</FormalName>
+		<Description xml:lang="en" Variant="Company">The International Herald Tribune</Description>
+	</Topic>
+	<Topic Duid="pid15">
+		<TopicType Scheme="IptcTopicType" FormalName="Provider"/>
+		<FormalName Scheme="IptcProvider">IPTC</FormalName>
+		<Description xml:lang="en" Variant="Company">International Press Telecommunications Council</Description>
+	</Topic>
+	<Topic Duid="pid16">
+		<TopicType Scheme="IptcTopicType" FormalName="Provider"/>
+		<FormalName Scheme="IptcProvider">KYODO</FormalName>
+		<Description xml:lang="en" Variant="Company">Kyodo news service</Description>
+	</Topic>
+	<Topic Duid="pid17">
+		<TopicType Scheme="IptcTopicType" FormalName="Provider"/>
+		<FormalName Scheme="IptcProvider">MTI</FormalName>
+		<Description xml:lang="hu" Variant="Company">Magyar T&#xE1;virati Iroda</Description>
+	</Topic>
+	<Topic Duid="pid18">
+		<TopicType Scheme="IptcTopicType" FormalName="Provider"/>
+		<FormalName Scheme="IptcProvider">NTR</FormalName>
+		<Description xml:lang="fr" Variant="Service">Nouvelles t&#xE9;l&#xE9;-radio</Description>
+	</Topic>
+	<Topic Duid="pid19">
+		<TopicType Scheme="IptcTopicType" FormalName="Provider"/>
+		<FormalName Scheme="IptcProvider">NYTBG</FormalName>
+		<Description xml:lang="en" Variant="Company">New York Times Broadcasting Group</Description>
+	</Topic>
+	<Topic Duid="pid20">
+		<TopicType Scheme="IptcTopicType" FormalName="Provider"/>
+		<FormalName Scheme="IptcProvider">NYTD</FormalName>
+		<Description xml:lang="en" Variant="Service">New York Times Digital</Description>
+	</Topic>
+	<Topic Duid="pid21">
+		<TopicType Scheme="IptcTopicType" FormalName="Provider"/>
+		<FormalName Scheme="IptcProvider">NYTIMES</FormalName>
+		<Description xml:lang="en" Variant="Company">The New York Times</Description>
+	</Topic>
+	<Topic Duid="pid22">
+		<TopicType Scheme="IptcTopicType" FormalName="Provider"/>
+		<FormalName Scheme="IptcProvider">NYTNS</FormalName>
+		<Description xml:lang="en" Variant="Service">New York Times News Service</Description>
+	</Topic>
+	<Topic Duid="pid23">
+		<TopicType Scheme="IptcTopicType" FormalName="Provider"/>
+		<FormalName Scheme="IptcProvider">NYTRNG</FormalName>
+		<Description xml:lang="en" Variant="Company">New York Times Regional Newspaper Group</Description>
+	</Topic>
+	<Topic Duid="pid24">
+		<TopicType Scheme="IptcTopicType" FormalName="Provider"/>
+		<FormalName Scheme="IptcProvider">NYTS</FormalName>
+		<Description xml:lang="en" Variant="Service">New York Times Syndicate</Description>
+	</Topic>
+	<Topic Duid="pid25">
+		<TopicType Scheme="IptcTopicType" FormalName="Provider"/>
+		<FormalName Scheme="IptcProvider">PA</FormalName>
+		<Description xml:lang="en" Variant="Company">The Press Association</Description>
+	</Topic>
+	<Topic Duid="pid26">
+		<TopicType Scheme="IptcTopicType" FormalName="Provider"/>
+		<FormalName Scheme="IptcProvider">PC</FormalName>
+		<Description xml:lang="fr" Variant="Company">La Presse Canadienne</Description>
+	</Topic>
+	<Topic Duid="pid27">
+		<TopicType Scheme="IptcTopicType" FormalName="Provider"/>
+		<FormalName Scheme="IptcProvider">PN</FormalName>
+		<Description xml:lang="en" Variant="Service">Press News, The Canadian Press Commercial Services</Description>
+	</Topic>
+	<Topic Duid="pid28">
+		<TopicType Scheme="IptcTopicType" FormalName="Provider"/>
+		<FormalName Scheme="IptcProvider">PRN</FormalName>
+		<Description xml:lang="en" Variant="Company">PR NewsWire</Description>
+	</Topic>
+	<Topic Duid="pid29">
+		<TopicType Scheme="IptcTopicType" FormalName="Provider"/>
+		<FormalName Scheme="IptcProvider">PRNE</FormalName>
+		<Description xml:lang="en" Variant="Company">PR NewsWire Europe</Description>
+	</Topic>
+	<Topic Duid="pid30">
+		<TopicType Scheme="IptcTopicType" FormalName="Provider"/>
+		<FormalName Scheme="IptcProvider">REUTERS</FormalName>
+		<Description xml:lang="en" Variant="Company">Reuters</Description>
+	</Topic>
+	<Topic Duid="pid31">
+		<TopicType Scheme="IptcTopicType" FormalName="Provider"/>
+		<FormalName Scheme="IptcProvider">STA</FormalName>
+		<Description xml:lang="sl" Variant="Company">Slovenska Tiskovna Agencija</Description>
+	</Topic>
+	<Topic Duid="pid32">
+		<TopicType Scheme="IptcTopicType" FormalName="Provider"/>
+		<FormalName Scheme="IptcProvider">TT</FormalName>
+		<Description xml:lang="sv" Variant="Company">Tidningarnas Telegrambyr&#xE5;</Description>
+	</Topic>
+	<Topic Duid="pid33">
+		<TopicType Scheme="IptcTopicType" FormalName="Provider"/>
+		<FormalName Scheme="IptcProvider">UP</FormalName>
+		<Description xml:lang="en" Variant="Service">United Press International-2</Description>
+	</Topic>
+	<Topic Duid="pid34">
+		<TopicType Scheme="IptcTopicType" FormalName="Provider"/>
+		<FormalName Scheme="IptcProvider">UPI</FormalName>
+		<Description xml:lang="en" Variant="Company">United Press International</Description>
+	</Topic>
+	<Topic Duid="pid35">
+		<TopicType Scheme="IptcTopicType" FormalName="Provider"/>
+		<FormalName Scheme="IptcProvider">ANL</FormalName>
+		<Description xml:lang="en" Variant="Company">Associated Newspapers Limited</Description>
+	</Topic>
+	<Topic Duid="pid36">
+		<TopicType Scheme="IptcTopicType" FormalName="Provider"/>
+		<FormalName Scheme="IptcProvider">DM</FormalName>
+		<Description xml:lang="en" Variant="Publication">Daily Mail, Associated Newspapers Limited</Description>
+	</Topic>
+	<Topic Duid="pid37">
+		<TopicType Scheme="IptcTopicType" FormalName="Provider"/>
+		<FormalName Scheme="IptcProvider">TMOS</FormalName>
+		<Description xml:lang="en" Variant="Publication">The Mail On Sunday, Associated Newspapers Limited</Description>
+	</Topic>
+	<Topic Duid="pid38">
+		<TopicType Scheme="IptcTopicType" FormalName="Provider"/>
+		<FormalName Scheme="IptcProvider">ES</FormalName>
+		<Description xml:lang="en" Variant="Publication">Evening Standard, Associated Newspapers Limited</Description>
+	</Topic>
+	<Topic Duid="pid39">
+		<TopicType Scheme="IptcTopicType" FormalName="Provider"/>
+		<FormalName Scheme="IptcProvider">METRO</FormalName>
+		<Description xml:lang="en" Variant="Publication">Metro, Associated Newspapers Limited</Description>
+	</Topic>
+	<Topic Duid="pid40">
+		<TopicType Scheme="IptcTopicType" FormalName="Provider"/>
+		<FormalName Scheme="IptcProvider">AMB</FormalName>
+		<Description xml:lang="en" Variant="Company">Associated MediaBase, Associated Newspapers Limited</Description>
+	</Topic>
+	<Topic Duid="pid41">
+		<TopicType Scheme="IptcTopicType" FormalName="Provider"/>
+		<FormalName Scheme="IptcProvider">ANM</FormalName>
+		<Description xml:lang="en" Variant="Company">Associated New Media, Associated Newspapers Limited</Description>
+	</Topic>
+	<Topic Duid="pid42">
+		<TopicType Scheme="IptcTopicType" FormalName="Provider"/>
+		<FormalName Scheme="IptcProvider">DMGT</FormalName>
+		<Description xml:lang="en" Variant="Company">Dail Mail &amp; General Trust, Associated Newspapers Limited</Description>
+	</Topic>
+</TopicSet>
+

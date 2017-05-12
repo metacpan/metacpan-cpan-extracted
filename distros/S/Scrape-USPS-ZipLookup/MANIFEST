@@ -1,0 +1,11 @@
+CHANGES
+COPYRIGHT
+Makefile.PL
+MANIFEST
+README.md
+lib/Scrape/USPS/ZipLookup.pm
+lib/Scrape/USPS/ZipLookup/Address.pm
+script/stdaddr
+t/address.t
+t/standardize.t
+META.yml                                 Module meta-data (added by MakeMaker)

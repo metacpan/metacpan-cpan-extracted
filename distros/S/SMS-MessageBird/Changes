@@ -1,0 +1,11 @@
+Revision history for SMS-MessageBird
+
+0.03    Fix the module compilation on 5.8 Perls, due to stupidly using the
+        defined-or assignment operator. Spotted by the eagle-eyed BIGPRESH.
+
+0.02    Add Prereqs and correct licenece to the Makefile.
+
+0.01    Initial release of distribution.
+        Most of the API implemented, except the new
+        beta "Chat API"
+

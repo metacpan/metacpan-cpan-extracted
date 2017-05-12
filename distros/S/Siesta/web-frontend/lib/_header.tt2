@@ -1,0 +1,22 @@
+[% DEFAULT title = "Siesta - siesta.unixbeard.net siesta server" %]
+<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN'>
+<html>
+  <head>
+    <title>[% title %]</title>
+    <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
+    <link href='siesta.css' type='text/css' rel='stylesheet'>
+  </head>
+  <body>
+    <table width='100%' border='0' cellpadding='0' cellspacing='0'>
+      <tr bgcolor='white'>
+        <td  width='50%'><a href='index.tt2'><img src='images/siesta_logo.gif' border='0' width='257' height='98' alt="Siesta"></a></td>
+        <td><img src='images/zero.gif' alt='' width='10' height='2'></td>
+        <td width='50%' align="right">
+          [% INCLUDE _login_box.tt2 %]
+        </td>
+        <td><img src='images/zero.gif' alt='' width='10' height='2'></td>
+      </tr>
+      <tr bgcolor='#4C4C4C'>
+        <td colspan='6'><img src='images/zero.gif' alt='' width='2' height='2'></td>
+      </tr>
+    </table>

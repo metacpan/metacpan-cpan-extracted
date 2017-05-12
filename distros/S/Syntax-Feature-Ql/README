@@ -1,0 +1,74 @@
+NAME
+    Syntax::Feature::Ql - Turns a quoted string into a single line
+
+VERSION
+    version 0.001000
+
+SYNOPSIS
+        use syntax qw( ql );
+
+        # prints on one line
+        say ql{
+            Do you know the feeling when you want to generate a long
+            string for a message without having to concatenate or end
+            up with newlines and indentation?
+        };
+
+DESCRIPTION
+    This is a syntax extension feature suitable for the syntax extension
+    dispatcher.
+
+    It provides two new quote-like operators named "ql" and "qql". These
+    work in the same way as "q" and "qq" (including the ability to change
+    the delimiters), except they put the returned string on a single line.
+
+    The following all output "foo bar baz":
+
+        # simple
+        say ql{foo bar baz};
+
+        # multiline
+        say ql{
+            foo
+            bar
+            baz
+        };
+
+        # different delimiters and interpolation
+        my $qux = q{ # <- this is a normal quote!
+            bar
+            baz
+        };
+        say qql!
+            foo
+            $qux
+        !;
+
+    As you can see with the last example, interpolated values are also
+    normalized to fit on the single line.
+
+METHODS
+  install
+        Syntax::Feature::Ql->install( into => $target );
+
+    Installs the "ql" and "qql" operators into the $target.
+
+SEE ALSO
+    *   syntax
+
+    *   perlop
+
+BUGS
+    Please report any bugs or feature requests to
+    bug-syntax-feature-ql@rt.cpan.org or through the web interface at:
+    http://rt.cpan.org/Public/Dist/Display.html?Name=Syntax-Feature-Ql
+
+AUTHOR
+    Robert 'phaylon' Sedlacek <rs@474.at>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Robert 'phaylon' Sedlacek.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

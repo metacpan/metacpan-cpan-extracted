@@ -1,0 +1,39 @@
+Revision history for SQL-Abstract-FromQuery
+
+
+0.10  06.04.2015
+  - INCOMPATIBLE CHANGE:
+    removed support for multicolumns (moved to SQL-Abstract-More)
+
+0.09  24.03.2015
+  - tests in 0.08 failed in perl >= 5.18 because of hash key orders
+
+0.08  23.03.2015
+  - fix multicolumns bug introduced in v0.07
+
+0.07  23.03.2015
+  - added support for multicolumns
+
+0.06  05.01.2015
+  - upgraded dependency to Regexp::Grammars 1.038
+  - support spaces within plain values (no need to put quotation marks)
+  - improved tests
+  - removed notice about "beta software"
+
+0.05  24.08.2014
+  - upgraded dependency to Regexp::Grammars 1.035
+  - fixed testing bug in perl >= 5.18 because of hash key randomization
+
+0.04  23.08.2014
+  - refactored given/when into plain if/elsif/else
+
+0.03  22.08.2014
+  - Changed algorithm for generating anonymous subclasses (avoid memleaks)
+  - Fixes/improvements in POD
+
+0.02  06.06.2012
+  - Forgot dependency on parent.pm
+
+0.01  03.06.2012
+  - First release
+

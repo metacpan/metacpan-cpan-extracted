@@ -1,0 +1,89 @@
+Revision history for Struct-Diff
+
+0.86    2017-01-22
+        number and same number as string are now distinguishable for diff()
+        diff() now much faster in hashes comparion
+
+0.85    2016-12-25
+        numbers stringification fixed in resulting diff
+
+0.84    2016-12-23
+        arrays path indexes fixed in dtraverse() for noU diffs
+
+0.83    2016-12-04
+        patch() fixed (A/R in the middle of arrays)
+
+0.82    2016-10-21
+        docs corrected
+
+0.81    2016-10-16
+        code and tests refactoring
+
+0.80    2016-09-18
+        LCS for arrays diff implemented
+
+0.71    2016-09-15
+        'depth' opt to dtraverse() added
+
+0.70    2016-09-13
+        dselect() removed, dtraverse() should be used instead
+        cosmetic refactoring
+        docs corrected
+
+0.66    2016-09-06
+        ref to subdiff passed as fourth arg to callback functions in dtraverse()
+        dtraverse() expects true value as callback's out value
+
+0.65    2016-08-16
+        Tests fixed, min perl ver 5.008
+
+0.64    2016-08-08
+        'statuses' opt for dtraverse() appeared
+
+0.63    2016-08-02
+        dtraverse() opts format changed, 'sortkeys' opt added
+
+0.62    2016-07-15
+        Docs corrected
+
+0.61    2016-07-13
+        Refactoring
+        diff()'s speed improved (~20%) on arrays
+
+0.60    2016-07-11
+        dtraverse() appeared
+
+0.58    2016-07-06
+        Diff fixed for array's nested single items,
+        example: [[ 0 ]] vs [[ 1 ]], tests for this case added.
+
+0.57    2016-07-03
+        Unused code removed
+        More tests added, tests refactored
+
+0.56    2016-06-22
+        Pod and dist corrected, unused code removed.
+
+0.55    2016-05-16
+        get rid of experimental feature (keys on scalars
+        (not supported in Perl < 5.14 and forbidden since >= 5.20))
+
+0.54    2016-05-16
+        dist corrected (tests and metadata).
+
+0.53    2016-05-15
+        Pod corrected.
+
+0.52    2016-05-10
+        Pod corrected, cosmetics.
+
+0.50    2016-04-18
+        Diff metadata format changed (and I hope stabilized)
+        diff()'s opts changed
+        strip() removed
+        dselect(), dsplit(), patch() appeared
+        tests and pod almost for everything
+
+0.01    2015-07-21
+        Original version.
+

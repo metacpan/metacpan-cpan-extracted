@@ -1,0 +1,14 @@
+CHANGES
+README.TXT
+Makefile.PL
+MANIFEST
+Match.pm
+t/10load.t
+t/25expand.t
+t/25isleap.t
+t/25localtime.t
+t/25rcheck-edge.t
+t/25rcheck.t
+t/25scheck-edge.t
+t/25scheck.t
+t/25uthash.t

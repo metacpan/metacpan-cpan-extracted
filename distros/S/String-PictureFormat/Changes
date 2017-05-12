@@ -1,0 +1,17 @@
+Revision history for String-PictureFormat
+
+1.00    2016-01-08
+        First version, released on an unsuspecting world.
+1.01    2016-01-10
+        Fixed small error that caused tests to fail, added cpl. optimizations.
+1.1     Added optional second format picture string for date/times in order  
+        to specify what format to "unformat" date/times into if needing a 
+        string result instead of a Perl/Unix time, ie. for database fields 
+        that, for example, use VARCHAR(8) "yyyymmdd" instead of datetimes.
+        That and a few minor cleanups.
+1.11    Redid the SYNOPSIS section to allow for copying and pasting into a 
+        runnable script (closes bug#111125).  Also added numerous in-
+        source code comments for better clarity.
+        Small fix so that justification does not default to right when 
+        floatiing "$" and/or "," in numeric fields if "-nonnumeric" option 
+        is set.

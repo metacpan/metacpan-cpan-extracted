@@ -1,0 +1,49 @@
+Revision history for Perl extension Starch.
+
+0.06 2015-07-31
+
+ - Move the TimeoutStore plugin to a separate distribution.
+
+0.05 2015-07-27
+
+ - Use the short store name when logging store exceptions.
+ - Simplified the state lifecycle methods a bit and modified them to be a
+   little less opinionated.
+ - Plugins can now more reliably extend BUILD via method modifiers.
+ - Make sure the TimeoutStore alarm is cleared when an exception is thrown.
+ - Use alarm instead of Time::HiRes::Alarm for the TimeoutStore plugin,
+   as sub-second alarms cause more unpredictable issues than they are worth.
+
+0.04 2015-07-21
+
+ - Update state's in_store if the store did not find any data.  This
+   should provide some minor performance improvements and correct
+   behavior.
+ - Moved the hash_seed and generate_id methods into the manager.
+ - Renamed invalid key to no_store key, which means its named
+   after what it causes rather than what it is used for (an anti-
+   pattern of sorts, but this key will be used for more general
+   purpose stuff).
+ - Added a mark_dirty method to state.
+ - Moved stringify_key and key_separator from manager to store.
+ - Increase test coverage.
+
+0.03 2015-07-20
+
+ - Better Carp handling by setting Starch modules as Internal so that
+   the caller information ends up in the user's code.
+ - Move state ID validation up to the Manager so it is easier for
+   integration libraries to validate the ID.
+ - Lots of documentation re-jiggery (still not 100% satisfied).
+
+0.02 2015-07-16
+
+ - Remove all uses of DEMOLISH, they were causing race conditions in
+   some cases during global destruction.  Good by LogUnsaved and AutoSave
+   plugins.  :(
+ - Fix Type::Tiny union constraints sometimes failing on Perl < 5.14.
+
+0.01 2015-07-16
+
+ - First version.
+

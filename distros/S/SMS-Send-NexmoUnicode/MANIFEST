@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/SMS-Send-NexmoUnicode.t
+lib/SMS/Send/NexmoUnicode.pm
+META.yml                                 Module meta-data (added by MakeMaker)

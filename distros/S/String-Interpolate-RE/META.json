@@ -1,0 +1,66 @@
+{
+   "abstract" : "interpolate variables into strings",
+   "author" : [
+      ", 2014 The Smithsonian Astrophysical Observatory",
+      "Diab Jerius"
+   ],
+   "dynamic_config" : "0",
+   "generated_by" : "Module::Install version 1.06, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "String-Interpolate-RE",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.36"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "ExtUtils::MakeMaker" : "6.36"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Module::Install" : "0",
+            "Module::Install::AuthorTests" : "0",
+            "Module::Install::CPANfile" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Fatal" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=String-Interpolate-RE"
+      },
+      "license" : [
+         "http://opensource.org/licenses/gpl-license.php"
+      ],
+      "repository" : {
+         "url" : "https://bitbucket.org/djerius/string-interpolate-re"
+      }
+   },
+   "version" : "0.05"
+}

@@ -1,0 +1,121 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+seealso - command line client to query SeeAlso services
+
+=cut
+
+use strict;
+
+our $VERSION = '0.11';
+
+use SeeAlso::Client;
+use SeeAlso::Server;
+use Getopt::Long;
+use Pod::Usage;
+use JSON::XS;
+
+my ($verbose, $quiet, $debug, $help, $man, $pretty);
+my ($csv, $json, $n3, $rdfjson, $listformats);
+# my ($inifile);
+
+GetOptions(
+    "quiet" => \$quiet,
+    "help|?" => \$help,
+    "man" => \$man,
+    "debug" => \$debug,
+    "verbose" => \$verbose,
+    "pretty" => \$pretty,
+    "json" => \$json,
+    "n3" => \$n3,
+    "rdfjson" => \$rdfjson,
+    "csv" => \$csv,
+ #   "ini" => \$inifile,
+    "formats" => \$listformats,
+) or pod2usage(2);
+pod2usage(1) if $help;
+pod2usage(-verbose => 2) if $man;
+
+failed('Please specify a SeeAlso service (URL or name) to query') unless @ARGV;
+
+# format
+my $format = "json";
+if ($csv) { $format = "csv"; }
+elsif ($rdfjson) { $format = "rdfjson"; }
+elsif ($n3) { $format = "n3"; }
+
+my $service = shift @ARGV;
+my @ids = @ARGV;
+
+
+my $client = eval { SeeAlso::Client->new( $service ); };
+failed($@) if ($@);
+
+print "Using SeeAlso service at " . $client->baseURL . "\n" if $verbose;
+
+if (@ids) {
+    foreach my $id (@ids) {
+        print "Query for $id\n" if $verbose;
+        my $result = $client->query( $id ); # query always for JSON
+        my $json = JSON::XS->new->pretty->utf8(0) if $pretty;
+        my $output = "";
+        if ($format eq "json") {
+            $output = $result->toJSON('',$json);
+        } elsif ($format eq "csv") {
+            $output .= '"LABEL","DESCRIPTION","URI"' . "\n" if $pretty;
+            $output .= $result->toCSV();
+        } elsif ($format eq "n3") {
+            $output = $result->toN3();
+        } elsif ($format eq "rdfjson") {
+            $output = $result->toRDFJSON( '', $json )
+        }
+        print "$output\n" unless $quiet; # TODO but into output file of given
+    }
+    # TODO: better combine multiple results
+} else {
+    if ($listformats) {
+        my $formats = $client->getFormats();
+        print SeeAlso::Server::_unapiListFormats( $formats, '', '' );
+    } else {
+        print "Please specify one or more IDs\n"; # TODO: Get OSD
+    }
+}
+
+sub failed {
+    my $msg = shift;
+    $msg =~ s/\n$//;
+    $msg =~ s/ at .+ line \d+//;
+    print STDERR "$msg!\n";
+    exit(1);
+}
+
+=head1 SYNOPSIS
+
+seealso service [identifier] [identifier] ...
+
+=head1 OPTIONS
+
+ -help          brief help message
+ -man           full documentation with examples
+ -verbose       print additional information what is beeing done
+ -quiet         don't print anything
+ -debug         print additional debugging information
+ -pretty        pretty output (releant only for JSON and CSV format)
+ -json          output in JSON format (default) 
+ -csv           output in CSV format
+ -n3            output in Notation3 format
+ -rdfjson       output in RDF/JSON format
+
+=head1 AUTHOR
+
+Jakob Voss C<< <jakob.voss@gbv.de> >>
+
+=head1 LICENSE
+
+Copyright (C) 2007-2010 by Verbundzentrale Goettingen (VZG) and Jakob Voss
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself, either Perl version 5.8.8 or, at
+your option, any later version of Perl 5 you may have available.
+

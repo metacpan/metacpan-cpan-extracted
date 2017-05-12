@@ -1,0 +1,17 @@
+Revision history for Perl extension Sledge::Plugin::DebugScreen
+
+0.08
+
+        - modernized package
+
+0.07  Mon Jan 23 17:41:18 JST 2006
+        - output the dying message to stderr, also debug mode(THANKS TO Jiro Nishiguchi)
+
+0.06  Sun Jan 15 05:31:08 JST 2006
+        - fix the document bug
+        - fix XML-parse error in IE. IE is xxx.
+        - remove BUGS section.
+
+0.05  Sun Jan 15 02:08:55 2006
+        - release to CPAN
+

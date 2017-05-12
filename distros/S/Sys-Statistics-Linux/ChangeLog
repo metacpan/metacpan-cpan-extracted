@@ -1,0 +1,441 @@
+0.66    Released at 2012-03-09.
+        - Quick fix and replaced the "defined or" operator // with || in
+          Processes.pm for backward compability with Perl < 5.10.
+          Thanks to all CPAN smoker for the fix test reports!
+
+0.65    Released at 2012-03-07.
+        - Just a full release.
+
+0.64_2  Released at 2012-03-02.
+        - Redesign of init() and load() of Processes.pm.
+
+0.64_1  Released at 2012-03-02.
+        - Debugging undef warnings from version 0.63 on lines 452,
+          490, 494, 501, 502. Thanks for helping!
+
+0.63    Released at 2012-02-16.
+        - Big sorry! The deletion of the PID was no good idea.
+          Fixed it and check if proc->pid->io exists instead
+          to delete the PID.
+
+0.62    Released at 2012-02-16.
+        - Fixed a bug in Processes.pm. Delete a PID if it's not
+          possible to open /proc/pid/io, otherwise the warning
+          "Use of uninitialized value in division (/) at Processes.pm line 505"
+          is printed.
+
+0.61    Released at 2011-09-27.
+        - Fixed a bug in NetStats.pm. The interface name was
+          matched with \w, what is really bad if the name of
+          a interface contains other signs like a dot.
+
+0.60    Released at 2011-06-22.
+        - Just a full release. Have fun :-)
+
+0.59_02 Released at 2011-04-16.
+        - Fixed a little bug in Processes.pm (_init).
+
+0.59_01 Released at 2011-04-14.
+        - Added statistics from /proc/pid/io to Processes.pm. See RT #67459.
+
+0.59    Released at 2010-09-28.
+        - Added key "arch" to SysInfo.pm.
+
+0.58    Released at 2010-09-27.
+        - Kicked cpuinfo from SysInfo.pm.
+
+0.57_04 Released at 2010-08-27.
+        - Fixed pcpucount and tcpucount in SysInfo.pm.
+
+0.57_03 Released at 2010-08-17.
+        - Fixed the validating of params in new() in all modules
+          that generates aggregates.
+        - Changed SysInfo and kicked niccount.
+
+0.57_02 Released at 2010-08-06.
+        - Fixed some bugs in SysInfo for keys pcpucount and niccount.
+        - Added key cpuinfo.
+        - It's now possible to add %opts to the call of new() of
+          each statistic module to set the path to proc.
+
+0.57_01 Released at 2010-08-05.
+        - Added method raw() to CpuStats, DiskStats, NetStats, PgSwStats,
+          and ProcStats.
+        - Added niccount, pcpucount and tcpucount to SysInfo.
+        - Fixed issues from RT #60100 and #60098.
+
+0.56    Released at 2009-10-07.
+        - Just a full release.
+
+0.55_02 Released at 2009-09-28.
+        - Processes.pm: calculate the keys minflt, cminflt, mayflt, cmayflt,
+            utime, stime, cutime, and cstime with sttime and uptime.
+
+0.55_01 Released at 2009-09-03.
+        - Processes.pm: processes that are created between the call of
+          init() and get() are now returned. The keys minflt, cminflt,
+          mayflt, cmayflt, utime, stime, cutime, and cstime are set
+          to 0.00 - see RT #49363
+
+0.54    Released at 2009-08-17.
+        - No changes, just a full release.
+
+0.53_01 Released at 2009-08-10.
+        - Fixed wchan in Processes.pm - RT #48458
+
+0.52    Released at 2009-06-05.
+        - No changes, just a full release.
+
+0.51_01 Released at 2009-05-29.
+        - Fixed tests 060-netstats.t and 070-sockstats.t.
+        - Updated the most of the other test files.
+        - Fixed a bug in Processes.pm - actime wasn't calculated correct.
+        - Added $RAWTIME to SysInfo.pm to get the raw time with jiffies
+          for uptime and idletime.
+
+0.50    Released at 2009-05-17.
+        - ProcStats: renamed stat "procs_blocked" to "blocked" and added
+          stat "running".
+
+0.49    Released at 2009-03-15.
+        - Just a full version... all tests runs without errors.
+
+0.48_02 Released at 2009-03-11.
+        - Fixed some tests and updated the documentation.
+
+0.48_01 Released at 2009-03-07.
+        - Fixed some tests.
+        - Fixed initfile in CpuStats, DiskStats, NetStats, PgSwStats and
+          ProcStats - if the machine was rebootet the deltas couldn't be
+          calculated.
+
+0.48    Released at 2009-03-07.
+        - Fixed tests 050-pgswstats.t, 070-sockstats.t, 080-diskstats.t.
+          If linux runs as a virtual machine than it's possible that the
+          statistics pgswstats, sockstats and diskstats are not available.
+        - Fixed regex in MemStats.pm - key "dirty" never matched.
+        - Fixed Processes.pm - now all processses will be collected.
+        - Added option initfile to PgSwStats, CpuStats, DiskStats, NetStats
+          and ProcStats - YAML::Syck as serializer.
+
+0.47    Released at 2009-02-10.
+        - GRML - forget to upgrade $VERSION in Processes.pm :)
+
+0.46    Released at 2009-02-10.
+        - Fixed a bug in Processs.pm. If /proc/<pid>/fd is empty then
+          t/120-processes.t returns an error.
+
+0.45    Released at 2009-02-02.
+        - Just a full release.
+
+0.44_03 Released at 2009-01-19.
+        - Fixed some tests.
+
+0.44_02 Released at 2009-01-18.
+        - Fixed a bug: delete a process if the process doesn't exists
+          any more and jump to the next PID with "next PID;".
+        - Fixed some tests.
+
+0.44_01 Released at 2009-01-13.
+        - Added "wchan" and "fd" to Processes.pm.
+
+0.43    Released at 2008-10-29.
+        - Kicked UNIVERSAL::require.
+        - Now it's possible to pass $sleep_time to get().
+
+0.42    Released at 2008-10-06.
+        - Added $PAGES_TO_BYTES to Sys::Statistics::Linux::Processes.
+          With this variable it's possible to get bytes/kilobytes instead
+          of pages for some statistics - feature request of Marcus V.
+        - Fixed a bug in processes. The values drs and lrs in Processes.pm
+          were interchanged.
+
+0.41    Released at 2008-10-01.
+        -  http://rt.cpan.org/Ticket/Display.html?id=39723
+           Sys::Statistics::Linux::DiskUsage - added global variables
+           $DF_PATH and $DF_CMD.
+
+0.40    Released at 2008-09-24.
+        - All tests for 0.39_01 runs fine, now a full version.
+
+0.39_01 Released at 2008-09-22.
+        - http://rt.cpan.org/Public/Bug/Display.html?id=39451
+          Fixed bug in Memstats.pm for key "inactive". On earlier kernels
+          it's Inact_dirty, Inact_laundry and Inact_clean.
+          Thanks to Peter E. for his report.
+
+0.38    Released at 2008-09-11.
+        - Fixed a little bug in Processes.pm - thanks to Marcus V. for
+          his report! Marcus reported that minflt could be negativ on
+          Xen machines and Processes.pm croaks with the message:
+          "value of 'minflt' is not a number".
+        - Different code improvements in ProcStats.pm, NetStats.pm,
+          CpuStats.pm, PgSwStats.pm.
+
+0.37    Released at 2008-09-05.
+        - Fixed a bug in Linux.pm for netstats/netinfo. The raw data was
+          returned with netstats and not the deltas.
+
+0.36    Released at 2008-05-13.
+        - Tests for 0.35_01 all ok. Now a full release.
+
+0.35_01 Released at 2008-05-08.
+        - Added irq, softirq, steal to CpuStats.pm.
+        - Fixed the calculation of total cpu utilization in CpuStats.pm.
+          Thanks to Morton B. for his suggestion.
+        - Key iowait is only available with kernels >= 2.6.
+
+0.34    Released at 2008-04-08.
+        - Timestamp of 0.33 in the future and a lot of fail reports.
+
+0.33    Released at 2008-04-04.
+        - Found a bug in Processes.pm. New processes were not added
+          to $self->{init}.
+
+0.32    Released at 2008-02-27.
+        - DAWN! Forget to add Time::HiRes to the dependencies!
+
+0.30    Released at 2008-02-27.
+        - Replaced uptime() with Time::HiRes::gettimeofday().
+
+0.28    Released at 2008-02-11.
+        - Full version. Jupm over 0.27 because I want to use odd numbers
+          for developer releases in the future.
+        - Better documentation here and there.
+
+0.26_02 Released at 2008-02-08.
+        - Fixed a lot of POD typos.
+
+0.26_01 Released at 2008-02-07.
+        - *uhm* forget to kicked cpuinfo()
+        - Added netinfo() to get the raw data of netstats() (feature request).
+
+0.26    Released at 2008-01-16.
+        - Tests seems to be okay... just a full version.
+
+0.25_02 Released at 2008-01-10.
+        - Kicked from MemStats: hightotal, highfree, lowtotal, lowfree
+          The reason is that 64-bit architectures by their nature has high
+          memory support and do not need the HIGHMEM configuration directive.
+          As a result these values are not available on any 64-bit. Yes,
+          there exists exceptions on some distributions like RHEL4 x86_64,
+          but are they useful?
+
+0.25_01 Released at 2008-01-08.
+        - Added to MemStats: swapcached, active, inactive, hightotal,
+          highfree, lowtotal, lowfree, commitlimit and committed_as
+
+0.25    Released at 2007-11-20.
+        - Kicked CpuInfo.pm. The reason is that /proc/cpuinfo can be very
+          different on various architectures.
+
+0.24    Released at 2007-11-19.
+        - Fixed swapusedper.
+        - Some POD improvements.
+
+0.23    Released at 2007-11-19.
+        - *grml* forget to update ChangeLog :)
+
+0.22    Released at 2007-11-19.
+        - Added pstop() to Compilation.pm and t/150pstop.t.
+        - Did some POD fixes in all modules.
+
+0.21_02 Released at 2007-11-18.
+        - Added CpuInfo.pm.
+
+0.21_01 Released at 2007-11-18.
+        - WHOA a lot of changes...
+        - All options are lowercase now! The key names are now lowercase as well!
+          For compatibilities the old options are still available.
+          As example: CpuStats is now cpustats.
+        - Added Sys::Statistics::Linux::Compilation
+        - get() now returns a Sys::Statistics::Linux::Compilation object. You can
+          access the statistics now via $stat->cpustats or $stat->{cpustats}. The
+          adventage is object oriented access to the statistics and that the
+          statistics are not stored into the Sys::Statistics::Linux object any more.
+          That's a bit more memory friendly.
+
+0.21    Released at 2007-10-15.
+        - Skipped ipfrag in test if the key isn't defined because
+          ipfrag is only avaiable by kernels > 2.2.
+
+0.20    Released at 2007-10-08.
+        - Fixed Makefile.PL.
+
+0.19    Released at 2007-10-07.
+        - No further changes, just a full version.
+
+0.18_01 Released at 2007-10-06.
+        - Testing for the current developer release of CPAN::Reporter.
+          Makefile.PL die() if the os is not a linux and the new
+          release of CPAN::Reporter sends a FAIL report.
+
+0.18    Released at 2007-10-06.
+        - Forget to update the version number of DiskUsage *grrr*.
+
+0.17    Released at 2007-10-06.
+        - Statistics minflt, cminflt, mayflt, cmayflt, utime, stime, cutime,
+          and cstime from Processes.pm are now ever floats.
+        - Sys::Statistics::Linux is taint safe now.
+        - Did some code improvements and fixed pod typos.
+
+0.16    Released at 2007-09-17.
+        - Bug fixed in Processes.pm. The deltas of utime, stime and ttime
+          weren't calculated per second.
+
+0.15    Released at 2007-08-04.
+        - Bug fixed in DiskStats.pm. major and minor were floats.
+
+0.14    Released at 2007-07-30.
+        - psfind() and search() checks now if a list is wanted. If no statistics found
+          it return undef ... thats bad.
+
+0.13    Released at 2007-07-12.
+        - Forget to add os check in make file *argh* sorry! :-)
+
+0.12    Released at 2007-07-12.
+        - Added key nlwp to Processes.
+        - All pods updated.
+
+0.11_03 Released at 2007-07-10.
+        - Added pgfault and pgmajfault to PgSwStats.
+        - Add section MOTIVATION to pod.
+
+0.11_02 Released at 2007-07-10.
+        - Fixed Build.PL and Makefile.PL.
+
+0.11_01 Released at 2007-07-10.
+        - Kicked option -1 - does anybody need that option really? I think not!
+        - Now the disk usage is collected with "df -kP". I hope that works on
+          all distributions.
+
+0.11    Released at 2007-06-19.
+        - Fixed _diff() and replace it with _compare().
+        - Did some other code changes like regexes.
+        - Kicked operators < > = ! as options for search() and psfind().
+
+0.10    Released at 2007-05-25.
+        - Fixed div code parts.
+        - Now there can be pass a process list to Processes.
+
+0.09_18 Released at 2007-05-16.
+        - Added ttpcks (rxpcks + txpcks) to NetStats.
+        - Fixed a bug in DiskStats. The field for wrtbyt was wrong.
+        - Changed method name fproc() to psfind().
+
+0.09_17 Released at 2007-04.27.
+        - Fixed actime from Processes.pm.
+        - Null values are now printed as 0.00 by ProcStats, NetStats,
+          DiskStats and PgSwStats.
+
+0.09_16 Released at 2007-04-21.
+        - Fixed code in NetStats.pm, DiskStats.pm, PgSwStats.pm and
+          ProcStats.pm. It seems to run better and better. :-)
+
+0.09_15 Error by uploading to pause.
+
+0.09_14 Released at 2007-04-13.
+        - Code fixes.
+
+0.09_13 Released at 2007-04-13.
+        - Did some fixes in DiskStats.pm, because the error message
+          "... no diskstats found ..." is ever issued.
+        - Did some fixes in fproc() and search() of Linux.pm.
+
+0.09_12 Released at 2007-04-12.
+        - Changed search() and fproc(). Now statistics can be set
+          as second argument. The first argument has to be the
+          search filter. Both arguments has to be a hash refrence.
+
+0.09_11 Released at 2007-04-12.
+        - To much files uploaded. :-)
+
+0.09_10 Released at 2007-04-12.
+        - Fixed the "Can't call method _struct" bug in Linux.pm line 419.
+        - "new" from ProcStats is float now. Did some fixes in ProcStats,
+          NetStats, PgSwStats and DiskStats... wrong averages/s calculated.
+
+0.09_09 Released at 2007-04-12.
+        - Delete key "pid" from Processes() because it exists double
+          times: $stats->{Processes}->{$pid}->{pid} = $pid
+        - Now all values of PgSwStats, NetStats, DiskStats and ProcStats
+          (here only the key "new") are values per second. I break
+          this down because it's very confusing if the statistics are
+          just add together.
+        - I kicked IO::File and the _load() Method from some modules
+          because they weren't really necessary.
+
+0.09_08 Released at 2007-03-05.
+        - Add the method fproc() to search for processes.
+        - Add t/14fproc.t and changed other test file names.
+        - Improve the search() method and add a bit documentation.
+
+0.09_06 Released at 2007-02-25.
+        - Improve the search() method. Now it's possible to search()
+          for special devices and more.
+
+0.09_05 Released at 2007-02-23.
+        - Added realfreeper to MemStats.
+
+0.09_04 Released at 2007-02-23.
+        - The next release today. :)
+        - Added key realfree to MemStats (free + buffers + cached).
+
+0.09_03 Released at 2007-02-23.
+        - Added key ttime to Processes (stime + utime).
+        - Fixed NetStats.t and Processes.t - missed ttbyt and ttime.
+
+0.09_02 Released at 2007-02-23.
+        - Fixed search(). Now it returns only that statistics that
+          matched the search string.
+
+0.09_01 Released at 2007-02-19.
+        - A lot of changes in Linux.pm.
+        - Sub modules will only be loaded if they are needed now.
+        - Added a search() method to search for values in statistics.
+        - Now there are different options (-1, 0, 1, 2) available
+          for the statistics.
+        - Added key ttbyt to NetStats (total bytes rx + tx).
+
+0.08    Released at 2007-02-13.
+        - Added key writeback to MemStats and actualize the
+          documentation. The new keys dirty, slab, mapped
+          and writeback are only available by kernels from
+          2.6.
+
+0.07    Released at 2007-02-12.
+        - Added keys dirty, slab and mapped to MemStats.
+
+0.06    Released at 2007-01-22.
+        - Bugfix in ProcStats.pm. "count" statistics fixed.
+        - Added t/Pod-Coverage.t.
+
+0.05    Released at 2006-12-30.
+        - Updated t/DiskStats.t.
+        - Updated POD and README.
+
+0.04    Released at 2006-12-29.
+        - DiskStats died now if the read access to /proc/partitions
+          was successful and if there are no statistics. The reason
+          is that it seems to be that the linux kernel (<=2.4) is not
+          compiled with CONFIG_BLK_STATS=y. Up to now the message
+          "there are no initial statistics defined" was generated
+          and this message is not very helpful if init() was called.
+
+0.03    Released at 2006-12-28.
+        - Updated Sys::Statistics::Linux::CpuStats. There weren't
+          irq and softirq calculated for the uptime for each cpu.
+          This values are only available with kernels > 2.4.
+          That aren't new keys! Just added for calculation.
+          Thanks to Alexey A Makeev for his report!
+          In addition I updated the documentation for iowait and
+          note that this statistic is only available by kernel
+          versions higher than 2.4.
+        - All values for CpuStats are now ever floats "%.2f", not only
+          if the values are higher than 0.
+
+0.02    Released at 2006-12-09.
+        - No code changes. Just updated POD and added t/Pod.t.
+
+0.01	Released at 2006-12-08.
+x.xx	Thanks to Larry Wall and all other Perl developers for Perl :-)

@@ -1,0 +1,19 @@
+Revision history for Perl extension Syntax::Highlight::Mason.
+
+1.23  Sun Feb  1 08:51:17 MST 2009
+        - mucked up version number
+1.22  Sun Feb  1 08:19:31 MST 2009
+        - added prerequisites in Makefile.PL
+1.21  Wed Jan 11 19:12:32 2006
+        - Fixed typo C<...> in pod
+1.2   Fri Dec 30 20:30:44 2005
+        - added xml_mode to HTML::Parse so that comments inside
+          of <script> .. </script> tags work properly.
+          fixed tests so that they work correctly.
+1.1   Tue Dec 27 05:52:44 2005
+        - Added validate_params to keep Class::Container happy
+        - Changed eg/view_source to allow inline display
+1.00  Wed Dec 14 06:34:52 2005
+	- original version;
+
+

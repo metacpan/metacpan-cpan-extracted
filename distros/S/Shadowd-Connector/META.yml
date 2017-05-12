@@ -1,0 +1,31 @@
+---
+abstract: 'Connector for the Shadow Daemon web application firewall'
+author:
+  - 'Hendrik Buchwald <hb@zecure.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Shadowd-Connector
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Attribute::Abstract: 0
+  CGI: 0
+  Config::IniFiles: 0
+  Crypt::Mac::HMAC: 0
+  IO::Socket: 0
+  IO::Socket::SSL: 0
+  JSON: 0
+  POSIX: 0
+  URI::Encode: 0
+  perl: 5.01
+version: v2.0.0

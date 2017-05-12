@@ -1,0 +1,50 @@
+Revision history for Search-QueryParser-SQL
+
+0.010 28 Feb 2014
+ - add 'lower' feature to parser
+
+0.009 20 Aug 2013
+ - switch to github
+ - fix for RT https://rt.cpan.org/Ticket/Display.html?id=87287 where
+   implicit OR applied in dbic() and rdbo() structures when implicit AND
+   was more appropriate.
+
+0.008 18 Aug 2009
+ - add tests and support for fuzzy int-types
+ - refactor to include an explicit Column class to allow for more granular
+   control of sql building. Thanks to John Maslanik for the prompting that
+   led to this idea.
+
+0.007 4 Dec 2008
+ - add fuzzify2 feature
+
+0.006 22 Nov 2008
+ - fix overload bug for Test::More 0.86
+
+0.005 10 Sept 2008
+ - add dbic() method to Query class
+
+0.004 9 Sept 2008
+ - bump req S::QP to 0.93, which apparently fixes the case sensitive bug
+   with rx* operator qr//
+
+0.003 9 Sept 2008
+ - fix rdbo() method bug where multiple columns were being AND'd instead of
+   OR'd as with stringify() and dbi()
+ - add PERL_DEBUG option to Query
+ - trim down the number of parens generated
+ - remove SQL->unparse() override so it just calls superclass
+
+0.002 7 Sept 2008
+ - added strict, fuzzify and like options to parser->new
+ - added wildcard support
+ - added dbi() method to Query
+ - added rdbo() method to Query
+ - override rxAnd rxOr and rxNot in SQL->new() to make the qr// patterns
+   all case-insensitive.
+ - override rxField in SQL->new() to match [\w\.]+ to allow for
+   table.column patterns
+
+0.001 5 Sept 2008
+ - First version, released on an unsuspecting world.
+

@@ -1,0 +1,34 @@
+Tested Environments
+===================
+
+This module has been developed and tested on CentOs 6.3, no guarantees are given 
+that it should work on other systems. Please inform me (markleeuw@gmail.com) 
+whenever an installation on a different platform fails (please provide build.log).
+
+
+Prerequisits
+============
+This module is known to have the following requirements on CentOs 6.3:
+- subversion
+- perl-CPAN
+- perl-YAML
+- perl-XML-Parser
+- gcc-c++
+
+To install there requirements use:
+yum install perl-CPAN perl-YAML perl-XML-Parser gcc-c++ make 
+
+Installing SVN::TeamTools::Indexer
+==================================
+
+To install this module as a suite of Perl modules, run the following commands:
+
+    perl Build.PL
+    perl Build
+    perl Build test
+    perl Build install
+
+Module::Build is required.  Since Perl 5.10.0, Module::Build has been bundled
+with the Perl core, but on older systems it may be necessary to install it
+from CPAN first.
+

@@ -1,0 +1,375 @@
+#!/usr/bin/env perl
+# vim: set ft=perl:
+
+# -------------------------------------------------------------------
+# Copyright (C) 2002-2009 SQLFairy Authors
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; version 2.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+# 02110-1301 USA.
+# -------------------------------------------------------------------
+
+=head1 NAME
+
+sqlt - convert SQL schema using SQL::Translator
+
+=head1 SYNOPSIS
+
+For help:
+
+  sqlt -h|--help
+
+For a list of all parsers and producers:
+
+  sqlt -l|--list
+
+To translate a schema:
+
+  sqlt -f|--from|--parser MySQL
+       -t|--to|--producer Oracle
+       [options]
+       file [file2 ...]
+
+  General Options:
+
+    -d|--debug         Print debug info
+    -v|--validate      Validate the schema
+    --version          Show the version of SQL::Translator
+    --trace            Print parser trace info
+    --show-warnings    Print warnings to STDERR
+
+  General Parser Options:
+
+    --skip             Comma-separated list of tables to skip (only implemented in some parsers)
+    --ignore_opts      Comma-separated list of table options to ignore
+
+  DBI Parser Options:
+
+    --dsn              DSN for connecting to database
+                       (see also --use-same-auth below)
+    --db-user          Database user
+    --db-password      Database password
+
+  xSV Parser Options:
+
+    --fs               The field separator
+    --rs               The record separator
+    --no-trim          Don't trim whitespace on fields
+    --no-scan          Don't scan fields for data types and sizes
+
+  MySQL Parser Options:
+
+    --mysql-parser-version  Target MySQL parser version for dealing with
+                              /*! comments; default = 30000
+
+  MySQL Producer Options:
+
+    --mysql-version  MySQL server version
+
+  General Producer Options
+
+    --producer-db-user   Database user for producer
+    --producer-db-pass   Database password for producer
+    --producer-dsn       DSN for producer
+    --use-same-auth      Use these DSN, user, password for producer output
+
+  DB Producer Options:
+
+    --add-drop-table   Add 'DROP TABLE' statements before creates
+    --quote-table-names  Quote all table names in statements
+    --quote-field-names  Qjuote all field names in statements
+    --no-comments      Don't include comments in SQL output
+
+  PostgreSQL Producer Options:
+
+    --postgres-version   PostgreSQL server version
+
+  Diagram Producer Options:
+
+    --imap-file        Filename to put image map data
+    --imap-url         URL to use for image map
+
+  Dumper Producer Options:
+
+    --skip             Comma-separated list of tables to skip
+    --skiplike         Regex for tables to skip
+    --add-truncate     Add "TRUNCATE TABLE" statements for each table
+
+  HTML/POD Producer Options:
+
+    --pretty           Use CGI::Pretty for the output
+    --title            Title of schema
+
+  TTSchema Producer Options:
+
+    --template             The path to the template
+    --tt-var var=value     Pass extra variables to the template
+    --tt-conf option=value Pass extra config options to Template
+
+  XML-SQLFairy Producer Options:
+
+    --add-prefix       Use an explicit namespace prefix of 'sqlf:'
+    --prefix=<p>       Use the namespace prefix given as argument.
+    --no-newlines      Write the XML as a single line.
+    --indent=<n>       Use <n> characters of whitespace to indent the XML.
+
+  ClassDBI Producer Options:
+
+    --package          Base package name for Class::DBI modules.
+
+=head1 DESCRIPTION
+
+This script is part of the SQL Fairy project.  It will try to convert
+any source file for which it has a grammar into any format for which
+it has a producer.
+
+If using "show-warnings," be sure to redirect STDERR to a separate file.
+In bash, you could do this:
+
+    $ sql_translator.pl -f MySQL -t PostgreSQL --show-warnings \
+       file.sql 1>out 2>err
+
+You can specify a parser or producer located in any module that Perl
+knows about, allowing you to easily substitute your own.
+
+=cut
+
+# -------------------------------------------------------------------
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use SQL::Translator;
+
+use vars qw( $VERSION );
+$VERSION = '1.59';
+
+my $from;             # the original database
+my $to;               # the destination database
+my $help;             # show POD and bail
+my $stdin;            # whether to read STDIN for create script
+my $no_comments;      # whether to put comments in out file
+my $show_warnings;    # whether to show warnings from SQL::Translator
+my $add_drop_table;   # whether to add "DROP table" statements
+my $quote_table_names;  # whether to quote table names
+my $quote_field_names;  # whether to quote field names
+my $debug;            # whether to print debug info
+my $trace;            # whether to print parser trace
+my $list;             # list all parsers and producers
+my $no_trim;          # don't trim whitespace on xSV fields
+my $no_scan;          # don't scan xSV fields for data types and sizes
+my $field_separator;  # for xSV files
+my $record_separator; # for xSV files
+my $validate;         # whether to validate the parsed document
+my $imap_file;        # filename where to place image map coords
+my $imap_url;         # URL to use in making image map
+my $pretty;           # use CGI::Pretty instead of CGI (HTML producer)
+my $template;         # template to pass to TTSchema producer
+my %tt_vars;          # additional template vars to pass the TTSchema producer
+my %tt_conf;          # additional template conf to pass the TTSchema producer
+my $title;            # title for HTML/POD producer
+my $add_prefix;       # Use explicit namespace prefix (XML producer)
+my $prefix;           # Set explicit namespace prefix (XML producer)
+my $newlines;         # Add newlines around tags (XML producer)
+my $indent;           # Number of indent chars for XML
+my $package_name;     # Base class name for ClassDBI
+my $use_same_auth =0; # producer uses same DSN, user, password as parser
+my $dsn;              # DBI parser
+my $db_user;          # DBI parser
+my $db_password;      # DBI parser
+my $show_version;     # Show version and exit script
+my $skip;
+my $skiplike;
+my $ignore_opts;
+my $producer_db_user; # DSN     for producer (e.g. Dumper, ClassDBI)
+my $producer_db_password; # db_pass "
+my $producer_dsn;     # db_user "
+my $add_truncate;
+my $mysql_parser_version;  # MySQL parser arg for /*! comments
+my $postgres_version; # PostgreSQL version
+my $mysql_version; # MySQL version
+
+GetOptions(
+    'add-drop-table'   => \$add_drop_table,
+    'quote-table-names|quote_table_names'   => \$quote_table_names,
+    'quote-field-names|quote_field_names'   => \$quote_field_names,
+    'd|debug'          => \$debug,
+    'f|from|parser:s'  => \$from,
+    'fs:s'             => \$field_separator,
+    'h|help'           => \$help,
+    'imap-file:s'      => \$imap_file,
+    'imap-url:s'       => \$imap_url,
+    't|to|producer:s'  => \$to,
+    'l|list'           => \$list,
+    'pretty!'          => \$pretty,
+    'no-comments'      => \$no_comments,
+    'no-scan'          => \$no_scan,
+    'no-trim'          => \$no_trim,
+    'rs:s'             => \$record_separator,
+    'show-warnings'    => \$show_warnings,
+    'template:s'       => \$template,
+    'tt-var=s'         => \%tt_vars,
+    'tt-conf=s'        => \%tt_conf,
+    'title:s'          => \$title,
+    'trace'            => \$trace,
+    'v|validate'       => \$validate,
+    'dsn:s'            => \$dsn,
+    'db-user:s'        => \$db_user,
+    'db-password:s'    => \$db_password,
+    'producer-dsn:s'   => \$producer_dsn,
+    'producer-db-user:s'=> \$producer_db_user,
+    'producer-db-pass:s'=> \$producer_db_password,
+    'skip:s'           => \$skip,
+    'skiplike:s'       => \$skiplike,
+    'ignore_opts:s'    => \$ignore_opts,
+    'add_truncate'     => \$add_truncate,
+    'add-prefix'       => \$add_prefix,
+    'prefix:s'         => \$prefix,
+    'indent:s'         => \$indent,
+    'newlines!'        => \$newlines,
+    'package=s'        => \$package_name,
+    'use-same-auth'    => \$use_same_auth,
+    'version'          => \$show_version,
+    'mysql-parser-version=i' => \$mysql_parser_version,
+    'postgres-version=f' => \$postgres_version,
+    'mysql-version=f' => \$mysql_version,
+) or pod2usage(2);
+
+if ($use_same_auth) {
+    $producer_dsn = $dsn;
+    $producer_db_user = $db_user;
+    $producer_db_password = $db_password;
+}
+
+if (
+    ( !defined $from && defined $dsn )
+    ||
+    $from =~ /^DBI.*/
+) {
+    $from = 'DBI';
+}
+
+my @files = @ARGV; # source files
+unless ( @files ) {
+    if ( defined($from) && $from eq 'DBI' ) {
+        @files = ('!');
+    }
+    else {
+        @files = ('-');
+    }
+}
+
+pod2usage(1) if $help;
+
+if ( $show_version ) {
+    print "SQL::Translator v", $SQL::Translator::VERSION, "\n";
+    exit(0);
+}
+
+my $translator           =  SQL::Translator->new(
+    debug                => $debug          ||  0,
+    trace                => $trace          ||  0,
+    no_comments          => $no_comments    ||  0,
+    show_warnings        => $show_warnings  ||  0,
+    add_drop_table       => $add_drop_table ||  0,
+    quote_table_names    => defined $quote_table_names ? $quote_table_names : 1,
+    quote_field_names    => defined $quote_field_names ? $quote_field_names : 1,
+    validate             => $validate       ||  0,
+    parser_args          => {
+        trim_fields      => $no_trim ? 0 : 1,
+        scan_fields      => $no_scan ? 0 : 1,
+        field_separator  => $field_separator,
+        record_separator => $record_separator,
+        dsn              => $dsn,
+        db_user          => $db_user,
+        db_password      => $db_password,
+        mysql_parser_version => $mysql_parser_version,
+        skip => $skip,
+        ignore_opts => $ignore_opts,
+    },
+    producer_args   => {
+        imap_file        => $imap_file,
+        imap_url         => $imap_url,
+        pretty           => $pretty,
+        ttfile           => $template,
+        tt_vars          => \%tt_vars,
+        tt_conf          => \%tt_conf,
+        title            => $title,
+        dsn              => $producer_dsn,
+        db_user          => $producer_db_user,
+        db_password      => $producer_db_password,
+        skip             => $skip,
+        skiplike         => $skiplike,
+        add_truncate     => $add_truncate,
+        add_prefix       => $add_prefix,
+        prefix           => $prefix,
+        indent           => $indent,
+        newlines         => $newlines,
+        postgres_version => $postgres_version,
+        mysql_version    => $mysql_version,
+        package_name     => $package_name,
+    },
+);
+
+if ( $list ) {
+    my @parsers   = $translator->list_parsers;
+    my @producers = $translator->list_producers;
+
+    for ( @parsers, @producers ) {
+        if ( $_ =~ m/.+::(\w+)\.pm/ ) {
+            $_ = $1;
+        }
+    }
+
+    print "\nParsers:\n",   map { "\t$_\n" } sort @parsers;
+    print "\nProducers:\n", map { "\t$_\n" } sort @producers;
+    print "\n";
+    exit(0);
+}
+
+pod2usage( msg => 'Please supply "from" and "to" arguments' )
+    unless $from && $to;
+
+$translator->parser($from);
+$translator->producer($to);
+
+for my $file (@files) {
+    my @args =
+        ($file eq '-') ? (data => \*STDIN) :
+        ($file eq '!') ? (data => '') :
+        (file => $file);
+
+    my $output = $translator->translate(@args) or die
+        "Error: " . $translator->error;
+
+    print $output;
+}
+
+# ----------------------------------------------------
+# It is not all books that are as dull as their readers.
+# Henry David Thoreau
+# ----------------------------------------------------
+
+=pod
+
+=head1 AUTHOR
+
+Ken Youens-Clark E<lt>kclark@cpan.orgE<gt>,
+darren chamberlain E<lt>darren@cpan.orgE<gt>.
+
+=head1 SEE ALSO
+
+SQL::Translator, L<http://sqlfairy.sourceforge.net>.
+
+=cut

@@ -1,0 +1,130 @@
+.desktop	./samples/highlight.desktop
+4GL	
+4GL-PER	
+ABC	./samples/highlight.abc
+Ada	
+AHDL	
+Alerts	
+ANSI C89	
+Ansys	
+Apache Configuration	
+Asm6502	
+ASP	./samples/highlight.asp
+AVR Assembler	./samples/highlight.asm-avr
+AWK	./samples/highlight.awk
+Bash	./samples/highlight.sh
+BibTeX	./samples/highlight.bib
+C	
+C#	
+C++	./samples/highlight.cpp
+Cg	
+CGiS	
+ChangeLog	
+Cisco	
+Clipper	./samples/highlight.prg
+CMake	./samples/highlight.cmake
+ColdFusion	
+Common Lisp	./samples/highlight.lisp
+Component-Pascal	
+CSS	./samples/highlight.css
+CSS/PHP	
+CUE Sheet	
+D	
+Debian Changelog	
+Debian Control	
+de_DE	
+Diff	
+Doxygen	./samples/highlight.dox
+E Language	./samples/highlight.e
+Eiffel	
+Email	./samples/highlight.eml
+en_US	
+Euphoria	
+ferite	
+Fortran	./samples/highlight.f90
+FreeBASIC	
+GDL	
+GLSL	./samples/highlight.glsl
+GNU Assembler	
+GNU Gettext	
+Haskell	./samples/highlight.lhs
+HTML	./samples/highlight.html
+IDL	
+ILERPG	
+Inform	
+INI Files	
+Intel x86 (NASM)	./samples/highlight.asm-nasm
+Java	./samples/highlight.java
+Javadoc	
+JavaScript	./samples/highlight.js
+JavaScript/PHP	
+JSP	./samples/highlight.jsp
+Kate File Template	
+KBasic	
+LaTeX	./samples/highlight.tex
+LDIF	
+Lex/Flex	./samples/highlight.lex
+LilyPond	./samples/highlight.ly
+Literate Haskell	./samples/highlight.lhs
+Logtalk	
+LPC	./samples/highlight_lpc.c
+Lua	
+M3U	./samples/highlight.m3u
+MAB-DB	
+Makefile	
+Mason	
+Matlab	./samples/highlight.m
+MIPS Assembler	
+Modula-2	
+Music Publisher	
+nl	
+Objective Caml	
+Objective-C	
+Octave	./samples/highlight_octave.m
+Pascal	
+Perl	./samples/highlight.pl
+PHP (HTML)	./samples/highlight.php
+PHP/PHP	
+PicAsm	./samples/highlight.asm
+Pike	./samples/highlight.pike
+PostScript	./samples/highlight.ps
+POV-Ray	./samples/highlight.pov
+progress	
+Prolog	
+PureBasic	./samples/highlight.pb
+Python	./samples/highlight.py
+Quake Script	
+R Script	
+RenderMan RIB	./samples/highlight.rib
+REXX	
+RPM Spec	
+RSI IDL	
+Ruby	./samples/highlight.rb
+Sather	
+Scheme	./samples/highlight.scheme
+scilab	
+SGML	
+Sieve	
+SML	
+Spice	./samples/highlight.sp
+SQL	
+SQL (MySQL)	
+SQL (PostgreSQL)	
+Stata	./samples/highlight.do
+TaskJuggler	
+Tcl/Tk	./samples/highlight.tcl
+TI Basic	
+txt2tags	
+UnrealScript	./samples/highlight.uc
+Velocity	
+Verilog	
+VHDL	
+VRML	./samples/highlight.wrl
+Wikimedia	
+WINE Config	
+x.org Configuration	./samples/xorg.conf
+xHarbour	
+XML	./samples/highlight.xml
+xslt	./samples/highlight.xsl
+yacas	
+Yacc/Bison	./samples/highlight.y

@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!DOCTYPE TopicSet PUBLIC "urn:newsml:iptc.org:20001006:NewsMLv1.0.dtd:1" "NewsMLv1.0.dtd">
+<TopicSet Duid="iptc.format" FormalName="Format">
+	<Comment xml:lang="en">The format of a ContentItem.</Comment>
+	<Topic Duid="Form1">
+		<TopicType Scheme="IptcTopicType" FormalName="Format"/>
+		<FormalName Scheme="IptcFormats">IIM</FormalName>
+		<Description xml:lang="en">Information Interchange Model.</Description>
+	</Topic>
+	<Topic Duid="Form2">
+		<TopicType Scheme="IptcTopicType" FormalName="Format"/>
+		<FormalName Scheme="IptcFormats">TTNITF</FormalName>
+		<Description xml:lang="en">TT variant of NITF.</Description>
+	</Topic>
+	<Topic Duid="Form3">
+		<TopicType Scheme="IptcTopicType" FormalName="Format"/>
+		<FormalName Scheme="IptcFormats">IPTC7901</FormalName>
+		<Description xml:lang="en">IPTC Text Message Format 7901.</Description>
+	</Topic>
+	<Topic Duid="Form4">
+		<TopicType Scheme="IptcTopicType" FormalName="Format"/>
+		<FormalName Scheme="IptcFormats">ANPA1312</FormalName>
+		<Description xml:lang="en">Newspaper Association of America Text Format (NAA-89-3).</Description>
+	</Topic>
+	<Topic Duid="Form5">
+		<TopicType Scheme="IptcTopicType" FormalName="Format"/>
+		<FormalName Scheme="IptcFormats">NSK-TIFF</FormalName>
+		<Description xml:lang="en">Japanese Newspaper Publishers TIFF variant.</Description>
+	</Topic>
+	<Topic Duid="Form6">
+		<TopicType Scheme="IptcTopicType" FormalName="Format"/>
+		<FormalName Scheme="IptcFormats">Ritzau-NITF</FormalName>
+		<Description xml:lang="en">Ritzau variant of NITF.</Description>
+	</Topic>
+	<Topic Duid="Form7">
+		<TopicType Scheme="IptcTopicType" FormalName="Format"/>
+		<FormalName Scheme="IptcFormats">DNPR</FormalName>
+		<Description xml:lang="en">Digital News Photo Parameter Record.</Description>
+	</Topic>
+</TopicSet>
+

@@ -1,0 +1,1 @@
+<element onClick="javascript:window.open('/url', 'key', 'par1=val1,par2=val2'); return false;">

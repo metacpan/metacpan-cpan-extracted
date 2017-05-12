@@ -1,0 +1,2 @@
+Temporary directory for tests that write files. Obviously must
+be writeable by the user running the tests.

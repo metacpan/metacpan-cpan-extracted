@@ -1,0 +1,121 @@
+WHAT IS THIS?
+
+This is Circa, a module who provide facilities to build
+and use a Perl search engine running with Mysql. 
+Circa is for your Web site, or for a list of sites. 
+It indexes like Altavista does. It can read, add and 
+parse all url's found in a page. It add url and word 
+to MySQL for use it at search.
+
+HOW DO I INSTALL IT?
+
+You need the following modules : DBI, DBD-Mysql, 
+LWP::RobotUA, URI::URL and HTML::Parser 3.0 if you can. 
+Else a defaut parser will be used.
+
+To install this module, cd to the directory that contains 
+this README file and type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+   make cgi
+
+Don't forget the last target !
+Then, you can do:
+
+In command line:
+admin.pl +create +add=http://www.monsite.com +parse_new=1 +depth_max
+for index your first url.
+
+Then for make a search, you can do:
+search.pl +word='my word'
+
+With CGI:
+Run admin.cgi on http://localhost/cgi-bin/circa
+Do:
+  - Create table
+  - Add one account
+  - Select it and index url
+Then run search.cgi on http://localhost/cgi-bin/circa
+
+FEATURES ?
+
++ Full text indexing 
+
++ Different weights for title, keywords, description and 
+rest of page HTML read can be given in configuration 
+
++ Boolean query language support : or (default) and ("+") 
+not ("-"). Ex perl + faq -cgi : Documents with faq, 
+eventually perl and not cgi. 
+
++ Support protocol HTTP,FTP 
+
++ Make index in MySQL 
+
++ Read HTML and full text plain 
+
++ Can do indexation of filesystem without talk to Web Server 
+
++ Can browse site by directory / rubrique. 
+
++ Several kinds of indexing : full, incremental, only on 
+
+a particular server. Documents not updated are not 
+reindexed. All requests for a file are made first with 
+a head http request, for information such as validate, 
+last update, size, etc. 
+
++ Size of documents read can be restricted (Ex: don't get 
+all documents > 5 MB). For use with low-bandwidth 
+connections, or computers which do not have much memory. 
+
++ HTML template can be easily customized for your needs. 
+
++ Search for different criteria: news, last modified date, 
+language, URL / site. 
+
++ Admin functions available by browser interface or 
+command-line. 
+
++ Full support of standard robots exclusion (robots.txt). 
+
++ Identification with CircaIndexer/0.1, mail 
+alian@alianwebserver.com. 
+
++ Delay requests to the same server for one minute. 
+"It's not a bug, it's a feature!" Basic rule for HTTP 
+serveur load. Index the different links found in a CGI 
+(all after name_of_file?) 
+
++ Support proxy HTTP 
+
+BENCHMARK ?
+
++ Memory : Indexation : 5,5M
++ Processeur : on Sun SPARC Station 4
+(5 secondes à 2%, 2s. à 20%, 1s. à 30%) / url.
++ Size on MySQL: 2-5 ko / url.
+
+
+WHERE IS THE DOCUMENTATION?
+
+You'll find very verbose documentation in the file 
+Indexer.pm in POD format
+
+When you install Circa::Indexer, the MakeMaker program 
+will automatically install the manual pages for you 
+(on Unix systems, type "man Circa::Indexer").
+
+WHERE ARE THE EXAMPLES?
+
+A collection of examples demonstrating various features 
+and techniques are in the directory "demo". You can use 
+admin.pl on command line or admin.cgi with CGI.
+
+Have fun, and let me know how it turns out!
+
+Alain BARBET
+alian@alianwebserver.com

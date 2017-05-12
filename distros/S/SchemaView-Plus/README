@@ -1,0 +1,27 @@
+SchemaView Plus 0.17
+(c) Copyright 2001-2014 by Milan Sorm, sorm@milansorm.cz
+
+If you plan to use this program you must respect LICENSE file.
+
+This software provides some functionality in drawing database schemas and
+some new extensions for Perl.
+
+Depends on installation of Tk, Tk::FontDialog, Tk::ProgressBar, Tk::MListbox,
+XML::Parser, XML::Dumper, Data::Dumper, FindBin, DBI and some DBD driver.
+
+Please read manual page for svplus, DBIx::SystemCatalog, 
+Hints, Hints::Base, Print::Printcap and PostScript::Poster
+for more information.
+
+To install make
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+For next documentation please run 
+
+	svplus
+
+and use Help -> Hints.

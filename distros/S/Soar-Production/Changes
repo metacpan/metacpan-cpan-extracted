@@ -1,0 +1,11 @@
+
+Revision history for Soar-Production
+
+0.03      2013-06-12 11:58:04 America/Los_Angeles
+    Added PRDGrammar.pm, which had been missing after modules merged.
+    Turned no_comment into an exported function, instead of a method.
+0.02      2013-02-09 08:27:16 UTC
+	Fixed POD formatting.
+
+0.01      2013-01-21 05:48:37 UTC
+	Initial release; combined Soar::Production::Parser and Soar::Production::Printer.

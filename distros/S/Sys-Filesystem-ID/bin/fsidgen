@@ -1,0 +1,42 @@
+#!/usr/bin/perl
+use strict;
+use base 'LEOCHARRE::CLI';
+use lib './lib';
+use Sys::Filesystem::ID 'create_id';
+
+my $o = gopts();
+
+sub usage {
+
+   return qq{
+$0 - create an id file for a filesystem
+
+DESCRIPTION
+
+Creates an id file for a filesystem. Argument is a device, mount point, or a path
+to a file on disk.
+
+Prints id to stdout.
+WIll throw an exception if it already exists.
+
+USAGE
+
+   $0 /dev/sda1
+   $0 /mnt/usbdisk
+   $0 ~/Documents
+
+SEE ALSO
+
+fsid
+Sys::Filesystem::ID
+
+};
+}
+
+
+my $arg = $ARGV[0];
+defined $arg or die('missing argument');
+
+my $id = create_id($ARGV[0]);
+print $id;
+exit;

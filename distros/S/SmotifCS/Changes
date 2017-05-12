@@ -1,0 +1,30 @@
+Revision history for SmotifCS
+
+0.01    2015-4-21
+        * First version, released on an unsuspecting world.
+
+0.02    2015-04-22
+        * File system independence Path feature was added
+
+0.03    2015-04-23
+        * Fixing some error with the documentation
+        * Fixing erro in SmotifCS/ClusterRankSmotifs.pm 
+          $lin[5] = ~s/\"//g was change to $lin[5] =~ s/\"//g
+
+0.04    2015-04-24
+        *  motifCS::GeometricalCalculations::get_from_file was taking
+           like ~10 seconds to finish. It was overwritten to improve performance
+
+0.05    2015-04-28
+        *  motifCS::GeometricalCalculations::get_from_file was modified and does not use
+           find functions. PDB files should be stored in one single folder.
+           smotifcs.pls is running ~7x faster.
+       
+        * File::Find::Rule requirement was removed from Makefile.PL and GeometricalCalculations.pm
+        *  Documentation added to SmotiCS.pm
+
+0.06    2015-04-29
+        * File::Find::Rule requirement was added to Makefile.PL; it is required by smotifcs.pl 
+
+0.07    2015-06-03
+        *  Fix a bug in EnumerateSmotifCombinations::gen_list 

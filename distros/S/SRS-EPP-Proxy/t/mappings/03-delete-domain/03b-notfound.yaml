@@ -1,0 +1,15 @@
+template: delete-domain.tt
+
+vars:
+  domain: chedder555.co.te
+
+input_assertions: {}
+
+SRS:
+  - assertions: {}
+
+output_assertions:
+  count:
+  match:
+  attr_is:
+    - [ '//epp:result', 'code', 2303, 'EPP: Correct error code' ]

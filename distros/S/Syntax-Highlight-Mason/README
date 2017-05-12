@@ -1,0 +1,52 @@
+Syntax-Highlight-Mason version 1.00
+===================================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+HTML::Mason
+HTML::Entities
+Syntax::Highlight::HTML
+Syntax::Highlight::Perl::Improved
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Henry Laxen
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+This module produces colorized and HTML escaped code from
+HTML::Mason source suitable for displaying on the WWW and
+perhaps even in an Mason environment.  Lots of things are
+customizable, but the defaults are pretty reasonable.
+
+
+SYNOPSIS
+
+  use Syntax::Highlight::Mason;
+  use IO::All;
+  my $compiler = Syntax::Highlight::Mason->new();
+  while (my $file = shift @ARGV) {
+    my $source < io($file);
+    print $compiler->compile($source);
+  }
+
+Also, take a look at:
+
+eg/view_source.html
+
+which is an HTML::Mason component that adds a view source option
+to any file based component into which it is added.

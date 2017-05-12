@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 8418b702027360e04ee9086d5bcb4ef94094ab77 Build
+SHA1 6dc662fd64852630e04dc6fde133b0e0ee5bf247 Build.PL
+SHA1 524d25b9d158ade450dfa19af393f532732dc84c Changes
+SHA1 7f26bbc4055ea532667d7a85e7877fd019d2d0bf EXAMPLES/ProxyLog.pm
+SHA1 f752e3cf310811f36f3f3044e76719bc142132f1 MANIFEST
+SHA1 fddb0d5c720da884084fb47b16bb945340b0b842 MANIFEST.SKIP
+SHA1 8c235ac54120e539e550b5a53a9037079c43b3e1 META.json
+SHA1 8632c9cce8fcec16df2f07f3ba0715e92c2389d9 META.yml
+SHA1 fbfeeb7e6709d10f9a97b60d1ac2cb108d29638d Makefile.PL
+SHA1 ab5b41cf5ead01409d6103e59f0fa037fdd94a29 README
+SHA1 50f1ba22f938a2cff27e07e103d714a833bac18c bin/logparser
+SHA1 b48d054f9116f84960a21e7f2cae16fba15916c3 etc/log4perl.conf
+SHA1 25c49a03bfd7d4cfbe734eaffad37cb0aa9ecaff etc/logparser.conf
+SHA1 f65330852147f4e25d4de9f5060db50d391d1235 lib/SNMP/LogParser.pm
+SHA1 f835cabcc25d08093d55846a09c5bdd37da851c2 lib/SNMP/LogParserDriver.pm
+SHA1 cfd2da043fdc4af3b5f2b29b08fa808770708b08 lib/SNMP/LogParserDriver/ExampleDriver.pm
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 log/logparser.log
+SHA1 5c9c06f0bb3ba026b5930e677ec20682bf8dcf1d t/00-load.t
+SHA1 62b9fe8e6e7bec4918965fdafa992e2b2626d23f t/boilerplate.t
+SHA1 9ef4c36319920862ff321f3ca779c90be09526e0 t/concurrentProcess.t
+SHA1 3d2d86004501e0edab11bd18bdf251b6f67129f7 t/etc/log4perl.conf
+SHA1 87b95154ffff73439043260bd44fb06966194960 t/etc/logparser.conf
+SHA1 32c738053b0bd367f7193731622519c19279d7a1 t/logparser.t
+SHA1 60154ed5e0ea03a31834e6c261a3f247d8b58bf0 t/pod-coverage.t
+SHA1 0190346d7072d458c8a10a45c19f86db641dcc48 t/pod.t
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 work/logparser.properties
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iD8DBQFWD3TzcV+oKB/QqikRAjPcAJ4zf7mOj1Ep3JmZTfmlRoeOg/NBiACgt3Ja
+GTvEtm7Bd8wL2bhVskRjF2Y=
+=/lP0
+-----END PGP SIGNATURE-----

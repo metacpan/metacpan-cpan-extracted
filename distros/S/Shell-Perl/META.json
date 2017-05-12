@@ -1,0 +1,61 @@
+{
+   "abstract" : "A read-eval-print loop in Perl",
+   "author" : [
+      "A. R. Ferreira <ferreira@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Shell-Perl",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Test::Expect" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Script" : "0"
+         },
+         "requires" : {
+            "Class::Accessor" : "0",
+            "File::Basename" : "0",
+            "File::HomeDir" : "0",
+            "Getopt::Long" : "2.43",
+            "IPC::Cmd" : "0",
+            "Path::Class" : "0.34",
+            "Term::ReadLine" : "0",
+            "Test::Deep" : "0",
+            "Test::More" : "0",
+            "version" : "0.77"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "http://github.com/aferreira/pirl"
+      }
+   },
+   "version" : "0.004"
+}

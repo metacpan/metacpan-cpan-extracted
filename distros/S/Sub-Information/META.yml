@@ -1,0 +1,25 @@
+---
+name: Sub-Information
+version: 0.10
+author:
+  - 'Curtis "Ovid" Poe <ovid@cpan.org>'
+abstract: Get subroutine information
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  B: 0
+  Data::Dump::Streamer: 1.14
+  Devel::Peek: 0
+  PadWalker: 0
+  Scalar::Util: 0
+  Sub::Identify: 0
+  Test::More: 0
+provides:
+  Sub::Information:
+    file: lib/Sub/Information.pm
+    version: 0.10
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

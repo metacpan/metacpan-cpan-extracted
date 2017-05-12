@@ -1,0 +1,33 @@
+Revision history for Perl module String::Parity
+
+1.34 2015-11-06 NEILB
+    - Removed the $VERSION from String/Parity.pm so that DZ can manage it.
+
+1.33 2015-20-25 NEILB
+    - Added [MetaJSON] to dist.ini so release tarballs will have META.json
+    - Auto tag and push to github on release
+    - Updated github repo URL in metadata and doc with new github username
+
+1.32 2014-03-28 NEILB
+    - Added "use warnings" and removed use of 'use vars'
+    - Fixed pod abstract to follow usual convention
+    - Updated author section and added COPYRIGHT AND LICENSE
+    - Reformatted this file as per CPAN::Changes::Spec
+    - Moved Parity.pm to lib/String/Parity.pm
+    - Moved testsuite into t/ as String-Parity.t
+    - Moved to Dist::Zilla
+    - Min perl version 5.6.0
+    - Added github repo to pod
+
+1.31 1996-12-10 @winko
+    - integrate MakeMaker
+
+1.3 1995-11-12 @winko
+    - included mark/space handling
+
+1.2 1995-11-02 @winko
+    - renamed to String::Parity
+
+1.1 1995-11-02 @winko
+    - original version; released as Text::Parity
+

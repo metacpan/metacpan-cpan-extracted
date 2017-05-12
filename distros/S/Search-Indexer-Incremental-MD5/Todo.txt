@@ -1,0 +1,17 @@
+#------------------#
+# This is Todo.txt #
+#------------------#
+
+testing
+	stop word list file (manually run ... OK)
+
+remove stop words from searcher creation
+
+--dry_run
+	does nothing but 
+
+--silent option for --check command
+
+move constants to a file that can be used
+	and remove 0, 1, ... from code
+

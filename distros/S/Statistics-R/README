@@ -1,0 +1,237 @@
+NAME
+    Statistics::R - Perl interface with the R statistical program
+
+DESCRIPTION
+    *Statistics::R* is a module to controls the R interpreter (R project for
+    statistical computing: <http://www.r-project.org/>). It lets you start
+    R, pass commands to it and retrieve their output. A shared mode allows
+    several instances of *Statistics::R* to talk to the same R process.
+
+    The current *Statistics::R* implementation uses pipes (stdin, stdout and
+    stderr) to communicate with R. This implementation is more efficient and
+    reliable than that in versions < 0.20, which relied on reading and
+    writing intermediary files. As before, this module works on GNU/Linux,
+    MS Windows and probably many more systems. *Statistics::R* has been
+    tested with R version 2 and 3.
+
+SYNOPSIS
+      use Statistics::R;
+  
+      # Create a communication bridge with R and start R
+      my $R = Statistics::R->new();
+  
+      # Run simple R commands
+      my $output_file = "file.ps";
+      $R->run(qq`postscript("$output_file", horizontal=FALSE, width=500, height=500)`);
+      $R->run(q`plot(c(1, 5, 10), type = "l")`);
+      $R->run(q`dev.off()`);
+
+      # Pass and retrieve data (scalars or arrays)
+      my $input_value = 1;
+      $R->set('x', $input_value);
+      $R->run(q`y <- x^2`);
+      my $output_value = $R->get('y');
+      print "y = $output_value\n";
+
+      $R->stop();
+
+METHODS
+    new()
+        Build a *Statistics::R* bridge object connecting Perl and R.
+        Available options are:
+
+        bin Specify the full path to the R executable, if it is not
+            automatically found. See "INSTALLATION".
+
+        shared
+            Start a shared bridge. When using a shared bridge, several
+            instances of Statistics::R can communicate with the same unique
+            R instance. Example:
+
+               use Statistics::R;
+
+               my $R1 = Statistics::R->new( shared => 1);
+               my $R2 = Statistics::R->new( shared => 1);
+
+               $R1->set( 'x', 'pear' );
+               my $x = $R2->get( 'x' );
+               print "x = $x\n";
+
+               $R1->stop; # or $R2->stop
+
+            Note that in shared mode, you are responsible for calling the
+            *stop()* method from one of your Statistics::R instances when
+            you are finished. But be careful not to call the *stop()* method
+            if you still have processes that need to interact with R!
+
+    run()
+        First, *start()* R if it is not yet running. Then, execute R
+        commands passed as a string and return the output as a string. If
+        your commands failed to run in R, an error message will be
+        displayed.
+
+        Example:
+
+           my $out = $R->run( q`print( 1 + 2 )` );
+
+        If you intend on runnning many R commands, it may be convenient to
+        pass a list of commands or put multiple commands in an here-doc:
+
+           # List of R commands:
+           my $out1 = $R->run(
+              q`a <- 2`,
+              q`b <- 5`,
+              q`c <- a * b`,
+              q`print("ok")`
+           );
+
+           # Here-doc with multiple R commands:
+           my $cmds = <<EOF;
+           a <- 2
+           b <- 5
+           c <- a * b
+           print('ok')
+           EOF
+           my $out2 = $R->run($cmds);
+
+        Alternatively, to run commands from a file, use the
+        *run_from_file()* method.
+
+        The return value you get from *run()* is a combination of what R
+        would display on the standard output and the standard error, but the
+        exact order may differ.
+
+        When loading modules, some may write numerous messages on standard
+        error. You can disable this behavior using the following R command:
+
+           suppressPackageStartupMessages(library(library_to_load))
+
+        Note that older versions of R impose a limit on how many characters
+        can be contained on a line: about 4076 bytes maximum. You will be
+        warned if this occurs, with an error message stating:
+
+          '\0' is an unrecognized escape in character string starting "...
+
+        In this case, try to break down your R code into several smaller,
+        more manageable statements. Alternatively, adding newline characters
+        "\n" at strategic places in the R statements will work around the
+        issue.
+
+    run_from_file()
+        Similar to *run()* but reads the R commands from the specified file.
+        Internally, this method converts the filename to a format compatible
+        with R and then passes it to the R *source()* command to read the
+        file and execute the commands.
+
+    result()
+        Get the results from the last R command.
+
+    set()
+        Set the value of an R variable (scalar or vector). Example:
+
+          # Create an R scalar
+          $R->set( 'x', 'pear' );
+
+        or
+
+          # Create an R list
+          $R->set( 'y', [1, 2, 3] );
+
+    get()
+        Get the value of an R variable (scalar or vector). Example:
+
+          # Retrieve an R scalar. $x is a Perl scalar.
+          my $x = $R->get( 'x' );
+
+        or
+
+          # Retrieve an R list. $x is a Perl arrayref.
+          my $y = $R->get( 'y' );
+
+    start()
+        Explicitly start R. Most times, you do not need to do that because
+        the first execution of *run()* or *set()* will automatically call
+        *start()*.
+
+    stop()
+        Stop a running instance of R. You need to call this method after
+        running a shared bridge. For a simple bridge, you do not need to do
+        this because *stop()* is automatically called when the Statistics::R
+        object goes out of scope.
+
+    restart()
+        *stop()* and *start()* R.
+
+    bin()
+        Get or set the path to the R executable. Note that the path will be
+        available only after start() has been called.
+
+    version()
+        Get the version number of R.
+
+    is_shared()
+        Was R started in shared mode?
+
+    is_started()
+        Is R running?
+
+    pid()
+        Return the PID of the running R process
+
+INSTALLATION
+    Since *Statistics::R* relies on R to work, you need to install R first.
+    See this page for downloads, <http://www.r-project.org/>. If R is in
+    your PATH environment variable, then it should be available from a
+    terminal and be detected automatically by *Statistics::R*. This means
+    that you don't have to do anything on Linux systems to get
+    *Statistics::R* working. On Windows systems, in addition to the folders
+    described in PATH, the usual suspects will be checked for the presence
+    of the R binary, e.g. C:\Program Files\R. If *Statistics::R* does not
+    find where R is installed, your last recourse is to specify its full
+    path when calling new():
+
+        my $R = Statistics::R->new( bin => $fullpath );
+
+    You also need to have the following CPAN Perl modules installed:
+
+    IPC::Run
+    Regexp::Common
+    Text::Balanced (>= 1.97)
+    Text::Wrap
+    version (>= 0.77)
+
+SEE ALSO
+    *   Statistics::R::Win32
+
+    *   Statistics::R::Legacy
+
+    *   The R-project web site: <http://www.r-project.org/>
+
+    *   Statistics::* modules for Perl:
+        <http://search.cpan.org/search?query=Statistics&mode=module>
+
+AUTHORS
+    Florent Angly <florent.angly@gmail.com> (2011 rewrite)
+
+    Graciliano M. P. <gm@virtuasites.com.br> (original code)
+
+MAINTAINERS
+    Florent Angly <florent.angly@gmail.com>
+
+    Brian Cassidy <bricas@cpan.org>
+
+COPYRIGHT & LICENSE
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+BUGS
+    All complex software has bugs lurking in it, and this program is no
+    exception. If you find a bug, please report it on the CPAN Tracker of
+    Statistics::R: <http://rt.cpan.org/Dist/Display.html?Name=Statistics-R>
+
+    Bug reports, suggestions and patches are welcome. The Statistics::R code
+    is developed on Github (<http://github.com/bricas/statistics-r>) and is
+    under Git revision control. To get the latest revision, run:
+
+       git clone git://github.com/bricas/statistics-r.git
+

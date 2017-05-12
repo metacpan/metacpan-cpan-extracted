@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/String/Expand.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/01use.t
+t/02string.t
+t/03strings.t
+t/99pod.t

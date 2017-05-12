@@ -1,0 +1,20 @@
+Revision history for perl module Statistics-Sequences-Turns
+
+0.13 2017.04.12
+    - removed function aliases undocumented since prior version
+    - added alias 'z_score' for function 'z_value' previously documented only ('zscore' was and is still supported)
+    - misc. POD revisions
+
+0.12 2016.04.08
+    - changed base dependency to Statistics::Sequences v. 0.14, with 0.13 having had a recursive dependency (thanks to Slaven Rezic for pointing this out)
+    - changed POD to (1) remove excessive aliases (will be removed from functionality in later version); (2) add note re previously undocumented options for z_value; (3) add example "Seating at the diner" as in other Sequences modules; (4) add SUPPORT section; and (5) misc.
+
+0.11 2013.07.29
+    - Added test from Kanji (1993)
+    - Cleanup of load() so that all_numeric() check works for any loaded data, not just unreferenced data
+    - Misc POD revisions
+
+0.10 2013.06.30
+    - Descriptives methods added, plus support for argument only (data-free) expectation and variance
+    - Not compatible with previous versions
+

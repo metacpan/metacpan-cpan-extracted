@@ -1,0 +1,10 @@
+[% USE date( format = '%d-%b-%Y' ) %]
+## [% list.name %] mailing list
+## created: [% date.format %] by [% app %]
+[% list.name %]:        "|[% tequila %] post     [% list.name %]"
+[% list.name %]-sub:    "|[% tequila %] sub      [% list.name %]"
+[% list.name %]-unsub:  "|[% tequila %] unsub    [% list.name %]"
+[% list.name %]-cmd:    "|[% tequila %] commands [% list.name %]"
+[% list.name %]-bounce: [% list.owner.email %]
+[% list.name %]-admin:  [% list.owner.email %]
+

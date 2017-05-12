@@ -1,0 +1,32 @@
+---
+abstract: 'Estimates the length of all the vectors in an SVG file.'
+author:
+  - 'JT Smith <jt@plainblack.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.044, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SVG-Estimate
+requires:
+  Clone: '0'
+  File::Slurp: '0'
+  Image::SVG::Path: '0.23'
+  Image::SVG::Transform: '0.04'
+  List::MoreUtils: '0'
+  List::Util: '0'
+  Math::Trig: '0'
+  Moo: '0'
+  Ouch: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  XML::Hash::LX: '0'
+  XML::LibXML: '0'
+resources:
+  bugtracker: http://github.com/rizen/SVG-Estimate/issues
+  repository: git://github.com/rizen/SVG-Estimate.git
+version: '1.0107'

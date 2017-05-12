@@ -1,0 +1,251 @@
+<HTML>
+<HEAD>
+<TITLE>Spreadsheet::BasicReadNamedCol - Methods to easily read data from spreadsheets with columns in the order you want based on the names of the column headings</TITLE>
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#required modules">REQUIRED MODULES</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<UL>
+
+		<LI><A HREF="#new">new</A></LI>
+		<LI><A HREF="#getnextrow()"><CODE>getNextRow()</CODE></A></LI>
+		<LI><A HREF="#numsheets()"><CODE>numSheets()</CODE></A></LI>
+		<LI><A HREF="#openspreadsheet(filename)"><CODE>openSpreadsheet(fileName)</CODE></A></LI>
+		<LI><A HREF="#currentsheetnum()"><CODE>currentSheetNum()</CODE></A></LI>
+		<LI><A HREF="#currentsheetname()"><CODE>currentSheetName()</CODE></A></LI>
+		<LI><A HREF="#setcurrentsheetnum(num)"><CODE>setCurrentSheetNum(num)</CODE></A></LI>
+		<LI><A HREF="#getnextsheet()"><CODE>getNextSheet()</CODE></A></LI>
+		<LI><A HREF="#getfirstsheet()"><CODE>getFirstSheet()</CODE></A></LI>
+		<LI><A HREF="#cellvalue(row, col)">cellValue(row, col)</A></LI>
+		<LI><A HREF="#getfirstrow()"><CODE>getFirstRow()</CODE></A></LI>
+		<LI><A HREF="#setheadingrow(rownumber)"><CODE>setHeadingRow(rowNumber)</CODE></A></LI>
+		<LI><A HREF="#logexp(message)"><CODE>logexp(message)</CODE></A></LI>
+		<LI><A HREF="#logmsg(debug, message)">logmsg(debug, message)</A></LI>
+	</UL>
+
+	<LI><A HREF="#known issues">KNOWN ISSUES</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#license">LICENSE</A></LI>
+	<LI><A HREF="#cvs id">CVS ID</A></LI>
+	<LI><A HREF="#update history">UPDATE HISTORY</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Spreadsheet::BasicReadNamedCol - Methods to easily read data from spreadsheets with columns in the order you want based on the names of the column headings</P>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Provides methods for simple reading of a Excel spreadsheet, where the columns
+are returned in the order defined.</P>
+<P>Assumes a specific format of the spreadsheet where the first row of
+data defined the names of the columns.</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ use Spreadsheet::BasicReadNamedCol;</PRE>
+<PRE>
+ my $xlsFileName = 'Excel Price Sheet 021203.xls';
+ my @columnHeadings = (
+    'Supplier Part Number',
+    'Customer Price',
+    'Currency Code',
+    'Price UOM',
+    'Short Description',
+    'Long Description',
+ );</PRE>
+<PRE>
+ my $ss = new Spreadsheet::BasicReadNamedCol($xlsFileName) ||
+    die &quot;Could not open '$xlsFileName': $!&quot;;
+ $ss-&gt;setColumns(@columnHeadings);</PRE>
+<PRE>
+ # Print each row of the spreadsheet in the order defined in
+ # the columnHeadings array
+ my $row = 0;
+ while (my $data = $ss-&gt;getNextRow())
+ {
+    $row++;
+    print join('|', $row, @$data), &quot;\n&quot;;
+ }</PRE>
+<P>
+<HR>
+<H1><A NAME="required modules">REQUIRED MODULES</A></H1>
+<P>The following modules are required:</P>
+<PRE>
+ Spreadsheet::BasicRead
+ Spreadsheet::ParseExcel</PRE>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<P>There are no class methods, the object methods are described below.
+Private class method start with the underscore character '_' and
+should be treated as <EM>Private</EM>.</P>
+<P>
+<H2><A NAME="new">new</A></H2>
+<P>Called to create a new BasicReadNamedCol object.  The arguments can
+be either a single string (see <A HREF="#synopsis">'SYNOPSIS'</A>)
+which is taken as the filename of the spreadsheet of as named arguments.</P>
+<PRE>
+ eg.  my $ss = Spreadsheet::BasicReadNamedCol-&gt;new(
+                  columns       =&gt; \@columnNames,
+                  fileName      =&gt; 'MyExcelSpreadSheet.xls',
+                  skipHeadings  =&gt; 1,
+                  skipBlankRows =&gt; 1,
+                  log           =&gt; $log,
+                  );</PRE>
+<P>The following named arguments are available:</P>
+<DL>
+<DT><STRONG><A NAME="item_columns">columns</A></STRONG><BR>
+<DD>
+Value expected to be an array reference to a list of column
+names that appear in the first line of the spreadsheet.  The
+order of the column names defines the order in which the data
+is returned by the <A HREF="#getnextrow">'getNextRow'</A> method.
+<P>This is really useful where spreadsheet files from sources out
+of your control are not consistant in the ordering of columns.</P>
+<P>Note that the match on column name uses the following pattern match:</P>
+<PRE>
+ if ($realColName =~ /^\Q$name/i)</PRE>
+<PRE>
+ where:
+   realColName - is the actual column name in the spreadsheet and
+   name        - is the pattern to match</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_skipHeadings">skipHeadings</A></STRONG><BR>
+<DD>
+Don't output the headings line in the first call to
+<A HREF="#getnextrow">'getNextRow'</A> if true.
+<P></P>
+<DT><STRONG><A NAME="item_skipBlankRows">skipBlankRows</A></STRONG><BR>
+<DD>
+Skip blank lines in the spreadsheet if true.
+<P></P>
+<DT><STRONG><A NAME="item_setColumns">setColumns(array or array_ref)</A></STRONG><BR>
+<DD>
+Sets the order that columns will be returned in based on the
+names in the array provided.  The names are expected to match
+the values in the first row of the spreadsheet.
+<P></P>
+<DT><STRONG><A NAME="item_log">log</A></STRONG><BR>
+<DD>
+Use the File::Log object to log exceptions.
+<P></P>
+<DT><STRONG><A NAME="item_fileName">fileName</A></STRONG><BR>
+<DD>
+The name (and optionally path) of the spreadsheet file to process.
+<P></P></DL>
+<P>
+<H2><A NAME="getnextrow()"><CODE>getNextRow()</CODE></A></H2>
+<P>Get the next row of data from the spreadsheet.  The data is
+returned as an array reference.</P>
+<PRE>
+  eg.  $rowDataArrayRef = $ss-&gt;getNextRow();</PRE>
+<P>
+<H2><A NAME="numsheets()"><CODE>numSheets()</CODE></A></H2>
+<P>Returns the number of sheets in the spreadsheet</P>
+<P>
+<H2><A NAME="openspreadsheet(filename)"><CODE>openSpreadsheet(fileName)</CODE></A></H2>
+<P>Open a new spreadsheet file and set the current sheet to the first
+sheet.  The name and optionally path of the
+spreadsheet file is a required argument to this method.</P>
+<P>
+<H2><A NAME="currentsheetnum()"><CODE>currentSheetNum()</CODE></A></H2>
+<P>Returns the current sheet number or undef if there is no current sheet.
+<A HREF="#setcurrentsheetnum">'setCurrentSheetNum'</A> can be called to set the
+current sheet.</P>
+<P>
+<H2><A NAME="currentsheetname()"><CODE>currentSheetName()</CODE></A></H2>
+<P>Return the name of the current sheet or undef if the current sheet is
+not defined.  see <A HREF="#setcurrentsheetnum">'setCurrentSheetNum'</A>.</P>
+<P>
+<H2><A NAME="setcurrentsheetnum(num)"><CODE>setCurrentSheetNum(num)</CODE></A></H2>
+<P>Sets the current sheet to the integer value 'num' passed as the required
+argument to this method.  Note that this should not be bigger than
+the value returned by <A HREF="#numsheets">'numSheets'</A>.</P>
+<P>
+<H2><A NAME="getnextsheet()"><CODE>getNextSheet()</CODE></A></H2>
+<P>Returns the next sheet ``ssBook'' object or undef if there are no more sheets
+to process.  If there is no current sheet defined the first sheet
+is returned.</P>
+<P>
+<H2><A NAME="getfirstsheet()"><CODE>getFirstSheet()</CODE></A></H2>
+<P>Returns the first sheet ``ssBook'' object.</P>
+<P>
+<H2><A NAME="cellvalue(row, col)">cellValue(row, col)</A></H2>
+<P>Returns the value of the cell defined by (row, col)in the current sheet.</P>
+<P>
+<H2><A NAME="getfirstrow()"><CODE>getFirstRow()</CODE></A></H2>
+<P>Returns the first row of data from the spreadsheet (possibly skipping the
+column headings  <A HREF="#new">'skipHeadings'</A>) as an array reference.</P>
+<P>
+<H2><A NAME="setheadingrow(rownumber)"><CODE>setHeadingRow(rowNumber)</CODE></A></H2>
+<P>Sets the effective minimum row for the spreadsheet to 'rowNumber', since it
+is assumed that the heading is on this row and anything above the heading is
+not relavent.</P>
+<P><STRONG>Note:</STRONG> the row (and column) numbers are zero indexed.</P>
+<P>
+<H2><A NAME="logexp(message)"><CODE>logexp(message)</CODE></A></H2>
+<P>Logs an exception message (can be a list of strings) using the File::Log
+object if it was defined and then calls die message.</P>
+<P>
+<H2><A NAME="logmsg(debug, message)">logmsg(debug, message)</A></H2>
+<P>If a File::Log object was passed as a named argument <A HREF="#new">'new'</A>) and
+if 'debug' (integer value) is equal to or greater than the current debug
+Level (see File::Log) then the message is added to the log file.</P>
+<P>If a File::Log object was not passed to new then the message is output to
+STDERR.</P>
+<P>
+<HR>
+<H1><A NAME="known issues">KNOWN ISSUES</A></H1>
+<P>None</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P>Spreadsheet::BasicRead</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<PRE>
+ Greg George, IT Technology Solutions P/L, Australia
+ Mobile: 0404-892-159, Email: gng@cpan.org</PRE>
+<P>
+<HR>
+<H1><A NAME="license">LICENSE</A></H1>
+<P>Copyright (c) 1999- Greg George. All rights reserved. This
+program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.</P>
+<P>
+<HR>
+<H1><A NAME="cvs id">CVS ID</A></H1>
+<P>$Id: BasicReadNamedCol.pm,v 1.3 2006/04/30 05:57:29 Greg Exp $</P>
+<P>
+<HR>
+<H1><A NAME="update history">UPDATE HISTORY</A></H1>
+<P>$Log: BasicReadNamedCol.pm,v $
+Revision 1.3  2006/04/30 05:57:29  Greg
+- removed tabs from file</P>
+<P>Revision 1.2  2006/03/07 10:03:26  Greg
+- minor pod changes</P>
+<P>Revision 1.1  2006/03/05 03:07:58  Greg
+- initial CPAN upload</P>
+<P>Revision 1.0  2003/12/02 23:58:34  gxg6
+- Initial development, need POD</P>
+
+</BODY>
+
+</HTML>

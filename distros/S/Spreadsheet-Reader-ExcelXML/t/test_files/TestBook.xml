@@ -1,0 +1,268 @@
+<?xml version="1.0"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:dt="uuid:C2F41010-65B3-11d1-A29F-00AA00C14882"
+ xmlns:s="uuid:BDC6E3F0-6DA3-11d1-A2A3-00AA00C14882"
+ xmlns:rs="urn:schemas-microsoft-com:rowset" xmlns:z="#RowsetSchema"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:html="http://www.w3.org/TR/REC-html40">
+ <DocumentProperties xmlns="urn:schemas-microsoft-com:office:office">
+  <Author>jlund</Author>
+  <LastAuthor>jlund</LastAuthor>
+  <Created>2013-11-10T08:27:01Z</Created>
+  <LastSaved>2015-08-15T19:37:30Z</LastSaved>
+  <Company>Microsoft</Company>
+  <Version>12.00</Version>
+ </DocumentProperties>
+ <ExcelWorkbook xmlns="urn:schemas-microsoft-com:office:excel">
+  <WindowHeight>4455</WindowHeight>
+  <WindowWidth>9345</WindowWidth>
+  <WindowTopX>240</WindowTopX>
+  <WindowTopY>45</WindowTopY>
+  <TabRatio>505</TabRatio>
+  <ActiveSheet>1</ActiveSheet>
+  <Date1904/>
+  <ProtectStructure>False</ProtectStructure>
+  <ProtectWindows>False</ProtectWindows>
+ </ExcelWorkbook>
+ <Styles>
+  <Style ss:ID="Default" ss:Name="Normal">
+   <Alignment ss:Vertical="Bottom"/>
+   <Borders/>
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="11" ss:Color="#000000"/>
+   <Interior/>
+   <NumberFormat/>
+   <Protection/>
+  </Style>
+  <Style ss:ID="s16">
+   <NumberFormat/>
+  </Style>
+  <Style ss:ID="s17">
+   <NumberFormat ss:Format="[ENG][$-409]d\-mmm\-yy;@"/>
+  </Style>
+  <Style ss:ID="s18">
+   <NumberFormat ss:Format="Short Date"/>
+  </Style>
+  <Style ss:ID="s20">
+   <Alignment ss:Horizontal="Left" ss:Vertical="Bottom"/>
+  </Style>
+  <Style ss:ID="s21">
+   <NumberFormat ss:Format="@"/>
+  </Style>
+  <Style ss:ID="s22">
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="14" ss:Color="#000000"
+    ss:Bold="1"/>
+  </Style>
+  <Style ss:ID="s23">
+   <NumberFormat ss:Format="Fixed"/>
+  </Style>
+  <Style ss:ID="s24">
+   <NumberFormat ss:Format="0"/>
+  </Style>
+  <Style ss:ID="s27">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Bottom"/>
+   <NumberFormat ss:Format="[ENG][$-409]d\-mmm\-yy;@"/>
+  </Style>
+ </Styles>
+ <Worksheet ss:Name="Sheet2">
+  <Table ss:ExpandedColumnCount="3" ss:ExpandedRowCount="7" x:FullColumns="1"
+   x:FullRows="1" ss:DefaultRowHeight="15">
+   <Column ss:Index="3" ss:Width="51"/>
+   <Row>
+    <Cell><Data ss:Type="String">Category</Data></Cell>
+    <Cell><Data ss:Type="String">Total</Data></Cell>
+    <Cell ss:StyleID="s18"><Data ss:Type="String">Date</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Red</Data></Cell>
+    <Cell><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s18"><Data ss:Type="DateTime">2017-02-14T00:00:00.000</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Blue</Data></Cell>
+    <Cell><Data ss:Type="Number">7</Data></Cell>
+    <Cell ss:StyleID="s18"><Data ss:Type="DateTime">2017-02-14T00:00:00.000</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Omaha</Data></Cell>
+    <Cell><Data ss:Type="Number">2</Data></Cell>
+    <Cell ss:StyleID="s18"><Data ss:Type="DateTime">2018-02-03T00:00:00.000</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Red</Data></Cell>
+    <Cell><Data ss:Type="Number">3</Data></Cell>
+    <Cell ss:StyleID="s18"><Data ss:Type="DateTime">2018-02-03T00:00:00.000</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Red</Data></Cell>
+    <Cell><Data ss:Type="Number">30</Data></Cell>
+    <Cell ss:StyleID="s18"><Data ss:Type="DateTime">2016-02-06T00:00:00.000</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Blue</Data></Cell>
+    <Cell><Data ss:Type="Number">10</Data></Cell>
+    <Cell ss:StyleID="s18"><Data ss:Type="DateTime">2016-02-06T00:00:00.000</Data></Cell>
+   </Row>
+  </Table>
+  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+   <PageSetup>
+    <Header x:Margin="0.3"/>
+    <Footer x:Margin="0.3"/>
+    <PageMargins x:Bottom="0.75" x:Left="0.7" x:Right="0.7" x:Top="0.75"/>
+   </PageSetup>
+   <Print>
+    <ValidPrinterInfo/>
+    <HorizontalResolution>600</HorizontalResolution>
+    <VerticalResolution>600</VerticalResolution>
+   </Print>
+   <Panes>
+    <Pane>
+     <Number>3</Number>
+     <ActiveRow>1</ActiveRow>
+     <ActiveCol>2</ActiveCol>
+    </Pane>
+   </Panes>
+   <ProtectObjects>False</ProtectObjects>
+   <ProtectScenarios>False</ProtectScenarios>
+  </WorksheetOptions>
+ </Worksheet>
+ <Worksheet ss:Name="Sheet5">
+  <Table ss:ExpandedColumnCount="5" ss:ExpandedRowCount="6" x:FullColumns="1"
+   x:FullRows="1" ss:DefaultRowHeight="15">
+   <Column ss:Width="100.5"/>
+   <Column ss:AutoFitWidth="0" ss:Width="85.5"/>
+   <Column ss:Width="51"/>
+   <Column ss:AutoFitWidth="0" ss:Width="45.75"/>
+   <Column ss:Width="59.25"/>
+   <Row>
+    <Cell><Data ss:Type="String">Superbowl Audibles</Data></Cell>
+    <Cell><Data ss:Type="String">Column Labels</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Row Labels</Data></Cell>
+    <Cell ss:StyleID="s18"><Data ss:Type="DateTime">2016-02-06T00:00:00.000</Data></Cell>
+    <Cell ss:StyleID="s18"><Data ss:Type="DateTime">2017-02-14T00:00:00.000</Data></Cell>
+    <Cell ss:StyleID="s18"><Data ss:Type="DateTime">2018-02-03T00:00:00.000</Data></Cell>
+    <Cell><Data ss:Type="String">Grand Total</Data></Cell>
+   </Row>
+   <Row>
+    <Cell ss:StyleID="s20"><Data ss:Type="String">Blue</Data></Cell>
+    <Cell ss:StyleID="s16"><Data ss:Type="Number">10</Data></Cell>
+    <Cell ss:StyleID="s16"><Data ss:Type="Number">7</Data></Cell>
+    <Cell ss:StyleID="s16"/>
+    <Cell ss:StyleID="s16"><Data ss:Type="Number">17</Data></Cell>
+   </Row>
+   <Row>
+    <Cell ss:StyleID="s20"><Data ss:Type="String">Omaha</Data></Cell>
+    <Cell ss:StyleID="s16"/>
+    <Cell ss:StyleID="s16"/>
+    <Cell ss:StyleID="s16"><Data ss:Type="Number">2</Data></Cell>
+    <Cell ss:StyleID="s16"><Data ss:Type="Number">2</Data></Cell>
+   </Row>
+   <Row>
+    <Cell ss:StyleID="s20"><Data ss:Type="String">Red</Data></Cell>
+    <Cell ss:StyleID="s16"><Data ss:Type="Number">30</Data></Cell>
+    <Cell ss:StyleID="s16"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s16"><Data ss:Type="Number">3</Data></Cell>
+    <Cell ss:StyleID="s16"><Data ss:Type="Number">38</Data></Cell>
+   </Row>
+   <Row>
+    <Cell ss:StyleID="s20"><Data ss:Type="String">Grand Total</Data></Cell>
+    <Cell ss:StyleID="s16"><Data ss:Type="Number">40</Data></Cell>
+    <Cell ss:StyleID="s16"><Data ss:Type="Number">12</Data></Cell>
+    <Cell ss:StyleID="s16"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s16"><Data ss:Type="Number">57</Data></Cell>
+   </Row>
+  </Table>
+  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+   <PageSetup>
+    <Header x:Margin="0.3"/>
+    <Footer x:Margin="0.3"/>
+    <PageMargins x:Bottom="0.75" x:Left="0.7" x:Right="0.7" x:Top="0.75"/>
+   </PageSetup>
+   <Visible>SheetHidden</Visible>
+   <Panes>
+    <Pane>
+     <Number>3</Number>
+     <ActiveRow>10</ActiveRow>
+     <ActiveCol>2</ActiveCol>
+    </Pane>
+   </Panes>
+   <ProtectObjects>False</ProtectObjects>
+   <ProtectScenarios>False</ProtectScenarios>
+  </WorksheetOptions>
+ </Worksheet>
+ <Worksheet ss:Name="Sheet1">
+  <Table ss:ExpandedColumnCount="6" ss:ExpandedRowCount="14" x:FullColumns="1"
+   x:FullRows="1" ss:DefaultRowHeight="15">
+   <Column ss:Width="50.25"/>
+   <Column ss:Index="3" ss:Hidden="1" ss:AutoFitWidth="0" ss:Span="1"/>
+   <Column ss:Index="5" ss:Width="51"/>
+   <Row ss:Index="2">
+    <Cell><Data ss:Type="String">Hello</Data></Cell>
+    <Cell ss:Index="4"><Data ss:Type="String">my</Data></Cell>
+   </Row>
+   <Row ss:Index="4" ss:Height="18.75">
+    <Cell ss:Index="3" ss:StyleID="s22"><Data ss:Type="String">World</Data></Cell>
+   </Row>
+   <Row ss:Index="6" ss:Height="26.25">
+    <Cell ss:MergeAcross="1" ss:StyleID="s20"><ss:Data ss:Type="String"
+      xmlns="http://www.w3.org/TR/REC-html40"><Font html:Color="#000000">He</Font><B><Font
+        html:Color="#FF0000">llo </Font><Font html:Size="20" html:Color="#0070C0">World</Font></B></ss:Data></Cell>
+   </Row>
+   <Row ss:Hidden="1">
+    <Cell ss:Index="2"><Data ss:Type="Number">69</Data></Cell>
+   </Row>
+   <Row ss:Hidden="1">
+    <Cell ss:Index="2"><Data ss:Type="Number">27</Data></Cell>
+    <Cell ss:Index="5" ss:StyleID="s17"><Data ss:Type="DateTime">2005-09-12T00:00:00.000</Data></Cell>
+   </Row>
+   <Row ss:Hidden="1">
+    <Cell ss:Index="2" ss:Formula="=R[-2]C-R[-1]C"><Data ss:Type="Number">42</Data></Cell>
+   </Row>
+   <Row ss:Hidden="1">
+    <Cell ss:Index="4" ss:StyleID="s16"><Data ss:Type="String"> </Data></Cell>
+    <Cell ss:StyleID="s21"><Data ss:Type="String">2/6/2011</Data></Cell>
+    <Cell ss:StyleID="s17"><Data ss:Type="String">2/6/2011</Data></Cell>
+   </Row>
+   <Row ss:Hidden="1">
+    <Cell ss:StyleID="s23"><Data ss:Type="Number">2.1345678901</Data></Cell>
+   </Row>
+   <Row>
+    <Cell ss:Index="2" ss:Formula="=IF(R[-1]C&gt;0,&quot;Hello&quot;,&quot;&quot;)"><Data
+      ss:Type="String"></Data></Cell>
+    <Cell ss:Index="4" ss:MergeAcross="1" ss:StyleID="s27"
+     ss:Formula="=DATEVALUE(R[-2]C[1])"><Data ss:Type="DateTime">2011-02-06T00:00:00.000</Data></Cell>
+   </Row>
+   <Row ss:Index="14">
+    <Cell ss:Index="3"><Data ss:Type="String"> </Data></Cell>
+    <Cell ss:StyleID="s24" ss:Formula="=R[-2]C"><Data ss:Type="Number">39118</Data></Cell>
+    <Cell ss:StyleID="s17" ss:Formula="=RC[-1]"><Data ss:Type="DateTime">2011-02-06T00:00:00.000</Data></Cell>
+   </Row>
+  </Table>
+  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+   <PageSetup>
+    <Header x:Margin="0.3"/>
+    <Footer x:Margin="0.3"/>
+    <PageMargins x:Bottom="0.75" x:Left="0.7" x:Right="0.7" x:Top="0.75"/>
+   </PageSetup>
+   <Print>
+    <ValidPrinterInfo/>
+    <HorizontalResolution>600</HorizontalResolution>
+    <VerticalResolution>4</VerticalResolution>
+   </Print>
+   <Selected/>
+   <Panes>
+    <Pane>
+     <Number>3</Number>
+     <ActiveRow>13</ActiveRow>
+     <ActiveCol>4</ActiveCol>
+    </Pane>
+   </Panes>
+   <ProtectObjects>False</ProtectObjects>
+   <ProtectScenarios>False</ProtectScenarios>
+  </WorksheetOptions>
+ </Worksheet>
+</Workbook>

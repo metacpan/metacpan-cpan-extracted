@@ -1,0 +1,49 @@
+{
+   "abstract" : "Build indexes for a set of search keys; Search using BerkeleyDB",
+   "author" : [
+      "Ron Savage <ron@savage.net.au>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "artistic_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Search-InvertedIndex-Simple-BerkeleyDB",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.94",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "BerkeleyDB" : "0.41",
+            "Search::InvertedIndex::Simple" : "1.03",
+            "Set::Array" : "0.19"
+         }
+      }
+   },
+   "provides" : {
+      "Search::InvertedIndex::Simple::BerkeleyDB" : {
+         "file" : "lib/Search/InvertedIndex/Simple/BerkeleyDB.pm",
+         "version" : "1.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/artistic-license.php"
+      ]
+   },
+   "version" : "1.06"
+}

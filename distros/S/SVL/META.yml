@@ -1,0 +1,68 @@
+---
+name: SVL
+version: 0.29
+author: ~
+abstract: A peer-to-peer version of svk
+license: perl
+requires:
+  App::CLI: 0
+  Catalyst: 0
+  Class::Accessor::Chained::Fast: 0
+  File::Path: 0
+  Net::DNS: 0.49.03
+  Net::OpenDHT: 0.32
+  Net::Rendezvous: 0
+  Net::Rendezvous::Publish: 0
+  Path::Class: 0
+  Pod::Usage: 0
+  SVK: 0
+  SVK::Simple: 0
+  SVN::Mirror: 0.65
+  Sys::HostIP: 0
+  Test::More: 0
+  Text::Tags::Parser: 0
+provides:
+  POEBeacon:
+    file: lib/SVL/POEBeacon.pm
+  SVL:
+    file: lib/SVL.pm
+    version: 0.29
+  SVL::BeaconClient:
+    file: lib/SVL/BeaconClient.pm
+  SVL::Bonjour:
+    file: lib/SVL/Bonjour.pm
+  SVL::Bonjour::Peer:
+    file: lib/SVL/Bonjour.pm
+  SVL::Command:
+    file: lib/SVL/Command.pm
+  SVL::Command::Checkout:
+    file: lib/SVL/Command/Checkout.pm
+  SVL::Command::Help:
+    file: lib/SVL/Command/Help.pm
+  SVL::Command::Pull:
+    file: lib/SVL/Command/Pull.pm
+  SVL::Command::Search:
+    file: lib/SVL/Command/Search.pm
+  SVL::Command::Search::fix:
+    file: lib/SVL/Command/Search.pm
+  SVL::Command::Share:
+    file: lib/SVL/Command/Share.pm
+  SVL::Command::Share::list:
+    file: lib/SVL/Command/Share.pm
+  SVL::Command::Tag:
+    file: lib/SVL/Command/Tag.pm
+  SVL::Command::Tag::delete:
+    file: lib/SVL/Command/Tag.pm
+  SVL::Command::Tag::list:
+    file: lib/SVL/Command/Tag.pm
+  SVL::Command::Unshare:
+    file: lib/SVL/Command/Unshare.pm
+  SVL::Mirror:
+    file: lib/SVL/Mirror.pm
+  SVL::OpenDHT:
+    file: lib/SVL/OpenDHT.pm
+  SVL::Share:
+    file: lib/SVL/Share.pm
+  SVL::Sharing:
+    file: lib/SVL/Sharing.pm
+generated_by: Module::Build version 0.25

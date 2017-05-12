@@ -1,0 +1,195 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><!-- #BeginTemplate "/Templates/circa.dwt" -->
+<head>
+<!-- #BeginEditable "doctitle" --> 
+<title>Circa, moteur de recherche Internet</title>
+<!-- #EndEditable --> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<style type="text/css">
+<!--
+body {
+  font-family: sans-serif;
+  color: black;
+  background: white;
+  margin-left : 0;
+  margin-top : 0;
+}
+th, td { /* ns 4 */
+  font-family: sans-serif;
+}
+a {font: bold; color:Navy;} 
+h1 { text-align: center }
+h2, h3, h4, h5, h6 { text-align: left }
+h1, h2, h3 { color: #005A9C; }
+h1 { font: bold 100% }
+h2 { margin:1em; font: bold 95% }
+h3 { font: 90%  }
+h4 { font: bold 85% }
+h5 { font: italic 85%  }
+h6 { text-align: right }
+ul,p { font: 80%;}
+p { text-align:justify; margin:1em;}
+.p-liens {text-align:right;}
+TH {background :  #008080; color :  White;}
+TD {}
+.td-bord {background :  Navy; color :  White;}
+.small {font:70%; }
+.h2-sans-marge {margin:0; text-align:center;}
+.without-margin {margin:0,0,0,0;}
+-->
+</style>
+</head>
+
+<body bgcolor="#FFFFFF">
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr> 
+    <td width="8%" class="td-bord" align="left">&nbsp;</td>
+    <td width="22%"><img src="http://www.alianwebserver.com/circa/images/circa_logo1.gif" width="70" height="70"><img src="http://www.alianwebserver.com/circa/images/circa_logo2.gif" width="110" height="50"> 
+    </td>
+    <td width="62%"><!-- #BeginEditable "titre" -->
+      <h1>Circa</h1>
+      <div align="right"><a href="index.fr.html">Version fran&ccedil;aise</a></div>
+      <!-- #EndEditable --></td>
+    <td width="8%" class="td-bord">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td width="8%" class="td-bord">&nbsp;</td>
+    <td colspan="2">&nbsp;</td>
+    <td width="8%" class="td-bord">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td width="8%" class="td-bord">&nbsp;</td>
+    <td colspan="2"><!-- #BeginEditable "corps" --> 
+      <h2>Presentation</h2>
+      <p>Circa is a search engine for your Web site, or for a list of sites. It 
+        indexes like Altavista does. It can read, add and parse all url's found 
+        in a page, if the page is on the same server.</p>
+      <p>Circa is free, under <a href="COPYING.txt" target="_blank">GNU</a> license</p>
+      <h2>Try-it !</h2>
+      <p>Make a search on AlianWebServer :</p>
+      <form method="POST"  enctype="application/x-www-form-urlencoded" action="http://www.alianwebserver.com/circa/search.cgi">
+        <table>
+          <tr> 
+            <td> 
+              <input type="text" name="word" >
+              <input type="hidden" name="id" value="1">
+            </td>
+            <td> 
+              <input type="submit" name=".submit">
+            </td>
+          </tr>
+        </table>
+        <p>Or try <a href="http://www.alianwebserver.com/circa/search.cgi" target="_blank">advanced 
+          search</a>.</p>
+      </form>
+      <h2>Features</h2>
+      <ul>
+        <li>Full text indexing</li>
+        <li>Different weights for title, keywords, description and rest of page 
+          HTML read can be given in configuration</li>
+        <li>Boolean query language support : or (default) and (&quot;+&quot;) 
+          not (&quot;-&quot;). Ex perl + faq -cgi : Documents with faq, eventually 
+          perl and not cgi.</li>
+        <li>Support protocol HTTP,FTP</li>
+        <li>Make index in MySQL</li>
+        <li>Client Perl or PHP</li>
+        <li>Read HTML and full text plain</li>
+        <li>Can do indexation of filesystem without talk to Web Server </li>
+        <li>Can browse site by directory / rubrique.</li>
+        <li>Several kinds of indexing : full, incremental, only on a particular 
+          server. Documents not updated are not reindexed. All requests for a 
+          file are made first with a head http request, for information such as 
+          validate, last update, size, etc.</li>
+        <li>Size of documents read can be restricted (Ex: don't get all documents 
+          > 5 MB). For use with low-bandwidth connections, or computers which 
+          do not have much memory.</li>
+        <li>HTML template can be easily customized for your needs.</li>
+        <li>Search for different criteria: news, last modified date, language, 
+          URL / site.</li>
+        <li>Admin functions available by browser interface or command-line. </li>
+        <li>Full support of standard robots exclusion (robots.txt). Identification 
+          with CircaIndexer/0.1, mail alian@alianwebserver.com.</li>
+        <li>Delay requests to the same server for 8 secondes. &quot;It's not a 
+          bug, it's a feature!&quot; Basic rule for HTTP serveur load.</li>
+        <li>Index the different links found in a CGI (all after name_of_file?)</li>
+        <li>Support proxy HTTP </li>
+      </ul>
+      <h2>To do</h2>
+      <ul>
+        <li>Support NNTP</li>
+        <li>Support of different character sets</li>
+        <li>Support of other bases</li>
+        <li>Requirement</li>
+      </ul>
+      <ul>
+        <li>MySQL</li>
+        <li>Perl</li>
+        <li>Modules DBI, DBD::mysql,LWP::RobotUA,HTML::LinkExtor; </li>
+      </ul>
+      <h2>Benchmark</h2>
+      <p>Memory : Indexation : 5,5M<br>
+        Processeur : on Sun SPARC Station 4 : (5 secondes &agrave; 2%, 2s. &agrave; 
+        20%, 1s. &agrave; 30%) / url index&eacute;e.<br>
+        Size on MySQL: 2-5 ko / url.</p>
+      <p>Make index is a big work so it's not for CGI protocol. Try to use admin.pl 
+        to update index; if you don't have telnet acces, try to lunch processus 
+        on background with another CGI. Or install MySQL on local disk, make your 
+        index, and export index on you sarch machine.</p>
+      <h2></h2>
+      <h2></h2>
+      <h2>Install</h2>
+      <ul>
+        <li>Download one of archive file, uncompress it.</li>
+        <li>You must update search.cgi and search.pl (script for search) admin.cgi 
+          and admin.pl (script for admin) for put your MYSQL param :user, password, 
+          database and ip adress if different from 'localhost'.</li>
+        <li>Run admin.cgi (CGI interface) or admin.pl (command line) for add your 
+          url, drop or create tables, ... I suggest to prefer use admin.pl on 
+          command line because indexation can take a lot of time and is not adapted 
+          for CGI</li>
+        <li>Run search.cgi. You can use the default form for use in your page. 
+          Only field 'words' is necessary.</li>
+        <li>For customized HTML result, look in file circa.htm</li>
+      </ul>
+      <h2>Documentation</h2>
+      <p>Documentation POD is available, use pod2html name_of_file.pm &gt; name_of_file.html 
+        for read it.</p>
+
+      <h2>Download</h2>
+      <p>If you have root privileges and can install Perl modules, you can install 
+        this two modules : <a href="http://search.cpan.org/search?dist=Circa-Search">Circa::Search</a> 
+        et <a href="http://search.cpan.org/search?dist=Circa-Indexer">Circa::Indexer</a>. See directory 
+        demo for how use this module. Install Circa::Indexer first.</p>
+      <p>Else, you can use this distrib : </p>
+      <p><a href="http://www.alianwebserver.com/circa/circa.zip">Format ZIP</a> 
+        or <a href="http://www.alianwebserver.com/circa/circa.tar.gz">Format tar.gz</a></p>
+      <h2>Author</h2>
+      <p>Alain BARBET <a href="mailto:alian@alianwebserver.com">alian@alianwebserver.com</a></p>
+      <h2>Reference</h2>
+      <p>Rules and security with :</p>
+      <p><a href="http://info.webcrawler.com/mak/projects/robots/robots.html" target="_blank">http://info.webcrawler.com/mak/projects/robots/robots.html</a></p>
+      <p>Feature :</p>
+      <p><a href="http://search.mnogo.ru/features.html" target="_blank">http://search.mnogo.ru/features.html</a></p>
+      <p>Why ?</p>
+      <p>I read of this <a href="http://www.debian.org/search" target="_blank">need</a>, 
+        I needed one for AlianWebServer, and I think other people need it too.</p>
+      <!-- #EndEditable --></td>
+    <td width="8%" class="td-bord">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td width="8%" class="td-bord">&nbsp;</td>
+    <td colspan="2"><!-- #BeginEditable "bas_page" --><!-- #EndEditable --></td>
+    <td width="8%" class="td-bord">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td width="8%" class="td-bord">&nbsp;</td>
+    <td colspan="2"> 
+      <h6>&nbsp;</h6>
+      <h6> Powered by <a href="http://www.alianwebserver.com/circa" target="_blank">AlianWebServer</a> 
+      </h6>
+    </td>
+    <td width="8%" class="td-bord">&nbsp;</td>
+  </tr>
+</table>
+</body>
+<!-- #EndTemplate --></html>

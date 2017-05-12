@@ -1,0 +1,12 @@
+SVN::Dump
+---------
+
+This module lets you manage SVN dumps with Perl.
+
+The reference document for Subversion dumpfiles is at:
+http://svn.apache.org/repos/asf/subversion/trunk/notes/dump-load-format.txt
+
+PLEASE NOTE THAT THIS CODE IS OF IN ALPHA QUALITY. I DO NOT MASTER YET
+ALL THE CONCEPTS BEHIND THE SUBVERSION FILESYSTEM, BUT WILL EVENTUALLY LEARN.
+THE INTERFACE IS SUBJECT TO CHANGE IN THE FUTURE.
+

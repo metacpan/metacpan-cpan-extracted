@@ -1,0 +1,4 @@
+Can we do something funky with AUTOLOAD?
+
+use PPI to find __DATA__ / __END__
+  perl -MPPI -MPPI::Dumper -e 'PPI::Dumper->new(PPI::Document->new("t/lib/Module/With/Data/Segment.pm"))->print()'

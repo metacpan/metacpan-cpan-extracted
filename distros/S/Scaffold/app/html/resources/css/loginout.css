@@ -1,0 +1,26 @@
+
+#loginout {
+    width: 375px;
+    height: 150px;
+    margin-top: 10%;
+    margin-left: 32%;
+}
+
+#loginout fieldset {
+    background-color: #CCCCCC;
+}
+
+#loginout fieldset legend {
+    background-color: #CCCCCC;
+}
+    
+#textbox {
+    width: 375px;
+    height: 150px;
+    border: 1px solid;
+    margin-top: 10%;
+    margin-left: 32%;
+    background-color: #CCCCCC;
+    text-align: center;
+}
+

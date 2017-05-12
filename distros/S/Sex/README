@@ -1,0 +1,74 @@
+Announcing a new perl module:  Sex 0.69!
+
+Sex can be had from any local CPAN mirror or from
+http://www.pobox.com/~schwern/src/Sex-0.69.tar.gz Email your sysadmin
+today and ask him or her for Sex!
+
+
+NAME
+    Sex - Perl teaches the birds and the bees.
+
+SYNOPSIS
+      package Catholicism;
+      use Sex qw(strict Religion);
+
+      package Mormonism;
+      use Sex qw(Catholicism Sex);
+
+DESCRIPTION
+    Heterogeneous recombination of Perl packages.
+
+    Given two (or more, I'm a liberal guy) packages, Sex.pm will recombine
+    their symbols at random recombining them into the new module thus
+    providing a cross-section of its functions and global variables. It will
+    also push the parent classes onto the child's @ISA array.
+
+    So you could do:
+
+        package Net::SFTP;
+        use Sex qw(Net::FTP Net::SSLeay);
+
+    And get a secure FTP client!
+
+    The recombination occurs in such a way to ensure that the child will
+    contain -all- the symbols of both parents. Should two (or more) parents
+    wish to bestow the same symbol on its child one will be chosen at
+    random.
+
+    For example:
+
+        package DejaNews;
+        use Sex qw(LWP::Simple Net::NNTP);
+
+    LWP::Simple and Net::NNTP both have a head() function and thus they try
+    to give head() to their child. Sex.pm will suck the head() off either
+    LWP::Simple or Net::NNTP and stick it to DejaNews. Afterwards, DejaNews
+    can procede to finally use its head().
+
+    Here's another timely example for Sex in the 21st century:
+
+        package URI::Bot9000;
+        use Sex qw(URI LWP::RobotUA protected);
+
+    Because of the dire consequences of having sex with URI, one should make
+    sure you're well protected.
+
+BUGS
+    There are many bugs you can get from having Sex used too often on your
+    computer. Please be sure your programs are Safe before they have Sex.
+
+        package Trojan;
+        use Sex qw(Safe Sex);
+
+AUTHOR
+    Michael 'The Porn King of CMU' Schwern <schwern@pobox.com>
+
+SEE ALSO
+    'Disco Dolls in Hot Skin'
+
+    'Exhaused: The John Holmes Story'
+
+    'Deep Recursion' starring Ada Lovelace.
+
+    'The Fly' (1953)
+

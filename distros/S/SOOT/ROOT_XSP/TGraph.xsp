@@ -1,0 +1,7 @@
+%module{SOOT};
+
+class TGraph {
+  TGraphFloatArray GetX();
+  TGraphFloatArray GetY();
+};
+

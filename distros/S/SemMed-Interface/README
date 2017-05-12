@@ -1,0 +1,137 @@
+SemMed-Interface
+  SYNOPSIS
+      The SemMed-Interface is a suite of Perl modules that utilize path information
+      present in the Semantic Medline Database in order to calculate the semantic
+      association between two concepts in the UMLS.
+
+  INSTALL
+        To install these modules run:
+
+          perl Makefile.PL
+          make
+          make test
+          make install
+
+        This will install the modules in the standard locations. You will, 
+        most probably, require root privileges to install in standard system
+        directories. To install in a non-standard directory, specify a prefix
+        during the 'perl Makefile.PL' stage as:
+
+          perl Makefile.PL PREFIX=/home
+
+        It is possible to modify other parameters during installation. The
+        details of these can be found in the ExtUtils::MakeMaker
+        documentation. However, it is highly recommended not messing 
+        around with other parameters, unless you know what you're doing.
+
+  CONTENTS
+        All the modules that will be installed in the Perl system directory are
+        present in the '/lib' directory tree of the package. These include the
+        semantic relatedness modules -- 
+
+          SemMed/Interface.pm
+              SemMed/Interface/CUI.pm
+              SemMed/Interface/Predicate.pm
+              SemMed/Interface/GraphTraversal.pm
+              SemMed/Interface/DataAccess.pm
+
+        -- present in the lib/ subdirectory. All these modules, once installed
+        in the Perl system directory, can be directly used by Perl programs.
+
+        The package contains a utils/ directory that contain Perl utility 
+        programs. These utilities use the modules or provide some supporting
+        functionality.
+
+          nanob2b-example.pl         -- simple example of using the module
+
+  CONFIGURATION
+    The SemMed-Interface requires access to the Semantic Medline Database.
+    Please install this database onto your MySQL server and follow the
+    set-up steps found in the INSTALL file.
+
+  SOFTWARE COPYRIGHT AND LICENSE
+        Copyright (C) 2016 Bridget T McInnes
+
+        This suite of programs is free software; you can redistribute it and/or
+        modify it under the terms of the GNU General Public License as published
+        by the Free Software Foundation; either version 2 of the License, or (at
+        your option) any later version.
+
+        This program is distributed in the hope that it will be useful, but
+        WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+        General Public License for more details.
+
+        You should have received a copy of the GNU General Public License along
+        with this program; if not, write to the Free Software Foundation, Inc.,
+        59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+        Note: The text of the GNU General Public License is provided in the file
+        'GPL.txt' that you should have received with this distribution.
+
+  REFERENCING
+        This is where you would add the paper referencing the packge. For 
+        example: 
+
+        If you write a paper that has used SemMed-Interface in some way, we'd 
+        certainly be grateful if you sent us a copy and referenced: 
+
+        @inproceedings{McInnesPP09,
+           title={{UMLS-Interface and NanoB2B-Example : Open Source 
+                   Software for Measuring Paths and Semantic Similarity}}, 
+           author={McInnes, B.T. and Pedersen, T. and Pakhomov, S.V.}, 
+           booktitle={Proceedings of the American Medical Informatics 
+                      Association (AMIA) Symposium},
+           year={2009}, 
+           month={November}, 
+           address={San Fransisco, CA}
+        }
+
+        This paper is also found in
+        <http://www-users.cs.umn.edu/~bthomson/publications/pubs.html>
+        or
+        <http://www.d.umn.edu/~tpederse/Pubs/amia09.pdf>
+
+  REFERENCES
+        1   <reference 1>
+
+        2   <reference 2> s
+
+  SEE ALSO
+    <http://search.cpan.org/dist/NanoB2B-Example>
+
+  CONTACT US
+    If you have any trouble installing and using SemMed-Interface, please
+    contact us via the users mailing list :
+
+    <mailing list email>
+
+    You can join this group by going to:
+
+    <mailing list website>
+
+    You may also contact us directly if you prefer :
+
+      Bridget T. McInnes: btmcinnes at vcu.edu
+
+  AUTHORS
+     Bridget T McInnes, University of Minnesota Twin Cities
+     bthomson at cs.umn.edu
+
+     Andriy Y. Mulyar
+
+  DOCUMENTATION COPYRIGHT AND LICENSE
+    Copyright (C) 2016 Bridget T. McInnes
+
+    Permission is granted to copy, distribute and/or modify this document
+    under the terms of the GNU Free Documentation License, Version 1.2 or
+    any later version published by the Free Software Foundation; with no
+    Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+
+    Note: a copy of the GNU Free Documentation License is available on the
+    web at:
+
+    <http://www.gnu.org/copyleft/fdl.html>
+
+    and is included in this distribution as FDL.txt.
+

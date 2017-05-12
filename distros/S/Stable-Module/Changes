@@ -1,0 +1,25 @@
+Revision history for this software.
+
+0.06 2017-03-05 00:00:00
+  - define NORECURS, PM, and PL_FILES in Makefile.PL
+  - created by INABA Hitoshi
+
+0.05 2016-07-13 00:00:00
+  - change 0402_FilePath_rmtree.t safely
+  - created by INABA Hitoshi
+
+0.04 2016-07-11 00:00:00
+  - fix any, all, none, and notall
+  - created by INABA Hitoshi
+
+0.03 2016-07-10 00:00:00
+  - fix any, all, none, and notall
+  - created by INABA Hitoshi
+
+0.02 2014-08-19 00:00:00
+  - remove slurp
+  - created by INABA Hitoshi
+
+0.01 2014-08-18 00:00:00
+  - experimental release
+  - created by INABA Hitoshi

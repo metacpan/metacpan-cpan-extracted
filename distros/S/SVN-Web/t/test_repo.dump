@@ -1,0 +1,329 @@
+SVN-fs-dump-format-version: 2
+
+UUID: 05d405f4-8dea-0310-8e20-829214fe2c8f
+
+Revision-number: 0
+Prop-content-length: 56
+Content-length: 56
+
+K 8
+svn:date
+V 27
+2004-12-06T08:05:35.443040Z
+PROPS-END
+
+Revision-number: 1
+Prop-content-length: 112
+Content-length: 112
+
+K 10
+svn:author
+V 3
+svk
+K 8
+svn:date
+V 27
+2004-12-06T08:05:35.445932Z
+K 7
+svn:log
+V 14
+test init tree
+PROPS-END
+
+Node-path: A
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: A/P
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: A/P/pe
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 32
+Text-content-md5: 1b5afbe8b6a4cde6a684c5817dc59684
+Text-content-sha1: a904fc102969e90d2058c71505477dfcabffd9f6
+Content-length: 42
+
+PROPS-END
+first line in pe
+2nd line in pe
+
+
+Node-path: A/Q
+Node-kind: dir
+Node-action: add
+Prop-content-length: 35
+Content-length: 35
+
+K 3
+foo
+V 11
+prop on A/Q
+PROPS-END
+
+
+Node-path: A/Q/qu
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 32
+Text-content-md5: 56422a8bb5a73f3d148497a934be3951
+Text-content-sha1: b097b25f131054f7d9b5ce4ae58aa9dfe0473b18
+Content-length: 42
+
+PROPS-END
+first line in qu
+2nd line in qu
+
+
+Node-path: A/Q/qz
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 32
+Text-content-md5: 42ed2bf1ddbaf69d5f5014a68c87b321
+Text-content-sha1: fda18f659deca291f5e56819ace4a786238df2fd
+Content-length: 42
+
+PROPS-END
+first line in qz
+2nd line in qz
+
+
+Node-path: A/be
+Node-kind: file
+Node-action: add
+Prop-content-length: 58
+Text-content-length: 59
+Text-content-md5: 0b8a2265fbf4c578eb4895cf79a57435
+Text-content-sha1: 0fbc600260ac2503403c2f4b29a2f15097de8154
+Content-length: 117
+
+K 12
+svn:keywords
+V 24
+Rev URL Revision FileRev
+PROPS-END
+$Rev$ $Revision$
+$FileRev$
+first line in be
+2nd line in be
+
+
+Node-path: B
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: C
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: C/R
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: me
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 32
+Text-content-md5: 4e6b8217e292dee12e28978ae0d666cb
+Text-content-sha1: 21f76b1007baa69643165c33409ed25701422b82
+Content-length: 42
+
+PROPS-END
+first line in me
+2nd line in me
+
+
+Revision-number: 2
+Prop-content-length: 112
+Content-length: 112
+
+K 10
+svn:author
+V 3
+svk
+K 8
+svn:date
+V 27
+2004-12-06T08:05:35.468804Z
+K 7
+svn:log
+V 14
+test init tree
+PROPS-END
+
+Node-path: A/P
+Node-action: delete
+
+
+Node-path: B/S
+Node-kind: dir
+Node-action: add
+Node-copyfrom-rev: 1
+Node-copyfrom-path: A
+
+
+Node-path: B/fe
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 20
+Text-content-md5: 8045a38e6cf3fa5428454868c1de7137
+Text-content-sha1: b359f028c21209077d0dfae52e95b282e45fe905
+Content-length: 30
+
+PROPS-END
+file fe added later
+
+
+Node-path: D
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: D/de
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 20
+Text-content-md5: 7dd8202826f7a217cefcb61b112f694c
+Text-content-sha1: bb4cccceecaa31e97bc5b64897e59f4070bc3472
+Content-length: 30
+
+PROPS-END
+file de added later
+
+
+Node-path: me
+Node-kind: file
+Node-action: change
+Text-content-length: 38
+Text-content-md5: 74003280f9c78798854b4fb020a387e7
+Text-content-sha1: 8a7f9619124933d2fe1f5fd4ab2f0d3d6d216acd
+Content-length: 38
+
+first line in me
+2nd line in me - mod
+
+
+Revision-number: 3
+Prop-content-length: 250
+Content-length: 250
+
+K 10
+svn:author
+V 3
+nik
+K 8
+svn:date
+V 27
+2006-05-06T12:29:41.721774Z
+K 7
+svn:log
+V 151
+Add a directory and a file with spaces in their names, to ensure that spaces
+are properly encoded and decoded through SVN::Web.  Prompted by rt#19093.
+
+PROPS-END
+
+Node-path: E F
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: E F/test file
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 21
+Text-content-md5: 2d282102fa671256327d4767ec23bc6b
+Text-content-sha1: e6c4fbd4fe7607f3e6ebf68b2ea4ef694da7b4fe
+Content-length: 31
+
+PROPS-END
+This is a test file.
+
+
+Revision-number: 4
+Prop-content-length: 310
+Content-length: 310
+
+K 10
+svn:author
+V 7
+vovkasm
+K 8
+svn:date
+V 27
+2012-10-14T18:32:33.348456Z
+K 7
+svn:log
+V 207
+For testing UTF-8 compatibility:
+- add directory with UTF-8 symbols
+- add file with UTF-8 symbols
+- add content with UTF-8 symbols in that file
+- add log message with UTF-8 (Вот это сообщение)
+PROPS-END
+
+Node-path: абвгд
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: абвгд/абвгд.txt
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 102
+Text-content-md5: f428acc48f0faea8c1fc6de69eb441d4
+Text-content-sha1: caa7c8a4a7241d9731db554b458481aec3ca1313
+Content-length: 112
+
+PROPS-END
+Test content for check unicode
+Тестовый контент для проверки Юникода
+
+

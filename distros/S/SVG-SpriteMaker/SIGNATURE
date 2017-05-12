@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 b902e34abeffcfb9128f1807262591e87731d8d3 Changes
+SHA1 2232a1fdd3a481871d8dded4e88718c2ea99bf77 MANIFEST
+SHA1 571081eb5ecde91512c2cd731b313ca400b85c55 META.json
+SHA1 34c72fee61d63cbbb164d956d5d044279f769673 META.yml
+SHA1 70b46cab97c18a33ee589f79eae8a5a916fbc4f2 Makefile.PL
+SHA1 98bee928102bbb80fda62a8b7f4f747bae9181ab README
+SHA1 44be8eba04a393231da3baa2f9c551ff055a2b84 lib/SVG/SpriteMaker.pm
+SHA1 820be6563299d70802fbfe4db125860c2147798a svg-spritemaker
+SHA1 f548ec4df9ce2425f06a0bc6c67496cffbdf7485 t/SVG-SpriteMaker.t
+SHA1 396ea946e24d45f04dbb329335dc7c33401dbcf0 t/circle.svg
+SHA1 fa4cca04d35b71b2c9a4d04e5977efb3868f88aa t/perlcritic.t
+SHA1 19d48dc9cb1480e88ed2f0e34f6a97fea61f2bfc t/perlcriticrc
+SHA1 356022bf163d8bb5d7cf596d1ea801aeb8fd5183 t/rect.svg
+-----BEGIN PGP SIGNATURE-----
+
+iQItBAEBCgAXBQJYr4ExEBxtYXJpdXNAaWV2YWwucm8ACgkQygQ1vl7Bs2IFfA/9
+HmYv5lnxS4Sb5CfdSXOSwG9d8pqmzrnIQvbP/XgFmf8Di8dadvBe2vs2Ler5ws2I
+fwTd89TL9Cmpg2t5iGlwB3iK7jxE7daHSCCgpt0xM2/SDecB0KA32JB8aoiuUYKm
+zCZa8AnOGNNGdsdAU5vjM762CFIaQRcGGPrrnbgPsWz1dD0JF8+uMZiNsWtj7zk/
+WMz5pS0S+mCScO5F5TJtfnFytciXA4QzQtc04Hu/Q72P2keBQcLI79xhcu5qqYi1
+t2R17F7eAICmcuKAM3BzpxWZx0zLrkOS0ckmuZivluQl7T3zQE73eXNw7ms++pss
+uwa5D2ZyNesv52DSoWu4YyhMV86xXHqCWsQ9HLC6r+yTPWXfJvrEPgDvt838GGWu
+zrDqinWFUnIYmhiDoifp228MsbB0/6ZSUkoNl8OzzeXPN3yTFWAgqGLvwuY19x5h
+v8U5eX4x07GXKC7kP0n+NMTubtL26KaKmvDZmyDlVPDCrWt0gXCqXgOOyJAHgTj6
+SFI1o539nRYU7vFyj0669TqJUhEAsso8WF9foBvXPsHma/38IXRR2Cnc2Xszfpam
+3cZlWgy+JJ06kXXHiTT0du7Zker/zTqBPs4ftrbSPFyub+6hOTEbKEThYpPyjvVS
+nxdo1j7VNHIFcR+tjgzIvKuNRrmnqOB36riVXEz0TnY=
+=zh5j
+-----END PGP SIGNATURE-----

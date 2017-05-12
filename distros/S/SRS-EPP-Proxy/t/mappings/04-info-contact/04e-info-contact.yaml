@@ -1,0 +1,25 @@
+# Info contact on a handle with no address2
+
+template: info-contact.tt
+
+vars:
+  contact_id: 04e
+
+input_assertions:
+  class: SRS::EPP::Command::Info::Contact
+
+output_assertions:
+  count:
+    - [ '//epp:result', 1, 'SRS: Check for one result' ]
+    - [ '//contact:street', 1, '1 street returned']
+  match:
+    - [ '//contact:name', 'EPP Test Registrar II', 'Correct name returned']
+    - [ '//contact:street', 'Test Address 1', 'Correct street 1 returned']
+    - [ '//contact:city', 'New City', 'Correct city returned']
+    - [ '//contact:sp', 'New State', 'Correct province returned']
+    - [ '//contact:pc', '1234', 'Correct postcode returned']
+    - [ '//contact:cc', 'NZ', 'Correct country code returned']
+    - [ '//contact:voice', '+12.12123456', 'Phone number correct']
+  match_all: ~
+  attr_is:
+    - [ '//epp:result', 'code', 1000, 'SRS: Check for correct result code' ]

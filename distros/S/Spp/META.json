@@ -1,0 +1,71 @@
+{
+   "abstract" : "String prepare Parser",
+   "author" : [
+      "Micheal.Song <perlvim@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Spp",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "JSON" : "0",
+            "List::MoreUtils" : "0",
+            "List::Util" : "0",
+            "Scalar::Util" : "0",
+            "perl" : "5.02"
+         }
+      }
+   },
+   "provides" : {
+      "Spp" : {
+         "file" : "lib/Spp.pm",
+         "version" : "0.04"
+      },
+      "Spp::AtomToStr" : {
+         "file" : "lib/Spp/AtomToStr.pm"
+      },
+      "Spp::AtomToValue" : {
+         "file" : "lib/Spp/AtomToValue.pm",
+         "version" : "0.03"
+      },
+      "Spp::Optimizer" : {
+         "file" : "lib/Spp/Optimizer.pm",
+         "version" : "0.02"
+      },
+      "Spp::Tools" : {
+         "file" : "lib/Spp/Tools.pm",
+         "version" : "0.03"
+      },
+      "Spp::ValueToAtom" : {
+         "file" : "lib/Spp/ValueToAtom.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

@@ -1,0 +1,30 @@
+DESCRIPTION
+       This module retrieves the 1 minute, 5 minute, and 15
+       minute load average of a machine.
+
+SYNOPSIS
+        use Sys::CpuLoad;
+        print '1 min, 5 min, 15 min load average: ',
+              join(',', Sys::CpuLoad::load()), "\n";
+
+
+TO-DO
+       - Better getloadavg() support.  Currently FreeBSD and OpenBSD
+         are supported.  To improve upon this, see the next item below.
+       - Instead of hard coding preprocessor macros around getloadavg(),
+         try to compile C code snippets to see if getloadavg() is supported.
+       - Wanted: HPUX 11.11 pstat_getprocessor() and
+                 HPUX 11.00 pstat(PSTAT_PROCESSOR, ...)
+                 man pages, sample code, and preprocessor macros.
+       - Win32 support
+
+AUTHOR
+        Clinton Wong
+        Contact info:
+        http://search.cpan.org/search?mode=author&query=CLINTDW
+
+COPYRIGHT
+        Copyright (c) 1999-2002 Clinton Wong. All rights reserved.
+        This program is free software; you can redistribute it
+        and/or modify it under the same terms as Perl itself.
+

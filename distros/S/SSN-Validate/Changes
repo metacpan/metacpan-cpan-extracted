@@ -1,0 +1,78 @@
+Revision history for Perl extension SSN::Validate.
+
+0.18 Thu Mar 09 04:40:12:
+	- Updated high groups from SSA site
+
+0.16 Tue Jul 17 03:03:21:
+	- Updated high groups from SSA site
+
+0.15 Fri Oct 06  10:33:07:
+	- Updated high groups from SSA site
+
+0.14 Sun Jan 01 09:11:03:
+	- Updated high groups from SSA site
+	- Updated SIGNATURE file (cpan #16853)
+
+0.12 Mon Aug 29 12:0615:
+	- Updated high groups from SSA site
+
+0.11 Tue June 06 10:22:27
+	- Updated high groups from SSA site
+
+0.10 Mon Apr 18 08:39:02
+	- Updated high groups from SSA site
+
+0.08 Sun Feb 6 10:04:53
+	- Updated high groups from SSA site
+  - Updated README to be generic install info instead of h2xs defaults
+  - Updated my TODO for things I'd like to, obviously, do
+
+0.07 Tue Feb 1 12:25:24 2005
+	- Updated high groups from SSA site
+  - Added 'ignore_bad_combo' for new() to ignore hardwired bad AAAA-GG
+		combos.
+  - Added new tests for above
+	- Changed a few tests to reflect new valid high groups.
+	- Updated POD accordingly
+
+0.06 Mon Aug 23 8:16:32 2004
+	- Fix for bug reported in RT#6643
+
+0.05 Tue Sept 2 10:33:11 2003
+	- POD updates
+	- Added t/009_groups.t
+	- Updated valid_group() to take both 2 digit arg or > 2 digits.
+		Allowed for only 9 digits or 2 before. Also made it look at the
+		BAD_COMBO list.
+	- Updated TODO
+	- Added links to SSN info in SEE ALSO
+	- All tests still pass!
+
+0.04 Tue Aug 27 12:39:18 2003
+  - Minor POD fixes
+  - Changed test suite to use Test::More
+  - Added some tests
+	- Added 'valid' to data structure and have valid_area using it.
+	  An area could have data, but be invalid because the SSA isn't
+		issuing it, although assigned.
+
+0.03 Tue Aug 26 01:14:23 2003
+	- Patch Applied from Benjamin R. Ginter with many things, most
+		notable.
+		- Adding High Groups
+		- ATIN/ITIN group ranges
+		- ATIN/ITIN Areas	
+		- Tests to go with his patch!
+	- Other changes made...
+		- Invalidation of Advertising SSNs
+		- Invalidation of certain invalid area/group combos
+		- Minor bugfixes
+		- Lots of tests added
+
+0.02  Sun Aug 17
+	- Minor doc changes and removing some comments.
+
+0.01  Sun Aug 17 17:36:13 2003
+	- original version; created by h2xs 1.21 with options
+		-X -n SSN::Validate
+

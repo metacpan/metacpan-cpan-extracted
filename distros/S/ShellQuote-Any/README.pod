@@ -1,0 +1,51 @@
+=encoding utf8
+
+
+This is Perl module B<ShellQuote::Any>.
+
+=begin html
+
+<a href="http://travis-ci.org/bayashi/ShellQuote-Any"><img src="https://secure.travis-ci.org/bayashi/ShellQuote-Any.png?_t=1472506498"/></a> <a href="https://coveralls.io/r/bayashi/ShellQuote-Any"><img src="https://coveralls.io/repos/bayashi/ShellQuote-Any/badge.png?_t=1472506498&branch=master"/></a>
+
+=end html
+
+
+=head1 INSTALLATION
+
+ShellQuote::Any installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan ShellQuote::Any
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+
+=head1 DOCUMENTATION
+
+ShellQuote::Any documentation is available as in POD. So you can do:
+
+    % perldoc ShellQuote::Any
+
+
+=head1 REPOSITORY
+
+ShellQuote::Any is hosted on github
+L<http://github.com/bayashi/ShellQuote-Any>
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>

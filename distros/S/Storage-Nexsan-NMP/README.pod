@@ -1,0 +1,355 @@
+=head1 NAME
+
+Storage::Nexsan::NMP - The great new way to mange Nexsan's programattically!
+
+=head1 VERSION
+
+Version 0.05
+
+
+=cut
+
+=head1 SYNOPSIS
+
+This module ecapsulates version 2.30 of the Nexsan Management Protocol (NMP), written to 
+automate some functions of the Nexsan storage device.  
+
+As most commands are relatively atomic, each command will carp if it fails, unless specifically 
+otherwise noted.
+	
+This module covers only the following functions:
+	
+	Status
+	System Information
+	Firmware upgrade
+	Shutdown
+	Rolling Reboot of controllers
+	Event Log count
+	Turning off MAID
+	Setting options via SETOPT/DAT files
+	
+Further work will be done to implement the rest of the NMP as I require it, 
+ unless anyone wants to pitch in and help...
+
+
+Sample code snippet.
+
+use Storage::Nexsan::NMP;
+
+say "Connecting to Nexsan: $nexsan, Port: $port";           
+my %NexsanInfo = ConnectToNexsan ($nexsan, $port);
+
+my $sock = $NexsanInfo{sock};
+
+say "Nexsan Version: " . $NexsanInfo{NMP}{Major} . "." . $NexsanInfo{NMP}{Minor} . "." . $NexsanInfo{NMP}{Patch};
+say "Nexsan Serial: " . $NexsanInfo{serial};
+
+
+#fill in the user and password details, then authenticate
+$NexsanInfo{username} = "ADMIN";
+$NexsanInfo{password} = "password";
+
+AuthenticateNexsan (\%NexsanInfo);
+
+GetEventCount(\%NexsanInfo); 
+#this will now be populated
+say "No Of Events: $NexsanInfo{eventCount}";
+
+ShowSystemNexsan(\%NexsanInfo); 
+
+say "Status: $NexsanInfo{status}";
+say "model: $NexsanInfo{model}";
+say "firmware: $NexsanInfo{firmware}";
+say "friendlyname $NexsanInfo{friendlyname}";
+say "vendor: $NexsanInfo{vendor}";
+say	"productid 	$NexsanInfo{productid}";
+say "enclosurenaaid: $NexsanInfo{enclosurenaaid}";
+
+unless (defined $firmware) { die "no firmware value passed\n"; }
+$NexsanInfo{firmwarefile} = $firmware;
+
+UploadFirmwareToNexsan(\%NexsanInfo);
+
+close($sock);
+
+=head1 TODO
+
+ * Rewrite the functions as OO - at the moment each function copies and pastes some standard functionality which is nasty and should be fixed, but out of TUITS..
+ * apply some error checking for correct INI structure in SetOpt()
+ * write a specific subroutine for the Powerlevel stanza (see notes in TurnOffMAIDInNexsan() )
+ * write tests that tries functions not passing a $nexsan veriable
+ * write tests that tries functions not passing a $port variable
+ * write a test suite
+ * write a Nexsan emulator that returns canned responses for the above test suite (definately in wish list territory here)
+
+
+=head1 EXPORT
+
+A list of functions that can be exported.  You can delete this section
+if you don't export anything, such as for a purely object-oriented module.
+
+=head1 SUBROUTINES/METHODS
+
+=head2 ConnectToNexsan
+
+MUST be passed IP/fqdn of Nexsan & then MAY be passed port no
+
+Returns hash with following (example) information (thanks to Data::Dumper!);
+
+$VAR1 = 'banner';
+
+$VAR2 = '220 <237C2F1C> SATABeast2-059955A0-0 NMP V2.3.0 ready
+';
+
+$VAR3 = 'serial';
+
+$VAR4 = '237C2F1C';
+
+$VAR5 = 'NMP';
+
+$VAR6 = {
+          'Minor' => '3',
+          'Major' => '2',
+          'Patch' => '0'
+        };
+$VAR7 = 'sock';
+
+
+
+=cut
+
+=head2 WriteLog
+
+internal (i.e. not exported) function that takes the %NexsanInfo hash, 
+and prepends nexan name/ip and date/time to the ususal 'say' output.
+
+it assumes that ConnectToNexsan has been run, but nothing else.
+
+
+=cut
+
+=head2 ConnectToNexsan
+
+Initial setup internal function used by all the utility functions to setup the telnet conenction
+
+
+=cut
+
+=head2 AuthenticateNexsan
+
+Authenticates to the NMP, without which any command but QUIT will fail.
+
+MUST be passed hash containing socket, username and password pairs, e.g.
+
+$NexsanInfo{sock}
+$NexsanInfo{username}
+$NexsanInfo{password}
+
+croak's on failure of username or password to authenticate, 
+as you can't do much without being logged in
+
+
+=cut
+
+=head2 GetEventCount
+
+	#MUST be passed a reference to a hash containing socket
+	
+	It will update the hash passed with a name:value pair called eventCount.
+	It can be called as many times as you wish.
+
+
+=cut
+
+=head2 ShowSystemNexsan
+
+	MUST be passed an reference to a hash that contains a socket, and the AuthenticateNexsan 
+		subroutine must have been run beforehand to populate the other required hash's
+	
+	Populates hash with the following name:value pairs;
+	Parameter			Description
+	<status>			Status of the RAID system (“HEALTHY”, “FAULT”)
+	<serial>			Serial number of the RAID system (8 hexadecimal digits)
+	<model>				Model name of the RAID system
+	<firmware>			Firmware version of the RAID system
+	<friendlyname>		User-defined friendly name of the RAID system
+	<vendor>			“T10 Vendor Identification” field as reported in SCSI INQUIRY data [NMP 2.2.0]
+	<productid>			“Product Identification” field as reported in SCSI INQUIRY data [NMP 2.2.0]
+	<enclosurenaaid>	“Enclosure NAA identifier” field as reported in SCSI INQUIRY VPD page 0x83 identifier type 3 [NMP 2.2.0]
+
+
+=cut
+
+=head2 UploadFirmwareToNexsan
+
+	Uploads a firmware file to the Nexsan. Requires NMP 2.3.0 or later - and this routine
+		checks for that, although it is safe to issue this command to an earlier version, as 
+		it will safely reject the command, according to the developer. :-)
+	
+	MUST be passed an reference to a hash that contains a socket, and the AuthenticateNexsan 
+		subroutine must have been run beforehand to populate the other required hash's
+	MUST have 
+	MUST have firmware filename passed in the above hash in the above hash's firmwarefile 
+		name:value, e.g. $NexsanInfo->{firmware}->{filename} .
+	
+	NOTE: DOES NOT reboot the system after the upgrade; you need to use another function to do that!
+
+
+=cut
+
+=head2 ShutdownNexsan
+
+To quote the NMP Reference Manual (v.2.3.0);
+"This command will perform a shutdown of the RAID system , the NMP connection will be closed. 
+All cached data will be flushed to the disks, it is advised all host IO is stopped before 
+this command is used. There are circumstances where shutdown is blocked (such as during a 
+firmware update), these scenarios can be detected from the returned response."
+
+
+
+=cut
+
+=head2 RollingRebootNexsan
+
+To quote the NMP Reference Manual (v.2.3.0);
+"This command will perform a rolling restart of the RAID system , the NMP connection will be 
+ closed. Each controller is restarted in turn and therefore should minimize the amount time 
+ the storage is inaccessible. There are circumstances where rolling restart is blocked (such 
+ as during a firmware update), these scenarios can be detected from the returned response."
+
+
+
+=cut
+
+=head2 TurnOffMAIDOnNexsan
+
+	#MUST be passed a reference to a hash containing socket
+	
+	This uses the SETOPT command to add the following MAID entry, as if it were uploaded 
+	via a settings.dat file;
+	
+	[PowerConfig]
+	PowerLevel1 = 2 ; 0, 2, 5 minutes
+	PowerLevel2 = 0 ; 0, 10, 20, 30, 40, 50, 60 minutes
+	PowerLevel3 = 0 ; 0, 15, 30, 60, 90, 120 minutes
+	MaxSpareLevel = 2 ; 0, 1, 2, 3
+
+	ASSUMPTION: that PowerLevel4 is not configured..
+
+
+=cut
+
+=head2 importDatFile
+
+Import an .ini file (called .dat by Nexsan) that provides many confuguration options.
+The idea is that it can be used by another function to then upload a atandard config, 
+replicating the behaviour of the GUI.
+
+Requires a filename scalar passed to it, and returns a hash reference, for e.g.;
+
+$HASH1 = {
+           ActiveActive
+                    => { ActiveActiveMode => 'APAL' },
+           Cache    => {
+                         AllowSCSIOverride
+                                       => 'Disabled',
+                         Cache         => 'Enabled',
+                         CacheTuning   => 'Mixed',
+                         IgnoreForceUnitAccess
+                                       => 'Enabled',
+                         Mirroring     => 'Enabled',
+                         ReadStreamMode
+                                       => 'Disabled',
+                         StreamingMode => 'Disabled'
+                       },
+           SYSLOG   => {
+                         Facility   => 'LOCAL0',
+                         SendToIP   => '172.17.9.9',
+                         UDPPort    => 514,
+                         WhenToSend => 'All'
+                       }
+         };
+
+
+=cut
+
+=head2 SetOpt
+
+using the importDatFile internal function, apply a number of Nexsan Dat file stanza's.
+
+The sub expects $NexsanInfo->{datfile} populated with the name of the dat file to import.
+
+Note: no error checking is done on the hash to see it contains a correct INI structure
+ as it assumes that its been imported from an Nexsan created/modified DAT file.
+ Given the SETOPT command if not passed the write information, this is relatively low risk
+ 
+ TODO apply some error checking for correct INI structure, as above!
+ TODO write a specific subroutine for the Powerlevel stanza 
+ 	(see notes in TurnOffMAIDInNexsan)
+
+
+=cut
+
+=head1 AUTHOR
+
+John Constable, C<< <john.constable at sanger.ac.uk> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-storage-nexsan-nmp at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Storage-Nexsan-NMP>.  I will 
+be notified, and then you'll automatically be notified of progress on your bug as I make changes.
+
+
+
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Storage::Nexsan::NMP
+
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Storage-Nexsan-NMP>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Storage-Nexsan-NMP>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Storage-Nexsan-NMP>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Storage-Nexsan-NMP/>
+
+=back
+
+
+=head1 ACKNOWLEDGEMENTS
+
+James Peck at Nexsan dot com for helping approve the release of this and answering inumerable questions
+Carl Elkins at sanger dot ac dot uk for allowing me the time to write this
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2011 John Constable.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+
+
+=cut
+

@@ -1,0 +1,27 @@
+_build/auto_features
+_build/build_params
+_build/cleanup
+_build/config_data
+_build/features
+_build/magicnum
+_build/notes
+_build/prereqs
+_build/runtime_params
+Build
+Build.PL
+extra/conf/system.conf
+extra/log/messages.log
+extra/lucy/README.lucy
+INSTALL
+lib/SVN/TeamTools/Index/Index.pm
+lib/SVN/TeamTools/Index/PrefixQuery.pm
+lib/SVN/TeamTools/Indexer.pm
+lib/SVN/TeamTools/Plugins/Mailer.pm
+lib/SVN/TeamTools/Store/Config.pm
+lib/SVN/TeamTools/Store/Repo.pm
+lib/SVN/TeamTools/Store/SvnIndex.pm
+LICENSE
+MANIFEST			This list of files
+MANIFEST.SKIP
+script/Indexer
+t/00-compile.t

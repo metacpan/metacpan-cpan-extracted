@@ -1,0 +1,14 @@
+0.03    2017-02-17 (PERLANCAR)
+
+	- Add option: reverse.
+
+
+0.02    2015-12-29 (PERLANCAR)
+
+        - Use schwartzian transform for sorting, increases performance by ~100%
+          (as measured by BS:SortBySpec).
+
+
+0.01    2015-12-29 (PERLANCAR)
+
+        - First release.

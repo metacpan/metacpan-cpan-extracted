@@ -1,0 +1,35 @@
+---
+abstract: 'A caching wrapper around the svnlook command.'
+author:
+  - 'Gustavo L. de M. Chaves <gnustavo@cpan.org>'
+build_requires:
+  Cwd: '0'
+  File::Copy: '0'
+  File::Path: '0'
+  Test::More: '0'
+  URI::file: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SVN-Look
+requires:
+  Carp: '0'
+  File::Spec::Functions: '0'
+  File::Temp: '0'
+  List::MoreUtils: '0'
+  MIME::Base64: '0'
+  XML::Simple: '0'
+  perl: 5.008_000
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/gnustavo/SVN-Look/issues
+  homepage: http://search.cpan.org/dist/SVN-Look/
+  repository: git://github.com/gnustavo/SVN-Look.git
+version: '0.41'

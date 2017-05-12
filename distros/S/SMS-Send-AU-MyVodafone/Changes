@@ -1,0 +1,18 @@
+Revision history for Perl extension SMS::Send::AU::MyVodafone
+
+1.04 Wed 24 Dec 2008
+	- Correcting some minor bugs, validating this still works
+	- Upgrading tests to newer style
+	- Updating to Module::Install 0.77
+	- Removed the use of use base
+	- Updated minimum Perl dependency to 5.006
+
+0.03 Wed 14 Nov 2007
+	- No functional changes
+	- Updating to Module::Install 0.68
+
+0.02 Tue Jan  3 2006
+	- Adding dependency on IO::Socket::SSL
+
+0.01 Tue Dec 27 2005
+	- Completed the first implementation

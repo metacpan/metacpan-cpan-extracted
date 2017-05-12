@@ -1,0 +1,15 @@
+Source: libsms-send-smsdiscount-perl
+Section: perl
+Priority: optional
+Build-Depends: debhelper (>= 5)
+Build-Depends-Indep: perl (>= 5.6.10-12)
+Maintainer: Mark Hindess <soft-debian@temporalanomaly.com>
+Standards-Version: 3.9.1.0
+Homepage: http://search.cpan.org/dist/SMS-Send-SMSDiscount/
+
+Package: libsms-send-smsdiscount-perl
+Architecture: all
+Depends: ${perl:Depends}, ${misc:Depends}, libwww-perl, libsms-send-perl
+Description: SMS::Send driver to send via smsdiscount.com
+ SMS::Send driver for sending SMS messages with the SMS Discount
+ Software (http://www.smsdiscount.com/) service.

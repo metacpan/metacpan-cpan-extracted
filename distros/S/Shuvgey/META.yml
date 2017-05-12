@@ -1,0 +1,48 @@
+---
+abstract: 'AnyEvent HTTP/2 (RFC 7540) Server for PSGI'
+author:
+  - 'Vladimir Lettiev <thecrux@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Shuvgey
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Plack::Handler::Shuvgey:
+    file: lib/Plack/Handler/Shuvgey.pm
+  Shuvgey:
+    file: lib/Shuvgey.pm
+    version: '0.09'
+  Shuvgey::Server:
+    file: lib/Shuvgey/Server.pm
+requires:
+  AnyEvent: '0'
+  Net::SSLeay: '1.56'
+  Plack: '1.0037'
+  Protocol::HTTP2: '1.03'
+  Scalar::Util: '0'
+  Sys::Hostname: '0'
+  URI::Escape: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/vlet/Shuvgey/issues
+  homepage: https://github.com/vlet/Shuvgey
+  repository: git://github.com/vlet/Shuvgey.git
+version: '0.09'
+x_authority: cpan:CRUX

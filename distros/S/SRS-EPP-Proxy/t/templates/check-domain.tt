@@ -1,0 +1,7 @@
+<check>
+  <domain:check xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+[% FOR domain = domains -%]
+    <domain:name>[% domain %]</domain:name>
+[% END -%]
+  </domain:check>
+</check>

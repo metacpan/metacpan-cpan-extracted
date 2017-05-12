@@ -1,0 +1,63 @@
+{
+   "abstract" : "manipulate Subversion workspaces with Perl objects",
+   "author" : [
+      "Peter Karman <perl@peknet.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "SVN-Class",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dump" : "0",
+            "File::Temp" : "0",
+            "IPC::Cmd" : "0.40",
+            "IPC::Run" : "0",
+            "Path::Class" : "0",
+            "Path::Class::File::Stat" : "0",
+            "Rose::Object" : "0",
+            "Rose::URI" : "0",
+            "Test::More" : "0",
+            "Text::ParseWords" : "0",
+            "perl" : "5.008003"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=SVN-Class"
+      },
+      "homepage" : "https://github.com/karpet/svn-class-perl",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/karpet/svn-class-perl"
+      }
+   },
+   "version" : "0.18"
+}

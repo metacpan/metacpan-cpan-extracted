@@ -1,0 +1,104 @@
+=pod
+
+=head1 Serengeti - Scraping websites with Serengeti
+
+=head2 INTRO
+
+Serengeti is a web-scraping framework with planned support for multiple backends 
+exposed to the user via a common JavaScript API. The framework is very 
+similar to a real browser as it exposes window, document, forms the same way 
+as their normally available when scripted in client-side JS.
+
+Milage may vary depending on what backend is currently used.
+
+=head2 READER PREREQUISITES
+
+The reader is expected to have basic understanding on Perl, JavaScript, 
+the HTML DOM, HTTP and how scraping works.
+
+You also need to have the Serengeti module and all its dependencies installed 
+for the examples in this tutorial to work.
+
+=head2 GETTING STARTED
+
+This example will show the very simpliest of scraping - performing a search on 
+google.com.
+
+Open up your favorite editor such as emacs, vi or TextMate, create a new file 
+and enter the following statements:
+
+  #!/usr/bin/perl
+  
+  use strict;
+  use warnings;
+  
+  use Serengeti;
+  
+  my $browser = Serengeti->new;
+  
+This is more or less a standard template, enable strictness and warnings, 
+load the Serengeti module and instansiate a new Serengeti. As we're using the 
+defaults for the browser (no arguments supplied) the backend used will be 
+the built-in and it's transport using cURL.
+
+In order to scape things we need to give the browser JavaScript to evaluate 
+which can be done either by loading external files using C<load> or directly 
+evaluating code using C<run>. To keep things simple we'll just use C<run> for 
+now.
+
+Enter this in your script:
+
+  $browser->run(<<'__END_OF_SCRIPT__');
+    $.get("http://www.google.com/");
+
+    /* The search for is named 'f'
+    document.forms["f"].submit({
+        q: "what would brian boitano do"
+    });
+    
+    1;
+  __END_OF_SCRIPT__
+
+What happens here? To start with we request the main google page as a GET 
+request (this is normally what the browser does).
+
+Next we find the form named "f" and submit it overriding the input "q" with a 
+new value. Serengeti investigates the form that we submit and extracts the 
+target and method from it as a traditional browser would.
+
+As C<submit(...)> load a new page the global object C<document> will now 
+reflect that instead of the one on the first page. We can use this to extract 
+some information.
+
+Continue by entering this in your script:
+
+  my $top_hits = $browser->run(<<'__END_OF_SCRIPT__');
+    var top_5_elements = $.find("a.l h3.r").slice(0, 5);
+    var results = top_5_elements.map(function(elem) {
+      return { title: elem.textContent, href: elem.href };
+    });
+    
+    results;
+  __END_OF_SCRIPT__
+
+The method C<run> returns the result of the latest statement which in the 
+script above is just the results which happens to be an array object that is 
+when returned to Perl is converted to an array reference. Let's go thru the 
+script line by line.
+
+Line 1 - C<$.find(...)> searches the current document by either XPath or 
+CSS selector with some of the jQuery extensions. In this case we use CSS 
+selector syntax. The expression translates to B<all A elements that belongs 
+to the class "l" and which are descendants of H3 elements that belongs to the 
+class "r">. C<$.find> returns an array object where the objects are returned 
+in the same order as the appear in the document. On the returned array we 
+use the method C<slice> to get the first 5.
+
+Line 2 to 4 - the method C<map> on an array transforms it into another array by 
+applying a function to each element. The function takes one argument - the 
+current element - and we return an object with the text content and 
+the elements attribute "href" as the properties "href" and "title" 
+respectively.
+
+Line 6 - return the C<results> object (array instance) as the last statement.
+

@@ -1,0 +1,14 @@
+\.swp$
+\.swo$
+_build
+^Build$
+\.bak$
+\.git
+blib
+\.svn
+smolder.conf
+smolder.log
+\.sqlite
+\.bak
+data/smoke_reports/*
+\.pid

@@ -1,0 +1,27 @@
+---
+abstract: 'Perl client for the Sensu API'
+author:
+  - 'Miquel Ruiz <mruiz@cpan.org>'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Sensu-API-Client
+requires:
+  HTTP::Tiny: '0.034'
+  JSON: '0'
+  Moo: '0'
+  Try::Tiny: '0'
+  namespace::clean: '0'
+resources:
+  bugtracker: https://github.com/miquelruiz/Sensu-API-Client/issues
+  homepage: http://metacpan.org/release/Sensu-API-Client/
+  repository: git://github.com/miquelruiz/Sensu-API-Client.git
+version: '0.02'

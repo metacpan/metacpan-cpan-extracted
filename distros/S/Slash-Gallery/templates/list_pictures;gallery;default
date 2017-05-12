@@ -1,0 +1,22 @@
+__section__
+default
+__description__
+
+__title__
+
+__page__
+gallery
+__lang__
+en_US
+__name__
+list_pictures
+__template__
+[% USE Slash %]
+<SMALL>[% FOREACH p = pictures.keys.nsort;
+   picture = pictures.$p;
+ %]<A HREF="[% constants.rootdir %]/gallery.pl?op=display&amp;pic_id=[% picture.id %]"><TT>[% picture.filename | strip_literal %]</TT></A> -
+[% picture.name | strip_literal %] <EM>([% Slash.timeCalc(picture.date) %])</EM><BR>
+[% END %]</SMALL>
+
+__seclev__
+500

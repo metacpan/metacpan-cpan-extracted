@@ -1,0 +1,32 @@
+String/CodiceFiscale version 0.01
+=================================
+
+String::CodiceFiscale might help you in the tricky task of verifying
+and/or producing a Codice Fiscale. It also gives you some utilities
+to "reverse engineer" a given Codice Fiscale and find out what personal
+data could have produce it.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Test::More  (only for installation)
+    Time::Piece
+    Class::Data::Inheritable
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Giulio Motta
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

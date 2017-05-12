@@ -1,0 +1,19 @@
+Revision history for Perl extension Search::QueryParser.
+
+0.94 30.09.2009
+   - patch from Peter Karman to add 'defField' option
+   - add support for quoting field names (RT 47423)
+
+0.93 04.02.2008
+  - fix RT#32840 (word boolean connectors) - thanks Frank Wesemann
+
+0.92 04.12.2007
+  - added '#' operator (for matching against sets of integers)        
+
+0.91 25.05.2005 
+  - quoted "exact phrases" are no longer parsed as arrays (was not
+    useful)
+
+
+
+        

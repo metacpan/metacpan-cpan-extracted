@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+CREDITS
+t/SOAP-Data-Builder.t
+lib/SOAP/Data/Builder.pm
+lib/SOAP/Data/Builder/Element.pm
+examples/soap_arr.pl
+examples/soap_4.pl 
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

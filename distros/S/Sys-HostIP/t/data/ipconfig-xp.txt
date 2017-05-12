@@ -1,0 +1,10 @@
+
+Windows IP Configuration
+
+
+Ethernet adapter Local Area Connection:
+
+        Connection-specific DNS Suffix  . : 
+        IP Address. . . . . . . . . . . . : 0.0.0.0
+        Subnet Mask . . . . . . . . . . . : 0.0.0.0
+        Default Gateway . . . . . . . . . : 

@@ -1,0 +1,9 @@
+Changes
+Index.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/String-Index.t
+lib/String/Index.pm
+META.yml                                 Module meta-data (added by MakeMaker)

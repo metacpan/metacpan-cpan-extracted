@@ -1,0 +1,25 @@
+---
+abstract: 'Provide a method keyword'
+author:
+  - "Robert 'phaylon' Sedlacek <rs@474.at>"
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.101900, CPAN::Meta::Converter version 2.101670'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Syntax-Feature-Method
+no_index:
+  directory:
+    - t/
+requires:
+  B::Hooks::EndOfScope: 0.08
+  Carp: 0
+  Method::Signatures::Simple: 0
+  Test::Most: 0.21
+  namespace::clean: 0.13
+  syntax: 0.001
+version: 0.001

@@ -1,0 +1,51 @@
+# Copyright (c) 2003, Cornell University
+# See the file COPYING for the status of this software
+
+The description file consists of a annotated command-line. Newline
+characters and #-comments are ignored when reading this command line, so
+the command-line may be spread over several lines for readability.
+
+The annotations consist of matching backets ('[' and ']') and the text
+enclosed within. These annotations have one of these forms,
+
+    [ DIREC MECH? NAME : TYPE ]
+    [ DIREC MECH? NAME : TYPE = DEFAULT ]
+
+When processing a SOAP request, the annotations are replaced with values
+from the SOAP request.
+
+For each annotation, DIREC is one of 'in', 'out' or 'in_out'. MECH is
+either "val" or "file" (if missing, then "val"). NAME is the
+name of the SOAP in or out parameter whose value is used for the
+substitution. TYPE is the type of the parameter. The valid types are,
+
+    bool, int, float, string, raw, xml("XSD URL")
+
+
+DEFAULT is an optional default value to be used if the parameter does
+not appear in the request.
+
+
+Example 1:
+
+    arithmatic.sh --x=[in x:int] --y=[in y:int] > [out file z:int] 2>/dev/null
+
+
+    The SOAP request will contain two parameters, x and y, both of which
+    are ints. The command will produce a result, named z, which is also
+    an int.
+
+Example 2:
+
+    /home/user/meshgen 
+	--param [in param:int=0]
+		# a parameter to the meshing algorithm   
+	[in file geo:xml("http://foo/geo.dtd")]
+		# The input geometry file
+	[out file mesh:xml("http://foo/mesh.dtd")]
+		# The output geometry file
+	>[out file log:string] 2>&1
+		# may generate diagnostics to stdout
+
+    The input parameters are named "param" and "geo". The output
+    parameters are named "mesh" and "log".

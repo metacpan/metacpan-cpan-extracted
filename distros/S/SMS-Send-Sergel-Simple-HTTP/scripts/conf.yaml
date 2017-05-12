@@ -1,0 +1,4 @@
+# Get this info from your provider
+url: "https://ws1.sp247.net/smscsimplehttp"
+serviceid: "ServiceId"
+source: "FROM"

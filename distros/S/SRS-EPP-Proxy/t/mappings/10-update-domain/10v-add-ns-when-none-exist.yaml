@@ -1,0 +1,35 @@
+# Add nameservers when none currently exist on the domain
+template: update-domain.tt
+
+vars:
+  domain: 10v.co.te
+  nslist:
+    - ns1.everydns.net
+    - ns2.everydns.net
+  
+
+input_assertions:
+  class: SRS::EPP::Command::Update::Domain
+
+SRS:
+    -
+        assertions: 
+           count:
+               - [ '//DomainDetailsQry', 1, 'DDQ generated']
+           match:
+               - [ '//DomainNameFilter', '10v.co.te', 'SRS[1] - Domain name filter correct' ]
+    -
+        assertions:
+           count:
+               - [ '//Server', 2, 'SRS[2] - 2 name servers' ]
+               - [ '//Server[@FQDN = "ns1.everydns.net"]', 1, 'ns2 in server list']
+               - [ '//Server[@FQDN = "ns2.everydns.net"]', 1, 'ns2 in server list']
+           match:  
+               - [ '//DomainNameFilter', '10v.co.te', 'SRS[2] - Domain name filter correct' ]
+
+
+output_assertions:
+  count:
+    - [ '//epp:result', 1, 'SRS: Check for one result' ]
+  attr_is:
+    - [ '//epp:result', 'code', 1000, 'SRS: Check for correct result code' ]

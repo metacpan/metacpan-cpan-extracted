@@ -1,0 +1,24 @@
+NAME
+      SVK::Churn - Generate SVK Statistics graph.
+
+SYNOPSIS
+      svk-churn.pl //mirror/svk
+
+DESCRIPTION
+    This module helps you to understand yor svk repository developing
+    statistics. It'll generate a file named "svk-commits-churn.png" under
+    current directory.
+
+    It's still rough and will be improved in the future.
+
+SEE ALSO
+    "SVN::Churn"
+
+COPYRIGHT
+    Copyright 2005 by Kang-min Liu <gugod@gugod.org>.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://www.perl.com/perl/misc/Artistic.html>
+

@@ -1,0 +1,75 @@
+Revision history for Perl module Smart::Args
+
+0.14 2016-08-01T11:53:28Z
+
+    - Use carp::croak if $Smart::Args::VERBOSE falsy
+      (aereal)
+
+0.12 2013-11-21T01:22:21Z
+
+    - Fixed a bug in test case.
+
+0.11 2013-11-20T04:43:18Z
+
+    - minil migrate
+
+0.10 2011-05-17
+
+    [better dist]
+    - depend to latest Mouse, PadWalker, Exporter.
+    - better M::I
+    - depend to Perl 5.8
+
+0.09 2011-01-18
+
+    - better error message with Carp::confess
+
+0.08 2010-12-28
+
+    - added 'args_pos' function
+
+0.07 2010-12-24
+
+    - fixed deps in testing
+
+0.06 2010-11-08
+
+    - Fix carp level to report warnings in the caller's context (gfx)
+    - remove testing dependencies for Test::Exception
+
+0.05 2010-11-08
+
+    - Unknown parameter names are now warned (gfx)
+    - Fix a typo in SYNOPSIS (@syohex)
+
+0.04 2010-11-07
+
+    - Invocants can have type rules (gfx):
+        e.g. args my $class => 'ClassName';
+         and args my $self  => 'Object';
+    - Types can be a type constraint object of both Mouse and Moose (gfx):
+        my $MyInt = subtype 'MyInt', as 'Int';
+        args my $foo => $MyInt; # OK
+    - If a type has a coercion, it is automatically applied (gfx)
+    - Performance are improved, esp. where no type rules are specified (gfx)
+
+0.03 2010-07-15
+
+    - renamed package from args.pm to Smart::Args.
+      (thanks to mst++, gfx++)
+
+0.02 2010-0-13
+
+    - fixed various testing issue
+    - depend to latest Mouse
+    - depend to latest PadWalker
+
+0.01_02 2009-09-03
+
+    - Types becomes optional: args my $x, my $y => 'Str'; # $x can be anything but required(gfx)
+    - Parameterized types are allowd; args my $x => "ArrayRef[Int]";(gfx)
+
+0.01_01 2009-09-02
+
+    - original version
+

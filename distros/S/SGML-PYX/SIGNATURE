@@ -1,0 +1,97 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 cf71c9da1816d9683d5fc6550600413af260639c Changes
+SHA1 ecec73beff956fc76e8b8199687ac9bb85103e96 LICENSE
+SHA1 e45b7a4af9ecbe15faa53f838a906865587632ff MANIFEST
+SHA1 eacd6b9f24f37ddf727be529e5af74418bbe2c57 META.yml
+SHA1 da65bb51e7bacda6fded15401fbb4e3cfc6f79e2 Makefile.PL
+SHA1 0ba8c5f60f91007547f1d98227b87fc1fe4047ef PYX.pm
+SHA1 3da5a26a48f3f5cd07915e1e15bc54c7891fe976 README
+SHA1 07ad09ae538f28f5a2da96ea795b855dcc977436 examples/ex1.pl
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 a64df1da1e6d34ace9dd5dd14c52eb71a41def3d t/SGML-PYX/01-use.t
+SHA1 a9ea3cacd41ac7d8d74f88788de37fb8de1d9f35 t/SGML-PYX/02-version.t
+SHA1 509703a3b079a8e48f92d699c2662d5ca2d64240 t/SGML-PYX/03-new.t
+SHA1 89ff8b6d11d7e3655064c046fcea2d71df1890df t/SGML-PYX/04-parsefile-cdata.t
+SHA1 f8b06eec1350e9481f09d64d98d33a30b982bcf5 t/SGML-PYX/05-parsefile-char.t
+SHA1 d79bd465614edc1fb370ca295895f89528c503ae t/SGML-PYX/06-parsefile-comment.t
+SHA1 0d780347f9d28c7eca52ea973704331dfaa771eb t/SGML-PYX/07-parsefile-doctype.t
+SHA1 17d25ae7caca9bcfc025ff8b3d3fa173dd0c7091 t/SGML-PYX/08-parsefile-element.t
+SHA1 143859b39b05f97cec1f5ae0d2f3f06b53db5451 t/SGML-PYX/09-parsefile-end_element.t
+SHA1 15bd4406c2c13f6a135d8770d5cdbbe8eb98e464 t/SGML-PYX/10-parsefile-instruction.t
+SHA1 0ffaeb9255dcf0e8d5fd85949f45c354fb4dd407 t/SGML-PYX/11-parsefile-start_element.t
+SHA1 8703b3d4fbbb8a3555e1065b4b02b50e5772159b t/SGML-PYX/12-parsefile-start_xml.t
+SHA1 570266684fdfc973f2530b3da1498c22d56e0458 t/data/cdata1.sgml
+SHA1 0d95b729bde37c3a87cb15031be19f0cac36a791 t/data/cdata2.sgml
+SHA1 71fafc4e2fc1e47e234762a96b80512b6b5534c2 t/data/char1.sgml
+SHA1 90804b5ff848d4792fd5f0277c65caad3db947b2 t/data/char2.sgml
+SHA1 51ab4c9eb5e268336242b9b5a2a059a538cc1384 t/data/comment1.sgml
+SHA1 51260abe6d0fc27a522541d2b3b4cd3f61d9f582 t/data/comment2.sgml
+SHA1 d1848aa7b5cfd853609db178070771ad67d351e9 t/data/doctype1.sgml
+SHA1 ae98d597867b3a81baea15612253cd15edbd8db9 t/data/element1.sgml
+SHA1 991b6b7b3ee228d0cc33e151fc364820337d6518 t/data/element2.sgml
+SHA1 e4d55701e6843fdbdf36389b05cdb0646ed04a81 t/data/element3.sgml
+SHA1 2be69dd8aedf6df75a596961fdc523b7d18f72ba t/data/element4.sgml
+SHA1 1e7e9e4f3605d4a423ae066e5ba617786c3c82e9 t/data/element5.sgml
+SHA1 7dc802356387900d2a17661f321ca23a315c3978 t/data/end_element1.sgml
+SHA1 a89853b3e614babfebd593113ed408d2ef70e2ee t/data/end_element2.sgml
+SHA1 8469e2d97824637929d8dfdaba099c0089d4e19c t/data/instruction1.sgml
+SHA1 b7d36fa0941b71cbad673802432f7c3b45a0371d t/data/instruction2.sgml
+SHA1 b4f2dc1220b9d2db284b6f934124cb2785e3232c t/data/start_element01.sgml
+SHA1 5976c245722d51c31f476d75e21862d74e964a40 t/data/start_element02.sgml
+SHA1 35713acdaaed1cc106116da7566750eeaa374a78 t/data/start_element03.sgml
+SHA1 07086c7333dc0fc888bb0ad0beec80c551c757d5 t/data/start_element04.sgml
+SHA1 e66c7db19005d143ceafd6fad7493320105354f0 t/data/start_element05.sgml
+SHA1 e9ac74a291587f2c0d2cde9f147eac46b4d49e3b t/data/start_element06.sgml
+SHA1 b644fcded7865d9f8dc6dc24f0150ed0021f71f8 t/data/start_element07.sgml
+SHA1 b3cc09e1f472e05c5b4eb1bfa5bbf9d4572d717f t/data/start_element08.sgml
+SHA1 317b7046e712a5aac584c8593d2407548d867b6e t/data/start_element09.sgml
+SHA1 01fc9f1c155f910034f02ffcc84bfe800ee16fb5 t/data/start_element10.sgml
+SHA1 9d95859eb7b1643b2bbea97d0c791e483f53ed65 t/data/start_element11.sgml
+SHA1 e58944fb019b482375b0d83e0b5f69f9adb002ec t/data/start_element12.sgml
+SHA1 f41241459684910b62585b2b091f5ac7fc50cc30 t/data/start_element13.sgml
+SHA1 555b7968511a2db5fc6d0c2d0fd03b50e2199b48 t/data/start_element14.sgml
+SHA1 80e28caa6507aa44916d33787381b93f0c6b748e t/data/start_element15.sgml
+SHA1 28e0ee01fb7feb013239b5e6c5b8568051a24eaa t/data/start_element16.sgml
+SHA1 2f87c4a4d1211d2fd4550a57979ab12133523c86 t/data/start_element17.sgml
+SHA1 301b11ad818e8609439ba068021bb19662a26fcc t/data/start_element18.sgml
+SHA1 d9f5bc9851f37e3a8b1845bd28047e3c300c2ee4 t/data/start_element19.sgml
+SHA1 9ea6aa0f0cbd567a0f0dee71edf3c0562d375340 t/data/start_element20.sgml
+SHA1 8754b50e87ee74294a0c09dad028a3e59d2036a6 t/data/xml1.sgml
+SHA1 1385c7fdd1f1a19fe36852c30c6a0f75b296c85a xt/SGML-PYX/01-pod_coverage.t
+SHA1 3c8bea75fb30827bf6c294fa7273809c6e8c825c xt/SGML-PYX/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJXF5qbAAoJEJe+XXKaIuTlYGwIAKuhxjCu3dgGq5RqY7SIorkG
+KJk4JBybvQSPasq8IYj1ycof2ANNOf4Cx4aDGPKfgn3K82lWrn5beP3fcUvnu1uR
+Xdyx3LOzztGC1gHQJrD25U2vqKuc5eiBk6I1Vux+rX2mo7Daaf/RUvKH+65GXh9M
+OExvtjTGsY4O6brgdELV4W53Np11rQV9hozdGpOi+BhH3dEuXCu2gMMrs4XW+2Sy
+A/J2xFdp3Y+c96MBmNQ8qX6pipe6kxWyo5ez+0vsfARzCv177WF7QNlM6XKsEZFr
+NU7kQmBIefzyy8H6GttGlrf+rjitKwzWMdZCkC8iV/Pra3k5zhCxRngsBd+Chr8=
+=VKsv
+-----END PGP SIGNATURE-----

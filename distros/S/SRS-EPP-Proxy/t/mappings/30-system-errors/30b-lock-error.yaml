@@ -1,0 +1,23 @@
+# Test how we behave if we get a lock error
+template: check-domain.tt
+
+# Too hard to make this happen in an integration test
+integration_skip: 1
+
+vars:
+  domains:
+    - cheese.co.te
+    - ffo.co.te
+    - foo.net.te
+    - bar.org.te
+
+input_assertions:
+  class: SRS::EPP::Command::Check::Domain
+
+output_assertions:
+  count:
+  match:
+  match_all:
+  attr_is:
+    - [ '//epp:result', 'code', '2400', 'EPP: correct result code' ]
+

@@ -1,0 +1,10 @@
+Revision history for Perl extension String::DiffLine.
+
+0.01  2000-01-28
+	- original version; created by h2xs 1.18
+
+0.02  2000-01-31
+	- updated docs with identical-string return values
+
+0.03  2016-03-27
+	- fix sv_undef -> PL_sv_undef to build in modern perl5's, fix docs

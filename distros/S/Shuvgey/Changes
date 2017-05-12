@@ -1,0 +1,46 @@
+Revision history for Perl extension Shuvgey
+
+0.09 2015-07-09T21:24:41Z
+    - required Protocol::HTTP2 >= 1.03 (improved conformance with RFC 7540)
+    - required Plack >= 1.0037 (now accept HTTP/2 value for
+      SERVER_PROTOCOL)
+    - Shuvgey now pass all tests of
+      [h2spec tool](https://github.com/summerwind/h2spec) (version 1.01) for
+      conformance with HTTP/2 specification
+
+0.08 2015-06-08T18:01:27Z
+    - required Protocol::HTTP2 >= 1.00
+    - preserved compatibility with h2-14 clients
+    - setup MAX_CONCURRENT_STREAMS to 100
+
+0.07 2015-02-11T14:05:36Z
+    - HTTP/2 draft 17
+
+0.06 2014-12-01T13:09:32Z
+    - HTTP/2 draft 16
+    - announce draft 14 support for interoperability
+    - only TLS v1.2 allowed for secure connections
+
+0.05 2014-10-28T12:50:53Z
+    - slightly changed debug timestamps
+    - return 505 error if client doesn't support HTTP/2
+    - HTTP/2 draft 15
+
+0.04 2014-09-09T13:09:10Z
+    - added support for ECDH ciphers (Net-SSLeay >= 1.56)
+    - required Protocol::HTTP2 >= 0.11 (HTTP/2 draft 14, HPACK draft 09)
+
+0.03 2014-07-08T13:22:45Z
+    - use system hostname
+    - required Protocol::HTTP2 >= 0.09 (HTTP/2 draft 13, HPACK draft 08)
+
+0.02 2014-05-17T10:19:39Z
+
+    - filling PSGI request env
+    - handling PSGI response
+    - 500 Internal Error page
+    - no_tls and upgrade options
+
+0.01 2014-05-17T10:15:21Z
+
+    - original version

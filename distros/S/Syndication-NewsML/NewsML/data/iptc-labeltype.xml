@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<!DOCTYPE TopicSet PUBLIC "urn:newsml:iptc.org:20001006:NewsMLv1.0.dtd:1" "NewsMLv1.0.dtd">
+<TopicSet Duid="iptc.labeltypes" FormalName="LabelType">
+	<Comment xml:lang="en">The type of label attached to a NewsItem.</Comment>
+	<Topic Duid="labt1">
+		<TopicType Scheme="IptcTopicType" FormalName="LabelType"/>
+		<FormalName Scheme="IptcLabelTypes">ReferenceCode</FormalName>
+		<Description xml:lang="en">A shorthand way of referring to a NewsItem.</Description>
+	</Topic>
+</TopicSet>
+

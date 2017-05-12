@@ -1,0 +1,27 @@
+SWIFT/Factory/Tag/Tag17
+=======================
+
+This class provides a a base class for the TAG17x family of classes.
+
+The class is primarily used as a base class for other I<TAG17x> classes,
+for instance TAG17T and TAG17U.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None.
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2003, BIKER. All rights reserved.
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

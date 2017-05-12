@@ -1,0 +1,10 @@
+DROP GENERATOR sp_user_seq;
+DROP TABLE spops_user;
+DROP GENERATOR sp_group_seq;
+DROP TABLE spops_group;
+DROP TABLE spops_group_user;
+DROP GENERATOR sp_security_seq;
+DROP TABLE spops_security;
+DROP GENERATOR sp_doodad_seq;
+DROP TABLE spops_doodad;
+COMMIT;

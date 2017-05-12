@@ -1,0 +1,22 @@
+---
+abstract: 'Exceute Your Scripts Over SSH (And Pass Data Along)'
+author:
+  - 'Copyright (c) 2008 Daisuke Maki <daisuke@endeworks.jp>'
+distribution_type: module
+generated_by: 'Module::Install version 0.74'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Script-Remote
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Data::Dump: 0
+  IPC::Open2: 0
+  Moose: 0
+  POSIX: 0
+  Path::Class: 0
+version: 0.00001

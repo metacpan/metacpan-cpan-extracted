@@ -1,0 +1,80 @@
+Revision history for Perl extension SQL-Composer
+
+0.18 2017-04-16T08:02:53Z
+
+    - do not use //
+
+0.17 2017-04-09T12:37:00Z
+
+    - support as is order types
+
+0.16 2016-04-12T10:05:30Z
+
+    - make sure order type is validated
+
+0.15 2016-01-17T11:14:06Z
+
+    - fix AS IS on the left with the column is on the right
+
+0.14 2015-11-19T21:21:28Z
+
+    - upserts (Stevan Little)
+    - normalised table method (Stevan Little)
+    - doc link correction (mickey)
+
+0.13 2015-09-21T08:08:40Z
+
+    - support HAVING
+
+0.12 2015-06-16T18:13:30Z
+
+    - limit & offset for UPDATE and DELETE
+
+0.11 2015-06-16T18:06:19Z
+
+    - functions
+    - limit and offset 0 #GH-3
+
+0.10 2015-05-03T07:19:30Z
+
+    - support multiple group by #GH-2
+    - make join population recursive
+    - allow overwriting rel name
+
+0.09 2014-11-30T08:27:45Z
+
+    - allow order by as is values
+
+0.08 2014-09-23T05:59:02Z
+
+    - allow specifying columns as is with bind values
+
+0.07 2014-08-20T13:59:30Z
+
+    - support as is with bind values in update
+
+0.06 2014-02-19T13:05:00Z
+
+    - support group_by as is
+
+0.05 2014-01-17T12:58:35Z
+
+    - support as is values in update
+
+0.04 2013-12-14T19:49:09Z
+
+    - build correct default values insert statements
+    - pass driver name everywhere
+
+0.03 2013-12-05T18:28:08Z
+
+    - remove mentioning of other SQL builders (ask mst why)
+
+0.02 2013-12-03T11:21:44Z
+
+    - renamed to SQL::Composer
+
+0.01 2013-12-02T19:10:52Z
+
+    - original version
+

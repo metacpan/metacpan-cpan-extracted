@@ -1,0 +1,10 @@
+<table width="100%">
+   <tr>
+     <td><font color="#FF0000"><strong>Problems:</strong></td>
+   </tr>
+[% FOR error = Siesta.errors %]
+  <tr>
+    <td>[% error | html_entity %]</td>
+  </tr>
+[% END %]
+</table>

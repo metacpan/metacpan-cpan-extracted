@@ -1,0 +1,24 @@
+load_extension('perlvtab.so')
+
+
+select a.student, b.student,
+    a.Reading,
+    b.subject
+ from roster a inner join join_to_me b on a.student=b.student;
+student|student|Reading|subject
+Fred|Fred|A|Reading
+Mary|Mary||Reading
+
+create virtual table roster2
+     using perl ("SQLite::VirtualTable::Pivot", "join_to_me", "student", "subject", "grade" );
+
+select a.student, a.Writing from roster a inner join roster b
+    on a.student=b.student;
+student|Writing
+Fred|B-
+Mary|B
+
+select a.student, a.Writing, b.Reading from roster a inner join roster b
+    on a.Reading=b.Reading;
+student|Writing|Reading
+Fred|B-|A

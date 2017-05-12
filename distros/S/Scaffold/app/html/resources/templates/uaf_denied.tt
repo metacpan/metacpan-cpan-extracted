@@ -1,0 +1,14 @@
+    <div id="header">
+      <h1>Scaffold</h1>
+      <h2>An Example Web Site</h2>
+    </div>
+    <div id="container">
+      <div id="textbox">
+        <p>You have been denied access</p>
+        <p>Please check with your systems administrator.</p>
+        <p>Thank you</p>
+      </div>
+    </div>
+    <div id="footer">
+[% INCLUDE footer.tt -%]
+    </div>

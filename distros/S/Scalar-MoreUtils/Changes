@@ -1,0 +1,7 @@
+Revision history for Scalar-MoreUtils
+
+0.02 2007-2-6
+   + Added "ifnil" and "ifempty".
+
+0.01 2007-2-6
+   + Initial release: "nil", "empty", "define", and "default".

@@ -1,0 +1,5 @@
+steps = FindVersion, CheckChangeLog, DistTest, Commit, Tag, MakeDist, UploadCPAN
+
+git.push_to = git@github.com:hkoba/perl-SQL-Concat.git
+
+CheckChangeLog.files = Changes

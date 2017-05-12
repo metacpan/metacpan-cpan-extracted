@@ -1,0 +1,9 @@
+{
+    use vars qw($SMAKH);
+
+    $SMAKH = "common.smakh";
+}
+
+include $SMAKH
+
+default:        commonrule

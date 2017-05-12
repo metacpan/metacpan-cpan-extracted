@@ -1,0 +1,17 @@
+Revision history for Perl module String-Trim
+
+0.005     2011-04-21
+    * Added tests
+
+0.004     2010-12-03
+    * Require Exporter 5.57
+    * Remove trim2, which was added accidentally
+
+0.003     2010-11-30
+    * Require Test::Buider 0.94 along with Test::More 0.94
+
+0.002     2010-11-28
+    * Use Perl_5 license: GPL+Artistic
+
+0.001     2010-11-26
+    * Initial release

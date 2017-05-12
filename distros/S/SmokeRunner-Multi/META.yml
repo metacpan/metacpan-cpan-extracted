@@ -1,0 +1,99 @@
+---
+abstract: 'Manage smoke tests across multiple branches/checkouts/projects'
+author:
+  - 'Dave Rolsky <autarch@urth.org>'
+  - 'Yanick Champoux <yanick@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Copy: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  lib: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.040, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SmokeRunner-Multi
+no_index:
+  directory:
+    - inc
+provides:
+  SmokeRunner::Multi:
+    file: lib/SmokeRunner/Multi.pm
+    version: '0.21'
+  SmokeRunner::Multi::Config:
+    file: lib/SmokeRunner/Multi/Config.pm
+    version: '0.21'
+  SmokeRunner::Multi::DBI:
+    file: lib/SmokeRunner/Multi/DBI.pm
+    version: '0.21'
+  SmokeRunner::Multi::Reporter:
+    file: lib/SmokeRunner/Multi/Reporter.pm
+    version: '0.21'
+  SmokeRunner::Multi::Reporter::Screen:
+    file: lib/SmokeRunner/Multi/Reporter/Screen.pm
+    version: '0.21'
+  SmokeRunner::Multi::Reporter::Smolder:
+    file: lib/SmokeRunner/Multi/Reporter/Smolder.pm
+    version: '0.21'
+  SmokeRunner::Multi::Runner:
+    file: lib/SmokeRunner/Multi/Runner.pm
+    version: '0.21'
+  SmokeRunner::Multi::Runner::Prove:
+    file: lib/SmokeRunner/Multi/Runner/Prove.pm
+    version: '0.21'
+  SmokeRunner::Multi::Runner::TAPArchive:
+    file: lib/SmokeRunner/Multi/Runner/TAPArchive.pm
+    version: '0.21'
+  SmokeRunner::Multi::SafeRun:
+    file: lib/SmokeRunner/Multi/SafeRun.pm
+    version: '0.21'
+  SmokeRunner::Multi::TestSet:
+    file: lib/SmokeRunner/Multi/TestSet.pm
+    version: '0.21'
+  SmokeRunner::Multi::TestSet::SVN:
+    file: lib/SmokeRunner/Multi/TestSet/SVN.pm
+    version: '0.21'
+  SmokeRunner::Multi::Validate:
+    file: lib/SmokeRunner/Multi/Validate.pm
+    version: '0.21'
+requires:
+  Archive::Tar: '0'
+  Class::Accessor::Fast: '0'
+  Class::Factory::Util: '0'
+  Cwd: '0'
+  DBD::SQLite: '0'
+  DBI: '0'
+  DateTime::Format::Strptime: '0'
+  Exporter: '0'
+  File::Basename: '0'
+  File::Find::Rule: '0'
+  File::HomeDir: '0'
+  File::Path: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  File::Which: '0'
+  File::chdir: '0'
+  IPC::Run3: '0'
+  List::Util: '0'
+  Moo: '0'
+  MooX::Singleton: '0'
+  Params::Validate: '0'
+  Scalar::Util: '0'
+  YAML::Syck: '0'
+  base: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/yanick/SmokeRunner-Multi/issues
+  homepage: https://github.com/yanick/SmokeRunner-Multi
+  repository: https://github.com/yanick/SmokeRunner-Multi.git
+version: '0.21'
+x_authority: cpan:YANICK

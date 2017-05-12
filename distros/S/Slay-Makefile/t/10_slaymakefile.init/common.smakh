@@ -1,0 +1,11 @@
+# A header file with all the common stuff for testing SlayMakefiles.
+
+{
+use vars qw(@OUTPUT);
+
+use trace;
+}
+
+# Default rule: N.B. Has multiple % so it will be lowest priority rule
+%%%%:
+	{ trace(@_) }

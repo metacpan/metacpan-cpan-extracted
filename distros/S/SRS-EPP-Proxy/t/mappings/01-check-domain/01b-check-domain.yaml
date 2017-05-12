@@ -1,0 +1,28 @@
+template: check-domain.tt
+
+vars:
+  domains:
+    - cheese.co.te
+
+input_assertions:
+  count:
+    - [ '//domain:name', 1, 'Initial EPP: One domain to check' ]
+
+SRS:
+  - assertions:
+      count:
+        - [ '//Whois', 1, 'SRS: Check that there is 1 domain' ]
+        - [ '/NZSRSRequest/*', 1, 'SRS: Check there is only 1 command' ]
+      match: []
+      match_all:
+        - [ '//Whois/@FullResult', '0', 'SRS: Check all FullResult attributes are zero' ]
+      attr_is:
+        - [ '/NZSRSRequest/Whois[1]', 'DomainName', 'cheese.co.te', 'SRS: Check cheese is the first check' ]
+
+  
+output_assertions:
+  count:
+    - [ '//domain:cd', 1, 'Check there is 1 domain only' ]
+  matches:
+    - [ '//epp::resData/domain:chkData/domain:cd[1]/domain:name', 'cheese.co.te', 'Check cheese is in the response' ]
+  attr_is: []

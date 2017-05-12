@@ -1,0 +1,91 @@
+Revision history for CPAN module Sub::Identify
+
+0.14 2017-04-11 RGARCIA
+    - Make tests pass without . in @INC (actual fix, by James E Keenan)
+
+0.13 2017-04-02 RGARCIA
+    - Reformatted Changes to follow basic format in CPAN::Changes::Spec
+    - Make tests pass without . in @INC
+
+0.12 2015-09-08 RGARCIA
+    - Update changes for 0.11
+    - Fix build on perl 5.8
+
+0.11 2015-09-04 RGARCIA
+    - Adding new test for signatures as part of Feb 2015 PRC
+      from B. Estrade
+    - Merge pull request #6 from estrabd/Issue-5-add-signature-test
+    - Fix skipping tests on earliers perls
+    - Add new test to MANIFEST
+    - Do not let get_code_location() segfault on XSUBs
+    - Add a test for calling get_code_location on XSUBs
+    - Add a pure-perl version of last test
+
+0.10 2015-01-02 RGARCIA
+    - No changes
+
+0.09 2014-12-31 RGARCIA
+    - Fix test failure due to hard-coded filenames.
+      From A. Sinan Unur
+
+0.08 2014-09-17 RGARCIA
+    - Require at least perl 5.8.0
+    - Improve docs beyond a really terse synopsis
+
+0.07 2014-09-11 RGARCIA
+    - Require B unconditionally on older perls
+
+0.06 2014-09-10 RGARCIA
+    - Remove perl version requirement
+    - Skip tests that rely on perls more recent than 5.14.0
+    - Update ppport.h
+    - Use the pure-perl version of is_sub_constant on perls earlier than 5.16
+
+0.05 2014-09-10 RGARCIA
+    - Add test for function prototypes
+    - Require at least perl 5.14.1
+    - Better, simpler code for testing if we can load the XS version
+    - Add gitignore file
+    - Experimental implementation of get_code_location
+    - Add XS implementation of get_code_location()
+    - Add test for the prototype of get_code_location
+    - Make get_code_location work on undefined subs
+    - Add link to github repo in the meta file
+    - Add TODO file
+    - Add pure-perl implementation of is_sub_constant()
+    - Add XS implemetation of is_constant_sub()
+    - Add documentation
+
+0.04 2008-12-15 RGARCIA
+    - First stab as a dual implementation XS / pure Perl
+    - Update MANIFEST and add ppport.h from bleadperl
+    - Bump version to 0.04
+    - Add license to Makefile.PL
+    - Re-add "use strict"
+    - Mortalize return values
+    - Add tests for a bug reported on P5P by Renée Bäcker
+    - Fix segfault / compilation error by returning nothing
+      for a sub being compiled
+    - Regenerate META.yml
+
+0.03 2008-05-19 RGARCIA
+    - Import Sub-Identify 0.02
+    - Add MANIFEST.SKIP file
+    - Add get_code_info, as suggested by Shawn M Moore
+    - Export get_code_info()
+    - Add tests for get_code_info()
+    - More tests for undefined subroutines
+    - Fix email address
+    - New tests for errors
+    - Merge branch 'moose'
+    - Add pod test file
+    - Pre-require Test::More
+    - Add copyright and license
+    - Bump version and regenerate the META.yml
+
+0.02 2005-05-13 RGARCIA
+    - Unknown changes
+
+0.01 2005-05-13 RGARCIA
+    - First release to CPAN
+

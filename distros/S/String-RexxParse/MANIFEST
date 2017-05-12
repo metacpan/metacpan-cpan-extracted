@@ -1,0 +1,15 @@
+MANIFEST
+Makefile.PL
+RexxParse.pm
+README
+t/a.t
+t/b.t
+t/c.t
+t/d.t
+t/e.t
+t/f.t
+t/g.t
+t/h.t
+t/i.t
+t/j.t
+t/z.t

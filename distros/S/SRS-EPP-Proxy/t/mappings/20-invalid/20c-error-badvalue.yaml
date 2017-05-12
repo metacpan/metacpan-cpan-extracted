@@ -1,0 +1,13 @@
+template: create-contact.tt
+
+vars:
+  contact_id: foo.co.te
+
+output_assertions:
+  count:
+    - [ '//epp:resData', 0, 'EPP: No resData in the response' ]
+  match:
+    - [ '//epp:result', '/XML Schema validation error at /epp/command/create/contact:create/contact:postalInfo/contact:name; bad value ''/', 'knows what happened' ]
+    - [ '//epp:msg', "Input violates XML Schema", "Message makes sense" ]
+  attr_is:
+    - [ '//epp:result', 'code', 2004, 'EPP: XML Schema invalid' ]

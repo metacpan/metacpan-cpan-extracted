@@ -1,0 +1,75 @@
+% unless ( $user->is_disabled() ) {
+<p>
+<% loc( '%1 %2 <strong>%3</strong> of this wiki', $pronoun_and_be, $article, lc $role ) | n %>
+</p>
+% }
+
+% if ($edited_count) {
+<h2>Recently Edited Pages</h2>
+
+<p>
+<% loc ('%1 edited %quant(%2, page, pages) in this wiki.', $pronoun_and_has, $edited_count ) %>
+</p>
+
+<ul>
+% while ( my ( $page, $revision ) = $edited_pages->next() ) {
+  <li><a href="<% $page->uri() %>"><% $page->title() %></a>
+      (<% $page->most_recent_revision()->revision_number() == $revision->revision_number()
+          ? loc('Most recent revision')
+          : loc( 'revision %1 of %2', $revision->revision_number(), $page->most_recent_revision()->revision_number() ) %>)
+    - <% loc( 'Edited %on_datetime(%1)', $revision->creation_datetime() ) %></li>
+% }
+</ul>
+
+% } else {
+<p>
+<% loc ('%1 has not edited any pages in this wiki.', $pronoun_and_has ) %>
+</p>
+% }
+
+% if ($created_count) {
+<h2>Recently Created Pages</h2>
+
+<p>
+<% loc ('%1 created %quant(%2, page, pages) in this wiki.', $pronoun_and_has, $created_count ) %>
+</p>
+
+<ul>
+% while ( my ( $page, $revision ) = $created_pages->next() ) {
+  <li><a href="<% $page->uri() %>"><% $page->title() %></a>
+    - <% loc( 'Created %on_datetime(%1)', $revision->creation_datetime() ) %></li>
+% }
+</ul>
+
+% } else {
+<p>
+<% loc ('%1 has not created any pages in this wiki.', $pronoun_and_has ) %>
+</p>
+% }
+
+<%args>
+$user
+$wiki
+</%args>
+
+<%init>
+my $role = $user->role_in_wiki($wiki)->name();
+$role = 'Guest' if $role eq 'Authenticated';
+
+my $pronoun_and_be = $user->user_id() == $c->user()->user_id() ? 'You are' : 'This user is';
+my $article = (split / /, A($role))[0];
+
+my $pronoun_and_has = $user->user_id() == $c->user()->user_id() ? 'You have' : 'This user has';
+
+my $edited_count = $wiki->pages_edited_by_user_count($user);
+
+my $edited_pages;
+$edited_pages = $wiki->pages_edited_by_user( user => $user, limit => 10 )
+    if $edited_count;
+
+my $created_count = $wiki->pages_created_by_user_count($user);
+
+my $created_pages;
+$created_pages = $wiki->pages_created_by_user( user => $user, limit => 10 )
+    if $created_count;
+</%init>

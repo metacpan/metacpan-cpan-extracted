@@ -1,0 +1,13 @@
+In order to complete the requested action either reply to this mail, 
+leaving the following line in tact :
+
+resume [% deferred.id %] [% deferred.hash %]
+
+or go to this web page :
+
+http://siesta.unixbeard.net/siesta/resume.tt2?id=[% deferred.id %]
+
+REMEMBER! You *must* log in to acknowledge this message.
+
+[% IF newmember %]You have been assigned the password [% deferred.who.password %][% END %]
+

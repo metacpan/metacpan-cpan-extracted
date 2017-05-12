@@ -1,0 +1,6 @@
+[% session.user = undef %]
+[% INCLUDE _header.tt2 %]
+
+<h2>Logged out</h2>
+
+[% INCLUDE _footer.tt2 %]

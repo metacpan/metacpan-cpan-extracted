@@ -1,0 +1,24 @@
+---
+version : 0.0.4
+date    : 2006-08-04T20:40:06Z
+changes :
+    - derive from SVK::Log::Filter::Output
+
+---
+version : 0.0.3
+date    : 2006-08-03T19:53:24Z
+changes :
+    - Use the new API for log filters
+    - Use the MIT license
+
+---
+version : 0.0.2
+date    :
+changes :
+    - Correct typos in the docs
+
+---
+version : 0.0.1
+date    : 2006-05-16T17:04:32Z
+changes :
+    - First version

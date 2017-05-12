@@ -1,0 +1,15 @@
+---
+abstract: 'SQL::YASP - SQL parser and evaluater'
+author:
+    - "Miko O'Sullivan <miko@idocs.com>"
+generated_by: home grown
+license: perl
+name: SQL-YASP
+provides:
+    SQL::YASP:
+        file: lib/SQL/YASP.pm
+        version: 0.12
+requires:
+    Tie::IxHash: 0
+    perl: 5.003
+version: 0.12

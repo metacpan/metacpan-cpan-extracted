@@ -1,0 +1,25 @@
+Changes
+lib/SWISH/Prog/KSx.pm
+lib/SWISH/Prog/KSx/Indexer.pm
+lib/SWISH/Prog/KSx/InvIndex.pm
+lib/SWISH/Prog/KSx/Result.pm
+lib/SWISH/Prog/KSx/Results.pm
+lib/SWISH/Prog/KSx/Searcher.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/01-fs.t
+t/02-leak-trace.t
+t/03-update-index.t
+t/04-auto-reconnect-searcher.t
+t/05-utf8.t
+t/config.xml
+t/pod-coverage.t
+t/pod.t
+t/test.conf
+t/test.html
+t/test.xml
+t/utf8.xml
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,19 @@
+include common.smakh
+
+default:        commonrule
+
+built2.smakh:
+        {
+	    my ($maker, $target, $deps, $matches) = @_;
+	    open T, ">$target";
+	    print T <<'EOS';
+	commonrule:
+		{
+		    my ($maker, $target, $deps, $matches) = @_;
+		    push @OUTPUT, "Built rule for building $target\n"
+		}
+	EOS
+	    close T;
+	}
+
+-include built2.smakh

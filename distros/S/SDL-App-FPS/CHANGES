@@ -1,0 +1,325 @@
+
+Revision history for SDL::App::FPS:
+
+2006-02-27 v0.21 Tels - 310 tests
+  * make to work with SDL_perl 1.2.3:
+    + resizing didn't work anymore
+    + costant exporting was borked, needs "use SDL;" not "use SDL::Event;"
+  * bundle Module::Install
+  * remove the NEW file
+  * fix tests failing due to timer problems
+  * fix XS code:
+    + remove unused RETVAL from _delay()
+    + avoid warnings about unused params, rename "class" to "myclass"
+  * option "show_fps" is really "show_fps" (not "showfps")
+  * fix speling and nits in doc
+  * use better tagline for CPAN indexing
+  * include examples/lib/SDL/OpenGL/Cube.pm since normal SDL misses it
+  * Mandelbroth example:
+    + modify the title to show % done
+    + re-use a SDL::Color object for more speed
+
+############################################################################## 
+Older revision history:
+
+2002-12-25 v0.01 Tels - 3 tests (not released)
+ * rewrote test.pl into package SDL::App::FPS complete with doc and a testfile
+ * features:
+   - option handling
+   - framerate monitor
+   - time warp (slow motion, fast forward, even clock going backwards)
+   - event handling after each frame
+   - framerate cap, with sophisticated delay to acocunt for timer inaccuracies
+   - object oriented approach, subclassable
+ * added sample subclass and testfile
+
+2002-12-26 v0.02 Tels - 8 tests (15:30)
+ * added $VERSION
+ * made into a proper package for easier handling
+ * added quit() to quit application from draw_frame() or anywhere else
+ * added fullscreen() (still needs some work)
+ * added can_ok() test to test for methods to exist
+ * added tests for pre_init_handler(), post_init_handler() and quit_handler()
+ * added test for framerate cap
+ * require SDL version 1.18.0 (since 1.19.x is not yet on CPAN)
+ * added ramp_time_warp(), stop_time_warp_ramp()
+ * added freeze_time(), thaw_time()
+
+2002-12-26 v0.03 Tels - 11 tests (19:50)
+ * added time_is_frozen(), time_is_ramping()
+ * added pause() to pause application until some or an specific event occured
+   (the SDL_QUIT event will always end the pause and then the application)
+ * added examples/ with Kcirb.pl and subclass for it
+ * main loop ends when $self->{quit} is true, to avoid hanging at end when
+   there are no more events
+ * moved post_init_handler() after initializing $self->{now} et al.
+ * renamed update() to next_frame() and added update() to call {app}->update()
+ * added app(), width() and height()
+ * added min_fps(), max_fps()
+ * added min_frame_time(), max_frame_time()
+
+2002-12-26 v0.04 Tels - 41 tests (22:35) 
+ * moved bugs from TODO to BUGS
+ * the event we wait in pause() for is put to handle_event(), too.
+ * added support for timers via SDL::App::FPS::Timer and add_timer(),
+   get_timer(), remove_timer(), timers() as well as expire_timers()
+ * added a timer example to the example application, it now spawns a new
+   rectangle every 3 seconds.
+ * re-ordered METHODS in FPS.pm: move the automatically used methods to bottom
+ * added tests for Timer.pm
+
+2002-12-27 v0.05 Tels - 50 tests (1.35) 
+ * timers can have additional arguments to callback, test for them
+ * timers allow negative target time and negative delay time
+ * fixed: add_timer() really add timer, instead of replacing the first one
+ * timer take a 'rand' argument to randomize their times (not used yet)
+ * pass overshot value to timer callback
+ * fixed README
+ * don't start time warp ramp if we are already at the target warp
+ * randomize rectangle sizes in example application
+ * add "shots" to example application (shows nested timers with overshot
+   correction!)
+ * added key 'b' to example application, wait for some action, then try it!
+
+2002-12-27 v0.06 Tels - 50 tests (23:43)
+ * coded the delay() routine in XS, so that the example app only spents about
+   4% of it's time in next_frame(), not 12%.
+ * remember timer's next $next_check so as to not check them too often
+   (example app saves a few % by calling expire_timers() only about half as
+   much as in v0.05)
+ * disable next_time_check when adding or removing timers (w/ nesting)
+ * optimized the example application to cache the SDL::rect objects for each
+   rectangle. While capping at 40 fps it uses about 50% CPU, even when there
+   are about 40 rectangles on the screen. v0.05 would start using 100% CPU
+   starting from only 20 or so rectangles onwards.
+
+2002-12-28 v0.07 Tels - 70 tests
+ * Changed the event handling framework:
+   added add_event_handler(), SDL::App::FPS::EventHandler (with new(),
+    rebind(), check()), and del_event_handler().
+   Overriding handle_event() no longer necc., removed handle_event(), and
+   changed example app to use this.
+ * timer check that rand value is smaller than abs(time) and abs(delay)
+ * wiggle timer time and delay based on rand value
+ * added in_fullscreen() to check current fullscreen status
+ * fullscreen() takes argument to switch to fullscreen or windowed mode
+   (instead just toggling) and returns current status
+ * tests for random timers and fullscreen stuff
+ * added a big section on why, how, time warp, ramping, event handlers and
+   timers to the pod in SDL::App::FPS
+ * renamed remove_timer() to del_timer() and documented it
+ * tests for del_timer()
+ * fixed get_timer() and test for it
+ * renamed example application to "demo"
+
+2002-12-29 v0.08 Tels - 76 tests
+ * optimized next_frame():
+   - calc $frame_diff was unnecc.
+   - shifted a bit more code to XS (calc of new wake_time)
+   When doing an empty loop (with max_fps set to 500), v0.07 was able to do
+   about 11000 FPS, v0.08 manages about 23000. (1 Ghz AMD)
+ * if max_fps == 0, set it to at least 1
+ * set max_fps to 500 at most (anything above 300 will result in no cap at
+   all, currently)
+ * fixed EventHandler::check: don't check if event is inactive
+
+2003-01-01 v0.09 Tels - 109 tests
+ * added activate(), deactivate(), is_active() to Timer.pm
+ * added SDL::FPS::App::Group.
+ * added example on how to sort event handlers in groups, and enable, disable
+   them in batches
+ * added a test for timer not beeing due when time_warp == 0 (time frozen)
+ * tests for new timer features and group
+ * encapsulate all data of base class SDL::App::FPS inside $self->{_app}
+ * EventHandler callback can carry additional arguments
+ * added mandel.pl to examples
+
+2003-01-02 v0.10 Tels - 111 tests
+ * nit: fixed =NAME to contain 'SDL' for indexing
+ * PREREQ SDL_perl v1.19.2 since it is now on CPAN
+ * added LICENSE and CREDITS
+ * added SDL::App::FPS::depth()
+ * depth(), height() and width() return cached values for more speed
+ * fixed: create_window() ignored the user options and always used 640x480x24
+ * fixed to mandel.pl:
+   + fixed and enabled the recursive algorithmn in mandel.pl (takes 48 sec
+     instead 154 sec on 1 Ghz AMD for first image, even better when zoomed in)
+   + fixed time output in mandel.pl, dump some debug output and coordinates
+   + zooming in while recursive calc was underway resulted in corruption
+   + toggle method: 1 (iterative), 2 (recursive), 3 (recursive with prefill)
+
+2003-01-04 v0.11 Tels - 164 tests
+ SDL::App::FPS::Thingy:
+  * added, made Timer, Group, EventHandler and Button use it as base class
+ SDL::App::FPS::EventHandler:
+  * cater for SDL_VIDEORESIZE events
+  * upon rebind, call $app->_rebound_event_handler()
+  * is now able to watch for 1,2 or 3 different mousebuttons with the same
+    handler (pass BUTTON_MOUSE_LEFT + BUTTON_MOUSE_RIGHT for instance)
+  * removed LEFTMOUSEBUTTON, RIGHTMOUSEBUTTON and MIDDLEMOUSEBUTTON
+ SDL::App::FPS::Button:
+  * added, use Thingy
+  * rectangular, circular or elliptic shapes
+  * watches for mouse in, out, hover, button down/up or click events
+ SDL::App::FPS::Group:
+  * use Thingy
+  * activate()/deactivate() calls activate()/deactivate() of each member
+ SDL::App::FPS:
+ * event_handler() no longer exists, so don't use nor document it
+ * pause() throws away events
+ * internal methods prefixed with '_'
+ * added support for option -resizeable
+   + add event for SDL_VIDEORESIZE and adjusting width/height in _resized()
+ * added _rebound_event_handler()
+ * added BUTTON_MOUSE_LEFT, BUTTON_MOUSE_RIGHT, BUTTON_MOUSE_MIDDLE
+ * added resize_handler() 
+ mandel.pl:
+  * rewrote mandel's recursive algorithmn to be simpler, also fixed a bug that
+     it calculated/draw one pixel too much for every hor/vert. line
+  * fixed the bug in recursive alg. that left 'holes'
+  * use watch_event(), support resizable (restart calc upon resize)
+  * reset point counter when starting new calculation
+  * use recursive method as default
+ demo.pl:
+  * use watch_event(), supports resizable (automatically)
+ empty.pl:
+  * use watch_event(), support resizable (automatically)
+ event.pl:
+  * use watch_event(), support resizable (automatically)
+ button.pl and MyButt.pm:
+  * added a simple click'n'kill game to show SDL::App::FPS::Button usage
+
+2003-01-05 v0.12 Tels - 190 tests
+ Library:
+  * fixed all the outstandind issues with Button, all combinations now work
+  * added: BUTTON_DOWN and BUTTON_UP (for BUTTON_RELEASED and BUTTON_PRESSED)
+  * documented add_button() in FPS.pm
+  * added SDL::App::FPS::Color inclusive tests
+  * fixed stupid definition bug in BUTTON_MOUSE_*
+ Demos:
+  * added mouse.pl and MyMouse.pm to show off advanced Button features
+  * added color.pl and MyColor.pm to show off colors
+  * mandel.pl shows percentage of already done area in recursive mode
+  * fixed event.pl (I know I should try things before releasing them..)
+
+2003-01-12 v0.13 Tels - 229 tests
+ Library:
+ fixed: 
+  * Color.pm: darken()s factor was accid. inverted (now 0..1 instead of 1..0)
+  * use 'unsigned int' instead of 'int' in XS code
+  * Timer.pm: callback no longer get's timer id (please change your code!)
+  * FPS: timers 'fire' now in the order in which they expire (e.g. the most
+    overdue timer first, then the next etc, instead of the one with the lowest
+    ID first)
+  * FPS: timers now fire multiple times in one frame (w/ diff. overdue values)
+ added:
+  * Color.pm: added blend()
+  * way more tests for Color.pm
+  * added two color ramps (linaer, sinus) to colors.pl to show blending/mixing
+  * FPS.pm: save() and load()
+  * FPS: base_ticks to adjust now(), allows load() to 'reset' the time to what
+    it was when the save() occured
+  * XS: keep wake_time, no need to carry it from/to Perl: 24,000 FPS empty
+  * XS: monitor framerate instead in Perl: about 31000 FPS empty
+  * min_fps() and max_fps() in XS
+  * min_frame_time() and max_frame_time() in XS: now about 34000 FPS empty
+  * FPS.pm: added resize() method to manually resize window
+  * Timer.pm: added is_due() and fire() to seperate these two steps
+  * Eventhandler: char2key() - convert char to SDLK_foo
+  * Eventhandler: support for key additional (all, none) modifiers 
+ Demos:
+ fixed:
+  * mouse.pl: MyMouse uses Color.pm
+ added:
+  * added examples/boulder/ - a simple game in a cave, showing resizing w/
+    min. window size, keeping a playfield with a fog-o-war
+  * added examples/keycheck.pl to show event handlers with key modifiers 
+
+2003-01-23 v0.14 Tels - 255 tests
+ mandel.pl
+  * optimized MyMandel.pm's _mandel_point() a bit (43 instead of 45 seconds)
+  * re-use SDL::Color objects in draw_point() makes it about 15% faster
+  * MyMandel.pm use Math::Fractal::Mandelbrot if possible (9 vs 42 seconds)
+  * recolor the image by pressing one of: 'r', 'g', 'b', 'p' or 'y'
+    (next image will be done with the newly set color preset)
+ Library:
+  * corrected Color.pm's =head1 NAME section to allow indexing in CPAN
+  * Color.pm: desaturate($color,$r,$g,$b) - convert color to gray-scale
+  * Color.pm: invert($color) - invert color
+  * Group.pm: added $group->clear()
+  * FPS.pm: added del_thing()
+  * better subclass handling of timers, event handlers and buttons
+  * pass $type to check() for about 25% faster event and button check/handling
+  * sort event handlers into groups based on type and check only these
+    that match the current event. So mouse move handlers don't get activated
+    for keydown events etc. No functional change, just faster.
+  * Thingy.pm calls $app->_activated_thing($self) and
+    $app->_deactivated_thing($self) to allow app to sort handlers etc into
+    active and inactive ones (e.g. inactive event handlers are no longer
+    called to check occuring events => slightly faster if you have lot's of
+    inactive ones)
+  * Thingy: don't (de)activate() if Thingy is already (in)active
+  * corrected bug in timer firing introduced by timer expiring optimization
+  * workaround bug in SDL::Event.pm that crashes us when using KMOD_foo
+
+2003-03-02 v0.15 Tels - 265 tests
+  * added example opengl.pl which shows OpenGL usage
+  * FPS.pm: support for "gl" switch
+	    added get_clock(), set_clock() and clock_to_ticks()
+  * Thingy: has field name (w/ default) and accessor method name()
+  * Group: method named(), returning one or more matching members by that name
+
+2003-03-10 v0.16 Tels - 265 tests
+  * document the Group->named() method
+  * opengl example: fix secondary rotation (instead of secondary wiggling)
+  * added modelview example: show MD2 models using Games::3D::Model
+            
+2003-03-12 v0.17 Tels - 265 tests
+  * removed modelview from distribution: see http://bloodgate.com/perl/sdl
+  * max_fps == 0 disables framerate cap (for benchmarks)
+  * removed obsolete cap_fps parameter
+
+2003-03-21 v0.18 Tels - 265 tests
+  * made compatible to SDL_perl 1.20.2 (actually, nothing had to be done :)
+  * The mandel fractal takes now 6.8 instead of 9.5 seconds, just be switching
+    to SDL_perl 1.20.2 :-)
+
+2003-03-23 v0.19 Tels - 306 tests
+  * added config file support via Config::Simple (defaults to reading
+    'config/client.cfg'), added parameter "config" to set the config file name
+  * support for parsing command line options via GetOpt::Long
+  * added: watch_event() knows 'screenshot'
+  * fixed: $app->option() was broken because it accessed the wrong namespace
+  * fixed: switching to fullscreen at new() didn't work since window didn't
+           exist yet
+
+2003-04-19 v0.20 Tels - 310 tests
+  * forgot to include the config files for mandel and opengl - oups.
+  * screenshots of OpenGL apps work now (needs SDL_perl v1.20.3)
+  * added support for wheel mouse buttons (needs SDL_perl v1.20.3)
+  * support for showing FPS (needs Games::OpenGL::Font::2D v0.05) 
+  * support for console (needs Games::Console v0.02) 
+  * added the following options:
+    - show_fps
+    - fps_font
+    - console_font
+    - debug
+    - useconsole
+  * reading in of config files describing a font (for fps and console),
+    thus the same font-bitmap, with different colors and sizes can be used
+  * fixed: option "name" is now known as "title", and really works (sets the
+    window title of the application window)
+  * when console is open, console receives keypresses instead of the app
+  * config reading reads options from default or [app], plus [input] section
+  * bind keys from config file (section [input]) to event handlers of the type
+    FPS_EVENT, this means you can use in your code:
+      $self->add_event_handler ( FPS_EVENT, 'some_event_name_here', ... );
+    and it will still work when somebody changes the config file (which even
+    your own app could do at runtime!)
+  * added: event_bound_to() to find out which keys needs pressing for an event
+  * fixed a bug in watch_event( pause => foo ); (didn't work)
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

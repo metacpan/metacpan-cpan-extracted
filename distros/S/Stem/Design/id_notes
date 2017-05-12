@@ -1,0 +1,18 @@
+
+			 Stem::Id Design Notes
+
+The Stem::Id module generates unique Id strings for use as names in Stem
+addresses. Its most common use is by parent Cells which clone themselves
+and need a unique Target. The parent Cell uses its Cell name and the new
+Target to register the cloned Cell.
+
+A typical use is by a Stem::SockMsg Cell which creates a Stem::Id object
+during its own construction. When this parent Cell accepts a socket
+connection, it clones itself and needs to register this new Cell with a
+unique address.  The parent Cell calls the next method of its Stem::Id
+object to get a unique Id which is uses for the Target address of the
+cloned Cell. Then the cloned Cell is registered with the parent Cell
+name and the new Target name. This address is then sent to other Cells
+so they can communicate with this new Cell.
+
+This module is only used internally and should not be configured.

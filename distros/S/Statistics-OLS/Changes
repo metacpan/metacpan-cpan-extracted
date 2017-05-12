@@ -1,0 +1,25 @@
+Revision history for Perl module Statistics::OLS.
+
+0.01 - 22 March 1998
+	 - original version
+
+0.02 - 29 March 1998
+	 - corrected array bounds check bug in setData
+	 - included check for divide by zero in standard error of
+	   coefficients and t-stats             
+
+0.03 - 31 May 1998
+	 - placed module into standard format using h2xs
+
+0.04 - 13 July 1998 
+	 - changed the name from Statistics::Ols to Statistics::OLS
+
+0.05 - 15 Sep 1999
+	 - corrected error checking bug
+	 - corrected pod documentation bug
+
+0.06 - 4 July 2000
+       - allowed data in scientific (exponential) notation
+
+0.07 - 12 October 2000
+        - _sse fix for potential precision problems

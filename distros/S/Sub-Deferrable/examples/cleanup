@@ -1,0 +1,52 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+=pod
+This script creates a bunch of temporary files, pretends to do something
+useful with them, and uses Sub::Deferrable to arrange for the files to
+be cleaned up at the end. There are simpler, and better, ways to clean up
+working files, but this is a reasonable illustration of the kind of task
+suited to deferring sub execution.
+
+=cut
+
+use Sub::Deferrable;
+
+# Initialize the cleanup queue, and a deferrable deletion function.
+my $cleanup = Sub::Deferrable->new;
+my $delete  = $cleanup->mk_deferrable( sub { unlink $_ for @_ } );
+
+# Actually tell cleanup to wait for the end
+$cleanup->defer;
+
+print "Processing...";
+
+# Now do lots of work with temporary files.
+for (1..10)
+{
+    my $file = sprintf "%02d.tmp", $_;
+
+    # Open the file *and* arrange for it to be cleaned up later.
+    open my $fh, ">", $file or die "Couldn't open $file: $!";
+    $delete->($file);    # The file doesn't actually get eaten at this time
+
+    # Pretend to do something useful.
+    print $fh "Ditty wah ditty!\n" or die "Couldn't write $file: $!";
+    close $fh;
+}
+
+print "Done.\n";
+
+# Confirm the files exist.
+print "Temp files found: ", join(", ", glob("*.tmp")), "\n";
+
+# Now let all those deferred file deletions take place.
+print "Cleaning up...";
+$cleanup->undefer;
+print "Done.\n";
+
+# Confirm the files don't exist.
+print "Temp files found: ", (join(", ", glob("*.tmp")) || "NONE"), "\n";
+

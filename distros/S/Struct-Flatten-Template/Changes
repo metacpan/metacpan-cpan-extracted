@@ -1,0 +1,33 @@
+Revision history for Struct-Flatten-Template
+
+v0.1.2  2014-08-16
+
+  [Other Changes]
+  - Corrected license type to make CPANTS happy.
+
+v0.1.1  2014-08-13
+
+  [Incompatabilities]
+  - Ignore_missing is now a read-only attribute.
+
+  [New Features]
+  - Added _path key that tracks the path in the data structure.
+
+  - The _index key is now deprecated.
+
+  [Documentation]
+  - Added more modules to the SEE ALSO section.
+
+  - Corrected POD: ignore_missing is true by default.
+
+  - Removed module details from the README.
+
+  [Other Changes]
+  - Minor code tweaks.
+
+  - Explicit prerequsite for Test::Differences that caused failures
+    for some CPAN Testers.
+
+v0.1.0  2014-08-01
+
+  - Initial version released.

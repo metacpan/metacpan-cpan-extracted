@@ -1,0 +1,90 @@
+{
+   "abstract" : "minimal mailing list manager",
+   "author" : [
+      "Gianni Ceccarelli <dakkar@thenautilus.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Sietima",
+   "no_index" : {
+      "directory" : [
+         "t/lib"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::Spec" : "0",
+            "App::Spec::Run" : "0",
+            "Digest::SHA" : "0",
+            "Email::Address" : "0",
+            "Email::MIME" : "0",
+            "Email::Sender" : "0",
+            "Email::Sender::Simple" : "0",
+            "Email::Stuffer" : "0",
+            "List::AllUtils" : "0",
+            "Moo" : "0",
+            "Moo::Role" : "0",
+            "MooX::Traits" : "0",
+            "Try::Tiny" : "0",
+            "Type::Library" : "0",
+            "Type::Params" : "0",
+            "Type::Utils" : "0",
+            "Types::Path::Tiny" : "0",
+            "Types::Standard" : "0",
+            "Types::URI" : "0",
+            "experimental" : "0",
+            "feature" : "0",
+            "namespace::clean" : "0",
+            "perl" : "5.024",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Printer" : "0",
+            "Email::Sender::Transport::Test" : "0",
+            "Import::Into" : "0",
+            "Path::Tiny" : "0",
+            "Test2::API" : "0",
+            "Test2::Bundle::Extended" : "0",
+            "URI" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://www.thenautilus.net/SW/Sietima/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://www.thenautilus.net/cgit/Sietima",
+         "web" : "https://www.thenautilus.net/cgit/Sietima"
+      }
+   },
+   "version" : "1.0.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

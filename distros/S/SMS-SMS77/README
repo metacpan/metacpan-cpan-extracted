@@ -1,0 +1,18 @@
+SMS::SMS77 - a perl interface to sms77
+
+Copyright (c) 2007 Markus Benning <me@w3r3wolf.de>
+
+See COPYRIGHT section in SMS77.pm for usage and distribution rights.
+
+To install `SMS::SMS77' do the following:
+
+perl Build.PL
+./Build
+./Build test
+./Build install
+
+
+The newest version of SMS::SMS77 is available from:
+
+http://www.w3r3wolf.de/
+

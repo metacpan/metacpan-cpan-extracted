@@ -1,0 +1,103 @@
+NAME
+    Statistics::Hartigan - Perl extension for the stopping rule proposed by
+    Hartigan J. Hartigan, J. (1975). Clustering Algorithms. John Wiley and
+    Sons, New York, NY, US.
+
+SYNOPSIS
+      use Statistics::Hartigan;
+      &hartigan(InputFile, "agglo", 6, 10);
+
+      Input file is expected in the "dense" format -
+      Sample Input file:
+   
+      6 5
+      1       1       0       0       1
+      1       0       0       0       0
+      1       1       0       0       1
+      1       1       0       0       1
+      1       0       0       0       1
+      1       1       0       0       1             
+
+DESCRIPTION
+    Hartigan J. uses the Within Cluster/Group Sum of Squares (WGSS) to
+    estimate the number of clusters a given data naturally falls into. The
+    is goal is to minimize WGSS.
+
+  EXPORT
+    "hartigan" function by default.
+
+INPUT
+  InputFile
+    The input dataset is expected in "dense" matrix format. The input dense
+    matrix is expected in a plain text file where the first line in the file
+    gives the dimensions of the dataset and then the dataset in a matrix
+    format should follow. The contexts / observations should be along the
+    rows and the features should be along the column.
+
+            eg:
+            6 5
+            1       1       0       0       1
+            1       0       0       0       0
+            1       1       0       0       1
+            1       1       0       0       1
+            1       0       0       0       1
+            1       1       0       0       1       
+
+    The first line (6 5) gives the number of rows (observations) and the
+    number of columns (features) present in the following matrix. Following
+    each line records the frequency of occurrence of the feature at the
+    column in the given observation. Thus features1 (1st column) occurs once
+    in the observation1 and infact once in all the other observations too
+    while the feature3 does not occur in observation1.
+
+  ClusteringMethod
+    The Clustering Measures that can be used are: 1. rb - Repeated
+    Bisections [Default] 2. rbr - Repeated Bisections for by k-way
+    refinement 3. direct - Direct k-way clustering 4. agglo - Agglomerative
+    clustering 5. graph - Graph partitioning-based clustering 6. bagglo -
+    Partitional biased Agglomerative clustering
+
+  K value
+    This is an approximate upper bound for the number of clusters that may
+    be present in the dataset. Thus for a dataset that you expect to be
+    seperated into 3 clusters this value should be set some integer value
+    greater than 3.
+
+  Threshold value
+    A threshold needs to be specified for this stopping rule to stop :) A
+    typical value (empirically found) is 10.
+
+OUTPUT
+    A single integer number which is the estimate of number of clusters
+    present in the input dataset.
+
+PRE-REQUISITES
+    1. This module uses suite of C programs called CLUTO for clustering
+    purposes. Thus CLUTO needs to be installed for this module to be
+    functional. CLUTO can be downloaded from
+    http://www-users.cs.umn.edu/~karypis/cluto/
+
+SEE ALSO
+    1. Hartigan, J. (1975). Clustering Algorithms. John Wiley and Sons, New
+    York, NY, US. 2. http://www-users.cs.umn.edu/~karypis/cluto/
+
+AUTHOR
+    Anagha Kulkarni, University of Minnesota Duluth kulka020 <at> d.umn.edu
+
+    Guergana Savova, Mayo Clinic savova.guergana <at> mayo.edu
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2005-2006, Guergana Savova and Anagha Kulkarni
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or (at your
+    option) any later version. This program is distributed in the hope that
+    it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+    warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+

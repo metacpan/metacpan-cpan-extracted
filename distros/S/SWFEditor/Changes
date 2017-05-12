@@ -1,0 +1,59 @@
+Revision history for Perl extension SWFEditor
+
+0.09
+    2013-12-12
+        - update SWFED_VERSION from 0.60 to 0.61
+        - add test
+
+0.08
+    2013-02-14
+        - update SWFED_VERSION from 0.59 to 0.60
+
+0.07
+    2012-12-18
+        - fix retval
+
+0.06
+    2012-11-23
+        - update SWFED_VERSION from 0.58 to 0.59
+
+0.05
+    2012-08-09
+        - update SWFED_VERSION from 0.57 to 0.58
+        - add some test
+
+0.04_01
+    2012-05-07
+        - change 'die' to 'croak'
+
+0.04
+    2012-04-18
+        - update SWFED_VERSION from 0.56 to 0.57
+
+0.03_01
+    2012-04-11
+        - fix Makefile.PL
+        - add some test
+        - add func replace_mld_data
+        - fix some leak bug
+        - fix pod
+
+0.03
+    2012-04-07
+        - fix MANIFEST
+
+0.02_01
+    2012-04-06
+        - add MANIFEST.SKIP
+
+0.02
+    2012-04-06
+        - fix pod
+        - fix get_bitmap_size bug
+        - fix some memory leak (thanks typestar)
+        - update SWFED_VERSION from 0.55 to 0.56
+        - add test
+
+0.01
+    2012-03-28
+        - initial release

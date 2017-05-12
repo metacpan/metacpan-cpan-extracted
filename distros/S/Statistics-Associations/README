@@ -1,0 +1,27 @@
+This is Perl module Statistics::Associations.
+
+INSTALLATION
+
+Statistics::Associations installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Statistics::Associations
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+Statistics::Associations documentation is available as in POD. So you can do:
+
+    % perldoc Statistics::Associations
+
+to read the documentation online with your favorite pager.
+
+takeshi miki

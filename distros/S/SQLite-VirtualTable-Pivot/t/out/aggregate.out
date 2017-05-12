@@ -1,0 +1,24 @@
+load_extension('perlvtab.so')
+
+
+select id, count(1) from pivoted group by 1;
+id|count(1)
+1|1
+2|1
+3|1
+4|1
+select shape, count(1) from pivoted group by 1;
+shape|count(1)
+round|3
+square|1
+select color, count(1) from pivoted group by 1;
+color|count(1)
+blue|2
+brown|1
+yellow|1
+select shape,color, count(1) from pivoted group by 1,2;
+shape|color|count(1)
+round|blue|2
+round|brown|1
+square|yellow|1
+

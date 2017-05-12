@@ -1,0 +1,8 @@
+Revision history for Perl extension Statistics::Test::RandomWalk
+
+0.02  Fri Dec 31 19:00 2010
+  - Example for testing an integer RNG
+  - Add rescaling factor
+
+0.01  Sat Jan  6 18:33 2007
+  - original version

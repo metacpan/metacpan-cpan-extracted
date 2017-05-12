@@ -1,0 +1,652 @@
+#!/usr/local/bin/perl5
+
+use SGI::FAM;
+use MD5;
+use IO::File;
+use Getopt::Mixed qw(getOptions);
+use File::Basename qw(basename dirname fileparse);
+use File::PathConvert qw(realpath);
+my $have_vc_rcs_file=1;
+eval {require VC::Rcs::File};
+if ($@ and $@ =~ /Can\'t locate/) {
+  $have_vc_rcs_file=0;
+} elsif ($@) {
+  die;
+}
+
+use strict;
+use integer;
+use vars qw($opt_h $opt_v $opt_d $opt_s $opt_r $opt_t $opt_u $opt_g
+	    $opt_c $opt_x $opt_w $opt_l $opt_dwim $syslevel $sig);
+# $syslevel is current syslog seriousness level
+# $sig is current signal
+
+my ($logseq, $fam, $md5, %md5, %monitor, %discard)=(0, undef, new MD5);
+# $logseq is logging sequencer
+# $fam is FAM handle
+# $md5 is MD5 context (reusable)
+# %md5 is hash from file names to last-seen MD5 hashes
+# %monitor is map from monitored file or dir names, to 1.
+# %discard is map from full path names to time_t of last modification.
+
+sub msg($;$;) {
+  my ($text, $reqd)=@_;
+  return unless $reqd or $opt_v;
+  if ($opt_s) {
+    syslog($syslevel, "$0: (%04d) $text", ++$logseq);
+  } else {
+    print STDERR "$0 (" . localtime() . "): $text\n";
+  }
+}
+
+sub excluded($;) {
+  my ($path)=@_;
+  msg("Excluding $path (nonexistent)"), return 1 unless -e $path;
+  msg("Excluding $path (special file)"), return 1 unless -d _ or -f _;
+  msg("Excluding $path (RCS directory)"), return 1 if -d _ and basename($path) eq 'RCS';
+  msg("Excluding $path (binary file)"), return 1 if -f _ and $opt_t and -s _ and -B _;
+  msg("Excluding $path (regex match)"), return 1 if $opt_x and $path =~ /$opt_x/o;
+  0;
+}
+
+sub chmog($$$) {
+  my ($path, $mode, $serious)=@_;
+  return unless $opt_u or $opt_g or $mode;
+  msg sprintf "Chmog $path: mode=%s%06o user=%s group=%s",
+  ($mode < 0 ? '&' : '|'), abs($mode),
+  (defined $opt_u ? $opt_u : ''), (defined $opt_g ? $opt_g : '');
+  my $warn_or_die=sub {
+    my ($msg)=@_;
+    $msg .= ": $!" if $!;
+    if ($serious) {
+      die $msg;
+    } else {
+      warn $msg;
+    }
+  };
+  my @stat=stat $path or (&$warn_or_die("Stat $path"), return);
+  if ($opt_u or $opt_g) {
+    my ($user, $group)=@stat[4, 5];
+    $user=$opt_u if $opt_u;
+    $group=$opt_g if $opt_g;
+    chown $user, $group, $path or (&$warn_or_die("Chown $user.$group $path"), return);
+    $discard{$path}{change}=time;
+  }
+  if ($mode) {
+    use integer;
+    my $omode=$stat[2] & 077777;
+    if ($mode > 0) {
+      $omode |= $mode;
+    } else {
+      $omode &= ~(-$mode);
+    }
+    chmod $omode, $path or (&$warn_or_die(sprintf("Chmod %06o $path", $omode)), return);
+    $discard{$path}{change}=time;
+  }
+}
+
+sub rcsperm($;) {
+  my ($file)=@_;
+  chmog $file, 0200 | (defined($opt_g) ? 0020 : 0), 1;
+  my ($base, $dir)=fileparse($file);
+  chmog "${dir}RCS/$base,v", 0, 0;
+}
+
+sub md5($;) {
+  my ($file)=@_;
+  $md5->reset;
+  $md5->addfile(IO::File->new($file) or die "Open $file: $?$!");
+  $md5->hexdigest;
+}
+
+sub rcscommit($;) {
+  my ($file)=@_;
+  my $newmd5=md5 $file;
+  if ($md5{$file} eq $newmd5) {
+    msg "Skipping commit on $file (unchanged: $newmd5)";
+    return;
+  }
+  msg "Committing changes to $file ($md5{$file} -> $newmd5)";
+  my ($author, $message);
+  if ($opt_l) {
+    my $log=new IO::File "$file.log";
+    if ($log) {
+      my @lines=<$log>;
+      if (@lines) {
+	if ($lines[0] =~ /^-(.*)$/) {
+	  shift @lines;
+	  $author=$1;
+	}
+	if (@lines) {
+	  $message=join '', @lines;
+	}
+      }
+      $log=new IO::File ">$file.log";
+      if ($log) {
+	print $log "-$author\n" if $author;
+      } else {
+	warn "Clearing of $file.log failed: $!";
+      }
+    } else {
+      msg "No log file available for $file: $!";
+    }
+  }
+  $author ||= 'magicrcs';
+  $message ||= '# (magicrcs)';
+  system qw{ci -u -q}, "-w$author", "-m$message", $file
+    and die "RCS checkin of $file failed: $?";
+  $discard{$file}{change}=time;
+  rcsperm $file;
+  # Might have keyword substs...
+  my $newnewmd5=$md5{$file}=md5 $file;
+  msg "New MD5 for $file (post-checkin): $newnewmd5" unless $newmd5 eq $newnewmd5;
+}
+
+sub rcsinit($;) {
+  my ($file)=@_;
+  my ($base, $dir)=fileparse($file);
+  my $rcs="${dir}RCS/$base,v";
+  if (-f $rcs) {
+    # Appears to already be under control. Ensure it is unlocked.
+    my $locked;
+    if ($have_vc_rcs_file) {
+      my $locks=VC::Rcs::File->new($rcs)->{locks};
+      $locked=$locks && %$locks;
+    } else {
+      # Alternate.
+      $locked=`rlog -L -R $rcs`;
+    }
+    if ($locked) {
+      msg "Stealing lock on $file", 1;
+      system qw{rcs -u -M -q}, $file
+	and die "RCS stealing lock on $file failed: $?";
+    }
+    msg "$file is already under RCS control";
+    system qw{rcs -U -q}, $file
+      and die "RCS setting to non-strict of $file failed: $?";
+    msg "RCS-restored MD5 for $file: " . ($md5{$file}=md5 "co -r -q -p $file |");
+    rcscommit $file;
+    rcsperm $file;
+  } else {
+    msg "Putting $file under RCS control";
+    system qw{ci -i -u -q -wmagicrcs -t-(magicrcs)}, $file
+      and die "RCS initial checkin of $file failed: $?";
+    msg "Initial MD5 for $file: " . ($md5{$file}=md5 $file);
+    $discard{$file}{change}=time;
+    rcsperm $file;
+  }
+  if ($opt_l) {
+    new IO::File ">$file.log" or die "Creation of $file.log failed: $!";
+    chmog "$file.log", 0220, 1;
+    $discard{"$file.log"}{change}=time;
+  }
+  system qw{rcs -U -q}, $file
+    and die "RCS setting to non-strict of $file failed: $?";
+}
+
+sub monitor($$) {
+  my ($_path, $why)=@_;
+  my $path=realpath($_path) or die "Resolution error at $File::PathConvert::resolved";
+  my $again=($monitor{$path} ? " (again)" : '');
+  msg "Monitoring $path ($why)$again";
+  $monitor{$path}=$why unless $again;
+  sub make_rcs($;) {
+    my ($basedir)=@_;
+    mkdir "$basedir/RCS", 0777 or die "mkdir $basedir/RCS 0777: $!"
+      unless -d "$basedir/RCS";
+    chmog "$basedir/RCS", 0, 0;
+  }
+  if (-d $path) {
+    $fam->monitor($path);
+    chmog $path, 0, 0;
+    make_rcs $path;
+  } else {
+    my $dir=dirname($path);
+    make_rcs $dir;
+    $fam->monitor($dir);
+    rcsinit $path;
+  }
+}
+
+sub cleanup() {
+  undef $fam;			# Close connection
+  my @_files=keys %monitor;
+  undef %monitor;
+  undef %md5;
+  undef %discard;
+  return unless $opt_c;
+  my @files=grep {-f $_} @_files;
+  msg "Cleaning up: @files";
+  foreach (@files) {
+    system qw{rcs -L -q}, $_
+      and die "RCS reverting to strict mode for $_ failed: $?";
+    rcsperm $_;
+    chmog $_, -0222, 0;
+    unlink "$_.log" or warn "Delete $_.log failed: $!" if $opt_l;
+  }
+}
+
+sub init() {
+  $fam=new SGI::FAM;
+  foreach (@ARGV) {
+    monitor $_, 'explicit';
+  }
+  if ($opt_r) {
+    require File::Find;
+    $File::Find::name=$File::Find::name; $File::Find::prune=$File::Find::prune; # -w
+    File::Find::find
+      (sub {
+	 my $test=excluded $_;
+	 if ($test) {
+	   $File::Find::prune=1 if -d;
+	 } else {
+	   monitor $File::Find::name, 'implicit';
+	 }
+       }, grep {
+	 if (-d) {
+	   msg "Searching $_";
+	   1;
+	 } else {
+	   0;
+	 }
+       } @ARGV);
+  }
+  msg 'Ready', 1;
+}
+
+sub event() {
+  my $ev=$fam->next_event;
+  my ($file, $type, $which)=($ev->filename, $ev->type, $fam->which($ev));
+  my $path=realpath($file eq $which ? $file : "$which/$file")
+    or die "Resolution failure at $File::PathConvert::resolved";
+  return unless $type eq 'change' and -f $path or $type eq 'create';
+  return if $file eq 'RCS' and -d $path;
+  if (exists $discard{$path}{$type} and $discard{$path}{$type} >= time - $opt_w) {
+    msg "Discarding recent $type event for $path";
+    return;
+  }
+  if ($path =~ s/\.log$//) {
+    if ($type eq 'create') {
+      msg "New log file for $path";
+    } else {
+      msg "Log file for $path changed";
+    }
+    return;
+  }
+  if ($type eq 'change' and not $monitor{$path}) {
+    msg "$type event on $path ignored";
+    return;
+  }
+  # Dispatching.
+  msg "Received $type event for $path";
+  if ($type eq 'create') {
+    return if excluded $path;
+    monitor $path, 'new';
+  }
+  if (-f $path) {
+    if ($type eq 'create') {
+      rcsinit $path;
+    } else {
+      # Change.
+      rcscommit $path;
+    }
+  } elsif (not -d $path) {
+    msg "Ignoring special file $path";
+  }
+}
+
+sub debug_dump() {
+  require Data::Dumper;
+  my $dump=new Data::Dumper [$fam, \%md5, \%monitor, \%discard],
+  [qw(fam *md5 *monitor *discard)];
+  # $dump->Indent(0);
+  $dump->Useqq(1);
+  my $msg=$dump->Dump;
+  $msg =~ s/%/%%/g if $opt_s;
+  msg 'Dumping internal data...', 1;
+  foreach (split /\n/, $msg) {
+    msg $_, 1;
+  }
+}
+
+sub handler {
+  $sig=shift;
+  # Trigger an event somewhere to speed response. If it fails, oh well.
+  unless ($fam and $fam->pending) {
+    my ($file)=grep {-f} keys %monitor;
+    if ($file) {
+      my $mode=(stat $file)[2];
+      if ($mode) {
+	chmod $mode, $file;
+      }
+    }
+  }
+}
+
+getOptions(q(h help>h d detach>d v verbose>v s:s syslog>s r recursize>r dwim l log>l
+	     t text>t u=s user>u g:s group>g c cleanup>c x=s exclude>x w=i wait>w));
+if ($opt_dwim) {
+  $opt_c=$opt_r=$opt_d=$opt_t=$opt_l=1;
+  $opt_s ||= '';
+  $opt_g ||= '';
+  # Dotfiles are bogus. _ files may be RCS crap.
+  # Emacs backups, sundry crap.
+  # Junk dirs should be skipped.
+  my $re=q/^[._]|([~\#]|\.(bak|tmp|old|log))$|^junk$/;
+  if ($opt_x) {
+    $opt_x=qq/($opt_x)|$re/;
+  } else {
+    $opt_x=$re;
+  }
+}
+$opt_s ||= q(info) if defined $opt_s;
+$syslevel=$opt_s;
+$opt_w ||= 1;
+
+use autouse Pod::Usage => qw(pod2usage);
+pod2usage(VERBOSE => 1) if $opt_h or not @ARGV or ($opt_s and not $opt_d);
+
+if ($opt_u and $opt_u =~ /\D/) {
+  defined($opt_u=(getpwnam $opt_u)[2]) or die "Get numeric UID: $!";
+}
+if ($opt_g and $opt_g =~ /\D/) {
+  defined($opt_g=(getgrnam $opt_g)[2]) or die "Get numeric GID: $!";
+}
+
+if ($opt_d) {
+  my $pid=fork;
+  if ($pid) {
+    print STDERR "Detached process ID: $pid\n";
+    exit;
+  }
+  
+  if ($opt_s) {
+    require Sys::Syslog;
+    import Sys::Syslog;
+    openlog($0, q(pid cons), q(user));
+    $SIG{__DIE__}=sub {
+      $syslevel=q(err);
+      my $err=shift;
+      msg "$err (terminating)", 1;
+      closelog();
+      die "magicrcs[$$]: $err (terminating)";
+    };
+    $SIG{__WARN__}=sub {
+      local($syslevel)=q(warning);
+      my $err=shift;
+      msg $err, 1;
+    };
+  }
+  
+  setpgrp 0, 0 or die "Detaching: $!";
+  msg "Starting (@ARGV)", 1;
+}
+
+init;
+
+$SIG{USR1}=$SIG{INT}=$SIG{TERM}=$SIG{TSTP}=$SIG{ALRM}=\&handler;
+$sig=0;
+msg 'Beginning event loop';
+while (1) {
+  my $sig2=$sig;
+  $sig=0;
+  if ($sig2) {
+    local($SIG{USR1}, $SIG{INT}, $SIG{TERM}, $SIG{TSTP}, $SIG{ALRM});
+    if ($sig2 eq 'TSTP') {
+      cleanup;
+      msg 'Suspending', 1;
+      $SIG{ALRM}=\&handler;
+      sleep;
+      next;
+    } elsif ($sig2 eq 'INT' or $sig2 eq 'TERM') {
+      cleanup;
+      msg 'Stopping', 1;
+      closelog() if $opt_s;
+      exit;
+    } elsif ($sig2 eq 'ALRM') {
+      msg 'Resuming', 1;
+      init;
+      next;
+    } else {
+      # USR1
+      debug_dump;
+      next;
+    }
+  } else {
+    event;
+  }
+}
+
+__END__
+
+=head1 NAME
+
+B<magicrcs> - automatically monitor directories & files and keep them under RCS
+
+=head1 SYNOPSIS
+
+Recommended usage:
+
+F<magicrcs> B<--dwim> I<file> | I<directory> ...
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--cleanup> I<OR> B<-c>
+
+Try to clean up file permissions before script exits, assuming this is done with a
+polite B<SIGINT> or B<SIGTERM>. (See L</SIGNALS>.) Specifically, write permission is
+turned off RCS-controlled files, so that Emacs VC-mode will not subsequently be
+confused; RCS files are reverted to strict mode; and log files (under B<--log>) are
+deleted.
+
+=item B<--user=>I<user> I<OR> B<-u> I<user>
+
+Try to change ownership of modified working files back to user I<user>. May fail unless
+run as root. File will be made user-writable whether this option is specified or not.
+
+=item B<--group> [ B<=>I<group> ] I<OR> B<-g>[I<group>]
+
+Like B<--user>, but change group ownership, and also make sure file is
+group-writable. If I<group> is omitted, just change the permission bit.
+
+=item B<--recursive> I<OR> B<-r>
+
+Recursively monitor all subdirectories and files within specified directories. This
+flag only takes effect when this script starts up, and is analogous to something like:
+
+  magicrcs `find dir1/ dir2/ ... -print` file1 file2 ...
+
+except F<RCS> subdirectories are excluded, &c.
+
+=item B<--text> I<OR> B<-t>
+
+Only I<automatically> start monitoring text files, not binary files. Useful if there
+are graphics, tar files, core dumps, &c. in the vicinity. Does not affect files
+explicitly mentioned on the command line.
+
+=item B<--exclude=>I<regex> I<OR> B<-x> I<regex>
+
+Do not I<automatically> start monitoring files or subdirectories whose names match this
+(Perl 5) regular expression. Should only be specified once, but that is what regex
+alternatives are for. Like B<--text>.
+
+You will almost certainly want this to include Emacs backup and autosave files; things
+like F<*.bak>; etc.
+
+=item B<--help> I<OR> B<-h>
+
+Show a synopsis.
+
+=item B<--detach> I<OR> B<-d>
+
+Detach after starting, in daemon fashion. This is the recommended usage.
+
+=item B<--syslog> [ B<=>I<level> ] I<OR> B<-s>[I<level>]
+
+Log messages to SYSLOG rather than standard error. Only meaningful in daemon mode
+(B<--detach>). Optional I<level> (default B<INFO>) sets logging level, which may affect
+visibility on the system log depending on its configuration (F</etc/syslog.conf>).
+
+=item B<--log> I<OR> B<-l>
+
+Permit external-file log messages. See L</Log Messages>.
+
+=item B<--verbose> I<OR> B<-v>
+
+Generate verbose messages about what is happening.
+
+=item B<--wait=>I<timeout> I<OR> B<-w> I<timeout>
+
+Wait for I<timeout> seconds of quiescence (default one second) before acknowledging
+further events on a file. This option may improve performance in some cases, though
+probably not dramatically. If it is too large, some changes to a file may not be
+noticed.
+
+=item B<--dwim>
+
+Do What I Mean. Sets B<--cleanup>, B<--log>, B<--group>, B<--recursive>, B<--text>,
+B<--exclude> (to a reasonable value, as well as your own excludes if any), B<--detach>,
+and B<--syslog>.
+
+=back
+
+=head1 DESCRIPTION
+
+F<magicrcs> is intended to run as a background process that will use the SGI File
+Access Monitor library to observe given files or directory trees and keep them
+transparently under RCS control. Files remain writable, but unlocked. Thus, the
+archival aspects of RCS can be retained in an environment where manual checkins and
+other operations are impractical.
+
+Selecting the correct invoking user, and combination of B<--user> and B<--group>
+options, may require experimentation if this script is to be useful in a multiuser
+environment, due to complexities of permissions interactions. These two options will
+also attempt to set ownership of monitored directories and RCS control files.
+
+You should be able to edit these files in Emacs even with VC Mode enabled (as it is by
+default); the RCS version at the time of first visitation will appear, and should be
+ignored as it will not stay in synch (unless you do a C<M-x revert-buffer>). But do not
+try to check monitored files in or out explicitly with Emacs, or all hell will break
+loose; just save the buffer whenever you want (which should not be write-protected
+assuming you have user or group access to the file). Hopefully, there will not be
+problems. If you need to log a message, though, or perform any fancy RCS operations,
+you will want to shut down this script first (and probably wanted B<--cleanup>
+specified to begin with).
+
+=head2 For each file monitored...
+
+=over 4
+
+=item Startup
+
+The file is put under RCS if it is not already. This script expects the RCS file for
+F<foo> to be named F<RCS/foo,v> and may not work correctly if it is not.
+
+=item File Changed
+
+Each change event, i.e. each time the contents of the file are changed, will deposit a
+new RCS revision. The author and log message indicate that the checkin was automated.
+
+Permissions on the file should be untouched, so you can continue editing freely.
+
+=item File Deleted
+
+Nothing happens to the RCS file. If the file is recreated, however, deposits will
+resume where they left off.
+
+=back
+
+=head2 For each directory monitored...
+
+=over 4
+
+=item Startup
+
+This script will ensure the existence of an RCS subdirectory. Files currently in the
+directory, and subdirectories recursively, are also automatically monitored if you
+provide the B<--recursive> flag, just as if they had been specified on the command
+line.
+
+=item New File or Subdirectory
+
+Monitoring begins on any new files or subdirectories (unless a file is binary and
+B<--text> was specified, or it matches B<--exclude>). Note that this happens whether
+B<--recursive> was given or not. If you never want I<any> new files to be put under
+RCS, you should not specify any directory names on the command line.
+
+=item Subdirectory Deleted
+
+Nothing special is done.
+
+=back
+
+=head2 Log Messages
+
+If B<--log> is given, the script will permit external files to be used to create RCS
+log messages. For each file F<foo> placed under RCS control, a separate file F<foo.log>
+will be created. If you want to register a log message with an RCS deposit of F<foo>,
+I<first> write it into F<foo.log>, save F<foo.log>, then save F<foo>. The contents of
+F<foo.log> will be used for the RCS log message. If the first line is of the form:
+
+B<  ->I<author>
+
+(a dash followed by some text) then I<author> will be used as the RCS author, as
+well. The F<foo.log> file is cleared (except for the author line, if present) after
+making the deposit.
+
+You may save the log file at any time. It will only be used if the message has been
+re-entered since the last deposit.
+
+=head1 SIGNALS
+
+=over 4
+
+=item B<INT> or B<TERM> (I<Ctrl-C> if undetached; else B<kill> ...)
+
+Stops the script, after cleaning up if requested.
+
+=item B<TSTP> and B<ALRM> (B<kill -TSTP> ... and B<kill -ALRM> ...)
+
+Suspend and resume (resp.); clean up and reinitialize as if the script were actually
+restarted. Handy if you need to do some special RCS operation but do not want to
+manually restart.
+
+=item B<USR1> (B<kill -USR1> ...)
+
+Log internal debugging information.
+
+=back
+
+=head1 BUGS
+
+Due to polling delays, monitoring NFS-mounted areas may be problematic if the NFS
+server is not also running Irix (or if it is just not running the FAM daemon). Try
+adjusting B<--wait> to a larger amount according to the poll settings on your FAM
+daemon; this is typically set to six seconds to provide a balance of load minimization
+and accuracy, so B<--wait> should be somewhat larger. See L<fam(1m)>.
+
+There are probably a variety of miscellaneous bugs here and there.
+
+The script is not as efficient as it could be; it sometimes invokes RCS gratuitously,
+usually at startup.
+
+This should really use some RCS XSUB library.
+
+=head1 SEE ALSO
+
+See L<SGI::FAM(3)> for the workings; for RCS, see L<rcsintro(1)>; for logging,
+L<syslog(3)> and the resultant logfile, typically F</var/adm/SYSLOG>; regular
+expressions, see L<perlre(1)>.
+
+=head1 AUTHORS
+
+J. Glick B<jglick@sig.bsh.com>.
+
+=head1 REVISION
+
+X<$Format: "F<$Source$> last modified $Date$ release $ProjectRelease$. $Copyright$"$>
+F<magicrcs> last modified Thu, 25 Sep 1997 22:56:42 -0400 release 1.002. Copyright (c) 1997 Strategic Interactive Group. All rights reserved. This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut

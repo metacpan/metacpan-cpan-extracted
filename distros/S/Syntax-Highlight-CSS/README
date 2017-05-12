@@ -1,0 +1,51 @@
+Syntax-Highlight-CSS
+
+The module takes CSS code and wraps different pieces of syntax into
+HTML C<< <span> >> elements with appropriate class names which enables
+you to highlight syntax of the snippet using.. CSS ^_^
+
+I honestly suggest you to try L<Syntax::Highlight::Engine::Kate::CSS>
+first and see if it does what you want. Personally, I found that it
+wasn't interpeting C<@media> blocks properly, but I could've been
+DoingItWrong. In constrast, with L<Syntax::Highlight::Engine::Kate::CSS>
+you will be able to differentiate between B<more> syntax elements than
+with this module.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Syntax::Highlight::CSS
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Syntax-Highlight-CSS
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Syntax-Highlight-CSS
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Syntax-Highlight-CSS
+
+    Search CPAN
+        http://search.cpan.org/dist/Syntax-Highlight-CSS
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Zoffix Znet
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

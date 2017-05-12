@@ -1,0 +1,46 @@
+#!/usr/bin/env perl
+## no critic (RequireUseStrict, RequireUseWarnings)
+use Shell::Tools::Extra Shell=>[ 'which', [xfile=>'file'] ];
+use warnings FATAL=>'IPC::Run3::Shell';
+use autodie qw/chdir readlink/;
+
+# This tool is a demo of the Perl module Shell::Tools.
+
+=head1 ABOUT
+
+Extension of L<which(1)> that calls L<file(1)> and follows symlinks around.
+
+ $ follow x-www-browser
+ /usr/bin/x-www-browser: symbolic link to `/etc/alternatives/x-www-browser'
+ /etc/alternatives/x-www-browser: symbolic link to `/usr/bin/firefox'
+ /usr/bin/firefox: symbolic link to `../lib/firefox/firefox.sh'
+ /usr/lib/firefox/firefox.sh: POSIX shell script text executable
+
+=head1 SYNOPSIS
+
+ follow [-v] FILENAME
+ 
+ -v  - verbose (show what commands are being invoked)
+
+=cut
+
+our $VERSION = 0.04;
+getopts('v', \my %opts) or pod2usage;
+pod2usage unless @ARGV==1 && $ARGV[0];
+
+my $fn = which $ARGV[0], {chomp=>1, show_cmd=>$opts{v}}
+	or croak "'which' didn't return anything";
+print "$fn\n" if $opts{v};
+
+while (1) {
+	my $dir;
+	($fn,$dir) = fileparse($fn);
+	if ( canonpath($dir) ne curdir ) {
+		print "\$ cd $dir\n" if $opts{v};
+		chdir $dir;
+	}
+	xfile -h, $opts{v} ? $fn : rel2abs($fn), {show_cmd=>$opts{v}};
+	-l $fn or last;
+	$fn = readlink $fn;
+}
+

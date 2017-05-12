@@ -1,0 +1,54 @@
+{
+   "abstract" : "Smart match friendly tests.",
+   "author" : [
+      "Leon Timmermans <fawaka@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200000, CPAN::Meta::Converter version 2.101670",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "SmartMatch-Sugar",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "Class::Inspector" : 0,
+            "Scalar::Util" : 0,
+            "Sub::Exporter" : 0,
+            "constant" : 0,
+            "overload" : 0,
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : 0,
+            "ok" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-smartmatch-sugar at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=SmartMatch-Sugar"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Leont/smartmatch-sugar.git",
+         "web" : "http://github.com/Leont/smartmatch-sugar"
+      }
+   },
+   "version" : "0.05"
+}
+

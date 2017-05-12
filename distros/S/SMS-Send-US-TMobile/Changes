@@ -1,0 +1,14 @@
+Revision history for SMS-Send-US-TMobile
+
+0.0.3  Sun Dec 16 11:15:41 2007
+       more tests to make updates for web site easier to do
+       Update for latest tmobile site
+
+0.0.2  Sun Tue Jul 22 09:04:37 2007
+       added overlooked new(), weird
+       make _from required as croak as per driver
+       return 0; instead of return; as per way driver mishandles $rv of send_sms
+
+0.0.1  Sat Jul 21 22:47:00 2007
+       Initial release.        
+

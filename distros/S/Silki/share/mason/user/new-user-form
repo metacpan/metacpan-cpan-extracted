@@ -1,0 +1,10 @@
+<& /lib/forms/user.mas, action => '/users' &>
+
+<%attr>
+show_title => 0
+sidebar => []
+</%attr>
+
+<%method title>
+<% loc( 'Register as a New User' ) %>
+</%method>

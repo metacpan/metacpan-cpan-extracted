@@ -1,0 +1,31 @@
+---
+abstract: 'KinoSearch query dialect'
+author:
+  - 'Peter Karman <karman@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Search-Query-Dialect-KSx
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  KinoSearch: '0.31'
+  Moo: '0'
+  Search::Query: '0.300'
+  Test::More: '0'
+  perl: '5.008003'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Search-Query-Dialect-KSx
+  homepage: https://github.com/karpet/search-query-dialect-ksx
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/karpet/search-query-dialect-ksx
+version: '0.201'

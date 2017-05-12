@@ -1,0 +1,13 @@
+[% IF (complexType.get_variety == 'all');
+    INCLUDE complexType/POD/all.tt(complexType = complexType);
+ELSIF (complexType.get_variety == 'sequence');
+    INCLUDE complexType/POD/all.tt(complexType = complexType);
+ELSIF (complexType.get_variety == 'group');
+    THROW NOT_IMPLEMENTED, "${ element.get_name } - complexType group not implemented yet";
+ELSIF (complexType.get_variety == 'choice');
+    INCLUDE complexType/POD/choice.tt(complexType = complexType);
+ELSIF (complexType.get_contentModel == 'simpleContent');
+    INCLUDE complexType/POD/structure/simpleContent.tt(complexType = complexType);
+ELSIF (complexType.get_contentModel == 'complexContent');
+    INCLUDE complexType/POD/complexContent.tt(complexType = complexType);
+END -%],

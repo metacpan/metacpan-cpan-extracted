@@ -1,0 +1,1 @@
+Improve test suite coverage for Scalar::Does::MooseTypes. (Scalar::Does itself has 100% coverage according to Devel::Cover.)

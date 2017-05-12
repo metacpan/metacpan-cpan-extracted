@@ -1,0 +1,19 @@
+---
+global:
+  name: ShipIt-Step-ApplyYAMLChangeLogVersion
+releases:
+  - author: 'Marcel Gruenauer <marcel@cpan.org>'
+    changes:
+      - set the version to 0.02
+      - also set the version on the shipit state object so it's available in other steps down the chain
+      - fixed Changes file
+    date: 2007-11-17T15:27:37Z
+    tags: []
+    version: 0.02
+  - author: 'Marcel Gruenauer <marcel@cpan.org>'
+    changes:
+      - original version
+      - documented that this step works well together with Dist::Joseki's 'dist change'-style development
+    date: 2007-11-17T15:24:42Z
+    tags: []
+    version: 0.01

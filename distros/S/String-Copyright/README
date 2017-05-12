@@ -1,0 +1,95 @@
+NAME
+    String::Copyright - Representation of text-based copyright statements
+
+VERSION
+    Version 0.003005
+
+SYNOPSIS
+        use String::Copyright;
+
+        my $copyright = copyright(<<'END');
+        copr. © 1999,2000 Foo Barbaz <fb@acme.corp> and Acme Corp.
+        Copyright (c) 2001,2004 Foo (work address) <foo@zorg.corp>
+        Copyright 2003, Foo B. and friends
+        © 2000, 2002 Foo Barbaz <foo@bar.baz>
+        END
+
+        print $copyright;
+
+        # Copyright 1999-2000 Foo Barbaz <fb@acme.com> and Acme Corp.
+        # Copyright 2000, 2002 Foo Barbaz and Acme Corp.
+        # Copyright 2001, 2004 Foo (work address) <foo@zorg.org>
+        # Copyright 2003 Foo B. and friends
+
+DESCRIPTION
+    String::Copyright Parses common styles of copyright statements and
+    serializes in normalized format.
+
+OPTIONS
+    Options can be set as an argument to the 'use' statement.
+
+  threshold, threshold_before, threshold_after
+        use String::Copyright { threshold_after => 5 };
+
+    Stop parsing after this many lines whithout copyright information, before
+    or after having found any copyright information at all. `threshold` sets
+    both `threshold_before` and `threshold_after`.
+
+    By default unset: All lines are parsed.
+
+  format( \&sub )
+        use String::Copyright { format => \&NGU_style } };
+
+        sub GNU_style {
+            my ( $years, $owners ) = @_;
+
+            return 'Copyright (C) ' . join '  ', $years || '', $owners || '';
+        }
+
+FUNCTIONS
+    Exports one function: `copyright`. This module uses Exporter::Tiny to
+    export functions, which allows for flexible import options; see the
+    Exporter::Tiny documentation for details.
+
+SEE ALSO
+    *   Encode
+
+    *   Exporter::Tiny
+
+BUGS/CAVEATS/etc
+    String::Copyright operates on strings, not bytes. Data encoded as UTF-8,
+    Latin1 or other formats need to be decoded to strings before use.
+
+    Only ASCII characters and © (copyright sign) are directly processed.
+
+    If copyright sign is mis-detected or accents or multi-byte characters
+    display wrong, then most likely the data was not decoded into a string.
+
+    If ranges or lists of years are not tidied, then maybe it contained
+    non-ASCII whitespace or digits.
+
+AUTHOR
+    Jonas Smedegaard `<dr@jones.dk>`
+
+COPYRIGHT AND LICENSE
+    Derived from App::Licensecheck originally part of the KDE SDK, originally
+    introduced by Stefan Westerfeld `<stefan@space.twc.de>`; and on the script
+    licensecheck2dep5 part of Debian CDBS tool, written by Jonas Smedegaard.
+
+      Copyright © 2007, 2008 Adam D. Barratt
+
+      Copyright © 2005-2012, 2016 Jonas Smedegaard
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the Free
+    Software Foundation; either version 3, or (at your option) any later
+    version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+    or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program. If not, see <https://www.gnu.org/licenses/>.
+

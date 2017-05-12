@@ -1,0 +1,419 @@
+=head1 NAME
+
+SPOPS::Manual::Security - SPOPS security system and how you can customize
+
+=head1 SYNOPSIS
+
+This part of the SPOPS manual deals with the last 'S' in SPOPS --
+Security. It is one of the main features that sets SPOPS apart from
+other serialization schemes as well as one of the most
+confusing. Hopefully we'll be able to clear up any confusion and
+provide some concrete examples.
+
+This document should answer the following questions:
+
+=over 4
+
+=item *
+
+How does security work?
+
+=item *
+
+How does security use users and groups?
+
+=item *
+
+How does SPOPS implement security?
+
+=item *
+
+How can I implement security?
+
+=item *
+
+How can I customize security?
+
+=back
+
+=head1 DESCRIPTION
+
+Security is implemented with a number of methods that are called
+within the SPOPS implementation module. For instance, every time you
+call C<fetch()> on an object, SPOPS first determines whether you have
+rights to do so. Similar callbacks are located in C<save()> and
+C<remove()>. Unmodified and uninformed of how your users and groups
+work, SPOPS always allows all actions. You will need to let SPOPS know
+about your users and groups before you can use security.
+
+We use the Unix-style of permission scheme, separating the scope into:
+USER, GROUP and WORLD from most- to least-specific. (This is
+abbreviated as U/G/W.) When we check permissions, we check whether a
+security level is defined for the most-specific item first, then work
+our way up to the least_specific. (We use the term 'scope' frequently
+in the module and documentation -- a 'specific scope' is a particular
+user or group, or the world.)
+
+Even though we use the U/G/W scheme from Unix, we are not constrained
+by its history. There is no strict 'ownership' assigned to an object
+as there is to a Unix file. Instead, an object can have assigned to
+it permissions from any number of users, and any number of groups.
+
+There are four levels for any object combined with a specific scope:
+
+ NONE:    The scope is barred from even seeing the object.
+ SUMMARY: The scope can see an object, but possibly not all of it.
+ READ:    The scope can read the object but not save it.
+ WRITE:   The scope can read, write and delete the object.
+
+(To be explicit: WRITE permission implies READ permission as well; if
+a specific scope has WRITE permission for an object, that specific
+scope can do anything with the object, including remove it.)
+
+Note that the C<SUMMARY> level is not required to be implemented, and
+many applications have no need of it. We skip it in most discussions
+below.
+
+=head2 Security Rules
+
+With security, there are some important assumptions. These
+rules are laid out here.
+
+=over 4
+
+=item *
+
+B<The most specific security wins.> This means that you might have set
+permissions on an object to be SEC_LEVEL_WRITE for SEC_LEVEL_WORLD,
+but if the user who is logged in has SEC_LEVEL_NONE, permission will
+be denied.
+
+=item *
+
+B<All objects must have a WORLD permission.> Configuration for your
+SPOPS object must include the B<initial_security> hash. The only
+required field is 'WORLD', which defines the default WORLD permission
+for newly-created objects. If you do not include this, the system will
+automatically set the WORLD permission to SEC_LEVEL_NONE, which is
+probably not what you want.
+
+=back
+
+For instance, look at an object that represents a news notice posted:
+
+ Object Class: MyApp::News
+ Object ID:    1625
+
+ ------------------------------------------------
+ | SCOPE | SCOPE_ID |  NONE  |  READ  |  WRITE  |
+ ------------------------------------------------
+ | USER  | 71827    |        |   X    |         |
+ | USER  | 6351     |   X    |        |         |
+ | USER  | 9182     |        |        |    X    |
+ | GROUP | 762      |        |   X    |         |
+ | GROUP | 938      |        |        |    X    |
+ | WORLD |          |        |   X    |         |
+ ------------------------------------------------
+
+From this, we can say:
+
+=over 4
+
+=item *
+
+User 6351 can B<never> view this notice. Even though the user might be
+a part of a group that can; even though WORLD has READ
+permission. Since the user is explicitly forbidden from viewing the
+notice, nothing else matters.
+
+=item *
+
+If a different User (say, 21092) who belongs to both Group 762 and
+Group 938 tries to determine permission for this object, that User
+will have WRITE permission since the system returns the highest
+permission granted by all Group memberships.
+
+=item *
+
+Any user who is not specified here and who does not belong to either
+Group 762 or Group 938 will get READ permission to the object, using
+the permission for the scope WORLD.
+
+=back
+
+=head2 Setting Security: User and Group Objects
+
+It is a fundamental tenet of this persistence framework that
+it should have no idea what your application looks like.
+However, since we deal with user and group objects, it is
+necessary to enforce some standards.
+
+=over 4
+
+=item *
+
+Must be able to retrieve the ID of the object with the method call
+'id'. The ID value can be numeric or it can be a string.
+
+=item *
+
+Must be able to get an arrayref of members. With a group object, you
+must implement a method that returns users called 'user'. Similarly,
+your user object must implement a method that returns the groups that
+user belongs to via the method 'group':
+
+  1:  # Note that 'login_name' is not required as a parameter; this is just
+  2:  # an example
+  3: 
+  4:  my $user_members = eval { $group->user };
+  5:  foreach my $user ( @{ $user_members } ) {
+  6:      print "Username is $user->{login_name}\n";
+  7:  }
+  8: 
+  9:  # Note that 'name' is not required as a parameter; this is just an
+ 10:  # example
+ 11: 
+ 12:  my $groups = eval { $user->group };
+ 13:  foreach my $group ( @{ $groups } ) {
+ 14:      print "Group name is $group->{name}\n";
+ 15:  }
+
+=item *
+
+Must be able to retrieve the logged-in user (and, by the rule stated
+above, the groups that user belongs to).  This is done via the
+C<global_user_current()> method call. The SPOPS object or other class
+must be able to fulfill this method and return a user object.
+
+=back
+
+=head1 CREATION SECURITY
+
+An object moving from the non-serialized to the saved state is a
+special case for security. We cannot determine in our usual manner
+what security the current user has because the object has not yet been
+created. Generally, we rely on the application to determine whether
+the user should be able to create an object at all. Once we get past
+that hurdle, we just need to figure out what permissions the object
+should have when it's first created. After that, we're set.
+
+The process for determining what security a newly created object
+should have can be simple, or it can be complicated :) It is designed
+to be flexible enough for us to easily plug-in security policy modules
+whenever we write them, but simple enough to be used just from the
+object configuration.
+
+Object security configuration information is specified in the
+'creation_security' hashref in the object configuration. A typical
+setup might look like:
+
+  creation_security => {
+     u   => undef,
+     g   => { 3 => 'WRITE' },
+     w   => 'READ',
+  },
+
+Each of the keys maps to a (hopefully intuitive) scope:
+
+ u = SEC_SCOPE_USER
+ g = SEC_SCOPE_GROUP
+ w = SEC_SCOPE_WORLD
+
+For each scope you can either name security specifically or you can
+defer the decision-making process to a subroutine. The former is
+called 'exact specification' and the latter 'code specification'. Both
+are described below.
+
+Note that the 'level' values used ('WRITE' or 'READ' above) do not
+match up to the SEC_LEVEL_* values exported from this module. Instead
+they are just handy mnemonics to use -- just lop off the 'SEC_LEVEL_'
+from the exported variable:
+
+ SEC_LEVEL_NONE    = 'NONE'
+ SEC_LEVEL_SUMMARY = 'SUMMARY'
+ SEC_LEVEL_READ    = 'READ'
+ SEC_LEVEL_WRITE   = 'WRITE'
+
+B<Exact specification>
+
+'Exact specification' does exactly that -- you specify the ID and
+security level of the users and/or groups, along with one for the
+'world' scope if you like. This is handy for smaller sites where you
+might have a small number of groups.
+
+The exact format is:
+
+ User and World
+
+   SCOPE => LEVEL
+
+ Group
+
+   SCOPE => ID => LEVEL,
+            ID => LEVEL, ... } }
+
+Where 'SCOPE' is 'u' or 'g', 'ID' is the ID of the group/user and
+'LEVEL' is the level you want to assign to that group/user. So using
+our example above:
+
+     g   => { 3 => 'WRITE' },
+
+We assign the security level SEC_LEVEL_WRITE to the group with ID 3.
+
+For the SEC_SCOPE_USER scope, if you specify a level:
+
+    u    => 'READ',
+
+Then that security level is assigned for the user who created the object.
+
+If you specify anything other than a level for the SEC_SCOPE_WORLD
+scope, the system will discard the entry and assign it the
+SEC_LEVEL_NONE level.
+
+B<Code specificiation>
+
+You can also assign the entire process off to a separate routine:
+
+  creation_security => {
+     code => [ 'My::Package' => 'security_set' ]
+  },
+
+This code should return a hashref formatted like this
+
+ {
+   u => SEC_LEVEL_*,
+   g => { gid => SEC_LEVEL_* },
+   w => SEC_LEVEL_*
+ }
+
+If you do not include a scope in the hashref, no security information
+for that scope will be entered. (Except for the world scope, which
+will get a SEC_LEVEL_NONE if it's not specified.)
+
+=head1 SECURITY OBJECT IMPLEMENTATION
+
+SPOPS comes with one implementation for security objects,
+L<SPOPS::Security::DBI|SPOPS::Security::DBI>. Implementations of the
+security object must implement the following methods.
+
+B<fetch_by_object( $object, \%params )>
+
+Find all security levels for a particular object and scope.
+
+You can restrict the security returned for USER and/or GROUP by
+passing an arrayref of objects or ID values under the 'user' or
+'group' keys.
+
+Parameters:
+
+=over 4
+
+=item B<user>
+
+A user object or ID.
+
+=item B<group>
+
+An arrayref of group of objects or group IDs.
+
+=item B<class>
+
+If you do not pass in an C<$object>, you can specify it by its class
+and ID. This should be a full object class name.
+
+=item B<object_id>
+
+If you do not pass in an C<$object>, you can specify it by its class
+and ID. This should be a full object ID.
+
+=back
+
+Examples:
+
+ my \%info = $sec->fetch_by_object( $obj );
+
+Returns all security information for $obj.
+
+ my \%info = $sec->fetch_by_object( $obj, { user  => 2,
+                                            group => [ 817, 901, 716 ] } );
+
+Returns $obj security information for WORLD, USER 2 and GROUPs 817,
+901, 716.
+
+ my $current_user = My::Object->global_user_current;
+ my \%info = $sec->fetch_by_object( undef, { class     => 'My::Object',
+                                             object_id => 'dandelion',
+                                             user      => $user,
+                                             group     => $user->group } );
+
+Returns security information for the object of class C<My::Object>
+with the ID C<dandelion> for the current user and the user's groups.
+
+Returns: a hashref with security information for C<$object> for a given
+scope. The keys of the hashref are SEC_SCOPE_WORLD, SEC_SCOPE_USER,
+and SEC_SCOPE_GROUP as exported by L<SPOPS::Secure|SPOPS::Secure>.
+
+B<fetch_match( \%params )>
+
+Returns a security object matching the $obj for the scope and scope_id
+passed in, undef if none found.
+
+Examples:
+
+ my $sec_class = 'My::Security';
+
+ # Returns security object matching $obj with a scope of WORLD
+
+ my $secw = $sec_class->fetch_match( $obj,
+                                     { scope => SEC_SCOPE_WORLD } );
+
+ # Returns security object matching $obj with a scope of GROUP
+ # matching the ID from $group
+ my $secg = $sec_class->fetch_match( $obj,
+                                     { scope    => SEC_SCOPE_GROUP,
+                                       scope_id => $group->id } );
+
+ # Returns security object matching $obj with a scope of USER
+ # matching the ID from $user
+ my $secg = $sec_class->fetch_match( $obj,
+                                     { scope    => SEC_SCOPE_USER,
+                                       scope_id => $user->id );
+
+=head1 SUBCLASSING AND CUSTOM SECURITY
+
+The SPOPS security scheme is flexbile enough for you to implement your
+own security. For instance, if you had a database of contacts for your
+national membership organization you might want to ensure that each
+state sees only the contacts within its state.
+
+To do this, you could simply create a C<get_security()> method in your
+contact class. A simplified example of what such a method might look
+something like:
+
+ sub get_security {
+     my ( $self, $p ) = @_;
+     my $log = get_logger();
+     my ( $user, $group_list ) = $self->get_security_scopes( $p );
+     if ( my $security_info = $self->_check_superuser( $user, $group_list ) ) {
+         $log->is_info &&
+             $log->info( "Superuser is logged in, can do anything" );
+         return $security_info;
+     }
+     if ( $self->{state} eq $user->{state} ) {
+         return { SEC_SCOPE_WORLD() => SEC_LEVEL_WRITE };
+     }
+     return { SEC_SCOPE_WORLD() => SEC_LEVEL_NONE };
+ }
+
+For a good example of what you can do with subclassing, see the code
+for the subclass L<SPOPS::Secure::Hierarchy|SPOPS::Secure::Hierarchy>.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2001-2004 Chris Winters. All rights reserved.
+
+See L<SPOPS::Manual|SPOPS::Manual> for license.
+
+=head1 AUTHORS
+
+Chris Winters E<lt>chris@cwinters.comE<gt>

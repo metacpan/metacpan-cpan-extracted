@@ -1,0 +1,27 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SDR-Radio-HackRF
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  AnyEvent: '0'
+  Math::Int64: 0.27_04
+  common::sense: '0'
+resources:
+  bugtracker: https://github.com/hoytech/SDR-Radio-HackRF/issues
+  repository: git://github.com/hoytech/SDR-Radio-HackRF.git
+version: '0.100'

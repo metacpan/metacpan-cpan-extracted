@@ -1,0 +1,33 @@
+Statistics-MVA version 0.0.2
+
+This module is a base module for the other modules in the Statistics::MVA namespace (e.g. Statistics::MVA::Bartlett,
+Statistics::MVA::Hotelling etc.). It is not intended for direct use - though it may be used for generating covariance matrices directly.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+'Carp' => '1.08',
+'Math::MatrixReal' => '2.05',
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010, Daniel S. T. Hughes
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

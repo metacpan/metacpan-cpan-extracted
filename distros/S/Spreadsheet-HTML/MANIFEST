@@ -1,0 +1,47 @@
+bin/benchmark-spreadsheet-html
+bin/mktable
+Changes
+lib/Spreadsheet/HTML.pm
+lib/Spreadsheet/HTML/Engine.pm
+lib/Spreadsheet/HTML/File/Loader.pm
+lib/Spreadsheet/HTML/Presets.pm
+lib/Spreadsheet/HTML/Presets/Animate.pm
+lib/Spreadsheet/HTML/Presets/Beadwork.pm
+lib/Spreadsheet/HTML/Presets/Calculator.pm
+lib/Spreadsheet/HTML/Presets/Chess.pm
+lib/Spreadsheet/HTML/Presets/Conway.pm
+lib/Spreadsheet/HTML/Presets/Handson.pm
+lib/Spreadsheet/HTML/Presets/List.pm
+lib/Spreadsheet/HTML/Presets/Scroll.pm
+lib/Spreadsheet/HTML/Presets/Sudoku.pm
+lib/Spreadsheet/HTML/Presets/TicTacToe.pm
+Makefile.PL
+MANIFEST			This list of files
+readme.md
+t/00-load.t
+t/03-encode-data.t
+t/06-theta.t
+t/07-theta-presets.t
+t/11-from-json.t
+t/12-from-yaml.t
+t/13-from-csv.t
+t/14-from-html.t
+t/15-from-xls.t
+t/16-from-png.t
+t/30-errors.t
+t/data/art.ascii
+t/data/list-bycol.csv
+t/data/list-byrow.csv
+t/data/map.json
+t/data/multiple.html
+t/data/multiple.xls
+t/data/simple-pipe.csv
+t/data/simple.csv
+t/data/simple.html
+t/data/simple.json
+t/data/simple.png
+t/data/simple.xls
+t/data/simple.yml
+t/README
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

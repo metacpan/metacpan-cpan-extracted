@@ -1,0 +1,14 @@
+LICENSE
+Changes
+Makefile.PL
+README
+TODO
+MANIFEST
+SIGNATURE
+lib/Software/Packager.pm
+lib/Software/Packager/Object.pm
+lib/Software/Packager/Tar.pm
+t/00_signature.t
+t/01_initialise.t
+t/02_tar.t
+example/example.pl

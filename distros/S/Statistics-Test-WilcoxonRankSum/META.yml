@@ -1,0 +1,32 @@
+--- #YAML:1.0
+name:               Statistics-Test-WilcoxonRankSum
+version:            0.0.7
+abstract:           perform the Wilcoxon (aka Mann-Whitney) rank sum test on two sets of numeric data.
+author:
+    - Ingrid Falk <ingrid dot falk at loria dot fr>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:                 0
+    Carp::Assert:         0
+    Class::Std:           0
+    Contextual::Return:   0
+    List::Util:           0
+    Math::BigFloat:       0
+    Math::Counting:       0
+    Set::Partition:       0
+    Statistics::Distributions:  0
+    Test::More:           0
+    version:              0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

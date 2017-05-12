@@ -1,0 +1,78 @@
+Revision history for Session-Storage-Secure
+
+0.010     2014-05-04 13:52:13-04:00 America/New_York
+
+    [ADDED]
+
+    - Added support for customizing options to Sereal encoder and decoder,
+      i.e. to allow object serialization for those willing to accept the
+      risks of doing so.  (Thanks to Breno de Oliveira for inspiration to
+      do this.)
+
+0.009     2014-04-17 17:15:25-04:00 America/New_York
+
+    [FIXED]
+
+    - Fixed bug that would cause custom encoding tests to fail
+      intermittently
+
+0.008     2014-04-17 16:29:50-04:00 America/New_York
+
+    [ADDED]
+
+    - Added support for keeping an array of old keys for decryption
+      (Tom Hukins)
+
+    - Added support for replacing MIME::Base64 encoding with user-specified
+      transport encoding/decoding, possibly with a custom separator
+
+    [INTERNAL]
+
+    - Update repository support and meta files
+
+0.007     2013-05-31 23:30:44 America/New_York
+
+    [FIXED]
+
+    - Replaced HMAC equality check with a constant-time comparison
+      to foil timing attacks
+
+0.006     2013-02-06 22:56:45 America/New_York
+
+    [FIXED]
+
+    - Made MooX::Types::MooseLike prereq explicit to try to address
+      prereqs failures by some testers
+
+0.005     2013-02-01 13:55:34 America/New_York
+
+    [FIXED]
+
+    - Added some defensive code to try to avoid test failures on Perl 5.8
+
+0.004     2013-01-25 15:10:34 America/New_York
+
+    [CHANGES]
+
+    - Seeding is now done by Crypt::URandom, which uses the best
+      non-blocking source of random data on a given platform, including
+      Win32
+
+0.003     2013-01-17 08:47:45 America/New_York
+
+    [BUG FIXES]
+
+    - ISAAC is now seeded from /dev/urandom instead of /dev/random to avoid
+      blocking.  urandom is sufficient for seeding a CPRNG that itself is
+      generating salt to permute the actual secret key.
+
+0.002     2013-01-15 23:06:47 America/New_York
+
+    [BUG FIXES]
+
+    - Specify MIME::Base64 3.12 as minimum for encode/decode_base64url
+
+0.001     2013-01-10 22:07:12 America/New_York
+
+    - First release
+

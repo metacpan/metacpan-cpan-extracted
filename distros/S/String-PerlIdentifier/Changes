@@ -1,0 +1,10 @@
+Revision history for Perl module String::PerlIdentifier
+
+v0.06 Mon Nov 14 13:28:16 EST 2016
+    - First version stored in Git.  Adapt to "default_inc_excludes_dot" for
+      Perl 5.26.
+
+v0.05_01 Apr 22 2006
+    - Last version stored in Subversion
+
+v0.04 Nov 25 2005

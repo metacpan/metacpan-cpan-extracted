@@ -1,0 +1,7 @@
+Changes	            - revision history
+MANIFEST            - this file
+Makefile.PL         - "perl Makefile.PL" to get things started
+README              - read this first
+CpuLoad.pm          - the main module
+CpuLoad.xs          - C stub to call bsd getloadavg()
+test.pl             - test script (empty for now)

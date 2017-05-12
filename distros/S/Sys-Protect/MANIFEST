@@ -1,0 +1,9 @@
+Changes
+lib/Sys/Protect.pm
+Protect.xs
+Makefile.PL
+MANIFEST
+ppport.h
+t/deny.t
+t/xsloader.t
+META.yml                                 Module meta-data (added by MakeMaker)

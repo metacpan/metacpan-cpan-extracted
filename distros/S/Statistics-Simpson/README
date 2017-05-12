@@ -1,0 +1,7 @@
+Statistics::Simpson module can be used to compute the Simpson
+index of data, which measures the variability of data.
+
+Copyright (C) 2002-2015, Jarkko Hietaniemi <jhi@iki.fi>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl 5.18.3.

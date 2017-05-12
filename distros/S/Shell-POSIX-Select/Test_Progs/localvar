@@ -1,0 +1,5 @@
+#! /usr/bin/perl -w
+
+use Shell::POSIX::Select ;
+
+select local $var (1) { print "/$var/\n"; }

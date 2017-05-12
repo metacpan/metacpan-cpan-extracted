@@ -1,0 +1,448 @@
+##
+##  String::Divert - String Object supporting Folding and Diversion
+##  Copyright (c) 2003-2005 Ralf S. Engelschall <rse@engelschall.com>
+##
+##  This file is part of String::Divert, a Perl module providing
+##  a string object supporting folding and diversion.
+##
+##  This program is free software; you can redistribute it and/or
+##  modify it under the terms of the GNU General Public  License
+##  as published by the Free Software Foundation; either version
+##  2.0 of the License, or (at your option) any later version.
+##
+##  This program is distributed in the hope that it will be useful,
+##  but WITHOUT ANY WARRANTY; without even the implied warranty of
+##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+##  General Public License for more details.
+##
+##  You should have received a copy of the GNU General Public License
+##  along with this file; if not, write to the Free Software Foundation,
+##  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
+##
+##  Divert.pod: Module Documentation
+##
+
+=pod
+
+=head1 NAME
+
+B<String::Divert> - String Object supporting Folding and Diversions
+
+=head1 SYNOPSIS
+
+  use String::Divert;
+
+  #   standard object-oriented API (SAPI)
+  $x = new String::Divert;
+  $x->assign("foo");
+  $x->fold("sub");
+  $x->append("quux");
+  $x->divert("sub");
+  $x->append("bar");
+  $x->undivert(0);
+  print "x=".$x->string()."\n";
+  $x->destroy();
+
+  #   extended operator-overloaded API (XAPI)
+  $x = new String::Divert;
+  $x->overload(1);
+  $x .= "foo";
+  $x *= "sub";
+  $x .= "quux";
+  $x >> "sub";
+  $x .= "bar";
+  $x << 0;
+  print "x=$x\n";
+  undef $x;
+
+=head1 ABSTRACT
+
+B<String::Divert> is small Perl 5 module providing a scalar-like string
+object with some overloaded operators, supporting the concept of
+I<Folding> and I<Diversion>. This allows nested generation of structured
+output. The idea is to decouple the sequential generation of output
+from the nested and non-sequential structure of the output.
+
+The two most prominent examples are the generation of code in SGML/XML
+based languages like [X]HTML (where large and deeply nested structures
+occur) and the generation of code in typed 3GL procedural languages
+like C/C++ (where symbols have to be declared before usage). Here
+B<String::Divert> allows you to generate the code in steps from the
+outer to the inner level or to append code to already generated previous
+or later inserted parts.
+
+This is achieved by leveraging two basic concepts: content folding
+and operation diversion.
+
+=head2 Content Folding
+
+The concept of content folding allows you to fold the content at the
+current output position by inserting a placeholder corresponding to
+a sub-output and just proceeding with the output generation. The
+sub-output initially is empty. Once output is appended to it (see
+diversion below), it will occur at the placeholder position if the
+content is unfolded later. Folding can be applied to the sub-object
+again and this way allowing arbitrary nested structures. A sub-output
+even can be unfolded into multiple placeholder positions.
+
+=head2 Operation Diversion
+
+The concept of operation diversion allows you to automatically divert
+an operation to one object to another object. Usually this is used for
+diverting output generation operations on a top-level string object
+to folded sub-objects without having to deal with multiple object
+variables and without having to know that you are actually operating on
+a sub-object. Diversions are applied in a stacked fashion, allowing the
+stepping back to the previous active diversion.
+
+=head1 DESCRIPTION
+
+B<String::Divert> provides two Application Programming Interfaces (API):
+a standard object-oriented API (SAPI) providing the core functionality
+and an extended operator-overloading API (XAPI) providing additional
+convenience in using the functionality (see also method B<overload>).
+
+=head2 Object Lifetime
+
+The following methods deal with the lifetime of a B<String::Divert>
+object:
+
+=over 4
+
+=item SAPI: C<$x = >B<new String::Divert> [C<$name>]C<;>
+
+I<Object Construction>. This creates a new string object with either
+an empty initial name or the one given in C<$name>.
+
+=item SAPI: C<$y = $x-E<gt>>B<clone>C<;>
+
+I<Object Cloning>. This recursively clones the string object in C<$x>.
+
+=item SAPI: C<$x-E<gt>>B<destroy>C<;>
+
+=item SAPI: C<undef $x;>
+
+I<Object Destruction>. This destroys the string object in C<$x> and this
+way releases all of its resources. Folding sub objects are destroyed
+implicitly unless they are still references by the application.
+
+=back
+
+=head2 Object Attributes
+
+The following methods adjust attributes of a B<String::Divert>
+object:
+
+=over 4
+
+=item SAPI: C<$overloaded = $x-E<gt>>B<overload>C<;>
+
+=item SAPI: [C<$old_overloaded =>] C<$x-E<gt>>B<overload>C<($new_overloaded);>
+
+I<Object Operator Overloading>. Either just retrieves whether string
+object C<$x> is operator overloaded or sets new operator overloading. If
+C<$new_overloaded> is I<false>, operator overloading is disabled (only
+SAPI is active); if it is I<true>, operator overloading is enabled (both
+SAPI and XAPI are active).
+
+=item SAPI: C<$name = $x-E<gt>>B<name>C<;>
+
+=item SAPI: [C<$old_name =>] C<$x-E<gt>>B<name>C<($new_name);>
+
+I<Object Naming>. Either just retrieves the current name of string
+object C<$x> or sets a new name. The name of a string object is used to
+identify the object on folding and diversion in case no object reference
+is used.
+
+=item SAPI: C<$mode = $x-E<gt>>B<overwrite>C<;>
+
+=item SAPI: [C<$old_mode =>] C<$x-E<gt>>B<overwrite>C<($new_mode);>
+
+I<Overwrite Mode>. Retrieves the current overwrite mode of string object
+C<$x> or sets a new overwrite mode. The mode can be C<"none"> (no
+overwriting), C<"once"> (no overwriting once on next B<append> operation
+only), or C<"always"> (overwriting on every B<append> operation). The
+default is C<"none">.
+
+=item SAPI: C<$mode = $x-E<gt>>B<storage>C<;>
+
+=item SAPI: [C<$old_mode =>] C<$x-E<gt>>B<storage>C<($new_mode);>
+
+I<Storage Mode>. Retrieves the current storage mode of string object
+C<$x> or sets a new storage mode. The mode can be C<"none"> (neither
+contents nor foldings is stored), C<"fold"> (only foldings are stored),
+or C<"all"> (both contents and foldings are stored). The default is
+C<"all">.
+
+=item SAPI: C<$mode = $x-E<gt>>B<copying>C<;>
+
+=item SAPI: [C<$old_mode =>] C<$x-E<gt>>B<copying>C<($new_mode);>
+
+I<Copying Mode>. Retrieves the current copying mode of string object
+C<$x> or sets a new copying mode. The mode can be C<"pass"> (just
+pass-through objects in the "copy constructor" from the XAPI) or
+C<"clone"> (clone object in the "copy constructor" from the XAPI). The
+default is C<"pass">.
+
+=back
+
+=head2 Content Manipulation
+
+The following methods manipulate the contents of a B<String::Divert>
+object:
+
+=over 4
+
+=item SAPI: [C<$x =>] C<$x-E<gt>>B<assign>C<($string);>
+
+I<Content Assignment>. Assigns C<$string> as the new contents
+of the string object C<$x>. The existing contents is lost.
+
+=item SAPI: [C<$x =>] C<$x-E<gt>>B<append>C<($string);>
+
+=item XAPI: C<$x .= $string;>
+
+I<Content Appending>. Appends C<$string> to the existing contents of the
+string object C<$x>. If the B<overwrite> mode (see above) is C<"once">,
+the previous contents is removed first and the B<overwrite> mode set to
+C<"none">. If it is C<"always">, the previous contents is removed every
+time.
+
+=item SAPI: C<$string = $x-E<gt>>B<string>C<;>
+
+=item XAPI: C<$string = "$x";>
+
+I<Content Unfolding (Temporary)>. This unfolds the contents of string
+object C<$x> and returns it as a string. The contents of the string
+object is still kept in folded internal format. For permanently
+unfolding the contents in string object C<$x>, you have to use operation
+B<unfold>.
+
+=item SAPI: C<$bool = $x-E<gt>>B<bool>C<;>
+
+I<Content Unfolding (Temporary)>. This unfolds the contents of string
+object C<$x> until its value is already equivalent to the boolean true
+value or finally equivalent to the boolean false value. The contents of
+the string object is still kept in folded internal format.
+
+=back
+
+=head2 Content Folding
+
+The following methods deal with content folding of a B<String::Divert>
+object:
+
+=over 4
+
+=item SAPI: [C<$y =>] C<$x-E<gt>>B<fold>C<($name);>
+
+=item SAPI: [C<$y =>] C<$x-E<gt>>B<fold>C<($y);>
+
+=item SAPI: [C<$y =>] C<$x-E<gt>>B<fold>C<();>
+
+=item XAPI: [C<$y = (>]C<$x E<gt>E<gt>= $name>[C<)>]C<;>
+
+=item XAPI: C<$x E<gt>E<gt> $y;>
+
+I<Content Folding>. This folds the contents of string object C<$x> at
+the current position by appending a B<String::Divert> sub object (given
+in existing object C<$y> or created on-the-fly with name I<name>). The
+sub-object representing the folding is allowed to be re-appended by name
+or through C<$y>. If no name or object is given, an anonymous
+sub object is created on the fly (for use by method B<divert> without
+arguments).
+
+=item SAPI: [C<$string =>] C<$x-E<gt>>B<unfold>C<;>
+
+=item XAPI: [C<$string =>] C<E<lt>$xE<gt>;>
+
+I<Content Unfolding (Permanently)>. This unfolds the contents of string
+object C<$x> and stores the result permanently as the new contents. For
+temporarily unfolding the contents in string object C<$x>, you can
+use operation B<string>.
+
+=item SAPI: C<$y = $x-E<gt>>B<folding>C<($name);>
+
+=item SAPI: C<@y = $x-E<gt>>B<folding>C<();>
+
+=item XAPI: C<$y = ($x E<lt>E<lt>= $name);>
+
+I<Content Folding Lookup>. This lookups in string object C<$x> the
+contained folding sub-object with name C<$name>. If C<$name> is not
+specified, it returns a list of all folding sub-objects.
+
+=item SAPI: C<$x-E<gt>>B<folder>C<($format, $regex);>
+
+=item SAPI: C<$string = $x-E<gt>>B<folder>C<($name);>
+
+=item SAPI: C<$string = $x-E<gt>>B<folder>C<();>
+
+I<Content Folding Textual Representation>. This configures (if
+the two argument form is used) or generates (if the one argument
+form is used) textual representation of a content folding. For
+configuring, the C<$format> has to be a Perl sprintf() format string
+(containing only a single C<%s> for expanding the name of the folding
+object) generating the textual representation and C<$regex> a Perl
+regular expression (containing a single clustering parenthesis
+pair) for matching a generated textual representation and returning
+the name of the folding object. The defaults are "C<{#%s#}>" and
+"C<\{#([a-zA-Z_][a-zA-Z0-9_]*)#\}>". In the one argument form, the
+function applies C<$name> to the previously configured C<$format> and
+returns the result for inclusion into a string which in turn is assigned
+or appended to the string object. If no C<$name> is given, an anonymous
+folder is returned on the fly (for use by method B<divert> without
+arguments).
+
+=back
+
+=head2 Operation Diversion
+
+The following methods deal with operation diversion of a
+B<String::Divert> object:
+
+=over 4
+
+=item SAPI: [C<$x =>] C<$x-E<gt>>B<divert>C<($name);>
+
+=item SAPI: [C<$x =>] C<$x-E<gt>>B<divert>C<($y);>
+
+=item SAPI: [C<$x =>] C<$x-E<gt>>B<divert>C<();>
+
+=item XAPI: C<$x E<gt>E<gt> $name;>
+
+=item XAPI: C<$x E<gt>E<gt> $y;>
+
+I<Content Diversion Activation>. This activates in string object C<$x>
+a content diversion to a sub-object (given by name C<$name> or object
+reference C<$y>). The diversion target should be a folded sub-object of
+C<$x>, but is not technically required. If no C<$name> or object C<$y>
+is specified, a diversion is activated to the folder which was
+inserted last into the currently or previously active objects.
+
+=item SAPI: [C<$x =>] C<$x-E<gt>>B<undivert>C<($num);>
+
+=item SAPI: [C<$x =>] C<$x-E<gt>>B<undivert>C<($name);>
+
+=item XAPI: C<$x E<lt>E<lt> $num;>
+
+=item XAPI: C<$x E<lt>E<lt> $name;>
+
+I<Content Diversion Deactivation>. This deactivates the last C<$num>
+activated diversions. If C<$num> is C<0>, deactivates all activated
+diversions. If C<$name> is given (i.e. the argument is not numeric), it
+deactivates all last activated diversion up to and including the one to
+the string object named C<$name>.
+
+=item SAPI: C<$y = $x-E<gt>>B<diversion>C<;>
+
+=item SAPI: C<@y = $x-E<gt>>B<diversion>C<;>
+
+I<Content Diversion Lookup>. This lookups and returns the last or all
+(in reverse oder of activation) sub-objects of activated diversion.
+
+=back
+
+=head1 EXAMPLE
+
+The following part of a fictive CGI program demonstrates how to generate
+the structured HTML code in a nested, clean and intuitive fashion:
+
+ #   create new object with operator overloading activated
+ use String::Divert;
+ my $html = new String::Divert;
+ $html->overload(1);
+
+ #   generate outer HTML framework
+ $html .=
+     "<html>\n" .
+     "  <head>\n" .
+     "    " . $html->folder("head") .
+     "  </head>\n" .
+     "  <body>\n" .
+     "    " . $html->folder("body") .
+     "  </body>\n" .
+     "</html>\n";
+ $html >> "body";
+
+ #   generate body
+ $html .= "<table>\n" .
+          "  <tr>\n" .
+          "   <td>\n" .
+          "     " . $html->folder("left") .
+          "   </td>\n" .
+          "   <td>\n" .
+          "     " . $html->folder("right") .
+          "   </td>\n" .
+          "  </tr>\n" .
+          "</table>\n";
+
+ #   generate header
+ $html >> "head";
+ $html .= "<title>foo</title>\n";
+ $html << 1;
+
+ #   generate left contents
+ $html >> "left";
+ $html .= "bar1\n" .
+          "bar2\n";
+ $html << 1;
+
+ #   generate right contents
+ $html >> "right";
+ $html .= "quux1\n" .
+          "quux2\n";
+ $html << 1;
+
+ #   undivert all diversions and output unfolded HTML
+ $html << 0;
+ print $html;
+
+ #   destroy object
+ $html->destroy;
+
+The output of this program obviously is:
+
+ <html>
+   <head>
+     <title>foo</title>
+   </head>
+   <body>
+     <table>
+       <tr>
+        <td>
+          bar1
+          bar2
+        </td>
+        <td>
+          quux1
+          quux2
+        </td>
+       </tr>
+     </table>
+   </body>
+ </html>
+
+=head1 SEE ALSO
+
+=over 0
+
+=item B<m4>'s C<divert()> function.
+
+=item B<Perl> module B<Data::Location>.
+
+=item B<WML>'s C<wml_p5_divert> filter.
+
+=back
+
+=head1 HISTORY
+
+B<String::Divert> was implemented in May 2003 by Ralf S. Engelschall
+E<lt>rse@engelschall.comE<gt> for reducing the complexity in conditional
+generation of HTML code within a web application.
+
+=head1 AUTHOR
+
+Ralf S. Engelschall E<lt>rse@engelschall.comE<gt>
+
+=cut
+

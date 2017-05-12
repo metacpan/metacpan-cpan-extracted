@@ -1,0 +1,17 @@
+Build.PL
+Changes
+ignore.txt
+lib/Statistics/ANOVA/KW.pm
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+Statistics-ANOVA-KW.ppd
+t/00-load.t
+t/01-calc_manip.t
+t/02-two-level-test.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+

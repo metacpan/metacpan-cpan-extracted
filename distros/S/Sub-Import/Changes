@@ -1,0 +1,7 @@
+Revision history for Sub-Import
+
+1.001     2013-10-15 22:41:36 America/New_York
+          update bugtracker and repo metadata
+
+1.000     2010-11-24 23:45:27 America/New_York
+          groups are in EXPORT_TAGS not EXPORT_TAG

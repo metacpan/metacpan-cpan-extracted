@@ -1,0 +1,17 @@
+Revision history for Perl extension Statistics::FisherPitman.
+
+0.03 
+    -added string method, in line with ANOVA, Sequences, and other Statistics modules
+    -use Statistics::Descriptive
+    -distribution issues up to .034
+
+
+0.02 2007 Jun 28
+    -added calculation and dumping of 95% confidence interval
+    -cleaned up what happens upon dump if no resamplings were specified in test
+    -and some POD clean-up - can't not document the <new> method
+
+0.01  Thu Jun 26 20:47:00 2008
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -n Statistics::FisherPitman
+

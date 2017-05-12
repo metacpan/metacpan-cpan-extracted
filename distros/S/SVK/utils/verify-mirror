@@ -1,0 +1,111 @@
+#!/usr/bin/perl -w
+# NOTE: This requires subversion 1.4.3 on both client and server
+
+# usage: verify-mirror repospath path revision
+use strict;
+no warnings 'once';
+use SVK;
+use SVK::XD;
+use SVK::Util 'abs2rel';
+use URI::Escape 'uri_escape';
+
+my ($repospath, $path, $revision) = @ARGV;
+
+die "repospath required.\n" unless $repospath;
+die "path required.\n" unless $path;
+die "revision.\n" unless $revision;
+
+my $repos = SVN::Repos::open($repospath) or die $!;
+my $depot = SVK::Depot->new( {repos => $repos, repospath => $repospath} );
+
+my $t = SVK::Path->real_new( { depot => $depot, revision => $revision, path => $path } );
+
+my ($m, $mpath) = $t->is_mirrored;
+my $rabackend = $m->_backend;
+
+my $changed = $t->root->paths_changed;
+my $rev = $m->find_changeset($t->revision) or die "Can't find remote revision for ".$t->revision;
+my $ra = $rabackend->_new_ra;
+my $md5;
+require SVK::Command::Log;
+$ra->get_log([''], $rev, $rev, 0,
+	    1, 1,
+    sub {
+        my ( $paths, $r, $author, $date, $log, $ppool ) = @_;
+        my $pool = SVN::Pool->new($ppool);
+
+	my $fra = $rabackend->_new_ra;
+	my $editor = MD5Collect::Editor->new(
+                           cb_md5 => sub { $md5->{ $_[0] } = $_[1] },
+                    );
+	$fra->replay( $rev, 0, 0, $editor );
+	$rabackend->_ra_finished($fra);
+
+
+        for my $remotepath ( sort keys %$paths ) {
+            $pool->clear;
+	    my $localpath = abs2rel($remotepath, ($m->source_path || '/') => $path, '/');
+            my $local     = delete $changed->{$localpath}
+                or die "$localpath is not in changes";
+            my $action = $SVK::Command::Log::chg->[ $local->change_kind ];
+            die "different change action for $remotepath "
+                . $paths->{$remotepath}->action
+                . " and $action"
+                unless $paths->{$remotepath}->action eq $action;
+
+            next if $action eq 'D';
+
+            # XXX: option to turn off strict on copies.
+            if ( defined( my $from = $paths->{$remotepath}->copyfrom_path ) )
+            {
+                my ( $lfrom_rev, $lfrom ) = $t->root->copied_from($localpath);
+                die "copy from rev different for $localpath"
+                    unless $m->find_changeset($lfrom_rev)
+                    == $paths->{$remotepath}->copyfrom_rev;
+                die "copy from path different for $localpath"
+                    unless Path::Class::Dir->new_foreign('Unix', $path)->subdir( $from ) eq $lfrom;
+
+            }
+
+            if ( $t->root->check_path($localpath) == $SVN::Node::file ) {
+		my $entry = $remotepath;
+		$entry =~ s|^/||;
+		my $exp_md5 = delete $md5->{$entry}
+		    or die "no md5 found from server for $remotepath";
+
+                die "md5 for $localpath is different"
+                    unless $exp_md5 eq
+                    $t->root->file_md5_checksum($localpath);
+
+}
+
+        }
+    } );
+
+use Data::Dumper;
+die "not in remote: ".join(',', keys %$changed)
+    if keys %$changed;
+
+die "md5 not verified: ".join(',', keys %$md5)
+    if keys %$md5;
+
+package MD5Collect::Editor;
+use base 'SVK::Editor';
+__PACKAGE__->mk_accessors(qw(cb_md5));
+
+sub add_file {
+    my $self = shift;
+    my $path = shift;
+    return $path;
+}
+
+sub open_file {
+    my $self = shift;
+    my $path = shift;
+    return $path;
+}
+
+sub close_file {
+    my ($self, $path, $md5) = @_;
+    $self->{cb_md5}->($path, $md5);
+}

@@ -1,0 +1,45 @@
+__section__
+default
+__description__
+Text that makes up the bottom of a page
+
+No specially passed variables
+__title__
+
+__page__
+ournet
+__lang__
+en_US
+__name__
+footer
+__template__
+
+      </td>
+      </tr>
+      </table>
+<!-- 右欄表格結束 -->
+
+
+    </td>
+    </tr>
+    </table>
+<!-- 右欄結束 -->
+
+  </td>
+  </tr>
+
+  <tr>
+  <td width="100%" height="25">
+  <p align="center" class="foot"><a href="mailto:honeypie@music543.com?subject=刊登廣告">廣告刊登</a>︱<a href="http://music543.com/faq.html">常見問題</a>︱<a href="http://music543.com/whats543.html">關於五四三</a>︱<a href="http://music543.com/privacy_c.html">隱私權及著作權聲明</a>︱<a href="http://music543.com/contactus.htm">聯絡我們</a>︱<a href="http://music543.com/" target="_blank">回首頁</a></p>
+  </td>
+  </tr>
+
+  </table>
+
+</div>
+
+</body>
+</HTML>
+
+__seclev__
+10000

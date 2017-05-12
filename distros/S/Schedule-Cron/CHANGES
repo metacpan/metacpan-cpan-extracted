@@ -1,0 +1,96 @@
+1.01
+
+- Fix for RT #56926 which causes systems without SIGCHLD to exit on
+  after 64 forked processes
+- Patch for Makefile.PL applied which seems to have problems after the 
+  reorganisation of the directory layout (RT #57914)
+- Fix for RT #63089 which left over a time-window of 1 sec where
+  Schedule::Cron could run havoc.
+- Fixes for RT #68530 ("Exposing too much information..."), #68450
+  ("Crash scheduling empty queue") and #68533 ("Thou shalt not REAP
+  what thou has not forked...") provided by tlhackque. Thanks a lot !
+- New options:
+  * loglevel: Tuning of logoutput
+  * nostatus: Avoid setting $0 to next schedule time
+  * sleep: Custom sleep() function between two calls
+  
+1.00
+
+- Fix for RT #54692 occured when removing an entry
+- Fixed #55741 with help from Clinton Gormley (a perl bug occuring when 
+  modyfing global hashes in an event handler)
+- Fixed RT #50325 which could cause an infinite loop when calculating
+  the next execution time
+- Further bug fixes.
+
+0.99
+
+- Fixed issue when switching back DST which can result into amok 
+  running jobs during this period. The behaviour for jobs triggered
+  within this rewinded hour is still not defined properly (yet). 
+
+0.98
+
+- New option 'after_job' for new() which allows for a callback run
+  after a job has been sucessfully run (RT #29040)
+- Argument logging is done using data dumper (RT #39499)
+- Private methods are now marked with '_'
+- Added tests for increased kwallitee
+- Switched over to Build.PL (Makefile.PL is still supported)
+- Fixed some time calculation times (e.g. for the first DST switch in
+  the year)  
+- Allow comments at the end of a crontab line
+
+0.97
+
+- Use POSIX only where available, otherwise fallback to an emulation
+  of waipid. 
+- Fixed bug when previous SIGCHLD handler was not a coderef, but a
+  String value like "DEFAULT" or "IGNORE"
+- Added tests
+- Made test more robust so they work now also on system without
+  alarm() functionality (Win32)
+
+0.96 
+
+- Applied patch for #4917 in order to be smarter to existing SIGCHLD
+  handler and to reap only own childs.
+
+0.95 
+
+- If a scheduled method in 'nofork' manipulates the execution queue with 
+  add_entry or delete_entry, it will be picked up during the next run. 
+- Clarified different behaviour of global variables within the fork/norfork 
+  mode in the documentation
+- Fixed warning about non-numeric arguments when sorting. 
+- Fixed bug which called to an undefined methods in a die-message
+- Pretty print a hashref in $0 if provided as argument and the 
+  prefix for the name to be shown in the process list can be configured
+  with the option "processprefix"
+
+0.9
+
+- Logging: It is now possible to add a reference to a custom logging
+  subroutine to the constructor which will be used for logging certain
+  events.
+- NoFork: The option 'nofork' prevents Cron.pm from creating a new
+  child process. Instead, the job is run within the current
+  process. You can use the 'skip' and 'catch' options to tune the
+  behaviour.
+- Seconds granularity: Cron times can now be specified up to the
+  second. 
+- Bugfix: Thinks like "*/5" now work like expected
+
+0.05   
+
+- Other bugfixes for parsedate problem with single digit hours/minutes 
+  and warnings if argumentlist of command to execute is empty
+
+0.03
+
+- Minor bug fixes (reaping of child processes improved, 
+  fixed regexp in get_next_execution_time())
+
+0.01
+
+- Initial Release

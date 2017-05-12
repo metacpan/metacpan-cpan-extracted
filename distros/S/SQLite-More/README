@@ -1,0 +1,28 @@
+SQLite-More version 0.10
+========================
+
+INSTALLATION
+
+
+See module doc
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   DBI                at least version 1.609 it seems
+   DBD::SQLite        at least version 1.27
+   Digest::MD5
+
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 by Kjetil Skotheim (kjetilskotheim@gmail.com)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

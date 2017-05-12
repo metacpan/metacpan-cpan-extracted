@@ -1,0 +1,85 @@
+NAME
+    Sys::ForkQueue - Run any number of jobs in a controlled manner in
+    parallel.
+
+SYNOPSIS
+            use Sys::ForkQueue;
+            my @jobs = qw(1 2 3 4 5 6 7 8 9 10);
+            my $Queue = Sys::ForkQueue::->new({
+                    'jobs' => \@jobs,
+                    'code' => \&worker,
+                    'logger' => Log::Tree::->new(),
+            });
+            $Queue->run();
+
+            sub worker { ... }
+
+DESCRIPTION
+    This class implements a job controller that can run any number of jobs
+    with configurable parllelism.
+
+ATTRIBUTES
+  chdir
+    Change to this directory after fork.
+
+    If the given directory does not exist, change to /.
+
+  umask
+    Set this umask after fork.
+
+  jobs
+    Must contain a list of job names. Each will be passed to the CODEREF in
+    $self->code() when it's runnable.
+
+  code
+    The CODEREF. This will called for every job in the list. Ths first
+    argument will be the job name. The second one will be $self->args()
+    which is an hashref.
+
+  args
+    This will be passed to every invocation of $self->code().
+
+  concurrency
+    Run this many jobs in parallel.
+
+  redirect_output
+    Redirect all output to this file.
+
+  chdir
+    Change to this directory after fork()ing.
+
+  setsid
+    Call setsid after fork().
+
+  delayedfork
+    Sleep for a brief time after fork. Set this to false if you plan to run
+    many short lived jobs.
+
+NAME
+    Sys::ForkQueue - Run any number of jobs in a controlled manner in
+    parallel.
+
+SUBROUTINES/METHODS
+  run
+    Run all enqueud jobs.
+
+  EAGAIN
+    Imported from Errno.
+
+  SIGTERM
+    Imported from POSIX.
+
+  WNOHANG
+    Imported from POSIX.
+
+    1; # End of Sys::ForkQueue
+
+AUTHOR
+    Dominik Schulz <tex@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Dominik Schulz.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,262 @@
+=head1 NAME
+
+SPOPS::Manual::Cookbook - Recipes for SPOPS usage
+
+=head1 DESCRIPTION
+
+This is a collection of recipes for usage of SPOPS. Some are common,
+some might be esoteric, but all of them should help to illuminate how
+SPOPS works and ways that you can expand it for your own needs.
+
+=head1 DATASOURCE AVAILABILITY
+
+SPOPS implementations that rely on some sort of datasource connection
+need to make that connection available all objects and class methods
+that need it. You can also pass a connection around to all calls, but
+this becomes difficult to maintain and is generally only used for
+special cases.
+
+All implementations use the method C<global_datasource_handle()> to
+retrieve the needed connection. So if you make the connection
+available via this method you never have to pass around handles or
+even worry about it.
+
+There are generally two ways (which are basically the same) to do
+this:
+
+=over 4
+
+=item 1.
+
+Make the handle available via a method in the SPOPS object class
+itself.
+
+=item 2.
+
+Make the handle available via a method in the ancestor class.
+
+=back
+
+Both are demonstrated below, using the L<SPOPS::DBI|SPOPS::DBI>
+implementation as an example.
+
+=head2 Datasource via object class
+
+This method works well if you have a small number of objects, or if
+you want to something quickly.
+
+Given the configuration:
+
+  1: my $spops = {
+  2:   'news' => {
+  3:      class           => 'My::News',
+  4:      isa             => [ 'SPOPS::DBI::Pg', 'SPOPS::DBI' ],
+  5:      rules_from      => [ 'My::DiscoverField' ],
+  6:      code_class      => [ 'My::NewsHandle' ],
+  7:      field_discover  => 'yes',
+  8:      base_table      => 'news',
+  9:      id_field        => 'news_id',
+ 10:      increment_field => 1,
+ 11:      no_insert       => [ 'news_id' ],
+ 12:      no_update       => [ 'news_id' ],
+ 13:   },
+ 14: };
+
+We can implement the datasource retrieval via a separate class:
+
+  1: package My::NewsHandle;
+  2: 
+  3: use strict;
+  4: use vars qw( $DBH );
+  5: use DBI;
+  6: 
+  7: $DBH = undef;
+  8: 
+  9: sub global_datasource_handle {
+ 10:     my ( $class ) = @_;
+ 11:     return $DBH if ( $DBH );
+ 12:     $DBH = DBI->connect( 'DBI:Pg:dbname=mydb', 'postgres', 'postgres',
+ 13:                          { RaiseError => 1, PrintError = 0 } );
+ 14:     unless ( $DBH ) {
+ 15:         die "Cannot create database handle! Error: $DBI::errstr\n";
+ 16:     }
+ 17:     return $DBH;
+ 18: }
+ 19: 
+ 20: 1;
+
+Or we can also use a self-contained script to do it:
+
+  1: #!/usr/bin/perl
+  2: 
+  3: use strict;
+  4: use DBI;
+  5: use SPOPS::Initialize;
+  6: 
+  7: my ( $DBH );
+  8: 
+  9: {
+ 10:     my $spops = {
+ 11:       'news' => {
+ 12:          class           => 'My::News',
+ 13:          isa             => [ 'SPOPS::DBI::Pg', 'SPOPS::DBI' ],
+ 14:          rules_from      => [ 'My::DiscoverField' ],
+ 15:          code_class      => [ 'My::NewsHandle' ],
+ 16:          field_discover  => 'yes',
+ 17:          base_table      => 'news',
+ 18:          id_field        => 'news_id',
+ 19:          increment_field => 1,
+ 20:          no_insert       => [ 'news_id' ],
+ 21:          no_update       => [ 'news_id' ],
+ 22:       },
+ 23:     };
+ 24: 
+ 25:     SPOPS::Initialize->process({ config => $spops });
+ 26: }
+ 27: 
+ 28: sub My::News::global_datasource_handle {
+ 29:     my ( $class ) = @_;
+ 30:     return $DBH if ( $DBH );
+ 31:     $DBH = DBI->connect( 'DBI:Pg:dbname=mydb', 'postgres', 'postgres',
+ 32:                          { RaiseError => 1, PrintError = 0 } );
+ 33:     unless ( $DBH ) {
+ 34:         die "Cannot create database handle! Error: $DBI::errstr\n";
+ 35:     }
+ 36:     return $DBH;
+ 37: }
+
+=head2 Datasource via ancestor class
+
+If you're using a lot of objects that share the same database or get
+their connection parameters from a common location, creating a common
+ancestor class is usually a better way to go.
+
+First create an ancestor class with the C<global_datasource_handle()>
+method:
+
+  1: package MyApp::Datasource; # -*-perl-*-
+  2: 
+  3: use strict;
+  4: use DBI;
+  5: 
+  6: my ( $DBH );
+  7: 
+  8: sub global_datasource_handle {
+  9:     my ( $class ) = @_;
+ 10:     return $DBH if ( $DBH );
+ 11:     $DBH = DBI->connect( 'DBI:Pg:dbname=mydb', 'postgres', 'postgres',
+ 12:                          { RaiseError => 1, PrintError = 0 } );
+ 13:     unless ( $DBH ) {
+ 14:         die "Cannot create database handle! Error: $DBI::errstr\n";
+ 15:     }
+ 16:     return $DBH;
+ 17: }
+ 18: 
+ 19: 1;
+
+And then include the ancestor class in the 'isa' key of your object's
+configuration:
+
+  1: my $spops = {
+  2:   'news' => {
+  3:      class           => 'My::News',
+  4:      isa             => [ qw/ MyApp::Datasource SPOPS::DBI::Pg SPOPS::DBI / ],
+  5:      rules_from      => [ 'My::DiscoverField' ],
+  6:      code_class      => [],
+  7:      field_discover  => 'yes',
+  8:      base_table      => 'news',
+  9:      id_field        => 'news_id',
+ 10:      increment_field => 1,
+ 11:      no_insert       => [ 'news_id' ],
+ 12:      no_update       => [ 'news_id' ],
+ 13:   },
+ 14: };
+
+Then just use as normal.
+
+=head1 COMMON QUERIES
+
+A common way to access data is to put a standard library of queries in
+one place and allow only those queries to be executed.
+
+To create a common query, even one that joins multiple tables, just
+write a method and put it in a 'code_class'. For our example, we'll
+use the following configuration:
+
+  1: my $spops = {
+  2:   'news' => {
+  3:      class           => 'My::News',
+  4:      isa             => [ 'SPOPS::DBI::Pg', 'SPOPS::DBI' ],
+  5:      rules_from      => [ 'My::DiscoverField' ],
+  6:      code_class      => [ 'My::NewsProcs' ],
+  7:      field_discover  => 'yes',
+  8:      base_table      => 'news',
+  9:      id_field        => 'news_id',
+ 10:      increment_field => 1,
+ 11:      no_insert       => [ 'news_id' ],
+ 12:      no_update       => [ 'news_id' ],
+ 13:   },
+ 14: };
+
+And the following code class:
+
+  1: package My::NewsProcs; # -*-perl-*-
+  2: 
+  3: use strict;
+  4: 
+  5: # All active news stories by a particular user, sorted in reverse
+  6: # date (latest first) order
+  7: 
+  8: sub by_user {
+  9:     my ( $class, $user, $params ) = @_;
+ 10:     unless ( $user->id ) {
+ 11:         SPOPS::Error->set({
+ 12:            error_msg => 'Cannot fetch news messages with unsaved user!',
+ 13:            type      => 'news' });
+ 14:         die $SPOPS::Error::error_msg;
+ 15:     }
+ 16: 
+ 17:     my $iter = eval { $class->fetch_iterator({
+ 18:                                    where => "active = ? AND posted_by = ?",
+ 19:                                    value => [ 'yes', $user->id ],
+ 20:                                    order => 'posted_on DESC',
+ 21:                                    limit => $params->{limit} });
+ 22:     if ( $@ ) {
+ 23:         SPOPS::Error->set({ 
+ 24:            error_msg  => 'Cannot run query to retrieve news messages by user',
+ 25:            system_msg => $SPOPS::Error::system_msg,
+ 26:            type       => 'news' });
+ 27:         die $SPOPS::Error::error_msg;
+ 28:     }
+ 29:     return $iter;    
+ 30: }
+ 31: 
+ 32: 1;
+
+And you would use this like:
+
+  1: #!/usr/bin/perl
+  2: 
+  3: use strict;
+  4: use SPOPS::Initialize;
+  5: 
+  6: {
+  7:     SPOPS::Initialize->process({ filename => 'news_config.perl' });
+  8:     my $user = MyApp->current_login;
+  9:     my $news_iter = My::News->by_user( $user );
+ 10: 
+ 11:     print "Stories posted by $user->{login_name}:\n";
+ 12:     while ( my $news = $news_iter->get_next ) {
+ 13:         print "$news->{title} posted on $news->{posted_on}\n";
+ 14:     }
+ 15: }
+
+=head1 COPYRIGHT
+
+Copyright (c) 2001-2004 Chris Winters. All rights reserved.
+
+See L<SPOPS::Manual|SPOPS::Manual> for license.
+
+=head1 AUTHORS
+
+Chris Winters E<lt>chris@cwinters.comE<gt>

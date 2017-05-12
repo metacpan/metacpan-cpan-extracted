@@ -1,0 +1,393 @@
+#!perl
+
+# Note: This script is a CLI interface to Riap function /Software/Release/Watch/list_software
+# and generated automatically using App::GenPericmdScript version 0.13
+
+our $DATE = '2015-09-04'; # DATE
+our $DIST = 'Software-Release-Watch'; # DIST
+our $VERSION = '0.04'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+Perinci::CmdLine::Any->new(
+    url => "/Software/Release/Watch/list_software",
+)->run;
+
+# ABSTRACT: REPLACE ME
+# PODNAME: list-watchable-software
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+list-watchable-software - REPLACE ME
+
+=head1 VERSION
+
+This document describes version 0.04 of list-watchable-software (from Perl distribution Software-Release-Watch), released on 2015-09-04.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % list-watchable-software [options] [query]
+
+=head1 DESCRIPTION
+
+REPLACE ME
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<filename>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=back
+
+=head2 Field selection options
+
+=over
+
+=item B<--detail>, B<-l>
+
+Return array of full records instead of just ID fields.
+
+By default, only the key (ID) field is returned per result entry.
+
+
+=item B<--field>=I<s@>
+
+Select fields to return.
+
+Can be specified multiple times.
+
+=item B<--fields-json>=I<s>
+
+Select fields to return (JSON-encoded).
+
+See C<--field>.
+
+=item B<--with-field-names>
+
+Return field names in each record (as hash/associative array).
+
+When enabled, function will return each record as hash/associative array
+(field name => value pairs). Otherwise, function will return each record
+as list/array (field value, field value, ...).
+
+
+=back
+
+=head2 Filtering for id options
+
+=over
+
+=item B<--id-contains>=I<s>
+
+Only return records where the 'id' field contains specified text.
+
+=item B<--id-in-json>=I<s>
+
+Only return records where the 'id' field is in the specified values (JSON-encoded).
+
+See C<--id-in>.
+
+=item B<--id-in>=I<s@>
+
+Only return records where the 'id' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--id-is>=I<s>
+
+Only return records where the 'id' field equals specified value.
+
+=item B<--id-isnt>=I<s>
+
+Only return records where the 'id' field does not equal specified value.
+
+=item B<--id-max>=I<s>
+
+Only return records where the 'id' field is less than or equal to specified value.
+
+=item B<--id-min>=I<s>
+
+Only return records where the 'id' field is greater than or equal to specified value.
+
+=item B<--id-not-contains>=I<s>
+
+Only return records where the 'id' field does not contain specified text.
+
+=item B<--id-not-in-json>=I<s>
+
+Only return records where the 'id' field is not in the specified values (JSON-encoded).
+
+See C<--id-not-in>.
+
+=item B<--id-not-in>=I<s@>
+
+Only return records where the 'id' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--id-xmax>=I<s>
+
+Only return records where the 'id' field is less than specified value.
+
+=item B<--id-xmin>=I<s>
+
+Only return records where the 'id' field is greater than specified value.
+
+=item B<--id>=I<s>
+
+Only return records where the 'id' field equals specified value.
+
+=back
+
+=head2 Filtering options
+
+=over
+
+=item B<--query>=I<s>, B<-q>
+
+Search.
+
+=back
+
+=head2 Ordering options
+
+=over
+
+=item B<--random>
+
+Return records in random order.
+
+=item B<--sort>=I<s>
+
+Order records according to certain field(s).
+
+A list of field names separated by comma. Each field can be prefixed with '-' to
+specify descending order instead of the default ascending.
+
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Paging options
+
+=over
+
+=item B<--result-limit>=I<i>
+
+Only return a certain number of records.
+
+=item B<--result-start>=I<i>
+
+Only return starting from the n'th record.
+
+Default value:
+
+ 1
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C list-watchable-software list-watchable-software
+
+in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install L<shcompgen> which allows you to
+activate completion scripts for several kinds of scripts on multiple shells.
+Some CPAN distributions (those that are built with
+L<Dist::Zilla::Plugin::GenShellCompletion>) will even automatically enable shell
+completion for their included scripts (using C<shcompgen>) at installation time,
+so you can immadiately have tab completion.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete list-watchable-software 'p/*/`list-watchable-software`/'
+
+in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install C<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install C<shcompgen> as described above.
+
+=head1 ENVIRONMENT
+
+=head2 LIST_WATCHABLE_SOFTWARE_OPT => str
+
+Specify additional command-line options
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration file, which by default is searched at C<~/.config/list-watchable-software.conf>, C<~/list-watchable-software.conf> or C</etc/list-watchable-software.conf> (can be changed by specifying C<--config-path>). All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+Configuration file is in the format of L<IOD>, which is basically INI with some extra features. 
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+List of available configuration parameters:
+
+ detail (see --detail)
+ fields (see --field)
+ format (see --format)
+ id (see --id)
+ id.contains (see --id-contains)
+ id.in (see --id-in)
+ id.is (see --id-is)
+ id.isnt (see --id-isnt)
+ id.max (see --id-max)
+ id.min (see --id-min)
+ id.not_contains (see --id-not-contains)
+ id.not_in (see --id-not-in)
+ id.xmax (see --id-xmax)
+ id.xmin (see --id-xmin)
+ naked_res (see --naked-res)
+ query (see --query)
+ random (see --random)
+ result_limit (see --result-limit)
+ result_start (see --result-start)
+ sort (see --sort)
+ with_field_names (see --with-field-names)
+
+=head1 FILES
+
+~/.config/list-watchable-software.conf
+
+~/list-watchable-software.conf
+
+/etc/list-watchable-software.conf
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Software-Release-Watch>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Software-Release-Watch>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Software-Release-Watch>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

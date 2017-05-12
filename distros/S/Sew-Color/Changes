@@ -1,0 +1,16 @@
+Revision history for Perl extension Sew::Color.
+
+0.01  Fri Jun 15 13:27:23 2012
+	- original version; created by h2xs 1.23 with options
+		-AX Sew::Color
+
+0.03  FRi Dec 24 14:50:00 2012 
+	- Corrected and updated Brother codes and rgb values, added other manufacturers. 
+      Increased search functionality for custom searches
+
+1.04  Dec 2012 
+      Released version
+
+1.05  Wed Feb 11 2014 
+	  New version to fix an obvious bug in the sat function. No other changes. 
+

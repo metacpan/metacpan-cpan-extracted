@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<atom:entry
+    xmlns:dcterms="http://purl.org/dc/terms/" 
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+    xmlns:atom="http://www.w3.org/2005/Atom"
+    xmlns:ore="http://www.openarchives.org/ore/terms/"
+    xmlns:oreatom="http://www.openarchives.org/ore/atom/"
+    xmlns:foaf="http://xmlns.com/foaf/0.1/"
+    xmlns:grddl="http://www.w3.org/2003/g/data-view#"
+    grddl:transformation="http://www.openarchives.org/ore/atom/atom-grddl.xsl">
+    
+    <!-- Information about the Atom entry -->
+    <!--                                  -->
+    
+    <atom:id>tag:arxiv.org,2008:astro-ph:0601007</atom:id>
+    
+    <!-- Information about the Aggregation -->
+    <!--                                   -->
+    
+    <!-- Express URI-A: This Atom entry is about URI-A -->
+    <atom:link href="http://arxiv.org/aggregation/astro-ph/0601007"
+        rel="http://www.openarchives.org/ore/terms/describes"/>
+    
+    <!-- Aggregation Author (repeatable) -->
+    <atom:author>
+        <atom:name>Hui Li</atom:name>
+        <atom:email>lihui@somewhere.cn</atom:email>
+    </atom:author>
+    <atom:author>
+        <atom:name>Zong-Kuan Guo</atom:name>
+    </atom:author>
+    <atom:author>
+        <atom:name>Yuan-Zhong Zhang</atom:name>
+    </atom:author>
+    
+    <!-- Aggregation Title -->
+    
+    <atom:title>Parametrization of K-essence and Its Kinetic Term</atom:title>
+    
+    <!-- Aggregation Summary -->
+    <atom:summary>We construct the non-canonical kinetic term of a k-essence field directly from the
+        effective equation of state function $w_k(z)$, which describes the properties of the dark
+        energy. Adopting the usual parametrizations of equation of state we numerically reproduce
+        the shape of the non-canonical kinetic term and discuss some features of the constructed
+        form of k-essence.</atom:summary>
+    
+    <!-- Resources somehow equivalent to the Aggregation  -->
+    <atom:link href="info:arxiv/astro-ph/0601007"
+        rel="http://www.openarchives.org/ore/terms/similarTo"/>
+    <atom:link href="info:doi/10.1142/S0217732306019475"
+        rel="http://www.openarchives.org/ore/terms/similarTo"/>    
+    
+    <!-- Resource Map in another format that describes the Aggregation  -->
+    
+    <atom:link href="http://arxiv.org/rem/rdf/astro-ph/0601007"
+        rel="http://www.openarchives.org/ore/terms/isDescribedBy"
+        type="application/rdf+xml"/>
+    
+    <!-- Human entry page for the Aggregation  -->
+    <atom:link href="http://arxiv.org/abs/astro-ph/0601007"
+        rel="alternate"/>
+    
+    <!-- Discovery pointer to a mirrored version of the Aggregation  -->
+    <atom:link href="http://jp.arxiv.org/aggregation/astro-ph/0601007"
+        rel="related"/>
+
+    <!-- Other versions of the Aggregation -->
+    <atom:link href="http://arxiv.org/aggregation/astro-ph/0601007v1"
+        rel="http://purl.org/dc/terms/hasVersion"/>
+    <atom:link href="http://arxiv.org/aggregation/astro-ph/0601007v2"
+        rel="http://purl.org/dc/terms/hasVersion"/>
+    
+    <!-- Resources that reference the Aggregation -->
+    <atom:link href="http://arxiv.org/aggregation/0807.1020"
+        rel="http://purl.org/dc/terms/isReferencedBy"
+        title="How the Scalar Field of Unified Dark Matter Models Can Cluster"/>
+    <atom:link href="http://arxiv.org/aggregation/0806.4327"
+        rel="http://purl.org/dc/terms/isReferencedBy"
+        title="Cosmological scalar fields that mimic the $\Lambda CDM$ cosmological model"/>
+
+    <!-- Categories for the Aggregation (rdf:type) -->
+    <atom:category term="http://www.openarchives.org/ore/terms/Aggregation"
+        scheme="http://www.openarchives.org/ore/terms/" label="Aggregation"/>
+    <atom:category term="http://purl.org/eprint/type/JournalArticle"
+        scheme="http://purl.org/eprint/type/" label="Journal Article"/>
+    
+    <!-- Creation and Modification date/time of the Aggregation (rdf literals) -->
+    <atom:category term="2005-12-31T04:01:23Z"
+        scheme="http://www.openarchives.org/ore/terms/datetime/created"/>
+    <atom:category term="2006-01-18T06:16:15Z"
+        scheme="http://www.openarchives.org/ore/terms/datetime/modified"/>
+
+    <!-- Information about the Resource Map -->
+    <!--                                    -->
+    
+    <!-- Express URI-R, the URI of the Atom Resource Map  -->
+    <atom:link href="http://arxiv.org/rem/atom/astro-ph/0601007"
+        rel="self"
+        type="application/atom+xml"/>
+    
+    <!-- Resource Map Creation and Modification date/time -->
+    <atom:published>2008-10-01T18:30:02Z</atom:published>
+    <atom:updated>2008-10-03T07:30:34Z</atom:updated>
+
+    <!-- Express rights pertaining to the Atom Resource Map -->
+    <atom:link href="http://creativecommons.org/licenses/by-nc/2.5/"
+        rel="license"
+        type="application/rdf+xml"/>
+    <atom:rights>This Resource Map is available under the Creative Commons Attribution-Noncommercial 2.5 Generic license</atom:rights>
+    
+    <!-- Express authorship of Resource Map using atom:source                             -->
+    <!-- Also express additional child elements of atom:source that are recommended in Atom -->
+    <atom:source>
+        <atom:author>
+            <atom:name>arXiv.org e-Print Repository</atom:name>
+            <atom:uri>http://arXiv.org</atom:uri>
+        </atom:author>
+        <atom:id>tag:arxiv.org,2008:astro-ph</atom:id>
+        <atom:link href="http://arxiv.org/feed/astro-ph"
+            rel="self"
+            type="application/atom+xml"/>
+        <atom:updated>2008-10-03T07:30:34Z</atom:updated>
+        <atom:title>ArXiv.org Atrophysics Feed</atom:title>
+    </atom:source>
+    
+    <!-- Express URI to edit this Atom entry via the Atom Publishing Protocol -->
+    <atom:link href="http://arxiv.org/edit/astro-ph/0601007"
+        rel="edit"/>
+
+    <!-- The Aggregated Resources  -->
+    <!--                           -->
+    <atom:link href="http://arxiv.org/abs/astro-ph/0601007"
+        rel="http://www.openarchives.org/ore/terms/aggregates"
+        title="[astro-ph/0601007] Parametrization of K-essence and Its Kinetic Term"
+        type="text/html" hreflang="en"/>
+    <atom:link href="http://arxiv.org/ps/astro-ph/0601007"
+        rel="http://www.openarchives.org/ore/terms/aggregates"
+        title="Parametrization of K-essence and Its Kinetic Term"
+        type="application/postscript" hreflang="en"/>
+    <atom:link href="http://arxiv.org/pdf/astro-ph/0601007"
+        rel="http://www.openarchives.org/ore/terms/aggregates"
+        title="Parametrization of K-essence and Its Kinetic Term"
+        type="application/pdf" hreflang="en"/>
+    <atom:link href="http://arxiv.org/ps/astro-ph/0601007&amp;dpi=600&amp;font=bitmapped"
+        rel="http://www.openarchives.org/ore/terms/aggregates"
+        title="Parametrization of K-essence and Its Kinetic Term (600 DPI Bitmapped Fonts PostScript)"
+        type="application/postscript" hreflang="en"/>
+    <atom:link href="http://arxiv.org/ps/astro-ph/0601007&amp;dpi=300&amp;font=bitmapped"
+        rel="http://www.openarchives.org/ore/terms/aggregates"
+        title="Parametrization of K-essence and Its Kinetic Term (300 DPI Bitmapped Fonts PostScript)"
+        type="application/postscript" hreflang="en"/>
+    <atom:link href="http://arxiv.org/ps/astro-ph/0601007&amp;fname=cm&amp;font=TypeI"
+        rel="http://www.openarchives.org/ore/terms/aggregates"
+        title="Parametrization of K-essence and Its Kinetic Term (Type I Fonts PostScript)"
+        type="application/postscript" hreflang="en"/>
+    <atom:link href="http://arxiv.org/dvi/astro-ph/0601007"
+        rel="http://www.openarchives.org/ore/terms/aggregates"
+        title="Parametrization of K-essence and Its Kinetic Term"
+        type="application/dvi" hreflang="en"/>
+    <atom:link
+        href="http://export.arxiv.org/oai2?verb=GetRecord&amp;metadataPrefix=oai_dc&amp;identifier=oai:arXiv.org:astro-ph/0601007"
+        rel="http://www.openarchives.org/ore/terms/aggregates"
+        title="Dublin Core Metadata for Parametrization of K-essence and Its Kinetic Term"
+        type="application/xml"/>
+    <atom:link href="http://arxiv.org/cits/astro-ph/0601007"
+        rel="http://www.openarchives.org/ore/terms/aggregates"
+        title="Citations for astro-ph/0601007" type="text/html" hreflang="en"/>
+    <atom:link href="http://www.citebase.org/abstract?id=oai:arXiv.org:astro-ph/0601007"
+        rel="http://www.openarchives.org/ore/terms/aggregates"
+        title="Citebase - Parametrization of K-essence and Its Kinetic Term" type="text/html"
+        hreflang="en"/>
+
+    <!-- Additional properties pertaining to Aggregated Resources and Aggregation -->
+    <!--                                                                          -->
+    <oreatom:triples>
+        <!-- About the Aggregation -->
+        <rdf:Description rdf:about="http://arxiv.org/aggregation/astro-ph/0601007">
+            <dcterms:audience rdf:parseType="Resource">
+                <rdf:value>OCLC audience level 1: research</rdf:value>
+            </dcterms:audience>
+        </rdf:Description>
+        <!-- Aggregated Resource http://arxiv.org/abs/astro-ph/0601007 -->
+        <rdf:Description rdf:about="http://arxiv.org/abs/astro-ph/0601007">
+            <rdf:type rdf:resource="info:eu-repo/semantics/humanStartPage"/>
+        </rdf:Description>
+        <rdf:Description rdf:about="info:eu-repo/semantics/humanStartPage">
+            <rdfs:label>humanStartPage</rdfs:label>
+            <rdfs:isDefinedBy rdf:resource="info:eu-repo/semantics/"/>
+        </rdf:Description>
+        <!-- Proxy for Aggregated Resource http://arxiv.org/abs/astro-ph/0601007 -->
+        <rdf:Description
+            rdf:about="http://oreproxy.org/r?what=http://arxiv.org/abs/astro-ph/0601007&amp;where=http://arxiv.org/aggregation/astro-ph/0601007">
+            <ore:proxyFor rdf:resource="http://arxiv.org/abs/astro-ph/0601007"/>
+            <ore:proxyIn rdf:resource="http://arxiv.org/aggregation/astro-ph/0601007"/>
+        </rdf:Description>
+        <!-- Aggregated Resource http://arxiv.org/ps/astro-ph/0601007 -->
+        <rdf:Description rdf:about="http://arxiv.org/ps/astro-ph/0601007">
+            <dcterms:hasFormat rdf:resource="http://arxiv.org/pdf/astro-ph/0601007"/>
+            <dcterms:hasFormat rdf:resource="http://arxiv.org/ps/astro-ph/0601007&amp;dpi=600&amp;font=bitmapped"/>
+            <dcterms:hasFormat rdf:resource="http://arxiv.org/ps/astro-ph/0601007&amp;dpi=300&amp;font=bitmapped"/>
+            <dcterms:hasFormat rdf:resource="http://arxiv.org/ps/astro-ph/0601007&amp;fname=cm&amp;font=TypeI"/>
+            <dcterms:hasFormat rdf:resource="http://arxiv.org/dvi/astro-ph/0601007"/>
+        </rdf:Description>
+        <!-- Proxy for Aggregated Resource http://arxiv.org/ps/astro-ph/0601007 -->
+        <rdf:Description
+            rdf:about="http://oreproxy.org/r?what=http://arxiv.org/ps/astro-ph/0601007&amp;where=http://arxiv.org/aggregation/astro-ph/0601007">
+            <ore:proxyFor rdf:resource="http://arxiv.org/ps/astro-ph/0601007"/>
+            <ore:proxyIn rdf:resource="http://arxiv.org/aggregation/astro-ph/0601007"/>
+        </rdf:Description>
+        <!-- Aggregated Resource http://arxiv.org/pdf/astro-ph/0601007 -->
+        <rdf:Description rdf:about="http://arxiv.org/pdf/astro-ph/0601007">
+            <dcterms:conformsTo rdf:resource="info:pronom/fmt/18"/>
+        </rdf:Description>
+        <!-- Proxy for Aggregated Resource http://arxiv.org/pdf/astro-ph/0601007 -->
+        <rdf:Description
+            rdf:about="http://oreproxy.org/r?what=http://arxiv.org/pdf/astro-ph/0601007&amp;where=http://arxiv.org/aggregation/astro-ph/0601007">
+            <ore:proxyFor rdf:resource="http://arxiv.org/pdf/astro-ph/0601007"/>
+            <ore:proxyIn rdf:resource="http://arxiv.org/aggregation/astro-ph/0601007"/>
+        </rdf:Description>
+        <!-- Proxy for Aggregated Resource http://arxiv.org/ps/astro-ph/0601007&dpi=600&font=bitmapped -->
+        <rdf:Description
+            rdf:about="http://oreproxy.org/r?what=http://arxiv.org/ps/astro-ph/0601007%26dpi%3d600%26font%3dbitmapped&amp;where=http://arxiv.org/aggregation/astro-ph/0601007">
+            <ore:proxyFor rdf:resource="http://arxiv.org/ps/astro-ph/0601007&amp;dpi=600&amp;font=bitmapped"/>
+            <ore:proxyIn rdf:resource="http://arxiv.org/aggregation/astro-ph/0601007"/>
+        </rdf:Description>
+        <!-- Proxy for Aggregated Resource http://arxiv.org/ps/astro-ph/0601007&dpi=300&font=bitmapped -->
+        <rdf:Description
+            rdf:about="http://oreproxy.org/r?what=http://arxiv.org/ps/astro-ph/0601007%26dpi%3d300%26font%3dbitmapped&amp;where=http://arxiv.org/aggregation/astro-ph/0601007">
+            <ore:proxyFor rdf:resource="http://arxiv.org/ps/astro-ph/0601007&amp;dpi=300&amp;font=bitmapped"/>
+            <ore:proxyIn rdf:resource="http://arxiv.org/aggregation/astro-ph/0601007"/>
+        </rdf:Description>
+        <!-- Proxy for Aggregated Resource http://arxiv.org/ps/astro-ph/0601007&fname=cm&font=TypeI -->
+        <rdf:Description
+            rdf:about="http://oreproxy.org/r?what=http://arxiv.org/ps/astro-ph/0601007%26fname%3dcm%26font%3dTypeI&amp;where=http://arxiv.org/aggregation/astro-ph/0601007">
+            <ore:proxyFor rdf:resource="http://arxiv.org/ps/astro-ph/0601007&amp;fname=cm&amp;font=TypeI"/>
+            <ore:proxyIn rdf:resource="http://arxiv.org/aggregation/astro-ph/0601007"/>
+        </rdf:Description>
+        <!-- Proxy for Aggregated Resource http://arxiv.org/dvi/astro-ph/0601007 -->
+        <rdf:Description
+            rdf:about="http://oreproxy.org/r?what=http://arxiv.org/dvi/astro-ph/0601007&amp;where=http://arxiv.org/aggregation/astro-ph/0601007">
+            <ore:proxyFor rdf:resource="http://arxiv.org/dvi/astro-ph/0601007"/>
+            <ore:proxyIn rdf:resource="http://arxiv.org/aggregation/astro-ph/0601007"/>
+        </rdf:Description>
+        <!-- Aggregated Resource http://export.arxiv.org/oai2?verb=GetRecord&metadataPrefix=oai_dc&identifier=oai:arXiv.org:astro-ph/0601007 -->
+        <rdf:Description
+            rdf:about="http://export.arxiv.org/oai2?verb=GetRecord&amp;metadataPrefix=oai_dc&amp;identifier=oai:arXiv.org:astro-ph/0601007">
+            <dcterms:conformsTo rdf:resource="http://www.openarchives.org/OAI/2.0/oai_dc/"/>
+            <rdf:type rdf:resource="info:eu-repo/semantics/descriptiveMetadata"/>
+        </rdf:Description>
+        <!-- Proxy for Aggregated Resource http://export.arxiv.org/oai2?verb=GetRecord&metadataPrefix=oai_dc&identifier=oai:arXiv.org:astro-ph/0601007 -->
+        <rdf:Description
+            rdf:about="http://oreproxy.org/r?what=http://export.arxiv.org/oai2?verb%3dGetRecord%26metadataPrefix%3doai_dc%26identifier%3doai:arXiv.org:astro-ph/0601007&amp;where=http://arxiv.org/aggregation/astro-ph/0601007">
+            <ore:proxyFor
+                rdf:resource="http://export.arxiv.org/oai2?verb=GetRecord&amp;metadataPrefix=oai_dc&amp;identifier=oai:arXiv.org:astro-ph/0601007"/>
+            <ore:proxyIn rdf:resource="http://arxiv.org/aggregation/astro-ph/0601007"/>
+        </rdf:Description>
+        <!-- Proxy for Aggregated Resource http://arxiv.org/cits/astro-ph/0601007 -->
+        <rdf:Description
+            rdf:about="http://oreproxy.org/r?what=http://arxiv.org/cits/astro-ph/0601007&amp;where=http://arxiv.org/aggregation/astro-ph/0601007">
+            <ore:proxyFor rdf:resource="http://arxiv.org/cits/astro-ph/0601007"/>
+            <ore:proxyIn rdf:resource="http://arxiv.org/aggregation/astro-ph/0601007"/>
+        </rdf:Description>
+        <!-- Aggregated Resource http://www.citebase.org/abstract?id=oai:arXiv.org:astro-ph/0601007 -->
+        <rdf:Description
+            rdf:about="http://www.citebase.org/abstract?id=oai:arXiv.org:astro-ph/0601007">
+            <dcterms:creator rdf:parseType="Resource">
+                <foaf:name>The Citebase Project</foaf:name>
+                <foaf:page rdf:resource="http://www.citebase.org/"/>
+                <foaf:mbox rdf:resource="mailto:tdb01r@ecs.soton.ac.uk"/>
+            </dcterms:creator>
+        </rdf:Description>
+        <!-- Proxy for Aggregated Resource http://www.citebase.org/abstract?id=oai:arXiv.org:astro-ph/0601007 -->
+        <rdf:Description
+            rdf:about="http://oreproxy.org/r?what=http://www.citebase.org/abstract?id%3doai:arXiv.org:astro-ph/0601007&amp;where=http://arxiv.org/aggregation/astro-ph/0601007">
+            <ore:proxyFor
+                rdf:resource="http://www.citebase.org/abstract?id=oai:arXiv.org:astro-ph/0601007"/>
+            <ore:proxyIn rdf:resource="http://arxiv.org/aggregation/astro-ph/0601007"/>
+        </rdf:Description>
+    </oreatom:triples>
+</atom:entry>

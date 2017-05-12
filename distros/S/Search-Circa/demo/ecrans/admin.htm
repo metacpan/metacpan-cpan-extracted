@@ -1,0 +1,197 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><!-- #BeginTemplate "/Templates/circa.dwt" -->
+<head>
+<!-- #BeginEditable "doctitle" --> 
+<title>Interface d'administration de Circa</title>
+<!-- #EndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<style type="text/css">
+<!--
+body {
+  font-family: sans-serif;
+  color: black;
+  background: white;
+  margin-left : 0;
+  margin-top : 0;
+}
+th, td { /* ns 4 */
+  font-family: sans-serif;
+}
+a {font: bold; color:Navy;} 
+h1 { text-align: center }
+h2, h3, h4, h5, h6 { text-align: left }
+h1, h2, h3 { color: #005A9C; }
+h1 { font: bold 100% }
+h2 { margin:1em; font: bold 95% }
+h3 { font: 90%  }
+h4 { font: bold 85% }
+h5 { font: italic 85%  }
+h6 { text-align: right }
+ul,p { font: 80%;}
+p { text-align:justify; margin:1em;}
+.p-liens {text-align:right;}
+TH {background :  #008080; color :  White;}
+TD {}
+.td-bord {background :  Navy; color :  White;}
+.small {font:70%; }
+.h2-sans-marge {margin:0; text-align:center;}
+.without-margin {margin:0,0,0,0;}
+-->
+</style>
+</head>
+
+<body bgcolor="#FFFFFF">
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr>
+    <td width="8%" class="td-bord" align="left">&nbsp;</td>
+    <td width="22%"><img src="/circa/images/circa_logo1.gif" width="70" height="70"><img src="/circa/images/circa_logo2.gif" width="110" height="50">
+    </td>
+    <td width="62%"><!-- #BeginEditable "titre" -->
+      <h1>Interface d'administration de Circa</h1>
+      <!-- #EndEditable --></td>
+    <td width="8%" class="td-bord">&nbsp;</td>
+  </tr>
+  <tr>
+    <td width="8%" class="td-bord">&nbsp;</td>
+    <td colspan="2">&nbsp;</td>
+    <td width="8%" class="td-bord">&nbsp;</td>
+  </tr>
+  <tr>
+    <td width="8%" class="td-bord">&nbsp;</td>
+    <td colspan="2"><!-- #BeginEditable "corps" -->
+      <ul>
+        <li><a href="admin.cgi?create=1">Cr&eacute;er les tables</a></li>
+        <li><a href="admin.cgi?drop=1">Supprimer les tables</a></li>
+        <li><a href="admin.cgi?export=1">Exporter les tables</a></li>
+        <li><a href="admin.cgi?import=1">Importer les tables (tables existantes detruites)</a></li>
+      </ul>
+
+      <h2>Mettre &agrave; jour les index : </h2>
+      <form action="admin.cgi">
+        <p class="h2-sans-marge">&nbsp; </p>
+        <table border="0" cellspacing="00" cellpadding="0">
+          <tr><td colspan="2"><p class="h2-sans-marge">Mettre &agrave; jour les documents pour <? $liste_site ?> </p></td></tr>
+          <tr>
+            <td><p class="h2-sans-marge">qui ont &eacute;t&eacute; index&eacute;s depuis plus de :</p></td>
+            <td><p class="h2-sans-marge"><input type="text" name="nb_jours" size="3" value="15"> jours <input type="submit" name="update" value="go"></p></td>
+          </tr>
+        </table>
+      </form>
+
+      <h2>Parser les derni&egrave;res url :</h2>
+      <form action="admin.cgi">
+        <table border="0" cellspacing="00" cellpadding="0">
+          <tr>
+            <td><p class="h2-sans-marge">Pour le site <? $liste_site ?></p></td>
+            <td><p class="h2-sans-marge"><input type="submit" name="parse_new" value="go"></p>
+            </td>
+          </tr>
+        </table>
+      </form>
+
+      <h2>Tableaux des diff&eacute;rents sites index&eacute;s :</h2>
+      <form action="admin_compte.cgi">
+      <input type="hidden" name="compte" value="acces">
+        <table border="0" cellspacing="00" cellpadding="0">
+          <tr>
+            <td><p class="h2-sans-marge">Pour le site <? $liste_site ?></p></td>
+            <td><p class="h2-sans-marge"><input type="submit" name="admin" value="go"></p></td>
+          </tr>
+        </table>
+      </form>
+
+     <h2>Ajout d'un site :</h2>
+      <form action="admin.cgi" enctype="multipart/form-data" method="post">
+      <table border="0" cellspacing="00" cellpadding="0">
+          <tr><td height="27"><p class="without-margin">Url : </p></td><td height="27"><input type="text" name="url"></td></tr>
+          <tr><td><p class="without-margin">Email: </p></td><td><input type="text" name="email"></td></tr>
+          <tr><td class="h2-sans-marge"><p class="without-margin">Titre : </p></td><td><input type="text" name="titre"></td>
+          </tr><tr><td class="h2-sans-marge"><p class="without-margin">Masque :</p></td><td><input type="file" name="file"></td></tr>
+          <tr><td class="h2-sans-marge"><p class="without-margin">Cat&eacute;gorie suivant le r&eacute;pertoire:</p></td><td> <? $categories ?></tr>
+          <tr><td>&nbsp; </td><td><input type="submit" name="Submit2" value="Ajouter"></td></tr>
+        </table>
+      </form>
+
+      <p>&nbsp;</p>
+      <h2>Ajout d'un site par un disque local:</h2>
+      <form action="admin.cgi" enctype="multipart/form-data" method="post">
+        <table border="0" cellspacing="2" cellpadding="0">
+          <tr>
+            <td class="h2-sans-marge">&nbsp;</td>
+            <td class="h2-sans-marge">&nbsp;</td>
+            <td class="h2-sans-marge"><p>Exemple:</p></td>
+          </tr>
+          <tr>
+            <td class="h2-sans-marge"><p class="h2-sans-marge">Url : </p></td>
+            <td class="h2-sans-marge"><p class="h2-sans-marge"><input type="text" name="local_url"></p></td>
+            <td class="h2-sans-marge"><p class="h2-sans-marge">http://www.alianwebserver.com/index.html</p></td>
+          </tr>
+          <tr>
+            <td class="h2-sans-marge"><p class="h2-sans-marge">Chemin local :</p></td>
+            <td class="h2-sans-marge"><input type="text" name="local_file" class="h2-sans-marge"></td>
+            <td class="h2-sans-marge"><p class="h2-sans-marge">file:///home/alian/publ<span class="h2-sans-marge">i</span>c_html/index.html</p></td>
+          </tr>
+          <tr>
+            <td class="h2-sans-marge"><p class="h2-sans-marge">Url racine du site :</p></td>
+            <td class="h2-sans-marge"><input type="text" name="url_racine" class="h2-sans-marge"></td>
+            <td><p class="h2-sans-marge">http://www.alianwebserver.com/</p></td>
+          </tr>
+          <tr>
+            <td class="h2-sans-marge"><p class="h2-sans-marge">Chemin racine du site :</p></td>
+            <td class="h2-sans-marge"><input type="text" name="local_file_site" class="h2-sans-marge"></td>
+            <td class="h2-sans-marge"><p class="h2-sans-marge">file:///home/alian/public_html/</p>
+            </td>
+          </tr>
+          <tr>
+            <td class="h2-sans-marge"><p class="h2-sans-marge">Emai<span class="h2-sans-marge">l</span>: </p></td>
+            <td class="h2-sans-marge"><p class="h2-sans-marge"><input type="text" name="email"></p></td>
+            <td class="h2-sans-marge">&nbsp;</td>
+          </tr>
+          <tr>
+            <td class="h2-sans-marge"><p class="h2-sans-marge">Titre : </p></td>
+            <td class="h2-sans-marge"><p class="h2-sans-marge"><input type="text" name="titre"></p></td>
+            <td class="h2-sans-marge">&nbsp;</td>
+          </tr>
+          <tr><td class="h2-sans-marge"><p>Masque :</p></td><td colspan="2"><input type="file" name="file"></td></tr>
+          <tr><td class="h2-sans-marge"><p class="h2-sans-marge">Cat&eacute;gorie :</p></td><td><? $categories ?></td><td class="h2-sans-marge">&nbsp;</td></tr>
+          <tr>
+            <td class="h2-sans-marge">&nbsp;</td>
+            <td ><input type="submit" name="Submit22" value="Ajouter"></td>
+            <td class="h2-sans-marge">&nbsp;</td>
+          </tr>
+        </table>
+      </form>
+
+       <h2>Supprimer un site :</h2>
+      <form>
+        <table border="0" cellspacing="00" cellpadding="0">
+          <tr>
+            <td><p class="h2-sans-marge">Le site <? $liste_site ?></p></td>
+            <td><p class="h2-sans-marge"><input type="submit" name="dropSite" value="Drop"></p></td>
+          </tr>
+        </table>
+      </form>
+
+      <!-- #EndEditable --></td>
+    <td width="8%" class="td-bord">&nbsp;</td>
+  </tr>
+  <tr>
+    <td width="8%" class="td-bord">&nbsp;</td>
+    <td colspan="2"><!-- #BeginEditable "bas_page" -->
+      <hr>
+      <p>Cette page est l'interface CGI. Pour l'interface en ligne de commande, voir le script admin.pl</p>
+      <!-- #EndEditable --></td>
+    <td width="8%" class="td-bord">&nbsp;</td>
+  </tr>
+  <tr>
+    <td width="8%" class="td-bord">&nbsp;</td>
+    <td colspan="2">
+      <h6>&nbsp;</h6>
+      <h6> Powered by <a href="http://www.alianwebserver.com/circa" target="_blank">AlianWebServer</a>
+      </h6>
+    </td>
+    <td width="8%" class="td-bord">&nbsp;</td>
+  </tr>
+</table>
+</body>
+<!-- #EndTemplate --></html>

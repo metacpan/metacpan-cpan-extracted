@@ -1,0 +1,9 @@
+Revision history for SystemTray-Applet-Win32
+
+0.02	25th March 2010
+	Ensure a timer is always created 
+
+0.01    15th June 2008
+	First version of Windows support
+
+

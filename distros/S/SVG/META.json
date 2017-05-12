@@ -1,0 +1,82 @@
+{
+   "abstract" : "Perl extension for generating Scalable Vector Graphics (SVG) documents.",
+   "author" : [
+      "Ronan Oger <ronan@cpan.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "SVG",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.94"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Scalar::Util" : "0",
+            "parent" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "SVG" : {
+         "file" : "lib/SVG.pm",
+         "version" : "2.76"
+      },
+      "SVG::DOM" : {
+         "file" : "lib/SVG/DOM.pm",
+         "version" : "2.76"
+      },
+      "SVG::Element" : {
+         "file" : "lib/SVG/Element.pm",
+         "version" : "2.76"
+      },
+      "SVG::Extension" : {
+         "file" : "lib/SVG/Extension.pm",
+         "version" : "2.76"
+      },
+      "SVG::XML" : {
+         "file" : "lib/SVG/XML.pm",
+         "version" : "2.76"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/manwar/SVG.git",
+         "web" : "https://github.com/manwar/SVG"
+      }
+   },
+   "version" : "2.76",
+   "x_contributors" : [
+      "Peter Wainwright",
+      "Ian Hickson",
+      "Adam Schneider",
+      "Steve Lihn",
+      "Allen Day",
+      "Gabor Szabo",
+      "Mohammad S Anwar"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

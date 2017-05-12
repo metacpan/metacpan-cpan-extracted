@@ -1,0 +1,79 @@
+%typemap{Short_t}{simple};
+%typemap{UShort_t}{simple};
+%typemap{Int_t}{simple};
+%typemap{UInt_t}{simple};
+%typemap{Double_t}{simple};
+%typemap{Float_t}{simple};
+%typemap{Long64_t}{simple};
+%typemap{ULong64_t}{simple};
+%typemap{Bool_t}{simple};
+
+%typemap{bool}{simple};
+%typemap{AV*}{simple};
+%typemap{SV*}{simple};
+
+%typemap{TGraphFloatArray}{parsed}{
+  %cpp_type{%SV*%};
+  %call_function_code{%
+    $CVar = SOOT::FloatVecToAV<double>(aTHX_ $Call, THIS->GetN());
+  %};
+};
+
+%typemap{TH1FloatArray}{parsed}{
+  %cpp_type{%SV*%};
+  %call_function_code{%
+    $CVar = SOOT::FloatVecToAV<double>(aTHX_ $Call, THIS->GetNbinsX());
+  %};
+};
+
+
+%typemap{TArrayDoubleArray}{parsed}{
+  %cpp_type{%SV*%};
+  %call_function_code{%
+    $CVar = SOOT::FloatVecToAV<double>(aTHX_ $Call, THIS->GetSize());
+  %};
+};
+
+%typemap{TArrayFloatArray}{parsed}{
+  %cpp_type{%SV*%};
+  %call_function_code{%
+    $CVar = SOOT::FloatVecToAV<float>(aTHX_ $Call, THIS->GetSize());
+  %};
+};
+
+
+%typemap{TArrayLongArray}{parsed}{
+  %cpp_type{%SV*%};
+  %call_function_code{%
+    $CVar = SOOT::IntegerVecToAV<long int>(aTHX_ $Call, THIS->GetSize());
+  %};
+};
+
+%typemap{TArrayIntArray}{parsed}{
+  %cpp_type{%SV*%};
+  %call_function_code{%
+    $CVar = SOOT::IntegerVecToAV<int>(aTHX_ $Call, THIS->GetSize());
+  %};
+};
+
+%typemap{TArrayCharArray}{parsed}{
+  %cpp_type{%SV*%};
+  %call_function_code{%
+    $CVar = SOOT::IntegerVecToAV<char>(aTHX_ $Call, THIS->GetSize());
+  %};
+};
+
+%typemap{TArrayShortArray}{parsed}{
+  %cpp_type{%SV*%};
+  %call_function_code{%
+    $CVar = SOOT::IntegerVecToAV<short>(aTHX_ $Call, THIS->GetSize());
+  %};
+};
+
+
+%typemap{TFormulaFloatArray}{parsed}{
+  %cpp_type{%SV*%};
+  %call_function_code{%
+    $CVar = SOOT::FloatVecToAV<double>(aTHX_ $Call, THIS->GetNpar());
+  %};
+};

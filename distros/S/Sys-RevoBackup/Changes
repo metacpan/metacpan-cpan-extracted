@@ -1,0 +1,23 @@
+Revision history for Sys-RevoBackup
+
+0.27    2014-04-22
+        Disable strict host key checking.
+
+0.26    2014-04-16
+        Fix handling of uninitialized parameters in _init.
+        Add sudo option.
+
+0.25    2013-10-18
+        Only rotate on success.
+
+0.24    2013-10-04
+        Add single job execution option
+
+0.23    2013-03-12
+        Add ExecDir plugin
+
+0.22    2013-03-12
+        Cleanup dependencies
+
+0.16    2012-12-02
+        First public version, released on an unsuspecting world.

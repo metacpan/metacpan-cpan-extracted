@@ -1,0 +1,6 @@
+Revision history for Perl extension SkypeAPI::Win.
+
+0.01  Mon Aug 18 19:51:47 2008
+	- original version; created by h2xs 1.23 with options
+		-A SkypeAPI::Win
+

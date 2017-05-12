@@ -1,0 +1,22 @@
+---
+version: 0.04
+date:    Sun Dec  4 22:00:27 EST 2005
+changes:
+- improved Kwalitee
+---
+version: 0.03
+date:    Tue May 18 10:54:28 EDT 2004
+changes:
+- fixed ImageScraper plugin and added support for double-slash URIs like the first image link on slashdot.org
+---
+version: 0.02
+date:    Sun May  9 12:47:44 EDT 2004
+changes:
+- quick, small tweaks
+- modified config.yaml
+- fixed module prerequisits in Makefile.PL
+---
+version: 0.01
+date:    Thu Apr 15 20:49:07 EDT 2004
+changes:
+- Initial public beta release

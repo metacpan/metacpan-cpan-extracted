@@ -1,0 +1,59 @@
+# ----------------------------------------------------------------------
+# Changelog for Shell::Base
+#
+# $Id: Changes,v 1.5 2004/08/26 20:08:18 dlc Exp $
+# ----------------------------------------------------------------------
+
+# ----------------------------------------------------------------------
+# Version 0.05                                        September 21, 2004 
+# ----------------------------------------------------------------------
+
+* Change bullet types from '-' and 'o' to the more conventional '*',
+  by request of Ricardo SIGNES.
+
+* Added DOAP file (see <http://usefulinc.com/doap> for details about
+  DOAP).
+
+# ----------------------------------------------------------------------
+# Version 0.04                                           January 5, 2004
+# ----------------------------------------------------------------------
+
+* Cleaned up for CPAN release, including some documentation updates.
+
+* Added logout to $RE_QUIT regex, so that typing 'logout' ends the
+  interactive session.
+
+* Some simple newline cleanup before printing, at the top and bottom
+  of the run loop.
+
+* By default, if the 'help' command is invoked without an argument,
+  then display the, er, helpful help blurb that was removed in version
+  0.03.
+
+# ----------------------------------------------------------------------
+# Version 0.03 (unreleased)                                July 22, 2003 
+# ----------------------------------------------------------------------
+
+* Added default command, which is executed when the asked for command
+  doesn't exist.
+
+* Removed the default help blurb, to keep from cluttering the help
+  output.
+
+# ----------------------------------------------------------------------
+# Version 0.02 (unreleased)                            February 11, 2003 
+# ----------------------------------------------------------------------
+
+* Added documented but missing emptycommand method, invoked when a
+  user issues a whitespace-only command.
+
+* Documentation updates and clarifications
+
+* Updated t/import.t with tests for inherited import().
+
+# ----------------------------------------------------------------------
+# Version 0.01                                          January 22, 2003
+# ----------------------------------------------------------------------
+
+* Initial release
+

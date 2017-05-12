@@ -1,0 +1,21 @@
+1.4 2004-08-18 21:16:56 
+
+* Altered tests to use Test::More
+* fixed deprecation in the plastlog
+* remedied the _PATH_LASTLOG mistake
+
+1.5 Sun Oct 15 21:23:10 BST 2006
+
+* Reorganised the code
+* Fixed compiler warnings with newer perls
+* CPANTS Friendly
+
+1.6 Mon Jan 19 13:02:38 GMT 2009
+
+* Changed my email address
+* Added lastlog_path() method to aid diagnostics
+
+1.7 Sun Oct 27 09:50:39 GMT 2013
+
+* Had a fixed test in git
+* Updated metadata

@@ -1,0 +1,12 @@
+Revision history for Perl extension Statistics::DependantTTest.
+
+0.03  Wed May 22 2003
+	Fixed failing tests due to namespace issue
+
+0.02  Tue May 21 2003
+	Fixed namespace issue
+
+0.01  Thu Apr  3 16:00:00 2003
+	- original version; created by h2xs 1.22 with options
+		-AXcfn Statistics::DependantTTest
+

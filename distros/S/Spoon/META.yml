@@ -1,0 +1,19 @@
+abstract: A Spiffy Application Building Framework
+author: 'Ingy döt Net <ingy@cpan.org>'
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Spoon
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  DB_File: 0
+  IO::All: 0.32
+  Spiffy: 0.22
+  Template: 2.10
+  Time::HiRes: 0
+  URI: 0
+  perl: 5.6.1
+version: 0.24

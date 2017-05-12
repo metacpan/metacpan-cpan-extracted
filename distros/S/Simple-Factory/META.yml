@@ -1,0 +1,33 @@
+---
+abstract: 'simple factory'
+author:
+  - 'Tiago Peczenyj <tiago.peczenyj@gmail.com>'
+build_requires:
+  CHI: 0
+  DateTime: 0
+  Test::Exception: 0
+  Test::MockObject: 0
+  Test::Warn: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.132661'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Simple-Factory
+requires:
+  Carp: 0
+  Module::Runtime: 0
+  Moo: 0
+  MooX::HandlesVia: 0
+  MooX::Types::MooseLike: 0
+  Try::Tiny: 0
+  namespace::autoclean: 0
+  perl: v5.10.0
+resources:
+  bugtracker: https://github.com/peczenyj/simple-factory-p5/issues
+  homepage: https://github.com/peczenyj/simple-factory-p5
+  repository: git://github.com/peczenyj/simple-factory-p5.git
+version: 0.09

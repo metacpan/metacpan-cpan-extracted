@@ -1,0 +1,13 @@
+/Build
+/Makefile
+/_build
+/blib
+/META.json
+/META.yml
+/MYMETA.json
+/MYMETA.yml
+/Makefile.PL
+/SIGNATURE
+/Sub-Metadata-*
+/lib/Sub/Metadata.c
+/lib/Sub/Metadata.o

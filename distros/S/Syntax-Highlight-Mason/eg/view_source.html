@@ -1,0 +1,41 @@
+<%doc>
+  Usage:  <& view_source.html &>
+  When called, with no arguments, inserts a link into the page
+  along with the text "View Source".  When called with argument
+  caller displays the specified component with its syntax
+  highlighted.  When called with caller => 'self', inserts the
+  calling component's source inline.
+  required: none
+  optional: caller => component name or 'self'
+            view_source => string to insert as text of link, default is 'View Source'
+</%doc>
+% unless (defined $caller) {
+<a href="view_source.html?caller=<% $m->request_comp->path %>"><% $view_source %></a>
+% }
+<%init>
+if (defined $caller) {
+  my $compiler;
+  if ($caller eq 'self') {
+    $compiler = Syntax::Highlight::Mason->new
+      (preamble => '<pre>',
+       postamble => '</pre>');
+    $caller = $m->request_comp->path if $caller eq 'self';
+  } else {
+    $compiler = Syntax::Highlight::Mason->new();
+  }
+  my $comp = $m->fetch_comp($caller);
+  my $file = $comp->source_file($comp);
+  local $/ = undef;
+  open(my $io,$file) or die "$! at $file";
+  my $source = <$io>;
+  close($io);
+  $m->print($compiler->compile($source));
+}
+</%init>
+<%args>
+$caller => undef
+$view_source => 'View Source'
+</%args>
+<%once>
+use Syntax::Highlight::Mason;
+</%once>

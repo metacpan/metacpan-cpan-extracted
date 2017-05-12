@@ -1,0 +1,11 @@
+abstract: Split items across nodes, and show takeovers in failure scenarios
+author: Ton Voon, <ton.voon@altinity.com>
+distribution_type: module
+generated_by: Module::Install version 0.63
+license: perl
+name: Set-Cluster
+no_index: 
+  directory: 
+    - inc
+    - t
+version: 0.01

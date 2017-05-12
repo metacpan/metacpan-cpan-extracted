@@ -1,0 +1,27 @@
+
+This is the Perl distribution Scalar-Properties.
+
+## Installation
+
+Scalar-Properties installation is straightforward.
+If your CPAN shell is set up, you should just be able to do
+
+    % cpan Scalar::Properties
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+## Documentation
+
+Scalar-Properties documentation is available as in POD.
+So you can do:
+
+    % perldoc Scalar::Properties
+
+to read the documentation with your favorite pager.

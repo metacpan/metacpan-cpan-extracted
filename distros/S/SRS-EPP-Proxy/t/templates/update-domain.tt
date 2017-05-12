@@ -1,0 +1,136 @@
+<update>
+  <domain:update xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+
+    <domain:name>[% domain %]</domain:name>
+
+    [%~ IF admin OR tech OR billing OR nslist OR status_list %]
+    <domain:add>
+      [%~ IF admin %]
+      <domain:contact type="admin">[% admin %]</domain:contact>
+      [%~ END %]
+      [%~ IF admin2 %]
+      <domain:contact type="admin">[% admin2 %]</domain:contact>
+      [%~ END %]      
+      [%~ IF tech %]
+      <domain:contact type="tech">[% tech %]</domain:contact>
+      [%~ END %]
+      [%~ IF tech2 %]
+      <domain:contact type="tech">[% tech2 %]</domain:contact>
+      [%~ END %]
+      [%~ IF billing %]
+      <domain:contact type="billing">[% billing %]</domain:contact>
+      [%~ END %]
+      [%~ IF nslist %]
+      <domain:ns>
+        [%~ FOREACH ns IN nslist %]
+        <domain:hostAttr>
+        	<domain:hostName>[% ns %]</domain:hostName>
+        </domain:hostAttr>
+        [%~ END %]
+      </domain:ns>
+      [%~ END %]
+      [%~ IF status_list %]
+        [%~ FOREACH status IN status_list %]
+      <domain:status s="[% status.name %]">[% status.value %]</domain:status>
+        [%~ END %]
+      [%~ END %]
+    </domain:add>
+    [%~ END %]
+
+    [%~ IF admin_old.defined OR tech_old OR nslist_old OR status_list_old %]
+    <domain:rem>
+      [%~ IF admin_old.defined %]
+      <domain:contact type="admin">[% admin_old %]</domain:contact>
+      [%~ END %]
+      [%~ IF admin_old2 %]
+      <domain:contact type="admin">[% admin_old2 %]</domain:contact>
+      [%~ END %]      
+      [%~ IF tech_old %]
+      <domain:contact type="tech">[% tech_old %]</domain:contact>
+      [%~ END %]
+      [%~ IF tech_old2 %]
+      <domain:contact type="tech">[% tech_old2 %]</domain:contact>
+      [%~ END %]      
+      [%~ IF nslist_old %]
+      <domain:ns>
+        [%~ FOREACH ns IN nslist_old %]
+        <domain:hostAttr>
+        	<domain:hostName>[% ns %]</domain:hostName>
+        </domain:hostAttr>
+        [%~ END %]
+      </domain:ns>
+      [%~ END %]
+      [%~ IF status_list_old %]
+        [%~ FOREACH status IN status_list_old %]
+      <domain:status s="[% status.name %]" />
+        [%~ END %]
+      [%~ END %]
+    </domain:rem>
+    [%~ END %]
+    
+    [% IF empty_rem %]
+    <domain:rem></domain:rem>
+    [% END %]
+
+    [%~ IF owner OR authinfo %]
+    <domain:chg>
+    [%~ END %]
+
+    [%~ IF owner %]
+      <domain:registrant>[% owner %]</domain:registrant>
+    [%~ END %]
+    [%~ IF authinfo %]
+      <domain:authInfo>
+        <domain:pw>[% authinfo %]</domain:pw>
+      </domain:authInfo>
+    [%~ END %]
+
+    [%~ IF owner OR authinfo %]
+    </domain:chg>
+    [%~ END %]
+
+  </domain:update>
+</update>
+[% IF dnssec %]
+   <extension>
+     <secDNS:update
+      xmlns:secDNS="urn:ietf:params:xml:ns:secDNS-1.1">
+  
+    [% IF dnssec.remove_all %]
+    	<secDNS:rem>
+    		<secDNS:all>true</secDNS:all>
+    	</secDNS:rem>
+    [% END %]
+        
+    [% FOREACH action IN ['rem','add'] %]
+    	[% IF dnssec.$action %]
+    	<secDNS:[% action %]>
+		[% FOREACH dnssec_data IN dnssec.$action %]
+			[% IF dnssec_data.is_key_data %]
+	          <secDNS:keyData>
+	            <secDNS:flags>[% dnssec_data.flags %]</secDNS:flags>
+	            <secDNS:protocol>[% dnssec_data.protocol %]</secDNS:protocol>
+	            <secDNS:alg>[% dnssec_data.alg %]</secDNS:alg>
+	            <secDNS:pubKey>[% dnssec_data.pub_key %]</secDNS:pubKey>
+	          </secDNS:keyData>
+			[% ELSE %]
+		       <secDNS:dsData>
+		         <secDNS:keyTag>[% dnssec_data.keytag %]</secDNS:keyTag>
+		         <secDNS:alg>[% dnssec_data.alg %]</secDNS:alg>
+		         <secDNS:digestType>[% dnssec_data.digest_type %]</secDNS:digestType>
+		         <secDNS:digest>[% dnssec_data.digest %]</secDNS:digest>
+		       </secDNS:dsData>
+	         [% END %]
+	    [% END %]
+	    </secDNS:[% action %]>
+	    [% END %]
+	 [% END %]
+
+     [% IF dnssec.max_sig_life %]
+     	<secDNS:chg>
+     		<secDNS:maxSigLife>[% dnssec.max_sig_life %]</secDNS:maxSigLife>
+     	</secDNS:chg>
+     [% END %]
+     </secDNS:update>
+   </extension>
+[% END %]

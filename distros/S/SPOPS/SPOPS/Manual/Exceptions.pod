@@ -1,0 +1,181 @@
+=head1 NAME
+
+SPOPS::Manual::Exceptions - Error handling in SPOPS
+
+=head1 SYNOPSIS
+
+This document describes SPOPS exceptions, their composition, how
+they're used and how you can create your own. See
+L<SPOPS::Exception|SPOPS::Exception> for more concrete implementation
+details.
+
+=head1 DESCRIPTION
+
+Error handling in SPOPS is fairly straightforward. Most (if not all)
+methods that can encounter some sort of error let the caller know
+about the error by throwing a C<die>. The error thrown is actually a
+L<SPOPS::Exception|SPOPS::Exception> object or one of its subclasses.
+
+The object can be placed directly into a string and it will do the
+Right Thing, displaying the message it was assigned. You can also
+query the object for additional information about the lcoation the
+object was thrown. Subclasses can have additional information in the
+object as well.
+
+The base object properties used are:
+
+B<message>
+
+This is the message the exception is created with -- there should be
+one with every exception. (It is bad form to throw an exception with
+no message.)
+
+B<package>
+
+The package the exception was thrown from.
+
+B<filename>
+
+The file the exception was thrown from.
+
+B<line>
+
+The line number in C<filename> the exception was thrown from.
+
+B<method>
+
+The subroutine the exception was thrown from.
+
+B<trace>
+
+Returns a L<Devel::StackTrace|Devel::StackTrace> object. If you set a
+package variable 'ShowTrace' in your exception then the output of
+C<to_string()> (along with the stringification output) will include
+the stack trace output as well as the message.
+
+This output may produce redundant messages in the default
+C<to_string()> method -- just override the method in your exception
+class if you want to create your own output. (See
+L<SPOPS::Exception::Security|SPOPS::Exception::Security> for an
+example of this.)
+
+=head1 SUBCLASSING
+
+Creating your own exceptions is very easy -- all you need to do is
+subclass L<SPOPS::Exception|SPOPS::Exception>. If you want additional
+properties in the exception, two or three lines will create them for
+you. And performing custom initialization is similarly easy.
+
+Here's an example of a subclass:
+
+  1: package MyApplication::Exception
+  2: 
+  3: use strict;
+  4: use base qw( SPOPS::Exception );
+  5: 
+  6: my @FIELDS = qw( epoch_time business_action );
+  7: MyApplication::Exception->mk_accessors( @FIELDS );
+  8: sub get_fields { return ( $_[0]->SUPER::get_fields, @FIELDS ) }
+  9: 
+ 10: sub initialize { $_[0]->epoch_time( time ) }
+ 11: 
+ 12: 1;
+
+The purpose of this should be plain -- we're creating a new exception
+for our application with two additional properties, 'epoch_time' and
+'business_action', and initializing 'epoch_time' to the current time
+when the exception is created.
+
+Here's how you might use it in your object:
+
+  1: package My::Object;
+  2: 
+  3: use strict;
+  4: use MyApplication::Exception;
+  5: 
+  6: my @BADWORDS = qw( pr0n );
+  7: 
+  8: sub find_relevant_links {
+  9:     my ( $self ) = @_;
+ 10:     my @words_found = grep { $self->{content} =~ /$_/ } @BADWORDS;
+ 11:     if ( scalar @words_found ) {
+ 12:         my $msg = "Cannot find relevant links -- bad words found: " .
+ 13:                   "[" . join( ", ", @words_found ) . "]";
+ 14:         MyApplication::Exception->throw(
+ 15:                $msg, { business_action => 'determine links from object' } );
+ 16:     }
+ 17:     ...
+ 18: }
+
+And then an example of handling it from code that uses the object:
+
+  1: my ( $object, $links );
+  2: eval { 
+  3:     $object = My::Object->fetch( $id );
+  4:     $links = $object->find_relevant_links;
+  5: };
+  6: if ( $@ and $@->isa( 'MyApplication::Exception' ) ) {
+  7:     print "Error trying to ", $@->business_action(), ": $@";
+  8: }
+  9: elsif ( $@ ) {
+ 10:     print "Database error: $@";
+ 11: }
+ 12: else {
+ 13:     print join( ", ",  @{ $links } );
+ 14: }
+
+=head1 EXAMPLES
+
+Here is a simple example trying to fetch an object and filtering the
+error returned to see if it's a security error:
+
+  1: my $news_id = $q->param( 'news_id' );
+  2: my $news = eval { My::News->fetch( $news_id ) };
+  3: if ( $@ ) {
+  4:     log_error( $@ );
+  5:     if ( $@->isa( 'SPOPS::Exception::Security' ) ) {
+  6:         print "Cannot retrieve News article -- insufficient security access.";
+  7:     }
+  8:     else {
+  9:         print "Cannot retrieve News article! (Error: $@) Please ",
+ 10:               "contact administrator.";
+ 11:     }
+ 12: }
+ 13: else {
+ 14:     print "$news->{title}\n$news->{posted_on}\n$news->{content}\n";
+ 15: }
+
+=head2 Shortcuts
+
+Every SPOPS exception module exports a shortcut. Instead of using the
+format:
+
+ use SPOPS::Exception;
+ ...
+ SPOPS::Exception->throw( $msg, \%params );
+
+You can use:
+
+ use SPOPS::Exception qw( spops_error );
+ ...
+ spops_error $msg, \%params;
+
+The shortcuts exported are:
+
+B<SPOPS::Exception>: C<spops_error>
+
+B<SPOPS::Exception::DBI>: C<spops_dbi_error>
+
+B<SPOPS::Exception::LDAP>: C<spops_ldap_error>
+
+B<SPOPS::Exception::Security>: C<spops_security_error>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2001-2004 Chris Winters. All rights reserved.
+
+See L<SPOPS::Manual|SPOPS::Manual> for license.
+
+=head1 AUTHORS
+
+Chris Winters E<lt>chris@cwinters.comE<gt>

@@ -1,0 +1,24 @@
+@import url(trac.css);
+@import url(browser.css);
+
+/* _action_bar template formatting */
+div.actions { 
+  margin-bottom: 1em;
+}
+
+div.actions ul {
+  margin-left: 0;
+  padding-left: 0;
+  display: inline;
+}
+
+div.actions ul li {
+  padding: 0.5em; 
+  list-style: none;
+  display: inline;  
+}
+
+.reponame {
+  color: #888;
+  font-size: 9px;
+}

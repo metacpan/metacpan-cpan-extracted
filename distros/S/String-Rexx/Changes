@@ -1,0 +1,49 @@
+Revision history for Perl extension String::Rexx.
+
+0.08  Sat Aug 28 08:15:21 2011
+       - Regular upkeep: changed installer, changed and added tests
+
+0.07  Wed Jul 23 21:48:23 2008
+        - Fixed license entry (to perl)
+
+0.06  Tue Jul 07, 2006 
+       - Updated center(), words(), and Substr()
+
+0.05  Fri Sep 23, 2005 
+       - Packaging changes to keep CPANTS happy.
+       - Now, also builds with Module::Build.
+       - Changed META.yaml
+
+0.04  Sat Apr 30, 2005
+    - Introduced the following new Rexx functions:
+      sign, b2d, d2x, x2b, b2x, x2c, x2d, c2x,  d2b    
+    - Renamed the old function d2h to the new name d2x
+    - Minor fixes and code cleanup for the following functions:
+      changestr, wordindex, copies, space, wordlength,  
+      countstr, delword, strip, verify, subword, word, xrange
+    - Major rewrite for functions datatype(), and wordpos()
+    - Added prereq_pm to Regexp::Common and Test::Exception
+    - Added more tests for fixed functions 
+
+
+0.03  Thu Jul 30, 2003
+    - Corrected Abstract 
+    - removed CVS/ entries from manifest
+
+0.02  Thu Jul 30, 2003
+    -  This release is institutes stroger refactoring and paramaeter checking:
+    -  Added Params::Validate  to center, copies, errortext, left, 
+       right, space, verify, insert, lastpos, overlay, wordindex, xrange,
+       compare, delstr, d2h, wordlength, word, wordindex, subword, and wordpos.
+    -  Added the new fuction abbrev()
+    -  wordpos(): on failure, it now returns 0 instead of undef. 
+    -  Refactored strip(). Added exceptions and (skipable) exception tests.
+    -  These fuctions now count \S sequences as words: words, delword,
+       subword.
+    -  translate(), changed mandatory options and some funtionality. See pod .
+
+
+0.01  Tue Jul  8 02:13:19 2003
+	- original version; created by h2xs 1.21 with options
+		-X -n String::Rexx
+

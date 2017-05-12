@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document title="SSLScan Results" version="1.8.2" web="http://www.titania.co.uk">
+ <ssltest host="google.com" port="443">
+  <cipher status="accepted" sslversion="SSLv2" bits="168" cipher="DES-CBC3-MD5" />
+  <cipher status="accepted" sslversion="SSLv2" bits="56" cipher="DES-CBC-MD5" />
+  <cipher status="accepted" sslversion="SSLv2" bits="40" cipher="EXP-RC2-CBC-MD5" />
+  <cipher status="accepted" sslversion="SSLv2" bits="128" cipher="RC2-CBC-MD5" />
+  <cipher status="accepted" sslversion="SSLv2" bits="40" cipher="EXP-RC4-MD5" />
+  <cipher status="accepted" sslversion="SSLv2" bits="128" cipher="RC4-MD5" />
+  <cipher status="rejected" sslversion="SSLv3" bits="256" cipher="ADH-AES256-SHA" />
+  <cipher status="rejected" sslversion="SSLv3" bits="256" cipher="DHE-RSA-AES256-SHA" />
+  <cipher status="rejected" sslversion="SSLv3" bits="256" cipher="DHE-DSS-AES256-SHA" />
+  <cipher status="accepted" sslversion="SSLv3" bits="256" cipher="AES256-SHA" />
+  <cipher status="rejected" sslversion="SSLv3" bits="128" cipher="ADH-AES128-SHA" />
+  <cipher status="rejected" sslversion="SSLv3" bits="128" cipher="DHE-RSA-AES128-SHA" />
+  <cipher status="rejected" sslversion="SSLv3" bits="128" cipher="DHE-DSS-AES128-SHA" />
+  <cipher status="accepted" sslversion="SSLv3" bits="128" cipher="AES128-SHA" />
+  <cipher status="rejected" sslversion="SSLv3" bits="168" cipher="ADH-DES-CBC3-SHA" />
+  <cipher status="rejected" sslversion="SSLv3" bits="56" cipher="ADH-DES-CBC-SHA" />
+  <cipher status="rejected" sslversion="SSLv3" bits="40" cipher="EXP-ADH-DES-CBC-SHA" />
+  <cipher status="rejected" sslversion="SSLv3" bits="128" cipher="ADH-RC4-MD5" />
+  <cipher status="rejected" sslversion="SSLv3" bits="40" cipher="EXP-ADH-RC4-MD5" />
+  <cipher status="rejected" sslversion="SSLv3" bits="168" cipher="EDH-RSA-DES-CBC3-SHA" />
+  <cipher status="rejected" sslversion="SSLv3" bits="56" cipher="EDH-RSA-DES-CBC-SHA" />
+  <cipher status="rejected" sslversion="SSLv3" bits="40" cipher="EXP-EDH-RSA-DES-CBC-SHA" />
+  <cipher status="rejected" sslversion="SSLv3" bits="168" cipher="EDH-DSS-DES-CBC3-SHA" />
+  <cipher status="rejected" sslversion="SSLv3" bits="56" cipher="EDH-DSS-DES-CBC-SHA" />
+  <cipher status="rejected" sslversion="SSLv3" bits="40" cipher="EXP-EDH-DSS-DES-CBC-SHA" />
+  <cipher status="accepted" sslversion="SSLv3" bits="168" cipher="DES-CBC3-SHA" />
+  <cipher status="accepted" sslversion="SSLv3" bits="56" cipher="DES-CBC-SHA" />
+  <cipher status="accepted" sslversion="SSLv3" bits="40" cipher="EXP-DES-CBC-SHA" />
+  <cipher status="rejected" sslversion="SSLv3" bits="40" cipher="EXP-RC2-CBC-MD5" />
+  <cipher status="accepted" sslversion="SSLv3" bits="128" cipher="RC4-SHA" />
+  <cipher status="accepted" sslversion="SSLv3" bits="128" cipher="RC4-MD5" />
+  <cipher status="accepted" sslversion="SSLv3" bits="40" cipher="EXP-RC4-MD5" />
+  <cipher status="rejected" sslversion="SSLv3" bits="0" cipher="NULL-SHA" />
+  <cipher status="rejected" sslversion="SSLv3" bits="0" cipher="NULL-MD5" />
+  <cipher status="rejected" sslversion="TLSv1" bits="256" cipher="ADH-AES256-SHA" />
+  <cipher status="rejected" sslversion="TLSv1" bits="256" cipher="DHE-RSA-AES256-SHA" />
+  <cipher status="rejected" sslversion="TLSv1" bits="256" cipher="DHE-DSS-AES256-SHA" />
+  <cipher status="accepted" sslversion="TLSv1" bits="256" cipher="AES256-SHA" />
+  <cipher status="rejected" sslversion="TLSv1" bits="128" cipher="ADH-AES128-SHA" />
+  <cipher status="rejected" sslversion="TLSv1" bits="128" cipher="DHE-RSA-AES128-SHA" />
+  <cipher status="rejected" sslversion="TLSv1" bits="128" cipher="DHE-DSS-AES128-SHA" />
+  <cipher status="accepted" sslversion="TLSv1" bits="128" cipher="AES128-SHA" />
+  <cipher status="rejected" sslversion="TLSv1" bits="168" cipher="ADH-DES-CBC3-SHA" />
+  <cipher status="rejected" sslversion="TLSv1" bits="56" cipher="ADH-DES-CBC-SHA" />
+  <cipher status="rejected" sslversion="TLSv1" bits="40" cipher="EXP-ADH-DES-CBC-SHA" />
+  <cipher status="rejected" sslversion="TLSv1" bits="128" cipher="ADH-RC4-MD5" />
+  <cipher status="rejected" sslversion="TLSv1" bits="40" cipher="EXP-ADH-RC4-MD5" />
+  <cipher status="rejected" sslversion="TLSv1" bits="168" cipher="EDH-RSA-DES-CBC3-SHA" />
+  <cipher status="rejected" sslversion="TLSv1" bits="56" cipher="EDH-RSA-DES-CBC-SHA" />
+  <cipher status="rejected" sslversion="TLSv1" bits="40" cipher="EXP-EDH-RSA-DES-CBC-SHA" />
+  <cipher status="rejected" sslversion="TLSv1" bits="168" cipher="EDH-DSS-DES-CBC3-SHA" />
+  <cipher status="rejected" sslversion="TLSv1" bits="56" cipher="EDH-DSS-DES-CBC-SHA" />
+  <cipher status="rejected" sslversion="TLSv1" bits="40" cipher="EXP-EDH-DSS-DES-CBC-SHA" />
+  <cipher status="accepted" sslversion="TLSv1" bits="168" cipher="DES-CBC3-SHA" />
+  <cipher status="accepted" sslversion="TLSv1" bits="56" cipher="DES-CBC-SHA" />
+  <cipher status="accepted" sslversion="TLSv1" bits="40" cipher="EXP-DES-CBC-SHA" />
+  <cipher status="rejected" sslversion="TLSv1" bits="40" cipher="EXP-RC2-CBC-MD5" />
+  <cipher status="accepted" sslversion="TLSv1" bits="128" cipher="RC4-SHA" />
+  <cipher status="accepted" sslversion="TLSv1" bits="128" cipher="RC4-MD5" />
+  <cipher status="accepted" sslversion="TLSv1" bits="40" cipher="EXP-RC4-MD5" />
+  <cipher status="rejected" sslversion="TLSv1" bits="0" cipher="NULL-SHA" />
+  <cipher status="rejected" sslversion="TLSv1" bits="0" cipher="NULL-MD5" />
+  <defaultcipher sslversion="SSLv2" bits="168" cipher="DES-CBC3-MD5" />
+  <defaultcipher sslversion="SSLv3" bits="128" cipher="RC4-SHA" />
+  <defaultcipher sslversion="TLSv1" bits="128" cipher="RC4-SHA" />
+  <certificate>
+   <version>2</version>
+   <serial>-4294967295</serial>
+   <signature-algorithm>sha1WithRSAEncryption</signature-algorithm>
+   <issuer>/C=ZA/ST=Western Cape/L=Cape Town/O=Thawte Consulting cc/OU=Certification Services Division/CN=Thawte Premium Server CA/emailAddress=premium-server@thawte.com</issuer>
+   <not-valid-before>Mar  7 17:45:51 2008 GMT</not-valid-before>
+   <not-valid-after>Apr  3 20:05:39 2010 GMT</not-valid-after>
+   <subject>/C=US/ST=California/L=Mountain View/O=Google Inc/CN=*.google.com</subject>
+   <pk-algorithm>rsaEncryption</pk-algorithm>
+   <pk error="false" type="RSA" bits="1024">
+    Modulus (1024 bit):
+        00:c0:c0:8a:1d:ae:b9:b0:57:ac:4c:65:fc:9e:0c:
+        8e:72:88:1c:82:47:96:0b:f7:0a:97:6e:c8:58:9a:
+        52:89:b9:7b:79:2c:5b:f2:2e:e0:5f:86:39:d0:ad:
+        38:09:4f:72:f8:27:c3:1a:bf:16:da:60:d3:8b:b2:
+        eb:2b:a0:4d:83:21:fb:21:c1:c6:ea:b0:39:60:e5:
+        0a:02:e4:38:43:87:ae:45:aa:15:ba:b5:a8:cb:87:
+        c5:26:f0:3c:bf:eb:07:00:c2:eb:be:0a:c7:2b:f6:
+        ef:85:36:6d:91:5f:04:c6:db:3d:c2:a2:ef:cf:f9:
+        4a:cc:c3:0e:5c:ea:4e:97:b1
+    Exponent: 65537 (0x10001)
+   </pk>
+   <X509v3-Extensions>
+    <extension name="X509v3 Extended Key Usage">TLS Web Server Authentication, TLS Web Client Authentication</extension>
+    <extension name="X509v3 CRL Distribution Points">URI:http://crl.thawte.com/ThawtePremiumServerCA.crl
+</extension>
+    <extension name="Authority Information Access">OCSP - URI:http://ocsp.thawte.com
+</extension>
+    <extension name="X509v3 Subject Alternative Name">DNS:google.com, DNS:*.google.com</extension>
+    <extension name="X509v3 Basic Constraints" level="critical">CA:FALSE</extension>
+   </X509v3-Extensions>
+  </certificate>
+ </ssltest>
+</document>

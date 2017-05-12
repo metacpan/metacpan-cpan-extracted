@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:               SVN-Notify-Filter-Watchers
+version:            0.10
+abstract:           Subscribe to SVN::Notify commits with a Subversion property.
+author:
+    - Larry Shatzer, Jr. <larrysh@cpan.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    File::Spec:   0
+    SVN::Notify:  2.72
+    Test::More:   0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

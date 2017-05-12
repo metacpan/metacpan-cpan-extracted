@@ -1,0 +1,51 @@
+{
+   "abstract" : "Kruskall-Wallis statistics and test (nonparametric independent analysis of variance by ranks for nominally grouped data)",
+   "author" : [
+      "Roderick Garton <rgarton@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Statistics-ANOVA-KW",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.421"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::AllUtils" : "0.09",
+            "Math::Cephes" : "0.5304",
+            "Statistics::Data" : "0.11",
+            "Statistics::Data::Rank" : "0.01",
+            "Statistics::Lite" : "3.62"
+         }
+      }
+   },
+   "provides" : {
+      "Statistics::ANOVA::KW" : {
+         "file" : "lib/Statistics/ANOVA/KW.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

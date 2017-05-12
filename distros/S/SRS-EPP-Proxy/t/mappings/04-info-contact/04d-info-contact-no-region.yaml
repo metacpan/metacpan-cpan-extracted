@@ -1,0 +1,24 @@
+# Info contact on a handle with no region (province)
+
+template: info-contact.tt
+
+vars:
+  contact_id: 04d
+
+input_assertions:
+  class: SRS::EPP::Command::Info::Contact
+
+output_assertions:
+  count:
+    - [ '//epp:result', 1, 'SRS: Check for one result' ]
+    - [ '//contact:sp', 0, 'Province not provided']
+  match:
+    - [ '//contact:name', 'A Person', 'Correct name returned']
+    - [ '//contact:street[1]', '1 Acacia Ave', 'Correct street 1 returned']
+    - [ '//contact:street[2]', 'Treewood', 'Correct street 2 returned']
+    - [ '//contact:city', 'Wellington', 'Correct city returned']
+    - [ '//contact:pc', '6021', 'Correct postcode returned']
+    - [ '//contact:cc', 'NZ', 'Correct country code returned']
+  match_all: ~
+  attr_is:
+    - [ '//epp:result', 'code', 1000, 'SRS: Check for correct result code' ]

@@ -1,0 +1,28 @@
+Jun 13 01:38:10 satellife sendmail[26050]: BAA26050: from=<joinkids@foo.phyast.pitt.edu>, size=5357, class=0, pri=35357, nrcpts=1, msgid=<199606130458.VAA27831@surf.aqua.net>, proto=ESMTP, relay=hamlet.phyast.pitt.edu [136.142.111.40]
+Jun 13 01:50:16 satellife sendmail[29556]: DAA29556: from=<shookway@fs1.ho.man.ac.uk>, size=954, class=0, pri=30954, nrcpts=1, msgid=<5B013544E0D@fs1.ho.man.ac.uk>, proto=ESMTP, relay=curlew.cs.man.ac.uk [130.88.13.7]
+Jun 13 01:50:17 satellife sendmail[29558]: DAA29556: to=<shoko@time.healthnet.org>, delay=00:00:05, mailer=fidogate, stat=Sent
+Jun 13 02:31:32 satellife sendmail[21570]: WAA18702: to=AntCount1@ANT.UTMEM.EDU, delay=03:48:49, mailer=smtp, relay=utmem1.utmem.edu. [132.192.1.1], stat=Sent (Ok.)
+Jun 13 02:31:37 satellife in.identd[25983]: connect from smtp2.halcyon.com
+Jun 13 02:34:54 satellife sendmail[26035]: BAA26035: from=<HELP-NET@BAR.TEMPLE.EDU>, size=7000, class=0, pri=37000, nrcpts=1, msgid=<199606130634.BAA26035@satellife.healthnet.org>, proto=SMTP, relay=vm.temple.edu [155.247.14.2]
+Jun 13 02:38:12 satellife sendmail[26052]: BAA26050: to=<joil_Gupta@ok.healthnet.org>, delay=00:00:03, mailer=fidogate, stat=Sent
+Jun 13 02:34:56 satellife sendmail[26038]: BAA26035: to=<helkaire@OK.HEALTHNET.ORG>, delay=00:00:05, mailer=fidogate, stat=Sent
+Jun 13 02:11:59 satellife sendmail[26888]: CAA26881: from=<UNIQUE3%SSWMBX%FDAOC@MR.CVMVAX.GOV>, size=519, class=0, pri=60519, nrcpts=2, msgid=<01I5UFEL02D08WWMKN@fdavm.cvm.fda.gov>, proto=SMTP, relay=CVMVAX.CVM.FDA.GOV [150.148.182.51]
+Jun 13 02:12:01 satellife sendmail[26888]: CAA26881: to=<uniman@ok.edu>, delay=00:00:06, mailer=local, stat=Sent
+Jun 13 02:12:06 satellife sendmail[26888]: CAA26881: to="<uni>|IFS=' ' && exec /usr/local/bin/procmail -f- || exit 75 #phil"@ok.com, ctladdr=phil (251/30), delay=00:00:11, mailer=prog, stat=Sent
+Jun 13 03:27:42 satellife sendmail[29007]: DAA29007: from=<UNIQUE3@VM.TEMPLE.EDU>, size=1531, class=0, pri=31531, nrcpts=1, msgid=<199606130827.DAA29007@satellife.healthnet.org>, proto=SMTP, relay=vm.temple.edu [155.247.14.2]
+Jun 13 03:27:43 satellife sendmail[24788]: DAA29008: clone DAA29007, owner=hello-l-owner
+Jun 13 03:27:44 satellife sendmail[29009]: DAA29007: to=<unizney@OK.HEALTHNET.ORG>, delay=00:00:03, mailer=fidogate, stat=Sent
+Jun 13 03:27:44 satellife sendmail[29019]: DAA29008: to=<unilo@OK.HELLO.ORG>, delay=00:00:03, mailer=fidogate, stat=Sent
+Jun 13 03:27:57 satellife sendmail[20646]: OAA20646: from=unique1@usa.healthnet.org, size=214, class=0, pri=60214, nrcpts=2, msgid=<199606131826.OAA20646@satellife.healthnet.org>, relay=majordom@localhost
+Jun 13 03:27:57 satellife vmunix: fd0: drive not ready
+Jun 13 03:27:57 satellife sendmail[20648]: OAA20646: to=unione@ok.healthnet.org, delay=00:00:00, mailer=local, stat=Sent
+Jun 13 03:27:59 satellife sendmail[20648]: OAA20646: to=unitwo@ok.foo.org, ctladdr=phil (251/30), delay=00:00:02, mailer=prog, stat=Sent
+Jun 13 03:29:32 satellife sendmail[29033]: DAA29033: from=<netprod@radirect.isinet.com>, size=13148, class=0, pri=43148, nrcpts=1, msgid=<9606130821.AA24400@radirect>, proto=ESMTP, relay=[199.4.155.10]
+Jun 13 03:29:33 satellife sendmail[29035]: DAA29033: to=<netnusi@ign.healthnet.org>, delay=00:00:04, mailer=fidogate, stat=Deferred: 451 collect: unexpected close, from=<netprod@radirect.isinet.com>: Host is unreachable
+Jun 13 06:23:47 satellife sendmail[1612]: GAA01612: from=unique2@usa.healthnet.org, size=1531, class=0, pri=31531, nrcpts=1, msgid=<199606131023.GAA01612@satellife.healthnet.org>, relay=majordom@localhost
+Jun 13 06:23:53 satellife sendmail[1614]: GAA01612: to=unione@OK.WPGATE.GALAXY.dnet.yorkhospital.edu,unitwo@ok.healthnet.org, delay=00:00:06, mailer=smtp, relay=mom.yorkhospital.edu. [192.206.231.90], stat=Sent (OK ; Job SMTP-NETMAIL (queue MULTINET_SMTP, entry 942) started on SMTP_MOM)
+Jun 13 08:31:24 satellife sendmail[1850]: FAA01850: from=<CouGithendu@iastate.edu>, size=8471, class=0, pri=38471, nrcpts=1, msgid=<m0uU97Y-0005O1C@uctmail2.uct.ac.za>, proto=ESMTP, relay=pop-3.iastate.edu [129.186.6.63]
+Jun 13 08:31:26 satellife sendmail[1852]: FAA01850: to=<Count11@ok.healthnet.org>, delay=00:00:04, mailer=fidogate, stat=Sent
+Jun 13 08:42:59 satellife sendmail[20699]: NAA20697: to=<Count1@prev.healthnet.org>, delay=00:00:02, mailer=fidogate, stat=Sent
+Jun 13 08:59:21 satellife sendmail[20769]: OAA20769: from=Countdomo-Owner@usa.healthnet.org, size=216, class=0, pri=60216, nrcpts=2, msgid=<199606131832.OAA20769@satellife.healthnet.org>, relay=majordom@localhost
+Jun 13 09:00:22 satellife sendmail[20771]: OAA20769: to=Count2@time, delay=00:00:01, mailer=local, stat=Sent

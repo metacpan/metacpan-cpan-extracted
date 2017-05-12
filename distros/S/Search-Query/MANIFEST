@@ -1,0 +1,28 @@
+bin/sqd
+Changes
+lib/Search/Query.pm
+lib/Search/Query/Clause.pm
+lib/Search/Query/Dialect.pm
+lib/Search/Query/Dialect/Native.pm
+lib/Search/Query/Dialect/SQL.pm
+lib/Search/Query/Dialect/SWISH.pm
+lib/Search/Query/Field.pm
+lib/Search/Query/Field/SQL.pm
+lib/Search/Query/Field/SWISH.pm
+lib/Search/Query/Parser.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/01-parser.t
+t/02-fields.t
+t/03-clause.t
+t/04-sql.t
+t/05-swish.t
+t/06-translate.t
+t/07-term-expander.t
+t/08-field-class.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

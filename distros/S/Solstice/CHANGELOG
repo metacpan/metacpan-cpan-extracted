@@ -1,0 +1,23 @@
+*0.9* (May 4th, 2006)
+
+Initial release!
+
+*0.92* (June 24th, 2006)
+
+- Moves the templating language to sol_
+- Embedded pageflows now get the proper Application object
+- Improvements to the View compiler
+- Improved installer process
+- Added central email widgets
+
+*0.93* (Aug, 14th, 2006)
+
+    - Adds a Solstice::Model::DBM_Deep for easy model storage
+    - Errors go to the browser in development mode
+    - Improved error reporting
+    - Button log - follow a user's path through an application
+    - All 'temporary/trash' tables live in the session db now, for easier db management
+    - A host of bugfixes and minor improvements
+
+
+

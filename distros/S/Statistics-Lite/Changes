@@ -1,0 +1,36 @@
+Revision history for Perl extension Statistics::Lite.
+
+3.62  Fri 29 Oct 2015 22:05:05 PM PDT
+    - Improved documentation and better organized tests, from Baldur Kristinsson
+3.61  Fri 27 Feb 2015 01:14:44 PM PST
+    - Upgraded ExtUtils::MakeMaker and repackaged (no functionality changes)
+3.6   Sun 22 Feb 2015 09:59:02 PM PST
+    - Added github repo to dist metadata and pod
+3.5   Sat 21 Feb 2015 11:38:52 PM PST
+    - Exclude undefined values, per CPAN bug # 50448
+3.4   Mon Feb 16 10:04:50 2015
+    - documentation fixes and additional tests
+    - now version controlled! https://github.com/brianary/Statistics-Lite
+3.3   Fri Feb 13 10:03:45 2015
+    - added license info
+3.2   Sun Jun 24 11:13:00 2007
+    - updated tests
+3.1
+    - fixed and renamed biased (population) versions
+    - added unbiased versions
+3.00  Sat Mar  3 16:48:00 2007
+    - after much delay, stddev has been restored to the sample or biased version of the formula; if you need the unbiased version, use stddev(0,@data)
+    - added frequencies() function from Nathan Haigh
+
+ ... time passed, people laughed and loved and sat, and we all learned something about the true meaning of New Year's Day ...
+
+1.02  Fri Nov  4 12:25:00 2005
+    - expanded explanation of limitations
+1.01  Thu Jan 10 14:59:52 2002
+    - bugfix version
+1.00  Thu Jan 10 14:25:38 2002
+    - fixed median algorithm
+0.05  Mon Jan 22 08:13:00 2001
+    - various optimizations
+0.01  Thu Sep 21 09:56:43 2000
+	- original version; created by h2xs 1.19

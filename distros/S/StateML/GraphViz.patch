@@ -1,0 +1,12 @@
+--- /usr/local/lib/perl5/site_perl/5.8.0/GraphViz.pm	Sun Feb 23 04:14:24 2003
++++ lib/GraphViz.pm	Tue Jun  3 13:54:46 2003
+@@ -410,6 +410,9 @@
+       { $_ =~ s#([|<>\[\]{}"])#\\$1#g; '<port' . $nports++ . '>' . $_ }
+       (@{$node->{label}});
+   }
++  else {
++    $node->{label} =~ s#([|<>\[\]{}"])#\\$1#g;
++  }
+ 
+   # Save ourselves
+   if (!exists($self->{NODES}->{$node->{name}})) {

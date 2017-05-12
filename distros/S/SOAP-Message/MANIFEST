@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/SOAP/Message.pm
+t/01_basic.t
+META.yml                                 Module meta-data (added by MakeMaker)

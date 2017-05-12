@@ -1,0 +1,50 @@
+
+=head1 NAME
+
+SDL::GFX::Framerate - framerate calculating functions
+
+=head1 CATEGORY
+
+GFX
+
+=head1 DESCRIPTION
+
+The framerate functions are used to insert delays into the graphics loop to maintain a constant framerate.
+
+=head1	METHODS
+
+=head2	init
+
+ use SDL;
+ use SDL::GFX::Framerate;
+ use SDL::GFX::FPSManager;
+
+ my $fps = SDL::GFX::FPSManager->new(0, 0, 0, 0);
+ 
+ SDL::GFX::Framerate::init($fps);
+
+Initialize the framerate manager, set default framerate of 30Hz and reset delay interpolation.
+
+=head2	set
+
+ SDL::GFX::Framerate::set($fps, 60);
+
+Sets the new desired framerate to 60 frames per second.
+
+=head2	get
+
+ my $rate = SDL::GFX::Framerate::get($fps);
+
+Get the currently set framerate of the manager.
+
+=head2	delay
+
+ SDL::GFX::Framerate::delay($fps);
+
+Generate a delay to accommodate the currently set framerate. Call once in the graphics/rendering loop. 
+If the computer cannot keep up with the rate (i.e. drawing too slow), the delay is zero and the delay interpolation is reset.
+
+=head1 AUTHORS
+
+See L<SDL/AUTHORS>.
+

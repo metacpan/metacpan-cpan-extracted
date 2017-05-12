@@ -1,0 +1,23 @@
+# Test how we behave if we get unparseable XML from the SRS
+#  Note, this probably just means our PRANG classes aren't setup properly
+#  But the example we use is completely invalid XML, which (we hope) the SRS
+#  will never emit
+template: check-domain.tt
+
+# Too hard to make this happen in an integration test
+integration_skip: 1
+
+vars:
+  domains:
+    - cheese.co.te
+
+input_assertions:
+  class: SRS::EPP::Command::Check::Domain
+
+output_assertions:
+  count:
+  match:
+  match_all:
+  attr_is:
+    - [ '//epp:result', 'code', '2500', 'EPP: correct result code' ]
+

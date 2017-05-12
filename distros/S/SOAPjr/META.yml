@@ -1,0 +1,20 @@
+--- #YAML:1.0
+name:                SOAPjr
+version:             1.1.4
+abstract:            SOAP without the bloat and JR (JSON-RPC) with proper error handling and file uploads
+license:             perl
+author:              
+    - Rob Manson <robman@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Carp:                          0
+    File::Basename:                0
+    File::Copy:                    0
+    File::Temp:                    0
+    JSON:                          0
+    Test::More:                    0
+    URI::Escape:                   0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

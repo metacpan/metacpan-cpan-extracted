@@ -1,0 +1,26 @@
+      <div id="left">
+        <h2>Welcome to the Scaffold Example Site</h2>
+        <p>Suspendisse potenti. Donec nulla est, laoreet quis, pellentesque in, congue in, dui. Nunc rhoncus placerat augue. Donec justo odio, eleifend varius, volutpat venenatis, sagittis ut, orci. Donec nulla est, laoreet quis, pellentesque in, congue in, dui. Nunc rhoncus placerat augue. Donec justo odio, eleifend varius, volutpat venenatis, sagittis ut, orci. Nullam et orci in erat viverra ornare. Nunc pellentesque. Sed vestibulum blandit nisl. Quisque elementum convallis purus. Quisque pellentesque semper massa.</p>
+        <ul>
+          <li><a href="#">Suspendisse quis gravida massa felis.</a></li>
+          <li><a href="#">Vivamus sagittis bibendum erat.</a></li>
+          <li><a href="#">Nullam et orci in erat viverra ornare.</a></li>
+          <li><a href="#">Suspendisse quis gravida massa felis.</a></li>
+          <li><a href="#">Curabitur malesuada turpis nec ante.</a></li>
+        </ul>
+        <p>Aliquam gravida massa eu arcu. Fusce mollis tristique sem. Sed eu eros imperdiet eros interdum blandit. Vivamus sagittis bibendum erat. Curabitur malesuada turpis nec ante. Suspendisse quis felis. Suspendisse potenti. Nullam et orci in erat viverra ornare. Nunc pellentesque. Sed vestibulum blandit nisl. Quisque elementum convallis purus.</p>
+      </div>
+      <div id="right">
+        <h2>Recent Updates</h2>
+        <p><strong>[06/09/2006]</strong> Etiam odio mi, suscipit et, rhoncus ac, lacinia, nisl. Aliquam gravida massa eu arcu. <a href="#">More&#8230;</a></p>
+        <p><strong>[06/06/2006]</strong> Fusce mollis tristique sem. Sed eu eros imperdiet eros interdum blandit. Vivamus sagittis bibendum erat. Curabitur malesuada. <a href="#">More&#8230;</a></p>
+        <p><strong>[06/03/2006]</strong> Nunc pellentesque. Sed vestibulum blandit nisl. Quisque elementum convallis purus. Suspendisse potenti. Donec nulla est, laoreet quis, pellentesque in. <a href="#">More&#8230;</a></p>
+        <h2>Ipsum Dolorem</h2>
+        <ul>
+          <li><a href="#">Sagittis Bibendum Erat</a></li>
+          <li><a href="#">Malesuada Turpis</a></li>
+          <li><a href="#">Quis Gravida Massa</a></li>
+          <li><a href="#">Inerat Viverra Ornare</a></li>
+        </ul>
+	<p>This sites theme was developed from the "PlainAndSimple" template by <a href="http://www.freecsstemplates.org">Free CSS Templates</a>.</p>
+      </div>

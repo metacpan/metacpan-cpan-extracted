@@ -1,0 +1,22 @@
+Changes
+lib/Spreadsheet/XLSX.pm
+lib/Spreadsheet/XLSX/Fmt2007.pm
+lib/Spreadsheet/XLSX/Utility2007.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml			Module meta-data (added by MakeMaker)
+README
+Spreadsheet-XLSX-0.14.tar.gz
+t/0____________use.t
+t/1_____loreyna126.t
+t/1_____loreyna126.xlsx
+t/2_____with_chart.t
+t/2_____with_chart.xlsx
+t/empty_v_tag.t
+t/empty_v_tag.xlsx
+t/formats.t
+t/formats.xlsx
+t/kwalitee.t
+t/missing_styles.t
+t/missing_styles.xlsx
+META.json                                Module JSON meta-data (added by MakeMaker)

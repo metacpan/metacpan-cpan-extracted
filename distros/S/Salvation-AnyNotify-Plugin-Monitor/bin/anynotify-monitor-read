@@ -1,0 +1,48 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+
+BEGIN {
+
+    require Carp;
+
+    $SIG{ __DIE__ } = \&Carp::confess;
+};
+
+use URI ();
+use LWP::Simple 'get';
+use Getopt::Long 'GetOptions';
+
+my $url = undef;
+my @channels = ();
+
+GetOptions(
+    'url=s' => \$url,
+    'channel=s' => \@channels,
+);
+
+die( 'URL is not specified' ) unless defined $url;
+die( 'Channels are not specified' ) if ( scalar( @channels ) == 0 );
+
+foreach my $channel ( @channels ) {
+
+    my $uri = URI -> new( $url );
+
+    $uri -> query_form( channel => $channel );
+
+    my $data = get( $uri -> as_string() );
+
+    while( length( $data ) > 0 ) {
+
+        my $len = unpack( 'N', substr( $data, 0, 4, '' ) );
+        my $data = substr( $data, 0, $len, '' );
+
+        print $data, "\n";
+    }
+}
+
+
+exit 0;
+
+__END__

@@ -1,0 +1,74 @@
+head	1.1;
+access;
+symbols
+	cleanup:1.1.2.1.0.2
+	funnytag:1.1.2.1
+	somebranch:1.1.0.2;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2003.06.12.15.58.52;	author xclkao;	state dead;
+branches
+	1.1.2.1;
+next	;
+
+1.1.2.1
+date	2003.06.12.15.58.52;	author xclkao;	state Exp;
+branches
+	1.1.2.1.2.1;
+next	1.1.2.2;
+
+1.1.2.2
+date	2003.07.03.15.34.10;	author clkao;	state Exp;
+branches;
+next	;
+
+1.1.2.1.2.1
+date	2003.07.02.12.29.35;	author xclkao;	state dead;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.1
+log
+@file zzzz was initially added on branch somebranch.
+@
+text
+@@
+
+
+1.1.2.1
+log
+@massive change on branch
+@
+text
+@a0 2
+massive change on branch
+
+@
+
+
+1.1.2.2
+log
+@play with common path
+@
+text
+@a2 1
+need more files to trigger fast update
+@
+
+
+1.1.2.1.2.1
+log
+@test pruning
+@
+text
+@@
+
+

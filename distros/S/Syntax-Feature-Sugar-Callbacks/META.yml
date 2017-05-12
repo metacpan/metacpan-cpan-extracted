@@ -1,0 +1,39 @@
+---
+abstract: 'Add sugar for declarative method callbacks'
+author:
+  - "Robert 'phaylon' Sedlacek <rs@474.at>"
+build_requires:
+  Test::Fatal: 0.003
+  Test::More: 0.96
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200015, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Syntax-Feature-Sugar-Callbacks
+no_index:
+  directory:
+    - t/
+provides:
+  Syntax::Feature::Sugar::Callbacks:
+    file: lib/Syntax/Feature/Sugar/Callbacks.pm
+    version: 0.002
+requires:
+  B::Hooks::EndOfScope: 0.09
+  Carp: 0
+  Data::Dump: 0
+  Devel::Declare: 0.006000
+  Params::Classify: 0.011
+  aliased: 0
+  namespace::clean: 0.18
+  strictures: 1
+  syntax: 0.003
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Syntax-Feature-Sugar-Callbacks
+  homepage: https://github.com/phaylon/Syntax-Feature-Sugar-Callbacks/wiki
+  repository: git://github.com/phaylon/Syntax-Feature-Sugar-Callbacks.git
+version: 0.002
+x_authority: cpan:PHAYLON

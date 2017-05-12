@@ -1,0 +1,6 @@
+name = "SVG-Fill"
+# badges = ["travis"]
+authority="cpan:JEGADE"
+
+module_maker="ModuleBuildTiny"
+abstract_from="lib/SVG/Fill.pm"

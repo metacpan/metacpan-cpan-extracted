@@ -1,0 +1,107 @@
+# -*- Makefile -*-
+# DESCRIPTION: SystemPerl: Example makefile for Cadence NC-SystemC
+#
+# This is executed in the "test_dir", not in this directory
+#
+# Copyright 2005-2014 by Wilson Snyder.  This program is free software; you
+# can redistribute it and/or modify it under the terms of either the GNU
+# Lesser General Public License Version 3 or the Perl Artistic License
+# Version 2.0.
+#
+
+mydefault:
+	@echo "Use 'make preproc' or 'make ncall'"
+	false
+
+SYSTEMPERL = ..
+SYSTEMPERL_INCLUDE ?= $(SYSTEMPERL)/src
+SYSTEMC_INCLUDE ?= $(SYSTEMC)/include
+SYSTEMC_LIBDIR ?= $(SYSTEMC)/lib-$(SYSTEMC_ARCH)
+
+INCDIR += -I. -I$(SYSTEMPERL_INCLUDE) -I$(SYSTEMC_INCLUDE) -I$(SYSTEMPERL)/example
+
+SP_INCLUDER = $(PERL) $(SYSTEMPERL)/sp_includer
+SP_PREPROC  = $(PERL) $(SYSTEMPERL)/sp_preproc
+
+SP_SP = $(wildcard $(SYSTEMPERL)/example/*.sp)
+
+######################################################################
+
+SP_SP_BASE := $(basename $(notdir $(SP_SP)))
+SP_H   := $(addsuffix .h,$(SP_SP_BASE))
+SP_CPP := $(notdir $(wildcard *.cpp))
+SP_OBJS   := $(addsuffix .o,$(basename $(SP_CPP)))
+
+SPPREPROC_FLAGS = -M sp_preproc.d --tree ex.tree --preproc --ncsc
+
+# Setup as a "always" rule; we don't check for enough sp_preproc dependencies
+# In a user example where you weren't editing sp_preproc, you could have:
+#preproc $(SP_CPP) $(SP_H): $(SP_SP)
+preproc:
+	$(SP_PREPROC) $(INCDIR) $(SPPREPROC_FLAGS) $(SP_SP)
+
+
+######################################################################
+
+CONCAT_CPP = $(SP_CPP) $(SYSTEMPERL_INCLUDE)/Sp.cpp
+OUR_NCSC_CPP = Ex__ALL.cpp
+
+$(OUR_NCSC_CPP): $(CONCAT_CPP)
+	$(SP_INCLUDER) $^ > $@
+
+# The following are user options, that are documented in the NC-SystemC manual
+# Makefile method:
+ifeq ($(NCSC_USE_MAKEFILE),)
+ # Direct ncsc_run method
+
+ # Or -static, and use below ncrun_static
+ OUR_NCSC_FLAGS += -gnu -dynamic -sc_main -O1 -DSP_COVERAGE
+
+ # The below is required to work around a bug in ncsc 05.40-p004
+ # This is fixed in ncsc 5.4 s8
+ #OUR_NCSC_FLAGS += -noedg
+
+ ncall: ncbuild ncrun
+
+ ncbuild: $(OUR_NCSC_CPP)
+	@echo Ncsc_run Build
+	ncsc_run $(OUR_NCSC_FLAGS) $(OUR_NCSC_CPP) $(INCDIR) -use ncsim -stop hdl_elab
+
+# ExMain.cpp shouldn't be required, but bug in ncsc 05.40-p004 requires it (no longer supported)
+# ncsc 06.20-s007 requires ncsimexe/ncelabexe, or dynamic linkage
+ ncrun:
+	@echo Ncsc_run on pre-elaborated design
+	ncsc_run -r worklib.sc_main:sc_module
+
+ ncrun_static:
+	@echo Ncsc_run on pre-elaborated design
+	ncsc_run -r worklib.sc_main:sc_module +ncsimexe+./ncsim_sc +ncelabexe+./ncelab_sc
+
+##############################
+else
+ # NCSC Makefile with separate steps
+
+ SYSTEMC_MAKEFILES = $(NC_ROOT)/tools/systemc/files/make
+ SYSTEMC_SOURCES = $(OUR_NCSC_CPP)
+ VERILOG_SOURCES =
+ COMPILER = gnu
+ USER_IFLAGS =
+ USER_LFLAGS =
+ USER_DFLAGS = -g
+ USER_LIBS +=
+ USER_SIM_OPTIONS =
+ USER_ELAB_OPTIONS =
+ USER_VLOG_OPTIONS =
+ USER_CPP_OPTIONS +=
+ DEBUG = -g
+ CPP_EXT = cpp
+ ARCH = lnx86
+ DESIGN_TOP =
+ SNAPSHOT_NAME = simx
+ export LD_LIBRARY_PATH
+
+ include $(SYSTEMC_MAKEFILES)/Makefile.sc
+
+ ncbuild: static
+
+endif

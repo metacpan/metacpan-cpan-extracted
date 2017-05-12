@@ -1,0 +1,12 @@
+Revision history for Perl extension SysTray.
+
+0.11  Mon Jan 19 2009
+  - initial version
+  - support for Linux, Mac, Windows    
+
+0.12  Tue Jan 20 2009
+  - added events for control keys pressed along with mouse buttons
+  - Log-off and shut-down system messages are now received
+
+0.13  Thu Jan 22 2009
+  - added function for releasing allocated GUI resources

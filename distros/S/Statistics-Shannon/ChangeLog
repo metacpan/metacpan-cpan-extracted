@@ -1,0 +1,50 @@
+2016-03-13  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Fix rt.cpan.org #112964:
+	  t/01base.t may fail (-Duselongdouble && hash randomization)
+
+	  The test was expecting floating point equivalence, which in itself
+	  is a bad expectation, but what broke it was a bit more interesting:
+	  because of long doubles the summation order mattered, and the hash
+	  randomization affected the summation order.
+
+	* Fix trailing whitespace in ChangeLog.
+
+	* Fix Statistics::Frequency link in pod.
+
+	* Modernize tests to use strict + warnings.
+
+2015-08-24  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Regenerate distro with a modern MakeMaker
+	  (using perl 5.18.2)
+
+	* Add README.
+
+	* Use the recommended copyright and license wording.
+
+	* Bump the copyright years.
+
+	* Add the copyright and license also to the README.
+
+	* Require Statistics::Frequence 0.04.
+
+	* Release as version 0.04.
+
+Sat Sep  7 20:50:18 2002  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* The base(1)/evenness(1) tests were bogus.
+
+	* Even more documentation tweaks.
+
+	* Release 0.03.
+
+Sat Sep  7 20:27:36 2002  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Documentation tweaks.
+
+	* Release 0.02.
+
+Sat Sep  7 20:22:56 2002  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Release 0.01.

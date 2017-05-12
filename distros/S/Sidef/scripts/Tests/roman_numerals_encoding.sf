@@ -1,0 +1,43 @@
+#!/usr/bin/ruby
+
+# Translation of: http://rosettacode.org/wiki/Roman_numerals/Encode#ActionScript
+
+func arabic2roman (num) {
+
+    static lookup = [
+        [ M => 1000],
+        [CM =>  900],
+        [ D =>  500],
+        [CD =>  400],
+        [ C =>  100],
+        [XC =>   90],
+        [ L =>   50],
+        [XL =>   40],
+        [ X =>   10],
+        [IX =>    9],
+        [ V =>    5],
+        [IV =>    4],
+        [ I =>    1],
+    ];
+
+    var roman = '';
+    for (lookup) { |arr|
+        var (r, a) = arr...;
+        while (num >= a) {
+            roman += r;
+            num   -= a;
+        }
+    }
+
+    return(roman);
+}
+
+#
+## MAIN
+#
+
+[[1990,'MCMXC'], [2008,'MMVIII'], [1666,'MDCLXVI']].each { |pair|
+    var roman = arabic2roman(pair[0]);
+    roman == pair[1] || "Error occurred on number: #{pair[0]}\n".die;
+    "%s in roman is %s".printlnf(pair[0], roman);
+}

@@ -1,0 +1,191 @@
+\+LanguageEncoding IPA93
+\ver 5.0
+\desc SIL Encore IPA93 version 2.0
+with FindPhone keyboard and sort orders
+
+ \codepage= silipa93.tec
+ \unicode_font = "Doulos SIL"
+\+srtset 
+
+\+srt abcde
+\desc Alphabetical order
+\primary a Q A Œ
+b B º õ
+c ş C
+d ê D ë
+e E « Î ¿ ¯ ‚ Ï
+f ¸
+g Ä © G ı
+h ú ç ğ K î
+i I ö
+j Æ ï ×
+k
+l ñ Â L ´ ; ä
+m M
+n ÷ ø N ²
+o   O P F
+p ‡
+q
+r } ¨ R Ó { Ò
+s § S
+t ÿ T
+u U µ Ã ¬ 
+v V
+w ã å
+x X
+y Y
+z ½ Z ü
+À ¹ ? û
+—  œ ’
+\-srt
+
+\+srt pbmfv
+\desc Place of articulation
+\primary p ‡ b º m õ ¸ B
+ã w
+M f v V
+ T D
+t — ’ d ë n r R ä s z Â L ¨ l
+S Z
+ÿ ê ÷ } § ½ Ó ñ
+œ ş ü
+c ï × ø C Æ j ´
+ç
+k g © N x Ä å ;
+î
+q G ı ² { X Ò
+ğ À
+? h ú
+û K ¹
+i I e E Q a y Y O ¿ ¯
+ö ‚ « Î Œ ¬ P Ï
+µ F Ã A u U o  
+\-srt
+
+\+srt ptckq
+\desc Manner of articulation
+\primary p t ÿ c k q ?
+‡  — œ ’
+b d ê ï g G û
+º ë × © ı
+m M n ÷ ø N ²
+õ r {
+R } ä
+¸ f T s S § ş C x î X ğ h K
+B v D z Z ½ ü Æ Ä Ò À ú ¹
+Â
+L
+ã
+w V ¨ Ó j ç å
+l ñ ´ ;
+i y ö ¬ µ u
+I Y U
+e O ‚ P F o
+«
+E ¿ Î Ï Ã 
+Q Œ
+a ¯ A 
+\-srt
+
+\srtDefault abcde
+\-srtset
+\+varset 
+
+\+var alveolar
+\chars t d n r R s z Â L ¨ l ë
+\-var
+
+\+var approximant
+\chars V ¨ Ó j å
+\-var
+
+\+var bilabial
+\chars p b m õ ¸ B º
+\-var
+
+\+var cons
+\chars p ‡ b º m õ ¸ B ã w M f v V  T D t — ’ d ë n r R ä s z Â L ¨ l S Z ÿ ê ÷ } § ½ Ó ñ œ ş ü c ï × ø C Æ j ´ ç k g © N x Ä å ; î q G ı ² { X Ò ğ À ? h ú û K ¹
+\-var
+
+\+var dental
+\chars T D
+\-var
+
+\+var flap
+\chars R }
+\-var
+
+\+var fricative
+\chars ¸ B f v T D s z S Z § ½ C Æ x Ä X Ò ğ À h ú
+\-var
+
+\+var glottal
+\chars ? h ú
+\-var
+
+\+var implosive
+\chars º ë × © ı
+\-var
+
+\+var labiodental
+\chars M f v V
+\-var
+
+\+var lateral_approximant
+\chars l ñ ´ ;
+\-var
+
+\+var lateral_fricative
+\chars Â L
+\-var
+
+\+var nasal
+\chars m M n ÷ ø N ²
+\-var
+
+\+var palatal
+\chars c ï ø C Æ j ´ ×
+\-var
+
+\+var pharyngeal
+\chars ğ À
+\-var
+
+\+var plosive
+\chars p b t d ÿ ê c ï k g q G ?
+\-var
+
+\+var postalveolar
+\chars S Z
+\-var
+
+\+var retroflex
+\chars ÿ ê ÷ } § ½ Ó ñ
+\-var
+
+\+var trill
+\chars õ r {
+\-var
+
+\+var uvular
+\chars q G ² { X Ò ı
+\-var
+
+\+var velar
+\chars k g N x Ä å ; ©
+\-var
+
+\+var vowel
+\chars i I e E Q a y Y O ¿ ¯ ö ‚ « Î Œ ¬ P Ï µ F Ã A u U o  
+\-var
+
+\-varset
+\+fnt 
+\Name SILDoulos IPA93
+\Size 12
+\charset 02
+\rgbColor 0,0,0
+\-fnt
+\kbdWin32 US
+\kbdKeyman IPA93 1.0 (FF)
+\-LanguageEncoding

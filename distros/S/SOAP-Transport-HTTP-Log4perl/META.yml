@@ -1,0 +1,38 @@
+---
+abstract: 'SOAP::Lite plugin that adds Log4perl traces'
+author:
+  - 'Emmanuel Rodriguez <potyl@cpan.org>'
+build_requires:
+  File::Spec::Functions: 0
+configure_requires:
+  File::Spec::Functions: 0
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: SOAP-Transport-HTTP-Log4perl
+provides:
+  SOAP::Transport::HTTP::Log4perl:
+    file: lib/SOAP/Transport/HTTP/Log4perl.pm
+    version: 0.01
+  SOAP::Transport::HTTP::MockReplay:
+    file: lib/SOAP/Transport/HTTP/MockReplay.pm
+    version: 0.01
+requires:
+  Digest::MD5: 0
+  File::Path: 0
+  File::Slurp: 0
+  File::Spec: 0
+  LWP: 0
+  Log::Log4perl: 0
+  SOAP::Lite: 0
+  XML::LibXML: 0
+  perl: v5.6.1
+resources:
+  bugtracker: http://github.com/potyl/pexeso/issues
+  homepage: http://github.com/potyl/pexeso
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/potyl/pexeso
+version: 0.01

@@ -1,0 +1,203 @@
+#!/usr/local/bin/perl -w
+
+use Solaris::MapDev qw(:ALL);
+
+################################################################################
+# Change an instance name to a device name, and if possible truncate as many
+# trailing spaces as are necessary to keep the total string length the same
+
+sub i2d($)
+{
+my ($str) = @_;
+$str =~ /(\S*)(\s*)/;
+my ($inst, $space) = ($1, $2);
+$space =~ s/\t/        /g;
+my $i = inst_to_dev($inst);
+if ($i)
+   {
+   return($i . " " . " " x (length($space) - 1 - (length($i) - length($inst))));
+   }
+else
+   {
+   return($str);
+   }
+}
+
+################################################################################
+# Display a list of all the instance to device mappings
+
+sub display()
+{
+foreach my $inst (get_inst_names())
+   {
+   print("$inst is an alias for ", inst_to_dev($inst), "\n");
+   }
+}
+
+################################################################################
+# Main routine
+
+# Process any command-line flags
+while (@ARGV && $ARGV[0] =~ /^-/)
+   {
+   $_ = shift(@ARGV);
+   CASE:
+      {
+      # -explorer flag - next arg is an explorer directory
+      $_ =~ /^-explorer$/ and do
+         {
+         # Check the dir actually exists
+         my $dir = shift(@ARGV);
+         die("No explorer directory specified\n") if (! defined($dir));
+         die("Explorer directory $dir doesn't exist\n") if (! -d $dir);
+
+         # Check the basic explorer data files are there
+         my $path_to_inst = "$dir/etc/path_to_inst";
+         my $mnttab       = "$dir/etc/mnttab";
+         my $dls = "$dir/disks/ls-l_dev_rdsk.out";
+         die("$dir isn't an explorer directory\n")
+            if (! (-f $path_to_inst && -f $mnttab && -f $dls));
+         my %dev_ls;
+         $dev_ls{"/dev/rdsk"} = $dls;
+
+         # Look for sonoma info
+         $dls = "$dir/disks/sonoma/ls-l_dev.osa.rdsk";
+         $dev_ls{"/dev/osa/rdsk"} = $dls if (-f $dls);
+         $dls = "$dir/disks/sonoma/ls-l_dev.osa.dev.rdsk";
+         $dev_ls{"/dev/osa/dev/rdsk"} = $dls if (-f $dls);
+
+         # Tell Solaris::MapDev to use the static data files
+         # instead of dynamically looking things up
+         mapdev_data_files(path_to_inst => $path_to_inst,
+                           mnttab       => $mnttab,
+                           dev_ls       => \%dev_ls);
+         last CASE;
+         };
+      # default
+      die("Unrecognised command-line flag \"$_\"\n");
+      }
+   }
+
+# If no arguments are supplied ...
+if (@ARGV == 0)
+   {
+   # ... and stdin is a pipe ...
+   if (! -t STDIN)
+      {
+      # Convert any sdNNN names to the ctd equivalents
+      $| = 1;
+      while (<STDIN>)
+         {
+         s/((ss?d\d+(,\w)?|nfs\d+|st\d+|dad\d+|atapicd\d+)\s*)/i2d($1)/ge;
+         print;
+         }
+      }
+   # Otherwise, just print the list of mappings
+   else
+      {
+      display();
+      }
+   }
+
+# If we have a list of arguments, assume they are a list of devices to map
+else
+   {
+   foreach my $arg (@ARGV)
+      {
+      if ($arg =~ /^(ss?d\d+|st\d+|nfs\d+|dad\d+|atapicd\d+)/)
+         { print(inst_to_dev($arg) || $arg); }
+      else
+         { print(dev_to_inst($arg) || $arg); }
+      print(" ");
+      }
+   print("\n");
+   }
+
+################################################################################
+__END__
+
+=head1 NAME
+
+mapdev - Map disk instance names to device names and vice-versa
+
+=head1 SYNOPSIS
+
+mapdev
+mapdev [ instance | dev ... ]
+mapdev -explorer <explorer dir>
+mapdev -explorer <explorer dir> [ instance | dev ... ]
+
+=head1 DESCRIPTION
+
+mapdev converts instance names to device names and vice-versa.  'Vanilla' SCSI
+disks, floppy disks, cdroms, SSA, A1000, A3000, A3500 and A5000 disks, tapes
+and NFS mounts are all catered for.  With no arguments mapdev prints a list of
+all the mappings.  With an argument like 'sdNNN', 'ssdNNN', 'nfsNNN', 'stNNN'
+etc it will display the corresponding device name.  With an argument that looks
+like 'cNtNdNsN', 'rmt/N' or 'host:/nfs/share' it will print the corresponding
+sd, sdd, mt or nfs instance name.  If the standard input is a pipe, it will
+convert any instance names to the corresponding device names, preserving column
+alignment as far as possible.
+
+=head1 OPERANDS
+
+The following operands are supported:
+
+=over 4
+
+=item -explorer <explorer directory>
+
+Mapping information is derived from the files in the explorer directory,
+rather than the "live" files on the system.
+
+
+=item instance name
+
+An instance name, e.g. as reported by C<'sar -d'>.  This will be converted to
+the corresponding device name.
+
+=item device name
+
+A device name without the leading "/dev/..." prefix.  This will be converted
+into  the corresponding instance name.
+
+=head1 EXAMPLES
+
+ $ mapdev
+ nfs132 is an alias for homesvr:/export/home/alan
+ nfs2 is an alias for mailsvr:/var/mail
+ nfs3 is an alias for workstation:vold(pid315)
+ sd0 is an alias for c0t0d0
+ sd8 is an alias for c0t9d0
+ sd9 is an alias for c0t10d0
+ st1 is an alias for mt0
+ st2 is an alias for mt1
+
+ $ mapdev nfs132 sd9,d c0t0d0s3
+ homesvr:/export/home/alan c0t10d0s3 sd0,d
+
+ $ sar -d 1 | mapdev
+ 17:01:42   device        %busy   avque   r+w/s  blks/s  avwait  avserv
+            c0t0d0            0     0.0       0       0     0.0     0.0
+            c0t0d0s0          0     0.0       0       0     0.0     0.0
+            c0t0d0s1          0     0.0       0       0     0.0     0.0
+            c0t0d0s2          0     0.0       0       0     0.0     0.0
+            c0t9d0            0     0.0       0       0     0.0     0.0
+            c0t9d0s2          0     0.0       0       0     0.0     0.0
+            c0t9d0s3          0     0.0       0       0     0.0     0.0
+            c0t9d0s4          0     0.0       0       0     0.0     0.0
+            c0t10d0           0     0.0       0       0     0.0     0.0
+            c0t10d0s2         0     0.0       0       0     0.0     0.0
+            c0t10d0s3         0     0.0       0       0     0.0     0.0
+            c0t10d0s4         0     0.0       0       0     0.0     0.0
+            rmt/1             0     0.0       0       0     0.0     0.0
+
+=head1 AUTHOR
+
+Alan Burlison, <Alan.Burlison@uk.sun.com>
+
+=head1 SEE ALSO
+
+L<Solaris::MapDev(3)>
+
+=cut

@@ -1,0 +1,53 @@
+% if ($has_activity) {
+<p>
+  <strong>
+    <% loc(q{Purging a user removes the user and all edits they've made in all wiki, as well as all pages and files they've created!}) %>
+  </strong>
+</p>
+% }
+
+<p>
+  <% loc('This action should only be used to remove spammers. If you want to remove a user who is not a spammer, you should simply disable their account, which will prevent them from logging in.') %>
+</p>
+
+<h2><% loc('Disable this user instead') %></h2>
+
+<form action="<% $user->uri() %>" method="post">
+  <input type="hidden" name="x-tunneled-method" value="PUT" />
+  <input type="hidden" name="is_disabled" value="1" />
+  <input type="submit" value="<% loc('Disable') %>" />
+</form>
+
+<h2><% loc('Purge this user') %></h2>
+
+% if ($has_activity) {
+<p>
+  <strong>
+    <% loc('Purging this user will delete %quant( %1, page, pages ), %quant( %2, revision, revisions ), and %quant( %3, file, files ).', $page_count, $rev_count, $file_count ) %>
+  </strong>
+</p>
+% }
+
+<p>
+  <% loc( 'User: <em>%html(%1) - %html(%2)</em>', $user->best_name(), $user->email_address() ) | n %>
+</p>
+
+<form action="<% $user->uri() %>" method="post">
+  <input type="hidden" name="x-tunneled-method" value="DELETE" />
+  <input type="submit" value="<% loc('Yes, purge this user') %>" />
+</form>
+
+<%args>
+$user
+</%args>
+
+<%init>
+my $page_count = $user->page_count();
+my $rev_count = $user->revision_count();
+my $file_count = $user->file_count();
+my $has_activity = $page_count || $rev_count || $file_count;
+</%init>
+
+<%method title>
+<% loc( 'Purge this user?') %>
+</%method>

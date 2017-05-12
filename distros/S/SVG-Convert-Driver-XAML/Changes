@@ -1,0 +1,8 @@
+Revision history for SVG-Convert-Driver-XAML
+
+0.02  2007/10/09 17:43
+      Moved from SVG::Convert
+      Add well-formed tests
+
+0.01  2007/09/13 20:58
+      First version.

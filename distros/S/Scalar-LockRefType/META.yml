@@ -1,0 +1,22 @@
+---
+abstract: 'simple scalar ref type checker'
+author:
+  - unknown
+build_requires:
+  Test::Exception: 0.32
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.132830'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Scalar-LockRefType
+provides:
+  Scalar::LockRefType:
+    file: lib/Scalar/LockRefType.pm
+    version: 0.03
+requires:
+  perl: 5.010
+version: 0.03

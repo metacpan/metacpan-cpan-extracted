@@ -1,0 +1,9 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README.md
+README.pod
+dist.ini
+lib/Software/License/PublicDomain.pm
+t/00-compile.t

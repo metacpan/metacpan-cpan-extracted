@@ -1,0 +1,26 @@
+Revision history for perl module Statistics-Data-Dichotomize
+
+0.05 2016-04-07
+    - added the optional argument 'set' to cut(), swing(), pool(), match() and binate() methods--but not shrink() method--to control the set of binary values of which the dichotomous sequence should be constructed. Previously, this was only the set {0, 1}, which remains the default. Description of the argument has been added to the DESCRIPTION section in POD, and also to the POD sections for each method.
+    - added 'rpt' as a possible value to the argument 'equal' in the cut() method to control how to treat elements that are equal to the cut-value (corresponding to the method for 'rpt' in the swing() method)
+    - added POD re handling stringy data by shrink() method
+    - corrected POD for cut() method re default operation when given value equals cut-value; this has always (by convention) been to treat the given value as if it was "greater than" the cut-value (as when specifying equal => 'gt'). The default operation was previously erroneously described in POD as skipping the value (as if equal => 0, or 'skip'). The default operation (as always) prevents a sequence which is only composed of the cut-value returning an empty list.
+    - added tests for operations following the value of the 'equal' argument in cut()
+    - removed from POD the alias "boolwin" for the shrink() method (still supported, for now, in the background).
+    - made misc. POD revisions not related to functionality, such as in specifying a value of 'skip' for the 'equal' argument
+
+0.04 2016-01-09
+    - no major functional changes
+    - removed defunct keying of the dichotomized "testdata" into the class object
+    - returned split() method to original name cut()
+    - misc. POD and some "best prac" cleanups
+
+0.03 2013-07-29
+    - added method crosslag() to support match() (instead of calling from Statistics::Data)
+
+0.02 2013-04-25
+    - First CPAN distribution
+
+0.01 2012-10-22
+    - First version
+

@@ -1,0 +1,168 @@
+#!perl
+use strict;
+use warnings;
+use Statistics::Swoop;
+use Getopt::Long qw/:config gnu_getopt/;
+use Text::ASCIITable;
+
+MAIN: {
+    my $opt = {};
+    get_opt($opt, @ARGV);
+    swoop($opt);
+}
+
+sub swoop {
+    my $opt = shift;
+
+    my %list;
+    while (my $stdin = <STDIN>) {
+        chomp $stdin;
+        next if !defined $stdin;
+        next if $stdin eq '';
+        if ($opt->{fields}) {
+            my @f = split /$opt->{delimiter}/, $stdin;
+            for my $field (@{$opt->{fields}}) {
+                push @{$list{$field - 1}}, normalize($f[$field - 1]);
+            }
+        }
+        else {
+            push @{$list{0}}, normalize($stdin);
+        }
+    }
+
+    my $t = Text::ASCIITable->new;
+    $t->setCols('', qw/ elem sum max min range avg /);
+
+    for my $field (@{$opt->{fields}}) {
+        my $swoop = Statistics::Swoop->new(\@{$list{$field - 1}});
+        $t->addRow(
+            $field,
+            defined $swoop->count ? $swoop->count : '-',
+            defined $swoop->sum   ? $swoop->sum   : '-',
+            defined $swoop->max   ? $swoop->max   : '-',
+            defined $swoop->min   ? $swoop->min   : '-',
+            defined $swoop->range ? $swoop->range : '-',
+            defined $swoop->avg   ? $swoop->avg   : '-',
+        );
+    }
+    if ($opt->{stderr}) {
+        warn $t;
+    }
+    else {
+        print $t;
+    }
+}
+
+sub get_opt {
+    my ($opt, @argv) = @_;
+
+    Getopt::Long::GetOptionsFromArray(
+        \@argv,
+        'fields|f=s'    => \$opt->{fields},
+        'delimiter|d=s' => \$opt->{delimiter},
+        'stderr'        => \$opt->{stderr},
+        'h|help' => sub {
+            _show_usage(1);
+        },
+        'v|version' => sub {
+            print "$0 $Statistics::Swoop::VERSION\n";
+            exit 1;
+        },
+    ) or _show_usage(2);
+
+    if (!$opt->{fields}) {
+        push @{$opt->{_fields}}, 1;
+    }
+    else {
+        for my $f (split /,/, $opt->{fields}) {
+            push @{$opt->{_fields}}, $f;
+        }
+    }
+    $opt->{fields} = $opt->{_fields};
+
+    unless ($opt->{delimiter}) {
+        $opt->{delimiter} = "\t";
+    }
+}
+
+sub normalize {
+    my $value = shift;
+
+    $value =~ s/^([\d\.]+).*/$1/;
+    return $value;
+}
+
+sub _show_usage {
+    my $exitval = shift;
+
+    require Pod::Usage;
+    Pod::Usage::pod2usage(-exitval => $exitval);
+}
+
+__END__
+
+=head1 NAME
+
+swoop - getting basic stats of lines
+
+=head1 SYNOPSIS
+
+Getting stats of lines(sum, max, min, range, avg)
+
+    $ cat some_file | swoop
+
+=head2 EXAMPLES
+
+specified the calc fields and the delimiter for splitting lines
+
+    $ cat some_file | swoop -f1,3 -d,
+
+output
+
+    .--------------------------------------------.
+    |   | elem | sum  | max | min | range | avg  |
+    +---+------+------+-----+-----+-------+------+
+    | 1 |   10 | 40.7 |   9 |   0 |     9 | 4.07 |
+    | 3 |   10 |   55 |  10 |   1 |     9 |  5.5 |
+    '---+------+------+-----+-----+-------+------'
+
+=head2 OPTIONS
+
+=head3 -f, --fields=LIST
+
+select only these fields
+
+=head3 -d, --delimiter=DELIM
+
+use DELIM instead of TAB for field delimiter
+
+=head3 --stderr
+
+put result to STDERR(default: STDOUT)
+
+=head3 -h, --help
+
+display this help and exit
+
+=head3 -v, --version
+
+output version information and exit
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>
+
+
+=head1 SEE ALSO
+
+L<Statistics::Swoop>
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+=cut
+

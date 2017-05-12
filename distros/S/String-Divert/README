@@ -1,0 +1,52 @@
+String::Divert
+==============
+
+ABSTRACT
+
+String::Divert is small Perl 5 module providing a scalar-like string
+object with some overloaded operators, supporting the concept of Fold-
+ing and Diversion. This allows nested generation of structured output.
+The idea is to decouple the sequential generation of output from the
+nested and non-sequential structure of the output.
+
+The two most prominent examples are the generation of code in SGML/XML
+based languages like [X]HTML (where large and deeply nested structures
+occur) and the generation of code in typed 3GL procedural languages
+like C/C++ (where symbols have to be declared before usage). Here
+String::Divert allows you to generate the code in steps from the outer
+to the inner level or to append code to already generated previous or
+later inserted parts.
+
+This is achieved by leveraging two basic concepts: content folding and
+operation diversion.
+
+Content Folding
+
+The concept of content folding allows you to fold the content at the
+current output position by inserting a placeholder corresponding to a
+sub-output and just proceeding with the output generation. The sub-out-
+put initially is empty. Once output is appended to it (see diversion
+below), it will occur at the placeholder position if the content is
+unfolded later. Folding can be applied to the sub-object again and this
+way allowing arbitrary nested structures. A sub-output even can be
+unfolded into multiple placeholder positions.
+
+Operation Diversion
+
+The concept of operation diversion allows you to automatically divert
+an operation to one object to another object. Usually this is used for
+diverting output generation operations on a top-level string object to
+folded sub-objects without having to deal with multiple object vari-
+ables and without having to know that you are actually operating on a
+sub-object. Diversions are applied in a stacked fashion, allowing the
+stepping back to the previous active diversion.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+

@@ -1,0 +1,13 @@
+Revision history for String-Cluster-Hobohm
+
+0.141020  2014-04-12 15:14:08ART-0300 America/Argentina/Buenos_Aires
+    - Remove dependency on namespace::autoclean (Github #1)
+
+0.121330  2012-05-12 13:03:26 America/Argentina/Buenos_Aires
+    - Allow empty strings as input (Bug #77148: empty string cause crash).
+
+0.112890  2011-10-16 11:17:12 America/Argentina/Buenos_Aires
+    - Don't require perl 5.10
+
+0.112880  2011-10-15 19:23:45 America/Argentina/Buenos_Aires
+    - Initial release to CPAN

@@ -1,0 +1,11 @@
+# a hash of headers, each header can have a string value or an array of strings
+# (to represent multiple headers)
+
+[hash, {
+  each_key: ['str*', match: '\A\w+(-\w+)*\z'],
+  each_value: ['any*', of, ['str*', ['array*', of, 'str*']]]
+}]
+
+# example valid data: {"Content-Type": "text/html", "X-Foo": ["one", "two"]}
+# example invalid data (invalid header name syntax): {"Content-Type-": "text/html"}
+# example invalid data (invalid header value): {"Content-Type": {}}

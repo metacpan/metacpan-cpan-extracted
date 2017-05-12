@@ -1,0 +1,13 @@
+# Send a request without logging in (which should fail)
+template: check-domain.tt
+
+user: ~
+no_auto_login: 1
+
+vars:
+  domains:
+    - cheese.co.te
+
+output_assertions:
+  attr_is:
+    - [ '//epp:result', 'code', '2001', 'EPP: login failed' ]

@@ -1,0 +1,251 @@
+
+		       Demonstration of Log Tail
+
+This demonstration script illustrates Stem's ability to monitor log
+files.  It showcases the Stem modules Stem::Log (which logs messages)
+and Stem::LogTail (which checks files for changes/updates).  This
+demonstration runs two hubs named archive and monitor.  The monitor
+hub watches a particular log file for changes.  When a change occurs,
+messages are sent to the archive hub to be logged.  The archive
+hub records the contents of the monitored log file (sent by the
+monitor hub) and also records status messages sent by the monitor
+hub.  Log messages that are recorded by the archive hub can be
+stored as either raw data or with custom formats.  This demonstrates
+a single log file being monitored, in a real world case there could be
+several log files being monitored.  It is easy to see in this example that
+Stem can handle this with a small number of additions to its
+configuration files.  This can be distributed securely across a network.
+This demo script is described in detail below with sections on
+running, using, configuring, and experimenting with it.
+
+Running tail_demo
+
+The log tail demonstration is called tail_demo and it uses monitor.stem
+and archive.stem configuration files (found in conf/).  It is run with
+the simple command:
+
+tail_demo
+
+To exit, just enter 'q' in the tail_demo script window itself. It will
+kill all the other windows and then exit. This will also happen if you
+interrupt the demo script with ^C.
+
+If the -s option is used, then all the windows will use ssfe (split
+screen front end) which provides a command line edit and history window
+section and an output section.  Two hub windows named Archive and
+Monitor will be created and a single shell window will be created with its
+current directory set to tail/.  Stem will create two log files
+in the tail/ directory, bar.log and bar_status.log.  bar.log is used
+by the archive hub to record what ever is sent to that log file and
+bar_status.log is used as a log file for status messages.
+The hub windows can be used to interact with that hubs Stem environment
+and the command line window can be used to put contents into a foo.log
+file.  The two hub windows use the standard module Stem::TtyMsg which
+allows you to interact with them.  In this demo they will be used to
+modify the Stem environment which will affect the behavior of the
+logical logs.
+
+Using tail_demo
+
+Initially, bar.log and bar_status.log will be empty files but in 10
+seconds (the tailing interval set in the monitor.stem configuration)
+the status log will have a message about foo.log not being found.  Run
+ls -l several times in the shell (center) window to see when the status
+has been logged and then read that file will
+
+$ cat bar_status.log
+
+Now type the following at the command line (in the shell window):
+
+$ echo 'foobar' > foo.log
+
+After 10 seconds (configured in the Stem configuration file)
+you can look in bar.log and you will notice that there is a single line
+that reads, "foobar", and in bar_status.log you will notice that there
+is a status message saying that it is the first time that foo.log was
+opened.  And, of course, we have the line "foobar" in the monitored log
+file, foo.log.
+
+Configuring tail_demo
+
+Look at the file conf/monitor.stem. That is one of the configuration files
+used by tail_demo. It is very simple and easy to understand. It is a Perl list
+of lists structure with key/value pairs. Read the config_notes for more
+on this.
+
+The first Cell configured is Stem::Hub which names this hub as
+'monitor'.
+
+	[
+		class	=>	'Stem::Hub',
+		name	=>	'monitor',
+		args	=>	[],
+	],
+
+Next comes the configuration for the Stem::Portal cell,
+
+	[
+		class	=>	'Stem::Portal',
+		args	=>	[
+		],
+	],
+
+It is important to note here that there are no args passed into the
+portal.  This means that the portal is a client portal, its default
+host is set to localhost, and its default port is set to 10,000.  For
+more information on portals, read the portal design notes.
+
+The next Cell configured is Stem::TtyMsg which supports typing in and
+sending command messages. This is used in all the demo configurations.
+
+	[
+		class	=>	'Stem::TtyMsg',
+		args	=>	[],
+	],
+
+The next cell is the application specific part in the monitor.stem
+configuration, the Cell configuration for Stem::LogTail:
+
+	[
+		'class'	=>	'Stem::LogTail',
+		'name'	=>	'foo',
+		'args'	=>	[
+			'path'		=> 'tail/foo.log',
+			'repeat_interval' => 10,
+			'data_log'	=> 'archive:bar',
+			'status_log'	=> 'archive:bar_status',
+		],
+	],
+
+This is the cell responsible for monitoring the indicated log file
+(foo.log).  It has arguments for the path to the monitored file, what
+the time interval is (in seconds) to check the file for changes, the
+data log, and the status log.  Note that the address of the data and status
+log indicates both the name of the hub that it is located at, as well as, the
+name of the log cell.  For more information on these configuration options
+please see the tail log design notes.
+
+Now, lets take a look at the conf/archive.stem configuration file.  This
+file defines logical log files  (bar and bar_status) that are used by the
+monitor.stem configuration file to log the changes to foo.log.  
+
+The first three cells that are configured are the same as the monitor
+configuration, Stem::Hub, Stem::Portal, and Stem::TtyMsg.  They are
+for the most part identical.  It is worth mentioning here that the
+configuration for the Portal has its server boolean flag set to true,
+indicating that this portal will be awaiting connection requests from
+remote Portals anywhere on a network.
+
+The next three are the configurations for Stem::Log logical logs.  The
+first one is a typical logical log file configuration,
+
+	[
+		'class'	=>	'Stem::Log',
+		'args'	=>	[
+			'name'		=> 'bar',
+			'path'		=> 'tail/bar.log',
+			'filters'	=> [
+				file	=> 1,
+				forward	=> [ 'bar_stdout' ],
+			],
+		],
+	],
+
+This is defining a logical log named "bar" that is associated with
+a real log file indicated by the path, "tail/bar.log".  It also
+has a filters argument that allows Stem::Log::Entries to be filtered
+before they are placed in the log file.  The first of the filter
+operations in the above configuration, 'file', indicates that the 
+incoming log entry should be placed in the file indicated by the 'path'
+argument.  Another one of these filter rules, 'forward, indicates that
+the log entry is always forwarded to the log 'bar_stdout'.
+
+
+The next Stem::Log configuration defines a logical log that conditionally
+outputs its entries to STDOUT.  It will write log file entries to STDOUT
+if the 'bar_stdout' Stem environment variable is set to be greater than
+the severity level of the log entry.
+
+	[
+		'class'	=>	'Stem::Log',
+		'args'	=>	[
+
+			'name'		=> 'bar_stdout',
+			'format'	=> '%f [%L][%l] %T',
+			'strftime'	=> '%D %T',
+			'filters'	=> [
+				'env_gt_level'	=> 'bar_stdout',
+				stdout	=> 1,
+			],
+		],
+	],
+
+This configuration specifies a format (overriding the default raw format 
+like bar.log) that displays the entry with timestamps, label, and level.
+This allows you to customize your log entries to your liking.
+To demonstrate the severity level detection, do the following at the
+Stem prompt in the archive hub window (upper left),
+
+bar_stdout=8
+
+This will ensure that if the severity level of the incoming log entry
+is less than 8, it will be displayed to standard output.  now, append a
+line to the foo.log file in the command line window,
+
+echo 'hello log' >> foo.log
+
+You will see in the archive hub window a log message appear in stdout
+in 10 seconds (according to this configuration),
+
+02/11/02 14:27:15 [tail][5] hello log
+
+This log entry is in raw format, the other Stem::Log configurations add
+formats (as mentioned above).  For more information on the format of the
+log entries and filters please take a look at the log design notes.
+
+The final cell configuration is for filtering the status messages from the
+LogTail Cell,
+
+	[
+		'class'	=>	'Stem::Log',
+		'args'	=>	[
+
+			'name'		=> 'bar_status',
+			'path'		=> 'tail/bar_status.log',
+			'format'	=> '[%f]%h:%H:%P - %T',
+			'strftime'	=> '%T',
+			'filters'	=> [
+				file	=> 1,
+				'env_gt_level'	=> 'bar_status',
+				tty_msg	=> 1,
+			],
+		],
+	],
+
+As you can see, it has the same format as the previous Stem::Log
+configurations.  This configuration has both a logfile (tail/bar_status.log)
+and the ability to display the status message if the severity level is less
+than the Stem environment variable 'bar_status' to the tty message
+console (indicated by the tty_msg filter operation, which is set to true).
+Note that tty_msg is different than stdout, the message is being sent to
+the TtyMsg module for output to the console versus just using stdout
+directly.  There are also other actions including custom ones.
+
+Let's see this in action, close the three widows created from the tail_demo
+script and re-run tail_demo.  do the following at the
+Stem prompt in the archive hub window,
+
+bar_status=8
+
+This will ensure that if the severity level of the incoming log entry
+is less than 8, it will be displayed to standard output.  now, append a
+line to the foo.log file in the command line window,
+
+echo 'hello again log' >> foo.log
+
+You will see in the archive hub window a log message appear in stdout
+in 10 seconds (according to this configuration),
+
+[21:58:04]trichards-linux.alias.net:monitor:/opt/bin/run_stem - LogTail: first open of /opt/bin/tail/foo.log
+
+

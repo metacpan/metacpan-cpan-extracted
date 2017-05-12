@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/get_txn_props.t
+t/get_txn_props_with_txn.t
+t/tie.t
+t/tie_with_txn.t
+lib/SVN/TXN/Props.pm
+META.yml                                 Module meta-data (added by MakeMaker)

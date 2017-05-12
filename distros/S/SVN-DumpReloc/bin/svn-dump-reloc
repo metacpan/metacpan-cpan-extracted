@@ -1,0 +1,190 @@
+#!/usr/bin/perl
+
+#
+# Copyright (C) 2007-2008 by Qindel Formacion y Servicios S.L.
+#
+# Permission is hereby granted, free of charge, to any person
+# obtaining a copy of this software and associated documentation files
+# (the "Software"), to deal in the Software without restriction,
+# including without limitation the rights to use, copy, modify, merge,
+# publish, distribute, sublicense, and/or sell copies of the Software,
+# and to permit persons to whom the Software is furnished to do so,
+# subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+# BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+# ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
+
+use strict;
+use warnings;
+
+my $usage = <<EOU;
+Usage:
+  $0 <from> <to> [<from1> <to1> [<from2> <to2> [...]]]
+
+EOU
+
+unless (@ARGV >= 2 and (@ARGV & 1) == 0) {
+    die $usage;
+}
+
+my @args = @ARGV;
+@ARGV = ();
+
+s|^/*|| for @args;
+s|/*$|| for @args;
+
+my %f2t = @args;
+my @f = reverse sort keys %f2t;
+my %f2re = map { $_, path2re($_) } @f;
+
+
+
+binmode STDIN;
+binmode STDOUT;
+
+$/ = "\x0A";
+
+my $head = <>;
+$head =~ /^SVN-fs-dump-format-version:\s*2\s*$/
+    or die "invalid svn dump stream format\n";
+
+print $head;
+
+while (!eof STDIN) {
+    my $line = <>;
+    my $cl = 0;
+    if (my ($k, $v) = $line =~ /^(.*?)\s*:\s*(.*)$/) {
+        if ($k eq 'Node-path' or $k eq 'Node-copyfrom-path') {
+            for my $from (@f) {
+                my $re = $f2re{$from};
+                if ($v =~ $re) {
+                    if ($from eq '') {
+                        $line = "$k: $f2t{$from}/$1$/";
+                    }
+                    else {
+                        $line = "$k: $f2t{$from}$1$/";
+                    }
+                    # print STDERR "from: $from, re: $re, to: $line";
+                    last;
+                }
+            }
+        }
+
+        elsif ($k eq 'Content-length') {
+            $cl = $v;
+        }
+    }
+    print $line;
+
+    if ($cl) {
+        dump_binary($cl);
+    }
+}
+
+sub path2re {
+    my $p = shift;
+    if (length $p) {
+        my $re = quotemeta $p;
+        return qr|^$re((?:/.*)?)$|;
+    }
+    else {
+        return qr|^(.*)$|
+    }
+}
+
+sub dump_binary {
+    my $len = shift;
+    while ($len) {
+        my $max = 32 * 1024;
+        $max = $len if $len < $max;
+        my $b = read STDIN, my ($buf), $max;
+        die "read failed\n" unless $b > 0;
+        print $buf;
+        $len -= $b;
+    }
+}
+
+
+__END__
+
+=head1 NAME
+
+svn-dump-reloc - rewrite paths in a Subversion dump
+
+=head1 SYNOPSIS
+
+  svn-dump-reloc from to [from1 to1 [...]]
+
+=head1 DESCRIPTION
+
+This utility modifies a repository dump, rewriting file paths in
+accordance with the passed arguments.
+
+It reads the original repository dump from stdin and writes the
+modified dump to stdout.
+
+It is useful to import a repository as a subdirectory of another
+already existent one. For instance:
+
+  $ svnadmin dump /my/repos | svn-dump-reloc "/" "my/project" >dump
+
+will relocate all the files in the dump to the subdirectory
+C<my/project>.
+
+Or to rename or move directories:
+
+  $ svnadmin dump /my/repos | svn-dump-reloc "foo/doz" "bar" >dump
+
+that will move the files in the directory C<foo/doz> to C<bar> leaving
+the rest untouched.
+
+Paths are always absolute and there is no need to begin them with a
+slash (C</>). For instance, C<foo> and C</foo> are equivalent.
+
+This program does not check for colisions on the file tree and so, it
+is possible to generate corrupted dumps when some target path overlaps
+with another directory present in the dump.
+
+=head1 SEE ALSO
+
+L<svnadmin>, L<svndumpfilter>, L<http://svnbook.red-bean.com/|the
+Subversion book>.
+
+=head1 AUTHOR
+
+Salvador FandiE<ntilde>o <sfandino@yahoo.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2007-2008 by Qindel Formacion y Servicios S.L.
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+=cut

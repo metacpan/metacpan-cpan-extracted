@@ -1,0 +1,57 @@
+#!/usr/bin/perl -w
+# $Id: svndump_renamefilter 78 2006-06-16 09:56:37Z martin $
+# Copyright (C) 2006 by Martin Scharrer <martin@scharrer-online.de>
+# This is free software under the GPL.
+
+use strict;
+use SVN::Dumpfilter;
+
+my $revision = 0;
+my $delrev = 38;
+my $deleting = 0;
+
+my $dumpfile = shift @ARGV;
+my $outfile  = shift @ARGV;
+
+sub renamefilter (\%;$);
+
+my $pathpattern   = qr(template/);
+my $renamepattern = 'templatus/';
+my $renamed = 0;
+
+Dumpfilter($dumpfile, $outfile, \&renamefilter);
+print STDERR "Renamed $renamed files.\n";
+exit(0);
+
+
+sub renamefilter (\%;$)
+ {
+   my $href = shift;
+   my $recalc = shift;
+   my $header = $href->{'header'};
+   my $prop   = $href->{'properties'};
+
+   # No revisions, please
+   return if (exists $header->{'Revision-number'});
+ 
+   my $OldNodepath = $header->{'Node-path'};
+
+   if ($header->{'Node-path'} =~ s{$pathpattern}{$renamepattern})
+    {
+     print STDERR "Renaming '$OldNodepath' to '" . $header->{'Node-path'} .  "'.\n";
+     $renamed++;
+    }
+
+   # Also rename copyfrom pathes
+   $header->{'Node-copyfrom-path'} =~ s{$pathpattern}{$renamepattern} 
+    if exists $header->{'Node-copyfrom-path'};
+  
+   if ($recalc)
+    {
+     svn_recalc_prop_header(%$href);        # call if you changed properties
+     svn_recalc_textcontent_header(%$href); # call if you modified text content
+    }
+ }
+
+
+__END__

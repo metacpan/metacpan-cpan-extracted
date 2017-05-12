@@ -1,0 +1,62 @@
+=head1 Installing the modules
+
+Install like any other Perl module:
+
+ % perl Build.PL
+ % perl Build test
+ % su
+ # perl Build install
+
+During the configuration step you will be asked to name a directory to
+install the system into.  /usr/local/siesta is the default.  We'll assume
+you chose that for the rest of this document.
+
+
+=head1 Set up the group and database
+
+The first thing you'll need to do is set up a group.
+
+Assuming you use the default SQLite backend, or expect to create
+archives with the Archive plugin, you will need to arrange for the
+user that runs the mail process to have read and write access to
+/usr/local/siesta.
+
+Make a new group called siesta and add the mail user (usually 'mail'
+or 'exim' but check your local convention), the webserver user (if you
+also wish to use the web interface).
+
+  # nacho create-database
+  # chgrp -R siesta /usr/local/siesta
+  # chmod -R g+rwx /usr/local/siesta
+
+
+=head1 Regular operation 
+
+Then read the B<Siesta::UserGuide> file using 
+
+  % perldoc Siesta::UserGuide
+
+for how to create new lists and members, add members to lists,
+configure plugins and generally administer the system.
+
+
+-------------------------------------
+ * Installing the web frontend
+-------------------------------------
+
+You need to add a line like this to your Apache config in one of the
+virtual server sections
+
+  ScriptAliasMatch /siesta/.*\.tt2 /usr/local/siesta/web-frontend/tt2.cgi
+
+Then you need to copy the directory 
+
+    /usr/local/siesta/web-frontend/siesta 
+
+to the document root of the virtual server you've set the ScriptAlias for and 
+away you go.
+
+It should be noted that the web frontend currently looks like ass. Most of the 
+functionality is there but work needs to be done on making it not completely 
+braindead usability wise.
+

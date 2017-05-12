@@ -1,0 +1,15 @@
+# Test logging in with no client side cert (should be rejected)
+template: login.tt
+
+skip: Can't be run as a unit test
+no_auto_login: 1
+expect_failure: 1
+
+ssl_cert: ~
+ssl_key: ~
+
+vars:
+  user: 100
+  pass: foobar
+
+

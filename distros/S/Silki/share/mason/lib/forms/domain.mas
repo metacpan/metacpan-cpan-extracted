@@ -1,0 +1,43 @@
+<&| /lib/filter/form.mas, objects => [ $domain || () ] &>
+<form action="<% $domain ? $domain->entity_uri() : $c->domain()->application_uri( path => '/domains' ) %>" method="post">
+% if ($domain) {
+  <input type="hidden" name="x-tunneled-method" value="PUT" />
+% }
+
+  <fieldset>
+    <legend><% loc('Domain Settings') %></legend>
+
+    <div class="form-item">
+      <label for="web_hostname" class="for-field"><% loc('Web Hostname') %></label>
+      <input type="text" class="text" name="web_hostname" id="web_hostname" />
+      <div class="help-text">
+        <p>
+          <% loc('The hostname to be used in web addresses.') %>
+        </p>
+      </div>
+    </div>
+
+    <div class="form-item">
+      <label for="email_hostname" class="for-field"><% loc('Email Hostname') %></label>
+      <input type="text" class="text" name="email_hostname" id="email_hostname" />
+      <div class="help-text">
+        <p>
+          <% loc('The hostname to be used when sending and receiving email. Defaults to the same value as the web hostname.') %>
+        </p>
+      </div>
+    </div>
+
+    <div class="form-item">
+      <label for="requires_ssl" class="for-field"><% loc('Requires SSL?') %></label>
+      <input type="checkbox" class="checkbox" name="requires_ssl" id="requires_ssl" value="1" />
+    </div>
+
+    <input type="submit" class="submit" value="Submit" />
+  </fieldset>
+
+</form>
+</&>
+
+<%args>
+$domain => undef
+</%args>

@@ -1,0 +1,155 @@
+NAME
+    Search::Elasticsearch::Compat - A compatibility layer for migrating from
+    ElasticSearch.pm
+
+VERSION
+    version 0.10
+
+DESCRIPTION
+    With the release of the official new Search::Elasticsearch module, the
+    old ElasticSearch (note the change in case) module has been deprecated.
+    This module, Search::Elasticsearch::Compat is a compatibility layer to
+    help migrate existing code from the old module to the new.
+
+    The client interface (ie "new()" plus all request methods like search())
+    are completely compatible with the old ElasticSearch.pm. The "new()"
+    method translates the parameters accepted by the old module to the
+    parameters accepted by the new module. All tests in the old test suite
+    pass.
+
+    However, the networking layer has been replaced by the new
+    Search::Elasticsearch module. The available transport backends are
+    "http" (LWP via Search::Elasticsearch::Cxn::LWP), "httptiny" (HTTP::Tiny
+    via Search::Elasticsearch::Cxn::HTTPTiny and "curl" (Net::Curl via
+    Search::Elasticsearch::Cxn::NetCurl). The AnyEvent backends are not
+    supported. That may change in the future.
+
+    No further development of this compatibility layer is planned. It allows
+    you to use your old code without change (other than the module name),
+    but new code should use the new Search::Elasticsearch module.
+
+    To use this module, you will need to change:
+
+        use ElasticSearch;
+        my $e = ElasticSearch->new(...);
+
+    to
+
+        use Search::Elasticsearch::Compat;
+        my $e = Search::Elasticsearch::Compat->new(...);
+
+    You can use the official client in the same code as the compatibility
+    layer with:
+
+        use Search::Elasticsearch;
+        use Search::Elasticsearch::Compat;
+
+        my $new_es = Search::Elasticsearch->new(...);
+        my $old_es = Search::Elasticsearch::Compat->new(...);
+
+Creating a new Search::Elasticsearch::Compat instance
+  new()
+        $es = Search::Elasticsearch::Compat->new(
+                transport    =>  'http',
+                servers      =>  '127.0.0.1:9200'                   # single server
+                                  | ['es1.foo.com:9200',
+                                     'es2.foo.com:9200'],           # multiple servers
+                trace_calls  => 1 | '/path/to/log/file' | $fh
+                timeout      => 30,
+
+                no_refresh   => 0 | 1                               # don't retrieve the live
+                                                                    # server list. Instead, use
+                                                                    # just the servers specified
+         );
+
+    The "new()" method translates the parameters accepted by the old module
+    into parameters accepted by the new Search::Elasticsearch module, and
+    returns an Search::Elasticsearch::Client::Compat instance, which
+    provides the same methods as were available in the old ElasticSearch
+    module.
+
+   servers
+    "servers" can be either a single server or an ARRAY ref with a list of
+    servers. If not specified, then it defaults to "localhost:9200".
+
+    These servers are used in a round-robin fashion. If any server fails to
+    connect, then the other servers in the list are tried, and if any
+    succeeds, then a list of all servers/nodes currently known to the
+    Elasticsearch cluster are retrieved and stored. This list of known nodes
+    is refreshed automatically.
+
+   no_refresh
+    Retrieving the list of live nodes from the cluster may not be desirable
+    behaviour if, for instance, you are connecting to remote servers which
+    use internal IP addresses, or which don't allow remote "nodes()"
+    requests.
+
+    If you want to disable the sniffing behaviour, set "no_refresh" to 1, in
+    which case the transport module will round robin through the "servers"
+    list only. Failed nodes will be removed from the list (but added back in
+    later if they respond to a ping or when all nodes have failed).
+
+   Transport Backends
+    There are three "transport" backends that Search::Elasticsearch::Compat
+    can use: "http" (LWP via Search::Elasticsearch::Cxn::LWP), "httptiny"
+    (HTTP::Tiny via Search::Elasticsearch::Cxn::HTTPTiny and "curl"
+    (Net::Curl via Search::Elasticsearch::Cxn::NetCurl). The AnyEvent
+    backends are not supported.
+
+    The "httptiny" backend is faster than "http", but does not use
+    persistent connections. If you want to use it, make sure that your open
+    filehandles limit ("ulimit -l") is high, or your connections may hang
+    because your system runs out of sockets. The "curl" backend is the
+    fastest and uses persistent connections, but must be installed
+    separately as it relies on "libcurl".
+
+OTHER METHODS
+    See Search::Elasticsearch::Client::Compat for documenation of methods
+    supported by the client.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Search::Elasticsearch::Compat
+
+    You can also look for information at:
+
+    *   GitHub
+
+        <http://github.com/elasticsearch/elasticsearch-perl-compat>
+
+    *   Search MetaCPAN
+
+        <https://metacpan.org/module/Search::Elasticsearch::Compat>
+
+    *   IRC
+
+        The #elasticsearch <irc://irc.freenode.net/elasticsearch> channel on
+        "irc.freenode.net".
+
+    *   Mailing list
+
+        The main Elasticsearch mailing list
+        <http://www.elasticsearch.org/community/forum/>.
+
+TEST SUITE
+    The full test suite requires a live Elasticsearch cluster to run. CPAN
+    testers doesn't support this. You can see full test results here:
+    <http://travis-ci.org/#!/clintongormley/Search::Elasticsearch::Compat/bu
+    ilds>.
+
+    To run the full test suite locally, run it as:
+
+        perl Makefile.PL
+        ES_HOME=/path/to/elasticsearch make test
+
+AUTHOR
+    Clinton Gormley <drtech@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2014 by Elasticsearch BV.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

@@ -1,0 +1,40 @@
+Statistics-MVA-MultipleRegression version 0.0.1
+
+    The general purpose of multiple regression is to gain information about the relationship between several independent
+    variables (x_i) and a dependent variable (y). The procedure involves fitting an equation of the form:
+    
+        y = b_o + x_1 * b_1 + x_2 * b_2 +... ... x_n * b_n
+
+    This is a minimal implementation of least squares procedure that accepts a List-of-Lists in which each nested list
+    corresponds to a single set of observations. The single exported routine returns the coefficients (b_i) and R^2.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+'Carp' => '1.08', 
+'Statistics::MVA' => '0.0.1',
+'List::Util' => '1.19',
+'Math::MatrixReal' => '2.05', 
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010, Daniel S. T. Hughes
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

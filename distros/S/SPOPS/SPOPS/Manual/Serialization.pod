@@ -1,0 +1,217 @@
+=head1 NAME
+
+SPOPS::Manual::Serialization - How SPOPS serializes objects
+
+=head1 SYNOPSIS
+
+This part of the SPOPS manual aims to answer the following questions:
+
+=over 4
+
+=item *
+
+How does serialization work?
+
+=item *
+
+How can I customize serialization?
+
+=item *
+
+How does caching work?
+
+=item *
+
+How can I lazy-load my fields?
+
+=back
+
+=head1 DESCRIPTION
+
+=head1 CUSTOMIZING SERIALIZATION
+
+=head2 Pre/Post Hooks
+
+SPOPS allows you to create multiple pre- and post-actions to
+C<save()>, C<fetch()> and C<remove()>. These actions can be as simple
+or complex as you like and allow objects to be extremely flexible. 
+
+These the actions implemented in the hooks are called rules, and each
+collection of rules is called a ruleset. Rulesets are documented in
+L<SPOPS::Manual::ObjectRules|SPOPS::Manual::ObjectRules>.
+
+=head2 Failed Actions
+
+If an action fails, the 'fail' method associated with that action is
+triggered. This can be a notification to an administrator, or saving
+the data in the filesystem after a failed save.
+
+B<fail_fetch()>
+
+Called after a fetch has been unsuccessful.
+
+B<fail_save()>
+
+Called after a save has been unsuccessful.
+
+B<fail_remove()>
+
+Called after a remove has been unsuccessful.
+
+=head1 CACHING
+
+SPOPS has hooks for object caching. You will need to return a caching
+object via the a C<global_cache()> method implemented either in your
+SPOPS object class one of its parents.
+
+The caching object will have a simple interface so it's easy to wrap
+it around your favorite caching backend. (Who wants to write this
+stuff from scratch themselves?)
+
+B<pre_cache_fetch()>
+
+Called before an item is fetched from the cache; if this is called, we
+know that the object is in the cache, we just have not retrieved it
+yet.
+
+B<post_cache_fetch()>
+
+Called after an item is successfully retrieved from the cache.
+
+B<pre_cache_save()>
+
+Called before an object has been cached.
+
+B<post_cache_save()>
+
+Called after an object has been cached.
+
+B<pre_cache_remove()>
+
+Called before an object is removed from the cache.
+
+B<post_cache_remove()>
+
+Called after an object is successfully removed from the cache.
+
+=head1 LAZY LOADING
+
+This section describes how to implement lazy loading for your objects.
+
+Every implementation should be able to handle the following column
+groups that should always be available:
+
+=over 4
+
+=item *
+
+B<_id_field>: Column group containing only the ID field. This can be
+useful if you are cycling through large groups of objects only for
+their ID value. (For instance, to set security values for many objects
+at once.)
+
+=back
+
+=head2 What You Need To Do
+
+Here are the methods you need to create to implement lazy loading:
+
+B<get_lazy_load_sub()>
+
+Called by SPOPS when initializing a new object if one or more
+'column_group' entries are found in the configuration. It should
+return a coderef that implements lazy loading for a single field. (See
+below.)
+
+B<perform_lazy_load( $class, \%data, $field )>
+
+Interface for a subclass to implement lazy loading. The method
+C<get_lazy_load_sub()> should return a coderef conforming to this
+interface.
+
+The implementation should return the value for C<$field> given the
+object information C<\%data>, which is a map of fieldname to value and
+includes the ID field and value of the object.
+
+For lazy loading usage, see L<SPOPS::Manual::Object|SPOPS::Manual::Object>.
+
+=head2 What SPOPS does
+
+These are methods implemented by SPOPS for lazy loading.
+
+B<is_loaded( $field )>
+
+Returns true if C<$field> has been loaded, false if not.
+
+B<set_loaded( $field )>
+
+Sets the 'loaded' property of C<$field> to true.
+
+B<clear_loaded( $field )>
+
+Sets the 'loaded' property of C<$field> to false.
+
+B<set_all_loaded()>
+
+Sets the 'loaded' property of all fields in the object to true.
+
+B<clear_all_loaded()>
+
+Sets the 'loaded' property of all fields in the object to false.
+
+For an example of how a SPOPS subclass implements lazy-loading, see
+L<SPOPS::DBI|SPOPS::DBI>.
+
+=head1 STORABLE SERIALIZATION
+
+The main L<SPOPS|SPOPS> class from which all SPOPS objects derive has
+the methods C<store()>, C<nstore()>, C<retrieve()> and
+C<fd_retrieve()> acting as delegates for methods of the same name in
+L<Storable|Storable>. (We can add more as needed.)
+
+Example:
+
+  1:  # Fetch the user object and if retrieved, store it in the session
+  2: 
+  3:  my $session = $session_class->create;
+  4:  my $login_name = read_login_name();
+  5:  my $user = eval { $user_class->fetch_by_login_name( $login_name ) };
+  6:  if ( $@ ) { ... }
+  7:  $session->{user_object} = $user->store;
+  8: 
+  9:  # ... time passes ...
+ 10: 
+ 11:  my $session = $session_class->fetch( $session_id );
+ 12:  my ( $user );
+ 13:  if ( $session->{user_object} ) {
+ 14:     $user = $user_class->retrieve( $session->{user_object} );
+ 15:  }
+ 16:  else {
+ 17:      my $login_name = read_login_name();
+ 18:      my $user = eval { $user_class->fetch_by_login_name( $login_name ) };
+ 19:      ...
+ 20:  }
+
+This has not been extensively tested, particularly with the
+C<nstore()> option for transporting objects among different
+architectures. In theory, this shouldn't be an issue at all, as long
+as when thawing the object the specific SPOPS class has been
+previously initialized.
+
+This could be an interesting area of future development, since you
+could in theory send an object over a network along with a minimal
+configuration and object definition that, when it reached the
+C<read_code> section of the code generation, reached out over the
+network to read in the actual meat of a class. Basically, the thawing
+routine could check to see if it had processed the SPOPS class and if
+not, grab it off the network and whip it up.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2001-2004 Chris Winters. All rights reserved.
+
+See L<SPOPS::Manual|SPOPS::Manual> for license.
+
+=head1 AUTHORS
+
+Chris Winters E<lt>chris@cwinters.comE<gt>

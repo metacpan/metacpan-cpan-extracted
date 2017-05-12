@@ -1,0 +1,19 @@
+Build.PL
+Changes
+Changes.SVN-Push.txt
+LICENSE
+MANIFEST
+META.json
+META.yml                                 Module meta-data (added by MakeMaker)
+Makefile.PL
+README
+TODO
+bin/svn-pusher
+examples/svn-pusher-test.sh
+inc/Test/Run/Builder.pm
+lib/SVN/Pusher.pm
+lib/SVN/Pusher/CmdLine.pm
+t/00-load.t
+t/cpan-changes.t
+t/pod.t
+t/style-trailing-space.t

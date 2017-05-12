@@ -1,0 +1,22 @@
+Revision history for String-RewritePrefix
+
+0.007     2013-10-15 22:37:01 America/New_York
+          update bugtracker and repo metadata
+
+0.006     2010-10-25 15:36:37 America/New_York
+          give explicit Sub::Exporter requirement
+
+          do not warn if a coderef prefix generator returns undef
+
+0.005     2009-11-30
+          export "rewrite" with Sub::Exporter
+          prefix new_rewriter with a _; it was always private
+
+0.004     2009-02-20
+          allow coderef prefix generators (thanks FLORA)
+
+0.002     2008-09-05
+          allow scalar context for 1 element rewrite -- and ONLY those
+
+0.001     2008-08-26
+          original skeleton created with Module::Boilerplate

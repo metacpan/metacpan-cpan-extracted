@@ -1,0 +1,180 @@
+
+=head1 NAME
+
+STUN::RFC_5389 - Perl implementation of RFC 5389, Session Traversal Utilities
+for NAT (STUN)
+
+
+
+
+=head1 SYNOPSIS
+
+    use STUN::RFC_5389;
+
+    # create a STUN-message you can then send through your client
+    $stun_request = STUN::RFC_5389->Client( { request => 1 } );
+
+
+    # when you received a message on your server, process it
+   # ( $port, $host_ip ) = unpack_sockaddr_in( .... );
+    $stun_answer = STUN::RFC_5389->Server( $stun_request, $port, $host_ip );
+
+    # print the error message if the message wasn't RFC 5389 conform
+    if ( defined $stun_answer && ! $stun_answer ) {
+        print $STUN::RFC_5389::error;
+    } else {
+        # send the answer back to the client
+    }
+
+
+    # the client can now parse the answer into a hash reference
+    $stun_answer_hashref = STUN::RFC_5389->Client( $stun_answer );
+
+
+
+
+=head1 DESCRIPTION
+
+This module is used to build, answer and parse STUN (RFC 5389) messages. It can
+be used by clients and servers.
+
+For now only the main 'required' attributes (MAPPED-ADDRESS and
+XOR-MAPPED-ADDRESS) and one 'optional' attribute (SOFTWARE) are supported.
+
+
+
+
+=head1 METHODS
+
+=over 4
+
+=item Client( { request => 1 | indication => 1 } | $ANSWER )
+
+=over 8
+
+=item -
+
+Creates a new STUN request/indication if the argument is a hash
+reference. Returns the message in binary format inside a string which
+can be send to a server.
+
+=item -
+
+Parses the $ANSWER (binary STUN-string) and returns a hash reference. The
+dump of this reference will show you something like this:
+
+    $hash_ref = {
+            'message_type'   => '0101',
+            'message_length' => 80,
+            'magic_cookie'   => '2112a442',
+            'transaction_id' => '544fefe8ecdc5732edd4b454',
+            'attributes'     => {
+                    '0020' => {
+                            'address' => '94.93.237.124',
+                            'port'    => 61497,
+                            'family'  => '01'
+                    },
+                    '8022' => {
+                            'software' => 'Perl - STUN::RFC_5389 version 0.1 at CPAN, by Detlef Pilzecker.'
+                    },
+                    'XOR-MAPPED-ADDRESS' => $hash_ref->{'attributes'}{'0020'},
+                    'SOFTWARE' => $hash_ref->{'attributes'}{'8022'},
+            },
+    }
+
+=back
+
+If an error was found it will return an empty string and you
+will find a message in C<$STUN::RFC_5389::error>.
+
+
+=item Server( $MESSAGE, $PORT, $HOST_IP )
+
+It will parse the $MESSAGE and return a string in bynary format with
+the (XOR-)MAPPED-ADDRESS which can be send back to the client. $PORT must
+be a number and $HOST_IP a IPv4 (IPv6 is not supported jet).
+
+If the STUN $MESSAGE Type is 'indication' (0x0011) it will return C<undef>.
+
+If an error was found it will return an empty string and you
+will find a message in C<$STUN::RFC_5389::error>.
+
+=back
+
+
+
+
+=head1 OTHER METHODS
+
+STUN::RFC_5389 also defines some other functions. See source code for more
+details:
+
+=over 4
+
+=item join_attribute( $ATTR_TYPE, $ATTR_VALUE )
+
+Joins type, length and value of the attribute and will fix the length to
+become a 32-bit boundary length.
+
+
+=item parse_attributes( $ATTRIBUTES )
+
+Parses attributes.
+
+
+=item true_stun_message( $MESSAGE_TYPE, $MESSAGE_LENGTH, $MAGIC_COOKIE, $TRANSACTION_ID, $ATTRIBUTES, $I_AM_SERVER )
+
+Checks the message for header errors.
+
+
+=item %STUN::RFC_5389::attribute_registry
+
+Is a hash with all RFC 5389 attributes. Its keys are the attribute-hex-values
+and the values are the human readable attribute names as found in the RFC 5389.
+
+
+=item %attribute_sub
+
+Is a hash with a subroutine (value) for each attribute type (key).
+
+
+=back
+
+
+
+
+=head1 AUTHOR
+
+=over 4
+
+Detlef Pilzecker, http://search.cpan.org/~deti/,
+http://www.secure-sip-server.net/
+
+=back
+
+
+
+
+=head1 PREREQUISITES
+
+This module requires the C<Socket> module to be installed.
+
+
+
+
+=head1 SEE ALSO
+
+L<perl(1)>, L<Socket>, L<http://tools.ietf.org/html/rfc5389>
+
+
+
+
+=head1 COPYRIGHT
+
+This module is Copyright (C) 2010 by Detlef Pilzecker.
+
+All Rights Reserved.
+
+This module is free software. It may be used, redistributed and/or modified
+under the same terms as Perl itself.
+

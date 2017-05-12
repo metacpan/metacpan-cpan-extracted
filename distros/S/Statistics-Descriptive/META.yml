@@ -1,0 +1,60 @@
+---
+abstract: 'Module of basic descriptive statistical functions.'
+author:
+  - 'Shlomi Fish <shlomif@cpan.org>'
+build_requires:
+  Benchmark: '0'
+  Test::More: '0'
+  lib: '0'
+configure_requires:
+  Module::Build: '0.36'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+keywords:
+  - average
+  - distribution
+  - mean
+  - median
+  - statistics
+  - stats
+  - stddev
+  - 'standard deviation'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Statistics-Descriptive
+provides:
+  Statistics::Descriptive:
+    file: lib/Statistics/Descriptive.pm
+    version: '3.0612'
+  Statistics::Descriptive::Full:
+    file: lib/Statistics/Descriptive.pm
+    version: '3.0612'
+  Statistics::Descriptive::Smoother:
+    file: lib/Statistics/Descriptive/Smoother.pm
+    version: '3.0612'
+  Statistics::Descriptive::Smoother::Exponential:
+    file: lib/Statistics/Descriptive/Smoother/Exponential.pm
+    version: '3.0612'
+  Statistics::Descriptive::Smoother::Weightedexponential:
+    file: lib/Statistics/Descriptive/Smoother/Weightedexponential.pm
+    version: '3.0612'
+  Statistics::Descriptive::Sparse:
+    file: lib/Statistics/Descriptive.pm
+    version: '3.0612'
+requires:
+  Carp: '0'
+  List::MoreUtils: '0'
+  List::Util: '0'
+  POSIX: '0'
+  perl: '5.006'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  homepage: http://web-cpan.shlomifish.org/modules/Statistics-Descriptive/
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/shlomif/perl-Statistics-Descriptive
+version: '3.0612'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

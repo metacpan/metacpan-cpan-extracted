@@ -1,0 +1,16 @@
+Revision history for Scalar-Andand
+
+0.04    2010-03-03
+		Fixed bug RT#54775: class method calls on variables elicit warnings
+		Documentation updates
+
+0.03    2009-01-08
+		Code refactoring
+		Documentation updates
+
+0.02    2009-01-08
+		Fixed use of UNIVERSAL, to make PAUSE index it.
+
+0.01    2009-01-08
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,205 @@
+Revision history for System-Command
+
+1.118 Thu Jun 2 2016
+    [ENHANCEMENTS]
+    - Avoid calling waitpid() more than necessary in _reap()
+    - Close all pipes when loop_on() ends successfully, and avoid a warning
+      when the exit value is not available
+    [TESTS]
+    - Fix t/20-zombie.t, which was broken in Strawberry Perl (viviparous)
+
+1.117 Sun Jan 17 2016
+    [ENHANCEMENT]
+    - New method loop_on() allows to run callbacks on the output/errput
+
+1.116 Sun Jan 3 2016
+    [BUG FIX]
+    - Fix for the 'interactive' option (RKINYON)
+    [COMPATIBILITY]
+    - Remove a warning that was showing up under Perl 5.6
+
+1.115 Mon Sep 28 2015
+    [BUG FIX]
+    - ensure test counts and skip counts remain tied together (MITHALDU)
+    [DOCUMENTATION]
+    - for each option/feature, document in which version it appeared
+
+1.114 Fri Sep 18 2015
+    [ENHANCEMENTS]
+    - added proper accessors for the following System::Command::Reaper
+      attributes: sdtin, stdout, stderr, exit, signal, core
+      (after discussion with TIMB in RT #106330)
+    - added 'exit', 'signal', 'core' options to System::Command, to allow
+      direct update of variables at reaping time
+    - added the 'interactive' option, to make it possible to run interactive
+      commands directly with system (after discussion with TIMB in RT #106330)
+
+1.113 Sun Sep 6 2015
+    [ENHANCEMENTS]
+    - add proper accessors for the following System::Command::Reaper
+      attributes: sdtin, stdout, stderr, exit, signal, core
+      (after discussion with TIMB in RT #106330)
+    - System::Command::close() now returns the object itself (RT #106867)
+    [DOCUMENTATION]
+    - document the return value of close() can be used to access the
+      value of exit, signal and core
+
+1.112 Sat Jul 25 2015
+    [ENHANCEMENTS]
+    - the 'trace' option now also outputs some information about process
+      termination and status (as requested by TIMB in RT #106046)
+
+1.111 Sat Feb 14 2015
+    [ENHANCEMENTS]
+    - throw an error on empty string env variables on Win32 (MITHALDU)
+      (RT #99824)
+    [DOCUMENTATION]
+    - minor documentation improvements
+    - added the list of contributors to the META file
+
+1.110 Wed Aug 27 2014
+    [ENHANCEMENTS]
+    - the 'setpgrp' option can be used to enable/disable the call to
+      setpgrp() in the spawned process
+    [TESTS]
+    - t/10-command.t now ignores environment variables set by ConEmu
+
+1.109 Wed Jul 2 2014
+    [BUG FIX]
+    - fix the test failures on Solaris, thanks to Wolfgang Pecho
+      (RT #82857). The reaper code was actually buggy (since v1.03!)
+      and only accidentally worked on platforms where WNOHANG == 1
+      (which was most of them)
+
+1.108 Wed Feb 26 2014
+    [ENHANCEMENTS]
+    - the 'trace' option makes it possible to see exactly which commands
+      were spawned, with their options (including environment)
+    [DOCUMENTATION]
+    - style fixes
+
+1.107 Sun Oct 20 2013
+    [ENHANCEMENTS]
+    - zombies do not exist under Win32, so no need to warn about
+      waitpid return value (many thanks to MITHALDU for his
+      continued help in testing on this platform)
+    [DOCUMENTATION]
+    - removed duplicated NAME section
+    [FUN]
+    - more zombie quotes in System::Command::Reaper comments
+
+1.106 Sat Oct 12 2013
+    [ENHANCEMENTS]
+    - brought back System::Command::Reaper, which properly deals
+      with zombies
+    - execute the command in its own process group whenever possible
+      (thanks to Vincent Pit)
+    [TESTS]
+    - test for the zombie processes is not TODO anymore
+    - tests for the timely destruction of the reaper are back
+
+1.105 Sat Oct 5 2013
+    [TESTS]
+    - add a TODO test for the zombie processes created in certain cases
+    - various other test improvements
+
+1.104 Thu Sep 12 2013
+    [ENHANCEMENTS]
+    - fixed for Perl versions < 5.8.9
+    [DOCUMENTATION]
+    - minor documentation improvements
+    [PACKAGING]
+    - switch to Dist::Zilla for maintaining the distribution
+
+1.103 Mon Jul 29 2013
+    [ENHANCEMENTS]
+    - rewrote the _spawn code to work properly under Plack
+    - version 1.100 and 1.102 re-introduced old bugs: they
+      have been squished again, and tests fixed to prevent
+      re-re-introduction
+
+1.102 Fri Jul 26 2013
+    [ENHANCEMENTS]
+    - ported an older fix from Git::Repository, to make System::Command
+      work with modules that do bad things to STDIN, STDOUT and STDERR
+      (thanks to Todd Rinaldo for his 2010 patch to Git::Repository)
+      [work done during the patch -p0 hackathon]
+
+1.101 Thu Jul 11 2013
+    [TESTS]
+    - various minor test improvements (thanks to Oleg Gashev and mokko)
+    [DOCUMENTATION]
+    - minor documentation improvements
+
+1.100 Sun Apr 14 2013
+    [ENHANCEMENTS]
+    - use a IPC::Run-based implementation on Win32
+    - thanks to a lot of testing help from Christian Walde (MITHALDU)
+      the test suite passes on Win32
+    - while working on this, we established that kill 0, $pid is broken
+      under Win32 (reported to the perl5-porters mailing-list via
+      <op.wvi2ygw1ydyjqt@digitizedsqueak.lancs.ac.uk>)
+
+1.09 Sun Dec  9 2012
+    [ENHANCEMENTS]
+    - list all dependencies and the github public repo in the META files
+      (RT #81302)
+    - use Symbol::gensym to create anonumous GLOBs (github #4)
+
+1.08 Mon Nov 26 2012
+    [ENHANCEMENTS]
+    - remove a superfluous eval {} that was hiding open3 exception
+      (RT #80171)
+    - set a handler for the PIPE signal only if Perl knows about it
+
+1.07 Wed Apr 18 03:00:50 CEST 2012
+    [TESTS]
+    - t/20-zombie.t sometimes failed because of a race condition.
+      I'm now testing my assumptions, make the test in question a
+      little bit useless, and closing RT #74959
+
+1.06 Sun Jan  8 00:36:40 CET 2012
+    [ENHANCEMENTS]
+    - add tests that show that I don't understand what I'm doing
+      with STDIN/OUT/ERR, and remove the offending code (RT #73614)
+
+1.05 Fri Jul  8 09:16:25 CEST 2011
+    [ENHANCEMENTS]
+    - make spawn() work properly with subclasses
+
+1.04 Tue Jun  7 00:47:13 CEST 2011
+    [ENHANCEMENTS]
+    - allow removing variables from the environment by setting
+      keys with an 'undef' value in the 'env' option
+    [TESTS]
+    - tests for the import options
+    - added tests that were created for version 1.02 to the MANIFEST
+
+1.03 Thu Mar 17 22:47:38 CET 2011
+    [ENHANCEMENTS]
+    - removed all the System::Command::Reaper logic which, while
+      being really nice, didn't actually add any value, and made
+      things more complex
+
+1.02 Tue Mar 15 20:27:29 CET 2011
+    [FEATURES]
+    - new method is_terminated() allows to inquire about the child
+      process state
+    [ENHANCEMENTS]
+    - added a relatively sane behaviour when a SIGCHLD handler exists
+    - warns when such a SIGCHLD handler may prevent prevent the
+      capture of status information at the death of a child process
+    - added a -quiet option to silence the warning
+    - ported fixes from Git::Repository to work with modules that do
+      bad things to STDIN, STDOUT and STDERR (thanks to Todd Rinaldo)
+
+1.01 Tue Feb  1 00:13:33 CET 2011
+    [FEATURES]
+    - new shortcut class method: spawn()
+
+1.00 Wed Jan 20 00:50:17 CET 2011
+    [FEATURES]
+    - Generic version of the Git::Repository::Command process spawner
+    [BUGS]
+    - No work has been put on the Win32 version yet.
+

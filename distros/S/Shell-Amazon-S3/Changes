@@ -1,0 +1,18 @@
+Revision history for Perl extension Shell::Amazon::S3
+
+0.041 Tue Oct 1 1:50:03 2008
+        * release a developed version as official release 
+
+0.04_02 Tue Sep 30 1:50:03 2008
+	* removed MooseX::Singleton because it doesn't work well with lates Moose.
+        * changed setup_api method to class method
+        * use Module::Pluggable::Object to load classes
+
+0.04_01 Tue Jun 29 21:50:03 2008
+	* Made developer release to change API
+
+0.04 Tue Jun 24 19:33:06 2008
+	* added MooseX::Object::Pluggable as dependency
+
+0.01 Tue Jun 24 20:59:06 2008
+	* original version

@@ -1,0 +1,26 @@
+---
+name: String-Rexx
+version: 0.08
+author:
+  - 'Ioannis Tambouras <ioannis@yahoo.com>'
+abstract: Perl implementation of Rexx string functions
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Params::Validate: 0
+  Regexp::Common: 0
+  perl: 5.006
+recommends:
+  Test::Exception: 0
+  Test::More: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 1.0
+provides:
+  String::Rexx:
+    file: lib/String/Rexx.pm
+    version: 0.08
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

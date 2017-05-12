@@ -1,0 +1,24 @@
+description: set up handle
+registrar: 1
+
+request: |-
+ <NZSRSRequest VerMajor="4" VerMinor="4" RegistrarId="100">
+  <HandleCreate HandleId="assoc1" Name="Albert Einstein" Email="update@email.com" ActionId="[% actionid %] 1">
+       <PostalAddress Address1="electric avenue" City="Anywhere" CountryCode="NZ" PostalCode="300000" Province="Everywhere"/>
+       <Phone CountryCode="64" LocalNumber="44798699"/>
+       <Fax CountryCode="64" LocalNumber="44798699"/>
+  </HandleCreate> 
+  <DomainCreate Delegate="1" DomainName="assoc1.co.te" Term="1" ActionId="[% actionid %] 2">
+    <RegistrantContact HandleId="assoc1"/>
+    <NameServers>
+      <Server FQDN="ns1.everydns.net"/>
+      <Server FQDN="ns2.everydns.net"/>
+      <Server FQDN="ns3.everydns.net"/>
+      <Server FQDN="ns4.everydns.net"/>
+    </NameServers>
+    <AuditText><![CDATA[Domain Agent Update]]></AuditText>
+  </DomainCreate>  
+ </NZSRSRequest>
+
+assertions:
+ - xpath_matches: [ '//Error', '0', 'No errors' ]

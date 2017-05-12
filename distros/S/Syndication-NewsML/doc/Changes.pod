@@ -1,0 +1,139 @@
+$Id: Changes.pod,v 0.6 2002/01/16 04:36:55 brendan Exp brendan $
+=for html
+<div id="content">
+<H1>
+Revision history for Syndication::NewsML
+</H1>
+</div>
+<div id="content">
+
+=begin text
+
+Revision history for Syndication::NewsML
+
+=end text
+
+=head2 v0.10 - Released to CPAN 14 Feb 2002
+
+- internals: separated classes out into more than one file
+
+- getXXXList now returns a real array when called in an array context
+ NOTE this may break some code, notably function calls like
+ myRoutine($newscomp->getNewsItemList) will now be passed an array rather
+ than an array reference. Sorry bout that, but remember this is
+ pre-release software you're working with...
+
+- greatly enhanced examples/NewsMLParser.pl
+
+=head2 v0.09 - 13 feb 2002 (unreleased)
+
+- fixed bug that didn't allow multiple Party elements
+
+- fixed bug: dies when asking for an attribute that doesn't exist
+
+- added AFP example file
+
+- added IPTC topic files (we don't use them yet, though)
+
+=head2 v0.08 - Released to CPAN 16 Jan 2002
+
+- A three-byte change (initialising a variable) which makes the test suite
+ pass... sorry about that guys!
+
+=head2 v0.07 - Released to CPAN 11 Jan 2002
+
+- Added some generic methods to Syndication::NewsML::Node (and therefore all
+ object classes):
+  + getXML -- return the current tag and all its children as an XML tree
+  + getContent -- same as above, but ignores the current container element
+  (which means the resulting string may not be well-formed XML)
+  + getText updated to get text of all children (bug fix)
+  + getAllText -- return text in all child elements with no sanity checking,
+  so you can even call this on the NewsML root element to retrieve all text
+  in a document
+
+=head2 v0.06 - 1 Nov 2001 (unreleased)
+
+- Enhanced examples/NewsMLParser.pl: now recurses through all NewsComponents.
+ It's almost useful!
+
+- Made auto routines handle undefined elements/attributes better: now returns
+ undef rather than croaks. Calling a method of an undef class still dies,
+ though: that's Perl, there's nothing I can do about it -- so test your return
+ codes.
+
+=head2 v0.05 - Released to CPAN 11 Oct 2001
+
+- Fixed faulty call to all parent _init functions in Syndication::NewsML::Node
+ which meant the calls to parent _init classes could be removed... thanks to
+ Duncan Cameron <dcameron@bcs.org.uk> for the tip, which allowed me to get rid
+ of 285 lines of crappy code!
+
+- Introduced better error reporting for calling getXXX when you should be
+ calling getXXXList (for elements that could be "zero or more" or "one or more")
+
+- Found and fixed a few minor mismatches between the module and the DTD
+
+- added resolveTopicRef to Origin and Party nodes, which uses the findReference
+ method to get the Topic node referred by a #reference in Origin's Href and
+ Party's Topic attributes. See tests and examples for usage.
+
+- added some "helper functions" to grab metadata directly from a NewsComponent
+ node, rather than having to delve into the metadata structure to pull out simple
+ items like copyright date and news provider. This is the first step down the path
+ of creating a simpler API for NewsML access.
+
+- Filled out more of t/4_reuters.t test and examples/NewsMLParser.pl
+
+=head2 v0.04 - Released to CPAN, 26 Sep 2001
+
+- Added resolveTopicSet, resolveTopicSetDescription to FormalNameNode
+ These routines allow the user to, given a Status node or something else with a
+ FormalName/Vocabulary pair, automatically look up a related TopicSet and get its
+ information. Note that this only works for locally referenced TopicSets (ie in
+ the same document referred by a Duid).  The annotated DTD specifies an algorithm
+ to use when the TopicSet can't be found locally -- I haven't implemented it yet.
+
+- Added References package including findReference method. Not tested for external
+ references yet.
+
+- Added getElementByEuid and getElementByDuid methods.  These methods can be used
+ on any tag that inherits IdNode -- ie nearly all of them.
+
+ Unfortunately the above methods only return a DOM element, not a NewsMLish
+ object. Perhaps I can use the tag name to construct them?
+
+- Added DOMUtils class with two methods to begin with:
+	findElementByAttribute(node, attr, value):
+		starting at "node", walk the tree and return the node that
+		has attribute "attr" with value "value".
+	getRootNode(node)
+		follow the path up from "node" and return a reference to the <NewsML> node
+		at the top of the tree.
+
+- Added getDatePerl method to date elements: converts ISO8601 date/time format
+ into internal Perl date/time format. Always returns date/time in UTC (it's easy
+ to then use Perl localtime() to get a representation in another timezone).
+ (Note: it may be useful to include a getOriginalTimeZone() or something as we're
+ destroying a bit of information here: namely the timezone under which the story
+ was filed / sent)
+ Elements that can use this are: DateAndTime, FirstCreated, ThisRevisionCreated, DateId
+
+- Updated examples/NewsMLParser to use getNewsItemList -- forgot to fix in 0.03
+
+- Changed all references of News::NewsML to Syndication::NewsML
+
+- Added getTagName method to all Nodes
+
+- Added getPath method to all Nodes
+
+=head2 v0.03, released 16 Sep 2001
+
+- Released to newsml@yahoogroups.com mailing list only.
+
+=for text
+** This file was automatically generated from **
+** doc/Changes.pod. To edit it, see there.    **
+
+=for html
+</div>

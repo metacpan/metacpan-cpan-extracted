@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<svg height="[% page.height %][% yu %]"
+	width="[% page.width %][% xu %]"
+	viewBox="0 0 [% page.width %] [% page.height %]"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	xmlns:sodipodi="http://inkscape.sourceforge.net/DTD/sodipodi-0.dtd"
+	xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape">
+	<defs>
+		<style>
+		<![CDATA[
+			.bb {
+				fill:         none;
+				stroke:       black;
+				stroke-width: 0.5;
+			}
+			.day, .week {
+				text-anchor:  middle;
+			}
+			.xx {
+				fill:         none;
+				stroke:       black;
+				stroke-width: 0.5;
+			}
+			.mday {
+				fill:         silver;
+				text-anchor:  right;
+			}
+			.current_month {
+				fill:         black;
+			}
+			.moon circle {
+				stroke-width: 25%;
+				fill:         none;
+			}
+			g.mday {
+				fill:         silver;
+				fill-opacity: 50%;
+			}
+			g.mday circle {
+				stroke:       silver;
+			}
+			g.current_month {
+				fill:         black;
+				fill-opacity: 1;
+			}
+			g.current_month circle {
+				stroke:       black;
+			}
+			.new-moon {
+				stroke: grey
+			}
+			.full-moon {
+				fill: black;
+				stroke: none;
+			}
+			.blue-moon {
+				fill: blue;
+				stroke: none;
+			}
+		]]>
+		</style>
+	</defs>
+	<g
+		inkscape:groupmode="layer"
+		id="image"
+		inkscape:label="Image">
+		[% IF image.src %]
+		<image xlink:href="[% image.src %]" x="[% image.x %]" y="[% image.y %]" height="[% image.height %]" width="[% image.width %]"/>
+		[% END %]
+	</g>
+	<g
+		inkscape:groupmode="layer"
+		id="calendar"
+		inkscape:label="Calendar">
+		<text id="month" x="[% month.x %]" y="[% month.y %]" style="[% month.style %]" >[% month.text %]</text>
+		<text id="year" x="[% year.x %]" y="[% year.y %]" style="[% year.style %]" >[% year.text %]</text>
+		<rect class="bb" id="a" style="" height="[% bb.height %]" width="[% bb.width %]" x="[% bb.x %]" y="[% bb.y %]" />
+		[% i = 0 -%]
+		[% FOREACH row IN cal -%]
+			[% j = 0 -%]
+			[% FOREACH col IN row %]
+		<g id="row[% i %]_col[% j %]" class="box [% IF current == 1 %]current[% ELSIF current == 2 %]off[% END %] [% col.text.class %]">
+			<rect class="xx" id="box_row[% i %]_col[% j %]" height="[% col.height %]" width="[% col.width %]" x="[% col.x %]" y="[% col.y %]" />
+			[% IF col.text %]<text
+				id="text_row[% i %]_col[% j %]"
+				class="[% col.text.class %]"
+				x="[% col.text.x %]"
+				y="[% col.text.y %]"
+				[% IF col.text.style %]style="[% col.text.style %]"[% END %]
+				[% IF col.text.length %]textLength="[% col.text.length %]"[% END %]
+				[% IF col.text.adjust %]lengthAdjust="[% col.text.adjust %]"[% END %]>
+				[% col.text.text %]
+			</text>[% END %]
+			[% IF col.moon %]
+			<g class="moon" id="extra_[% col.moon.id %]">
+				<circle
+				[%- FOREACH attrib IN col.moon.border %]
+					[% attrib.key %]="[% attrib.value -%]"
+				[%- END %]
+				/>
+				[%- IF col.moon.highlight %]
+				<[% col.moon.highlight.type %]
+					[%- FOREACH attrib IN col.moon.highlight %]
+						[%- IF attrib.key == 'type'; NEXT; END %]
+					[% attrib.key %]="[% attrib.value -%]"
+					[%- END %]
+				/>
+				[%- END %]
+			</g>
+			[%- END %]
+		</g>
+				[%- j=j+1 -%]
+			[% END -%]
+			[% i=i+1 -%]
+		[% END %]
+		[% extra %]
+	</g>
+</svg>

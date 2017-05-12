@@ -1,0 +1,5 @@
+Makefile.PL
+MANIFEST
+lib/SOAP/UMRA.pm
+README
+META.yml                                 Module meta-data (added by MakeMaker)

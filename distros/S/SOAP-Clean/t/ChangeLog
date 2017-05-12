@@ -1,0 +1,35 @@
+2003-04-15  Paul Stodghill  <stodghil@quimby-xp>
+
+	* true.t: Original version.
+
+2003-01-15  Paul Stodghill  <stodghil@quimby-xp>
+
+	* server.sh, wsdl-parser.pl, wsdl.sh:
+	Added copyright notice.
+
+	* example-JMeshWS.xml, example-Persistence.xml, example-PipeGeo.xml, example-SOAP-Clean.xml, example-Tempurature.xml, example-delayed-quotes.xml, server.sh, wsdl-parser.pl, wsdl.sh:
+	Moved to new location that is consistent with CPAN-style distribution.
+
+2002-12-22  Paul Stodghill  <stodghil@quimby-xp>
+
+	* server.sh:
+	Use command-line arguments instead of environment variables.
+
+	* server.sh:
+	Reformatted XML data. Added sleep_for argument.
+
+2002-12-10  Paul Stodghill  <stodghil@quimby-xp>
+
+	* example-JMeshWS.xml, example-Persistence.xml, example-PipeGeo.xml, example-SOAP-Clean.xml, example-Tempurature.xml, example-delayed-quotes.xml, wsdl-parser.pl:
+	Original version.
+
+2002-12-02  Paul Stodghill  <stodghil@quimby-xp>
+
+	* wsdl.sh, server.sh:
+	Run from the examples directory.
+
+2002-11-12  Paul Stodghill  <stodghil@quimby-xp>
+
+	* server.sh, wsdl.sh:
+	"Original version". Taken from ../
+

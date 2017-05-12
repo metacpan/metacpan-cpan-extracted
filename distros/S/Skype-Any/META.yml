@@ -1,0 +1,83 @@
+---
+abstract: 'Skype API wrapper for Perl'
+author:
+  - 'Takumi Akiyama <t.akiym@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.11.0, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Skype-Any
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+    - img
+provides:
+  Skype::Any:
+    file: lib/Skype/Any.pm
+    version: 0.06
+  Skype::Any::API:
+    file: lib/Skype/Any/API.pm
+  Skype::Any::API::darwin:
+    file: lib/Skype/Any/API/darwin.pm
+  Skype::Any::API::linux:
+    file: lib/Skype/Any/API/linux.pm
+  Skype::Any::Command:
+    file: lib/Skype/Any/Command.pm
+  Skype::Any::Declare:
+    file: lib/Skype/Any/Declare.pm
+  Skype::Any::Error:
+    file: lib/Skype/Any/Error.pm
+  Skype::Any::Handler:
+    file: lib/Skype/Any/Handler.pm
+  Skype::Any::Object:
+    file: lib/Skype/Any/Object.pm
+  Skype::Any::Object::Application:
+    file: lib/Skype/Any/Object/Application.pm
+  Skype::Any::Object::Call:
+    file: lib/Skype/Any/Object/Call.pm
+  Skype::Any::Object::Chat:
+    file: lib/Skype/Any/Object/Chat.pm
+  Skype::Any::Object::ChatMember:
+    file: lib/Skype/Any/Object/ChatMember.pm
+  Skype::Any::Object::ChatMessage:
+    file: lib/Skype/Any/Object/ChatMessage.pm
+  Skype::Any::Object::FileTransfer:
+    file: lib/Skype/Any/Object/FileTransfer.pm
+  Skype::Any::Object::Group:
+    file: lib/Skype/Any/Object/Group.pm
+  Skype::Any::Object::Message:
+    file: lib/Skype/Any/Object/Message.pm
+  Skype::Any::Object::Profile:
+    file: lib/Skype/Any/Object/Profile.pm
+  Skype::Any::Object::SMS:
+    file: lib/Skype/Any/Object/SMS.pm
+  Skype::Any::Object::User:
+    file: lib/Skype/Any/Object/User.pm
+  Skype::Any::Object::VoiceMail:
+    file: lib/Skype/Any/Object/VoiceMail.pm
+requires:
+  AnyEvent: 0
+  Module::Runtime: 0
+  parent: 0
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/akiym/Skype-Any/issues
+  homepage: https://github.com/akiym/Skype-Any
+  repository: git://github.com/akiym/Skype-Any.git
+version: 0.06

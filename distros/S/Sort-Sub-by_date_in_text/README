@@ -1,0 +1,17 @@
+DESCRIPTION
+
+    The generated sort routine will sort by date found in text (extracted
+    using Date::Extract) or (f no date is found in text) ascibetically.
+    Items that have a date will sort before items that do not.
+
+ENVIRONMENT
+
+ DEBUG => bool
+
+    If set to true, will print stuffs to stderr.
+
+ PERL_DATE_EXTRACT_MODULE => str
+
+    Can be set to Date::Extract, Date::Extract::ID, or
+    DateTime::Format::Alami::EN, DateTime::Format::Alami::ID.
+

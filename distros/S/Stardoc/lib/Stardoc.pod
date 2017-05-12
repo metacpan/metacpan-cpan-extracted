@@ -1,0 +1,46 @@
+=encoding utf8
+
+=head1 NAME
+
+Stardoc - Acmeist Documentation Toolset
+
+=head1 SYNOPSIS
+
+    use Stardoc;
+
+=head1 DESCRIPTION
+
+Stardoc is a toolset for making programming documentation easier.
+
+It is intended to one day be a way to write Acmeist documentation. That is,
+documentation that you write once, and it works in all programming languages.
+
+=head1 WARNING
+
+This is a very early release. Don't use Stardoc yet. Things are still being
+worked out.
+
+=head1 CURRENT USAGE
+
+Right now, you can use it to simplify your Perl module docs.
+
+Take a look at the source code for this module. The POD lacks several standard
+sections. These sections are generated from the information provided in the
+special Stardoc section at the top.
+
+The Stardoc section starts with C<##> and contains a YAML map or metadata.
+
+=head1 AUTHOR
+
+Ingy döt Net <ingy@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2011. Ingy döt Net.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+See http://www.perl.com/perl/misc/Artistic.html
+
+=cut

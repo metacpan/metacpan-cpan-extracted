@@ -1,0 +1,11 @@
+The following this the history of changes for distribution Skeletor-Template-Example
+
+0.001   October 27, 2015
+        - Initial Release
+
+0.002   October 28, 2015
+        - Fix broken share directory
+
+0.003   October 28, 2015
+        - Change to use __var__ for file name expansion since that seems to be
+          more generically supported.

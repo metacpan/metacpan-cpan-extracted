@@ -1,0 +1,15 @@
+Revision history for Set-Tiny
+
+0.04    2016-02-22
+        Updated convenience initializer:
+            - If you pass a Set::Tiny, it will return a clone of that Set::Tiny
+            - The test for passing an arrayref is stricter, so it won't do weird things to hashrefs.
+
+0.03    2015-08-26
+        Faster intersection. Thanks to Alberto Simões.
+
+0.02    2014-09-24
+        Added convenience initializer `set`. Thanks to Ricky Morse.
+
+0.01    2009-03-18
+        First version, released on an unsuspecting world.

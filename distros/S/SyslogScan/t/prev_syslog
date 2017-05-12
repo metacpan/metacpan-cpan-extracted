@@ -1,0 +1,3 @@
+Jun 12 08:42:58 satellife sendmail[20697]: NAA20697: from=<coumfuller@warren.med.harvard.edu>, size=1477, class=0, pri=31477, nrcpts=1, msgid=<1c059f30@warren.med.harvard.edu>, proto=ESMTP, relay=mail.med.harvard.edu [134.174.141.3]
+Jun 12 14:27:09 satellife sendmail[20658]: OAA20658: from=couMajordomo-Owner@usa.healthnet.org, size=229, class=0, pri=60229, nrcpts=2, msgid=<199606131827.OAA20658@satellife.healthnet.org>, relay=majordom@localhost
+Jun 12 14:27:09 satellife sendmail[20660]: OAA20658: to=Count1@ptime.healthnet.org, delay=00:00:00, mailer=local, stat=Sent

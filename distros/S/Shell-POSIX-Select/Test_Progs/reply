@@ -1,0 +1,20 @@
+#! /usr/bin/perl -w
+
+use Shell::POSIX::Select qw( $Heading);
+
+$Heading='Menu 1';
+select my $var (1,2) {
+	warn "inside Outer loop\n";
+	warn "Reply is $Reply\n";
+
+	$Heading='Menu 2';
+	select my $var2 (qw (a b) ) {
+		warn "inside Inner loop\n";
+		warn "Reply is $Reply\n";
+		print "$var$var2\n";
+		last;
+	}
+	warn "outside Inner loop\n";
+	warn "Reply is $Reply\n";
+}
+warn "outside all loops\n";

@@ -1,0 +1,54 @@
+{
+   "abstract" : "verifies if the OS is supported by Siebel applications",
+   "author" : [
+      "Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Siebel-AssertOS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.22",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {}
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/glasswalk3r/siebel-gnu-tools/issues"
+      },
+      "homepage" : "https://github.com/glasswalk3r/siebel-gnu-tools",
+      "license" : [
+         "http://www.gnu.org/licenses/gpl.txt"
+      ],
+      "repository" : {
+         "url" : "https://github.com/glasswalk3r/siebel-gnu-tools"
+      }
+   },
+   "version" : "0.07"
+}

@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<!DOCTYPE TopicSet PUBLIC "urn:newsml:iptc.org:20001006:NewsMLv1.0.dtd:1" "NewsMLv1.0.dtd">
+<TopicSet Duid="iptc.notation" FormalName="Notation">
+	<Comment xml:lang="en">The notation of a ContentItem.</Comment>
+	<Topic Duid="not2">
+		<TopicType Scheme="IptcTopicType" FormalName="Notation"/>
+		<FormalName Scheme="IptcNotation">SGML</FormalName>
+		<FormalName Scheme="Formal Public Identifier">
+ISO 8879:1986//NOTATION Information processing -Text and office systems-Standard Generalized Markup Language(SGML)//EN</FormalName>
+		<Description xml:lang="en">Standard Generalized Markup Language(SGML)</Description>
+	</Topic>
+	<Topic Duid="not3">
+		<TopicType Scheme="IptcTopicType" FormalName="Notation"/>
+		<FormalName Scheme="IptcNotation">JPEG</FormalName>
+		<FormalName Scheme="Formal Public Identifier">
+ISO/IEC 10918-1:1994//NOTATION Digital Compression and Coding of Continuous-tone Still Images (JPEG)//EN</FormalName>
+		<Description xml:lang="en">Digital Compression and Coding of Continuous-tone Still Images (JPEG)</Description>
+	</Topic>
+	<Topic Duid="not4">
+		<TopicType Scheme="IptcTopicType" FormalName="Notation"/>
+		<FormalName Scheme="IptcNotation">MPEG2vid</FormalName>
+		<FormalName Scheme="Formal Public Identifier">ISO/IEC 13818-2:1996//NOTATION Information technology-Generic coding of moving pictures and associated audio information - Part 2: Video//EN</FormalName>
+		<Description xml:lang="en">Generic coding of moving pictures and associated audio information - Part 2: Video</Description>
+	</Topic>
+	<Topic Duid="not5">
+		<TopicType Scheme="IptcTopicType" FormalName="Notation"/>
+		<FormalName Scheme="IptcNotation">MPEG2aud</FormalName>
+		<FormalName Scheme="Formal Public Identifier">ISO/IEC 13818-2:1996//NOTATION Information technology -Generic coding of moving pictures and associated audio information - Part 3: Audio//EN</FormalName>
+		<Description xml:lang="en">Generic coding of moving pictures and associated audio information - Part 3: Audio</Description>
+	</Topic>
+	<Topic Duid="not6">
+		<TopicType Scheme="IptcTopicType" FormalName="Notation"/>
+		<FormalName Scheme="IptcNotation">ITU-G711</FormalName>
+		<FormalName Scheme="Formal Public Identifier">ISO/IEC TR 9573-9//NOTATION Pulse code modulation (PCM) of voice frequencies//EN</FormalName>
+		<Description xml:lang="en">Pulse code modulation (PCM) of voice frequencies</Description>
+	</Topic>
+	<Topic Duid="not7">
+		<TopicType Scheme="IptcTopicType" FormalName="Notation"/>
+		<FormalName Scheme="IptcNotation">ITU-G721</FormalName>
+		<FormalName Scheme="Formal Public Identifier">ISO/IEC TR 9573-9//NOTATION 32kbit/s adaptive pulse code modulation (ADPCM)//EN</FormalName>
+		<Description xml:lang="en">ISO/IEC TR 9573-9//NOTATION 32kbit/s adaptive pulse code modulation (ADPCM)//EN</Description>
+	</Topic>
+	<Topic Duid="not8">
+		<TopicType Scheme="IptcTopicType" FormalName="Notation"/>
+		<FormalName Scheme="IptcNotation">ITU-G722</FormalName>
+		<FormalName Scheme="Formal Public Identifier">ISO/IEC TR 9573-9//NOTATION 7kHz audio-coding within 64kbit/s//EN</FormalName>
+		<Description xml:lang="en">7kHz audio-coding within 64kbit/s</Description>
+	</Topic>
+	<Topic Duid="not9">
+		<TopicType Scheme="IptcTopicType" FormalName="Notation"/>
+		<FormalName Scheme="IptcNotation">NewsML</FormalName>
+		<FormalName Scheme="NewsML URN">urn:newsml:iptc.org:20001006:NewsMlv1.0DTD</FormalName>
+		<Description xml:lang="en">News Markup Language (TM) IPTC</Description>
+	</Topic>
+	<Topic Duid="not10">
+		<TopicType Scheme="IptcTopicType" FormalName="Notation"/>
+		<FormalName Scheme="IptcNotation">XML</FormalName>
+		<FormalName Scheme="Formal Public Identifier">-//W3C/REC-xml-19980210//NOTATION Extensible Markup Language Version 1.0//EN</FormalName>
+		<Description xml:lang="en">Extensible Markup Language Version 1.0</Description>
+	</Topic>
+	<Topic Duid="notation-nitf">
+		<TopicType Scheme="IptcTopicType" FormalName="Notation"/>
+		<FormalName Scheme="IptcNotation">NITF</FormalName>
+		<FormalName Scheme="Formal Public Identifier">-//IPTC-NAA//DTD NITF-XML 1.0//EN</FormalName>
+		<FormalName Scheme="NewsML URN">urn:newsml:iptc.org:20001006:NITF</FormalName>
+		<Description xml:lang="en">IPTC-NAA News Industry Text Format</Description>
+	</Topic>
+	<Topic Duid="notation-nsktiff">
+		<TopicType Scheme="IptcTopicType" FormalName="Notation"/>
+		<FormalName Scheme="IptcNotation">NSK-TIFF</FormalName>
+		<FormalName Scheme="NewsML URN">urn:newsml:nsk.or.jp:20001006:NSK-TIFF</FormalName>
+		<Description xml:lang="en">Japanese Newspaper Publishers TIFF variant.</Description>
+	</Topic>
+</TopicSet>
+

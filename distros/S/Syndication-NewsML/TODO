@@ -1,0 +1,25 @@
+TODO
+
+    * Store catalogs for future use: eg <Role> tag should look up
+    DefaultVocabularyFor "Role"...???
+    * Allow creation/modification of NewsML documents as well as just
+    reading them
+    * A Syndication::NewsML::Simple type module that takes the pain out of
+    accessing all these methods.
+    * Better error checking
+    * Better handling of error reporting -- don't just croak() every time
+    something goes wrong
+    * POD docs of each class (!)
+    * Or at least some kind of class/method map so people know what they can
+    call
+    * Separate out the classes into more than one file!
+    * Finish off t/4_reuters.t and examples/NewsMLParser.pl
+    * Possibly change the way the constructor works... call it
+    Syndication::NewsML::Parser?
+    * The rest of the TODO list ;-)
+  Would be nice
+
+    *
+    ** This file was automatically generated from **
+    ** doc/TODO.pod. To edit it, see there.    **
+

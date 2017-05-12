@@ -1,0 +1,420 @@
+
+1.24 2016-02-11
+  No code changes.
+
+  [INTERNALS]
+  - Fixed t/dist.t test failure due to version mismatch in 1.23.
+
+
+1.23 2016-02-11
+  No code changes.
+
+  [INTERNALS]
+  - Correct link to license in README.  (Mark Stosberg) [rt.cpan.org #111948] 
+
+1.22 2013-08-10
+    No code changes.
+
+    [INTERNALS]
+    - Updated test suite to pass with Perl 5.18 hash randomization.  (Mark Stosberg)
+
+1.21 2012-01-20
+    No code changes.
+
+    [INTERNALS]
+    - Sync'ed version of DBIx::Interp and SQL::Interp to avoid test failure (RT#73756)
+
+1.20 2011-11-30
+
+    No changes since 1.11-TRIAL. Releasing as stable.
+
+1.11-TRIAL 2011-05-03
+
+    [THINGS THAT MIGHT BREAK YOUR CODE]
+    - This is no longer supported for enabling SQL tracing: 
+         SQL::Interp TRACE => 1;
+      You can still set $ENV{TRACE_SQL} = 1  to enable SQL tracing.
+
+    [FEATURES]
+    - Add sql_interp_strict() as a first stab at an API for adding a strict mode. 
+    - Switched to using Sub::Exporter and Exporter. This allows you to do this:
+
+      use SQL::Interp 'sql_interp_strict' => { -as => 'sql_interp' };
+
+      So that strict mode is enabled throughout your code. Before you do that,
+      read the docs on sql_interp_strict-- some of your code may need to be
+      refactored for it work, so you may want to start with the incremental
+      approach.
+
+      While sql_interp() will work as before for backwards compatibility, you
+      can do this to rename them on import now:
+
+      use SQL::Interp
+         'sql_interp'        => { -as => 'sql_interp_insecure' },
+         'sql_interp_strict' => { -as => 'sql_interp' };
+
+      If you would like a shortcut for this in the form of SQL::Interp::Strict,
+      let me know. 
+
+    [DOCUMENTATION]
+    - The documentation has been updated to clarify that DBIx::Simple's
+      SQL::Interp integration is recommended over DBIx::Interp.
+
+    - Noted that SQL::Interp now has the primary repo hosted on Github:
+      https://github.com/markstos/SQL-Interp
+
+1.10 2009-06-28
+
+    [FEATURES]
+    - Add support for MySQL's "REPLACE INTO". (TBONE, Mark Stosberg, RT#43477)
+
+    [PERFORMANCE]
+    - When SQL snippets are provided as hashrefs, we now always sort them to
+      insure consistent results for the benefit of possible statement caching.
+      This shouldn't change your application behavior, as hashs are not to be
+      considered an ordered data structure. If you want to force an element to
+      be first in the where clause, that's better done with the pre-existing
+      functionality:
+          sql_interp("... WHERE a = 1 AND ",\%rest_of_where_hash);
+
+      Thanks to Andrew Kirkpatrick for the patch (RT#33310).
+
+    [BUG FIXES]
+    - The documentation said that we supported a reference to an arrayref in 
+      the "IN ()" context, but there didn't appear to be code or tests for this.
+      Both have been added now. (Mark Stosberg, RT#39336).
+
+    [INTERNALS]
+    - Update formatting and language about the historical fork with SQL::Interpolate.
+    - Fix documentation typos (TBONE, RT#42726, RT#42733, RT#42336)
+
+1.06 2007-12-20
+
+    [INTERNALS]
+    - Fix warnings introduced in 1.05
+    - Fix Build.PL to create Makefile.PL
+
+1.05 2007-11-15
+
+    - Support "NOT IN" with an empty list (Aristotle, test by Mark Stosberg, RT#30752)
+    - Support MySQL's "ON DUPLICATE KEY UPDATE", so it works like "SET". (Aristotle, RT#30652)
+
+1.01 2007-07-15
+    - No code changes. Just some doc improvements.
+
+    [INTERNALS]
+    - Add details about the fork to "See Also"  (suggestion from Juerd).
+    - mention that SQL::KeywordSearch supports SQL::Interp-style results
+    - mention DBIx::Simple support for SQL::Interp
+
+
+1.00 2007-07-06
+
+    - forked as SQL::Interp / DBIx::Interp from SQL::Interpolate
+    - TRACE_SQL can now be set through an environment variable
+    - sql_var() renamed to sql_type()
+    - removed sql_literal(). It had been previously superceded by sql(). 
+    - removed make_sql_interp and make_dbi_interp.
+        These are just basic curry patterns that you probably won't need,
+        and can be easily created as-needed.
+
+    - significant doc update, mostly to simplify it
+    - removed Macro support
+    - removed filter support
+
+0.40 2007-05-08
+    - No code changes. Declaring stable.
+    - List DBI as a dependency to squelch a test failure.
+
+0.40_03 2006-09-27
+
+    - Further documentation refinements. No code changes.
+
+0.40_02 ??
+
+	## SQL::Interp
+
+	- POD improvements.
+
+	- Expanded (table) identifier match:
+	  /[a-zA-Z_.]+/ --> /[a-zA-Z_][a-zA-Z0-9_\$\.]*/
+	  (reported by mark tiefenbruck)
+
+	## DBIx::Interp
+
+	- WARNING: BREAKS compatibility with 0.33.
+
+	- DBIx::Interp now inherits from DBI.
+
+	- Changed SQL::Interp::Key and SQL::Interp::Attr
+	  to DBIx::Interp::Key and DBIx::Interp::Attr
+	  respectively to reduce chance of name conflict.
+
+	- Fixed circular references to allow garbage collection.
+
+	- Now requires Scalar::Util.
+
+0.33	2005-11-10
+
+	## SQL::Interp
+
+	- Build.PL - fixed version syntax so that META.yml is valid.
+
+	- Added support for result sets:
+	  [[1, 2], [3, 4]], 'UNION', [{x => 10, y > 11}, {x => 12, y => 13}]
+
+	- Added support for temporary table references:
+	  "SELECT * FROM", [[1, 2], [3, 4]], 'JOIN',
+	                   [{x => 10, y > 11}, {x => 12, y => 13}]
+
+	- Added support for "IS NULL" in
+	    IN:  "WHERE", {bla => undef}
+	    OUT: "WHERE bla IS NULL"
+	  Recommended by (slaven) in
+	  http://rt.cpan.org/NoAuth/Bug.html?id=11810
+
+	- POD improvements in all modules.
+
+0.32	2005-11-05
+
+	## SQL::Interp
+
+	This module has been simplified, and it incorporates
+	defect corrections and style improvements.
+
+	- Fixed ("x IN", []) to return "1=0" not "1=1".
+
+	- Fixed ("x in", \@v) to not fail when "in" lowercase.
+
+	- Fixed sql_interp.t on some platforms
+	  (perl.cpan.testers, 254029)
+
+	- Fixed sub-module version numbers for CPAN.
+
+	- New sql() function (based on SQL::Interp::SQL
+	  from Macro.pm).  sql_literal() is now depreciated
+	  in favor of sql().
+
+	- sql_interp() now handles recursion correctly.
+
+	- sql_flatten() moved into SQL::Interp::Macro.
+
+	- Added pod.t - Test::Pod checks
+
+	- Added pod-coverage.t - Test::Pod::Coverage checks
+
+	- Added dist.t - distribution checks
+
+	- POD and code style improvements.
+
+	## DBIx::Interp
+
+	- Removed AUTOLOAD usage.
+
+	## SQL::Macro
+
+	The macro framework has been refined.
+
+	- Fixed sql_and(sql()) and sql_or(sql()) to
+	  now return '1=1' and '1=0' respectively (rather than "()").
+
+	- sql_flatten() now expands depth-first rather than
+	  breadth-first.
+
+	- sql_fragment() is now depreciated.  Use sql() instead.
+
+	- relations() is now depreciated.  Use sql_rel_filter() instead.
+
+	- expand() no longer has $filter param.  Macros now
+	  query the $interp object for state.
+
+	- SQLFilter::macro_names() no longer used.  The $interp
+	  object no longer knows which macro object use which filters.
+
+	- SQLFilter::filter_text_fragment() no longer has $changing_ref
+	  in parameter list.
+
+	## SQL::Interp::Filter
+
+	- sql// objects now transform into calls to make_sql().
+
+0.31	2005-09-27
+
+	## SQL::Interp
+
+	- Improved error reporting by sql_interp
+	  (recommended by mark stosberg)
+
+	- Added support for ("WHERE", {x => \@v, ...})
+	  ==> "WHERE (x IN (?,...) AND ...)".
+	  (recommended by multiple people)
+
+	- Generate 'WHERE id = 5 and 1=1' and 'WHERE id = 5 or 1=0'
+	  rather than 'WHERE id = 5 and 1' and 'WHERE id = 5 or 0'
+	  for Oracle compatibility.
+	  (reported by wojciech pietron)
+
+	- Fixed some improper handling of "use"
+	  parameters, e.g. $x in "use SQL::Interp FILTER=>$x"
+
+	- Fixed various Exporter problems from custom import
+	  (reported by mark stosberg)
+
+	- sql_interp.t and dbi.t - Fixed test case errors due to
+	  different hash order on MacOS.
+	  (reported by sean davis)
+
+	- Documentation improvements.
+
+	## SQL::Interp::Macro
+
+	- Fixed: '^' and '$' are no longer
+	  automatically placed around regexes in 'relations' parameter.
+	  (reported by wojciech pietron)
+
+	## DBIx::Interp
+
+	- Added support for transparent
+	  caching of statement handles (no need to prepare()).
+
+	- Fixed error in STX::fetchrow_hashref returning an
+	  arrayref rather than a hashref.
+	  (reported by mark tiefenbruck)
+
+	- Added Carp
+
+0.30	2005-01-10
+
+	## General
+
+	- Refactored SQL::Interp module into multiple modules.
+	  Everything except sql_interp-related functionality
+	  moved out of SQL::Interp and into DBIx::Interp,
+	  SQL::Interp::Filter, and SQL::Interp::Macro (new module).
+	  (recommended by mark s)
+
+	- Reorganized macro processing.  SQL::Interp contains
+	  only hooks for macro processing, and SQL::Interp::Macro
+	  implements various macros.
+
+	## SQL::Interp
+
+	- added sql_var type
+
+	- added sql_literal type (thanks mark s)
+
+	- ("WHERE x in", []) now generates "WHERE 1" not "WHERE NULL"
+
+	- croak not die
+
+	- macros, sql_var, and sql_literal can now exist in
+	  elements of aggregates (hashref and arrayref)
+
+	## DBIx::Interp
+
+	- DBIx::Interp is now derived from SQL::Interp.
+
+	- Support for statement handle sets (stx/prepare).
+
+	- Renamed select_key() to key_field().
+
+	## SQL::Interp::Macro
+
+	- SQL::Interp::SQL is now a macro for uniformity.
+
+	- new macros: relations, sql_and, sql_fragment, sql_if,
+	  sql_link, sql_or, sql_paren, sql_rel
+
+	- removed limit() macro since MySQL supports Postgres syntax.
+	(thanks mark s)
+
+	## Other
+
+	- reorganized POD (thanks mark s)
+
+	- reorganized test cases
+
+0.29	2004-12-25
+
+	### SQL::Interp features
+
+	- Added support for ("IN", $scalarref) (thanks mark s)
+
+	- Added support for ("INSERT INTO mytable", $scalarref)
+
+	- Added support for ("INSERT INTO mytable", $arrayref)
+
+	- Added support for ("WHERE {x = 3, y = 4}")
+
+	- Added support for ("INSERT HIGH_PRIORITY DELAYED INTO mytable", $ref)
+	  for mysql.
+
+	- Added simplified syntax for table joins using
+	  R(...) and LINK(...) macros via new method filter_sql().
+
+	- Added OO-interface in addition to the functional one.
+
+	- Added support for \%attr to be returned by dbi_interp()
+	  and sent to DBI when new SQL::Intepolate::Attr object is given.
+	  This object may be created by new attr() function.
+
+	- Added support for extra $key_field to be returned by
+	  dbi_interp() when instance of new SQL::Interp::Key object
+	  is given.  This object may be created by new attr() function.
+	  This is for using in DBI::selectall_hashref and similar methods.
+
+	- Added exports:
+           attr, dbi_interp, select_key, limit, make_sql_interp,
+           make_dbi_interp, filter_sql, sql_flatten, limit
+
+	- Added debugging options in use statement: TRACE_SQL, TRACE_FILTER.
+
+	- Changed: less extra whitespace around SQL generated by sql_interp().
+
+	- Changed: In limit(), for mysql, don't use bind values since they
+	  don't always work right.
+
+	- Changed: In limit(), for mysql, $start and/or $count may be undef.
+
+	### SQL::Interp internal changes
+
+	- Dereferencing extra reference that source filtering produces from
+	  sql[$x] when $x is an arrayref or hashref is now performed more
+	  immediately in SQL::Interp::SQL::new() rather than sql_interp().
+
+	- new SQL::Interp::Limit extends SQL::Interp::Macro.
+
+	- Moved SQL::Interp::SQL into SQL::Interp
+
+	- Fixed some documentation (thanks mark s)
+
+	- Added more tests, more complete docs
+
+	### DBIx::Interp features
+
+	- Added new() method in addition to connect() to attach existing
+	  database handle (thanks mark s)
+
+	- Added dbh() and interp() methods to expose underlying DBI and
+	  SQL::Interp objects.
+
+0.20	2004-01-03
+	- Added SQL::Interp::Filter module for source filtering
+	  with string-like sql// operator.
+
+	- Added DBIx::Interp module. (thanks jim c)
+
+	- Added SQL::Interp::SQL module.
+
+	- Support macro calls inside SQL (e.g. LIMIT macro).
+
+	- Renamed sql_interpolate and dbi_interpolate to sql_interp
+	  and dbi_interp respectively (thanks terrence).
+
+	- Changed SQL::Interp to not export symbols by default.
+
+	- Limited cross-database support for LIMIT clauses.
+
+0.10	2003-12-26
+	- Initial version.
+

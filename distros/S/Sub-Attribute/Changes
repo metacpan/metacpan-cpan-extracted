@@ -1,0 +1,19 @@
+Revision history for Perl extension Sub::Attribute
+
+0.05 Tue Jan 19 11:10:46 2010
+    - Work around RT #53776 (Thanks to Andreas Koenig)
+    - Work around RT #53793 (Thanks to Markus Peter)
+
+0.04 Sat Jan  9 16:25:43 2010
+    - Fix an issue on ActivePerl (RT #53530, thanks to Taro Nishino)
+
+0.03 Thu Jan  7 17:32:53 2010
+    - Fix the error resolution
+        Now Sub::Attribute throws fatal error currecly and safely
+    - Work around 5.8 bugs in attributes (RT #53420 by Markus Peter)
+
+0.02 Mon May 18 14:05:32 2009
+	- change internal attribute names
+
+0.01 Thu Apr 23 23:00:00 2009
+        - original version; created by Module::Setup

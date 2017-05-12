@@ -1,0 +1,20 @@
+Revision history for Sub::Chain::Group
+
+0.014     2016-01-07T04:22:08Z
+
+  - Remove Test::Synopsis test dependency
+
+0.013     2012-10-13T22:06:52Z
+
+  - Enable before/after hooks that operate on the input record as a whole
+  - Use the lightweight Module::Load instead of error-prone eval("require ...")
+  - Replace Object::Enum with simple string comparisons
+
+0.012     2011-07-15T00:19:37Z
+
+  - Documentation fixes
+  - Superficial dist/release changes
+
+0.010011  2011-01-07T06:15:22Z
+
+  - Initial release

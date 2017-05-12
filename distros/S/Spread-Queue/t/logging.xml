@@ -1,0 +1,19 @@
+<channel_config>
+  <channel>
+    <topic>Spread::Session</topic>
+    <suppress />
+  </channel>
+  <channel>
+    <topic>Spread::Session::message</topic>
+    <suppress />
+  </channel>
+  <channel>
+    <topic>Spread::Queue</topic>
+    <suppress />
+  </channel>
+  <channel>
+    <topic>Spread::Queue::Worker</topic>
+    <suppress />
+  </channel>
+</channel_config>
+

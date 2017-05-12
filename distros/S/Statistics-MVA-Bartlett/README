@@ -1,0 +1,37 @@
+Statistics-MVA-Bartlett version 0.0.4
+
+Bartlett's test ( Snedecor and Cochran, 1983) is used to test if k samples have equal variances. This multivariate form
+tests for homogeneity of the variance-covariance matrices across samples. Some statistical tests assume such homogeneity
+across groups or samples. This test allows you to check that assumption. See
+http://www.itl.nist.gov/div898/handbook/eda/section3/eda357.htm.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+'Statistics::MVA' => '0.0.1',
+'Carp' => '1.08',
+'Math::Cephes' => '0.47',
+'Statistics::Distributions' => '1.02',
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010, Daniel S. T. Hughes
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

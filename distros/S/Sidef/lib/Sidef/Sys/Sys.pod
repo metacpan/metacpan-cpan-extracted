@@ -1,0 +1,570 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Sys::Sys
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = Sys.new(...);
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef::Object::Object
+
+=head1 METHODS
+
+
+=head2 alarm
+
+Sys.alarm() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 bless
+
+Sys.bless() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 class_name
+
+Sys.class_name() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 defined
+
+Sys.defined() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 die
+
+Sys.die() -> I<Obj>
+
+Return the
+
+Aliases: I<raise>
+
+=cut
+
+=head2 eval
+
+Sys.eval() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 exec
+
+Sys.exec() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 exit
+
+Sys.exit() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 fork
+
+Sys.fork() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getgrent
+
+Sys.getgrent() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getgrgid
+
+Sys.getgrgid() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getgrnam
+
+Sys.getgrnam() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 gethostbyaddr
+
+Sys.gethostbyaddr() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 gethostbyname
+
+Sys.gethostbyname() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 gethostent
+
+Sys.gethostent() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getnetbyaddr
+
+Sys.getnetbyaddr() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getnetbyname
+
+Sys.getnetbyname() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getnetent
+
+Sys.getnetent() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getpgrp
+
+Sys.getpgrp() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getppid
+
+Sys.getppid() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getpriority
+
+Sys.getpriority() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getprotobyname
+
+Sys.getprotobyname() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getprotobynumber
+
+Sys.getprotobynumber() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getprotoent
+
+Sys.getprotoent() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getpwent
+
+Sys.getpwent() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getpwnam
+
+Sys.getpwnam() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getpwuid
+
+Sys.getpwuid() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getservbyname
+
+Sys.getservbyname() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getservbyport
+
+Sys.getservbyport() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getservent
+
+Sys.getservent() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 isweak
+
+Sys.isweak() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 nanosleep
+
+Sys.nanosleep() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 open
+
+Sys.open() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 opendir
+
+Sys.opendir() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 osname
+
+Sys.osname() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 print
+
+Sys.print() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 printf
+
+Sys.printf() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 printh
+
+Sys.printh() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 read
+
+Sys.read() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 readln
+
+Sys.readln() -> I<Obj>
+
+Return the
+
+Aliases: I<scanln>
+
+=cut
+
+=head2 ref
+
+Sys.ref() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 refaddr
+
+Sys.refaddr() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 reftype
+
+Sys.reftype() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 run
+
+Sys.run() -> I<Obj>
+
+Return the
+
+Aliases: I<system>
+
+=cut
+
+=head2 say
+
+Sys.say() -> I<Obj>
+
+Return the
+
+Aliases: I<println>
+
+=cut
+
+=head2 select
+
+Sys.select() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 setgrent
+
+Sys.setgrent() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sethostent
+
+Sys.sethostent() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 setnetent
+
+Sys.setnetent() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 setpgrp
+
+Sys.setpgrp() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 setpriority
+
+Sys.setpriority() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 setprotoent
+
+Sys.setprotoent() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 setpwent
+
+Sys.setpwent() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 setservent
+
+Sys.setservent() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sidef
+
+Sys.sidef() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sleep
+
+Sys.sleep() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 stderr
+
+Sys.stderr() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 stdin
+
+Sys.stdin() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 stdout
+
+Sys.stdout() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ualarm
+
+Sys.ualarm() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 umask
+
+Sys.umask() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 unweaken
+
+Sys.unweaken() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 user
+
+Sys.user() -> I<Obj>
+
+Return the
+
+Aliases: I<getlogin>
+
+=cut
+
+=head2 usleep
+
+Sys.usleep() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 wait
+
+Sys.wait() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 warn
+
+Sys.warn() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 weaken
+
+Sys.weaken() -> I<Obj>
+
+Return the
+
+=cut

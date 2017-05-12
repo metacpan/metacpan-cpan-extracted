@@ -1,0 +1,19 @@
+---
+name: Solaris-SysInfo
+version: 0.06
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+abstract: A perl wrapper around Solaris' sysinfo(1) system call
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Test::More: 0
+provides:
+  Solaris::SysInfo:
+    file: lib/Solaris/SysInfo.pm
+    version: 0.06
+generated_by: Module::Build version 0.33
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

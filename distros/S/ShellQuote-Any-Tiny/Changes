@@ -1,0 +1,24 @@
+Revision history for ShellQuote-Any-Tiny
+
+0.004   2017-01-04 (PERLANCAR)
+
+	- No functional changes.
+
+	- Avoid use of 'warnings' to reduce startup overhead.
+
+
+0.003   2016-12-27 (PERLANCAR)
+
+	- No functional changes.
+
+	- Fix failing test, avoid use of 5.10-ism (defined-or) [CT].
+
+
+0.002   2016-12-26 (PERLANCAR)
+
+	- Fix failing tests on Unix [CT].
+
+
+0.001   2016-12-25 (PERLANCAR)
+
+        - First release.

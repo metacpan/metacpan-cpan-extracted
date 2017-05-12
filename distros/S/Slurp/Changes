@@ -1,0 +1,19 @@
+Revision history for Perl extension Slurp
+
+0.1   Wed Dec 18 00:01:00 2002
+        - Original version; rob@cowsnet.com.au
+
+0.2   Mon Dec 30 12:30:00 2002
+        - Added documentation; rob@cowsnet.com.au
+        - Added to_array and to_scalar methods; rob@cowsnet.com.au
+        - Incorporated Changes revision history; rob@cowsnet.com.au
+        - Incorporated module tests; rob@cowsnet.com.au
+
+0.3   Tue Dec 31 01:22:00 2002
+        - Minor update to module documentation; rob@cowsnet.com.au
+        - Minor update to module tests; rob@cowsnet.com.au
+
+0.4   Mon Jan 06 09:22:00 2003
+        - Removal of pseudo- object-orientated interface to module; rob@cowsnet.com.au
+        - Minor update to module documentation; rob@cowsnet.com.au
+        - Minor update to module tests; rob@cowsnet.com.au

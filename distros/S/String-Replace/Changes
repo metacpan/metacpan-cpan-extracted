@@ -1,0 +1,11 @@
+Revision history for Perl module String::Replace
+
+0.02 2013-01-23
+
+ - String::Replace::Safe is now compatible with pre 5.14 Perl.
+ - Improved efficiency for the in-place replace functionnality.
+ - Fix typo in the documentation.
+
+ 0.01 2013-01-22
+
+ - Initial release

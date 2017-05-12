@@ -1,0 +1,95 @@
+0.36 - not yet released
+ - Added a dep on Net::SSLeay since we now require https for tests
+ - Added ->delete_page
+ - Added ->get_persontags
+
+0.35 - Mon Nov 29 16:48:45 PST 2010
+ - adds a --group-id option to the command line
+ - adds a ->offset method for requests
+ - adds a ->get_sheet_cell for Socialcalc sheet read API
+
+0.34 - Fri Jul 16 09:35:49 PDT 2010
+ - Include st-webhook in the MANIFEST. Doh.
+
+0.33 - Wed Jul 14 15:14:40 PDT 2010
+ - Make sure to install st-webhook
+
+0.32 - Wed Jul 14 12:43:34 PDT 2010
+ - Use a more correct HTTP verb (POST) when creating a webhook.
+
+0.31 - Wed Jul 14 11:32:33 PDT 2010
+ - Add support for sending signals in reply to another signal.
+ - Add support for sending signals with annotations.
+ - Add "on_behalf_of" to set header for "X-On-Behalf-Of". (not docced yet)
+ - Add `st-webhook` tool to create/list/delete webhooks
+
+0.30 - Thu Feb  4 10:19:42 PST 2010
+ - Add group and account ids to post_signal()
+ - Doc that get_signals() accepts query parameters (such as group & account
+   ids)
+
+0.29 - Thu Jan 28 13:16:49 PST 2010
+ - Specify a Content-Length for all PUT requests
+
+0.28 - Fri Aug 28 13:15:23 PDT 2009
+ - added put_webhook()
+
+0.27 - Fri Apr 17 15:39:18 PDT 2009
+ - Fixed problem due to a change to the REST server response for some
+   redirects.
+ - added put_persontag()
+ - added get_signals() and post_signal()
+
+0.26 - Thu Apr 17 11:15:07 PDT 2008
+ - Add get_workspace()
+ - Add get_revision() - thanks, Michele Berg
+
+0.25 - Fri Mar 21 02:19:35 PDT 2008
+ - Fixed JSON dependency to be JSON::XS
+
+0.24 - Thu Mar 20 17:48:50 PDT 2008
+ - Updated docs based on some ingy feedback
+ - Add a customizable user agent string
+ - s/JSON/JSON::XS/
+
+0.23 - Wed Oct 10 09:09:54 PDT 2007
+ - Added missing JSON dependency
+
+0.22 - Tue Oct  9 10:03:42 PDT 2007
+ - Add undocumented 'perl_hash' accept type.  The type may change in the
+   future.
+
+0.21 - Wed Aug  8 14:29:38 PDT 2007
+ - check if server is set, die if not
+ - make name_to_id method public, as many things already use
+   _name_to_id.
+ - store etag_cache per-workspace
+
+0.20 - Thu Jun 21 15:30:30 PDT 2007
+ - added json_verbose flag to return json + wikitext in get_page()
+ - fixed warning when an invalid workspace is used with get_homepage()
+ - support setting a cookie for requests
+
+0.19 - Sun Mar 11 17:05:49 PDT 2007
+ - Added get_homepage()
+
+0.18 - Tue Feb 20 10:35:31 PST 2007
+ - Added get_tag()
+ - Added put_workspacetag()
+ - Added delete_workspacetag()
+ - Fixed collection methods in scalar context
+ - Too many version bumps since last release
+
+0.15 - Mon Feb 12 17:16:27 PST 2007
+ - Added method to return previous HTTP::Response object
+ - Added support for breadcrumbs, backlinks, frontlinks
+ - Added docs for accept()
+
+0.12 - Thu Jan 25 11:14:35 PST 2007
+0.11 - (failed to upload to cpan)
+ - Added etag caching support to allow for collision detection
+   - etags are cached on all get_page() calls, and sent to server
+     in put_page() calls in the 'If-Match' header.  If the etags
+     don't match, the server will return 412.
+ - Added unit tests using mocked LWP packages.  
+   - ~92X faster and they already have better coverage

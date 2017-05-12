@@ -1,0 +1,15 @@
+Build.PL
+Changelog.ini
+Changes
+lib/Set/Array.pm
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/difference.pl
+t/intersection.1.pl
+t/intersection.2.pl
+t/rt.81971.t
+t/test.t
+xt/author/pod.t

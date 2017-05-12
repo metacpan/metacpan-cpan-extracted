@@ -1,0 +1,15 @@
+2003-01-15  Paul Stodghill  <stodghil@quimby-xp>
+
+	* cgi-env.txt, descr.txt:
+	Added copyright notice.
+
+	* cgi-env.txt, descr.txt:
+	Moved to new location that is consistent with CPAN-style distribution.
+
+	* cgi-env.txt:
+	Original version.
+
+2002-11-12  Paul Stodghill  <stodghil@quimby-xp>
+
+	* descr.txt: Original version.
+

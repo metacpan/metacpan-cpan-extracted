@@ -1,0 +1,11 @@
+BinRPC.xs
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/Ser-BinRPC.t
+t/ser.cfg
+lib/Ser/BinRPC.pm
+bin/sercmd.pl
+META.yml                                 Module meta-data (added by MakeMaker)

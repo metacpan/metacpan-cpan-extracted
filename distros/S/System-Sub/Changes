@@ -1,0 +1,25 @@
+Revision history for System-Sub.
+
+0.162800     2016-10-07    DOLMEN (Olivier Mengué)
+	Fix $_ corruption by wrapper subs (RT#118114 reported by BooK).
+
+0.150960     2015-04-06    DOLMEN (Olivier Mengué)
+	Fix metadata: add back the source repository on GitHub
+	POD: add more SEE ALSO links (Shell, Capture::Tiny)
+
+0.142280     2014-08-16    DOLMEN (Olivier Mengué)
+	Add option '&?' to handle exit code != 0.
+	Add common options (an ARRAY as first import arg) that will apply
+          to all the commands on the import list.
+	Doc: add link to Shell.pm (Thanks Slaven Rezic, RT#84739).
+
+0.130210     2013-01-21    DOLMEN (Olivier Mengué)
+	Add option '()' to define the prototype of the sub.
+
+0.130180     2013-01-18    DOLMEN (Olivier Mengué)
+	Define the DEBUG compile symbol with 'constant.pm'. This fixes
+	  Pod::Coverage tests.
+	Minor fixes from BOOK (Philippe Bruhat).
+
+0.123440     2012-12-09    DOLMEN (Olivier Mengué)
+	Initial release, at the Quack and Hack 2012 Europe hackathon.

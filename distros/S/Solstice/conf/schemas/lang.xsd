@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+<xsd:complexType name="langstr">
+  <xsd:simpleContent>
+    <xsd:extension base="xsd:string">
+      <xsd:attribute name="name" type="xsd:string" use="required"/>
+      <xsd:attribute name="title" type="xsd:string" use="optional"/>
+    </xsd:extension>
+  </xsd:simpleContent>
+</xsd:complexType>
+
+<xsd:element name="i18n">
+  <xsd:complexType>
+    <xsd:all>
+   
+      <xsd:element name="btns">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="btn" type="langstr" minOccurs="0" maxOccurs="unbounded"/>  
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      
+      <xsd:element name="errs">
+          <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="err" type="langstr" minOccurs="0" maxOccurs="unbounded"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      
+      <xsd:element name="msgs">
+          <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="msg" type="langstr" minOccurs="0" maxOccurs="unbounded"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      
+      <xsd:element name="strs">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="str" type="langstr" minOccurs="0" maxOccurs="unbounded"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      
+      <xsd:element name="hlps">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="hlp" type="langstr" minOccurs="0" maxOccurs="unbounded"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    
+    </xsd:all>
+  </xsd:complexType>
+</xsd:element>
+  
+</xsd:schema>  

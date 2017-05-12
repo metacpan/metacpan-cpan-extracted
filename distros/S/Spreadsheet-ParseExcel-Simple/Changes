@@ -1,0 +1,28 @@
+Revision history for Perl extension Spreadsheet::ParseExcel::Simple.
+
+1.04  Sun Nov  5 10:23:43 GMT 2006
+	- Allow t/02 to skip gracefully when missing Spreadsheet::WriteExcel
+
+1.03  Sat Sep  3 22:32:22 UTC 2005
+	- Document accessing the underlying Spreadsheet::ParseExcel objects
+	- Tidy tests
+
+1.02  Wed Mar 23 2005
+	- handle single row worksheets
+  (Josh Rosenbaum, John McNamara)
+
+1.01  Thu Dec 12 2002
+	- return undef if can't read the document 
+  (thanks to Marty Pauley and Adrian Howard)
+
+1.00  Wed Aug 14 2002
+	- tweaked tests to work better when you don't have 
+     Spreadsheet::WriteExcel
+
+0.02  Thu Sep 13 2001
+	- handle empty worksheets better
+           (Thanks to Mark Thomas)
+
+0.01  Sat Sep 1 2001
+	- original version
+

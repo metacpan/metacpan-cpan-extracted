@@ -1,0 +1,14 @@
+This directory contains a simple example of the script interface to StatsView.
+
+Note that you will have to have compiled gnuplot with the optional gd (GIF)
+graphics support for this example to work - If you havn't you can change the
+output format to something else - postscript or csv, for example.
+
+To run the example, firstly unzip the sar.txt.gz file in this directory, then
+modify the first line of the "sargif" script to invoke the perl interpreter on
+your machine.  You can then run the "sargif" script.  If you want to try this
+before installing the StatsView package, run the script using
+"perl -Mblib sargif".
+
+When the script has run you will be left with four GIF files in the current
+directory.

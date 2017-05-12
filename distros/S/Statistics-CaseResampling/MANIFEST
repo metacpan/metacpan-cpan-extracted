@@ -1,0 +1,18 @@
+_mt.c
+_stats.c
+CaseResampling.xs
+Changes
+lib/Statistics/CaseResampling.pm
+Makefile.PL
+MANIFEST			This list of files
+mt.h
+MYMETA.json
+MYMETA.yml
+ppport.h
+RdGen.xs.inc
+README
+stats.h
+t/01all.t
+t/02stats.t
+typemap
+META.yml                                 Module meta-data (added by MakeMaker)

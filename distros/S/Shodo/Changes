@@ -1,0 +1,36 @@
+Revision history for Perl extension Shodo
+
+0.08 2013-12-27T08:17:48Z
+
+    - move Shodo::Test::JSONRPC to "Test::Shodo::JSONRPC"
+    - fixed required modules
+    - update POD
+
+0.07 2013-11-29T15:48:57Z
+
+    - add '?' to uri if it has query, thanks to hisaichi5518
+
+0.06 2013-11-09T16:25:50Z
+
+    - highlight JSON texts
+
+0.05 2013-11-05T09:18:14Z
+
+    - fixed utf8 bug
+
+0.04 2013-11-05T05:05:22Z
+
+    - no throw on validation error
+
+0.03 2013-11-04T07:30:48Z
+
+    - add required module
+
+0.02 2013-11-04T07:19:56Z
+
+    - update documents
+    - add test module "Shodo::Test::JSONRPC"
+
+0.01 2013-11-02T07:26:03Z
+
+    - original version

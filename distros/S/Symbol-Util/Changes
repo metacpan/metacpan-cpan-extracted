@@ -1,0 +1,57 @@
+------------------------------------------------------------------------
+0.0203 | Piotr Roszatycki <dexter@cpan.org> | 2012-03-14
+
+Fixes:
+
+* Compiles cleanly with Perl 5.14: defined(%hash) and defined(@array) are
+  deprecated.  Fixes: RT#75763.
+* Mixor changes in POD.
+
+------------------------------------------------------------------------
+0.0202 | Piotr Roszatycki <dexter@cpan.org> | 2009-11-29
+
+Fixes:
+
+* Compiles with Perl 5.6
+
+------------------------------------------------------------------------
+0.0201 | Piotr Roszatycki <dexter@cpan.org> | 2009-11-29
+
+Fixes:
+
+* Function "export_package" could fail if $1 variable was unempty.
+
+------------------------------------------------------------------------
+0.02 | Piotr Roszatycki <dexter@cpan.org> | 2009-11-27
+
+New:
+
+* New function "delete_sub" deletes the specified subroutine name from class
+  API.
+
+* New function "list_glob_slots" returns list of defined slots.
+
+* New function "export_glob" exports glob to targeted package.
+
+* New function "export_package" exports symbols like Exporter do.
+
+* New function "unexport_package" cleans previously exported symbols.
+
+* Function "fetch_glob" approves slot name as second argument.
+
+* Exported functions can be deleted with "no Scalar::Util".
+
+Changes:
+
+* Function "delete_glob" deletes SCALAR slot if it exists and contains
+  undef value.
+
+* Exporter is not used anymore.  Own "export_package" function is used
+  instead.
+
+------------------------------------------------------------------------
+0.01 | Piotr Roszatycki <dexter@cpan.org> | 2009-02-02
+
+* Initial release.
+
+------------------------------------------------------------------------

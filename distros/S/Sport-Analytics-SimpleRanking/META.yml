@@ -1,0 +1,25 @@
+---
+abstract: "This module provides a method that calculate Doug Drinen's simple ranking system. "
+author:
+  - 'David Myers <dwm042@email.com>'
+build_requires:
+  Carp: 0
+  ExtUtils::MakeMaker: 6.42
+  List::Util: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.92'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Sport-Analytics-SimpleRanking
+no_index:
+  directory:
+    - inc
+    - t
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.21

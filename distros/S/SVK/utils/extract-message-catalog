@@ -1,0 +1,54 @@
+#!/usr/bin/perl -w
+
+use strict;
+use FindBin;
+use File::Find;
+use Text::Wrap;
+use Pod::Simple::Text;
+
+chdir "$FindBin::Bin/..";
+
+my (@files, @pms, @pods);
+find(sub { push @files, $File::Find::name if -f }, 'lib', 'bin'); 
+find(sub { push @pms, $File::Find::name if -f }, 'lib/SVK/Command');
+push @pms, 'lib/SVK/Resolve.pm', glob('lib/SVK/Help/*.pod');
+
+my %strings;
+foreach my $pm (@pms) {
+    my $buf = '';
+    my $parser = Pod::Simple::Text->new;
+    $parser->output_string(\$buf);
+    $parser->parse_file($pm);
+    my $cur = '';
+    foreach my $line (split(/\n\n+/, $buf)) {
+	last if $line =~ /^AUTHORS/m;
+	if ($line =~ /SVK::Command::(\w+ - .+)/) {
+	    $strings{"\l$1"}++;
+	}
+	elsif ($line =~ /^([A-Z_]+)/) {
+	    $strings{$1}++;
+	}
+	elsif (my @lines = $line =~ /^ {4}\s+(.+)\s*$/mg) {
+	    foreach my $chunk (@lines) { 
+		$chunk =~ s/ +: /: /;
+		$strings{$chunk}++;
+	    }
+	}
+        else {
+            $strings{$line}++;
+        }
+    }
+    next unless %strings;
+}
+
+if (%strings) {
+    open my $fh, ">", "lib/SVK/Command.pod" or die $!;
+    print $fh "{{$_}}\n" for sort keys %strings;
+    close $fh;
+    push @pods, "lib/SVK/Command.pod";
+}
+
+unlink("lib/SVK/I18N/i_default.po");
+system("xgettext.pl", "-u", "-o", "lib/SVK/I18N/i_default.po", @files, @pods);
+system($^X, "-pi", "-es/charset=CHARSET/charset=UTF-8/", "lib/SVK/I18N/i_default.po");
+unlink $_ for @pods;

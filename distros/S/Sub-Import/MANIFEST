@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Sub/Import.pm
+t/00-compile.t
+t/000-report-versions-tiny.t
+t/import-ex.t
+t/import-se.t
+t/lib/Ex.pm
+t/lib/SE.pm
+xt/release/changes_has_content.t
+xt/release/pod-syntax.t

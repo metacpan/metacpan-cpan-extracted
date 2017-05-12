@@ -1,0 +1,215 @@
+=head1 NAME
+
+sparkline.cgi - CGI script for generating SVG-based sparklines
+
+=head1 VERSION
+
+This document describes sparkline.cgi version 0.34
+
+=head1 SYNOPSIS
+
+    http://example.com/cgi-bin/sparkline.cgi?type=Line&values=1,2,3,4,3,2
+
+=head1 DESCRIPTION
+
+Since SVG sparklines are useful for display on the web, this CGI script supports
+creating sparklines on the fly. The CGI returns an SVG file representing the
+sparkline based on the supplied parameters.
+
+=head1 REFERENCING THE SPARKLINE
+
+In theory, you would be able to reference the sparkline call in an HTML C<img>
+tag to display it. Unfortunately, browser support for SVG in the C<img> tag is
+currently inconsistent. You can work around this by using the C<object> tag. For
+example, to render a Line sparkline in an HTML page, you might use the following:
+
+    <object type="image/svg+xml" height="12"
+        data="http://anomaly.org/cgi-bin/sparkline.cgi?type=Line&sized=0&color=blue&values=10,12,9,11,14,17,20,15,13,8,5,9,13&mark=3:green&mark=high:%23f66&mark=last:%23000&thick=2&padx=4">
+    </object>
+
+=head1 QUERY PARAMETERS
+
+=over 4
+
+=item type
+
+The value of this parameter specifies the type of sparkline. It must be one of
+C<Area>, C<Bar>, C<Line>, C<RangeArea>, C<RangeBar>, or C<Whisker>.
+
+=item allns
+
+A value of 1 provides all of the xmlns attributes on the root svg element, the
+default is to only supply the default SVG namespace.
+
+=item sized
+
+A value of 1 adds the I<height> and I<width> attributes on the root svg element. This is
+currently the default behavior. A value of 0 removes thos attributes.
+
+=item bgcolor={color}
+
+Specify a background color for the sparkline. By default, the sparkline will
+have a transparent background.
+
+=item padx={length}
+
+Provide {length} pixels of padding on the left and right of the sparkline.
+
+=item pady={length}
+
+Provide {length} pixels of padding on the top and bottom of the sparkline.
+
+=item height={length}
+
+Specify the height of the sparkline. The default height is 10 pixels.
+
+=item width={length}
+
+Specify the width of the sparkling in pixels. The default width depends on the
+sparkline type and the number of data values.
+
+=item values={comma separated list of values}
+
+Specify the parameters to display on the sparkline. These values can take one
+of three forms.
+
+=over 4
+
+=item All but RangeArea and RangeBar
+
+Almost all sparkline types support the default data format which is a series
+of numbers separated by commas. The C<Whisker> type has limits on the values
+allowed. Other than that, all specified types work the same way.
+
+  values=1,2,3,4,5,6,7,8,9
+
+=item Whisker
+
+The C<Whisker> sparkline type supports another format which is more condensed.
+This is a series of '+', '-', and '0' characters that represent the high, low,
+and neutral ticks on the Whisker graph.
+
+   values=+--+-0+---+++
+
+=item RangeArea and RangeBar
+
+These two sparkline types require a pair of data values for each point on the
+sparkline. To accomplish this, we comma-separated list of pairs of values. Each
+pair consists of two values separated by a colon, with the smaller value first.
+
+   values=1:1,2:4,3:9,4:16,5:25
+
+=back
+
+=item mark={mark}
+
+This parameter can be supplied multiple times to define multiple marks. Each mark
+has an index value and a color separated by a colon (or equals). The index value
+can be either a numeric index or one of the named indexes described in
+L<SVG::Sparkline::Manual> under I<mark>.
+
+=item color={color}
+
+Specify the color of the data line.
+
+=item xscale={length}
+
+Specify the distance between individual data points in the absence of a
+a I<width>. If neither I<width> or I<xscale> are supplied, the default
+is 2.
+
+=item thick={length}
+
+Thickness of the line for those sparklines that have lines. For a Bar or
+RangeBar sparkline, this specifies the thickness of the bar.
+
+=item gap={length}
+
+Gap between the bars of the Bar sparkline or the whiskers of the
+Whisker sparkline.
+
+=back
+
+=head1 ON COLORS
+
+When specifying colors for any part of a sparkline, you can use any of the color
+formats allowed by the SVG recommendation. However, the hexadecimal form poses a
+problem when used with a CGI script. The C<#> preceding the hexadecimal string
+must be URL-encoded as C<%23>, otherwise it truncates the URL.
+
+With that caveat, the all color forms listed in
+L<SVG::Sparkline::Cookbook/"How do I specify a color for the data, background, or marks?">
+are supported.
+
+=head1 DIAGNOSTICS
+
+The error messages that this script can generate are documented in the
+various C<SVG::Sparkline> modules. Each is returned with a status code
+of 400. The error message is returned as HTML content.
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+Although it should be obvious, it is important that the modules that this
+script depends on are available to the webserver and user the CGI will be
+run as. Otherwise, the program will not execute.
+
+=head1 HOSTED ENVIRONMENT
+
+If you need to run the script in a hosted environment, you may not be able to
+install the dependencies normally. The recommended approach is the use the
+L<local::lib> module to configure a local Perl directory for modules the host
+admin won't or can't install.
+
+Follow the directions in the L<local::Lib> module. Then install L<SVG> and
+L<SVG::Sparkline> to the local perl directories. Then add the following lines
+to your copy of C<sparkline.cgi> before the other libraries.
+
+   use lib '/home/example/perl5/lib/perl5';
+   use local::lib;
+
+Obviously, you will need to replace I</home/example/perl5> with the path created
+by the L<local::lib> bootstrap process.
+
+=head1 DEPENDENCIES
+
+L<CGI>, L<SVG::Sparkline>, L<SVG>, and the various submodules associated
+with L<SVG::Sparkline>.
+
+=head1 BUGS AND LIMITATIONS
+
+No bugs have been reported.
+
+=head1 AUTHOR
+
+G. Wade Johnson  C<< gwadej@cpan.org >>
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2015, G. Wade Johnson C<< gwadej@cpan.org >>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl 5.8.0. See L<perlartistic>.
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.
+

@@ -1,0 +1,36 @@
+NAME
+    Sledge::Plugin::DebugScreen - show the debug screen if crashed
+
+SYNOPSIS
+        package Your::Pages;
+        use Sledge::Plugin::DebugScreen;
+        sub debug_level {
+            return $ENV{'DEBUG_MODE'} ? 1 : 0;
+        }
+
+DESCRIPTION
+    This plugin shows the debug screen if crashed, like Catalyst. The debug
+    screen is only showing debug mode.
+
+    Screen image:
+    <http://image.blog.livedoor.jp/nipotan/imgs/a/2/a2b67309.jpg>
+
+AUTHOR
+        MATSUNO Tokuhiro <tokuhirom@gmail.com>
+        Koichi Taniguchi <taniguchi@livedoor.jp>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+THANKS TO
+    Jiro Nishiguchi.
+
+TODO
+    more tests.
+
+DEPENDENCIES
+    Template, Bundle::Sledge, Devel::StackTrace
+
+SEE ALSO
+    Catalyst::Plugin::StackTrace
+

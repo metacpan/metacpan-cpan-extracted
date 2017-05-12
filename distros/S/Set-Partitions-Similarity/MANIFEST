@@ -1,0 +1,12 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/Set/Partitions/Similarity.pm
+t/001_test.t
+scripts/examples_Set_Partitions_Measures.pl
+scripts/compareParititions.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

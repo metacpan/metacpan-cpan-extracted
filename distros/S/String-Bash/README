@@ -1,0 +1,221 @@
+NAME
+    String::Bash - Parameter expansion in strings
+
+VERSION
+    version 1.110960
+
+SYNOPSIS
+        use String::Bash qw( bash );
+
+        # pass hashref
+        print bash "Hello %{name:-Guest}!", { name => 'Alex' };
+
+        # or key/value pairs
+        print bash "Hello %{name:-Guest}!", name => 'Alex';
+
+        # or object which can('name');
+        my $user = My::Users->new( name => 'Alex' );
+        print bash "Hello %{name:-Guest}!", $user;
+
+        # or use lexical vars
+        my $name = 'Alex';
+        print bash "Hello %{name:-Guest}!";
+
+    all will print
+
+        Hello Alex
+
+    or if *name* is undefined or empty
+
+        Hello Guest
+
+DESCRIPTION
+    String::Bash is based on shell parameter expansion from Bash
+    <http://www.gnu.org/software/bash/>, thus it allows to provide default
+    values, substrings and in-place substitutions, changing case of
+    characters and nesting.
+
+    The String::Bash provides "bash" exported with Sub::Exporter.
+
+REPLACEMENT VALUES
+    Replacements can be provided in four different ways:
+
+  Hash reference
+        my $hashref = { param1 => 'value1', ... };
+        print bash $format, $hashref;
+
+  Key/value pairs
+        print bash $format, param1 => 'value1', ...;
+
+  Object
+        print bash $format, $object;
+
+    Please note that $object needs to implement *read/write* accessors (if
+    "%{param:=word}" is used, otherwise *read-only* are sufficient) for all
+    parameters used in $format.
+
+  Lexical variables
+        my $param1 = ...;
+        our $param2 = ...;
+        print bash $format;
+
+    Lexical ("my") and package ("our") scalar variables visible at the scope
+    of "bash" caller are available as replacement.
+
+FORMAT SYNTAX
+    Please assume that following variables are visible in below examples:
+
+        my $param = 'hello';
+        my $not_set;
+        my $param2 = 'WELCOME';
+
+  %{param}
+        print bash "%{param}"; # hello
+
+    Value of $param is substituted.
+
+  %{param:-word}
+        print bash "%{param:-word}";    # hello
+        print bash "%{not_set:-word}";  # word
+
+    If $param is unset or null, the expansion of *word* is substituted.
+    Otherwise, the value of $param is substituted.
+
+    The *word* can be another parameter so nesting is possible:
+
+        print bash "%{not_set:-%{param2}}"; # WELCOME
+
+  %{param:=word}
+        print bash "%{not_set:=word}"; # word
+
+    If $param is unset or null, the expansion of *word* is assigned to
+    $param. The value of $param is then substituted.
+
+    Notes on replacement syntax:
+
+    *   If "Object" is passed as replacement than assignment will execute
+        following code:
+
+            $obj->$param( 'word' );
+
+    *   If "Key/value pairs" are passed as replacement then the assignment
+        will be applied to occurrences of *param* after the assignment has
+        been done, and will be disregarded after parsing is done.
+
+    *   If "Lexical variables" are used, then their value will be set to
+        *word*.
+
+  %{param:+word}
+        print bash "%{param:+word}";   # word
+        print bash "%{not_set:+word}"; #
+
+    If $param is null or unset, nothing is substituted, otherwise the
+    expansion of *word* is substituted.
+
+  %{param:offset}
+  %{param:offset:length}
+        print bash "%{param:2}";     # llo
+        print bash "%{param:2:2}";   # ll
+
+    Expands to up to *length* characters of $param starting at the character
+    specified by *offset*. If *length* is omitted, expands to the substring
+    of $param starting at the character specified by *offset*.
+
+  %{#param}
+        print bash "%{#param}";   # 5
+
+    The length in characters of the value of $param is substituted.
+
+  %{param#word}
+  %{param##word}
+        print bash "%{param#he*l}";   # lo
+        print bash "%{param##he*l}";  # o
+
+    The *word* is expanded to produce a pattern (see "Pattern expansion").
+    If the pattern matches the beginning of the value of $param, then the
+    result of the expansion is the expanded value of $param with the
+    shortest matching pattern (the *'#'* case) or the longest matching
+    pattern (the *'##'* case) deleted.
+
+  %{param%word}
+  %{param%%word}
+        print bash "%{param%l*o}";   # hel
+        print bash "%{param%%l*o}";  # he
+
+    The *word* is expanded to produce a pattern (see "Pattern expansion").
+    If the *pattern* matches a trailing portion of the value of $param, then
+    the result of the expansion is the value of $param with the shortest
+    matching pattern (the *'%'* case) or the longest matching pattern (the
+    *'%%'* case) deleted.
+
+  %{param/pattern/string}
+        print bash "%{param/l/t}";   # hetlo
+        print bash "%{param//l/t}";  # hetto
+        print bash "%{param/#h/t}";  # tello
+        print bash "%{param/%o/t}";  # hellt
+
+    The *pattern* is expanded to produce a pattern (see "Pattern
+    expansion"). The longest match of *pattern* against $param value is
+    replaced with *string*. If *pattern* begins with *'/'*, all matches of
+    *pattern* are replaced with *string*. Normally only the first match is
+    replaced. If *pattern* begins with *'#'*, it must match at the beginning
+    of the value of $param. If *pattern* begins with *'%'*, it must match at
+    the end of the $param. If *string* is null, matches of *pattern* are
+    deleted and the */* following *pattern* may be omitted.
+
+  %{param^pattern}
+  %{param^^pattern}
+  %{param,pattern}
+  %{param,,pattern}
+        print bash "%{param^}";     # Hello
+        print bash "%{param^^}";    # HELLO
+        print bash "%{param2,}";    # wELCOME
+        print bash "%{param2,,}";   # welcome
+
+        print bash "%{param^[hl]}";     # Hello
+        print bash "%{param^^[hl]}";    # HeLLo
+        print bash "%{param2,[WE]}";    # wELCOME
+        print bash "%{param2,,[WE]}";   # weLCOMe
+
+    This expansion modifies the case of alphabetic characters in $param. The
+    *pattern* is expanded to produce a pattern (see "Pattern expansion").
+    The *'^'* operator converts lowercase letters matching pattern to
+    uppercase; the *','* operator converts matching uppercase letters to
+    lowercase. The *'^^'* and *',,'* expansions convert each matched
+    character in $param; the *'^'* and *','* expansions match and convert
+    only the first character in the value of $param. If *pattern* is
+    omitted, it is treated like a *'?'*, which matches every character.
+
+NOTES
+  Pattern expansion
+    Pattern expansion is performed using following rules (based on filename
+    expansion):
+
+        # Character       # Replacement (perl syntax)
+        *                 .*
+        ?                 .
+        [a-z]             [a-z]
+
+    Please do not use perl regular expression syntax in pattern
+    substitutions, or you may get unexpected results.
+
+COMPATIBILITY WITH BASH
+    String::Bash provides only syntax described above and some of Bash
+    features (like expansions of arrays) are not available - but please let
+    me know if you need them.
+
+SEE ALSO
+    *   Shell Parameter Expansion in Bash
+        <http://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-E
+        xpansion.html#Shell-Parameter-Expansion>
+
+AUTHOR
+    Alex J. G. Burzyński <ajgb@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Alex J. G. Burzyński
+    <ajgb@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,20 @@
+#! /usr/bin/perl -w
+
+use Shell::POSIX::Select qw($Prompt $Heading);
+
+$Heading="\n\nQuantity Menu:";
+$Prompt="Choose Quantity:";
+OUTER:
+select my $quantity (1..4) {
+#	warn "inside Outer loop\n";
+
+	$Heading="\nSize Menu:";
+	$Prompt='Choose Size:';
+	select my $size ( qw (L XL) ) {
+#		warn "inside Inner loop\n";
+		print "You chose $quantity units of size $size\n";
+		last OUTER;
+	}
+#	warn "outside Inner loop\n";
+}
+#warn "outside all loops\n";

@@ -1,0 +1,9 @@
+Revision history for Perl extension SMS::Send::TW::chtsns.
+
+0.01  Tue Jan  5 12:02:12 2010
+	- original version; created by h2xs 1.23 with options
+		-XA -n SMS::Send::TW::chtsns
+
+0.02  Tue Jan  5 12:30:00 2010		
+	- Fix UCS-2 to UTF-8 converting problem.
+

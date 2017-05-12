@@ -1,0 +1,13 @@
+blib
+Makefile
+pm_to_blib
+*.o
+*.c
+*.bs
+*.output
+lib*.def
+scgrammer.h
+scgrammer.c
+sclex*.c
+test_dir
+*.old

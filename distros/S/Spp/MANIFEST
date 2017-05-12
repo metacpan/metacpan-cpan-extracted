@@ -1,0 +1,26 @@
+Build.PL
+Changes
+lib/Spp.pm
+lib/Spp/AtomToValue.pm
+lib/Spp/AtomToStr.pm
+lib/Spp/Optimizer.pm
+lib/Spp/Tools.pm
+lib/Spp/ValueToAtom.pm
+lib/rule/Spp.spp
+lib/rule/Spp.json
+lib/Spp/test.spp
+lib/Spp/spp-spp.spp
+lib/Spp/Optimizer.spp
+lib/Spp/AtomToStr.spp
+lib/Spp/Tools.spp
+lib/Spp/AtomToStr.spp
+lib/Spp/to-ruby.spp
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+Makefile.PL
+META.yml
+META.json

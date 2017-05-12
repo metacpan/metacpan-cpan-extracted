@@ -1,0 +1,11 @@
+blib
+.gz
+^Makefile$
+^Makefile.old$
+CVS
+.cvsignore
+docs
+MANIFEST.bak
+Makefile.bak
+adm/release
+.git

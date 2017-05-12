@@ -1,0 +1,127 @@
+package Sisimai::Test::Modules;
+sub list {
+    my $v = [];
+    my $f = [ qw|
+        Address.pm
+        ARF.pm
+        CED.pm
+            CED/US/AmazonSES.pm
+            CED/US/SendGrid.pm
+        Data.pm
+            Data/JSON.pm
+            Data/YAML.pm
+        DateTime.pm
+        MIME.pm
+        Mail.pm
+            Mail/Mbox.pm
+            Mail/Maildir.pm
+            Mail/STDIN.pm
+        Message.pm
+            Message/Email.pm
+            Message/JSON.pm
+        MDA.pm
+        MSP.pm
+            MSP/DE/EinsUndEins.pm
+            MSP/DE/GMX.pm
+            MSP/JP/Biglobe.pm
+            MSP/JP/EZweb.pm
+            MSP/JP/KDDI.pm
+            MSP/RU/MailRu.pm
+            MSP/RU/Yandex.pm
+            MSP/UK/MessageLabs.pm
+            MSP/US/AmazonSES.pm
+            MSP/US/AmazonWorkMail.pm
+            MSP/US/Aol.pm
+            MSP/US/Bigfoot.pm
+            MSP/US/Facebook.pm
+            MSP/US/Google.pm
+            MSP/US/GSuite.pm
+            MSP/US/Office365.pm
+            MSP/US/Outlook.pm
+            MSP/US/ReceivingSES.pm
+            MSP/US/SendGrid.pm
+            MSP/US/Verizon.pm
+            MSP/US/Yahoo.pm
+            MSP/US/Zoho.pm
+        MTA.pm
+            MTA/Activehunter.pm
+            MTA/ApacheJames.pm
+            MTA/Courier.pm
+            MTA/Domino.pm
+            MTA/Exim.pm
+            MTA/Exchange2003.pm
+            MTA/Exchange2007.pm
+            MTA/IMailServer.pm
+            MTA/InterScanMSS.pm
+            MTA/MailFoundry.pm
+            MTA/MailMarshalSMTP.pm
+            MTA/McAfee.pm
+            MTA/MessagingServer.pm
+            MTA/mFILTER.pm
+            MTA/MXLogic.pm
+            MTA/Notes.pm
+            MTA/OpenSMTPD.pm
+            MTA/Postfix.pm
+            MTA/qmail.pm
+            MTA/Sendmail.pm
+            MTA/SurfControl.pm
+            MTA/UserDefined.pm
+            MTA/V5sendmail.pm
+            MTA/X1.pm
+            MTA/X2.pm
+            MTA/X3.pm
+            MTA/X4.pm
+            MTA/X5.pm
+        Order.pm
+            Order/Email.pm
+            Order/JSON.pm
+        Reason.pm
+            Reason/Blocked.pm
+            Reason/ContentError.pm
+            Reason/Delivered.pm
+            Reason/ExceedLimit.pm
+            Reason/Expired.pm
+            Reason/Feedback.pm
+            Reason/Filtered.pm
+            Reason/HasMoved.pm
+            Reason/HostUnknown.pm
+            Reason/MailboxFull.pm
+            Reason/MailerError.pm
+            Reason/MesgTooBig.pm
+            Reason/NoRelaying.pm
+            Reason/NotAccept.pm
+            Reason/NetworkError.pm
+            Reason/OnHold.pm
+            Reason/Rejected.pm
+            Reason/SecurityError.pm
+            Reason/SpamDetected.pm
+            Reason/Suspend.pm
+            Reason/SyntaxError.pm
+            Reason/SystemError.pm
+            Reason/SystemFull.pm
+            Reason/TooManyConn.pm
+            Reason/Undefined.pm
+            Reason/UserUnknown.pm
+            Reason/Vacation.pm
+        RFC2606.pm
+        RFC3464.pm
+        RFC3834.pm
+        RFC5322.pm
+        Rhost.pm
+            Rhost/GoogleApps.pm
+            Rhost/ExchangeOnline.pm
+        SMTP.pm
+            SMTP/Error.pm
+            SMTP/Reply.pm
+            SMTP/Status.pm
+        String.pm
+        Time.pm
+    | ];
+
+    push @$v, 'Sisimai.pm';
+    for my $e ( @$f ) {
+        push @$v, sprintf("Sisimai/%s", $e);
+    }
+    return $v;
+}
+1;

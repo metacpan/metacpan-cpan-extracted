@@ -1,0 +1,9 @@
+%module{SOOT};
+
+class TGraphAsymmErrors {
+  TGraphFloatArray GetEXhigh();
+  TGraphFloatArray GetEXlow();
+  TGraphFloatArray GetEYhigh();
+  TGraphFloatArray GetEYlow();
+};
+

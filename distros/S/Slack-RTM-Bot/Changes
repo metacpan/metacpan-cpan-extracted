@@ -1,0 +1,84 @@
+Revision history for Perl extension Slack-RTM-Bot
+
+1.04 2017-04-08T03:30:26Z
+
+   - Fix dying when response to new channel/group
+
+1.03 2017-04-05T23:11:07Z
+
+   - Fix a bug that zombies spawn when stop_RTM
+   - Fix a problem that main process stop when die in callback process
+
+1.02 2017-03-29T23:12:01Z
+
+   - Add x_static_install flag
+
+1.01 2017-03-25T00:20:55Z
+
+   - Improve that max_message_size can be set to Protocol::WebSocket::Client
+   - Remove reconnect (not working method)
+
+1.00 2017-03-15T17:07:06Z
+
+   - Restore threads to fork (but on MSWin32, using threads)
+   - Fix to wait establish connection on start_RTM
+
+0.14 2017-02-18T16:06:25Z
+
+   - Fix tests without threads
+
+0.13 2017-02-11T04:35:24Z
+
+    - Using thread instead of fork
+    - Fixes say()
+
+0.12 2016-10-08T14:29:19Z
+
+    - Fixes reading/writing to private channels 
+
+0.11 2016-10-05T14:23:02Z
+
+    - Add a error message
+    - Add a How To Contribute section in POD
+
+0.10 2016-09-17T08:15:46Z
+
+    - Fix synopsis
+
+0.09 2016-08-28T06:31:34Z
+
+    - Add options
+
+0.08 2016-08-04T18:04:39Z
+
+    - Fix action matching process
+
+0.07 2016-06-25T00:26:06Z
+
+    - Fix Garbled characters
+    - Improve execution timing of "say" method
+
+0.06 2016-06-24T00:55:32Z
+
+    - Fix a bug that isn't working without using "say" 
+
+0.05 2016-06-23T16:13:50Z
+
+    - Fix a bug that isn't working on Linux
+
+0.04 2016-06-23T12:09:44Z
+
+    - Fix cpanfile
+
+0.03 2016-06-22T23:04:39Z
+
+    - Turned off verifying the hostname.
+
+0.02 2016-06-22T15:55:41Z
+
+    - Fix a bug that child process will be zombie without stop_RTM.
+
+0.01 2016-06-21T22:20:24Z
+
+    - original version
+

@@ -1,0 +1,133 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><!-- #BeginTemplate "/Templates/circa.dwt" -->
+<head>
+<!-- #BeginEditable "doctitle" --> 
+<title>Simple interface d'administration de Circa</title>
+<!-- #EndEditable --> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<style type="text/css">
+<!--
+body {
+  font-family: sans-serif;
+  color: black;
+  background: white;
+  margin-left : 0;
+  margin-top : 0;
+}
+th, td { /* ns 4 */
+  font-family: sans-serif;
+}
+a {font: bold; color:Navy;} 
+h1 { text-align: center }
+h2, h3, h4, h5, h6 { text-align: left }
+h1, h2, h3 { color: #005A9C; }
+h1 { font: bold 100% }
+h2 { margin:1em; font: bold 95% }
+h3 { font: 90%  }
+h4 { font: bold 85% }
+h5 { font: italic 85%  }
+h6 { text-align: right }
+ul,p { font: 80%;}
+p { text-align:justify; margin:1em;}
+.p-liens {text-align:right;}
+TH {background :  #008080; color :  White;}
+TD {}
+.td-bord {background :  Navy; color :  White;}
+.small {font:70%; }
+.h2-sans-marge {margin:0; text-align:center;}
+.without-margin {margin:0,0,0,0;}
+-->
+</style>
+</head>
+
+<body bgcolor="#FFFFFF">
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr> 
+    <td width="8%" class="td-bord" align="left">&nbsp;</td>
+    <td width="22%"><img src="/circa/images/circa_logo1.gif" width="70" height="70"><img src="/circa/images/circa_logo2.gif" width="110" height="50">
+    </td>
+    <td width="62%"><!-- #BeginEditable "titre" --> 
+      <h1>Administration de votre compte</h1>
+      <h2 class="h2-sans-marge">Informations g&eacute;n&eacute;rales</h2>
+      <!-- #EndEditable --></td>
+    <td width="8%" class="td-bord">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td width="8%" class="td-bord">&nbsp;</td>
+    <td colspan="2">&nbsp;</td>
+    <td width="8%" class="td-bord">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td width="8%" class="td-bord">&nbsp;</td>
+    <td colspan="2"><!-- #BeginEditable "corps" --> 
+      <? $sommaire ?>
+<table border="2" cellspacing="2" cellpadding="2">
+        <tr> 
+          <td> 
+            <p class="h2-sans-marge">Responsable</p>
+          </td>
+          <td> 
+            <p class="h2-sans-marge"><b><? $responsable ?></b></p>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <p class="h2-sans-marge">Titre du site</p>
+          </td>
+          <td> 
+            <p class="h2-sans-marge"><b><? $titre ?></b></p>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <p class="h2-sans-marge">Racine du site index&eacute;</p>
+          </td>
+          <td><b> 
+            <p class="h2-sans-marge"><a href="<? $racine ?>"><? $racine ?></a></p>
+            </b></td>
+        </tr>
+        <tr> 
+          <td> 
+            <p class="h2-sans-marge">Nombre de pages inscrites</p>
+          </td>
+          <td> 
+            <p class="h2-sans-marge"><b><? $nbpages ?></b></p>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <p class="h2-sans-marge">Nombre de mots index&eacute;s</p>
+          </td>
+          <td> 
+            <p class="h2-sans-marge"><b><? $nbmots ?></b></p>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <p class="h2-sans-marge">Derni&egrave;re indexation</p>
+          </td>
+          <td> 
+            <p class="h2-sans-marge"><b><? $last_indexed ?></b></p>
+          </td>
+        </tr>
+      </table>
+      <!-- #EndEditable --></td>
+    <td width="8%" class="td-bord">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td width="8%" class="td-bord">&nbsp;</td>
+    <td colspan="2"><!-- #BeginEditable "bas_page" --><!-- #EndEditable --></td>
+    <td width="8%" class="td-bord">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td width="8%" class="td-bord">&nbsp;</td>
+    <td colspan="2"> 
+      <h6>&nbsp;</h6>
+      <h6> Powered by <a href="http://www.alianwebserver.com/circa" target="_blank">AlianWebServer</a> 
+      </h6>
+    </td>
+    <td width="8%" class="td-bord">&nbsp;</td>
+  </tr>
+</table>
+</body>
+<!-- #EndTemplate --></html>

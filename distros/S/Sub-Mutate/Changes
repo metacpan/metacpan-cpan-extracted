@@ -1,0 +1,85 @@
+version 0.007; 2015-03-26
+
+  * in t/is_constant.t, account for Perl 5.20.0 having reintroduced the
+    dodgy constant-sub fudge
+
+  * tweak t/when_bodied.t to avoid involvement of metadata functions
+
+version 0.006; 2015-03-24
+
+  * rewrite as wrapper for Sub::Metadata and Sub::WhenBodied
+
+version 0.005; 2013-08-25
+
+  * bugfix: avoid memory corruption that could occur in an edge case
+    for when_sub_bodied()
+
+  * update for Perl 5.15.3, where padlists are now AvREAL
+
+  * update for Perl 5.17.4's new pad API
+
+  * update for Perl 5.19.3's tracking of the last named item in a pad
+
+  * in t/is_constant.t, account for Perl 5.19.3 having removed the dodgy
+    constant-sub fudge
+
+version 0.004; 2011-10-27
+
+  * update documentation and tests for Perl 5.15.4's change in when
+    attribute handlers are executed
+
+  * add B::CallChecker to "see also" list
+
+  * in XS, declare "PROTOTYPES: DISABLE" to prevent automatic generation
+    of unintended prototypes
+
+  * include META.json in distribution
+
+  * convert .cvsignore to .gitignore
+
+  * add MYMETA.json to .gitignore
+
+version 0.003; 2010-10-22
+
+  * bugfix: correctly maintain PL_sv_objcount in when_sub_bodied()
+
+  * in XS, use gv_stashpvs() wherever appropriate
+
+  * use full stricture in test suite
+
+  * in test suite, make all numeric comparisons against $] stringify it
+    first, to avoid architecture-dependent problems with floating point
+    rounding giving it an unexpected numeric value
+
+  * in Build.PL, complete declaration of configure-time requirements
+
+version 0.002; 2010-07-20
+
+  * port to Perl 5.11, supporting new first-class regexp objects in
+    type checking
+
+  * in XS, use PERL_NO_GET_CONTEXT for efficiency
+
+  * include Exporter in dependency list
+
+  * check for required Perl version at runtime
+
+  * in prototype.t, adjust test prototypes to avoid warnings on Perl
+    5.11 and above
+
+  * in Build.PL, explicitly declare configure-time requirements
+
+  * add MYMETA.yml to .cvsignore
+
+version 0.001; 2009-09-26
+
+  * bugfix: in XS, check SvOBJECT before looking at SvSTASH, because
+    the latter isn't guaranteed to be meaningful otherwise
+
+  * in the documentation, fix a badly-worded sentence
+
+  * remove bogus "exit 0" from Build.PL
+
+version 0.000; 2009-08-27
+
+  * initial released version

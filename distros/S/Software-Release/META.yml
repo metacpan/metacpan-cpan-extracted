@@ -1,0 +1,23 @@
+---
+abstract: 'Object representing a release of software.'
+author:
+  - 'Cory G Watson <gphat@cpan.org>'
+build_requires:
+  DateTime: 0
+  Test::More: 0
+  strict: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300002, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Software-Release
+requires:
+  Moose: 0
+resources:
+  homepage: https://github.com/gphat/software-release
+  repository: https://github.com/gphat/software-release.git
+version: 0.03

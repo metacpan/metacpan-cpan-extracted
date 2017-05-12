@@ -1,0 +1,45 @@
+SystemTray-Applet
+
+SystemTray::Applet allows you to create simple system tray applets without
+caring about the exact windowing interface the user users. Currently
+only Gnome is supported but Windows is on the way.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc SystemTray::Applet
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=SystemTray-Applet
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/SystemTray-Applet
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/SystemTray-Applet
+
+    Search CPAN
+        http://search.cpan.org/dist/SystemTray-Applet
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Peter Sinnott
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

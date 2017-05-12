@@ -1,0 +1,9 @@
+SVN::Push changelog:
+--------------------
+
+- 0.02
+
+  * fixed problem with startrev argument. Now HEAD means the
+    HEAD of the given directory, not of the repository at all.
+
+- 0.01 Initial release

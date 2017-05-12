@@ -1,0 +1,26 @@
+# Test how we behave if we get a lock error
+template: create-contact.tt
+
+# TODO: this shouldn't actually be all that difficult to trigger...
+integration_skip: 1
+
+vars:
+  name: Lionel Cosgrove
+  street: 15 Waharoa St
+  street2: Hataitai
+  city: Wellington
+  ccode: NZ
+  phone: +64.99999999
+  email: a@braindead.co.te
+  contact_id: 30c
+  transaction_id: brause
+
+output_assertions:
+  count:
+  match:
+    - [ '//epp:extValue/epp:value', 'brause', 'EPP: returned bad action ID' ]
+    - [ '//epp:msg', 'Action id already used', 'EPP: informative error message' ]
+  match_all:
+  attr_is:
+    - [ '//epp:result', 'code', '2306', 'EPP: correct result code' ]
+

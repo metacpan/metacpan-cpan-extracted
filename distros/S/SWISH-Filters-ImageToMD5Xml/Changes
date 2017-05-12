@@ -1,0 +1,15 @@
+Revision history for SWISH-Filters-ImageToMD5Xml
+
+0.04 12/04/2015
+ - do not attempt to filter XML that does not contain the b64_data tag
+
+0.03 06/14/2015
+ - [Contributor: Chorny] makefile fixes
+
+0.02 12/27/2011
+ - Updated Makefile.PL to have the appropriate dependencies to fix test
+ - builds.
+
+0.01 12/27/2011
+ - Initial Release
+

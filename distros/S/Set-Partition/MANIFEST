@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+META.yml                                 Module meta-data (added by MakeMaker)
+Makefile.PL
+README
+Partition.pm
+TODO
+eg/setpart
+t/00-basic.t
+t/01-method.t

@@ -1,0 +1,7 @@
+$Id: Changes,v 1.1.1.1 2003/04/03 19:10:10 matthias Exp $
+
+Revision history for Perl extension String::ExpandEscapes.
+
+0.01  Thu Apr  3 17:23:36 CEST 2003
+	- initial revision.
+

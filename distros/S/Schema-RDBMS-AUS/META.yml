@@ -1,0 +1,39 @@
+---
+name: Schema-RDBMS-AUS
+version: 0.04
+author:
+  - 'Tyler "Crackerjack" MacDonald <japh@crackerjack.net>'
+abstract: Authentication, Users and Sessions in an SQL schema
+license: perl
+requires:
+  CGI::Session: 4.07
+  CGI::Session::Serialize::yaml: 0
+  DBIx::Migration::Directories: 0.07
+  DBIx::Transaction: 0.005
+  JSON::Syck: 0.07
+build_requires:
+  DBIx::Migration::Directories::Build: 0
+  Module::Build: 0.27_03
+  Test::Exception: 0.20
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+provides:
+  CGI::Session::AUS:
+    file: lib/CGI/Session/AUS.pm
+  CGI::Session::Driver::aus:
+    file: lib/CGI/Session/Driver/aus.pm
+  Schema::RDBMS::AUS:
+    file: lib/Schema/RDBMS/AUS.pm
+    version: 0.04
+  Schema::RDBMS::AUS::Crypt::MD5:
+    file: lib/Schema/RDBMS/AUS/Crypt/MD5.pm
+  Schema::RDBMS::AUS::Crypt::None:
+    file: lib/Schema/RDBMS/AUS/Crypt/None.pm
+  Schema::RDBMS::AUS::Crypt::SHA1:
+    file: lib/Schema/RDBMS/AUS/Crypt/SHA1.pm
+  Schema::RDBMS::AUS::User:
+    file: lib/Schema/RDBMS/AUS/User.pm
+resources:
+  license: http://dev.perl.org/licenses/

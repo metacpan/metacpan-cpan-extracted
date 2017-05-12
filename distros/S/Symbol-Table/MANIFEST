@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+Table.pm
+t/dumpthedumper.t
+t/make_scalar_into_constant.t
+t/modify_a_scalar_value.t
+t/names_of_scalars_in_current_package.t
+t/package_mypackage_contains_packages.t

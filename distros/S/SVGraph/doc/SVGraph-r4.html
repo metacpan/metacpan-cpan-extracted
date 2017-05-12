@@ -1,0 +1,122 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>SVGraph</title><link rel="stylesheet" href="docbook.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.73.2"><meta name="description" content=""></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="article" lang="sk"><div class="titlepage"><div><div><h2 class="title"><a name="id2729156"></a>SVGraph</h2></div><div><div class="authorgroup"><h3 class="corpauthor">WebCom, s.r.o.</h3><div class="author"><h3 class="author"><span class="firstname">Roman</span> <span class="surname">Fordinál</span></h3><code class="email">&lt;<a class="email" href="mailto:fordinal@webcom.sk">fordinal@webcom.sk</a>&gt;</code></div><div class="author"><h3 class="author"><span class="firstname">Matej</span> <span class="surname">Gregor</span></h3><code class="email">&lt;<a class="email" href="mailto:gregor@webcom.sk">gregor@webcom.sk</a>&gt;</code></div><div class="author"><h3 class="author"><span class="firstname">Michal</span> <span class="surname">Ondrovi&#269;</span></h3><code class="email">&lt;<a class="email" href="mailto:ondrovic@webcom.sk">ondrovic@webcom.sk</a>&gt;</code></div></div></div><div><div class="legalnotice"><a name="id2729257"></a><p>This program is free software; you can redistribute it and/or modify it
+        under LGPLv2.
+        </p></div></div><div><p class="pubdate">YYYY-MM-DD</p></div><div><div class="revhistory"><table border="1" width="100%" summary="Revision history"><tr><th align="left" valign="top" colspan="3"><b>Preh&#318;ad revízií</b></th></tr><tr><td align="left">Revízia 1</td><td align="left">2005-01-07</td><td align="left"><span class="firstname">Roman<br></span><span class="surname">Fordinál<br></span></td></tr><tr><td align="left" colspan="3">
+          <p>Creation of this documentation.</p>
+        </td></tr><tr><td align="left">Revízia 2</td><td align="left">2005-07-07</td><td align="left"><span class="firstname">Matej<br></span><span class="surname">Gregor<br></span></td></tr><tr><td align="left" colspan="3">
+          <p>Change of structure of this document, added new
+          information.</p>
+        </td></tr><tr><td align="left">Revízia 3</td><td align="left">2006-11-07</td><td align="left"><span class="firstname">Michal<br></span><span class="surname">Ondrovi&#269;<br></span></td></tr><tr><td align="left" colspan="3">
+          <p>Added new information.</p>
+        </td></tr><tr><td align="left">Revízia 4</td><td align="left">2008-02-20</td><td align="left"><span class="firstname">Roman<br></span><span class="surname">Fordinal<br></span></td></tr><tr><td align="left" colspan="3">
+          <p>Legal notice update.</p>
+        </td></tr></table></div></div><div><div class="abstract"><p class="title"><b>Abstrakt</b></p><p></p></div></div></div><hr></div><div class="toc"><p><b>Obsah</b></p><dl><dt><span class="section"><a href="#id2729271">SVGraph Library</a></span></dt><dd><dl><dt><span class="section"><a href="#id2729283">SVGraph::2D::columns</a></span></dt><dt><span class="section"><a href="#id2730195">SVGraph::2D::lines</a></span></dt><dt><span class="section"><a href="#id2785135">SVGraph::2D::map</a></span></dt></dl></dd></dl></div><div class="section" lang="sk"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="id2729271"></a>SVGraph Library</h2></div></div></div><p>This library is used for generation of graphs in SVG format. With
+    the help of the SVGraph library you should easy and itelligent design your
+    own graph and its range.</p><div class="section" lang="sk"><div class="titlepage"><div><div><h3 class="title"><a name="id2729283"></a>SVGraph::2D::columns</h3></div></div></div><p>Class for column graphs.</p><div class="section" lang="sk"><div class="titlepage"><div><div><h4 class="title"><a name="id2729292"></a>Dictionary</h4></div></div></div><p></p></div><div class="section" lang="sk"><div class="titlepage"><div><div><h4 class="title"><a name="id2729301"></a>New object of a column graph</h4></div></div></div><p>Creation of a new object of a column graph :</p><pre class="synopsis">my $graph=SVGraph::2D::column-&gt;new(%params);</pre><p>%param:</p><div class="itemizedlist"><ul type="disc"><li><p>title</p><p>Title of the graph. It will by displayed in the body of the
+            graph.</p></li><li><p>type</p><p>Type of drawing of the graph:</p><div class="itemizedlist"><ul type="circle"><li><p>normal</p></li><li><p>normal/percentage</p></li><li><p>overlap</p></li></ul></div></li><li><p>x</p><p>Width of the graph.</p></li><li><p>y</p><p>Height of the graph.</p></li><li><p>reload</p><p>Time in seconds for automatical refresh of the graph. It is
+            assured by the javascript function reload().</p></li><li><p>show_legend</p><p>1/0</p><p>Displays the legend on the right site of the graph.</p></li><li><p>show_legend_reverse</p><p>1/0</p><p>Displays the legend in reverse order.</p></li><li><p>show_areas</p><p>1/0</p><p>Displays the areas in graph.</p></li><li><p>show_label_textsize</p><p>Textsize in labels on the x axis.</p></li><li><p>show_areas_opacity</p><p>0.0 -&gt; 1.1</p><p>Shows areas with defined alpha.</p></li><li><p>show_data</p><p>1/0</p><p>Shows the values above each colunm.</p></li><li><p>show_data_background</p><p>1/0</p><p>Shows the values above columns with background.</p></li><li><p>show_grid_x</p><p>1/0</p><p>Shows the grid on x axis and the labels.</p></li><li><p>grid_y_scale_minimum</p><p>Defines the starting value of the graph.</p></li><li><p>grid_y_scale_maximum</p><p>Defines the maximum value displayed on the y axis</p></li><li><p>grid_y_main_spacing</p><p>Defines spacing in the grid on the y axis.</p></li></ul></div></div><div class="section" lang="sk"><div class="titlepage"><div><div><h4 class="title"><a name="id2729621"></a>Adding columns into graph</h4></div></div></div><p>Columns are data accumulators of the same type.</p><p>For adding new columns in the graph is used following
+        method:</p><pre class="synopsis">my $column = $graph-&gt;addColumn(%params);</pre><p>%params :</p><div class="itemizedlist"><ul type="disc"><li><p>title</p><p>Name of the coulmn.</p></li><li><p>show_area</p><p>0/1</p><p>Shows the columns as areas.</p></li><li><p>show_line</p><p>0/1</p><p>Allows to display the column as a line.</p></li><li><p>color</p><p>Color of the column.</p></li></ul></div></div><div class="section" lang="sk"><div class="titlepage"><div><div><h4 class="title"><a name="id2729697"></a>Adding row labels</h4></div></div></div><p>For adding labels to rows is used the following method:</p><pre class="synopsis">$graph-&gt;addRowLabel($label_text);</pre><p>Parameters:</p><div class="itemizedlist"><ul type="disc"><li><p>$label_text</p><p>Text, which identifies the row.</p></li></ul></div></div><div class="section" lang="sk"><div class="titlepage"><div><div><h4 class="title"><a name="id2729732"></a>Adding data to graph</h4></div></div></div><pre class="synopsis">$column-&gt;addData($label_text, value);</pre><p>Parameters:</p><div class="itemizedlist"><ul type="disc"><li><p>$label_text</p><p>Text in row label.</p></li></ul></div></div><div class="section" lang="sk"><div class="titlepage"><div><div><h4 class="title"><a name="id2729762"></a>Adding value marks</h4></div></div></div><pre class="synopsis">$graph-&gt;addValueMark(value,%params);</pre><p>%params:</p><div class="itemizedlist"><ul type="disc"><li><p>front</p><p>1/0</p><p>The markline is in the front of the graph.</p></li><li><p>size</p><p>Size of the line.</p></li><li><p>color</p><p>Color of the line.</p></li><li><p>right</p><p>0/1</p><p>Is the label on the right (1) or left (0) side?</p></li><li><p>show_label</p><p>Shows the label. Default is it the value of the mark.</p></li><li><p>show_label_text</p><p>Shows a text as the label.</p></li></ul></div></div><div class="section" lang="sk"><div class="titlepage"><div><div><h4 class="title"><a name="id2730153"></a>Example</h4></div></div></div><p>Code:</p><pre class="programlisting">#!/bin/perl
+use SVGraph::2D::columns;
+use strict;
+
+my $graph=SVGraph::2D::columns-&gt;new(
+  title =&gt; "My graph",
+  type =&gt; "normal",
+  x =&gt; 500,
+  y =&gt; 300,
+  show_legend =&gt; 1,
+  show_data =&gt; 1,
+  show_data_background =&gt;1,
+  grid_y_scale_maximum =&gt; 70.00,
+  show_grid_x =&gt; 1
+  );
+
+# adding two columns
+my %columns;
+$columns{first}=$graph-&gt;addColumn(title=&gt;"first"); 
+$columns{second}=$graph-&gt;addColumn(title=&gt;"second");
+
+# adding rows and labels
+$graph-&gt;addRowLabel('1');
+$graph-&gt;addRowLabel('2');
+
+# data for graph
+$columns{first}-&gt;addData('1',14);
+$columns{second}-&gt;addData('2',50);
+
+$graph-&gt;addValueMark(20,front =&gt; 1, color =&gt; 'blue', 
+                    right =&gt; 1, show_label_text =&gt; 'minimum', show_label =&gt; 1);
+
+# create svg file
+open (my $fh, "+&gt;graph.svg");
+print $fh $graph-&gt;prepare;</pre><div class="mediaobject"><img src="images/graph.svg"></div></div></div><div class="section" lang="sk"><div class="titlepage"><div><div><h3 class="title"><a name="id2730195"></a>SVGraph::2D::lines</h3></div></div></div><p>Class for the line graphs.</p><div class="section" lang="sk"><div class="titlepage"><div><div><h4 class="title"><a name="id2730204"></a>Dictionary</h4></div></div></div><p></p></div><div class="section" lang="sk"><div class="titlepage"><div><div><h4 class="title"><a name="id2730212"></a>New object of a line graph</h4></div></div></div><p>Creation of a new object of a line graph :</p><pre class="synopsis">my $graf=SVGraph::2D::lines-&gt;new(%params)</pre><p>%params:</p><div class="itemizedlist"><ul type="disc"><li><p>title</p><p>Title of the graph. It will by displayed in the body of
+              the graph.</p></li><li><p>type</p><p>Type of drawing of the graph:</p><div class="itemizedlist"><ul type="circle"><li><p>normal</p></li><li><p>normal/percentage</p></li><li><p>stacked</p><p>The values are counted together.</p><div class="mediaobject"><img src="images/stacked.jpeg"></div></li><li><p>stacked/percentage</p></li><li><p>overlap</p></li></ul></div></li><li><p>x</p><p>Width of the graph.</p></li><li><p>y</p><p>Height of the graph.</p></li><li><p>reload</p><p>Time in seconds for automatical refresh of the graph. It
+              is assured by the javascript function reload().</p></li><li><p>show_legend</p><p>1/0</p><p>Displays the legend on the right site of the graph.</p></li><li><p>show_legend_reverse</p><p>0/1</p><p>Displays the legend in reverse order.</p></li><li><p>show_points</p><p>0/1</p><p>Displays points in the graph.</p><div class="mediaobject"><img src="images/points.jpeg"></div></li><li><p>show_points_middle</p><p>0/1</p><p>Displayes point in the middle of defined values.</p></li><li><p>show_lines</p><p>1/0</p><p>Shows lines in the line graph.</p></li><li><p>show_lines_smooth</p><p>0/1</p><p>Rounds the lines in the graph.</p></li><li><p>show_areas</p><p>1/0</p><p>Displays the areas in graph.</p></li><li><p>show_label_textsize</p><p>Textsize in labels on the x axis.</p></li><li><p>show_areas</p><p>1/0</p><p>Dislpays the areas.</p></li><li><p>show_areas_opacity</p><p>0.0 -&gt; 1.1</p><p>Shows areas with defined alpha.</p></li><li><p>show_lines_smooth_range</p><p>1/0</p><p>Smooths ranges around the lines.</p></li><li><p>show_data</p><p>1/0</p><p>Shows the values above each colunm.</p></li><li><p>show_data_background</p><p>1/0</p><p>Shows the values above columns with background.</p></li><li><p>show_grid_x</p><p>1/0</p><p>Shows the grid on x axis and the labels.</p></li><li><p>grid_y_scale_minimum</p><p>Defines the starting value of the graph.</p></li><li><p>grid_y_scale_maximum</p><p>Defines the maximum value displayed on the y axis</p></li><li><p>grid_y_main_spacing</p><p>Defines spacing in the grid on the y axis.</p></li></ul></div></div><div class="section" lang="sk"><div class="titlepage"><div><div><h4 class="title"><a name="id2730576"></a>Adding columns into graph</h4></div></div></div><p>Columns are data accumulators of the same type.</p><p>For adding new columns in the graph is used following
+        method:</p><pre class="synopsis">my $column = $graph-&gt;addColumn(%params);</pre><p>%params :</p><div class="itemizedlist"><ul type="disc"><li><p>title</p><p>Name of the coulmn.</p></li><li><p>show_area</p><p>0/1</p><p>Shows the columns as areas.</p></li><li><p>show_line</p><p>0/1</p><p>Allows to display the column as a line.</p></li><li><p>color</p><p>Color of the column.</p></li></ul></div></div><div class="section" lang="sk"><div class="titlepage"><div><div><h4 class="title"><a name="id2784922"></a>Adding row labels</h4></div></div></div><p>For adding labels to rows is used the following method:</p><pre class="synopsis">$graph-&gt;addRowLabel($label_text);</pre><p>Parameters:</p><div class="itemizedlist"><ul type="disc"><li><p>$label_text</p><p>Text, which identifies the row.</p></li></ul></div></div><div class="section" lang="sk"><div class="titlepage"><div><div><h4 class="title"><a name="id2784958"></a>Adding data to graph</h4></div></div></div><pre class="synopsis">$column-&gt;addData($label_text, value);</pre><p>Parameters:</p><div class="itemizedlist"><ul type="disc"><li><p>$label_text</p><p>Text in row label.</p></li></ul></div></div><div class="section" lang="sk"><div class="titlepage"><div><div><h4 class="title"><a name="id2784988"></a>Adding value marks</h4></div></div></div><pre class="synopsis">$graph-&gt;addValueMark(value,%params);</pre><p>%params:</p><div class="itemizedlist"><ul type="disc"><li><p>front</p><p>1/0</p><p>The markline is in the front of the graph.</p></li><li><p>size</p><p>Size of the line.</p></li><li><p>color</p><p>Color of the line.</p></li><li><p>right</p><p>0/1</p><p>Is the label on the right (1) or left (0) side?</p></li><li><p>show_label</p><p>Shows the label. Default is it the value of the mark.</p></li><li><p>show_label_text</p><p>Shows a text as the label.</p></li></ul></div></div><div class="section" lang="sk"><div class="titlepage"><div><div><h4 class="title"><a name="id2785078"></a>Example</h4></div></div></div><p>Code:</p><pre class="programlisting">#!/bin/perl
+use strict;
+use SVGraph::2D::lines;
+
+my $graph=SVGraph::2D::lines-&gt;new(
+ title =&gt; "My graph",
+ type =&gt; "normal/percentage",
+ x =&gt; 500,
+ y =&gt; 300,
+ show_lines =&gt; 1,
+ show_points =&gt; 1,
+ grid_y_main_lines =&gt; 0,
+ show_label_textsize =&gt; 20,
+ show_legend =&gt; 1,
+ show_data =&gt; 1,
+ show_data_background =&gt; 1,
+ show_grid_x =&gt; 0
+);
+
+# two columns -&gt; two lines in the graph
+my %columns;
+$columns{first}=$graph-&gt;addColumn(title=&gt;"first", show_line=&gt;1);
+$columns{second}=$graph-&gt;addColumn(title=&gt;"second", show_line=&gt;1);
+
+$graph-&gt;addRowLabel('1');
+$graph-&gt;addRowLabel('2');
+$graph-&gt;addRowLabel('3');
+
+$graph-&gt;addValueMark(20,front =&gt; 1, color =&gt; 'blue', right =&gt; 1, 
+                     show_label_text =&gt; 'something', show_label =&gt; 1);
+# data for graph
+$columns{first}-&gt;addData('1',30);
+$columns{first}-&gt;addData('2',60);
+$columns{first}-&gt;addData('3',50);
+$columns{second}-&gt;addData('1',20);
+$columns{second}-&gt;addData('2',0);
+$columns{second}-&gt;addData('3',70);
+
+# creates svg file
+open (my $fh, "+&gt;graph.svg");
+print $fh $graph-&gt;prepare;</pre><div class="mediaobject"><img src="images/graph2.svg"></div></div></div><div class="section" lang="sk"><div class="titlepage"><div><div><h3 class="title"><a name="id2785135"></a>SVGraph::2D::map</h3></div></div></div><p>Class for graph maps.</p><div class="section" lang="sk"><div class="titlepage"><div><div><h4 class="title"><a name="id2785144"></a>Dictionary</h4></div></div></div><p></p></div><div class="section" lang="sk"><div class="titlepage"><div><div><h4 class="title"><a name="id2785153"></a>New object of a map</h4></div></div></div><p>Creation of a new object of a map graph :</p><pre class="synopsis">my $map=SVGraph::2D::map-&gt;new(%params);</pre><p>%param:</p><div class="itemizedlist"><ul type="disc"><li><p>title</p><p>Title of the graph.</p></li><li><p>continent</p><p>Continent to be displayed. For whole world is it 'world',
+            for slovakia is this parameter 'slovakia'.</p></li><li><p>x</p><p>Width of the graph.</p></li><li><p>y</p><p>Height of the graph.</p></li><li><p>reload</p><p>Time in seconds for automatical refresh of the graph. It is
+            assured by the javascript function reload().</p></li><li><p>show_legend</p><p>1/0</p><p>Disables the legend.</p></li></ul></div></div><div class="section" lang="sk"><div class="titlepage"><div><div><h4 class="title"><a name="id2785244"></a>Adding columns into graph</h4></div></div></div><p>Columns are data accumulators of the same type. In the map is
+        only one column.</p><p>Creating new column :</p><pre class="synopsis">my $column = $map-&gt;addColumn(%params);</pre><p>%params :</p><div class="itemizedlist"><ul type="disc"><li><p>title</p><p>Name of the coulmn.</p></li><li><p>color</p><p>Color of the countries.</p></li></ul></div></div><div class="section" lang="sk"><div class="titlepage"><div><div><h4 class="title"><a name="id2785291"></a>Adding row labels</h4></div></div></div><p>Row labels identifies countries, which have defined value. For
+        adding labels to rows is used the following method:</p><pre class="synopsis">$map-&gt;addRowLabel($label_text);</pre><p>Parameters:</p><div class="itemizedlist"><ul type="disc"><li><p>$label_text</p><p>Text, which identifies the row.</p></li></ul></div></div><div class="section" lang="sk"><div class="titlepage"><div><div><h4 class="title"><a name="id2785328"></a>Adding data to graph</h4></div></div></div><pre class="synopsis">$column-&gt;addData($label_text, value);</pre><p>Parameters:</p><div class="itemizedlist"><ul type="disc"><li><p>$label_text</p><p>Text in row label.</p></li></ul></div></div><div class="section" lang="sk"><div class="titlepage"><div><div><h4 class="title"><a name="id2785358"></a>Example</h4></div></div></div><p>Code:</p><pre class="programlisting">#!/bin/perl
+
+use SVGraph::2D::map;
+use strict;
+
+my $svgfh;
+
+open($svgfh,"+&gt;map.svg") or die $!;
+
+my $map = SVGraph::2D::map-&gt;new(title =&gt; 'europe', continent =&gt; 'europe', x =&gt; 400, y =&gt; 400);
+
+my $column = $map-&gt;addColumn(title =&gt; 'europe', color =&gt; 'blue');
+
+
+$map-&gt;addRowLabel('SK');
+$column-&gt;addData('SK', 2520);
+
+$map-&gt;addRowLabel('CZ');
+$column-&gt;addData('CZ', 1000);
+
+$map-&gt;addRowLabel('GB');
+$column-&gt;addData('GB', 545);
+
+
+print $svgfh $map-&gt;prepare();</pre><div class="mediaobject"><img src="map.png"></div></div></div></div></div></body></html>

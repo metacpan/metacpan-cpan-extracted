@@ -1,0 +1,14 @@
+Revision history for String-Splitter
+
+0.4     2008-03-28 17:00:00 CET
+        Added Test::Exception to Makefile.pm
+
+0.3     2008-03-19 13:00:00 CET
+        Fixed UTF in POD
+
+0.2     2008-03-18 16:00:00 CET
+        Fixed version inconsistency - 0.01 in package vs 0.1 in file
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

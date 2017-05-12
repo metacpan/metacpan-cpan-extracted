@@ -1,0 +1,15 @@
+[% IF reposcount %]
+<p>
+[%|l%](choose repos)[%END%]
+</p>
+
+<ul>
+  [% FOREACH r = repos %]
+ <li><a href="[% script %]/[% r | url %]">[% r %]</a></li>
+  [% END %]
+</ul>
+[% ELSE %]
+<p>
+[%|l%]No repositories are available for browsing.[%END%]
+</p>
+[% END %]

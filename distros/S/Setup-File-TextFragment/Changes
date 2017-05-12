@@ -1,0 +1,35 @@
+Revision history for Setup-File-TextFragment
+
+0.05    2015-09-04 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.04    2015-08-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Log::Any to Log::Any::IfLOG.
+
+
+0.03    2014-05-17 (SHARYANTO)
+
+        - No functional changes.
+
+        - Replace File::Slurp with File::Slurp::Tiny.
+
+
+0.02    2013-04-25 (SHARYANTO)
+
+        - No functional changes. Fix bug: forgot to export.
+
+
+0.01    2012-09-12 (SHARYANTO)
+
+        - First release. Previous incarnation is Setup-Text-Snippet. Renamed to
+          Setup-File-TextFragment and split the text fragment routines to
+          Setup-Text-Fragment.

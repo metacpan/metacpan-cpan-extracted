@@ -1,0 +1,34 @@
+template: poll-req.tt
+
+vars:
+
+# Skipped because I'm too lazy to setup the data
+integration_skip: 1
+
+input_assertions:
+  class: SRS::EPP::Command::Poll
+  match:
+
+SRS:
+ - assertions:
+     count:
+       - [ '/NZSRSRequest/*', 1, 'SRS: there is 1 srs command' ]
+       - [ '/NZSRSRequest/GetMessages/TypeFilter', 2, 'SRS: there are both typefilters' ]
+     attr_is:
+       - [ '/NZSRSRequest/GetMessages', 'QueueMode', '1', 'SRS: Get message correct' ]
+       - [ '/NZSRSRequest/GetMessages', 'MaxResults', '1', 'SRS: request wants just one row' ]
+       
+output_assertions:
+  count:
+    - [ '//epp:msgQ/epp:msg', '3', "EPP: 2 msgs returned" ]
+    - [ '//domain:infData', '3', "EPP: 2 domain records returned" ]
+  attr_is:
+    - [ '//epp:result', 'code', 1301, 'EPP: Correct response code' ]
+  match:
+    - [ '//epp:msgQ/epp:msg[1]', 'Domain Update', "EPP: Correct first message type" ]
+    - [ '//epp:msgQ/epp:msg[2]', 'Domain Update', "EPP: Correct second message type" ]
+    - [ '//epp:msgQ/epp:msg[3]', 'Domain Update', "EPP: Correct third message type" ]
+    - [ '//domain:infData[1]/domain:name', 'eppregistrar1.co.nz', "EPP: correct first domain" ]
+    - [ '//domain:infData[2]/domain:name', 'eppregistrar2.co.nz', "EPP: correct second domain" ]
+    - [ '//domain:infData[3]/domain:name', 'eppregistrar3.co.nz', "EPP: correct third domain" ]
+

@@ -1,0 +1,60 @@
+Revision history for SQL-OOP
+
+0.21 2014/05/29
+  - Removed dependency on Class::Inheritable.
+  - Deprecated accepting hashs for where clauses and datasets.
+  - Deprecated Where::and_hash infavor of Where::and_abstract.
+  - Deprecated Where::or_hash infavor of Where::or_abstract.
+  - Tested on perl-5.18.2
+
+0.20 2012/01/06
+  - Improved Dataset class to be compatible to super class attr.
+
+0.19 2012/01/04
+  - Added retrieve method for Dataset class.
+
+0.18 2012/01/01
+  - Fixed version number
+
+0.17 2012/01/01
+  - Made in and not_in methods to be capable of sub queries.
+  - Reduced undef warnings on quote method
+  - Added values method on Array class to retrieve values.
+
+0.16 2011/12/20
+  - Added some tests
+
+0.15 2011/07/08
+  - cmp is now capable of sub queries for value
+  - cmp_nested is deprecated
+
+0.14 2011/07/08
+  - Dependency for test specified
+
+0.13 2011/07/08
+
+0.12 2011/07/07
+  - Documents improved
+
+0.11 2011/07/06
+  - Documents improved
+
+0.10 2011/07/06
+  - Fixed bug on alias methods in SQL::OOP package
+
+0.09 2011/07/05
+  - Order class got capable of array refs for keys
+  - SQL::OOP renamed to SQL::OOP::Base
+  - Documents improved
+
+0.08 2011/06/20
+  - Dataset got capable of sub expression
+  - Experimental feature to_string_embeded added
+  - append method got capable of array refs
+  - where methods got capable of array refs for keys
+
+0.07 2011/02/05
+  - not_in added
+
+0.01 2011/02/05
+  - initial release

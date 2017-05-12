@@ -1,0 +1,187 @@
+\+LanguageEncoding UNICODE Thai
+\ver 5.0
+\desc Base Language encoding for Standard Thai and Thai Based Orthographies with default "Standard Thai" properties for case associations, sort orders, and variables.
+\case A a
+B b
+C c
+D d
+E e
+F f
+G g
+H h
+I i
+J j
+K k
+L l
+M m
+N n
+O o
+P p
+Q q
+R r
+S s
+T t
+U u
+V v
+W w
+X x
+Y y
+Z z
+\+srtset 
+
+\+srt Thai UNICODE
+\desc Preliminary default Thai Sort order.
+(still needs .CCT for xE0-xE4 and x80-x9A etc.) UPC
+\primary ก
+ข
+ฃ
+ค
+ฅ
+ฆ
+ง
+จ
+ฉ
+ช
+ซ
+ฌ
+ญ
+ฎ
+ฏ
+ฐ
+ฑ
+ฒ
+ณ
+ด
+ต
+ถ
+ท
+ธ
+น
+บ
+ป
+ผ
+ฝ
+พ
+ฟ
+ภ
+ม
+ย
+ร
+ฤ
+ล
+ฦ
+ว
+ศ
+ษ
+ส
+ห
+ฬ
+อ
+ฮ
+ะ
+ ั
+า
+ำ
+  ิ
+  ี
+  ึ
+  ื
+  ุ
+  ู
+เ
+แ
+โ
+ใ
+ไ
+0 ๐
+1 ๑
+2 ๒
+3 ๓
+4 ๔
+5 ๕
+6 ๖
+7 ๗
+8 ๘
+9 ๙
+A a
+B b
+C c
+D d
+E e
+F f
+G g
+H h
+I i
+J j
+K k
+L l
+M m
+N n
+O o
+P p
+Q q
+R r
+S s
+T t
+U u
+V v
+W w
+X x
+Y y
+Z z
+_
+\SecPreceding `
+\SecFollowing ่  ้  ๊ ๋  ์  ็
+\SecAfterBase
+\cct Thaiupv.cct
+\-srt
+
+\srtDefault Thai UNICODE
+\-srtset
+\+varset 
+
+\+var !
+\chars . , ? : ; ! < > { } [ ] ( ) " ' `
+\-var
+
+\+var @
+\chars A a B b C c D d E e F f G g H h I i J j K k L l M m
+N n O o P p Q q R r S s T t U u V v W w X x Y y Z z
+\-var
+
+\+var D
+\chars 0 1 2 3 4 5 6 7 8 9
+\-var
+
+\+var L
+\chars a b c d e f g h i j k l m n o p q r s t u v w x y z
+\-var
+
+\+var U
+\chars A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+\-var
+
+\+var cons
+\chars ก ํํข ฃ ค ฅ ฆ ง จ ฉ ช ซ ฌ ญ ฎ ฏ ฐ ฑ ฒ ณ ด ต ถ ท ธ น บ ป ผ
+ฝ พ ฟ ภ ม ย ร ฤ ล ฦ ว ศ ษ ส ห ฬ อ ฮ B b C c D d F f G g H h J j K k L l M m N n P p Q q R r S s T t V v W w X x Y y Z z
+\-var
+
+\+var nasal
+\chars M m N n
+\-var
+
+\+var vowel
+\chars A a E e I i O o U u
+\-var
+
+\-varset
+\+fnt 
+\Name Angsana New
+\Size 18
+\charset 00
+\rgbColor 0,0,0
+\-fnt
+\kbdWin32 Thai Kedmanee
+\kbdKeyman Thai UPC v1.12
+\UnicodeLang
+\-LanguageEncoding

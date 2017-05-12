@@ -1,0 +1,36 @@
+---
+abstract: 'Manipulate Solaris 10 services from Perl'
+author:
+  - 'Brad Macpherson <brad@teched-creations.com>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Solaris-SMF
+provides:
+  Solaris::SMF:
+    file: lib/Solaris/SMF.pm
+    version: v1.0.1
+  Solaris::SMF::Service:
+    file: lib/Solaris/SMF/Service.pm
+    version: v1.0.1
+requires:
+  Carp: '0'
+  Exporter: '0'
+  Log::Any: '0'
+  Params::Validate: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+version: 1.0.1

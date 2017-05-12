@@ -1,0 +1,48 @@
+0.15      2014-05-06 07:59:07 Europe/Madrid
+
+0.15      2014-05-05 15:53:00 Europe/Madrid
+
+0.010     2013-09-18 15:39:17 Europe/Madrid
+
+    -- added support for NanoPublishing
+
+0.008     2013-04-27 18:34:17 America/Vancouver
+    
+    -- automatically type output nodes (with SADI output class URI)
+    -- change DC URLs in service description to use protege DC ontology instead
+
+0.007
+
+    -- remove accidental Plack dependency in 0.006
+
+0.006     2011-08-18 09:08:03 America/Vancouver
+
+    -- constant::boolean missing from requires in 0.005, removed references
+    to constant::boolean in the code 
+       
+
+0.005     2011-08-17 21:00:17 America/Vancouver
+
+    -- URL parameter no longer required for AsyncService config, unless
+       the service is accessed through HTTP redirects
+    -- return HTTP 500 when internal service error occurs, not HTTP 200
+    -- fixed uncaught exception when parsing input RDF in AsyncService.pm
+    -- disable throwing of an exception on malformed email address (Provider) 
+       or malformed authority (Authority)
+    -- fixed incorrect root URI for RDF service description, when service URL is unspecified 
+
+0.004     2011-07-21 06:47:17 Europe/Vienna
+    
+    -- minor documentation cleanup on main page (SADI::Simple)
+
+0.003     2011-07-19 13:58:01 Europe/Vienna
+
+    -- botched move of testlib/CGI/Test.pm below, try again
+
+0.002     2011-07-19 12:45:14 Europe/Vienna
+
+    -- moved testlib/CGI/Test.pm to t/CGITest.pm so CPAN doesn't try to install it 
+
+0.001     2011-07-19 11:44:55 Europe/Vienna
+
+    -- initial release

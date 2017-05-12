@@ -1,0 +1,157 @@
+#!/usr/bin/env perl 
+use strict;
+use warnings;
+
+use Getopt::Long;
+use File::Spec::Functions qw/catfile catdir splitdir/;
+use Cwd;
+use Carp;
+use File::Find;
+@ARGV = '--help' unless @ARGV;
+my %args;
+GetOptions( \%args, 'install-links=s', 'switch:s', 'help' );
+
+my $USAGE = <<'END'
+run: ./tools/shipwright-utility --install-links /usr/local
+run: ./tools/shipwright-utility --switch ubuntu
+
+options: 
+
+help: print this usage
+
+install-links: link files in bin, sbin, or libexec to other places
+    e.g. --install-links /usr/local
+
+switch: switch to the lib below as/$name, default is uname
+    e.g. --switch ubuntu
+
+END
+  ;
+
+if ( $args{'help'} ) {
+    print $USAGE;
+}
+elsif ( $args{'install-links'} ) {
+    my $cwd = getcwd();
+
+    for my $dir (qw/bin sbin libexec/) {
+        next unless -e $dir;
+        my $dh;
+        opendir $dh, $dir or confess $!;
+
+        mkdir catfile( $args{'install-links'},       $dir )
+          unless -e catfile( $args{'install-links'}, $dir );
+        my @files = readdir $dh;
+        for (@files) {
+            next if $_ eq '.' || $_ eq '..';
+            symlink catfile( $cwd, $dir, $_ ),
+              catfile( $args{'install-links'}, $dir, $_ ) or confess
+                  $!;
+        }
+    }
+}
+elsif ( defined $args{'switch'} ) {
+    my $name = $args{'switch'} || `uname 2>/dev/null`;
+    chomp $name;
+
+    my $as_dir = catdir( 'as', $name );
+    if ( -e $as_dir ) {
+        for my $r ( qw/lib/ ) {
+            my $dir = catdir( $as_dir, $r );
+            next unless -e $dir;
+
+            if ( $r !~ /bin/ ) {
+                unlink $r;
+                symlink $dir, $r;
+            }
+        }
+
+        # remove old ones
+        for my $dir ( 'bin', 'sbin', catdir( 'usr', 'bin' ),
+            catdir( 'usr', 'sbin' ) )
+        {
+            if ( -e $dir ) {
+                system( "rm -rf $dir" );
+            }
+        }
+        wrap_bin($name);
+
+        open my $fh, '>', '__as' or die $!;
+        print $fh $name;
+        close $fh;
+
+        print "successfully switched to $name.\n";
+
+    }
+    else {
+        print "no switch name $name exists\n";
+    }
+}
+
+sub wrap_bin {
+    my $name = shift;
+    my $install_base = getcwd();
+    my $sub = sub {
+        my $file = $_;
+
+        return unless -f $file;
+
+        my $wrap_dir = $File::Find::dir;
+        $wrap_dir =~ s!as/$name/!!;
+
+        my $wrap_file = catfile( $wrap_dir, $file );
+        my $wrapped_depth =
+          scalar( splitdir($File::Find::dir) ) -
+          scalar( splitdir($install_base) ) - 2;
+        mkdir $wrap_dir unless -d $wrap_dir;
+
+        # return if it's been wrapped already
+        if ( -l $wrap_file ) {
+            print "seems $file has been already wrapped, skipping\n";
+            return;
+        }
+
+        my $type;
+        if ( -T $file ) {
+            open my $fh, '<', $file or confess "can't open $file: $!";
+            my $shebang = <$fh>;
+            if (
+                $shebang =~ m{
+\Q$install_base\E(?:/|\\)(?:s?bin)(?:/|\\)(\w+)
+|\benv\s+(\w+)
+}x
+              )
+            {
+                $type = $1 || $2;
+            }
+        }
+
+    # if we have this $type(e.g. perl) installed and have that specific wrapper,
+    # then link to it, else link to the normal one
+        if (
+            $type
+            && (   -e catfile( '..', 'bin', $type )
+                || -e catfile( ('..') x $wrapped_depth, 'bin', $type ) )
+            && -e catfile( ('..') x $wrapped_depth, 'etc',
+                "shipwright-$type-wrapper" )
+          )
+        {
+            symlink catfile( ('..') x $wrapped_depth,
+                'etc', "shipwright-$type-wrapper" ) => $wrap_file
+              or confess $!;
+        }
+        else {
+
+            symlink catfile( ('..') x $wrapped_depth,
+                'etc', 'shipwright-script-wrapper' ) => $wrap_file
+              or confess $!;
+        }
+        chmod oct 755, $wrap_file;
+    };
+
+    my @dirs =
+      grep { -e $_ } map { catdir( $install_base, 'as', $name, $_ ) } 'bin',
+      'sbin', catdir( 'usr', 'bin' ), catdir( 'usr', 'sbin' );
+    find( { wanted => $sub, follow => 1 }, @dirs ) if @dirs;
+}
+

@@ -1,0 +1,24 @@
+Sys::Hostname::Long
+===================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+   none
+
+COPYRIGHT AND LICENCE
+
+GNU
+
+Copyright (C) 2001 Scott Penrose <scottp@dd.com.au>
+	http://linux.dd.com.au/
+
+
+

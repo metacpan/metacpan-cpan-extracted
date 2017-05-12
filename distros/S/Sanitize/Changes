@@ -1,0 +1,6 @@
+Revision history for Perl extension Sanitize.
+
+1.00  Tue Dec 16 12:22:28 2014
+	- original version; created by h2xs 1.23 with options
+		-AX Sanitize
+

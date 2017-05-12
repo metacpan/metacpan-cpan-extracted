@@ -1,0 +1,29 @@
+---
+abstract: 'Unordered collections (sets) of Perl Objects'
+author:
+  - 'Jean-Louis Leroy and Sam Vilain'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Set-Object
+no_index:
+  directory:
+    - t
+    - inc
+recommends:
+  Moose: '0'
+  Test::LeakTrace: '0'
+requires:
+  Scalar::Util: '0'
+  Test::More: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/rurban/Set-Object.git
+version: '1.35'

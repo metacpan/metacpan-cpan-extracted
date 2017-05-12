@@ -1,0 +1,6 @@
+To run ShatterProof using the provided sample data, follow these steps:
+1.Install the ShatterProof Perl module
+2.In the "scripts" directroy run the shatterproof.pl Perl script as
+	perl -w shatterproof.pl --cnv ./../sample_data/cnv/ --trans ./../sample_data/trans/ --insrt ./../sample_data/indels/ --loh ./../sample_data/loh/ --tp53 --config ./config.pl --output ./../sample_data/output/ 
+3.Once ShatterProof has finished running, navigate to the sample_data/output directory
+4.Open the /output/suspect_regions/suspect_regions.yml file to see the chromothripsis calls that ShatterProof has produced

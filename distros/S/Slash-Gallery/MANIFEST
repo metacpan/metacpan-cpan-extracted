@@ -1,0 +1,17 @@
+Gallery.pm
+MANIFEST
+Makefile.PL
+PLUGIN
+README
+TODO
+dump.sql
+gallery.pl
+mysql_schema.sql
+templates/data;gallery;default
+templates/display;gallery;default
+templates/edit_group;gallery;default
+templates/gallery;menu;default
+templates/list;gallery;default
+templates/list_groups;gallery;default
+templates/list_pictures;gallery;default
+templates/picture_menu;gallery;default

@@ -1,0 +1,81 @@
+Revision history for Search-OpenSearch-Engine-Lucy
+
+0.400 22 July 2014
+ - switch to Dezi::App components, away from SWISH::Prog::Lucy
+
+0.300 07 June 2014
+ - official Moose release in support of S::OS 0.400
+
+0.299_03 05 June 2014
+ - DELETE operates on all indexes, just like GET and search do.
+ - add notes that PUT and POST operate only on the first index defined.
+
+0.299_02 23 April 2014
+ - fix internal indexer management for auto-commit, etc.
+
+0.299_01 22 April 2014
+ - port to Moose for Search::OpenSearch 0.400
+
+0.19 02 March 2014
+ - check for !defined $query rather than !$query
+
+0.18 02 Feb 2014
+ - include 'mtime' in GET response
+
+0.17 01 Oct 2013
+ - packaging clean up only
+
+0.16 27 Jan 2013
+ - implement type() method documented in parent class.
+
+0.15 08 Jan 2013
+ - respect no_hiliting() method in REST GET() method
+
+0.14 04 Jan 2013
+ - optionally highlight search terms in REST GET() method
+
+0.13 17 Oct 2012
+ - support LucyX::Suggester if available (Text::Aspell required)
+
+0.12 14 Oct 2012
+ - only include COMMIT and ROLLBACK as supported REST methods if
+   auto_commit is off.
+
+0.11 3 Sept 2012
+ - add transaction support with COMMIT and ROLLBACK and auto_commit().
+
+0.10 21 Aug 2012
+ - add mem leak tests
+ - require SOS 0.18 for array_field_values
+
+0.09 4 April 2012
+ - fix the 0.08 fix
+
+0.08 4 April 2012
+ - fix bug where a failed PUT failed to release lock on invindex
+
+0.07 2 April 2012
+ - declare JSON as a dependency (RT #76252)
+
+0.06 26 Dec 2011
+ - refactor to add aggregator_class method, for overriding the default
+   behaviour of SWISH::Prog::Aggregator->swish_filter()
+
+0.05 22 Oct 2011
+ - support for Search::OpenSearch::Engine searcher_config and
+   indexer_config.
+ - fix class names left from KinoSearch port
+
+0.04 13 Oct 2011
+ - fields now optional in config. If not defined, will be read from
+   searcher->get_propnames().
+
+0.03 09 Oct 2011
+ - support all file types via SWISH::Filter
+
+0.02 29 Sept 2011
+ - fix edge case on PUT where index not yet created.
+
+0.01 21 June 2011
+ - Initial port of KSx version.
+

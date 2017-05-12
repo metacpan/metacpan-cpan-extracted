@@ -1,0 +1,33 @@
+Revision history for String-BufferStack
+
+1.16   Wed Oct 26 08:05:17 2011
+        * No code changes; fix license in META.yml
+
+1.15   Wed Jan  6 18:26:17 2009
+        * Don't calculate buffer length as it is built, unless we ask
+          for it; it has serious runtime cost
+
+1.14   Mon Mar  2 20:21:17 2009
+        * No code changes; make tests pass on 5.6
+
+1.13   Fri Feb 27 19:19:17 2009
+        * No code changes; add LICENSE and AUTHOR to POD
+
+1.12   Wed Feb  4 14:41:17 2009
+        * Add buffer_ref
+        * Documentation adjustments
+
+1.10   Thu Jan 15 23:37:17 2009
+        * Remove support for data stack
+
+1.03   Sun Nov 23 01:00:30 2008
+        * Require 5.8.0 or higher (for three-arg open and local *STDOUT in tests)
+
+1.02   Sun Nov 23 01:00:30 2008
+        * Releng fixes
+
+1.01   Sun Nov 23 00:51:30 2008
+        * Test fixes
+
+1.00   Thu Nov  6 22:28:19 2008
+        * First release

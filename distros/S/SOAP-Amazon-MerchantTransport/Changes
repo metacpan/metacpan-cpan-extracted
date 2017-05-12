@@ -1,0 +1,10 @@
+Revision history for SOAP-Amazon-MerchantTransport
+
+0.02    Wed Jan 18 17:10:17 PST 2006  
+        First stable version. Covers most of the major SOAP methods provided by
+        Amazon. The only major omission is 'postDocumentDownloadAck'.
+
+0.01    Wed Jan 01 10:08:42 PST 2006 
+        First version, Successfully posted a valid SOAP request to Amazon 
+        using SOAP::Lite
+

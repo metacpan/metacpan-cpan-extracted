@@ -1,0 +1,17 @@
+Revision history for Perl extension SWIFT::Factory::BasicHeader.
+
+0.01  14-Feb-2003
+	   - First beta release
+
+0.02  16-Feb-2003
+      - Removed the redundant object method version().
+        Please use the class method $h1->VERSION instead. (Inherited from UNIVERSAL::VERSION)
+
+      - Added the invalid() method. It's just a place-holder right now, but use it.
+        Future releases will fill the method with validation code.
+
+      - Minor corrections in the POD.
+
+0.03  06-Mar-2003
+      - Transfered ownership of module to BIKER.
+

@@ -1,0 +1,112 @@
+# Vertebral Column Description (VCD)
+# Describes bifurcation in various sauropods
+
+*width: 800
+*height: 565
+*taxon-height: 35
+*cervico-dorsal-offset: 530
+*cervico-dorsal-color: gray
+*cervical-width: 15
+*cervical-height: 15
+*dorsal-width: 15
+*dorsal-height: 20
+*box-color: rgb(192,192,192)
+
+*font-family: Helvetica
+*font-size: 12
+*text-y-offset: 0
+
+*state-V-color: rgb(255,0,0)
+*state-Y-color: rgb(255,128,0)
+*state-u-color: rgb(255,192,0)
+*state-n-color: rgb(192,192,0)
+*state---color: grey
+
+*state-V-polygon: 0,1 0,0 0.5,0.9 1,0 1,1
+*state-Y-polygon: 0,1 0,0 0.5,0.5 1,0 1,1
+*state-u-polygon: 0,1 0.2,0 0.3,0 0.5,0.25 0.7,0 0.8,0 1,1
+*state-n-polygon: 0,1 0.3,0 0.6,0 1,1
+*state---polygon: 0.1,0.5 0.1,0.6 0.9,0.6 0.9,0.5
+
+
+Taxon: Apatosaurus louisae
+Specimen: CM 3018
+Citation: Gilmore 1936:195 and plates 24-25
+Data: -----YVVVVVVVVV|VVVuuunnn-
+
+Taxon: Apatosaurus parvus
+Specimen: UWGM 155556/CM 563
+Citation: Gilmore 1936:plate 31 and figure 10
+Data: --nnn-VVV---V-V|VVVu------
+
+Taxon: Apatosaurus ajax
+Specimen: NMST-PV 20375
+Citation: Upchurch et al. 2005:27-35 and plates 1-3
+Data: --n--VVVVVVVVVV|VVVVYunnnn
+
+Taxon: Apatosaurus sp.
+Specimen: FMNH P25112
+Citation: Riggs 1903:174 and plate 46
+Data: ---------------|VVVVYunnnn
+
+Taxon: Diplodocus carnegii
+Specimen: CM 84/94
+Citation: Hatcher 1901: plates 3-6, 8
+Data: -n---YVVVVVVVVV|VVVVVYuuun
+
+Taxon: Diplodocus longus
+Specimen: USNM 10865
+Citation: Gilmore 1932:plate 5
+Data: ---------------|VVVVYuuunn
+
+Taxon: Barosaurus lentus
+Specimen: YPM 429
+Citation: Lull 1919:15-21 and plates 3-4
+Data: ----------------|V--VVnnnn
+
+Taxon: Barosaurus lentus
+Specimen: AMNH 6341
+Citation: McIntosh 2005:47-48, 51 and figures 2.1-2.3, 2.5
+Data: -------nYYYYYVVV|VVVYuuuun
+
+Taxon: Suuwassea emilieae
+Specimen: ANS 21122
+Citation: Harris 2006c:1094-1107 and figures 4-7, 10-11
+Data: -u--nu---------|VVY-------
+
+Taxon: Haplocanthosaurus utterbacki
+Specimen: CM 879
+Citation: Hatcher 1903:plates 1-2
+Data: --nn---nnnnnn-n|nnnnnnnnnnnnnn
+
+Taxon: Camarasaurus lentus
+Specimen: CM 11338
+Citation: Gilmore 1925:369-370
+Data: --nnnnuuYVV-|VVYYYunnnnnn
+
+Taxon: Camarasaurus grandis
+Specimen: YPM 1905
+Citation: Ostrom & McIntosh 1966:plates 9-11; McIntosh, Miles, et al. 1996:76
+Data: --uYYV------
+
+Taxon: Camarasaurus grandis
+Specimen: GMNH-PV 101/WPL 1995
+Citation: McIntosh, Miles, et al. 1996:pages 11-13, figures 24-37
+Data: -nunuYVV----|-----uunnnnn
+
+Taxon: Camarasaurus supremus
+Specimen: AMNH 5761
+Citation: Osborn & Mook 1921:294, 300, plates 67-73
+Data: -nnnunYVVVVVV|VVVVVYuunnnn
+
+# No point in including this one: it only has one informative vert
+#Taxon: Camarasaurus lentus
+#Specimen: YPM 1910
+#Citation: McIntosh, Miller et al. 1996:76
+#Data: ----u-------
+
+Taxon: Camarasaurus lewisi
+Specimen: BYU 9047
+Citation: McIntosh, Miller et al. 1996:76, plates 1-4
+Data: -nuuuVVV----|VVVVVVVVYYuu
+

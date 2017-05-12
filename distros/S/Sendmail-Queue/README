@@ -1,0 +1,47 @@
+Sendmail-Queue
+
+Manipulate Sendmail queues directly with Perl
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Sendmail::Queue
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Sendmail-Queue
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Sendmail-Queue
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Sendmail-Queue
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Sendmail-Queue
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 David F. Skoll
+
+This program is released under the following license: GPL

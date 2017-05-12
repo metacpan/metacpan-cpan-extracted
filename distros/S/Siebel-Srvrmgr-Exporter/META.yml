@@ -1,0 +1,61 @@
+---
+abstract: 'Perl extension for dumping Siebel Components data'
+author:
+  - 'Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>'
+build_requires:
+  Capture::Tiny: '0.36'
+  Cwd: '0'
+  Digest::MD5: '0'
+  Test::More: '0'
+  perl: '5.014004'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.014004'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Siebel-Srvrmgr-Exporter
+no_index:
+  directory:
+    - inc
+provides:
+  Siebel::Srvrmgr::Exporter:
+    file: lib/Siebel/Srvrmgr/Exporter.pm
+    version: '0.06'
+  Siebel::Srvrmgr::Exporter::ListComp:
+    file: lib/Siebel/Srvrmgr/Exporter/ListComp.pm
+    version: '0.06'
+  Siebel::Srvrmgr::Exporter::ListCompDef:
+    file: lib/Siebel/Srvrmgr/Exporter/ListCompDef.pm
+    version: '0.06'
+  Siebel::Srvrmgr::Exporter::ListCompTypes:
+    file: lib/Siebel/Srvrmgr/Exporter/ListCompTypes.pm
+    version: '0.06'
+  Siebel::Srvrmgr::Exporter::ListParams:
+    file: lib/Siebel/Srvrmgr/Exporter/ListParams.pm
+    version: '0.06'
+requires:
+  File::Spec: '0'
+  Getopt::Std: '0'
+  Moose: '2.1604'
+  Siebel::Srvrmgr::Daemon::Action: '0'
+  Siebel::Srvrmgr::Daemon::ActionStash: '0.21'
+  Siebel::Srvrmgr::Daemon::Command: '0.24'
+  Siebel::Srvrmgr::Daemon::Heavy: '0'
+  Siebel::Srvrmgr::Daemon::Light: '0'
+  Siebel::Srvrmgr::ListParser::Output::ListComp::Server: '0.24'
+  Siebel::Srvrmgr::ListParser::Output::Tabular::ListParams: '0.24'
+  Term::YAP: '0.04'
+  namespace::autoclean: '0.13'
+  perl: '5.014004'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/glasswalk3r/siebel-monitoring-tools/issues
+  homepage: https://github.com/glasswalk3r/siebel-monitoring-tools
+  repository: https://github.com/glasswalk3r/siebel-monitoring-tools.git
+version: '0.06'
+x_serialization_backend: 'YAML::Tiny version 1.69'

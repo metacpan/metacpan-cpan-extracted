@@ -1,0 +1,61 @@
+NAME
+    Sub::Disable - Remove function/method call from compiled code
+
+SYNOPSIS
+        use Sub::Disable 'debug', 'foo', 'bar'; # without specification - both method + sub form calls
+
+        use Sub::Disable method => ['debug'];
+        use Sub::Disable sub    => ['debug'];
+        use Sub::Disable {
+            method => ['foo'],
+            sub    => ['bar'],
+        };
+
+        sub debug { warn "DEBUG INFO: @_" }
+
+        __PACKAGE__->debug(some_heave_debug()); # no-op
+        debug(even_more(), heavier_debug()); # no-op
+
+DESCRIPTION
+    This module allows you to turn compile-time resolvable function or
+    method call into no-op (together with all arguments' computations). This
+    is useful for debugging and/or logging, when you don't want to make your
+    production code slower.
+
+    Note that 'compile-time resolvable method call' is a method call on a
+    literal package name
+
+        Some::Package->method
+        # or
+        __PACKAGE__->method
+
+    and does not consider inheritance.
+
+    Sub::Disable distinguishes between sub and method calls and, by default,
+    removes both of them. If you want to remove only one type, you should
+    use specific import.
+
+PERFORMACE
+    There's zero runtime overhead. Compile time overhead is negligible - on
+    a test run it took an additional 0.2 ms during compilation of a
+    large-scale project with 1200+ modules loaded.
+
+CAVEATS
+    Sub::Disable will remove only those sub/method calls that were compiled
+    after you have use'd it.
+
+    If you use Sub::Disable together with namespace::clean and you want to
+    remove sub call, but not a method call, of a specific function, you
+    should use Sub::Disable after using namespace::clean or exclude that
+    method with '-except'.
+
+SEE ALSO
+    B::Hooks::OP::Check and various OP_check[] related core stuff.
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2015 by Sergey Aleynikov
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.10.1 or, at
+    your option, any later version of Perl 5 you may have available.
+

@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Storable-CouchDB
+version:             0.04
+abstract:            Persistences for Perl data structures in Apache CouchDB
+license:             ~
+author:              
+    - Michael R. Davis (mdavis@davisnetworks.com)
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    CouchDB::Client:               0
+    IO::Socket::INET:              0
+    Test::Simple:                  0.44
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

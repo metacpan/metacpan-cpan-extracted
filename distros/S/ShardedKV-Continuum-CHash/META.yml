@@ -1,0 +1,22 @@
+---
+abstract: 'Continuum implementation based on Algorithm::ConsistentHash::CHash'
+author:
+  - 'Steffen Mueller <smueller@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.005, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: ShardedKV-Continuum-CHash
+requires:
+  Algorithm::ConsistentHash::CHash: 0.00008
+  Carp: 0
+  JSON::XS: 0
+  ShardedKV: 0.18
+resources:
+  repository: http://github.com/tsee/p5-ShardedKV-Continuum-CHash
+version: 0.01

@@ -1,0 +1,4 @@
+TESTDIR/bin/succ
+TESTDIR/bin/fail
+TESTDIR/bin/succ.2
+TESTDIR/bin/fail.2

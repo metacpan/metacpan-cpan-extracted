@@ -1,0 +1,28 @@
+---
+abstract: 'Alternate reftype() interface'
+author:
+  - 'Burak Gursoy <burak@cpan.org>'
+build_requires:
+  Test::More: '0.40'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Scalar-Util-Reftype
+no_index:
+  directory:
+    - monolithic_version
+    - builder
+    - t
+    - xt
+requires:
+  Scalar::Util: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/burak/cpan-scalar-util-reftype/
+version: '0.44'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

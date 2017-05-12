@@ -1,0 +1,20 @@
+--- #YAML:1.0
+name:                SMS-Send-US-Ipipi
+version:             0.03
+abstract:            An SMS::Send driver for the ipipi.com website
+license:             ~
+author:              
+    - Andrew Moore <andrew.moore@liblime.com>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Carp:                          0
+    File::Spec:                    0.80
+    IO::Socket::SSL:               0.97
+    LWP:                           5.69
+    SMS::Send:                     0.02
+    Test::More:                    0.47
+    WWW::Mechanize:                1.06
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

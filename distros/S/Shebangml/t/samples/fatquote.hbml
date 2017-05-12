@@ -1,0 +1,20 @@
+blah{
+style{{{
+  body{ font-family:foo,bar }
+  #whatever{ height:18px;}
+}}}#style;
+inline{{{ this{is{{)){{}} } ok} }}} and_then{{{more of this}}}
+inline[with=atts]{{{ this{is ok too} }}}
+
+# I think my vim matcher needs work
+# but I might just make it the rule that if it is multiline it starts
+# with {{{\n and ends with ^\s*}}}
+bacon[has=atts]{{{
+  so{none of this matters}
+}}}
+chunky_bacon[might=have
+  lots="of attributes"
+]{{{
+  and this is still thick bacon
+}}}
+}

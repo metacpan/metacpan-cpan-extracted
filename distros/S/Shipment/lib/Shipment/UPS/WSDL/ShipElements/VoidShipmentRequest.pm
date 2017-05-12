@@ -1,0 +1,207 @@
+
+package Shipment::UPS::WSDL::ShipElements::VoidShipmentRequest;
+$Shipment::UPS::WSDL::ShipElements::VoidShipmentRequest::VERSION = '2.03';
+use strict;
+use warnings;
+
+{    # BLOCK to scope variables
+
+    sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Void/v1.1'}
+
+    __PACKAGE__->__set_name('VoidShipmentRequest');
+    __PACKAGE__->__set_nillable();
+    __PACKAGE__->__set_minOccurs();
+    __PACKAGE__->__set_maxOccurs();
+    __PACKAGE__->__set_ref();
+
+    use base qw(
+      SOAP::WSDL::XSD::Typelib::Element
+      SOAP::WSDL::XSD::Typelib::ComplexType
+    );
+
+    our $XML_ATTRIBUTE_CLASS;
+    undef $XML_ATTRIBUTE_CLASS;
+
+    sub __get_attr_class {
+        return $XML_ATTRIBUTE_CLASS;
+    }
+
+    use Class::Std::Fast::Storable constructor => 'none';
+    use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
+
+    Class::Std::initialize();
+
+    {    # BLOCK to scope variables
+
+        my %Request_of : ATTR(:get<Request>);
+        my %VoidShipment_of : ATTR(:get<VoidShipment>);
+
+        __PACKAGE__->_factory(
+            [   qw(        Request
+                  VoidShipment
+
+                  )
+            ],
+            {   'Request'      => \%Request_of,
+                'VoidShipment' => \%VoidShipment_of,
+            },
+            {   'Request' => 'Shipment::UPS::WSDL::ShipElements::Request',
+
+
+                'VoidShipment' =>
+                  'Shipment::UPS::WSDL::ShipElements::VoidShipmentRequest::_VoidShipment',
+            },
+            {
+
+                'Request'      => '',
+                'VoidShipment' => 'VoidShipment',
+            }
+        );
+
+    }    # end BLOCK
+
+
+    package Shipment::UPS::WSDL::ShipElements::VoidShipmentRequest::_VoidShipment;
+    $Shipment::UPS::WSDL::ShipElements::VoidShipmentRequest::_VoidShipment::VERSION
+      = '2.03';
+    use strict;
+    use warnings;
+    {
+        our $XML_ATTRIBUTE_CLASS;
+        undef $XML_ATTRIBUTE_CLASS;
+
+        sub __get_attr_class {
+            return $XML_ATTRIBUTE_CLASS;
+        }
+
+        use Class::Std::Fast::Storable constructor => 'none';
+        use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
+
+        Class::Std::initialize();
+
+        {    # BLOCK to scope variables
+
+            sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Void/v1.1'}
+
+            my %ShipmentIdentificationNumber_of :
+              ATTR(:get<ShipmentIdentificationNumber>);
+            my %TrackingNumber_of : ATTR(:get<TrackingNumber>);
+
+            __PACKAGE__->_factory(
+                [   qw(        ShipmentIdentificationNumber
+                      TrackingNumber
+
+                      )
+                ],
+                {   'ShipmentIdentificationNumber' =>
+                      \%ShipmentIdentificationNumber_of,
+                    'TrackingNumber' => \%TrackingNumber_of,
+                },
+                {   'ShipmentIdentificationNumber' =>
+                      'SOAP::WSDL::XSD::Typelib::Builtin::string',
+                    'TrackingNumber' =>
+                      'SOAP::WSDL::XSD::Typelib::Builtin::string',
+                },
+                {
+
+                    'ShipmentIdentificationNumber' =>
+                      'ShipmentIdentificationNumber',
+                    'TrackingNumber' => 'TrackingNumber',
+                }
+            );
+
+        }    # end BLOCK
+
+
+    }
+
+
+}    # end of BLOCK
+
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Shipment::UPS::WSDL::ShipElements::VoidShipmentRequest
+
+=head1 VERSION
+
+version 2.03
+
+=head1 DESCRIPTION
+
+Perl data type class for the XML Schema defined element
+VoidShipmentRequest from the namespace http://www.ups.com/XMLSchema/XOLTWS/Void/v1.1.
+
+=head1 NAME
+
+Shipment::UPS::WSDL::ShipElements::VoidShipmentRequest
+
+=head1 PROPERTIES
+
+The following properties may be accessed using get_PROPERTY / set_PROPERTY
+methods:
+
+=over
+
+=item * Request
+
+ $element->set_Request($data);
+ $element->get_Request();
+
+Note: The name of this property has been altered, because it didn't match
+perl's notion of variable/subroutine names. The altered name is used in
+perl code only, XML output uses the original name:
+
+=item * VoidShipment
+
+ $element->set_VoidShipment($data);
+ $element->get_VoidShipment();
+
+=back
+
+=head1 METHODS
+
+=head2 new
+
+ my $element = Shipment::UPS::WSDL::ShipElements::VoidShipmentRequest->new($data);
+
+Constructor. The following data structure may be passed to new():
+
+ {
+   Request =>  { # Shipment::UPS::WSDL::ShipTypes::RequestType
+     RequestOption =>  $some_value, # string
+     TransactionReference =>  { # Shipment::UPS::WSDL::ShipTypes::TransactionReferenceType
+       CustomerContext =>  $some_value, # string
+       TransactionIdentifier =>  $some_value, # string
+     },
+   },
+   VoidShipment =>  {
+     ShipmentIdentificationNumber =>  $some_value, # string
+     TrackingNumber =>  $some_value, # string
+   },
+ },
+
+=head1 AUTHOR
+
+Generated by SOAP::WSDL
+
+=head1 AUTHOR
+
+Andrew Baerg <baergaj@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Andrew Baerg.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

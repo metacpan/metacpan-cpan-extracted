@@ -1,0 +1,41 @@
+=encoding euc-jp
+
+=head1 NAME
+
+String::Gsub::Matcher::JA - match result object (ja-doc)
+
+=head1 名前
+
+String::Gsub::Matcher::JA - マッチ結果オブジェクト
+
+=head1 SYNOPSIS
+
+ use String::Gsub::Matcher;
+ 
+ my $matcher = String::Gsub::Matcher($origstr);
+ print $matcher; # ==> ($MATCH)
+ print $matcher->expand($tmpl); # expand.
+
+=head1 説明
+
+L<String::Gsub::Functions::JA> から内部的に利用されます.
+
+=head1 エクスポート
+
+このモジュールからエクスポートされる関数はありません.
+
+=head1 メソッド
+
+=head2 new
+
+=head2 expand
+
+=head2 stringy
+
+=head1 参考
+
+L<String::Gsub>
+
+=cut
+
+

@@ -1,0 +1,44 @@
+2014-06-26
+    0.13    Maintenance release, removing random duplicate bundle of Module::Install
+
+2013-07-28
+    0.12    Fix for the << operator, and new operators >> and | (prj++)
+
+2009-11-24
+    0.11    Updated M::I to 0.91 (via rafl++)
+
+2009-05-14
+    0.10    Fix for 5.8.8 (BeginLift'd CV needs to be teardown_for_cv'd on end of scope
+              otherwise CV may be reused, causing subsequent subs to be erroneously
+              lifted)
+
+2009-05-02
+    0.09    Fix dist
+
+2009-04-27
+    0.08    Documentation.
+            Fixed examples/cycle.pl
+            Lifting named curries (rafl++)
+            Fixed bug with multiple return values
+            More tests.
+
+2009-04-26
+    0.07    Changed codegen to monadic style
+            This requires change to allow alias-on-zero-args, using Sub::Current
+            Moved to B::Hooks::EndOfScope
+            Added Sub::Composable
+
+2008-09-24
+    0.06    Corrected SYNOPSIS (Caelum++, dada++)
+            Added test for curry with no params (not that this makes sense!) (dada++)
+2008-09-22
+    0.05    Updated to D::D 0.002000, with new internals and hack to avoid final semicolon!
+
+2008-07-26
+    0.04    corrected doc typo (ilmari++)
+            added examples/cycle.pl
+    0.03    Corrected bug in trim
+
+2008-07-24
+    0.02    correction to SYNOPSIS
+    0.01    first public release

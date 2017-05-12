@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name:               SQLite-More
+version:            0.10
+abstract:           Add more SQL functions to SQLite in Perl - some of those found in Oracle and others
+author:
+    - Kjetil Skotheim <kjetilskotheim@gmail.com>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:         0.01
+    DBD::SQLite:  1.27
+    DBI:          1.609
+    Digest::MD5:  0.01
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

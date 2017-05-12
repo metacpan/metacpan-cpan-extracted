@@ -1,0 +1,25 @@
+# Test adding and removing the same status
+template: update-domain.tt
+
+vars:
+  domain: cheese.co.te
+  status_list: 
+    - name: clientHold
+      value: Payment overdue.
+  status_list_old:
+    - name: clientHold
+
+input_assertions:
+  class: SRS::EPP::Command::Update::Domain
+
+SRS:
+
+output_assertions:
+  count:
+    - [ '//epp:result', 1, 'SRS: Check for one result' ]
+  match:
+    - [ '//epp:value', 'clientHold', 'EPP: prohibited status returned' ]
+    - [ '//epp:reason', 'Cannot add and remove the same status', 'EPP: reason returned' ]
+  match_all:
+  attr_is:
+    - [ '//epp:result', 'code', 2002, 'SRS: Check for correct result code' ]

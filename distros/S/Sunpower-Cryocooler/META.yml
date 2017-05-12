@@ -1,0 +1,21 @@
+--- #YAML:1.0
+name:               Sunpower-Cryocooler
+version:            0.1.5
+abstract:           a module for interfacing with Sunpower Cryocoolers 
+author:
+    - Sam Kerr <kerr@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Device::SerialPort:  0
+    Test::More:          0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

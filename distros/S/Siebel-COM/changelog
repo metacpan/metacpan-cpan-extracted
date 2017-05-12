@@ -1,0 +1,304 @@
+==================================================
+Changes from 2015-03-18 00:00:00 +0000 to present.
+==================================================
+
+----------------------------------------
+version 0.3 at 2016-03-17 19:30:11 +0000
+----------------------------------------
+
+  Change: 6db1e2ecd4e150ea45018b9d407d23613db306d2
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2016-03-17 16:02:09 +0000
+
+    Fixed Perl::Critic tests Went back to use physical files for
+    validating Pod Fixed minor warnings regarding Perl::Critic tests 
+
+  Change: 9beb237db57038791a7910d874e1d33d50c85e7e
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2016-03-17 12:03:27 +0000
+
+    Allowing tests to be properly executed Removed the usage of BAIL_OUT
+    since the other tests can be executed without a instance of
+    Win32::OLE objects Added more verbose information to help
+    troubleshooting missing DLLs registered 
+
+  Change: 9d38a176bdf1db838bf9ded85caa4f3b1a7a98ab
+  Author: Alceu Rodrigues de Freitas Junior <glasswalker@yahoo.com.br>
+  Date : 2016-03-16 17:33:10 +0000
+
+    Fixed details about Dist::Zilla 
+
+  Change: 92a663c41ed948b341a9f36e6267aeca0a5d9f7a
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2016-03-16 15:44:39 +0000
+
+    Migrated distribution from Makefile.PL to Dist::Zilla Implemented
+    some news things to improve Kwalitee 
+
+  Change: effee9186fd3011683c68429bcf38b41c0e3afe0
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2015-03-26 00:18:05 +0000
+
+    Moving the distribution to Siebel GNU Tools project 
+
+  Change: d9ac560a14ba681bda3d52779664833510356f4e
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2015-03-20 22:33:01 +0000
+
+    Create README.md 
+
+  Change: fdbe9d8328cd1f131bc853a67c0f2d1d3e515cac
+  Author: alceu.freitas.jr
+  <alceu.freitas.jr@216e0bc1-3962-c2de-828c-cd1015cef062>
+  Date : 2013-04-30 09:33:40 +0000
+
+
+
+  Change: da257c3c851dbd69c83f652092132f6c572c2145
+  Author: alceu.freitas.jr
+  <alceu.freitas.jr@216e0bc1-3962-c2de-828c-cd1015cef062>
+  Date : 2013-04-29 04:47:37 +0000
+
+    removed dependency from Linux::Distribution 
+
+  Change: a07c45d2e5edd0631f4afdbae516609c01a7e266
+  Author: alceu.freitas.jr
+  <alceu.freitas.jr@216e0bc1-3962-c2de-828c-cd1015cef062>
+  Date : 2013-04-29 04:43:00 +0000
+
+    fixed bugs regarding wrong message returned when OS is not supported
+    copied Linux::Distribution inside since the distribution cannot be
+    installed in non-Linux OS 
+
+  Change: b9f8f88aeea2bc91a49c70c73a00001b55fc77f7
+  Author: alceu.freitas.jr
+  <alceu.freitas.jr@216e0bc1-3962-c2de-828c-cd1015cef062>
+  Date : 2013-04-26 02:45:04 +0000
+
+    fixed Pod 
+
+  Change: 1de510f6eae895e68860ee23f6d636fc40dcc7b3
+  Author: alceu.freitas.jr
+  <alceu.freitas.jr@216e0bc1-3962-c2de-828c-cd1015cef062>
+  Date : 2013-04-23 13:08:35 +0000
+
+    Added usage of Linux::Distribution to check distributions that
+    supports Siebel CRM 
+
+  Change: 626371a634befd140d99b305400bea7ce574fa59
+  Author: alceu.freitas.jr
+  <alceu.freitas.jr@216e0bc1-3962-c2de-828c-cd1015cef062>
+  Date : 2013-04-19 13:11:32 +0000
+
+    fixed minor bug regarding missing an argument to die_unsupported sub 
+
+  Change: 806a6d4939661bd39964113cccc34705d40dada5
+  Author: alceu.freitas.jr
+  <alceu.freitas.jr@216e0bc1-3962-c2de-828c-cd1015cef062>
+  Date : 2013-03-26 23:27:03 +0000
+
+    fixed bugs 
+
+  Change: c59470c544681bdf9351d0e692c28082d9e3bdd1
+  Author: alceu.freitas.jr
+  <alceu.freitas.jr@216e0bc1-3962-c2de-828c-cd1015cef062>
+  Date : 2013-03-14 20:36:05 +0000
+
+    fixed POD errors minor bug fixes added license added additional tests
+    for Siebel/COM/App/DataControl 
+
+  Change: 7b32521fe4007083202e788f921c4c3e15a9a481
+  Author: alceu.freitas.jr
+  <alceu.freitas.jr@216e0bc1-3962-c2de-828c-cd1015cef062>
+  Date : 2013-03-13 21:42:00 +0000
+
+    fixed minor bug in Siebel-COM/lib/Siebel/COM/Exception/DataServer.pm
+    added license adding more tests 
+
+  Change: 07ec516178ad204ca6852788360ce1becb48fa1c
+  Author: alceu.freitas.jr
+  <alceu.freitas.jr@216e0bc1-3962-c2de-828c-cd1015cef062>
+  Date : 2013-03-13 20:13:09 +0000
+
+    removing MANIFEST from source control since a new one is created by
+    demand 
+
+  Change: 9b58d7c4811bb05c7b88d4a96d0b9a054ca4fc8a
+  Author: alceu.freitas.jr
+  <alceu.freitas.jr@216e0bc1-3962-c2de-828c-cd1015cef062>
+  Date : 2013-03-13 20:11:22 +0000
+
+    minor bug regarding undefined $os 
+
+  Change: 69c2fb6ece31f43a33dd09564a7f9ddfa028fc3b
+  Author: alceu.freitas.jr
+  <alceu.freitas.jr@216e0bc1-3962-c2de-828c-cd1015cef062>
+  Date : 2013-03-13 19:58:20 +0000
+
+    added more tests fixed issue regarding using Devel::AssertOS (now the
+    functions of it were copied and modified) added more information
+    about license 
+
+  Change: f3d6439da3e332487837ca76c78458c263e65ccc
+  Author: alceu.freitas.jr
+  <alceu.freitas.jr@216e0bc1-3962-c2de-828c-cd1015cef062>
+  Date : 2013-03-11 21:32:25 +0000
+
+    fixed Makefile.PL to run with perl versions equal or higher than 5.10 
+
+  Change: 8554cb5e6c830322575b66fab9c25db0502931b6
+  Author: alceu.freitas.jr
+  <alceu.freitas.jr@216e0bc1-3962-c2de-828c-cd1015cef062>
+  Date : 2013-03-08 18:26:40 +0000
+
+    removed unwanted dependencies from Makefile.PL new distribution
+    Siebel-AssertOS Siebel-COM now uses Siebel-AssertOS for checking
+    supported plataforms 
+
+  Change: 8148e3b42645a5608bf26b82e56067cc814b69b2
+  Author: alceu.freitas.jr
+  <alceu.freitas.jr@216e0bc1-3962-c2de-828c-cd1015cef062>
+  Date : 2013-03-07 22:05:30 +0000
+
+    -fixed bug with Siebel/COM.pm -added a new method to
+    Siebel/COM/Business/Component.pm (untested) 
+
+  Change: 768fdd3af3414588e1adf0561ddd40a3f7718247
+  Author: alceu.freitas.jr
+  <alceu.freitas.jr@216e0bc1-3962-c2de-828c-cd1015cef062>
+  Date : 2013-02-22 19:37:09 +0000
+
+    added useful information to README and fixed the copyright at
+    lib/Siebel/COM.pm 
+
+  Change: 42b68ca4a86976d5173cf98434242fa5122b3141
+  Author: alceu.freitas.jr
+  <alceu.freitas.jr@216e0bc1-3962-c2de-828c-cd1015cef062>
+  Date : 2013-02-21 20:31:19 +0000
+
+    fixed bug 
+
+  Change: dce12c9507dac076d94bec6545d92f00fe6a1642
+  Author: alceu.freitas.jr
+  <alceu.freitas.jr@216e0bc1-3962-c2de-828c-cd1015cef062>
+  Date : 2013-02-20 19:19:57 +0000
+
+    added more POD finished adding basic tests 
+
+  Change: c3ed4f0520f4f428bdebf817854a9354a8d84752
+  Author: alceu.freitas.jr
+  <alceu.freitas.jr@216e0bc1-3962-c2de-828c-cd1015cef062>
+  Date : 2013-02-19 23:02:25 +0000
+
+    added POD to all packages 
+
+  Change: 30bfc27b3e2afab87da7101dd3d2f885f1ddcfa9
+  Author: alceu.freitas.jr
+  <alceu.freitas.jr@216e0bc1-3962-c2de-828c-cd1015cef062>
+  Date : 2013-02-18 20:31:16 +0000
+
+    added verification of Siebel DLL to avoid testing at all changed
+    BUILD_REQUIRES to TEST_REQUIRES 
+
+  Change: dcc1dc08fbf2acde7c36744b73d112ce3dc52dff
+  Author: alceu.freitas.jr
+  <alceu.freitas.jr@216e0bc1-3962-c2de-828c-cd1015cef062>
+  Date : 2013-02-13 21:47:19 +0000
+
+    fixed the tests fixed a bug at
+    Siebel/COM/Business/Component/DataServer.pm added OS assertion to the
+    distribution 
+
+  Change: a464995c305d6500bd73a489285943984e8fde6a
+  Author: alceu.freitas.jr
+  <alceu.freitas.jr@216e0bc1-3962-c2de-828c-cd1015cef062>
+  Date : 2013-02-10 21:48:38 +0000
+
+    minor changes regarding good practices added more constants implement
+    correct connect string for Siebel::COM::App::DataControl 
+
+  Change: cd2b91f4e826bdcc9c9efcd1d756e6583dc09e9f
+  Author: alceu.freitas.jr
+  <alceu.freitas.jr@216e0bc1-3962-c2de-828c-cd1015cef062>
+  Date : 2013-02-07 20:55:44 +0000
+
+    -more bugs fixes -added some more methods to
+    Siebel-COM/lib/Siebel/COM/Business/Component.pm and
+    Siebel-COM/lib/Siebel/COM/Business/Component/DataServer.pm 
+
+  Change: e0ddc0410af7b07c592c3a472e70d797ef2a0987
+  Author: alceu.freitas.jr
+  <alceu.freitas.jr@216e0bc1-3962-c2de-828c-cd1015cef062>
+  Date : 2013-02-06 19:08:27 +0000
+
+    finished previous changes, fixed some bugs now
+    Siebel/COM/App/DataControl.pm seems to be working fine with
+    exceptions 
+
+  Change: 75c7987f8befcb6d2263a603969a2c4b01b41b7e
+  Author: alceu.freitas.jr
+  <alceu.freitas.jr@216e0bc1-3962-c2de-828c-cd1015cef062>
+  Date : 2013-02-05 22:15:17 +0000
+
+    several important changes regarding subclasses and error checking
+    depending on the type of a Siebel::COM::App:
+    Siebel::COM::App::DataServer based objects must use the new role
+    Siebel::COM::Exception::DataServer and use around method modifiers in
+    all methods that need to use return codes for checking on exceptions 
+
+  Change: 39ee52ed83111a42bbc0b9d997621d337acb02bc
+  Author: alceu.freitas.jr@gmail.com
+  <alceu.freitas.jr@gmail.com@216e0bc1-3962-c2de-828c-cd1015cef062>
+  Date : 2013-01-31 23:03:54 +0000
+
+    initial tests creation 
+
+  Change: 842ee8fdea2c0015f3a81794dd39d932117e0306
+  Author: alceu.freitas.jr@gmail.com
+  <alceu.freitas.jr@gmail.com@216e0bc1-3962-c2de-828c-cd1015cef062>
+  Date : 2013-01-28 20:20:13 +0000
+
+    -improve exception treatment by not trying to execute LogOff if an
+    exception happened with a Siebel::COM::App subclass - now
+    Siebel::COM::App will raise COM exceptions with a exception happens
+    inside the Siebel application - overrided the Siebel::COM check_error
+    methods in Siebel::COM::App 
+
+  Change: 896a42516fcb02af75577da75a826bd7fd207ee1
+  Author: alceu.freitas.jr@gmail.com
+  <alceu.freitas.jr@gmail.com@216e0bc1-3962-c2de-828c-cd1015cef062>
+  Date : 2013-01-28 10:05:53 +0000
+
+    added another way for checking errors 
+
+  Change: 5d86aecdebfc1a3d18dbed60db4a9b8086da79c2
+  Author: alceu.freitas.jr@gmail.com
+  <alceu.freitas.jr@gmail.com@216e0bc1-3962-c2de-828c-cd1015cef062>
+  Date : 2013-01-26 10:04:17 +0000
+
+    small bugs fixes 
+
+  Change: e9a71b1b8c62e92c21b1d6a6b1bc60136d7f28ee
+  Author: alceu.freitas.jr@gmail.com
+  <alceu.freitas.jr@gmail.com@216e0bc1-3962-c2de-828c-cd1015cef062>
+  Date : 2013-01-26 00:19:01 +0000
+
+    added example of usage 
+
+  Change: 4ece3f481dc3508d7de8804667478da86ebf7a50
+  Author: alceu.freitas.jr@gmail.com
+  <alceu.freitas.jr@gmail.com@216e0bc1-3962-c2de-828c-cd1015cef062>
+  Date : 2013-01-17 15:25:53 +0000
+
+    first working release 
+
+  Change: d1501bafd7a2fb9c29e8aea2b20ea6e9125849ef
+  Author: alceu.freitas.jr@gmail.com
+  <alceu.freitas.jr@gmail.com@216e0bc1-3962-c2de-828c-cd1015cef062>
+  Date : 2013-01-13 19:09:01 +0000
+
+    initial release 
+
+================
+End of releases.
+================

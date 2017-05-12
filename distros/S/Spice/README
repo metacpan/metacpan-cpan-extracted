@@ -1,0 +1,63 @@
+            Copyright (c) 2000 Rohit Sharma. All rights reserved.
+        This program is free software; you can redistribute it and/or
+              modify it under the same terms as Perl itself.
+
+WHAT IS THIS?
+spice.pm, an easy-to-use Perl5 library for parsing spice netlist.
+
+WHAT IS SPICE
+Spice is a circuit level design format/language for describing VLSI
+designs at transistr level.
+
+TRAGATED AUDIANCE
+CAD persons and VLSI designers.
+
+APPLICATIONS
+   This release
+      o Extracting the hierarchy.
+      o Traversing the netlist.
+      o Creating html document for an easy naviagation of netlist.
+      o any other appication, which requires netlist specific information.
+
+   Future release
+   Current version does not support more than one netlist open at a time.
+   Future version, (Object Oriented Design) shall support this feature. It
+   can help developing the following applications-
+      o Comparing two spice netlists.
+      o extracting the netlist difference.
+
+INSTALLATION
+To install this module, cd to the directory that contains this README
+file and type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If this doesn't work for you, try:
+
+   cp spice.pm /usr/local/lib/perl5
+
+If you have trouble installing spice.pm because you have insufficient
+access privileges to add to the perl library directory, you can still
+use spice.pm. Add the following lines in your script-
+
+$path2spice = "absolute_path_2_spice.pm_file" ;
+BEGIN {push @INC, "$path2spice" ; }
+
+If evrything fails, please contact me at srohit@cpan.org.
+
+DOCUMENTATION
+Type "perldoc spice" for a detailed documentation on the usage and other
+internals.
+
+EXAMPLES
+Please see perl scripts files under examples/ directory.
+
+TODO
+   o Convert module design to OO style.
+   o Build some more interface methods. Need feedback from the audiances.
+
+Rohit Sharma
+srohit@cpan.org

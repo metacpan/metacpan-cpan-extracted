@@ -1,0 +1,41 @@
+---
+abstract: 'SMS::Send SMSGlobal.com Driver'
+author:
+  - 'David Warring, C<< <david.warring at gmail.com> >>'
+  - 'David Warrring <david.warring@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  HTTP::Response: 0
+  Test::Fatal: 0
+  Test::MockObject: 0
+  Test::More: 0
+  Test::NoWarnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: SMS::Send::SMSGlobal::HTTP
+name: SMS-Send-SMSGlobal-HTTP
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Class::Accessor: 0
+  HTTP::Request::Common: 0
+  LWP::UserAgent: 0
+  SMS::Send::Driver: 0
+  Scalar::Util: 0
+  Try::Tiny: 0
+  fields: 0
+  parent: 0
+  perl: 5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/dwarring/SMS-Send-SMSGlobal-HTTP.git
+version: 0.12

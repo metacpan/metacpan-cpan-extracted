@@ -1,0 +1,22 @@
+<& /lib/forms/user.mas, user => $user, action => $action &>
+
+<%args>
+$user
+$wiki => undef
+</%args>
+
+<%init>
+my $action = $wiki ? $wiki->uri( view => 'user/' . $user->user_id() ) : $user->uri();
+</%init>
+
+<%attr>
+show_title => 0
+sidebar => []
+</%attr>
+
+<%method title>
+<% loc( 'Preferences for %1', $user->best_name() ) %>
+<%args>
+$user
+</%args>
+</%method>

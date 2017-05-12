@@ -1,0 +1,50 @@
+{
+   "abstract" : "set operations for functional programming",
+   "author" : [
+      "Aaron Cohen <aarondcohen@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Set-Functional",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/aarondcohen/Set-Functional/issues"
+      },
+      "homepage" : "http://github.com/aarondcohen/Set-Functional",
+      "repository" : {
+         "url" : "git://github.com/aarondcohen/Set-Functional.git"
+      }
+   },
+   "version" : "1.04"
+}

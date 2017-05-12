@@ -1,0 +1,29 @@
+---
+abstract: 'multi-connection sniffer driver'
+author:
+  - 'Max Maischein <corion@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Sniffer-HTTP
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Class::Accessor: '0'
+  Class::Data::Inheritable: '0'
+  Exporter: '5.5'
+  HTTP::Request: '0'
+  LWP::Simple: '0'
+  Net::Pcap: '0.09'
+  NetPacket::TCP: '0'
+version: '0.24'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

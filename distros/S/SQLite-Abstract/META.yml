@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         SQLite-Abstract
+version:      0.14
+version_from: lib/SQLite/Abstract.pm
+installdirs:  site
+requires:
+    DBD::SQLite2:                  0.01
+    DBI:                           1.48
+    Test::More:                    0.01
+    Test::Simple:                  0.44
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

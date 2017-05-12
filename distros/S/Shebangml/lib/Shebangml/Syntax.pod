@@ -1,0 +1,52 @@
+=pod
+
+=head1 NAME
+
+Shebangml/Syntax.pod - about the #!ml syntax
+
+=head1 Basics
+
+Shebangml is a human-writable syntax for xml.  Unlike YAML, HAML, and
+various other shorthands, it directly expresses the xml structure (nodes
+have attributes and/or content), 
+
+  node{The content goes here}
+
+  node[with="just attributes"]
+
+  node[with=attribute]{and content!}
+
+The syntax is just that, and not much more.
+
+=head1 Shortcuts
+
+As you may have noticed, attributes do not need to be quoted if they
+have no spaces or special characters.
+
+=head2 Entities
+
+  '\n;' => '<br/>'
+
+=head2 Attributes
+
+These commonly used attributes may be shortened as long as the value is
+a simple string and all shortcuts occur before any full attributes.
+
+  '=foo' => 'id="foo"'
+  ':foo' => 'name="foo"'
+  '@foo' => 'class="foo"'
+
+=head1 Verbatim Quoting
+
+The content of an element surrounded with {{{ and }}} will be passed
+through without parsing.  This can be done on a single line or as
+start/end tokens for a multiline block.
+
+  whatever{{{ no parsing in{here} at all }}}
+
+  whatever{{{
+    Or some multiline thing, but you have to stop this section at the
+    beginning of the line.
+  }}}
+
+=cut

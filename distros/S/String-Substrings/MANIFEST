@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+Substrings.pm
+t/1.t
+t/all_substrings.t
+t/wrong_parameters.t

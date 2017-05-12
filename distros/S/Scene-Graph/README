@@ -1,0 +1,41 @@
+NAME
+
+Scene::Graph - A Two-Dimensional Scene Graph
+
+DESCRIPTION
+
+This is a pure-perl implementation of scene graph.
+It allows the creation of scenes of nodes with translations.  The scene may
+then be traversed using Scene::Graph::Traverser.  It allows iteration over
+a flat array of cloned nodes with all applicable transformations applied.
+
+SYNOPSIS
+
+    use Scene::Graph::Node;
+    use Scene::Graph::Traverser;
+
+    my $box = Scene::Graph::Node->new;
+
+    my $thing1 = Scene::Graph::Node->new;
+    my $thing2 = Scene::Graph::Node->new;
+    $box->add_child($thing1);
+    $box->add_child($thing2);
+
+    my $traverser = Scene::Graph::Traverser->new(scene => $thing);
+    while(my $node = $traverser->next) {
+        # 1st is box, then thing1 and finally thing2
+    }
+
+AUTHOR
+
+Cory G Watson, C<< <gphat at cpan.org> >>
+
+COPYRIGHT & LICENSE
+
+Copyright 2010 Cold Hard Code, LLC.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.

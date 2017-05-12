@@ -1,0 +1,33 @@
+---
+abstract: 'Perl JSON Web Encryption (JWE) implementation'
+author:
+  - 'Companies House <chgovuk@cpan.org>'
+build_requires:
+  Module::Build: '0.3601'
+configure_requires:
+  Module::Build: '0.3601'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Security-JWE
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Crypt::CBC: '0'
+  JSON: '0'
+  Moose: '0'
+  Try::Tiny: '0'
+resources:
+  bugtracker: https://github.com/companieshouse/Security-JWE/issues
+  homepage: https://github.com/companieshouse/Security-JWE
+  repository: https://github.com/companieshouse/Security-JWE.git
+version: '0.04'

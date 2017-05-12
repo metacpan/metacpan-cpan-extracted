@@ -1,0 +1,27 @@
+Set-Product
+===========
+
+This module generates the cartesian product of a list of sets.
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Scalar::Util
+    Test::More
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2015 by gray <gray@cpan.org>
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

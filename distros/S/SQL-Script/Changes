@@ -1,0 +1,22 @@
+Changes for Perl extension SQL-Script
+
+1.06 Mon 12 Oct 2009
+	- Add support for providing the statements to the constructor
+	- Updating to Module::Install 0.91
+
+1.05 Thu  5 Jun 2008
+	- No functional changes
+	- Updating to Module::Install 0.75
+
+0.04 Mon 10 Sep 2006
+	- Do some trimming and filtering to remove useless stuff
+
+0.03 Mon 10 Sep 2007
+        - Adding the ->run method
+       
+0.02 Wed  5 Sep 2007
+	- Added a proper test for ->read
+	- Fixed a rather obvious bug in ->read
+
+0.01 Wed  5 Sep 2007
+	- Created initial (simplistic) version

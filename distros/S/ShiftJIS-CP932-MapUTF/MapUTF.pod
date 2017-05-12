@@ -1,0 +1,291 @@
+
+=head1 NAME
+
+ShiftJIS::CP932::MapUTF - transcode between Microsoft CP932 and Unicode
+
+=head1 SYNOPSIS
+
+    use ShiftJIS::CP932::MapUTF qw(:all);
+
+    $utf8_string  = cp932_to_utf8($cp932_string);
+    $cp932_string = utf8_to_cp932($utf8_string);
+
+=head1 DESCRIPTION
+
+The table of Microsoft Windows CodePage 932 (CP-932) comprises 7915 characters:
+
+    JIS X 0201 single-byte characters (191 characters),
+    JIS X 0208 double-byte characters (6879 characters),
+    NEC special characters (83 characters, row 13),
+    NEC-selected IBM extended characters (374 characters, rows 89..92),
+    and IBM extended characters (388 characters, rows 115..119).
+
+This table includes duplicates that do not round trip
+map. These duplicates are due to the characters defined
+by vendors, NEC and IBM.
+For example, there are two characters
+that are mapped to C<U+2252> in Unicode;
+i.e., C<0x81e0> (a JIS X 0208 character)
+and C<0x8790> (an NEC special character).
+
+Actually, 7915 characters in CP-932 must be
+mapped to 7517 characters in Unicode.
+There are 398 non-round-trip mappings.
+
+This module provides some functions to convert properly
+from CP-932 to Unicode, and vice versa.
+
+=head2 Transcoding from CP-932 to Unicode
+
+If the first parameter is a reference,
+that is used for coping with CP-932 characters
+unmapped to Unicode, C<SJIS_CALLBACK>.
+(any reference will not allowed as C<STRING>.)
+
+If C<SJIS_CALLBACK> is given, C<STRING> is
+the second parameter; otherwise the first.
+
+If C<SJIS_CALLBACK> is not specified,
+CP-932 characters unmapped to Unicode are silently deleted
+and partial bytes are skipped by one byte.
+(as if a coderef constantly returning null string, C<sub {''}>,
+is passed as C<SJIS_CALLBACK>.)
+
+Currently, only coderefs are allowed as C<SJIS_CALLBACK>.
+A string returned from C<SJIS_CALLBACK> is inserted
+in place of the unmapped character.
+
+A coderef as C<SJIS_CALLBACK> is called with one or more arguments.
+If the unmapped character is a partial double-byte character
+(i.e. a string with onebyte length of leading byte),
+the first argument is C<undef>
+and the second argument is an unsigned integer representing the byte.
+If the unmapped character is not partial, the first argument is
+a defined string representing a character.
+
+By default, a partial double-byte character may appear
+only at the end of C<STRING>; does not in the beginning
+nor in the middle (see also 't' of C<SJIS_OPTION>).
+
+Example
+
+    my $sjis_callback = sub {
+        my ($char, $byte) = @_;
+        return function($char) if defined $char;
+        die sprintf "found partial byte 0x%02x", $byte;
+    };
+
+In the example above, C<$char> may be one of
+C<"\x80">, C<"\x82\xf2">, C<"\xfc\xfc">, C<"\xff">.
+
+The return value of C<SJIS_CALLBACK> must be legal in the target format.
+E.g. never use with C<cp932_to_utf16be()> a callback that returns UTF-8.
+I.e. you should prepare C<SJIS_CALLBACK> for each UTF.
+
+C<SJIS_OPTION> may be specified after C<STRING>. They can be combined
+like C<'tg'> and C<'gst'> (the order does not matter).
+
+    'g'    add mappings of Gaiji (user defined characters)
+           [0xF040 to 0xF9FC (rows 95 to 114) in CP-932]
+           to Unicode's PUA [0xE000 to 0xE757] (1880 characters).
+
+    's'    add mappings of undefined Single-byte characters:
+           0x80 => U+0080,  0xA0 => U+F8F0,
+           0xFD => U+F8F1,  0xFE => U+F8F2,  0xFF => U+F8F3.
+
+    't'    check the Trailing byte range [0x40..0x7E, 0x80..0xFC].
+           E.g. "\x81\x39" is regarded as an undefined double-byte character
+           by default; with 't', it is a partial character byte 0x81
+           followed by a single-byte character "\x39".
+
+=over 4
+
+=item C<cp932_to_utf8([SJIS_CALLBACK,] STRING [, SJIS_OPTION])>
+
+Converts CP-932 to UTF-8.
+
+=item C<cp932_to_unicode([SJIS_CALLBACK,] STRING [, SJIS_OPTION])>
+
+Converts CP-932 to Unicode.
+(Perl's internal format, flagged with C<SVf_UTF8>,
+see F<perlunicode>)
+
+B<This function is provided only for Perl 5.6.1 or later, and via XS.>
+
+=item C<cp932_to_utf16le([SJIS_CALLBACK,] STRING [, SJIS_OPTION])>
+
+Converts CP-932 to UTF-16LE.
+
+=item C<cp932_to_utf16be([SJIS_CALLBACK,] STRING [, SJIS_OPTION])>
+
+Converts CP-932 to UTF-16BE.
+
+=item C<cp932_to_utf32le([SJIS_CALLBACK,] STRING [, SJIS_OPTION])>
+
+Converts CP-932 to UTF-32LE.
+
+=item C<cp932_to_utf32be([SJIS_CALLBACK,] STRING [, SJIS_OPTION])>
+
+Converts CP-932 to UTF-32BE.
+
+=back
+
+=head2 Transcoding from Unicode to CP-932
+
+Any duplicates are converted according to Microsoft PRB Q170559.
+E.g. C<U+2252> is converted to C<"\x81\xE0">, not to C<"\x87\x90">.
+
+If the first parameter is a reference,
+that is used for coping with Unicode characters
+unmapped to CP-932, C<UNICODE_CALLBACK>.
+(any reference will not allowed as C<STRING>.)
+
+If C<UNICODE_CALLBACK> is given, C<STRING> is
+the second parameter; otherwise the first.
+
+If C<UNICODE_CALLBACK> is not specified,
+CP-932 characters unmapped to Unicode are silently deleted
+and partial bytes are skipped by one byte.
+(as if a coderef constantly returning null string, C<sub {''}>
+is passed as C<UNICODE_CALLBACK>.)
+
+Currently, only coderefs are allowed as C<UNICODE_CALLBACK>.
+A string returned from the coderef is inserted
+in place of the unmapped character.
+
+A coderef as C<UNICODE_CALLBACK> is called with one or more arguments.
+If the unmapped character is a partial character (an illegal byte),
+the first argument is C<undef>
+and the second argument is an unsigned integer representing the byte.
+If not partial, the first argument is an unsigned interger
+representing a Unicode code point.
+
+For example, characters unmapped to CP-932 are
+converted to numerical character references for HTML 4.01.
+
+    sub toHexNCR {
+        my ($char, $byte) = @_;
+        return sprintf("&#x%x;", $char) if defined $char;
+        die sprintf "illegal byte 0x%02x was found", $byte;
+    }
+
+    $cp932 = utf8_to_cp932   (\&toHexNCR, $utf8_string);
+    $cp932 = unicode_to_cp932(\&toHexNCR, $unicode_string);
+    $cp932 = utf16le_to_cp932(\&toHexNCR, $utf16le_string);
+
+The return value of C<UNICODE_CALLBACK> must be legal in CP-932.
+
+C<UNICODE_OPTION> may be specified after C<STRING>. They can be combined
+like C<'fg'> and C<'gsf'> (the order does not matter).
+
+    'g'    add mappings of Gaiji (user defined characters)
+           [0xF040 to 0xF9FC (rows 95 to 114) in CP-932]
+           from Unicode's PUA [0xE000 to 0xE757] (1880 characters).
+
+    's'    add mappings of undefined Single-byte characters:
+           U+0080 => 0x80,  U+F8F0 => 0xA0,
+           U+F8F1 => 0xFD,  U+F8F2 => 0xFE,  U+F8F3 => 0xFF.
+
+    'f'    add some Fallback mappings from Unicode to CP-932.
+           The characters additionally mapped are
+           some characters in latin-1 region [U+00A0..U+00FF], and
+           HIRAGANA LETTER VU [U+3094, to KATAKANA LETTER VU, 0x8394].
+
+=over 4
+
+=item C<utf8_to_cp932([UNICODE_CALLBACK,] STRING [, UNICODE_OPTION])>
+
+Converts UTF-8 to CP-932.
+
+=item C<unicode_to_cp932([UNICODE_CALLBACK,] STRING [, UNICODE_OPTION])>
+
+Converts Unicode to CP-932.
+
+This B<Unicode> is coded in the Perl's internal format (see F<perlunicode>).
+If not flagged with C<SVf_UTF8>, upgraded as an ISO 8859-1 (latin1) string.
+
+B<This function is provided only for Perl 5.6.1 or later, and via XS.>
+
+=item C<utf16_to_cp932([UNICODE_CALLBACK,] STRING [, UNICODE_OPTION])>
+
+Converts UTF-16 (with or w/o C<BOM>) to CP-932.
+
+=item C<utf16le_to_cp932([UNICODE_CALLBACK,] STRING [, UNICODE_OPTION])>
+
+Converts UTF-16LE to CP-932.
+
+=item C<utf16be_to_cp932([UNICODE_CALLBACK,] STRING [, UNICODE_OPTION])>
+
+Converts UTF-16BE to CP-932.
+
+=item C<utf32_to_cp932([UNICODE_CALLBACK,] STRING [, UNICODE_OPTION])>
+
+Converts UTF-32 (with or w/o C<BOM>) to CP-932.
+
+=item C<utf32le_to_cp932([UNICODE_CALLBACK,] STRING [, UNICODE_OPTION])>
+
+Converts UTF-32LE to CP-932.
+
+=item C<utf32be_to_cp932([UNICODE_CALLBACK,] STRING [, UNICODE_OPTION])>
+
+Converts UTF-32BE to CP-932.
+
+=back
+
+=head2 Export
+
+B<By default:>
+
+    cp932_to_utf8     utf8_to_cp932
+    cp932_to_utf16le  utf16le_to_cp932
+    cp932_to_utf16be  utf16be_to_cp932
+
+    cp932_to_unicode  unicode_to_cp932 (only for XS)
+
+B<On request:>
+
+    cp932_to_utf32le  utf32le_to_cp932
+    cp932_to_utf32be  utf32be_to_cp932
+                      utf16_to_cp932 [*]
+                      utf32_to_cp932 [*]
+
+[*] Their counterparts C<cp932_to_utf16()> and C<cp932_to_utf32()>
+are not implemented yet. They need more investigation
+on return values from C<SJIS_CALLBACK>...
+(concatenation needs recognition of and coping with C<BOM>)
+
+=head1 CAVEAT
+
+Pure Perl edition of this module doesn't understand
+any logically wide characters (see F<perlunicode>).
+Use C<utf8::decode>/C<utf8::encode> (see F<utf8>) on Perl 5.7 or later
+if necessary.
+
+=head1 AUTHOR
+
+SADAHIRO Tomoyuki <SADAHIRO@cpan.org>
+
+Copyright(C) 2001-2007, SADAHIRO Tomoyuki. Japan. All rights reserved.
+
+This module is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item Microsoft PRB, Article ID: Q170559
+
+Conversion Problem Between Shift-JIS and Unicode
+
+=item cp932 to Unicode table
+
+http://www.unicode.org/Public/MAPPINGS/VENDORS/MICSFT/WINDOWS/CP932.TXT
+
+http://www.unicode.org/Public/MAPPINGS/VENDORS/MICSFT/WindowsBestFit/bestfit932.txt
+
+http://www.microsoft.com/globaldev/reference/dbcs/932.htm
+
+=back
+
+=cut

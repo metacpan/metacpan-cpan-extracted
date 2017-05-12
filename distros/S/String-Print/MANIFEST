@@ -1,0 +1,16 @@
+ChangeLog
+MANIFEST
+Makefile.PL
+README
+lib/String/Print.pm
+lib/String/Print.pod
+t/00use.t
+t/10serial.t
+t/11modif.t
+t/20prewrite.t
+t/30examp_oo.t
+t/31examp_fun.t
+t/40utf8.t
+xt/99pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,24 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+L<Simple::Html> make simple html, without install Template 
+
+=head1 FUNCTION
+
+=head2  make_html_table
+
+    my  $head = [ 'col_a', 'col_b', 'col_c' ];
+    my  $data =  [ [ 1, 2, 3 ], [ 4, 5, 6 ] ];
+    my  $html_table = make_html_table($head, $data);
+
+=head2  make_html
+    
+    my $html_body = '<div> ....</div>';
+    my $html = make_html($html_body, 
+            # css => 'body { ... } ', 
+            );
+
+=cut

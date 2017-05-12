@@ -1,0 +1,126 @@
+#!/usr/bin/ruby
+
+#
+## The Ackermann function
+#
+
+func A({ .is_zero }, n) {
+    n + 1
+}
+
+func A(m, (0)) {
+    A(m-1, 1);
+}
+
+func A(m, n) {
+    A(m-1, A(m, n-1));
+}
+
+assert_eq(A(3, 2), 29);
+
+
+#
+## The Fibonacci Nth term
+#
+
+func fib(Number n { _ <= 1 } = 0) {
+    return n
+}
+
+func fib(n) {
+    fib(n-1) + fib(n-2)
+}
+
+assert_eq(fib(), 0);
+assert_eq(fib(12), 144);
+
+
+#
+## The Fibonacci Nth term (#2)
+#
+
+func fib2((0)) { 0 }
+func fib2((1)) { 1 }
+func fib2(n)   { __FUNC__(n-1) + __FUNC__(n-2) }
+
+assert_eq(fib2(12), 144);
+
+#
+## The Fibonacci Nth term (#3)
+#
+
+func fib3(Number n (0)) { n }
+func fib3(Number n (1)) { n }
+func fib3(Number n)   { fib3(n-1) + fib3(n-2) }
+
+assert_eq(fib3(12), 144);
+
+#
+## The Fibonacci Nth term (#4)
+#
+
+func fib4(Number n  {.is_zero}) { n }
+func fib4(Number n  {.is_one }) { n }
+func fib4(Number n) { fib4(n-1) + __FUNC__(n-2) }
+
+assert_eq(fib4(12), 144);
+
+#
+## The Fibonacci Nth term (#5)
+#
+
+func fib5(n (0))    { n }
+func fib5(n (1))    { n }
+func fib5(Number n) { __FUNC__(n-1) + fib5(n-2) }
+
+assert_eq(fib5(12), 144);
+
+#
+## The Fibonacci Nth term (#6)
+#
+
+func fib6(n < Number (0)) { n }
+func fib6(n < Number (1)) { n }
+func fib6(n < Number)     { fib6(n-1) + fib6(n-2) }
+
+assert_eq(fib6(12), 144);
+
+#
+## The Fibonacci Nth term (#7)
+#
+
+func fib7(n < Number {.is_zero}) { n }
+func fib7(n < Number {.is_one})  { n }
+func fib7(n < Number)            { fib7(n-1) + fib7(n-2) }
+
+assert_eq(fib7(12), 144);
+
+#
+## Slurpy variable with block
+#
+
+func f(a, *b { .all{ _ >= 0} }) {
+    a * b.sum
+}
+
+assert_eq(f(2, 3, 4, 5, 6), 36);
+
+#
+## Fizz-Buzz
+#
+
+func fizzbuzz({ _ %% 15 }) { "FizzBuzz" }
+func fizzbuzz({ _ %%  5 }) {     "Buzz" }
+func fizzbuzz({ _ %%  3 }) {     "Fizz" }
+func fizzbuzz(        n  ) {          n }
+
+assert_eq(fizzbuzz(3), 'Fizz');
+assert_eq(fizzbuzz(5), 'Buzz');
+assert_eq(fizzbuzz(15), 'FizzBuzz');
+assert_eq(fizzbuzz(12), 'Fizz');
+assert_eq(fizzbuzz(30), 'FizzBuzz');
+assert_eq(fizzbuzz(25), 'Buzz');
+assert_eq(fizzbuzz(41), 41);
+assert_eq(fizzbuzz(19), 19);
+
+say "** Test passed!";

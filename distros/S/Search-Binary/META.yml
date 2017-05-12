@@ -1,0 +1,33 @@
+---
+abstract: 'generic binary search (DEPRECATED)'
+author:
+  - 'Erik Rantapaa <rantapaa@uswest.net>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.96'
+  Test::Warnings: '0.012'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.92, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Search-Binary
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Exporter: '0'
+  lib: '0'
+  parent: '0'
+  perl: '5.006000'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Dist/Display.html?Name=Search-Binary
+  repository: git://github.com/Xaerxess/Search-Binary.git
+version: '0.99'

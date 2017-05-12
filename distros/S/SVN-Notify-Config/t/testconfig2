@@ -1,0 +1,26 @@
+#!/usr/bin/perl -MSVN::Notify::Config=$0
+--- #YAML:1.0
+'':
+  PATH: "/usr/local/bin:/usr/bin"
+'/project2/branches/branch1':
+  handler: Dummy
+  from: branch@example.com
+  to: branches@example.com,branch1@example.com
+'/project2/trunk':
+  handler: Dummy
+  user_domain: example.com
+  to: 
+    - trunk@example.com
+    - other@example.com
+  with_diff: 1
+'/project2/tags':
+  handler: Dummy
+  from: tags@example.com
+  to_regex_map: 
+    tags@example.com: PROD_
+  smtp: 127.0.0.1
+'/project2/':
+  handler: Dummy
+  from: tags@example.com
+  to: 
+    - projleader@example.com

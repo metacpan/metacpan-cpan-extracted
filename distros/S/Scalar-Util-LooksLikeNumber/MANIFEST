@@ -1,0 +1,11 @@
+Changes
+lib/Scalar/Util/LooksLikeNumber.pm
+LooksLikeNumber.xs
+Makefile.PL
+MANIFEST			This list of files
+multicall.h
+MYMETA.json
+MYMETA.yml
+ppport.h
+README
+t/lln.t

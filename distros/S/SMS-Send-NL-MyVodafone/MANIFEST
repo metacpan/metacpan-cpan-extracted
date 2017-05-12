@@ -1,0 +1,8 @@
+MANIFEST
+README
+LICENSE
+Changes
+Makefile.PL
+lib/SMS/Send/NL/MyVodafone.pm
+t/001_load.t
+META.yml                                 Module meta-data (added by MakeMaker)

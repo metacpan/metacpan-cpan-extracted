@@ -1,0 +1,16 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/String/EscapeCage.pm
+t/001_load.t
+t/002_caging.t
+t/003_escaping.t
+t/004_caveat.t
+t/005_re.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,45 @@
+#!/usr/bin/perl -w
+# $Id$
+# Copyright (C) 2006 by Martin Scharrer <martin@scharrer-online.de>
+# This is free software under the GPL.
+
+use strict;
+use SVN::Dumpfilter;
+
+my $dumpfile = shift @ARGV;
+my $outfile  = shift @ARGV;
+
+# Remap list 
+my %remap = (
+  'martin' => 'sepp',
+  'oldauthor2' => 'newauthor2',
+  'oldauthor3' => 'newauthor3',
+  # ...
+);
+
+sub remapauthors_filter (\%;$);
+
+Dumpfilter($dumpfile, $outfile, \&remapauthors_filter);
+exit(0);
+
+# Remaps authors
+sub remapauthors_filter (\%;$)
+ {
+   my $href = shift;
+   my $recalc = shift;
+   my $header = $href->{'header'};
+   my $prop   = $href->{'properties'};
+
+   # Only revisions, please
+   return unless (exists $header->{'Revision-number'});
+ 
+   if (exists $prop->{'svn:author'} && exists $remap{$prop->{'svn:author'}})
+    { $prop->{'svn:author'} = $remap{$prop->{'svn:author'}} }
+   
+   svn_recalc_prop_header(%$href);
+
+   if ($recalc)
+    { svn_recalc_textcontent_header(%$href) }
+ }
+
+__END__

@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<application>
+    <states>
+        <state name="home" controller="Solstice::Controller" />
+        <state name="work" controller="Solstice::Controller" />
+        <state name="school" controller="Solstice::Controller" />
+        <state name="add_workplace" controller="Solstice::Controller" />
+    </states>
+    <pageflows>
+        <pageflow name="Main" entrance="home">
+            <state name="home">
+                <transitions>
+                    <transition action="stay_home" state="home" />
+                    <transition action="go_to_work" state="work" onback="nope">
+                        <lifecycle name="update" />
+                    </transition>
+                    <transition action="go_to_school" state="school" />
+                    <begin action="add_workplace" pageflow="add_workplace" input="in" output="out" />
+                </transitions>
+            </state>
+            <state name="work">
+                <transitions>
+                    <transition action="go_home" state="home">
+                        <lifecycle name="revert" />
+                    </transition>
+                </transitions>
+                <failovers>
+                    <failover name="revert" state="school" />
+                </failovers>
+            </state>
+            <state name="school">
+                <transitions>
+                    <transition action="go_home" state="home" />
+                </transitions>
+            </state>
+        </pageflow>
+        <pageflow name="add_workplace" entrance="add_workplace">
+            <state name="add_workplace">
+                <transitions>
+                    <transition action="done" state="__exit__" />
+                </transitions>
+            </state>
+        </pageflow>
+    </pageflows>
+    <globaltransitions>
+    </globaltransitions>
+</application>

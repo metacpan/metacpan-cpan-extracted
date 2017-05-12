@@ -1,0 +1,16 @@
+Revision history for String-Stomp
+
+0.0102 2016-01-09T23:09:23Z UTC
+ [Documentation]
+ - Fixed a couple of typos and messed up pod.
+
+ [Requirements]
+ - Replaced Sub::Exporter::Progressive with Exporter.
+
+0.0101 2015-05-16T22:26:32Z CEST
+ [Requirements]
+ - Added missing test prereq (syntax)
+
+0.0100 2015-05-01T00:33:15Z CEST
+ - Initial release.
+

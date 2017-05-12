@@ -1,0 +1,4 @@
+test: harrison.ok
+
+harrison.ok:
+        { die "No, thanks" }

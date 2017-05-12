@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/Socket/Multicast6.pm
+lib/Socket/Multicast6.xs
+MANIFEST
+README
+t/00-Socket-Multicast.t
+t/10-socket-options.t
+t/20-pack-ip-mreq.t
+t/20-pack-ipv6-mreq.t
+t/30-pack-ip-mreq-source.t
+META.yml

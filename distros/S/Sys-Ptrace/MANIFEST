@@ -1,0 +1,10 @@
+CHANGES
+README
+MANIFEST
+Makefile.PL
+Ptrace.pm
+Ptrace.xs
+t/100_load.t
+t/110_constants.t
+t/200_strace.t
+META.yml                                 Module meta-data (added by MakeMaker)

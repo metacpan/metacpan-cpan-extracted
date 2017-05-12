@@ -1,0 +1,11 @@
+Revision history for Perl extension ShellQuote::Any
+
+0.03    Tue Aug 30 06:34:26 JST 2016
+        - fix test for Windows
+
+0.02    Sat Aug 27 13:37:32 JST 2016
+        - enhance POD
+        - fix regexp for detecting Windows OS
+
+0.01    Wed Aug 24 6:39:8 JST 2016
+        - original version

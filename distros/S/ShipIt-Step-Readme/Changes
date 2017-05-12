@@ -1,0 +1,9 @@
+0.03    2010-03-07
+        Added minimum versions to prerequisites 
+
+0.02    2010-03-07
+        Fixed logic bug, that recreates README only if INSTALL Pod doesn't exist
+        Added Pod DESCRIPTION and SYNOPSIS
+
+0.01    2010-03-05
+        Initial Implementation

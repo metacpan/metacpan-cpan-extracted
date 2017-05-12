@@ -1,0 +1,17 @@
+elements:
+    - name: title
+      label: Channel Title
+      attributes:
+        class: span7
+      constraints:
+        - type: Required
+          message: "Title of channel required"
+    - type: "+Strehler::FormFu::Element::Slug"
+    - name: description
+      label: Channel Description
+      attributes:
+        class: span7
+      constraints:
+        - type: Required
+          message: "Channel description required"
+

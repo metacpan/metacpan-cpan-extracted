@@ -1,0 +1,18 @@
+Revision history for String-Expand
+
+0.04    CHANGES:
+         * 'use warnings'
+         * Fixed a POD error
+         * Various small updates to keep CPANTS happy
+
+0.03    CHANGES:
+         * Declare build_requires Test::More for perl 5.6.1 compat.
+         * Create Makefile.PL out of Build.PL
+
+0.02    CHANGES:
+         * Switch to Module::Build
+         * Use Test::Exception
+         * Licencing updates
+
+0.01    First version, released on an unsuspecting world.
+

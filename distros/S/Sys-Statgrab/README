@@ -1,0 +1,31 @@
+Sys::Statgrab - Extension of Unix::Statgrab for greater portability.
+
+DESCRIPTION
+
+See "perldoc Sys::Statgrab" (or "perldoc Sys/Statgrab.pm") for details.
+
+
+PREREQUISITES
+
+Sys::Statgrab requires the following perl modules:
+
+- Unix::Statgrab
+
+Sys::Statgrab may require the following perl modules, depending on your platform:
+
+- Win32::Process:Info
+
+
+INSTALLING
+
+perl Makefile.PL
+make
+make test
+make install
+
+
+LICENSE
+
+This library is free software, you can distribute it under the same 
+terms as perl itself.
+

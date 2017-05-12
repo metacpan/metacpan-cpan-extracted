@@ -1,0 +1,7 @@
+# -*- mode: generic; -*-
+steps = FindVersion, ChangeVersion, CheckChangeLog, Manifest, DistTest, Commit, Tag, MakeDist, UploadCPAN, DistClean
+svn.tagpattern = release-%v
+
+# twitter.config   = ~/.twitterrc
+# twitter.distname = __Module-Name-Fixme__
+# twitter.message  = shipped %d %v - soon at %u

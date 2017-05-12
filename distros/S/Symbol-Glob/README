@@ -1,0 +1,33 @@
+Symbol-Glob version 0.01
+
+Symbol::Glob provides an easy interface to manipulate a
+glob. You can dynamically define or undefine symbols at any time.
+
+This is most commonly used to undefine a subroutine 
+at runtime.
+
+Suggested by Ovid; written as a learning exercise in 
+using Class::Std for a more adventurous class.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+
+DEPENDENCIES
+
+Class::Std, Class::Std::Utils.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005, Joe McMahon
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -1,0 +1,440 @@
+#!/bin/sh
+#
+#Fake sacctmgr show cluster results for testing
+#
+#Updated to handle preTRES (Slurm v 14.x.y) and postTRES (Slurm 15.x.y) data
+#USe env var FAKE_SLURM_VERSION to set this
+#Also accepts --version and format= arguments
+
+#Order of fields is now controllable via format option
+#Below is the default if no format given
+FORMAT_FIELDS="classification cluster controlhost controlport cpucount flags nodecount nodenames pluginidselect rpc"
+
+verbose_flag=
+
+print_version()
+{	version=$1
+	cat - <<EOF
+slurm $version
+EOF
+	exit 0
+}
+
+print_header()
+{
+	tmptext=
+	for fld in $FORMAT_FIELDS
+	do
+		case $fld in
+		#-----	Common stuff
+		    classification)
+			tmptext="${tmptext}Class"
+			;;
+		    cluster)
+			tmptext="${tmptext}Cluster"
+			;;
+		    controlhost)
+			tmptext="${tmptext}ControlHost"
+			;;
+		    controlport)
+			tmptext="${tmptext}ControlPort"
+			;;
+		    defaultqos)
+			tmptext="${tmptext}Def QOS"
+			;;
+		    fairshare)
+			tmptext="${tmptext}Share"
+			;;
+		    flags)
+			tmptext="${tmptext}Flags"
+			;;
+		    grpjobs)
+			tmptext="${tmptext}GrpJobs"
+			;;
+		    grpsubmitjobs)
+			tmptext="${tmptext}GrpSubmit"
+			;;
+		    maxjobs)
+			tmptext="${tmptext}MaxJobs"
+			;;
+		    maxsubmitjobs)
+			tmptext="${tmptext}MaxSubmit"
+			;;
+		    maxwall)
+			tmptext="${tmptext}MaxWall"
+			;;
+		    nodenames)
+			tmptext="${tmptext}Cluster Nodes"
+			;;
+		    pluginidselect)
+			tmptext="${tmptext}PluginIDSelect"
+			;;
+		    qos)
+			tmptext="${tmptext}QOS"
+			;;
+		    rpc)
+			tmptext="${tmptext}RPC"
+			;;
+
+		#-----	preTRES stuff
+		    cpucount)
+			tmptext="${tmptext}CPUCount"
+			;;
+		    grpnodes)
+			tmptext="${tmptext}GrpNodes"
+			;;
+		    maxnodes)
+			tmptext="${tmptext}MaxNodes"
+			;;
+		    nodecount)
+			tmptext="${tmptext}NodeCount"
+			;;
+
+		#-----	postTRES stuff
+		    grptres)
+			tmptext="${tmptext}GrpTRES"
+			;;
+		    maxtres)
+			tmptext="${tmptext}MaxTRES"
+			;;
+		    tres)
+			tmptext="${tmptext}TRES"
+			;;
+
+		#-----	ERROR
+		    *)
+			echo >&2 "Unrecognized field name $fld in format string, aborting"
+			exit 1;
+			;;
+		esac
+		tmptext="${tmptext}|"
+	done
+	echo $tmptext
+}
+
+
+print_cluster()
+{	
+	#Clear values
+	#-----	Common stuff
+	tmp_classification=
+	tmp_cluster=
+	tmp_controlhost=
+	tmp_controlport=
+	tmp_defaultqos=
+	tmp_fairshare=
+	tmp_flags=
+	tmp_grpjobs=
+	tmp_grpsubmitjobs=
+	tmp_maxjobs=
+	tmp_maxsubmitjobs=
+	tmp_maxwall=
+	tmp_nodenames=
+	tmp_pluginidselect=
+	tmp_qos=
+	tmp_rpc=
+
+	#-----	preTRES stuff
+	tmp_cpucount=
+	tmp_grpnodes=
+	tmp_maxnodes=
+	tmp_nodecount=
+
+	#-----	postTRES stuff
+	tmp_grptres=
+	tmp_maxtres=
+	tmp_tres=
+
+	#Set values
+	while [ $# -gt 0 ]
+	do
+		key=$1
+		val=$1
+		shift
+		key=`echo $key | sed -e 's/=.*$//'`
+		val=`echo $val | sed -e 's/^[^=]*=//'`
+		#echo >&2 "$key = $val"
+
+		case $key in
+		#----	Common fields
+		    classification)
+			tmp_classification=$val
+			;;
+		    cluster)
+			tmp_cluster=$val
+			;;
+		    controlhost)
+			tmp_controlhost=$val
+			;;
+		    controlport)
+			tmp_controlport=$val
+			;;
+		    defaultqos)
+			tmp_defaultqos=$val
+			;;
+		    fairshare)
+			tmp_fairshare=$val
+			;;
+		    flags)
+			tmp_flags=$val
+			;;
+		    grpjobs)
+			tmp_grpjobs=$val
+			;;
+		    grpsubmitjobs)
+			tmp_grpsubmitjobs=$val
+			;;
+		    maxjobs)
+			tmp_maxjobs=$val
+			;;
+		    maxsubmitjobs)
+			tmp_maxsubmitjobs=$val
+			;;
+		    maxwall)
+			tmp_maxwall=$val
+			;;
+		    nodenames)
+			tmp_nodenames=$val
+			;;
+		    pluginidselect)
+			tmp_pluginidselect=$val
+			;;
+		    qos)
+			tmp_qos=$val
+			;;
+		    rpc)
+			tmp_rpc=$val
+			;;
+
+		#----	preTRES fields
+		    cpucount)
+			tmp_cpucount=$val
+			;;
+		    grpnodes)
+			tmp_grpnodes=$val
+			;;
+		    maxnodes)
+			tmp_maxnodes=$val
+			;;
+		    nodecount)
+			tmp_nodecount=$val
+			;;
+
+		#----	postTRES fields
+		    grptres)
+			tmp_grptres=$val
+			;;
+		    maxtres)
+			tmp_maxtres=$val
+			;;
+		    tres)
+			tmp_tres=$val
+			;;
+
+
+		#----	ERROR
+		    *)
+			echo >&2 "Unrecognized parm $key, aborting"
+			exit 1
+			;;
+		esac
+	done
+		    
+	#Print values
+	tmptext=
+	for fld in $FORMAT_FIELDS
+	do
+		case $fld in
+		#----	common fields
+		    classification)
+			tmptext="${tmptext}${tmp_classification}"
+			;;
+		    cluster)
+			tmptext="${tmptext}${tmp_cluster}"
+			;;
+		    controlhost)
+			tmptext="${tmptext}${tmp_controlhost}"
+			;;
+		    controlport)
+			tmptext="${tmptext}${tmp_controlport}"
+			;;
+		    defaultqos)
+			tmptext="${tmptext}${tmp_defaultqos}"
+			;;
+		    fairshare)
+			tmptext="${tmptext}${tmp_fairshare}"
+			;;
+		    flags)
+			tmptext="${tmptext}${tmp_flags}"
+			;;
+		    grpjobs)
+			tmptext="${tmptext}${tmp_grpjobs}"
+			;;
+		    grpsubmitjobs)
+			tmptext="${tmptext}${tmp_grpsubmitjobs}"
+			;;
+		    maxjobs)
+			tmptext="${tmptext}${tmp_maxjobs}"
+			;;
+		    maxsubmitjobs)
+			tmptext="${tmptext}${tmp_maxsubmitjobs}"
+			;;
+		    maxwall)
+			tmptext="${tmptext}${tmp_maxwall}"
+			;;
+		    nodenames)
+			tmptext="${tmptext}${tmp_nodenames}"
+			;;
+		    pluginidselect)
+			tmptext="${tmptext}${tmp_pluginidselect}"
+			;;
+		    qos)
+			tmptext="${tmptext}${tmp_qos}"
+			;;
+		    rpc)
+			tmptext="${tmptext}${tmp_rpc}"
+			;;
+
+		#----	preTRES fields
+		    cpucount)
+			tmptext="${tmptext}${tmp_cpucount}"
+			;;
+		    grpnodes)
+			tmptext="${tmptext}${tmp_grpnodes}"
+			;;
+		    maxnodes)
+			tmptext="${tmptext}${tmp_maxnodes}"
+			;;
+		    nodecount)
+			tmptext="${tmptext}${tmp_nodecount}"
+			;;
+
+		#----	preTRES fields
+		    grptres)
+			tmptext="${tmptext}${tmp_grptres}"
+			;;
+		    maxtres)
+			tmptext="${tmptext}${tmp_maxtres}"
+			;;
+		    tres)
+			tmptext="${tmptext}${tmp_tres}"
+			;;
+
+		#----	ERROR
+		    *)
+			echo >&2 "Unrecognized field name $fld in format string, aborting"
+			exit 1;
+			;;
+		esac
+		tmptext="${tmptext}|"
+	done
+	echo $tmptext
+
+
+}
+
+print_yotta_cluster()
+{	print_cluster \
+		cluster='yottascale' classification='imaginary' \
+		 controlhost='ys-master1' controlport=6817  \
+		flags='virtual'  rpc=7168 pluginidselect=1 \
+		nodenames='compute-[0-99999]'   \
+		nodecount=1000000  cpucount=20000000 tres="node=1000000,cpu=20000000,mem=128000000000"
+}
+
+print_test_cluster()
+{	print_cluster \
+		cluster='test1'  classification='test' \
+		 controlhost='test1-master' controlport=6817  \
+		flags='debug'  rpc=7168 pluginidselect=1 \
+		nodenames='test-[0-1]'  \
+		nodecount=2  cpucount=4 tres="node=2,cpu=4,mem=32000"
+}
+
+print_specified_cluster()
+{	cname=$1
+
+	case $cname in
+	   yottascale|yotta)
+		print_yotta_cluster
+		;;
+	   test1|test)
+		print_test_cluster
+		;;
+	   *)
+		x=x
+		#echo >&2 "Unknown cluster $usr"
+		;;
+	esac
+}
+
+print_clusters()
+{	#We always have --noheader
+	if [ "x$verbose_flag" = "xyes" ]; then
+		print_header
+	fi
+	while [ $# -gt 0 ]
+	do
+		cid=$1
+		shift
+		print_specified_cluster $cid
+	done
+}
+
+print_all_clusters()
+{	#Must do alphabetically
+	print_clusters yottascale test1
+}
+
+
+print_no_clusters()
+{	print_clusters 'no-such-cluster'
+}
+
+#Parse options
+name_flag=
+
+while [ $# -gt 0 ]
+do
+	arg=$1
+	shift
+
+	case $arg in
+	    --version)
+		#Print version and exit
+		if [ "x$FAKE_SLURM_VERSION" = "x" ]; then
+			print_version 14
+		else
+			print_version $FAKE_SLURM_VERSION
+		fi
+		exit 0
+		;;
+	    format=*)
+		#Set our format string
+		tmp=`echo $arg | sed -e 's/^format=//' -e "s/'//g" -e 's/"//g' -e 's/,/ /g'`
+		FORMAT_FIELDS=$tmp
+		;;
+	    name=*)
+		tmp=`echo $arg | sed -e 's/^name=//' -e "s/'//g" -e 's/"//g' `
+		name_flag=$tmp
+		;;
+	    cluster=* )
+		tmp=`echo $arg | sed -e 's/^cluster=//' -e "s/'//g" -e 's/"//g' `
+		name_flag=$tmp
+		;;
+	    -v|--verbose)
+		verbose_flag=yes
+		;;
+	esac
+done
+
+if [ "x${name_flag}" = "xyottascale" ]; then
+	print_clusters yottascale
+elif [ "x${name_flag}" = "xtest1" ]; then
+	print_clusters test1
+elif [ "x${name_flag}" = "x" ]; then
+	print_all_clusters
+else
+	print_no_clusters
+fi
+

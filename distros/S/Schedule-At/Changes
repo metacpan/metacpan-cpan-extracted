@@ -1,0 +1,85 @@
+Revision history for Perl extension Schedule::At.
+
+1.00  Fri Oct  3 19:36:47 1997
+	- original version; created by Jose A. Rodriguez <josear AT ac.upc.es>
+
+1.01  Wed Nov 12 09:37:16 1997
+	- Removed warning about 'inherited AUTOLOAD for non-methods'
+		(reported by jon AT uns.com.au)
+	- Fixed SunOS settings (bad date specification)
+	- Fixed a few bugs in the test suite
+
+1.02  Thu Feb 12 11:55:49 1998
+	- Fixed test suite expiration bug
+
+1.03  Mon Mar 25 12:53:38 MET 2002
+	- Removed support for AUTOLOAD (and bugs derived...)
+		(reported by ydesyatnik AT digitalthink.com, kar AT webline.dk,
+		william.l.kidd AT VBA.VA.GOV, andreas.koenig AT dubravka.in-berlin.de)
+	- Added support for AIX (not tested by me)
+		(sent by Roger.Kehr AT dresdner-bank.com)
+	- Added support for Dynix/ptx (not tested by me)
+		(sent by william.l.kidd AT VBA.VA.GOV)
+	- Added support for current distributions of Linux
+
+1.04  Wed Jul 17 09:08:28 MEST 2002
+	- getJobs now dies (instead of returning undef) if there is an error
+		(suggested by Bernhard Graf <fisch AT augensalat.de>)
+	- Added subroutine 'readJobs' to get the commands of jobs
+		(feature suggested by Bernhard Graf <fisch AT augensalat.de>)
+	- Added TAG and JOBID params support to 'getJobs'
+		(feature suggested by Aaron Duncan 
+			<aaron.duncan AT centrelink.gov.au>)
+	- Fixed documentation bug (when adding a job with 'add', the
+		TAG param does not work with the FILE param). The POD
+		stated the opposite.
+		
+1.05  Tue Mar 22 11:34:01 MET 2005
+	- Fixed SunOS support (not working for root, rt.cpan.org: Ticket #4427)
+	- Added support for FreeBSD (Frazer Irving <frazer AT homescreen.com.au>)
+
+1.06  Tue Sep 13 09:10:56 MEST 2005
+	- Added support for Darwin (Felipe Wettstein <karl AT gromski.ch>)
+
+1.07  Mon Sep  8 09:21:34 MEST 2008
+	- Fixed typo in pod (Michael Gang" <michaelgang AT gmail.com>)
+	- remove function using TAG now returns something useful (pointed by
+		<T.Haecker AT gmx.net>)
+
+1.08  Thu Oct  9 07:53:30 MEST 2008
+	- Fixed typos and improve explanations in pod 
+		(Adam Benjamin <aebenjam AT opentext.com>)
+	- addJob now accepts multiple commands as a REF ARRAY
+		(implemented by Adam Benjamin <aebenjam AT opentext.com>)
+	- Many systems don't allow users to execute the "at" command
+		so tests fail. Now you need to set environment AT_CAN_EXEC=1
+		to exec all tests if you're not root. Set AT_VERBOSE=1 to
+		get more info about test execution.
+
+1.09 Tue Dec 15 08:54:41 CET 2009
+	- Skip non supported OSs
+	- Added support for OpenBSD (Eric Olsen <herolsen AT alumni.upenn.edu>)
+
+1.10 Wed Apr  7 13:35:48 CEST 2010
+	- Fixed bug about reporting exit status on past submited jobs
+	Bug: https://rt.cpan.org/Ticket/Display.html?id=55891
+	(based on patch submited by JLMARTIN <jlmartinez AT capisde.com>)
+
+1.11 Web Dic  9 11:40:11 CET 2010
+	- Added support for $SHELL (Jiří Pavlovský jira AT getnet.cz)
+
+1.12 Wed May 25 11:53:10 MEST 2011
+	- Added support for NetBSD and DragonFly NetBSD (Dan McMahill <dmcmahill AT netbsd.org>)
+
+1.13 
+	- Fix POD errors (https://rt.cpan.org/Public/Bug/Display.html?id=63810)
+	(reported and patch submitted by carnil [...] debian.org)
+	- Updated support for AIX (Bogenstätter Marcus <bogenstaetter AT empirius.de>)
+	
+1.14 Mon Jan 30 16:25:48 MET 2012
+	- Fix https://rt.cpan.org/Public/Bug/Display.html?id=72813
+	(reported by cbouvi [...] cpan.org)
+
+1.15 Tue Abr 24 08:14:43 CEST 2012
+	- Change AIX 'getCommand' to use a non privileged one
+		(patch by marcus.bogenstaetter [...] empirius.de)

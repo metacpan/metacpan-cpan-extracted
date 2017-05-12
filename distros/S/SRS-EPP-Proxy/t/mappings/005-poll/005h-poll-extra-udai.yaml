@@ -1,0 +1,27 @@
+# Test polling of a handle update that causes a new UDAI
+template: poll-req.tt
+
+vars:
+
+# Skipped because I'm too lazy to setup the data
+integration_skip: 1
+
+input_assertions:
+  class: SRS::EPP::Command::Poll
+  match:
+
+SRS:
+ - assertions:
+     count:
+       - [ '/NZSRSRequest/*', 1, 'SRS: there is 1 srs command' ]
+       - [ '/NZSRSRequest/GetMessages/TypeFilter', 2, 'SRS: there are both typefilters' ]
+     attr_is:
+       - [ '/NZSRSRequest/GetMessages', 'QueueMode', '1', 'SRS: Get message correct' ]
+       - [ '/NZSRSRequest/GetMessages', 'MaxResults', '1', 'SRS: request wants just one row' ]
+output_assertions:
+  count:
+  attr_is:
+    - [ '//epp:result', 'code', 1301, 'EPP: Correct response code' ]
+  match:
+
+

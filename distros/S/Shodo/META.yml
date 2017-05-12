@@ -1,0 +1,55 @@
+---
+abstract: 'Auto-generate documents from HTTP::Request and HTTP::Response'
+author:
+  - 'Yusuke Wada <yusuke@kamawada.com>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.11.0, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Shodo
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Shodo:
+    file: lib/Shodo.pm
+    version: 0.08
+  Shodo::Hanshi:
+    file: lib/Shodo/Hanshi.pm
+  Shodo::Suzuri:
+    file: lib/Shodo/Suzuri.pm
+  Test::Shodo::JSONRPC:
+    file: lib/Test/Shodo/JSONRPC.pm
+requires:
+  Clone: 0
+  Data::Validator: 0
+  HTTP::Message: 0
+  JSON: 0
+  Path::Tiny: 0
+  Test::More: 0.98
+  Text::MicroTemplate: 0
+  Try::Tiny: 0
+  parent: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/yusukebe/Shodo/issues
+  homepage: https://github.com/yusukebe/Shodo
+  repository: git://github.com/yusukebe/Shodo.git
+version: 0.08
+x_contributors:
+  - 'hisaichi5518 <hisaichi5518@gmail.com>'

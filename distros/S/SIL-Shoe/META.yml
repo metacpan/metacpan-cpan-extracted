@@ -1,0 +1,19 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         SIL-Shoe
+version:      1.37
+version_from: lib/SIL/Shoe.pm
+installdirs:  site
+requires:
+    Algorithm::Diff:               0
+    Algorithm::Merge:              0
+    Archive::Zip:                  0
+    Encode::Registry:              0
+    Encode::TECkit:                0
+    Image::Size:                   0
+    OpenOffice::OODoc:             0
+    Pod::Usage:                    0
+    Unicode::Collate:              0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30_01

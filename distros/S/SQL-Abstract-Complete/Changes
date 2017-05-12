@@ -1,0 +1,16 @@
+Revision history for SQL::Abstract::Complete
+
+1.06      2015-01-29 15:49:17-08:00 America/Los_Angeles
+        - Implementing use of Dist::Zilla
+
+1.05      Thu Dec 18 10:18:29 PST 2014
+        - Having bind params support added thanks to dlage
+
+1.04      Wed Sep 25 10:00:58 PDT 2014
+        - Some OCD cleanup; addition of Travis and Coveralls.
+
+1.03      Mon Jun 10 16:49:35 PDT 2013
+        - Switch from Clone::Fast to Storable dclone for deep copy
+
+1.01      Sat Feb 23 16:25:56 PST 2013
+        - First version, released on an unsuspecting world.

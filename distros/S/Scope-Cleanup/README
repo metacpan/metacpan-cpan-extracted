@@ -1,0 +1,36 @@
+NAME
+
+Scope::Cleanup - reliably run code upon exit of dynamic scope
+
+DESCRIPTION
+
+This module provides a facility for automatically running cleanup code
+when exiting a dynamic scope.  The cleanup code is attached to the stack
+frame directly, rather than being attached to an object that must then
+be managed separately.  The cleanup code reliably runs when the stack
+frame unwinds, regardless of the reason for unwinding: it may be a normal
+return, exception throwing, program exit, or any kind of non-local return.
+
+Cleanup code established through this module has direct access to Perl's
+dynamic state.  It can do things such as "die" to change the course of
+execution outside the cleanup.
+
+INSTALLATION
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+AUTHOR
+
+Andrew Main (Zefram) <zefram@fysh.org>
+
+COPYRIGHT
+
+Copyright (C) 2010, 2012 Andrew Main (Zefram) <zefram@fysh.org>
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

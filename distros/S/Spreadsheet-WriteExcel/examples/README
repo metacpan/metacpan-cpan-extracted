@@ -1,0 +1,108 @@
+The following is a description of the example files that are provided
+with Spreadsheet::WriteExcel. They are intended to demonstrate the
+different features and options of the module.
+
+
+Getting started
+===============
+a_simple.pl             A get started example with some basic features.
+demo.pl                 A demo of some of the available features.
+regions.pl              A simple example of multiple worksheets.
+stats.pl                Basic formulas and functions.
+formats.pl              All the available formatting on several worksheets.
+bug_report.pl           A template for submitting bug reports.
+
+
+Advanced
+========
+autofilter.pl           Examples of worksheet autofilters.
+autofit.pl              Simulate Excel's autofit for column widths.
+bigfile.pl              Write past the 7MB limit with OLE::Storage_Lite.
+cgi.pl                  A simple CGI program.
+chart_area.pl           A demo of area style charts.
+chart_bar.pl            A demo of bar (vertical histogram) style charts.
+chart_column.pl         A demo of column (histogram) style charts.
+chart_line.pl           A demo of line style charts.
+chart_pie.pl            A demo of pie style charts.
+chart_scatter.pl        A demo of scatter style charts.
+chart_stock.pl          A demo of stock style charts.
+chess.pl                An example of reusing formatting via properties.
+colors.pl               A demo of the colour palette and named colours.
+comments1.pl            Add comments to worksheet cells.
+comments2.pl            Add comments with advanced options.
+copyformat.pl           Example of copying a cell format.
+data_validate.pl        An example of data validation and dropdown lists.
+date_time.pl            Write dates and times with write_date_time().
+defined_name.pl         Example of how to create defined names.
+diag_border.pl          A simple example of diagonal cell borders.
+easter_egg.pl           Expose the Excel97 flight simulator.
+filehandle.pl           Examples of working with filehandles.
+formula_result.pl       Formulas with user specified results.
+headers.pl              Examples of worksheet headers and footers.
+hide_sheet.pl           Simple example of hiding a worksheet.
+hyperlink1.pl           Shows how to create web hyperlinks.
+hyperlink2.pl           Examples of internal and external hyperlinks.
+images.pl               Adding images to worksheets.
+indent.pl               An example of cell indentation.
+merge1.pl               A simple example of cell merging.
+merge2.pl               A simple example of cell merging with formatting.
+merge3.pl               Add hyperlinks to merged cells.
+merge4.pl               An advanced example of merging with formatting.
+merge5.pl               An advanced example of merging with formatting.
+merge6.pl               An example of merging with Unicode strings.
+mod_perl1.pl            A simple mod_perl 1 program.
+mod_perl2.pl            A simple mod_perl 2 program.
+outline.pl              An example of outlines and grouping.
+outline_collapsed.pl    An example of collapsed outlines.
+panes.pl                An examples of how to create panes.
+properties.pl           Add document properties to a workbook.
+protection.pl           Example of cell locking and formula hiding.
+repeat.pl               Example of writing repeated formulas.
+right_to_left.pl        Change default sheet direction to right to left.
+row_wrap.pl             How to wrap data from one worksheet onto another.
+sales.pl                An example of a simple sales spreadsheet.
+sendmail.pl             Send an Excel email attachment using Mail::Sender.
+stats_ext.pl            Same as stats.pl with external references.
+stocks.pl               Demonstrates conditional formatting.
+tab_colors.pl           Example of how to set worksheet tab colours.
+textwrap.pl             Demonstrates text wrapping options.
+win32ole.pl             A sample Win32::OLE example for comparison.
+write_arrays.pl         Example of writing 1D or 2D arrays of data.
+write_handler1.pl       Example of extending the write() method. Step 1.
+write_handler2.pl       Example of extending the write() method. Step 2.
+write_handler3.pl       Example of extending the write() method. Step 3.
+write_handler4.pl       Example of extending the write() method. Step 4.
+write_to_scalar.pl      Example of writing an Excel file to a Perl scalar.
+
+
+Unicode
+=======
+unicode_utf16.pl        Simple example of using Unicode UTF16 strings.
+unicode_utf16_japan.pl  Write Japanese Unicode strings using UTF-16.
+unicode_cyrillic.pl     Write Russian Cyrillic strings using UTF-8.
+unicode_list.pl         List the chars in a Unicode font.
+unicode_2022_jp.pl      Japanese: ISO-2022-JP to utf8 in perl 5.8.
+unicode_8859_11.pl      Thai:     ISO-8859_11 to utf8 in perl 5.8.
+unicode_8859_7.pl       Greek:    ISO-8859_7  to utf8 in perl 5.8.
+unicode_big5.pl         Chinese:  BIG5        to utf8 in perl 5.8.
+unicode_cp1251.pl       Russian:  CP1251      to utf8 in perl 5.8.
+unicode_cp1256.pl       Arabic:   CP1256      to utf8 in perl 5.8.
+unicode_koi8r.pl        Russian:  KOI8-R      to utf8 in perl 5.8.
+unicode_polish_utf8.pl  Polish :  UTF8        to utf8 in perl 5.8.
+unicode_shift_jis.pl    Japanese: Shift JIS   to utf8 in perl 5.8.
+
+
+Utility
+=======
+csv2xls.pl              Program to convert a CSV file to an Excel file.
+tab2xls.pl              Program to convert a tab separated file to xls.
+datecalc1.pl            Convert Unix/Perl time to Excel time.
+datecalc2.pl            Calculate an Excel date using Date::Calc.
+lecxe.pl                Convert Excel to WriteExcel using Win32::OLE.
+
+
+Developer
+=========
+convertA1.pl            Helper functions for dealing with A1 notation.
+function_locale.pl      Add non-English function names to Formula.pm.
+writeA1.pl              Example of how to extend the module.

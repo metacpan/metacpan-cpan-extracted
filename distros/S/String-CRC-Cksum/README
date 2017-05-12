@@ -1,0 +1,46 @@
+
+String/CRC/Cksum version 0.91
+=============================
+
+The String::CRC::Cksum module calculates a 32 bit CRC.  It generates the
+same CRC value as the POSIX cksum program.  If called in a list context,
+returns the length of the data object as well, which is useful for fully
+emulating the cksum program.
+
+Despite its name, this module is able to compute the checksum of files
+as well as of strings.
+
+Beware: consider proper use of binmode() if you are on a non-UNIX platform
+or processing files derived from other platforms.
+
+The algorithm can be accessed OO style, allowing progressive supply
+of data, or with a convenience function call which wraps up all the work.
+
+The algorithm works properly on 64 bit platforms from version 0.90.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module has no dependencies beyond the standard Carp and Exporter.
+
+COPYRIGHT AND LICENCE
+
+Copyright disclaimed 2003 by Andrew Clarke
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+The algorithm came from here:
+
+http://www.opengroup.org/onlinepubs/007904975/utilities/cksum.html
+
+It's legal pages will be nearby.
+

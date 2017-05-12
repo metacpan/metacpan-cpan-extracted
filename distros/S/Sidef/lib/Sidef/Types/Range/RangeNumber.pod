@@ -1,0 +1,83 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Range::RangeNumber
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = RangeNumber.new(...);
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef::Types::Range::Range
+	* Sidef::Object::Object
+
+=head1 METHODS
+
+
+=head2 dump
+
+RangeNumber.dump() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 iter
+
+RangeNumber.iter() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 new
+
+RangeNumber.new() -> I<Obj>
+
+Return the
+
+Aliases: I<call>
+
+=cut
+
+=head2 prod
+
+RangeNumber.prod() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 prod_by
+
+RangeNumber.prod_by() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sum
+
+RangeNumber.sum() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sum_by
+
+RangeNumber.sum_by() -> I<Obj>
+
+Return the
+
+=cut

@@ -1,0 +1,11 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use autodie qw( :all );
+
+use lib './inc';
+
+use Silki::DatabaseManager;
+
+Silki::DatabaseManager->new_with_options()->update_or_install_db();

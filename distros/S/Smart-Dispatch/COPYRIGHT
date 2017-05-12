@@ -1,0 +1,61 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Smart-Dispatch
+Upstream-Contact: TOBYINK <tobyink@cpan.org> and Toby Inkster <tobyink@cpan.org>
+Source: https://metacpan.org/release/Smart-Dispatch
+
+Files: Changes
+ META.json
+ META.yml
+ dist.ini
+ doap.ttl
+ t/04exists.t
+Copyright: Copyright 2014 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: CONTRIBUTING
+ INSTALL
+ LICENSE
+ examples/calculator.pl
+ examples/tour-de-force.pl
+ examples/use-syntax.pl
+Copyright: Unknown
+License: Unknown
+
+Files: README
+ lib/Smart/Dispatch.pm
+ lib/Smart/Dispatch/Match.pm
+ lib/Smart/Dispatch/Table.pm
+ lib/Syntax/Feature/Dispatcher.pm
+Copyright: This software is copyright (c) 2012 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/01basic.t
+ t/02dispatcher.t
+ t/03overloading.t
+ t/05subclassing.t
+Copyright: Copyright 2012 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
+
+Files: Makefile.PL
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+License: Artistic-1.0
+ This software is Copyright (c) 2014 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The Artistic License 1.0
+
+License: GPL-1.0
+ This software is Copyright (c) 2014 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The GNU General Public License, Version 1, February 1989

@@ -1,0 +1,67 @@
+*** gplt_x11.c~	Fri Oct 15 17:04:50 1999
+--- gplt_x11.c	Tue Feb 27 13:18:53 2001
+***************
+*** 839,844 ****
+--- 839,847 ----
+  plot_struct *plot;
+  {
+      int n, x, y, sw, sl, lt = 0, width, type, point, px, py;
++ #ifdef STATSVIEW
++     int dash;
++ #endif
+      int user_width = 1;		/* as specified by plot...linewidth */
+      char *buffer, *str;
+      enum JUSTIFY jmode;
+***************
+*** 951,957 ****
+--- 954,973 ----
+  	/*   X11_linetype(type) - set line type  */
+  	else if (*buffer == 'L') {
+  	    sscanf(buffer, "L%4d", &lt);
++ #ifdef STATSVIEW
++             dash = (lt < 0 ? lt : lt / 8) + 2;
+  	    lt = (lt % 8) + 2;
++ 	    if (dashes[dash][0]) {
++ 		type = LineOnOffDash;
++ 		XSetDashes(dpy, gc, 0, dashes[dash], strlen(dashes[dash]));
++ 	    } else {
++ 		type = LineSolid;
++ 	    }
++ 	    width = widths[lt] ? user_width * widths[lt] : user_width;
++ 	    XSetForeground(dpy, gc, colors[lt + 3]);
++ 	    XSetLineAttributes(dpy, gc, width, type, CapButt, JoinBevel);
++ #else 
++ 	    lt = (lt % 8) + 2;
+  	    /* default width is 0 {which X treats as 1} */
+  	    width = widths[lt] ? user_width * widths[lt] : user_width;
+  	    if (dashes[lt][0]) {
+***************
+*** 962,967 ****
+--- 978,984 ----
+  	    }
+  	    XSetForeground(dpy, gc, colors[lt + 3]);
+  	    XSetLineAttributes(dpy, gc, width, type, CapButt, JoinBevel);
++ #endif
+  	}
+  	/*   X11_point(number) - draw a point */
+  	else if (*buffer == 'P') {
+***************
+*** 1523,1532 ****
+--- 1540,1556 ----
+      "0", "42", "13", "44", "15", "4441", "42", "13"
+  };
+  
++ #ifdef STATSVIEW
+  char dash_color[Ndashes][10] = {
+      "0", "16",
++     "0", "31", "61", "91", "3111", "6111", "9111", "9131"
++ };
++ #else
++ char dash_color[Ndashes][10] = {
++     "0", "16",
+      "0", "0", "0", "0", "0", "0", "0", "0"
+  };
++ #endif
+  
+  void
+  pr_dashes()

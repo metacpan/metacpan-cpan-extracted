@@ -1,0 +1,60 @@
+---
+abstract: 'Rate limit sync and async function calls'
+author:
+  - 'Alex Efros <powerman@cpan.org>'
+build_requires:
+  JSON::XS: '0'
+  Test::Exception: '0'
+  Test::Mock::Time: v0.1.5
+  Test::More: '0.96'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Sub-Throttler
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Sub::Throttler:
+    file: lib/Sub/Throttler.pm
+    version: v0.2.10
+  Sub::Throttler::Limit:
+    file: lib/Sub/Throttler/Limit.pm
+    version: v0.2.10
+  Sub::Throttler::Periodic::EV:
+    file: lib/Sub/Throttler/Periodic/EV.pm
+    version: v0.2.10
+  Sub::Throttler::Rate::AnyEvent:
+    file: lib/Sub/Throttler/Rate/AnyEvent.pm
+    version: v0.2.10
+  Sub::Throttler::Rate::rr:
+    file: lib/Sub/Throttler/Rate/AnyEvent.pm
+    version: v0.2.10
+  Sub::Throttler::algo:
+    file: lib/Sub/Throttler/algo.pm
+    version: v0.2.10
+requires:
+  AnyEvent: '0'
+  EV: '0'
+  Export::Attrs: '0'
+  List::Util: '1.33'
+  Scalar::Util: '0'
+  Time::HiRes: '0'
+  parent: '0'
+  perl: '5.010001'
+  version: '0.77'
+resources:
+  bugtracker: https://github.com/powerman/perl-Sub-Throttler/issues
+  homepage: https://github.com/powerman/perl-Sub-Throttler
+  repository: https://github.com/powerman/perl-Sub-Throttler.git
+version: v0.2.10

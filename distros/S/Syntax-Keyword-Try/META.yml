@@ -1,0 +1,27 @@
+---
+abstract: 'a C<try/catch/finally> syntax for perl'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  ExtUtils::CBuilder: '0'
+  Test::More: '0.88'
+configure_requires:
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Syntax-Keyword-Try
+provides:
+  Syntax::Keyword::Try:
+    file: lib/Syntax/Keyword/Try.pm
+    version: '0.04'
+requires:
+  perl: '5.014'
+resources:
+  IRC: irc://irc.perl.org/#io-async
+  license: http://dev.perl.org/licenses/
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

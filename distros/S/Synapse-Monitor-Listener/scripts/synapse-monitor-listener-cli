@@ -1,0 +1,28 @@
+#!/usr/bin/perl
+use Synapse::CLI::Config;
+use YAML::XS;
+use warnings;
+use strict;
+$Synapse::CLI::Config::BASE_DIR          = "/etc/synapse/monitor/listener";
+$Synapse::CLI::Config::ALIAS->{type}     = 'Synapse::CLI::Config::Type';
+$Synapse::CLI::Config::ALIAS->{action}   = 'Synapse::Monitor::Listener::Action';
+$Synapse::CLI::Config::ALIAS->{state}    = 'Synapse::Monitor::Listener::State';
+$Synapse::CLI::Config::ALIAS->{listener} = 'Synapse::Monitor::Listener';
+if (@ARGV == 1 and $ARGV[0] eq '--create-configdir') { create_configdir(); exit };
+print Dump (Synapse::CLI::Config::execute (@ARGV));
+
+
+sub create_configdir {
+    my $dir = shift || $Synapse::CLI::Config::BASE_DIR;
+    $dir =~ s/\/$//;
+    my ($parent, $child) = $dir =~ /(.*)\/(.*)/;
+    -d $parent or create_configdir ($parent);
+    print "mkdir $dir\n";
+    mkdir $dir or die "cannot make $dir";
+}
+
+
+1;
+
+
+__END__

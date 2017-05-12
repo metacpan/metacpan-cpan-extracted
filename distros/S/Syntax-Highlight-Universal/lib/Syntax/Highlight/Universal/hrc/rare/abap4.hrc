@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<!DOCTYPE hrc PUBLIC "-//Cail Lomecb//DTD Colorer HRC take5//EN"
+  "http://colorer.sf.net/2003/hrc.dtd">
+<hrc version="take5" xmlns="http://colorer.sf.net/2003/hrc"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://colorer.sf.net/2003/hrc http://colorer.sf.net/2003/hrc.xsd">
+<!--
+   ABAP/4 Syntax
+With Help of:
+   Arpad Biro <biroa@demasz.hu>
+-->
+   <type name="abap4">
+
+      <import type="def"/>
+
+      <region name="abap4Comment" parent="Comment"/>
+      <region name="abap4Number" parent="Number"/>
+      <region name="abap4String" parent="String"/>
+      <region name="abap4Symbol" parent="Symbol"/>
+      <region name="abap4Word" parent="Keyword"/>
+
+
+      <scheme name="abap4">
+<!-- Linear Comments -->
+         <regexp match="/\&#34;.*$/" region0="abap4Comment"/>
+         <regexp match="/^\*.*$/" region0="abap4Comment"/>
+<!-- Strings -->
+         <regexp match="/\'.*?\'/" region0="abap4String"/>
+<!-- Numbers -->
+         <regexp match="/\b[0-9]+\b/" region0="abap4Number"/>
+         <keywords region="abap4Symbol">
+            <symb name="="/>
+            <symb name="+"/>
+            <symb name="-"/>
+            <symb name="*"/>
+            <symb name="/"/>
+            <symb name="("/>
+            <symb name=")"/>
+            <symb name="&lt;"/>
+            <symb name="&gt;"/>
+            <symb name=","/>
+            <symb name="."/>
+            <symb name=":"/>
+            <symb name="#"/>
+            <symb name="&amp;"/>
+         </keywords>
+         <keywords ignorecase="yes" worddiv="[^\w_\-]" region="abap4Word">
+            <word name="ADD"/>
+            <word name="ADD-CONDITIONAL"/>
+            <word name="ADD-CORRESPONDING"/>
+            <word name="ADD-SELECTIVE"/>
+            <word name="APPEND"/>
+            <word name="ASSIGN"/>
+            <word name="AT"/>
+            <word name="AUTHORITY-CHECK"/>
+            <word name="BACK"/>
+            <word name="BREAK-POINT"/>
+            <word name="CALL"/>
+            <word name="CASE"/>
+            <word name="CATCH"/>
+            <word name="CHECK"/>
+            <word name="CLASS"/>
+            <word name="CLASS-DATA"/>
+            <word name="CLASS-EVENTS"/>
+            <word name="CLASS-METHODS"/>
+            <word name="CLEAR"/>
+            <word name="CLOSE"/>
+            <word name="COLLECT"/>
+            <word name="COMMIT"/>
+            <word name="COMMUNICATION"/>
+            <word name="COMPONENT-CHECK"/>
+            <word name="COMPUTE"/>
+            <word name="CONCATENATE"/>
+            <word name="CONDENSE"/>
+            <word name="CONSTANTS"/>
+            <word name="CONTEXTS"/>
+            <word name="CONTINUE"/>
+            <word name="CONTROLS"/>
+            <word name="CONVERT"/>
+            <word name="CREATE"/>
+            <word name="CURRENCY-CONVERSION"/>
+            <word name="DATA"/>
+            <word name="DEFINE"/>
+            <word name="DELETE"/>
+            <word name="DEMAND"/>
+            <word name="DEQUEUE"/>
+            <word name="DESCRIBE"/>
+            <word name="DETAIL"/>
+            <word name="DIVIDE"/>
+            <word name="DIVIDE-CORRESPONDING"/>
+            <word name="DO"/>
+            <word name="DOWNLOAD"/>
+            <word name="DYNPROS"/>
+            <word name="EDITOR-CALL"/>
+            <word name="ELSE"/>
+            <word name="ELSEIF"/>
+            <word name="END-OF-DEFINITION"/>
+            <word name="END-OF-PAGE"/>
+            <word name="END-OF-SELECTION"/>
+            <word name="ENDAT"/>
+            <word name="ENDCASE"/>
+            <word name="ENDCATCH"/>
+            <word name="ENDCLASS"/>
+            <word name="ENDDO"/>
+            <word name="ENDEXEC"/>
+            <word name="ENDFOR"/>
+            <word name="ENDFORM"/>
+            <word name="ENDFUNCTION"/>
+            <word name="ENDIF"/>
+            <word name="ENDIFEND"/>
+            <word name="ENDINTERFACE"/>
+            <word name="ENDLOOP"/>
+            <word name="ENDMETHOD"/>
+            <word name="ENDMODULE"/>
+            <word name="ENDON"/>
+            <word name="ENDPROVIDE"/>
+            <word name="ENDSELECT"/>
+            <word name="ENDUPLOAD"/>
+            <word name="ENDWHILE"/>
+            <word name="ENQUEUE"/>
+            <word name="EVENTS"/>
+            <word name="EXEC"/>
+            <word name="EXIT"/>
+            <word name="EXPORT"/>
+            <word name="EXTRACT"/>
+            <word name="FETCH"/>
+            <word name="FIELD-GROUPS"/>
+            <word name="FIELD-SYMBOLS"/>
+            <word name="FIELDS"/>
+            <word name="FILL"/>
+            <word name="FOR"/>
+            <word name="FORM"/>
+            <word name="FORMAT"/>
+            <word name="FREE"/>
+            <word name="FUNCTION"/>
+            <word name="FUNCTION-POOL"/>
+            <word name="GENERATE"/>
+            <word name="GET"/>
+            <word name="HIDE"/>
+            <word name="IF"/>
+            <word name="IMPORT"/>
+            <word name="INCLUDE"/>
+            <word name="INFOTYPES"/>
+            <word name="INITIALIZATION"/>
+            <word name="INPUT"/>
+            <word name="INSERT"/>
+            <word name="INTERFACE"/>
+            <word name="INTERFACES"/>
+            <word name="LEAVE"/>
+            <word name="LOAD"/>
+            <word name="LOCAL"/>
+            <word name="LOOP"/>
+            <word name="MARK"/>
+            <word name="MAXIMUM"/>
+            <word name="MESSAGE"/>
+            <word name="METHOD"/>
+            <word name="METHODS"/>
+            <word name="MINIMUM"/>
+            <word name="MODIFY"/>
+            <word name="MODULE"/>
+            <word name="MOVE"/>
+            <word name="MOVE-CONDITIONAL"/>
+            <word name="MOVE-CORRESPONDING"/>
+            <word name="MOVE-DYNPRO"/>
+            <word name="MOVE-TEXT"/>
+            <word name="MULTIPLY"/>
+            <word name="MULTIPLY-CORRESPONDING"/>
+            <word name="NEW-LINE"/>
+            <word name="NEW-PAGE"/>
+            <word name="NEW-SECTION"/>
+            <word name="ON"/>
+            <word name="OPEN"/>
+            <word name="OVERLAY"/>
+            <word name="PACK"/>
+            <word name="PARAMETERS"/>
+            <word name="PERFORM"/>
+            <word name="POSITION"/>
+            <word name="PRINT-CONTROL"/>
+            <word name="PRIVATE"/>
+            <word name="PROGRAM"/>
+            <word name="PROTECTED"/>
+            <word name="PROVIDE"/>
+            <word name="PUBLIC"/>
+            <word name="PUT"/>
+            <word name="RAISE"/>
+            <word name="RANGES"/>
+            <word name="READ"/>
+            <word name="RECEIVE"/>
+            <word name="REFRESH"/>
+            <word name="REJECT"/>
+            <word name="REPLACE"/>
+            <word name="REPORT"/>
+            <word name="RESERVE"/>
+            <word name="RESTORE"/>
+            <word name="ROLLBACK"/>
+            <word name="SCAN"/>
+            <word name="SCROLL"/>
+            <word name="SEARCH"/>
+            <word name="SECURITY"/>
+            <word name="SEGMENTS"/>
+            <word name="SELECT"/>
+            <word name="SELECT-OPTIONS"/>
+            <word name="SELECTION-SCREEN"/>
+            <word name="SET"/>
+            <word name="SHIFT"/>
+            <word name="SKIP"/>
+            <word name="SORT"/>
+            <word name="SPLIT"/>
+            <word name="START-OF-SELECTION"/>
+            <word name="STATICS"/>
+            <word name="STOP"/>
+            <word name="SUBMIT"/>
+            <word name="SUBTRACT"/>
+            <word name="SUBTRACT-CORRESPONDING"/>
+            <word name="SUM"/>
+            <word name="SUMMARY"/>
+            <word name="SUMMING"/>
+            <word name="SUPPLY"/>
+            <word name="SUPPRESS"/>
+            <word name="SYNTAX-CHECK"/>
+            <word name="SYNTAX-TRACE"/>
+            <word name="SYSTEM-CALL"/>
+            <word name="TABLES"/>
+            <word name="TELEX"/>
+            <word name="TEXTS"/>
+            <word name="TOP-OF-PAGE"/>
+            <word name="TRANSFER"/>
+            <word name="TRANSFER-DYNPRO"/>
+            <word name="TRANSLATE"/>
+            <word name="TYPE-POOL"/>
+            <word name="TYPE-POOLS"/>
+            <word name="TYPES"/>
+            <word name="ULINE"/>
+            <word name="UNASSIGN"/>
+            <word name="UNPACK"/>
+            <word name="UPDATE"/>
+            <word name="UPLOAD"/>
+            <word name="WAIT"/>
+            <word name="WHEN"/>
+            <word name="WHILE"/>
+            <word name="WINDOW"/>
+            <word name="WRITE"/>
+         </keywords>
+      </scheme>
+
+   </type>
+</hrc>
+<!-- ***** BEGIN LICENSE BLOCK *****
+   - Version: MPL 1.1/GPL 2.0/LGPL 2.1
+   -
+   - The contents of this file are subject to the Mozilla Public License Version
+   - 1.1 (the "License"); you may not use this file except in compliance with
+   - the License. You may obtain a copy of the License at
+   - http://www.mozilla.org/MPL/
+   -
+   - Software distributed under the License is distributed on an "AS IS" basis,
+   - WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+   - for the specific language governing rights and limitations under the
+   - License.
+   -
+   - The Original Code is the Colorer Library.
+   -
+   - The Initial Developer of the Original Code is
+   - Cail Lomecb <cail@nm.ru>.
+   - Portions created by the Initial Developer are Copyright (C) 1999-2003
+   - the Initial Developer. All Rights Reserved.
+   -
+   - Contributor(s):
+   -
+   - Alternatively, the contents of this file may be used under the terms of
+   - either the GNU General Public License Version 2 or later (the "GPL"), or
+   - the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
+   - in which case the provisions of the GPL or the LGPL are applicable instead
+   - of those above. If you wish to allow use of your version of this file only
+   - under the terms of either the GPL or the LGPL, and not to allow others to
+   - use your version of this file under the terms of the MPL, indicate your
+   - decision by deleting the provisions above and replace them with the notice
+   - and other provisions required by the LGPL or the GPL. If you do not delete
+   - the provisions above, a recipient may use your version of this file under
+   - the terms of any one of the MPL, the GPL or the LGPL.
+   -
+   - ***** END LICENSE BLOCK ***** -->

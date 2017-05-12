@@ -1,0 +1,45 @@
+<NZSRSResponse VerMajor="5" VerMinor="0">
+  <Response Action="Whois" FeId="8" FeSeq="4739879" OrigRegistrarId="90" RecipientRegistrarId="90">
+    <FeTimeStamp Day="23" Hour="14" Minute="49" Month="6" Second="20" TimeZoneOffset="+12:00" Year="2010"/>
+    <Domain DomainName="cheese123.co.te" Status="Active"/>
+  </Response>
+  <Response Action="DomainDetailsQry" FeId="8" FeSeq="4739999" OrigRegistrarId="1" RecipientRegistrarId="1" Rows="1">
+    <FeTimeStamp Day="23" Hour="17" Minute="29" Month="6" Second="44" TimeZoneOffset="+12:00" Year="2010"/>
+    <Domain Delegate="1" DomainName="cheese123.co.te" RegistrarId="100" Status="Active" Term="1">
+      <NameServers>
+        <Server FQDN="ns1.everydns.net"/>
+        <Server FQDN="ns2.everydns.net"/>
+        <Server FQDN="ns3.everydns.net"/>
+        <Server FQDN="ns4.everydns.net"/>
+      </NameServers>
+      <DNSSEC>
+       <DS DigestType="3" KeyTag="1" Algorithm="2">
+         <Digest>1234abcd</Digest>
+       </DS>
+       <DS DigestType="6" KeyTag="4" Algorithm="5">
+         <Digest>8888zxy</Digest>
+       </DS>
+     </DNSSEC>
+      <RegistrantContact Email="e@xample.com" Name="Mr Ben">
+        <PostalAddress Address1="52 Festive Rd" Address2="Putney" City="London" CountryCode="UK"/>
+        <Phone AreaCode="207" CountryCode="44" LocalNumber="000000"/>
+      </RegistrantContact>
+      <AdminContact Email="e@xample.com" Name="Mr Ben">
+        <PostalAddress Address1="52 Festive Rd" Address2="Putney" City="London" CountryCode="UK" PostalCode="6021"/>
+        <Phone AreaCode="207" CountryCode="44" LocalNumber="000000"/>
+      </AdminContact>
+      <TechnicalContact Email="e@xample.com" Name="Mr Ben">
+        <PostalAddress Address1="52 Festive Rd" Address2="Putney" City="London" CountryCode="UK" PostalCode="6021"/>
+        <Phone AreaCode="207" CountryCode="44" LocalNumber="000000"/>
+      </TechnicalContact>
+      <BilledUntil Day="19" Hour="19" Minute="45" Month="11" Second="02" TimeZoneOffset="+13:00" Year="2011"/>
+      <RegisteredDate Day="19" Hour="19" Minute="45" Month="11" Second="02" TimeZoneOffset="+13:00" Year="2007"/>
+      <AuditDetails ActionId="20091231.4b3b555304642" RegistrarId="100">
+        <AuditTime>
+          <From Day="19" Hour="19" Minute="45" Month="11" Second="02" TimeZoneOffset="+13:00" Year="2007"/>
+        </AuditTime>
+        <AuditText><![CDATA[Domain Agent Update]]></AuditText>
+      </AuditDetails>
+    </Domain>
+  </Response>
+</NZSRSResponse>

@@ -1,0 +1,189 @@
+[%### An example of how to extract HTML documentation from StateML ###%]
+[% MACRO Handlers(name,handlers) BLOCK %]
+[%     IF handlers %]
+[%         IF name %]
+    <li><b>[% name | html %]</b>
+[%         END %]
+        <ul>
+[%         FOREACH handler = handlers %]
+            <li><pre><code>[% handler | html %]</code></pre>
+
+[%         END %]
+        </ul>
+[%     END %]
+[% END %]
+
+[% MACRO Arc(name, arcs) BLOCK %]
+    [% IF name %]<li>[% ELSE %]<big>[% END %]
+        <b>[% arc.event_id | html %]</b>
+    [% IF name %][% ELSE %]</big>[% END %]
+        : [%     arc.from_state.id | html %]
+            -&gt; [% arc.to_state.id   | html %]
+[%             IF arc.description %]
+            <br /><span class="desc">[% arc.description | html %]</span><br />
+[%             END %]
+[%             IF arc.handlers %]
+[%                 Handlers( "", arc.handlers ) %]
+[%             ELSE %]
+                   <br />
+[%             END %]
+[% END %]
+
+[% MACRO Arcs(name, arcs) BLOCK %]
+[%     IF arcs %]
+[%         IF name %]
+    <li><b>[% name %]</b>
+        <ul>
+[%         END %]
+[%         FOREACH arc = arcs %]
+[%             Arc( name, arc ) %]
+[%         END %]
+[%     END %]
+[%         IF name %]
+        </ul>
+[%         END %]
+[% END %]
+
+[% ########################################################################## %]
+<html>
+<head>
+    <title>Description of State Machine [% machine.id | html %]</title>
+    <style type="text/css">
+        .desc   { background: #eeeeee; }
+        li      { list-style-type: none; }
+        code    { color: #333333; }
+        h2      { text-decoration: underline; }
+    </style>
+</head>
+<body bgcolor="#ffffff">
+    <h1>Description of State Machine [% machine.id | html %]</h1>
+<a name="States" /><h2>States</h2>
+
+<p>A state is a condition that the machine rests in between <a
+href="#Events">events</a>.  Each state may have <a href="#Arcs">arcs</a> that
+define what events a state handles by itself (loopback
+arcs), what events cause a transition to another state (exit arcs), and what events cause transitions in to that state from other states (entry arcs).</p>
+
+[% IF machine.states %]
+[%     FOREACH state = machine.states %]
+        <big><b>[% state.id | html %]</b></big>
+[%         IF state.description %]
+            <br /><span class="desc">[% state.description | html %]</span>
+[%         END %]
+            <ul>
+[%         Handlers("Entry Handlers", state.entry_handlers) %]
+[%         Handlers("Exit Handlers", state.exit_handlers) %]
+
+[%         SET arcs = [] %]
+[%         FOR arc = machine.arcs %]
+[%             IF arc.from != state.id && arc.to == state.id %]
+[%                 arcs.push( arc ) %]
+[%             END %]
+[%         END %]
+[%         IF arcs.size %]
+[%             Arcs( "Entering Arcs", arcs ) %]
+[%         ELSE %]
+               <li>No entering arcs
+[%         END %]
+
+[%         SET arcs = [] %]
+[%         FOR arc = machine.arcs %]
+[%             IF arc.from == state.id && arc.to == state.id %]
+[%                 arcs.push( arc ) %]
+[%             END %]
+[%         END %]
+[%         IF arcs.size %]
+[%             Arcs( "Loopback Arcs", arcs ) %]
+[%         END %]
+
+[%         SET arcs = [] %]
+[%         FOR arc = machine.arcs %]
+[%             IF arc.from == state.id && arc.to != state.id %]
+[%                 arcs.push( arc ) %]
+[%             END %]
+[%         END %]
+[%         IF arcs.size %]
+[%             Arcs( "Exiting Arcs", arcs ) %]
+[%         ELSE %]
+               <li>No exiting arcs
+[%         END %]
+
+            </ul>
+[%     END %]
+[% ELSE %]
+<p>No states defined.</p>
+[% END %]
+
+
+<a name="Events" /><h2>Events</h2>
+
+<p>A event is a notification, usually from outside the machine, that something
+has occured, like a key press or a timeout.  For instance, there is usually an
+event that starts the machine by moving it from an undefined (power-up) state
+in to an initial state.</p>
+
+<p>In a given state, each event may only trigger one <a href="#Arcs">arc</a>.
+An event need not trigger any arcs on a given state, or indeed any arcs in the
+machine at all.  Such events are ignored except for running their event
+handlers.</p>
+
+<p>Events may have several types of "handlers" associated with them.
+These run whenever
+that event is recieved by the machine, regardless of whether or not the event
+fires an arc.  These are:
+
+<blockquote>
+<dl>
+   <dt>pre handlers
+   <dd>code snippets that run before the arc is traversed, while still in
+   the current state.
+   <dt>handlers
+   <dd>code snippets that run while the arc is being traversed; these
+   occur "between" states: after the current state is exited and before
+   the new state is entered.
+   <dt>post handlers
+   <dd>code snippets that run after the arc is traversed and the new
+   state has been entered.
+</dl>
+</blockquote>
+
+<p>The events in [% machine.id | html %] are:</p>
+
+[% IF machine.events %]
+[%     FOREACH event = machine.events %]
+        <big><b>[% event.id | html %]</b></big>
+[%         IF event.description %]
+            <br /><span class="desc">[% event.description | html %]</span>
+[%         END %]
+            <ul>
+[%         Handlers( "Pre Handlers", event.pre_handlers ) %]
+[%         Handlers( "Handlers", event.handlers ) %]
+[%         Handlers( "Post Handlers", event.post_handlers ) %]
+[%         Arcs( "Arcs", event.arcs ) %]
+            </ul>
+[%     END %]
+[% ELSE %]
+<p>No events defined.</p>
+[% END %]
+
+<a name="Arcs" /><h2>Arcs</h2>
+
+<p>Arcs are the transitions that occur between <a href="#States">states</a>
+when <a href="#Events">events</a> are received: they cause the state machine to
+move from one state to another state.  A loopback arc is an arc that ends in
+the same state it left; these are used to handles inputs that are consumed in a
+given state.</p>
+
+<p>A handler routine may be associated with any arg.</p>
+
+<p>There is a special state ID "__ALL" or "#ALL" which is used to define
+arcs that affect all states.</p>
+
+
+[% IF machine.arcs %]
+[% Arcs( "", machine.arcs ) %]
+[% ELSE %]
+<p>No arcs defined.</p>
+[% END %]
+</body>
+</html>

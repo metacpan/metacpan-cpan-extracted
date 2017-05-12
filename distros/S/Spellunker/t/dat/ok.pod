@@ -1,0 +1,9 @@
+=pod
+
+=for stopwords gah
+
+This is a duck.
+
+gah
+
+L<Data::Dumper>'s

@@ -1,0 +1,26 @@
+NAME
+	Sys::Uptime - Info on CPU load, uptime, users and number of CPU's installed.
+
+SYNOPSIS
+	use Sys::Uptime;
+
+	my $users  = Sys::Uptime->users;
+	my @load   = Sys::Uptime->loadavg;
+	my $uptime = Sys::Uptime->uptime;
+	my $nbrcpu = Sys::Uptime->nbrcpu;
+
+	print "Users logged on: $users\n";
+	print "CPU load (1min, 5min, 15min): @load\n";
+	print "System uptime: $uptime seconds\n";
+	print "Number of CPU's installed: $nbrcpu\n";
+
+DESCRIPTION
+	A quick and dirty module that returns CPU load, uptime, users and number of CPU's installed.
+	Currently only tested on Linux.
+
+COPYRIGHT
+
+	Copyright (c) 2004 Wim De Hul.
+	All rights reserved.
+	This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself. 
+

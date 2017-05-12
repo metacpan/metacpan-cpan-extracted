@@ -1,0 +1,3 @@
+# Test the "Cannot build include file" error
+
+include nosuchfile

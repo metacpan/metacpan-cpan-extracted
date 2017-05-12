@@ -1,0 +1,23 @@
+Build.PL
+Changes
+lib/Sub/Signatures.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/010internals.t
+t/020sub_signatures.t
+t/030anonymous_subs.t
+t/040overloaded_sigs.t
+t/050fallback.t
+t/060loose_methods.t
+t/070classnames.t
+t/080subclassing.t
+t/090export.t
+t/100prototypes.t
+t/pod-coverage.t
+t/pod.t
+t/test_lib/ClassA.pm
+t/test_lib/ClassA/Subclass.pm
+t/test_lib/ClassB.pm
+t/test_lib/ExportTest.pm

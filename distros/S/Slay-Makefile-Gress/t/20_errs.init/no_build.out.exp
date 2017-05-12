@@ -1,0 +1,6 @@
+1..1
+not ok 1 - vanburen.ok
+#   Failed test 'vanburen.ok'
+#          got: 'Failed to build vanburen.ok'
+#     expected: ''
+# Looks like you failed 1 test of 1.

@@ -1,0 +1,5 @@
+name = "Sort-strverscmp"
+badges = ["travis"]
+authority="cpan:NNUTTER"
+module_maker="ModuleBuildTiny"
+tag_format="v%v"

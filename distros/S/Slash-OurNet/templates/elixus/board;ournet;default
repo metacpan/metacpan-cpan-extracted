@@ -1,0 +1,141 @@
+__section__
+default
+__description__
+Lists all articles in a board
+
+* board = the Board object
+* group = the Group object board belongs to
+* child = the ArticleGroup type: 'archive', 'article' or 'mailbox'
+* message = any additional prompts
+* display = 'top' means the 'recent articles' list in the top page
+
+__title__
+
+__page__
+ournet
+__lang__
+en_US
+__name__
+board
+__template__
+<TABLE BORDER="0" WIDTH="100%">
+<caption><nobr><FONT FACE="[% constants.mainfontface %] COLOR="[% user.fg.0 %]"><strong>
+[% IF child == "articles" %]
+    [% IF archives_count > 0 %]
+	<a href="[% script %]/[% group %]/[% board %]/archives/"><img width=19 height=16 src="[% imagedir %]/archive.png" border=0></a>
+    [% END %]
+[% END %]
+[% message %]
+</strong></font></nobr></caption>
+    <tr>
+[% IF display != 'top' %]
+    <td BGCOLOR="[% user.bg.3 %]"><FONT FACE="[% constants.mainfontface %]" COLOR="[% user.fg.0 %]"><nobr>
+    [% loc('No.') %]
+    </nobr></font></td>
+[% END %]
+    <td BGCOLOR="[% user.bg.3 %]"><FONT FACE="[% constants.mainfontface %]" COLOR="[% user.fg.0 %]">
+    [% loc('Subject') %]
+    </font></td>
+    <td BGCOLOR="[% user.bg.3 %]"><FONT FACE="[% constants.mainfontface %]" COLOR="[% user.fg.0 %]">
+    [% loc('From') %]
+    </font></td>
+[% IF display == 'top' %]
+    <td BGCOLOR="[% user.bg.3 %]"><FONT FACE="[% constants.mainfontface %]" COLOR="[% user.fg.0 %]">
+    [% loc('Board') %]
+    </font></td>
+[% END %]
+    <td BGCOLOR="[% user.bg.3 %]"><FONT FACE="[% constants.mainfontface %]" COLOR="[% user.fg.0 %]"><nobr>
+    [% loc('Date') %]
+    </nobr></font></td>
+    </tr>
+[% IF child == 'articles' AND !user.is_anon %]
+<form action="[% script %]/[% group %]/[% board %]/[% child %]/" method="post">
+    <tr>
+    <td BGCOLOR="[% user.bg.1 %]">
+    [% articles_count + 2 %]
+    </td><td BGCOLOR="[% user.bg.1 %]">
+    <INPUT type="hidden" name="op" value="article_edit">
+    <INPUT type="hidden" name="author" value="[% user.nickname %] ([% user.fakeemail %])">
+    <INPUT type="hidden" name="child" value="[% child %]">
+    <INPUT type="hidden" name="board" value="[% board %]">
+    <INPUT type="hidden" name="group" value="[% group %]">
+    <INPUT size=30 maxlength=60 name="title">
+    </td><td width="10%" BGCOLOR="[% user.bg.1 %]">
+    [% user.nickname %]
+    </td><td width="10%" BGCOLOR="[% user.bg.1 %]">
+    <INPUT TYPE="submit" VALUE="[% loc('Post') %]">
+    </td></tr>
+</form>
+[% END %]
+<form name='pageform' action="[% script %]/[% group %]/[% board %]/[% child %]/" method="get">
+[% FOREACH articles %]
+[% IF recno % 2 != articles_count % 2 %]
+    <tr>
+[% ELSE %]
+    <tr bgcolor="[% user.bg.1 %]">
+[% END %]
+[% IF display != 'top' %]
+    <td width=10% BGCOLOR="[% user.bg.3 %]"><FONT COLOR="[% user.fg.0 %]">
+    [% recno + 1 %]
+    </font></td>
+[% END %]
+    <td width=100%>
+[% IF type == 'deleted' %]
+    [% title %]
+[% ELSIF type == 'article' %]
+    <a class="link" href="[% script %]/[% group %]/[% board %]/[% child %]/[% name %]">[% title %]</a>
+[% ELSE %]
+    [% IF articles_count > 0 %]
+    <a class="link" href="[% script %]/[% group %]/[% board %]/[% child %]/[% name %]">[% title %]</a>
+    [% ELSE %]
+    [% title %]
+    [% END %]
+[% END %]
+    </td><td width="10%"><nobr>
+    [% author %]
+[% IF display == 'top' %]
+    </nobr></td><td width="10%"><nobr>
+    <a class="link" href="[% script %]/[% topclass %]/[% board %]/articles/">[% board %]</a>
+[% END %]
+    </nobr></td><td><nobr>
+    [% date %]
+    </nobr></td></tr>
+[% END %]
+</table>
+[% IF display != 'top' %]
+<hr>
+<div align='center'>
+    <FONT FACE="[% constants.mainfontface %]"><nobr>
+    |
+    <a href="[% script %]/[% topclass %]/[% group %]/">[% loc('Back to group') %]</a>
+    |
+[% IF child == "articles" %]
+    [% IF archives_count > 0 %]
+    <a href="[% script %]/[% group %]/[% board %]/archives/">[% loc('Back to archives') %]</a>
+    |
+    [% END %]
+[% ELSE %]
+    <a href="[% script %]/[% group %]/[% board %]/articles/">[% loc('Back to board') %]</a>
+    |
+[% END %]
+</nobr>
+[% IF pages %]
+    [% loc('Page') %] 
+<select name="begin" onchange="pageform.submit();">
+    [% FOREACH pages %]
+	[% IF iscurpage %]
+<OPTION SELECTED value="[% begin %]">[% number %]</OPTION>
+	[% ELSE %]
+<OPTION value="[% begin %]">[% number %]</OPTION>
+	[% END %]
+    [% END %]
+</SELECT>
+<input type='submit' value=" [% loc('Go_Board') %] ">
+    |
+[% END %]
+    </NOBR>
+</div>
+[% END %]
+</FORM>
+__seclev__
+10000

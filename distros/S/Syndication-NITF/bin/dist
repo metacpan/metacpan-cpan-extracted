@@ -1,0 +1,26 @@
+#!/bin/sh
+
+# $Id: dist,v 0.1 2001/09/11 04:53:58 brendan Exp brendan $
+
+echo "Updating \"The latest version is: ...\" string in doc/README.pod"
+
+perl -pi -e 'BEGIN{require "./NITF.pm";}; s/(latest version is:\s*v).*/$1$Syndication::NITF::VERSION (released $Syndication::NITF::VERSION_DATE)/gi;' doc/README.pod
+
+#echo "Making html docs"
+#pod2html="pod2html --noindex --htmldir $HTML"
+
+#$pod2html --infile=doc/TODO.pod    --css=$URL/perldav.css --title="TODO" --outfile=$HTML/TODO.html
+#$pod2html --infile=doc/README.pod  --css=$URL/perldav.css --title="PerlDAV" --outfile=$HTML/index.html
+#$pod2html --infile=doc/Changes.pod --css=$URL/perldav.css --title="Changes" --outfile=$HTML/Changes.html
+#$pod2html --infile=NITF.pm          --css=$URL/perldav_plain.css --outfile=$HTML/NITF.html
+##$pod2html --infile=doc/HISTORY.pod --css=$URL/perldav.css --outfile=$HTML/HISTORY.html
+
+#echo "Removing extraneous <P>'s from HTML"
+#perl -pi -e 's#^<P>$##; s#^<P></P>$##; ' $HTML/*.html
+
+echo "Making text docs"
+pod2text doc/README.pod > README
+pod2text doc/TODO.pod > TODO
+pod2text doc/Changes.pod > Changes
+
+echo "Done!"

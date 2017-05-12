@@ -1,0 +1,44 @@
+SMS-Send-DistributeSMS
+
+SMS::Send::DistributeSMS driver for SMS::Send for
+the SMS gateway at www.distributesms.com.au.  The driver
+supports sending sms to any country in the world.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc SMS::Send::DistributeSMS
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=SMS-Send-DistributeSMS
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/SMS-Send-DistributeSMS
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/SMS-Send-DistributeSMS
+
+    Search CPAN
+        http://search.cpan.org/dist/SMS-Send-DistributeSMS
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 David Sobon
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

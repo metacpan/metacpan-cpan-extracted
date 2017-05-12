@@ -1,0 +1,271 @@
+
+book: Sort::Maker
+chapter: Sort::Maker
+
+title: A Little Past History
+
+*: TPC3 in Monterey, CA 1999
+*: Co-wrote and presented "A Fresh Look at Efficient Perl Sorting"
+html:
+   <A href="http://www.sysarch.com/perl/sort_paper.html">http://www.sysarch.com/perl/sort_paper.html</A>
+*: Co-author was Larry Rosler (retired from HP and Perl)
+*: Introduced the GRT as a way to speed up Perl sorts
+*: It won the prize for Best Technical Paper
+*: A module Sort::Records was promised which would implement the GRT
+*: Sort::Records was started but a code and design review showed many
+  problems.
+*: Sort::Records was shelved during development because of a code review
+*: People still write to me asking about that module
+
+PAGE_END
+
+title: Recent History
+
+*: I have been thinking about this module for 5 years
+*: Solved the major design flaw - have the user provide key extraction
+  code
+*: A thread in perl6-language gave needed inspiration
+*: Sort::Maker emerges
+*: Much help in the API design and some coding tricks from Damian Conway
+PAGE_END
+
+title: Introducing Sort::Maker
+
+*: Easy description of sorts
+*: Generates a sort sub
+*: Choice of generated sort styles
+*: Can generate the highest speed sorts in Perl
+*: Generated source can be printed
+**: For study
+**: For pasting in code to save the generation time overhead
+*: These slides can be found at
+
+html:
+   <A href="http://www.stemsystems.com/sort/slides/slides/index.html">http://www.stemsystems.com/slides/slides/index.html</A><BR>
+*: The current tarball is at 
+
+html:
+   <A href="http://www.stemsystems.com/sort/Sort-Maker-0.01.tar.gz">http://www.stemsystems.com/sort/Sort-Maker-0.01.tar.gz</A><BR>
+
+PAGE_END
+
+title: Sort::Maker Synopsis
+
+*: Exports a single sub 'make_sorter'
+*: Each key has its own description
+*: Call make_sorter with sort description arguments and it returns a
+   code reference.
+*: Call that reference with unsorted input records
+*: Returns sorted records
+
+code:
+
+	my $sorter = make_sorter(
+		qw( plain ),
+		number => [
+			code => '/(\d+)/',
+			'descending',
+		],
+	) ;
+
+	my @sorted = $sorter->( @unsorted ) ;
+
+PAGE_END
+
+title: Key Descriptions
+
+*: Each key has a description
+*: Keys must be in the order they will sort (higher level keys must be
+  earlier)
+*: The key type must be specified as 'string' or 'number'
+*: Keys can have attributes such as 'descending' or 'case'
+*: Attributes can have defaults set for all the keys
+*: Default attributes can be overridden in any key description
+
+PAGE_END
+
+title: Extraction Code
+
+*: Each key needs code to extract it from a record
+*: Each record is aliased to $_ (via map)
+*: Key extraction code operates on $_ and gets the value for this key
+*: The extraction code is executed in list context so m/(foo)/ works
+*: The code is inside a do{} block so you can have multiple statements
+
+PAGE_END
+
+title: Sort Styles
+
+*: Four different sorting styles to choose from
+**: Plain
+**: Orcish Manouvre
+**: Schwartian Transform (ST)
+**: Guttman-Rosler Transform (GRT)
+*: Each has its uses and advantages
+*: Styles are really different ways to cache extracted keys
+*: Caching keys moves key extraction from O( N log N ) to O( N )
+*: In larger sizes of sort sets, caching keys is a very big win
+*: This is a classic sort of arrays of numbers
+**: Compare this code to the generated code for the different sort styles
+code:
+
+	sort { $a->[0] cmp $b->[0] ||
+	       $a->[1] cmp $b->[1]
+	}
+
+PAGE_END
+
+title: Plain Sort
+
+*: No key caching
+*: Similar to common sorts with a code block
+*: Good for small sort sets as there is no caching
+*: Pass 'plain' option to make_sorter
+
+code:
+
+	sub {
+
+		sort {
+		do{ my( $left, $right ) = map { $_->[0] } $a, $b;
+			$left cmp $right }
+			||
+		do{ my( $left, $right ) = map { $_->[1] } $a, $b;
+			$left cmp $right }
+
+		} @_  ;
+	}
+
+PAGE_END
+
+title: Orcish Manouvre Sort
+
+*: Caches extracted keys in a hash
+*: Assignments to the hash in ||=
+*: Called the orcish because of Or-Cache
+*: Created by Joseph Hall
+*: It will re-extract keys for any record with a false value
+*: The caching hash must be cleared beforehand
+**: Sort::Maker declares a caching hash in the anonymous sub
+*: Hash lookups are still O( N log N )
+*: Good for medium sort sets
+*: Pass 'orcish' option to make_sorter
+
+code:
+	sub {
+		my %or_cache ;
+
+
+		sort {
+		(
+		  ( $or_cache{$a} ||=
+			do{ my ($val) = map { $_->[0] } $a ; $val } )
+				cmp
+		  ( $or_cache{$b} ||=
+			do{ my ($val) = map { $_->[0] } $b ; $val } )
+		)
+			||
+		(
+		  ( $or_cache{$a} ||=
+			do{ my ($val) = map { $_->[1] } $a ; $val } )
+				cmp
+		  ( $or_cache{$b} ||=
+			do{ my ($val) = map { $_->[1] } $b ; $val } )
+		)
+
+		} @_  ;
+	}
+
+PAGE_END
+
+title: Schwartian Transform (ST) Sort
+
+*: Caches extracted keys in an anonymous array for each input record
+*: Stores the record itself in slot 0 of the array
+*: Uses the map/sort/map idiom
+*: Popularized by Randal Schwartz
+*: Good for medium to large sort sets
+*: Key extraction is O( N )
+*: Does a full callback to Perl in the comparison block
+*: Pass 'ST' option to make_sorter
+
+code:
+sub {
+        map $_->[0],
+        sort {
+        $a->[1] cmp $b->[1]
+                ||
+        $a->[2] cmp $b->[2]
+
+        }
+        map [ $_,
+                do{ my ($val) = $_->[0] ; $val },
+                do{ my ($val) = $_->[1] ; $val }
+        ], @_  ;
+}
+
+PAGE_END
+
+title: Guttman-Rosler Transform (GRT) Sort
+
+*: Caches extracted keys in a single string for each input record
+*: String records can be stored in that string
+*: Reference records have their index stored in the cache string
+**: The sorted indices are used to slice into the input array to create
+    sorted records
+*: Key extraction is O( N )
+*: The comparison code is internal and uses C with no Perl callback (big
+   win)
+*: More complex to use properly and efficiently
+*: GRT has special key description attributes for optimization
+**: Numbers can be integer/float, signed/unsigned
+**: Strings can be fixed/varying
+**: Fastest sort style for larger sets of sort records
+*: Pass 'GRT' option to make_sorter
+code:
+sub {
+        my $rec_ind = 0 ;
+
+        return  @_[
+            map unpack( 'N', substr( $_, -4 ) ), 
+            sort
+            map pack( "Z*Z*N",
+                do{ my( $val ) = $_->[0] ; ( $val ) },
+                do{ my( $val ) = $_->[1] ; ( $val ) },
+                $rec_ind++
+            ), @_
+        ] ;
+}
+
+PAGE_END
+
+title: Tests and Benchmarks
+
+*: Test system is table driven
+*: Scripts can do both tests and benchmarks
+*: Provide a set of data
+**: Manually
+**: Generate in place with map
+**: Generate with a anonymous sub
+*: Provide a hand written 'golden' sort sub 
+*: Provide the arguments to make_sorter()
+*: Many tests are in but more are wanted
+**: Send in tests if you want
+*: More complex tests are needed
+code:
+
+	{
+		skip	=> 0,
+		name	=> 'arrays of multiple strings',
+		source	=> 1,
+		data	=> [ map {
+				[ rand_token( 8, 20 ), rand_token( 8, 20 ), ]
+			} 1 .. 100
+		],
+		gold	=> sub { $a->[0] cmp $b->[0] ||
+				 $a->[1] cmp $b->[1] },
+		args	=> [ qw( string $_->[0] string $_->[1] ) ],
+	},
+
+PAGE_END
+

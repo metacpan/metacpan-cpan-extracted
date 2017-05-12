@@ -1,0 +1,6 @@
+Revision history for Perl extension System::Index.
+
+0.1  Mon Sep  4 11:51:46 2000
+	- original version; created by Josiah Bryan
+	- initial creation of cpu_index(), hd_index(), and mem_index().
+

@@ -1,0 +1,54 @@
+{
+   "abstract" : "Arrays as objects with lots of handy methods",
+   "author" : [
+      "Ron Savage <ron@savage.net.au>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.131560",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Set-Array",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Deep" : "0.108",
+            "Test::More" : "0.47"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Try::Tiny" : "0.11",
+            "Want" : "0",
+            "attributes" : "0.06",
+            "overload" : "1.01",
+            "strict" : "1.03",
+            "subs" : "1",
+            "warnings" : "1.03"
+         }
+      }
+   },
+   "provides" : {
+      "Set::Array" : {
+         "file" : "lib/Set/Array.pm",
+         "version" : "0.30"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ]
+   },
+   "version" : "0.30"
+}

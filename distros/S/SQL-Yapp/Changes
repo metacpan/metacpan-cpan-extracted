@@ -1,0 +1,39 @@
+Revision history for SQL-Yapp
+
+2.001   2016-04-24
+        - Fix Oracle 'AS' generation bug (CPAN #100454)
+
+2       2013-04-07
+        - Added sqlDo{} and sqlFetch{} for more easy direct embedding into Perl
+        - Added prefix AND and OR
+        - Allow void context if there is no result
+        - BUG FIX: nested AND and OR sometimes expanded only into the outer operand
+        - many more tests
+
+1.002   2011-08-05/0:00
+        - Removed HTML generation from Makefile.PL: not my business (and produced
+          'unknown' results on cpantesters)
+        - fixed documentation
+        - reworked documentation
+        - made hash interpolation deterministic by sorting keys
+        - BUG FIX: REGRESSION: fixed parens again (WHEN was broken in some cases)
+        - FEATURE: sqlCheck{...} + WHEN and hash interpolation
+        - throw error in void context so that we can fill this with life later
+        - changed required Perl version to 5.8 so that more tests can be done
+          (produced 'unknown' results on cpantesters)
+        Thanks again to cpantesters!
+
+1.001   2011-07-31/0:00
+        - BUG FIX: 'use DBI' in syntax.t (bug found by CPAN tests, thank you!)
+        - BUG FIX: CAST(x AS y) cannot not be parsed (like several others)
+        - BUG FIX: DEFAULT CHARACTER SET is not parsed correctly
+        - BUG FIX: quote_identifier module option doesn't work
+        - fixed documentation
+        - more tests (simple syntax check from earlier manual testing)
+        - more tests (some dialect switching features)
+        - more tests (documentation examples)
+        - added prerequisites to Makefile.PL
+
+1       2011-01-01/0:00
+        - First version, released on an unsuspecting world.
+

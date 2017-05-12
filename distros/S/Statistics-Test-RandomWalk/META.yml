@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name:               Statistics-Test-RandomWalk
+version:            0.02
+abstract:           Random Walk test for random numbers
+author:
+    - Steffen Mueller <smueller@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Class::XSAccessor:    1.05
+    Math::BigFloat:       0
+    Params::Util:         0
+    Statistics::Test::Sequence:  0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -1,0 +1,45 @@
+Revision history for Perl extension Smart::Options
+
+0.06 2017-05-02T12:49:20Z
+    - support environment
+    - support negate fields
+    - support short option multi set
+    - fix document
+
+0.056 2014-06-13T08:29:18Z
+    - fixed corece type can use default value (thx scott)
+
+0.054 2014-06-02T12:27:58Z
+    - fixed 'Multiple' type (thx hirobanex)
+
+0.053 2013-05-27T07:20:04Z
+    - unuse given-when (thx takuji31)
+
+0.052 2013-05-27T02:22:53Z
+    - fixed require module info (thx takuji31)
+    - stop warnings on perl 5.18.x or later
+
+0.051  Fri Mar  15 15:53:04 JST 2013
+    - fixed require module info (thx hirobanex)
+
+0.05   Sun Jan  27 18:14:08 JST 2013
+    - support load option from file
+
+0.04   Sat Jan  12 19:30:30 JST 2013
+    - support type check and coerce
+
+0.03   Fri Dec  14 20:51:25 JST 2012
+    - fix test on windows (thanks to NGLENN)
+    - support dot notation
+
+0.021  Thu Nov  29 12:32:53 JST 2012
+    - fix test_requires and alias bugs (thanks to hayajo)
+     - https://github.com/kan/p5-smart-options/pull/1
+
+0.02   Tue Nov  13 21:16:21 JST 2012
+    - support subcommand like GetOpt::Compat::WithCmd
+    - support DSL like opts (Smart::Options::Declare)
+
+0.01   Sun Oct  07 13:23:11 JST 2012
+    - original version
+

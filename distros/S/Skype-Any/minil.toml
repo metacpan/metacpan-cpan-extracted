@@ -1,0 +1,4 @@
+name = "Skype-Any"
+
+[no_index]
+directory = ['t', 'xt', 'inc', 'share', 'eg', 'examples', 'author', 'builder', 'img']

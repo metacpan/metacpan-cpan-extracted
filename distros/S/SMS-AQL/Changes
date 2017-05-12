@@ -1,0 +1,75 @@
+Revision history for Perl extension SMS::AQL.
+
+
+1.02 2015-03-20
+- Declare HTTP::Message as a pre-req (thanks to pink-mist, GH-2)
+
+1.00 2012-12-15
+- Example script eg/send-sms added (useful for other programs to call, I use
+  this from procmail to alert me when specific emails come in).
+
+0.08 2008-03-18
+Support for voice push messages (strictly speaking this ought to be in
+a seperate module as it's not an SMS-related feature, but it makes sense
+to group with here I think.  If I ever do seperate it, I'll probably go
+for Net::AQL::SMS and Net::AQL::Voice, and have them use Net::AQL::Common
+for shared implementation.)
+
+0.07 2008-01-14
+Minor changes to boost Kwalitee score on cpants.perl.org - mostly updated
+META.yml (and also adding LWP::UserAgent as a pre-req in Makefile.PL)
+
+0.06 2007-08-22
+Changes to make SMS::AQL work under prehistoric perl 5.005
+
+0.05 2007-08-14
+Added support for connecting via a proxy - simply supply the proxy URL in
+the options hashref when instantiating the object:
+my $sms = new SMS::AQL({
+    username => 'user',
+    password => 'pass',
+    options => {
+        proxy => 'http://user:pass@host:port/',
+    }
+});
+
+0.04 2007-07-16
+New release incorporating several improvements kindly submitted by
+Ton Voon at Altinity (http://www.altinity.com/) - thanks Ton!  There's
+numerous documentation improvements, better parsing of server responses,
+and a new test script using Test::MockObject to exercise the module
+code without actually interacting with the AQL servers or sending 
+messages.  Nice work Ton, thanks for your contribution!
+
+
+0.03  2007-06-26
+Previous versions had use 5.008007 in the Makefile, where I forgot to
+change it.  There's nothing funky in this module that should require
+5.8.7, 5.8.0 should be good enough.  Thanks to Nicola W for pointing
+this out.
+
+Also added new credit() method to return the number of message credits
+available on the account.
+
+
+0.02  2007-01-04
+Fix stupid, stupid bug #24201 - don't remove servers from the list of 
+servers, unless we fail to send a message.  Previously, each instance 
+of SMS::AQL could only send 4 messages in a row before starting to fail.
+Obviously, passed all tests, only showed up in real usage.  Wibble.  
+Also some minor style problems cleared up.
+
+Important: constructor now takes a hashref of params to provide for 
+future expansion needs.
+
+0.01  2006-08-10
+development starts... pre-alpha version started life as Net::AQSMS::Send, 
+name SMS::AQL was then agreed after brief discussion with modules@perl.org 
+guys, Brian in particular - thanks for your input Brian.
+
+Initial version is quite limited, but tested and works well for me.  
+Not tested with non-UK destination numbers.
+
+
+
+$Id$

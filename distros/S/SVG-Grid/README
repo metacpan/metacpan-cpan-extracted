@@ -1,0 +1,33 @@
+README file for SVG::Grid.
+
+See also: CHANGES and Changelog.ini.
+
+Warning: WinZip 8.1 and 9.0 both contain an 'accidental' bug which stops
+them recognizing POSIX-style directory structures in valid tar files.
+You are better off using a reliable tool such as InfoZip:
+ftp://ftp.info-zip.org/pub/infozip/
+
+1 Installing from a Unix-like distro
+------------------------------------
+shell>gunzip SVG-Grid-1.00.tgz
+shell>tar mxvf SVG::Grid-1.00.tar
+
+Note: 'make' on MS Windows-like systems may be called 'nmake' or 'dmake'.
+
+shell>perl Makefile.PL
+shell>make
+shell>make test
+shell>su              (for Unix-like systems)
+shell>make install
+shell>exit            (for Unix-like systems)
+
+On all systems:
+
+Run Grid.pm through your favourite pod2html translator.
+
+2 Installing from an ActiveState distro
+---------------------------------------
+shell>unzip SVG-Grid-1.0.zip
+shell>ppm install --location=. SVG-Grid
+shell>del SVG-Grid-1.00.ppd
+shell>del PPM-SVG-Grid-1.00.tar.gz

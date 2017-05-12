@@ -1,0 +1,20 @@
+Revision history for Perl module Sub::Curry
+
+0.80 2004-08-06 [LODIN]
+    - Complete rewrite by Johan Lodin.
+    - Introduced several features.
+    - Added the cookbook, Sub::Curry::Cookbook.
+    - Added several tests.
+
+0.08 2002-08-05 [DAVIDH]
+
+0.07 2002-08-05 [DAVIDH]
+    - Changed name to capitalized Sub::Curry.
+
+0.06 2000-11-07 [DAVIDH]
+    - Added tests.
+
+0.04 2000-11-06 [DAVIDH]
+
+0.02 2000-10-12 [DAVIDH]
+    - Original version of sub::curry by David Helgason.

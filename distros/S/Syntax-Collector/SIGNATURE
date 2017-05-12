@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 294505f858f11dd062e9916e3f50d88210a9ef54 CONTRIBUTING
+SHA1 a7f437e7f6532832049e3b04ec7c5676d2a78043 COPYRIGHT
+SHA1 6bd7b17d81be63d08d4efa6cb80106e72887842c CREDITS
+SHA1 4fa88b2903790d7c2cb408377d60c797c28a1242 Changes
+SHA1 0a1eb79a52a56dc54af93653193e3d8a409cb9da INSTALL
+SHA1 ec5a7b4f3023f03ebf821b57690758f7e6f3ae2a LICENSE
+SHA1 a44c728ae27a2c0bddd55074d21ffda8d371ccd9 MANIFEST
+SHA1 571a604a664174c77ae1c327751a0ef3acdcc806 META.json
+SHA1 bfc248189161f813da6f6044f2bac20b5c8462af META.yml
+SHA1 7fe116cbddab9e78e757034792acc46bb4829f2c Makefile.PL
+SHA1 24855c71cf5c5bdac71d01980bb41828e01ef3c6 README
+SHA1 a752c71686a7f6a3a473cfd723ef411b40dc762a dist.ini
+SHA1 02ce7a139a41f4cf7c2f4f3a32540a5065401837 doap.ttl
+SHA1 df610896241011e76d1abfff21c8ecc1bbd8587c examples/MyTest.pm
+SHA1 8c719324cb43dd6c1f9aebc277980686e0f06888 examples/basic.pl
+SHA1 8b3c5d366a0a716096617c9e14a100c1948fd159 inc/Test/Fatal.pm
+SHA1 95d4da14025622f3a45f5e9b75b7b6860148f415 inc/Test/Requires.pm
+SHA1 75dd349355aff420c46d9e37802e39712b6309c2 inc/Try/Tiny.pm
+SHA1 9b8ead9041531dc9b8d4f7ba834862a44a5de536 lib/Syntax/Collector.pm
+SHA1 bf28aeffade9903c351cf34ff0dec3c4111f8001 t/01basic.t
+SHA1 0e9e5275cf556b760ec3c2ce58cd2dbe76d76f70 t/02collection.t
+SHA1 cdbc7001884822024bf1d2f3a548a823d8855acf t/03modern.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.14 (GNU/Linux)
+
+iEYEARECAAYFAlKMq3oACgkQzr+BKGoqfTnBcQCfWamLDinODGIt3d+MOV0OaRUJ
+C8IAoLZGn+d8Jc8PFKBtoxY6w6Cbl5rq
+=hmPm
+-----END PGP SIGNATURE-----

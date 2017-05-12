@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<i18n>
+    <btns>
+        <btn name="example" title="Button title">Button label</btn>
+        <btn name="turn_on_rte" title="Rich Text Editor">Use the rich text editor.</btn>
+        <btn name="turn_off_rte" title="Plain Text Area">Use the plain text editor.</btn>
+        <btn name="display_wire_frames" title="Display wire frames">Display wire frames</btn>
+        <btn name="hide_wire_frames" title="Hide wire frames">Hide wire frames</btn>
+        <btn name="display_lang_tags" title="Display lang tags">Display lang tags</btn>
+        <btn name="hide_lang_tags" title="Hide lang tags">Hide lang tags</btn>
+    </btns>
+
+    <msgs>
+        <msg name="form_error"><![CDATA[There was a problem with the form.]]></msg>
+        <msg name="generic_back_error"><![CDATA[The page you tried to view has expired.]]></msg>
+    </msgs>
+    
+    <errs>
+        <err name="cant_create_path"><![CDATA[Could not create path <!-- var name=path -->: <!-- var name=error -->]]></err>
+        <err name="input_required">Required</err>    
+        <err name="invalid_credentials">Could not contact the databse with this information.</err>    
+        <err name="passwords_do_not_match">The passwords do not match.</err>    
+        <err name="non_solstice_path"><![CDATA[The given path does not appear to be a Solstice installation.]]></err>
+        <err name="non_directory"><![CDATA[The path given exists, but is not a directory.]]></err>
+        <err name="non_writable_directory"><![CDATA[Unable to write to the directory given.]]></err>
+        <err name="non_createable_directory"><![CDATA[Unable to create the directory given.]]></err>
+        <err name="db_preexists"><![CDATA[That database already exists.]]></err>
+        <err name="encryption_length_error"><![CDATA[The encryption key must be 16 characters.]]></err>
+        <err name="invalid_emails"><![CDATA[One or more emails are invalid:]]></err>
+        <err name="invalid_date"><![CDATA[Invalid date]]></err>
+        <err name="passed_date"><![CDATA[Date has passed]]></err>
+    </errs>
+
+    <strs>
+        <str name="textarea_switch_rich_text"><![CDATA[Need more text formatting options?]]></str>
+        <str name="textarea_switch_plain_text"><![CDATA[Want faster page load times?]]></str>
+        <str name="textarea_switch_plain_text_confirm"><![CDATA[Switch to Plain Text mode and remove all formatting?]]></str>
+        <str name="404_title"><![CDATA[404 Page Not Found]]></str>
+        <str name="clickthrough_no_javascript"><![CDATA[Please click to continue.]]></str>
+        <str name="install_header"><![CDATA[<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" dir="ltr" lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="KEYWORDS" content="Say Hello to Solstice">
+    <title>Welcome to Solstice</title>
+    <style type="text/css">
+        .sol_error_notification_text { color: red; }
+        .sol_message_service_text { border: 1px solid #aaa; color: #d00; }
+        .header { font-size: 188%; font-weight: normal; border-bottom: 1px solid #aaa; }
+        .subheader { font-size: 120%; font-weight: normal; }
+        .solstice_box { border: 1px solid #aaa; }
+        body {margin:0px; padding:0px;}
+        .sol_formtip { font-size: 0.8em; padding-bottom:0.8em; color:rgb(80,80,80);}
+    </style>
+</head>
+<body>
+    <div>
+        <img src="http://solstice.eplt.washington.edu/skins/solstice/logo.gif" />
+    </div>
+    <div style="margin-top: 10px; height: 10px; width: 100%; background-color: #E1A856;">
+    </div>
+    <div style="margin-left: 20%; width: 60%;">
+    <form action="." method="POST">
+]]></str>
+        <str name="install_footer"><![CDATA[    
+        </form>
+        </div>
+    <div style="margin-top: 30px; height: 25px; width: 100%; background-color: #E1A856;">
+    </div>
+</body>
+</html>
+]]></str>
+        <str name="install_save_button"><![CDATA[Generate Config]]></str>
+        <str name="popin_remove_title">Close this box</str>
+        <str name="no_cookies_message"><![CDATA[
+<h2>You must enable cookies in order to continue.</h2>
+<ol>
+  <li>In order to use this application, you must enable cookies for this site
+    in your browser. Please consult your browser's Help files for instructions
+    about how to enable cookies. </li>
+</ol>
+<p>For Firefox, follow these steps to enable cookies:</p>
+<ol>
+  <li>From the menu bar, select <strong>Tools &gt; Options</strong>. The Options
+    dialog box will open.</li>
+  <li>Select Privacy in the left pane.</li>
+  <li>Select <strong>Cookies</strong> in the right pane. The Cookies options will
+    expand. </li>
+  <li>Select <strong>Allow sites to set cookies</strong>. </li>
+  <li>Click <strong>OK.</strong></li>
+</ol>
+<p>For Internet Explorer, follow these steps to enable cookies:</p>
+<ol>
+  <li>From the menu bar, select <strong>Tools &gt; Internet Options</strong>.
+  </li>
+  <li>Select the <strong>Privacy</strong> tab.</li>
+  <li>Drag the slider to reduce your settings to Medium.</li>
+  <li>Click <strong>OK</strong>.</li>
+</ol>
+
+]]></str>
+        <str name="solstice_installer_info"><![CDATA[<p>Solstice is not yet configured.  Please ensure your Solstice <code>conf</code> directory is writable by the webserver and visit <a href="<!-- sol_var name=url -->/installer/">the installer</a> to set some initial options.</p>]]></str>
+        <str name="welcome_to_solstice"><![CDATA[<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" dir="ltr" lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="KEYWORDS" content="Say Hello to Solstice">
+    <title>Welcome to Solstice</title>
+</head>
+<body style="margin:0px;padding:0px;">
+    <div>
+        <img src="http://solstice.eplt.washington.edu/skins/solstice/logo.gif" />
+    </div>
+    <div style="margin-top: 10px; height: 10px; width: 100%; background-color: #E1A856;">
+    </div>
+    <div style="margin-left: 20%; width: 60%;">
+        <h1 style="font-size: 188%; font-weight: normal; border-bottom: 1px solid #aaa;">Welcome to Solstice</h1>
+        <!-- sol_var name=installer_info -->
+        <p>If you are seeing this screen, it means you have successfully installed the Solstice Application Framework, but
+        there are no applications installed.  <a href="http://solstice.eplt.washington.edu/projects/">The Solstice Download page</a>
+        is a good place to look for applications to install.
+        </p>
+        <p>
+        If you're wondering where to go from here, please visit our <a href="http://solstice.eplt.washington.edu/Documentation">documentation page</a>,
+        or visit us in #solstice on irc.freenode.net.
+        </p>
+    </div>
+    <div style="margin-top: 30px; height: 25px; width: 100%; background-color: #E1A856;">
+    </div>
+</body>
+</html>
+]]></str>
+    <str name="denied_browser_message"><![CDATA[
+        <h2>Your browser or rendering engine is not supported.</h2>
+<br />
+This application supports a limited set of Web browsers and rendering engines.
+The browser or rendering engine you are using is not supported. We recommend that
+you use one of the following browsers:
+<ul>
+  <li>Microsoft Internet Explorer 5.01 and up for Windows.</li>
+  <li>Netscape Navigator 6.x and 7.x for any operating system.</li>
+  <li>Netscape 8.x and up for Windows</li>
+  <li>Mozilla Firefox 0.8 and up for any operating system</li>
+  <li>Safari for Macintosh OS X and up</li>
+</ul>
+
+For Netscape 8, please change the rendering engine for this site to Mozilla
+Firefox. To change the rendering engine,
+follow these steps:
+
+<ol>
+  <li>On the menu bar, select <strong>View &gt; Rendering Engine &gt; Display
+    Page Like Firefox</strong>.</li>
+  </ol>
+
+Or,
+
+<ol>
+  <li>Click the browser icon in the status bar at the bottom left of the window.
+    A context menu will open.
+  <li>From the context menu, select <strong>Display Like Firefox</strong>.
+</ol>
+
+]]></str>
+        <str name="denied_user_message"><![CDATA[
+Your account does not have access to the service you have requested.
+]]></str>
+        <str name="redirection_message"><![CDATA[<h1>Redirecting...</h1>]]></str>
+        <str name="upload_add_label"><![CDATA[Add file]]></str>
+        <str name="upload_another_label"><![CDATA[Add another file]]></str>
+        <str name="upload_remove_label"><![CDATA[Remove]]></str>
+        <str name="unknown_content_type"><![CDATA[Unknown file type]]></str>
+    </strs>
+    
+    <hlps>
+        <hlp name="example"><![CDATA[This is an example.]]></hlp>
+    </hlps>
+</i18n>

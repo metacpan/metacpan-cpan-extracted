@@ -1,0 +1,250 @@
+=head1 NAME
+
+Sys::Hwloc::Cpuset - Class representing a hwloc cpuset object
+
+=head1 SYNOPSIS
+
+       use Sys::Hwloc;
+
+       $set  = Sys::Hwloc::Cpuset->alloc;
+       $oset = $set->dup;
+       $set->copy( $oset );
+       $set->free;
+
+       $set->zero;
+       $set->fill;
+       $set->cpu( $id );
+       $set->all_but_cpu( $id );
+       $set->from_ulong( $mask );
+       $set->from_ith_ulong( $i, $mask );
+       $rc   = $set->from_string( $string );
+       $rc   = $set->from_liststring( $string );
+       $set->set( $id );
+       $set->set_range( $ida, $ide );
+       $set->set_ith_ulong( $i, $mask );
+       $set->clr( $id );
+       $set->clr_range( $ida, $ide );
+       $set->singlify;
+
+       $val  = $set->ulong;
+       $val  = $set->to_ith_ulong( $i );
+       $val  = $set->sprintf;
+       $val  = $set->sprintf_list;
+       @ids  = $set->ids;
+
+       $rc   = $set->isset( $id );
+       $rc   = $set->iszero;
+       $rc   = $set->isfull;
+
+       $id   = $set->first;
+       $id   = $set->next( $previd );
+       $id   = $set->last;
+
+       $val  = $set->weight;
+
+       $set->or( $oset );
+       $set->and( $oset );
+       $set->andnot( $oset );
+       $set->xor( $oset );
+       $set->not;
+
+       $rc   = $set->intersects( $oset );
+       $rc   = $set->includes( $oset );
+       $rc   = $set->isincluded( $oset );
+       $rc   = $set->isequal( $oset );
+       $rc   = $set->compare( $oset );
+       $rc   = $set->compare_first( $oset );
+
+
+=head1 DESCRIPTION
+
+Sys::Hwloc::Cpuset is the Perl namespace used for I<struct hwloc_cpuset>
+data prior hwloc-1.1.
+
+Since hwloc-1.1, this class is replaced by L<Sys::Hwloc::Bitmap>.
+
+The Sys::Hwloc::Cpuset class provides an object-oriented interface
+for hwloc C functions that act on cpuset and nodeset objects. In particular,
+every hwloc C function that gets a I<hwloc_cpuset> pointer as first argument
+has an OO-ish counterpart in Sys::Hwloc::Cpuset.
+
+A Sys::Hwloc::Cpuset instance is created with B<hwloc_cpuset_alloc()> or
+B<Sys::Hwloc::Cpuset-E<gt>alloc()>.
+
+The underlying C data must become freed with B<hwloc_cpuset_free()> or
+B<$cpuset-E<gt>free()>.
+
+=head1 METHODS
+
+Refer to L<http://www.open-mpi.org/projects/hwloc> for the full specification.
+
+This section lists only methods that are specific to Sys::Hwloc. These are
+methods, which have no pendants in the hwloc C API, or which behave differently
+compared to their hwloc C API counterparts.
+
+=over 4
+
+=item B<alloc>
+
+  $set = Sys::Hwloc::Cpuset->alloc();
+
+Allocates and returns a cpuset. Returns a new Sys::Hwloc::Cpuset instance
+on success, returns I<undef> on error.
+
+=item B<free>
+
+  $set->free();
+
+Frees an allocated cpuset.
+
+There is no automatic Perl destructor Sys::Hwloc::Cpuset::DESTROY.
+That means, if an initialized cpuset variable goes out of scope or gets another value assigned,
+the C cpuset is not freed. This conforms to the usage of the hwloc C API,
+but unfortunately not to the rules of OO in Perl.
+
+=item B<ids>
+
+  @ids = $set->ids;
+
+Returns the bits that are set in a cpuset as an array of unsigned numbers.
+
+The method is a replacement of the hwloc C API macro pair B<hwloc_cpuset_foreach_begin> and B<hwloc_cpuset_foreach_end>.
+
+The following example shows the use of the hwloc C API macros, and what the Perl B<ids> method does:
+
+  /* This is C */
+  unsigned id;
+  hwloc_cpuset_foreach_begin(id, set) {
+    printf("id = %u\n", id);
+  }
+  hwloc_cpuset_foreach_end();
+
+  # This is Perl
+  foreach $id ($set->ids) {
+    printf "id = %u\n", $id;
+  }
+
+=item B<sprintf_list>
+
+  $string = $set->sprintf_list
+
+Returns a string containing the bits set in a cpuset as a comma-separated list of decimal numbers and ranges of numbers.
+The format conforms to the B<List Format> of Linux cpusets, see L<cpuset>(7).
+
+This method is not part of the hwloc C API.
+
+The following example script will print "0-7,16,17,24-27".
+
+  $set = Sys::Hwloc::Cpuset->alloc;
+  $set->set_range(0,7);
+  $set->set_range(16,17);
+  $set->set_range(24,27);
+  printf "%s\n", $set->sprintf_list;
+  $set->free;
+
+=item B<from_liststring>
+
+  $rc = $set->from_liststring( $string );
+
+Parses a Linux L<cpuset>(7) list format ASCII string and stores it in cpuset $set.
+
+Returns 0 on success, -1 on error. If error, the content of $set is undefined.
+
+This method is not part of the hwloc C API. It is the reverse of B<$string = $set-E<gt>sprintf_list>.
+
+=item B<includes>
+
+  $rc = $set->includes( $oset );
+
+Tests wether $oset is part of $set.
+
+This method is not part of the hwloc C API. It is equivalent to B<$oset-E<gt>isincluded($set)>.
+
+=item B<or>
+
+  $set->or( $oset );
+
+ORes $set with $oset, similar to B<|=>. In hwloc-0.9 this method is named B<orset>.
+
+The long version of this in pure hwloc-1.0 is:
+
+  $tempset = hwloc_cpuset_alloc;
+  hwloc_cpuset_or($tempset, $set, $oset);
+  hwloc_cpuset_free($set);
+  $set = $tempset;
+
+=item B<and>
+
+  $set->and( $oset );
+
+ANDs $set with $oset, similar to B<&=>. In hwloc-0.9 this method is named B<andset>.
+
+The long version of this in pure hwloc-1.0 is:
+
+  $tempset = hwloc_cpuset_alloc;
+  hwloc_cpuset_and($tempset, $set, $oset);
+  hwloc_cpuset_free($set);
+  $set = $tempset;
+
+=item B<andnot>
+
+  $set->andnot( $oset );
+
+ANDs $set with the negation of $oset.
+
+The long version of this in pure hwloc-1.0 is:
+
+  $tempset = hwloc_cpuset_alloc;
+  hwloc_cpuset_andnot($tempset, $set, $oset);
+  hwloc_cpuset_free($set);
+  $set = $tempset;
+
+=item B<xor>
+
+  $set->xor( $oset );
+
+XORes $set with $oset, similar to B<^=>. In hwloc-0.9 this method is named B<xorset>.
+
+The long version of this in pure hwloc-1.0 is:
+
+  $tempset = hwloc_cpuset_alloc;
+  hwloc_cpuset_xor($tempset, $set, $oset);
+  hwloc_cpuset_free($set);
+  $set = $tempset;
+
+=item B<not>
+
+  $set->not;
+
+Negates $set.
+
+The long version of this in pure hwloc-1.0 is:
+
+  $tempset = hwloc_cpuset_alloc;
+  hwloc_cpuset_not($tempset, $set);
+  hwloc_cpuset_free($set);
+  $set = $tempset;
+
+=back
+
+=head1 SEE ALSO
+
+L<hwloc>(7),
+L<Sys::Hwloc::Topology>(3pm),
+L<Sys::Hwloc::Obj>(3pm),
+L<Sys::Hwloc::Bitmap>(3pm)
+
+
+=head1 AUTHOR
+
+Bernd Kallies, E<lt>kallies@zib.deE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011 Zuse Institute Berlin
+
+This package and its accompanying libraries is free software; you can
+redistribute it and/or modify it under the terms of the GPL version 2.0,
+or the Artistic License 2.0. Refer to LICENSE for the full license text.
+
+=cut

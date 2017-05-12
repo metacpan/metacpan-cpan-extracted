@@ -1,0 +1,148 @@
+NAME
+    Sub::Documentation - Collect documentation for subroutines
+
+VERSION
+    version 1.100880
+
+SYNOPSIS
+        use Sub::Documentation 'add_documentation';
+
+        my $pkg = __PACKAGE__;
+        add_documentation(
+            package       => $pkg,
+            glob_type     => 'CODE',
+            name          => 'new',
+            type          => 'purpose',
+            documentation => 'A constructor.'
+        );
+        add_documentation(
+            package       => $pkg,
+            glob_type     => 'SCALAR',
+            name          => 'count',
+            type          => 'purpose',
+            documentation => 'Number of flurbles.'
+        );
+
+DESCRIPTION
+    This module provides support for generating documentation for your
+    subroutines. It does not itself generate the documentation, but relies
+    on tools such as Pod::Weaver::Transformer::AddMethodAutoDoc - which is a
+    plugin to Pod::Weaver that is most likely used in conjunction with
+    Dist::Zilla - to put the collected information to use.
+
+    Also see Sub::Documentation::Attributes.
+
+    Modules that generate methods - such as Class::Accessor::Installer -
+    might want to use this module. Class::Accessor::Complex,
+    Class::Accessor::Constructor and Class::Accessor::FactoryTyped use
+    Class::Accessor::Installer and so support this kind of auto-generated
+    documentation.
+
+    This functions are exported on request.
+
+FUNCTIONS
+  add_documentation(%args)
+    Adds documentation. It depends on how you use the collected
+    documentation data, but most tools would use the following key/value
+    pairs:
+
+    package
+        The package for which to add documentation.
+
+    glob_type
+        The kind of symbol that is being documented: "CODE", "SCALAR",
+        "ARRAY", "HASH" etc. The symbol name alone is insufficient to
+        determine what is being documented - does "new" refer to the
+        subroutine "new()" or any of the variables $new, C@new> or %new.
+        Therefore you also need to pass the glob type.
+
+    name
+        The symbol name for which to add documentation, that is, the
+        subroutine name or variable name.
+
+    type
+        The type of documentation to add. This might be "purpose", "example"
+        or the like.
+
+        The documentation type is freely definable, but the code that
+        actually generates the documentation, for example,
+        Pod::Weaver::Section::CollectWithAutoDoc needs to understand these
+        documentation types.
+
+    documentation
+        The actual documentation string.
+
+    You can add any other key/value pairs which your documentation tool
+    needs. For example, Class::Accessor::Complex generates helper methods
+    for most accessors, so in the documentation tool we would like to know
+    which helper method belongs to which main accessor. For example, for
+    array accessors, "foo_push()", "shift_foo()" and "foo_count()", amongst
+    others, all belong to the "foo" array accessor.
+
+    The documentation is stored in a list where each element is the has
+    passed to "add_documentation()".
+
+  get_documentation
+    Returns the documentation list. This can be used by modules that
+    actually generate the documentation to inspect which documentation has
+    been defined.
+
+  search_documentation(%args)
+    Goes through the list of collected documentation and returns those
+    entries that match the key/value pairs given as the arguments.
+
+    For example,
+
+        search_documentation(
+            package   => 'Foo::Bar',
+            glob_type => 'CODE',
+            type      => 'examples',
+        );
+
+    will return all entries with those key/value pairs.
+
+    If a string value in the arguments is compared to an array value in the
+    entry, it is sufficient for one of the array elements to be equal to the
+    required value. For example,
+
+        search_documentation(
+            name => 'clear_foo'
+        );
+
+    will match this entry:
+
+        add_documentation(
+            name => [ qw(clear_foo foo_clear) ],
+            ...
+        );
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Sub-Documentation>.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <http://search.cpan.org/dist/Sub-Documentation/>.
+
+    The development version lives at
+    <http://github.com/hanekomu/Sub-Documentation/>. Instead of sending
+    patches, please fork this project using the standard git and github
+    infrastructure.
+
+AUTHOR
+      Marcel Gruenauer <marcel@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

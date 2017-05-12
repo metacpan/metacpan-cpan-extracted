@@ -1,0 +1,57 @@
+Set-Equivalence
+===============
+
+Created:      2013-07-13
+Home page:    <https://metacpan.org/release/Set-Equivalence>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Set-Equivalence>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.003	2013-09-30
+
+ [ Documentation ]
+ - Link to List::Objects::WithUtils in SEE ALSO.
+
+ [ Packaging ]
+ - Use Dist::Inkt.
+
+ [ Other ]
+ - Updated: Use Exporter::Tiny instead of Exporter::TypeTiny.
+
+0.002	2013-07-28
+
+ [ Documentation ]
+ - Include example using Types::Set with p5-mop.
+
+0.001	2013-07-16
+
+ [ Documentation ]
+ - Add Types::Set SYNOPSIS and DESCRIPTION.
+ - Include examples using Types::Set with Moo and Moose.
+
+0.000_05	2013-07-16
+
+ [ Bug Fixes ]
+ - Raise Type::Tiny dependency version number.
+
+0.000_04	2013-07-15
+
+ [ Bug Fixes ]
+ - Lower Type::Tiny dependency version number.
+
+0.000_03	2013-07-15
+
+ - Added: Set::Equivalence objects can now apply type constraints and
+   coercions to their members.
+ - Added: Types::Set.
+ - Set::Equivalence uses Exporter::TypeTiny instead of Exporter.pm for
+   exporting.
+
+0.000_02	2013-07-15
+
+ [ Bug Fixes ]
+ - Fixed $set->member in list context.
+
+ [ Packaging ]
+ - Improved test suite.
+
+0.000_01	2013-07-14	Preview release

@@ -1,0 +1,36 @@
+Revision history for Perl module Sledge::Template::Xslate
+
+0.09 2013-10-13T12:47:47Z
+        - Added missing dates to Changes to satisfy CPAN::Changes::Spec. (neilbowers)
+
+0.08 2013-10-12T02:17:13Z
+        - minil migrate
+        - no check exists xslate cache directory.
+        - fixed dependency.
+
+0.07 2012-01-22
+        - fixed xslate option.
+        - fixed package.
+        - fixed defined Exception.
+
+0.06 2012-01-20
+        - fixed xslate option.
+        - fixed dependencies.
+
+0.05 2012-01-20
+        - change version format.
+        - fixed dependencies.
+
+0.0.4 2011-02-21
+        - memoize Text::Xslate constructor.(gfx++)
+
+0.0.3 2010-11-23
+        - change interface of Text::Xslate constructor options.
+          (idea by tokuhirom)
+
+0.0.2 2010-11-22
+        - original version
+
+0.0.1 2010-11-21
+        - mistake version
+

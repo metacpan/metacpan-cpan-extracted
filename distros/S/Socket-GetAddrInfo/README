@@ -1,0 +1,327 @@
+NAME
+    `Socket::GetAddrInfo' - address-family independent name resolving
+    functions
+
+SYNOPSIS
+     use Socket qw( SOCK_STREAM );
+     use Socket::GetAddrInfo qw( getaddrinfo getnameinfo );
+     use IO::Socket;
+
+     my %hints = ( socktype => SOCK_STREAM );
+     my ( $err, @res ) = getaddrinfo( "www.google.com", "www", \%hints );
+
+     die "Cannot resolve name - $err" if $err;
+
+     my $sock;
+
+     foreach my $ai ( @res ) {
+        my $candidate = IO::Socket->new();
+
+        $candidate->socket( $ai->{family}, $ai->{socktype}, $ai->{protocol} )
+           or next;
+
+        $candidate->connect( $ai->{addr} )
+           or next;
+
+        $sock = $candidate;
+        last;
+     }
+
+     if( $sock ) {
+        my ( $err, $host, $service ) = getnameinfo( $sock->peername );
+        print "Connected to $host:$service\n" if !$err;
+     }
+
+DESCRIPTION
+    The RFC 2553 functions `getaddrinfo' and `getnameinfo' provide an
+    abstracted way to convert between a pair of host name/service name and
+    socket addresses, or vice versa. `getaddrinfo' converts names into a set
+    of arguments to pass to the `socket()' and `connect()' syscalls, and
+    `getnameinfo' converts a socket address back into its host name/service
+    name pair.
+
+    These functions provide a useful interface for performing either of
+    these name resolution operation, without having to deal with IPv4/IPv6
+    transparency, or whether the underlying host can support IPv6 at all, or
+    other such issues. However, not all platforms can support the underlying
+    calls at the C layer, which means a dilema for authors wishing to write
+    forward-compatible code. Either to support these functions, and cause
+    the code not to work on older platforms, or stick to the older "legacy"
+    resolvers such as `gethostbyname()', which means the code becomes more
+    portable.
+
+    This module attempts to solve this problem, by detecting at compiletime
+    whether the underlying OS will support these functions. If it does not,
+    the module will use pure-perl emulations of the functions using the
+    legacy resolver functions instead. The emulations support the same
+    interface as the real functions, and behave as close as is resonably
+    possible to emulate using the legacy resolvers. See
+    Socket::GetAddrInfo::Emul for details on the limits of this emulation.
+
+    As of Perl version 5.14.0, Perl already supports `getaddrinfo' in core.
+    On such a system, this module simply uses the functions provided by
+    `Socket', and does not need to use its own compiled XS, or pure-perl
+    legacy emulation.
+
+    As `Socket' in core now provides all the functions also provided by this
+    module, it is likely this may be the last released version of this
+    module. And code currently using this module would be advised to switch
+    to using core `Socket' instead.
+
+EXPORT TAGS
+    The following tags may be imported by `use Socket::GetAddrInfo qw( :tag
+    )':
+
+    AI      Imports all of the `AI_*' constants for `getaddrinfo' flags
+
+    NI      Imports all of the `NI_*' constants for `getnameinfo' flags
+
+    EAI     Imports all of the `EAI_*' for error values
+
+    constants
+            Imports all of the above constants
+
+FUNCTIONS
+  ( $err, @res ) = getaddrinfo( $host, $service, $hints )
+    `getaddrinfo' turns human-readable text strings (containing hostnames,
+    numeric addresses, service names, or port numbers) into sets of binary
+    values containing socket-level representations of these addresses.
+
+    When given both host and service, this function attempts to resolve the
+    host name to a set of network addresses, and the service name into a
+    protocol and port number, and then returns a list of address structures
+    suitable to connect() to it.
+
+    When given just a host name, this function attempts to resolve it to a
+    set of network addresses, and then returns a list of these addresses in
+    the returned structures.
+
+    When given just a service name, this function attempts to resolve it to
+    a protocol and port number, and then returns a list of address
+    structures that represent it suitable to bind() to.
+
+    When given neither name, it generates an error.
+
+    The optional `$hints' parameter can be passed a HASH reference to
+    indicate how the results are generated. It may contain any of the
+    following four fields:
+
+    flags => INT
+            A bitfield containing `AI_*' constants. At least the following
+            flags will be available:
+
+            * `AI_PASSIVE'
+              Indicates that this resolution is for a local `bind()' for a
+              passive (i.e. listening) socket, rather than an active (i.e.
+              connecting) socket.
+
+            * `AI_CANONNAME'
+              Indicates that the caller wishes the canonical hostname
+              (`canonname') field of the result to be filled in.
+
+            * `AI_NUMERICHOST'
+              Indicates that the caller will pass a numeric address, rather
+              than a hostname, and that `getaddrinfo' must not perform a
+              resolve operation on this name. This flag will prevent a
+              possibly-slow network lookup operation, and instead return an
+              error, if a hostname is passed.
+
+            Other flags may be provided by the OS.
+
+    family => INT
+            Restrict to only generating addresses in this address family
+
+    socktype => INT
+            Restrict to only generating addresses of this socket type
+
+    protocol => INT
+            Restrict to only generating addresses for this protocol
+
+    Errors are indicated by the `$err' value returned; which will be
+    non-zero in numeric context, and contain a string error message as a
+    string. The value can be compared against any of the `EAI_*' constants
+    to determine what the error is. Rather than explicitly checking, see
+    also Socket::GetAddrInfo::Strict which provides functions that throw
+    exceptions on errors.
+
+    If no error occurs, `@res' will contain HASH references, each
+    representing one address. It will contain the following five fields:
+
+    family => INT
+            The address family (e.g. AF_INET)
+
+    socktype => INT
+            The socket type (e.g. SOCK_STREAM)
+
+    protocol => INT
+            The protocol (e.g. IPPROTO_TCP)
+
+    addr => STRING
+            The address in a packed string (such as would be returned by
+            pack_sockaddr_in)
+
+    canonname => STRING
+            The canonical name for the host if the `AI_CANONNAME' flag was
+            provided, or `undef' otherwise. This field will only be present
+            on the first returned address.
+
+  ( $err, $host, $service ) = getnameinfo( $addr, $flags, $xflags )
+    `getnameinfo' turns a binary socket address into a pair of
+    human-readable strings, containing the host name, numeric address,
+    service name, or port number.
+
+    The optional `$flags' parameter is a bitfield containing `NI_*'
+    constants. At least the following flags will be available:
+
+    * `NI_NUMERICHOST'
+      Requests that a human-readable string representation of the numeric
+      address is returned directly, rather than performing a name resolve
+      operation that may convert it into a hostname.
+
+    * `NI_NUMERICSERV'
+      Requests that the port number be returned directly as a number
+      representation rather than performing a name resolve operation that
+      may convert it into a service name.
+
+    * `NI_NAMEREQD'
+      If a name resolve operation fails to provide a name, then this flag
+      will cause `getnameinfo' to indicate an error, rather than returning
+      the numeric representation as a human-readable string.
+
+    * `NI_DGRAM'
+      Indicates that the socket address relates to a `SOCK_DGRAM' socket,
+      for the services whose name differs between `TCP' and `UDP' protocols.
+
+    Other flags may be provided by the OS.
+
+    The optional `$xflags' parameter is a bitfield containing `NIx_*'
+    constants. These are a Perl-level extension to the API, to indicate
+    extra information.
+
+    * `NIx_NOHOST'
+      Indicates that the caller is not interested in the hostname of the
+      result, so it does not have to be converted; `undef' will be returned
+      as the hostname.
+
+    * `NIx_NOSERV'
+      Indicates that the caller is not interested in the service name of the
+      result, so it does not have to be converted; `undef' will be returned
+      as the service name.
+
+    Errors are indicated by the `$err' value returned; which will be
+    non-zero in numeric context, and contain a string error message as a
+    string. The value can be compared against any of the `EAI_*' constants
+    to determine what the error is. Rather than explicitly checking, see
+    also Socket::GetAddrInfo::Strict which provides functions that throw
+    exceptions on errors.
+
+EXAMPLES
+  Lookup for `connect'
+    The `getaddrinfo' function converts a hostname and a service name into a
+    list of structures, each containing a potential way to `connect()' to
+    the named service on the named host.
+
+     my %hints = ( socktype => SOCK_STREAM );
+     my ( $err, @res ) = getaddrinfo( $hostname, $servicename, \%hints );
+     die "Cannot getaddrinfo - $err" if $err;
+
+     my $sock;
+
+     foreach my $ai ( @res ) {
+        my $candidate = IO::Socket->new();
+
+        $candidate->socket( $ai->{family}, $ai->{socktype}, $ai->{protocol} )
+           or next;
+
+        $candidate->connect( $ai->{addr} )
+           or next;
+
+        $sock = $candidate;
+        last;
+     }
+
+    Because a list of potential candidates is returned, the `while' loop
+    tries each in turn until it it finds one that succeeds both the
+    `socket()' and `connect()' calls.
+
+    This function performs the work of the legacy functions `gethostbyname',
+    `getservbyname', `inet_aton' and `pack_sockaddr_in'.
+
+  Making a human-readable string out of an address
+    The `getnameinfo' function converts a socket address, such as returned
+    by `getsockname' or `getpeername', into a pair of human-readable strings
+    representing the address and service name.
+
+     my ( $err, $hostname, $servicename ) = getnameinfo( $socket->peername );
+     die "Cannot getnameinfo - $err" if $err;
+
+     print "The peer is connected from $hostname\n";
+
+    Since in this example only the hostname was used, the redundant
+    conversion of the port number into a service name may be omitted by
+    passing the `NIx_NOSERV' flag.
+
+     my ( $err, $hostname ) = getnameinfo( $socket->peername, 0, NIx_NOSERV );
+
+    This function performs the work of the legacy functions
+    `unpack_sockaddr_in', `inet_ntoa', `gethostbyaddr' and `getservbyport'.
+
+  Resolving hostnames into IP addresses
+    To turn a hostname into a human-readable plain IP address use
+    `getaddrinfo' to turn the hostname into a list of socket structures,
+    then `getnameinfo' on each one to make it a readable IP address again.
+
+     my ( $err, @res ) = getaddrinfo( $hostname, "", { socktype => SOCK_RAW } );
+     die "Cannot getaddrinfo - $err" if $err;
+
+     while( my $ai = shift @res ) {
+        my ( $err, $ipaddr ) = getnameinfo( $ai->{addr}, NI_NUMERICHOST, NIx_NOSERV );
+        die "Cannot getnameinfo - $err" if $err;
+
+        print "$ipaddr\n";
+     }
+
+    The `socktype' hint to `getaddrinfo' filters the results to only include
+    one socket type and protocol. Without this most OSes return three
+    combinations, for `SOCK_STREAM', `SOCK_DGRAM' and `SOCK_RAW', resulting
+    in triplicate output of addresses. The `NI_NUMERICHOST' flag to
+    `getnameinfo' causes it to return a string-formatted plain IP address,
+    rather than reverse resolving it back into a hostname.
+
+    This combination performs the work of the legacy functions
+    `gethostbyname' and `inet_ntoa'.
+
+BUILDING WITHOUT XS CODE
+    In some environments it may be preferred not to build the XS
+    implementation, leaving a choice only of the core or pure-perl emulation
+    implementations.
+
+     $ perl Build.PL --pp
+
+    or
+
+     $ PERL_SOCKET_GETADDRINFO_NO_BUILD_XS=1 perl Build.PL 
+
+BUGS
+    *   Appears to FAIL on older Darwin machines (e.g. `osvers=8.11.1'). The
+        failure mode occurs in t/02getnameinfo.t and appears to relate to an
+        endian bug; expecting to receive `80' and instead receiving `20480'
+        (which is a 16-bit `80' byte-swapped).
+
+SEE ALSO
+    *   http://tools.ietf.org/html/rfc2553 - Basic Socket Interface
+        Extensions for IPv6
+
+ACKNOWLEDGEMENTS
+    Christian Hansen <chansen@cpan.org> - for help with some XS features and
+    Win32 build fixes.
+
+    Zefram <zefram@fysh.org> - for help with fixing some bugs in the XS
+    code.
+
+    Reini Urban <rurban@cpan.org> - for help with older perls and more Win32
+    build fixes.
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

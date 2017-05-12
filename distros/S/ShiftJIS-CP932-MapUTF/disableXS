@@ -1,0 +1,17 @@
+#!perl
+
+use File::Copy ();
+
+if (-f "MapUTF.xs") {
+    print STDERR "Disabling XSUB in sources...\n";
+
+    die "***** Failed, sources could be inconsistent! *****\n"
+    unless  File::Copy::move('MANIFEST',	'MANIFEST.XS')
+	and File::Copy::move('MANIFEST.NXS',	'MANIFEST')
+	and File::Copy::move('MapUTF.pm',	'MapUTF.pmX')
+	and File::Copy::move('MapUTF.xs',	'MapUTF.xsX')
+	and File::Copy::move('MapUTF.pmN',	'MapUTF.pm');
+}
+
+1;
+__END__

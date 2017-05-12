@@ -1,0 +1,348 @@
+2017-04-16  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Resolve https://rt.cpan.org/Public/Bug/Display.html?id=121033
+	  Fails tests with no '.' in @INC
+
+	* Released as 3.28.
+
+2013-01-22  Jarkko Hietaniemi  <jhi@google.com>
+
+	* Resolve https://rt.cpan.org/Ticket/Display.html?id=69029
+	  Do not die (adist()) on empty pattern string.
+	
+	* Resolve https://rt.cpan.org/Ticket/Display.html?id=36707
+	  Do not die on undefined inputs, just return undef.
+	
+	* Resolve https://rt.cpan.org/Ticket/Display.html?id=82341
+	  Explicitly specify the licensing to be Artistic 2 or LGPL 2.
+	
+	* Modernize all the tests to use Test::More.
+
+	* Add some tests for UTF-8 inputs.
+	
+	* Mark some stalled/ancient bugs as resolved.
+	
+	* Delete the hopelessly obsolete BUGS file.
+	
+	* Released as 3.27.
+
+2006-04-09  Jarkko Hietaniemi  <jhi@Chicxulub.local>
+ 
+	* Try to underline, highlight, and explain the fact that
+	  String::Approx does not do a good job for comparing
+	  strings "with fuzz", use the Levenshtein et al for that.
+	
+	* aindex() might return "too early" indices if either the pattern
+	  or the text contain repetitive characters, this seems to be a
+	  tricky defect to fix and somewhat conflicting with our model
+	  (return "as early as possible" matches, just like regular
+	  expressions) (to get "as late as possible" matches one would
+	  basically have to keep retrying at later indices until one
+	  fails), so for now only document this known problem.
+	  The same goes for aslice().
+	
+	* [INTERNAL] use Test::More (not 100% yet)
+	
+	* [INTERNAL] apse.c: do not reset text_position_range in apse_reset
+	  (thanks to Helmut Jarausch)
+	
+	* [INTERNAL] apse.c: add #include <assert.h>.
+	
+	* [INTERNAL] apse.c: small signed/unsigned cleanups.
+	
+	* Released as 3.26.
+	
+2005-05-24  Jarkko Hietaniemi  <jhi@iki.fi>
+	
+	* Pure documentation cleanup release to address
+	  http://rt.cpan.org/NoAuth/Bug.html?id=12196
+	  "Small String::Approx Pod issue"
+	
+	* Released as 3.25.
+
+2005-01-02  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Pure documentation cleanup release to address
+	  http://rt.cpan.org/NoAuth/Bug.html?id=6668
+	  "Unfortunate perldoc rendering of String::Approx"
+	
+	* Released as 3.24.
+
+Mon Nov 30 15:18:15 2003  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Safeguards against trying to use greater edit distance
+	  than the pattern is long, inspired by 'idallen'.
+	
+	* Advise against using String::Approx for text comparisons,
+	  since String::Approx is meant for strings.
+	
+	* Released as 3.23.
+
+Sun Oct 19 12:17:20 2003  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* adistr($pattern, @inputs) returned absolute, not relative,
+	  distances in list context, reported by 'idallen'.
+	
+	* Released as 3.22.
+
+Sat Oct 18 10:29:30 2003  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* asubstitute() didn't substitute in $_ as promised,
+	  reported by Tim Maher.
+	
+	* Released as 3.21.
+
+Mon May 12 22:09:59 2003  Jarkko Hietaniemi  <jhi@iki>
+
+	* Bug report, analysis, and patch from Rich Williams for
+	  a nasty segfault (no easy test case, sadly).
+
+	* Clarify the documentation about the weirdness of the
+	  'size' from aslice().
+
+	* Released as 3.20.
+
+Sun Aug 18 01:37:53 2002  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Fixed a frontend bug which caused 0% to be rounded up to 1,
+	  (instead of being equal to 0) found by Ji Y Park.
+
+	* Released as 3.19.
+
+Tue Oct 16 20:06:53 2001  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Documented how one can use the adist() and adistr()
+	  to sort the inputs according on their approximateness,
+	  suggested by Arthur Bergman.
+	
+	* Fixed yet another aindex() bug found by Juha Muilu.
+
+	* Pasha Sadri figured out what was the stupid bug
+	  breaking complex cache flushing: I was calling
+	  a wrong non-existent sub: _cache_flush_complex
+	  was called instead of _flush_cache_complex.
+	  Argh.
+	
+	* Released as 3.18.
+
+Fri Aug  3 15:47:10 2001  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* 3.17: Add COPYRIGHT and LICENSE to the pod.
+
+Thu Jun 28 23:50:14 2001  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Released as 3.16.
+
+	* Ben Kennedy found yet another silly memory leak,
+	  in Approx.pm:_complex() this time.
+
+Sat Feb 10 04:18:09 2001  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Rewrote _simple() and _complex(), now the silly memory
+	  leak in the caching code should be gone, the problem was
+	  reported at least by Frank Kirsch, Dag Kristian Rognlien,
+	  Chris Rosin, and Ben Kennedy.
+
+	* There were actually two memory leaks, the other one was
+	  mild enough not to be noticed.  While fixing the mild one
+	  found a long standing bug, fixing it made asubst() to
+	  matches to greedy again (they were always stingy because
+	  of the bug).
+
+	* Fixed a bug in adist() (actually, aslice(), which adist()
+	  internally uses) which made adist('MOM','XXMOXXMOXX') to
+	  return 0, not 1, reported by Chris Rosin.
+
+	* Fixed a bug in aindex() where aindex('----foobar----',
+	  '----aoobar----', 1) would report 10 instead of 0,
+	  reported by Trank Tobin.
+
+	* Fixed a bug in aindex() where reported by Damian Keefe.
+
+	* Added an API to control the size of the cache(s),
+	  as suggested by B. Elijah Griffin.
+
+	* Added Aldo Calpini's test failure in Win32 as an open bug.
+	  Don't know what's wrong yet, the test output looks garbled.
+
+	* Internal: use sv_len() instead of SvCUR() to be Unicode-safe.
+
+Thu Nov 16 22:35:13 2000  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Fixed the apse.c:_apse_match() for loop bug reported
+	  by Ross Smith and Eric Promislow.
+
+	* Add adist() and adistr() which tell the edit distance
+	  and the relative edit distance.  For both zero is an exact match,
+	  and negative means that the pattern is longer than the input.
+	  For the relative edit distances 1 means that the strings are
+	  completely different, and the negative values never reach -1.
+	  This feature has been requested by zillions. 
+
+	* Add arindex() (a backward aindex()).
+
+	* Add BUGS list.  Two open bugs. 
+
+Wed Sep  6 19:23:55 2000  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Released as 3.13.
+
+	* apse.c: fixed an aindex() bug where a better match
+	  doesn't move the match_begin forward.  Reported by
+	  David Curiel and Stefan Ram.
+
+	* Approx.pm: fix a cache flushing bug where the most current
+	  pattern was accidentally flushed, fix from Ben Kennedy.
+
+	  Revert back to using real words: "approximateness" it is
+	  (drop the "approximity" coinage).
+
+Sun Apr 30 22:39:09 2000  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Released as 3.12.
+
+	* ChangeLog: Explain the bug fixed in 3.10 a little bit more.
+
+Mon Apr 24 23:19:20 2000  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Makefile.PL: The -DAPSE_DEBUGGING was accidentally left on,
+	  resulting in a deluge of debug messages being spewed to stderr.
+	  Oops.	 Reported by Rob Fugina.
+
+	* Approx.pm: Bump to 3.11.
+
+Tue Apr 18 06:48:34 2000  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Released as 3.10.
+
+	* apse.c: Fix an insidious buffer overrun, found by heroic
+	  debugging by J. D. Laub (already back in November 1999,
+	  but I'm amazingly good at procrastinating).  This is
+	  probably the bug that plagued String::Approx 3.0*
+	  in HP-UX and Solaris.	 I couldn't anymore repeat it
+	  in HP-UX, in Solaris it was still going strong.
+
+	  The bug was really well camouflaged: it didn't
+	  overstep the buffer area as a whole, in which case it would
+	  have been found by Purify-like tools.	 What was happening
+	  was that the code is maintaining a 2-dimensional bitmask
+	  (or a 3-dimensional bitbuffer, if you will), and under
+	  certain circumstances the bits from one dimension leaked
+	  into another.	 The only user-visible API that was
+	  tickling the bug was aslice(), so if you weren't using that,
+	  you were probably okay.  In Solaris (and at some point HP-UX)
+	  the malloced buffers happened to be laid out so that bug
+	  was visible (e.g. in Linux, AIX, and Digital UNIX, it wasn't).
+
+Mon Jul 19 10:42:13 1999  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Approx.pm: Released 3.09.
+
+	* Approx.pm: Do the right things if pattern is empty
+	  (the bug found by Anirvan Chatterjee).
+
+	* apse.c: Fixed the cases "this-has-so-many-edits-that-it-is-
+	  going-to-match-no-matter-what" and "there-are-not-enough-edits-
+	  to-ever-match-this" (the latter bug found by Mitch Helle).
+
+Thu Jun 24 02:00:26 1999  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Approx.pm: Released 3.08.
+
+	* Approx.pm: Add aslice() as suggested by Mike Hanafey.
+
+	* apse.h: Introduce use_minimal_distance.
+
+	* apse.c: Implement use_minimal_distance.
+
+	* t/aslice.t: Test the new feature.
+
+	* MANIFEST: Add t/aslice.t.
+
+Wed Jun 23 20:07:05 1999  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Approx.pm: Released 3.07.
+
+	* Approx.pm: Add aindex() as suggested by Mike Hanafey.
+
+	* apse.h: Introduce text_initial_position and text_final_position.
+
+	* apse.c: Implement text_initial_position and text_final_position.
+
+	* t/aindex.t: Test the new feature.
+
+	* MANIFEST: Add t/aindex.t.
+
+Wed Jun 16 14:19:39 1999  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Approx.pm: Released 3.06.
+
+	* Approx.pm: Release 3.06: Fixed a bug in caching
+	  of parsed parameters (the absolute length of the
+	  pattern must be cached, too). (Reported by
+	  Chris Rosin and Mark Land)
+
+	* Approx.pm: Fixed a couple of typos and introduced
+	  the coinage 'approximity' (to replace the clunky
+	  'approximateness').
+
+	* t/user.t: Added four new tests from Rosin and Land.
+
+Fri Jan	 8 16:09:52 1999  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Approx.pm: Release 3.05.  No functional changes
+	  or bug fixes (no bugs reported), just a release
+	  that includes both the Artistic License and LGPL.
+
+Wed Dec 30 11:07:28 1998  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* MANIFEST: Added Artistic and LGPL, reworded COPYRIGHT
+	  slightly to comply.
+
+Thu Dec 17 13:17:58 1998  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Approx.pm: Released 3.04.
+
+	* Approx.pm: Fixed a parameter parsing bug: "i 1" was
+	  not accepted. (Reported by Bob J.A. Schijvenaars)
+
+	* Approx.pm: Documented that matching is asymmetric:
+	  the inputs are matched against the pattern, not the
+	  other way round.
+
+	* Approx.pm: Added a few C<>s and I<>s to the pod.
+
+	* Approx.pm: Added an automatic flush to the pattern
+	  compilation caches (triggered by a high water mark).
+
+	* Approx.pm: Added "require 5.004_04;", Previously only
+	  Makefile.PL had this, but better be paranoid.
+
+Wed Dec 16 10:28:07 1998  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Approx.pm: Released 3.03.
+
+	* Approx.pm: Added confirmation from Udi Manber
+	  to README: it's not a problem that I have looked
+	  at agrep code.  My code is my code and can be
+	  used within the limits set by my copyright.
+
+	* Approx.xs: Removed a lot of the glue code
+	  because it is not yet reachable via Approx.pm.
+	  Later.
+
+Wed Dec 16 01:23:58 1998  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Approx.pm: Released 3.02.
+
+	* README: Added a clarification about our relationship
+	  with agrep.  There is no common code.	 None.
+	  Waiting for confirmation from Udi Manber.
+	  (The concern raised by Slaven Rezic).
+
+	* Approx.xs: fixed the PL_na mess for now, will
+	  have to figure out the correct way.  Tested
+	  under 5.004-maint, 5.005-maint, and 5.005-devel.
+
+	* Approx.pm: Released 3.01 (actually already Dec 15).
+

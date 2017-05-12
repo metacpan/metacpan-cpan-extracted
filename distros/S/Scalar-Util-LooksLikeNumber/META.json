@@ -1,0 +1,45 @@
+{
+   "abstract" : "Access to looks_like_number() perl API function",
+   "author" : [
+      "perlancar <perlancar@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Scalar-Util-LooksLikeNumber",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Scalar-Util-LooksLikeNumber"
+      },
+      "homepage" : "https://metacpan.org/release/Scalar-Util-LooksLikeNumber",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/perlancar/perl-Scalar-Util-LooksLikeNumber.git",
+         "web" : "https://github.com/perlancar/perl-Scalar-Util-LooksLikeNumber"
+      }
+   },
+   "version" : "1.39.2",
+   "x_authority" : "cpan:PERLANCAR"
+}

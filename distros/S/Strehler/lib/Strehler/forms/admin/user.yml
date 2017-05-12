@@ -1,0 +1,40 @@
+attributes:
+    class: well
+elements:
+    - name: user
+      label: Username
+      attributes: 
+        class: span8
+      validators:
+        - type: '+Strehler::FormFu::Validator::UserUnique'
+          message: 'Username already exists'
+#      constraints:
+#        type: Required
+#        message: 'Username needed'
+    - name: password
+      label: Password
+      type: Password
+      attributes: 
+        class: span8
+      constraints:
+        - type: Equal
+          others: password-confirm
+          message: "Password and password confirmation don't match"
+    - name: password-confirm
+      label: Password confirm
+      type: Password
+      attributes: 
+        class: span8
+    - type: Select
+      name: role
+      label: Role
+      options:
+          - [ 'admin', 'admin' ]
+          - [ 'editor', 'editor' ]
+    - type: Block
+      name: save
+      tag: button
+      content: Submit
+      attributes:
+        type: submit
+        class: btn btn-primary

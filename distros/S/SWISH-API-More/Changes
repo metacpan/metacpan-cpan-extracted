@@ -1,0 +1,31 @@
+Revision history for Perl extension SWISH::API::More.
+
+0.01  Fri Sep 22 16:07:34 2006
+	- original version; created by h2xs 1.23 with options
+		-XA -n SWISH::API::More
+
+0.02
+    * misc cleanup
+
+0.03
+    * Complete re-write to support multiple instances in same Perl process.
+      No more ugly Symbol table mangling. Instead uses Class::ISA and Class::Inspector
+      and caches subclass names per object.
+    * Split subclasses up into separate .pm files.
+
+0.04
+    * added VERSIONs to all subclasses to fix CPAN indexing
+    * fixed PropertyList and MetaList to return native objects without wrappers
+      (thanks to bmiele@ipnstock.com for the bug report)
+    * fixed bug in Result subclass with returning undef when native returns undef
+
+0.05
+    * added default index value 'index.swish-e' to mimic libswish-e default
+    * no longer require SWISH::API since it is not in cpan. Warn about it in tests.
+
+0.06     01 Feb 2010
+    * added die_on_error() method.
+
+0.07     23 Feb 2010
+    * add Results->query accessor method.
+

@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Sash
+version:      1.01
+version_from: src/sash
+installdirs:  site
+requires:
+    Data::Table:                   1.5
+    Term::ReadKey:                 2.3
+    Term::ShellUI:                 0.85
+    Text::ASCIITable:              0.18
+    Time::HiRes:                   1.86
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

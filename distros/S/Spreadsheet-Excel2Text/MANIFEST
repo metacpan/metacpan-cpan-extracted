@@ -1,0 +1,8 @@
+Changes
+Build.PL
+Makefile.PL
+MANIFEST
+README
+t/Spreadsheet-Excel2Text.t
+lib/Spreadsheet/Excel2Text.pm
+META.yml                                 Module meta-data (added by MakeMaker)

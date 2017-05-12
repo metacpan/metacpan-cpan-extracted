@@ -1,0 +1,266 @@
+---
+abstract: 'SMS::Send driver for the T-Mobile Austria SMSC service'
+author:
+  - 'Alexander Hartmaier <abraxxa@cpan.org>'
+build_requires:
+  Test::Exception: '0.32'
+  Test::More: '0.98'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SMS-Send-AT-TMobile
+requires:
+  HTTP::Tiny: '0.035'
+  SMS::Send::Driver: '0.06'
+  perl: '5.008008'
+resources:
+  repository: https://github.com/abraxxa/SMS-Send-AT-TMobile.git
+version: '0.002'
+x_Dist_Zilla:
+  perl:
+    version: '5.020001'
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      config:
+        Dist::Zilla::Plugin::GatherDir:
+          exclude_filename: []
+          exclude_match: []
+          follow_symlinks: '0'
+          include_dotfiles: '0'
+          prefix: ''
+          prune_directory: []
+          root: .
+      name: '@Basic/GatherDir'
+      version: '5.031'
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@Basic/PruneCruft'
+      version: '5.031'
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@Basic/ManifestSkip'
+      version: '5.031'
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@Basic/MetaYAML'
+      version: '5.031'
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@Basic/License'
+      version: '5.031'
+    -
+      class: Dist::Zilla::Plugin::Readme
+      name: '@Basic/Readme'
+      version: '5.031'
+    -
+      class: Dist::Zilla::Plugin::ExtraTests
+      name: '@Basic/ExtraTests'
+      version: '5.031'
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@Basic/ExecDir'
+      version: '5.031'
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@Basic/ShareDir'
+      version: '5.031'
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 1
+      name: '@Basic/MakeMaker'
+      version: '5.031'
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@Basic/Manifest'
+      version: '5.031'
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@Basic/TestRelease'
+      version: '5.031'
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@Basic/ConfirmRelease'
+      version: '5.031'
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@Basic/UploadToCPAN'
+      version: '5.031'
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      config:
+        Dist::Zilla::Plugin::PodWeaver:
+          finder:
+            - ':InstallModules'
+            - ':ExecFiles'
+          plugins:
+            -
+              class: Pod::Weaver::Plugin::EnsurePod5
+              name: '@CorePrep/EnsurePod5'
+              version: '4.010'
+            -
+              class: Pod::Weaver::Plugin::H1Nester
+              name: '@CorePrep/H1Nester'
+              version: '4.010'
+            -
+              class: Pod::Weaver::Plugin::SingleEncoding
+              name: '@Default/SingleEncoding'
+              version: '4.010'
+            -
+              class: Pod::Weaver::Section::Name
+              name: '@Default/Name'
+              version: '4.010'
+            -
+              class: Pod::Weaver::Section::Version
+              name: '@Default/Version'
+              version: '4.010'
+            -
+              class: Pod::Weaver::Section::Region
+              name: '@Default/prelude'
+              version: '4.010'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: SYNOPSIS
+              version: '4.010'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: DESCRIPTION
+              version: '4.010'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: OVERVIEW
+              version: '4.010'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: ATTRIBUTES
+              version: '4.010'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: METHODS
+              version: '4.010'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: FUNCTIONS
+              version: '4.010'
+            -
+              class: Pod::Weaver::Section::Leftovers
+              name: '@Default/Leftovers'
+              version: '4.010'
+            -
+              class: Pod::Weaver::Section::Region
+              name: '@Default/postlude'
+              version: '4.010'
+            -
+              class: Pod::Weaver::Section::Authors
+              name: '@Default/Authors'
+              version: '4.010'
+            -
+              class: Pod::Weaver::Section::Legal
+              name: '@Default/Legal'
+              version: '4.010'
+      name: PodWeaver
+      version: '4.006'
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: PkgVersion
+      version: '5.031'
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: NextRelease
+      version: '5.031'
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: MetaConfig
+      version: '5.031'
+    -
+      class: Dist::Zilla::Plugin::MetaResources
+      name: MetaResources
+      version: '5.031'
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: PodSyntaxTests
+      version: '5.031'
+    -
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: PodCoverageTests
+      version: '5.031'
+    -
+      class: Dist::Zilla::Plugin::Test::Portability
+      name: Test::Portability
+      version: '2.000005'
+    -
+      class: Dist::Zilla::Plugin::Test::DistManifest
+      name: Test::DistManifest
+      version: '2.000004'
+    -
+      class: Dist::Zilla::Plugin::Test::Synopsis
+      name: Test::Synopsis
+      version: '2.000005'
+    -
+      class: Dist::Zilla::Plugin::Test::UnusedVars
+      name: Test::UnusedVars
+      version: '2.000006'
+    -
+      class: Dist::Zilla::Plugin::HasVersionTests
+      name: HasVersionTests
+      version: '1.101420'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: Prereqs
+      version: '5.031'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: test
+          type: requires
+      name: TestRequires
+      version: '5.031'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: '5.031'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: '5.031'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: '5.031'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: '5.031'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: '5.031'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: '5.031'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':AllFiles'
+      version: '5.031'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':NoFiles'
+      version: '5.031'
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: '0'
+    version: '5.031'

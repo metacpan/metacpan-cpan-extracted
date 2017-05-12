@@ -1,0 +1,93 @@
+{
+   "abstract" : "Async API for Elasticsearch using Promises",
+   "author" : [
+      "Clinton Gormley <drtech@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Search-Elasticsearch-Async",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::EOL" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "URI::Escape::XS" : "0"
+         },
+         "requires" : {
+            "AnyEvent::HTTP" : "0",
+            "AnyEvent::TLS" : "0",
+            "Moo" : "0",
+            "Moo::Role" : "0",
+            "Promises" : "0.93",
+            "Scalar::Util" : "0",
+            "Search::Elasticsearch" : "5.02",
+            "Sub::Exporter" : "0",
+            "Time::HiRes" : "0",
+            "Try::Tiny" : "0",
+            "namespace::clean" : "0",
+            "parent" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Mojo::IOLoop" : "0",
+            "Mojo::UserAgent" : "0"
+         },
+         "requires" : {
+            "AE" : "0",
+            "Cpanel::JSON::XS" : "0",
+            "Data::Dumper" : "0",
+            "EV" : "0",
+            "File::Temp" : "0",
+            "JSON::PP" : "0",
+            "JSON::XS" : "0",
+            "Log::Any::Adapter" : "0",
+            "Log::Any::Adapter::Callback" : "0.09",
+            "POSIX" : "0",
+            "Test::Deep" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0.98",
+            "lib" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/elastic/elasticsearch-perl/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/elastic/elasticsearch-perl.git",
+         "web" : "https://github.com/elastic/elasticsearch-perl"
+      }
+   },
+   "version" : "5.02",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
+}
+

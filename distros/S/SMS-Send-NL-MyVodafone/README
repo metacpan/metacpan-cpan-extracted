@@ -1,0 +1,22 @@
+SMS-Send-NL-MyVodafone
+======================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+   SMS::Send
+   WWW::Mechanize 
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2006 by M. Blom

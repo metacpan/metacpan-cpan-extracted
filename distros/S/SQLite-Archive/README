@@ -1,0 +1,96 @@
+NAME
+    SQLite::Archive - Version-agnostic storage and manipulation of SQLite
+    databases
+
+DESCRIPTION
+    SQLite (and the Perl module for it DBD::SQLite) is an extremely handy
+    database for storing various types of simple information.
+
+    However, as SQLite has developed, the binary structure of the SQLite
+    database format itself has changed and evolved, and continues to change
+    and evolve. As new releases come out, new versions of DBD::SQLite are
+    also released with matching code.
+
+    This makes SQLite database files suboptimal (at best) for use in
+    distributing data sets between disparate systems.
+
+    At the same time, a giant raw .sql script says very little about the
+    data itself (such as which database and version it is intended for),
+    requires a client front end to throw the SQL script at, and it not
+    easily editable or manipulatable while dumped.
+
+    SQLite::Archive provides a straight forward mechanism for exporting (and
+    importing) SQLite databases, and moving that data around as a single
+    file to (or from) other hosts.
+
+    It uses a regular tar archive, with the data stored in CSV files, and
+    the table structure stored in a create.sql file.
+
+    Given a SQLite archive file (SQLite::Archive will take anything
+    supported by Archive::Extract) it will extract the tarball to a
+    temporary directory, create a SQLite database (in a location of your
+    choice or also in a temp directory) and then populate the SQLite
+    database with the data from the archive.
+
+METHODS
+new
+      SQLite::Archive->new( file => 'data.tar.gz' );
+      SQLite::Archive->new( file => 'data.zip'    );
+      SQLite::Archive->new( dir  => 'extracted'   );
+
+    The "new" constructor creates a new SQLite archive object.
+
+    It takes a data source as either a "file" param (which should be an
+    Archive::Extract-compatible archive, or a "dir" param (which should
+    contain the equivalent of the content of the archive, but already
+    expanded as single files).
+
+    Returns a new SQLite::Archive object, or throws an exception on error.
+
+create_db
+      $dbh = $archive->create_db; # Temp file created
+      $dbh = $archive->create_db( 'dir/sqlite.db' );
+
+    The "create_db" method create a new (empty) SQLite database.
+
+    It optionally takes a single param of a path at which it should create
+    the SQLite file.
+
+    If created as a temp file, the database file will be destroyed until
+    END-time (as opposed to being destroyed when the DBI connection handle
+    goes out of scope).
+
+    Returns a DBI connection (as a DBI::db object) or throws an exception on
+    error.
+
+build_db
+      $dbh = $archive->build_db; # Temp file created
+      $dbh = $archive->build_db( 'dir/sqlite.db' );
+
+    The "build_db" method provides the main functionality for
+    SQLite::Archive.
+
+    It creates a new SQLite database (at a temporary file if needed),
+    executes any SQL scripts, populates tables from any CSV files, and
+    returns a DBI handle.
+
+    Returns a BDI::db object, or throws an exception on error.
+
+SUPPORT
+    No support is available for this module
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+SEE ALSO
+    SQLite::Temp
+
+COPYRIGHT
+    Copyright 2007 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

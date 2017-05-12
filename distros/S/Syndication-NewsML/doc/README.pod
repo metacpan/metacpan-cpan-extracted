@@ -1,0 +1,217 @@
+$Id: README.pod,v 0.8 2002/01/16 04:37:56 brendan Exp brendan $
+
+=for html 
+<div id="content">
+<H1>Syndication::NewsML -- A NewsML library for Perl</H1>
+</div><div id="content">
+
+=begin text
+
+=head1 Syndication::NewsML -- a NewsML library for Perl
+
+=end text
+
+NewsML is a standard format for the markup of multimedia news content, ratified by the International
+Press Telecommunications Council (http://www.iptc.org). According to the newsml.org website NewsML is
+"An XML-based standard to represent and manage news throughout its lifecycle, including production,
+interchange, and consumer use."
+
+NewsML differs from simpler standards such as RSS in that RSS sends B<links> to stories, where NewsML
+can be used to send links or the story itself, plus any associated information such as images, video
+or audio files, PDF documents, or any other type of data.
+
+NewsML also offers much more metadata information than RSS, including links between associated content;
+the ability to revoke, update or modify previously sent stories; support for sending the same story in
+multiple languages and/or formats; and a method for user-defined metadata known as Topic Sets.
+
+Syndication::NewsML is an object-oriented Perl interface to NewsML documents, allowing you to manage
+(and one day create) NewsML documents without any specialised NewsML or XML knowledge.
+
+=over 4
+
+=back
+
+You can find out more about NewsML at
+B<http://www.iptc.org/site/NewsML/>
+or B<http://www.newsml.org/>
+
+=head1 LATEST VERSION AND WHAT'S NEW
+
+The latest version is 0.10, released 14 February 2002.
+
+Download: http://www.cpan.org/authors/id/B/BQ/BQUINN/
+
+=head2 What's New:
+
+=over 4
+
+=head2 v0.10 - Released to CPAN 14 Feb 2002
+
+- internals: separated some classes out into NewsML/ directory
+
+- getXXXList now returns a real array when called in an array context.
+ NOTE this may break some code, notably function calls like
+ myRoutine($newscomp->getNewsItemList) will now be passed an array rather
+ than an array reference. Sorry bout that, but remember, this is
+ pre-release software you're working with...
+
+=head2 v0.09 - 13 Feb 2002 (unreleased)
+
+- fixed bug that didn't allow multiple Party elements
+
+- fixed bug: dies when asking for an attribute that doesn't exist
+
+- greatly enhanced examples/NewsMLParser.pl
+
+- added AFP example file
+
+- added IPTC topic files (we don't use them yet, though)
+
+=head2 v0.08 - Released to CPAN 16 Jan 2002
+
+- one simple bugfix to make the test suite pass...
+
+=head2 v0.07 - Released to CPAN 11 Jan 2002
+
+- Added some generic methods to Syndication::NewsML::Node (and therefore all
+ object classes):
+
+=over 2
+
+=item o
+getXML -- return the current tag and all its children as an XML tree
+getContent -- same as above, but ignores the current container element
+(which means the resulting string may not be well-formed XML)
+
+=item o
+getText updated to get text of all children (bug fix)
+
+=item o
+getAllText -- return text in all child elements with no sanity checking,
+so you can even call this on the NewsML root element to retrieve all text
+in a document
+
+=back
+
+  Thanks to Peter Hilbring for giving me the prodding required to get this
+ done :-)
+
+=back
+
+=for html
+<P>See the <A HREF="Changes.html">Changes file</A> for previous releases.</P>
+
+=for text
+See the Changes file for previous releases.
+
+=head1 INSTALLING Syndication::NewsML
+
+The lazy way to install Syndication::NewsML:
+
+   $ perl -MCPAN -e shell
+   cpan> install Syndication::NewsML
+
+Or the normal way:
+
+Retrieve the latest copy from CPAN: http://www.cpan.org/authors/id/B/BQ/BQUINN/
+
+   $ perl Makefile.PL # Creates the Makefile
+   $ make             # Runs the makefile
+   $ make test        # Optional (See Interopability below)
+   $ make install     # Installs Syndication::NewsML into  your Perl library location
+
+With this method you will first have to install the pre-requisite module XML::DOM.
+See L<what are the prerequisites?>.
+
+=head2 What Are The Prerequisites?
+
+=over 4
+
+=item * 
+
+XML::DOM (Have not tested lower than v1.27) 
+
+=item *
+
+Perl5 (Have not tested lower than v5.6) 
+
+=back
+
+To get the latest versions of the prerequisite module you can simply type this at the command prompt:
+
+   $ perl -MCPAN -e shell
+   cpan> install XML::DOM
+
+or if you just 'install Syndication::NewsML' the CPAN module should automagically install all of the prerequisites for you.
+
+=head2 What Systems Does It Work With?
+
+Syndication::NewsML B<should> work on any machine that supports XML::DOM, and any filesystem including Windows,
+although I haven't tested it on Windows yet. It's still early days, so expect some bugs.
+
+=head1 WHERE ARE THE MANUALS?
+
+Once you've installed, you can type: 
+
+   $ perldoc Syndication::NewsML
+
+=for html
+<P>Or you can view them starting from here:
+<A HREF="News-NewsML.html">Syndication::NewsML</A>,
+
+=head1 GETTING HELP
+
+The best place to ask questions now would be the NewsML mailing list at
+B<http://groups.yahoo.com/group/newsml/>, or ask
+me directly at brendan\@clueful.com.au. If there is enough demand we may start up a specialised list.
+
+General Perl/XML questions should be asked on the Perl-XML mailing list, which you can find at
+B<http://aspn.activestate.com/ASPN/Mail/Browse/Threaded/perl-xml>
+
+=head1 THE TEST SUITE & INTEROPERABILITY
+
+The standard C<make test> test suite checks most elements in a small range of test NewsML documents
+obtained from the Net. You can find the test documents in the C<t/test_data/> directory.
+
+I haven't written complete unit tests yet (after all there are 127 classes), so some methods remain
+untested. However the test documents include a fairly standard range of elements, so you should be able
+to get somewhere with the methods that work so far.
+
+=head1 BUGS and TODO
+
+There are probably bugs all over the place -- this is still an early version.
+
+At the moment, C<Syndication::NewsML> only reads NewsML files -- in the future it should be able to modify and
+write them as well.
+
+=for html
+<P>See <A HREF="TODO.html">TODO</A> for what I'm thinking of building and what would be nice to have.</P>
+
+=for text
+See TODO for what I'm thinking of building and what would be nice to have.
+
+=head1 AUTHOR AND COPYRIGHT
+
+This module is Copyright (C) 2001 by
+
+	Brendan Quinn
+	Clueful Consulting Pty Ltd
+	GPO Box 2747EE
+	Melbourne 3001
+	Victoria, AUSTRALIA
+
+All rights reserved.
+
+This module is free software. It may be used, redistributed
+and/or modified under the same terms as Perl itself.
+
+$Id: README.pod,v 0.8 2002/01/16 04:37:56 brendan Exp brendan $
+
+=cut
+
+=for text
+** This file was automatically generated from **
+** doc/README.pod. To edit it, see there.    **
+
+=for html
+</div>

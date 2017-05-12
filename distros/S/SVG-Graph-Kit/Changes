@@ -1,0 +1,59 @@
+Revision history for SVG-Graph-Kit
+
+0.0402 2015-10-20
+    - Use parent instead of base.
+    - Update ABSTRACT and NAME sections.
+
+0.0401 MAR 01, 2014
+    - Added full compliment of dzil plugins.
+    - Replaced the missing NAME section in the POD. Oof!
+
+0.04 May 29, 2012
+    - Rename the "threshold" attribute to "ticks", "xticks" and "yticks."
+    - Improved POD.
+
+0.0301 May 29, 2012
+    - Improved documentation.
+
+0.03 May 29, 2012
+    - Enable axis scaling.
+
+0.02 May 28, 2012
+    - Allowed calling of the statistics methods as given by SVG::Graph.
+    - Fixed the incorrect data labeling.
+    - Added work-around for x/y intercept in SVG::Graph.
+
+0.0102 May 28, 2012
+    - Removing crufty eg scripts.
+
+0.0101 May 28, 2012
+    - Cleaned up logic and code.
+    - Improved POD.
+
+0.01 May 22, 2012
+    - Refactored with Dist::Zilla
+    - Simplified axis options.
+    - Refactored data input.
+
+0.00_7 Feb 8 2009
+    - Began to update this still-handy module.
+
+0.00_6 Apr 14 2006
+    - More fixin'... And now the auto-axis finally works. Yay!
+    - Added scaling factors.
+
+0.00_5 Apr 9 2006
+    - Fixed auto-axis.
+
+0.00_4 Apr 5 2006
+    - Ack. Left the autoaxis code commented-out. Grrrrr.
+    - Added the crucial scaling factor variable to the autoaxis.
+
+0.00_3 Sun Apr 2 2006
+    - Added automatic axis plotting.
+
+0.00_2 Wed Mar 29 2006
+    - Cleaned things up a bit.
+
+0.00_1 Sun Mar 19 22:17:32 2006
+    - Created by Module::Husbandry.

@@ -1,0 +1,16 @@
+{
+  "prereqs": {
+    "configure": {
+      "requires": {
+        "perl": "5.012",
+        "XSLoader": "0"
+      }
+    },
+    "runtime": {
+      "requires": {
+        "perl": "5.012",
+        "XSLoader": "0"
+      }
+    }
+  }
+}

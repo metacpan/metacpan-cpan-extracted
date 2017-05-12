@@ -1,0 +1,87 @@
+{
+   "abstract" : "Text::Xslate template system for Sledge",
+   "author" : [
+      "Kenta Sato  C<< <kenta.sato.1990@gmail.com> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.7.5",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Sledge-Template-Xslate",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38",
+            "perl" : "5.008_001"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Spec::Memoized" : "0",
+            "Memoize" : "0",
+            "Sledge" : "0",
+            "Text::Xslate" : "0",
+            "parent" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Class::Accessor" : "0",
+            "Sledge" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Sledge::Template::Xslate" : {
+         "file" : "lib/Sledge/Template/Xslate.pm",
+         "version" : "0.09"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/karupanerura/Sledge-Template-Xslate/issues"
+      },
+      "homepage" : "https://github.com/karupanerura/Sledge-Template-Xslate",
+      "repository" : {
+         "url" : "git://github.com/karupanerura/Sledge-Template-Xslate.git",
+         "web" : "https://github.com/karupanerura/Sledge-Template-Xslate"
+      }
+   },
+   "version" : "0.09",
+   "x_contributors" : [
+      "Kenta Sato <f0913@www.schoolsocial.org>",
+      "karupanerura <kenta.sato.1990@gmail.com>",
+      "Neil Bowers <neil@bowers.com>",
+      "karupanerura <karupa@cpan.org>"
+   ]
+}

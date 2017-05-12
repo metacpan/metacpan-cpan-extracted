@@ -1,0 +1,42 @@
+Revision history for String-Formatter
+
+0.102084  2013-11-08 22:30:46 America/New_York
+        - typo fixes
+        - update repo and bugtracker links
+
+0.102082  2010-10-19 14:34:34 America/New_York
+          add missing prereq for Test::More
+
+0.102081  2010-10-17 13:40:26 America/New_York
+          allow subclasses to provide default_codes
+
+          implement %% in a simpler, but not quite perl-like, way
+
+0.102080  2010-07-27 22:07:11 America/New_York
+          input hunkers have been tweaked and more fully documented
+
+0.101620  2010-06-11 21:31:26 America/New_York
+          add indexed_replace, require_arrayref_input, and indexed_stringf
+
+0.100720  2010-03-13 09:36:03 America/New_York
+          fix an ancillary file that brought in a bunch of bogus prereqs
+
+0.100690  2010-03-10 21:09:36 America/New_York
+          fix a 5.10-ism that slipped in
+
+0.100680  2010-03-09 20:54:11 America/New_York
+          bug fix: newlines no longer end formatting, but not allowed in braces
+          (thanks for bug report, Christopher J. Madsen)
+
+0.093221  2009-11-18 08:13:22 America/New_York
+          remove stupidly left-in hardcoded version!
+
+0.093220  2009-11-18 08:12:10 America/New_York
+          fix a problem with prereqs and tests
+
+0.093210  2009-11-17
+          add the cookbook
+          add method importer
+
+0.093200  2009-11-16
+          first release!

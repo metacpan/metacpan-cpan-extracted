@@ -1,0 +1,94 @@
+{
+   "abstract" : "Auto-generate documents from HTTP::Request and HTTP::Response",
+   "author" : [
+      "Yusuke Wada <yusuke@kamawada.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.11.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Shodo",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Clone" : "0",
+            "Data::Validator" : "0",
+            "HTTP::Message" : "0",
+            "JSON" : "0",
+            "Path::Tiny" : "0",
+            "Test::More" : "0.98",
+            "Text::MicroTemplate" : "0",
+            "Try::Tiny" : "0",
+            "parent" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Shodo" : {
+         "file" : "lib/Shodo.pm",
+         "version" : "0.08"
+      },
+      "Shodo::Hanshi" : {
+         "file" : "lib/Shodo/Hanshi.pm"
+      },
+      "Shodo::Suzuri" : {
+         "file" : "lib/Shodo/Suzuri.pm"
+      },
+      "Test::Shodo::JSONRPC" : {
+         "file" : "lib/Test/Shodo/JSONRPC.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/yusukebe/Shodo/issues"
+      },
+      "homepage" : "https://github.com/yusukebe/Shodo",
+      "repository" : {
+         "url" : "git://github.com/yusukebe/Shodo.git",
+         "web" : "https://github.com/yusukebe/Shodo"
+      }
+   },
+   "version" : "0.08",
+   "x_contributors" : [
+      "hisaichi5518 <hisaichi5518@gmail.com>"
+   ]
+}

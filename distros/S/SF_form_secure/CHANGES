@@ -1,0 +1,28 @@
+Improvement history for SF::SF_form_secure
+
+ v4.0 - 10/24/2006 11:20:50
+ Two New functions Action 4 Returns an encoding for action 5 to check.
+ Action 4 and 5 where made to use in Form's, URL's, cookies and anywhere else you like,
+ can use remote ip in encoding and/or expiration funtion, also alows for extra code to be added in encoding.
+ Removed an error text and renamed $x_error{i} to "Encoding is Bad" for use in all Encoding errors.
+ Settings to this package can be changed with $SF_form_secure::variable_name examples are given in SYNOPSIS.
+
+ v3.0 - 10/22/2006 11:04:23
+ Fixed SYNOPSIS Text to reflect current script.
+ Changed POD location to bottum of file with __END__.
+ Added $VERSION and use vars qw($VERSION %x_error); to top of file.
+ Removed my from %x_error.
+
+ v2.1 - 10/22/2006 08:53:47
+ Fixed version Time made in COPYLEFT and IMPROVEMENTS, to propper time.
+ Fixed DESCRIPTION and SYNOPSIS Text to reflect current script.
+
+ v2.0 - 10/22/2006 10:30:55
+ Better regular expression for "# Security issue 3".
+ Reports Text Errors.
+ Controle the time stamp funtion and minutes used 1 to 99, blank is off.
+ Use Remote IP in encoding.
+ Added x_time_cal, x_code_make, x_regex, x_bad_input and x_code_expires to reduce script size.
+ The new Changes Expand the security levels to allow many combos.
+ Returns the number 1 if Check is ok.
+ Returns English Text if Check is Bad.

@@ -1,0 +1,28 @@
+Changes
+LICENSE
+Makefile.PL
+MANIFEST
+README
+lib/Slurm/Sshare.pm
+bin/README
+bin/sbalance
+t/000_Slurm-Sshare-use.t
+t/050_pod.t
+t/100_Slurm-Share-basic.t
+t/110_sshare-versioning.t
+t/150_Slurm-Sshare-taint.t
+t/200_sshare_list-echo.t
+t/250_sshare_usage-echo.t
+t/300_usage_xxx-echo.t
+t/400_sshare_list-parse.t
+t/500_usage_xxx-parse.t
+t/600_sbalance.t
+t/run-tests.sh
+t/helpers/echo-help.pl
+t/helpers/echo_cmdline
+t/helpers/echo_cmdline_to_stderr
+t/helpers/fake_sshare
+t/helpers/parse-help.pl
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

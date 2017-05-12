@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<entry xmlns="http://www.w3.org/2005/Atom">
+
+  <!-- Atom Specific; No ORE Semantics -->
+  <id>tag:arxiv.org,2008:astro-ph:0601007</id>
+  <link rel="alternate" type="text/html" href="http://arxiv.org/abs/astro-ph/0601007"/>
+
+  <!-- Resource Map Metadata -->
+  <link rel="self" type="application/atom+xml" href="http://arxiv.org/rem/atom/astro-ph/0601007"/>
+  <link rel="http://www.openarchives.org/ore/terms/describes" href="http://arxiv.org/aggregation/astro-ph/0601007"/>
+  <source>
+        <author>
+            <name>arXiv.org e-Print Repository</name>
+            <uri>http://arXiv.org</uri>
+        </author>
+        <id>tag:arxiv.org,2008:astro-ph</id>
+        <updated>2008-10-03T07:30:34Z</updated>
+        <title>arXiv.org Astrophysics Feed</title>
+  </source>
+  <published>2008-10-01T18:30:02Z</published>
+  <updated>2007-10-10T18:30:02Z</updated>
+  <link rel="license" type="application/rdf+xml" href="http://creativecommons.org/licenses/by-nc/2.5/rdf" />
+  <rights>This Resource Map is available under the Creative Commons Attribution-Noncommercial 2.5 Generic license</rights>
+
+  <!-- Aggregation Metadata -->
+  <title>Parametrization of K-essence and Its Kinetic Term</title>
+  <author>
+    <name>Hui Li</name>
+    <email>lihui@somewhere.cn</email>
+  </author>
+  <author>
+    <name>Zong-Kuan Guo</name>
+  </author>
+  <author>
+    <name>Yuan-Zhong Zhang</name>
+  </author>
+  <link rel="http://www.openarchives.org/ore/terms/isDescribedBy" href="http://arxiv.org/rem/rdf/astro-ph/0601007"/>
+  <category term="2005-12-31T04:01:23Z" scheme="http://www.openarchives.org/ore/atom/created"/>
+  <category term="http://www.openarchives.org/ore/terms/Aggregation" label="Aggregation" 
+  scheme="http://www.openarchives.org/ore/terms/" />
+  <category term="2006-01-18T06:16:15Z" scheme="http://www.openarchives.org/ore/atom/modified"/>
+  <category term="http://purl.org/eprint/type/JournalArticle" 
+  scheme="http://purl.org/eprint/type/" label="Journal Article"/>
+
+</entry>

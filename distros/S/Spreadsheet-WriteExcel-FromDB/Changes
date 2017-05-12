@@ -1,0 +1,32 @@
+Revision history 
+
+1.00  Sat Sep 14 2002
+	+ Add write_xls() method 
+	+ Get column information in database agnostic manner
+	+ Add some actual tests
+
+0.08  Sat Sep 14 2002
+	+ added 'restrict_rows' and 'columns_wanted' (from Drew Taylor)
+
+0.07  Wed Sep 11 2002
+	+ added Oracle query (from Hans Poo & Daniel Mercado)
+
+0.06  Wed Feb 20 2002
+	+ Bugfix on Pg subclass
+
+0.05  Wed Feb 20 2002
+	+ tweak PostgreSQL query (from Thomas Mason)
+
+0.04  Fri Dec 28 2001
+	+ added PostgreSQL query (from Thomas Mason)
+
+0.03  Mon Aug 27 2001
+	+ added Sybase query (from Matt Sanford)
+  - split out common code to column_finder.pm
+
+0.02  Fri Aug 24 2001
+	+ split MySQL-specific code out
+
+0.01  Tue Aug  7 2001
+	- original version
+

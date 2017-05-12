@@ -1,0 +1,9 @@
+Changes
+dist.ini
+lib/SMS/Send/BulkSMS.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.yml
+README.pod
+t/00-compile.t

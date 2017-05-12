@@ -1,0 +1,47 @@
+Statistics::OLS 
+  - perform ordinary least squares and other bivariate statistics, v 0.07.
+
+I wrote Statistics::OLS to perform Ordinary Least Squares (linear curve
+fitting) on two dimensional data: y = a + bx. The other simple
+statistical module I found on CPAN (Statistics::Descriptive) is
+designed for univariate analysis. It accomodates OLS, but somewhat
+inflexibly and without rich bivariate statistics. Nevertheless, it
+might make sense to fold OLS into that module or a supermodule someday.
+
+Statistics::OLS computes the estimated slope and intercept of the
+regression line, their T-statistics, R squared, standard error of the
+regression and the Durbin-Watson statistic. It can also return the
+residuals.
+
+It is pretty simple to do two dimensional least squares, but much
+harder to do multiple regression, so Statistics::OLS is unlikely ever
+to work with multiple independent variables. The
+Statistics::Descriptive module performs useful univariate
+statistics and is well tested. The Perl Data Language (see CPAN) may
+also prove useful for statistics.  For a heavy duty, free, and open
+source statistical analysis language and environment, see the R
+project at http://www.R-project.org
+
+This is beta code, and has not been extensively tested. It has worked
+on a few published datasets. Feedback is welcome, particularly if you
+notice an error or try it with known results that are not reproduced
+correctly.
+
+Installation:
+
+Untar and unzip the distribution and cd into its directory. Then the
+usual
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+should work. Since this is beta code, you might prefer to install it
+in a private library. In that case, replace the first command with
+
+  perl Makefile.pl PREFIX=/home/sally/myperl
+
+or whatever.
+
+Sanford Morton <smorton@pobox.com>

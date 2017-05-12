@@ -1,0 +1,7 @@
+1.00  Change to convert decimal HTML::Entities into unicode
+      directly so that we will natually support any extra
+      characters (anticipating new version HTML::Fraction)
+
+      Change build system to Module::Install
+
+0.20  Release on the CPAN

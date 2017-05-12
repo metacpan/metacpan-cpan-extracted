@@ -1,0 +1,40 @@
+NAMES
+
+    Scrapar - Just another web scraping framework
+
+DESCRIPTION
+
+    This module helps you write scrapers in a more clean and efficient way.
+
+    It is mainly divided into 3 parts: Backend, Extractor, and Data Handler.
+
+    - A backend is a module that fetches and calls extractors and
+      handles data by calling data handlers.
+
+    - An extractor is a text processing module that extracts
+      information from a text string.
+
+    - A data handler takes the extracted information and renders it in
+      different ways.
+
+USAGE
+
+    To run the scraper is very easy. You just need to call the main
+    scraper with a backend.
+
+
+    # If you install Scrapar in system directories, you just run scrape.pl
+
+    % scrape.pl -b Backend
+
+
+    # If you are running in the untarred directory, you just run it
+    # from the bin directory
+
+    % ./bin/scrape.pl -b Backend
+
+AUTHOR
+
+    Copyright 2009 Yung-chung Lin <henearkrxern@gmail.com>
+
+    All rights reserved.

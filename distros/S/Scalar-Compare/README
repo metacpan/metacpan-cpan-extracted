@@ -1,0 +1,18 @@
+Scalar::Compare
+====================
+
+Dynamically use comparison operators
+
+INSTALLATION
+
+To install this module, type the following:
+
+perl Makefile.pl
+make
+make test
+make install
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2013 Bizowie. All rights reserved.
+

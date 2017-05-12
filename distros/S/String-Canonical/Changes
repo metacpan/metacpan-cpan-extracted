@@ -1,0 +1,11 @@
+Change history for String-Canonical
+
+revision 1.2
+date: 2003/02/15 01:44:39;  author: ekkis;  state: Exp;  lines: +26 -15
+- fixed C<Ol' Train Runnin'>
+- POD changes
+
+revision 1.1
+date: 2003/02/14 08:28:50;  author: ekkis;  state: Exp;
+branches:  1.1.1;
+Initial revision

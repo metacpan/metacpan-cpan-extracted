@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         SVG-Shapefile
+version:      0.01
+version_from: lib/SVG/Shapefile.pm
+installdirs:  site
+requires:
+    Compress::Zlib:                0.1
+    DBD::Excel:                    0.06
+    Geo::Shapelib:                 0.09
+    SQL::Statement:                0.01
+    SVG:                           0.1
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

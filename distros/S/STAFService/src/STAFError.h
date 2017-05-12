@@ -1,0 +1,212 @@
+/*****************************************************************************/
+/* Software Testing Automation Framework (STAF)                              */
+/* (C) Copyright IBM Corp. 2001                                              */
+/*                                                                           */
+/* This software is licensed under the Common Public License (CPL) V1.0.     */
+/*****************************************************************************/
+
+#ifndef STAF_Error
+#define STAF_Error
+
+#ifndef STAF_OLD_ERROR_CODES
+
+typedef unsigned int STAFRC_t;
+
+typedef enum STAFError_e
+{
+     kSTAFOk = 0,
+     kSTAFInvalidAPI = 1,
+     kSTAFUnknownService = 2,
+     kSTAFInvalidHandle = 3,
+     kSTAFHandleAlreadyExists = 4,
+     kSTAFHandleDoesNotExist = 5,
+     kSTAFUnknownError = 6,
+     kSTAFInvalidRequestString = 7,
+     kSTAFInvalidServiceResult = 8,
+     kSTAFREXXError = 9,
+     kSTAFBaseOSError = 10,
+     kSTAFProcessAlreadyComplete = 11,
+     kSTAFProcessNotComplete = 12, 
+     kSTAFVariableDoesNotExist = 13,
+     kSTAFUnResolvableString = 14,
+     kSTAFInvalidResolveString = 15,
+     kSTAFNoPathToMachine = 16,
+     kSTAFFileOpenError = 17,
+     kSTAFFileReadError = 18,
+     kSTAFFileWriteError = 19,
+     kSTAFFileDeleteError = 20,
+     kSTAFNotRunning = 21,
+     kSTAFCommunicationError = 22,
+     kSTAFTrusteeDoesNotExist = 23,
+     kSTAFInvalidTrustLevel = 24,
+     kSTAFAccessDenied = 25,
+     kSTAFRegistrationError = 26,
+     kSTAFServiceConfigurationError = 27,
+     kSTAFQueueFull = 28,
+     kSTAFNoQueueElement = 29,
+     kSTAFNotifieeDoesNotExist = 30,
+     kSTAFInvalidAPILevel = 31,
+     kSTAFServiceNotUnregisterable = 32,
+     kSTAFServiceNotAvailable = 33,
+     kSTAFSemaphoreDoesNotExist = 34,
+     kSTAFNotSemaphoreOwner = 35, 
+     kSTAFSemaphoreHasPendingRequests = 36,
+     kSTAFTimeout = 37,
+     kSTAFJavaError = 38,
+     kSTAFConverterError = 39,
+     kSTAFNotUsed = 40,
+     kSTAFInvalidObject = 41,
+     kSTAFInvalidParm = 42,
+     kSTAFRequestNumberNotFound = 43,
+     kSTAFInvalidAsynchOption = 44,
+     kSTAFRequestNotComplete = 45,
+     kSTAFProcessAuthenticationDenied = 46,
+     kSTAFInvalidValue = 47,
+     kSTAFDoesNotExist = 48,
+     kSTAFAlreadyExists = 49,
+     kSTAFDirectoryNotEmpty = 50,
+     kSTAFDirectoryCopyError = 51,
+     kSTAFDiagnosticsNotEnabled = 52,
+     kSTAFHandleAuthenticationDenied = 53,
+     kSTAFHandleAlreadyAuthenticated = 54,
+     kSTAFInvalidSTAFVersion = 55,
+     kSTAFRequestCancelled = 56,
+     kSTAFUserDefined = 4000
+     
+} STAFError_t;
+
+#else
+
+enum STAFErrorID
+{
+    kOk = 0,
+    kInvalidAPI = 1,
+    kUnknownService = 2,
+    kInvalidHandle = 3,
+    kHandleAlreadyExists = 4,
+    kHandleDoesNotExist = 5,
+    kUnknownError = 6,
+    kInvalidRequestString = 7,
+    kInvalidServiceResult = 8,
+    kREXXError = 9,
+    kBaseOSError = 10,
+    kProcessAlreadyComplete = 11,
+    kProcessNotComplete = 12,
+    kVariableDoesNotExist = 13,
+    kUnResolvableString = 14,
+    kInvalidResolveString = 15,
+    kNoPathToMachine = 16,
+    kFileOpenError = 17,
+    kFileReadError = 18,
+    kFileWriteError = 19,
+    kFileDeleteError = 20,
+    kSTAFNotRunning = 21,
+    kCommunicationError = 22,
+    kTrusteeDoesNotExist = 23,
+    kInvalidTrustLevel = 24,
+    kAccessDenied = 25,
+    kSTAFRegistrationError = 26,
+    kServiceConfigurationError = 27,
+    kQueueFull = 28,
+    kNoQueueElement = 29,
+    kNotifieeDoesNotExist = 30,
+    kInvalidAPILevel = 31,
+    kServiceNotUnregisterable = 32,
+    kServiceNotAvailable = 33,
+    kSemaphoreDoesNotExist = 34,
+    kNotSemaphoreOwner = 35,
+    kSemaphoreHasPendingRequests = 36,
+    kTimeout = 37,
+    kJavaError = 38,
+    kConverterError = 39,
+    kNotUsed = 40,
+    kInvalidObject = 41,
+    kInvalidParm = 42,
+    kRequestNumberNotFound = 43,
+    kInvalidAsynchOption = 44,
+    kRequestNotComplete = 45,
+    kProcessAuthenticationDenied = 46,
+    kInvalidValue = 47,
+    kDoesNotExist = 48,
+    kAlreadyExists = 49,
+    kDirectoryNotEmpty = 50,
+    kSTAFDirectoryCopyError = 51,
+    kSTAFDiagnosticsNotEnabled = 52,
+    kHandleAuthenticationDenied = 53,
+    kHandleAlreadyAuthenticated = 54,
+    kInvalidSTAFVersion = 55,
+    kRequestCancelled = 56,
+    kUserDefined = 4000
+};
+
+
+class STAFError
+{
+public:
+
+    enum ID {
+
+         kOk = 0,
+         kInvalidAPI = 1,
+         kUnknownService = 2,
+         kInvalidHandle = 3,
+         kHandleAlreadyExists = 4,
+         kHandleDoesNotExist = 5,
+         kUnknownError = 6,
+         kInvalidRequestString = 7,
+         kInvalidServiceResult = 8,
+         kREXXError = 9,
+         kBaseOSError = 10,
+         kProcessAlreadyComplete = 11,
+         kProcessNotComplete = 12,
+         kVariableDoesNotExist = 13,
+         kUnResolvableString = 14,
+         kInvalidResolveString = 15,
+         kNoPathToMachine = 16,
+         kFileOpenError = 17,
+         kFileReadError = 18,
+         kFileWriteError = 19,
+         kFileDeleteError = 20,
+         kSTAFNotRunning = 21,
+         kCommunicationError = 22,
+         kTrusteeDoesNotExist = 23,
+         kInvalidTrustLevel = 24,
+         kAccessDenied = 25,
+         kSTAFRegistrationError = 26,
+         kServiceConfigurationError = 27,
+         kQueueFull = 28,
+         kNoQueueElement = 29,
+         kNotifieeDoesNotExist = 30,
+         kInvalidAPILevel = 31,
+         kServiceNotUnregisterable = 32,
+         kServiceNotAvailable = 33,
+         kSemaphoreDoesNotExist = 34,
+         kNotSemaphoreOwner = 35,
+         kSemaphoreHasPendingRequests = 36,
+         kTimeout = 37,
+         kJavaError = 38,
+         kConverterError = 39,
+         kNotUsed = 40,
+         kInvalidObject = 41,
+         kInvalidParm = 42,
+         kRequestNumberNotFound = 43,
+         kInvalidAsynchOption = 44,
+         kRequestNotComplete = 45,
+         kProcessAuthenticationDenied = 46,
+         kInvalidValue = 47,
+         kDoesNotExist = 48,
+         kAlreadyExists = 49,
+         kDirectoryNotEmpty = 50,
+         kSTAFDirectoryCopyError = 51,
+         kSTAFDiagnosticsNotEnabled = 52,
+         kHandleAuthenticationDenied = 53,
+         kHandleAlreadyAuthenticated = 54,
+         kInvalidSTAFVersion = 55,
+         kRequestCancelled = 56,
+         kUserDefined = 4000
+    };
+};
+
+#endif
+
+#endif

@@ -1,0 +1,13 @@
+Build.PL
+Changes
+MANIFEST
+MANIFEST.SKIP
+README
+lib/SugarSync/API.pm
+lib/SugarSync/API/Data.pm
+t/00-load.t
+script/mirror_share.pl
+script/test.pl
+Makefile.PL
+META.yml
+META.json                                Module JSON meta-data (added by MakeMaker)

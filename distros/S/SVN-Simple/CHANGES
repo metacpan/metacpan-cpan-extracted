@@ -1,0 +1,32 @@
+[Changes for 0.29 - Dec 8, 2009]
+
+* Make tests pass for Subversion 1.6.x.
+
+[Changes for 0.27 - Feb 24, 2005]
+
+* Don't do version check for SVN::Core.
+
+[Changes for 0.26 - Nov 10, 2004]
+
+* Tests now pass on Win32.
+
+[Changes for 0.25 - Feb 25, 2004]
+
+* Documentation
+* Fix - delete_entry is using bad Perl construct.
+* New - automatically close files and directories.
+
+[Changes for 0.21 - Nov 24, 2003]
+
+* Fix - add a base_path parameter for check_missing to use.
+* New - allow editing based on a given transaction root.
+
+[Changes for 0.20 - Oct 6, 2003]
+
+* Fix - unbreak absolute path used in edit functions.
+* Fix - make modify_file verify checksum correctly when given.
+* require subversion 0.31 now.
+
+[Changes for 0.1 - Aug 25, 2003]
+
+Initial release.

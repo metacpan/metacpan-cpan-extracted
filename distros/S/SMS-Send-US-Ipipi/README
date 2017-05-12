@@ -1,0 +1,55 @@
+SMS-Send-Ipipi
+===========================
+
+This README is a very bare skeleton. Please see the POD documentation
+found in the Ipipi.pm module included in the distribution.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Since ipipi.com is a pay service, the test suite does not actually use
+it to send any text messages. If you would like to test that
+capability, you should set three environment variables:
+
+IPIPI_LOGIN - your ipipi.com username
+IPIPI_PASSWORD - your ipipi.com password
+IPIPI_DESTINATION - a mobile phone number to send a text message to.
+
+Then, run 'make test' again and a text message will be sent.
+   
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  SMS::Send
+  Carp           
+  SMS::Send      
+  WWW::Mechanize 
+  IO::Socket::SSL
+  LWP            
+  File::Spec     
+  Test::More     
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 LibLime L<http://liblime.com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+Additionally, you are again reminded that this software comes with
+no warranty of any kind, including but not limited to the implied
+warranty of merchantability.
+
+ANY use my result in charges on your ipipi.com bill, and you should
+use this software with care. The author takes no responsibility for
+any such charges accrued.
+
+

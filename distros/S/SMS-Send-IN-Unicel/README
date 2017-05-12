@@ -1,0 +1,55 @@
+SMS-Send-IN-Unicel version 0.01
+===============================
+
+Please see the POD documentation in Unicel.pm module included in the
+distribution.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Since Unicel Technologies runs a paid service, the test suite 
+does not actually use it to send any text message. If you wish to 
+test the functionality, you should set the following four environment
+variables:
+
+UNICEL_LOGIN - Your Unicel username
+UNICEL_PASSW - Your Unicel account password
+UNICEL_DESTP - A mobile number in India to send a text message to
+UNICEL_MSGTP - A message conforming with your transactional template
+               registered with Unicel as per TRAI rules
+
+Then, run 'make test' again and a text message will be sent.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  SMS::Send
+  IO::Socket::SSL
+  LWP
+  File::Spec
+  Test::More 
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2015 by Indranil Das Gupta (indradg@l2c2.co.in)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+This software comes with no warranty of any kind, including but not
+limited to the implied warranty of merchantability.
+
+Your use of this software may result in charges against / use of available
+credits on your Unicel account. Please use this software carefully
+keeping a close eye on your usage and/or billing, The author takes 
+no responsibility for any such charges accrued.
+
+Document published by L2C2 Technologies [ http://www.l2c2.co.in ]

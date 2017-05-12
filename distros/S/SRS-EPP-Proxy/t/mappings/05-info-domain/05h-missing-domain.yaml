@@ -1,0 +1,13 @@
+template: info-domain.tt
+
+vars:
+  domain_name: ''
+
+output_assertions:
+  count:
+    - [ '//epp:resData', 0, 'EPP: Check for resData' ]
+  match:
+    - [ '//epp:reason', '/XML Schema validation error at /epp/command/info/domain:info; Missing required value/', 'Correct reason' ]
+  match_all:
+  attr_is:
+    - [ '//epp:result', 'code', 2004, 'EPP: command ok' ]

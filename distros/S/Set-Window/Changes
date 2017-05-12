@@ -1,0 +1,8 @@
+Revision history for Perl extension Set::Window.
+
+1.01  2002 Jul 15
+      - Fixed a warning in t/Window.t
+
+0.01  Mon Dec 30 11:32:45 1996
+      - original version; created by h2xs 1.16
+

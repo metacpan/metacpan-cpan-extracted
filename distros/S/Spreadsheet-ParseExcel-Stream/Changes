@@ -1,0 +1,30 @@
+Revision history for Perl extension Spreadsheet::ParseExcel::Stream.
+
+0.11  Tue Oct 22 07:45:03 2013
+  - Create workbook() method to expose workbook object(rt89603).
+0.10  Wed Jul 30 04:51:22 2013
+  - Fix error when calling sheet() on last sheet of xls files.
+0.09  Wed Jul 10 20:17:55 2013
+  - Make password option available for xls files
+  - Parse xls or xlsx files.
+0.08  Thu Sep 12 19:26:38 2012
+  - Ability to skip worksheets. sheet() will now advance to next sheet.
+0.07  Thu Apr 19 18:16:27 2012
+  - Added bind_columns.
+0.06  Thu Jan 12 17:57:14 2012
+  - Fix next_row and unformatted methods.
+  - Add tests.
+0.05  Tue Sep 27 17:12:42 2011
+  - Add bugs/limitations to pod.
+0.04  Mon Sep 26 16:22:42 2011
+  - Implement TrimEmpty option.
+    Added tests.
+0.03  Thu Sep 22 19:23:22 2011
+  - Remove debug code in test.
+0.02  Thu Sep 22 18:23:22 2011
+  - Fixed misalignment of empty columns (RT #71138)
+    Reported and patch supplied by SHYOKOU
+  - Added test of empty columns.
+0.01  Wed Jul 27 19:03:17 2011
+  - original version; created by h2xs with options
+    -n Spreadsheet::ParseExcel::Stream -X -A

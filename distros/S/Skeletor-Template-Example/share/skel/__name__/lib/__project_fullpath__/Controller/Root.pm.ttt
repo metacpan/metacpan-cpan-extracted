@@ -1,0 +1,36 @@
+package [% namespace %]::Controller::Root;
+
+use Moose;
+use MooseX::MethodAttributes;
+use HTTP::Exception;
+
+extends 'Catalyst::Controller';
+
+
+sub root :Chained(/) PathPart('') CaptureArgs(0) {
+  my ($self, $c) = @_;
+  $c->stash(current_view=>'JSON') if $c->accepts_json && !$c->accepts_html;
+}
+
+  sub index :GET Chained(root) PathPart('') Args(0) {
+    my ($self, $c) = @_;
+
+    my $new_game = $c->uri_for( $c->controller('Game')->action_for('process_move'),['new']);
+    my $form = $c->model("Form::Game", action => $new_game);
+    my @links_to_games = map {
+       $c->uri_for($c->controller('Game')->action_for('process_move'), [$_->id])
+    } $c->model("Schema::Game")->all;
+
+    $c->stash(
+      form => $form, games => \@links_to_games, 
+      body_data => { games => \@links_to_games, new_game => "$new_game"} );
+  }
+
+sub default :Default { $_[1]->go('/not_found') }
+
+sub end :ActionClass(RenderView) { }
+
+sub not_found :Action { HTTP::Exception->throw(404) }
+
+__PACKAGE__->config(namespace=>'');
+__PACKAGE__->meta->make_immutable;

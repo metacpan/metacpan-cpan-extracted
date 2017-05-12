@@ -1,0 +1,34 @@
+[% PROCESS admin/blocks/listblocks.tt %]
+<div class="span12">
+    <h1>[% label %]</h1>
+</div>
+<div class="content articlelist span12">
+        [% INCLUDE tools %]
+        [% INCLUDE pager %]
+        <table class="table table-striped">
+        [% INCLUDE listhead %]
+        <tbody>
+            [% FOREACH el IN elements %]
+            <tr>
+                <td>[% el.id %]</td>
+                <td>[% el.title %]</td>
+                <td>[% el.category_name %]</td>
+                <td>
+                    <div class="thumbnail">
+                        <img src="[% el.image %]" alt="">
+                    </div>
+                </td>
+                <td>
+                    <div class="btn-group span2 offset1">
+                        <a href="/admin/image/edit/[% el.id %]" class="btn">Edit</a>
+                        <a href="/admin/image/delete/[% el.id %]" class="btn">Delete</a>
+                    </div>
+                </td>
+            </tr>
+            [% END %]
+        </tbody>
+        </table>
+        [% INCLUDE pager %]
+</div>
+[% INCLUDE filterscripts %]
+

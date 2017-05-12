@@ -1,0 +1,20 @@
+Revision history for module SQLite:DB.
+
+0.04 Tue Nov 23 10:52:00 2004
+     - commit and rollback was returning '1' even with errors occuring.
+     - created @transaction_errors var to hold all errors of an transcation
+       since each exec creates it's own error, and at the end, if the commit
+       command itself does not had an error, it would consider all transaction
+       sucessfull, wich is wrong.
+
+0.03 Mon Aug 02 21:44:00 2004
+     - select_one_row now returns undef if an error occur.
+
+0.02 Thu Jun 03 20:06:00 2004
+     - Improved POD documentation.
+     = Commit and Rollback now checks if is under transaction.
+     - Included tests to call commit and rollback when is not in
+       transaction mode.
+
+0.01  Tue Jun 01 18:53:00 2004
+    - original version; created by VXX 

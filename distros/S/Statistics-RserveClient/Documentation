@@ -1,0 +1,13 @@
+
+Starting R-serve
+
+Assuming that you have Rserve (and Rserve.dbg) properly installed (see the instructions for R-serve) 
+you should be able to type either of the following at a shell prompt. The following command starts
+the regular R-serve server
+
+  % R CMD Rserve
+
+To start the R-serve server with debugging enabled, type
+
+  % R CMD Rserve.dbg
+

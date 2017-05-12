@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/ChangeLog
+lib/SchemaEvolution.pm
+lib/SchemaEvolution/Types.pm
+script/ChangeLog
+script/evolve.pl
+t/release-pod-coverage.t
+t/release-pod-syntax.t

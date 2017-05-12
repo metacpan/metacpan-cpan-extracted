@@ -1,0 +1,707 @@
+# See copyright, etc in below POD section.
+######################################################################
+
+=pod
+
+=head1 NAME
+
+SystemC::SystemPerl - SystemPerl Language Extension to SystemC
+
+=head1 DESCRIPTION
+
+SystemPerl is a version of the SystemC language.  It is designed to expand
+text so that needless repetition in the language is minimized.  By using
+L<sp_preproc>, SystemPerl files can be expanded into C++ files at compile
+time, or expanded in place to make them valid stand-alone SystemC files.
+
+The concept of SystemPerl is based upon the AUTOS in the L<verilog-mode>
+package for Emacs, by the same author.
+
+=head1 LANGUAGE
+
+=over 4
+
+=item #sp
+
+#sp directives are recognized by SystemPerl to split up files and control
+preprocessing.  Use of any #sp's forces use of SystemPerl preprocessing, and
+removes full SystemC compatibility.
+
+=item /*AUTOS*/
+
+AUTOmatics provide a way of expanding interconnections, while potentially
+retaining fully compatible SystemC code.  The preprocessor can edit the
+source code file directly, resulting in the source code having the expanded
+automatics.
+
+Code with expanded AUTOs are fully valid SystemC code, and can be sent to
+anyone who does not even have system perl.  Anyone with SystemPerl has the
+benefit of being able to automatically regenerate them, and saves coding
+time.
+
+=back
+
+=head1 LANGUAGE REQUIREMENTS
+
+SystemPerl requires the following coding conventions.  These tokens are not
+changed in any way, but are simply required for SystemPerl to be able to
+derive required information from the source code.
+
+=over 4
+
+=item SP_AUTO_COVER()
+
+Create a coverage point at the current file and line number.  If the
+statement is executed, the coverage bucket will increment.
+
+=item SP_AUTO_COVER_CMT (I<comment>)
+
+Create a coverage point at the current file and line number, and note the
+specified comment.  If the statement is executed, the coverage bucket will
+increment.
+
+=item SP_AUTO_COVER_CMT_IF (I<comment>,I<condition>)
+
+Create a coverage point at the current file and line number, and note the
+specified comment.  If the statement is executed and the specified
+condition is true, the coverage bucket will increment.
+
+=item SP_COVER_INSERT (I<valuePtr>,I<key>,I<value>[,I<key2>,I<value2>...])
+
+Create a coverage point at the current file and line number.  Store the key
+and value pairs as attributes of the coverage bucket; generally these are
+arbitrary text; use "comment" to set the general comment field.
+
+The coverage variable is passed as a pointer, which the user must increment
+manually.  The pointer will be read by dereference at the end of time, and
+so must still point to a valid structure at that time.
+
+For example:
+
+    // In the class declaration:
+    SpZeroed<uint32_t> m_fcCases[FsmState::MAX][FsmState::MAX]; // [old][new]
+
+    ...
+    // In the constructor:
+    for (a = 0; a<FsmState::MAX; a++) {
+      for (b = 0; b<FsmState::MAX; b++) {
+        SP_COVER_INSERT(&m_fcCases[*a][*b],
+	            "comment","FsmState Transitions",
+                    "OldState",*a,
+	            "NewState",*b,
+                    "TestplanSectionNumber","1.4.2.1");
+
+    // Wherever you need to increment:
+    ++m_fcCases[oldstate][newstate];
+
+=item SP_COVERGROUP I<groupname> (I<coverpoints>...])
+
+For example:
+
+SC_MODULE(__MODULE__) {
+
+  EnumType var1;
+  EnumType var2;
+  uint32_t var3;
+  uint32_t var4;
+  bool e1;
+  bool e2;
+  ...
+
+  SP_COVERGROUP name (
+    option per_instance = 1;                     // this group is covered separately per instance
+    description = "a bunch of text that will appear next to the HTML table; what's this covergroup all about?";
+    coverpoint      var3[16] = [0:0x1000];       // 16 evenly space bins dividing [0:0x1000]
+    coverpoint      var3_alt(var3) {             // alternate name
+      bins sizes[] = {0, 1, [2:5], [8:100]};     // 4 bins as specified
+      bins few = [3:5];
+      bins three = EnumType::THREE;              // can use enums on the RHS
+      bins dist_ranges[4] = [200:299];           // 4 bins spread over a range
+      bins other = default;                      // named default
+      limit_func = var3_limit();
+    }
+    coverpoint var1 {                            // automatic enum bins
+      auto_enum_bins = EnumType;
+    };
+    coverpoint var4[16] = [0:0x1000] {           // illegal and ignored bins
+      option radix = 16;                         // name the bins in hex
+      illegal_bins_func = var4_illegal();
+      ignore_bins_func = var4_ignore();
+      illegal_bins banish_bad_luck = 13;
+      ignore_bins  ignore_zero = 0;
+    };
+    cross myCross {                              // 3-dimensional cross; up to 8 are permitted
+      rows = {var1,var4};
+      cols = {var3_alt};
+      page = "mypage";                           // put this table on a separate page
+      description = "this text goes above the table";
+    };
+    window myWin(e1,e2,4);                       // 9 bins +/- e1 occuring 4 samples before/after e2
+  );
+  ...
+  bool var4_ignore(uint64_t var4) { ... }  // return true if value should be ignored
+  bool var4_illegal(uint64_t var4) { ... } // return true if test should assert
+  uint32_t var3_limit(uint64_t var3_alt) { ... } // return CovVise limit for "high"; default is 10
+  ...
+  /*AUTOMETHODS*/
+}
+
+SP_CTOR_IMP(__MODULE__) /*AUTOINIT*/ {
+    SP_AUTO_CTOR;
+    ...
+}
+
+void __MODULE__::foo() {
+    ...
+    SP_COVER_SAMPLE(name);
+    ...
+}
+
+=item SP_CLASS (I<class>)
+
+SP_CLASS declares a SC_MODULE like structure, most likely to accomplish
+special inheritance.  If a new base class is derived from sc_module, you
+must use SP_CLASS when the derived class is used, so that SystemPerl knows
+the final class is a child of a sc_module.  For example:
+
+    class FooBase : public sc_module {...};
+
+  Then to use FooBase, instead of
+    class Foo : public FooBase {...};
+
+  use
+    SP_CLASS(Foo) : public FooBase {...};
+
+=item SP_CELL_DECL (I<refname>, I<instname[s]>)
+
+SP_CELL_DECL declares the cell structures.  It is only needed to declare
+those cells that AUTOCELLS will not create itself; currently this is any
+cells which are arrayed.
+
+=item SP_CELL (I<instname>, I<refname>)
+
+SP_CELL instantiates the given module named refname as a instantiation
+called instname.  The instname is also passed as a parameter to refname as
+a string.  Note if you are doing an array, you probably want SP_CELL_FORM.
+
+=item SP_CELL_FORM (I<instname>, I<refname>, I<form>, ...)
+
+SP_CELL_FORM instantiates the given module named refname as a instantiation.
+The instantiation is named by using a sprintf of the given format and arguments.
+Generally this is used for arrays: i.e.:
+
+    SP_CELL_FORM(slice[i], smm_pi_slice, "slice[%d]", i);
+
+=item SC_MODULE (I<modulename>)
+
+Though a standard optional SystemC construct, SystemC requires use of the
+SC_MODULE macro when defining a module class. For example "struct mod1 :
+public sc_module" must instead be coded as "SC_MODULE(mod1)".
+
+=item SP_MODULE_CONTINUED (I<modulename>)
+
+SP_MODULE_CONTINUED allows a new source file to continue declaration of
+functions that were declared in a different .sp file.  This will not put
+any code into the output, it is only required for proper parsing of
+Verilated files.
+
+=item SP_PIN (I<instname>, I<portname>, I<netname>)
+
+SP_PIN declares a connection of a instantiation's port to the specified net.
+
+=item SP_TEMPLATE ("<instregexp>", "<portregexp>", "<netregexp>", ["<typeregexp>"]);
+
+SP_TEMPLATE defines a rule for connecting pins with AUTOINST that can apply
+to a regular expression of instance names and port names.  This is useful
+for connecting signals to arrayed instances, or other mass-renaming tasks.
+
+The first parameter is a unquoted instance name, or a double-quoted Perl
+regular expression which must match against the instance name for the
+template to apply.  Regular expressions must conform to those described in
+L<pcrepattern>, and are anchored to the instance name - in that SystemPerl
+implies a leading "^" and trailing "$" in the regular expression, and the
+^/$ must not be included by the user.  Be careful with brackets, as they
+specify regular expression character classes; if a literal bracket is
+wanted such as for matching array references, quote it with a backslash.
+
+The second parameter is a regular expression which must match against the
+port name for the template to apply.  As with the instance regexp, it is
+anchored for you.
+
+The third parameter is the net to connect when the template matches.  The
+regular expression may contain $1, $2 etc, which correspond to the
+parenthesis in both the instance and port regular expressions concatenated.
+
+The optional fourth parameter is a regular expression which must match the
+type of the cell's pin.  For example "sc_out" would make a template that
+matches only outputs.
+
+For example,
+
+    SP_TEMPLATE("sub(\d+)", "arrayed_(.*)", "$2_array$1");
+
+    Where there	is a sub1 instance with a pin "arrayed_foo".
+
+When a instance name matches /^sub\d+$/ which "sub1" does, and a port name
+matches /^arrayed_.*$/, which "arrayed_foo" does, then the pin will be
+named based on the port name and sub number, in this case $2 has "foo" and
+$1 has "1", so the resulting connection will be to "foo_array1".
+
+=item SP_TRACED
+
+SP_TRACED is used as an attribute like static or const.  It indicates the
+simple variable inside a SC_MODULE or another class should be added to any
+waves files that AUTOTRACE creates.
+
+SP_TRACED may also be used on the member variables inside standard classes.
+This allows the class to be traced if it is used as the type of a
+sc_in/sc_out/sc_signal.  For a sample, see MySigStruct in the examples.
+
+=back
+
+=head1 EXPANSIONS
+
+SystemPerl expands the following special tokens.
+
+=over 4
+
+=item __MODULE__
+
+__MODULE__ is predefined to the name of the module, from the basename of
+the filename.  This allows files to be more easily replicated, and to avoid
+obscure errors when the filename does not match the module name.
+
+For example:
+
+    SC_MODULE (__MODULE__) {
+      ...
+
+=item /*AUTOATTR("I<attribute>")*/
+
+Sets a internal attribute.  There are no attributes currently specified for
+general usage.
+
+=item /*AUTOCTOR*/
+
+AUTOCTOR creates the pin name initializers required in the SC_MODULE's
+constructor.  For example:
+
+    sc_in<bool> in_signal;
+    ...
+    SP_CTOR_IMP(__MODULE__) /*AUTOCTOR*/ {
+
+Becomes:
+
+    SP_CTOR_IMP(__MODULE__) : in_signal("in_signal") {
+
+=item /*AUTOINIT*/
+
+AUTOINIT creates signal and port name initializers for SC_CTOR's.
+/*AUTOCTOR*/ is a backward compatible alias, but was depreciated due to the
+similarity in name with SP_AUTO_CTOR.
+
+For example:
+
+    SC_MODULE(submod) {
+	sc_in_clk   clk;
+	...
+
+    SC_MODULE(mod) {
+	SC_CTOR(mod) /*AUTOINIT*/ {
+
+Becomes:
+
+    SC_MODULE(mod) {
+	SC_CTOR(mod)
+	      // Beginning of SystemPerl automatic initializer
+	      : clk("clk")
+	      // End of SystemPerl automatic initializer
+
+=item /*AUTOENUM_I<CLASS|GLOBAL>(I<enum>)*/
+
+AUTOENUM is used to take an existing enumeration and make it into a class
+with functions to return the ASCII name of the enumeration, and to create
+an iterator to loop over all enum values.  This makes it easy to print the
+value of the enumeration in text form.
+
+For example:
+
+    class MyENumClass {
+    public:
+	enum en {
+	IDLE = 0,
+	ONE, TWO
+	};
+	/*AUTOENUM_CLASS(MyENumClass.en)*/
+    };
+    /*AUTOENUM_GLOBAL(MyENumClass.en)*/
+
+Becomes:
+
+    class MyENumClass {
+    public:
+	enum en {
+	    IDLE = 0,
+	    ONE, TWO
+	};
+	/*AUTOENUM_CLASS(MyENumClass.en)*/
+	// Beginning of SystemPerl automatic enumeration
+	enum en e_en;
+	inline MyENumClass () {};
+	inline MyENumClass (en _e) : e_en(_e) {};
+	explicit inline MyENumClass (int _e) : e_en(static_cast<en>(_e)) {};
+	operator const char * (void) const { return ascii(); };
+	operator en (void) const { return e_en; };
+	const char *ascii (void) const {
+	   switch (e_en) {
+	   case IDLE: return "IDLE";
+	   case ONE: return "ONE";
+	   case TWO: return "TWO";
+	   default: return "%E:BadVal:MyENumClass";
+	   };
+	};
+	class iterator; ...
+	// End of SystemPerl automatic enumeration
+    };
+    /*AUTOENUM_GLOBAL(MyENumClass.en)*/
+    // Beginning of SystemPerl automatic enumeration
+    inline bool operator== (MyENumClass lhs, MyENumClass rhs) { return (lhs.e_en == rhs.e_en); }
+    //... other accessors
+    // End of SystemPerl automatic enumeration
+
+=item /*AUTOINOUT_MODULE(I<mod>[,I<signal>[,I<direction-or-type>]])*/
+
+AUTOINOUT_MODULE indicates the input/output list should be copied from the
+specified other module.  Optionally only signal names matching the
+specified regular expression, and with direction and data type matching the
+third parameter are included.
+
+This is useful for creating null modules which need identical pinouts to
+the module which they are nulling out.  AUTOSIGNAL must be used along with
+this auto, as the ports are inserted at the point where the AUTOSIGNAL is.
+
+=item /*AUTOIMPLEMENTATION*/
+
+AUTOIMPLEMENTATION includes function definitions required inside the .cpp
+file, such as functions implementing ENUM ascii functions.  AUTOIMPLEMENTATION
+will be included automatically at the end of a expanded .cpp file if it is
+not otherwise found in the file.
+
+=item /*AUTOINST*/
+
+AUTOINST connects any unreferenced ports for the current SP_CELL to signals
+named the same as the port name.
+
+For example:
+
+    SC_MODULE(submod) {
+	sc_in_clk   clk;
+	...
+
+    SC_MODULE(mod) {
+	SC_CTOR(mod) {
+	    SP_CELL (sub, submod);
+	      /*AUTOINST*/
+
+Becomes:
+
+    SC_MODULE(mod) {
+	SC_CTOR(mod) {
+	    SP_CELL (sub, submod);
+	      // Beginning of SystemPerl automatic instantiation pins
+	      SP_PIN (sub, clk,	    clk);
+	      // End of SystemPerl automatic instantiation pins
+
+=item /*AUTOINTERFACE*/
+
+AUTOINTERFACE includes function definitions required inside the .h file.
+Nothing needs to be inserted there yet, so this AUTO does not need to be
+used.
+
+=item /*AUTOMETHODS*/
+
+AUTOMETHODS indicates where interface declarations should be inserted.  It
+also declares a SC_CTOR(__MODULE__) method if there is not already one in
+the class header.  Additional methods that are inserted are is described
+under AUTOTRACE.
+
+=item /*AUTOSUBCELL_CLASS*/
+
+AUTOSUBCELL_CLASS creates forward class declarations for the submodules
+instantiated in SP_CELL declarations.
+
+For example:
+
+    /*AUTOSUBCELL_CLASS*/
+    SC_MODULE(mod) {
+	SC_CTOR(mod) {
+	    SP_CELL (sub, submod);
+
+Becomes:
+
+    /*AUTOSUBCELL_CLASS*/
+    // Beginning of SystemPerl automatic subcell includes
+    class submod;
+    // End of SystemPerl automatic subcell includes
+    ...
+
+=item /*AUTOSUBCELL_DECL*/
+
+AUTOSUBCELL_DECL declares the submodules instantiated in SP_CELL declarations.
+
+For example:
+
+    SC_MODULE(mod) {
+	/*AUTOSUBCELL_DECL*/
+	SC_CTOR(mod) {
+	    SP_CELL (sub, submod);
+	      SP_PIN (sub, a,	    a);
+
+Becomes:
+
+    SC_MODULE(mod) {
+	/*AUTOSUBCELL_DECL*/
+	// Beginning of SystemPerl automatic subcells
+	submod		  *sub;
+	// End of SystemPerl automatic subcells
+
+	SC_CTOR(mod) {
+	    SP_CELL (sub, submod);
+	      SP_PIN (sub, a,	    a);
+
+=item /*AUTOSUBCELL_INCLUDE*/
+
+AUTOSUBCELL_INCLUDE creates includes for the submodules instantiated in
+SP_CELL declarations.
+
+For example:
+
+    /*AUTOSUBCELL_INCLUDE*/
+    SC_MODULE(mod) {
+	SC_CTOR(mod) {
+	    SP_CELL (sub, submod);
+
+Becomes:
+
+    /*AUTOSUBCELL_INCLUDE*/
+    // Beginning of SystemPerl automatic subcell includes
+    #include "submod.h"
+    // End of SystemPerl automatic subcell includes
+    ...
+
+=item /*AUTOSIGNAL*/
+
+AUTOSIGNAL declares any signals used in SP_PIN connections that are not
+declared elsewhere.
+
+For example:
+
+    SC_MODULE(mod) {
+	/*AUTOSIGNAL*/
+	SC_CTOR(mod) {
+	    SP_CELL (sub, submod);
+	      SP_PIN (sub, a,	    a);
+
+Becomes:
+
+    SC_MODULE(mod) {
+	/*AUTOSIGNAL*/
+	// Beginning of SystemPerl automatic signals
+	sc_signal<bool>		    a;	     // For submod
+	// End of SystemPerl automatic signals
+
+	SC_CTOR(mod) {
+	    SP_CELL (sub, submod);
+	      SP_PIN (sub, a,	    a);
+
+=item /*AUTOTIEOFF*/
+
+AUTOTIEOFF creates zeroing assignments for all outputs of the module.
+Normally this is used in a method called at reset time.
+
+For example:
+
+    /*AUTOTIEOFF*/
+
+Becomes:
+
+    /*AUTOTIEOFF*/
+    // Beginning of SystemPerl automatic tieoffs
+    a.write(0);
+    // End of SystemPerl automatic tieoffs
+
+=item /*AUTOTRACE(I<module>,I<recurse>)*/
+
+AUTOTRACE creates a routine to trace the ports and signals in the current
+module, and then call the tracing routine on all submodules.  AUTOMETHODS
+is also required in the declaration of the module.  A optional second
+argument of "recurse" indicates the trace code should include all
+submodules, leading to smaller trace files, but longer compile and link
+times.
+
+AUTOTRACE will not trace signals beginning with a underscore.  It also
+replaces __DOT__ in signal names to "." to support fake hierarchy, such as
+is created with Verilator.
+
+Note because of a SystemC limitation, output ports cannot be traced.  Also
+the hierarchy is not properly placed into the trace file; the hierarchy path
+will be added to the signal name itself.  Also, arrayed nets/cells aren't
+quite right yet.
+
+Example:
+
+    SC_MODULE (ExMod) {
+	...
+	sc_in<bool>	    in;
+	SP_CELL_DECL(ExModSub,		suba);
+
+	/*AUTOMETHODS*/
+	// Beginning of SystemPerl automatic declarations
+	void trace (sc_trace_file *tf, const sc_string& prefix, int levels, int options=0);
+	// End of SystemPerl automatic declarations
+    }
+    ...
+
+    /*AUTOTRACE(ExMod)*/
+    // Beginning of SystemPerl automatic trace file routine
+    void ExMod::trace (sc_trace_file *tf, const sc_string& prefix, int levels, int options=0) {
+	sc_trace(tf, this->in.read(),		prefix+"in", 1);
+	if (levels > 0) {
+	    this->suba->trace (tf, prefix+"suba.", levels-1, options);
+	}
+    }
+    // End of SystemPerl automatic trace file routine
+
+=item SP_AUTO_CTOR
+
+SP_AUTO_CTOR should be called first in every constructor.  It will call
+internal functions needed for coverage analysis, and other possible future
+enhancements.
+
+=item SP_AUTO_METHOD
+
+SP_AUTO_METHOD is placed in a SC_METHOD function.  It takes a method name
+and a sensitivity argument, and declares the specified method under the
+AUTOMETHODS auto, and declares the SC_METHOD and sensitivity under the
+SP_AUTO_CTOR area.
+
+For example the below
+
+    void __MODULE__::clockMethod() {
+        SP_AUTO_METHOD(clockMethod, clk.pos());
+
+This will automatically insert the following:
+   in the class declaration under AUTOMETHODS:
+	private:
+	   void clockMethod();
+
+   in the constructor under SP_AUTO_CTOR:
+	SC_METHOD(clockMethod);
+	sensitive << clk.pos();
+
+=item SP_CTOR_IMP
+
+SP_CTOR_IMP provides the implementation function corresponding to SC_CTOR.
+This allows the header to use "SC_CTOR;" and the body of the constructor
+to be moved into the implementation file.   This greatly decreases the number
+of includes needed in the header file, and thus speeds compilation.
+
+=item sp_ui
+
+Sp_ui acts a magic SystemC signal type.  Sp_ui takes two template-like
+arguments, representing the MSB and LSB of the data.  SystemPerl will
+replace the sp_ui with a bool, uint32_t, uint64_t or sc_bv depending on the
+width of the required type, using MSB alone.  This matches the rules that
+Verilator requires for created shells.  Thus a Verilog definition
+
+     input [35:3]  signal;
+
+is equivalent to the SystemPerl declaration:
+
+     sc_in<sp_ui<35,3> >   signal;
+
+Sp_ui's can interconnect with the standard uint types. Only the bits up to
+the MSB will be traced in waves files, while the LSB is only for Verilog
+interconnecting; it's presumed the lower bits are still stored and zero
+inside SystemC.  Note it is the programmers job to insure that bits above
+the MSB and below the LSB are zero, this is not done for you.
+
+=item #sp else
+
+Inverts the last #sp ifdef/ifndef.
+
+=item #sp endif
+
+Ends a #sp ifdef/ifndef.
+
+=item #sp ifdef I<define>
+
+Turns off processing until the next #sp endif, if the specified define is not
+defined.  Allows SystemPerl preprocessing similar to C++ #ifdef.
+
+=item #sp ifndef I<define>
+
+Turns off processing until the next #sp endif, if the specified define is
+defined.  Allows SystemPerl preprocessing similar to C++ #ifdef.
+
+=item #sp include
+
+Includes the file for the preprocessor, it will be expanded into the output
+.h/.cpp files.  Note that regular "#include" files are not read or expanded
+to save disk space and time.
+
+=item #sp interface
+
+Interface specifies the following code should be moved into a the header
+file.  This allows a common .sp file to contain both .h and .cpp
+information.  SystemPerl automatically adds include guards in the header,
+to protect against multiple inclusion.
+
+=item #sp implementation
+
+Specifies the following code should be part of the cpp file.
+This allows a common .sp file to contain both .h and .cpp information.
+
+=item #sp slow
+
+Specifies the following code should be part of a slow cpp file, compiled
+with minimal optimization because the functions contained within are only
+executed once.  This allows a common .sp file to contain both .h, fast .cpp,
+and slow .cpp information.
+
+=item #sp use
+
+This specifies a file that must be #included at compile time.  In addition
+the file is a .sp file, which must be preprocessed by sp_preproc, and added
+to the link list.  Thus using #sp use automatically finds the objects
+required for linking against the includer.  (Just like Perl's package and
+use statements.)
+
+In addition to specifying an exact string like with #include, you may also
+specify a define symbol or a cell search path.  The value of a definition
+will be substituted to find the file to be included.  If a name of the form
+.cell.subcell is used, it will include both the header for the module for
+"cell", and for "subcell" underneath "cell".
+
+=back
+
+=head1 DISTRIBUTION
+
+SystemPerl is part of the L<http://www.veripool.org/> free SystemC software
+tool suite.  The latest version is available from CPAN and from
+L<http://www.veripool.org/systemperl>.
+
+Copyright 2001-2014 by Wilson Snyder.  This package is free software; you
+can redistribute it and/or modify it under the terms of either the GNU
+Lesser General Public License Version 3 or the Perl Artistic License
+Version 2.0.
+
+=head1 AUTHORS
+
+Wilson Snyder <wsnyder@wsnyder.org>
+
+=head1 SEE ALSO
+
+L<SystemC::Manual>
+
+=cut

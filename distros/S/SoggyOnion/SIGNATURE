@@ -1,0 +1,48 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.50.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 7fd1daf575e9d6b375fe6c60c8f1fdf509eb812f .releaserc
+SHA1 8a26c27886d2105b205dd6d782d33a0231936b0d Changes
+SHA1 c83545748c59bc9535d9d653af3fbc765c39684e MANIFEST
+SHA1 10ee5dc575a69d753acef59f719d3c691cae0c83 MANIFEST.SKIP
+SHA1 9c5d880ebe4e948c4642b9f450c3215866476aa0 META.yml
+SHA1 8d5a083de1521b22230824ae1389ab86f2e6253d Makefile.PL
+SHA1 019144b10eea6202f27c3b3186cd1406cd2ff46e README
+SHA1 a2261bcc391599e28f6a31176d47f266839aa902 TODO
+SHA1 e1c853a34147c485a2ea3157fbf48c01adaeef18 bin/soggyonion-install.PL
+SHA1 e67c81d844d8faea453db3423f25fbfe01ae6a75 bin/soggyonion.PL
+SHA1 500311410b1be2dd66e44a820e8c87f3cca7abac defaults/config.yaml
+SHA1 eb2ad83361121b88503673dfff08b250a26bb51d defaults/templates/imagescraper.tt2
+SHA1 d861b745df9c813a36f04b466a144aa8d8a159d5 defaults/templates/main.tt2
+SHA1 67a7cf415ce231c4ab835edaba662d6e82c895a1 defaults/templates/rss.tt2
+SHA1 456df6e45ec6743c423eb24c32d7851a78b84e13 lib/SoggyOnion.pm
+SHA1 4ba205618fd4dc96d9576b8e597815b602d1807d lib/SoggyOnion/Plugin.pm
+SHA1 63754a6f820bd97867f9d2249ce5370624149544 lib/SoggyOnion/Plugin/GeoWeather.pm
+SHA1 c3a379eca7909de69321ef3df1bf356f2593d1fe lib/SoggyOnion/Plugin/ImageScraper.pm
+SHA1 24b37c7faa9285c6e9690ffff9dfd5a5652f45a6 lib/SoggyOnion/Plugin/RSS.pm
+SHA1 80d26d6658c2c176953f0700748397a7acf51d54 lib/SoggyOnion/Resource.pm
+SHA1 b8cc592761451b26de1181efb2774baa827bb941 logo.svg
+SHA1 fba73d30aa3fbe2204e6aa9d54c04b4d608b09c6 t/0-signature.t
+SHA1 d14d16177d9d8e0f2407f3ea9bddaf0856684162 t/all.t
+SHA1 35f84f73d36f8ce0ee574bfca6fc9b9aa84cd2c4 t/pod-coverage.t
+SHA1 0190346d7072d458c8a10a45c19f86db641dcc48 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.1 (GNU/Linux)
+
+iD8DBQFDk70sL3e/8OaAfH4RAssnAJ9UIWdvcMcn8dSx1Duo05NdaXUHOACdEtPQ
+GGSEq56SReR1+/44Ns2GqQ0=
+=rDDs
+-----END PGP SIGNATURE-----

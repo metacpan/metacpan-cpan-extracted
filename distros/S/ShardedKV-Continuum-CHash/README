@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution ShardedKV-Continuum-CHash,
+version 0.01:
+
+  Continuum implementation based on Algorithm::ConsistentHash::CHash
+
+This software is copyright (c) 2013 by Steffen Mueller.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

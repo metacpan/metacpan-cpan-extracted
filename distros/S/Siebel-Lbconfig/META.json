@@ -1,0 +1,99 @@
+{
+   "abstract" : "helper to generate optimied lbconfig file",
+   "author" : [
+      "Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Siebel-Lbconfig",
+   "no_index" : {
+      "directory" : [
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.014004"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::More" : "0.88",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Config::IniFiles" : "2.88",
+            "Cwd" : "0",
+            "Exporter" : "0",
+            "File::HomeDir" : "1.00",
+            "File::Spec" : "0",
+            "Getopt::Std" : "0",
+            "Moose" : "2.0401",
+            "Scalar::Util" : "0",
+            "Set::Tiny" : "0.03",
+            "Siebel::Srvrmgr::Daemon::Action" : "0",
+            "Siebel::Srvrmgr::Daemon::ActionStash" : "0.27",
+            "Siebel::Srvrmgr::Daemon::Command" : "0.27",
+            "Siebel::Srvrmgr::Daemon::Light" : "0.27",
+            "Siebel::Srvrmgr::Util::IniDaemon" : "0.27",
+            "namespace::autoclean" : "0.13",
+            "perl" : "5.014004",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Digest::MD5" : "0",
+            "Siebel::Srvrmgr::Daemon::ActionFactory" : "0.27",
+            "Siebel::Srvrmgr::ListParser" : "0.27",
+            "Test::More" : "0",
+            "perl" : "5.014004"
+         }
+      }
+   },
+   "provides" : {
+      "Siebel::Lbconfig" : {
+         "file" : "lib/Siebel/Lbconfig.pm",
+         "version" : "0.002"
+      },
+      "Siebel::Lbconfig::Daemon::Action::AOM" : {
+         "file" : "lib/Siebel/Lbconfig/Daemon/Action/AOM.pm",
+         "version" : "0.002"
+      },
+      "Siebel::Lbconfig::Daemon::Action::ListServers" : {
+         "file" : "lib/Siebel/Lbconfig/Daemon/Action/ListServers.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/glasswalk3r/siebel-monitoring-tools/issues"
+      },
+      "homepage" : "https://github.com/glasswalk3r/siebel-monitoring-tools",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/glasswalk3r/siebel-monitoring-tools.git",
+         "web" : "https://github.com/glasswalk3r/siebel-monitoring-tools"
+      }
+   },
+   "version" : "0.002",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

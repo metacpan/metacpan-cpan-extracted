@@ -1,0 +1,8 @@
+<Backup sam.heins.net>
+	DestinationList /space
+	Hourlies  2
+	Directory /home
+	Directory /etc
+	Directory /var/www
+</Backup>
+

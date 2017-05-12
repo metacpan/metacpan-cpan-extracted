@@ -1,0 +1,101 @@
+_fileVersion = 2.1;
+eventtype AdapterDevKit::calcReply {
+    storageType = Volatile;
+    timeToLive = 30;
+    description = "";
+
+    int result;
+}
+eventtype AdapterDevKit::calcRequest {
+    storageType = Volatile;
+    timeToLive = 30;
+    description = "";
+
+    int numbers[];
+}
+eventtype AdapterDevKit::time {
+    storageType = Persistent;
+    timeToLive = 0;
+    description = "CADK Sample Adapter Event Type";
+
+    date time;
+    
+    infoset public {
+        string attributes = "time";
+        string comments = "Time event for the clock adapter";
+    }
+}
+eventtype AdapterDevKit::timeRequest {
+    storageType = Persistent;
+    timeToLive = 0;
+    description = "CADK Sample Adapter Event Type";
+    
+    infoset public {
+        string attributes = "";
+        string comments = "Time request event for the clock adapter";
+    }
+}
+eventtype SOAP::Reply {
+    storageType = Persistent;
+    timeToLive = 30;
+    description = "";
+
+    string Content_Type;
+    int Content_Length;
+    string envelope;
+}
+eventtype SOAP::Request {
+    storageType = Persistent;
+    timeToLive = 30;
+    description = "";
+
+    string Content_Type;
+    int Content_Length;
+    string SOAPAction;
+    string envelope;
+}
+clientgroup "SOAP" {
+    description = "SOAP Testing";
+    lifeCycle = DestroyOnDisconnect;
+    storageType = Volatile;
+    requiredEncryption = None;
+    accessLabelRequired = false;
+    canPublish = {
+        SOAP::Reply,
+        SOAP::Request
+    };
+    canSubscribe = {
+        SOAP::Reply,
+        SOAP::Request
+    };
+}
+clientgroup "devkitAdapter" {
+    description = "For adapter \"exec_sol\" of type \"exec\"";
+    lifeCycle = ExplicitDestroy;
+    storageType = Persistent;
+    requiredEncryption = None;
+    accessLabelRequired = false;
+    canPublish = {
+        AdapterDevKit::calcReply,
+        AdapterDevKit::time
+    };
+    canSubscribe = {
+        AdapterDevKit::calcRequest,
+        AdapterDevKit::timeRequest
+    };
+}
+clientgroup "devkitClient" {
+    description = "CADK Tutorial and tool clients";
+    lifeCycle = DestroyOnDisconnect;
+    storageType = Volatile;
+    requiredEncryption = None;
+    accessLabelRequired = false;
+    canPublish = {
+        AdapterDevKit::timeRequest,
+        AdapterDevKit::calcRequest
+    };
+    canSubscribe = {
+        AdapterDevKit::calcReply,
+        AdapterDevKit::time
+    };
+}

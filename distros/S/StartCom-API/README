@@ -1,0 +1,96 @@
+NAME
+    StartCom::API - a connector for StartAPI
+
+VERSION
+    0.2
+
+SYNOPSIS
+     use StartCom::API;
+     $api = new StartCom::API;
+     $api->tokenID($mytokenID);
+     $api->client_cert($pathtoclientcert);
+     $api->client_key($pathtoclientkey);
+     $rc = $api->retrieve($myOrderID);
+     $rc = $api->apply(...);
+     $rc = $api->success;
+     $msg = $api->errormsg;
+     $cert = $api->certificate;
+     $intermed = $api->intermediate;
+     $myOrderID = $api->orderID;
+     $myOrderNum = $api->orderNo;
+
+DESCRIPTION
+    This module allows to connect to the api of StartCom in order to generate
+    or retrieve certificates.
+
+    Please see also the StartAPI documentation
+    <https://startssl.com/StartAPI/Docs>.
+
+METHODS
+    "$api = new StartCom::API"
+        The constructor. Returns a "StartCom::API" object.
+
+    "$api->tokenID($key)"
+        Sets or gets the API key.
+
+    "$api->client_cert($pathtoclientcert)"
+        Sets or gets the path to the client certificate file (PEM).
+
+    "$api->client_key($pathtoclientkey)"
+        Sets or gets the path to the client key file.
+
+    "$api->retrieve($orderID)"
+        Retrieves the certificate corresponding to the "orderID" and stores it
+        in this object.
+
+        Returns 1 on success, 0 or undef on failure.
+
+    "$api->apply({'certType' => '...', 'CSR' => '...', ...})"
+        Applies for a new certificate and, if successful, stores it in this
+        object.
+
+        See StartAPI documentation
+        <https://startssl.com/StartAPI/Docs#ApplyCertificate> for parameters.
+
+        Returns 1 on success, 0 or undef on failure.
+
+    "$api->success"
+        Checks whether or not the last call was successful.
+
+    "$api->errormsg"
+        Returns the error message if the last call was unsuccessful.
+
+    "$api->certificate"
+        If the last call was successful and the certificate was issued, this
+        method returns the certificate.
+
+    "$api->intermediate"
+        If the last call was successful and the certificate was issued, this
+        method returns the intermediate certificate.
+
+    "$api->orderID"
+        If the last call was successful and the certificate was issued, this
+        method returns the certificate order ID which can be used in
+        conjunction with "$api->retrieve".
+
+    "$api->orderNo"
+        If the last call was successful and the certificate was issued, this
+        method returns the certificate ordering number which is shown in
+        StartCom's web interface.
+
+    "$api->testmode"
+        When set to 0, which is the default, the api calls
+        <https://api.startssl.com>, else <https://apitest.startssl.com>.
+
+DEPENDENCIES
+    *       LWP::UserAgent
+
+    *       IO::Socket::SSL
+
+    *       JSON
+
+    *       MIME::Base64
+
+AUTHOR
+    Philippe Kueck <projects at unixadm dot org>
+

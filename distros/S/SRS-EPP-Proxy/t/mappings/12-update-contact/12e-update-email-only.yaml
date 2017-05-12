@@ -1,0 +1,24 @@
+# Update email address only
+template: update-contact.tt
+
+vars:
+  contact_id: minimal1
+  no_addr: 1
+  email: update@email.com
+
+input_assertions:
+  class: SRS::EPP::Command::Update::Contact
+
+SRS:
+ - assertions:
+     attr_is:
+       - [ '/NZSRSRequest/HandleUpdate', 'HandleId', 'minimal1', 'SRS: handle id correct on request' ]
+       - [ '/NZSRSRequest/HandleUpdate', 'Email', 'update@email.com', 'SRS: email correct on request' ]
+
+output_assertions:
+  count: 
+    - [ '//epp:resData', 0, "No res data returned"]
+  attr_is:
+    - [ '//epp:result', 'code', 1000, 'EPP: Correct response code' ]
+
+

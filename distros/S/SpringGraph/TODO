@@ -1,0 +1,13 @@
+TODO
+----
+
+1) Write tests
+
+2) Handle out-of-bounds errors when laying out graph
+
+3) More and better error reporting
+
+4) Add more options
+
+5) make edges leave and arrive at nodes in better positions/angles
+

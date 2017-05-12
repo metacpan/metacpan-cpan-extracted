@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/String/ToIdentifier/EN.pm
+lib/String/ToIdentifier/EN/Unicode.pm
+t/00-compile.t
+t/00_basic.t
+t/10_ascii.t
+t/20_capitalization.t
+t/lib/TestString.pm
+t/release-pod-syntax.t

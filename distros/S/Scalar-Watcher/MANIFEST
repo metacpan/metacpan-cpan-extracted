@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+Watcher.xs
+t/Scalar-Watcher.t
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/Scalar/Watcher.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

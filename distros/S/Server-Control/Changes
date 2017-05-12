@@ -1,0 +1,122 @@
+Revision history for Server-Control
+
+** denotes an incompatible change
+
+0.20  Aug 20, 2012
+
+- Fix error_log default for Starman - RT #79008 (RSAVAGE)
+- Various doc improvements - RT #79009 (RSAVAGE)
+- Fix nonsensical dist.ini abstract
+
+0.19  Aug 15, 2012
+
+- Fix httpd_binary for backward compatibility
+
+0.18  Aug 14, 2012
+
+- Add Starman and Nginx subclasses
+- Move validate_url and validate_regex to main class
+- Add binary_path to main class (replacing httpd_binary in Apache subclass)
+- Add 'use warnings' to scripts - RT #78958 (WSHELDAHL)
+
+0.17  Mar 22, 2012
+
+- Skip tests that try to listen to port if something already listening to port
+
+0.16  Mar 15, 2012
+
+- Apache graceful restart checks config file syntax, and starts server if it wasn't started
+
+0.15  Jun 8, 2011
+
+- Attempt to show error logs when start or stop throws fatal
+- Convert to dzil
+
+0.14  Nov 18, 2010
+
+- Attempt to show error logs when validation request fails
+- Check Apache config file syntax before attempting to start or hup
+
+0.13  Mar 12, 2010
+
+- When waiting for a server to start or stop, print errors from logs as they occur
+- Throw error if pod2usage will output blank usage message
+- Only require Proc::ProcessTable 0.39; later versions have trouble building on linux
+
+0.12  Dec 15, 2009
+
+- Don't require -d/-f in Apache if server_root or conf_file were passed into handle_cli
+- Add overridable validate_server method, called after start and hup
+- Add validate_url and validate_regex options for Apache
+
+0.11  Oct 8, 2009
+
+- Add hup action
+- Allow restart method to be set to hup or stopstart (default is still stopstart)
+- Parse relative error_log and pid_file paths in Apache conf correctly
+- Handle --serverctlrc correctly
+- Make restart work if server isn't running
+- Improve diagnostics when server is only partially active
+
+0.10  Sep 25, 2009
+
+- Fix -b option in apachectlp
+- Add graceful and graceful-stop to apachectlp and Server::Control::Apache
+- Add bin/serverctlp, a generic version of apachectlp with required --class
+- Add refork action, which sends a TERM to the child processes of the server's main process
+- Use MooseX::Traits if available
+- Add successful_start, failed_start, successful_stop, failed_stop hooks
+- Return boolean indicating success from start, stop, restart
+- Add --no-parse-config to apachectlp
+- Add -I to CLI options
+
+0.09  Sep 18, 2009
+
+- Add Hash::MoreUtils to dependencies
+- Fix rc file test (add terminating newline to yml)
+
+0.08  Sep 17, 2009
+
+- ** Rename root_dir to server_root - just more intuitive for existing apache users
+- ** Rename run_command to run_system_command to avoid confusion with cli methods
+- ** Overhaul command-line processing. Rename handle_cmdline to handle_cli and make much
+     more comprehensive; can remove all logic from scripts like apachectlp and easily
+     modify behavior of CLI in subclass
+- Allow optional serverctl.yml file containing constructor options
+- Add --quiet to CLI options to accompany --verbose
+- Use MooseX::StrictConstructor everywhere
+
+0.07  Sep 11, 2009
+
+- Fix apachectlp --bind-addr, --error-log, etc options to actually take values
+- Allow name to be overriden rather than description, and fix bug with default name
+
+0.06  Sep 11, 2009
+
+- Fix -d in apachectlp and add more specific usage errors
+- Remove default of ARGV[0] from handle_cmdline
+
+0.05  Aug 31, 2009
+
+- Fix test_port_busy test to be more robust in killing temp server
+
+0.04  Aug 27, 2009
+
+- Use Unix::Lsof to try and determine who is listening to a port, report this in diagnostics
+- Add Pod::Usage to dependencies
+- Fix handling of relative paths given to apachectlp
+
+0.03  Aug 25, 2009
+
+- Add Hash::MoreUtils to dependencies
+- Make Apache tests release-only, since they depend on httpd version, etc.
+- Remove some unnecessary internal files
+
+0.02  Aug 24, 2009
+
+- Parse Apache config to determine server_root, port, bind_addr, error_log, and pid_file if not specified
+- Add bin/apachectlp, a replacement for apachectl
+
+0.01  Aug 21, 2009
+
+- Initial version

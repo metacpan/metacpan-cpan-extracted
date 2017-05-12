@@ -1,0 +1,6 @@
+Revision history for Perl extension Secret::Simple
+
+ 0.10 - 2006/10/16
+        First release to CPAN.
+ 0.11 - 2006/10/16
+        Removed open :raw syntax to support older perl interp.

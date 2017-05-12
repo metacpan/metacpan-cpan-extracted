@@ -1,0 +1,10 @@
+Revision history for Set::SortedArray
+
+0.02	2012-03-14 12:00
+  - Stopped x.x.x version numbering
+  - Updated documentation
+  - Added merge and binary_intersection
+  - Variables updated to look like POD
+
+0.0.1	2011-05-24 16:25
+  - Initial release

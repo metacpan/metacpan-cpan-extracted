@@ -1,0 +1,79 @@
+NAME
+    Sub::NonRole - prevent some subs from appearing in a role's API
+
+SYNOPSIS
+       package My::Role {
+          use Moose::Role;
+          use Sub::NonRole;
+      
+          sub some_function {
+             ...;
+          }
+      
+          sub other_function : NonRole {
+             ...;
+          }
+       }
+   
+       package My::Class {
+          use Moose;
+          with 'My::Role';
+       }
+   
+       My::Class->some_function();    # ok
+       My::Class->other_function();   # no such method!
+
+DESCRIPTION
+    This module allows you to mark certain subs within a role as not being
+    part of the role's API. This means that they will not be copied across
+    into packages which consume the role.
+
+    The subs can still be called as:
+
+       My::Role->other_function();
+       My::Role::other_function();
+
+    It should work with Role::Tiny, Moo::Role, Moose::Role and
+    MooseX::Role::Parameterized roles.
+
+  Developer API
+    `Sub::NonRole->setup_for($role)`
+        If you wish to import the Sub::NonRole functionality into another
+        package, this is how to do it.
+
+    `$role->meta->non_role_methods`
+        For Moose roles (but not Moo or Role::Tiny ones) you can access the
+        `non_role_methods` attribute on the role's meta object to get an
+        arrayref of non-role method names.
+
+BUGS
+    Currently when consuming a Moo role within a Moose class, Sub::NonRole can
+    cause a warning to be issued in the global cleanup phase. This is unlikely
+    to result in serious problems; it's just annoying.
+
+    In older Perls (before 5.10.1 I believe), importing Sub::Role into a
+    package without actually applying the attribute to any subs can cause a
+    crash with the error message *Internal error: Your::Package symbol went
+    missing*. Once you've applied the `:NonRole` attribute to a sub,
+    everything should be OK.
+
+    Please report any other bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Sub-NonRole>.
+
+SEE ALSO
+    Role::Tiny, Moo::Role, Moose::Role.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2013 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

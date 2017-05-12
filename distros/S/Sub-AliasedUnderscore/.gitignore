@@ -1,0 +1,10 @@
+META.yml
+MANIFEST.BAK
+inc
+blib
+cover_db
+Makefile
+Makefile.old
+pm_to_blib
+NINJA
+MANIFEST

@@ -1,0 +1,32 @@
+NAME
+    SMS::Send::Wadja - SMS::Send driver for Wadja's free global text messaging service.
+
+SYNOPSIS
+    use SMS::Send;
+
+    my $sender = SMS::Send->new('Wadja',
+        _key      => 'my-wadja-API-key'
+    );
+
+    my $sent = $sender->send_sms(
+        to        => '+40-722-123456',  # recipient
+        text      => "Hello, world!",   # the text of the message to send
+    );
+
+    # Did it send to Wadja OK?
+    if ( $sent ) {
+        print "Sent test message\n";
+    } else {
+        print "Test message failed\n";
+    }
+
+
+
+AUTHOR
+    Dan Dascalescu, http://dandascalescu.com
+
+LICENSE
+    Copyright (C) 2009-2010 Dan Dascalescu. All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.

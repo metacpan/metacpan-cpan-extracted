@@ -1,0 +1,51 @@
+README for Scriptalicious
+~~~~~~~~~~~~~~~~~~~~~~~~~
+This is a simple little module that contains a few of the things that
+I just wished Perl came with for writing SysAdmin scripts.
+
+Using this module, it is very easy to write programs which more or
+less adhere to the GNU program conventions for well behaved programs.
+Things like printing the name of your program before all messages.
+
+It is suggested that you try the example in the manual page, and see
+how it responds to `-v', '-h', unknown switches, etc.
+
+Required Modules
+^^^^^^^^^^^^^^^^
+Module::Build is required to build and install the module.
+Test::Simple is required to run the test suite.
+
+Other than this, there should be no `hard' dependancies, other than
+modules that come with 5.6.1.  However, scripts that use this module
+don't show help messages without Pod::Constants.
+
+Recommended Modules
+^^^^^^^^^^^^^^^^^^^
+If you want the scripts that use this module to display their help
+messages, you need to install Pod::Constants, which requires
+Pod::Parser (which should be standard with recent Perls).
+
+If you don't, you can still use `perldoc foo.pl' on the installed
+scripts, so it's still better than nothing.
+
+You will need the YAML module for the nifty new getopt-style YAML
+config file processor.
+
+Optional Modules
+^^^^^^^^^^^^^^^^
+If you want your help screens to look nice with all terminal sizes,
+you will need Term::ReadKey.
+
+If you want accurate timing information about how long programs take
+to execute when you use `-v', you will need Time::HiRes installed.
+
+Installation instructions
+^^^^^^^^^^^^^^^^^^^^^^^^^
+Once you have satisfied yourself that you have installed Module::Build and and the recommended and 
+enough to satisfy your hunger for modules, you should To install this
+module.
+
+  perl Build.PL
+  ./Build test
+  ./Build install
+

@@ -1,0 +1,52 @@
+Scalar-Validation version 0.700
+==============================
+
+Scalar::Validation makes validation of scalar values or function (sub)
+parameters easy, is fast and uses pure Perl:
+
+  my $param = par param => Int => shift;
+
+It will die (by default), if shift returns something different than an Int.
+
+Same for named parameters
+
+  my $param = npar param => Int => \%options;
+
+You can create own types/rules.  You can change behaviour for invalid
+data detected, or switch checks totally off. In this case par()
+returns immediately the given value.
+
+  my $var = validate var => int => $box->get_input();
+
+It uses pure Perl (no compilation needed), so you can run it from a
+USB stick.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Exporter
+  Carp
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2014 by Ralf Peine, Germany.  All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.6.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+DISCLAIMER OF WARRANTY
+
+This library is distributed in the hope that it will be useful,
+but without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.

@@ -1,0 +1,6 @@
+Revision history for Perl extension SNMP::Map.
+
+0.01  Fri Jan  2 17:29:00 2009
+	- original version; created by h2xs 1.21 with options
+		-X -n SNMP::Map
+

@@ -1,0 +1,31 @@
+---
+abstract: 'temporary buffer to save bytes'
+author:
+  - 'Tatsuhiko Miyagawa'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.4, Dist::Zilla version 5.014, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Stream-Buffered
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  IO::File: '1.14'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/plack/Stream-Buffered/issues
+  homepage: https://github.com/plack/Stream-Buffered
+  repository: https://github.com/plack/Stream-Buffered.git
+version: '0.03'
+x_authority: cpan:MIYAGAWA

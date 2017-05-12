@@ -1,0 +1,18 @@
+Build.PL
+Changes
+lib/SQL/Abstract/FromQuery.pm
+lib/SQL/Abstract/FromQuery/Contains.pm
+lib/SQL/Abstract/FromQuery/FR.pm
+lib/SQL/Abstract/FromQuery/Oracle.pm
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00-base.t
+t/01-FR.t
+t/02-Oracle.t
+t/03-multiple_inherit.t
+t/04-parse_errors.t
+t/05-Contains.t
+t/pod.t

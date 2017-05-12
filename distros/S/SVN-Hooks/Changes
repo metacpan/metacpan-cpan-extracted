@@ -1,0 +1,502 @@
+Revision history for SVN-Hooks. -*- text -*-
+
+1.34      2016-11-10 14:16:13-02:00 America/Sao_Paulo
+
+  [Fix]
+
+  - Remove tests for SVN::Hooks::JiraAcceptance that should have been
+    removed on 1.33.
+
+1.33      2016-10-31 13:41:42-02:00 America/Sao_Paulo
+
+  [Changes]
+
+  - The SVN::Hooks::CheckJira plugin now uses the JIRA::REST module instead
+    of the JIRA::Client module to talk to JIRA. The JIRA::Client module uses
+    the SOAP API which was deprecated in JIRA 6 and isn't supported anymore
+    by JIRA 7. Note that this may break hooks that use one of the check-*
+    options to the CHECK_JIRA directive, because they now pass a JIRA::REST
+    object to the user functions instead of a JIRA::Client object.
+
+  - The SVN::Hooks::JiraAcceptance plugin was removed from the distribution
+    because it depended directly on the JIRA::Client module.
+
+1.32      2016-07-19 14:05:37-03:00 America/Sao_Paulo
+
+  [Changes]
+
+  - Now hooks can assume they run with their current directory set to the
+    repository's roor directory on the server. Previously they could not
+    assume anything, since Subversion does not specify where the hooks run.
+
+1.31      2015-11-26 23:13:57-02:00 America/Sao_Paulo
+
+  [Fixes]
+
+  - Fix bug introduced in version 1.26 that made hooks be invoked as many
+    times as their plugin directives was used. For example, if the
+    CHECK_JIRA directive was used 10 times to configure the CheckJira
+    plugin, the pre-commit function hook was invoked 10 times too! Hooks
+    that just checked conditions were made slower by this bug, but hooks
+    that performed actions (such as sending notifications) would execute
+    them multiple times, with probably bad effects.
+
+1.30      2015-08-29 13:19:57-03:00 America/Sao_Paulo
+
+  [Fixes]
+
+  - Make sure tests are performed using the C locale.
+
+1.29      2015-08-24 08:20:10-03:00 America/Sao_Paulo
+
+  [Fixes]
+
+  - Andrey Starodubtsev contributed fixes to make tests pass on Windows.
+
+  - Subversion 1.9.0 seems to have a bug on the pre-lock/pre-unlock hooks
+    that makes the commands lock/unlock succeed even if the hooks fail. This
+    release skips tests using those hooks when using svn 1.9.
+
+1.28      2015-02-18 09:33:41-02:00 America/Sao_Paulo
+
+  [Internal changes]
+
+  - Clean up module prerequisite list in dist.ini.
+    
+  - Use Dist::Zilla::Plugin::MetaProvide to insert provides into META.yml.
+    
+  - Replace README with brian d foy's README.pod template.
+    
+  - Update documentation.
+
+1.27      2014-08-09 17:04:45 America/Sao_Paulo
+
+  [Fixes]
+
+  - UpdateConfFile: Fix detection of paths outside of the repository's conf
+    directori when specified as a TO argument to the UPDATE_CONF_FILE
+    directive.
+
+  - CheckJira: Fix default value for CHECK_JIRA_CONFIG 4th argument.
+
+1.26      2014-07-04 10:48:58 America/Sao_Paulo
+
+  [Changes]
+
+  - Add directive CHECK_JIRA_DISABLE to SVN::Hooks::CheckJira to disable all
+    CHECK_JIRA directives.
+
+  - Make hooks execute in the order they are defined. Previously, the
+    execution order was unspecified. (Change kindly contributed by
+    DC. Thanks!)
+
+1.25      2014-04-13 16:50:07 America/Sao_Paulo
+
+  [Fixes]
+
+  - UpdateConfFile: the specification of a subdirectory as the
+    destination file wasn't working.
+
+1.24      2014-03-16 23:31:06 America/Sao_Paulo
+
+  [Fixes]
+
+  - CheckMimeTypes: disregard symbolic links because they don't need to
+    have the svn:mime-type property set.
+
+  - UpdateConfFile: create non-existing directories if the 'to'
+    specification contains directories they are created if they don't
+    exist.
+
+1.23      2013-11-22 08:13:25 America/Sao_Paulo
+
+  [Fixes]
+
+  - Some tests were failing when run with Subversion 1.8 because
+    of changes in the 'svn propset' command.
+
+1.22      2013-11-19 11:19:06 America/Sao_Paulo
+
+  [Changes]
+
+  CheckJira: accept and disregard spaces in the "projects"
+  specification.
+
+  [Fixes]
+
+  The META.yml information which is automatically generated from
+  Github had a wrong URL for the module repository.
+
+1.21      2013-06-18 09:36:02 America/Sao_Paulo
+
+  UpdateConfFile implements a new option 'remove' which, when
+  set, makes the configuration file in the server be removed if
+  the its versioned counterpart is removed from the repository.
+
+1.20      2013-06-12 15:08:11 America/Sao_Paulo
+
+  In CheckJira, the PROJKEYS in a 'projects' option may now have
+  spaces around the comma separating project keys.
+
+  Fix UpdateConfFile. It was considering only the fist
+  added/updated file in a commit for updating.
+
+  Fix CheckStructure numeric else-clause detection. Also, fix
+  its documentation to say that negative values are also treated
+  as true. Only zeroes are considered false. (Thanks to Uwe
+  Satthoff for bringing this to my attention!)
+
+1.19      2012-06-24 15:12:56 America/Sao_Paulo
+
+  Fix example/check-mergeinfo.pl.
+
+1.18      2012-05-21 13:06:06 America/Sao_Paulo
+
+  Implement 'exclude' option for CHECK_JIRA directive.
+
+1.17      2012-05-01 18:07:52 America/Sao_Paulo
+
+  Use Data::Util to make for cleaner code.
+
+1.16      2012-04-21 21:35:48 America/Sao_Paulo
+
+  Moved from Google Code to GitHub.
+
+1.15      2012-04-19 23:06:42 America/Sao_Paulo
+
+  Fix and optimize example/check-mergeinfo.pl.
+
+1.14      2012-04-19 22:22:39 America/Sao_Paulo
+
+  Implement example/check-mergeinfo.pl showing how to garantee
+  that merges are performed only on allowed places.
+
+1.13      2012-03-05 11:49:34 America/Sao_Paulo
+
+  Fix RT#75547 by making Windows test scripts non-verbose.
+  (Thanks Mike Brimer!)
+
+1.12      2012-02-25 23:34:48 America/Sao_Paulo
+
+  Convert distribution to Dist::Zilla.
+
+1.11    2011-12-04
+
+  Fix UpdateConfFile's shell command invokation.
+
+1.10    2011-11-09
+
+  Pass the SVN::Look object as the third argument to the
+  validator, generator, and actuator in UpdateConfFile.
+
+1.09    2011-11-02
+
+  Document importance of defining the PATH properly and set it
+  properly in the hooks used during testing. (This was a problem
+  in FreeBSD systems.)
+
+  Repository moved to git (http://code.google.com/p/svn-hooks/source).
+
+1.08    2011-09-26
+
+  Deprecate SVN::Hooks::Mailer. Its directives now produce
+  errors.
+
+1.07    2011-08-27
+
+  Requiring at least svnlook version 1.4.0.
+
+1.06    2011-08-21
+
+  Checking in Makefile.PL if we can exec svnlook. Just
+  specifying the dependency from SVN::Look in it doesn't do.
+
+1.05    2011-08-12
+
+  Fixing a bug in the new DENY_FILENAMES_PER_PATH directive.
+
+1.04    2011-08-11
+
+  Implementing directive DENY_FILENAMES_PER_PATH in
+  SVN::Hooks::DenyFilenames.
+
+1.03    2011-07-30
+
+  SVN::Hooks::CheckJira's check_one and check_all_svnlook checks
+  now get a SVN::Look object to make it possible to grok
+  information about the commit.
+
+  Tests made a little more robust.
+
+1.02    2011-07-27
+
+  Porting Makefile.PL to Windows.
+  Adjusting dependency from SVN::Look version.
+  Supporting absolute file names for SVN::Hooks configuration files.
+  Adding URI::file to the dependencies.
+
+1.01    2011-07-21
+
+  Avoiding dependency from File::Slurp in the tests.
+
+1.00    2011-07-20
+
+  Ported to Windows with Strawberry Perl and with Active Perl.
+
+0.91    2011-07-07
+
+  CHECK_JIRA_CONFIG accepts a fifth argument to match JIRA
+  project keys.
+
+  Fixes an error on UpdateConfFile.
+
+  Configuration files should be optional, but they were always
+  required. Now it's fixed.
+
+0.90    2011-05-14
+
+  Big refactoring of the code base. Implements hook directives
+  in SVN::Hooks and simplifies the implementation and
+  configuration of plugins.
+
+  Revises the POD documentation.
+
+  Deprecates SVN::Hooks::Generic.
+
+  Preparing for a 1.00 release.
+
+0.33    2011-01-16
+
+  Corrects a few gotchas in the test suite.
+
+0.32    2010-12-10
+
+  Corrects some long standing errors in the arguments passed to
+  some hooks.
+
+  Corrects some hard errors in the SVN::Hooks::Generic plugin
+  and enhances its test suite.
+
+0.31    2010-12-09
+
+  Implements the SVN::Hooks::Generic plugin to allow for the
+  easy creation of custom hooks.
+
+  Corrects CheckJira's "projects" verification.
+
+0.30    2010-10-07
+
+  Small adjustment in some test cases to accomodate changes in
+  Perl 5.13.5.
+
+0.29    2010-10-06
+
+  Extends the syntax of DENY_FILENAME directive to allow
+  customized error messages.
+
+0.28    2010-04-28
+
+  Being more careful during tests.
+
+0.27    2010-03-09
+
+  Substitutes DENY_EXCEPT_USERS for DENY_EXEMPT_USERS.
+  (My wife asked me to change it.)
+
+0.26    2010-03-08
+
+  Implements the DENY_EXEMPT_USERS directive in DenyChanges.
+
+0.25    2010-01-19
+
+  Add a 'post_action' pseudo-check to CheckJira so that the
+  plugin can perform an action during the post-commit hook
+  phase.
+
+0.24    2010-01-06
+
+  Applies a spelling errors patch by Angel Abad.
+
+0.23    2009-10-24
+
+  Add kwalitee tests. (See
+  http://cpants.perl.org/dist/overview/SVN-Hooks)
+
+0.22    2009-09-23
+
+  New hook: CheckCapability.
+
+0.21    2009-08-19
+
+  The pod tests are skipped by default unless you use
+  perl Makefile.PL --author-tests.
+
+0.20    2009-07-28
+
+  Reverting the change in 0.19 and better documenting the
+  CHECK_JIRA behaviour.
+
+  Updating SVN::Hooks documentation.
+
+0.19    2009-07-28
+
+  Corrects a bug in CheckJira.
+
+0.18    2009-07-24
+
+  Corrects two bugs.
+
+  Drops the sub-minor versions.
+
+0.17    2009-04-26
+
+  Implements the CheckJira plugin and deprecates JiraAcceptance.
+
+  Make Makefile.PL know about online tests.
+
+0.16    2009-04-12
+
+  Implements the AllowPropChange plugin.
+
+  Better document the CheckProperty plugin.
+
+  Accepts relative paths in CHECK_STRUCTURE. 
+
+0.15    2009-03-12
+
+  Corrects a nasty bug in CheckStructure.
+
+  Corrects some problems with the test scripts that prevented
+  them to work right in some environments.
+
+  Implements the function
+  SVN::Hooks::CheckStructure::check_structure.
+
+0.14    2009-02-08
+
+  JiraAcceptance: don't replay the user's log in the error
+  message.
+
+  Removed LICENSE file because it was inconsistent with the
+  licensing information in META.yml.
+
+  UpdateConfFile:
+  - It accepts an 'actuator' function to be executed in the
+  post-commit hook after a succesful commit.
+  - All functions (validator, generator, and actuator) receive
+  the same two parameters: the file contents and the file
+  relative path in the repository.
+  - The files to be updated can be specified via Regexps and
+  they can be copied to subdirectories of /repo/conf.
+
+0.13    2008-12-03
+
+  Moving code to http://code.google.com/p/svn-hooks/.
+  Improving some tests.
+
+0.12    2008-10-09
+
+  Updating documentation at lib/SVN/Hooks.pm and
+  lib/SVN/Hooks/CheckProperty.pm.
+
+0.11    2008-10-04
+
+  Implemented new plugin SVN::Hooks::Notify which uses
+  SVN::Notify. With this we deprecate the SVN::Hooks::Mailer
+  plugin.
+
+  Using File::Spec to be a little more portable.
+
+  Changed license to the license of Perl itself.
+
+0.10    2008-09-27
+
+  The Mailer plugin can send GNU-style diffs of the files
+  changed in the commit.
+
+0.09    2008-09-27
+
+  Implemented the AllowLogChange plugin to allow changes in past
+  revision logs by specific users.
+
+  Removed dependency from Switch.pm.
+
+  Now the tests will check if the svn commands are available and
+  be skipped otherwise.
+
+  Enabled tests: t/pod.t and t/pod-coverage.t.
+
+  Added test t/02-allowlogchange.t.
+
+  Removed test t/boilerplate.t.
+
+  Private functions got the _ prefix to avoid complaints from
+  pod-coverage.t. 
+
+0.08    2008-09-25
+
+  Moving SVN::Look out to its own distribution as sugested by Daniel
+  Muey, the owner of its namespace.
+
+0.07    2008-09-23
+
+  META.yml gets more complete.
+
+  Makefile.PL exits if can't find /usr/bin/svnlook.
+
+  Some typo corrections.
+
+0.06    2008-09-21
+
+  All modules are documented now.
+
+  New files: LICENSE and META.yml.
+
+0.05    2008-09-19
+
+  New test t/02-jiraacceptance.t.
+
+  JiraAcceptance has a new directive: JIRA_LOG_MATCH(Regexp,
+  Help). You can specify a regexp to extract the JIRA keys from a
+  specific part of the log message. You can also pass a help message
+  to be shown to the user if the commit fails.
+
+  The error messages generated by JIRA_ACCEPTANCE are more helpful.
+
+  This file was renamed from Changes to ChangeLog to make my life
+  easier.
+
+0.04    2008-08-21
+
+  New test t/02-checklog.t.
+
+  CheckMimeTypes: now accepts an optional error message to show to
+  the user.
+
+  New plugin CheckLog to check the commit log message with a regexp.
+
+0.03    2008-08-20
+
+  New test t/02-mailer.t.
+
+  Removing deprecated plugin AccessControl.pm.
+
+  UpdateConfFile now can rotate (a la logrotate) the files it
+  updates.
+
+  Finished first usable version of the plugin Mailer.
+
+  JiraAcceptance: dropped the CHECK_ suffix from the directive
+  names. Also implemented the directive JIRA_CONFIG the pass the
+  information needed to connect to the JIRA server.
+
+0.02    2008-08-12
+
+  Hooks::UpdateRepoFile was renamed to UpdateConfFile to make it more specific.
+  But it also was enhanced in the configuration options.
+
+  Hooks::JiraAcceptance was optimized.
+
+  Hooks.pm now can process a list of configuration files.
+
+  Removed files t/01-noplugins.pl, t/svn-hook.pl, t/svn-hook.conf.

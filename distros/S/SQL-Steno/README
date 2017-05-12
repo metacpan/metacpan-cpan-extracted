@@ -1,0 +1,406 @@
+﻿NAME
+    SQL::Steno - Short hand for SQL and compact output
+
+SYNOPSIS
+    Type some short-hand, see the corresponding SQL and its output:
+
+     steno> TABLE1;somecolumn > 2    -- ; after tables means where
+     select * from TABLE1 where somecolumn > 2;
+     prepare: 0.000s   execute: 0.073s   rows: 14
+       id|column1                                    |column2
+         |                                           |    |column3
+         |                                           |    | |somecolumn
+     ----|-------------------------------------------|----|-|-|
+       27|foo                                        |    |a|7|
+       49|bar                                        |abcd|a|3|
+       81|baz\nbazinga\nbazurka                      |jk  |b|9|
+     1984|bla bla bla bla bla bla bla bla bla bla bla|xyz |c|5|
+     ...
+     steno> /abc|foo/#TBL1;.socol > 2    -- /regexp/ grep, #tableabbrev, .columnabbrev
+     select * from TABLE1 where somecolumn > 2;
+     prepare: 0.000s   execute: 0.039s   rows: 14
+     id|column1
+       |   |column2
+       |   |    |[column3=a]
+       |   |    |somecolumn
+     --|---|----|-|
+     27|foo|    |7|
+     49|bar|abcd|3|
+     steno> .c1,.c2,.some;#TE1#:ob2d3    -- ; before tables means from, 2nd # alias, :macro
+     select column1,column2,somecolumn from TABLE1 TE1 order by 2 desc, 3;
+     ...
+     steno> n(), yr(), cw(,1,2,3)    -- functionabbrev before (, can have initial default arg
+     select count(*), year(now()), concat_ws(',',1,2,3);
+     ...
+     steno> .col1,.clm2,.sn;#TBL1:jTBL2 u(id);mydate :b :m+3d and :d-w    -- :jTABLEABBREV and :+/- family
+     select column1,column2,somecolumn from TABLE1 join TABLE2 using(id) where mydate
+     between date_format(now(),"%Y-%m-01")+interval 3 day and curdate()-interval 1 week;
+     ...
+
+DESCRIPTION
+    You're the command-line type, but are tired of typing "select * from
+    TABLE where CONDITION", always forgetting the final ";"? Output always
+    seems far too wide and at least mysql cli messes up the format when it
+    includes newlines?
+
+    This module consists of the function "convert" which implements a
+    configurable ultra-compact language that maps to SQL. Then there is
+    "run" which performs normal SQL queries but has various tricks for
+    narrowing the output. It can also grep on whole rows, rather than having
+    to list all fields that you expect to match. They get combined by the
+    function "shell" which converts and runs in an endless loop.
+
+    This is work in progress, only recently isolated from a monolithic
+    script. Language elements and API may change as the need arises, e.g.
+    ":macro" used to be @macro, till the day I wanted to use an SQL-variable
+    and noticed the collision. In this early stage, you are more than
+    welcome to propose ammendments, especially if they make the language
+    more powerful and/or more consistent. Defaults are for MariaDB/MySQL,
+    though the mechanism also works with other DBs.
+
+  convert
+    This function takes a short-hand query in $_ and transforms it to SQL.
+    See "shell" for more run time oriented features.
+
+   ":\*namespec*(*strings*)"   or   ":\*namespec*%*join*(*strings*)"
+    This is a special macro that transforms odd lists to SQL syntax. It
+    takes a list of unquoted strings and quotes each one of them in various
+    ways. The syntax is inspired by the Shell single character quote and
+    Perl's "\(...)" syntax. The *namespec* is a combination of an optional
+    *name* (set up with the Perl function "Quote"), followed by an optional
+    *spec* that extends the named spec. The *strings* can get split on a
+    variety of one or even simultaneously various characters, which you can
+    give in any order in the *spec*:
+
+    "\" (backslash)
+        This one isn't a character to split on, but rather prevents trimming
+        the whitespace of both ends of the resulting strings.
+
+    "," (comma), the default
+        You only need to specify it, if you want to split on commas, as well
+        as other characters, at the same time. Where the "\" (backslash)
+        syntax is also used, when given a list, there is no default
+        splitting of list members: ":\{*Perl code*}" and canned query's
+        "$\*" & "$\>". In that case you must specify it, if needed, e.g.
+        "$\,*".
+
+    " " (space)
+        This one stands for any single whitespace. Since strings are
+        normally trimmed, it's the equivalent of what the Shell does. But,
+        if you combine it with "\", which prevents trimming, you will get an
+        empty string between each of multiple whitespaces.
+
+    "-" (minus)
+    ":" (colon)
+    ";" (semicolon)
+    "." (period)
+    "/" (slash)
+
+    The *spec* can also contain several of these characters to prevent
+    certain strings from being quoted:
+
+    "#" (hash)
+        All numbers, including signed, floats, binary and hexadecimal stay
+        literal. If you use "-" as a separator, there can be no negative
+        numbers.
+
+    "?" (question mark)
+        The boolean values "true" and "false" stay literal.
+
+    "ω" (omega) or "^" (caret)
+        The value "null" stays literal. Note that "ω" is also a word
+        character, that would be part of a name at the beginning of
+        *namespec*. It is only the "null"-symbol following some non-word
+        character, e.g. "," (comma).
+
+    "@" (at sign)
+        Variables @name stay literal.
+
+    "!" (exclamation mark)
+        Everything, presumed valid sql syntax, stays literal.
+
+    And you can give at most one *spec* for the quotes to use:
+
+    "'" (quote), the default
+    """ (double quote)
+    "`" (backquote)
+    "[]" (brackets)
+    "{}" (braces)
+        In the latter two cases, the closing quotes are optional, for
+        decoration only, or if code completion adds them.
+
+    The results are joined by comma, unless *join* is given. E.g. ":\(a,b,
+    c,NULL,true,-1.2)" gives 'a','b','c','NULL','true','-1.2', while
+    ":\:"/\#?0(a:b/ c:NULL:true/-1.2)" gives ""a","b"," c",NULL,true,-1.2"
+    and ":\ !%&&(a b c)" gives "a&&b&&c".
+
+   ":*macro*"
+    These are mostly simple text-replacements stored in %Macros. Unlike ":\"
+    these do not take arguments. There are also some dynamic macros. Those
+    starting with ":j" (join) or ":lj" (left join) may continue into a table
+    spec without the leading "#". E.g. ":ljtbl#t" might expand to "left join
+    table t".
+
+    Those starting with ":gb" (group by) or ":ob" (order by) may be followed
+    by result columns numbers from 1-9, each optionally followed by a or d
+    for asc or desc. E.g. ":ob2d3" gives "order by 2 desc, 3".
+
+   ":+*interval*"   or   ":*time*+*interval*"   or   ":-*interval*"   or   ":*time*-*interval*"
+    These are time calculation macros, where an optional leading letter
+    indicates a base time, and an optional trailing letter with an optional
+    count means the offset. The letters are:
+
+    y   (this) year(start). E.g. ":y+2m" is march this year.
+
+    q   (this) quarter(start). E.g. ":q+0" is this quarter, ":q+q" is next
+        quarter.
+
+    m   (this) month(start). E.g. ":-3m" is whatever precedes, minus 3
+        months.
+
+    w   (this) week(start). E.g. ":w+3d" is this week thursday (or wednesday
+        if you set $weekstart to not follow ISO 8601 and the bible).
+
+    d   (this) day(start). E.g. ":d-w" is midnight one week ago.
+
+    h   (this) hour(start). E.g. ":h+30M" is half past current hour.
+
+    M   (this) minute(start). E.g. ":+10M" is whatever precedes, plus 10min.
+
+    s   (this) second. E.g. ":s-2h" is exactly 2h ago.
+
+   ":{*Perl code*}"   or   ":\*namespec*{*Perl code*}"   or   ":\*namespec*%*join*{*Perl code*}"
+    This gets replaced by what it returns in list context. Undefined
+    elements get rendered as "NULL" and they all get joined by *join* or
+    else "," (comma). They can become quoted like ":\". Since the result is
+    already a list, the elements don't get split by default. If you want
+    that, you must specify it as in ":\,{*Perl code*}".
+
+   "#*tbl*"   or   "#*tbl*#"   or   "#*tbl*#*alias*"
+    Here *tbl* is a key of %Tables or any abbreviation of known tables in
+    @Tables. If followed by "#", the abbreviation is used as an alias,
+    unless an *alias* directly follows, in which case that is used.
+
+   ".*col*"   or   ".*col*."   or   ".*col*.*alias*"
+    Here *col* is a key of %Columns or any abbreviation of columns of any
+    table recognized in the query. If followed by ".", the abbreviation is
+    used as an alias, unless an *alias* directly follows, in which case that
+    is used. It tries to be clever about whether the 1st "." needs to be
+    preserved, i.e. following a table name.
+
+   "*func*("   or   "*func*\*namespec*(*strings*)"  
+or   "*func*\*namespec*%*join*(*strings*)"
+    Here *func* is a key of %Functions or any abbreviation of known
+    functions in @Functions, which includes words typically followed by an
+    opening parenthesis, such as "u(" for "using(". "i(" becomes "in(",
+    whereas "in(" becomes "ifnull(".
+
+    If the 2nd or 3rd form is used, the *strings* inside of the parentheses
+    are treated just like ":\*namespec*(*strings*)", but in this case
+    preserving the parentheses.
+
+    If the 1st argument of a function is empty and the abbrev or function is
+    found in %DefaultArguments the value becomes the 1st argument. E.g.
+    "cw(,'a','b','c')" or "cw(,:\(a,b,c))" both become
+    "concat_ws(',','a','b','c')".
+
+   Abbreviated Keyword
+    Finally it picks on the structure of the statement: These keywords can
+    be abbreviated: "se(lect)", "ins(ert)", "upd(ate)" or "del(ete)". If
+    none of these or "set" is present, "select" is assumed as default (more
+    keywords need to be recognized in the future).
+
+    For "select", semicolons are alternately replaced by "from" (the 1st
+    being optional if it starts with a table name) and "where". If no result
+    columns are given, they default to "*", see "SYNOPSIS". For "update",
+    semicolons are frst replaced by "set" and then "where".
+
+  shell
+    This function reads, converts and (if $dbh is set) runs in an end-less
+    loop (i.e. till end of file or "^D"). Reading is a single line affair,
+    unless you request otherwise. This can happen either, as in Unix Shell,
+    by using continuation lines as long as you put a backslash at the end of
+    your lines. Or there is a special case, if the 1st line starts with
+    "\\", then everything up to "\\" at the end of one of the next lines,
+    constitutes one entry.
+
+    In addition to converting, it offers a few extra features, performed in
+    this order (i.e. "&*xyz*" can return "/*regexp*/=*literal sql*" etc.):
+
+   "&{*Perl code*} *following text*"
+    Run *Perl code*. It sees the optional *following text* in $_ and may
+    modify it. If it returns "undef", this statement is skipped. If it
+    returns a DBI statement handle, run that instead of this statement. Else
+    replace with what it returns.
+
+    Reprocess result as a shell entry (i.e. it may return another
+    "&*query*").
+
+   "&*query arg*; ..."   or   "&*query*( *arg*; ... ) *following text*"
+    These allow canned entries and are more complex than macros, in that
+    they take arguments and replacement can depend on the argument.
+
+    Reprocess result as a shell entry (i.e. it may return another
+    "&*query*").
+
+    You can define your own canned queries with:
+
+    " &{ Query *name* => '*doc*', '*query*' }"
+
+    Here "query" becomes the replacement string for &name. It may contain
+    arguments a bit like the Shell: $0 (*name*), $* (all arguments), "$1,
+    $2, ..., $10, ..." (individual arguments) and $> (all arguments not
+    adressed individually). They can become quoted like ":\" as
+    "$\*namespec**arg*" or "$\*namespec*%*join**arg*". Here *arg* is "*",
+    ">" or a number directly tacked on to *spec* or *join*. E.g.: "$\-"1"
+    splits the 1st (semi-colon separated from the 2nd) argument itself on
+    "-" (minus), quotes the pieces with """ (double quote) and joins them
+    with "," (comma). The two list variables "$\*" & "$\>" don't get split
+    individually unless explicitly specified, e.g. "$\,*". Putting the
+    quotes inside the argument like this, eliminates them, if no argument is
+    given.
+
+   "/*regexp*/ *statement*"   or   "/*regexp*/i *statement*"   or   "!/*regexp*/ *statement*"   or   "!/*regexp*/i *statement*"
+    This will treat the *statement* normally, but will join each output row
+    into a "~" (tilde) separated string for matching. NULL fields are
+    rendered as that string. E.g. to return only rows starting with a number
+    1-5, followed by a NULL field, you could write: "/^[1-5]~NULL~/".
+
+    With a suffix "i", matching becomes case insensitive. This is why the
+    mostly optional space before *statement* is shown above. Without an "i",
+    but if the statement starts with the word "i" (e.g. your first column
+    name), you must separate it with a space. With an "i", if the statement
+    starts with an alphanumeric caracter, you must separate it with a space.
+
+    Only matching rows are considered unless there is a preceding "!"
+    (exclamation mark), in which case only non-matching rows are considered.
+
+    You can provide your own formatting of the row by setting $regexp_fail
+    to a Perl sub that returns a Perl expression as a string. That
+    expression takes the row in @_ and shall be true if the row fails to
+    match.
+
+    Caveat: the whole result set of the *statement* gets generated and
+    transferred to the client. This is definitely much more expensive than
+    doing the equivalent filtering in the where clause. But it is not a big
+    deal for tens or maybe hundreds of thousands or rows, probably still
+    faster than writing the corresponding SQL. And Perl's regexps are so
+    much more powerful.
+
+   "{*Perl code*}*statement*"
+    Call *Perl code* for every output row returned by the *statement* with
+    the array of column names as zeroth argument and the values after that
+    (i.e. numbered from 1 like in SQL). It may modify individual values. If
+    it returns false, the row is skipped.
+
+    You may combine "/*regexp*/{*Perl code*}" in any order and as many of
+    them as you want.
+
+    The same caveat as for regexps applies here. But again Perl is far more
+    powerful than any SQL functions.
+
+   "=*literal sql*"
+    A preceding "=" prevents conversion, useful for hitherto untreated
+    keywords or where the conversion doesn't play well with your intention.
+
+   "?"
+    Help prefix. Alone it will give an overview. You can follow up with any
+    of the special syntaxes, with or without an abbreviation. E.g. "?(" will
+    show all function abbreviations, whereas "?*abbrev*(" will show only
+    those functions matching *abbrev* or "?#*abbrev*" only those tables
+    matching *abbrev*.
+
+   "??*statement*"
+    Will convert and show, but not perform *statement*. If $dbh is not set,
+    this is the default behaviour.
+
+   "!*System Shell code*"
+    Run *System Shell code*.
+
+   ">*filename*"   or   ">>*filename*"
+    Redirect or append next statement's output to *filename*. For known
+    suffixes and options, see the next section.
+
+   "|*System Shell code*"
+    Pipe next statement's output through *System Shell code*.
+
+  Output Formats
+    The output format for the next SQL statement that is run, is chosen from
+    the suffix of a redirection or a special suffix query. In both cases
+    comma-separated options may be passed:
+
+    >*filename*.*suffix*
+    >*filename*.*suffix*( *opt*; ... )
+    >>*filename*.*suffix*
+    >>*filename*.*suffix*( *opt*; ... )
+    &.*suffix opt*; ...
+    &.*suffix*( *opt*; ... ) following text
+
+    The known suffixes and their respective options are:
+
+    ".csv"
+        This writes Comma Separated Values with one subtle trick: NULL and
+        empty strings are distinguished by quoting the latter. Some tools
+        like Perl's file DB DBD::CSV or rather its underlying Text::CSV_XS
+        can pick that up. CSV can take one of these options:
+
+        semi
+            Use a semicolon as a separator. This is a common format in
+            environments where the comma is the decimal separator. However
+            if you want decimal commas, you must provide such formatting
+            yourself.
+
+        tab Use tabulators as column separators. Apart from that you get the
+            full CSV formatting, so this is not the primitive .tsv format
+            some tools may have.
+
+    ".table"
+        This is the default table format. But you need to name it, if you
+        want to set options.
+
+        all This is a shorthand for outputting everything in the long form,
+            equivalent to "( NULL, crlf, date )".
+
+        crlf
+            Do not shorten "\r\n" to "\R".
+
+        date
+            Output ISO dates fully instead of shortening 0000-00-00 to 0000-
+            and yyyy-01-01 to yyyy- or yyyy-mm-01 to yyyy-mm-.
+
+        time
+            Output times fully instead of shortening 23:59(:59) to 24: and
+            hh:00(:00) to hh: or hh:mm(:00) to hh:mm.
+
+        NULL
+        null
+            Output this keyword instead of the shorter "ω" from DB theory
+            (or whatever you assigned to $NULL).
+
+    ".yaml"
+    ".yml"
+        Format output as YAML. This format has no options. Because its every
+        value on a new line format can be more readable, there is a
+        shorthand query "&-" for it.
+
+YOUR SCRIPT
+        package SQL::Steno;         # doesn't export yet, so get the functions easily
+        use SQL::Steno;
+        use DBI;
+        our $dbh = DBI->connect( ... ); # preferably mysql, but other DBs should work (with limitations).
+        # If you want #tbl and .col to work, (only) one of:
+        init_from_query;            # fast, defaults to mysql information_schema, for which you need read permission
+        init;                       # slow, using DBI dbh methods.
+        # Set any of the variables mentioned above to get you favourite abbreviations.
+        shell;
+
+LICENSE
+    This program is free software; you may redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    DBI, SQL::Interp, SQL::Preproc, SQL::Yapp, Jade <http://jade-lang.com/>
+
+AUTHOR
+    (C) 2015, 2016 by Daniel Pfeiffer <occitan@esperanto.org>.
+

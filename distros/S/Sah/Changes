@@ -1,0 +1,506 @@
+0.9.45  2017-03-09 (PERLANCAR)
+
+	- No spec changes.
+
+	- Move examples to Sah-Examples distribution.
+
+
+0.9.44  2016-07-28 (PERLANCAR)
+
+	- No spec changes.
+
+	- [Removed] Split Sah::Schema::* into its own dist to avoid having
+	  to release this spec dists everytime we tweak the schemas.
+
+
+0.9.43  2016-07-22 (PERLANCAR)
+
+        - No spec changes.
+
+        - Remove Sah::Schemas::Sah because we are not a Sah-Schemas-*
+          distribution.
+
+
+0.9.42  2016-07-22 (PERLANCAR)
+
+        - No spec changes.
+
+        - Add a couple of tests to test for nested loop variables in
+          implementation (e.g. [array => of=>[array => of=>int]]).
+
+        - Some minor refactoring, add missing tags, add untested clause aliases.
+
+
+0.9.41  2016-06-11 (PERLANCAR)
+
+	- Add hash clause: req_some_keys (and alias req_some).
+
+        - Follow Sah::Schemas convention (schemas for Sah are now put in
+          Sah::Schema::sah::*).
+
+
+0.9.40  2016-05-12 (PERLANCAR)
+
+	- Introduce x.* attribute, like in DefHash.
+
+
+0.9.39  2015-09-09 (PERLANCAR)
+
+	- No spec changes.
+
+	- Add Sah::SpecTest, a dummy module just so other dists can express
+	  depending on share/spectest.
+
+
+0.9.38  2015-09-03 (PERLANCAR)
+
+	- No spec changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.9.37  2015-06-11 (PERLANCAR)
+
+        - No spec changes.
+
+        - spectest: Add ID number to type tests, produce canonical (sorted keys)
+          JSON.
+
+
+0.9.36  2015-05-05 (PERLANCAR)
+
+        - Rename dep_one -> dep_any, req_dep_one -> req_dep_any because those
+          are the more apt names.
+
+
+0.9.35  2015-05-05 (PERLANCAR)
+
+	- No spec changes.
+
+	- Fix spectests for req_dep_one & req_dep_all.
+
+
+0.9.34   2015-04-30 (PERLANCAR)
+
+         - Add clauses for hash: choose_one_key (choose_one), choose_all_keys
+           (choose_all), req_one_key (req_one), dep_one, dep_all, req_dep_one,
+           req_dep_all. UPDATE: dep_one has been renamed to dep_any, req_dep_one
+           to req_dep_any.
+
+         - Add aliases req_all_keys & req_all for hash clause req_keys.
+
+
+0.9.33   2015-04-08 (PERLANCAR)
+
+         - No spec changes.
+
+         - Add a test for any.
+
+
+0.9.32   2015-02-14 (PERLANCAR) - The Day After Friday The 13th
+
+         - No spec changes.
+
+         - Update text which still says *.{human,err_msg}.LANGCODE instead of
+           *.{human,err_msg}.alt.lang.LANGCODE.
+
+
+0.9.31   2014-10-23 (PERLANCAR)
+
+         - Add clause for string: encoding.
+
+
+0.9.30   2013-11-25 (SHARYANTO)
+
+         - No spec changes. Fix spectest for 're_keys' clause.
+
+
+0.9.29   2013-11-23 (SHARYANTO)
+
+         - Add spectests for all types and clauses and properties that have not
+           been equipped with them. The spectest is now pretty complete and
+           covers most of the specification document. Some clause attributes and
+           advanced features (like expresssion and function) have not been
+           covered though.
+
+         [INCOMPATIBLE CHANGES]
+
+         - Rename obj properties: 'methods' -> 'meths', 'attributes' -> 'attrs'.
+           This is to be consistent with design principle 'abbreviate when
+           common abbreviation is present and won't introduce ambiguity'.
+
+         [REMOVED FEATURES]
+
+         - Remove hash 'req_keys_re', which doesn't make any sense.
+
+
+0.9.28   2013-11-21 (SHARYANTO)
+
+         - No spec changes. Rebuild with updated
+           Dist::Zilla::Plugin::ShareDir::Tarball (0.9.27 temporarily reverts to
+           using ShareDir due to garbled shared-files.tar.gz problem).
+
+
+0.9.27   2013-11-20 (SHARYANTO)
+
+         [NEW FEATURES]
+
+         - Add clauses for hash: 'req_keys_re', 'forbidden_keys',
+           'forbidden_keys_re'.
+
+         [ENHANCEMENTS]
+
+         - Add spectests for: hash's {req,allowed,forbidden}_keys{,_re}.
+
+         - Add tags to tests, so an implementation can more easily skip some
+           tests.
+
+
+0.9.26   2013-02-13 (SHARYANTO)
+
+         - No spec changes. Add FAQ entry on using abbreviations in type/clause
+           names.
+
+
+0.9.25   2013-02-02 (SHARYANTO)
+
+         - No spec changes. Convert spectest format from YAML to JSON due to
+           different Perl YAML implementations dumping/loading data differently
+           (YAML::Syck loads floats as strings ('1.23'), while YAML::XS causes
+           test failures).
+
+
+0.9.24   2013-01-30 (SHARYANTO)
+
+         - No spec changes. Fixes for spectest.
+
+
+0.9.23   2013-01-11 (SHARYANTO)
+
+         - No spec changes. Add tests to spectest, including tests for 'clause'
+           and 'clset' clauses and for array's 'elems' clause. Fix a couple of
+           bugs in spectest.
+
+
+0.9.22   2012-11-28 (SHARYANTO)
+
+         [NEW FEATURES]
+
+         - Add clause 'clause'.
+
+         [INCOMPATIBLE CHANGES]
+
+         - Rename clause 'cset' to 'clset' to make it less ambiguous (since we
+           also use the notation 'cname' [clname], 'cval' [clvar]).
+
+         [BUG FIXES]
+
+         - Fix typos and grammar.
+
+
+0.9.21   2012-11-27 (SHARYANTO)
+
+         - No spec changes. Forgot to update spectest.
+
+
+0.9.20   2012-11-27 (SHARYANTO)
+
+         [REMOVED FEATURES]
+
+         - Remove .{min,max}_{ok,nok} attributes because they are too generic
+           and only the and/or/not/none cases are needed most of the time. This
+           generic attributes make it slightly more complex for compilers. They
+           are now replaced by the new .op attribute, which can currently
+           contain 'and', 'or', 'not', or 'none'. The old attributes will
+           probably be re-added in the future if proven needed, perhaps in the
+           form of .op having the value of [1, 3] (equivalent of .min_ok 1 +
+           .max_ok 3) or [-1, -3] (equivalent to .min_nok 1 + .max_nok 3).
+
+         - Remove .ok_err_msg attribute to simplify things.
+
+         [NEW FEATURES]
+
+         - Add attribute .op (see above).
+
+         - Add clause 'clause'.
+
+
+0.9.19   2012-11-20 (SHARYANTO)
+
+         - Introduce shortcut form CLAUSE(LANG) and C.ATTR(LANG) for
+           CLAUSE.alt.lang.LANG and C.ATTR.alt.lang.LANG.
+
+
+0.9.18   2012-11-20 (SHARYANTO)
+
+         - No spec changes. Fix some typos in POD and spectest.
+
+
+0.9.17   2012-11-13 (SHARYANTO)
+
+         - Add hash's keys.create_default attribute.
+
+         - Add array's elems.create_default attribute.
+
+         - Add more spectests.
+
+
+0.9.16   2012-10-26 (SHARYANTO)
+
+         - Normalization rule: extras are now always normalized to {} so before
+           "int" => ["int", {}] and now => ["int", {}, {}]. (I think it's more
+           proper, normalized form doesn't change when extras {} exist, and more
+           clearly make the normalized form stand out visually).
+
+         - bool: Add clause 'is_true' (I think it'll be more portable than using
+           'is').
+
+         - array and hash no longer assume the Sortable role (actually it was a
+           typo, it never was).
+
+         - spectest: Add more tests (str, hash, bool, any, all).
+
+
+0.9.15   2012-10-25 (SHARYANTO)
+
+         - No spec changes.
+
+         - spectest: Add tests for type 'array' (incomplete).
+
+
+0.9.14   2012-10-25 (SHARYANTO)
+
+         - No spec changes.
+
+         - spectest: Add tests for type 'float'.
+
+         - build: Move spectest to share/ so it gets installed.
+
+
+0.9.13   2012-10-25 (SHARYANTO)
+
+         - No spec changes.
+
+         - spectest: reenable "clause|" tests, add {min,max}_{ok,nok}
+           and .err_level=warn tests.
+
+
+0.9.12   2012-10-18 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Add 'c.COMPILER' attribute namespace to store compiler-specific
+           options.
+
+         - float: Add clauses 'is_pos_inf' and 'is_neg_inf'.
+
+         - Add type spectest. Preliminary version, now only available for 'int'.
+
+
+0.9.11   2012-10-16 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Add .ok_err_msg to set error message when clause succeeds (existing
+           .err_msg is for when clause fails). Succeeding clause is regarded as
+           a validation failure under the presence of .max_ok or .min_ok
+           attributes.
+
+         - Introduce another error level (.err_level => 'fatal').
+
+
+0.9.10   2012-10-16 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - Simplify syntax for 'if' clause. Argument back to 3-element array
+           [COND, THEN, ELSE]. Whether COND/THEN/ELSE is an expression, schema,
+           clause set, or simple true/false is determined by its type (str,
+           array, str, hash, bool). This improves readability.
+
+         - Replace '.input' attribute with 'prop' and 'check_prop' clauses (and
+           possibly others in the future). '.input' does not provide a clean
+           switch between types (e.g. to express string which has an even
+           length, we used ["str", "div_by.input", ["prop", "len"], "div_by",
+           2], but 'div_by' is not a clause for str. Now we simply use: ["str",
+           "prop", ["len", ["int", "div_by": 2]]] or ["str", "check_prop", "$_ %
+           2 == 0"].
+
+
+0.9.9    2012-10-05 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - Change attribute for 'prefilters' clause, from 'perm' to 'temp' (to
+           make it consistent with the new default.temp).
+
+         [NEW FEATURES]
+
+         - Add attribute for 'default' clause: 'temp'.
+
+
+0.9.8    2012-10-03 (SHARYANTO)
+
+         - No functional changes. Fix examples and misplaced clauses.
+
+
+0.9.7    2012-10-03 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - Rename HasElems' clause: 'each' to 'each_elem' to avoid ambiguity
+           with 'each_index'. Also rename 'check_each' to 'check_each_elem'.
+
+         [NEW FEATURES]
+
+         - Add hash clauses: 'check_each_key', 'check_each_value'.
+
+
+0.9.6    2012-10-03 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - Remove hash clause 'allow_extra_keys' and replace it with '.restrict'
+           attribute for 'keys' clause.
+
+         [NEW FEATURES]
+
+         - Add property: 'prio'.
+
+         - Add HasElems properties: 'elems', 'indices'.
+
+         - Add hash properties: 'keys', 'values'.
+
+         - Add hash clauses: 're_keys', 'allowed_keys', 'allowed_keys_re'.
+
+         [ENHANCEMENTS]
+
+         - Specification for 'req_keys' (previously forgotten to be written).
+
+         - Reorganize FAQ and add some items.
+
+
+0.9.5    2012-09-26 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - Change merge prefix from "[merge]", "[merge+]", etc to
+           "merge.normal.", "merge.add.", etc (to be compliant with DefHash)
+
+
+0.9.4    2012-09-21 (SHARYANTO)
+
+         - Rewrite some parts.
+
+         - Specify types 'all', 'any', 'obj', 'date' (moved from Data::Sah).
+           Type 'date' still doesn't have clauses specified yet.
+
+         - Specify clauses for 'hash' and 'array' (moved from Data::Sah)
+
+         - Change examples to use JSON instead of Perl notation.
+
+         - Add FAQ item: comparison to JSON schema.
+
+         - Add FAQ item: advice on writing schemas (preliminary).
+
+         [NEW]
+
+         - Add type: 'undef'.
+
+         - Add attribute: 'input'.
+
+         - Add clauses: 'check_each', 'exists', 'check_exists', 'each_index',
+           'check_each_index'.
+
+         [INCOMPATIBLE CHANGES]
+
+         - Rename 'vals' attribute to 'is_multi' (a bool) and store the multiple
+           values in the clause value itself. This is to avoid having both
+           'CLAUSE' and 'CLAUSE.vals'.
+
+         - Rename 'expr' clause attribute to 'is_expr' (a bool). The expression
+           is now contained in the original clause value/attribute. This is to
+           be consistent with 'is_multi'.
+
+         - Tweak the 'if' clause (change 'then_ok' or 'else_nok' to 'then' and
+           'else').
+
+         - Rename clause 'noop' to 'ok' (consistency with min_ok/max_nok/etc).
+           Remove clause 'fail' (can be replaced with '!ok').
+
+         - Rename clause 'check' to 'expr' (consistency with 'prop' as well as
+           the 'prop' and 'expr' keys in the 'if' clause).
+
+         [REMOVED]
+
+         - HasElems: remove 'num_of' clause (not generic enough, might be split
+           to a custom clause distribution later).
+
+
+0.9.3    2012-09-20 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - BaseType: Rename old 'if' clause to 'if_clause' (the new 'if' clause
+           is now a generic condition clause which accepts a hash).
+
+         - HasElems: Rename clause 'all_elems' to 'each_elem'.
+
+         [NEW]
+
+         - Introduce 'result_var' attribute.
+
+         - Introduce 'type property'.
+
+         - BaseType: add clauses 'schema_v' & 'base_v'. Also mention 'defhash_v'
+           (from DefHash specification).
+
+         - BaseType: add generic condition clause 'if' (this is different from
+           the old 'if', which has been renamed to 'if_clause').
+
+         - BaseType: add generic looping clauses 'each' and 'exists'.
+
+         [FIXED]
+
+         - Move 'elems' clause to array (POD mistake).
+
+         [OTHER]
+
+         - Specify behavior when CLAUSE value and CLAUSE.vals both exist.
+
+
+0.9.2    2012-09-19 (SHARYANTO)
+
+         - Clause set now uses DefHash.
+
+         - '=' is now a shortcut for '.expr' attribute.
+
+         - Add FAQ and overview (moved from Data::Sah's POD).
+
+         [REMOVED]
+
+         - '.val' removed, now use clause value (DefHash).
+
+         [FIXES]
+
+         - Update some examples.
+
+
+0.9.1    2012-09-13 (SHARYANTO)
+
+         - Move type documentation from Data::Sah.
+
+         - BaseType: remove clauses 'comment' and add clauses 'v' (DefHash);
+           remove implementation clauses (SANITY, PREPROCESS, POSTPROCESS).
+
+         - HasElems: rename clause 'elem_deps' to 'if_elems_re', add clause
+           'if_elems'.
+
+         - str: rename clause 'is_regex' to 'is_re'.
+
+
+0.9.0    2012-07-21 (SHARYANTO)
+
+         - First release, split specification from Data-Sah.

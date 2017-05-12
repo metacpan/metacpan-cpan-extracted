@@ -1,0 +1,27 @@
+--- #YAML:1.0
+name:               String-Replace
+version:            0.02
+abstract:           Performs arbitrary replacement in strings
+author:
+    - Mathias Kende <mathias@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  6.3002
+build_requires:
+    Test::Subs:   0
+    Tie::Scalar:  0
+requires:
+    Carp:             0
+    Exporter:         0
+    List::MoreUtils:  0
+    perl:             5.008000
+    Scalar::Util:     0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

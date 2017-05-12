@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
+	<TITLE></TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 1.1.2  (Win32)">
+	<META NAME="AUTHOR" CONTENT="Martin Hosken">
+	<META NAME="CREATED" CONTENT="20040828;18564918">
+	<META NAME="CHANGEDBY" CONTENT="Martin Hosken">
+	<META NAME="CHANGED" CONTENT="20040901;12312107">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Shoebox Utilities</H1>
+<P>These Shoebox utilities were developed back in the days of
+Shoebox. They are equally useable with the newer Toolbox and most of
+the tools have been updated to handle Unicode data. For the sake of
+discussion, this manual will talk in terms of Shoebox as including
+Toolbox unless otherwise stated.</P>
+<P>This manual also breaks the golden rule of manual writing: Never
+let the programmer write the manual. My apologies and if anyone would
+like to offer a better one, I am very open to contributions.</P>
+<H2>Installation</H2>
+<P>ShUtils is distributed as a .exe program which is an installer. To
+install, run this program and follow the installation instructions
+included. If in doubt, just accept each of the default values
+offered.</P>
+<P>Due to a problem with updating the path on your computer. It is
+advisable to reboot after installation.</P>
+<H2>The Programs</H2>
+<P>All the programs are command line based programs and should be run
+from a command prompt.</P>
+<H3>Sh2xml</H3>
+<P>SH2XML is a program to convert Shoebox/Toolbox data to XML. It
+automatically creates an XML document structure from the database
+type hierarchy of standard format markers. It also analyses
+interlinear text and breaks this into interlinear blocks in the
+output XML rather than leaving it as lines of text.</P>
+<P>Since XML is a Unicode based file format, it is necessary to
+convert the standard format data used by Shoebox into Unicode as the
+XML file is being created. If the data is already in Unicode (as may
+happen in Toolbox) then that conversion is easy. Other encodings are
+harder, but SH2XML provides a mechanism to do this conversion easily
+and simply.</P>
+<P>Each field in a Shoebox database has an associated language
+definition. This language includes such information as possible sort
+orders, default font, etc. In effect the language definition includes
+information regarding the encoding of the data. For a Unicode based
+encoding, SH2XML will identify this automatically. Likewise, if no
+other information is given, the default encoding (usually the system
+encoding, which is usually codepage 1252), is used for conversion.
+But often legacy data needs a more sophisticated conversion to
+Unicode. This conversion can be done via a Windows codepage number or
+a TECkit binary mapping.</P>
+<P>SH2XML interacts with text conversion via an install once, use
+anyway, mechanism whereby mappings are installed on a user's system
+and then are referenced by name rather than needing to know about
+paths to specific mapping files. To set up the database of mappings
+and to install new mappings, see the section on the encrem program
+later in this manual.</P>
+<P>SH2XML identifies the particular mapping name to use from
+information in the language definition. 
+</P>
+</BODY>
+</HTML>

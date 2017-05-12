@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!DOCTYPE TopicSet PUBLIC "urn:newsml:iptc.org:20001006:NewsMLv1.0.dtd:1" "NewsMLv1.0.dtd">
+<TopicSet Duid="iptc.mediatype" FormalName="MediaType">
+	<Comment xml:lang="en">The media type of a ContentItem.</Comment>
+	<Topic Duid="Med1">
+		<TopicType Scheme="IptcTopicType" FormalName="MediaType"/>
+		<FormalName Scheme="IptcMediaTypes">Text</FormalName>
+		<Description xml:lang="en">Text file</Description>
+	</Topic>
+	<Topic Duid="Med2">
+		<TopicType Scheme="IptcTopicType" FormalName="MediaType"/>
+		<FormalName Scheme="IptcMediaTypes">Graphic</FormalName>
+		<Description xml:lang="en">Graphic Image File</Description>
+	</Topic>
+	<Topic Duid="Med3">
+		<TopicType Scheme="IptcTopicType" FormalName="MediaType"/>
+		<FormalName Scheme="IptcMediaTypes">Photo</FormalName>
+		<Description xml:lang="en">Photo Image File</Description>
+	</Topic>
+	<Topic Duid="Med4">
+		<TopicType Scheme="IptcTopicType" FormalName="MediaType"/>
+		<FormalName Scheme="IptcMediaTypes">Audio</FormalName>
+		<Description xml:lang="en">Digital Audio File</Description>
+	</Topic>
+	<Topic Duid="Med5">
+		<TopicType Scheme="IptcTopicType" FormalName="MediaType"/>
+		<FormalName Scheme="IptcMediaTypes">Video</FormalName>
+		<Description xml:lang="en">Digital Video File</Description>
+	</Topic>
+	<Topic Duid="Med6">
+		<TopicType Scheme="IptcTopicType" FormalName="MediaType"/>
+		<FormalName Scheme="IptcMediaTypes">Animation</FormalName>
+		<Description xml:lang="en">Animation</Description>
+	</Topic>
+</TopicSet>
+

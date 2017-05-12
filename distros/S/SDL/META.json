@@ -1,0 +1,311 @@
+{
+   "abstract" : "SDL bindings to Perl",
+   "author" : [
+      "Kartik Thakore <KTHAKORE@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4204",
+   "license" : [
+      "lgpl_2_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "SDL",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::SDL" : "1.446",
+            "Capture::Tiny" : "0",
+            "ExtUtils::CBuilder" : "0",
+            "File::Find" : "0",
+            "File::ShareDir" : "1.0",
+            "Scalar::Util" : "0",
+            "Test::Most" : "0.21",
+            "Test::Simple" : "0.88",
+            "Tie::Simple" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::SDL" : "1.446",
+            "Capture::Tiny" : "0",
+            "ExtUtils::CBuilder" : "0.260301",
+            "File::Find" : "0",
+            "File::ShareDir" : "1.0",
+            "Module::Build" : "0.40",
+            "Tie::Simple" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPAN" : "1.92",
+            "File::ShareDir" : "1.0",
+            "Scalar::Util" : "0",
+            "Tie::Simple" : "0",
+            "perl" : "5.008000"
+         }
+      }
+   },
+   "provides" : {
+      "Module::Build::SDL" : {
+         "file" : "lib/Module/Build/SDL.pm"
+      },
+      "SDL" : {
+         "file" : "lib/SDL.pm",
+         "version" : "2.546"
+      },
+      "SDL::Audio" : {
+         "file" : "lib/SDL/Audio.pm"
+      },
+      "SDL::AudioCVT" : {
+         "file" : "lib/SDL/AudioCVT.pm"
+      },
+      "SDL::AudioSpec" : {
+         "file" : "lib/SDL/AudioSpec.pm"
+      },
+      "SDL::CD" : {
+         "file" : "lib/SDL/CD.pm"
+      },
+      "SDL::CDROM" : {
+         "file" : "lib/SDL/CDROM.pm"
+      },
+      "SDL::CDTrack" : {
+         "file" : "lib/SDL/CDTrack.pm"
+      },
+      "SDL::Color" : {
+         "file" : "lib/SDL/Color.pm"
+      },
+      "SDL::Config" : {
+         "file" : "lib/SDL/Config.pm"
+      },
+      "SDL::Constants" : {
+         "file" : "lib/SDL/Constants.pm"
+      },
+      "SDL::Cursor" : {
+         "file" : "lib/SDL/Cursor.pm"
+      },
+      "SDL::Event" : {
+         "file" : "lib/SDL/Event.pm"
+      },
+      "SDL::Events" : {
+         "file" : "lib/SDL/Events.pm"
+      },
+      "SDL::GFX" : {
+         "file" : "lib/SDL/GFX.pm"
+      },
+      "SDL::GFX::BlitFunc" : {
+         "file" : "lib/SDL/GFX/BlitFunc.pm"
+      },
+      "SDL::GFX::FPSManager" : {
+         "file" : "lib/SDL/GFX/FPSManager.pm"
+      },
+      "SDL::GFX::Framerate" : {
+         "file" : "lib/SDL/GFX/Framerate.pm"
+      },
+      "SDL::GFX::ImageFilter" : {
+         "file" : "lib/SDL/GFX/ImageFilter.pm"
+      },
+      "SDL::GFX::Primitives" : {
+         "file" : "lib/SDL/GFX/Primitives.pm"
+      },
+      "SDL::GFX::Rotozoom" : {
+         "file" : "lib/SDL/GFX/Rotozoom.pm"
+      },
+      "SDL::Image" : {
+         "file" : "lib/SDL/Image.pm"
+      },
+      "SDL::Internal::Loader" : {
+         "file" : "lib/SDL/Internal/Loader.pm"
+      },
+      "SDL::Joystick" : {
+         "file" : "lib/SDL/Joystick.pm"
+      },
+      "SDL::Mixer" : {
+         "file" : "lib/SDL/Mixer.pm"
+      },
+      "SDL::Mixer::Channels" : {
+         "file" : "lib/SDL/Mixer/Channels.pm"
+      },
+      "SDL::Mixer::Effects" : {
+         "file" : "lib/SDL/Mixer/Effects.pm"
+      },
+      "SDL::Mixer::Groups" : {
+         "file" : "lib/SDL/Mixer/Groups.pm"
+      },
+      "SDL::Mixer::MixChunk" : {
+         "file" : "lib/SDL/Mixer/MixChunk.pm"
+      },
+      "SDL::Mixer::MixMusic" : {
+         "file" : "lib/SDL/Mixer/MixMusic.pm"
+      },
+      "SDL::Mixer::Music" : {
+         "file" : "lib/SDL/Mixer/Music.pm"
+      },
+      "SDL::Mixer::Samples" : {
+         "file" : "lib/SDL/Mixer/Samples.pm"
+      },
+      "SDL::Mouse" : {
+         "file" : "lib/SDL/Mouse.pm"
+      },
+      "SDL::MultiThread" : {
+         "file" : "lib/SDL/MultiThread.pm"
+      },
+      "SDL::Net" : {
+         "file" : "lib/SDL/Net.pm"
+      },
+      "SDL::Net::IPaddress" : {
+         "file" : "lib/SDL/Net/IPaddress.pm"
+      },
+      "SDL::Net::TCP" : {
+         "file" : "lib/SDL/Net/TCP.pm"
+      },
+      "SDL::Net::UDP" : {
+         "file" : "lib/SDL/Net/UDP.pm"
+      },
+      "SDL::Overlay" : {
+         "file" : "lib/SDL/Overlay.pm"
+      },
+      "SDL::Palette" : {
+         "file" : "lib/SDL/Palette.pm"
+      },
+      "SDL::Pango" : {
+         "file" : "lib/SDL/Pango.pm"
+      },
+      "SDL::Pango::Context" : {
+         "file" : "lib/SDL/Pango/Context.pm"
+      },
+      "SDL::PixelFormat" : {
+         "file" : "lib/SDL/PixelFormat.pm"
+      },
+      "SDL::RWOps" : {
+         "file" : "lib/SDL/RWOps.pm"
+      },
+      "SDL::Rect" : {
+         "file" : "lib/SDL/Rect.pm"
+      },
+      "SDL::SMPEG" : {
+         "file" : "lib/SDL/SMPEG.pm"
+      },
+      "SDL::SMPEG::Info" : {
+         "file" : "lib/SDL/SMPEG/Info.pm"
+      },
+      "SDL::Surface" : {
+         "file" : "lib/SDL/Surface.pm"
+      },
+      "SDL::TTF" : {
+         "file" : "lib/SDL/TTF.pm"
+      },
+      "SDL::TTF::Font" : {
+         "file" : "lib/SDL/TTF/Font.pm"
+      },
+      "SDL::TTFont" : {
+         "file" : "lib/SDL/TTFont.pm"
+      },
+      "SDL::Time" : {
+         "file" : "lib/SDL/Time.pm"
+      },
+      "SDL::Tutorial" : {
+         "file" : "lib/SDL/Tutorial.pm"
+      },
+      "SDL::Tutorial::Animation" : {
+         "file" : "lib/SDL/Tutorial/Animation.pm"
+      },
+      "SDL::Tutorial::LunarLander" : {
+         "file" : "lib/SDL/Tutorial/LunarLander.pm"
+      },
+      "SDL::Version" : {
+         "file" : "lib/SDL/Version.pm"
+      },
+      "SDL::Video" : {
+         "file" : "lib/SDL/Video.pm"
+      },
+      "SDL::VideoInfo" : {
+         "file" : "lib/SDL/VideoInfo.pm"
+      },
+      "SDL_perl" : {
+         "file" : "lib/SDL_perl.pm"
+      },
+      "SDLx::App" : {
+         "file" : "lib/SDLx/App.pm"
+      },
+      "SDLx::Controller" : {
+         "file" : "lib/SDLx/Controller.pm"
+      },
+      "SDLx::Controller::Interface" : {
+         "file" : "lib/SDLx/Controller/Interface.pm"
+      },
+      "SDLx::Controller::State" : {
+         "file" : "lib/SDLx/Controller/State.pm"
+      },
+      "SDLx::Controller::Timer" : {
+         "file" : "lib/SDLx/Controller/Timer.pm"
+      },
+      "SDLx::FPS" : {
+         "file" : "lib/SDLx/FPS.pm"
+      },
+      "SDLx::Layer" : {
+         "file" : "lib/SDLx/Layer.pm"
+      },
+      "SDLx::LayerManager" : {
+         "file" : "lib/SDLx/LayerManager.pm"
+      },
+      "SDLx::Music" : {
+         "file" : "lib/SDLx/Music.pm"
+      },
+      "SDLx::Music::Data" : {
+         "file" : "lib/SDLx/Music/Data.pm"
+      },
+      "SDLx::Music::Default" : {
+         "file" : "lib/SDLx/Music/Default.pm"
+      },
+      "SDLx::Rect" : {
+         "file" : "lib/SDLx/Rect.pm",
+         "version" : "0.01"
+      },
+      "SDLx::SFont" : {
+         "file" : "lib/SDLx/SFont.pm"
+      },
+      "SDLx::Sound" : {
+         "file" : "lib/SDLx/Sound.pm"
+      },
+      "SDLx::Sprite" : {
+         "file" : "lib/SDLx/Sprite.pm"
+      },
+      "SDLx::Sprite::Animated" : {
+         "file" : "lib/SDLx/Sprite/Animated.pm"
+      },
+      "SDLx::Surface" : {
+         "file" : "lib/SDLx/Surface.pm"
+      },
+      "SDLx::Surface::TiedMatrix" : {
+         "file" : "lib/SDLx/Surface/TiedMatrix.pm"
+      },
+      "SDLx::Surface::TiedMatrixRow" : {
+         "file" : "lib/SDLx/Surface/TiedMatrixRow.pm"
+      },
+      "SDLx::TTF" : {
+         "file" : "lib/SDLx/TTF.pm"
+      },
+      "SDLx::Text" : {
+         "file" : "lib/SDLx/Text.pm"
+      },
+      "SDLx::Validate" : {
+         "file" : "lib/SDLx/Validate.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/PerlGameDev/SDL/issues"
+      },
+      "license" : [
+         "http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt"
+      ],
+      "repository" : {
+         "url" : "http://github.com/PerlGameDev/SDL"
+      }
+   },
+   "version" : "2.546"
+}

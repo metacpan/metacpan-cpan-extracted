@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+XS.xs
+t/Statistics-CountAverage-XS.t
+lib/Statistics/CountAverage/XS.pm
+META.yml                                 Module meta-data (added by MakeMaker)

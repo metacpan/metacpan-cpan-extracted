@@ -1,0 +1,62 @@
+#!/usr/local/bin/perl -s
+
+use strict ;
+use warnings ;
+our $s ;
+
+if ( -d 'conf' && -e 'bin/run_stem' ) {
+
+	$ENV{PERL5LIB} = 'lib' ;
+	$ENV{PATH} =  "bin:$ENV{PATH}" ;
+}
+
+print "HELLO DEMO\n" ;
+
+$SIG{ 'INT' } = \&cleanup ;
+
+my @children ;
+
+my $ssfe = $s ? 'ssfe -prompt Stem:' : '' ;
+my $echo = $s ? 'console_echo=1' : '' ;
+
+my $cmd = <<CMD ;
+xterm -T Hello -n Hello -geometry 80x40+0+0 -e $ssfe run_stem $echo hello
+CMD
+
+print "$cmd\n" ;
+
+my @cmd = split ' ', $cmd ;
+s/:/: / for @cmd ;
+
+fork_exec( @cmd ) ;
+
+while( <STDIN> ) {
+
+	next unless /^q/i ;
+
+	cleanup() ;
+}
+
+sub cleanup {
+
+	print "clean up\n" ;
+
+	kill 9, @children ;
+
+	wait ;	
+	exit ;
+
+}
+
+sub fork_exec {
+
+	my( @exec ) = @_ ;
+
+	if ( my $pid = fork() ) {
+
+		push @children, $pid ;
+		return ;
+	}
+
+	exec @exec ;
+}

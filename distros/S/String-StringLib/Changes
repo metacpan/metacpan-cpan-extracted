@@ -1,0 +1,11 @@
+Revision history for Perl extension String::StringLib.
+
+1.00  Thu Jul 28 21:53:01 1999
+	- original version; created by h2xs 1.18
+
+1.01  Wed Mar 22 09:27:04 2000
+	- Deprecated, replaced by String::Strip, and replaced with a
+	  wrapper
+
+1.02  Wed Mar 22 09:59:03 2000
+	- CPAN/PAUSE problems

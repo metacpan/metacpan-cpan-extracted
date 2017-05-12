@@ -1,0 +1,19 @@
+Revision history for Perl extension Spreadsheet::ParseExcel_XLHTML.
+
+0.04  2009-11-28 17:10:11
+    - added deps on HTML::Entities and xlhtml
+    - added basic tests
+
+0.03  2009-11-24 08:09:09
+    - added POD fix from Frank Wiegand
+    - updated homepage reference (project has been dead for a long time)
+    - switch to Module::Install
+
+0.02  Mon Nov 26 23:30:31 PST 2001
+    - Added the evil -install import option.
+    - Now using HTML::Entities to decode entities.
+    - Expanded silly docs a bit.
+    - Removed patch, 0.3.9.7 is out and works fine.
+
+0.01  Sun Nov 25 19:03:56 PST 2001
+    - First release.

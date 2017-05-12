@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution SQL-Abstract-Plugin-InsertReturning, version
+0.05:
+
+  Augment SQL::Abstract->insert with support for returning data
+
+This software is Copyright (c) 2010 by Oliver Charles.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0
+

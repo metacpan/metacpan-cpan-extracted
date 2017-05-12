@@ -1,0 +1,20 @@
+Revision history for Perl extension SQL::Snippet.
+
+0.01  Thu Jun 27 02:14:00 2002
+    - original version; created by h2xs 1.21 with options
+        -AX -n SQL::Snippet
+
+0.02  Thu Aug 15 16:15:00 2002
+    - many parms are no longer hard-coded, instead they 
+      are obtained via $ui->parameters
+    - BIG usability bonus - will now give intelligent error
+      if an object is called as though it were a function.
+        Ex. 
+            # correct
+            $snippet->parm->gender->value('F');
+            # incorrect, gives nice error
+            $snippet->parm->gender('F');
+
+0.03 Tue Aug 20 10:59:00 2002
+    - updated Term::Interact prerequisite version
+      number in Makefile.pl to 0.43

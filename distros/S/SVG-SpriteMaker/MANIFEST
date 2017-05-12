@@ -1,0 +1,14 @@
+Changes
+lib/SVG/SpriteMaker.pm
+Makefile.PL
+MANIFEST
+README
+svg-spritemaker
+t/circle.svg
+t/perlcritic.t
+t/perlcriticrc
+t/rect.svg
+t/SVG-SpriteMaker.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

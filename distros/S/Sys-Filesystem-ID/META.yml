@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                Sys-Filesystem-ID
+version:             1.06
+abstract:            ~
+license:             ~
+author:              ~
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Cwd:                           3.12
+    Exporter:                      5.58
+    LEOCHARRE::CLI:                1.14
+    LEOCHARRE::DEBUG:              1.11
+    Sys::Filesystem:               1.22
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,36 @@
+---
+abstract: 'Convert SWF file into version 9 format forcibly if version is under 9'
+author:
+  - 'WATANABE Hiroaki <hwat@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.5, Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: SWF-ForcibleConverter
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  IO::Compress::Deflate: 0
+  IO::File: 0
+  IO::Handle: 0
+  IO::Uncompress::Inflate: 0
+  Test::More: 0.32
+resources:
+  bugtracker: https://github.com/hiroaki/SWF-ForcibleConverter/issues
+  homepage: https://github.com/hiroaki/SWF-ForcibleConverter
+  repository: https://github.com/hiroaki/SWF-ForcibleConverter.git
+version: 0.02
+x_contributors:
+  - 'WATANABE Hiroaki <hwat@mac.com>'

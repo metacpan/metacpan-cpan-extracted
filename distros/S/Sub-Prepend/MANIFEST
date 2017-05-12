@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README
+lib/Sub/Prepend.pm
+t/010basic.t
+t/020interface.t
+t/030prepend.t
+t/031prepend.t
+t/032prepend_prototype.t
+t/040caller.t
+META.yml                                 Module meta-data (added by MakeMaker)

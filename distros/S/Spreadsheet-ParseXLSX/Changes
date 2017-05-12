@@ -1,0 +1,129 @@
+Revision history for Spreadsheet-ParseXLSX
+
+0.27  2016-08-16
+      - Fix issues parsing sheets whose cell elements do not have location
+        attributes (dgiordano, #61)
+
+0.26  2016-08-16
+      - Add explicit dependency on perl 5.10 (we apparently broke 5.8 support
+        at some point) (andk, #62)
+
+0.25  2016-07-14
+      - Fix encryption.t test on Windows (marks6i, #60)
+
+0.24  2016-06-25
+      - Support scalar refs as input (rshadow, #59)
+
+0.23  2016-05-28
+      - Stable release
+
+0.22-TRIAL  2016-05-25
+      - Fix some regressions around cell style application (Tux)
+      - Speed up parsing of large spreadsheets
+
+0.21-TRIAL  2016-05-23
+      - Give a better error message when opening xls files (mchendriks, #52)
+      - Fix parsing files with non-default XML namespace names
+      - Handle files with no style information
+      - Handle fills that don't specify a pattern type (vfilatov, #41)
+      - Fix parsing of encrypted files on big-endian systems
+        (mazurin, Tux, #50, #51)
+      - Support reading files where the case is specified incorrectly (this is
+        likely actually a bug in the program generating these files, but I
+        don't think this fix is likely to break any real files) (Tux, #57)
+      - Ensure we coerce hidden state for rows and columns to booleans
+        (Jeffery Hammock)
+      - Support extracting rich text formatting from cells (Carlos Alberto
+        Danzos)
+
+0.20  2015-12-05
+      - Fix the test suite on perls compiled with -Duselongdouble (Slaven
+        Rezić, #49)
+
+0.19  2015-12-04
+      - Support encrypted xlsx files (mazurin, #37)
+      - Support absolute internal pathnames (zhouzhen1, #46)
+      - Support hidden rows, columns, and sheets (ssimms, #47)
+
+0.18  2015-09-19
+      - Fix 5.8 support (rjbs, #39)
+      - Fix parsing of files which have empty worksheets (for instance,
+        worksheets that are only charts) (Stuart Watt, #43)
+
+0.17  2015-03-25
+      - Fix using_1904_date (f20, #31)
+      - Add support for get_header, get_footer, get_margin_*, get_print_scale,
+        get_paper, is_portrait, and get_start_page, and also fill in the
+        BdrDiag, Rotate, Indent, and Shrink format properties (Dave Clarke,
+        #35)
+      - Fix JasperSoft-created files (rdboisvert, #27)
+      - bump required perl version to 5.010 (zhouzhen1, #33)
+      - Fix Google Drive-created files (reported by ovidiubarbu, #29)
+
+0.16  2014-07-05
+      - Cells should default to locked (f20, #25)
+      - Support ColFmtNo and TabColor (Fitz Elliott, #26)
+      - try to avoid dying on certain oddly generated spreadsheets with missing
+        data (#23)
+
+0.15  2014-07-04
+      - Parse shared strings and worksheets as they are read rather than
+        reading everything into memory, to reduce memory usage
+        (merrilymeredith, #21)
+
+0.14  2014-04-03
+      - fix incompatibility with newer Spreadsheet::ParseExcel (reported by
+        dsteinbrunner, #22)
+
+0.13  2014-01-29
+      - support locked and hidden cells (Tux, #15)
+      - "default color" is now returned as undef, rather than assuming it's
+        always black (Tux, #15)
+
+0.12  2013-12-09
+      - support underline and strikethrough font properties (matrot, #14)
+
+0.11  2013-11-13
+      - fix $workbook->get_filename (masonik, #13)
+
+0.10  2013-11-06
+      - support inlineStr cells (David Gang, #12)
+
+0.09  2013-10-09
+      - fix getting cell values for cells with rich text contents
+        (merrilymeredith, #11)
+      - support merged cells (rolaf, #10)
+      - row_range and col_range for empty worksheets (rolaf, #8)
+      - support error cells (rolaf, #7)
+      - support worksheets with a range selection
+
+0.08  2013-09-10
+      - fix string lookups when the workbook contains cells with complicated
+        formatting (Drokaten, #6)
+      - fix warnings during parsing when using -w
+
+0.07  2013-09-05
+      - support boolean and string format cells (Drokaten, #6)
+      - provide a working minimum version for Spreadsheet::ParseExcel (rjbs)
+
+0.06  2013-08-29
+      - fix conversion between cell and column index for large column indices
+
+0.05  2013-07-31
+      - more fixes for xlsx format variations (mikaelg79, #5)
+
+0.04  2013-07-31
+      - fix spreadsheets that only have a single cell (servuscmj, #2)
+      - fixes for some variations in how xlsx files are generated (tophopstop,
+        #3)
+      - fix spreadsheets with more than 26 columns (tophopstop, #4)
+
+0.03  2013-07-26
+      - fix exception when the 'selection' node doesn't exist (reported by
+        melick, #1)
+
+0.02  2013-07-17
+      - fix bugtracker link
+
+0.01  2013-07-16
+      - Initial release

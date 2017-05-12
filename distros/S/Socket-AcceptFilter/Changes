@@ -1,0 +1,11 @@
+Revision history for Socket-AcceptFilter
+
+0.03    2009-11-12
+        Fix tests to check fbsd's modules using kldstat
+
+0.02    2009-11-09
+        Fix typo in tests
+
+0.01    2009-11-06
+        First version: freebsd, linux
+

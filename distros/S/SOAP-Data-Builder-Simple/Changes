@@ -1,0 +1,23 @@
+Revision history for SOAP-Data-Builder-Simple
+
+0.04  2015-02-16 18:08:47 GMT
+
+  [Maintenance]
+  - more tests
+  - tidying up build process (use Dist::Milla)
+  - fixing test breakages (more general matching of output)
+
+0.03  2014-11-17 10:07:37 GMT
+
+  - Allow SOAP::Data objects as values
+  - Fixed pre-requisite version of List::Util
+
+0.02  2014-11-14 16:57:00 GMT
+
+  - Switched from using SOAP::Data::Builder to calling SOAP::Data directly
+  - Improved interface and documentation
+
+0.01  2014-11-03 10:56:43 GMT
+
+  - Initial release
+

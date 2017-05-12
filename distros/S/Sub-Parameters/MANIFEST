@@ -1,0 +1,7 @@
+README
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+lib/Sub/Parameters.pm
+t/Sub-Parameters.t
+t/Sub-Parameters_alternate.t

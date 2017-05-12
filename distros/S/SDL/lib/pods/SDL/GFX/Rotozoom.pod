@@ -1,0 +1,113 @@
+
+=head1 NAME
+
+SDL::GFX::Rotozoom - rotation and zooming functions for surfaces
+
+=head1 CATEGORY
+
+GFX
+
+=head1 CONSTANTS
+
+The constants are exported by default. You can avoid this by doing:
+
+ use SDL::GFX::Rotozoom ();
+
+and access them directly:
+
+ SDL::GFX::Rotozoom::SMOOTHING_OFF;
+
+or by choosing the export tags below:
+
+Export tag: ':smoothing'
+
+ SMOOTHING_OFF
+ SMOOTHING_ON
+
+=head1 METHODS
+
+=head2 surface
+
+ my $new_surface = SDL::GFX::Rotozoom::surface( $surface, $angle, $zoom, $smooth );
+
+With C<SDL::GFX::Rotozoom::surface> you have the opportunity to rotate and zoom a given surface.
+The surface will be rotated counter clockwise (in degrees).
+Pass C<SMOOTHING_ON> or C<SMOOTHING_OFF> in order to turn it on or off.
+
+B<Note>: The new surface (with $C<zoom == 1>) will usually be bigger than the source C<$surface>.
+
+B<Note>: Note: new surface should be less than 16384 in width and height.
+
+Example:
+
+ use SDL;
+ use SDL::Video;
+ use SDL::Rect;
+ use SDL::Surface;
+ use SDL::GFX::Rotozoom;
+ 
+ my $screen_width  = 640;
+ my $screen_height = 480;
+ 
+ SDL::init(SDL_INIT_VIDEO);
+ 
+ my $screen  = SDL::Video::set_video_mode(800, 600, 32, SDL_SWSURFACE);
+ my $picture = SDL::Video::load_BMP('test.bmp');
+ 
+ my $rotated = SDL::GFX::Rotozoom::surface( $picture, 45, 0.8, SMOOTHING_ON );
+ 
+ SDL::Video::blit_surface( $rotated, SDL::Rect->new(0, 0, $rotated->w, $rotated->h), 
+                           $screen,  SDL::Rect->new(0, 0, 0, 0) );
+ 
+ SDL::Video::update_rect( $screen, 0, 0, 0, 0 );
+ 
+ sleep(2);
+
+=head2 surface_xy
+
+ my $new_surface = SDL::GFX::Rotozoom::surface_xy( $surface, $angle, $zoom_x, $zoom_y, $smooth );
+
+Same as L<SDL::GFX::Rotozoom::surface|/surface> but you can specify the zoomlevel for x and y separately.
+
+=head2 surface_size
+
+ my ($new_width, $new_height) = @{ SDL::GFX::Rotozoom::surface_size( $width, $height, $angle, $zoom ) };
+
+C<surface_size> will give you the width and height of an rotating/zoom operation for the given C<$width> and C<$height>.
+Helpful for knowing the surface size before actually do the rotating/zoom operation.
+
+=head2 surface_size_xy
+
+ my ($new_width, $new_height) = @{ SDL::GFX::Rotozoom::surface_size_xy( $width, $height, $angle, $zoom_x, $zoom_y ) };
+
+Same as L<SDL::GFX::Rotozoom::surface_size|/surface_size> but you can specify the zoomlevel for x and y separately.
+
+=head2 zoom_surface
+
+ my $new_surface = SDL::GFX::Rotozoom::zoom_surface( $surface, $zoom_x, $zoom_y, $smooth );
+
+Same as L<SDL::GFX::Rotozoom::surface_xy|/surface_xy> except you can zoom only.
+
+=head2 zoom_surface_size
+
+ my ($new_width, $new_height) = SDL::GFX::Rotozoom::zoom_surface_size( $width, $height, $zoom_x, $zoom_y );
+
+Same as L<SDL::GFX::Rotozoom::surface_size_xy|/surface_size_xy> except you can specify zoom only.
+
+=head2 shrink_surface
+
+ my $new_surface = SDL::GFX::Rotozoom::shrink_surface( $surface, $factor_x, $factor_y );
+
+Specialized function for shrinking a surface.
+
+=head2 rotate_surface_90_degrees
+
+ my $new_surface = SDL::GFX::Rotozoom::rotate_surface_90_degrees( $surface, $num_clockwise_turns );
+
+Rotating a surface C<$num_clockwise_turns>-times.
+
+=head1 AUTHORS
+
+See L<SDL/AUTHORS>.
+
+

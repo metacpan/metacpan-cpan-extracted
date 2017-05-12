@@ -1,0 +1,88 @@
+SMS/API version 2.01
+===================
+1)INSTALLATION
+2)Synopsis (example)
+3)Description
+4)Author
+5)Licence
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+For any help visit http://www.goyali.com
+
+
+SMS::API - A module to send SMS using the sms1.in servers
+
+SYNOPSIS
+
+ use HTTP::Request::Common;
+  use LWP::UserAgent;
+  use SMS::API;
+my $email = 'test@webbee.biz';
+my $password= 'demo';
+my $to = '919911111111'; #Substitute by a valid International format mobile number to whom you wanted to send SMS. eg. 919811111111 where 91 is indian isd code.
+$message= 'Wow ! This site rocks.';
+  my $sms = SMS::API->new(
+    'email' => "$email",
+    'password' => "$password",
+    'to' =>  "$to",
+    'message'=>"$message", #Max 160 characters Message.
+      );
+print $sms->send;
+
+
+DESCRIPTION
+
+This is a module for sending the SMS by integrating with the servers of http://www.sms1.in
+
+For a solution of directly sending the SMS via internet or through SMS visit http://www.sms1.in
+In case of any problem whatsoever please do not hesitate to contact http://www.sms1.in/ .We have an excellent team of customer support and you will be responded in hours.
+
+NOTE: You first need to register at http://www.sms1.in/ (visit the URL and request a sms gateway account. You will given one within seconds and it is free)for using this module. On registering you will be given a user id and password and some free test credits. You can use the credits to send the SMS.
+
+NOTE: We are very serious about this module and any errors performed are requested to be reported at http://www.sms1.in/
+
+NOTE: This module has a dependency over LWP::UserAgent and HTTP::Request::Common and that must be installed to properly send the SMSes . It can be obtained easily from cpan.
+
+At the moment these methods are implemented:
+
+new
+
+A constructor
+
+The parameters sent are :
+email , password = The user name and Password given to you at the time of signup.
+message = The message you wish to send.
+from = If your account supports dynamic sender id then this parameter will tell what will be the from id as seen by the mobile.
+to = The mobile number whom you wish to send SMS to in international  format eg. 919811111111 .
+
+send
+
+This method send an SMS.
+On successful sending the SMS the function returns the error text / success text.
+
+You can also visit the SMS1.in to check the status by logging on to your account.
+
+And do not forget to inform the author of any bugs you encountered or the features you want into that.
+
+NOTE:
+This module was initially made for the indian audience and so was the site http://sms1.in , international customers were also brought in later but you need to place a special request for that.
+As alread mentioned sms1.in prouds to have a good support and you will be replied faster than expected.
+
+AUTHOR
+
+<Abhishek jain>
+goyali at cpan.org
+
+SEE ALSO
+
+http://www.sms1.in
+
+

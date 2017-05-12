@@ -1,0 +1,30 @@
+% if ( $process->is_complete() ) {
+%   if ( $process->was_successful() ) {
+<p>
+<% loc( 'Import is complete. You can <a href="%html(%1)">visit the imported wiki</a>', $process->final_result() ) %>
+</p>
+%   } else {
+<p>
+<% loc('Import failed.') %>
+</p>
+%   }
+% } else {
+<pre id="process-status" class="js-process-id-<% $process->process_id() %> js-process-type-Import">
+<img src="/images/small-spinner.gif" /> <% loc('Waiting for import to start ...') %>
+</pre>
+% }
+<div id="process-complete" style="display: none">
+<% loc('You can <a href="@result@">visit the imported wiki</a>.') | n %>
+</div>
+
+<%args>
+$process
+</%args>
+
+<%method title>
+<% loc('Importing a Wiki') %>
+</%method>
+
+<%flags>
+inherit => '/autohandler'
+</%flags>

@@ -1,0 +1,302 @@
+---
+abstract: 'SMS::Send driver to send messages via TMC (http://www.tmcsms.com/)'
+author:
+  - 'Nigel Metheringham <nigelm@cpan.org>'
+build_requires:
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Module::Build: 0.3601
+  Scalar::Util: 0
+  Test::More: 0.94
+  perl: 5.004
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.132661'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: SMS-Send-TMC
+provides:
+  SMS::Send::TMC:
+    file: lib/SMS/Send/TMC.pm
+    version: 0.01
+requires:
+  Carp: 0
+  LWP::Protocol::https: 0
+  LWP::UserAgent: 0
+  SMS::Send::Driver: 0
+  URI::Escape: 0
+  base: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=SMS-Send-TMC
+  homepage: https://metacpan.org/release/SMS-Send-TMC
+  repository: git://github.com/nigelm/sms-send-tmc.git
+version: 0.01
+x_Dist_Zilla:
+  perl:
+    version: 5.018001
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::Git::NextVersion
+      name: '@NIGELM/Git::NextVersion'
+      version: 2.014
+    -
+      class: Dist::Zilla::Plugin::Git::Check
+      name: '@NIGELM/Git::Check'
+      version: 2.014
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      name: '@NIGELM/GatherDir'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::Test::Compile
+      config:
+        Dist::Zilla::Plugin::Test::Compile:
+          module_finder:
+            - ':InstallModules'
+          script_finder:
+            - ':ExecFiles'
+      name: '@NIGELM/Test::Compile'
+      version: 2.033
+    -
+      class: Dist::Zilla::Plugin::Test::Perl::Critic
+      name: '@NIGELM/Test::Perl::Critic'
+      version: 2.112410
+    -
+      class: Dist::Zilla::Plugin::MetaTests
+      name: '@NIGELM/MetaTests'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: '@NIGELM/PodCoverageTests'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@NIGELM/PodSyntaxTests'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::Test::PodSpelling
+      name: '@NIGELM/Test::PodSpelling'
+      version: 2.006001
+    -
+      class: Dist::Zilla::Plugin::KwaliteeTests
+      name: '@NIGELM/KwaliteeTests'
+      version: 1.101420
+    -
+      class: Dist::Zilla::Plugin::Test::Portability
+      name: '@NIGELM/Test::Portability'
+      version: 2.000005
+    -
+      class: Dist::Zilla::Plugin::Test::Synopsis
+      name: '@NIGELM/Test::Synopsis'
+      version: 2.000004
+    -
+      class: Dist::Zilla::Plugin::Test::MinimumVersion
+      name: '@NIGELM/Test::MinimumVersion'
+      version: 2.000005
+    -
+      class: Dist::Zilla::Plugin::HasVersionTests
+      name: '@NIGELM/HasVersionTests'
+      version: 1.101420
+    -
+      class: Dist::Zilla::Plugin::Test::DistManifest
+      name: '@NIGELM/Test::DistManifest'
+      version: 2.000004
+    -
+      class: Dist::Zilla::Plugin::Test::UnusedVars
+      name: '@NIGELM/Test::UnusedVars'
+      version: 2.000005
+    -
+      class: Dist::Zilla::Plugin::NoTabsTests
+      config:
+        Dist::Zilla::Plugin::Test::NoTabs:
+          module_finder:
+            - ':InstallModules'
+          script_finder:
+            - ':ExecFiles'
+      name: '@NIGELM/NoTabsTests'
+      version: 0.04
+    -
+      class: Dist::Zilla::Plugin::EOLTests
+      name: '@NIGELM/EOLTests'
+      version: 0.02
+    -
+      class: Dist::Zilla::Plugin::InlineFiles
+      name: '@NIGELM/InlineFiles'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::ReportVersions
+      name: '@NIGELM/ReportVersions'
+      version: 1.110730
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@NIGELM/PruneCruft'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::PruneFiles
+      name: '@NIGELM/PruneFiles'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@NIGELM/ManifestSkip'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: '@NIGELM/AutoPrereqs'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@NIGELM/MetaConfig'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Class
+      config:
+        Dist::Zilla::Role::MetaProvider::Provider:
+          inherit_missing: 1
+          inherit_version: 1
+          meta_noindex: 1
+      name: '@NIGELM/MetaProvides::Class'
+      version: 1.14000001
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: '@NIGELM/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      config:
+        Dist::Zilla::Plugin::MetaProvides::Package: {}
+        Dist::Zilla::Role::MetaProvider::Provider:
+          inherit_missing: 1
+          inherit_version: 1
+          meta_noindex: 1
+      name: '@NIGELM/MetaProvides::Package'
+      version: 1.15000000
+    -
+      class: Dist::Zilla::Plugin::MetaResources
+      name: '@NIGELM/MetaResources'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::Authority
+      name: '@NIGELM/Authority'
+      version: 1.006
+    -
+      class: Dist::Zilla::Plugin::ExtraTests
+      name: '@NIGELM/ExtraTests'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: '@NIGELM/NextRelease'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::OurPkgVersion
+      name: '@NIGELM/OurPkgVersion'
+      version: 0.005000
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      config:
+        Dist::Zilla::Plugin::PodWeaver:
+          config_plugin: '@MARCEL'
+          finder:
+            - ':InstallModules'
+            - ':ExecFiles'
+      name: '@NIGELM/PodWeaver'
+      version: 3.102000
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@NIGELM/License'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::ModuleBuild
+      name: '@NIGELM/ModuleBuild'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@NIGELM/MetaYAML'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@NIGELM/MetaJSON'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::ReadmeAnyFromPod
+      name: '@NIGELM/ReadmeAnyFromPod'
+      version: 0.131500
+    -
+      class: Dist::Zilla::Plugin::ReadmeAnyFromPod
+      name: '@NIGELM/ReadmePodInRoot'
+      version: 0.131500
+    -
+      class: Dist::Zilla::Plugin::InstallGuide
+      name: '@NIGELM/InstallGuide'
+      version: 1.200000
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@NIGELM/Manifest'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      name: '@NIGELM/Git::Commit'
+      version: 2.014
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      name: '@NIGELM/Git::Tag'
+      version: 2.014
+    -
+      class: Dist::Zilla::Plugin::Git::CommitBuild
+      name: '@NIGELM/Git::CommitBuild'
+      version: 2.014
+    -
+      class: Dist::Zilla::Plugin::Git::Push
+      name: '@NIGELM/Git::Push'
+      version: 2.014
+    -
+      class: Dist::Zilla::Plugin::CheckChangeLog
+      name: '@NIGELM/CheckChangeLog'
+      version: 0.01
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@NIGELM/UploadToCPAN'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: Prereqs
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: 4.300039
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: 0
+    version: 4.300039
+x_authority: cpan:NIGELM

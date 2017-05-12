@@ -1,0 +1,51 @@
+Syntax-Collector
+================
+
+Created:      2012-02-15
+Home page:    <https://metacpan.org/release/Syntax-Collector>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Syntax-Collector>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.006	2013-11-20
+
+ [ Documentation ]
+ - Improve the bundled examples.
+
+0.005	2013-11-20
+
+ [ BACK COMPAT ]
+ - Almost complete rewrite, subclassing Exporter::Tiny.
+ - The IMPORT method no longer gets passed @_ from import, and is now
+   undocumented.
+
+ [ Packaging ]
+ - Drop Sub::Name dependency.
+ - Drop Test::Exception dependency.
+ - Drop Test::Warn dependency.
+ - Drop syntax.pm dependency.
+
+0.004	2012-09-07
+
+ [ Documentation ]
+ - Clean up documentation.
+
+ [ Packaging ]
+ - Drop PerlX::Maybe dependency.
+
+0.003	2012-05-11
+
+ [ Packaging ]
+ - Drop Sub::Uplevel dependency.
+
+ [ Other ]
+ - Added: Support an 'into' parameter.
+ - Borrow caller-fooling technique from Import::Into, so we no longer need
+   uplevel.
+ - IMPORT methods now get passed @_ from import.
+
+0.002	2012-02-16
+
+ - Cope better with modules that inherit their import routine.
+ - Make Sub::Uplevel more aggressive.
+
+0.001	2012-02-16	Initial release

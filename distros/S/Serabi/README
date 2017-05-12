@@ -1,0 +1,41 @@
+NAME
+    Serabi - Create REST-style web service with Riap backend
+
+VERSION
+    version 0.00
+
+DESCRIPTION
+    This will be a set of PSGI middlewares (Plack::Middleware::Serabi::*) to
+    help you build REST-style web service with Riap backend. This is meant
+    as an alternative (or companion) to Periuk (a.k.a.
+    Perinci::Access::HTTP::Server).
+
+    I currently have no plan implementing this, as I find Rinci/Riap easy to
+    implement and sufficient for a rich and usable API service. But this
+    library is mostly only about mapping HTTP requests (URI's, methods,
+    headers) as REST resources and verbs, and then mapping them to Riap
+    requests.
+
+STATUS
+    Nothing is implemented yet.
+
+FAQ
+  Serabi?
+    Serabi is a delicious traditional food from where I live (Java,
+    Indonesia). I picked the name after a Python project, jango-tastypie.
+    Aside from the name, both projects are unrelated.
+
+SEE ALSO
+    Rinci, Riap, Perinci, Periuk (Gosh, have I "gone Ruby"?)
+
+    django-tastypie, https://github.com/toastdriven/django-tastypie
+
+AUTHOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Steven Haryanto.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

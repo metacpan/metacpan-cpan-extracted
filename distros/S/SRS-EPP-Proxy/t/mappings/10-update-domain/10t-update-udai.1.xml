@@ -1,0 +1,34 @@
+<NZSRSResponse VerMajor="5" VerMinor="6" RegistrarId="119">
+        <Response Action="DomainUpdate" FeId="4" FeSeq="3567364" OrigRegistrarId="1" RecipientRegistrarId="119" Rows="1" TransId="sep.d2b95ee.2c7a.001">
+          <FeTimeStamp Day="11" Hour="12" Minute="39" Month="1" Second="32" TimeZoneOffset="+13:00" Year="2011"/>
+          <Domain Delegate="0" DomainName="cheese.net.te" RegistrantRef="1094908" RegistrarId="119" Status="Active" Term="1" UDAI="R75yheay">
+            <NameServers>
+              <Server FQDN="ns1.cheese.net.te" IP4Addr="202.77.240.34" IP6Addr="2404:131:0:D0::34:0"/>
+              <Server FQDN="ns3.cheese.net.te" IP4Addr="202.77.244.33" IP6Addr="2404:131:20D0:1::1"/>
+              <Server FQDN="ns2.cheese.net.te" IP4Addr="202.77.240.35" IP6Addr="2404:131:0:D0::35:0"/>
+            </NameServers>
+            <RegistrantContact HandleId="cheese" Name="Cheese.Net Ltd" Email="dns@cheese.net.te" ActionId="H11:35:28 2010">
+              <PostalAddress Address1="PO Box 11-222" Address2="M Street" City="Wellington" CountryCode="TE" PostalCode="6142"/>
+              <Phone AreaCode="4" CountryCode="64" LocalNumber="800 2267"/>
+              <Fax AreaCode="4" CountryCode="64" LocalNumber="800 5596"/>
+            </RegistrantContact>
+            <AdminContact HandleId="cheese" Name="Cheese.Net Ltd" Email="dns@cheese.net.te" ActionId="H11:35:28 2010">
+              <PostalAddress Address1="PO Box 11-222" Address2="M Street" City="Wellington" CountryCode="TE" PostalCode="6142"/>
+              <Phone AreaCode="4" CountryCode="64" LocalNumber="800 2267"/>
+              <Fax AreaCode="4" CountryCode="64" LocalNumber="800 5596"/>
+            </AdminContact>
+            <TechnicalContact HandleId="auto_technical" Name="Cheese DNS Administrator" Email="dns@cheese.net.te" ActionId="H11:17:28 2010">
+              <PostalAddress Address1="PO Box 11-222" City="Wellington" CountryCode="TE"/>
+              <Phone AreaCode="4" CountryCode="64" LocalNumber="800-2267"/>
+            </TechnicalContact>
+            <BilledUntil Day="07" Hour="00" Minute="00" Month="2" Second="00" TimeZoneOffset="+13:00" Year="2011"/>
+            <RegisteredDate Day="07" Hour="00" Minute="00" Month="12" Second="00" TimeZoneOffset="+13:00" Year="1998"/>
+            <AuditDetails ActionId="sep.d2b95ee.2c7a.001" RegistrarId="1">
+              <AuditTime>
+                <From Day="11" Hour="12" Minute="39" Month="1" Second="32" TimeZoneOffset="+13:00" Year="2011"/>
+              </AuditTime>
+              <AuditText/>
+            </AuditDetails>
+          </Domain>
+        </Response>
+</NZSRSResponse>

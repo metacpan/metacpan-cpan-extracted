@@ -1,0 +1,12 @@
+MANIFEST                        This file
+HISTORY                         Revision history
+README                          Readme file
+SimpleCDB.pm                    SimpleCDB module
+Makefile.PL                     Makefile generator
+test.pl                         make test script
+examples/testdbm.pl             Test any of [NSO]DBM
+examples/testsimplecdb.pl       Test the SimpleCDB with multiple readers
+examples/grep.pl                Iterate over a SimpleCDB
+examples/wr.pl                  Create a SimpleCDB, populated with random data
+examples/rd.pl                  Read a given record from a SimpleCDB
+examples/storable.pl            Example of using Storable to store complex data

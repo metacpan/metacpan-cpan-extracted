@@ -1,0 +1,17 @@
+Build.PL
+Changes
+MANIFEST
+Makefile.PL
+README
+META.yml
+Statistics-Autocorrelation.ppd
+lib/Statistics/Autocorrelation.pm
+t/00-load.t
+t/01-basics.t
+t/02-nist_ref.t
+t/03-neg_lag.t
+t/04-correlogram.t
+t/05-PASW_RiessData.t
+t/pod-coverage.t
+t/pod.t
+META.json

@@ -1,0 +1,15 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/SQLite/Abstract.pm
+t/01_load.t
+t/02_tables.t
+t/03_insert.t
+t/04_update.t
+t/05_select.t
+t/06_delete.t
+t/07_unload.t
+META.yml                                 Module meta-data (added by MakeMaker)

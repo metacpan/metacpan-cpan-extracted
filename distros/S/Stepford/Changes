@@ -1,0 +1,251 @@
+0.004001 2017-02-14
+
+- Fixed an issue where Stepford would fail if $_ was modified by a
+  step.
+- Removed duplicate "Running.." message during sequential runs.
+
+
+0.004000 2017-01-25
+
+- The internals of Stepford were largely rewritten. The planner contained
+  significant bugs that caused Stepford to run or skip steps incorrectly,
+  particularly on complex trees.
+- If a dependency has an undef last_run_time, the step will always be re-run.
+  Previously, the step would be re-run only if all dependencies had an undef
+  last_run_time due to a bug.
+- Stepford::Planner, a deprecated class, was removed. Use Stepford::Runner
+  instead.
+
+
+0.003009 2016-09-29
+
+- Make Memory::Stats optional (since not all platforms can reliably install
+  it).
+
+
+0.003008 2016-07-13
+
+- Log output at the info level now includes details of memory usage as before
+  and after each step object is created.
+
+
+0.003007 2016-06-02
+
+- Added the force_step_execution option to Stepford::Runner to force running
+  all steps reguardless of the last run time.
+
+
+0.003006 2016-05-31
+
+- Fixed warning that could occur from trying to inline the constructor for
+  Stepford::Error. Since this class subclasses a Moo class, this could cause
+  issues.
+
+
+0.003005 2015-12-16
+
+- When running steps in parallel and a step in a child process dies, we now
+  include the step class name in the error message, which makes diagnosing
+  failures much easier.
+
+
+0.003004 2015-10-21
+
+- Updated some tests to work better on filesystems (e.g. OS X's HFS+) that
+  don't support sub-second accuracy on timestamps
+
+
+0.003003 2015-03-02
+
+- The fix for Atomic file generator steps in the last release introduced a new
+  bug. If the pre-commit and post-commit files both existed, the pre-commit
+  file would just be ignored. We want to use the pre-commit file whenever one
+  is generated.
+
+
+0.003002 2015-02-23
+
+[BACKWARDS INCOMPATIBILITIES]
+
+- When running in parallel, each step's run() method is executed in a
+  try/catch block. This should not affect your code unless you explicitly
+  checked $^S inside the run() method.
+
+[BUG FIXES]
+
+- When running in parallel, if the step dies, we now pass the error back to
+  the parent process and do not execute any more steps. We also now explicitly
+  handle steps calling exit() internally, as well as step processes exiting
+  because of some sort of external signal. Previously a child step could die
+  and the build would simply continue on.
+
+- Steps classes which consumed the Stepford::Role::Step::FileGenerator::Atomic
+  role would throw an error if their run() method did not produce a pre-commit
+  file, even if the final post-commit file _did_ exist. This should not be an
+  error, as it's up to each step to decide whether it needs to regenerate the
+  post-commit file.
+
+[ENHANCEMENTS]
+
+- Added more logging around the checks for whether a step needs to be re-run
+  based on last run time. This will make debugging unnecessary rebuilds much
+  simpler.
+
+
+0.003001 2014-12-17
+
+[BUG FIXES]
+
+- Remove use of Path::Class::File->copy_to method in a test, as this requires
+  new(ish) version of Path::Class (0.33), but nothing else in this distro
+  would require a specific new version (that we know of).
+
+
+0.003000 2014-12-02
+
+[BACKWARDS INCOMPATIBILITIES]
+
+- Renamed Stepford::Planner to Stepford::Runner. The old class name will still
+  work, but you will get a warning every time you call Stepford::Planner->new.
+
+[ENHANCEMENTS]
+
+- Added the Stepford::Role::Step::Unserializable role. This role tells the
+  Stepford::Runner not to run the step class in a forked process because it's
+  productions cannot be serialized. Instead, this step will be run in the same
+  process as the planner.
+
+
+0.002011 2014-11-13
+
+- The Stepford::Role::Step::FileGenerator::Atomic now creates its
+  pre_commit_file() in the same directory as the final file. Previously we
+  used a temp dir but renaming the pre_commit_file() to the final file could
+  fail if the two files were on different filesystems.
+
+
+0.002010 2014-11-12
+
+- Fixed a bug with Stepford::Role::Step::FileGenerator::Atomic steps and
+  parallel test runs. The step would create a temp directory in the parent
+  process which could be deleted by the time the step's run() method was
+  called in a child process.
+
+
+0.002009 2014-10-22
+
+- There is now a new Stepford::Role::Step::FileGenerator::Atomic role. This
+  role can be consumed by step classes which want to ensure that single file
+  is generated atomically. Implemented by Ran Eilam. GH #11.
+
+
+0.002008 2014-10-14
+
+- (Some) previous releases were missing a LICENSE file.
+
+
+0.002007 2014-09-30
+
+- FileGenerator steps can now return undef from the last_run_time() method in
+  order to indicate that the step must be re-run. The last_run_time() method
+  provided by the Stepford::Role::Step::FileGenerator role does this when any
+  of the production files are missing. Fixed by Ran Eilam. GH #9.
+
+- When running a parallel plan, steps that should have been rebuilt because of
+  stale files were not being rebuilt properly. Fixed by Ran Eilam. GH #10.
+
+
+0.002006 2014-08-12
+
+- The logger passed to each step class is now wrapped to prepend a per-step
+  class moniker to each log message. This makes following the logs for a
+  parallel run much easier.
+
+- The planner object now recognizes inner classes created by any files that it
+  loads. This means you can create step classes on the fly and the planner
+  will recognize them as being valid.
+
+
+0.002005 2014-06-30
+
+- More doc fixes for Stepford::Runner. The docs on when we do error checks
+  and what type of errors are checked for were out of date.
+
+
+0.002004 2014-06-30
+
+- Fixed the Stepford::Runner docs. The docs said that the constructor
+  accepted a final_steps method, and did not document the parameter passed to
+  the run() method properly. Bug report by Olaf Alders. GH #5.
+
+
+0.002003 2014-06-19
+
+- Added debug level logging that explains how each dependency for each class
+  is resolved.
+
+
+0.002002 2014-06-02
+
+- The Stepford::Runner object now throws an error if it finds a class in any
+  given step namespace that is a subclass of Moose::Object but which doesn't
+  consume the Stepford::Role::Step role.
+
+
+0.002001 2014-05-21
+
+- Fixed an incorrect example in the Stepford::Runner SYNOPSIS and improved
+  the larger example in the Stepford.pm SYNOPSIS.
+
+
+0.002000 2014-05-21
+
+* Breaking API changes. Final step(s) are now passed to the $planner->run()
+  method rather than the Stepford::Runner constructor.
+
+- Implemented the ability to specify multiple final steps for a run.
+
+- Implemented parallel running.
+
+- All runs now end with a new step, Stepford::FinalStep. This just logs a
+  message saying that the run is complete.
+
+- Plans are now optimized so steps run as early as possible in the plan. This
+  helps improve parallelism and is just more generally correct. Thanks to Ran
+  Eilam for pointing me at a blog post
+  (blog.codeaholics.org/parallel-ant/#how-it-works) that described a very
+  simple algorithm to do this.
+
+
+0.001002 2014-04-22
+
+- Require Time::HiRes 1.9726. Some earlier versions broke constructs like
+  (stat $file)[9]. This construct is used in the Stepford::Role::FileGenerator
+  role.
+
+
+0.001001 2014-03-27
+
+- (Hopefully) Fix some test failures that look they're caused by hash
+  randomization. Reported by Slaven Rezic. GitHub issue #1.
+
+
+0.001000 2014-03-20
+
+- Totally redesigned the whole thing after discussions with Greg Oschwald here
+  at MaxMind. I did say this was alpha!
+
+
+0.000002 2014-03-03
+
+- The tests now require Time::HiRes 1.9722. It seems like the version shipped
+  before Perl 5.16 (1.9721_01) has a weird bug when used like this:
+
+      some_sub( (stat $file)[9] );
+
+  It seems to return the value "9" rather than the mtime.
+
+
+0.000001 2014-02-25
+
+- First release upon an unsuspecting world.

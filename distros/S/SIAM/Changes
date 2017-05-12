@@ -1,0 +1,55 @@
+Revision history for SIAM
+
+1.01    2014-08-22
+        * Object model has changed: removed ServiceDataElement, added
+          ServiceComponent and DeviceComponent
+
+0.10    2011-12-26
+        * new method: is_complete() in SIAM::Object
+
+0.09    2011-06-26
+        * memory cleanup on disconnect()
+
+0.08    2011-05-20
+        * SIAM::Device did not make it into CPAN
+
+0.07    2011-05-18
+        * new method in Simple driver:  object_exists()
+        *  new method in SIAM::Object:  objclass()
+        * call format changed for SIAM::Driver::Simple->clone_data
+        * new method: get_device() in SIAM::ServiceDataElement
+          and SIAM::ServiceUnit
+          
+0.06    2011-05-11
+        * Logging API changed
+        * SIAM initialization data changed
+        * Client configuration: $siam->get_client_config()
+        * new method: $siam->manifest_attributes()
+        * some attributes changed
+        
+0.05    2011-04-21
+        * Removed all attributes from the root object
+        * All SIAM attribute names are now prefixed with siam.*
+        * Replaced siam.svcdata.available with siam.object.complete
+        * set_condition(): a new method in SIAM::Object and in driver
+        * new method: get_objects_by_attribute in SIAM::Object
+        * new method: fetch_object_ids_by_attribute in driver
+        * new object class: SIAM::Device
+        
+0.04    2011-04-17
+        * YAML version 0.71 or higher required. The older ones did not treat
+        UTF-8 data correclty.
+
+        
+0.02    2011-04-13
+        * Removed Makefile.PL from distribution
+        * Replaced object.container_id with a method contained_in()
+        * Moved instantiate_object() from SIAM into SIAM::Object
+        * Added computable: siam.contract.content_md5hash
+        * Enabled driver validation
+        * Added method: SIAM::Driver::Simple->clone_data
+
+        
+0.01    2011-04-04
+        First version uploaded to CPAN
+       

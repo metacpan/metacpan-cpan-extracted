@@ -1,0 +1,6 @@
+# Test the error message if a subroutine has a run-time error
+
+default:
+	{
+            die "I don't wanna";
+	}

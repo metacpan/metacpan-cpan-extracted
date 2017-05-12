@@ -1,0 +1,10 @@
+Revision history for Sys-CmdMod
+
+0.18    2012-12-03
+        Fix plugin initialization issues
+
+0.17    2012-12-02
+        Change config module
+
+0.16    2012-11-27
+        First public version, released on an unsuspecting world.

@@ -1,0 +1,101 @@
+#!/usr/bin/ruby
+
+# Dice game solver
+
+var board = [
+             [4, 1, 3, 3, 5, 2],
+             [3, 4, 1, 2, 0, 3],
+             [5, 1, 5, 5, 4, 2],
+             [1, 3, 2, 5, 2, 1],
+             [6, 2, 4, 1, 5, 4],
+             [6, 2, 1, 6, 6, 3],
+            ]
+
+var moves = Hash.new(
+                'up'         => [-1, +0],
+                'up-right'   => [-1, +1],
+                'up-left'    => [-1, -1],
+                'right'      => [+0, +1],
+                'left'       => [+0, -1],
+                'down'       => [+1, +0],
+                'down-left'  => [+1, -1],
+                'down-right' => [+1, +1],
+             )
+
+var directions = moves.keys;
+
+func valid_move (row, col) {
+
+    row < 0 && return false;
+    col < 0 && return false;
+
+    board.has_index(row)      || return false;
+    board[row].has_index(col) || return false;
+
+    return true;
+}
+
+loop {
+
+    var map  = Hash.new;
+    var seen = Hash.new;
+    var dirs = Array.new;
+    var spos = Hash.new;
+
+    var current_pos = [board.end, 0];
+    var current_num = board[current_pos[0]][current_pos[1]];
+
+    spos{current_pos.join(';')} = 1;
+
+    {
+        var dir = (
+         map.has_key(current_num)
+          ? map{current_num}
+          : (
+            var d = '';
+            do {
+                d = directions[directions.len.rand]
+            } while (map.values.contains(d));
+            d;
+          )
+        );
+
+        var pos = moves{dir};
+        var row = current_pos[0]+pos[0];
+        var col = current_pos[1]+pos[1];
+
+        valid_move(row, col) || break;
+
+        dirs.push(
+                  Hash.new(
+                        'dir' => dir,
+                        'num' => current_num,
+                        'pos' => current_pos,
+                   )
+                );
+
+        map{current_num} := dir;
+        current_pos = [row, col];
+        current_num = board[current_pos[0]][current_pos[1]];
+
+        if (spos{current_pos.join(';')} := 0 ++ > 1) {
+            break;
+        }
+
+        seen{current_num} := 0 ++;
+
+        if (current_num == 0) {
+
+            if (seen{board[current_pos[0] - pos[0]][current_pos[1] - pos[1]]} > 1) {
+                dirs.each { |hash|
+                    "Go %-40s (from num '%s')\n".printf(hash{:dir}, hash{:num});
+                };
+                goto :END;
+            }
+
+            break;
+        }
+
+    } * (board.end ** 2);
+}
+@:END;

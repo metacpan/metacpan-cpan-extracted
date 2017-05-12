@@ -1,0 +1,58 @@
+Revision history for Perl extension String-FlexMatch
+
+1.100820  2010-03-23 19:34:28 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+0.13  Wed 2010.02.10 11:53:45 CET (Marcel Gruenauer <marcel@cpan.org>)
+     - Changed dist style and Changes back to standard. People didn't like it -
+       the nail that sticks out gets hammered down.
+     - Added standard test files; this will also help with CPANTS.
+
+0.12  Thu, 29 May 2008 12:07:50 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - set the version to 0.12
+     - moved generated documentation of interited methods to after
+       documentation of this class' methods so the manpage is more readable
+     - .shipit: fixed svk.tagpattern
+
+0.11  Sat, 24 Nov 2007 21:56:44 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - Converted Changes file to YAML style
+     - .shipit: added Twitter step
+     - Makefile.PL: added auto_install() and process_templates()
+     - lib/*: converted to template
+     - updated MANIFEST
+     - updated t/perlcriticrc
+     - Makefile.PL: now requires Class::Accessor::Complex 0.12
+     - tags: NEWFEATURE
+
+0.10  Sat, 20 Oct 2007 22:35:03 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - simplified accessor declaration
+
+0.09  Thu, 18 Oct 2007 10:09:39 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - fixed version requirement of Test::More
+
+0.08  Wed, 17 Oct 2007 13:07:50 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - switched from Class::MethodMaker to Class::Accessor::Complex
+
+0.07  Thu, 04 Oct 2007 17:31:55 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - brought it into shape for CPAN release
+
+0.06  Wed, 16 Feb 2005 12:45:19 +0100 (Marcel Gruenauer <marcel@cpan.org>)
+     - added support for YAML::Active's Dump()
+
+0.05  Thu, 04 Sep 2003 12:47:18 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - now uses Module::Build and generates META.yml and Makefile.PL
+     - added documentation for accessors and overloaded operators
+
+0.04  Thu, 04 Sep 2003 00:20:30 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - added YAML and Test::More to Makefile.PL's PREREQ_PM (thanks Andrew
+       Savige)
+     - simplified is_eq() somewhat (thanks Steffen Mueller)
+
+0.03  Tue, 02 Sep 2003 13:01:15 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - now uses Class::MethodMaker for constructor generation
+
+0.02  Tue, 02 Sep 2003 10:45:23 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - first working implementation
+
+0.01  Mon, 01 Sep 2003 23:52:02 +0100 (Marcel Gruenauer <marcel@cpan.org>)
+     - original version

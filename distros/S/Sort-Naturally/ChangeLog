@@ -1,0 +1,13 @@
+Revision history for Perl module Sort::Naturally
+
+2012-04-11  bingos         bingos@cpan.org
+
+  * release 1.03 -- modernise the distribution
+
+2004-12-29  Sean M. Burke  sburke@cpan.org
+
+	* Release 1.02 -- just rebundling, no code changes
+
+2001-05-25  Sean M. Burke  sburke@cpan.org
+
+	* Release 1.01 -- first public release.

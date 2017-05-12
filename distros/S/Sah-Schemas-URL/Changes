@@ -1,0 +1,23 @@
+0.004   2017-03-09 (PERLANCAR)
+
+	- [Bugfix] obj::str_url coercion rule must not be enabled by
+	  default for all object, only for 'url' schema.
+
+
+0.003   2017-02-25 (PERLANCAR)
+
+        - [Incompatible] Change type of url from str to URI object, provide
+          coercion rule from str.
+
+
+0.002   2016-07-22 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild, forgot to activate DZP:Sah::Schemas and
+          PWP:Sah::Schemas.
+
+
+0.001   2016-07-22 (PERLANCAR)
+
+        - First release.

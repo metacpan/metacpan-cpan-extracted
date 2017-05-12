@@ -1,0 +1,10 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Sys::GNU::ldconfig;
+
+foreach my $part ( @ARGV ) {
+    print "$part: ", ld_lookup( $part )||'N/A', "\n";
+}

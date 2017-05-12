@@ -1,0 +1,201 @@
+Spreadsheet::Perl
+=================
+
+insert_rows_columns works only in the same spreadsheet
+	this can be fixed though, Recalc and use dependents to modify
+	inter spreadsheet formulas
+
+deletion of cell should update the dependent list
+
+insert_rows_columns check formulas to see if they are inlclusive in the
+	insertion range. should they check for intersection as Delete_column does?
+
+subs checking if a cell or range is contained or intersect with another range MUST first Canonize the range so named ranges work too
+
+Named cells in insertion/deletion
+
+dependents are stored by name not by reference, thus do not work, yet, with
+insert and delete
+
+tests for col/row insertion
+
+if a cell contains a formula calculation error (#ERROR, #REF, ..) 
+	should Sum ingnore it or return an error (better is a value telling
+	where the error is comming from
+
+should arithmetic formulas consider undefed cells like cells containing 0?
+
+test function are_spreadsheet_values_equal
+
+cache the result of list context CanonizeAddress to speed up things
+
+code is not documented making the API difficult to grasp and use
+
+find a way to move the examples to tests
+
+function to show cell dependencies
+	in a tree mode with formulas, based on get dependencies. also show the cell
+	names if any
+
+verification at load time of the formulas could be optional
+
+factorize formula code in STORE/FETCH, is it needed in STORE?
+
+default file format should be perl, writable too (dump streamer?)
+
+function definitions should be object specific, OK as class specific but a choice should exist
+
+debugging mode to show where the functions are called
+
+#!Use new ASCIITAble.
+
+-a column/row stores default value for unset cells ? Use Fetch callback
+-spreadsheet (0,0) stores default value for unset cells ? Use Fetch callback
+
+What do we call before we clear the spreadsheet? rows or columns?
+
+DBI interface
+
+R1C1 reference in formulas => $ss{"+1,-3"}
+
+Insertion of rows and columns (=> inter spreadsheet formulas !!)
+Sorting (=> formulas !!)
+	option to invalidate all formulas containing a ref to the deleted row ...
+
+Generate graphs, pies, ..
+
+Composite initialisation type? Composite(PerlFormula(), 7, Format(), ....) ;
+Clear(FORMULA, VALUE, FORMAT, ALL) ;
+
+perl debugger support/triggers
+
+#Common format
+	#register non spreadsheet formulas => builtin functions serialisation
+	
+	#update serialization
+	#update deserialisation
+	
+	#update documentation
+	#have a formula and a perl_formula field
+	
+#write should serialize using multilines if formulas are so written.
+#!!!!! accept x\s+,\s+y as address
+
+#-----
+
+#Fix the name export problem
+
+#Symbolic formulas => translator? or simpy refuse it
+#Symbolic addressing? partly done through perl.
+
+#function to list the available spreadsheet functions and where they are comming from ?
+#keep the list of added functions
+#AddFunction can take a text rep for the function
+#Read/Write
+
+#Fetch and store sub should have symbolic names that can be used when debugging
+#DEBUG::INLINE_INFORMATION
+
+#$ss->Formula( F1, F2, ...) ;
+#$ss->{DEBUG}{FETCH} = sub. See {DEBUG}{FETCH_TRIGGER}
+
+#dump to screen in cell form
+#handle page width
+#redraw the row header if multi page
+
+#dump to html table
+#Autofill example
+#RE-think AUTOCALC!
+#one naming function for range and cell (recursive within call)
+#DefineSpreadsheetFunction, remove object function
+#No cache at spreadsheet level
+#Ref RefNoCache
+#run the formulas in script namespace ? => No
+range limit ('B*'), what are the semantics of '*'?
+
+#Find
+[addresses] = Find(regexes and/or subs, range[s]),
+@adresses = map{$_->[0] ;}
+		grep{test($_->[1])}
+			map{[$_, $ss->Get($_)]} $ss->GetAddressList(@ranges) ;
+			
+@values = grep{test($_) ;} map{$ss->Get($_)} $ss->GetAddressList(@ranges) ;
+
+#Replace
+scalar = FindAndReplace(sub, ranges)
+
+Perl debugger support: breakpoint ...
+
+#Change DATA to CELLS
+
+#$ss{A9.USER_DATA} ;
+
+#Store callback
+
+#$ss->{DEBUG}{FETCH_CELL}{A1}++ /= sub ; # display message when 'A1' is fetched
+
+#!AddFormat should be deep => user can get the format and modify it
+
+#Let range share validators
+#Range fillers
+
+#a range is a spreadsheet (?) => fetching a range returns a list with alll the values
+
+#inter spreadsheet references ? Spreadsheets have names: 'main:A3:B7'
+	#$ss->AddSpreadsheet('name', reference_to_object) ;
+	#$ss->SetName, $ss->GetName
+	#sorting of cell names
+	
+#inter spreadsheets dependencies ??
+#inter spreadsheets cycles ?? 
+
+#Relative references : A1 and Absolute references : $A$1 in formulas
+#	=> absolute is '[A][1]'
+
+#F:OffsetFormula, GetAddressOffset  (x,y)
+#F:Copy, Copy(address/range) / Paste => easily done through hash slices
+
+modules: DBI URL-GET statistique ....
+modules: printing html-generation ImportExcel ...
+modules: autofill wizards ...
+
+#Fetchers => sub
+#Input validator => Add by name (lock is one)
+
+#Spreadsheet::Perl::Arithmetic::Sum ...
+#Spreadsheet::Perl::Arithmetic::Sum should take a list of ranges
+
+#row 0 is the header row
+
+#formulas are pure perl
+#formula defintions
+
+#function definitions
+
+#constructor arguments
+
+#setting through a data struct
+#dump
+
+#each cell is a hash internaly
+
+#named cell and range
+
+#locking per cell
+
+#format
+
+#AUTOCALC
+
+#no cycles are allowed (we can use the new cyclic module)
+#compute cells when needed only
+#dependencies changes mark the cell as needing update
+
+#sorting of cell names
+
+#F:GetCellList
+#F:GetLastIndexes
+
+
+
+

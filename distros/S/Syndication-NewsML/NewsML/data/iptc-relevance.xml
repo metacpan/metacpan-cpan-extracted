@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE TopicSet PUBLIC "urn:newsml:iptc.org:20001006:NewsMLv1.0.dtd:1" "NewsMLv1.0.dtd">
+<TopicSet Duid="iptc.relevance" FormalName="Relevance">
+	<Comment xml:lang="en">The manner in which a NewsComponent is relevant to the target audience specified by the OfInterestTo element.</Comment>
+	<Topic Duid="rel1">
+		<TopicType Scheme="IptcTopicType" FormalName="Relevance"/>
+		<FormalName Scheme="IptcRelevance">High</FormalName>
+		<Description xml:lang="en" Variant="">The content of the NewsItem is considered to be highly relevant to the target audience.</Description>
+	</Topic>
+	<Topic Duid="rel2">
+		<TopicType Scheme="IptcTopicType" FormalName="Relevance"/>
+		<FormalName Scheme="IptcRelevance">Medium</FormalName>
+		<Description xml:lang="en" Variant="">The content of the NewsItem is considered to be relevant to the target audience.</Description>
+	</Topic>
+	<Topic Duid="rel3">
+		<TopicType Scheme="IptcTopicType" FormalName="Relevance"/>
+		<FormalName Scheme="IptcRelevance">Low</FormalName>
+		<Description xml:lang="en" Variant="">The content of the NewsItem is considered to be of some relevance to the target audience.</Description>
+	</Topic>
+</TopicSet>
+

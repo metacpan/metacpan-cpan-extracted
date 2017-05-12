@@ -1,0 +1,47 @@
+0.008   2017-04-25 (PERLANCAR)
+
+	- Allow using DateTime::Format::Alami::*.
+
+
+0.007   2016-12-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- [Incompatible change] Rename module to by_* to be consistent with
+	  the convention.
+
+
+0.006   2016-12-18 (PERLANCAR) (unreleased)
+
+        - Rename module/dist from Sort-Sub-{,by_}date_in_text.
+
+
+0.005   2016-12-17 (PERLANCAR)
+
+	- No functional changes.
+
+        - [dist] Rebuild with update Pod::Weaver::Plugin::Sort::Sub.
+
+
+0.004   2016-12-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Add Pod::Weaver plugin: Sort::Sub to generate Synopsis
+	  etc.
+
+
+0.003   2016-12-16 (PERLANCAR)
+
+	- Add debugging message on DEBUG.
+
+
+0.002   2016-04-06 (PERLANCAR)
+
+	- Allow customizing which Date::Extract module to use (via
+	  PERL_DATE_EXTRACT_MODULE).
+
+
+0.001   2016-04-06 (PERLANCAR)
+
+        - First release.

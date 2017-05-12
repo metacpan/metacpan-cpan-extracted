@@ -1,0 +1,8 @@
+README
+Makefile.PL
+t/lrc.t		# general tests
+bench.pl	# tests comparing perl sub and XS based routine, requires Time::HiRes
+LRC.xs	# the heart of the module	
+LRC.pm
+LRC.pod	# documentation
+MANIFEST

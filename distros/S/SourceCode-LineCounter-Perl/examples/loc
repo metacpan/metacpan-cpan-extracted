@@ -1,0 +1,26 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use SourceCode::LineCounter::Perl;
+
+my $counter = SourceCode::LineCounter::Perl->new;
+
+foreach my $file ( @ARGV ) {
+	$counter->count( $file );
+	}
+
+my $template = <<'HERE';
+files: %s
+total: %s
+documentation: %s
+code: %s
+comment: %s
+blank: %s
+HERE
+
+printf $template,
+	scalar @ARGV,
+	map { $counter->$_() }
+		qw( total documentation code comment blank );

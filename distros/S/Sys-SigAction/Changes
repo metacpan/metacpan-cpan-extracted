@@ -1,0 +1,315 @@
+=head1 NAME
+
+Sys::SigAction::Changes - List of significant changes
+
+=head1 CHANGES
+
+Revision history for Sys::SigAction.
+
+=head2 Changes in Sys::SigAction 0.23  10 September 2016
+
+Responding to Bug: L<https://rt.cpan.org/Public/Bug/Display.html?id=105091>
+
+Renamed t/nested.t to t/inline_nested.t (don't execute this on arm platforms
+arm perl port appear to be at fault.  See t/inline_nested.t
+
+create new tests:
+
+   t/alternatives.t
+   t/recursive_nested.t
+
+Allow arm platforms, but skip t/inline_nested.t with a warning
+on arm platforms.
+
+Desupport perl 5.5 (that was soooo long ago > 12 years)... This
+allows me to turn on use warnings everywhere: Prompted by the Kwalitee 
+folks who noticed it was not used. 
+
+Set MIN_PERL_VERSION => 5.6.0 in Makefile.PL. 
+
+Referenced the new github repository in the generated META.* files:
+L<https://github.com/labaxter/sys-sigaction>
+
+=head2 Changes in Sys::SigAction 0.22  July 31 2016
+
+Fix lack of interpolation in Makefile.PL for unsupported MSWin OS.
+
+
+=head2 Changes in Sys::SigAction 0.21  20 Nov 2013
+
+Remove erroneous note at the end of the POD related to references to
+this module in DBD:Oracle.  In reality the reference was in DBI, and it
+is still there.
+
+Close pod error bug (which referred to the above paragraph) submitted
+by the Debian Packaging team.
+
+=head2 Changes in Sys::SigAction 0.20  4 Aug 2013
+
+Even if C<Time::HiRes::ualarm()> exists, it may not necessarily
+work. (There were way too many broken smoke tests which might have been
+the result of this). One reason for this may also bave been that the test
+was looking for too small an interval in the sub-second timeout tests.  On busy 
+systems, this may also have been causing tests to fail.
+
+This version got rid of the attempt at tracking broken environments in timeout.t 
+(the hash structure mentioned in the previous change).
+
+The sub-second timer tests now set a timeout at 0.1 seconds, and check
+for a delta time that is less than 0.8 seconds. Proving that they completed
+in under 1 second. This provides a 0.7 second range of execution time to account
+for busy systems.  Previous tests, only allowed for something less than 0.1 second.
+
+Makefile.PL now looks for C<Time::HiRes::ualarm()>, and tests it.
+If it works, high resolution timeouts are enabled.
+Makefile.PL reports what it finds, and t/timeout.t reports when high
+resolution tests are disabled, but timeout.t should not fail because of
+this... it will just run fewer tests.
+
+=head2 Changes in Sys::SigAction 0.19  27 Jul 2013
+
+Change sig_alarm() to use HiRes::ualarm() instead of
+HiRes::alarm().  Hoping to fix hires test failures
+on some platforms.
+
+Build a hash structure in timeout.t to disable
+the HiRes tests on certain platforms where these functions may
+to be consistently broken, but disable them for at least
+another round, hoping that the change to using HiRes::ualarm()
+solves the problem. 
+
+Also, restructure timeout.t to hardcode the number of tests
+run.  Apparently Test::More on perl 5.8.x insisteds on getting
+the plan before ANY tests are run.
+
+Build similar structure in mask.t to disable
+the test on certain platforms were signal masking appears
+to be broken. Currently this is set to 
+
+   my $mask_broken_platforms = {
+       'archname' => { 'i686-cygwin-thread-multi-64int' => 1
+                     }
+      ,'perlver' =>  { 'v5.10.1' => 1 
+                     }
+   };
+
+
+Update Makefile.PL to note the fact the HiRes timeouts may 
+broken on some platforms.
+
+=head2 Changes in Sys::SigAction 0.18  24 Jul 2013
+
+Fix "bareword" error on some platforms at least, by explicitly importing
+INT_MAX from POSIX module.
+
+Fix Changes file which listed verson 0.16 twice when it should have
+list version 0.17 for the more recent changes.
+
+=head2 Changes in Sys::SigAction 0.17  22 Jul 2013
+
+Fix timeout.t to use POSIX::pause() instead of select(), which was used
+to optimized the while ( 1 ) loop in the forever function. This caused
+failures on some platforms.  pause() is right solution -- thanks (again)
+to Carsten Gaebler and for the suggestion for handling the Time::HiRes
+request.
+
+More double eval documentation cleanup that had not been previously
+caught in the POD. (bug #79130).
+
+When Time::HiRes is present, allow for long timeouts longer than the
+POSIX::INT_MAX microseconds when Time::HiRes is present.  Just call
+call alarm() instead of ualarm() in the case where input argument
+would result in a msecs value in an argument to ualarm which is
+larger than POSIX::INT_MAX (and, of course, add a test for this in
+timeout.t). (bug/enhancement request #75784)
+
+Fix typos in dbd-oracle-timeout.POD (bug #87141).  It appears that
+the DBD:oracle module may now have internal handling for this problem
+(DBD::oracle not longer references Sys::SigAction).
+
+=head2 Changes in Sys::SigAction 0.16  21 Jul 2013
+
+Thanks to excellent patches from Carsten Gaebler (contact me
+if you want to contact him), timeout_call() now supports
+passing an array of arguments which it will pass to the code
+it executes.
+
+Minor tweak to POD.
+
+=head2 Changes in Sys::SigAction 0.15  1 Jul 2011
+
+Clean up POD. Close bug #69057. Other minor tweaks to POD.
+
+=head2 Changes in Sys::SigAction 0.13  23 Jun 2011
+
+No functional changes. Fix for test timeout.t.
+Fix strict undefined symbol error in timeout.t, when Time::HiRes is not present.
+Not sure if constant pragma will exist in all supported perl versions,
+so, we just commented out the use strict in this test.
+
+Print warning when Time::HiRes not found in Makefile.PL
+
+=head2 Changes in Sys::SigAction 0.12  20 Jun 2011
+
+Conditionally add 'LICENSE' => 'perl' to WriteMakefile()
+call if $ExtUtils::MakeMaker::VERSION >= 6.3002.
+
+Added support for timeout_call() in fractional seconds
+expressed as a floating point number.  If Time::HiRes
+is not loadable, then the timeout value is raised to the
+next high integer value with the POSIX:ceil() funtion.
+
+Added sig_alarm(), which timeout_call uses. This is drop
+in replacement for alarm(). If Time::HiRes
+is not loadable, then the seconds argument is raised to the
+next high integer value with the POSIX:ceil() funtion.
+
+Update sample code to use double evals in response 
+
+   https://rt.cpan.org/Public/Bug/Display.html?id=50628
+
+The bug author wrote: 
+
+   Suppose the eval dies for some reason unrelated to the signal handling
+   just before the alarm expires, and then the code exits the eval, and
+   then the alarm expires before the final alarm(0) can be called. Now
+   either the code will completely die because there is no SIGALRM
+   handler in place to catch the signal, or the wrong handler (not the
+   local handler) will be called.
+
+Make the same change in timeout_call().  The change traps the 
+remote possibility that an alarm signal could arrive 
+between the time code dies (for some unrelated reason) and the 
+final eval is called or called.
+
+
+=head2 Changes in Sys::SigAction 0.11  31 Jan 2009
+
+Remove Restriction in License which required permission 
+to include in CDROM media for commercial distribution.
+
+License is now Straight GPL or Artistic as Perl is.
+
+Fix safe attribute for perl >= 5.8.2, but applying patch in 
+(duplicate) bugs:
+
+   http://rt.cpan.org/Ticket/Display.html?id=39599
+   http://rt.cpan.org/Ticket/Display.html?id=39946
+
+Test by cloning mask.t into safe.t in the block for perl => 5.008002 
+and test setting safe attribute. Sadly, using both masked signals
+and safe=>1 at the same time, is still broken.
+
+Add checks for unsupported configurations in Makefile.PL to (hopefully)
+suppress the Smoke test failures for those environments.
+
+Update documentation.
+
+Lincoln
+
+=head2 Changes in Sys::SigAction 0.10  24 Oct 2006
+
+Documentation cleanup, thanks to Tim Maher.
+
+Lincoln
+
+=head2 Changes in Sys::SigAction 0.09  17 Oct 2006
+
+Francesco has pointed out that I still have a special case 
+of safe=>0 broken for perl 5.8.0.  
+
+The perl 5.8.1 build I tested with (I could not find 5.8.0)
+it turns out has .../lib/5.8.1/auto/POSIX/SigAction/safe.al, 
+my previous tests works.
+
+This version of Sys::SigAction now as a test of these
+subtleties in t/safe.t, those still no real test of 
+safe=>1 for perls >= 5.8.2
+
+Lincoln
+
+=head2 Changes in Sys::SigAction 0.08  11 Oct 2006
+
+Add extra protection to test of $attrs->(safe} when
+the perl version is between 5.8 and 5.8.2, thanks to 
+Francesco Duranti. Now test for it being defined before
+testing it's value.  It would be a pretty bizarre case 
+for that to happen, but... belt and suspenders... is 
+'safe'.
+
+Fix warning in safe.t which referred to attrs.t (old test name)
+which was renamed to mask.t, to refer to mask.t.
+
+Lincoln
+
+=head2 Changes in Sys::SigAction 0.07  09 Oct 2006
+
+Version 0.06 broke in perl < 5.8.2... (who uses that any more!!!)
+Well someone does... at least on RedHat... I did (do) claim backwards
+compatibility... So I fixed it right this time, by checking the perl 
+version before called the safe accessor on the POSIX::SigAction object.
+
+Still no good test for safe mode... be prepared to send me a test
+if you think safe signal handling is broken... for sure I could
+not get it to work the way I think it should with with deferred 
+signals.
+
+Lincoln
+
+=head2 Changes in Sys::SigAction 0.06  25 June 2006
+
+Fix setting of SAFE flag in POSIX::sigaction.  In response
+to CPAN bug: http://rt.cpan.org/Ticket/Display.html?id=19916
+Thanks to Steve Purk?, for point this out.
+
+This required NOT setting safe=>1 (changing to to safe=>0)
+in t/attrs.t and the the dbd-oracle test script.
+
+A new test for safe=>1 needs to be developed, which explicitly tests
+deferred signal handling.  I would welcome such a contribution.
+
+Lincoln A Baxter
+
+=head2 Changes in Sys::SigAction 0.05  24 July 2004
+
+Fix typo in POD for mask => thanks to Henri Asseily
+This was apparently never uploaded. :-(
+
+Lincoln A Baxter
+
+=head2 Changes in Sys::SigAction 0.04  7 April 2004
+
+Modify forever() in timeout.t so just loop instead of trying
+to read from STDIN, which apparently does not block or immediately
+returns an error on some platforms or test environments
+
+Lincoln A Baxter
+ck 
+=head2 Changes in Sys::SigAction 0.03  4 April 2004
+
+Skip attrs.t test if perl version < 5.8.2 (rt.cpan.org ticket #5948)
+
+Rename dbd-oracle-timout.PL -> dbd-oracle-timeout.POD 
+
+=head2 Changes in Sys::SigAction 0.02  3 February 2004
+
+Comment out 'use warnings' for $] < 5.006
+
+Suppress undefined warning in destructor for $] < 5.008
+
+Documentation expansion and cleanup
+
+Add dbd-oracle-timeout.PL 
+
+Lincoln A Baxter
+
+=head2 Original version: Sys::SigAction 0.01  17 January 2004
+
+original version; created by h2xs 1.22 with options:
+
+   --compat-version=5.5.0 -X --name=Sys::SigAction  \
+   --use-new-tests --skip-warnings --version=0.01
+
+Lincoln A Baxter
+
+=cut

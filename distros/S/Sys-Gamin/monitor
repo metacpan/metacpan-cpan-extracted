@@ -1,0 +1,62 @@
+#!/usr/bin/env perl
+use Sys::Gamin;
+use autouse Pod::Usage => qw(pod2usage);
+pod2usage(VERBOSE => 1) unless @ARGV;
+
+my $fm=new Sys::Gamin;
+foreach (@ARGV) {
+  $fm->monitor($_);
+}
+my $ev;
+
+format STDOUT_TOP=
+TYPE        MONITOR                          FILE
+-----------------------------------------------------------------------------
+.
+format=
+@<<<<<<<<<<<@<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<@<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+$ev->type,  $fm->which($ev),           $ev->filename
+.
+
+while (1) {
+  do {
+    $ev=$fm->next_event;
+    write;
+  } while $fm->pending;
+  print <<EOL;
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+EOL
+}
+
+__END__
+
+=head1 NAME
+
+B<monitor> - monitor filesystem activity with FAM
+
+=head1 SYNOPSIS
+
+F<monitor> I<directory> | I<file> ...
+
+=head1 DESCRIPTION
+
+Provides a running tally of FAM events affecting the specified files or
+directories. Blocks separated by dotted lines indicate contiguous chunks of events in
+the event queue. Should be self-explanatory.
+
+Hit interrupt to stop the monitoring.
+
+=head1 SEE ALSO
+
+See L<SGI::FAM(3)> for the workings.
+
+=head1 AUTHORS
+
+J. Glick B<jglick@sig.bsh.com>.
+
+=head1 REVISION
+
+X<$Format: "F<$Source$> last modified $Date$ release $ProjectRelease$. $Copyright$"$>
+F<monitor> last modified Thu, 25 Sep 1997 22:56:42 -0400 release 1.002. Copyright (c) 1997 Strategic Interactive Group. All rights reserved. This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut

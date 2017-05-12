@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<svg height="300" width="500" xml:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+	<linearGradient id="gr_back01" x1="0%" x2="0%" y1="0%" y2="100%">
+		<stop offset="0%" style="stop-color:rgb(179,179,179);stop-opacity:1" />
+		<stop offset="100%" style="stop-color:rgb(248,248,248);stop-opacity:1" />
+	</linearGradient>
+	<polyline fill="black" fill-opacity="0.4" points="40,50 405,50 405,230 40,230 40,50" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0pt" />
+	<polyline fill="url(#gr_back01)" points="35,45 400,45 400,225 35,225 35,45" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.2pt" />
+	<text style="fill: black; font-family: Verdana; font-weight: 900; font-size: 13" x="35" y="22">My graph
+	</text>
+	<line stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.2pt" x1="35" x2="35" y1="45" y2="225" />
+	<line stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.2pt" x1="35" x2="42" y1="225" y2="245" />
+	<g style="fill: black; font-family: Verdana; font-size: 8" x="40" y="231">
+		<text transform="translate(40,233) rotate(70)">1
+		</text>
+		<animate attributeName="font-weight" begin="mouseover" end="mouseout" restart="whenNotActive" values="900" />
+		<animate attributeName="font-size" begin="mouseover" end="mouseout" restart="whenNotActive" values="9.6" />
+	</g>
+	<line stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.2pt" x1="217" x2="217" y1="45" y2="225" />
+	<line stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.2pt" x1="217" x2="224" y1="225" y2="245" />
+	<g style="fill: black; font-family: Verdana; font-size: 8" x="222" y="231">
+		<text transform="translate(222,233) rotate(70)">2
+		</text>
+		<animate attributeName="font-weight" begin="mouseover" end="mouseout" restart="whenNotActive" values="900" />
+		<animate attributeName="font-size" begin="mouseover" end="mouseout" restart="whenNotActive" values="9.6" />
+	</g>
+	<line stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.2pt" x1="400" x2="400" y1="45" y2="225" />
+	<line stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.2pt" x1="400" x2="407" y1="225" y2="245" />
+	<g style="fill: black; font-family: Verdana; font-size: 8" x="405" y="231">
+		<text transform="translate(405,233) rotate(70)">
+		</text>
+		<animate attributeName="font-weight" begin="mouseover" end="mouseout" restart="whenNotActive" values="900" />
+		<animate attributeName="font-size" begin="mouseover" end="mouseout" restart="whenNotActive" values="9.6" />
+	</g>
+	<line stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.2pt" x1="5" x2="400" y1="225" y2="225" />
+	<text style="text-anchor: end; fill: black; font-family: Verdana; font-size: 10" x="30" y="223">10
+	</text>
+	<line stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.2pt" x1="5" x2="400" y1="195" y2="195" />
+	<text style="text-anchor: end; fill: black; font-family: Verdana; font-size: 10" x="30" y="193">20
+	</text>
+	<line stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.2pt" x1="5" x2="400" y1="165" y2="165" />
+	<text style="text-anchor: end; fill: black; font-family: Verdana; font-size: 10" x="30" y="163">30
+	</text>
+	<line stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.2pt" x1="5" x2="400" y1="135" y2="135" />
+	<text style="text-anchor: end; fill: black; font-family: Verdana; font-size: 10" x="30" y="133">40
+	</text>
+	<line stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.2pt" x1="5" x2="400" y1="105" y2="105" />
+	<text style="text-anchor: end; fill: black; font-family: Verdana; font-size: 10" x="30" y="103">50
+	</text>
+	<line stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.2pt" x1="5" x2="400" y1="75" y2="75" />
+	<text style="text-anchor: end; fill: black; font-family: Verdana; font-size: 10" x="30" y="73">60
+	</text>
+	<line stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.2pt" x1="5" x2="400" y1="45" y2="45" />
+	<text style="text-anchor: end; fill: black; font-family: Verdana; font-size: 10" x="30" y="43">70
+	</text>
+	<rect fill="rgb(252,65,2)" height="9" rx="2pt" ry="2pt" stroke="rgb(0,0,0)" stroke-linecap="round" stroke-linejoin="round" stroke-width="1pt" width="7" x="415" y="51" />
+	<text style="text-anchor: start; fill: black; font-family: Verdana; font-weight: 600; font-size: 9" x="425" y="58">first
+	</text>
+	<rect fill="rgb(252,189,2)" height="9" rx="2pt" ry="2pt" stroke="rgb(0,0,0)" stroke-linecap="round" stroke-linejoin="round" stroke-width="1pt" width="7" x="415" y="66" />
+	<text style="text-anchor: start; fill: black; font-family: Verdana; font-weight: 600; font-size: 9" x="425" y="73">second
+	</text>
+	<linearGradient id="gr_azure_0" x1="0%" x2="100%" y1="0%" y2="0%">
+		<stop offset="0%" style="stop-color:rgb(2,189,252);stop-opacity:1" />
+		<stop offset="50%" style="stop-color:rgb(100,214,252);stop-opacity:1" />
+		<stop offset="100%" style="stop-color:rgb(2,189,252);stop-opacity:1" />
+	</linearGradient>
+	<linearGradient id="gr_carmine_0" x1="0%" x2="100%" y1="0%" y2="0%">
+		<stop offset="0%" style="stop-color:rgb(252,2,127);stop-opacity:1" />
+		<stop offset="50%" style="stop-color:rgb(252,100,176);stop-opacity:1" />
+		<stop offset="100%" style="stop-color:rgb(252,2,127);stop-opacity:1" />
+	</linearGradient>
+	<linearGradient id="gr_purple_0" x1="0%" x2="100%" y1="0%" y2="0%">
+		<stop offset="0%" style="stop-color:rgb(85,2,252);stop-opacity:1" />
+		<stop offset="50%" style="stop-color:rgb(151,100,252);stop-opacity:1" />
+		<stop offset="100%" style="stop-color:rgb(85,2,252);stop-opacity:1" />
+	</linearGradient>
+	<linearGradient id="gr_vermillion_0" x1="0%" x2="100%" y1="0%" y2="0%">
+		<stop offset="0%" style="stop-color:rgb(252,65,2);stop-opacity:1" />
+		<stop offset="50%" style="stop-color:rgb(252,138,100);stop-opacity:1" />
+		<stop offset="100%" style="stop-color:rgb(252,65,2);stop-opacity:1" />
+	</linearGradient>
+	<linearGradient id="gr_green_0" x1="0%" x2="100%" y1="0%" y2="0%">
+		<stop offset="0%" style="stop-color:rgb(23,252,2);stop-opacity:1" />
+		<stop offset="50%" style="stop-color:rgb(113,252,100);stop-opacity:1" />
+		<stop offset="100%" style="stop-color:rgb(23,252,2);stop-opacity:1" />
+	</linearGradient>
+	<linearGradient id="gr_gold_0" x1="0%" x2="100%" y1="0%" y2="0%">
+		<stop offset="0%" style="stop-color:rgb(252,189,2);stop-opacity:1" />
+		<stop offset="50%" style="stop-color:rgb(252,214,100);stop-opacity:1" />
+		<stop offset="100%" style="stop-color:rgb(252,189,2);stop-opacity:1" />
+	</linearGradient>
+	<linearGradient id="gr_blue_0" x1="0%" x2="100%" y1="0%" y2="0%">
+		<stop offset="0%" style="stop-color:rgb(2,2,252);stop-opacity:1" />
+		<stop offset="50%" style="stop-color:rgb(100,100,252);stop-opacity:1" />
+		<stop offset="100%" style="stop-color:rgb(2,2,252);stop-opacity:1" />
+	</linearGradient>
+	<linearGradient id="gr_cobalt_0" x1="0%" x2="100%" y1="0%" y2="0%">
+		<stop offset="0%" style="stop-color:rgb(2,85,252);stop-opacity:1" />
+		<stop offset="50%" style="stop-color:rgb(100,151,252);stop-opacity:1" />
+		<stop offset="100%" style="stop-color:rgb(2,85,252);stop-opacity:1" />
+	</linearGradient>
+	<linearGradient id="gr_orchid_0" x1="0%" x2="100%" y1="0%" y2="0%">
+		<stop offset="0%" style="stop-color:rgb(210,2,252);stop-opacity:1" />
+		<stop offset="50%" style="stop-color:rgb(227,100,252);stop-opacity:1" />
+		<stop offset="100%" style="stop-color:rgb(210,2,252);stop-opacity:1" />
+	</linearGradient>
+	<linearGradient id="gr_red_0" x1="0%" x2="100%" y1="0%" y2="0%">
+		<stop offset="0%" style="stop-color:rgb(252,6,2);stop-opacity:1" />
+		<stop offset="50%" style="stop-color:rgb(252,103,100);stop-opacity:1" />
+		<stop offset="100%" style="stop-color:rgb(252,6,2);stop-opacity:1" />
+	</linearGradient>
+	<linearGradient id="gr_violent_0" x1="0%" x2="100%" y1="0%" y2="0%">
+		<stop offset="0%" style="stop-color:rgb(127,2,252);stop-opacity:1" />
+		<stop offset="50%" style="stop-color:rgb(176,100,252);stop-opacity:1" />
+		<stop offset="100%" style="stop-color:rgb(127,2,252);stop-opacity:1" />
+	</linearGradient>
+	<linearGradient id="gr_amber_0" x1="0%" x2="100%" y1="0%" y2="0%">
+		<stop offset="0%" style="stop-color:rgb(252,102,2);stop-opacity:1" />
+		<stop offset="50%" style="stop-color:rgb(252,161,100);stop-opacity:1" />
+		<stop offset="100%" style="stop-color:rgb(252,102,2);stop-opacity:1" />
+	</linearGradient>
+	<linearGradient id="gr_lime_0" x1="0%" x2="100%" y1="0%" y2="0%">
+		<stop offset="0%" style="stop-color:rgb(85,252,2);stop-opacity:1" />
+		<stop offset="50%" style="stop-color:rgb(151,252,100);stop-opacity:1" />
+		<stop offset="100%" style="stop-color:rgb(85,252,2);stop-opacity:1" />
+	</linearGradient>
+	<linearGradient id="gr_yellow_0" x1="0%" x2="100%" y1="0%" y2="0%">
+		<stop offset="0%" style="stop-color:rgb(252,252,2);stop-opacity:1" />
+		<stop offset="50%" style="stop-color:rgb(252,252,100);stop-opacity:1" />
+		<stop offset="100%" style="stop-color:rgb(252,252,2);stop-opacity:1" />
+	</linearGradient>
+	<linearGradient id="gr_cyan_0" x1="0%" x2="100%" y1="0%" y2="0%">
+		<stop offset="0%" style="stop-color:rgb(2,252,252);stop-opacity:1" />
+		<stop offset="50%" style="stop-color:rgb(100,252,252);stop-opacity:1" />
+		<stop offset="100%" style="stop-color:rgb(2,252,252);stop-opacity:1" />
+	</linearGradient>
+	<linearGradient id="gr_jade_0" x1="0%" x2="100%" y1="0%" y2="0%">
+		<stop offset="0%" style="stop-color:rgb(2,252,106);stop-opacity:1" />
+		<stop offset="50%" style="stop-color:rgb(100,252,164);stop-opacity:1" />
+		<stop offset="100%" style="stop-color:rgb(2,252,106);stop-opacity:1" />
+	</linearGradient>
+	<linearGradient id="gr_chartreuse_0" x1="0%" x2="100%" y1="0%" y2="0%">
+		<stop offset="0%" style="stop-color:rgb(127,252,2);stop-opacity:1" />
+		<stop offset="50%" style="stop-color:rgb(176,252,100);stop-opacity:1" />
+		<stop offset="100%" style="stop-color:rgb(127,252,2);stop-opacity:1" />
+	</linearGradient>
+	<linearGradient id="gr_sapphire_0" x1="0%" x2="100%" y1="0%" y2="0%">
+		<stop offset="0%" style="stop-color:rgb(2,127,252);stop-opacity:1" />
+		<stop offset="50%" style="stop-color:rgb(100,176,252);stop-opacity:1" />
+		<stop offset="100%" style="stop-color:rgb(2,127,252);stop-opacity:1" />
+	</linearGradient>
+	<linearGradient id="gr_apple_0" x1="0%" x2="100%" y1="0%" y2="0%">
+		<stop offset="0%" style="stop-color:rgb(189,252,2);stop-opacity:1" />
+		<stop offset="50%" style="stop-color:rgb(214,252,100);stop-opacity:1" />
+		<stop offset="100%" style="stop-color:rgb(189,252,2);stop-opacity:1" />
+	</linearGradient>
+	<linearGradient id="gr_turquoise_0" x1="0%" x2="100%" y1="0%" y2="0%">
+		<stop offset="0%" style="stop-color:rgb(2,252,169);stop-opacity:1" />
+		<stop offset="50%" style="stop-color:rgb(100,252,201);stop-opacity:1" />
+		<stop offset="100%" style="stop-color:rgb(2,252,169);stop-opacity:1" />
+	</linearGradient>
+	<linearGradient id="gr_magenta_0" x1="0%" x2="100%" y1="0%" y2="0%">
+		<stop offset="0%" style="stop-color:rgb(252,2,252);stop-opacity:1" />
+		<stop offset="50%" style="stop-color:rgb(252,100,252);stop-opacity:1" />
+		<stop offset="100%" style="stop-color:rgb(252,2,252);stop-opacity:1" />
+	</linearGradient>
+	<linearGradient id="gr_fuchsia_0" x1="0%" x2="100%" y1="0%" y2="0%">
+		<stop offset="0%" style="stop-color:rgb(252,2,189);stop-opacity:1" />
+		<stop offset="50%" style="stop-color:rgb(252,100,214);stop-opacity:1" />
+		<stop offset="100%" style="stop-color:rgb(252,2,189);stop-opacity:1" />
+	</linearGradient>
+	<linearGradient id="gr_black_0" x1="0%" x2="100%" y1="0%" y2="0%">
+		<stop offset="0%" style="stop-color:rgb(0,0,0);stop-opacity:1" />
+		<stop offset="50%" style="stop-color:rgb(0,0,0);stop-opacity:1" />
+		<stop offset="100%" style="stop-color:rgb(0,0,0);stop-opacity:1" />
+	</linearGradient>
+	<linearGradient id="gr_scarlet_0" x1="0%" x2="100%" y1="0%" y2="0%">
+		<stop offset="0%" style="stop-color:rgb(252,2,85);stop-opacity:1" />
+		<stop offset="50%" style="stop-color:rgb(252,100,151);stop-opacity:1" />
+		<stop offset="100%" style="stop-color:rgb(252,2,85);stop-opacity:1" />
+	</linearGradient>
+	<linearGradient id="gr_mint_0" x1="0%" x2="100%" y1="0%" y2="0%">
+		<stop offset="0%" style="stop-color:rgb(2,252,65);stop-opacity:1" />
+		<stop offset="50%" style="stop-color:rgb(100,252,138);stop-opacity:1" />
+		<stop offset="100%" style="stop-color:rgb(2,252,65);stop-opacity:1" />
+	</linearGradient>
+	<linearGradient id="gr_highlight_0" x1="0%" x2="100%" y1="0%" y2="0%">
+		<stop offset="0%" style="stop-color:rgb(0,0,0);stop-opacity:1" />
+		<stop offset="50%" style="stop-color:rgb(100,100,100);stop-opacity:1" />
+		<stop offset="100%" style="stop-color:rgb(0,0,0);stop-opacity:1" />
+	</linearGradient>
+	<polyline fill="url(#gr_vermillion_0)" fill-opacity="1" points="38.5,225 125.75,225 125.75,213 38.5,213 38.5,225 " stroke="rgb(0,0,0)" stroke-linecap="butt" stroke-width="0pt" />
+	<rect fill="rgb(255,255,255)" fill-opacity="0.5" height="10" rx="2pt" ry="2pt" stroke="rgb(125,125,125)" stroke-linecap="round" stroke-linejoin="round" stroke-width="1pt" width="13" x="40.5" y="200" />
+	<text style="fill: rgb(0,0,0); font-family: Verdana; font-weight: 400; font-size: 8; stroke-linecap: round; stroke-linejoin: round" x="41.5" y="208">14
+	</text>
+	<polyline fill="url(#gr_gold_0)" fill-opacity="1" points="221,225 308.25,225 308.25,105 221,105 221,225 " stroke="rgb(0,0,0)" stroke-linecap="butt" stroke-width="0pt" />
+	<rect fill="rgb(255,255,255)" fill-opacity="0.5" height="10" rx="2pt" ry="2pt" stroke="rgb(125,125,125)" stroke-linecap="round" stroke-linejoin="round" stroke-width="1pt" width="13" x="223" y="92" />
+	<text style="fill: rgb(0,0,0); font-family: Verdana; font-weight: 400; font-size: 8; stroke-linecap: round; stroke-linejoin: round" x="224" y="100">50
+	</text>
+	<line stroke="rgb(39,39,219)" stroke-linecap="round" stroke-linejoin="round" stroke-width="1pt" x1="35" x2="410" y1="195" y2="195" />
+	<circle cx="410" cy="195" fill="white" r="2" stroke="rgb(39,39,219)" stroke-width="1pt" />
+	<text style="fill: black; font-family: Verdana; font-size: 8" x="408" y="191">minimum
+	</text>
+	<polyline fill-opacity="0" points="35,45 35,225 400,225 " stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.0pt" /><!-- 
+	Generated using the Perl SVG Module V2.32
+	by Ronan Oger
+	Info: http://www.roasp.com/
+ -->
+</svg>

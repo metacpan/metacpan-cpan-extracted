@@ -1,0 +1,574 @@
+=head1 NAME
+
+ShiftJIS::Regexp - regular expressions in Shift-JIS
+
+=head1 SYNOPSIS
+
+  use ShiftJIS::Regexp qw(:all);
+
+  match($string, '\p{Hiragana}{2}\p{Digit}{2}');
+  match($string, '\pH{2}\pD{2}');
+  # these two are equivalent:
+
+=head1 DESCRIPTION
+
+This module provides some functions to use regular expressions
+in Shift-JIS on the byte-oriented perl.
+
+The legal Shift-JIS character in this module must
+match the following regular expression:
+
+    [\x00-\x7F\xA1-\xDF]|[\x81-\x9F\xE0-\xFC][\x40-\x7E\x80-\xFC]
+
+Therefore this module can't handle the addition of single-byte characters
+(C<[\x80\xA0\xFD-\xFF]>) for MacOS Japanese.
+
+To avoid false matching in multibyte encoding, this module uses
+anchoring technique to ensure each matching position places at
+the character boundaries.
+cf. F<perlfaq6>, "How can I match strings with multibyte characters?"
+
+See also L<Avoiding Mismatching> below.
+
+=head2 Functions
+
+=over 4
+
+=item C<re(PATTERN)>
+
+=item C<re(PATTERN, MODIFIER)>
+
+Returns a regular expression parsable by the byte-oriented perl.
+
+C<PATTERN> is specified as a string. C<MODIFIER> is specified
+as a string. Modifiers in the following list are allowed.
+
+     i  case-insensitive pattern (only for ascii alphabets)
+     I  case-insensitive pattern (greek, cyrillic, fullwidth latin)
+     j  hiragana-katakana-insensitive pattern (but halfwidth katakana
+        are not considered.)
+
+     s  treat string as single line
+     m  treat string as multiple lines
+     x  ignore whitespace (i.e. [\x20\n\r\t\f]) unless backslashed
+        or inside a character class; but comments are not recognized!
+
+     o  once parsed (not compiled!) and the result is cached internally.
+
+B<C<o> modifier>
+
+     while (<DATA>) {
+        print replace($_, '(perl)', '<strong>$1</strong>', 'igo');
+     }
+        is more efficient than
+
+     while (<DATA>) {
+        print replace($_, '(perl)', '<strong>$1</strong>', 'ig');
+     }
+
+     because in the latter case the pattern is parsed every time
+     whenever the function is called.
+
+=item C<match(STRING, PATTERN)>
+
+=item C<match(STRING, PATTERN, MODIFIER)>
+
+An emulation of C<m//> operator aware of Shift-JIS.
+But, to emulate C<@list = $string =~ m/PATTERN/g>,
+the pattern should be parenthesized
+(capturing parentheses are not added automatically).
+
+    @list = match($string, '\pH', 'g'); # wrong; returns garbage!
+    @list = match($string,'(\pH)','g'); # good
+
+C<PATTERN> is specified as a string. C<MODIFIER> is specified as a string.
+
+     i,I,j,s,m,x,o   please see re().
+
+     g  match globally
+     z  tell the function the pattern matches an empty string
+           (sorry, due to the poor auto-detection)
+
+=item C<replace(STRING or SCALAR REF, PATTERN, REPLACEMENT)>
+
+=item C<replace(STRING or SCALAR REF, PATTERN, REPLACEMENT, MODIFIER)>
+
+An emulation of C<s///> operator but aware of Shift-JIS.
+
+If a reference to a scalar is specified as the first argument,
+substitutes the referent scalar and returns the number of substitutions made.
+If a string (not a reference) is specified as the first argument,
+returns the substituted string and the specified string is unaffected.
+
+C<MODIFIER> is specified as a string.
+
+     i,I,j,s,m,x,o   please see re().
+     g,z             please see match().
+
+=item C<jsplit(PATTERN or ARRAY REF of [PATTERN, MODIFIER], STRING)>
+
+=item C<jsplit(PATTERN or ARRAY REF of [PATTERN, MODIFIER], STRING, LIMIT)>
+
+An emulation of C<CORE::split> but aware of Shift-JIS.
+
+In scalar/void context, it does not split into the C<@_> array;
+in scalar context, only returns the number of fields found.
+
+C<PATTERN> is specified as a string. But C<' '> as C<PATTERN> has
+no special meaning; it splits the string on a single space similarly
+to C<CORE::split / />.
+
+When you want to split the string on whitespace, pass an undefined
+value as C<PATTERN> or use the C<splitspace()> function.
+
+    jsplit(undef, " \x81\x40 This  is \x81\x40 perl.");
+    splitspace(" \x81\x40 This  is \x81\x40 perl.");
+    # ('This', 'is', 'perl.')
+
+If you want to pass pattern with modifiers, specify an arrayref
+of C<[PATTERN, MODIFIER]> as the first argument. You can also
+use L<Embedded Modifiers>).
+
+C<MODIFIER> is specified as a string.
+
+     i,I,j,s,m,x,o   please see re().
+
+=item C<splitspace(STRING)>
+
+=item C<splitspace(STRING, LIMIT)>
+
+This function emulates C<CORE::split(' ', STRING, LIMIT)>. It returns
+a list given by split C<STRING> on whitespace including C<"\x81\x40">
+(IDEOGRAPHIC SPACE). Leading whitespace characters do not produce
+any field.
+
+B<Note:> C<splitspace(STRING, LIMIT)> is equivalent
+to C<jsplit(undef, STRING, LIMIT)>.
+
+=item C<splitchar(STRING)>
+
+=item C<splitchar(STRING, LIMIT)>
+
+This function emulates C<CORE::split(//, STRING, LIMIT)>.
+It returns a list given by split of C<STRING> into characters.
+
+B<Note:> C<splitchar(STRING, LIMIT)> is equivalent
+to C<jsplit('', STRING, LIMIT)>.
+
+=back
+
+=head2 Basic Regular Expressions
+
+   regexp          meaning
+
+   ^               match the start of the string
+                   match the start of any line with 'm' modifier
+
+   $               match the end of the string, or before newline at the end
+                   match the end of any line with 'm' modifier
+
+   .               match any character except \n
+                   match any character with 's' modifier
+
+   \A              only at beginning of string
+   \Z              at the end of the string, or before newline at the end
+   \z              only at the end of the string (eq. '(?!\n)\Z')
+
+   \C              match a single C char (octet), i.e. [\0-\xFF] in perl.
+   \j              match any character, i.e. [\0-\x{FCFC}] in this module.
+   \J              match any character except \n, i.e. [^\n] in this module.
+
+     * \j and \J are extensions by this module. e.g.
+
+        match($_, '(\j{5})\z') returns last five chars including \n at the end
+        match($_, '(\J{5})\Z') returns last five chars excluding \n at the end
+
+=head2 Metacharacters
+
+   \a              alarm      (BEL)
+   \b              backspace  (BS) * within character classes *
+   \e              escape     (ESC)
+   \f              form feed  (FF)
+   \n              newline    (LF)
+   \r              return     (CR)
+   \t              tab        (HT)
+   \0              null       (NUL)
+
+   \ooo            octal single-byte character
+   \xhh            hexadecimal single-byte character
+   \x{hhhh}        hexadecimal double-byte character
+   \c[             control character
+
+      e.g. \012 \123 \x5c \x5C \x{824F} \x{9Fae} \cA \cZ \c^ \c?
+
+=head2 Character Classes
+
+A character class can include literal characters, metacharacters,
+and predefined character classes.
+Ranges in character class are supported. The endpoints of a range
+are specified by literal characters or metacharacters.
+
+The order of Shift-JIS characters is:
+  C<0x00 .. 0x7F, 0xA1 .. 0xDF, 0x8140 .. 0x9FFC, 0xE040 .. 0xFCFC>.
+
+It is no need for users to be conscious of legal ranges of leading
+and trailing bytes in Shift-JIS, as this module properly skips
+illegal byte sequences when a character range is to be expanded.
+For example C<[\x{8340}-\x{8396}]> is equivalent to
+C<[\x{8340}-\x{837E}\x{8380}-\x{8396}]>, since C<0x7F> is illegal
+as the trailing byte in Shift-JIS.
+So C<[\0-\x{fcfc}]> matches any one Shift-JIS character.
+In character classes, any character or byte sequence that does not
+match any one Shift-JIS character (say, C<re('[\xA0-\xFF]')>) is croaked.
+
+Character classes that match non-Shift-JIS substring
+are not supported (use C<\C> or alternation).
+
+=head2 Character Equivalences
+
+Since the version 0.13,
+the POSIX character equivalence classes C<[=x=]> are supported,
+where x can be any character literal or meta chatacter
+(C<\xhh>, C<\x{hhhh}>) that belongs to the character equivalents can be used.
+have identical meanings.
+Character equivalence classes are used in a character class.
+
+A kana collation symbol which may be voiced/semi-voiced includes
+a sequence(s) of two characters of voiced/semi-voiced in halfwidth katakana.
+
+C<[[===]]> matches C<EQUALS SIGN> or C<FULLWIDTH EQUALS SIGN>; C<[[=[=]]>
+matches C<LEFT SQUARE BRACKET> or C<FULLWIDTH LEFT SQUARE BRACKET>; C<[[=]=]]>
+matches C<RIGHT SQUARE BRACKET> or C<FULLWIDTH RIGHT SQUARE BRACKET>;
+C<[[=\=]]> matches C<YEN SIGN> or C<FULLWIDTH YEN SIGN>.
+
+=head2 Predefined Character Classes
+
+   Normal        Abbrev.      POSIX            definition by characters and ranges
+
+   \d                                          [0-9]
+   \D                                          [^0-9]
+   \w                                          [0-9A-Z_a-z]
+   \W                                          [^0-9A-Z_a-z]
+   \s                                          [\t\n\r\f ]
+   \S                                          [^\t\n\r\f ]
+
+   \p{Xdigit}     \pX        [[:xdigit:]]      [0-9A-Fa-f]
+   \p{Digit}      \pD        [[:digit:]]       [0-9\x{824F}-\x{8258}]
+   \p{Upper}      \pU        [[:upper:]]       [A-Z\x{8260}-\x{8279}]
+   \p{Lower}      \pL        [[:lower:]]       [a-z\x{8281}-\x{829A}]
+   \p{Alpha}      \pA        [[:alpha:]]       [\p{Upper}\p{Lower}]
+   \p{Alnum}      \pQ        [[:alnum:]]       [\p{Alpha}\p{Digit}]
+
+   \p{Word}       \pW        [[:word:]]        [_\p{Digit}\p{European}\p{Kana}\p{Kanji}]
+   \p{Punct}      \pP        [[:punct:]]       [!-/:-@[-`{-~\xA1-\xA5\x{8141}-\x{8149}\x{814C}-\x{8151}
+                                                \x{815C}-\x{81AC}\x{81B8}-\x{81BF}\x{81C8}-\x{81CE}
+                                                \x{81DA}-\x{81E8}\x{81F0}-\x{81F7}\x{81FC}\x{849F}-\x{84BE}]
+   \p{Graph}      \pG        [[:graph:]]       [\p{Word}\p{Punct}]
+   \p{Print}      \pT        [[:print:]]       [\x20\x{8140}\p{Graph}]
+   \p{Space}      \pS        [[:space:]]       [\x20\x{8140}\x09-\x0D]
+   \p{Blank}      \pB        [[:blank:]]       [\x20\x{8140}\t]
+   \p{Cntrl}      \pC        [[:cntrl:]]       [\x00-\x1F\x7F]
+   \p{ASCII}                 [[:ascii:]]       [\x00-\x7F]
+
+   \p{Roman}      \pR        [[:roman:]]       [\x21-\x7E]
+   \p{Hankaku}    \pY        [[:hankaku:]]     [\xA1-\xDF]
+   \p{Zenkaku}    \pZ        [[:zenkaku:]]     [\x{8140}-\x{FCFC}]
+ ( \p{^Zenkaku}   \p^Z       [[:^zenkaku:]]    [\x00-\x7F\xA1-\xDF] )
+   \p{Halfwidth}             [[:halfwidth:]]   [!#$%&()*+,./0-9:;<=>?@A-Z\[\x5c\]^_`a-z{|}~]
+   \p{Fullwidth}  \pF        [[:fullwidth:]]   [\x{8143}\x{8144}\x{8146}-\x{8149}\x{814D}\x{814F}-\x{8151}
+                                                \x{815E}\x{8162}\x{8169}\x{816A}\x{816D}-\x{8170}\x{817B}
+                                                \x{8181}\x{8183}\x{8184}\x{818F}\x{8190}\x{8193}-\x{8197}
+                                                \x{824F}-\x{8258}\p{FullLatin}]
+
+   \p{X0201}                 [[:x0201:]]       [\x20-\x7F\xA1-\xDF]
+   \p{X0208}                 [[:x0208:]]       [\x{8140}-\x{81AC}\x{81B8}-\x{81BF}\x{81C8}-\x{81CE}
+                                                \x{81DA}-\x{81E8}\x{81F0}-\x{81F7}\x{81FC}\x{824F}-\x{8258}
+                                                \p{FullLatin}\x{829F}-\x{82F1}\x{8340}-\x{8396}
+                                                \p{Greek}\p{Cyrillic}\p{BoxDrawing}\p{Kanji1}\p{Kanji2}]
+   \p{X0211}                 [[:x0211:]]       [\x00-\x1F]
+   \p{JIS}        \pJ        [[:jis:]]         [\p{X0201}\p{X0208}\p{X0211}]
+
+   \p{NEC}        \pN        [[:nec:]]         [\x{8740}-\x{875D}\x{875F}-\x{8775}\x{877E}-\x{879C}
+                                                \x{ED40}-\x{EEEC}\x{EEEF}-\x{EEFC}]
+   \p{IBM}        \pI        [[:ibm:]]         [\x{FA40}-\x{FC4B}]
+   \p{Vendor}     \pV        [[:vendor:]]      [\p{NEC}\p{IBM}]
+   \p{MSWin}      \pM        [[:mswin:]]       [\p{JIS}\p{Vendor}]
+
+   \p{Latin}                 [[:latin:]]       [A-Za-z]
+   \p{FullLatin}             [[:fulllatin:]]   [\x{8260}-\x{8279}\x{8281}-\x{829A}]
+   \p{Greek}                 [[:greek:]]       [\x{839F}-\x{83B6}\x{83BF}-\x{83D6}]
+   \p{Cyrillic}              [[:cyrillic:]]    [\x{8440}-\x{8460}\x{8470}-\x{8491}]
+   \p{European}   \pE        [[:european:]]    [\p{Latin}\p{FullLatin}\p{Greek}\p{Cyrillic}]
+
+   \p{HalfKana}              [[:halfkana:]]    [\xA6-\xDF]
+   \p{Hiragana}   \pH        [[:hiragana:]]    [\x{829F}-\x{82F1}\x{814A}\x{814B}\x{8154}\x{8155}]
+   \p{Katakana}   \pK        [[:katakana:]]    [\x{8340}-\x{8396}\x{815B}\x{8152}\x{8153}]
+   \p{FullKana}              [[:fullkana:]]    [\p{Hiragana}\p{Katakana}]
+   \p{Kana}                  [[:kana:]]        [\p{HalfKana}\p{FullKana}]
+   \p{Kanji0}     \p0        [[:kanji0:]]      [\x{8156}-\x{815A}]
+   \p{Kanji1}     \p1        [[:kanji1:]]      [\x{889F}-\x{9872}]
+   \p{Kanji2}     \p2        [[:kanji2:]]      [\x{989F}-\x{EAA4}]
+   \p{Kanji}                 [[:kanji:]]       [\p{Kanji0}\p{Kanji1}\p{Kanji2}]
+   \p{BoxDrawing}            [[:boxdrawing:]]  [\x{849F}-\x{84BE}]
+
+=over 4
+
+=item *
+
+C<\p{Halfwidth}> matches an ASCII graphic character excluding
+C<QUOTATION MARK>, C<APOSTROPHE>, and C<HYPHEN-MINUS>.
+C<\p{Fullwidth}> matches a double-byte character corresponding
+to C<\p{Halfwidth}>.  Note: the C<\p{Fullwidth}> character for
+C<0x5C> (C<\>) is C<FULLWIDTH YEN SIGN> and that for C<0x7E> (C<~>)
+is C<FULLWIDTH MACRON>.
+
+=item *
+
+C<\p{MSWin}> matches a character of Microsoft CP932.
+C<\p{NEC}> matches an NEC special character or an NEC-selected
+IBM extended character.
+C<\p{IBM}> matches an IBM extended character.
+C<\p{Vendor}> matches a character of vendor-defined characters
+in Microsoft CP932, i.e. equivalent to C<[\p{NEC}\p{IBM}]>.
+
+=item *
+
+C<\p{Kanji0}> matches a kanji of the minimum kanji class of JIS X 4061;
+C<\p{Kanji1}> matches a kanji of the level 1 kanji of JIS X 0208;
+C<\p{Kanji2}> matches a kanji of the level 2 kanji of JIS X 0208;
+C<\p{Kanji}> matches a kanji of the basic kanji class of JIS X 4061.
+
+=item *
+
+C<\p{Prop}>, C<\P{^Prop}>, C<[\p{Prop}]>, etc. are equivalent to each other;
+and their complements are C<\P{Prop}>, C<\p{^Prop}>, C<[\P{Prop}]>,
+C<[^\p{Prop}]>, etc.
+C<\pP>, C<\P^P>, C<[\pP]>, etc. are equivalent to each other;
+and their complements are C<\PP>, C<\p^P>, C<[\PP]>, C<[^\pP]>, etc.
+C<[[:class:]]> is equivalent to C<[^[:^class:]]>;
+and their complements are C<[[:^class:]]> or C<[^[:class:]]>.
+
+=item *
+
+In C<\p{Prop}>, C<\P{Prop}>, C<[:class:]> expressions,
+C<Prop> and C<class> are case-insensitive.
+E.g. C<\p{digit}>, C<[:BoxDrawing:]>, etc. are also accepted.
+Prefixes C<Is> and C<In> for C<\p{Prop}> and C<\P{Prop}>
+(e.g. C<\p{IsProp}>, C<\P{InProp}>, etc.) are optional.
+But C<\p{isProp}>, C<\p{ISProp}>, etc. are not ok,
+since the prefixes C<Is> and C<In> are B<not> case-insensitive.
+
+=back
+
+=head2 Examples of Character Classes
+
+=over 4
+
+=item Kanji
+
+   Level 1 and 2 kanji by JIS X 0208:1997;   [\x{889F}-\x{9872}\x{989F}-\x{EAA4}]
+   Level 3 kanji by JIS X 0213:2004; [\x{879F}-\x{889E}\x{9873}-\x{989E}\x{EAA5}-\x{EFFC}]
+   Level 4 kanji by JIS X 0213:2004;         [\x{F040}-\x{FCF4}]
+   Level 1 to 3 kanji by JIS X 0213:2004;    [\x{879F}-\x{EFFC}]
+   Level 1 to 4 kanji by JIS X 0213:2004;    [\x{879F}-\x{FCF4}]
+   Kanji in NEC-selected IBM extended chars; [\x{ED40}-\x{EEEC}]
+   Kanji in IBM extended characters;         [\x{FA5C}-\x{FC4B}]
+
+=item JIS X 0213:2004
+
+   Assigned;       [\x{8140}-\x{82F9}\x{8340}-\x{84DC}\x{84E5}-\x{84FA}
+                    \x{8540}-\x{86F1}\x{86FB}-\x{8776}\x{877E}-\x{878F}
+                    \x{8793}\x{8798}\x{8799}\x{879D}-\x{FCF4}]
+
+   Unassigned;     [\x{82FA}-\x{82FC}\x{84DD}-\x{84E4}\x{84FB}\x{84FC}
+                    \x{86F2}-\x{86FA}\x{8777}-\x{877D}\x{8790}-\x{8792}
+                    \x{8794}-\x{8797}\x{879A}-\x{879C}\x{FCF5}-\x{FCFC}]
+
+   Assigned (plain 1);   [\x{8140}-\x{82F9}\x{8340}-\x{84DC}\x{84E5}-\x{84FA}
+                          \x{8540}-\x{86F1}\x{86FB}-\x{8776}\x{877E}-\x{878F}
+                          \x{8793}\x{8798}\x{8799}\x{879D}-\x{EFFC}]
+
+   Unassigned (plain 1); [\x{82FA}-\x{82FC}\x{84DD}-\x{84E4}\x{84FB}\x{84FC}
+                          \x{86F2}-\x{86FA}\x{8777}-\x{877D}\x{8790}-\x{8792}
+                          \x{8794}-\x{8797}\x{879A}-\x{879C}]
+
+   Addition in 2004;  [\x{879F}\x{889E}\x{9873}\x{989E}\x{EAA5}\x{EFF8}-\x{EFFC}]
+
+=item User-defined characters
+
+   Windows CP-932:   [\x{F040}-\x{F9FC}]
+   MacOS Japanese:   [\x{F040}-\x{FCFC}]
+
+=item Circled Digits and Numbers
+
+   Circled 1-50 by JIS X 0213;             [\x{8740}-\x{8753}\x{84BF}-\x{84DC}]
+   Circled 1-20 in NEC special chars;      [\x{8740}-\x{8753}]
+   Circled 1-20 in MacOS Japanese;         [\x{8540}-\x{8553}]
+   Double Circled 1-10 by JIS X 0213;      [\x{83D8}-\x{83E1}]
+   Negative Circled 1-20 by JIS X 0213;    [\x{869F}-\x{86B2}]
+   Negative Circled 1-9 in MacOS Japanese; [\x{857C}-\x{8585}]
+
+=item Roman Numerals
+
+   Capital I-XII by JIS X 0213;                  [\x{8754}-\x{875E}\x{8776}]
+   Capital I-X in NEC special chars;             [\x{8754}-\x{875D}]
+   Capital I-X in IBM extended characters;       [\x{FA4A}-\x{FA53}]
+   Capital I-XV in MacOS Japanese;               [\x{859F}-\x{85AD}]
+   Small i-xii by JIS X 0213;                    [\x{86B3}-\x{86BE}]
+   Small i-x in NEC-selected IBM extended chars; [\x{EEEF}-\x{EEF8}]
+   Small i-x in IBM extended characters;         [\x{FA40}-\x{FA49}]
+   Small i-xv in MacOS Japanese;                 [\x{85B3}-\x{85C1}]
+
+=item Double-Byte Characters for ASCII Graphic Characters
+
+   JIS X 0213;      [\x{8149}\x{81AE}\x{8194}\x{8190}\x{8193}\x{8195}\x{81AD}
+                     \x{8169}\x{816A}\x{8196}\x{817B}\x{8143}\x{81AF}\x{8144}
+                     \x{815E}\x{824F}-\x{8258}\x{8146}\x{8147}\x{8183}\x{8181}
+                     \x{8184}\x{8148}\x{8197}\x{8260}-\x{8279}\x{816D}\x{815F}
+                     \x{816E}\x{814F}\x{8151}\x{814D}\x{8281}-\x{829A}\x{816F}
+                     \x{8162}\x{8170}\x{81B0}]
+
+   Windows CP-932;  [\x{8149}\x{FA57}\x{8194}\x{8190}\x{8193}\x{8195}\x{FA56}
+                     \x{8169}\x{816A}\x{8196}\x{817B}\x{8143}\x{817C}\x{8144}
+                     \x{815E}\x{824F}-\x{8258}\x{8146}\x{8147}\x{8183}\x{8181}
+                     \x{8184}\x{8148}\x{8197}\x{8260}-\x{8279}\x{816D}\x{815F}
+                     \x{816E}\x{814F}\x{8151}\x{814D}\x{8281}-\x{829A}\x{816F}
+                     \x{8162}\x{8170}\x{8160}]
+
+Note: here, the character for ASCII C<0x5C> is C<REVERSE SOLIDUS> (or
+C<FULLWIDTH REVERSE SOLIDUS>) and the character for ASCII C<0x7E> is
+C<TILDE> (or C<FULLWIDTH TILDE>).
+
+=back
+
+=head2 Code Embedded in a Regular Expression (Perl 5.005 or later)
+
+Parsing C<(?{ ... })> or C<(??{ ... })> assertions is carried out
+without any special care of double-byte characters.
+
+C<(?{ ... })> or C<(??{ ... })> assertions are disallowed
+in C<match()> or C<replace()> function by perl due to security concerns.
+Use them via C<re()> function inside your scope.
+
+=head2 Embedded Modifiers
+
+Since version 0.15, embedded modifiers are extended.
+
+An embedded modifier, C<(?iIjsmxo)>, that appears at the beginning
+of the 'regexp' or that follows one of regular expressions C<^>, C<\A>,
+or C<\G> at the beginning of the 'regexp' is allowed to contain
+C<I>, C<j>, C<o> modifiers.
+
+    e.g. (?sm)pattern  ^(?i)pattern  \G(?j)pattern  \A(?ijo)pattern
+
+=head2 Avoiding Mismatching
+
+Using 'e' modifier in replacement or looping in a C<while>-clause
+are not supported by this module. They can be used only via a usual syntax
+(i.e. in C<m//> or C<s///> operators).
+
+Use a regular expression C<'\A(\j*?)'> or C<'\G(\j*?)'>, to avoid
+mismatching a single-byte character on a trailing byte of a double-byte
+character, or a double-byte character on two bytes before and after
+a character boundary.
+
+Don't forget C<$1> corresponds to C<'(\j*?)'>
+and backreferences intended to use begin from C<$2>.
+
+B<Note:> If matching on a very long string, a special regular expression
+C<\R{padG}> may be safer than C<\G(\j*?)> as the former has a lower
+probability of that the repeating count of C<*> would overflow a limit.
+
+=head1 CAVEATS
+
+A legal Shift-JIS character in this module
+must match the following regular expression:
+
+   [\x00-\x7F\xA1-\xDF]|[\x81-\x9F\xE0-\xFC][\x40-\x7E\x80-\xFC]
+
+Any string from external resource should be checked by the function
+C<ShiftJIS::String::issjis()>, excepting you know it is surely encoded
+in Shift-JIS.
+
+Use of an illegal Shift-JIS string may lead to odd results.
+
+Some Shift-JIS double-byte characters have a trailing byte
+in the range of C<[\x40-\x7E]>, viz.,
+
+   @ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~
+
+The Perl's lexical analyzer doesn't take any care to these characters,
+so they sometimes make trouble.
+For example, the quoted literal ending with a double-byte character
+whose trailing byte is C<0x5C> causes a B<fatal error>,
+since the trailing byte C<0x5C> backslashes the closing quote.
+
+Such a problem doesn't arise when the string is gotten from
+any external resource.
+But writing the script containing Shift-JIS
+double-byte characters needs the greatest care.
+
+The use of single-quoted heredoc, C<E<lt>E<lt> ''>,
+or C<\xhh> meta characters is recommended
+in order to define a Shift-JIS string literal.
+
+The safe ASCII-graphic characters, C<[\x21-\x3F]>, are:
+
+   !"#$%&'()*+,-./0123456789:;<=>?
+
+They are preferred as the delimiter of quote-like operators.
+
+=head1 BUGS
+
+=over 4
+
+=item *
+
+The C<\U>, C<\L>, C<\Q>, C<\E>, and interpolation are not considered.
+If necessary, use them in C<""> (or C<qq//>) operators in the argument list.
+
+=item *
+
+The regular expressions of the word boundary,
+C<\b> and C<\B>, don't work correctly.
+
+=item *
+
+The C<i>, C<I> and C<j> modifiers are invalid to C<\p{}>, C<\P{}>,
+and POSIX C<[: :]> (e.g. C<\p{Lower}>, C<[:lower:]>, etc).
+So use C<re('\p{Alpha}')> instead of C<re('\p{IsLower}', 'iI')>.
+
+=item *
+
+The look-behind assertion like C<(?<=[A-Z])> is not prevented from matching
+trail byte of the previous double byte character.
+
+=item *
+
+Use of not greedy regular expressions, which can match empty string,
+such as C<.??> and C<\d*?>, as the PATTERN in C<jsplit()>,
+may cause failure to the emulation of C<CORE::split>.
+
+=back
+
+=head1 AUTHOR
+
+SADAHIRO Tomoyuki <SADAHIRO@cpan.org>
+
+Copyright(C) 2001-2012, SADAHIRO Tomoyuki. Japan. All rights reserved.
+
+This module is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<ShiftJIS::String>
+
+=item L<ShiftJIS::Collate>
+
+=back
+
+=cut
+

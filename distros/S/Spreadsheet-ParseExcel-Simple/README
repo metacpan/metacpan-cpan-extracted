@@ -1,0 +1,83 @@
+NAME
+    Spreadsheet::ParseExcel::Simple - A simple interface to Excel data
+
+SYNOPSIS
+      my $xls = Spreadsheet::ParseExcel::Simple->read('spreadsheet.xls');
+      foreach my $sheet ($xls->sheets) {
+         while ($sheet->has_data) {  
+             my @data = $sheet->next_row;
+         }
+      }
+
+DESCRIPTION
+    This provides an abstraction to the Spreadsheet::ParseExcel module for
+    simple reading of values.
+
+    You simply loop over the sheets, and fetch rows to arrays.
+
+    For anything more complex, you probably want to use
+    Spreadsheet::ParseExcel directly.
+
+BOOK METHODS
+  read
+      my $xls = Spreadsheet::ParseExcel::Simple->read('spreadsheet.xls');
+
+    This opens the spreadsheet specified for you. Returns undef if we cannot
+    read the book.
+
+  sheets
+      @sheets = $xls->sheets;
+
+    Each spreadsheet can contain one or more worksheets. This fetches them
+    all back. You can then iterate over them, or jump straight to the one
+    you wish to play with.
+
+  book
+            my $book = $xls->book;
+
+    The Spreadsheet::ParseExcel object we are working with. You can use this
+    if you need to manipulate it in ways that this interface doesn't allow.
+
+SHEET METHODS
+    These methods can be called on each sheet returned from $xls->sheets:
+
+  has_data
+      if ($sheet->has_data) { ... }
+
+    This lets us know if there are more rows in this sheet that we haven't
+    read yet. This allows us to differentiate between an empty row, and the
+    end of the sheet.
+
+  next_row
+      my @data = $sheet->next_row;
+
+    Fetch the next row of data back.
+
+  sheet
+            my $obj = $sheet->sheet;
+
+    The underlying Spreadsheet::ParseExcel object for the worksheet. You can
+    use this if you need to manipulate it in ways that this interface
+    doesn't allow (e.g. asking it for the sheet's name).
+
+AUTHOR
+    Tony Bowden
+
+BUGS and QUERIES
+    Please direct all correspondence regarding this module to:
+    bug-Spreadsheet-ParseExcel-Simple@rt.cpan.org
+
+COPYRIGHT AND LICENSE
+      Copyright (C) 2001-2005 Tony Bowden.
+
+      This program is free software; you can redistribute it and/or modify it under
+      the terms of the GNU General Public License; either version 2 of the License,
+      or (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful, but WITHOUT
+      ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+      FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+    Spreadsheet::ParseExcel.
+

@@ -1,0 +1,103 @@
+SYNOPSIS
+
+    Suppose you have a CLI named process-users that accepts some
+    command-line options and arguments. To add tab completion for
+    process-users, write _process-users as follows:
+
+     #!/usr/bin/env perl
+     use Shell::Completer;
+     declare_completer(
+         options => {
+             'help|h'     => undef,               # no completion, no option value
+             'verbose!'   => undef,               #
+             'on-fail=s'  => ['skip', 'die'],     # complete from a list of words
+             'template=s' => _file(file_ext_filter=>['tmpl', 'html']),
+                                                  # complete from *.tmpl or *.html files
+             '<>'         => _user(),             # complete from list of users
+         },
+     );
+
+    Install it (on bash):
+
+     % complete -C _process-users process-users
+
+    or use shcompgen.
+
+    Now you can do completion for process-users:
+
+     % process-users -on<tab>
+     % process-users --on-fail _
+    
+     % process-users --on-fail <tab>
+     die     skip
+     % process-users --on-fail s<tab>
+     % process-users --on-fail skip _
+    
+     % process-users b<tab>
+     bob     bobby
+
+DESCRIPTION
+
+    EARLY RELEASE, EXPERIMENTAL.
+
+    This module lets you easily add shell tab completion to an existing CLI
+    program.
+
+FUNCTIONS
+
+ declare_completer(%args)
+
+COMPLETION FUNCTIONS
+
+    All these functions accept a hash argument.
+
+ _dir
+
+    Complete from directories. See Complete::File's complete_dir for more
+    details.
+
+ _file
+
+    Complete from files. See Complete::File's complete_file for more
+    details.
+
+ _gid
+
+    Complete from list of Unix GID's. See Complete::Unix's complete_gid for
+    more details.
+
+ _group
+
+    Complete from list of Unix group names. See Complete::Unix's
+    complete_group for more details.
+
+ _uid
+
+    Complete from list of Unix UID's. See Complete::Unix's complete_uid for
+    more details.
+
+ _pid
+
+    Complete from list of running PID's. See Complete::Unix's complete_pid
+    for more details.
+
+ _user
+
+    Complete from list of Unix user names. See Complete::Unix's
+    complete_user for more details.
+
+TODOS AND IDEAS
+
+    Add more completion functions.
+
+    Override | operator to combine answers, e.g.:
+
+     'user|U=s' => _user() | _uid(),
+
+SEE ALSO
+
+    Getopt::Long::Complete if you want to write a CLI program that can
+    complete itself.
+
+    shcompgen from App::shcompgen.
+

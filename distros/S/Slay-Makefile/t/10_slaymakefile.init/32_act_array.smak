@@ -1,0 +1,12 @@
+include common.smakh
+
+{
+    $ENV{FILE} = $FILE = "32_act_array";
+}
+
+default:   depend1 depend2 depend3
+	{ @OUTPUT = `cat $FILE.trace`;
+        trace(@_) }
+
+depend%:   my_prereq% your_prereq%
+        ['sh', '-c', 'echo "Building $TARGET with deps ($DEP0, $DEP1) and match ($MATCH0)" >> $FILE.trace']
